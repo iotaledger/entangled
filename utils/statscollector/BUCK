@@ -1,0 +1,8 @@
+cxx_binary(
+    name='statscollector',
+    srcs=['statscollector.cpp'],
+    deps=[
+        '//external/rxcpp:rxcpp',
+        '//external/influxdb-cpp-rest:influxdb-cpp',
+        '//external/cppzmq:cppzmq',
+    ])
