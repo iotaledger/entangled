@@ -1,21 +1,30 @@
 [submodule "external/rxcpp"]
-	path = external/rxcpp/rxcpp
+	path = third-party/rxcpp/rxcpp
 	url = https://github.com/Reactive-Extensions/RxCpp.git
 [submodule "external/cpprestsdk/cpprestsdk"]
-	path = external/cpprestsdk/cpprestsdk
+	path = third-party/cpprestsdk/cpprestsdk
 	url = https://github.com/Microsoft/cpprestsdk.git
 [submodule "external/influxdb-cpp-rest/influxdb-cpp-rest"]
-	path = external/influxdb-cpp-rest/influxdb-cpp-rest
+	path = third-party/influxdb-cpp-rest/influxdb-cpp-rest
 	url = https://github.com/d-led/influxdb-cpp-rest.git
 [submodule "external/fmt/fmt"]
-	path = external/fmt/fmt
+	path = third-party/fmt/fmt
 	url = https://github.com/fmtlib/fmt.git
 [submodule "external/libzmq/libzmq"]
-	path = external/libzmq/libzmq
+	path = third-party/libzmq/libzmq
 	url = https://github.com/zeromq/libzmq.git
 [submodule "external/cppzmq/cppzmq"]
-	path = external/cppzmq/cppzmq
+	path = third-party/cppzmq/cppzmq
 	url = https://github.com/zeromq/cppzmq.git
 [submodule "external/libsodium/libsodium"]
-	path = external/libsodium/libsodium
+	path = third-party/libsodium/libsodium
 	url = https://github.com/jedisct1/libsodium.git
+[submodule "third-party/google/googletest"]
+	path = third-party/google/googletest/googletest
+	url = https://github.com/google/googletest.git
+[submodule "third-party/google/gflags"]
+	path = third-party/google/gflags/gflags
+	url = https://github.com/gflags/gflags.git
+[submodule "third-party/google/glog"]
+	path = third-party/google/glog/glog
+	url = https://github.com/google/glog.git

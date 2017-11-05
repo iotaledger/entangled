@@ -1,0 +1,5 @@
+[cxx]
+  cppflags = -Wall
+  cflags = -Wall
+  gtest_dep = //third-party/google/googletest:gtest
+   
