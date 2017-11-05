@@ -1,8 +1,22 @@
+cxx_library(
+    name='shared',
+    header_namespace='statscollector',
+    compiler_flags=['-std=c++17'],
+    exported_headers=subdir_glob([('shared', '*.hpp')]),
+    srcs=['shared/iri.cpp'])
+
 cxx_binary(
     name='statscollector',
     srcs=['statscollector.cpp'],
     deps=[
-        '//external/rxcpp:rxcpp',
-        '//external/influxdb-cpp-rest:influxdb-cpp',
-        '//external/cppzmq:cppzmq',
+        ':shared',
+        '//third-party/rxcpp:rxcpp',
+        '//third-party/influxdb-cpp-rest:influxdb-cpp',
+        '//third-party/cppzmq:cppzmq',
     ])
+
+cxx_test(
+    name='iri-test',
+    srcs=['tests/iri.cpp'],
+    deps=[':shared'],
+    compiler_flags=['-std=c++17'], )
