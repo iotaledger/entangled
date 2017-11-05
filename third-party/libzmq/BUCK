@@ -98,29 +98,36 @@ MACOS_PLATFORM_HPP = """
 """
 
 genrule(
-  name = 'macos-platform.hpp',
-  out = 'platform.hpp',
-  cmd = 'echo "' + MACOS_PLATFORM_HPP + '" > $OUT',
-)
+    name='macos-platform.hpp',
+    out='platform.hpp',
+    cmd='echo "' + MACOS_PLATFORM_HPP + '" > $OUT', )
 
 cxx_library(
-  name = 'libzmq',
-  header_namespace = '',
-  exported_headers = subdir_glob([
-    ('libzmq/include', '*.h'),
-  ]),
-  exported_platform_headers = [
-    ('default', { 'platform.hpp': ':macos-platform.hpp' }),
-    ('^macos.*', { 'platform.hpp': ':macos-platform.hpp' }),
-  ],
-  headers = subdir_glob([
-    ('libzmq/src', '*.hpp'),
-  ]),
-  srcs = glob([
-    'libzmq/src/*.cpp',
-  ]),
-  visibility = [
-    'PUBLIC',
-  ],
-  deps = ['//external/libsodium:libsodium', '//external:pthread'],
-)
+    name='libzmq',
+    header_namespace='',
+    exported_headers=subdir_glob([
+        ('libzmq/include', '*.h'),
+    ]),
+    exported_platform_headers=[
+        ('default', {
+            'platform.hpp': ':macos-platform.hpp'
+        }),
+        ('^macos.*', {
+            'platform.hpp': ':macos-platform.hpp'
+        }),
+    ],
+    headers=subdir_glob([
+        ('libzmq/src', '*.hpp'),
+    ]),
+    srcs=glob([
+        'libzmq/src/*.cpp',
+    ]),
+    visibility=[
+        'PUBLIC',
+    ],
+    deps=['//third-party/libsodium:libsodium'],
+    exported_platform_linker_flags=[
+        ('default', ['-lpthread']),
+        ('^linux.*', ['-lpthread']),
+        ('^macos.*', []),
+    ], )

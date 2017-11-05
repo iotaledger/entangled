@@ -1,0 +1,62 @@
+cxx_library(
+    name='gtest',
+    header_namespace='',
+    srcs=[
+        'googletest/googletest/src/gtest-all.cc',
+        'googletest/googletest/src/gtest_main.cc',
+    ],
+    headers=subdir_glob([
+        ('googletest/googletest', 'src/*.h'),
+        ('googletest/googletest', 'src/*.cc'),
+        ('googletest/googletest/include', 'internal/**/*.h'),
+    ]),
+    exported_headers=subdir_glob(
+        [
+            ('googletest/googletest/include', '**/*.h'),
+        ],
+        excludes=[
+            'googletest/googletest/include/internal/**/*.h',
+        ]),
+    preprocessor_flags=[
+        '-U_STRICT_ANSI_',
+    ],
+    compiler_flags=[
+        '-std=c++14',
+    ],
+    exported_platform_linker_flags=[
+        ('default', ['-lpthread']),
+        ('^linux.*', ['-lpthread']),
+        ('^macos.*', []),
+    ],
+    visibility=[
+        'PUBLIC',
+    ], )
+
+cxx_library(
+    name='gmock',
+    header_namespace='',
+    srcs=[
+        'googletest/googlemock/src/gmock-all.cc',
+        'googletest/googlemock/src/gmock_main.cc',
+    ],
+    headers=subdir_glob([
+        ('googletest/googlemock', 'src/*.h'),
+        ('googletest/googlemock', 'src/*.cc'),
+        ('googletest/googlemock/include', 'internal/**/*.h'),
+    ]),
+    exported_headers=subdir_glob(
+        [
+            ('googletest/googlemock/include', '**/*.h'),
+        ],
+        excludes=[
+            'googletest/googlemock/include/internal/**/*.h',
+        ]),
+    preprocessor_flags=[
+        '-U_STRICT_ANSI_',
+    ],
+    compiler_flags=[
+        '-std=c++14',
+    ],
+    visibility=[
+        'PUBLIC',
+    ], )

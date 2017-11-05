@@ -8,5 +8,5 @@ prebuilt_cxx_library(
   visibility = [
     'PUBLIC',
   ],
-  deps = ['//external/libzmq:libzmq']
+  deps = ['//third-party/libzmq:libzmq']
 )

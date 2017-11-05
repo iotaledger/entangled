@@ -2,8 +2,8 @@ BASE = 'influxdb-cpp-rest/src'
 cxx_library(
     name='influxdb-cpp',
     deps=[
-        '//external/cpprestsdk:cpprest', '//external/fmt:fmt',
-        '//external/rxcpp:rxcpp'
+        '//third-party/cpprestsdk:cpprest', '//third-party/fmt:fmt',
+        '//third-party/rxcpp:rxcpp'
     ],
     header_namespace='influxdb',
     exported_headers=subdir_glob([(BASE + '/influxdb-cpp-rest',

@@ -1,0 +1,78 @@
+def merge_dicts(x, y):
+    z = x.copy()
+    z.update(y)
+    return z
+
+
+genrule(
+    name='configure',
+    out='out',
+    srcs=glob([
+        'glog/README',
+        'glog/install-sh',
+        'glog/config.guess',
+        'glog/config.sub',
+        'glog/missing',
+        'glog/Makefile.in',
+        'glog/ltmain.sh',
+        'glog/libglog.pc.in',
+        'glog/src/config.h.in',
+        'glog/src/glog/logging.h.in',
+        'glog/src/glog/raw_logging.h.in',
+        'glog/src/glog/stl_logging.h.in',
+        'glog/src/glog/vlog_is_on.h.in',
+        'glog/configure',
+    ]),
+    cmd=
+    'cp -r $SRCDIR $OUT && cd $OUT && mv glog/* . && chmod +x ./configure && ./configure',
+)
+
+genrule(
+    name='config.h',
+    out='config.h',
+    cmd='cp $(location :configure)/src/config.h $OUT', )
+
+genrule(
+    name='logging.h',
+    out='logging.h',
+    cmd='cp $(location :configure)/src/glog/logging.h $OUT', )
+
+genrule(
+    name='vlog_is_on.h',
+    out='vlog_is_on.h',
+    cmd='cp $(location :configure)/src/glog/vlog_is_on.h $OUT', )
+
+genrule(
+    name='raw_logging.h',
+    out='raw_logging.h',
+    cmd='cp $(location :configure)/src/glog/raw_logging.h $OUT', )
+
+cxx_library(
+    name='glog',
+    header_namespace='',
+    deps = ['//third-party/google/gflags:gflags'],
+    exported_headers=merge_dicts({
+        'glog/logging.h': ':logging.h',
+        'glog/vlog_is_on.h': ':vlog_is_on.h',
+        'glog/raw_logging.h': ':raw_logging.h',
+    }, subdir_glob([
+        ('glog/src', 'glog/**/*.h'),
+    ])),
+    headers={
+        'config.h': ':config.h',
+    },
+    srcs=[
+        'glog/src/demangle.cc',
+        'glog/src/raw_logging.cc',
+        'glog/src/signalhandler.cc',
+        'glog/src/symbolize.cc',
+        'glog/src/logging.cc',
+        'glog/src/utilities.cc',
+        'glog/src/vlog_is_on.cc',
+    ],
+    exported_platform_linker_flags=[
+        ('^linux.*', ['-pthread']),
+    ],
+    visibility=[
+        'PUBLIC',
+    ])
