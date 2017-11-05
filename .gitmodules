@@ -1,0 +1,21 @@
+[submodule "external/rxcpp"]
+	path = external/rxcpp/rxcpp
+	url = https://github.com/Reactive-Extensions/RxCpp.git
+[submodule "external/cpprestsdk/cpprestsdk"]
+	path = external/cpprestsdk/cpprestsdk
+	url = https://github.com/Microsoft/cpprestsdk.git
+[submodule "external/influxdb-cpp-rest/influxdb-cpp-rest"]
+	path = external/influxdb-cpp-rest/influxdb-cpp-rest
+	url = https://github.com/d-led/influxdb-cpp-rest.git
+[submodule "external/fmt/fmt"]
+	path = external/fmt/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "external/libzmq/libzmq"]
+	path = external/libzmq/libzmq
+	url = https://github.com/zeromq/libzmq.git
+[submodule "external/cppzmq/cppzmq"]
+	path = external/cppzmq/cppzmq
+	url = https://github.com/zeromq/cppzmq.git
+[submodule "external/libsodium/libsodium"]
+	path = external/libsodium/libsodium
+	url = https://github.com/jedisct1/libsodium.git

@@ -1,0 +1,11 @@
+cxx_library(
+    name='fmt',
+    header_namespace='fmt',
+    exported_headers=subdir_glob([('fmt/fmt', '*.h')]),
+    srcs=[
+        'fmt/fmt/format.cc',
+        'fmt/fmt/ostream.cc',
+        'fmt/fmt/posix.cc',
+        'fmt/fmt/printf.cc',
+    ],
+    visibility=['PUBLIC'])

@@ -1,0 +1,96 @@
+SBASE = 'cpprestsdk/Release/src'
+HBASE = 'cpprestsdk/Release/include'
+
+prebuilt_cxx_library(
+    name='headers',
+    header_namespace='cpprest',
+    header_only=True,
+    exported_headers=subdir_glob([(HBASE + '/cpprest', '**/*.h*'),
+                                  (HBASE + '/cpprest', '**/*.hpp'),
+                                  (HBASE + '/cpprest', 'details/*.dat')]))
+
+prebuilt_cxx_library(
+    name='stdafx',
+    deps=[':headers'],
+    header_only=True,
+    header_namespace='',
+    exported_headers={'stdafx.h': SBASE + '/pch/stdafx.h'})
+
+cxx_library(
+    name='pplx',
+    deps=[':stdafx'],
+    header_namespace='pplx',
+    headers=subdir_glob([(HBASE + '/pplx', '*.h')]),
+    exported_headers=subdir_glob([(HBASE + '/pplx', '*.h')]),
+    srcs=[SBASE + '/pplx/pplx.cpp', SBASE + '/pplx/threadpool.cpp'],
+    platform_srcs=[
+        ('.*default.*$', [SBASE + '/pplx/pplxlinux.cpp']),
+        ('.*arwin.*$', [SBASE + '/pplx/pplxapple.cpp']),
+        ('.*indows.*$', [SBASE + '/pplx/pplxwin.cpp']),
+    ])
+
+cxx_library(
+    name='json',
+    deps=[':stdafx', ':pplx'],
+    srcs=[
+        SBASE + '/json/json.cpp',
+        SBASE + '/json/json_parsing.cpp',
+        SBASE + '/json/json_serialization.cpp',
+    ])
+
+cxx_library(
+    name='streams',
+    deps=[':stdafx', ':pplx'],
+    platform_srcs=[
+        ('.*default.*$', [SBASE + '/streams/fileio_posix.cpp']),
+        ('.*winrt*$', [SBASE + '/streams/fileio_winrt.cpp']),
+        ('.*win32.*$', [SBASE + '/streams/fileio_win32.cpp']),
+    ])
+
+cxx_library(
+    name='uri',
+    deps=[':stdafx', ':pplx'],
+    srcs=[
+        SBASE + '/uri/uri_builder.cpp', SBASE + '/uri/uri.cpp',
+        SBASE + '/uri/uri_parser.cpp'
+    ])
+
+cxx_library(
+    name='utilities',
+    deps=[':stdafx', ':pplx'],
+    srcs=[
+        SBASE + '/utilities/base64.cpp',
+        SBASE + '/utilities/asyncrt_utils.cpp',
+        SBASE + '/utilities/web_utilities.cpp'
+    ])
+
+cxx_library(
+    name='http',
+    deps=[':stdafx', ':pplx'],
+    srcs=[
+        SBASE + '/http/oauth/oauth1.cpp',
+        SBASE + '/http/oauth/oauth2.cpp',
+        SBASE + '/http/listener/http_listener.cpp',
+        SBASE + '/http/listener/http_listener_msg.cpp',
+        SBASE + '/http/listener/http_server_api.cpp',
+        SBASE + '/http/listener/http_server_asio.cpp',
+        SBASE + '/http/client/http_client.cpp',
+        SBASE + '/http/client/http_client_msg.cpp',
+        SBASE + '/http/client/http_client_asio.cpp',
+        SBASE + '/http/client/x509_cert_utilities.cpp',
+        SBASE + '/http/common/http_helpers.cpp',
+        SBASE + '/http/common/http_msg.cpp',
+    ],
+    platform_srcs=[('.*win.*$', [
+        SBASE + '/http/listener/http_server_httpsys.cpp',
+        SBASE + '/http/client/http_client_winhttp.cpp',
+        SBASE + '/http/client/http_client_winrt.cpp',
+    ])])
+
+cxx_library(
+    name='cpprest',
+    deps=[
+        ':stdafx', ':pplx', ':http', ':utilities', ':uri', ':streams', ':json',
+        ':pplx'
+    ],
+    visibility=['PUBLIC'])
