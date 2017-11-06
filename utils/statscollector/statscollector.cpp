@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
     }
   });
 
-  zmqObservable.subscribe_on(rxcpp::observe_on_event_loop())
+  zmqObservable.observe_on(rxcpp::synchronize_new_thread())
       .as_blocking()
       .subscribe(
           [weakCollector =
