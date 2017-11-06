@@ -7,6 +7,7 @@ cxx_library(
         '//third-party/rxcpp:rxcpp',
         '//third-party/influxdb-cpp-rest:influxdb-cpp',
         '//third-party/cppzmq:cppzmq',
+        '//third-party/cpprestsdk:cpprestsdk',
     ],
     srcs=glob(['*.cpp']),
     visibility=['PUBLIC'])
