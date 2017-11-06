@@ -3,16 +3,22 @@ cxx_library(
     header_namespace='statscollector',
     compiler_flags=['-std=c++17'],
     exported_headers=subdir_glob([('shared', '*.hpp')]),
-    srcs=['shared/iri.cpp'])
+    deps=[
+        '//third-party/rxcpp:rxcpp',
+        '//third-party/influxdb-cpp-rest:influxdb-cpp',
+        '//third-party/cppzmq:cppzmq',
+    ],
+    srcs=glob(['shared/*.cpp']))
 
 cxx_binary(
     name='statscollector',
     srcs=['statscollector.cpp'],
+    compiler_flags=['-std=c++17'],
     deps=[
         ':shared',
-        '//third-party/rxcpp:rxcpp',
+        '//third-party/google/gflags:gflags',
+        '//third-party/google/glog:glog',
         '//third-party/influxdb-cpp-rest:influxdb-cpp',
-        '//third-party/cppzmq:cppzmq',
     ])
 
 cxx_test(

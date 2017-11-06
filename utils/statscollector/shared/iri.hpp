@@ -32,28 +32,28 @@ enum IRIMessageType {
 };
 
 /**!
-   * Base class for all IRI ZMQ messages.
-   */
+ * Base class for all IRI ZMQ messages.
+ */
 class IRIMessage {
-public:
+ public:
   virtual IRIMessageType type() = 0;
 
-protected:
-  static std::vector<std::string> chunks(std::string_view s, char delim = ' ')
-  {
+ protected:
+  static std::vector<std::string> chunks(std::string_view s, char delim = ' ') {
     std::vector<std::string> elems;
     size_t pos = 0, ppos = 0;
     while ((pos = s.find(delim, ppos)) != std::string_view::npos) {
-      elems.push_back(std::string {s.substr(ppos, pos - ppos)});;
+      elems.push_back(std::string{s.substr(ppos, pos - ppos)});
       ppos = pos + 1;
     }
 
-    elems.push_back(std::string { s.substr(ppos) });
+    elems.push_back(std::string{s.substr(ppos)});
 
     return elems;
   }
 };
 
+/// Deserialises a string payload to the correct message implementation.
 std::shared_ptr<iri::IRIMessage> payloadToMsg(std::string_view payload);
 
 /**!
@@ -61,9 +61,8 @@ std::shared_ptr<iri::IRIMessage> payloadToMsg(std::string_view payload);
   */
 
 class SNMessage : public IRIMessage {
-public:
-  explicit SNMessage(std::string_view from)
-  {
+ public:
+  explicit SNMessage(std::string_view from) {
     auto chunks = IRIMessage::chunks(from);
     this->_milestoneIdx = std::stoull(chunks[0]);
     this->_hash = std::move(chunks[1]);
@@ -75,7 +74,7 @@ public:
 
   inline IRIMessageType type() { return IRIMessageType::SN; }
 
-public:
+ public:
   const std::string& hash() { return this->_hash; }
   uint64_t milestoneIdx() { return this->_milestoneIdx; }
   const std::string& address() { return this->_address; }
@@ -83,7 +82,7 @@ public:
   const std::string& trunk() { return this->_trunk; }
   const std::string& branch() { return this->_branch; }
 
-private:
+ private:
   std::string _hash;
   uint64_t _milestoneIdx;
   std::string _address;
@@ -93,12 +92,11 @@ private:
 };
 
 /**!
-   * Emitted when IRI has received a new Transaction.
-   */
+ * Emitted when IRI has received a new Transaction.
+ */
 class TXMessage : public IRIMessage {
-public:
-  explicit TXMessage(std::string_view from)
-  {
+ public:
+  explicit TXMessage(std::string_view from) {
     auto chunks = IRIMessage::chunks(from);
 
     this->_hash = std::move(chunks[0]);
@@ -124,20 +122,24 @@ public:
   }
   inline IRIMessageType type() { return IRIMessageType::TX; }
 
-public:
+ public:
   const std::string& hash() { return this->_hash; }
   const std::string& address() { return this->_address; }
   int64_t value() { return this->_value; }
   const std::string& obsoleteTag() { return this->_obsoleteTag; }
-  const std::chrono::system_clock::time_point& timestamp() { return this->_timestamp; }
+  const std::chrono::system_clock::time_point& timestamp() {
+    return this->_timestamp;
+  }
   uint64_t currentIndex() { return this->_currentIndex; }
   uint64_t lastIndex() { return this->_lastIndex; }
   const std::string& bundle() { return this->_bundle; }
   const std::string& trunk() { return this->_trunk; }
   const std::string& branch() { return this->_branch; }
-  const std::chrono::system_clock::time_point& arrivalTime() { return this->_arrivalTime; }
+  const std::chrono::system_clock::time_point& arrivalTime() {
+    return this->_arrivalTime;
+  }
 
-private:
+ private:
   std::string _hash;
   std::string _address;
   int64_t _value;
@@ -150,4 +152,4 @@ private:
   std::string _branch;
   std::chrono::system_clock::time_point _arrivalTime;
 };
-}
+}  // namespace iri
