@@ -1,7 +1,9 @@
 #include <iostream>
 #include <map>
+#include <memory>
 #include <string>
 #include <string_view>
+#include <chrono>
 
 #include <rx.hpp>
 #include <zmq.hpp>
@@ -20,12 +22,19 @@ void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s, const s
   subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
   subscriber.connect(uri);
 
+  auto poller = std::make_unique<zmq::poller_t>();
+
+  auto handler = std::function<void(void)>();
+  poller->add(subscriber, ZMQ_POLLIN, handler);
+
   while (1) {
     buf.fill('\0');
+
+    poller->wait(std::chrono::milliseconds(-1));
+
     int size = zmq_recv(subscriber, buf.data(), buf.size() - 1, 0);
     if (size == -1)
       continue;
-
 
     std::string_view view(buf.data(), static_cast<std::string_view::size_type>(size));
 
