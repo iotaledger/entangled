@@ -1,0 +1,12 @@
+cxx_binary(
+    name='echocatcher',
+    srcs=['echocatcher.cpp'],
+    compiler_flags=['-std=c++17'],
+    deps=[
+        '//utils/common:common',
+        '//ccurl:ccurl',
+        '//third-party/cpprestsdk:cpprestsdk',
+        '//third-party/google/gflags:gflags',
+        '//third-party/google/glog:glog',
+    ])
+
