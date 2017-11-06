@@ -23,7 +23,9 @@ void StatsCollector::onNewTransaction(std::shared_ptr<iri::TXMessage> msg) {
 
   // Check if bundle has been confirmed already.
   if (_confirmedBundles.find(msg->bundle()) != _confirmedBundles.end()) {
-    _frame->transactionsReattached++;
+    VLOG(7) << "onNewTransaction(bundle: " << msg->bundle()
+            << ") already confirmed";
+    trackReattachedTX();
     return;
   }
 
@@ -38,6 +40,9 @@ void StatsCollector::onNewTransaction(std::shared_ptr<iri::TXMessage> msg) {
     auto unconfirmed = std::make_unique<UnconfirmedTX>(msg);
     trackNewTX(*unconfirmed);
     vec.at(index) = std::move(unconfirmed);
+
+    _unconfirmedBundles.insert(
+        std::make_pair<>(std::string(msg->bundle()), std::move(vec)));
   } else {
     // Bundle was seen before.
     // Was this bundle tx seen before?
@@ -57,17 +62,21 @@ void StatsCollector::onTransactionConfirmed(
     std::shared_ptr<iri::SNMessage> msg) {
   std::lock_guard guard(_mutex);
 
-  auto entry = _unconfirmedBundles.find(msg->bundle());
+  const auto entry = _unconfirmedBundles.find(msg->bundle());
+
   if (_confirmedBundles.find(msg->bundle()) != _confirmedBundles.end() ||
-      entry == _unconfirmedBundles.end()) {
+      !_unconfirmedBundles.count(msg->bundle())) {
     // Confirmed already or we haven't seen this bundle before and thus are
     // ignoring it on purpose.
+    VLOG(7) << "onTransactionConfirmed(bundle: " << msg->bundle() << "): discarding.";
     return;
   }
 
   uint64_t size = 0;
   int64_t totalValue = 0;
   uint64_t duration = 0;
+
+  VLOG(7) << "onTransactionConfirmed(bundle: " << msg->bundle() << ")";
 
   for (const std::unique_ptr<UnconfirmedTX>& tx : entry->second) {
     if (tx) {
@@ -117,7 +126,7 @@ void StatsCollector::trackConfirmedBundle(int64_t totalValue, uint64_t size,
   _frame->avgConfirmationDuration =
       (avgBundleDuration +
        _frame->bundlesConfirmed * _frame->avgConfirmationDuration) /
-      (_frame->bundlesConfirmed);
+      (_frame->bundlesConfirmed + 1);
   _frame->bundlesConfirmed++;
 
   _frame->valueConfirmed += totalValue;

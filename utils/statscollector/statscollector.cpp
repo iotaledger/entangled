@@ -18,8 +18,9 @@ DEFINE_string(zmqURL, "tcp://m5.iotaledger.net:5556",
               "URL of ZMQ publisher to connect to");
 DEFINE_string(influxURL, "http://localhost:8086", "InfluxDB URL to connect to");
 DEFINE_string(influxDB, "iristats", "InfluxDB db name");
-DEFINE_uint64(pubInterval, 5000,
-              "interval on which to publish to InfluxDB in milliseconds");
+DEFINE_uint64(pubInterval, 1000,
+              "interval on which to publish to InfluxDB in milliseconds. You "
+              "probably don't want to change this.");
 DEFINE_uint64(pubDelay, 120000,
               "interval to wait before starting publishing in milliseconds");
 
@@ -62,6 +63,8 @@ int main(int argc, char** argv) {
               "stats", key_value_pairs(),
               key_value_pairs("transactionsNew", frame->transactionsNew)
                   .add("transactionsReattached", frame->transactionsReattached)
+                  .add("transactionsTotal",
+                       frame->transactionsNew + frame->transactionsReattached)
                   .add("transactionsConfirmed", frame->transactionsConfirmed)
                   .add("bundlesNew", frame->bundlesNew)
                   .add("bundlesConfirmed", frame->bundlesConfirmed)
