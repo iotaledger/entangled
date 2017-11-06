@@ -26,7 +26,10 @@ void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s, const s
     if (size == -1)
       continue;
 
-    auto msg = iri::payloadToMsg({ buf.data(), static_cast<std::string_view::size_type>(size) + 1 });
+
+    std::string_view view(buf.data(), static_cast<std::string_view::size_type>(size));
+
+    auto msg = iri::payloadToMsg(view);
 
     if (msg) {
       s.on_next(std::move(msg));
