@@ -1,12 +1,12 @@
 prebuilt_cxx_library(
-  name = 'cppzmq',
-  header_only = True,
-  header_namespace = '',
-  exported_headers = subdir_glob([
-    ('cppzmq', '*.hpp'),
-  ]),
-  visibility = [
-    'PUBLIC',
-  ],
-  deps = ['//third-party/libzmq:libzmq']
-)
+    name='cppzmq',
+    header_only=True,
+    header_namespace='',
+    exported_preprocessor_flags=['-DZMQ_BUILD_DRAFT_API'],
+    exported_headers=subdir_glob([
+        ('cppzmq', '*.hpp'),
+    ]),
+    visibility=[
+        'PUBLIC',
+    ],
+    deps=['//third-party/libzmq:libzmq'])
