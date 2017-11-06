@@ -7,7 +7,7 @@ cxx_library(
     ],
     header_namespace='influxdb',
     exported_headers=subdir_glob([(BASE + '/influxdb-cpp-rest',
-                                   'influxdb*.h')]),
+                                   '*.h')]),
     srcs=[
         BASE + '/influxdb-cpp-rest/influxdb_raw_db.cpp',
         BASE + '/influxdb-cpp-rest/influxdb_raw_db_utf8.cpp',

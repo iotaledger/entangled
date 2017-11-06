@@ -71,7 +71,7 @@ cxx_library(
         'glog/src/vlog_is_on.cc',
     ],
     exported_platform_linker_flags=[
-        ('^linux.*', ['-pthread']),
+        ('^default*', ['-pthread', '-lunwind']),
     ],
     visibility=[
         'PUBLIC',

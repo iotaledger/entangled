@@ -66,7 +66,11 @@ cxx_library(
 
 cxx_library(
     name='http',
-    deps=[':stdafx', ':pplx'],
+    deps=[
+        ':stdafx',
+        ':pplx',
+        ':utilities',
+    ],
     srcs=[
         SBASE + '/http/oauth/oauth1.cpp',
         SBASE + '/http/oauth/oauth2.cpp',
@@ -90,7 +94,22 @@ cxx_library(
 cxx_library(
     name='cpprest',
     deps=[
-        ':stdafx', ':pplx', ':http', ':utilities', ':uri', ':streams', ':json',
-        ':pplx'
+        ':stdafx',
+        ':pplx',
+        ':http',
+        ':utilities',
+        ':uri',
+        ':streams',
+        ':json',
+        ':pplx',
+        '//third-party:boost_system',
+        '//third-party:boost_regex',
+        '//third-party:boost_filesystem',
+        '//third-party:boost_chrono',
+        '//third-party:boost_atomic',
+        '//third-party:boost_thread',
+        '//third-party:boost_random',
+        '//third-party:openssl_crypto',
+        '//third-party:openssl_ssl',
     ],
     visibility=['PUBLIC'])
