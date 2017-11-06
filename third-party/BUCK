@@ -4,6 +4,11 @@ cxx_library(
     visibility=['PUBLIC'], )
 
 cxx_library(
+    name='opencl',
+    exported_linker_flags=['-lOpenCL'],
+    visibility=['PUBLIC'], )
+
+cxx_library(
     name='boost_system',
     exported_linker_flags=['-lboost_system'],
     deps=[

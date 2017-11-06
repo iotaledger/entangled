@@ -1,0 +1,37 @@
+language: c
+
+compiler: clang
+matrix:
+  include:
+    # works on Precise and Trusty
+    - os: linux
+      addons:
+      addons:
+        apt:
+          sources:
+            - george-edison55-precise-backports
+          packages:
+            - cmake-data
+            - cmake
+    - os: osx
+      osx_image: xcode8
+
+#before_script:
+before_install:
+    - eval "${MATRIX_EVAL}"
+    - cmake .
+
+script: 
+    - cmake --build .
+
+deploy:
+  - provider: releases
+    api_key:
+        secure: "XJczJol6PDf2cr2rYIX2gnW2LLoWxwimTtdGRgVF6D7aUD1OczYnxqhKodSnykjWwmLZ7pBB/Yp9VaJlhR225lyBRKSa+z7LbcV3hBiPZjlHfBFEGJQPzK0NAKxKMcFeNLjp/MwkgxOJUtuiH2wiBP3lke0AXViMe1PoGT0R8X+PWtkSGKV7YSjsFrbFycii3tFGE840e9ErZHnOTLNwER7y+twYBujXqUZTvKBbTBr46XJ4m3VFDkfvXWDIHRWt8K/hNMwxZegTaQruKC112EeV9wwyO8xfl7I6xjEMg1H34rWqKWlFQc+RxP+Eu/O0/1P88KhiK1bUQz7pzsRPuR/+Iilqh12Z75QZejo0zYVXaYk4XWdRpeVl7iORe4FXq/bCxUoZ4T+RpE8pwG8bEY+1UDwW3soQiIJCBX0kbCbqlqBH2dVo/3gcPZom8q6NqBPL5H74PPt+/b9xx7Wnr504F7uM05j1qv5BybGfAR30p1dZZFirGnfA0SLp4xXrQZMZFYjiiZCgTUQH8gfAdpbyFhb0enbbcIGuw2bX2+x7m/bYqvTsh9iG7cVd7G2bJ5R98p9VicYtrIBVyzB9Nro0QSkdp97kg157aKITWKgDf/sWV+TGquoys29ur4nIC90pMRJ1567JkPtiqJbBDZ3EeLjE0GNEyVG9UXyumOg="
+    file_glob: true
+    file: lib/*
+    skip_cleanup: true
+    on:
+      tags: true
+      repo: iotaledger/ccurl
+      branch: master

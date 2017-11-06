@@ -28,3 +28,6 @@
 [submodule "third-party/google/glog"]
 	path = third-party/google/glog/glog
 	url = https://github.com/google/glog.git
+[submodule "ccurl/deps/libopencl-stub"]
+	path = ccurl/deps/libopencl-stub
+	url = https://github.com/iotaledger/libopencl-stub.git
