@@ -7,7 +7,7 @@ genrule(
     out='pearl.cl.h', )
 
 cxx_library(
-    name='libopencl-stub',
+    name='opencl-stub',
     header_namespace='',
     exported_headers=subdir_glob([
         ('deps/libopencl-stub/include', '**/*.h'),
@@ -22,11 +22,12 @@ cxx_library(
     headers={'pearl.cl.h': ':opencl_xxd'},
     deps=[
         ':opencl_xxd',
-        ':libopencl-stub',
-        '//third-party:opencl',
+        ':opencl-stub',
         '//third-party:pthread',
     ],
     exported_headers=subdir_glob([('src/lib', '**/*.h')]),
     srcs=glob([
+        'src/lib/*.c',
         'src/lib/**/*.c',
-    ]))
+    ]),
+    visibility=['PUBLIC'])
