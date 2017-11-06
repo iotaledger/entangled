@@ -92,7 +92,7 @@ cxx_library(
     ])])
 
 cxx_library(
-    name='cpprest',
+    name='cpprestsdk',
     deps=[
         ':stdafx',
         ':pplx',
