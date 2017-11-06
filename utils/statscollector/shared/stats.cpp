@@ -68,7 +68,8 @@ void StatsCollector::onTransactionConfirmed(
       !_unconfirmedBundles.count(msg->bundle())) {
     // Confirmed already or we haven't seen this bundle before and thus are
     // ignoring it on purpose.
-    VLOG(7) << "onTransactionConfirmed(bundle: " << msg->bundle() << "): discarding.";
+    VLOG(7) << "onTransactionConfirmed(bundle: " << msg->bundle()
+            << "): discarding.";
     return;
   }
 
@@ -81,7 +82,9 @@ void StatsCollector::onTransactionConfirmed(
   for (const std::unique_ptr<UnconfirmedTX>& tx : entry->second) {
     if (tx) {
       // Maybe we've only seen part of the bundle.
-      totalValue += tx->value;
+      if (tx->value > 0) {
+        totalValue += tx->value;
+      }
 
       auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(
                            std::chrono::system_clock::now() - tx->arrivalTime)
