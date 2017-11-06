@@ -12,6 +12,8 @@
 
 #include "iri.hpp"
 
+namespace iota {
+namespace utils {
 namespace stats {
 class StatsFrame {
  public:
@@ -59,3 +61,5 @@ class StatsCollector {
   std::unique_ptr<StatsFrame> _frame;
 };
 }  // namespace stats
+}  // namespace utils
+}  // namespace iota

@@ -8,6 +8,9 @@
 #include <string_view>
 #include <vector>
 
+namespace iota {
+namespace utils {
+
 namespace iri {
 
 enum IRIMessageType {
@@ -153,3 +156,5 @@ class TXMessage : public IRIMessage {
   std::chrono::system_clock::time_point _arrivalTime;
 };
 }  // namespace iri
+}  // namespace utils
+}  // namespace iota

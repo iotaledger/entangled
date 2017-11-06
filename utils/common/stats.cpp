@@ -7,6 +7,8 @@
 #include "iri.hpp"
 #include "stats.hpp"
 
+namespace iota {
+namespace utils {
 namespace stats {
 
 std::unique_ptr<StatsFrame> StatsCollector::swapFrame() {
@@ -137,3 +139,5 @@ void StatsCollector::trackConfirmedBundle(int64_t totalValue, uint64_t size,
 }
 
 }  // namespace stats
+}  // namespace utils
+}  // namespace iota

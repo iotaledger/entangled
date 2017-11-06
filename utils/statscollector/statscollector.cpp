@@ -10,9 +10,9 @@
 #include <influxdb/influxdb_simple_async_api.h>
 #include <rx.hpp>
 
-#include <statscollector/iri.hpp>
-#include <statscollector/stats.hpp>
-#include <statscollector/zmq.hpp>
+#include <iota/utils/common/iri.hpp>
+#include <iota/utils/common/stats.hpp>
+#include <iota/utils/common/zmq.hpp>
 
 DEFINE_string(zmqURL, "tcp://m5.iotaledger.net:5556",
               "URL of ZMQ publisher to connect to");
@@ -23,6 +23,8 @@ DEFINE_uint64(pubInterval, 1000,
               "probably don't want to change this.");
 DEFINE_uint64(pubDelay, 120000,
               "interval to wait before starting publishing in milliseconds");
+
+using namespace iota::utils;
 
 int main(int argc, char** argv) {
   ::gflags::ParseCommandLineFlags(&argc, &argv, true);
