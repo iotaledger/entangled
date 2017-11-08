@@ -66,3 +66,5 @@ pom.xml
 # Logs
 *.log
 .gdb_history
+
+/bazel*

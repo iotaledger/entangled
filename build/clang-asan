@@ -1,5 +1,0 @@
-@build/clang
---config
-cxx.cxxflags=-Wall -fsanitize=address -fno-omit-frame-pointer --std=c++14
---config
-cxx.ldflags=-lasan

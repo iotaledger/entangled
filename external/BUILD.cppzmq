@@ -1,0 +1,8 @@
+cc_library(
+    name='cppzmq',
+    hdrs=glob(["*.hpp"]),
+    includes=['.'],
+    visibility=[
+        '//visibility:public',
+    ],
+    deps=['//external:zmq'])

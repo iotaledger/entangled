@@ -1,4 +1,7 @@
-MACOS_PLATFORM_HPP = """
+genrule(
+    name='platform_hpp',
+    outs=['platform.hpp'],
+    cmd="""cat > $@ <<"EOF"
 #ifndef __ZMQ_PLATFORM_HPP_INCLUDED__
 #define __ZMQ_PLATFORM_HPP_INCLUDED__
 
@@ -18,6 +21,7 @@ MACOS_PLATFORM_HPP = """
 #define ZMQ_USE_EPOLL 1
 #define ZMQ_USE_EPOLL_CLOEXEC 1
 #define ZMQ_USE_TWEETNACL 1
+#define HAVE_LIBSODIUM 1
 
 #ifdef _AIX
   #define ZMQ_HAVE_AIX
@@ -74,39 +78,30 @@ MACOS_PLATFORM_HPP = """
 /* #undef ZMQ_HAVE_WINDOWS */
 
 #endif
-"""
+EOF""", )
 
-genrule(
-    name='macos-platform.hpp',
-    out='platform.hpp',
-    cmd='echo "' + MACOS_PLATFORM_HPP + '" > $OUT', )
+config_setting(
+    name="win",
+    values={"cpu": "x64_windows_msvc"}, )
 
-cxx_library(
-    name='libzmq',
-    header_namespace='',
-    exported_headers=subdir_glob([
-        ('libzmq/include', '*.h'),
-    ]),
-    exported_platform_headers=[
-        ('default', {
-            'platform.hpp': ':macos-platform.hpp'
-        }),
-        ('^macos.*', {
-            'platform.hpp': ':macos-platform.hpp'
-        }),
+cc_library(
+    name='zmq',
+    srcs=glob(["src/*.cpp", "src/*.hpp"]),
+    hdrs=[
+        ":platform_hpp",
+        "include/zmq.h",
+        "include/zmq_utils.h",
+        "src/zmq_draft.h",
+        "src/tweetnacl.h",
     ],
-    headers=subdir_glob([
-        ('libzmq/src', '*.hpp'),
-    ]),
-    srcs=glob([
-        'libzmq/src/*.cpp',
-    ]),
+    includes=['include'],
+    deps=['//external:sodium'],
+    linkopts=select({
+        ":win": [],
+        "//conditions:default": [
+            "-pthread",
+        ],
+    }),
     visibility=[
-        'PUBLIC',
-    ],
-    deps=['//third-party/libsodium:libsodium'],
-    exported_platform_linker_flags=[
-        ('default', ['-lpthread']),
-        ('^linux.*', ['-lpthread']),
-        ('^macos.*', []),
-    ], )
+        "//visibility:public",
+    ])

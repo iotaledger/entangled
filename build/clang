@@ -1,6 +1,0 @@
---config
-cxx.cc=/usr/bin/clang
---config
-cxx.cxx=/usr/bin/clang++
---config
-cxx.cxxpp=/usr/bin/clang++

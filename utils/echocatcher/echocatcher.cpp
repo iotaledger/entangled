@@ -11,7 +11,7 @@
 #include <ccurl/ccurl.h>
 #include <iota/utils/common/api.hpp>
 #include <iota/utils/common/iri.hpp>
-#include <iota/utils/common/zmq.hpp>
+#include <iota/utils/common/zmqpub.hpp>
 
 DEFINE_string(zmqURL, "tcp://m5.iotaledger.net:5556",
               "URL of ZMQ publisher to connect to");

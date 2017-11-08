@@ -1,0 +1,5 @@
+cc_library(
+    name='rxcpp',
+    hdrs=glob(["Rx/v2/src/**/*.hpp"]),
+    strip_include_prefix="Rx/v2/src/rxcpp",
+    visibility=["//visibility:public"], )

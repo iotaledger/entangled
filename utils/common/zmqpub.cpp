@@ -6,11 +6,11 @@
 #include <string_view>
 
 #include <rx.hpp>
+
 #include <zmq.hpp>
 
-#include "./zmq.hpp"
-
-#include <iota/utils/common/iri.hpp>
+#include "zmqpub.hpp"
+#include "iri.hpp"
 
 namespace iota {
 namespace utils {

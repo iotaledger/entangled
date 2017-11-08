@@ -2,7 +2,7 @@
 #include "claccess/clcontext.h"
 #include "constants.h"
 #include "hash.h"
-#include <ccurl/pearl.cl.h>
+#include "ccurl/pearl.cl.h"
 #include "pearl_diver.h"
 #include <assert.h>
 #include <stdio.h>
@@ -29,8 +29,8 @@ typedef struct {
 
 int init_pearcl(PearCLDiver* pdcl) {
   CLContext* cl;
-  unsigned char* src[PD_NUM_SRC] = {pearl_cl};
-  size_t size[PD_NUM_SRC] = {pearl_cl_len};
+  unsigned char* src[PD_NUM_SRC] = {ccurl_src_lib_cl_pearl_cl};
+  size_t size[PD_NUM_SRC] = {ccurl_src_lib_cl_pearl_cl_len};
   char** names = (char* []){"init", "search", "finalize"};
   if (!pdcl) {
     pdcl = malloc(sizeof(PearCLDiver));

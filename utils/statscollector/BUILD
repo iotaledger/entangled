@@ -1,0 +1,9 @@
+cc_binary(
+    name='statscollector',
+    srcs=['statscollector.cpp'],
+    deps=[
+        '//utils/common:common',
+        '//external:gflags',
+        '//external:glog',
+        '//external:influxdb_cpp_rest',
+    ])
