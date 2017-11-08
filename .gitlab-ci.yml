@@ -1,0 +1,25 @@
+image: walberla/buildenv-ubuntu-gcc:7
+
+stages:
+  - test
+
+cache:
+  untracked: true
+  paths:
+    - bazel-cache
+
+before_script:
+  - apt-get update
+  - apt-get install -y unzip ccache libssl-dev openssl xxd
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+tests:
+  stage: test
+  script:
+    - mkdir /root/.cache && [ -d bazel-cache ] && mv bazel-cache /root/.cache/bazel
+    - tools/ci/build.sh
+    - mv /root/.cache/bazel bazel-cache
+  tags:
+    - gitlab-org-high-cpu

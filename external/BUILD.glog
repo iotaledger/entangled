@@ -13,28 +13,35 @@ licenses(['notice'])
 cc_library(
     visibility=["//visibility:public"],
     name="glog",
-    includes=["src"],
+    hdrs=[
+        ":stl_logging_h",
+        ":logging_h",
+        ":vlog_is_on_h",
+        ":raw_logging_h",
+        "src/glog/log_severity.h",
+    ],
+    strip_include_prefix='src/glog',
+    deps=[':glog_impl'])
+cc_library(
+    visibility=["//visibility:public"],
+    name="glog_impl",
     srcs=[
-        "src/base/commandlineflags.h",
-        "src/base/googleinit.h",
         "src/demangle.cc",
         "src/logging.cc",
         "src/symbolize.cc",
         "src/vlog_is_on.cc",
         "src/raw_logging.cc",
         "src/utilities.cc",
-    ],
-    hdrs=[
-        "src/base/mutex.h",
-        "src/utilities.h",
-        "src/demangle.h",
-        "src/symbolize.h",
-        ":stl_logging_h",
         ":config_h",
+    ] + glob(['src/**/*.h']),
+    hdrs=[
+        ":stl_logging_h",
         ":logging_h",
         ":vlog_is_on_h",
-        "raw_logging_h",
+        ":raw_logging_h",
+        "src/glog/log_severity.h",
     ],
+    strip_include_prefix='src',
     copts=[
         # Disable warnings that exists in glog
         "-Wno-sign-compare",
@@ -104,7 +111,7 @@ genrule(
         "src/glog/logging.h.in",
     ],
     outs=[
-        "glog/logging.h",
+        "src/glog/logging.h",
     ],
     cmd="$(location :gen_sh) < $(<) > $(@)",
     tools=[":gen_sh"], )
@@ -115,7 +122,7 @@ genrule(
         "src/glog/raw_logging.h.in",
     ],
     outs=[
-        "glog/raw_logging.h",
+        "src/glog/raw_logging.h",
     ],
     cmd="$(location :gen_sh) < $(<) > $(@)",
     tools=[":gen_sh"], )
@@ -126,7 +133,7 @@ genrule(
         "src/glog/stl_logging.h.in",
     ],
     outs=[
-        "glog/stl_logging.h",
+        "src/glog/stl_logging.h",
     ],
     cmd="$(location :gen_sh) < $(<) > $(@)",
     tools=[":gen_sh"], )
@@ -137,7 +144,7 @@ genrule(
         "src/glog/vlog_is_on.h.in",
     ],
     outs=[
-        "glog/vlog_is_on.h",
+        "src/glog/vlog_is_on.h",
     ],
     cmd="$(location :gen_sh) < $(<) > $(@)",
     tools=[":gen_sh"], )
