@@ -1,5 +1,6 @@
 #include <string_view>
-#include <iota/utils/common/iri.hpp>
+
+#include "iri.hpp"
 
 namespace iota {
 namespace utils {

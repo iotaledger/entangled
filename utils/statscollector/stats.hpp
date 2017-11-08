@@ -10,7 +10,7 @@
 #include <memory>
 #include <shared_mutex>
 
-#include "iri.hpp"
+#include "iota/utils/common/iri.hpp"
 
 namespace iota {
 namespace utils {

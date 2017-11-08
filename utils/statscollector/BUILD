@@ -1,6 +1,6 @@
 cc_binary(
     name='statscollector',
-    srcs=['statscollector.cpp'],
+    srcs=glob(['**/*.cpp', '**/*.hpp']),
     deps=[
         '//utils/common:common',
         '@com_github_gflags_gflags//:gflags',

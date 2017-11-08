@@ -10,9 +10,9 @@
 #include <influxdb/influxdb_simple_async_api.h>
 #include <rx.hpp>
 
-#include <iota/utils/common/iri.hpp>
-#include <iota/utils/common/stats.hpp>
-#include <iota/utils/common/zmqpub.hpp>
+#include "iota/utils/common/iri.hpp"
+#include "iota/utils/common/zmqpub.hpp"
+#include "stats.hpp"
 
 DEFINE_string(zmqURL, "tcp://m5.iotaledger.net:5556",
               "URL of ZMQ publisher to connect to");

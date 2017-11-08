@@ -1,8 +1,8 @@
-#include <iota/utils/common/api.hpp>
-
 #include <cpprest/http_client.h>
 #include <cpprest/json.h>
 #include <glog/logging.h>
+
+#include "api.hpp"
 
 namespace iota {
 namespace utils {

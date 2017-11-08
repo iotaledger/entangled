@@ -4,8 +4,8 @@
 
 #include <glog/logging.h>
 
-#include <iota/utils/common/iri.hpp>
-#include <iota/utils/common/stats.hpp>
+#include "iota/utils/common/iri.hpp"
+#include "stats.hpp"
 
 namespace iota {
 namespace utils {
