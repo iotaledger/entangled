@@ -1,3 +1,5 @@
+licenses(['notice'])
+
 # Derived from https://github.com/google/glog/files/393474/BUILD.txt
 #
 # Currently gflags is not included, since having deps

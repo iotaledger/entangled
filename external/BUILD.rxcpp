@@ -1,3 +1,5 @@
+licenses(['notice'])
+
 cc_library(
     name='rxcpp',
     hdrs=glob(["Rx/v2/src/**/*.hpp"]),

@@ -1,6 +1,8 @@
 SBASE = 'Release/src'
 HBASE = 'Release/include'
 
+licenses(['notice'])
+
 cc_library(
     name='stdafx',
     hdrs=[SBASE + '/pch/stdafx.h'],

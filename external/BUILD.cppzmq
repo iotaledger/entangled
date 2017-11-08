@@ -1,3 +1,5 @@
+licenses(['notice'])
+
 cc_library(
     name='cppzmq',
     hdrs=glob(["*.hpp"]),
@@ -5,4 +7,4 @@ cc_library(
     visibility=[
         '//visibility:public',
     ],
-    deps=['//external:zmq'])
+    deps=['@libzmq//:zmq'])

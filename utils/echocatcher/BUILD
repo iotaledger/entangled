@@ -4,8 +4,8 @@ cc_binary(
     deps=[
         '//utils/common:common',
         '//ccurl:ccurl',
-        '//external:cpprestsdk',
-        '//external:gflags',
-        '//external:glog',
+        '@cpprestsdk//:cpprestsdk',
+        '@com_github_gflags_gflags//:gflags',
+        '@glog//:glog',
     ])
 

@@ -1,3 +1,5 @@
+licenses(['notice'])
+
 genrule(
     name="gen_sh",
     outs=[

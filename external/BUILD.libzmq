@@ -1,3 +1,5 @@
+licenses(['reciprocal', 'restricted'])
+
 genrule(
     name='platform_hpp',
     outs=['platform.hpp'],
@@ -95,7 +97,7 @@ cc_library(
         "src/tweetnacl.h",
     ],
     includes=['include'],
-    deps=['//external:sodium'],
+    deps=['@libsodium//:sodium'],
     linkopts=select({
         ":win": [],
         "//conditions:default": [

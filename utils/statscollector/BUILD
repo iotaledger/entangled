@@ -3,7 +3,7 @@ cc_binary(
     srcs=['statscollector.cpp'],
     deps=[
         '//utils/common:common',
-        '//external:gflags',
-        '//external:glog',
-        '//external:influxdb_cpp_rest',
+        '@com_github_gflags_gflags//:gflags',
+        '@glog//:glog',
+        '@influxdb_cpp_rest//:influxdb_cpp_rest',
     ])

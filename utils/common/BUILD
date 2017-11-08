@@ -5,18 +5,18 @@ cc_library(
     copts=['-DZMQ_BUILD_DRAFT_API'],
     srcs=glob(['*.cpp', '*.hpp']),
     deps=[
-        '//external:rxcpp',
-        '//external:cppzmq',
-        '//external:cpprestsdk',
+        '@rxcpp//:rxcpp',
+        '@cppzmq//:cppzmq',
+        '@cpprestsdk//:cpprestsdk',
     ],
     visibility=['//visibility:public'])
 
 cc_test(
-    name='iri-test',
+    name='common_test',
     srcs=['tests/iri.cpp'],
     deps=[
         ':common',
-        '//external:gtest_main',
-        '//external:glog',
-        '//external:gflags',
+        '@gtest//:gtest_main',
+        '@glog//:glog',
+        '@com_github_gflags_gflags//:gflags',
     ], )
