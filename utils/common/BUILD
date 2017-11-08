@@ -7,6 +7,7 @@ cc_library(
     deps=[
         '@rxcpp//:rxcpp',
         '@cppzmq//:cppzmq',
+        '@glog//:glog',
         '@cpprestsdk//:cpprestsdk',
     ],
     visibility=['//visibility:public'])
@@ -17,6 +18,5 @@ cc_test(
     deps=[
         ':common',
         '@gtest//:gtest_main',
-        '@glog//:glog',
         '@com_github_gflags_gflags//:gflags',
     ], )
