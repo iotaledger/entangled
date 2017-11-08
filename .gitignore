@@ -68,3 +68,4 @@ pom.xml
 .gdb_history
 
 /bazel*
+.bazelrc
