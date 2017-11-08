@@ -12,8 +12,8 @@
 
 #include "iota/utils/common/iri.hpp"
 
-namespace iota {
-namespace utils {
+using namespace iota::utils;
+
 namespace stats {
 class StatsFrame {
  public:
@@ -61,5 +61,3 @@ class StatsCollector {
   std::unique_ptr<StatsFrame> _frame;
 };
 }  // namespace stats
-}  // namespace utils
-}  // namespace iota
