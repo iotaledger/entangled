@@ -12,7 +12,9 @@
 
 #include "iota/utils/common/iri.hpp"
 #include "iota/utils/common/zmqpub.hpp"
-#include "stats.hpp"
+
+#include "analyzer.hpp"
+#include "stats/frame.hpp"
 
 DEFINE_string(zmqURL, "tcp://m5.iotaledger.net:5556",
               "URL of ZMQ publisher to connect to");
@@ -26,13 +28,18 @@ DEFINE_uint64(pubDelay, 120000,
 
 using namespace iota::utils;
 
+namespace iota {
+namespace utils {
+namespace statscollector {
+
 int main(int argc, char** argv) {
   ::gflags::ParseCommandLineFlags(&argc, &argv, true);
   ::google::InitGoogleLogging("statscollector");
 
   LOG(INFO) << "Booting up.";
 
-  auto collector = std::make_shared<stats::StatsCollector>();
+  auto stats = std::make_shared<FrameTXStats>();
+  auto analyzer = std::make_shared<TXAnalyzer>(stats);
 
   auto zmqThread = rxcpp::schedulers::make_new_thread();
   auto zmqObservable =
@@ -49,11 +56,12 @@ int main(int argc, char** argv) {
   auto pubInterval = std::chrono::milliseconds(FLAGS_pubInterval);
 
   pubWorker.schedule_periodically(pubStartDelay, pubInterval, [
-    &influxdb, weakCollector = std::weak_ptr(collector)
+    &influxdb, weakStats = std::weak_ptr(stats)
   ](auto scbl) {
-    static bool pubDelayComplete = false;
-    if (auto collector = weakCollector.lock()) {
-      auto frame = collector->swapFrame();
+    if (auto stats = weakStats.lock()) {
+      auto frame = stats->swapFrame();
+      static bool pubDelayComplete = false;
+
       if (!pubDelayComplete) {
         pubDelayComplete = true;
       } else {
@@ -85,19 +93,19 @@ int main(int argc, char** argv) {
   zmqObservable.observe_on(rxcpp::synchronize_new_thread())
       .as_blocking()
       .subscribe(
-          [weakCollector =
-               std::weak_ptr(collector)](std::shared_ptr<iri::IRIMessage> msg) {
-            auto collector = weakCollector.lock();
+          [weakAnalyzer =
+               std::weak_ptr(analyzer)](std::shared_ptr<iri::IRIMessage> msg) {
+            auto analyzer = weakAnalyzer.lock();
             // FIXME (@th0br0) Proper error handling.
-            if (!collector) return;
+            if (!analyzer) return;
 
             switch (msg->type()) {
               case iri::IRIMessageType::TX:
-                collector->onNewTransaction(
+                analyzer->newTransaction(
                     std::static_pointer_cast<iri::TXMessage>(std::move(msg)));
                 break;
               case iri::IRIMessageType::SN:
-                collector->onTransactionConfirmed(
+                analyzer->transactionConfirmed(
                     std::static_pointer_cast<iri::SNMessage>(std::move(msg)));
                 break;
               default:
@@ -107,4 +115,11 @@ int main(int argc, char** argv) {
           []() {});
 
   return 0;
+}
+}
+}
+}
+
+int main(int argc, char** argv) {
+  iota::utils::statscollector::main(argc, argv);
 }
