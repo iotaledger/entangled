@@ -21,5 +21,4 @@ tests:
     - mkdir /root/.cache && [ -d bazel-cache ] && mv bazel-cache /root/.cache/bazel
     - tools/ci/build.sh
     - mv /root/.cache/bazel bazel-cache
-  tags:
-    - gitlab-org-high-cpu
+
