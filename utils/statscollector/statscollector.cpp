@@ -13,8 +13,8 @@
 #include "iota/utils/common/iri.hpp"
 #include "iota/utils/common/zmqpub.hpp"
 
-#include "analyzer.hpp"
-#include "stats/frame.hpp"
+#include "iota/utils/statscollector/analyzer.hpp"
+#include "iota/utils/statscollector/stats/frame.hpp"
 
 DEFINE_string(zmqURL, "tcp://m5.iotaledger.net:5556",
               "URL of ZMQ publisher to connect to");
@@ -116,9 +116,9 @@ int main(int argc, char** argv) {
 
   return 0;
 }
-}
-}
-}
+}  // namespace statscollector
+}  // namespace utils
+}  // namespace iota
 
 int main(int argc, char** argv) {
   iota::utils::statscollector::main(argc, argv);

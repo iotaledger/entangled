@@ -4,18 +4,20 @@ cc_library(name='shared',
            hdrs=glob(
                ['**/*.hpp'],
                exclude=['tests/**/*.hpp']),
+           include_prefix='iota/utils/statscollector',
            deps=[
                '//utils/common:common',
                '@com_github_gflags_gflags//:gflags',
                '@glog//:glog',
            ])
 
-cc_test(name='statscollector_tests',
-        srcs=glob(['tests/**/*.cpp', 'tests/**/*.hpp']),
-        deps=[':shared', '@gtest//:gtest_main'])
+cc_test(name='tests',
+        srcs=glob(['tests/**/*.cpp', '**/*.hpp']),
+        deps=['@gtest//:gtest_main', '@gtest//:gtest', ':shared'])
 
 cc_binary(name='statscollector',
-          srcs=glob(['**/*.cpp', '**/*.hpp']),
+          srcs=["statscollector.cpp"],
           deps=[
-              '@influxdb_cpp_rest//:influxdb_cpp_rest', ':shared'
+              '@influxdb_cpp_rest//:influxdb_cpp_rest',
+              ':shared',
           ])

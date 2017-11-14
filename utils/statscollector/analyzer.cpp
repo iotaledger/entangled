@@ -6,7 +6,7 @@
 
 #include "iota/utils/common/iri.hpp"
 
-#include "analyzer.hpp"
+#include "iota/utils/statscollector/analyzer.hpp"
 
 namespace iota {
 namespace utils {
@@ -34,10 +34,11 @@ void TXAnalyzer::newTransaction(std::shared_ptr<iri::TXMessage> msg) {
     _stats->trackNewTX(*msg);
 
     auto bundle = msg->bundle();
+    std::string bundleHash = msg->bundle();
     vec.at(index) = std::move(msg);
 
     _unconfirmedBundles.insert(
-        std::make_pair<>(std::string(msg->bundle()), std::move(vec)));
+        std::make_pair<>(std::move(bundleHash), std::move(vec)));
   } else {
     // Bundle was seen before.
     // Was this bundle tx seen before?
@@ -93,6 +94,6 @@ void TXAnalyzer::transactionConfirmed(std::shared_ptr<iri::SNMessage> msg) {
 
   _unconfirmedBundles.erase(entry);
 }
-}
-}
-}
+}  // namespace statscollector
+}  // namespace utils
+}  // namespace iota
