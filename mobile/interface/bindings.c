@@ -8,7 +8,7 @@
 #define NONCE_LENGTH 27 * 3
 
 
-char* do_pow(char* trytes_in, int mwm) {
+char* do_pow(const char* trytes_in, int mwm) {
   Curl curl;
 
   int tryte_len = strlen(trytes_in);

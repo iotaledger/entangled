@@ -5,4 +5,5 @@ cc_library(
         "//common/trinary:trit_tryte"
     ],
     srcs=["bindings.c"],
-    hdrs=["bindings.h"], )
+    hdrs=["bindings.h"],
+    visibility = ["//visibility:public"])

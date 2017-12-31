@@ -1,2 +1,2 @@
-build --cxxopt='-std=c++17'
+build --cxxopt='-std=c++1z'
 test --copt='-ggdb3'
