@@ -14,7 +14,7 @@ public class DummyActivity extends Activity{
     setContentView(android.R.layout.simple_list_item_1);
 
     Log.e("IOTA", "Starting PoW");
-    String nonce = Interface.doPOW(TX_TRYTES, 9);
+    String nonce = Interface.doPOW(TX_TRYTES, 14);
     Log.e("IOTA", "Retrieved nonce: " + nonce);
   }
 }
