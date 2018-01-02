@@ -4,6 +4,7 @@
 
 #ifndef _Included_org_iota_mobile_Interface
 #define _Included_org_iota_mobile_Interface
+
 #ifdef __cplusplus
 extern "C" {
 #endif

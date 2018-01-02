@@ -7,6 +7,6 @@ cc_library(
 android_binary(
     name="hello_android",
     custom_package="org.iota.mobile",
-    srcs=["java/Interface.java"],
+    srcs=["java/Interface.java", "demo/App.java", "demo/DummyActivity.java"],
     manifest="AndroidManifest.xml",
-    deps=[":jni"])
+    deps=[":jni", "//mobile/interface:interface"])

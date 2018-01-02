@@ -1,5 +1,5 @@
 package org.iota.mobile;
 
 public class Interface {
-    public native String doPOW(String trytes, int mwm);
+    public static native String doPOW(String trytes, int mwm);
 }

@@ -8,6 +8,17 @@
         android:targetSdkVersion="16" />
 
     <application
-        android:label="Bazel App">
+        android:label="Bazel App"
+        android:name=".App"
+        >
+
+      <activity
+          android:name=".DummyActivity"
+          android:label="Bazel App" >
+        <intent-filter>
+          <action android:name="android.intent.action.MAIN" />
+          <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+      </activity>
     </application>
 </manifest>
