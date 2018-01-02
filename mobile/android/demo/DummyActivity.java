@@ -2,6 +2,7 @@ package org.iota.mobile;
 
 import android.os.*;
 import android.app.*;
+import android.util.Log;
 
 
 public class DummyActivity extends Activity{
@@ -10,8 +11,10 @@ public class DummyActivity extends Activity{
   {
     super.onCreate(savedInstanceState);
 
-    System.err.println("Starting PoW");
-    String nonce = Interface.doPOW(TX_TRYTES, 14);
-    System.err.println("Retrieved nonce: " + nonce);
+    setContentView(android.R.layout.simple_list_item_1);
+
+    Log.e("IOTA", "Starting PoW");
+    String nonce = Interface.doPOW(TX_TRYTES, 9);
+    Log.e("IOTA", "Retrieved nonce: " + nonce);
   }
 }
