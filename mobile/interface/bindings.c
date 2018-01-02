@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 
 #include "common/trinary/trit_tryte.h"
 #include "common/curl-p/hashcash.h"
@@ -25,10 +26,9 @@ char* do_pow(const char* trytes_in, int mwm) {
   curl_absorb(&curl, trits, trits_len);
 
   // FIXME(th0br0) deal with result value of `hashcash` call
-  hashcash(&curl, BODY, 0, trits_len, mwm);
+  hashcash(&curl, BODY, 0, HASH_LENGTH, mwm);
 
   curl_squeeze(&curl, nonce_trits, NONCE_LENGTH);
-
   trits_to_trytes(nonce_trits, nonce_trytes, NONCE_LENGTH);
 
   free(trits);
