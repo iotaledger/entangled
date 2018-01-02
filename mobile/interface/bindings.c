@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -6,7 +7,6 @@
 #include "common/curl-p/trit.h"
 
 #define NONCE_LENGTH 27 * 3
-
 
 char* do_pow(const char* trytes_in, int mwm) {
   Curl curl;
@@ -18,7 +18,7 @@ char* do_pow(const char* trytes_in, int mwm) {
   tryte_t* nonce_trytes = (tryte_t*) malloc(sizeof(tryte_t) * (NONCE_LENGTH / 3));
   trit_t* trits = (trit_t*) malloc(sizeof(trit_t) * trits_len);
 
-  trytes_to_trits((tryte_t*) trytes_in, trits, trits_len);
+  trytes_to_trits((tryte_t*) trytes_in, trits, tryte_len);
 
   curl.type = CURL_P_81;
   init_curl(&curl);
@@ -29,7 +29,7 @@ char* do_pow(const char* trytes_in, int mwm) {
 
   curl_squeeze(&curl, nonce_trits, NONCE_LENGTH);
 
-  trits_to_trytes(nonce_trits, nonce_trytes, NONCE_LENGTH / 3);
+  trits_to_trytes(nonce_trits, nonce_trytes, NONCE_LENGTH);
 
   free(trits);
 
