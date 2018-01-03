@@ -1,4 +1,4 @@
-image: walberla/buildenv-ubuntu-gcc:7
+image: th0br0/iota-buildenv:latest
 
 stages:
   - test
