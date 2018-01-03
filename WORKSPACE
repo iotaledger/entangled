@@ -7,7 +7,7 @@ git_repository(
 
 android_sdk_repository(
     name="androidsdk",
-    api_level=16, )
+    api_level=19, )
 
 android_ndk_repository(
     name="androidndk",
