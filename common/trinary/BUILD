@@ -9,7 +9,10 @@ cc_library(
 
 cc_library(
     name="trits",
-    hdrs=["trits.h"], )
+    hdrs=["trits.h"],
+    deps=[
+    "//common:stdint",
+    ], )
 
 cc_library(
     name="tryte",
