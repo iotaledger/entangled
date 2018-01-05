@@ -6,8 +6,9 @@
 short test(PCurl *curl, unsigned short security) {
   unsigned short i, j, k;
   signed short sum;
-  for (i = 0; i < HASH_LENGTH; i++) {
+  for (i = 0; i < sizeof(ptrit_t) * 8; i++) {
     sum = 0;
+
     for (j = 0; j < security; j++) {
       for (k = j * HASH_LENGTH / 3; k < (j + 1) * HASH_LENGTH / 3; k++) {
         if ((curl->state[k].low & (1 << i)) == 0) {
@@ -16,15 +17,18 @@ short test(PCurl *curl, unsigned short security) {
           sum++;
         }
       }
+
+      if (sum == 0 && j < security - 1) {
+        sum = 1;
+        break;
+      }
     }
-    if (sum == 0 && j < security - 1) {
-      goto end;
+
+    if (sum == 0) {
+      return i;
     }
   }
-  if (sum == 0) {
-    return i;
-  }
-end:
+
   return -1;
 }
 
