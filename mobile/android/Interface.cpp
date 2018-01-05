@@ -1,6 +1,7 @@
-#include <jni.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "jni.h"
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 
 #include "Interface.h"
 

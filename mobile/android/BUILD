@@ -1,7 +1,7 @@
 cc_library(
     name="jni",
     hdrs=["Interface.h"],
-    srcs=["Interface.cpp"],
+    srcs=["Interface.cpp", "jni.h"],
     deps=["//mobile/interface:interface"])
 
 android_binary(
