@@ -35,7 +35,7 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short offset,
                            short (*test)(PCurl *, unsigned short),
                            unsigned short param) {
   unsigned short found_thread = 0, n_procs = sysconf(_SC_NPROCESSORS_ONLN);
-  signed short found_index = -1;
+  intptr_t found_index = -1;
   SearchInstance inst[n_procs];
   SearchStatus status = SEARCH_RUNNING;
   pthread_rwlock_t statusLock;
@@ -122,7 +122,7 @@ void *run_search_thread(void *data) {
   for (i = 0; i < inst->index; i++) {
     ptrit_increment(inst->curl.state, inst->offset, HASH_LENGTH);
   }
-  return (void *)(long)do_pd_search(inst->test, inst, &copy);
+  return (void *)(intptr_t)do_pd_search(inst->test, inst, &copy);
 }
 
 short do_pd_search(short (*test)(PCurl *, unsigned short), SearchInstance *inst,
