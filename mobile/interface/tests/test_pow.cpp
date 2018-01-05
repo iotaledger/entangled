@@ -50,10 +50,11 @@ std::string TX_TRYTES =
 
 TEST(PoWTest, testsPoW) {
   using namespace testing;
-  auto nonce = do_pow(TX_TRYTES.c_str(), 9);
+  auto nonce = do_pow(TX_TRYTES.c_str(), 14);
 
   //FIXME(th0br0) verify that nonce yields a good hash
 
+  std::cerr << "TX: " << TX_TRYTES << std::endl;
   std::cerr << "Nonce: " << nonce << std::endl;
 }
 
