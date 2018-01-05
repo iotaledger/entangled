@@ -4,5 +4,6 @@
 #include "common/trinary/ptrit.h"
 
 void ptrit_increment(ptrit_t *const, size_t, size_t);
+void ptrit_offset(ptrit_t *const trits, size_t length);
 
 #endif
