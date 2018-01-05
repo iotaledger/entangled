@@ -33,7 +33,8 @@ cc_test (
     srcs = [
         "test_cpu_hashcash.c",
         ],
-    linkopts = ["-pthread"],
+    linkopts = ["-lpthread"],
+    tags = ["exclusive"],
     deps = [
         "//common/curl-p:hashcash",
         "@unity//:unity",
@@ -45,7 +46,8 @@ cc_test (
     srcs = [
         "test_cpu_hamming.c",
         ],
-    linkopts = ["-pthread"],
+    linkopts = ["-lpthread"],
+    tags = ["exclusive"],
     deps = [
         "//common/curl-p:hamming",
         "@unity//:unity",
