@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdatomic.h>
 
 #include "common/trinary/ptrit_incr.h"
 #include "common/trinary/trit_ptrit.h"
@@ -19,14 +18,15 @@ typedef struct {
   PCurl curl;
   short (*test)(PCurl *, unsigned short);
   unsigned short param;
-  volatile _Atomic SearchStatus *status;
+  SearchStatus *status;
+  pthread_rwlock_t *statusLock;
 } SearchInstance;
 
 void *run_search_thread(void *);
 void pt_start(pthread_t *const, SearchInstance *const, unsigned short);
 short do_pd_search(short (*)(PCurl *, unsigned short), SearchInstance *const,
                    PCurl *const);
-void init_inst(SearchInstance *const, volatile _Atomic SearchStatus *, unsigned short,
+void init_inst(SearchInstance *const, SearchStatus *, pthread_rwlock_t*, unsigned short,
                PCurl *const, unsigned short, unsigned short, unsigned short,
                short (*)(PCurl *, unsigned short));
 
@@ -37,17 +37,21 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short offset,
   unsigned short found_thread = 0, n_procs = sysconf(_SC_NPROCESSORS_ONLN);
   signed short found_index = -1;
   SearchInstance inst[n_procs];
-  volatile _Atomic SearchStatus status;
-  atomic_init(&status, SEARCH_RUNNING);
-
+  SearchStatus status = SEARCH_RUNNING;
+  pthread_rwlock_t statusLock;
   pthread_t tid[n_procs];
+
+  if(pthread_rwlock_init(&statusLock, NULL)) {
+    return PEARL_DIVER_ERROR;
+  }
+
 
   {
     PCurl curl;
     trits_to_ptrits(ctx->state, curl.state, STATE_LENGTH);
     ptrit_offset(&curl.state[offset], 4);
     curl.type = ctx->type;
-    init_inst(inst, &status, n_procs, &curl, offset + 4, end, param, test);
+    init_inst(inst, &status, &statusLock, n_procs, &curl, offset + 4, end, param, test);
   }
 
   pt_start(tid, inst, n_procs - 1);
@@ -71,13 +75,15 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short offset,
       return PEARL_DIVER_ERROR;
   }
 
+  pthread_rwlock_destroy(&statusLock);
+
   ptrits_to_trits(&inst[found_thread].curl.state[offset], &ctx->state[offset],
                   found_index, end - offset);
 
   return PEARL_DIVER_SUCCESS;
 }
 
-void init_inst(SearchInstance *const inst, volatile _Atomic SearchStatus *status,
+void init_inst(SearchInstance *const inst, SearchStatus *status, pthread_rwlock_t *statusLock,
                unsigned short index, PCurl *const curl, unsigned short offset,
                unsigned short end, unsigned short param,
                short (*test)(PCurl *, unsigned short)) {
@@ -89,9 +95,10 @@ void init_inst(SearchInstance *const inst, volatile _Atomic SearchStatus *status
                            .end = end,
                            .param = param,
                            .status = status,
+                           .statusLock = statusLock,
                            .test = test};
   memcpy(&(inst->curl), curl, sizeof(PCurl));
-  init_inst(&inst[1], status, index - 1, curl, offset, end, param, test);
+  init_inst(&inst[1], status, statusLock, index - 1, curl, offset, end, param, test);
 }
 
 void pt_start(pthread_t *const tid, SearchInstance *const inst,
@@ -121,15 +128,24 @@ void *run_search_thread(void *data) {
 short do_pd_search(short (*test)(PCurl *, unsigned short), SearchInstance *inst,
                    PCurl *copy) {
   short index;
-  while (atomic_load_explicit(inst->status, memory_order_relaxed) == SEARCH_RUNNING) {
+
+  SearchStatus status = SEARCH_RUNNING;
+  while (status == SEARCH_RUNNING) {
     memcpy(copy, &inst->curl, sizeof(PCurl));
     ptrit_transform(copy);
     index = test(copy, inst->param);
     if (index >= 0) {
-      atomic_store(inst->status, SEARCH_FINISHED);
+      pthread_rwlock_wrlock(inst->statusLock);
+      *inst->status = SEARCH_FINISHED;
+      pthread_rwlock_unlock(inst->statusLock);
+
       return index;
     }
     ptrit_increment(inst->curl.state, inst->offset + 1, HASH_LENGTH);
+
+    pthread_rwlock_rdlock(inst->statusLock);
+    status = *inst->status;
+    pthread_rwlock_unlock(inst->statusLock);
   }
   return -1;
   // return do_pd_search(test, inst, copy);
