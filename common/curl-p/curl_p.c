@@ -59,7 +59,7 @@ void sbox(Curl *const c, Curl *const s, size_t const i) {
     return;
   }
   c->state[i] = TRUTH_TABLE[s->state[CURL_INDEX[i]] +
-                            (s->state[CURL_INDEX[i + 1]] << 2) + 5];
+                            ((unsigned)s->state[CURL_INDEX[i + 1]] << 2) + 5];
   sbox(c, s, i + 1);
 }
 

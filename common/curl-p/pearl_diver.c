@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdatomic.h>
 
 #include "common/trinary/ptrit_incr.h"
 #include "common/trinary/trit_ptrit.h"
@@ -18,14 +19,14 @@ typedef struct {
   PCurl curl;
   short (*test)(PCurl *, unsigned short);
   unsigned short param;
-  volatile SearchStatus *status;
+  volatile _Atomic SearchStatus *status;
 } SearchInstance;
 
 void *run_search_thread(void *);
 void pt_start(pthread_t *const, SearchInstance *const, unsigned short);
 short do_pd_search(short (*)(PCurl *, unsigned short), SearchInstance *const,
                    PCurl *const);
-void init_inst(SearchInstance *const, volatile SearchStatus *, unsigned short,
+void init_inst(SearchInstance *const, volatile _Atomic SearchStatus *, unsigned short,
                PCurl *const, unsigned short, unsigned short, unsigned short,
                short (*)(PCurl *, unsigned short));
 
@@ -36,7 +37,8 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short offset,
   unsigned short found_thread = 0, n_procs = sysconf(_SC_NPROCESSORS_ONLN);
   signed short found_index = -1;
   SearchInstance inst[n_procs];
-  volatile SearchStatus status = SEARCH_RUNNING;
+  volatile _Atomic SearchStatus status;
+  atomic_init(&status, SEARCH_RUNNING);
 
   pthread_t tid[n_procs];
 
@@ -75,7 +77,7 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short offset,
   return PEARL_DIVER_SUCCESS;
 }
 
-void init_inst(SearchInstance *const inst, volatile SearchStatus *status,
+void init_inst(SearchInstance *const inst, volatile _Atomic SearchStatus *status,
                unsigned short index, PCurl *const curl, unsigned short offset,
                unsigned short end, unsigned short param,
                short (*test)(PCurl *, unsigned short)) {
@@ -119,12 +121,12 @@ void *run_search_thread(void *data) {
 short do_pd_search(short (*test)(PCurl *, unsigned short), SearchInstance *inst,
                    PCurl *copy) {
   short index;
-  while (*inst->status == SEARCH_RUNNING) {
+  while (atomic_load_explicit(inst->status, memory_order_relaxed) == SEARCH_RUNNING) {
     memcpy(copy, &inst->curl, sizeof(PCurl));
     ptrit_transform(copy);
     index = test(copy, inst->param);
     if (index >= 0) {
-      *(inst->status) = SEARCH_FINISHED;
+      atomic_store(inst->status, SEARCH_FINISHED);
       return index;
     }
     ptrit_increment(inst->curl.state, inst->offset + 1, HASH_LENGTH);

@@ -29,16 +29,8 @@ void ptrits_to_trits(ptrit_t *ptrits, trit_t *trits, size_t index,
     return;
   }
 
-  short low =  (ptrits->low >> index) & 1;
-  short high = (ptrits->high >> index) & 1;
-
-  if(low == 1 && high == 0) {
-    trits[0] = -1;
-  } else if(low == 0 && high == 1) {
-    trits[0] = 1;
-  } else {
-    trits[0] = 0;
-  }
-
-  ptrits_to_trits(ptrits + 1, trits + 1, index, length - 1);
+  trits[0] = (ptrits->low & (1uL << index))
+                 ? ((ptrits->high & (1uL << index)) ? 0 : -1)
+                 : 1;
+  ptrits_to_trits(&ptrits[1], &trits[1], index, length - 1);
 }
