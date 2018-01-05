@@ -29,9 +29,6 @@ void init_inst(SearchInstance *const, volatile SearchStatus *, unsigned short,
                PCurl *const, unsigned short, unsigned short, unsigned short,
                short (*)(PCurl *, unsigned short));
 
-void join_all(pthread_t *const tid, unsigned short index, unsigned short *,
-              short *);
-
 PearlDiverStatus pd_search(Curl *const ctx, unsigned short offset,
                            unsigned short end,
                            short (*test)(PCurl *, unsigned short),
@@ -53,10 +50,12 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short offset,
 
   pt_start(tid, inst, n_procs - 1);
 
-  // join_all(tid, n_procs - 1, &found_thread, &found_index);
-  for (int i = 0; i < n_procs; i++) {
+  for (int i = n_procs; --i >= 0;) {
+    if (tid[i] == 0) continue;
+
     if (found_index < 0) {
       pthread_join(tid[i], (void *)&found_index);
+
       if (found_index >= 0) {
         found_thread = i;
       }
@@ -97,7 +96,7 @@ void pt_start(pthread_t *const tid, SearchInstance *const inst,
               unsigned short index) {
   if (pthread_create(&tid[index], NULL, run_search_thread,
                      ((void *)&inst[index]))) {
-    // tid[thread_count] = 0;
+    tid[index] = 0;
   }
   if (index == 0) {
     return;
@@ -114,7 +113,7 @@ void *run_search_thread(void *data) {
   for (i = 0; i < inst->index; i++) {
     ptrit_increment(inst->curl.state, inst->offset, HASH_LENGTH);
   }
-  return (void*) (long) do_pd_search(inst->test, inst, &copy);
+  return (void *)(long)do_pd_search(inst->test, inst, &copy);
 }
 
 short do_pd_search(short (*test)(PCurl *, unsigned short), SearchInstance *inst,
@@ -132,23 +131,4 @@ short do_pd_search(short (*test)(PCurl *, unsigned short), SearchInstance *inst,
   }
   return -1;
   // return do_pd_search(test, inst, copy);
-}
-
-void join_all(pthread_t *const tid, unsigned short index,
-              unsigned short *found_thread, short *found_index) {
-  int join_result;
-  if (*found_index < 0) {
-    join_result = pthread_join(tid[index], (void *)found_index);
-    if (*found_index >= 0) {
-      *found_thread = index;
-    }
-  } else {
-    join_result = pthread_join(tid[index], NULL);
-  }
-
-  // FIXME (@nctls) - this might leave threads running.
-  if (join_result || index == 0) {
-    return;
-  }
-  join_all(tid, index - 1, found_thread, found_index);
 }
