@@ -13,8 +13,12 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_doPOW(JNIEnv* env,
                                                                jstring jtrytes,
                                                                jint mwm) {
   const char* trytes = env->GetStringUTFChars(jtrytes, 0);
+  char* nonce = (char*) calloc(27 + 1, sizeof(char));
 
-  char* nonce = do_pow((const char*) trytes, mwm);
+  char* foundNonce = do_pow((const char*) trytes, mwm);
+  memcpy(nonce, foundNonce, 27);
+  free(foundNonce);
+
   jstring out = env->NewStringUTF(nonce);
   free(nonce);
 
