@@ -18,31 +18,28 @@
       -1, 0, 1, -1, -1, 0, 1
 const trit_t zeros[HASH_LENGTH] = {0};
 
-void run_pd_test(Curl *curl, unsigned short mwm) {
+void run_pd_test(CurlType type, unsigned short mwm) {
+  Curl curl;
+  curl.type = type;
   trit_t trits[] = {TRYTES_IN};
   trit_t hash[HASH_LENGTH];
-  init_curl(curl);
-  curl_absorb(curl, trits, HASH_LENGTH);
-  PearlDiverStatus result = hashcash(curl, BODY, 0, HASH_LENGTH, mwm);
-  curl_squeeze(curl, hash, HASH_LENGTH);
+  init_curl(&curl);
+  curl_absorb(&curl, trits, HASH_LENGTH);
+  PearlDiverStatus result = hashcash(&curl, BODY, 0, HASH_LENGTH, mwm);
+  curl_squeeze(&curl, hash, HASH_LENGTH);
 
   TEST_ASSERT_EQUAL_INT8(PEARL_DIVER_SUCCESS, result);
-  TEST_ASSERT_EQUAL_INT8_ARRAY(zeros, &(curl->state[HASH_LENGTH - mwm]),
+  TEST_ASSERT_EQUAL_INT8_ARRAY(zeros, &(curl.state[HASH_LENGTH - mwm]),
                                mwm * sizeof(trit_t));
-}
-
-void test_pd_27_works(void) {
-  Curl curl;
-  curl.type = CURL_P_27;
-  run_pd_test(&curl, 5);
   curl_reset(&curl);
 }
+
+void test_pd_27_works(void) { run_pd_test(CURL_P_27, 13); }
 
 void test_pd_81_works(void) {
-  Curl curl;
-  curl.type = CURL_P_81;
-  run_pd_test(&curl, 5);
-  curl_reset(&curl);
+  for (int i = 12; i < 15; i++) {
+    run_pd_test(CURL_P_81, i);
+  }
 }
 
 int main(void) {

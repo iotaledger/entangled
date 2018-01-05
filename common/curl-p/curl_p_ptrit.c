@@ -41,15 +41,16 @@ void ptrit_curl_squeeze(PCurl *ctx, ptrit_t *const trits, size_t length) {
 void ptrit_transform(PCurl *const ctx) {
   PCurl s;
   ptrit_transform_round(ctx, &s, ctx->type);
+  memcpy(ctx->state, s.state, sizeof(ptrit_t) * STATE_LENGTH);
+  ptrit_curl_reset(&s);
 }
 
 void ptrit_transform_round(PCurl *const ctx, PCurl *const s, size_t const i) {
   if (i == 0) {
     return;
   }
-  memcpy(s, ctx, sizeof(PCurl));
-  ptrit_sbox(ctx->state, s->state, 0);
-  ptrit_transform_round(ctx, s, i - 1);
+  ptrit_sbox(s->state, ctx->state, 0);
+  ptrit_transform_round(s, ctx, i - 1);
 }
 void ptrit_sbox(ptrit_t *const c, ptrit_t *const s, size_t const i) {
   if (i == STATE_LENGTH) {
