@@ -1,4 +1,5 @@
 #include <unity/unity.h>
+#include <string.h>
 
 #include "common/trinary/trit_tryte.h"
 
@@ -10,6 +11,7 @@ void test_tryte_to_trit(void) {
   tryte_t trytes[12];
   tryte_t exp[] = {TRYTES_IN};
   trits_to_trytes(trits, trytes, 12);
+  TEST_ASSERT_EQUAL(strlen((const char *)trytes), 12);
   TEST_ASSERT_EQUAL_MEMORY(exp, trits, sizeof(exp));
 }
 

@@ -31,7 +31,7 @@ void trits_to_trytes(trit_t *trits, tryte_t *trytes, size_t length) {
     j += TRYTE_SPACE;
   }
   trytes[0] = TRYTE_STRING[(size_t)j];
-  if (length < NUMBER_OF_TRITS_IN_A_TRYTE) {
+  if (length <= NUMBER_OF_TRITS_IN_A_TRYTE) {
     return;
   }
   trits_to_trytes(&trits[NUMBER_OF_TRITS_IN_A_TRYTE], &trytes[1],
