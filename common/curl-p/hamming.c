@@ -1,8 +1,8 @@
 #include "hamming.h"
+#include <stdio.h>
 #include "ptrit.h"
 #include "search.h"
 #include "trit.h"
-#include <stdio.h>
 
 short test(PCurl *curl, unsigned short security) {
   unsigned short i, j, k;
@@ -12,9 +12,9 @@ short test(PCurl *curl, unsigned short security) {
 
     for (j = 0; j < security; j++) {
       for (k = j * HASH_LENGTH / 3; k < (j + 1) * HASH_LENGTH / 3; k++) {
-        if ((curl->state[k].low & (1uL << i)) == 0) {
+        if ((curl->state[k].low & (1uLL << i)) == 0) {
           sum--;
-        } else if ((curl->state[k].high & (1uL << i)) == 0) {
+        } else if ((curl->state[k].high & (1uLL << i)) == 0) {
           sum++;
         }
       }
