@@ -15,10 +15,17 @@ before_script:
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
-tests:
+test64:
   stage: test
   script:
     - mkdir /root/.cache && [ -d bazel-cache ] && mv bazel-cache /root/.cache/bazel
-    - tools/ci/build.sh
+    - tools/ci/build.sh 64
+    - mv /root/.cache/bazel bazel-cache
+
+test32:
+  stage: test
+  script:
+    - mkdir /root/.cache && [ -d bazel-cache ] && mv bazel-cache /root/.cache/bazel
+    - tools/ci/build.sh 32
     - mv /root/.cache/bazel bazel-cache
 
