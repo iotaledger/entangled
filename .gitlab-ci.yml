@@ -8,10 +8,6 @@ cache:
   paths:
     - bazel-cache
 
-before_script:
-  - apt-get update
-  - apt-get install -y unzip ccache libssl-dev openssl xxd
-
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
