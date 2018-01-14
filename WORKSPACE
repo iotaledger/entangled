@@ -3,7 +3,7 @@ workspace(name="org_iota_entangled")
 git_repository(
     name="rules_iota",
     remote="https://gitlab.com/iota-foundation/software/rules_iota.git",
-    commit="2ebb283b3ca02431291047b1f99e168449f97d66")
+    commit="31b4f2e2abadc9b5007401b13c9f79c5bfdb5834")
 
 android_sdk_repository(
     name="androidsdk",
