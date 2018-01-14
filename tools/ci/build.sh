@@ -45,7 +45,8 @@ elif [ $1 -eq "32" ]; then
 	echo "================================================================================="
 	echo "================================================================================="
 
-	${BAZEL} test --linkopt="-m32" --copt="-m32" --cxxopt="-m32" //... --verbose_failures
+	# FIXME @th0br0 these build opts are also passed to Android clang causing build failure for aarch64
+	${BAZEL} test --linkopt="-m32" --copt="-m32" --cxxopt="-m32" --deleted_packages="//mobile/android" //... --verbose_failures
 else 
 	exit 1
 fi
