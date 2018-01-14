@@ -7,5 +7,6 @@ cc_binary(
         '@cpprestsdk//:cpprestsdk',
         '@com_github_gflags_gflags//:gflags',
         '@glog//:glog',
+	'@prometheus_cpp//:prometheus_cpp',
     ])
 
