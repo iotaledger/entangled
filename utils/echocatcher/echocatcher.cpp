@@ -23,7 +23,7 @@ DEFINE_string(iriHost, "http://node02.iotatoken.nl:14265",
               "URL of IRI API to use");
 
 DEFINE_string(prometheusExposerIP, "0.0.0.0:8080",
-              "URL of the prometheus exposer from where its data will be scraped");
+              "IP/Port that the Prometheus Exposer binds to");
 
 DEFINE_int32(mwm, 14, "Minimum Weight Magnitude");
 
