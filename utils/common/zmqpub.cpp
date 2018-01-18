@@ -16,7 +16,7 @@ namespace iota {
 namespace utils {
 
 void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s,
-                  const std::string& uri) {
+                  const std::string& uri, const std::atomic<bool>& shouldFinish) {
   std::array<char, 2048> buf;
 
   zmq::context_t context(1);
@@ -30,7 +30,7 @@ void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s,
   auto handler = std::function<void(void)>();
   poller->add(subscriber, ZMQ_POLLIN, handler);
 
-  while (1) {
+  while (!shouldFinish) {
     buf.fill('\0');
 
     poller->wait(std::chrono::milliseconds(-1));
@@ -50,6 +50,8 @@ void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s,
 
   s.on_completed();
 }
+
+
 
 }  // namespace utils
 }  // namespace iota
