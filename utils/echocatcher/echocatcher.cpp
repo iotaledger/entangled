@@ -134,11 +134,12 @@ int main(int argc, char** argv) {
 
   exposer.RegisterCollectable(registry);
 
+  std::atomic<bool> haveAllTXReturned = false;
   auto zmqThread = rxcpp::schedulers::make_new_thread();
-  std::atomic<bool> hasAllTXReturned = false;
+
   auto zmqObservable =
       rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
-          [&](auto s) { zmqPublisher(std::move(s), FLAGS_zmqURL, hasAllTXReturned); })
+          [&](auto s) { zmqPublisher(std::move(s), FLAGS_zmqURL, haveAllTXReturned); })
           .observe_on(rxcpp::observe_on_new_thread());
 
   auto broadcast = iriClient->broadcastTransactions({hashed.tx});
@@ -147,7 +148,7 @@ int main(int argc, char** argv) {
   zmqObservable.observe_on(rxcpp::synchronize_new_thread())
       .subscribe(
           [start, hashed, &gauge_received_family,
-           &gauge_arrived_family, &hasAllTXReturned](std::shared_ptr<iri::IRIMessage> msg) {
+           &gauge_arrived_family, &haveAllTXReturned](std::shared_ptr<iri::IRIMessage> msg) {
             if (msg->type() != iri::IRIMessageType::TX) return;
 
             auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
@@ -172,7 +173,7 @@ int main(int argc, char** argv) {
 
               current_received_duration_gauge.Set(elapsed_until_received);
               current_arrived_duration_gauge.Set(elapsed_until_arrived);
-              hasAllTXReturned = true;
+              haveAllTXReturned = true;
             }
           },
           []() {});
