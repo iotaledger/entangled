@@ -232,7 +232,7 @@ int main(int argc, char** argv) {
   std::atomic<bool> haveAllTXReturned = false;
   auto tangleDBWarmupPeriod = std::chrono::milliseconds(FLAGS_tangleDBWarmupPeriod*1000);
 
-  std::map<std::string,std::time_t> hashToFirstSeenTime;
+  std::map<std::string,std::time_t> hashToSeenTimestamp;
   std::vector<std::shared_future<void>> futures;
 
   auto zmqThread = rxcpp::schedulers::make_new_thread();
@@ -277,14 +277,14 @@ int main(int argc, char** argv) {
       .subscribe(
           [start, hashed, &gauge_received_family,
            &gauge_arrived_family, &haveAllTXReturned, &iriClient,
-           &hashToFirstSeenTime, &futures](std::shared_ptr<iri::IRIMessage> msg) {
+           &hashToSeenTimestamp, &futures](std::shared_ptr<iri::IRIMessage> msg) {
             if (msg->type() != iri::IRIMessageType::TX) return;
 
             auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
 
               auto received = std::chrono::system_clock::now();
 
-              futures.push_back(std::async(std::launch::async, handleUnseenTransactions,tx, std::ref(hashToFirstSeenTime), received, iriClient));
+              futures.push_back(std::async(std::launch::async, handleUnseenTransactions,tx, std::ref(hashToSeenTimestamp), received, iriClient));
 
             if (tx->hash() == hashed.hash) {
               auto& current_received_duration_gauge = gauge_received_family.Add(
