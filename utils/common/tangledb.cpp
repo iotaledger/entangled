@@ -43,9 +43,6 @@ TangleDB& TangleDB::instance(){
     return db;
 }
 
-//the problem with this function will be noticed when
-//someone will keep its returned value as if it is a valid copy
-//while this record has been somehow deleted
 TangleDB::TXRecordImpl TangleDB::find(const std::string &hash) {
 
     std::shared_lock<std::shared_mutex> lock(mutex_);
