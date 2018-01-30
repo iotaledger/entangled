@@ -30,7 +30,7 @@ void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s,
   auto handler = std::function<void(void)>();
   poller->add(subscriber, ZMQ_POLLIN, handler);
 
-  while (!shouldFinish) {
+  while (!shouldFinish && s.is_subscribed()) {
     buf.fill('\0');
 
     poller->wait(std::chrono::milliseconds(-1));
@@ -43,7 +43,7 @@ void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s,
 
     auto msg = iri::payloadToMsg(view);
 
-    if (msg) {
+    if (msg && !shouldFinish) {
       s.on_next(std::move(msg));
     }
   }
