@@ -1,9 +1,9 @@
 cc_library(
     name='common',
     include_prefix='iota/utils/common',
-    hdrs=glob(['*.hpp','*.h']),
+    hdrs=glob(['*.hpp']),
     defines=['ZMQ_BUILD_DRAFT_API'],
-    srcs=glob(['*.cpp', '*.hpp','*.h']),
+    srcs=glob(['*.cpp', '*.hpp']),
     deps=[
         '@rxcpp//:rxcpp',
         '@cppzmq//:cppzmq',

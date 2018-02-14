@@ -6,7 +6,6 @@
 #include <cstring>
 #include <list>
 #include <unordered_set>
-#include <future>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -16,10 +15,13 @@
 #include <iota/utils/common/api.hpp>
 #include <iota/utils/common/iri.hpp>
 #include <iota/utils/common/zmqpub.hpp>
-#include <iota/utils/common/tangledb.h>
+#include <iota/utils/common/txauxiliary.hpp>
+
 
 
 #include <prometheus/exposer.h>
+
+#include "utils/common/tangledb.hpp"
 
 
 DEFINE_string(zmqURL, "tcp://m5.iotaledger.net:5556",
@@ -91,110 +93,10 @@ std::string fillTX(api::GetTransactionsToApproveResponse response) {
   return std::move(tx);
 }
 
-pplx::task<std::string> constructTXs(api::IRIClient* client) {
-  return client->getTransactionsToApprove().then(fillTX);
-}
-
 std::string powTX(std::string tx, int mwm) { return ccurl_pow(tx.data(), mwm); }
 
 HashedTX hashTX(std::string tx) {
   return {ccurl_digest_transaction(tx.data()), std::move(tx)};
-}
-
-bool removeConfirmedTransactions(std::shared_ptr<api::IRIClient> client,
-                                 const std::vector<std::string>& tips, std::vector<std::string>& txs){
-
-    using namespace std;
-
-    auto inclusionStatesResponse = std::move(client->getInclusionStates(txs,tips).get());
-
-    if (inclusionStatesResponse.states.empty()){
-    return false;
-    }
-    auto states = std::move(inclusionStatesResponse.states);
-
-    auto idx = 0;
-    txs.erase(remove_if(txs.begin(),
-                       txs.end(),
-                       [&idx, &states](string hash){return states[idx++];}),
-        txs.end());
-    return true;
-}
-
-std::set<std::string> getUnconfirmedTXs(
-    std::shared_ptr<api::IRIClient> client, std::shared_ptr<iri::TXMessage> tx) {
-
- using namespace std;
- auto nodeInfo = client->getNodeInfo().get();
- auto tips = {nodeInfo.latestMilestone};
-
- set<string> res;
- vector<string> currentLevelTXs = {tx->branch(),tx->trunk()};
-
- while(!currentLevelTXs.empty())
- {
-
-    if (!removeConfirmedTransactions(client,tips,currentLevelTXs) || currentLevelTXs.empty()){
-     break;
-    }
-
-   res.insert(currentLevelTXs.begin(),currentLevelTXs.end());
-
-   auto trytesVec = client->getTrytes(currentLevelTXs).get();
-   set<string> nextLevelTXs;//Avoid duplications and allow a minimal query for IRI
-
-   for_each(trytesVec.begin(), trytesVec.end(),
-                   [&nextLevelTXs](const string& trytes){
-                       nextLevelTXs.insert(trytes.substr(2430,81).data());
-                       nextLevelTXs.insert(trytes.substr(2511,81).data());
-                   });
-   currentLevelTXs.clear();
-   for_each(nextLevelTXs.begin(),nextLevelTXs.end(),[&currentLevelTXs](const string& hash){
-       currentLevelTXs.push_back(hash);});
- }
-
- return res;
-}
-
-void handleUnseenTransactions(std::shared_ptr<iri::TXMessage> tx,
-                              std::map<std::string,std::time_t>& hashToSeenTimestamp,
-                              std::chrono::time_point<std::chrono::system_clock> received,
-                              std::shared_ptr<api::IRIClient> iriClient){
-
-    static std::mutex mapMutex;
-
-    TXRecord txRecord = {tx->hash().data(),tx->trunk().data(),tx->branch().data()};
-    putInTangleDB(tx->hash().data(),std::move(txRecord));
-
-    {
-        std::lock_guard<std::mutex> lock(mapMutex);
-        auto txTimeIt = hashToSeenTimestamp.find(tx->hash());
-        if (txTimeIt != hashToSeenTimestamp.end()){
-            auto txArrivalLatency = std::chrono::duration_cast<std::chrono::milliseconds>(
-                    received - std::chrono::system_clock::from_time_t(txTimeIt->second)).count();
-            hashToSeenTimestamp.erase(tx->hash().data());
-            LOG(INFO) << "TX: "<<tx->hash()<<" arrived "<<txArrivalLatency<<" milliseconds after it was firstly discovered";
-        }
-    }
-
-    auto unconfirmed = getUnconfirmedTXs(iriClient,tx);
-
-    if (unconfirmed.empty()){
-        return;
-    }
-
-    std::vector<std::string> unconfirmedVec(unconfirmed.begin(),unconfirmed.end());
-    //remove seen transactions
-    unconfirmedVec.erase(remove_if(unconfirmedVec.begin(),
-                                   unconfirmedVec.end(),
-                                   [](std::string txHash){
-                                       return !std::string_view(findInTangleDB(txHash.data()).hash).empty();}),
-                         unconfirmedVec.end());
-
-    std::lock_guard<std::mutex> lock(mapMutex);
-    std::for_each(unconfirmedVec.begin(),unconfirmedVec.end(),[&hashToSeenTimestamp, received](std::string txHash){
-        hashToSeenTimestamp[txHash] = std::chrono::system_clock::to_time_t(received);
-    });
 }
 
 int main(int argc, char** argv) {
@@ -232,8 +134,8 @@ int main(int argc, char** argv) {
   std::atomic<bool> haveAllTXReturned = false;
   auto tangleDBWarmupPeriod = std::chrono::milliseconds(FLAGS_tangleDBWarmupPeriod*1000);
 
-  std::map<std::string,std::time_t> hashToSeenTimestamp;
-  std::vector<std::shared_future<void>> futures;
+  std::map<std::string,std::chrono::system_clock::time_point> hashToDiscoveryTimestamp;
+  std::vector<pplx::task<void>> handleTXtasks;
 
   auto zmqThread = rxcpp::schedulers::make_new_thread();
 
@@ -255,8 +157,8 @@ int main(int argc, char** argv) {
 
                   auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
 
-                  TXRecord txRec = {tx->hash().data(),tx->trunk().data(),tx->branch().data()};
-                  putInTangleDB(tx->hash().data(),std::move(txRec));
+                  TangleDB::TXRecord txRec = {tx->hash(),tx->trunk(),tx->branch()};
+                  TangleDB::instance().put(tx->hash(),std::move(txRec));
               },
               []() {});
 
@@ -277,14 +179,15 @@ int main(int argc, char** argv) {
       .subscribe(
           [start, hashed, &gauge_received_family,
            &gauge_arrived_family, &haveAllTXReturned, &iriClient,
-           &hashToSeenTimestamp, &futures](std::shared_ptr<iri::IRIMessage> msg) {
+           &hashToDiscoveryTimestamp, &handleTXtasks](std::shared_ptr<iri::IRIMessage> msg) {
             if (msg->type() != iri::IRIMessageType::TX) return;
 
             auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
 
-              auto received = std::chrono::system_clock::now();
+            auto received = std::chrono::system_clock::now();
 
-              futures.push_back(std::async(std::launch::async, handleUnseenTransactions,tx, std::ref(hashToSeenTimestamp), received, iriClient));
+            auto txHandlerTask = TXAuxiliary::instance().handleUnseenTransactions(tx,hashToDiscoveryTimestamp,received,iriClient);
+            handleTXtasks.push_back(std::move(txHandlerTask));
 
             if (tx->hash() == hashed.hash) {
               auto& current_received_duration_gauge = gauge_received_family.Add(
@@ -292,7 +195,6 @@ int main(int argc, char** argv) {
 
               auto& current_arrived_duration_gauge = gauge_arrived_family.Add(
                   {{"bundle_size", std::to_string(tx->lastIndex() + 1)}});
-
 
               auto elapsed_until_received =
                   std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -312,8 +214,7 @@ int main(int argc, char** argv) {
           },
           []() {});
 
-    std::for_each(futures.begin(),futures.end(),[](std::shared_future<void>& fu){if (fu.valid())fu.get();});
-
+    std::for_each(handleTXtasks.begin(),handleTXtasks.end(),[&](pplx::task<void> task){task.get();});
 
   return 0;
 }

@@ -16,26 +16,25 @@ struct GetTransactionsToApproveResponse {
 };
 
 struct GetNodeInfoResponse {
+  std::string appName;
+  std::string appVersion;
+  uint32_t jreAvailableProcessors;
+  int64_t jreFreeMemory;
+  std::string jreVersion;
 
-std::string appName;
-std::string appVersion;
-uint32_t    jreAvailableProcessors;
-int64_t     jreFreeMemory;
-std::string jreVersion;
+  int64_t jreMaxMemory;
+  int64_t jreTotalMemory;
+  std::string latestMilestone;
+  uint32_t latestMilestoneIndex;
 
-int64_t     jreMaxMemory;
-int64_t     jreTotalMemory;
-std::string latestMilestone;
-uint32_t    latestMilestoneIndex;
+  std::string latestSolidSubtangleMilestone;
+  uint32_t latestSolidSubtangleMilestoneIndex;
 
-std::string latestSolidSubtangleMilestone;
-uint32_t    latestSolidSubtangleMilestoneIndex;
-
-uint32_t neighbors;
-uint32_t packetsQueueSize;
-int64_t  time;
-uint32_t tips;
-uint32_t transactionsToRequest;
+  uint32_t neighbors;
+  uint32_t packetsQueueSize;
+  int64_t time;
+  uint32_t tips;
+  uint32_t transactionsToRequest;
 };
 struct GetInclusionStatesResponse {
         std::vector<bool> states;
