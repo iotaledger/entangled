@@ -2,8 +2,8 @@
 
 #define RADIX 3
 
-long long trits_to_long(trit_t *trit, size_t const i) {
-  long long accum = 0;
+int64_t trits_to_long(trit_t *trit, size_t const i) {
+  int64_t accum = 0;
   size_t end = i;
   while (end-- > 0) {
     accum = accum * RADIX + trit[end];
@@ -11,17 +11,17 @@ long long trits_to_long(trit_t *trit, size_t const i) {
   return accum;
 }
 
-size_t min_trits(long long value) {
+size_t min_trits(int64_t value) {
   size_t num = 1;
-  long long vp = 1;
-  long long v_abs = value < 0 ? -value : value;
+  int64_t vp = 1;
+  int64_t v_abs = value < 0 ? -value : value;
   while (v_abs > (vp *= RADIX)) {
     num++;
   }
   return num;
 }
 
-size_t long_to_trits(long long value, trit_t *out) {
+size_t long_to_trits(int64_t value, trit_t *out) {
   trit_t trit;
   size_t i, size;
   char negative;
@@ -57,7 +57,7 @@ size_t nearest_greater_power_of_three(size_t value, size_t *power) {
   return vp;
 }
 
-size_t encoded_length_variables(long long value, size_t *start, size_t *power) {
+size_t encoded_length_variables(int64_t value, size_t *start, size_t *power) {
   size_t size, size_size;
   size = nearest_greater_power_of_three(min_trits(value), power);
   size_size = (*power + 1) / 2;
@@ -65,13 +65,13 @@ size_t encoded_length_variables(long long value, size_t *start, size_t *power) {
   return size_size + size;
 }
 
-size_t encoded_length(long long value) {
+size_t encoded_length(int64_t value) {
   size_t start, power;
   return encoded_length_variables(value, &start, &power);
 }
 
-// trit_t *encode_long(long long value) {
-int encode_long(long long value, trit_t *out, size_t size) {
+// trit_t *encode_long(int64_t value) {
+int encode_long(int64_t value, trit_t *out, size_t size) {
   size_t size_size, power;
   size_t end = encoded_length_variables(value, &size_size, &power);
   if (size < end) {
@@ -84,7 +84,7 @@ encode_long_err:
   return -1;
 }
 
-long long get_encoded_long(trit_t *trits, size_t length, size_t *end) {
+int64_t get_encoded_long(trit_t *trits, size_t length, size_t *end) {
   size_t size = 1, i;
   for (i = 0; i < length && trits[i] == 0; i++, size *= 3) {
     size *= 3;
