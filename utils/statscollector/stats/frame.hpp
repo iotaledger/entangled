@@ -28,6 +28,7 @@ class StatsFrame {
 
 class FrameTXStats : public TXStats {
  public:
+  FrameTXStats();
   void trackNewTX(iri::TXMessage &);
   void trackReattachedTX();
   void trackNewBundle();
@@ -36,7 +37,6 @@ class FrameTXStats : public TXStats {
 
  public:
   std::unique_ptr<StatsFrame> swapFrame();
-
  private:
   std::shared_mutex _mutex;
   std::unique_ptr<StatsFrame> _frame;

@@ -11,6 +11,10 @@ namespace iota {
 namespace utils {
 namespace statscollector {
 
+FrameTXStats::FrameTXStats(){
+_frame = std::make_unique<StatsFrame>();
+}
+
 std::unique_ptr<StatsFrame> FrameTXStats::swapFrame() {
   std::lock_guard guard(_mutex);
 
@@ -19,6 +23,7 @@ std::unique_ptr<StatsFrame> FrameTXStats::swapFrame() {
 
   return old;
 }
+
 
 void FrameTXStats::trackNewTX(iri::TXMessage& tx) {
   std::lock_guard guard(_mutex);

@@ -18,6 +18,6 @@ cc_test(name='tests',
 cc_binary(name='statscollector',
           srcs=["statscollector.cpp"],
           deps=[
-              '@influxdb_cpp_rest//:influxdb_cpp_rest',
+	      '@prometheus_cpp//:prometheus_cpp',
               ':shared',
-          ])
+	  ])
