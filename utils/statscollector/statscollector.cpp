@@ -35,25 +35,26 @@ namespace utils {
 namespace statscollector {
 
 using namespace prometheus;
-std::map<std::string,std::reference_wrapper<Family<Gauge>> > buildMetricsMap(std::shared_ptr<Registry> registry){
+std::map<std::string, std::reference_wrapper<Family<Gauge>>> buildMetricsMap(
+    std::shared_ptr<Registry> registry) {
+  static std::map<std::string, std::string> nameToDesc = {
+      {"transactionsNew", "New TXs count"},
+      {"transactionsReattached", "Reattached TXs count"},
+      {"transactionsConfirmed", "confirmed TXs count"},
+      {"bundlesNew", "new bundles count"},
+      {"bundlesConfirmed", "confirmed bundles count"},
+      {"avgConfirmationDuration", "bundle's average confirmation duration"},
+      {"valueNew", "new tx's accumulated value"},
+      {"valueConfirmed", "confirmed tx's accumulated value"}};
 
-    static std::map<std::string,std::string> nameToDesc= {{"transactionsNew","New TXs count"},
-                                                    {"transactionsReattached","Reattached TXs count"},
-                                                    {"transactionsConfirmed","confirmed TXs count"},
-                                                    {"bundlesNew","new bundles count"},
-                                                    {"bundlesConfirmed","confirmed bundles count"},
-                                                    {"avgConfirmationDuration","bundle's average confirmation duration"},
-                                                    {"valueNew","new tx's accumulated value"},
-                                                    {"valueConfirmed","confirmed tx's accumulated value"}};
+  std::map<std::string, std::reference_wrapper<Family<Gauge>>> famillies;
 
-    std::map<std::string,std::reference_wrapper<Family<Gauge>> > famillies;
-
-    for (const auto& kv : nameToDesc) {
-    auto&       curr_family = BuildGauge()
-                .Name("statscollector_" + kv.first)
-                .Help(kv.second)
-                .Labels({{"publish_node",FLAGS_zmqURL}})
-                .Register(*registry);
+  for (const auto& kv : nameToDesc) {
+    auto& curr_family = BuildGauge()
+                            .Name("statscollector_" + kv.first)
+                            .Help(kv.second)
+                            .Labels({{"publish_node", FLAGS_zmqURL}})
+                            .Register(*registry);
 
     famillies.insert(std::make_pair(std::string(kv.first),std::ref(curr_family)));
     }
@@ -87,12 +88,12 @@ int main(int argc, char** argv) {
   Exposer exposer{FLAGS_prometheusExposerIP};
   auto registry = std::make_shared<Registry>();
 
-  auto famillies = buildMetricsMap(registry);
+  auto families = buildMetricsMap(registry);
 
   exposer.RegisterCollectable(registry);
 
   pubWorker.schedule_periodically(pubStartDelay, pubInterval, [
-          weakStats = std::weak_ptr(stats), &famillies
+          weakStats = std::weak_ptr(stats), &families
   ](auto scbl) {
     if (auto stats = weakStats.lock()) {
       auto frame = stats->swapFrame();
@@ -102,14 +103,14 @@ int main(int argc, char** argv) {
         pubDelayComplete = true;
       } else {
         {
-            famillies.at("transactionsNew").get().Add({}).Set(frame->transactionsNew);
-            famillies.at("transactionsReattached").get().Add({}).Set(frame->transactionsReattached);
-            famillies.at("transactionsConfirmed").get().Add({}).Set(frame->transactionsConfirmed);
-            famillies.at("bundlesNew").get().Add({}).Set(frame->bundlesNew);
-            famillies.at("bundlesConfirmed").get().Add({}).Set(frame->bundlesConfirmed);
-            famillies.at("avgConfirmationDuration").get().Add({}).Set(frame->avgConfirmationDuration);
-            famillies.at("valueNew").get().Add({}).Set(frame->valueNew);
-            famillies.at("valueConfirmed").get().Add({}).Set(frame->valueConfirmed);
+            families.at("transactionsNew").get().Add({}).Set(frame->transactionsNew);
+            families.at("transactionsReattached").get().Add({}).Set(frame->transactionsReattached);
+            families.at("transactionsConfirmed").get().Add({}).Set(frame->transactionsConfirmed);
+            families.at("bundlesNew").get().Add({}).Set(frame->bundlesNew);
+            families.at("bundlesConfirmed").get().Add({}).Set(frame->bundlesConfirmed);
+            families.at("avgConfirmationDuration").get().Add({}).Set(frame->avgConfirmationDuration);
+            families.at("valueNew").get().Add({}).Set(frame->valueNew);
+            families.at("valueConfirmed").get().Add({}).Set(frame->valueConfirmed);
         }
       }
     } else {
