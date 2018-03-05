@@ -38,14 +38,14 @@ using namespace prometheus;
 std::map<std::string, std::reference_wrapper<Family<Gauge>>> buildMetricsMap(
     std::shared_ptr<Registry> registry) {
   static std::map<std::string, std::string> nameToDesc = {
-      {"transactionsNew", "New TXs count"},
-      {"transactionsReattached", "Reattached TXs count"},
-      {"transactionsConfirmed", "confirmed TXs count"},
-      {"bundlesNew", "new bundles count"},
-      {"bundlesConfirmed", "confirmed bundles count"},
-      {"avgConfirmationDuration", "bundle's average confirmation duration"},
-      {"valueNew", "new tx's accumulated value"},
-      {"valueConfirmed", "confirmed tx's accumulated value"}};
+      {"transactions_new", "New TXs count"},
+      {"transactions_reattached", "Reattached TXs count"},
+      {"transactions_confirmed", "confirmed TXs count"},
+      {"bundles_new", "new bundles count"},
+      {"bundles_confirmed", "confirmed bundles count"},
+      {"avg_confirmationDuration", "bundle's average confirmation duration"},
+      {"value_new", "new tx's accumulated value"},
+      {"value_confirmed", "confirmed tx's accumulated value"}};
 
   std::map<std::string, std::reference_wrapper<Family<Gauge>>> famillies;
 
@@ -103,14 +103,14 @@ int main(int argc, char** argv) {
         pubDelayComplete = true;
       } else {
         {
-            families.at("transactionsNew").get().Add({}).Set(frame->transactionsNew);
-            families.at("transactionsReattached").get().Add({}).Set(frame->transactionsReattached);
-            families.at("transactionsConfirmed").get().Add({}).Set(frame->transactionsConfirmed);
-            families.at("bundlesNew").get().Add({}).Set(frame->bundlesNew);
-            families.at("bundlesConfirmed").get().Add({}).Set(frame->bundlesConfirmed);
-            families.at("avgConfirmationDuration").get().Add({}).Set(frame->avgConfirmationDuration);
-            families.at("valueNew").get().Add({}).Set(frame->valueNew);
-            families.at("valueConfirmed").get().Add({}).Set(frame->valueConfirmed);
+            families.at("transactions_new").get().Add({}).Set(frame->transactionsNew);
+            families.at("transactions_reattached").get().Add({}).Set(frame->transactionsReattached);
+            families.at("transactions_confirmed").get().Add({}).Set(frame->transactionsConfirmed);
+            families.at("bundles_new").get().Add({}).Set(frame->bundlesNew);
+            families.at("bundles_confirmed").get().Add({}).Set(frame->bundlesConfirmed);
+            families.at("avg_confirmationDuration").get().Add({}).Set(frame->avgConfirmationDuration);
+            families.at("value_new").get().Add({}).Set(frame->valueNew);
+            families.at("value_confirmed").get().Add({}).Set(frame->valueConfirmed);
         }
       }
     } else {
