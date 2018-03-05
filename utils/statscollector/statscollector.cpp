@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <tuple>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -19,7 +20,7 @@
 DEFINE_string(zmqURL, "tcp://m5.iotaledger.net:5556",
               "URL of ZMQ publisher to connect to");
 DEFINE_uint64(pubInterval, 1000,
-              "interval on which to publish to InfluxDB in milliseconds. You "
+              "interval on which to publish to prometheus in milliseconds. You "
               "probably don't want to change this.");
 DEFINE_uint64(pubDelay, 120000,
               "interval to wait before starting publishing in milliseconds");
@@ -32,6 +33,33 @@ using namespace iota::utils;
 namespace iota {
 namespace utils {
 namespace statscollector {
+
+using namespace prometheus;
+std::map<std::string,std::reference_wrapper<Family<Gauge>> > buildMetricsMap(std::shared_ptr<Registry> registry){
+
+    static std::map<std::string,std::string> nameToDesc= {{"transactionsNew","New TXs count"},
+                                                    {"transactionsReattached","Reattached TXs count"},
+                                                    {"transactionsConfirmed","confirmed TXs count"},
+                                                    {"bundlesNew","new bundles count"},
+                                                    {"bundlesConfirmed","confirmed bundles count"},
+                                                    {"avgConfirmationDuration","bundle's average confirmation duration"},
+                                                    {"valueNew","new tx's accumulated value"},
+                                                    {"valueConfirmed","confirmed tx's accumulated value"}};
+
+    std::map<std::string,std::reference_wrapper<Family<Gauge>> > famillies;
+
+    for (const auto& kv : nameToDesc) {
+    auto&       curr_family = BuildGauge()
+                .Name("statscollector_" + kv.first)
+                .Help(kv.second)
+                .Labels({{"publish_node",FLAGS_zmqURL}})
+                .Register(*registry);
+
+    famillies.insert(std::make_pair(std::string(kv.first),std::ref(curr_family)));
+    }
+
+    return std::move(famillies);
+}
 
 int main(int argc, char** argv) {
   ::gflags::ParseCommandLineFlags(&argc, &argv, true);
@@ -59,38 +87,29 @@ int main(int argc, char** argv) {
   Exposer exposer{FLAGS_prometheusExposerIP};
   auto registry = std::make_shared<Registry>();
 
-  auto& gauge_stats_family = BuildGauge()
-          .Name("stats")
-          .Help("TX statistics")
-          .Labels({{"publish_node",FLAGS_zmqURL}})
-          .Register(*registry);
+  auto famillies = buildMetricsMap(registry);
 
   exposer.RegisterCollectable(registry);
 
   pubWorker.schedule_periodically(pubStartDelay, pubInterval, [
-          weakStats = std::weak_ptr(stats), &gauge_stats_family
+          weakStats = std::weak_ptr(stats), &famillies
   ](auto scbl) {
     if (auto stats = weakStats.lock()) {
       auto frame = stats->swapFrame();
       static bool pubDelayComplete = false;
-      static auto currStatsId = 0;
 
       if (!pubDelayComplete) {
         pubDelayComplete = true;
       } else {
-        LOG(INFO) << "Logging to InfluxDB.";
         {
-          gauge_stats_family.Add({{"id",std::to_string(++currStatsId)},
-                                  {"transactionsNew", std::to_string(frame->transactionsNew)},
-                                  {"transactionsReattached", std::to_string(frame->transactionsReattached)},
-                                  {"transactionsTotal", std::to_string(frame->transactionsNew + frame->transactionsReattached)},
-                                  {"transactionsConfirmed", std::to_string(frame->transactionsConfirmed)},
-                                  {"bundlesNew", std::to_string(frame->bundlesNew)},
-                                  {"bundlesConfirmed", std::to_string(frame->bundlesConfirmed)},
-                                  {"avgConfirmationDuration", std::to_string(frame->avgConfirmationDuration)},
-                                  {"valueNew", std::to_string(frame->valueNew)},
-                                  {"valueConfirmed", std::to_string(frame->valueConfirmed)}})
-                                  .SetToCurrentTime();
+            famillies.at("transactionsNew").get().Add({}).Set(frame->transactionsNew);
+            famillies.at("transactionsReattached").get().Add({}).Set(frame->transactionsReattached);
+            famillies.at("transactionsConfirmed").get().Add({}).Set(frame->transactionsConfirmed);
+            famillies.at("bundlesNew").get().Add({}).Set(frame->bundlesNew);
+            famillies.at("bundlesConfirmed").get().Add({}).Set(frame->bundlesConfirmed);
+            famillies.at("avgConfirmationDuration").get().Add({}).Set(frame->avgConfirmationDuration);
+            famillies.at("valueNew").get().Add({}).Set(frame->valueNew);
+            famillies.at("valueConfirmed").get().Add({}).Set(frame->valueConfirmed);
         }
       }
     } else {
@@ -124,6 +143,8 @@ int main(int argc, char** argv) {
 
   return 0;
 }
+
+
 }  // namespace statscollector
 }  // namespace utils
 }  // namespace iota
