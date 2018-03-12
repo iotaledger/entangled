@@ -3,25 +3,16 @@ image: th0br0/iota-buildenv:latest
 stages:
   - test
 
-cache:
-  untracked: true
-  paths:
-    - bazel-cache
-
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 test64:
   stage: test
   script:
-    - mkdir /root/.cache && [ -d bazel-cache ] && mv bazel-cache /root/.cache/bazel
     - tools/ci/build.sh 64
-    - mv /root/.cache/bazel bazel-cache
 
 test32:
   stage: test
   script:
-    - mkdir /root/.cache && [ -d bazel-cache ] && mv bazel-cache /root/.cache/bazel
     - tools/ci/build.sh 32
-    - mv /root/.cache/bazel bazel-cache
 
