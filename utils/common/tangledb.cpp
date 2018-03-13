@@ -18,7 +18,7 @@ TangleDB::TXRecord TangleDB::find(const std::string &hash) {
     return std::move(TXRecord());
 }
 
-void TangleDB::put(const std::string &hash, const TXRecord& tx) {
+void TangleDB::put(const TXRecord& tx) {
     std::unique_lock<std::shared_mutex> lock(mutex_);
-    _txs[hash] = tx;
+    _txs[tx.hash] = tx;
 }

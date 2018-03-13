@@ -5,9 +5,7 @@
 
 
 class TangleDB {
-
 public:
-
     struct TXRecord {
         std::string hash;
         std::string trunk;
@@ -18,7 +16,7 @@ public:
 
     TXRecord find(const std::string &hash);
 
-    void put(const std::string &hash, const TXRecord& tx);
+    void put(const TXRecord& tx);
 
     static TangleDB& instance();
 

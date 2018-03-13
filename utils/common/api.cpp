@@ -1,6 +1,7 @@
 #include <cpprest/http_client.h>
 #include <cpprest/json.h>
 #include <glog/logging.h>
+#include <chrono>
 
 #include "api.hpp"
 
@@ -87,7 +88,7 @@ IRIClient::getNodeInfo() {
                         js["latestSolidSubtangleMilestoneIndex"].as_number().to_uint32(),
                         js["neighbors"].as_number().to_uint32(),
                         js["packetsQueueSize"].as_number().to_uint32(),
-                        js["time"].as_number().to_int64(),
+                        std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(js["time"].as_number().to_int64())),
                         js["tips"].as_number().to_uint32(),
                         js["transactionsToRequest"].as_number().to_uint32(),
 

@@ -6,13 +6,9 @@
 
 namespace iota {
 namespace utils {
+namespace txAuxiliary{
 
-TXAuxiliary& TXAuxiliary::instance() {
-  static TXAuxiliary aux;
-  return aux;
-}
-
-pplx::task<void> TXAuxiliary::removeConfirmedTransactions(
+pplx::task<void> removeConfirmedTransactions(
     std::weak_ptr<api::IRIClient> client, const std::vector<std::string>& tips,
     std::vector<std::string>& txs) {
 
@@ -38,7 +34,7 @@ pplx::task<void> TXAuxiliary::removeConfirmedTransactions(
 
 }
 
-pplx::task<std::set<std::string>> TXAuxiliary::getUnconfirmedTXs(
+pplx::task<std::set<std::string>> getUnconfirmedTXs(
     std::weak_ptr<api::IRIClient> client, std::shared_ptr<iri::TXMessage> tx) {
 
   using namespace std;
@@ -89,7 +85,7 @@ pplx::task<std::set<std::string>> TXAuxiliary::getUnconfirmedTXs(
   return pplx::create_task([]() -> set<string> {return set<string>();});
 }
 
-pplx::task<void> TXAuxiliary::handleUnseenTransactions(
+pplx::task<void> handleUnseenTransactions(
     std::shared_ptr<iri::TXMessage> tx,
     std::map<std::string, std::chrono::system_clock::time_point>& hashToDiscoveryTimestamp,
     std::chrono::time_point<std::chrono::system_clock> received,
@@ -98,7 +94,7 @@ pplx::task<void> TXAuxiliary::handleUnseenTransactions(
   static std::mutex mapMutex;
 
   TangleDB::TXRecord txRecord = {tx->hash(), tx->trunk(), tx->branch()};
-  TangleDB::instance().put(tx->hash(), std::move(txRecord));
+  TangleDB::instance().put(std::move(txRecord));
 
 
   {
@@ -139,6 +135,6 @@ pplx::task<void> TXAuxiliary::handleUnseenTransactions(
                 });
           });
 }
-
+}
 }
 }

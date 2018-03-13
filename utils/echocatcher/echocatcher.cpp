@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
                   auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
 
                   TangleDB::TXRecord txRec = {tx->hash(),tx->trunk(),tx->branch()};
-                  TangleDB::instance().put(tx->hash(),std::move(txRec));
+                  TangleDB::instance().put(std::move(txRec));
               },
               []() {});
 
@@ -186,7 +186,7 @@ int main(int argc, char** argv) {
 
             auto received = std::chrono::system_clock::now();
 
-            auto txHandlerTask = TXAuxiliary::instance().handleUnseenTransactions(tx,hashToDiscoveryTimestamp,received,iriClient);
+            auto txHandlerTask = txAuxiliary::handleUnseenTransactions(tx,hashToDiscoveryTimestamp,received,iriClient);
             handleTXtasks.push_back(std::move(txHandlerTask));
 
             if (tx->hash() == hashed.hash) {

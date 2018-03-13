@@ -32,10 +32,11 @@ struct GetNodeInfoResponse {
 
   uint32_t neighbors;
   uint32_t packetsQueueSize;
-  int64_t time;
+  std::chrono::time_point<std::chrono::system_clock> time;
   uint32_t tips;
   uint32_t transactionsToRequest;
 };
+
 struct GetInclusionStatesResponse {
         std::vector<bool> states;
         std::string error;

@@ -4,12 +4,13 @@
 #include <iota/utils/common/iri.hpp>
 #include <map>
 
+/*
+ * Under this namespace are functions to allow complex queries over IRI
+ */
+
 namespace iota {
 namespace utils {
-
-class TXAuxiliary {
- public:
-  static TXAuxiliary& instance();
+namespace txAuxiliary {
 
   pplx::task<void> handleUnseenTransactions(
       std::shared_ptr<iri::TXMessage> tx,
@@ -17,7 +18,6 @@ class TXAuxiliary {
       std::chrono::time_point<std::chrono::system_clock> received,
       std::weak_ptr<api::IRIClient> iriClient);
 
- private:
   pplx::task<std::set<std::string>> getUnconfirmedTXs(
       std::weak_ptr<api::IRIClient> client, std::shared_ptr<iri::TXMessage> tx);
 
@@ -25,15 +25,6 @@ class TXAuxiliary {
       std::weak_ptr<api::IRIClient> client,
       const std::vector<std::string>& tips, std::vector<std::string>& txs);
 
- private:
-  TXAuxiliary() = default;
-  ~TXAuxiliary() = default;
-
-  TXAuxiliary(const TXAuxiliary&) = delete;
-  TXAuxiliary& operator=(const TXAuxiliary&) = delete;
-  TXAuxiliary(TXAuxiliary&&) = delete;
-  TXAuxiliary& operator=(TXAuxiliary&&) = delete;
-};
-
+}//namespace txAuxiliary
 }  // namespace utils
 }  // namespace iota
