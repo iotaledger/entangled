@@ -18,7 +18,6 @@
 #include <iota/utils/common/txauxiliary.hpp>
 
 
-
 #include <prometheus/exposer.h>
 
 #include "utils/common/tangledb.hpp"
@@ -134,7 +133,7 @@ int main(int argc, char** argv) {
   std::atomic<bool> haveAllTXReturned = false;
   auto tangleDBWarmupPeriod = std::chrono::milliseconds(FLAGS_tangleDBWarmupPeriod*1000);
 
-  std::map<std::string,std::chrono::system_clock::time_point> hashToDiscoveryTimestamp;
+  cuckoohash_map<std::string,std::chrono::system_clock::time_point> hashToDiscoveryTimestamp;
   std::vector<pplx::task<void>> handleTXtasks;
 
   auto zmqThread = rxcpp::schedulers::make_new_thread();

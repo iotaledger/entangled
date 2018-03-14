@@ -9,6 +9,7 @@ cc_library(
         '@cppzmq//:cppzmq',
         '@glog//:glog',
         '@cpprestsdk//:cpprestsdk',
+	'@libcuckoo//:libcuckoo',
     ],
     visibility=['//visibility:public'])
 

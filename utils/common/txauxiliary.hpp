@@ -2,7 +2,8 @@
 
 #include <iota/utils/common/api.hpp>
 #include <iota/utils/common/iri.hpp>
-#include <map>
+#include <libcuckoo/cuckoohash_map.hh>
+#include <set>
 
 /*
  * Under this namespace are functions to allow complex queries over IRI
@@ -14,7 +15,7 @@ namespace txAuxiliary {
 
   pplx::task<void> handleUnseenTransactions(
       std::shared_ptr<iri::TXMessage> tx,
-      std::map<std::string, std::chrono::system_clock::time_point>& hashToSeenTimestamp,
+      cuckoohash_map<std::string, std::chrono::system_clock::time_point>& hashToSeenTimestamp,
       std::chrono::time_point<std::chrono::system_clock> received,
       std::weak_ptr<api::IRIClient> iriClient);
 
