@@ -11,7 +11,7 @@ cc_library(
     name="trits",
     hdrs=["trits.h"],
     deps=[
-    "//common:stdint",
+        "//common:stdint",
     ], )
 
 cc_library(
@@ -76,3 +76,11 @@ cc_library(
         ":ptrits",
         "//common:stdint",
     ])
+
+cc_library(
+    name="add",
+    srcs=["add.c"],
+    hdrs=["add.h"],
+    deps=[
+        ":trits",
+    ], )
