@@ -4,7 +4,7 @@ cc_test(
         'test_iss_curl.c',
     ],
     deps=[
-        '//common/sign:iss_curl',
+        '//common/sign/v1:iss_curl',
         '//common/trinary:trit_tryte',
         '//common/curl-p:trit',
         '@unity//:unity',
