@@ -1,6 +1,6 @@
 cc_library(name='shared',
            srcs=glob(['**/*.cpp'],
-                     exclude=['statscollector.cpp', 'tests/**/*.cpp']),
+                     exclude=['statscollector.cpp','tests/**/*.cpp']),
            hdrs=glob(
                ['**/*.hpp'],
                exclude=['tests/**/*.hpp']),
@@ -15,9 +15,14 @@ cc_test(name='tests',
         srcs=glob(['tests/**/*.cpp', '**/*.hpp']),
         deps=['@gtest//:gtest_main', '@gtest//:gtest', ':shared'])
 
-cc_binary(name='statscollector',
-          srcs=["statscollector.cpp"],
-          deps=[
-	      '@prometheus_cpp//:prometheus_cpp',
-              ':shared',
-	  ])
+cc_library(name='statscollector',
+           include_prefix='iota/utils',
+           hdrs=glob(['statscollector.hpp']),
+           srcs=["statscollector.cpp"],
+           deps=[
+	       '@prometheus_cpp//:prometheus_cpp',
+           ':shared',
+           '//utils/exposer:exposer',
+	       ],
+           visibility = ["//visibility:public"]
+      )

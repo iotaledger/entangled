@@ -10,6 +10,7 @@ cc_library(
         '@glog//:glog',
         '@cpprestsdk//:cpprestsdk',
 	'@libcuckoo//:libcuckoo',
+	'@yaml_cpp//:yaml_cpp',
     ],
     visibility=['//visibility:public'])
 

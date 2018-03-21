@@ -6,36 +6,19 @@
 #include <cstring>
 #include <list>
 #include <unordered_set>
-
-#include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <rx.hpp>
-
 #include <ccurl/ccurl.h>
 #include <iota/utils/common/api.hpp>
 #include <iota/utils/common/iri.hpp>
 #include <iota/utils/common/zmqpub.hpp>
 #include <iota/utils/common/txauxiliary.hpp>
-
-
 #include <prometheus/exposer.h>
-
 #include "utils/common/tangledb.hpp"
-
-
-DEFINE_string(zmqURL, "tcp://m5.iotaledger.net:5556",
-              "URL of ZMQ publisher to connect to");
-
-DEFINE_string(iriHost, "http://node02.iotatoken.nl:14265",
-              "URL of IRI API to use");
-
-DEFINE_string(prometheusExposerIP, "0.0.0.0:8080",
-              "IP/Port that the Prometheus Exposer binds to");
-
-DEFINE_int32(mwm, 14, "Minimum Weight Magnitude");
-
-DEFINE_uint64(tangleDBWarmupPeriod, 6*60,
-"interval to wait for TangleDB to load in seconds");
+#include <iota/utils/common/txauxiliary.hpp>
+#include <prometheus/exposer.h>
+#include <iota/utils/echocatcher/echocatcher.hpp>
+#include "utils/common/tangledb.hpp"
 
 using namespace iota::utils;
 
@@ -98,74 +81,92 @@ HashedTX hashTX(std::string tx) {
   return {ccurl_digest_transaction(tx.data()), std::move(tx)};
 }
 
-int main(int argc, char** argv) {
-  ::gflags::ParseCommandLineFlags(&argc, &argv, true);
-  ::google::InitGoogleLogging("echocatcher");
+bool EchoCatcher::parseConfiguration(const YAML::Node& conf) {
+  if (!StatsExposer::parseConfiguration(conf)) {
+    return false;
+  }
+
+  if (conf["iri_host"] && conf["publishers"] && conf["iri_host"] &&
+      conf["tangledb_warmup_period"] && conf["prometheus_exposer_uri"]) {
+    _iriHost = conf["iri_host"].as<std::string>();
+    _zmqPublishers = conf["publishers"].as<std::list<std::string>>();
+    _mwm = conf["mwm"].as<uint32_t>();
+    _tangleDBWarmupPeriod = conf["tangledb_warmup_period"].as<uint32_t>();
+    _prometheusExpURI = conf["prometheus_exposer_uri"].as<std::string>();
+    return true;
+  }
+
+  return false;
+}
+
+void EchoCatcher::expose() {
   using namespace prometheus;
 
-  LOG(INFO) << "Booting up.";
+  LOG(INFO) << __FUNCTION__;
   ccurl_pow_init();
 
-  LOG(INFO) << "IRI Host: " << FLAGS_iriHost;
+  auto iriClient = std::make_shared<api::IRIClient>(_iriHost);
+  std::string zmqURL = *_zmqPublishers.begin();
 
-  auto iriClient = std::make_shared<api::IRIClient>(FLAGS_iriHost);
-
-  Exposer exposer{FLAGS_prometheusExposerIP};
-
-  // create a metrics registry with component=main labels applied to all its
-  // metrics
+  Exposer exposer{_prometheusExpURI};
   auto registry = std::make_shared<Registry>();
 
-  auto& gauge_received_family = BuildGauge()
-            .Name("time_elapsed_received")
-            .Help("#Milli seconds it took for tx to travel back to transaction's original source(\"listen_node\")")
-            .Labels({{"publish_node",FLAGS_zmqURL},{"listen_node",FLAGS_iriHost}})
-            .Register(*registry);
+  auto& gauge_received_family =
+      BuildGauge()
+          .Name("time_elapsed_received")
+          .Help(
+              "#Milli seconds it took for tx to travel back to transaction's "
+              "original source(\"listen_node\")")
+          .Labels({{"publish_node", zmqURL}, {"listen_node", _iriHost}})
+          .Register(*registry);
 
-  auto& gauge_arrived_family = BuildGauge()
-            .Name("time_elapsed_arrived")
-            .Help("#Milli seconds it took for tx to arrive to destination (\"publish_node\")")
-            .Labels({{"publish_node",FLAGS_zmqURL},{"listen_node",FLAGS_iriHost}})
-            .Register(*registry);
+  auto& gauge_arrived_family =
+      BuildGauge()
+          .Name("time_elapsed_arrived")
+          .Help(
+              "#Milli seconds it took for tx to arrive to destination "
+              "(\"publish_node\")")
+          .Labels({{"publish_node", zmqURL}, {"listen_node", _iriHost}})
+          .Register(*registry);
 
   exposer.RegisterCollectable(registry);
 
   std::atomic<bool> haveAllTXReturned = false;
-  auto tangleDBWarmupPeriod = std::chrono::milliseconds(FLAGS_tangleDBWarmupPeriod*1000);
-
-  cuckoohash_map<std::string,std::chrono::system_clock::time_point> hashToDiscoveryTimestamp;
-  std::vector<pplx::task<void>> handleTXtasks;
+  auto tangleDBWarmupPeriod =
+      std::chrono::milliseconds(_tangleDBWarmupPeriod * 1000);
 
   auto zmqThread = rxcpp::schedulers::make_new_thread();
 
   auto zmqObservable =
       rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
-          [&](auto s) { zmqPublisher(std::move(s), FLAGS_zmqURL, haveAllTXReturned); })
+          [&](auto s) {
+            zmqPublisher(std::move(s), zmqURL, haveAllTXReturned);
+          })
           .observe_on(rxcpp::observe_on_new_thread());
 
-  auto stopPopulatingDBTime =
-          std::chrono::system_clock::now() + tangleDBWarmupPeriod;
+  const auto& stopPopulatingDBTime =
+      std::chrono::system_clock::now() + tangleDBWarmupPeriod;
 
   zmqObservable.observe_on(rxcpp::synchronize_new_thread())
-          .take_while([stopPopulatingDBTime](std::shared_ptr<iri::IRIMessage> msg){
-              return std::chrono::system_clock::now() < stopPopulatingDBTime;
-          })
-          .subscribe(
-              [](std::shared_ptr<iri::IRIMessage> msg) {
-                  if (msg->type() != iri::IRIMessageType::TX) return;
+      .take_while([stopPopulatingDBTime](std::shared_ptr<iri::IRIMessage> msg) {
+        return std::chrono::system_clock::now() < stopPopulatingDBTime;
+      })
+      .subscribe(
+          [](std::shared_ptr<iri::IRIMessage> msg) {
+            if (msg->type() != iri::IRIMessageType::TX) return;
 
-                  auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
+            auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
 
-                  TangleDB::TXRecord txRec = {tx->hash(),tx->trunk(),tx->branch()};
-                  TangleDB::instance().put(std::move(txRec));
-              },
-              []() {});
+            TangleDB::TXRecord txRec = {tx->hash(), tx->trunk(), tx->branch()};
+            TangleDB::instance().put(std::move(txRec));
+          },
+          []() {});
 
   auto task =
-        iriClient->getTransactionsToApprove()
-                .then(fillTX)
-                .then([](std::string tx) { return powTX(std::move(tx), FLAGS_mwm); })
-                .then(hashTX);
+      iriClient->getTransactionsToApprove()
+          .then(fillTX)
+          .then([*this](std::string tx) { return powTX(std::move(tx), _mwm); })
+          .then(hashTX);
 
   task.wait();
   auto hashed = task.get();
@@ -173,19 +174,23 @@ int main(int argc, char** argv) {
 
   auto broadcast = iriClient->broadcastTransactions({hashed.tx});
   auto start = std::chrono::system_clock::now();
+  cuckoohash_map<std::string, std::chrono::system_clock::time_point>
+            hashToDiscoveryTimestamp;
+  std::vector<pplx::task<void>> handleTXtasks;
 
   zmqObservable.observe_on(rxcpp::synchronize_new_thread())
       .subscribe(
-          [start, hashed, &gauge_received_family,
-           &gauge_arrived_family, &haveAllTXReturned, &iriClient,
-           &hashToDiscoveryTimestamp, &handleTXtasks](std::shared_ptr<iri::IRIMessage> msg) {
+          [start, hashed, &gauge_received_family, &gauge_arrived_family,
+           &haveAllTXReturned, &iriClient, &hashToDiscoveryTimestamp,
+           &handleTXtasks](std::shared_ptr<iri::IRIMessage> msg) {
             if (msg->type() != iri::IRIMessageType::TX) return;
 
             auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
 
             auto received = std::chrono::system_clock::now();
 
-            auto txHandlerTask = txAuxiliary::handleUnseenTransactions(tx,hashToDiscoveryTimestamp,received,iriClient);
+            auto txHandlerTask = txAuxiliary::handleUnseenTransactions(
+                tx, hashToDiscoveryTimestamp, received, iriClient);
             handleTXtasks.push_back(std::move(txHandlerTask));
 
             if (tx->hash() == hashed.hash) {
@@ -208,12 +213,12 @@ int main(int argc, char** argv) {
               current_received_duration_gauge.Set(elapsed_until_received);
               current_arrived_duration_gauge.Set(elapsed_until_arrived);
               haveAllTXReturned = true;
-
             }
           },
           []() {});
 
-    std::for_each(handleTXtasks.begin(),handleTXtasks.end(),[&](pplx::task<void> task){task.get();});
-
-  return 0;
+  std::for_each(handleTXtasks.begin(), handleTXtasks.end(),
+                [&](pplx::task<void> task) { task.get(); });
 }
+
+
