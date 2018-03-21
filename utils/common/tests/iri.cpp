@@ -1,8 +1,6 @@
 #include <chrono>
 #include <gtest/gtest.h>
 #include <string>
-#include <string_view>
-
 #include "iota/utils/common/iri.hpp"
 
 using namespace iota::utils;

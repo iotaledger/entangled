@@ -5,19 +5,23 @@ cc_library(name='shared',
                ['**/*.hpp'],
                exclude=['tests/**/*.hpp']),
            deps=[
-               '//utils/common:common',
-               '@com_github_gflags_gflags//:gflags',
-               '@glog//:glog',
+               '//utils/echocatcher:echocatcher',
+               '//utils/statscollector:statscollector',
+               '@yaml_cpp//:yaml_cpp',
            ])
+
 
 cc_binary(name='tangleanalyzer',
           srcs=["tangleanalyzer.cpp"],
-          deps=['@yaml_cpp//:yaml_cpp',
-                '//utils/echocatcher:echocatcher',
-                '//utils/statscollector:statscollector'],
-
+          deps=[
+                ':shared',],
           data = [":copy_configuration",],
 )
+
+cc_test(name='tests',
+        srcs=glob(['tests/**/*.cpp', '**/*.hpp']),
+        deps=['@gtest//:gtest_main', '@gtest//:gtest',
+              ':shared',])
 
 genrule(name = 'copy_configuration',
         local = 1,

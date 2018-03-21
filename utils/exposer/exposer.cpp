@@ -2,6 +2,9 @@
 
 namespace iota {
     namespace utils {
+        StatsExposer::~StatsExposer(){
+
+        }
         bool StatsExposer::parseConfiguration(const YAML::Node &conf) {
             if (!conf){
                 return false;

@@ -10,11 +10,9 @@
 #include "iota/utils/common/iri.hpp"
 #include "iota/utils/common/zmqpub.hpp"
 
+#include "iota/utils/statscollector.hpp"
 #include "iota/utils/statscollector/analyzer.hpp"
 #include "iota/utils/statscollector/stats/frame.hpp"
-#include "iota/utils/statscollector.hpp"
-
-
 
 using namespace iota::utils;
 
@@ -78,7 +76,6 @@ void StatsCollector::expose() {
             if (!pubDelayComplete) {
                 pubDelayComplete = true;
             } else {
-                {
                     families.at("transactions_new").get().Add({}).Set(frame->transactionsNew);
                     families.at("transactions_reattached").get().Add({}).Set(frame->transactionsReattached);
                     families.at("transactions_confirmed").get().Add({}).Set(frame->transactionsConfirmed);
@@ -87,7 +84,6 @@ void StatsCollector::expose() {
                     families.at("avg_confirmationDuration").get().Add({}).Set(frame->avgConfirmationDuration);
                     families.at("value_new").get().Add({}).Set(frame->valueNew);
                     families.at("value_confirmed").get().Add({}).Set(frame->valueConfirmed);
-                }
             }
         } else {
             scbl.unsubscribe();
@@ -119,7 +115,7 @@ void StatsCollector::expose() {
                     []() {});
 }
 using namespace prometheus;
-std::map<std::string, std::reference_wrapper<Family<Gauge>>> StatsCollector::buildMetricsMap(
+StatsCollector::gaugeMap StatsCollector::buildMetricsMap(
     std::shared_ptr<Registry> registry) {
   static std::map<std::string, std::string> nameToDesc = {
       {"transactions_new", "New TXs count"},
