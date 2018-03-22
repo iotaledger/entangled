@@ -64,12 +64,32 @@ int _ISS_PREFIX(address)(trit_t *const d, trit_t *const digest, HASH_STATE *cons
   return 0;
 }
 
-int _ISS_PREFIX(signature)(trit_t *sig, trit_t *const hash, trit_t *key, size_t key_len,
+int hamming_window(trit_t *hash) {
+  ssize_t sum = 0, i, j;
+  trit_t *he;
+  for (i = 1; i <= TRYTE_WIDTH; i++) {
+    he = &hash[HASH_LENGTH / TRYTE_WIDTH];
+    do {
+      sum += *hash;
+    } while (++hash < he);
+    if (sum == 0) {
+      return HASH_LENGTH * i / TRYTE_WIDTH;
+    }
+  }
+  return 0;
+}
+
+int _ISS_PREFIX(signature)(trit_t *sig, trit_t *const hash, size_t start_offset, trit_t *key, size_t key_len,
                   HASH_STATE *const c) {
-  size_t i, j;
+  size_t window, i, j;
   trit_t *se = &sig[key_len];
   if (sig != key) memcpy(sig, key, key_len * sizeof(trit_t));
-  for (i = 0; sig < se; i++, sig = &sig[HASH_LENGTH]) {
+
+  if(!(window = hamming_window(hash))) {
+    return 1;
+  }
+
+  for (i = start_offset; sig < se; i++, sig = &sig[HASH_LENGTH]) {
     for (j = 0;
          j < MAX_TRYTE_VALUE - hash[i * TRYTE_WIDTH] +
                  hash[i * TRYTE_WIDTH + 1] * 3 + hash[i * TRYTE_WIDTH + 2] * 9;
@@ -78,14 +98,22 @@ int _ISS_PREFIX(signature)(trit_t *sig, trit_t *const hash, trit_t *key, size_t 
       memcpy(sig, c->state, HASH_LENGTH * sizeof(trit_t));
       _HASH_PREFIX(reset)(c);
     }
+    if (i >= window) {
+      i = 0;
+    }
   }
   return 0;
 }
 
 int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t *const hash, trit_t *sig,
                    size_t sig_len, HASH_STATE *const c) {
-  size_t i, j;
+  size_t window, i, j;
   trit_t *sig_start = sig, *sig_end = &sig[sig_len];
+
+  if(!(window = hamming_window(hash))) {
+    return 1;
+  }
+
   for (i = 0; sig < sig_end; i++, sig = &sig[HASH_LENGTH]) {
     for (j = 0; j < hash[i * TRYTE_WIDTH] + hash[i * TRYTE_WIDTH + 1] * 3 +
                         hash[i * TRYTE_WIDTH + 2] * 9 - MIN_TRYTE_VALUE;
@@ -93,6 +121,9 @@ int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t *const hash, trit_t *sig,
       _HASH_PREFIX(absorb)(c, sig, HASH_LENGTH);
       memcpy(sig, c->state, HASH_LENGTH * sizeof(trit_t));
       _HASH_PREFIX(reset)(c);
+    }
+    if (i >= window) {
+      i = 0;
     }
   }
   _HASH_PREFIX(absorb)(c, sig_start, sig_len);

@@ -2,8 +2,8 @@
 #include <unity/unity.h>
 
 #include "common/curl-p/trit.h"
-#include "common/trinary/trit_tryte.h"
 #include "common/sign/v2/iss_curl.h"
+#include "common/trinary/trit_tryte.h"
 
 #define TEST_SEED                                                              \
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRST" \

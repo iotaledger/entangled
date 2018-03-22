@@ -17,7 +17,7 @@ int _ISS_PREFIX(key)(trit_t *const s, trit_t *k, const size_t l, HASH_STATE *con
 int _ISS_PREFIX(key_digest)(trit_t *k, trit_t *o, const size_t l, HASH_STATE *const c);
 int _ISS_PREFIX(address)(trit_t *const d, trit_t *const o, HASH_STATE *const c);
 
-int _ISS_PREFIX(signature)(trit_t *sig, trit_t *const hash, trit_t *key, size_t kl,
+int _ISS_PREFIX(signature)(trit_t *sig, trit_t *const hash, size_t o, trit_t *key, size_t kl,
                   HASH_STATE *const c);
 
 int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t *const hash, trit_t *sig,
