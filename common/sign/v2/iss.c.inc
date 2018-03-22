@@ -105,7 +105,7 @@ int _ISS_PREFIX(signature)(trit_t *sig, trit_t *const hash, size_t start_offset,
   return 0;
 }
 
-int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t *const hash, trit_t *sig,
+int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t *const hash, size_t offset, trit_t *sig,
                    size_t sig_len, HASH_STATE *const c) {
   size_t window, i, j;
   trit_t *sig_start = sig, *sig_end = &sig[sig_len];
@@ -114,7 +114,7 @@ int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t *const hash, trit_t *sig,
     return 1;
   }
 
-  for (i = 0; sig < sig_end; i++, sig = &sig[HASH_LENGTH]) {
+  for (i = offset; sig < sig_end; i++, sig = &sig[HASH_LENGTH]) {
     for (j = 0; j < hash[i * TRYTE_WIDTH] + hash[i * TRYTE_WIDTH + 1] * 3 +
                         hash[i * TRYTE_WIDTH + 2] * 9 - MIN_TRYTE_VALUE;
          j++) {
