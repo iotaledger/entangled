@@ -65,7 +65,7 @@ int _ISS_PREFIX(address)(trit_t *const d, trit_t *const digest, HASH_STATE *cons
 }
 
 int hamming_window(trit_t *hash) {
-  ssize_t sum = 0, i, j;
+  ssize_t sum = 0, i;
   trit_t *he;
   for (i = 1; i <= TRYTE_WIDTH; i++) {
     he = &hash[HASH_LENGTH / TRYTE_WIDTH];
