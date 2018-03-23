@@ -105,29 +105,31 @@ int _ISS_PREFIX(signature)(trit_t *sig, trit_t *const hash, size_t start_offset,
   return 0;
 }
 
-int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t *const hash, size_t offset, trit_t *sig,
+int _ISS_PREFIX(sig_digest)(HASH_STATE *const d, trit_t *const hash, size_t offset, trit_t *sig,
                    size_t sig_len, HASH_STATE *const c) {
   size_t window, i, j;
   trit_t *sig_start = sig, *sig_end = &sig[sig_len];
+  trit_t dig[HASH_LENGTH];
 
   if(!(window = hamming_window(hash))) {
     return 1;
   }
 
   for (i = offset; sig < sig_end; i++, sig = &sig[HASH_LENGTH]) {
+    memcpy(dig, sig, HASH_LENGTH * sizeof(trit_t));
     for (j = 0; j < hash[i * TRYTE_WIDTH] + hash[i * TRYTE_WIDTH + 1] * 3 +
                         hash[i * TRYTE_WIDTH + 2] * 9 - MIN_TRYTE_VALUE;
          j++) {
-      _HASH_PREFIX(absorb)(c, sig, HASH_LENGTH);
-      memcpy(sig, c->state, HASH_LENGTH * sizeof(trit_t));
+      _HASH_PREFIX(absorb)(c, dig, HASH_LENGTH);
+      memcpy(dig, c->state, HASH_LENGTH * sizeof(trit_t));
       _HASH_PREFIX(reset)(c);
     }
+    _HASH_PREFIX(absorb)(d, dig, HASH_LENGTH);
     if (i >= window) {
       i = 0;
     }
   }
   _HASH_PREFIX(absorb)(c, sig_start, sig_len);
-  _HASH_PREFIX(squeeze)(c, dig, HASH_LENGTH);
   return 0;
 }
 
