@@ -22,14 +22,6 @@ class MockEchoCatcher : public EchoCatcher {
                     std::chrono::time_point<std::chrono::system_clock>));
 };
 
-struct EchoCatcherRunner {
-  EchoCatcherRunner(MockEchoCatcher* echoCatcher) : _echocatcher(echoCatcher){};
-
-  void run() { _echocatcher->expose(); };
-
-  MockEchoCatcher* _echocatcher;
-};
-
 TEST(TangleAnalyzer, EchoCatcherFlow) {
   ::google::InitGoogleLogging("echocatcher test");
 
@@ -42,12 +34,12 @@ TEST(TangleAnalyzer, EchoCatcherFlow) {
   config["prometheus_exposer_uri"] = "some_exposer_uri";
   config["mwm"] = "17";
   auto mockEchoCatcher = std::make_shared<MockEchoCatcher>();
-  ASSERT_EQ(mockEchoCatcher->parseConfiguration(config), true);
 
-  EchoCatcherRunner echoCatcherRunner(mockEchoCatcher.get());
+  ASSERT_EQ(mockEchoCatcher->parseConfiguration(config), true);
 
   EXPECT_CALL(*(mockEchoCatcher), loadDB()).Times(1);
   EXPECT_CALL(*(mockEchoCatcher), broadcastTransactions()).Times(1);
   EXPECT_CALL(*(mockEchoCatcher), handleRecievedTransactions(_, _)).Times(1);
-  echoCatcherRunner.run();
+
+  mockEchoCatcher->expose();
 }

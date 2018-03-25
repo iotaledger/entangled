@@ -8,13 +8,13 @@ TangleDB& TangleDB::instance() {
   return db;
 }
 
-TangleDB::TXRecord TangleDB::find(const std::string& hash) {
+std::optional<TangleDB::TXRecord> TangleDB::find(const std::string& hash) {
   std::shared_lock<std::shared_mutex> lock(mutex_);
   auto tx = _txs.find(hash);
   if (tx != _txs.end()) {
     return tx->second;
   }
-  return std::move(TXRecord());
+  return {};
 }
 
 void TangleDB::put(const TXRecord& tx) {

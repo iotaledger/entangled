@@ -13,11 +13,13 @@ class StatsCollector : public StatsExposer {
  public:
   void expose() override;
   bool parseConfiguration(const YAML::Node& conf) override;
- private:
-  typedef   std::map<std::string,
-          std::reference_wrapper<prometheus::Family<prometheus::Gauge>>> gaugeMap;
 
-  gaugeMap buildMetricsMap(std::shared_ptr<prometheus::Registry> registry);
+ private:
+  typedef std::map<std::string, std::reference_wrapper<
+                                    prometheus::Family<prometheus::Gauge>>>
+      GaugeMap;
+
+  GaugeMap buildMetricsMap(std::shared_ptr<prometheus::Registry> registry);
 
   std::string _prometheusExpURI;
   std::string _zmqURL;

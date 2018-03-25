@@ -2,6 +2,7 @@
 
 #include <shared_mutex>
 #include <unordered_map>
+#include <optional>
 
 class TangleDB {
  public:
@@ -13,7 +14,7 @@ class TangleDB {
     TXRecord() = default;
   };
 
-  TXRecord find(const std::string& hash);
+  std::optional<TXRecord> find(const std::string& hash);
 
   void put(const TXRecord& tx);
 

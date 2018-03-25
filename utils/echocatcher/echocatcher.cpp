@@ -6,9 +6,7 @@
 #include <list>
 #include <unordered_set>
 #include <glog/logging.h>
-#include <rx.hpp>
 #include <ccurl/ccurl.h>
-#include <iota/utils/common/iri.hpp>
 #include <iota/utils/common/zmqpub.hpp>
 #include <iota/utils/common/txauxiliary.hpp>
 #include <prometheus/exposer.h>
@@ -97,6 +95,8 @@ void EchoCatcher::expose() {
   ccurl_pow_init();
 
   _iriClient = std::make_shared<api::IRIClient>(_iriHost);
+  _zmqObservable = rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
+          [&](auto s) { zmqPublisher(std::move(s), *_zmqPublishers.begin()); });
 
   loadDB();
   // TODO: should get arg for interval between following TXs and update a
@@ -113,15 +113,10 @@ void EchoCatcher::loadDB() {
 
   auto zmqThread = rxcpp::schedulers::make_new_thread();
 
-  auto zmqObservable =
-      rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
-          [&](auto s) { zmqPublisher(std::move(s), *_zmqPublishers.begin()); })
-          .observe_on(rxcpp::observe_on_new_thread());
-
   const auto& stopPopulatingDBTime =
       std::chrono::system_clock::now() + tangleDBWarmupPeriod;
 
-  zmqObservable.observe_on(rxcpp::synchronize_new_thread())
+  _zmqObservable.observe_on(rxcpp::synchronize_new_thread())
       .take_while([stopPopulatingDBTime](std::shared_ptr<iri::IRIMessage> msg) {
         return std::chrono::system_clock::now() < stopPopulatingDBTime;
       })
@@ -183,18 +178,12 @@ void EchoCatcher::handleRecievedTransactions(
 
   auto zmqThread = rxcpp::schedulers::make_new_thread();
   std::atomic<bool> haveAllTXReturned = false;
-  auto zmqObservable =
-      rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
-          [&](auto s) {
-            zmqPublisher(std::move(s), zmqURL, haveAllTXReturned);
-          })
-          .observe_on(rxcpp::observe_on_new_thread());
 
   cuckoohash_map<std::string, std::chrono::system_clock::time_point>
       hashToDiscoveryTimestamp;
   std::vector<pplx::task<void>> handleTXtasks;
 
-  zmqObservable.observe_on(rxcpp::synchronize_new_thread())
+  _zmqObservable.observe_on(rxcpp::synchronize_new_thread())
       .subscribe(
           [*this, start, hashed, &gauge_received_family, &gauge_arrived_family,
            &haveAllTXReturned, &hashToDiscoveryTimestamp,

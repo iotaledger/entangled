@@ -115,7 +115,7 @@ void StatsCollector::expose() {
                     []() {});
 }
 using namespace prometheus;
-StatsCollector::gaugeMap StatsCollector::buildMetricsMap(
+StatsCollector::GaugeMap StatsCollector::buildMetricsMap(
     std::shared_ptr<Registry> registry) {
   static std::map<std::string, std::string> nameToDesc = {
       {"transactions_new", "New TXs count"},

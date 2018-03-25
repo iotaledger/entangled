@@ -109,9 +109,7 @@ pplx::task<void> handleUnseenTransactions(
         unconfirmedVec.erase(
             remove_if(unconfirmedVec.begin(), unconfirmedVec.end(),
                       [](std::string txHash) {
-                        return !std::string_view(
-                                    TangleDB::instance().find(txHash).hash)
-                                    .empty();
+                        return TangleDB::instance().find(txHash).has_value();
                       }),
             unconfirmedVec.end());
         std::for_each(
