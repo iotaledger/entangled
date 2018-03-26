@@ -84,3 +84,11 @@ cc_library(
     deps=[
         ":trits",
     ], )
+
+cc_library(
+    name="tryte_long",
+    srcs=["tryte_long.c"],
+    hdrs=["tryte_long.h"],
+    deps=[
+        ":tryte",
+    ], )

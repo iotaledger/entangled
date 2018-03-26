@@ -31,3 +31,12 @@ cc_test (
         "@unity//:unity",
         ]
 )
+
+cc_test (
+    name = "test_tryte_long",
+    srcs = ["test_tryte_long.c"],
+    deps = [
+        "//common/trinary:tryte_long",
+        "@unity//:unity",
+    ]
+)
