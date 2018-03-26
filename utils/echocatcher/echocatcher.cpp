@@ -104,7 +104,7 @@ void EchoCatcher::expose() {
   auto hashed = broadcastTransactions();
   auto start = std::chrono::system_clock::now();
 
-  handleRecievedTransactions(hashed, start);
+  handleReceivedTransactions(hashed, start);
 }
 
 void EchoCatcher::loadDB() {
@@ -147,7 +147,7 @@ EchoCatcher::HashedTX EchoCatcher::broadcastTransactions() {
   return std::move(hashed);
 }
 
-void EchoCatcher::handleRecievedTransactions(
+void EchoCatcher::handleReceivedTransactions(
     EchoCatcher::HashedTX hashed,
     std::chrono::time_point<std::chrono::system_clock> start) {
   // split to prometheus set up and actual listening
