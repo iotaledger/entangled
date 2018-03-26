@@ -25,7 +25,7 @@ class EchoCatcher : public StatsExposer {
  protected:  // gmock classes
   virtual void loadDB();
   virtual HashedTX broadcastTransactions();
-  virtual void handleRecievedTransactions(
+  virtual void handleReceivedTransactions(
       HashedTX hashed,
       std::chrono::time_point<std::chrono::system_clock> start);
 
