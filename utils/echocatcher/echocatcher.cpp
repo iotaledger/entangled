@@ -160,7 +160,7 @@ void EchoCatcher::handleReceivedTransactions(
       BuildGauge()
           .Name("time_elapsed_received")
           .Help(
-              "#Milli seconds it took for tx to travel back to transaction's "
+              "#Milliseconds it took for tx to travel back to transaction's "
               "original source(\"listen_node\")")
           .Labels({{"publish_node", zmqURL}, {"listen_node", _iriHost}})
           .Register(*registry);
