@@ -46,7 +46,7 @@ int64_t trytes_to_long(tryte_t *trytes, size_t const i) {
 size_t long_to_trytes(int64_t value, tryte_t *trytes) {
     // Calculate numer of iterations (number of trytes)
     size_t num_trytes = min_trytes(value);
-    for (size_t i = num_trytes - 1; i < -1; i--) {
+    for (int i = num_trytes - 1; i >= 0; i--) {
         // Check if the current value to convert is negative
         uint8_t negative = value < 0;
         // Get its absolute value
