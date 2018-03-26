@@ -17,7 +17,7 @@ class MockEchoCatcher : public EchoCatcher {
  public:
   MOCK_METHOD0(loadDB, void());
   MOCK_METHOD0(broadcastTransactions, EchoCatcher::HashedTX());
-  MOCK_METHOD2(handleRecievedTransactions,
+  MOCK_METHOD2(handleReceivedTransactions,
                void(EchoCatcher::HashedTX,
                     std::chrono::time_point<std::chrono::system_clock>));
 };
@@ -39,7 +39,7 @@ TEST(TangleAnalyzer, EchoCatcherFlow) {
 
   EXPECT_CALL(*(mockEchoCatcher), loadDB()).Times(1);
   EXPECT_CALL(*(mockEchoCatcher), broadcastTransactions()).Times(1);
-  EXPECT_CALL(*(mockEchoCatcher), handleRecievedTransactions(_, _)).Times(1);
+  EXPECT_CALL(*(mockEchoCatcher), handleReceivedTransactions(_, _)).Times(1);
 
   mockEchoCatcher->expose();
 }
