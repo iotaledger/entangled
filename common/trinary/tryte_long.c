@@ -12,8 +12,10 @@
 #define TRYTE_STRING "9ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 size_t min_trytes(int64_t value) {
+    // Need minimum 1 tryte to represent any number
     size_t num = 1;
     value = value < 0 ? -value : value;
+    // As long as value is > than (27^2)/2, need one more tryte
     while (value > pow(27, num) / 2) {
         num++;
     }
@@ -40,21 +42,28 @@ int64_t trytes_to_long(tryte_t *trytes, size_t const i) {
     return value;
 }
 
+// Return the number of trytes needed to encode the value
 size_t long_to_trytes(int64_t value, tryte_t *trytes) {
-    size_t max_exp = min_trytes(value) - 1;
-    for (; max_exp < -1; max_exp--) {
+    // Calculate numer of iterations (number of trytes)
+    size_t num_trytes = min_trytes(value);
+    for (size_t i = num_trytes - 1; i < -1; i--) {
+        // Check if the current value to convert is negative
         uint8_t negative = value < 0;
+        // Get its absolute value
         value = negative ? -value : value;
-        int64_t radix_pow = pow(TRYTE_SPACE, max_exp);
+        // Precalculate the current power order (27^i)
+        int64_t radix_pow = pow(TRYTE_SPACE, i);
+        // Find out the highest order tryte for this value
         int64_t tryte = (value + radix_pow / 2) / radix_pow;
-        int64_t tryte_index = tryte;
+        // Store the remainder of value minus the value of the highest order tryte
         value-= radix_pow * tryte;
+        // If the original value was negative, the tryte value should also be negative
         if (negative) {
-            tryte_index = 27 - tryte_index;
+            tryte = 27 - tryte;
             value = -value;
         }
-        trytes[max_exp] = TRYTE_STRING[tryte_index];
+        trytes[i] = TRYTE_STRING[tryte];
     }
-    return max_exp;
+    return num_trytes;
 }
 
