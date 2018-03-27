@@ -70,18 +70,43 @@ void test_key(trit_t *s, trit_t *k, size_t l, Curl *c) {
   "WYWDRDS"
 
 void test_addy(trit_t *k, size_t l, Curl *c) {
-  tryte_t addy_trytes[l];
+  tryte_t addy_trytes[HASH_LENGTH / 3 + 1];
 
   iss_curl_key_digest(k, k, l, c);
-  iss_curl_address(k, k, c);
+  iss_curl_address(k, k, l * 243 / 6561, c);
 
-  trits_to_trytes(k, addy_trytes, l);
+  trits_to_trytes(k, addy_trytes, l * 243 / 6561);
 
   addy_trytes[HASH_LENGTH / 3] = 0;
 
   TEST_ASSERT_EQUAL_MEMORY(EXP_ADDY, addy_trytes,
                            HASH_LENGTH / 3 * sizeof(tryte_t));
 }
+
+#define EX_SIG                                                                 \
+  "B9YB9YB9YB9YB9YB9YB9YB9YB9YB9YB9YB9YB9YB9YB9YB9YB9YB9SB9YB9YB9YB9YB9YB9YB9" \
+  "YB9YB9E"
+void test_sig(trit_t *k, size_t l, Curl *c) {
+  tryte_t addy_trytes[l];
+  trit_t hash[HASH_LENGTH];
+
+  memset(hash, 0, sizeof(hash));
+  memset(addy_trytes, 0, sizeof(hash));
+
+  trytes_to_trits((tryte_t *)EX_SIG, hash, 81);
+
+  TEST_ASSERT_EQUAL_INT(0, iss_curl_signature(k, hash, 0, k, l, c));
+  TEST_ASSERT_EQUAL_INT(0, iss_curl_sig_digest(k, hash, 0, k, l, c));
+  TEST_ASSERT_EQUAL_INT(0, iss_curl_address(k, k, HASH_LENGTH, c));
+
+  trits_to_trytes(k, addy_trytes, HASH_LENGTH);
+
+  addy_trytes[HASH_LENGTH / 3] = 0;
+
+  TEST_ASSERT_EQUAL_MEMORY(EXP_ADDY, addy_trytes,
+                           HASH_LENGTH / 3 * sizeof(tryte_t));
+}
+#undef EX_SIG
 #undef EXP_ADDY
 
 void test_iss() {
@@ -98,6 +123,9 @@ void test_iss() {
   test_subseed(seed, subseed, index, &curl);
   test_key(subseed, key, key_length, &curl);
   test_addy(key, key_length, &curl);
+
+  test_key(subseed, key, key_length, &curl);
+  test_sig(key, key_length, &curl);
   // printf("%s\n", addy_trytes);
 }
 
