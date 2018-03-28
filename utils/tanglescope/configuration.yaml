@@ -4,14 +4,18 @@ echocatcher:
 
       - "tcp://zmq.testnet.iota.org:5556"
 
+      - "tcp://zmq.testnet.iota.org:5556"
+
   #url of iri node
   iri_host: "https://nodes.testnet.iota.org:443"
   #IP/Port that the Prometheus Exposer binds to
   prometheus_exposer_uri: "0.0.0.0:8080"
   #MWM for transaction's POW
   mwm: 14
-  #time in seconds for db to load from publishers zmq
+  #time for db to load from publishers zmq [seconds]
   tangledb_warmup_period: 360
+  #in-between transactions interval [seconds]
+  broadcast_interval: 20
 
 statscollector:
 

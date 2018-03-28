@@ -1,8 +1,8 @@
 
 #include "txauxiliary.hpp"
+#include <set>
 #include <glog/logging.h>
 #include <iota/utils/common/tangledb.hpp>
-#include <set>
 
 namespace iota {
 namespace utils {
@@ -75,7 +75,7 @@ pplx::task<std::set<std::string>> getUnconfirmedTXs(
   return pplx::create_task([]() -> set<string> { return set<string>(); });
 }
 
-pplx::task<void> handleUnseenTransactions(
+pplx::task<std::optional<uint64_t>> handleUnseenTransactions(
     std::shared_ptr<iri::TXMessage> tx,
     cuckoohash_map<std::string, std::chrono::system_clock::time_point>&
         hashToDiscoveryTimestamp,
@@ -92,15 +92,16 @@ pplx::task<void> handleUnseenTransactions(
                                                                 txTime)
               .count();
       hashToDiscoveryTimestamp.erase(tx->hash());
-      LOG(INFO) << "TX: " << tx->hash() << " arrived " << txArrivalLatency
-                << " milliseconds after it was firstly discovered";
+      return pplx::create_task([txArrivalLatency]() -> std::optional<uint64_t> {
+        return std::optional<uint64_t>(txArrivalLatency);
+      });
     }
   }
 
   return getUnconfirmedTXs(iriClient, tx)
       .then([&](std::set<std::string> unconfirmed) {
         if (unconfirmed.empty()) {
-          return;
+          return std::optional<uint64_t>();
         }
 
         std::vector<std::string> unconfirmedVec(unconfirmed.begin(),
@@ -117,6 +118,7 @@ pplx::task<void> handleUnseenTransactions(
             [&hashToDiscoveryTimestamp, received](std::string txHash) {
               hashToDiscoveryTimestamp.insert(txHash, received);
             });
+        return std::optional<uint64_t>();
       });
 }
 }  // namespace txAuxiliary

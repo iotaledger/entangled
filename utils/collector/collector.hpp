@@ -6,10 +6,10 @@
 namespace iota {
     namespace utils {
 
-        class StatsExposer {
+        class CollectorBase {
         public:
-            virtual ~StatsExposer();
-            virtual void expose() = 0;
+            virtual ~CollectorBase();
+            virtual void collect() = 0;
             virtual bool parseConfiguration(const YAML::Node& conf);
         };
     }

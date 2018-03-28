@@ -13,7 +13,7 @@ DEFINE_string(ConfigurationPath, "", "YAML's configuration file path");
 int main(int argc, char** argv) {
 
     ::gflags::ParseCommandLineFlags(&argc, &argv, true);
-    ::google::InitGoogleLogging("tangleanalyzer");
+    ::google::InitGoogleLogging("tanglescope");
 
     std::list<pplx::task<void>> tasks;
 
@@ -23,12 +23,12 @@ int main(int argc, char** argv) {
     iota::utils::statscollector::StatsCollector statsCollector;
 
     if (echoCatcher.parseConfiguration(conf["echocatcher"])){
-        auto task = pplx::task<void>([&echoCatcher](){echoCatcher.expose();});
+        auto task = pplx::task<void>([&echoCatcher](){echoCatcher.collect();});
         tasks.push_back(std::move(task));
     }
 
     if (statsCollector.parseConfiguration(conf["statscollector"])){
-        auto task = pplx::task<void>([&statsCollector](){statsCollector.expose();});
+        auto task = pplx::task<void>([&statsCollector](){statsCollector.collect();});
         tasks.push_back(std::move(task));
     }
 
