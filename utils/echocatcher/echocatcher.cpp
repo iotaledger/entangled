@@ -170,10 +170,8 @@ void EchoCatcher::handleReceivedTransactions() {
 
   std::vector<pplx::task<void>> observableTasks;
   for (auto& kv : _urlToZmqObservables) {
-    auto zmqURL = kv.first;
-    auto zmqObservable = kv.second;
     auto task = pplx::task<void>(
-        [&]() { subscribeToTransactions(zmqURL, zmqObservable, registry); });
+        [&]() { subscribeToTransactions(kv.first, kv.second, registry); });
     observableTasks.push_back(std::move(task));
   }
 
