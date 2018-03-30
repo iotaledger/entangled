@@ -1,11 +1,11 @@
-#include <iota/utils/exposer/exposer.hpp>
+#include <iota/utils/collector/collector.hpp>
 
 namespace iota {
     namespace utils {
-        StatsExposer::~StatsExposer(){
+        CollectorBase::~CollectorBase(){
 
         }
-        bool StatsExposer::parseConfiguration(const YAML::Node &conf) {
+        bool CollectorBase::parseConfiguration(const YAML::Node &conf) {
             if (!conf){
                 return false;
             }

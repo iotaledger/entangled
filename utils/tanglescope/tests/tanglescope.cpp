@@ -8,21 +8,14 @@
 using namespace iota::utils::statscollector;
 using namespace iota::utils;
 
-class MockStatsCollector : public StatsCollector {
- public:
-  MOCK_METHOD0(expose, void());
-};
-
 class MockEchoCatcher : public EchoCatcher {
  public:
   MOCK_METHOD0(loadDB, void());
-  MOCK_METHOD0(broadcastTransactions, EchoCatcher::HashedTX());
-  MOCK_METHOD2(handleReceivedTransactions,
-               void(EchoCatcher::HashedTX,
-                    std::chrono::time_point<std::chrono::system_clock>));
+  MOCK_METHOD0(broadcastTransactions, void());
+  MOCK_METHOD0(handleReceivedTransactions,void());
 };
 
-TEST(TangleAnalyzer, EchoCatcherFlow) {
+TEST(TangleScope, EchoCatcherFlow) {
   ::google::InitGoogleLogging("echocatcher test");
 
   using namespace testing;
@@ -33,13 +26,15 @@ TEST(TangleAnalyzer, EchoCatcherFlow) {
   config["tangledb_warmup_period"] = "100";
   config["prometheus_exposer_uri"] = "some_exposer_uri";
   config["mwm"] = "17";
+  config["broadcast_interval"] = "10";
   auto mockEchoCatcher = std::make_shared<MockEchoCatcher>();
 
   ASSERT_EQ(mockEchoCatcher->parseConfiguration(config), true);
 
   EXPECT_CALL(*(mockEchoCatcher), loadDB()).Times(1);
   EXPECT_CALL(*(mockEchoCatcher), broadcastTransactions()).Times(1);
-  EXPECT_CALL(*(mockEchoCatcher), handleReceivedTransactions(_, _)).Times(1);
+  EXPECT_CALL(*(mockEchoCatcher), handleReceivedTransactions()).Times(1);
 
-  mockEchoCatcher->expose();
+
+  mockEchoCatcher->collect();
 }

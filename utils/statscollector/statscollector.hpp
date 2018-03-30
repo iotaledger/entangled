@@ -1,17 +1,17 @@
 #pragma once
 
-#include <prometheus/exposer.h>
-#include <iota/utils/exposer/exposer.hpp>
-#include <set>
 #include <string>
+#include <prometheus/exposer.h>
+#include <iota/utils/prometheus_collector/prometheus_collector.hpp>
+
 
 namespace iota {
 namespace utils {
 namespace statscollector {
 
-class StatsCollector : public StatsExposer {
+class StatsCollector : public PrometheusCollector {
  public:
-  void expose() override;
+  void collect() override;
   bool parseConfiguration(const YAML::Node& conf) override;
 
  private:
@@ -19,7 +19,9 @@ class StatsCollector : public StatsExposer {
                                     prometheus::Family<prometheus::Gauge>>>
       GaugeMap;
 
-  GaugeMap buildMetricsMap(std::shared_ptr<prometheus::Registry> registry);
+  virtual GaugeMap buildMetricsMap(
+      std::shared_ptr<prometheus::Registry> registry,
+      const std::map<std::string, std::string>& labels) override;
 
   std::string _prometheusExpURI;
   std::string _zmqURL;

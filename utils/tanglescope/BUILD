@@ -1,6 +1,6 @@
 cc_library(name='shared',
            srcs=glob(['**/*.cpp'],
-                     exclude=['tangleanalyzer.cpp', 'tests/**/*.cpp']),
+                     exclude=['tanglescope.cpp', 'tests/**/*.cpp']),
            hdrs=glob(
                ['**/*.hpp'],
                exclude=['tests/**/*.hpp']),
@@ -11,8 +11,8 @@ cc_library(name='shared',
            ])
 
 
-cc_binary(name='tangleanalyzer',
-          srcs=["tangleanalyzer.cpp"],
+cc_binary(name='tanglescope',
+          srcs=["tanglescope.cpp"],
           deps=[
                 ':shared',],
           data = [":copy_configuration",],

@@ -1,0 +1,9 @@
+cc_library(
+    name='prometheus_collector',
+    include_prefix='iota/utils/prometheus_collector',
+    hdrs=glob(['*.hpp']),
+    srcs=glob(['*.cpp']),
+    deps=['//utils/collector:collector',
+          '@prometheus_cpp//:prometheus_cpp',
+         ],
+    visibility=['//visibility:public'])

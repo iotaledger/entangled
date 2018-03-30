@@ -6,7 +6,7 @@ cc_library(
     deps=[
         '//utils/common:common',
         '//ccurl:ccurl',
-        '//utils/exposer:exposer',
+        '//utils/prometheus_collector:prometheus_collector',
         '@cpprestsdk//:cpprestsdk',
         '@com_github_gflags_gflags//:gflags',
         '@glog//:glog',

@@ -1,20 +1,27 @@
 #pragma once
 
-#include <iota/utils/exposer/exposer.hpp>
-#include <iota/utils/common/api.hpp>
-#include <iota/utils/common/iri.hpp>
-#include <list>
 #include <string>
+#include <list>
+#include <memory>
 #include <chrono>
 #include <rx.hpp>
-
+#include <prometheus/exposer.h>
+#include <libcuckoo/cuckoohash_map.hh>
+#include <iota/utils/common/api.hpp>
+#include <iota/utils/common/iri.hpp>
+#include <iota/utils/prometheus_collector/prometheus_collector.hpp>
 
 namespace iota {
 namespace utils {
 
-class EchoCatcher : public StatsExposer {
+class EchoCatcher : public PrometheusCollector {
  public:
-  void expose() override;
+  // typedef
+  typedef std::map<std::string, std::reference_wrapper<
+                                    prometheus::Family<prometheus::Gauge>>>
+      GaugeMap;
+  typedef rxcpp::observable<std::shared_ptr<iri::IRIMessage>> ZmqObservable;
+  void collect() override;
   bool parseConfiguration(const YAML::Node& conf) override;
 
   struct HashedTX {
@@ -24,21 +31,38 @@ class EchoCatcher : public StatsExposer {
 
  protected:  // gmock classes
   virtual void loadDB();
-  virtual HashedTX broadcastTransactions();
-  virtual void handleReceivedTransactions(
-      HashedTX hashed,
-      std::chrono::time_point<std::chrono::system_clock> start);
+  virtual void broadcastTransactions();
+  virtual void broadcastOneTransaction();
+  virtual void handleReceivedTransactions();
+  void handleUnseenTransactions(
+      std::shared_ptr<iri::TXMessage> tx,
+      cuckoohash_map<std::string, std::chrono::system_clock::time_point>&
+          hashToSeenTimestamp,
+      std::chrono::time_point<std::chrono::system_clock> received,
+      std::weak_ptr<api::IRIClient> iriClient, prometheus::Gauge& timeUntilPublishedGauge);
 
  private:
-  //Configuration
-  std::string _prometheusExpURI;
+  // methods
+  GaugeMap buildMetricsMap(
+      std::shared_ptr<prometheus::Registry> registry,
+      const std::map<std::string, std::string>& labels) override;
+
+  virtual void subscribeToTransactions(
+      std::string zmqURL, ZmqObservable& zmqObservable,
+      std::shared_ptr<prometheus::Registry> registry);
+  // Configuration
   std::string _iriHost;
   std::list<std::string> _zmqPublishers;
   uint32_t _tangleDBWarmupPeriod;
   uint32_t _mwm;
-  //Others
+  uint32_t _broadcastInterval;
+  // Others
   std::shared_ptr<iota::utils::api::IRIClient> _iriClient;
- rxcpp::observable<std::shared_ptr<iri::IRIMessage>> _zmqObservable;
+  std::map<std::string, ZmqObservable> _urlToZmqObservables;
+  cuckoohash_map<std::string, std::chrono::system_clock::time_point>
+      _hashToBroadcastTime;
+  cuckoohash_map<std::string, std::chrono::system_clock::time_point>
+      _hashToDiscoveryTime;
 };
 
 }  // namespace utils

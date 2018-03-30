@@ -22,7 +22,7 @@ cc_library(name='statscollector',
            deps=[
 	       '@prometheus_cpp//:prometheus_cpp',
            ':shared',
-           '//utils/exposer:exposer',
+           '//utils/prometheus_collector:prometheus_collector',
 	       ],
            visibility = ["//visibility:public"]
       )
