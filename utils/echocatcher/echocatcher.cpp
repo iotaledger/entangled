@@ -168,10 +168,14 @@ void EchoCatcher::handleReceivedTransactions() {
   exposer.RegisterCollectable(registry);
   auto zmqThread = rxcpp::schedulers::make_new_thread();
 
+  auto& catcher = *this;
   std::vector<pplx::task<void>> observableTasks;
   for (auto& kv : _urlToZmqObservables) {
-    auto task = pplx::task<void>(
-        [&]() { subscribeToTransactions(kv.first, kv.second, registry); });
+    auto zmqURL = kv.first;
+    auto zmqObservable = kv.second;
+    auto task = pplx::task<void>([
+      zmqURL = std::move(zmqURL), &zmqObservable, &registry, &catcher
+    ]() { catcher.subscribeToTransactions(zmqURL, zmqObservable, registry); });
     observableTasks.push_back(std::move(task));
   }
 
@@ -182,7 +186,7 @@ void EchoCatcher::handleReceivedTransactions() {
 using namespace prometheus;
 
 void EchoCatcher::subscribeToTransactions(
-    std::string zmqURL, EchoCatcher::ZmqObservable& zmqObservable,
+    std::string zmqURL, const EchoCatcher::ZmqObservable& zmqObservable,
     std::shared_ptr<Registry> registry) {
   std::atomic<bool> haveAllTXReturned = false;
   auto families = buildMetricsMap(
