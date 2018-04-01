@@ -13,6 +13,8 @@
 #include <set>
 #include <unordered_set>
 
+#include "common/trinary/tryte_long.h"
+
 using namespace iota::utils;
 
 const std::string TX_TRYTES =
@@ -55,11 +57,16 @@ const std::string TX_TRYTES =
     "999999999";
 
 std::string fillTX(api::GetTransactionsToApproveResponse response) {
+  using namespace std::chrono;
   std::string tx = TX_TRYTES;
 
   tx.replace(2430, 81, response.trunkTransaction);
   tx.replace(2511, 81, response.branchTransaction);
-
+  auto timestampSeconds =
+      duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+  tryte_t trytes[10] = "999999999";
+  long_to_trytes(timestampSeconds, trytes);
+  tx.replace(2322, 9, (char*)trytes);
   return std::move(tx);
 }
 
@@ -158,7 +165,7 @@ void EchoCatcher::broadcastOneTransaction() {
   LOG(INFO) << "Hash: " << hashed.hash;
 
   _iriClient->broadcastTransactions({hashed.tx});
-  _hashToBroadcastTime.insert(hashed.tx, std::chrono::system_clock::now());
+  _hashToBroadcastTime.insert(hashed.hash, std::chrono::system_clock::now());
 }
 
 void EchoCatcher::handleReceivedTransactions() {
