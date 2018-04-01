@@ -135,6 +135,11 @@ tryte_t *transaction_serialize(const iota_transaction transaction);
 // Places the serialized data from an existing transaction in pre-allocated string - returns non 0 on success
 uint16_t transaction_serialize_on_trytes(const iota_transaction transaction, tryte_t *trytes);
 /***********************************************************************************************************
+ * Deserialization
+ ***********************************************************************************************************/
+// Fills up an existing transaction with the serialized data in trytes - returns non 0 on success
+uint16_t transaction_deserialize_from_trytes(iota_transaction transaction, const tryte_t *trytes);
+/***********************************************************************************************************
  * Destructor
  ***********************************************************************************************************/
 // Free an existing transaction - compatible with free()

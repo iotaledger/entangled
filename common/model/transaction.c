@@ -21,7 +21,7 @@
  ***********************************************************************************************************/
 // Fills up an existing transaction with the serialized data in bytes
 // Return non 0 on success
-uint16_t transaction_deserialize_from_trytes(iota_transaction transaction, const tryte_t *trytes) {
+uint16_t transaction_deserialize_trytes(iota_transaction transaction, const tryte_t *trytes) {
     uint16_t offset = 0;
     transaction_set_signature(transaction, trytes + offset);
     offset+= sizeof(transaction->signature_or_message);
@@ -274,6 +274,7 @@ iota_transaction transaction_new(void) {
     if (!transaction) {
         // errno = IOTA_OUT_OF_MEMORY
     }
+    memset(transaction, 0, sizeof(struct _iota_transaction));
     return transaction;
 }
 
@@ -313,10 +314,19 @@ tryte_t *transaction_serialize(const iota_transaction transaction) {
 }
 
 // Places the serialized data from an existing transaction in pre-allocated bytes
-// Returns 0 on success
+// Returns non 0 on success
 uint16_t transaction_serialize_on_trytes(const iota_transaction transaction, tryte_t *trytes) {
     return transaction_serialize_to_trytes(transaction, trytes);
 }
+
+/***********************************************************************************************************
+ * Deserialization
+ ***********************************************************************************************************/
+// Fills up an existing transaction with the serialized data in trytes - returns non 0 on success
+uint16_t transaction_deserialize_from_trytes(iota_transaction transaction, const tryte_t *trytes) {
+    return transaction_deserialize_trytes(transaction, trytes);    
+}
+
 /***********************************************************************************************************
  * Destructor
  ***********************************************************************************************************/

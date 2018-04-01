@@ -6,6 +6,7 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
 #include <unity/unity.h>
 
 #include "common/model/transaction.h"
@@ -373,20 +374,35 @@ static const struct _iota_transaction TRANSACTION = {
 
 void test_serialize(void) {
   tryte_t *serialized_value = transaction_serialize((const iota_transaction)&TRANSACTION);
-  TEST_ASSERT_EQUAL_MEMORY(TRYTES, serialized_value, sizeof(TRYTES)/sizeof(char));
+  TEST_ASSERT_EQUAL_MEMORY(TRYTES, serialized_value, sizeof(TRYTES));
+  free(serialized_value);
 }
 
 void test_deserialize(void) {
   iota_transaction transaction = transaction_deserialize((const tryte_t *)&TRYTES);
   TEST_ASSERT_EQUAL_MEMORY(&TRANSACTION, transaction, sizeof(TRANSACTION));
+  transaction_free(transaction);
 }
 
+void test_serialize_allocated(void) {
+  tryte_t serialized_value[2673];
+  transaction_serialize_on_trytes((const iota_transaction)&TRANSACTION, serialized_value);
+  TEST_ASSERT_EQUAL_MEMORY(TRYTES, serialized_value, sizeof(TRYTES));
+}
+
+void test_deserialize_allocated(void) {
+  struct _iota_transaction transaction = {};
+  transaction_deserialize_from_trytes(&transaction, (const tryte_t *)&TRYTES);
+  TEST_ASSERT_EQUAL_MEMORY(&TRANSACTION, &transaction, sizeof(TRANSACTION));
+}
 
 int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_serialize);
   RUN_TEST(test_deserialize);
+  RUN_TEST(test_serialize_allocated);
+  RUN_TEST(test_deserialize_allocated);
 
   return UNITY_END();
 }
