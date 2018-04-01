@@ -15,7 +15,7 @@ extern "C" {
 #include "common/trinary/tryte.h"
 
 size_t min_trytes(int64_t value);
-int64_t trytes_to_long(tryte_t *trytes, size_t const i);
+int64_t trytes_to_long(const tryte_t *trytes, size_t const i);
 size_t long_to_trytes(int64_t value, tryte_t *trytes);
 
 #endif // __COMMON_TRINARY_TRYTE_LONG_H_

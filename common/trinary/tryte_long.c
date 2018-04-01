@@ -22,7 +22,7 @@ size_t min_trytes(int64_t value) {
     return num;
 }
 
-int64_t trytes_to_long(tryte_t *trytes, size_t const i) {
+int64_t trytes_to_long(const tryte_t *trytes, size_t const i) {
     int64_t value = 0;
     for (size_t j = 0; j < i; j++) {
         tryte_t tryte = trytes[j];
