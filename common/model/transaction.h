@@ -126,14 +126,14 @@ void transaction_set_nonce(iota_transaction transaction, const tryte_t *nonce);
 // Creates and returns a new transaction without data
 iota_transaction transaction_new(void);
 // Creates and returns a new transaction from serialized data - NULL if failed
-iota_transaction transaction_deserialize(tryte_t *trytes);
+iota_transaction transaction_deserialize(const tryte_t *trytes);
 /***********************************************************************************************************
  * Serialization
  ***********************************************************************************************************/
 // Returns the serialized data from an existing transaction - NULL if failed
-tryte_t *transaction_serialize(iota_transaction transaction);
-// Places the serialized data from an existing transaction in pre-allocated string - returns 0 on success
-uint8_t transaction_serialize_on_trytes(iota_transaction transaction, tryte_t *trytes);
+tryte_t *transaction_serialize(const iota_transaction transaction);
+// Places the serialized data from an existing transaction in pre-allocated string - returns non 0 on success
+uint16_t transaction_serialize_on_trytes(const iota_transaction transaction, tryte_t *trytes);
 /***********************************************************************************************************
  * Destructor
  ***********************************************************************************************************/

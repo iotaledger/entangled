@@ -20,8 +20,8 @@
  * Private interface
  ***********************************************************************************************************/
 // Fills up an existing transaction with the serialized data in bytes
-// Return 0 on success
-uint8_t transaction_deserialize_from_trytes(iota_transaction transaction, tryte_t *trytes) {
+// Return non 0 on success
+uint16_t transaction_deserialize_from_trytes(iota_transaction transaction, const tryte_t *trytes) {
     uint16_t offset = 0;
     transaction_set_signature(transaction, trytes + offset);
     offset+= sizeof(transaction->signature_or_message);
@@ -52,26 +52,32 @@ uint8_t transaction_deserialize_from_trytes(iota_transaction transaction, tryte_
     transaction_set_attachment_timestamp_upper(transaction, trytes_to_long(trytes + offset, 9));
     offset+= 9;
     transaction_set_nonce(transaction, trytes + offset);
-    return 0;
+    offset+= sizeof(transaction->nonce);
+    return offset;
 }
 
+void _convert_and_pad(int64_t value, tryte_t *trytes, size_t length) {
+    size_t num_trytes;
+    num_trytes = long_to_trytes(value, trytes);
+    memset(trytes + num_trytes, '9', length - num_trytes);
+}
 // Serialize an existing transaction
-// Return 0 on success
-uint8_t transaction_serialize_to_trytes(iota_transaction transaction, tryte_t *trytes) {
+// Return non 0 on success
+uint16_t transaction_serialize_to_trytes(const iota_transaction transaction, tryte_t *trytes) {
     uint16_t offset = 0;
     memcpy(trytes + offset, transaction_signature(transaction), sizeof(transaction->signature_or_message));
     offset+= sizeof(transaction->signature_or_message);
     memcpy(trytes + offset, transaction_address(transaction), sizeof(transaction->address));
     offset+= sizeof(transaction->address);
-    long_to_trytes(transaction_value(transaction), trytes + offset);
+    _convert_and_pad(transaction_value(transaction), trytes + offset, 27);
     offset+= 27;
-    long_to_trytes(transaction_obsolete_tag(transaction), trytes + offset);
+    _convert_and_pad(transaction_obsolete_tag(transaction), trytes + offset, 27);
     offset+= 27;
-    long_to_trytes(transaction_timestamp(transaction), trytes + offset);
+    _convert_and_pad(transaction_timestamp(transaction), trytes + offset, 9);
     offset+= 9;
-    long_to_trytes(transaction_current_index(transaction), trytes + offset);
+    _convert_and_pad(transaction_current_index(transaction), trytes + offset, 9);
     offset+= 9;
-    long_to_trytes(transaction_last_index(transaction), trytes + offset);
+    _convert_and_pad(transaction_last_index(transaction), trytes + offset, 9);
     offset+= 9;
     memcpy(trytes + offset, transaction_bundle(transaction), sizeof(transaction->bundle));
     offset+= sizeof(transaction->bundle);
@@ -81,14 +87,15 @@ uint8_t transaction_serialize_to_trytes(iota_transaction transaction, tryte_t *t
     offset+= sizeof(transaction->branch);
     memcpy(trytes + offset, transaction_tag(transaction), sizeof(transaction->tag));
     offset+= sizeof(transaction->tag);
-    long_to_trytes(transaction_attachment_timestamp(transaction), trytes + offset);
+    _convert_and_pad(transaction_attachment_timestamp(transaction), trytes + offset, 9);
     offset+= 9;
-    long_to_trytes(transaction_attachment_timestamp_lower(transaction), trytes + offset);
+    _convert_and_pad(transaction_attachment_timestamp_lower(transaction), trytes + offset, 9);
     offset+= 9;
-    long_to_trytes(transaction_attachment_timestamp_upper(transaction), trytes + offset);
+    _convert_and_pad(transaction_attachment_timestamp_upper(transaction), trytes + offset, 9);
     offset+= 9;
     memcpy(trytes + offset, transaction_nonce(transaction), sizeof(transaction->nonce));
-    return 0;
+    offset+= sizeof(transaction->nonce);
+    return offset;
 }
 
 /***********************************************************************************************************
@@ -272,14 +279,14 @@ iota_transaction transaction_new(void) {
 
 // Creates and returns a new transaction from serialized data
 // Returns NULL if failed
-iota_transaction transaction_deserialize(tryte_t *trytes) {
+iota_transaction transaction_deserialize(const tryte_t *trytes) {
     iota_transaction transaction;
     transaction = transaction_new();
     if (!transaction) {
         // errno = IOTA_OUT_OF_MEMORY
         return NULL;
     }
-    if (transaction_deserialize_from_trytes(transaction, trytes)) {
+    if (!transaction_deserialize_from_trytes(transaction, trytes)) {
         // errno = IOTA_SOME_ERROR
         transaction_free(transaction);
         return NULL;
@@ -292,13 +299,13 @@ iota_transaction transaction_deserialize(tryte_t *trytes) {
  ***********************************************************************************************************/
 // Returns the serialized data from an existing transaction
 // Returns NULL if failed
-tryte_t *transaction_serialize(iota_transaction transaction) {
-    tryte_t *serialized_value = (tryte_t *)malloc(sizeof(tryte_t) * 2187);
+tryte_t *transaction_serialize(const iota_transaction transaction) {
+    tryte_t *serialized_value = (tryte_t *)malloc(sizeof(tryte_t) * 2673);
     if (!serialized_value) {
         // errno = IOTA_OUT_OF_MEMORY
         return NULL;
     }
-    if (transaction_serialize_on_trytes(transaction, serialized_value)) {
+    if (!transaction_serialize_on_trytes(transaction, serialized_value)) {
         free(serialized_value);
         serialized_value = NULL;
     }
@@ -307,7 +314,7 @@ tryte_t *transaction_serialize(iota_transaction transaction) {
 
 // Places the serialized data from an existing transaction in pre-allocated bytes
 // Returns 0 on success
-uint8_t transaction_serialize_on_tryte(iota_transaction transaction, tryte_t *trytes) {
+uint16_t transaction_serialize_on_trytes(const iota_transaction transaction, tryte_t *trytes) {
     return transaction_serialize_to_trytes(transaction, trytes);
 }
 /***********************************************************************************************************
@@ -317,3 +324,4 @@ uint8_t transaction_serialize_on_tryte(iota_transaction transaction, tryte_t *tr
 void transaction_free(void *t) {
     free(t);
 }
+
