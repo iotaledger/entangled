@@ -92,10 +92,9 @@ pplx::task<std::optional<uint64_t>> handleUnseenTransactions(
                                                                 txTime)
               .count();
       hashToDiscoveryTimestamp.erase(tx->hash());
-      auto txArrivalLatencySP = std::make_shared<uint64_t>(txArrivalLatency);
       return pplx::create_task(
-          [txArrivalLatencySP]() -> std::optional<uint64_t> {
-            return std::optional<uint64_t>(*txArrivalLatencySP);
+          [txArrivalLatency = std::move(txArrivalLatency)]() -> std::optional<uint64_t> {
+            return std::optional<uint64_t>(txArrivalLatency);
           });
     }
   }

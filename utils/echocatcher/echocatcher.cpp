@@ -211,7 +211,7 @@ void EchoCatcher::subscribeToTransactions(
                     .get()
                     .Add(
                         {{"bundle_size", std::to_string(tx->lastIndex() + 1)}});
-            auto task = pplx::task<void>([&]() {
+            auto task = pplx::task<void>([&, received = received]() {
               handleUnseenTransactions(tx, _hashToDiscoveryTime, received,
                                        _iriClient, timeUntilPublishedGauge);
             });
