@@ -331,7 +331,10 @@ static const struct _iota_transaction TRANSACTION = {
     'J'
   },
   0,
-  0,
+  {
+    '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', 
+    '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9'    
+  },
   1482522289,
   0,
   0,
@@ -373,20 +376,20 @@ static const struct _iota_transaction TRANSACTION = {
 };
 
 void test_serialize(void) {
-  tryte_t *serialized_value = transaction_serialize((const iota_transaction)&TRANSACTION);
+  tryte_t *serialized_value = transaction_serialize((const iota_transaction_t)&TRANSACTION);
   TEST_ASSERT_EQUAL_MEMORY(TRYTES, serialized_value, sizeof(TRYTES));
   free(serialized_value);
 }
 
 void test_deserialize(void) {
-  iota_transaction transaction = transaction_deserialize((const tryte_t *)&TRYTES);
+  iota_transaction_t transaction = transaction_deserialize((const tryte_t *)&TRYTES);
   TEST_ASSERT_EQUAL_MEMORY(&TRANSACTION, transaction, sizeof(TRANSACTION));
   transaction_free(transaction);
 }
 
 void test_serialize_allocated(void) {
   tryte_t serialized_value[2673];
-  transaction_serialize_on_trytes((const iota_transaction)&TRANSACTION, serialized_value);
+  transaction_serialize_on_trytes((const iota_transaction_t)&TRANSACTION, serialized_value);
   TEST_ASSERT_EQUAL_MEMORY(TRYTES, serialized_value, sizeof(TRYTES));
 }
 
