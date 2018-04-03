@@ -59,7 +59,7 @@ size_t long_to_trytes(int64_t value, tryte_t *trytes) {
         value-= radix_pow * tryte;
         // If the original value was negative, the tryte value should also be negative
         if (negative) {
-            tryte = 27 - tryte;
+            tryte = tryte ? 27 - tryte : tryte;
             value = -value;
         }
         trytes[i] = TRYTE_STRING[tryte];

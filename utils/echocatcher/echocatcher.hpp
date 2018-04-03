@@ -48,7 +48,7 @@ class EchoCatcher : public PrometheusCollector {
       const std::map<std::string, std::string>& labels) override;
 
   virtual void subscribeToTransactions(
-      std::string zmqURL, ZmqObservable& zmqObservable,
+      std::string zmqURL, const ZmqObservable& zmqObservable,
       std::shared_ptr<prometheus::Registry> registry);
   // Configuration
   std::string _iriHost;

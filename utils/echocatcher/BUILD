@@ -7,6 +7,7 @@ cc_library(
         '//utils/common:common',
         '//ccurl:ccurl',
         '//utils/prometheus_collector:prometheus_collector',
+        '//common/trinary:tryte_long',
         '@cpprestsdk//:cpprestsdk',
         '@com_github_gflags_gflags//:gflags',
         '@glog//:glog',
