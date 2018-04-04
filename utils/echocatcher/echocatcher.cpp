@@ -82,13 +82,13 @@ bool EchoCatcher::parseConfiguration(const YAML::Node& conf) {
     return false;
   }
 
-  if (conf["iri_host"] && conf["publishers"] && conf["mwm"] &&
-      conf["tangledb_warmup_period"] && conf["broadcast_interval"]) {
-    _iriHost = conf["iri_host"].as<std::string>();
-    _zmqPublishers = conf["publishers"].as<std::list<std::string>>();
-    _mwm = conf["mwm"].as<uint32_t>();
-    _tangleDBWarmupPeriod = conf["tangledb_warmup_period"].as<uint32_t>();
-    _broadcastInterval = conf["broadcast_interval"].as<uint32_t>();
+  if (conf[IRI_HOST] && conf[PUBLISHERS] && conf[MWM] &&
+      conf[TANGLE_DB_WARMUP_TIME] && conf[BROADCAST_INTERVAL]) {
+    _iriHost = conf[IRI_HOST].as<std::string>();
+    _zmqPublishers = conf[PUBLISHERS].as<std::list<std::string>>();
+    _mwm = conf[MWM].as<uint32_t>();
+    _tangleDBWarmupPeriod = conf[TANGLE_DB_WARMUP_TIME].as<uint32_t>();
+    _broadcastInterval = conf[BROADCAST_INTERVAL].as<uint32_t>();
     return true;
   }
 

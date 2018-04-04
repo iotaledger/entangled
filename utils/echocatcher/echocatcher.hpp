@@ -16,6 +16,11 @@ namespace utils {
 
 class EchoCatcher : public PrometheusCollector {
  public:
+  constexpr static auto IRI_HOST = "iri_host";
+  constexpr static auto PUBLISHERS = "publishers";
+  constexpr static auto MWM = "mwm";
+  constexpr static auto TANGLE_DB_WARMUP_TIME = "tangledb_warmup_period";
+  constexpr static auto BROADCAST_INTERVAL = "broadcast_interval";
   // typedef
   typedef std::map<std::string, std::reference_wrapper<
                                     prometheus::Family<prometheus::Gauge>>>

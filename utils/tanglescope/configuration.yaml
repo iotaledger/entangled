@@ -1,17 +1,15 @@
 echocatcher:
   #list of publisher to listen to. (they should return the echo)
   publishers:
-
       - "tcp://zmq.testnet.iota.org:5556"
 
-      - "tcp://zmq.testnet.iota.org:5556"
-
+      - "tcp://m5.iotaledger.net:5556"
   #url of iri node
   iri_host: "https://nodes.testnet.iota.org:443"
   #IP/Port that the Prometheus Exposer binds to
   prometheus_exposer_uri: "0.0.0.0:8080"
   #MWM for transaction's POW
-  mwm: 14
+  mwm: 9
   #time for db to load from publishers zmq [seconds]
   tangledb_warmup_period: 360
   #in-between transactions interval [seconds]
@@ -22,7 +20,10 @@ statscollector:
   #IP/Port that the Prometheus Exposer binds to
   prometheus_exposer_uri: "0.0.0.0:8081"
   #URL of ZMQ publisher to connect to
-  publisher: "tcp://m5.iotaledger.net:5556"
+  publishers:
+      - "tcp://zmq.testnet.iota.org:5556"
+
+      - "tcp://m5.iotaledger.net:5556"
   #interval to wait before starting publishing in milliseconds
   pub_delay: 120000
   #interval on which to publish to prometheus in milliseconds. You probably don't want to change this.
