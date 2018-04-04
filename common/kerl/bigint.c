@@ -22,11 +22,12 @@ static void full_add(full_add_s *const fa, const uint64_t lh,
   carry1 = hi != 0;
   if (fa->carry) {
     v = fa->v + 1uLL;
+    hi = (uint32_t)(v >> 32uLL);
+    fa->v = v & 0xFFFFFFFF;
+    fa->carry = carry1 || (hi != 0);
+  } else {
+    fa->carry = carry1;
   }
-
-  hi = (uint32_t)(v >> 32uLL);
-  fa->v = v & 0xFFFFFFFF;
-  fa->carry = carry1 || (hi != 0);
 }
 
 void bigint_not(uint32_t *const base, size_t len) {
