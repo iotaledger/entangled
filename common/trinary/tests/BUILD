@@ -40,3 +40,12 @@ cc_test (
         "@unity//:unity",
     ]
 )
+
+cc_test (
+    name = "test_add",
+    srcs = ["test_add.c"],
+    deps = [
+        "//common/trinary:add",
+        "@unity//:unity",
+    ]
+)
