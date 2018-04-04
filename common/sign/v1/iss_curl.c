@@ -1,4 +1,5 @@
 #include "common/curl-p/trit.h"
+#include "iss_curl.h"
 
 #define HASH_PREFIX curl
 #define HASH_STATE Curl

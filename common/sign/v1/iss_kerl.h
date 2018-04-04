@@ -11,4 +11,4 @@
 #undef HASH_PREFIX
 #undef HASH_STATE
 
-#endif /* __ISS_CURL_H_ */
+#endif /* __ISS_KERL_H_ */

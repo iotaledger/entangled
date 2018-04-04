@@ -66,17 +66,17 @@ void test_key(trit_t *s, trit_t *k, size_t l, Curl *c) {
 #undef EXP_KEY
 
 #define EXP_ADDY                                                               \
-  "LZSSW9TZUVUJXX9F9CXTYTRWYVOB9XNANDTULZBHSUZTTJSPICWWYSBHMKZWENSFVBDCGWFTNWLWRIYMT"
+  "LZSSW9TZUVUJXX9F9CXTYTRWYVOB9XNANDTULZBHSUZTTJSPICWWYSBHMKZWENSFVBDCGWFTNW" \
+  "LWRIYMT"
 
 void test_addy(trit_t *k, size_t l, Curl *c) {
   tryte_t addy_trytes[l];
+  addy_trytes[HASH_LENGTH / 3] = 0;
 
   iss_curl_key_digest(k, k, l, c);
-  iss_curl_address(k, k, c);
+  iss_curl_address(k, k, HASH_LENGTH, c);
 
   trits_to_trytes(k, addy_trytes, l);
-
-  addy_trytes[HASH_LENGTH / 3] = 0;
 
   TEST_ASSERT_EQUAL_MEMORY(EXP_ADDY, addy_trytes,
                            HASH_LENGTH / 3 * sizeof(tryte_t));

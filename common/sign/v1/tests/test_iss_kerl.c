@@ -74,7 +74,7 @@ void test_addy(trit_t *k, size_t l, Kerl *c) {
   tryte_t addy_trytes[l];
 
   iss_kerl_key_digest(k, k, l, c);
-  iss_kerl_address(k, k, c);
+  iss_kerl_address(k, k, HASH_LENGTH, c);
 
   trits_to_trytes(k, addy_trytes, l);
 
