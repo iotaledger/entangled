@@ -2,6 +2,7 @@
 #include <glog/logging.h>
 #include <prometheus/exposer.h>
 #include <atomic>
+#include <chrono>
 #include <cstring>
 #include <iostream>
 #include <iota/utils/common/tangledb.hpp>
@@ -211,10 +212,12 @@ void EchoCatcher::subscribeToTransactions(
                     .get()
                     .Add(
                         {{"bundle_size", std::to_string(tx->lastIndex() + 1)}});
-            auto task = pplx::task<void>([&, received = received, txSharedPtr = tx]() {
-              handleUnseenTransactions(txSharedPtr, _hashToDiscoveryTime, received,
-                                       _iriClient, timeUntilPublishedGauge);
-            });
+            auto task =
+                pplx::task<void>([&, received = received, txSharedPtr = tx ]() {
+                  handleUnseenTransactions(txSharedPtr, _hashToDiscoveryTime,
+                                           received, _iriClient,
+                                           timeUntilPublishedGauge);
+                });
             tasks.push_back(std::move(task));
 
             std::chrono::system_clock::time_point broadcastTime;
@@ -248,7 +251,7 @@ void EchoCatcher::subscribeToTransactions(
                 [&](pplx::task<void> task) { task.get(); });
 }
 
-void EchoCatcher::handleUnseenTransactions(
+pplx::task<void> EchoCatcher::handleUnseenTransactions(
     std::shared_ptr<iri::TXMessage> tx,
     cuckoohash_map<std::string, std::chrono::system_clock::time_point>&
         hashToSeenTimestamp,
@@ -257,8 +260,16 @@ void EchoCatcher::handleUnseenTransactions(
   auto txHandlerTask = txAuxiliary::handleUnseenTransactions(
       tx, _hashToDiscoveryTime, received, iriClient);
 
-  if (txHandlerTask.get().has_value()) {
-    timeUntilPublishedGauge.Set(txHandlerTask.get().value());
+  std::chrono::system_clock::time_point txTime;
+  if (_hashToDiscoveryTime.find(tx->hash(), txTime)) {
+    auto txArrivalLatency =
+        std::chrono::duration_cast<std::chrono::milliseconds>(received - txTime)
+            .count();
+    _hashToDiscoveryTime.erase(tx->hash());
+    timeUntilPublishedGauge.Set(txArrivalLatency);
+  } else {
+    return txAuxiliary::handleUnseenTransactions(tx, _hashToDiscoveryTime,
+                                                 received, iriClient);
   }
 }
 

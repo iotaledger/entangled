@@ -1,15 +1,15 @@
 #pragma once
 
-#include <string>
-#include <list>
-#include <memory>
-#include <chrono>
-#include <rx.hpp>
 #include <prometheus/exposer.h>
-#include <libcuckoo/cuckoohash_map.hh>
+#include <chrono>
 #include <iota/utils/common/api.hpp>
 #include <iota/utils/common/iri.hpp>
 #include <iota/utils/prometheus_collector/prometheus_collector.hpp>
+#include <libcuckoo/cuckoohash_map.hh>
+#include <list>
+#include <memory>
+#include <rx.hpp>
+#include <string>
 
 namespace iota {
 namespace utils {
@@ -34,12 +34,13 @@ class EchoCatcher : public PrometheusCollector {
   virtual void broadcastTransactions();
   virtual void broadcastOneTransaction();
   virtual void handleReceivedTransactions();
-  void handleUnseenTransactions(
+  pplx::task<void> handleUnseenTransactions(
       std::shared_ptr<iri::TXMessage> tx,
       cuckoohash_map<std::string, std::chrono::system_clock::time_point>&
           hashToSeenTimestamp,
       std::chrono::time_point<std::chrono::system_clock> received,
-      std::weak_ptr<api::IRIClient> iriClient, prometheus::Gauge& timeUntilPublishedGauge);
+      std::weak_ptr<api::IRIClient> iriClient,
+      prometheus::Gauge& timeUntilPublishedGauge);
 
  private:
   // methods

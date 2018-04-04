@@ -75,7 +75,7 @@ pplx::task<std::set<std::string>> getUnconfirmedTXs(
   return pplx::create_task([]() -> set<string> { return set<string>(); });
 }
 
-pplx::task<std::optional<uint64_t>> handleUnseenTransactions(
+pplx::task<void> handleUnseenTransactions(
     std::shared_ptr<iri::TXMessage> tx,
     cuckoohash_map<std::string, std::chrono::system_clock::time_point>&
         hashToDiscoveryTimestamp,
@@ -84,25 +84,10 @@ pplx::task<std::optional<uint64_t>> handleUnseenTransactions(
   TangleDB::TXRecord txRecord = {tx->hash(), tx->trunk(), tx->branch()};
   TangleDB::instance().put(std::move(txRecord));
 
-  {
-    std::chrono::system_clock::time_point txTime;
-    if (hashToDiscoveryTimestamp.find(tx->hash(), txTime)) {
-      auto txArrivalLatency =
-          std::chrono::duration_cast<std::chrono::milliseconds>(received -
-                                                                txTime)
-              .count();
-      hashToDiscoveryTimestamp.erase(tx->hash());
-      return pplx::create_task(
-          [txArrivalLatency = std::move(txArrivalLatency)]() -> std::optional<uint64_t> {
-            return std::optional<uint64_t>(txArrivalLatency);
-          });
-    }
-  }
-
   return getUnconfirmedTXs(iriClient, tx)
       .then([&](std::set<std::string> unconfirmed) {
         if (unconfirmed.empty()) {
-          return std::optional<uint64_t>();
+          return;
         }
 
         std::vector<std::string> unconfirmedVec(unconfirmed.begin(),
@@ -119,7 +104,7 @@ pplx::task<std::optional<uint64_t>> handleUnseenTransactions(
             [&hashToDiscoveryTimestamp, received](std::string txHash) {
               hashToDiscoveryTimestamp.insert(txHash, received);
             });
-        return std::optional<uint64_t>();
+        return;
       });
 }
 }  // namespace txAuxiliary
