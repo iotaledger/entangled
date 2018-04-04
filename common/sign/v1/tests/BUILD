@@ -9,3 +9,15 @@ cc_test(
         '//common/curl-p:trit',
         '@unity//:unity',
     ], )
+
+cc_test(
+    name='test_iss_kerl',
+    srcs=[
+        'test_iss_kerl.c',
+    ],
+    deps=[
+        '//common/sign/v1:iss_kerl',
+        '//common/trinary:trit_tryte',
+        '//common/curl-p:trit',
+        '@unity//:unity',
+    ], )

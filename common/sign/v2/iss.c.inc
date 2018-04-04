@@ -47,7 +47,7 @@ int _ISS_PREFIX(digest)(trit_t *chunk, int count, HASH_STATE *const c) {
   }
   for (; count-- > 0;) {
     _HASH_PREFIX(absorb)(c, chunk, HASH_LENGTH);
-    memcpy(chunk, c->state, HASH_LENGTH * sizeof(trit_t));
+    _HASH_PREFIX(squeeze)(c, chunk, HASH_LENGTH);
     _HASH_PREFIX(reset)(c);
   }
   return 0;

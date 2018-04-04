@@ -76,7 +76,7 @@ int _ISS_PREFIX(signature)(trit_t *sig, trit_t *const hash, trit_t *key, size_t 
                  hash[i * TRYTE_WIDTH + 1] * 3 + hash[i * TRYTE_WIDTH + 2] * 9;
          j++) {
       _HASH_PREFIX(absorb)(state, sig, HASH_LENGTH);
-      memcpy(sig, state->state, HASH_LENGTH * sizeof(trit_t));
+      _HASH_PREFIX(squeeze)(state, sig, HASH_LENGTH);
       _HASH_PREFIX(reset)(state);
     }
   }
@@ -92,7 +92,7 @@ int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t *const hash, trit_t *sig,
                         hash[i * TRYTE_WIDTH + 2] * 9 - MIN_TRYTE_VALUE;
          j++) {
       _HASH_PREFIX(absorb)(state, sig, HASH_LENGTH);
-      memcpy(sig, state->state, HASH_LENGTH * sizeof(trit_t));
+      _HASH_PREFIX(squeeze)(state, sig, HASH_LENGTH);
       _HASH_PREFIX(reset)(state);
     }
   }
