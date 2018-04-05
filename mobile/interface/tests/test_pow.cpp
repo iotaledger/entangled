@@ -56,6 +56,8 @@ TEST(PoWTest, testsPoW) {
 
   //std::cerr << "TX: " << TX_TRYTES << std::endl;
   //std::cerr << "Nonce: " << nonce << std::endl;
+  std::free(nonce);
+  
 }
 
 }  // namespace
