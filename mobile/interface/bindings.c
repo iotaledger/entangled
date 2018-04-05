@@ -46,7 +46,6 @@ char* generate_address(const char* seed, const size_t index,
   const size_t key_length = security * ISS_KEY_LENGTH;
 
   Kerl kerl;
-  size_t i;
 
   trit_t subseed[HASH_LENGTH];
   trit_t key[key_length];
@@ -60,12 +59,9 @@ char* generate_address(const char* seed, const size_t index,
   iss_kerl_key(subseed, key, key_length, &kerl);
   memset(subseed, 0, HASH_LENGTH * sizeof(trit_t));
 
-  for (i = 0; i < security; i++) {
-    iss_kerl_key_digest(key + i * ISS_KEY_LENGTH, key + i * HASH_LENGTH,
-                        ISS_KEY_LENGTH, &kerl);
-  }
-
+  iss_kerl_key_digest(key, key, key_length, &kerl);
   iss_kerl_address(key, key, security * HASH_LENGTH, &kerl);
+
   kerl_reset(&kerl);
 
   trits_to_trytes(key, (tryte_t*)address, HASH_LENGTH);
@@ -74,30 +70,30 @@ char* generate_address(const char* seed, const size_t index,
   return address;
 }
 char* generate_signature(const char* seed, const size_t index,
-                         const size_t security, const size_t bundleHash) {
+                         const size_t security, const char* bundleHash) {
   const size_t key_length = security * ISS_KEY_LENGTH;
 
   Kerl kerl;
   size_t i;
 
+  trit_t hash[HASH_LENGTH];
   trit_t subseed[HASH_LENGTH];
   trit_t key[key_length];
+  tryte_t* signature = calloc(1 + key_length / RADIX, sizeof(tryte_t));
 
   init_kerl(&kerl);
 
   trytes_to_trits((tryte_t*)seed, subseed, HASH_LENGTH / RADIX);
+  trytes_to_trits((tryte_t*)bundleHash, hash, HASH_LENGTH / RADIX);
   iss_kerl_subseed(subseed, subseed, index, &kerl);
-
   iss_kerl_key(subseed, key, key_length, &kerl);
   memset(subseed, 0, HASH_LENGTH * sizeof(trit_t));
 
-  for (i = 0; i < security; i++) {
-    iss_kerl_key_digest(key + i * ISS_KEY_LENGTH, key + i * HASH_LENGTH,
-                        ISS_KEY_LENGTH, &kerl);
-  }
+  iss_kerl_signature(key, hash, key, key_length, &kerl);
+  trits_to_trytes(key, (tryte_t*)signature, key_length);
+  memset(key, 0, key_length * sizeof(trit_t));
 
-
-  return "";
+  return (char*)signature;
 }
 
 #undef RADIX

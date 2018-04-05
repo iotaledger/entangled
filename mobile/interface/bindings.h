@@ -11,7 +11,7 @@ char* do_pow(const char* trytes, int mwm);
 char* generate_address(const char* seed, const size_t index,
                        const size_t security);
 char* generate_signature(const char* seed, const size_t index,
-                         const size_t security, const size_t bundleHash);
+                         const size_t security, const char* bundleHash);
 
 #ifdef __cplusplus
 }
