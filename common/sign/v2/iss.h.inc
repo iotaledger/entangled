@@ -9,6 +9,10 @@
 
 #define _ISS_PREFIX(A) CAT(CAT(CAT(iss_,HASH_PREFIX),_),A)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int _ISS_PREFIX(subseed)(trit_t *const seed, trit_t *const out, int64_t index,
                 HASH_STATE *const c);
 
@@ -22,6 +26,10 @@ int _ISS_PREFIX(signature)(trit_t *sig, trit_t *const hash, size_t o, trit_t *ke
 
 int _ISS_PREFIX(sig_digest)(trit_t *const d, trit_t *const hash, size_t o, trit_t *sig,
                    size_t sig_len, HASH_STATE *const c);
+
+#ifdef __cplusplus
+}
+#endif
 
 #undef _ISS_PREFIX
 #undef CAT
