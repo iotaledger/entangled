@@ -54,8 +54,8 @@ TEST(PoWTest, testsPoW) {
 
   //FIXME(th0br0) verify that nonce yields a good hash
 
-  std::cerr << "TX: " << TX_TRYTES << std::endl;
-  std::cerr << "Nonce: " << nonce << std::endl;
+  //std::cerr << "TX: " << TX_TRYTES << std::endl;
+  //std::cerr << "Nonce: " << nonce << std::endl;
 }
 
 }  // namespace
