@@ -4,7 +4,6 @@
 
 #ifndef _Included_org_iota_mobile_Interface
 #define _Included_org_iota_mobile_Interface
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -14,7 +13,23 @@ extern "C" {
  * Signature: (Ljava/lang/String;I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_doPOW
-  (JNIEnv *, jobject, jstring, jint);
+  (JNIEnv *, jclass, jstring, jint);
+
+/*
+ * Class:     org_iota_mobile_Interface
+ * Method:    generateAddress
+ * Signature: (Ljava/lang/String;II)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_generateAddress
+  (JNIEnv *, jclass, jstring, jint, jint);
+
+/*
+ * Class:     org_iota_mobile_Interface
+ * Method:    generateSignature
+ * Signature: (Ljava/lang/String;IILjava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_generateSignature
+  (JNIEnv *, jclass, jstring, jint, jint, jstring);
 
 #ifdef __cplusplus
 }
