@@ -21,7 +21,8 @@ cc_binary(name='tanglescope',
 cc_test(name='tests',
         srcs=glob(['tests/**/*.cpp', '**/*.hpp']),
         deps=['@gtest//:gtest_main', '@gtest//:gtest',
-              ':shared',])
+              ':shared',],
+        timeout="short")
 
 genrule(name = 'copy_configuration',
         local = 1,

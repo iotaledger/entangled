@@ -14,6 +14,10 @@ echocatcher:
   tangledb_warmup_period: 360
   #in-between transactions interval [seconds]
   broadcast_interval: 20
+  #how often should echocatcher discover "unseen" transactions [seconds]
+  #shouldn't be too frequent since it can incur in multiple api
+  #calls ..
+  discovery_interval: 5
 
 statscollector:
 

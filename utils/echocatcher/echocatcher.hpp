@@ -21,6 +21,7 @@ class EchoCatcher : public PrometheusCollector {
   constexpr static auto MWM = "mwm";
   constexpr static auto TANGLE_DB_WARMUP_TIME = "tangledb_warmup_period";
   constexpr static auto BROADCAST_INTERVAL = "broadcast_interval";
+  constexpr static auto DISCOVERY_INTERVAL = "discovery_interval";
   // typedef
   typedef std::map<std::string, std::reference_wrapper<
                                     prometheus::Family<prometheus::Gauge>>>
@@ -62,6 +63,7 @@ class EchoCatcher : public PrometheusCollector {
   uint32_t _tangleDBWarmupPeriod;
   uint32_t _mwm;
   uint32_t _broadcastInterval;
+  uint32_t _discoveryInterval;
   // Others
   std::shared_ptr<iota::utils::api::IRIClient> _iriClient;
   std::map<std::string, ZmqObservable> _urlToZmqObservables;

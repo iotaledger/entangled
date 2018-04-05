@@ -20,13 +20,15 @@ TEST(TangleScope, EchoCatcherFlow) {
 
   using namespace testing;
   YAML::Node config;
-  config["iri_host"] = "some_host";
-  config["publishers"].push_back("p1");
-  config["publishers"].push_back("p2");
-  config["tangledb_warmup_period"] = "100";
-  config["prometheus_exposer_uri"] = "some_exposer_uri";
-  config["mwm"] = "17";
-  config["broadcast_interval"] = "10";
+  config[EchoCatcher::IRI_HOST] = "some_host";
+  config[EchoCatcher::PUBLISHERS].push_back("p1");
+  config[EchoCatcher::PUBLISHERS].push_back("p2");
+  config[EchoCatcher::TANGLE_DB_WARMUP_TIME] = "100";
+  config[PrometheusCollector::PROMETHEUS_EXPOSER_URI] = "some_exposer_uri";
+  config[EchoCatcher::MWM] = "17";
+  config[EchoCatcher::DISCOVERY_INTERVAL] = "10";
+  config[EchoCatcher::BROADCAST_INTERVAL] = "10";
+
   auto mockEchoCatcher = std::make_shared<MockEchoCatcher>();
 
   ASSERT_EQ(mockEchoCatcher->parseConfiguration(config), true);

@@ -83,12 +83,14 @@ bool EchoCatcher::parseConfiguration(const YAML::Node& conf) {
   }
 
   if (conf[IRI_HOST] && conf[PUBLISHERS] && conf[MWM] &&
-      conf[TANGLE_DB_WARMUP_TIME] && conf[BROADCAST_INTERVAL]) {
+      conf[TANGLE_DB_WARMUP_TIME] && conf[BROADCAST_INTERVAL] &&
+      conf[DISCOVERY_INTERVAL]) {
     _iriHost = conf[IRI_HOST].as<std::string>();
     _zmqPublishers = conf[PUBLISHERS].as<std::list<std::string>>();
     _mwm = conf[MWM].as<uint32_t>();
     _tangleDBWarmupPeriod = conf[TANGLE_DB_WARMUP_TIME].as<uint32_t>();
     _broadcastInterval = conf[BROADCAST_INTERVAL].as<uint32_t>();
+    _discoveryInterval = conf[DISCOVERY_INTERVAL].as<uint32_t>();
     return true;
   }
 
@@ -104,9 +106,7 @@ void EchoCatcher::collect() {
   for (const auto& url : _zmqPublishers) {
     auto zmqObservable =
         rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
-            [&](auto s) {
-              zmqPublisher(std::move(s), *_zmqPublishers.begin());
-            });
+            [&](auto s) { zmqPublisher(std::move(s), url); });
     _urlToZmqObservables.insert(std::pair(url, zmqObservable));
   }
 
@@ -212,12 +212,11 @@ void EchoCatcher::subscribeToTransactions(
                     .get()
                     .Add(
                         {{"bundle_size", std::to_string(tx->lastIndex() + 1)}});
+
             auto task =
-                pplx::task<void>([&, received = received, txSharedPtr = tx ]() {
-                  handleUnseenTransactions(txSharedPtr, _hashToDiscoveryTime,
-                                           received, _iriClient,
-                                           timeUntilPublishedGauge);
-                });
+                handleUnseenTransactions(tx, _hashToDiscoveryTime, received,
+                                         _iriClient, timeUntilPublishedGauge);
+
             tasks.push_back(std::move(task));
 
             std::chrono::system_clock::time_point broadcastTime;
@@ -257,9 +256,8 @@ pplx::task<void> EchoCatcher::handleUnseenTransactions(
         hashToSeenTimestamp,
     std::chrono::time_point<std::chrono::system_clock> received,
     std::weak_ptr<api::IRIClient> iriClient, Gauge& timeUntilPublishedGauge) {
-  auto txHandlerTask = txAuxiliary::handleUnseenTransactions(
-      tx, _hashToDiscoveryTime, received, iriClient);
-
+  static std::atomic<std::chrono::time_point<std::chrono::system_clock>>
+      lastDiscoveryTime = received;
   std::chrono::system_clock::time_point txTime;
   if (_hashToDiscoveryTime.find(tx->hash(), txTime)) {
     auto txArrivalLatency =
@@ -268,9 +266,16 @@ pplx::task<void> EchoCatcher::handleUnseenTransactions(
     _hashToDiscoveryTime.erase(tx->hash());
     timeUntilPublishedGauge.Set(txArrivalLatency);
   } else {
-    return txAuxiliary::handleUnseenTransactions(tx, _hashToDiscoveryTime,
-                                                 received, iriClient);
+    auto elapsedFromLastTime = std::chrono::duration_cast<std::chrono::seconds>(
+                                   received - lastDiscoveryTime.load())
+                                   .count();
+    if (elapsedFromLastTime > _discoveryInterval) {
+      lastDiscoveryTime = received;
+      return txAuxiliary::handleUnseenTransactions(
+          std::move(tx), _hashToDiscoveryTime, std::move(received), iriClient);
+    }
   }
+  return pplx::create_task([]() {});
 }
 
 EchoCatcher::GaugeMap EchoCatcher::buildMetricsMap(

@@ -6,8 +6,8 @@ bool PrometheusCollector::parseConfiguration(const YAML::Node &conf) {
   if (!CollectorBase::parseConfiguration(conf)) {
     return false;
   }
-  if (conf["prometheus_exposer_uri"]) {
-    _prometheusExpURI = conf["prometheus_exposer_uri"].as<std::string>();
+  if (conf[PROMETHEUS_EXPOSER_URI]) {
+    _prometheusExpURI = conf[PROMETHEUS_EXPOSER_URI].as<std::string>();
     return true;
   }
   return false;

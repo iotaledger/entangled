@@ -1,8 +1,8 @@
 
 #include "txauxiliary.hpp"
-#include <set>
 #include <glog/logging.h>
 #include <iota/utils/common/tangledb.hpp>
+#include <set>
 
 namespace iota {
 namespace utils {
@@ -84,28 +84,28 @@ pplx::task<void> handleUnseenTransactions(
   TangleDB::TXRecord txRecord = {tx->hash(), tx->trunk(), tx->branch()};
   TangleDB::instance().put(std::move(txRecord));
 
-  return getUnconfirmedTXs(iriClient, tx)
-      .then([&](std::set<std::string> unconfirmed) {
-        if (unconfirmed.empty()) {
-          return;
-        }
+  return getUnconfirmedTXs(iriClient, tx).then([
+    &hashToDiscoveryTimestamp, received = std::move(received)
+  ](std::set<std::string> unconfirmed) {
+    if (unconfirmed.empty()) {
+      return;
+    }
 
-        std::vector<std::string> unconfirmedVec(unconfirmed.begin(),
-                                                unconfirmed.end());
-        // remove seen transactions
-        unconfirmedVec.erase(
-            remove_if(unconfirmedVec.begin(), unconfirmedVec.end(),
-                      [](std::string txHash) {
-                        return TangleDB::instance().find(txHash).has_value();
-                      }),
-            unconfirmedVec.end());
-        std::for_each(
-            unconfirmedVec.begin(), unconfirmedVec.end(),
-            [&hashToDiscoveryTimestamp, received](std::string txHash) {
-              hashToDiscoveryTimestamp.insert(txHash, received);
-            });
-        return;
-      });
+    std::vector<std::string> unconfirmedVec(unconfirmed.begin(),
+                                            unconfirmed.end());
+    // remove seen transactions
+    unconfirmedVec.erase(
+        remove_if(unconfirmedVec.begin(), unconfirmedVec.end(),
+                  [](std::string txHash) {
+                    return TangleDB::instance().find(txHash).has_value();
+                  }),
+        unconfirmedVec.end());
+    std::for_each(unconfirmedVec.begin(), unconfirmedVec.end(),
+                  [&hashToDiscoveryTimestamp, received](std::string txHash) {
+                    hashToDiscoveryTimestamp.insert(txHash, received);
+                  });
+    return;
+  });
 }
 }  // namespace txAuxiliary
 }  // namespace utils
