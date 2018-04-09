@@ -155,6 +155,24 @@ class TXMessage : public IRIMessage {
   std::string _branch;
   std::chrono::system_clock::time_point _arrivalTime;
 };
+
+class LMHSMessage : public IRIMessage {
+ public:
+  explicit LMHSMessage(std::string_view from) {
+    auto chunks = IRIMessage::chunks(from);
+    this->_latestSolidMilestoneHash = std::move(chunks[0]);
+  }
+
+  inline IRIMessageType type() { return IRIMessageType::LMHS; }
+
+ public:
+  const std::string& latestSolidMilestoneHash() {
+    return this->_latestSolidMilestoneHash;
+  }
+
+ private:
+  std::string _latestSolidMilestoneHash;
+};
 }  // namespace iri
 }  // namespace utils
 }  // namespace iota

@@ -30,27 +30,28 @@ pplx::task<void> removeConfirmedTransactions(
   }
 }
 
-pplx::task<std::set<std::string>> getUnconfirmedTXs(
-    std::weak_ptr<api::IRIClient> client, std::shared_ptr<iri::TXMessage> tx) {
+std::set<std::string> getUnconfirmedTXs(std::weak_ptr<api::IRIClient> client,
+                                        std::shared_ptr<iri::TXMessage> tx,
+                                        std::string lmhs) {
   using namespace std;
 
   if (auto clientSharedPtr = client.lock()) {
-    return clientSharedPtr->getNodeInfo().then([=](api::GetNodeInfoResponse
-                                                       nodeInfo) {
-      auto tips = {nodeInfo.latestMilestone};
-      set<string> res;
-      vector<string> currentLevelTXs = {tx->trunk(), tx->branch()};
+    set<string> res;
+    vector<string> currentLevelTXs = {tx->trunk(), tx->branch()};
 
-      while (!currentLevelTXs.empty()) {
-        auto removeTask =
-            removeConfirmedTransactions(client, tips, currentLevelTXs)
-                .then([&]() {
-                  if (!currentLevelTXs.empty()) {
-                    res.insert(currentLevelTXs.begin(), currentLevelTXs.end());
+    auto tips = {lmhs};
+    while (!currentLevelTXs.empty()) {
+      auto removeTask =
+          removeConfirmedTransactions(client, tips, currentLevelTXs)
+              .then([&]() {
+                if (!currentLevelTXs.empty()) {
+                  res.insert(currentLevelTXs.begin(), currentLevelTXs.end());
+
+                  try {
                     auto trytesVec =
                         clientSharedPtr->getTrytes(currentLevelTXs).get();
                     set<string> nextLevelTXs;  // Avoid duplications and allow a
-                                               // minimal query for IRI
+                    // minimal query for IRI
 
                     for_each(
                         trytesVec.begin(), trytesVec.end(),
@@ -63,16 +64,21 @@ pplx::task<std::set<std::string>> getUnconfirmedTXs(
                              [&currentLevelTXs](const string& hash) {
                                currentLevelTXs.push_back(hash);
                              });
+                  } catch (const std::exception& e) {
+                    LOG(ERROR) << " Exception: " << e.what();
                   }
-                });
-
+                }
+              });
+      try {
         removeTask.wait();
+      } catch (const std::exception& e) {
+        LOG(ERROR) << " Exception: " << e.what();
       }
-      return res;
-    });
+    }
+    return std::move(res);
   }
 
-  return pplx::create_task([]() -> set<string> { return set<string>(); });
+  return std::set<std::string>();
 }
 
 pplx::task<void> handleUnseenTransactions(
@@ -80,13 +86,15 @@ pplx::task<void> handleUnseenTransactions(
     cuckoohash_map<std::string, std::chrono::system_clock::time_point>&
         hashToDiscoveryTimestamp,
     std::chrono::time_point<std::chrono::system_clock> received,
-    std::weak_ptr<api::IRIClient> iriClient) {
+    std::weak_ptr<api::IRIClient> iriClient, std::string lmhs) {
   TangleDB::TXRecord txRecord = {tx->hash(), tx->trunk(), tx->branch()};
   TangleDB::instance().put(std::move(txRecord));
 
-  return getUnconfirmedTXs(iriClient, tx).then([
-    &hashToDiscoveryTimestamp, received = std::move(received)
-  ](std::set<std::string> unconfirmed) {
+  return pplx::create_task([
+    tx, &hashToDiscoveryTimestamp, received = std::move(received), iriClient,
+    lmhs = std::move(lmhs)
+  ]() {
+    auto unconfirmed = getUnconfirmedTXs(iriClient, tx, std::move(lmhs));
     if (unconfirmed.empty()) {
       return;
     }

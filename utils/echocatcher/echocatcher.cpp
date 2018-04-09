@@ -155,18 +155,21 @@ void EchoCatcher::broadcastTransactions() {
   }
 }
 void EchoCatcher::broadcastOneTransaction() {
-  auto task =
+  auto getTransactionsTask =
       _iriClient->getTransactionsToApprove()
           .then(fillTX)
-          .then([*this](std::string tx) { return powTX(std::move(tx), _mwm); })
+          .then([this](std::string tx) { return powTX(std::move(tx), _mwm); })
           .then(hashTX);
 
-  task.wait();
-  auto hashed = task.get();
-  LOG(INFO) << "Hash: " << hashed.hash;
-
-  _iriClient->broadcastTransactions({hashed.tx});
-  _hashToBroadcastTime.insert(hashed.hash, std::chrono::system_clock::now());
+  try {
+    auto hashed = getTransactionsTask.get();
+    LOG(INFO) << "Hash: " << hashed.hash;
+    auto broadcastTask = _iriClient->broadcastTransactions({hashed.tx});
+    _hashToBroadcastTime.insert(hashed.hash, std::chrono::system_clock::now());
+    broadcastTask.wait();
+  } catch (const std::exception& e) {
+    LOG(ERROR) << __FUNCTION__ << " Exception: " << e.what();
+  }
 }
 
 void EchoCatcher::handleReceivedTransactions() {
@@ -204,7 +207,19 @@ void EchoCatcher::subscribeToTransactions(
   zmqObservable.observe_on(rxcpp::synchronize_new_thread())
       .subscribe(
           [&](std::shared_ptr<iri::IRIMessage> msg) {
-            if (msg->type() != iri::IRIMessageType::TX) return;
+
+            if (msg->type() == iri::IRIMessageType::LMHS) {
+              std::unique_lock<std::shared_mutex> lock(_milestoneMutex);
+              auto lmhs =
+                  std::static_pointer_cast<iri::LMHSMessage>(std::move(msg));
+              _latestSolidMilestoneHash = lmhs->latestSolidMilestoneHash();
+              return;
+            }
+
+            if (msg->type() != iri::IRIMessageType::TX ||
+                _latestSolidMilestoneHash.empty())
+              return;
+
             auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
             auto received = std::chrono::system_clock::now();
             auto& timeUntilPublishedGauge =
@@ -214,8 +229,7 @@ void EchoCatcher::subscribeToTransactions(
                         {{"bundle_size", std::to_string(tx->lastIndex() + 1)}});
 
             auto task =
-                handleUnseenTransactions(tx, _hashToDiscoveryTime, received,
-                                         _iriClient, timeUntilPublishedGauge);
+                handleUnseenTransactions(tx, received, timeUntilPublishedGauge);
 
             tasks.push_back(std::move(task));
 
@@ -252,13 +266,12 @@ void EchoCatcher::subscribeToTransactions(
 
 pplx::task<void> EchoCatcher::handleUnseenTransactions(
     std::shared_ptr<iri::TXMessage> tx,
-    cuckoohash_map<std::string, std::chrono::system_clock::time_point>&
-        hashToSeenTimestamp,
     std::chrono::time_point<std::chrono::system_clock> received,
-    std::weak_ptr<api::IRIClient> iriClient, Gauge& timeUntilPublishedGauge) {
+    Gauge& timeUntilPublishedGauge) {
   static std::atomic<std::chrono::time_point<std::chrono::system_clock>>
       lastDiscoveryTime = received;
   std::chrono::system_clock::time_point txTime;
+  
   if (_hashToDiscoveryTime.find(tx->hash(), txTime)) {
     auto txArrivalLatency =
         std::chrono::duration_cast<std::chrono::milliseconds>(received - txTime)
@@ -271,8 +284,11 @@ pplx::task<void> EchoCatcher::handleUnseenTransactions(
                                    .count();
     if (elapsedFromLastTime > _discoveryInterval) {
       lastDiscoveryTime = received;
+      std::shared_lock<std::shared_mutex> lock(_milestoneMutex);
+      auto lmhs = _latestSolidMilestoneHash;
       return txAuxiliary::handleUnseenTransactions(
-          std::move(tx), _hashToDiscoveryTime, std::move(received), iriClient);
+          std::move(tx), _hashToDiscoveryTime, std::move(received), _iriClient,
+          std::move(lmhs));
     }
   }
   return pplx::create_task([]() {});

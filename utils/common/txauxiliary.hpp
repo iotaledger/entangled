@@ -4,7 +4,7 @@
 #include <iota/utils/common/iri.hpp>
 #include <libcuckoo/cuckoohash_map.hh>
 #include <set>
-
+#include <vector>
 /*
  * Under this namespace are functions to allow complex queries over IRI
  */
@@ -18,10 +18,11 @@ pplx::task<void> handleUnseenTransactions(
     cuckoohash_map<std::string, std::chrono::system_clock::time_point>&
         hashToSeenTimestamp,
     std::chrono::time_point<std::chrono::system_clock> received,
-    std::weak_ptr<api::IRIClient> iriClient);
+    std::weak_ptr<api::IRIClient> iriClient, std::string lmhs);
 
-pplx::task<std::set<std::string>> getUnconfirmedTXs(
-    std::weak_ptr<api::IRIClient> client, std::shared_ptr<iri::TXMessage> tx);
+std::set<std::string> getUnconfirmedTXs(std::weak_ptr<api::IRIClient> client,
+                                        std::shared_ptr<iri::TXMessage> tx,
+                                        std::string lmhs);
 
 pplx::task<void> removeConfirmedTransactions(
     std::weak_ptr<api::IRIClient> client, const std::vector<std::string>& tips,

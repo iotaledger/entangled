@@ -9,6 +9,7 @@
 #include <list>
 #include <memory>
 #include <rx.hpp>
+#include <shared_mutex>
 #include <string>
 
 namespace iota {
@@ -42,10 +43,7 @@ class EchoCatcher : public PrometheusCollector {
   virtual void handleReceivedTransactions();
   pplx::task<void> handleUnseenTransactions(
       std::shared_ptr<iri::TXMessage> tx,
-      cuckoohash_map<std::string, std::chrono::system_clock::time_point>&
-          hashToSeenTimestamp,
       std::chrono::time_point<std::chrono::system_clock> received,
-      std::weak_ptr<api::IRIClient> iriClient,
       prometheus::Gauge& timeUntilPublishedGauge);
 
  private:
@@ -71,6 +69,9 @@ class EchoCatcher : public PrometheusCollector {
       _hashToBroadcastTime;
   cuckoohash_map<std::string, std::chrono::system_clock::time_point>
       _hashToDiscoveryTime;
+
+  mutable std::shared_mutex _milestoneMutex;
+  std::string _latestSolidMilestoneHash;
 };
 
 }  // namespace utils
