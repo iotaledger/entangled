@@ -23,10 +23,9 @@ class EchoCatcher : public PrometheusCollector {
   constexpr static auto TANGLE_DB_WARMUP_TIME = "tangledb_warmup_period";
   constexpr static auto BROADCAST_INTERVAL = "broadcast_interval";
   constexpr static auto DISCOVERY_INTERVAL = "discovery_interval";
+
+  constexpr static double BUCKET_WIDTH = 10;
   // typedef
-  typedef std::map<std::string, std::reference_wrapper<
-                                    prometheus::Family<prometheus::Gauge>>>
-      GaugeMap;
   typedef rxcpp::observable<std::shared_ptr<iri::IRIMessage>> ZmqObservable;
   void collect() override;
   bool parseConfiguration(const YAML::Node& conf) override;
@@ -44,13 +43,15 @@ class EchoCatcher : public PrometheusCollector {
   pplx::task<void> handleUnseenTransactions(
       std::shared_ptr<iri::TXMessage> tx,
       std::chrono::time_point<std::chrono::system_clock> received,
-      prometheus::Gauge& timeUntilPublishedGauge);
+      HistogramsMap& families, const std::vector<double>& buckets);
 
  private:
   // methods
-  GaugeMap buildMetricsMap(
+  HistogramsMap buildHistogramsMap(
       std::shared_ptr<prometheus::Registry> registry,
-      const std::map<std::string, std::string>& labels) override;
+      const std::map<std::string, std::string>& labels);
+
+  const std::vector<double>& histogramBuckets() const;
 
   virtual void subscribeToTransactions(
       std::string zmqURL, const ZmqObservable& zmqObservable,

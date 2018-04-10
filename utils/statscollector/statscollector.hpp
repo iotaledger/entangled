@@ -33,7 +33,7 @@ class StatsCollector : public PrometheusCollector {
  private:
   virtual PrometheusCollector::GaugeMap buildMetricsMap(
       std::shared_ptr<prometheus::Registry> registry,
-      const std::map<std::string, std::string>& labels) override;
+      const std::map<std::string, std::string>& labels);
 
   std::unordered_set<std::string> _zmqPublishers;
   uint32_t _pubDelay;

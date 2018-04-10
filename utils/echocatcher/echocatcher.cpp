@@ -1,6 +1,7 @@
 #include <ccurl/ccurl.h>
 #include <glog/logging.h>
 #include <prometheus/exposer.h>
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cstring>
@@ -200,9 +201,16 @@ void EchoCatcher::subscribeToTransactions(
     std::string zmqURL, const EchoCatcher::ZmqObservable& zmqObservable,
     std::shared_ptr<Registry> registry) {
   std::atomic<bool> haveAllTXReturned = false;
-  auto families = buildMetricsMap(
+  auto families = buildHistogramsMap(
       registry, {{"listen_node", _iriHost}, {"zmq_url", zmqURL}});
+
   std::vector<pplx::task<void>> tasks;
+  std::vector<double> buckets(400);
+  double currInterval = 0;
+  std::generate(buckets.begin(), buckets.end(), [&currInterval]() {
+    currInterval += BUCKET_WIDTH;
+    return currInterval;
+  });
 
   zmqObservable.observe_on(rxcpp::synchronize_new_thread())
       .subscribe(
@@ -222,14 +230,8 @@ void EchoCatcher::subscribeToTransactions(
 
             auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
             auto received = std::chrono::system_clock::now();
-            auto& timeUntilPublishedGauge =
-                families.at("time_elapsed_unseen_tx_published")
-                    .get()
-                    .Add(
-                        {{"bundle_size", std::to_string(tx->lastIndex() + 1)}});
-
             auto task =
-                handleUnseenTransactions(tx, received, timeUntilPublishedGauge);
+                handleUnseenTransactions(tx, received, families, buckets);
 
             tasks.push_back(std::move(task));
 
@@ -246,12 +248,14 @@ void EchoCatcher::subscribeToTransactions(
 
               families.at("time_elapsed_received")
                   .get()
-                  .Add({{"bundle_size", std::to_string(tx->lastIndex() + 1)}})
-                  .Set(elapsedUntilReceived);
+                  .Add({{"bundle_size", std::to_string(tx->lastIndex() + 1)}},
+                       buckets)
+                  .Observe(elapsedUntilReceived);
               families.at("time_elapsed_arrived")
                   .get()
-                  .Add({{"bundle_size", std::to_string(tx->lastIndex() + 1)}})
-                  .Set(elapsedUntilArrived);
+                  .Add({{"bundle_size", std::to_string(tx->lastIndex() + 1)}},
+                       buckets)
+                  .Observe(elapsedUntilArrived);
 
               if (_broadcastInterval == 0) {
                 haveAllTXReturned = true;
@@ -267,17 +271,21 @@ void EchoCatcher::subscribeToTransactions(
 pplx::task<void> EchoCatcher::handleUnseenTransactions(
     std::shared_ptr<iri::TXMessage> tx,
     std::chrono::time_point<std::chrono::system_clock> received,
-    Gauge& timeUntilPublishedGauge) {
+    HistogramsMap& families, const std::vector<double>& buckets) {
   static std::atomic<std::chrono::time_point<std::chrono::system_clock>>
       lastDiscoveryTime = received;
   std::chrono::system_clock::time_point txTime;
-  
+
   if (_hashToDiscoveryTime.find(tx->hash(), txTime)) {
     auto txArrivalLatency =
         std::chrono::duration_cast<std::chrono::milliseconds>(received - txTime)
             .count();
     _hashToDiscoveryTime.erase(tx->hash());
-    timeUntilPublishedGauge.Set(txArrivalLatency);
+
+    families.at("time_elapsed_unseen_tx_published")
+        .get()
+        .Add({{"bundle_size", std::to_string(tx->lastIndex() + 1)}}, buckets)
+        .Observe(txArrivalLatency);
   } else {
     auto elapsedFromLastTime = std::chrono::duration_cast<std::chrono::seconds>(
                                    received - lastDiscoveryTime.load())
@@ -294,23 +302,27 @@ pplx::task<void> EchoCatcher::handleUnseenTransactions(
   return pplx::create_task([]() {});
 }
 
-EchoCatcher::GaugeMap EchoCatcher::buildMetricsMap(
+PrometheusCollector::HistogramsMap EchoCatcher::buildHistogramsMap(
     std::shared_ptr<Registry> registry,
     const std::map<std::string, std::string>& labels) {
   static std::map<std::string, std::string> nameToDesc = {
       {"time_elapsed_received",
        "#Milliseconds it took for tx to travel back to transaction's "
-       "original source(\"listen_node\")"},
+       "original source(\"listen_node\") [each interval is " +
+           std::to_string(BUCKET_WIDTH) + " milliseconds]"},
       {"time_elapsed_arrived",
        "#Milliseconds it took for tx to arrive to destination "
-       "(\"publish_node\")"},
+       "(\"publish_node\") [each interval is " +
+           std::to_string(BUCKET_WIDTH) + " milliseconds]"},
       {"time_elapsed_unseen_tx_published",
-       "#Milliseconds it took for tx to be published since the moment client "
-       "first learned about it"}};
+       "#Milliseconds it took for tx to be published since the moment "
+       "client "
+       "first learned about it [each interval is " +
+           std::to_string(BUCKET_WIDTH) + " milliseconds]"}};
 
-  std::map<std::string, std::reference_wrapper<Family<Gauge>>> famillies;
+  std::map<std::string, std::reference_wrapper<Family<Histogram>>> famillies;
   for (const auto& kv : nameToDesc) {
-    auto& curr_family = BuildGauge()
+    auto& curr_family = BuildHistogram()
                             .Name("echocatcher_" + kv.first)
                             .Help(kv.second)
                             .Labels(labels)
