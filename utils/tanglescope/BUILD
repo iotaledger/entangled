@@ -1,3 +1,5 @@
+load("@io_bazel_rules_docker//cc:image.bzl", "cc_image")
+
 cc_library(name='shared',
            srcs=glob(['**/*.cpp'],
                      exclude=['tanglescope.cpp', 'tests/**/*.cpp']),
@@ -17,6 +19,16 @@ cc_binary(name='tanglescope',
                 ':shared',],
           data = [":copy_configuration",],
 )
+
+#need docker client installation:
+#https://docs.docker.com/install/linux/docker-ce/ubuntu/#set-up-the-repository
+cc_image(
+    name='tanglescope_img',
+    srcs=['tanglescope.cpp'],
+    deps=[':shared'],
+    data=[":copy_configuration"],
+    base="@essentials//image"
+    )
 
 cc_test(name='tests',
         srcs=glob(['tests/**/*.cpp', '**/*.hpp']),
