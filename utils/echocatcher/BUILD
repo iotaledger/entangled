@@ -5,7 +5,7 @@ cc_library(
     srcs=['echocatcher.cpp'],
     deps=[
         '//utils/common:common',
-        '//ccurl:ccurl',
+        '//common/helpers:helpers',
         '//utils/prometheus_collector:prometheus_collector',
         '//common/trinary:tryte_long',
         '@cpprestsdk//:cpprestsdk',

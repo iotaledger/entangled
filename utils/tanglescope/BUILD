@@ -15,8 +15,7 @@ cc_library(name='shared',
 
 cc_binary(name='tanglescope',
           srcs=["tanglescope.cpp"],
-          deps=[
-                ':shared',],
+          deps=[':shared'],
           data = [":copy_configuration",],
 )
 

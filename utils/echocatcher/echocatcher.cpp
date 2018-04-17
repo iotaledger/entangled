@@ -1,4 +1,3 @@
-#include <ccurl/ccurl.h>
 #include <glog/logging.h>
 #include <prometheus/exposer.h>
 #include <algorithm>
@@ -15,6 +14,8 @@
 #include <set>
 #include <unordered_set>
 
+#include "common/helpers/digest.h"
+#include "common/helpers/pow.h"
 #include "common/trinary/tryte_long.h"
 
 using namespace iota::utils;
@@ -72,10 +73,19 @@ std::string fillTX(api::GetTransactionsToApproveResponse response) {
   return std::move(tx);
 }
 
-std::string powTX(std::string tx, int mwm) { return ccurl_pow(tx.data(), mwm); }
+std::string powTX(std::string tx, int mwm) {
+  char* foundNonce = iota_pow(tx.data(), mwm);
+  tx.replace(2646, 27, foundNonce);
+  free(foundNonce);
+
+  return tx.data();
+}
 
 EchoCatcher::HashedTX hashTX(std::string tx) {
-  return {ccurl_digest_transaction(tx.data()), std::move(tx)};
+  char* digest = iota_digest(tx.data());
+  EchoCatcher::HashedTX hashed = {digest, std::move(tx)};
+  free(digest);
+  return std::move(hashed);
 }
 
 bool EchoCatcher::parseConfiguration(const YAML::Node& conf) {
@@ -100,7 +110,6 @@ bool EchoCatcher::parseConfiguration(const YAML::Node& conf) {
 
 void EchoCatcher::collect() {
   LOG(INFO) << __FUNCTION__;
-  ccurl_pow_init();
 
   _iriClient = std::make_shared<api::IRIClient>(_iriHost);
 

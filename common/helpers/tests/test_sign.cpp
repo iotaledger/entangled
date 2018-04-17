@@ -5,7 +5,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "mobile/interface/bindings.h"
+#include "common/helpers/sign.h"
 
 namespace {
 
@@ -26,9 +26,9 @@ TEST(KerlTest, testAddressGeneration) {
       "MLAUELWJHZ9QBPCIYLOXAWCVSZTK9XUEIWQSRLFDWEORDOLVOMOF9RUMFXSAMYWCGXDAVXZM"
       "RWQOJH9RY";
 
-  char* out_1 = generate_address(SEED.c_str(), 0, 1);
-  char* out_2 = generate_address(SEED.c_str(), 2, 2);
-  char* out_3 = generate_address(SEED.c_str(), 2, 3);
+  char* out_1 = iota_sign_address_gen(SEED.c_str(), 0, 1);
+  char* out_2 = iota_sign_address_gen(SEED.c_str(), 2, 2);
+  char* out_3 = iota_sign_address_gen(SEED.c_str(), 2, 3);
 
   EXPECT_EQ(out_1, EX_ADD_0_1);
   EXPECT_EQ(out_2, EX_ADD_2_2);
@@ -108,7 +108,7 @@ TEST(KerlTest, testSignature) {
       "GMV99T9HTXML9EUZYADINHCSQISPTQXKTIHAWYCGYFTRFT99IHJCURQUYMVYKXSBYUALS9GK"
       "Q9LOWROQSZANOVISNYYZQK9KBKA";
 
-  char* out_1 = generate_signature(SEED.c_str(), 2, 2, SEED.c_str());
+  char* out_1 = iota_sign_signature_gen(SEED.c_str(), 2, 2, SEED.c_str());
 
   EXPECT_EQ(out_1, EX);
 

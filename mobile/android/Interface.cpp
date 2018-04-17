@@ -3,7 +3,8 @@
 #include <cstring>
 #include "jni.h"
 
-#include "mobile/interface/bindings.h"
+#include "common/helpers/pow.h"
+#include "common/helpers/sign.h"
 
 #include "Interface.h"
 
@@ -15,7 +16,7 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_doPOW(JNIEnv* env,
   const char* trytes = env->GetStringUTFChars(jtrytes, 0);
   char* nonce = (char*)calloc(27 + 1, sizeof(char));
 
-  char* foundNonce = do_pow((const char*)trytes, mwm);
+  char* foundNonce = iota_pow((const char*)trytes, mwm);
   memcpy(nonce, foundNonce, 27);
   free(foundNonce);
 
@@ -29,7 +30,7 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_generateAddress(
     JNIEnv* env, jclass thiz, jstring jseed, jint index, jint security) {
   const char* seed = env->GetStringUTFChars(jseed, 0);
 
-  char* address = generate_address(seed, index, security);
+  char* address = iota_sign_address_gen(seed, index, security);
   std::memset((void*)seed, 0, 81);
 
   jstring out = env->NewStringUTF(address);
@@ -49,7 +50,7 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_generateSignature(
   const char* seed = env->GetStringUTFChars(jseed, 0);
   const char* bundleHash = env->GetStringUTFChars(jBundleHash, 0);
 
-  char* signature = generate_signature(seed, index, security, bundleHash);
+  char* signature = iota_sign_signature_gen(seed, index, security, bundleHash);
   std::memset((void*)seed, 0, 81);
 
   jstring out = env->NewStringUTF(signature);

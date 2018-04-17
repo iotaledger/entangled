@@ -113,3 +113,12 @@ cc_library (
         ":curl-p-const",
         ],
     )
+
+cc_library(name="digest",
+      deps=[":trit",
+            "//common/trinary:trit_tryte"
+            ],
+      srcs=["digest.c"],
+      hdrs=["digest.h"],
+      visibility=["//visibility:public"]
+      )
