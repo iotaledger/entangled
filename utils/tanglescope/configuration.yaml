@@ -3,7 +3,6 @@ echocatcher:
   publishers:
       - "tcp://zmq.testnet.iota.org:5556"
 
-      - "tcp://m5.iotaledger.net:5556"
   #url of iri node
   iri_host: "http://iri01.testnet.iota.cafe:14265"
   #IP/Port that the Prometheus Exposer binds to
@@ -27,8 +26,19 @@ statscollector:
   publishers:
       - "tcp://zmq.testnet.iota.org:5556"
 
-      - "tcp://m5.iotaledger.net:5556"
   #interval to wait before starting publishing in milliseconds
   pub_delay: 120000
   #interval on which to publish to prometheus in milliseconds. You probably don't want to change this.
   pub_interval: 1000
+
+topology_mapper:
+
+  #IP/Port that the Prometheus Exposer binds to
+  prometheus_exposer_uri: "0.0.0.0:8082"
+  #URL of ZMQ publisher to connect to
+  publishers:
+      - "tcp://zmq.testnet.iota.org:5556"
+
+  #interval between following "db" snapshots
+  snapshot_interval: 60
+

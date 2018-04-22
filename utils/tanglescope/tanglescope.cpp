@@ -3,6 +3,7 @@
 #include <iota/utils/common/txauxiliary.hpp>
 #include <iota/utils/echocatcher/echocatcher.hpp>
 #include <iota/utils/statscollector.hpp>
+#include <iota/utils/topologymapper.hpp>
 #include <yaml-cpp/yaml.h>
 #include <list>
 
@@ -21,6 +22,7 @@ int main(int argc, char** argv) {
     auto conf = YAML::LoadFile(FLAGS_ConfigurationPath.empty()?"default_configuration.yaml":FLAGS_ConfigurationPath);
     iota::utils::EchoCatcher echoCatcher;
     iota::utils::statscollector::StatsCollector statsCollector;
+    iota::utils::TopologyMapper topologyMapper;
 
     if (echoCatcher.parseConfiguration(conf["echocatcher"])){
         auto task = pplx::task<void>([&echoCatcher](){echoCatcher.collect();});
@@ -29,6 +31,11 @@ int main(int argc, char** argv) {
 
     if (statsCollector.parseConfiguration(conf["statscollector"])){
         auto task = pplx::task<void>([&statsCollector](){statsCollector.collect();});
+        tasks.push_back(std::move(task));
+    }
+
+    if (topologyMapper.parseConfiguration(conf["topology_mapper"])){
+        auto task = pplx::task<void>([&topologyMapper](){topologyMapper.collect();});
         tasks.push_back(std::move(task));
     }
 
