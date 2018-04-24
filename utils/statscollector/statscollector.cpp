@@ -25,29 +25,29 @@ bool StatsCollector::parseConfiguration(const YAML::Node& conf) {
     return false;
   }
 
-  if (conf[PUBLISHERS] && conf[PUB_INTERVAL] && conf[PUB_DELAY]) {
-    auto listPublishers = conf[PUBLISHERS].as<std::list<std::string>>();
-    _zmqPublishers.insert(listPublishers.begin(), listPublishers.end());
-    _pubInterval = conf[PUB_INTERVAL].as<uint32_t>();
-    _pubDelay = conf[PUB_DELAY].as<uint32_t>();
-    return true;
+  if (!conf[PUBLISHERS]) {
+    return false;
   };
 
-  return false;
+  auto listPublishers = conf[PUBLISHERS].as<std::list<std::string>>();
+  _zmqPublishers.insert(listPublishers.begin(), listPublishers.end());
+  return true;
 }
 
 void StatsCollector::collect() {
   using namespace prometheus;
 
-  LOG(INFO) << __FUNCTION__;
+  VLOG(3) << __FUNCTION__;
 
   Exposer exposer{_prometheusExpURI};
   auto registry = std::make_shared<Registry>();
 
   for (auto zmqURL : _zmqPublishers) {
-    auto families = buildMetricsMap(registry, {{"publish_node", zmqURL}});
+    auto counters = buildCountersMap(registry, {{"publish_node", zmqURL}});
+    auto histograms = buildHistogramsMap(registry, {{"publish_node", zmqURL}});
     auto collector =
-        ZMQCollectorImpl(zmqURL, _pubDelay, _pubInterval, std::move(families));
+        ZMQCollectorImpl(zmqURL, std::move(counters),
+                         std::move(histograms));
     _zmqCollectors.push_back(std::move(collector));
   }
   exposer.RegisterCollectable(registry);
@@ -61,101 +61,15 @@ void StatsCollector::collect() {
   std::for_each(collectorsTasks.begin(), collectorsTasks.end(),
                 [&](pplx::task<void> task) { task.get(); });
 }
-using namespace prometheus;
-PrometheusCollector::GaugeMap StatsCollector::buildMetricsMap(
-    std::shared_ptr<Registry> registry,
-    const std::map<std::string, std::string>& labels) {
-  static std::map<std::string, std::string> nameToDesc = {
-      {"transactions_new", "New TXs count"},
-      {"transactions_reattached", "Reattached TXs count"},
-      {"transactions_confirmed", "confirmed TXs count"},
-      {"bundles_new", "new bundles count"},
-      {"bundles_confirmed", "confirmed bundles count"},
-      {"avg_confirmationDuration", "bundle's average confirmation duration"},
-      {"value_new", "new tx's accumulated value"},
-      {"value_confirmed", "confirmed tx's accumulated value"}};
 
-  std::map<std::string, std::reference_wrapper<Family<Gauge>>> famillies;
-
-  for (const auto& kv : nameToDesc) {
-    auto& curr_family = BuildGauge()
-                            .Name("statscollector_" + kv.first)
-                            .Help(kv.second)
-                            .Labels(labels)
-                            .Register(*registry);
-
-    famillies.insert(
-        std::make_pair(std::string(kv.first), std::ref(curr_family)));
-  }
-
-  return std::move(famillies);
-}
-ZMQCollectorImpl::ZMQCollectorImpl(std::string zmqURL, uint32_t pubDelay,
-                                   uint32_t pubInterval,
-                                   PrometheusCollector::GaugeMap gaugeFamilies)
-    : _zmqURL(zmqURL),
-      _pubDelay(pubDelay),
-      _pubInterval(pubInterval),
-      _gaugeFamilies(gaugeFamilies) {}
+ZMQCollectorImpl::ZMQCollectorImpl(
+    std::string zmqURL, PrometheusCollector::CountersMap counters,
+    PrometheusCollector::HistogramsMap histograms)
+    : _zmqURL(zmqURL), _counters(counters), _histograms(histograms) {}
 
 void ZMQCollectorImpl::collect() {
   auto stats = std::make_shared<FrameTXStats>();
-  auto analyzer = std::make_shared<TXAnalyzer>(stats);
-
-  auto pubThread = rxcpp::schedulers::make_new_thread();
-  auto pubWorker = pubThread.create_worker();
-  auto pubStartDelay = pubThread.now() + std::chrono::milliseconds(_pubDelay);
-  auto pubInterval = std::chrono::milliseconds(_pubInterval);
-
-  auto& thisRef = *this;
-
-  pubWorker.schedule_periodically(
-      pubStartDelay, pubInterval,
-      [ weakStats = std::weak_ptr(stats), &thisRef ](auto scbl) {
-        if (auto stats = weakStats.lock()) {
-          auto frame = stats->swapFrame();
-          static bool pubDelayComplete = false;
-
-          if (!pubDelayComplete) {
-            pubDelayComplete = true;
-          } else {
-            thisRef._gaugeFamilies.at("transactions_new")
-                .get()
-                .Add({})
-                .Set(frame->transactionsNew);
-            thisRef._gaugeFamilies.at("transactions_reattached")
-                .get()
-                .Add({})
-                .Set(frame->transactionsReattached);
-            thisRef._gaugeFamilies.at("transactions_confirmed")
-                .get()
-                .Add({})
-                .Set(frame->transactionsConfirmed);
-            thisRef._gaugeFamilies.at("bundles_new")
-                .get()
-                .Add({})
-                .Set(frame->bundlesNew);
-            thisRef._gaugeFamilies.at("bundles_confirmed")
-                .get()
-                .Add({})
-                .Set(frame->bundlesConfirmed);
-            thisRef._gaugeFamilies.at("avg_confirmationDuration")
-                .get()
-                .Add({})
-                .Set(frame->avgConfirmationDuration);
-            thisRef._gaugeFamilies.at("value_new")
-                .get()
-                .Add({})
-                .Set(frame->valueNew);
-            thisRef._gaugeFamilies.at("value_confirmed")
-                .get()
-                .Add({})
-                .Set(frame->valueConfirmed);
-          }
-        } else {
-          scbl.unsubscribe();
-        }
-      });
+  auto analyzer = std::make_shared<TXAnalyzer>(_counters, _histograms, stats);
 
   auto zmqThread = rxcpp::schedulers::make_new_thread();
   auto zmqObservable =
@@ -185,6 +99,57 @@ void ZMQCollectorImpl::collect() {
             };
           },
           []() {});
+}
+
+using namespace prometheus;
+PrometheusCollector::CountersMap StatsCollector::buildCountersMap(
+    std::shared_ptr<Registry> registry,
+    const std::map<std::string, std::string>& labels) {
+  static std::map<std::string, std::string> nameToDesc = {
+      {"transactions_new", "New TXs count"},
+      {"transactions_reattached", "Reattached TXs count"},
+      {"transactions_confirmed", "confirmed TXs count"},
+      {"bundles_new", "new bundles count"},
+      {"bundles_confirmed", "confirmed bundles count"},
+      {"value_new", "new tx's accumulated value"},
+      {"value_confirmed", "confirmed tx's accumulated value"}};
+
+  std::map<std::string, std::reference_wrapper<Family<Counter>>> families;
+
+  for (const auto& kv : nameToDesc) {
+    auto& curr_family = BuildCounter()
+                            .Name("statscollector_" + kv.first)
+                            .Help(kv.second)
+                            .Labels(labels)
+                            .Register(*registry);
+
+    families.insert(
+        std::make_pair(std::string(kv.first), std::ref(curr_family)));
+  }
+
+  return std::move(families);
+}
+
+PrometheusCollector::HistogramsMap StatsCollector::buildHistogramsMap(
+    std::shared_ptr<Registry> registry,
+    const std::map<std::string, std::string>& labels) {
+  static std::map<std::string, std::string> nameToDesc = {
+      {"bundle_confirmation_duration", "bundle's confirmation duration [ms]"}};
+
+  std::map<std::string, std::reference_wrapper<Family<Histogram>>> families;
+
+  for (const auto& kv : nameToDesc) {
+    auto& curr_family = BuildHistogram()
+                            .Name("statscollector_" + kv.first)
+                            .Help(kv.second)
+                            .Labels(labels)
+                            .Register(*registry);
+
+    families.insert(
+        std::make_pair(std::string(kv.first), std::ref(curr_family)));
+  }
+
+  return std::move(families);
 }
 
 }  // namespace statscollector

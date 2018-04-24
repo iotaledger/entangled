@@ -11,62 +11,55 @@ namespace iota {
 namespace utils {
 namespace statscollector {
 
-FrameTXStats::FrameTXStats(){
-_frame = std::make_unique<StatsFrame>();
+FrameTXStats::FrameTXStats() : _buckets(800) {
+  double currInterval = 0;
+  std::generate(_buckets.begin(), _buckets.end(), [&currInterval]() {
+    currInterval += 50;
+    return currInterval;
+  });
 }
 
-std::unique_ptr<StatsFrame> FrameTXStats::swapFrame() {
-  std::lock_guard guard(_mutex);
-
-  auto old = std::move(_frame);
-  _frame = std::make_unique<StatsFrame>();
-
-  return old;
-}
-
-
-void FrameTXStats::trackNewTX(iri::TXMessage& tx) {
-  std::lock_guard guard(_mutex);
-
+void FrameTXStats::trackNewTX(iri::TXMessage& tx,
+                              PrometheusCollector::CountersMap& counters) {
   VLOG(5) << "trackNewTX({" << tx.value() << ", "
           << std::chrono::duration_cast<std::chrono::milliseconds>(
                  tx.arrivalTime().time_since_epoch())
                  .count()
           << "})";
-  _frame->transactionsNew++;
+  counters.at("transactions_new").get().Add({}).Increment();
   if (tx.value() > 0) {
-    _frame->valueNew += static_cast<int64_t>(tx.value());
+    auto value = static_cast<int64_t>(tx.value());
+    counters.at("value_new").get().Add({}).Increment(value);
   }
 }
-void FrameTXStats::trackReattachedTX() {
-  std::lock_guard guard(_mutex);
-
+void FrameTXStats::trackReattachedTX(
+    PrometheusCollector::CountersMap& counters) {
   VLOG(5) << "trackReattachedTX";
-  _frame->transactionsReattached++;
+  counters.at("transactions_reattached").get().Add({}).Increment();
 }
 
-void FrameTXStats::trackNewBundle() {
-  std::lock_guard guard(_mutex);
-
+void FrameTXStats::trackNewBundle(PrometheusCollector::CountersMap& counters) {
   VLOG(5) << "trackNewBundle()";
-  _frame->bundlesNew++;
+  counters.at("bundles_new").get().Add({}).Increment();
 }
-void FrameTXStats::trackConfirmedBundle(int64_t totalValue, uint64_t size,
-                                        uint64_t avgBundleDuration) {
-  std::lock_guard guard(_mutex);
-
+void FrameTXStats::trackConfirmedBundle(
+    int64_t totalValue, uint64_t size, uint64_t bundleDuration,
+    PrometheusCollector::CountersMap& counters,
+    PrometheusCollector::HistogramsMap& histograms) {
   VLOG(5) << "trackConfirmedBundle(" << totalValue << ", " << size << ","
-          << avgBundleDuration << ")";
+          << bundleDuration << ")";
 
-  _frame->avgConfirmationDuration =
-      (avgBundleDuration +
-       _frame->bundlesConfirmed * _frame->avgConfirmationDuration) /
-      (_frame->bundlesConfirmed + 1);
-  _frame->bundlesConfirmed++;
+  histograms.at("bundle_confirmation_duration")
+      .get()
+      .Add({}, _buckets)
+      .Observe(bundleDuration);
 
-  _frame->valueConfirmed += totalValue;
-  _frame->transactionsConfirmed += size;
+  counters.at("bundles_confirmed").get().Add({}).Increment();
+
+  counters.at("value_confirmed").get().Add({}).Increment(totalValue);
+
+  counters.at("transactions_confirmed").get().Add({}).Increment(size);
 }
-}
-}
-}
+}  // namespace statscollector
+}  // namespace utils
+}  // namespace iota

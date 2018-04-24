@@ -26,11 +26,6 @@ statscollector:
   publishers:
       - "tcp://zmq.testnet.iota.org:5556"
 
-  #interval to wait before starting publishing in milliseconds
-  pub_delay: 120000
-  #interval on which to publish to prometheus in milliseconds. You probably don't want to change this.
-  pub_interval: 1000
-
 topology_mapper:
 
   #IP/Port that the Prometheus Exposer binds to

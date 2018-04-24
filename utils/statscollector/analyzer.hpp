@@ -10,6 +10,8 @@
 #include <memory>
 #include <shared_mutex>
 
+#include <iota/utils/prometheus_collector/prometheus_collector.hpp>
+
 #include "iota/utils/common/iri.hpp"
 
 #include "stats/noop.hpp"
@@ -24,8 +26,12 @@ namespace statscollector {
 class TXAnalyzer {
  public:
   explicit TXAnalyzer(
+      PrometheusCollector::CountersMap& counters,
+      PrometheusCollector::HistogramsMap& histograms,
       std::shared_ptr<TXStats> stats = std::make_shared<NoopTXStats>())
-      : _stats(std::move(stats)) {}
+      : _counters(counters),
+        _histograms(histograms),
+        _stats(std::move(stats)) {}
 
   void newTransaction(std::shared_ptr<iri::TXMessage>);
   void transactionConfirmed(std::shared_ptr<iri::SNMessage>);
@@ -38,7 +44,9 @@ class TXAnalyzer {
       _unconfirmedBundles;
 
   std::shared_ptr<TXStats> _stats;
+  PrometheusCollector::CountersMap& _counters;
+  PrometheusCollector::HistogramsMap& _histograms;
 };
-}
-}
-}
+}  // namespace statscollector
+}  // namespace utils
+}  // namespace iota

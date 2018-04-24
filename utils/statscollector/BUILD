@@ -9,6 +9,7 @@ cc_library(name='shared',
                '//utils/common:common',
                '@com_github_gflags_gflags//:gflags',
                '@glog//:glog',
+               '//utils/prometheus_collector:prometheus_collector',
            ])
 
 cc_test(name='tests',
@@ -22,7 +23,6 @@ cc_library(name='statscollector',
            deps=[
 	       '@prometheus_cpp//:prometheus_cpp',
            ':shared',
-           '//utils/prometheus_collector:prometheus_collector',
 	       ],
            visibility = ["//visibility:public"]
       )

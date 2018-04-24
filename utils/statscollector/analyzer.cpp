@@ -19,7 +19,7 @@ void TXAnalyzer::newTransaction(std::shared_ptr<iri::TXMessage> msg) {
   if (_confirmedBundles.find(msg->bundle()) != _confirmedBundles.end()) {
     VLOG(7) << "onNewTransaction(bundle: " << msg->bundle()
             << ") already confirmed";
-    _stats->trackReattachedTX();
+    _stats->trackReattachedTX(_counters);
     return;
   }
 
@@ -28,10 +28,10 @@ void TXAnalyzer::newTransaction(std::shared_ptr<iri::TXMessage> msg) {
 
   if (entry == _unconfirmedBundles.end()) {
     // Bundle is new. Set up everything.
-    _stats->trackNewBundle();
+    _stats->trackNewBundle(_counters);
     auto vec =
         std::vector<std::shared_ptr<iri::TXMessage>>(msg->lastIndex() + 1);
-    _stats->trackNewTX(*msg);
+    _stats->trackNewTX(*msg, _counters);
 
     auto bundle = msg->bundle();
     std::string bundleHash = msg->bundle();
@@ -44,11 +44,11 @@ void TXAnalyzer::newTransaction(std::shared_ptr<iri::TXMessage> msg) {
     // Was this bundle tx seen before?
     if (entry->second.at(index) == nullptr) {
       // No, so add & track.
-      _stats->trackNewTX(*msg);
+      _stats->trackNewTX(*msg, _counters);
       entry->second.at(index) = std::move(msg);
     } else {
       // Yes, so track reattachment.
-      _stats->trackReattachedTX();
+      _stats->trackReattachedTX(_counters);
     }
   }
 }
@@ -90,7 +90,8 @@ void TXAnalyzer::transactionConfirmed(std::shared_ptr<iri::SNMessage> msg) {
     size++;
   }
 
-  _stats->trackConfirmedBundle(totalValue, size, duration);
+  _stats->trackConfirmedBundle(totalValue, size, duration, _counters,
+                               _histograms);
 
   _unconfirmedBundles.erase(entry);
 }
