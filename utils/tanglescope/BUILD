@@ -9,7 +9,7 @@ cc_library(name='shared',
            deps=[
                '//utils/echocatcher:echocatcher',
                '//utils/statscollector:statscollector',
-               '//utils/topologymapper:topologymapper',
+               '//utils/blowballcollector:blowballcollector',
                '@yaml_cpp//:yaml_cpp',
            ])
 

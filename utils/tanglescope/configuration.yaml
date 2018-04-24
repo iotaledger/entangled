@@ -26,13 +26,12 @@ statscollector:
   publishers:
       - "tcp://zmq.testnet.iota.org:5556"
 
-topology_mapper:
+blowballcollector:
 
   #IP/Port that the Prometheus Exposer binds to
   prometheus_exposer_uri: "0.0.0.0:8082"
   #URL of ZMQ publisher to connect to
-  publishers:
-      - "tcp://zmq.testnet.iota.org:5556"
+  publisher: "tcp://zmq.testnet.iota.org:5556"
 
   #interval between following "db" snapshots
   snapshot_interval: 60

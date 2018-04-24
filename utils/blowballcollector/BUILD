@@ -1,8 +1,8 @@
 cc_library(
-    name='topologymapper',
+    name='blowballcollector',
     include_prefix='iota/utils',
     hdrs=glob(['*.hpp']),
-    srcs=['topologymapper.cpp'],
+    srcs=['blowballcollector.cpp'],
     deps=[
         '//utils/common:common',
         '//utils/prometheus_collector:prometheus_collector',
