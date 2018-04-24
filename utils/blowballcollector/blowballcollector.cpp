@@ -2,8 +2,8 @@
 #include <glog/logging.h>
 #include <set>
 
-#include <iota/utils/common/zmqpub.hpp>
 #include <iota/utils/blowballcollector.hpp>
+#include <iota/utils/common/zmqpub.hpp>
 
 using namespace iota::utils;
 bool BlowballCollector::parseConfiguration(const YAML::Node& conf) {
@@ -42,7 +42,7 @@ void BlowballCollector::analyzeBlowballsPeriodically() {
   auto pubThread = rxcpp::schedulers::make_new_thread();
   auto pubWorker = pubThread.create_worker();
 
-  std::vector<double> buckets(200);
+  std::vector<double> buckets(40);
   double currInterval = 0;
   std::generate(buckets.begin(), buckets.end(),
                 [&currInterval]() { return ++currInterval; });
@@ -58,11 +58,21 @@ void BlowballCollector::analyzeBlowballsPeriodically() {
 void BlowballCollector::analyzeBlowballs(const std::vector<double>& buckets) {
   {
     auto refCountIt = _txToRefCount.lock_table();
+    auto now = std::chrono::system_clock::now();
+
     for (const auto& it : refCountIt) {
       _families.at(TX_NUM_APPROVERS).get().Add({}, buckets).Observe(it.second);
+      std::chrono::system_clock::time_point lastUpdateTime;
+      _txToLastUpdateTime.find(it.first, lastUpdateTime);
+      auto timeSinceLastUpdate =
+          std::chrono::duration_cast<std::chrono::seconds>(now - lastUpdateTime)
+              .count();
+      if (timeSinceLastUpdate > EXPIARY_PERIOD) {
+        _txToRefCount.erase(it.first);
+        _txToLastUpdateTime.erase(it.first);
+      }
     }
   }
-  _txToRefCount.clear();
 }
 
 void BlowballCollector::refCountPublishedTransactions() {
@@ -72,12 +82,31 @@ void BlowballCollector::refCountPublishedTransactions() {
           [&](std::shared_ptr<iri::IRIMessage> msg) {
 
             // assuming no tx is a milestone
+            if (msg->type() == iri::IRIMessageType::LMHS) {
+              auto lmhs =
+                  std::static_pointer_cast<iri::LMHSMessage>(std::move(msg));
+              if (_milestones.size() > MAX_NUM_MILESTONES) {
+                _milestones.pop_front();
+              }
+              _milestones.push_back(lmhs->latestSolidMilestoneHash());
+            }
             if (msg->type() != iri::IRIMessageType::TX) return;
 
             auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
+            auto now = std::chrono::system_clock::now();
 
-            _txToRefCount.upsert(tx->trunk(), counterFn, 1);
-            _txToRefCount.upsert(tx->branch(), counterFn, 1);
+            if (std::find(_milestones.begin(), _milestones.end(),
+                          tx->trunk()) == _milestones.end()) {
+              _txToRefCount.upsert(tx->trunk(), counterFn, 1);
+              _txToLastUpdateTime.insert(tx->trunk(), now);
+            }
+
+            if (std::find(_milestones.begin(), _milestones.end(),
+                          tx->branch()) == _milestones.end()) {
+              _txToRefCount.upsert(tx->branch(), counterFn, 1);
+              _txToLastUpdateTime.insert(tx->branch(), std::move(now));
+            }
+
           },
           []() {});
 }
