@@ -33,6 +33,6 @@ blowballcollector:
   #URL of ZMQ publisher to connect to
   publisher: "tcp://zmq.testnet.iota.org:5556"
 
-  #interval between following "db" snapshots
-  snapshot_interval: 60
+  #interval between following snapshots (internal counters update)
+  snapshot_interval: 5
 
