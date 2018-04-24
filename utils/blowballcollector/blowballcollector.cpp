@@ -56,6 +56,8 @@ void BlowballCollector::analyzeBlowballsPeriodically() {
 }
 
 void BlowballCollector::analyzeBlowballs(const std::vector<double>& buckets) {
+
+  std::set<std::string> expiredRefCounts;
   {
     auto refCountIt = _txToRefCount.lock_table();
     auto now = std::chrono::system_clock::now();
@@ -68,10 +70,13 @@ void BlowballCollector::analyzeBlowballs(const std::vector<double>& buckets) {
           std::chrono::duration_cast<std::chrono::seconds>(now - lastUpdateTime)
               .count();
       if (timeSinceLastUpdate > EXPIARY_PERIOD) {
-        _txToRefCount.erase(it.first);
-        _txToLastUpdateTime.erase(it.first);
+        expiredRefCounts.insert(it.first);
       }
     }
+  }
+  for (const auto& txHash : expiredRefCounts){
+    _txToRefCount.erase(txHash);
+    _txToLastUpdateTime.erase(txHash);
   }
 }
 
