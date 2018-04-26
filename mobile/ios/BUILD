@@ -11,6 +11,6 @@ objc_library(
    name="ios_bindings_classes",
    srcs=["Interface.m"],
    hdrs=["Interface.h"],
-   deps=["//mobile/interface:ios_interface"])
+   deps=["//mobile/interface:interface"])
    
 

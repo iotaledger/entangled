@@ -16,10 +16,3 @@ cc_test(name='tests',
             ':interface',
         ],
         tags=["exclusive"])
-
-objc_library(name="ios_interface",
-           deps=["//common/curl-p:hashcash", "//common/trinary:trit_tryte",
-                 "//common/kerl:kerl", "//common/sign/v1:iss_kerl"],
-           srcs=["bindings.c"],
-           hdrs=["bindings.h"],
-           visibility=["//visibility:public"])
