@@ -138,3 +138,6 @@ xcuserdata/
 
 
 # End of https://www.gitignore.io/api/xcode
+
+# iOS Frameworks
+*.framework

@@ -7,30 +7,31 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		600C4AEE20813DFF00BB72E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 600C4AED20813DFF00BB72E1 /* AppDelegate.m */; };
-		600C4AF120813DFF00BB72E1 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 600C4AF020813DFF00BB72E1 /* ViewController.m */; };
-		600C4AF420813DFF00BB72E1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 600C4AF220813DFF00BB72E1 /* Main.storyboard */; };
-		600C4AF620813DFF00BB72E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 600C4AF520813DFF00BB72E1 /* Assets.xcassets */; };
-		600C4AF920813DFF00BB72E1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 600C4AF720813DFF00BB72E1 /* LaunchScreen.storyboard */; };
-		600C4AFC20813DFF00BB72E1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 600C4AFB20813DFF00BB72E1 /* main.m */; };
-		600C4B1120813EF700BB72E1 /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 600C4B1020813EF700BB72E1 /* Constants.m */; };
 		600C4B192081474D00BB72E1 /* EntangledKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 600C4B182081474D00BB72E1 /* EntangledKit.framework */; };
+		60CD81D020918E5A00D3C2A7 /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CD81C320918E5A00D3C2A7 /* Constants.m */; };
+		60CD81D120918E5A00D3C2A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 60CD81C520918E5A00D3C2A7 /* Assets.xcassets */; };
+		60CD81D220918E5A00D3C2A7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CD81C620918E5A00D3C2A7 /* ViewController.m */; };
+		60CD81D320918E5A00D3C2A7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 60CD81C720918E5A00D3C2A7 /* LaunchScreen.storyboard */; };
+		60CD81D420918E5A00D3C2A7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 60CD81C920918E5A00D3C2A7 /* Main.storyboard */; };
+		60CD81D520918E5A00D3C2A7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CD81CC20918E5A00D3C2A7 /* main.m */; };
+		60CD81D620918E5A00D3C2A7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CD81CD20918E5A00D3C2A7 /* AppDelegate.m */; };
+		60CD81D720918E5A00D3C2A7 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 60CD81CE20918E5A00D3C2A7 /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		600C4AE920813DFF00BB72E1 /* EntangledDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EntangledDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		600C4AEC20813DFF00BB72E1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		600C4AED20813DFF00BB72E1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		600C4AEF20813DFF00BB72E1 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		600C4AF020813DFF00BB72E1 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		600C4AF320813DFF00BB72E1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		600C4AF520813DFF00BB72E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		600C4AF820813DFF00BB72E1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		600C4AFA20813DFF00BB72E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		600C4AFB20813DFF00BB72E1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		600C4B1020813EF700BB72E1 /* Constants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
-		600C4B1220813F0C00BB72E1 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		600C4B182081474D00BB72E1 /* EntangledKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = EntangledKit.framework; sourceTree = "<group>"; };
+		60CD81C320918E5A00D3C2A7 /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
+		60CD81C420918E5A00D3C2A7 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		60CD81C520918E5A00D3C2A7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		60CD81C620918E5A00D3C2A7 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		60CD81C820918E5A00D3C2A7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		60CD81CA20918E5A00D3C2A7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		60CD81CB20918E5A00D3C2A7 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		60CD81CC20918E5A00D3C2A7 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		60CD81CD20918E5A00D3C2A7 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		60CD81CE20918E5A00D3C2A7 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		60CD81CF20918E5A00D3C2A7 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,8 +49,8 @@
 		600C4AE020813DFF00BB72E1 = {
 			isa = PBXGroup;
 			children = (
+				60CD81C220918E5A00D3C2A7 /* Demo */,
 				600C4B13208145AC00BB72E1 /* Frameworks */,
-				600C4AEB20813DFF00BB72E1 /* EntangledDemo */,
 				600C4AEA20813DFF00BB72E1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -62,30 +63,30 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		600C4AEB20813DFF00BB72E1 /* EntangledDemo */ = {
-			isa = PBXGroup;
-			children = (
-				600C4AEC20813DFF00BB72E1 /* AppDelegate.h */,
-				600C4AED20813DFF00BB72E1 /* AppDelegate.m */,
-				600C4AEF20813DFF00BB72E1 /* ViewController.h */,
-				600C4AF020813DFF00BB72E1 /* ViewController.m */,
-				600C4AF220813DFF00BB72E1 /* Main.storyboard */,
-				600C4AF520813DFF00BB72E1 /* Assets.xcassets */,
-				600C4AF720813DFF00BB72E1 /* LaunchScreen.storyboard */,
-				600C4AFA20813DFF00BB72E1 /* Info.plist */,
-				600C4AFB20813DFF00BB72E1 /* main.m */,
-				600C4B1220813F0C00BB72E1 /* Constants.h */,
-				600C4B1020813EF700BB72E1 /* Constants.m */,
-			);
-			path = EntangledDemo;
-			sourceTree = "<group>";
-		};
 		600C4B13208145AC00BB72E1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				600C4B182081474D00BB72E1 /* EntangledKit.framework */,
 			);
 			path = Frameworks;
+			sourceTree = "<group>";
+		};
+		60CD81C220918E5A00D3C2A7 /* Demo */ = {
+			isa = PBXGroup;
+			children = (
+				60CD81C320918E5A00D3C2A7 /* Constants.m */,
+				60CD81C420918E5A00D3C2A7 /* AppDelegate.h */,
+				60CD81C520918E5A00D3C2A7 /* Assets.xcassets */,
+				60CD81C620918E5A00D3C2A7 /* ViewController.m */,
+				60CD81C720918E5A00D3C2A7 /* LaunchScreen.storyboard */,
+				60CD81C920918E5A00D3C2A7 /* Main.storyboard */,
+				60CD81CB20918E5A00D3C2A7 /* Constants.h */,
+				60CD81CC20918E5A00D3C2A7 /* main.m */,
+				60CD81CD20918E5A00D3C2A7 /* AppDelegate.m */,
+				60CD81CE20918E5A00D3C2A7 /* Info.plist */,
+				60CD81CF20918E5A00D3C2A7 /* ViewController.h */,
+			);
+			path = Demo;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -123,7 +124,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 600C4AE420813DFF00BB72E1 /* Build configuration list for PBXProject "EntangledDemo" */;
+			buildConfigurationList = 600C4AE420813DFF00BB72E1 /* Build configuration list for PBXProject "Demo" */;
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -146,9 +147,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				600C4AF920813DFF00BB72E1 /* LaunchScreen.storyboard in Resources */,
-				600C4AF620813DFF00BB72E1 /* Assets.xcassets in Resources */,
-				600C4AF420813DFF00BB72E1 /* Main.storyboard in Resources */,
+				60CD81D720918E5A00D3C2A7 /* Info.plist in Resources */,
+				60CD81D420918E5A00D3C2A7 /* Main.storyboard in Resources */,
+				60CD81D120918E5A00D3C2A7 /* Assets.xcassets in Resources */,
+				60CD81D320918E5A00D3C2A7 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,30 +161,30 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				600C4AF120813DFF00BB72E1 /* ViewController.m in Sources */,
-				600C4AFC20813DFF00BB72E1 /* main.m in Sources */,
-				600C4AEE20813DFF00BB72E1 /* AppDelegate.m in Sources */,
-				600C4B1120813EF700BB72E1 /* Constants.m in Sources */,
+				60CD81D620918E5A00D3C2A7 /* AppDelegate.m in Sources */,
+				60CD81D220918E5A00D3C2A7 /* ViewController.m in Sources */,
+				60CD81D520918E5A00D3C2A7 /* main.m in Sources */,
+				60CD81D020918E5A00D3C2A7 /* Constants.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		600C4AF220813DFF00BB72E1 /* Main.storyboard */ = {
+		60CD81C720918E5A00D3C2A7 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				600C4AF320813DFF00BB72E1 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		600C4AF720813DFF00BB72E1 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				600C4AF820813DFF00BB72E1 /* Base */,
+				60CD81C820918E5A00D3C2A7 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		60CD81C920918E5A00D3C2A7 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				60CD81CA20918E5A00D3C2A7 /* Base */,
+			);
+			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -303,7 +305,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
 				);
-				INFOPLIST_FILE = EntangledDemo/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Demo/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.iota.EntangledDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -323,7 +325,7 @@
 					"$(PROJECT_DIR)/Frameworks",
 				);
 				GCC_OPTIMIZATION_LEVEL = s;
-				INFOPLIST_FILE = EntangledDemo/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Demo/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.iota.EntangledDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -334,7 +336,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		600C4AE420813DFF00BB72E1 /* Build configuration list for PBXProject "EntangledDemo" */ = {
+		600C4AE420813DFF00BB72E1 /* Build configuration list for PBXProject "Demo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				600C4B0820813DFF00BB72E1 /* Debug */,
