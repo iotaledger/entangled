@@ -23,7 +23,6 @@ start container
 
 iOS
 ====================================
-* A pre-compiled framework is included in the repo for demo use only. This framework should not be used in production.
 * Bitcode is currently not supported (see [this bug](https://github.com/bazelbuild/bazel/issues/4982) for more info)
 
 ## How to Use
