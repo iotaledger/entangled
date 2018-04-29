@@ -194,7 +194,7 @@ int transfer_ctx_init(transfer_ctx_t transfer_ctx, transfer_t *transfers, size_t
 // Calculates the bundle hash for a collection of transfers
 int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl* kerl, transfer_t *transfers, size_t len);
 // Returns the resulting bundle hash
-tryte_t *transfer_ctx_finilize(transfer_ctx_t transfer_ctx);
+tryte_t *transfer_ctx_finalize(transfer_ctx_t transfer_ctx);
 // Creates and returns a new transfer context
 transfer_ctx_t transfer_ctx_new(void);
 // Free an existing transfer context - compatible with free()
