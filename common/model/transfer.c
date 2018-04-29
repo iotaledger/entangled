@@ -496,7 +496,7 @@ int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl* kerl, transfer_t *trans
 }
 
 // Returns the resulting bundle hash
-tryte_t *transfer_ctx_finilize(transfer_ctx_t transfer_ctx) {
+tryte_t *transfer_ctx_finalize(transfer_ctx_t transfer_ctx) {
   return transfer_ctx->bundle;
 }
 
