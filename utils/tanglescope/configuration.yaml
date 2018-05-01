@@ -34,5 +34,5 @@ blowballcollector:
   publisher: "tcp://zmq.testnet.iota.org:5556"
 
   #interval between following snapshots (internal counters update)
-  snapshot_interval: 5
+  snapshot_interval: 60
 
