@@ -15,33 +15,34 @@ extern "C" {
 #include <stdlib.h>
 #include "common/trinary/tryte.h"
 #include "common/kerl/kerl.h"
+#include "common/model/transaction.h"
 
 /***********************************************************************************************************
  * Transfer Input data structure
  ***********************************************************************************************************/
-typedef struct _transfer_input *transfer_input_t;
-struct _transfer_input {
+typedef struct _transfer_output *transfer_output_t;
+struct _transfer_output {
   tryte_t seed[81];
   size_t security;
   size_t index;
 };
 
 // Get the seed
-tryte_t *transfer_input_seed(transfer_input_t transfer_input);
+tryte_t *transfer_output_seed(transfer_output_t transfer_output);
 // Set the seed (copy argument)
-void transfer_input_set_seed(transfer_input_t transfer_input, const tryte_t *seed);
+void transfer_output_set_seed(transfer_output_t transfer_output, const tryte_t *seed);
 // Get the security level
-size_t transfer_input_security(transfer_input_t transfer_input);
+size_t transfer_output_security(transfer_output_t transfer_output);
 // Set the security level
-void transfer_input_set_security(transfer_input_t transfer_input, size_t security);
+void transfer_output_set_security(transfer_output_t transfer_output, size_t security);
 // Get the index
-size_t transfer_input_index(transfer_input_t transfer_input);
+size_t transfer_output_index(transfer_output_t transfer_output);
 // Set the index
-void transfer_input_set_index(transfer_input_t transfer_input, size_t index);
+void transfer_output_set_index(transfer_output_t transfer_output, size_t index);
 // Creates and returns a new transfer input
-transfer_input_t transfer_input_new(void);
+transfer_output_t transfer_output_new(void);
 // Free an existing transfer input - compatible with free()
-void transfer_input_free(void *transfer_input);
+void transfer_output_free(void *transfer_output);
 
 /***********************************************************************************************************
  * Transfer Data data structure
@@ -71,44 +72,13 @@ transfer_data_t transfer_data_new(void);
 void transfer_data_free(void *transfer_data);
 
 /***********************************************************************************************************
- * Transfer Value In data structure
- ***********************************************************************************************************/
-typedef struct _transfer_value_in *transfer_value_in_t;
-struct _transfer_value_in {
-  tryte_t address[81];
-  int64_t value;
-  transfer_input_t input;
-};
-
-// Get the address
-tryte_t *transfer_value_in_address(transfer_value_in_t transfer_value_in);
-// Set the address (copy argument)
-void transfer_value_in_set_address(transfer_value_in_t transfer_value_in, const tryte_t *address);
-// Get the value
-int64_t transfer_value_in_value(transfer_value_in_t transfer_value_in);
-// Set the value
-void transfer_value_in_set_value(transfer_value_in_t transfer_value_in, int64_t value);
-// Get the transfer input
-transfer_input_t transfer_value_in_input(transfer_value_in_t transfer_value_in);
-// Set the transfer input (copy argument)
-void transfer_value_in_set_input(transfer_value_in_t transfer_value_in, transfer_input_t transfer_input);
-// Get the number of transactions for this value in transfer
-size_t transfer_value_in_transactions_count(transfer_value_in_t transfer_value_in);
-// Creates and returns a new transfer value in
-transfer_value_in_t transfer_value_in_new(void);
-// Free an existing transfer value in - compatible with free()
-void transfer_value_in_free(void *transfer_value_in);
-
-/***********************************************************************************************************
  * Transfer Value Out data structure
  ***********************************************************************************************************/
 typedef struct _transfer_value_out *transfer_value_out_t;
 struct _transfer_value_out {
   tryte_t address[81];
-  uint64_t value;
-  // can have up to 2187 trytes as data!
-  size_t len;
-  tryte_t* data;
+  int64_t value;
+  transfer_output_t output;
 };
 
 // Get the address
@@ -119,26 +89,57 @@ void transfer_value_out_set_address(transfer_value_out_t transfer_value_out, con
 int64_t transfer_value_out_value(transfer_value_out_t transfer_value_out);
 // Set the value
 void transfer_value_out_set_value(transfer_value_out_t transfer_value_out, int64_t value);
-// Get the length of the data
-size_t transfer_value_out_len(transfer_value_out_t transfer_value_out);
-// Get the data
-tryte_t *transfer_value_out_data(transfer_value_out_t transfer_value_out);
-// Set the data (copy argument)
-void transfer_value_out_set_data(transfer_value_out_t transfer_value_out, tryte_t *data, size_t len);
-// Get the number of transactions for this value out transfer
+// Get the transfer output
+transfer_output_t transfer_value_out_output(transfer_value_out_t transfer_value_out);
+// Set the transfer output (copy argument)
+void transfer_value_out_set_output(transfer_value_out_t transfer_value_out, transfer_output_t transfer_output);
+// Get the number of transactions for this value in transfer
 size_t transfer_value_out_transactions_count(transfer_value_out_t transfer_value_out);
-// Creates and returns a new transfer value out
+// Creates and returns a new transfer value in
 transfer_value_out_t transfer_value_out_new(void);
-// Free an existing transfer value out - compatible with free()
+// Free an existing transfer value in - compatible with free()
 void transfer_value_out_free(void *transfer_value_out);
+
+/***********************************************************************************************************
+ * Transfer Value In data structure
+ ***********************************************************************************************************/
+typedef struct _transfer_value_in *transfer_value_in_t;
+struct _transfer_value_in {
+  tryte_t address[81];
+  uint64_t value;
+  // can have up to 2187 trytes as data!
+  size_t len;
+  tryte_t* data;
+};
+
+// Get the address
+tryte_t *transfer_value_in_address(transfer_value_in_t transfer_value_in);
+// Set the address (copy argument)
+void transfer_value_in_set_address(transfer_value_in_t transfer_value_in, const tryte_t *address);
+// Get the value
+int64_t transfer_value_in_value(transfer_value_in_t transfer_value_in);
+// Set the value
+void transfer_value_in_set_value(transfer_value_in_t transfer_value_in, int64_t value);
+// Get the length of the data
+size_t transfer_value_in_len(transfer_value_in_t transfer_value_in);
+// Get the data
+tryte_t *transfer_value_in_data(transfer_value_in_t transfer_value_in);
+// Set the data (copy argument)
+void transfer_value_in_set_data(transfer_value_in_t transfer_value_in, tryte_t *data, size_t len);
+// Get the number of transactions for this value out transfer
+size_t transfer_value_in_transactions_count(transfer_value_in_t transfer_value_in);
+// Creates and returns a new transfer value out
+transfer_value_in_t transfer_value_in_new(void);
+// Free an existing transfer value out - compatible with free()
+void transfer_value_in_free(void *transfer_value_in);
 
 /***********************************************************************************************************
  * Transfer data structure
  ***********************************************************************************************************/
 typedef enum {
   DATA = 0,
-  VALUE_IN,
-  VALUE_OUT
+  VALUE_OUT,
+  VALUE_IN
 } transfer_type_e;
 
 typedef struct _transfer *transfer_t;
@@ -148,8 +149,8 @@ struct _transfer {
   uint64_t timestamp;
   union {
     transfer_data_t data;
-    transfer_value_in_t in;
-    transfer_value_out_t out;
+    transfer_value_out_t in;
+    transfer_value_in_t out;
   };
 };
 
@@ -171,10 +172,10 @@ int64_t transfer_value(transfer_t transfer);
 tryte_t *transfer_address(transfer_t transfer);
 // Get the transfer data or NULL if type not DATA
 transfer_data_t transfer_data(transfer_t transfer);
-// Get the transfer value in or NULL if type not VALUE_IN
-transfer_value_in_t transfer_value_in(transfer_t transfer);
-// Get the transfer value out or NULL if type not VALUE_OUT
+// Get the transfer value in or NULL if type not VALUE_OUT
 transfer_value_out_t transfer_value_out(transfer_t transfer);
+// Get the transfer value out or NULL if type not VALUE_IN
+transfer_value_in_t transfer_value_in(transfer_t transfer);
 // Creates and returns a new transfer
 transfer_t transfer_new(transfer_type_e transfer_type);
 // Free an existing transfer - compatible with free()
@@ -191,6 +192,8 @@ struct _transfer_ctx {
 
 // Creates and returns a new transfer context
 int transfer_ctx_init(transfer_ctx_t transfer_ctx, transfer_t *transfers, size_t len);
+// Gets the count of transactions for the transfers
+int transfer_ctx_count(transfer_ctx_t transfer_ctx);
 // Calculates the bundle hash for a collection of transfers
 int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl* kerl, transfer_t *transfers, size_t len);
 // Returns the resulting bundle hash
@@ -200,8 +203,29 @@ transfer_ctx_t transfer_ctx_new(void);
 // Free an existing transfer context - compatible with free()
 void transfer_ctx_free(void *transfer_ctx);
 
+/***********************************************************************************************************
+ * Transfer Iterator data structure
+ ***********************************************************************************************************/
+typedef struct _transfer_iterator *transfer_iterator_t;
+struct _transfer_iterator {
+  transfer_t *transfers;
+  size_t transfers_count;
+  size_t transactions_count;
+  size_t current_transfer;
+  size_t current_transfer_transaction_index;
+  size_t current_transaction_index;
+  tryte_t bundle_hash[81];
+  tryte_t transaction_signature[6561];
+};
+
+// Returns the next transaction
+iota_transaction_t transfer_iterator_next(transfer_iterator_t transfer_iterator, const tryte_t *seed);
+// Creates and returns a new transfer iterator
+transfer_iterator_t transfer_iterator_new(transfer_t *transfers, size_t len, Kerl* kerl);
+// Free an existing transfer iterator - compatible with free()
+void transfer_iterator_free(void *transfer_iterator);
+
 #endif  // __COMMON_MODEL_TRANSFER_H_
 #ifdef __cplusplus
 }
 #endif
-                               
