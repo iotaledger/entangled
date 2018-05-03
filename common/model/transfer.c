@@ -9,14 +9,9 @@
 #include "common/model/transfer.h"
 #include "common/trinary/tryte_long.h"
 #include "common/trinary/trit_tryte.h"
+#include "common/helpers/sign.h"
 
 #define TRYTES_PER_MESSAGE 2187
-
-/***********************************************************************************************************
- * Transfer Input data structure
- ***********************************************************************************************************/
-// To obfuscate the model, the structure definition comees here
-// struct _transfer_input {...};
 
 void _convert_and_pad(int64_t value, tryte_t *trytes, size_t length) {
   size_t num_trytes;
@@ -24,50 +19,56 @@ void _convert_and_pad(int64_t value, tryte_t *trytes, size_t length) {
   memset(trytes + num_trytes, '9', length - num_trytes);
 }
 
-// Creates and returns a new transfer input
-transfer_input_t transfer_input_new(void) {
-  transfer_input_t transfer_input;
-  transfer_input = (transfer_input_t)malloc(sizeof(struct _transfer_input));
-  if (!transfer_input) {
+/***********************************************************************************************************
+ * Transfer Input data structure
+ ***********************************************************************************************************/
+// To obfuscate the model, the structure definition comees here
+// struct _transfer_output {...};
+
+// Creates and returns a new transfer output
+transfer_output_t transfer_output_new(void) {
+  transfer_output_t transfer_output;
+  transfer_output = (transfer_output_t)malloc(sizeof(struct _transfer_output));
+  if (!transfer_output) {
     // errno = IOTA_OUT_OF_MEMORY
     return NULL;
   }
-  memset(transfer_input, 0, sizeof(struct _transfer_input));
-  return transfer_input;
+  memset(transfer_output, 0, sizeof(struct _transfer_output));
+  return transfer_output;
 }
 
 // Get the seed
-tryte_t *transfer_input_seed(transfer_input_t transfer_input) {
-  return transfer_input->seed;
+tryte_t *transfer_output_seed(transfer_output_t transfer_output) {
+  return transfer_output->seed;
 }
 
 // Set the seed (copy argument)
-void transfer_input_set_seed(transfer_input_t transfer_input, const tryte_t *seed) {
-  memcpy(transfer_input->seed, seed, sizeof(transfer_input->seed));
+void transfer_output_set_seed(transfer_output_t transfer_output, const tryte_t *seed) {
+  memcpy(transfer_output->seed, seed, sizeof(transfer_output->seed));
 }
 
 // Get the security level
-size_t transfer_input_security(transfer_input_t transfer_input) {
-  return transfer_input->security;
+size_t transfer_output_security(transfer_output_t transfer_output) {
+  return transfer_output->security;
 }
 
 // Set the security level
-void transfer_input_set_security(transfer_input_t transfer_input, size_t security) {
-  transfer_input->security = security;
+void transfer_output_set_security(transfer_output_t transfer_output, size_t security) {
+  transfer_output->security = security;
 }
 
 // Get the index
-size_t transfer_input_index(transfer_input_t transfer_input) {
-  return transfer_input->index;
+size_t transfer_output_index(transfer_output_t transfer_output) {
+  return transfer_output->index;
 }
 
 // Set the index
-void transfer_input_set_index(transfer_input_t transfer_input, size_t index) {
-  transfer_input->index = index;
+void transfer_output_set_index(transfer_output_t transfer_output, size_t index) {
+  transfer_output->index = index;
 }
 
-// Free an existing transfer input - compatible with free()
-void transfer_input_free(void *t) {
+// Free an existing transfer output - compatible with free()
+void transfer_output_free(void *t) {
   if (t) {
     free(t);
   }
@@ -141,84 +142,6 @@ void transfer_data_free(void *t) {
 }
 
 /***********************************************************************************************************
- * Transfer Value In data structure
- ***********************************************************************************************************/
-// To obfuscate the model, the structure definition comees here
-// struct _transfer_value_in {...};
-
-// Get the address
-tryte_t *transfer_value_in_address(transfer_value_in_t transfer_value_in) {
-  return transfer_value_in->address;
-}
-
-// Set the address (copy argument)
-void transfer_value_in_set_address(transfer_value_in_t transfer_value_in, const tryte_t *address) {
-  memcpy(transfer_value_in->address, address, sizeof(transfer_value_in->address));
-}
-
-// Get the value
-int64_t transfer_value_in_value(transfer_value_in_t transfer_value_in) {
-  return transfer_value_in->value;
-}
-
-// Set the value
-void transfer_value_in_set_value(transfer_value_in_t transfer_value_in, int64_t value) {
-  transfer_value_in->value = value;
-}
-
-// Get the transfer input
-transfer_input_t transfer_value_in_input(transfer_value_in_t transfer_value_in) {
-  return transfer_value_in->input;
-}
-
-// Set the transfer input (copy argument)
-void transfer_value_in_set_input(transfer_value_in_t transfer_value_in, transfer_input_t transfer_input) {
-  if (transfer_value_in->input) {
-    transfer_value_in_free(transfer_value_in->input);
-    transfer_value_in->input = NULL;
-  }
-  transfer_input_t input = transfer_input_new();
-  transfer_input_set_seed(input, transfer_input_seed(transfer_input));
-  transfer_input_set_security(input, transfer_input_security(transfer_input));
-  transfer_input_set_index(input, transfer_input_index(transfer_input));
-  transfer_value_in->input = input;
-}
-
-// Get the number of transactions for this value in transfer
-size_t transfer_value_in_transactions_count(transfer_value_in_t transfer_value_in) {
-  return transfer_input_security(transfer_value_in_input(transfer_value_in));
-}
-
-// Creates and returns a new transfer value in
-transfer_value_in_t transfer_value_in_new(void) {
-  transfer_value_in_t transfer_value_in;
-  transfer_value_in = (transfer_value_in_t)malloc(sizeof(struct _transfer_value_in));
-  if (!transfer_value_in) {
-    // errno = IOTA_OUT_OF_MEMORY
-    return NULL;
-  }
-  memset(transfer_value_in, 0, sizeof(struct _transfer_value_in));
-  transfer_value_in->input = transfer_input_new();
-  if (!transfer_value_in->input) {
-    // errno = IOTA_OUT_OF_MEMORY
-    transfer_value_in_free(transfer_value_in);
-    transfer_value_in = NULL;
-  }
-  return transfer_value_in;
-}
-
-// Free an existing transfer value in - compatible with free()
-void transfer_value_in_free(void *t) {
-  if (t) {
-    transfer_value_in_t transfer_value_in = (transfer_value_in_t)t;
-    if (transfer_value_in->input) {
-      transfer_input_free(transfer_value_in->input);
-    }
-    free(t);
-  }
-}
-
-/***********************************************************************************************************
  * Transfer Value Out data structure
  ***********************************************************************************************************/
 // To obfuscate the model, the structure definition comees here
@@ -244,35 +167,30 @@ void transfer_value_out_set_value(transfer_value_out_t transfer_value_out, int64
   transfer_value_out->value = value;
 }
 
-// Get the length of the data
-size_t transfer_value_out_len(transfer_value_out_t transfer_value_out) {
-  return transfer_value_out->len;
+// Get the transfer output
+transfer_output_t transfer_value_out_output(transfer_value_out_t transfer_value_out) {
+  return transfer_value_out->output;
 }
 
-// Get the data
-tryte_t *transfer_value_out_data(transfer_value_out_t transfer_value_out) {
-  return transfer_value_out->data;
-}
-
-// Set the data (copy argument)
-void transfer_value_out_set_data(transfer_value_out_t transfer_value_out, tryte_t *data, size_t len) {
-  if (transfer_value_out->data) {
-    free(transfer_value_out->data);
-    transfer_value_out->data = NULL;
+// Set the transfer output (copy argument)
+void transfer_value_out_set_output(transfer_value_out_t transfer_value_out, transfer_output_t transfer_output) {
+  if (transfer_value_out->output) {
+    transfer_value_out_free(transfer_value_out->output);
+    transfer_value_out->output = NULL;
   }
-  size_t data_len = len * sizeof(tryte_t);
-  transfer_value_out->data = (tryte_t *)malloc(data_len);
-  if (transfer_value_out->data) {
-    memcpy(transfer_value_out->data, data, data_len);
-  }  
+  transfer_output_t output = transfer_output_new();
+  transfer_output_set_seed(output, transfer_output_seed(transfer_output));
+  transfer_output_set_security(output, transfer_output_security(transfer_output));
+  transfer_output_set_index(output, transfer_output_index(transfer_output));
+  transfer_value_out->output = transfer_output;
 }
 
-// Get the number of transactions for this value out transfer
+// Get the number of transactions for this value in transfer
 size_t transfer_value_out_transactions_count(transfer_value_out_t transfer_value_out) {
-  return 1;
+  return transfer_output_security(transfer_value_out_output(transfer_value_out));
 }
 
-// Creates and returns a new transfer value out
+// Creates and returns a new transfer value in
 transfer_value_out_t transfer_value_out_new(void) {
   transfer_value_out_t transfer_value_out;
   transfer_value_out = (transfer_value_out_t)malloc(sizeof(struct _transfer_value_out));
@@ -281,15 +199,98 @@ transfer_value_out_t transfer_value_out_new(void) {
     return NULL;
   }
   memset(transfer_value_out, 0, sizeof(struct _transfer_value_out));
+  transfer_value_out->output = transfer_output_new();
+  if (!transfer_value_out->output) {
+    // errno = IOTA_OUT_OF_MEMORY
+    transfer_value_out_free(transfer_value_out);
+    transfer_value_out = NULL;
+  }
   return transfer_value_out;
 }
 
-// Free an existing transfer value out - compatible with free()
+// Free an existing transfer value in - compatible with free()
 void transfer_value_out_free(void *t) {
   if (t) {
     transfer_value_out_t transfer_value_out = (transfer_value_out_t)t;
-    if (transfer_value_out->data) {
-      free(transfer_value_out->data);
+    if (transfer_value_out->output) {
+      transfer_output_free(transfer_value_out->output);
+    }
+    free(t);
+  }
+}
+
+/***********************************************************************************************************
+ * Transfer Value In data structure
+ ***********************************************************************************************************/
+// To obfuscate the model, the structure definition comees here
+// struct _transfer_value_in {...};
+
+// Get the address
+tryte_t *transfer_value_in_address(transfer_value_in_t transfer_value_in) {
+  return transfer_value_in->address;
+}
+
+// Set the address (copy argument)
+void transfer_value_in_set_address(transfer_value_in_t transfer_value_in, const tryte_t *address) {
+  memcpy(transfer_value_in->address, address, sizeof(transfer_value_in->address));
+}
+
+// Get the value
+int64_t transfer_value_in_value(transfer_value_in_t transfer_value_in) {
+  return transfer_value_in->value;
+}
+
+// Set the value
+void transfer_value_in_set_value(transfer_value_in_t transfer_value_in, int64_t value) {
+  transfer_value_in->value = value;
+}
+
+// Get the length of the data
+size_t transfer_value_in_len(transfer_value_in_t transfer_value_in) {
+  return transfer_value_in->len;
+}
+
+// Get the data
+tryte_t *transfer_value_in_data(transfer_value_in_t transfer_value_in) {
+  return transfer_value_in->data;
+}
+
+// Set the data (copy argument)
+void transfer_value_in_set_data(transfer_value_in_t transfer_value_in, tryte_t *data, size_t len) {
+  if (transfer_value_in->data) {
+    free(transfer_value_in->data);
+    transfer_value_in->data = NULL;
+  }
+  size_t data_len = len * sizeof(tryte_t);
+  transfer_value_in->data = (tryte_t *)malloc(data_len);
+  if (transfer_value_in->data) {
+    memcpy(transfer_value_in->data, data, data_len);
+  }  
+}
+
+// Get the number of transactions for this value out transfer
+size_t transfer_value_in_transactions_count(transfer_value_in_t transfer_value_in) {
+  return 1;
+}
+
+// Creates and returns a new transfer value out
+transfer_value_in_t transfer_value_in_new(void) {
+  transfer_value_in_t transfer_value_in;
+  transfer_value_in = (transfer_value_in_t)malloc(sizeof(struct _transfer_value_in));
+  if (!transfer_value_in) {
+    // errno = IOTA_OUT_OF_MEMORY
+    return NULL;
+  }
+  memset(transfer_value_in, 0, sizeof(struct _transfer_value_in));
+  return transfer_value_in;
+}
+
+// Free an existing transfer value out - compatible with free()
+void transfer_value_in_free(void *t) {
+  if (t) {
+    transfer_value_in_t transfer_value_in = (transfer_value_in_t)t;
+    if (transfer_value_in->data) {
+      free(transfer_value_in->data);
     }
     free(t);
   }  
@@ -311,10 +312,10 @@ size_t transfer_transactions_count(transfer_t transfer) {
   switch (transfer_type(transfer)) {
     case DATA:
       return transfer_data_transactions_count(transfer_data(transfer));
-    case VALUE_IN:
-      return transfer_value_in_transactions_count(transfer_value_in(transfer));
     case VALUE_OUT:
       return transfer_value_out_transactions_count(transfer_value_out(transfer));
+    case VALUE_IN:
+      return transfer_value_in_transactions_count(transfer_value_in(transfer));
   }
   // Should not reach here
   return 0;
@@ -345,10 +346,10 @@ int64_t transfer_value(transfer_t transfer) {
   switch (transfer_type(transfer)) {
     case DATA:
       return 0;
-    case VALUE_IN:
-      return transfer_value_in_value(transfer_value_in(transfer));
     case VALUE_OUT:
       return transfer_value_out_value(transfer_value_out(transfer));
+    case VALUE_IN:
+      return transfer_value_in_value(transfer_value_in(transfer));
   }
   // Should not reach here
   return 0;
@@ -359,10 +360,10 @@ tryte_t *transfer_address(transfer_t transfer) {
   switch (transfer_type(transfer)) {
     case DATA:
       return transfer_data_address(transfer_data(transfer));
-    case VALUE_IN:
-      return transfer_value_in_address(transfer_value_in(transfer));
     case VALUE_OUT:
       return transfer_value_out_address(transfer_value_out(transfer));
+    case VALUE_IN:
+      return transfer_value_in_address(transfer_value_in(transfer));
   }
   // Should not reach here
   return NULL;  
@@ -377,16 +378,16 @@ transfer_data_t transfer_data(transfer_t transfer) {
 }
 
 // Get the transfer value in
-transfer_value_in_t transfer_value_in(transfer_t transfer) {
-  if (transfer_type(transfer) != VALUE_IN) {
+transfer_value_out_t transfer_value_out(transfer_t transfer) {
+  if (transfer_type(transfer) != VALUE_OUT) {
     return NULL;
   }
   return transfer->in;
 }
 
 // Get the transfer value out
-transfer_value_out_t transfer_value_out(transfer_t transfer) {
-  if (transfer_type(transfer) != VALUE_OUT) {
+transfer_value_in_t transfer_value_in(transfer_t transfer) {
+  if (transfer_type(transfer) != VALUE_IN) {
     return NULL;
   }
   return transfer->out;
@@ -406,11 +407,11 @@ transfer_t transfer_new(transfer_type_e transfer_type) {
     case DATA:
       transfer->data = transfer_data_new();
       break;
-    case VALUE_IN:
-      transfer->in = transfer_value_in_new();
-      break;
     case VALUE_OUT:
-      transfer->out = transfer_value_out_new();
+      transfer->in = transfer_value_out_new();
+      break;
+    case VALUE_IN:
+      transfer->out = transfer_value_in_new();
       break;
     default:
       free(transfer);
@@ -427,11 +428,11 @@ void transfer_free(void *t) {
       case DATA:
         transfer_data_free(transfer_data(transfer));
         break;
-      case VALUE_IN:
-        transfer_value_in_free(transfer_value_in(transfer));
-        break;
       case VALUE_OUT:
         transfer_value_out_free(transfer_value_out(transfer));
+        break;
+      case VALUE_IN:
+        transfer_value_in_free(transfer_value_in(transfer));
         break;    
     }
     free(t);
@@ -456,6 +457,11 @@ int transfer_ctx_init(transfer_ctx_t transfer_ctx, transfer_t *transfers, size_t
   return total ? -1 : 0;
 }
 
+// Gets the count of transactions for the transfers
+int transfer_ctx_count(transfer_ctx_t transfer_ctx) {
+  return transfer_ctx->count;
+}
+
 // Calculates the bundle hash for a collection of transfers
 int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl* kerl, transfer_t *transfers, size_t len) {
   size_t i, j, current_index, count;
@@ -469,7 +475,7 @@ int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl* kerl, transfer_t *trans
     for (j = 0; j < count; j++) {
       // essence = Address + Value + Tag + Timestamp + Current Index + Last Index
       tryte_t value[27];
-      int64_t effective_value = transfer_type(transfer) == VALUE_IN ? j == 0 ? transfer_value(transfer) : 0 : 0;
+      int64_t effective_value = transfer_type(transfer) == VALUE_OUT ? j == 0 ? transfer_value(transfer) : 0 : 0;
       _convert_and_pad(effective_value, value, 27);
       tryte_t timestamp[9];
       _convert_and_pad(transfer_timestamp(transfer), timestamp, 9);
@@ -514,6 +520,112 @@ transfer_ctx_t transfer_ctx_new(void) {
 
 // Free an existing transfer context - compatible with free()
 void transfer_ctx_free(void *t) {
+  if (t) {
+    free(t);
+  }
+}
+
+/***********************************************************************************************************
+ * Transfer Iterator data structure
+ ***********************************************************************************************************/
+// To obfuscate the model, the structure definition comees here
+// struct _transfer_iterator {...};
+
+/***********************************************************************************************************
+ * Private interface
+ ***********************************************************************************************************/
+
+iota_transaction_t transfer_iterator_next_data_transaction(transfer_iterator_t transfer_iterator, const tryte_t *seed) {
+  transfer_t transfer = transfer_iterator->transfers[transfer_iterator->current_transfer];
+  size_t count = transfer_transactions_count(transfer);
+  if (transfer_iterator->current_transfer_transaction_index >= count) {
+    transfer_iterator->current_transfer_transaction_index = 0;
+    return NULL;
+  }
+  if (transfer_iterator->current_transfer_transaction_index == 0) {
+    // iota_sign_signature_gen((const char *)seed, const size_t index,
+    //                         const size_t security, (const char *)transfer_iterator->bundleHash);
+  }
+  iota_transaction_t transaction = transaction_new();
+
+  transfer_iterator->current_transfer_transaction_index++;
+  return transaction;
+}
+
+iota_transaction_t transfer_iterator_next_output_transaction(transfer_iterator_t transfer_iterator, const tryte_t *seed) {
+  transfer_t transfer = transfer_iterator->transfers[transfer_iterator->current_transfer];
+  size_t count = transfer_transactions_count(transfer);
+  if (transfer_iterator->current_transfer_transaction_index >= count) {
+    transfer_iterator->current_transfer_transaction_index = 0;
+    return NULL;
+  }
+  if (transfer_iterator->current_transfer_transaction_index == 0) {
+  }
+  iota_transaction_t transaction = transaction_new();
+  transfer_iterator->current_transfer_transaction_index++;
+  return transaction;
+}
+
+iota_transaction_t transfer_iterator_next_input_transaction(transfer_iterator_t transfer_iterator, const tryte_t *seed) {
+  transfer_t transfer = transfer_iterator->transfers[transfer_iterator->current_transfer];
+  size_t count = transfer_transactions_count(transfer);
+  if (transfer_iterator->current_transfer_transaction_index >= count) {
+    transfer_iterator->current_transfer_transaction_index = 0;
+    return NULL;
+  }  
+  if (transfer_iterator->current_transfer_transaction_index == 0) {
+  }
+  iota_transaction_t transaction = transaction_new();
+  transfer_iterator->current_transfer_transaction_index++;
+  return transaction;
+}
+
+/***********************************************************************************************************
+ * Public interface
+ ***********************************************************************************************************/
+// Returns the next transaction
+iota_transaction_t transfer_iterator_next(transfer_iterator_t transfer_iterator, const tryte_t *seed) {
+  if (transfer_iterator->current_transfer < transfer_iterator->transfers_count) {
+    transfer_t transfer = transfer_iterator->transfers[transfer_iterator->current_transfer];
+    switch (transfer_type(transfer)) {
+      case DATA:
+        return transfer_iterator_next_data_transaction(transfer_iterator, seed);
+      case VALUE_OUT:
+        return transfer_iterator_next_output_transaction(transfer_iterator, seed);
+      case VALUE_IN:
+        return transfer_iterator_next_input_transaction(transfer_iterator, seed);
+    }
+  }
+  return NULL;
+}
+
+// Creates and returns a new transfer iterator
+transfer_iterator_t transfer_iterator_new(transfer_t *transfers, size_t len, Kerl* kerl) {
+  transfer_iterator_t transfer_iterator;
+  transfer_iterator = (transfer_iterator_t)malloc(sizeof(struct _transfer_iterator));
+  if (!transfer_iterator) {
+    // errno = IOTA_OUT_OF_MEMORY
+    return NULL;
+  }
+  memset(transfer_iterator, 0, sizeof(struct _transfer_iterator));
+  transfer_iterator->transfers = transfers;
+  transfer_iterator->transfers_count = len;
+  transfer_ctx_t transfer_ctx = transfer_ctx_new();
+  if (!transfer_ctx) {
+    // errno = IOTA_OUT_OF_MEMORY
+    transfer_iterator_free(transfer_iterator);
+    return NULL;    
+  }
+  transfer_ctx_init(transfer_ctx, transfers, len);
+  transfer_iterator->transactions_count = transfer_ctx_count(transfer_ctx);
+  transfer_ctx_hash(transfer_ctx, kerl, transfers, len);
+  memcpy(transfer_iterator->bundle_hash, transfer_ctx_finalize(transfer_ctx), 81);
+  transfer_ctx_free(transfer_ctx);
+  return transfer_iterator;
+}
+
+// Free an existing transfer iterator - compatible with free()
+void transfer_iterator_free(void *t) {
   if (t) {
     free(t);
   }
