@@ -11,13 +11,9 @@
 #include "common/trinary/trit_tryte.h"
 #include "common/helpers/sign.h"
 
-#define TRYTES_PER_MESSAGE 2187
-
-void _convert_and_pad(int64_t value, tryte_t *trytes, size_t length) {
-  size_t num_trytes;
-  num_trytes = long_to_trytes(value, trytes);
-  memset(trytes + num_trytes, '9', length - num_trytes);
-}
+#define TRYTES_PER_MESSAGE      2187
+#define TRYTES_PER_ESSENCE      162
+#define TRITES_PER_BUNDLE_HASH  243
 
 /***********************************************************************************************************
  * Transfer Input data structure
@@ -455,40 +451,36 @@ int transfer_ctx_count(transfer_ctx_t transfer_ctx) {
 
 // Calculates the bundle hash for a collection of transfers
 int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl* kerl, transfer_t *transfers, size_t len) {
-  size_t i, j, current_index, count;
-  trit_t essence_trit[468];
-  current_index = 0;
+  size_t i, j, count, current_index = 0;
+  tryte_t essence[TRYTES_PER_ESSENCE];
+  trit_t essence_trits[TRYTES_PER_ESSENCE * 3];
 
   // Calculate bundle hash
   for (i = 0; i < len; i++) {
-    tryte_t essence[162];
     transfer_t transfer = transfers[i];
     count = transfer_transactions_count(transfer);
     for (j = 0; j < count; j++) {
+      // Set essence trytes to 9
+      memset(essence, '9', TRYTES_PER_ESSENCE);
       // essence = Address + Value + Tag + Timestamp + Current Index + Last Index
-      tryte_t value[27];
-      int64_t effective_value = transfer_type(transfer) == VALUE_OUT ? j == 0 ? transfer_value(transfer) : 0 : 0;
-      _convert_and_pad(effective_value, value, 27);
-      tryte_t timestamp[9];
-      _convert_and_pad(transfer_timestamp(transfer), timestamp, 9);
-      tryte_t current_index[9];
-      _convert_and_pad((int64_t)index, current_index, 9);
-      tryte_t last_index[9];
-      _convert_and_pad(transfer_ctx->count, last_index, 9);
       memcpy(essence + 0, transfer_address(transfer), 81);
-      memcpy(essence + 81, value, 27);
+      int64_t value = transfer_type(transfer) == VALUE_OUT ? j == 0 ? transfer_value(transfer) : 0 : 0;
+      long_to_trytes(value, essence + 81);
       memcpy(essence + 108, transfer_tag(transfer), 27);
-      memcpy(essence + 135, timestamp, 9);
-      memcpy(essence + 144, current_index, 9);
-      memcpy(essence + 153, last_index, 9);
+      long_to_trytes(transfer_timestamp(transfer), essence + 135);
+      long_to_trytes(current_index, essence + 144);
+      long_to_trytes(transfer_ctx->count, essence + 153);
       // essence in in trytes, convert to trits
-      trytes_to_trits(essence, essence_trit, 162);
-      kerl_absorb(kerl, essence_trit, 468);
+      trytes_to_trits(essence, essence_trits, TRYTES_PER_ESSENCE);
+      // Absorb essence in kerl
+      kerl_absorb(kerl, essence_trits, TRYTES_PER_ESSENCE * 3);
+      current_index++;
     }
   }
-  trit_t bundle_trit[243];
-  kerl_squeeze(kerl, bundle_trit, 243);
-  trits_to_trytes(bundle_trit, transfer_ctx->bundle, 243);
+  trit_t bundle_trit[TRITES_PER_BUNDLE_HASH];
+  // Squeeze kerl to get the bundle hash
+  kerl_squeeze(kerl, bundle_trit, TRITES_PER_BUNDLE_HASH);
+  trits_to_trytes(bundle_trit, transfer_ctx->bundle, TRITES_PER_BUNDLE_HASH);
   return 0;
 }
 
