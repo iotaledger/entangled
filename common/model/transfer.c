@@ -257,15 +257,10 @@ tryte_t *transfer_value_in_data(transfer_value_in_t transfer_value_in) {
 
 // Set the data (copy argument)
 void transfer_value_in_set_data(transfer_value_in_t transfer_value_in, tryte_t *data, size_t len) {
-  if (transfer_value_in->data) {
-    free(transfer_value_in->data);
-    transfer_value_in->data = NULL;
+  if (len && len <= sizeof(transfer_value_in->data)) {
+    transfer_value_in->len = len;
+    memcpy(transfer_value_in->data, data, len);
   }
-  size_t data_len = len * sizeof(tryte_t);
-  transfer_value_in->data = (tryte_t *)malloc(data_len);
-  if (transfer_value_in->data) {
-    memcpy(transfer_value_in->data, data, data_len);
-  }  
 }
 
 // Get the number of transactions for this value out transfer
@@ -288,10 +283,6 @@ transfer_value_in_t transfer_value_in_new(void) {
 // Free an existing transfer value out - compatible with free()
 void transfer_value_in_free(void *t) {
   if (t) {
-    transfer_value_in_t transfer_value_in = (transfer_value_in_t)t;
-    if (transfer_value_in->data) {
-      free(transfer_value_in->data);
-    }
     free(t);
   }  
 }
@@ -465,6 +456,7 @@ int transfer_ctx_count(transfer_ctx_t transfer_ctx) {
 // Calculates the bundle hash for a collection of transfers
 int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl* kerl, transfer_t *transfers, size_t len) {
   size_t i, j, current_index, count;
+  trit_t essence_trit[468];
   current_index = 0;
 
   // Calculate bundle hash
@@ -490,7 +482,6 @@ int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl* kerl, transfer_t *trans
       memcpy(essence + 144, current_index, 9);
       memcpy(essence + 153, last_index, 9);
       // essence in in trytes, convert to trits
-      trit_t essence_trit[468];
       trytes_to_trits(essence, essence_trit, 162);
       kerl_absorb(kerl, essence_trit, 468);
     }
@@ -515,6 +506,7 @@ transfer_ctx_t transfer_ctx_new(void) {
     return NULL;
   }
   memset(transfer_ctx, 0, sizeof(struct _transfer_ctx));
+  memset(transfer_ctx->bundle, 9, sizeof(transfer_ctx->bundle));
   return transfer_ctx;
 }
 
@@ -535,68 +527,91 @@ void transfer_ctx_free(void *t) {
  * Private interface
  ***********************************************************************************************************/
 
-iota_transaction_t transfer_iterator_next_data_transaction(transfer_iterator_t transfer_iterator, const tryte_t *seed) {
-  transfer_t transfer = transfer_iterator->transfers[transfer_iterator->current_transfer];
-  size_t count = transfer_transactions_count(transfer);
-  if (transfer_iterator->current_transfer_transaction_index >= count) {
-    transfer_iterator->current_transfer_transaction_index = 0;
-    return NULL;
-  }
-  if (transfer_iterator->current_transfer_transaction_index == 0) {
-    // iota_sign_signature_gen((const char *)seed, const size_t index,
-    //                         const size_t security, (const char *)transfer_iterator->bundleHash);
-  }
-  iota_transaction_t transaction = transaction_new();
-
-  transfer_iterator->current_transfer_transaction_index++;
-  return transaction;
+void transfer_iterator_next_data_transaction(transfer_iterator_t transfer_iterator, transfer_t transfer) {
+  transfer_data_t trans_data = transfer_data(transfer);
+  tryte_t *data = transfer_data_data(trans_data);
+  size_t len = transfer_data_len(trans_data);
+  data += (transfer_iterator->current_transfer_transaction_index * TRYTES_PER_MESSAGE);
+  len -= (transfer_iterator->current_transfer_transaction_index * TRYTES_PER_MESSAGE);
+  len = len < TRYTES_PER_MESSAGE ? len : TRYTES_PER_MESSAGE;
+  transaction_set_message(transfer_iterator->transaction, data, len);
 }
 
-iota_transaction_t transfer_iterator_next_output_transaction(transfer_iterator_t transfer_iterator, const tryte_t *seed) {
-  transfer_t transfer = transfer_iterator->transfers[transfer_iterator->current_transfer];
-  size_t count = transfer_transactions_count(transfer);
-  if (transfer_iterator->current_transfer_transaction_index >= count) {
-    transfer_iterator->current_transfer_transaction_index = 0;
-    return NULL;
-  }
+void transfer_iterator_next_output_transaction(transfer_iterator_t transfer_iterator, transfer_t transfer) {
   if (transfer_iterator->current_transfer_transaction_index == 0) {
+    transfer_value_out_t value_out = transfer_value_out(transfer);
+    transfer_output_t output = transfer_value_out_output(value_out);
+    if (transfer_iterator->transaction_signature) {
+      free(transfer_iterator->transaction_signature);
+    }
+    transfer_iterator->transaction_signature = (tryte_t *)iota_sign_signature_gen(
+      (const char *)transfer_output_seed(output),
+      (const size_t)transfer_output_index(output),
+      (const size_t)transfer_output_security(output),
+      (const char *)transfer_iterator->bundle_hash);
+    transaction_set_value(transfer_iterator->transaction, transfer_value(transfer));
   }
-  iota_transaction_t transaction = transaction_new();
-  transfer_iterator->current_transfer_transaction_index++;
-  return transaction;
+  transaction_set_signature(
+    transfer_iterator->transaction,
+    transfer_iterator->transaction_signature + (transfer_iterator->current_transfer_transaction_index * TRYTES_PER_MESSAGE));
 }
 
-iota_transaction_t transfer_iterator_next_input_transaction(transfer_iterator_t transfer_iterator, const tryte_t *seed) {
-  transfer_t transfer = transfer_iterator->transfers[transfer_iterator->current_transfer];
-  size_t count = transfer_transactions_count(transfer);
-  if (transfer_iterator->current_transfer_transaction_index >= count) {
-    transfer_iterator->current_transfer_transaction_index = 0;
-    return NULL;
-  }  
-  if (transfer_iterator->current_transfer_transaction_index == 0) {
-  }
-  iota_transaction_t transaction = transaction_new();
-  transfer_iterator->current_transfer_transaction_index++;
-  return transaction;
+void transfer_iterator_next_input_transaction(transfer_iterator_t transfer_iterator, transfer_t transfer) {
+  transfer_value_in_t value_in = transfer_value_in(transfer);
+  transaction_set_message(
+    transfer_iterator->transaction,
+    transfer_value_in_data(value_in),
+    transfer_value_in_len(value_in));
+  transaction_set_value(transfer_iterator->transaction, transfer_value(transfer));
 }
 
 /***********************************************************************************************************
  * Public interface
  ***********************************************************************************************************/
 // Returns the next transaction
-iota_transaction_t transfer_iterator_next(transfer_iterator_t transfer_iterator, const tryte_t *seed) {
+iota_transaction_t transfer_iterator_next(transfer_iterator_t transfer_iterator) {
+  iota_transaction_t transaction = NULL;
   if (transfer_iterator->current_transfer < transfer_iterator->transfers_count) {
+    // Dynamically allocate a transaction structure if none was
+    // previously provided with transfer_iterator_set_transaction
+    if (!transfer_iterator->transaction) {
+      transfer_iterator->transaction = transaction_new();
+      transfer_iterator->dynamic_transaction = 1;
+    }
     transfer_t transfer = transfer_iterator->transfers[transfer_iterator->current_transfer];
+    size_t count = transfer_transactions_count(transfer);
+    if (transfer_iterator->current_transfer_transaction_index >= count) {
+      transfer_iterator->current_transfer++;
+      transfer_iterator->current_transfer_transaction_index = 0;
+      return transfer_iterator_next(transfer_iterator);
+    }
+    // Reset all transaction fields
+    transaction_reset(transfer_iterator->transaction);
+    // Set common transaction fields
+    transaction_set_bundle(transfer_iterator->transaction, transfer_iterator->bundle_hash);
+    transaction_set_address(transfer_iterator->transaction, transfer_address(transfer));
+    transaction_set_obsolete_tag(transfer_iterator->transaction, transfer_tag(transfer));
+    transaction_set_tag(transfer_iterator->transaction, transfer_tag(transfer));
+    transaction_set_timestamp(transfer_iterator->transaction, transfer_timestamp(transfer));
+    transaction_set_current_index(transfer_iterator->transaction, transfer_iterator->current_transaction_index);
+    transaction_set_last_index(transfer_iterator->transaction, transfer_iterator->transactions_count - 1);
+    // Set transaction type specific fields
     switch (transfer_type(transfer)) {
       case DATA:
-        return transfer_iterator_next_data_transaction(transfer_iterator, seed);
+        transfer_iterator_next_data_transaction(transfer_iterator, transfer);
+        break;
       case VALUE_OUT:
-        return transfer_iterator_next_output_transaction(transfer_iterator, seed);
+        transfer_iterator_next_output_transaction(transfer_iterator, transfer);
+        break;
       case VALUE_IN:
-        return transfer_iterator_next_input_transaction(transfer_iterator, seed);
+        transfer_iterator_next_input_transaction(transfer_iterator, transfer);
+        break;
     }
+    transaction = transfer_iterator->transaction;
+    transfer_iterator->current_transfer_transaction_index++;  
+    transfer_iterator->current_transaction_index++;
   }
-  return NULL;
+  return transaction;
 }
 
 // Creates and returns a new transfer iterator
@@ -624,9 +639,21 @@ transfer_iterator_t transfer_iterator_new(transfer_t *transfers, size_t len, Ker
   return transfer_iterator;
 }
 
+// Set statically allocated transaction - If not used, will be dynamically allocated
+void transfer_iterator_set_transaction(transfer_iterator_t transfer_iterator, iota_transaction_t transaction) {
+  transfer_iterator->transaction = transaction;
+}
+
 // Free an existing transfer iterator - compatible with free()
 void transfer_iterator_free(void *t) {
   if (t) {
+    transfer_iterator_t transfer_iterator = (transfer_iterator_t)t;
+    if (transfer_iterator->dynamic_transaction && transfer_iterator->transaction) {
+      transaction_free(transfer_iterator->transaction);
+    }
+    if (transfer_iterator->transaction_signature) {
+      free(transfer_iterator->transaction_signature);
+    }
     free(t);
   }
 }

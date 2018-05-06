@@ -107,9 +107,9 @@ typedef struct _transfer_value_in *transfer_value_in_t;
 struct _transfer_value_in {
   tryte_t address[81];
   uint64_t value;
-  // can have up to 2187 trytes as data!
+  // can have up to 2187 trytes as data
   size_t len;
-  tryte_t* data;
+  tryte_t data[2187];
 };
 
 // Get the address
@@ -215,13 +215,17 @@ struct _transfer_iterator {
   size_t current_transfer_transaction_index;
   size_t current_transaction_index;
   tryte_t bundle_hash[81];
-  tryte_t transaction_signature[6561];
+  tryte_t *transaction_signature;
+  iota_transaction_t transaction;
+  uint8_t dynamic_transaction;
 };
 
 // Returns the next transaction
-iota_transaction_t transfer_iterator_next(transfer_iterator_t transfer_iterator, const tryte_t *seed);
+iota_transaction_t transfer_iterator_next(transfer_iterator_t transfer_iterator);
 // Creates and returns a new transfer iterator
 transfer_iterator_t transfer_iterator_new(transfer_t *transfers, size_t len, Kerl* kerl);
+// Set statically allocated transaction - If not used, will be dynamically allocated
+void transfer_iterator_set_transaction(transfer_iterator_t transfer_iterator, iota_transaction_t transaction);
 // Free an existing transfer iterator - compatible with free()
 void transfer_iterator_free(void *transfer_iterator);
 
