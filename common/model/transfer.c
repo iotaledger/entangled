@@ -30,6 +30,7 @@ transfer_output_t transfer_output_new(void) {
     return NULL;
   }
   memset(transfer_output, 0, sizeof(struct _transfer_output));
+  memset(transfer_output->seed, '9', sizeof(transfer_output->seed));
   return transfer_output;
 }
 
@@ -123,6 +124,7 @@ transfer_data_t transfer_data_new(void) {
     return NULL;
   }
   memset(transfer_data, 0, sizeof(struct _transfer_data));
+  memset(transfer_data->address, '9', sizeof(transfer_data->address));
   return transfer_data;  
 }
 
@@ -195,6 +197,7 @@ transfer_value_out_t transfer_value_out_new(void) {
     return NULL;
   }
   memset(transfer_value_out, 0, sizeof(struct _transfer_value_out));
+  memset(transfer_value_out->address, '9', sizeof(transfer_value_out->address));
   transfer_value_out->output = transfer_output_new();
   if (!transfer_value_out->output) {
     // errno = IOTA_OUT_OF_MEMORY
@@ -273,6 +276,7 @@ transfer_value_in_t transfer_value_in_new(void) {
     return NULL;
   }
   memset(transfer_value_in, 0, sizeof(struct _transfer_value_in));
+  memset(transfer_value_in->address, '9', sizeof(transfer_value_in->address));
   return transfer_value_in;
 }
 
@@ -389,6 +393,7 @@ transfer_t transfer_new(transfer_type_e transfer_type) {
     return NULL;
   }
   memset(transfer, 0, sizeof(struct _transfer));
+  memset(transfer->tag, '9', sizeof(transfer->tag));
   transfer->type = transfer_type;
   switch (transfer_type) {
     case DATA:
@@ -498,7 +503,7 @@ transfer_ctx_t transfer_ctx_new(void) {
     return NULL;
   }
   memset(transfer_ctx, 0, sizeof(struct _transfer_ctx));
-  memset(transfer_ctx->bundle, 9, sizeof(transfer_ctx->bundle));
+  memset(transfer_ctx->bundle, '9', sizeof(transfer_ctx->bundle));
   return transfer_ctx;
 }
 
