@@ -406,14 +406,14 @@ void transaction_set_hash(iota_transaction_t transaction,
 // Reset all transaction fields
 void transaction_reset(iota_transaction_t transaction) {
   memset(transaction, 0, sizeof(struct _iota_transaction));
-  memset(transaction, '9', sizeof(transaction->signature_or_message));
-  memset(transaction, '9', sizeof(transaction->address));
-  memset(transaction, '9', sizeof(transaction->obsolete_tag));
-  memset(transaction, '9', sizeof(transaction->bundle));
-  memset(transaction, '9', sizeof(transaction->trunk));
-  memset(transaction, '9', sizeof(transaction->branch));
-  memset(transaction, '9', sizeof(transaction->tag));
-  memset(transaction, '9', sizeof(transaction->nonce));
+  memset(transaction->signature_or_message, '9', sizeof(transaction->signature_or_message));
+  memset(transaction->address, '9', sizeof(transaction->address));
+  memset(transaction->obsolete_tag, '9', sizeof(transaction->obsolete_tag));
+  memset(transaction->bundle, '9', sizeof(transaction->bundle));
+  memset(transaction->trunk, '9', sizeof(transaction->trunk));
+  memset(transaction->branch, '9', sizeof(transaction->branch));
+  memset(transaction->tag, '9', sizeof(transaction->tag));
+  memset(transaction->nonce, '9', sizeof(transaction->nonce));
 }
 
 /***********************************************************************************************************
