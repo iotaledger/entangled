@@ -1,0 +1,50 @@
+echocatcher:
+  #list of publisher to listen to. (they should return the echo)
+  publishers:
+      - "tcp://zmq.testnet.iota.org:5556"
+
+  #url of iri node
+  iri_host: "http://iri01.testnet.iota.cafe:14265"
+  #IP/Port that the Prometheus Exposer binds to
+  prometheus_exposer_uri: "0.0.0.0:8080"
+  #MWM for transaction's POW
+  mwm: 9
+  #time for db to load from publishers zmq [seconds]
+  tangledb_warmup_period: 360
+  #in-between transactions interval [seconds]
+  broadcast_interval: 20
+  #how often should echocatcher discover "unseen" transactions [seconds]
+  #shouldn't be too frequent since it can incur in multiple api
+  #calls ..
+  discovery_interval: 5
+
+statscollector:
+
+  #IP/Port that the Prometheus Exposer binds to
+  prometheus_exposer_uri: "0.0.0.0:8081"
+  #URL of ZMQ publisher to connect to
+  publishers:
+      - "tcp://zmq.testnet.iota.org:5556"
+
+  #histogram of bundle's confirmation duration granularity:
+  #(number of buckets = bundle_confirmation_histogram_range*1000 / bundle_confirmation_bucket_size)
+
+  #histogram's range  [seconds]
+  bundle_confirmation_histogram_range: 40
+  #bucket's size [milliseconds]
+  bundle_confirmation_bucket_size: 400
+
+blowballcollector:
+
+  #IP/Port that the Prometheus Exposer binds to
+  prometheus_exposer_uri: "0.0.0.0:8082"
+  #URL of ZMQ publisher to connect to
+  publisher: "tcp://zmq.testnet.iota.org:5556"
+
+  #interval between following snapshots (internal counters update)
+  snapshot_interval: 60
+  #histogram granularity configuration
+  #histogram's bucket's size (refcount of tx approvers)
+  bucket_size: 1
+  #histogram's range (maximum value of refcount to report)
+  histogram_range: 40
