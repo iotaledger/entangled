@@ -5,9 +5,11 @@
 //  Created by Rajiv Shah on 4/13/18.
 //
 
+#include "common/helpers/sign.h"
+#include "common/helpers/pow.h"
+
 #ifndef Interface_h
 #define Interface_h
-
 
 char* doPOW(const char* trytes, int mwm);
 char* generateAddress(const char* seed, const int index, const int security);

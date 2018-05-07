@@ -1,6 +1,7 @@
 #include "pow.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include "common/curl-p/hashcash.h"
 #include "common/trinary/trit_tryte.h"
 

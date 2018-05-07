@@ -4,6 +4,9 @@
 #include "common/curl-p/hashcash.h"
 #include "common/trinary/trit_tryte.h"
 
+#include <string.h>
+#include <stdlib.h>
+
 
 #define NONCE_LENGTH 27 * 3
 

@@ -141,3 +141,4 @@ xcuserdata/
 
 # iOS Frameworks
 *.framework
+*.framework/*

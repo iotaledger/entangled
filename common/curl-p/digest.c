@@ -1,6 +1,9 @@
 #include "digest.h"
 #include "common/trinary/trit_tryte.h"
 
+#include <string.h>
+#include <stdlib.h>
+
 void curl_digest(const trit_t* const trits, size_t len, trit_t* out, Curl* curl){
     char digest[HASH_LENGTH];
     curl_absorb(curl, trits, len);
