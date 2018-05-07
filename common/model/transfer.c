@@ -18,7 +18,7 @@
 /***********************************************************************************************************
  * Transfer Input data structure
  ***********************************************************************************************************/
-// To obfuscate the model, the structure definition comees here
+// To obfuscate the model, the structure definition comes here
 // struct _transfer_output {...};
 
 // Creates and returns a new transfer output
@@ -74,7 +74,7 @@ void transfer_output_free(void *t) {
 /***********************************************************************************************************
  * Transfer Data data structure
  ***********************************************************************************************************/
-// To obfuscate the model, the structure definition comees here
+// To obfuscate the model, the structure definition comes here
 // struct _transfer_data {...};
 
 // Get the address
@@ -142,7 +142,7 @@ void transfer_data_free(void *t) {
 /***********************************************************************************************************
  * Transfer Value Out data structure
  ***********************************************************************************************************/
-// To obfuscate the model, the structure definition comees here
+// To obfuscate the model, the structure definition comes here
 // struct _transfer_value_out {...};
 
 // Get the address
@@ -221,7 +221,7 @@ void transfer_value_out_free(void *t) {
 /***********************************************************************************************************
  * Transfer Value In data structure
  ***********************************************************************************************************/
-// To obfuscate the model, the structure definition comees here
+// To obfuscate the model, the structure definition comes here
 // struct _transfer_value_in {...};
 
 // Get the address
@@ -262,7 +262,7 @@ void transfer_value_in_set_data(transfer_value_in_t transfer_value_in, tryte_t *
   }
 }
 
-// Get the number of transactions for this value out transfer
+// Get the number of transactions for this value in transfer
 size_t transfer_value_in_transactions_count(transfer_value_in_t transfer_value_in) {
   return 1;
 }
@@ -276,7 +276,6 @@ transfer_value_in_t transfer_value_in_new(void) {
     return NULL;
   }
   memset(transfer_value_in, 0, sizeof(struct _transfer_value_in));
-  memset(transfer_value_in->address, '9', sizeof(transfer_value_in->address));
   return transfer_value_in;
 }
 
@@ -290,7 +289,7 @@ void transfer_value_in_free(void *t) {
 /***********************************************************************************************************
  * Transfer data structure
  ***********************************************************************************************************/
-// To obfuscate the model, the structure definition comees here
+// To obfuscate the model, the structure definition comes here
 // struct _transfer {...};
 
 // Get the type
@@ -434,7 +433,7 @@ void transfer_free(void *t) {
 /***********************************************************************************************************
  * Transfer Context data structure
  ***********************************************************************************************************/
-// To obfuscate the model, the structure definition comees here
+// To obfuscate the model, the structure definition comes here
 // struct _transfer_ctx {...};
 
 // Creates and returns a new transfer context
@@ -517,7 +516,7 @@ void transfer_ctx_free(void *t) {
 /***********************************************************************************************************
  * Transfer Iterator data structure
  ***********************************************************************************************************/
-// To obfuscate the model, the structure definition comees here
+// To obfuscate the model, the structure definition comes here
 // struct _transfer_iterator {...};
 
 /***********************************************************************************************************
