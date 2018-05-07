@@ -23,9 +23,11 @@ start container
 
 iOS
 ====================================
-* Bitcode is currently not supported (see [this bug](https://github.com/bazelbuild/bazel/issues/4982) for more info)
 
 ## How to Use
+
+#### Compiling
+`bazel build --ios_multi_cpus=i386,x86_64,armv7,arm64 --copt=-fembed-bitcode --copt=-Ofast //mobile/ios:ios_bindings`
 
 #### Objective-C
 1. Drag and drop your compiled EntangledKit.framework into your Xcode project. It should appear under "Linked Frameworks and Libraries" in the General tab of your target and in the "Link Binary With Libraries" step on the Build Phases tab of your target.
