@@ -51,7 +51,7 @@ typedef struct _transfer_data *transfer_data_t;
 struct _transfer_data {
   tryte_t address[81];
   size_t len;
-  tryte_t* data;
+  tryte_t *data;
 };
 
 // Get the address
