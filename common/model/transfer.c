@@ -64,11 +64,9 @@ void transfer_output_set_index(transfer_output_t transfer_output, size_t index) 
   transfer_output->index = index;
 }
 
-// Free an existing transfer output - compatible with free()
-void transfer_output_free(void *t) {
-  if (t) {
-    free(t);
-  }
+// Free an existing transfer output
+void transfer_output_free(transfer_output_t transfer_output) {
+  free(transfer_output);
 }
 
 /***********************************************************************************************************
@@ -128,15 +126,12 @@ transfer_data_t transfer_data_new(void) {
   return transfer_data;  
 }
 
-// Free an existing transfer data - compatible with free()
-void transfer_data_free(void *t) {
-  if (t) {
-    transfer_data_t transfer_data = (transfer_data_t)t;
-    if (transfer_data->data) {
-      free(transfer_data->data);
-    }
-    free(t);
+// Free an existing transfer data
+void transfer_data_free(transfer_data_t transfer_data) {
+  if (transfer_data->data) {
+    free(transfer_data->data);
   }
+  free(transfer_data);
 }
 
 /***********************************************************************************************************
@@ -173,7 +168,7 @@ transfer_output_t transfer_value_out_output(transfer_value_out_t transfer_value_
 // Set the transfer output (copy argument)
 void transfer_value_out_set_output(transfer_value_out_t transfer_value_out, transfer_output_t transfer_output) {
   if (transfer_value_out->output) {
-    transfer_value_out_free(transfer_value_out->output);
+    transfer_output_free(transfer_value_out->output);
     transfer_value_out->output = NULL;
   }
   transfer_output_t output = transfer_output_new();
@@ -183,12 +178,12 @@ void transfer_value_out_set_output(transfer_value_out_t transfer_value_out, tran
   transfer_value_out->output = transfer_output;
 }
 
-// Get the number of transactions for this value in transfer
+// Get the number of transactions for this value out transfer
 size_t transfer_value_out_transactions_count(transfer_value_out_t transfer_value_out) {
   return transfer_output_security(transfer_value_out_output(transfer_value_out));
 }
 
-// Creates and returns a new transfer value in
+// Creates and returns a new transfer value out
 transfer_value_out_t transfer_value_out_new(void) {
   transfer_value_out_t transfer_value_out;
   transfer_value_out = (transfer_value_out_t)malloc(sizeof(struct _transfer_value_out));
@@ -207,15 +202,12 @@ transfer_value_out_t transfer_value_out_new(void) {
   return transfer_value_out;
 }
 
-// Free an existing transfer value in - compatible with free()
-void transfer_value_out_free(void *t) {
-  if (t) {
-    transfer_value_out_t transfer_value_out = (transfer_value_out_t)t;
-    if (transfer_value_out->output) {
-      transfer_output_free(transfer_value_out->output);
-    }
-    free(t);
+// Free an existing transfer value out
+void transfer_value_out_free(transfer_value_out_t transfer_value_out) {
+  if (transfer_value_out->output) {
+    transfer_output_free(transfer_value_out->output);
   }
+  free(transfer_value_out);
 }
 
 /***********************************************************************************************************
@@ -267,7 +259,7 @@ size_t transfer_value_in_transactions_count(transfer_value_in_t transfer_value_i
   return 1;
 }
 
-// Creates and returns a new transfer value out
+// Creates and returns a new transfer value in
 transfer_value_in_t transfer_value_in_new(void) {
   transfer_value_in_t transfer_value_in;
   transfer_value_in = (transfer_value_in_t)malloc(sizeof(struct _transfer_value_in));
@@ -279,11 +271,9 @@ transfer_value_in_t transfer_value_in_new(void) {
   return transfer_value_in;
 }
 
-// Free an existing transfer value out - compatible with free()
-void transfer_value_in_free(void *t) {
-  if (t) {
-    free(t);
-  }  
+// Free an existing transfer value in
+void transfer_value_in_free(transfer_value_in_t transfer_value_in) {
+  free(transfer_value_in);
 }
 
 /***********************************************************************************************************
@@ -411,23 +401,20 @@ transfer_t transfer_new(transfer_type_e transfer_type) {
   return transfer;  
 }
 
-// Free an existing transfer - compatible with free()
-void transfer_free(void *t) {
-  if (t) {
-    transfer_t transfer = (transfer_t)t;
-    switch (transfer_type(transfer)) {
-      case DATA:
-        transfer_data_free(transfer_data(transfer));
-        break;
-      case VALUE_OUT:
-        transfer_value_out_free(transfer_value_out(transfer));
-        break;
-      case VALUE_IN:
-        transfer_value_in_free(transfer_value_in(transfer));
-        break;    
-    }
-    free(t);
+// Free an existing transfer
+void transfer_free(transfer_t transfer) {
+  switch (transfer_type(transfer)) {
+    case DATA:
+      transfer_data_free(transfer_data(transfer));
+      break;
+    case VALUE_OUT:
+      transfer_value_out_free(transfer_value_out(transfer));
+      break;
+    case VALUE_IN:
+      transfer_value_in_free(transfer_value_in(transfer));
+      break;    
   }
+  free(transfer);
 }
 
 /***********************************************************************************************************
@@ -506,11 +493,9 @@ transfer_ctx_t transfer_ctx_new(void) {
   return transfer_ctx;
 }
 
-// Free an existing transfer context - compatible with free()
-void transfer_ctx_free(void *t) {
-  if (t) {
-    free(t);
-  }
+// Free an existing transfer context
+void transfer_ctx_free(transfer_ctx_t transfer_ctx) {
+  free(transfer_ctx);
 }
 
 /***********************************************************************************************************
@@ -640,16 +625,13 @@ void transfer_iterator_set_transaction(transfer_iterator_t transfer_iterator, io
   transfer_iterator->transaction = transaction;
 }
 
-// Free an existing transfer iterator - compatible with free()
-void transfer_iterator_free(void *t) {
-  if (t) {
-    transfer_iterator_t transfer_iterator = (transfer_iterator_t)t;
-    if (transfer_iterator->dynamic_transaction && transfer_iterator->transaction) {
-      transaction_free(transfer_iterator->transaction);
-    }
-    if (transfer_iterator->transaction_signature) {
-      free(transfer_iterator->transaction_signature);
-    }
-    free(t);
+// Free an existing transfer iterator
+void transfer_iterator_free(transfer_iterator_t transfer_iterator) {
+  if (transfer_iterator->dynamic_transaction && transfer_iterator->transaction) {
+    transaction_free(transfer_iterator->transaction);
   }
+  if (transfer_iterator->transaction_signature) {
+    free(transfer_iterator->transaction_signature);
+  }
+  free(transfer_iterator);
 }
