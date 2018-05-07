@@ -498,4 +498,4 @@ size_t transaction_deserialize_from_trits(iota_transaction_t transaction,
  * Destructor
  ***********************************************************************************************************/
 // Free an existing transaction - compatible with free()
-void transaction_free(void *t) { free(t); }
+void transaction_free(iota_transaction_t t) { free(t); }

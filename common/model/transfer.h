@@ -41,8 +41,8 @@ size_t transfer_output_index(transfer_output_t transfer_output);
 void transfer_output_set_index(transfer_output_t transfer_output, size_t index);
 // Creates and returns a new transfer input
 transfer_output_t transfer_output_new(void);
-// Free an existing transfer input - compatible with free()
-void transfer_output_free(void *transfer_output);
+// Free an existing transfer input
+void transfer_output_free(transfer_output_t transfer_output);
 
 /***********************************************************************************************************
  * Transfer Data data structure
@@ -68,8 +68,8 @@ void transfer_data_set_data(transfer_data_t transfer_data, tryte_t *data, size_t
 size_t transfer_data_transactions_count(transfer_data_t transfer_data);
 // Creates and returns a new transfer data
 transfer_data_t transfer_data_new(void);
-// Free an existing transfer data - compatible with free()
-void transfer_data_free(void *transfer_data);
+// Free an existing transfer data
+void transfer_data_free(transfer_data_t transfer_data);
 
 /***********************************************************************************************************
  * Transfer Value Out data structure
@@ -93,12 +93,12 @@ void transfer_value_out_set_value(transfer_value_out_t transfer_value_out, int64
 transfer_output_t transfer_value_out_output(transfer_value_out_t transfer_value_out);
 // Set the transfer output (copy argument)
 void transfer_value_out_set_output(transfer_value_out_t transfer_value_out, transfer_output_t transfer_output);
-// Get the number of transactions for this value in transfer
+// Get the number of transactions for this value out transfer
 size_t transfer_value_out_transactions_count(transfer_value_out_t transfer_value_out);
-// Creates and returns a new transfer value in
+// Creates and returns a new transfer value out
 transfer_value_out_t transfer_value_out_new(void);
-// Free an existing transfer value in - compatible with free()
-void transfer_value_out_free(void *transfer_value_out);
+// Free an existing transfer value out
+void transfer_value_out_free(transfer_value_out_t transfer_value_out);
 
 /***********************************************************************************************************
  * Transfer Value In data structure
@@ -126,12 +126,12 @@ size_t transfer_value_in_len(transfer_value_in_t transfer_value_in);
 tryte_t *transfer_value_in_data(transfer_value_in_t transfer_value_in);
 // Set the data (copy argument)
 void transfer_value_in_set_data(transfer_value_in_t transfer_value_in, tryte_t *data, size_t len);
-// Get the number of transactions for this value out transfer
+// Get the number of transactions for this value int transfer
 size_t transfer_value_in_transactions_count(transfer_value_in_t transfer_value_in);
-// Creates and returns a new transfer value out
+// Creates and returns a new transfer value in
 transfer_value_in_t transfer_value_in_new(void);
-// Free an existing transfer value out - compatible with free()
-void transfer_value_in_free(void *transfer_value_in);
+// Free an existing transfer value in
+void transfer_value_in_free(transfer_value_in_t transfer_value_in);
 
 /***********************************************************************************************************
  * Transfer data structure
@@ -178,8 +178,8 @@ transfer_value_out_t transfer_value_out(transfer_t transfer);
 transfer_value_in_t transfer_value_in(transfer_t transfer);
 // Creates and returns a new transfer
 transfer_t transfer_new(transfer_type_e transfer_type);
-// Free an existing transfer - compatible with free()
-void transfer_free(void *transfer);
+// Free an existing transfer
+void transfer_free(transfer_t transfer);
 
 /***********************************************************************************************************
  * Transfer Context data structure
@@ -200,8 +200,8 @@ int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl* kerl, transfer_t *trans
 tryte_t *transfer_ctx_finalize(transfer_ctx_t transfer_ctx);
 // Creates and returns a new transfer context
 transfer_ctx_t transfer_ctx_new(void);
-// Free an existing transfer context - compatible with free()
-void transfer_ctx_free(void *transfer_ctx);
+// Free an existing transfer context
+void transfer_ctx_free(transfer_ctx_t transfer_ctx);
 
 /***********************************************************************************************************
  * Transfer Iterator data structure
@@ -226,8 +226,8 @@ iota_transaction_t transfer_iterator_next(transfer_iterator_t transfer_iterator)
 transfer_iterator_t transfer_iterator_new(transfer_t *transfers, size_t len, Kerl* kerl);
 // Set statically allocated transaction - If not used, will be dynamically allocated
 void transfer_iterator_set_transaction(transfer_iterator_t transfer_iterator, iota_transaction_t transaction);
-// Free an existing transfer iterator - compatible with free()
-void transfer_iterator_free(void *transfer_iterator);
+// Free an existing transfer iterator
+void transfer_iterator_free(transfer_iterator_t transfer_iterator);
 
 #endif  // __COMMON_MODEL_TRANSFER_H_
 #ifdef __cplusplus
