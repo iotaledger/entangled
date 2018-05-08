@@ -8,6 +8,8 @@
 #import <Foundation/Foundation.h>
 #import "Interface.h"
 
+#include "common/helpers/sign.h"
+#include "common/helpers/pow.h"
 
 char* doPOW(const char* trytes, int mwm) {
     char* nonce_trytes = iota_pow(trytes, mwm);
