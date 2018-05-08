@@ -460,7 +460,7 @@ int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl* kerl, transfer_t *trans
       memcpy(essence + 108, transfer_tag(transfer), 27);
       long_to_trytes(transfer_timestamp(transfer), essence + 135);
       long_to_trytes(current_index, essence + 144);
-      long_to_trytes(transfer_ctx->count, essence + 153);
+      long_to_trytes(transfer_ctx->count - 1, essence + 153);
       // essence in in trytes, convert to trits
       trytes_to_trits(essence, essence_trits, TRYTES_PER_ESSENCE);
       // Absorb essence in kerl
