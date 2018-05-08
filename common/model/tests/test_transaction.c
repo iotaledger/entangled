@@ -1620,6 +1620,7 @@ void test_reset(void) {
   transaction_reset(transaction);
   TEST_ASSERT_EQUAL_INT8(0, transaction->address[0]);
   TEST_ASSERT_EQUAL_MEMORY("999999999999999999999999999", transaction->obsolete_tag, sizeof(transaction->obsolete_tag));
+  transaction_free(transaction);
 }
 
 int main(void) {
