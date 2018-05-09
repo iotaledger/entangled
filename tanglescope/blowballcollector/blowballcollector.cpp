@@ -18,6 +18,8 @@ bool BlowballCollector::parseConfiguration(const YAML::Node& conf) {
 
   _zmqPublisher = conf[PUBLISHER].as<std::string>();
   _snapshotInterval = conf[SNAPSHOT_INTERVAL].as<uint32_t>();
+  _histogramRange = conf[HISTOGRAM_RANGE].as<uint32_t>();
+  _bucketSize = conf[BUCKET_SIZE].as<uint32_t>();
   return true;
 }
 
@@ -130,7 +132,7 @@ PrometheusCollector::HistogramsMap BlowballCollector::buildHistogramsMap(
   std::map<std::string, std::reference_wrapper<Family<Histogram>>> families;
   for (const auto& kv : nameToDesc) {
     auto& curr_family = BuildHistogram()
-                            .Name("topology_mapper_" + kv.first)
+                            .Name("blowball_collector" + kv.first)
                             .Help(kv.second)
                             .Labels(labels)
                             .Register(*registry);

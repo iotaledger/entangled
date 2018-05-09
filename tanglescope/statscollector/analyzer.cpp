@@ -80,12 +80,12 @@ void TXAnalyzer::transactionConfirmed(std::shared_ptr<iri::SNMessage> msg) {
         totalValue += tx->value();
       }
 
-      auto elapsedMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+      auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(
                            std::chrono::system_clock::now() - tx->arrivalTime())
                            .count();
 
       // We normalise on bundle here
-      duration = (elapsedMs + size * duration) / (size + 1);
+      duration = (elapsedSeconds + size * duration) / (size + 1);
     }
     size++;
   }

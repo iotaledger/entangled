@@ -13,7 +13,7 @@ namespace statscollector {
 
 FrameTXStats::FrameTXStats(uint32_t bundleConfirmationHistogramRange,
                            uint32_t bundleConfirmationHistogramBucketSize)
-    : _buckets(bundleConfirmationHistogramRange * 1000 /
+    : _buckets(bundleConfirmationHistogramRange /
                bundleConfirmationHistogramBucketSize) {
   double currInterval = 0;
   std::generate(_buckets.begin(), _buckets.end(),

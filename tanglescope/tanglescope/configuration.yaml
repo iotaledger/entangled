@@ -30,9 +30,9 @@ statscollector:
   #(number of buckets = bundle_confirmation_histogram_range*1000 / bundle_confirmation_bucket_size)
 
   #histogram's range  [seconds]
-  bundle_confirmation_histogram_range: 40
-  #bucket's size [milliseconds]
-  bundle_confirmation_bucket_size: 400
+  bundle_confirmation_histogram_range: 240
+  #bucket's size [seconds]
+  bundle_confirmation_bucket_size: 2
 
 blowballcollector:
 
