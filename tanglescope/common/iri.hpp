@@ -173,6 +173,34 @@ class LMHSMessage : public IRIMessage {
  private:
   std::string _latestSolidMilestoneHash;
 };
+
+class RSTATMessage : public IRIMessage {
+ public:
+  explicit RSTATMessage(std::string_view from) {
+    auto chunks = IRIMessage::chunks(from);
+    this->_toProcess = std::stoull(chunks[0]);
+    this->_toBroadcast = std::stoull(chunks[1]);
+    this->_toRequest = std::stoull(chunks[2]);
+    this->_toReply = std::stoull(chunks[3]);
+    this->_totalTransactions = std::stoull(chunks[4]);
+  }
+
+  inline IRIMessageType type() { return IRIMessageType::RSTAT; }
+
+ public:
+  uint64_t toProcess() { return this->_toProcess; }
+  uint64_t toBroadcast() { return this->_toBroadcast; }
+  uint64_t toRequest() { return this->_toRequest; }
+  uint64_t toReply() { return this->_toReply; }
+  uint64_t totalTransactions() { return this->_totalTransactions; }
+
+ private:
+  uint32_t _toProcess;
+  uint32_t _toBroadcast;
+  uint32_t _toRequest;
+  uint32_t _toReply;
+  uint32_t _totalTransactions;
+};
 }  // namespace iri
 }  // namespace tanglescope
 }  // namespace iota

@@ -21,7 +21,8 @@ class ZMQCollectorImpl {
  public:
   ZMQCollectorImpl(std::string zmqURL,
                    PrometheusCollector::CountersMap counters,
-                   PrometheusCollector::HistogramsMap histograms);
+                   PrometheusCollector::HistogramsMap histograms,
+                   PrometheusCollector::GaugeMap gauges);
   void collect(uint32_t bundleConfirmationHistogramRange,
                uint32_t bundleConfirmationBucketSize);
 
@@ -29,6 +30,7 @@ class ZMQCollectorImpl {
   std::string _zmqURL;
   PrometheusCollector::CountersMap _counters;
   PrometheusCollector::HistogramsMap _histograms;
+  PrometheusCollector::GaugeMap _gauges;
 };
 class StatsCollector : public PrometheusCollector {
  public:
@@ -41,6 +43,10 @@ class StatsCollector : public PrometheusCollector {
       const std::map<std::string, std::string>& labels);
 
   virtual PrometheusCollector::HistogramsMap buildHistogramsMap(
+      std::shared_ptr<prometheus::Registry> registry,
+      const std::map<std::string, std::string>& labels);
+
+  virtual PrometheusCollector::GaugeMap buildGaugeMap(
       std::shared_ptr<prometheus::Registry> registry,
       const std::map<std::string, std::string>& labels);
 

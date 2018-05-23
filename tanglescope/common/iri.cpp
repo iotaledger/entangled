@@ -15,8 +15,10 @@ std::shared_ptr<IRIMessage> payloadToMsg(std::string_view payload) {
     return std::make_shared<TXMessage>(actual);
   } else if (what == "sn") {
     return std::make_shared<SNMessage>(actual);
-  }else if (what == "lmhs") {
+  } else if (what == "lmhs") {
     return std::make_shared<LMHSMessage>(actual);
+  } else if (what == "rstat") {
+    return std::make_shared<RSTATMessage>(actual);
   }
 
   return nullptr;

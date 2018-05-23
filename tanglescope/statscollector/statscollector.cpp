@@ -50,8 +50,9 @@ void StatsCollector::collect() {
   for (auto zmqURL : _zmqPublishers) {
     auto counters = buildCountersMap(registry, {{"publish_node", zmqURL}});
     auto histograms = buildHistogramsMap(registry, {{"publish_node", zmqURL}});
-    auto collector =
-        ZMQCollectorImpl(zmqURL, std::move(counters), std::move(histograms));
+    auto gauges = buildGaugeMap(registry, {{"publish_node", zmqURL}});
+    auto collector = ZMQCollectorImpl(zmqURL, std::move(counters),
+                                      std::move(histograms), std::move(gauges));
     _zmqCollectors.push_back(std::move(collector));
   }
   exposer.RegisterCollectable(registry);
@@ -71,8 +72,12 @@ void StatsCollector::collect() {
 
 ZMQCollectorImpl::ZMQCollectorImpl(
     std::string zmqURL, PrometheusCollector::CountersMap counters,
-    PrometheusCollector::HistogramsMap histograms)
-    : _zmqURL(zmqURL), _counters(counters), _histograms(histograms) {}
+    PrometheusCollector::HistogramsMap histograms,
+    PrometheusCollector::GaugeMap gauges)
+    : _zmqURL(zmqURL),
+      _counters(counters),
+      _histograms(histograms),
+      _gauges(gauges) {}
 
 void ZMQCollectorImpl::collect(uint32_t bundleConfirmationHistogramRange,
                                uint32_t bundleConfirmationBucketSize) {
@@ -88,8 +93,8 @@ void ZMQCollectorImpl::collect(uint32_t bundleConfirmationHistogramRange,
   zmqObservable.observe_on(rxcpp::synchronize_new_thread())
       .as_blocking()
       .subscribe(
-          [weakAnalyzer =
-               std::weak_ptr(analyzer)](std::shared_ptr<iri::IRIMessage> msg) {
+          [weakAnalyzer = std::weak_ptr(analyzer),
+           &gauges = _gauges](std::shared_ptr<iri::IRIMessage> msg) {
             auto analyzer = weakAnalyzer.lock();
             // FIXME (@th0br0) Proper error handling.
             if (!analyzer) return;
@@ -103,6 +108,30 @@ void ZMQCollectorImpl::collect(uint32_t bundleConfirmationHistogramRange,
                 analyzer->transactionConfirmed(
                     std::static_pointer_cast<iri::SNMessage>(std::move(msg)));
                 break;
+              case iri::IRIMessageType::RSTAT: {
+                auto rstatMessage =
+                    std::static_pointer_cast<iri::RSTATMessage>(std::move(msg));
+                gauges.at("to_process")
+                    .get()
+                    .Add({})
+                    .Set(rstatMessage->toProcess());
+                gauges.at("to_broadcast")
+                    .get()
+                    .Add({})
+                    .Set(rstatMessage->toBroadcast());
+                gauges.at("to_request")
+                    .get()
+                    .Add({})
+                    .Set(rstatMessage->toRequest());
+                gauges.at("to_reply")
+                    .get()
+                    .Add({})
+                    .Set(rstatMessage->toReply());
+                gauges.at("total_transactions")
+                    .get()
+                    .Add({})
+                    .Set(rstatMessage->totalTransactions());
+              } break;
               default:
                 break;
             };
@@ -150,6 +179,32 @@ PrometheusCollector::HistogramsMap StatsCollector::buildHistogramsMap(
   for (const auto& kv : nameToDesc) {
     auto& curr_family = BuildHistogram()
                             .Name("statscollector_" + kv.first)
+                            .Help(kv.second)
+                            .Labels(labels)
+                            .Register(*registry);
+
+    families.insert(
+        std::make_pair(std::string(kv.first), std::ref(curr_family)));
+  }
+
+  return std::move(families);
+}
+
+PrometheusCollector::GaugeMap StatsCollector::buildGaugeMap(
+    std::shared_ptr<Registry> registry,
+    const std::map<std::string, std::string>& labels) {
+  static std::map<std::string, std::string> nameToDesc = {
+      {"to_process", "Number of transactions to process"},
+      {"to_broadcast", "Number of transactions to broadcast to other nodes"},
+      {"to_request", "Number of transactions to request from other nodes"},
+      {"to_reply", "Number of transactions to reply to nodes who requested"},
+      {"total_transactions", "Number of transactions stored in node"}};
+
+  std::map<std::string, std::reference_wrapper<Family<Gauge>>> families;
+
+  for (const auto& kv : nameToDesc) {
+    auto& curr_family = BuildGauge()
+                            .Name("statscollector_rstat_" + kv.first)
                             .Help(kv.second)
                             .Labels(labels)
                             .Register(*registry);
