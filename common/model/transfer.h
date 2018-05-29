@@ -206,6 +206,9 @@ void transfer_ctx_free(transfer_ctx_t transfer_ctx);
 /***********************************************************************************************************
  * Transfer Iterator data structure
  ***********************************************************************************************************/
+typedef char *(*iota_signature_generator)(const char* seed, const size_t index,
+                                          const size_t security, const char* bundleHash);
+
 typedef struct _transfer_iterator *transfer_iterator_t;
 struct _transfer_iterator {
   transfer_t *transfers;
@@ -218,6 +221,7 @@ struct _transfer_iterator {
   tryte_t *transaction_signature;
   iota_transaction_t transaction;
   uint8_t dynamic_transaction;
+  iota_signature_generator iota_signature_gen;
 };
 
 // Returns the next transaction
@@ -226,6 +230,10 @@ iota_transaction_t transfer_iterator_next(transfer_iterator_t transfer_iterator)
 transfer_iterator_t transfer_iterator_new(transfer_t *transfers, size_t len, Kerl* kerl);
 // Set statically allocated transaction - If not used, will be dynamically allocated
 void transfer_iterator_set_transaction(transfer_iterator_t transfer_iterator, iota_transaction_t transaction);
+// Get signature generator function
+iota_signature_generator transfer_iterator_sign_gen(transfer_iterator_t transfer_iterator);
+// Set signature generator function
+void transfer_iterator_set_sign_gen(transfer_iterator_t transfer_iterator, iota_signature_generator iota_signature_gen);
 // Free an existing transfer iterator
 void transfer_iterator_free(transfer_iterator_t transfer_iterator);
 

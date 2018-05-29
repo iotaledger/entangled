@@ -525,7 +525,8 @@ void transfer_iterator_next_output_transaction(transfer_iterator_t transfer_iter
     if (transfer_iterator->transaction_signature) {
       free(transfer_iterator->transaction_signature);
     }
-    transfer_iterator->transaction_signature = (tryte_t *)iota_sign_signature_gen(
+    iota_signature_generator iota_signature_gen = transfer_iterator_sign_gen(transfer_iterator);
+    transfer_iterator->transaction_signature = (tryte_t *)iota_signature_gen(
       (const char *)transfer_output_seed(output),
       (const size_t)transfer_output_index(output),
       (const size_t)transfer_output_security(output),
@@ -617,12 +618,23 @@ transfer_iterator_t transfer_iterator_new(transfer_t *transfers, size_t len, Ker
   transfer_ctx_hash(transfer_ctx, kerl, transfers, len);
   memcpy(transfer_iterator->bundle_hash, transfer_ctx_finalize(transfer_ctx), 81);
   transfer_ctx_free(transfer_ctx);
+  transfer_iterator_set_sign_gen(transfer_iterator, iota_sign_signature_gen);
   return transfer_iterator;
 }
 
 // Set statically allocated transaction - If not used, will be dynamically allocated
 void transfer_iterator_set_transaction(transfer_iterator_t transfer_iterator, iota_transaction_t transaction) {
   transfer_iterator->transaction = transaction;
+}
+
+// Get signature generator function
+iota_signature_generator transfer_iterator_sign_gen(transfer_iterator_t transfer_iterator) {
+  return transfer_iterator->iota_signature_gen;
+}
+
+// Set signature generator function
+void transfer_iterator_set_sign_gen(transfer_iterator_t transfer_iterator, iota_signature_generator iota_signature_gen) {
+  transfer_iterator->iota_signature_gen = iota_signature_gen;
 }
 
 // Free an existing transfer iterator
