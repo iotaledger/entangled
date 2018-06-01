@@ -49,3 +49,13 @@ cc_test (
         "@unity//:unity",
     ]
 )
+
+cc_test (
+    name = "test_trit_array",
+    srcs = ["test_trit_array.c"],
+    deps = [
+        "//common/trinary:trit_array",
+        "//common/trinary:trit_byte",
+        "@unity//:unity",
+    ]
+)

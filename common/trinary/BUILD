@@ -92,3 +92,14 @@ cc_library(
     deps=[
         ":tryte",
     ], )
+
+cc_library(
+    name="trit_array",
+    srcs=["trit_array.c"],
+    hdrs=["trit_array.h"],
+    deps=[
+        ":trits",
+        ":trit_byte",
+        "//common:stdint",
+    ], )
+
