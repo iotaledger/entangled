@@ -41,7 +41,7 @@ void test_trit_array_static_set(void) {
 void test_trit_array_static_slice(void) {
   TRIT_ARRAY_ASSIGN(from, NUM_TRITS, TRITS_IN);
   TRIT_ARRAY_DECLARE(to, 7);
-  trit_array_t pto = &to;
+  trit_array_p pto = &to;
   trit_array_slice(&from, &pto, 6, 7);
   TEST_ASSERT_EQUAL_INT(1, trit_array_at(&to, 0));
   TEST_ASSERT_EQUAL_INT(0, trit_array_at(&to, 1));
