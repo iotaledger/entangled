@@ -22,7 +22,7 @@ extern "C" {
 
 typedef struct _trit_array *trit_array_p;
 typedef struct _trit_array {
-  char *trits;
+  int8_t *trits;
   size_t num_trits;
   size_t num_bytes;
   uint8_t dynamic;
@@ -86,9 +86,11 @@ static inline void trit_array_set_at(trit_array_p trit_array, size_t index, trit
 #endif
 }
 
-void trit_array_set_trits(trit_array_p trit_array, char *trits, size_t num_trits);
+void trit_array_set_trits(trit_array_p trit_array, int8_t *trits, size_t num_trits);
 trit_array_p trit_array_slice(trit_array_p trit_array, trit_array_p to_trit_array, size_t start, size_t num_trits);
+int8_t *trit_array_to_int8(trit_array_p trit_array, int8_t *trits);
 
+#if !defined(NO_DYNAMIC_ALLOCATION)
 /***********************************************************************************************************
  * Constructor
  ***********************************************************************************************************/
@@ -100,15 +102,17 @@ trit_array_p trit_array_new(size_t num_trits);
  ***********************************************************************************************************/
 void trit_array_free(trit_array_p trit_array);
 
+#endif //NO_DYNAMIC_ALLOCATION
+
 #define TRIT_ARRAY_DECLARE(NAME, NUM_TRITS) \
-size_t NAME ## _num_trits = trit_array_bytes_for_trits(NUM_TRITS); \
-char *NAME ## _trits[NAME ## _num_trits]; \
-struct _trit_array NAME = { (char *) NAME ## _trits, NAME ## _num_trits };
+size_t NAME ## _num_bytes = trit_array_bytes_for_trits(NUM_TRITS); \
+int8_t *NAME ## _trits[NAME ## _num_bytes]; \
+struct _trit_array NAME = { (int8_t *) NAME ## _trits, NUM_TRITS, NAME ## _num_bytes };
 
 #define TRIT_ARRAY_ASSIGN(NAME, NUM_TRITS, TRITS) \
-size_t NAME ## _num_trits = trit_array_bytes_for_trits(NUM_TRITS); \
+size_t NAME ## _num_bytes = trit_array_bytes_for_trits(NUM_TRITS); \
 trit_t NAME ## _trits[] = {TRITS}; \
-struct _trit_array NAME = { (char *) NAME ## _trits, NAME ## _num_trits };
+struct _trit_array NAME = { (int8_t *) NAME ## _trits, NUM_TRITS, NAME ## _num_bytes };
 
 #endif
 #ifdef __cplusplus

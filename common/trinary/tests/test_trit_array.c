@@ -16,6 +16,7 @@
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
 #define TRITS_IN  0x23, 0x98, 0x25, 0x02
 #endif
+#define TRITS_OUT  -1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1, 1, 0, -1, 1
 #define NUM_TRITS 17
 
 void test_trit_array_static(void) {
@@ -51,12 +52,21 @@ void test_trit_array_static_slice(void) {
   TEST_ASSERT_EQUAL_INT(1, trit_array_at(&to, 6));
 }
 
+void test_trit_array_static_to_int8(void) {
+  int8_t trits[NUM_TRITS];
+  trit_t trits_out[] = {TRITS_OUT};
+  TRIT_ARRAY_ASSIGN(test, NUM_TRITS, TRITS_IN);
+  trit_array_to_int8(&test, trits);
+  TEST_ASSERT_EQUAL_MEMORY(trits_out, trits, NUM_TRITS);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_trit_array_static);
   RUN_TEST(test_trit_array_static_set);
   RUN_TEST(test_trit_array_static_slice);
+  RUN_TEST(test_trit_array_static_to_int8);
   
   return UNITY_END();
 }

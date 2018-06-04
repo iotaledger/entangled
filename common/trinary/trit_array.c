@@ -37,37 +37,40 @@ size_t trit_array_bytes_for_trits(size_t num_trits) {
 /***********************************************************************************************************
  * Accessors
  ***********************************************************************************************************/
-void trit_array_set_trits(trit_array_p trit_array, char *trits, size_t num_trits) {
+void trit_array_set_trits(trit_array_p trit_array, int8_t *trits, size_t num_trits) {
+#if !defined(NO_DYNAMIC_ALLOCATION)
   if (trit_array->dynamic) {
     free(trit_array->trits);
     trit_array->dynamic = 0;
   }
+#endif //NO_DYNAMIC_ALLOCATION
   trit_array->trits = trits;
   trit_array->num_trits = num_trits;
   trit_array->num_bytes = trit_array_bytes_for_trits(num_trits);
 }
 
 trit_array_p trit_array_slice(trit_array_p trit_array, trit_array_p to_trit_array, size_t start, size_t num_trits) {
-  trit_array_p new_trit_array;
-  new_trit_array = to_trit_array ? to_trit_array : trit_array_new(num_trits);
-  new_trit_array->num_trits = num_trits;
-  new_trit_array->num_bytes = trit_array_bytes_for_trits(num_trits);
+#if !defined(NO_DYNAMIC_ALLOCATION)
+  to_trit_array = to_trit_array ? to_trit_array : trit_array_new(num_trits);
+#endif //NO_DYNAMIC_ALLOCATION
+  to_trit_array->num_trits = num_trits;
+  to_trit_array->num_bytes = trit_array_bytes_for_trits(num_trits);
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
-  memcpy(new_trit_array->trits, trit_array->trits + start, num_trits);
+  memcpy(to_trit_array->trits, trit_array->trits + start, num_trits);
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
   byte_t buffer;
   uint8_t tshift = (start % 4U) << 1U;
   uint8_t rshift = (8U - tshift) % 8U;
-  size_t index = start / 4U;
-  size_t max_index = (start + num_trits - 1) / 4U;
+  size_t index = start >> 2U;
+  size_t max_index = (start + num_trits - 1) >> 2U;
   // Calculate the number of bytes to copy over
-  for (int i = index, j = 0; i < index + new_trit_array->num_bytes; i++, j++) {
+  for (size_t i = index, j = 0; i < index + to_trit_array->num_bytes; i++, j++) {
     buffer = trit_array->trits[i];
     buffer = buffer >> tshift;
     if (rshift && i < max_index) {
       buffer |= (trit_array->trits[i + 1] << rshift);
     }
-    new_trit_array->trits[j] = buffer;
+    to_trit_array->trits[j] = buffer;
   }
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
   byte_t buffer = 0;
@@ -75,17 +78,32 @@ trit_array_p trit_array_slice(trit_array_p trit_array, trit_array_p to_trit_arra
   size_t index = start / 5U;
   size_t offset = start % 5U;
   size_t max_index = (start + num_trits - 1) / 5U;
-  for (int i = index, j = 0; i < index + new_trit_array->num_bytes; i++, j++) {
+  for (size_t i = index, j = 0; i < index + to_trit_array->num_bytes; i++, j++) {
     bytes_to_trits(((byte_t *)trit_array->trits + i), 1, trits, 5);
     if (offset && i < max_index) {
       bytes_to_trits(((byte_t *)trit_array->trits + i + 1), 1, ((trit_t *)trits + 5), 5);
     }
-    new_trit_array->trits[j] = trits_to_byte(trits + offset, buffer, 5);
+    to_trit_array->trits[j] = trits_to_byte(trits + offset, buffer, 5);
   }
 #endif
-  return new_trit_array;
+  return to_trit_array;
 }
 
+int8_t *trit_array_to_int8(trit_array_p trit_array, int8_t *trits) {
+#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+  memcpy(trits, trit_array->trits, trit_array->num_trits);
+#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
+  for (size_t i = 0; i < trit_array->num_trits; i++) {
+    trits[i] = trit_array_at(trit_array, i);
+  }
+#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+  bytes_to_trits(trit_array->trits, trit_array->num_bytes,
+                 trits, trit_array->num_trits);
+#endif
+  return trits;
+}
+
+#if !defined(NO_DYNAMIC_ALLOCATION)
 /***********************************************************************************************************
  * Constructor
  ***********************************************************************************************************/
@@ -121,3 +139,5 @@ void trit_array_free(trit_array_p trit_array) {
   }
   free(trit_array);
 }
+
+#endif //NO_DYNAMIC_ALLOCATION
