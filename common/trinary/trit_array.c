@@ -47,14 +47,9 @@ void trit_array_set_trits(trit_array_p trit_array, char *trits, size_t num_trits
   trit_array->num_bytes = trit_array_bytes_for_trits(num_trits);
 }
 
-trit_array_p trit_array_slice(trit_array_p trit_array, trit_array_p *to_trit_array, size_t start, size_t num_trits) {
+trit_array_p trit_array_slice(trit_array_p trit_array, trit_array_p to_trit_array, size_t start, size_t num_trits) {
   trit_array_p new_trit_array;
-  if (!to_trit_array) {
-    new_trit_array = trit_array_new(num_trits);
-  }
-  else {
-    new_trit_array = *to_trit_array;
-  }
+  new_trit_array = to_trit_array ? to_trit_array : trit_array_new(num_trits);
   new_trit_array->num_trits = num_trits;
   new_trit_array->num_bytes = trit_array_bytes_for_trits(num_trits);
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)

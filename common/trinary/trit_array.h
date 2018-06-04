@@ -12,7 +12,10 @@ extern "C" {
 #ifndef __COMMON_TRINARY_TRIT_ARRAY_H_
 #define __COMMON_TRINARY_TRIT_ARRAY_H_
 
-#define TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE
+#if !defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE) && \
+    !defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+#define TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE
+#endif
 
 #include "trits.h"
 #include "trit_byte.h"
@@ -84,7 +87,7 @@ static inline void trit_array_set_at(trit_array_p trit_array, size_t index, trit
 }
 
 void trit_array_set_trits(trit_array_p trit_array, char *trits, size_t num_trits);
-trit_array_p trit_array_slice(trit_array_p trit_array, trit_array_p *to_trit_array, size_t start, size_t num_trits);
+trit_array_p trit_array_slice(trit_array_p trit_array, trit_array_p to_trit_array, size_t start, size_t num_trits);
 
 /***********************************************************************************************************
  * Constructor
