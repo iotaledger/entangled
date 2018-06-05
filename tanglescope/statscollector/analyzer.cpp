@@ -12,6 +12,8 @@ namespace iota {
 namespace tanglescope {
 namespace statscollector {
 
+static constexpr uint32_t MAX_CONFIRMED_BUNDLES_TO_KEEP = 10000;
+
 void TXAnalyzer::newTransaction(std::shared_ptr<iri::TXMessage> msg) {
   std::lock_guard guard(_mutex);
 
@@ -95,7 +97,7 @@ void TXAnalyzer::transactionConfirmed(std::shared_ptr<iri::SNMessage> msg) {
 
   _unconfirmedBundles.erase(entry);
   _confirmedBundles.push_back(msg->bundle());
-  if (_confirmedBundles.size() > 1000){
+  if (_confirmedBundles.size() > MAX_CONFIRMED_BUNDLES_TO_KEEP){
     _confirmedBundles.pop_front();
   }
 }
