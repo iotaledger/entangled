@@ -15,7 +15,7 @@
 #define TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE
 #endif
 
-size_t flex_trit_array_slice(int8_t *trit_array, int8_t *to_trit_array, size_t start, size_t num_trits) {
+size_t flex_trit_array_slice(flex_trit_t *trit_array, flex_trit_t *to_trit_array, size_t start, size_t num_trits) {
   size_t num_bytes = trit_array_bytes_for_trits(num_trits);
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   memcpy(to_trit_array, trit_array + start, num_trits);
@@ -51,7 +51,7 @@ size_t flex_trit_array_slice(int8_t *trit_array, int8_t *to_trit_array, size_t s
   return num_bytes;
 }
 
-size_t flex_trit_array_to_int8(int8_t *trit_array, int8_t *trits, size_t num_trits) {
+size_t flex_trit_array_to_int8(flex_trit_t *trit_array, trit_t *trits, size_t num_trits) {
   size_t num_bytes = trit_array_bytes_for_trits(num_trits);
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   memcpy(trits, trit_array, num_trits);
@@ -81,7 +81,7 @@ size_t trit_array_bytes_for_trits(size_t num_trits) {
 /***********************************************************************************************************
  * Accessors
  ***********************************************************************************************************/
-void trit_array_set_trits(trit_array_p trit_array, int8_t *trits, size_t num_trits) {
+void trit_array_set_trits(trit_array_p trit_array, flex_trit_t *trits, size_t num_trits) {
 #if !defined(NO_DYNAMIC_ALLOCATION)
   if (trit_array->dynamic) {
     free(trit_array->trits);
@@ -102,7 +102,7 @@ trit_array_p trit_array_slice(trit_array_p trit_array, trit_array_p to_trit_arra
   return to_trit_array;
 }
 
-int8_t *trit_array_to_int8(trit_array_p trit_array, int8_t *trits) {
+trit_t *trit_array_to_int8(trit_array_p trit_array, trit_t *trits) {
   flex_trit_array_to_int8(trit_array->trits, trits, trit_array->num_trits);
   return trits;
 }
