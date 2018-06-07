@@ -20,6 +20,71 @@ extern "C" {
 #include "trits.h"
 #include "trit_byte.h"
 
+static inline size_t num_bytes_for_flex_trits(size_t num_trits) {
+#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+  return num_trits;
+#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)  
+  return (num_trits + 3) / 4;
+#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+  return min_bytes(num_trits);
+#endif
+}
+
+static inline trit_t flex_trit_array_at(int8_t *trit_array, size_t index) {
+#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+  // Straight forward 1 trit per byte
+  return trit_array[index];
+#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
+  // Find out the position of the trit in the byte
+  uint8_t mshift = (index % 4U) << 1U;
+  // Calculate the shift to sign extend the result
+  uint8_t tshift = 6U - mshift;
+  // Find out the index of the byte in the array
+  index = index >> 2U;  
+  // Get the trit and sign extend it
+  return (trit_t)(((trit_array[index]) << tshift)) >> 6U;
+#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+  trit_t trits[5];
+  // Find out the index of the trit in the byte
+  uint8_t tindex = index % 5U;
+  // Find out the index of the byte in the array
+  index = index / 5U;
+  bytes_to_trits(((byte_t *)trit_array + index), 1, trits, 5);
+  return trits[tindex];
+#endif
+}
+
+static inline void flex_trit_array_set_at(int8_t *trit_array, size_t index, trit_t trit) {
+#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+  // Straight forward 1 trit per byte
+  trit_array[index] = trit;
+#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
+  // Calculate the final position of the trit in the byte
+  uint8_t shift = (index % 4U) << 1U;
+  // Position the trit at its place in the byte
+  trit = (trit & 0x03) << shift;
+  // Create a mask to reset the target trit
+  uint8_t mask = ~(0x03 << shift);
+  // Find out the index of the byte in the array
+  index = index >> 2U;
+  // bitblit the trit in place
+  trit_array[index] = (trit_array[index] & mask) | trit;
+#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+  byte_t buffer = 0;
+  trit_t trits[5];
+  // Find out the index of the trit in the byte
+  uint8_t tindex = index % 5U;
+  // Find out the index of the byte in the array
+  index = index / 5U;
+  bytes_to_trits(((byte_t *)trit_array + index), 1, trits, 5);
+  trits[tindex] = trit;
+  trit_array[index] = trits_to_byte(trits, buffer, 5);
+#endif
+}
+
+size_t flex_trit_array_slice(int8_t *trit_array, int8_t *to_trit_array, size_t start, size_t num_trits);
+size_t flex_trit_array_to_int8(int8_t *trit_array, int8_t *trits, size_t num_trits);
+
 typedef struct _trit_array *trit_array_p;
 typedef struct _trit_array {
   int8_t *trits;
@@ -34,56 +99,11 @@ size_t trit_array_bytes_for_trits(size_t num_trits);
  * Accessors
  ***********************************************************************************************************/
 static inline trit_t trit_array_at(trit_array_p trit_array, size_t index) {
-#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
-  // Straight forward 1 trit per byte
-  return trit_array->trits[index];
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
-  // Find out the position of the trit in the byte
-  uint8_t mshift = (index % 4U) << 1U;
-  // Calculate the shift to sign extend the result
-  uint8_t tshift = 6U - mshift;
-  // Find out the index of the byte in the array
-  index = index >> 2U;  
-  // Get the trit and sign extend it
-  return (trit_t)(((trit_array->trits[index]) << tshift)) >> 6U;
-#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
-  trit_t trits[5];
-  // Find out the index of the trit in the byte
-  uint8_t tindex = index % 5U;
-  // Find out the index of the byte in the array
-  index = index / 5U;
-  bytes_to_trits(((byte_t *)trit_array->trits + index), 1, trits, 5);
-  return trits[tindex];
-#endif
+  return flex_trit_array_at(trit_array->trits, index);
 }
 
-
 static inline void trit_array_set_at(trit_array_p trit_array, size_t index, trit_t trit) {
-#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
-  // Straight forward 1 trit per byte
-  trit_array->trits[index] = trit;
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
-  // Calculate the final position of the trit in the byte
-  uint8_t shift = (index % 4U) << 1U;
-  // Position the trit at its place in the byte
-  trit = (trit & 0x03) << shift;
-  // Create a mask to reset the target trit
-  uint8_t mask = ~(0x03 << shift);
-  // Find out the index of the byte in the array
-  index = index >> 2U;
-  // bitblit the trit in place
-  trit_array->trits[index] = (trit_array->trits[index] & mask) | trit;
-#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
-  byte_t buffer = 0;
-  trit_t trits[5];
-  // Find out the index of the trit in the byte
-  uint8_t tindex = index % 5U;
-  // Find out the index of the byte in the array
-  index = index / 5U;
-  bytes_to_trits(((byte_t *)trit_array->trits + index), 1, trits, 5);
-  trits[tindex] = trit;
-  trit_array->trits[index] = trits_to_byte(trits, buffer, 5);
-#endif
+  flex_trit_array_set_at(trit_array->trits, index, trit);
 }
 
 void trit_array_set_trits(trit_array_p trit_array, int8_t *trits, size_t num_trits);
