@@ -22,7 +22,7 @@ extern "C" {
 
 typedef int8_t flex_trit_t;
 
-static inline size_t num_bytes_for_flex_trits(size_t num_trits) {
+static inline size_t flex_trits_num_for_trits(size_t num_trits) {
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   return num_trits;
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)  

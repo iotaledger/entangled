@@ -75,7 +75,7 @@ size_t flex_trit_array_to_int8(flex_trit_t *trit_array, trit_t *trits, size_t nu
  * Public interface
  ***********************************************************************************************************/
 size_t trit_array_bytes_for_trits(size_t num_trits) {
-  return num_bytes_for_flex_trits(num_trits);
+  return flex_trits_num_for_trits(num_trits);
 }
 
 /***********************************************************************************************************
