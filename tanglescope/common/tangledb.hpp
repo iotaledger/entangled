@@ -1,8 +1,8 @@
 #pragma once
 
+#include <optional>
 #include <shared_mutex>
 #include <unordered_map>
-#include <optional>
 
 class TangleDB {
  public:

@@ -9,14 +9,15 @@
 
 #include <zmq.hpp>
 
-#include "zmqpub.hpp"
 #include "iri.hpp"
+#include "zmqpub.hpp"
 
 namespace iota {
 namespace tanglescope {
 
 void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s,
-                  const std::string& uri, const std::atomic<bool>& shouldFinish) {
+                  const std::string& uri,
+                  const std::atomic<bool>& shouldFinish) {
   std::array<char, 2048> buf;
 
   zmq::context_t context(1);
@@ -25,15 +26,15 @@ void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s,
   subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
   subscriber.connect(uri);
 
-  auto poller = std::make_unique<zmq::poller_t>();
+  zmq::poller_t<> poller;
+  std::vector<zmq_poller_event_t> events(1);
 
-  auto handler = std::function<void(void)>();
-  poller->add(subscriber, ZMQ_POLLIN, handler);
+  poller.add(subscriber, ZMQ_POLLIN, nullptr);
 
   while (!shouldFinish && s.is_subscribed()) {
     buf.fill('\0');
 
-    poller->wait(std::chrono::milliseconds(-1));
+    poller.wait_all(events, std::chrono::milliseconds(-1));
 
     int size = zmq_recv(subscriber, buf.data(), buf.size() - 1, 0);
     if (size == -1) continue;
@@ -50,8 +51,6 @@ void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s,
 
   s.on_completed();
 }
-
-
 
 }  // namespace tanglescope
 }  // namespace iota

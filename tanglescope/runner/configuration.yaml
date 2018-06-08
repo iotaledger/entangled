@@ -4,7 +4,8 @@ echocatcher:
       - "tcp://zmq.testnet.iota.org:5556"
 
   #url of iri node
-  iri_host: "http://iri01.testnet.iota.cafe:14265"
+  iri_host: "iri01.testnet.iota.cafe"
+  iri_port: 14265
   #IP/Port that the Prometheus Exposer binds to
   prometheus_exposer_uri: "0.0.0.0:8080"
   #MWM for transaction's POW

@@ -8,12 +8,17 @@ namespace iota {
 namespace tanglescope {
 namespace txAuxiliary {
 
-pplx::task<void> removeConfirmedTransactions(
-    std::weak_ptr<api::IRIClient> client, const std::vector<std::string>& tips,
-    std::vector<std::string>& txs) {
+boost::future<void> removeConfirmedTransactions(
+    std::weak_ptr<cppclient::IotaAPI> client,
+    const std::vector<std::string>& tips, std::vector<std::string>& txs) {
   if (auto clientSharedPtr = client.lock()) {
-    return clientSharedPtr->getInclusionStates(txs, tips).then(
-        [&](api::GetInclusionStatesResponse response) {
+    return boost::async(boost::launch::async,
+                        [clientSharedPtr = std::move(clientSharedPtr),
+                         txs = std::move(txs), tips] {
+                          return clientSharedPtr->getInclusionStates(txs, tips);
+                        })
+        .then([&](auto future) {
+          auto response = future.get();
           if (response.states.empty()) {
             txs.clear();
             return;
@@ -28,11 +33,12 @@ pplx::task<void> removeConfirmedTransactions(
                     txs.end());
         });
   }
+  return {};
 }
 
-std::set<std::string> getUnconfirmedTXs(std::weak_ptr<api::IRIClient> client,
-                                        std::shared_ptr<iri::TXMessage> tx,
-                                        std::string lmhs) {
+std::set<std::string> getUnconfirmedTXs(
+    std::weak_ptr<cppclient::IotaAPI> client,
+    std::shared_ptr<iri::TXMessage> tx, std::string lmhs) {
   using namespace std;
 
   if (auto clientSharedPtr = client.lock()) {
@@ -43,13 +49,13 @@ std::set<std::string> getUnconfirmedTXs(std::weak_ptr<api::IRIClient> client,
     while (!currentLevelTXs.empty()) {
       auto removeTask =
           removeConfirmedTransactions(client, tips, currentLevelTXs)
-              .then([&]() {
+              .then([&](auto future) {
                 if (!currentLevelTXs.empty()) {
                   res.insert(currentLevelTXs.begin(), currentLevelTXs.end());
 
                   try {
                     auto trytesVec =
-                        clientSharedPtr->getTrytes(currentLevelTXs).get();
+                        clientSharedPtr->getTrytes(currentLevelTXs);
                     set<string> nextLevelTXs;  // Avoid duplications and allow a
                     // minimal query for IRI
 
@@ -81,19 +87,19 @@ std::set<std::string> getUnconfirmedTXs(std::weak_ptr<api::IRIClient> client,
   return std::set<std::string>();
 }
 
-pplx::task<void> handleUnseenTransactions(
+boost::future<void> handleUnseenTransactions(
     std::shared_ptr<iri::TXMessage> tx,
     cuckoohash_map<std::string, std::chrono::system_clock::time_point>&
         hashToDiscoveryTimestamp,
     std::chrono::time_point<std::chrono::system_clock> received,
-    std::weak_ptr<api::IRIClient> iriClient, std::string lmhs) {
+    std::weak_ptr<cppclient::IotaAPI> iriClient, std::string lmhs) {
   TangleDB::TXRecord txRecord = {tx->hash(), tx->trunk(), tx->branch()};
   TangleDB::instance().put(std::move(txRecord));
 
-  return pplx::create_task([
-    tx, &hashToDiscoveryTimestamp, received = std::move(received), iriClient,
-    lmhs = std::move(lmhs)
-  ]() {
+  return boost::async(boost::launch::async, [tx, &hashToDiscoveryTimestamp,
+                                             received = std::move(received),
+                                             iriClient,
+                                             lmhs = std::move(lmhs)]() {
     auto unconfirmed = getUnconfirmedTXs(iriClient, tx, std::move(lmhs));
     if (unconfirmed.empty()) {
       return;

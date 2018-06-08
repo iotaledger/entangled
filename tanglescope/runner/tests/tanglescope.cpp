@@ -21,6 +21,7 @@ TEST(TangleScope, EchoCatcherFlow) {
   using namespace testing;
   YAML::Node config;
   config[EchoCatcher::IRI_HOST] = "some_host";
+  config[EchoCatcher::IRI_PORT] = "1234";
   config[EchoCatcher::PUBLISHERS].push_back("p1");
   config[EchoCatcher::PUBLISHERS].push_back("p2");
   config[EchoCatcher::TANGLE_DB_WARMUP_TIME] = "100";

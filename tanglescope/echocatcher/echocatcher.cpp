@@ -18,6 +18,8 @@
 #include "common/helpers/pow.h"
 #include "common/trinary/tryte_long.h"
 
+constexpr static auto DEPTH = 3;
+
 using namespace iota::tanglescope;
 
 const std::string TX_TRYTES =
@@ -59,7 +61,8 @@ const std::string TX_TRYTES =
     "99999999999999999999999999999999999999999999999999999999999999999999999999"
     "999999999";
 
-std::string fillTX(api::GetTransactionsToApproveResponse response) {
+std::string fillTX(
+    const cppclient::GetTransactionsToApproveResponse& response) {
   using namespace std::chrono;
   std::string tx = TX_TRYTES;
 
@@ -93,10 +96,11 @@ bool EchoCatcher::parseConfiguration(const YAML::Node& conf) {
     return false;
   }
 
-  if (conf[IRI_HOST] && conf[PUBLISHERS] && conf[MWM] &&
+  if (conf[IRI_HOST] && conf[IRI_PORT] && conf[PUBLISHERS] && conf[MWM] &&
       conf[TANGLE_DB_WARMUP_TIME] && conf[BROADCAST_INTERVAL] &&
       conf[DISCOVERY_INTERVAL]) {
     _iriHost = conf[IRI_HOST].as<std::string>();
+    _iriPort = conf[IRI_PORT].as<uint32_t>();
     _zmqPublishers = conf[PUBLISHERS].as<std::list<std::string>>();
     _mwm = conf[MWM].as<uint32_t>();
     _tangleDBWarmupPeriod = conf[TANGLE_DB_WARMUP_TIME].as<uint32_t>();
@@ -111,7 +115,7 @@ bool EchoCatcher::parseConfiguration(const YAML::Node& conf) {
 void EchoCatcher::collect() {
   LOG(INFO) << __FUNCTION__;
 
-  _iriClient = std::make_shared<api::IRIClient>(_iriHost);
+  _api = std::make_shared<cppclient::BeastIotaAPI>(_iriHost, _iriPort);
 
   for (const auto& url : _zmqPublishers) {
     auto zmqObservable =
@@ -165,18 +169,24 @@ void EchoCatcher::broadcastTransactions() {
   }
 }
 void EchoCatcher::broadcastOneTransaction() {
-  auto getTransactionsTask =
-      _iriClient->getTransactionsToApprove()
-          .then(fillTX)
-          .then([this](std::string tx) { return powTX(std::move(tx), _mwm); })
-          .then(hashTX);
+  auto hashTXFuture =
+      boost::async(boost::launch::async,
+                   [this] { return _api->getTransactionsToApprove(DEPTH); })
+          .then([](auto resp) { return fillTX(resp.get()); })
+          .then(
+              [this](auto resp) { return powTX(std::move(resp.get()), _mwm); })
+          .then([](auto resp) { return hashTX(resp.get()); });
 
   try {
-    auto hashed = getTransactionsTask.get();
+    auto hashed = hashTXFuture.get();
     LOG(INFO) << "Hash: " << hashed.hash;
-    auto broadcastTask = _iriClient->broadcastTransactions({hashed.tx});
+
+    auto broadcastFuture = boost::async(boost::launch::async, [hashed, this] {
+      return _api->broadcastTransactions({hashed.tx});
+    });
+
     _hashToBroadcastTime.insert(hashed.hash, std::chrono::system_clock::now());
-    broadcastTask.wait();
+    broadcastFuture.wait();
   } catch (const std::exception& e) {
     LOG(ERROR) << __FUNCTION__ << " Exception: " << e.what();
   }
@@ -190,18 +200,20 @@ void EchoCatcher::handleReceivedTransactions() {
   auto zmqThread = rxcpp::schedulers::make_new_thread();
 
   auto& catcher = *this;
-  std::vector<pplx::task<void>> observableTasks;
+  std::vector<boost::future<void>> observableTasks;
   for (auto& kv : _urlToZmqObservables) {
     auto zmqURL = kv.first;
     auto zmqObservable = kv.second;
-    auto task = pplx::task<void>([
-      zmqURL = std::move(zmqURL), &zmqObservable, &registry, &catcher
-    ]() { catcher.subscribeToTransactions(zmqURL, zmqObservable, registry); });
+    auto task = boost::async(
+        boost::launch::async,
+        [zmqURL = std::move(zmqURL), &zmqObservable, &registry, &catcher]() {
+          catcher.subscribeToTransactions(zmqURL, zmqObservable, registry);
+        });
     observableTasks.push_back(std::move(task));
   }
 
   std::for_each(observableTasks.begin(), observableTasks.end(),
-                [&](pplx::task<void> task) { task.get(); });
+                [&](auto& task) { task.wait(); });
 }
 
 using namespace prometheus;
@@ -213,7 +225,7 @@ void EchoCatcher::subscribeToTransactions(
   auto families = buildHistogramsMap(
       registry, {{"listen_node", _iriHost}, {"zmq_url", zmqURL}});
 
-  std::vector<pplx::task<void>> tasks;
+  std::vector<boost::future<void>> tasks;
   std::vector<double> buckets(400);
   double currInterval = 0;
   std::generate(buckets.begin(), buckets.end(), [&currInterval]() {
@@ -224,7 +236,6 @@ void EchoCatcher::subscribeToTransactions(
   zmqObservable.observe_on(rxcpp::synchronize_new_thread())
       .subscribe(
           [&](std::shared_ptr<iri::IRIMessage> msg) {
-
             if (msg->type() == iri::IRIMessageType::LMHS) {
               std::unique_lock<std::shared_mutex> lock(_milestoneMutex);
               auto lmhs =
@@ -273,11 +284,10 @@ void EchoCatcher::subscribeToTransactions(
           },
           []() {});
 
-  std::for_each(tasks.begin(), tasks.end(),
-                [&](pplx::task<void> task) { task.get(); });
+  std::for_each(tasks.begin(), tasks.end(), [&](auto& task) { task.get(); });
 }
 
-pplx::task<void> EchoCatcher::handleUnseenTransactions(
+boost::future<void> EchoCatcher::handleUnseenTransactions(
     std::shared_ptr<iri::TXMessage> tx,
     std::chrono::time_point<std::chrono::system_clock> received,
     HistogramsMap& families, const std::vector<double>& buckets) {
@@ -304,11 +314,12 @@ pplx::task<void> EchoCatcher::handleUnseenTransactions(
       std::shared_lock<std::shared_mutex> lock(_milestoneMutex);
       auto lmhs = _latestSolidMilestoneHash;
       return txAuxiliary::handleUnseenTransactions(
-          std::move(tx), _hashToDiscoveryTime, std::move(received), _iriClient,
+          std::move(tx), _hashToDiscoveryTime, std::move(received), _api,
           std::move(lmhs));
     }
   }
-  return pplx::create_task([]() {});
+
+  return {};
 }
 
 PrometheusCollector::HistogramsMap EchoCatcher::buildHistogramsMap(

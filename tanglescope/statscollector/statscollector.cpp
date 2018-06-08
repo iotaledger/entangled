@@ -3,7 +3,9 @@
 #include <iostream>
 #include <map>
 
-#include <cpprest/http_client.h>
+#include <boost/thread/executor.hpp>
+#include <boost/thread/future.hpp>
+
 #include <glog/logging.h>
 #include <rx.hpp>
 
@@ -48,36 +50,37 @@ void StatsCollector::collect() {
   auto registry = std::make_shared<Registry>();
 
   for (auto zmqURL : _zmqPublishers) {
-    auto counters = buildCountersMap(registry, {{"publish_node", zmqURL}});
-    auto histograms = buildHistogramsMap(registry, {{"publish_node", zmqURL}});
-    auto gauges = buildGaugeMap(registry, {{"publish_node", zmqURL}});
-    auto collector = ZMQCollectorImpl(zmqURL, std::move(counters),
-                                      std::move(histograms), std::move(gauges));
+    auto collector =
+        ZMQCollectorImpl(zmqURL, registry, _zmqPublishers.size() > 1);
     _zmqCollectors.push_back(std::move(collector));
   }
   exposer.RegisterCollectable(registry);
 
-  std::vector<pplx::task<void>> collectorsTasks;
+  std::vector<boost::future<void>> collectorsTasks;
   for (auto& zmqCollector : _zmqCollectors) {
-    auto task = pplx::task<void>([&zmqCollector, this]() {
+    auto fu = boost::async(boost::launch::async, [&zmqCollector, this]() {
       zmqCollector.collect(_bundleConfirmationHistogramRange,
                            _bundleConfirmationBucketSize);
     });
-    collectorsTasks.push_back(std::move(task));
+    collectorsTasks.push_back(std::move(fu));
   }
 
   std::for_each(collectorsTasks.begin(), collectorsTasks.end(),
-                [&](pplx::task<void> task) { task.get(); });
+                [&](boost::future<void>& fu) { fu.get(); });
 }
 
 ZMQCollectorImpl::ZMQCollectorImpl(
-    std::string zmqURL, PrometheusCollector::CountersMap counters,
-    PrometheusCollector::HistogramsMap histograms,
-    PrometheusCollector::GaugeMap gauges)
-    : _zmqURL(zmqURL),
-      _counters(counters),
-      _histograms(histograms),
-      _gauges(gauges) {}
+    std::string zmqURL, std::shared_ptr<prometheus::Registry>& registry,
+    bool useURLLable)
+    : _zmqURL(zmqURL) {
+  std::map<std::string, std::string> lables;
+  if (useURLLable) {
+    lables.insert(std::make_pair("publish_node", zmqURL));
+  }
+  _counters = buildCountersMap(registry, lables);
+  _histograms = buildHistogramsMap(registry, lables);
+  _gauges = buildGaugeMap(registry, lables);
+}
 
 void ZMQCollectorImpl::collect(uint32_t bundleConfirmationHistogramRange,
                                uint32_t bundleConfirmationBucketSize) {
@@ -140,7 +143,7 @@ void ZMQCollectorImpl::collect(uint32_t bundleConfirmationHistogramRange,
 }
 
 using namespace prometheus;
-PrometheusCollector::CountersMap StatsCollector::buildCountersMap(
+PrometheusCollector::CountersMap ZMQCollectorImpl::buildCountersMap(
     std::shared_ptr<Registry> registry,
     const std::map<std::string, std::string>& labels) {
   static std::map<std::string, std::string> nameToDesc = {
@@ -168,7 +171,7 @@ PrometheusCollector::CountersMap StatsCollector::buildCountersMap(
   return std::move(families);
 }
 
-PrometheusCollector::HistogramsMap StatsCollector::buildHistogramsMap(
+PrometheusCollector::HistogramsMap ZMQCollectorImpl::buildHistogramsMap(
     std::shared_ptr<Registry> registry,
     const std::map<std::string, std::string>& labels) {
   static std::map<std::string, std::string> nameToDesc = {
@@ -190,7 +193,7 @@ PrometheusCollector::HistogramsMap StatsCollector::buildHistogramsMap(
   return std::move(families);
 }
 
-PrometheusCollector::GaugeMap StatsCollector::buildGaugeMap(
+PrometheusCollector::GaugeMap ZMQCollectorImpl::buildGaugeMap(
     std::shared_ptr<Registry> registry,
     const std::map<std::string, std::string>& labels) {
   static std::map<std::string, std::string> nameToDesc = {

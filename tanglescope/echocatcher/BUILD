@@ -1,17 +1,17 @@
 cc_library(
-    name='echocatcher',
-    include_prefix='iota/tanglescope/echocatcher',
-    hdrs=glob(['*.hpp']),
-    srcs=['echocatcher.cpp'],
-    deps=[
-        '//tanglescope/common:common',
-        '//common/helpers:helpers',
-        '//tanglescope/prometheus_collector:prometheus_collector',
-        '//common/trinary:tryte_long',
-        '@cpprestsdk//:cpprestsdk',
-        '@com_github_gflags_gflags//:gflags',
-        '@glog//:glog',
-	'@prometheus_cpp//:prometheus_cpp',
+    name = "echocatcher",
+    srcs = ["echocatcher.cpp"],
+    hdrs = glob(["*.hpp"]),
+    include_prefix = "iota/tanglescope/echocatcher",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common/helpers",
+        "//common/trinary:tryte_long",
+        "//cppclient:beast",
+        "//tanglescope/common",
+        "//tanglescope/prometheus_collector",
+        "@com_github_gflags_gflags//:gflags",
+        "@glog",
+        "@prometheus_cpp",
     ],
-    visibility = ["//visibility:public"])
-
+)
