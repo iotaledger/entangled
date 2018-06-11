@@ -47,14 +47,9 @@ class EchoCatcher : public PrometheusCollector {
   boost::future<void> handleUnseenTransactions(
       std::shared_ptr<iri::TXMessage> tx,
       std::chrono::time_point<std::chrono::system_clock> received,
-      HistogramsMap& families, const std::vector<double>& buckets);
+      HistogramsMap& histograms, const std::vector<double>& buckets);
 
  private:
-  // methods
-  HistogramsMap buildHistogramsMap(
-      std::shared_ptr<prometheus::Registry> registry,
-      const std::map<std::string, std::string>& labels);
-
   const std::vector<double>& histogramBuckets() const;
 
   virtual void subscribeToTransactions(
@@ -78,6 +73,8 @@ class EchoCatcher : public PrometheusCollector {
 
   mutable std::shared_mutex _milestoneMutex;
   std::string _latestSolidMilestoneHash;
+
+  static std::map<std::string, std::string> nameToDescHistogram;
 };
 
 }  // namespace tanglescope

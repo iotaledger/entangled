@@ -69,7 +69,8 @@ class IotaAPI {
 
   virtual std::vector<std::string> findTransactions(
       nonstd::optional<std::vector<std::string>> addresses,
-      nonstd::optional<std::vector<std::string>> bundles) = 0;
+      nonstd::optional<std::vector<std::string>> bundles,
+      nonstd::optional<std::vector<std::string>> approvees) = 0;
 
   virtual NodeInfo getNodeInfo() = 0;
 

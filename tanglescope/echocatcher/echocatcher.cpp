@@ -22,6 +22,21 @@ constexpr static auto DEPTH = 3;
 
 using namespace iota::tanglescope;
 
+std::map<std::string, std::string> EchoCatcher::nameToDescHistogram = {
+    {"time_elapsed_received",
+     "#Milliseconds it took for tx to travel back to transaction's "
+     "original source(\"listen_node\") [each interval is " +
+         std::to_string(BUCKET_WIDTH) + " milliseconds]"},
+    {"time_elapsed_arrived",
+     "#Milliseconds it took for tx to arrive to destination "
+     "(\"publish_node\") [each interval is " +
+         std::to_string(BUCKET_WIDTH) + " milliseconds]"},
+    {"time_elapsed_unseen_tx_published",
+     "#Milliseconds it took for tx to be published since the moment "
+     "client "
+     "first learned about it [each interval is " +
+         std::to_string(BUCKET_WIDTH) + " milliseconds]"}};
+
 const std::string TX_TRYTES =
     "99999999999999999999999999999999999999999999999999999999999999999999999999"
     "99999999999999999999999999999999999999999999999999999999999999999999999999"
@@ -222,8 +237,9 @@ void EchoCatcher::subscribeToTransactions(
     std::string zmqURL, const EchoCatcher::ZmqObservable& zmqObservable,
     std::shared_ptr<Registry> registry) {
   std::atomic<bool> haveAllTXReturned = false;
-  auto families = buildHistogramsMap(
-      registry, {{"listen_node", _iriHost}, {"zmq_url", zmqURL}});
+  auto histograms = buildHistogramsMap(
+      registry, "echocatcher", {{"listen_node", _iriHost}, {"zmq_url", zmqURL}},
+      nameToDescHistogram);
 
   std::vector<boost::future<void>> tasks;
   std::vector<double> buckets(400);
@@ -251,7 +267,7 @@ void EchoCatcher::subscribeToTransactions(
             auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
             auto received = std::chrono::system_clock::now();
             auto task =
-                handleUnseenTransactions(tx, received, families, buckets);
+                handleUnseenTransactions(tx, received, histograms, buckets);
 
             tasks.push_back(std::move(task));
 
@@ -266,12 +282,12 @@ void EchoCatcher::subscribeToTransactions(
                       tx->arrivalTime() - broadcastTime)
                       .count();
 
-              families.at("time_elapsed_received")
+              histograms.at("time_elapsed_received")
                   .get()
                   .Add({{"bundle_size", std::to_string(tx->lastIndex() + 1)}},
                        buckets)
                   .Observe(elapsedUntilReceived);
-              families.at("time_elapsed_arrived")
+              histograms.at("time_elapsed_arrived")
                   .get()
                   .Add({{"bundle_size", std::to_string(tx->lastIndex() + 1)}},
                        buckets)
@@ -290,7 +306,7 @@ void EchoCatcher::subscribeToTransactions(
 boost::future<void> EchoCatcher::handleUnseenTransactions(
     std::shared_ptr<iri::TXMessage> tx,
     std::chrono::time_point<std::chrono::system_clock> received,
-    HistogramsMap& families, const std::vector<double>& buckets) {
+    HistogramsMap& histograms, const std::vector<double>& buckets) {
   static std::atomic<std::chrono::time_point<std::chrono::system_clock>>
       lastDiscoveryTime = received;
   std::chrono::system_clock::time_point txTime;
@@ -301,7 +317,7 @@ boost::future<void> EchoCatcher::handleUnseenTransactions(
             .count();
     _hashToDiscoveryTime.erase(tx->hash());
 
-    families.at("time_elapsed_unseen_tx_published")
+    histograms.at("time_elapsed_unseen_tx_published")
         .get()
         .Add({{"bundle_size", std::to_string(tx->lastIndex() + 1)}}, buckets)
         .Observe(txArrivalLatency);
@@ -320,37 +336,4 @@ boost::future<void> EchoCatcher::handleUnseenTransactions(
   }
 
   return {};
-}
-
-PrometheusCollector::HistogramsMap EchoCatcher::buildHistogramsMap(
-    std::shared_ptr<Registry> registry,
-    const std::map<std::string, std::string>& labels) {
-  static std::map<std::string, std::string> nameToDesc = {
-      {"time_elapsed_received",
-       "#Milliseconds it took for tx to travel back to transaction's "
-       "original source(\"listen_node\") [each interval is " +
-           std::to_string(BUCKET_WIDTH) + " milliseconds]"},
-      {"time_elapsed_arrived",
-       "#Milliseconds it took for tx to arrive to destination "
-       "(\"publish_node\") [each interval is " +
-           std::to_string(BUCKET_WIDTH) + " milliseconds]"},
-      {"time_elapsed_unseen_tx_published",
-       "#Milliseconds it took for tx to be published since the moment "
-       "client "
-       "first learned about it [each interval is " +
-           std::to_string(BUCKET_WIDTH) + " milliseconds]"}};
-
-  std::map<std::string, std::reference_wrapper<Family<Histogram>>> famillies;
-  for (const auto& kv : nameToDesc) {
-    auto& curr_family = BuildHistogram()
-                            .Name("echocatcher_" + kv.first)
-                            .Help(kv.second)
-                            .Labels(labels)
-                            .Register(*registry);
-
-    famillies.insert(
-        std::make_pair(std::string(kv.first), std::ref(curr_family)));
-  }
-
-  return std::move(famillies);
 }

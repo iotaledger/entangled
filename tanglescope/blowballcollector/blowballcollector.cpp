@@ -6,6 +6,12 @@
 #include <iota/tanglescope/common/zmqpub.hpp>
 
 using namespace iota::tanglescope;
+
+std::map<std::string, std::string> BlowballCollector::nameToDescHistogram = {
+    {BlowballCollector::TX_NUM_APPROVERS,
+     "Number of transactions approving a single transaction as observed "
+     "across multiple nodes"}};
+
 bool BlowballCollector::parseConfiguration(const YAML::Node& conf) {
   if (!PrometheusCollector::parseConfiguration(conf)) {
     return false;
@@ -35,7 +41,7 @@ void BlowballCollector::collect() {
   auto registry = std::make_shared<Registry>();
   exposer.RegisterCollectable(registry);
 
-  _families = buildHistogramsMap(registry, {});
+  histograms = buildHistogramsMap(registry, "blowball", {}, nameToDescHistogram);
 
   analyzeBlowballsPeriodically();
   refCountPublishedTransactions();
@@ -68,7 +74,7 @@ void BlowballCollector::analyzeBlowballs(const std::vector<double>& buckets) {
     auto now = std::chrono::system_clock::now();
 
     for (const auto& it : refCountIt) {
-      _families.at(TX_NUM_APPROVERS).get().Add({}, buckets).Observe(it.second);
+      histograms.at(TX_NUM_APPROVERS).get().Add({}, buckets).Observe(it.second);
       std::chrono::system_clock::time_point lastUpdateTime;
       _txToLastUpdateTime.find(it.first, lastUpdateTime);
       auto timeSinceLastUpdate =
@@ -117,29 +123,4 @@ void BlowballCollector::refCountPublishedTransactions() {
             }
           },
           []() {});
-}
-
-using namespace prometheus;
-
-PrometheusCollector::HistogramsMap BlowballCollector::buildHistogramsMap(
-    std::shared_ptr<Registry> registry,
-    const std::map<std::string, std::string>& labels) {
-  static std::map<std::string, std::string> nameToDesc = {
-      {TX_NUM_APPROVERS,
-       "Number of transactions approving a single transaction as observed "
-       "across multiple nodes"}};
-
-  std::map<std::string, std::reference_wrapper<Family<Histogram>>> families;
-  for (const auto& kv : nameToDesc) {
-    auto& curr_family = BuildHistogram()
-                            .Name("blowball_collector" + kv.first)
-                            .Help(kv.second)
-                            .Labels(labels)
-                            .Register(*registry);
-
-    families.insert(
-        std::make_pair(std::string(kv.first), std::ref(curr_family)));
-  }
-
-  return std::move(families);
 }

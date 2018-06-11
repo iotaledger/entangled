@@ -32,7 +32,8 @@ class IotaJsonAPI : virtual public IotaAPI {
 
   std::vector<std::string> findTransactions(
       nonstd::optional<std::vector<std::string>> addresses,
-      nonstd::optional<std::vector<std::string>> bundles) override;
+      nonstd::optional<std::vector<std::string>> bundles,
+      nonstd::optional<std::vector<std::string>> approvees) override;
 
   std::unordered_set<std::string> filterConsistentTails(
       const std::vector<std::string>& tails) override;

@@ -10,6 +10,7 @@ namespace cppclient {
 struct GetTransactionsToApproveResponse {
   std::string trunkTransaction;
   std::string branchTransaction;
+  uint32_t duration;
 };
 
 struct GetNodeInfoResponse {

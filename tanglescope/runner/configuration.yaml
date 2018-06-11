@@ -49,3 +49,22 @@ blowballcollector:
   bucket_size: 1
   #histogram's range (maximum value of refcount to report)
   histogram_range: 40
+
+tipselectioncollector:
+
+  #url of iri node
+  iri_host : "iri01.testnet.iota.cafe"
+  iri_port: 14265
+  #IP / Port that the Prometheus Exposer binds to
+  prometheus_exposer_uri: "0.0.0.0:8083"
+  #depth to give to "getTransactionsToApprove"
+  depth: 10
+  #in - between samples interval[seconds]
+  sample_interval: 20
+  #of calls to getTransactionsToApprove in each sample
+  sample_size: 20
+  #histogram granularity configuration
+  #duration's histogram (time it took 'getTransactionsToApprove') bucket's size [ms]
+  duration_bucket_size: 20
+  #duration's histogram range (maximum time it took 'getTransactionsToApprove')
+  duration_histogram_range: 1000

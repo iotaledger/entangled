@@ -104,7 +104,8 @@ return result;
 
 std::vector<std::string> IotaJsonAPI::findTransactions(
 nonstd::optional<std::vector<std::string>> addresses,
-nonstd::optional<std::vector<std::string>> bundles) {
+nonstd::optional<std::vector<std::string>> bundles,
+nonstd::optional<std::vector<std::string>> approvees) {
 if (!addresses && !bundles) {
 return {
 };
@@ -117,6 +118,9 @@ req["addresses"] = std::move(addresses.value());
 }
 if (bundles) {
 req["bundles"] = std::move(bundles.value());
+}
+if (approvees) {
+req["approvees"] = std::move(approvees.value());
 }
 
 auto maybeResponse = post(std::move(req));
@@ -203,7 +207,7 @@ IotaJsonAPI::getConfirmedBundlesForAddresses(
 const std::vector<std::string>& addresses) {
 // 1. Get all transactions for address [findTransactions, getTransactions]
 auto txHashes = findTransactions(addresses, {
-});
+}, {});
 auto transactions = getTransactions(txHashes);
 
 // 2. Filter unique bundles from these []
@@ -214,7 +218,7 @@ return tx.bundleHash;
 boost::back_move_inserter(bundles));
 
 // 3. Materialise all bundles [findTransactions, getTransactions]
-txHashes = findTransactions({}, bundles);
+txHashes = findTransactions({}, bundles, {});
 transactions = getTransactions(txHashes);
 
 // 4. Filter unconfirmed bundles [getNodeInfo, getInclusionStates]
@@ -320,7 +324,7 @@ return {};
 
 auto& response = maybeResponse.value();
 
-return { response["trunkTransaction"], response["branchTransaction"] };
+return { response["trunkTransaction"], response["branchTransaction"], response["duration"] };
 }
 
 std::vector<std::string> IotaJsonAPI::attachToTangle(
