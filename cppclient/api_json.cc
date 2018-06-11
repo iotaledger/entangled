@@ -106,7 +106,7 @@ std::vector<std::string> IotaJsonAPI::findTransactions(
 nonstd::optional<std::vector<std::string>> addresses,
 nonstd::optional<std::vector<std::string>> bundles,
 nonstd::optional<std::vector<std::string>> approvees) {
-if (!addresses && !bundles) {
+if (!addresses && !bundles && !approvees) {
 return {
 };
 }
