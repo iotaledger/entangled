@@ -1,0 +1,11 @@
+steps:
+  - name: "bazel test opt"
+    command: bazel test -c opt --test_output=all //...
+    plugins:
+      docker#v1.2.0:
+        image: "th0br0/iota-buildenv:x86_64"
+  - name: "bazel test debug"
+    command: bazel test -c dbg --test_output=all //...
+    plugins:
+      docker#v1.2.0:
+        image: "th0br0/iota-buildenv:x86_64"
