@@ -17,22 +17,23 @@ extern "C" {
 #define TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE
 #endif
 
-#include "trits.h"
 #include "trit_byte.h"
+#include "trits.h"
 
 typedef int8_t flex_trit_t;
 
 static inline size_t flex_trits_num_for_trits(size_t num_trits) {
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   return num_trits;
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)  
+#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
   return (num_trits + 3) / 4;
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
   return min_bytes(num_trits);
 #endif
 }
 
-static inline trit_t flex_trit_array_at(flex_trit_t *trit_array, size_t index) {
+static inline trit_t flex_trit_array_at(const flex_trit_t *trit_array,
+                                        size_t index) {
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   // Straight forward 1 trit per byte
   return trit_array[index];
@@ -42,7 +43,7 @@ static inline trit_t flex_trit_array_at(flex_trit_t *trit_array, size_t index) {
   // Calculate the shift to sign extend the result
   uint8_t tshift = 6U - mshift;
   // Find out the index of the byte in the array
-  index = index >> 2U;  
+  index = index >> 2U;
   // Get the trit and sign extend it
   return (flex_trit_t)(trit_array[index] << tshift) >> 6U;
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
@@ -56,7 +57,8 @@ static inline trit_t flex_trit_array_at(flex_trit_t *trit_array, size_t index) {
 #endif
 }
 
-static inline void flex_trit_array_set_at(flex_trit_t *trit_array, size_t index, trit_t trit) {
+static inline void flex_trit_array_set_at(flex_trit_t *trit_array, size_t index,
+                                          trit_t trit) {
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   // Straight forward 1 trit per byte
   trit_array[index] = trit;
@@ -84,8 +86,11 @@ static inline void flex_trit_array_set_at(flex_trit_t *trit_array, size_t index,
 #endif
 }
 
-size_t flex_trit_array_slice(flex_trit_t *trit_array, flex_trit_t *to_trit_array, size_t start, size_t num_trits);
-size_t flex_trit_array_to_int8(flex_trit_t *trit_array, trit_t *trits, size_t num_trits);
+size_t flex_trit_array_slice(const flex_trit_t *trit_array,
+                             flex_trit_t *to_trit_array, size_t start,
+                             size_t num_trits);
+size_t flex_trit_array_to_int8(const flex_trit_t *trit_array, trit_t *trits,
+                               size_t num_trits);
 
 typedef struct _trit_array *trit_array_p;
 typedef struct _trit_array {
@@ -104,12 +109,16 @@ static inline trit_t trit_array_at(trit_array_p trit_array, size_t index) {
   return flex_trit_array_at(trit_array->trits, index);
 }
 
-static inline void trit_array_set_at(trit_array_p trit_array, size_t index, trit_t trit) {
+static inline void trit_array_set_at(trit_array_p trit_array, size_t index,
+                                     trit_t trit) {
   flex_trit_array_set_at(trit_array->trits, index, trit);
 }
 
-void trit_array_set_trits(trit_array_p trit_array, flex_trit_t *trits, size_t num_trits);
-trit_array_p trit_array_slice(trit_array_p trit_array, trit_array_p to_trit_array, size_t start, size_t num_trits);
+void trit_array_set_trits(trit_array_p trit_array, flex_trit_t *trits,
+                          size_t num_trits);
+trit_array_p trit_array_slice(trit_array_p trit_array,
+                              trit_array_p to_trit_array, size_t start,
+                              size_t num_trits);
 trit_t *trit_array_to_int8(trit_array_p trit_array, trit_t *trits);
 
 #if !defined(NO_DYNAMIC_ALLOCATION)
@@ -124,17 +133,19 @@ trit_array_p trit_array_new(size_t num_trits);
  ***********************************************************************************************************/
 void trit_array_free(trit_array_p trit_array);
 
-#endif //NO_DYNAMIC_ALLOCATION
+#endif  // NO_DYNAMIC_ALLOCATION
 
-#define TRIT_ARRAY_DECLARE(NAME, NUM_TRITS) \
-size_t NAME ## _num_bytes = trit_array_bytes_for_trits(NUM_TRITS); \
-flex_trit_t *NAME ## _trits[NAME ## _num_bytes]; \
-struct _trit_array NAME = { (flex_trit_t *) NAME ## _trits, NUM_TRITS, NAME ## _num_bytes };
+#define TRIT_ARRAY_DECLARE(NAME, NUM_TRITS)                          \
+  size_t NAME##_num_bytes = trit_array_bytes_for_trits(NUM_TRITS);   \
+  flex_trit_t *NAME##_trits[NAME##_num_bytes];                       \
+  struct _trit_array NAME = {(flex_trit_t *)NAME##_trits, NUM_TRITS, \
+                             NAME##_num_bytes};
 
-#define TRIT_ARRAY_ASSIGN(NAME, NUM_TRITS, TRITS) \
-size_t NAME ## _num_bytes = trit_array_bytes_for_trits(NUM_TRITS); \
-flex_trit_t NAME ## _trits[] = {TRITS}; \
-struct _trit_array NAME = { (flex_trit_t *) NAME ## _trits, NUM_TRITS, NAME ## _num_bytes };
+#define TRIT_ARRAY_ASSIGN(NAME, NUM_TRITS, TRITS)                    \
+  size_t NAME##_num_bytes = trit_array_bytes_for_trits(NUM_TRITS);   \
+  flex_trit_t NAME##_trits[] = {TRITS};                              \
+  struct _trit_array NAME = {(flex_trit_t *)NAME##_trits, NUM_TRITS, \
+                             NAME##_num_bytes};
 
 #endif
 #ifdef __cplusplus
