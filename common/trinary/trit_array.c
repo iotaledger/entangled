@@ -15,8 +15,8 @@
 #define TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE
 #endif
 
-size_t flex_trit_array_slice(const flex_trit_t *trit_array,
-                             flex_trit_t *to_trit_array, size_t start,
+size_t flex_trit_array_slice(flex_trit_t *to_trit_array,
+                             const flex_trit_t *trit_array, size_t start,
                              size_t num_trits) {
   size_t num_bytes = trit_array_bytes_for_trits(num_trits);
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
@@ -69,7 +69,16 @@ size_t flex_trit_array_slice(const flex_trit_t *trit_array,
   return num_bytes;
 }
 
-size_t flex_trit_array_to_int8(const flex_trit_t *trit_array, trit_t *trits,
+size_t flex_trit_array_insert(flex_trit_t *trit_array,
+                              const flex_trit_t *from_trit_array, size_t start,
+                              size_t num_trits) {
+  for (size_t i = 0; i < num_trits; i++) {
+    flex_trit_array_set_at(trit_array, start + i,
+                           flex_trit_array_at(from_trit_array, i));
+  }
+}
+
+size_t flex_trit_array_to_int8(trit_t *trits, const flex_trit_t *trit_array,
                                size_t num_trits) {
   size_t num_bytes = trit_array_bytes_for_trits(num_trits);
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
@@ -82,6 +91,20 @@ size_t flex_trit_array_to_int8(const flex_trit_t *trit_array, trit_t *trits,
   bytes_to_trits((flex_trit_t *)trit_array, num_bytes, trits, num_trits);
 #endif
   return num_bytes;
+}
+
+size_t int8_to_flex_trit_array(flex_trit_t *trit_array, const trit_t *trits,
+                               size_t num_trits) {
+#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+  memcpy(trit_array, trits, num_trits);
+#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
+  for (size_t i = 0; i < num_trits; i++) {
+    flex_trit_array_set_at(trit_array, i, trits[i]);
+  }
+#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+  trits_to_bytes(trits, trit_array, num_trits);
+#endif
+  return num_trits;
 }
 
 /***********************************************************************************************************
@@ -121,12 +144,12 @@ trit_array_p trit_array_slice(trit_array_p trit_array,
 #endif  // NO_DYNAMIC_ALLOCATION
   to_trit_array->num_trits = num_trits;
   to_trit_array->num_bytes = flex_trit_array_slice(
-      trit_array->trits, to_trit_array->trits, start, num_trits);
+      to_trit_array->trits, trit_array->trits, start, num_trits);
   return to_trit_array;
 }
 
 trit_t *trit_array_to_int8(trit_array_p trit_array, trit_t *trits) {
-  flex_trit_array_to_int8(trit_array->trits, trits, trit_array->num_trits);
+  flex_trit_array_to_int8(trits, trit_array->trits, trit_array->num_trits);
   return trits;
 }
 

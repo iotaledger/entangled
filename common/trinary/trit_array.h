@@ -86,10 +86,15 @@ static inline void flex_trit_array_set_at(flex_trit_t *trit_array, size_t index,
 #endif
 }
 
-size_t flex_trit_array_slice(const flex_trit_t *trit_array,
-                             flex_trit_t *to_trit_array, size_t start,
+size_t flex_trit_array_slice(flex_trit_t *to_trit_array,
+                             const flex_trit_t *trit_array, size_t start,
                              size_t num_trits);
-size_t flex_trit_array_to_int8(const flex_trit_t *trit_array, trit_t *trits,
+size_t flex_trit_array_insert(flex_trit_t *trit_array,
+                              const flex_trit_t *from_trit_array, size_t start,
+                              size_t num_trits);
+size_t flex_trit_array_to_int8(trit_t *trits, const flex_trit_t *trit_array,
+                               size_t num_trits);
+size_t int8_to_flex_trit_array(flex_trit_t *trit_array, const trit_t *trits,
                                size_t num_trits);
 
 typedef struct _trit_array *trit_array_p;
