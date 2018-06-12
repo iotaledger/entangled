@@ -13,7 +13,7 @@ cc_library(
     deps = [
         "//cppclient:beast",
         "@cppzmq",
-        "@glog",
+        "@com_github_google_glog//:glog",
         "@libcuckoo",
         "@rxcpp",
         "@yaml_cpp",
@@ -26,6 +26,6 @@ cc_test(
     deps = [
         ":common",
         "@com_github_gflags_gflags//:gflags",
-        "@gtest//:gtest_main",
+        "@com_google_googletest//:gtest_main",
     ],
 )

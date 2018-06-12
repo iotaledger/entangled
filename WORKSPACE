@@ -2,7 +2,7 @@ workspace(name = "org_iota_entangled")
 
 git_repository(
     name = "rules_iota",
-    commit = "cf7ffa1d71b3bc751b6cd13166fa34625673fdfd",
+    commit = "b5e5b91d955f257e47c7803808073658387f8a86",
     remote = "https://github.com/iotaledger/rules_iota.git",
 )
 

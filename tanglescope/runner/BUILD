@@ -36,8 +36,7 @@ cc_test(
     ]),
     deps = [
         ":shared",
-        "@gtest",
-        "@gtest//:gtest_main",
+        "@com_google_googletest//:gtest_main",
     ],
 )
 

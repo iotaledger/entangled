@@ -16,7 +16,7 @@ cc_library(
         "//tanglescope/common",
         "//tanglescope/prometheus_collector",
         "@com_github_gflags_gflags//:gflags",
-        "@glog",
+        "@com_github_google_glog//:glog",
     ],
 )
 
