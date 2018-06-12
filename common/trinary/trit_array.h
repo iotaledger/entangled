@@ -26,7 +26,7 @@ static inline size_t flex_trits_num_for_trits(size_t num_trits) {
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   return num_trits;
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
-  return (num_trits + 3) / 4;
+  return (num_trits + 3) >> 2U;
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
   return min_bytes(num_trits);
 #endif

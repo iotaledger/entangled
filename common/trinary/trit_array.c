@@ -26,38 +26,44 @@ size_t flex_trit_array_slice(const flex_trit_t *trit_array,
   uint8_t tshift = (start % 4U) << 1U;
   uint8_t rshift = (8U - tshift) % 8U;
   size_t index = start >> 2U;
-  size_t max_index = (start + num_trits - 1) >> 2U;
+  size_t end_index = (start + num_trits - 1) >> 2U;
   size_t i, j;
   // Calculate the number of bytes to copy over
   for (i = index, j = 0; i < index + num_bytes; i++, j++) {
     buffer = trit_array[i];
     buffer = buffer >> tshift;
-    if (rshift && i < max_index) {
-      buffer |= (trit_array[i + 1] << rshift);
+    if (i < end_index) {
+      if (rshift) {
+        buffer |= (trit_array[i + 1] << rshift);
+      }
+    } else {
+      uint8_t residual = (num_trits % 4);
+      if (residual) {
+        uint8_t shift = (4 - residual) << 1U;
+        buffer = (uint8_t)(buffer << shift) >> shift;
+      }
     }
     to_trit_array[j] = buffer;
   }
   // There is a risk of noise after the last trit so we need to clean up
-  uint8_t residual = (num_trits % 4);
-  if (residual) {
-    uint8_t shift = (4 - residual) << 1U;
-    j--;
-    to_trit_array[j] = (flex_trit_t)(to_trit_array[j] << shift) >> shift;
-  }
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
-  byte_t buffer = 0;
+  byte_t buffer;
   trit_t trits[10];
   size_t index = start / 5U;
   size_t offset = start % 5U;
-  size_t max_index = (start + num_trits - 1) / 5U;
-  size_t i, j;
+  size_t end_index = (start + num_trits - 1) / 5U;
+  size_t i, j, len = 5;
   for (i = index, j = 0; i < index + num_bytes; i++, j++) {
     bytes_to_trits(((byte_t *)trit_array + i), 1, trits, 5);
-    if (offset && i < max_index) {
-      bytes_to_trits(((byte_t *)trit_array + i + 1), 1, ((trit_t *)trits + 5),
-                     5);
+    if (i < end_index) {
+      if (offset) {
+        bytes_to_trits(((byte_t *)trit_array + i + 1), 1, ((trit_t *)trits + 5),
+                       5);
+      }
+    } else if (num_bytes * 5 > num_trits) {
+      len = (num_trits - num_bytes * 5 + 5);
     }
-    to_trit_array[j] = trits_to_byte(trits + offset, buffer, 5);
+    to_trit_array[j] = trits_to_byte(trits + offset, 0, len - 1);
   }
 #endif
   return num_bytes;
