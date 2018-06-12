@@ -8,7 +8,7 @@
 #include "common/model/transaction.h"
 #include <stdlib.h>
 #include <string.h>
-#include "common/trinary/tryte_long.h"
+#include "common/trinary/trit_long.h"
 
 /***********************************************************************************************************
  * Transaction
@@ -21,97 +21,123 @@
  ***********************************************************************************************************/
 // Fills up an existing transaction with the serialized data in bytes
 // Return non 0 on success
-uint16_t transaction_deserialize_trytes(iota_transaction_t transaction,
-                                        const tryte_t *trytes) {
-  uint16_t offset = 0;
-  transaction_set_signature(transaction, trytes + offset);
-  offset += sizeof(transaction->signature_or_message);
-  transaction_set_address(transaction, trytes + offset);
-  offset += sizeof(transaction->address);
-  transaction_set_value(transaction, trytes_to_long(trytes + offset, 27));
+size_t transaction_deserialize_trits(iota_transaction_t transaction,
+                                     const flex_trit_t *trits) {
+  flex_trit_t partial[FLEX_TRIT_SIZE_81];
+  trit_t buffer[81];
+  size_t offset = 0;
+  memset(transaction, 0, sizeof(struct _iota_transaction));
+  flex_trit_array_slice(transaction->signature_or_message, trits,
+                        offset, 6561);
+  offset += 6561;
+  flex_trit_array_slice(transaction->address, trits,
+                        offset, 243);
+  offset += 243;
+  flex_trit_array_slice(partial, trits, offset, 81);
+  flex_trit_array_to_int8(buffer, partial, 81);
+  transaction_set_value(transaction, trits_to_long(buffer, 81));
+  offset += 81;
+  flex_trit_array_slice(transaction->obsolete_tag, trits,
+                        offset, 81);
+  offset += 81;
+  flex_trit_array_slice(partial, trits, offset, 27);
+  flex_trit_array_to_int8(buffer, partial, 27);
+  transaction_set_timestamp(transaction, trits_to_long(buffer, 27));
   offset += 27;
-  transaction_set_obsolete_tag(transaction, trytes + offset);
-  offset += sizeof(transaction->obsolete_tag);
-  transaction_set_timestamp(transaction, trytes_to_long(trytes + offset, 9));
-  offset += 9;
-  transaction_set_current_index(transaction,
-                                trytes_to_long(trytes + offset, 9));
-  offset += 9;
-  transaction_set_last_index(transaction, trytes_to_long(trytes + offset, 9));
-  offset += 9;
-  transaction_set_bundle(transaction, trytes + offset);
-  offset += sizeof(transaction->bundle);
-  transaction_set_trunk(transaction, trytes + offset);
-  offset += sizeof(transaction->trunk);
-  transaction_set_branch(transaction, trytes + offset);
-  offset += sizeof(transaction->branch);
-  transaction_set_tag(transaction, trytes + offset);
-  offset += sizeof(transaction->tag);
+  flex_trit_array_slice(partial, trits, offset, 27);
+  flex_trit_array_to_int8(buffer, partial, 27);
+  transaction_set_current_index(transaction, trits_to_long(buffer, 27));
+  offset += 27;
+  flex_trit_array_slice(partial, trits, offset, 27);
+  flex_trit_array_to_int8(buffer, partial, 27);
+  transaction_set_last_index(transaction, trits_to_long(buffer, 27));
+  offset += 27;
+  flex_trit_array_slice(transaction->bundle, trits,
+                        offset, 243);
+  offset += 243;
+  flex_trit_array_slice(transaction->trunk, trits,
+                        offset, 243);
+  offset += 243;
+  flex_trit_array_slice(transaction->branch, trits,
+                        offset, 243);
+  offset += 243;
+  flex_trit_array_slice(transaction->tag, trits,
+                        offset, 81);
+  offset += 81;
+  flex_trit_array_slice(partial, trits, offset, 27);
+  flex_trit_array_to_int8(buffer, partial, 27);
   transaction_set_attachment_timestamp(transaction,
-                                       trytes_to_long(trytes + offset, 9));
-  offset += 9;
-  transaction_set_attachment_timestamp_lower(
-      transaction, trytes_to_long(trytes + offset, 9));
-  offset += 9;
-  transaction_set_attachment_timestamp_upper(
-      transaction, trytes_to_long(trytes + offset, 9));
-  offset += 9;
-  transaction_set_nonce(transaction, trytes + offset);
-  offset += sizeof(transaction->nonce);
+                                       trits_to_long(buffer, 27));
+  offset += 27;
+  flex_trit_array_slice(partial, trits, offset, 27);
+  flex_trit_array_to_int8(buffer, partial, 27);
+  transaction_set_attachment_timestamp_lower(transaction,
+                                             trits_to_long(buffer, 27));
+  offset += 27;
+  flex_trit_array_slice(partial, trits, offset, 27);
+  flex_trit_array_to_int8(buffer, partial, 27);
+  transaction_set_attachment_timestamp_upper(transaction,
+                                             trits_to_long(buffer, 27));
+  offset += 27;
+  flex_trit_array_slice(transaction->nonce, trits,
+                        offset, 81);
+  offset += 81;
   return offset;
 }
 
-void _convert_and_pad(int64_t value, tryte_t *trytes, size_t length) {
-  size_t num_trytes;
-  num_trytes = long_to_trytes(value, trytes);
-  memset(trytes + num_trytes, '9', length - num_trytes);
+size_t _long_to_flex_trit(int64_t value, flex_trit_t *trits) {
+  trit_t buffer[81];
+  memset(buffer, 0, 81);
+  size_t long_size = long_to_trits(value, buffer);
+  int8_to_flex_trit_array(trits, buffer, long_size);
+  return long_size;
 }
 // Serialize an existing transaction
 // Return non 0 on success
-uint16_t transaction_serialize_to_trytes(const iota_transaction_t transaction,
-                                         tryte_t *trytes) {
-  uint16_t offset = 0;
-  memcpy(trytes + offset, transaction_signature(transaction),
-         sizeof(transaction->signature_or_message));
-  offset += sizeof(transaction->signature_or_message);
-  memcpy(trytes + offset, transaction_address(transaction),
-         sizeof(transaction->address));
-  offset += sizeof(transaction->address);
-  _convert_and_pad(transaction_value(transaction), trytes + offset, 27);
+size_t transaction_serialize_to_trits(const iota_transaction_t transaction,
+                                      flex_trit_t *trits) {
+  flex_trit_t partial[FLEX_TRIT_SIZE_81];
+  size_t offset = 0, long_size;
+  size_t num_bytes = flex_trits_num_for_trits(8019);
+  memset(trits, 0, num_bytes);
+
+  flex_trit_array_insert(trits, transaction->signature_or_message, offset, 6561);
+  offset += 6561;
+  flex_trit_array_insert(trits, transaction->address, offset, 243);
+  offset += 243;
+  long_size = _long_to_flex_trit(transaction->value, partial);
+  flex_trit_array_insert(trits, partial, offset, long_size);
+  offset += 81;
+  flex_trit_array_insert(trits, transaction->obsolete_tag, offset, 81);
+  offset += 81;
+  long_size = _long_to_flex_trit(transaction->timestamp, partial);
+  flex_trit_array_insert(trits, partial, offset, long_size);
   offset += 27;
-  memcpy(trytes + offset, transaction_obsolete_tag(transaction),
-         sizeof(transaction->obsolete_tag));
-  offset += sizeof(transaction->obsolete_tag);
-  _convert_and_pad(transaction_timestamp(transaction), trytes + offset, 9);
-  offset += 9;
-  _convert_and_pad(transaction_current_index(transaction), trytes + offset, 9);
-  offset += 9;
-  _convert_and_pad(transaction_last_index(transaction), trytes + offset, 9);
-  offset += 9;
-  memcpy(trytes + offset, transaction_bundle(transaction),
-         sizeof(transaction->bundle));
-  offset += sizeof(transaction->bundle);
-  memcpy(trytes + offset, transaction_trunk(transaction),
-         sizeof(transaction->trunk));
-  offset += sizeof(transaction->trunk);
-  memcpy(trytes + offset, transaction_branch(transaction),
-         sizeof(transaction->branch));
-  offset += sizeof(transaction->branch);
-  memcpy(trytes + offset, transaction_tag(transaction),
-         sizeof(transaction->tag));
-  offset += sizeof(transaction->tag);
-  _convert_and_pad(transaction_attachment_timestamp(transaction),
-                   trytes + offset, 9);
-  offset += 9;
-  _convert_and_pad(transaction_attachment_timestamp_lower(transaction),
-                   trytes + offset, 9);
-  offset += 9;
-  _convert_and_pad(transaction_attachment_timestamp_upper(transaction),
-                   trytes + offset, 9);
-  offset += 9;
-  memcpy(trytes + offset, transaction_nonce(transaction),
-         sizeof(transaction->nonce));
-  offset += sizeof(transaction->nonce);
+  long_size = _long_to_flex_trit(transaction->current_index, partial);
+  flex_trit_array_insert(trits, partial, offset, long_size);
+  offset += 27;
+  long_size = _long_to_flex_trit(transaction->last_index, partial);
+  flex_trit_array_insert(trits, partial, offset, long_size);
+  offset += 27;
+  flex_trit_array_insert(trits, transaction->bundle, offset, 243);
+  offset += 243;
+  flex_trit_array_insert(trits, transaction->trunk, offset, 243);
+  offset += 243;
+  flex_trit_array_insert(trits, transaction->branch, offset, 243);
+  offset += 243;
+  flex_trit_array_insert(trits, transaction->tag, offset, 81);
+  offset += 81;
+  long_size = _long_to_flex_trit(transaction->attachment_timestamp, partial);
+  flex_trit_array_insert(trits, partial, offset, long_size);
+  offset += 27;
+  long_size = _long_to_flex_trit(transaction->attachment_timestamp_lower, partial);
+  flex_trit_array_insert(trits, partial, offset, long_size);
+  offset += 27;
+  long_size = _long_to_flex_trit(transaction->attachment_timestamp_upper, partial);
+  flex_trit_array_insert(trits, partial, offset, long_size);
+  offset += 27;
+  flex_trit_array_insert(trits, transaction->nonce, offset, 81);
+  offset += 81;
   return offset;
 }
 
@@ -122,37 +148,37 @@ uint16_t transaction_serialize_to_trytes(const iota_transaction_t transaction,
  * Accessors
  ***********************************************************************************************************/
 // Get the transaction signature
-tryte_t *transaction_signature(iota_transaction_t transaction) {
+flex_trit_t *transaction_signature(iota_transaction_t transaction) {
   return transaction->signature_or_message;
 }
 
 // Set the transaction signature (copy argument)
 void transaction_set_signature(iota_transaction_t transaction,
-                               const tryte_t *signature) {
+                               const flex_trit_t *signature) {
   memcpy(transaction->signature_or_message, signature,
          sizeof(transaction->signature_or_message));
 }
 
 // Get the transaction message
-tryte_t *transaction_message(iota_transaction_t transaction) {
+flex_trit_t *transaction_message(iota_transaction_t transaction) {
   return transaction->signature_or_message;
 }
 
 // Set the transaction message (copy argument)
 void transaction_set_message(iota_transaction_t transaction,
-                             const tryte_t *message) {
+                             const flex_trit_t *message) {
   memcpy(transaction->signature_or_message, message,
          sizeof(transaction->signature_or_message));
 }
 
 // Get the transaction address
-tryte_t *transaction_address(iota_transaction_t transaction) {
+flex_trit_t *transaction_address(iota_transaction_t transaction) {
   return transaction->address;
 }
 
 // Set the transaction address (copy argument)
 void transaction_set_address(iota_transaction_t transaction,
-                             const tryte_t *address) {
+                             const flex_trit_t *address) {
   memcpy(transaction->address, address, sizeof(transaction->address));
 }
 
@@ -167,13 +193,13 @@ void transaction_set_value(iota_transaction_t transaction, int64_t value) {
 }
 
 // Get the transaction obsolete tag
-tryte_t *transaction_obsolete_tag(iota_transaction_t transaction) {
+flex_trit_t *transaction_obsolete_tag(iota_transaction_t transaction) {
   return transaction->obsolete_tag;
 }
 
 // Set the transaction obsolete tag
 void transaction_set_obsolete_tag(iota_transaction_t transaction,
-                                  const tryte_t *obsolete_tag) {
+                                  const flex_trit_t *obsolete_tag) {
   memcpy(transaction->obsolete_tag, obsolete_tag,
          sizeof(transaction->obsolete_tag));
 }
@@ -211,45 +237,45 @@ void transaction_set_last_index(iota_transaction_t transaction, int64_t index) {
 }
 
 // Get the transaction bundle
-tryte_t *transaction_bundle(iota_transaction_t transaction) {
+flex_trit_t *transaction_bundle(iota_transaction_t transaction) {
   return transaction->bundle;
 }
 
 // Set the transaction bundle (copy argument)
 void transaction_set_bundle(iota_transaction_t transaction,
-                            const tryte_t *bundle) {
+                            const flex_trit_t *bundle) {
   memcpy(transaction->bundle, bundle, sizeof(transaction->bundle));
 }
 
 // Get the transaction trunk
-tryte_t *transaction_trunk(iota_transaction_t transaction) {
+flex_trit_t *transaction_trunk(iota_transaction_t transaction) {
   return transaction->trunk;
 }
 
 // Set the transaction trunk (copy argument)
 void transaction_set_trunk(iota_transaction_t transaction,
-                           const tryte_t *trunk) {
+                           const flex_trit_t *trunk) {
   memcpy(transaction->trunk, trunk, sizeof(transaction->trunk));
 }
 
 // Get the transaction branch
-tryte_t *transaction_branch(iota_transaction_t transaction) {
+flex_trit_t *transaction_branch(iota_transaction_t transaction) {
   return transaction->branch;
 }
 
 // Set the transaction branch (copy argument)
 void transaction_set_branch(iota_transaction_t transaction,
-                            const tryte_t *branch) {
+                            const flex_trit_t *branch) {
   memcpy(transaction->branch, branch, sizeof(transaction->branch));
 }
 
 // Get the transaction tag
-tryte_t *transaction_tag(iota_transaction_t transaction) {
+flex_trit_t *transaction_tag(iota_transaction_t transaction) {
   return transaction->tag;
 }
 
 // Set the transaction tag (copy argument)
-void transaction_set_tag(iota_transaction_t transaction, const tryte_t *tag) {
+void transaction_set_tag(iota_transaction_t transaction, const flex_trit_t *tag) {
   memcpy(transaction->tag, tag, sizeof(transaction->tag));
 }
 
@@ -287,13 +313,13 @@ void transaction_set_attachment_timestamp_upper(iota_transaction_t transaction,
 }
 
 // Get the transaction nonce
-tryte_t *transaction_nonce(iota_transaction_t transaction) {
+flex_trit_t *transaction_nonce(iota_transaction_t transaction) {
   return transaction->nonce;
 }
 
 // Set the transaction nonce (copy argument)
 void transaction_set_nonce(iota_transaction_t transaction,
-                           const tryte_t *nonce) {
+                           const flex_trit_t *nonce) {
   memcpy(transaction->nonce, nonce, sizeof(transaction->nonce));
 }
 
@@ -313,14 +339,14 @@ iota_transaction_t transaction_new(void) {
 
 // Creates and returns a new transaction from serialized data
 // Returns NULL if failed
-iota_transaction_t transaction_deserialize(const tryte_t *trytes) {
+iota_transaction_t transaction_deserialize(const flex_trit_t *trits) {
   iota_transaction_t transaction;
   transaction = transaction_new();
   if (!transaction) {
     // errno = IOTA_OUT_OF_MEMORY
     return NULL;
   }
-  if (!transaction_deserialize_from_trytes(transaction, trytes)) {
+  if (!transaction_deserialize_from_trits(transaction, trits)) {
     // errno = IOTA_SOME_ERROR
     transaction_free(transaction);
     return NULL;
@@ -333,13 +359,14 @@ iota_transaction_t transaction_deserialize(const tryte_t *trytes) {
  ***********************************************************************************************************/
 // Returns the serialized data from an existing transaction
 // Returns NULL if failed
-tryte_t *transaction_serialize(const iota_transaction_t transaction) {
-  tryte_t *serialized_value = (tryte_t *)malloc(sizeof(tryte_t) * 2673);
+flex_trit_t *transaction_serialize(const iota_transaction_t transaction) {
+  size_t num_bytes = flex_trits_num_for_trits(8019);
+  flex_trit_t *serialized_value = (flex_trit_t *)malloc(sizeof(flex_trit_t) * num_bytes);
   if (!serialized_value) {
     // errno = IOTA_OUT_OF_MEMORY
     return NULL;
   }
-  if (!transaction_serialize_on_trytes(transaction, serialized_value)) {
+  if (!transaction_serialize_on_trits(transaction, serialized_value)) {
     free(serialized_value);
     serialized_value = NULL;
   }
@@ -348,19 +375,19 @@ tryte_t *transaction_serialize(const iota_transaction_t transaction) {
 
 // Places the serialized data from an existing transaction in pre-allocated
 // bytes Returns non 0 on success
-uint16_t transaction_serialize_on_trytes(const iota_transaction_t transaction,
-                                         tryte_t *trytes) {
-  return transaction_serialize_to_trytes(transaction, trytes);
+size_t transaction_serialize_on_trits(const iota_transaction_t transaction,
+                                      flex_trit_t *trits) {
+  return transaction_serialize_to_trits(transaction, trits);
 }
 
 /***********************************************************************************************************
  * Deserialization
  ***********************************************************************************************************/
-// Fills up an existing transaction with the serialized data in trytes - returns
+// Fills up an existing transaction with the serialized data in trits - returns
 // non 0 on success
-uint16_t transaction_deserialize_from_trytes(iota_transaction_t transaction,
-                                             const tryte_t *trytes) {
-  return transaction_deserialize_trytes(transaction, trytes);
+size_t transaction_deserialize_from_trits(iota_transaction_t transaction,
+                                          const flex_trit_t *trits) {
+  return transaction_deserialize_trits(transaction, trits);
 }
 
 /***********************************************************************************************************
