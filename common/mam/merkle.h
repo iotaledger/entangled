@@ -16,7 +16,7 @@ int merkle_create(trit_t *const tree, trit_t *const seed, int64_t offset,
                   const size_t base_size, size_t security, Curl *const c);
 int merkle_branch(trit_t *sibling, trit_t *const merkle_tree,
                   size_t tree_length, size_t tree_depth, size_t leaf_index);
-int merkle_root(trit_t *hash, trit_t *siblings, size_t depth, size_t index,
-                Curl *c);
+int merkle_root(trit_t *hash, trit_t *siblings, size_t siblings_number,
+                size_t index, Curl *c);
 
 #endif  //__MERKLE_H__

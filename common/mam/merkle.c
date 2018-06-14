@@ -34,6 +34,10 @@ static size_t binary_tree_size(size_t acc, size_t depth) {
 size_t merkle_size(size_t leaf_count) {
   size_t acc = 1;
 
+  if (leaf_count == 0)
+    return 0;
+  else if (leaf_count == 1)
+    return 2;
   while (leaf_count >= 2) {
     acc += leaf_count;
     leaf_count = (leaf_count + 1) >> 1;
@@ -158,9 +162,9 @@ int merkle_branch(trit_t *sibling, trit_t *const merkle_tree,
   return 0;
 }
 
-int merkle_root(trit_t *hash, trit_t *siblings, size_t depth, size_t index,
-                Curl *c) {
-  for (size_t i = 0; i < depth; i++) {
+int merkle_root(trit_t *hash, trit_t *siblings, size_t siblings_number,
+                size_t index, Curl *c) {
+  for (size_t i = 0; i < siblings_number; i++) {
     if (index & 1) {
       curl_absorb(c, siblings, HASH_LENGTH);
       curl_absorb(c, hash, HASH_LENGTH);
