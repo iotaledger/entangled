@@ -14,6 +14,8 @@ extern "C" {
 
 #include "common/trinary/trit_array.h"
 
+#define NUM_TRITS_SERIALIZED_TRANSACTION    8019
+
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
 #define FLEX_TRIT_SIZE_27   27
 #define FLEX_TRIT_SIZE_81   81
