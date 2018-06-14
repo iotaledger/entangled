@@ -30,6 +30,8 @@ int _ISS_PREFIX(signature)(trit_t *sig, trit_t *const hash, trit_t *key,
 int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t *const hash, trit_t *sig,
                             size_t sig_len, HASH_STATE *const c);
 
+int signed_window(trit_t *hash);
+
 #ifdef __cplusplus
 }
 #endif
