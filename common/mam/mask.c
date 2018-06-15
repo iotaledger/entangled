@@ -19,12 +19,10 @@ int mask(trit_t *dest, trit_t *message, size_t l, Curl *const c) {
 
 int unmask(trit_t *dest, trit_t *cipher, size_t l, Curl *const c) {
   size_t chunk_length;
-  trit_t chunk[HASH_LENGTH];
   for (size_t i = 0; i < l; i += HASH_LENGTH) {
     chunk_length = l - i < HASH_LENGTH ? l - i : HASH_LENGTH;
-    memcpy(chunk, &cipher[i], chunk_length * sizeof(trit_t));
     for (size_t j = 0; j < chunk_length; j++) {
-      dest[i + j] = trit_sum(chunk[j], -c->state[j]);
+      dest[i + j] = trit_sum(cipher[i + j], -c->state[j]);
     }
     curl_absorb(c, &dest[i], chunk_length);
   }
