@@ -121,7 +121,7 @@ int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t *const hash, trit_t *sig,
     }
   }
   _HASH_PREFIX(absorb)(state, sig_start, sig_len);
-  //_HASH_PREFIX(squeeze)(state, dig, HASH_LENGTH);
+  _HASH_PREFIX(squeeze)(state, dig, HASH_LENGTH);
   return 0;
 }
 
