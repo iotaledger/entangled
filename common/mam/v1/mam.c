@@ -174,9 +174,11 @@ int mam_parse(trit_t *payload, size_t payload_length, trit_t *message,
     offset += enc_sibling_number_length;
 
     // get merkle root from siblings from payload
-    if (offset >= payload_length) return -1;
-    curl_reset(enc_curl);
-    merkle_root(hash, payload + offset, sibling_number, *index, enc_curl);
+    if (sibling_number != 0) {
+      if (offset >= payload_length) return -1;
+      curl_reset(enc_curl);
+      merkle_root(hash, payload + offset, sibling_number, *index, enc_curl);
+    }
 
     // check merkle root with the given root
     if (memcmp(hash, root, HASH_LENGTH * sizeof(trit_t)) == 0)

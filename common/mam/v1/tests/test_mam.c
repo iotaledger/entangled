@@ -41,10 +41,9 @@ void test_create(void) {
   size_t next_tree_size = merkle_size(next_count);
   trit_t merkle_tree[tree_size * HASH_LENGTH];
   trit_t next_root[next_tree_size * HASH_LENGTH];
-  size_t payload_length =
+  int payload_length =
       payload_min_length(message_length, tree_size * HASH_LENGTH,
-                         merkle_leaf_index(index, count), security) +
-      security * ISS_KEY_LENGTH;
+                         merkle_leaf_index(index, count), security);
   trit_t *payload = malloc(payload_length * sizeof(trit_t));
 
   Curl curl;
@@ -56,11 +55,11 @@ void test_create(void) {
   TEST_ASSERT_EQUAL_INT(0, merkle_create(next_root, seed_trits, next_start,
                                          next_count, security, &curl));
   curl_reset(&curl);
-  TEST_ASSERT_TRUE(mam_create(payload, payload_length, message_trits,
-                              message_length, side_key_trits,
-                              strlen(side_key) * 3, merkle_tree,
-                              tree_size * HASH_LENGTH, count, index, start,
-                              next_root, seed_trits, security, &curl) != -1);
+  payload_length = mam_create(
+      payload, payload_length, message_trits, message_length, side_key_trits,
+      strlen(side_key) * 3, merkle_tree, tree_size * HASH_LENGTH, count, index,
+      start, next_root, seed_trits, security, &curl);
+  TEST_ASSERT_TRUE(payload_length != -1);
   curl_reset(&curl);
 
   size_t parsed_index = -1;
