@@ -2,7 +2,7 @@
 #include <string.h>
 #include <unity/unity.h>
 
-#include "common/sign/v1/iss_curl.h"
+#include "common/sign/v2/iss_curl.h"
 #include "common/trinary/trit_tryte.h"
 #include "mam/mam.h"
 #include "mam/merkle.h"
@@ -42,8 +42,8 @@ void test_create(void) {
   trit_t merkle_tree[tree_size * HASH_LENGTH];
   trit_t next_root[next_tree_size * HASH_LENGTH];
   size_t payload_length =
-      payload_min_length(message_length, tree_size * HASH_LENGTH, index,
-                         security) +
+      payload_min_length(message_length, tree_size * HASH_LENGTH,
+                         merkle_leaf_index(index, count), security) +
       security * ISS_KEY_LENGTH;
   trit_t *payload = malloc(payload_length * sizeof(trit_t));
 
@@ -59,8 +59,8 @@ void test_create(void) {
   TEST_ASSERT_TRUE(mam_create(payload, payload_length, message_trits,
                               message_length, side_key_trits,
                               strlen(side_key) * 3, merkle_tree,
-                              tree_size * HASH_LENGTH, index, start, next_root,
-                              seed_trits, security, &curl) != -1);
+                              tree_size * HASH_LENGTH, count, index, start,
+                              next_root, seed_trits, security, &curl) != -1);
   curl_reset(&curl);
 
   size_t parsed_index = -1;

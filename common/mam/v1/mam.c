@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "common/curl-p/hamming.h"
-#include "common/sign/v1/iss_curl.h"
+#include "common/sign/v2/iss_curl.h"
 #include "common/trinary/trit_long.h"
 #include "mam/mask.h"
 #include "mam/merkle.h"
@@ -24,16 +24,17 @@ int payload_min_length(size_t message_length, size_t merkle_tree_length,
 
 int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
                size_t message_length, trit_t *side_key, size_t side_key_length,
-               trit_t *merkle_tree, size_t merkle_tree_length, size_t index,
-               size_t start, trit_t *next_root, trit_t *seed, size_t security,
-               Curl *enc_curl) {
+               trit_t *merkle_tree, size_t merkle_tree_length,
+               size_t leaf_count, size_t index, size_t start, trit_t *next_root,
+               trit_t *seed, size_t security, Curl *enc_curl) {
   if (security > 3) {
     fprintf(stderr, "invalid security %zd\n", security);
     return -1;
   }
 
   size_t sibling_number = merkle_depth(merkle_tree_length / HASH_LENGTH) - 1;
-  size_t enc_index_length = encoded_length(index);
+  size_t enc_index_length =
+      encoded_length(merkle_leaf_index(index, leaf_count));
   size_t enc_message_length_length = encoded_length(message_length);
   size_t signature_length = security * ISS_KEY_LENGTH;
   size_t enc_siblings_number_length = encoded_length(sibling_number);
@@ -53,7 +54,8 @@ int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
   mam_init_encryption(side_key, side_key_length, merkle_tree, enc_curl);
 
   // encode index to payload
-  encode_long(index, payload + offset, enc_index_length);
+  encode_long(merkle_leaf_index(index, leaf_count), payload + offset,
+              enc_index_length);
   offset += enc_index_length;
 
   // encode message length to payload
@@ -82,7 +84,7 @@ int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
   curl_reset(&curl);
   iss_curl_subseed(seed, payload + offset, start + index, &curl);
   iss_curl_key(payload + offset, payload + offset, signature_length, &curl);
-  iss_curl_signature(payload + offset, enc_curl->state, payload + offset,
+  iss_curl_signature(payload + offset, enc_curl->state, 0, payload + offset,
                      signature_length, &curl);
   offset += signature_length;
 
@@ -92,7 +94,7 @@ int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
 
   // encrypt siblings to payload
   merkle_branch(payload + offset, merkle_tree, merkle_tree_length,
-                sibling_number + 1, index);
+                sibling_number + 1, index, leaf_count);
   offset += sibling_number * HASH_LENGTH;
 
   size_t to_mask = signature_length + enc_siblings_number_length +
@@ -156,7 +158,7 @@ int mam_parse(trit_t *payload, size_t payload_length, trit_t *message,
   else {
     // decrypt signature from payload
     curl_reset(enc_curl);
-    iss_curl_sig_digest(hash, hash, payload + offset,
+    iss_curl_sig_digest(hash, hash, 0, payload + offset,
                         *security * ISS_KEY_LENGTH, enc_curl);
 
     // complete the address

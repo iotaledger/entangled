@@ -1,12 +1,13 @@
 #include <unity/unity.h>
 
-#include "common/sign/v1/iss_curl.h"
+#include "common/sign/v2/iss_curl.h"
 #include "common/trinary/trit_tryte.h"
 #include "mam/merkle.h"
 
 static size_t const expected_merkle_size = 20;
 static size_t const expected_tree_depth = 5;
-static size_t const expected_siblings[] = {11, 13, 2, 16};
+static size_t const expected_leaf_index = 8;
+static size_t const expected_siblings_indexes[] = {7, 3, 9, 16};
 
 void test_merkle(void) {
   char *const seed =
@@ -31,16 +32,18 @@ void test_merkle(void) {
                                          leaf_count, security, &c));
   TEST_ASSERT_EQUAL_INT(0,
                         merkle_branch(siblings, merkle_tree, size * HASH_LENGTH,
-                                      merkle_depth(size), index));
+                                      merkle_depth(size), index, leaf_count));
   for (size_t i = 0; i < merkle_depth(size) - 1; i++) {
-    TEST_ASSERT_EQUAL_MEMORY(&merkle_tree[expected_siblings[i] * HASH_LENGTH],
-                             &siblings[i * HASH_LENGTH], HASH_LENGTH);
+    TEST_ASSERT_EQUAL_MEMORY(
+        &merkle_tree[expected_siblings_indexes[i] * HASH_LENGTH],
+        &siblings[i * HASH_LENGTH], HASH_LENGTH);
   }
   trit_t hash[HASH_LENGTH];
-  memcpy(hash, &merkle_tree[12 * HASH_LENGTH], HASH_LENGTH);
+  memcpy(hash, &merkle_tree[expected_leaf_index * HASH_LENGTH], HASH_LENGTH);
   curl_reset(&c);
-  TEST_ASSERT_EQUAL_INT(
-      0, merkle_root(hash, siblings, merkle_depth(size) - 1, index, &c));
+  TEST_ASSERT_EQUAL_INT(0,
+                        merkle_root(hash, siblings, merkle_depth(size) - 1,
+                                    merkle_leaf_index(index, leaf_count), &c));
   TEST_ASSERT_EQUAL_MEMORY(merkle_tree, hash, HASH_LENGTH);
 }
 

@@ -1,5 +1,5 @@
 #include "mam/merkle.h"
-#include "common/sign/v1/iss_curl.h"
+#include "common/sign/v2/iss_curl.h"
 
 static trit_t const merkle_null_hash[HASH_LENGTH] = {0};
 
@@ -16,7 +16,7 @@ size_t merkle_size(size_t leaf_count) {
   if (leaf_count == 0)
     return 0;
   else if (leaf_count == 1)
-    return 2;
+    return 1;
   while (leaf_count >= 2) {
     acc += leaf_count;
     leaf_count = (leaf_count + 1) >> 1;
@@ -50,6 +50,10 @@ size_t merkle_node_index(size_t depth, size_t width, size_t tree_depth) {
   return merkle_node_index_traverse(0, depth, width, tree_depth);
 }
 
+size_t merkle_leaf_index(size_t leaf_index, size_t leaf_count) {
+  return leaf_index = leaf_count - leaf_index - 1;
+}
+
 int merkle_create(trit_t *const tree, trit_t *const seed, int64_t offset,
                   const size_t base_size, size_t security, Curl *const c) {
   size_t depth_i;
@@ -60,30 +64,31 @@ int merkle_create(trit_t *const tree, trit_t *const seed, int64_t offset,
 
   // create base addresses
   for (depth_i = 0; depth_i < base_size; depth_i++) {
-    iss_curl_subseed(seed, key, offset + depth_i, c);
+    iss_curl_subseed(seed, key, offset + merkle_leaf_index(depth_i, base_size),
+                     c);
     iss_curl_key(key, key, key_size, c);
     iss_curl_key_digest(key, key, key_size, c);
-    iss_curl_address(key,
-                     &tree[HASH_LENGTH * merkle_node_index(td, depth_i, td)],
-                     HASH_LENGTH, c);
+    iss_curl_address(&tree[HASH_LENGTH * merkle_node_index(td, depth_i, td)],
+                     key, HASH_LENGTH, c);
   }
   curl_reset(c);
 
   // hash tree
   for (size_t cur_size = base_size, depth_i = td; depth_i > 0; depth_i--) {
     for (size_t j = 0; j < cur_size; j += 2) {
-      // absorb left hash
-      curl_absorb(c, &tree[HASH_LENGTH * merkle_node_index(depth_i, j, td)],
-                  HASH_LENGTH);
-      // if depth width is odd, absorb a null hash as right hash
-      if (j + 1 >= cur_size) {
-        curl_absorb(c, (trit_t *)merkle_null_hash, HASH_LENGTH);
-      }
-      // else absorb right hash
-      else {
+      // if right hash exists, absorb right hash then left hash
+      if (j < cur_size - 1) {
         curl_absorb(c,
                     &tree[HASH_LENGTH * merkle_node_index(depth_i, j + 1, td)],
                     HASH_LENGTH);
+        curl_absorb(c, &tree[HASH_LENGTH * merkle_node_index(depth_i, j, td)],
+                    HASH_LENGTH);
+      }
+      // else, absorb the remaining hash then a null hash
+      else {
+        curl_absorb(c, &tree[HASH_LENGTH * merkle_node_index(depth_i, j, td)],
+                    HASH_LENGTH);
+        curl_absorb(c, (trit_t *)merkle_null_hash, HASH_LENGTH);
       }
       // squeeze the result in the parent node
       curl_squeeze(
@@ -97,7 +102,8 @@ int merkle_create(trit_t *const tree, trit_t *const seed, int64_t offset,
 }
 
 int merkle_branch(trit_t *sibling, trit_t *const merkle_tree,
-                  size_t tree_length, size_t tree_depth, size_t leaf_index) {
+                  size_t tree_length, size_t tree_depth, size_t leaf_index,
+                  size_t leaf_count) {
   if (sibling == NULL) {
     return NULL_SIBLING;
   }
@@ -113,6 +119,8 @@ int merkle_branch(trit_t *sibling, trit_t *const merkle_tree,
     return DEPTH_OUT_OF_BOUNDS;
 
   size_t depth_i, sib_i, site_i;
+
+  leaf_index = merkle_leaf_index(leaf_index, leaf_count);
 
   if (leaf_index & 1) {
     sib_i = leaf_index - 1;
@@ -142,18 +150,21 @@ int merkle_branch(trit_t *sibling, trit_t *const merkle_tree,
 }
 
 int merkle_root(trit_t *hash, trit_t *siblings, size_t siblings_number,
-                size_t index, Curl *c) {
+                size_t leaf_index, Curl *c) {
   for (size_t i = 0; i < siblings_number; i++) {
-    if (index & 1) {
-      curl_absorb(c, siblings, HASH_LENGTH);
-      curl_absorb(c, hash, HASH_LENGTH);
-    } else {
+    // if index is a right node, absorb the hash then a sibling (left)
+    if (leaf_index & 1) {
       curl_absorb(c, hash, HASH_LENGTH);
       curl_absorb(c, siblings, HASH_LENGTH);
     }
+    // if index is a left node, absorb a sibling (right) then the hash
+    else {
+      curl_absorb(c, siblings, HASH_LENGTH);
+      curl_absorb(c, hash, HASH_LENGTH);
+    }
     curl_squeeze(c, hash, HASH_LENGTH);
     curl_reset(c);
-    index >>= 1;
+    leaf_index >>= 1;
     siblings += HASH_LENGTH;
   }
   return 0;
