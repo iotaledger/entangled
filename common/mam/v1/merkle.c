@@ -152,15 +152,15 @@ int merkle_branch(trit_t *sibling, trit_t *const merkle_tree,
 int merkle_root(trit_t *hash, trit_t *siblings, size_t siblings_number,
                 size_t leaf_index, Curl *c) {
   for (size_t i = 0; i < siblings_number; i++) {
-    // if index is a right node, absorb the hash then a sibling (left)
+    // if index is a right node, absorb a sibling (left) then the hash
     if (leaf_index & 1) {
-      curl_absorb(c, hash, HASH_LENGTH);
       curl_absorb(c, siblings, HASH_LENGTH);
+      curl_absorb(c, hash, HASH_LENGTH);
     }
-    // if index is a left node, absorb a sibling (right) then the hash
+    // if index is a left node, absorb the hash then a sibling (right)
     else {
-      curl_absorb(c, siblings, HASH_LENGTH);
       curl_absorb(c, hash, HASH_LENGTH);
+      curl_absorb(c, siblings, HASH_LENGTH);
     }
     curl_squeeze(c, hash, HASH_LENGTH);
     curl_reset(c);

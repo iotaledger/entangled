@@ -33,8 +33,7 @@ int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
   }
 
   size_t sibling_number = merkle_depth(merkle_tree_length / HASH_LENGTH) - 1;
-  size_t enc_index_length =
-      encoded_length(merkle_leaf_index(index, leaf_count));
+  size_t enc_index_length = encoded_length(index);
   size_t enc_message_length_length = encoded_length(message_length);
   size_t signature_length = security * ISS_KEY_LENGTH;
   size_t enc_siblings_number_length = encoded_length(sibling_number);
@@ -54,8 +53,7 @@ int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
   mam_init_encryption(side_key, side_key_length, merkle_tree, enc_curl);
 
   // encode index to payload
-  encode_long(merkle_leaf_index(index, leaf_count), payload + offset,
-              enc_index_length);
+  encode_long(index, payload + offset, enc_index_length);
   offset += enc_index_length;
 
   // encode message length to payload

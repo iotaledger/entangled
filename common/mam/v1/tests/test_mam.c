@@ -29,21 +29,20 @@ void test_create(void) {
   trytes_to_trits((tryte_t *)side_key, side_key_trits, strlen(side_key));
   trytes_to_trits((tryte_t *)message, message_trits, strlen(message));
 
-  size_t index = 0;
+  size_t index = 7;
   size_t message_length = strlen(message) * 3;
 
   size_t security = 1;
   size_t start = 0;
-  size_t count = 1;
+  size_t count = 16;
   size_t next_start = start + count;
   size_t next_count = 1;
   size_t tree_size = merkle_size(count);
   size_t next_tree_size = merkle_size(next_count);
   trit_t merkle_tree[tree_size * HASH_LENGTH];
   trit_t next_root[next_tree_size * HASH_LENGTH];
-  int payload_length =
-      payload_min_length(message_length, tree_size * HASH_LENGTH,
-                         merkle_leaf_index(index, count), security);
+  int payload_length = payload_min_length(
+      message_length, tree_size * HASH_LENGTH, index, security);
   trit_t *payload = malloc(payload_length * sizeof(trit_t));
 
   Curl curl;
