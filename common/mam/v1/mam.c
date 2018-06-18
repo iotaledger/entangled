@@ -32,15 +32,15 @@ int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
     return -1;
   }
 
-  size_t sibling_number = merkle_depth(merkle_tree_length / HASH_LENGTH) - 1;
+  size_t siblings_number = merkle_depth(merkle_tree_length / HASH_LENGTH) - 1;
   size_t enc_index_length = encoded_length(index);
   size_t enc_message_length_length = encoded_length(message_length);
   size_t signature_length = security * ISS_KEY_LENGTH;
-  size_t enc_siblings_number_length = encoded_length(sibling_number);
+  size_t enc_siblings_number_length = encoded_length(siblings_number);
   size_t payload_min_length = enc_index_length + enc_message_length_length +
                               HASH_LENGTH + message_length + (HASH_LENGTH / 3) +
                               signature_length + enc_siblings_number_length +
-                              (sibling_number * HASH_LENGTH);
+                              (siblings_number * HASH_LENGTH);
 
   if (payload_length < payload_min_length) {
     fprintf(stderr, "payload too short: needed %zd, given %zd\n",
@@ -87,16 +87,16 @@ int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
   offset += signature_length;
 
   // encrypt siblings number to payload
-  encode_long(sibling_number, payload + offset, enc_siblings_number_length);
+  encode_long(siblings_number, payload + offset, enc_siblings_number_length);
   offset += enc_siblings_number_length;
 
   // encrypt siblings to payload
   merkle_branch(payload + offset, merkle_tree, merkle_tree_length,
-                sibling_number + 1, index, leaf_count);
-  offset += sibling_number * HASH_LENGTH;
+                siblings_number + 1, index, leaf_count);
+  offset += siblings_number * HASH_LENGTH;
 
   size_t to_mask = signature_length + enc_siblings_number_length +
-                   sibling_number * HASH_LENGTH;
+                   siblings_number * HASH_LENGTH;
   mask(payload + offset - to_mask, payload + offset - to_mask, to_mask,
        enc_curl);
 
@@ -166,16 +166,16 @@ int mam_parse(trit_t *payload, size_t payload_length, trit_t *message,
 
     // decrypt siblings number from payload
     if (offset >= payload_length) return -1;
-    size_t enc_sibling_number_length;
-    size_t sibling_number = decode_long(
-        payload + offset, payload_length - offset, &enc_sibling_number_length);
-    offset += enc_sibling_number_length;
+    size_t enc_siblings_number_length;
+    size_t siblings_number = decode_long(
+        payload + offset, payload_length - offset, &enc_siblings_number_length);
+    offset += enc_siblings_number_length;
 
     // get merkle root from siblings from payload
-    if (sibling_number != 0) {
+    if (siblings_number != 0) {
       if (offset >= payload_length) return -1;
       curl_reset(enc_curl);
-      merkle_root(hash, payload + offset, sibling_number, *index, enc_curl);
+      merkle_root(hash, payload + offset, siblings_number, *index, enc_curl);
     }
 
     // check merkle root with the given root
