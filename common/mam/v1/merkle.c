@@ -1,5 +1,7 @@
-#include "mam/merkle.h"
+#include <stdio.h>
+
 #include "common/sign/v2/iss_curl.h"
+#include "mam/merkle.h"
 
 static trit_t const merkle_null_hash[HASH_LENGTH] = {0};
 
@@ -58,6 +60,13 @@ int merkle_create(trit_t *const tree, trit_t *const seed, int64_t offset,
                   const size_t base_size, size_t security, Curl *const c) {
   size_t key_size = security * ISS_KEY_LENGTH;
   trit_t key[key_size];
+
+  // enforcing the tree to be perfect by checking if the base size (number of
+  // leaves) is a power of two
+  if ((base_size != 0) && (base_size & (base_size - 1)) != 0) {
+    fprintf(stderr, "base size of the merkle tree should be a power of 2\n");
+    return -1;
+  }
 
   const size_t td = merkle_depth(merkle_size(base_size)) - 1;
 
