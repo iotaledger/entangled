@@ -13,21 +13,21 @@ typedef struct {
   /**
    * Transactions with any of these addresses as input/output will be returned
    */
-  string_array addresses;
+  address_array addresses;
 
   /**
    * Transactions with any of these tags will be returned
    */
-  string_array tags;
+  tag_array tags;
 
   /**
    * Transactions which directly approve any of approvees will be returned
    */
-  string_array approvees;
+  address_array approvees;
   /**
    * Transactions belonging to bundles will be returned
    */
-  char* bundles;
+  bundle_hash_t* bundles;
   size_t numBundles;
 
 } find_transaction_req_t;

@@ -37,7 +37,7 @@ typedef struct {
   /**
    * Latest milestone that was signed off by the coordinator.
    */
-  char* latestMilestone;
+  address_t latestMilestone;
   /**
    * Index of the latest milestone.
    */
@@ -48,7 +48,7 @@ typedef struct {
    * subtangle of coordinator-approved transactions, and have a consistent view
    * of all referenced transactions.
    */
-  char* latestSolidSubtangleMilestone;
+  address_t latestSolidSubtangleMilestone;
   /**
    * Index of the latest solid subtangle.
    */

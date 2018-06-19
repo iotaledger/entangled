@@ -8,8 +8,8 @@ extern "C" {
 #endif
 
 typedef struct {
-  char* branchTransaction;
-  char* trunkTransaction;
+  address_t branchTransaction;
+  address_t trunkTransaction;
 
 } get_transactions_to_approve_res_t;
 

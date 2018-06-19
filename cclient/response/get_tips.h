@@ -10,8 +10,7 @@ extern "C" {
 #include "types/types.h"
 
 typedef struct {
-  string_array tips;
-
+  address_array tips;
 } get_tips_res_t;
 
 #ifdef __cplusplus

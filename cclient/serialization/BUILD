@@ -7,12 +7,10 @@ cc_library(
     hdrs = glob([
         "json/*.h",
     ]),
-
-                deps = [
-                    ":serializer_base",
-                ],
-
     visibility = ["//visibility:public"],
+    deps = [
+        ":serializer_base",
+    ],
 )
 
 cc_library(
@@ -23,12 +21,10 @@ cc_library(
     hdrs = glob([
         "*.h",
     ]),
-
-            deps = [
-                "//cclient/request:requests",
-                "//cclient/response:responses",
-            ],
-
     include_prefix = "serializer",
     visibility = ["//visibility:public"],
+    deps = [
+        "//cclient/request:requests",
+        "//cclient/response:responses",
+    ],
 )

@@ -11,7 +11,7 @@ typedef struct {
   /**
    * Address of your peer.
    */
-  char* address;
+  address_t address;
   /**
    * Number of all transactions sent (invalid, valid, already-seen).
    */

@@ -14,7 +14,7 @@ extern "C" {
 /**
  * Returns inforation about your node.
  *
- * https://iota.reade.io/reference#getnodeinfo
+ * https://iota.readme.io/reference#getnodeinfo
  *
  * @return The response.
  */
@@ -27,7 +27,7 @@ iota_api_result_t iota_api_get_node_info(const iota_service_t* const service,
  * activity counters regarding participation in the protocol. The activity
  * counters are reset after restarting IRI.
  *
- * https://iota.reade.io/reference#getneighborsactivity
+ * https://iota.readme.io/reference#getneighborsactivity
  *
  * @para service IRI node end point.
  * @para res get_node_info_res_t struct containing the node's info
@@ -42,7 +42,7 @@ iota_api_result_t iota_api_get_neighbors(const iota_service_t* const service,
  * teporary, and the added neighbors will be reoved fro your set of neighbors
  * after you relaunch IRI.
  *
- * https://iota.reade.io/reference#addneighors
+ * https://iota.readme.io/reference#addneighors
  *
  * @para service IRI node end point.
  * @para uris List of URI eleents.
@@ -59,7 +59,7 @@ iota_api_result_t iota_api_add_neighbors(const iota_service_t* const service,
  * have your neighbors added via the coand line, they will be retained after
  * you restart your node.
  *
- * https://iota.reade.io/reference#reoveneighors
+ * https://iota.readme.io/reference#reoveneighors
 
   * @para service IRI node end point.
  * @para uris List of URI eleents.
@@ -73,7 +73,7 @@ iota_api_result_t iota_api_remove_neighbors(const iota_service_t* const service,
 /**
  * Returns the list of tips.
  *
- * https://iota.reade.io/reference#gettips
+ * https://iota.readme.io/reference#gettips
  *
  * @para service IRI node end point.
  * @para res Response containing the tips
@@ -89,7 +89,7 @@ iota_api_result_t iota_api_get_tips(const iota_service_t* const service,
  * fields can either be bundles, addresses, tags or approvees. Using ultiple of
  * these input fields returns the intersection of the values.
  *
- * https://iota.reade.io/reference#findtransactions
+ * https://iota.readme.io/reference#findtransactions
  *
  * @para service IRI node end point.
  * @para req - find_transaction_req_t struct containing all eleents by which
@@ -108,7 +108,7 @@ iota_api_result_t iota_api_find_transactions(
  * trytes can then be easily converted into the actual transaction object. See
  * utility functions for ore details.
  *
- * https://iota.reade.io/reference#gettrytes
+ * https://iota.readme.io/reference#gettrytes
  *
  * @para service IRI node end point.
  * @para hashes Hashes of transactions to which trytes are to be retreived
@@ -131,7 +131,7 @@ iota_api_result_t iota_api_get_trytes(const iota_service_t* const service,
  * sae order as the transaction list you subitted, thus you get a true/false
  * whether a transaction is confired or not.
  *
- * https://iota.reade.io/reference#getinclusionstates
+ * https://iota.readme.io/reference#getinclusionstates
  *
  * @para service IRI node end point.
  * @para transactions List of transactions to get the inclusion state
@@ -155,7 +155,7 @@ iota_api_result_t iota_api_get_inclusion_states(
  * the confired balance was deterined. The balances is returned as a list in the
  * sae order as the addresses were provided as input.
  *
- * https://iota.reade.io/reference#getbalances
+ * https://iota.readme.io/reference#getbalances
  *
  * @para service IRI node end point.
  * @para addresses List of addresses you want to get the confired balance
@@ -178,7 +178,7 @@ iota_api_result_t iota_api_get_balances(const iota_service_t* const service,
  * "babysitting" you do for the network (as you have to confir ore
  * transactions).
  *
- * https://iota.reade.io/reference#getbalances
+ * https://iota.readme.io/reference#getbalances
  *
  * @para service IRI node end point.
  * @para depth Nuber of bundles to go back to deterine the transactions for
@@ -203,7 +203,7 @@ iota_api_result_t iota_api_get_transactions_to_approve(
  * branchTransaction + nonce. These are valid trytes which are then accepted by
  * the network.
  *
- * https://iota.reade.io/reference#attachtotangle
+ * https://iota.readme.io/reference#attachtotangle
  *
  *
  * @para service IRI node end point.
@@ -225,7 +225,7 @@ iota_api_result_t iota_api_attach_to_tangle(const iota_service_t* const service,
 /**
  * Interrupts and copletely aborts the iota_api_attach_to_tangle process.
  *
- * https://iota.reade.io/reference#interruptattachingtotangle
+ * https://iota.readme.io/reference#interruptattachingtotangle
  *
  * @para service IRI node end point.
  * @return error value.
@@ -238,7 +238,7 @@ iota_api_result_t iota_api_interrupt_attaching_to_tangle(
  * Broadcast a list of transactions to all neighbors. The input trytes for this
  * call are provided by iota_api_attach_to_tangle.
  *
- * https://iota.reade.io/reference#broadcasttransactions
+ * https://iota.readme.io/reference#broadcasttransactions
  *
  * @para service IRI node end point.
  * @para trytes List of raw data of transactions to be rebroadcast.
@@ -254,7 +254,7 @@ iota_api_result_t iota_api_broadcast_transactions(
  * Store transactions into the local storage. The trytes to be used for this
  * call are returned by iota_api_attach_to_tangle.
  *
- * https://iota.reade.io/reference#storetransactions
+ * https://iota.readme.io/reference#storetransactions
  *
  * @para trytes List of raw data of transactions to be rebroadcast.
  * @para nuTxs Nuber of eleents in trytes
