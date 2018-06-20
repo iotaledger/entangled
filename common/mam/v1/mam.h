@@ -1,6 +1,9 @@
-#include <mam/mask.h>
+#ifndef __MAM_H__
+#define __MAM_H__
+
 #include "common/curl-p/hamming.h"
 #include "common/trinary/trit_long.h"
+#include "mam/mask.h"
 
 int mam_init_encryption(trit_t *encryption_key, size_t key_length, trit_t *r,
                         Curl *c);
@@ -18,3 +21,5 @@ int mam_parse(trit_t *payload, size_t payload_length, trit_t *message,
               size_t *message_length, trit_t *side_key, size_t side_key_length,
               trit_t *root, size_t *index, trit_t *next_root, size_t *security,
               Curl *enc_curl);
+
+#endif  //__MAM_H__

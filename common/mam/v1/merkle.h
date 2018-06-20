@@ -1,5 +1,5 @@
-#ifndef __MERKLE_H__
-#define __MERKLE_H__
+#ifndef __MAM_MERKLE_H__
+#define __MAM_MERKLE_H__
 
 #include "common/curl-p/trit.h"
 
@@ -21,4 +21,4 @@ int merkle_branch(trit_t *siblings, trit_t *const merkle_tree,
 int merkle_root(trit_t *hash, trit_t *siblings, size_t siblings_number,
                 size_t leaf_index, Curl *c);
 
-#endif  //__MERKLE_H__
+#endif  //__MAM_MERKLE_H__
