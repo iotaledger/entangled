@@ -14,22 +14,22 @@ extern "C" {
 
 #include "common/trinary/trit_array.h"
 
-#define NUM_TRITS_SERIALIZED_TRANSACTION    8019
+#define NUM_TRITS_SERIALIZED_TRANSACTION 8019
 
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
-#define FLEX_TRIT_SIZE_27   27
-#define FLEX_TRIT_SIZE_81   81
-#define FLEX_TRIT_SIZE_243  243
+#define FLEX_TRIT_SIZE_27 27
+#define FLEX_TRIT_SIZE_81 81
+#define FLEX_TRIT_SIZE_243 243
 #define FLEX_TRIT_SIZE_6561 6561
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)  
-#define FLEX_TRIT_SIZE_27   7
-#define FLEX_TRIT_SIZE_81   21
-#define FLEX_TRIT_SIZE_243  61
+#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_27 7
+#define FLEX_TRIT_SIZE_81 21
+#define FLEX_TRIT_SIZE_243 61
 #define FLEX_TRIT_SIZE_6561 1641
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
-#define FLEX_TRIT_SIZE_27   6
-#define FLEX_TRIT_SIZE_81   17
-#define FLEX_TRIT_SIZE_243  49
+#define FLEX_TRIT_SIZE_27 6
+#define FLEX_TRIT_SIZE_81 17
+#define FLEX_TRIT_SIZE_243 49
 #define FLEX_TRIT_SIZE_6561 1313
 #endif
 
@@ -131,7 +131,8 @@ void transaction_set_branch(iota_transaction_t transaction,
 // Get the transaction tag
 flex_trit_t *transaction_tag(iota_transaction_t transaction);
 // Set the transaction tag (copy argument)
-void transaction_set_tag(iota_transaction_t transaction, const flex_trit_t *tag);
+void transaction_set_tag(iota_transaction_t transaction,
+                         const flex_trit_t *tag);
 // Get the transaction attachement timestamp
 int64_t transaction_attachment_timestamp(iota_transaction_t transaction);
 // Set the transaction attachement timestamp
