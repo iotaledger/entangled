@@ -151,38 +151,34 @@ int mam_parse(trit_t *payload, size_t payload_length, trit_t *message,
   *security = signed_window(hash);
   unmask(payload + offset, payload + offset, payload_length - offset, enc_curl);
 
-  if (*security == 0)
-    return -1;
-  else {
-    // decrypt signature from payload
-    curl_reset(enc_curl);
-    iss_curl_sig_digest(hash, hash, 0, payload + offset,
-                        *security * ISS_KEY_LENGTH, enc_curl);
+  if (*security == 0) return -1;
 
-    // complete the address
-    curl_reset(enc_curl);
-    iss_curl_address(hash, hash, HASH_LENGTH, enc_curl);
-    offset += *security * ISS_KEY_LENGTH;
+  // decrypt signature from payload
+  curl_reset(enc_curl);
+  iss_curl_sig_digest(hash, hash, 0, payload + offset,
+                      *security * ISS_KEY_LENGTH, enc_curl);
 
-    // decrypt siblings number from payload
+  // complete the address
+  curl_reset(enc_curl);
+  iss_curl_address(hash, hash, HASH_LENGTH, enc_curl);
+  offset += *security * ISS_KEY_LENGTH;
+
+  // decrypt siblings number from payload
+  if (offset >= payload_length) return -1;
+  size_t enc_siblings_number_length;
+  size_t siblings_number = decode_long(
+      payload + offset, payload_length - offset, &enc_siblings_number_length);
+  offset += enc_siblings_number_length;
+
+  // get merkle root from siblings from payload
+  if (siblings_number != 0) {
     if (offset >= payload_length) return -1;
-    size_t enc_siblings_number_length;
-    size_t siblings_number = decode_long(
-        payload + offset, payload_length - offset, &enc_siblings_number_length);
-    offset += enc_siblings_number_length;
-
-    // get merkle root from siblings from payload
-    if (siblings_number != 0) {
-      if (offset >= payload_length) return -1;
-      curl_reset(enc_curl);
-      merkle_root(hash, payload + offset, siblings_number, *index, enc_curl);
-    }
-
-    // check merkle root with the given root
-    if (memcmp(hash, root, HASH_LENGTH * sizeof(trit_t)) == 0)
-      return 0;
-    else
-      return -1;
+    curl_reset(enc_curl);
+    merkle_root(hash, payload + offset, siblings_number, *index, enc_curl);
   }
+
+  // check merkle root with the given root
+  if (memcmp(hash, root, HASH_LENGTH * sizeof(trit_t)) != 0) return -1;
+
   return 0;
 }
