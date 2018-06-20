@@ -1,17 +1,30 @@
-package(default_visibility=["//visibility:public"])
-
-cc_library(name="bigint",
-           srcs=["bigint.c"],
-           hdrs=["bigint.h"],
-           deps=["//common:stdint"])
-
-cc_library(name="converter",
-           srcs=["converter.c"],
-           hdrs=["converter.h"],
-           deps=[":bigint", "//common:stdint", "//common/trinary:trits"])
+package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name="kerl",
-    srcs=["kerl.c"],
-    hdrs=["kerl.h"],
-    deps=[":converter", "//common/curl-p:curl-p-const", "@keccak//:keccak"], )
+    name = "bigint",
+    srcs = ["bigint.c"],
+    hdrs = ["bigint.h"],
+    deps = ["//common:stdint"],
+)
+
+cc_library(
+    name = "converter",
+    srcs = ["converter.c"],
+    hdrs = ["converter.h"],
+    deps = [
+        ":bigint",
+        "//common:stdint",
+        "//common/trinary:trits",
+    ],
+)
+
+cc_library(
+    name = "kerl",
+    srcs = ["kerl.c"],
+    hdrs = ["kerl.h"],
+    deps = [
+        ":converter",
+        "//common/curl-p:curl-p-const",
+        "@keccak",
+    ],
+)

@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
 
-#ifndef ENTANGLED_CPPCLIENT_IOTA_BEAST_H_
-#define ENTANGLED_CPPCLIENT_IOTA_BEAST_H_
+#ifndef CPPCLIENT_BEAST_H_
+#define CPPCLIENT_BEAST_H_
 
 #include <cstdint>
 #include <nonstd/optional.hpp>
@@ -10,8 +16,8 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "api.h"
-#include "api_json.h"
+#include "cppclient/api.h"
+#include "cppclient/api_json.h"
 
 namespace cppclient {
 /// Implementation of IotaJsonAPI class. This is the actual IOTA API provider.
@@ -31,4 +37,4 @@ class BeastIotaAPI : virtual public IotaAPI, public IotaJsonAPI {
 };
 }  // namespace cppclient
 
-#endif  // ENTANGLED_CPPCLIENT_IOTA_BEAST_H_
+#endif  // CPPCLIENT_BEAST_H_

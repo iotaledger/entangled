@@ -1,4 +1,11 @@
-#include "api_json.h"
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+#include "cppclient/api_json.h"
 
 #include <algorithm>
 #include <cstdint>
