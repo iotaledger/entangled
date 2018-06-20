@@ -8,6 +8,10 @@
 bazel test //...
 ```
 
+## Developing Entangled 
+- Be sure to run `./hooks/autohook.sh install` after initial checkout!
+- Pass `-c dbg` for building with debug symbols.
+
 ## Building a docker image and running a container with BAZEL (cc_image target)
 
 * [Rules for building and handling Docker images with Bazel](https://github.com/bazelbuild/rules_docker)

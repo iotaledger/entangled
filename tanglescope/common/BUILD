@@ -12,8 +12,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cppclient:beast",
-        "@cppzmq",
         "@com_github_google_glog//:glog",
+        "@cppzmq",
         "@libcuckoo",
         "@rxcpp",
         "@yaml_cpp",

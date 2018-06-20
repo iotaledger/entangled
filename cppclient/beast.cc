@@ -1,5 +1,11 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
 
-#include "beast.h"
+#include "cppclient/beast.h"
 
 #include <nonstd/optional.hpp>
 

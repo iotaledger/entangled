@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
 
-#ifndef ENTANGLED_CPPCLIENT_IOTA_API_H_
-#define ENTANGLED_CPPCLIENT_IOTA_API_H_
+#ifndef CPPCLIENT_API_H_
+#define CPPCLIENT_API_H_
 
 #include <chrono>
 #include <cstdint>
@@ -10,7 +16,8 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
-#include "messages.h"
+
+#include "cppclient/messages.h"
 
 namespace cppclient {
 
@@ -98,4 +105,4 @@ class IotaAPI {
 };
 }  // namespace cppclient
 
-#endif  // ENTANGLED_CPPCLIENT_IOTA_API_H_
+#endif  // CPPCLIENT_API_H_
