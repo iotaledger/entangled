@@ -2,9 +2,9 @@
 
 #include <unity/unity.h>
 
-#include "common/mam/v1/mask.h"
 #include "common/trinary/add.h"
 #include "common/trinary/trit_tryte.h"
+#include "mam/v1/mask.h"
 
 void test_mask(void) {
   char* const payload =

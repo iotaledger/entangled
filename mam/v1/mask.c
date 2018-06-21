@@ -1,7 +1,7 @@
 #include <string.h>
 
-#include "common/mam/v1/mask.h"
 #include "common/trinary/add.h"
+#include "mam/v1/mask.h"
 
 int mask(trit_t *dest, trit_t *message, size_t l, Curl *const c) {
   size_t chunk_length;

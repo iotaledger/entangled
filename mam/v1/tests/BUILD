@@ -4,8 +4,8 @@ cc_test(
     linkopts = ["-lpthread"],
     deps =
         [
-            "//common/mam/v1:mam",
             "//common/trinary:trit_tryte",
+            "//mam/v1:mam",
             "@unity",
         ],
 )
@@ -15,8 +15,8 @@ cc_test(
     srcs = ["test_mask.c"],
     deps =
         [
-            "//common/mam/v1:mask",
             "//common/trinary:trit_tryte",
+            "//mam/v1:mask",
             "@unity",
         ],
 )
@@ -26,8 +26,8 @@ cc_test(
     srcs = ["test_merkle.c"],
     deps =
         [
-            "//common/mam/v1:merkle",
             "//common/trinary:trit_tryte",
+            "//mam/v1:merkle",
             "@unity",
         ],
 )
