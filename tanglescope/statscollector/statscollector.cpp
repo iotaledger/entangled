@@ -23,23 +23,23 @@ namespace tanglescope {
 namespace statscollector {
 
 std::map<std::string, std::string> ZMQCollectorImpl::nameToDescCounters = {
-{"transactions_new", "New TXs count"},
-{"transactions_reattached", "Reattached TXs count"},
-{"transactions_confirmed", "confirmed TXs count"},
-{"bundles_new", "new bundles count"},
-{"bundles_confirmed", "confirmed bundles count"},
-{"value_new", "new tx's accumulated value"},
-{"value_confirmed", "confirmed tx's accumulated value"}};
+    {"transactions_new", "New TXs count"},
+    {"transactions_reattached", "Reattached TXs count"},
+    {"transactions_confirmed", "confirmed TXs count"},
+    {"bundles_new", "new bundles count"},
+    {"bundles_confirmed", "confirmed bundles count"},
+    {"value_new", "new tx's accumulated value"},
+    {"value_confirmed", "confirmed tx's accumulated value"}};
 
 std::map<std::string, std::string> ZMQCollectorImpl::nameToDescHistograms = {
-{"bundle_confirmation_duration", "bundle's confirmation duration [ms]"}};
+    {"bundle_confirmation_duration", "bundle's confirmation duration [ms]"}};
 
 std::map<std::string, std::string> ZMQCollectorImpl::nameToDescGauges = {
-{"to_process", "Number of transactions to process"},
-{"to_broadcast", "Number of transactions to broadcast to other nodes"},
-{"to_request", "Number of transactions to request from other nodes"},
-{"to_reply", "Number of transactions to reply to nodes who requested"},
-{"total_transactions", "Number of transactions stored in node"}};
+    {"to_process", "Number of transactions to process"},
+    {"to_broadcast", "Number of transactions to broadcast to other nodes"},
+    {"to_request", "Number of transactions to request from other nodes"},
+    {"to_reply", "Number of transactions to reply to nodes who requested"},
+    {"total_transactions", "Number of transactions stored in node"}};
 
 bool StatsCollector::parseConfiguration(const YAML::Node& conf) {
   if (!PrometheusCollector::parseConfiguration(conf)) {
@@ -96,9 +96,12 @@ ZMQCollectorImpl::ZMQCollectorImpl(
   if (useURLLable) {
     lables.insert(std::make_pair("publish_node", zmqURL));
   }
-  _counters = PrometheusCollector::buildCountersMap(registry, METRIC_PREFIX, lables, nameToDescCounters);
-  _histograms = PrometheusCollector::buildHistogramsMap(registry, METRIC_PREFIX, lables, nameToDescHistograms);
-  _gauges = PrometheusCollector::buildGaugeMap(registry, METRIC_PREFIX, lables, nameToDescGauges);
+  _counters = PrometheusCollector::buildCountersMap(registry, METRIC_PREFIX,
+                                                    lables, nameToDescCounters);
+  _histograms = PrometheusCollector::buildHistogramsMap(
+      registry, METRIC_PREFIX, lables, nameToDescHistograms);
+  _gauges = PrometheusCollector::buildGaugeMap(registry, METRIC_PREFIX, lables,
+                                               nameToDescGauges);
 }
 
 void ZMQCollectorImpl::collect(uint32_t bundleConfirmationHistogramRange,

@@ -67,5 +67,7 @@ pom.xml
 *.log
 .gdb_history
 
-/bazel*
+bazel*
 .bazelrc
+cclient/bazel*
+cclient/cmake-*

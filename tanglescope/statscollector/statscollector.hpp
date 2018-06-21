@@ -28,7 +28,6 @@ class ZMQCollectorImpl {
                uint32_t bundleConfirmationBucketSize);
 
  private:
-
   std::string _zmqURL;
   PrometheusCollector::CountersMap _counters;
   PrometheusCollector::HistogramsMap _histograms;

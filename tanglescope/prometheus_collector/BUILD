@@ -1,6 +1,9 @@
 cc_library(
     name = "prometheus_collector",
-    srcs = glob(["*.cpp"]),
+    srcs = glob([
+        "*.cpp",
+        "*.hpp",
+    ]),
     hdrs = glob(["*.hpp"]),
     include_prefix = "iota/tanglescope/prometheus_collector",
     visibility = ["//visibility:public"],
