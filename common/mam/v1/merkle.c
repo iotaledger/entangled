@@ -79,7 +79,6 @@ int merkle_create(trit_t *const tree, trit_t *const seed, int64_t offset,
     iss_curl_address(&tree[HASH_LENGTH * merkle_node_index(td, leaf_index, td)],
                      key, HASH_LENGTH, c);
   }
-  curl_reset(c);
 
   // hash tree
   for (size_t cur_size = base_size, depth = td; depth > 0; depth--) {

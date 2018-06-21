@@ -159,7 +159,6 @@ int mam_parse(trit_t *payload, size_t payload_length, trit_t *message,
                       *security * ISS_KEY_LENGTH, enc_curl);
 
   // complete the address
-  curl_reset(enc_curl);
   iss_curl_address(hash, hash, HASH_LENGTH, enc_curl);
   offset += *security * ISS_KEY_LENGTH;
 
@@ -173,7 +172,6 @@ int mam_parse(trit_t *payload, size_t payload_length, trit_t *message,
   // get merkle root from siblings from payload
   if (siblings_number != 0) {
     if (offset >= payload_length) return -1;
-    curl_reset(enc_curl);
     merkle_root(hash, payload + offset, siblings_number, *index, enc_curl);
   }
 
