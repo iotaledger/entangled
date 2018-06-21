@@ -2,10 +2,10 @@
 #include <string.h>
 #include <unity/unity.h>
 
+#include "common/mam/v1/mam.h"
+#include "common/mam/v1/merkle.h"
 #include "common/sign/v2/iss_curl.h"
 #include "common/trinary/trit_tryte.h"
-#include "mam/mam.h"
-#include "mam/merkle.h"
 
 void test_create(void) {
   char *const seed =

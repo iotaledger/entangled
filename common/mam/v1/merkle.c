@@ -1,7 +1,7 @@
 #include <stdio.h>
 
+#include "common/mam/v1/merkle.h"
 #include "common/sign/v2/iss_curl.h"
-#include "mam/merkle.h"
 
 static trit_t const merkle_null_hash[HASH_LENGTH] = {0};
 

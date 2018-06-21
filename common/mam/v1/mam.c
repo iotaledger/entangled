@@ -2,10 +2,10 @@
 #include <string.h>
 
 #include "common/curl-p/hamming.h"
+#include "common/mam/v1/mask.h"
+#include "common/mam/v1/merkle.h"
 #include "common/sign/v2/iss_curl.h"
 #include "common/trinary/trit_long.h"
-#include "mam/mask.h"
-#include "mam/merkle.h"
 
 int mam_init_encryption(trit_t *side_key, size_t side_key_length,
                         trit_t *merkle_root, Curl *enc_curl) {
