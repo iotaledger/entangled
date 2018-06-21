@@ -12,10 +12,11 @@ cc_library(
         exclude = ["tests/**/*.hpp"],
     ),
     deps = [
-        "//tanglescope/blowballcollector",
-        "//tanglescope/echocatcher",
+        "//tanglescope:blowballcollector",
+        "//tanglescope:echocollector",
+        "//tanglescope:tanglewidthcollector",
+        "//tanglescope:tipselectioncollector",
         "//tanglescope/statscollector",
-        "//tanglescope/tipselectioncollector",
         "@yaml_cpp",
     ],
 )

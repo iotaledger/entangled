@@ -41,7 +41,8 @@ void BlowballCollector::collect() {
   auto registry = std::make_shared<Registry>();
   exposer.RegisterCollectable(registry);
 
-  histograms = buildHistogramsMap(registry, "blowball", {}, nameToDescHistogram);
+  histograms =
+      buildHistogramsMap(registry, "blowball", {}, nameToDescHistogram);
 
   analyzeBlowballsPeriodically();
   refCountPublishedTransactions();

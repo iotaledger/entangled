@@ -8,7 +8,7 @@
 #include <iota/tanglescope/common/tangledb.hpp>
 #include <iota/tanglescope/common/txauxiliary.hpp>
 #include <iota/tanglescope/common/zmqpub.hpp>
-#include <iota/tanglescope/echocatcher/echocatcher.hpp>
+#include <iota/tanglescope/echocollector/echocollector.hpp>
 #include <list>
 #include <map>
 #include <set>
@@ -22,7 +22,7 @@ constexpr static auto DEPTH = 3;
 
 using namespace iota::tanglescope;
 
-std::map<std::string, std::string> EchoCatcher::nameToDescHistogram = {
+std::map<std::string, std::string> EchoCollector::nameToDescHistogram = {
     {"time_elapsed_received",
      "#Milliseconds it took for tx to travel back to transaction's "
      "original source(\"listen_node\") [each interval is " +
@@ -99,26 +99,24 @@ std::string powTX(std::string tx, int mwm) {
   return tx.data();
 }
 
-EchoCatcher::HashedTX hashTX(std::string tx) {
+EchoCollector::HashedTX hashTX(std::string tx) {
   char* digest = iota_digest(tx.data());
-  EchoCatcher::HashedTX hashed = {digest, std::move(tx)};
+  EchoCollector::HashedTX hashed = {digest, std::move(tx)};
   free(digest);
   return std::move(hashed);
 }
 
-bool EchoCatcher::parseConfiguration(const YAML::Node& conf) {
+bool EchoCollector::parseConfiguration(const YAML::Node& conf) {
   if (!PrometheusCollector::parseConfiguration(conf)) {
     return false;
   }
 
-  if (conf[IRI_HOST] && conf[IRI_PORT] && conf[PUBLISHERS] && conf[MWM] &&
-      conf[TANGLE_DB_WARMUP_TIME] && conf[BROADCAST_INTERVAL] &&
+  if (conf[IRI_HOST] && conf[IRI_PORT] && conf[PUBLISHERS] && conf[MWM] && conf[BROADCAST_INTERVAL] &&
       conf[DISCOVERY_INTERVAL]) {
     _iriHost = conf[IRI_HOST].as<std::string>();
     _iriPort = conf[IRI_PORT].as<uint32_t>();
     _zmqPublishers = conf[PUBLISHERS].as<std::list<std::string>>();
     _mwm = conf[MWM].as<uint32_t>();
-    _tangleDBWarmupPeriod = conf[TANGLE_DB_WARMUP_TIME].as<uint32_t>();
     _broadcastInterval = conf[BROADCAST_INTERVAL].as<uint32_t>();
     _discoveryInterval = conf[DISCOVERY_INTERVAL].as<uint32_t>();
     return true;
@@ -127,7 +125,7 @@ bool EchoCatcher::parseConfiguration(const YAML::Node& conf) {
   return false;
 }
 
-void EchoCatcher::collect() {
+void EchoCollector::collect() {
   LOG(INFO) << __FUNCTION__;
 
   _api = std::make_shared<cppclient::BeastIotaAPI>(_iriHost, _iriPort);
@@ -139,39 +137,11 @@ void EchoCatcher::collect() {
     _urlToZmqObservables.insert(std::pair(url, zmqObservable));
   }
 
-  loadDB();
   broadcastTransactions();
   handleReceivedTransactions();
 }
 
-void EchoCatcher::loadDB() {
-  auto tangleDBWarmupPeriod =
-      std::chrono::milliseconds(_tangleDBWarmupPeriod * 1000);
-
-  auto zmqThread = rxcpp::schedulers::make_new_thread();
-
-  const auto& stopPopulatingDBTime =
-      std::chrono::system_clock::now() + tangleDBWarmupPeriod;
-
-  // can load using only one zmq
-  auto zmqObservable = (*_urlToZmqObservables.begin()).second;
-  zmqObservable.observe_on(rxcpp::synchronize_new_thread())
-      .take_while([stopPopulatingDBTime](std::shared_ptr<iri::IRIMessage> msg) {
-        return std::chrono::system_clock::now() < stopPopulatingDBTime;
-      })
-      .subscribe(
-          [](std::shared_ptr<iri::IRIMessage> msg) {
-            if (msg->type() != iri::IRIMessageType::TX) return;
-
-            auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
-
-            TangleDB::TXRecord txRec = {tx->hash(), tx->trunk(), tx->branch()};
-            TangleDB::instance().put(std::move(txRec));
-          },
-          []() {});
-}
-
-void EchoCatcher::broadcastTransactions() {
+void EchoCollector::broadcastTransactions() {
   auto pubThread = rxcpp::schedulers::make_new_thread();
   auto pubWorker = pubThread.create_worker();
 
@@ -183,7 +153,7 @@ void EchoCatcher::broadcastTransactions() {
     broadcastOneTransaction();
   }
 }
-void EchoCatcher::broadcastOneTransaction() {
+void EchoCollector::broadcastOneTransaction() {
   auto hashTXFuture =
       boost::async(boost::launch::async,
                    [this] { return _api->getTransactionsToApprove(DEPTH); })
@@ -207,7 +177,7 @@ void EchoCatcher::broadcastOneTransaction() {
   }
 }
 
-void EchoCatcher::handleReceivedTransactions() {
+void EchoCollector::handleReceivedTransactions() {
   using namespace prometheus;
   Exposer exposer{_prometheusExpURI};
   auto registry = std::make_shared<Registry>();
@@ -233,13 +203,13 @@ void EchoCatcher::handleReceivedTransactions() {
 
 using namespace prometheus;
 
-void EchoCatcher::subscribeToTransactions(
-    std::string zmqURL, const EchoCatcher::ZmqObservable& zmqObservable,
+void EchoCollector::subscribeToTransactions(
+    std::string zmqURL, const EchoCollector::ZmqObservable& zmqObservable,
     std::shared_ptr<Registry> registry) {
   std::atomic<bool> haveAllTXReturned = false;
   auto histograms = buildHistogramsMap(
-      registry, "echocatcher", {{"listen_node", _iriHost}, {"zmq_url", zmqURL}},
-      nameToDescHistogram);
+      registry, "echocollector",
+      {{"listen_node", _iriHost}, {"zmq_url", zmqURL}}, nameToDescHistogram);
 
   std::vector<boost::future<void>> tasks;
   std::vector<double> buckets(400);
@@ -303,7 +273,7 @@ void EchoCatcher::subscribeToTransactions(
   std::for_each(tasks.begin(), tasks.end(), [&](auto& task) { task.get(); });
 }
 
-boost::future<void> EchoCatcher::handleUnseenTransactions(
+boost::future<void> EchoCollector::handleUnseenTransactions(
     std::shared_ptr<iri::TXMessage> tx,
     std::chrono::time_point<std::chrono::system_clock> received,
     HistogramsMap& histograms, const std::vector<double>& buckets) {

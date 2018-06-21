@@ -2,6 +2,7 @@
 #include <memory>
 #include <shared_mutex>
 #include <unordered_map>
+#include <vector>
 
 TangleDB& TangleDB::instance() {
   static TangleDB db;
@@ -21,3 +22,25 @@ void TangleDB::put(const TXRecord& tx) {
   std::unique_lock<std::shared_mutex> lock(mutex_);
   _txs[tx.hash] = tx;
 }
+
+void TangleDB::removeAgedTxs(uint32_t ageInSeconds) {
+  auto now = std::chrono::system_clock::now();
+
+  std::unique_lock<std::shared_mutex> lock(mutex_);
+
+  for (auto&& it = _txs.begin(); it != _txs.end();) {
+    if (std::chrono::duration_cast<std::chrono::seconds>(now -
+                                                         it->second.timestamp)
+            .count() > ageInSeconds) {
+      _txs.erase(it++);
+    } else {
+      ++it;
+    }
+  }
+}
+
+std::unordered_map<std::string, TangleDB::TXRecord> TangleDB::getTXsMap()
+    const {
+  std::shared_lock<std::shared_mutex> lock(mutex_);
+  return _txs;
+};
