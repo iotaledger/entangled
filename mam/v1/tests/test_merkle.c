@@ -27,11 +27,11 @@ void test_merkle(void) {
 
   TEST_ASSERT_EQUAL_INT(expected_merkle_size, size);
   TEST_ASSERT_EQUAL_INT(expected_tree_depth, depth);
-  TEST_ASSERT_EQUAL_INT(0, merkle_create(merkle_tree, seed_trits, start,
-                                         leaf_count, security, &c));
+  TEST_ASSERT_EQUAL_INT(0, merkle_create(merkle_tree, leaf_count, seed_trits,
+                                         start, security, &c));
   for (size_t i = 0; i < leaf_count; i++) {
     TEST_ASSERT_EQUAL_INT(
-        0, merkle_branch(siblings, merkle_tree, size * HASH_LENGTH, depth, i,
+        0, merkle_branch(merkle_tree, siblings, size * HASH_LENGTH, depth, i,
                          leaf_count));
     memcpy(hash,
            &merkle_tree[merkle_node_index(depth - 1,
@@ -40,7 +40,7 @@ void test_merkle(void) {
                         HASH_LENGTH],
            HASH_LENGTH);
     curl_reset(&c);
-    TEST_ASSERT_EQUAL_INT(0, merkle_root(hash, siblings, depth - 1, i, &c));
+    merkle_root(hash, siblings, depth - 1, i, &c);
     TEST_ASSERT_EQUAL_MEMORY(merkle_tree, hash, HASH_LENGTH);
   }
 }

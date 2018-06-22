@@ -49,15 +49,15 @@ void test_create(void) {
   curl.type = CURL_P_27;
   init_curl(&curl);
   TEST_ASSERT_EQUAL_INT(
-      0, merkle_create(merkle_tree, seed_trits, start, count, security, &curl));
+      0, merkle_create(merkle_tree, count, seed_trits, start, security, &curl));
   curl_reset(&curl);
-  TEST_ASSERT_EQUAL_INT(0, merkle_create(next_root, seed_trits, next_start,
-                                         next_count, security, &curl));
+  TEST_ASSERT_EQUAL_INT(0, merkle_create(next_root, next_count, seed_trits,
+                                         next_start, security, &curl));
   curl_reset(&curl);
   payload_length = mam_create(
       payload, payload_length, message_trits, message_length, side_key_trits,
       strlen(side_key) * 3, merkle_tree, tree_size * HASH_LENGTH, count, index,
-      start, next_root, seed_trits, security, &curl);
+      next_root, start, seed_trits, security, &curl);
   TEST_ASSERT_TRUE(payload_length != -1);
   curl_reset(&curl);
 

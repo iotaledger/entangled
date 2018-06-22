@@ -7,11 +7,10 @@
 #include "mam/v1/mask.h"
 #include "mam/v1/merkle.h"
 
-int mam_init_encryption(trit_t *side_key, size_t side_key_length,
-                        trit_t *merkle_root, Curl *enc_curl) {
+void mam_init_encryption(trit_t *side_key, size_t side_key_length,
+                         trit_t *merkle_root, Curl *enc_curl) {
   curl_absorb(enc_curl, side_key, side_key_length);
   curl_absorb(enc_curl, merkle_root, HASH_LENGTH);
-  return 0;
 }
 
 int payload_min_length(size_t message_length, size_t merkle_tree_length,
@@ -25,7 +24,7 @@ int payload_min_length(size_t message_length, size_t merkle_tree_length,
 int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
                size_t message_length, trit_t *side_key, size_t side_key_length,
                trit_t *merkle_tree, size_t merkle_tree_length,
-               size_t leaf_count, size_t index, size_t start, trit_t *next_root,
+               size_t leaf_count, size_t index, trit_t *next_root, size_t start,
                trit_t *seed, size_t security, Curl *enc_curl) {
   if (security > 3) {
     fprintf(stderr, "invalid security %zd\n", security);
@@ -91,7 +90,7 @@ int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
   offset += enc_siblings_number_length;
 
   // encrypt siblings to payload
-  merkle_branch(payload + offset, merkle_tree, merkle_tree_length,
+  merkle_branch(merkle_tree, payload + offset, merkle_tree_length,
                 siblings_number + 1, index, leaf_count);
   offset += siblings_number * HASH_LENGTH;
 

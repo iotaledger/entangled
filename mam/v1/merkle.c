@@ -56,8 +56,9 @@ size_t merkle_leaf_index(size_t leaf_index, size_t leaf_count) {
   return leaf_index = leaf_count - leaf_index - 1;
 }
 
-int merkle_create(trit_t *const tree, trit_t *const seed, int64_t offset,
-                  const size_t base_size, size_t security, Curl *const c) {
+int merkle_create(trit_t *const tree, const size_t base_size,
+                  trit_t *const seed, int64_t offset, size_t security,
+                  Curl *const c) {
   size_t key_size = security * ISS_KEY_LENGTH;
   trit_t key[key_size];
 
@@ -108,7 +109,7 @@ int merkle_create(trit_t *const tree, trit_t *const seed, int64_t offset,
   return 0;
 }
 
-int merkle_branch(trit_t *siblings, trit_t *const merkle_tree,
+int merkle_branch(trit_t *const merkle_tree, trit_t *siblings,
                   size_t tree_length, size_t tree_depth, size_t leaf_index,
                   size_t leaf_count) {
   if (siblings == NULL) {
@@ -157,8 +158,8 @@ int merkle_branch(trit_t *siblings, trit_t *const merkle_tree,
   return 0;
 }
 
-int merkle_root(trit_t *hash, trit_t *siblings, size_t siblings_number,
-                size_t leaf_index, Curl *c) {
+void merkle_root(trit_t *hash, trit_t *siblings, size_t siblings_number,
+                 size_t leaf_index, Curl *c) {
   for (size_t i = 0; i < siblings_number; i++) {
     // if index is a right node, absorb a sibling (left) then the hash
     if (leaf_index & 1) {
@@ -175,5 +176,4 @@ int merkle_root(trit_t *hash, trit_t *siblings, size_t siblings_number,
     leaf_index >>= 1;
     siblings += HASH_LENGTH;
   }
-  return 0;
 }
