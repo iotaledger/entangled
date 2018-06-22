@@ -13,8 +13,9 @@
  * @param merkle_root The merkle root
  * @param enc_curl A curl instance used for encryption/decryption
  */
-void mam_init_encryption(trit_t *side_key, size_t side_key_length,
-                         trit_t *merkle_root, Curl *enc_curl);
+void mam_init_encryption(trit_t const *const side_key,
+                         size_t const side_key_length,
+                         trit_t const *const merkle_root, Curl *const enc_curl);
 
 /**
  * Computes the minimum length of a payload
@@ -26,8 +27,9 @@ void mam_init_encryption(trit_t *side_key, size_t side_key_length,
  *
  * @return The minimum length of the payload
  */
-int payload_min_length(size_t message_length, size_t merkle_tree_length,
-                       size_t index, size_t security);
+int payload_min_length(size_t const message_length,
+                       size_t const merkle_tree_length, size_t const index,
+                       size_t const security);
 
 /**
  * Creates a signed, encrypted payload from a message
@@ -50,11 +52,14 @@ int payload_min_length(size_t message_length, size_t merkle_tree_length,
  *
  * @return Success/error code
  */
-int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
-               size_t message_length, trit_t *side_key, size_t side_key_length,
-               trit_t *merkle_tree, size_t merkle_tree_length,
-               size_t leaf_count, size_t index, trit_t *next_root, size_t start,
-               trit_t *seed, size_t security, Curl *enc_curl);
+int mam_create(trit_t *const payload, size_t const payload_length,
+               trit_t const *const message, size_t const message_length,
+               trit_t const *const side_key, size_t const side_key_length,
+               trit_t const *const merkle_tree, size_t const merkle_tree_length,
+               size_t const leaf_count, size_t const index,
+               trit_t const *const next_root, size_t const start,
+               trit_t const *const seed, size_t const security,
+               Curl *const enc_curl);
 
 /**
  * Decrypts, parses and validates an encrypted payload
@@ -73,9 +78,11 @@ int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
  *
  * @return Success/error code
  */
-int mam_parse(trit_t *payload, size_t payload_length, trit_t *message,
-              size_t *message_length, trit_t *side_key, size_t side_key_length,
-              trit_t *root, size_t *index, trit_t *next_root, size_t *security,
-              Curl *enc_curl);
+int mam_parse(trit_t *const payload, size_t const payload_length,
+              trit_t *const message, size_t *const message_length,
+              trit_t const *const side_key, size_t const side_key_length,
+              trit_t const *const root, size_t *const index,
+              trit_t *const next_root, size_t *const security,
+              Curl *const enc_curl);
 
 #endif  //__MAM_H__

@@ -7,25 +7,31 @@
 #include "mam/v1/mask.h"
 #include "mam/v1/merkle.h"
 
-void mam_init_encryption(trit_t *side_key, size_t side_key_length,
-                         trit_t *merkle_root, Curl *enc_curl) {
+void mam_init_encryption(trit_t const *const side_key,
+                         size_t const side_key_length,
+                         trit_t const *const merkle_root,
+                         Curl *const enc_curl) {
   curl_absorb(enc_curl, side_key, side_key_length);
   curl_absorb(enc_curl, merkle_root, HASH_LENGTH);
 }
 
-int payload_min_length(size_t message_length, size_t merkle_tree_length,
-                       size_t index, size_t security) {
+int payload_min_length(size_t const message_length,
+                       size_t const merkle_tree_length, size_t const index,
+                       size_t const security) {
   size_t sibling_number = merkle_depth(merkle_tree_length / HASH_LENGTH) - 1;
   return encoded_length(index) + encoded_length(message_length) + HASH_LENGTH +
          message_length + (HASH_LENGTH / 3) + security * ISS_KEY_LENGTH +
          encoded_length(sibling_number) + (sibling_number * HASH_LENGTH);
 }
 
-int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
-               size_t message_length, trit_t *side_key, size_t side_key_length,
-               trit_t *merkle_tree, size_t merkle_tree_length,
-               size_t leaf_count, size_t index, trit_t *next_root, size_t start,
-               trit_t *seed, size_t security, Curl *enc_curl) {
+int mam_create(trit_t *const payload, size_t const payload_length,
+               trit_t const *const message, size_t const message_length,
+               trit_t const *const side_key, size_t const side_key_length,
+               trit_t const *const merkle_tree, size_t const merkle_tree_length,
+               size_t const leaf_count, size_t const index,
+               trit_t const *const next_root, size_t const start,
+               trit_t const *const seed, size_t const security,
+               Curl *const enc_curl) {
   if (security > 3) {
     fprintf(stderr, "invalid security %zd\n", security);
     return -1;
@@ -104,10 +110,12 @@ int mam_create(trit_t *payload, size_t payload_length, trit_t *message,
   return payload_min_length;
 }
 
-int mam_parse(trit_t *payload, size_t payload_length, trit_t *message,
-              size_t *message_length, trit_t *side_key, size_t side_key_length,
-              trit_t *root, size_t *index, trit_t *next_root, size_t *security,
-              Curl *enc_curl) {
+int mam_parse(trit_t *const payload, size_t const payload_length,
+              trit_t *const message, size_t *const message_length,
+              trit_t const *const side_key, size_t const side_key_length,
+              trit_t const *const root, size_t *const index,
+              trit_t *const next_root, size_t *const security,
+              Curl *const enc_curl) {
   size_t offset = 0;
 
   mam_init_encryption(side_key, side_key_length, root, enc_curl);

@@ -5,28 +5,28 @@
 
 static trit_t const merkle_null_hash[HASH_LENGTH] = {0};
 
-static size_t binary_tree_size(size_t acc, size_t depth) {
+static size_t binary_tree_size(size_t const acc, size_t const depth) {
   if (depth == 0) {
     return acc + 1;
   }
   return binary_tree_size(acc + (1 << depth), depth - 1);
 }
 
-size_t merkle_size(size_t leaf_count) {
-  size_t acc = 1;
+size_t merkle_size(size_t const leaf_count) {
+  size_t acc = 1, count = leaf_count;
 
-  if (leaf_count == 0)
+  if (count == 0)
     return 0;
-  else if (leaf_count == 1)
+  else if (count == 1)
     return 1;
-  while (leaf_count >= 2) {
-    acc += leaf_count;
-    leaf_count = (leaf_count + 1) >> 1;
+  while (count >= 2) {
+    acc += count;
+    count = (count + 1) >> 1;
   }
   return acc;
 }
 
-size_t merkle_depth(size_t node_count) {
+size_t merkle_depth(size_t const node_count) {
   size_t depth = 0;
 
   while (binary_tree_size(0, depth) < node_count) {
@@ -35,8 +35,9 @@ size_t merkle_depth(size_t node_count) {
   return depth + 1;
 }
 
-static size_t merkle_node_index_traverse(size_t acc, size_t depth, size_t width,
-                                         size_t tree_depth) {
+static size_t merkle_node_index_traverse(size_t const acc, size_t const depth,
+                                         size_t const width,
+                                         size_t const tree_depth) {
   if (depth == 0) return acc;
   if (width < (1 << (depth - 1))) {
     return merkle_node_index_traverse(acc + 1, depth - 1, width,
@@ -48,17 +49,18 @@ static size_t merkle_node_index_traverse(size_t acc, size_t depth, size_t width,
   }
 }
 
-size_t merkle_node_index(size_t depth, size_t width, size_t tree_depth) {
+size_t merkle_node_index(size_t const depth, size_t const width,
+                         size_t const tree_depth) {
   return merkle_node_index_traverse(0, depth, width, tree_depth);
 }
 
-size_t merkle_leaf_index(size_t leaf_index, size_t leaf_count) {
-  return leaf_index = leaf_count - leaf_index - 1;
+size_t merkle_leaf_index(size_t const leaf_index, size_t const leaf_count) {
+  return leaf_count - leaf_index - 1;
 }
 
-int merkle_create(trit_t *const tree, const size_t base_size,
-                  trit_t *const seed, int64_t offset, size_t security,
-                  Curl *const c) {
+int merkle_create(trit_t *const tree, size_t const base_size,
+                  trit_t const *const seed, int64_t const offset,
+                  size_t const security, Curl *const c) {
   size_t key_size = security * ISS_KEY_LENGTH;
   trit_t key[key_size];
 
@@ -109,13 +111,13 @@ int merkle_create(trit_t *const tree, const size_t base_size,
   return 0;
 }
 
-int merkle_branch(trit_t *const merkle_tree, trit_t *siblings,
-                  size_t tree_length, size_t tree_depth, size_t leaf_index,
-                  size_t leaf_count) {
+int merkle_branch(trit_t const *const tree, trit_t *const siblings,
+                  size_t const tree_length, size_t const tree_depth,
+                  size_t const leaf_index, size_t const leaf_count) {
   if (siblings == NULL) {
     return NULL_SIBLING;
   }
-  if (merkle_tree == NULL) {
+  if (tree == NULL) {
     return NULL_TREE;
   }
   if (HASH_LENGTH *
@@ -126,54 +128,49 @@ int merkle_branch(trit_t *const merkle_tree, trit_t *siblings,
   if (tree_depth > merkle_depth(tree_length / HASH_LENGTH))
     return DEPTH_OUT_OF_BOUNDS;
 
-  size_t depth_index, sibling_index, site_index;
+  size_t sibling_index, site_index;
 
-  leaf_index = merkle_leaf_index(leaf_index, leaf_count);
+  sibling_index = merkle_leaf_index(leaf_index, leaf_count);
 
-  if (leaf_index & 1) {
-    sibling_index = leaf_index - 1;
-  } else {
-    sibling_index = leaf_index + 1;
-  }
-
-  for (depth_index = tree_depth - 1; depth_index > 0; depth_index--) {
-    site_index = HASH_LENGTH *
-                 merkle_node_index(depth_index, sibling_index, tree_depth - 1);
-    if (site_index >= tree_length) {
-      // if depth width is not even, copy a null hash
-      memcpy(siblings, merkle_null_hash, HASH_LENGTH * sizeof(trit_t));
-    } else {
-      // else copy a sibling
-      memcpy(siblings, &merkle_tree[site_index], HASH_LENGTH * sizeof(trit_t));
-    }
-
-    sibling_index >>= 1;
+  for (size_t i = 0, depth_index = tree_depth - 1; depth_index > 0;
+       i++, depth_index--) {
     if (sibling_index & 1) {
       sibling_index--;
     } else {
       sibling_index++;
     }
-    siblings += HASH_LENGTH;
+    site_index = HASH_LENGTH *
+                 merkle_node_index(depth_index, sibling_index, tree_depth - 1);
+    if (site_index >= tree_length) {
+      // if depth width is not even, copy a null hash
+      memcpy(&siblings[i * HASH_LENGTH], merkle_null_hash,
+             HASH_LENGTH * sizeof(trit_t));
+    } else {
+      // else copy a sibling
+      memcpy(&siblings[i * HASH_LENGTH], &tree[site_index],
+             HASH_LENGTH * sizeof(trit_t));
+    }
+
+    sibling_index >>= 1;
   }
   return 0;
 }
 
-void merkle_root(trit_t *hash, trit_t *siblings, size_t siblings_number,
-                 size_t leaf_index, Curl *c) {
-  for (size_t i = 0; i < siblings_number; i++) {
+void merkle_root(trit_t *const hash, trit_t const *const siblings,
+                 size_t const siblings_number, size_t const leaf_index,
+                 Curl *const c) {
+  for (size_t i = 0, j = 1; i < siblings_number; i++, j <<= 1) {
     // if index is a right node, absorb a sibling (left) then the hash
-    if (leaf_index & 1) {
-      curl_absorb(c, siblings, HASH_LENGTH);
+    if (leaf_index & j) {
+      curl_absorb(c, &siblings[i * HASH_LENGTH], HASH_LENGTH);
       curl_absorb(c, hash, HASH_LENGTH);
     }
     // if index is a left node, absorb the hash then a sibling (right)
     else {
       curl_absorb(c, hash, HASH_LENGTH);
-      curl_absorb(c, siblings, HASH_LENGTH);
+      curl_absorb(c, &siblings[i * HASH_LENGTH], HASH_LENGTH);
     }
     curl_squeeze(c, hash, HASH_LENGTH);
     curl_reset(c);
-    leaf_index >>= 1;
-    siblings += HASH_LENGTH;
   }
 }

@@ -59,14 +59,14 @@ size_t nearest_greater_multiple_of_three(size_t value) {
   return value + RADIX - rem;
 }
 
-size_t encoded_length(int64_t value) {
+size_t encoded_length(int64_t const value) {
   if (value == 0) return sizeof(encoded_zero) / sizeof(trit_t);
   size_t length = nearest_greater_multiple_of_three(min_trits(llabs(value)));
   // trits length + encoding length
   return length + min_trits(pow(2, length / RADIX) - 1);
 }
 
-int encode_long(int64_t value, trit_t *trits, size_t size) {
+int encode_long(int64_t const value, trit_t *const trits, size_t const size) {
   if (size < encoded_length(value)) return -1;
   if (value == 0) {
     memcpy(trits, encoded_zero, encoded_length(0));
@@ -93,7 +93,8 @@ int encode_long(int64_t value, trit_t *trits, size_t size) {
   return 0;
 }
 
-int64_t decode_long(trit_t *trits, size_t length, size_t *end) {
+int64_t decode_long(trit_t const *const trits, size_t const length,
+                    size_t *const end) {
   if (memcmp(trits, encoded_zero, encoded_length(0)) == 0) {
     *end = encoded_length(0);
     return 0;

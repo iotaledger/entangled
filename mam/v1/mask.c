@@ -3,7 +3,8 @@
 #include "common/trinary/add.h"
 #include "mam/v1/mask.h"
 
-void mask(trit_t *dest, trit_t *message, size_t length, Curl *const c) {
+void mask(trit_t *const dest, trit_t const *const message, size_t const length,
+          Curl *const c) {
   size_t chunk_length;
   trit_t chunk[HASH_LENGTH];
   for (size_t i = 0; i < length; i += HASH_LENGTH) {
@@ -16,7 +17,8 @@ void mask(trit_t *dest, trit_t *message, size_t length, Curl *const c) {
   }
 }
 
-void unmask(trit_t *dest, trit_t *cipher, size_t length, Curl *const c) {
+void unmask(trit_t *const dest, trit_t const *const cipher, size_t const length,
+            Curl *const c) {
   size_t chunk_length;
   for (size_t i = 0; i < length; i += HASH_LENGTH) {
     chunk_length = length - i < HASH_LENGTH ? length - i : HASH_LENGTH;

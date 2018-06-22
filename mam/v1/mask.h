@@ -11,7 +11,8 @@
  * @param length Length of the message
  * @param c The curl instance used to mask the message
  */
-void mask(trit_t *dest, trit_t *message, size_t length, Curl *const c);
+void mask(trit_t *const dest, trit_t const *const message, size_t const length,
+          Curl *const c);
 
 /**
  * Unmasks a given cipher with a curl instance state
@@ -21,6 +22,7 @@ void mask(trit_t *dest, trit_t *message, size_t length, Curl *const c);
  * @param length Length of the cipher
  * @param c The curl instance used to unmask the cipher
  */
-void unmask(trit_t *dest, trit_t *cipher, size_t length, Curl *const c);
+void unmask(trit_t *const dest, trit_t const *const cipher, size_t const length,
+            Curl *const c);
 
 #endif  //__MAM_MASK_H__
