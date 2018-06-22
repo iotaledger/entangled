@@ -63,7 +63,7 @@ size_t encoded_length(int64_t const value) {
   if (value == 0) return sizeof(encoded_zero) / sizeof(trit_t);
   size_t length = nearest_greater_multiple_of_three(min_trits(llabs(value)));
   // trits length + encoding length
-  return length + min_trits(pow(2, length / RADIX) - 1);
+  return length + min_trits((1 << (length / RADIX)) - 1);
 }
 
 int encode_long(int64_t const value, trit_t *const trits, size_t const size) {
@@ -106,7 +106,7 @@ int64_t decode_long(trit_t const *const trits, size_t const length,
     encoding_start += RADIX;
   if (encoding_start >= length) return -1;
   encoding_start += RADIX;
-  size_t encoding_length = min_trits(pow(2, encoding_start / RADIX) - 1);
+  size_t encoding_length = min_trits((1 << (encoding_start / RADIX)) - 1);
   size_t encoding = trits_to_long(&trits[encoding_start], encoding_length);
   for (size_t i = 0; i < encoding_start / RADIX; i += 1) {
     int64_t tryte_value = trits_to_long(&trits[i * RADIX], RADIX);
