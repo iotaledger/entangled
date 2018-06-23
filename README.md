@@ -34,7 +34,10 @@ docker start ##the_name
 ## iOS
 
 #### Compiling
-`bazel build --ios_multi_cpus=i386,x86_64,armv7,arm64 --copt=-fembed-bitcode --copt=-Ofast //mobile/ios:ios_bindings`
+To build with bitcode ([don't use -c opt!](https://github.com/bazelbuild/rules_apple/issues/163)): `bazel build --ios_multi_cpus=i386,x86_64,armv7,arm64 --copt=-fembed-bitcode --copt=-Ofast //mobile/ios:ios_bindings`
+
+To build without bitcode:
+`bazel build --ios_multi_cpus=i386,x86_64,armv7,arm64 -c opt //mobile/ios:ios_bindings`
 
 #### Objective-C
 1. Drag and drop your compiled EntangledKit.framework into your Xcode project. It should appear under "Linked Frameworks and Libraries" in the General tab of your target and in the "Link Binary With Libraries" step on the Build Phases tab of your target.
