@@ -8,7 +8,7 @@
 
 #define NONCE_LENGTH 27 * 3
 
-char* iota_pow(const char* trytes_in, uint8_t mwm) {
+char* iota_pow(char const* const trytes_in, uint8_t const mwm) {
   Curl curl;
   init_curl(&curl);
   curl.type = CURL_P_81;

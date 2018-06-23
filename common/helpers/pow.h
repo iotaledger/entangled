@@ -6,7 +6,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-char* iota_pow(const char* trytes, uint8_t mwm);
+
+char* iota_pow(char const* const trytes, uint8_t const mwm);
 
 #ifdef __cplusplus
 }

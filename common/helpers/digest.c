@@ -7,7 +7,7 @@
 #define TRYTE_LENGTH 2673
 #define TRANSACTION_LENGTH TRYTE_LENGTH * 3
 
-char* iota_digest(const char* trytes) {
+char* iota_digest(char const* const trytes) {
   Curl curl;
   init_curl(&curl);
   curl.type = CURL_P_81;
