@@ -14,7 +14,6 @@
 		60CD81D420918E5A00D3C2A7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 60CD81C920918E5A00D3C2A7 /* Main.storyboard */; };
 		60CD81D520918E5A00D3C2A7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CD81CC20918E5A00D3C2A7 /* main.m */; };
 		60CD81D620918E5A00D3C2A7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CD81CD20918E5A00D3C2A7 /* AppDelegate.m */; };
-		60CD81D720918E5A00D3C2A7 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 60CD81CE20918E5A00D3C2A7 /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +46,7 @@
 			isa = PBXGroup;
 			children = (
 				60CD81C220918E5A00D3C2A7 /* Demo */,
+				60CCCCFD20DECB450080348B /* Frameworks */,
 				600C4AEA20813DFF00BB72E1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -57,6 +57,13 @@
 				600C4AE920813DFF00BB72E1 /* EntangledDemo.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		60CCCCFD20DECB450080348B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Frameworks;
 			sourceTree = "<group>";
 		};
 		60CD81C220918E5A00D3C2A7 /* Demo */ = {
@@ -135,7 +142,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				60CD81D720918E5A00D3C2A7 /* Info.plist in Resources */,
 				60CD81D420918E5A00D3C2A7 /* Main.storyboard in Resources */,
 				60CD81D120918E5A00D3C2A7 /* Assets.xcassets in Resources */,
 				60CD81D320918E5A00D3C2A7 /* LaunchScreen.storyboard in Resources */,
