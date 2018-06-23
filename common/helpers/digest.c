@@ -13,7 +13,7 @@ char* iota_digest(const char* trytes) {
   curl.type = CURL_P_81;
 
   size_t length = strnlen(trytes, TRANSACTION_LENGTH);
-  char input[sizeof(char) * length * 3];
+  trit_t input[sizeof(char) * length * 3];
   trytes_to_trits((tryte_t*)trytes, input, length);
 
   char trits_hash[HASH_LENGTH];
