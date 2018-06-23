@@ -1,5 +1,11 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
 
-#include "beast.h"
+#include "cppclient/beast.h"
 
 #include <nonstd/optional.hpp>
 
@@ -9,6 +15,7 @@
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
 #include <nlohmann/json.hpp>
+#include <glog/logging.h>
 
 using json = nlohmann::json;
 
@@ -39,12 +46,16 @@ nonstd::optional<json> BeastIotaAPI::post(const json& input) {
     req.body() = input.dump();
     req.content_length(req.body().size());
 
+    VLOG(7) << __FUNCTION__ << " - req:\n" << req;
+
     http::write(socket, req);
     boost::beast::flat_buffer buffer;
     http::response<http::string_body> res;
 
     http::read(socket, buffer, res);
     result = json::parse(res.body());
+
+    VLOG(7) << __FUNCTION__ << " - res:\n" << res;
 
     socket.shutdown(tcp::socket::shutdown_both, ec);
 

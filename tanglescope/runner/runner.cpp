@@ -5,8 +5,11 @@
 #include <boost/thread/future.hpp>
 #include <iota/tanglescope/blowballcollector.hpp>
 #include <iota/tanglescope/common/txauxiliary.hpp>
-#include <iota/tanglescope/echocatcher/echocatcher.hpp>
+#include <iota/tanglescope/common/zmqdbloader.hpp>
+#include <iota/tanglescope/echocollector.hpp>
 #include <iota/tanglescope/statscollector.hpp>
+#include <iota/tanglescope/tanglewidthcollector.hpp>
+#include <iota/tanglescope/tipselectioncollector.hpp>
 #include <list>
 
 DEFINE_string(ConfigurationPath, "", "YAML's configuration file path");
@@ -18,33 +21,68 @@ int main(int argc, char** argv) {
   std::list<boost::future<void>> tasks;
 
   // need to parse yaml file and get arguments
-  auto conf = YAML::LoadFile(FLAGS_ConfigurationPath.empty()
-                                 ? "default_configuration.yaml"
-                                 : FLAGS_ConfigurationPath);
-  iota::tanglescope::EchoCatcher echoCatcher;
-  iota::tanglescope::statscollector::StatsCollector statsCollector;
-  iota::tanglescope::BlowballCollector blowballCollector;
+  try {
+    auto conf = YAML::LoadFile(FLAGS_ConfigurationPath.empty()
+                                   ? "default_configuration.yaml"
+                                   : FLAGS_ConfigurationPath);
+    iota::tanglescope::EchoCollector echoCatcher;
+    iota::tanglescope::statscollector::StatsCollector statsCollector;
+    iota::tanglescope::BlowballCollector blowballCollector;
+    iota::tanglescope::TipSelectionCollector tipSelectionCollector;
+    iota::tanglescope::TangleWidthCollector widthCollector;
+    iota::tanglescope::ZmqDBLoader dbLoader;
 
-  if (echoCatcher.parseConfiguration(conf["echocatcher"])) {
-    auto task = boost::async(boost::launch::async,
-                             [&echoCatcher]() { echoCatcher.collect(); });
-    tasks.push_back(std::move(task));
+    if (conf["echocollector"] || conf["tanglewidthcollector"]) {
+      if (!dbLoader.parseConfiguration(conf["dbloader"])) {
+        LOG(FATAL) << __FUNCTION__
+                   << ": Failed to parse dbloader (required for "
+                      "echocollector and tanglewidthcollector)";
+      } else {
+        auto task = boost::async(boost::launch::async,
+                                 [&dbLoader]() { dbLoader.start(); });
+        tasks.emplace_back(std::move(task));
+      }
+    }
+
+    if (echoCatcher.parseConfiguration(conf["echocollector"])) {
+      auto task = boost::async(boost::launch::async,
+                               [&echoCatcher]() { echoCatcher.collect(); });
+      tasks.push_back(std::move(task));
+    }
+
+    if (statsCollector.parseConfiguration(conf["statscollector"])) {
+      auto task = boost::async(boost::launch::async, [&statsCollector]() {
+        statsCollector.collect();
+      });
+      tasks.push_back(std::move(task));
+    }
+
+    if (blowballCollector.parseConfiguration(conf["blowballcollector"])) {
+      auto task = boost::async(boost::launch::async, [&blowballCollector]() {
+        blowballCollector.collect();
+      });
+      tasks.push_back(std::move(task));
+    }
+
+    if (tipSelectionCollector.parseConfiguration(
+            conf["tipselectioncollector"])) {
+      auto task = boost::async(
+          boost::launch::async,
+          [&tipSelectionCollector]() { tipSelectionCollector.collect(); });
+      tasks.push_back(std::move(task));
+    }
+
+    if (widthCollector.parseConfiguration(conf["tanglewidthcollector"])) {
+      auto task = boost::async(boost::launch::async, [&widthCollector]() {
+        widthCollector.collect();
+      });
+      tasks.push_back(std::move(task));
+    }
+
+    std::for_each(tasks.begin(), tasks.end(), [](auto& task) { task.wait(); });
+  } catch (const std::exception& e) {
+    LOG(ERROR) << __FUNCTION__ << " Exception: " << e.what();
   }
-
-  if (statsCollector.parseConfiguration(conf["statscollector"])) {
-    auto task = boost::async(boost::launch::async,
-                             [&statsCollector]() { statsCollector.collect(); });
-    tasks.push_back(std::move(task));
-  }
-
-  if (blowballCollector.parseConfiguration(conf["blowballcollector"])) {
-    auto task = boost::async(boost::launch::async, [&blowballCollector]() {
-      blowballCollector.collect();
-    });
-    tasks.push_back(std::move(task));
-  }
-
-  std::for_each(tasks.begin(), tasks.end(), [](auto& task) { task.wait(); });
 
   return 0;
 }

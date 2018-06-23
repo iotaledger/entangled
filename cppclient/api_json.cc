@@ -1,4 +1,11 @@
-#include "api_json.h"
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+#include "cppclient/api_json.h"
 
 #include <algorithm>
 #include <cstdint>
@@ -29,386 +36,396 @@ DEFINE_uint32(maxNumAddressesForGetBalances, 1000,
 
 namespace cppclient {
 
-
 bool IotaJsonAPI::isNodeSolid() {
-auto ni = getNodeInfo();
+  auto ni = getNodeInfo();
 
-if (ni.latestMilestoneIndex != ni.latestSolidMilestoneIndex) {
-return false;
-}
+  if (ni.latestMilestoneIndex != ni.latestSolidMilestoneIndex) {
+    return false;
+  }
 
-auto tx = getTransactions({
-ni.latestMilestone
-})[0];
-auto now = std::chrono::system_clock::now();
+  auto tx = getTransactions({ni.latestMilestone})[0];
+  auto now = std::chrono::system_clock::now();
 
-if ((now - tx.timestamp) > std::chrono::seconds(300)) {
-return false;
-}
+  if ((now - tx.timestamp) > std::chrono::seconds(300)) {
+    return false;
+  }
 
-return true;
+  return true;
 }
 
 NodeInfo IotaJsonAPI::getNodeInfo() {
-json req;
-req["command"] = "getNodeInfo";
+  json req;
+  req["command"] = "getNodeInfo";
 
-// TODO(th0br0) proper failure mechanism
-auto response = post(std::move(req)).value();
+  // TODO(th0br0) proper failure mechanism
+  auto response = post(std::move(req)).value();
 
-return {
-response["latestMilestone"], response["latestMilestoneIndex"],
-response["latestSolidSubtangleMilestoneIndex"]
-};
+  return {response["latestMilestone"], response["latestMilestoneIndex"],
+          response["latestSolidSubtangleMilestoneIndex"]};
 }
 
 std::unordered_map<std::string, uint64_t> IotaJsonAPI::getBalances(
-const std::vector<std::string>& addresses) {
-std::unordered_map<std::string, uint64_t> result;
-json req;
-req["command"] = "getBalances";
-req["threshold"] = 100;
+    const std::vector<std::string>& addresses) {
+  std::unordered_map<std::string, uint64_t> result;
+  json req;
+  req["command"] = "getBalances";
+  req["threshold"] = 100;
 
-uint32_t currAddressCount = 0;
-while (currAddressCount < addresses.size()) {
-auto numAddressesToQuery = (addresses.size() - currAddressCount) >
-FLAGS_maxNumAddressesForGetBalances
-? FLAGS_maxNumAddressesForGetBalances
-: (addresses.size() - currAddressCount);
-auto start = addresses.begin() + currAddressCount;
-auto currAddresses =
-std::vector<std::string>(start, start + numAddressesToQuery);
-req["addresses"] = currAddresses;
+  uint32_t currAddressCount = 0;
+  while (currAddressCount < addresses.size()) {
+    auto numAddressesToQuery = (addresses.size() - currAddressCount) >
+                                       FLAGS_maxNumAddressesForGetBalances
+                                   ? FLAGS_maxNumAddressesForGetBalances
+                                   : (addresses.size() - currAddressCount);
+    auto start = addresses.begin() + currAddressCount;
+    auto currAddresses =
+        std::vector<std::string>(start, start + numAddressesToQuery);
+    req["addresses"] = currAddresses;
 
-auto maybeResponse = post(req);
+    auto maybeResponse = post(req);
 
-if (!maybeResponse) {
-LOG(INFO) << __FUNCTION__ << " request failed.";
-return {};
-}
+    if (!maybeResponse) {
+      LOG(INFO) << __FUNCTION__ << " request failed.";
+      return {};
+    }
 
-auto& response = maybeResponse.value();
-auto balances = response["balances"].get<std::vector<std::string>>();
+    auto& response = maybeResponse.value();
 
-for (const auto& tup : boost::combine(currAddresses, balances)) {
-std::string add, bal;
-boost::tie(add, bal) = tup;
-result.emplace(std::move(add), std::stoull(bal));
-}
+    if (response["balances"].is_null()) {
+      return {};
+    }
+    auto balances = response["balances"].get<std::vector<std::string>>();
 
-currAddressCount += numAddressesToQuery;
-}
+    for (const auto& tup : boost::combine(currAddresses, balances)) {
+      std::string add, bal;
+      boost::tie(add, bal) = tup;
+      result.emplace(std::move(add), std::stoull(bal));
+    }
 
-return result;
+    currAddressCount += numAddressesToQuery;
+  }
+
+  return result;
 }
 
 std::vector<std::string> IotaJsonAPI::findTransactions(
-nonstd::optional<std::vector<std::string>> addresses,
-nonstd::optional<std::vector<std::string>> bundles) {
-if (!addresses && !bundles) {
-return {
-};
-}
+    nonstd::optional<std::vector<std::string>> addresses,
+    nonstd::optional<std::vector<std::string>> bundles,
+    nonstd::optional<std::vector<std::string>> approvees) {
+  if (!addresses && !bundles && !approvees) {
+    return {};
+  }
 
-json req;
-req["command"] = "findTransactions";
-if (addresses) {
-req["addresses"] = std::move(addresses.value());
-}
-if (bundles) {
-req["bundles"] = std::move(bundles.value());
-}
+  json req;
+  req["command"] = "findTransactions";
+  if (addresses) {
+    req["addresses"] = std::move(addresses.value());
+  }
+  if (bundles) {
+    req["bundles"] = std::move(bundles.value());
+  }
+  if (approvees) {
+    req["approvees"] = std::move(approvees.value());
+  }
 
-auto maybeResponse = post(std::move(req));
+  auto maybeResponse = post(std::move(req));
 
-if (!maybeResponse) {
-LOG(INFO) << __FUNCTION__ << " request failed.";
-return {};
-}
+  if (!maybeResponse) {
+    LOG(INFO) << __FUNCTION__ << " request failed.";
+    return {};
+  }
 
-return maybeResponse.value()["hashes"].get<std::vector<std::string>>();
+  if (!maybeResponse.value()["hashes"].is_null()) {
+    return maybeResponse.value()["hashes"].get<std::vector<std::string>>();
+  }
+  return {};
 }
 std::vector<std::string> IotaJsonAPI::getTrytes(
-const std::vector<std::string>& hashes){
+    const std::vector<std::string>& hashes) {
+  json req;
+  req["command"] = "getTrytes";
+  req["hashes"] = hashes;
 
-json req;
-req["command"] = "getTransactions";
-req["hashes"] = hashes;
+  auto maybeResponse = post(std::move(req));
+  if (!maybeResponse) {
+    LOG(INFO) << __FUNCTION__ << " request failed.";
+    return {};
+  }
 
-auto maybeResponse = post(std::move(req));
-if (!maybeResponse) {
-LOG(INFO) << __FUNCTION__ << " request failed.";
-return {};
-}
-
-return maybeResponse.value()["trytes"].get<std::vector<std::string>>();
-
+  if (maybeResponse.value()["trytes"].is_null()) {
+    return {};
+  }
+  return maybeResponse.value()["trytes"].get<std::vector<std::string>>();
 }
 
 std::vector<Transaction> IotaJsonAPI::getTransactions(
-const std::vector<std::string>& hashes) {
+    const std::vector<std::string>& hashes) {
+  auto trytes = getTrytes(hashes);
 
-
-auto trytes = getTrytes(hashes);
-
-if (trytes.empty()){
+  if (trytes.empty()) {
     return {};
-}
+  }
 
-std::vector<Transaction> txs;
-iota_transaction_t tx = transaction_new();
-std::chrono::system_clock::time_point epoch;
+  std::vector<Transaction> txs;
+  iota_transaction_t tx = transaction_new();
+  std::chrono::system_clock::time_point epoch;
 
-boost::copy(
-trytes | transformed([&tx,
-&epoch](const std::string& trytes) -> Transaction {
-transaction_deserialize_from_trytes(
-tx, reinterpret_cast<const tryte_t*>(trytes.c_str()));
+  boost::copy(
+      trytes | transformed([&tx,
+                            &epoch](const std::string& trytes) -> Transaction {
+        transaction_deserialize_from_trytes(
+            tx, reinterpret_cast<const tryte_t*>(trytes.c_str()));
 
-// We could also rely on the ordering of the hashes argument here.
-auto hash = iota_digest(trytes.c_str());
-std::string sHash = std::string(reinterpret_cast<char*>(hash), 81);
-std::free(hash);
+        // We could also rely on the ordering of the hashes argument here.
+        auto hash = iota_digest(trytes.c_str());
+        std::string sHash = std::string(reinterpret_cast<char*>(hash), 81);
+        std::free(hash);
 
-auto address = transaction_address(tx);
-std::string sAddress =
-std::string(reinterpret_cast<char*>(address), 81);
-auto bundle = transaction_bundle(tx);
-std::string sBundle = std::string(reinterpret_cast<char*>(bundle), 81);
-auto trunk = transaction_trunk(tx);
-std::string sTrunk = std::string(reinterpret_cast<char*>(trunk), 81);
+        auto address = transaction_address(tx);
+        std::string sAddress =
+            std::string(reinterpret_cast<char*>(address), 81);
+        auto bundle = transaction_bundle(tx);
+        std::string sBundle = std::string(reinterpret_cast<char*>(bundle), 81);
+        auto trunk = transaction_trunk(tx);
+        std::string sTrunk = std::string(reinterpret_cast<char*>(trunk), 81);
 
-std::chrono::seconds sinceEpoch(transaction_timestamp(tx));
+        std::chrono::seconds sinceEpoch(transaction_timestamp(tx));
 
-return {
-sHash,
-sAddress,
-transaction_value(tx),
-epoch + sinceEpoch,
-transaction_current_index(tx),
-transaction_last_index(tx),
-sBundle,
-sTrunk
-};
-}),
-boost::back_move_inserter(txs));
+        return {sHash,
+                sAddress,
+                transaction_value(tx),
+                epoch + sinceEpoch,
+                transaction_current_index(tx),
+                transaction_last_index(tx),
+                sBundle,
+                sTrunk};
+      }),
+      boost::back_move_inserter(txs));
 
-transaction_free(tx);
+  transaction_free(tx);
 
-return txs;
+  return txs;
 }
 
 std::unordered_multimap<std::string, Bundle>
 IotaJsonAPI::getConfirmedBundlesForAddresses(
-const std::vector<std::string>& addresses) {
-// 1. Get all transactions for address [findTransactions, getTransactions]
-auto txHashes = findTransactions(addresses, {
-});
-auto transactions = getTransactions(txHashes);
+    const std::vector<std::string>& addresses) {
+  // 1. Get all transactions for address [findTransactions, getTransactions]
+  auto txHashes = findTransactions(addresses, {}, {});
+  auto transactions = getTransactions(txHashes);
 
-// 2. Filter unique bundles from these []
-std::vector<std::string> bundles;
-boost::copy(transactions | transformed([](const Transaction& tx) {
-return tx.bundleHash;
-}) | uniqued,
-boost::back_move_inserter(bundles));
+  // 2. Filter unique bundles from these []
+  std::vector<std::string> bundles;
+  boost::copy(transactions | transformed([](const Transaction& tx) {
+                return tx.bundleHash;
+              }) | uniqued,
+              boost::back_move_inserter(bundles));
 
-// 3. Materialise all bundles [findTransactions, getTransactions]
-txHashes = findTransactions({}, bundles);
-transactions = getTransactions(txHashes);
+  // 3. Materialise all bundles [findTransactions, getTransactions]
+  txHashes = findTransactions({}, bundles, {});
+  transactions = getTransactions(txHashes);
 
-// 4. Filter unconfirmed bundles [getNodeInfo, getInclusionStates]
-std::vector<std::string> tails;
-boost::copy(transactions | filtered([](const Transaction& tx) {
-return tx.currentIndex == 0;
-}) | transformed([](const Transaction& tx) { return tx.hash; }),
-boost::back_move_inserter(tails));
+  // 4. Filter unconfirmed bundles [getNodeInfo, getInclusionStates]
+  std::vector<std::string> tails;
+  boost::copy(transactions | filtered([](const Transaction& tx) {
+                return tx.currentIndex == 0;
+              }) | transformed([](const Transaction& tx) { return tx.hash; }),
+              boost::back_move_inserter(tails));
 
-auto confirmedTails = filterConfirmedTails(tails, {});
+  auto confirmedTails = filterConfirmedTails(tails, {});
 
-std::vector<Bundle> confirmedBundles;
-std::unordered_multimap<std::string, Bundle> confirmedBundlesMap;
-std::unordered_map<std::string, Transaction> transactionsByHash;
+  std::vector<Bundle> confirmedBundles;
+  std::unordered_multimap<std::string, Bundle> confirmedBundlesMap;
+  std::unordered_map<std::string, Transaction> transactionsByHash;
 
-for (auto& tx : transactions) {
-transactionsByHash.emplace(tx.hash, std::move(tx));
-}
+  for (auto& tx : transactions) {
+    transactionsByHash.emplace(tx.hash, std::move(tx));
+  }
 
-for (const std::string& tail : confirmedTails) {
-Bundle bundle;
-auto tx = std::move(transactionsByHash[std::move(tail)]);
+  for (const std::string& tail : confirmedTails) {
+    Bundle bundle;
+    auto tx = std::move(transactionsByHash[std::move(tail)]);
 
-while (tx.currentIndex != tx.lastIndex) {
-auto& trunk = tx.trunk;
-auto& next = transactionsByHash[trunk];
+    while (tx.currentIndex != tx.lastIndex) {
+      auto& trunk = tx.trunk;
+      auto& next = transactionsByHash[trunk];
 
-bundle.push_back(std::move(tx));
-tx = std::move(next);
-}
-bundle.push_back(std::move(tx));
-confirmedBundles.push_back(std::move(bundle));
-}
+      bundle.push_back(std::move(tx));
+      tx = std::move(next);
+    }
+    bundle.push_back(std::move(tx));
+    confirmedBundles.push_back(std::move(bundle));
+  }
 
-for (const auto& address : addresses) {
-for (const auto& b : confirmedBundles) {
-if (std::find_if(b.begin(), b.end(),
-[address](const Transaction& tx) -> bool {
-return address == tx.address;
-}) != b.end()) {
-confirmedBundlesMap.emplace(std::pair(address, b));
-}
-}
-}
+  for (const auto& address : addresses) {
+    for (const auto& b : confirmedBundles) {
+      if (std::find_if(b.begin(), b.end(),
+                       [address](const Transaction& tx) -> bool {
+                         return address == tx.address;
+                       }) != b.end()) {
+        confirmedBundlesMap.emplace(std::pair(address, b));
+      }
+    }
+  }
 
-return confirmedBundlesMap;
+  return confirmedBundlesMap;
 }
 
 std::unordered_set<std::string> IotaJsonAPI::filterConfirmedTails(
-const std::vector<std::string>& tails,
-const nonstd::optional<std::string>& reference) {
-json req;
-req["command"] = "getInclusionStates";
-req["transactions"] = tails;
+    const std::vector<std::string>& tails,
+    const nonstd::optional<std::string>& reference) {
+  json req;
+  req["command"] = "getInclusionStates";
+  req["transactions"] = tails;
 
-if (reference.has_value()) {
-req["tips"] = std::vector<std::string>{
-reference.value()
-};
-} else {
-auto ni = getNodeInfo();
-req["tips"] = std::vector<std::string>{ ni.latestMilestone };
-}
+  if (reference.has_value()) {
+    req["tips"] = std::vector<std::string>{reference.value()};
+  } else {
+    auto ni = getNodeInfo();
+    req["tips"] = std::vector<std::string>{ni.latestMilestone};
+  }
 
-auto maybeResponse = post(std::move(req));
+  auto maybeResponse = post(std::move(req));
 
-if (!maybeResponse) {
-LOG(INFO) << __FUNCTION__ << " request failed.";
-return {};
-}
+  if (!maybeResponse) {
+    LOG(INFO) << __FUNCTION__ << " request failed.";
+    return {};
+  }
 
-auto& response = maybeResponse.value();
-auto states = response["states"].get<std::vector<bool>>();
+  auto& response = maybeResponse.value();
 
-std::unordered_set<std::string> confirmedTails;
+  if (response["states"].is_null()) {
+    return {};
+  }
+  auto states = response["states"].get<std::vector<bool>>();
 
-for (auto const& tpl : boost::combine(tails, states)) {
-if (tpl.get<1>()) {
-confirmedTails.emplace(tpl.get<0>());
-}
-}
+  std::unordered_set<std::string> confirmedTails;
 
-return confirmedTails;
+  for (auto const& tpl : boost::combine(tails, states)) {
+    if (tpl.get<1>()) {
+      confirmedTails.emplace(tpl.get<0>());
+    }
+  }
+
+  return confirmedTails;
 }
 
 GetTransactionsToApproveResponse IotaJsonAPI::getTransactionsToApprove(
-size_t depth, const nonstd::optional<std::string>& reference) {
-json req;
+    size_t depth, const nonstd::optional<std::string>& reference) {
+  json req;
 
-req["command"] = "getTransactionsToApprove";
-req["depth"] = depth;
+  req["command"] = "getTransactionsToApprove";
+  req["depth"] = depth;
 
-if (reference.has_value()) {
-req["reference"] = reference.value();
-}
+  if (reference.has_value()) {
+    req["reference"] = reference.value();
+  }
 
-auto maybeResponse = post(std::move(req));
+  auto maybeResponse = post(std::move(req));
 
-if (!maybeResponse) {
-LOG(INFO) << __FUNCTION__ << " request failed.";
-return {};
-}
+  if (!maybeResponse) {
+    LOG(INFO) << __FUNCTION__ << " request failed.";
+    return {};
+  }
 
-auto& response = maybeResponse.value();
+  auto& response = maybeResponse.value();
 
-return { response["trunkTransaction"], response["branchTransaction"] };
+  return {response["trunkTransaction"], response["branchTransaction"],
+          response["duration"]};
 }
 
 std::vector<std::string> IotaJsonAPI::attachToTangle(
-const std::string& trunkTransaction, const std::string& branchTransaction,
-size_t minWeightMagnitude, const std::vector<std::string>& trytes) {
-json req;
-req["command"] = "attachToTangle";
-req["trunkTransaction"] = trunkTransaction;
-req["branchTransaction"] = branchTransaction;
-req["minWeightMagnitude"] = minWeightMagnitude;
+    const std::string& trunkTransaction, const std::string& branchTransaction,
+    size_t minWeightMagnitude, const std::vector<std::string>& trytes) {
+  json req;
+  req["command"] = "attachToTangle";
+  req["trunkTransaction"] = trunkTransaction;
+  req["branchTransaction"] = branchTransaction;
+  req["minWeightMagnitude"] = minWeightMagnitude;
 
-// FIXME(th0br0) should decode trytes and not trust input ordering
-std::vector<std::string> localTrytes = trytes;
-std::reverse(std::begin(localTrytes), std::end(localTrytes));
-req["trytes"] = localTrytes;
+  // FIXME(th0br0) should decode trytes and not trust input ordering
+  std::vector<std::string> localTrytes = trytes;
+  std::reverse(std::begin(localTrytes), std::end(localTrytes));
+  req["trytes"] = localTrytes;
 
-auto maybeResponse = post(std::move(req));
+  auto maybeResponse = post(std::move(req));
 
-if (!maybeResponse) {
-LOG(INFO) << __FUNCTION__ << " request failed.";
-return {};
-}
+  if (!maybeResponse) {
+    LOG(INFO) << __FUNCTION__ << " request failed.";
+    return {};
+  }
 
-return maybeResponse.value()["trytes"].get<std::vector<std::string>>();
+  if (maybeResponse.value()["trytes"].is_null()) {
+    return {};
+  }
+
+  return maybeResponse.value()["trytes"].get<std::vector<std::string>>();
 }
 
 bool IotaJsonAPI::storeTransactions(const std::vector<std::string>& trytes) {
-json req;
-req["command"] = "storeTransactions";
-req["trytes"] = trytes;
+  json req;
+  req["command"] = "storeTransactions";
+  req["trytes"] = trytes;
 
-auto maybeResponse = post(std::move(req));
-return maybeResponse.has_value();
+  auto maybeResponse = post(std::move(req));
+  return maybeResponse.has_value();
 }
 
 bool IotaJsonAPI::broadcastTransactions(
-const std::vector<std::string>& trytes) {
-json req;
-req["command"] = "broadcastTransactions";
-req["trytes"] = trytes;
+    const std::vector<std::string>& trytes) {
+  json req;
+  req["command"] = "broadcastTransactions";
+  req["trytes"] = trytes;
 
-auto maybeResponse = post(std::move(req));
-return maybeResponse.has_value();
+  auto maybeResponse = post(std::move(req));
+  return maybeResponse.has_value();
 }
 
 std::unordered_set<std::string> IotaJsonAPI::filterConsistentTails(
-const std::vector<std::string>& tails) {
-std::unordered_set<std::string> ret;
+    const std::vector<std::string>& tails) {
+  std::unordered_set<std::string> ret;
 
-for (const auto& tail : tails) {
-json req;
-req["command"] = "checkConsistency";
-req["tails"] = std::vector<std::string>({ tail });
+  for (const auto& tail : tails) {
+    json req;
+    req["command"] = "checkConsistency";
+    req["tails"] = std::vector<std::string>({tail});
 
-auto maybeResponse = post(std::move(req));
+    auto maybeResponse = post(std::move(req));
 
-if (!maybeResponse.has_value()) {
-continue;
-}
+    if (!maybeResponse.has_value()) {
+      continue;
+    }
 
-if (maybeResponse.value()["state"].get<bool>()) {
-ret.insert(tail);
-}
-}
+    if ((!maybeResponse.value()["state"].is_null()) &&
+        maybeResponse.value()["state"].get<bool>()) {
+      ret.insert(tail);
+    }
+  }
 
-return ret;
+  return ret;
 }
 
 GetInclusionStatesResponse IotaJsonAPI::getInclusionStates(
-const std::vector<std::string>& trans,
-const std::vector<std::string>& tips){
+    const std::vector<std::string>& trans,
+    const std::vector<std::string>& tips) {
+  json req;
+  req["command"] = "getInclusionStates";
+  req["transactions"] = trans;
+  req["tips"] = tips;
 
-json req;
-req["command"] = "getInclusionStates";
-req["transactions"] = trans;
-req["tips"] = tips;
+  auto maybeResponse = post(std::move(req));
 
+  if (!maybeResponse) {
+    LOG(INFO) << __FUNCTION__ << " request failed.";
+    return {};
+  }
 
-auto maybeResponse = post(std::move(req));
+  auto& response = maybeResponse.value();
+  if (response["states"].is_null()) {
+    return {};
+  }
 
-if (!maybeResponse) {
-LOG(INFO) << __FUNCTION__ << " request failed.";
-return {};
+  return {response["states"].get<std::vector<bool>>()};
 }
 
-auto& response = maybeResponse.value();
-return {response["states"].get<std::vector<bool>>()};
-
-}
-
-}
+}  // namespace cppclient

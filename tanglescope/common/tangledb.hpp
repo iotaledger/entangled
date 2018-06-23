@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <optional>
 #include <shared_mutex>
 #include <unordered_map>
@@ -10,6 +11,7 @@ class TangleDB {
     std::string hash;
     std::string trunk;
     std::string branch;
+    std::chrono::system_clock::time_point timestamp;
 
     TXRecord() = default;
   };
@@ -17,6 +19,9 @@ class TangleDB {
   std::optional<TXRecord> find(const std::string& hash);
 
   void put(const TXRecord& tx);
+  void removeAgedTxs(uint32_t ageInSeconds);
+
+  std::unordered_map<std::string, TXRecord> getTXsMap() const;
 
   static TangleDB& instance();
 

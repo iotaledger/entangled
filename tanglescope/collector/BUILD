@@ -1,7 +1,8 @@
 cc_library(
-    name='collector',
-    include_prefix='iota/tanglescope/collector',
-    hdrs=glob(['*.hpp']),
-    srcs=glob(['*.cpp']),
-    deps=['@yaml_cpp//:yaml_cpp'],
-    visibility=['//visibility:public'])
+    name = "collector",
+    srcs = glob(["*.cpp"]),
+    hdrs = glob(["*.hpp"]),
+    include_prefix = "iota/tanglescope/collector",
+    visibility = ["//visibility:public"],
+    deps = ["@yaml_cpp"],
+)

@@ -1,15 +1,23 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
 
-#ifndef ENTANGLED_CPPCLIENT_MESSAGES_H_
-#define ENTANGLED_CPPCLIENT_MESSAGES_H_
+#ifndef CPPCLIENT_MESSAGES_H_
+#define CPPCLIENT_MESSAGES_H_
 
-#include <nonstd/optional.hpp>
 #include <string>
+#include <vector>
+#include <nonstd/optional.hpp>
 
 namespace cppclient {
 
 struct GetTransactionsToApproveResponse {
   std::string trunkTransaction;
   std::string branchTransaction;
+  uint32_t duration;
 };
 
 struct GetNodeInfoResponse {
@@ -40,4 +48,4 @@ struct GetInclusionStatesResponse {
 };
 }  // namespace cppclient
 
-#endif  // ENTANGLED_CPPCLIENT_MESSAGES_H_
+#endif  // CPPCLIENT_MESSAGES_H_

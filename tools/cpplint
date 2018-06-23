@@ -1,0 +1,4 @@
+#!/bin/sh
+
+python tools/cpplint.py --filter=-build/include_order,-whitespace/comments --extensions=h,cc ./**/*.h ./**/*.cc
+

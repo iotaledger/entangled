@@ -12,8 +12,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cppclient:beast",
+        "@com_github_google_glog//:glog",
         "@cppzmq",
-        "@glog",
         "@libcuckoo",
         "@rxcpp",
         "@yaml_cpp",
@@ -26,6 +26,6 @@ cc_test(
     deps = [
         ":common",
         "@com_github_gflags_gflags//:gflags",
-        "@gtest//:gtest_main",
+        "@com_google_googletest//:gtest_main",
     ],
 )

@@ -26,7 +26,7 @@ cc_library(
         "@boost//:range",
         "@boost//:thread",
         "@com_github_gflags_gflags//:gflags",
-        "@glog",
+        "@com_github_google_glog//:glog",
         "@nlohmann//:json",
     ],
 )
@@ -46,7 +46,6 @@ cc_test(
     srcs = glob(["tests/**/*.cc"]),
     deps = [
         ":beast",
-        "@gtest",
-        "@gtest//:gtest_main",
+        "@com_google_googletest//:gtest_main",
     ],
 )

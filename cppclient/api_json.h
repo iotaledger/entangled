@@ -1,5 +1,12 @@
-#ifndef ENTANGLED_CPPCLIENT_IOTA_API_JSON_H_
-#define ENTANGLED_CPPCLIENT_IOTA_API_JSON_H_
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+#ifndef CPPCLIENT_API_JSON_H_
+#define CPPCLIENT_API_JSON_H_
 
 #include <cstdint>
 #include <nonstd/optional.hpp>
@@ -11,7 +18,7 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include "api.h"
+#include "cppclient/api.h"
 
 namespace cppclient {
 
@@ -32,7 +39,8 @@ class IotaJsonAPI : virtual public IotaAPI {
 
   std::vector<std::string> findTransactions(
       nonstd::optional<std::vector<std::string>> addresses,
-      nonstd::optional<std::vector<std::string>> bundles) override;
+      nonstd::optional<std::vector<std::string>> bundles,
+      nonstd::optional<std::vector<std::string>> approvees) override;
 
   std::unordered_set<std::string> filterConsistentTails(
       const std::vector<std::string>& tails) override;
@@ -65,4 +73,4 @@ class IotaJsonAPI : virtual public IotaAPI {
 };
 }  // namespace cppclient
 
-#endif  // ENTANGLED_CPPCLIENT_IOTA_API_JSON_H_
+#endif  // CPPCLIENT_API_JSON_H_
