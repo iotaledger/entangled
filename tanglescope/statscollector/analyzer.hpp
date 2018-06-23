@@ -1,5 +1,6 @@
 #pragma once
 
+#include <list>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -39,7 +40,7 @@ class TXAnalyzer {
  private:
   std::shared_mutex _mutex;
 
-  std::unordered_set<std::string> _confirmedBundles;
+  std::list<std::string> _confirmedBundles;
   std::unordered_map<std::string, std::vector<std::shared_ptr<iri::TXMessage>>>
       _unconfirmedBundles;
 

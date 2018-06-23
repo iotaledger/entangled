@@ -1,0 +1,162 @@
+[
+  {
+    "name": "documentation",
+    "description": "Call for participation: Needs documentation written",
+    "color": "47f43a"
+  },
+  {
+    "name": "relnotes",
+    "description": "Issue should be included in next release notes for the project",
+    "color": "fad8c7"
+  },
+  {
+    "name": "invalid",
+    "description": "Issue is invalid / was raised in error.",
+    "color": "ffa500"
+  },
+  {
+    "name": "S-do-not-merge",
+    "description": "Status: DO NOT MERGE",
+    "color": "b60205"
+  },
+  {
+    "name": "S-waiting-on-author",
+    "description": "Status: Waiting on the author to update or respond",
+    "color": "c2e0c6"
+  },
+  {
+    "name": "S-blocked",
+    "description": "Status: Waiting on a dependency",
+    "color": "c2e0c6"
+  },
+  {
+    "name": "S-inactive-closed",
+    "description": "Status: Closed due to inactivity",
+    "color": "c2e0c6"
+  },
+  {
+    "name": "S-needs-rebase",
+    "description": "Status: PR needs to be rebased on latest",
+    "color": "c2e0c6"
+  },
+  {
+    "name": "S-ready-for-review",
+    "description": "Status: PR is ready to be reviewed",
+    "color": "c2e0c6"
+  },
+  {
+    "name": "E-help-wanted",
+    "description": "Call for participation: Help is requested by the issue author to fix it",
+    "color": "47f43a"
+  },
+  {
+    "name": "E-needs-test",
+    "description": "Call for participation: Help is requested for writing tests",
+    "color": "47f43a"
+  },
+  {
+    "name": "E-needs-mentor",
+    "description": "Call for participation: The issue is in need of a mentor",
+    "color": "47f43a"
+  },
+  {
+    "name": "E-easy",
+    "description": "Call for participation: Experience needed: not much",
+    "color": "47f43a"
+  },
+  {
+    "name": "E-medium",
+    "description": "Call for participation: Experience needed: some",
+    "color": "47f43a"
+  },
+  {
+    "name": "E-hard",
+    "description": "Call for participation: Experience needed: a lot",
+    "color": "47f43a"
+  },
+  {
+    "name": "C-bug",
+    "description": "Category: This is a bug.",
+    "color": "f5f1fd"
+  },
+  {
+    "name": "C-enhancement",
+    "description": "Category: PR contains an enhancement to existing code",
+    "color": "f5f1fd"
+  },
+  {
+    "name": "C-enhancement",
+    "description": "Category: PR or issue containing an enhancement",
+    "color": "f5f1fd"
+  },
+  {
+    "name": "C-feature-accepted",
+    "description": "Category: A feature request that was accepted",
+    "color": "f5f1fd"
+  },
+  {
+    "name": "C-feature-request",
+    "description": "Category: A feature request",
+    "color": "f5f1fd"
+  },
+  {
+    "name": "C-tracking-issue",
+    "description": "Category: Parent tracking issue for umultiple sub issues",
+    "color": "f5f1fd"
+  },
+  {
+    "name": "C-cleanup",
+    "description": "Category: PR cleans up code or documentation",
+    "color": "f5f1fd"
+  },
+  {
+    "name": "P-high",
+    "description": "High priority",
+    "color": "eb6420"
+  },
+  {
+    "name": "P-medium",
+    "description": "Medium priority",
+    "color": "eb6420"
+  },
+  {
+    "name": "P-low",
+    "description": "Low priority",
+    "color": "eb6420"
+  },
+  {
+    "name": "A-common",
+    "description": "Area: common code foundation",
+    "color": "d7e102"
+  },
+  {
+    "name": "A-tanglescope",
+    "description": "Area: Tanglescope",
+    "color": "d7e102"
+  },
+  {
+    "name": "A-crypto",
+    "description": "Area: Issues/PRs pertaining to cryptographical matters",
+    "color": "d7e102"
+  },
+  {
+    "name": "A-c-client",
+    "description": "Area: C-Client",
+    "color": "d7e102"
+  },
+  {
+    "name": "A-infra",
+    "description": "Area: Project/repository infrastructure ",
+    "color": "d7e102"
+  },
+  {
+    "name": "A-cppclient",
+    "description": "Area: C++ Client",
+    "color": "d7e102"
+  },
+  {
+    "name": "A-mobile",
+    "description": "Area: Mobile bindings",
+    "color": "d7e102"
+  }
+]

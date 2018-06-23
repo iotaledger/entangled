@@ -1,0 +1,92 @@
+dbloader:
+
+  #URL of ZMQ publisher to connect to
+  publisher: "tcp://zmq.testnet.iota.org:5556"
+  #TX's older than that age will be removed each cleanup_interval [seconds]
+  oldest_tx_age: 1800
+  #in - between cleanup interval[seconds]
+  cleanup_interval: 60
+
+echocollector:
+  #list of publisher to listen to. (they should return the echo)
+  publishers:
+      - "tcp://zmq.testnet.iota.org:5556"
+
+  #url of iri node
+  iri_host: "iri01.testnet.iota.cafe"
+  iri_port: 14265
+  #IP/Port that the Prometheus Exposer binds to
+  prometheus_exposer_uri: "0.0.0.0:8080"
+  #MWM for transaction's POW
+  mwm: 9
+  #in-between transactions interval [seconds]
+  broadcast_interval: 20
+  #how often should echocatcher discover "unseen" transactions [seconds]
+  #shouldn't be too frequent since it can incur in multiple api
+  #calls ..
+  discovery_interval: 5
+
+statscollector:
+
+  #IP/Port that the Prometheus Exposer binds to
+  prometheus_exposer_uri: "0.0.0.0:8081"
+  #URL of ZMQ publisher to connect to
+  publishers:
+      - "tcp://zmq.testnet.iota.org:5556"
+
+  #histogram of bundle's confirmation duration granularity:
+  #(number of buckets = bundle_confirmation_histogram_range*1000 / bundle_confirmation_bucket_size)
+
+  #histogram's range  [seconds]
+  bundle_confirmation_histogram_range: 240
+  #bucket's size [seconds]
+  bundle_confirmation_bucket_size: 2
+
+blowballcollector:
+
+  #IP/Port that the Prometheus Exposer binds to
+  prometheus_exposer_uri: "0.0.0.0:8082"
+  #URL of ZMQ publisher to connect to
+  publisher: "tcp://zmq.testnet.iota.org:5556"
+
+  #interval between following snapshots (internal counters update)
+  snapshot_interval: 60
+  #histogram granularity configuration
+  #histogram's bucket's size (refcount of tx approvers)
+  bucket_size: 1
+  #histogram's range (maximum value of refcount to report)
+  histogram_range: 40
+
+tipselectioncollector:
+
+  #IP / Port that the Prometheus Exposer binds to
+  prometheus_exposer_uri: "0.0.0.0:8083"
+  #url of iri node
+  iri_host : "iri01.testnet.iota.cafe"
+  iri_port: 14265
+  #depth to give to "getTransactionsToApprove"
+  depth: 10
+  #in - between samples interval[seconds]
+  sample_interval: 20
+  #of calls to getTransactionsToApprove in each sample
+  sample_size: 20
+  #histogram granularity configuration
+  #duration's histogram (time it took 'getTransactionsToApprove') bucket's size [ms]
+  duration_bucket_size: 20
+  #duration's histogram range (maximum time it took 'getTransactionsToApprove')
+  duration_histogram_range: 1000
+
+
+# Width definition (by Darcy Camargo):
+# W(s,t) = |{(Vi,Vj) : Vi approves Vj, Vi > s, Vj < s}|
+# 't' is of course > 's' and the more t > s the more
+# complete is the picture of the tangle in regards to
+# the measure line s
+tanglewidthcollector:
+
+  #IP / Port that the Prometheus Exposer binds to
+  prometheus_exposer_uri: "0.0.0.0:8084"
+  #The measure line from the above definition, [seconds]
+  measure_line_age: 60
+  #interval between following snapshots (internal counters update)
+  snapshot_interval: 60

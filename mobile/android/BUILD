@@ -1,12 +1,21 @@
 cc_library(
-    name="jni",
-    hdrs=["Interface.h"],
-    srcs=["Interface.cpp", "jni.h"],
-    deps=['//common/helpers:helpers'])
+    name = "jni",
+    srcs = [
+        "Interface.cpp",
+        "jni.h",
+    ],
+    hdrs = ["Interface.h"],
+    deps = ["//common/helpers"],
+)
 
 android_binary(
-    name="dummy",
-    custom_package="org.iota.mobile",
-    srcs=["java/Interface.java", "demo/App.java", "demo/DummyActivity.java"],
-    manifest="AndroidManifest.xml",
-    deps=[":jni"])
+    name = "dummy",
+    srcs = [
+        "demo/App.java",
+        "demo/DummyActivity.java",
+        "java/Interface.java",
+    ],
+    custom_package = "org.iota.mobile",
+    manifest = "AndroidManifest.xml",
+    deps = [":jni"],
+)

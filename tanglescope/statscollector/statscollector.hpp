@@ -17,12 +17,13 @@ constexpr static auto BUNDLE_CONFIRMATION_HISTOGRAM_RANGE =
 constexpr static auto BUNDLE_CONFIRMATION_BUCKET_SIZE =
     "bundle_confirmation_bucket_size";
 
+constexpr static auto METRIC_PREFIX = "statscollector";
+
 class ZMQCollectorImpl {
  public:
   ZMQCollectorImpl(std::string zmqURL,
-                   PrometheusCollector::CountersMap counters,
-                   PrometheusCollector::HistogramsMap histograms,
-                   PrometheusCollector::GaugeMap gauges);
+                   std::shared_ptr<prometheus::Registry>& registry,
+                   bool useURLLable);
   void collect(uint32_t bundleConfirmationHistogramRange,
                uint32_t bundleConfirmationBucketSize);
 
@@ -31,6 +32,10 @@ class ZMQCollectorImpl {
   PrometheusCollector::CountersMap _counters;
   PrometheusCollector::HistogramsMap _histograms;
   PrometheusCollector::GaugeMap _gauges;
+
+  static std::map<std::string, std::string> nameToDescHistograms;
+  static std::map<std::string, std::string> nameToDescCounters;
+  static std::map<std::string, std::string> nameToDescGauges;
 };
 class StatsCollector : public PrometheusCollector {
  public:
@@ -38,18 +43,6 @@ class StatsCollector : public PrometheusCollector {
   bool parseConfiguration(const YAML::Node& conf) override;
 
  private:
-  virtual PrometheusCollector::CountersMap buildCountersMap(
-      std::shared_ptr<prometheus::Registry> registry,
-      const std::map<std::string, std::string>& labels);
-
-  virtual PrometheusCollector::HistogramsMap buildHistogramsMap(
-      std::shared_ptr<prometheus::Registry> registry,
-      const std::map<std::string, std::string>& labels);
-
-  virtual PrometheusCollector::GaugeMap buildGaugeMap(
-      std::shared_ptr<prometheus::Registry> registry,
-      const std::map<std::string, std::string>& labels);
-
   std::unordered_set<std::string> _zmqPublishers;
 
   std::list<ZMQCollectorImpl> _zmqCollectors;

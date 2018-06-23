@@ -32,10 +32,6 @@ class BlowballCollector : public PrometheusCollector {
 
  private:
   // methods
-  HistogramsMap buildHistogramsMap(
-      std::shared_ptr<prometheus::Registry> registry,
-      const std::map<std::string, std::string>& labels);
-
   void analyzeBlowballs(const std::vector<double>& buckets);
 
   // Configuration
@@ -43,7 +39,7 @@ class BlowballCollector : public PrometheusCollector {
   uint32_t _snapshotInterval;
   // Others
   ZmqObservable _zmqObservable;
-  PrometheusCollector::HistogramsMap _families;
+  PrometheusCollector::HistogramsMap histograms;
   // state
   cuckoohash_map<std::string, uint8_t> _txToRefCount;
   cuckoohash_map<std::string, std::chrono::system_clock::time_point>
@@ -52,6 +48,8 @@ class BlowballCollector : public PrometheusCollector {
 
   uint32_t _histogramRange;
   uint32_t _bucketSize;
+
+  static std::map<std::string, std::string> nameToDescHistogram;
 };
 
 }  // namespace tanglescope

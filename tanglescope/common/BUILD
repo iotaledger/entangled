@@ -1,24 +1,31 @@
 cc_library(
-    name='common',
-    include_prefix='iota/tanglescope/common',
-    hdrs=glob(['*.hpp']),
-    defines=['ZMQ_BUILD_DRAFT_API'],
-    srcs=glob(['*.cpp', '*.hpp']),
-    deps=[
-        '@rxcpp//:rxcpp',
-        '@cppzmq//:cppzmq',
-        '@glog//:glog',
-        '@cpprestsdk//:cpprestsdk',
-	'@libcuckoo//:libcuckoo',
-	'@yaml_cpp//:yaml_cpp',
+    name = "common",
+    srcs = glob([
+        "*.cpp",
+        "*.hpp",
+    ]),
+    hdrs = glob(["*.hpp"]),
+    defines = [
+        "ZMQ_BUILD_DRAFT_API",
     ],
-    visibility=['//visibility:public'])
+    include_prefix = "iota/tanglescope/common",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cppclient:beast",
+        "@com_github_google_glog//:glog",
+        "@cppzmq",
+        "@libcuckoo",
+        "@rxcpp",
+        "@yaml_cpp",
+    ],
+)
 
 cc_test(
-    name='common_test',
-    srcs=['tests/iri.cpp'],
-    deps=[
-        ':common',
-        '@gtest//:gtest_main',
-        '@com_github_gflags_gflags//:gflags',
-    ], )
+    name = "common_test",
+    srcs = ["tests/iri.cpp"],
+    deps = [
+        ":common",
+        "@com_github_gflags_gflags//:gflags",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

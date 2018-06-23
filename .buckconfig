@@ -1,5 +1,0 @@
-[cxx]
-  cxxflags = -Wall -g
-  cflags = -Wall -g
-  gtest_dep = //third-party/google/googletest:gtest
-   
