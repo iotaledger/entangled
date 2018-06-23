@@ -1,7 +1,6 @@
 #ifndef ENTANGLED_POW_H
 #define ENTANGLED_POW_H
 
-
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -13,5 +12,4 @@ char* iota_pow(const char* trytes, uint8_t mwm);
 }
 #endif
 
-
-#endif //ENTANGLED_POW_H
+#endif  // ENTANGLED_POW_H
