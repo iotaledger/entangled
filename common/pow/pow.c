@@ -7,8 +7,8 @@
 
 #define NONCE_LENGTH 27 * 3
 
-trit_t* do_pow(Curl* curl, const trit_t* trits_in, size_t trits_len,
-               uint8_t mwm) {
+trit_t* do_pow(Curl* const curl, trit_t const* const trits_in,
+               size_t const trits_len, uint8_t const mwm) {
   tryte_t* nonce_trits = (tryte_t*)calloc(NONCE_LENGTH + 1, sizeof(tryte_t));
 
   curl_absorb(curl, trits_in, trits_len - HASH_LENGTH);
