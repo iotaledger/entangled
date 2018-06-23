@@ -19,7 +19,7 @@ void sbox(Curl *const, Curl *const);
 
 void init_curl(Curl *ctx) { memset(ctx->state, 0, sizeof(ctx->state)); }
 
-void curl_absorb(Curl *ctx, trit_t *const trits, size_t length) {
+void curl_absorb(Curl *ctx, trit_t const *const trits, size_t length) {
   size_t numChunks = length / HASH_LENGTH + ((length % HASH_LENGTH) ? 1 : 0);
   size_t i = 0;
   for (; i < numChunks; ++i) {

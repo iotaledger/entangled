@@ -22,7 +22,7 @@ static double const pow27LUT[] = {1,
                                   150094635296999136,
                                   4052555153018976256};
 
-int64_t trits_to_long(trit_t *trit, size_t const i) {
+int64_t trits_to_long(trit_t const *const trit, size_t const i) {
   int64_t accum = 0;
   size_t end = i;
   while (end-- > 0) {

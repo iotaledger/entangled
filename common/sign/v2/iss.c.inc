@@ -14,8 +14,8 @@
 #define _ISS_PREFIX(A) CAT(CAT(CAT(iss_, HASH_PREFIX), _), A)
 #define _HASH_PREFIX(A) CAT(CAT(HASH_PREFIX, _), A)
 
-int _ISS_PREFIX(subseed)(trit_t *const seed, trit_t *const out, int64_t index,
-                         HASH_STATE *const c) {
+int _ISS_PREFIX(subseed)(trit_t const *const seed, trit_t *const out,
+                         int64_t index, HASH_STATE *const c) {
   memcpy(out, seed, HASH_LENGTH * sizeof(trit_t));
   add_assign(out, HASH_LENGTH, index);
   _HASH_PREFIX(absorb)(c, out, HASH_LENGTH);

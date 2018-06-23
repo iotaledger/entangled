@@ -3,7 +3,7 @@
 
 #include "common/trinary/trits.h"
 
-int64_t trits_to_long(trit_t *trit, size_t const i);
+int64_t trits_to_long(trit_t const *const trit, size_t const i);
 size_t min_trits(int64_t value);
 size_t long_to_trits(int64_t value, trit_t *trits);
 
