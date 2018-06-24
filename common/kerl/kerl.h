@@ -15,11 +15,11 @@ typedef struct {
   Keccak_HashInstance keccak;
 } Kerl;
 
-void init_kerl(Kerl* ctx);
+void init_kerl(Kerl* const ctx);
 
-void kerl_absorb(Kerl* ctx, trit_t* trits, size_t length);
-void kerl_squeeze(Kerl* ctx, trit_t* trits, size_t length);
-void kerl_reset(Kerl* ctx);
+void kerl_absorb(Kerl* const ctx, trit_t const* trits, size_t const length);
+void kerl_squeeze(Kerl* const ctx, trit_t* trits, size_t const length);
+void kerl_reset(Kerl* const ctx);
 
 #ifdef __cplusplus
 }
