@@ -9,7 +9,7 @@
 #define LOW_3 0xFFC0000007FFFFFF
 #define HIGH_3 0x003FFFFFFFFFFFFF
 
-void ptrit_offset(ptrit_t *const trits, size_t length) {
+void ptrit_offset(ptrit_t *const trits, size_t const length) {
   if (length < 4) {
     return;
   }
@@ -23,7 +23,8 @@ void ptrit_offset(ptrit_t *const trits, size_t length) {
   trits[3].high = HIGH_3;
 }
 
-void ptrit_increment(ptrit_t *const trits, size_t offset, size_t end) {
+void ptrit_increment(ptrit_t *const trits, size_t const offset,
+                     size_t const end) {
   size_t i;
   ptrit_s carry = 1;
   ptrit_t copy;
