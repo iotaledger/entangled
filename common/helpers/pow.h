@@ -1,4 +1,4 @@
-#ifndef ENTANGLE_POW_H
+#ifndef ENTANGLED_POW_H
 #define ENTANGLED_POW_H
 
 
