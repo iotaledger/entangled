@@ -7,7 +7,7 @@
 #define TRYTE_LENGTH 2673
 #define TRANSACTION_LENGTH TRYTE_LENGTH * 3
 
-char* iota_digest(char const* const trytes) {
+char* iota_digest(const char* trytes) {
   Curl curl;
   init_curl(&curl);
   curl.type = CURL_P_81;
@@ -16,7 +16,7 @@ char* iota_digest(char const* const trytes) {
   trit_t input[sizeof(char) * length * 3];
   trytes_to_trits((tryte_t*)trytes, input, length);
 
-  char trits_hash[HASH_LENGTH];
+  trit_t trits_hash[HASH_LENGTH];
   curl_digest(input, length * 3, trits_hash, &curl);
 
   char* hash = calloc(HASH_LENGTH / 3 + 1, sizeof(char));
