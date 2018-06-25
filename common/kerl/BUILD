@@ -28,3 +28,13 @@ cc_library(
         "@keccak",
     ],
 )
+
+cc_library(
+    name = "hash",
+    srcs = ["hash.c"],
+    hdrs = ["hash.h"],
+    deps = [
+        ":kerl",
+        "//common/trinary:tryte",
+    ],
+)

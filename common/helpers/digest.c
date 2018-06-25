@@ -14,12 +14,11 @@ char* iota_digest(const char* trytes) {
     char input[sizeof(char) * length * 3];
     trytes_to_trits((tryte_t*)trytes, input, length);
 
-    char* trits_hash = calloc(HASH_LENGTH + 1, sizeof(char));
+    char trits_hash[HASH_LENGTH];
     curl_digest(input, length * 3, trits_hash, &curl);
 
     char* hash = calloc(HASH_LENGTH/3 + 1, sizeof(char));
     trits_to_trytes((trit_t*)trits_hash, (tryte_t*)hash, HASH_LENGTH);
-    free(trits_hash);
 
     return hash;
 
