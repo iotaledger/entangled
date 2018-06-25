@@ -8,8 +8,7 @@ namespace tanglescope {
 
 std::map<std::string, std::string> TangleWidthCollector::nameToDescGauges = {
     {TangleWidthCollector::TANGLE_WIDTH,
-     "Number of transactions approving a single transaction as observed "
-     "across multiple nodes"},
+     "Width/Number of edges crossing a measure line"},
     {TangleWidthCollector::MEASURE_LINE, "Measure line's timestamp"}};
 
 bool TangleWidthCollector::parseConfiguration(const YAML::Node& conf) {
