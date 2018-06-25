@@ -8,7 +8,6 @@
 #include "common/sign/v1/iss_kerl.h"
 #include "common/trinary/trit_tryte.h"
 
-#define RADIX 3
 
 char* iota_sign_address_gen(const char* seed, const size_t index,
                        const size_t security) {
