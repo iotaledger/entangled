@@ -86,7 +86,11 @@ tanglewidthcollector:
 
   #IP / Port that the Prometheus Exposer binds to
   prometheus_exposer_uri: "0.0.0.0:8084"
-  #The measure line from the above definition, [seconds]
-  measure_line_age: 60
+  #The measure line base from the above definition, [seconds]
+  measure_line_base_age: 30
+  #The measure line max age [seconds]
+  measure_line_max_age: 90
+  #Step from measure_line_base_age to measure_line_max_age, [seconds]
+  measure_line_age_step: 10
   #interval between following snapshots (internal counters update)
-  snapshot_interval: 60
+  snapshot_interval: 10

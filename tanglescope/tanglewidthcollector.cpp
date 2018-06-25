@@ -8,19 +8,23 @@ namespace tanglescope {
 
 std::map<std::string, std::string> TangleWidthCollector::nameToDescGauges = {
     {TangleWidthCollector::TANGLE_WIDTH,
-     "Width/Number of edges crossing a measure line"}};
+     "Width/Number of edges crossing a measure line"},
+    {TangleWidthCollector::MEASURE_LINE, "Measure line's timestamp"}};
 
 bool TangleWidthCollector::parseConfiguration(const YAML::Node& conf) {
   if (!PrometheusCollector::parseConfiguration(conf)) {
     return false;
   }
 
-  if (!conf[SNAPSHOT_INTERVAL] || !conf[MEASURE_LINE_AGE]) {
+  if (!conf[SNAPSHOT_INTERVAL] || !conf[MEASURE_LINE_BASE_AGE] ||
+      !conf[MEASURE_LINE_AGE_STEP] || !conf[MEASURE_LINE_MAX_AGE]) {
     return false;
   }
 
   _snapshotInterval = conf[SNAPSHOT_INTERVAL].as<uint32_t>();
-  _mesaureLineAge = conf[MEASURE_LINE_AGE].as<uint32_t>();
+  _measureLineBaseAge = conf[MEASURE_LINE_BASE_AGE].as<uint32_t>();
+  _measureLineMaxAge = conf[MEASURE_LINE_MAX_AGE].as<uint32_t>();
+  _measureLineAgeStep = conf[MEASURE_LINE_AGE_STEP].as<uint32_t>();
 
   return true;
 }
@@ -40,15 +44,17 @@ void TangleWidthCollector::collect() {
 }
 
 void TangleWidthCollector::analyzeWidthPeriodically() {
-  _collectorsThread = std::move(rxcpp::schedulers::make_current_thread());
-  _collectorsWorker = _collectorsThread.create_worker();
+  _collectorThread = std::move(rxcpp::schedulers::make_current_thread());
+  _collectorWorker = _collectorThread.create_worker();
 
-  auto& thisRef = *this;
   if (_snapshotInterval > 0) {
-    _collectorsWorker.schedule_periodically(
-        _collectorsThread.now() + std::chrono::seconds(_mesaureLineAge * 3),
-        std::chrono::seconds(_snapshotInterval),
-        [&thisRef](auto scbl) { thisRef.analyzeWidthImpl(); });
+    _collectorWorker.schedule_periodically(
+        _collectorThread.now() + std::chrono::seconds(_measureLineBaseAge * 3),
+        std::chrono::seconds(_snapshotInterval), [this](auto scbl) {
+          auto task = boost::async(boost::launch::async,
+                                   [this]() { analyzeWidthImpl(); });
+          _tasks.emplace_back(std::move(task));
+        });
   }
 }
 
@@ -62,19 +68,16 @@ void TangleWidthCollector::analyzeWidthImpl() {
    *******************************************************/
 
   // has to be ordered
-  std::map<uint64_t, uint32_t> offsetToWidth = {{0, 0},
-                                                {MEASURE_LINE_AGE_STEP, 0},
-                                                {2 * MEASURE_LINE_AGE_STEP, 0},
-                                                {3 * MEASURE_LINE_AGE_STEP, 0},
-                                                {4 * MEASURE_LINE_AGE_STEP, 0}};
+  std::map<uint64_t, uint32_t> offsetToWidth;
 
   auto now = std::chrono::system_clock::now();
   auto measureLine =
       std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch())
           .count() -
-      _mesaureLineAge;
+      _measureLineBaseAge;
 
-  for (auto& offWidthPair : offsetToWidth) {
+  for (uint16_t offset = 0; offset < _measureLineMaxAge;
+       offset += _measureLineAgeStep) {
     auto txs = std::move(TangleDB::instance().getTXsMap());
     for (auto&& kv : txs) {
       if (std::chrono::duration_cast<std::chrono::seconds>(
@@ -85,7 +88,7 @@ void TangleWidthCollector::analyzeWidthImpl() {
           if (std::chrono::duration_cast<std::chrono::seconds>(
                   trunkIt->second.timestamp.time_since_epoch())
                   .count() < measureLine) {
-            ++offWidthPair.second;
+            ++offsetToWidth[offset];
           }
         }
         auto branchIt = txs.find(kv.second.branch);
@@ -93,25 +96,28 @@ void TangleWidthCollector::analyzeWidthImpl() {
           if (std::chrono::duration_cast<std::chrono::seconds>(
                   branchIt->second.timestamp.time_since_epoch())
                   .count() < measureLine) {
-            ++offWidthPair.second;
+            ++offsetToWidth[offset];
           }
         }
       }
     }
-    std::this_thread::sleep_for(std::chrono::seconds(MEASURE_LINE_AGE_STEP));
+    std::this_thread::sleep_for(std::chrono::seconds(_measureLineAgeStep));
   }
 
   for (auto& offWidthPair : offsetToWidth) {
     _gauges.at(TANGLE_WIDTH)
         .get()
         .Add({{"time_after_measure_line",
-               std::to_string(_mesaureLineAge + offWidthPair.first)}})
+               std::to_string(_measureLineBaseAge + offWidthPair.first)}})
         .Set(offWidthPair.second);
   }
+
+  _gauges.at(MEASURE_LINE).get().Add({}).Set(measureLine);
 }
 
 TangleWidthCollector::~TangleWidthCollector() {
-  _collectorsWorker.unsubscribe();
+  _collectorWorker.unsubscribe();
+  std::for_each(_tasks.begin(), _tasks.end(), [&](auto& task) { task.wait(); });
 }
 
 }  // namespace tanglescope
