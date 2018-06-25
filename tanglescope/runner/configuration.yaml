@@ -48,9 +48,9 @@ blowballcollector:
   prometheus_exposer_uri: "0.0.0.0:8082"
   #URL of ZMQ publisher to connect to
   publisher: "tcp://zmq.testnet.iota.org:5556"
-
   #interval between following snapshots (internal counters update)
   snapshot_interval: 60
+
   #histogram granularity configuration
   #histogram's bucket's size (refcount of tx approvers)
   bucket_size: 1
