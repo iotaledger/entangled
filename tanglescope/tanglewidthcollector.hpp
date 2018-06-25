@@ -16,9 +16,9 @@ namespace tanglescope {
 class TangleWidthCollector : public PrometheusCollector {
  public:
   constexpr static auto SNAPSHOT_INTERVAL = "snapshot_interval";
-  constexpr static auto MEASURE_LINE_AGE = "measure_line_age";
-
-  constexpr static uint32_t MEASURE_LINE_AGE_STEP = 15;
+  constexpr static auto MEASURE_LINE_BASE_AGE = "measure_line_base_age";
+  constexpr static auto MEASURE_LINE_MAX_AGE = "measure_line_max_age";
+  constexpr static auto MEASURE_LINE_AGE_STEP = "measure_line_age_step";
 
   constexpr static auto MEASURE_LINE = "measure_line";
   constexpr static auto TANGLE_WIDTH = "tangle_width";
@@ -33,7 +33,9 @@ class TangleWidthCollector : public PrometheusCollector {
 
   // Configuration
   uint32_t _snapshotInterval;
-  uint32_t _measureLineAge;
+  uint32_t _measureLineBaseAge;
+  uint32_t _measureLineMaxAge;
+  uint32_t _measureLineAgeStep;
 
   // Others
   PrometheusCollector::GaugeMap _gauges;

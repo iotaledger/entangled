@@ -17,12 +17,15 @@ bool TangleWidthCollector::parseConfiguration(const YAML::Node& conf) {
     return false;
   }
 
-  if (!conf[SNAPSHOT_INTERVAL] || !conf[MEASURE_LINE_AGE]) {
+  if (!conf[SNAPSHOT_INTERVAL] || !conf[MEASURE_LINE_BASE_AGE] ||
+      !conf[MEASURE_LINE_AGE_STEP] || !conf[MEASURE_LINE_MAX_AGE]) {
     return false;
   }
 
   _snapshotInterval = conf[SNAPSHOT_INTERVAL].as<uint32_t>();
-  _measureLineAge = conf[MEASURE_LINE_AGE].as<uint32_t>();
+  _measureLineBaseAge = conf[MEASURE_LINE_BASE_AGE].as<uint32_t>();
+  _measureLineMaxAge = conf[MEASURE_LINE_MAX_AGE].as<uint32_t>();
+  _measureLineAgeStep = conf[MEASURE_LINE_AGE_STEP].as<uint32_t>();
 
   return true;
 }
@@ -47,7 +50,7 @@ void TangleWidthCollector::analyzeWidthPeriodically() {
 
   if (_snapshotInterval > 0) {
     _collectorWorker.schedule_periodically(
-        _collectorThread.now() + std::chrono::seconds(_measureLineAge * 3),
+        _collectorThread.now() + std::chrono::seconds(_measureLineBaseAge * 3),
         std::chrono::seconds(_snapshotInterval), [this](auto scbl) {
           auto task = boost::async(boost::launch::async,
                                    [this]() { analyzeWidthImpl(); });
@@ -72,13 +75,10 @@ void TangleWidthCollector::analyzeWidthImpl() {
   auto measureLine =
       std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch())
           .count() -
-      _measureLineAge;
+      _measureLineBaseAge;
 
-  uint16_t step = MEASURE_LINE_AGE_STEP >= _measureLineAge
-                      ? _measureLineAge
-                      : MEASURE_LINE_AGE_STEP;
-
-  for (uint16_t offset = 0; offset < 2 * _measureLineAge; offset += step) {
+  for (uint16_t offset = 0; offset < _measureLineMaxAge;
+       offset += _measureLineAgeStep) {
     auto txs = std::move(TangleDB::instance().getTXsMap());
     for (auto&& kv : txs) {
       if (std::chrono::duration_cast<std::chrono::seconds>(
@@ -102,14 +102,14 @@ void TangleWidthCollector::analyzeWidthImpl() {
         }
       }
     }
-    std::this_thread::sleep_for(std::chrono::seconds(step));
+    std::this_thread::sleep_for(std::chrono::seconds(_measureLineAgeStep));
   }
 
   for (auto& offWidthPair : offsetToWidth) {
     _gauges.at(TANGLE_WIDTH)
         .get()
         .Add({{"time_after_measure_line",
-               std::to_string(_measureLineAge + offWidthPair.first)}})
+               std::to_string(_measureLineBaseAge + offWidthPair.first)}})
         .Set(offWidthPair.second);
   }
 
