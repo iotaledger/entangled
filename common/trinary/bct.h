@@ -8,8 +8,8 @@
 
 typedef uint8_t bct_t;
 
-void copy_bct(bct_t *const d, size_t const o, bct_t *const s, size_t const i,
-              size_t const l);
+void copy_bct(bct_t *const d, size_t const o, bct_t const *const s,
+              size_t const i, size_t const l);
 void copy_trits_to_bct(bct_t *const s, size_t const i, trit_t const *const t,
                        size_t const l);
 void copy_bct_to_trits(trit_t *const t, bct_t const *const s, size_t const i,

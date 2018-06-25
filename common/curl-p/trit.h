@@ -12,8 +12,8 @@ typedef struct {
 
 void init_curl(Curl* ctx);
 
-void curl_absorb(Curl* ctx, trit_t const* const trits, size_t length);
-void curl_squeeze(Curl* ctx, trit_t* const trits, size_t length);
-void curl_reset(Curl* ctx);
+void curl_absorb(Curl* const ctx, trit_t const* const trits, size_t length);
+void curl_squeeze(Curl* const ctx, trit_t* const trits, size_t length);
+void curl_reset(Curl* const ctx);
 
 #endif

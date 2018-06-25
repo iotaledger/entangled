@@ -11,11 +11,12 @@
 static const size_t CURL_INDEX[STATE_LENGTH + 1] = {__INDEX_TABLE};
 
 void ptrit_transform_round(PCurl *const, PCurl *const, size_t const);
-void ptrit_sbox(ptrit_t *const, ptrit_t *const, size_t const);
+void ptrit_sbox(ptrit_t *const, ptrit_t const *const, size_t const);
 
-void init_ptrit_curl(PCurl *ctx) { ptrit_curl_reset(ctx); }
+void init_ptrit_curl(PCurl *const ctx) { ptrit_curl_reset(ctx); }
 
-void ptrit_curl_absorb(PCurl *ctx, ptrit_t *const trits, size_t length) {
+void ptrit_curl_absorb(PCurl *const ctx, ptrit_t const *const trits,
+                       size_t const length) {
   memcpy(ctx->state, trits,
          (length < HASH_LENGTH ? length : HASH_LENGTH) * sizeof(ptrit_t));
   ptrit_transform(ctx);
@@ -26,7 +27,8 @@ void ptrit_curl_absorb(PCurl *ctx, ptrit_t *const trits, size_t length) {
                     length - HASH_LENGTH);
 }
 
-void ptrit_curl_squeeze(PCurl *ctx, ptrit_t *const trits, size_t length) {
+void ptrit_curl_squeeze(PCurl *const ctx, ptrit_t *const trits,
+                        size_t const length) {
   memcpy(trits, ctx->state,
          (length < HASH_LENGTH ? length : HASH_LENGTH) * sizeof(ptrit_t));
 
@@ -52,7 +54,7 @@ void ptrit_transform_round(PCurl *const ctx, PCurl *const s, size_t const i) {
   ptrit_sbox(s->state, ctx->state, 0);
   ptrit_transform_round(s, ctx, i - 1);
 }
-void ptrit_sbox(ptrit_t *const c, ptrit_t *const s, size_t const i) {
+void ptrit_sbox(ptrit_t *const c, ptrit_t const *const s, size_t const i) {
   if (i == STATE_LENGTH) {
     return;
   }
@@ -68,6 +70,6 @@ void ptrit_sbox(ptrit_t *const c, ptrit_t *const s, size_t const i) {
   ptrit_sbox(&c[1], s, i + 1);
 }
 
-void ptrit_curl_reset(PCurl *ctx) {
+void ptrit_curl_reset(PCurl *const ctx) {
   memset(ctx->state, 0, sizeof(ptrit_t) * STATE_LENGTH);
 }

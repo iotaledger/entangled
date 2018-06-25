@@ -22,18 +22,21 @@ typedef struct {
   pthread_rwlock_t *statusLock;
 } SearchInstance;
 
-void *run_search_thread(void *);
-void pt_start(pthread_t *const, SearchInstance *const, unsigned short);
-short do_pd_search(short (*)(PCurl *, unsigned short), SearchInstance *const,
-                   PCurl *const);
-void init_inst(SearchInstance *const, SearchStatus *, pthread_rwlock_t*, unsigned short,
-               PCurl *const, unsigned short, unsigned short, unsigned short,
-               short (*)(PCurl *, unsigned short));
+void init_inst(SearchInstance *const inst, SearchStatus *const status,
+               pthread_rwlock_t *const statusLock, unsigned short const index,
+               PCurl *const curl, unsigned short const offset,
+               unsigned short const end, unsigned short const param,
+               short (*test)(PCurl *const, unsigned short const));
+void pt_start(pthread_t *const tid, SearchInstance *const inst,
+              unsigned short const index);
+void *run_search_thread(void *const data);
+short do_pd_search(short (*test)(PCurl *const, unsigned short const),
+                   SearchInstance *const inst, PCurl *const copy);
 
-PearlDiverStatus pd_search(Curl *const ctx, unsigned short offset,
-                           unsigned short end,
-                           short (*test)(PCurl *, unsigned short),
-                           unsigned short param) {
+PearlDiverStatus pd_search(Curl *const ctx, unsigned short const offset,
+                           unsigned short const end,
+                           short (*test)(PCurl *const, unsigned short const),
+                           unsigned short const param) {
   unsigned short found_thread = 0, n_procs = sysconf(_SC_NPROCESSORS_ONLN);
   intptr_t found_index = -1;
   SearchInstance inst[n_procs];
@@ -41,17 +44,17 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short offset,
   pthread_rwlock_t statusLock;
   pthread_t tid[n_procs];
 
-  if(pthread_rwlock_init(&statusLock, NULL)) {
+  if (pthread_rwlock_init(&statusLock, NULL)) {
     return PEARL_DIVER_ERROR;
   }
-
 
   {
     PCurl curl;
     trits_to_ptrits(ctx->state, curl.state, STATE_LENGTH);
     ptrit_offset(&curl.state[offset], 4);
     curl.type = ctx->type;
-    init_inst(inst, &status, &statusLock, n_procs, &curl, offset + 4, end, param, test);
+    init_inst(inst, &status, &statusLock, n_procs, &curl, offset + 4, end,
+              param, test);
   }
 
   pt_start(tid, inst, n_procs - 1);
@@ -83,10 +86,11 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short offset,
   return PEARL_DIVER_SUCCESS;
 }
 
-void init_inst(SearchInstance *const inst, SearchStatus *status, pthread_rwlock_t *statusLock,
-               unsigned short index, PCurl *const curl, unsigned short offset,
-               unsigned short end, unsigned short param,
-               short (*test)(PCurl *, unsigned short)) {
+void init_inst(SearchInstance *const inst, SearchStatus *const status,
+               pthread_rwlock_t *const statusLock, unsigned short const index,
+               PCurl *const curl, unsigned short const offset,
+               unsigned short const end, unsigned short const param,
+               short (*test)(PCurl *const, unsigned short const)) {
   if (index == 0) {
     return;
   }
@@ -98,11 +102,12 @@ void init_inst(SearchInstance *const inst, SearchStatus *status, pthread_rwlock_
                            .statusLock = statusLock,
                            .test = test};
   memcpy(&(inst->curl), curl, sizeof(PCurl));
-  init_inst(&inst[1], status, statusLock, index - 1, curl, offset, end, param, test);
+  init_inst(&inst[1], status, statusLock, index - 1, curl, offset, end, param,
+            test);
 }
 
 void pt_start(pthread_t *const tid, SearchInstance *const inst,
-              unsigned short index) {
+              unsigned short const index) {
   if (pthread_create(&tid[index], NULL, run_search_thread,
                      ((void *)&inst[index]))) {
     tid[index] = 0;
@@ -113,7 +118,7 @@ void pt_start(pthread_t *const tid, SearchInstance *const inst,
   pt_start(tid, inst, index - 1);
 }
 
-void *run_search_thread(void *data) {
+void *run_search_thread(void *const data) {
   unsigned short i;
   PCurl copy;
 
@@ -125,8 +130,8 @@ void *run_search_thread(void *data) {
   return (void *)(intptr_t)do_pd_search(inst->test, inst, &copy);
 }
 
-short do_pd_search(short (*test)(PCurl *, unsigned short), SearchInstance *inst,
-                   PCurl *copy) {
+short do_pd_search(short (*test)(PCurl *const, unsigned short const),
+                   SearchInstance *const inst, PCurl *const copy) {
   short index;
 
   SearchStatus status = SEARCH_RUNNING;
