@@ -2,6 +2,7 @@ cc_library(
     name = "helpers",
     visibility = ["//visibility:public"],
     deps = [
+        ":checksum",
         ":digest",
         ":pow",
         ":sign",
@@ -35,6 +36,19 @@ cc_library(
     hdrs = ["digest.h"],
     visibility = ["//visibility:public"],
     deps = ["//common/curl-p:digest"],
+)
+
+cc_library(
+    name = "checksum",
+    srcs = ["checksum.c"],
+    hdrs = ["checksum.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":digest",
+        "//common/kerl:hash",
+        "//common/sign/v1:iss_kerl",
+        "//common/trinary:trit_tryte",
+    ],
 )
 
 cc_test(

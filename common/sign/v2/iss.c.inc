@@ -17,8 +17,8 @@
 int _ISS_PREFIX(subseed)(trit_t *const seed, trit_t *const out, int64_t index,
                          HASH_STATE *const c) {
   memcpy(out, seed, HASH_LENGTH * sizeof(trit_t));
-  add_assign(seed, HASH_LENGTH, index);
-  _HASH_PREFIX(absorb)(c, seed, HASH_LENGTH);
+  add_assign(out, HASH_LENGTH, index);
+  _HASH_PREFIX(absorb)(c, out, HASH_LENGTH);
   _HASH_PREFIX(squeeze)(c, out, HASH_LENGTH);
   _HASH_PREFIX(reset)(c);
   return 0;

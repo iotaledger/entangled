@@ -45,9 +45,12 @@ void transform(Curl *const ctx) {
   Curl s;
   size_t round = 0;
   for (; round < ctx->type; ++round) {
-    memcpy(s.state, ctx->state, sizeof(ctx->state));
-    sbox(ctx, &s);
+    if (round & 1)
+      sbox(ctx, &s);
+    else
+      sbox(&s, ctx);
   }
+  if (round & 1) memcpy(ctx->state, s.state, sizeof(ctx->state));
 }
 
 void sbox(Curl *const c, Curl *const s) {

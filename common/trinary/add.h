@@ -3,6 +3,7 @@
 
 #include "common/trinary/trits.h"
 
+trit_t trit_sum(trit_t a, trit_t b);
 int add_assign(trit_t *t, size_t s, int64_t v);
 void add_trits(const trit_t *const lh, trit_t *rh, size_t len);
 

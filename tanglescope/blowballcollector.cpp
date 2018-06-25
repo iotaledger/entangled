@@ -9,8 +9,7 @@ using namespace iota::tanglescope;
 
 std::map<std::string, std::string> BlowballCollector::nameToDescHistogram = {
     {BlowballCollector::TX_NUM_APPROVERS,
-     "Number of transactions approving a single transaction as observed "
-     "across multiple nodes"}};
+     "Number of transactions directly approving a single transaction"}};
 
 bool BlowballCollector::parseConfiguration(const YAML::Node& conf) {
   if (!PrometheusCollector::parseConfiguration(conf)) {

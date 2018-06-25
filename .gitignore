@@ -144,3 +144,6 @@ xcuserdata/
 # iOS Frameworks
 *.framework
 *.framework/*
+
+# Atom conf
+.clang_complete
