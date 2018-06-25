@@ -74,21 +74,6 @@ int _ISS_PREFIX(address)(trit_t *const digest, trit_t *const address,
   return 0;
 }
 
-int signed_window(trit_t *hash) {
-  ssize_t sum = 0, i;
-  trit_t *he;
-  for (i = 1; i <= TRYTE_WIDTH; i++) {
-    he = &hash[HASH_LENGTH / TRYTE_WIDTH];
-    do {
-      sum += *hash;
-    } while (++hash < he);
-    if (sum == 0) {
-      return i;
-    }
-  }
-  return 0;
-}
-
 #define HASH_TRYTE_VAL(hash, i)                            \
   (hash[i * TRYTE_WIDTH] + hash[i * TRYTE_WIDTH + 1] * 3 + \
    hash[i * TRYTE_WIDTH + 2] * 9)
