@@ -7,6 +7,20 @@
 #define RADIX 3
 
 static trit_t const encoded_zero[] = {1, 0, 0, -1};
+static double const pow27LUT[] = {1,
+                                  27,
+                                  729,
+                                  19683,
+                                  531441,
+                                  14348907,
+                                  387420489,
+                                  10460353203,
+                                  282429536481,
+                                  7625597484987,
+                                  205891132094649,
+                                  5559060566555523,
+                                  150094635296999136,
+                                  4052555153018976256};
 
 int64_t trits_to_long(trit_t *trit, size_t const i) {
   int64_t accum = 0;
@@ -108,10 +122,12 @@ int64_t decode_long(trit_t const *const trits, size_t const length,
   encoding_start += RADIX;
   size_t encoding_length = min_trits((1 << (encoding_start / RADIX)) - 1);
   size_t encoding = trits_to_long(&trits[encoding_start], encoding_length);
+  // Bound checking for the lookup table
+  if (encoding_start / RADIX > 13) return -1;
   for (size_t i = 0; i < encoding_start / RADIX; i += 1) {
     int64_t tryte_value = trits_to_long(&trits[i * RADIX], RADIX);
     if ((encoding >> i) & 1) tryte_value = -tryte_value;
-    value += pow(27, i) * tryte_value;
+    value += pow27LUT[i] * tryte_value;
   }
   *end = encoding_start + encoding_length;
   return value;
