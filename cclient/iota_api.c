@@ -15,13 +15,14 @@ iota_api_result_t iota_api_get_neighbors(const iota_service_t* const service,
 }
 
 iota_api_result_t iota_api_add_neighbors(const iota_service_t* const service,
-                                         const char* const uris, int size) {
+                                         const add_neighbors_req_t* const req) {
   iota_api_result_t result;
   return result;
 }
 
-iota_api_result_t iota_api_remove_neighbors(const iota_service_t* const service,
-                                            const char* const uris, int size) {
+iota_api_result_t iota_api_remove_neighbors(
+    const iota_service_t* const service,
+    const remove_neighbors_req_t* const req) {
   iota_api_result_t result;
   return result;
 }
@@ -34,30 +35,29 @@ iota_api_result_t iota_api_get_tips(const iota_service_t* const service,
 
 iota_api_result_t iota_api_find_transactions(
     const iota_service_t* const service,
-    const find_transaction_req_t* const req,
+    const find_transactions_req_t* const req,
     find_transactions_res_t* const res) {
   iota_api_result_t result;
   return result;
 }
 
 iota_api_result_t iota_api_get_trytes(const iota_service_t* const service,
-                                      const char* const hashes, size_t size,
+                                      const get_trytes_req_t* const req,
                                       char* trytes[]) {
   iota_api_result_t result;
   return result;
 }
 
 iota_api_result_t iota_api_get_inclusion_states(
-    const iota_service_t* const service, const char* const transactions,
-    size_t nuTransactions, const char* const tips, size_t nuTips,
+    const iota_service_t* const service,
+    const get_inclusion_state_req_t* const req,
     get_inclusion_state_res_t* res) {
   iota_api_result_t result;
   return result;
 }
 
 iota_api_result_t iota_api_get_balances(const iota_service_t* const service,
-                                        const char* const addresses, int size,
-                                        const int threshold,
+                                        const get_balances_req_t* const req,
                                         get_balances_res_t* res) {
   iota_api_result_t result;
   return result;
@@ -70,12 +70,9 @@ iota_api_result_t iota_api_get_transactions_to_approve(
   return result;
 }
 
-iota_api_result_t iota_api_attach_to_tangle(const iota_service_t* const service,
-                                            const char* const trunkTransaction,
-                                            const char* const branchTransaction,
-                                            int inWeightMagnitude,
-                                            char* const txsToAttachTrytes[],
-                                            size_t nuTxs) {
+iota_api_result_t iota_api_attach_to_tangle(
+    const iota_service_t* const service,
+    const attach_to_tangle_req_t* const req) {
   iota_api_result_t result;
   return result;
 }
@@ -87,15 +84,15 @@ iota_api_result_t iota_api_interrupt_attaching_to_tangle(
 }
 
 iota_api_result_t iota_api_broadcast_transactions(
-    const iota_service_t* const service, const char* const txsTrytes,
-    int size) {
+    const iota_service_t* const service,
+    const broadcast_transactions_req_t* const req) {
   iota_api_result_t result;
   return result;
 }
 
 iota_api_result_t iota_api_store_transactions(
-    const iota_service_t* const service, const char* const txsTrytes,
-    int size) {
+    const iota_service_t* const service,
+    const store_transactions_req_t* const req) {
   iota_api_result_t result;
   return result;
 }

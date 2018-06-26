@@ -14,15 +14,22 @@ extern "C" {
 #define NUM_TRITS_ADDRESS 243
 #define NUM_TRITS_BUNDLE_HASH 243
 #define NUM_TRITS_TAG 81
+#define NUM_TRITS_TX_HASH 243
 
 typedef trit_array_p address_t;
 typedef trit_array_p bundle_hash_t;
 typedef trit_array_p tag_t;
+typedef trit_array_p tx_hash_t;
 
 typedef struct {
   size_t size;
   int* array;
 } int_array;
+
+typedef struct {
+  size_t size;
+  char* array;
+} string_array;
 
 typedef struct {
   size_t size;
@@ -33,6 +40,11 @@ typedef struct {
   size_t size;
   tag_t* array;
 } tag_array;
+
+typedef struct {
+  size_t size;
+  tx_hash_t* array;
+} tx_hash_array;
 
 #ifdef __cplusplus
 }

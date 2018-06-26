@@ -6,10 +6,9 @@ cc_library(
     hdrs = glob([
         "*.h",
     ]),
+    include_prefix = "response",
+    visibility = ["//visibility:public"],
     deps = [
         "//cclient/types",
     ],
-    include_prefix = "response",
-    visibility = ["//visibility:public"],
 )
-

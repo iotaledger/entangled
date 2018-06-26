@@ -1,11 +1,11 @@
 // Copyright 2018 IOTA Foundation
 
-#ifndef CCLIENT_LIBRARY_H
-#define CCLIENT_LIBRARY_H
+#ifndef CCLIENT_IOTA_API_H_
+#define CCLIENT_IOTA_API_H_
 
 #include "request/requests.h"
 #include "response/responses.h"
-#include "service.h"
+#include "cclient/service.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,13 +45,12 @@ iota_api_result_t iota_api_get_neighbors(const iota_service_t* const service,
  * https://iota.readme.io/reference#addneighors
  *
  * @para service IRI node end point.
- * @para uris List of URI eleents.
- * @para nuUris Nuber of eleents in uris
+ * @para req Request containing list of neighbors to add
  *
  * @return error value.
  */
 iota_api_result_t iota_api_add_neighbors(const iota_service_t* const service,
-                                         const char* const uris, int nuUris);
+                                         const add_neighbors_req_t* const req);
 
 /**
  * Reoves a list of neighbors fro your iri node. This is only teporary, and
@@ -67,8 +66,9 @@ iota_api_result_t iota_api_add_neighbors(const iota_service_t* const service,
  *
  * @return error value.
  */
-iota_api_result_t iota_api_remove_neighbors(const iota_service_t* const service,
-                                            const char* const uris, int nuUris);
+iota_api_result_t iota_api_remove_neighbors(
+    const iota_service_t* const service,
+    const remove_neighbors_req_t* const req);
 
 /**
  * Returns the list of tips.
@@ -92,7 +92,7 @@ iota_api_result_t iota_api_get_tips(const iota_service_t* const service,
  * https://iota.readme.io/reference#findtransactions
  *
  * @para service IRI node end point.
- * @para req - find_transaction_req_t struct containing all eleents by which
+ * @para req - find_transactions_req_t struct containing all eleents by which
  * transactions should be sought.
  * @para res Response containing found transactions
  *
@@ -100,7 +100,7 @@ iota_api_result_t iota_api_get_tips(const iota_service_t* const service,
  */
 iota_api_result_t iota_api_find_transactions(
     const iota_service_t* const service,
-    const find_transaction_req_t* const req,
+    const find_transactions_req_t* const req,
     find_transactions_res_t* const res);
 
 /**
@@ -111,16 +111,13 @@ iota_api_result_t iota_api_find_transactions(
  * https://iota.readme.io/reference#gettrytes
  *
  * @para service IRI node end point.
- * @para hashes Hashes of transactions to which trytes are to be retreived
- * @para
- * @para hashes List of transaction hashes of which you want to get trytes
- * fro.
- * @para nuHashes Nuber of eleents in hashes
+ * @para req The request containing Hashes of transactions to which trytes are
+ * to be retrieved
  *
  * @return error value.
  */
 iota_api_result_t iota_api_get_trytes(const iota_service_t* const service,
-                                      const char* const hashes, size_t nuHashes,
+                                      const get_trytes_req_t* const req,
                                       char* trytes[]);
 
 /**
@@ -134,19 +131,15 @@ iota_api_result_t iota_api_get_trytes(const iota_service_t* const service,
  * https://iota.readme.io/reference#getinclusionstates
  *
  * @para service IRI node end point.
- * @para transactions List of transactions to get the inclusion state
- * for.
- * @para nuTransactions nuber of eleents in transactions
- * @para tips List of tips (including ilestones) to search for the
- * inclusion state.
- * @para nuTips nuber of eleents in tips
+ * @para req The request with transactions to which we are searching for
+ * inclusion state for.
+ * @para res The response with the corresponding inclusion states
  *
  * @return error value.
  */
 iota_api_result_t iota_api_get_inclusion_states(
-    const iota_service_t* const service, const char* const transactions,
-    size_t nuTransactions, const char* const tips, size_t nuTips,
-    get_inclusion_state_res_t* res);
+    const iota_service_t* const service,
+    const get_inclusion_state_req_t* const req, get_inclusion_state_res_t* res);
 
 /**
  * Siilar to iota_api_get_inclusion_states. It returns the confired balance
@@ -158,17 +151,14 @@ iota_api_result_t iota_api_get_inclusion_states(
  * https://iota.readme.io/reference#getbalances
  *
  * @para service IRI node end point.
- * @para addresses List of addresses you want to get the confired balance
- * fro.
- * @para nuAddresses Nuber of eleents in addresses
- * @para threshold Confiration threshold, should be set to 100.
+ * @para req The request containing the addresses for which balances are
+ * requested
  * @para res Response containing the requested balances
  *
  * @return error value.
  */
 iota_api_result_t iota_api_get_balances(const iota_service_t* const service,
-                                        const char* const addresses,
-                                        int nuAddresses, const int threshold,
+                                        const get_balances_req_t* const req,
                                         get_balances_res_t* res);
 
 /**
@@ -207,20 +197,13 @@ iota_api_result_t iota_api_get_transactions_to_approve(
  *
  *
  * @para service IRI node end point.
- * @para trunkTransaction Trunk transaction to approve.
- * @para branchTransaction Branch transaction to approve.
- * @para inWeightMagnitude Proof of Work intensity. Miniu value is 18.
- * @para trytes List of trytes (raw transaction data) to attach to the tangle.
- * [in/out]
+ * @para req The request with the attachment params
  *
  * @return error value.
  */
-iota_api_result_t iota_api_attach_to_tangle(const iota_service_t* const service,
-                                            const char* const trunkTransaction,
-                                            const char* const branchTransaction,
-                                            int inWeightMagnitude,
-                                            char* const txsToAttachTrytes[],
-                                            size_t nuTxs);
+iota_api_result_t iota_api_attach_to_tangle(
+    const iota_service_t* const service,
+    const attach_to_tangle_req_t* const req);
 
 /**
  * Interrupts and copletely aborts the iota_api_attach_to_tangle process.
@@ -241,14 +224,13 @@ iota_api_result_t iota_api_interrupt_attaching_to_tangle(
  * https://iota.readme.io/reference#broadcasttransactions
  *
  * @para service IRI node end point.
- * @para trytes List of raw data of transactions to be rebroadcast.
- * @para nuTxs Nuber of eleents in trytes
+ * @para req - the request containing the transactions to broadcast
  *
  * @return error value.
  */
 iota_api_result_t iota_api_broadcast_transactions(
-    const iota_service_t* const service, const char* const txsTrytes,
-    int nuTxs);
+    const iota_service_t* const service,
+    const broadcast_transactions_req_t* const req);
 
 /**
  * Store transactions into the local storage. The trytes to be used for this
@@ -256,17 +238,17 @@ iota_api_result_t iota_api_broadcast_transactions(
  *
  * https://iota.readme.io/reference#storetransactions
  *
- * @para trytes List of raw data of transactions to be rebroadcast.
- * @para nuTxs Nuber of eleents in trytes
+ * @para service IRI node end point.
+ * @para req - the request containing the transactions to store
  *
  * @return The error value.
  */
 iota_api_result_t iota_api_store_transactions(
-    const iota_service_t* const service, const char* const txsTrytes,
-    int nuTxs);
+    const iota_service_t* const service,
+    const store_transactions_req_t* const req);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif //CCLIENT_IOTA_API_H_

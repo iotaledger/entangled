@@ -30,7 +30,7 @@ typedef struct {
   bundle_hash_t* bundles;
   size_t numBundles;
 
-} find_transaction_req_t;
+} find_transactions_req_t;
 
 #ifdef __cplusplus
 }

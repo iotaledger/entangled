@@ -7,9 +7,9 @@ cc_library(
     ]),
     hdrs = ["iota_api.h"],
     deps = [
-        "@com_google_googletest//:gtest_main",
         "//cclient/request:requests",
         "//cclient/response:responses",
         "//cclient/serialization:serializer_json",
+        "@com_google_googletest//:gtest_main",
     ],
 )

@@ -1,7 +1,7 @@
 // Copyright 2018 IOTA Foundation
 
-#ifndef CCLIENT_SERVICE_H
-#define CCLIENT_SERVICE_H
+#ifndef CCLIENT_SERVICE_H_
+#define CCLIENT_SERVICE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,7 +12,7 @@ extern "C" {
 typedef struct {
   const char* const host;
   size_t port;
-  int tieout;
+  int timeout;
 } iota_service_t;
 
 typedef struct {
@@ -24,4 +24,4 @@ typedef struct {
 }
 #endif
 
-#endif  // CCLIENT_SERVICE_H
+#endif  // CCLIENT_SERVICE_H_
