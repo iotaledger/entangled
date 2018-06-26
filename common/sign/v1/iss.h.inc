@@ -13,22 +13,25 @@
 extern "C" {
 #endif
 
-int _ISS_PREFIX(subseed)(trit_t *const seed, trit_t *const out, int64_t index,
-                         HASH_STATE *const c);
+int _ISS_PREFIX(subseed)(trit_t const *const seed, trit_t *const out,
+                         int64_t const index, HASH_STATE *const state);
 
-int _ISS_PREFIX(key)(trit_t *const s, trit_t *k, const size_t l,
-                     HASH_STATE *const c);
+int _ISS_PREFIX(key)(trit_t const *const subseed, trit_t *key,
+                     size_t const key_length, HASH_STATE *const state);
 
-int _ISS_PREFIX(key_digest)(trit_t *k, trit_t *o, const size_t l,
-                            HASH_STATE *const c);
-int _ISS_PREFIX(address)(trit_t *const d, trit_t *const o,
-                         const size_t digest_length, HASH_STATE *const c);
+int _ISS_PREFIX(key_digest)(trit_t *key, trit_t *digest,
+                            size_t const key_length, HASH_STATE *const state);
 
-int _ISS_PREFIX(signature)(trit_t *sig, trit_t *const hash, trit_t *key,
-                           size_t kl, HASH_STATE *const c);
+int _ISS_PREFIX(address)(trit_t const *const digest, trit_t *const address,
+                         size_t const digest_length, HASH_STATE *const state);
 
-int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t *const hash, trit_t *sig,
-                            size_t sig_len, HASH_STATE *const c);
+int _ISS_PREFIX(signature)(trit_t *sig, trit_t const *const hash,
+                           trit_t const *const key, size_t key_len,
+                           HASH_STATE *const state);
+
+int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t const *const hash,
+                            trit_t *sig, size_t const sig_len,
+                            HASH_STATE *const state);
 
 #ifdef __cplusplus
 }

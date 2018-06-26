@@ -7,10 +7,11 @@
 extern "C" {
 #endif
 
-void curl_digest(const trit_t* const trits, size_t len, trit_t* out, Curl* curl);
+void curl_digest(trit_t const* const trits, size_t const len, trit_t* const out,
+                 Curl* const curl);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //__DIGEST_H
+#endif  //__DIGEST_H

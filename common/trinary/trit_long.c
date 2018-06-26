@@ -22,7 +22,7 @@ static double const pow27LUT[] = {1,
                                   150094635296999136,
                                   4052555153018976256};
 
-int64_t trits_to_long(trit_t *trit, size_t const i) {
+int64_t trits_to_long(trit_t const *const trit, size_t const i) {
   int64_t accum = 0;
   size_t end = i;
   while (end-- > 0) {
@@ -31,7 +31,7 @@ int64_t trits_to_long(trit_t *trit, size_t const i) {
   return accum;
 }
 
-size_t min_trits(int64_t value) {
+size_t min_trits(int64_t const value) {
   size_t num = 1;
   int64_t vp = 1;
   int64_t v_abs = value < 0 ? -value : value;
@@ -42,32 +42,30 @@ size_t min_trits(int64_t value) {
   return num;
 }
 
-size_t long_to_trits(int64_t value, trit_t *trits) {
+size_t long_to_trits(int64_t const value, trit_t *const trits) {
   trit_t trit;
   size_t i, size;
   char negative;
 
   negative = value < 0;
   size = min_trits(value);
-  if (negative) {
-    value = -value;
-  }
+  int64_t v_abs = negative ? -value : value;
   for (i = 0; i < size; i++) {
-    if (value == 0) {
+    if (v_abs == 0) {
       break;
     }
-    trit = (value + 1) % (RADIX)-1;
+    trit = (v_abs + 1) % (RADIX)-1;
     if (negative) {
       trit = -trit;
     }
     trits[i] = trit;
-    value++;
-    value /= RADIX;
+    v_abs++;
+    v_abs /= RADIX;
   }
   return size;
 }
 
-size_t nearest_greater_multiple_of_three(size_t value) {
+size_t nearest_greater_multiple_of_three(size_t const value) {
   size_t rem = value % RADIX;
   if (rem == 0) return value;
   return value + RADIX - rem;

@@ -5,9 +5,9 @@ struct ha_o {
   trit_t c;
 };
 
-trit_t trit_cons(trit_t a, trit_t b) { return a == b ? a : 0; }
+trit_t trit_cons(trit_t const a, trit_t const b) { return a == b ? a : 0; }
 
-trit_t trit_sum(trit_t a, trit_t b) {
+trit_t trit_sum(trit_t const a, trit_t const b) {
   trit_t s = a + b;
   switch (s) {
     case 2:
@@ -20,7 +20,7 @@ trit_t trit_sum(trit_t a, trit_t b) {
 }
 
 /// Adds values `a` with `b` with a carry `c`, and returns (sum, carry)
-struct ha_o trit_full_add(trit_t a, trit_t b, trit_t c) {
+struct ha_o trit_full_add(trit_t const a, trit_t const b, trit_t const c) {
   trit_t s_ab = trit_sum(a, b);
 
   trit_t x = trit_cons(a, b) + trit_cons(s_ab, c);
@@ -44,11 +44,11 @@ int add_internal(trit_t *const t, size_t const s, int8_t const negative,
   return add_internal(&t[1], s - 1, negative, (v + 1) / 3, r);
 }
 
-int add_assign(trit_t *t, size_t s, int64_t v) {
+int add_assign(trit_t *const t, size_t const s, int64_t const v) {
   return add_internal(t, s, v < 0, v, (struct ha_o){0, 0});
 }
 
-void add_trits(const trit_t *const lh, trit_t *rh, size_t len) {
+void add_trits(trit_t const *const lh, trit_t *const rh, size_t const len) {
   struct ha_o r = {0, 0};
   size_t i = 0;
   for (; i < len; i++) {

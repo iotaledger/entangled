@@ -4,7 +4,7 @@
 #include "ptrit.h"
 #include "search.h"
 
-short test(PCurl *curl, unsigned short mwm) {
+short test(PCurl *const curl, unsigned short const mwm) {
   unsigned short i;
   ptrit_s probe = HIGH_BITS;
   for (i = HASH_LENGTH; i-- > HASH_LENGTH - mwm && probe != 0;) {
@@ -16,7 +16,7 @@ short test(PCurl *curl, unsigned short mwm) {
   return __builtin_ctzll(probe);
 }
 
-PearlDiverStatus hashcash(Curl *const ctx, SearchType type,
+PearlDiverStatus hashcash(Curl *const ctx, SearchType const type,
                           unsigned short const offset, unsigned short const end,
                           unsigned short const min_weight) {
   return pd_search(ctx, offset, end, &test, min_weight);

@@ -3,7 +3,8 @@
 #define HIGH_BITS 0xFFFFFFFFFFFFFFFF
 #define LOW_BITS 0x0000000000000000
 
-void trits_to_ptrits(trit_t *trits, ptrit_t *ptrits, size_t length) {
+void trits_to_ptrits(trit_t const *const trits, ptrit_t *const ptrits,
+                     size_t const length) {
   if (length == 0) {
     return;
   }
@@ -23,8 +24,8 @@ void trits_to_ptrits(trit_t *trits, ptrit_t *ptrits, size_t length) {
   trits_to_ptrits(&trits[1], &ptrits[1], length - 1);
 }
 
-void ptrits_to_trits(ptrit_t *ptrits, trit_t *trits, size_t index,
-                     size_t length) {
+void ptrits_to_trits(ptrit_t const *const ptrits, trit_t *const trits,
+                     size_t const index, size_t length) {
   if (length == 0) {
     return;
   }

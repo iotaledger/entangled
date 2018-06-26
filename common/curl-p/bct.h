@@ -11,11 +11,13 @@ typedef struct {
   CurlType type;
 } BCurl;
 
-void init_s_curl(BCurl* ctx);
+void init_s_curl(BCurl* const ctx);
 
-void s_transform(BCurl*);
-void s_curl_absorb(BCurl*, bct_t* const, size_t, size_t);
-void s_curl_squeeze(BCurl*, bct_t* const, size_t, size_t);
-void s_curl_reset(BCurl*);
+void s_transform(BCurl* const ctx);
+void s_curl_absorb(BCurl* const ctx, bct_t const* const trits,
+                   size_t const offset, size_t const length);
+void s_curl_squeeze(BCurl* const ctx, bct_t* const trits, size_t const offset,
+                    size_t const length);
+void s_curl_reset(BCurl* const ctx);
 
 #endif /* __COMMON_CURL_P_BCT_H */

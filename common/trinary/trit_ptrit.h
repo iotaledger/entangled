@@ -5,7 +5,9 @@
 #include "common/trinary/ptrit_incr.h"
 #include "common/trinary/trits.h"
 
-void trits_to_ptrits(trit_t*, ptrit_t*, size_t);
-void ptrits_to_trits(ptrit_t*, trit_t*, size_t, size_t);
+void trits_to_ptrits(trit_t const *const trits, ptrit_t *const ptrits,
+                     size_t const length);
+void ptrits_to_trits(ptrit_t const *const ptrits, trit_t *const trits,
+                     size_t const index, size_t length);
 
 #endif

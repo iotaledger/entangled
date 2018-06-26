@@ -7,13 +7,14 @@
 extern "C" {
 #endif
 
-char* iota_sign_address_gen(const char* seed, const size_t index,
-                       const size_t security);
-char* iota_sign_signature_gen(const char* seed, const size_t index,
-                         const size_t security, const char* bundleHash);
+char* iota_sign_address_gen(char const* const seed, size_t const index,
+                            size_t const security);
+char* iota_sign_signature_gen(char const* const seed, size_t const index,
+                              size_t const security,
+                              char const* const bundleHash);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //__COMMON_SIGN_DEFAULT_H_
+#endif  //__COMMON_SIGN_DEFAULT_H_

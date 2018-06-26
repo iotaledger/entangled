@@ -14,10 +14,12 @@
     -1, 0, 0                                                                \
   }
 
-const trit_t TRYTE_TO_TRITS_MAPPINGS[TRYTE_SPACE][NUMBER_OF_TRITS_IN_A_TRYTE] =
-    {TRITS_TO_TRYTES_MAP};
+static const trit_t TRYTE_TO_TRITS_MAPPINGS[TRYTE_SPACE]
+                                           [NUMBER_OF_TRITS_IN_A_TRYTE] = {
+                                               TRITS_TO_TRYTES_MAP};
 
-void trits_to_trytes(trit_t *trits, tryte_t *trytes, size_t length) {
+void trits_to_trytes(trit_t const *const trits, tryte_t *const trytes,
+                     size_t const length) {
   int j = 0,
       end = length < NUMBER_OF_TRITS_IN_A_TRYTE ? length
                                                 : NUMBER_OF_TRITS_IN_A_TRYTE,
@@ -38,7 +40,8 @@ void trits_to_trytes(trit_t *trits, tryte_t *trytes, size_t length) {
                   length - NUMBER_OF_TRITS_IN_A_TRYTE);
 }
 
-void trytes_to_trits(tryte_t *tryte, trit_t *trits, size_t length) {
+void trytes_to_trits(tryte_t const *const tryte, trit_t *const trits,
+                     size_t const length) {
   if (length == 0) {
     return;
   }
