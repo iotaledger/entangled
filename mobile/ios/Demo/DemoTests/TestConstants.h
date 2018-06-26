@@ -1,0 +1,16 @@
+//
+//  TestConstants.h
+//  Demo
+//
+//  Created by Rajiv Shah on 6/26/18.
+//  Copyright © 2018 IOTA Foundation. All rights reserved.
+//
+
+#ifndef TestConstants_h
+#define TestConstants_h
+
+extern NSString * const EXPECTED_NONCE;
+extern NSString * const EXPECTED_ADDRESS;
+extern NSString * const EXPECTED_SIGNATURE;
+
+#endif /* TestConstants_h */
