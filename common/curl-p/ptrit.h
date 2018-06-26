@@ -9,11 +9,12 @@ typedef struct {
   CurlType type;
 } PCurl;
 
-void init_ptrit_curl(PCurl* ctx);
-
-void ptrit_transform(PCurl*);
-void ptrit_curl_absorb(PCurl*, ptrit_t* const, size_t);
-void ptrit_curl_squeeze(PCurl*, ptrit_t* const, size_t);
-void ptrit_curl_reset(PCurl*);
+void init_ptrit_curl(PCurl* const ctx);
+void ptrit_transform(PCurl* const ctx);
+void ptrit_curl_absorb(PCurl* const ctx, ptrit_t const* const trits,
+                       size_t const length);
+void ptrit_curl_squeeze(PCurl* const ctx, ptrit_t* const trits,
+                        size_t const length);
+void ptrit_curl_reset(PCurl* const ctx);
 
 #endif

@@ -7,12 +7,14 @@
 extern "C" {
 #endif
 
-void bigint_not(uint32_t* const base, size_t len);
-size_t bigint_add_small(uint32_t* const base, const uint32_t other);
-void bigint_add(uint32_t* const base, uint32_t const* const rh, size_t len);
+void bigint_not(uint32_t* const base, size_t const len);
+size_t bigint_add_small(uint32_t* const base, uint32_t const other);
+void bigint_add(uint32_t* const base, uint32_t const* const rh,
+                size_t const len);
+void bigint_sub(uint32_t* const base, uint32_t const* const rh,
+                size_t const len);
 int8_t bigint_cmp(uint32_t const* const lh, uint32_t const* const rh,
-                  size_t len);
-  void bigint_sub(uint32_t* const base, uint32_t const* const rh, size_t len);
+                  size_t const len);
 
 #ifdef __cplusplus
 }

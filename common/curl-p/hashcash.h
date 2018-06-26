@@ -10,7 +10,7 @@ typedef enum {
   HEAD,
 } SearchType;
 
-PearlDiverStatus hashcash(Curl *const ctx, SearchType type,
+PearlDiverStatus hashcash(Curl *const ctx, SearchType const type,
                           unsigned short const offset, unsigned short const end,
                           unsigned short const min_weight);
 #endif

@@ -14,16 +14,16 @@ static const size_t CURL_INDEX[STATE_LENGTH + 1] = {__INDEX_TABLE};
 
 static const trit_t TRUTH_TABLE[11] = {__TRUTH_TABLE};
 
-void s_transform(BCurl *ctx);
-void transform_round(BCurl *const, BCurl *const, size_t);
-void sbox(BCurl *const, BCurl *const, size_t const);
+void s_transform(BCurl *const ctx);
+void transform_round(BCurl *const, BCurl *const, size_t const);
+void sbox(BCurl *const, BCurl const *const, size_t const);
 
-void init_s_curl(BCurl *ctx) {
+void init_s_curl(BCurl *const ctx) {
   memset(ctx->state, 0, S_STATE_LENGTH * sizeof(bct_t));
 }
 
-void s_curl_absorb(BCurl *ctx, bct_t *const trits, size_t offset,
-                   size_t length) {
+void s_curl_absorb(BCurl *const ctx, bct_t const *const trits,
+                   size_t const offset, size_t const length) {
   copy_bct(ctx->state, 0, trits, offset,
            (length < HASH_LENGTH ? length : HASH_LENGTH));
   s_transform(ctx);
@@ -33,8 +33,8 @@ void s_curl_absorb(BCurl *ctx, bct_t *const trits, size_t offset,
   s_curl_absorb(ctx, trits, offset + HASH_LENGTH, length - HASH_LENGTH);
 }
 
-void s_curl_squeeze(BCurl *ctx, bct_t *const trits, size_t offset,
-                    size_t length) {
+void s_curl_squeeze(BCurl *const ctx, bct_t *const trits, size_t const offset,
+                    size_t const length) {
   copy_bct(trits, offset, ctx->state, 0,
            (length < HASH_LENGTH ? length : HASH_LENGTH));
   s_transform(ctx);
@@ -49,7 +49,7 @@ void s_transform(BCurl *const ctx) {
   transform_round(ctx, &s, ctx->type == 27 ? 27 : 81);
 }
 
-void transform_round(BCurl *const ctx, BCurl *const s, size_t i) {
+void transform_round(BCurl *const ctx, BCurl *const s, size_t const i) {
   if (i > 0) {
     memcpy(&(s->state[0]), &(ctx->state[0]), sizeof(ctx->state));
     sbox(ctx, s, 0);
@@ -57,7 +57,7 @@ void transform_round(BCurl *const ctx, BCurl *const s, size_t i) {
   }
 }
 
-void sbox(BCurl *const c, BCurl *const s, size_t const i) {
+void sbox(BCurl *const c, BCurl const *const s, size_t const i) {
   if (i == STATE_LENGTH) {
     return;
   }
@@ -69,6 +69,6 @@ void sbox(BCurl *const c, BCurl *const s, size_t const i) {
   sbox(c, s, i + 1);
 }
 
-void s_curl_reset(BCurl *ctx) {
+void s_curl_reset(BCurl *const ctx) {
   memset(ctx->state, 0, S_STATE_LENGTH * sizeof(bct_t));
 }
