@@ -1,11 +1,10 @@
 #include <string.h>
+#include <stdlib.h>
 
 #include "common/curl-p/digest.h"
 #include "common/trinary/trit_tryte.h"
 #include "digest.h"
 
-#include <string.h>
-#include <stdlib.h>
 
 #define TRYTE_LENGTH 2673
 #define TRANSACTION_LENGTH TRYTE_LENGTH * 3
