@@ -2,7 +2,7 @@
 //  Constants.h
 //  EntangledDemo
 //
-//  Created by Rajiv Shah on 4/13/18.
+//
 //  Copyright © 2018 IOTA Foundation. All rights reserved.
 //
 

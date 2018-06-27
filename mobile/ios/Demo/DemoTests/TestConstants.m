@@ -1,8 +1,8 @@
 //
 //  TestConstants.m
-//  EntangledDemo
+//  EntangledDemoTests
 //
-//  Created by Rajiv Shah on 6/26/18.
+//
 //  Copyright © 2018 IOTA Foundation. All rights reserved.
 //
 
