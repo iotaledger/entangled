@@ -5,5 +5,8 @@ cc_library(
     ],
     include_prefix = "types",
     visibility = ["//visibility:public"],
-    deps = ["//common/trinary:trit_array_1"],
+    deps = [
+        "//common/trinary:trit_array_1",
+        "//common/trinary:tryte",
+    ],
 )

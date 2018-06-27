@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "common/trinary/trit_array.h"
+#include "common/trinary/tryte.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,8 +29,8 @@ typedef struct {
 
 typedef struct {
   size_t size;
-  char* array;
-} string_array;
+  trit_array_p* array;
+} tryte_array;
 
 typedef struct {
   size_t size;
