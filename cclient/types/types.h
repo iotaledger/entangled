@@ -30,7 +30,7 @@ typedef struct {
 typedef struct {
   size_t size;
   trit_array_p* array;
-} tryte_array;
+} trit_array_array;
 
 typedef struct {
   size_t size;

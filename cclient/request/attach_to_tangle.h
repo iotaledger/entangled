@@ -25,7 +25,7 @@ typedef struct {
   /**
    * Transaction's raw trytes
    */
-  string_array txToAttachTrytes;
+  trit_array_array txToAttachTrytes;
 
 } attach_to_tangle_req_t;
 

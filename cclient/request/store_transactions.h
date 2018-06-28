@@ -13,7 +13,7 @@ typedef struct {
   /**
    * Trunk transaction to store
    */
-  string_array* txs;
+  trit_array_array* txs;
   size_t numTxs;
 
 } store_transactions_req_t;
