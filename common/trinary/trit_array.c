@@ -131,6 +131,7 @@ size_t flex_trit_to_tryte(tryte_t *trytes, size_t to_len,
   if (num_trits > len || num_trits > to_len * 3) {
     return 0;
   }
+  memset(trytes, '9', to_len);
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   trits_to_trytes((trit_t *)trit_array, trytes, num_trits);
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE) || \
@@ -149,6 +150,7 @@ size_t tryte_to_flex_trit(flex_trit_t *trit_array, size_t to_len,
   if (num_trytes > len || num_trytes > to_len * 3) {
     return 0;
   }
+  memset(trit_array, 0, trit_array_bytes_for_trits(to_len));
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   trytes_to_trits((tryte_t *)trytes, trit_array, num_trytes);
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE) || \
