@@ -59,6 +59,7 @@ cc_test(
     deps = [
         "//common/trinary:trit_array_1",
         "//common/trinary:trit_byte",
+        "//common/trinary:trit_tryte",
         "@unity",
     ],
 )
@@ -70,6 +71,7 @@ cc_test(
     deps = [
         "//common/trinary:trit_array_4",
         "//common/trinary:trit_byte",
+        "//common/trinary:trit_tryte",
         "@unity",
     ],
 )
@@ -81,6 +83,7 @@ cc_test(
     deps = [
         "//common/trinary:trit_array_5",
         "//common/trinary:trit_byte",
+        "//common/trinary:trit_tryte",
         "@unity",
     ],
 )

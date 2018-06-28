@@ -112,6 +112,7 @@ cc_library(
     deps = [
         ":trit_byte",
         ":trits",
+        ":trit_tryte",
         "//common:stdint",
     ],
 )
@@ -124,6 +125,7 @@ cc_library(
     deps = [
         ":trit_byte",
         ":trits",
+        ":trit_tryte",
         "//common:stdint",
     ],
 )
@@ -136,6 +138,7 @@ cc_library(
     deps = [
         ":trit_byte",
         ":trits",
+        ":trit_tryte",
         "//common:stdint",
     ],
 )
@@ -148,6 +151,7 @@ cc_library(
     deps = [
         ":trit_byte",
         ":trits",
+        ":trit_tryte",
         "//common:stdint",
     ],
 )

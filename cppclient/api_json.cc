@@ -25,11 +25,13 @@
 #include <nlohmann/json.hpp>
 #include "common/helpers/digest.h"
 #include "common/model/transaction.h"
+#include "common/model/cpptransaction.h"
 
 using json = nlohmann::json;
 using boost::adaptors::filtered;
 using boost::adaptors::transformed;
 using boost::adaptors::uniqued;
+using model::transaction;
 
 DEFINE_uint32(maxNumAddressesForGetBalances, 1000,
               "Maximum number of addresses to query for in 'getBalances'");
@@ -176,42 +178,35 @@ std::vector<Transaction> IotaJsonAPI::getTransactions(
   }
 
   std::vector<Transaction> txs;
-  iota_transaction_t tx = transaction_new();
   std::chrono::system_clock::time_point epoch;
 
   boost::copy(
-      trytes | transformed([&tx,
-                            &epoch](const std::string& trytes) -> Transaction {
-        transaction_deserialize_from_trytes(
-            tx, reinterpret_cast<const tryte_t*>(trytes.c_str()));
+      trytes | transformed([&epoch](const std::string& trytes) -> Transaction {
+        transaction *tx = new transaction(trytes);                              
 
         // We could also rely on the ordering of the hashes argument here.
         auto hash = iota_digest(trytes.c_str());
         std::string sHash = std::string(reinterpret_cast<char*>(hash), 81);
         std::free(hash);
 
-        auto address = transaction_address(tx);
-        std::string sAddress =
-            std::string(reinterpret_cast<char*>(address), 81);
-        auto bundle = transaction_bundle(tx);
-        std::string sBundle = std::string(reinterpret_cast<char*>(bundle), 81);
-        auto trunk = transaction_trunk(tx);
-        std::string sTrunk = std::string(reinterpret_cast<char*>(trunk), 81);
+        auto sAddress =  tx->get_address();
+        auto sBundle = tx->get_bundle();
+        auto sTrunk = tx->get_trunk();
 
-        std::chrono::seconds sinceEpoch(transaction_timestamp(tx));
+        std::chrono::seconds sinceEpoch(tx->get_timestamp());
 
         return {sHash,
                 sAddress,
-                transaction_value(tx),
+                tx->get_value(),
                 epoch + sinceEpoch,
-                transaction_current_index(tx),
-                transaction_last_index(tx),
+                tx->get_current_index(),
+                tx->get_last_index(),
                 sBundle,
                 sTrunk};
       }),
       boost::back_move_inserter(txs));
 
-  transaction_free(tx);
+  // transaction_free(tx);
 
   return txs;
 }

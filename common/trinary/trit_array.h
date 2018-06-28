@@ -18,8 +18,8 @@ extern "C" {
 #define TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE
 #endif
 
-#include "trit_byte.h"
-#include "trits.h"
+#include "common/trinary/trit_byte.h"
+#include "common/trinary/trit_tryte.h"
 
 typedef int8_t flex_trit_t;
 
@@ -156,6 +156,27 @@ size_t int8_to_flex_trit_array(flex_trit_t *const to_trit_array,
                                size_t const to_len, trit_t const *const trits,
                                size_t const len, size_t const num_trits);
 
+/// Returns an array of trytes.
+/// @param[in] trytes - an array to store trytes
+/// @param[in] to_len - the size of the array to store trytes
+/// @param[in] trit_array - the array of packed trits
+/// @param[in] len - the size of the trit array
+/// @param[in] num_trits - the number of trits to pack
+/// @return size_t - the number of trits decoded
+size_t flex_trit_to_tryte(tryte_t *trytes, size_t to_len,
+                          const flex_trit_t *trit_array, size_t len,
+                          size_t num_trits);
+
+/// Returns an array of flex_trits.
+/// @param[in] trit_array - the array of packed trits
+/// @param[in] to_len - the number of trits in the flex_trits array
+/// @param[in] trytes - an array of trytes
+/// @param[in] len - the number of trytes in the trytes array
+/// @param[in] num_trytes - the size of trytes to unpack
+/// @return size_t - the number of trytes decoded
+size_t tryte_to_flex_trit(flex_trit_t *trit_array, size_t to_len,
+                          const tryte_t *trytes, size_t len,
+                          size_t num_trytes);
 /***********************************************************************************************************
  * Trits array
  ***********************************************************************************************************/
