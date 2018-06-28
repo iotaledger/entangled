@@ -33,7 +33,7 @@ cc_test (
 
 cc_test (
     name = "test_cpptransaction_1",
-    srcs = ["test_cpptransaction.c"],
+    srcs = ["test_cpptransaction.cc"],
     defines = ["TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE"],
     deps = [
         "//common/trinary:trit_tryte",
@@ -44,7 +44,7 @@ cc_test (
 
 cc_test (
     name = "test_cpptransaction_4",
-    srcs = ["test_cpptransaction.c"],
+    srcs = ["test_cpptransaction.cc"],
     defines = ["TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE"],
     deps = [
         "//common/trinary:trit_tryte",
@@ -55,7 +55,7 @@ cc_test (
 
 cc_test (
     name = "test_cpptransaction_5",
-    srcs = ["test_transaction.c"],
+    srcs = ["test_cpptransaction.cc"],
     defines = ["TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE"],
     deps = [
         "//common/trinary:trit_tryte",
