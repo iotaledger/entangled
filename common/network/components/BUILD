@@ -17,8 +17,8 @@ cc_library(
 )
 
 cc_library(
-    name = "replier",
-    hdrs = ["replier.h"],
+    name = "responder",
+    hdrs = ["responder.h"],
     deps = [
         "//common/network/queues:concurrent_queue_hash_request",
         "//common/trinary:tryte",
