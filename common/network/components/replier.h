@@ -4,7 +4,7 @@
 #include "common/network/queues/concurrent_queue_hash_request.h"
 #include "common/trinary/tryte.h"
 
-void replier_on_next(tryte_t const *const hash);
+void replier_on_next(tryte_t const *const hash, neighbor_t *const neighbor);
 void *replier_routine(void *arg);
 
 extern concurrent_queue_of_hash_request_t replier_queue;
