@@ -37,12 +37,12 @@ DEFINE_uint32(maxNumAddressesForGetBalances, 1000,
 namespace cppclient {
 
 bool IotaJsonAPI::isNodeSolid() {
-  auto niOptional = getNodeInfo();
-  if (!niOptional.has_value()) {
+  auto maybeNodeInfo = getNodeInfo();
+  if (!maybeNodeInfo.has_value()) {
     LOG(INFO) << __FUNCTION__ << " request failed.";
-    return {};
+    return false;
   }
-  auto ni = niOptional.value();
+  auto ni = maybeNodeInfo.value();
   if (ni.latestMilestoneIndex != ni.latestSolidMilestoneIndex) {
     return false;
   }
