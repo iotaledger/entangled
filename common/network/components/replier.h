@@ -1,7 +1,7 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_REPLIER_H__
 #define __COMMON_NETWORK_COMPONENTS_REPLIER_H__
 
-#include "common/network/concurrent_queue_hash_request.h"
+#include "common/network/queues/concurrent_queue_hash_request.h"
 #include "common/trinary/tryte.h"
 
 void replier_on_next(tryte_t const *const hash);
