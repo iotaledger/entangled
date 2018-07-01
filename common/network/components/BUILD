@@ -4,7 +4,7 @@ cc_library(
     name = "broadcaster",
     hdrs = ["broadcaster.h"],
     deps = [
-        "//common/network/queues:concurrent_queue_transaction",
+        "//common/network/queues:concurrent_queue_trytes",
     ],
 )
 
@@ -12,7 +12,7 @@ cc_library(
     name = "processor",
     hdrs = ["processor.h"],
     deps = [
-        "//common/network/queues:concurrent_queue_transaction",
+        "//common/network/queues:concurrent_queue_trytes",
     ],
 )
 
