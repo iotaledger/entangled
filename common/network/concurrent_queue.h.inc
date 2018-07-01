@@ -18,7 +18,7 @@
     void (*pop)(struct concurrent_queue_of_##TYPE##_s * this);             \
   } vtable_concurrent_queue_of_##TYPE##_t;                                 \
   extern vtable_concurrent_queue_of_##TYPE##_t const                       \
-      vtable_concurrent_queue_of_##TYPE;
+      vtable_concurrent_queue_of_##TYPE_g;
 
 #define DECLARE_STRUCT_CONCURRENT_QUEUE_OF(TYPE)         \
   typedef struct concurrent_queue_of_##TYPE##_s {        \
@@ -29,7 +29,7 @@
     size_t size;                                         \
     pthread_rwlock_t lock;                               \
     pthread_cond_t cond;                                 \
-  } concurrent_queue_of_##TYPE##_s;
+  } concurrent_queue_of_##TYPE;
 
 /**
  * Returns pointer to the first element in the queue. This element will be the
