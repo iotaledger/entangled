@@ -45,7 +45,7 @@ class IotaJsonAPI : virtual public IotaAPI {
   std::unordered_set<std::string> filterConsistentTails(
       const std::vector<std::string>& tails) override;
 
-  NodeInfo getNodeInfo() override;
+  nonstd::optional<NodeInfo> getNodeInfo() override;
   std::vector<Transaction> getTransactions(
       const std::vector<std::string>& hashes) override;
 

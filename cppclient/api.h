@@ -79,7 +79,7 @@ class IotaAPI {
       nonstd::optional<std::vector<std::string>> bundles,
       nonstd::optional<std::vector<std::string>> approvees) = 0;
 
-  virtual NodeInfo getNodeInfo() = 0;
+  virtual nonstd::optional<NodeInfo> getNodeInfo() = 0;
 
   virtual std::vector<Transaction> getTransactions(
       const std::vector<std::string>& hashes) = 0;

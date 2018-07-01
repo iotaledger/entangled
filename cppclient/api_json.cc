@@ -37,8 +37,12 @@ DEFINE_uint32(maxNumAddressesForGetBalances, 1000,
 namespace cppclient {
 
 bool IotaJsonAPI::isNodeSolid() {
-  auto ni = getNodeInfo();
-
+  auto niOptional = getNodeInfo();
+  if (!niOptional.has_value()) {
+    LOG(INFO) << __FUNCTION__ << " request failed.";
+    return {};
+  }
+  auto ni = niOptional.value();
   if (ni.latestMilestoneIndex != ni.latestSolidMilestoneIndex) {
     return false;
   }
@@ -53,15 +57,20 @@ bool IotaJsonAPI::isNodeSolid() {
   return true;
 }
 
-NodeInfo IotaJsonAPI::getNodeInfo() {
+nonstd::optional<NodeInfo> IotaJsonAPI::getNodeInfo() {
   json req;
   req["command"] = "getNodeInfo";
 
   // TODO(th0br0) proper failure mechanism
   auto response = post(std::move(req)).value();
 
-  return {response["latestMilestone"], response["latestMilestoneIndex"],
-          response["latestSolidSubtangleMilestoneIndex"]};
+  if (!response || response["latestMilestone"].is_null()) {
+    LOG(INFO) << __FUNCTION__ << " request failed.";
+    return {};
+  }
+
+  return {{response["latestMilestone"], response["latestMilestoneIndex"],
+           response["latestSolidSubtangleMilestoneIndex"]}};
 }
 
 std::unordered_map<std::string, uint64_t> IotaJsonAPI::getBalances(
@@ -281,7 +290,12 @@ std::unordered_set<std::string> IotaJsonAPI::filterConfirmedTails(
   if (reference.has_value()) {
     req["tips"] = std::vector<std::string>{reference.value()};
   } else {
-    auto ni = getNodeInfo();
+    auto niOptional = getNodeInfo();
+    if (!niOptional.has_value()) {
+      LOG(INFO) << __FUNCTION__ << " request failed.";
+      return {};
+    }
+    auto ni = niOptional.value();
     req["tips"] = std::vector<std::string>{ni.latestMilestone};
   }
 
@@ -368,7 +382,7 @@ bool IotaJsonAPI::storeTransactions(const std::vector<std::string>& trytes) {
   req["trytes"] = trytes;
 
   auto maybeResponse = post(std::move(req));
-  return maybeResponse.has_value();
+  return maybeResponse && maybeResponse.has_value();
 }
 
 bool IotaJsonAPI::broadcastTransactions(
@@ -378,7 +392,7 @@ bool IotaJsonAPI::broadcastTransactions(
   req["trytes"] = trytes;
 
   auto maybeResponse = post(std::move(req));
-  return maybeResponse.has_value();
+  return maybeResponse && maybeResponse.has_value();
 }
 
 std::unordered_set<std::string> IotaJsonAPI::filterConsistentTails(
