@@ -7,7 +7,7 @@ cc_library(
         "concurrent_queue_hash_request.h",
     ],
     deps = [
-        "//common/model:neighbor",
+        "//common/network:neighbor",
     ],
 )
 

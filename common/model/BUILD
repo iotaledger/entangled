@@ -8,8 +8,3 @@ cc_library(
         "//common/trinary:tryte_long",
     ],
 )
-
-cc_library(
-    name = "neighbor",
-    hdrs = ["neighbor.h"],
-)
