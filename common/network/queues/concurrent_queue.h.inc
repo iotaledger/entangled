@@ -18,7 +18,7 @@
     void (*pop)(struct concurrent_queue_of_##TYPE##_s * this);             \
   } vtable_concurrent_queue_of_##TYPE##_t;                                 \
   extern vtable_concurrent_queue_of_##TYPE##_t const                       \
-      vtable_concurrent_queue_of_##TYPE_g;
+      vtable_concurrent_queue_of_##TYPE##_g;
 
 #define DECLARE_STRUCT_CONCURRENT_QUEUE_OF(TYPE)         \
   typedef struct concurrent_queue_of_##TYPE##_s {        \
@@ -38,7 +38,8 @@
  * @return Pointer to the first element
  */
 #define DECLARE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE) \
-  TYPE *front(struct concurrent_queue_of_##TYPE##_s *this);
+  TYPE *CONCURRENT_QUEUE_OF_##TYPE##_FRONT(              \
+      struct concurrent_queue_of_##TYPE##_s *this);
 
 /**
  * Returns pointer to the last element in the queue. This is the most recently
@@ -47,7 +48,8 @@
  * @return Pointer to the last element
  */
 #define DECLARE_FUNCTION_BACK_CONCURRENT_QUEUE_OF(TYPE) \
-  TYPE *back(struct concurrent_queue_of_##TYPE##_s *this);
+  TYPE *CONCURRENT_QUEUE_OF_##TYPE##_BACK(              \
+      struct concurrent_queue_of_##TYPE##_s *this);
 
 /**
  * Checks if the underlying container has no elements
@@ -55,7 +57,8 @@
  * @return true if the queue is empty, false otherwise
  */
 #define DECLARE_FUNCTION_EMPTY_CONCURRENT_QUEUE_OF(TYPE) \
-  int empty(struct concurrent_queue_of_##TYPE##_s *this);
+  int CONCURRENT_QUEUE_OF_##TYPE##_EMPTY(                \
+      struct concurrent_queue_of_##TYPE##_s *this);
 
 /**
  * Returns the number of elements in the queue
@@ -63,19 +66,22 @@
  * @return The number of elements in the queue
  */
 #define DECLARE_FUNCTION_SIZE_CONCURRENT_QUEUE_OF(TYPE) \
-  size_t size(struct concurrent_queue_of_##TYPE##_s *this);
+  size_t CONCURRENT_QUEUE_OF_##TYPE##_SIZE(             \
+      struct concurrent_queue_of_##TYPE##_s *this);
 
 /**
  * Pushes the given element value to the end of the queue
  */
 #define DECLARE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE) \
-  void push(struct concurrent_queue_of_##TYPE##_s *this, TYPE data);
+  void CONCURRENT_QUEUE_OF_##TYPE##_PUSH(               \
+      struct concurrent_queue_of_##TYPE##_s *this, TYPE data);
 
 /**
  * Removes an element from the front of the queue
  */
 #define DECLARE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE) \
-  void pop(struct concurrent_queue_of_##TYPE##_s *this);
+  void CONCURRENT_QUEUE_OF_##TYPE##_POP(               \
+      struct concurrent_queue_of_##TYPE##_s *this);
 
 #define DECLARE_CONCURRENT_QUEUE_OF(TYPE)          \
   DECLARE_STRUCT_CONCURRENT_QUEUE_NODE_OF(TYPE)    \
