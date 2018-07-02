@@ -1,11 +1,12 @@
 #ifndef __COMMON_NETWORK_CONCURRENT_QUEUE_HASH_REQUEST_H__
 #define __COMMON_NETWORK_CONCURRENT_QUEUE_HASH_REQUEST_H__
 
-#include "common/model/neighbor.h"
+#include "common/network/neighbor.h"
+#include "common/trinary/trit_array.h"
 #include "concurrent_queue.h.inc"
 
 typedef struct {
-  char *hash;
+  trit_array_p hash;
   neighbor_t neighbor;
 } hash_request_t;
 

@@ -8,16 +8,17 @@ cc_library(
     ],
     deps = [
         "//common/network:neighbor",
+        "//common/trinary:trit_array_1",
     ],
 )
 
 cc_library(
-    name = "concurrent_queue_trytes",
+    name = "concurrent_queue_trit_array",
     hdrs = [
         "concurrent_queue.h.inc",
-        "concurrent_queue_trytes.h",
+        "concurrent_queue_trit_array.h",
     ],
     deps = [
-        "//common/trinary:tryte",
+        "//common/trinary:trit_array_1",
     ],
 )

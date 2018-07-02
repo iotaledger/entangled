@@ -4,7 +4,7 @@ cc_library(
     name = "broadcaster",
     hdrs = ["broadcaster.h"],
     deps = [
-        "//common/network/queues:concurrent_queue_trytes",
+        "//common/network/queues:concurrent_queue_trit_array",
     ],
 )
 
@@ -12,7 +12,7 @@ cc_library(
     name = "processor",
     hdrs = ["processor.h"],
     deps = [
-        "//common/network/queues:concurrent_queue_trytes",
+        "//common/network/queues:concurrent_queue_trit_array",
     ],
 )
 
@@ -21,7 +21,6 @@ cc_library(
     hdrs = ["responder.h"],
     deps = [
         "//common/network/queues:concurrent_queue_hash_request",
-        "//common/trinary:tryte",
     ],
 )
 
@@ -34,6 +33,6 @@ cc_library(
     name = "requester",
     hdrs = ["requester.h"],
     deps = [
-        "//common/network/queues:concurrent_queue_trytes",
+        "//common/network/queues:concurrent_queue_trit_array",
     ],
 )
