@@ -8,7 +8,7 @@ cc_library(
     ],
     deps = [
         "//common/network:neighbor",
-        "//common/trinary:trit_array_1",
+        "//common/trinary:trit_array",
     ],
 )
 
@@ -19,6 +19,6 @@ cc_library(
         "concurrent_queue_trit_array.h",
     ],
     deps = [
-        "//common/trinary:trit_array_1",
+        "//common/trinary:trit_array",
     ],
 )
