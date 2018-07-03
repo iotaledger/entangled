@@ -9,8 +9,8 @@ typedef struct {
   uint32_t v;
 } full_add_s;
 
-static void full_add(full_add_s *const fa, const uint64_t lh,
-                     const uint64_t rh) {
+static void full_add(full_add_s *const fa, uint64_t const lh,
+                     uint64_t const rh) {
   uint8_t carry1;
   uint32_t hi;
   uint64_t v;
@@ -30,13 +30,13 @@ static void full_add(full_add_s *const fa, const uint64_t lh,
   }
 }
 
-void bigint_not(uint32_t *const base, size_t len) {
-  for (; len--;) {
-    base[len] = ~base[len];
+void bigint_not(uint32_t *const base, size_t const len) {
+  for (size_t i = len; i--;) {
+    base[i] = ~base[i];
   }
 }
 
-size_t bigint_add_small(uint32_t *const base, const uint32_t other) {
+size_t bigint_add_small(uint32_t *const base, uint32_t const other) {
   // Note that this method doesn't do any bounds checks!
   size_t i = 1;
   full_add_s fa = {0, 0};
@@ -53,7 +53,8 @@ size_t bigint_add_small(uint32_t *const base, const uint32_t other) {
   return i;
 }
 
-void bigint_add(uint32_t *const base, uint32_t const *const rh, size_t len) {
+void bigint_add(uint32_t *const base, uint32_t const *const rh,
+                size_t const len) {
   full_add_s fa = {0, 0};
   size_t i = 0;
 
@@ -63,7 +64,8 @@ void bigint_add(uint32_t *const base, uint32_t const *const rh, size_t len) {
   }
 }
 
-void bigint_sub(uint32_t *const base, uint32_t const *const rh, size_t len) {
+void bigint_sub(uint32_t *const base, uint32_t const *const rh,
+                size_t const len) {
   full_add_s fa = {1, 0};
   size_t i = 0;
 
@@ -76,7 +78,7 @@ void bigint_sub(uint32_t *const base, uint32_t const *const rh, size_t len) {
 }
 
 int8_t bigint_cmp(uint32_t const *const lh, uint32_t const *const rh,
-                  size_t len) {
+                  size_t const len) {
   size_t i = len;
 
   for (; i-- > 0;) {

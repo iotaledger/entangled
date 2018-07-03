@@ -4,7 +4,7 @@
 #include "search.h"
 #include "trit.h"
 
-short test(PCurl *curl, unsigned short security) {
+short test(PCurl *const curl, unsigned short const security) {
   unsigned short i, j, k;
   signed short sum;
   for (i = 0; i < sizeof(ptrit_s) * 8; i++) {

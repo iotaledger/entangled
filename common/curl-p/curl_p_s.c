@@ -11,15 +11,18 @@
 #define HALF_MAX S_STATE_LENGTH / 2 + 1
 #define __TRUTH_TABLE 1, 0, -1, 2, 1, -1, 0, 2, -1, 1, 0
 
-static const trit_t TRUTH_TABLE[11] = {__TRUTH_TABLE};
+static trit_t const TRUTH_TABLE[11] = {__TRUTH_TABLE};
 
-void transform(s_curl_t *ctx);
+void transform(s_curl_t *);
 void transform_round(s_curl_t *const, s_curl_t *const, size_t const);
-void sbox(s_curl_t *const, s_curl_t *const, size_t const, size_t);
+void sbox(s_curl_t *const, s_curl_t *const, size_t const, size_t const);
 
-void s_init_curl(s_curl_t *ctx) { memset(ctx->state, 0, sizeof(ctx->state)); }
+void s_init_curl(s_curl_t *const ctx) {
+  memset(ctx->state, 0, sizeof(ctx->state));
+}
 
-void s_curl_absorb(s_curl_t *ctx, trit_t *const trits, size_t length) {
+void s_curl_absorb(s_curl_t *const ctx, trit_t const *const trits,
+                   size_t const length) {
   memcpy(ctx->state, trits,
          (length < S_HASH_LENGTH ? length : S_HASH_LENGTH) * sizeof(trit_t));
   transform(ctx);
@@ -30,7 +33,8 @@ void s_curl_absorb(s_curl_t *ctx, trit_t *const trits, size_t length) {
                 length - S_HASH_LENGTH);
 }
 
-void s_curl_squeeze(s_curl_t *ctx, trit_t *const trits, size_t length) {
+void s_curl_squeeze(s_curl_t *const ctx, trit_t *const trits,
+                    size_t const length) {
   memcpy(trits, ctx->state,
          (length < S_HASH_LENGTH ? length : S_HASH_LENGTH) * sizeof(trit_t));
   transform(ctx);
@@ -55,7 +59,8 @@ void transform_round(s_curl_t *const ctx, s_curl_t *const s, size_t const i) {
   }
 }
 
-void sbox(s_curl_t *const c, s_curl_t *const s, size_t const i, size_t j) {
+void sbox(s_curl_t *const c, s_curl_t *const s, size_t const i,
+          size_t const j) {
   if (i < S_STATE_LENGTH) {
     size_t j_n = j <= HALF_LENGTH ? j + HALF_LENGTH : j - HALF_MAX;
     c->state[i] = TRUTH_TABLE[s->state[j] + (s->state[j_n] << 2) + 5];
@@ -63,4 +68,6 @@ void sbox(s_curl_t *const c, s_curl_t *const s, size_t const i, size_t j) {
   }
 }
 
-void s_curl_reset(s_curl_t *ctx) { memset(ctx->state, 0, sizeof(ctx->state)); }
+void s_curl_reset(s_curl_t *const ctx) {
+  memset(ctx->state, 0, sizeof(ctx->state));
+}

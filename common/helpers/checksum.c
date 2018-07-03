@@ -13,13 +13,12 @@ char* iota_checksum(const char* input, const size_t inputLength,
   Kerl kerl;
   init_kerl(&kerl);
 
-  if (checksumLength == 0){
+  if (checksumLength == 0) {
     return NULL;
   }
 
-  char inputTrits[sizeof(char) * inputLength * RADIX];
+  trit_t inputTrits[sizeof(char) * inputLength * RADIX];
   trit_t trits_hash[HASH_LENGTH];
-  char hash[HASH_LENGTH / RADIX];
   char* checksumTrytes;
 
   checksumTrytes = calloc(checksumLength, sizeof(tryte_t));

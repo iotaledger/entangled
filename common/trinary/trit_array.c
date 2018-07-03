@@ -10,9 +10,11 @@
 #include <string.h>
 #include "common/trinary/trit_byte.h"
 
-size_t flex_trit_array_slice(flex_trit_t *to_trit_array, size_t to_len,
-                             const flex_trit_t *trit_array, size_t len,
-                             size_t start, size_t num_trits) {
+size_t flex_trit_array_slice(flex_trit_t *const to_trit_array,
+                             size_t const to_len,
+                             flex_trit_t const *const trit_array,
+                             size_t const len, size_t const start,
+                             size_t const num_trits) {
   // Bounds checking
   if (num_trits > to_len || (start + num_trits) > len) {
     return 0;
@@ -67,9 +69,11 @@ size_t flex_trit_array_slice(flex_trit_t *to_trit_array, size_t to_len,
   return num_bytes;
 }
 
-size_t flex_trit_array_insert(flex_trit_t *to_trit_array, size_t to_len,
-                              const flex_trit_t *trit_array, size_t len,
-                              size_t start, size_t num_trits) {
+size_t flex_trit_array_insert(flex_trit_t *const to_trit_array,
+                              size_t const to_len,
+                              flex_trit_t const *const trit_array,
+                              size_t const len, size_t const start,
+                              size_t const num_trits) {
   // Bounds checking
   if (num_trits > len || num_trits > to_len) {
     return 0;
@@ -81,9 +85,9 @@ size_t flex_trit_array_insert(flex_trit_t *to_trit_array, size_t to_len,
   return num_trits;
 }
 
-size_t flex_trit_array_to_int8(trit_t *trits, size_t to_len,
-                               const flex_trit_t *trit_array, size_t len,
-                               size_t num_trits) {
+size_t flex_trit_array_to_int8(trit_t *const trits, size_t const to_len,
+                               flex_trit_t const *const trit_array,
+                               size_t const len, size_t const num_trits) {
   // Bounds checking
   if (num_trits > len || num_trits > to_len) {
     return 0;
@@ -101,9 +105,9 @@ size_t flex_trit_array_to_int8(trit_t *trits, size_t to_len,
   return num_bytes;
 }
 
-size_t int8_to_flex_trit_array(flex_trit_t *to_trit_array, size_t to_len,
-                               const trit_t *trits, size_t len,
-                               size_t num_trits) {
+size_t int8_to_flex_trit_array(flex_trit_t *const to_trit_array,
+                               size_t const to_len, trit_t const *const trits,
+                               size_t const len, size_t const num_trits) {
   // Bounds checking
   if (num_trits > len || num_trits > to_len) {
     return 0;
@@ -129,15 +133,15 @@ size_t int8_to_flex_trit_array(flex_trit_t *to_trit_array, size_t to_len,
 /***********************************************************************************************************
  * Public interface
  ***********************************************************************************************************/
-size_t trit_array_bytes_for_trits(size_t num_trits) {
+size_t trit_array_bytes_for_trits(size_t const num_trits) {
   return flex_trits_num_for_trits(num_trits);
 }
 
 /***********************************************************************************************************
  * Accessors
  ***********************************************************************************************************/
-void trit_array_set_trits(trit_array_p trit_array, flex_trit_t *trits,
-                          size_t num_trits) {
+void trit_array_set_trits(trit_array_p const trit_array,
+                          flex_trit_t *const trits, size_t const num_trits) {
 #if !defined(NO_DYNAMIC_ALLOCATION)
   if (trit_array->dynamic) {
     free(trit_array->trits);
@@ -157,12 +161,13 @@ trit_array_p trit_array_slice(trit_array_p trit_array,
 #endif  // NO_DYNAMIC_ALLOCATION
   to_trit_array->num_trits = num_trits;
   to_trit_array->num_bytes = flex_trit_array_slice(
-      to_trit_array->trits, to_trit_array->num_trits,
-      trit_array->trits, trit_array->num_trits, start, num_trits);
+      to_trit_array->trits, to_trit_array->num_trits, trit_array->trits,
+      trit_array->num_trits, start, num_trits);
   return to_trit_array;
 }
 
-trit_t *trit_array_to_int8(trit_array_p trit_array, trit_t *trits, size_t len) {
+trit_t *trit_array_to_int8(trit_array_p const trit_array, trit_t *const trits,
+                           size_t const len) {
   flex_trit_array_to_int8(trits, len, trit_array->trits, trit_array->num_trits,
                           trit_array->num_trits);
   return trits;
@@ -172,7 +177,7 @@ trit_t *trit_array_to_int8(trit_array_p trit_array, trit_t *trits, size_t len) {
 /***********************************************************************************************************
  * Constructor
  ***********************************************************************************************************/
-trit_array_p trit_array_new(size_t num_trits) {
+trit_array_p trit_array_new(size_t const num_trits) {
   trit_array_p trit_array;
   trit_array = (trit_array_p)malloc(sizeof(struct _trit_array));
   if (!trit_array) {
@@ -196,7 +201,7 @@ trit_array_p trit_array_new(size_t num_trits) {
 /***********************************************************************************************************
  * Destructor
  ***********************************************************************************************************/
-void trit_array_free(trit_array_p trit_array) {
+void trit_array_free(trit_array_p const trit_array) {
   if (trit_array) {
     if (trit_array->dynamic) {
       free(trit_array->trits);

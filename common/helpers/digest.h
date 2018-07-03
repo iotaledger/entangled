@@ -8,10 +8,10 @@
 extern "C" {
 #endif
 
-char* iota_digest(const char* trytes);
+char* iota_digest(char const* const trytes);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif //__IOTA_DIGEST_H
+#endif  //__IOTA_DIGEST_H

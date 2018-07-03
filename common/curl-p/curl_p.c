@@ -14,12 +14,12 @@ static const size_t CURL_INDEX[STATE_LENGTH + 1] = {__INDEX_TABLE};
 
 static const trit_t TRUTH_TABLE[11] = {__TRUTH_TABLE};
 
-void transform(Curl *ctx);
+void transform(Curl *const ctx);
 void sbox(Curl *const, Curl *const);
 
-void init_curl(Curl *ctx) { memset(ctx->state, 0, sizeof(ctx->state)); }
+void init_curl(Curl *const ctx) { memset(ctx->state, 0, sizeof(ctx->state)); }
 
-void curl_absorb(Curl *ctx, trit_t *const trits, size_t length) {
+void curl_absorb(Curl *const ctx, trit_t const *const trits, size_t length) {
   size_t numChunks = length / HASH_LENGTH + ((length % HASH_LENGTH) ? 1 : 0);
   size_t i = 0;
   for (; i < numChunks; ++i) {
@@ -30,7 +30,7 @@ void curl_absorb(Curl *ctx, trit_t *const trits, size_t length) {
   }
 }
 
-void curl_squeeze(Curl *ctx, trit_t *const trits, size_t length) {
+void curl_squeeze(Curl *const ctx, trit_t *const trits, size_t length) {
   size_t numChunks = length / HASH_LENGTH + ((length % HASH_LENGTH) ? 1 : 0);
   size_t i = 0;
   for (; i < numChunks; ++i) {
@@ -45,9 +45,12 @@ void transform(Curl *const ctx) {
   Curl s;
   size_t round = 0;
   for (; round < ctx->type; ++round) {
-    memcpy(s.state, ctx->state, sizeof(ctx->state));
-    sbox(ctx, &s);
+    if (round & 1)
+      sbox(ctx, &s);
+    else
+      sbox(&s, ctx);
   }
+  if (round & 1) memcpy(ctx->state, s.state, sizeof(ctx->state));
 }
 
 void sbox(Curl *const c, Curl *const s) {
@@ -58,4 +61,4 @@ void sbox(Curl *const c, Curl *const s) {
   }
 }
 
-void curl_reset(Curl *ctx) { memset(ctx->state, 0, sizeof(ctx->state)); }
+void curl_reset(Curl *const ctx) { memset(ctx->state, 0, sizeof(ctx->state)); }

@@ -1,17 +1,16 @@
 #ifndef ENTANGLED_POW_H
 #define ENTANGLED_POW_H
 
-
 #include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-char* iota_pow(const char* trytes, uint8_t mwm);
+
+char* iota_pow(char const* const trytes, uint8_t const mwm);
 
 #ifdef __cplusplus
 }
 #endif
 
-
-#endif //ENTANGLED_POW_H
+#endif  // ENTANGLED_POW_H
