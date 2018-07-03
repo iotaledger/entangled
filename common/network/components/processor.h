@@ -3,7 +3,9 @@
 
 #include "common/network/queues/concurrent_queue_trit_array.h"
 
-void processor_on_next(concurrent_queue_of_trit_array_p *const queue,
+typedef concurrent_queue_of_trit_array_p processor_queue_t;
+
+void processor_on_next(processor_queue_t *const queue,
                        trit_array_t const *const hash);
 void *processor_routine(void *arg);
 
