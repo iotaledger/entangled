@@ -22,7 +22,6 @@
 
 #define DECLARE_STRUCT_CONCURRENT_QUEUE_OF(TYPE)         \
   typedef struct concurrent_queue_of_##TYPE##_s {        \
-    concurrent_queue_node_of_##TYPE##_t *list;           \
     concurrent_queue_node_of_##TYPE##_t *front;          \
     concurrent_queue_node_of_##TYPE##_t *back;           \
     vtable_concurrent_queue_of_##TYPE##_t const *vtable; \
