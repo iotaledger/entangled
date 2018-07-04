@@ -3,7 +3,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "concurrent_queue",
     hdrs = ["concurrent_queue.h.inc"],
-    deps = ["//common/network:lock_handle"],
+    deps = [
+        "//common/network:cond_handle",
+        "//common/network:lock_handle",
+    ],
 )
 
 cc_library(
