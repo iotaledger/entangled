@@ -32,33 +32,33 @@ typedef pthread_rwlock_t lock_handle_t;
  *
  * @return exit status
  */
-int initialize(lock_handle_t* const lock);
+int lock_handle_init(lock_handle_t* const lock);
 
 /**
- * Locks the lock
+ * Acquires ownership of the given lock
  *
  * @param lock The lock
  *
  * @return exit status
  */
-int lock(lock_handle_t* const lock);
+int lock_handle_lock(lock_handle_t* const lock);
 
 /**
- * Unlocks the lock
+ * Releases ownership of the given lock
  *
  * @param lock The lock
  *
  * @return exit status
  */
-int unlock(lock_handle_t* const lock);
+int lock_handle_unlock(lock_handle_t* const lock);
 
 /**
- * Destroy the lock
+ * Destroys the lock
  *
  * @param lock The lock
  *
  * @return exit status
  */
-int destroy(lock_handle_t* const lock);
+int lock_handle_destroy(lock_handle_t* const lock);
 
 #endif  // __COMMON_NETWORK_LOCK_HANDLE_H____
