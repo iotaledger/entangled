@@ -1,8 +1,6 @@
 #ifndef __COMMON_NETWORK_NEIGHBOR_H__
 #define __COMMON_NETWORK_NEIGHBOR_H__
 
-#include <stdlib.h>
-
 #include "common/network/iota_packet.h"
 
 typedef enum connection_type_e { TCP, UDP } connection_type_t;
