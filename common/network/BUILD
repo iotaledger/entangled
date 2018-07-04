@@ -19,3 +19,8 @@ cc_library(
     name = "socket",
     hdrs = ["socket.h"],
 )
+
+cc_library(
+    name = "lock_handle",
+    hdrs = ["lock_handle.h"],
+)

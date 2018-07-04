@@ -1,6 +1,8 @@
 #include <pthread.h>
 #include <stdlib.h>
 
+#include "common/network/lock_handle.h"
+
 #define DECLARE_STRUCT_CONCURRENT_QUEUE_NODE_OF(TYPE)  \
   typedef struct concurrent_queue_node_of_##TYPE##_s { \
     TYPE data;                                         \
@@ -26,7 +28,7 @@
     concurrent_queue_node_of_##TYPE##_t *back;           \
     vtable_concurrent_queue_of_##TYPE##_t const *vtable; \
     size_t size;                                         \
-    pthread_rwlock_t lock;                               \
+    lock_handle_t lock;                                  \
     pthread_cond_t cond;                                 \
   } concurrent_queue_of_##TYPE;
 
