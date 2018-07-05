@@ -1,7 +1,7 @@
 #!/bin/bash
 
 status=0
-for file in $(git ls-files | grep -E "\.(c|cc|cpp|h|hh|hpp)\$")
+for file in $(git diff --staged --name-only | grep -E "\.(c|cc|cpp|h|hh|hpp)\$")
 do
   output=$(diff <(cat $file) <(clang-format -style=file -fallback-style=none $file))
   if [ $? -ne 0 ]
