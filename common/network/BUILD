@@ -3,10 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "iota_packet",
     hdrs = ["iota_packet.h"],
-    deps = [
-        ":socket",
-        "//common/trinary:tryte",
-    ],
+    deps = [":socket"],
 )
 
 cc_library(
