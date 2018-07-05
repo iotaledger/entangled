@@ -1,4 +1,3 @@
 #!/bin/sh
 
-python tools/cpplint.py --filter=-build/include_order,-whitespace/comments --extensions=h,cc ./**/*.h ./**/*.cc
-
+python tools/cpplint.py --filter=-build/include_order,-whitespace/comments --extensions=h,cc $(git ls-files | grep -E "cppclient/.*[cc|h]")
