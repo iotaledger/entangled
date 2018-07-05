@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_LOCK_HANDLE_H__
-#define __COMMON_NETWORK_LOCK_HANDLE_H__
+#ifndef COMMON_LOCK_HANDLE_H_
+#define COMMON_LOCK_HANDLE_H_
 
 /**
  * We declare a type lock_handle_t that depends on the system available lock
@@ -68,4 +68,4 @@ int lock_handle_unlock(lock_handle_t* const lock);
  */
 int lock_handle_destroy(lock_handle_t* const lock);
 
-#endif  // __COMMON_NETWORK_LOCK_HANDLE_H____
+#endif  // COMMON_LOCK_HANDLE_H_

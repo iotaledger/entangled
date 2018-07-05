@@ -4,8 +4,8 @@ cc_library(
     name = "concurrent_queue",
     hdrs = ["concurrent_queue.h.inc"],
     deps = [
-        "//common/network:cond_handle",
-        "//common/network:lock_handle",
+        "//common:cond_handle",
+        "//common:lock_handle",
     ],
 )
 

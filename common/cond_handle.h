@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_COND_HANDLE_H__
-#define __COMMON_NETWORK_COND_HANDLE_H__
+#ifndef COMMON_COND_HANDLE_H_
+#define COMMON_COND_HANDLE_H_
 
 /**
  * We declare a type cond_handle_t that depends on the system conditional
@@ -81,4 +81,4 @@ int cond_handle_wait(cond_handle_t* const cond);
  */
 int cond_handle_destroy(cond_handle_t* const cond);
 
-#endif  // __COMMON_NETWORK_COND_HANDLE_H____
+#endif  // COMMON_COND_HANDLE_H_

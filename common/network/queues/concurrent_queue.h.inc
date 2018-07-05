@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/network/cond_handle.h"
-#include "common/network/lock_handle.h"
+#include "common/cond_handle.h"
+#include "common/lock_handle.h"
 
 #define DECLARE_STRUCT_CONCURRENT_QUEUE_NODE_OF(TYPE)  \
   typedef struct concurrent_queue_node_of_##TYPE##_s { \
