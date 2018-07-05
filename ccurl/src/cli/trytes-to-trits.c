@@ -1,14 +1,14 @@
-#include "../lib/util/converter.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../lib/util/converter.h"
 
-#define HINTS                                                                  \
-  "### TRYTES TO TRITS ###\nUsage:\n\t trytes-to-long <Tryte string all caps> " \
+#define HINTS                                                             \
+  "### TRYTES TO TRITS ###\nUsage:\n\t trytes-to-long <Tryte string all " \
+  "caps> "                                                                \
   "\n"
 
 int get_stdin(char* str, int len) {
-
   int i = 0;
   char chr;
   struct timeval timeout;
@@ -23,8 +23,7 @@ int get_stdin(char* str, int len) {
 
   if (select(1, &readfds, NULL, NULL, &timeout)) {
     while ((chr = getchar()) != EOF) {
-      if (i > len)
-        return -1;
+      if (i > len) return -1;
       str[i++] = chr;
     }
   }
@@ -47,19 +46,16 @@ int main(int argc, char* argv[]) {
   }
   size_t length = strlen(buf);
   char* input = trits_from_trytes(buf, length);
-  for(int i = 0; i < length * 3; i++ ) {
-	  switch(input[i]) {
-		  case 1: {
-					  fprintf(stdout, "+");
-				  }break;
-		  case -1: {
-					   fprintf(stdout, "-");
-				   } break;
-		  default: {
-					   fprintf(stdout, "0");
-				   }
-	  }
+  for (int i = 0; i < length * 3; i++) {
+    switch (input[i]) {
+      case 1: {
+        fprintf(stdout, "+");
+      } break;
+      case -1: {
+        fprintf(stdout, "-");
+      } break;
+      default: { fprintf(stdout, "0"); }
+    }
   }
   return 0;
 }
-

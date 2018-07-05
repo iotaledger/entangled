@@ -12,7 +12,7 @@ class MockEchoCollector : public EchoCollector {
  public:
   MOCK_METHOD0(loadDB, void());
   MOCK_METHOD0(broadcastTransactions, void());
-  MOCK_METHOD0(handleReceivedTransactions,void());
+  MOCK_METHOD0(handleReceivedTransactions, void());
 };
 
 TEST(TangleScope, EchoCollectorFlow) {
@@ -36,7 +36,6 @@ TEST(TangleScope, EchoCollectorFlow) {
   EXPECT_CALL(*(mockEchoCollector), loadDB()).Times(1);
   EXPECT_CALL(*(mockEchoCollector), broadcastTransactions()).Times(1);
   EXPECT_CALL(*(mockEchoCollector), handleReceivedTransactions()).Times(1);
-
 
   mockEchoCollector->collect();
 }

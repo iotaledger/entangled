@@ -1,16 +1,15 @@
 #include "pearl_diver.h"
-#include "constants.h"
-#include "hash.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "constants.h"
+#include "hash.h"
 #if defined(_WIN32) && !defined(__MINGW32__)
 #include <intrin.h>
 #else
 #include <sched.h>
 #endif
-
 
 #define OFFSET_LENGTH 4
 #define NONCE_START HASH_LENGTH - NONCE_LENGTH
@@ -39,16 +38,11 @@ void interrupt(PearlDiver* ctx) {
   pthread_mutex_unlock(&ctx->new_thread_search);
 }
 
-void pd_search(
-    PearlDiver* ctx,
-    curl_t *const curl,
-    const int min_weight_magnitude,
-    int numberOfThreads
-    ) {
+void pd_search(PearlDiver* ctx, curl_t* const curl,
+               const int min_weight_magnitude, int numberOfThreads) {
   int k, thread_count;
 
-  if (min_weight_magnitude < 0 ||
-      min_weight_magnitude > HASH_LENGTH) {
+  if (min_weight_magnitude < 0 || min_weight_magnitude > HASH_LENGTH) {
     ctx->status = PD_INVALID;
 
 #ifdef DEBUG
@@ -63,7 +57,6 @@ void pd_search(
   pd_search_init(&states, curl, HASH_LENGTH - NONCE_LENGTH);
 
   if (numberOfThreads <= 0) {
-
 #if defined(_WIN32)
     SYSTEM_INFO sysinfo;
     GetSystemInfo(&sysinfo);
@@ -71,8 +64,7 @@ void pd_search(
 #else
     numberOfThreads = sysconf(_SC_NPROCESSORS_ONLN) - 1;
 #endif
-    if (numberOfThreads < 1)
-      numberOfThreads = 1;
+    if (numberOfThreads < 1) numberOfThreads = 1;
   }
 
   pthread_mutex_init(&ctx->new_thread_search, NULL);
@@ -84,23 +76,22 @@ void pd_search(
   fprintf(stderr, "I: Starting search threads.\n");
 #endif
   while (thread_count < numberOfThreads) {
-
     pdthreads[thread_count] =
         (PDThread){.states = &states,
                    .trits = curl->state,
                    .min_weight_magnitude = min_weight_magnitude,
                    .threadIndex = thread_count,
                    .ctx = ctx};
-    if(pthread_create(&tid[thread_count], NULL, &find_nonce,
+    if (pthread_create(&tid[thread_count], NULL, &find_nonce,
                        (void*)&(pdthreads[thread_count]))) {
-      //tid[thread_count] = 0;
+      // tid[thread_count] = 0;
     }
     thread_count++;
   }
 
   for (k = 0; k < thread_count; k++) {
     // Could be that thread creation has failed.
-    if(tid[k]) {
+    if (tid[k]) {
       pthread_join(tid[k], NULL);
     }
   }
@@ -108,7 +99,7 @@ void pd_search(
 #ifdef DEBUG
   fprintf(stderr, "I: Found threads. Returning.\n");
 #endif
-  return; // ctx->status == PD_INTERRUPTED;
+  return;  // ctx->status == PD_INTERRUPTED;
 }
 
 void pd_search_init(States* states, curl_t* curl, size_t offset) {
@@ -116,17 +107,17 @@ void pd_search_init(States* states, curl_t* curl, size_t offset) {
   for (i = 0; i < STATE_LENGTH; i++) {
     switch (curl->state[i]) {
       case 0: {
-                states->mid_low[i] = HIGH_BITS;
-                states->mid_high[i] = HIGH_BITS;
-              } break;
+        states->mid_low[i] = HIGH_BITS;
+        states->mid_high[i] = HIGH_BITS;
+      } break;
       case 1: {
-                states->mid_low[i] = LOW_BITS;
-                states->mid_high[i] = HIGH_BITS;
-              } break;
+        states->mid_low[i] = LOW_BITS;
+        states->mid_high[i] = HIGH_BITS;
+      } break;
       default: {
-                 states->mid_low[i] = HIGH_BITS;
-                 states->mid_high[i] = LOW_BITS;
-               }
+        states->mid_low[i] = HIGH_BITS;
+        states->mid_high[i] = LOW_BITS;
+      }
     }
   }
   states->mid_low[offset] = LOW_0;
@@ -137,10 +128,10 @@ void pd_search_init(States* states, curl_t* curl, size_t offset) {
   states->mid_high[offset + 2] = HIGH_2;
   states->mid_low[offset + 3] = LOW_3;
   states->mid_high[offset + 3] = HIGH_3;
-      
 }
 
-int is_found(bc_trit_t* low, bc_trit_t* high, int index, int min_weight_magnitude) {
+int is_found(bc_trit_t* low, bc_trit_t* high, int index,
+             int min_weight_magnitude) {
   int i;
   for (i = min_weight_magnitude; i-- > 0;) {
     if ((((bc_trit_t)(low[HASH_LENGTH - 1 - i])) & (1 << index)) !=
@@ -172,7 +163,7 @@ char ctxStatusEq(PDThread* thread, PearlDiver* ctx, int cmp) {
 #endif
 
   char eq = ctx->status == cmp;
-  
+
 #if defined(_WIN32) && !defined(__MINGW32__)
   LeaveCriticalSection(&thread->ctx->new_thread_search);
 #else
@@ -203,7 +194,7 @@ void* find_nonce(void* data) {
 
   for (i = my_thread->threadIndex; i-- > 0;) {
     pd_increment(midStateCopyLow, midStateCopyHigh, NONCE_INIT_START,
-        NONCE_INCREMENT_START);
+                 NONCE_INCREMENT_START);
   }
 
   bc_trit_t scratchpadLow[STATE_LENGTH], scratchpadHigh[STATE_LENGTH],
@@ -244,8 +235,9 @@ void* find_nonce(void* data) {
         trits[i] =
             (((bc_trit_t)(midStateCopyLow[i]) & nonce_output) == 0)
                 ? 1
-                : ((((bc_trit_t)(midStateCopyHigh[i]) & nonce_output) == 0) ? -1
-                                                                         : 0);
+                : ((((bc_trit_t)(midStateCopyHigh[i]) & nonce_output) == 0)
+                       ? -1
+                       : 0);
       }
     }
 
@@ -261,8 +253,8 @@ void* find_nonce(void* data) {
 }
 
 void pd_transform(bc_trit_t* const stateLow, bc_trit_t* const stateHigh,
-                  bc_trit_t* const scratchpadLow, bc_trit_t* const scratchpadHigh) {
-
+                  bc_trit_t* const scratchpadLow,
+                  bc_trit_t* const scratchpadHigh) {
   int scratchpadIndex = 0, round, stateIndex;
   bc_trit_t alpha, beta, gamma, delta;
 
@@ -271,7 +263,6 @@ void pd_transform(bc_trit_t* const stateLow, bc_trit_t* const stateHigh,
     memcpy(scratchpadHigh, stateHigh, STATE_LENGTH * sizeof(bc_trit_t));
 
     for (stateIndex = 0; stateIndex < STATE_LENGTH; stateIndex++) {
-
       alpha = scratchpadLow[scratchpadIndex];
       beta = scratchpadHigh[scratchpadIndex];
       gamma = scratchpadHigh[scratchpadIndex +=
@@ -285,7 +276,6 @@ void pd_transform(bc_trit_t* const stateLow, bc_trit_t* const stateHigh,
 }
 void pd_increment(bc_trit_t* const mid_low, bc_trit_t* const mid_high,
                   const int from_index, const int to_index) {
-
   size_t i;
   bc_trit_t carry = 1;
   bc_trit_t low, hi;

@@ -51,11 +51,10 @@ char* bytes_from_trits(char* const trits, const int offset, const int size) {
       (size + NUMBER_OF_TRITS_IN_A_BYTE - 1) / NUMBER_OF_TRITS_IN_A_BYTE;
   char* bytes = (char*)malloc(sizeof(char) * length);
   for (i = 0; i < length; i++) {
-
     char value = 0;
     for (j = (size - i * NUMBER_OF_TRITS_IN_A_BYTE) < 5
-                     ? (size - i * NUMBER_OF_TRITS_IN_A_BYTE)
-                     : NUMBER_OF_TRITS_IN_A_BYTE;
+                 ? (size - i * NUMBER_OF_TRITS_IN_A_BYTE)
+                 : NUMBER_OF_TRITS_IN_A_BYTE;
          j-- > 0;) {
       value = value * RADIX + trits[offset + i * NUMBER_OF_TRITS_IN_A_BYTE + j];
     }
@@ -72,15 +71,10 @@ void getTrits(const char* bytes, int bytelength, char* const trits,
   int offset = 0;
   for (i = 0; i < bytelength && offset < length; i++) {
     memcpy(
-        trits + offset,
-        BYTE_TO_TRITS_MAPPINGS
-            [bytes[i] < 0
-                 ? (bytes[i] +
-                    HASH_LENGTH /* length of what? first? BYTE_TO_TRITS_MAPPINGS.length */)
-                 : bytes[i]],
+        trits + offset, BYTE_TO_TRITS_MAPPINGS[bytes[i] < 0 ? (bytes[i] + HASH_LENGTH /* length of what? first? BYTE_TO_TRITS_MAPPINGS.length */) : bytes[i]],
         sizeof(char) * (length - offset < NUMBER_OF_TRITS_IN_A_BYTE
-                              ? (length - offset)
-                              : NUMBER_OF_TRITS_IN_A_BYTE));
+                            ? (length - offset)
+                            : NUMBER_OF_TRITS_IN_A_BYTE));
     offset += NUMBER_OF_TRITS_IN_A_BYTE;
   }
   while (offset < length) {
@@ -107,11 +101,9 @@ void copyTrits(char const value, char* const destination, const int offset,
 
   char absoluteValue = value < 0 ? -value : value;
   for (i = 0; i < size; i++) {
-
     int remainder = (int)(absoluteValue % RADIX);
     absoluteValue /= RADIX;
     if (remainder > MAX_TRIT_VALUE) {
-
       remainder = MIN_TRIT_VALUE;
       absoluteValue++;
     }
@@ -134,7 +126,7 @@ char* trytes_from_trits(char* const trits, const int offset, const int size) {
 
   for (i = 0; i < length; i++) {
     char j = trits[offset + i * 3] + trits[offset + i * 3 + 1] * 3 +
-               trits[offset + i * 3 + 2] * 9;
+             trits[offset + i * 3 + 2] * 9;
     if (j < 0) {
       j += 27;
     }
@@ -158,7 +150,7 @@ static void increment(char* trits, int size) {
   }
 }
 
-void init_converter (void) __attribute__ ((constructor));
+void init_converter(void) __attribute__((constructor));
 void init_converter() {
   int i;
   char trits[NUMBER_OF_TRITS_IN_A_BYTE];

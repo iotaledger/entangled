@@ -1,13 +1,13 @@
 #include "pearcldiver.h"
-#include "claccess/clcontext.h"
-#include "constants.h"
-#include "hash.h"
-#include "ccurl/pearl.cl.h"
-#include "pearl_diver.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include "ccurl/pearl.cl.h"
+#include "claccess/clcontext.h"
+#include "constants.h"
+#include "hash.h"
+#include "pearl_diver.h"
 #if defined(_WIN32) && !defined(__MINGW32__)
 #else
 #include <sched.h>
@@ -20,7 +20,7 @@
 typedef struct {
   States states;
   char* trits;
-  curl_t *curl;
+  curl_t* curl;
   size_t min_weight_magnitude;
   size_t index;
   size_t offset;
@@ -31,7 +31,7 @@ int init_pearcl(PearCLDiver* pdcl) {
   CLContext* cl;
   unsigned char* src[PD_NUM_SRC] = {ccurl_src_lib_cl_pearl_cl};
   size_t size[PD_NUM_SRC] = {ccurl_src_lib_cl_pearl_cl_len};
-  char** names = (char* []){"init", "search", "finalize"};
+  char** names = (char*[]){"init", "search", "finalize"};
   if (!pdcl) {
     pdcl = malloc(sizeof(PearCLDiver));
   }
@@ -43,23 +43,23 @@ int init_pearcl(PearCLDiver* pdcl) {
   }
   cl->kernel.num_buffers = 9;
   cl->kernel.buffer[0] = (BufferInfo){sizeof(char) * HASH_LENGTH,
-                                      CL_MEM_WRITE_ONLY}; // trit_hash //
+                                      CL_MEM_WRITE_ONLY};  // trit_hash //
   cl->kernel.buffer[1] = (BufferInfo){sizeof(bc_trit_t) * STATE_LENGTH,
-                                      CL_MEM_READ_WRITE, 2}; // states array  //
+                                      CL_MEM_READ_WRITE, 2};  // states array //
   cl->kernel.buffer[2] = (BufferInfo){sizeof(bc_trit_t) * STATE_LENGTH,
-                                      CL_MEM_READ_WRITE, 2}; // states array  //
+                                      CL_MEM_READ_WRITE, 2};  // states array //
   cl->kernel.buffer[3] = (BufferInfo){sizeof(bc_trit_t) * STATE_LENGTH,
-                                      CL_MEM_READ_WRITE, 2}; // states array  //
+                                      CL_MEM_READ_WRITE, 2};  // states array //
   cl->kernel.buffer[4] = (BufferInfo){sizeof(bc_trit_t) * STATE_LENGTH,
-                                      CL_MEM_READ_WRITE, 2}; // states array  //
+                                      CL_MEM_READ_WRITE, 2};  // states array //
   cl->kernel.buffer[5] =
-      (BufferInfo){sizeof(size_t), CL_MEM_READ_ONLY}; // minweightmagnitude //
+      (BufferInfo){sizeof(size_t), CL_MEM_READ_ONLY};  // minweightmagnitude //
   cl->kernel.buffer[6] =
-      (BufferInfo){sizeof(char), CL_MEM_READ_WRITE}; // found //
+      (BufferInfo){sizeof(char), CL_MEM_READ_WRITE};  // found //
   cl->kernel.buffer[7] =
-      (BufferInfo){sizeof(bc_trit_t), CL_MEM_READ_WRITE, 2}; // nonce_probe //
+      (BufferInfo){sizeof(bc_trit_t), CL_MEM_READ_WRITE, 2};  // nonce_probe //
   cl->kernel.buffer[8] =
-      (BufferInfo){sizeof(size_t), CL_MEM_READ_ONLY}; // loop_length //
+      (BufferInfo){sizeof(size_t), CL_MEM_READ_ONLY};  // loop_length //
 
   return kernel_init_buffers(cl);
 }
@@ -125,7 +125,13 @@ void* pearcl_find(void* data) {
                                  &global_work_size, &local_work_size, 0, NULL,
                                  &ev1) != CL_SUCCESS) {
         clReleaseEvent(ev1);
-        fprintf(stderr, "E: running search kernel failed. \n");
+        fprintf(stderr,
+                "E: "
+                "running "
+                "search "
+                "kernel "
+                "failed. "
+                "\n");
         break;
       }
       clWaitForEvents(1, &ev1);
@@ -134,7 +140,13 @@ void* pearcl_find(void* data) {
                                             pdcl->cl.buffers[thread->index][6],
                                             CL_TRUE, 0, sizeof(char), &found, 0,
                                             NULL, NULL)) {
-        fprintf(stderr, "E: reading finished bool failed.\n");
+        fprintf(stderr,
+                "E: "
+                "reading "
+                "finished "
+                "bool "
+                "failed."
+                "\n");
         break;
       }
     }
@@ -153,13 +165,13 @@ void* pearcl_find(void* data) {
     pthread_mutex_lock(&pdcl->pd.new_thread_search);
     if (pdcl->pd.status != PD_FOUND) {
       pdcl->pd.status = PD_FOUND;
-      if (CL_SUCCESS != clEnqueueReadBuffer(
-                            pdcl->cl.clcmdq[thread->index],
-                            pdcl->cl.buffers[thread->index][0], CL_TRUE, 0,
-                            HASH_LENGTH * sizeof(char),
-                            &(thread->curl[0]),
-                            //&(thread->trits[TRANSACTION_LENGTH - HASH_LENGTH]),
-                            1, &ev, NULL)) {
+      if (CL_SUCCESS !=
+          clEnqueueReadBuffer(pdcl->cl.clcmdq[thread->index],
+                              pdcl->cl.buffers[thread->index][0], CL_TRUE, 0,
+                              HASH_LENGTH * sizeof(char), &(thread->curl[0]),
+                              //&(thread->trits[TRANSACTION_LENGTH
+                              //- HASH_LENGTH]),
+                              1, &ev, NULL)) {
       }
     }
     pthread_mutex_unlock(&pdcl->pd.new_thread_search);
@@ -168,12 +180,8 @@ void* pearcl_find(void* data) {
   return 0;
 }
 
-void pearcl_search(
-		PearCLDiver* pdcl, 
-		curl_t * const curl, 
-		size_t offset, 
-		size_t min_weight_magnitude
-		) {
+void pearcl_search(PearCLDiver* pdcl, curl_t* const curl, size_t offset,
+                   size_t min_weight_magnitude) {
   int k, thread_count;
   int numberOfThreads = pdcl->cl.num_devices;
 

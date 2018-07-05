@@ -5,13 +5,13 @@
 #include "common/trinary/trit_byte.h"
 
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
-#define TRITS_IN  -1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1, 1, 0, -1, 1
+#define TRITS_IN -1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1, 1, 0, -1, 1
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
 #define TRITS_IN 0x53, 0x14, 0x1f, 0xC5, 0x01
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
-#define TRITS_IN  0x23, 0x98, 0x25, 0x02
+#define TRITS_IN 0x23, 0x98, 0x25, 0x02
 #endif
-#define TRITS_OUT  -1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1, 1, 0, -1, 1
+#define TRITS_OUT -1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1, 1, 0, -1, 1
 #define NUM_TRITS 17
 
 void test_trit_array_static(void) {
@@ -62,6 +62,6 @@ int main(void) {
   RUN_TEST(test_trit_array_static_set);
   RUN_TEST(test_trit_array_static_slice);
   RUN_TEST(test_trit_array_static_to_int8);
-  
+
   return UNITY_END();
 }

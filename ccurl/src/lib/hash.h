@@ -23,5 +23,5 @@ typedef char trit_t;
 
 #ifndef DEBUG
 #define DEBUG
-#endif // DEBUG
+#endif  // DEBUG
 #endif

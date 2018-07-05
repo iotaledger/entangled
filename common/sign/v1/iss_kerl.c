@@ -1,8 +1,8 @@
-#include "common/kerl/kerl.h"
 #include "iss_kerl.h"
+#include "common/kerl/kerl.h"
 
-#define HASH_PREFIX kerl 
-#define HASH_STATE Kerl 
+#define HASH_PREFIX kerl
+#define HASH_STATE Kerl
 
 #include "iss.c.inc"
 

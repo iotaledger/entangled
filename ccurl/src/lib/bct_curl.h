@@ -4,9 +4,9 @@
 #define BCT_CURL_H
 #include "hash.h"
 
-typedef struct { 
-	bc_trit_t low[STATE_LENGTH]; 
-	bc_trit_t hi[STATE_LENGTH]; 
+typedef struct {
+  bc_trit_t low[STATE_LENGTH];
+  bc_trit_t hi[STATE_LENGTH];
 } bct_curl_t;
 
 /*

@@ -8,7 +8,6 @@
 #include "common/trinary/trit_tryte.h"
 #include "sign.h"
 
-
 char* iota_sign_address_gen(char const* const seed, size_t const index,
                             size_t const security) {
   if (!(security > 0 && security <= 3)) return NULL;
