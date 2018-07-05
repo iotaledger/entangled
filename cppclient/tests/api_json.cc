@@ -12,8 +12,8 @@
 
 #include "cppclient/api_json.h"
 
-using namespace testing;
-using namespace cppclient;
+using cppclient::IotaJsonAPI;
+using testing::Return;
 
 using json = nlohmann::json;
 
