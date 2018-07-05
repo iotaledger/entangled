@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for file in $(find $(git rev-parse --show-toplevel) | grep -E "\.(c|cc|cpp|h|hh|hpp)\$")
+do
+  clang-format -style=file -fallback-style=none -i $file
+done

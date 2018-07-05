@@ -11,16 +11,16 @@
 #else
 #include <pthread.h>
 #endif
-#include "hash.h"
 #include <stdbool.h>
+#include "hash.h"
 
 #define Invalid_transaction_trits_length 0x63
 #define Invalid_min_weight_magnitude 0x64
 #define InterruptedException 0x65
 //#define HIGH_BITS
-//0b1111111111111111111111111111111111111111111111111111111111111111L
+// 0b1111111111111111111111111111111111111111111111111111111111111111L
 //#define LOW_BITS
-//0b0000000000000000000000000000000000000000000000000000000000000000L
+// 0b0000000000000000000000000000000000000000000000000000000000000000L
 #define HIGH_BITS 0xFFFFFFFFFFFFFFFF
 #define LOW_BITS 0x0000000000000000
 #define LOW_0 0xDB6DB6DB6DB6DB6D
@@ -71,9 +71,11 @@ void interrupt(PearlDiver* ctx);
 void pd_search(PearlDiver* ctx, curl_t* const curl,
                const int min_weight_magnitude, int numberOfThreads);
 void pd_transform(bc_trit_t* const stateLow, bc_trit_t* const stateHigh,
-                  bc_trit_t* const scratchpadLow, bc_trit_t* const scratchpadHigh);
-void pd_increment(bc_trit_t* const midStateCopyLow, bc_trit_t* const midStateCopyHigh,
-                  const int fromIndex, const int toIndex);
-void pd_search_init(States* states, curl_t *const curl, size_t offset);
+                  bc_trit_t* const scratchpadLow,
+                  bc_trit_t* const scratchpadHigh);
+void pd_increment(bc_trit_t* const midStateCopyLow,
+                  bc_trit_t* const midStateCopyHigh, const int fromIndex,
+                  const int toIndex);
+void pd_search_init(States* states, curl_t* const curl, size_t offset);
 
 #endif

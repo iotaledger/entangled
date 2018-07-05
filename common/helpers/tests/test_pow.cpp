@@ -1,6 +1,6 @@
 #include <cstdint>
-#include <memory>
 #include <iostream>
+#include <memory>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -52,12 +52,11 @@ TEST(PoWTest, testsPoW) {
   using namespace testing;
   auto nonce = iota_pow(TX_TRYTES.c_str(), 9);
 
-  //FIXME(th0br0) verify that nonce yields a good hash
+  // FIXME(th0br0) verify that nonce yields a good hash
 
-  //std::cerr << "TX: " << TX_TRYTES << std::endl;
-  //std::cerr << "Nonce: " << nonce << std::endl;
+  // std::cerr << "TX: " << TX_TRYTES << std::endl;
+  // std::cerr << "Nonce: " << nonce << std::endl;
   std::free(nonce);
-  
 }
 
 }  // namespace

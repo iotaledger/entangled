@@ -1,3 +1,3 @@
 #!/bin/bash
 
-buildifier -showlog -mode=fix $(find . -type f \( -iname BUILD -or -iname BUILD.bazel -or -iname WORKSPACE -or -iname BUILD.bzl \))
+buildifier -showlog -mode=fix $(find $(git rev-parse --show-toplevel) | grep -E "WORKSPACE|BUILD(\.(bazel|bzl))?\$")

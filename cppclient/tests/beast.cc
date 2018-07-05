@@ -11,9 +11,7 @@
 
 #include "cppclient/beast.h"
 
-using namespace testing;
-using namespace cppclient;
-
+using cppclient::BeastIotaAPI;
 
 using json = nlohmann::json;
 

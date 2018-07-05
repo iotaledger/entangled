@@ -43,7 +43,7 @@ static int get_devices(CLContext* ctx, unsigned char** src, size_t* size) {
   cl_int errno;
   ctx->num_devices = 0;
   cl_platform_id* platforms;
-// cl_device_id devices[CLCONTEXT_MAX_DEVICES];
+  // cl_device_id devices[CLCONTEXT_MAX_DEVICES];
 
 #ifdef DEBUG
   fprintf(stderr, "Getting platforms... \n");
@@ -286,8 +286,7 @@ void finalize_cl(CLContext* ctx) {
       for (j = 0; j < ctx->kernel.num_kernels; j++) {
         clReleaseKernel(ctx->clkernel[i][j]);
       }
-      if (ctx->kernel.num_src > 0)
-        clReleaseProgram(ctx->programs[i]);
+      if (ctx->kernel.num_src > 0) clReleaseProgram(ctx->programs[i]);
       for (j = 0; j < ctx->kernel.num_buffers; j++) {
         clReleaseMemObject(ctx->buffers[i][j]);
       }

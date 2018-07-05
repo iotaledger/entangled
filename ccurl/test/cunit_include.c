@@ -10,8 +10,7 @@
 #include <time.h>
 
 int run_tests(CU_SuiteInfo* suites) {
-  if (CUE_SUCCESS != CU_initialize_registry())
-    return CU_get_error();
+  if (CUE_SUCCESS != CU_initialize_registry()) return CU_get_error();
 
   CU_ErrorCode error;
 

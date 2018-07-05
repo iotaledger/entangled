@@ -1,13 +1,13 @@
+#include <stdio.h>
+#include <string.h>
+#include <sys/resource.h>
+#include <sys/time.h>
 #include "../src/lib/ccurl.h"
 #include "../src/lib/curl.h"
 #include "../src/lib/hash.h"
 #include "../src/lib/util/converter.h"
 #include "cunit_include.h"
 #include "random_trits.h"
-#include <stdio.h>
-#include <string.h>
-#include <sys/time.h>
-#include <sys/resource.h>
 
 static const size_t length = STATE_LENGTH;
 static const int length_2 = length;
@@ -327,8 +327,7 @@ void test_curl_absorb(void) {
   squeeze(&curl, my_trits_1, 0, length_1);
   reset(&curl);
   CU_ASSERT(memcmp(my_trits_1, trits_in_2, STATE_LENGTH * sizeof(char)) != 0);
-  CU_ASSERT(memcmp(my_trits_1, trits_out_2, STATE_LENGTH * sizeof(char)) ==
-            0);
+  CU_ASSERT(memcmp(my_trits_1, trits_out_2, STATE_LENGTH * sizeof(char)) == 0);
 
   length_1 = STATE_LENGTH;
   memcpy(my_trits_1, trits_in_1, length_1 * sizeof(char));
@@ -342,7 +341,6 @@ void test_curl_absorb(void) {
 }
 
 void test_curl_reset() {
-
   char my_trits_2[length_2];
 
   Curl curl;
@@ -410,14 +408,14 @@ void test_curl_benchmark() {
   char* mytrits = trits_from_trytes(nocl_pd_trans, TRANSACTION_LENGTH / 3);
   char myhash[HASH_LENGTH];
 
-  start = (float)clock()/CLOCKS_PER_SEC;
-  for(int i = 0; i < count; i++) {
+  start = (float)clock() / CLOCKS_PER_SEC;
+  for (int i = 0; i < count; i++) {
     absorb(&curl, mytrits, 0, TRANSACTION_LENGTH);
     squeeze(&curl, myhash, 0, HASH_LENGTH);
     reset(&curl);
   }
-  end = (float)clock()/CLOCKS_PER_SEC;
-  fprintf (stderr, "\nTime elapsed %f \n", (end-start)/count);
+  end = (float)clock() / CLOCKS_PER_SEC;
+  fprintf(stderr, "\nTime elapsed %f \n", (end - start) / count);
 }
 
 static CU_TestInfo tests[] = {

@@ -1,9 +1,9 @@
-#include "../lib/ccurl.h"
-#include "../lib/hash.h"
-#include "../lib/pearl_diver.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../lib/ccurl.h"
+#include "../lib/hash.h"
+#include "../lib/pearl_diver.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -22,7 +22,7 @@
 
 #define TRYTE_LENGTH 2673
 
-#define HINTS                                                                  \
+#define HINTS \
   "### CCURL DAEMON ###\nUsage:\n\tccurld <MinWeightMagnitude> <path>\n"
 static volatile bool running = true;
 static void shutdown();
@@ -93,8 +93,8 @@ int main(int argc, char* argv[]) {
         digest = ccurl_digest_transaction(out);
         fprintf(stderr, "%s: %f s\n", digest, difftime(end, start));
 
-        free((void*) digest);
-        free((void*) out);
+        free((void*)digest);
+        free((void*)out);
       }
     }
   }
@@ -123,7 +123,7 @@ static void shutdown() {
     close(fd);
   }
 
-  if(path != defaultPath) {
-    free((void*) path);
+  if (path != defaultPath) {
+    free((void*)path);
   }
 }

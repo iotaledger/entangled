@@ -9,5 +9,4 @@
 #define VALUE_USABLE_LENGTH 33
 #define NUMBER_OF_ROUNDS 81
 
-#endif //__CONST_H__
-
+#endif  //__CONST_H__

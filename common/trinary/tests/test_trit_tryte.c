@@ -1,5 +1,5 @@
-#include <unity/unity.h>
 #include <string.h>
+#include <unity/unity.h>
 
 #include "common/trinary/trit_tryte.h"
 

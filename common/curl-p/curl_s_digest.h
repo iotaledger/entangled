@@ -3,5 +3,4 @@
 
 int curl_s_digest(char *const str);
 
-#endif //__CURL_S_DIGEST__
-
+#endif  //__CURL_S_DIGEST__
