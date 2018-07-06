@@ -12,9 +12,9 @@ extern "C" {
 #include "serialization/serializer.h"
 
 typedef struct {
-  char const host[255];
+  const char host[255];
   size_t port;
-  char const content_type[255];
+  const char content_type[255];
   int version;
   uint timeout;
   serializer_t serializer;

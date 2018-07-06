@@ -17,7 +17,7 @@
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
 
-iota_api_result_t iota_service_query(const iota_service_t* const service,
+iota_api_result_t iota_service_query(const void* const service_opaque,
                                      const char* const obj,
                                      iota_response_t* const response) {
   using tcp = boost::asio::ip::tcp;
@@ -27,6 +27,9 @@ iota_api_result_t iota_service_query(const iota_service_t* const service,
   boost::system::error_code ec;
   tcp::resolver resolver{ioc};
   tcp::socket socket{ioc};
+
+  const iota_service_t* const service =
+      reinterpret_cast<const iota_service_t* const>(service_opaque);
 
   iota_api_result_t result;
   result.is_error = 0;

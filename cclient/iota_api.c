@@ -19,7 +19,7 @@ iota_api_result_t iota_api_get_node_info(const iota_service_t* const service,
   service->serializer.vtable.get_node_info_serialize_request(
       &service->serializer, request_data);
 
-  result = post(service, request_data, &response);
+  result = iota_service_query(service, request_data, &response);
 
   // TODO - deserialize response
 
