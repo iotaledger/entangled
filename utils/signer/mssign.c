@@ -108,7 +108,8 @@ void print_siblings(ToSign *args) {
   merkle_branch(args->tree, sib_branch, args->tree_len * HASH_LENGTH, depth,
                 args->key_i, args->n_leafs);
   trits_to_trytes(sib_branch, siblings, sib_length);
-  fprintf(stdout, "%s\n", siblings);
+  fprintf(stdout, "%d\n", args->key_i);
+  fprintf(stdout, "%s", siblings);
 }
 
 int merkle_sign(ToSign *args) {
