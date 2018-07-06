@@ -16,7 +16,7 @@ typedef struct {
   size_t port;
   char const content_type[255];
   int version;
-  int timeout;
+  uint timeout;
   serializer_t serializer;
 } iota_service_t;
 

@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "cclient/http/http.h"
 #include "../service.h"
+#include "cclient/http/http.h"
 
 #include <string>
 
@@ -17,8 +17,9 @@
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
 
-iota_api_result_t post(const iota_service_t* const service,
-                       const char* const obj, iota_response_t* const response) {
+iota_api_result_t iota_service_query(const iota_service_t* const service,
+                                     const char* const obj,
+                                     iota_response_t* const response) {
   using tcp = boost::asio::ip::tcp;
   namespace http = boost::beast::http;
 
@@ -67,8 +68,7 @@ iota_api_result_t post(const iota_service_t* const service,
 
     socket.shutdown(tcp::socket::shutdown_both, ec);
 
-    if (ec && ec != boost::system::errc::not_connected)
-      result.is_error = 1;
+    if (ec && ec != boost::system::errc::not_connected) result.is_error = 1;
   } catch (const std::exception& ex) {
     result.is_error = 1;
   }

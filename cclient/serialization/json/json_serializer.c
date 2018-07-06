@@ -82,7 +82,6 @@ size_t json_get_neighbors_deserialize_response_get_size(
 size_t json_get_node_info_serialize_request_get_size(
     const serializer_t* const s) {
   return sizeof("{\"command\": \"getNodeInfo\"}");
-  ;
 }
 void json_get_node_info_serialize_request(const serializer_t* const s,
                                           char* out) {

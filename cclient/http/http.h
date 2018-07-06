@@ -15,8 +15,9 @@ extern "C" {
 #include <stdlib.h>
 #include "cclient/service.h"
 
-iota_api_result_t post(const iota_service_t* const service,
-                       const char* const obj, iota_response_t* const response);
+iota_api_result_t iota_service_query(const iota_service_t* const service,
+                                     const char* const obj,
+                                     iota_response_t* const response);
 
 #ifdef __cplusplus
 }
