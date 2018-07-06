@@ -12,13 +12,18 @@ extern "C" {
 #include "serialization/serializer.h"
 
 typedef struct {
-  const char host[255];
+  const char* host;
   size_t port;
-  const char content_type[255];
+  const char* content_type;
   int version;
   uint timeout;
   serializer_t serializer;
-} iota_service_t;
+} iota_http_service_t;
+
+// TODO - implement + figure a way to pass serializer/serializer_enum and other
+// TODO - params, should they be loaded from conf?
+void init_iota_http_service(iota_http_service_t*, const char* const host,
+                            size_t port);
 
 typedef struct {
   size_t is_error;
