@@ -124,6 +124,7 @@ int merkle_sign(ToSign *args) {
 
     memset(signature, 0, sizeof(signature));
 
+    iss_curl_subseed(args->seed, args->seed, args->key_i, &c);
     iss_curl_key(args->seed, sigkey, key_length, &c);
     curl_reset(&c);
     iss_curl_signature(sigkey, hash, 0, sigkey, key_length, &c);
