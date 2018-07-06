@@ -9,13 +9,13 @@
 
 #include <nonstd/optional.hpp>
 
+#include <glog/logging.h>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
 #include <nlohmann/json.hpp>
-#include <glog/logging.h>
 
 using json = nlohmann::json;
 

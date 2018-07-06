@@ -4,13 +4,13 @@
 #include "../src/lib/pearl_diver.h"
 #include "../src/lib/util/converter.h"
 
-#include "cunit_include.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include "cunit_include.h"
 
 #define SIZE_IN_BYTES 49
 // static const char *tryte_nines =
@@ -67,8 +67,7 @@ static void teardown_cl_test(void) {}
 bool test_last_n_nines(char* hash, int length, int numNines) {
   int i;
   for (i = 1; i <= numNines; i++) {
-    if (hash[length - i] != '9')
-      return false;
+    if (hash[length - i] != '9') return false;
   }
   return true;
 }
@@ -119,7 +118,8 @@ static void test_search(void) {
 }
 
 static CU_TestInfo tests[] = {
-    {"Test Search ", test_search}, CU_TEST_INFO_NULL,
+    {"Test Search ", test_search},
+    CU_TEST_INFO_NULL,
 };
 
 static CU_SuiteInfo suites[] = {

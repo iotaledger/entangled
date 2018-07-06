@@ -12,24 +12,24 @@ extern "C" {
  * Method:    doPOW
  * Signature: (Ljava/lang/String;I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_doPOW
-  (JNIEnv *, jclass, jstring, jint);
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_doPOW(JNIEnv *, jclass,
+                                                               jstring, jint);
 
 /*
  * Class:     org_iota_mobile_Interface
  * Method:    generateAddress
  * Signature: (Ljava/lang/String;II)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_generateAddress
-  (JNIEnv *, jclass, jstring, jint, jint);
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_generateAddress(
+    JNIEnv *, jclass, jstring, jint, jint);
 
 /*
  * Class:     org_iota_mobile_Interface
  * Method:    generateSignature
  * Signature: (Ljava/lang/String;IILjava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_generateSignature
-  (JNIEnv *, jclass, jstring, jint, jint, jstring);
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_generateSignature(
+    JNIEnv *, jclass, jstring, jint, jint, jstring);
 
 #ifdef __cplusplus
 }

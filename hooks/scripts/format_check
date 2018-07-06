@@ -1,0 +1,16 @@
+#!/bin/bash
+
+root=$(git rev-parse --show-toplevel)
+status=0
+for file in $(git diff --staged --name-only | grep -E "\.(c|cc|cpp|h|hh|hpp)\$")
+do
+  filepath="$root/$file"
+  output=$(diff <(cat $filepath) <(clang-format -style=file -fallback-style=none $filepath))
+  if [ $? -ne 0 ]
+  then
+    echo -e "\nFile \""$file"\" is not compliant with the coding style"
+    echo "$output"
+    status=1
+  fi
+done
+exit $status

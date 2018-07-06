@@ -1,14 +1,14 @@
 Tanglescope
 ===========
 
-Tanglescope is a program composed of metrics collectors,
-each collector is responsible for collecting different metrics about
-the tangle and exposing them to a configurable prometheus (https://github.com/prometheus/prometheus) end point.
+Tanglescope is a program composed of metric collectors,
+Each collector is responsible for a different aspect of the Tangle behavior and collects different set of metrics
+and exposes them to a configurable prometheus end point. (https://github.com/prometheus/prometheus) 
 
 Configuration
 ==============
 
-Each collector has its own section defined in a yaml file whose path is specified by --ConfigurationPath flag
+Each collector has its own section defined in a yaml file whose path is specified by `--ConfigurationPath` flag
 (Default example yaml file in runner/configuration.yaml)
 
 Collectors:
@@ -128,7 +128,7 @@ Blowball collector
 **Purpose:**
 
 Identifying blowballs which can indicate network problems/malice behavior.
-By listening to a list of zmq publisher (IRI nodes with `ZMQ_ENABLED = true`)
+By listening to a list of zmq publishers (IRI nodes with `ZMQ_ENABLED = true`)
 and ref counting transaction's direct approvers
 
 **Configuration section example:**

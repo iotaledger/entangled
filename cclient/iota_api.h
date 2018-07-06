@@ -3,9 +3,9 @@
 #ifndef CCLIENT_IOTA_API_H_
 #define CCLIENT_IOTA_API_H_
 
+#include "cclient/service.h"
 #include "request/requests.h"
 #include "response/responses.h"
-#include "service.h"
 
 #ifdef __cplusplus
 extern "C" {

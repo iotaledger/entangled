@@ -13,4 +13,4 @@ void kerl_hash(const trit_t* const trits, size_t len, trit_t* out, Kerl* kerl);
 }
 #endif
 
-#endif //__KERL_HASH_H
+#endif  //__KERL_HASH_H

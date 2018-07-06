@@ -1,7 +1,7 @@
-#include "curl.h"
-#include "util/converter.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "curl.h"
+#include "util/converter.h"
 
 EXPORT char* ccurl_digest_transaction(char* trytes) {
   char* hash;
@@ -15,6 +15,6 @@ EXPORT char* ccurl_digest_transaction(char* trytes) {
   squeeze(&curl, digest, HASH_LENGTH);
   hash = trytes_from_trits(digest, 0, HASH_LENGTH);
   // hash[HASH_LENGTH] = 0;
-  free((void*) input);
+  free((void*)input);
   return hash;
 }

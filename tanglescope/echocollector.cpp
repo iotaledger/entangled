@@ -111,8 +111,8 @@ bool EchoCollector::parseConfiguration(const YAML::Node& conf) {
     return false;
   }
 
-  if (conf[IRI_HOST] && conf[IRI_PORT] && conf[PUBLISHERS] && conf[MWM] && conf[BROADCAST_INTERVAL] &&
-      conf[DISCOVERY_INTERVAL]) {
+  if (conf[IRI_HOST] && conf[IRI_PORT] && conf[PUBLISHERS] && conf[MWM] &&
+      conf[BROADCAST_INTERVAL] && conf[DISCOVERY_INTERVAL]) {
     _iriHost = conf[IRI_HOST].as<std::string>();
     _iriPort = conf[IRI_PORT].as<uint32_t>();
     _zmqPublishers = conf[PUBLISHERS].as<std::list<std::string>>();
