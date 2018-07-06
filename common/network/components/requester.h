@@ -12,7 +12,11 @@
 
 typedef concurrent_queue_of_trit_array_p request_queue_t;
 
-void request_transaction(request_queue_t *const queue,
+typedef struct {
+  request_queue_t *queue;
+} request_state_t;
+
+void request_transaction(request_state_t *const state,
                          trit_array_t const *const hash);
 trit_array_t *get_transaction_to_request();
 

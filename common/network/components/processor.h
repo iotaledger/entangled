@@ -12,8 +12,12 @@
 
 typedef concurrent_queue_of_trit_array_p processor_queue_t;
 
-void processor_on_next(processor_queue_t *const queue,
+typedef struct {
+  processor_queue_t *queue;
+} processor_state_t;
+
+void processor_on_next(processor_state_t *const state,
                        trit_array_t const *const hash);
-void *processor_routine(void *arg);
+void *processor_routine(processor_state_t *const state);
 
 #endif  //__COMMON_NETWORK_COMPONENTS_PROCESSOR_H__

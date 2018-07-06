@@ -12,8 +12,12 @@
 
 typedef concurrent_queue_of_trit_array_p broadcaster_queue_t;
 
-void broadcaster_on_next(broadcaster_queue_t *const queue,
+typedef struct {
+  broadcaster_queue_t *queue;
+} broadcaster_state_t;
+
+void broadcaster_on_next(broadcaster_state_t *const state,
                          trit_array_t const *const hash);
-void *broadcaster_routine(void *arg);
+void *broadcaster_routine(broadcaster_state_t *const state);
 
 #endif  //__COMMON_NETWORK_COMPONENTS_BROADCASTER_H__
