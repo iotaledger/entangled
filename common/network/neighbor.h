@@ -10,12 +10,8 @@
 
 #include "common/network/iota_packet.h"
 
-typedef enum connection_type_e { TCP, UDP } connection_type_t;
-
 typedef struct {
-  socket_addr_t endpoint;
-  int socket;
-  connection_type_t connection_type;
+  void *network_desc;
   unsigned int number_of_all_transactions;
   unsigned int number_of_new_transactions;
   unsigned int number_of_invalid_transactions;
