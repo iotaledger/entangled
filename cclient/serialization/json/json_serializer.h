@@ -9,92 +9,98 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+void init_json_serializer(serializer_t* serializer);
 
 void json_find_transactions_serialize_request(
-    const serializer* const, const find_transactions_req_t* const obj,
+    const serializer_t* const, const find_transactions_req_t* const obj,
     char* out);
 
-void json_find_transactions_deserialize_response(const serializer* const,
+void json_find_transactions_deserialize_response(const serializer_t* const,
                                                  const char* const obj,
                                                  find_transactions_res_t* out);
 
 size_t json_find_transactions_serialize_request_get_size(
-    const serializer* const, const find_transactions_req_t* const toSerialize);
+    const serializer_t* const,
+    const find_transactions_req_t* const toSerialize);
 
 size_t json_find_transactions_deserialize_response_get_size(
-    const serializer* const, const char* const toDesirialize);
+    const serializer_t* const, const char* const toDeserialize);
 
 // get_balances_response
-void json_get_balances_serialize_request(const serializer* const,
+void json_get_balances_serialize_request(const serializer_t* const,
                                          const get_balances_req_t* const obj,
                                          char* out);
 
-void json_get_balances_deserialize_response(const serializer* const,
+void json_get_balances_deserialize_response(const serializer_t* const,
                                             const char* const obj,
                                             get_balances_res_t* out);
 
 size_t json_get_balances_serialize_request_get_size_(
-    const serializer* const, const get_balances_req_t* const toSerialize);
+    const serializer_t* const, const get_balances_req_t* const toSerialize);
 
 size_t json_get_balances_deserialize_response_get_size(
-    const serializer* const, const char* const toDesirialize);
+    const serializer_t* const, const char* const toDeserialize);
 
 // get_inclusion_state_response
 void json_get_inclusion_state_serialize_request(
-    const serializer* const, const get_inclusion_state_req_t* const obj,
+    const serializer_t* const, const get_inclusion_state_req_t* const obj,
     char* out);
 
 void json_get_inclusion_state_deserialize_response(
-    const serializer* const, const char* const obj,
+    const serializer_t* const, const char* const obj,
     get_inclusion_state_res_t* out);
 
 size_t json_get_inclusion_state_serialize_request_get_size(
-    const serializer* const,
+    const serializer_t* const,
     const get_inclusion_state_req_t* const toSerialize);
 
 size_t json_get_inclusion_state_deserialize_response_get_size(
-    const serializer* const, const char* const toDesirialize);
+    const serializer_t* const, const char* const toDeserialize);
 
 // get_neighbors_response
 
-void json_get_neighbors_deserialize_response(const serializer* const,
+void json_get_neighbors_deserialize_response(const serializer_t* const s,
                                              const char* const obj,
                                              get_neighbors_res_t* out);
 
 size_t json_get_neighbors_deserialize_response_get_size(
-    const serializer* const, const char* const toDesirialize);
+    const serializer_t* const, const char* const toDeserialize);
 
-// get_node_info_response
+// get_node_info
+size_t json_get_node_info_serialize_request_get_size(
+    const serializer_t* const s);
 
-void json_get_node_info_deserialize_response(const serializer* const,
+void json_get_node_info_serialize_request(const serializer_t* const, char* out);
+
+void json_get_node_info_deserialize_response(const serializer_t* const,
                                              const char* const obj,
                                              get_node_info_res_t* out);
 
 size_t json_get_node_info_deserialize_response_get_size(
-    const serializer* const, const char* const toDesirialize);
+    const serializer_t* const, const char* const toDeserialize);
 
 // get_tips_response
 
-void json_get_tips_deserialize_response(const serializer* const,
+void json_get_tips_deserialize_response(const serializer_t* const,
                                         const char* const obj,
                                         get_tips_res_t* out);
 
 size_t json_get_tips_deserialize_response_get_size(
-    const serializer* const, const char* const toDesirialize);
+    const serializer_t* const, const char* const toDeserialize);
 
 // get_transactions_to_approve_response
-void json_get_transactions_to_approve_serialize_request(const serializer* const,
-                                                        int depth, char* out);
+void json_get_transactions_to_approve_serialize_request(
+    const serializer_t* const, int depth, char* out);
 
 void json_get_transactions_to_approve_deserialize_response(
-    const serializer* const, const char* const obj,
+    const serializer_t* const, const char* const obj,
     get_transactions_to_approve_res_t* out);
 
 size_t json_get_transactions_to_approve_serialize_request_get_size(
-    const serializer* const);
+    const serializer_t* const);
 
 size_t json_get_transactions_to_approve_deserialize_response_get_size(
-    const serializer* const, const char* const toDesirialize);
+    const serializer_t* const, const char* const toDeserialize);
 
 static serializer_vtable json_vtable = {
     .find_transactions_serialize_request =
@@ -123,6 +129,9 @@ static serializer_vtable json_vtable = {
         json_get_neighbors_deserialize_response,
     .get_neighbors_deserialize_response_get_size =
         json_get_neighbors_deserialize_response_get_size,
+    .get_node_info_serialize_request_get_size =
+        json_get_node_info_serialize_request_get_size,
+    .get_node_info_serialize_request = json_get_node_info_serialize_request,
     .get_node_info_deserialize_response =
         json_get_node_info_deserialize_response,
     .get_node_info_deserialize_response_get_size =

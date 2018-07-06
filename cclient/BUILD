@@ -1,5 +1,5 @@
 cc_library(
-    name = "cclient",
+    name = "api",
     srcs = glob([
         "*.c",
         "**/*.c",
@@ -7,9 +7,19 @@ cc_library(
     ]),
     hdrs = ["iota_api.h"],
     deps = [
+        "//cclient/http:beast",
+    ],
+)
+
+cc_library(
+    name = "service",
+    srcs = [
+        "service.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
         "//cclient/request:requests",
         "//cclient/response:responses",
         "//cclient/serialization:serializer_json",
-        "@com_google_googletest//:gtest_main",
     ],
 )

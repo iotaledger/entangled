@@ -5,7 +5,7 @@
 
 #include "request/requests.h"
 #include "response/responses.h"
-#include "cclient/service.h"
+#include "service.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -251,4 +251,4 @@ iota_api_result_t iota_api_store_transactions(
 }
 #endif
 
-#endif //CCLIENT_IOTA_API_H_
+#endif  // CCLIENT_IOTA_API_H_

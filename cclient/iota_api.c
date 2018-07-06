@@ -1,10 +1,28 @@
 // Copyright 2018 IOTA Foundation
 
 #include "iota_api.h"
+#include "cclient/http/http.h"
+#include "cclient/service.h"
 
 iota_api_result_t iota_api_get_node_info(const iota_service_t* const service,
                                          get_node_info_res_t* const res) {
   iota_api_result_t result;
+  iota_response_t response;
+  char buffer[660];
+  response.data = &buffer;
+  response.length = 660;
+  size_t req_size =
+      service->serializer.vtable.get_node_info_serialize_request_get_size(
+          &service->serializer);
+  char request_data[req_size];
+
+  service->serializer.vtable.get_node_info_serialize_request(
+      &service->serializer, request_data);
+
+  result = post(service, request_data, &response);
+
+  // TODO - deserialize response
+
   return result;
 }
 
