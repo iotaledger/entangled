@@ -8,6 +8,9 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_RECEIVER_H__
 #define __COMMON_NETWORK_COMPONENTS_RECEIVER_H__
 
-void *receiver_routine(void *arg);
+typedef struct {
+} receiver_state_t;
+
+void *receiver_routine(receiver_state_t *const state);
 
 #endif  //__COMMON_NETWORK_COMPONENTS_RECEIVER_H__
