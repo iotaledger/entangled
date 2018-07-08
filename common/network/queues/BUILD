@@ -12,6 +12,7 @@ cc_library(
 
 cc_library(
     name = "concurrent_queue_hash_request",
+    srcs = ["concurrent_queue_hash_request.c"],
     hdrs = ["concurrent_queue_hash_request.h"],
     deps = [
         ":concurrent_queue",
@@ -22,6 +23,7 @@ cc_library(
 
 cc_library(
     name = "concurrent_queue_trit_array",
+    srcs = ["concurrent_queue_trit_array.c"],
     hdrs = ["concurrent_queue_trit_array.h"],
     deps = [
         ":concurrent_queue",
