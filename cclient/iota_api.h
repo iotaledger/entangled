@@ -12,7 +12,7 @@ extern "C" {
 #endif
 
 /**
- * Returns inforation about your node.
+ * Returns information about your node.
  *
  * https://iota.readme.io/reference#getnodeinfo
  *
@@ -29,8 +29,8 @@ iota_api_result_t iota_api_get_node_info(const iota_http_service_t* const servic
  *
  * https://iota.readme.io/reference#getneighborsactivity
  *
- * @para service IRI node end point.
- * @para res get_node_info_res_t struct containing the node's info
+ * @param service IRI node end point.
+ * @param res get_node_info_res_t struct containing the node's info
  *
  * @return error value.
  */
@@ -39,13 +39,13 @@ iota_api_result_t iota_api_get_neighbors(const iota_http_service_t* const servic
 
 /**
  * Add a list of neighbors to iri node. It should be noted that this is only
- * teporary, and the added neighbors will be reoved fro your set of neighbors
+ * temporary, and the added neighbors will be removed from your set of neighbors
  * after you relaunch IRI.
  *
  * https://iota.readme.io/reference#addneighors
  *
- * @para service IRI node end point.
- * @para req Request containing list of neighbors to add
+ * @param service IRI node end point.
+ * @param req Request containing list of neighbors to add
  *
  * @return error value.
  */
@@ -53,16 +53,16 @@ iota_api_result_t iota_api_add_neighbors(const iota_http_service_t* const servic
                                          const add_neighbors_req_t* const req);
 
 /**
- * Reoves a list of neighbors fro your iri node. This is only teporary, and
+ * Removes a list of neighbors from your iri node. This is only temporary, and
  if you
- * have your neighbors added via the coand line, they will be retained after
+ * have your neighbors added via the command line, they will be retained after
  * you restart your node.
  *
  * https://iota.readme.io/reference#reoveneighors
 
-  * @para service IRI node end point.
- * @para uris List of URI eleents.
- * @para nuUris Nuber of eleents in uris
+  * @param service IRI node end point.
+ * @param uris List of URI elements.
+ * @param nuUris Number of elements in uris
  *
  * @return error value.
  */
@@ -75,26 +75,26 @@ iota_api_result_t iota_api_remove_neighbors(
  *
  * https://iota.readme.io/reference#gettips
  *
- * @para service IRI node end point.
- * @para res Response containing the tips
+ * @param service IRI node end point.
+ * @param res Response containing the tips
  *
  * @return error value.
  */
 iota_api_result_t iota_api_get_tips(const iota_http_service_t* const service,
                                     get_tips_res_t* const res);
 /**
- * Find the transactions which atch the specified input and return. All input
+ * Find the transactions which attach the specified input and return. All input
  * values are lists (in req), for which a list of return values (transaction
- * hashes) in the sae order is returned for all individual eleents. The input
- * fields can either be bundles, addresses, tags or approvees. Using ultiple of
+ * hashes) in the same order is returned for all individual elements. The input
+ * fields can either be bundles, addresses, tags or approvees. Using multiple of
  * these input fields returns the intersection of the values.
  *
  * https://iota.readme.io/reference#findtransactions
  *
- * @para service IRI node end point.
- * @para req - find_transactions_req_t struct containing all eleents by which
+ * @param service IRI node end point.
+ * @param req - find_transactions_req_t struct containing all elements by which
  * transactions should be sought.
- * @para res Response containing found transactions
+ * @param res Response containing found transactions
  *
  * @return error value.
  */
@@ -106,12 +106,12 @@ iota_api_result_t iota_api_find_transactions(
 /**
  * Returns the raw transaction data (trytes) of a specific transaction. These
  * trytes can then be easily converted into the actual transaction object. See
- * utility functions for ore details.
+ * utility functions for more details.
  *
  * https://iota.readme.io/reference#gettrytes
  *
- * @para service IRI node end point.
- * @para req The request containing Hashes of transactions to which trytes are
+ * @param service IRI node end point.
+ * @param req The request containing Hashes of transactions to which trytes are
  * to be retrieved
  *
  * @return error value.
@@ -121,19 +121,19 @@ iota_api_result_t iota_api_get_trytes(const iota_http_service_t* const service,
                                       char* trytes[]);
 
 /**
- * Get the inclusion states of a set of transactions. This is for deterining if
- * a transaction was accepted and confired by the network or not. You can
- * search for ultiple tips (and thus, ilestones) to get past inclusion states
- * of transactions. This API call siply returns a list of boolean values in the
- * sae order as the transaction list you subitted, thus you get a true/false
- * whether a transaction is confired or not.
+ * Get the inclusion states of a set of transactions. This is for determining if
+ * a transaction was accepted and confirmed by the network or not. You can
+ * search for multiple tips (and thus, milestones) to get past inclusion states
+ * of transactions. This API call simply returns a list of boolean values in the
+ * same order as the transaction list you submitted, thus you get a true/false
+ * whether a transaction is confirmed or not.
  *
  * https://iota.readme.io/reference#getinclusionstates
  *
- * @para service IRI node end point.
- * @para req The request with transactions to which we are searching for
+ * @param service IRI node end point.
+ * @param req The request with transactions to which we are searching for
  * inclusion state for.
- * @para res The response with the corresponding inclusion states
+ * @param res The response with the corresponding inclusion states
  *
  * @return error value.
  */
@@ -142,18 +142,18 @@ iota_api_result_t iota_api_get_inclusion_states(
     const get_inclusion_state_req_t* const req, get_inclusion_state_res_t* res);
 
 /**
- * Siilar to iota_api_get_inclusion_states. It returns the confired balance
- * which a list of addresses have at the latest confired ilestone. In addition
- * to the balances, it also returns the ilestone as well as the index with which
- * the confired balance was deterined. The balances is returned as a list in the
- * sae order as the addresses were provided as input.
+ * Similar to iota_api_get_inclusion_states. It returns the confirmed balance
+ * which a list of addresses have at the latest confirmed milestone. In addition
+ * to the balances, it also returns the milestone as well as the index with which
+ * the confirmed balance was determined. The balances is returned as a list in the
+ * same order as the addresses were provided as input.
  *
  * https://iota.readme.io/reference#getbalances
  *
- * @para service IRI node end point.
- * @para req The request containing the addresses for which balances are
+ * @param service IRI node end point.
+ * @param req The request containing the addresses for which balances are
  * requested
- * @para res Response containing the requested balances
+ * @param res Response containing the requested balances
  *
  * @return error value.
  */
@@ -163,17 +163,17 @@ iota_api_result_t iota_api_get_balances(const iota_http_service_t* const service
 
 /**
  * Tip selection which returns trunkTransaction and branchTransaction. The input
- * value is depth, which basically deterines how any bundles to go back to for
- * finding the transactions to approve. The higher your depth value, the ore
- * "babysitting" you do for the network (as you have to confir ore
+ * value is depth, which basically determines how many bundles to go back to for
+ * finding the transactions to approve. The higher your depth value, the more
+ * "babysitting" you do for the network (as you have to confirm more
  * transactions).
  *
  * https://iota.readme.io/reference#getbalances
  *
- * @para service IRI node end point.
- * @para depth Nuber of bundles to go back to deterine the transactions for
+ * @param service IRI node end point.
+ * @param depth Nuber of bundles to go back to determine the transactions for
  * approval.
- * @para res Transactions to approve (branch + trunk)
+ * @param res Transactions to approve (branch + trunk)
  *
  * @return error value.
  */
@@ -196,8 +196,8 @@ iota_api_result_t iota_api_get_transactions_to_approve(
  * https://iota.readme.io/reference#attachtotangle
  *
  *
- * @para service IRI node end point.
- * @para req The request with the attachment params
+ * @param service IRI node end point.
+ * @param req The request with the attachment params
  *
  * @return error value.
  */
@@ -206,11 +206,11 @@ iota_api_result_t iota_api_attach_to_tangle(
     const attach_to_tangle_req_t* const req);
 
 /**
- * Interrupts and copletely aborts the iota_api_attach_to_tangle process.
+ * Interrupts and completely aborts the iota_api_attach_to_tangle process.
  *
  * https://iota.readme.io/reference#interruptattachingtotangle
  *
- * @para service IRI node end point.
+ * @param service IRI node end point.
  * @return error value.
  */
 
@@ -223,8 +223,8 @@ iota_api_result_t iota_api_interrupt_attaching_to_tangle(
  *
  * https://iota.readme.io/reference#broadcasttransactions
  *
- * @para service IRI node end point.
- * @para req - the request containing the transactions to broadcast
+ * @param service IRI node end point.
+ * @param req - the request containing the transactions to broadcast
  *
  * @return error value.
  */
@@ -238,8 +238,8 @@ iota_api_result_t iota_api_broadcast_transactions(
  *
  * https://iota.readme.io/reference#storetransactions
  *
- * @para service IRI node end point.
- * @para req - the request containing the transactions to store
+ * @param service IRI node end point.
+ * @param req - the request containing the transactions to store
  *
  * @return The error value.
  */
