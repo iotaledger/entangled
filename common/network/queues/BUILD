@@ -2,6 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "concurrent_queue",
+    srcs = ["concurrent_queue.c.inc"],
     hdrs = ["concurrent_queue.h.inc"],
     deps = [
         "//common:cond_handle",

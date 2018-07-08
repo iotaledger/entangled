@@ -37,6 +37,9 @@
     cond_handle_t cond;                                  \
   } concurrent_queue_of_##TYPE;
 
+#define DECLARE_NEW_CONCURRENT_QUEUE_OF(TYPE) \
+  struct concurrent_queue_of_##TYPE##_s *NEW_CONCURRENT_QUEUE_OF_##TYPE();
+
 /**
  * Returns pointer to the first element in the queue. This element will be the
  * first element to be removed on a call to pop()
@@ -93,6 +96,7 @@
   DECLARE_STRUCT_CONCURRENT_QUEUE_NODE_OF(TYPE)    \
   DECLARE_VTABLE_CONCURRENT_QUEUE_OF(TYPE)         \
   DECLARE_STRUCT_CONCURRENT_QUEUE_OF(TYPE)         \
+  DECLARE_NEW_CONCURRENT_QUEUE_OF(TYPE)            \
   DECLARE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE) \
   DECLARE_FUNCTION_BACK_CONCURRENT_QUEUE_OF(TYPE)  \
   DECLARE_FUNCTION_EMPTY_CONCURRENT_QUEUE_OF(TYPE) \
