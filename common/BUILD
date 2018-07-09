@@ -7,6 +7,7 @@ cc_library(
 
 cc_library(
     name = "lock_handle",
+    srcs = ["lock_handle.c"],
     hdrs = ["lock_handle.h"],
 )
 
