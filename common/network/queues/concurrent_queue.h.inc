@@ -14,17 +14,17 @@
     struct concurrent_queue_node_of_##TYPE##_s *next;  \
   } concurrent_queue_node_of_##TYPE##_t;
 
-#define DECLARE_VTABLE_CONCURRENT_QUEUE_OF(TYPE)                           \
-  struct concurrent_queue_of_##TYPE##_s;                                   \
-  typedef struct vtable_concurrent_queue_of_##TYPE##_s {                   \
-    TYPE *(*front)(struct concurrent_queue_of_##TYPE##_s * self);          \
-    TYPE *(*back)(struct concurrent_queue_of_##TYPE##_s * self);           \
-    int (*empty)(struct concurrent_queue_of_##TYPE##_s * self);            \
-    size_t (*size)(struct concurrent_queue_of_##TYPE##_s * self);          \
-    void (*push)(struct concurrent_queue_of_##TYPE##_s * self, TYPE data); \
-    void (*pop)(struct concurrent_queue_of_##TYPE##_s * self);             \
-  } vtable_concurrent_queue_of_##TYPE##_t;                                 \
-  extern vtable_concurrent_queue_of_##TYPE##_t const                       \
+#define DECLARE_VTABLE_CONCURRENT_QUEUE_OF(TYPE)                          \
+  struct concurrent_queue_of_##TYPE##_s;                                  \
+  typedef struct vtable_concurrent_queue_of_##TYPE##_s {                  \
+    TYPE *(*front)(struct concurrent_queue_of_##TYPE##_s * self);         \
+    TYPE *(*back)(struct concurrent_queue_of_##TYPE##_s * self);          \
+    int (*empty)(struct concurrent_queue_of_##TYPE##_s * self);           \
+    size_t (*size)(struct concurrent_queue_of_##TYPE##_s * self);         \
+    int (*push)(struct concurrent_queue_of_##TYPE##_s * self, TYPE data); \
+    int (*pop)(struct concurrent_queue_of_##TYPE##_s * self, TYPE *data); \
+  } vtable_concurrent_queue_of_##TYPE##_t;                                \
+  extern vtable_concurrent_queue_of_##TYPE##_t const                      \
       vtable_concurrent_queue_of_##TYPE##_g;
 
 #define DECLARE_STRUCT_CONCURRENT_QUEUE_OF(TYPE)         \
@@ -82,15 +82,15 @@
  * Pushes the given element value to the end of the queue
  */
 #define DECLARE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE) \
-  void CONCURRENT_QUEUE_OF_##TYPE##_PUSH(               \
+  int CONCURRENT_QUEUE_OF_##TYPE##_PUSH(                \
       struct concurrent_queue_of_##TYPE##_s *self, TYPE data);
 
 /**
  * Removes an element from the front of the queue
  */
 #define DECLARE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE) \
-  void CONCURRENT_QUEUE_OF_##TYPE##_POP(               \
-      struct concurrent_queue_of_##TYPE##_s *self);
+  int CONCURRENT_QUEUE_OF_##TYPE##_POP(                \
+      struct concurrent_queue_of_##TYPE##_s *self, TYPE *data);
 
 #define DECLARE_CONCURRENT_QUEUE_OF(TYPE)          \
   DECLARE_STRUCT_CONCURRENT_QUEUE_NODE_OF(TYPE)    \
