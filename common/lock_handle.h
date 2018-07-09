@@ -18,11 +18,11 @@
 #ifdef _POSIX_THREADS
 
 #include <pthread.h>
-typedef pthread_rwlock_t lock_handle_t;
+typedef pthread_mutex_t lock_handle_t;
 
 #else
 
-#error "No thread primitives found"
+#error "No lock primitives found"
 
 #endif  // _POSIX_THREADS
 
@@ -49,24 +49,6 @@ int lock_handle_init(lock_handle_t* const lock);
  * @return exit status
  */
 int lock_handle_lock(lock_handle_t* const lock);
-
-/**
- * Acquires reading ownership of the given lock
- *
- * @param lock The lock
- *
- * @return exit status
- */
-int lock_handle_rdlock(lock_handle_t* const lock);
-
-/**
- * Acquires writing ownership of the given lock
- *
- * @param lock The lock
- *
- * @return exit status
- */
-int lock_handle_wrlock(lock_handle_t* const lock);
 
 /**
  * Releases ownership of the given lock

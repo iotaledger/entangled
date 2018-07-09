@@ -12,31 +12,23 @@
 #ifdef _POSIX_THREADS
 
 int lock_handle_init(lock_handle_t* const lock) {
-  return pthread_rwlock_init(lock, NULL);
+  return pthread_mutex_init(lock, NULL);
 }
 
 int lock_handle_lock(lock_handle_t* const lock) {
-  return pthread_rwlock_wrlock(lock);
-}
-
-int lock_handle_rdlock(lock_handle_t* const lock) {
-  return pthread_rwlock_rdlock(lock);
-}
-
-int lock_handle_wrlock(lock_handle_t* const lock) {
-  return pthread_rwlock_wrlock(lock);
+  return pthread_mutex_lock(lock);
 }
 
 int lock_handle_unlock(lock_handle_t* const lock) {
-  return pthread_rwlock_unlock(lock);
+  return pthread_mutex_unlock(lock);
 }
 
 int lock_handle_destroy(lock_handle_t* const lock) {
-  return pthread_rwlock_destroy(lock);
+  return pthread_mutex_destroy(lock);
 }
 
 #else
 
-#error "No thread primitives found"
+#error "No lock primitives found"
 
 #endif  // _POSIX_THREADS
