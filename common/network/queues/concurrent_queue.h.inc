@@ -43,6 +43,8 @@
  * Returns pointer to the first element in the queue. This element will be the
  * first element to be removed on a call to pop()
  *
+ * @param self The queue
+ *
  * @return Pointer to the first element
  */
 #define DECLARE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE) \
@@ -53,6 +55,8 @@
  * Returns pointer to the last element in the queue. This is the most recently
  * pushed element
  *
+ * @param self The queue
+ *
  * @return Pointer to the last element
  */
 #define DECLARE_FUNCTION_BACK_CONCURRENT_QUEUE_OF(TYPE) \
@@ -61,6 +65,8 @@
 
 /**
  * Checks if the underlying container has no elements
+ *
+ * @param self The queue
  *
  * @return true if the queue is empty, false otherwise
  */
@@ -71,6 +77,8 @@
 /**
  * Returns the number of elements in the queue
  *
+ * @param self The queue
+ *
  * @return The number of elements in the queue
  */
 #define DECLARE_FUNCTION_SIZE_CONCURRENT_QUEUE_OF(TYPE) \
@@ -79,6 +87,11 @@
 
 /**
  * Pushes the given element value to the end of the queue
+ *
+ * @param self The queue
+ * @param data The data to be pushed
+ *
+ * @return an exit status
  */
 #define DECLARE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE) \
   int CONCURRENT_QUEUE_OF_##TYPE##_PUSH(                \
@@ -86,6 +99,11 @@
 
 /**
  * Removes an element from the front of the queue
+ *
+ * @param self The queue
+ * @param data The popped data
+ *
+ * @return an exit status
  */
 #define DECLARE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE) \
   int CONCURRENT_QUEUE_OF_##TYPE##_POP(                \
