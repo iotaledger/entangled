@@ -17,17 +17,15 @@
            CONCURRENT_QUEUE_OF_##TYPE##_PUSH,   \
            CONCURRENT_QUEUE_OF_##TYPE##_POP};
 
-#define DEFINE_NEW_CONCURRENT_QUEUE_OF(TYPE)                                \
-  struct concurrent_queue_of_##TYPE##_s *NEW_CONCURRENT_QUEUE_OF_##TYPE() { \
-    struct concurrent_queue_of_##TYPE##_s *queue = malloc(sizeof(*queue));  \
-    if (queue == NULL) return NULL;                                         \
-    queue->front = NULL;                                                    \
-    queue->back = NULL;                                                     \
-    queue->vtable = &vtable_concurrent_queue_of_##TYPE##_g;                 \
-    queue->size = 0;                                                        \
-    lock_handle_init(&queue->lock);                                         \
-    cond_handle_init(&queue->cond);                                         \
-    return queue;                                                           \
+#define NEW_CONCURRENT_QUEUE_OF(TYPE, NAME)                            \
+  struct concurrent_queue_of_##TYPE##_s *NAME = malloc(sizeof(*NAME)); \
+  if (NAME != NULL) {                                                  \
+    NAME->front = NULL;                                                \
+    NAME->back = NULL;                                                 \
+    NAME->vtable = &vtable_concurrent_queue_of_##TYPE##_g;             \
+    NAME->size = 0;                                                    \
+    lock_handle_init(&NAME->lock);                                     \
+    cond_handle_init(&NAME->cond);                                     \
   }
 
 #define DEFINE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE)    \
@@ -120,7 +118,6 @@
 
 #define DEFINE_CONCURRENT_QUEUE_OF(TYPE)          \
   DEFINE_VTABLE_CONCURRENT_QUEUE_OF(TYPE)         \
-  DEFINE_NEW_CONCURRENT_QUEUE_OF(TYPE)            \
   DEFINE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE) \
   DEFINE_FUNCTION_BACK_CONCURRENT_QUEUE_OF(TYPE)  \
   DEFINE_FUNCTION_EMPTY_CONCURRENT_QUEUE_OF(TYPE) \
