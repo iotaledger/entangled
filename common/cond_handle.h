@@ -15,6 +15,8 @@
 
 #include <unistd.h>
 
+#include "lock_handle.h"
+
 #ifdef _POSIX_THREADS
 
 #include <pthread.h>
@@ -66,10 +68,11 @@ int cond_handle_broadcast(cond_handle_t* const cond);
  * signaled or broadcast to
  *
  * @param cond The condition variable
+ * @param lock The associated lock
  *
  * @return exit status
  */
-int cond_handle_wait(cond_handle_t* const cond);
+int cond_handle_wait(cond_handle_t* const cond, lock_handle_t* const lock);
 
 /**
  * Destroys the condition variable specified by cond

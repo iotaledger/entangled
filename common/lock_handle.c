@@ -5,8 +5,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <unistd.h>
-
 #include "lock_handle.h"
 
 #ifdef _POSIX_THREADS
