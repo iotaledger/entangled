@@ -10,25 +10,32 @@
 #include "common/cond_handle.h"
 #include "common/lock_handle.h"
 
+typedef enum concurrent_queue_status_e {
+  CONCURRENT_QUEUE_SUCCESS,
+  CONCURRENT_QUEUE_NULL_SELF,
+  CONCURRENT_QUEUE_NULL_DATA,
+  CONCURRENT_QUEUE_ALLOC_FAILED
+} concurrent_queue_status_t;
+
 #define DECLARE_STRUCT_CONCURRENT_QUEUE_NODE_OF(TYPE)  \
   typedef struct concurrent_queue_node_of_##TYPE##_s { \
     TYPE data;                                         \
     struct concurrent_queue_node_of_##TYPE##_s *next;  \
   } concurrent_queue_node_of_##TYPE##_t;
 
-#define DECLARE_VTABLE_CONCURRENT_QUEUE_OF(TYPE)                       \
-  struct concurrent_queue_of_##TYPE##_s;                               \
-  typedef struct vtable_concurrent_queue_of_##TYPE##_s {               \
-    TYPE *(*front)(struct concurrent_queue_of_##TYPE##_s *const self); \
-    TYPE *(*back)(struct concurrent_queue_of_##TYPE##_s *const self);  \
-    int (*empty)(struct concurrent_queue_of_##TYPE##_s *const self);   \
-    size_t (*size)(struct concurrent_queue_of_##TYPE##_s *const self); \
-    int (*push)(struct concurrent_queue_of_##TYPE##_s *const self,     \
-                TYPE const data);                                      \
-    int (*pop)(struct concurrent_queue_of_##TYPE##_s *const self,      \
-               TYPE *const data);                                      \
-  } vtable_concurrent_queue_of_##TYPE##_t;                             \
-  extern vtable_concurrent_queue_of_##TYPE##_t const                   \
+#define DECLARE_VTABLE_CONCURRENT_QUEUE_OF(TYPE)                              \
+  struct concurrent_queue_of_##TYPE##_s;                                      \
+  typedef struct vtable_concurrent_queue_of_##TYPE##_s {                      \
+    TYPE *(*front)(struct concurrent_queue_of_##TYPE##_s *const self);        \
+    TYPE *(*back)(struct concurrent_queue_of_##TYPE##_s *const self);         \
+    int (*empty)(struct concurrent_queue_of_##TYPE##_s *const self);          \
+    size_t (*size)(struct concurrent_queue_of_##TYPE##_s *const self);        \
+    concurrent_queue_status_t (*push)(                                        \
+        struct concurrent_queue_of_##TYPE##_s *const self, TYPE const data);  \
+    concurrent_queue_status_t (*pop)(                                         \
+        struct concurrent_queue_of_##TYPE##_s *const self, TYPE *const data); \
+  } vtable_concurrent_queue_of_##TYPE##_t;                                    \
+  extern vtable_concurrent_queue_of_##TYPE##_t const                          \
       vtable_concurrent_queue_of_##TYPE##_g;
 
 #define DECLARE_STRUCT_CONCURRENT_QUEUE_OF(TYPE)         \
@@ -106,8 +113,8 @@
  *
  * @return an exit status
  */
-#define DECLARE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE) \
-  int CONCURRENT_QUEUE_OF_##TYPE##_PUSH(                \
+#define DECLARE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE)        \
+  concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_PUSH( \
       struct concurrent_queue_of_##TYPE##_s *const self, TYPE const data);
 
 /**
@@ -118,8 +125,8 @@
  *
  * @return an exit status
  */
-#define DECLARE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE) \
-  int CONCURRENT_QUEUE_OF_##TYPE##_POP(                \
+#define DECLARE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE)        \
+  concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_POP( \
       struct concurrent_queue_of_##TYPE##_s *const self, TYPE *const data);
 
 #define DECLARE_CONCURRENT_QUEUE_OF(TYPE)          \

@@ -9,9 +9,9 @@
 #define COMMON_COND_HANDLE_H_
 
 /**
- * We define a type cond_handle_t, depending on the system condition variable
- * primitives, and its associated functions; some of them might have no effect
- * if not needed by the underlying API
+ * We define a type cond_handle_t mapping to a system available condition
+ * variable primitive and its associated functions, some of them might have no
+ * effect if not needed by the underlying API
  */
 
 #include <unistd.h>

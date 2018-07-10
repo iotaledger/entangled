@@ -9,9 +9,9 @@
 #define COMMON_LOCK_HANDLE_H_
 
 /**
- * We declare a type lock_handle_t, depending on the system available lock
- * primitives, and its associated functions; some of them might have no effect
- * if not needed by the underlying API
+ * We define a type lock_handle_t mapping to a system available lock primitive
+ * and its associated functions, some of them might have no effect if not needed
+ * by the underlying API
  */
 
 #include <unistd.h>
