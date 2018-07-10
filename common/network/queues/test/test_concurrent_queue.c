@@ -17,71 +17,72 @@ typedef concurrent_queue_of_int conqueue_int;
 
 void test_concurrent_queue() {
   int data;
-  NEW_CONCURRENT_QUEUE_OF(int, c);
-  TEST_ASSERT_NOT_NULL(c);
+  conqueue_int *queue;
+  INIT_CONCURRENT_QUEUE_OF(int, queue);
+  TEST_ASSERT_NOT_NULL(queue);
 
-  TEST_ASSERT_NULL(c->vtable->front(NULL));
-  TEST_ASSERT_NULL(c->vtable->front(c));
-  TEST_ASSERT_NULL(c->vtable->back(NULL));
-  TEST_ASSERT_NULL(c->vtable->back(c));
-  TEST_ASSERT_EQUAL_INT(c->vtable->empty(NULL), 1);
-  TEST_ASSERT_EQUAL_INT(c->vtable->empty(c), 1);
-  TEST_ASSERT_EQUAL_INT(c->vtable->size(NULL), 0);
-  TEST_ASSERT_EQUAL_INT(c->vtable->size(c), 0);
-  TEST_ASSERT_EQUAL_INT(c->vtable->push(NULL, 0), 1);
-  TEST_ASSERT_EQUAL_INT(c->vtable->pop(NULL, &data), 1);
-  TEST_ASSERT_EQUAL_INT(c->vtable->pop(c, NULL), 1);
+  TEST_ASSERT_NULL(queue->vtable->front(NULL));
+  TEST_ASSERT_NULL(queue->vtable->front(queue));
+  TEST_ASSERT_NULL(queue->vtable->back(NULL));
+  TEST_ASSERT_NULL(queue->vtable->back(queue));
+  TEST_ASSERT_EQUAL_INT(queue->vtable->empty(NULL), 1);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->empty(queue), 1);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->size(NULL), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->size(queue), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->push(NULL, 0), 1);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->pop(NULL, &data), 1);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->pop(queue, NULL), 1);
 
-  TEST_ASSERT_EQUAL_INT(c->vtable->push(c, 0), 0);
-  TEST_ASSERT_EQUAL_INT(c->vtable->push(c, 1), 0);
-  TEST_ASSERT_EQUAL_INT(c->vtable->push(c, 2), 0);
-  TEST_ASSERT_EQUAL_INT(c->vtable->push(c, 3), 0);
-  TEST_ASSERT_EQUAL_INT(c->vtable->push(c, 4), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->push(queue, 0), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->push(queue, 1), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->push(queue, 2), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->push(queue, 3), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->push(queue, 4), 0);
 
-  TEST_ASSERT_EQUAL_INT(*c->vtable->front(c), 0);
-  TEST_ASSERT_EQUAL_INT(*c->vtable->back(c), 4);
-  TEST_ASSERT_EQUAL_INT(c->vtable->empty(c), 0);
-  TEST_ASSERT_EQUAL_INT(c->vtable->size(c), 5);
+  TEST_ASSERT_EQUAL_INT(*queue->vtable->front(queue), 0);
+  TEST_ASSERT_EQUAL_INT(*queue->vtable->back(queue), 4);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->empty(queue), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->size(queue), 5);
 
-  TEST_ASSERT_EQUAL_INT(c->vtable->pop(c, &data), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->pop(queue, &data), 0);
   TEST_ASSERT_EQUAL_INT(data, 0);
 
-  TEST_ASSERT_EQUAL_INT(*c->vtable->front(c), 1);
-  TEST_ASSERT_EQUAL_INT(*c->vtable->back(c), 4);
-  TEST_ASSERT_EQUAL_INT(c->vtable->empty(c), 0);
-  TEST_ASSERT_EQUAL_INT(c->vtable->size(c), 4);
+  TEST_ASSERT_EQUAL_INT(*queue->vtable->front(queue), 1);
+  TEST_ASSERT_EQUAL_INT(*queue->vtable->back(queue), 4);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->empty(queue), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->size(queue), 4);
 
-  TEST_ASSERT_EQUAL_INT(c->vtable->pop(c, &data), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->pop(queue, &data), 0);
   TEST_ASSERT_EQUAL_INT(data, 1);
 
-  TEST_ASSERT_EQUAL_INT(*c->vtable->front(c), 2);
-  TEST_ASSERT_EQUAL_INT(*c->vtable->back(c), 4);
-  TEST_ASSERT_EQUAL_INT(c->vtable->empty(c), 0);
-  TEST_ASSERT_EQUAL_INT(c->vtable->size(c), 3);
+  TEST_ASSERT_EQUAL_INT(*queue->vtable->front(queue), 2);
+  TEST_ASSERT_EQUAL_INT(*queue->vtable->back(queue), 4);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->empty(queue), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->size(queue), 3);
 
-  TEST_ASSERT_EQUAL_INT(c->vtable->pop(c, &data), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->pop(queue, &data), 0);
   TEST_ASSERT_EQUAL_INT(data, 2);
 
-  TEST_ASSERT_EQUAL_INT(*c->vtable->front(c), 3);
-  TEST_ASSERT_EQUAL_INT(*c->vtable->back(c), 4);
-  TEST_ASSERT_EQUAL_INT(c->vtable->empty(c), 0);
-  TEST_ASSERT_EQUAL_INT(c->vtable->size(c), 2);
+  TEST_ASSERT_EQUAL_INT(*queue->vtable->front(queue), 3);
+  TEST_ASSERT_EQUAL_INT(*queue->vtable->back(queue), 4);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->empty(queue), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->size(queue), 2);
 
-  TEST_ASSERT_EQUAL_INT(c->vtable->pop(c, &data), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->pop(queue, &data), 0);
   TEST_ASSERT_EQUAL_INT(data, 3);
 
-  TEST_ASSERT_EQUAL_INT(*c->vtable->front(c), 4);
-  TEST_ASSERT_EQUAL_INT(*c->vtable->back(c), 4);
-  TEST_ASSERT_EQUAL_INT(c->vtable->empty(c), 0);
-  TEST_ASSERT_EQUAL_INT(c->vtable->size(c), 1);
+  TEST_ASSERT_EQUAL_INT(*queue->vtable->front(queue), 4);
+  TEST_ASSERT_EQUAL_INT(*queue->vtable->back(queue), 4);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->empty(queue), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->size(queue), 1);
 
-  TEST_ASSERT_EQUAL_INT(c->vtable->pop(c, &data), 0);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->pop(queue, &data), 0);
   TEST_ASSERT_EQUAL_INT(data, 4);
 
-  TEST_ASSERT_NULL(c->vtable->front(c));
-  TEST_ASSERT_NULL(c->vtable->back(c));
-  TEST_ASSERT_EQUAL_INT(c->vtable->empty(c), 1);
-  TEST_ASSERT_EQUAL_INT(c->vtable->size(c), 0);
+  TEST_ASSERT_NULL(queue->vtable->front(queue));
+  TEST_ASSERT_NULL(queue->vtable->back(queue));
+  TEST_ASSERT_EQUAL_INT(queue->vtable->empty(queue), 1);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->size(queue), 0);
 }
 
 int main(void) {

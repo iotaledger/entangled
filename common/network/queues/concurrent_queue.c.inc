@@ -5,8 +5,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdlib.h>
-
 #define DEFINE_VTABLE_CONCURRENT_QUEUE_OF(TYPE) \
   vtable_concurrent_queue_of_##TYPE##_t const   \
       vtable_concurrent_queue_of_##TYPE##_g =   \
@@ -16,17 +14,6 @@
            CONCURRENT_QUEUE_OF_##TYPE##_SIZE,   \
            CONCURRENT_QUEUE_OF_##TYPE##_PUSH,   \
            CONCURRENT_QUEUE_OF_##TYPE##_POP};
-
-#define NEW_CONCURRENT_QUEUE_OF(TYPE, NAME)                            \
-  struct concurrent_queue_of_##TYPE##_s *NAME = malloc(sizeof(*NAME)); \
-  if (NAME != NULL) {                                                  \
-    NAME->front = NULL;                                                \
-    NAME->back = NULL;                                                 \
-    NAME->vtable = &vtable_concurrent_queue_of_##TYPE##_g;             \
-    NAME->size = 0;                                                    \
-    lock_handle_init(&NAME->lock);                                     \
-    cond_handle_init(&NAME->cond);                                     \
-  }
 
 #define DEFINE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE)    \
   TYPE *CONCURRENT_QUEUE_OF_##TYPE##_FRONT(                \

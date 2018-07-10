@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #include "common/cond_handle.h"
 #include "common/lock_handle.h"
 
@@ -38,6 +40,17 @@
     lock_handle_t lock;                                  \
     cond_handle_t cond;                                  \
   } concurrent_queue_of_##TYPE;
+
+#define INIT_CONCURRENT_QUEUE_OF(TYPE, NAME)                  \
+  NAME = (concurrent_queue_of_##TYPE *)malloc(sizeof(*NAME)); \
+  if (NAME != NULL) {                                         \
+    NAME->front = NULL;                                       \
+    NAME->back = NULL;                                        \
+    NAME->vtable = &vtable_concurrent_queue_of_##TYPE##_g;    \
+    NAME->size = 0;                                           \
+    lock_handle_init(&NAME->lock);                            \
+    cond_handle_init(&NAME->cond);                            \
+  }
 
 /**
  * Returns pointer to the first element in the queue. This element will be the
