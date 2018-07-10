@@ -5,6 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 #include "common/cond_handle.h"
@@ -28,7 +29,7 @@ typedef enum concurrent_queue_status_e {
   typedef struct vtable_concurrent_queue_of_##TYPE##_s {                      \
     TYPE *(*front)(struct concurrent_queue_of_##TYPE##_s *const self);        \
     TYPE *(*back)(struct concurrent_queue_of_##TYPE##_s *const self);         \
-    int (*empty)(struct concurrent_queue_of_##TYPE##_s *const self);          \
+    bool (*empty)(struct concurrent_queue_of_##TYPE##_s *const self);         \
     size_t (*size)(struct concurrent_queue_of_##TYPE##_s *const self);        \
     concurrent_queue_status_t (*push)(                                        \
         struct concurrent_queue_of_##TYPE##_s *const self, TYPE const data);  \
@@ -91,7 +92,7 @@ typedef enum concurrent_queue_status_e {
  * @return true if the queue is empty, false otherwise
  */
 #define DECLARE_FUNCTION_EMPTY_CONCURRENT_QUEUE_OF(TYPE) \
-  int CONCURRENT_QUEUE_OF_##TYPE##_EMPTY(                \
+  bool CONCURRENT_QUEUE_OF_##TYPE##_EMPTY(               \
       struct concurrent_queue_of_##TYPE##_s *const self);
 
 /**

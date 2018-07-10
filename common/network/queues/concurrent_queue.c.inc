@@ -38,10 +38,10 @@
   }
 
 #define DEFINE_FUNCTION_EMPTY_CONCURRENT_QUEUE_OF(TYPE)    \
-  int CONCURRENT_QUEUE_OF_##TYPE##_EMPTY(                  \
+  bool CONCURRENT_QUEUE_OF_##TYPE##_EMPTY(                 \
       struct concurrent_queue_of_##TYPE##_s *const self) { \
     size_t size;                                           \
-    if (self == NULL) return 1;                            \
+    if (self == NULL) return true;                         \
     lock_handle_lock(&self->lock);                         \
     size = self->size;                                     \
     lock_handle_unlock(&self->lock);                       \
