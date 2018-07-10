@@ -9,8 +9,9 @@
 #define COMMON_LOCK_HANDLE_H_
 
 /**
- * We declare a type lock_handle_t that depends on the system available lock
- * primitives
+ * We declare a type lock_handle_t, depending on the system available lock
+ * primitives, and its associated functions; some of them might have no effect
+ * if not needed by the underlying API
  */
 
 #include <unistd.h>
@@ -18,19 +19,8 @@
 #ifdef _POSIX_THREADS
 
 #include <pthread.h>
+
 typedef pthread_mutex_t lock_handle_t;
-
-#else
-
-#error "No lock primitives found"
-
-#endif  // _POSIX_THREADS
-
-/**
- * The following functions are defined contextually with macros depending on the
- * system available lock primitives, some of them might have no effect if not
- * needed by the underlying API
- */
 
 /**
  * Initializes a lock
@@ -39,7 +29,9 @@ typedef pthread_mutex_t lock_handle_t;
  *
  * @return exit status
  */
-int lock_handle_init(lock_handle_t* const lock);
+static inline int lock_handle_init(lock_handle_t* const lock) {
+  return pthread_mutex_init(lock, NULL);
+}
 
 /**
  * Acquires ownership of the given lock
@@ -48,7 +40,9 @@ int lock_handle_init(lock_handle_t* const lock);
  *
  * @return exit status
  */
-int lock_handle_lock(lock_handle_t* const lock);
+static inline int lock_handle_lock(lock_handle_t* const lock) {
+  return pthread_mutex_lock(lock);
+}
 
 /**
  * Releases ownership of the given lock
@@ -57,7 +51,9 @@ int lock_handle_lock(lock_handle_t* const lock);
  *
  * @return exit status
  */
-int lock_handle_unlock(lock_handle_t* const lock);
+static inline int lock_handle_unlock(lock_handle_t* const lock) {
+  return pthread_mutex_unlock(lock);
+}
 
 /**
  * Destroys the lock
@@ -66,6 +62,14 @@ int lock_handle_unlock(lock_handle_t* const lock);
  *
  * @return exit status
  */
-int lock_handle_destroy(lock_handle_t* const lock);
+static inline int lock_handle_destroy(lock_handle_t* const lock) {
+  return pthread_mutex_destroy(lock);
+}
+
+#else
+
+#error "No lock primitives found"
+
+#endif  // _POSIX_THREADS
 
 #endif  // COMMON_LOCK_HANDLE_H_
