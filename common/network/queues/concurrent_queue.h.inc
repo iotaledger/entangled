@@ -49,15 +49,16 @@ typedef enum concurrent_queue_status_e {
     cond_handle_t cond;                                  \
   } concurrent_queue_of_##TYPE;
 
-#define INIT_CONCURRENT_QUEUE_OF(TYPE, NAME)                  \
-  NAME = (concurrent_queue_of_##TYPE *)malloc(sizeof(*NAME)); \
-  if (NAME != NULL) {                                         \
-    NAME->front = NULL;                                       \
-    NAME->back = NULL;                                        \
-    NAME->vtable = &vtable_concurrent_queue_of_##TYPE##_g;    \
-    NAME->size = 0;                                           \
-    lock_handle_init(&NAME->lock);                            \
-    cond_handle_init(&NAME->cond);                            \
+#define INIT_CONCURRENT_QUEUE_OF(TYPE, NAME)               \
+  NAME = (concurrent_queue_of_##TYPE *)malloc(             \
+      sizeof(concurrent_queue_of_##TYPE));                 \
+  if (NAME != NULL) {                                      \
+    NAME->front = NULL;                                    \
+    NAME->back = NULL;                                     \
+    NAME->vtable = &vtable_concurrent_queue_of_##TYPE##_g; \
+    NAME->size = 0;                                        \
+    lock_handle_init(&NAME->lock);                         \
+    cond_handle_init(&NAME->cond);                         \
   }
 
 /**
