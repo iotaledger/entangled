@@ -98,7 +98,8 @@
       struct concurrent_queue_of_##TYPE##_s *const self, TYPE const data) { \
     concurrent_queue_node_of_##TYPE##_t *node;                              \
     if (self == NULL) return CONCURRENT_QUEUE_NULL_SELF;                    \
-    node = calloc(1, sizeof(concurrent_queue_node_of_##TYPE##_t));          \
+    node = (concurrent_queue_node_of_##TYPE##_t *)calloc(                   \
+        1, sizeof(concurrent_queue_node_of_##TYPE##_t));                    \
     if (node == NULL) return CONCURRENT_QUEUE_ALLOC_FAILED;                 \
     node->data = data;                                                      \
     lock_handle_lock(&self->lock);                                          \
