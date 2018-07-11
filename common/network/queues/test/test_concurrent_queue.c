@@ -18,6 +18,7 @@ typedef concurrent_queue_of_int conqueue_int;
 void test_concurrent_queue() {
   int data;
   conqueue_int *queue;
+  conqueue_int *nqueue = NULL;
   TEST_ASSERT_EQUAL_INT(INIT_CONCURRENT_QUEUE_OF(int, queue),
                         CONCURRENT_QUEUE_SUCCESS);
   TEST_ASSERT_NOT_NULL(queue);
@@ -98,7 +99,22 @@ void test_concurrent_queue() {
   TEST_ASSERT_EQUAL_INT(queue->vtable->empty(queue), true);
   TEST_ASSERT_EQUAL_INT(queue->vtable->size(queue), 0);
 
-  free(queue);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->push(queue, 0),
+                        CONCURRENT_QUEUE_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->push(queue, 1),
+                        CONCURRENT_QUEUE_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->push(queue, 2),
+                        CONCURRENT_QUEUE_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->push(queue, 3),
+                        CONCURRENT_QUEUE_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(queue->vtable->push(queue, 4),
+                        CONCURRENT_QUEUE_SUCCESS);
+
+  TEST_ASSERT_EQUAL_INT(DESTROY_CONCURRENT_QUEUE_OF(int, nqueue),
+                        CONCURRENT_QUEUE_NULL_SELF);
+  TEST_ASSERT_EQUAL_INT(DESTROY_CONCURRENT_QUEUE_OF(int, queue),
+                        CONCURRENT_QUEUE_SUCCESS);
+  TEST_ASSERT_NULL(queue);
 }
 
 int main(void) {

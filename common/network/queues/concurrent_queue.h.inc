@@ -49,12 +49,34 @@ typedef enum concurrent_queue_status_e {
     cond_handle_t cond;                                  \
   } concurrent_queue_of_##TYPE;
 
-#define DECLARE_FUNCTION_INIT_CONCURRENT_QUEUE_OF(TYPE) \
-  int CONCURRENT_QUEUE_OF_##TYPE##_INIT(                \
-      struct concurrent_queue_of_##TYPE##_s **const self);
-
 #define INIT_CONCURRENT_QUEUE_OF(TYPE, NAME) \
   CONCURRENT_QUEUE_OF_##TYPE##_INIT(&NAME)
+
+#define DESTROY_CONCURRENT_QUEUE_OF(TYPE, NAME) \
+  CONCURRENT_QUEUE_OF_##TYPE##_DESTROY(&NAME)
+
+/**
+ * Initializes a concurrent queue
+ *
+ * @param self The queue
+ *
+ * @return an exit status
+ */
+#define DECLARE_FUNCTION_INIT_CONCURRENT_QUEUE_OF(TYPE)        \
+  concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_INIT( \
+      struct concurrent_queue_of_##TYPE##_s **const self);
+
+/**
+ * Destroys a concurrent queue
+ * /!\ This function is not thread safe
+ *
+ * @param self The queue
+ *
+ * @return an exit status
+ */
+#define DECLARE_FUNCTION_DESTROY_CONCURRENT_QUEUE_OF(TYPE)        \
+  concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_DESTROY( \
+      struct concurrent_queue_of_##TYPE##_s **const self);
 
 /**
  * Returns pointer to the first element in the queue. This element will be the
@@ -126,14 +148,15 @@ typedef enum concurrent_queue_status_e {
   concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_POP( \
       struct concurrent_queue_of_##TYPE##_s *const self, TYPE *const data);
 
-#define DECLARE_CONCURRENT_QUEUE_OF(TYPE)          \
-  DECLARE_STRUCT_CONCURRENT_QUEUE_NODE_OF(TYPE)    \
-  DECLARE_VTABLE_CONCURRENT_QUEUE_OF(TYPE)         \
-  DECLARE_STRUCT_CONCURRENT_QUEUE_OF(TYPE)         \
-  DECLARE_FUNCTION_INIT_CONCURRENT_QUEUE_OF(TYPE)  \
-  DECLARE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE) \
-  DECLARE_FUNCTION_BACK_CONCURRENT_QUEUE_OF(TYPE)  \
-  DECLARE_FUNCTION_EMPTY_CONCURRENT_QUEUE_OF(TYPE) \
-  DECLARE_FUNCTION_SIZE_CONCURRENT_QUEUE_OF(TYPE)  \
-  DECLARE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE)  \
-  DECLARE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE)\
+#define DECLARE_CONCURRENT_QUEUE_OF(TYPE)            \
+  DECLARE_STRUCT_CONCURRENT_QUEUE_NODE_OF(TYPE)      \
+  DECLARE_VTABLE_CONCURRENT_QUEUE_OF(TYPE)           \
+  DECLARE_STRUCT_CONCURRENT_QUEUE_OF(TYPE)           \
+  DECLARE_FUNCTION_INIT_CONCURRENT_QUEUE_OF(TYPE)    \
+  DECLARE_FUNCTION_DESTROY_CONCURRENT_QUEUE_OF(TYPE) \
+  DECLARE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE)   \
+  DECLARE_FUNCTION_BACK_CONCURRENT_QUEUE_OF(TYPE)    \
+  DECLARE_FUNCTION_EMPTY_CONCURRENT_QUEUE_OF(TYPE)   \
+  DECLARE_FUNCTION_SIZE_CONCURRENT_QUEUE_OF(TYPE)    \
+  DECLARE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE)    \
+  DECLARE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE)
