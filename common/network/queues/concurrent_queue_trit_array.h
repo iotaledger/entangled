@@ -12,6 +12,14 @@
 
 #include "concurrent_queue.h.inc"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 DECLARE_CONCURRENT_QUEUE_OF(trit_array_p);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __COMMON_NETWORK_CONCURRENT_QUEUE_TRIT_ARRAY_H__

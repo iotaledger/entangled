@@ -17,6 +17,14 @@ typedef struct {
   neighbor_t neighbor;
 } hash_request_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 DECLARE_CONCURRENT_QUEUE_OF(hash_request_t);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __COMMON_NETWORK_CONCURRENT_QUEUE_HASH_REQUEST_H__
