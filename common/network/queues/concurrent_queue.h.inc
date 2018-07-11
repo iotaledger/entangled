@@ -49,17 +49,12 @@ typedef enum concurrent_queue_status_e {
     cond_handle_t cond;                                  \
   } concurrent_queue_of_##TYPE;
 
-#define INIT_CONCURRENT_QUEUE_OF(TYPE, NAME)               \
-  NAME = (concurrent_queue_of_##TYPE *)malloc(             \
-      sizeof(concurrent_queue_of_##TYPE));                 \
-  if (NAME != NULL) {                                      \
-    NAME->front = NULL;                                    \
-    NAME->back = NULL;                                     \
-    NAME->vtable = &vtable_concurrent_queue_of_##TYPE##_g; \
-    NAME->size = 0;                                        \
-    lock_handle_init(&NAME->lock);                         \
-    cond_handle_init(&NAME->cond);                         \
-  }
+#define DECLARE_FUNCTION_INIT_CONCURRENT_QUEUE_OF(TYPE) \
+  int CONCURRENT_QUEUE_OF_##TYPE##_INIT(                \
+      struct concurrent_queue_of_##TYPE##_s **const self);
+
+#define INIT_CONCURRENT_QUEUE_OF(TYPE, NAME) \
+  CONCURRENT_QUEUE_OF_##TYPE##_INIT(&NAME)
 
 /**
  * Returns pointer to the first element in the queue. This element will be the
@@ -135,6 +130,7 @@ typedef enum concurrent_queue_status_e {
   DECLARE_STRUCT_CONCURRENT_QUEUE_NODE_OF(TYPE)    \
   DECLARE_VTABLE_CONCURRENT_QUEUE_OF(TYPE)         \
   DECLARE_STRUCT_CONCURRENT_QUEUE_OF(TYPE)         \
+  DECLARE_FUNCTION_INIT_CONCURRENT_QUEUE_OF(TYPE)  \
   DECLARE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE) \
   DECLARE_FUNCTION_BACK_CONCURRENT_QUEUE_OF(TYPE)  \
   DECLARE_FUNCTION_EMPTY_CONCURRENT_QUEUE_OF(TYPE) \

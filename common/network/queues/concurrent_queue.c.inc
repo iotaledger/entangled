@@ -15,6 +15,22 @@
            CONCURRENT_QUEUE_OF_##TYPE##_PUSH,   \
            CONCURRENT_QUEUE_OF_##TYPE##_POP};
 
+#define DEFINE_FUNCTION_INIT_CONCURRENT_QUEUE_OF(TYPE)        \
+  int CONCURRENT_QUEUE_OF_##TYPE##_INIT(                      \
+      struct concurrent_queue_of_##TYPE##_s **const self) {   \
+    if (self == NULL) return CONCURRENT_QUEUE_NULL_SELF;      \
+    *self = (concurrent_queue_of_##TYPE *)malloc(             \
+        sizeof(concurrent_queue_of_##TYPE));                  \
+    if (*self == NULL) return CONCURRENT_QUEUE_ALLOC_FAILED;  \
+    (*self)->front = NULL;                                    \
+    (*self)->back = NULL;                                     \
+    (*self)->vtable = &vtable_concurrent_queue_of_##TYPE##_g; \
+    (*self)->size = 0;                                        \
+    lock_handle_init(&(*self)->lock);                         \
+    cond_handle_init(&(*self)->cond);                         \
+    return CONCURRENT_QUEUE_SUCCESS;                          \
+  }
+
 #define DEFINE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE)    \
   TYPE *CONCURRENT_QUEUE_OF_##TYPE##_FRONT(                \
       struct concurrent_queue_of_##TYPE##_s *const self) { \
@@ -102,6 +118,7 @@
 
 #define DEFINE_CONCURRENT_QUEUE_OF(TYPE)          \
   DEFINE_VTABLE_CONCURRENT_QUEUE_OF(TYPE)         \
+  DEFINE_FUNCTION_INIT_CONCURRENT_QUEUE_OF(TYPE)  \
   DEFINE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE) \
   DEFINE_FUNCTION_BACK_CONCURRENT_QUEUE_OF(TYPE)  \
   DEFINE_FUNCTION_EMPTY_CONCURRENT_QUEUE_OF(TYPE) \
