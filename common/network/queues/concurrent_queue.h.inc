@@ -5,6 +5,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#ifndef __COMMON_NETWORK_CONCURRENT_QUEUE_H__
+#define __COMMON_NETWORK_CONCURRENT_QUEUE_H__
+
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -160,3 +163,5 @@ typedef enum concurrent_queue_status_e {
   DECLARE_FUNCTION_SIZE_CONCURRENT_QUEUE_OF(TYPE)    \
   DECLARE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE)    \
   DECLARE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE)
+
+#endif  // __COMMON_NETWORK_CONCURRENT_QUEUE_H__
