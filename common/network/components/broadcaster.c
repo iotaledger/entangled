@@ -17,7 +17,8 @@ void broadcaster_on_next(broadcaster_state_t *const state,
 void *broadcaster_routine(broadcaster_state_t *const state) {
   trit_array_p hash;
 
-  printf("Spawning broadcaster thread\n");  // TODO(thibault@iota.org) logger
+  // TODO(thibault@iota.org) logger
+  printf("Spawning broadcaster thread\n");
   state->running = true;
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &hash) ==
