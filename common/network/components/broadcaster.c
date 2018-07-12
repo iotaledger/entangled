@@ -5,9 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdio.h>
-
 #include "broadcaster.h"
+#include "common/network/logger.h"
 
 void broadcaster_on_next(broadcaster_state_t *const state,
                          trit_array_p const hash) {
@@ -17,8 +16,7 @@ void broadcaster_on_next(broadcaster_state_t *const state,
 void *broadcaster_routine(broadcaster_state_t *const state) {
   trit_array_p hash;
 
-  // TODO(thibault@iota.org) logger
-  printf("Spawning broadcaster thread\n");
+  log_info("Spawning broadcaster thread");
   state->running = true;
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &hash) ==
@@ -28,6 +26,6 @@ void *broadcaster_routine(broadcaster_state_t *const state) {
       // }
     }
   }
-  printf("Shutting down broadcaster thread\n");
+  log_info("Shutting down broadcaster thread");
   return NULL;
 }

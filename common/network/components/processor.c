@@ -5,9 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdio.h>
-
 #include "processor.h"
+#include "common/network/logger.h"
 
 void processor_on_next(processor_state_t *const state,
                        trit_array_p const hash) {
@@ -17,8 +16,7 @@ void processor_on_next(processor_state_t *const state,
 void *processor_routine(processor_state_t *const state) {
   trit_array_p hash;
 
-  // TODO(thibault@iota.org) logger
-  printf("Spawning processor thread\n");
+  log_info("Spawning processor thread");
   state->running = true;
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &hash) ==
@@ -26,6 +24,6 @@ void *processor_routine(processor_state_t *const state) {
       // TODO(thibault@iota.org) actual processing of the hash
     }
   }
-  printf("Shutting down processor thread\n");
+  log_info("Shutting down processor thread");
   return NULL;
 }

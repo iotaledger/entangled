@@ -5,6 +5,7 @@ cc_library(
     srcs = ["broadcaster.c"],
     hdrs = ["broadcaster.h"],
     deps = [
+        "//common/network:logger",
         "//common/network/queues:concurrent_queue_trit_array",
     ],
 )
@@ -14,6 +15,7 @@ cc_library(
     srcs = ["processor.c"],
     hdrs = ["processor.h"],
     deps = [
+        "//common/network:logger",
         "//common/network/queues:concurrent_queue_trit_array",
     ],
 )
@@ -23,6 +25,7 @@ cc_library(
     srcs = ["responder.c"],
     hdrs = ["responder.h"],
     deps = [
+        "//common/network:logger",
         "//common/network/queues:concurrent_queue_hash_request",
     ],
 )

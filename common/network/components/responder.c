@@ -5,9 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdio.h>
-
 #include "responder.h"
+#include "common/network/logger.h"
 
 void responder_on_next(responder_state_t *const state, trit_array_p const hash,
                        neighbor_t *const neighbor) {
@@ -17,8 +16,7 @@ void responder_on_next(responder_state_t *const state, trit_array_p const hash,
 void *responder_routine(responder_state_t *const state) {
   hash_request_t request;
 
-  // TODO(thibault@iota.org) logger
-  printf("Spawning responder thread\n");
+  log_info("Spawning responder thread");
   state->running = true;
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &request) ==
@@ -26,6 +24,6 @@ void *responder_routine(responder_state_t *const state) {
       // TODO(thibault@iota.org) actual responding to the request
     }
   }
-  printf("Shutting down responder thread\n");
+  log_info("Shutting down responder thread");
   return NULL;
 }
