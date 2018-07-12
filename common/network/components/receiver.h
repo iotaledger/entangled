@@ -8,7 +8,10 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_RECEIVER_H__
 #define __COMMON_NETWORK_COMPONENTS_RECEIVER_H__
 
+#include <stdbool.h>
+
 typedef struct {
+  bool running;
 } receiver_state_t;
 
 #ifdef __cplusplus

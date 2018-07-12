@@ -34,13 +34,12 @@ cc_library(
     name = "receiver",
     srcs = ["receiver.c"],
     hdrs = ["receiver.h"],
+    deps = ["//common/network:logger"],
 )
 
 cc_library(
     name = "requester",
     srcs = ["requester.c"],
     hdrs = ["requester.h"],
-    deps = [
-        "//common/network/queues:concurrent_queue_trit_array",
-    ],
+    deps = ["//common/network/queues:concurrent_queue_trit_array"],
 )
