@@ -5,10 +5,27 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdio.h>
+
 #include "responder.h"
 
-void responder_on_next(responder_state_t *const state,
-                       trit_array_t const *const hash,
-                       neighbor_t *const neighbor) {}
+void responder_on_next(responder_state_t *const state, trit_array_p const hash,
+                       neighbor_t *const neighbor) {
+  state->queue->vtable->push(state->queue, (hash_request_t){hash, *neighbor});
+}
 
-void *responder_routine(responder_state_t *const state) {}
+void *responder_routine(responder_state_t *const state) {
+  hash_request_t request;
+
+  // TODO(thibault@iota.org) logger
+  printf("Spawning responder thread\n");
+  state->running = true;
+  while (state->running) {
+    if (state->queue->vtable->pop(state->queue, &request) ==
+        CONCURRENT_QUEUE_SUCCESS) {
+      // TODO(thibault@iota.org) actual responding to the request
+    }
+  }
+  printf("Shutting down responder thread\n");
+  return NULL;
+}

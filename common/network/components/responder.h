@@ -8,20 +8,22 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_RESPONDER_H__
 #define __COMMON_NETWORK_COMPONENTS_RESPONDER_H__
 
+#include <stdbool.h>
+
 #include "common/network/queues/concurrent_queue_hash_request.h"
 
 typedef concurrent_queue_of_hash_request_t responder_queue_t;
 
 typedef struct {
   responder_queue_t *queue;
+  bool running;
 } responder_state_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void responder_on_next(responder_state_t *const state,
-                       trit_array_t const *const hash,
+void responder_on_next(responder_state_t *const state, trit_array_p const hash,
                        neighbor_t *const neighbor);
 void *responder_routine(responder_state_t *const state);
 
