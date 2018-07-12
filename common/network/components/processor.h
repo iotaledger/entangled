@@ -16,8 +16,16 @@ typedef struct {
   processor_queue_t *queue;
 } processor_state_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void processor_on_next(processor_state_t *const state,
                        trit_array_t const *const hash);
 void *processor_routine(processor_state_t *const state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  //__COMMON_NETWORK_COMPONENTS_PROCESSOR_H__

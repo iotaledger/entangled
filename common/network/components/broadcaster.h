@@ -16,8 +16,16 @@ typedef struct {
   broadcaster_queue_t *queue;
 } broadcaster_state_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void broadcaster_on_next(broadcaster_state_t *const state,
                          trit_array_t const *const hash);
 void *broadcaster_routine(broadcaster_state_t *const state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  //__COMMON_NETWORK_COMPONENTS_BROADCASTER_H__

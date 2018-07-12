@@ -11,6 +11,14 @@
 typedef struct {
 } receiver_state_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void *receiver_routine(receiver_state_t *const state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  //__COMMON_NETWORK_COMPONENTS_RECEIVER_H__

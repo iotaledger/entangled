@@ -16,9 +16,17 @@ typedef struct {
   responder_queue_t *queue;
 } responder_state_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void responder_on_next(responder_state_t *const state,
                        trit_array_t const *const hash,
                        neighbor_t *const neighbor);
 void *responder_routine(responder_state_t *const state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  //__COMMON_NETWORK_COMPONENTS_RESPONDER_H__
