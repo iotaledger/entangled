@@ -16,8 +16,16 @@ typedef struct {
   requester_queue_t *queue;
 } requester_state_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void request_transaction(requester_state_t *const state,
-                         trit_array_t const *const hash);
-trit_array_t *get_transaction_to_request();
+                         trit_array_p const hash);
+trit_array_p get_transaction_to_request(requester_state_t *const state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  //__COMMON_NETWORK_COMPONENTS_REQUESTER_H__
