@@ -9,7 +9,6 @@
 #define __COMMON_NETWORK_CONCURRENT_QUEUE_H__
 
 #include <stdbool.h>
-#include <stdlib.h>
 
 #include "common/cond_handle.h"
 #include "common/lock_handle.h"

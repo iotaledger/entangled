@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #define DEFINE_VTABLE_CONCURRENT_QUEUE_OF(TYPE) \
   vtable_concurrent_queue_of_##TYPE##_t const   \
       vtable_concurrent_queue_of_##TYPE##_g =   \
