@@ -8,8 +8,6 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_REQUESTER_H__
 #define __COMMON_NETWORK_COMPONENTS_REQUESTER_H__
 
-#include <stdbool.h>
-
 #include "common/network/queues/concurrent_queue_trit_array.h"
 
 typedef concurrent_queue_of_trit_array_p requester_queue_t;

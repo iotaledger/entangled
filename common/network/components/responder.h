@@ -8,8 +8,6 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_RESPONDER_H__
 #define __COMMON_NETWORK_COMPONENTS_RESPONDER_H__
 
-#include <stdbool.h>
-
 #include "common/network/queues/concurrent_queue_hash_request.h"
 
 typedef concurrent_queue_of_hash_request_t responder_queue_t;
