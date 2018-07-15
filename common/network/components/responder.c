@@ -21,7 +21,7 @@ static void *responder_routine(responder_state_t *const state) {
   return NULL;
 }
 
-bool responder_init(responder_state_t *const state) {
+bool responder_start(responder_state_t *const state) {
   if (state == NULL) return false;
   if (INIT_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS)

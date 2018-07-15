@@ -21,7 +21,7 @@ typedef struct {
 extern "C" {
 #endif
 
-bool broadcaster_init(broadcaster_state_t *const state);
+bool broadcaster_start(broadcaster_state_t *const state);
 bool broadcaster_on_next(broadcaster_state_t *const state,
                          trit_array_p const hash);
 bool broadcaster_stop(broadcaster_state_t *const state);

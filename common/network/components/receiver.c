@@ -16,7 +16,7 @@ static void *receiver_routine(receiver_state_t *const state) {
   return NULL;
 }
 
-bool receiver_init(receiver_state_t *const state) {
+bool receiver_start(receiver_state_t *const state) {
   if (state == NULL) return false;
   state->running = true;
   log_info("Spawning receiver thread");

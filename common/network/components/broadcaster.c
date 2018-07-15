@@ -21,7 +21,7 @@ static void *broadcaster_routine(broadcaster_state_t *const state) {
   return NULL;
 }
 
-bool broadcaster_init(broadcaster_state_t *const state) {
+bool broadcaster_start(broadcaster_state_t *const state) {
   if (state == NULL) return false;
   if (INIT_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS)

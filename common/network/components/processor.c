@@ -21,7 +21,7 @@ static void *processor_routine(processor_state_t *const state) {
   return NULL;
 }
 
-bool processor_init(processor_state_t *const state) {
+bool processor_start(processor_state_t *const state) {
   if (state == NULL) return false;
   if (INIT_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS)

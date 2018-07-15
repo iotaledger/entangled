@@ -21,7 +21,7 @@ typedef struct {
 extern "C" {
 #endif
 
-bool responder_init(responder_state_t *const state);
+bool responder_start(responder_state_t *const state);
 bool responder_on_next(responder_state_t *const state, trit_array_p const hash,
                        neighbor_t *const neighbor);
 bool responder_stop(responder_state_t *const state);
