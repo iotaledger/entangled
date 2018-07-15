@@ -35,6 +35,7 @@ bool responder_init(responder_state_t *const state) {
 
 bool responder_on_next(responder_state_t *const state, trit_array_p const hash,
                        neighbor_t *const neighbor) {
+  if (state == NULL) return false;
   return state->queue->vtable->push(state->queue,
                                     (hash_request_t){hash, *neighbor}) ==
          CONCURRENT_QUEUE_SUCCESS;
