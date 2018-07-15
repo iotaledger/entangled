@@ -5,6 +5,7 @@ cc_library(
     srcs = ["broadcaster.c"],
     hdrs = ["broadcaster.h"],
     deps = [
+        "//common:thread_handle",
         "//common/network:logger",
         "//common/network/queues:concurrent_queue_trit_array",
     ],
@@ -15,6 +16,7 @@ cc_library(
     srcs = ["processor.c"],
     hdrs = ["processor.h"],
     deps = [
+        "//common:thread_handle",
         "//common/network:logger",
         "//common/network/queues:concurrent_queue_trit_array",
     ],
@@ -25,6 +27,7 @@ cc_library(
     srcs = ["responder.c"],
     hdrs = ["responder.h"],
     deps = [
+        "//common:thread_handle",
         "//common/network:logger",
         "//common/network/queues:concurrent_queue_hash_request",
     ],
@@ -34,7 +37,10 @@ cc_library(
     name = "receiver",
     srcs = ["receiver.c"],
     hdrs = ["receiver.h"],
-    deps = ["//common/network:logger"],
+    deps = [
+        "//common:thread_handle",
+        "//common/network:logger",
+    ],
 )
 
 cc_library(

@@ -9,11 +9,13 @@
 #define __COMMON_NETWORK_COMPONENTS_PROCESSOR_H__
 
 #include "common/network/queues/concurrent_queue_trit_array.h"
+#include "common/thread_handle.h"
 
 typedef concurrent_queue_of_trit_array_p processor_queue_t;
 
 typedef struct {
   processor_queue_t *queue;
+  thread_handle_t thread;
   bool running;
 } processor_state_t;
 

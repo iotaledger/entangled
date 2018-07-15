@@ -26,9 +26,10 @@ bool responder_start(responder_state_t *const state) {
   if (INIT_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS)
     return false;
-  state->running = true;
   log_info("Spawning responder thread");
-  // TODO(thibault) spawn thread
+  state->running = true;
+  thread_handle_create(&state->thread, (thread_routine_t)responder_routine,
+                       state);
   return true;
 }
 
@@ -42,11 +43,11 @@ bool responder_on_next(responder_state_t *const state, trit_array_p const hash,
 
 bool responder_stop(responder_state_t *const state) {
   if (state == NULL) return false;
-  state->running = false;
   if (DESTROY_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS)
     return false;
   log_info("Shutting down responder thread");
-  // TODO(thibault) join thread
+  state->running = false;
+  thread_handle_join(state->thread, NULL);
   return true;
 }

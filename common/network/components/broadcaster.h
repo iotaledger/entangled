@@ -9,11 +9,13 @@
 #define __COMMON_NETWORK_COMPONENTS_BROADCASTER_H__
 
 #include "common/network/queues/concurrent_queue_trit_array.h"
+#include "common/thread_handle.h"
 
 typedef concurrent_queue_of_trit_array_p broadcaster_queue_t;
 
 typedef struct {
   broadcaster_queue_t *queue;
+  thread_handle_t thread;
   bool running;
 } broadcaster_state_t;
 

@@ -10,7 +10,10 @@
 
 #include <stdbool.h>
 
+#include "common/thread_handle.h"
+
 typedef struct {
+  thread_handle_t thread;
   bool running;
 } receiver_state_t;
 

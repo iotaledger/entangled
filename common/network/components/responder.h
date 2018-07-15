@@ -9,11 +9,13 @@
 #define __COMMON_NETWORK_COMPONENTS_RESPONDER_H__
 
 #include "common/network/queues/concurrent_queue_hash_request.h"
+#include "common/thread_handle.h"
 
 typedef concurrent_queue_of_hash_request_t responder_queue_t;
 
 typedef struct {
   responder_queue_t *queue;
+  thread_handle_t thread;
   bool running;
 } responder_state_t;
 
