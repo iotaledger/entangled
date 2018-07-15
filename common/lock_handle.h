@@ -68,7 +68,7 @@ static inline int lock_handle_destroy(lock_handle_t* const lock) {
 
 #else
 
-#error "No lock primitives found"
+#error "No lock primitive found"
 
 #endif  // _POSIX_THREADS
 

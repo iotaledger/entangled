@@ -86,7 +86,7 @@ static inline int cond_handle_destroy(cond_handle_t* const cond) {
 
 #else
 
-#error "No condition variable primitives found"
+#error "No condition variable primitive found"
 
 #endif  // _POSIX_THREADS
 
