@@ -24,6 +24,7 @@ bool requester_init(requester_state_t *const state);
 bool request_transaction(requester_state_t *const state,
                          trit_array_p const hash);
 trit_array_p get_transaction_to_request(requester_state_t *const state);
+bool requester_stop(requester_state_t *const state);
 
 #ifdef __cplusplus
 }

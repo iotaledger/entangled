@@ -15,10 +15,9 @@ static void *broadcaster_routine(broadcaster_state_t *const state) {
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &hash) ==
         CONCURRENT_QUEUE_SUCCESS) {
-      // TODO(thibault) broadcasting of the hash
+      // TODO(thibault) broadcast the hash
     }
   }
-  log_info("Shutting down broadcaster thread");
   return NULL;
 }
 
@@ -29,7 +28,7 @@ bool broadcaster_init(broadcaster_state_t *const state) {
     return false;
   state->running = true;
   log_info("Spawning broadcaster thread");
-  // TODO(thibault) spawning of the thread
+  // TODO(thibault) spawn thread
   return true;
 }
 
@@ -38,4 +37,15 @@ bool broadcaster_on_next(broadcaster_state_t *const state,
   if (state == NULL) return false;
   return state->queue->vtable->push(state->queue, hash) ==
          CONCURRENT_QUEUE_SUCCESS;
+}
+
+bool broadcaster_stop(broadcaster_state_t *const state) {
+  if (state == NULL) return false;
+  state->running = false;
+  if (DESTROY_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
+      CONCURRENT_QUEUE_SUCCESS)
+    return false;
+  log_info("Shutting down broadcaster thread");
+  // TODO(thibault) join thread
+  return true;
 }

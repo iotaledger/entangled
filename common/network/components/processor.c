@@ -15,10 +15,9 @@ static void *processor_routine(processor_state_t *const state) {
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &hash) ==
         CONCURRENT_QUEUE_SUCCESS) {
-      // TODO(thibault) processing of the hash
+      // TODO(thibault) process the hash
     }
   }
-  log_info("Shutting down processor thread");
   return NULL;
 }
 
@@ -29,7 +28,7 @@ bool processor_init(processor_state_t *const state) {
     return false;
   state->running = true;
   log_info("Spawning processor thread");
-  // TODO(thibault) spawning of the thread
+  // TODO(thibault) spawn thread
   return true;
 }
 
@@ -38,4 +37,15 @@ bool processor_on_next(processor_state_t *const state,
   if (state == NULL) return false;
   return state->queue->vtable->push(state->queue, hash) ==
          CONCURRENT_QUEUE_SUCCESS;
+}
+
+bool processor_stop(processor_state_t *const state) {
+  if (state == NULL) return false;
+  state->running = false;
+  if (DESTROY_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
+      CONCURRENT_QUEUE_SUCCESS)
+    return false;
+  log_info("Shutting down processor thread");
+  // TODO(thibault) join thread
+  return true;
 }

@@ -11,9 +11,8 @@
 static void *receiver_routine(receiver_state_t *const state) {
   if (state == NULL) return NULL;
   while (state->running) {
-    // TODO(thibault) receiving
+    // TODO(thibault) receive
   }
-  log_info("Shutting down receiver thread");
   return NULL;
 }
 
@@ -21,6 +20,14 @@ bool receiver_init(receiver_state_t *const state) {
   if (state == NULL) return false;
   state->running = true;
   log_info("Spawning receiver thread");
-  // TODO(thibault) spawning of the thread
+  // TODO(thibault) spawn thread
+  return true;
+}
+
+bool receiver_stop(receiver_state_t *const state) {
+  if (state == NULL) return false;
+  state->running = false;
+  log_info("Shutting down receiver thread");
+  // TODO(thibault) join thread
   return true;
 }

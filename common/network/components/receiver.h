@@ -19,6 +19,7 @@ extern "C" {
 #endif
 
 bool receiver_init(receiver_state_t *const state);
+bool receiver_stop(receiver_state_t *const state);
 
 #ifdef __cplusplus
 }

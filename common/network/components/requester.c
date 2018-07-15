@@ -31,3 +31,11 @@ trit_array_p get_transaction_to_request(requester_state_t *const state) {
     return NULL;
   return hash;
 }
+
+bool requester_stop(requester_state_t *const state) {
+  if (state == NULL) return false;
+  if (DESTROY_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
+      CONCURRENT_QUEUE_SUCCESS)
+    return false;
+  return true;
+}
