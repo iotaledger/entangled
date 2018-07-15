@@ -18,7 +18,7 @@ typedef struct {
 extern "C" {
 #endif
 
-void *receiver_routine(receiver_state_t *const state);
+bool receiver_init(receiver_state_t *const state);
 
 #ifdef __cplusplus
 }

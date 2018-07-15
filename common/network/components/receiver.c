@@ -8,12 +8,19 @@
 #include "receiver.h"
 #include "common/network/logger.h"
 
-void *receiver_routine(receiver_state_t *const state) {
-  log_info("Spawning receiver thread");
-  state->running = true;
+static void *receiver_routine(receiver_state_t *const state) {
+  if (state == NULL) return NULL;
   while (state->running) {
-    // TODO(thibault@iota.org) actual receiving
+    // TODO(thibault) receiving
   }
   log_info("Shutting down receiver thread");
   return NULL;
+}
+
+bool receiver_init(receiver_state_t *const state) {
+  if (state == NULL) return false;
+  state->running = true;
+  log_info("Spawning receiver thread");
+  // TODO(thibault) spawning of the thread
+  return true;
 }

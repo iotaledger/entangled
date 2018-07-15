@@ -23,8 +23,8 @@ typedef struct {
 extern "C" {
 #endif
 
+bool processor_init(processor_state_t *const state);
 bool processor_on_next(processor_state_t *const state, trit_array_p const hash);
-void *processor_routine(processor_state_t *const state);
 
 #ifdef __cplusplus
 }

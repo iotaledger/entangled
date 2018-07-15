@@ -7,6 +7,13 @@
 
 #include "requester.h"
 
+bool requester_init(requester_state_t *const state) {
+  if (INIT_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
+      CONCURRENT_QUEUE_SUCCESS)
+    return false;
+  return true;
+}
+
 bool request_transaction(requester_state_t *const state,
                          trit_array_p const hash) {
   return state->queue->vtable->push(state->queue, hash) ==

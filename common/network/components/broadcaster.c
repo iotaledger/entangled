@@ -8,25 +8,33 @@
 #include "broadcaster.h"
 #include "common/network/logger.h"
 
-bool broadcaster_on_next(broadcaster_state_t *const state,
-                         trit_array_p const hash) {
-  return state->queue->vtable->push(state->queue, hash) ==
-         CONCURRENT_QUEUE_SUCCESS;
-}
-
-void *broadcaster_routine(broadcaster_state_t *const state) {
+static void *broadcaster_routine(broadcaster_state_t *const state) {
   trit_array_p hash;
 
-  log_info("Spawning broadcaster thread");
-  state->running = true;
+  if (state == NULL) return NULL;
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &hash) ==
         CONCURRENT_QUEUE_SUCCESS) {
-      // for (size_t i = 0; neighbors[i]; ++i) {
-      // TODO(thibault@iota.org) actual broadcasting of the hash
-      // }
+      // TODO(thibault) broadcasting of the hash
     }
   }
   log_info("Shutting down broadcaster thread");
   return NULL;
+}
+
+bool broadcaster_init(broadcaster_state_t *const state) {
+  if (state == NULL) return false;
+  if (INIT_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
+      CONCURRENT_QUEUE_SUCCESS)
+    return false;
+  state->running = true;
+  log_info("Spawning broadcaster thread");
+  // TODO(thibault) spawning of the thread
+  return true;
+}
+
+bool broadcaster_on_next(broadcaster_state_t *const state,
+                         trit_array_p const hash) {
+  return state->queue->vtable->push(state->queue, hash) ==
+         CONCURRENT_QUEUE_SUCCESS;
 }
