@@ -8,6 +8,8 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_REQUESTER_H__
 #define __COMMON_NETWORK_COMPONENTS_REQUESTER_H__
 
+#include <stdbool.h>
+
 #include "common/network/queues/concurrent_queue_trit_array.h"
 
 typedef concurrent_queue_of_trit_array_p requester_queue_t;
@@ -20,7 +22,7 @@ typedef struct {
 extern "C" {
 #endif
 
-void request_transaction(requester_state_t *const state,
+bool request_transaction(requester_state_t *const state,
                          trit_array_p const hash);
 trit_array_p get_transaction_to_request(requester_state_t *const state);
 

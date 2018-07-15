@@ -8,9 +8,10 @@
 #include "broadcaster.h"
 #include "common/network/logger.h"
 
-void broadcaster_on_next(broadcaster_state_t *const state,
+bool broadcaster_on_next(broadcaster_state_t *const state,
                          trit_array_p const hash) {
-  state->queue->vtable->push(state->queue, hash);
+  return state->queue->vtable->push(state->queue, hash) ==
+         CONCURRENT_QUEUE_SUCCESS;
 }
 
 void *broadcaster_routine(broadcaster_state_t *const state) {

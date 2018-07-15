@@ -8,9 +8,10 @@
 #include "processor.h"
 #include "common/network/logger.h"
 
-void processor_on_next(processor_state_t *const state,
+bool processor_on_next(processor_state_t *const state,
                        trit_array_p const hash) {
-  state->queue->vtable->push(state->queue, hash);
+  return state->queue->vtable->push(state->queue, hash) ==
+         CONCURRENT_QUEUE_SUCCESS;
 }
 
 void *processor_routine(processor_state_t *const state) {

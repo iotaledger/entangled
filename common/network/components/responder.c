@@ -8,9 +8,11 @@
 #include "responder.h"
 #include "common/network/logger.h"
 
-void responder_on_next(responder_state_t *const state, trit_array_p const hash,
+bool responder_on_next(responder_state_t *const state, trit_array_p const hash,
                        neighbor_t *const neighbor) {
-  state->queue->vtable->push(state->queue, (hash_request_t){hash, *neighbor});
+  return state->queue->vtable->push(state->queue,
+                                    (hash_request_t){hash, *neighbor}) ==
+         CONCURRENT_QUEUE_SUCCESS;
 }
 
 void *responder_routine(responder_state_t *const state) {

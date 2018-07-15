@@ -23,7 +23,7 @@ typedef struct {
 extern "C" {
 #endif
 
-void processor_on_next(processor_state_t *const state, trit_array_p const hash);
+bool processor_on_next(processor_state_t *const state, trit_array_p const hash);
 void *processor_routine(processor_state_t *const state);
 
 #ifdef __cplusplus

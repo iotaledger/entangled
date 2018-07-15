@@ -7,9 +7,10 @@
 
 #include "requester.h"
 
-void request_transaction(requester_state_t *const state,
+bool request_transaction(requester_state_t *const state,
                          trit_array_p const hash) {
-  state->queue->vtable->push(state->queue, hash);
+  return state->queue->vtable->push(state->queue, hash) ==
+         CONCURRENT_QUEUE_SUCCESS;
 }
 
 trit_array_p get_transaction_to_request(requester_state_t *const state) {
