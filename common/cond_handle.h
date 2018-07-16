@@ -74,6 +74,23 @@ static inline int cond_handle_wait(cond_handle_t* const cond,
 }
 
 /**
+ * Blocks the calling thread, waiting for the condition specified by cond to be
+ * signaled or broadcast to, or until the timeout is reached
+ *
+ * @param cond The condition variable
+ * @param lock The associated lock
+ * @param timeout The timeout in seconds
+ *
+ * @return exit status
+ */
+static inline int cond_handle_timedwait(cond_handle_t* const cond,
+                                        lock_handle_t* const lock,
+                                        unsigned int timeout) {
+  struct timespec ts = {time(NULL) + timeout, 0};
+  return pthread_cond_timedwait(cond, lock, &ts);
+}
+
+/**
  * Destroys the condition variable specified by cond
  *
  * @param cond The condition variable
