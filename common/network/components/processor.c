@@ -42,11 +42,11 @@ bool processor_on_next(processor_state_t *const state,
 
 bool processor_stop(processor_state_t *const state) {
   if (state == NULL) return false;
-  if (DESTROY_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS)
-    return false;
   log_info("Shutting down processor thread");
   state->running = false;
   thread_handle_join(state->thread, NULL);
+  if (DESTROY_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
+      CONCURRENT_QUEUE_SUCCESS)
+    return false;
   return true;
 }

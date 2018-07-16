@@ -43,11 +43,11 @@ bool responder_on_next(responder_state_t *const state, trit_array_p const hash,
 
 bool responder_stop(responder_state_t *const state) {
   if (state == NULL) return false;
-  if (DESTROY_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS)
-    return false;
   log_info("Shutting down responder thread");
   state->running = false;
   thread_handle_join(state->thread, NULL);
+  if (DESTROY_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) !=
+      CONCURRENT_QUEUE_SUCCESS)
+    return false;
   return true;
 }

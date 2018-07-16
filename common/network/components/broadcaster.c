@@ -42,11 +42,11 @@ bool broadcaster_on_next(broadcaster_state_t *const state,
 
 bool broadcaster_stop(broadcaster_state_t *const state) {
   if (state == NULL) return false;
-  if (DESTROY_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS)
-    return false;
   log_info("Shutting down broadcaster thread");
   state->running = false;
   thread_handle_join(state->thread, NULL);
+  if (DESTROY_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
+      CONCURRENT_QUEUE_SUCCESS)
+    return false;
   return true;
 }
