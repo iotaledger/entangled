@@ -14,9 +14,9 @@
 typedef concurrent_queue_of_trit_array_p broadcaster_queue_t;
 
 typedef struct {
-  broadcaster_queue_t *queue;
   thread_handle_t thread;
   bool running;
+  broadcaster_queue_t *queue;
 } broadcaster_state_t;
 
 #ifdef __cplusplus
