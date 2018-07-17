@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "processor.h"
+#include "common/network/components/processor.h"
 #include "common/network/logger.h"
 
 static void *processor_routine(processor_state_t *const state) {

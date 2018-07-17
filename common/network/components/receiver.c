@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "receiver.h"
+#include "common/network/components/receiver.h"
 #include "common/network/logger.h"
 
 static void *receiver_routine(receiver_state_t *const state) {

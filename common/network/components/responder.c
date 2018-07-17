@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "responder.h"
+#include "common/network/components/responder.h"
 #include "common/network/logger.h"
 
 static void *responder_routine(responder_state_t *const state) {

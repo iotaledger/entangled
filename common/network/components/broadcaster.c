@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "broadcaster.h"
+#include "common/network/components/broadcaster.h"
 #include "common/network/logger.h"
 
 static void *broadcaster_routine(broadcaster_state_t *const state) {

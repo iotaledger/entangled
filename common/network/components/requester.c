@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "requester.h"
+#include "common/network/components/requester.h"
 
 bool requester_start(requester_state_t *const state) {
   if (state == NULL) return false;
