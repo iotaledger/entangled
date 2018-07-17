@@ -15,3 +15,8 @@ cc_library(
     hdrs = ["cond_handle.h"],
     deps = [":lock_handle"],
 )
+
+cc_library(
+    name = "errors",
+    hdrs = ["errors.h"],
+)
