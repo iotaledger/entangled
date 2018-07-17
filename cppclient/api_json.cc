@@ -182,7 +182,7 @@ std::vector<Transaction> IotaJsonAPI::getTransactions(
 
   boost::copy(
       trytes | transformed([&epoch](const std::string& trytes) -> Transaction {
-        transaction *tx = new transaction(trytes);                              
+        transaction *tx = new Transaction(trytes);                              
 
         // We could also rely on the ordering of the hashes argument here.
         auto hash = iota_digest(trytes.c_str());
