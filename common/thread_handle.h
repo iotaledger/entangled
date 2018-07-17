@@ -24,6 +24,21 @@ typedef void *(*thread_routine_t)(void *);
 
 typedef pthread_t thread_handle_t;
 
+static inline int thread_handle_create(thread_handle_t *const thread,
+                                       thread_routine_t routine, void *arg) {
+  return pthread_create(thread, NULL, routine, arg);
+}
+
+static inline int thread_handle_join(thread_handle_t thread, void **status) {
+  return pthread_join(thread, status);
+}
+
+#else
+
+#error "No thread primitive found"
+
+#endif  // _POSIX_THREADS
+
 /**
  * Creates a new thread
  *
@@ -34,9 +49,7 @@ typedef pthread_t thread_handle_t;
  * @return exit status
  */
 static inline int thread_handle_create(thread_handle_t *const thread,
-                                       thread_routine_t routine, void *arg) {
-  return pthread_create(thread, NULL, routine, arg);
-}
+                                       thread_routine_t routine, void *arg);
 
 /**
  * Waits for a thread termination
@@ -46,14 +59,6 @@ static inline int thread_handle_create(thread_handle_t *const thread,
  *
  * @return exit status
  */
-static inline int thread_handle_join(thread_handle_t thread, void **status) {
-  return pthread_join(thread, status);
-}
-
-#else
-
-#error "No thread primitive found"
-
-#endif  // _POSIX_THREADS
+static inline int thread_handle_join(thread_handle_t thread, void **status);
 
 #endif  // COMMON_THREAD_HANDLE_H_

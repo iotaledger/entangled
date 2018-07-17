@@ -24,6 +24,40 @@
 
 typedef pthread_cond_t cond_handle_t;
 
+static inline int cond_handle_init(cond_handle_t* const cond) {
+  return pthread_cond_init(cond, NULL);
+}
+
+static inline int cond_handle_signal(cond_handle_t* const cond) {
+  return pthread_cond_signal(cond);
+}
+
+static inline int cond_handle_broadcast(cond_handle_t* const cond) {
+  return pthread_cond_broadcast(cond);
+}
+
+static inline int cond_handle_wait(cond_handle_t* const cond,
+                                   lock_handle_t* const lock) {
+  return pthread_cond_wait(cond, lock);
+}
+
+static inline int cond_handle_timedwait(cond_handle_t* const cond,
+                                        lock_handle_t* const lock,
+                                        unsigned int timeout) {
+  struct timespec ts = {time(NULL) + timeout, 0};
+  return pthread_cond_timedwait(cond, lock, &ts);
+}
+
+static inline int cond_handle_destroy(cond_handle_t* const cond) {
+  return pthread_cond_destroy(cond);
+}
+
+#else
+
+#error "No condition variable primitive found"
+
+#endif  // _POSIX_THREADS
+
 /**
  * Initializes a condition variable object with the specified attributes for use
  *
@@ -31,9 +65,7 @@ typedef pthread_cond_t cond_handle_t;
  *
  * @return exit status
  */
-static inline int cond_handle_init(cond_handle_t* const cond) {
-  return pthread_cond_init(cond, NULL);
-}
+static inline int cond_handle_init(cond_handle_t* const cond);
 
 /**
  * Wakes up at least one thread that is currently waiting on the condition
@@ -43,9 +75,7 @@ static inline int cond_handle_init(cond_handle_t* const cond) {
  *
  * @return exit status
  */
-static inline int cond_handle_signal(cond_handle_t* const cond) {
-  return pthread_cond_signal(cond);
-}
+static inline int cond_handle_signal(cond_handle_t* const cond);
 
 /**
  * Wakes up all threads that are currently waiting on the condition variable
@@ -55,9 +85,7 @@ static inline int cond_handle_signal(cond_handle_t* const cond) {
  *
  * @return exit status
  */
-static inline int cond_handle_broadcast(cond_handle_t* const cond) {
-  return pthread_cond_broadcast(cond);
-}
+static inline int cond_handle_broadcast(cond_handle_t* const cond);
 
 /**
  * Blocks the calling thread, waiting for the condition specified by cond to be
@@ -69,9 +97,7 @@ static inline int cond_handle_broadcast(cond_handle_t* const cond) {
  * @return exit status
  */
 static inline int cond_handle_wait(cond_handle_t* const cond,
-                                   lock_handle_t* const lock) {
-  return pthread_cond_wait(cond, lock);
-}
+                                   lock_handle_t* const lock);
 
 /**
  * Blocks the calling thread, waiting for the condition specified by cond to be
@@ -85,10 +111,7 @@ static inline int cond_handle_wait(cond_handle_t* const cond,
  */
 static inline int cond_handle_timedwait(cond_handle_t* const cond,
                                         lock_handle_t* const lock,
-                                        unsigned int timeout) {
-  struct timespec ts = {time(NULL) + timeout, 0};
-  return pthread_cond_timedwait(cond, lock, &ts);
-}
+                                        unsigned int timeout);
 
 /**
  * Destroys the condition variable specified by cond
@@ -97,14 +120,6 @@ static inline int cond_handle_timedwait(cond_handle_t* const cond,
  *
  * @return exit status
  */
-static inline int cond_handle_destroy(cond_handle_t* const cond) {
-  return pthread_cond_destroy(cond);
-}
-
-#else
-
-#error "No condition variable primitive found"
-
-#endif  // _POSIX_THREADS
+static inline int cond_handle_destroy(cond_handle_t* const cond);
 
 #endif  // COMMON_COND_HANDLE_H_

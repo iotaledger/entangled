@@ -22,46 +22,18 @@
 
 typedef pthread_mutex_t lock_handle_t;
 
-/**
- * Initializes a lock
- *
- * @param lock The lock
- *
- * @return exit status
- */
 static inline int lock_handle_init(lock_handle_t* const lock) {
   return pthread_mutex_init(lock, NULL);
 }
 
-/**
- * Acquires ownership of the given lock
- *
- * @param lock The lock
- *
- * @return exit status
- */
 static inline int lock_handle_lock(lock_handle_t* const lock) {
   return pthread_mutex_lock(lock);
 }
 
-/**
- * Releases ownership of the given lock
- *
- * @param lock The lock
- *
- * @return exit status
- */
 static inline int lock_handle_unlock(lock_handle_t* const lock) {
   return pthread_mutex_unlock(lock);
 }
 
-/**
- * Destroys the lock
- *
- * @param lock The lock
- *
- * @return exit status
- */
 static inline int lock_handle_destroy(lock_handle_t* const lock) {
   return pthread_mutex_destroy(lock);
 }
@@ -71,5 +43,41 @@ static inline int lock_handle_destroy(lock_handle_t* const lock) {
 #error "No lock primitive found"
 
 #endif  // _POSIX_THREADS
+
+/**
+ * Initializes a lock
+ *
+ * @param lock The lock
+ *
+ * @return exit status
+ */
+static inline int lock_handle_init(lock_handle_t* const lock);
+
+/**
+ * Acquires ownership of the given lock
+ *
+ * @param lock The lock
+ *
+ * @return exit status
+ */
+static inline int lock_handle_lock(lock_handle_t* const lock);
+
+/**
+ * Releases ownership of the given lock
+ *
+ * @param lock The lock
+ *
+ * @return exit status
+ */
+static inline int lock_handle_unlock(lock_handle_t* const lock);
+
+/**
+ * Destroys the lock
+ *
+ * @param lock The lock
+ *
+ * @return exit status
+ */
+static inline int lock_handle_destroy(lock_handle_t* const lock);
 
 #endif  // COMMON_LOCK_HANDLE_H_
