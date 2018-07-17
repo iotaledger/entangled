@@ -11,7 +11,9 @@
 static void *processor_routine(processor_state_t *const state) {
   trit_array_p hash;
 
-  if (state == NULL) return NULL;
+  if (state == NULL) {
+    return NULL;
+  }
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &hash) ==
         CONCURRENT_QUEUE_SUCCESS) {
@@ -22,10 +24,13 @@ static void *processor_routine(processor_state_t *const state) {
 }
 
 bool processor_start(processor_state_t *const state) {
-  if (state == NULL) return false;
-  if (INIT_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS)
+  if (state == NULL) {
     return false;
+  }
+  if (INIT_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
+      CONCURRENT_QUEUE_SUCCESS) {
+    return false;
+  }
   log_info("Spawning processor thread");
   state->running = true;
   thread_handle_create(&state->thread, (thread_routine_t)processor_routine,
@@ -35,18 +40,23 @@ bool processor_start(processor_state_t *const state) {
 
 bool processor_on_next(processor_state_t *const state,
                        trit_array_p const hash) {
-  if (state == NULL) return false;
+  if (state == NULL) {
+    return false;
+  }
   return state->queue->vtable->push(state->queue, hash) ==
          CONCURRENT_QUEUE_SUCCESS;
 }
 
 bool processor_stop(processor_state_t *const state) {
-  if (state == NULL) return false;
+  if (state == NULL) {
+    return false;
+  }
   log_info("Shutting down processor thread");
   state->running = false;
   thread_handle_join(state->thread, NULL);
   if (DESTROY_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS)
+      CONCURRENT_QUEUE_SUCCESS) {
     return false;
+  }
   return true;
 }

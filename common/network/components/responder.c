@@ -11,7 +11,9 @@
 static void *responder_routine(responder_state_t *const state) {
   hash_request_t request;
 
-  if (state == NULL) return NULL;
+  if (state == NULL) {
+    return NULL;
+  }
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &request) ==
         CONCURRENT_QUEUE_SUCCESS) {
@@ -22,10 +24,13 @@ static void *responder_routine(responder_state_t *const state) {
 }
 
 bool responder_start(responder_state_t *const state) {
-  if (state == NULL) return false;
-  if (INIT_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS)
+  if (state == NULL) {
     return false;
+  }
+  if (INIT_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) !=
+      CONCURRENT_QUEUE_SUCCESS) {
+    return false;
+  }
   log_info("Spawning responder thread");
   state->running = true;
   thread_handle_create(&state->thread, (thread_routine_t)responder_routine,
@@ -35,19 +40,24 @@ bool responder_start(responder_state_t *const state) {
 
 bool responder_on_next(responder_state_t *const state, trit_array_p const hash,
                        neighbor_t *const neighbor) {
-  if (state == NULL) return false;
+  if (state == NULL) {
+    return false;
+  }
   return state->queue->vtable->push(state->queue,
                                     (hash_request_t){hash, *neighbor}) ==
          CONCURRENT_QUEUE_SUCCESS;
 }
 
 bool responder_stop(responder_state_t *const state) {
-  if (state == NULL) return false;
+  if (state == NULL) {
+    return false;
+  }
   log_info("Shutting down responder thread");
   state->running = false;
   thread_handle_join(state->thread, NULL);
   if (DESTROY_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS)
+      CONCURRENT_QUEUE_SUCCESS) {
     return false;
+  }
   return true;
 }

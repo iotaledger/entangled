@@ -9,7 +9,9 @@
 #include "common/network/logger.h"
 
 static void *receiver_routine(receiver_state_t *const state) {
-  if (state == NULL) return NULL;
+  if (state == NULL) {
+    return NULL;
+  }
   while (state->running) {
     // TODO(thibault) receive
   }
@@ -17,7 +19,9 @@ static void *receiver_routine(receiver_state_t *const state) {
 }
 
 bool receiver_start(receiver_state_t *const state) {
-  if (state == NULL) return false;
+  if (state == NULL) {
+    return false;
+  }
   log_info("Spawning receiver thread");
   state->running = true;
   thread_handle_create(&state->thread, (thread_routine_t)receiver_routine,
@@ -26,7 +30,9 @@ bool receiver_start(receiver_state_t *const state) {
 }
 
 bool receiver_stop(receiver_state_t *const state) {
-  if (state == NULL) return false;
+  if (state == NULL) {
+    return false;
+  }
   log_info("Shutting down receiver thread");
   state->running = false;
   thread_handle_join(state->thread, NULL);
