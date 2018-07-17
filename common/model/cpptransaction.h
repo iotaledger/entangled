@@ -12,16 +12,17 @@
 #include "common/model/transaction.h"
 #include "common/trinary/tryte.h"
 
+namespace iota {
 namespace model {
 
-class transaction {
+class Transaction {
   private:
     iota_transaction_t iota_transaction;
 
   public:
-    transaction();
-    transaction(std::string trytes);
-    ~transaction(void);
+    Transaction();
+    Transaction(std::string trytes);
+    ~Transaction(void);
 
     std::string get_signature(void);
     // Set the transaction signature (copy argument)
@@ -90,5 +91,6 @@ class transaction {
     flex_trit_t *serialize(void);
 }; // class transaction
 } // namespace model
+} // namespace iota
 
 #endif // __COMMON_MODEL_CPPTRANSACTION_H_
