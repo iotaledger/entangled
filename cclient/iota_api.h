@@ -60,7 +60,7 @@ iota_api_result_t iota_api_add_neighbors(const iota_http_service_t* const servic
  *
  * https://iota.readme.io/reference#reoveneighors
 
-  * @param service IRI node end point.
+ * @param service IRI node end point.
  * @param uris List of URI elements.
  * @param nuUris Number of elements in uris
  *
