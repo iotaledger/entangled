@@ -15,16 +15,20 @@
 
 #define TRANSACTION_TABLE_NAME "iota_transaction"
 
-retcode_t create_index(const connection_t* const conn, const std::string& indexName, const std::string& colName){
+retcode_t create_index(const connection_t* const conn,
+                       const std::string& indexName,
+                       const std::string& colName) {
+  char* errMsg = 0;
+  std::string createIndexStatement =
+      std::string("CREATE UNIQUE INDEX IF NOT EXISTS ") + indexName + " ON " +
+      TRANSACTION_TABLE_NAME + "(" + colName + ")";
 
-  char *errMsg = 0;
-  std::string  createIndexStatement = std::string("CREATE UNIQUE INDEX IF NOT EXISTS ") + indexName + " ON " + TRANSACTION_TABLE_NAME + "(" + colName + ")";
-
-  int rc = sqlite3_exec((sqlite3*)conn->db, createIndexStatement.c_str(), 0, 0, &errMsg);
-  if( rc!=SQLITE_OK ){
-    LOG(ERROR)<<"SQL error: "<< errMsg;
+  int rc = sqlite3_exec((sqlite3*)conn->db, createIndexStatement.c_str(), 0, 0,
+                        &errMsg);
+  if (rc != SQLITE_OK) {
+    LOG(ERROR) << "SQL error: " << errMsg;
     sqlite3_free(errMsg);
-    //TODO - return appropriate error
+    // TODO - return appropriate error
     return RC_UNKNOWN;
   }
 
@@ -33,7 +37,6 @@ retcode_t create_index(const connection_t* const conn, const std::string& indexN
 
 retcode_t init_connection(connection_t* const conn,
                           const connection_config_t* const config) {
-
   retcode_t retcode = RC_OK;
   int rc;
 
@@ -43,7 +46,6 @@ retcode_t init_connection(connection_t* const conn,
     rc = sqlite3_open(config->dbPath, (sqlite3**)&conn->db);
   }
 
-
   if (rc) {
     LOG(FATAL) << __FUNCTION__ << " Can't open database: \n"
                << sqlite3_errmsg((sqlite3*)conn->db);
@@ -52,28 +54,28 @@ retcode_t init_connection(connection_t* const conn,
   }
 
   if (config->indexApprovee) {
-    if (retcode = create_index(conn, "trunk_index", "trunk")){
+    if (retcode = create_index(conn, "trunk_index", "trunk")) {
       return retcode;
     }
-    if (create_index(conn, "branch_index", "branch")){
-      return retcode;
-    }
-  }
-
-  if (config->indexAddress){
-    if (retcode = create_index(conn, "address_index", "address")){
+    if (create_index(conn, "branch_index", "branch")) {
       return retcode;
     }
   }
 
-  if (config->indexBundle){
-    if (retcode = create_index(conn, "bundle_index", "bundle")){
+  if (config->indexAddress) {
+    if (retcode = create_index(conn, "address_index", "address")) {
       return retcode;
     }
   }
 
-  if (config->indexTag){
-    if (retcode = create_index(conn, "tag_index", "tag")){
+  if (config->indexBundle) {
+    if (retcode = create_index(conn, "bundle_index", "bundle")) {
+      return retcode;
+    }
+  }
+
+  if (config->indexTag) {
+    if (retcode = create_index(conn, "tag_index", "tag")) {
       return retcode;
     }
   }
