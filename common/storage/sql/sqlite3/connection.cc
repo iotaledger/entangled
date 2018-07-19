@@ -6,14 +6,13 @@
  */
 
 #include "common/storage/connection.h"
+#include "common/storage/sql/defs.h"
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <string>
 
 #include <sqlite3.h>
-
-#define TRANSACTION_TABLE_NAME "iota_transaction"
 
 retcode_t create_index(const connection_t* const conn,
                        const std::string& indexName,
@@ -28,8 +27,7 @@ retcode_t create_index(const connection_t* const conn,
   if (rc != SQLITE_OK) {
     LOG(ERROR) << "SQL error: " << errMsg;
     sqlite3_free(errMsg);
-    // TODO - return appropriate error
-    return RC_UNKNOWN;
+    return RC_SQLITE3_FAILED_CREATE_INDEX_DB;
   }
 
   return RC_OK;

@@ -21,22 +21,20 @@ extern "C" {
 
 /*index_name = column name by to compare to key*/
 extern retcode_t iota_stor_store(const connection_t* const conn,
-                                 const trit_array_p key,
-                                 const iota_transaction_t* const data_in);
+                                 const iota_transaction_t data_in);
 extern retcode_t iota_stor_load(const connection_t* const conn,
                                 const char* index_name, const trit_array_p key,
-                                iota_transaction_t* const data_out);
+                                iota_transaction_t data_out);
 extern retcode_t iota_stor_exist(const connection_t* const conn,
                                  const char* index_name, const trit_array_p key,
                                  bool* exist);
 extern retcode_t iota_stor_find(const connection_t* const conn,
                                 const char* index_name, const trit_array_p key,
-                                bool* found,
-                                iota_transaction_t* const data_out);
+                                bool* found, iota_transaction_t data_out);
 extern retcode_t iota_stor_update(const connection_t* const conn,
                                   const char* index_name,
                                   const trit_array_p key,
-                                  const iota_transaction_t* const data_in);
+                                  const iota_transaction_t data_in);
 
 #ifdef __cplusplus
 }

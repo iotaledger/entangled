@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_STORAGE_SQL_CONNECTION_H__
-#define __COMMON_STORAGE_SQL_CONNECTION_H__
+#ifndef __COMMON_STORAGE_CONNECTION_H__
+#define __COMMON_STORAGE_CONNECTION_H__
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -37,4 +37,4 @@ extern retcode_t destroy_connection(connection_t* const);
 }
 #endif
 
-#endif  // __COMMON_STORAGE_SQL_CONNECTION_H__
+#endif  // __COMMON_STORAGE_CONNECTION_H__
