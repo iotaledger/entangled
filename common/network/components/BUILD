@@ -34,12 +34,19 @@ cc_library(
 )
 
 cc_library(
-    name = "receiver",
-    srcs = ["receiver.c"],
+    name = "receiver_shared",
     hdrs = ["receiver.h"],
     deps = [
         "//common:thread_handle",
-        "//common/network:logger",
+    ],
+)
+
+cc_library(
+    name = "receiver",
+    srcs = ["receiver.c"],
+    deps = [
+        ":receiver_shared",
+        "//common/network/services:receiver",
     ],
 )
 
