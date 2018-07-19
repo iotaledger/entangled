@@ -155,3 +155,13 @@ cc_library(
         "//common:stdint",
     ],
 )
+
+cc_library(
+    name = "flex_trit",
+    srcs = ["flex_trit.cc"],
+    hdrs = ["flex_trit.h"],
+    deps = [
+        ":trit_array",
+        "//common:stdint",
+    ],
+)

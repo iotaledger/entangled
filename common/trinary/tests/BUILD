@@ -87,3 +87,13 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_flex_trit",
+    srcs = ["test_flex_trit.cc"],
+    deps = [
+        "//common/trinary:flex_trit",
+        "//common/trinary:trit_array",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
