@@ -5,43 +5,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <memory>
-
-#include <boost/asio.hpp>
-
-#include "common/network/iota_packet.h"
-#include "common/network/logger.h"
 #include "common/network/services/receiver.h"
-
-using boost::asio::ip::udp;
-
-class UdpReceiverService {
- public:
-  UdpReceiverService(boost::asio::io_context& io_context, uint16_t port)
-      : socket_(io_context, udp::endpoint(udp::v4(), port)) {
-    receive();
-  }
-
-  void receive() {
-    socket_.async_receive_from(
-        boost::asio::buffer(packet_, TRANSACTION_PACKET_SIZE), sender_endpoint_,
-        [this](boost::system::error_code ec, std::size_t length) {
-          if (!ec && length > 0) {
-            handle_packet(length);
-          }
-          receive();
-        });
-  }
-
-  void handle_packet(std::size_t length) {
-    // TODO(thibault) call receiver handle packet function
-  }
-
- private:
-  udp::socket socket_;
-  udp::endpoint sender_endpoint_;
-  char packet_[TRANSACTION_PACKET_SIZE];
-};
+#include "common/network/logger.h"
+#include "common/network/services/udp_receiver.hpp"
 
 bool receiver_service_start(receiver_state_t* const state) {
   if (state == NULL) {
