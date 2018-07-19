@@ -12,9 +12,11 @@
 extern "C" {
 #endif
 
+
+
 enum retcode_t {
-    E_OK = 0,
-    E_UNKNOWN,
+    RC_OK = 0,
+    RC_UNKNOWN,
 };
 
 

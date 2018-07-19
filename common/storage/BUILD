@@ -1,16 +1,15 @@
 cc_library(
     name = "storage",
-    hdrs = ["storage.h"],
-    deps = [
-        ":persistable",
-    ],
-)
-
-cc_library(
-    name = "persistable",
-    hdrs = ["persistable.h"],
+    hdrs = glob(["*.h"]),
+    visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
         "//common/trinary:trit_array",
     ],
+)
+
+cc_binary(
+    name = "main",
+    srcs = ["main.cc"],
+    deps = ["//common/storage/sql/sqlite3:sqlite3_storage"],
 )
