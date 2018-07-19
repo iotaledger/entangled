@@ -7,6 +7,7 @@
 
 #include "common/network/services/receiver.h"
 #include "common/network/logger.h"
+#include "common/network/services/tcp_receiver.hpp"
 #include "common/network/services/udp_receiver.hpp"
 
 bool receiver_service_start(receiver_state_t* const state) {
@@ -18,6 +19,7 @@ bool receiver_service_start(receiver_state_t* const state) {
     state->opaque_network = &ctx;
     // TODO(thibault) port as parameter
     UdpReceiverService udpService(ctx, 4242);
+    TcpReceiverService tcpService(ctx, 4243);
     ctx.run();
   } catch (std::exception const& e) {
     log_error("Receiver service failed to start: %s", e.what());
