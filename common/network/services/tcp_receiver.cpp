@@ -5,8 +5,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <boost/bind.hpp>
-
 #include "common/network/services/tcp_receiver.hpp"
 
 /*
@@ -25,7 +23,7 @@ void TcpConnection::start() {
 
   boost::asio::async_write(
       socket_, boost::asio::buffer(message_),
-      boost::bind(&TcpConnection::handleWrite, shared_from_this()));
+      std::bind(&TcpConnection::handleWrite, shared_from_this()));
 }
 
 TcpConnection::TcpConnection(boost::asio::io_context& io_context)
@@ -45,20 +43,19 @@ TcpReceiverService::TcpReceiverService(boost::asio::io_context& io_context,
 }
 
 void TcpReceiverService::startAccept() {
-  TcpConnection::TcpConnectionPtr new_connection =
+  TcpConnection::TcpConnectionPtr newConnection =
       TcpConnection::create(acceptor_.get_executor().context());
 
-  acceptor_.async_accept(
-      new_connection->socket(),
-      boost::bind(&TcpReceiverService::handleAccept, this, new_connection,
-                  boost::asio::placeholders::error));
+  acceptor_.async_accept(newConnection->socket(),
+                         std::bind(&TcpReceiverService::handleAccept, this,
+                                   newConnection, std::placeholders::_1));
 }
 
 void TcpReceiverService::handleAccept(
-    TcpConnection::TcpConnectionPtr new_connection,
+    TcpConnection::TcpConnectionPtr newConnection,
     const boost::system::error_code& error) {
   if (!error) {
-    new_connection->start();
+    newConnection->start();
   }
 
   startAccept();
