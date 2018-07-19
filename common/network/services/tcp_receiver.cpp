@@ -18,7 +18,7 @@ void TcpConnection::start() { receive(); }
 
 void TcpConnection::receive() {
   socket_.async_read_some(
-      boost::asio::buffer(data_, TRANSACTION_PACKET_SIZE),
+      boost::asio::buffer(packet_, TRANSACTION_PACKET_SIZE),
       [this](boost::system::error_code ec, std::size_t length) {
         if (!ec) {
           handlePacket(length);
