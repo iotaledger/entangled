@@ -13,20 +13,18 @@
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
  public:
-  using TcpConnectionPtr = std::shared_ptr<TcpConnection>;
+  TcpConnection(boost::asio::ip::tcp::socket socket);
 
  public:
-  static TcpConnectionPtr create(boost::asio::io_context& io_context);
-  boost::asio::ip::tcp::socket& socket();
   void start();
 
  private:
-  TcpConnection(boost::asio::io_context& io_context);
-  void handleWrite();
+  void receive();
+  void handlePacket(std::size_t const length) const;
 
  private:
   boost::asio::ip::tcp::socket socket_;
-  std::string message_;
+  char data_[TRANSACTION_PACKET_SIZE];
 };
 
 class TcpReceiverService {
@@ -34,9 +32,7 @@ class TcpReceiverService {
   TcpReceiverService(boost::asio::io_context& io_context, uint16_t const port);
 
  private:
-  void startAccept();
-  void handleAccept(TcpConnection::TcpConnectionPtr new_connection,
-                    const boost::system::error_code& error);
+  void accept();
 
  private:
   boost::asio::ip::tcp::acceptor acceptor_;

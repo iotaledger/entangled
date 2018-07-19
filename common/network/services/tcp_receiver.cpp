@@ -11,25 +11,25 @@
  * TcpConnection
  */
 
-TcpConnection::TcpConnectionPtr TcpConnection::create(
-    boost::asio::io_context& io_context) {
-  return TcpConnectionPtr(new TcpConnection(io_context));
+TcpConnection::TcpConnection(boost::asio::ip::tcp::socket socket)
+    : socket_(std::move(socket)) {}
+
+void TcpConnection::start() { receive(); }
+
+void TcpConnection::receive() {
+  socket_.async_read_some(
+      boost::asio::buffer(data_, TRANSACTION_PACKET_SIZE),
+      [this](boost::system::error_code ec, std::size_t length) {
+        if (!ec) {
+          handlePacket(length);
+        }
+        receive();
+      });
 }
 
-boost::asio::ip::tcp::socket& TcpConnection::socket() { return socket_; }
-
-void TcpConnection::start() {
-  message_ = "Hello";
-
-  boost::asio::async_write(
-      socket_, boost::asio::buffer(message_),
-      std::bind(&TcpConnection::handleWrite, shared_from_this()));
+void TcpConnection::handlePacket(std::size_t const length) const {
+  // TODO(thibault) call receiver handle packet function
 }
-
-TcpConnection::TcpConnection(boost::asio::io_context& io_context)
-    : socket_(io_context) {}
-
-void TcpConnection::handleWrite() {}
 
 /*
  * TcpReceiverService
@@ -39,24 +39,15 @@ TcpReceiverService::TcpReceiverService(boost::asio::io_context& io_context,
                                        uint16_t const port)
     : acceptor_(io_context, boost::asio::ip::tcp::endpoint(
                                 boost::asio::ip::tcp::v4(), port)) {
-  startAccept();
+  accept();
 }
 
-void TcpReceiverService::startAccept() {
-  TcpConnection::TcpConnectionPtr newConnection =
-      TcpConnection::create(acceptor_.get_executor().context());
-
-  acceptor_.async_accept(newConnection->socket(),
-                         std::bind(&TcpReceiverService::handleAccept, this,
-                                   newConnection, std::placeholders::_1));
-}
-
-void TcpReceiverService::handleAccept(
-    TcpConnection::TcpConnectionPtr newConnection,
-    const boost::system::error_code& error) {
-  if (!error) {
-    newConnection->start();
-  }
-
-  startAccept();
+void TcpReceiverService::accept() {
+  acceptor_.async_accept([this](boost::system::error_code ec,
+                                boost::asio::ip::tcp::socket socket) {
+    if (!ec) {
+      std::make_shared<TcpConnection>(std::move(socket))->start();
+    }
+    accept();
+  });
 }
