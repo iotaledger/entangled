@@ -26,11 +26,14 @@ static void *receiver_routine(receiver_state_t *const state) {
   return NULL;
 }
 
-bool receiver_start(receiver_state_t *const state) {
+bool receiver_start(receiver_state_t *const state, uint16_t tcp_port,
+                    uint16_t udp_port) {
   if (state == NULL) {
     return false;
   }
   state->opaque_network = NULL;
+  state->tcp_port = tcp_port;
+  state->udp_port = udp_port;
   log_info("Spawning receiver thread");
   state->running = true;
   thread_handle_create(&state->thread, (thread_routine_t)receiver_routine,
