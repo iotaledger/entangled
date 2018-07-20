@@ -9,12 +9,13 @@
 #include "common/network/logger.h"
 #include "common/network/services/receiver.h"
 
-void packet_handler(receiver_state_t *const state,
+bool packet_handler(receiver_state_t *const state,
                     iota_packet_t *const packet) {
   // TODO(thibault) discard if bad size
   log_debug("Packet received from %s:%d", packet->source.host,
             packet->source.port);
   // TODO(thibault) submit packet for pre-processing
+  return true;
 }
 
 static void *receiver_routine(receiver_state_t *const state) {

@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_SOCKET_H__
-#define __COMMON_NETWORK_SOCKET_H__
+#ifndef __COMMON_NETWORK_ENDPOINT_H__
+#define __COMMON_NETWORK_ENDPOINT_H__
 
 #include <stdint.h>
 
@@ -15,6 +15,6 @@
 typedef struct {
   char host[HOST_NAME_MAX];
   uint16_t port;
-} socket_addr_t;
+} endpoint_t;
 
-#endif  // __COMMON_NETWORK_SOCKET_H__
+#endif  // __COMMON_NETWORK_ENDPOINT_H__
