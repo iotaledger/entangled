@@ -25,5 +25,5 @@ class UdpReceiverService {
   receiver_state_t* state_;
   boost::asio::ip::udp::socket socket_;
   boost::asio::ip::udp::endpoint senderEndpoint_;
-  char packet_[TRANSACTION_PACKET_SIZE];
+  char packet_[TRANSACTION_PACKET_SIZE + 1];
 };

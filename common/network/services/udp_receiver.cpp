@@ -36,5 +36,6 @@ void UdpReceiverService::handlePacket(std::size_t const length) const {
   packet.source.host[host.size()] = '\0';
   packet.source.port = senderEndpoint_.port();
   memcpy(packet.content, packet_, length);
+  packet.content[length] = '\0';
   packet_handler(state_, packet);
 }

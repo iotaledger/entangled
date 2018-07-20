@@ -41,6 +41,7 @@ void TcpConnection::handlePacket(std::size_t const length) const {
   packet.source.host[host.size()] = '\0';
   packet.source.port = socket_.remote_endpoint().port();
   memcpy(packet.content, packet_, length);
+  packet.content[length] = '\0';
   packet_handler(state_, packet);
 }
 
