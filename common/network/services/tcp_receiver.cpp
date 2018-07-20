@@ -52,6 +52,7 @@ TcpReceiverService::TcpReceiverService(receiver_state_t* state,
     : state_(state),
       acceptor_(context, boost::asio::ip::tcp::endpoint(
                              boost::asio::ip::tcp::v4(), port)) {
+  acceptor_.set_option(boost::asio::socket_base::reuse_address(true));
   accept();
 }
 
