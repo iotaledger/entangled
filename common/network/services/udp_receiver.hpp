@@ -9,11 +9,13 @@
 
 #include <boost/asio.hpp>
 
+#include "common/network/components/receiver.h"
 #include "common/network/iota_packet.h"
 
 class UdpReceiverService {
  public:
-  UdpReceiverService(boost::asio::io_context& io_context, uint16_t const port);
+  UdpReceiverService(receiver_state_t* state, boost::asio::io_context& context,
+                     uint16_t const port);
 
  public:
   void receive();
@@ -21,6 +23,7 @@ class UdpReceiverService {
 
  private:
   boost::asio::ip::udp::socket socket_;
-  boost::asio::ip::udp::endpoint sender_endpoint_;
+  boost::asio::ip::udp::endpoint senderEndpoint_;
   char packet_[TRANSACTION_PACKET_SIZE];
+  receiver_state_t* state_;
 };

@@ -10,8 +10,10 @@
 
 #include <stdint.h>
 
+#define HOST_NAME_MAX 255
+
 typedef struct {
-  char *host;
+  char host[HOST_NAME_MAX];
   uint16_t port;
 } socket_addr_t;
 

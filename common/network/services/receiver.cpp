@@ -18,7 +18,7 @@ bool receiver_service_start(receiver_state_t* const state) {
     boost::asio::io_context ctx;
     state->opaque_network = &ctx;
     // TODO(thibault) port as parameter
-    UdpReceiverService udpService(ctx, 4242);
+    UdpReceiverService udpService(state, ctx, 4242);
     TcpReceiverService tcpService(ctx, 4243);
     ctx.run();
   } catch (std::exception const& e) {

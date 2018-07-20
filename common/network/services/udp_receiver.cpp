@@ -7,16 +7,18 @@
 
 #include "common/network/services/udp_receiver.hpp"
 
-UdpReceiverService::UdpReceiverService(boost::asio::io_context& io_context,
+UdpReceiverService::UdpReceiverService(receiver_state_t* state,
+                                       boost::asio::io_context& context,
                                        uint16_t const port)
-    : socket_(io_context, boost::asio::ip::udp::endpoint(
-                              boost::asio::ip::udp::v4(), port)) {
+    : socket_(context,
+              boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port)),
+      state_(state) {
   receive();
 }
 
 void UdpReceiverService::receive() {
   socket_.async_receive_from(
-      boost::asio::buffer(packet_, TRANSACTION_PACKET_SIZE), sender_endpoint_,
+      boost::asio::buffer(packet_, TRANSACTION_PACKET_SIZE), senderEndpoint_,
       [this](boost::system::error_code ec, std::size_t length) {
         if (!ec && length > 0) {
           handlePacket(length);
@@ -26,5 +28,13 @@ void UdpReceiverService::receive() {
 }
 
 void UdpReceiverService::handlePacket(std::size_t const length) const {
-  // TODO(thibault) call receiver handle packet function
+  // TODO(thibault) check size packet
+  iota_packet_t packet;
+
+  auto ip = senderEndpoint_.address().to_string();
+  memcpy(packet.source.host, ip.c_str(), ip.size());
+  packet.source.host[ip.size()] = '\0';
+  packet.source.port = senderEndpoint_.port();
+  memcpy(packet.content, packet_, length);
+  packet_handler(state_, packet);
 }
