@@ -22,10 +22,13 @@ void TcpConnection::receive() {
   socket_.async_read_some(
       boost::asio::buffer(packet_, TRANSACTION_PACKET_SIZE),
       [this, self](boost::system::error_code ec, std::size_t length) {
-        if (!ec && length > 0) {
+        if (ec == boost::asio::error::eof ||
+            ec == boost::asio::error::connection_reset) {
+          // TODO(thibault) disconnect
+        } else if (!ec && length > 0) {
           handlePacket(length);
+          receive();
         }
-        receive();
       });
 }
 
