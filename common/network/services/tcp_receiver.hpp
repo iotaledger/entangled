@@ -21,12 +21,12 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
  private:
   void receive();
-  void handlePacket(std::size_t const length) const;
+  void handlePacket(std::size_t const length);
 
  private:
   receiver_state_t* state_;
   boost::asio::ip::tcp::socket socket_;
-  char packet_[TRANSACTION_PACKET_SIZE + 1];
+  iota_packet_t packet_;
 };
 
 class TcpReceiverService {

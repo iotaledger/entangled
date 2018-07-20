@@ -20,7 +20,7 @@ void TcpConnection::start() { receive(); }
 void TcpConnection::receive() {
   auto self(shared_from_this());
   socket_.async_read_some(
-      boost::asio::buffer(packet_, TRANSACTION_PACKET_SIZE),
+      boost::asio::buffer(packet_.content, TRANSACTION_PACKET_SIZE),
       [this, self](boost::system::error_code ec, std::size_t length) {
         if (ec == boost::asio::error::eof ||
             ec == boost::asio::error::connection_reset) {
@@ -32,17 +32,14 @@ void TcpConnection::receive() {
       });
 }
 
-void TcpConnection::handlePacket(std::size_t const length) const {
+void TcpConnection::handlePacket(std::size_t const length) {
   // TODO(thibault) check size packet
-  iota_packet_t packet;
-
   auto host = socket_.remote_endpoint().address().to_string();
-  memcpy(packet.source.host, host.c_str(), host.size());
-  packet.source.host[host.size()] = '\0';
-  packet.source.port = socket_.remote_endpoint().port();
-  memcpy(packet.content, packet_, length);
-  packet.content[length] = '\0';
-  packet_handler(state_, packet);
+  memcpy(packet_.source.host, host.c_str(), host.size());
+  packet_.source.host[host.size()] = '\0';
+  packet_.source.port = socket_.remote_endpoint().port();
+  packet_.content[length] = '\0';
+  packet_handler(state_, packet_);
 }
 
 /*
