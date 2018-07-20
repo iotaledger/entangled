@@ -9,11 +9,12 @@
 
 #include <boost/asio.hpp>
 
+#include "common/network/components/receiver.h"
 #include "common/network/iota_packet.h"
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
  public:
-  TcpConnection(boost::asio::ip::tcp::socket socket);
+  TcpConnection(receiver_state_t* state, boost::asio::ip::tcp::socket socket);
 
  public:
   void start();
@@ -23,17 +24,20 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
   void handlePacket(std::size_t const length) const;
 
  private:
+  receiver_state_t* state_;
   boost::asio::ip::tcp::socket socket_;
   char packet_[TRANSACTION_PACKET_SIZE];
 };
 
 class TcpReceiverService {
  public:
-  TcpReceiverService(boost::asio::io_context& io_context, uint16_t const port);
+  TcpReceiverService(receiver_state_t* state, boost::asio::io_context& context,
+                     uint16_t const port);
 
  private:
   void accept();
 
  private:
+  receiver_state_t* state_;
   boost::asio::ip::tcp::acceptor acceptor_;
 };

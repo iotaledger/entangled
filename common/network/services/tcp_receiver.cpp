@@ -11,16 +11,18 @@
  * TcpConnection
  */
 
-TcpConnection::TcpConnection(boost::asio::ip::tcp::socket socket)
-    : socket_(std::move(socket)) {}
+TcpConnection::TcpConnection(receiver_state_t* state,
+                             boost::asio::ip::tcp::socket socket)
+    : state_(state), socket_(std::move(socket)) {}
 
 void TcpConnection::start() { receive(); }
 
 void TcpConnection::receive() {
+  auto self(shared_from_this());
   socket_.async_read_some(
       boost::asio::buffer(packet_, TRANSACTION_PACKET_SIZE),
-      [this](boost::system::error_code ec, std::size_t length) {
-        if (!ec) {
+      [this, self](boost::system::error_code ec, std::size_t length) {
+        if (!ec && length > 0) {
           handlePacket(length);
         }
         receive();
@@ -28,17 +30,27 @@ void TcpConnection::receive() {
 }
 
 void TcpConnection::handlePacket(std::size_t const length) const {
-  // TODO(thibault) call receiver handle packet function
+  // TODO(thibault) check size packet
+  iota_packet_t packet;
+
+  auto host = socket_.remote_endpoint().address().to_string();
+  memcpy(packet.source.host, host.c_str(), host.size());
+  packet.source.host[host.size()] = '\0';
+  packet.source.port = socket_.remote_endpoint().port();
+  memcpy(packet.content, packet_, length);
+  packet_handler(state_, packet);
 }
 
 /*
  * TcpReceiverService
  */
 
-TcpReceiverService::TcpReceiverService(boost::asio::io_context& io_context,
+TcpReceiverService::TcpReceiverService(receiver_state_t* state,
+                                       boost::asio::io_context& context,
                                        uint16_t const port)
-    : acceptor_(io_context, boost::asio::ip::tcp::endpoint(
-                                boost::asio::ip::tcp::v4(), port)) {
+    : state_(state),
+      acceptor_(context, boost::asio::ip::tcp::endpoint(
+                             boost::asio::ip::tcp::v4(), port)) {
   accept();
 }
 
@@ -46,7 +58,7 @@ void TcpReceiverService::accept() {
   acceptor_.async_accept([this](boost::system::error_code ec,
                                 boost::asio::ip::tcp::socket socket) {
     if (!ec) {
-      std::make_shared<TcpConnection>(std::move(socket))->start();
+      std::make_shared<TcpConnection>(state_, std::move(socket))->start();
     }
     accept();
   });

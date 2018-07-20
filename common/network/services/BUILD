@@ -28,6 +28,7 @@ cc_library(
     hdrs = ["tcp_receiver.hpp"],
     deps = [
         "//common/network:iota_packet",
+        "//common/network/components:receiver_shared",
         "@boost//:asio",
     ],
 )

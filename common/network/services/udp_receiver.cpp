@@ -10,9 +10,9 @@
 UdpReceiverService::UdpReceiverService(receiver_state_t* state,
                                        boost::asio::io_context& context,
                                        uint16_t const port)
-    : socket_(context,
-              boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), port)),
-      state_(state) {
+    : state_(state),
+      socket_(context, boost::asio::ip::udp::endpoint(
+                           boost::asio::ip::udp::v4(), port)) {
   receive();
 }
 
@@ -31,9 +31,9 @@ void UdpReceiverService::handlePacket(std::size_t const length) const {
   // TODO(thibault) check size packet
   iota_packet_t packet;
 
-  auto ip = senderEndpoint_.address().to_string();
-  memcpy(packet.source.host, ip.c_str(), ip.size());
-  packet.source.host[ip.size()] = '\0';
+  auto host = senderEndpoint_.address().to_string();
+  memcpy(packet.source.host, host.c_str(), host.size());
+  packet.source.host[host.size()] = '\0';
   packet.source.port = senderEndpoint_.port();
   memcpy(packet.content, packet_, length);
   packet_handler(state_, packet);
