@@ -38,7 +38,7 @@ TEST_F(IotaJsonAPITest, GetBalances) {
   uint64_t balance = 1000;
 
   std::vector<std::string> addresses = {address};
-  std::unordered_map<std::string, uint64_t> expected = {{address, 1000}};
+  std::unordered_map<std::string, uint64_t> expected = {{address, balance}};
 
   json req;
   req["command"] = "getBalances";
