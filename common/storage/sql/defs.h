@@ -25,4 +25,6 @@
 #define COL_ATTACHMENT_TIMESTAMP_LOWER "attachment_timestamp_lower"
 #define COL_NONCE "nonce"
 
+#define NUM_COLS 15
+
 #endif  // __COMMON_STORAGE_SQL_DEFS_H__

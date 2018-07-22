@@ -9,8 +9,6 @@ cc_library(
     deps = [
         "//common/storage",
         "//common/storage/sql:connection",
-        "@com_github_gflags_gflags//:gflags",
-        "@com_github_google_glog//:glog",
         "@sqlite3",
     ],
 )

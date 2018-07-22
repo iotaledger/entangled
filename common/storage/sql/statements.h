@@ -21,16 +21,24 @@ extern "C" {
 
 /*index_name = column name by to compare to key*/
 retcode_t iota_transactions_insert_statement(const iota_transaction_t tx,
-                                             char statement[]);
+                                             char statement[],
+                                             size_t statement_cap);
 
-retcode_t iota_transactions_select_statement(const char* index_name,
+retcode_t iota_transactions_select_statement(const char* index_col,
                                              const trit_array_p key,
-                                             char statement[]);
+                                             char statement[],
+                                             size_t statement_cap);
 
-retcode_t iota_transactions_update_statement(const char* index_name,
+retcode_t iota_transactions_exist_statement(const char* index_col,
+                                            const trit_array_p key,
+                                            char statement[],
+                                            size_t statement_cap);
+
+retcode_t iota_transactions_update_statement(const char* index_col,
                                              const trit_array_p key,
                                              const iota_transaction_t tx,
-                                             char statement[]);
+                                             char statement[],
+                                             size_t statement_cap);
 
 #ifdef __cplusplus
 }

@@ -181,7 +181,7 @@ static const char TRYTES[] = {
     'N', 'P', 'J', 'R', 'B', 'Y', 'Z', 'P', 'O', 'R', 'H', 'Z', 'U', '9', 'C',
     'E', 'M', 'F', 'I', 'F', 'V', 'V', 'Q', 'B', 'U', 'S', 'T', 'D', 'G', 'S',
     'J', 'C', 'Z', 'M', 'B', 'T', 'Z', 'C', 'D', 'T', 'T', 'J', 'V', 'U', 'F',
-    'P', 'T', 'C', 'C', 'V', 'H', 'H', 'O', 'R', 'P', 'M', 'G', 'C', 'U', 'R',
+    'P', 'B', 'C', 'C', 'V', 'H', 'H', 'O', 'R', 'P', 'M', 'G', 'C', 'U', 'R',
     'K', 'T', 'H', '9', 'V', 'G', 'J', 'I', 'X', 'U', 'Q', 'J', 'V', 'H', 'K',
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
@@ -218,6 +218,17 @@ int main(int argc, char* argv[]) {
   init_connection(&conn, &conf);
 
   retcode_t ret = iota_stor_store(&conn, transaction);
+
+  iota_transaction_t txs[5];
+  for (int i = 0; i < 5; ++i) {
+    txs[i] = transaction_new();
+  }
+
+  size_t num;
+
+  ret = iota_stor_load(&conn, NULL, NULL, txs, 5, &num);
+  bool exist = false;
+  ret = iota_stor_exist(&conn, NULL, NULL, &exist);
 
   destroy_connection(&conn);
 }

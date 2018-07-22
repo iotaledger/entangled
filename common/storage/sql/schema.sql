@@ -1,5 +1,4 @@
 CREATE TABLE IF NOT EXISTS iota_transaction (
-  id INTEGER PRIMARY KEY /*!40101 AUTO_INCREMENT */,
   signature_or_message BLOB NOT NULL,
   address BLOB NOT NULL,
   value INTEGER DEFAULT 0 NOT NULL,

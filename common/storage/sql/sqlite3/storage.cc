@@ -6,26 +6,82 @@
  */
 
 #include <stdint.h>
-#include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "common/storage/sql/defs.h"
 #include "common/storage/sql/statements.h"
 #include "common/storage/storage.h"
 
-#include <glog/logging.h>
 #include <sqlite3.h>
+
+struct iota_transactions_pack {
+  iota_transaction_t* txs;
+  size_t num_txs;
+  size_t num_loaded;
+};
+
+int select_transactions_cb(void* txs, int num_cols, char** col_values,
+                           char** col_names) {
+  char* end;
+  size_t c = 0;
+  iota_transactions_pack* pack;
+
+  if (num_cols != NUM_COLS) {
+    // TODO - log something
+    return -1;
+  }
+
+  pack = (iota_transactions_pack*)txs;
+  if (pack->num_loaded < pack->num_txs) {
+    iota_transaction_t curr_transaction = pack->txs[pack->num_loaded++];
+
+    memcpy(curr_transaction->signature_or_message, col_values[c++], 2187);
+    memcpy(curr_transaction->address, col_values[c++], 81);
+    curr_transaction->value = strtol(col_values[c++], &end, 10);
+    memcpy(curr_transaction->obsolete_tag, col_values[c++], 27);
+    curr_transaction->timestamp = strtol(col_values[c++], &end, 10);
+    curr_transaction->current_index = strtol(col_values[c++], &end, 10);
+    curr_transaction->last_index = strtol(col_values[c++], &end, 10);
+    memcpy(curr_transaction->bundle, col_values[c++], 81);
+    memcpy(curr_transaction->trunk, col_values[c++], 81);
+    memcpy(curr_transaction->branch, col_values[c++], 81);
+    memcpy(curr_transaction->tag, col_values[c++], 27);
+    curr_transaction->attachment_timestamp = strtol(col_values[c++], &end, 10);
+    curr_transaction->attachment_timestamp_upper =
+        strtol(col_values[c++], &end, 10);
+    curr_transaction->attachment_timestamp_lower =
+        strtol(col_values[c++], &end, 10);
+    memcpy(curr_transaction->nonce, col_values[c++], 27);
+  }
+
+  return 0;
+}
+
+int check_transactions_exist_cb(void* exist_arg, int num_cols,
+                                char** col_values, char** col_names) {
+  bool* exist = (bool*)exist_arg;
+  *exist = true;
+  return 0;
+}
 
 retcode_t iota_stor_store(const connection_t* const conn,
                           const iota_transaction_t data_in) {
   // TODO - input more reasonable size
-  char statement[8192];
-  iota_transactions_insert_statement(data_in, statement);
+  char statement[4096];
+  // Step vars
+  int step_res;
+  int bytes;
+  const unsigned char* text;
+
+  iota_transactions_insert_statement(data_in, statement, 4096);
 
   char* err_msg = 0;
   int rc = sqlite3_exec((sqlite3*)conn->db, statement, 0, 0, &err_msg);
 
   if (rc != SQLITE_OK) {
-    LOG(ERROR) << "SQL error: " << err_msg;
+    // TODO - log
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
@@ -33,13 +89,49 @@ retcode_t iota_stor_store(const connection_t* const conn,
   return RC_OK;
 }
 retcode_t iota_stor_load(const connection_t* const conn, const char* index_name,
-                         const trit_array_p key, iota_transaction_t data_out) {}
+                         const trit_array_p key, iota_transaction_t data_out[],
+                         size_t max_num_txs, size_t* num_loaded) {
+  char statement[255];
+  iota_transactions_select_statement(index_name, key, statement, 255);
+
+  char* err_msg = 0;
+  iota_transactions_pack pack;
+  pack.txs = data_out;
+  pack.num_txs = max_num_txs;
+  pack.num_loaded = 0;
+
+  int rc = sqlite3_exec((sqlite3*)conn->db, statement, select_transactions_cb,
+                        (void*)&pack, &err_msg);
+
+  if (rc != SQLITE_OK) {
+    // TODO - log
+    sqlite3_free(err_msg);
+    return RC_SQLITE3_FAILED_INSERT_DB;
+  }
+
+  return RC_OK;
+}
 retcode_t iota_stor_exist(const connection_t* const conn,
                           const char* index_name, const trit_array_p key,
-                          bool* exist) {}
-retcode_t iota_stor_find(const connection_t* const conn, const char* index_name,
-                         const trit_array_p key, bool* found,
-                         iota_transaction_t data_out) {}
+                          bool* exist) {
+  char statement[255];
+  iota_transactions_exist_statement(index_name, key, statement, 255);
+
+  char* err_msg = 0;
+  *exist = false;
+
+  int rc = sqlite3_exec((sqlite3*)conn->db, statement,
+                        check_transactions_exist_cb, (void*)exist, &err_msg);
+
+  if (rc != SQLITE_OK) {
+    // TODO - log
+    sqlite3_free(err_msg);
+    return RC_SQLITE3_FAILED_INSERT_DB;
+  }
+
+  return RC_OK;
+}
+
 retcode_t iota_stor_update(const connection_t* const conn,
                            const char* index_name, const trit_array_p key,
                            const iota_transaction_t data_in) {}

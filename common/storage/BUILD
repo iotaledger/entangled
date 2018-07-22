@@ -11,5 +11,9 @@ cc_library(
 cc_binary(
     name = "main",
     srcs = ["main.cc"],
-    deps = ["//common/storage/sql/sqlite3:sqlite3_storage"],
+    deps = [
+        "//common/storage/sql/sqlite3:sqlite3_storage",
+        "@com_github_gflags_gflags//:gflags",
+        "@com_github_google_glog//:glog",
+    ],
 )

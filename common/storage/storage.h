@@ -24,13 +24,12 @@ extern retcode_t iota_stor_store(const connection_t* const conn,
                                  const iota_transaction_t data_in);
 extern retcode_t iota_stor_load(const connection_t* const conn,
                                 const char* index_name, const trit_array_p key,
-                                iota_transaction_t data_out);
+                                iota_transaction_t data_out[],
+                                size_t max_num_txs, size_t* num_loaded);
 extern retcode_t iota_stor_exist(const connection_t* const conn,
                                  const char* index_name, const trit_array_p key,
                                  bool* exist);
-extern retcode_t iota_stor_find(const connection_t* const conn,
-                                const char* index_name, const trit_array_p key,
-                                bool* found, iota_transaction_t data_out);
+
 extern retcode_t iota_stor_update(const connection_t* const conn,
                                   const char* index_name,
                                   const trit_array_p key,

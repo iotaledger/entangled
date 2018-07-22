@@ -8,24 +8,28 @@
 #include "common/storage/connection.h"
 #include "common/storage/sql/defs.h"
 
-#include <gflags/gflags.h>
-#include <glog/logging.h>
-#include <string>
-
 #include <sqlite3.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 retcode_t create_index(const connection_t* const conn,
-                       const std::string& indexName,
-                       const std::string& colName) {
+                       const char* const indexName, const char* const colName) {
   char* errMsg = 0;
-  std::string createIndexStatement =
-      std::string("CREATE UNIQUE INDEX IF NOT EXISTS ") + indexName + " ON " +
-      TRANSACTION_TABLE_NAME + "(" + colName + ")";
 
-  int rc = sqlite3_exec((sqlite3*)conn->db, createIndexStatement.c_str(), 0, 0,
-                        &errMsg);
+  char statement[255];
+
+  int res = snprintf(statement, 255, "CREATE INDEX IF NOT EXISTS %s ON %s(%s)",
+                     TRANSACTION_TABLE_NAME, indexName, colName);
+
+  if (res < 0 || res == 255) {
+    // TODO - log error
+    return RC_SQLITE3_FAILED_WRITE_STATEMENT;
+  }
+
+  int rc = sqlite3_exec((sqlite3*)conn->db, statement, 0, 0, &errMsg);
   if (rc != SQLITE_OK) {
-    LOG(ERROR) << "SQL error: " << errMsg;
+    // TODO - log
     sqlite3_free(errMsg);
     return RC_SQLITE3_FAILED_CREATE_INDEX_DB;
   }
@@ -45,10 +49,12 @@ retcode_t init_connection(connection_t* const conn,
   }
 
   if (rc) {
-    LOG(FATAL) << __FUNCTION__ << " Can't open database: \n"
-               << sqlite3_errmsg((sqlite3*)conn->db);
+    // TODO - log
+    // LOG(FATAL) << __FUNCTION__ << " Can't open database: \n"
+    //          << sqlite3_errmsg((sqlite3*)conn->db);
   } else {
-    LOG(INFO) << "Opened database successfully";
+    // TODO - log
+    // LOG(INFO) << "Opened database successfully";
   }
 
   if (config->indexApprovee) {

@@ -15,28 +15,22 @@ extern "C" {
 /**
  * @file  erros.h
  *
- * This interface provides type definitions, data types and functions to handle
- * exceptions.
+ * The following error scheme takes advantage of a 16-bit integer
+ * in order to fit in data about an error, its origin and severity
  *
- * The error code is designed to fit into a single, 16 bit integer
- * The higher bits representing the module, the lower bits represent
- * the code within the module. The two high bits of the module
- * are interpreted as the severity of the error code.
- *
+ * bits devision:
+ * 1 -> 6 - actual error code (63 errors)
+ * 7 -> 8 - error's severity (4 categories)
+ * 9 -> 16 - the module which originated the error (255 different modules)
  * The stack itself uses modules in the range 1..127.
  * Thus an application may use values 128..255 for own purposes.
  *
  * M is the module, S the severity and C the actual error code
- *  1
- *  5      8        0
- * +--------+--------+
- * |MMMMMMMM|SSCCCCCC|
- * +--------+--------+
  *
- * This yields 255 modules and 255 codes per module.
- * In the naive construction like it is done below,
- * the severity is treated separately and thus only 63 codes per
- * module are actually used.
+ *  16      9        1
+ * *--------*--------*
+ * |MMMMMMMM|SSCCCCCC|
+ * *--------*--------*
  *
  */
 
@@ -68,6 +62,8 @@ extern "C" {
 /* Macros for Error code module specific */
 #define RC_GET_ERRORCODE(x) ((x)&RC_ERRORCODE_MASK)
 
+#define RC_RESOLVE_FORMAT_STR "M=0x%02X, E=0x%02X, S=0x%X (0x%04X)"
+
 
 /** Return Codes */
 enum retcode_t {
@@ -79,6 +75,8 @@ enum retcode_t {
       0x02 | RC_MODULE_STORAGE_SQLITE3 | RC_SEVERITY_MAJOR,
   RC_SQLITE3_FAILED_CREATE_INDEX_DB =
       0x03 | RC_MODULE_STORAGE_SQLITE3 | RC_SEVERITY_MAJOR,
+    RC_SQLITE3_FAILED_WRITE_STATEMENT =
+    0x04 | RC_MODULE_STORAGE_SQLITE3 | RC_SEVERITY_MAJOR,
 };
 
 #ifdef __cplusplus
