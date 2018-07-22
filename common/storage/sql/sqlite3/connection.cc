@@ -35,6 +35,11 @@ retcode_t create_index(const connection_t* const conn,
     return RC_SQLITE3_FAILED_CREATE_INDEX_DB;
   }
 
+  //TODO - implement connections pool so no two threads
+  //will access db through same connection simultaneously
+  sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
+  sqlite3_config(SQLITE_CONFIG_MEMSTATUS, 0);
+
   return RC_OK;
 }
 
