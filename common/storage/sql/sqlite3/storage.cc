@@ -68,14 +68,10 @@ int check_transactions_exist_cb(void* exist_arg, int num_cols,
 
 retcode_t iota_stor_store(const connection_t* const conn,
                           const iota_transaction_t data_in) {
-  // TODO - input more reasonable size
-  char statement[4096];
-  // Step vars
-  int step_res;
-  int bytes;
-  const unsigned char* text;
 
-  iota_transactions_insert_statement(data_in, statement, 4096);
+  char statement[MAX_STORE_STATEMENT_SIZE];
+  iota_transactions_insert_statement(data_in, statement,
+                                     MAX_STORE_STATEMENT_SIZE);
 
   char* err_msg = 0;
   int rc = sqlite3_exec((sqlite3*)conn->db, statement, 0, 0, &err_msg);
@@ -91,8 +87,9 @@ retcode_t iota_stor_store(const connection_t* const conn,
 retcode_t iota_stor_load(const connection_t* const conn, const char* index_name,
                          const trit_array_p key, iota_transaction_t data_out[],
                          size_t max_num_txs, size_t* num_loaded) {
-  char statement[255];
-  iota_transactions_select_statement(index_name, key, statement, 255);
+  char statement[MAX_SELECT_STATEMENT_SIZE];
+  iota_transactions_select_statement(index_name, key, statement,
+                                     MAX_SELECT_STATEMENT_SIZE);
 
   char* err_msg = 0;
   iota_transactions_pack pack;
@@ -114,8 +111,9 @@ retcode_t iota_stor_load(const connection_t* const conn, const char* index_name,
 retcode_t iota_stor_exist(const connection_t* const conn,
                           const char* index_name, const trit_array_p key,
                           bool* exist) {
-  char statement[255];
-  iota_transactions_exist_statement(index_name, key, statement, 255);
+  char statement[MAX_EXIST_STATEMENT_SIZE];
+  iota_transactions_exist_statement(index_name, key, statement,
+                                    MAX_EXIST_STATEMENT_SIZE);
 
   char* err_msg = 0;
   *exist = false;

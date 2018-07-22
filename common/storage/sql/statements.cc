@@ -93,10 +93,9 @@ retcode_t iota_transactions_exist_statement(const char* index_col,
   int res;
 
   if (index_col == NULL || strcmp(index_col, "") == 0) {
-    res = snprintf(
-        statement, statement_cap,
-        "SELECT '1' WHERE EXISTS(SELECT 1 FROM %s)",
-        TRANSACTION_TABLE_NAME);
+    res = snprintf(statement, statement_cap,
+                   "SELECT '1' WHERE EXISTS(SELECT 1 FROM %s)",
+                   TRANSACTION_TABLE_NAME);
   } else {
     char key_str[key->num_bytes];
     memcpy(key_str, key->trits, key->num_bytes);

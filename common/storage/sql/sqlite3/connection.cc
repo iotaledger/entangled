@@ -17,12 +17,13 @@ retcode_t create_index(const connection_t* const conn,
                        const char* const indexName, const char* const colName) {
   char* errMsg = 0;
 
-  char statement[255];
+  char statement[MAX_CREATE_INDEX_STATEMENT_SIZE];
 
-  int res = snprintf(statement, 255, "CREATE INDEX IF NOT EXISTS %s ON %s(%s)",
+  int res = snprintf(statement, MAX_CREATE_INDEX_STATEMENT_SIZE,
+                     "CREATE INDEX IF NOT EXISTS %s ON %s(%s)",
                      TRANSACTION_TABLE_NAME, indexName, colName);
 
-  if (res < 0 || res == 255) {
+  if (res < 0 || res == MAX_CREATE_INDEX_STATEMENT_SIZE) {
     // TODO - log error
     return RC_SQLITE3_FAILED_WRITE_STATEMENT;
   }
