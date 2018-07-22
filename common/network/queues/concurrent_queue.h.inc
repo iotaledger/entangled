@@ -44,9 +44,9 @@ typedef enum concurrent_queue_status_e {
 
 #define DECLARE_STRUCT_CONCURRENT_QUEUE_OF(TYPE)         \
   typedef struct concurrent_queue_of_##TYPE##_s {        \
+    vtable_concurrent_queue_of_##TYPE##_t const *vtable; \
     concurrent_queue_node_of_##TYPE##_t *front;          \
     concurrent_queue_node_of_##TYPE##_t *back;           \
-    vtable_concurrent_queue_of_##TYPE##_t const *vtable; \
     size_t size;                                         \
     lock_handle_t lock;                                  \
     cond_handle_t cond;                                  \

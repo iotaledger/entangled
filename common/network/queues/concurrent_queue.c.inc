@@ -26,9 +26,9 @@ static unsigned int const concurrent_queue_pop_timeout_g = 2;
     *self = (concurrent_queue_of_##TYPE *)malloc(              \
         sizeof(concurrent_queue_of_##TYPE));                   \
     if (*self == NULL) return CONCURRENT_QUEUE_ALLOC_FAILED;   \
+    (*self)->vtable = &vtable_concurrent_queue_of_##TYPE##_g;  \
     (*self)->front = NULL;                                     \
     (*self)->back = NULL;                                      \
-    (*self)->vtable = &vtable_concurrent_queue_of_##TYPE##_g;  \
     (*self)->size = 0;                                         \
     lock_handle_init(&(*self)->lock);                          \
     cond_handle_init(&(*self)->cond);                          \
