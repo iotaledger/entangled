@@ -7,8 +7,9 @@
 
 #include <stdlib.h>
 
-#define DEFINE_VTABLE_LIST_OF(TYPE)                             \
-  vtable_list_of_##TYPE##_t const vtable_list_of_##TYPE##_g = { \
+#define DEFINE_VTABLE_LIST_OF(TYPE)                                          \
+  vtable_list_of_##TYPE##_t const vtable_list_of_##TYPE##_g = {              \
+      LIST_OF_##TYPE##_FRONT, LIST_OF_##TYPE##_BACK, LIST_OF_##TYPE##_EMPTY, \
       LIST_OF_##TYPE##_SIZE};
 
 #define DEFINE_FUNCTION_INIT_LIST_OF(TYPE)                    \
@@ -40,8 +41,31 @@
     return LIST_SUCCESS;                                      \
   }
 
+#define DEFINE_FUNCTION_FRONT_LIST_OF(TYPE)                             \
+  TYPE *LIST_OF_##TYPE##_FRONT(struct list_of_##TYPE##_s *const self) { \
+    TYPE *data = NULL;                                                  \
+    if (self == NULL) return NULL;                                      \
+    if (self->front) data = &self->front->data;                         \
+    return data;                                                        \
+  }
+
+#define DEFINE_FUNCTION_BACK_LIST_OF(TYPE)                             \
+  TYPE *LIST_OF_##TYPE##_BACK(struct list_of_##TYPE##_s *const self) { \
+    TYPE *data = NULL;                                                 \
+    if (self == NULL) return NULL;                                     \
+    if (self->back) data = &self->back->data;                          \
+    return data;                                                       \
+  }
+
+#define DEFINE_FUNCTION_EMPTY_LIST_OF(TYPE)                            \
+  bool LIST_OF_##TYPE##_EMPTY(struct list_of_##TYPE##_s *const self) { \
+    if (self == NULL) return true;                                     \
+    return self->size == 0;                                            \
+  }
+
 #define DEFINE_FUNCTION_SIZE_LIST_OF(TYPE)                              \
   size_t LIST_OF_##TYPE##_SIZE(struct list_of_##TYPE##_s *const self) { \
+    if (self == NULL) return 0;                                         \
     return self->size;                                                  \
   }
 
@@ -49,4 +73,7 @@
   DEFINE_VTABLE_LIST_OF(TYPE)           \
   DEFINE_FUNCTION_INIT_LIST_OF(TYPE)    \
   DEFINE_FUNCTION_DESTROY_LIST_OF(TYPE) \
+  DEFINE_FUNCTION_FRONT_LIST_OF(TYPE)   \
+  DEFINE_FUNCTION_BACK_LIST_OF(TYPE)    \
+  DEFINE_FUNCTION_EMPTY_LIST_OF(TYPE)   \
   DEFINE_FUNCTION_SIZE_LIST_OF(TYPE)\

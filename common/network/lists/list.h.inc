@@ -8,7 +8,7 @@
 #ifndef __COMMON_NETWORK_LIST_H__
 #define __COMMON_NETWORK_LIST_H__
 
-#include <stdlib.h>
+#include <stdbool.h>
 
 typedef enum list_status_e {
   LIST_SUCCESS,
@@ -26,6 +26,9 @@ typedef enum list_status_e {
 #define DECLARE_VTABLE_LIST_OF(TYPE)                       \
   struct list_of_##TYPE##_s;                               \
   typedef struct vtable_list_of_##TYPE##_s {               \
+    TYPE *(*front)(struct list_of_##TYPE##_s *const self); \
+    TYPE *(*back)(struct list_of_##TYPE##_s *const self);  \
+    bool (*empty)(struct list_of_##TYPE##_s *const self);  \
     size_t (*size)(struct list_of_##TYPE##_s *const self); \
   } vtable_list_of_##TYPE##_t;                             \
   extern vtable_list_of_##TYPE##_t const vtable_list_of_##TYPE##_g;
@@ -64,6 +67,36 @@ typedef enum list_status_e {
       struct list_of_##TYPE##_s **const self);
 
 /**
+ * Returns pointer to the first element in the list
+ *
+ * @param self The list
+ *
+ * @return Pointer to the first element
+ */
+#define DECLARE_FUNCTION_FRONT_LIST_OF(TYPE) \
+  TYPE *LIST_OF_##TYPE##_FRONT(struct list_of_##TYPE##_s *const self);
+
+/**
+ * Returns pointer to the last element in the list
+ *
+ * @param self The list
+ *
+ * @return Pointer to the last element
+ */
+#define DECLARE_FUNCTION_BACK_LIST_OF(TYPE) \
+  TYPE *LIST_OF_##TYPE##_BACK(struct list_of_##TYPE##_s *const self);
+
+/**
+ * Checks if the list has no elements
+ *
+ * @param self The list
+ *
+ * @return true if the list is empty, false otherwise
+ */
+#define DECLARE_FUNCTION_EMPTY_LIST_OF(TYPE) \
+  bool LIST_OF_##TYPE##_EMPTY(struct list_of_##TYPE##_s *const self);
+
+/**
  * Returns the number of elements in the list
  *
  * @param self The list
@@ -79,6 +112,9 @@ typedef enum list_status_e {
   DECLARE_STRUCT_LIST_OF(TYPE)           \
   DECLARE_FUNCTION_INIT_LIST_OF(TYPE)    \
   DECLARE_FUNCTION_DESTROY_LIST_OF(TYPE) \
+  DECLARE_FUNCTION_FRONT_LIST_OF(TYPE)   \
+  DECLARE_FUNCTION_BACK_LIST_OF(TYPE)    \
+  DECLARE_FUNCTION_EMPTY_LIST_OF(TYPE)   \
   DECLARE_FUNCTION_SIZE_LIST_OF(TYPE)
 
 #endif  // __COMMON_NETWORK_LIST_H__

@@ -21,6 +21,15 @@ void test_list() {
   TEST_ASSERT_EQUAL_INT(INIT_LIST_OF(int, list), LIST_SUCCESS);
   TEST_ASSERT_NOT_NULL(list);
 
+  TEST_ASSERT_NULL(list->vtable->front(NULL));
+  TEST_ASSERT_NULL(list->vtable->front(list));
+  TEST_ASSERT_NULL(list->vtable->back(NULL));
+  TEST_ASSERT_NULL(list->vtable->back(list));
+  TEST_ASSERT_EQUAL_INT(list->vtable->empty(NULL), true);
+  TEST_ASSERT_EQUAL_INT(list->vtable->empty(list), true);
+  TEST_ASSERT_EQUAL_INT(list->vtable->size(NULL), 0);
+  TEST_ASSERT_EQUAL_INT(list->vtable->size(list), 0);
+
   TEST_ASSERT_EQUAL_INT(DESTROY_LIST_OF(int, nlist), LIST_NULL_SELF);
   TEST_ASSERT_EQUAL_INT(DESTROY_LIST_OF(int, list), LIST_SUCCESS);
   TEST_ASSERT_NULL(list);

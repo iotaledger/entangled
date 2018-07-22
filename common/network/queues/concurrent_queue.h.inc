@@ -106,7 +106,7 @@ typedef enum concurrent_queue_status_e {
       struct concurrent_queue_of_##TYPE##_s *const self);
 
 /**
- * Checks if the underlying container has no elements
+ * Checks if the queue has no elements
  *
  * @param self The queue
  *
