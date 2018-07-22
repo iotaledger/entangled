@@ -10,12 +10,11 @@
 #include <boost/asio.hpp>
 
 #include "common/network/components/receiver.h"
-#include "common/network/iota_packet.h"
 
 class UdpReceiverService {
  public:
-  UdpReceiverService(receiver_state_t* state, boost::asio::io_context& context,
-                     uint16_t const port);
+  UdpReceiverService(receiver_state_t* const state,
+                     boost::asio::io_context& context, uint16_t const port);
 
  public:
   void receive();

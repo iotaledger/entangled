@@ -5,9 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/network/components/receiver.h"
-#include "common/network/logger.h"
 #include "common/network/services/receiver.h"
+#include "common/network/logger.h"
 
 bool packet_handler(receiver_state_t *const state,
                     iota_packet_t *const packet) {

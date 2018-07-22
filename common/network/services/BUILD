@@ -16,7 +16,6 @@ cc_library(
     srcs = ["udp_receiver.cpp"],
     hdrs = ["udp_receiver.hpp"],
     deps = [
-        "//common/network:iota_packet",
         "//common/network/components:receiver_shared",
         "@boost//:asio",
     ],
@@ -27,7 +26,6 @@ cc_library(
     srcs = ["tcp_receiver.cpp"],
     hdrs = ["tcp_receiver.hpp"],
     deps = [
-        "//common/network:iota_packet",
         "//common/network/components:receiver_shared",
         "@boost//:asio",
     ],

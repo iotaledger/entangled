@@ -36,7 +36,10 @@ cc_library(
 cc_library(
     name = "receiver_shared",
     hdrs = ["receiver.h"],
-    deps = ["//common:thread_handle"],
+    deps = [
+        "//common:thread_handle",
+        "//common/network:iota_packet",
+    ],
 )
 
 cc_library(

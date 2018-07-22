@@ -11,7 +11,7 @@
  * TcpConnection
  */
 
-TcpConnection::TcpConnection(receiver_state_t* state,
+TcpConnection::TcpConnection(receiver_state_t* const state,
                              boost::asio::ip::tcp::socket socket)
     : state_(state), socket_(std::move(socket)) {}
 
@@ -46,7 +46,7 @@ void TcpConnection::handlePacket(std::size_t const length) {
  * TcpReceiverService
  */
 
-TcpReceiverService::TcpReceiverService(receiver_state_t* state,
+TcpReceiverService::TcpReceiverService(receiver_state_t* const state,
                                        boost::asio::io_context& context,
                                        uint16_t const port)
     : state_(state),

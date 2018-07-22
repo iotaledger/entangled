@@ -35,8 +35,7 @@ bool receiver_service_stop(receiver_state_t* const state) {
     auto ctx =
         reinterpret_cast<boost::asio::io_context*>(state->opaque_network);
     if (ctx == NULL) {
-      log_error(
-          "Receiver service failed to stop: invalid network configuration");
+      log_error("Receiver service failed to stop: invalid service");
       return false;
     }
     ctx->stop();
