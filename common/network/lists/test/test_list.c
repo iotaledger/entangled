@@ -13,7 +13,18 @@
 DECLARE_LIST_OF(int)
 DEFINE_LIST_OF(int)
 
-void test_list() {}
+void test_list() {
+  int data;
+  list_of_int *list = NULL;
+  list_of_int *nlist = NULL;
+
+  TEST_ASSERT_EQUAL_INT(INIT_LIST_OF(int, list), LIST_SUCCESS);
+  TEST_ASSERT_NOT_NULL(list);
+
+  TEST_ASSERT_EQUAL_INT(DESTROY_LIST_OF(int, nlist), LIST_NULL_SELF);
+  TEST_ASSERT_EQUAL_INT(DESTROY_LIST_OF(int, list), LIST_SUCCESS);
+  TEST_ASSERT_NULL(list);
+}
 
 int main(void) {
   UNITY_BEGIN();

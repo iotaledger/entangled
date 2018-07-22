@@ -11,16 +11,33 @@
   vtable_list_of_##TYPE##_t const vtable_list_of_##TYPE##_g = { \
       LIST_OF_##TYPE##_SIZE};
 
-#define DEFINE_FUNCTION_INIT_LIST_OF(TYPE)      \
-  list_status_t LIST_OF_##TYPE##_INIT(          \
-      struct list_of_##TYPE##_s **const self) { \
-    return LIST_SUCCESS;                        \
+#define DEFINE_FUNCTION_INIT_LIST_OF(TYPE)                    \
+  list_status_t LIST_OF_##TYPE##_INIT(                        \
+      struct list_of_##TYPE##_s **const self) {               \
+    if (self == NULL) return LIST_NULL_SELF;                  \
+    *self = (list_of_##TYPE *)malloc(sizeof(list_of_##TYPE)); \
+    if (*self == NULL) return LIST_ALLOC_FAILED;              \
+    (*self)->vtable = &vtable_list_of_##TYPE##_g;             \
+    (*self)->front = NULL;                                    \
+    (*self)->back = NULL;                                     \
+    (*self)->size = 0;                                        \
+    return LIST_SUCCESS;                                      \
   }
 
-#define DEFINE_FUNCTION_DESTROY_LIST_OF(TYPE)   \
-  list_status_t LIST_OF_##TYPE##_DESTROY(       \
-      struct list_of_##TYPE##_s **const self) { \
-    return LIST_SUCCESS;                        \
+#define DEFINE_FUNCTION_DESTROY_LIST_OF(TYPE)                 \
+  list_status_t LIST_OF_##TYPE##_DESTROY(                     \
+      struct list_of_##TYPE##_s **const self) {               \
+    list_node_of_##TYPE##_t *front, *tmp;                     \
+    if (self == NULL || *self == NULL) return LIST_NULL_SELF; \
+    front = (*self)->front;                                   \
+    while (front) {                                           \
+      tmp = front;                                            \
+      front = front->next;                                    \
+      free(tmp);                                              \
+    }                                                         \
+    free(*self);                                              \
+    *self = NULL;                                             \
+    return LIST_SUCCESS;                                      \
   }
 
 #define DEFINE_FUNCTION_SIZE_LIST_OF(TYPE)                              \

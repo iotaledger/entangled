@@ -12,6 +12,8 @@
 
 typedef enum list_status_e {
   LIST_SUCCESS,
+  LIST_NULL_SELF,
+  LIST_ALLOC_FAILED
 } list_status_t;
 
 #define DECLARE_STRUCT_LIST_NODE_OF(TYPE)  \
@@ -30,9 +32,9 @@ typedef enum list_status_e {
 
 #define DECLARE_STRUCT_LIST_OF(TYPE)         \
   typedef struct list_of_##TYPE##_s {        \
+    vtable_list_of_##TYPE##_t const *vtable; \
     list_node_of_##TYPE##_t *front;          \
     list_node_of_##TYPE##_t *back;           \
-    vtable_list_of_##TYPE##_t const *vtable; \
     size_t size;                             \
   } list_of_##TYPE;
 
