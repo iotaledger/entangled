@@ -8,7 +8,7 @@
 #ifndef __COMMON_NETWORK_LIST_NEIGHBOR_H__
 #define __COMMON_NETWORK_LIST_NEIGHBOR_H__
 
-#include "common/network/list/list.h.inc"
+#include "common/network/lists/list.h.inc"
 #include "common/network/neighbor.h"
 
 #ifdef __cplusplus
