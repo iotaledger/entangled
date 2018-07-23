@@ -19,6 +19,8 @@
 extern "C" {
 #endif
 
+extern retcode_t iota_stor_init();
+extern retcode_t iota_stor_destroy();
 /*index_name = column name by to compare to key*/
 extern retcode_t iota_stor_store(const connection_t* const conn,
                                  const iota_transaction_t data_in);

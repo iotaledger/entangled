@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 #include <gflags/gflags.h>
-#include <glog/logging.h>
+#include <logger.h>
 
 #include "common/model/transaction.h"
 #include "common/storage/storage.h"
@@ -203,7 +203,22 @@ static const char TRYTES[] = {
 
 int main(int argc, char* argv[]) {
   ::gflags::ParseCommandLineFlags(&argc, &argv, true);
-  ::google::InitGoogleLogging("dummy storage");
+
+  /* check logger version */
+  if (LOGGER_VERSION != logger_version()) {
+    return (1);
+  }
+
+  /* initialize logger */
+  logger_init();
+
+  /* open stdout as output for messages above LOGGER_ERR */
+  logger_output_register(stdout);
+  logger_output_level_set(stdout, LOGGER_ERR);
+
+  /* register user function for messages above LOGGER_INFO */
+  logger_output_function_register(logger_helper_printer);
+  logger_output_function_level_set(logger_helper_printer, LOGGER_INFO);
 
   iota_transaction_t transaction =
       transaction_deserialize((const tryte_t*)&TRYTES);
@@ -231,4 +246,10 @@ int main(int argc, char* argv[]) {
   ret = iota_stor_exist(&conn, NULL, NULL, &exist);
 
   destroy_connection(&conn);
+
+  /* deregister user function */
+  logger_output_function_deregister(logger_helper_printer);
+
+  /* deregister stdout output */
+  logger_output_deregister(stdout);
 }

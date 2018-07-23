@@ -13,6 +13,8 @@
 
 #include "common/errors.h"
 
+#include <logger.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
