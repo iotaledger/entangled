@@ -12,6 +12,12 @@ git_repository(
     remote = "https://github.com/iotaledger/toolchains.git",
 )
 
+git_repository(
+    name = "iota_toolchains",
+    commit = "a273b913ae18ab80a6e0f5c96e254927ee7c9440",
+    remote = "https://github.com/iotaledger/toolchains.git",
+)
+
 android_sdk_repository(
     name = "androidsdk",
     api_level = 19,
