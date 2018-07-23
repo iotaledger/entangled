@@ -23,14 +23,14 @@ typedef enum list_status_e {
     struct list_node_of_##TYPE##_s *next;  \
   } list_node_of_##TYPE##_t;
 
-#define DECLARE_VTABLE_LIST_OF(TYPE)                \
-  typedef struct list_of_##TYPE##_s list_of_##TYPE; \
-  typedef struct vtable_list_of_##TYPE##_s {        \
-    TYPE *(*front)(list_of_##TYPE *const self);     \
-    TYPE *(*back)(list_of_##TYPE *const self);      \
-    bool (*empty)(list_of_##TYPE *const self);      \
-    size_t (*size)(list_of_##TYPE *const self);     \
-  } vtable_list_of_##TYPE##_t;                      \
+#define DECLARE_VTABLE_LIST_OF(TYPE)                  \
+  typedef struct list_of_##TYPE##_s list_of_##TYPE;   \
+  typedef struct vtable_list_of_##TYPE##_s {          \
+    TYPE *(*front)(list_of_##TYPE const *const self); \
+    TYPE *(*back)(list_of_##TYPE const *const self);  \
+    bool (*empty)(list_of_##TYPE const *const self);  \
+    size_t (*size)(list_of_##TYPE const *const self); \
+  } vtable_list_of_##TYPE##_t;                        \
   extern vtable_list_of_##TYPE##_t const vtable_list_of_##TYPE##_g;
 
 #define DECLARE_STRUCT_LIST_OF(TYPE)         \
@@ -73,7 +73,7 @@ typedef enum list_status_e {
  * @return Pointer to the first element
  */
 #define DECLARE_FUNCTION_FRONT_LIST_OF(TYPE) \
-  TYPE *LIST_OF_##TYPE##_FRONT(list_of_##TYPE *const self);
+  TYPE *LIST_OF_##TYPE##_FRONT(list_of_##TYPE const *const self);
 
 /**
  * Returns pointer to the last element in the list
@@ -83,7 +83,7 @@ typedef enum list_status_e {
  * @return Pointer to the last element
  */
 #define DECLARE_FUNCTION_BACK_LIST_OF(TYPE) \
-  TYPE *LIST_OF_##TYPE##_BACK(list_of_##TYPE *const self);
+  TYPE *LIST_OF_##TYPE##_BACK(list_of_##TYPE const *const self);
 
 /**
  * Checks if the list has no elements
@@ -93,7 +93,7 @@ typedef enum list_status_e {
  * @return true if the list is empty, false otherwise
  */
 #define DECLARE_FUNCTION_EMPTY_LIST_OF(TYPE) \
-  bool LIST_OF_##TYPE##_EMPTY(list_of_##TYPE *const self);
+  bool LIST_OF_##TYPE##_EMPTY(list_of_##TYPE const *const self);
 
 /**
  * Returns the number of elements in the list
@@ -103,7 +103,7 @@ typedef enum list_status_e {
  * @return The number of elements in the list
  */
 #define DECLARE_FUNCTION_SIZE_LIST_OF(TYPE) \
-  size_t LIST_OF_##TYPE##_SIZE(list_of_##TYPE *const self);
+  size_t LIST_OF_##TYPE##_SIZE(list_of_##TYPE const *const self);
 
 #define DECLARE_LIST_OF(TYPE)            \
   DECLARE_STRUCT_LIST_NODE_OF(TYPE)      \

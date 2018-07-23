@@ -39,32 +39,32 @@
     return LIST_SUCCESS;                                                \
   }
 
-#define DEFINE_FUNCTION_FRONT_LIST_OF(TYPE)                  \
-  TYPE *LIST_OF_##TYPE##_FRONT(list_of_##TYPE *const self) { \
-    TYPE *data = NULL;                                       \
-    if (self == NULL) return NULL;                           \
-    if (self->front) data = &self->front->data;              \
-    return data;                                             \
+#define DEFINE_FUNCTION_FRONT_LIST_OF(TYPE)                        \
+  TYPE *LIST_OF_##TYPE##_FRONT(list_of_##TYPE const *const self) { \
+    TYPE *data = NULL;                                             \
+    if (self == NULL) return NULL;                                 \
+    if (self->front) data = &self->front->data;                    \
+    return data;                                                   \
   }
 
-#define DEFINE_FUNCTION_BACK_LIST_OF(TYPE)                  \
-  TYPE *LIST_OF_##TYPE##_BACK(list_of_##TYPE *const self) { \
-    TYPE *data = NULL;                                      \
-    if (self == NULL) return NULL;                          \
-    if (self->back) data = &self->back->data;               \
-    return data;                                            \
+#define DEFINE_FUNCTION_BACK_LIST_OF(TYPE)                        \
+  TYPE *LIST_OF_##TYPE##_BACK(list_of_##TYPE const *const self) { \
+    TYPE *data = NULL;                                            \
+    if (self == NULL) return NULL;                                \
+    if (self->back) data = &self->back->data;                     \
+    return data;                                                  \
   }
 
-#define DEFINE_FUNCTION_EMPTY_LIST_OF(TYPE)                 \
-  bool LIST_OF_##TYPE##_EMPTY(list_of_##TYPE *const self) { \
-    if (self == NULL) return true;                          \
-    return self->size == 0;                                 \
+#define DEFINE_FUNCTION_EMPTY_LIST_OF(TYPE)                       \
+  bool LIST_OF_##TYPE##_EMPTY(list_of_##TYPE const *const self) { \
+    if (self == NULL) return true;                                \
+    return self->size == 0;                                       \
   }
 
-#define DEFINE_FUNCTION_SIZE_LIST_OF(TYPE)                   \
-  size_t LIST_OF_##TYPE##_SIZE(list_of_##TYPE *const self) { \
-    if (self == NULL) return 0;                              \
-    return self->size;                                       \
+#define DEFINE_FUNCTION_SIZE_LIST_OF(TYPE)                         \
+  size_t LIST_OF_##TYPE##_SIZE(list_of_##TYPE const *const self) { \
+    if (self == NULL) return 0;                                    \
+    return self->size;                                             \
   }
 
 #define DEFINE_LIST_OF(TYPE)            \
