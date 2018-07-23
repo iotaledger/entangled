@@ -220,6 +220,8 @@ int main(int argc, char* argv[]) {
   logger_output_function_register(logger_helper_printer);
   logger_output_function_level_set(logger_helper_printer, LOGGER_INFO);
 
+  iota_stor_init();
+
   iota_transaction_t transaction =
       transaction_deserialize((const tryte_t*)&TRYTES);
 
@@ -246,6 +248,8 @@ int main(int argc, char* argv[]) {
   ret = iota_stor_exist(&conn, NULL, NULL, &exist);
 
   destroy_connection(&conn);
+
+  iota_stor_destroy();
 
   /* deregister user function */
   logger_output_function_deregister(logger_helper_printer);

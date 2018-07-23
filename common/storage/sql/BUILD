@@ -7,5 +7,6 @@ cc_library(
         "//common:errors",
         "//common/model:transaction",
         "//common/storage:storage",
+        "//common:logger_helper",
     ],
 )
