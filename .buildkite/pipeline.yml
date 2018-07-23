@@ -15,7 +15,7 @@ steps:
           - /conf:/conf
 
   - name: "bazel test opt i686"
-    command: bazel test --crosstool_top=@iota_toolchains//tools/x86-i686--glibc--stable-2018.02-2:toolchain --cpu=i686 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain -c opt --test_output=all //...
+    command: bazel test --crosstool_top=@iota_toolchains//tools/x86-i686--glibc--bleeding-edge-2018.07-1:toolchain --cpu=i686 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain -c opt --test_output=all //...
     plugins:
       docker#v1.3.0:
         image: "th0br0/iota-buildenv:x86_64"
@@ -23,7 +23,7 @@ steps:
           - /conf:/conf
 
   - name: "bazel test debug i686"
-    command: bazel test --crosstool_top=@iota_toolchains//tools/x86-i686--glibc--stable-2018.02-2:toolchain --cpu=i686 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain -c dbg --test_output=all //...
+    command: bazel test --crosstool_top=@iota_toolchains//tools/x86-i686--glibc--bleeding-edge-2018.07-1:toolchain --cpu=i686 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain -c dbg --test_output=all //...
     plugins:
       docker#v1.3.0:
         image: "th0br0/iota-buildenv:x86_64"
