@@ -10,7 +10,9 @@
 
 bool receiver_packet_handler(receiver_state_t *const state,
                              iota_packet_t *const packet) {
-  // TODO(thibault) discard if bad size
+  if (packet->length != TRANSACTION_PACKET_SIZE) {
+    return false;
+  }
   log_debug("%s packet received from %s:%d",
             (packet->source.protocol == ENDPOINT_PROTOCOL_TCP ? "TCP" : "UDP"),
             packet->source.host, packet->source.port);

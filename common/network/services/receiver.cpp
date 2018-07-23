@@ -15,8 +15,7 @@ void receiver_service_prepare_packet(iota_packet_t* const packet,
                                      char const* const host,
                                      uint16_t const port,
                                      protocol_type_t const protocol) {
-  // TODO(thibault) check size packet
-  // TODO(thibault) check size host
+  packet->length = length;
   strcpy(packet->source.host, host);
   packet->source.port = port;
   packet->source.protocol = protocol;
