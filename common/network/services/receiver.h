@@ -14,8 +14,13 @@
 extern "C" {
 #endif
 
-bool receiver_service_start(receiver_state_t *const state);
-bool receiver_service_stop(receiver_state_t *const state);
+void receiver_service_prepare_packet(iota_packet_t* const packet,
+                                     size_t const length,
+                                     char const* const host,
+                                     uint16_t const port,
+                                     protocol_type_t const protocol);
+bool receiver_service_start(receiver_state_t* const state);
+bool receiver_service_stop(receiver_state_t* const state);
 
 #ifdef __cplusplus
 }

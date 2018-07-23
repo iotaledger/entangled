@@ -6,6 +6,7 @@
  */
 
 #include "common/network/services/udp_receiver.hpp"
+#include "common/network/services/receiver.h"
 
 UdpReceiverService::UdpReceiverService(receiver_state_t* const state,
                                        boost::asio::io_context& context,
@@ -29,11 +30,8 @@ void UdpReceiverService::receive() {
 }
 
 void UdpReceiverService::handlePacket(std::size_t const length) {
-  // TODO(thibault) check packet size
-  auto host = senderEndpoint_.address().to_string();
-  memcpy(packet_.source.host, host.c_str(), host.size());
-  packet_.source.host[host.size()] = '\0';
-  packet_.source.port = senderEndpoint_.port();
-  packet_.content[length] = '\0';
-  packet_handler(state_, &packet_);
+  receiver_service_prepare_packet(
+      &packet_, length, senderEndpoint_.address().to_string().c_str(),
+      senderEndpoint_.port(), ENDPOINT_PROTOCOL_UDP);
+  receiver_packet_handler(state_, &packet_);
 }

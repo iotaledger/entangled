@@ -10,6 +10,19 @@
 #include "common/network/services/tcp_receiver.hpp"
 #include "common/network/services/udp_receiver.hpp"
 
+void receiver_service_prepare_packet(iota_packet_t* const packet,
+                                     size_t const length,
+                                     char const* const host,
+                                     uint16_t const port,
+                                     protocol_type_t const protocol) {
+  // TODO(thibault) check size packet
+  // TODO(thibault) check size host
+  strcpy(packet->source.host, host);
+  packet->source.port = port;
+  packet->source.protocol = protocol;
+  packet->content[length] = '\0';
+}
+
 bool receiver_service_start(receiver_state_t* const state) {
   if (state == NULL) {
     return false;

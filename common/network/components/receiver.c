@@ -8,11 +8,12 @@
 #include "common/network/services/receiver.h"
 #include "common/network/logger.h"
 
-bool packet_handler(receiver_state_t *const state,
-                    iota_packet_t *const packet) {
+bool receiver_packet_handler(receiver_state_t *const state,
+                             iota_packet_t *const packet) {
   // TODO(thibault) discard if bad size
-  log_debug("Packet received from %s:%d", packet->source.host,
-            packet->source.port);
+  log_debug("%s packet received from %s:%d",
+            (packet->source.protocol == ENDPOINT_PROTOCOL_TCP ? "TCP" : "UDP"),
+            packet->source.host, packet->source.port);
   // TODO(thibault) submit packet for pre-processing
   return true;
 }

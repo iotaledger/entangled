@@ -6,6 +6,7 @@
  */
 
 #include "common/network/services/tcp_receiver.hpp"
+#include "common/network/services/receiver.h"
 
 /*
  * TcpConnection
@@ -33,13 +34,10 @@ void TcpConnection::receive() {
 }
 
 void TcpConnection::handlePacket(std::size_t const length) {
-  // TODO(thibault) check size packet
-  auto host = socket_.remote_endpoint().address().to_string();
-  memcpy(packet_.source.host, host.c_str(), host.size());
-  packet_.source.host[host.size()] = '\0';
-  packet_.source.port = socket_.remote_endpoint().port();
-  packet_.content[length] = '\0';
-  packet_handler(state_, &packet_);
+  receiver_service_prepare_packet(
+      &packet_, length, socket_.remote_endpoint().address().to_string().c_str(),
+      socket_.remote_endpoint().port(), ENDPOINT_PROTOCOL_TCP);
+  receiver_packet_handler(state_, &packet_);
 }
 
 /*

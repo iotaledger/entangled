@@ -1,10 +1,15 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "receiver_shared",
+    hdrs = ["receiver.h"],
+)
+
+cc_library(
     name = "receiver",
     srcs = ["receiver.cpp"],
-    hdrs = ["receiver.h"],
     deps = [
+        ":receiver_shared",
         "//common/network:logger",
         "//common/network/services:tcp_receiver",
         "//common/network/services:udp_receiver",
@@ -17,6 +22,7 @@ cc_library(
     hdrs = ["udp_receiver.hpp"],
     deps = [
         "//common/network/components:receiver_shared",
+        "//common/network/services:receiver_shared",
         "@boost//:asio",
     ],
 )
@@ -27,6 +33,7 @@ cc_library(
     hdrs = ["tcp_receiver.hpp"],
     deps = [
         "//common/network/components:receiver_shared",
+        "//common/network/services:receiver_shared",
         "@boost//:asio",
     ],
 )
