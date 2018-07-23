@@ -6,6 +6,12 @@ git_repository(
     remote = "https://github.com/iotaledger/rules_iota.git",
 )
 
+git_repository(
+    name = "iota_toolchains",
+    commit = "984a2e58bce68c2b74100d9fa1f3434e96e92d95",
+    remote = "https://github.com/iotaledger/toolchains.git",
+)
+
 android_sdk_repository(
     name = "androidsdk",
     api_level = 19,
@@ -19,3 +25,6 @@ android_ndk_repository(
 load("@rules_iota//:defs.bzl", "iota_deps")
 
 iota_deps()
+
+load("@iota_toolchains//:toolchains.bzl", "setup_toolchains")
+setup_toolchains()
