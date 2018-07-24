@@ -24,8 +24,8 @@
 #include <boost/range/combine.hpp>
 #include <nlohmann/json.hpp>
 #include "common/helpers/digest.h"
-#include "common/model/transaction.h"
 #include "common/model/cpptransaction.h"
+#include "common/model/transaction.h"
 
 using json = nlohmann::json;
 using boost::adaptors::filtered;
@@ -181,14 +181,14 @@ std::vector<Transaction> IotaJsonAPI::getTransactions(
 
   boost::copy(
       trytes | transformed([&epoch](const std::string& trytes) -> Transaction {
-        iota::model::Transaction *tx = new iota::model::Transaction(trytes);                              
+        iota::model::Transaction* tx = new iota::model::Transaction(trytes);
 
         // We could also rely on the ordering of the hashes argument here.
         auto hash = iota_digest(trytes.c_str());
         std::string sHash = std::string(reinterpret_cast<char*>(hash), 81);
         std::free(hash);
 
-        auto sAddress =  tx->get_address();
+        auto sAddress = tx->get_address();
         auto sBundle = tx->get_bundle();
         auto sTrunk = tx->get_trunk();
 

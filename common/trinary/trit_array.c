@@ -135,7 +135,7 @@ size_t flex_trit_to_tryte(tryte_t *trytes, size_t to_len,
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   trits_to_trytes((trit_t *)trit_array, trytes, num_trits);
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE) || \
-      defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+    defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
   trit_t trits[num_trits];
   flex_trit_array_to_int8(trits, num_trits, trit_array, len, num_trits);
   trits_to_trytes((trit_t *)trits, trytes, num_trits);
@@ -154,7 +154,7 @@ size_t tryte_to_flex_trit(flex_trit_t *trit_array, size_t to_len,
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   trytes_to_trits((tryte_t *)trytes, trit_array, num_trytes);
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE) || \
-      defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+    defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
   trit_t trits[to_len];
   trytes_to_trits((tryte_t *)trytes, trits, num_trytes);
   int8_to_flex_trit_array(trit_array, to_len, trits, to_len, to_len);

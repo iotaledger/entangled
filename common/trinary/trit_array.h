@@ -175,8 +175,7 @@ size_t flex_trit_to_tryte(tryte_t *trytes, size_t to_len,
 /// @param[in] num_trytes - the size of trytes to unpack
 /// @return size_t - the number of trytes decoded
 size_t tryte_to_flex_trit(flex_trit_t *trit_array, size_t to_len,
-                          const tryte_t *trytes, size_t len,
-                          size_t num_trytes);
+                          const tryte_t *trytes, size_t len, size_t num_trytes);
 /***********************************************************************************************************
  * Trits array
  ***********************************************************************************************************/
