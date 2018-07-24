@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unity/unity.h>
 
 int main(void) {

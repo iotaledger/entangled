@@ -10,28 +10,25 @@
 
 namespace iota {
 namespace model {
-Transaction::Transaction() {
-  iota_transaction = transaction_new();
-}
+Transaction::Transaction() { iota_transaction = transaction_new(); }
 
 Transaction::Transaction(std::string trytes) {
   iota_transaction = transaction_new();
   size_t to_len = trytes.size() * 3;
   size_t flex_len = flex_trits_num_for_trits(to_len);
   flex_trit_t trits[flex_len];
-  tryte_to_flex_trit(trits, to_len, (const tryte_t *)trytes.data(), trytes.size(), trytes.size());
+  tryte_to_flex_trit(trits, to_len, (const tryte_t *)trytes.data(),
+                     trytes.size(), trytes.size());
   transaction_deserialize_from_trits(iota_transaction, trits);
 }
 
-Transaction::~Transaction() {
-  transaction_free(iota_transaction);
-}
+Transaction::~Transaction() { transaction_free(iota_transaction); }
 
 std::string Transaction::get_signature(void) {
   auto trits = transaction_signature(iota_transaction);
   tryte_t trytes[2187];
   flex_trit_to_tryte(trytes, 2187, trits, 6561, 6561);
-  return std::string(reinterpret_cast<char*>(trytes), 2187);
+  return std::string(reinterpret_cast<char *>(trytes), 2187);
 }
 
 // Set the transaction signature (copy argument)
@@ -47,7 +44,7 @@ std::string Transaction::get_message(void) {
   auto trits = transaction_message(iota_transaction);
   tryte_t trytes[2187];
   flex_trit_to_tryte(trytes, 2187, trits, 6561, 6561);
-  return std::string(reinterpret_cast<char*>(trytes), 2187);
+  return std::string(reinterpret_cast<char *>(trytes), 2187);
 }
 
 // Set the transaction message (copy argument)
@@ -63,7 +60,7 @@ std::string Transaction::get_address(void) {
   auto trits = transaction_address(iota_transaction);
   tryte_t trytes[81];
   flex_trit_to_tryte(trytes, 81, trits, 243, 243);
-  return std::string(reinterpret_cast<char*>(trytes), 81);
+  return std::string(reinterpret_cast<char *>(trytes), 81);
 }
 
 // Set the transaction address (copy argument)
@@ -89,7 +86,7 @@ std::string Transaction::get_obsolete_tag(void) {
   auto trits = transaction_obsolete_tag(iota_transaction);
   tryte_t trytes[81];
   flex_trit_to_tryte(trytes, 81, trits, 243, 243);
-  return std::string(reinterpret_cast<char*>(trytes), 81);
+  return std::string(reinterpret_cast<char *>(trytes), 81);
 }
 
 // Set the transaction obsolete tag
@@ -135,7 +132,7 @@ std::string Transaction::get_bundle(void) {
   auto trits = transaction_bundle(iota_transaction);
   tryte_t trytes[81];
   flex_trit_to_tryte(trytes, 81, trits, 243, 243);
-  return std::string(reinterpret_cast<char*>(trytes), 81);
+  return std::string(reinterpret_cast<char *>(trytes), 81);
 }
 
 // Set the transaction bundle (copy argument)
@@ -151,7 +148,7 @@ std::string Transaction::get_trunk(void) {
   auto trits = transaction_trunk(iota_transaction);
   tryte_t trytes[81];
   flex_trit_to_tryte(trytes, 81, trits, 243, 243);
-  return std::string(reinterpret_cast<char*>(trytes), 81);
+  return std::string(reinterpret_cast<char *>(trytes), 81);
 }
 
 // Set the transaction trunk (copy argument)
@@ -167,7 +164,7 @@ std::string Transaction::get_branch(void) {
   auto trits = transaction_branch(iota_transaction);
   tryte_t trytes[81];
   flex_trit_to_tryte(trytes, 81, trits, 243, 243);
-  return std::string(reinterpret_cast<char*>(trytes), 81);
+  return std::string(reinterpret_cast<char *>(trytes), 81);
 }
 
 // Set the transaction branch (copy argument)
@@ -183,7 +180,7 @@ std::string Transaction::get_tag(void) {
   auto trits = transaction_branch(iota_transaction);
   tryte_t trytes[27];
   flex_trit_to_tryte(trytes, 27, trits, 81, 81);
-  return std::string(reinterpret_cast<char*>(trytes), 27);
+  return std::string(reinterpret_cast<char *>(trytes), 27);
 }
 
 // Set the transaction tag (copy argument)
@@ -229,7 +226,7 @@ std::string Transaction::get_nonce(void) {
   auto trits = transaction_nonce(iota_transaction);
   tryte_t trytes[27];
   flex_trit_to_tryte(trytes, 27, trits, 81, 81);
-  return std::string(reinterpret_cast<char*>(trytes), 27);
+  return std::string(reinterpret_cast<char *>(trytes), 27);
 }
 
 // Set the transaction nonce (copy argument)
@@ -239,5 +236,5 @@ void Transaction::set_nonce(std::string trytes) {
   tryte_to_flex_trit(trits, 81, (const tryte_t *)trytes.data(), 27, 27);
   transaction_set_nonce(iota_transaction, trits);
 }
-} // namespace model
-} // namespace iota
+}  // namespace model
+}  // namespace iota
