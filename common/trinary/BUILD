@@ -157,9 +157,31 @@ cc_library(
 )
 
 cc_library(
-    name = "flex_trit",
-    srcs = ["flex_trit.cc"],
-    hdrs = ["flex_trit.h"],
+    name = "flex_trit_array",
+    srcs = ["flex_trit_array.cc"],
+    hdrs = ["flex_trit_array.h"],
+    deps = [
+        ":trit_array",
+        "//common:stdint",
+    ],
+)
+
+cc_library(
+    name = "flex_trit_array_4",
+    srcs = ["flex_trit_array.cc"],
+    hdrs = ["flex_trit_array.h"],
+    defines = ["TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE"],
+    deps = [
+        ":trit_array",
+        "//common:stdint",
+    ],
+)
+
+cc_library(
+    name = "flex_trit_array_5",
+    srcs = ["flex_trit_array.cc"],
+    hdrs = ["flex_trit_array.h"],
+    defines = ["TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE"],
     deps = [
         ":trit_array",
         "//common:stdint",
