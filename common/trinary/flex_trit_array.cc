@@ -6,6 +6,7 @@
  */
 
 #include "common/trinary/flex_trit_array.h"
+#include <cassert>
 
 namespace iota {
 namespace trinary {
