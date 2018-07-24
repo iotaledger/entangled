@@ -12,33 +12,30 @@ namespace iota {
 namespace trinary {
 FlexTritArray FlexTritArray::createFromTrits(const std::vector<trit_t> trits) {
   size_t flex_len = FlexTritArray::sizeForTrits(trits.size());
-  std::vector<flex_trit_t> flex_trits;
-  flex_trits.resize(flex_len, 0);
-  int8_to_flex_trit_array(flex_trits.data(), flex_len, trits.data(),
+  FlexTritArray ft = FlexTritArray(flex_len);
+  int8_to_flex_trit_array(ft.flex_trits_.data(), flex_len, trits.data(),
                           trits.size(), trits.size());
-  return FlexTritArray(flex_trits, trits.size());
+  return ft;
 }
 
 FlexTritArray FlexTritArray::createFromTrytes(
-    const std::vector<tryte_t> trytes) {
+  const std::vector<tryte_t> trytes) {
   size_t num_trits = trytes.size() * 3;
   size_t flex_len = FlexTritArray::sizeForTrits(num_trits);
-  std::vector<flex_trit_t> flex_trits;
-  flex_trits.resize(flex_len, 0);
-  tryte_to_flex_trit(flex_trits.data(), num_trits, trytes.data(), trytes.size(),
+  FlexTritArray ft = FlexTritArray(flex_len);
+  tryte_to_flex_trit(ft.flex_trits_.data(), num_trits, trytes.data(), trytes.size(),
                      trytes.size());
-  return FlexTritArray(flex_trits, num_trits);
+  return ft;
 }
 
 FlexTritArray FlexTritArray::slice(size_t start, size_t num_trits) {
   assert(start < num_trits_);
   assert(start + num_trits <= num_trits_);
   size_t flex_len = FlexTritArray::sizeForTrits(num_trits);
-  std::vector<flex_trit_t> flex_trits;
-  flex_trits.resize(flex_len, 0);
-  flex_trit_array_slice(flex_trits.data(), flex_len, flex_trits_.data(),
+  FlexTritArray ft = FlexTritArray(flex_len);
+  flex_trit_array_slice(ft.flex_trits_.data(), flex_len, flex_trits_.data(),
                         num_trits_, start, num_trits);
-  return FlexTritArray(std::move(flex_trits), num_trits);
+  return ft;
 }
 
 size_t FlexTritArray::insert(FlexTritArray &flex_trit_array, size_t start) {
