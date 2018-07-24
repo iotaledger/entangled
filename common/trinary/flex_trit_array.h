@@ -40,19 +40,19 @@ class FlexTritArray {
   /// current memory model.
   /// @param[in] num_trits - number of trits to store
   /// @return size_t - the number of bytes need
-  static size_t sizeForTrits(size_t num_trits) {
+  static size_t numBytesForTrits(size_t num_trits) {
     return flex_trits_num_for_trits(num_trits);
   };
 
   /// Returns a new FlexTritArray from a vector of trits.
   /// @param[in] trits - a vector of trits
   /// @return FlexTritArray
-  static FlexTritArray createFromTrits(const std::vector<trit_t> trits);
+  static FlexTritArray createFromTrits(const std::vector<trit_t> &trits);
 
   /// Returns a new FlexTritArray from a vector of trytes.
   /// @param[in] trytes - a vector of trytes
   /// @return FlexTritArray
-  static FlexTritArray createFromTrytes(const std::vector<tryte_t> trytes);
+  static FlexTritArray createFromTrytes(const std::vector<tryte_t> &trytes);
 
   /// Constructor that rturns a new FlexTritArray capable of holding num_trits trits.
   /// @param[in] num_trits - the number of trits that can be stored
@@ -64,7 +64,7 @@ class FlexTritArray {
   /// @param[in] num_trits - the number of trits encoded in the vector of
   /// flex_trits
   /// @return FlexTritArray
-  FlexTritArray(const std::vector<flex_trit_t> flex_trits, size_t num_trits)
+  FlexTritArray(const std::vector<flex_trit_t> &flex_trits, size_t num_trits)
       : flex_trits_(flex_trits), num_trits_(num_trits){};
 
   /// Copy Constructor
@@ -76,10 +76,10 @@ class FlexTritArray {
   /// Destructor
   ~FlexTritArray(){};
 
-  FlexTritArrayProxy operator[](const int i) {
+  FlexTritArrayProxy operator[](int i) {
     return FlexTritArrayProxy(*this, i);
   }
-  const FlexTritArrayProxy operator[](const int i) const {
+  const FlexTritArrayProxy operator[](int i) const {
     return FlexTritArrayProxy(const_cast<FlexTritArray &>(*this), i);
   }
 
