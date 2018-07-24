@@ -31,7 +31,6 @@ using json = nlohmann::json;
 using boost::adaptors::filtered;
 using boost::adaptors::transformed;
 using boost::adaptors::uniqued;
-using model::transaction;
 
 DEFINE_uint32(maxNumAddressesForGetBalances, 1000,
               "Maximum number of addresses to query for in 'getBalances'");
@@ -182,7 +181,7 @@ std::vector<Transaction> IotaJsonAPI::getTransactions(
 
   boost::copy(
       trytes | transformed([&epoch](const std::string& trytes) -> Transaction {
-        transaction *tx = new Transaction(trytes);                              
+        iota::model::Transaction *tx = new iota::model::Transaction(trytes);                              
 
         // We could also rely on the ordering of the hashes argument here.
         auto hash = iota_digest(trytes.c_str());
