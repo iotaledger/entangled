@@ -13,7 +13,9 @@
 typedef enum list_status_e {
   LIST_SUCCESS,
   LIST_NULL_SELF,
-  LIST_ALLOC_FAILED
+  LIST_NULL_DATA,
+  LIST_ALLOC_FAILED,
+  LIST_EMPTY
 } list_status_t;
 
 #define DECLARE_STRUCT_LIST_NODE_OF(TYPE)  \
@@ -23,14 +25,18 @@ typedef enum list_status_e {
     struct list_node_of_##TYPE##_s *next;  \
   } list_node_of_##TYPE##_t;
 
-#define DECLARE_VTABLE_LIST_OF(TYPE)                  \
-  typedef struct list_of_##TYPE##_s list_of_##TYPE;   \
-  typedef struct vtable_list_of_##TYPE##_s {          \
-    TYPE *(*front)(list_of_##TYPE const *const self); \
-    TYPE *(*back)(list_of_##TYPE const *const self);  \
-    bool (*empty)(list_of_##TYPE const *const self);  \
-    size_t (*size)(list_of_##TYPE const *const self); \
-  } vtable_list_of_##TYPE##_t;                        \
+#define DECLARE_VTABLE_LIST_OF(TYPE)                                          \
+  typedef struct list_of_##TYPE##_s list_of_##TYPE;                           \
+  typedef struct vtable_list_of_##TYPE##_s {                                  \
+    TYPE *(*front)(list_of_##TYPE const *const self);                         \
+    TYPE *(*back)(list_of_##TYPE const *const self);                          \
+    bool (*empty)(list_of_##TYPE const *const self);                          \
+    size_t (*size)(list_of_##TYPE const *const self);                         \
+    list_status_t (*push_front)(list_of_##TYPE *const self, TYPE const data); \
+    list_status_t (*push_back)(list_of_##TYPE *const self, TYPE const data);  \
+    list_status_t (*pop_front)(list_of_##TYPE *const self, TYPE *const data); \
+    list_status_t (*pop_back)(list_of_##TYPE *const self, TYPE *const data);  \
+  } vtable_list_of_##TYPE##_t;                                                \
   extern vtable_list_of_##TYPE##_t const vtable_list_of_##TYPE##_g;
 
 #define DECLARE_STRUCT_LIST_OF(TYPE)         \
@@ -105,15 +111,67 @@ typedef enum list_status_e {
 #define DECLARE_FUNCTION_SIZE_LIST_OF(TYPE) \
   size_t LIST_OF_##TYPE##_SIZE(list_of_##TYPE const *const self);
 
-#define DECLARE_LIST_OF(TYPE)            \
-  DECLARE_STRUCT_LIST_NODE_OF(TYPE)      \
-  DECLARE_VTABLE_LIST_OF(TYPE)           \
-  DECLARE_STRUCT_LIST_OF(TYPE)           \
-  DECLARE_FUNCTION_INIT_LIST_OF(TYPE)    \
-  DECLARE_FUNCTION_DESTROY_LIST_OF(TYPE) \
-  DECLARE_FUNCTION_FRONT_LIST_OF(TYPE)   \
-  DECLARE_FUNCTION_BACK_LIST_OF(TYPE)    \
-  DECLARE_FUNCTION_EMPTY_LIST_OF(TYPE)   \
-  DECLARE_FUNCTION_SIZE_LIST_OF(TYPE)
+/**
+ * Adds an element at the front of the list
+ *
+ * @param self The list
+ * @param data The data to add
+ *
+ * @return an exit status
+ */
+#define DECLARE_FUNCTION_PUSH_FRONT_LIST_OF(TYPE)                       \
+  list_status_t LIST_OF_##TYPE##_PUSH_FRONT(list_of_##TYPE *const self, \
+                                            TYPE const data);
+
+/**
+ * Adds an element at the back of the list
+ *
+ * @param self The list
+ * @param data The data to add
+ *
+ * @return an exit status
+ */
+#define DECLARE_FUNCTION_PUSH_BACK_LIST_OF(TYPE)                       \
+  list_status_t LIST_OF_##TYPE##_PUSH_BACK(list_of_##TYPE *const self, \
+                                           TYPE const data);
+
+/**
+ * Removes an element from the front of the list
+ *
+ * @param self The list
+ * @param data The data where to store the element
+ *
+ * @return an exit status
+ */
+#define DECLARE_FUNCTION_POP_FRONT_LIST_OF(TYPE)                       \
+  list_status_t LIST_OF_##TYPE##_POP_FRONT(list_of_##TYPE *const self, \
+                                           TYPE *const data);
+
+/**
+ * Removes an element from the back of the list
+ *
+ * @param self The list
+ * @param data The data where to store the element
+ *
+ * @return an exit status
+ */
+#define DECLARE_FUNCTION_POP_BACK_LIST_OF(TYPE)                       \
+  list_status_t LIST_OF_##TYPE##_POP_BACK(list_of_##TYPE *const self, \
+                                          TYPE *const data);
+
+#define DECLARE_LIST_OF(TYPE)               \
+  DECLARE_STRUCT_LIST_NODE_OF(TYPE)         \
+  DECLARE_VTABLE_LIST_OF(TYPE)              \
+  DECLARE_STRUCT_LIST_OF(TYPE)              \
+  DECLARE_FUNCTION_INIT_LIST_OF(TYPE)       \
+  DECLARE_FUNCTION_DESTROY_LIST_OF(TYPE)    \
+  DECLARE_FUNCTION_FRONT_LIST_OF(TYPE)      \
+  DECLARE_FUNCTION_BACK_LIST_OF(TYPE)       \
+  DECLARE_FUNCTION_EMPTY_LIST_OF(TYPE)      \
+  DECLARE_FUNCTION_SIZE_LIST_OF(TYPE)       \
+  DECLARE_FUNCTION_PUSH_FRONT_LIST_OF(TYPE) \
+  DECLARE_FUNCTION_PUSH_BACK_LIST_OF(TYPE)  \
+  DECLARE_FUNCTION_POP_FRONT_LIST_OF(TYPE)  \
+  DECLARE_FUNCTION_POP_BACK_LIST_OF(TYPE)
 
 #endif  // __COMMON_NETWORK_LIST_H__
