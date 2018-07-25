@@ -1,7 +1,7 @@
 cc_library(
     name = "connection",
     hdrs = glob(["*.h"]),
-    srcs = ["statements.cc",],
+    srcs = ["statements.c",],
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",

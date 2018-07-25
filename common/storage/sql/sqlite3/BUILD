@@ -1,8 +1,8 @@
 cc_library(
     name = "sqlite3_storage",
     srcs = [
-        "connection.cc",
-        "storage.cc",
+        "connection.c",
+        "storage.c",
     ],
     linkopts = ["-pthread"],
     visibility = ["//visibility:public"],

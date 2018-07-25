@@ -145,4 +145,6 @@ retcode_t iota_stor_exist(const connection_t* const conn,
 
 retcode_t iota_stor_update(const connection_t* const conn,
                            const char* index_name, const trit_array_p key,
-                           const iota_transaction_t data_in) {}
+                           const iota_transaction_t data_in) {
+  //TODO - implement
+}
