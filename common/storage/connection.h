@@ -19,17 +19,17 @@
 extern "C" {
 #endif
 
-struct connection_t {
+typedef struct connection_t {
   void* db;
-};
+} connection_t;
 
-struct connection_config_t {
+typedef struct connection_config_t {
   const char* dbPath;
   bool indexAddress;
   bool indexApprovee;
   bool indexBundle;
   bool indexTag;
-};
+} connection_config_t;
 
 extern retcode_t init_connection(connection_t* const,
                                  const connection_config_t* const config);

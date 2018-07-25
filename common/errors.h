@@ -8,6 +8,8 @@
 #ifndef COMMON_ERRORS_H_
 #define COMMON_ERRORS_H_
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -83,6 +85,8 @@ enum retcode_t {
   RC_SQL_FAILED_WRITE_STATEMENT =
       0x01 | RC_MODULE_STORAGE_SQL | RC_SEVERITY_MAJOR,
 };
+
+typedef enum retcode_t retcode_t;
 
 #ifdef __cplusplus
 }

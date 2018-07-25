@@ -20,11 +20,11 @@
 
 #define SQLITE3_LOGGER_ID "sqlite3_storage"
 
-struct iota_transactions_pack {
+typedef struct iota_transactions_pack {
   iota_transaction_t* txs;
   size_t num_txs;
   size_t num_loaded;
-};
+} iota_transactions_pack;
 
 retcode_t iota_stor_init() {
   logger_helper_init(SQLITE3_LOGGER_ID, LOGGER_INFO, true);
