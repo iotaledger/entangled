@@ -18,7 +18,8 @@
           CONCURRENT_LIST_OF_##TYPE##_PUSH_BACK,  \
           CONCURRENT_LIST_OF_##TYPE##_POP_FRONT,  \
           CONCURRENT_LIST_OF_##TYPE##_POP_BACK,   \
-          CONCURRENT_LIST_OF_##TYPE##_CONTAINS};
+          CONCURRENT_LIST_OF_##TYPE##_CONTAIN,    \
+          CONCURRENT_LIST_OF_##TYPE##_REMOVE};
 
 #define DEFINE_FUNCTION_INIT_CONCURRENT_LIST_OF(TYPE)        \
   concurrent_list_status_t CONCURRENT_LIST_OF_##TYPE##_INIT( \
@@ -176,23 +177,55 @@
     return CONCURRENT_LIST_SUCCESS;                              \
   }
 
-#define DEFINE_FUNCTION_CONTAINS_CONCURRENT_LIST_OF(TYPE)       \
-  bool CONCURRENT_LIST_OF_##TYPE##_CONTAINS(                    \
-      concurrent_list_of_##TYPE *const self, TYPE const data) { \
-    if (self == NULL) {                                         \
-      return false;                                             \
-    }                                                           \
-    concurrent_list_node_of_##TYPE##_t *iter;                   \
-    iter = self->front;                                         \
-    while (iter) {                                              \
-      if (self->cmp && self->cmp(iter->data, data)) {           \
-        return true;                                            \
-      } else if (iter->data == data) {                          \
-        return true;                                            \
-      }                                                         \
-      iter = iter->next;                                        \
-    }                                                           \
-    return false;                                               \
+#define DEFINE_FUNCTION_CONTAIN_CONCURRENT_LIST_OF(TYPE)                      \
+  bool CONCURRENT_LIST_OF_##TYPE##_CONTAIN(                                   \
+      concurrent_list_of_##TYPE *const self, TYPE const data) {               \
+    if (self == NULL) {                                                       \
+      return false;                                                           \
+    }                                                                         \
+    concurrent_list_node_of_##TYPE##_t *iter;                                 \
+    iter = self->front;                                                       \
+    while (iter) {                                                            \
+      if ((self->cmp && self->cmp(iter->data, data)) || iter->data == data) { \
+        return true;                                                          \
+      }                                                                       \
+      iter = iter->next;                                                      \
+    }                                                                         \
+    return false;                                                             \
+  }
+
+#define DEFINE_FUNCTION_REMOVE_CONCURRENT_LIST_OF(TYPE)                       \
+  bool CONCURRENT_LIST_OF_##TYPE##_REMOVE(                                    \
+      concurrent_list_of_##TYPE *const self, TYPE const data) {               \
+    concurrent_list_node_of_##TYPE##_t *iter, *tmp;                           \
+    if (self == NULL) {                                                       \
+      return CONCURRENT_LIST_NULL_SELF;                                       \
+    }                                                                         \
+    iter = self->front;                                                       \
+    while (iter) {                                                            \
+      tmp = iter->next;                                                       \
+      if ((self->cmp && self->cmp(iter->data, data)) || iter->data == data) { \
+        if (iter->prev) {                                                     \
+          iter->prev->next = iter->next;                                      \
+        }                                                                     \
+        if (iter->next) {                                                     \
+          iter->next->prev = iter->prev;                                      \
+        }                                                                     \
+        if (iter == self->front) {                                            \
+          self->front = iter->next;                                           \
+        } else if (iter == self->back) {                                      \
+          self->back = iter->prev;                                            \
+        }                                                                     \
+        free(iter);                                                           \
+        self->size--;                                                         \
+        if (self->size == 0) {                                                \
+          self->front = NULL;                                                 \
+          self->back = NULL;                                                  \
+        }                                                                     \
+      }                                                                       \
+      iter = tmp;                                                             \
+    }                                                                         \
+    return CONCURRENT_LIST_SUCCESS;                                           \
   }
 
 #define DEFINE_CONCURRENT_LIST_OF(TYPE)               \
@@ -207,4 +240,5 @@
   DEFINE_FUNCTION_PUSH_BACK_CONCURRENT_LIST_OF(TYPE)  \
   DEFINE_FUNCTION_POP_FRONT_CONCURRENT_LIST_OF(TYPE)  \
   DEFINE_FUNCTION_POP_BACK_CONCURRENT_LIST_OF(TYPE)   \
-  DEFINE_FUNCTION_CONTAINS_CONCURRENT_LIST_OF(TYPE)
+  DEFINE_FUNCTION_CONTAIN_CONCURRENT_LIST_OF(TYPE)    \
+  DEFINE_FUNCTION_REMOVE_CONCURRENT_LIST_OF(TYPE)
