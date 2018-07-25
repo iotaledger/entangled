@@ -17,6 +17,14 @@ extern "C" {
 
 DECLARE_CONCURRENT_LIST_OF(neighbor_t);
 
+typedef concurrent_list_of_neighbor_t neighbors_list_t;
+
+bool cmp_neighbor(neighbor_t const *const lhs, neighbor_t const *const rhs);
+bool add_neighbor(neighbors_list_t *const neighbors, char const *const host,
+                  uint16_t port);
+bool remove_neighbor(neighbors_list_t *const neighbors, char const *const host,
+                     uint16_t port);
+
 #ifdef __cplusplus
 }
 #endif

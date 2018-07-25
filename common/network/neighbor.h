@@ -11,7 +11,7 @@
 #include "common/network/iota_packet.h"
 
 typedef struct {
-  void *network_desc;
+  endpoint_t endpoint;
   unsigned int number_of_all_transactions;
   unsigned int number_of_new_transactions;
   unsigned int number_of_invalid_transactions;
