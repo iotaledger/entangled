@@ -12,6 +12,8 @@
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
 const int8_t TRITS_IN[] = {-1, 0, 1, 1, 0, 1, 1,  0, -1,
                            -1, 1, 0, 1, 1, 0, -1, 1, 0};
+#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+const uint8_t TRITS_IN[] = {0x48, 0x4a, 0x53, 0x42, 0x44, 0x42};
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
 const uint8_t TRITS_IN[] = {0x53, 0x14, 0x1f, 0xC5, 0x01};
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)

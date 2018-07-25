@@ -6,6 +6,8 @@
 
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
 #define TRITS_IN -1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1, 1, 0, -1, 1, 0
+#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+#define TRITS_IN 0x48, 0x4a, 0x53, 0x42, 0x44, 0x42
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
 #define TRITS_IN 0x53, 0x14, 0x1f, 0xC5, 0x01
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
@@ -37,15 +39,25 @@ void test_trit_array_static_set(void) {
 
 void test_trit_array_static_slice(void) {
   TRIT_ARRAY_MAKE(from, NUM_TRITS, TRITS_IN);
-  TRIT_ARRAY_DECLARE(to, 7);
-  trit_array_slice(&from, &to, 6, 7);
-  TEST_ASSERT_EQUAL_INT(1, trit_array_at(&to, 0));
-  TEST_ASSERT_EQUAL_INT(0, trit_array_at(&to, 1));
-  TEST_ASSERT_EQUAL_INT(-1, trit_array_at(&to, 2));
-  TEST_ASSERT_EQUAL_INT(-1, trit_array_at(&to, 3));
+  TRIT_ARRAY_DECLARE(to, 5);
+  trit_array_slice(&from, &to, 8, 5);
+  TEST_ASSERT_EQUAL_INT(-1, trit_array_at(&to, 0));
+  TEST_ASSERT_EQUAL_INT(-1, trit_array_at(&to, 1));
+  TEST_ASSERT_EQUAL_INT(1, trit_array_at(&to, 2));
+  TEST_ASSERT_EQUAL_INT(0, trit_array_at(&to, 3));
   TEST_ASSERT_EQUAL_INT(1, trit_array_at(&to, 4));
-  TEST_ASSERT_EQUAL_INT(0, trit_array_at(&to, 5));
-  TEST_ASSERT_EQUAL_INT(1, trit_array_at(&to, 6));
+}
+
+void test_trit_array_static_insert(void) {
+  TRIT_ARRAY_MAKE(from, NUM_TRITS, TRITS_IN);
+  TRIT_ARRAY_DECLARE(to, 5);
+  trit_array_slice(&from, &to, 8, 5);
+  trit_array_insert(&from, &to, 4, 5);
+  TEST_ASSERT_EQUAL_INT(-1, trit_array_at(&from, 4));
+  TEST_ASSERT_EQUAL_INT(-1, trit_array_at(&from, 5));
+  TEST_ASSERT_EQUAL_INT(1, trit_array_at(&from, 6));
+  TEST_ASSERT_EQUAL_INT(0, trit_array_at(&from, 7));
+  TEST_ASSERT_EQUAL_INT(1, trit_array_at(&from, 8));
 }
 
 void test_trit_array_static_to_int8(void) {
@@ -78,6 +90,7 @@ int main(void) {
   RUN_TEST(test_trit_array_static);
   RUN_TEST(test_trit_array_static_set);
   RUN_TEST(test_trit_array_static_slice);
+  RUN_TEST(test_trit_array_static_insert);
   RUN_TEST(test_trit_array_static_to_int8);
   RUN_TEST(test_trit_array_to_trytes);
   RUN_TEST(test_trytes_to_trit_array);
