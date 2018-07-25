@@ -40,15 +40,17 @@ typedef enum list_status_e {
   } vtable_list_of_##TYPE##_t;                                                \
   extern vtable_list_of_##TYPE##_t const vtable_list_of_##TYPE##_g;
 
-#define DECLARE_STRUCT_LIST_OF(TYPE)         \
-  typedef struct list_of_##TYPE##_s {        \
-    vtable_list_of_##TYPE##_t const *vtable; \
-    list_node_of_##TYPE##_t *front;          \
-    list_node_of_##TYPE##_t *back;           \
-    size_t size;                             \
+#define DECLARE_STRUCT_LIST_OF(TYPE)               \
+  typedef struct list_of_##TYPE##_s {              \
+    vtable_list_of_##TYPE##_t const *vtable;       \
+    bool (*cmp)(TYPE const self, TYPE const data); \
+    list_node_of_##TYPE##_t *front;                \
+    list_node_of_##TYPE##_t *back;                 \
+    size_t size;                                   \
   } list_of_##TYPE;
 
-#define INIT_LIST_OF(TYPE, NAME) LIST_OF_##TYPE##_INIT(&NAME)
+#define INIT_LIST_OF(TYPE, NAME, CMP_FUNC) \
+  LIST_OF_##TYPE##_INIT(&NAME, CMP_FUNC)
 
 #define DESTROY_LIST_OF(TYPE, NAME) LIST_OF_##TYPE##_DESTROY(&NAME)
 
@@ -60,7 +62,9 @@ typedef enum list_status_e {
  * @return an exit status
  */
 #define DECLARE_FUNCTION_INIT_LIST_OF(TYPE) \
-  list_status_t LIST_OF_##TYPE##_INIT(list_of_##TYPE **const self);
+  list_status_t LIST_OF_##TYPE##_INIT(      \
+      list_of_##TYPE **const self,          \
+      bool (*cmp)(TYPE const self, TYPE const data));
 
 /**
  * Destroys a list

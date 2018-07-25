@@ -15,16 +15,19 @@
       LIST_OF_##TYPE##_POP_FRONT,  LIST_OF_##TYPE##_POP_BACK,   \
       LIST_OF_##TYPE##_CONTAINS};
 
-#define DEFINE_FUNCTION_INIT_LIST_OF(TYPE)                           \
-  list_status_t LIST_OF_##TYPE##_INIT(list_of_##TYPE **const self) { \
-    if (self == NULL) return LIST_NULL_SELF;                         \
-    *self = (list_of_##TYPE *)malloc(sizeof(list_of_##TYPE));        \
-    if (*self == NULL) return LIST_ALLOC_FAILED;                     \
-    (*self)->vtable = &vtable_list_of_##TYPE##_g;                    \
-    (*self)->front = NULL;                                           \
-    (*self)->back = NULL;                                            \
-    (*self)->size = 0;                                               \
-    return LIST_SUCCESS;                                             \
+#define DEFINE_FUNCTION_INIT_LIST_OF(TYPE)                    \
+  list_status_t LIST_OF_##TYPE##_INIT(                        \
+      list_of_##TYPE **const self,                            \
+      bool (*cmp)(TYPE const self, TYPE const data)) {        \
+    if (self == NULL) return LIST_NULL_SELF;                  \
+    *self = (list_of_##TYPE *)malloc(sizeof(list_of_##TYPE)); \
+    if (*self == NULL) return LIST_ALLOC_FAILED;              \
+    (*self)->vtable = &vtable_list_of_##TYPE##_g;             \
+    (*self)->cmp = cmp;                                       \
+    (*self)->front = NULL;                                    \
+    (*self)->back = NULL;                                     \
+    (*self)->size = 0;                                        \
+    return LIST_SUCCESS;                                      \
   }
 
 #define DEFINE_FUNCTION_DESTROY_LIST_OF(TYPE)                           \
@@ -171,7 +174,9 @@
     list_node_of_##TYPE##_t *iter;                           \
     iter = self->front;                                      \
     while (iter) {                                           \
-      if (iter->data == data) {                              \
+      if (self->cmp && self->cmp(iter->data, data)) {        \
+        return true;                                         \
+      } else if (iter->data == data) {                       \
         return true;                                         \
       }                                                      \
       iter = iter->next;                                     \

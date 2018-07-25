@@ -13,12 +13,14 @@
 DECLARE_LIST_OF(int)
 DEFINE_LIST_OF(int)
 
+static bool int_cmp(int a, int b) { return a == b; }
+
 void test_list() {
   int data;
   list_of_int *list = NULL;
   list_of_int *nlist = NULL;
 
-  TEST_ASSERT_EQUAL_INT(INIT_LIST_OF(int, list), LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(INIT_LIST_OF(int, list, int_cmp), LIST_SUCCESS);
   TEST_ASSERT_NOT_NULL(list);
 
   TEST_ASSERT_NULL(list->vtable->front(NULL));
