@@ -28,16 +28,16 @@ typedef enum concurrent_queue_status_e {
   } concurrent_queue_node_of_##TYPE##_t;
 
 #define DECLARE_VTABLE_CONCURRENT_QUEUE_OF(TYPE)                              \
-  struct concurrent_queue_of_##TYPE##_s;                                      \
+  typedef struct concurrent_queue_of_##TYPE##_s concurrent_queue_of_##TYPE;   \
   typedef struct vtable_concurrent_queue_of_##TYPE##_s {                      \
-    TYPE *(*front)(struct concurrent_queue_of_##TYPE##_s *const self);        \
-    TYPE *(*back)(struct concurrent_queue_of_##TYPE##_s *const self);         \
-    bool (*empty)(struct concurrent_queue_of_##TYPE##_s *const self);         \
-    size_t (*size)(struct concurrent_queue_of_##TYPE##_s *const self);        \
-    concurrent_queue_status_t (*push)(                                        \
-        struct concurrent_queue_of_##TYPE##_s *const self, TYPE const data);  \
-    concurrent_queue_status_t (*pop)(                                         \
-        struct concurrent_queue_of_##TYPE##_s *const self, TYPE *const data); \
+    TYPE *(*front)(concurrent_queue_of_##TYPE *const self);                   \
+    TYPE *(*back)(concurrent_queue_of_##TYPE *const self);                    \
+    bool (*empty)(concurrent_queue_of_##TYPE *const self);                    \
+    size_t (*size)(concurrent_queue_of_##TYPE *const self);                   \
+    concurrent_queue_status_t (*push)(concurrent_queue_of_##TYPE *const self, \
+                                      TYPE const data);                       \
+    concurrent_queue_status_t (*pop)(concurrent_queue_of_##TYPE *const self,  \
+                                     TYPE *const data);                       \
   } vtable_concurrent_queue_of_##TYPE##_t;                                    \
   extern vtable_concurrent_queue_of_##TYPE##_t const                          \
       vtable_concurrent_queue_of_##TYPE##_g;
@@ -67,7 +67,7 @@ typedef enum concurrent_queue_status_e {
  */
 #define DECLARE_FUNCTION_INIT_CONCURRENT_QUEUE_OF(TYPE)        \
   concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_INIT( \
-      struct concurrent_queue_of_##TYPE##_s **const self);
+      concurrent_queue_of_##TYPE **const self);
 
 /**
  * Destroys a concurrent queue
@@ -79,7 +79,7 @@ typedef enum concurrent_queue_status_e {
  */
 #define DECLARE_FUNCTION_DESTROY_CONCURRENT_QUEUE_OF(TYPE)        \
   concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_DESTROY( \
-      struct concurrent_queue_of_##TYPE##_s **const self);
+      concurrent_queue_of_##TYPE **const self);
 
 /**
  * Returns pointer to the first element in the queue. This element will be the
@@ -91,7 +91,7 @@ typedef enum concurrent_queue_status_e {
  */
 #define DECLARE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE) \
   TYPE *CONCURRENT_QUEUE_OF_##TYPE##_FRONT(              \
-      struct concurrent_queue_of_##TYPE##_s *const self);
+      concurrent_queue_of_##TYPE *const self);
 
 /**
  * Returns pointer to the last element in the queue. This is the most recently
@@ -103,7 +103,7 @@ typedef enum concurrent_queue_status_e {
  */
 #define DECLARE_FUNCTION_BACK_CONCURRENT_QUEUE_OF(TYPE) \
   TYPE *CONCURRENT_QUEUE_OF_##TYPE##_BACK(              \
-      struct concurrent_queue_of_##TYPE##_s *const self);
+      concurrent_queue_of_##TYPE *const self);
 
 /**
  * Checks if the queue has no elements
@@ -114,7 +114,7 @@ typedef enum concurrent_queue_status_e {
  */
 #define DECLARE_FUNCTION_EMPTY_CONCURRENT_QUEUE_OF(TYPE) \
   bool CONCURRENT_QUEUE_OF_##TYPE##_EMPTY(               \
-      struct concurrent_queue_of_##TYPE##_s *const self);
+      concurrent_queue_of_##TYPE *const self);
 
 /**
  * Returns the number of elements in the queue
@@ -125,7 +125,7 @@ typedef enum concurrent_queue_status_e {
  */
 #define DECLARE_FUNCTION_SIZE_CONCURRENT_QUEUE_OF(TYPE) \
   size_t CONCURRENT_QUEUE_OF_##TYPE##_SIZE(             \
-      struct concurrent_queue_of_##TYPE##_s *const self);
+      concurrent_queue_of_##TYPE *const self);
 
 /**
  * Pushes the given element value to the end of the queue
@@ -137,7 +137,7 @@ typedef enum concurrent_queue_status_e {
  */
 #define DECLARE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE)        \
   concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_PUSH( \
-      struct concurrent_queue_of_##TYPE##_s *const self, TYPE const data);
+      concurrent_queue_of_##TYPE *const self, TYPE const data);
 
 /**
  * Removes an element from the front of the queue
@@ -149,7 +149,7 @@ typedef enum concurrent_queue_status_e {
  */
 #define DECLARE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE)        \
   concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_POP( \
-      struct concurrent_queue_of_##TYPE##_s *const self, TYPE *const data);
+      concurrent_queue_of_##TYPE *const self, TYPE *const data);
 
 #define DECLARE_CONCURRENT_QUEUE_OF(TYPE)            \
   DECLARE_STRUCT_CONCURRENT_QUEUE_NODE_OF(TYPE)      \
