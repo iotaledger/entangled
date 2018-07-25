@@ -11,7 +11,6 @@
 #include <logger.h>
 #include <stdarg.h>
 #include <stdbool.h>
-#include "common/lock_handle.h"
 
 #ifdef __cplusplus
 extern "C" {
