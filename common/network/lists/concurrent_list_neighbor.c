@@ -15,6 +15,10 @@ bool cmp_neighbor(neighbor_t const *const lhs, neighbor_t const *const rhs) {
 bool add_neighbor(neighbors_list_t *const neighbors, char const *const host,
                   uint16_t const port) {
   neighbor_t neighbor;
+
+  if (neighbors == NULL) {
+    return false;
+  }
   strcpy(neighbor.endpoint.host, host);
   neighbor.endpoint.port = port;
   if (neighbors->vtable->contain(neighbors, neighbor) == true) {
@@ -27,6 +31,10 @@ bool add_neighbor(neighbors_list_t *const neighbors, char const *const host,
 bool remove_neighbor(neighbors_list_t *const neighbors, char const *const host,
                      uint16_t const port) {
   neighbor_t neighbor;
+
+  if (neighbors == NULL) {
+    return false;
+  }
   strcpy(neighbor.endpoint.host, host);
   neighbor.endpoint.port = port;
   return neighbors->vtable->remove(neighbors, neighbor) ==
