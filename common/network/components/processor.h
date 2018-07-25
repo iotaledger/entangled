@@ -9,15 +9,26 @@
 #define __COMMON_NETWORK_COMPONENTS_PROCESSOR_H__
 
 #include "common/network/queues/concurrent_queue_trit_array.h"
+#include "common/thread_handle.h"
 
 typedef concurrent_queue_of_trit_array_p processor_queue_t;
 
 typedef struct {
+  thread_handle_t thread;
+  bool running;
   processor_queue_t *queue;
 } processor_state_t;
 
-void processor_on_next(processor_state_t *const state,
-                       trit_array_t const *const hash);
-void *processor_routine(processor_state_t *const state);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+bool processor_start(processor_state_t *const state);
+bool processor_on_next(processor_state_t *const state, trit_array_p const hash);
+bool processor_stop(processor_state_t *const state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  //__COMMON_NETWORK_COMPONENTS_PROCESSOR_H__
