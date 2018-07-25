@@ -27,4 +27,5 @@ load("@rules_iota//:defs.bzl", "iota_deps")
 iota_deps()
 
 load("@iota_toolchains//:toolchains.bzl", "setup_toolchains")
+
 setup_toolchains()
