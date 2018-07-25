@@ -7,20 +7,21 @@
 
 #include <unity/unity.h>
 
-#include "common/network/lists/list.c.inc"
-#include "common/network/lists/list.h.inc"
+#include "common/network/lists/concurrent_list.c.inc"
+#include "common/network/lists/concurrent_list.h.inc"
 
-DECLARE_LIST_OF(int)
-DEFINE_LIST_OF(int)
+DECLARE_CONCURRENT_LIST_OF(int)
+DEFINE_CONCURRENT_LIST_OF(int)
 
 static bool int_cmp(int a, int b) { return a == b; }
 
 void test_list() {
   int data;
-  list_of_int *list = NULL;
-  list_of_int *nlist = NULL;
+  concurrent_list_of_int *list = NULL;
+  concurrent_list_of_int *nlist = NULL;
 
-  TEST_ASSERT_EQUAL_INT(INIT_LIST_OF(int, list, int_cmp), LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(INIT_CONCURRENT_LIST_OF(int, list, int_cmp),
+                        CONCURRENT_LIST_SUCCESS);
   TEST_ASSERT_NOT_NULL(list);
 
   TEST_ASSERT_NULL(list->vtable->front(NULL));
@@ -32,51 +33,73 @@ void test_list() {
   TEST_ASSERT_EQUAL_INT(list->vtable->size(NULL), 0);
   TEST_ASSERT_EQUAL_INT(list->vtable->size(list), 0);
 
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(NULL, 42), LIST_NULL_SELF);
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(list, 42), LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(NULL, 42),
+                        CONCURRENT_LIST_NULL_SELF);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(list, 42),
+                        CONCURRENT_LIST_SUCCESS);
   TEST_ASSERT_EQUAL_INT(*list->vtable->front(list), 42);
   TEST_ASSERT_EQUAL_INT(*list->vtable->back(list), 42);
   TEST_ASSERT_EQUAL_INT(list->vtable->empty(list), false);
   TEST_ASSERT_EQUAL_INT(list->vtable->size(list), 1);
-  TEST_ASSERT_EQUAL_INT(list->vtable->pop_front(NULL, &data), LIST_NULL_SELF);
-  TEST_ASSERT_EQUAL_INT(list->vtable->pop_front(list, NULL), LIST_NULL_DATA);
-  TEST_ASSERT_EQUAL_INT(list->vtable->pop_front(list, &data), LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->pop_front(NULL, &data),
+                        CONCURRENT_LIST_NULL_SELF);
+  TEST_ASSERT_EQUAL_INT(list->vtable->pop_front(list, NULL),
+                        CONCURRENT_LIST_NULL_DATA);
+  TEST_ASSERT_EQUAL_INT(list->vtable->pop_front(list, &data),
+                        CONCURRENT_LIST_SUCCESS);
   TEST_ASSERT_EQUAL_INT(data, 42);
   TEST_ASSERT_NULL(list->vtable->front(list));
   TEST_ASSERT_NULL(list->vtable->back(list));
   TEST_ASSERT_EQUAL_INT(list->vtable->empty(list), true);
   TEST_ASSERT_EQUAL_INT(list->vtable->size(list), 0);
-  TEST_ASSERT_EQUAL_INT(list->vtable->pop_front(list, &data), LIST_EMPTY);
+  TEST_ASSERT_EQUAL_INT(list->vtable->pop_front(list, &data),
+                        CONCURRENT_LIST_EMPTY);
 
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(NULL, 42), LIST_NULL_SELF);
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(list, 42), LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(NULL, 42),
+                        CONCURRENT_LIST_NULL_SELF);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(list, 42),
+                        CONCURRENT_LIST_SUCCESS);
   TEST_ASSERT_EQUAL_INT(*list->vtable->back(list), 42);
   TEST_ASSERT_EQUAL_INT(*list->vtable->front(list), 42);
   TEST_ASSERT_EQUAL_INT(list->vtable->empty(list), false);
   TEST_ASSERT_EQUAL_INT(list->vtable->size(list), 1);
-  TEST_ASSERT_EQUAL_INT(list->vtable->pop_back(NULL, &data), LIST_NULL_SELF);
-  TEST_ASSERT_EQUAL_INT(list->vtable->pop_back(list, NULL), LIST_NULL_DATA);
-  TEST_ASSERT_EQUAL_INT(list->vtable->pop_back(list, &data), LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->pop_back(NULL, &data),
+                        CONCURRENT_LIST_NULL_SELF);
+  TEST_ASSERT_EQUAL_INT(list->vtable->pop_back(list, NULL),
+                        CONCURRENT_LIST_NULL_DATA);
+  TEST_ASSERT_EQUAL_INT(list->vtable->pop_back(list, &data),
+                        CONCURRENT_LIST_SUCCESS);
   TEST_ASSERT_EQUAL_INT(data, 42);
   TEST_ASSERT_NULL(list->vtable->back(list));
   TEST_ASSERT_NULL(list->vtable->front(list));
   TEST_ASSERT_EQUAL_INT(list->vtable->empty(list), true);
   TEST_ASSERT_EQUAL_INT(list->vtable->size(list), 0);
-  TEST_ASSERT_EQUAL_INT(list->vtable->pop_back(list, &data), LIST_EMPTY);
+  TEST_ASSERT_EQUAL_INT(list->vtable->pop_back(list, &data),
+                        CONCURRENT_LIST_EMPTY);
 
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(list, 0), LIST_SUCCESS);
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(list, 1), LIST_SUCCESS);
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(list, 2), LIST_SUCCESS);
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(list, 3), LIST_SUCCESS);
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(list, 4), LIST_SUCCESS);
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(list, 5), LIST_SUCCESS);
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(list, 6), LIST_SUCCESS);
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(list, 7), LIST_SUCCESS);
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(list, 8), LIST_SUCCESS);
-  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(list, 9), LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(list, 0),
+                        CONCURRENT_LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(list, 1),
+                        CONCURRENT_LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(list, 2),
+                        CONCURRENT_LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(list, 3),
+                        CONCURRENT_LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(list, 4),
+                        CONCURRENT_LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(list, 5),
+                        CONCURRENT_LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(list, 6),
+                        CONCURRENT_LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(list, 7),
+                        CONCURRENT_LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_front(list, 8),
+                        CONCURRENT_LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(list->vtable->push_back(list, 9),
+                        CONCURRENT_LIST_SUCCESS);
   TEST_ASSERT_EQUAL_INT(list->vtable->empty(list), false);
   TEST_ASSERT_EQUAL_INT(list->vtable->size(list), 10);
-  list_node_of_int_t *tmp = list->front;
+  concurrent_list_node_of_int_t *tmp = list->front;
   TEST_ASSERT_NOT_NULL(tmp);
   TEST_ASSERT_EQUAL_INT(tmp->data, 8);
   tmp = tmp->next;
@@ -115,8 +138,10 @@ void test_list() {
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 42), false);
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, -1), false);
 
-  TEST_ASSERT_EQUAL_INT(DESTROY_LIST_OF(int, nlist), LIST_NULL_SELF);
-  TEST_ASSERT_EQUAL_INT(DESTROY_LIST_OF(int, list), LIST_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(DESTROY_CONCURRENT_LIST_OF(int, nlist),
+                        CONCURRENT_LIST_NULL_SELF);
+  TEST_ASSERT_EQUAL_INT(DESTROY_CONCURRENT_LIST_OF(int, list),
+                        CONCURRENT_LIST_SUCCESS);
   TEST_ASSERT_NULL(list);
 }
 

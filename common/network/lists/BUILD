@@ -1,17 +1,17 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "list",
-    srcs = ["list.c.inc"],
-    hdrs = ["list.h.inc"],
+    name = "concurrent_list",
+    srcs = ["concurrent_list.c.inc"],
+    hdrs = ["concurrent_list.h.inc"],
 )
 
 cc_library(
-    name = "list_neighbor",
-    srcs = ["list_neighbor.c"],
-    hdrs = ["list_neighbor.h"],
+    name = "concurrent_list_neighbor",
+    srcs = ["concurrent_list_neighbor.c"],
+    hdrs = ["concurrent_list_neighbor.h"],
     deps = [
-        ":list",
+        ":concurrent_list",
         "//common/network:neighbor",
     ],
 )

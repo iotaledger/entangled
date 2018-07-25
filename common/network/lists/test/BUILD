@@ -1,8 +1,8 @@
 cc_test(
-    name = "test_list",
-    srcs = ["test_list.c"],
+    name = "test_concurrent_list",
+    srcs = ["test_concurrent_list.c"],
     deps = [
-        "//common/network/lists:list",
+        "//common/network/lists:concurrent_list",
         "@unity",
     ],
 )
