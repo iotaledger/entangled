@@ -9,6 +9,7 @@
 #define __COMMON_MODEL_CPPTRANSACTION_H_
 
 #include <string>
+#include <vector>
 #include "common/model/transaction.h"
 #include "common/trinary/tryte.h"
 
@@ -21,20 +22,20 @@ class Transaction {
 
  public:
   Transaction();
-  Transaction(std::string trytes);
+  Transaction(const std::string& trytes);
   ~Transaction(void);
 
   std::string get_signature(void);
   // Set the transaction signature (copy argument)
-  void set_signature(std::string signature);
+  void set_signature(const std::string& signature);
   // Get the transaction message
   std::string get_message(void);
   // Set the transaction message (copy argument)
-  void set_message(std::string message);
+  void set_message(const std::string& message);
   // Get the transaction address
   std::string get_address(void);
   // Set the transaction address (copy argument)
-  void set_address(std::string address);
+  void set_address(const std::string& address);
   // Get the transaction value
   int64_t get_value(void);
   // Set the transaction value
@@ -42,7 +43,7 @@ class Transaction {
   // Get the transaction obsolete tag
   std::string get_obsolete_tag(void);
   // Set the transaction obsolete tag
-  void set_obsolete_tag(std::string obsolete_tag);
+  void set_obsolete_tag(const std::string& obsolete_tag);
   // Get the transaction timestamp
   uint64_t get_timestamp(void);
   // Set the transaction timestamp
@@ -58,19 +59,19 @@ class Transaction {
   // Get the transaction bundle
   std::string get_bundle(void);
   // Set the transaction bundle (copy argument)
-  void set_bundle(std::string bundle);
+  void set_bundle(const std::string& bundle);
   // Get the transaction trunk
   std::string get_trunk(void);
   // Set the transaction trunk (copy argument)
-  void set_trunk(std::string trunk);
+  void set_trunk(const std::string& trunk);
   // Get the transaction branch
   std::string get_branch(void);
   // Set the transaction branch (copy argument)
-  void set_branch(std::string branch);
+  void set_branch(const std::string& branch);
   // Get the transaction tag
   std::string get_tag(void);
   // Set the transaction tag (copy argument)
-  void set_tag(std::string tag);
+  void set_tag(const std::string& tag);
   // Get the transaction attachement timestamp
   int64_t get_attachment_timestamp(void);
   // Set the transaction attachement timestamp
@@ -86,9 +87,9 @@ class Transaction {
   // Get the transaction nonce
   std::string get_nonce(void);
   // Set the transaction nonce (copy argument)
-  void set_nonce(std::string nonce);
+  void set_nonce(const std::string& nonce);
 
-  flex_trit_t *serialize(void);
+  std::vector<flex_trit_t> serialize(void);
 };  // class transaction
 }  // namespace model
 }  // namespace iota
