@@ -54,7 +54,8 @@ static inline trit_t flex_trit_array_at(flex_trit_t const *const trit_array,
   // Straight forward 1 trit per byte
   return trit_array[index];
 #elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
-  return get_trit_at((tryte_t *)trit_array, flex_trits_num_for_trits(len), index);
+  return get_trit_at((tryte_t *)trit_array, flex_trits_num_for_trits(len),
+                     index);
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
   // Find out the position of the trit in the byte
   uint8_t mshift = (index & 3) << 1U;

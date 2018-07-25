@@ -9,6 +9,17 @@ cc_test (
 )
 
 cc_test (
+    name = "test_transaction_3",
+    srcs = ["test_transaction.c"],
+    defines = ["TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE"],
+    deps = [
+        "//common/trinary:trit_tryte",
+        "//common/model:transaction_3",
+        "@unity//:unity",
+        ]
+)
+
+cc_test (
     name = "test_transaction_4",
     srcs = ["test_transaction.c"],
     defines = ["TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE"],
@@ -36,6 +47,17 @@ cc_test (
     deps = [
         "//common/trinary:trit_tryte",
         "//common/model:cpptransaction",
+        "@com_google_googletest//:gtest_main",
+        ]
+)
+
+cc_test (
+    name = "test_cpptransaction_3",
+    srcs = ["test_cpptransaction.cc"],
+    defines = ["TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE"],
+    deps = [
+        "//common/trinary:trit_tryte",
+        "//common/model:cpptransaction_3",
         "@com_google_googletest//:gtest_main",
         ]
 )

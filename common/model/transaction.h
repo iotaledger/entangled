@@ -21,6 +21,11 @@ extern "C" {
 #define FLEX_TRIT_SIZE_81 81
 #define FLEX_TRIT_SIZE_243 243
 #define FLEX_TRIT_SIZE_6561 6561
+#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_27 9
+#define FLEX_TRIT_SIZE_81 27
+#define FLEX_TRIT_SIZE_243 81
+#define FLEX_TRIT_SIZE_6561 2187
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
 #define FLEX_TRIT_SIZE_27 7
 #define FLEX_TRIT_SIZE_81 21
@@ -168,8 +173,8 @@ iota_transaction_t transaction_deserialize(const flex_trit_t *trits);
 flex_trit_t *transaction_serialize(const iota_transaction_t transaction);
 // Places the serialized data from an existing transaction in pre-allocated
 // string - returns non 0 on success
-size_t transaction_serialize_on_trits(const iota_transaction_t transaction,
-                                      flex_trit_t *trits);
+size_t transaction_serialize_on_flex_trits(const iota_transaction_t transaction,
+                                           flex_trit_t *trits);
 /***********************************************************************************************************
  * Deserialization
  ***********************************************************************************************************/
