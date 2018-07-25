@@ -34,6 +34,7 @@
     (*self)->front = NULL;                                   \
     (*self)->back = NULL;                                    \
     (*self)->size = 0;                                       \
+    lock_handle_init(&(*self)->lock);                        \
     return CONCURRENT_LIST_SUCCESS;                          \
   }
 
@@ -48,6 +49,7 @@
       front = front->next;                                               \
       free(tmp);                                                         \
     }                                                                    \
+    lock_handle_destroy(&(*self)->lock);                                 \
     free(*self);                                                         \
     *self = NULL;                                                        \
     return CONCURRENT_LIST_SUCCESS;                                      \
@@ -55,34 +57,46 @@
 
 #define DEFINE_FUNCTION_FRONT_CONCURRENT_LIST_OF(TYPE) \
   TYPE *CONCURRENT_LIST_OF_##TYPE##_FRONT(             \
-      concurrent_list_of_##TYPE const *const self) {   \
+      concurrent_list_of_##TYPE *const self) {         \
     TYPE *data = NULL;                                 \
     if (self == NULL) return NULL;                     \
+    lock_handle_lock(&self->lock);                     \
     if (self->front) data = &self->front->data;        \
+    lock_handle_unlock(&self->lock);                   \
     return data;                                       \
   }
 
 #define DEFINE_FUNCTION_BACK_CONCURRENT_LIST_OF(TYPE) \
   TYPE *CONCURRENT_LIST_OF_##TYPE##_BACK(             \
-      concurrent_list_of_##TYPE const *const self) {  \
+      concurrent_list_of_##TYPE *const self) {        \
     TYPE *data = NULL;                                \
     if (self == NULL) return NULL;                    \
+    lock_handle_lock(&self->lock);                    \
     if (self->back) data = &self->back->data;         \
+    lock_handle_unlock(&self->lock);                  \
     return data;                                      \
   }
 
 #define DEFINE_FUNCTION_EMPTY_CONCURRENT_LIST_OF(TYPE) \
   bool CONCURRENT_LIST_OF_##TYPE##_EMPTY(              \
-      concurrent_list_of_##TYPE const *const self) {   \
+      concurrent_list_of_##TYPE *const self) {         \
+    size_t size;                                       \
     if (self == NULL) return true;                     \
-    return self->size == 0;                            \
+    lock_handle_lock(&self->lock);                     \
+    size = self->size;                                 \
+    lock_handle_unlock(&self->lock);                   \
+    return size == 0;                                  \
   }
 
 #define DEFINE_FUNCTION_SIZE_CONCURRENT_LIST_OF(TYPE) \
   size_t CONCURRENT_LIST_OF_##TYPE##_SIZE(            \
-      concurrent_list_of_##TYPE const *const self) {  \
+      concurrent_list_of_##TYPE *const self) {        \
+    size_t size;                                      \
     if (self == NULL) return 0;                       \
-    return self->size;                                \
+    lock_handle_lock(&self->lock);                    \
+    size = self->size;                                \
+    lock_handle_unlock(&self->lock);                  \
+    return size;                                      \
   }
 
 #define DEFINE_FUNCTION_PUSH_FRONT_CONCURRENT_LIST_OF(TYPE)        \
@@ -98,6 +112,7 @@
       return CONCURRENT_LIST_ALLOC_FAILED;                         \
     }                                                              \
     node->data = data;                                             \
+    lock_handle_lock(&self->lock);                                 \
     if (self->size == 0) {                                         \
       self->back = node;                                           \
     } else {                                                       \
@@ -106,6 +121,7 @@
     }                                                              \
     self->front = node;                                            \
     self->size++;                                                  \
+    lock_handle_unlock(&self->lock);                               \
     return CONCURRENT_LIST_SUCCESS;                                \
   }
 
@@ -122,6 +138,7 @@
       return CONCURRENT_LIST_ALLOC_FAILED;                        \
     }                                                             \
     node->data = data;                                            \
+    lock_handle_lock(&self->lock);                                \
     if (self->size == 0) {                                        \
       self->front = node;                                         \
     } else {                                                      \
@@ -130,6 +147,7 @@
     }                                                             \
     self->back = node;                                            \
     self->size++;                                                 \
+    lock_handle_unlock(&self->lock);                              \
     return CONCURRENT_LIST_SUCCESS;                               \
   }
 
@@ -143,7 +161,9 @@
     if (data == NULL) {                                           \
       return CONCURRENT_LIST_NULL_DATA;                           \
     }                                                             \
+    lock_handle_lock(&self->lock);                                \
     if (self->size == 0) {                                        \
+      lock_handle_unlock(&self->lock);                            \
       return CONCURRENT_LIST_EMPTY;                               \
     }                                                             \
     tmp = self->front;                                            \
@@ -152,6 +172,7 @@
     if (self->front == NULL) self->back = NULL;                   \
     self->size--;                                                 \
     free(tmp);                                                    \
+    lock_handle_unlock(&self->lock);                              \
     return CONCURRENT_LIST_SUCCESS;                               \
   }
 
@@ -165,7 +186,9 @@
     if (data == NULL) {                                          \
       return CONCURRENT_LIST_NULL_DATA;                          \
     }                                                            \
+    lock_handle_lock(&self->lock);                               \
     if (self->size == 0) {                                       \
+      lock_handle_unlock(&self->lock);                           \
       return CONCURRENT_LIST_EMPTY;                              \
     }                                                            \
     tmp = self->front;                                           \
@@ -174,6 +197,7 @@
     if (self->back == NULL) self->front = NULL;                  \
     self->size--;                                                \
     free(tmp);                                                   \
+    lock_handle_unlock(&self->lock);                             \
     return CONCURRENT_LIST_SUCCESS;                              \
   }
 
@@ -184,13 +208,16 @@
       return false;                                                           \
     }                                                                         \
     concurrent_list_node_of_##TYPE##_t *iter;                                 \
+    lock_handle_lock(&self->lock);                                            \
     iter = self->front;                                                       \
     while (iter) {                                                            \
       if ((self->cmp && self->cmp(iter->data, data)) || iter->data == data) { \
+        lock_handle_unlock(&self->lock);                                      \
         return true;                                                          \
       }                                                                       \
       iter = iter->next;                                                      \
     }                                                                         \
+    lock_handle_unlock(&self->lock);                                          \
     return false;                                                             \
   }
 
@@ -201,6 +228,7 @@
     if (self == NULL) {                                                       \
       return CONCURRENT_LIST_NULL_SELF;                                       \
     }                                                                         \
+    lock_handle_lock(&self->lock);                                            \
     iter = self->front;                                                       \
     while (iter) {                                                            \
       tmp = iter->next;                                                       \
@@ -225,6 +253,7 @@
       }                                                                       \
       iter = tmp;                                                             \
     }                                                                         \
+    lock_handle_unlock(&self->lock);                                          \
     return CONCURRENT_LIST_SUCCESS;                                           \
   }
 

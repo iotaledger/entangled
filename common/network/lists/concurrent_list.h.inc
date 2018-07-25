@@ -10,6 +10,8 @@
 
 #include <stdbool.h>
 
+#include "common/lock_handle.h"
+
 typedef enum concurrent_list_status_e {
   CONCURRENT_LIST_SUCCESS,
   CONCURRENT_LIST_NULL_SELF,
@@ -28,10 +30,10 @@ typedef enum concurrent_list_status_e {
 #define DECLARE_VTABLE_CONCURRENT_LIST_OF(TYPE)                              \
   typedef struct concurrent_list_of_##TYPE##_s concurrent_list_of_##TYPE;    \
   typedef struct vtable_concurrent_list_of_##TYPE##_s {                      \
-    TYPE *(*front)(concurrent_list_of_##TYPE const *const self);             \
-    TYPE *(*back)(concurrent_list_of_##TYPE const *const self);              \
-    bool (*empty)(concurrent_list_of_##TYPE const *const self);              \
-    size_t (*size)(concurrent_list_of_##TYPE const *const self);             \
+    TYPE *(*front)(concurrent_list_of_##TYPE *const self);                   \
+    TYPE *(*back)(concurrent_list_of_##TYPE *const self);                    \
+    bool (*empty)(concurrent_list_of_##TYPE *const self);                    \
+    size_t (*size)(concurrent_list_of_##TYPE *const self);                   \
     concurrent_list_status_t (*push_front)(                                  \
         concurrent_list_of_##TYPE *const self, TYPE const data);             \
     concurrent_list_status_t (*push_back)(                                   \
@@ -53,6 +55,7 @@ typedef enum concurrent_list_status_e {
     concurrent_list_node_of_##TYPE##_t *front;          \
     concurrent_list_node_of_##TYPE##_t *back;           \
     size_t size;                                        \
+    lock_handle_t lock;                                 \
   } concurrent_list_of_##TYPE;
 
 #define INIT_CONCURRENT_LIST_OF(TYPE, NAME, CMP_FUNC) \
@@ -93,7 +96,7 @@ typedef enum concurrent_list_status_e {
  */
 #define DECLARE_FUNCTION_FRONT_CONCURRENT_LIST_OF(TYPE) \
   TYPE *CONCURRENT_LIST_OF_##TYPE##_FRONT(              \
-      concurrent_list_of_##TYPE const *const self);
+      concurrent_list_of_##TYPE *const self);
 
 /**
  * Returns pointer to the last element in the list
@@ -103,8 +106,7 @@ typedef enum concurrent_list_status_e {
  * @return Pointer to the last element
  */
 #define DECLARE_FUNCTION_BACK_CONCURRENT_LIST_OF(TYPE) \
-  TYPE *CONCURRENT_LIST_OF_##TYPE##_BACK(              \
-      concurrent_list_of_##TYPE const *const self);
+  TYPE *CONCURRENT_LIST_OF_##TYPE##_BACK(concurrent_list_of_##TYPE *const self);
 
 /**
  * Checks if the list has no elements
@@ -114,8 +116,7 @@ typedef enum concurrent_list_status_e {
  * @return true if the list is empty, false otherwise
  */
 #define DECLARE_FUNCTION_EMPTY_CONCURRENT_LIST_OF(TYPE) \
-  bool CONCURRENT_LIST_OF_##TYPE##_EMPTY(               \
-      concurrent_list_of_##TYPE const *const self);
+  bool CONCURRENT_LIST_OF_##TYPE##_EMPTY(concurrent_list_of_##TYPE *const self);
 
 /**
  * Returns the number of elements in the list
@@ -126,7 +127,7 @@ typedef enum concurrent_list_status_e {
  */
 #define DECLARE_FUNCTION_SIZE_CONCURRENT_LIST_OF(TYPE) \
   size_t CONCURRENT_LIST_OF_##TYPE##_SIZE(             \
-      concurrent_list_of_##TYPE const *const self);
+      concurrent_list_of_##TYPE *const self);
 
 /**
  * Adds an element at the front of the list
