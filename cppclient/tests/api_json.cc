@@ -56,10 +56,10 @@ TEST_F(IotaJsonAPITest, GetBalances) {
 
   api.response = res;
   EXPECT_CALL(api, post_()).Times(1);
-  EXPECT_EQ(api.request, req);
 
   auto response = api.getBalances(addresses);
 
+  EXPECT_EQ(api.request, req);
   EXPECT_EQ(response, expected);
 }
 
