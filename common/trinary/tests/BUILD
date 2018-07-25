@@ -53,11 +53,10 @@ cc_test(
 )
 
 cc_test(
-    name = "test_trit_array_1",
+    name = "test_trit_array",
     srcs = ["test_trit_array.c"],
-    defines = ["TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE"],
     deps = [
-        "//common/trinary:trit_array_1",
+        "//common/trinary:trit_array",
         "//common/trinary:trit_byte",
         "//common/trinary:trit_tryte",
         "@unity",

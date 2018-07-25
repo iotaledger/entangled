@@ -12,7 +12,7 @@ namespace iota {
 namespace model {
 Transaction::Transaction() { iota_transaction = transaction_new(); }
 
-Transaction::Transaction(std::string trytes) {
+Transaction::Transaction(const std::string &trytes) {
   iota_transaction = transaction_new();
   size_t to_len = trytes.size() * 3;
   size_t flex_len = flex_trits_num_for_trits(to_len);
@@ -32,7 +32,7 @@ std::string Transaction::get_signature(void) {
 }
 
 // Set the transaction signature (copy argument)
-void Transaction::set_signature(std::string trytes) {
+void Transaction::set_signature(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(6561);
   flex_trit_t trits[flex_len];
   tryte_to_flex_trit(trits, 6561, (const tryte_t *)trytes.data(), 2187, 2187);
@@ -48,7 +48,7 @@ std::string Transaction::get_message(void) {
 }
 
 // Set the transaction message (copy argument)
-void Transaction::set_message(std::string trytes) {
+void Transaction::set_message(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(6561);
   flex_trit_t trits[flex_len];
   tryte_to_flex_trit(trits, 6561, (const tryte_t *)trytes.data(), 2187, 2187);
@@ -64,7 +64,7 @@ std::string Transaction::get_address(void) {
 }
 
 // Set the transaction address (copy argument)
-void Transaction::set_address(std::string trytes) {
+void Transaction::set_address(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(243);
   flex_trit_t trits[flex_len];
   tryte_to_flex_trit(trits, 243, (const tryte_t *)trytes.data(), 81, 81);
@@ -90,7 +90,7 @@ std::string Transaction::get_obsolete_tag(void) {
 }
 
 // Set the transaction obsolete tag
-void Transaction::set_obsolete_tag(std::string trytes) {
+void Transaction::set_obsolete_tag(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(243);
   flex_trit_t trits[flex_len];
   tryte_to_flex_trit(trits, 243, (const tryte_t *)trytes.data(), 81, 81);
@@ -136,7 +136,7 @@ std::string Transaction::get_bundle(void) {
 }
 
 // Set the transaction bundle (copy argument)
-void Transaction::set_bundle(std::string trytes) {
+void Transaction::set_bundle(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(243);
   flex_trit_t trits[flex_len];
   tryte_to_flex_trit(trits, 243, (const tryte_t *)trytes.data(), 81, 81);
@@ -152,7 +152,7 @@ std::string Transaction::get_trunk(void) {
 }
 
 // Set the transaction trunk (copy argument)
-void Transaction::set_trunk(std::string trytes) {
+void Transaction::set_trunk(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(243);
   flex_trit_t trits[flex_len];
   tryte_to_flex_trit(trits, 243, (const tryte_t *)trytes.data(), 81, 81);
@@ -168,7 +168,7 @@ std::string Transaction::get_branch(void) {
 }
 
 // Set the transaction branch (copy argument)
-void Transaction::set_branch(std::string trytes) {
+void Transaction::set_branch(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(243);
   flex_trit_t trits[flex_len];
   tryte_to_flex_trit(trits, 243, (const tryte_t *)trytes.data(), 81, 81);
@@ -184,7 +184,7 @@ std::string Transaction::get_tag(void) {
 }
 
 // Set the transaction tag (copy argument)
-void Transaction::set_tag(std::string trytes) {
+void Transaction::set_tag(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(81);
   flex_trit_t trits[flex_len];
   tryte_to_flex_trit(trits, 81, (const tryte_t *)trytes.data(), 27, 27);
@@ -230,11 +230,18 @@ std::string Transaction::get_nonce(void) {
 }
 
 // Set the transaction nonce (copy argument)
-void Transaction::set_nonce(std::string trytes) {
+void Transaction::set_nonce(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(81);
   flex_trit_t trits[flex_len];
   tryte_to_flex_trit(trits, 81, (const tryte_t *)trytes.data(), 27, 27);
   transaction_set_nonce(iota_transaction, trits);
+}
+
+std::vector<flex_trit_t> Transaction::serialize(void) {
+  size_t num_bytes = flex_trits_num_for_trits(NUM_TRITS_SERIALIZED_TRANSACTION);
+  std::vector<flex_trit_t> value(num_bytes);
+  transaction_serialize_on_trits(iota_transaction, value.data());
+  return value;
 }
 }  // namespace model
 }  // namespace iota

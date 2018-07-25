@@ -7,15 +7,15 @@
 
 #include <gtest/gtest.h>
 #include <chrono>
-#include <iostream>
 #include "common/trinary/flex_trit_array.h"
 
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
-#define TRITS_IN -1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1, 1, 0, -1, 1, 0
+const int8_t TRITS_IN[] = {-1, 0, 1, 1, 0, 1, 1,  0, -1,
+                           -1, 1, 0, 1, 1, 0, -1, 1, 0};
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
-#define TRITS_IN 0x53, 0x14, 0x1f, 0xC5, 0x01
+const uint8_t TRITS_IN[] = {0x53, 0x14, 0x1f, 0xC5, 0x01};
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
-#define TRITS_IN 0x23, 0x98, 0x25, 0x02
+const uint8_t TRITS_IN[] = {0x23, 0x98, 0x25, 0x02};
 #endif
 #define TRYTES 'H', 'J', 'S', 'B', 'D', 'B'
 #define TRITS_OUT -1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1, 1, 0, -1, 1, 0
@@ -27,7 +27,7 @@ TEST(FlexTritTest, testFlexTritArrayAt) {
   using namespace iota;
   using namespace trinary;
 
-  std::vector<trit_t> trits = {TRITS_IN};
+  std::vector<flex_trit_t> trits(TRITS_IN, TRITS_IN + sizeof(TRITS_IN));
   FlexTritArray ft(trits, NUM_TRITS);
   ASSERT_EQ(ft[0], -1);
   ASSERT_EQ(ft[1], 0);
@@ -45,7 +45,7 @@ TEST(FlexTritTest, testFlexTritArraySlice) {
   using namespace iota;
   using namespace trinary;
 
-  std::vector<trit_t> trits = {TRITS_IN};
+  std::vector<flex_trit_t> trits(TRITS_IN, TRITS_IN + sizeof(TRITS_IN));
   FlexTritArray ft(trits, NUM_TRITS);
   FlexTritArray st = ft.slice(4, 7);
   ASSERT_EQ(st.size(), 7);
@@ -58,7 +58,7 @@ TEST(FlexTritTest, testFlexTritArrayInsert) {
   using namespace iota;
   using namespace trinary;
 
-  std::vector<trit_t> trits = {TRITS_IN};
+  std::vector<flex_trit_t> trits(TRITS_IN, TRITS_IN + sizeof(TRITS_IN));
   FlexTritArray ft(trits, NUM_TRITS);
   FlexTritArray st = ft.slice(8, 5);
   ASSERT_EQ(ft[4], 0);
@@ -73,7 +73,7 @@ TEST(FlexTritTest, testFlexTritArrayTrits) {
   using namespace iota;
   using namespace trinary;
 
-  std::vector<trit_t> trits = {TRITS_IN};
+  std::vector<flex_trit_t> trits(TRITS_IN, TRITS_IN + sizeof(TRITS_IN));
   FlexTritArray ft(trits, NUM_TRITS);
   std::vector<trit_t> expected = {TRITS_OUT};
   ASSERT_EQ(ft.trits(), expected);
@@ -84,7 +84,7 @@ TEST(FlexTritTest, testFlexTritArrayTrytes) {
   using namespace iota;
   using namespace trinary;
 
-  std::vector<trit_t> trits = {TRITS_IN};
+  std::vector<flex_trit_t> trits(TRITS_IN, TRITS_IN + sizeof(TRITS_IN));
   FlexTritArray ft(trits, NUM_TRITS);
   std::vector<tryte_t> expected = {TRYTES};
   ASSERT_EQ(ft.trytes(), expected);

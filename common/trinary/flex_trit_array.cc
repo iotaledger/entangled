@@ -10,35 +10,42 @@
 
 namespace iota {
 namespace trinary {
+
 FlexTritArray FlexTritArray::createFromTrits(const std::vector<trit_t> &trits) {
-  size_t flex_len = FlexTritArray::numBytesForTrits(trits.size());
-  FlexTritArray ft = FlexTritArray(flex_len);
-  int8_to_flex_trit_array(ft.flex_trits_.data(), flex_len, trits.data(),
-                          trits.size(), trits.size());
+  size_t num_trits = trits.size();
+  FlexTritArray ft = FlexTritArray(num_trits);
+  int8_to_flex_trit_array(ft.flex_trits_.data(), num_trits, trits.data(),
+                          num_trits, num_trits);
   return ft;
 }
 
 FlexTritArray FlexTritArray::createFromTrytes(
-  const std::vector<tryte_t> &trytes) {
-  size_t num_trits = trytes.size() * 3;
-  size_t flex_len = FlexTritArray::numBytesForTrits(num_trits);
-  FlexTritArray ft = FlexTritArray(flex_len);
-  tryte_to_flex_trit(ft.flex_trits_.data(), num_trits, trytes.data(), trytes.size(),
-                     trytes.size());
+    const std::vector<tryte_t> &trytes) {
+  size_t num_trytes = trytes.size();
+  size_t num_trits = num_trytes * 3;
+  FlexTritArray ft = FlexTritArray(num_trits);
+  tryte_to_flex_trit(ft.flex_trits_.data(), num_trits, trytes.data(),
+                     num_trytes, num_trytes);
   return ft;
+}
+
+FlexTritArray::FlexTritArray(size_t num_trits) : num_trits_(num_trits) {
+  size_t flex_len = FlexTritArray::numBytesForTrits(num_trits);
+  flex_trits_.resize(flex_len, 0);
+  num_trits_ = num_trits;
 }
 
 FlexTritArray FlexTritArray::slice(size_t start, size_t num_trits) {
   assert(start < num_trits_);
   assert(start + num_trits <= num_trits_);
-  size_t flex_len = FlexTritArray::numBytesForTrits(num_trits);
-  FlexTritArray ft = FlexTritArray(flex_len);
-  flex_trit_array_slice(ft.flex_trits_.data(), flex_len, flex_trits_.data(),
+  FlexTritArray ft = FlexTritArray(num_trits);
+  flex_trit_array_slice(ft.flex_trits_.data(), num_trits, flex_trits_.data(),
                         num_trits_, start, num_trits);
   return ft;
 }
 
-size_t FlexTritArray::insert(FlexTritArray &flex_trit_array, size_t start) {
+size_t FlexTritArray::insert(const FlexTritArray &flex_trit_array,
+                             size_t start) {
   assert(start < num_trits_);
   assert(start + flex_trit_array.num_trits_ <= num_trits_);
   flex_trit_array_insert(

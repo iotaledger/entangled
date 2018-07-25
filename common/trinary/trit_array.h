@@ -96,7 +96,6 @@ static inline uint8_t flex_trit_array_set_at(flex_trit_t *const trit_array,
   // bitblit the trit in place
   trit_array[index] = (trit_array[index] & mask) | trit;
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
-  byte_t buffer = 0;
   trit_t trits[5];
   // Find out the index of the trit in the byte
   uint8_t tindex = index % 5U;
@@ -104,7 +103,7 @@ static inline uint8_t flex_trit_array_set_at(flex_trit_t *const trit_array,
   index = index / 5U;
   bytes_to_trits((byte_t *)(trit_array + index), 1, trits, 5);
   trits[tindex] = trit;
-  trit_array[index] = trits_to_byte(trits, 0, 5);
+  trit_array[index] = trits_to_byte(trits, 0, 4);
 #endif
   return 1;
 }

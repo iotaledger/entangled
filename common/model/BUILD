@@ -10,15 +10,6 @@ cc_library(
     ], )
 
 cc_library(
-    name="transaction_1",
-    srcs=["transaction.c"],
-    hdrs=["transaction.h"],
-    deps=[
-        "//common/trinary:trit_long",
-        "//common/trinary:trit_array_1"
-    ], )
-
-cc_library(
     name="transaction_4",
     srcs=["transaction.c"],
     hdrs=["transaction.h"],
@@ -44,16 +35,6 @@ cc_library(
         "//common/model:transaction",
         "//common/trinary:trit_long",
         "//common/trinary:trit_array"
-    ], )
-
-cc_library(
-    name="cpptransaction_1",
-    srcs=["cpptransaction.cc"],
-    hdrs=["cpptransaction.h"],
-    deps=[
-        "//common/model:transaction_1",
-        "//common/trinary:trit_long",
-        "//common/trinary:trit_array_1"
     ], )
 
 cc_library(

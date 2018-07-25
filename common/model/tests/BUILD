@@ -1,10 +1,9 @@
 cc_test (
-    name = "test_transaction_1",
+    name = "test_transaction",
     srcs = ["test_transaction.c"],
-    defines = ["TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE"],
     deps = [
         "//common/trinary:trit_tryte",
-        "//common/model:transaction_1",
+        "//common/model:transaction",
         "@unity//:unity",
         ]
 )
@@ -32,13 +31,12 @@ cc_test (
 )
 
 cc_test (
-    name = "test_cpptransaction_1",
+    name = "test_cpptransaction",
     srcs = ["test_cpptransaction.cc"],
-    defines = ["TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE"],
     deps = [
         "//common/trinary:trit_tryte",
-        "//common/model:cpptransaction_1",
-        "@unity//:unity",
+        "//common/model:cpptransaction",
+        "@com_google_googletest//:gtest_main",
         ]
 )
 
@@ -49,7 +47,7 @@ cc_test (
     deps = [
         "//common/trinary:trit_tryte",
         "//common/model:cpptransaction_4",
-        "@unity//:unity",
+        "@com_google_googletest//:gtest_main",
         ]
 )
 
@@ -60,6 +58,6 @@ cc_test (
     deps = [
         "//common/trinary:trit_tryte",
         "//common/model:cpptransaction_5",
-        "@unity//:unity",
+        "@com_google_googletest//:gtest_main",
         ]
 )
