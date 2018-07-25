@@ -164,6 +164,19 @@ cc_library(
 )
 
 cc_library(
+    name = "trit_array_3",
+    srcs = ["trit_array.c"],
+    hdrs = ["trit_array.h"],
+    defines = ["TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE"],
+    deps = [
+        ":trit_byte",
+        ":trits",
+        ":trit_tryte",
+        "//common:stdint",
+    ],
+)
+
+cc_library(
     name = "trit_array_4",
     srcs = ["trit_array.c"],
     hdrs = ["trit_array.h"],
