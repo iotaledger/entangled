@@ -13,7 +13,7 @@ bool cmp_neighbor(neighbor_t const *const lhs, neighbor_t const *const rhs) {
 }
 
 bool add_neighbor(neighbors_list_t *const neighbors, char const *const host,
-                  uint16_t port) {
+                  uint16_t const port) {
   neighbor_t neighbor;
   strcpy(neighbor.endpoint.host, host);
   neighbor.endpoint.port = port;
@@ -25,7 +25,7 @@ bool add_neighbor(neighbors_list_t *const neighbors, char const *const host,
 }
 
 bool remove_neighbor(neighbors_list_t *const neighbors, char const *const host,
-                     uint16_t port) {
+                     uint16_t const port) {
   neighbor_t neighbor;
   strcpy(neighbor.endpoint.host, host);
   neighbor.endpoint.port = port;

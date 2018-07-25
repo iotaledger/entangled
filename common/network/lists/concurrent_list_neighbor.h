@@ -21,9 +21,9 @@ typedef concurrent_list_of_neighbor_t neighbors_list_t;
 
 bool cmp_neighbor(neighbor_t const *const lhs, neighbor_t const *const rhs);
 bool add_neighbor(neighbors_list_t *const neighbors, char const *const host,
-                  uint16_t port);
+                  uint16_t const port);
 bool remove_neighbor(neighbors_list_t *const neighbors, char const *const host,
-                     uint16_t port);
+                     uint16_t const port);
 
 #ifdef __cplusplus
 }
