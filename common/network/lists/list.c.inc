@@ -12,7 +12,8 @@
       LIST_OF_##TYPE##_FRONT,      LIST_OF_##TYPE##_BACK,       \
       LIST_OF_##TYPE##_EMPTY,      LIST_OF_##TYPE##_SIZE,       \
       LIST_OF_##TYPE##_PUSH_FRONT, LIST_OF_##TYPE##_PUSH_BACK,  \
-      LIST_OF_##TYPE##_POP_FRONT,  LIST_OF_##TYPE##_POP_BACK};
+      LIST_OF_##TYPE##_POP_FRONT,  LIST_OF_##TYPE##_POP_BACK,   \
+      LIST_OF_##TYPE##_CONTAINS};
 
 #define DEFINE_FUNCTION_INIT_LIST_OF(TYPE)                           \
   list_status_t LIST_OF_##TYPE##_INIT(list_of_##TYPE **const self) { \
@@ -161,6 +162,23 @@
     return LIST_SUCCESS;                                              \
   }
 
+#define DEFINE_FUNCTION_CONTAINS_LIST_OF(TYPE)               \
+  bool LIST_OF_##TYPE##_CONTAINS(list_of_##TYPE *const self, \
+                                 TYPE const data) {          \
+    if (self == NULL) {                                      \
+      return false;                                          \
+    }                                                        \
+    list_node_of_##TYPE##_t *iter;                           \
+    iter = self->front;                                      \
+    while (iter) {                                           \
+      if (iter->data == data) {                              \
+        return true;                                         \
+      }                                                      \
+      iter = iter->next;                                     \
+    }                                                        \
+    return false;                                            \
+  }
+
 #define DEFINE_LIST_OF(TYPE)               \
   DEFINE_VTABLE_LIST_OF(TYPE)              \
   DEFINE_FUNCTION_INIT_LIST_OF(TYPE)       \
@@ -172,4 +190,5 @@
   DEFINE_FUNCTION_PUSH_FRONT_LIST_OF(TYPE) \
   DEFINE_FUNCTION_PUSH_BACK_LIST_OF(TYPE)  \
   DEFINE_FUNCTION_POP_FRONT_LIST_OF(TYPE)  \
-  DEFINE_FUNCTION_POP_BACK_LIST_OF(TYPE)
+  DEFINE_FUNCTION_POP_BACK_LIST_OF(TYPE)   \
+  DEFINE_FUNCTION_CONTAINS_LIST_OF(TYPE)

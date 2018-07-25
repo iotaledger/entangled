@@ -98,6 +98,21 @@ void test_list() {
   tmp = tmp->next;
   TEST_ASSERT_NULL(tmp);
 
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(NULL, 0), false);
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 0), true);
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 1), true);
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 2), true);
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 3), true);
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 4), true);
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 5), true);
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 6), true);
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 7), true);
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 8), true);
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 9), true);
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 10), false);
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 42), false);
+  TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, -1), false);
+
   TEST_ASSERT_EQUAL_INT(DESTROY_LIST_OF(int, nlist), LIST_NULL_SELF);
   TEST_ASSERT_EQUAL_INT(DESTROY_LIST_OF(int, list), LIST_SUCCESS);
   TEST_ASSERT_NULL(list);

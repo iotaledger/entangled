@@ -36,6 +36,7 @@ typedef enum list_status_e {
     list_status_t (*push_back)(list_of_##TYPE *const self, TYPE const data);  \
     list_status_t (*pop_front)(list_of_##TYPE *const self, TYPE *const data); \
     list_status_t (*pop_back)(list_of_##TYPE *const self, TYPE *const data);  \
+    bool (*contains)(list_of_##TYPE *const self, TYPE const data);            \
   } vtable_list_of_##TYPE##_t;                                                \
   extern vtable_list_of_##TYPE##_t const vtable_list_of_##TYPE##_g;
 
@@ -159,6 +160,17 @@ typedef enum list_status_e {
   list_status_t LIST_OF_##TYPE##_POP_BACK(list_of_##TYPE *const self, \
                                           TYPE *const data);
 
+/**
+ * Tells whether an element is in a list or not
+ *
+ * @param self The list
+ * @param data The data to check
+ *
+ * @return whether the element is in the list or not
+ */
+#define DECLARE_FUNCTION_CONTAINS_LIST_OF(TYPE) \
+  bool LIST_OF_##TYPE##_CONTAINS(list_of_##TYPE *const self, TYPE const data);
+
 #define DECLARE_LIST_OF(TYPE)               \
   DECLARE_STRUCT_LIST_NODE_OF(TYPE)         \
   DECLARE_VTABLE_LIST_OF(TYPE)              \
@@ -172,6 +184,7 @@ typedef enum list_status_e {
   DECLARE_FUNCTION_PUSH_FRONT_LIST_OF(TYPE) \
   DECLARE_FUNCTION_PUSH_BACK_LIST_OF(TYPE)  \
   DECLARE_FUNCTION_POP_FRONT_LIST_OF(TYPE)  \
-  DECLARE_FUNCTION_POP_BACK_LIST_OF(TYPE)
+  DECLARE_FUNCTION_POP_BACK_LIST_OF(TYPE)   \
+  DECLARE_FUNCTION_CONTAINS_LIST_OF(TYPE)
 
 #endif  // __COMMON_NETWORK_LIST_H__
