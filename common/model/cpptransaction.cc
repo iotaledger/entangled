@@ -240,7 +240,7 @@ void Transaction::set_nonce(const std::string &trytes) {
 std::vector<flex_trit_t> Transaction::serialize(void) {
   size_t num_bytes = flex_trits_num_for_trits(NUM_TRITS_SERIALIZED_TRANSACTION);
   std::vector<flex_trit_t> value(num_bytes);
-  transaction_serialize_on_trits(iota_transaction, value.data());
+  transaction_serialize_on_flex_trits(iota_transaction, value.data());
   return value;
 }
 }  // namespace model
