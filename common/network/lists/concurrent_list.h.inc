@@ -48,14 +48,14 @@ typedef enum concurrent_list_status_e {
   extern vtable_concurrent_list_of_##TYPE##_t const                          \
       vtable_concurrent_list_of_##TYPE##_g;
 
-#define DECLARE_STRUCT_CONCURRENT_LIST_OF(TYPE)         \
-  typedef struct concurrent_list_of_##TYPE##_s {        \
-    vtable_concurrent_list_of_##TYPE##_t const *vtable; \
-    bool (*cmp)(TYPE const self, TYPE const data);      \
-    concurrent_list_node_of_##TYPE##_t *front;          \
-    concurrent_list_node_of_##TYPE##_t *back;           \
-    size_t size;                                        \
-    lock_handle_t lock;                                 \
+#define DECLARE_STRUCT_CONCURRENT_LIST_OF(TYPE)                  \
+  typedef struct concurrent_list_of_##TYPE##_s {                 \
+    vtable_concurrent_list_of_##TYPE##_t const *vtable;          \
+    bool (*cmp)(TYPE const *const self, TYPE const *const data); \
+    concurrent_list_node_of_##TYPE##_t *front;                   \
+    concurrent_list_node_of_##TYPE##_t *back;                    \
+    size_t size;                                                 \
+    lock_handle_t lock;                                          \
   } concurrent_list_of_##TYPE;
 
 #define INIT_CONCURRENT_LIST_OF(TYPE, NAME, CMP_FUNC) \
@@ -74,7 +74,7 @@ typedef enum concurrent_list_status_e {
 #define DECLARE_FUNCTION_INIT_CONCURRENT_LIST_OF(TYPE)       \
   concurrent_list_status_t CONCURRENT_LIST_OF_##TYPE##_INIT( \
       concurrent_list_of_##TYPE **const self,                \
-      bool (*cmp)(TYPE const self, TYPE const data));
+      bool (*cmp)(TYPE const *const self, TYPE const *const data));
 
 /**
  * Destroys a list

@@ -21,21 +21,21 @@
           CONCURRENT_LIST_OF_##TYPE##_CONTAIN,    \
           CONCURRENT_LIST_OF_##TYPE##_REMOVE};
 
-#define DEFINE_FUNCTION_INIT_CONCURRENT_LIST_OF(TYPE)        \
-  concurrent_list_status_t CONCURRENT_LIST_OF_##TYPE##_INIT( \
-      concurrent_list_of_##TYPE **const self,                \
-      bool (*cmp)(TYPE const self, TYPE const data)) {       \
-    if (self == NULL) return CONCURRENT_LIST_NULL_SELF;      \
-    *self = (concurrent_list_of_##TYPE *)malloc(             \
-        sizeof(concurrent_list_of_##TYPE));                  \
-    if (*self == NULL) return CONCURRENT_LIST_ALLOC_FAILED;  \
-    (*self)->vtable = &vtable_concurrent_list_of_##TYPE##_g; \
-    (*self)->cmp = cmp;                                      \
-    (*self)->front = NULL;                                   \
-    (*self)->back = NULL;                                    \
-    (*self)->size = 0;                                       \
-    lock_handle_init(&(*self)->lock);                        \
-    return CONCURRENT_LIST_SUCCESS;                          \
+#define DEFINE_FUNCTION_INIT_CONCURRENT_LIST_OF(TYPE)                \
+  concurrent_list_status_t CONCURRENT_LIST_OF_##TYPE##_INIT(         \
+      concurrent_list_of_##TYPE **const self,                        \
+      bool (*cmp)(TYPE const *const self, TYPE const *const data)) { \
+    if (self == NULL) return CONCURRENT_LIST_NULL_SELF;              \
+    *self = (concurrent_list_of_##TYPE *)malloc(                     \
+        sizeof(concurrent_list_of_##TYPE));                          \
+    if (*self == NULL) return CONCURRENT_LIST_ALLOC_FAILED;          \
+    (*self)->vtable = &vtable_concurrent_list_of_##TYPE##_g;         \
+    (*self)->cmp = cmp;                                              \
+    (*self)->front = NULL;                                           \
+    (*self)->back = NULL;                                            \
+    (*self)->size = 0;                                               \
+    lock_handle_init(&(*self)->lock);                                \
+    return CONCURRENT_LIST_SUCCESS;                                  \
   }
 
 #define DEFINE_FUNCTION_DESTROY_CONCURRENT_LIST_OF(TYPE)                 \
@@ -201,60 +201,62 @@
     return CONCURRENT_LIST_SUCCESS;                              \
   }
 
-#define DEFINE_FUNCTION_CONTAIN_CONCURRENT_LIST_OF(TYPE)                      \
-  bool CONCURRENT_LIST_OF_##TYPE##_CONTAIN(                                   \
-      concurrent_list_of_##TYPE *const self, TYPE const data) {               \
-    if (self == NULL) {                                                       \
-      return false;                                                           \
-    }                                                                         \
-    concurrent_list_node_of_##TYPE##_t *iter;                                 \
-    lock_handle_lock(&self->lock);                                            \
-    iter = self->front;                                                       \
-    while (iter) {                                                            \
-      if ((self->cmp && self->cmp(iter->data, data)) || iter->data == data) { \
-        lock_handle_unlock(&self->lock);                                      \
-        return true;                                                          \
-      }                                                                       \
-      iter = iter->next;                                                      \
-    }                                                                         \
-    lock_handle_unlock(&self->lock);                                          \
-    return false;                                                             \
+#define DEFINE_FUNCTION_CONTAIN_CONCURRENT_LIST_OF(TYPE)        \
+  bool CONCURRENT_LIST_OF_##TYPE##_CONTAIN(                     \
+      concurrent_list_of_##TYPE *const self, TYPE const data) { \
+    if (self == NULL) {                                         \
+      return false;                                             \
+    }                                                           \
+    concurrent_list_node_of_##TYPE##_t *iter;                   \
+    lock_handle_lock(&self->lock);                              \
+    iter = self->front;                                         \
+    while (iter) {                                              \
+      if ((self->cmp && self->cmp(&iter->data, &data)) ||       \
+          iter->data == data) {                                 \
+        lock_handle_unlock(&self->lock);                        \
+        return true;                                            \
+      }                                                         \
+      iter = iter->next;                                        \
+    }                                                           \
+    lock_handle_unlock(&self->lock);                            \
+    return false;                                               \
   }
 
-#define DEFINE_FUNCTION_REMOVE_CONCURRENT_LIST_OF(TYPE)                       \
-  bool CONCURRENT_LIST_OF_##TYPE##_REMOVE(                                    \
-      concurrent_list_of_##TYPE *const self, TYPE const data) {               \
-    concurrent_list_node_of_##TYPE##_t *iter, *tmp;                           \
-    if (self == NULL) {                                                       \
-      return CONCURRENT_LIST_NULL_SELF;                                       \
-    }                                                                         \
-    lock_handle_lock(&self->lock);                                            \
-    iter = self->front;                                                       \
-    while (iter) {                                                            \
-      tmp = iter->next;                                                       \
-      if ((self->cmp && self->cmp(iter->data, data)) || iter->data == data) { \
-        if (iter->prev) {                                                     \
-          iter->prev->next = iter->next;                                      \
-        }                                                                     \
-        if (iter->next) {                                                     \
-          iter->next->prev = iter->prev;                                      \
-        }                                                                     \
-        if (iter == self->front) {                                            \
-          self->front = iter->next;                                           \
-        } else if (iter == self->back) {                                      \
-          self->back = iter->prev;                                            \
-        }                                                                     \
-        free(iter);                                                           \
-        self->size--;                                                         \
-        if (self->size == 0) {                                                \
-          self->front = NULL;                                                 \
-          self->back = NULL;                                                  \
-        }                                                                     \
-      }                                                                       \
-      iter = tmp;                                                             \
-    }                                                                         \
-    lock_handle_unlock(&self->lock);                                          \
-    return CONCURRENT_LIST_SUCCESS;                                           \
+#define DEFINE_FUNCTION_REMOVE_CONCURRENT_LIST_OF(TYPE)         \
+  bool CONCURRENT_LIST_OF_##TYPE##_REMOVE(                      \
+      concurrent_list_of_##TYPE *const self, TYPE const data) { \
+    concurrent_list_node_of_##TYPE##_t *iter, *tmp;             \
+    if (self == NULL) {                                         \
+      return CONCURRENT_LIST_NULL_SELF;                         \
+    }                                                           \
+    lock_handle_lock(&self->lock);                              \
+    iter = self->front;                                         \
+    while (iter) {                                              \
+      tmp = iter->next;                                         \
+      if ((self->cmp && self->cmp(&iter->data, &data)) ||       \
+          iter->data == data) {                                 \
+        if (iter->prev) {                                       \
+          iter->prev->next = iter->next;                        \
+        }                                                       \
+        if (iter->next) {                                       \
+          iter->next->prev = iter->prev;                        \
+        }                                                       \
+        if (iter == self->front) {                              \
+          self->front = iter->next;                             \
+        } else if (iter == self->back) {                        \
+          self->back = iter->prev;                              \
+        }                                                       \
+        free(iter);                                             \
+        self->size--;                                           \
+        if (self->size == 0) {                                  \
+          self->front = NULL;                                   \
+          self->back = NULL;                                    \
+        }                                                       \
+      }                                                         \
+      iter = tmp;                                               \
+    }                                                           \
+    lock_handle_unlock(&self->lock);                            \
+    return CONCURRENT_LIST_SUCCESS;                             \
   }
 
 #define DEFINE_CONCURRENT_LIST_OF(TYPE)               \

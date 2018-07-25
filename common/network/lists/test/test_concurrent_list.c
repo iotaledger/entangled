@@ -13,7 +13,7 @@
 DECLARE_CONCURRENT_LIST_OF(int)
 DEFINE_CONCURRENT_LIST_OF(int)
 
-static bool int_cmp(int a, int b) { return a == b; }
+static bool int_cmp(int const *const a, int const *const b) { return *a == *b; }
 
 void test_list() {
   int data;
