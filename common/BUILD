@@ -19,4 +19,5 @@ cc_library(
 cc_library(
     name = "thread_handle",
     hdrs = ["thread_handle.h"],
+    linkopts = ["-lpthread"],
 )
