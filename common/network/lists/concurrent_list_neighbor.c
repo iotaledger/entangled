@@ -1,8 +1,9 @@
 #include <string.h>
 
+#include "common/network/lists/concurrent_list.c.inc"
 #include "common/network/lists/concurrent_list_neighbor.h"
 
-DEFINE_LIST_OF(neighbor_t);
+DEFINE_CONCURRENT_LIST_OF(neighbor_t);
 
 bool cmp_neighbor(neighbor_t const *const lhs, neighbor_t const *const rhs) {
   if (lhs == NULL || rhs == NULL) {
