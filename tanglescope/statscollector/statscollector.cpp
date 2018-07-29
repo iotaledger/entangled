@@ -15,6 +15,7 @@
 #include "iota/tanglescope/statscollector.hpp"
 #include "iota/tanglescope/statscollector/analyzer.hpp"
 #include "iota/tanglescope/statscollector/stats/frame.hpp"
+#include "tanglescope/common/iri.hpp"
 
 using namespace iota::tanglescope;
 
@@ -29,7 +30,8 @@ std::map<std::string, std::string> ZMQCollectorImpl::nameToDescCounters = {
     {"bundles_new", "new bundles count"},
     {"bundles_confirmed", "confirmed bundles count"},
     {"value_new", "new tx's accumulated value"},
-    {"value_confirmed", "confirmed tx's accumulated value"}};
+    {"value_confirmed", "confirmed tx's accumulated value"},
+    {"milestones_count", "received milestone count"}};
 
 std::map<std::string, std::string> ZMQCollectorImpl::nameToDescHistograms = {
     {"bundle_confirmation_duration", "bundle's confirmation duration [ms]"}};
@@ -115,11 +117,13 @@ void ZMQCollectorImpl::collect(uint32_t bundleConfirmationHistogramRange,
       rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
           [&](auto s) { zmqPublisher(std::move(s), _zmqURL); });
 
+  uint64_t lmsi = 0;
+
   zmqObservable.observe_on(rxcpp::synchronize_new_thread())
       .as_blocking()
       .subscribe(
-          [weakAnalyzer = std::weak_ptr(analyzer),
-           &gauges = _gauges](std::shared_ptr<iri::IRIMessage> msg) {
+          [weakAnalyzer = std::weak_ptr(analyzer), &gauges = _gauges,
+           &counters = _counters, &lmsi](std::shared_ptr<iri::IRIMessage> msg) {
             auto analyzer = weakAnalyzer.lock();
             // FIXME (@th0br0) Proper error handling.
             if (!analyzer) return;
@@ -133,6 +137,14 @@ void ZMQCollectorImpl::collect(uint32_t bundleConfirmationHistogramRange,
                 analyzer->transactionConfirmed(
                     std::static_pointer_cast<iri::SNMessage>(std::move(msg)));
                 break;
+              case iri::IRIMessageType::LMSI: {
+                auto lmsiCurr =
+                    std::static_pointer_cast<iri::LMSIMessage>(std::move(msg));
+                counters.at("milestones_count").get().Add({}).Increment();
+                lmsi = lmsiCurr->latestSolidMilestoneIndex();
+              }
+
+              break;
               case iri::IRIMessageType::RSTAT: {
                 auto rstatMessage =
                     std::static_pointer_cast<iri::RSTATMessage>(std::move(msg));
