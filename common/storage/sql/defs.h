@@ -27,6 +27,12 @@
 
 #define NUM_COLS 15
 
+#define ADDRESS_INDEX "address_index"
+#define BUNDLE_INDEX "bundle_index"
+#define TRUNK_INDEX "trunk_index"
+#define BRANCH_INDEX "branch_index"
+#define TAG_INDEX "tag_index"
+
 #define MAX_CREATE_INDEX_STATEMENT_SIZE 128
 #define MAX_STORE_STATEMENT_SIZE 4096
 #define MAX_EXIST_STATEMENT_SIZE 256

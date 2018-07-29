@@ -24,11 +24,11 @@ typedef struct connection_t {
 } connection_t;
 
 typedef struct connection_config_t {
-  const char* dbPath;
-  bool indexAddress;
-  bool indexApprovee;
-  bool indexBundle;
-  bool indexTag;
+  const char* db_path;
+  bool index_address;
+  bool index_approvee;
+  bool index_bundle;
+  bool index_tag;
 } connection_config_t;
 
 extern retcode_t init_connection(connection_t* const,

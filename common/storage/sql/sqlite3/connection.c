@@ -27,7 +27,7 @@ retcode_t create_index_if_not_exist(const connection_t* const conn,
 
   int res = snprintf(statement, MAX_CREATE_INDEX_STATEMENT_SIZE,
                      "CREATE INDEX IF NOT EXISTS %s ON %s(%s)",
-                     TRANSACTION_TABLE_NAME, indexName, colName);
+                     indexName, TRANSACTION_TABLE_NAME, colName);
 
   if (res < 0 || res == MAX_CREATE_INDEX_STATEMENT_SIZE) {
     logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_ERR,
@@ -38,7 +38,7 @@ retcode_t create_index_if_not_exist(const connection_t* const conn,
   int rc = sqlite3_exec((sqlite3*)conn->db, statement, 0, 0, &errMsg);
   if (rc != SQLITE_OK) {
     logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_ERR,
-                        "Failed in creating index, statement: %s", statement);
+                        "Failed in creating index, statement: %s, errMsg: %s\n", statement, errMsg);
     sqlite3_free(errMsg);
     return RC_SQLITE3_FAILED_CREATE_INDEX_DB;
   }
@@ -57,49 +57,51 @@ retcode_t init_connection(connection_t* const conn,
   char* err_msg = 0;
   char* sql;
 
-  if (config->dbPath == "") {
-    rc = sqlite3_open(":memory:", (sqlite3**)&conn->db);
+  if (config->db_path == NULL) {
+    logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_CRIT,
+                        "No path for db specified");
+    return RC_SQLITE3_NO_PATH_FOR_DB_SPECIFIED;
   } else {
-    rc = sqlite3_open(config->dbPath, (sqlite3**)&conn->db);
+    rc = sqlite3_open_v2(config->db_path, (sqlite3**)&conn->db,SQLITE_OPEN_READWRITE, NULL);
   }
 
   if (rc) {
     logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_CRIT,
-                        "Failed to open db on path: %s", config->dbPath);
+                        "Failed to open db on path: %s", config->db_path);
   } else {
     logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_INFO,
                         "Opened database (from path: %s ) successfully",
-                        config->dbPath);
+                        config->db_path);
   }
 
-  if (config->indexApprovee) {
+  if (config->index_approvee) {
     if (retcode = create_index_if_not_exist(conn, TRANSACTION_TABLE_NAME,
-                                            "trunk_index", "trunk")) {
+                                            TRUNK_INDEX, COL_TRUNK)) {
       return retcode;
     }
-    if (create_index_if_not_exist(conn, TRANSACTION_TABLE_NAME, "branch_index",
-                                  "branch")) {
-      return retcode;
-    }
-  }
-
-  if (config->indexAddress) {
-    if (retcode = create_index_if_not_exist(conn, TRANSACTION_TABLE_NAME,
-                                            "address_index", "address")) {
+    if (create_index_if_not_exist(conn, TRANSACTION_TABLE_NAME, BRANCH_INDEX,
+                                  COL_BRANCH)) {
       return retcode;
     }
   }
 
-  if (config->indexBundle) {
+  if (config->index_address) {
     if (retcode = create_index_if_not_exist(conn, TRANSACTION_TABLE_NAME,
-                                            "bundle_index", "bundle")) {
+                                            ADDRESS_INDEX, COL_ADDRESS)) {
       return retcode;
     }
   }
 
-  if (config->indexTag) {
+  if (config->index_bundle) {
     if (retcode = create_index_if_not_exist(conn, TRANSACTION_TABLE_NAME,
-                                            "tag_index", "tag")) {
+                                            BUNDLE_INDEX, COL_BUNDLE)) {
+      return retcode;
+    }
+  }
+
+  if (config->index_tag) {
+    if (retcode = create_index_if_not_exist(conn, TRANSACTION_TABLE_NAME,
+                                            TAG_INDEX, COL_TAG)) {
       return retcode;
     }
   }

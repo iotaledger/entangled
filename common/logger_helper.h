@@ -9,7 +9,6 @@
 #define COMMON_LOGGER_HELPER_H_
 
 #include <logger.h>
-#include <stdarg.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus

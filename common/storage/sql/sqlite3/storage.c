@@ -95,11 +95,12 @@ retcode_t iota_stor_store(const connection_t* const conn,
 
   return RC_OK;
 }
-retcode_t iota_stor_load(const connection_t* const conn, const char* index_name,
+retcode_t iota_stor_load(const connection_t* const conn, const char* col_name,
                          const trit_array_p key, iota_transaction_t data_out[],
                          size_t max_num_txs, size_t* num_loaded) {
+
   char statement[MAX_SELECT_STATEMENT_SIZE];
-  iota_transactions_select_statement(index_name, key, statement,
+  iota_transactions_select_statement(col_name, key, statement,
                                      MAX_SELECT_STATEMENT_SIZE);
 
   char* err_msg = 0;
@@ -110,6 +111,7 @@ retcode_t iota_stor_load(const connection_t* const conn, const char* index_name,
 
   int rc = sqlite3_exec((sqlite3*)conn->db, statement, select_transactions_cb,
                         (void*)&pack, &err_msg);
+  *num_loaded = pack.num_loaded;
 
   if (rc != SQLITE_OK) {
     logger_helper_print(SQLITE3_LOGGER_ID, LOGGER_ERR, "Failed in statement",
@@ -117,6 +119,8 @@ retcode_t iota_stor_load(const connection_t* const conn, const char* index_name,
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
+
+
 
   return RC_OK;
 }
