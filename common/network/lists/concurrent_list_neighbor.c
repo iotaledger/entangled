@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include <string.h>
 
 #include "common/network/lists/concurrent_list.c.inc"
@@ -9,19 +16,16 @@ bool cmp_neighbor(neighbor_t const *const lhs, neighbor_t const *const rhs) {
   if (lhs == NULL || rhs == NULL) {
     return false;
   }
-  return strcmp(lhs->endpoint.host, rhs->endpoint.host) == 0 &&
+  return lhs->endpoint.protocol == rhs->endpoint.protocol &&
+         strcmp(lhs->endpoint.host, rhs->endpoint.host) == 0 &&
          lhs->endpoint.port == rhs->endpoint.port;
 }
 
-bool add_neighbor(neighbors_list_t *const neighbors, char const *const host,
-                  uint16_t const port) {
-  neighbor_t neighbor;
-
+bool add_neighbor(neighbors_list_t *const neighbors,
+                  neighbor_t const neighbor) {
   if (neighbors == NULL) {
     return false;
   }
-  strcpy(neighbor.endpoint.host, host);
-  neighbor.endpoint.port = port;
   if (neighbors->vtable->contain(neighbors, neighbor) == true) {
     return false;
   }
@@ -29,15 +33,11 @@ bool add_neighbor(neighbors_list_t *const neighbors, char const *const host,
          CONCURRENT_LIST_SUCCESS;
 }
 
-bool remove_neighbor(neighbors_list_t *const neighbors, char const *const host,
-                     uint16_t const port) {
-  neighbor_t neighbor;
-
+bool remove_neighbor(neighbors_list_t *const neighbors,
+                     neighbor_t const neighbor) {
   if (neighbors == NULL) {
     return false;
   }
-  strcpy(neighbor.endpoint.host, host);
-  neighbor.endpoint.port = port;
   return neighbors->vtable->remove(neighbors, neighbor) ==
          CONCURRENT_LIST_SUCCESS;
 }
