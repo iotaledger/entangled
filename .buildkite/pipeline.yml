@@ -1,6 +1,8 @@
 steps:
   - name: "bazel test opt"
     command: bazel test -c opt --test_output=all //...
+    agents:
+      queue: dev
     plugins:
       docker#v1.3.0:
         image: "th0br0/iota-buildenv:x86_64"
@@ -8,6 +10,17 @@ steps:
           - /conf:/conf
   - name: "bazel test debug"
     command: bazel test -c dbg --test_output=all //...
+    agents:
+      queue: dev
+    plugins:
+      docker#v1.3.0:
+        image: "th0br0/iota-buildenv:x86_64"
+        mounts:
+          - /conf:/conf
+  - name: "bazel test bootlin x86_64 toolchains"
+    command: bazel build --crosstool_top=@iota_toolchains//tools/x86-64-core-i7--glibc--bleeding-edge-2018.07-1:toolchain --cpu=x86_64 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain  //...
+    agents:
+      queue: dev
     plugins:
       docker#v1.3.0:
         image: "th0br0/iota-buildenv:x86_64"

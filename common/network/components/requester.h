@@ -10,14 +10,24 @@
 
 #include "common/network/queues/concurrent_queue_trit_array.h"
 
-typedef concurrent_queue_of_trit_array_p request_queue_t;
+typedef concurrent_queue_of_trit_array_p requester_queue_t;
 
 typedef struct {
-  request_queue_t *queue;
-} request_state_t;
+  requester_queue_t *queue;
+} requester_state_t;
 
-void request_transaction(request_state_t *const state,
-                         trit_array_t const *const hash);
-trit_array_t *get_transaction_to_request();
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+bool requester_start(requester_state_t *const state);
+bool request_transaction(requester_state_t *const state,
+                         trit_array_p const hash);
+trit_array_p get_transaction_to_request(requester_state_t *const state);
+bool requester_stop(requester_state_t *const state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  //__COMMON_NETWORK_COMPONENTS_REQUESTER_H__
