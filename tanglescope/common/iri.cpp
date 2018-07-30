@@ -19,7 +19,7 @@ std::shared_ptr<IRIMessage> payloadToMsg(std::string_view payload) {
     return std::make_shared<LMHSMessage>(actual);
   } else if (what == "lmsi") {
     return std::make_shared<LMSIMessage>(actual);
-  }else if (what == "rstat") {
+  } else if (what == "rstat") {
     return std::make_shared<RSTATMessage>(actual);
   }
 
