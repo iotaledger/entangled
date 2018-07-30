@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-int cp(const char *to, const char *from);
+int copy_file(const char *to, const char *from);
 
 #ifdef __cplusplus
 }

@@ -14,20 +14,20 @@
 #include <stdio.h>
 #include <string.h>
 
-#define CONNECTION_LOGGER_ID "sqlite3_connection_storage"
+#define CONNECTION_LOGGER_ID "stor_sqlite3_conn"
 
-retcode_t create_index_if_not_exist(const connection_t* const conn,
-                                    const char* const table_name,
-                                    const char* const indexName,
-                                    const char* const colName) {
+retcode_t create_index_if_not_exists(const connection_t* const conn,
+                                     const char* const table_name,
+                                     const char* const indexName,
+                                     const char* const colName) {
   char* errMsg = 0;
   logger_id_t id = logger_id_unknown;
 
   char statement[MAX_CREATE_INDEX_STATEMENT_SIZE];
 
   int res = snprintf(statement, MAX_CREATE_INDEX_STATEMENT_SIZE,
-                     "CREATE INDEX IF NOT EXISTS %s ON %s(%s)",
-                     indexName, TRANSACTION_TABLE_NAME, colName);
+                     "CREATE INDEX IF NOT EXISTS %s ON %s(%s)", indexName,
+                     TRANSACTION_TABLE_NAME, colName);
 
   if (res < 0 || res == MAX_CREATE_INDEX_STATEMENT_SIZE) {
     logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_ERR,
@@ -38,7 +38,8 @@ retcode_t create_index_if_not_exist(const connection_t* const conn,
   int rc = sqlite3_exec((sqlite3*)conn->db, statement, 0, 0, &errMsg);
   if (rc != SQLITE_OK) {
     logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_ERR,
-                        "Failed in creating index, statement: %s, errMsg: %s\n", statement, errMsg);
+                        "Failed in creating index, statement: %s, errMsg: %s\n",
+                        statement, errMsg);
     sqlite3_free(errMsg);
     return RC_SQLITE3_FAILED_CREATE_INDEX_DB;
   }
@@ -62,7 +63,8 @@ retcode_t init_connection(connection_t* const conn,
                         "No path for db specified");
     return RC_SQLITE3_NO_PATH_FOR_DB_SPECIFIED;
   } else {
-    rc = sqlite3_open_v2(config->db_path, (sqlite3**)&conn->db,SQLITE_OPEN_READWRITE, NULL);
+    rc = sqlite3_open_v2(config->db_path, (sqlite3**)&conn->db,
+                         SQLITE_OPEN_READWRITE, NULL);
   }
 
   if (rc) {
@@ -75,33 +77,33 @@ retcode_t init_connection(connection_t* const conn,
   }
 
   if (config->index_approvee) {
-    if (retcode = create_index_if_not_exist(conn, TRANSACTION_TABLE_NAME,
-                                            TRUNK_INDEX, COL_TRUNK)) {
+    if (retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                             TRUNK_INDEX, COL_TRUNK)) {
       return retcode;
     }
-    if (create_index_if_not_exist(conn, TRANSACTION_TABLE_NAME, BRANCH_INDEX,
-                                  COL_BRANCH)) {
+    if (create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME, BRANCH_INDEX,
+                                   COL_BRANCH)) {
       return retcode;
     }
   }
 
   if (config->index_address) {
-    if (retcode = create_index_if_not_exist(conn, TRANSACTION_TABLE_NAME,
-                                            ADDRESS_INDEX, COL_ADDRESS)) {
+    if (retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                             ADDRESS_INDEX, COL_ADDRESS)) {
       return retcode;
     }
   }
 
   if (config->index_bundle) {
-    if (retcode = create_index_if_not_exist(conn, TRANSACTION_TABLE_NAME,
-                                            BUNDLE_INDEX, COL_BUNDLE)) {
+    if (retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                             BUNDLE_INDEX, COL_BUNDLE)) {
       return retcode;
     }
   }
 
   if (config->index_tag) {
-    if (retcode = create_index_if_not_exist(conn, TRANSACTION_TABLE_NAME,
-                                            TAG_INDEX, COL_TAG)) {
+    if (retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                             TAG_INDEX, COL_TAG)) {
       return retcode;
     }
   }

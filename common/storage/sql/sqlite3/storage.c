@@ -18,7 +18,7 @@
 #include <logger.h>
 #include <sqlite3.h>
 
-#define SQLITE3_LOGGER_ID "sqlite3_storage"
+#define SQLITE3_LOGGER_ID "stor_sqlite3"
 
 typedef struct iota_transactions_pack {
   iota_transaction_t* txs;
@@ -98,7 +98,6 @@ retcode_t iota_stor_store(const connection_t* const conn,
 retcode_t iota_stor_load(const connection_t* const conn, const char* col_name,
                          const trit_array_p key, iota_transaction_t data_out[],
                          size_t max_num_txs, size_t* num_loaded) {
-
   char statement[MAX_SELECT_STATEMENT_SIZE];
   iota_transactions_select_statement(col_name, key, statement,
                                      MAX_SELECT_STATEMENT_SIZE);
@@ -119,9 +118,6 @@ retcode_t iota_stor_load(const connection_t* const conn, const char* col_name,
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
-
-
-
   return RC_OK;
 }
 retcode_t iota_stor_exist(const connection_t* const conn,
@@ -150,5 +146,6 @@ retcode_t iota_stor_exist(const connection_t* const conn,
 retcode_t iota_stor_update(const connection_t* const conn,
                            const char* index_name, const trit_array_p key,
                            const iota_transaction_t data_in) {
-  //TODO - implement
+  // TODO - implement
+  return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
 }

@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 /**
- * @file  erros.h
+ * @file  errors.h
  *
  * The following error scheme takes advantage of a 16-bit integer
  * in order to fit in data about an error, its origin and severity
@@ -82,7 +82,10 @@ enum retcode_t {
   RC_SQLITE3_FAILED_SELECT_DB =
       0x05 | RC_MODULE_STORAGE_SQLITE3 | RC_SEVERITY_MAJOR,
   RC_SQLITE3_NO_PATH_FOR_DB_SPECIFIED =
-  0x06 | RC_MODULE_STORAGE_SQLITE3 | RC_SEVERITY_FATAL,
+      0x06 | RC_MODULE_STORAGE_SQLITE3 | RC_SEVERITY_FATAL,
+
+  RC_SQLITE3_FAILED_NOT_IMPLEMENTED =
+      0x07 | RC_MODULE_STORAGE_SQLITE3 | RC_SEVERITY_MAJOR,
 
   RC_SQL_FAILED_WRITE_STATEMENT =
       0x01 | RC_MODULE_STORAGE_SQL | RC_SEVERITY_MAJOR,

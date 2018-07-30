@@ -74,8 +74,8 @@ void test_stored_transaction(void) {
 int main(void) {
   UNITY_BEGIN();
 
-  cp("common/storage/sql/sqlite3/tests/test.db",
-     "common/storage/sql/sqlite3/tests/ciri.db");
+  copy_file("common/storage/sql/sqlite3/tests/test.db",
+            "common/storage/sql/sqlite3/tests/ciri.db");
 
   RUN_TEST(test_init_connection);
   RUN_TEST(initialized_db_empty);

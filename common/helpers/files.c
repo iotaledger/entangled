@@ -7,7 +7,7 @@
 
 #include "common/helpers/files.h"
 
-int cp(const char *to, const char *from) {
+int copy_file(const char *to, const char *from) {
   int fd_to, fd_from;
   char buf[4096];
   ssize_t nread;
