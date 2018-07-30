@@ -7,6 +7,8 @@
 
 #include <stdlib.h>
 
+static unsigned int const concurrent_queue_pop_timeout_g = 2;
+
 #define DEFINE_VTABLE_CONCURRENT_QUEUE_OF(TYPE) \
   vtable_concurrent_queue_of_##TYPE##_t const   \
       vtable_concurrent_queue_of_##TYPE##_g =   \
@@ -125,7 +127,11 @@
     if (data == NULL) return CONCURRENT_QUEUE_NULL_DATA;                     \
     lock_handle_lock(&self->lock);                                           \
     while (self->size == 0) {                                                \
-      cond_handle_wait(&self->cond, &self->lock);                            \
+      if (cond_handle_timedwait(&self->cond, &self->lock,                    \
+                                concurrent_queue_pop_timeout_g) != 0) {      \
+        lock_handle_unlock(&self->lock);                                     \
+        return CONCURRENT_QUEUE_TIMEOUT;                                     \
+      }                                                                      \
     }                                                                        \
     concurrent_queue_node_of_##TYPE##_t *tmp = self->front;                  \
     *data = tmp->data;                                                       \
