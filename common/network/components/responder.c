@@ -23,18 +23,29 @@ static void *responder_routine(responder_state_t *const state) {
   return NULL;
 }
 
-bool responder_start(responder_state_t *const state) {
-  if (state == NULL) {
+bool responder_init(responder_state_t *const state, node_t *const node) {
+  if (state == NULL || node == NULL) {
     return false;
   }
+  state->running = false;
   if (INIT_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
     return false;
   }
+  state->node = node;
+  return true;
+}
+
+bool responder_start(responder_state_t *const state) {
+  if (state == NULL) {
+    return false;
+  }
   log_info("Spawning responder thread");
   state->running = true;
-  thread_handle_create(&state->thread, (thread_routine_t)responder_routine,
-                       state);
+  if (thread_handle_create(&state->thread, (thread_routine_t)responder_routine,
+                           state) != 0) {
+    return false;
+  }
   return true;
 }
 
@@ -54,7 +65,16 @@ bool responder_stop(responder_state_t *const state) {
   }
   log_info("Shutting down responder thread");
   state->running = false;
-  thread_handle_join(state->thread, NULL);
+  if (thread_handle_join(state->thread, NULL) != 0) {
+    return false;
+  }
+  return true;
+}
+
+bool responder_destroy(responder_state_t *const state) {
+  if (state == NULL) {
+    return false;
+  }
   if (DESTROY_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
     return false;

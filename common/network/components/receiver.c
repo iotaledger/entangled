@@ -18,14 +18,25 @@ static void *receiver_routine(receiver_state_t *const state) {
   return NULL;
 }
 
+bool receiver_init(receiver_state_t *const state, node_t *const node) {
+  if (state == NULL || node == NULL) {
+    return false;
+  }
+  state->running = false;
+  state->node = node;
+  return true;
+}
+
 bool receiver_start(receiver_state_t *const state) {
   if (state == NULL) {
     return false;
   }
   log_info("Spawning receiver thread");
   state->running = true;
-  thread_handle_create(&state->thread, (thread_routine_t)receiver_routine,
-                       state);
+  if (thread_handle_create(&state->thread, (thread_routine_t)receiver_routine,
+                           state) != 0) {
+    return false;
+  }
   return true;
 }
 
@@ -35,6 +46,8 @@ bool receiver_stop(receiver_state_t *const state) {
   }
   log_info("Shutting down receiver thread");
   state->running = false;
-  thread_handle_join(state->thread, NULL);
+  if (thread_handle_join(state->thread, NULL) != 0) {
+    return false;
+  }
   return true;
 }
