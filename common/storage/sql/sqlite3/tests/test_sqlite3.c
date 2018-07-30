@@ -44,7 +44,7 @@ void test_stored_transaction(void) {
     txs[i] = transaction_new();
   }
 
-  int num_loaded;
+  size_t num_loaded;
   TEST_ASSERT(iota_stor_load(&conn, NULL, NULL, txs, 5, &num_loaded) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, num_loaded);
 
