@@ -51,6 +51,13 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "files",
+    srcs = ["files.c"],
+    hdrs = ["files.h"],
+    visibility = ["//visibility:public"],
+)
+
 cc_test(
     name = "tests",
     timeout = "short",
