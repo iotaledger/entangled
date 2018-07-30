@@ -30,8 +30,8 @@ extern "C" {
 
 bool receiver_packet_handler(receiver_state_t *const state,
                              iota_packet_t *const packet);
-bool receiver_init(receiver_state_t *const state, node_t *const node, uint16_t tcp_port,
-                    uint16_t udp_port);
+bool receiver_init(receiver_state_t *const state, node_t *const node,
+                   uint16_t tcp_port, uint16_t udp_port);
 bool receiver_start(receiver_state_t *const state);
 bool receiver_stop(receiver_state_t *const state);
 

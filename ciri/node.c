@@ -8,6 +8,10 @@
 #include "ciri/node.h"
 #include "common/network/logger.h"
 
+// TODO(thibault) configuration variable
+static uint16_t tcp_port_g = 4242;
+static uint16_t udp_port_g = 4243;
+
 bool node_init(node_t* const node) {
   log_info("Initializing broadcaster component");
   if (broadcaster_init(&node->broadcaster, node) == false) {
@@ -20,7 +24,7 @@ bool node_init(node_t* const node) {
     return false;
   }
   log_info("Initializing receiver component");
-  if (receiver_init(&node->receiver, node) == false) {
+  if (receiver_init(&node->receiver, node, tcp_port_g, udp_port_g) == false) {
     log_fatal("Initializing receiver component failed");
     return false;
   }

@@ -28,8 +28,8 @@ static void *receiver_routine(receiver_state_t *const state) {
   return NULL;
 }
 
-bool receiver_init(receiver_state_t *const state, node_t *const node, uint16_t tcp_port,
-                    uint16_t udp_port) {
+bool receiver_init(receiver_state_t *const state, node_t *const node,
+                   uint16_t tcp_port, uint16_t udp_port) {
   if (state == NULL || node == NULL) {
     return false;
   }
