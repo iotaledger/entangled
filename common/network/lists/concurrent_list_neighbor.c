@@ -12,7 +12,7 @@
 
 DEFINE_CONCURRENT_LIST_OF(neighbor_t);
 
-bool cmp_neighbor(neighbor_t const *const lhs, neighbor_t const *const rhs) {
+bool neighbor_cmp(neighbor_t const *const lhs, neighbor_t const *const rhs) {
   if (lhs == NULL || rhs == NULL) {
     return false;
   }
@@ -21,23 +21,29 @@ bool cmp_neighbor(neighbor_t const *const lhs, neighbor_t const *const rhs) {
          lhs->endpoint.port == rhs->endpoint.port;
 }
 
-bool add_neighbor(neighbors_list_t *const neighbors,
+bool neighbor_add(neighbors_list_t *const neighbors,
                   neighbor_t const neighbor) {
   if (neighbors == NULL) {
     return false;
   }
-  if (neighbors->vtable->contain(neighbors, neighbor) == true) {
+  if (neighbors->vtable->contains(neighbors, neighbor) == true) {
     return false;
   }
-  return neighbors->vtable->push_back(neighbors, neighbor) ==
-         CONCURRENT_LIST_SUCCESS;
+  if (neighbors->vtable->push_back(neighbors, neighbor) !=
+      CONCURRENT_LIST_SUCCESS) {
+    return false;
+  }
+  return true;
 }
 
-bool remove_neighbor(neighbors_list_t *const neighbors,
+bool neighbor_remove(neighbors_list_t *const neighbors,
                      neighbor_t const neighbor) {
   if (neighbors == NULL) {
     return false;
   }
-  return neighbors->vtable->remove(neighbors, neighbor) ==
-         CONCURRENT_LIST_SUCCESS;
+  if (neighbors->vtable->remove(neighbors, neighbor) !=
+      CONCURRENT_LIST_SUCCESS) {
+    return false;
+  }
+  return true;
 }

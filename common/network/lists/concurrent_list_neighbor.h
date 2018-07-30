@@ -19,9 +19,9 @@ DECLARE_CONCURRENT_LIST_OF(neighbor_t);
 
 typedef concurrent_list_of_neighbor_t neighbors_list_t;
 
-bool cmp_neighbor(neighbor_t const *const lhs, neighbor_t const *const rhs);
-bool add_neighbor(neighbors_list_t *const neighbors, neighbor_t const neighbor);
-bool remove_neighbor(neighbors_list_t *const neighbors,
+bool neighbor_cmp(neighbor_t const *const lhs, neighbor_t const *const rhs);
+bool neighbor_add(neighbors_list_t *const neighbors, neighbor_t const neighbor);
+bool neighbor_remove(neighbors_list_t *const neighbors,
                      neighbor_t const neighbor);
 
 #ifdef __cplusplus
