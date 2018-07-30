@@ -18,7 +18,7 @@
           CONCURRENT_LIST_OF_##TYPE##_PUSH_BACK,  \
           CONCURRENT_LIST_OF_##TYPE##_POP_FRONT,  \
           CONCURRENT_LIST_OF_##TYPE##_POP_BACK,   \
-          CONCURRENT_LIST_OF_##TYPE##_CONTAIN,    \
+          CONCURRENT_LIST_OF_##TYPE##_CONTAINS,   \
           CONCURRENT_LIST_OF_##TYPE##_REMOVE};
 
 #define DEFINE_FUNCTION_INIT_CONCURRENT_LIST_OF(TYPE)                \
@@ -226,8 +226,8 @@
     return CONCURRENT_LIST_SUCCESS;                              \
   }
 
-#define DEFINE_FUNCTION_CONTAIN_CONCURRENT_LIST_OF(TYPE)        \
-  bool CONCURRENT_LIST_OF_##TYPE##_CONTAIN(                     \
+#define DEFINE_FUNCTION_CONTAINS_CONCURRENT_LIST_OF(TYPE)       \
+  bool CONCURRENT_LIST_OF_##TYPE##_CONTAINS(                    \
       concurrent_list_of_##TYPE *const self, TYPE const data) { \
     if (self == NULL) {                                         \
       return false;                                             \
@@ -294,5 +294,5 @@
   DEFINE_FUNCTION_PUSH_BACK_CONCURRENT_LIST_OF(TYPE)  \
   DEFINE_FUNCTION_POP_FRONT_CONCURRENT_LIST_OF(TYPE)  \
   DEFINE_FUNCTION_POP_BACK_CONCURRENT_LIST_OF(TYPE)   \
-  DEFINE_FUNCTION_CONTAIN_CONCURRENT_LIST_OF(TYPE)    \
+  DEFINE_FUNCTION_CONTAINS_CONCURRENT_LIST_OF(TYPE)   \
   DEFINE_FUNCTION_REMOVE_CONCURRENT_LIST_OF(TYPE)

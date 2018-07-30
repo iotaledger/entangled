@@ -28,25 +28,25 @@ typedef enum concurrent_list_status_e {
     struct concurrent_list_node_of_##TYPE##_s *next;  \
   } concurrent_list_node_of_##TYPE##_t;
 
-#define DECLARE_VTABLE_CONCURRENT_LIST_OF(TYPE)                              \
-  typedef struct concurrent_list_of_##TYPE##_s concurrent_list_of_##TYPE;    \
-  typedef struct vtable_concurrent_list_of_##TYPE##_s {                      \
-    TYPE *(*front)(concurrent_list_of_##TYPE *const self);                   \
-    TYPE *(*back)(concurrent_list_of_##TYPE *const self);                    \
-    bool (*empty)(concurrent_list_of_##TYPE *const self);                    \
-    size_t (*size)(concurrent_list_of_##TYPE *const self);                   \
-    concurrent_list_status_t (*push_front)(                                  \
-        concurrent_list_of_##TYPE *const self, TYPE const data);             \
-    concurrent_list_status_t (*push_back)(                                   \
-        concurrent_list_of_##TYPE *const self, TYPE const data);             \
-    concurrent_list_status_t (*pop_front)(                                   \
-        concurrent_list_of_##TYPE *const self, TYPE *const data);            \
-    concurrent_list_status_t (*pop_back)(                                    \
-        concurrent_list_of_##TYPE *const self, TYPE *const data);            \
-    bool (*contain)(concurrent_list_of_##TYPE *const self, TYPE const data); \
-    bool (*remove)(concurrent_list_of_##TYPE *const self, TYPE const data);  \
-  } vtable_concurrent_list_of_##TYPE##_t;                                    \
-  extern vtable_concurrent_list_of_##TYPE##_t const                          \
+#define DECLARE_VTABLE_CONCURRENT_LIST_OF(TYPE)                               \
+  typedef struct concurrent_list_of_##TYPE##_s concurrent_list_of_##TYPE;     \
+  typedef struct vtable_concurrent_list_of_##TYPE##_s {                       \
+    TYPE *(*front)(concurrent_list_of_##TYPE *const self);                    \
+    TYPE *(*back)(concurrent_list_of_##TYPE *const self);                     \
+    bool (*empty)(concurrent_list_of_##TYPE *const self);                     \
+    size_t (*size)(concurrent_list_of_##TYPE *const self);                    \
+    concurrent_list_status_t (*push_front)(                                   \
+        concurrent_list_of_##TYPE *const self, TYPE const data);              \
+    concurrent_list_status_t (*push_back)(                                    \
+        concurrent_list_of_##TYPE *const self, TYPE const data);              \
+    concurrent_list_status_t (*pop_front)(                                    \
+        concurrent_list_of_##TYPE *const self, TYPE *const data);             \
+    concurrent_list_status_t (*pop_back)(                                     \
+        concurrent_list_of_##TYPE *const self, TYPE *const data);             \
+    bool (*contains)(concurrent_list_of_##TYPE *const self, TYPE const data); \
+    bool (*remove)(concurrent_list_of_##TYPE *const self, TYPE const data);   \
+  } vtable_concurrent_list_of_##TYPE##_t;                                     \
+  extern vtable_concurrent_list_of_##TYPE##_t const                           \
       vtable_concurrent_list_of_##TYPE##_g;
 
 #define DECLARE_STRUCT_CONCURRENT_LIST_OF(TYPE)                  \
@@ -186,8 +186,8 @@ typedef enum concurrent_list_status_e {
  *
  * @return whether the element is in the list or not
  */
-#define DECLARE_FUNCTION_CONTAIN_CONCURRENT_LIST_OF(TYPE) \
-  bool CONCURRENT_LIST_OF_##TYPE##_CONTAIN(               \
+#define DECLARE_FUNCTION_CONTAINS_CONCURRENT_LIST_OF(TYPE) \
+  bool CONCURRENT_LIST_OF_##TYPE##_CONTAINS(               \
       concurrent_list_of_##TYPE *const self, TYPE const data);
 
 /**
@@ -216,7 +216,7 @@ typedef enum concurrent_list_status_e {
   DECLARE_FUNCTION_PUSH_BACK_CONCURRENT_LIST_OF(TYPE)  \
   DECLARE_FUNCTION_POP_FRONT_CONCURRENT_LIST_OF(TYPE)  \
   DECLARE_FUNCTION_POP_BACK_CONCURRENT_LIST_OF(TYPE)   \
-  DECLARE_FUNCTION_CONTAIN_CONCURRENT_LIST_OF(TYPE)    \
+  DECLARE_FUNCTION_CONTAINS_CONCURRENT_LIST_OF(TYPE)   \
   DECLARE_FUNCTION_REMOVE_CONCURRENT_LIST_OF(TYPE)
 
 #endif  // __COMMON_NETWORK_CONCURRENT_LIST_H__

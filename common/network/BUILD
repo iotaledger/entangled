@@ -10,7 +10,7 @@ cc_library(
     name = "logger",
     srcs = ["logger.c"],
     hdrs = ["logger.h"],
-    deps = ["//common:lock_handle"]
+    deps = ["//common:lock_handle"],
 )
 
 cc_library(
