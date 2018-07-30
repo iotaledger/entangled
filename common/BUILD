@@ -20,3 +20,16 @@ cc_library(
     name = "thread_handle",
     hdrs = ["thread_handle.h"],
 )
+
+cc_library(
+    name = "errors",
+    hdrs = ["errors.h"],
+)
+
+cc_library(
+    name = "logger_helper",
+    hdrs = ["logger_helper.h"],
+    srcs = ["logger_helper.c"],
+    deps = ["@com_github_embear_logger//:logger",
+            ":lock_handle"],
+)
