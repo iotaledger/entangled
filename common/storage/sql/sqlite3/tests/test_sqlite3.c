@@ -26,7 +26,7 @@ void test_init_connection(void) {
   TEST_ASSERT(init_connection(&conn, &config) == RC_OK);
 }
 
-void initialized_db_empty(void) {
+void test_initialized_db_empty(void) {
   bool exist = false;
   TEST_ASSERT(iota_stor_exist(&conn, NULL, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == false);
@@ -78,7 +78,9 @@ int main(void) {
             "common/storage/sql/sqlite3/tests/ciri.db");
 
   RUN_TEST(test_init_connection);
-  RUN_TEST(initialized_db_empty);
+  RUN_TEST(test_initialized_db_empty);
+  RUN_TEST(test_stored_transaction);
+  //TODO - Add test to find transaction by any column name (When #2 is merged)
 
   return UNITY_END();
 }
