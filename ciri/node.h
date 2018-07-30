@@ -22,7 +22,9 @@ typedef struct node_s {
   responder_state_t responder;
 } node_t;
 
+bool node_init(node_t* const node);
 bool node_start(node_t* const node);
 bool node_stop(node_t* const node);
+bool node_destroy(node_t* const node);
 
 #endif  // __CIRI_NODE_H__

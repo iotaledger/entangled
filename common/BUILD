@@ -29,8 +29,10 @@ cc_library(
 
 cc_library(
     name = "logger_helper",
-    hdrs = ["logger_helper.h"],
     srcs = ["logger_helper.c"],
-    deps = ["@com_github_embear_logger//:logger",
-            ":lock_handle"],
+    hdrs = ["logger_helper.h"],
+    deps = [
+        ":lock_handle",
+        "@com_github_embear_logger//:logger",
+    ],
 )
