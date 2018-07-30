@@ -27,11 +27,4 @@ bool neighbor_init_with_values(neighbor_t *const neighbor,
                                protocol_type_t const protocol,
                                char const *const host, uint16_t const port);
 
-int neighbor_send(neighbor_t *const neighbor,
-                  iota_packet_t const *const packet);
-int tcp_neighbor_send(neighbor_t *const neighbor,
-                      iota_packet_t const *const packet);
-int udp_neigbhor_send(neighbor_t *const neighbor,
-                      iota_packet_t const *const packet);
-
 #endif  // __COMMON_NETWORK_NEIGHBOR_H__
