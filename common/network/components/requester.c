@@ -7,14 +7,15 @@
 
 #include "common/network/components/requester.h"
 
-bool requester_start(requester_state_t *const state) {
-  if (state == NULL) {
+bool requester_init(requester_state_t *const state, node_t *const node) {
+  if (state == NULL || node == NULL) {
     return false;
   }
   if (INIT_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
     return false;
   }
+  state->node = node;
   return true;
 }
 
@@ -23,8 +24,11 @@ bool request_transaction(requester_state_t *const state,
   if (state == NULL) {
     return false;
   }
-  return state->queue->vtable->push(state->queue, hash) ==
-         CONCURRENT_QUEUE_SUCCESS;
+  if (state->queue->vtable->push(state->queue, hash) !=
+      CONCURRENT_QUEUE_SUCCESS) {
+    return false;
+  }
+  return true;
 }
 
 trit_array_p get_transaction_to_request(requester_state_t *const state) {
@@ -40,7 +44,7 @@ trit_array_p get_transaction_to_request(requester_state_t *const state) {
   return hash;
 }
 
-bool requester_stop(requester_state_t *const state) {
+bool requester_destroy(requester_state_t *const state) {
   if (state == NULL) {
     return false;
   }

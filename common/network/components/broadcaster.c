@@ -23,18 +23,29 @@ static void *broadcaster_routine(broadcaster_state_t *const state) {
   return NULL;
 }
 
-bool broadcaster_start(broadcaster_state_t *const state) {
-  if (state == NULL) {
+bool broadcaster_init(broadcaster_state_t *const state, node_t *const node) {
+  if (state == NULL || node == NULL) {
     return false;
   }
+  state->running = false;
   if (INIT_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
     return false;
   }
+  state->node = node;
+  return true;
+}
+
+bool broadcaster_start(broadcaster_state_t *const state) {
+  if (state == NULL) {
+    return false;
+  }
   log_info("Spawning broadcaster thread");
   state->running = true;
-  thread_handle_create(&state->thread, (thread_routine_t)broadcaster_routine,
-                       state);
+  if (thread_handle_create(&state->thread,
+                           (thread_routine_t)broadcaster_routine, state) != 0) {
+    return false;
+  }
   return true;
 }
 
@@ -43,8 +54,12 @@ bool broadcaster_on_next(broadcaster_state_t *const state,
   if (state == NULL) {
     return false;
   }
-  return state->queue->vtable->push(state->queue, hash) ==
-         CONCURRENT_QUEUE_SUCCESS;
+  // TODO(thibault) check broadcaster queue size against a maximum size ?
+  if (state->queue->vtable->push(state->queue, hash) !=
+      CONCURRENT_QUEUE_SUCCESS) {
+    return false;
+  }
+  return true;
 }
 
 bool broadcaster_stop(broadcaster_state_t *const state) {
@@ -53,7 +68,16 @@ bool broadcaster_stop(broadcaster_state_t *const state) {
   }
   log_info("Shutting down broadcaster thread");
   state->running = false;
-  thread_handle_join(state->thread, NULL);
+  if (thread_handle_join(state->thread, NULL) != 0) {
+    return false;
+  }
+  return true;
+}
+
+bool broadcaster_destroy(broadcaster_state_t *const state) {
+  if (state == NULL) {
+    return false;
+  }
   if (DESTROY_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
     return false;
