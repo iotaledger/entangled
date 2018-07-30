@@ -10,7 +10,7 @@
 #include "common/network/neighbor.h"
 #include "common/network/uri_parser.h"
 
-bool init_neighbor_with_uri(neighbor_t *const neighbor, char const *const uri) {
+bool neighbor_init_with_uri(neighbor_t *const neighbor, char const *const uri) {
   char scheme[MAX_SCHEME_LENGTH];
 
   if (neighbor == NULL || uri == NULL) {
@@ -31,7 +31,7 @@ bool init_neighbor_with_uri(neighbor_t *const neighbor, char const *const uri) {
   return true;
 }
 
-bool init_neighbor_with_values(neighbor_t *const neighbor,
+bool neighbor_init_with_values(neighbor_t *const neighbor,
                                protocol_type_t const protocol,
                                char const *const host, uint16_t const port) {
   if (neighbor == NULL || host == NULL) {
