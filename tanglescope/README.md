@@ -52,13 +52,13 @@ statscollector:
 - statscollector_transactions_reattached (Reattached TXs count) [Counter]
 - statscollector_value_confirmed (Confirmed tx's accumulated value) [Counter]
 - statscollector_value_new (new tx's accumulated value) [Counter]
-- statscollector_bundle_confirmation_duration (bundle's confirmation duration [ms]) [Histogram]
+- statscollector_bundle_confirmation_duration (bundle's confirmation duration [seconds]) [Histogram]
 - statscollector_to_broadcast (Number of transactions to broadcast to other nodes) [Gauge]
 - statscollector_to_process (Number of transactions to process) [Gauge]
 - statscollector_to_reply (Number of transactions to reply to nodes who requested) [Gauge]
 - statscollector_to_request (Number of transactions to request from other nodes) [Gauge]
 - statscollector_total_transactions (Number of transactions stored in node) [Counter]
-
+- statscollector_milestones_count (Number of received milestones) [Counter]
 
 Echo collector
 ---------------
