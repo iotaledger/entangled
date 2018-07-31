@@ -9,8 +9,8 @@
 #include "common/network/logger.h"
 
 // TODO(thibault) configuration variable
-static uint16_t tcp_port_g = 4242;
-static uint16_t udp_port_g = 4243;
+static uint16_t tcp_port_g = 14265;
+static uint16_t udp_port_g = 14265;
 
 bool node_init(node_t* const node) {
   log_info("Initializing broadcaster component");

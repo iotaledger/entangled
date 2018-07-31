@@ -9,7 +9,7 @@
 #define __COMMON_NETWORK_CONCURRENT_QUEUE_PACKET_H__
 
 #include "common/network/iota_packet.h"
-#include "concurrent_queue.h.inc"
+#include "common/network/queues/concurrent_queue.h.inc"
 
 #ifdef __cplusplus
 extern "C" {
