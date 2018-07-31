@@ -29,8 +29,14 @@ bool receiver_service_start(receiver_state_t* const state) {
   try {
     boost::asio::io_context ctx;
     state->opaque_network = &ctx;
-    TcpReceiverService tcpService(state, ctx, state->tcp_port);
-    UdpReceiverService udpService(state, ctx, state->udp_port);
+    if (state->tcp_port != 0) {
+      log_info("Starting TCP receiver service on port %d", state->tcp_port);
+      TcpReceiverService tcpService(state, ctx, state->tcp_port);
+    }
+    if (state->udp_port != 0) {
+      log_info("Starting UDP receiver service on port %d", state->udp_port);
+      UdpReceiverService udpService(state, ctx, state->udp_port);
+    }
     ctx.run();
   } catch (std::exception const& e) {
     log_error("Receiver service failed to start: %s", e.what());
