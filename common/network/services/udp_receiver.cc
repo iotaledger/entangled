@@ -8,9 +8,11 @@
 #include "common/network/services/udp_receiver.hpp"
 #include "common/network/logger.h"
 
-UdpReceiverService::UdpReceiverService(boost::asio::io_context& context,
+UdpReceiverService::UdpReceiverService(receiver_service_t* const service,
+                                       boost::asio::io_context& context,
                                        uint16_t const port)
-    : socket_(context, boost::asio::ip::udp::endpoint(
+    : service_(service),
+      socket_(context, boost::asio::ip::udp::endpoint(
                            boost::asio::ip::udp::v4(), port)) {
   receive();
 }
@@ -36,5 +38,9 @@ bool UdpReceiverService::handlePacket(std::size_t const length) {
                                   senderEndpoint_.port(), PROTOCOL_UDP);
   log_debug("UDP packet received from %s:%d", &packet_.source.host,
             packet_.source.port);
+  if (service_->queue->vtable->push(service_->queue, packet_) !=
+      CONCURRENT_QUEUE_SUCCESS) {
+    return false;
+  }
   return true;
 }

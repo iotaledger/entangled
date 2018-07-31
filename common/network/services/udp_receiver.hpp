@@ -13,13 +13,15 @@
 
 class UdpReceiverService {
  public:
-  UdpReceiverService(boost::asio::io_context& context, uint16_t const port);
+  UdpReceiverService(receiver_service_t* const service,
+                     boost::asio::io_context& context, uint16_t const port);
 
  public:
   void receive();
   bool handlePacket(std::size_t const length);
 
  private:
+  receiver_service_t* service_;
   boost::asio::ip::udp::socket socket_;
   boost::asio::ip::udp::endpoint senderEndpoint_;
   iota_packet_t packet_;

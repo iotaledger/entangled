@@ -6,6 +6,7 @@
  */
 
 #include "common/network/components/receiver.h"
+#include "ciri/node.h"
 #include "common/network/logger.h"
 
 bool receiver_init(receiver_state_t *const state, node_t *const node,
@@ -13,13 +14,18 @@ bool receiver_init(receiver_state_t *const state, node_t *const node,
   if (state == NULL || node == NULL) {
     return false;
   }
+  if (node->processor.queue == NULL) {
+    return false;
+  }
   state->running = false;
   state->tcp_service.port = tcp_port;
   state->tcp_service.protocol = PROTOCOL_TCP;
   state->tcp_service.context = NULL;
+  state->tcp_service.queue = node->processor.queue;
   state->udp_service.port = udp_port;
   state->udp_service.protocol = PROTOCOL_UDP;
   state->udp_service.context = NULL;
+  state->udp_service.queue = node->processor.queue;
   state->node = node;
   return true;
 }

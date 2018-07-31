@@ -29,10 +29,10 @@ bool receiver_service_start(receiver_service_t* const service) {
     boost::asio::io_context ctx;
     service->context = &ctx;
     if (service->protocol == PROTOCOL_TCP) {
-      TcpReceiverService tcpService(ctx, service->port);
+      TcpReceiverService tcpService(service, ctx, service->port);
       ctx.run();
     } else if (service->protocol == PROTOCOL_UDP) {
-      UdpReceiverService udpService(ctx, service->port);
+      UdpReceiverService udpService(service, ctx, service->port);
       ctx.run();
     } else {
       log_error("Starting receiver service failed: unknown protocol");
