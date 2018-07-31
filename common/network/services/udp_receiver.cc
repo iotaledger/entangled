@@ -6,7 +6,7 @@
  */
 
 #include "common/network/services/udp_receiver.hpp"
-#include "common/network/services/receiver.h"
+#include "common/network/logger.h"
 
 UdpReceiverService::UdpReceiverService(boost::asio::io_context& context,
                                        uint16_t const port)
@@ -27,9 +27,14 @@ void UdpReceiverService::receive() {
       });
 }
 
-void UdpReceiverService::handlePacket(std::size_t const length) {
+bool UdpReceiverService::handlePacket(std::size_t const length) {
+  if (length != TRANSACTION_PACKET_SIZE) {
+    return false;
+  }
   receiver_service_prepare_packet(&packet_, length,
                                   senderEndpoint_.address().to_string().c_str(),
                                   senderEndpoint_.port(), PROTOCOL_UDP);
-  receiver_packet_handler(&packet_);
+  log_debug("UDP packet received from %s:%d", &packet_.source.host,
+            packet_.source.port);
+  return true;
 }

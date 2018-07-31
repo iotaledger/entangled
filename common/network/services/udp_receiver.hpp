@@ -17,7 +17,7 @@ class UdpReceiverService {
 
  public:
   void receive();
-  void handlePacket(std::size_t const length);
+  bool handlePacket(std::size_t const length);
 
  private:
   boost::asio::ip::udp::socket socket_;

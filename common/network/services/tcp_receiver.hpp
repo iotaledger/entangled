@@ -20,7 +20,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
  private:
   void receive();
-  void handlePacket(std::size_t const length);
+  bool handlePacket(std::size_t const length);
 
  private:
   boost::asio::ip::tcp::socket socket_;

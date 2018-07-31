@@ -6,7 +6,7 @@
  */
 
 #include "common/network/services/tcp_receiver.hpp"
-#include "common/network/services/receiver.h"
+#include "common/network/logger.h"
 
 /*
  * TcpConnection
@@ -32,11 +32,16 @@ void TcpConnection::receive() {
       });
 }
 
-void TcpConnection::handlePacket(std::size_t const length) {
+bool TcpConnection::handlePacket(std::size_t const length) {
+  if (length != TRANSACTION_PACKET_SIZE) {
+    return false;
+  }
   receiver_service_prepare_packet(
       &packet_, length, socket_.remote_endpoint().address().to_string().c_str(),
       socket_.remote_endpoint().port(), PROTOCOL_TCP);
-  receiver_packet_handler(&packet_);
+  log_debug("TCP packet received from %s:%d", &packet_.source.host,
+            packet_.source.port);
+  return true;
 }
 
 /*

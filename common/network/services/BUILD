@@ -10,7 +10,6 @@ cc_library(
     srcs = ["receiver.cc"],
     deps = [
         ":receiver_shared",
-        "//common/network:logger",
         "//common/network/services:tcp_receiver",
         "//common/network/services:udp_receiver",
     ],
@@ -21,6 +20,7 @@ cc_library(
     srcs = ["udp_receiver.cc"],
     hdrs = ["udp_receiver.hpp"],
     deps = [
+        "//common/network:logger",
         "//common/network/components:receiver_shared",
         "//common/network/services:receiver_shared",
         "@boost//:asio",
@@ -32,6 +32,7 @@ cc_library(
     srcs = ["tcp_receiver.cc"],
     hdrs = ["tcp_receiver.hpp"],
     deps = [
+        "//common/network:logger",
         "//common/network/components:receiver_shared",
         "//common/network/services:receiver_shared",
         "@boost//:asio",

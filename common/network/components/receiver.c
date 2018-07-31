@@ -8,17 +8,6 @@
 #include "common/network/components/receiver.h"
 #include "common/network/logger.h"
 
-bool receiver_packet_handler(iota_packet_t *const packet) {
-  if (packet->length != TRANSACTION_PACKET_SIZE) {
-    return false;
-  }
-  log_debug("%s packet received from %s:%d",
-            (packet->source.protocol == PROTOCOL_TCP ? "TCP" : "UDP"),
-            packet->source.host, packet->source.port);
-  // TODO(thibault) submit packet for pre-processing
-  return true;
-}
-
 bool receiver_init(receiver_state_t *const state, node_t *const node,
                    uint16_t tcp_port, uint16_t udp_port) {
   if (state == NULL || node == NULL) {
