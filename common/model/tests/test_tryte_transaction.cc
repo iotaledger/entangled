@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 #include <chrono>
-#include "common/model/cpptransaction.h"
+#include "common/model/tryte_transaction.h"
 
 static const char TRYTES[] = {
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
@@ -1059,7 +1059,7 @@ TEST(TransactionTest, testTransaction) {
 
   std::string trytes(reinterpret_cast<char const*>(TRYTES));
 
-  Transaction transaction = Transaction(trytes);
+  TryteTransaction transaction = TryteTransaction(trytes);
   std::vector<flex_trit_t> value = transaction.serialize();
   std::vector<flex_trit_t> ref(TRITS, TRITS + sizeof(TRITS));
   ASSERT_EQ(ref, value);

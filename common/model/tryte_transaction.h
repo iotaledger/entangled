@@ -16,78 +16,78 @@
 namespace iota {
 namespace model {
 
-class Transaction {
+class TryteTransaction {
  private:
   iota_transaction_t iota_transaction;
 
  public:
-  Transaction();
-  Transaction(const std::string& trytes);
-  ~Transaction(void);
+  TryteTransaction();
+  TryteTransaction(const std::string& trytes);
+  ~TryteTransaction(void);
 
-  std::string get_signature(void);
+  std::string signature(void);
   // Set the transaction signature (copy argument)
-  void set_signature(const std::string& signature);
+  void setSignature(const std::string& signature);
   // Get the transaction message
-  std::string get_message(void);
+  std::string message(void);
   // Set the transaction message (copy argument)
-  void set_message(const std::string& message);
+  void setMessage(const std::string& message);
   // Get the transaction address
-  std::string get_address(void);
+  std::string address(void);
   // Set the transaction address (copy argument)
-  void set_address(const std::string& address);
+  void setAddress(const std::string& address);
   // Get the transaction value
-  int64_t get_value(void);
+  int64_t value(void);
   // Set the transaction value
-  void set_value(int64_t value);
+  void setValue(int64_t value);
   // Get the transaction obsolete tag
-  std::string get_obsolete_tag(void);
+  std::string obsoleteTag(void);
   // Set the transaction obsolete tag
-  void set_obsolete_tag(const std::string& obsolete_tag);
+  void setObsoleteTag(const std::string& obsolete_tag);
   // Get the transaction timestamp
-  uint64_t get_timestamp(void);
+  uint64_t timestamp(void);
   // Set the transaction timestamp
-  void set_timestamp(uint64_t timestamp);
+  void setTimestamp(uint64_t timestamp);
   // Get the transaction current index
-  int64_t get_current_index(void);
+  int64_t currentIndex(void);
   // Set the transaction current index
-  void set_current_index(int64_t index);
+  void setCurrentIndex(int64_t index);
   // Get the transaction last index
-  int64_t get_last_index(void);
+  int64_t lastIndex(void);
   // Set the transaction last index
-  void set_last_index(int64_t last_index);
+  void setLastIndex(int64_t last_index);
   // Get the transaction bundle
-  std::string get_bundle(void);
+  std::string bundle(void);
   // Set the transaction bundle (copy argument)
-  void set_bundle(const std::string& bundle);
+  void setBundle(const std::string& bundle);
   // Get the transaction trunk
-  std::string get_trunk(void);
+  std::string trunk(void);
   // Set the transaction trunk (copy argument)
-  void set_trunk(const std::string& trunk);
+  void setTrunk(const std::string& trunk);
   // Get the transaction branch
-  std::string get_branch(void);
+  std::string branch(void);
   // Set the transaction branch (copy argument)
-  void set_branch(const std::string& branch);
+  void setBranch(const std::string& branch);
   // Get the transaction tag
-  std::string get_tag(void);
+  std::string tag(void);
   // Set the transaction tag (copy argument)
-  void set_tag(const std::string& tag);
+  void setTag(const std::string& tag);
   // Get the transaction attachement timestamp
-  int64_t get_attachment_timestamp(void);
+  int64_t attachmentTimestamp(void);
   // Set the transaction attachement timestamp
-  void set_attachment_timestamp(int64_t timestamp);
+  void setAttachmentTimestamp(int64_t timestamp);
   // Get the transaction attachement timestamp lower
-  int64_t get_attachment_timestamp_lower(void);
+  int64_t attachmentTimestampLower(void);
   // Set the transaction attachement timestamp lower
-  void set_attachment_timestamp_lower(int64_t timestamp);
+  void setAttachmentTimestampLower(int64_t timestamp);
   // Get the transaction attachement timestamp upper
-  int64_t get_attachment_timestamp_upper(void);
+  int64_t attachmentTimestampUpper(void);
   // Set the transaction attachement timestamp upper
-  void set_attachment_timestamp_upper(int64_t timestamp);
+  void setAttachmentTimestampUpper(int64_t timestamp);
   // Get the transaction nonce
-  std::string get_nonce(void);
+  std::string nonce(void);
   // Set the transaction nonce (copy argument)
-  void set_nonce(const std::string& nonce);
+  void setNonce(const std::string& nonce);
 
   std::vector<flex_trit_t> serialize(void);
 };  // class transaction

@@ -11,7 +11,6 @@ cc_test (
 #cc_test (
 #    name = "test_transaction_3",
 #    srcs = ["test_transaction.c"],
-#    defines = ["TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE"],
 #    deps = [
 #        "//common/trinary:trit_tryte",
 #        "//common/model:transaction_3",
@@ -22,7 +21,6 @@ cc_test (
 cc_test (
     name = "test_transaction_4",
     srcs = ["test_transaction.c"],
-    defines = ["TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE"],
     deps = [
         "//common/trinary:trit_tryte",
         "//common/model:transaction_4",
@@ -33,7 +31,6 @@ cc_test (
 cc_test (
     name = "test_transaction_5",
     srcs = ["test_transaction.c"],
-    defines = ["TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE"],
     deps = [
         "//common/trinary:trit_tryte",
         "//common/model:transaction_5",
@@ -42,44 +39,41 @@ cc_test (
 )
 
 cc_test (
-    name = "test_cpptransaction",
-    srcs = ["test_cpptransaction.cc"],
+    name = "test_tryte_transaction",
+    srcs = ["test_tryte_transaction.cc"],
     deps = [
         "//common/trinary:trit_tryte",
-        "//common/model:cpptransaction",
+        "//common/model:tryte_transaction",
         "@com_google_googletest//:gtest_main",
         ]
 )
 
 #cc_test (
-#    name = "test_cpptransaction_3",
-#    srcs = ["test_cpptransaction.cc"],
-#    defines = ["TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE"],
+#    name = "test_tryte_transaction_3",
+#    srcs = ["test_tryte_transaction.cc"],
 #    deps = [
 #        "//common/trinary:trit_tryte",
-#        "//common/model:cpptransaction_3",
+#        "//common/model:tryte_transaction_3",
 #        "@com_google_googletest//:gtest_main",
 #        ]
 #)
 
 cc_test (
-    name = "test_cpptransaction_4",
-    srcs = ["test_cpptransaction.cc"],
-    defines = ["TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE"],
+    name = "test_tryte_transaction_4",
+    srcs = ["test_tryte_transaction.cc"],
     deps = [
         "//common/trinary:trit_tryte",
-        "//common/model:cpptransaction_4",
+        "//common/model:tryte_transaction_4",
         "@com_google_googletest//:gtest_main",
         ]
 )
 
 cc_test (
-    name = "test_cpptransaction_5",
-    srcs = ["test_cpptransaction.cc"],
-    defines = ["TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE"],
+    name = "test_tryte_transaction_5",
+    srcs = ["test_tryte_transaction.cc"],
     deps = [
         "//common/trinary:trit_tryte",
-        "//common/model:cpptransaction_5",
+        "//common/model:tryte_transaction_5",
         "@com_google_googletest//:gtest_main",
         ]
 )

@@ -24,13 +24,14 @@
 #include <boost/range/combine.hpp>
 #include <nlohmann/json.hpp>
 #include "common/helpers/digest.h"
-#include "common/model/cpptransaction.h"
 #include "common/model/transaction.h"
+#include "common/model/tryte_transaction.h"
 
 using json = nlohmann::json;
 using boost::adaptors::filtered;
 using boost::adaptors::transformed;
 using boost::adaptors::uniqued;
+using iota::model::TryteTransaction;
 
 DEFINE_uint32(maxNumAddressesForGetBalances, 1000,
               "Maximum number of addresses to query for in 'getBalances'");
@@ -181,25 +182,25 @@ std::vector<Transaction> IotaJsonAPI::getTransactions(
 
   boost::copy(
       trytes | transformed([&epoch](const std::string& trytes) -> Transaction {
-        iota::model::Transaction* tx = new iota::model::Transaction(trytes);
+        TryteTransaction* tx = new TryteTransaction(trytes);
 
         // We could also rely on the ordering of the hashes argument here.
         auto hash = iota_digest(trytes.c_str());
         std::string sHash = std::string(reinterpret_cast<char*>(hash), 81);
         std::free(hash);
 
-        auto sAddress = tx->get_address();
-        auto sBundle = tx->get_bundle();
-        auto sTrunk = tx->get_trunk();
+        auto sAddress = tx->address();
+        auto sBundle = tx->bundle();
+        auto sTrunk = tx->trunk();
 
-        std::chrono::seconds sinceEpoch(tx->get_timestamp());
+        std::chrono::seconds sinceEpoch(tx->timestamp());
 
         return {sHash,
                 sAddress,
-                tx->get_value(),
+                tx->value(),
                 epoch + sinceEpoch,
-                tx->get_current_index(),
-                tx->get_last_index(),
+                tx->currentIndex(),
+                tx->lastIndex(),
                 sBundle,
                 sTrunk};
       }),

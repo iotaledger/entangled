@@ -17,7 +17,7 @@ cc_library(
     deps = [
         ":api",
         "//common/helpers:digest",
-        "//common/model:cpptransaction",
+        "//common/model:tryte_transaction",
         "@boost//:config",
         "@boost//:core",
         "@boost//:fusion",
