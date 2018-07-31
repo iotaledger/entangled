@@ -10,12 +10,7 @@
 
 #include <stdint.h>
 
-#define HOST_NAME_MAX 255
-
-typedef enum protocol_type_e {
-  ENDPOINT_PROTOCOL_TCP,
-  ENDPOINT_PROTOCOL_UDP
-} protocol_type_t;
+#include "common/network/network.h"
 
 typedef struct {
   char host[HOST_NAME_MAX];

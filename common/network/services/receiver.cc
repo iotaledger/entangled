@@ -5,7 +5,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/network/services/receiver.h"
 #include "common/network/logger.h"
 #include "common/network/services/tcp_receiver.hpp"
 #include "common/network/services/udp_receiver.hpp"
@@ -22,38 +21,38 @@ void receiver_service_prepare_packet(iota_packet_t* const packet,
   packet->content[length] = '\0';
 }
 
-bool receiver_service_start(receiver_state_t* const state) {
-  if (state == NULL) {
+bool receiver_service_start(receiver_service_t* const service) {
+  if (service == NULL) {
     return false;
   }
   try {
     boost::asio::io_context ctx;
-    state->opaque_network = &ctx;
-    if (state->tcp_port != 0) {
-      log_info("Starting TCP receiver service on port %d", state->tcp_port);
-      TcpReceiverService tcpService(state, ctx, state->tcp_port);
+    service->context = &ctx;
+    if (service->protocol == PROTOCOL_TCP) {
+      TcpReceiverService tcpService(ctx, service->port);
+      ctx.run();
+    } else if (service->protocol == PROTOCOL_UDP) {
+      UdpReceiverService udpService(ctx, service->port);
+      ctx.run();
+    } else {
+      log_error("Starting receiver service failed: unknown protocol");
+      return false;
     }
-    if (state->udp_port != 0) {
-      log_info("Starting UDP receiver service on port %d", state->udp_port);
-      UdpReceiverService udpService(state, ctx, state->udp_port);
-    }
-    ctx.run();
   } catch (std::exception const& e) {
-    log_error("Receiver service failed to start: %s", e.what());
+    log_error("Starting receiver service failed: %s", e.what());
     return false;
   }
   return true;
 }
 
-bool receiver_service_stop(receiver_state_t* const state) {
-  if (state == NULL) {
+bool receiver_service_stop(receiver_service_t* const service) {
+  if (service == NULL) {
     return false;
   }
   try {
-    auto ctx =
-        reinterpret_cast<boost::asio::io_context*>(state->opaque_network);
+    auto ctx = reinterpret_cast<boost::asio::io_context*>(service->context);
     if (ctx == NULL) {
-      log_error("Receiver service failed to stop: invalid service");
+      log_error("Receiver service failed to stop: invalid context");
       return false;
     }
     ctx->stop();

@@ -1,6 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "network",
+    hdrs = ["network.h"],
+)
+
+cc_library(
     name = "iota_packet",
     hdrs = ["iota_packet.h"],
     deps = [":endpoint"],
@@ -22,4 +27,5 @@ cc_library(
 cc_library(
     name = "endpoint",
     hdrs = ["endpoint.h"],
+    deps = [":network"],
 )

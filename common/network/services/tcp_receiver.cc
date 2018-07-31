@@ -12,9 +12,8 @@
  * TcpConnection
  */
 
-TcpConnection::TcpConnection(receiver_state_t* const state,
-                             boost::asio::ip::tcp::socket socket)
-    : state_(state), socket_(std::move(socket)) {}
+TcpConnection::TcpConnection(boost::asio::ip::tcp::socket socket)
+    : socket_(std::move(socket)) {}
 
 void TcpConnection::start() { receive(); }
 
@@ -36,19 +35,17 @@ void TcpConnection::receive() {
 void TcpConnection::handlePacket(std::size_t const length) {
   receiver_service_prepare_packet(
       &packet_, length, socket_.remote_endpoint().address().to_string().c_str(),
-      socket_.remote_endpoint().port(), ENDPOINT_PROTOCOL_TCP);
-  receiver_packet_handler(state_, &packet_);
+      socket_.remote_endpoint().port(), PROTOCOL_TCP);
+  receiver_packet_handler(&packet_);
 }
 
 /*
  * TcpReceiverService
  */
 
-TcpReceiverService::TcpReceiverService(receiver_state_t* const state,
-                                       boost::asio::io_context& context,
+TcpReceiverService::TcpReceiverService(boost::asio::io_context& context,
                                        uint16_t const port)
-    : state_(state),
-      acceptor_(context, boost::asio::ip::tcp::endpoint(
+    : acceptor_(context, boost::asio::ip::tcp::endpoint(
                              boost::asio::ip::tcp::v4(), port)) {
   acceptor_.set_option(boost::asio::socket_base::reuse_address(true));
   accept();
@@ -58,7 +55,7 @@ void TcpReceiverService::accept() {
   acceptor_.async_accept([this](boost::system::error_code ec,
                                 boost::asio::ip::tcp::socket socket) {
     if (!ec) {
-      std::make_shared<TcpConnection>(state_, std::move(socket))->start();
+      std::make_shared<TcpConnection>(std::move(socket))->start();
     }
     accept();
   });

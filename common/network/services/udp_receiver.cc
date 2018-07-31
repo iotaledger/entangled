@@ -8,11 +8,9 @@
 #include "common/network/services/udp_receiver.hpp"
 #include "common/network/services/receiver.h"
 
-UdpReceiverService::UdpReceiverService(receiver_state_t* const state,
-                                       boost::asio::io_context& context,
+UdpReceiverService::UdpReceiverService(boost::asio::io_context& context,
                                        uint16_t const port)
-    : state_(state),
-      socket_(context, boost::asio::ip::udp::endpoint(
+    : socket_(context, boost::asio::ip::udp::endpoint(
                            boost::asio::ip::udp::v4(), port)) {
   receive();
 }
@@ -30,8 +28,8 @@ void UdpReceiverService::receive() {
 }
 
 void UdpReceiverService::handlePacket(std::size_t const length) {
-  receiver_service_prepare_packet(
-      &packet_, length, senderEndpoint_.address().to_string().c_str(),
-      senderEndpoint_.port(), ENDPOINT_PROTOCOL_UDP);
-  receiver_packet_handler(state_, &packet_);
+  receiver_service_prepare_packet(&packet_, length,
+                                  senderEndpoint_.address().to_string().c_str(),
+                                  senderEndpoint_.port(), PROTOCOL_UDP);
+  receiver_packet_handler(&packet_);
 }
