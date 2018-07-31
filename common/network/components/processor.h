@@ -14,7 +14,7 @@
 typedef concurrent_queue_of_trit_array_p processor_queue_t;
 typedef struct node_s node_t;
 
-typedef struct {
+typedef struct processor_state_s {
   thread_handle_t thread;
   bool running;
   processor_queue_t *queue;
