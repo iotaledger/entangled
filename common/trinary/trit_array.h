@@ -24,6 +24,12 @@ extern "C" {
 
 typedef int8_t flex_trit_t;
 
+#if defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+#define FLEX_TRIT_NULL_VALUE '9'
+#else
+#define FLEX_TRIT_NULL_VALUE 0
+#endif
+
 /// Returns the number of bytes needed to store a given number of trits in the
 /// current memory model.
 /// @param[in] num_trits - number of trits to store

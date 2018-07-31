@@ -134,7 +134,7 @@ size_t transaction_serialize_to_flex_trits(const iota_transaction_t transaction,
   flex_trit_t partial[FLEX_TRIT_SIZE_81];
   size_t offset = 0, long_size;
   size_t num_bytes = flex_trits_num_for_trits(NUM_TRITS_SERIALIZED_TRANSACTION);
-  memset(trits, 0, num_bytes);
+  memset(trits, FLEX_TRIT_NULL_VALUE, num_bytes);
 
   flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          transaction->signature_or_message, NUM_TRITS_SIGNATURE,

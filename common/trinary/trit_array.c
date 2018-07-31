@@ -134,7 +134,7 @@ size_t int8_to_flex_trit_array(flex_trit_t *const to_trit_array,
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   memcpy(to_trit_array, trits, num_trits);
 #elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
-  memset(to_trit_array, '9', flex_trits_num_for_trits(to_len));
+  memset(to_trit_array, FLEX_TRIT_NULL_VALUE, flex_trits_num_for_trits(to_len));
   trits_to_trytes(trits, to_trit_array, num_trits);
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
   for (size_t i = 0; i < num_trits; i++) {
@@ -265,11 +265,7 @@ trit_array_p trit_array_new(size_t const num_trits) {
     // errno = IOTA_OUT_OF_MEMORY
     return NULL;
   }
-#if defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
-  memset(trit_array->trits, '9', trit_array->num_bytes);
-#else
-  memset(trit_array->trits, 0, trit_array->num_bytes);
-#endif
+  memset(trit_array->trits, FLEX_TRIT_NULL_VALUE, trit_array->num_bytes);
   trit_array->dynamic = 1;
   return trit_array;
 }

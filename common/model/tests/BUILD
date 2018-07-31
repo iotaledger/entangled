@@ -8,15 +8,15 @@ cc_test (
         ]
 )
 
-#cc_test (
-#    name = "test_transaction_3",
-#    srcs = ["test_transaction.c"],
-#    deps = [
-#        "//common/trinary:trit_tryte",
-#        "//common/model:transaction_3",
-#        "@unity//:unity",
-#        ]
-#)
+cc_test (
+    name = "test_transaction_3",
+    srcs = ["test_transaction.c"],
+    deps = [
+        "//common/trinary:trit_tryte",
+        "//common/model:transaction_3",
+        "@unity//:unity",
+        ]
+)
 
 cc_test (
     name = "test_transaction_4",
@@ -48,15 +48,15 @@ cc_test (
         ]
 )
 
-#cc_test (
-#    name = "test_tryte_transaction_3",
-#    srcs = ["test_tryte_transaction.cc"],
-#    deps = [
-#        "//common/trinary:trit_tryte",
-#        "//common/model:tryte_transaction_3",
-#        "@com_google_googletest//:gtest_main",
-#        ]
-#)
+cc_test (
+    name = "test_tryte_transaction_3",
+    srcs = ["test_tryte_transaction.cc"],
+    deps = [
+        "//common/trinary:trit_tryte",
+        "//common/model:tryte_transaction_3",
+        "@com_google_googletest//:gtest_main",
+        ]
+)
 
 cc_test (
     name = "test_tryte_transaction_4",
