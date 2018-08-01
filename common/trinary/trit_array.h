@@ -18,6 +18,8 @@ extern "C" {
 #define TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE
 #endif
 
+#include <string.h>
+
 #include "trit_byte.h"
 #include "trits.h"
 
@@ -65,7 +67,7 @@ static inline trit_t flex_trit_array_at(flex_trit_t const *const trit_array,
   uint8_t tindex = index % 5U;
   // Find out the index of the byte in the array
   index = index / 5U;
-  bytes_to_trits(((byte_t *)trit_array + index), 1, trits, 5);
+  byte_to_trits(*(trit_array + index), trits, 4);
   return trits[tindex];
 #endif
 }
@@ -96,15 +98,14 @@ static inline uint8_t flex_trit_array_set_at(flex_trit_t *const trit_array,
   // bitblit the trit in place
   trit_array[index] = (trit_array[index] & mask) | trit;
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
-  byte_t buffer = 0;
   trit_t trits[5];
   // Find out the index of the trit in the byte
   uint8_t tindex = index % 5U;
   // Find out the index of the byte in the array
   index = index / 5U;
-  bytes_to_trits((byte_t *)(trit_array + index), 1, trits, 5);
+  byte_to_trits(*(trit_array + index), trits, 4);
   trits[tindex] = trit;
-  trit_array[index] = trits_to_byte(trits, 0, 5);
+  trit_array[index] = trits_to_byte(trits, 0, 4);
 #endif
   return 1;
 }
@@ -240,6 +241,7 @@ void trit_array_free(trit_array_p const trit_array);
 #define TRIT_ARRAY_DECLARE(NAME, NUM_TRITS)                           \
   size_t NAME##_num_bytes = trit_array_bytes_for_trits(NUM_TRITS);    \
   flex_trit_t NAME##_trits[NAME##_num_bytes];                         \
+  memset(&NAME##_trits, 0, NAME##_num_bytes);                         \
   struct _trit_array NAME = {(flex_trit_t *)&NAME##_trits, NUM_TRITS, \
                              NAME##_num_bytes};
 
