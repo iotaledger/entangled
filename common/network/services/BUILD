@@ -32,6 +32,7 @@ cc_library(
     srcs = ["tcp_receiver.cc"],
     hdrs = ["tcp_receiver.hpp"],
     deps = [
+        "//ciri:node_shared",
         "//common/network:logger",
         "//common/network:neighbor",
         "//common/network/components:receiver_shared",

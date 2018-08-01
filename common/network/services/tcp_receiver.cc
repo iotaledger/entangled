@@ -6,6 +6,7 @@
  */
 
 #include "common/network/services/tcp_receiver.hpp"
+#include "ciri/node.h"
 #include "common/network/logger.h"
 #include "common/network/neighbor.h"
 
@@ -33,8 +34,8 @@ void TcpConnection::start() {
           socket_.remote_endpoint().port()) == false) {
     return;
   }
-  // TODO(thibault) check if in tethered list
-  if (false) {
+  neighbors_list_t* neighbors = service_->state->node->neighbors;
+  if (neighbors->vtable->contains(neighbors, neighbor) == false) {
     log_info("TCP connection request denied: %s:%d is not a tethered neighbor",
              socket_.remote_endpoint().address().to_string().c_str(),
              socket_.remote_endpoint().port());
