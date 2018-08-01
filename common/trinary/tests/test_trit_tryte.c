@@ -23,10 +23,35 @@ void test_trit_to_tryte(void) {
   TEST_ASSERT_EQUAL_MEMORY(exp, trits, sizeof(exp));
 }
 
+void test_get_trit_at(void) {
+  tryte_t trytes[] = {TRYTES_IN};
+  trit_t trit;
+  trit = get_trit_at(trytes, strlen(TRYTES_IN), 0);
+  TEST_ASSERT_EQUAL(trit, 1);
+  trit = get_trit_at(trytes, strlen(TRYTES_IN), 3);
+  TEST_ASSERT_EQUAL(trit, -1);
+  trit = get_trit_at(trytes, strlen(TRYTES_IN), 11);
+  TEST_ASSERT_EQUAL(trit, 0);
+}
+
+void test_set_trit_at(void) {
+  tryte_t trytes[] = {TRYTES_IN};
+  trit_t trit;
+  set_trit_at(trytes, strlen(TRYTES_IN), 0, -1);
+  trit = get_trit_at(trytes, strlen(TRYTES_IN), 0);
+  TEST_ASSERT_EQUAL(trit, -1);
+  trit = get_trit_at(trytes, strlen(TRYTES_IN), 1);
+  TEST_ASSERT_EQUAL(trit, 0);
+  trit = get_trit_at(trytes, strlen(TRYTES_IN), 2);
+  TEST_ASSERT_EQUAL(trit, 0);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_trit_to_tryte);
+  RUN_TEST(test_get_trit_at);
+  RUN_TEST(test_set_trit_at);
 
   return UNITY_END();
 }
