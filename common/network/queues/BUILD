@@ -30,3 +30,13 @@ cc_library(
         "//common/trinary:trit_array",
     ],
 )
+
+cc_library(
+    name = "concurrent_queue_packet",
+    srcs = ["concurrent_queue_packet.c"],
+    hdrs = ["concurrent_queue_packet.h"],
+    deps = [
+        ":concurrent_queue",
+        "//common/network:iota_packet",
+    ],
+)
