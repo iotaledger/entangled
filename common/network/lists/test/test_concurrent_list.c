@@ -99,7 +99,7 @@ void test_list() {
                         CONCURRENT_LIST_SUCCESS);
   TEST_ASSERT_EQUAL_INT(list->vtable->empty(list), false);
   TEST_ASSERT_EQUAL_INT(list->vtable->size(list), 10);
-  concurrent_list_node_of_int_t *tmp = list->front;
+  concurrent_list_node_of_int *tmp = list->front;
   TEST_ASSERT_NOT_NULL(tmp);
   TEST_ASSERT_EQUAL_INT(tmp->data, 8);
   tmp = tmp->next;
