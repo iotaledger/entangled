@@ -14,7 +14,7 @@
 typedef concurrent_queue_of_hash_request_t responder_queue_t;
 typedef struct node_s node_t;
 
-typedef struct {
+typedef struct responder_state_s {
   thread_handle_t thread;
   bool running;
   responder_queue_t *queue;
