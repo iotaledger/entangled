@@ -17,6 +17,11 @@ cc_library(
 )
 
 cc_library(
+    name = "rw_lock_handle",
+    hdrs = ["rw_lock_handle.h"],
+)
+
+cc_library(
     name = "thread_handle",
     hdrs = ["thread_handle.h"],
     linkopts = ["-lpthread"],

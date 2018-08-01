@@ -18,7 +18,7 @@ cc_library(
     deps = [
         "//common:thread_handle",
         "//common/network:logger",
-        "//common/network/queues:concurrent_queue_trit_array",
+        "//common/network/queues:concurrent_queue_packet",
     ],
 )
 
@@ -34,12 +34,22 @@ cc_library(
 )
 
 cc_library(
-    name = "receiver",
-    srcs = ["receiver.c"],
+    name = "receiver_shared",
     hdrs = ["receiver.h"],
     deps = [
         "//common:thread_handle",
-        "//common/network:logger",
+        "//common/network:iota_packet",
+        "//common/network/services:receiver_shared",
+    ],
+)
+
+cc_library(
+    name = "receiver",
+    srcs = ["receiver.c"],
+    deps = [
+        ":receiver_shared",
+        "//ciri:node_shared",
+        "//common/network/services:receiver",
     ],
 )
 

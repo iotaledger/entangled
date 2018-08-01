@@ -13,7 +13,7 @@
 typedef concurrent_queue_of_trit_array_p requester_queue_t;
 typedef struct node_s node_t;
 
-typedef struct {
+typedef struct requester_state_s {
   requester_queue_t *queue;
   node_t *node;
 } requester_state_t;
