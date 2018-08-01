@@ -15,6 +15,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
  public:
   TcpConnection(receiver_service_t* const service,
                 boost::asio::ip::tcp::socket socket);
+  ~TcpConnection();
 
  public:
   void start();

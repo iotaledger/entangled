@@ -33,6 +33,7 @@ cc_library(
     hdrs = ["tcp_receiver.hpp"],
     deps = [
         "//common/network:logger",
+        "//common/network:neighbor",
         "//common/network/components:receiver_shared",
         "//common/network/services:receiver_shared",
         "@boost//:asio",

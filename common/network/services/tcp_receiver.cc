@@ -7,6 +7,7 @@
 
 #include "common/network/services/tcp_receiver.hpp"
 #include "common/network/logger.h"
+#include "common/network/neighbor.h"
 
 /*
  * TcpConnection
@@ -16,7 +17,31 @@ TcpConnection::TcpConnection(receiver_service_t* const service,
                              boost::asio::ip::tcp::socket socket)
     : service_(service), socket_(std::move(socket)) {}
 
-void TcpConnection::start() { receive(); }
+TcpConnection::~TcpConnection() {
+  log_info("TCP connection with %s:%d lost",
+           socket_.remote_endpoint().address().to_string().c_str(),
+           socket_.remote_endpoint().port());
+  // TODO(thibault) remove from tethered list ?
+}
+
+void TcpConnection::start() {
+  neighbor_t neighbor;
+
+  if (neighbor_init_with_values(
+          &neighbor, PROTOCOL_TCP,
+          socket_.remote_endpoint().address().to_string().c_str(),
+          socket_.remote_endpoint().port()) == false) {
+    return;
+  }
+  // TODO(thibault) check if in tethered list
+  if (false) {
+    log_info("TCP connection request denied: %s:%d is not a tethered neighbor",
+             socket_.remote_endpoint().address().to_string().c_str(),
+             socket_.remote_endpoint().port());
+    return;
+  }
+  receive();
+}
 
 void TcpConnection::receive() {
   auto self(shared_from_this());
