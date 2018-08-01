@@ -16,6 +16,7 @@ typedef struct {
   char host[MAX_HOST_LENGTH];
   uint16_t port;
   protocol_type_t protocol;
+  void *opaque_inetaddr;
 } endpoint_t;
 
 #endif  // __COMMON_NETWORK_ENDPOINT_H__

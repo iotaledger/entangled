@@ -40,3 +40,12 @@ cc_library(
         "@boost//:asio",
     ],
 )
+
+cc_library(
+    name = "tcp_sender",
+    srcs = ["tcp_sender.cc"],
+    hdrs = ["tcp_sender.hpp"],
+    deps = [
+        "@boost//:asio",
+    ],
+)

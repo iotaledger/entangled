@@ -31,7 +31,9 @@ cc_library(
     hdrs = ["neighbor.h"],
     deps = [
         ":iota_packet",
+        ":logger",
         ":uri_parser",
+        "//common/network/services:tcp_sender",
         "//common/trinary:trit_array",
     ],
 )

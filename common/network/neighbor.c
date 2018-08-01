@@ -7,7 +7,9 @@
 
 #include <string.h>
 
+#include "common/network/logger.h"
 #include "common/network/neighbor.h"
+#include "common/network/services/tcp_sender.hpp"
 #include "common/network/uri_parser.h"
 
 bool neighbor_init_with_uri(neighbor_t *const neighbor, char const *const uri) {
@@ -48,6 +50,13 @@ bool neighbor_init_with_values(neighbor_t *const neighbor,
 }
 
 bool neighbor_send(neighbor_t *const neighbor, trit_array_p const hash) {
+  if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
+    tcp_send(neighbor->endpoint.opaque_inetaddr);
+  } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
+  } else {
+    log_error("Sending to neighbor failed: unrecognized protocol");
+    return false;
+  }
   // printf("Broadcasting to neighbor %s://%s:%d\n",
   //        neighbor->endpoint.protocol == PROTOCOL_TCP ? "tcp" : "udp",
   //        neighbor->endpoint.host, neighbor->endpoint.port);
