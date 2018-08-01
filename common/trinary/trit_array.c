@@ -65,7 +65,7 @@ size_t flex_trit_array_slice(flex_trit_t *const to_trit_array,
   }
   // There is a risk of noise after the last trit so we need to clean up
 #elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
-  trit_t trits[10];
+  trit_t trits[10] = {0};
   size_t index = start / 5U;
   size_t offset = start % 5U;
   size_t end_index = (start + num_trits - 1) / 5U;
