@@ -13,6 +13,10 @@ static uint16_t tcp_port_g = 14265;
 static uint16_t udp_port_g = 14265;
 
 bool node_init(node_t* const node) {
+  if (INIT_CONCURRENT_LIST_OF(neighbor_t, node->neighbors, neighbor_cmp) !=
+      CONCURRENT_QUEUE_SUCCESS) {
+    return false;
+  }
   log_info("Initializing broadcaster component");
   if (broadcaster_init(&node->broadcaster, node) == false) {
     log_fatal("Initializing broadcaster component failed");
@@ -112,6 +116,10 @@ bool node_destroy(node_t* const node) {
   log_info("Destroying responder component");
   if (responder_destroy(&node->responder) == false) {
     log_error("Destroying responder component failed");
+    ret = false;
+  }
+  if (DESTROY_CONCURRENT_LIST_OF(neighbor_t, node->neighbors) !=
+      CONCURRENT_LIST_SUCCESS) {
     ret = false;
   }
   return ret;

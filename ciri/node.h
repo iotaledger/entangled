@@ -13,6 +13,9 @@
 #include "common/network/components/receiver.h"
 #include "common/network/components/requester.h"
 #include "common/network/components/responder.h"
+#include "common/network/lists/concurrent_list_neighbor.h"
+
+typedef concurrent_list_of_neighbor_t neighbors_list_t;
 
 typedef struct node_s {
   broadcaster_state_t broadcaster;
@@ -20,6 +23,7 @@ typedef struct node_s {
   receiver_state_t receiver;
   requester_state_t requester;
   responder_state_t responder;
+  neighbors_list_t* neighbors;
 } node_t;
 
 bool node_init(node_t* const node);
