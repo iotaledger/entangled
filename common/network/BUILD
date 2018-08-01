@@ -32,6 +32,7 @@ cc_library(
     deps = [
         ":iota_packet",
         ":uri_parser",
+        "//common/trinary:trit_array",
     ],
 )
 

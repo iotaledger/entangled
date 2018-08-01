@@ -6,10 +6,12 @@
  */
 
 #include "common/network/components/broadcaster.h"
+#include "ciri/node.h"
 #include "common/network/logger.h"
 
 static void *broadcaster_routine(broadcaster_state_t *const state) {
   trit_array_p hash;
+  concurrent_list_node_of_neighbor_t *iter;
 
   if (state == NULL) {
     return NULL;
@@ -17,7 +19,12 @@ static void *broadcaster_routine(broadcaster_state_t *const state) {
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &hash) ==
         CONCURRENT_QUEUE_SUCCESS) {
-      // TODO(thibault) broadcast the hash
+      iter = state->node->neighbors->front;
+      while (iter) {
+        neighbor_send(&iter->data, hash);
+        iter = iter->next;
+      }
+      // TODO(thibault) release the hash ?
     }
   }
   return NULL;

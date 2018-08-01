@@ -46,3 +46,10 @@ bool neighbor_init_with_values(neighbor_t *const neighbor,
   neighbor->endpoint.port = port;
   return true;
 }
+
+bool neighbor_send(neighbor_t *const neighbor, trit_array_p const hash) {
+  printf("Broadcasting to neighbor %s://%s:%d\n",
+         neighbor->endpoint.protocol == PROTOCOL_TCP ? "tcp" : "udp",
+         neighbor->endpoint.host, neighbor->endpoint.port);
+  return true;
+}
