@@ -6,23 +6,26 @@
  */
 
 #include "common/network/components/receiver.h"
+#include "ciri/node.h"
 #include "common/network/logger.h"
 
-static void *receiver_routine(receiver_state_t *const state) {
-  if (state == NULL) {
-    return NULL;
-  }
-  while (state->running) {
-    // TODO(thibault) receive
-  }
-  return NULL;
-}
-
-bool receiver_init(receiver_state_t *const state, node_t *const node) {
+bool receiver_init(receiver_state_t *const state, node_t *const node,
+                   uint16_t tcp_port, uint16_t udp_port) {
   if (state == NULL || node == NULL) {
     return false;
   }
+  if (node->processor.queue == NULL) {
+    return false;
+  }
   state->running = false;
+  state->tcp_service.port = tcp_port;
+  state->tcp_service.protocol = PROTOCOL_TCP;
+  state->tcp_service.context = NULL;
+  state->tcp_service.queue = node->processor.queue;
+  state->udp_service.port = udp_port;
+  state->udp_service.protocol = PROTOCOL_UDP;
+  state->udp_service.context = NULL;
+  state->udp_service.queue = node->processor.queue;
   state->node = node;
   return true;
 }
@@ -31,11 +34,26 @@ bool receiver_start(receiver_state_t *const state) {
   if (state == NULL) {
     return false;
   }
-  log_info("Spawning receiver thread");
   state->running = true;
-  if (thread_handle_create(&state->thread, (thread_routine_t)receiver_routine,
-                           state) != 0) {
-    return false;
+  if (state->tcp_service.port != 0) {
+    log_info("Spawning TCP receiver thread with port %d",
+             state->tcp_service.port);
+    if (thread_handle_create(&state->tcp_service.thread,
+                             (thread_routine_t)receiver_service_start,
+                             &state->tcp_service) != 0) {
+      log_fatal("Spawning TCP receiver thread failed", state->tcp_service.port);
+      return false;
+    }
+  }
+  if (state->udp_service.port != 0) {
+    log_info("Spawning UDP receiver thread with port %d",
+             state->udp_service.port);
+    if (thread_handle_create(&state->udp_service.thread,
+                             (thread_routine_t)receiver_service_start,
+                             &state->udp_service) != 0) {
+      log_info("Spawning UDP receiver thread failed", state->udp_service.port);
+      return false;
+    }
   }
   return true;
 }
@@ -44,9 +62,15 @@ bool receiver_stop(receiver_state_t *const state) {
   if (state == NULL) {
     return false;
   }
-  log_info("Shutting down receiver thread");
   state->running = false;
-  if (thread_handle_join(state->thread, NULL) != 0) {
+  log_info("Shutting down TCP receiver thread");
+  receiver_service_stop(&state->tcp_service);
+  if (thread_handle_join(state->tcp_service.thread, NULL) != 0) {
+    return false;
+  }
+  log_info("Shutting down UDP receiver thread");
+  receiver_service_stop(&state->udp_service);
+  if (thread_handle_join(state->udp_service.thread, NULL) != 0) {
     return false;
   }
   return true;
