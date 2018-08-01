@@ -8,7 +8,8 @@
 #ifndef __COMMON_NETWORK_H__
 #define __COMMON_NETWORK_H__
 
-#define HOST_NAME_MAX 255
+#define MAX_SCHEME_LENGTH 8
+#define MAX_HOST_LENGTH 255
 
 typedef enum protocol_type_e { PROTOCOL_TCP, PROTOCOL_UDP } protocol_type_t;
 
