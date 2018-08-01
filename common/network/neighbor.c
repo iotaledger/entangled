@@ -22,9 +22,9 @@ bool neighbor_init_with_uri(neighbor_t *const neighbor, char const *const uri) {
     return false;
   }
   if (strcmp(scheme, "tcp") == 0) {
-    neighbor->endpoint.protocol = ENDPOINT_PROTOCOL_TCP;
+    neighbor->endpoint.protocol = PROTOCOL_TCP;
   } else if (strcmp(scheme, "udp") == 0) {
-    neighbor->endpoint.protocol = ENDPOINT_PROTOCOL_UDP;
+    neighbor->endpoint.protocol = PROTOCOL_UDP;
   } else {
     return false;
   }
