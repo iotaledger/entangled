@@ -9,12 +9,9 @@
 #define __COMMON_NETWORK_URI_PARSER_H__
 
 #include <stdbool.h>
-#include <stdint.h>
+#include <stdlib.h>
 
-#define MAX_SCHEME_LENGTH 8
-#define MAX_HOST_LENGTH 255
-
-bool uri_parse(char const *const uri, char *const scheme, char *const host,
-               uint16_t *const port);
+bool uri_parse(char const *const uri, char *const scheme, size_t scheme_len,
+               char *const host, size_t host_len, uint16_t *const port);
 
 #endif  // __COMMON_NETWORK_URI_PARSER_H__

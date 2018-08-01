@@ -8,9 +8,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "common/network/network.h"
 #include "common/network/uri_parser.h"
 
-bool uri_parse(char const *const uri, char *const scheme, char *const host,
+bool uri_parse(char const *const uri, char *const scheme,
+               size_t const scheme_len, char *const host, size_t const host_len,
                uint16_t *const port) {
   size_t length = 0;
   size_t offset = 0;
@@ -22,8 +24,8 @@ bool uri_parse(char const *const uri, char *const scheme, char *const host,
   if ((delim = strchr(uri, ':')) == NULL) {
     return false;
   }
-  length = (int)(delim - (uri + offset));
-  if (length > MAX_SCHEME_LENGTH) {
+  length = (size_t)(delim - (uri + offset));
+  if (length > MAX_SCHEME_LENGTH || length + 1 > scheme_len) {
     return false;
   }
   if (scheme != NULL) {
@@ -38,8 +40,8 @@ bool uri_parse(char const *const uri, char *const scheme, char *const host,
   if ((delim = strchr(uri + offset, ':')) == NULL) {
     return false;
   }
-  length = (int)(delim - (uri + offset));
-  if (length > MAX_HOST_LENGTH) {
+  length = (size_t)(delim - (uri + offset));
+  if (length > MAX_HOST_LENGTH || length + 1 > host_len) {
     return false;
   }
   if (host != NULL) {

@@ -22,6 +22,7 @@ cc_library(
     name = "uri_parser",
     srcs = ["uri_parser.c"],
     hdrs = ["uri_parser.h"],
+    deps = [":network"],
 )
 
 cc_library(

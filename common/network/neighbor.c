@@ -17,8 +17,8 @@ bool neighbor_init_with_uri(neighbor_t *const neighbor, char const *const uri) {
     return false;
   }
   memset(neighbor, 0, sizeof(neighbor_t));
-  if (uri_parse(uri, scheme, neighbor->endpoint.host,
-                &neighbor->endpoint.port) == false) {
+  if (uri_parse(uri, scheme, MAX_SCHEME_LENGTH, neighbor->endpoint.host,
+                MAX_HOST_LENGTH, &neighbor->endpoint.port) == false) {
     return false;
   }
   if (strcmp(scheme, "tcp") == 0) {
