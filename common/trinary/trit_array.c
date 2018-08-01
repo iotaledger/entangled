@@ -19,9 +19,26 @@ size_t flex_trit_array_slice(flex_trit_t *const to_trit_array,
   if (num_trits > to_len || (start + num_trits) > len) {
     return 0;
   }
-  size_t num_bytes = trit_array_bytes_for_trits(num_trits);
+  size_t num_bytes = flex_trits_num_for_trits(num_trits);
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   memcpy(to_trit_array, trit_array + start, num_trits);
+#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+  trit_t trits[6];
+  size_t index = start / 3U;
+  size_t offset = start % 3U;
+  size_t end_index = (start + num_trits - 1) / 3U;
+  size_t i, j, tlen = 3;
+  for (i = index, j = 0; i < index + num_bytes; i++, j++) {
+    trytes_to_trits(&trit_array[i], trits, 1);
+    if (i < end_index) {
+      if (offset) {
+        trytes_to_trits(&trit_array[i + 1], trits + 3, 1);
+      }
+    } else if (num_bytes * 3 > num_trits) {
+      tlen = (num_trits - num_bytes * 3 + 3);
+    }
+    trits_to_trytes(trits + offset, to_trit_array + j, tlen);
+  }
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
   uint8_t buffer;
   uint8_t tshift = (start & 3) << 1U;
@@ -92,9 +109,11 @@ size_t flex_trit_array_to_int8(trit_t *const trits, size_t const to_len,
   if (num_trits > len || num_trits > to_len) {
     return 0;
   }
-  size_t num_bytes = trit_array_bytes_for_trits(num_trits);
+  size_t num_bytes = flex_trits_num_for_trits(num_trits);
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   memcpy(trits, trit_array, num_bytes);
+#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+  trytes_to_trits(trit_array, trits, num_bytes);
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
   for (size_t i = 0; i < num_trits; i++) {
     trits[i] = flex_trit_array_at(trit_array, len, i);
@@ -114,6 +133,9 @@ size_t int8_to_flex_trit_array(flex_trit_t *const to_trit_array,
   }
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
   memcpy(to_trit_array, trits, num_trits);
+#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+  memset(to_trit_array, FLEX_TRIT_NULL_VALUE, flex_trits_num_for_trits(to_len));
+  trits_to_trytes(trits, to_trit_array, num_trits);
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
   for (size_t i = 0; i < num_trits; i++) {
     flex_trit_array_set_at(to_trit_array, to_len, i, trits[i]);
@@ -124,6 +146,47 @@ size_t int8_to_flex_trit_array(flex_trit_t *const to_trit_array,
   return num_trits;
 }
 
+size_t flex_trit_to_tryte(tryte_t *trytes, size_t to_len,
+                          const flex_trit_t *trit_array, size_t len,
+                          size_t num_trits) {
+  // Bounds checking
+  if (num_trits > len || num_trits > to_len * 3) {
+    return 0;
+  }
+  memset(trytes, '9', to_len);
+#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+  trits_to_trytes((trit_t *)trit_array, trytes, num_trits);
+#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+  memcpy(trytes, trit_array, flex_trits_num_for_trits(num_trits));
+#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE) || \
+    defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+  trit_t trits[num_trits];
+  flex_trit_array_to_int8(trits, num_trits, trit_array, len, num_trits);
+  trits_to_trytes((trit_t *)trits, trytes, num_trits);
+#endif
+  return num_trits;
+}
+
+size_t tryte_to_flex_trit(flex_trit_t *trit_array, size_t to_len,
+                          const tryte_t *trytes, size_t len,
+                          size_t num_trytes) {
+  // Bounds checking
+  if (num_trytes > len || num_trytes > to_len * 3) {
+    return 0;
+  }
+  memset(trit_array, 0, flex_trits_num_for_trits(to_len));
+#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+  trytes_to_trits((tryte_t *)trytes, trit_array, num_trytes);
+#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+  memcpy(trit_array, trytes, num_trytes);
+#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE) || \
+    defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+  trit_t trits[to_len];
+  trytes_to_trits((tryte_t *)trytes, trits, num_trytes);
+  int8_to_flex_trit_array(trit_array, to_len, trits, to_len, to_len);
+#endif
+  return num_trytes;
+}
 /***********************************************************************************************************
  * Trits
  ***********************************************************************************************************/
@@ -166,6 +229,15 @@ trit_array_p trit_array_slice(trit_array_p trit_array,
   return to_trit_array;
 }
 
+trit_array_p trit_array_insert(trit_array_p const trit_array,
+                               trit_array_p const from_trit_array,
+                               size_t const start, size_t const num_trits) {
+  flex_trit_array_insert(trit_array->trits, trit_array->num_trits,
+                         from_trit_array->trits, from_trit_array->num_trits,
+                         start, num_trits);
+  return trit_array;
+}
+
 trit_t *trit_array_to_int8(trit_array_p const trit_array, trit_t *const trits,
                            size_t const len) {
   flex_trit_array_to_int8(trits, len, trit_array->trits, trit_array->num_trits,
@@ -193,7 +265,7 @@ trit_array_p trit_array_new(size_t const num_trits) {
     // errno = IOTA_OUT_OF_MEMORY
     return NULL;
   }
-  memset(trit_array->trits, 0, trit_array->num_bytes);
+  memset(trit_array->trits, FLEX_TRIT_NULL_VALUE, trit_array->num_bytes);
   trit_array->dynamic = 1;
   return trit_array;
 }

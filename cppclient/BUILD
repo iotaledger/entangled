@@ -5,7 +5,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":api_json",
-        "//common/model:transaction",
         "@boost//:beast",
         "@nlohmann//:json",
     ],
@@ -18,7 +17,7 @@ cc_library(
     deps = [
         ":api",
         "//common/helpers:digest",
-        "//common/model:transaction",
+        "//common/model:tryte_transaction",
         "@boost//:config",
         "@boost//:core",
         "@boost//:fusion",
