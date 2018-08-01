@@ -8,9 +8,8 @@
 #ifndef __COMMON_NETWORK_CONCURRENT_QUEUE_TRIT_ARRAY_H__
 #define __COMMON_NETWORK_CONCURRENT_QUEUE_TRIT_ARRAY_H__
 
+#include "common/network/queues/concurrent_queue.h.inc"
 #include "common/trinary/trit_array.h"
-
-#include "concurrent_queue.h.inc"
 
 #ifdef __cplusplus
 extern "C" {

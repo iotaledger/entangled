@@ -9,8 +9,8 @@
 #define __COMMON_NETWORK_CONCURRENT_QUEUE_HASH_REQUEST_H__
 
 #include "common/network/neighbor.h"
+#include "common/network/queues/concurrent_queue.h.inc"
 #include "common/trinary/trit_array.h"
-#include "concurrent_queue.h.inc"
 
 typedef struct {
   trit_array_p hash;

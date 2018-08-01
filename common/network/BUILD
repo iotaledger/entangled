@@ -19,9 +19,20 @@ cc_library(
 )
 
 cc_library(
+    name = "uri_parser",
+    srcs = ["uri_parser.c"],
+    hdrs = ["uri_parser.h"],
+    deps = [":network"],
+)
+
+cc_library(
     name = "neighbor",
+    srcs = ["neighbor.c"],
     hdrs = ["neighbor.h"],
-    deps = [":iota_packet"],
+    deps = [
+        ":iota_packet",
+        ":uri_parser",
+    ],
 )
 
 cc_library(
