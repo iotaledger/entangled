@@ -18,6 +18,7 @@
           CONCURRENT_LIST_OF_##TYPE##_PUSH_BACK,  \
           CONCURRENT_LIST_OF_##TYPE##_POP_FRONT,  \
           CONCURRENT_LIST_OF_##TYPE##_POP_BACK,   \
+          CONCURRENT_LIST_OF_##TYPE##_FIND,       \
           CONCURRENT_LIST_OF_##TYPE##_CONTAINS,   \
           CONCURRENT_LIST_OF_##TYPE##_REMOVE};
 
@@ -226,11 +227,11 @@
     return CONCURRENT_LIST_SUCCESS;                              \
   }
 
-#define DEFINE_FUNCTION_CONTAINS_CONCURRENT_LIST_OF(TYPE)       \
-  bool CONCURRENT_LIST_OF_##TYPE##_CONTAINS(                    \
+#define DEFINE_FUNCTION_FIND_CONCURRENT_LIST_OF(TYPE)           \
+  TYPE *CONCURRENT_LIST_OF_##TYPE##_FIND(                       \
       concurrent_list_of_##TYPE *const self, TYPE const data) { \
     if (self == NULL) {                                         \
-      return false;                                             \
+      return NULL;                                              \
     }                                                           \
     concurrent_list_node_of_##TYPE *iter;                       \
     lock_handle_lock(&self->lock);                              \
@@ -238,12 +239,21 @@
     while (iter) {                                              \
       if (self->cmp(&iter->data, &data)) {                      \
         lock_handle_unlock(&self->lock);                        \
-        return true;                                            \
+        return &iter->data;                                     \
       }                                                         \
       iter = iter->next;                                        \
     }                                                           \
     lock_handle_unlock(&self->lock);                            \
-    return false;                                               \
+    return NULL;                                                \
+  }
+
+#define DEFINE_FUNCTION_CONTAINS_CONCURRENT_LIST_OF(TYPE)       \
+  bool CONCURRENT_LIST_OF_##TYPE##_CONTAINS(                    \
+      concurrent_list_of_##TYPE *const self, TYPE const data) { \
+    if (self == NULL) {                                         \
+      return false;                                             \
+    }                                                           \
+    return self->vtable->find(self, data) != NULL;              \
   }
 
 #define DEFINE_FUNCTION_REMOVE_CONCURRENT_LIST_OF(TYPE)         \
@@ -294,5 +304,6 @@
   DEFINE_FUNCTION_PUSH_BACK_CONCURRENT_LIST_OF(TYPE)  \
   DEFINE_FUNCTION_POP_FRONT_CONCURRENT_LIST_OF(TYPE)  \
   DEFINE_FUNCTION_POP_BACK_CONCURRENT_LIST_OF(TYPE)   \
+  DEFINE_FUNCTION_FIND_CONCURRENT_LIST_OF(TYPE)       \
   DEFINE_FUNCTION_CONTAINS_CONCURRENT_LIST_OF(TYPE)   \
   DEFINE_FUNCTION_REMOVE_CONCURRENT_LIST_OF(TYPE)
