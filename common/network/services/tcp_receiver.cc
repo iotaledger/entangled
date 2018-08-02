@@ -23,9 +23,6 @@ TcpConnection::TcpConnection(receiver_service_t* const service,
 TcpConnection::~TcpConnection() {
   neighbor_t neighbor;
 
-  log_info("TCP connection with %s:%d lost",
-           socket_.remote_endpoint().address().to_string().c_str(),
-           socket_.remote_endpoint().port());
   if (neighbor_init_with_values(
           &neighbor, PROTOCOL_TCP,
           socket_.remote_endpoint().address().to_string().c_str(),
@@ -35,11 +32,11 @@ TcpConnection::~TcpConnection() {
   neighbors_list_t* neighbors = service_->state->node->neighbors;
   neighbor_t* tethered_neighbor = neighbors->vtable->find(neighbors, neighbor);
   if (tethered_neighbor == NULL) {
-    log_info("TCP connection request denied: %s:%d is not a tethered neighbor",
-             socket_.remote_endpoint().address().to_string().c_str(),
-             socket_.remote_endpoint().port());
     return;
   }
+  log_info("TCP connection from tethered neighbor %s:%d lost",
+           socket_.remote_endpoint().address().to_string().c_str(),
+           socket_.remote_endpoint().port());
   tethered_neighbor->endpoint.opaque_inetaddr = NULL;
   // TODO(thibault) remove from tethered list ?
 }
@@ -61,6 +58,9 @@ void TcpConnection::start() {
              socket_.remote_endpoint().port());
     return;
   }
+  log_info("TCP connection from tethered neighbor %s:%d accepted",
+           socket_.remote_endpoint().address().to_string().c_str(),
+           socket_.remote_endpoint().port());
   tethered_neighbor->endpoint.opaque_inetaddr = &socket_;
   receive();
 }
