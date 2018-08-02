@@ -18,11 +18,29 @@ TcpConnection::TcpConnection(receiver_service_t* const service,
                              boost::asio::ip::tcp::socket socket)
     : service_(service), socket_(std::move(socket)) {}
 
+// TODO(thibault) try/ctach every boost call
+
 TcpConnection::~TcpConnection() {
+  neighbor_t neighbor;
+
   log_info("TCP connection with %s:%d lost",
            socket_.remote_endpoint().address().to_string().c_str(),
            socket_.remote_endpoint().port());
-  // TODO(thibault) nullify the opaque_inetaddr
+  if (neighbor_init_with_values(
+          &neighbor, PROTOCOL_TCP,
+          socket_.remote_endpoint().address().to_string().c_str(),
+          socket_.remote_endpoint().port()) == false) {
+    return;
+  }
+  neighbors_list_t* neighbors = service_->state->node->neighbors;
+  neighbor_t* tethered_neighbor = neighbors->vtable->find(neighbors, neighbor);
+  if (tethered_neighbor == NULL) {
+    log_info("TCP connection request denied: %s:%d is not a tethered neighbor",
+             socket_.remote_endpoint().address().to_string().c_str(),
+             socket_.remote_endpoint().port());
+    return;
+  }
+  tethered_neighbor->endpoint.opaque_inetaddr = NULL;
   // TODO(thibault) remove from tethered list ?
 }
 

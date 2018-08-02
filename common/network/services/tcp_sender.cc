@@ -7,6 +7,7 @@
 
 #include <boost/asio.hpp>
 
+#include "common/network/logger.h"
 #include "common/network/services/tcp_sender.hpp"
 
 bool tcp_send(void *opaque_inetaddr) {
@@ -14,6 +15,11 @@ bool tcp_send(void *opaque_inetaddr) {
     return false;
   }
   auto sock = reinterpret_cast<boost::asio::ip::tcp::socket *>(opaque_inetaddr);
-  boost::asio::write(*sock, boost::asio::buffer("Broadcast\n", 10));
+  try {
+    boost::asio::write(*sock, boost::asio::buffer("Broadcast\n", 10));
+  } catch (std::exception const &e) {
+    log_error("TCP write failed:  %s", e.what());
+    return false;
+  }
   return true;
 }

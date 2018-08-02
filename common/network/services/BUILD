@@ -46,6 +46,7 @@ cc_library(
     srcs = ["tcp_sender.cc"],
     hdrs = ["tcp_sender.hpp"],
     deps = [
+        "//common/network:logger",
         "@boost//:asio",
     ],
 )
