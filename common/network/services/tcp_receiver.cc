@@ -21,13 +21,12 @@ TcpConnection::TcpConnection(receiver_service_t* const service,
 // TODO(thibault) try/ctach every boost call
 
 TcpConnection::~TcpConnection() {
-  if (neighbor_ == NULL) {
-    return;
+  if (neighbor_ != NULL) {
+    log_info("TCP connection from tethered neighbor %s:%d lost",
+             socket_.remote_endpoint().address().to_string().c_str(),
+             socket_.remote_endpoint().port());
+    neighbor_->endpoint.opaque_inetaddr = NULL;
   }
-  log_info("TCP connection from tethered neighbor %s:%d lost",
-           socket_.remote_endpoint().address().to_string().c_str(),
-           socket_.remote_endpoint().port());
-  neighbor_->endpoint.opaque_inetaddr = NULL;
 }
 
 void TcpConnection::start() {
