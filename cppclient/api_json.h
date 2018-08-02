@@ -27,7 +27,7 @@ class IotaJsonAPI : virtual public IotaAPI {
  public:
   bool isNodeSolid() override;
 
-  std::unordered_map<std::string, uint64_t> getBalances(
+  nonstd::optional<std::unordered_map<std::string, uint64_t>> getBalances(
       const std::vector<std::string>& addresses) override;
 
   std::unordered_multimap<std::string, Bundle> getConfirmedBundlesForAddresses(
