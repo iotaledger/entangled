@@ -75,8 +75,8 @@ nonstd::optional<NodeInfo> IotaJsonAPI::getNodeInfo() {
            response["latestSolidSubtangleMilestoneIndex"]}};
 }
 
-std::unordered_map<std::string, uint64_t> IotaJsonAPI::getBalances(
-    const std::vector<std::string>& addresses) {
+nonstd::optional<std::unordered_map<std::string, uint64_t>>
+IotaJsonAPI::getBalances(const std::vector<std::string>& addresses) {
   std::unordered_map<std::string, uint64_t> result;
   json req;
   req["command"] = "getBalances";
@@ -116,7 +116,7 @@ std::unordered_map<std::string, uint64_t> IotaJsonAPI::getBalances(
     currAddressCount += numAddressesToQuery;
   }
 
-  return result;
+  return {result};
 }
 
 std::vector<std::string> IotaJsonAPI::findTransactions(

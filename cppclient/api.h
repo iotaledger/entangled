@@ -60,8 +60,8 @@ class IotaAPI {
  public:
   virtual bool isNodeSolid() = 0;
 
-  virtual std::unordered_map<std::string, uint64_t> getBalances(
-      const std::vector<std::string>& addresses) = 0;
+  virtual nonstd::optional<std::unordered_map<std::string, uint64_t>>
+  getBalances(const std::vector<std::string>& addresses) = 0;
 
   virtual std::unordered_multimap<std::string, Bundle>
   getConfirmedBundlesForAddresses(
