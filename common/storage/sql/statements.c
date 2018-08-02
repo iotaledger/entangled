@@ -4,6 +4,7 @@
  *
  * Refer to the LICENSE file for licensing information
  */
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -20,12 +21,12 @@ retcode_t iota_transactions_insert_statement(const iota_transaction_t tx,
   // sizes should be different
   char sig_or_msg[2187 + 1];
   char address[81 + 1];
-  char obsolete_tag[27];
-  char bundle[81];
-  char trunk[81];
-  char branch[81];
-  char tag[27];
-  char nonce[27];
+  char obsolete_tag[27 + 1];
+  char bundle[81 + 1];
+  char trunk[81 + 1];
+  char branch[81 + 1];
+  char tag[27 + 1];
+  char nonce[27 + 1];
   int res;
 
   memcpy(sig_or_msg, tx->signature_or_message, 2187);
@@ -51,7 +52,8 @@ retcode_t iota_transactions_insert_statement(const iota_transaction_t tx,
   res = snprintf(
       statement, statement_cap,
       "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
-      "VALUES ('%s','%s',%d,'%s',%d,%d,%d,'%s','%s','%s','%s',%d,%d,%d,'%s')",
+      "VALUES ('%s','%s',%" PRIu64 ",'%s',%" PRIu64 ",%" PRIu64 ",%" PRIu64
+      ",'%s','%s','%s','%s',%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",'%s')",
       TRANSACTION_TABLE_NAME, COL_SIG_OR_MSG, COL_ADDRESS, COL_VALUE,
       COL_OBSOLETE_TAG, COL_TIMESTAMP, COL_CURRENT_INDEX, COL_LAST_INDEX,
       COL_BUNDLE, COL_TRUNK, COL_BRANCH, COL_TAG, COL_ATTACHMENT_TIMESTAMP,
@@ -69,7 +71,7 @@ retcode_t iota_transactions_insert_statement(const iota_transaction_t tx,
   }
 }
 
-retcode_t iota_transactions_select_statement(const char* index_col,
+retcode_t iota_transactions_select_statement(const char *index_col,
                                              const trit_array_p key,
                                              char statement[],
                                              size_t statement_cap) {
@@ -93,7 +95,7 @@ retcode_t iota_transactions_select_statement(const char* index_col,
   }
 }
 
-retcode_t iota_transactions_exist_statement(const char* index_col,
+retcode_t iota_transactions_exist_statement(const char *index_col,
                                             const trit_array_p key,
                                             char statement[],
                                             size_t statement_cap) {
@@ -119,7 +121,7 @@ retcode_t iota_transactions_exist_statement(const char* index_col,
   }
 }
 
-retcode_t iota_transactions_update_statement(const char* index_col,
+retcode_t iota_transactions_update_statement(const char *index_col,
                                              const trit_array_p key,
                                              const iota_transaction_t tx,
                                              char statement[],
