@@ -18,7 +18,16 @@ steps:
         mounts:
           - /conf:/conf
   - name: "bazel test bootlin x86_64 toolchains"
-    command: bazel build --crosstool_top=@iota_toolchains//tools/x86-64-core-i7--glibc--bleeding-edge-2018.07-1:toolchain --cpu=x86_64 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain  //...
+    command: bazel test --crosstool_top=@iota_toolchains//tools/x86-64-core-i7--glibc--bleeding-edge-2018.07-1:toolchain --cpu=x86_64 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain  //...
+    agents:
+      queue: dev
+    plugins:
+      docker#v1.3.0:
+        image: "th0br0/iota-buildenv:x86_64"
+        mounts:
+          - /conf:/conf
+  - name: "bazel test bootlin i686 toolchains"
+    command: bazel test --crosstool_top='@iota_toolchains//tools/x86-i686--glibc--bleeding-edge-2018.07-1:toolchain' --cpu=i686 --host_crosstool_top=@bazel_tools//tools/cpp:toolchain //...
     agents:
       queue: dev
     plugins:
