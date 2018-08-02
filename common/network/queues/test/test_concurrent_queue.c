@@ -17,8 +17,9 @@ typedef concurrent_queue_of_int conqueue_int;
 
 void test_concurrent_queue() {
   int data;
-  conqueue_int *queue;
+  conqueue_int *queue = NULL;
   conqueue_int *nqueue = NULL;
+
   TEST_ASSERT_EQUAL_INT(INIT_CONCURRENT_QUEUE_OF(int, queue),
                         CONCURRENT_QUEUE_SUCCESS);
   TEST_ASSERT_NOT_NULL(queue);

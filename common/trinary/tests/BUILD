@@ -53,12 +53,23 @@ cc_test(
 )
 
 cc_test(
-    name = "test_trit_array_1",
+    name = "test_trit_array",
     srcs = ["test_trit_array.c"],
-    copts = ["-DTRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE"],
     deps = [
-        "//common/trinary:trit_array_1",
+        "//common/trinary:trit_array",
         "//common/trinary:trit_byte",
+        "//common/trinary:trit_tryte",
+        "@unity",
+    ],
+)
+
+cc_test(
+    name = "test_trit_array_3",
+    srcs = ["test_trit_array.c"],
+    deps = [
+        "//common/trinary:trit_array_3",
+        "//common/trinary:trit_byte",
+        "//common/trinary:trit_tryte",
         "@unity",
     ],
 )
@@ -66,10 +77,10 @@ cc_test(
 cc_test(
     name = "test_trit_array_4",
     srcs = ["test_trit_array.c"],
-    copts = ["-DTRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE"],
     deps = [
         "//common/trinary:trit_array_4",
         "//common/trinary:trit_byte",
+        "//common/trinary:trit_tryte",
         "@unity",
     ],
 )
@@ -77,10 +88,50 @@ cc_test(
 cc_test(
     name = "test_trit_array_5",
     srcs = ["test_trit_array.c"],
-    copts = ["-DTRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE"],
     deps = [
         "//common/trinary:trit_array_5",
         "//common/trinary:trit_byte",
+        "//common/trinary:trit_tryte",
         "@unity",
+    ],
+)
+
+cc_test(
+    name = "test_flex_trit_array",
+    srcs = ["test_flex_trit_array.cc"],
+    deps = [
+        "//common/trinary:flex_trit_array",
+        "//common/trinary:trit_array",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "test_flex_trit_array_3",
+    srcs = ["test_flex_trit_array.cc"],
+    deps = [
+        "//common/trinary:flex_trit_array_3",
+        "//common/trinary:trit_array_3",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "test_flex_trit_array_4",
+    srcs = ["test_flex_trit_array.cc"],
+    deps = [
+        "//common/trinary:flex_trit_array_4",
+        "//common/trinary:trit_array_4",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "test_flex_trit_array_5",
+    srcs = ["test_flex_trit_array.cc"],
+    deps = [
+        "//common/trinary:flex_trit_array_5",
+        "//common/trinary:trit_array_5",
+        "@com_google_googletest//:gtest_main",
     ],
 )
