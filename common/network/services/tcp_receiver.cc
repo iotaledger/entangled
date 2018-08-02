@@ -21,47 +21,28 @@ TcpConnection::TcpConnection(receiver_service_t* const service,
 // TODO(thibault) try/ctach every boost call
 
 TcpConnection::~TcpConnection() {
-  neighbor_t neighbor;
-
-  if (neighbor_init_with_values(
-          &neighbor, PROTOCOL_TCP,
-          socket_.remote_endpoint().address().to_string().c_str(),
-          socket_.remote_endpoint().port()) == false) {
-    return;
-  }
-  neighbors_list_t* neighbors = service_->state->node->neighbors;
-  neighbor_t* tethered_neighbor = neighbors->vtable->find(neighbors, neighbor);
-  if (tethered_neighbor == NULL) {
+  if (neighbor_ == NULL) {
     return;
   }
   log_info("TCP connection from tethered neighbor %s:%d lost",
            socket_.remote_endpoint().address().to_string().c_str(),
            socket_.remote_endpoint().port());
-  tethered_neighbor->endpoint.opaque_inetaddr = NULL;
-  // TODO(thibault) remove from tethered list ?
+  neighbor_->endpoint.opaque_inetaddr = NULL;
 }
 
 void TcpConnection::start() {
-  neighbor_t neighbor;
+  auto host = socket_.remote_endpoint().address().to_string().c_str();
+  auto port = socket_.remote_endpoint().port();
 
-  if (neighbor_init_with_values(
-          &neighbor, PROTOCOL_TCP,
-          socket_.remote_endpoint().address().to_string().c_str(),
-          socket_.remote_endpoint().port()) == false) {
+  neighbor_ = neighbor_find_by_values(service_->state->node->neighbors,
+                                      PROTOCOL_TCP, host, port);
+  if (neighbor_ == NULL) {
+    log_info("TCP connection from non-tethered neighbor %s:%d denied", host,
+             port);
     return;
   }
-  neighbors_list_t* neighbors = service_->state->node->neighbors;
-  neighbor_t* tethered_neighbor = neighbors->vtable->find(neighbors, neighbor);
-  if (tethered_neighbor == NULL) {
-    log_info("TCP connection request denied: %s:%d is not a tethered neighbor",
-             socket_.remote_endpoint().address().to_string().c_str(),
-             socket_.remote_endpoint().port());
-    return;
-  }
-  log_info("TCP connection from tethered neighbor %s:%d accepted",
-           socket_.remote_endpoint().address().to_string().c_str(),
-           socket_.remote_endpoint().port());
-  tethered_neighbor->endpoint.opaque_inetaddr = &socket_;
+  log_info("TCP connection from tethered neighbor %s:%d accepted", host, port);
+  neighbor_->endpoint.opaque_inetaddr = &socket_;
   receive();
 }
 

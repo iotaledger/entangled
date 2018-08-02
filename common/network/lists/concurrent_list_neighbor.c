@@ -47,3 +47,15 @@ bool neighbor_remove(neighbors_list_t *const neighbors,
   }
   return true;
 }
+
+neighbor_t *neighbor_find_by_values(neighbors_list_t *const neighbors,
+                                    protocol_type_t const protocol,
+                                    char const *const host,
+                                    uint16_t const port) {
+  neighbor_t cmp;
+
+  if (neighbor_init_with_values(&cmp, protocol, host, port) == false) {
+    return NULL;
+  }
+  return neighbors->vtable->find(neighbors, cmp);
+}

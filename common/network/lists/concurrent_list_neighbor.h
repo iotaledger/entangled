@@ -23,6 +23,10 @@ bool neighbor_cmp(neighbor_t const *const lhs, neighbor_t const *const rhs);
 bool neighbor_add(neighbors_list_t *const neighbors, neighbor_t const neighbor);
 bool neighbor_remove(neighbors_list_t *const neighbors,
                      neighbor_t const neighbor);
+neighbor_t *neighbor_find_by_values(neighbors_list_t *const neighbors,
+                                    protocol_type_t const protocol,
+                                    char const *const host,
+                                    uint16_t const port);
 
 #ifdef __cplusplus
 }
