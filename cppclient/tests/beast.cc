@@ -37,4 +37,13 @@ TEST_F(BeastIotaAPITest, InvalidHostPort) {
   EXPECT_FALSE(res2);
 }
 
+TEST_F(BeastIotaAPITest,
+       TestgetConfirmedBundlesForAddressesOnInvalidAddressNotCrashing) {
+  MockBeast beast("localhost", 15265);
+
+  auto bundles = beast.getConfirmedBundlesForAddresses(
+      {"9YCNCN9TKECSIOIHPFKVODWOLBQLMIQDPXNAHVPEQZDVSQJWCMSFXERABADFLVVEINKQHZB"
+       "OIHCBTQCH9ULDQMPMBX"});
+}
+
 };  // namespace
