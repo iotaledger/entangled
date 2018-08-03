@@ -184,6 +184,9 @@ std::vector<std::string> IotaJsonAPI::findTransactions(
       auto resVec =
           maybeResponse.value()["hashes"].get<std::vector<std::string>>();
       txs.insert(std::end(txs), std::begin(resVec), std::end(resVec));
+    } else {
+      LOG(INFO) << __FUNCTION__ << " request failed.";
+      return {};
     }
   }
 

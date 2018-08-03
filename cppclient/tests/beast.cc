@@ -37,13 +37,4 @@ TEST_F(BeastIotaAPITest, InvalidHostPort) {
   EXPECT_FALSE(res2);
 }
 
-TEST_F(BeastIotaAPITest,
-       TestgetConfirmedBundlesForAddressesOnInvalidAddressNotCrashing) {
-  MockBeast beast("iri01.mainnet.iota.cafe", 14265);
-
-  auto bundles = beast.getConfirmedBundlesForAddresses(
-      {"9YCNCN9TKECSIOIHPFKVODWOLBQLMIQDPXNAHVPEQZDVSQJWCMSFXERABADFLVVEINKQHZB"
-       "OIHCBTQCH9"});
-}
-
 };  // namespace
