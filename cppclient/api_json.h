@@ -70,6 +70,11 @@ class IotaJsonAPI : virtual public IotaAPI {
 
   virtual nonstd::optional<nlohmann::json> post(
       const nlohmann::json& input) = 0;
+
+ private:
+  static std::vector<std::string> nextBatch(const std::vector<std::string>& vec,
+                                            uint32_t numBatchedEntries,
+                                            uint32_t batchSize);
 };
 }  // namespace cppclient
 

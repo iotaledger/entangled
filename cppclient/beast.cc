@@ -62,6 +62,7 @@ nonstd::optional<json> BeastIotaAPI::post(const json& input) {
     if (ec && ec != boost::system::errc::not_connected)
       throw boost::system::system_error{ec};
   } catch (const std::exception& ex) {
+    LOG(ERROR) << ex.what();
     return {};
   }
 

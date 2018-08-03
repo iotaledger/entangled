@@ -36,6 +36,14 @@ using iota::model::TryteTransaction;
 DEFINE_uint32(maxNumAddressesForGetBalances, 1000,
               "Maximum number of addresses to query for in 'getBalances'");
 
+DEFINE_uint32(maxQuerySizeFindTransactions, 500,
+              "Maximum number of addresses/bundles/approvees to query for in "
+              "'findTransactions'");
+
+DEFINE_uint32(maxQuerySizeGetTrytes, 100,
+              "Maximum number of hashes to query for in "
+              "'getTrytes'");
+
 namespace cppclient {
 
 bool IotaJsonAPI::isNodeSolid() {
@@ -65,8 +73,8 @@ nonstd::optional<NodeInfo> IotaJsonAPI::getNodeInfo() {
 
   auto maybeResponse = post(std::move(req));
   if (!maybeResponse) {
-      LOG(INFO) << __FUNCTION__ << " request failed.";
-      return {};
+    LOG(INFO) << __FUNCTION__ << " request failed.";
+    return {};
   }
   auto response = maybeResponse.value();
 
@@ -133,44 +141,84 @@ std::vector<std::string> IotaJsonAPI::findTransactions(
 
   json req;
   req["command"] = "findTransactions";
-  if (addresses) {
-    req["addresses"] = std::move(addresses.value());
-  }
-  if (bundles) {
-    req["bundles"] = std::move(bundles.value());
-  }
-  if (approvees) {
-    req["approvees"] = std::move(approvees.value());
+
+  std::vector<std::string> txs;
+
+  uint32_t currAddressCount = 0;
+  uint32_t currBundleCount = 0;
+  uint32_t currApproveeCount = 0;
+  uint32_t maxAddresses = addresses.has_value() ? addresses.value().size() : 0;
+  uint32_t maxBundles = bundles.has_value() ? bundles.value().size() : 0;
+  uint32_t maxApprovees = approvees.has_value() ? approvees.value().size() : 0;
+
+  while (currAddressCount < maxAddresses || currBundleCount < maxBundles ||
+         currApproveeCount < maxApprovees) {
+    if (currAddressCount < maxAddresses) {
+      auto currAddresses = nextBatch(addresses.value(), currAddressCount,
+                                     FLAGS_maxQuerySizeFindTransactions);
+      currAddressCount += currAddresses.size();
+      req["addresses"] = std::move(currAddresses);
+    }
+
+    if (currBundleCount < maxBundles) {
+      auto currBundles = nextBatch(bundles.value(), currBundleCount,
+                                   FLAGS_maxQuerySizeFindTransactions);
+      currBundleCount += currBundles.size();
+      req["bundles"] = std::move(currBundles);
+    }
+
+    if (currApproveeCount < maxApprovees) {
+      auto currApprovees = nextBatch(bundles.value(), currApproveeCount,
+                                     FLAGS_maxQuerySizeFindTransactions);
+      currApproveeCount += currApprovees.size();
+      req["approvees"] = std::move(currApprovees);
+    }
+
+    auto maybeResponse = post(std::move(req));
+    if (!maybeResponse) {
+      LOG(INFO) << __FUNCTION__ << " request failed.";
+      return {};
+    }
+
+    if (!maybeResponse.value()["hashes"].is_null()) {
+      auto resVec =
+          maybeResponse.value()["hashes"].get<std::vector<std::string>>();
+      txs.insert(std::end(txs), std::begin(resVec), std::end(resVec));
+    }
   }
 
-  auto maybeResponse = post(std::move(req));
-
-  if (!maybeResponse) {
-    LOG(INFO) << __FUNCTION__ << " request failed.";
-    return {};
-  }
-
-  if (!maybeResponse.value()["hashes"].is_null()) {
-    return maybeResponse.value()["hashes"].get<std::vector<std::string>>();
-  }
-  return {};
+  return txs;
 }
 std::vector<std::string> IotaJsonAPI::getTrytes(
     const std::vector<std::string>& hashes) {
   json req;
   req["command"] = "getTrytes";
-  req["hashes"] = hashes;
 
-  auto maybeResponse = post(std::move(req));
-  if (!maybeResponse) {
-    LOG(INFO) << __FUNCTION__ << " request failed.";
-    return {};
-  }
+  uint32_t currHashesCount = 0;
+  std::vector<std::string> trytes;
 
-  if (maybeResponse.value()["trytes"].is_null()) {
-    return {};
+  while (currHashesCount < hashes.size()) {
+    auto currHashes =
+        nextBatch(hashes, currHashesCount, FLAGS_maxQuerySizeFindTransactions);
+    currHashesCount += currHashes.size();
+    req["hashes"] = currHashes;
+
+    auto maybeResponse = post(std::move(req));
+    if (!maybeResponse) {
+      LOG(INFO) << __FUNCTION__ << " request failed.";
+      return {};
+    }
+
+    if (!maybeResponse.value()["trytes"].is_null()) {
+      auto res =
+          maybeResponse.value()["trytes"].get<std::vector<std::string>>();
+      trytes.insert(std::end(trytes), std::begin(res), std::end(res));
+    } else {
+      LOG(INFO) << __FUNCTION__ << " request failed.";
+      return {};
+    }
   }
-  return maybeResponse.value()["trytes"].get<std::vector<std::string>>();
+  return trytes;
 }
 
 std::vector<Transaction> IotaJsonAPI::getTransactions(
@@ -439,6 +487,19 @@ GetInclusionStatesResponse IotaJsonAPI::getInclusionStates(
   }
 
   return {response["states"].get<std::vector<bool>>()};
+}
+
+std::vector<std::string> IotaJsonAPI::nextBatch(
+    const std::vector<std::string>& vec, uint32_t numBatchedEntries,
+    uint32_t batchSize) {
+  auto numToQuery = (vec.size() - numBatchedEntries) > batchSize
+                        ? batchSize
+                        : (vec.size() - numBatchedEntries);
+  auto startEntry = vec.begin() + numBatchedEntries;
+  auto currAddresses =
+      std::vector<std::string>(startEntry, startEntry + numToQuery);
+
+  return currAddresses;
 }
 
 }  // namespace cppclient

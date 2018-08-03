@@ -39,11 +39,11 @@ TEST_F(BeastIotaAPITest, InvalidHostPort) {
 
 TEST_F(BeastIotaAPITest,
        TestgetConfirmedBundlesForAddressesOnInvalidAddressNotCrashing) {
-  MockBeast beast("localhost", 15265);
+  MockBeast beast("iri01.mainnet.iota.cafe", 14265);
 
   auto bundles = beast.getConfirmedBundlesForAddresses(
       {"9YCNCN9TKECSIOIHPFKVODWOLBQLMIQDPXNAHVPEQZDVSQJWCMSFXERABADFLVVEINKQHZB"
-       "OIHCBTQCH9ULDQMPMBX"});
+       "OIHCBTQCH9"});
 }
 
 };  // namespace
