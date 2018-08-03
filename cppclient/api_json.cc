@@ -63,10 +63,14 @@ nonstd::optional<NodeInfo> IotaJsonAPI::getNodeInfo() {
   json req;
   req["command"] = "getNodeInfo";
 
-  // TODO(th0br0) proper failure mechanism
-  auto response = post(std::move(req)).value();
+  auto maybeResponse = post(std::move(req));
+  if (!maybeResponse) {
+      LOG(INFO) << __FUNCTION__ << " request failed.";
+      return {};
+  }
+  auto response = maybeResponse.value();
 
-  if (!response || response["latestMilestone"].is_null()) {
+  if (response["latestMilestone"].is_null()) {
     LOG(INFO) << __FUNCTION__ << " request failed.";
     return {};
   }
