@@ -44,6 +44,10 @@ DEFINE_uint32(maxQuerySizeGetTrytes, 500,
               "Maximum number of hashes to query for in "
               "'getTrytes'");
 
+DEFINE_uint32(maxQuerySizeGetInclusionState, 1000,
+              "Maximum number of tails to query for in "
+              "'getInclusionStates'");
+
 namespace cppclient {
 
 bool IotaJsonAPI::isNodeSolid() {
@@ -156,21 +160,18 @@ std::vector<std::string> IotaJsonAPI::findTransactions(
     if (currAddressCount < maxAddresses) {
       auto currAddresses = nextBatch(addresses.value(), currAddressCount,
                                      FLAGS_maxQuerySizeFindTransactions);
-      currAddressCount += currAddresses.size();
       req["addresses"] = std::move(currAddresses);
     }
 
     if (currBundleCount < maxBundles) {
       auto currBundles = nextBatch(bundles.value(), currBundleCount,
                                    FLAGS_maxQuerySizeFindTransactions);
-      currBundleCount += currBundles.size();
       req["bundles"] = std::move(currBundles);
     }
 
     if (currApproveeCount < maxApprovees) {
       auto currApprovees = nextBatch(bundles.value(), currApproveeCount,
                                      FLAGS_maxQuerySizeFindTransactions);
-      currApproveeCount += currApprovees.size();
       req["approvees"] = std::move(currApprovees);
     }
 
@@ -203,7 +204,6 @@ std::vector<std::string> IotaJsonAPI::getTrytes(
   while (currHashesCount < hashes.size()) {
     auto currHashes =
         nextBatch(hashes, currHashesCount, FLAGS_maxQuerySizeFindTransactions);
-    currHashesCount += currHashes.size();
     req["hashes"] = currHashes;
 
     auto maybeResponse = post(std::move(req));
@@ -335,7 +335,6 @@ std::unordered_set<std::string> IotaJsonAPI::filterConfirmedTails(
     const nonstd::optional<std::string>& reference) {
   json req;
   req["command"] = "getInclusionStates";
-  req["transactions"] = tails;
 
   if (reference.has_value()) {
     req["tips"] = std::vector<std::string>{reference.value()};
@@ -349,19 +348,33 @@ std::unordered_set<std::string> IotaJsonAPI::filterConfirmedTails(
     req["tips"] = std::vector<std::string>{ni.latestMilestone};
   }
 
-  auto maybeResponse = post(std::move(req));
+  uint32_t currTailCount = 0;
 
-  if (!maybeResponse) {
-    LOG(INFO) << __FUNCTION__ << " request failed.";
-    return {};
+  std::vector<bool> states;
+
+  while (currTailCount < tails.size()) {
+    auto currTails =
+        nextBatch(tails, currTailCount, FLAGS_maxQuerySizeGetInclusionState);
+
+    req["transactions"] = currTails;
+
+    auto maybeResponse = post(std::move(req));
+    if (!maybeResponse) {
+      LOG(INFO) << __FUNCTION__ << " request failed.";
+      return {};
+    }
+
+    auto& response = maybeResponse.value();
+
+    if (response["states"].is_null()) {
+      LOG(INFO) << __FUNCTION__ << " request failed.";
+      return {};
+    } else {
+      auto currVec = response["states"].get<std::vector<bool>>();
+      std::copy(std::begin(currVec), std::end(currVec),
+                std::back_inserter(states));
+    }
   }
-
-  auto& response = maybeResponse.value();
-
-  if (response["states"].is_null()) {
-    return {};
-  }
-  auto states = response["states"].get<std::vector<bool>>();
 
   std::unordered_set<std::string> confirmedTails;
 
@@ -492,17 +505,19 @@ GetInclusionStatesResponse IotaJsonAPI::getInclusionStates(
   return {response["states"].get<std::vector<bool>>()};
 }
 
-std::vector<std::string> IotaJsonAPI::nextBatch(
-    const std::vector<std::string>& vec, uint32_t numBatchedEntries,
-    uint32_t batchSize) {
+template <typename T>
+std::vector<T> IotaJsonAPI::nextBatch(const std::vector<T>& vec,
+                                      uint32_t& numBatchedEntries,
+                                      uint32_t batchSize) {
   auto numToQuery = (vec.size() - numBatchedEntries) > batchSize
                         ? batchSize
                         : (vec.size() - numBatchedEntries);
   auto startEntry = vec.begin() + numBatchedEntries;
-  auto currAddresses =
-      std::vector<std::string>(startEntry, startEntry + numToQuery);
+  auto currVec = std::vector<T>(startEntry, startEntry + numToQuery);
 
-  return currAddresses;
+  numBatchedEntries += currVec.size();
+
+  return currVec;
 }
 
 }  // namespace cppclient
