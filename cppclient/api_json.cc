@@ -40,7 +40,7 @@ DEFINE_uint32(maxQuerySizeFindTransactions, 500,
               "Maximum number of addresses/bundles/approvees to query for in "
               "'findTransactions'");
 
-DEFINE_uint32(maxQuerySizeGetTrytes, 100,
+DEFINE_uint32(maxQuerySizeGetTrytes, 500,
               "Maximum number of hashes to query for in "
               "'getTrytes'");
 
@@ -183,7 +183,7 @@ std::vector<std::string> IotaJsonAPI::findTransactions(
     if (!maybeResponse.value()["hashes"].is_null()) {
       auto resVec =
           maybeResponse.value()["hashes"].get<std::vector<std::string>>();
-      txs.insert(std::end(txs), std::begin(resVec), std::end(resVec));
+      std::copy(std::begin(resVec), std::end(resVec), std::back_inserter(txs));
     } else {
       LOG(INFO) << __FUNCTION__ << " request failed.";
       return {};
