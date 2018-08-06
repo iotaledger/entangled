@@ -18,8 +18,6 @@ TcpConnection::TcpConnection(receiver_service_t* const service,
                              boost::asio::ip::tcp::socket socket)
     : service_(service), socket_(std::move(socket)) {}
 
-// TODO(thibault) try/ctach every boost call
-
 TcpConnection::~TcpConnection() {
   if (neighbor_ != NULL) {
     log_info("TCP connection from tethered neighbor %s:%d lost",
@@ -36,8 +34,8 @@ void TcpConnection::start() {
   neighbor_ = neighbor_find_by_values(service_->state->node->neighbors,
                                       PROTOCOL_TCP, host, port);
   if (neighbor_ == NULL) {
-    log_info("TCP connection from non-tethered neighbor %s:%d denied", host,
-             port);
+    log_info("TCP connection from non-tethered neighbor tcp://%s:%d denied",
+             host, port);
     return;
   }
   log_info("TCP connection from tethered neighbor %s:%d accepted", host, port);
@@ -50,10 +48,7 @@ void TcpConnection::receive() {
   socket_.async_read_some(
       boost::asio::buffer(packet_.content, TRANSACTION_PACKET_SIZE),
       [this, self](boost::system::error_code ec, std::size_t length) {
-        if (ec == boost::asio::error::eof ||
-            ec == boost::asio::error::connection_reset) {
-          // TODO(thibault) disconnect
-        } else if (!ec && length > 0) {
+        if (!ec && length > 0) {
           handlePacket(length);
           receive();
         }

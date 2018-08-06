@@ -6,7 +6,9 @@
  */
 
 #include "common/network/services/udp_receiver.hpp"
+#include "ciri/node.h"
 #include "common/network/logger.h"
+#include "common/network/neighbor.h"
 
 UdpReceiverService::UdpReceiverService(receiver_service_t* const service,
                                        boost::asio::io_context& context,
@@ -23,7 +25,16 @@ void UdpReceiverService::receive() {
       senderEndpoint_,
       [this](boost::system::error_code ec, std::size_t length) {
         if (!ec && length > 0) {
-          handlePacket(length);
+          auto host = senderEndpoint_.address().to_string().c_str();
+          auto port = senderEndpoint_.port();
+          neighbor_t* neighbor = neighbor_find_by_values(
+              service_->state->node->neighbors, PROTOCOL_TCP, host, port);
+          if (neighbor == NULL) {
+            log_info("UDP packet from non-tethered neighbor udp://%s:%d denied",
+                     host, port);
+          } else {
+            handlePacket(length);
+          }
         }
         receive();
       });

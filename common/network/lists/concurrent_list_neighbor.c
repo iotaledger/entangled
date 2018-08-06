@@ -16,9 +16,9 @@ bool neighbor_cmp(neighbor_t const *const lhs, neighbor_t const *const rhs) {
   if (lhs == NULL || rhs == NULL) {
     return false;
   }
-  return lhs->endpoint.protocol == rhs->endpoint.protocol &&
-         strcmp(lhs->endpoint.host, rhs->endpoint.host) == 0 &&
-         lhs->endpoint.port == rhs->endpoint.port;
+  return strcmp(lhs->endpoint.host, rhs->endpoint.host) == 0 &&
+         lhs->endpoint.port == rhs->endpoint.port &&
+         lhs->endpoint.protocol == rhs->endpoint.protocol;
 }
 
 bool neighbor_add(neighbors_list_t *const neighbors,
@@ -54,6 +54,9 @@ neighbor_t *neighbor_find_by_values(neighbors_list_t *const neighbors,
                                     uint16_t const port) {
   neighbor_t cmp;
 
+  if (neighbors == NULL) {
+    return false;
+  }
   if (neighbor_init_with_values(&cmp, protocol, host, port) == false) {
     return NULL;
   }

@@ -20,7 +20,9 @@ cc_library(
     srcs = ["udp_receiver.cc"],
     hdrs = ["udp_receiver.hpp"],
     deps = [
+        "//ciri:node_shared",
         "//common/network:logger",
+        "//common/network:neighbor",
         "//common/network/components:receiver_shared",
         "//common/network/services:receiver_shared",
         "@boost//:asio",
