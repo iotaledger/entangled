@@ -30,8 +30,8 @@ void UdpReceiverService::receive() {
           neighbor_t* neighbor = neighbor_find_by_values(
               service_->state->node->neighbors, PROTOCOL_UDP, host, port);
           if (neighbor == NULL) {
-            log_info("UDP packet from non-tethered neighbor udp://%s:%d denied",
-                     host, port);
+            log_debug("Packet denied from non-tethered neighbor udp://%s:%d",
+                      host, port);
           } else {
             neighbor->endpoint.opaque_inetaddr = &socket_;
             handlePacket(length);
@@ -48,8 +48,8 @@ bool UdpReceiverService::handlePacket(std::size_t const length) {
   receiver_service_prepare_packet(&packet_, length,
                                   senderEndpoint_.address().to_string().c_str(),
                                   senderEndpoint_.port(), PROTOCOL_UDP);
-  log_debug("UDP packet received from %s:%d", &packet_.source.host,
-            packet_.source.port);
+  log_debug("Packet received from tethered neighbor udp://%s:%d",
+            &packet_.source.host, packet_.source.port);
   if (service_->queue->vtable->push(service_->queue, packet_) !=
       CONCURRENT_QUEUE_SUCCESS) {
     return false;
