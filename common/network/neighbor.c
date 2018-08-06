@@ -53,12 +53,10 @@ bool neighbor_send(neighbor_t *const neighbor, trit_array_p const hash) {
     return false;
   }
   if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
-    tcp_send(&neighbor->endpoint);
+    return tcp_send(&neighbor->endpoint, hash);
   } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
-    udp_send(&neighbor->endpoint);
-  } else {
-    log_error("Sending to neighbor failed: unrecognized protocol");
-    return false;
+    return udp_send(&neighbor->endpoint, hash);
   }
-  return true;
+  log_error("Sending to neighbor failed: unrecognized protocol");
+  return false;
 }

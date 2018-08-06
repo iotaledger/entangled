@@ -50,6 +50,7 @@ cc_library(
     deps = [
         "//common/network:endpoint",
         "//common/network:logger",
+        "//common/trinary:trit_array",
         "@boost//:asio",
     ],
 )
@@ -61,6 +62,7 @@ cc_library(
     deps = [
         "//common/network:endpoint",
         "//common/network:logger",
+        "//common/trinary:trit_array",
         "@boost//:asio",
     ],
 )
