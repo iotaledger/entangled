@@ -10,8 +10,7 @@
 #include "ciri/node.h"
 #include "common/network/logger.h"
 
-#define TRITS_IN -1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1, 1, 0, -1, 1
-#define TRITS_OUT -1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1, 1, 0, -1, 1
+#define TRITS -1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1, 1, 0, -1, 1
 #define NUM_TRITS 17
 
 static node_t node_g;
@@ -35,10 +34,11 @@ int main() {
   neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:14261");
   neighbor_add(node_g.neighbors, neighbor);
 
-  TRIT_ARRAY_MAKE(trits, NUM_TRITS, TRITS_IN);
-
+  flex_trit_t raw_trits[] = {TRITS};
   while (1) {
-    broadcaster_on_next(&node_g.broadcaster, &trits);
+    trit_array_p trits = trit_array_new(NUM_TRITS);
+    trit_array_set_trits(trits, raw_trits, NUM_TRITS);
+    broadcaster_on_next(&node_g.broadcaster, trits);
     sleep(1);
   }
 

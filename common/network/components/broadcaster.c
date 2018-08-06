@@ -24,7 +24,9 @@ static void *broadcaster_routine(broadcaster_state_t *const state) {
         neighbor_send(&iter->data, hash);
         iter = iter->next;
       }
-      // TODO(thibault) release the hash ?
+#if !defined(NO_DYNAMIC_ALLOCATION)
+      trit_array_free(hash);
+#endif
     }
   }
   return NULL;
