@@ -46,6 +46,18 @@ cc_library(
     srcs = ["tcp_sender.cc"],
     hdrs = ["tcp_sender.hpp"],
     deps = [
+        "//common/network:endpoint",
+        "//common/network:logger",
+        "@boost//:asio",
+    ],
+)
+
+cc_library(
+    name = "udp_sender",
+    srcs = ["udp_sender.cc"],
+    hdrs = ["udp_sender.hpp"],
+    deps = [
+        "//common/network:endpoint",
         "//common/network:logger",
         "@boost//:asio",
     ],

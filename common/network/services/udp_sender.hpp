@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-bool tcp_send(endpoint_t *const endpoint);
+bool udp_send(endpoint_t *const endpoint);
 
 #ifdef __cplusplus
 }
