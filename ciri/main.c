@@ -10,9 +10,6 @@
 #include "ciri/node.h"
 #include "common/network/logger.h"
 
-#define TRITS -1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1, 1, 0, -1, 1
-#define NUM_TRITS 17
-
 static node_t node_g;
 
 int main() {
@@ -28,16 +25,17 @@ int main() {
     return EXIT_FAILURE;
   }
 
+  // TODO(thibault) Remove, for broadcaster testing purpose
   neighbor_t neighbor;
   neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:14262");
   neighbor_add(node_g.neighbors, neighbor);
   neighbor_init_with_uri(&neighbor, "udp://127.0.0.1:14263");
   neighbor_add(node_g.neighbors, neighbor);
-
-  flex_trit_t raw_trits[] = {TRITS};
+  flex_trit_t raw_trits[] = {-1, 0, 1, 1, 0, 1, 1,  0, -1,
+                             -1, 1, 0, 1, 1, 0, -1, 1};
   while (1) {
-    trit_array_p trits = trit_array_new(NUM_TRITS);
-    trit_array_set_trits(trits, raw_trits, NUM_TRITS);
+    trit_array_p trits = trit_array_new(17);
+    trit_array_set_trits(trits, raw_trits, 17);
     broadcaster_on_next(&node_g.broadcaster, trits);
     sleep(1);
   }

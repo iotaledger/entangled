@@ -20,7 +20,6 @@ typedef struct receiver_service_s {
   protocol_type_t protocol;
   void* context;
   receiver_state_t* state;
-  // TODO(thibault) remove ?
   receive_queue_t* queue;
 } receiver_service_t;
 
