@@ -11,19 +11,19 @@
 #include "common/network/services/tcp_sender.hpp"
 
 bool tcp_send(endpoint_t *const endpoint, trit_array_p const hash) {
-  trit_t trytes[6];
-
   if (endpoint == NULL || endpoint->opaque_inetaddr == NULL) {
     return false;
   }
-  if (flex_trit_to_tryte(trytes, 6, hash->trits, hash->num_trits,
+  size_t trytes_num = num_trytes_for_trits(hash->num_trits);
+  trit_t trytes[trytes_num];
+  if (flex_trit_to_tryte(trytes, trytes_num, hash->trits, hash->num_trits,
                          hash->num_trits) == 0) {
     return false;
   }
   try {
     auto socket = reinterpret_cast<boost::asio::ip::tcp::socket *>(
         endpoint->opaque_inetaddr);
-    boost::asio::write(*socket, boost::asio::buffer(trytes, 6));
+    boost::asio::write(*socket, boost::asio::buffer(trytes, trytes_num));
   } catch (std::exception const &e) {
     log_error("Sending packet to tcp://%s:%d failed: %s", endpoint->host,
               endpoint->port, e.what());
