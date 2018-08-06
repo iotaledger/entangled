@@ -63,7 +63,6 @@ bool broadcaster_on_next(broadcaster_state_t *const state,
   if (state == NULL) {
     return false;
   }
-  // TODO(thibault) check broadcaster queue size against a maximum size ?
   if (state->queue->vtable->push(state->queue, hash) !=
       CONCURRENT_QUEUE_SUCCESS) {
     return false;

@@ -29,9 +29,9 @@ int main() {
   }
 
   neighbor_t neighbor;
-  neighbor_init_with_uri(&neighbor, "udp://127.0.0.1:14260");
+  neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:14262");
   neighbor_add(node_g.neighbors, neighbor);
-  neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:14261");
+  neighbor_init_with_uri(&neighbor, "udp://127.0.0.1:14263");
   neighbor_add(node_g.neighbors, neighbor);
 
   flex_trit_t raw_trits[] = {TRITS};

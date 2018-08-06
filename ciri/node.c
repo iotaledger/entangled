@@ -9,8 +9,8 @@
 #include "common/network/logger.h"
 
 // TODO(thibault) configuration variable
-static uint16_t tcp_port_g = 14265;
-static uint16_t udp_port_g = 14265;
+static uint16_t tcp_port_g = 14260;
+static uint16_t udp_port_g = 14261;
 
 bool node_init(node_t* const node) {
   if (node == NULL) {

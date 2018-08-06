@@ -28,11 +28,12 @@ void UdpReceiverService::receive() {
           auto host = senderEndpoint_.address().to_string().c_str();
           auto port = senderEndpoint_.port();
           neighbor_t* neighbor = neighbor_find_by_values(
-              service_->state->node->neighbors, PROTOCOL_TCP, host, port);
+              service_->state->node->neighbors, PROTOCOL_UDP, host, port);
           if (neighbor == NULL) {
             log_info("UDP packet from non-tethered neighbor udp://%s:%d denied",
                      host, port);
           } else {
+            neighbor->endpoint.opaque_inetaddr = &socket_;
             handlePacket(length);
           }
         }

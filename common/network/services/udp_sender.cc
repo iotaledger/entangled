@@ -11,15 +11,20 @@
 #include "common/network/services/udp_sender.hpp"
 
 bool udp_send(endpoint_t *const endpoint) {
-  if (endpoint == NULL) {
+  if (endpoint == NULL || endpoint->opaque_inetaddr == NULL) {
     return false;
   }
-  // auto sock = reinterpret_cast<boost::asio::ip::tcp::socket
-  // *>(opaque_inetaddr); try {
-  //   boost::asio::write(*sock, boost::asio::buffer("Broadcast\n", 10));
-  // } catch (std::exception const &e) {
-  //   log_error("TCP write failed:  %s", e.what());
-  //   return false;
-  // }
+  auto sock = reinterpret_cast<boost::asio::ip::udp::socket *>(
+      endpoint->opaque_inetaddr);
+  try {
+    // TODO(thibault) clear
+    boost::asio::ip::address addr;
+    addr.from_string(endpoint->host);
+    boost::asio::ip::udp::endpoint sender_endpoint(addr, endpoint->port);
+    sock->send_to(boost::asio::buffer("Broadcast\n", 10), sender_endpoint);
+  } catch (std::exception const &e) {
+    log_error("UDP write failed:  %s", e.what());
+    return false;
+  }
   return true;
 }
