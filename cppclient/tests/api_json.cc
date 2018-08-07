@@ -62,5 +62,38 @@ TEST_F(IotaJsonAPITest, GetBalances) {
   EXPECT_EQ(api.request, req);
   EXPECT_EQ(response, expected);
 }
+TEST_F(IotaJsonAPITest, GetNodeInfo) {
+  MockAPI api;
 
+  json req;
+  req["command"] = "getNodeInfo";
+  json res;
+  char *str = "VBVEUQYE99LFWHDZRFKTGFHYGDFEAMAEBGUBTTJRFKHCFBRTXFAJQ9XIUEZQCJOQTZNOOHKUQIKOY9999";
+  res["latestMilestone"] = str;
+  res["latestMilestoneIndex"] = 107;
+  res["latestSolidSubtangleMilestoneIndex"] = 107;
+  
+  cppclient::NodeInfo expected = {res["latestMilestone"], res["latestMilestoneIndex"]
+                              , res["latestSolidSubtangleMilestoneIndex"]}; 
+  
+  api.response = res;
+
+  EXPECT_CALL(api, post_()).Times(1);  
+  
+  auto response = api.getNodeInfo();
+  
+  // Imitae the unit test in getBlances in entangled
+  EXPECT_EQ(api.request, req);
+  EXPECT_STREQ((*response).latestMilestone.c_str(), str);
+  EXPECT_GE((*response).latestMilestoneIndex, res["latestMilestoneIndex"]);
+  EXPECT_GE((*response).latestSolidMilestoneIndex, res["latestSolidSubtangleMilestoneIndex"]);
+
+
+  /*
+  // Imitate the unit test in iota.lib.cpp 
+  EXPECT_EQ(api.request, req);
+  EXPECT_GE((*response).latestMilestoneIndex, 0);
+  EXPECT_GE((*response).latestSolidMilestoneIndex, 0);
+  */
+}
 };  // namespace
