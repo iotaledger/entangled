@@ -93,4 +93,24 @@ tanglewidthcollector:
   #Step from measure_line_base_age to measure_line_max_age, [seconds]
   measure_line_age_step: 10
   #interval between following snapshots (internal counters update)
-  snapshot_interval: 10
+  snapshot_interval: 1
+
+confirmationratecollector:
+  #list of publisher to listen to. (they should return the echo)
+  publishers:
+      - "tcp://zmq.testnet.iota.org:5556"
+
+  #url of iri node
+  iri_host: "iri01.testnet.iota.cafe"
+  iri_port: 14265
+  #IP/Port that the Prometheus Exposer binds to
+  prometheus_exposer_uri: "0.0.0.0:8085"
+  #MWM for transaction's POW
+  mwm: 9
+  #in-between transactions interval [seconds]
+  broadcast_interval: 3
+
+  #Time after which we should expect transaction to be approved
+  measurement_upper_bound: 30
+  #Time after which if a transaction hasn't been approved, we give up
+  measurement_lower_bound: 360

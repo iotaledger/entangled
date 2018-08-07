@@ -11,9 +11,12 @@ cc_library(
     include_prefix = "iota/tanglescope/common",
     visibility = ["//visibility:public"],
     deps = [
+        "//common/helpers",
+        "//common/trinary:tryte_long",
         "//cppclient:beast",
         "@com_github_google_glog//:glog",
         "@cppzmq",
+        "@iota_lib_cpp",
         "@libcuckoo",
         "@rxcpp",
         "@yaml_cpp",

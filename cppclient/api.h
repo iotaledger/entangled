@@ -91,7 +91,8 @@ class IotaAPI {
       const std::string& trunkTransaction, const std::string& branchTransaction,
       size_t minWeightMagnitude, const std::vector<std::string>& trytes) = 0;
 
-  virtual GetTransactionsToApproveResponse getTransactionsToApprove(
+  virtual nonstd::optional<GetTransactionsToApproveResponse>
+  getTransactionsToApprove(
       size_t depth, const nonstd::optional<std::string>& reference = {}) = 0;
 
   virtual bool storeTransactions(const std::vector<std::string>& trytes) = 0;

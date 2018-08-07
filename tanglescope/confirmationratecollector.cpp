@@ -1,0 +1,167 @@
+#include "tanglescope/confirmationratecollector.hpp"
+#include <glog/logging.h>
+#include <prometheus/exposer.h>
+#include <algorithm>
+#include <chrono>
+#include <cstring>
+#include <iostream>
+#include <iota/tanglescope/common/tangledb.hpp>
+#include <iota/tanglescope/common/txauxiliary.hpp>
+#include <iota/tanglescope/common/zmqpub.hpp>
+#include <thread>
+
+#include "tanglescope/confirmationratecollector.hpp"
+
+using namespace iota::tanglescope;
+
+std::map<std::string, std::string> CRCollector::nameToDescGauges = {
+    {CRCollector::CONFIRMATION_RATE_ZMQ,
+     "Confirmation rate ratio [0,1] as it is perceived by inspecting the zmq "
+     "stream"},
+    {CRCollector::CONFIRMATION_RATE_API,
+     "Confirmation rate ratio [0,1] as it is perceived by making api calls to "
+     "get inclusion state"}};
+
+bool CRCollector::parseConfiguration(const YAML::Node& conf) {
+  if (!ThrowCatchCollector::parseConfiguration(conf)) {
+    return false;
+  }
+  if (conf[MESAUREMENT_LOWER_BOUND] && conf[MESAUREMENT_UPPER_BOUND]) {
+    _measurementUpperBound = conf[MESAUREMENT_UPPER_BOUND].as<uint32_t>();
+    _measurementLowerBound = conf[MESAUREMENT_LOWER_BOUND].as<uint32_t>();
+    return true;
+  }
+  return false;
+}
+
+void CRCollector::doPeriodically() {
+  _collectorThread = std::move(rxcpp::schedulers::make_new_thread());
+  _collectorWorker = _collectorThread.create_worker();
+
+  _collectorWorker.schedule_periodically(
+      _collectorThread.now() + std::chrono::seconds(_measurementUpperBound),
+      std::chrono::seconds(_measurementUpperBound / 4), [this](auto scbl) {
+        auto task = boost::async(boost::launch::async,
+                                 [this]() { calcConfirmationRateAPICall(); });
+        _tasks.emplace_back(std::move(task));
+      });
+}
+
+void CRCollector::artificialyDelay() {
+  static uint16_t step = 0;
+  std::this_thread::sleep_for(
+      std::chrono::seconds((step++ % NUM_VARIANT_DELAYS) * DELAY_STEP_SECONDS));
+}
+void CRCollector::calcConfirmationRateAPICall() {
+  auto niOptional = _api->getNodeInfo();
+  if (!niOptional.has_value()) {
+    LOG(INFO) << __FUNCTION__ << " request failed.";
+    return;
+  }
+
+  auto ni = niOptional.value();
+  auto tips = std::vector<std::string>{ni.latestMilestone};
+  std::vector<std::string> transactions;
+
+  auto now = std::chrono::system_clock::now();
+  auto startTimepoint = now - std::chrono::seconds(_measurementUpperBound);
+  auto endTimepoint = now - std::chrono::seconds(_measurementLowerBound);
+
+  // We must copy here because the only way to unlock is via DTOR (until we move
+  // from libcukoo)
+  auto copiedTable = _hashToBroadcastTime;
+  auto lt = copiedTable.lock_table();
+  auto it = lt.begin();
+
+  while (it != lt.end()) {
+    if (it->second.tp < startTimepoint && it->second.tp > endTimepoint) {
+      transactions.push_back(it->first);
+    }
+    ++it;
+  }
+
+  if (transactions.empty()) {
+    return;
+  }
+
+  auto resp = _api->getInclusionStates(transactions, tips);
+  if (resp.error.has_value()) {
+    return;
+  }
+  std::set<std::string> confirmedTransactions;
+  uint32_t idx = 0;
+  std::copy_if(
+      transactions.begin(), transactions.end(),
+      std::inserter(confirmedTransactions, confirmedTransactions.begin()),
+      [&](const std::string& hash) { return resp.states[idx++]; });
+
+  calcAndExposeImpl(confirmedTransactions, CONFIRMATION_RATE_API);
+}
+
+using namespace prometheus;
+
+void CRCollector::subscribeToTransactions(
+    std::string zmqURL, const ThrowCatchCollector::ZmqObservable& zmqObservable,
+    std::shared_ptr<Registry> registry) {
+  _gauges = buildGaugeMap(registry, "confirmationratecollector",
+                          {{"listen_node", _iriHost}, {"zmq_url", zmqURL}},
+                          nameToDescGauges);
+
+  zmqObservable.observe_on(rxcpp::synchronize_new_thread())
+      .subscribe(
+          [&](std::shared_ptr<iri::IRIMessage> msg) {
+            if (msg->type() != iri::IRIMessageType::SN) return;
+            auto tx = std::static_pointer_cast<iri::SNMessage>(std::move(msg));
+            _confirmedTransactions.insert(tx->hash());
+            calcAndExposeImpl(_confirmedTransactions, CONFIRMATION_RATE_ZMQ);
+          },
+          []() {});
+}
+void CRCollector::calcAndExposeImpl(
+    const std::set<std::string>& confirmedTransactions,
+    const std::string label) {
+  auto now = std::chrono::system_clock::now();
+  auto ub = now - std::chrono::seconds(_measurementUpperBound);
+  auto lb = now - std::chrono::seconds(_measurementLowerBound);
+  // Map between POW duration (multiple of DELAY_STEP_SECONDS) to the
+  // confirmed txs count
+  std::map<uint32_t, double> durationToConfirmed;
+  std::map<uint32_t, double> durationToTotal;
+  double confirmedCount = 0;
+  double totalTransactionsCount = 0;
+
+  // Filter transactions that are too old
+  auto lt = _hashToBroadcastTime.lock_table();
+  auto it = lt.begin();
+  while (it != lt.end()) {
+    if (it->second.tp < ub && it->second.tp > lb) {
+      totalTransactionsCount += 1;
+      durationToTotal[it->second.msDuration / (DELAY_STEP_SECONDS * 1000)] += 1;
+      if (_confirmedTransactions.find(it->first) !=
+          _confirmedTransactions.end()) {
+        confirmedCount += 1;
+        durationToConfirmed[it->second.msDuration /
+                                (DELAY_STEP_SECONDS * 1000)] += 1;
+      }
+    }
+    it++;
+  }
+
+  for (auto kv : durationToTotal) {
+    double cr = 0;
+    if (durationToConfirmed.find(kv.first) != durationToConfirmed.end()) {
+      cr = durationToConfirmed[kv.first] / kv.second;
+    }
+    if (totalTransactionsCount > 0) {
+      _gauges.at(label)
+          .get()
+          .Add({{"pow_duration_group_seconds",
+                 std::to_string(kv.first * DELAY_STEP_SECONDS)}})
+          .Set(cr);
+    }
+  }
+}
+CRCollector::~CRCollector() {
+  _collectorWorker.unsubscribe();
+  std::for_each(_tasks.begin(), _tasks.end(), [&](auto& task) { task.wait(); });
+}
