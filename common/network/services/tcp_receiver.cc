@@ -46,8 +46,8 @@ void TcpConnection::start() {
 
 void TcpConnection::receive() {
   auto self(shared_from_this());
-  socket_.async_read_some(
-      boost::asio::buffer(packet_.content, TRANSACTION_PACKET_SIZE),
+  boost::asio::async_read(
+      socket_, boost::asio::buffer(packet_.content, TRANSACTION_PACKET_SIZE),
       [this, self](boost::system::error_code ec, std::size_t length) {
         if (!ec && length > 0) {
           handlePacket(length);
