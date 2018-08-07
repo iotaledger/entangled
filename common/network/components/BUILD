@@ -7,7 +7,7 @@ cc_library(
     deps = [
         "//common:thread_handle",
         "//common/network:logger",
-        "//common/network/queues:concurrent_queue_trit_array",
+        "//utils/containers/queues:concurrent_queue_trit_array",
     ],
 )
 
@@ -18,7 +18,7 @@ cc_library(
     deps = [
         "//common:thread_handle",
         "//common/network:logger",
-        "//common/network/queues:concurrent_queue_packet",
+        "//utils/containers/queues:concurrent_queue_packet",
     ],
 )
 
@@ -29,7 +29,7 @@ cc_library(
     deps = [
         "//common:thread_handle",
         "//common/network:logger",
-        "//common/network/queues:concurrent_queue_hash_request",
+        "//utils/containers/queues:concurrent_queue_hash_request",
     ],
 )
 
@@ -57,5 +57,5 @@ cc_library(
     name = "requester",
     srcs = ["requester.c"],
     hdrs = ["requester.h"],
-    deps = ["//common/network/queues:concurrent_queue_trit_array"],
+    deps = ["//utils/containers/queues:concurrent_queue_trit_array"],
 )

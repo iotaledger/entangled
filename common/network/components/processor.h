@@ -8,8 +8,8 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_PROCESSOR_H__
 #define __COMMON_NETWORK_COMPONENTS_PROCESSOR_H__
 
-#include "common/network/queues/concurrent_queue_packet.h"
 #include "common/thread_handle.h"
+#include "utils/containers/queues/concurrent_queue_packet.h"
 
 typedef concurrent_queue_of_iota_packet_t processor_queue_t;
 typedef struct node_s node_t;
