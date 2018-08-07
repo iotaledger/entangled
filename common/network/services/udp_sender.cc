@@ -25,7 +25,9 @@ bool udp_send(endpoint_t *const endpoint, trit_array_p const hash) {
         endpoint->opaque_inetaddr);
     boost::asio::ip::udp::endpoint destination(
         boost::asio::ip::address::from_string(endpoint->host), endpoint->port);
-    socket->send_to(boost::asio::buffer(trytes, trytes_num), destination);
+    socket->async_send_to(
+        boost::asio::buffer(trytes, trytes_num), destination,
+        [](const boost::system::error_code &, std::size_t) {});
   } catch (std::exception const &e) {
     log_error("Sending packet to udp://%s:%d failed: %s", endpoint->host,
               endpoint->port, e.what());
