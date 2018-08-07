@@ -5,12 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_CONCURRENT_QUEUE_HASH_REQUEST_H__
-#define __COMMON_NETWORK_CONCURRENT_QUEUE_HASH_REQUEST_H__
+#ifndef __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_HASH_REQUEST_H__
+#define __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_HASH_REQUEST_H__
 
 #include "common/network/neighbor.h"
-#include "common/network/queues/concurrent_queue.h.inc"
 #include "common/trinary/trit_array.h"
+#include "utils/containers//queues/concurrent_queue.h.inc"
 
 typedef struct {
   trit_array_p hash;
@@ -27,4 +27,4 @@ DECLARE_CONCURRENT_QUEUE_OF(hash_request_t);
 }
 #endif
 
-#endif  // __COMMON_NETWORK_CONCURRENT_QUEUE_HASH_REQUEST_H__
+#endif  // __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_HASH_REQUEST_H__

@@ -3,7 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "receiver_shared",
     hdrs = ["receiver.h"],
-    deps = ["//common/network/queues:concurrent_queue_packet"],
+    deps = ["//utils/containers/queues:concurrent_queue_packet"],
 )
 
 cc_library(
