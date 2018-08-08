@@ -6,8 +6,8 @@
  */
 
 #include "common/storage/connection.h"
-#include "common/logger_helper.h"
 #include "common/storage/sql/defs.h"
+#include "utils/logger_helper.h"
 
 #include <sqlite3.h>
 #include <stdint.h>

@@ -8,9 +8,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "common/logger_helper.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/sql/statements.h"
+#include "utils/logger_helper.h"
 
 #define SQL_STATEMENTS_ID "sql_statements"
 

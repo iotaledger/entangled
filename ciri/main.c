@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #include "ciri/node.h"
-#include "common/logger_helper.h"
+#include "utils/logger_helper.h"
 
 static node_t node_g;
 static char const main_logger[] = "main";

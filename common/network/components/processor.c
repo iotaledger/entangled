@@ -6,7 +6,7 @@
  */
 
 #include "common/network/components/processor.h"
-#include "common/logger_helper.h"
+#include "utils/logger_helper.h"
 
 static char const processor_component_logger[] = "processor_component";
 

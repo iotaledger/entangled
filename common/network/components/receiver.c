@@ -7,7 +7,7 @@
 
 #include "common/network/components/receiver.h"
 #include "ciri/node.h"
-#include "common/logger_helper.h"
+#include "utils/logger_helper.h"
 
 static char const receiver_component_logger[] = "receiver_component";
 

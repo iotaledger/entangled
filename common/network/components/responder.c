@@ -6,7 +6,7 @@
  */
 
 #include "common/network/components/responder.h"
-#include "common/logger_helper.h"
+#include "utils/logger_helper.h"
 
 static char const responder_component_logger[] = "responder_component";
 

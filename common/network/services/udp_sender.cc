@@ -7,8 +7,8 @@
 
 #include <boost/asio.hpp>
 
-#include "common/logger_helper.h"
 #include "common/network/services/udp_sender.hpp"
+#include "utils/logger_helper.h"
 
 bool udp_send(endpoint_t *const endpoint, trit_array_p const hash) {
   if (endpoint == NULL || endpoint->opaque_inetaddr == NULL) {

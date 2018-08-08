@@ -7,7 +7,7 @@
 
 #include "common/network/components/broadcaster.h"
 #include "ciri/node.h"
-#include "common/logger_helper.h"
+#include "utils/logger_helper.h"
 
 static char const broadcaster_component_logger[] = "broadcaster_component";
 

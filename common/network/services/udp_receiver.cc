@@ -7,8 +7,8 @@
 
 #include "common/network/services/udp_receiver.hpp"
 #include "ciri/node.h"
-#include "common/logger_helper.h"
 #include "common/network/neighbor.h"
+#include "utils/logger_helper.h"
 
 static char const udp_receiver_service_logger[] = "udp_receiver_service";
 
