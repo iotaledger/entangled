@@ -15,7 +15,7 @@ bool tcp_send(endpoint_t *const endpoint, trit_array_p const hash) {
     return false;
   }
   size_t trytes_num = num_trytes_for_trits(hash->num_trits);
-  trit_t trytes[trytes_num];
+  tryte_t trytes[trytes_num];
   if (flex_trit_to_tryte(trytes, trytes_num, hash->trits, hash->num_trits,
                          hash->num_trits) == 0) {
     return false;
