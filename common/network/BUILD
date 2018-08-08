@@ -12,13 +12,6 @@ cc_library(
 )
 
 cc_library(
-    name = "logger",
-    srcs = ["logger.c"],
-    hdrs = ["logger.h"],
-    deps = ["//utils/handles:lock"],
-)
-
-cc_library(
     name = "uri_parser",
     srcs = ["uri_parser.c"],
     hdrs = ["uri_parser.h"],
