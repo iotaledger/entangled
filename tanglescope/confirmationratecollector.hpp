@@ -26,10 +26,11 @@ class CRCollector : public ThrowCatchCollector {
   constexpr static auto MESAUREMENT_LOWER_BOUND = "measurement_lower_bound";
   constexpr static auto CONFIRMATION_RATE_ZMQ = "confirmation_rate_zmq";
   constexpr static auto CONFIRMATION_RATE_API = "confirmation_rate_api";
-
-  constexpr static uint8_t NUM_VARIANT_DELAYS = 3;
-  constexpr static uint8_t MIN_NUM_TRANSACTIONS_TO_REPORT_CR = 2;
-  constexpr static uint32_t DELAY_STEP_SECONDS = 5;
+  constexpr static auto ENABLE_CR_FROM_API = "enable_cr_from_api";
+  constexpr static auto ADDITIONAL_LATENCY_STEP_SECONDS =
+      "additional_latency_step_seconds";
+  constexpr static auto ADDITIONAL_LATENCY_NUM_STEPS =
+      "additional_latency_num_steps";
 
   bool parseConfiguration(const YAML::Node& conf) override;
 
@@ -60,6 +61,9 @@ class CRCollector : public ThrowCatchCollector {
   rxcpp::schedulers::scheduler _collectorThread;
   rxcpp::schedulers::worker _collectorWorker;
   std::vector<boost::future<void>> _tasks;
+  bool _enableApi;
+  uint32_t _addtionalLatencyStepSeconds;
+  uint32_t _addtionalLatencyNumSteps;
 };
 
 }  // namespace tanglescope

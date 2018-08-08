@@ -26,15 +26,23 @@ bool CRCollector::parseConfiguration(const YAML::Node& conf) {
   if (!ThrowCatchCollector::parseConfiguration(conf)) {
     return false;
   }
-  if (conf[MESAUREMENT_LOWER_BOUND] && conf[MESAUREMENT_UPPER_BOUND]) {
+  if (conf[MESAUREMENT_LOWER_BOUND] && conf[MESAUREMENT_UPPER_BOUND] &&
+      conf[ENABLE_CR_FROM_API] && conf[ADDITIONAL_LATENCY_STEP_SECONDS] &&
+      conf[ADDITIONAL_LATENCY_NUM_STEPS]) {
     _measurementUpperBound = conf[MESAUREMENT_UPPER_BOUND].as<uint32_t>();
     _measurementLowerBound = conf[MESAUREMENT_LOWER_BOUND].as<uint32_t>();
+    _enableApi = conf[ENABLE_CR_FROM_API].as<bool>();
+    _addtionalLatencyStepSeconds =
+        conf[ADDITIONAL_LATENCY_STEP_SECONDS].as<uint32_t>();
+    _addtionalLatencyNumSteps =
+        conf[ADDITIONAL_LATENCY_NUM_STEPS].as<uint32_t>();
     return true;
   }
   return false;
 }
 
 void CRCollector::doPeriodically() {
+  if (!_enableApi) return;
   _collectorThread = std::move(rxcpp::schedulers::make_new_thread());
   _collectorWorker = _collectorThread.create_worker();
 
@@ -49,8 +57,10 @@ void CRCollector::doPeriodically() {
 
 void CRCollector::artificialyDelay() {
   static uint16_t step = 0;
-  std::this_thread::sleep_for(
-      std::chrono::seconds((step++ % NUM_VARIANT_DELAYS) * DELAY_STEP_SECONDS));
+  if (_addtionalLatencyStepSeconds > 0) {
+    std::this_thread::sleep_for(std::chrono::seconds(
+        (step++ % _addtionalLatencyNumSteps) * _addtionalLatencyStepSeconds));
+  }
 }
 void CRCollector::calcConfirmationRateAPICall() {
   auto niOptional = _api->getNodeInfo();
@@ -136,12 +146,13 @@ void CRCollector::calcAndExposeImpl(
   while (it != lt.end()) {
     if (it->second.tp < ub && it->second.tp > lb) {
       totalTransactionsCount += 1;
-      durationToTotal[it->second.msDuration / (DELAY_STEP_SECONDS * 1000)] += 1;
+      durationToTotal[it->second.msDuration /
+                      (_addtionalLatencyStepSeconds * 1000)] += 1;
       if (_confirmedTransactions.find(it->first) !=
           _confirmedTransactions.end()) {
         confirmedCount += 1;
         durationToConfirmed[it->second.msDuration /
-                                (DELAY_STEP_SECONDS * 1000)] += 1;
+                            (_addtionalLatencyStepSeconds * 1000)] += 1;
       }
     }
     it++;
@@ -156,7 +167,7 @@ void CRCollector::calcAndExposeImpl(
       _gauges.at(label)
           .get()
           .Add({{"pow_duration_group_seconds",
-                 std::to_string(kv.first * DELAY_STEP_SECONDS)}})
+                 std::to_string(kv.first * _addtionalLatencyStepSeconds)}})
           .Set(cr);
     }
   }
