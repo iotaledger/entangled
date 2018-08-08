@@ -5,13 +5,13 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_CONCURRENT_QUEUE_H__
-#define __COMMON_NETWORK_CONCURRENT_QUEUE_H__
+#ifndef __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_H__
+#define __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_H__
 
 #include <stdbool.h>
 
-#include "common/cond_handle.h"
-#include "common/lock_handle.h"
+#include "utils/handles/cond.h"
+#include "utils/handles/lock.h"
 
 typedef enum concurrent_queue_status_e {
   CONCURRENT_QUEUE_SUCCESS,
@@ -164,4 +164,4 @@ typedef enum concurrent_queue_status_e {
   DECLARE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE)    \
   DECLARE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE)
 
-#endif  // __COMMON_NETWORK_CONCURRENT_QUEUE_H__
+#endif  // __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_H__

@@ -7,8 +7,8 @@
 
 #include <unity/unity.h>
 
-#include "common/network/lists/concurrent_list.c.inc"
-#include "common/network/lists/concurrent_list.h.inc"
+#include "utils/containers/lists/concurrent_list.c.inc"
+#include "utils/containers/lists/concurrent_list.h.inc"
 
 DECLARE_CONCURRENT_LIST_OF(int)
 DEFINE_CONCURRENT_LIST_OF(int)

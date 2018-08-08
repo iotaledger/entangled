@@ -7,8 +7,8 @@
 
 #include <unity/unity.h>
 
-#include "common/network/queues/concurrent_queue.c.inc"
-#include "common/network/queues/concurrent_queue.h.inc"
+#include "utils/containers/queues/concurrent_queue.c.inc"
+#include "utils/containers/queues/concurrent_queue.h.inc"
 
 DECLARE_CONCURRENT_QUEUE_OF(int)
 DEFINE_CONCURRENT_QUEUE_OF(int)

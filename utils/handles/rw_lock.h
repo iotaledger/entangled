@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef COMMON_RW_LOCK_HANDLE_H_
-#define COMMON_RW_LOCK_HANDLE_H_
+#ifndef __UTILS_HANDLES_RW_LOCK_H__
+#define __UTILS_HANDLES_RW_LOCK_H__
 
 /**
  * We define a type rw_lock_handle_t mapping to a system available read/write
@@ -93,4 +93,4 @@ static inline int rw_lock_handle_unlock(rw_lock_handle_t* const lock);
  */
 static inline int rw_lock_handle_destroy(rw_lock_handle_t* const lock);
 
-#endif  // COMMON_RW_LOCK_HANDLE_H_
+#endif  // __UTILS_HANDLES_RW_LOCK_H__

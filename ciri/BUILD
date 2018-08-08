@@ -15,7 +15,7 @@ cc_library(
         "//common/network/components:receiver_shared",
         "//common/network/components:requester",
         "//common/network/components:responder",
-        "//common/network/lists:concurrent_list_neighbor",
+        "//utils/containers/lists:concurrent_list_neighbor",
     ],
 )
 

@@ -13,7 +13,7 @@
 #include "common/network/components/receiver.h"
 #include "common/network/components/requester.h"
 #include "common/network/components/responder.h"
-#include "common/network/lists/concurrent_list_neighbor.h"
+#include "utils/containers/lists/concurrent_list_neighbor.h"
 
 typedef concurrent_list_of_neighbor_t neighbors_list_t;
 

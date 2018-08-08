@@ -5,11 +5,11 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_CONCURRENT_LIST_NEIGHBOR_H__
-#define __COMMON_NETWORK_CONCURRENT_LIST_NEIGHBOR_H__
+#ifndef __UTILS_CONTAINERS_LISTS_CONCURRENT_LIST_NEIGHBOR_H__
+#define __UTILS_CONTAINERS_LISTS_CONCURRENT_LIST_NEIGHBOR_H__
 
-#include "common/network/lists/concurrent_list.h.inc"
 #include "common/network/neighbor.h"
+#include "utils/containers/lists/concurrent_list.h.inc"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,4 +32,4 @@ neighbor_t *neighbor_find_by_values(neighbors_list_t *const neighbors,
 }
 #endif
 
-#endif  // __COMMON_NETWORK_CONCURRENT_LIST_NEIGHBOR_H__
+#endif  // __UTILS_CONTAINERS_LISTS_CONCURRENT_LIST_NEIGHBOR_H__

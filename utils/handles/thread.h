@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef COMMON_THREAD_HANDLE_H_
-#define COMMON_THREAD_HANDLE_H_
+#ifndef __UTILS_HANDLES_THREAD_H__
+#define __UTILS_HANDLES_THREAD_H__
 
 /**
  * We define a type thread_handle_t mapping to a system available thread
@@ -61,4 +61,4 @@ static inline int thread_handle_create(thread_handle_t *const thread,
  */
 static inline int thread_handle_join(thread_handle_t thread, void **status);
 
-#endif  // COMMON_THREAD_HANDLE_H_
+#endif  // __UTILS_HANDLES_THREAD_H__

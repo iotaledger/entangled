@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef COMMON_COND_HANDLE_H_
-#define COMMON_COND_HANDLE_H_
+#ifndef __UTILS_HANDLES_COND_H__
+#define __UTILS_HANDLES_COND_H__
 
 /**
  * We define a type cond_handle_t mapping to a system available condition
@@ -16,7 +16,7 @@
 
 #include <unistd.h>
 
-#include "lock_handle.h"
+#include "utils/handles/lock.h"
 
 #ifdef _POSIX_THREADS
 
@@ -122,4 +122,4 @@ static inline int cond_handle_timedwait(cond_handle_t* const cond,
  */
 static inline int cond_handle_destroy(cond_handle_t* const cond);
 
-#endif  // COMMON_COND_HANDLE_H_
+#endif  // __UTILS_HANDLES_COND_H__

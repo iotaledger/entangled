@@ -5,12 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_CONCURRENT_LIST_H__
-#define __COMMON_NETWORK_CONCURRENT_LIST_H__
+#ifndef __UTILS_CONTAINERS_LISTS_CONCURRENT_LIST_H__
+#define __UTILS_CONTAINERS_LISTS_CONCURRENT_LIST_H__
 
 #include <stdbool.h>
 
-#include "common/lock_handle.h"
+#include "utils/handles/lock.h"
 
 typedef enum concurrent_list_status_e {
   CONCURRENT_LIST_SUCCESS,
@@ -233,4 +233,4 @@ typedef enum concurrent_list_status_e {
   DECLARE_FUNCTION_CONTAINS_CONCURRENT_LIST_OF(TYPE)   \
   DECLARE_FUNCTION_REMOVE_CONCURRENT_LIST_OF(TYPE)
 
-#endif  // __COMMON_NETWORK_CONCURRENT_LIST_H__
+#endif  // __UTILS_CONTAINERS_LISTS_CONCURRENT_LIST_H__

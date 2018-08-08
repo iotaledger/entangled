@@ -5,11 +5,11 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_CONCURRENT_QUEUE_TRIT_ARRAY_H__
-#define __COMMON_NETWORK_CONCURRENT_QUEUE_TRIT_ARRAY_H__
+#ifndef __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_TRIT_ARRAY_H__
+#define __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_TRIT_ARRAY_H__
 
-#include "common/network/queues/concurrent_queue.h.inc"
 #include "common/trinary/trit_array.h"
+#include "utils/containers/queues/concurrent_queue.h.inc"
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,4 +21,4 @@ DECLARE_CONCURRENT_QUEUE_OF(trit_array_p);
 }
 #endif
 
-#endif  // __COMMON_NETWORK_CONCURRENT_QUEUE_TRIT_ARRAY_H__
+#endif  // __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_TRIT_ARRAY_H__
