@@ -7,7 +7,7 @@
 
 #include "common/network/components/broadcaster.h"
 #include "ciri/node.h"
-#include "common/network/logger.h"
+#include "common/logger_helper.h"
 
 static void *broadcaster_routine(broadcaster_state_t *const state) {
   trit_array_p hash;

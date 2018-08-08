@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #include "ciri/node.h"
-#include "common/network/logger.h"
+#include "common/logger_helper.h"
 
 static node_t node_g;
 

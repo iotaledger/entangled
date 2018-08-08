@@ -6,7 +6,7 @@
  */
 
 #include "ciri/node.h"
-#include "common/network/logger.h"
+#include "common/logger_helper.h"
 
 // TODO(thibault) configuration variable
 static uint16_t tcp_port_g = 14260;

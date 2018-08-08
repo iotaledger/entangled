@@ -6,7 +6,7 @@
  */
 
 #include "common/network/neighbor.h"
-#include "common/network/logger.h"
+#include "common/logger_helper.h"
 #include "common/network/services/tcp_sender.hpp"
 #include "common/network/services/udp_sender.hpp"
 #include "common/network/uri_parser.h"

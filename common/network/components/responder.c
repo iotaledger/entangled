@@ -6,7 +6,7 @@
  */
 
 #include "common/network/components/responder.h"
-#include "common/network/logger.h"
+#include "common/logger_helper.h"
 
 static void *responder_routine(responder_state_t *const state) {
   hash_request_t request;

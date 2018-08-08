@@ -7,7 +7,7 @@
 
 #include "common/network/components/receiver.h"
 #include "ciri/node.h"
-#include "common/network/logger.h"
+#include "common/logger_helper.h"
 
 bool receiver_init(receiver_state_t *const state, node_t *const node,
                    uint16_t tcp_port, uint16_t udp_port) {

@@ -7,7 +7,7 @@
 
 #include "common/network/services/udp_receiver.hpp"
 #include "ciri/node.h"
-#include "common/network/logger.h"
+#include "common/logger_helper.h"
 #include "common/network/neighbor.h"
 
 UdpReceiverService::UdpReceiverService(receiver_service_t* const service,

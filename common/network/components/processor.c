@@ -6,7 +6,7 @@
  */
 
 #include "common/network/components/processor.h"
-#include "common/network/logger.h"
+#include "common/logger_helper.h"
 
 static void *processor_routine(processor_state_t *const state) {
   iota_packet_t packet;

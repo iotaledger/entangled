@@ -7,7 +7,7 @@
 
 #include <boost/asio.hpp>
 
-#include "common/network/logger.h"
+#include "common/logger_helper.h"
 #include "common/network/services/udp_sender.hpp"
 
 bool udp_send(endpoint_t *const endpoint, trit_array_p const hash) {
