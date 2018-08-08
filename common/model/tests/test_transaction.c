@@ -1619,7 +1619,10 @@ void test_reset(void) {
   iota_transaction_t transaction = transaction_new();
   transaction_reset(transaction);
   TEST_ASSERT_EQUAL_INT8(0, transaction->address[0]);
-  TEST_ASSERT_EQUAL_MEMORY("999999999999999999999999999", transaction->obsolete_tag, sizeof(transaction->obsolete_tag));
+  flex_trit_t obsolete_tag[sizeof(transaction->obsolete_tag)];
+  memset(obsolete_tag, FLEX_TRIT_NULL_VALUE, sizeof(transaction->obsolete_tag));
+  TEST_ASSERT_EQUAL_MEMORY(obsolete_tag, transaction->obsolete_tag,
+                           sizeof(transaction->obsolete_tag));
   transaction_free(transaction);
 }
 

@@ -19,8 +19,8 @@ void test_identity(tryte_t const* const trytes) {
   trytes_to_trits((tryte_t*)trytes, trits_in, TRYTE_LENGTH);
   trits_in[TRIT_LENGTH - 1] = 0;
 
-  trits_to_bytes(trits_in, bytes);
-  bytes_to_trits(bytes, trits_out);
+  convert_trits_to_bytes(trits_in, bytes);
+  convert_bytes_to_trits(bytes, trits_out);
 
   TEST_ASSERT_EQUAL_MEMORY(trits_in, trits_out, TRIT_LENGTH * sizeof(trit_t));
 }
@@ -31,7 +31,7 @@ void bt(uint8_t const* const bytes_in, tryte_t const* const expected) {
   tryte_t trytes[TRYTE_LENGTH] = {0};
 
   memcpy(bytes, bytes_in, BYTE_LENGTH);
-  bytes_to_trits(bytes, trits);
+  convert_bytes_to_trits(bytes, trits);
   trits_to_trytes(trits, trytes, TRIT_LENGTH);
 
   TEST_ASSERT_EQUAL_MEMORY(trytes, expected, TRYTE_LENGTH * sizeof(tryte_t));
@@ -47,10 +47,10 @@ void test_trits_all_bytes(void) {
 
   for (i = 0; i < 256; i++) {
     memset(bytes, i, BYTE_LENGTH);
-    bytes_to_trits(bytes, trits);
+    convert_bytes_to_trits(bytes, trits);
     trits_to_trytes(trits, trytes, TRIT_LENGTH);
-    trits_to_bytes(trits, bytes);
-    bytes_to_trits(bytes, norm_trits);
+    convert_trits_to_bytes(trits, bytes);
+    convert_bytes_to_trits(bytes, norm_trits);
     trits_to_trytes(norm_trits, trytes, TRIT_LENGTH);
 
     TEST_ASSERT_EQUAL_MEMORY(trits, norm_trits, TRIT_LENGTH * sizeof(trit_t));
