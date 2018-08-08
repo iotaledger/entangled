@@ -248,9 +248,9 @@ TEST(KerlTest, testFlexAddressGeneration) {
   flex_trit_t* out_2 = iota_flex_sign_address_gen(SEED, 2, 2);
   flex_trit_t* out_3 = iota_flex_sign_address_gen(SEED, 2, 3);
 
-  EXPECT_TRUE(std::memcmp(out_1, EX_ADD_0_1, sizeof(EX_ADD_0_1)) == 0);
-  EXPECT_TRUE(std::memcmp(out_2, EX_ADD_2_2, sizeof(EX_ADD_2_2)) == 0);
-  EXPECT_TRUE(std::memcmp(out_3, EX_ADD_2_3, sizeof(EX_ADD_2_3)) == 0);
+  EXPECT_TRUE(memcmp(out_1, EX_ADD_0_1, sizeof(EX_ADD_0_1)) == 0);
+  EXPECT_TRUE(memcmp(out_2, EX_ADD_2_2, sizeof(EX_ADD_2_2)) == 0);
+  EXPECT_TRUE(memcmp(out_3, EX_ADD_2_3, sizeof(EX_ADD_2_3)) == 0);
 
   free(out_1);
   free(out_2);
@@ -1534,7 +1534,7 @@ TEST(KerlTest, testFlexSignature) {
 #endif
   flex_trit_t* out_1 = iota_flex_sign_signature_gen(SEED, 2, 2, SEED);
 
-  EXPECT_TRUE(std::memcmp(out_1, EX, sizeof(EX)) == 0);
+  EXPECT_TRUE(memcmp(out_1, EX, sizeof(EX)) == 0);
 
   free(out_1);
 }
