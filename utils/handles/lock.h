@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef COMMON_LOCK_HANDLE_H_
-#define COMMON_LOCK_HANDLE_H_
+#ifndef __UTILS_HANDLES_LOCK_H__
+#define __UTILS_HANDLES_LOCK_H__
 
 /**
  * We define a type lock_handle_t mapping to a system available lock primitive
@@ -80,4 +80,4 @@ static inline int lock_handle_unlock(lock_handle_t* const lock);
  */
 static inline int lock_handle_destroy(lock_handle_t* const lock);
 
-#endif  // COMMON_LOCK_HANDLE_H_
+#endif  // __UTILS_HANDLES_LOCK_H__

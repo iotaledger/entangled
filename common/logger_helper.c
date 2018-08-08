@@ -9,7 +9,7 @@
 #include <time.h>
 
 #include "common/logger_helper.h"
-#include "common/lock_handle.h"
+#include "utils/handles/lock.h"
 
 static lock_handle_t lock;
 

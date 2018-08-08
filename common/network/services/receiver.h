@@ -8,8 +8,8 @@
 #ifndef __COMMON_NETWORK_SERVICES_RECEIVER_H__
 #define __COMMON_NETWORK_SERVICES_RECEIVER_H__
 
-#include "common/thread_handle.h"
 #include "utils/containers/queues/concurrent_queue_packet.h"
+#include "utils/handles/thread.h"
 
 typedef concurrent_queue_of_iota_packet_t receive_queue_t;
 typedef struct receiver_state_s receiver_state_t;

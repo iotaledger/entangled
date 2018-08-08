@@ -10,7 +10,7 @@
 
 #include <stdbool.h>
 
-#include "common/lock_handle.h"
+#include "utils/handles/lock.h"
 
 typedef enum concurrent_list_status_e {
   CONCURRENT_LIST_SUCCESS,

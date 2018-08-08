@@ -10,8 +10,8 @@
 
 #include <stdbool.h>
 
-#include "common/cond_handle.h"
-#include "common/lock_handle.h"
+#include "utils/handles/cond.h"
+#include "utils/handles/lock.h"
 
 typedef enum concurrent_queue_status_e {
   CONCURRENT_QUEUE_SUCCESS,

@@ -4,7 +4,7 @@ cc_library(
     name = "concurrent_list",
     srcs = ["concurrent_list.c.inc"],
     hdrs = ["concurrent_list.h.inc"],
-    deps = ["//common:lock_handle"],
+    deps = ["//utils/handles:lock"],
 )
 
 cc_library(
