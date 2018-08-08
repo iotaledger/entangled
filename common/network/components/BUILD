@@ -66,5 +66,8 @@ cc_library(
     name = "requester",
     srcs = ["requester.c"],
     hdrs = ["requester.h"],
-    deps = ["//utils/containers/queues:concurrent_queue_trit_array"],
+    deps = [
+        "//utils:logger_helper",
+        "//utils/containers/queues:concurrent_queue_trit_array",
+    ],
 )

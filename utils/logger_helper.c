@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "common/logger_helper.h"
 #include "utils/handles/lock.h"
+#include "utils/logger_helper.h"
 
 static lock_handle_t lock;
 
