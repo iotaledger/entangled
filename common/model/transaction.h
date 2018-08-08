@@ -204,6 +204,8 @@ flex_trit_t *transaction_hash(iota_transaction_t transaction);
 void transaction_set_hash(iota_transaction_t transaction,
                           const flex_trit_t *hash);
 
+void transaction_reset(iota_transaction_t transaction);
+
 /***********************************************************************************************************
  * Constructors
  ***********************************************************************************************************/
