@@ -21,9 +21,8 @@ void logger_helper_init(const char* const logger_id, logger_level_t level,
   id = logger_id_request(logger_id);
   logger_id_enable(id);
   logger_id_level_set(id, level);
-  logger_id_prefix_set(
-      id, (LOGGER_PFX_DATE | LOGGER_PFX_NAME | LOGGER_PFX_LEVEL |
-           LOGGER_PFX_FILE | LOGGER_PFX_FUNCTION | LOGGER_PFX_LINE));
+  logger_id_prefix_set(id,
+                       (LOGGER_PFX_DATE | LOGGER_PFX_NAME | LOGGER_PFX_LEVEL));
   if (enable_color) {
     logger_color_prefix_enable();
     logger_color_message_enable();

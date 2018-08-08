@@ -10,6 +10,8 @@
 #include "common/logger_helper.h"
 #include "common/network/neighbor.h"
 
+static char const tcp_receiver_service_logger[] = "tcp_receiver_service";
+
 /*
  * TcpConnection
  */
@@ -20,7 +22,8 @@ TcpConnection::TcpConnection(receiver_service_t* const service,
 
 TcpConnection::~TcpConnection() {
   if (neighbor_ != NULL) {
-    log_info("Connection lost with tethered neighbor tcp://%s:%d",
+    log_info(tcp_receiver_service_logger,
+             "Connection lost with tethered neighbor tcp://%s:%d\n",
              socket_.remote_endpoint().address().to_string().c_str(),
              socket_.remote_endpoint().port());
     neighbor_->endpoint.opaque_inetaddr = NULL;
@@ -34,11 +37,13 @@ void TcpConnection::start() {
   neighbor_ = neighbor_find_by_values(service_->state->node->neighbors,
                                       PROTOCOL_TCP, host, port);
   if (neighbor_ == NULL) {
-    log_info("Connection denied with non-tethered neighbor tcp://%s:%d", host,
+    log_info(tcp_receiver_service_logger,
+             "Connection denied with non-tethered neighbor tcp://%s:%d\n", host,
              port);
     return;
   }
-  log_info("Connection accepted with tethered neighbor tcp://%s:%d", host,
+  log_info(tcp_receiver_service_logger,
+           "Connection accepted with tethered neighbor tcp://%s:%d\n", host,
            port);
   neighbor_->endpoint.opaque_inetaddr = &socket_;
   receive();
@@ -63,7 +68,8 @@ bool TcpConnection::handlePacket(std::size_t const length) {
   receiver_service_prepare_packet(
       &packet_, length, socket_.remote_endpoint().address().to_string().c_str(),
       socket_.remote_endpoint().port(), PROTOCOL_TCP);
-  log_debug("Packet received from tethered neighbor tcp://%s:%d",
+  log_debug(tcp_receiver_service_logger,
+            "Packet received from tethered neighbor tcp://%s:%d\n",
             &packet_.source.host, packet_.source.port);
   if (service_->queue->vtable->push(service_->queue, packet_) !=
       CONCURRENT_QUEUE_SUCCESS) {
@@ -82,8 +88,13 @@ TcpReceiverService::TcpReceiverService(receiver_service_t* const service,
     : service_(service),
       acceptor_(context, boost::asio::ip::tcp::endpoint(
                              boost::asio::ip::tcp::v4(), port)) {
+  logger_helper_init(tcp_receiver_service_logger, LOGGER_DEBUG, true);
   acceptor_.set_option(boost::asio::socket_base::reuse_address(true));
   accept();
+}
+
+TcpReceiverService::~TcpReceiverService() {
+  logger_helper_destroy(tcp_receiver_service_logger);
 }
 
 void TcpReceiverService::accept() {

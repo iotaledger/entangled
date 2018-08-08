@@ -9,11 +9,14 @@
 #include "ciri/node.h"
 #include "common/logger_helper.h"
 
+static char const receiver_component_logger[] = "receiver_component";
+
 bool receiver_init(receiver_state_t *const state, node_t *const node,
                    uint16_t tcp_port, uint16_t udp_port) {
   if (state == NULL || node == NULL) {
     return false;
   }
+  logger_helper_init(receiver_component_logger, LOGGER_DEBUG, true);
   if (node->processor.queue == NULL) {
     return false;
   }
@@ -38,22 +41,22 @@ bool receiver_start(receiver_state_t *const state) {
   }
   state->running = true;
   if (state->tcp_service.port != 0) {
-    log_info("Spawning TCP receiver thread with port %d",
-             state->tcp_service.port);
+    log_info(receiver_component_logger, "Spawning TCP receiver thread\n");
     if (thread_handle_create(&state->tcp_service.thread,
                              (thread_routine_t)receiver_service_start,
                              &state->tcp_service) != 0) {
-      log_fatal("Spawning TCP receiver thread failed", state->tcp_service.port);
+      log_critical(receiver_component_logger,
+                   "Spawning TCP receiver thread failed");
       return false;
     }
   }
   if (state->udp_service.port != 0) {
-    log_info("Spawning UDP receiver thread with port %d",
-             state->udp_service.port);
+    log_info(receiver_component_logger, "Spawning UDP receiver thread\n");
     if (thread_handle_create(&state->udp_service.thread,
                              (thread_routine_t)receiver_service_start,
                              &state->udp_service) != 0) {
-      log_info("Spawning UDP receiver thread failed", state->udp_service.port);
+      log_critical(receiver_component_logger,
+                   "Spawning UDP receiver thread failed\n");
       return false;
     }
   }
@@ -61,19 +64,26 @@ bool receiver_start(receiver_state_t *const state) {
 }
 
 bool receiver_stop(receiver_state_t *const state) {
+  bool ret = true;
+
   if (state == NULL) {
     return false;
   }
   state->running = false;
-  log_info("Shutting down TCP receiver thread");
-  receiver_service_stop(&state->tcp_service);
-  if (thread_handle_join(state->tcp_service.thread, NULL) != 0) {
-    return false;
+  log_info(receiver_component_logger, "Shutting down TCP receiver thread");
+  if (receiver_service_stop(&state->tcp_service) == false ||
+      thread_handle_join(state->tcp_service.thread, NULL) != 0) {
+    log_error(receiver_component_logger,
+              "Shutting down TCP receiver thread failed");
+    ret = false;
   }
-  log_info("Shutting down UDP receiver thread");
-  receiver_service_stop(&state->udp_service);
-  if (thread_handle_join(state->udp_service.thread, NULL) != 0) {
-    return false;
+  log_info(receiver_component_logger, "Shutting down UDP receiver thread");
+  if (receiver_service_stop(&state->udp_service) == false ||
+      thread_handle_join(state->udp_service.thread, NULL) != 0) {
+    log_error(receiver_component_logger,
+              "Shutting down UDP receiver thread failed");
+    ret = false;
   }
-  return true;
+  logger_helper_destroy(receiver_component_logger);
+  return ret;
 }

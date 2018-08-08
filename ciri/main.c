@@ -11,16 +11,23 @@
 #include "common/logger_helper.h"
 
 static node_t node_g;
+static char const main_logger[] = "main";
 
 int main() {
-  logger_init(LOG_DEBUG, false, stdout);
+  if (LOGGER_VERSION != logger_version()) {
+    return EXIT_FAILURE;
+  }
+  logger_init();
+  logger_output_register(stdout);
+  logger_output_level_set(stdout, LOGGER_DEBUG);
+  logger_helper_init(main_logger, LOGGER_DEBUG, true);
 
-  log_info("Initializing cIRI node");
+  log_info(main_logger, "Initializing cIRI node\n");
   if (node_init(&node_g) == false) {
     return EXIT_FAILURE;
   }
 
-  log_info("Starting cIRI node");
+  log_info(main_logger, "Starting cIRI node\n");
   if (node_start(&node_g) == false) {
     return EXIT_FAILURE;
   }
@@ -40,12 +47,12 @@ int main() {
     sleep(1);
   }
 
-  log_info("Stopping cIRI node");
+  log_info(main_logger, "Stopping cIRI node\n");
   if (node_stop(&node_g) == false) {
     return EXIT_FAILURE;
   }
 
-  log_info("Destroying cIRI node");
+  log_info(main_logger, "Destroying cIRI node\n");
   if (node_destroy(&node_g) == false) {
     return EXIT_FAILURE;
   }

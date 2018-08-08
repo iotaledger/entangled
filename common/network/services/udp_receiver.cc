@@ -10,13 +10,20 @@
 #include "common/logger_helper.h"
 #include "common/network/neighbor.h"
 
+static char const udp_receiver_service_logger[] = "udp_receiver_service";
+
 UdpReceiverService::UdpReceiverService(receiver_service_t* const service,
                                        boost::asio::io_context& context,
                                        uint16_t const port)
     : service_(service),
       socket_(context, boost::asio::ip::udp::endpoint(
                            boost::asio::ip::udp::v4(), port)) {
+  logger_helper_init(udp_receiver_service_logger, LOGGER_DEBUG, true);
   receive();
+}
+
+UdpReceiverService::~UdpReceiverService() {
+  logger_helper_destroy(udp_receiver_service_logger);
 }
 
 void UdpReceiverService::receive() {
@@ -30,7 +37,8 @@ void UdpReceiverService::receive() {
           neighbor_t* neighbor = neighbor_find_by_values(
               service_->state->node->neighbors, PROTOCOL_UDP, host, port);
           if (neighbor == NULL) {
-            log_debug("Packet denied from non-tethered neighbor udp://%s:%d",
+            log_debug(udp_receiver_service_logger,
+                      "Packet denied from non-tethered neighbor udp://%s:%d\n",
                       host, port);
           } else {
             neighbor->endpoint.opaque_inetaddr = &socket_;
@@ -48,7 +56,8 @@ bool UdpReceiverService::handlePacket(std::size_t const length) {
   receiver_service_prepare_packet(&packet_, length,
                                   senderEndpoint_.address().to_string().c_str(),
                                   senderEndpoint_.port(), PROTOCOL_UDP);
-  log_debug("Packet received from tethered neighbor udp://%s:%d",
+  log_debug(udp_receiver_service_logger,
+            "Packet received from tethered neighbor udp://%s:%d\n",
             &packet_.source.host, packet_.source.port);
   if (service_->queue->vtable->push(service_->queue, packet_) !=
       CONCURRENT_QUEUE_SUCCESS) {

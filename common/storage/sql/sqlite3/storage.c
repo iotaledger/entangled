@@ -39,8 +39,7 @@ int select_transactions_cb(void* txs, int num_cols, char** col_values,
   iota_transactions_pack* pack;
 
   if (num_cols != NUM_COLS) {
-    logger_helper_print(SQLITE3_LOGGER_ID, LOGGER_ERR,
-                        "Failed to retrieve columns");
+    log_error(SQLITE3_LOGGER_ID, "Failed to retrieve columns");
     return RC_SQLITE3_FAILED_SELECT_DB;
   }
 
@@ -87,8 +86,7 @@ retcode_t iota_stor_store(const connection_t* const conn,
   int rc = sqlite3_exec((sqlite3*)conn->db, statement, 0, 0, &err_msg);
 
   if (rc != SQLITE_OK) {
-    logger_helper_print(SQLITE3_LOGGER_ID, LOGGER_ERR, "Failed in statement",
-                        statement);
+    log_error(SQLITE3_LOGGER_ID, "Failed in statement", statement);
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
@@ -113,8 +111,7 @@ retcode_t iota_stor_load(const connection_t* const conn, const char* col_name,
   *num_loaded = pack.num_loaded;
 
   if (rc != SQLITE_OK) {
-    logger_helper_print(SQLITE3_LOGGER_ID, LOGGER_ERR, "Failed in statement",
-                        statement);
+    log_error(SQLITE3_LOGGER_ID, "Failed in statement", statement);
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
@@ -134,8 +131,7 @@ retcode_t iota_stor_exist(const connection_t* const conn,
                         check_transactions_exist_cb, (void*)exist, &err_msg);
 
   if (rc != SQLITE_OK) {
-    logger_helper_print(SQLITE3_LOGGER_ID, LOGGER_ERR, "Failed in statement",
-                        statement);
+    log_error(SQLITE3_LOGGER_ID, "Failed in statement", statement);
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
