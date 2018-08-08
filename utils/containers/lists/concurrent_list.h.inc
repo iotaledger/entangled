@@ -26,7 +26,7 @@ typedef enum concurrent_list_status_e {
     TYPE data;                                        \
     struct concurrent_list_node_of_##TYPE##_s *prev;  \
     struct concurrent_list_node_of_##TYPE##_s *next;  \
-  } concurrent_list_node_of_##TYPE##_t;
+  } concurrent_list_node_of_##TYPE;
 
 #define DECLARE_VTABLE_CONCURRENT_LIST_OF(TYPE)                               \
   typedef struct concurrent_list_of_##TYPE##_s concurrent_list_of_##TYPE;     \
@@ -43,6 +43,7 @@ typedef enum concurrent_list_status_e {
         concurrent_list_of_##TYPE *const self, TYPE *const data);             \
     concurrent_list_status_t (*pop_back)(                                     \
         concurrent_list_of_##TYPE *const self, TYPE *const data);             \
+    TYPE *(*find)(concurrent_list_of_##TYPE *const self, TYPE const data);    \
     bool (*contains)(concurrent_list_of_##TYPE *const self, TYPE const data); \
     bool (*remove)(concurrent_list_of_##TYPE *const self, TYPE const data);   \
   } vtable_concurrent_list_of_##TYPE##_t;                                     \
@@ -53,8 +54,8 @@ typedef enum concurrent_list_status_e {
   typedef struct concurrent_list_of_##TYPE##_s {                 \
     vtable_concurrent_list_of_##TYPE##_t const *vtable;          \
     bool (*cmp)(TYPE const *const self, TYPE const *const data); \
-    concurrent_list_node_of_##TYPE##_t *front;                   \
-    concurrent_list_node_of_##TYPE##_t *back;                    \
+    concurrent_list_node_of_##TYPE *front;                       \
+    concurrent_list_node_of_##TYPE *back;                        \
     size_t size;                                                 \
     lock_handle_t lock;                                          \
   } concurrent_list_of_##TYPE;
@@ -179,6 +180,18 @@ typedef enum concurrent_list_status_e {
       concurrent_list_of_##TYPE *const self, TYPE *const data);
 
 /**
+ * Find an element in a list
+ *
+ * @param self The list
+ * @param data The data to find
+ *
+ * @return null or a pointer to the data
+ */
+#define DECLARE_FUNCTION_FIND_CONCURRENT_LIST_OF(TYPE) \
+  TYPE *CONCURRENT_LIST_OF_##TYPE##_FIND(              \
+      concurrent_list_of_##TYPE *const self, TYPE const data);
+
+/**
  * Checks whether an element is in a list or not
  *
  * @param self The list
@@ -216,6 +229,7 @@ typedef enum concurrent_list_status_e {
   DECLARE_FUNCTION_PUSH_BACK_CONCURRENT_LIST_OF(TYPE)  \
   DECLARE_FUNCTION_POP_FRONT_CONCURRENT_LIST_OF(TYPE)  \
   DECLARE_FUNCTION_POP_BACK_CONCURRENT_LIST_OF(TYPE)   \
+  DECLARE_FUNCTION_FIND_CONCURRENT_LIST_OF(TYPE)       \
   DECLARE_FUNCTION_CONTAINS_CONCURRENT_LIST_OF(TYPE)   \
   DECLARE_FUNCTION_REMOVE_CONCURRENT_LIST_OF(TYPE)
 

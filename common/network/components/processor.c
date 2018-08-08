@@ -17,7 +17,7 @@ static void *processor_routine(processor_state_t *const state) {
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &packet) ==
         CONCURRENT_QUEUE_SUCCESS) {
-      log_info("Processing packet");
+      log_debug("Processing packet");
       // TODO(thibault) process the hash
     }
   }

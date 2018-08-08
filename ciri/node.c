@@ -9,10 +9,17 @@
 #include "common/network/logger.h"
 
 // TODO(thibault) configuration variable
-static uint16_t tcp_port_g = 14265;
-static uint16_t udp_port_g = 14265;
+static uint16_t tcp_port_g = 14260;
+static uint16_t udp_port_g = 14261;
 
 bool node_init(node_t* const node) {
+  if (node == NULL) {
+    return false;
+  }
+  if (INIT_CONCURRENT_LIST_OF(neighbor_t, node->neighbors, neighbor_cmp) !=
+      CONCURRENT_QUEUE_SUCCESS) {
+    return false;
+  }
   log_info("Initializing broadcaster component");
   if (broadcaster_init(&node->broadcaster, node) == false) {
     log_fatal("Initializing broadcaster component failed");
@@ -42,6 +49,9 @@ bool node_init(node_t* const node) {
 }
 
 bool node_start(node_t* const node) {
+  if (node == NULL) {
+    return false;
+  }
   log_info("Starting broadcaster component");
   if (broadcaster_start(&node->broadcaster) == false) {
     log_fatal("Starting broadcaster component failed");
@@ -68,6 +78,9 @@ bool node_start(node_t* const node) {
 bool node_stop(node_t* const node) {
   bool ret = true;
 
+  if (node == NULL) {
+    return false;
+  }
   log_info("Stopping broadcaster component");
   if (broadcaster_stop(&node->broadcaster) == false) {
     log_error("Stopping broadcaster component failed");
@@ -94,6 +107,9 @@ bool node_stop(node_t* const node) {
 bool node_destroy(node_t* const node) {
   bool ret = true;
 
+  if (node == NULL) {
+    return false;
+  }
   log_info("Destroying broadcaster component");
   if (broadcaster_destroy(&node->broadcaster) == false) {
     log_error("Destroying broadcaster component failed");
@@ -112,6 +128,10 @@ bool node_destroy(node_t* const node) {
   log_info("Destroying responder component");
   if (responder_destroy(&node->responder) == false) {
     log_error("Destroying responder component failed");
+    ret = false;
+  }
+  if (DESTROY_CONCURRENT_LIST_OF(neighbor_t, node->neighbors) !=
+      CONCURRENT_LIST_SUCCESS) {
     ret = false;
   }
   return ret;

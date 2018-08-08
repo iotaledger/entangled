@@ -1,13 +1,22 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "broadcaster",
-    srcs = ["broadcaster.c"],
+    name = "broadcaster_shared",
     hdrs = ["broadcaster.h"],
     deps = [
         "//common/network:logger",
         "//utils/containers/queues:concurrent_queue_trit_array",
         "//utils/handles:thread",
+    ],
+)
+
+cc_library(
+    name = "broadcaster",
+    srcs = ["broadcaster.c"],
+    deps = [
+        ":broadcaster_shared",
+        "//ciri:node_shared",
+        "//common/network:logger",
     ],
 )
 

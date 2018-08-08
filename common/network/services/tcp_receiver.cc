@@ -6,7 +6,9 @@
  */
 
 #include "common/network/services/tcp_receiver.hpp"
+#include "ciri/node.h"
 #include "common/network/logger.h"
+#include "common/network/neighbor.h"
 
 /*
  * TcpConnection
@@ -16,17 +18,38 @@ TcpConnection::TcpConnection(receiver_service_t* const service,
                              boost::asio::ip::tcp::socket socket)
     : service_(service), socket_(std::move(socket)) {}
 
-void TcpConnection::start() { receive(); }
+TcpConnection::~TcpConnection() {
+  if (neighbor_ != NULL) {
+    log_info("Connection lost with tethered neighbor tcp://%s:%d",
+             socket_.remote_endpoint().address().to_string().c_str(),
+             socket_.remote_endpoint().port());
+    neighbor_->endpoint.opaque_inetaddr = NULL;
+  }
+}
+
+void TcpConnection::start() {
+  auto host = socket_.remote_endpoint().address().to_string().c_str();
+  auto port = socket_.remote_endpoint().port();
+
+  neighbor_ = neighbor_find_by_values(service_->state->node->neighbors,
+                                      PROTOCOL_TCP, host, port);
+  if (neighbor_ == NULL) {
+    log_info("Connection denied with non-tethered neighbor tcp://%s:%d", host,
+             port);
+    return;
+  }
+  log_info("Connection accepted with tethered neighbor tcp://%s:%d", host,
+           port);
+  neighbor_->endpoint.opaque_inetaddr = &socket_;
+  receive();
+}
 
 void TcpConnection::receive() {
   auto self(shared_from_this());
-  socket_.async_read_some(
-      boost::asio::buffer(packet_.content, TRANSACTION_PACKET_SIZE),
+  boost::asio::async_read(
+      socket_, boost::asio::buffer(packet_.content, TRANSACTION_PACKET_SIZE),
       [this, self](boost::system::error_code ec, std::size_t length) {
-        if (ec == boost::asio::error::eof ||
-            ec == boost::asio::error::connection_reset) {
-          // TODO(thibault) disconnect
-        } else if (!ec && length > 0) {
+        if (!ec && length > 0) {
           handlePacket(length);
           receive();
         }
@@ -40,8 +63,8 @@ bool TcpConnection::handlePacket(std::size_t const length) {
   receiver_service_prepare_packet(
       &packet_, length, socket_.remote_endpoint().address().to_string().c_str(),
       socket_.remote_endpoint().port(), PROTOCOL_TCP);
-  log_debug("TCP packet received from %s:%d", &packet_.source.host,
-            packet_.source.port);
+  log_debug("Packet received from tethered neighbor tcp://%s:%d",
+            &packet_.source.host, packet_.source.port);
   if (service_->queue->vtable->push(service_->queue, packet_) !=
       CONCURRENT_QUEUE_SUCCESS) {
     return false;

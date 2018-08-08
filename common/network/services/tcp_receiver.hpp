@@ -10,11 +10,13 @@
 #include <boost/asio.hpp>
 
 #include "common/network/components/receiver.h"
+#include "common/network/neighbor.h"
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
  public:
   TcpConnection(receiver_service_t* const service,
                 boost::asio::ip::tcp::socket socket);
+  ~TcpConnection();
 
  public:
   void start();
@@ -25,6 +27,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
  private:
   receiver_service_t* service_;
+  neighbor_t* neighbor_;
   boost::asio::ip::tcp::socket socket_;
   iota_packet_t packet_;
 };

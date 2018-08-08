@@ -42,7 +42,7 @@ static unsigned int const concurrent_queue_pop_timeout_g = 2;
 #define DEFINE_FUNCTION_DESTROY_CONCURRENT_QUEUE_OF(TYPE)         \
   concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_DESTROY( \
       concurrent_queue_of_##TYPE **const self) {                  \
-    concurrent_queue_node_of_##TYPE##_t *front, *tmp;             \
+    concurrent_queue_node_of_##TYPE *front, *tmp;                 \
     if (self == NULL || *self == NULL) {                          \
       return CONCURRENT_QUEUE_NULL_SELF;                          \
     }                                                             \
@@ -118,12 +118,12 @@ static unsigned int const concurrent_queue_pop_timeout_g = 2;
 #define DEFINE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE)           \
   concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_PUSH(   \
       concurrent_queue_of_##TYPE *const self, TYPE const data) { \
-    concurrent_queue_node_of_##TYPE##_t *node;                   \
+    concurrent_queue_node_of_##TYPE *node;                       \
     if (self == NULL) {                                          \
       return CONCURRENT_QUEUE_NULL_SELF;                         \
     }                                                            \
-    node = (concurrent_queue_node_of_##TYPE##_t *)calloc(        \
-        1, sizeof(concurrent_queue_node_of_##TYPE##_t));         \
+    node = (concurrent_queue_node_of_##TYPE *)calloc(            \
+        1, sizeof(concurrent_queue_node_of_##TYPE));             \
     if (node == NULL) {                                          \
       return CONCURRENT_QUEUE_ALLOC_FAILED;                      \
     }                                                            \
@@ -159,7 +159,7 @@ static unsigned int const concurrent_queue_pop_timeout_g = 2;
         return CONCURRENT_QUEUE_TIMEOUT;                                \
       }                                                                 \
     }                                                                   \
-    concurrent_queue_node_of_##TYPE##_t *tmp = self->front;             \
+    concurrent_queue_node_of_##TYPE *tmp = self->front;                 \
     *data = tmp->data;                                                  \
     self->front = self->front->next;                                    \
     if (self->front == NULL) {                                          \

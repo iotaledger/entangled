@@ -99,7 +99,7 @@ void test_list() {
                         CONCURRENT_LIST_SUCCESS);
   TEST_ASSERT_EQUAL_INT(list->vtable->empty(list), false);
   TEST_ASSERT_EQUAL_INT(list->vtable->size(list), 10);
-  concurrent_list_node_of_int_t *tmp = list->front;
+  concurrent_list_node_of_int *tmp = list->front;
   TEST_ASSERT_NOT_NULL(tmp);
   TEST_ASSERT_EQUAL_INT(tmp->data, 8);
   tmp = tmp->next;
@@ -123,19 +123,33 @@ void test_list() {
   tmp = tmp->next;
   TEST_ASSERT_NULL(tmp);
 
+  TEST_ASSERT_NULL(list->vtable->find(NULL, 0));
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(NULL, 0), false);
+  TEST_ASSERT_EQUAL_INT(*list->vtable->find(list, 0), 0);
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 0), true);
+  TEST_ASSERT_EQUAL_INT(*list->vtable->find(list, 1), 1);
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 1), true);
+  TEST_ASSERT_EQUAL_INT(*list->vtable->find(list, 2), 2);
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 2), true);
+  TEST_ASSERT_EQUAL_INT(*list->vtable->find(list, 3), 3);
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 3), true);
+  TEST_ASSERT_EQUAL_INT(*list->vtable->find(list, 4), 4);
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 4), true);
+  TEST_ASSERT_EQUAL_INT(*list->vtable->find(list, 5), 5);
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 5), true);
+  TEST_ASSERT_EQUAL_INT(*list->vtable->find(list, 6), 6);
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 6), true);
+  TEST_ASSERT_EQUAL_INT(*list->vtable->find(list, 7), 7);
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 7), true);
+  TEST_ASSERT_EQUAL_INT(*list->vtable->find(list, 8), 8);
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 8), true);
+  TEST_ASSERT_EQUAL_INT(*list->vtable->find(list, 9), 9);
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 9), true);
+  TEST_ASSERT_NULL(list->vtable->find(list, 10));
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 10), false);
+  TEST_ASSERT_NULL(list->vtable->find(list, 42));
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, 42), false);
+  TEST_ASSERT_NULL(list->vtable->find(list, -1));
   TEST_ASSERT_EQUAL_INT(list->vtable->contains(list, -1), false);
 
   TEST_ASSERT_EQUAL_INT(list->vtable->remove(NULL, 0),

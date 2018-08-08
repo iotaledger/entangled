@@ -25,7 +25,20 @@ int main() {
     return EXIT_FAILURE;
   }
 
-  sleep(10);
+  // TODO(thibault) Remove, for broadcaster testing purpose
+  neighbor_t neighbor;
+  neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:14262");
+  neighbor_add(node_g.neighbors, neighbor);
+  neighbor_init_with_uri(&neighbor, "udp://127.0.0.1:14263");
+  neighbor_add(node_g.neighbors, neighbor);
+  flex_trit_t raw_trits[] = {-1, 0, 1, 1, 0, 1, 1,  0, -1,
+                             -1, 1, 0, 1, 1, 0, -1, 1};
+  while (1) {
+    trit_array_p trits = trit_array_new(17);
+    trit_array_set_trits(trits, raw_trits, 17);
+    broadcaster_on_next(&node_g.broadcaster, trits);
+    sleep(1);
+  }
 
   log_info("Stopping cIRI node");
   if (node_stop(&node_g) == false) {
