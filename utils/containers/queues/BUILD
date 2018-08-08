@@ -5,8 +5,8 @@ cc_library(
     srcs = ["concurrent_queue.c.inc"],
     hdrs = ["concurrent_queue.h.inc"],
     deps = [
-        "//common:cond_handle",
-        "//common:lock_handle",
+        "//utils/handles:cond",
+        "//utils/handles:lock",
     ],
 )
 

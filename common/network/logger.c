@@ -7,8 +7,8 @@
 
 #include <stdarg.h>
 
-#include "common/lock_handle.h"
 #include "logger.h"
+#include "utils/handles/lock.h"
 
 static struct logger_s {
   log_level_t level;

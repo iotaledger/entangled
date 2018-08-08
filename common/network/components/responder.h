@@ -8,8 +8,8 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_RESPONDER_H__
 #define __COMMON_NETWORK_COMPONENTS_RESPONDER_H__
 
-#include "common/thread_handle.h"
 #include "utils/containers/queues/concurrent_queue_hash_request.h"
+#include "utils/handles/thread.h"
 
 typedef concurrent_queue_of_hash_request_t responder_queue_t;
 typedef struct node_s node_t;
