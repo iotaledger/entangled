@@ -8,7 +8,6 @@
 #include "common/trinary/trit_array.h"
 #include <stdlib.h>
 #include <string.h>
-#include "common/trinary/trit_byte.h"
 
 size_t flex_trit_array_slice(flex_trit_t *const to_trit_array,
                              size_t const to_len,
