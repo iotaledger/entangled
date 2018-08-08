@@ -19,9 +19,9 @@ typedef struct {
       const serializer_t* const, const find_transactions_req_t* const obj,
       char* out);
 
-  void (*find_transactions_deserialize_response)(const serializer_t* const,
-                                                 const char* const obj,
-                                                 find_transactions_res_t* out);
+  int (*find_transactions_deserialize_response)(const serializer_t* const,
+                                                const char* const obj,
+                                                find_transactions_res_t* out);
 
   size_t (*find_transactions_serialize_request_get_size)(
       const serializer_t* const,
@@ -35,9 +35,9 @@ typedef struct {
                                          const get_balances_req_t* const obj,
                                          char* out);
 
-  void (*get_balances_deserialize_response)(const serializer_t* const,
-                                            const char* const obj,
-                                            get_balances_res_t* out);
+  int (*get_balances_deserialize_response)(const serializer_t* const,
+                                           const char* const obj,
+                                           get_balances_res_t* out);
 
   size_t (*get_balances_serialize_request_get_size_)(
       const serializer_t* const, const get_balances_req_t* const toSerialize);
@@ -50,7 +50,7 @@ typedef struct {
       const serializer_t* const, const get_inclusion_state_req_t* const obj,
       char* out);
 
-  void (*get_inclusion_state_deserialize_response)(
+  int (*get_inclusion_state_deserialize_response)(
       const serializer_t* const, const char* const obj,
       get_inclusion_state_res_t* out);
 
@@ -76,18 +76,18 @@ typedef struct {
       const serializer_t* const s);
   void (*get_node_info_serialize_request)(const serializer_t* const, char* out);
 
-  void (*get_node_info_deserialize_response)(const serializer_t* const,
-                                             const char* const obj,
-                                             get_node_info_res_t* out);
+  int (*get_node_info_deserialize_response)(const serializer_t* const,
+                                            const char* const obj,
+                                            get_node_info_res_t* out);
 
   size_t (*get_node_info_deserialize_response_get_size)(
       const serializer_t* const, const char* const toDeserialize);
 
   // get_tips_request
 
-  void (*get_tips_deserialize_response)(const serializer_t* const,
-                                        const char* const obj,
-                                        get_tips_res_t* out);
+  int (*get_tips_deserialize_response)(const serializer_t* const,
+                                       const char* const obj,
+                                       get_tips_res_t* out);
 
   size_t (*get_tips_deserialize_response_get_size)(
       const serializer_t* const, const char* const toDeserialize);
@@ -96,7 +96,7 @@ typedef struct {
   void (*get_transactions_to_approve_serialize_request)(
       const serializer_t* const, int depth, char* out);
 
-  void (*get_transactions_to_approve_deserialize_response)(
+  int (*get_transactions_to_approve_deserialize_response)(
       const serializer_t* const, const char* const obj,
       get_transactions_to_approve_res_t* out);
 

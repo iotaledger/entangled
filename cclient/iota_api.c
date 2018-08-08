@@ -4,8 +4,8 @@
 #include "cclient/http/http.h"
 #include "cclient/service.h"
 
-iota_api_result_t iota_api_get_node_info(const iota_http_service_t* const service,
-                                         get_node_info_res_t* const res) {
+iota_api_result_t iota_api_get_node_info(
+    const iota_http_service_t* const service, get_node_info_res_t* const res) {
   iota_api_result_t result;
   iota_response_t response;
   char buffer[660];
@@ -21,19 +21,21 @@ iota_api_result_t iota_api_get_node_info(const iota_http_service_t* const servic
 
   result = iota_service_query(service, request_data, &response);
 
-  // TODO - deserialize response
+  service->serializer.vtable.get_node_info_deserialize_response(
+      &service->serializer, &response, res);
 
   return result;
 }
 
-iota_api_result_t iota_api_get_neighbors(const iota_http_service_t* const service,
-                                         get_neighbors_res_t* const res) {
+iota_api_result_t iota_api_get_neighbors(
+    const iota_http_service_t* const service, get_neighbors_res_t* const res) {
   iota_api_result_t result;
   return result;
 }
 
-iota_api_result_t iota_api_add_neighbors(const iota_http_service_t* const service,
-                                         const add_neighbors_req_t* const req) {
+iota_api_result_t iota_api_add_neighbors(
+    const iota_http_service_t* const service,
+    const add_neighbors_req_t* const req) {
   iota_api_result_t result;
   return result;
 }
@@ -74,9 +76,9 @@ iota_api_result_t iota_api_get_inclusion_states(
   return result;
 }
 
-iota_api_result_t iota_api_get_balances(const iota_http_service_t* const service,
-                                        const get_balances_req_t* const req,
-                                        get_balances_res_t* res) {
+iota_api_result_t iota_api_get_balances(
+    const iota_http_service_t* const service,
+    const get_balances_req_t* const req, get_balances_res_t* res) {
   iota_api_result_t result;
   return result;
 }
