@@ -13,7 +13,7 @@ typedef struct {
   /**
    * Transactions with any of these addresses as input/output will be returned
    */
-  address_array addresses;
+  flex_trit_array addresses;
 
   /**
    * Transactions with any of these tags will be returned
@@ -23,7 +23,7 @@ typedef struct {
   /**
    * Transactions which directly approve any of approvees will be returned
    */
-  address_array approvees;
+  flex_trit_array approvees;
   /**
    * Transactions belonging to bundles will be returned
    */

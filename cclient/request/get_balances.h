@@ -13,7 +13,7 @@ typedef struct {
   /**
    * List of addresses you want to get the confirmed balance for.
    */
-  address_array addresses;
+  flex_trit_array addresses;
   /**
    * Transactions with any of these tags will be returned
    */

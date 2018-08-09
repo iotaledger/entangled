@@ -10,7 +10,7 @@ extern "C" {
 #include "types/types.h"
 
 typedef struct {
-  address_array transactions;
+  flex_trit_array transactions;
 } find_transactions_res_t;
 
 #ifdef __cplusplus

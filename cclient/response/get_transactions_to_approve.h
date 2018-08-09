@@ -8,8 +8,8 @@ extern "C" {
 #endif
 
 typedef struct {
-  address_t branchTransaction;
-  address_t trunkTransaction;
+  flex_trit_p branchTransaction;
+  flex_trit_p trunkTransaction;
 
 } get_transactions_to_approve_res_t;
 

@@ -10,6 +10,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":serializer_base",
+        "//common/model:transaction",
         "@cJSON",
     ],
 )
