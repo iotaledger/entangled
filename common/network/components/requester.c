@@ -13,7 +13,10 @@
 #define REQUESTER_COMPONENT_LOGGER_ID "requester_component"
 
 bool requester_init(requester_state_t *const state, node_t *const node) {
-  if (state == NULL || node == NULL) {
+  if (state == NULL) {
+    return false;
+  }
+  if (node == NULL) {
     return false;
   }
   logger_helper_init(REQUESTER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
@@ -28,15 +31,24 @@ bool requester_init(requester_state_t *const state, node_t *const node) {
 }
 
 size_t transactions_to_request_number(requester_state_t *const state) {
+  if (state == NULL) {
+    return 0;
+  }
   return state->queue->vtable->size(state->queue);
 }
 
 bool clear_transaction_request(trit_array_p const hash) {
+  if (hash == NULL) {
+    return false;
+  }
   // TODO(thibault) remove from set/queue
   return true;
 }
 
 bool transactions_to_request_is_full(requester_state_t *const state) {
+  if (state == NULL) {
+    return true;
+  }
   return state->queue->vtable->size(state->queue) >= MAX_TX_REQ_QUEUE_SIZE;
 }
 
