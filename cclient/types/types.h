@@ -5,8 +5,7 @@
 
 #include <stdlib.h>
 
-//#include "common/trinary/trit_array.h"
-//#include "common/trinary/tryte.h"
+#include "common/errors.h"
 #include "common/model/transaction.h"
 
 #ifdef __cplusplus

@@ -12,21 +12,21 @@ void json_find_transactions_serialize_request(
     const serializer_t* const s, const find_transactions_req_t* const obj,
     char* out) {}
 
-int json_find_transactions_deserialize_response(const serializer_t* const s,
-                                                const char* const obj,
-                                                find_transactions_res_t* out) {
+retcode_t json_find_transactions_deserialize_response(
+    const serializer_t* const s, const char* const obj,
+    find_transactions_res_t* out) {
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
 
   if (json_obj == NULL) {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->string != NULL)) {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "hashes");
@@ -34,7 +34,7 @@ int json_find_transactions_deserialize_response(const serializer_t* const s,
     int hash_items = cJSON_GetArraySize(json_item);
     if (hash_items <= 0) {
       cJSON_Delete(json_obj);
-      return EXIT_FAILURE;
+      return RC_CCLIENT_JSON_PARSE;
     }
 
     cJSON* current_obj = NULL;
@@ -50,7 +50,7 @@ int json_find_transactions_deserialize_response(const serializer_t* const s,
             strlen(current_obj->string), NUM_TRYTES_ADDRESS);
         if (ret_trytes == 0) {
           cJSON_Delete(json_obj);
-          return EXIT_FAILURE;
+          return RC_CCLIENT_JSON_PARSE;
         }
 
         addr_count++;
@@ -58,10 +58,10 @@ int json_find_transactions_deserialize_response(const serializer_t* const s,
     }
   } else {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
-  return EXIT_SUCCESS;
+  return RC_OK;
 }
 
 size_t json_find_transactions_serialize_request_get_size(
@@ -80,21 +80,21 @@ void json_get_balances_serialize_request(const serializer_t* const s,
                                          const get_balances_req_t* const obj,
                                          char* out) {}
 
-int json_get_balances_deserialize_response(const serializer_t* const s,
-                                           const char* const obj,
-                                           get_balances_res_t* out) {
+retcode_t json_get_balances_deserialize_response(const serializer_t* const s,
+                                                 const char* const obj,
+                                                 get_balances_res_t* out) {
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
 
   if (json_obj == NULL) {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->string != NULL)) {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "balances");
@@ -104,7 +104,7 @@ int json_get_balances_deserialize_response(const serializer_t* const s,
     int_items = cJSON_GetArraySize(json_item);
     if (int_items <= 0) {
       cJSON_Delete(json_obj);
-      return EXIT_FAILURE;
+      return RC_CCLIENT_JSON_PARSE;
     }
   }
 
@@ -129,11 +129,11 @@ int json_get_balances_deserialize_response(const serializer_t* const s,
                            strlen(json_item->string), NUM_TRYTES_ADDRESS);
     if (ret_trytes == 0) {
       cJSON_Delete(json_obj);
-      return EXIT_FAILURE;
+      return RC_CCLIENT_JSON_PARSE;
     }
   }
 
-  return EXIT_SUCCESS;
+  return RC_OK;
 }
 
 size_t json_get_balances_serialize_request_get_size_(
@@ -151,7 +151,7 @@ void json_get_inclusion_state_serialize_request(
     const serializer_t* const s, const get_inclusion_state_req_t* const obj,
     char* out) {}
 
-int json_get_inclusion_state_deserialize_response(
+retcode_t json_get_inclusion_state_deserialize_response(
     const serializer_t* const s, const char* const obj,
     get_inclusion_state_res_t* out) {
   cJSON* json_obj = cJSON_Parse(obj);
@@ -159,13 +159,13 @@ int json_get_inclusion_state_deserialize_response(
 
   if (json_obj == NULL) {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->string != NULL)) {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "states");
@@ -175,7 +175,7 @@ int json_get_inclusion_state_deserialize_response(
     int_items = cJSON_GetArraySize(json_item);
     if (int_items <= 0) {
       cJSON_Delete(json_obj);
-      return EXIT_FAILURE;
+      return RC_CCLIENT_JSON_PARSE;
     }
   }
 
@@ -189,7 +189,7 @@ int json_get_inclusion_state_deserialize_response(
     }
     int_cnt++;
   }
-  return EXIT_SUCCESS;
+  return RC_OK;
 }
 
 size_t json_get_inclusion_state_serialize_request_get_size(
@@ -224,21 +224,21 @@ void json_get_node_info_serialize_request(const serializer_t* const s,
   strcpy(out, "{\"command\": \"getNodeInfo\"}");
 }
 
-int json_get_node_info_deserialize_response(const serializer_t* const s,
-                                            const char* const obj,
-                                            get_node_info_res_t* out) {
+retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
+                                                  const char* const obj,
+                                                  get_node_info_res_t* out) {
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_value = NULL;
 
   if (json_obj == NULL) {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
   json_value = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_value) && (json_value->string != NULL)) {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
   json_value = cJSON_GetObjectItemCaseSensitive(json_obj, "appName");
@@ -280,7 +280,7 @@ int json_get_node_info_deserialize_response(const serializer_t* const s,
                            strlen(json_value->string), NUM_TRYTES_ADDRESS);
     if (ret_trytes == 0) {
       cJSON_Delete(json_obj);
-      return EXIT_FAILURE;
+      return RC_CCLIENT_JSON_PARSE;
     }
   }
 
@@ -299,7 +299,7 @@ int json_get_node_info_deserialize_response(const serializer_t* const s,
         NUM_TRYTES_ADDRESS);
     if (ret_trytes == 0) {
       cJSON_Delete(json_obj);
-      return EXIT_FAILURE;
+      return RC_CCLIENT_JSON_PARSE;
     }
   }
 
@@ -335,7 +335,7 @@ int json_get_node_info_deserialize_response(const serializer_t* const s,
     out->transactionsToRequest = json_value->valueint;
   }
 
-  return EXIT_SUCCESS;
+  return RC_OK;
 }
 
 size_t json_get_node_info_deserialize_response_get_size(
@@ -344,21 +344,21 @@ size_t json_get_node_info_deserialize_response_get_size(
 }
 
 // get_tips_response
-int json_get_tips_deserialize_response(const serializer_t* const s,
-                                       const char* const obj,
-                                       get_tips_res_t* out) {
+retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
+                                             const char* const obj,
+                                             get_tips_res_t* out) {
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
 
   if (json_obj == NULL) {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->string != NULL)) {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "hashes");
@@ -366,7 +366,7 @@ int json_get_tips_deserialize_response(const serializer_t* const s,
     int hash_items = cJSON_GetArraySize(json_item);
     if (hash_items <= 0) {
       cJSON_Delete(json_obj);
-      return EXIT_FAILURE;
+      return RC_CCLIENT_JSON_PARSE;
     }
 
     cJSON* current_obj = NULL;
@@ -380,7 +380,7 @@ int json_get_tips_deserialize_response(const serializer_t* const s,
             strlen(current_obj->string), NUM_TRYTES_ADDRESS);
         if (ret_trytes == 0) {
           cJSON_Delete(json_obj);
-          return EXIT_FAILURE;
+          return RC_CCLIENT_JSON_PARSE;
         }
 
         addr_cnt++;
@@ -388,10 +388,10 @@ int json_get_tips_deserialize_response(const serializer_t* const s,
     }
   } else {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
-  return EXIT_SUCCESS;
+  return RC_OK;
 }
 
 size_t json_get_tips_deserialize_response_get_size(
@@ -403,7 +403,7 @@ size_t json_get_tips_deserialize_response_get_size(
 void json_get_transactions_to_approve_serialize_request(
     const serializer_t* const s, int depth, char* out) {}
 
-int json_get_transactions_to_approve_deserialize_response(
+retcode_t json_get_transactions_to_approve_deserialize_response(
     const serializer_t* const s, const char* const obj,
     get_transactions_to_approve_res_t* out) {
   cJSON* json_obj = cJSON_Parse(obj);
@@ -411,13 +411,13 @@ int json_get_transactions_to_approve_deserialize_response(
 
   if (json_obj == NULL) {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
   json_value = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_value) && (json_value->string != NULL)) {
     cJSON_Delete(json_obj);
-    return EXIT_FAILURE;
+    return RC_CCLIENT_JSON_PARSE;
   }
 
   json_value = cJSON_GetObjectItemCaseSensitive(json_obj, "trunkTransaction");
@@ -428,7 +428,7 @@ int json_get_transactions_to_approve_deserialize_response(
                            strlen(json_value->string), NUM_TRYTES_ADDRESS);
     if (ret_trytes == 0) {
       cJSON_Delete(json_obj);
-      return EXIT_FAILURE;
+      return RC_CCLIENT_JSON_PARSE;
     }
   }
 
@@ -440,10 +440,10 @@ int json_get_transactions_to_approve_deserialize_response(
                            strlen(json_value->string), NUM_TRYTES_ADDRESS);
     if (ret_trytes == 0) {
       cJSON_Delete(json_obj);
-      return EXIT_FAILURE;
+      return RC_CCLIENT_JSON_PARSE;
     }
   }
-  return EXIT_SUCCESS;
+  return RC_OK;
 }
 
 size_t json_get_transactions_to_approve_serialize_request_get_size(
