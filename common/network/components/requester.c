@@ -30,6 +30,9 @@ bool request_transaction(requester_state_t *const state,
   if (state == NULL) {
     return false;
   }
+  if (hash == NULL) {
+    return false;
+  }
   if (state->queue->vtable->push(state->queue, hash) !=
       CONCURRENT_QUEUE_SUCCESS) {
     log_warning(REQUESTER_COMPONENT_LOGGER_ID,
