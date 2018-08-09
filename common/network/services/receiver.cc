@@ -9,7 +9,7 @@
 #include "common/network/services/udp_receiver.hpp"
 #include "utils/logger_helper.h"
 
-static char const receiver_service_logger[] = "receiver_service";
+#define RECEIVER_SERVICE_LOGGER_ID "receiver_service"
 
 void receiver_service_prepare_packet(iota_packet_t* const packet,
                                      size_t const length,
@@ -27,28 +27,28 @@ bool receiver_service_start(receiver_service_t* const service) {
   if (service == NULL) {
     return false;
   }
-  logger_helper_init(receiver_service_logger, LOGGER_DEBUG, true);
+  logger_helper_init(RECEIVER_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
   try {
     boost::asio::io_context ctx;
     service->context = &ctx;
     if (service->protocol == PROTOCOL_TCP) {
-      log_info(receiver_service_logger,
+      log_info(RECEIVER_SERVICE_LOGGER_ID,
                "Starting TCP receiver service on port %d\n", service->port);
       TcpReceiverService tcpService(service, ctx, service->port);
       ctx.run();
     } else if (service->protocol == PROTOCOL_UDP) {
-      log_info(receiver_service_logger,
+      log_info(RECEIVER_SERVICE_LOGGER_ID,
                "Starting UDP receiver service on port %d\n", service->port);
       UdpReceiverService udpService(service, ctx, service->port);
       ctx.run();
     } else {
-      log_error(receiver_service_logger,
+      log_error(RECEIVER_SERVICE_LOGGER_ID,
                 "Starting receiver service failed: unknown protocol\n");
       return false;
     }
   } catch (std::exception const& e) {
-    log_error(receiver_service_logger, "Starting receiver service failed: %s\n",
-              e.what());
+    log_error(RECEIVER_SERVICE_LOGGER_ID,
+              "Starting receiver service failed: %s\n", e.what());
     return false;
   }
   return true;
@@ -61,16 +61,16 @@ bool receiver_service_stop(receiver_service_t* const service) {
   try {
     auto ctx = reinterpret_cast<boost::asio::io_context*>(service->context);
     if (ctx == NULL) {
-      log_error(receiver_service_logger,
+      log_error(RECEIVER_SERVICE_LOGGER_ID,
                 "Stopping receiver service failed: invalid context\n");
       return false;
     }
     ctx->stop();
   } catch (std::exception const& e) {
-    log_error(receiver_service_logger, "Stopping receiver service failed: %s\n",
-              e.what());
+    log_error(RECEIVER_SERVICE_LOGGER_ID,
+              "Stopping receiver service failed: %s\n", e.what());
     return false;
   }
-  logger_helper_destroy(receiver_service_logger);
+  logger_helper_destroy(RECEIVER_SERVICE_LOGGER_ID);
   return true;
 }

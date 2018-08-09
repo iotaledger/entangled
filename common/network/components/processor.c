@@ -8,7 +8,7 @@
 #include "common/network/components/processor.h"
 #include "utils/logger_helper.h"
 
-static char const processor_component_logger[] = "processor_component";
+#define PROCESSOR_COMPONENT_LOGGER_ID "processor_component"
 
 static void *processor_routine(processor_state_t *const state) {
   iota_packet_t packet;
@@ -19,7 +19,7 @@ static void *processor_routine(processor_state_t *const state) {
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &packet) ==
         CONCURRENT_QUEUE_SUCCESS) {
-      log_debug(processor_component_logger, "Processing packet\n");
+      log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing packet\n");
       // TODO(thibault) process the hash
     }
   }
@@ -30,11 +30,11 @@ bool processor_init(processor_state_t *const state, node_t *const node) {
   if (state == NULL || node == NULL) {
     return false;
   }
-  logger_helper_init(processor_component_logger, LOGGER_DEBUG, true);
+  logger_helper_init(PROCESSOR_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
   state->running = false;
   if (INIT_CONCURRENT_QUEUE_OF(iota_packet_t, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
-    log_critical(processor_component_logger,
+    log_critical(PROCESSOR_COMPONENT_LOGGER_ID,
                  "Initializing processor queue failed\n");
     return false;
   }
@@ -46,11 +46,11 @@ bool processor_start(processor_state_t *const state) {
   if (state == NULL) {
     return false;
   }
-  log_info(processor_component_logger, "Spawning processor thread\n");
+  log_info(PROCESSOR_COMPONENT_LOGGER_ID, "Spawning processor thread\n");
   state->running = true;
   if (thread_handle_create(&state->thread, (thread_routine_t)processor_routine,
                            state) != 0) {
-    log_critical(processor_component_logger,
+    log_critical(PROCESSOR_COMPONENT_LOGGER_ID,
                  "Spawning processor thread failed\n");
     return false;
   }
@@ -64,7 +64,7 @@ bool processor_on_next(processor_state_t *const state,
   }
   if (state->queue->vtable->push(state->queue, packet) !=
       CONCURRENT_QUEUE_SUCCESS) {
-    log_warning(processor_component_logger,
+    log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                 "Pushing to processor queue failed\n");
     return false;
   }
@@ -77,10 +77,10 @@ bool processor_stop(processor_state_t *const state) {
   if (state == NULL) {
     return false;
   }
-  log_info(processor_component_logger, "Shutting down processor thread\n");
+  log_info(PROCESSOR_COMPONENT_LOGGER_ID, "Shutting down processor thread\n");
   state->running = false;
   if (thread_handle_join(state->thread, NULL) != 0) {
-    log_error(processor_component_logger,
+    log_error(PROCESSOR_COMPONENT_LOGGER_ID,
               "Shutting down processor thread failed\n");
     ret = false;
   }
@@ -95,7 +95,7 @@ bool processor_destroy(processor_state_t *const state) {
   }
   if (DESTROY_CONCURRENT_QUEUE_OF(iota_packet_t, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
-    log_error(processor_component_logger,
+    log_error(PROCESSOR_COMPONENT_LOGGER_ID,
               "Destroying processor queue failed\n");
     ret = false;
   }
