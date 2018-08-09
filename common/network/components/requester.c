@@ -8,6 +8,8 @@
 #include "common/network/components/requester.h"
 #include "utils/logger_helper.h"
 
+// TODO(thibault) configuration variable
+#define MAX_TX_REQ_QUEUE_SIZE 1000
 #define REQUESTER_COMPONENT_LOGGER_ID "requester_component"
 
 bool requester_init(requester_state_t *const state, node_t *const node) {
@@ -25,6 +27,19 @@ bool requester_init(requester_state_t *const state, node_t *const node) {
   return true;
 }
 
+size_t transactions_to_request_number(requester_state_t *const state) {
+  return state->queue->vtable->size(state->queue);
+}
+
+bool clear_transaction_request(trit_array_p const hash) {
+  // TODO(thibault) remove from set/queue
+  return true;
+}
+
+bool transactions_to_request_is_full(requester_state_t *const state) {
+  return state->queue->vtable->size(state->queue) >= MAX_TX_REQ_QUEUE_SIZE;
+}
+
 bool request_transaction(requester_state_t *const state,
                          trit_array_p const hash) {
   if (state == NULL) {
@@ -33,11 +48,13 @@ bool request_transaction(requester_state_t *const state,
   if (hash == NULL) {
     return false;
   }
-  if (state->queue->vtable->push(state->queue, hash) !=
-      CONCURRENT_QUEUE_SUCCESS) {
-    log_warning(REQUESTER_COMPONENT_LOGGER_ID,
-                "Pushing to requester queue failed\n");
-    return false;
+  if (!transactions_to_request_is_full(state)) {
+    if (state->queue->vtable->push(state->queue, hash) !=
+        CONCURRENT_QUEUE_SUCCESS) {
+      log_warning(REQUESTER_COMPONENT_LOGGER_ID,
+                  "Pushing to requester queue failed\n");
+      return false;
+    }
   }
   return true;
 }
