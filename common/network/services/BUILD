@@ -21,10 +21,10 @@ cc_library(
     hdrs = ["udp_receiver.hpp"],
     deps = [
         "//ciri:node_shared",
-        "//common/network:logger",
         "//common/network:neighbor",
         "//common/network/components:receiver_shared",
         "//common/network/services:receiver_shared",
+        "//utils:logger_helper",
         "@boost//:asio",
     ],
 )
@@ -35,10 +35,10 @@ cc_library(
     hdrs = ["tcp_receiver.hpp"],
     deps = [
         "//ciri:node_shared",
-        "//common/network:logger",
         "//common/network:neighbor",
         "//common/network/components:receiver_shared",
         "//common/network/services:receiver_shared",
+        "//utils:logger_helper",
         "@boost//:asio",
     ],
 )
@@ -49,8 +49,8 @@ cc_library(
     hdrs = ["tcp_sender.hpp"],
     deps = [
         "//common/network:endpoint",
-        "//common/network:logger",
         "//common/trinary:trit_array",
+        "//utils:logger_helper",
         "@boost//:asio",
     ],
 )
@@ -61,8 +61,8 @@ cc_library(
     hdrs = ["udp_sender.hpp"],
     deps = [
         "//common/network:endpoint",
-        "//common/network:logger",
         "//common/trinary:trit_array",
+        "//utils:logger_helper",
         "@boost//:asio",
     ],
 )

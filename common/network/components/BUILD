@@ -4,7 +4,7 @@ cc_library(
     name = "broadcaster_shared",
     hdrs = ["broadcaster.h"],
     deps = [
-        "//common/network:logger",
+        "//utils:logger_helper",
         "//utils/containers/queues:concurrent_queue_trit_array",
         "//utils/handles:thread",
     ],
@@ -16,7 +16,7 @@ cc_library(
     deps = [
         ":broadcaster_shared",
         "//ciri:node_shared",
-        "//common/network:logger",
+        "//utils:logger_helper",
     ],
 )
 
@@ -25,7 +25,7 @@ cc_library(
     srcs = ["processor.c"],
     hdrs = ["processor.h"],
     deps = [
-        "//common/network:logger",
+        "//utils:logger_helper",
         "//utils/containers/queues:concurrent_queue_packet",
         "//utils/handles:thread",
     ],
@@ -36,7 +36,7 @@ cc_library(
     srcs = ["responder.c"],
     hdrs = ["responder.h"],
     deps = [
-        "//common/network:logger",
+        "//utils:logger_helper",
         "//utils/containers/queues:concurrent_queue_hash_request",
         "//utils/handles:thread",
     ],
@@ -66,5 +66,8 @@ cc_library(
     name = "requester",
     srcs = ["requester.c"],
     hdrs = ["requester.h"],
-    deps = ["//utils/containers/queues:concurrent_queue_trit_array"],
+    deps = [
+        "//utils:logger_helper",
+        "//utils/containers/queues:concurrent_queue_trit_array",
+    ],
 )
