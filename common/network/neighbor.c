@@ -5,9 +5,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <string.h>
-
 #include "common/network/neighbor.h"
+#include "common/network/services/tcp_sender.hpp"
+#include "common/network/services/udp_sender.hpp"
 #include "common/network/uri_parser.h"
 
 bool neighbor_init_with_uri(neighbor_t *const neighbor, char const *const uri) {
@@ -45,4 +45,16 @@ bool neighbor_init_with_values(neighbor_t *const neighbor,
   strcpy(neighbor->endpoint.host, host);
   neighbor->endpoint.port = port;
   return true;
+}
+
+bool neighbor_send(neighbor_t *const neighbor, trit_array_p const hash) {
+  if (neighbor == NULL || hash == NULL) {
+    return false;
+  }
+  if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
+    return tcp_send(&neighbor->endpoint, hash);
+  } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
+    return udp_send(&neighbor->endpoint, hash);
+  }
+  return false;
 }

@@ -5,9 +5,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
-        "//common:logger_helper",
         "//common/model:transaction",
         "//common/storage",
+        "//utils:logger_helper",
     ],
 )
 

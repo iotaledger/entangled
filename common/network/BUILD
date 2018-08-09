@@ -12,13 +12,6 @@ cc_library(
 )
 
 cc_library(
-    name = "logger",
-    srcs = ["logger.c"],
-    hdrs = ["logger.h"],
-    deps = ["//common:lock_handle"],
-)
-
-cc_library(
     name = "uri_parser",
     srcs = ["uri_parser.c"],
     hdrs = ["uri_parser.h"],
@@ -32,6 +25,9 @@ cc_library(
     deps = [
         ":iota_packet",
         ":uri_parser",
+        "//common/network/services:tcp_sender",
+        "//common/network/services:udp_sender",
+        "//common/trinary:trit_array",
     ],
 )
 

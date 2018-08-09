@@ -4,7 +4,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
-        "//common:logger_helper",
         "//common/trinary:trit_array",
+        "//utils:logger_helper",
     ],
 )

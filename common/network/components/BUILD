@@ -1,13 +1,22 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "broadcaster",
-    srcs = ["broadcaster.c"],
+    name = "broadcaster_shared",
     hdrs = ["broadcaster.h"],
     deps = [
-        "//common:thread_handle",
-        "//common/network:logger",
-        "//common/network/queues:concurrent_queue_trit_array",
+        "//utils:logger_helper",
+        "//utils/containers/queues:concurrent_queue_trit_array",
+        "//utils/handles:thread",
+    ],
+)
+
+cc_library(
+    name = "broadcaster",
+    srcs = ["broadcaster.c"],
+    deps = [
+        ":broadcaster_shared",
+        "//ciri:node_shared",
+        "//utils:logger_helper",
     ],
 )
 
@@ -16,9 +25,9 @@ cc_library(
     srcs = ["processor.c"],
     hdrs = ["processor.h"],
     deps = [
-        "//common:thread_handle",
-        "//common/network:logger",
-        "//common/network/queues:concurrent_queue_packet",
+        "//utils:logger_helper",
+        "//utils/containers/queues:concurrent_queue_packet",
+        "//utils/handles:thread",
     ],
 )
 
@@ -27,9 +36,9 @@ cc_library(
     srcs = ["responder.c"],
     hdrs = ["responder.h"],
     deps = [
-        "//common:thread_handle",
-        "//common/network:logger",
-        "//common/network/queues:concurrent_queue_hash_request",
+        "//utils:logger_helper",
+        "//utils/containers/queues:concurrent_queue_hash_request",
+        "//utils/handles:thread",
     ],
 )
 
@@ -37,9 +46,9 @@ cc_library(
     name = "receiver_shared",
     hdrs = ["receiver.h"],
     deps = [
-        "//common:thread_handle",
         "//common/network:iota_packet",
         "//common/network/services:receiver_shared",
+        "//utils/handles:thread",
     ],
 )
 
@@ -57,5 +66,8 @@ cc_library(
     name = "requester",
     srcs = ["requester.c"],
     hdrs = ["requester.h"],
-    deps = ["//common/network/queues:concurrent_queue_trit_array"],
+    deps = [
+        "//utils:logger_helper",
+        "//utils/containers/queues:concurrent_queue_trit_array",
+    ],
 )
