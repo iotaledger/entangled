@@ -75,3 +75,6 @@ cclient/cmake-*
 
 # Atom conf
 .clang_complete
+
+# Database
+ciri/ciri.db*
