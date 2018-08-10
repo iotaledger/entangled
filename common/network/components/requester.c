@@ -9,7 +9,7 @@
 #include "utils/logger_helper.h"
 
 // TODO(thibault) configuration variable
-#define MAX_TX_REQ_QUEUE_SIZE 10000
+#define MAX_TX_REQ_NBR 10000
 #define REQUESTER_COMPONENT_LOGGER_ID "requester_component"
 
 bool requester_init(requester_state_t *const state, node_t *const node) {
@@ -20,10 +20,10 @@ bool requester_init(requester_state_t *const state, node_t *const node) {
     return false;
   }
   logger_helper_init(REQUESTER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
-  if (INIT_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (INIT_CONCURRENT_LIST_OF(trit_array_p, state->list, trit_array_cmp) !=
+      CONCURRENT_LIST_SUCCESS) {
     log_critical(REQUESTER_COMPONENT_LOGGER_ID,
-                 "Initializing requester queue failed\n");
+                 "Initializing requester list failed\n");
     return false;
   }
   state->node = node;
@@ -34,7 +34,7 @@ size_t transactions_to_request_number(requester_state_t *const state) {
   if (state == NULL) {
     return 0;
   }
-  return state->queue->vtable->size(state->queue);
+  return state->list->vtable->size(state->list);
 }
 
 bool clear_transaction_request(trit_array_p const hash) {
@@ -49,7 +49,7 @@ bool transactions_to_request_is_full(requester_state_t *const state) {
   if (state == NULL) {
     return true;
   }
-  return state->queue->vtable->size(state->queue) >= MAX_TX_REQ_QUEUE_SIZE;
+  return state->list->vtable->size(state->list) >= MAX_TX_REQ_NBR;
 }
 
 bool request_transaction(requester_state_t *const state,
@@ -61,10 +61,10 @@ bool request_transaction(requester_state_t *const state,
     return false;
   }
   if (!transactions_to_request_is_full(state)) {
-    if (state->queue->vtable->push(state->queue, hash) !=
-        CONCURRENT_QUEUE_SUCCESS) {
+    if (state->list->vtable->push_back(state->list, hash) !=
+        CONCURRENT_LIST_SUCCESS) {
       log_warning(REQUESTER_COMPONENT_LOGGER_ID,
-                  "Pushing to requester queue failed\n");
+                  "Pushing to requester list failed\n");
       return false;
     }
   }
@@ -77,10 +77,6 @@ bool get_transaction_to_request(requester_state_t *const state,
   if (state == NULL) {
     return false;
   }
-  if (state->queue->vtable->pop(state->queue, hash) !=
-      CONCURRENT_QUEUE_SUCCESS) {
-    log_warning(REQUESTER_COMPONENT_LOGGER_ID,
-                "Popping from requester queue failed\n");
     return false;
   }
   return true;
@@ -92,7 +88,7 @@ bool requester_destroy(requester_state_t *const state) {
   if (state == NULL) {
     return false;
   }
-  if (DESTROY_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
+  if (DESTROY_CONCURRENT_LIST_OF(trit_array_p, state->list) !=
       CONCURRENT_QUEUE_SUCCESS) {
     ret = false;
   }

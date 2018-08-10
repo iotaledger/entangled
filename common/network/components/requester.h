@@ -8,13 +8,13 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_REQUESTER_H__
 #define __COMMON_NETWORK_COMPONENTS_REQUESTER_H__
 
-#include "utils/containers/queues/concurrent_queue_trit_array.h"
+#include "utils/containers/lists/concurrent_list_trit_array.h"
 
-typedef concurrent_queue_of_trit_array_p requester_queue_t;
+typedef concurrent_list_of_trit_array_p requester_list_t;
 typedef struct node_s node_t;
 
 typedef struct requester_state_s {
-  requester_queue_t *queue;
+  requester_list_t *list;
   node_t *node;
 } requester_state_t;
 
