@@ -16,3 +16,13 @@ cc_library(
         "//common/network:neighbor",
     ],
 )
+
+cc_library(
+    name = "concurrent_list_trit_array",
+    srcs = ["concurrent_list_trit_array.c"],
+    hdrs = ["concurrent_list_trit_array.h"],
+    deps = [
+        ":concurrent_list",
+        "//common/trinary:trit_array",
+    ],
+)
