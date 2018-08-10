@@ -30,15 +30,15 @@ bool requester_init(requester_state_t *const state, node_t *const node) {
   return true;
 }
 
-size_t transactions_to_request_number(requester_state_t *const state) {
+size_t requester_size(requester_state_t *const state) {
   if (state == NULL) {
     return 0;
   }
   return state->list->vtable->size(state->list);
 }
 
-bool clear_transaction_request(requester_state_t *const state,
-                               trit_array_p const hash) {
+bool requster_clear_request(requester_state_t *const state,
+                            trit_array_p const hash) {
   if (state == NULL) {
     return false;
   }
@@ -52,7 +52,7 @@ bool clear_transaction_request(requester_state_t *const state,
   return true;
 }
 
-bool transactions_to_request_is_full(requester_state_t *const state) {
+bool requester_is_full(requester_state_t *const state) {
   if (state == NULL) {
     return true;
   }
