@@ -28,7 +28,8 @@ bool clear_transaction_request(trit_array_p const hash);
 bool transactions_to_request_is_full(requester_state_t *const state);
 bool request_transaction(requester_state_t *const state,
                          trit_array_p const hash);
-trit_array_p get_transaction_to_request(requester_state_t *const state);
+bool get_transaction_to_request(requester_state_t *const state,
+                                trit_array_p *hash);
 bool requester_destroy(requester_state_t *const state);
 
 #ifdef __cplusplus

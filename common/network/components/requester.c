@@ -9,7 +9,7 @@
 #include "utils/logger_helper.h"
 
 // TODO(thibault) configuration variable
-#define MAX_TX_REQ_QUEUE_SIZE 1000
+#define MAX_TX_REQ_QUEUE_SIZE 10000
 #define REQUESTER_COMPONENT_LOGGER_ID "requester_component"
 
 bool requester_init(requester_state_t *const state, node_t *const node) {
@@ -71,19 +71,19 @@ bool request_transaction(requester_state_t *const state,
   return true;
 }
 
-trit_array_p get_transaction_to_request(requester_state_t *const state) {
-  trit_array_p hash;
 
+bool get_transaction_to_request(requester_state_t *const state,
+                                trit_array_p *hash) {
   if (state == NULL) {
-    return NULL;
+    return false;
   }
-  if (state->queue->vtable->pop(state->queue, &hash) !=
+  if (state->queue->vtable->pop(state->queue, hash) !=
       CONCURRENT_QUEUE_SUCCESS) {
     log_warning(REQUESTER_COMPONENT_LOGGER_ID,
                 "Popping from requester queue failed\n");
-    return NULL;
+    return false;
   }
-  return hash;
+  return true;
 }
 
 bool requester_destroy(requester_state_t *const state) {
