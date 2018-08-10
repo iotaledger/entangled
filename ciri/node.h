@@ -15,9 +15,11 @@
 #include "common/network/components/responder.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 
+typedef struct core_s core_t;
 typedef concurrent_list_of_neighbor_t neighbors_list_t;
 
 typedef struct node_s {
+  core_t* core;
   broadcaster_state_t broadcaster;
   processor_state_t processor;
   receiver_state_t receiver;
@@ -26,7 +28,7 @@ typedef struct node_s {
   neighbors_list_t* neighbors;
 } node_t;
 
-bool node_init(node_t* const node);
+bool node_init(node_t* const node, core_t* const core);
 bool node_start(node_t* const node);
 bool node_stop(node_t* const node);
 bool node_destroy(node_t* const node);

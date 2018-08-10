@@ -32,7 +32,7 @@ bool core_init(core_t* const core) {
     return false;
   }
   log_info(CORE_LOGGER_ID, "Initializing cIRI node\n");
-  if (node_init(&core->node) == false) {
+  if (node_init(&core->node, core) == false) {
     log_critical(CORE_LOGGER_ID, "Initializing cIRI node failed\n");
     return false;
   }

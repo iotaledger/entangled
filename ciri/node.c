@@ -14,7 +14,7 @@
 static uint16_t tcp_port_g = 14260;
 static uint16_t udp_port_g = 14261;
 
-bool node_init(node_t* const node) {
+bool node_init(node_t* const node, core_t* const core) {
   if (node == NULL) {
     return false;
   }
@@ -50,6 +50,7 @@ bool node_init(node_t* const node) {
     log_critical(NODE_LOGGER_ID, "Initializing responder component failed\n");
     return false;
   }
+  node->core = core;
   return true;
 }
 
