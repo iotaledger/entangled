@@ -4,7 +4,19 @@ cc_binary(
     name = "ciri",
     srcs = ["main.c"],
     copts = ["-DLOGGER_ENABLE"],
-    deps = [":node"],
+    deps = [
+        ":core",
+        ":node",
+    ],
+)
+
+cc_library(
+    name = "core",
+    srcs = ["core.c"],
+    hdrs = ["core.h"],
+    deps = [
+        "//common/storage/sql/sqlite3:sqlite3_storage",
+    ],
 )
 
 cc_library(

@@ -7,12 +7,14 @@
 
 #include <stdlib.h>
 
+#include "ciri/core.h"
 #include "ciri/node.h"
 #include "utils/logger_helper.h"
 
 #define MAIN_LOGGER_ID "main"
 
 static node_t node_g;
+static core_t core_g;
 
 int main() {
   if (LOGGER_VERSION != logger_version()) {
@@ -22,6 +24,10 @@ int main() {
   logger_output_register(stdout);
   logger_output_level_set(stdout, LOGGER_DEBUG);
   logger_helper_init(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
+
+  if (core_init(&core_g) == false) {
+    return EXIT_FAILURE;
+  }
 
   log_info(MAIN_LOGGER_ID, "Initializing cIRI node\n");
   if (node_init(&node_g) == false) {

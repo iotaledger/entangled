@@ -142,4 +142,5 @@ retcode_t init_connection(connection_t* const conn,
 retcode_t destroy_connection(connection_t* const conn) {
   log_info(CONNECTION_LOGGER_ID, "Destroying connection");
   sqlite3_close((sqlite3*)conn->db);
+  return RC_OK;
 }
