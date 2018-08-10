@@ -93,13 +93,33 @@ bool request_transaction(requester_state_t *const state,
   return true;
 }
 
-
 bool get_transaction_to_request(requester_state_t *const state,
                                 trit_array_p *hash) {
+  concurrent_list_node_of_trit_array_p *iter = NULL;
+  bool exists = false;
+
   if (state == NULL) {
     return false;
   }
+  if (hash == NULL) {
     return false;
+  }
+  iter = state->list->front;
+  while (iter) {
+    *hash = iter->data;
+    iter = iter->next;
+    if (iota_stor_exist(&state->node->core->db_conn, NULL, *hash, &exists) !=
+        RC_OK) {
+      return false;
+    }
+    if (exists) {
+      requster_clear_request(state, *hash);
+    } else {
+      break;
+    }
+  }
+  if (iter == NULL) {
+    *hash = NULL;
   }
   return true;
 }
