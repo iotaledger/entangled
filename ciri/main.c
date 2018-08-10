@@ -13,10 +13,11 @@
 
 #define MAIN_LOGGER_ID "main"
 
-static node_t node_g;
 static core_t core_g;
 
 int main() {
+  int ret = EXIT_SUCCESS;
+
   if (LOGGER_VERSION != logger_version()) {
     return EXIT_FAILURE;
   }
@@ -25,44 +26,44 @@ int main() {
   logger_output_level_set(stdout, LOGGER_DEBUG);
   logger_helper_init(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
 
+  log_info(MAIN_LOGGER_ID, "Initializing cIRI core\n");
   if (core_init(&core_g) == false) {
+    log_critical(MAIN_LOGGER_ID, "Initializing cIRI core failed\n");
     return EXIT_FAILURE;
   }
 
-  log_info(MAIN_LOGGER_ID, "Initializing cIRI node\n");
-  if (node_init(&node_g) == false) {
-    return EXIT_FAILURE;
-  }
-
-  log_info(MAIN_LOGGER_ID, "Starting cIRI node\n");
-  if (node_start(&node_g) == false) {
+  log_info(MAIN_LOGGER_ID, "Starting cIRI core\n");
+  if (core_start(&core_g) == false) {
+    log_critical(MAIN_LOGGER_ID, "Starting cIRI core failed\n");
     return EXIT_FAILURE;
   }
 
   // TODO(thibault) Remove, for broadcaster testing purpose
   neighbor_t neighbor;
   neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:14262");
-  neighbor_add(node_g.neighbors, neighbor);
+  neighbor_add(core_g.node.neighbors, neighbor);
   neighbor_init_with_uri(&neighbor, "udp://127.0.0.1:14263");
-  neighbor_add(node_g.neighbors, neighbor);
+  neighbor_add(core_g.node.neighbors, neighbor);
   flex_trit_t raw_trits[] = {-1, 0, 1, 1, 0, 1, 1,  0, -1,
                              -1, 1, 0, 1, 1, 0, -1, 1};
   while (1) {
     trit_array_p trits = trit_array_new(17);
     trit_array_set_trits(trits, raw_trits, 17);
-    broadcaster_on_next(&node_g.broadcaster, trits);
+    broadcaster_on_next(&core_g.node.broadcaster, trits);
     sleep(1);
   }
 
-  log_info(MAIN_LOGGER_ID, "Stopping cIRI node\n");
-  if (node_stop(&node_g) == false) {
-    return EXIT_FAILURE;
+  log_info(MAIN_LOGGER_ID, "Stopping cIRI core\n");
+  if (core_stop(&core_g) == false) {
+    log_error(MAIN_LOGGER_ID, "Stopping cIRI core failed\n");
+    ret = EXIT_FAILURE;
   }
 
-  log_info(MAIN_LOGGER_ID, "Destroying cIRI node\n");
-  if (node_destroy(&node_g) == false) {
-    return EXIT_FAILURE;
+  log_info(MAIN_LOGGER_ID, "Destroying cIRI core\n");
+  if (core_destroy(&core_g) == false) {
+    log_error(MAIN_LOGGER_ID, "Destroying cIRI core\n");
+    ret = EXIT_FAILURE;
   }
 
-  return EXIT_SUCCESS;
+  return ret;
 }

@@ -6,7 +6,6 @@ cc_binary(
     copts = ["-DLOGGER_ENABLE"],
     deps = [
         ":core",
-        ":node",
     ],
 )
 
@@ -15,6 +14,7 @@ cc_library(
     srcs = ["core.c"],
     hdrs = ["core.h"],
     deps = [
+        ":node",
         "//common/storage/sql/sqlite3:sqlite3_storage",
     ],
 )

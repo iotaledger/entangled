@@ -31,7 +31,38 @@ bool core_init(core_t* const core) {
     log_critical(CORE_LOGGER_ID, "Initializing database connection failed\n");
     return false;
   }
+  log_info(CORE_LOGGER_ID, "Initializing cIRI node\n");
+  if (node_init(&core->node) == false) {
+    log_critical(CORE_LOGGER_ID, "Initializing cIRI node failed\n");
+    return false;
+  }
   return true;
+}
+
+bool core_start(core_t* const core) {
+  if (core == NULL) {
+    return false;
+  }
+  log_info(CORE_LOGGER_ID, "Starting cIRI node\n");
+  if (node_start(&core->node) == false) {
+    log_critical(CORE_LOGGER_ID, "Starting cIRI node failed\n");
+    return false;
+  }
+  return true;
+}
+
+bool core_stop(core_t* const core) {
+  bool ret = true;
+
+  if (core == NULL) {
+    return false;
+  }
+  log_info(CORE_LOGGER_ID, "Stopping cIRI node\n");
+  if (node_stop(&core->node) == false) {
+    log_error(CORE_LOGGER_ID, "Stopping cIRI node failed\n");
+    ret = false;
+  }
+  return ret;
 }
 
 bool core_destroy(core_t* const core) {
@@ -40,11 +71,16 @@ bool core_destroy(core_t* const core) {
   if (core == NULL) {
     return false;
   }
-  logger_helper_destroy(CORE_LOGGER_ID);
+  log_info(CORE_LOGGER_ID, "Destroying cIRI node\n");
+  if (node_destroy(&core->node) == false) {
+    log_error(CORE_LOGGER_ID, "Destroying cIRI node failed\n");
+    ret = false;
+  }
   log_info(CORE_LOGGER_ID, "Destroying database connection\n");
   if (destroy_connection(&core->db_conn) != RC_OK) {
     log_error(CORE_LOGGER_ID, "Destroying database connection failed\n");
     ret = false;
   }
+  logger_helper_destroy(CORE_LOGGER_ID);
   return ret;
 }
