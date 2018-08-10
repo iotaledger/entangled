@@ -75,6 +75,7 @@ cc_library(
     srcs = ["requester.c"],
     deps = [
         ":requester_shared",
+        "//ciri:core_shared",
         "//utils:logger_helper",
     ],
 )

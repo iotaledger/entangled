@@ -6,6 +6,8 @@
  */
 
 #include "common/network/components/requester.h"
+#include "ciri/core.h"
+#include "common/storage/storage.h"
 #include "utils/logger_helper.h"
 
 // TODO(thibault) configuration variable
@@ -61,18 +63,31 @@ bool requester_is_full(requester_state_t *const state) {
 
 bool request_transaction(requester_state_t *const state,
                          trit_array_p const hash) {
+  bool exists = false;
+
   if (state == NULL) {
     return false;
   }
   if (hash == NULL) {
     return false;
   }
-  if (!transactions_to_request_is_full(state)) {
-    if (state->list->vtable->push_back(state->list, hash) !=
-        CONCURRENT_LIST_SUCCESS) {
+  // TODO(thibault) check null hash
+  if (iota_stor_exist(&state->node->core->db_conn, NULL, hash, &exists) !=
+          RC_OK ||
+      exists) {
+    return false;
+  }
+  if (state->list->vtable->contains(state->list, hash) == false) {
+    if (requester_is_full(state) == false) {
+      if (state->list->vtable->push_back(state->list, hash) !=
+          CONCURRENT_LIST_SUCCESS) {
+        log_warning(REQUESTER_COMPONENT_LOGGER_ID,
+                    "Adding new transaction request to the list failed\n");
+        return false;
+      }
+    } else {
       log_warning(REQUESTER_COMPONENT_LOGGER_ID,
-                  "Pushing to requester list failed\n");
-      return false;
+                  "Transactions requests list is full\n");
     }
   }
   return true;
