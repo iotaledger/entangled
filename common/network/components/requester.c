@@ -37,11 +37,18 @@ size_t transactions_to_request_number(requester_state_t *const state) {
   return state->list->vtable->size(state->list);
 }
 
-bool clear_transaction_request(trit_array_p const hash) {
+bool clear_transaction_request(requester_state_t *const state,
+                               trit_array_p const hash) {
+  if (state == NULL) {
+    return false;
+  }
   if (hash == NULL) {
     return false;
   }
-  // TODO(thibault) remove from set/queue
+  if (state->list->vtable->remove(state->list, hash) !=
+      CONCURRENT_LIST_SUCCESS) {
+    return false;
+  }
   return true;
 }
 

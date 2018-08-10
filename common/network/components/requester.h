@@ -24,7 +24,8 @@ extern "C" {
 
 bool requester_init(requester_state_t *const state, node_t *const node);
 size_t transactions_to_request_number(requester_state_t *const state);
-bool clear_transaction_request(trit_array_p const hash);
+bool clear_transaction_request(requester_state_t *const state,
+                               trit_array_p const hash);
 bool transactions_to_request_is_full(requester_state_t *const state);
 bool request_transaction(requester_state_t *const state,
                          trit_array_p const hash);
