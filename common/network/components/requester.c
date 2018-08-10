@@ -39,8 +39,8 @@ size_t requester_size(requester_state_t *const state) {
   return state->list->vtable->size(state->list);
 }
 
-bool requster_clear_request(requester_state_t *const state,
-                            trit_array_p const hash) {
+bool requester_clear_request(requester_state_t *const state,
+                             trit_array_p const hash) {
   if (state == NULL) {
     return false;
   }
@@ -113,7 +113,7 @@ bool get_transaction_to_request(requester_state_t *const state,
       return false;
     }
     if (exists) {
-      requster_clear_request(state, *hash);
+      requester_clear_request(state, *hash);
     } else {
       break;
     }
