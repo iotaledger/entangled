@@ -8,9 +8,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "common/logger_helper.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/sql/statements.h"
+#include "utils/logger_helper.h"
 
 #define SQL_STATEMENTS_ID "sql_statements"
 
@@ -64,9 +64,8 @@ retcode_t iota_transactions_insert_statement(const iota_transaction_t tx,
       tx->attachment_timestamp_lower, nonce);
 
   if (res < 0 || res == statement_cap) {
-    logger_helper_print(SQL_STATEMENTS_ID, LOGGER_ERR,
-                        "Failed in creating statement, statement: %s",
-                        statement);
+    log_error(SQL_STATEMENTS_ID, "Failed in creating statement, statement: %s",
+              statement);
     return RC_SQL_FAILED_WRITE_STATEMENT;
   }
 }
@@ -88,9 +87,8 @@ retcode_t iota_transactions_select_statement(const char *index_col,
   }
 
   if (res < 0 || res == statement_cap) {
-    logger_helper_print(SQL_STATEMENTS_ID, LOGGER_ERR,
-                        "Failed in creating statement, statement: %s",
-                        statement);
+    log_error(SQL_STATEMENTS_ID, "Failed in creating statement, statement: %s",
+              statement);
     return RC_SQL_FAILED_WRITE_STATEMENT;
   }
 }
@@ -114,9 +112,8 @@ retcode_t iota_transactions_exist_statement(const char *index_col,
   }
 
   if (res < 0 || res == statement_cap) {
-    logger_helper_print(SQL_STATEMENTS_ID, LOGGER_ERR,
-                        "Failed in creating statement, statement: %s",
-                        statement);
+    log_error(SQL_STATEMENTS_ID, "Failed in creating statement, statement: %s",
+              statement);
     return RC_SQL_FAILED_WRITE_STATEMENT;
   }
 }

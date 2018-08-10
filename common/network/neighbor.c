@@ -6,7 +6,6 @@
  */
 
 #include "common/network/neighbor.h"
-#include "common/network/logger.h"
 #include "common/network/services/tcp_sender.hpp"
 #include "common/network/services/udp_sender.hpp"
 #include "common/network/uri_parser.h"
@@ -57,6 +56,5 @@ bool neighbor_send(neighbor_t *const neighbor, trit_array_p const hash) {
   } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
     return udp_send(&neighbor->endpoint, hash);
   }
-  log_error("Sending to neighbor failed: unrecognized protocol");
   return false;
 }
