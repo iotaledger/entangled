@@ -53,7 +53,6 @@ TEST_F(IotaJsonAPITest, GetBalances) {
   json res;
   res["balances"] = std::vector<std::string>{"1000"};
 
-
   api.response = res;
   EXPECT_CALL(api, post_()).Times(1);
 
@@ -61,6 +60,31 @@ TEST_F(IotaJsonAPITest, GetBalances) {
 
   EXPECT_EQ(api.request, req);
   EXPECT_EQ(response, expected);
+}
+
+TEST_F(IotaJsonAPITest, GetNodeInfo) {
+  MockAPI api;
+
+  json req;
+  req["command"] = "getNodeInfo";
+  json res;
+  res["latestMilestone"] =
+      "VBVEUQYE99LFWHDZRFKTGFHYGDFEAMAEBGUBTTJRFKHCFBRTXFA"
+      "JQ9XIUEZQCJOQTZNOOHKUQIKOY9999";
+  res["latestMilestoneIndex"] = 107;
+  res["latestSolidSubtangleMilestoneIndex"] = 107;
+
+  api.response = res;
+
+  EXPECT_CALL(api, post_()).Times(1);
+
+  auto response = api.getNodeInfo();
+
+  EXPECT_EQ(api.request, req);
+  EXPECT_EQ((*response).latestMilestone, res["latestMilestone"]);
+  EXPECT_EQ((*response).latestMilestoneIndex, res["latestMilestoneIndex"]);
+  EXPECT_EQ((*response).latestSolidMilestoneIndex,
+            res["latestSolidSubtangleMilestoneIndex"]);
 }
 
 };  // namespace
