@@ -9,9 +9,9 @@ extern "C" {
 
 typedef struct {
   /**
-   * Address of your peer.
+   * IP Address of your peer.
    */
-  flex_trit_p address;
+  char* address;
   /**
    * Number of all transactions sent (invalid, valid, already-seen).
    */

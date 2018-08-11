@@ -26,6 +26,11 @@ typedef struct {
 
 typedef struct {
   size_t size;
+  char* string;
+} char_array;
+
+typedef struct {
+  size_t size;
   flex_trit_p trits;
 } flex_trit_array;
 

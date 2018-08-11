@@ -63,9 +63,9 @@ typedef struct {
 
   // get_neighbors_request
 
-  void (*get_neighbors_deserialize_response)(const serializer_t* const,
-                                             const char* const obj,
-                                             get_neighbors_res_t* out);
+  retcode_t (*get_neighbors_deserialize_response)(const serializer_t* const,
+                                                  const char* const obj,
+                                                  get_neighbors_res_t* out);
 
   size_t (*get_neighbors_deserialize_response_get_size)(
       const serializer_t* const, const char* const toDeserialize);
@@ -105,6 +105,68 @@ typedef struct {
 
   size_t (*get_transactions_to_approve_deserialize_response_get_size)(
       const serializer_t* const, const char* const toDeserialize);
+
+  size_t (*add_neighbors_serialize_request_get_size)(
+      const serializer_t* const s);
+
+  void (*add_neighbors_serialize_request)(const serializer_t* const s,
+                                          char* out);
+
+  retcode_t (*add_neighbors_deserialize_response)(const serializer_t* const s,
+                                                  const char* const obj,
+                                                  int* out);
+
+  size_t (*add_neighbors_deserialize_response_get_size)(
+      const serializer_t* const s, const char* const toDeserialize);
+
+  size_t (*remove_neighbors_serialize_request_get_size)(
+      const serializer_t* const s);
+
+  void (*remove_neighbors_serialize_request)(const serializer_t* const s,
+                                             char* out);
+
+  retcode_t (*remove_neighbors_deserialize_response)(
+      const serializer_t* const s, const char* const obj, int* out);
+
+  size_t (*remove_neighbors_deserialize_response_get_size)(
+      const serializer_t* const s, const char* const toDeserialize);
+
+  size_t (*get_trytes_serialize_request_get_size)(const serializer_t* const s);
+
+  void (*get_trytes_serialize_request)(const serializer_t* const s, char* out);
+
+  retcode_t (*get_trytes_deserialize_response)(const serializer_t* const s,
+                                               const char* const obj,
+                                               get_trytes_res_t* out);
+
+  size_t (*get_trytes_deserialize_response_get_size)(
+      const serializer_t* const s, const char* const toDeserialize);
+
+  size_t (*attach_to_tangle_serialize_request_get_size)(
+      const serializer_t* const s);
+
+  void (*attach_to_tangle_serialize_request)(const serializer_t* const s,
+                                             char* out);
+
+  retcode_t (*attach_to_tangle_deserialize_response)(
+      const serializer_t* const s, const char* const obj,
+      attach_to_tangle_res_t* out);
+
+  size_t (*attach_to_tangle_deserialize_response_get_size)(
+      const serializer_t* const s, const char* const toDeserialize);
+
+  size_t (*addresses_spent_from_serialize_request_get_size)(
+      const serializer_t* const s);
+
+  void (*addresses_spent_from_serialize_request)(const serializer_t* const s,
+                                                 char* out);
+
+  retcode_t (*addresses_spent_from_deserialize_response)(
+      const serializer_t* const s, const char* const obj,
+      addresses_spent_from_res_t* out);
+
+  size_t (*addresses_spent_from_deserialize_response_get_size)(
+      const serializer_t* const s, const char* const toDeserialize);
 
 } serializer_vtable;
 

@@ -10,7 +10,7 @@ extern "C" {
 #include "types/types.h"
 
 typedef struct {
-  trit_array_array* trytes;
+  flex_trit_p trytes;
   size_t numTransactions;
 } get_trytes_res_t;
 
