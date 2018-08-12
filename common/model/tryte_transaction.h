@@ -88,6 +88,10 @@ class TryteTransaction {
   std::string nonce(void);
   // Set the transaction nonce (copy argument)
   void setNonce(const std::string& nonce);
+  // Get the transaction hash
+  std::string hash(void);
+  // Set the transaction hash (copy argument)
+  void setHash(const std::string& hash);
 
   std::vector<flex_trit_t> serialize(void);
 };  // class transaction

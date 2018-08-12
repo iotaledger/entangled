@@ -388,6 +388,17 @@ void transaction_set_nonce(iota_transaction_t transaction,
   memcpy(transaction->nonce, nonce, sizeof(transaction->nonce));
 }
 
+// Get the transaction hash
+flex_trit_t *transaction_hash(iota_transaction_t transaction) {
+  return transaction->hash;
+}
+
+// Set the transaction hash (copy argument)
+void transaction_set_hash(iota_transaction_t transaction,
+                          const flex_trit_t *hash) {
+  memcpy(transaction->hash, hash, sizeof(transaction->hash));
+}
+
 /***********************************************************************************************************
  * Constructors
  ***********************************************************************************************************/

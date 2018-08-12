@@ -256,6 +256,24 @@ void TryteTransaction::setNonce(const std::string &trytes) {
   transaction_set_nonce(iota_transaction, trits);
 }
 
+// Get the transaction hash
+std::string TryteTransaction::hash(void) {
+  auto trits = transaction_hash(iota_transaction);
+  std::string trytes(NUM_TRYTES_HASH, '9');
+  flex_trit_to_tryte((tryte_t *)trytes.data(), NUM_TRYTES_HASH, trits,
+                     NUM_TRITS_HASH, NUM_TRITS_HASH);
+  return trytes;
+}
+
+// Set the transaction hash (copy argument)
+void TryteTransaction::setHash(const std::string &trytes) {
+  size_t flex_len = flex_trits_num_for_trits(NUM_TRITS_HASH);
+  flex_trit_t trits[flex_len];
+  tryte_to_flex_trit(trits, NUM_TRITS_HASH, (const tryte_t *)trytes.data(),
+                     NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  transaction_set_hash(iota_transaction, trits);
+}
+
 std::vector<flex_trit_t> TryteTransaction::serialize(void) {
   size_t num_bytes = flex_trits_num_for_trits(NUM_TRITS_SERIALIZED_TRANSACTION);
   std::vector<flex_trit_t> value(num_bytes);
