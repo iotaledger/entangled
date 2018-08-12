@@ -5,6 +5,7 @@ cc_library(
     srcs = ["transaction.c"],
     hdrs = ["transaction.h"],
     deps = [
+        "//common/curl-p:digest",
         "//common/trinary:trit_array",
         "//common/trinary:trit_long",
     ],
@@ -15,6 +16,7 @@ cc_library(
     srcs = ["transaction.c"],
     hdrs = ["transaction.h"],
     deps = [
+        "//common/curl-p:digest",
         "//common/trinary:trit_array_3",
         "//common/trinary:trit_long",
     ],
@@ -25,6 +27,7 @@ cc_library(
     srcs = ["transaction.c"],
     hdrs = ["transaction.h"],
     deps = [
+        "//common/curl-p:digest",
         "//common/trinary:trit_array_4",
         "//common/trinary:trit_long",
     ],
@@ -35,6 +38,7 @@ cc_library(
     srcs = ["transaction.c"],
     hdrs = ["transaction.h"],
     deps = [
+        "//common/curl-p:digest",
         "//common/trinary:trit_array_5",
         "//common/trinary:trit_long",
     ],

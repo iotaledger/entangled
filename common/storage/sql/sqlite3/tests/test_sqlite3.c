@@ -23,6 +23,7 @@ void test_init_connection(void) {
   config.index_approvee = true;
   config.index_bundle = true;
   config.index_tag = true;
+  config.index_hash = true;
   TEST_ASSERT(init_connection(&conn, &config) == RC_OK);
 }
 
@@ -65,6 +66,7 @@ void test_stored_transaction(void) {
   TEST_ASSERT_EQUAL_INT(txs[0]->timestamp, TEST_TRANSACTION.timestamp);
   TEST_ASSERT_EQUAL_INT(txs[0]->current_index, TEST_TRANSACTION.current_index);
   TEST_ASSERT_EQUAL_INT(txs[0]->last_index, TEST_TRANSACTION.last_index);
+  TEST_ASSERT_EQUAL_STRING(txs[0]->hash, TEST_TRANSACTION.hash);
 
   for (int i = 0; i < 5; ++i) {
     transaction_free(txs[i]);
@@ -80,7 +82,7 @@ int main(void) {
   RUN_TEST(test_init_connection);
   RUN_TEST(test_initialized_db_empty);
   RUN_TEST(test_stored_transaction);
-  //TODO - Add test to find transaction by any column name (When #2 is merged)
+  // TODO - Add test to find transaction by any column name (When #2 is merged)
 
   return UNITY_END();
 }

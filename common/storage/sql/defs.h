@@ -24,14 +24,16 @@
 #define COL_ATTACHMENT_TIMESTAMP_UPPER "attachment_timestamp_upper"
 #define COL_ATTACHMENT_TIMESTAMP_LOWER "attachment_timestamp_lower"
 #define COL_NONCE "nonce"
+#define COL_HASH "hash"
 
-#define NUM_COLS 15
+#define NUM_COLS 16
 
 #define ADDRESS_INDEX "address_index"
 #define BUNDLE_INDEX "bundle_index"
 #define TRUNK_INDEX "trunk_index"
 #define BRANCH_INDEX "branch_index"
 #define TAG_INDEX "tag_index"
+#define HASH_INDEX "hash_index"
 
 #define MAX_CREATE_INDEX_STATEMENT_SIZE 128
 #define MAX_STORE_STATEMENT_SIZE 4096

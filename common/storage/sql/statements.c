@@ -27,6 +27,7 @@ retcode_t iota_transactions_insert_statement(const iota_transaction_t tx,
   char branch[81 + 1];
   char tag[27 + 1];
   char nonce[27 + 1];
+  char hash[81 + 1];
   int res;
 
   memcpy(sig_or_msg, tx->signature_or_message, 2187);
@@ -49,19 +50,22 @@ retcode_t iota_transactions_insert_statement(const iota_transaction_t tx,
   memcpy(nonce, tx->nonce, 27);
   nonce[27] = '\0';
 
+  memcpy(hash, tx->hash, 81);
+  hash[81] = '\0';
+
   res = snprintf(
       statement, statement_cap,
-      "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
+      "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
       "VALUES ('%s','%s',%" PRIu64 ",'%s',%" PRIu64 ",%" PRIu64 ",%" PRIu64
-      ",'%s','%s','%s','%s',%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",'%s')",
+      ",'%s','%s','%s','%s',%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",'%s','%s')",
       TRANSACTION_TABLE_NAME, COL_SIG_OR_MSG, COL_ADDRESS, COL_VALUE,
       COL_OBSOLETE_TAG, COL_TIMESTAMP, COL_CURRENT_INDEX, COL_LAST_INDEX,
       COL_BUNDLE, COL_TRUNK, COL_BRANCH, COL_TAG, COL_ATTACHMENT_TIMESTAMP,
       COL_ATTACHMENT_TIMESTAMP_UPPER, COL_ATTACHMENT_TIMESTAMP_LOWER, COL_NONCE,
-      sig_or_msg, address, tx->value, obsolete_tag, tx->timestamp,
+      COL_HASH, sig_or_msg, address, tx->value, obsolete_tag, tx->timestamp,
       tx->current_index, tx->last_index, bundle, trunk, branch, tag,
       tx->attachment_timestamp, tx->attachment_timestamp_upper,
-      tx->attachment_timestamp_lower, nonce);
+      tx->attachment_timestamp_lower, nonce, hash);
 
   if (res < 0 || res == statement_cap) {
     log_error(SQL_STATEMENTS_ID, "Failed in creating statement, statement: %s",
