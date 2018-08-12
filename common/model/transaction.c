@@ -120,7 +120,7 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
   offset += NUM_TRITS_NONCE;
 
   // Compute the transaction hash
-  // TODO(thibault) Waiting for cryptographic functions to handle flex_trits
+  // FIXME(thibault) Waiting for cryptographic functions to handle flex_trits
   Curl curl;
   init_curl(&curl);
   curl.type = CURL_P_81;
