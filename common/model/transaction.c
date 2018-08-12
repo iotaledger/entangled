@@ -112,10 +112,10 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
   transaction_set_attachment_timestamp_upper(
       transaction, trits_to_long(buffer, NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER));
   offset += NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER;
-  flex_trit_array_slice(transaction->nonce, NUM_TRITS_NOUNCE, trits,
+  flex_trit_array_slice(transaction->nonce, NUM_TRITS_NONCE, trits,
                         NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_NOUNCE);
-  offset += NUM_TRITS_NOUNCE;
+                        NUM_TRITS_NONCE);
+  offset += NUM_TRITS_NONCE;
   return offset;
 }
 
@@ -199,9 +199,9 @@ size_t transaction_serialize_to_flex_trits(const iota_transaction_t transaction,
                          NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER);
   offset += NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER;
   flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         transaction->nonce, NUM_TRITS_NOUNCE, offset,
-                         NUM_TRITS_NOUNCE);
-  offset += NUM_TRITS_NOUNCE;
+                         transaction->nonce, NUM_TRITS_NONCE, offset,
+                         NUM_TRITS_NONCE);
+  offset += NUM_TRITS_NONCE;
   return offset;
 }
 
