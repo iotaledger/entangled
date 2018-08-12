@@ -5,9 +5,11 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/model/transaction.h"
 #include <stdlib.h>
 #include <string.h>
+
+#include "common/curl-p/digest.h"
+#include "common/model/transaction.h"
 #include "common/trinary/trit_long.h"
 
 /***********************************************************************************************************
@@ -116,6 +118,19 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
                         NUM_TRITS_SERIALIZED_TRANSACTION, offset,
                         NUM_TRITS_NONCE);
   offset += NUM_TRITS_NONCE;
+
+  // Compute the transaction hash
+  // TODO(thibault) Waiting for cryptographic functions to handle flex_trits
+  Curl curl;
+  init_curl(&curl);
+  curl.type = CURL_P_81;
+  trit_t tx_trits[NUM_TRITS_SERIALIZED_TRANSACTION];
+  trit_t hash[NUM_TRITS_HASH];
+  flex_trit_array_to_int8(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, trits,
+                          offset, offset);
+  curl_digest(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, hash, &curl);
+  int8_to_flex_trit_array(transaction->hash, NUM_TRITS_HASH, hash,
+                          NUM_TRITS_HASH, NUM_TRITS_HASH);
   return offset;
 }
 
