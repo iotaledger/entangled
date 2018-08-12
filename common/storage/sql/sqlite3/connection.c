@@ -105,6 +105,13 @@ retcode_t init_connection(connection_t* const conn,
     }
   }
 
+  if (config->index_hash) {
+    if (retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                             HASH_INDEX, COL_HASH)) {
+      return retcode;
+    }
+  }
+
   // TODO - implement connections pool so no two threads
   // will access db through same connection simultaneously
   sqlite3_config(SQLITE_CONFIG_MULTITHREAD);

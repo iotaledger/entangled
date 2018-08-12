@@ -64,6 +64,7 @@ int select_transactions_cb(void* txs, int num_cols, char** col_values,
     curr_transaction->attachment_timestamp_lower =
         strtol(col_values[c++], &end, 10);
     memcpy(curr_transaction->nonce, col_values[c++], 27);
+    memcpy(curr_transaction->hash, col_values[c++], 81);
   }
 
   return 0;
