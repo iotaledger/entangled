@@ -11,6 +11,7 @@
 
 #include "common/helpers/files.h"
 #include "common/storage/connection.h"
+#include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
 
@@ -73,6 +74,28 @@ void test_stored_transaction(void) {
   }
 }
 
+void test_stored_load_hashes_by_address(void) {
+  trit_array_p hashes[5];
+
+  for (int i = 0; i < 5; ++i) {
+    hashes[i] = trit_array_new(FLEX_TRIT_SIZE_243);
+  }
+
+  size_t num_loaded;
+  trit_array_p key = trit_array_new(FLEX_TRIT_SIZE_243);
+  memcpy(key->trits,TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT(iota_stor_load_hashes(&conn, COL_ADDRESS,
+                                    key, hashes, 5,
+                                    &num_loaded) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, num_loaded);
+  TEST_ASSERT_EQUAL_MEMORY(TEST_TRANSACTION.hash, hashes[0]->trits, 81);
+
+  for (int i = 0; i < 5; ++i) {
+    trit_array_free(hashes[i]);
+  }
+
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -82,6 +105,7 @@ int main(void) {
   RUN_TEST(test_init_connection);
   RUN_TEST(test_initialized_db_empty);
   RUN_TEST(test_stored_transaction);
+  RUN_TEST(test_stored_load_hashes_by_address);
   // TODO - Add test to find transaction by any column name (When #2 is merged)
 
   return UNITY_END();

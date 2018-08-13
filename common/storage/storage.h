@@ -37,6 +37,13 @@ extern retcode_t iota_stor_update(const connection_t* const conn,
                                   const trit_array_p key,
                                   const iota_transaction_t data_in);
 
+extern retcode_t iota_stor_load_hashes(const connection_t* const conn,
+                                       const char* col_name,
+                                       const trit_array_p key,
+                                       trit_array_p data_out[],
+                                       size_t max_num_hashes,
+                                       size_t* num_loaded);
+
 #ifdef __cplusplus
 }
 #endif
