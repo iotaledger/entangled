@@ -87,7 +87,7 @@ retcode_t iota_transactions_select_statement(const char *index_col,
   } else {
     char key_str[key->num_bytes];
     memcpy(key_str, key->trits, key->num_bytes);
-    res = snprintf(statement, statement_cap, "SELECT * FROM %s WHERE %s = %s",
+    res = snprintf(statement, statement_cap, "SELECT * FROM %s WHERE %s = '%s'",
                    TRANSACTION_TABLE_NAME, index_col, key_str);
   }
 
@@ -113,7 +113,7 @@ retcode_t iota_transactions_exist_statement(const char *index_col,
     char key_str[key->num_bytes];
     memcpy(key_str, key->trits, key->num_bytes);
     res = snprintf(statement, statement_cap,
-                   "SELECT '1' WHERE EXISTS(SELECT 1 FROM %s WHERE %s = %s)",
+                   "SELECT '1' WHERE EXISTS(SELECT 1 FROM %s WHERE %s = '%s')",
                    TRANSACTION_TABLE_NAME, index_col, key_str);
   }
 
@@ -131,4 +131,28 @@ retcode_t iota_transactions_update_statement(const char *index_col,
                                              char statement[],
                                              size_t statement_cap) {
   return RC_OK;
+}
+
+retcode_t iota_transactions_select_hashes_statement(const char *index_col,
+                                                    const trit_array_p key,
+                                                    char statement[],
+                                                    size_t statement_cap) {
+  int res;
+
+  if (index_col == NULL || strcmp(index_col, "") == 0) {
+    res = snprintf(statement, statement_cap, "SELECT %s FROM %s", COL_HASH,
+                   TRANSACTION_TABLE_NAME);
+  } else {
+    char key_str[key->num_bytes + 1];
+    memcpy(key_str, key->trits, key->num_bytes);
+    key_str[key->num_bytes] = 0;
+    res = snprintf(statement, statement_cap, "SELECT %s FROM %s WHERE %s='%s'",
+                   COL_HASH, TRANSACTION_TABLE_NAME, index_col, key_str);
+  }
+
+  if (res < 0 || res == statement_cap) {
+    log_error(SQL_STATEMENTS_ID, "Failed in creating statement, statement: %s",
+              statement);
+    return RC_SQL_FAILED_WRITE_STATEMENT;
+  }
 }

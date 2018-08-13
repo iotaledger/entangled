@@ -20,11 +20,8 @@
 
 #define SQLITE3_LOGGER_ID "stor_sqlite3"
 
-typedef struct iota_transactions_pack {
-  iota_transaction_t* txs;
-  size_t num_txs;
-  size_t num_loaded;
-} iota_transactions_pack;
+int select_hashes_cb(void* hashes, int num_cols, char** col_values,
+                     char** col_names);
 
 retcode_t iota_stor_init() {
   logger_helper_init(SQLITE3_LOGGER_ID, LOGGER_INFO, true);
@@ -48,7 +45,7 @@ int select_transactions_cb(void* txs, int num_cols, char** col_values,
   }
 
   pack = (iota_transactions_pack*)txs;
-  if (pack->num_loaded < pack->num_txs) {
+  if (pack->num_loaded < pack->max_txs) {
     iota_transaction_t curr_transaction = pack->txs[pack->num_loaded++];
 
     memcpy(curr_transaction->signature_or_message, col_values[c++], 2187);
@@ -99,21 +96,14 @@ retcode_t iota_stor_store(const connection_t* const conn,
   return RC_OK;
 }
 retcode_t iota_stor_load(const connection_t* const conn, const char* col_name,
-                         const trit_array_p key, iota_transaction_t data_out[],
-                         size_t max_num_txs, size_t* num_loaded) {
+                         const trit_array_p key, iota_transactions_pack* pack) {
   char statement[MAX_SELECT_STATEMENT_SIZE];
   iota_transactions_select_statement(col_name, key, statement,
                                      MAX_SELECT_STATEMENT_SIZE);
 
   char* err_msg = 0;
-  iota_transactions_pack pack;
-  pack.txs = data_out;
-  pack.num_txs = max_num_txs;
-  pack.num_loaded = 0;
-
   int rc = sqlite3_exec((sqlite3*)conn->db, statement, select_transactions_cb,
-                        (void*)&pack, &err_msg);
-  *num_loaded = pack.num_loaded;
+                        (void*)pack, &err_msg);
 
   if (rc != SQLITE_OK) {
     log_error(SQLITE3_LOGGER_ID, "Failed in statement", statement);
@@ -142,6 +132,43 @@ retcode_t iota_stor_exist(const connection_t* const conn,
   }
 
   return RC_OK;
+}
+
+extern retcode_t iota_stor_load_hashes(const connection_t* const conn,
+                                       const char* col_name,
+                                       const trit_array_p key,
+                                       iota_hashes_pack* pack) {
+  char statement[MAX_SELECT_STATEMENT_SIZE];
+  iota_transactions_select_hashes_statement(col_name, key, statement,
+                                            MAX_SELECT_STATEMENT_SIZE);
+
+  char* err_msg = 0;
+
+  int rc = sqlite3_exec((sqlite3*)conn->db, statement, select_hashes_cb,
+                        (void*)pack, &err_msg);
+
+  if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID, "Failed in statement", statement);
+    sqlite3_free(err_msg);
+    return RC_SQLITE3_FAILED_INSERT_DB;
+  }
+  return RC_OK;
+}
+
+int select_hashes_cb(void* hashes, int num_cols, char** col_values,
+                     char** col_names) {
+  iota_hashes_pack* pack;
+  int len;
+  pack = (iota_hashes_pack*)hashes;
+  if (pack->num_loaded < pack->max_hashes) {
+    len = strlen(col_values[pack->num_loaded]);
+    pack->hashes[pack->num_loaded]->num_bytes = len;
+    memcpy(pack->hashes[pack->num_loaded]->trits, col_values[pack->num_loaded],
+           len);
+    pack->num_loaded++;
+  }
+
+  return 0;
 }
 
 retcode_t iota_stor_update(const connection_t* const conn,
