@@ -17,9 +17,9 @@ typedef struct core_s {
   connection_config_t db_conf;
 } core_t;
 
-bool core_init(core_t *const core);
-bool core_start(core_t *const core);
-bool core_stop(core_t *const core);
-bool core_destroy(core_t *const core);
+retcode_t core_init(core_t *const core);
+retcode_t core_start(core_t *const core);
+retcode_t core_stop(core_t *const core);
+retcode_t core_destroy(core_t *const core);
 
 #endif  // __CIRI_CORE_H__
