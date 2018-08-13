@@ -40,15 +40,19 @@ void test_stored_transaction(void) {
   TEST_ASSERT(iota_stor_exist(&conn, NULL, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
+  iota_transactions_pack pack;
   iota_transaction_t txs[5];
+  pack.txs = &txs;
+  pack.num_loaded = 0;
+  pack.max_txs = 5;
 
   for (int i = 0; i < 5; ++i) {
-    txs[i] = transaction_new();
+    pack.txs[i] = transaction_new();
   }
 
   size_t num_loaded;
-  TEST_ASSERT(iota_stor_load(&conn, NULL, NULL, txs, 5, &num_loaded) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(1, num_loaded);
+  TEST_ASSERT(iota_stor_load(&conn, NULL, NULL, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
 
   TEST_ASSERT_EQUAL_STRING(txs[0]->nonce, TEST_TRANSACTION.nonce);
   TEST_ASSERT_EQUAL_STRING(txs[0]->signature_or_message,
@@ -70,30 +74,29 @@ void test_stored_transaction(void) {
   TEST_ASSERT_EQUAL_STRING(txs[0]->hash, TEST_TRANSACTION.hash);
 
   for (int i = 0; i < 5; ++i) {
-    transaction_free(txs[i]);
+    transaction_free(pack.txs[i]);
   }
 }
 
 void test_stored_load_hashes_by_address(void) {
   trit_array_p hashes[5];
-
-  for (int i = 0; i < 5; ++i) {
-    hashes[i] = trit_array_new(FLEX_TRIT_SIZE_243);
+  iota_hashes_pack pack;
+  pack.hashes = &hashes;
+  pack.num_loaded = 0;
+  pack.max_hashes = 5;
+  for (int i = 0; i < pack.max_hashes; ++i) {
+    pack.hashes[i] = trit_array_new(243);
   }
+  pack.max_hashes = 5;
+  trit_array_p key = trit_array_new(243);
+  memcpy(key->trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT(iota_stor_load_hashes(&conn, COL_ADDRESS, key, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
+  TEST_ASSERT_EQUAL_MEMORY(TEST_TRANSACTION.hash, pack.hashes[0]->trits, 81);
 
-  size_t num_loaded;
-  trit_array_p key = trit_array_new(FLEX_TRIT_SIZE_243);
-  memcpy(key->trits,TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_stor_load_hashes(&conn, COL_ADDRESS,
-                                    key, hashes, 5,
-                                    &num_loaded) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(1, num_loaded);
-  TEST_ASSERT_EQUAL_MEMORY(TEST_TRANSACTION.hash, hashes[0]->trits, 81);
-
-  for (int i = 0; i < 5; ++i) {
-    trit_array_free(hashes[i]);
+  for (int i = 0; i < pack.max_hashes; ++i) {
+    trit_array_free(pack.hashes[i]);
   }
-
 }
 
 int main(void) {
