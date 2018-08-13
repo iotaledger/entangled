@@ -7,6 +7,7 @@
 
 #include "common/network/components/requester.h"
 #include "ciri/core.h"
+#include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
 #include "utils/logger_helper.h"
 
@@ -72,9 +73,10 @@ bool request_transaction(requester_state_t *const state,
     return false;
   }
   // TODO(thibault) check null hash
-  if (iota_stor_exist(&state->node->core->db_conn, NULL, hash, &exists) !=
-          RC_OK ||
-      exists) {
+  if (iota_stor_exist(&state->node->core->db_conn, COL_HASH, hash, &exists)) {
+    return false;
+  }
+  if (exists) {
     return false;
   }
   if (state->list->vtable->contains(state->list, hash) == false) {
@@ -108,8 +110,8 @@ bool get_transaction_to_request(requester_state_t *const state,
   while (iter) {
     *hash = iter->data;
     iter = iter->next;
-    if (iota_stor_exist(&state->node->core->db_conn, NULL, *hash, &exists) !=
-        RC_OK) {
+    if (iota_stor_exist(&state->node->core->db_conn, COL_HASH, *hash,
+                        &exists)) {
       return false;
     }
     if (exists) {
