@@ -34,7 +34,7 @@ void UdpReceiverService::receive() {
         if (!ec && length > 0) {
           auto host = senderEndpoint_.address().to_string().c_str();
           auto port = senderEndpoint_.port();
-          neighbor_t* neighbor = neighbor_find_by_values(
+          neighbor_t* neighbor = neighbor_find_by_endpoint_values(
               service_->state->node->neighbors, PROTOCOL_UDP, host, port);
           if (neighbor == NULL) {
             log_debug(UDP_RECEIVER_SERVICE_LOGGER_ID,

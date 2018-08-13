@@ -34,8 +34,8 @@ void TcpConnection::start() {
   auto host = socket_.remote_endpoint().address().to_string().c_str();
   auto port = socket_.remote_endpoint().port();
 
-  neighbor_ = neighbor_find_by_values(service_->state->node->neighbors,
-                                      PROTOCOL_TCP, host, port);
+  neighbor_ = neighbor_find_by_endpoint_values(service_->state->node->neighbors,
+                                               PROTOCOL_TCP, host, port);
   if (neighbor_ == NULL) {
     log_info(TCP_RECEIVER_SERVICE_LOGGER_ID,
              "Connection denied with non-tethered neighbor tcp://%s:%d\n", host,
