@@ -84,6 +84,13 @@ bool receiver_stop(receiver_state_t *const state) {
               "Shutting down UDP receiver thread failed");
     ret = false;
   }
-  logger_helper_destroy(RECEIVER_COMPONENT_LOGGER_ID);
   return ret;
+}
+
+bool receiver_destroy(receiver_state_t *const state) {
+  if (state == NULL) {
+    return false;
+  }
+  logger_helper_destroy(RECEIVER_COMPONENT_LOGGER_ID);
+  return true;
 }
