@@ -3,6 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "ciri",
     srcs = ["main.c"],
+    copts = ["-DLOGGER_ENABLE"],
     deps = [":node"],
 )
 

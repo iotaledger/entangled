@@ -36,6 +36,7 @@ class TcpReceiverService {
  public:
   TcpReceiverService(receiver_service_t* const service,
                      boost::asio::io_context& context, uint16_t const port);
+  ~TcpReceiverService();
 
  private:
   void accept();

@@ -6,8 +6,8 @@
  */
 
 #include "common/storage/connection.h"
-#include "common/logger_helper.h"
 #include "common/storage/sql/defs.h"
+#include "utils/logger_helper.h"
 
 #include <sqlite3.h>
 #include <stdint.h>
@@ -30,23 +30,22 @@ retcode_t create_index_if_not_exists(const connection_t* const conn,
                      TRANSACTION_TABLE_NAME, colName);
 
   if (res < 0 || res == MAX_CREATE_INDEX_STATEMENT_SIZE) {
-    logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_ERR,
-                        "Failed to write statement, statement: %s", statement);
+    log_error(CONNECTION_LOGGER_ID, "Failed to write statement, statement: %s",
+              statement);
     return RC_SQLITE3_FAILED_WRITE_STATEMENT;
   }
 
   int rc = sqlite3_exec((sqlite3*)conn->db, statement, 0, 0, &errMsg);
   if (rc != SQLITE_OK) {
-    logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_ERR,
-                        "Failed in creating index, statement: %s, errMsg: %s\n",
-                        statement, errMsg);
+    log_error(CONNECTION_LOGGER_ID,
+              "Failed in creating index, statement: %s, errMsg: %s\n",
+              statement, errMsg);
     sqlite3_free(errMsg);
     return RC_SQLITE3_FAILED_CREATE_INDEX_DB;
   }
 
-  logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_INFO,
-                      "created index: %s on column: %s successfully", indexName,
-                      colName);
+  log_info(CONNECTION_LOGGER_ID, "created index: %s on column: %s successfully",
+           indexName, colName);
 
   return RC_OK;
 }
@@ -59,8 +58,7 @@ retcode_t init_connection(connection_t* const conn,
   char* sql;
 
   if (config->db_path == NULL) {
-    logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_CRIT,
-                        "No path for db specified");
+    log_critical(CONNECTION_LOGGER_ID, "No path for db specified");
     return RC_SQLITE3_NO_PATH_FOR_DB_SPECIFIED;
   } else {
     rc = sqlite3_open_v2(config->db_path, (sqlite3**)&conn->db,
@@ -68,12 +66,11 @@ retcode_t init_connection(connection_t* const conn,
   }
 
   if (rc) {
-    logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_CRIT,
-                        "Failed to open db on path: %s", config->db_path);
+    log_critical(CONNECTION_LOGGER_ID, "Failed to open db on path: %s",
+                 config->db_path);
   } else {
-    logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_INFO,
-                        "Opened database (from path: %s ) successfully",
-                        config->db_path);
+    log_info(CONNECTION_LOGGER_ID,
+             "Opened database (from path: %s ) successfully", config->db_path);
   }
 
   if (config->index_approvee) {
@@ -108,6 +105,13 @@ retcode_t init_connection(connection_t* const conn,
     }
   }
 
+  if (config->index_hash) {
+    if (retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                             HASH_INDEX, COL_HASH)) {
+      return retcode;
+    }
+  }
+
   // TODO - implement connections pool so no two threads
   // will access db through same connection simultaneously
   sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
@@ -117,8 +121,7 @@ retcode_t init_connection(connection_t* const conn,
   rc = sqlite3_exec((sqlite3*)conn->db, sql, 0, 0, &err_msg);
 
   if (rc != SQLITE_OK) {
-    logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_ERR,
-                        "Failed in statement: %s", sql);
+    log_error(CONNECTION_LOGGER_ID, "Failed in statement: %s", sql);
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
@@ -127,20 +130,17 @@ retcode_t init_connection(connection_t* const conn,
   rc = sqlite3_exec((sqlite3*)conn->db, sql, 0, 0, &err_msg);
 
   if (rc != SQLITE_OK) {
-    logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_ERR,
-                        "Failed in statement: %s", sql);
+    log_error(CONNECTION_LOGGER_ID, "Failed in statement: %s", sql);
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
 
-  logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_INFO,
-                      "connection initialised successfully");
+  log_info(CONNECTION_LOGGER_ID, "connection initialised successfully");
 
   return retcode;
 }
 
 retcode_t destroy_connection(connection_t* const conn) {
-  logger_helper_print(CONNECTION_LOGGER_ID, LOGGER_INFO,
-                      "Destroying connection");
+  log_info(CONNECTION_LOGGER_ID, "Destroying connection");
   sqlite3_close((sqlite3*)conn->db);
 }

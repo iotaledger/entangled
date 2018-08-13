@@ -15,6 +15,7 @@ class UdpReceiverService {
  public:
   UdpReceiverService(receiver_service_t* const service,
                      boost::asio::io_context& context, uint16_t const port);
+  ~UdpReceiverService();
 
  public:
   void receive();

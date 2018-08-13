@@ -5,14 +5,13 @@
 #include "digest.h"
 
 #define TRYTE_LENGTH 2673
-#define TRANSACTION_LENGTH TRYTE_LENGTH * 3
 
 char* iota_digest(const char* trytes) {
   Curl curl;
   init_curl(&curl);
   curl.type = CURL_P_81;
 
-  size_t length = strnlen(trytes, TRANSACTION_LENGTH);
+  size_t length = strnlen(trytes, TRYTE_LENGTH);
   trit_t input[sizeof(char) * length * 3];
   trytes_to_trits((tryte_t*)trytes, input, length);
 

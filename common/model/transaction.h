@@ -29,7 +29,8 @@ extern "C" {
 #define NUM_TRITS_ATTACHMENT_TIMESTAMP 27
 #define NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER 27
 #define NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER 27
-#define NUM_TRITS_NOUNCE 81
+#define NUM_TRITS_NONCE 81
+#define NUM_TRITS_HASH 243
 
 #define NUM_TRYTES_SERIALIZED_TRANSACTION 2673
 #define NUM_TRYTES_SIGNATURE 2187
@@ -46,7 +47,8 @@ extern "C" {
 #define NUM_TRYTES_ATTACHMENT_TIMESTAMP 9
 #define NUM_TRYTES_ATTACHMENT_TIMESTAMP_LOWER 9
 #define NUM_TRYTES_ATTACHMENT_TIMESTAMP_UPPER 9
-#define NUM_TRYTES_NOUNCE 27
+#define NUM_TRYTES_NONCE 27
+#define NUM_TRYTES_HASH 81
 
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
 #define FLEX_TRIT_SIZE_27 27
@@ -106,6 +108,8 @@ struct _iota_transaction {
   // 27 trytes = 81 trits
   flex_trit_t nonce[FLEX_TRIT_SIZE_81];
   // Total 2673 trytes
+  // 81 trytes = 243 trits
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
 };
 
 /***********************************************************************************************************
@@ -190,6 +194,11 @@ flex_trit_t *transaction_nonce(iota_transaction_t transaction);
 // Set the transaction nonce (copy argument)
 void transaction_set_nonce(iota_transaction_t transaction,
                            const flex_trit_t *nonce);
+// Get the transaction hash
+flex_trit_t *transaction_hash(iota_transaction_t transaction);
+// Set the transaction hash (copy argument)
+void transaction_set_hash(iota_transaction_t transaction,
+                          const flex_trit_t *hash);
 
 /***********************************************************************************************************
  * Constructors

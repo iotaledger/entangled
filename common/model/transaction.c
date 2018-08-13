@@ -5,9 +5,11 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/model/transaction.h"
 #include <stdlib.h>
 #include <string.h>
+
+#include "common/curl-p/digest.h"
+#include "common/model/transaction.h"
 #include "common/trinary/trit_long.h"
 
 /***********************************************************************************************************
@@ -112,10 +114,23 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
   transaction_set_attachment_timestamp_upper(
       transaction, trits_to_long(buffer, NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER));
   offset += NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER;
-  flex_trit_array_slice(transaction->nonce, NUM_TRITS_NOUNCE, trits,
+  flex_trit_array_slice(transaction->nonce, NUM_TRITS_NONCE, trits,
                         NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_NOUNCE);
-  offset += NUM_TRITS_NOUNCE;
+                        NUM_TRITS_NONCE);
+  offset += NUM_TRITS_NONCE;
+
+  // Compute the transaction hash
+  // FIXME(thibault) Waiting for cryptographic functions to handle flex_trits
+  Curl curl;
+  init_curl(&curl);
+  curl.type = CURL_P_81;
+  trit_t tx_trits[NUM_TRITS_SERIALIZED_TRANSACTION];
+  trit_t hash[NUM_TRITS_HASH];
+  flex_trit_array_to_int8(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, trits,
+                          offset, offset);
+  curl_digest(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, hash, &curl);
+  int8_to_flex_trit_array(transaction->hash, NUM_TRITS_HASH, hash,
+                          NUM_TRITS_HASH, NUM_TRITS_HASH);
   return offset;
 }
 
@@ -199,9 +214,9 @@ size_t transaction_serialize_to_flex_trits(const iota_transaction_t transaction,
                          NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER);
   offset += NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER;
   flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         transaction->nonce, NUM_TRITS_NOUNCE, offset,
-                         NUM_TRITS_NOUNCE);
-  offset += NUM_TRITS_NOUNCE;
+                         transaction->nonce, NUM_TRITS_NONCE, offset,
+                         NUM_TRITS_NONCE);
+  offset += NUM_TRITS_NONCE;
   return offset;
 }
 
@@ -386,6 +401,17 @@ flex_trit_t *transaction_nonce(iota_transaction_t transaction) {
 void transaction_set_nonce(iota_transaction_t transaction,
                            const flex_trit_t *nonce) {
   memcpy(transaction->nonce, nonce, sizeof(transaction->nonce));
+}
+
+// Get the transaction hash
+flex_trit_t *transaction_hash(iota_transaction_t transaction) {
+  return transaction->hash;
+}
+
+// Set the transaction hash (copy argument)
+void transaction_set_hash(iota_transaction_t transaction,
+                          const flex_trit_t *hash) {
+  memcpy(transaction->hash, hash, sizeof(transaction->hash));
 }
 
 /***********************************************************************************************************

@@ -29,6 +29,7 @@ typedef struct connection_config_t {
   bool index_approvee;
   bool index_bundle;
   bool index_tag;
+  bool index_hash;
 } connection_config_t;
 
 extern retcode_t init_connection(connection_t* const,
