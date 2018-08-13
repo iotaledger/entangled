@@ -105,8 +105,8 @@ retcode_t init_connection(connection_t* const conn,
   }
 
   if (config->index_hash) {
-    if (retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                             HASH_INDEX, COL_HASH)) {
+    if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                              HASH_INDEX, COL_HASH))) {
       return retcode;
     }
   }
