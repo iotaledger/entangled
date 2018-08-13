@@ -164,20 +164,20 @@ size_t json_attach_to_tangle_deserialize_response_get_size(
     const serializer_t* const s, const char* const toDeserialize);
 
 // wereAddressesSpentFrom
-size_t json_addresses_spent_from_deserialize_response_get_size(
+size_t json_were_addresses_spent_from_deserialize_response_get_size(
     const serializer_t* const s, const char* const toDeserialize);
 
-size_t json_addresses_spent_from_serialize_request_get_size(
+size_t json_were_addresses_spent_from_serialize_request_get_size(
     const serializer_t* const s);
 
-void json_addresses_spent_from_serialize_request(const serializer_t* const s,
-                                                 char* out);
+void json_were_addresses_spent_from_serialize_request(
+    const serializer_t* const s, char* out);
 
-retcode_t json_addresses_spent_from_deserialize_response(
+retcode_t json_were_addresses_spent_from_deserialize_response(
     const serializer_t* const s, const char* const obj,
-    addresses_spent_from_res_t* out);
+    were_addresses_spent_from_res_t* out);
 
-size_t json_addresses_spent_from_deserialize_response_get_size(
+size_t json_were_addresses_spent_from_deserialize_response_get_size(
     const serializer_t* const s, const char* const toDeserialize);
 
 static serializer_vtable json_vtable = {
@@ -257,14 +257,14 @@ static serializer_vtable json_vtable = {
     .attach_to_tangle_deserialize_response_get_size =
         json_attach_to_tangle_deserialize_response_get_size,
 
-    .addresses_spent_from_serialize_request_get_size =
-        json_addresses_spent_from_serialize_request_get_size,
-    .addresses_spent_from_serialize_request =
-        json_addresses_spent_from_serialize_request,
-    .addresses_spent_from_deserialize_response =
-        json_addresses_spent_from_deserialize_response,
-    .addresses_spent_from_deserialize_response_get_size =
-        json_addresses_spent_from_deserialize_response_get_size,
+    .were_addresses_spent_from_serialize_request_get_size =
+        json_were_addresses_spent_from_serialize_request_get_size,
+    .were_addresses_spent_from_serialize_request =
+        json_were_addresses_spent_from_serialize_request,
+    .were_addresses_spent_from_deserialize_response =
+        json_were_addresses_spent_from_deserialize_response,
+    .were_addresses_spent_from_deserialize_response_get_size =
+        json_were_addresses_spent_from_deserialize_response_get_size,
 };
 
 #ifdef __cplusplus

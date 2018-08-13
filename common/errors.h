@@ -91,8 +91,10 @@ enum retcode_t {
   RC_SQL_FAILED_WRITE_STATEMENT =
       0x01 | RC_MODULE_STORAGE_SQL | RC_SEVERITY_MAJOR,
 
+  // The function is no implemented in cclient
   RC_CCLIENT_NOT_IMPLEMENTED =
       0x01 | RC_MODULE_CCLIENT_JSON | RC_SEVERITY_MAJOR,
+  // JSON parse failed (NULL object or vlaue) in cclient
   RC_CCLIENT_JSON_PARSE = 0x02 | RC_MODULE_CCLIENT_JSON | RC_SEVERITY_MAJOR,
 };
 

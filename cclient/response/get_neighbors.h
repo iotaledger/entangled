@@ -9,7 +9,7 @@ extern "C" {
 
 typedef struct {
   /**
-   * IP Address of your peer.
+   * URI of your peer.
    */
   char* address;
   /**

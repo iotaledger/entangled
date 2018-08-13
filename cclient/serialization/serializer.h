@@ -155,17 +155,17 @@ typedef struct {
   size_t (*attach_to_tangle_deserialize_response_get_size)(
       const serializer_t* const s, const char* const toDeserialize);
 
-  size_t (*addresses_spent_from_serialize_request_get_size)(
+  size_t (*were_addresses_spent_from_serialize_request_get_size)(
       const serializer_t* const s);
 
-  void (*addresses_spent_from_serialize_request)(const serializer_t* const s,
-                                                 char* out);
+  void (*were_addresses_spent_from_serialize_request)(
+      const serializer_t* const s, char* out);
 
-  retcode_t (*addresses_spent_from_deserialize_response)(
+  retcode_t (*were_addresses_spent_from_deserialize_response)(
       const serializer_t* const s, const char* const obj,
-      addresses_spent_from_res_t* out);
+      were_addresses_spent_from_res_t* out);
 
-  size_t (*addresses_spent_from_deserialize_response_get_size)(
+  size_t (*were_addresses_spent_from_deserialize_response_get_size)(
       const serializer_t* const s, const char* const toDeserialize);
 
 } serializer_vtable;

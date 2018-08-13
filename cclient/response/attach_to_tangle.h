@@ -10,7 +10,7 @@ extern "C" {
 #include "types/types.h"
 
 typedef struct {
-  flex_trit_p trytes;
+  flex_trit_array trytes;
   size_t size;
 } attach_to_tangle_res_t;
 

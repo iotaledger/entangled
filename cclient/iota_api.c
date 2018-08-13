@@ -18,11 +18,9 @@ iota_api_result_t iota_api_get_node_info(
 
   service->serializer.vtable.get_node_info_serialize_request(
       &service->serializer, request_data);
-
   result = iota_service_query(service, request_data, &response);
-
   service->serializer.vtable.get_node_info_deserialize_response(
-      &service->serializer, &response, res);
+      &service->serializer, response.data, res);
 
   return result;
 }
