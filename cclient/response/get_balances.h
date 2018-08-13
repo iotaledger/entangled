@@ -12,7 +12,7 @@ extern "C" {
 typedef struct {
   int_array balances;
   int milestoneIndex;
-  const address_t milestone;
+  flex_trit_array references;
 
 } get_balances_res_t;
 

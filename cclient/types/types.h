@@ -5,17 +5,14 @@
 
 #include <stdlib.h>
 
-#include "common/trinary/trit_array.h"
-#include "common/trinary/tryte.h"
+#include "common/errors.h"
+#include "common/model/transaction.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define NUM_TRITS_ADDRESS 243
-#define NUM_TRITS_BUNDLE_HASH 243
-#define NUM_TRITS_TAG 81
-#define NUM_TRITS_TX_HASH 243
+typedef flex_trit_t* flex_trit_p;
 
 typedef trit_array_p address_t;
 typedef trit_array_p bundle_hash_t;
@@ -24,8 +21,18 @@ typedef trit_array_p tx_hash_t;
 
 typedef struct {
   size_t size;
-  int* array;
+  int* integers;
 } int_array;
+
+typedef struct {
+  size_t size;
+  char* string;
+} char_array;
+
+typedef struct {
+  size_t size;
+  flex_trit_p trits;
+} flex_trit_array;
 
 typedef struct {
   size_t size;

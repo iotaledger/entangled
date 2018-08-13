@@ -15,9 +15,9 @@ void json_find_transactions_serialize_request(
     const serializer_t* const, const find_transactions_req_t* const obj,
     char* out);
 
-void json_find_transactions_deserialize_response(const serializer_t* const,
-                                                 const char* const obj,
-                                                 find_transactions_res_t* out);
+retcode_t json_find_transactions_deserialize_response(
+    const serializer_t* const, const char* const obj,
+    find_transactions_res_t* out);
 
 size_t json_find_transactions_serialize_request_get_size(
     const serializer_t* const,
@@ -31,9 +31,9 @@ void json_get_balances_serialize_request(const serializer_t* const,
                                          const get_balances_req_t* const obj,
                                          char* out);
 
-void json_get_balances_deserialize_response(const serializer_t* const,
-                                            const char* const obj,
-                                            get_balances_res_t* out);
+retcode_t json_get_balances_deserialize_response(const serializer_t* const,
+                                                 const char* const obj,
+                                                 get_balances_res_t* out);
 
 size_t json_get_balances_serialize_request_get_size_(
     const serializer_t* const, const get_balances_req_t* const toSerialize);
@@ -46,7 +46,7 @@ void json_get_inclusion_state_serialize_request(
     const serializer_t* const, const get_inclusion_state_req_t* const obj,
     char* out);
 
-void json_get_inclusion_state_deserialize_response(
+retcode_t json_get_inclusion_state_deserialize_response(
     const serializer_t* const, const char* const obj,
     get_inclusion_state_res_t* out);
 
@@ -59,9 +59,9 @@ size_t json_get_inclusion_state_deserialize_response_get_size(
 
 // get_neighbors_response
 
-void json_get_neighbors_deserialize_response(const serializer_t* const s,
-                                             const char* const obj,
-                                             get_neighbors_res_t* out);
+retcode_t json_get_neighbors_deserialize_response(const serializer_t* const s,
+                                                  const char* const obj,
+                                                  get_neighbors_res_t* out);
 
 size_t json_get_neighbors_deserialize_response_get_size(
     const serializer_t* const, const char* const toDeserialize);
@@ -72,18 +72,18 @@ size_t json_get_node_info_serialize_request_get_size(
 
 void json_get_node_info_serialize_request(const serializer_t* const, char* out);
 
-void json_get_node_info_deserialize_response(const serializer_t* const,
-                                             const char* const obj,
-                                             get_node_info_res_t* out);
+retcode_t json_get_node_info_deserialize_response(const serializer_t* const,
+                                                  const char* const obj,
+                                                  get_node_info_res_t* out);
 
 size_t json_get_node_info_deserialize_response_get_size(
     const serializer_t* const, const char* const toDeserialize);
 
 // get_tips_response
 
-void json_get_tips_deserialize_response(const serializer_t* const,
-                                        const char* const obj,
-                                        get_tips_res_t* out);
+retcode_t json_get_tips_deserialize_response(const serializer_t* const,
+                                             const char* const obj,
+                                             get_tips_res_t* out);
 
 size_t json_get_tips_deserialize_response_get_size(
     const serializer_t* const, const char* const toDeserialize);
@@ -92,7 +92,7 @@ size_t json_get_tips_deserialize_response_get_size(
 void json_get_transactions_to_approve_serialize_request(
     const serializer_t* const, int depth, char* out);
 
-void json_get_transactions_to_approve_deserialize_response(
+retcode_t json_get_transactions_to_approve_deserialize_response(
     const serializer_t* const, const char* const obj,
     get_transactions_to_approve_res_t* out);
 
@@ -101,6 +101,84 @@ size_t json_get_transactions_to_approve_serialize_request_get_size(
 
 size_t json_get_transactions_to_approve_deserialize_response_get_size(
     const serializer_t* const, const char* const toDeserialize);
+
+size_t json_add_neighbors_serialize_request_get_size(
+    const serializer_t* const s);
+
+void json_add_neighbors_serialize_request(const serializer_t* const s,
+                                          char* out);
+
+retcode_t json_add_neighbors_deserialize_response(const serializer_t* const s,
+                                                  const char* const obj,
+                                                  int* out);
+
+size_t json_add_neighbors_deserialize_response_get_size(
+    const serializer_t* const s, const char* const toDeserialize);
+
+// removeNeighbors
+size_t json_remove_neighbors_deserialize_response_get_size(
+    const serializer_t* const s, const char* const toDeserialize);
+
+size_t json_remove_neighbors_serialize_request_get_size(
+    const serializer_t* const s);
+
+void json_remove_neighbors_serialize_request(const serializer_t* const s,
+                                             char* out);
+
+retcode_t json_remove_neighbors_deserialize_response(
+    const serializer_t* const s, const char* const obj, int* out);
+
+size_t json_remove_neighbors_deserialize_response_get_size(
+    const serializer_t* const s, const char* const toDeserialize);
+
+// getTrytes
+size_t json_get_trytes_deserialize_response_get_size(
+    const serializer_t* const s, const char* const toDeserialize);
+
+size_t json_get_trytes_serialize_request_get_size(const serializer_t* const s);
+
+void json_get_trytes_serialize_request(const serializer_t* const s, char* out);
+
+retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
+                                               const char* const obj,
+                                               get_trytes_res_t* out);
+
+size_t json_get_trytes_deserialize_response_get_size(
+    const serializer_t* const s, const char* const toDeserialize);
+
+// attachToTangle
+size_t json_attach_to_tangle_deserialize_response_get_size(
+    const serializer_t* const s, const char* const toDeserialize);
+
+size_t json_attach_to_tangle_serialize_request_get_size(
+    const serializer_t* const s);
+
+void json_attach_to_tangle_serialize_request(const serializer_t* const s,
+                                             char* out);
+
+retcode_t json_attach_to_tangle_deserialize_response(
+    const serializer_t* const s, const char* const obj,
+    attach_to_tangle_res_t* out);
+
+size_t json_attach_to_tangle_deserialize_response_get_size(
+    const serializer_t* const s, const char* const toDeserialize);
+
+// wereAddressesSpentFrom
+size_t json_were_addresses_spent_from_deserialize_response_get_size(
+    const serializer_t* const s, const char* const toDeserialize);
+
+size_t json_were_addresses_spent_from_serialize_request_get_size(
+    const serializer_t* const s);
+
+void json_were_addresses_spent_from_serialize_request(
+    const serializer_t* const s, char* out);
+
+retcode_t json_were_addresses_spent_from_deserialize_response(
+    const serializer_t* const s, const char* const obj,
+    were_addresses_spent_from_res_t* out);
+
+size_t json_were_addresses_spent_from_deserialize_response_get_size(
+    const serializer_t* const s, const char* const toDeserialize);
 
 static serializer_vtable json_vtable = {
     .find_transactions_serialize_request =
@@ -145,6 +223,48 @@ static serializer_vtable json_vtable = {
         json_get_transactions_to_approve_deserialize_response,
     .get_transactions_to_approve_deserialize_response_get_size =
         json_get_transactions_to_approve_deserialize_response_get_size,
+
+    .add_neighbors_serialize_request_get_size =
+        json_add_neighbors_serialize_request_get_size,
+    .add_neighbors_serialize_request = json_add_neighbors_serialize_request,
+    .add_neighbors_deserialize_response =
+        json_add_neighbors_deserialize_response,
+    .add_neighbors_deserialize_response_get_size =
+        json_add_neighbors_deserialize_response_get_size,
+
+    .remove_neighbors_serialize_request_get_size =
+        json_remove_neighbors_serialize_request_get_size,
+    .remove_neighbors_serialize_request =
+        json_remove_neighbors_serialize_request,
+    .remove_neighbors_deserialize_response =
+        json_remove_neighbors_deserialize_response,
+    .remove_neighbors_deserialize_response_get_size =
+        json_remove_neighbors_deserialize_response_get_size,
+
+    .get_trytes_serialize_request_get_size =
+        json_get_trytes_serialize_request_get_size,
+    .get_trytes_serialize_request = json_get_trytes_serialize_request,
+    .get_trytes_deserialize_response = json_get_trytes_deserialize_response,
+    .get_trytes_deserialize_response_get_size =
+        json_get_trytes_deserialize_response_get_size,
+
+    .attach_to_tangle_serialize_request_get_size =
+        json_attach_to_tangle_serialize_request_get_size,
+    .attach_to_tangle_serialize_request =
+        json_attach_to_tangle_serialize_request,
+    .attach_to_tangle_deserialize_response =
+        json_attach_to_tangle_deserialize_response,
+    .attach_to_tangle_deserialize_response_get_size =
+        json_attach_to_tangle_deserialize_response_get_size,
+
+    .were_addresses_spent_from_serialize_request_get_size =
+        json_were_addresses_spent_from_serialize_request_get_size,
+    .were_addresses_spent_from_serialize_request =
+        json_were_addresses_spent_from_serialize_request,
+    .were_addresses_spent_from_deserialize_response =
+        json_were_addresses_spent_from_deserialize_response,
+    .were_addresses_spent_from_deserialize_response_get_size =
+        json_were_addresses_spent_from_deserialize_response_get_size,
 };
 
 #ifdef __cplusplus

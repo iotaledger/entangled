@@ -74,7 +74,7 @@ class IotaJsonAPI : virtual public IotaAPI {
  private:
   template <typename T>
   static std::vector<T> nextBatch(const std::vector<T>& vec,
-                                  uint32_t& numBatchedEntries,
+                                  uint32_t* numBatchedEntries,
                                   uint32_t batchSize);
 };
 }  // namespace cppclient

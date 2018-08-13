@@ -10,7 +10,7 @@ extern "C" {
 #include "types/types.h"
 
 typedef struct {
-  int_array bitmap;
+  int_array states;
 } get_inclusion_state_res_t;
 
 #ifdef __cplusplus

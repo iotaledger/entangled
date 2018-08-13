@@ -52,6 +52,7 @@ extern "C" {
 #define RC_MODULE_STORAGE (0x01 << RC_SHIFT_MODULE)
 #define RC_MODULE_STORAGE_SQL (0x02 << RC_SHIFT_MODULE)
 #define RC_MODULE_STORAGE_SQLITE3 (0x03 << RC_SHIFT_MODULE)
+#define RC_MODULE_CCLIENT_JSON (0x04 << RC_SHIFT_MODULE)
 
 /* error code module specific */
 #define RC_ERRORCODE_MASK 0x003F
@@ -89,6 +90,12 @@ enum retcode_t {
 
   RC_SQL_FAILED_WRITE_STATEMENT =
       0x01 | RC_MODULE_STORAGE_SQL | RC_SEVERITY_MAJOR,
+
+  // The function is no implemented in cclient
+  RC_CCLIENT_NOT_IMPLEMENTED =
+      0x01 | RC_MODULE_CCLIENT_JSON | RC_SEVERITY_MAJOR,
+  // JSON parse failed (NULL object or vlaue) in cclient
+  RC_CCLIENT_JSON_PARSE = 0x02 | RC_MODULE_CCLIENT_JSON | RC_SEVERITY_MAJOR,
 };
 
 typedef enum retcode_t retcode_t;

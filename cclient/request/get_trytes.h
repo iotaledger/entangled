@@ -13,7 +13,7 @@ typedef struct {
   /**
    * List of tx hashes for which request should get trytes
    */
-  tx_hash_array hashes;
+  flex_trit_array hashes;
 
 } get_trytes_req_t;
 

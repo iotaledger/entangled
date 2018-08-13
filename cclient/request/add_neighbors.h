@@ -13,7 +13,7 @@ typedef struct {
   /**
    * List of neighbors URIs
    */
-  trit_array_array uris;
+  char_array uris;
 
 } add_neighbors_req_t;
 
