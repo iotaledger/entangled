@@ -31,6 +31,7 @@ cc_library(
     name = "node_shared",
     hdrs = ["node.h"],
     deps = [
+        "//common:errors",
         "//common/network/components:broadcaster_shared",
         "//common/network/components:processor",
         "//common/network/components:receiver_shared",

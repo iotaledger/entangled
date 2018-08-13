@@ -32,7 +32,7 @@ bool core_init(core_t* const core) {
     return false;
   }
   log_info(CORE_LOGGER_ID, "Initializing cIRI node\n");
-  if (node_init(&core->node, core) == false) {
+  if (node_init(&core->node, core) != RC_OK) {
     log_critical(CORE_LOGGER_ID, "Initializing cIRI node failed\n");
     return false;
   }
@@ -44,7 +44,7 @@ bool core_start(core_t* const core) {
     return false;
   }
   log_info(CORE_LOGGER_ID, "Starting cIRI node\n");
-  if (node_start(&core->node) == false) {
+  if (node_start(&core->node) != RC_OK) {
     log_critical(CORE_LOGGER_ID, "Starting cIRI node failed\n");
     return false;
   }
@@ -58,7 +58,7 @@ bool core_stop(core_t* const core) {
     return false;
   }
   log_info(CORE_LOGGER_ID, "Stopping cIRI node\n");
-  if (node_stop(&core->node) == false) {
+  if (node_stop(&core->node) != RC_OK) {
     log_error(CORE_LOGGER_ID, "Stopping cIRI node failed\n");
     ret = false;
   }
@@ -72,7 +72,7 @@ bool core_destroy(core_t* const core) {
     return false;
   }
   log_info(CORE_LOGGER_ID, "Destroying cIRI node\n");
-  if (node_destroy(&core->node) == false) {
+  if (node_destroy(&core->node) != RC_OK) {
     log_error(CORE_LOGGER_ID, "Destroying cIRI node failed\n");
     ret = false;
   }
