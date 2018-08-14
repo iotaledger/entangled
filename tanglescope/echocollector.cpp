@@ -35,7 +35,7 @@ std::map<std::string, std::string> EchoCollector::nameToDescHistogram = {
          std::to_string(BUCKET_WIDTH) + " milliseconds]"}};
 
 bool EchoCollector::parseConfiguration(const YAML::Node& conf) {
-  if (!ThrowCatchCollector::parseConfiguration(conf)) {
+  if (!BroadcastReceiveCollector::parseConfiguration(conf)) {
     return false;
   }
   if (conf[DISCOVERY_INTERVAL]) {
@@ -48,7 +48,7 @@ bool EchoCollector::parseConfiguration(const YAML::Node& conf) {
 using namespace prometheus;
 
 void EchoCollector::subscribeToTransactions(
-    std::string zmqURL, const ThrowCatchCollector::ZmqObservable& zmqObservable,
+    std::string zmqURL, const BroadcastReceiveCollector::ZmqObservable& zmqObservable,
     std::shared_ptr<Registry> registry) {
   std::atomic<bool> haveAllTXReturned = false;
   auto histograms = buildHistogramsMap(
@@ -85,7 +85,7 @@ void EchoCollector::subscribeToTransactions(
 
             tasks.push_back(std::move(task));
 
-            ThrowCatchCollector::broadcastInfo bi;
+            BroadcastReceiveCollector::BroadcastInfo bi;
             if (_hashToBroadcastTime.find(tx->hash(), bi)) {
               auto elapsedUntilReceived =
                   std::chrono::duration_cast<std::chrono::milliseconds>(

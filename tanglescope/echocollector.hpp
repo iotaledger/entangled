@@ -19,9 +19,8 @@
 namespace iota {
 namespace tanglescope {
 
-class EchoCollector : public ThrowCatchCollector {
+class EchoCollector : public BroadcastReceiveCollector {
  public:
-
   constexpr static auto DISCOVERY_INTERVAL = "discovery_interval";
 
   constexpr static double BUCKET_WIDTH = 10;
@@ -34,7 +33,7 @@ class EchoCollector : public ThrowCatchCollector {
       HistogramsMap& histograms, const std::vector<double>& buckets);
 
  private:
-    virtual void doPeriodically() {};
+  virtual void doPeriodically(){};
   const std::vector<double>& histogramBuckets() const;
 
   virtual void subscribeToTransactions(

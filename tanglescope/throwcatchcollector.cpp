@@ -21,7 +21,7 @@ constexpr static auto DEPTH = 3;
 
 using namespace iota::tanglescope;
 
-bool ThrowCatchCollector::parseConfiguration(const YAML::Node& conf) {
+bool BroadcastReceiveCollector::parseConfiguration(const YAML::Node& conf) {
   if (!PrometheusCollector::parseConfiguration(conf)) {
     return false;
   }
@@ -39,7 +39,7 @@ bool ThrowCatchCollector::parseConfiguration(const YAML::Node& conf) {
   return false;
 }
 
-void ThrowCatchCollector::collect() {
+void BroadcastReceiveCollector::collect() {
   LOG(INFO) << __FUNCTION__;
 
   _api = std::make_shared<cppclient::BeastIotaAPI>(_iriHost, _iriPort);
@@ -53,10 +53,10 @@ void ThrowCatchCollector::collect() {
 
   doPeriodically();
   broadcastTransactions();
-  handleReceivedTransactions();
+  receivedTransactions();
 }
 
-void ThrowCatchCollector::broadcastTransactions() {
+void BroadcastReceiveCollector::broadcastTransactions() {
   auto pubThread = rxcpp::schedulers::make_new_thread();
   auto pubWorker = pubThread.create_worker();
 
@@ -68,7 +68,7 @@ void ThrowCatchCollector::broadcastTransactions() {
     broadcastOneTransaction();
   }
 }
-void ThrowCatchCollector::broadcastOneTransaction() {
+void BroadcastReceiveCollector::broadcastOneTransaction() {
   using namespace txAuxiliary;
   using namespace std::chrono;
 
@@ -98,13 +98,13 @@ void ThrowCatchCollector::broadcastOneTransaction() {
     });
 
     broadcastFuture.wait();
-    _hashToBroadcastTime.insert(hashed.hash, broadcastInfo{std::chrono::system_clock::now(), duration});
+    _hashToBroadcastTime.insert(hashed.hash, BroadcastInfo{std::chrono::system_clock::now(), duration});
   } catch (const std::exception& e) {
     LOG(ERROR) << __FUNCTION__ << " Exception: " << e.what();
   }
 }
 
-void ThrowCatchCollector::handleReceivedTransactions() {
+void BroadcastReceiveCollector::receivedTransactions() {
   using namespace prometheus;
   Exposer exposer{_prometheusExpURI};
   auto registry = std::make_shared<Registry>();

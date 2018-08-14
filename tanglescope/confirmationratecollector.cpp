@@ -23,7 +23,7 @@ std::map<std::string, std::string> CRCollector::nameToDescGauges = {
      "get inclusion state"}};
 
 bool CRCollector::parseConfiguration(const YAML::Node& conf) {
-  if (!ThrowCatchCollector::parseConfiguration(conf)) {
+  if (!BroadcastReceiveCollector::parseConfiguration(conf)) {
     return false;
   }
   if (conf[MESAUREMENT_LOWER_BOUND] && conf[MESAUREMENT_UPPER_BOUND] &&
@@ -48,7 +48,7 @@ void CRCollector::doPeriodically() {
 
   _collectorWorker.schedule_periodically(
       _collectorThread.now() + std::chrono::seconds(_measurementUpperBound),
-      std::chrono::seconds(_measurementUpperBound / 4), [this](auto scbl) {
+      std::chrono::seconds(API_SAMPLE_INTERVAL_SECONDS), [this](auto scbl) {
         auto task = boost::async(boost::launch::async,
                                  [this]() { calcConfirmationRateAPICall(); });
         _tasks.emplace_back(std::move(task));
@@ -111,7 +111,7 @@ void CRCollector::calcConfirmationRateAPICall() {
 using namespace prometheus;
 
 void CRCollector::subscribeToTransactions(
-    std::string zmqURL, const ThrowCatchCollector::ZmqObservable& zmqObservable,
+    std::string zmqURL, const BroadcastReceiveCollector::ZmqObservable& zmqObservable,
     std::shared_ptr<Registry> registry) {
   _gauges = buildGaugeMap(registry, "confirmationratecollector",
                           {{"listen_node", _iriHost}, {"zmq_url", zmqURL}},
