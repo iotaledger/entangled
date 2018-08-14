@@ -52,7 +52,7 @@ class IotaJsonAPI : virtual public IotaAPI {
   std::vector<std::string> getTrytes(
       const std::vector<std::string>& hashes) override;
 
-  GetTransactionsToApproveResponse getTransactionsToApprove(
+  nonstd::optional<GetTransactionsToApproveResponse> getTransactionsToApprove(
       size_t depth,
       const nonstd::optional<std::string>& reference = {}) override;
 

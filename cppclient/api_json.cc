@@ -387,7 +387,8 @@ std::unordered_set<std::string> IotaJsonAPI::filterConfirmedTails(
   return confirmedTails;
 }
 
-GetTransactionsToApproveResponse IotaJsonAPI::getTransactionsToApprove(
+nonstd::optional<GetTransactionsToApproveResponse>
+IotaJsonAPI::getTransactionsToApprove(
     size_t depth, const nonstd::optional<std::string>& reference) {
   json req;
 
@@ -407,8 +408,8 @@ GetTransactionsToApproveResponse IotaJsonAPI::getTransactionsToApprove(
 
   auto& response = maybeResponse.value();
 
-  return {response["trunkTransaction"], response["branchTransaction"],
-          response["duration"]};
+  return {{response["trunkTransaction"], response["branchTransaction"],
+           response["duration"]}};
 }
 
 std::vector<std::string> IotaJsonAPI::attachToTangle(
