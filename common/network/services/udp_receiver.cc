@@ -53,9 +53,9 @@ bool UdpReceiverService::handlePacket(std::size_t const length) {
   if (length != TRANSACTION_PACKET_SIZE) {
     return false;
   }
-  receiver_service_prepare_packet(&packet_, length,
-                                  senderEndpoint_.address().to_string().c_str(),
-                                  senderEndpoint_.port(), PROTOCOL_UDP);
+  iota_packet_build(&packet_, length,
+                    senderEndpoint_.address().to_string().c_str(),
+                    senderEndpoint_.port(), PROTOCOL_UDP);
   log_debug(UDP_RECEIVER_SERVICE_LOGGER_ID,
             "Packet received from tethered neighbor udp://%s:%d\n",
             &packet_.source.host, packet_.source.port);

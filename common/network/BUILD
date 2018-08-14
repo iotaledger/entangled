@@ -7,6 +7,7 @@ cc_library(
 
 cc_library(
     name = "iota_packet",
+    srcs = ["iota_packet.c"],
     hdrs = ["iota_packet.h"],
     deps = [
         ":endpoint",

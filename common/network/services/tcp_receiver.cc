@@ -65,9 +65,9 @@ bool TcpConnection::handlePacket(std::size_t const length) {
   if (length != TRANSACTION_PACKET_SIZE) {
     return false;
   }
-  receiver_service_prepare_packet(
-      &packet_, length, socket_.remote_endpoint().address().to_string().c_str(),
-      socket_.remote_endpoint().port(), PROTOCOL_TCP);
+  iota_packet_build(&packet_, length,
+                    socket_.remote_endpoint().address().to_string().c_str(),
+                    socket_.remote_endpoint().port(), PROTOCOL_TCP);
   log_debug(TCP_RECEIVER_SERVICE_LOGGER_ID,
             "Packet received from tethered neighbor tcp://%s:%d\n",
             &packet_.source.host, packet_.source.port);
