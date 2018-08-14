@@ -13,6 +13,7 @@ cc_library(
     ),
     deps = [
         "//tanglescope:blowballcollector",
+        "//tanglescope:confirmationratecollector",
         "//tanglescope:echocollector",
         "//tanglescope:tanglewidthcollector",
         "//tanglescope:tipselectioncollector",

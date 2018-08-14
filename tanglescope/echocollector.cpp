@@ -13,10 +13,7 @@
 #include <map>
 #include <set>
 #include <unordered_set>
-
-#include "common/helpers/digest.h"
-#include "common/helpers/pow.h"
-#include "common/trinary/tryte_long.h"
+#include "tanglescope/throwcatchcollector.hpp"
 
 constexpr static auto DEPTH = 3;
 
@@ -37,174 +34,21 @@ std::map<std::string, std::string> EchoCollector::nameToDescHistogram = {
      "first learned about it [each interval is " +
          std::to_string(BUCKET_WIDTH) + " milliseconds]"}};
 
-const std::string TX_TRYTES =
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999SAYHELLOTOECHOCATCHERECHOCATCHING"
-    "SINCETWENTYSEVENTEENONTHEIOTATANGLE999999999999999999999999999999999999999"
-    "9VD9999999999999999999999999JAKBHNJIE999999999999999999JURSJVFIECKJYEHPATC"
-    "XADQGHABKOOEZCRUHLIDHPNPIGRCXBFBWVISWCF9ODWQKLXBKY9FACCKVXRAGZ999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "99999999999999999999999999999999999999999999999999999999999999999999999999"
-    "999999999";
-
-std::string fillTX(
-    const cppclient::GetTransactionsToApproveResponse& response) {
-  using namespace std::chrono;
-  std::string tx = TX_TRYTES;
-
-  tx.replace(2430, 81, response.trunkTransaction);
-  tx.replace(2511, 81, response.branchTransaction);
-  auto timestampSeconds =
-      duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
-  tryte_t trytes[10] = "999999999";
-  long_to_trytes(timestampSeconds, trytes);
-  tx.replace(2322, 9, (char*)trytes);
-  return std::move(tx);
-}
-
-std::string powTX(std::string tx, int mwm) {
-  char* foundNonce = iota_pow(tx.data(), mwm);
-  tx.replace(2646, 27, foundNonce);
-  free(foundNonce);
-
-  return tx.data();
-}
-
-EchoCollector::HashedTX hashTX(std::string tx) {
-  char* digest = iota_digest(tx.data());
-  EchoCollector::HashedTX hashed = {digest, std::move(tx)};
-  free(digest);
-  return std::move(hashed);
-}
-
 bool EchoCollector::parseConfiguration(const YAML::Node& conf) {
-  if (!PrometheusCollector::parseConfiguration(conf)) {
+  if (!BroadcastReceiveCollector::parseConfiguration(conf)) {
     return false;
   }
-
-  if (conf[IRI_HOST] && conf[IRI_PORT] && conf[PUBLISHERS] && conf[MWM] &&
-      conf[BROADCAST_INTERVAL] && conf[DISCOVERY_INTERVAL]) {
-    _iriHost = conf[IRI_HOST].as<std::string>();
-    _iriPort = conf[IRI_PORT].as<uint32_t>();
-    _zmqPublishers = conf[PUBLISHERS].as<std::list<std::string>>();
-    _mwm = conf[MWM].as<uint32_t>();
-    _broadcastInterval = conf[BROADCAST_INTERVAL].as<uint32_t>();
+  if (conf[DISCOVERY_INTERVAL]) {
     _discoveryInterval = conf[DISCOVERY_INTERVAL].as<uint32_t>();
     return true;
   }
-
   return false;
-}
-
-void EchoCollector::collect() {
-  LOG(INFO) << __FUNCTION__;
-
-  _api = std::make_shared<cppclient::BeastIotaAPI>(_iriHost, _iriPort);
-
-  for (const auto& url : _zmqPublishers) {
-    auto zmqObservable =
-        rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
-            [&](auto s) { zmqPublisher(std::move(s), url); });
-    _urlToZmqObservables.insert(std::pair(url, zmqObservable));
-  }
-
-  broadcastTransactions();
-  handleReceivedTransactions();
-}
-
-void EchoCollector::broadcastTransactions() {
-  auto pubThread = rxcpp::schedulers::make_new_thread();
-  auto pubWorker = pubThread.create_worker();
-
-  if (_broadcastInterval > 0) {
-    pubWorker.schedule_periodically(
-        pubThread.now(), std::chrono::seconds(_broadcastInterval),
-        [&](auto scbl) { broadcastOneTransaction(); });
-  } else {
-    broadcastOneTransaction();
-  }
-}
-void EchoCollector::broadcastOneTransaction() {
-  auto hashTXFuture =
-      boost::async(boost::launch::async,
-                   [this] { return _api->getTransactionsToApprove(DEPTH); })
-          .then([](auto resp) { return fillTX(resp.get()); })
-          .then(
-              [this](auto resp) { return powTX(std::move(resp.get()), _mwm); })
-          .then([](auto resp) { return hashTX(resp.get()); });
-
-  try {
-    auto hashed = hashTXFuture.get();
-    LOG(INFO) << "Hash: " << hashed.hash;
-
-    auto broadcastFuture = boost::async(boost::launch::async, [hashed, this] {
-      return _api->broadcastTransactions({hashed.tx});
-    });
-
-    _hashToBroadcastTime.insert(hashed.hash, std::chrono::system_clock::now());
-    broadcastFuture.wait();
-  } catch (const std::exception& e) {
-    LOG(ERROR) << __FUNCTION__ << " Exception: " << e.what();
-  }
-}
-
-void EchoCollector::handleReceivedTransactions() {
-  using namespace prometheus;
-  Exposer exposer{_prometheusExpURI};
-  auto registry = std::make_shared<Registry>();
-  exposer.RegisterCollectable(registry);
-  auto zmqThread = rxcpp::schedulers::make_new_thread();
-
-  auto& catcher = *this;
-  std::vector<boost::future<void>> observableTasks;
-  for (auto& kv : _urlToZmqObservables) {
-    auto zmqURL = kv.first;
-    auto zmqObservable = kv.second;
-    auto task = boost::async(
-        boost::launch::async,
-        [zmqURL = std::move(zmqURL), &zmqObservable, &registry, &catcher]() {
-          catcher.subscribeToTransactions(zmqURL, zmqObservable, registry);
-        });
-    observableTasks.push_back(std::move(task));
-  }
-
-  std::for_each(observableTasks.begin(), observableTasks.end(),
-                [&](auto& task) { task.wait(); });
 }
 
 using namespace prometheus;
 
 void EchoCollector::subscribeToTransactions(
-    std::string zmqURL, const EchoCollector::ZmqObservable& zmqObservable,
+    std::string zmqURL, const BroadcastReceiveCollector::ZmqObservable& zmqObservable,
     std::shared_ptr<Registry> registry) {
   std::atomic<bool> haveAllTXReturned = false;
   auto histograms = buildHistogramsMap(
@@ -241,15 +85,15 @@ void EchoCollector::subscribeToTransactions(
 
             tasks.push_back(std::move(task));
 
-            std::chrono::system_clock::time_point broadcastTime;
-            if (_hashToBroadcastTime.find(tx->hash(), broadcastTime)) {
+            BroadcastReceiveCollector::BroadcastInfo bi;
+            if (_hashToBroadcastTime.find(tx->hash(), bi)) {
               auto elapsedUntilReceived =
                   std::chrono::duration_cast<std::chrono::milliseconds>(
-                      received - broadcastTime)
+                      received - bi.tp)
                       .count();
               auto elapsedUntilArrived =
                   std::chrono::duration_cast<std::chrono::milliseconds>(
-                      tx->arrivalTime() - broadcastTime)
+                      tx->arrivalTime() - bi.tp)
                       .count();
 
               histograms.at("time_elapsed_received")
