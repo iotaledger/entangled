@@ -21,13 +21,20 @@ cc_library(
 )
 
 cc_library(
-    name = "processor",
-    srcs = ["processor.c"],
+    name = "processor_shared",
     hdrs = ["processor.h"],
     deps = [
-        "//utils:logger_helper",
         "//utils/containers/queues:concurrent_queue_packet",
         "//utils/handles:thread",
+    ],
+)
+
+cc_library(
+    name = "processor",
+    srcs = ["processor.c"],
+    deps = [
+        ":processor_shared",
+        "//ciri:node_shared",
     ],
 )
 

@@ -6,9 +6,68 @@
  */
 
 #include "common/network/components/processor.h"
+#include "ciri/node.h"
+#include "common/network/neighbor.h"
+#include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
+#define TX_BYTES_SIZE 1604
+#define TX_TRITS_SIZE 8019
+
 #define PROCESSOR_COMPONENT_LOGGER_ID "processor_component"
+
+static bool pre_processor(processor_state_t *const state,
+                          iota_packet_t *const packet) {
+  neighbor_t *neighbor = NULL;
+
+  if (state == NULL) {
+    return false;
+  }
+  if (packet == NULL) {
+    return false;
+  }
+
+  log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Pre-processing packet\n");
+  neighbor = neighbor_find_by_endpoint(state->node->neighbors, &packet->source);
+  if (neighbor == NULL) {
+    return false;
+  }
+
+  // Transaction bytes
+  // TODO(thibault): neighbor.incAllTransactions();
+  // TODO(thibault): Randomly dropping transaction.
+  // TODO(thibault): Compute cache-specific hash (faster)?
+  // TODO(thibault): get from cache
+  // if !cached
+  if (true) {
+    trit_t tx_trits[TX_TRITS_SIZE];
+    bytes_to_trits((byte_t *)packet->content, TX_BYTES_SIZE, tx_trits,
+                   TX_TRITS_SIZE);
+    // TODO(thibault): create transaction ?
+    // TODO(thibault): transaction validation
+    // TODO(thibault): put to cache ? Why here ?
+    //           synchronized(recentSeenBytes) {
+    //             recentSeenBytes.put(byteHash, receivedTransactionHash);
+    // TODO(thibault): if valid - add to receive queue
+    //           addReceivedDataToReceiveQueue(receivedTransactionViewModel,
+    //           neighbor);
+  }
+
+  // Request bytes
+  //       // Request bytes
+  //
+  //       // add request to reply queue (requestedHash, neighbor)
+  //       Hash requestedHash =
+  //           new Hash(receivedData, TransactionViewModel.SIZE, reqHashSize);
+  //       if (requestedHash.equals(receivedTransactionHash)) {
+  //         // requesting a random tip
+  //         requestedHash = Hash.NULL_HASH;
+  //       }
+  //
+  //       addReceivedDataToReplyQueue(requestedHash, neighbor);
+
+  return true;
+}
 
 static void *processor_routine(processor_state_t *const state) {
   iota_packet_t packet;
@@ -19,8 +78,7 @@ static void *processor_routine(processor_state_t *const state) {
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &packet) ==
         CONCURRENT_QUEUE_SUCCESS) {
-      log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing packet\n");
-      // TODO(thibault) process the hash
+      pre_processor(state, &packet);
     }
   }
   return NULL;
