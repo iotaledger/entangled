@@ -7,14 +7,10 @@
 
 #include "ciri/node.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
+#include "ciri/conf/configuration.h"
 #include "utils/logger_helper.h"
 
 #define NODE_LOGGER_ID "node"
-
-// FIXME: Initialize TCP/UDP receiver services with ports from conf variables
-// https://github.com/iotaledger/entangled/issues/104
-static uint16_t tcp_port_g = 14260;
-static uint16_t udp_port_g = 14261;
 
 retcode_t node_init(node_t* const node, core_t* const core) {
   if (node == NULL) {
