@@ -25,9 +25,13 @@ int select_hashes_cb(void* hashes, int num_cols, char** col_values,
 
 retcode_t iota_stor_init() {
   logger_helper_init(SQLITE3_LOGGER_ID, LOGGER_INFO, true);
+  return RC_OK;
 }
 
-retcode_t iota_stor_destroy() { logger_helper_destroy(SQLITE3_LOGGER_ID); }
+retcode_t iota_stor_destroy() {
+  logger_helper_destroy(SQLITE3_LOGGER_ID);
+  return RC_OK;
+}
 
 int select_transactions_cb(void* txs, int num_cols, char** col_values,
                            char** col_names) {

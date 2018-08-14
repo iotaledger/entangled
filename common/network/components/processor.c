@@ -93,6 +93,9 @@ bool processor_destroy(processor_state_t *const state) {
   if (state == NULL) {
     return false;
   }
+  if (state->running) {
+    return false;
+  }
   if (DESTROY_CONCURRENT_QUEUE_OF(iota_packet_t, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
     log_error(PROCESSOR_COMPONENT_LOGGER_ID,

@@ -63,11 +63,19 @@ cc_library(
 )
 
 cc_library(
-    name = "requester",
-    srcs = ["requester.c"],
+    name = "requester_shared",
     hdrs = ["requester.h"],
     deps = [
+        "//utils/containers/lists:concurrent_list_trit_array",
+    ],
+)
+
+cc_library(
+    name = "requester",
+    srcs = ["requester.c"],
+    deps = [
+        ":requester_shared",
+        "//ciri:core_shared",
         "//utils:logger_helper",
-        "//utils/containers/queues:concurrent_queue_trit_array",
     ],
 )

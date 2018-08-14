@@ -21,7 +21,6 @@ retcode_t create_index_if_not_exists(const connection_t* const conn,
                                      const char* const indexName,
                                      const char* const colName) {
   char* errMsg = 0;
-  logger_id_t id = logger_id_unknown;
 
   char statement[MAX_CREATE_INDEX_STATEMENT_SIZE];
 
@@ -74,8 +73,8 @@ retcode_t init_connection(connection_t* const conn,
   }
 
   if (config->index_approvee) {
-    if (retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                             TRUNK_INDEX, COL_TRUNK)) {
+    if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                              TRUNK_INDEX, COL_TRUNK))) {
       return retcode;
     }
     if (create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME, BRANCH_INDEX,
@@ -85,29 +84,29 @@ retcode_t init_connection(connection_t* const conn,
   }
 
   if (config->index_address) {
-    if (retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                             ADDRESS_INDEX, COL_ADDRESS)) {
+    if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                              ADDRESS_INDEX, COL_ADDRESS))) {
       return retcode;
     }
   }
 
   if (config->index_bundle) {
-    if (retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                             BUNDLE_INDEX, COL_BUNDLE)) {
+    if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                              BUNDLE_INDEX, COL_BUNDLE))) {
       return retcode;
     }
   }
 
   if (config->index_tag) {
-    if (retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                             TAG_INDEX, COL_TAG)) {
+    if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                              TAG_INDEX, COL_TAG))) {
       return retcode;
     }
   }
 
   if (config->index_hash) {
-    if (retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                             HASH_INDEX, COL_HASH)) {
+    if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                              HASH_INDEX, COL_HASH))) {
       return retcode;
     }
   }
@@ -143,4 +142,5 @@ retcode_t init_connection(connection_t* const conn,
 retcode_t destroy_connection(connection_t* const conn) {
   log_info(CONNECTION_LOGGER_ID, "Destroying connection");
   sqlite3_close((sqlite3*)conn->db);
+  return RC_OK;
 }

@@ -8,13 +8,13 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_REQUESTER_H__
 #define __COMMON_NETWORK_COMPONENTS_REQUESTER_H__
 
-#include "utils/containers/queues/concurrent_queue_trit_array.h"
+#include "utils/containers/lists/concurrent_list_trit_array.h"
 
-typedef concurrent_queue_of_trit_array_p requester_queue_t;
+typedef concurrent_list_of_trit_array_p requester_list_t;
 typedef struct node_s node_t;
 
 typedef struct requester_state_s {
-  requester_queue_t *queue;
+  requester_list_t *list;
   node_t *node;
 } requester_state_t;
 
@@ -23,9 +23,14 @@ extern "C" {
 #endif
 
 bool requester_init(requester_state_t *const state, node_t *const node);
+size_t requester_size(requester_state_t *const state);
+bool requester_clear_request(requester_state_t *const state,
+                             trit_array_p const hash);
+bool requester_is_full(requester_state_t *const state);
 bool request_transaction(requester_state_t *const state,
                          trit_array_p const hash);
-trit_array_p get_transaction_to_request(requester_state_t *const state);
+bool get_transaction_to_request(requester_state_t *const state,
+                                trit_array_p *hash);
 bool requester_destroy(requester_state_t *const state);
 
 #ifdef __cplusplus

@@ -51,12 +51,3 @@ void logger_helper_print(const char* const logger_id, logger_level_t level,
   lock_handle_unlock(&lock);
   va_end(argp);
 }
-
-void logger_helper_printer(const char* const string) {
-  char date[200];
-  time_t t;
-
-  t = time(NULL);
-  strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", localtime(&t));
-  printf("%s: %s", date, string);
-}

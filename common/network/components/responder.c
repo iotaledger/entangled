@@ -93,6 +93,9 @@ bool responder_destroy(responder_state_t *const state) {
   if (state == NULL) {
     return false;
   }
+  if (state->running) {
+    return false;
+  }
   if (DESTROY_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
     log_error(RESPONDER_COMPONENT_LOGGER_ID,

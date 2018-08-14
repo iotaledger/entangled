@@ -72,6 +72,7 @@ retcode_t iota_transactions_insert_statement(const iota_transaction_t tx,
               statement);
     return RC_SQL_FAILED_WRITE_STATEMENT;
   }
+  return RC_OK;
 }
 
 retcode_t iota_transactions_select_statement(const char *index_col,
@@ -95,6 +96,7 @@ retcode_t iota_transactions_select_statement(const char *index_col,
               statement);
     return RC_SQL_FAILED_WRITE_STATEMENT;
   }
+  return RC_OK;
 }
 
 retcode_t iota_transactions_exist_statement(const char *index_col,
@@ -120,13 +122,16 @@ retcode_t iota_transactions_exist_statement(const char *index_col,
               statement);
     return RC_SQL_FAILED_WRITE_STATEMENT;
   }
+  return RC_OK;
 }
 
 retcode_t iota_transactions_update_statement(const char *index_col,
                                              const trit_array_p key,
                                              const iota_transaction_t tx,
                                              char statement[],
-                                             size_t statement_cap) {}
+                                             size_t statement_cap) {
+  return RC_OK;
+}
 
 retcode_t iota_transactions_select_hashes_statement(const char *index_col,
                                                     const trit_array_p key,
@@ -150,4 +155,6 @@ retcode_t iota_transactions_select_hashes_statement(const char *index_col,
               statement);
     return RC_SQL_FAILED_WRITE_STATEMENT;
   }
+
+  return RC_OK;
 }

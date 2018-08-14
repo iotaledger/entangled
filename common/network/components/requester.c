@@ -6,52 +6,124 @@
  */
 
 #include "common/network/components/requester.h"
+#include "ciri/core.h"
+#include "common/storage/sql/defs.h"
+#include "common/storage/storage.h"
 #include "utils/logger_helper.h"
 
+// TODO(thibault) configuration variable
+#define MAX_TX_REQ_NBR 10000
 #define REQUESTER_COMPONENT_LOGGER_ID "requester_component"
 
 bool requester_init(requester_state_t *const state, node_t *const node) {
-  if (state == NULL || node == NULL) {
+  if (state == NULL) {
+    return false;
+  }
+  if (node == NULL) {
     return false;
   }
   logger_helper_init(REQUESTER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
-  if (INIT_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (INIT_CONCURRENT_LIST_OF(trit_array_p, state->list, trit_array_cmp) !=
+      CONCURRENT_LIST_SUCCESS) {
     log_critical(REQUESTER_COMPONENT_LOGGER_ID,
-                 "Initializing requester queue failed\n");
+                 "Initializing requester list failed\n");
     return false;
   }
   state->node = node;
   return true;
 }
 
-bool request_transaction(requester_state_t *const state,
-                         trit_array_p const hash) {
+size_t requester_size(requester_state_t *const state) {
+  if (state == NULL) {
+    return 0;
+  }
+  return state->list->vtable->size(state->list);
+}
+
+bool requester_clear_request(requester_state_t *const state,
+                             trit_array_p const hash) {
   if (state == NULL) {
     return false;
   }
-  if (state->queue->vtable->push(state->queue, hash) !=
-      CONCURRENT_QUEUE_SUCCESS) {
-    log_warning(REQUESTER_COMPONENT_LOGGER_ID,
-                "Pushing to requester queue failed\n");
+  if (hash == NULL) {
+    return false;
+  }
+  if (state->list->vtable->remove(state->list, hash) !=
+      CONCURRENT_LIST_SUCCESS) {
     return false;
   }
   return true;
 }
 
-trit_array_p get_transaction_to_request(requester_state_t *const state) {
-  trit_array_p hash;
+bool requester_is_full(requester_state_t *const state) {
+  if (state == NULL) {
+    return true;
+  }
+  return state->list->vtable->size(state->list) >= MAX_TX_REQ_NBR;
+}
+
+bool request_transaction(requester_state_t *const state,
+                         trit_array_p const hash) {
+  bool exists = false;
 
   if (state == NULL) {
-    return NULL;
+    return false;
   }
-  if (state->queue->vtable->pop(state->queue, &hash) !=
-      CONCURRENT_QUEUE_SUCCESS) {
-    log_warning(REQUESTER_COMPONENT_LOGGER_ID,
-                "Popping from requester queue failed\n");
-    return NULL;
+  if (hash == NULL) {
+    return false;
   }
-  return hash;
+  // TODO(thibault) check null hash
+  if (iota_stor_exist(&state->node->core->db_conn, COL_HASH, hash, &exists)) {
+    return false;
+  }
+  if (exists) {
+    return false;
+  }
+  if (state->list->vtable->contains(state->list, hash) == false) {
+    if (requester_is_full(state) == false) {
+      if (state->list->vtable->push_back(state->list, hash) !=
+          CONCURRENT_LIST_SUCCESS) {
+        log_warning(REQUESTER_COMPONENT_LOGGER_ID,
+                    "Adding new transaction request to the list failed\n");
+        return false;
+      }
+    } else {
+      log_warning(REQUESTER_COMPONENT_LOGGER_ID,
+                  "Transactions requests list is full\n");
+    }
+  }
+  return true;
+}
+
+bool get_transaction_to_request(requester_state_t *const state,
+                                trit_array_p *hash) {
+  concurrent_list_node_of_trit_array_p *iter = NULL;
+  bool exists = false;
+
+  if (state == NULL) {
+    return false;
+  }
+  if (hash == NULL) {
+    return false;
+  }
+  iter = state->list->front;
+  while (iter) {
+    *hash = iter->data;
+    iter = iter->next;
+    if (iota_stor_exist(&state->node->core->db_conn, COL_HASH, *hash,
+                        &exists)) {
+      return false;
+    }
+    if (exists) {
+      requester_clear_request(state, *hash);
+    } else {
+      break;
+    }
+  }
+  if (iter == NULL) {
+    *hash = NULL;
+  }
+  return true;
 }
 
 bool requester_destroy(requester_state_t *const state) {
@@ -60,7 +132,7 @@ bool requester_destroy(requester_state_t *const state) {
   if (state == NULL) {
     return false;
   }
-  if (DESTROY_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
+  if (DESTROY_CONCURRENT_LIST_OF(trit_array_p, state->list) !=
       CONCURRENT_QUEUE_SUCCESS) {
     ret = false;
   }
