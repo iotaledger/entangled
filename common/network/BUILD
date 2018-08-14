@@ -8,7 +8,10 @@ cc_library(
 cc_library(
     name = "iota_packet",
     hdrs = ["iota_packet.h"],
-    deps = [":endpoint"],
+    deps = [
+        ":endpoint",
+        "//common/trinary:bytes",
+    ],
 )
 
 cc_library(

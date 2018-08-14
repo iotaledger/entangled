@@ -20,7 +20,6 @@ void receiver_service_prepare_packet(iota_packet_t* const packet,
   strcpy(packet->source.host, host);
   packet->source.port = port;
   packet->source.protocol = protocol;
-  packet->content[length] = '\0';
 }
 
 bool receiver_service_start(receiver_service_t* const service) {
