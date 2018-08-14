@@ -91,6 +91,9 @@ bool receiver_destroy(receiver_state_t *const state) {
   if (state == NULL) {
     return false;
   }
+  if (state->running) {
+    return false;
+  }
   logger_helper_destroy(RECEIVER_COMPONENT_LOGGER_ID);
   return true;
 }

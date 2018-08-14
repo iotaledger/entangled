@@ -102,6 +102,9 @@ bool broadcaster_destroy(broadcaster_state_t *const state) {
   if (state == NULL) {
     return false;
   }
+  if (state->running) {
+    return false;
+  }
   if (DESTROY_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
     log_error(BROADCASTER_COMPONENT_LOGGER_ID,
