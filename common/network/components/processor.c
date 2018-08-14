@@ -7,18 +7,17 @@
 
 #include "common/network/components/processor.h"
 #include "ciri/node.h"
+#include "common/model/transaction.h"
 #include "common/network/neighbor.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
-
-#define TX_BYTES_SIZE 1604
-#define TX_TRITS_SIZE 8019
 
 #define PROCESSOR_COMPONENT_LOGGER_ID "processor_component"
 
 static bool pre_processor(processor_state_t *const state,
                           iota_packet_t *const packet) {
   neighbor_t *neighbor = NULL;
+  iota_transaction_t tx = NULL;
 
   if (state == NULL) {
     return false;
@@ -41,9 +40,14 @@ static bool pre_processor(processor_state_t *const state,
   // if !cached
   if (true) {
     trit_t tx_trits[TX_TRITS_SIZE];
-    bytes_to_trits((byte_t *)packet->content, TX_BYTES_SIZE, tx_trits,
-                   TX_TRITS_SIZE);
-    // TODO(thibault): create transaction ?
+    flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
+
+    bytes_to_trits(packet->content, TX_BYTES_SIZE, tx_trits, TX_TRITS_SIZE);
+    int8_to_flex_trit_array(tx_flex_trits, FLEX_TRIT_SIZE_8019, tx_trits,
+                            TX_TRITS_SIZE, TX_TRITS_SIZE);
+    if ((tx = transaction_deserialize(tx_flex_trits)) == NULL) {
+      return false;
+    }
     // TODO(thibault): transaction validation
     // TODO(thibault): put to cache ? Why here ?
     //           synchronized(recentSeenBytes) {
@@ -54,8 +58,6 @@ static bool pre_processor(processor_state_t *const state,
   }
 
   // Request bytes
-  //       // Request bytes
-  //
   //       // add request to reply queue (requestedHash, neighbor)
   //       Hash requestedHash =
   //           new Hash(receivedData, TransactionViewModel.SIZE, reqHashSize);
@@ -65,6 +67,9 @@ static bool pre_processor(processor_state_t *const state,
   //       }
   //
   //       addReceivedDataToReplyQueue(requestedHash, neighbor);
+
+  // TODO(thibault): recentSeenBytes statistics
+  // TODO(thibault): Testnet add non-tethered neighbor
 
   return true;
 }

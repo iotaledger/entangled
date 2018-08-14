@@ -35,6 +35,7 @@ cc_library(
     deps = [
         ":processor_shared",
         "//ciri:node_shared",
+        "//common/model:transaction",
     ],
 )
 
