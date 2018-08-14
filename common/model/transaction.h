@@ -111,9 +111,9 @@ struct _iota_transaction {
   int64_t attachment_timestamp_upper;
   // 27 trytes = 81 trits
   flex_trit_t nonce[FLEX_TRIT_SIZE_81];
-  // Total 2673 trytes
   // 81 trytes = 243 trits
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  // Total 2754 trytes
 };
 
 /***********************************************************************************************************

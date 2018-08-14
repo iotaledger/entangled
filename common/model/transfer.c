@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018 IOTA Stiftung
- * https://gitlab.com/iota-foundation/software/entangled
+ * https://github.com/iotaledger/entangled
  *
  * Refer to the LICENSE file for licensing information
  */
@@ -24,29 +24,15 @@
 // To obfuscate the model, the structure definition comes here
 // struct _transfer_output {...};
 
-// Creates and returns a new transfer output
-transfer_output_t transfer_output_new(void) {
-  transfer_output_t transfer_output;
-  transfer_output = (transfer_output_t)malloc(sizeof(struct _transfer_output));
-  if (!transfer_output) {
-    // errno = IOTA_OUT_OF_MEMORY
-    return NULL;
-  }
-  memset(transfer_output, 0, sizeof(struct _transfer_output));
-  memset(transfer_output->seed, FLEX_TRIT_NULL_VALUE,
-         sizeof(transfer_output->seed));
-  return transfer_output;
-}
-
 // Get the seed
-flex_trit_t *transfer_output_seed(transfer_output_t transfer_output) {
+const flex_trit_t *transfer_output_seed(transfer_output_t transfer_output) {
   return transfer_output->seed;
 }
 
-// Set the seed (copy argument)
+// Set the seed (assign)
 void transfer_output_set_seed(transfer_output_t transfer_output,
                               const flex_trit_t *seed) {
-  memcpy(transfer_output->seed, seed, sizeof(transfer_output->seed));
+  transfer_output->seed = seed;
 }
 
 // Get the security level
@@ -61,14 +47,26 @@ void transfer_output_set_security(transfer_output_t transfer_output,
 }
 
 // Get the index
-size_t transfer_output_index(transfer_output_t transfer_output) {
-  return transfer_output->index;
+size_t transfer_output_seed_index(transfer_output_t transfer_output) {
+  return transfer_output->seed_index;
 }
 
 // Set the index
-void transfer_output_set_index(transfer_output_t transfer_output,
+void transfer_output_set_seed_index(transfer_output_t transfer_output,
                                size_t index) {
-  transfer_output->index = index;
+  transfer_output->seed_index = index;
+}
+
+// Creates and returns a new transfer output
+transfer_output_t transfer_output_new(void) {
+  transfer_output_t transfer_output;
+  transfer_output = (transfer_output_t)malloc(sizeof(struct _transfer_output));
+  if (!transfer_output) {
+    // errno = IOTA_OUT_OF_MEMORY
+    return NULL;
+  }
+  memset(transfer_output, 0, sizeof(struct _transfer_output));
+  return transfer_output;
 }
 
 // Free an existing transfer output
@@ -83,14 +81,14 @@ void transfer_output_free(transfer_output_t transfer_output) {
 // struct _transfer_data {...};
 
 // Get the address
-flex_trit_t *transfer_data_address(transfer_data_t transfer_data) {
+const flex_trit_t *transfer_data_address(transfer_data_t transfer_data) {
   return transfer_data->address;
 }
 
-// Set the address (copy argument)
+// Set the address (assign)
 void transfer_data_set_address(transfer_data_t transfer_data,
                                const flex_trit_t *address) {
-  memcpy(transfer_data->address, address, sizeof(transfer_data->address));
+  transfer_data->address = address;
 }
 
 // Get the length of the data in trits
@@ -99,25 +97,15 @@ size_t transfer_data_len(transfer_data_t transfer_data) {
 }
 
 // Get the data
-flex_trit_t *transfer_data_data(transfer_data_t transfer_data) {
+const flex_trit_t *transfer_data_data(transfer_data_t transfer_data) {
   return transfer_data->data;
 }
 
-// Set the data (copy argument)
+// Set the data (assign)
 void transfer_data_set_data(transfer_data_t transfer_data, flex_trit_t *data,
                             size_t len) {
-  if (transfer_data->data) {
-    free(transfer_data->data);
-    transfer_data->data = NULL;
-    transfer_data->len = 0;
-  }
-  size_t data_len = flex_trits_num_for_trits(len);
-  transfer_data->data = (flex_trit_t *)malloc(data_len * sizeof(flex_trit_t));
-  memset(transfer_data->data, FLEX_TRIT_NULL_VALUE, data_len);
-  if (transfer_data->data) {
-    transfer_data->len = len;
-    memcpy(transfer_data->data, data, data_len);
-  }
+  transfer_data->data = data;
+  transfer_data->len = len;
 }
 
 // Get the number of transactions for this data transfer
@@ -135,16 +123,11 @@ transfer_data_t transfer_data_new(void) {
     return NULL;
   }
   memset(transfer_data, 0, sizeof(struct _transfer_data));
-  memset(transfer_data->address, FLEX_TRIT_NULL_VALUE,
-         sizeof(transfer_data->address));
   return transfer_data;
 }
 
 // Free an existing transfer data
 void transfer_data_free(transfer_data_t transfer_data) {
-  if (transfer_data->data) {
-    free(transfer_data->data);
-  }
   free(transfer_data);
 }
 
@@ -155,16 +138,15 @@ void transfer_data_free(transfer_data_t transfer_data) {
 // struct _transfer_value_out {...};
 
 // Get the address
-flex_trit_t *transfer_value_out_address(
+const flex_trit_t *transfer_value_out_address(
     transfer_value_out_t transfer_value_out) {
   return transfer_value_out->address;
 }
 
-// Set the address (copy argument)
+// Set the address (assign)
 void transfer_value_out_set_address(transfer_value_out_t transfer_value_out,
                                     const flex_trit_t *address) {
-  memcpy(transfer_value_out->address, address,
-         sizeof(transfer_value_out->address));
+  transfer_value_out->address = address;
 }
 
 // Get the value
@@ -184,18 +166,9 @@ transfer_output_t transfer_value_out_output(
   return transfer_value_out->output;
 }
 
-// Set the transfer output (copy argument)
+// Set the transfer output (assign)
 void transfer_value_out_set_output(transfer_value_out_t transfer_value_out,
                                    transfer_output_t transfer_output) {
-  if (transfer_value_out->output) {
-    transfer_output_free(transfer_value_out->output);
-    transfer_value_out->output = NULL;
-  }
-  transfer_output_t output = transfer_output_new();
-  transfer_output_set_seed(output, transfer_output_seed(transfer_output));
-  transfer_output_set_security(output,
-                               transfer_output_security(transfer_output));
-  transfer_output_set_index(output, transfer_output_index(transfer_output));
   transfer_value_out->output = transfer_output;
 }
 
@@ -216,22 +189,11 @@ transfer_value_out_t transfer_value_out_new(void) {
     return NULL;
   }
   memset(transfer_value_out, 0, sizeof(struct _transfer_value_out));
-  memset(transfer_value_out->address, FLEX_TRIT_NULL_VALUE,
-         sizeof(transfer_value_out->address));
-  transfer_value_out->output = transfer_output_new();
-  if (!transfer_value_out->output) {
-    // errno = IOTA_OUT_OF_MEMORY
-    transfer_value_out_free(transfer_value_out);
-    transfer_value_out = NULL;
-  }
   return transfer_value_out;
 }
 
 // Free an existing transfer value out
 void transfer_value_out_free(transfer_value_out_t transfer_value_out) {
-  if (transfer_value_out->output) {
-    transfer_output_free(transfer_value_out->output);
-  }
   free(transfer_value_out);
 }
 
@@ -242,15 +204,14 @@ void transfer_value_out_free(transfer_value_out_t transfer_value_out) {
 // struct _transfer_value_in {...};
 
 // Get the address
-flex_trit_t *transfer_value_in_address(transfer_value_in_t transfer_value_in) {
+const flex_trit_t *transfer_value_in_address(transfer_value_in_t transfer_value_in) {
   return transfer_value_in->address;
 }
 
-// Set the address (copy argument)
+// Set the address (assign)
 void transfer_value_in_set_address(transfer_value_in_t transfer_value_in,
                                    const flex_trit_t *address) {
-  memcpy(transfer_value_in->address, address,
-         sizeof(transfer_value_in->address));
+  transfer_value_in->address = address;
 }
 
 // Get the value
@@ -270,17 +231,15 @@ size_t transfer_value_in_len(transfer_value_in_t transfer_value_in) {
 }
 
 // Get the data
-flex_trit_t *transfer_value_in_data(transfer_value_in_t transfer_value_in) {
+const flex_trit_t *transfer_value_in_data(transfer_value_in_t transfer_value_in) {
   return transfer_value_in->data;
 }
 
-// Set the data (copy argument)
+// Set the data (assign)
 void transfer_value_in_set_data(transfer_value_in_t transfer_value_in,
                                 flex_trit_t *data, size_t len) {
-  if (len && len <= sizeof(transfer_value_in->data)) {
-    transfer_value_in->len = len;
-    memcpy(transfer_value_in->data, data, len);
-  }
+  transfer_value_in->len = len;
+  transfer_value_in->data = data;
 }
 
 // Get the number of transactions for this value in transfer
@@ -332,11 +291,11 @@ size_t transfer_transactions_count(transfer_t transfer) {
 }
 
 // Get the tag
-flex_trit_t *transfer_tag(transfer_t transfer) { return transfer->tag; }
+const flex_trit_t *transfer_tag(transfer_t transfer) { return transfer->tag; }
 
-// Set the tag (copy argument)
+// Set the tag (assign)
 void transfer_set_tag(transfer_t transfer, flex_trit_t *tag) {
-  memcpy(transfer->tag, tag, sizeof(transfer->tag));
+  transfer->tag = tag;
 }
 
 // Get the timestamp
@@ -362,7 +321,7 @@ int64_t transfer_value(transfer_t transfer) {
 }
 
 // Get the transfer value
-flex_trit_t *transfer_address(transfer_t transfer) {
+const flex_trit_t *transfer_address(transfer_t transfer) {
   switch (transfer_type(transfer)) {
     case DATA:
       return transfer_data_address(transfer_data(transfer));
@@ -408,7 +367,6 @@ transfer_t transfer_new(transfer_type_e transfer_type) {
     return NULL;
   }
   memset(transfer, 0, sizeof(struct _transfer));
-  memset(transfer->tag, FLEX_TRIT_NULL_VALUE, sizeof(transfer->tag));
   transfer->type = transfer_type;
   switch (transfer_type) {
     case DATA:
@@ -546,7 +504,7 @@ void transfer_ctx_free(transfer_ctx_t transfer_ctx) { free(transfer_ctx); }
 void transfer_iterator_next_data_transaction(
     transfer_iterator_t transfer_iterator, transfer_t transfer) {
   transfer_data_t trans_data = transfer_data(transfer);
-  flex_trit_t *data = transfer_data_data(trans_data);
+  const flex_trit_t *data = transfer_data_data(trans_data);
   // Length of message in trits
   size_t data_len = transfer_data_len(trans_data);
   // Offset of message data for current index
@@ -573,7 +531,7 @@ void transfer_iterator_next_output_transaction(
         transfer_iterator_sign_gen(transfer_iterator);
     transfer_iterator->transaction_signature =
         (flex_trit_t *)iota_signature_gen(
-            transfer_output_seed(output), transfer_output_index(output),
+            transfer_output_seed(output), transfer_output_seed_index(output),
             transfer_output_security(output), transfer_iterator->bundle_hash);
     transaction_set_value(transfer_iterator->transaction,
                           transfer_value(transfer));
