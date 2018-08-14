@@ -149,8 +149,8 @@ void CRCollector::calcAndExposeImpl(
       totalTransactionsCount += 1;
       durationToTotal[it->second.msDuration /
                       (_addtionalLatencyStepSeconds.count() * 1000)] += 1;
-      if (_confirmedTransactions.find(it->first) !=
-          _confirmedTransactions.end()) {
+      if (confirmedTransactions.find(it->first) !=
+          confirmedTransactions.end()) {
         confirmedCount += 1;
         durationToConfirmed[it->second.msDuration /
                             (_addtionalLatencyStepSeconds.count() * 1000)] += 1;
