@@ -32,7 +32,7 @@ std::string TryteTransaction::signature(void) {
   return trytes;
 }
 
-// Set the transaction signature (copy argument)
+// Set the transaction signature (assign)
 void TryteTransaction::setSignature(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(NUM_TRITS_SIGNATURE);
   flex_trit_t trits[flex_len];
@@ -50,7 +50,7 @@ std::string TryteTransaction::message(void) {
   return trytes;
 }
 
-// Set the transaction message (copy argument)
+// Set the transaction message (assign)
 void TryteTransaction::setMessage(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(NUM_TRITS_SIGNATURE);
   flex_trit_t trits[flex_len];
@@ -68,7 +68,7 @@ std::string TryteTransaction::address(void) {
   return trytes;
 }
 
-// Set the transaction address (copy argument)
+// Set the transaction address (assign)
 void TryteTransaction::setAddress(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(NUM_TRITS_ADDRESS);
   flex_trit_t trits[flex_len];
@@ -145,7 +145,7 @@ std::string TryteTransaction::bundle(void) {
   return trytes;
 }
 
-// Set the transaction bundle (copy argument)
+// Set the transaction bundle (assign)
 void TryteTransaction::setBundle(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(NUM_TRITS_BUNDLE);
   flex_trit_t trits[flex_len];
@@ -163,7 +163,7 @@ std::string TryteTransaction::trunk(void) {
   return trytes;
 }
 
-// Set the transaction trunk (copy argument)
+// Set the transaction trunk (assign)
 void TryteTransaction::setTrunk(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(NUM_TRITS_TRUNK);
   flex_trit_t trits[flex_len];
@@ -181,7 +181,7 @@ std::string TryteTransaction::branch(void) {
   return trytes;
 }
 
-// Set the transaction branch (copy argument)
+// Set the transaction branch (assign)
 void TryteTransaction::setBranch(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(NUM_TRITS_BRANCH);
   flex_trit_t trits[flex_len];
@@ -199,7 +199,7 @@ std::string TryteTransaction::tag(void) {
   return trytes;
 }
 
-// Set the transaction tag (copy argument)
+// Set the transaction tag (assign)
 void TryteTransaction::setTag(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(NUM_TRITS_TAG);
   flex_trit_t trits[flex_len];
@@ -247,7 +247,7 @@ std::string TryteTransaction::nonce(void) {
   return trytes;
 }
 
-// Set the transaction nonce (copy argument)
+// Set the transaction nonce (assign)
 void TryteTransaction::setNonce(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(NUM_TRITS_NONCE);
   flex_trit_t trits[flex_len];
@@ -265,7 +265,7 @@ std::string TryteTransaction::hash(void) {
   return trytes;
 }
 
-// Set the transaction hash (copy argument)
+// Set the transaction hash (assign)
 void TryteTransaction::setHash(const std::string &trytes) {
   size_t flex_len = flex_trits_num_for_trits(NUM_TRITS_HASH);
   flex_trit_t trits[flex_len];
