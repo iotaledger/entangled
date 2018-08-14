@@ -7,6 +7,8 @@ cc_binary(
     deps = [
         ":core",
         "//utils/containers/lists:concurrent_list_neighbor",
+        "//ciri/conf:configuration",
+        "//ciri/conf:config_args",
     ],
 )
 
@@ -45,6 +47,7 @@ cc_library(
     srcs = ["node.c"],
     deps = [
         ":node_shared",
+        "//ciri/conf:configuration",
         "//gossip/components:broadcaster",
         "//gossip/components:processor",
         "//gossip/components:receiver",
