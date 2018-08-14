@@ -52,7 +52,7 @@ void TcpConnection::start() {
 void TcpConnection::receive() {
   auto self(shared_from_this());
   boost::asio::async_read(
-      socket_, boost::asio::buffer(packet_.content, TRANSACTION_PACKET_SIZE),
+      socket_, boost::asio::buffer(packet_.content, PACKET_SIZE),
       [this, self](boost::system::error_code ec, std::size_t length) {
         if (!ec && length > 0) {
           handlePacket(length);
@@ -62,7 +62,7 @@ void TcpConnection::receive() {
 }
 
 bool TcpConnection::handlePacket(std::size_t const length) {
-  if (length != TRANSACTION_PACKET_SIZE) {
+  if (length != PACKET_SIZE) {
     return false;
   }
   iota_packet_build(&packet_, length,

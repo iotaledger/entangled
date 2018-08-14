@@ -28,8 +28,7 @@ UdpReceiverService::~UdpReceiverService() {
 
 void UdpReceiverService::receive() {
   socket_.async_receive_from(
-      boost::asio::buffer(packet_.content, TRANSACTION_PACKET_SIZE),
-      senderEndpoint_,
+      boost::asio::buffer(packet_.content, PACKET_SIZE), senderEndpoint_,
       [this](boost::system::error_code ec, std::size_t length) {
         if (!ec && length > 0) {
           auto host = senderEndpoint_.address().to_string().c_str();
@@ -50,7 +49,7 @@ void UdpReceiverService::receive() {
 }
 
 bool UdpReceiverService::handlePacket(std::size_t const length) {
-  if (length != TRANSACTION_PACKET_SIZE) {
+  if (length != PACKET_SIZE) {
     return false;
   }
   iota_packet_build(&packet_, length,
