@@ -20,7 +20,7 @@ std::map<std::string, std::string> CRCollector::nameToDescGauges = {
      "stream"},
     {CRCollector::CONFIRMATION_RATE_API,
      "Confirmation rate ratio [0,1] as it is perceived by making api calls to "
-     "get inclusion state"}};
+     "\"getInclusionStates\""}};
 
 bool CRCollector::parseConfiguration(const YAML::Node& conf) {
   if (!BroadcastReceiveCollector::parseConfiguration(conf)) {

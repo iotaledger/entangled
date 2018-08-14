@@ -242,5 +242,52 @@ dbloader:
 - tanglewidthcollector_measure_line (Measure line's timestamp) [Gauge]  
 - tanglewidthcollector_tangle_width (Width/Number of edges crossing a measure line) [Gauge]
 
+Confirmation rate collector
+---------------------------
+
+
+**Purpose:**
+
+Measuring transaction's confirmation rate
+
+
+**Configuration section example:**
+
+
+```yaml
+confirmationratecollector:
+  #list of publisher to listen to. (they should return the echo)
+  publishers:
+      - "tcp://zmq.testnet.iota.org:5556"
+
+  #url of iri node
+  iri_host: "iri01.testnet.iota.cafe"
+  iri_port: 14265
+  #IP/Port that the Prometheus Exposer binds to
+  prometheus_exposer_uri: "0.0.0.0:8085"
+  #MWM for transaction's POW
+  mwm: 9
+  #in-between transactions interval [seconds]
+  broadcast_interval: 3
+
+  #Time after which we should expect transaction to be approved
+  measurement_upper_bound: 60
+  #Time after which if a transaction hasn't been approved, we give up
+  measurement_lower_bound: 360
+  #should calculate confirmation rate using API calls
+  enable_cr_from_api: true
+  #For checking the CR for various Latencies, define the latency in seconds,
+  #"step" means that for 10 seconds we will check latency of 10,20,30 seconds
+  additional_latency_step_seconds: 10
+  #num different latencies to check
+  additional_latency_num_steps: 3
+```
+
+**Metrics**:
+
+- confirmationratecollector_confirmation_rate_api (Confirmation rate ratio [0,1] as it is perceived by making api calls to "getInclusionStates") [Gauge]  
+
+- confirmationratecollector_confirmation_rate_zmq (Confirmation rate ratio [0,1] as it is perceived by inspecting the zmq stream) [Gauge]
+
 
 
