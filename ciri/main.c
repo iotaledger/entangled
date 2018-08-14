@@ -6,16 +6,20 @@
  */
 
 #include <stdlib.h>
+#include <getopt.h>
 
 #include "ciri/core.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
+#include "ciri/conf/configuration.h"
+#include "ciri/conf/config_args.h"
 #include "utils/logger_helper.h"
 
 #define MAIN_LOGGER_ID "main"
 
 static core_t core_g;
 
-int main() {
+
+int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
 
   if (LOGGER_VERSION != logger_version()) {
@@ -25,6 +29,21 @@ int main() {
   logger_output_register(stdout);
   logger_output_level_set(stdout, LOGGER_DEBUG);
   logger_helper_init(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
+
+  // configuration argument parser
+  int arg;
+  while ((arg = getopt_long(argc, argv, short_options, long_options, NULL)) != -1) {
+      switch (arg) {
+          case 't':
+            tcp_port_g = atoi(optarg);
+            break;
+          case 'u':
+            udp_port_g = atoi(optarg);
+            break;
+          default:
+            break;
+      }
+  }
 
   log_info(MAIN_LOGGER_ID, "Initializing cIRI core\n");
   if (core_init(&core_g)) {
