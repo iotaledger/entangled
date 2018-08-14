@@ -20,6 +20,7 @@ typedef struct core_s core_t;
 typedef concurrent_list_of_neighbor_t neighbors_list_t;
 
 typedef struct node_s {
+  bool running;
   core_t* core;
   broadcaster_state_t broadcaster;
   processor_state_t processor;
