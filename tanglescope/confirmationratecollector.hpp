@@ -22,7 +22,7 @@ namespace tanglescope {
 
 class CRCollector : public BroadcastReceiveCollector {
  public:
-  //Conf
+  // Conf
   constexpr static auto MESAUREMENT_UPPER_BOUND = "measurement_upper_bound";
   constexpr static auto MESAUREMENT_LOWER_BOUND = "measurement_lower_bound";
   constexpr static auto CONFIRMATION_RATE_ZMQ = "confirmation_rate_zmq";
@@ -33,7 +33,7 @@ class CRCollector : public BroadcastReceiveCollector {
   constexpr static auto ADDITIONAL_LATENCY_NUM_STEPS =
       "additional_latency_num_steps";
 
-  //Defs
+  // Defs
   constexpr static uint16_t API_SAMPLE_INTERVAL_SECONDS = 10;
 
   bool parseConfiguration(const YAML::Node& conf) override;
@@ -65,7 +65,7 @@ class CRCollector : public BroadcastReceiveCollector {
   rxcpp::schedulers::worker _collectorWorker;
   std::vector<boost::future<void>> _tasks;
   bool _enableApi;
-  uint32_t _addtionalLatencyStepSeconds;
+  std::chrono::seconds _addtionalLatencyStepSeconds;
   uint32_t _addtionalLatencyNumSteps;
 };
 

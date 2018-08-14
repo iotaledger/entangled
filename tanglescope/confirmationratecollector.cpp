@@ -32,8 +32,8 @@ bool CRCollector::parseConfiguration(const YAML::Node& conf) {
     _measurementUpperBound = conf[MESAUREMENT_UPPER_BOUND].as<uint32_t>();
     _measurementLowerBound = conf[MESAUREMENT_LOWER_BOUND].as<uint32_t>();
     _enableApi = conf[ENABLE_CR_FROM_API].as<bool>();
-    _addtionalLatencyStepSeconds =
-        conf[ADDITIONAL_LATENCY_STEP_SECONDS].as<uint32_t>();
+    _addtionalLatencyStepSeconds = std::chrono::seconds(
+        conf[ADDITIONAL_LATENCY_STEP_SECONDS].as<uint32_t>());
     _addtionalLatencyNumSteps =
         conf[ADDITIONAL_LATENCY_NUM_STEPS].as<uint32_t>();
     return true;
@@ -57,7 +57,7 @@ void CRCollector::doPeriodically() {
 
 void CRCollector::artificialyDelay() {
   static uint16_t step = 0;
-  if (_addtionalLatencyStepSeconds > 0) {
+  if (_addtionalLatencyStepSeconds.count()) {
     std::this_thread::sleep_for(std::chrono::seconds(
         (step++ % _addtionalLatencyNumSteps) * _addtionalLatencyStepSeconds));
   }
@@ -111,7 +111,8 @@ void CRCollector::calcConfirmationRateAPICall() {
 using namespace prometheus;
 
 void CRCollector::subscribeToTransactions(
-    std::string zmqURL, const BroadcastReceiveCollector::ZmqObservable& zmqObservable,
+    std::string zmqURL,
+    const BroadcastReceiveCollector::ZmqObservable& zmqObservable,
     std::shared_ptr<Registry> registry) {
   _gauges = buildGaugeMap(registry, "confirmationratecollector",
                           {{"listen_node", _iriHost}, {"zmq_url", zmqURL}},
@@ -147,12 +148,12 @@ void CRCollector::calcAndExposeImpl(
     if (it->second.tp < ub && it->second.tp > lb) {
       totalTransactionsCount += 1;
       durationToTotal[it->second.msDuration /
-                      (_addtionalLatencyStepSeconds * 1000)] += 1;
+                      (_addtionalLatencyStepSeconds.count() * 1000)] += 1;
       if (_confirmedTransactions.find(it->first) !=
           _confirmedTransactions.end()) {
         confirmedCount += 1;
         durationToConfirmed[it->second.msDuration /
-                            (_addtionalLatencyStepSeconds * 1000)] += 1;
+                            (_addtionalLatencyStepSeconds.count() * 1000)] += 1;
       }
     }
     it++;
@@ -167,7 +168,8 @@ void CRCollector::calcAndExposeImpl(
       _gauges.at(label)
           .get()
           .Add({{"pow_duration_group_seconds",
-                 std::to_string(kv.first * _addtionalLatencyStepSeconds)}})
+                 std::to_string(kv.first *
+                                _addtionalLatencyStepSeconds.count())}})
           .Set(cr);
     }
   }
