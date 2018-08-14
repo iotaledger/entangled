@@ -21,6 +21,7 @@ retcode_t core_init(core_t* const core) {
 
   logger_helper_init(CORE_LOGGER_ID, LOGGER_DEBUG, true);
   memset(core, 0, sizeof(core_t));
+  core->running = false;
 
   log_info(CORE_LOGGER_ID, "Initializing database connection\n");
   core->db_conf.db_path = CIRI_DB_PATH;
@@ -38,6 +39,7 @@ retcode_t core_init(core_t* const core) {
     log_critical(CORE_LOGGER_ID, "Initializing cIRI node failed\n");
     return RC_CORE_FAILED_NODE_INIT;
   }
+
   return RC_OK;
 }
 
@@ -51,6 +53,9 @@ retcode_t core_start(core_t* const core) {
     log_critical(CORE_LOGGER_ID, "Starting cIRI node failed\n");
     return RC_CORE_FAILED_NODE_START;
   }
+
+  core->running = true;
+
   return RC_OK;
 }
 
@@ -66,6 +71,9 @@ retcode_t core_stop(core_t* const core) {
     log_error(CORE_LOGGER_ID, "Stopping cIRI node failed\n");
     ret = RC_CORE_FAILED_NODE_STOP;
   }
+
+  core->running = false;
+
   return ret;
 }
 
@@ -74,6 +82,10 @@ retcode_t core_destroy(core_t* const core) {
 
   if (core == NULL) {
     return RC_CORE_NULL_CORE;
+  }
+
+  if (core->running) {
+    return RC_CORE_STILL_RUNNING;
   }
 
   log_info(CORE_LOGGER_ID, "Destroying cIRI node\n");

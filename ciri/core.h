@@ -12,6 +12,7 @@
 #include "common/storage/connection.h"
 
 typedef struct core_s {
+  bool running;
   node_t node;
   connection_t db_conn;
   connection_config_t db_conf;
