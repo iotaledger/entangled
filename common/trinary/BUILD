@@ -104,10 +104,47 @@ cc_library(
     ],
 )
 
+config_setting(
+    name = "trit_encoding_1",
+    values = {"define": "trit_encoding=1"},
+)
+
+config_setting(
+    name = "trit_encoding_3",
+    values = {"define": "trit_encoding=3"},
+)
+
+config_setting(
+    name = "trit_encoding_4",
+    values = {"define": "trit_encoding=4"},
+)
+
+config_setting(
+    name = "trit_encoding_5",
+    values = {"define": "trit_encoding=5"},
+)
+
 cc_library(
     name = "trit_array",
+    deps = select({
+        ":trit_encoding_1": [":trit_array_1"],
+        ":trit_encoding_3": [":trit_array_3"],
+        ":trit_encoding_4": [":trit_array_4"],
+        ":trit_encoding_5": [":trit_array_5"],
+        "//conditions:default": [":trit_array_3"],
+    }),
+)
+
+cc_library(
+    name = "trit_array_1",
+    srcs = ["trit_array.c"],
+    hdrs = ["trit_array.h"],
+    defines = ["TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE"],
     deps = [
-        ":trit_array_3",
+        ":trit_byte",
+        ":trit_tryte",
+        ":trits",
+        "//common:stdint",
     ],
 )
 
