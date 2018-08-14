@@ -155,4 +155,6 @@ retcode_t iota_transactions_select_hashes_statement(const char *index_col,
               statement);
     return RC_SQL_FAILED_WRITE_STATEMENT;
   }
+
+  return RC_OK;
 }
