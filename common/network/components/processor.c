@@ -18,7 +18,7 @@ static bool pre_processor(processor_state_t *const state,
                           iota_packet_t *const packet) {
   neighbor_t *neighbor = NULL;
   iota_transaction_t tx = NULL;
-  trit_array_p hash = NULL;
+  trit_array_p request_hash = NULL;
 
   if (state == NULL) {
     return false;
@@ -60,24 +60,20 @@ static bool pre_processor(processor_state_t *const state,
 
   // Request bytes
   {
-    trit_t hash_trits[NUM_TRITS_HASH] = {0};
+    trit_t request_hash_trits[NUM_TRITS_HASH] = {0};
     bytes_to_trits(packet->content + TX_BYTES_SIZE, REQ_HASH_BYTES_SIZE,
-                   hash_trits, NUM_TRITS_HASH);
-    if ((hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
+                   request_hash_trits, NUM_TRITS_HASH);
+    if ((request_hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
       return false;
     }
-    int8_to_flex_trit_array(hash->trits, hash->num_bytes, hash_trits,
-                            NUM_TRITS_HASH, NUM_TRITS_HASH);
+    int8_to_flex_trit_array(request_hash->trits, request_hash->num_bytes,
+                            request_hash_trits, NUM_TRITS_HASH, NUM_TRITS_HASH);
   }
-  //       // add request to reply queue (requestedHash, neighbor)
-  //       Hash requestedHash =
-  //           new Hash(receivedData, TransactionViewModel.SIZE, reqHashSize);
   //       if (requestedHash.equals(receivedTransactionHash)) {
   //         // requesting a random tip
   //         requestedHash = Hash.NULL_HASH;
   //       }
-  //
-  //       addReceivedDataToReplyQueue(requestedHash, neighbor);
+  responder_on_next(&state->node->responder, request_hash, neighbor);
 
   // TODO(thibault): recentSeenBytes statistics
   // TODO(thibault): Testnet add non-tethered neighbor
