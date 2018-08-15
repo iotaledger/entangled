@@ -29,6 +29,8 @@ cc_library(
     deps = [
         ":iota_packet",
         ":uri_parser",
+        "//common/model:transaction",
+        "//common/network/components:requester_shared",
         "//common/network/services:tcp_sender",
         "//common/network/services:udp_sender",
     ],

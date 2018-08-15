@@ -7,10 +7,13 @@
 
 #include <string.h>
 
+#include "common/model/transaction.h"
+#include "common/network/components/requester.h"
 #include "common/network/neighbor.h"
 #include "common/network/services/tcp_sender.hpp"
 #include "common/network/services/udp_sender.hpp"
 #include "common/network/uri_parser.h"
+#include "common/trinary/trit_array.h"
 
 bool neighbor_init_with_uri(neighbor_t *const neighbor, char const *const uri) {
   char scheme[MAX_SCHEME_LENGTH];
@@ -50,13 +53,24 @@ bool neighbor_init_with_values(neighbor_t *const neighbor,
 }
 
 bool neighbor_send(neighbor_t *const neighbor, iota_packet_t *const packet) {
+  trit_t hash_trits[NUM_TRITS_HASH];
+  trit_array_p hash = NULL;
+
   if (neighbor == NULL) {
     return false;
   }
   if (packet == NULL) {
     return false;
   }
-  // TODO(thibault): add hash request
+  if (get_transaction_to_request(NULL, &hash) == false) {
+    return false;
+  }
+  if (hash == NULL) {
+    return false;
+  }
+  flex_trit_array_to_int8(hash_trits, NUM_TRITS_HASH, hash->trits,
+                          hash->num_trits, hash->num_trits);
+  trits_to_bytes(hash_trits, packet->content + PACKET_SIZE, NUM_TRITS_HASH);
   if ((neighbor->endpoint.protocol == PROTOCOL_TCP &&
        tcp_send(&neighbor->endpoint, packet)) ||
       (neighbor->endpoint.protocol == PROTOCOL_UDP &&
