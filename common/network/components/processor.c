@@ -29,9 +29,10 @@ static bool pre_processor(processor_state_t *const state,
 
   log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Pre-processing packet\n");
   neighbor = neighbor_find_by_endpoint(state->node->neighbors, &packet->source);
+
   if (neighbor) {
+    neighbor->nbr_all_packets++;
     // Transaction bytes
-    // TODO(thibault): neighbor.incAllTransactions();
     // TODO(thibault): Randomly dropping transaction.
     // TODO(thibault): Compute cache-specific hash (faster)?
     // TODO(thibault): get from cache
