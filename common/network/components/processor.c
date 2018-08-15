@@ -5,9 +5,11 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/network/components/processor.h"
+#include <string.h>
+
 #include "ciri/node.h"
 #include "common/model/transaction.h"
+#include "common/network/components/processor.h"
 #include "common/network/neighbor.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
@@ -68,13 +70,14 @@ static bool pre_processor(processor_state_t *const state,
                               request_hash_trits, NUM_TRITS_HASH,
                               NUM_TRITS_HASH);
     }
-    //       if (requestedHash.equals(receivedTransactionHash)) {
-    //         // requesting a random tip
-    //         requestedHash = Hash.NULL_HASH;
-    //       }
+    if (memcmp(request_hash->trits, tx->hash, request_hash->num_bytes) == 0) {
+      // requesting a random tip
+      // requestedHash = Hash.NULL_HASH;
+    }
     responder_on_next(&state->node->responder, request_hash, neighbor);
 
-    // TODO(thibault): recentSeenBytes statistics
+    // TODO(thibault): debug: recent seen bytes statistics
+
   } else {
     // TODO(thibault): Testnet add non-tethered neighbor
   }
