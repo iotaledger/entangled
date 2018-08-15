@@ -18,47 +18,12 @@
 
 #define PROCESSOR_COMPONENT_LOGGER_ID "processor_component"
 
-static bool process(processor_state_t *const state, iota_transaction_t const tx,
-                    neighbor_t *const neighbor) {
-  bool exists = false;
-
-  if (state == NULL) {
-    return false;
-  }
-  if (tx == NULL) {
-    return false;
-  }
-  if (neighbor == NULL) {
-    return false;
-  }
-
-  // if (iota_stor_exist(&state->node->core->db_conn, COL_HASH, hash, &exists))
-  // {
-  //   return false;
-  // }
-  if (exists == false) {
-    // Store new transaction
-    if (iota_stor_store(&state->node->core->db_conn, tx)) {
-      neighbor->nbr_invalid_tx++;
-      return false;
-    }
-    neighbor->nbr_new_tx++;
-    // receivedTransactionViewModel.setArrivalTime(System.currentTimeMillis());
-    // transactionValidator.updateStatus(receivedTransactionViewModel);
-    // receivedTransactionViewModel.update(tangle, "arrivalTime|sender");
-  }
-
-  // // if new, then broadcast to all neighbors
-  // neighbor.incNewTransactions();
-  // broadcast(receivedTransactionViewModel);
-  return true;
-}
-
-static bool pre_process(processor_state_t *const state,
-                        iota_packet_t *const packet) {
+static bool process_packet(processor_state_t *const state,
+                           iota_packet_t *const packet) {
   neighbor_t *neighbor = NULL;
   iota_transaction_t tx = NULL;
   trit_array_p request_hash = NULL;
+  bool exists = false;
 
   if (state == NULL) {
     return false;
@@ -87,8 +52,23 @@ static bool pre_process(processor_state_t *const state,
       }
       // TODO(thibault): Transaction validation
       // TODO(thibault): Add to cache
-      // TODO(thibault): Add to receive queue
-      process(state, tx, neighbor);
+
+      // if (iota_stor_exist(&state->node->core->db_conn, COL_HASH, hash,
+      // &exists))
+      // {
+      //   return false;
+      // }
+      if (exists == false) {
+        // Store new transaction
+        if (iota_stor_store(&state->node->core->db_conn, tx)) {
+          neighbor->nbr_invalid_tx++;
+          return false;
+        }
+        // TODO(thibault): Store transaction metadata
+        neighbor->nbr_new_tx++;
+        // Broadcast new transaction
+        broadcaster_on_next(&state->node->broadcaster, *packet);
+      }
     }
 
     // Request bytes
@@ -126,7 +106,7 @@ static void *processor_routine(processor_state_t *const state) {
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &packet) ==
         CONCURRENT_QUEUE_SUCCESS) {
-      pre_process(state, &packet);
+      process_packet(state, &packet);
     }
   }
   return NULL;
