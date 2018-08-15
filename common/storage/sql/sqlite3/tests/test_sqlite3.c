@@ -30,13 +30,21 @@ void test_init_connection(void) {
 
 void test_initialized_db_empty(void) {
   bool exist = false;
-  TEST_ASSERT(iota_stor_exist(&conn, NULL, NULL, &exist) == RC_OK);
+
+  trit_array_p  col_value = trit_array_new(FLEX_TRIT_SIZE_243);
+  col_value->trits = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+  TEST_ASSERT(iota_stor_exist(&conn, COL_HASH,col_value , &exist) == RC_OK);
   TEST_ASSERT(exist == false);
 }
 
 void test_stored_transaction(void) {
   TEST_ASSERT(iota_stor_store(&conn, &TEST_TRANSACTION) == RC_OK);
   bool exist = false;
+  trit_array_p  col_value = trit_array_new(FLEX_TRIT_SIZE_243);
+  col_value->trits = TEST_TRANSACTION.hash;
+  TEST_ASSERT(iota_stor_exist(&conn, COL_HASH, col_value, &exist) == RC_OK);
+  TEST_ASSERT(exist == true);
+
   TEST_ASSERT(iota_stor_exist(&conn, NULL, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
@@ -44,14 +52,14 @@ void test_stored_transaction(void) {
   iota_transaction_t txs[5];
   pack.txs = &txs;
   pack.num_loaded = 0;
-  pack.max_txs = 5;
+  pack.txs_capacity = 5;
 
   for (int i = 0; i < 5; ++i) {
     pack.txs[i] = transaction_new();
   }
 
   size_t num_loaded;
-  TEST_ASSERT(iota_stor_load(&conn, NULL, NULL, &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_load(&conn, COL_HASH, col_value, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
 
   TEST_ASSERT_EQUAL_STRING(txs[0]->nonce, TEST_TRANSACTION.nonce);
@@ -83,18 +91,18 @@ void test_stored_load_hashes_by_address(void) {
   iota_hashes_pack pack;
   pack.hashes = &hashes;
   pack.num_loaded = 0;
-  pack.max_hashes = 5;
-  for (int i = 0; i < pack.max_hashes; ++i) {
+  pack.hashes_capacity = 5;
+  for (int i = 0; i < pack.hashes_capacity; ++i) {
     pack.hashes[i] = trit_array_new(243);
   }
-  pack.max_hashes = 5;
-  trit_array_p key = trit_array_new(243);
-  memcpy(key->trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
+  pack.hashes_capacity = 5;
+  trit_array_p key = trit_array_new(81);
+  memcpy(key->trits, TEST_TRANSACTION.address, 81);
   TEST_ASSERT(iota_stor_load_hashes(&conn, COL_ADDRESS, key, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_MEMORY(TEST_TRANSACTION.hash, pack.hashes[0]->trits, 81);
 
-  for (int i = 0; i < pack.max_hashes; ++i) {
+  for (int i = 0; i < pack.hashes_capacity; ++i) {
     trit_array_free(pack.hashes[i]);
   }
 }
@@ -109,7 +117,6 @@ int main(void) {
   RUN_TEST(test_initialized_db_empty);
   RUN_TEST(test_stored_transaction);
   RUN_TEST(test_stored_load_hashes_by_address);
-  // TODO - Add test to find transaction by any column name (When #2 is merged)
 
   return UNITY_END();
 }

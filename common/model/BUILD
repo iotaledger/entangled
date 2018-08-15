@@ -6,7 +6,7 @@ cc_library(
     hdrs = ["transaction.h"],
     deps = [
         "//common/curl-p:digest",
-        "//common/trinary:trit_array",
+        "//common/trinary:trit_array_3",
         "//common/trinary:trit_long",
     ],
 )

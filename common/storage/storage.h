@@ -21,14 +21,16 @@ extern "C" {
 
 typedef struct iota_transactions_pack {
   iota_transaction_t* txs;
-  size_t max_txs;
+  size_t txs_capacity;
   size_t num_loaded;
+  bool insufficient_capacity;
 } iota_transactions_pack;
 
 typedef struct iota_hashes_pack {
   trit_array_p* hashes;
-  size_t max_hashes;
+  size_t hashes_capacity;
   size_t num_loaded;
+  bool insufficient_capacity;
 } iota_hashes_pack;
 
 extern retcode_t iota_stor_init();
