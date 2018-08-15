@@ -71,8 +71,8 @@ static bool pre_processor(processor_state_t *const state,
                               NUM_TRITS_HASH);
     }
     if (memcmp(request_hash->trits, tx->hash, request_hash->num_bytes) == 0) {
-      // requesting a random tip
-      // requestedHash = Hash.NULL_HASH;
+      // If requested hash is equal to transaction hash: request a random tip
+      trit_array_set_null(request_hash);
     }
     responder_on_next(&state->node->responder, request_hash, neighbor);
 

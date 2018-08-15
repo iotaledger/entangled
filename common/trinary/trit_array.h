@@ -236,6 +236,10 @@ static inline uint8_t trit_array_set_at(trit_array_p const trit_array,
 void trit_array_set_trits(trit_array_p const trit_array,
                           flex_trit_t *const trits, size_t const num_trits);
 
+static inline void trit_array_set_null(trit_array_p const trit_array) {
+  memset(trit_array->trits, FLEX_TRIT_NULL_VALUE, trit_array->num_bytes);
+}
+
 /// Returns a new trit_array containing a portion of length num_trits of the
 /// trits of another trit_array, from index start.
 /// @param[in] trit_array - the original trit_array
