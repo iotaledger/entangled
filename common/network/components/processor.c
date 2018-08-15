@@ -18,12 +18,77 @@
 
 #define PROCESSOR_COMPONENT_LOGGER_ID "processor_component"
 
+static bool process_transaction_bytes(processor_state_t *const state,
+                                      neighbor_t *const neighbor,
+                                      iota_packet_t *const packet,
+                                      iota_transaction_t *const tx) {
+  bool exists = false;
+
+  if (state == NULL || neighbor == NULL || packet == NULL || tx == NULL) {
+    return false;
+  }
+  if (true /* TODO(thibault): if !cached */) {
+    trit_t tx_trits[TX_TRITS_SIZE];
+    flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
+
+    bytes_to_trits(packet->content, TX_BYTES_SIZE, tx_trits, TX_TRITS_SIZE);
+    int8_to_flex_trit_array(tx_flex_trits, FLEX_TRIT_SIZE_8019, tx_trits,
+                            TX_TRITS_SIZE, TX_TRITS_SIZE);
+    if ((*tx = transaction_deserialize(tx_flex_trits)) == NULL) {
+      return false;
+    }
+    // TODO(thibault): Transaction validation
+    // TODO(thibault): Add to cache
+
+    // if (iota_stor_exist(&state->node->core->db_conn, COL_HASH, hash,
+    // &exists))
+    // {
+    //   return false;
+    // }
+    if (exists == false) {
+      // Store new transaction
+      if (iota_stor_store(&state->node->core->db_conn, *tx)) {
+        neighbor->nbr_invalid_tx++;
+        return false;
+      }
+      // TODO(thibault): Store transaction metadata
+      neighbor->nbr_new_tx++;
+      // Broadcast new transaction
+      broadcaster_on_next(&state->node->broadcaster, *packet);
+    }
+  }
+  return true;
+}
+
+static bool process_request_bytes(processor_state_t *const state,
+                                  neighbor_t *const neighbor,
+                                  iota_packet_t *const packet,
+                                  iota_transaction_t const tx) {
+  trit_t request_hash_trits[NUM_TRITS_HASH] = {0};
+  trit_array_p request_hash = NULL;
+
+  if (state == NULL || neighbor == NULL || packet == NULL || tx == NULL) {
+    return false;
+  }
+  bytes_to_trits(packet->content + TX_BYTES_SIZE, REQ_HASH_BYTES_SIZE,
+                 request_hash_trits, NUM_TRITS_HASH);
+  if ((request_hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
+    return false;
+  }
+  int8_to_flex_trit_array(request_hash->trits, request_hash->num_bytes,
+                          request_hash_trits, NUM_TRITS_HASH, NUM_TRITS_HASH);
+  if (memcmp(request_hash->trits, tx->hash, request_hash->num_bytes) == 0) {
+    // If requested hash is equal to transaction hash: request a random tip
+    trit_array_set_null(request_hash);
+  }
+  responder_on_next(&state->node->responder, request_hash, neighbor);
+  return true;
+}
+
 static bool process_packet(processor_state_t *const state,
                            iota_packet_t *const packet) {
   neighbor_t *neighbor = NULL;
   iota_transaction_t tx = NULL;
-  trit_array_p request_hash = NULL;
-  bool exists = false;
 
   if (state == NULL) {
     return false;
@@ -32,62 +97,21 @@ static bool process_packet(processor_state_t *const state,
     return false;
   }
 
-  log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Pre-processing packet\n");
+  log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing packet\n");
   neighbor = neighbor_find_by_endpoint(state->node->neighbors, &packet->source);
 
   if (neighbor) {
     neighbor->nbr_all_tx++;
-    // Transaction bytes
+
     // TODO(thibault): Random drop transaction
-    // TODO(thibault): If !cached
-    if (true) {
-      trit_t tx_trits[TX_TRITS_SIZE];
-      flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
 
-      bytes_to_trits(packet->content, TX_BYTES_SIZE, tx_trits, TX_TRITS_SIZE);
-      int8_to_flex_trit_array(tx_flex_trits, FLEX_TRIT_SIZE_8019, tx_trits,
-                              TX_TRITS_SIZE, TX_TRITS_SIZE);
-      if ((tx = transaction_deserialize(tx_flex_trits)) == NULL) {
-        return false;
-      }
-      // TODO(thibault): Transaction validation
-      // TODO(thibault): Add to cache
-
-      // if (iota_stor_exist(&state->node->core->db_conn, COL_HASH, hash,
-      // &exists))
-      // {
-      //   return false;
-      // }
-      if (exists == false) {
-        // Store new transaction
-        if (iota_stor_store(&state->node->core->db_conn, tx)) {
-          neighbor->nbr_invalid_tx++;
-          return false;
-        }
-        // TODO(thibault): Store transaction metadata
-        neighbor->nbr_new_tx++;
-        // Broadcast new transaction
-        broadcaster_on_next(&state->node->broadcaster, *packet);
-      }
+    if (process_transaction_bytes(state, neighbor, packet, &tx) == false) {
+      return false;
     }
 
-    // Request bytes
-    {
-      trit_t request_hash_trits[NUM_TRITS_HASH] = {0};
-      bytes_to_trits(packet->content + TX_BYTES_SIZE, REQ_HASH_BYTES_SIZE,
-                     request_hash_trits, NUM_TRITS_HASH);
-      if ((request_hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
-        return false;
-      }
-      int8_to_flex_trit_array(request_hash->trits, request_hash->num_bytes,
-                              request_hash_trits, NUM_TRITS_HASH,
-                              NUM_TRITS_HASH);
+    if (process_request_bytes(state, neighbor, packet, tx) == false) {
+      return false;
     }
-    if (memcmp(request_hash->trits, tx->hash, request_hash->num_bytes) == 0) {
-      // If requested hash is equal to transaction hash: request a random tip
-      trit_array_set_null(request_hash);
-    }
-    responder_on_next(&state->node->responder, request_hash, neighbor);
 
     // TODO(thibault): Recent seen bytes statistics
   } else {
