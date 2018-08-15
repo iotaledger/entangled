@@ -8,10 +8,10 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_BROADCASTER_H__
 #define __COMMON_NETWORK_COMPONENTS_BROADCASTER_H__
 
-#include "utils/containers/queues/concurrent_queue_trit_array.h"
+#include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/handles/thread.h"
 
-typedef concurrent_queue_of_trit_array_p broadcaster_queue_t;
+typedef concurrent_queue_of_iota_packet_t broadcaster_queue_t;
 typedef struct node_s node_t;
 
 typedef struct broadcaster_state_s {
@@ -28,7 +28,7 @@ extern "C" {
 bool broadcaster_init(broadcaster_state_t *const state, node_t *const node);
 bool broadcaster_start(broadcaster_state_t *const state);
 bool broadcaster_on_next(broadcaster_state_t *const state,
-                         trit_array_p const hash);
+                         iota_packet_t const packet);
 bool broadcaster_stop(broadcaster_state_t *const state);
 bool broadcaster_destroy(broadcaster_state_t *const state);
 
