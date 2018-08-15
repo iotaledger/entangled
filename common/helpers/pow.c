@@ -1,14 +1,16 @@
+#include "common/helpers/pow.h"
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "common/curl-p/hashcash.h"
 #include "common/pow/pow.h"
 #include "common/trinary/trit_tryte.h"
-#include "pow.h"
+#include "utils/export.h"
 
 #define NONCE_LENGTH 27 * 3
 
-char* iota_pow(char const* const trytes_in, uint8_t const mwm) {
+IOTA_EXPORT char* iota_pow(char const* const trytes_in, uint8_t const mwm) {
   Curl curl;
   init_curl(&curl);
   curl.type = CURL_P_81;

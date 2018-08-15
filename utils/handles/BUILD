@@ -1,5 +1,13 @@
 package(default_visibility = ["//visibility:public"])
 
+config_setting(
+    name = "linux",
+    constraint_values = [
+        "@bazel_tools//platforms:linux",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 cc_library(
     name = "cond",
     hdrs = ["cond.h"],
@@ -19,5 +27,8 @@ cc_library(
 cc_library(
     name = "thread",
     hdrs = ["thread.h"],
-    linkopts = ["-lpthread"],
+    linkopts = select({
+        ":linux": ["-pthread"],
+        "//conditions:default": [],
+    }),
 )
