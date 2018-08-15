@@ -12,6 +12,7 @@
 #include "common/model/transaction.h"
 #include "common/network/components/processor.h"
 #include "common/network/neighbor.h"
+#include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
@@ -27,6 +28,7 @@ static bool process_transaction_bytes(processor_state_t *const state,
   if (state == NULL || neighbor == NULL || packet == NULL || tx == NULL) {
     return false;
   }
+
   if (true /* TODO(thibault): if !cached */) {
     trit_t tx_trits[TX_TRITS_SIZE];
     flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
@@ -40,11 +42,13 @@ static bool process_transaction_bytes(processor_state_t *const state,
     // TODO(thibault): Transaction validation
     // TODO(thibault): Add to cache
 
-    // if (iota_stor_exist(&state->node->core->db_conn, COL_HASH, hash,
-    // &exists))
-    // {
-    //   return false;
-    // }
+    TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
+    trit_array_set_trits(&hash, (*tx)->hash, NUM_TRITS_HASH);
+
+    if (iota_stor_exist(&state->node->core->db_conn, COL_HASH, &hash,
+                        &exists)) {
+      return false;
+    }
     if (exists == false) {
       // Store new transaction
       if (iota_stor_store(&state->node->core->db_conn, *tx)) {
