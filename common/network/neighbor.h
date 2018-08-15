@@ -15,10 +15,10 @@
 
 typedef struct {
   endpoint_t endpoint;
-  unsigned int nbr_all_packets;
-  unsigned int nbr_new_packets;
-  unsigned int nbr_invalid_packets;
-  unsigned int nbr_sent_packets;
+  unsigned int nbr_all_tx;
+  unsigned int nbr_new_tx;
+  unsigned int nbr_invalid_tx;
+  unsigned int nbr_sent_tx;
   unsigned int random_transaction_requests;
   int flagged;
 } neighbor_t;

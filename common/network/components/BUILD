@@ -34,6 +34,7 @@ cc_library(
     srcs = ["processor.c"],
     deps = [
         ":processor_shared",
+        "//ciri:core_shared",
         "//ciri:node_shared",
         "//common/model:transaction",
     ],

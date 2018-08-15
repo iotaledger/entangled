@@ -55,7 +55,7 @@ bool neighbor_send(neighbor_t *const neighbor, trit_array_p const hash) {
        tcp_send(&neighbor->endpoint, hash)) ||
       (neighbor->endpoint.protocol == PROTOCOL_UDP &&
        udp_send(&neighbor->endpoint, hash))) {
-    neighbor->nbr_sent_packets++;
+    neighbor->nbr_sent_tx++;
     return true;
   }
   return false;

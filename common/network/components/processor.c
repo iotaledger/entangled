@@ -7,17 +7,55 @@
 
 #include <string.h>
 
+#include "ciri/core.h"
 #include "ciri/node.h"
 #include "common/model/transaction.h"
 #include "common/network/components/processor.h"
 #include "common/network/neighbor.h"
+#include "common/storage/storage.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_COMPONENT_LOGGER_ID "processor_component"
 
-static bool pre_processor(processor_state_t *const state,
-                          iota_packet_t *const packet) {
+static bool process(processor_state_t *const state, iota_transaction_t const tx,
+                    neighbor_t *const neighbor) {
+  bool exists = false;
+
+  if (state == NULL) {
+    return false;
+  }
+  if (tx == NULL) {
+    return false;
+  }
+  if (neighbor == NULL) {
+    return false;
+  }
+
+  // if (iota_stor_exist(&state->node->core->db_conn, COL_HASH, hash, &exists))
+  // {
+  //   return false;
+  // }
+  if (exists == false) {
+    // Store new transaction
+    if (iota_stor_store(&state->node->core->db_conn, tx)) {
+      neighbor->nbr_invalid_tx++;
+      return false;
+    }
+    neighbor->nbr_new_tx++;
+    // receivedTransactionViewModel.setArrivalTime(System.currentTimeMillis());
+    // transactionValidator.updateStatus(receivedTransactionViewModel);
+    // receivedTransactionViewModel.update(tangle, "arrivalTime|sender");
+  }
+
+  // // if new, then broadcast to all neighbors
+  // neighbor.incNewTransactions();
+  // broadcast(receivedTransactionViewModel);
+  return true;
+}
+
+static bool pre_process(processor_state_t *const state,
+                        iota_packet_t *const packet) {
   neighbor_t *neighbor = NULL;
   iota_transaction_t tx = NULL;
   trit_array_p request_hash = NULL;
@@ -33,12 +71,10 @@ static bool pre_processor(processor_state_t *const state,
   neighbor = neighbor_find_by_endpoint(state->node->neighbors, &packet->source);
 
   if (neighbor) {
-    neighbor->nbr_all_packets++;
+    neighbor->nbr_all_tx++;
     // Transaction bytes
-    // TODO(thibault): Randomly dropping transaction.
-    // TODO(thibault): Compute cache-specific hash (faster)?
-    // TODO(thibault): get from cache
-    // if !cached
+    // TODO(thibault): Random drop transaction
+    // TODO(thibault): If !cached
     if (true) {
       trit_t tx_trits[TX_TRITS_SIZE];
       flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
@@ -49,13 +85,10 @@ static bool pre_processor(processor_state_t *const state,
       if ((tx = transaction_deserialize(tx_flex_trits)) == NULL) {
         return false;
       }
-      // TODO(thibault): transaction validation
-      // TODO(thibault): put to cache ? Why here ?
-      //           synchronized(recentSeenBytes) {
-      //             recentSeenBytes.put(byteHash, receivedTransactionHash);
-      // TODO(thibault): if valid - add to receive queue
-      //           addReceivedDataToReceiveQueue(receivedTransactionViewModel,
-      //           neighbor);
+      // TODO(thibault): Transaction validation
+      // TODO(thibault): Add to cache
+      // TODO(thibault): Add to receive queue
+      process(state, tx, neighbor);
     }
 
     // Request bytes
@@ -76,8 +109,7 @@ static bool pre_processor(processor_state_t *const state,
     }
     responder_on_next(&state->node->responder, request_hash, neighbor);
 
-    // TODO(thibault): debug: recent seen bytes statistics
-
+    // TODO(thibault): Recent seen bytes statistics
   } else {
     // TODO(thibault): Testnet add non-tethered neighbor
   }
@@ -94,7 +126,7 @@ static void *processor_routine(processor_state_t *const state) {
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &packet) ==
         CONCURRENT_QUEUE_SUCCESS) {
-      pre_processor(state, &packet);
+      pre_process(state, &packet);
     }
   }
   return NULL;
