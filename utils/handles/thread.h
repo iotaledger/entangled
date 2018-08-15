@@ -51,8 +51,8 @@ static inline int thread_handle_join(thread_handle_t thread, void **status) {
   WaitForSingleObject(thread, INFINITE);
 
   if (status) {
-	  return GetExitCodeThread(thread, status);
-  } 
+    return !GetExitCodeThread(thread, status);
+  }
   return 0;
 }
 
