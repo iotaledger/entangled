@@ -109,10 +109,7 @@ cc_library(
     srcs = ["trit_array.c"],
     hdrs = ["trit_array.h"],
     deps = [
-        ":trit_byte",
-        ":trit_tryte",
-        ":trits",
-        "//common:stdint",
+        ":trit_array_3",
     ],
 )
 
