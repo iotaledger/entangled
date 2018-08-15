@@ -12,6 +12,8 @@
 
 #include "common/network/iota_packet.h"
 
+typedef struct node_s node_t;
+
 typedef struct {
   endpoint_t endpoint;
   unsigned int nbr_all_tx;
@@ -30,7 +32,8 @@ bool neighbor_init_with_uri(neighbor_t *const neighbor, char const *const uri);
 bool neighbor_init_with_values(neighbor_t *const neighbor,
                                protocol_type_t const protocol,
                                char const *const host, uint16_t const port);
-bool neighbor_send(neighbor_t *const neighbor, iota_packet_t *const packet);
+bool neighbor_send(node_t *const node, neighbor_t *const neighbor,
+                   iota_packet_t *const packet);
 
 #ifdef __cplusplus
 }

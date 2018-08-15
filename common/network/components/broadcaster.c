@@ -23,7 +23,7 @@ static void *broadcaster_routine(broadcaster_state_t *const state) {
         CONCURRENT_QUEUE_SUCCESS) {
       iter = state->node->neighbors->front;
       while (iter) {
-        neighbor_send(&iter->data, &packet);
+        neighbor_send(state->node, &iter->data, &packet);
         iter = iter->next;
       }
     }

@@ -7,6 +7,7 @@
 
 #include <string.h>
 
+#include "ciri/node.h"
 #include "common/model/transaction.h"
 #include "common/network/components/requester.h"
 #include "common/network/neighbor.h"
@@ -52,7 +53,8 @@ bool neighbor_init_with_values(neighbor_t *const neighbor,
   return true;
 }
 
-bool neighbor_send(neighbor_t *const neighbor, iota_packet_t *const packet) {
+bool neighbor_send(node_t *const node, neighbor_t *const neighbor,
+                   iota_packet_t *const packet) {
   trit_t hash_trits[NUM_TRITS_HASH];
   trit_array_p hash = NULL;
 
@@ -62,15 +64,14 @@ bool neighbor_send(neighbor_t *const neighbor, iota_packet_t *const packet) {
   if (packet == NULL) {
     return false;
   }
-  if (get_transaction_to_request(NULL, &hash) == false) {
+  if (get_transaction_to_request(&node->requester, &hash) == false) {
     return false;
   }
-  if (hash == NULL) {
-    return false;
+  if (hash != NULL) {
+    flex_trit_array_to_int8(hash_trits, NUM_TRITS_HASH, hash->trits,
+                            hash->num_trits, hash->num_trits);
+    trits_to_bytes(hash_trits, packet->content + PACKET_SIZE, NUM_TRITS_HASH);
   }
-  flex_trit_array_to_int8(hash_trits, NUM_TRITS_HASH, hash->trits,
-                          hash->num_trits, hash->num_trits);
-  trits_to_bytes(hash_trits, packet->content + PACKET_SIZE, NUM_TRITS_HASH);
   if ((neighbor->endpoint.protocol == PROTOCOL_TCP &&
        tcp_send(&neighbor->endpoint, packet)) ||
       (neighbor->endpoint.protocol == PROTOCOL_UDP &&

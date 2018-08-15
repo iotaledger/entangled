@@ -23,12 +23,20 @@ cc_library(
 )
 
 cc_library(
-    name = "neighbor",
-    srcs = ["neighbor.c"],
+    name = "neighbor_shared",
     hdrs = ["neighbor.h"],
     deps = [
         ":iota_packet",
+    ],
+)
+
+cc_library(
+    name = "neighbor",
+    srcs = ["neighbor.c"],
+    deps = [
+        ":neighbor_shared",
         ":uri_parser",
+        "//ciri:node_shared",
         "//common/model:transaction",
         "//common/network/components:requester_shared",
         "//common/network/services:tcp_sender",
