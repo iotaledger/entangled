@@ -106,8 +106,6 @@ cc_library(
 
 cc_library(
     name = "trit_array",
-    srcs = ["trit_array.c"],
-    hdrs = ["trit_array.h"],
     deps = [
         ":trit_array_3",
     ],
