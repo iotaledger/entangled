@@ -55,6 +55,10 @@ extern retcode_t iota_stor_load_hashes(const connection_t* const conn,
                                        const trit_array_p key,
                                        iota_hashes_pack* pack);
 
+extern retcode_t iota_stor_load_hashes_approvers(
+    const connection_t* const conn, const trit_array_p approvee_hash,
+    iota_hashes_pack* pack);
+
 #ifdef __cplusplus
 }
 #endif

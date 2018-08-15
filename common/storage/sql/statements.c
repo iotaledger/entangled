@@ -112,3 +112,23 @@ retcode_t iota_transactions_select_hashes_statement(const char *index_col,
 
   return RC_OK;
 }
+
+retcode_t iota_transactions_select_hashes_approvers_statement(
+    const trit_array_p approvee_hash, char statement[], size_t statement_cap) {
+  int res;
+
+  char key_str[approvee_hash->num_bytes + 1];
+  memcpy(key_str, approvee_hash->trits, approvee_hash->num_bytes);
+  key_str[approvee_hash->num_bytes] = 0;
+  res =
+      snprintf(statement, statement_cap, "SELECT %s FROM %s WHERE %s=? OR %s=?",
+               COL_HASH, TRANSACTION_TABLE_NAME, COL_BRANCH, COL_TRUNK);
+
+  if (res < 0 || res == statement_cap) {
+    log_error(SQL_STATEMENTS_ID, "Failed in creating statement, statement: %s",
+              statement);
+    return RC_SQL_FAILED_WRITE_STATEMENT;
+  }
+
+  return RC_OK;
+}

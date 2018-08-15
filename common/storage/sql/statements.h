@@ -42,6 +42,9 @@ retcode_t iota_transactions_select_hashes_statement(const char* index_col,
                                                     char statement[],
                                                     size_t statement_cap);
 
+retcode_t iota_transactions_select_hashes_approvers_statement(
+    const trit_array_p approvee_hash, char statement[], size_t statement_cap);
+
 #ifdef __cplusplus
 }
 #endif

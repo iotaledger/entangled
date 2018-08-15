@@ -243,6 +243,54 @@ extern retcode_t iota_stor_load_hashes(const connection_t* const conn,
   return RC_OK;
 }
 
+retcode_t iota_stor_load_hashes_approvers(const connection_t* const conn,
+                                          const trit_array_p approvee_hash,
+                                          iota_hashes_pack* pack) {
+  char statement[MAX_SELECT_STATEMENT_SIZE];
+  iota_transactions_select_hashes_approvers_statement(
+      approvee_hash, statement, MAX_SELECT_STATEMENT_SIZE);
+
+  char* err_msg = 0;
+  sqlite3_stmt* sqlite_statement = 0;
+  char* buffer;
+
+  int rc = sqlite3_prepare_v2((sqlite3*)conn->db, statement, -1,
+                              &sqlite_statement, &err_msg);
+  if (rc != SQLITE_OK) {
+    return RC_SQLITE3_FAILED_PREPARED_STATEMENT;
+  }
+
+  rc = sqlite3_bind_blob(sqlite_statement, 1, (void*)approvee_hash->trits,
+                         approvee_hash->num_bytes, NULL);
+  if (rc != SQLITE_OK) {
+    return RC_SQLITE3_FAILED_BINDING;
+  }
+
+  rc = sqlite3_bind_blob(sqlite_statement, 2, (void*)approvee_hash->trits,
+                         approvee_hash->num_bytes, NULL);
+  if (rc != SQLITE_OK) {
+    return RC_SQLITE3_FAILED_BINDING;
+  }
+
+  pack->insufficient_capacity = false;
+  while (sqlite3_step(sqlite_statement) ==
+         SQLITE_ROW) {  // While query has result-rows.
+    if (pack->num_loaded == pack->hashes_capacity) {
+      pack->insufficient_capacity = true;
+      break;
+    }
+    buffer = sqlite3_column_blob(sqlite_statement, 0);
+    memcpy(pack->hashes[pack->num_loaded++]->trits, buffer, FLEX_TRIT_SIZE_243);
+  }
+
+  rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
+  if (rc != SQLITE_OK) {
+    return RC_SQLITE3_FAILED_FINALIZE;
+  }
+
+  return RC_OK;
+}
+
 retcode_t iota_stor_update(const connection_t* const conn,
                            const char* index_name, const trit_array_p key,
                            const iota_transaction_t data_in) {

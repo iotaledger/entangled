@@ -107,6 +107,27 @@ void test_stored_load_hashes_by_address(void) {
   }
 }
 
+void test_stored_load_hashes_of_approvers(void) {
+  trit_array_p hashes[5];
+  iota_hashes_pack pack;
+  pack.hashes = &hashes;
+  pack.num_loaded = 0;
+  pack.hashes_capacity = 5;
+  for (int i = 0; i < pack.hashes_capacity; ++i) {
+    pack.hashes[i] = trit_array_new(243);
+  }
+  pack.hashes_capacity = 5;
+  trit_array_p key = trit_array_new(81);
+  memcpy(key->trits, TEST_TRANSACTION.address, 81);
+  TEST_ASSERT(iota_stor_load_hashes_approvers(&conn, key, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(0, pack.num_loaded);
+
+  for (int i = 0; i < pack.hashes_capacity; ++i) {
+    trit_array_free(pack.hashes[i]);
+  }
+  //TODO - complete the test with 2 transaction's that one approves the other
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -117,6 +138,7 @@ int main(void) {
   RUN_TEST(test_initialized_db_empty);
   RUN_TEST(test_stored_transaction);
   RUN_TEST(test_stored_load_hashes_by_address);
+  RUN_TEST(test_stored_load_hashes_of_approvers);
 
   return UNITY_END();
 }
