@@ -26,9 +26,6 @@ void test_init_connection(void) {
   config.index_tag = true;
   config.index_hash = true;
   TEST_ASSERT(init_connection(&conn, &config) == RC_OK);
-  TEST_ASSERT(FLEX_TRIT_SIZE_243 == 81);
-  TEST_ASSERT(FLEX_TRIT_SIZE_6561 == 6561/3);
-  TEST_ASSERT(FLEX_TRIT_SIZE_81 == 27);
 }
 
 void test_initialized_db_empty(void) {
@@ -102,7 +99,7 @@ void test_stored_load_hashes_by_address(void) {
   }
   pack.hashes_capacity = 5;
   trit_array_p key = trit_array_new(NUM_TRITS_ADDRESS);
-  memcpy(key->trits, TEST_TRANSACTION.address, 81);
+  memcpy(key->trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
   TEST_ASSERT(iota_stor_load_hashes(&conn, COL_ADDRESS, key, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_MEMORY(TEST_TRANSACTION.hash, pack.hashes[0]->trits, 81);
@@ -123,7 +120,7 @@ void test_stored_load_hashes_of_approvers(void) {
   }
   pack.hashes_capacity = 5;
   trit_array_p key = trit_array_new(NUM_TRITS_HASH);
-  memcpy(key->trits, TEST_TRANSACTION.address, 81);
+  memcpy(key->trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
   TEST_ASSERT(iota_stor_load_hashes_approvers(&conn, key, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(0, pack.num_loaded);
 
@@ -141,7 +138,6 @@ int main(void) {
 
   RUN_TEST(test_init_connection);
   RUN_TEST(test_initialized_db_empty);
-
   RUN_TEST(test_stored_transaction);
   RUN_TEST(test_stored_load_hashes_by_address);
   RUN_TEST(test_stored_load_hashes_of_approvers);
