@@ -31,7 +31,6 @@ cc_library(
         ":uri_parser",
         "//common/network/services:tcp_sender",
         "//common/network/services:udp_sender",
-        "//common/trinary:trit_array",
     ],
 )
 

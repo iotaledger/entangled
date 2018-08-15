@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <string.h>
+
 #include "common/network/neighbor.h"
 #include "common/network/services/tcp_sender.hpp"
 #include "common/network/services/udp_sender.hpp"
@@ -47,14 +49,18 @@ bool neighbor_init_with_values(neighbor_t *const neighbor,
   return true;
 }
 
-bool neighbor_send(neighbor_t *const neighbor, trit_array_p const hash) {
-  if (neighbor == NULL || hash == NULL) {
+bool neighbor_send(neighbor_t *const neighbor, iota_packet_t *const packet) {
+  if (neighbor == NULL) {
     return false;
   }
+  if (packet == NULL) {
+    return false;
+  }
+  // TODO(thibault): add hash request
   if ((neighbor->endpoint.protocol == PROTOCOL_TCP &&
-       tcp_send(&neighbor->endpoint, hash)) ||
+       tcp_send(&neighbor->endpoint, packet)) ||
       (neighbor->endpoint.protocol == PROTOCOL_UDP &&
-       udp_send(&neighbor->endpoint, hash))) {
+       udp_send(&neighbor->endpoint, packet))) {
     neighbor->nbr_sent_tx++;
     return true;
   }

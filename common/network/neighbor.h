@@ -11,7 +11,6 @@
 #include <stdbool.h>
 
 #include "common/network/iota_packet.h"
-#include "common/trinary/trit_array.h"
 
 typedef struct {
   endpoint_t endpoint;
@@ -31,7 +30,7 @@ bool neighbor_init_with_uri(neighbor_t *const neighbor, char const *const uri);
 bool neighbor_init_with_values(neighbor_t *const neighbor,
                                protocol_type_t const protocol,
                                char const *const host, uint16_t const port);
-bool neighbor_send(neighbor_t *const neighbor, trit_array_p const hash);
+bool neighbor_send(neighbor_t *const neighbor, iota_packet_t *const packet);
 
 #ifdef __cplusplus
 }
