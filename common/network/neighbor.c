@@ -51,10 +51,12 @@ bool neighbor_send(neighbor_t *const neighbor, trit_array_p const hash) {
   if (neighbor == NULL || hash == NULL) {
     return false;
   }
-  if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
-    return tcp_send(&neighbor->endpoint, hash);
-  } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
-    return udp_send(&neighbor->endpoint, hash);
+  if ((neighbor->endpoint.protocol == PROTOCOL_TCP &&
+       tcp_send(&neighbor->endpoint, hash)) ||
+      (neighbor->endpoint.protocol == PROTOCOL_UDP &&
+       udp_send(&neighbor->endpoint, hash))) {
+    neighbor->nbr_sent_packets++;
+    return true;
   }
   return false;
 }
