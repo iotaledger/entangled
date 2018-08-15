@@ -19,6 +19,7 @@ static void *responder_routine(responder_state_t *const state) {
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &request) ==
         CONCURRENT_QUEUE_SUCCESS) {
+      log_debug(RESPONDER_COMPONENT_LOGGER_ID, "Responding to request\n");
       // TODO(thibault) respond to request
     }
   }
