@@ -29,54 +29,54 @@ static bool pre_processor(processor_state_t *const state,
 
   log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Pre-processing packet\n");
   neighbor = neighbor_find_by_endpoint(state->node->neighbors, &packet->source);
-  if (neighbor == NULL) {
-    return false;
-  }
+  if (neighbor) {
+    // Transaction bytes
+    // TODO(thibault): neighbor.incAllTransactions();
+    // TODO(thibault): Randomly dropping transaction.
+    // TODO(thibault): Compute cache-specific hash (faster)?
+    // TODO(thibault): get from cache
+    // if !cached
+    if (true) {
+      trit_t tx_trits[TX_TRITS_SIZE];
+      flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
 
-  // Transaction bytes
-  // TODO(thibault): neighbor.incAllTransactions();
-  // TODO(thibault): Randomly dropping transaction.
-  // TODO(thibault): Compute cache-specific hash (faster)?
-  // TODO(thibault): get from cache
-  // if !cached
-  if (true) {
-    trit_t tx_trits[TX_TRITS_SIZE];
-    flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
-
-    bytes_to_trits(packet->content, TX_BYTES_SIZE, tx_trits, TX_TRITS_SIZE);
-    int8_to_flex_trit_array(tx_flex_trits, FLEX_TRIT_SIZE_8019, tx_trits,
-                            TX_TRITS_SIZE, TX_TRITS_SIZE);
-    if ((tx = transaction_deserialize(tx_flex_trits)) == NULL) {
-      return false;
+      bytes_to_trits(packet->content, TX_BYTES_SIZE, tx_trits, TX_TRITS_SIZE);
+      int8_to_flex_trit_array(tx_flex_trits, FLEX_TRIT_SIZE_8019, tx_trits,
+                              TX_TRITS_SIZE, TX_TRITS_SIZE);
+      if ((tx = transaction_deserialize(tx_flex_trits)) == NULL) {
+        return false;
+      }
+      // TODO(thibault): transaction validation
+      // TODO(thibault): put to cache ? Why here ?
+      //           synchronized(recentSeenBytes) {
+      //             recentSeenBytes.put(byteHash, receivedTransactionHash);
+      // TODO(thibault): if valid - add to receive queue
+      //           addReceivedDataToReceiveQueue(receivedTransactionViewModel,
+      //           neighbor);
     }
-    // TODO(thibault): transaction validation
-    // TODO(thibault): put to cache ? Why here ?
-    //           synchronized(recentSeenBytes) {
-    //             recentSeenBytes.put(byteHash, receivedTransactionHash);
-    // TODO(thibault): if valid - add to receive queue
-    //           addReceivedDataToReceiveQueue(receivedTransactionViewModel,
-    //           neighbor);
-  }
 
-  // Request bytes
-  {
-    trit_t request_hash_trits[NUM_TRITS_HASH] = {0};
-    bytes_to_trits(packet->content + TX_BYTES_SIZE, REQ_HASH_BYTES_SIZE,
-                   request_hash_trits, NUM_TRITS_HASH);
-    if ((request_hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
-      return false;
+    // Request bytes
+    {
+      trit_t request_hash_trits[NUM_TRITS_HASH] = {0};
+      bytes_to_trits(packet->content + TX_BYTES_SIZE, REQ_HASH_BYTES_SIZE,
+                     request_hash_trits, NUM_TRITS_HASH);
+      if ((request_hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
+        return false;
+      }
+      int8_to_flex_trit_array(request_hash->trits, request_hash->num_bytes,
+                              request_hash_trits, NUM_TRITS_HASH,
+                              NUM_TRITS_HASH);
     }
-    int8_to_flex_trit_array(request_hash->trits, request_hash->num_bytes,
-                            request_hash_trits, NUM_TRITS_HASH, NUM_TRITS_HASH);
-  }
-  //       if (requestedHash.equals(receivedTransactionHash)) {
-  //         // requesting a random tip
-  //         requestedHash = Hash.NULL_HASH;
-  //       }
-  responder_on_next(&state->node->responder, request_hash, neighbor);
+    //       if (requestedHash.equals(receivedTransactionHash)) {
+    //         // requesting a random tip
+    //         requestedHash = Hash.NULL_HASH;
+    //       }
+    responder_on_next(&state->node->responder, request_hash, neighbor);
 
-  // TODO(thibault): recentSeenBytes statistics
-  // TODO(thibault): Testnet add non-tethered neighbor
+    // TODO(thibault): recentSeenBytes statistics
+  } else {
+    // TODO(thibault): Testnet add non-tethered neighbor
+  }
 
   return true;
 }
