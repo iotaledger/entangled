@@ -64,13 +64,13 @@ void test_stored_transaction(void) {
   TEST_ASSERT(iota_stor_load(&conn, COL_HASH, col_value, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
 
-  TEST_ASSERT_EQUAL_STRING(txs[0]->nonce, TEST_TRANSACTION.nonce);
-  TEST_ASSERT_EQUAL_STRING(txs[0]->signature_or_message,
-                           TEST_TRANSACTION.signature_or_message);
-  TEST_ASSERT_EQUAL_STRING(txs[0]->address, TEST_TRANSACTION.address);
-  TEST_ASSERT_EQUAL_STRING(txs[0]->branch, TEST_TRANSACTION.branch);
-  TEST_ASSERT_EQUAL_STRING(txs[0]->trunk, TEST_TRANSACTION.trunk);
-  TEST_ASSERT_EQUAL_STRING(txs[0]->bundle, TEST_TRANSACTION.bundle);
+  TEST_ASSERT_EQUAL_MEMORY(txs[0]->nonce, TEST_TRANSACTION.nonce,FLEX_TRIT_SIZE_81);
+  TEST_ASSERT_EQUAL_MEMORY(txs[0]->signature_or_message,
+                           TEST_TRANSACTION.signature_or_message, FLEX_TRIT_SIZE_6561);
+  TEST_ASSERT_EQUAL_MEMORY(txs[0]->address, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(txs[0]->branch, TEST_TRANSACTION.branch, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(txs[0]->trunk, TEST_TRANSACTION.trunk,FLEX_TRIT_SIZE_243 );
+  TEST_ASSERT_EQUAL_MEMORY(txs[0]->bundle, TEST_TRANSACTION.bundle, FLEX_TRIT_SIZE_243);
   TEST_ASSERT_EQUAL_INT(txs[0]->value, TEST_TRANSACTION.value);
   TEST_ASSERT_EQUAL_INT(txs[0]->attachment_timestamp,
                         TEST_TRANSACTION.attachment_timestamp);
@@ -81,7 +81,7 @@ void test_stored_transaction(void) {
   TEST_ASSERT_EQUAL_INT(txs[0]->timestamp, TEST_TRANSACTION.timestamp);
   TEST_ASSERT_EQUAL_INT(txs[0]->current_index, TEST_TRANSACTION.current_index);
   TEST_ASSERT_EQUAL_INT(txs[0]->last_index, TEST_TRANSACTION.last_index);
-  TEST_ASSERT_EQUAL_STRING(txs[0]->hash, TEST_TRANSACTION.hash);
+  TEST_ASSERT_EQUAL_MEMORY(txs[0]->hash, TEST_TRANSACTION.hash, FLEX_TRIT_SIZE_243);
 
   for (int i = 0; i < 5; ++i) {
     transaction_free(pack.txs[i]);

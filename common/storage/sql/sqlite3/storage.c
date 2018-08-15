@@ -161,6 +161,8 @@ retcode_t iota_stor_load(const connection_t* const conn, const char* col_name,
 
   rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
   if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed in finalizing, sqlite3 code is: %\" PRIu64 \"", rc);
     return RC_SQLITE3_FAILED_FINALIZE;
   }
 
@@ -205,7 +207,6 @@ retcode_t iota_stor_exist(const connection_t* const conn,
 
   rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
   if (rc != SQLITE_OK) {
-    sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
     log_error(
         SQLITE3_LOGGER_ID,
         "Failed in finalizing the statement, sqlite3 code is: %\" PRIu64 \"",
@@ -263,6 +264,8 @@ extern retcode_t iota_stor_load_hashes(const connection_t* const conn,
 
   rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
   if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed in finalizing, sqlite3 code is: %\" PRIu64 \"", rc);
     return RC_SQLITE3_FAILED_FINALIZE;
   }
 
