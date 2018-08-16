@@ -14,9 +14,9 @@
 
 #define RESPONDER_COMPONENT_LOGGER_ID "responder_component"
 
-static bool get_transaction_to_reply(responder_state_t *const state,
-                                     transaction_request_t *const request,
-                                     iota_transaction_t *const tx) {
+static bool get_transaction_for_request(responder_state_t *const state,
+                                        transaction_request_t *const request,
+                                        iota_transaction_t *const tx) {
   if (state == NULL) {
     return false;
   }
@@ -98,7 +98,7 @@ static void *responder_routine(responder_state_t *const state) {
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &request) ==
         CONCURRENT_QUEUE_SUCCESS) {
-      if (get_transaction_to_reply(state, &request, &tx) == false) {
+      if (get_transaction_for_request(state, &request, &tx) == false) {
         continue;
       }
       if (reply_to_request(state, &request, tx) == false) {
