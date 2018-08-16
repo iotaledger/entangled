@@ -12,7 +12,7 @@
 #include "common/trinary/trit_array.h"
 
 typedef struct {
-  neighbor_t neighbor;
+  neighbor_t *neighbor;
   trit_array_p hash;
 } hash_request_t;
 
