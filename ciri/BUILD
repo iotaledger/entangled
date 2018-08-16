@@ -36,7 +36,7 @@ cc_library(
         "//common/network/components:processor_shared",
         "//common/network/components:receiver_shared",
         "//common/network/components:requester_shared",
-        "//common/network/components:responder",
+        "//common/network/components:responder_shared",
         "//utils/containers/lists:concurrent_list_neighbor",
     ],
 )
@@ -50,5 +50,6 @@ cc_library(
         "//common/network/components:processor",
         "//common/network/components:receiver",
         "//common/network/components:requester",
+        "//common/network/components:responder",
     ],
 )

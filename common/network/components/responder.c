@@ -6,12 +6,52 @@
  */
 
 #include "common/network/components/responder.h"
+#include "ciri/core.h"
+#include "ciri/node.h"
+#include "common/storage/sql/defs.h"
+#include "common/storage/storage.h"
 #include "utils/logger_helper.h"
 
 #define RESPONDER_COMPONENT_LOGGER_ID "responder_component"
 
+static bool get_transaction_to_reply(responder_state_t *const state,
+                                     hash_request_t *const request,
+                                     iota_transaction_t *const tx) {
+  if (state == NULL) {
+    return false;
+  }
+  if (request == NULL) {
+    return false;
+  }
+  if (request->neighbor == NULL) {
+    return false;
+  }
+  if (trit_array_is_null(request->hash)) {
+    // Random tip request
+    // TODO(thibault): get random tip
+    request->neighbor->random_tx_req++;
+  } else {
+    // Regular transaction request
+    iota_transactions_pack pack;
+    if ((*tx = transaction_new()) == NULL) {
+      return false;
+    }
+    pack.txs = tx;
+    pack.num_loaded = 0;
+    pack.txs_capacity = 1;
+    if (iota_stor_load(&state->node->core->db_conn, COL_HASH, request->hash,
+                       &pack)) {
+      return false;
+    }
+    if (pack.num_loaded == 0) {
+      return false;
+    }
+  }
+  return true;
+}
 static void *responder_routine(responder_state_t *const state) {
   hash_request_t request;
+  iota_transaction_t tx = NULL;
 
   if (state == NULL) {
     return NULL;
@@ -20,7 +60,10 @@ static void *responder_routine(responder_state_t *const state) {
     if (state->queue->vtable->pop(state->queue, &request) ==
         CONCURRENT_QUEUE_SUCCESS) {
       log_debug(RESPONDER_COMPONENT_LOGGER_ID, "Responding to request\n");
-      // TODO(thibault) respond to request
+
+      if (get_transaction_to_reply(state, &request, &tx) == false) {
+        continue;
+      }
     }
   }
   return NULL;

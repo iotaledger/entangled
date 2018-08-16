@@ -41,13 +41,24 @@ cc_library(
 )
 
 cc_library(
+    name = "responder_shared",
+    hdrs = ["responder.h"],
+    deps = [
+        "//utils/containers/queues:concurrent_queue_hash_request",
+        "//utils/handles:thread",
+    ],
+)
+
+cc_library(
     name = "responder",
     srcs = ["responder.c"],
     hdrs = ["responder.h"],
     deps = [
-        "//utils:logger_helper",
+        ":responder_shared",
+        "//ciri:core_shared",
+        "//ciri:node_shared",
+        "//common/storage",
         "//utils/containers/queues:concurrent_queue_hash_request",
-        "//utils/handles:thread",
     ],
 )
 
