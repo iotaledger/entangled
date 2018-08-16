@@ -128,7 +128,7 @@ size_t int8_to_flex_trit_array(flex_trit_t *const to_trit_array,
                                size_t const to_len, trit_t const *const trits,
                                size_t const len, size_t const num_trits) {
   // Bounds checking
-  if (num_trits > len || num_trits > to_len) {
+  if (num_trits > len) {
     return 0;
   }
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
