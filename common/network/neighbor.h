@@ -21,7 +21,7 @@ typedef struct {
   unsigned int nbr_new_tx;
   unsigned int nbr_invalid_tx;
   unsigned int nbr_sent_tx;
-  unsigned int random_tx_req;
+  unsigned int nbr_random_tx_req;
   bool flagged;
 } neighbor_t;
 

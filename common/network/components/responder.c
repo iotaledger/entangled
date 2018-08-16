@@ -33,7 +33,7 @@ static bool get_transaction_for_request(responder_state_t *const state,
     log_debug(RESPONDER_COMPONENT_LOGGER_ID,
               "Responding to random tip request\n");
     // TODO(thibault): Random tip request
-    request->neighbor->random_tx_req++;
+    request->neighbor->nbr_random_tx_req++;
   } else {
     log_debug(RESPONDER_COMPONENT_LOGGER_ID,
               "Responding to regular transaction request\n");
