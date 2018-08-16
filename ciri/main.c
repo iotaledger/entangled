@@ -45,7 +45,7 @@ int main() {
   neighbor_init_with_uri(&neighbor, "udp://127.0.0.1:14263");
   neighbor_add(core_g.node.neighbors, neighbor);
 
-  sleep(100);
+  sleep(1000);
 
   log_info(MAIN_LOGGER_ID, "Stopping cIRI core\n");
   if (core_stop(&core_g)) {
