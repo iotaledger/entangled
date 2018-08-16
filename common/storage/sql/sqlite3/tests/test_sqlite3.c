@@ -9,11 +9,11 @@
 #include <string.h>
 #include <unity/unity.h>
 
-#include "common/helpers/files.h"
 #include "common/storage/connection.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
+#include "utils/files.h"
 
 static connection_t conn;
 

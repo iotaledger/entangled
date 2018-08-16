@@ -1,6 +1,18 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "system",
+    srcs = ["system.c"],
+    hdrs = ["system.h"],
+)
+
+cc_library(
+    name = "files",
+    srcs = ["files.c"],
+    hdrs = ["files.h"],
+)
+
+cc_library(
     name = "logger_helper",
     srcs = ["logger_helper.c"],
     hdrs = ["logger_helper.h"],
@@ -9,4 +21,9 @@ cc_library(
         "//utils/handles:lock",
         "@com_github_embear_logger//:logger",
     ],
+)
+
+cc_library(
+    name = "export",
+    hdrs = ["export.h"],
 )
