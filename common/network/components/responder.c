@@ -15,7 +15,7 @@
 #define RESPONDER_COMPONENT_LOGGER_ID "responder_component"
 
 static bool get_transaction_to_reply(responder_state_t *const state,
-                                     hash_request_t *const request,
+                                     transaction_request_t *const request,
                                      iota_transaction_t *const tx) {
   if (state == NULL) {
     return false;
@@ -56,7 +56,7 @@ static bool get_transaction_to_reply(responder_state_t *const state,
 }
 
 static bool reply_to_request(responder_state_t *const state,
-                             hash_request_t *const request,
+                             transaction_request_t *const request,
                              iota_transaction_t const tx) {
   if (state == NULL) {
     return false;
@@ -89,7 +89,7 @@ static bool reply_to_request(responder_state_t *const state,
 }
 
 static void *responder_routine(responder_state_t *const state) {
-  hash_request_t request;
+  transaction_request_t request;
   iota_transaction_t tx = NULL;
 
   if (state == NULL) {
@@ -115,7 +115,7 @@ bool responder_init(responder_state_t *const state, node_t *const node) {
   }
   logger_helper_init(RESPONDER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
   state->running = false;
-  if (INIT_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) !=
+  if (INIT_CONCURRENT_QUEUE_OF(transaction_request_t, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
     log_critical(RESPONDER_COMPONENT_LOGGER_ID,
                  "Initializing responder queue failed\n");
@@ -146,7 +146,7 @@ bool responder_on_next(responder_state_t *const state,
     return false;
   }
   if (state->queue->vtable->push(state->queue,
-                                 (hash_request_t){neighbor, hash}) !=
+                                 (transaction_request_t){neighbor, hash}) !=
       CONCURRENT_QUEUE_SUCCESS) {
     log_warning(RESPONDER_COMPONENT_LOGGER_ID,
                 "Pushing to responder queue failed\n");
@@ -180,7 +180,7 @@ bool responder_destroy(responder_state_t *const state) {
   if (state->running) {
     return false;
   }
-  if (DESTROY_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) !=
+  if (DESTROY_CONCURRENT_QUEUE_OF(transaction_request_t, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
     log_error(RESPONDER_COMPONENT_LOGGER_ID,
               "Destroying responder queue failed\n");

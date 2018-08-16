@@ -6,8 +6,8 @@ cc_library(
 )
 
 cc_library(
-    name = "hash_request",
-    hdrs = ["hash_request.h"],
+    name = "transaction_request",
+    hdrs = ["transaction_request.h"],
     deps = [
         ":neighbor_shared",
         "//common/trinary:trit_array",

@@ -11,12 +11,12 @@ cc_library(
 )
 
 cc_library(
-    name = "concurrent_queue_hash_request",
-    srcs = ["concurrent_queue_hash_request.c"],
-    hdrs = ["concurrent_queue_hash_request.h"],
+    name = "concurrent_queue_transaction_request",
+    srcs = ["concurrent_queue_transaction_request.c"],
+    hdrs = ["concurrent_queue_transaction_request.h"],
     deps = [
         ":concurrent_queue",
-        "//common/network:hash_request",
+        "//common/network:transaction_request",
     ],
 )
 

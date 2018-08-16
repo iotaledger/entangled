@@ -8,14 +8,14 @@
 #ifndef __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_HASH_REQUEST_H__
 #define __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_HASH_REQUEST_H__
 
-#include "common/network/hash_request.h"
+#include "common/network/transaction_request.h"
 #include "utils/containers//queues/concurrent_queue.h.inc"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-DECLARE_CONCURRENT_QUEUE_OF(hash_request_t);
+DECLARE_CONCURRENT_QUEUE_OF(transaction_request_t);
 
 #ifdef __cplusplus
 }
