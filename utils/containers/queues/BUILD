@@ -16,8 +16,7 @@ cc_library(
     hdrs = ["concurrent_queue_hash_request.h"],
     deps = [
         ":concurrent_queue",
-        "//common/network:neighbor_shared",
-        "//common/trinary:trit_array",
+        "//common/network:hash_request",
     ],
 )
 

@@ -63,7 +63,7 @@ bool responder_on_next(responder_state_t *const state, trit_array_p const hash,
     return false;
   }
   if (state->queue->vtable->push(state->queue,
-                                 (hash_request_t){hash, *neighbor}) !=
+                                 (hash_request_t){*neighbor, hash}) !=
       CONCURRENT_QUEUE_SUCCESS) {
     log_warning(RESPONDER_COMPONENT_LOGGER_ID,
                 "Pushing to responder queue failed\n");
