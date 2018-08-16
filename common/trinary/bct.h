@@ -2,7 +2,6 @@
 #define __COMMON_TRINARY_BCT_H__
 
 #include <stdint.h>
-#include <unistd.h>
 
 #include "common/trinary/trits.h"
 

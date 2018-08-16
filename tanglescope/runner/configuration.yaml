@@ -111,9 +111,9 @@ confirmationratecollector:
   broadcast_interval: 3
 
   #Time after which we should expect transaction to be approved
-  measurement_upper_bound: 60
+  measurement_upper_bound: 240
   #Time after which if a transaction hasn't been approved, we give up
-  measurement_lower_bound: 360
+  measurement_lower_bound: 480
   #should calculate confirmation rate using API calls
   enable_cr_from_api: true
   #For checking the CR for various Latencies, define the latency in seconds,

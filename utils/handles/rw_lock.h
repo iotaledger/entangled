@@ -13,8 +13,12 @@
  * lock primitive and its associated functions, some of them might have no
  * effect if not needed by the underlying API
  */
-
+#if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
+    (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>
+#elif defined(_WIN32)
+#include <Windows.h>
+#endif
 
 #ifdef _POSIX_THREADS
 
@@ -40,6 +44,40 @@ static inline int rw_lock_handle_unlock(rw_lock_handle_t* const lock) {
 
 static inline int rw_lock_handle_destroy(rw_lock_handle_t* const lock) {
   return pthread_rwlock_destroy(lock);
+}
+
+#elif defined(_WIN32)
+
+typedef SRWLOCK rw_lock_handle_t;
+
+static inline int rw_lock_handle_init(rw_lock_handle_t* const lock) {
+  InitializeSRWLock(lock);
+  return 0;
+}
+
+static inline int rw_lock_handle_rdlock(rw_lock_handle_t* const lock) {
+  AcquireSRWLockShared(lock);
+  return 0;
+}
+
+static inline int rw_lock_handle_wrlock(rw_lock_handle_t* const lock) {
+  AcquireSRWLockExclusive(lock);
+  return 0;
+}
+
+static inline int rw_lock_handle_unlock(rw_lock_handle_t* const lock) {
+  void* state = *(void**)lock;
+
+  if (state == (void*)1) {
+    ReleaseSRWLockExclusive(lock);
+  } else {
+    ReleaseSRWLockShared(lock);
+  }
+  return 0;
+}
+
+static inline int rw_lock_handle_destroy(rw_lock_handle_t* const lock) {
+  return 0;
 }
 
 #else

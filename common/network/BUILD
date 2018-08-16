@@ -27,6 +27,7 @@ cc_library(
     hdrs = ["neighbor.h"],
     deps = [
         ":iota_packet",
+        "//common:errors",
     ],
 )
 

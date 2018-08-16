@@ -66,7 +66,7 @@ neighbor_t *neighbor_find_by_endpoint_values(neighbors_list_t *const neighbors,
   if (neighbors == NULL) {
     return NULL;
   }
-  if (neighbor_init_with_values(&cmp, protocol, host, port) == false) {
+  if (neighbor_init_with_values(&cmp, protocol, host, port)) {
     return NULL;
   }
   return neighbors->vtable->find(neighbors, cmp);

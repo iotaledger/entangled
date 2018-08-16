@@ -14,7 +14,12 @@
  * effect if not needed by the underlying API
  */
 
+#if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
+    (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>
+#elif defined(_WIN32)
+#include <Windows.h>
+#endif
 
 #include "utils/handles/lock.h"
 
@@ -51,6 +56,34 @@ static inline int cond_handle_timedwait(cond_handle_t* const cond,
 static inline int cond_handle_destroy(cond_handle_t* const cond) {
   return pthread_cond_destroy(cond);
 }
+#elif defined(_WIN32)
+typedef CONDITION_VARIABLE cond_handle_t;
+static inline int cond_handle_init(cond_handle_t* const cond) {
+  InitializeConditionVariable(cond);
+  return 0;
+}
+static inline int cond_handle_signal(cond_handle_t* const cond) {
+  WakeConditionVariable(cond);
+  return 0;
+}
+static inline int cond_handle_broadcast(cond_handle_t* const cond) {
+  WakeAllConditionVariable(cond);
+  return 0;
+}
+static inline int cond_handle_wait(cond_handle_t* const cond,
+                                   lock_handle_t* const lock) {
+  SleepConditionVariableCS(cond, lock, INFINITE);
+  return 0;
+}
+
+static inline int cond_handle_timedwait(cond_handle_t* const cond,
+                                        lock_handle_t* const lock,
+                                        unsigned int timeout) {
+  if (!SleepConditionVariableCS(cond, lock, timeout * 1000)) return ETIMEDOUT;
+  return 0;
+}
+
+static inline int cond_handle_destroy(cond_handle_t* const cond) { return 0; }
 
 #else
 
