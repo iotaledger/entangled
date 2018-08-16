@@ -83,6 +83,9 @@ cc_library(
         "//common/trinary:ptrits",
         "//common/trinary:trit_ptrit",
         "//common/trinary:trits",
+        "//utils:system",
+        "//utils/handles:rw_lock",
+        "//utils/handles:thread",
     ],
 )
 

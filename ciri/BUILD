@@ -33,7 +33,7 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/network/components:broadcaster_shared",
-        "//common/network/components:processor",
+        "//common/network/components:processor_shared",
         "//common/network/components:receiver_shared",
         "//common/network/components:requester_shared",
         "//common/network/components:responder",
@@ -47,6 +47,7 @@ cc_library(
     deps = [
         ":node_shared",
         "//common/network/components:broadcaster",
+        "//common/network/components:processor",
         "//common/network/components:receiver",
         "//common/network/components:requester",
     ],

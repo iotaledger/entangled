@@ -14,7 +14,12 @@
  * by the underlying API
  */
 
+#if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
+    (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>
+#elif defined(_WIN32)
+#include <Windows.h>
+#endif
 
 #ifdef _POSIX_THREADS
 
@@ -36,6 +41,27 @@ static inline int lock_handle_unlock(lock_handle_t* const lock) {
 
 static inline int lock_handle_destroy(lock_handle_t* const lock) {
   return pthread_mutex_destroy(lock);
+}
+
+#elif defined(_WIN32)
+
+typedef CRITICAL_SECTION lock_handle_t;
+
+static inline int lock_handle_init(lock_handle_t* const lock) {
+  InitializeCriticalSection(lock);
+  return 0;
+}
+static inline int lock_handle_lock(lock_handle_t* const lock) {
+  EnterCriticalSection(lock);
+  return 0;
+}
+static inline int lock_handle_unlock(lock_handle_t* const lock) {
+  LeaveCriticalSection(lock);
+  return 0;
+}
+static inline int lock_handle_destroy(lock_handle_t* const lock) {
+  DeleteCriticalSection(lock);
+  return 0;
 }
 
 #else

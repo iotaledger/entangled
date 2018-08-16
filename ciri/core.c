@@ -29,6 +29,7 @@ retcode_t core_init(core_t* const core) {
   core->db_conf.index_approvee = true;
   core->db_conf.index_bundle = true;
   core->db_conf.index_tag = true;
+  core->db_conf.index_hash = true;
   if (init_connection(&core->db_conn, &core->db_conf)) {
     log_critical(CORE_LOGGER_ID, "Initializing database connection failed\n");
     return RC_CORE_FAILED_DATABASE_INIT;

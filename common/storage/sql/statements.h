@@ -25,12 +25,10 @@ retcode_t iota_transactions_insert_statement(const iota_transaction_t tx,
                                              size_t statement_cap);
 
 retcode_t iota_transactions_select_statement(const char* index_col,
-                                             const trit_array_p key,
                                              char statement[],
                                              size_t statement_cap);
 
 retcode_t iota_transactions_exist_statement(const char* index_col,
-                                            const trit_array_p key,
                                             char statement[],
                                             size_t statement_cap);
 
@@ -41,9 +39,11 @@ retcode_t iota_transactions_update_statement(const char* index_col,
                                              size_t statement_cap);
 
 retcode_t iota_transactions_select_hashes_statement(const char* index_col,
-                                                    const trit_array_p key,
                                                     char statement[],
                                                     size_t statement_cap);
+
+retcode_t iota_transactions_select_hashes_approvers_statement(
+    const trit_array_p approvee_hash, char statement[], size_t statement_cap);
 
 #ifdef __cplusplus
 }

@@ -9,16 +9,23 @@ cc_library(
     ],
 )
 
+cc_binary(
+    name = "helpers.dll",
+    linkshared = 1,
+    linkstatic = 1,
+    deps = [":helpers"],
+)
+
 cc_library(
     name = "sign",
     srcs = ["sign.c"],
     hdrs = ["sign.h"],
     visibility = ["//visibility:public"],
     deps = [
-        ":pow",
         "//common/kerl",
         "//common/sign/v1:iss_kerl",
         "//common/trinary:trit_tryte",
+        "//utils:export",
     ],
 )
 
@@ -27,7 +34,10 @@ cc_library(
     srcs = ["pow.c"],
     hdrs = ["pow.h"],
     visibility = ["//visibility:public"],
-    deps = ["//common/pow"],
+    deps = [
+        "//common/pow",
+        "//utils:export",
+    ],
 )
 
 cc_library(
@@ -35,7 +45,10 @@ cc_library(
     srcs = ["digest.c"],
     hdrs = ["digest.h"],
     visibility = ["//visibility:public"],
-    deps = ["//common/curl-p:digest"],
+    deps = [
+        "//common/curl-p:digest",
+        "//utils:export",
+    ],
 )
 
 cc_library(
@@ -48,14 +61,8 @@ cc_library(
         "//common/kerl:hash",
         "//common/sign/v1:iss_kerl",
         "//common/trinary:trit_tryte",
+        "//utils:export",
     ],
-)
-
-cc_library(
-    name = "files",
-    srcs = ["files.c"],
-    hdrs = ["files.h"],
-    visibility = ["//visibility:public"],
 )
 
 cc_test(

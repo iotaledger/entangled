@@ -1,11 +1,17 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://gitlab.com/iota-foundation/software/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
-#include "common/helpers/files.h"
+#include "utils/files.h"
 
 int copy_file(const char *to, const char *from) {
   int fd_to, fd_from;

@@ -11,18 +11,6 @@
 
 #define RECEIVER_SERVICE_LOGGER_ID "receiver_service"
 
-void receiver_service_prepare_packet(iota_packet_t* const packet,
-                                     size_t const length,
-                                     char const* const host,
-                                     uint16_t const port,
-                                     protocol_type_t const protocol) {
-  packet->length = length;
-  strcpy(packet->source.host, host);
-  packet->source.port = port;
-  packet->source.protocol = protocol;
-  packet->content[length] = '\0';
-}
-
 bool receiver_service_start(receiver_service_t* const service) {
   if (service == NULL) {
     return false;

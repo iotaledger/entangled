@@ -28,13 +28,12 @@ UdpReceiverService::~UdpReceiverService() {
 
 void UdpReceiverService::receive() {
   socket_.async_receive_from(
-      boost::asio::buffer(packet_.content, TRANSACTION_PACKET_SIZE),
-      senderEndpoint_,
+      boost::asio::buffer(packet_.content, PACKET_SIZE), senderEndpoint_,
       [this](boost::system::error_code ec, std::size_t length) {
         if (!ec && length > 0) {
           auto host = senderEndpoint_.address().to_string().c_str();
           auto port = senderEndpoint_.port();
-          neighbor_t* neighbor = neighbor_find_by_values(
+          neighbor_t* neighbor = neighbor_find_by_endpoint_values(
               service_->state->node->neighbors, PROTOCOL_UDP, host, port);
           if (neighbor == NULL) {
             log_debug(UDP_RECEIVER_SERVICE_LOGGER_ID,
@@ -50,12 +49,12 @@ void UdpReceiverService::receive() {
 }
 
 bool UdpReceiverService::handlePacket(std::size_t const length) {
-  if (length != TRANSACTION_PACKET_SIZE) {
+  if (length != PACKET_SIZE) {
     return false;
   }
-  receiver_service_prepare_packet(&packet_, length,
-                                  senderEndpoint_.address().to_string().c_str(),
-                                  senderEndpoint_.port(), PROTOCOL_UDP);
+  iota_packet_build(&packet_, length,
+                    senderEndpoint_.address().to_string().c_str(),
+                    senderEndpoint_.port(), PROTOCOL_UDP);
   log_debug(UDP_RECEIVER_SERVICE_LOGGER_ID,
             "Packet received from tethered neighbor udp://%s:%d\n",
             &packet_.source.host, packet_.source.port);

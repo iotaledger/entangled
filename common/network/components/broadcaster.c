@@ -12,23 +12,20 @@
 #define BROADCASTER_COMPONENT_LOGGER_ID "broadcaster_component"
 
 static void *broadcaster_routine(broadcaster_state_t *const state) {
-  trit_array_p hash;
+  iota_packet_t packet;
   concurrent_list_node_of_neighbor_t *iter;
 
   if (state == NULL) {
     return NULL;
   }
   while (state->running) {
-    if (state->queue->vtable->pop(state->queue, &hash) ==
+    if (state->queue->vtable->pop(state->queue, &packet) ==
         CONCURRENT_QUEUE_SUCCESS) {
       iter = state->node->neighbors->front;
       while (iter) {
-        neighbor_send(&iter->data, hash);
+        neighbor_send(state->node, &iter->data, &packet);
         iter = iter->next;
       }
-#if !defined(NO_DYNAMIC_ALLOCATION)
-      trit_array_free(hash);
-#endif
     }
   }
   return NULL;
@@ -40,7 +37,7 @@ bool broadcaster_init(broadcaster_state_t *const state, node_t *const node) {
   }
   logger_helper_init(BROADCASTER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
   state->running = false;
-  if (INIT_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
+  if (INIT_CONCURRENT_QUEUE_OF(iota_packet_t, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
     log_critical(BROADCASTER_COMPONENT_LOGGER_ID,
                  "Initializing broadcaster queue failed\n");
@@ -66,11 +63,11 @@ bool broadcaster_start(broadcaster_state_t *const state) {
 }
 
 bool broadcaster_on_next(broadcaster_state_t *const state,
-                         trit_array_p const hash) {
+                         iota_packet_t const packet) {
   if (state == NULL) {
     return false;
   }
-  if (state->queue->vtable->push(state->queue, hash) !=
+  if (state->queue->vtable->push(state->queue, packet) !=
       CONCURRENT_QUEUE_SUCCESS) {
     log_warning(BROADCASTER_COMPONENT_LOGGER_ID,
                 "Pushing to broadcaster queue failed\n");
@@ -105,7 +102,7 @@ bool broadcaster_destroy(broadcaster_state_t *const state) {
   if (state->running) {
     return false;
   }
-  if (DESTROY_CONCURRENT_QUEUE_OF(trit_array_p, state->queue) !=
+  if (DESTROY_CONCURRENT_QUEUE_OF(iota_packet_t, state->queue) !=
       CONCURRENT_QUEUE_SUCCESS) {
     log_error(BROADCASTER_COMPONENT_LOGGER_ID,
               "Destroying broadcaster queue failed\n");

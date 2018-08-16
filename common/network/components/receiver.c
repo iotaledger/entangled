@@ -70,14 +70,14 @@ bool receiver_stop(receiver_state_t *const state) {
     return false;
   }
   state->running = false;
-  log_info(RECEIVER_COMPONENT_LOGGER_ID, "Shutting down TCP receiver thread");
+  log_info(RECEIVER_COMPONENT_LOGGER_ID, "Shutting down TCP receiver thread\n");
   if (receiver_service_stop(&state->tcp_service) == false ||
       thread_handle_join(state->tcp_service.thread, NULL) != 0) {
     log_error(RECEIVER_COMPONENT_LOGGER_ID,
               "Shutting down TCP receiver thread failed");
     ret = false;
   }
-  log_info(RECEIVER_COMPONENT_LOGGER_ID, "Shutting down UDP receiver thread");
+  log_info(RECEIVER_COMPONENT_LOGGER_ID, "Shutting down UDP receiver thread\n");
   if (receiver_service_stop(&state->udp_service) == false ||
       thread_handle_join(state->udp_service.thread, NULL) != 0) {
     log_error(RECEIVER_COMPONENT_LOGGER_ID,

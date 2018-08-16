@@ -44,6 +44,9 @@ hs_err_pid*
 /out/
 /lib/
 
+# Visual Studio
+.vs/
+
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 

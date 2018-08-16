@@ -7,14 +7,13 @@
 
 #pragma once
 
-#include "common/network/endpoint.h"
-#include "common/trinary/trit_array.h"
+#include "common/network/iota_packet.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-bool tcp_send(endpoint_t *const endpoint, trit_array_p const hash);
+bool tcp_send(endpoint_t *const endpoint, iota_packet_t *const packet);
 
 #ifdef __cplusplus
 }

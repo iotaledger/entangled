@@ -27,12 +27,6 @@ typedef struct receiver_service_s {
 extern "C" {
 #endif
 
-void receiver_service_prepare_packet(iota_packet_t* const packet,
-                                     size_t const length,
-                                     char const* const host,
-                                     uint16_t const port,
-                                     protocol_type_t const protocol);
-
 bool receiver_service_start(receiver_service_t* const service);
 bool receiver_service_stop(receiver_service_t* const service);
 
