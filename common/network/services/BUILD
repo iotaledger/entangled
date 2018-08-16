@@ -48,8 +48,7 @@ cc_library(
     srcs = ["tcp_sender.cc"],
     hdrs = ["tcp_sender.hpp"],
     deps = [
-        "//common/network:endpoint",
-        "//common/trinary:trit_array",
+        "//common/network:iota_packet",
         "//utils:logger_helper",
         "@boost//:asio",
     ],
@@ -60,8 +59,7 @@ cc_library(
     srcs = ["udp_sender.cc"],
     hdrs = ["udp_sender.hpp"],
     deps = [
-        "//common/network:endpoint",
-        "//common/trinary:trit_array",
+        "//common/network:iota_packet",
         "//utils:logger_helper",
         "@boost//:asio",
     ],

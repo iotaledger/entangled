@@ -31,16 +31,18 @@ void test_init_connection(void) {
 void test_initialized_db_empty(void) {
   bool exist = false;
 
-  trit_array_p  col_value = trit_array_new(FLEX_TRIT_SIZE_243);
-  col_value->trits = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-  TEST_ASSERT(iota_stor_exist(&conn, COL_HASH,col_value , &exist) == RC_OK);
+  trit_array_p col_value = trit_array_new(FLEX_TRIT_SIZE_243);
+  col_value->trits =
+      "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      "AAAAAAAAA";
+  TEST_ASSERT(iota_stor_exist(&conn, COL_HASH, col_value, &exist) == RC_OK);
   TEST_ASSERT(exist == false);
 }
 
 void test_stored_transaction(void) {
   TEST_ASSERT(iota_stor_store(&conn, &TEST_TRANSACTION) == RC_OK);
   bool exist = false;
-  trit_array_p  col_value = trit_array_new(NUM_TRITS_ADDRESS);
+  trit_array_p col_value = trit_array_new(NUM_TRITS_ADDRESS);
   col_value->trits = TEST_TRANSACTION.hash;
   TEST_ASSERT(iota_stor_exist(&conn, NULL, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
@@ -64,13 +66,19 @@ void test_stored_transaction(void) {
   TEST_ASSERT(iota_stor_load(&conn, COL_HASH, col_value, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
 
-  TEST_ASSERT_EQUAL_MEMORY(txs[0]->nonce, TEST_TRANSACTION.nonce,FLEX_TRIT_SIZE_81);
+  TEST_ASSERT_EQUAL_MEMORY(txs[0]->nonce, TEST_TRANSACTION.nonce,
+                           FLEX_TRIT_SIZE_81);
   TEST_ASSERT_EQUAL_MEMORY(txs[0]->signature_or_message,
-                           TEST_TRANSACTION.signature_or_message, FLEX_TRIT_SIZE_6561);
-  TEST_ASSERT_EQUAL_MEMORY(txs[0]->address, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT_EQUAL_MEMORY(txs[0]->branch, TEST_TRANSACTION.branch, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT_EQUAL_MEMORY(txs[0]->trunk, TEST_TRANSACTION.trunk,FLEX_TRIT_SIZE_243 );
-  TEST_ASSERT_EQUAL_MEMORY(txs[0]->bundle, TEST_TRANSACTION.bundle, FLEX_TRIT_SIZE_243);
+                           TEST_TRANSACTION.signature_or_message,
+                           FLEX_TRIT_SIZE_6561);
+  TEST_ASSERT_EQUAL_MEMORY(txs[0]->address, TEST_TRANSACTION.address,
+                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(txs[0]->branch, TEST_TRANSACTION.branch,
+                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(txs[0]->trunk, TEST_TRANSACTION.trunk,
+                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(txs[0]->bundle, TEST_TRANSACTION.bundle,
+                           FLEX_TRIT_SIZE_243);
   TEST_ASSERT_EQUAL_INT(txs[0]->value, TEST_TRANSACTION.value);
   TEST_ASSERT_EQUAL_INT(txs[0]->attachment_timestamp,
                         TEST_TRANSACTION.attachment_timestamp);
@@ -81,7 +89,8 @@ void test_stored_transaction(void) {
   TEST_ASSERT_EQUAL_INT(txs[0]->timestamp, TEST_TRANSACTION.timestamp);
   TEST_ASSERT_EQUAL_INT(txs[0]->current_index, TEST_TRANSACTION.current_index);
   TEST_ASSERT_EQUAL_INT(txs[0]->last_index, TEST_TRANSACTION.last_index);
-  TEST_ASSERT_EQUAL_MEMORY(txs[0]->hash, TEST_TRANSACTION.hash, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(txs[0]->hash, TEST_TRANSACTION.hash,
+                           FLEX_TRIT_SIZE_243);
 
   for (int i = 0; i < 5; ++i) {
     transaction_free(pack.txs[i]);
@@ -127,7 +136,7 @@ void test_stored_load_hashes_of_approvers(void) {
   for (int i = 0; i < pack.hashes_capacity; ++i) {
     trit_array_free(pack.hashes[i]);
   }
-  //TODO - complete the test with 2 transaction's that one approves the other
+  // TODO - complete the test with 2 transaction's that one approves the other
 }
 
 int main(void) {

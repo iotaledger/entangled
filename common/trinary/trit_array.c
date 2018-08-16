@@ -265,7 +265,7 @@ trit_array_p trit_array_new(size_t const num_trits) {
     // errno = IOTA_OUT_OF_MEMORY
     return NULL;
   }
-  memset(trit_array->trits, FLEX_TRIT_NULL_VALUE, trit_array->num_bytes);
+  trit_array_set_null(trit_array);
   trit_array->dynamic = 1;
   return trit_array;
 }

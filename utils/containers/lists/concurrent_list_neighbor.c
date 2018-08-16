@@ -48,16 +48,25 @@ bool neighbor_remove(neighbors_list_t *const neighbors,
   return true;
 }
 
-neighbor_t *neighbor_find_by_values(neighbors_list_t *const neighbors,
-                                    protocol_type_t const protocol,
-                                    char const *const host,
-                                    uint16_t const port) {
+neighbor_t *neighbor_find_by_endpoint(neighbors_list_t *const neighbors,
+                                      endpoint_t *endpoint) {
+  if (neighbors == NULL || endpoint == NULL) {
+    return NULL;
+  }
+  return neighbor_find_by_endpoint_values(neighbors, endpoint->protocol,
+                                          endpoint->host, endpoint->port);
+}
+
+neighbor_t *neighbor_find_by_endpoint_values(neighbors_list_t *const neighbors,
+                                             protocol_type_t const protocol,
+                                             char const *const host,
+                                             uint16_t const port) {
   neighbor_t cmp;
 
   if (neighbors == NULL) {
-    return false;
+    return NULL;
   }
-  if (neighbor_init_with_values(&cmp, protocol, host, port) == false) {
+  if (neighbor_init_with_values(&cmp, protocol, host, port)) {
     return NULL;
   }
   return neighbors->vtable->find(neighbors, cmp);

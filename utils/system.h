@@ -21,4 +21,4 @@ size_t system_cpu_available();
 }
 #endif
 
-#endif // __UTILS_SYSTEM_H 
+#endif  // __UTILS_SYSTEM_H
