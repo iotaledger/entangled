@@ -127,7 +127,6 @@ void test_iss() {
 
   test_key(subseed, key, key_length, &curl);
   test_sig(key, key_length, &curl);
-  // printf("%s\n", addy_trytes);
 }
 
 int main(void) {
