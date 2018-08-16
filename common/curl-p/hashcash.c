@@ -4,6 +4,12 @@
 #include "ptrit.h"
 #include "search.h"
 
+#ifdef _WIN32
+#define CTZLL(x) _tzcnt_u64(x)
+#else
+#define CTZLL(x) __builtin_ctzll(x)
+#endif
+
 short test(PCurl *const curl, unsigned short const mwm) {
   unsigned short i;
   ptrit_s probe = HIGH_BITS;
@@ -13,8 +19,10 @@ short test(PCurl *const curl, unsigned short const mwm) {
   if (probe == 0) {
     return -1;
   }
-  return __builtin_ctzll(probe);
+  return CTZLL(probe);
 }
+
+#undef CTZLL
 
 PearlDiverStatus hashcash(Curl *const ctx, SearchType const type,
                           unsigned short const offset, unsigned short const end,

@@ -3,20 +3,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "common/helpers/sign.h"
 #include "common/kerl/kerl.h"
 #include "common/sign/v1/iss_kerl.h"
 #include "common/trinary/trit_tryte.h"
-#include "sign.h"
+#include "utils/export.h"
 
-char* iota_sign_address_gen(char const* const seed, size_t const index,
-                            size_t const security) {
+IOTA_EXPORT char* iota_sign_address_gen(char const* const seed,
+                                        size_t const index,
+                                        size_t const security) {
   if (!(security > 0 && security <= 3)) return NULL;
   const size_t key_length = security * ISS_KEY_LENGTH;
 
   Kerl kerl;
 
   trit_t subseed[HASH_LENGTH];
-  trit_t key[key_length];
+  trit_t* key = calloc(key_length, sizeof(trit_t));
+
   char* address = calloc(1 + (HASH_LENGTH / RADIX), sizeof(tryte_t));
 
   init_kerl(&kerl);
@@ -35,6 +38,8 @@ char* iota_sign_address_gen(char const* const seed, size_t const index,
   trits_to_trytes(key, (tryte_t*)address, HASH_LENGTH);
   memset(key, 0, key_length * sizeof(trit_t));
 
+  free(key);
+
   return address;
 }
 
@@ -47,7 +52,7 @@ char* iota_sign_signature_gen(char const* const seed, size_t const index,
 
   trit_t hash[HASH_LENGTH];
   trit_t subseed[HASH_LENGTH];
-  trit_t key[key_length];
+  trit_t* key = calloc(key_length, sizeof(trit_t));
   tryte_t* signature = calloc(1 + key_length / RADIX, sizeof(tryte_t));
 
   init_kerl(&kerl);
@@ -61,6 +66,8 @@ char* iota_sign_signature_gen(char const* const seed, size_t const index,
   iss_kerl_signature(key, hash, key, key_length, &kerl);
   trits_to_trytes(key, (tryte_t*)signature, key_length);
   memset(key, 0, key_length * sizeof(trit_t));
+
+  free(key);
 
   return (char*)signature;
 }

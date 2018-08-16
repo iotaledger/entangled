@@ -16,7 +16,12 @@
 
 typedef void *(*thread_routine_t)(void *);
 
+#if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
+    (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>
+#elif defined(_WIN32)
+#include <Windows.h>
+#endif
 
 #ifdef _POSIX_THREADS
 
@@ -31,6 +36,24 @@ static inline int thread_handle_create(thread_handle_t *const thread,
 
 static inline int thread_handle_join(thread_handle_t thread, void **status) {
   return pthread_join(thread, status);
+}
+
+#elif defined(_WIN32)
+typedef HANDLE thread_handle_t;
+
+static inline int thread_handle_create(thread_handle_t *const thread,
+                                       thread_routine_t routine, void *arg) {
+  *thread =
+      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)routine, arg, 0, NULL);
+  return 0;
+}
+static inline int thread_handle_join(thread_handle_t thread, void **status) {
+  WaitForSingleObject(thread, INFINITE);
+
+  if (status) {
+    return !GetExitCodeThread(thread, status);
+  }
+  return 0;
 }
 
 #else

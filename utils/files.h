@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://gitlab.com/iota-foundation/software/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #ifndef ENTANGLED_COMMON_FILES_H
 #define ENTANGLED_COMMON_FILES_H
 
