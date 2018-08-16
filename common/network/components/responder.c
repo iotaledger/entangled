@@ -46,9 +46,9 @@ static bool get_transaction_to_reply(responder_state_t *const state,
                        &pack)) {
       return false;
     }
-    // if (pack.num_loaded == 0) {
-    //   return false;
-    // }
+    if (pack.num_loaded == 0) {
+      return false;
+    }
   }
   return true;
 }
