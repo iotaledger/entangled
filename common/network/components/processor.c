@@ -85,7 +85,7 @@ static bool process_request_bytes(processor_state_t *const state,
     // If requested hash is equal to transaction hash: request a random tip
     trit_array_set_null(request_hash);
   }
-  responder_on_next(&state->node->responder, request_hash, neighbor);
+  responder_on_next(&state->node->responder, neighbor, request_hash);
   return true;
 }
 

@@ -27,8 +27,8 @@ extern "C" {
 
 bool responder_init(responder_state_t *const state, node_t *const node);
 bool responder_start(responder_state_t *const state);
-bool responder_on_next(responder_state_t *const state, trit_array_p const hash,
-                       neighbor_t *const neighbor);
+bool responder_on_next(responder_state_t *const state,
+                       neighbor_t *const neighbor, trit_array_p const hash);
 bool responder_stop(responder_state_t *const state);
 bool responder_destroy(responder_state_t *const state);
 

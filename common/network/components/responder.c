@@ -57,8 +57,8 @@ bool responder_start(responder_state_t *const state) {
   return true;
 }
 
-bool responder_on_next(responder_state_t *const state, trit_array_p const hash,
-                       neighbor_t *const neighbor) {
+bool responder_on_next(responder_state_t *const state,
+                       neighbor_t *const neighbor, trit_array_p const hash) {
   if (state == NULL) {
     return false;
   }
