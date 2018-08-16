@@ -69,7 +69,8 @@ static bool reply_to_request(responder_state_t *const state,
   }
   if (tx != NULL) {
     // Send transaction back to neighbor
-    iota_packet_t packet;
+    iota_packet_t packet = {{0}};
+    iota_packet_set_transaction(&packet, tx);
     if (neighbor_send(state->node, request->neighbor, &packet)) {
       return false;
     }
