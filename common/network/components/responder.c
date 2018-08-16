@@ -26,9 +26,12 @@ static bool get_transaction_to_reply(responder_state_t *const state,
   if (request->neighbor == NULL) {
     return false;
   }
+  if (tx == NULL) {
+    return false;
+  }
   if (trit_array_is_null(request->hash)) {
     // Random tip request
-    // TODO(thibault): get random tip
+    // TODO(thibault): Random tip request
     request->neighbor->random_tx_req++;
   } else {
     // Regular transaction request
@@ -43,12 +46,46 @@ static bool get_transaction_to_reply(responder_state_t *const state,
                        &pack)) {
       return false;
     }
-    if (pack.num_loaded == 0) {
+    // if (pack.num_loaded == 0) {
+    //   return false;
+    // }
+  }
+  return true;
+}
+
+bool reply_to_request(responder_state_t *const state,
+                      hash_request_t *const request,
+                      iota_transaction_t const tx) {
+  if (state == NULL) {
+    return false;
+  }
+  if (request == NULL) {
+    return false;
+  }
+  if (request->neighbor == NULL) {
+    return false;
+  }
+  printf("Hello %p\n", tx);
+  if (tx != NULL) {
+    // Send transaction back to neighbor
+    iota_packet_t packet;
+    if (neighbor_send(state->node, request->neighbor, &packet)) {
       return false;
+    }
+  } else {
+    // Transaction not found
+    // TODO(thibault): Randomly doesn't propagate request
+    if (trit_array_is_null(request->hash) == false) {
+      // Request is an actual missing transaction
+      if (request_transaction(&state->node->requester, request->hash) ==
+          false) {
+        return false;
+      }
     }
   }
   return true;
 }
+
 static void *responder_routine(responder_state_t *const state) {
   hash_request_t request;
   iota_transaction_t tx = NULL;
@@ -62,6 +99,10 @@ static void *responder_routine(responder_state_t *const state) {
       log_debug(RESPONDER_COMPONENT_LOGGER_ID, "Responding to request\n");
 
       if (get_transaction_to_reply(state, &request, &tx) == false) {
+        continue;
+      }
+
+      if (reply_to_request(state, &request, tx) == false) {
         continue;
       }
     }
