@@ -8,6 +8,7 @@
 #ifndef __COMMON_NETWORK_IOTA_PACKET_H__
 #define __COMMON_NETWORK_IOTA_PACKET_H__
 
+#include "common/model/transaction.h"
 #include "common/network/endpoint.h"
 #include "common/trinary/bytes.h"
 
@@ -29,6 +30,8 @@ extern "C" {
 void iota_packet_build(iota_packet_t* const packet, size_t const length,
                        char const* const host, uint16_t const port,
                        protocol_type_t const protocol);
+void iota_packet_set_transaction(iota_packet_t* const packet,
+                                 iota_transaction_t const tx);
 
 #ifdef __cplusplus
 }

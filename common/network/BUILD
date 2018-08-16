@@ -20,6 +20,7 @@ cc_library(
     hdrs = ["iota_packet.h"],
     deps = [
         ":endpoint",
+        "//common/model:transaction",
         "//common/trinary:bytes",
     ],
 )
