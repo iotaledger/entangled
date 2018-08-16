@@ -215,7 +215,7 @@ size_t trit_array_bytes_for_trits(size_t const num_trits);
  * Accessors
  ***********************************************************************************************************/
 /// Returns the trit at a given index in an array of trits
-/// @param[in] trit_array - a pointer to a tri_array_t
+/// @param[in] trit_array - a pointer to a trit_array_t
 /// @param[in] index - the index of the trit to access
 /// @return trit_t - the trit at the given index
 static inline trit_t trit_array_at(trit_array_p const trit_array,
@@ -224,7 +224,7 @@ static inline trit_t trit_array_at(trit_array_p const trit_array,
 }
 
 /// Set the trit at a given index in an array of trits to the given value
-/// @param[in] trit_array - a pointer to a tri_array_t
+/// @param[in] trit_array - a pointer to a trit_array_t
 /// @param[in] index - the index of the trit to access
 /// @param[in] trit - the trit value to set
 static inline uint8_t trit_array_set_at(trit_array_p const trit_array,

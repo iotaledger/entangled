@@ -54,13 +54,13 @@ class FlexTritArray {
   /// @return FlexTritArray
   static FlexTritArray createFromTrytes(const std::vector<tryte_t> &trytes);
 
-  /// Constructor that rturns a new FlexTritArray capable of holding num_trits
+  /// Constructor that returns a new FlexTritArray capable of holding num_trits
   /// trits.
   /// @param[in] num_trits - the number of trits that can be stored
   /// @return FlexTritArray
   FlexTritArray(size_t num_trits);
 
-  /// Constructor that rturns a new FlexTritArray from a vector of flex_trites.
+  /// Constructor that returns a new FlexTritArray from a vector of flex_trits.
   /// @param[in] flex_trits - a vector of flex_trits
   /// @param[in] num_trits - the number of trits encoded in the vector of
   /// flex_trits
@@ -82,7 +82,7 @@ class FlexTritArray {
     return FlexTritArrayProxy(const_cast<FlexTritArray &>(*this), i);
   }
 
-  /// Returns the number of trits in the reciever
+  /// Returns the number of trits in the receiver
   /// @return size_t - the number of trits
   size_t size() { return num_trits_; }
 
