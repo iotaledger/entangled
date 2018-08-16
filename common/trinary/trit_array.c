@@ -216,6 +216,15 @@ void trit_array_set_trits(trit_array_p const trit_array,
   trit_array->num_bytes = trit_array_bytes_for_trits(num_trits);
 }
 
+bool trit_array_is_null(trit_array_p const trit_array) {
+  for (size_t i = 0; i < trit_array->num_bytes; i++) {
+    if (trit_array->trits[i] != FLEX_TRIT_NULL_VALUE) {
+      return false;
+    }
+  }
+  return true;
+}
+
 trit_array_p trit_array_slice(trit_array_p trit_array,
                               trit_array_p to_trit_array, size_t start,
                               size_t num_trits) {

@@ -19,6 +19,7 @@ extern "C" {
 #define TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE
 #endif
 
+#include <stdbool.h>
 #include <string.h>
 
 #include "common/trinary/trit_byte.h"
@@ -235,6 +236,8 @@ static inline uint8_t trit_array_set_at(trit_array_p const trit_array,
 
 void trit_array_set_trits(trit_array_p const trit_array,
                           flex_trit_t *const trits, size_t const num_trits);
+
+bool trit_array_is_null(trit_array_p const trit_array);
 
 static inline void trit_array_set_null(trit_array_p const trit_array) {
   memset(trit_array->trits, FLEX_TRIT_NULL_VALUE, trit_array->num_bytes);
