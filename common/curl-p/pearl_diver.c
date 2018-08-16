@@ -45,7 +45,6 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short const offset,
   rw_lock_handle_t statusLock;
 
   if (rw_lock_handle_init(&statusLock)) {
-    fprintf(stderr, "init\n");
     return PEARL_DIVER_ERROR;
   }
 
@@ -69,10 +68,7 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short const offset,
     if (found_index == -1) {
       thread_handle_join(tid[i], (void *)&found_index);
 
-      fprintf(stderr, "%d found: %d\n", i, found_index);
-
       if (found_index != -1) {
-        fprintf(stderr, "gotcha\n");
         found_thread = i;
       }
     } else {
@@ -84,7 +80,6 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short const offset,
     case -1:
       free(inst);
       free(tid);
-      fprintf(stderr, "fidx: %d\n", found_index);
 
       return PEARL_DIVER_ERROR;
   }
