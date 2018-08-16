@@ -30,11 +30,13 @@ static bool get_transaction_to_reply(responder_state_t *const state,
     return false;
   }
   if (trit_array_is_null(request->hash)) {
-    // Random tip request
+    log_debug(RESPONDER_COMPONENT_LOGGER_ID,
+              "Responding to random tip request\n");
     // TODO(thibault): Random tip request
     request->neighbor->random_tx_req++;
   } else {
-    // Regular transaction request
+    log_debug(RESPONDER_COMPONENT_LOGGER_ID,
+              "Responding to regular transaction request\n");
     iota_transactions_pack pack;
     if ((*tx = transaction_new()) == NULL) {
       return false;
@@ -53,9 +55,9 @@ static bool get_transaction_to_reply(responder_state_t *const state,
   return true;
 }
 
-bool reply_to_request(responder_state_t *const state,
-                      hash_request_t *const request,
-                      iota_transaction_t const tx) {
+static bool reply_to_request(responder_state_t *const state,
+                             hash_request_t *const request,
+                             iota_transaction_t const tx) {
   if (state == NULL) {
     return false;
   }
@@ -65,7 +67,6 @@ bool reply_to_request(responder_state_t *const state,
   if (request->neighbor == NULL) {
     return false;
   }
-  printf("Hello %p\n", tx);
   if (tx != NULL) {
     // Send transaction back to neighbor
     iota_packet_t packet;
@@ -96,12 +97,9 @@ static void *responder_routine(responder_state_t *const state) {
   while (state->running) {
     if (state->queue->vtable->pop(state->queue, &request) ==
         CONCURRENT_QUEUE_SUCCESS) {
-      log_debug(RESPONDER_COMPONENT_LOGGER_ID, "Responding to request\n");
-
       if (get_transaction_to_reply(state, &request, &tx) == false) {
         continue;
       }
-
       if (reply_to_request(state, &request, tx) == false) {
         continue;
       }
