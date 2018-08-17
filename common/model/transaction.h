@@ -178,19 +178,19 @@ flex_trit_t *transaction_tag(iota_transaction_t transaction);
 // Set the transaction tag (copy argument)
 void transaction_set_tag(iota_transaction_t transaction,
                          const flex_trit_t *tag);
-// Get the transaction attachement timestamp
+// Get the transaction attachment timestamp
 int64_t transaction_attachment_timestamp(iota_transaction_t transaction);
-// Set the transaction attachement timestamp
+// Set the transaction attachment timestamp
 void transaction_set_attachment_timestamp(iota_transaction_t transaction,
                                           int64_t timestamp);
-// Get the transaction attachement timestamp lower
+// Get the transaction attachment timestamp lower
 int64_t transaction_attachment_timestamp_lower(iota_transaction_t transaction);
-// Set the transaction attachement timestamp lower
+// Set the transaction attachment timestamp lower
 void transaction_set_attachment_timestamp_lower(iota_transaction_t transaction,
                                                 int64_t timestamp);
-// Get the transaction attachement timestamp upper
+// Get the transaction attachment timestamp upper
 int64_t transaction_attachment_timestamp_upper(iota_transaction_t transaction);
-// Set the transaction attachement timestamp upper
+// Set the transaction attachment timestamp upper
 void transaction_set_attachment_timestamp_upper(iota_transaction_t transaction,
                                                 int64_t timestamp);
 // Get the transaction nonce

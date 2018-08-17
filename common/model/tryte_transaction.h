@@ -72,17 +72,17 @@ class TryteTransaction {
   std::string tag(void);
   // Set the transaction tag (copy argument)
   void setTag(const std::string& tag);
-  // Get the transaction attachement timestamp
+  // Get the transaction attachment timestamp
   int64_t attachmentTimestamp(void);
-  // Set the transaction attachement timestamp
+  // Set the transaction attachment timestamp
   void setAttachmentTimestamp(int64_t timestamp);
-  // Get the transaction attachement timestamp lower
+  // Get the transaction attachment timestamp lower
   int64_t attachmentTimestampLower(void);
-  // Set the transaction attachement timestamp lower
+  // Set the transaction attachment timestamp lower
   void setAttachmentTimestampLower(int64_t timestamp);
-  // Get the transaction attachement timestamp upper
+  // Get the transaction attachment timestamp upper
   int64_t attachmentTimestampUpper(void);
-  // Set the transaction attachement timestamp upper
+  // Set the transaction attachment timestamp upper
   void setAttachmentTimestampUpper(int64_t timestamp);
   // Get the transaction nonce
   std::string nonce(void);

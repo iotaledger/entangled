@@ -15,7 +15,7 @@
 /***********************************************************************************************************
  * Transaction
  ***********************************************************************************************************/
-// To obfuscate the model, the structure definition comees here
+// To obfuscate the model, the structure definition comes here
 // struct _iota_transaction_t {...}
 
 /***********************************************************************************************************
@@ -359,34 +359,34 @@ void transaction_set_tag(iota_transaction_t transaction,
   memcpy(transaction->tag, tag, sizeof(transaction->tag));
 }
 
-// Get the transaction attachement timestamp
+// Get the transaction attachment timestamp
 int64_t transaction_attachment_timestamp(iota_transaction_t transaction) {
   return transaction->attachment_timestamp;
 }
 
-// Set the transaction attachement timestamp
+// Set the transaction attachment timestamp
 void transaction_set_attachment_timestamp(iota_transaction_t transaction,
                                           int64_t timestamp) {
   transaction->attachment_timestamp = timestamp;
 }
 
-// Get the transaction attachement timestamp lower
+// Get the transaction attachment timestamp lower
 int64_t transaction_attachment_timestamp_lower(iota_transaction_t transaction) {
   return transaction->attachment_timestamp_lower;
 }
 
-// Set the transaction attachement timestamp lower
+// Set the transaction attachment timestamp lower
 void transaction_set_attachment_timestamp_lower(iota_transaction_t transaction,
                                                 int64_t timestamp) {
   transaction->attachment_timestamp_lower = timestamp;
 }
 
-// Get the transaction attachement timestamp upper
+// Get the transaction attachment timestamp upper
 int64_t transaction_attachment_timestamp_upper(iota_transaction_t transaction) {
   return transaction->attachment_timestamp_upper;
 }
 
-// Set the transaction attachement timestamp upper
+// Set the transaction attachment timestamp upper
 void transaction_set_attachment_timestamp_upper(iota_transaction_t transaction,
                                                 int64_t timestamp) {
   transaction->attachment_timestamp_upper = timestamp;
