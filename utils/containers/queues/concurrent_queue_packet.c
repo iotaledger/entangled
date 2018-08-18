@@ -8,4 +8,4 @@
 #include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/containers/queues/concurrent_queue.c.inc"
 
-DEFINE_CONCURRENT_QUEUE_OF(iota_packet_t);
+DEFINE_CQ(iota_packet_t);

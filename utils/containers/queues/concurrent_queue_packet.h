@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-DECLARE_CONCURRENT_QUEUE_OF(iota_packet_t);
+DECLARE_CQ(iota_packet_t);
 
 #ifdef __cplusplus
 }

@@ -31,7 +31,7 @@ bool responder_init(responder_state_t *const state, node_t *const node) {
   }
   logger_helper_init(RESPONDER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
   state->running = false;
-  if (INIT_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) != CQ_SUCCESS) {
+  if (CQ_INIT(hash_request_t, state->queue) != CQ_SUCCESS) {
     log_critical(RESPONDER_COMPONENT_LOGGER_ID,
                  "Initializing responder queue failed\n");
     return false;
@@ -94,7 +94,7 @@ bool responder_destroy(responder_state_t *const state) {
   if (state->running) {
     return false;
   }
-  if (DESTROY_CONCURRENT_QUEUE_OF(hash_request_t, state->queue) != CQ_SUCCESS) {
+  if (CQ_DESTROY(hash_request_t, state->queue) != CQ_SUCCESS) {
     log_error(RESPONDER_COMPONENT_LOGGER_ID,
               "Destroying responder queue failed\n");
     ret = false;
