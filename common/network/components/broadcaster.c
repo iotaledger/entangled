@@ -13,7 +13,7 @@
 
 static void *broadcaster_routine(broadcaster_state_t *const state) {
   iota_packet_t packet;
-  concurrent_list_node_of_neighbor_t *iter;
+  concurrent_list_node_neighbor_t *iter;
 
   if (state == NULL) {
     return NULL;

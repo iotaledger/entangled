@@ -23,8 +23,7 @@ bool requester_init(requester_state_t *const state, node_t *const node) {
     return false;
   }
   logger_helper_init(REQUESTER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
-  if (INIT_CONCURRENT_LIST_OF(trit_array_p, state->list, trit_array_cmp) !=
-      CL_SUCCESS) {
+  if (CL_INIT(trit_array_p, state->list, trit_array_cmp) != CL_SUCCESS) {
     log_critical(REQUESTER_COMPONENT_LOGGER_ID,
                  "Initializing requester list failed\n");
     return false;
@@ -95,7 +94,7 @@ bool request_transaction(requester_state_t *const state,
 
 bool get_transaction_to_request(requester_state_t *const state,
                                 trit_array_p *hash) {
-  concurrent_list_node_of_trit_array_p *iter = NULL;
+  concurrent_list_node_trit_array_p *iter = NULL;
   bool exists = false;
 
   if (state == NULL) {
@@ -130,7 +129,7 @@ bool requester_destroy(requester_state_t *const state) {
   if (state == NULL) {
     return false;
   }
-  if (DESTROY_CONCURRENT_LIST_OF(trit_array_p, state->list) != CQ_SUCCESS) {
+  if (CL_DESTROY(trit_array_p, state->list) != CQ_SUCCESS) {
     ret = false;
   }
   logger_helper_destroy(REQUESTER_COMPONENT_LOGGER_ID);

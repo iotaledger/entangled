@@ -10,18 +10,17 @@
 #include "utils/containers/lists/concurrent_list.c.inc"
 #include "utils/containers/lists/concurrent_list.h.inc"
 
-DECLARE_CONCURRENT_LIST_OF(int)
-DEFINE_CONCURRENT_LIST_OF(int)
+DECLARE_CL(int)
+DEFINE_CL(int)
 
 static bool int_cmp(int const *const a, int const *const b) { return *a == *b; }
 
 void test_list() {
   int data;
-  concurrent_list_of_int *list = NULL;
-  concurrent_list_of_int *nlist = NULL;
+  concurrent_list_int *list = NULL;
+  concurrent_list_int *nlist = NULL;
 
-  TEST_ASSERT_EQUAL_INT(INIT_CONCURRENT_LIST_OF(int, list, int_cmp),
-                        CL_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(CL_INIT(int, list, int_cmp), CL_SUCCESS);
   TEST_ASSERT_NOT_NULL(list);
 
   TEST_ASSERT_NULL(list->vtable->front(NULL));
@@ -77,7 +76,7 @@ void test_list() {
   TEST_ASSERT_EQUAL_INT(CL_PUSH_BACK(list, 9), CL_SUCCESS);
   TEST_ASSERT_EQUAL_INT(CL_EMPTY(list), false);
   TEST_ASSERT_EQUAL_INT(CL_SIZE(list), 10);
-  concurrent_list_node_of_int *tmp = list->front;
+  concurrent_list_node_int *tmp = list->front;
   TEST_ASSERT_NOT_NULL(tmp);
   TEST_ASSERT_EQUAL_INT(tmp->data, 8);
   tmp = tmp->next;
@@ -183,8 +182,8 @@ void test_list() {
   TEST_ASSERT_NULL(CL_FRONT(list));
   TEST_ASSERT_NULL(CL_BACK(list));
 
-  TEST_ASSERT_EQUAL_INT(DESTROY_CONCURRENT_LIST_OF(int, nlist), CL_NULL_SELF);
-  TEST_ASSERT_EQUAL_INT(DESTROY_CONCURRENT_LIST_OF(int, list), CL_SUCCESS);
+  TEST_ASSERT_EQUAL_INT(CL_DESTROY(int, nlist), CL_NULL_SELF);
+  TEST_ASSERT_EQUAL_INT(CL_DESTROY(int, list), CL_SUCCESS);
   TEST_ASSERT_NULL(list);
 }
 

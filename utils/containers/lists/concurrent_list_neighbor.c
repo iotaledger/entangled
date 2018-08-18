@@ -10,7 +10,7 @@
 #include "utils/containers/lists/concurrent_list.c.inc"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 
-DEFINE_CONCURRENT_LIST_OF(neighbor_t);
+DEFINE_CL(neighbor_t);
 
 bool neighbor_cmp(neighbor_t const *const lhs, neighbor_t const *const rhs) {
   if (lhs == NULL || rhs == NULL) {

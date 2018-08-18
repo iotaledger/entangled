@@ -8,7 +8,7 @@
 #include "utils/containers/lists/concurrent_list_trit_array.h"
 #include "utils/containers/lists/concurrent_list.c.inc"
 
-DEFINE_CONCURRENT_LIST_OF(trit_array_p);
+DEFINE_CL(trit_array_p);
 
 bool trit_array_cmp(trit_array_p const *const lhs,
                     trit_array_p const *const rhs) {
