@@ -92,7 +92,7 @@ typedef enum concurrent_queue_status_e {
 #define DECLARE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE) \
   TYPE *CONCURRENT_QUEUE_OF_##TYPE##_FRONT(              \
       concurrent_queue_of_##TYPE *const self);
-#define CQ_FRONT(queue) queue->vtable->front(queue)
+#define CQ_FRONT(queue) (queue)->vtable->front((queue))
 
 /**
  * Returns pointer to the last element in the queue. This is the most recently
@@ -105,7 +105,7 @@ typedef enum concurrent_queue_status_e {
 #define DECLARE_FUNCTION_BACK_CONCURRENT_QUEUE_OF(TYPE) \
   TYPE *CONCURRENT_QUEUE_OF_##TYPE##_BACK(              \
       concurrent_queue_of_##TYPE *const self);
-#define CQ_BACK(queue) queue->vtable->back(queue)
+#define CQ_BACK(queue) (queue)->vtable->back((queue))
 
 /**
  * Checks if the queue has no elements
@@ -117,7 +117,7 @@ typedef enum concurrent_queue_status_e {
 #define DECLARE_FUNCTION_EMPTY_CONCURRENT_QUEUE_OF(TYPE) \
   bool CONCURRENT_QUEUE_OF_##TYPE##_EMPTY(               \
       concurrent_queue_of_##TYPE *const self);
-#define CQ_EMPTY(queue) queue->vtable->empty(queue)
+#define CQ_EMPTY(queue) (queue)->vtable->empty((queue))
 
 /**
  * Returns the number of elements in the queue
@@ -129,7 +129,7 @@ typedef enum concurrent_queue_status_e {
 #define DECLARE_FUNCTION_SIZE_CONCURRENT_QUEUE_OF(TYPE) \
   size_t CONCURRENT_QUEUE_OF_##TYPE##_SIZE(             \
       concurrent_queue_of_##TYPE *const self);
-#define CQ_SIZE(queue) queue->vtable->size(queue)
+#define CQ_SIZE(queue) (queue)->vtable->size((queue))
 
 /**
  * Pushes the given element value to the end of the queue
@@ -142,7 +142,7 @@ typedef enum concurrent_queue_status_e {
 #define DECLARE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE)        \
   concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_PUSH( \
       concurrent_queue_of_##TYPE *const self, TYPE const data);
-#define CQ_PUSH(queue, data) queue->vtable->push(queue, data)
+#define CQ_PUSH(queue, data) (queue)->vtable->push((queue), (data))
 
 /**
  * Removes an element from the front of the queue
@@ -155,7 +155,7 @@ typedef enum concurrent_queue_status_e {
 #define DECLARE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE)        \
   concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_POP( \
       concurrent_queue_of_##TYPE *const self, TYPE *const data);
-#define CQ_POP(queue, data) queue->vtable->pop(queue, data)
+#define CQ_POP(queue, data) (queue)->vtable->pop((queue), (data))
 
 #define DECLARE_CONCURRENT_QUEUE_OF(TYPE)            \
   DECLARE_STRUCT_CONCURRENT_QUEUE_NODE_OF(TYPE)      \
