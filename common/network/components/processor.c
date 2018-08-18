@@ -132,8 +132,7 @@ static void *processor_routine(processor_state_t *const state) {
     return NULL;
   }
   while (state->running) {
-    if (state->queue->vtable->pop(state->queue, &packet) ==
-        CONCURRENT_QUEUE_SUCCESS) {
+    if (CQ_POP(state->queue, &packet) == CONCURRENT_QUEUE_SUCCESS) {
       process_packet(state, &packet);
     }
   }
@@ -176,8 +175,7 @@ bool processor_on_next(processor_state_t *const state,
   if (state == NULL) {
     return false;
   }
-  if (state->queue->vtable->push(state->queue, packet) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CQ_PUSH(state->queue, packet) != CONCURRENT_QUEUE_SUCCESS) {
     log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                 "Pushing to processor queue failed\n");
     return false;

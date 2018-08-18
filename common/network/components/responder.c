@@ -17,8 +17,7 @@ static void *responder_routine(responder_state_t *const state) {
     return NULL;
   }
   while (state->running) {
-    if (state->queue->vtable->pop(state->queue, &request) ==
-        CONCURRENT_QUEUE_SUCCESS) {
+    if (CQ_POP(state->queue, &request) == CONCURRENT_QUEUE_SUCCESS) {
       log_debug(RESPONDER_COMPONENT_LOGGER_ID, "Responding to request\n");
       // TODO(thibault) respond to request
     }
@@ -62,8 +61,7 @@ bool responder_on_next(responder_state_t *const state, trit_array_p const hash,
   if (state == NULL) {
     return false;
   }
-  if (state->queue->vtable->push(state->queue,
-                                 (hash_request_t){hash, *neighbor}) !=
+  if (CQ_PUSH(state->queue, ((hash_request_t){hash, *neighbor})) !=
       CONCURRENT_QUEUE_SUCCESS) {
     log_warning(RESPONDER_COMPONENT_LOGGER_ID,
                 "Pushing to responder queue failed\n");

@@ -37,7 +37,7 @@ size_t requester_size(requester_state_t *const state) {
   if (state == NULL) {
     return 0;
   }
-  return state->list->vtable->size(state->list);
+  return CL_SIZE(state->list);
 }
 
 bool requester_clear_request(requester_state_t *const state,
@@ -48,8 +48,7 @@ bool requester_clear_request(requester_state_t *const state,
   if (hash == NULL) {
     return false;
   }
-  if (state->list->vtable->remove(state->list, hash) !=
-      CONCURRENT_LIST_SUCCESS) {
+  if (CL_REMOVE(state->list, hash) != CONCURRENT_LIST_SUCCESS) {
     return false;
   }
   return true;
@@ -59,7 +58,7 @@ bool requester_is_full(requester_state_t *const state) {
   if (state == NULL) {
     return true;
   }
-  return state->list->vtable->size(state->list) >= MAX_TX_REQ_NBR;
+  return CL_SIZE(state->list) >= MAX_TX_REQ_NBR;
 }
 
 bool request_transaction(requester_state_t *const state,
@@ -79,10 +78,9 @@ bool request_transaction(requester_state_t *const state,
   if (exists) {
     return false;
   }
-  if (state->list->vtable->contains(state->list, hash) == false) {
+  if (CL_CONTAINS(state->list, hash) == false) {
     if (requester_is_full(state) == false) {
-      if (state->list->vtable->push_back(state->list, hash) !=
-          CONCURRENT_LIST_SUCCESS) {
+      if (CL_PUSH_BACK(state->list, hash) != CONCURRENT_LIST_SUCCESS) {
         log_warning(REQUESTER_COMPONENT_LOGGER_ID,
                     "Adding new transaction request to the list failed\n");
         return false;

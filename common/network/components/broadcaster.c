@@ -19,8 +19,7 @@ static void *broadcaster_routine(broadcaster_state_t *const state) {
     return NULL;
   }
   while (state->running) {
-    if (state->queue->vtable->pop(state->queue, &packet) ==
-        CONCURRENT_QUEUE_SUCCESS) {
+    if (CQ_POP(state->queue, &packet) == CONCURRENT_QUEUE_SUCCESS) {
       iter = state->node->neighbors->front;
       while (iter) {
         neighbor_send(state->node, &iter->data, &packet);
@@ -67,8 +66,7 @@ bool broadcaster_on_next(broadcaster_state_t *const state,
   if (state == NULL) {
     return false;
   }
-  if (state->queue->vtable->push(state->queue, packet) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CQ_PUSH(state->queue, packet) != CONCURRENT_QUEUE_SUCCESS) {
     log_warning(BROADCASTER_COMPONENT_LOGGER_ID,
                 "Pushing to broadcaster queue failed\n");
     return false;
