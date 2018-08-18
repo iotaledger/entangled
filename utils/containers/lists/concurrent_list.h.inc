@@ -99,6 +99,7 @@ typedef enum concurrent_list_status_e {
 #define DECLARE_FUNCTION_FRONT_CONCURRENT_LIST_OF(TYPE) \
   TYPE *CONCURRENT_LIST_OF_##TYPE##_FRONT(              \
       concurrent_list_of_##TYPE *const self);
+#define CL_FRONT(list) list->vtable->front(list)
 
 /**
  * Returns pointer to the last element in the list
@@ -109,6 +110,7 @@ typedef enum concurrent_list_status_e {
  */
 #define DECLARE_FUNCTION_BACK_CONCURRENT_LIST_OF(TYPE) \
   TYPE *CONCURRENT_LIST_OF_##TYPE##_BACK(concurrent_list_of_##TYPE *const self);
+#define CL_BACK(list) list->vtable->back(list)
 
 /**
  * Checks if the list has no elements
@@ -119,6 +121,7 @@ typedef enum concurrent_list_status_e {
  */
 #define DECLARE_FUNCTION_EMPTY_CONCURRENT_LIST_OF(TYPE) \
   bool CONCURRENT_LIST_OF_##TYPE##_EMPTY(concurrent_list_of_##TYPE *const self);
+#define CL_EMPTY(list) list->vtable->empty(list)
 
 /**
  * Returns the number of elements in the list
@@ -130,6 +133,7 @@ typedef enum concurrent_list_status_e {
 #define DECLARE_FUNCTION_SIZE_CONCURRENT_LIST_OF(TYPE) \
   size_t CONCURRENT_LIST_OF_##TYPE##_SIZE(             \
       concurrent_list_of_##TYPE *const self);
+#define CL_SIZE(list) list->vtable->size(list)
 
 /**
  * Adds an element at the front of the list
@@ -142,6 +146,7 @@ typedef enum concurrent_list_status_e {
 #define DECLARE_FUNCTION_PUSH_FRONT_CONCURRENT_LIST_OF(TYPE)       \
   concurrent_list_status_t CONCURRENT_LIST_OF_##TYPE##_PUSH_FRONT( \
       concurrent_list_of_##TYPE *const self, TYPE const data);
+#define CL_PUSH_FRONT(list, data) list->vtable->push_front(list, data)
 
 /**
  * Adds an element at the back of the list
@@ -154,6 +159,7 @@ typedef enum concurrent_list_status_e {
 #define DECLARE_FUNCTION_PUSH_BACK_CONCURRENT_LIST_OF(TYPE)       \
   concurrent_list_status_t CONCURRENT_LIST_OF_##TYPE##_PUSH_BACK( \
       concurrent_list_of_##TYPE *const self, TYPE const data);
+#define CL_PUSH_BACK(list, data) list->vtable->push_back(list, data)
 
 /**
  * Removes an element from the front of the list
@@ -166,6 +172,7 @@ typedef enum concurrent_list_status_e {
 #define DECLARE_FUNCTION_POP_FRONT_CONCURRENT_LIST_OF(TYPE)       \
   concurrent_list_status_t CONCURRENT_LIST_OF_##TYPE##_POP_FRONT( \
       concurrent_list_of_##TYPE *const self, TYPE *const data);
+#define CL_POP_FRONT(list, data) list->vtable->pop_front(list, data)
 
 /**
  * Removes an element from the back of the list
@@ -178,6 +185,7 @@ typedef enum concurrent_list_status_e {
 #define DECLARE_FUNCTION_POP_BACK_CONCURRENT_LIST_OF(TYPE)       \
   concurrent_list_status_t CONCURRENT_LIST_OF_##TYPE##_POP_BACK( \
       concurrent_list_of_##TYPE *const self, TYPE *const data);
+#define CL_POP_BACK(list, data) list->vtable->pop_back(list, data)
 
 /**
  * Find an element in a list
@@ -190,6 +198,7 @@ typedef enum concurrent_list_status_e {
 #define DECLARE_FUNCTION_FIND_CONCURRENT_LIST_OF(TYPE) \
   TYPE *CONCURRENT_LIST_OF_##TYPE##_FIND(              \
       concurrent_list_of_##TYPE *const self, TYPE const data);
+#define CL_FIND(list, data) list->vtable->find(list, data)
 
 /**
  * Checks whether an element is in a list or not
@@ -202,6 +211,7 @@ typedef enum concurrent_list_status_e {
 #define DECLARE_FUNCTION_CONTAINS_CONCURRENT_LIST_OF(TYPE) \
   bool CONCURRENT_LIST_OF_##TYPE##_CONTAINS(               \
       concurrent_list_of_##TYPE *const self, TYPE const data);
+#define CL_CONTAINS(list, data) list->vtable->contains(list, data)
 
 /**
  * Removes elements from a list
@@ -214,6 +224,7 @@ typedef enum concurrent_list_status_e {
 #define DECLARE_FUNCTION_REMOVE_CONCURRENT_LIST_OF(TYPE) \
   bool CONCURRENT_LIST_OF_##TYPE##_REMOVE(               \
       concurrent_list_of_##TYPE *const self, TYPE const data);
+#define CL_REMOVE(list, data) list->vtable->remove(list, data)
 
 #define DECLARE_CONCURRENT_LIST_OF(TYPE)               \
   DECLARE_STRUCT_CONCURRENT_LIST_NODE_OF(TYPE)         \
