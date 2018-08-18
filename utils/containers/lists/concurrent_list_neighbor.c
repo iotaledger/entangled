@@ -29,8 +29,7 @@ bool neighbor_add(neighbors_list_t *const neighbors,
   if (neighbors->vtable->contains(neighbors, neighbor) == true) {
     return false;
   }
-  if (neighbors->vtable->push_back(neighbors, neighbor) !=
-      CONCURRENT_LIST_SUCCESS) {
+  if (neighbors->vtable->push_back(neighbors, neighbor) != CL_SUCCESS) {
     return false;
   }
   return true;
@@ -41,8 +40,7 @@ bool neighbor_remove(neighbors_list_t *const neighbors,
   if (neighbors == NULL) {
     return false;
   }
-  if (neighbors->vtable->remove(neighbors, neighbor) !=
-      CONCURRENT_LIST_SUCCESS) {
+  if (neighbors->vtable->remove(neighbors, neighbor) != CL_SUCCESS) {
     return false;
   }
   return true;

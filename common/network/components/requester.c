@@ -24,7 +24,7 @@ bool requester_init(requester_state_t *const state, node_t *const node) {
   }
   logger_helper_init(REQUESTER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
   if (INIT_CONCURRENT_LIST_OF(trit_array_p, state->list, trit_array_cmp) !=
-      CONCURRENT_LIST_SUCCESS) {
+      CL_SUCCESS) {
     log_critical(REQUESTER_COMPONENT_LOGGER_ID,
                  "Initializing requester list failed\n");
     return false;
@@ -48,7 +48,7 @@ bool requester_clear_request(requester_state_t *const state,
   if (hash == NULL) {
     return false;
   }
-  if (CL_REMOVE(state->list, hash) != CONCURRENT_LIST_SUCCESS) {
+  if (CL_REMOVE(state->list, hash) != CL_SUCCESS) {
     return false;
   }
   return true;
@@ -80,7 +80,7 @@ bool request_transaction(requester_state_t *const state,
   }
   if (CL_CONTAINS(state->list, hash) == false) {
     if (requester_is_full(state) == false) {
-      if (CL_PUSH_BACK(state->list, hash) != CONCURRENT_LIST_SUCCESS) {
+      if (CL_PUSH_BACK(state->list, hash) != CL_SUCCESS) {
         log_warning(REQUESTER_COMPONENT_LOGGER_ID,
                     "Adding new transaction request to the list failed\n");
         return false;
@@ -130,8 +130,7 @@ bool requester_destroy(requester_state_t *const state) {
   if (state == NULL) {
     return false;
   }
-  if (DESTROY_CONCURRENT_LIST_OF(trit_array_p, state->list) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (DESTROY_CONCURRENT_LIST_OF(trit_array_p, state->list) != CQ_SUCCESS) {
     ret = false;
   }
   logger_helper_destroy(REQUESTER_COMPONENT_LOGGER_ID);

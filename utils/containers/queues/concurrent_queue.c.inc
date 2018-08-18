@@ -23,12 +23,12 @@ static unsigned int const concurrent_queue_pop_timeout_g = 2;
   concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_INIT( \
       concurrent_queue_of_##TYPE **const self) {               \
     if (self == NULL) {                                        \
-      return CONCURRENT_QUEUE_NULL_SELF;                       \
+      return CQ_NULL_SELF;                                     \
     }                                                          \
     *self = (concurrent_queue_of_##TYPE *)malloc(              \
         sizeof(concurrent_queue_of_##TYPE));                   \
     if (*self == NULL) {                                       \
-      return CONCURRENT_QUEUE_ALLOC_FAILED;                    \
+      return CQ_ALLOC_FAILED;                                  \
     }                                                          \
     (*self)->vtable = &vtable_concurrent_queue_of_##TYPE##_g;  \
     (*self)->front = NULL;                                     \
@@ -36,7 +36,7 @@ static unsigned int const concurrent_queue_pop_timeout_g = 2;
     (*self)->size = 0;                                         \
     lock_handle_init(&(*self)->lock);                          \
     cond_handle_init(&(*self)->cond);                          \
-    return CONCURRENT_QUEUE_SUCCESS;                           \
+    return CQ_SUCCESS;                                         \
   }
 
 #define DEFINE_FUNCTION_DESTROY_CONCURRENT_QUEUE_OF(TYPE)         \
@@ -44,7 +44,7 @@ static unsigned int const concurrent_queue_pop_timeout_g = 2;
       concurrent_queue_of_##TYPE **const self) {                  \
     concurrent_queue_node_of_##TYPE *front, *tmp;                 \
     if (self == NULL || *self == NULL) {                          \
-      return CONCURRENT_QUEUE_NULL_SELF;                          \
+      return CQ_NULL_SELF;                                        \
     }                                                             \
     front = (*self)->front;                                       \
     while (front) {                                               \
@@ -56,7 +56,7 @@ static unsigned int const concurrent_queue_pop_timeout_g = 2;
     cond_handle_destroy(&(*self)->cond);                          \
     free(*self);                                                  \
     *self = NULL;                                                 \
-    return CONCURRENT_QUEUE_SUCCESS;                              \
+    return CQ_SUCCESS;                                            \
   }
 
 #define DEFINE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE) \
@@ -120,12 +120,12 @@ static unsigned int const concurrent_queue_pop_timeout_g = 2;
       concurrent_queue_of_##TYPE *const self, TYPE const data) { \
     concurrent_queue_node_of_##TYPE *node;                       \
     if (self == NULL) {                                          \
-      return CONCURRENT_QUEUE_NULL_SELF;                         \
+      return CQ_NULL_SELF;                                       \
     }                                                            \
     node = (concurrent_queue_node_of_##TYPE *)calloc(            \
         1, sizeof(concurrent_queue_node_of_##TYPE));             \
     if (node == NULL) {                                          \
-      return CONCURRENT_QUEUE_ALLOC_FAILED;                      \
+      return CQ_ALLOC_FAILED;                                    \
     }                                                            \
     node->data = data;                                           \
     lock_handle_lock(&self->lock);                               \
@@ -139,24 +139,24 @@ static unsigned int const concurrent_queue_pop_timeout_g = 2;
     self->size++;                                                \
     lock_handle_unlock(&self->lock);                             \
     cond_handle_signal(&self->cond);                             \
-    return CONCURRENT_QUEUE_SUCCESS;                             \
+    return CQ_SUCCESS;                                           \
   }
 
 #define DEFINE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE)                   \
   concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_POP(           \
       concurrent_queue_of_##TYPE *const self, TYPE *const data) {       \
     if (self == NULL) {                                                 \
-      return CONCURRENT_QUEUE_NULL_SELF;                                \
+      return CQ_NULL_SELF;                                              \
     }                                                                   \
     if (data == NULL) {                                                 \
-      return CONCURRENT_QUEUE_NULL_DATA;                                \
+      return CQ_NULL_DATA;                                              \
     }                                                                   \
     lock_handle_lock(&self->lock);                                      \
     while (self->size == 0) {                                           \
       if (cond_handle_timedwait(&self->cond, &self->lock,               \
                                 concurrent_queue_pop_timeout_g) != 0) { \
         lock_handle_unlock(&self->lock);                                \
-        return CONCURRENT_QUEUE_TIMEOUT;                                \
+        return CQ_TIMEOUT;                                              \
       }                                                                 \
     }                                                                   \
     concurrent_queue_node_of_##TYPE *tmp = self->front;                 \
@@ -168,7 +168,7 @@ static unsigned int const concurrent_queue_pop_timeout_g = 2;
     self->size--;                                                       \
     free(tmp);                                                          \
     lock_handle_unlock(&self->lock);                                    \
-    return CONCURRENT_QUEUE_SUCCESS;                                    \
+    return CQ_SUCCESS;                                                  \
   }
 
 #define DEFINE_CONCURRENT_QUEUE_OF(TYPE)            \

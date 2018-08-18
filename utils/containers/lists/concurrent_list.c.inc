@@ -27,15 +27,15 @@
       concurrent_list_of_##TYPE **const self,                        \
       bool (*cmp)(TYPE const *const self, TYPE const *const data)) { \
     if (self == NULL) {                                              \
-      return CONCURRENT_LIST_NULL_SELF;                              \
+      return CL_NULL_SELF;                                           \
     }                                                                \
     if (cmp == NULL) {                                               \
-      return CONCURRENT_LIST_NULL_CMP_FUNC;                          \
+      return CL_NULL_CMP_FUNC;                                       \
     }                                                                \
     *self = (concurrent_list_of_##TYPE *)malloc(                     \
         sizeof(concurrent_list_of_##TYPE));                          \
     if (*self == NULL) {                                             \
-      return CONCURRENT_LIST_ALLOC_FAILED;                           \
+      return CL_ALLOC_FAILED;                                        \
     }                                                                \
     (*self)->vtable = &vtable_concurrent_list_of_##TYPE##_g;         \
     (*self)->cmp = cmp;                                              \
@@ -43,7 +43,7 @@
     (*self)->back = NULL;                                            \
     (*self)->size = 0;                                               \
     lock_handle_init(&(*self)->lock);                                \
-    return CONCURRENT_LIST_SUCCESS;                                  \
+    return CL_SUCCESS;                                               \
   }
 
 #define DEFINE_FUNCTION_DESTROY_CONCURRENT_LIST_OF(TYPE)        \
@@ -51,7 +51,7 @@
       concurrent_list_of_##TYPE **const self) {                 \
     concurrent_list_node_of_##TYPE *front, *tmp;                \
     if (self == NULL || *self == NULL) {                        \
-      return CONCURRENT_LIST_NULL_SELF;                         \
+      return CL_NULL_SELF;                                      \
     }                                                           \
     front = (*self)->front;                                     \
     while (front) {                                             \
@@ -62,7 +62,7 @@
     lock_handle_destroy(&(*self)->lock);                        \
     free(*self);                                                \
     *self = NULL;                                               \
-    return CONCURRENT_LIST_SUCCESS;                             \
+    return CL_SUCCESS;                                          \
   }
 
 #define DEFINE_FUNCTION_FRONT_CONCURRENT_LIST_OF(TYPE) \
@@ -126,12 +126,12 @@
       concurrent_list_of_##TYPE *const self, TYPE const data) {    \
     concurrent_list_node_of_##TYPE *node;                          \
     if (self == NULL) {                                            \
-      return CONCURRENT_LIST_NULL_SELF;                            \
+      return CL_NULL_SELF;                                         \
     }                                                              \
     node = (concurrent_list_node_of_##TYPE *)calloc(               \
         1, sizeof(concurrent_list_node_of_##TYPE));                \
     if (node == NULL) {                                            \
-      return CONCURRENT_LIST_ALLOC_FAILED;                         \
+      return CL_ALLOC_FAILED;                                      \
     }                                                              \
     node->data = data;                                             \
     lock_handle_lock(&self->lock);                                 \
@@ -144,7 +144,7 @@
     self->front = node;                                            \
     self->size++;                                                  \
     lock_handle_unlock(&self->lock);                               \
-    return CONCURRENT_LIST_SUCCESS;                                \
+    return CL_SUCCESS;                                             \
   }
 
 #define DEFINE_FUNCTION_PUSH_BACK_CONCURRENT_LIST_OF(TYPE)        \
@@ -152,12 +152,12 @@
       concurrent_list_of_##TYPE *const self, TYPE const data) {   \
     concurrent_list_node_of_##TYPE *node;                         \
     if (self == NULL) {                                           \
-      return CONCURRENT_LIST_NULL_SELF;                           \
+      return CL_NULL_SELF;                                        \
     }                                                             \
     node = (concurrent_list_node_of_##TYPE *)calloc(              \
         1, sizeof(concurrent_list_node_of_##TYPE));               \
     if (node == NULL) {                                           \
-      return CONCURRENT_LIST_ALLOC_FAILED;                        \
+      return CL_ALLOC_FAILED;                                     \
     }                                                             \
     node->data = data;                                            \
     lock_handle_lock(&self->lock);                                \
@@ -170,7 +170,7 @@
     self->back = node;                                            \
     self->size++;                                                 \
     lock_handle_unlock(&self->lock);                              \
-    return CONCURRENT_LIST_SUCCESS;                               \
+    return CL_SUCCESS;                                            \
   }
 
 #define DEFINE_FUNCTION_POP_FRONT_CONCURRENT_LIST_OF(TYPE)        \
@@ -178,15 +178,15 @@
       concurrent_list_of_##TYPE *const self, TYPE *const data) {  \
     concurrent_list_node_of_##TYPE *tmp;                          \
     if (self == NULL) {                                           \
-      return CONCURRENT_LIST_NULL_SELF;                           \
+      return CL_NULL_SELF;                                        \
     }                                                             \
     if (data == NULL) {                                           \
-      return CONCURRENT_LIST_NULL_DATA;                           \
+      return CL_NULL_DATA;                                        \
     }                                                             \
     lock_handle_lock(&self->lock);                                \
     if (self->size == 0) {                                        \
       lock_handle_unlock(&self->lock);                            \
-      return CONCURRENT_LIST_EMPTY;                               \
+      return CL_EMPTY;                                            \
     }                                                             \
     tmp = self->front;                                            \
     *data = tmp->data;                                            \
@@ -197,7 +197,7 @@
     self->size--;                                                 \
     free(tmp);                                                    \
     lock_handle_unlock(&self->lock);                              \
-    return CONCURRENT_LIST_SUCCESS;                               \
+    return CL_SUCCESS;                                            \
   }
 
 #define DEFINE_FUNCTION_POP_BACK_CONCURRENT_LIST_OF(TYPE)        \
@@ -205,15 +205,15 @@
       concurrent_list_of_##TYPE *const self, TYPE *const data) { \
     concurrent_list_node_of_##TYPE *tmp;                         \
     if (self == NULL) {                                          \
-      return CONCURRENT_LIST_NULL_SELF;                          \
+      return CL_NULL_SELF;                                       \
     }                                                            \
     if (data == NULL) {                                          \
-      return CONCURRENT_LIST_NULL_DATA;                          \
+      return CL_NULL_DATA;                                       \
     }                                                            \
     lock_handle_lock(&self->lock);                               \
     if (self->size == 0) {                                       \
       lock_handle_unlock(&self->lock);                           \
-      return CONCURRENT_LIST_EMPTY;                              \
+      return CL_EMPTY;                                           \
     }                                                            \
     tmp = self->front;                                           \
     *data = tmp->data;                                           \
@@ -224,7 +224,7 @@
     self->size--;                                                \
     free(tmp);                                                   \
     lock_handle_unlock(&self->lock);                             \
-    return CONCURRENT_LIST_SUCCESS;                              \
+    return CL_SUCCESS;                                           \
   }
 
 #define DEFINE_FUNCTION_FIND_CONCURRENT_LIST_OF(TYPE)           \
@@ -261,7 +261,7 @@
       concurrent_list_of_##TYPE *const self, TYPE const data) { \
     concurrent_list_node_of_##TYPE *iter, *tmp;                 \
     if (self == NULL) {                                         \
-      return CONCURRENT_LIST_NULL_SELF;                         \
+      return CL_NULL_SELF;                                      \
     }                                                           \
     lock_handle_lock(&self->lock);                              \
     iter = self->front;                                         \
@@ -289,7 +289,7 @@
       iter = tmp;                                               \
     }                                                           \
     lock_handle_unlock(&self->lock);                            \
-    return CONCURRENT_LIST_SUCCESS;                             \
+    return CL_SUCCESS;                                          \
   }
 
 #define DEFINE_CONCURRENT_LIST_OF(TYPE)               \
