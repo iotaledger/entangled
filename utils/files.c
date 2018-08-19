@@ -5,10 +5,11 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifdef _WIN32
-#include <io.h>
-#else
+#if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
+    (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>
+#elif defined(_WIN32)
+#include <io.h>
 #endif
 
 #include <errno.h>
