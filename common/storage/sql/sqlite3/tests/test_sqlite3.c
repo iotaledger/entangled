@@ -32,7 +32,7 @@ void test_initialized_db_empty(void) {
   bool exist = false;
 
   trit_array_p col_value = trit_array_new(FLEX_TRIT_SIZE_243);
-  col_value->trits =
+  col_value->trits = (flex_trit_t *)
       "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
       "AAAAAAAAA";
   TEST_ASSERT(iota_stor_exist(&conn, COL_HASH, col_value, &exist) == RC_OK);
@@ -40,10 +40,11 @@ void test_initialized_db_empty(void) {
 }
 
 void test_stored_transaction(void) {
-  TEST_ASSERT(iota_stor_store(&conn, &TEST_TRANSACTION) == RC_OK);
+  TEST_ASSERT(iota_stor_store(&conn, (iota_transaction_t)&TEST_TRANSACTION) ==
+              RC_OK);
   bool exist = false;
   trit_array_p col_value = trit_array_new(NUM_TRITS_ADDRESS);
-  col_value->trits = TEST_TRANSACTION.hash;
+  col_value->trits = (flex_trit_t *)TEST_TRANSACTION.hash;
   TEST_ASSERT(iota_stor_exist(&conn, NULL, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
   TEST_ASSERT(iota_stor_exist(&conn, COL_HASH, col_value, &exist) == RC_OK);
@@ -54,7 +55,7 @@ void test_stored_transaction(void) {
 
   iota_transactions_pack pack;
   iota_transaction_t txs[5];
-  pack.txs = &txs;
+  pack.txs = txs;
   pack.num_loaded = 0;
   pack.txs_capacity = 5;
 
@@ -62,7 +63,6 @@ void test_stored_transaction(void) {
     pack.txs[i] = transaction_new();
   }
 
-  size_t num_loaded;
   TEST_ASSERT(iota_stor_load(&conn, COL_HASH, col_value, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
 
@@ -100,7 +100,7 @@ void test_stored_transaction(void) {
 void test_stored_load_hashes_by_address(void) {
   trit_array_p hashes[5];
   iota_hashes_pack pack;
-  pack.hashes = &hashes;
+  pack.hashes = hashes;
   pack.num_loaded = 0;
   pack.hashes_capacity = 5;
   for (int i = 0; i < pack.hashes_capacity; ++i) {
@@ -121,7 +121,7 @@ void test_stored_load_hashes_by_address(void) {
 void test_stored_load_hashes_of_approvers(void) {
   trit_array_p hashes[5];
   iota_hashes_pack pack;
-  pack.hashes = &hashes;
+  pack.hashes = hashes;
   pack.num_loaded = 0;
   pack.hashes_capacity = 5;
   for (int i = 0; i < pack.hashes_capacity; ++i) {

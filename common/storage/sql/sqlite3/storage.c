@@ -34,7 +34,7 @@ retcode_t iota_stor_destroy() {
 
 void select_transactions_populate_from_row(sqlite3_stmt* statement,
                                            iota_transaction_t tx) {
-  char* buffer;
+  char const* buffer;
 
   buffer = sqlite3_column_blob(statement, 0);
   memcpy(tx->signature_or_message, buffer, FLEX_TRIT_SIZE_6561);
@@ -68,7 +68,7 @@ retcode_t iota_stor_store(const connection_t* const conn,
   char statement[MAX_STORE_STATEMENT_SIZE];
   iota_transactions_insert_statement(data_in, statement,
                                      MAX_STORE_STATEMENT_SIZE);
-  char* err_msg = 0;
+  char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
 
   int rc = sqlite3_prepare_v2((sqlite3*)conn->db, statement, -1,
@@ -125,9 +125,8 @@ retcode_t iota_stor_load(const connection_t* const conn, const char* col_name,
   iota_transactions_select_statement(col_name, statement,
                                      MAX_SELECT_STATEMENT_SIZE);
 
-  char* err_msg = 0;
+  char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
-  char* buffer;
 
   pack->insufficient_capacity = false;
 
@@ -171,7 +170,7 @@ retcode_t iota_stor_load(const connection_t* const conn, const char* col_name,
 retcode_t iota_stor_exist(const connection_t* const conn,
                           const char* index_name, const trit_array_p key,
                           bool* exist) {
-  char* err_msg = 0;
+  char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
   char statement[MAX_SELECT_STATEMENT_SIZE];
 
@@ -226,9 +225,9 @@ extern retcode_t iota_stor_load_hashes(const connection_t* const conn,
   iota_transactions_select_hashes_statement(col_name, statement,
                                             MAX_SELECT_STATEMENT_SIZE);
 
-  char* err_msg = 0;
+  char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
-  char* buffer;
+  char const* buffer;
 
   int rc = sqlite3_prepare_v2((sqlite3*)conn->db, statement, -1,
                               &sqlite_statement, &err_msg);
@@ -279,9 +278,9 @@ retcode_t iota_stor_load_hashes_approvers(const connection_t* const conn,
   iota_transactions_select_hashes_approvers_statement(
       approvee_hash, statement, MAX_SELECT_STATEMENT_SIZE);
 
-  char* err_msg = 0;
+  char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
-  char* buffer;
+  char const* buffer;
 
   int rc = sqlite3_prepare_v2((sqlite3*)conn->db, statement, -1,
                               &sqlite_statement, &err_msg);
