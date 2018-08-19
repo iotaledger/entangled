@@ -32,6 +32,7 @@ void iota_packet_set_transaction(iota_packet_t* const packet,
     return;
   }
 
+  // Tracked via #166: Efficient flex_trit_array_to_bytes
   transaction_serialize_on_flex_trits(tx, tx_flex_trits);
   flex_trit_array_to_int8(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                           tx_flex_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
