@@ -15,9 +15,9 @@
 extern "C" {
 #endif
 
-DECLARE_CONCURRENT_LIST_OF(trit_array_p);
+DECLARE_CL(trit_array_p);
 
-typedef concurrent_list_of_trit_array_p trit_array_list_t;
+typedef concurrent_list_trit_array_p trit_array_list_t;
 
 bool trit_array_cmp(trit_array_p const *const lhs,
                     trit_array_p const *const rhs);

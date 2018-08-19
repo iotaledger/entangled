@@ -25,8 +25,7 @@ retcode_t node_init(node_t* const node, core_t* const core) {
   logger_helper_init(NODE_LOGGER_ID, LOGGER_DEBUG, true);
 
   log_info(NODE_LOGGER_ID, "Initializing neighbors list\n");
-  if (INIT_CONCURRENT_LIST_OF(neighbor_t, node->neighbors, neighbor_cmp) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CL_INIT(neighbor_t, node->neighbors, neighbor_cmp) != CL_SUCCESS) {
     log_critical(NODE_LOGGER_ID, "Initializing neighbors list failed\n");
     return RC_NODE_FAILED_NEIGHBORS_INIT;
   }
@@ -179,8 +178,7 @@ retcode_t node_destroy(node_t* const node) {
   }
 
   log_info(NODE_LOGGER_ID, "Destroying neighbors list\n");
-  if (DESTROY_CONCURRENT_LIST_OF(neighbor_t, node->neighbors) !=
-      CONCURRENT_LIST_SUCCESS) {
+  if (CL_DESTROY(neighbor_t, node->neighbors) != CL_SUCCESS) {
     log_error(NODE_LOGGER_ID, "Destroying neighbors list failed\n");
     ret = false;
   }

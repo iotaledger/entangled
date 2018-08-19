@@ -15,9 +15,9 @@
 extern "C" {
 #endif
 
-DECLARE_CONCURRENT_LIST_OF(neighbor_t);
+DECLARE_CL(neighbor_t);
 
-typedef concurrent_list_of_neighbor_t neighbors_list_t;
+typedef concurrent_list_neighbor_t neighbors_list_t;
 
 bool neighbor_cmp(neighbor_t const *const lhs, neighbor_t const *const rhs);
 bool neighbor_add(neighbors_list_t *const neighbors, neighbor_t const neighbor);

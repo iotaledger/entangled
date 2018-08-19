@@ -13,14 +13,13 @@
 
 static void *broadcaster_routine(broadcaster_state_t *const state) {
   iota_packet_t packet;
-  concurrent_list_node_of_neighbor_t *iter;
+  concurrent_list_node_neighbor_t *iter;
 
   if (state == NULL) {
     return NULL;
   }
   while (state->running) {
-    if (state->queue->vtable->pop(state->queue, &packet) ==
-        CONCURRENT_QUEUE_SUCCESS) {
+    if (CQ_POP(state->queue, &packet) == CQ_SUCCESS) {
       iter = state->node->neighbors->front;
       while (iter) {
         neighbor_send(state->node, &iter->data, &packet);
@@ -37,8 +36,7 @@ bool broadcaster_init(broadcaster_state_t *const state, node_t *const node) {
   }
   logger_helper_init(BROADCASTER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
   state->running = false;
-  if (INIT_CONCURRENT_QUEUE_OF(iota_packet_t, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CQ_INIT(iota_packet_t, state->queue) != CQ_SUCCESS) {
     log_critical(BROADCASTER_COMPONENT_LOGGER_ID,
                  "Initializing broadcaster queue failed\n");
     return false;
@@ -67,8 +65,7 @@ bool broadcaster_on_next(broadcaster_state_t *const state,
   if (state == NULL) {
     return false;
   }
-  if (state->queue->vtable->push(state->queue, packet) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CQ_PUSH(state->queue, packet) != CQ_SUCCESS) {
     log_warning(BROADCASTER_COMPONENT_LOGGER_ID,
                 "Pushing to broadcaster queue failed\n");
     return false;
@@ -102,8 +99,7 @@ bool broadcaster_destroy(broadcaster_state_t *const state) {
   if (state->running) {
     return false;
   }
-  if (DESTROY_CONCURRENT_QUEUE_OF(iota_packet_t, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CQ_DESTROY(iota_packet_t, state->queue) != CQ_SUCCESS) {
     log_error(BROADCASTER_COMPONENT_LOGGER_ID,
               "Destroying broadcaster queue failed\n");
     ret = false;

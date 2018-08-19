@@ -14,49 +14,43 @@
 #include "utils/handles/lock.h"
 
 typedef enum concurrent_queue_status_e {
-  CONCURRENT_QUEUE_SUCCESS,
-  CONCURRENT_QUEUE_NULL_SELF,
-  CONCURRENT_QUEUE_NULL_DATA,
-  CONCURRENT_QUEUE_ALLOC_FAILED,
-  CONCURRENT_QUEUE_TIMEOUT
+  CQ_SUCCESS,
+  CQ_NULL_SELF,
+  CQ_NULL_DATA,
+  CQ_ALLOC_FAILED,
+  CQ_TIMEOUT
 } concurrent_queue_status_t;
 
-#define DECLARE_STRUCT_CONCURRENT_QUEUE_NODE_OF(TYPE)  \
-  typedef struct concurrent_queue_node_of_##TYPE##_s { \
-    TYPE data;                                         \
-    struct concurrent_queue_node_of_##TYPE##_s *next;  \
-  } concurrent_queue_node_of_##TYPE;
+#define DECLARE_CQ_STRUCT_NODE(TYPE)                \
+  typedef struct concurrent_queue_node_##TYPE##_s { \
+    TYPE data;                                      \
+    struct concurrent_queue_node_##TYPE##_s *next;  \
+  } concurrent_queue_node_##TYPE;
 
-#define DECLARE_VTABLE_CONCURRENT_QUEUE_OF(TYPE)                              \
-  typedef struct concurrent_queue_of_##TYPE##_s concurrent_queue_of_##TYPE;   \
-  typedef struct vtable_concurrent_queue_of_##TYPE##_s {                      \
-    TYPE *(*front)(concurrent_queue_of_##TYPE *const self);                   \
-    TYPE *(*back)(concurrent_queue_of_##TYPE *const self);                    \
-    bool (*empty)(concurrent_queue_of_##TYPE *const self);                    \
-    size_t (*size)(concurrent_queue_of_##TYPE *const self);                   \
-    concurrent_queue_status_t (*push)(concurrent_queue_of_##TYPE *const self, \
-                                      TYPE const data);                       \
-    concurrent_queue_status_t (*pop)(concurrent_queue_of_##TYPE *const self,  \
-                                     TYPE *const data);                       \
-  } vtable_concurrent_queue_of_##TYPE##_t;                                    \
-  extern vtable_concurrent_queue_of_##TYPE##_t const                          \
-      vtable_concurrent_queue_of_##TYPE##_g;
+#define DECLARE_CQ_VTABLE(TYPE)                                            \
+  typedef struct concurrent_queue_##TYPE##_s concurrent_queue_##TYPE;      \
+  typedef struct concurrent_queue_vtable_##TYPE##_s {                      \
+    TYPE *(*front)(concurrent_queue_##TYPE *const self);                   \
+    TYPE *(*back)(concurrent_queue_##TYPE *const self);                    \
+    bool (*empty)(concurrent_queue_##TYPE *const self);                    \
+    size_t (*size)(concurrent_queue_##TYPE *const self);                   \
+    concurrent_queue_status_t (*push)(concurrent_queue_##TYPE *const self, \
+                                      TYPE const data);                    \
+    concurrent_queue_status_t (*pop)(concurrent_queue_##TYPE *const self,  \
+                                     TYPE *const data);                    \
+  } concurrent_queue_vtable_##TYPE;                                        \
+  extern concurrent_queue_vtable_##TYPE const                              \
+      concurrent_queue_vtable_##TYPE##_g;
 
-#define DECLARE_STRUCT_CONCURRENT_QUEUE_OF(TYPE)         \
-  typedef struct concurrent_queue_of_##TYPE##_s {        \
-    vtable_concurrent_queue_of_##TYPE##_t const *vtable; \
-    concurrent_queue_node_of_##TYPE *front;              \
-    concurrent_queue_node_of_##TYPE *back;               \
-    size_t size;                                         \
-    lock_handle_t lock;                                  \
-    cond_handle_t cond;                                  \
-  } concurrent_queue_of_##TYPE;
-
-#define INIT_CONCURRENT_QUEUE_OF(TYPE, NAME) \
-  CONCURRENT_QUEUE_OF_##TYPE##_INIT(&NAME)
-
-#define DESTROY_CONCURRENT_QUEUE_OF(TYPE, NAME) \
-  CONCURRENT_QUEUE_OF_##TYPE##_DESTROY(&NAME)
+#define DECLARE_CQ_STRUCT(TYPE)                   \
+  typedef struct concurrent_queue_##TYPE##_s {    \
+    concurrent_queue_vtable_##TYPE const *vtable; \
+    concurrent_queue_node_##TYPE *front;          \
+    concurrent_queue_node_##TYPE *back;           \
+    size_t size;                                  \
+    lock_handle_t lock;                           \
+    cond_handle_t cond;                           \
+  } concurrent_queue_##TYPE;
 
 /**
  * Initializes a concurrent queue
@@ -65,9 +59,10 @@ typedef enum concurrent_queue_status_e {
  *
  * @return an exit status
  */
-#define DECLARE_FUNCTION_INIT_CONCURRENT_QUEUE_OF(TYPE)        \
-  concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_INIT( \
-      concurrent_queue_of_##TYPE **const self);
+#define DECLARE_CQ_INIT(TYPE)               \
+  concurrent_queue_status_t CQ_INIT_##TYPE( \
+      concurrent_queue_##TYPE **const self);
+#define CQ_INIT(TYPE, NAME) CQ_INIT_##TYPE(&NAME)
 
 /**
  * Destroys a concurrent queue
@@ -77,9 +72,10 @@ typedef enum concurrent_queue_status_e {
  *
  * @return an exit status
  */
-#define DECLARE_FUNCTION_DESTROY_CONCURRENT_QUEUE_OF(TYPE)        \
-  concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_DESTROY( \
-      concurrent_queue_of_##TYPE **const self);
+#define DECLARE_CQ_DESTROY(TYPE)               \
+  concurrent_queue_status_t CQ_DESTROY_##TYPE( \
+      concurrent_queue_##TYPE **const self);
+#define CQ_DESTROY(TYPE, NAME) CQ_DESTROY_##TYPE(&NAME)
 
 /**
  * Returns pointer to the first element in the queue. This element will be the
@@ -89,9 +85,9 @@ typedef enum concurrent_queue_status_e {
  *
  * @return Pointer to the first element
  */
-#define DECLARE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE) \
-  TYPE *CONCURRENT_QUEUE_OF_##TYPE##_FRONT(              \
-      concurrent_queue_of_##TYPE *const self);
+#define DECLARE_CQ_FRONT(TYPE) \
+  TYPE *CQ_FRONT_##TYPE(concurrent_queue_##TYPE *const self);
+#define CQ_FRONT(queue) (queue)->vtable->front((queue))
 
 /**
  * Returns pointer to the last element in the queue. This is the most recently
@@ -101,9 +97,9 @@ typedef enum concurrent_queue_status_e {
  *
  * @return Pointer to the last element
  */
-#define DECLARE_FUNCTION_BACK_CONCURRENT_QUEUE_OF(TYPE) \
-  TYPE *CONCURRENT_QUEUE_OF_##TYPE##_BACK(              \
-      concurrent_queue_of_##TYPE *const self);
+#define DECLARE_CQ_BACK(TYPE) \
+  TYPE *CQ_BACK_##TYPE(concurrent_queue_##TYPE *const self);
+#define CQ_BACK(queue) (queue)->vtable->back((queue))
 
 /**
  * Checks if the queue has no elements
@@ -112,9 +108,9 @@ typedef enum concurrent_queue_status_e {
  *
  * @return true if the queue is empty, false otherwise
  */
-#define DECLARE_FUNCTION_EMPTY_CONCURRENT_QUEUE_OF(TYPE) \
-  bool CONCURRENT_QUEUE_OF_##TYPE##_EMPTY(               \
-      concurrent_queue_of_##TYPE *const self);
+#define DECLARE_CQ_EMPTY(TYPE) \
+  bool CQ_EMPTY_##TYPE(concurrent_queue_##TYPE *const self);
+#define CQ_EMPTY(queue) (queue)->vtable->empty((queue))
 
 /**
  * Returns the number of elements in the queue
@@ -123,9 +119,9 @@ typedef enum concurrent_queue_status_e {
  *
  * @return The number of elements in the queue
  */
-#define DECLARE_FUNCTION_SIZE_CONCURRENT_QUEUE_OF(TYPE) \
-  size_t CONCURRENT_QUEUE_OF_##TYPE##_SIZE(             \
-      concurrent_queue_of_##TYPE *const self);
+#define DECLARE_CQ_SIZE(TYPE) \
+  size_t CQ_SIZE_##TYPE(concurrent_queue_##TYPE *const self);
+#define CQ_SIZE(queue) (queue)->vtable->size((queue))
 
 /**
  * Pushes the given element value to the end of the queue
@@ -135,9 +131,10 @@ typedef enum concurrent_queue_status_e {
  *
  * @return an exit status
  */
-#define DECLARE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE)        \
-  concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_PUSH( \
-      concurrent_queue_of_##TYPE *const self, TYPE const data);
+#define DECLARE_CQ_PUSH(TYPE)               \
+  concurrent_queue_status_t CQ_PUSH_##TYPE( \
+      concurrent_queue_##TYPE *const self, TYPE const data);
+#define CQ_PUSH(queue, data) (queue)->vtable->push((queue), (data))
 
 /**
  * Removes an element from the front of the queue
@@ -147,21 +144,22 @@ typedef enum concurrent_queue_status_e {
  *
  * @return an exit status
  */
-#define DECLARE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE)        \
-  concurrent_queue_status_t CONCURRENT_QUEUE_OF_##TYPE##_POP( \
-      concurrent_queue_of_##TYPE *const self, TYPE *const data);
+#define DECLARE_CQ_POP(TYPE)                                                   \
+  concurrent_queue_status_t CQ_POP_##TYPE(concurrent_queue_##TYPE *const self, \
+                                          TYPE *const data);
+#define CQ_POP(queue, data) (queue)->vtable->pop((queue), (data))
 
-#define DECLARE_CONCURRENT_QUEUE_OF(TYPE)            \
-  DECLARE_STRUCT_CONCURRENT_QUEUE_NODE_OF(TYPE)      \
-  DECLARE_VTABLE_CONCURRENT_QUEUE_OF(TYPE)           \
-  DECLARE_STRUCT_CONCURRENT_QUEUE_OF(TYPE)           \
-  DECLARE_FUNCTION_INIT_CONCURRENT_QUEUE_OF(TYPE)    \
-  DECLARE_FUNCTION_DESTROY_CONCURRENT_QUEUE_OF(TYPE) \
-  DECLARE_FUNCTION_FRONT_CONCURRENT_QUEUE_OF(TYPE)   \
-  DECLARE_FUNCTION_BACK_CONCURRENT_QUEUE_OF(TYPE)    \
-  DECLARE_FUNCTION_EMPTY_CONCURRENT_QUEUE_OF(TYPE)   \
-  DECLARE_FUNCTION_SIZE_CONCURRENT_QUEUE_OF(TYPE)    \
-  DECLARE_FUNCTION_PUSH_CONCURRENT_QUEUE_OF(TYPE)    \
-  DECLARE_FUNCTION_POP_CONCURRENT_QUEUE_OF(TYPE)
+#define DECLARE_CQ(TYPE)       \
+  DECLARE_CQ_STRUCT_NODE(TYPE) \
+  DECLARE_CQ_VTABLE(TYPE)      \
+  DECLARE_CQ_STRUCT(TYPE)      \
+  DECLARE_CQ_INIT(TYPE)        \
+  DECLARE_CQ_DESTROY(TYPE)     \
+  DECLARE_CQ_FRONT(TYPE)       \
+  DECLARE_CQ_BACK(TYPE)        \
+  DECLARE_CQ_EMPTY(TYPE)       \
+  DECLARE_CQ_SIZE(TYPE)        \
+  DECLARE_CQ_PUSH(TYPE)        \
+  DECLARE_CQ_POP(TYPE)
 
 #endif  // __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_H__

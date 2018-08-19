@@ -10,7 +10,7 @@
 #include "utils/containers/lists/concurrent_list.c.inc"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 
-DEFINE_CONCURRENT_LIST_OF(neighbor_t);
+DEFINE_CL(neighbor_t);
 
 bool neighbor_cmp(neighbor_t const *const lhs, neighbor_t const *const rhs) {
   if (lhs == NULL || rhs == NULL) {
@@ -29,8 +29,7 @@ bool neighbor_add(neighbors_list_t *const neighbors,
   if (neighbors->vtable->contains(neighbors, neighbor) == true) {
     return false;
   }
-  if (neighbors->vtable->push_back(neighbors, neighbor) !=
-      CONCURRENT_LIST_SUCCESS) {
+  if (neighbors->vtable->push_back(neighbors, neighbor) != CL_SUCCESS) {
     return false;
   }
   return true;
@@ -41,8 +40,7 @@ bool neighbor_remove(neighbors_list_t *const neighbors,
   if (neighbors == NULL) {
     return false;
   }
-  if (neighbors->vtable->remove(neighbors, neighbor) !=
-      CONCURRENT_LIST_SUCCESS) {
+  if (neighbors->vtable->remove(neighbors, neighbor) != CL_SUCCESS) {
     return false;
   }
   return true;

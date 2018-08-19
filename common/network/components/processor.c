@@ -132,8 +132,7 @@ static void *processor_routine(processor_state_t *const state) {
     return NULL;
   }
   while (state->running) {
-    if (state->queue->vtable->pop(state->queue, &packet) ==
-        CONCURRENT_QUEUE_SUCCESS) {
+    if (CQ_POP(state->queue, &packet) == CQ_SUCCESS) {
       process_packet(state, &packet);
     }
   }
@@ -146,8 +145,7 @@ bool processor_init(processor_state_t *const state, node_t *const node) {
   }
   logger_helper_init(PROCESSOR_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
   state->running = false;
-  if (INIT_CONCURRENT_QUEUE_OF(iota_packet_t, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CQ_INIT(iota_packet_t, state->queue) != CQ_SUCCESS) {
     log_critical(PROCESSOR_COMPONENT_LOGGER_ID,
                  "Initializing processor queue failed\n");
     return false;
@@ -176,8 +174,7 @@ bool processor_on_next(processor_state_t *const state,
   if (state == NULL) {
     return false;
   }
-  if (state->queue->vtable->push(state->queue, packet) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CQ_PUSH(state->queue, packet) != CQ_SUCCESS) {
     log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                 "Pushing to processor queue failed\n");
     return false;
@@ -210,8 +207,7 @@ bool processor_destroy(processor_state_t *const state) {
   if (state->running) {
     return false;
   }
-  if (DESTROY_CONCURRENT_QUEUE_OF(iota_packet_t, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CQ_DESTROY(iota_packet_t, state->queue) != CQ_SUCCESS) {
     log_error(PROCESSOR_COMPONENT_LOGGER_ID,
               "Destroying processor queue failed\n");
     ret = false;

@@ -23,8 +23,7 @@ bool requester_init(requester_state_t *const state, node_t *const node) {
     return false;
   }
   logger_helper_init(REQUESTER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
-  if (INIT_CONCURRENT_LIST_OF(trit_array_p, state->list, trit_array_cmp) !=
-      CONCURRENT_LIST_SUCCESS) {
+  if (CL_INIT(trit_array_p, state->list, trit_array_cmp) != CL_SUCCESS) {
     log_critical(REQUESTER_COMPONENT_LOGGER_ID,
                  "Initializing requester list failed\n");
     return false;
@@ -37,7 +36,7 @@ size_t requester_size(requester_state_t *const state) {
   if (state == NULL) {
     return 0;
   }
-  return state->list->vtable->size(state->list);
+  return CL_SIZE(state->list);
 }
 
 bool requester_clear_request(requester_state_t *const state,
@@ -48,8 +47,7 @@ bool requester_clear_request(requester_state_t *const state,
   if (hash == NULL) {
     return false;
   }
-  if (state->list->vtable->remove(state->list, hash) !=
-      CONCURRENT_LIST_SUCCESS) {
+  if (CL_REMOVE(state->list, hash) != CL_SUCCESS) {
     return false;
   }
   return true;
@@ -59,7 +57,7 @@ bool requester_is_full(requester_state_t *const state) {
   if (state == NULL) {
     return true;
   }
-  return state->list->vtable->size(state->list) >= MAX_TX_REQ_NBR;
+  return CL_SIZE(state->list) >= MAX_TX_REQ_NBR;
 }
 
 bool request_transaction(requester_state_t *const state,
@@ -79,10 +77,9 @@ bool request_transaction(requester_state_t *const state,
   if (exists) {
     return false;
   }
-  if (state->list->vtable->contains(state->list, hash) == false) {
+  if (CL_CONTAINS(state->list, hash) == false) {
     if (requester_is_full(state) == false) {
-      if (state->list->vtable->push_back(state->list, hash) !=
-          CONCURRENT_LIST_SUCCESS) {
+      if (CL_PUSH_BACK(state->list, hash) != CL_SUCCESS) {
         log_warning(REQUESTER_COMPONENT_LOGGER_ID,
                     "Adding new transaction request to the list failed\n");
         return false;
@@ -97,7 +94,7 @@ bool request_transaction(requester_state_t *const state,
 
 bool get_transaction_to_request(requester_state_t *const state,
                                 trit_array_p *hash) {
-  concurrent_list_node_of_trit_array_p *iter = NULL;
+  concurrent_list_node_trit_array_p *iter = NULL;
   bool exists = false;
 
   if (state == NULL) {
@@ -132,8 +129,7 @@ bool requester_destroy(requester_state_t *const state) {
   if (state == NULL) {
     return false;
   }
-  if (DESTROY_CONCURRENT_LIST_OF(trit_array_p, state->list) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CL_DESTROY(trit_array_p, state->list) != CQ_SUCCESS) {
     ret = false;
   }
   logger_helper_destroy(REQUESTER_COMPONENT_LOGGER_ID);

@@ -21,7 +21,7 @@ typedef struct {
 extern "C" {
 #endif
 
-DECLARE_CONCURRENT_QUEUE_OF(hash_request_t);
+DECLARE_CQ(hash_request_t);
 
 #ifdef __cplusplus
 }
