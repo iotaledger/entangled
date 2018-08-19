@@ -5,6 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
