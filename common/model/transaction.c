@@ -451,7 +451,7 @@ iota_transaction_t transaction_deserialize(const flex_trit_t *trits) {
 // Returns the serialized data from an existing transaction
 // Returns NULL if failed
 flex_trit_t *transaction_serialize(const iota_transaction_t transaction) {
-  size_t num_bytes = flex_trits_num_for_trits(NUM_TRITS_SERIALIZED_TRANSACTION);
+  size_t num_bytes = FLEX_TRIT_SIZE_8019;
   flex_trit_t *serialized_value =
       (flex_trit_t *)malloc(sizeof(flex_trit_t) * num_bytes);
   if (!serialized_value) {

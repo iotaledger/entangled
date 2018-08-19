@@ -128,7 +128,7 @@ size_t int8_to_flex_trit_array(flex_trit_t *const to_trit_array,
                                size_t const to_len, trit_t const *const trits,
                                size_t const len, size_t const num_trits) {
   // Bounds checking
-  if (num_trits > len || num_trits > to_len) {
+  if (num_trits > len) {
     return 0;
   }
 #if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
@@ -214,6 +214,15 @@ void trit_array_set_trits(trit_array_p const trit_array,
   trit_array->trits = trits;
   trit_array->num_trits = num_trits;
   trit_array->num_bytes = trit_array_bytes_for_trits(num_trits);
+}
+
+bool trit_array_is_null(trit_array_p const trit_array) {
+  for (size_t i = 0; i < trit_array->num_bytes; i++) {
+    if (trit_array->trits[i] != FLEX_TRIT_NULL_VALUE) {
+      return false;
+    }
+  }
+  return true;
 }
 
 trit_array_p trit_array_slice(trit_array_p trit_array,

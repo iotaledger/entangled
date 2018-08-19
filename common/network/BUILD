@@ -6,11 +6,21 @@ cc_library(
 )
 
 cc_library(
+    name = "transaction_request",
+    hdrs = ["transaction_request.h"],
+    deps = [
+        ":neighbor_shared",
+        "//common/trinary:trit_array",
+    ],
+)
+
+cc_library(
     name = "iota_packet",
     srcs = ["iota_packet.c"],
     hdrs = ["iota_packet.h"],
     deps = [
         ":endpoint",
+        "//common/model:transaction",
         "//common/trinary:bytes",
     ],
 )

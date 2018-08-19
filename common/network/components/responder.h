@@ -8,10 +8,10 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_RESPONDER_H__
 #define __COMMON_NETWORK_COMPONENTS_RESPONDER_H__
 
-#include "utils/containers/queues/concurrent_queue_hash_request.h"
+#include "utils/containers/queues/concurrent_queue_transaction_request.h"
 #include "utils/handles/thread.h"
 
-typedef concurrent_queue_hash_request_t responder_queue_t;
+typedef concurrent_queue_transaction_request_t responder_queue_t;
 typedef struct node_s node_t;
 
 typedef struct responder_state_s {
@@ -27,8 +27,8 @@ extern "C" {
 
 bool responder_init(responder_state_t *const state, node_t *const node);
 bool responder_start(responder_state_t *const state);
-bool responder_on_next(responder_state_t *const state, trit_array_p const hash,
-                       neighbor_t *const neighbor);
+bool responder_on_next(responder_state_t *const state,
+                       neighbor_t *const neighbor, trit_array_p const hash);
 bool responder_stop(responder_state_t *const state);
 bool responder_destroy(responder_state_t *const state);
 

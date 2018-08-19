@@ -29,6 +29,7 @@ static bool process_transaction_bytes(processor_state_t *const state,
     return false;
   }
 
+  log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing transaction\n");
   if (true /* TODO(thibault): if !cached */) {
     trit_t tx_trits[TX_TRITS_SIZE];
     flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
@@ -51,6 +52,7 @@ static bool process_transaction_bytes(processor_state_t *const state,
     }
     if (exists == false) {
       // Store new transaction
+      log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Storing new transaction\n");
       if (iota_stor_store(&state->node->core->db_conn, *tx)) {
         neighbor->nbr_invalid_tx++;
         return false;
@@ -74,6 +76,8 @@ static bool process_request_bytes(processor_state_t *const state,
   if (state == NULL || neighbor == NULL || packet == NULL || tx == NULL) {
     return false;
   }
+
+  log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing request\n");
   bytes_to_trits(packet->content + TX_BYTES_SIZE, REQ_HASH_BYTES_SIZE,
                  request_hash_trits, NUM_TRITS_HASH);
   if ((request_hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
@@ -85,7 +89,7 @@ static bool process_request_bytes(processor_state_t *const state,
     // If requested hash is equal to transaction hash: request a random tip
     trit_array_set_null(request_hash);
   }
-  responder_on_next(&state->node->responder, request_hash, neighbor);
+  responder_on_next(&state->node->responder, neighbor, request_hash);
   return true;
 }
 

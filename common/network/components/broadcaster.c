@@ -18,8 +18,10 @@ static void *broadcaster_routine(broadcaster_state_t *const state) {
   if (state == NULL) {
     return NULL;
   }
+
   while (state->running) {
     if (CQ_POP(state->queue, &packet) == CQ_SUCCESS) {
+      log_debug(BROADCASTER_COMPONENT_LOGGER_ID, "Broadcasting transaction\n");
       iter = state->node->neighbors->front;
       while (iter) {
         neighbor_send(state->node, &iter->data, &packet);
