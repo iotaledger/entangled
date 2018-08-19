@@ -17,7 +17,7 @@
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 
 typedef struct core_s core_t;
-typedef concurrent_list_of_neighbor_t neighbors_list_t;
+typedef concurrent_list_neighbor_t neighbors_list_t;
 
 typedef struct node_s {
   bool running;

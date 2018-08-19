@@ -71,8 +71,7 @@ bool TcpConnection::handlePacket(std::size_t const length) {
   log_debug(TCP_RECEIVER_SERVICE_LOGGER_ID,
             "Packet received from tethered neighbor tcp://%s:%d\n",
             &packet_.source.host, packet_.source.port);
-  if (service_->queue->vtable->push(service_->queue, packet_) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CQ_PUSH(service_->queue, packet_) != CQ_SUCCESS) {
     return false;
   }
   return true;

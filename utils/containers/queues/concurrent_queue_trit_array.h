@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-DECLARE_CONCURRENT_QUEUE_OF(trit_array_p);
+DECLARE_CQ(trit_array_p);
 
 #ifdef __cplusplus
 }

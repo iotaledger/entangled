@@ -10,7 +10,7 @@
 
 #include "utils/containers/lists/concurrent_list_trit_array.h"
 
-typedef concurrent_list_of_trit_array_p requester_list_t;
+typedef concurrent_list_trit_array_p requester_list_t;
 typedef struct node_s node_t;
 
 typedef struct requester_state_s {

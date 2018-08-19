@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-DECLARE_CONCURRENT_QUEUE_OF(transaction_request_t);
+DECLARE_CQ(transaction_request_t);
 
 #ifdef __cplusplus
 }

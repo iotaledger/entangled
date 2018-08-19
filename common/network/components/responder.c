@@ -96,8 +96,8 @@ static void *responder_routine(responder_state_t *const state) {
     return NULL;
   }
   while (state->running) {
-    if (state->queue->vtable->pop(state->queue, &request) ==
-        CONCURRENT_QUEUE_SUCCESS) {
+    if (CQ_POP(state->queue, &request) == CQ_SUCCESS) {
+      log_debug(RESPONDER_COMPONENT_LOGGER_ID, "Responding to request\n");
       if (get_transaction_for_request(state, &request, &tx) == false) {
         continue;
       }
@@ -115,8 +115,7 @@ bool responder_init(responder_state_t *const state, node_t *const node) {
   }
   logger_helper_init(RESPONDER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
   state->running = false;
-  if (INIT_CONCURRENT_QUEUE_OF(transaction_request_t, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CQ_INIT(transaction_request_t, state->queue) != CQ_SUCCESS) {
     log_critical(RESPONDER_COMPONENT_LOGGER_ID,
                  "Initializing responder queue failed\n");
     return false;
@@ -145,9 +144,8 @@ bool responder_on_next(responder_state_t *const state,
   if (state == NULL) {
     return false;
   }
-  if (state->queue->vtable->push(state->queue,
-                                 (transaction_request_t){neighbor, hash}) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CQ_PUSH(state->queue, ((transaction_request_t){neighbor, hash})) !=
+      CQ_SUCCESS) {
     log_warning(RESPONDER_COMPONENT_LOGGER_ID,
                 "Pushing to responder queue failed\n");
     return false;
@@ -180,8 +178,7 @@ bool responder_destroy(responder_state_t *const state) {
   if (state->running) {
     return false;
   }
-  if (DESTROY_CONCURRENT_QUEUE_OF(transaction_request_t, state->queue) !=
-      CONCURRENT_QUEUE_SUCCESS) {
+  if (CQ_DESTROY(transaction_request_t, state->queue) != CQ_SUCCESS) {
     log_error(RESPONDER_COMPONENT_LOGGER_ID,
               "Destroying responder queue failed\n");
     ret = false;
