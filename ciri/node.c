@@ -6,6 +6,7 @@
  */
 
 #include "ciri/node.h"
+#include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
 #define NODE_LOGGER_ID "node"

@@ -9,6 +9,7 @@
 
 #include "ciri/core.h"
 #include "ciri/node.h"
+#include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
 #define MAIN_LOGGER_ID "main"

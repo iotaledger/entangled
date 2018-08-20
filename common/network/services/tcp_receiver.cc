@@ -8,6 +8,7 @@
 #include "common/network/services/tcp_receiver.hpp"
 #include "ciri/node.h"
 #include "common/network/neighbor.h"
+#include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
 #define TCP_RECEIVER_SERVICE_LOGGER_ID "tcp_receiver_service"

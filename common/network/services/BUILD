@@ -25,6 +25,7 @@ cc_library(
         "//common/network/components:receiver_shared",
         "//common/network/services:receiver_shared",
         "//utils:logger_helper",
+        "//utils/containers/lists:concurrent_list_neighbor",
         "@boost//:asio",
     ],
 )
@@ -39,6 +40,7 @@ cc_library(
         "//common/network/components:receiver_shared",
         "//common/network/services:receiver_shared",
         "//utils:logger_helper",
+        "//utils/containers/lists:concurrent_list_neighbor",
         "@boost//:asio",
     ],
 )

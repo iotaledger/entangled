@@ -17,6 +17,7 @@ cc_library(
         ":broadcaster_shared",
         "//ciri:node_shared",
         "//utils:logger_helper",
+        "//utils/containers/lists:concurrent_list_neighbor",
     ],
 )
 
@@ -37,6 +38,7 @@ cc_library(
         "//ciri:core_shared",
         "//ciri:node_shared",
         "//common/model:transaction",
+        "//utils/containers/lists:concurrent_list_neighbor",
     ],
 )
 

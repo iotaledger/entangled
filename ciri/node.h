@@ -8,16 +8,15 @@
 #ifndef __CIRI_NODE_H__
 #define __CIRI_NODE_H__
 
-#include "common/errors.h"
 #include "common/network/components/broadcaster.h"
 #include "common/network/components/processor.h"
 #include "common/network/components/receiver.h"
 #include "common/network/components/requester.h"
 #include "common/network/components/responder.h"
-#include "utils/containers/lists/concurrent_list_neighbor.h"
 
+// Forward declarations
 typedef struct core_s core_t;
-typedef concurrent_list_neighbor_t neighbors_list_t;
+typedef struct concurrent_list_neighbor_t_s neighbors_list_t;
 
 typedef struct node_s {
   bool running;
