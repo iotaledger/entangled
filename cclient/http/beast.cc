@@ -18,8 +18,7 @@
 #include <boost/beast/version.hpp>
 
 iota_api_result_t iota_service_query(const void* const service_opaque,
-                                     const char* const obj,
-                                     iota_response_t* const response) {
+                                     char_buffer* obj, char_buffer* response) {
   using tcp = boost::asio::ip::tcp;
   namespace http = boost::beast::http;
 
@@ -32,7 +31,7 @@ iota_api_result_t iota_service_query(const void* const service_opaque,
       reinterpret_cast<const iota_http_service_t* const>(service_opaque);
 
   iota_api_result_t result;
-  result.is_error = 0;
+  result.error = RC_OK;
 
   try {
     auto const results =
@@ -45,7 +44,7 @@ iota_api_result_t iota_service_query(const void* const service_opaque,
     req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
     req.set(http::field::content_type, service->content_type);
     req.set("X-IOTA-API-Version", service->version);
-    req.body() = obj;
+    req.body() = obj->data;
     req.content_length(req.body().size());
 
     VLOG(7) << __FUNCTION__ << " - req:\n" << req;
@@ -55,25 +54,19 @@ iota_api_result_t iota_service_query(const void* const service_opaque,
     http::response<http::string_body> res;
 
     http::read(socket, buffer, res);
+    result.error = char_buffer_allocate(response, res.body().size());
+    if (result.error != RC_OK) return result;
 
-    if (res.body().size() > response->length) {
-      LOG(ERROR) << "Insufficient response capacity, returned: "
-                 << res.body().size()
-                 << " Allocated in response: " << response->length;
-      result.is_error = 1;
-      return result;
-
-    } else {
-      std::memcpy(response->data, res.body().data(), res.body().size());
-    }
+    std::memcpy(response->data, res.body().data(), res.body().size());
 
     VLOG(7) << __FUNCTION__ << " - res:\n" << res;
 
     socket.shutdown(tcp::socket::shutdown_both, ec);
 
-    if (ec && ec != boost::system::errc::not_connected) result.is_error = 1;
+    if (ec && ec != boost::system::errc::not_connected)
+      result.error = RC_CCLIENT_HTTP;
   } catch (const std::exception& ex) {
-    result.is_error = 1;
+    result.error = RC_CCLIENT_HTTP;
   }
 
   return result;

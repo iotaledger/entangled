@@ -10,8 +10,13 @@ extern "C" {
 #include "types/types.h"
 
 typedef struct {
-  address_array transactions;
+  UT_array* hashes;
 } find_transactions_res_t;
+
+find_transactions_res_t* find_transactions_res_new();
+void find_transactions_res_free(find_transactions_res_t* res);
+char* find_transactions_res_hash_at(find_transactions_res_t* in, int index);
+int find_transactions_res_hash_num(find_transactions_res_t* in);
 
 #ifdef __cplusplus
 }

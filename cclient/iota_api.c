@@ -6,7 +6,8 @@
 
 iota_api_result_t iota_api_get_node_info(
     const iota_http_service_t* const service, get_node_info_res_t* const res) {
-  iota_api_result_t result;
+  iota_api_result_t result = {0};
+  /*
   iota_response_t response;
   char buffer[660];
   response.data = buffer;
@@ -20,6 +21,7 @@ iota_api_result_t iota_api_get_node_info(
       &service->serializer, request_data);
 
   result = iota_service_query(service, request_data, &response);
+  */
 
   // TODO - deserialize response
 
@@ -57,6 +59,19 @@ iota_api_result_t iota_api_find_transactions(
     const find_transactions_req_t* const req,
     find_transactions_res_t* const res) {
   iota_api_result_t result = {0};
+  char_buffer* res_buff = char_buffer_new();
+  char_buffer* req_buff = char_buffer_new();
+
+  service->serializer.vtable.find_transactions_serialize_request(
+      &service->serializer, req, req_buff);
+
+  result = iota_service_query(service, req_buff, res_buff);
+
+  service->serializer.vtable.find_transactions_deserialize_response(
+      &service->serializer, res_buff->data, res);
+
+  char_buffer_free(req_buff);
+  char_buffer_free(res_buff);
   return result;
 }
 
