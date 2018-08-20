@@ -6,6 +6,7 @@
  */
 
 #include "utils/containers/lists/concurrent_list_trit_array.h"
+#include "common/trinary/trit_array.h"
 #include "utils/containers/lists/concurrent_list.c.inc"
 
 DEFINE_CL(trit_array_p);

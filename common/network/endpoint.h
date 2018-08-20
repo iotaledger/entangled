@@ -12,7 +12,7 @@
 
 #include "common/network/network.h"
 
-typedef struct {
+typedef struct endpoint_s {
   char host[MAX_HOST_LENGTH];
   uint16_t port;
   protocol_type_t protocol;

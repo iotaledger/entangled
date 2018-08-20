@@ -8,17 +8,25 @@
 #ifndef __UTILS_CONTAINERS_LISTS_CONCURRENT_LIST_TRIT_ARRAY_H__
 #define __UTILS_CONTAINERS_LISTS_CONCURRENT_LIST_TRIT_ARRAY_H__
 
-#include "common/trinary/trit_array.h"
 #include "utils/containers/lists/concurrent_list.h.inc"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+// Forward declarations
+typedef struct _trit_array *trit_array_p;
+
 DECLARE_CL(trit_array_p);
 
-typedef concurrent_list_trit_array_p trit_array_list_t;
-
+/**
+ * trit_array_p comparator for list operations
+ *
+ * @param lhs Left hand side trit_array_p
+ * @param rhs Right hand side trit_array_p
+ *
+ * @return true if equal, false otherwise
+ */
 bool trit_array_cmp(trit_array_p const *const lhs,
                     trit_array_p const *const rhs);
 

@@ -35,7 +35,7 @@ void UdpReceiverService::receive() {
           auto host = senderEndpoint_.address().to_string().c_str();
           auto port = senderEndpoint_.port();
           neighbor_t* neighbor = neighbor_find_by_endpoint_values(
-              service_->state->node->neighbors, PROTOCOL_UDP, host, port);
+              service_->state->node->neighbors, host, port, PROTOCOL_UDP);
           if (neighbor == NULL) {
             log_debug(UDP_RECEIVER_SERVICE_LOGGER_ID,
                       "Packet denied from non-tethered neighbor udp://%s:%d\n",

@@ -15,7 +15,7 @@
 
 typedef struct node_s node_t;
 
-typedef struct {
+typedef struct neighbor_s {
   endpoint_t endpoint;
   unsigned int nbr_all_tx;
   unsigned int nbr_new_tx;
