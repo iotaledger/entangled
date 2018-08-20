@@ -11,10 +11,8 @@
 #include "common/trinary/trit_tryte.h"
 #include "common/trinary/tryte_long.h"
 
-#define TRITS_PER_MESSAGE 6561
 #define TRITS_PER_ESSENCE 486
 #define TRITS_PER_BUNDLE_HASH 243
-#define TRYTES_PER_MESSAGE 2187
 #define TRYTES_PER_ESSENCE 162
 #define TRYTES_PER_BUNDLE_HASH 81
 
@@ -53,7 +51,7 @@ size_t transfer_output_seed_index(transfer_output_t transfer_output) {
 
 // Set the index
 void transfer_output_set_seed_index(transfer_output_t transfer_output,
-                               size_t index) {
+                                    size_t index) {
   transfer_output->seed_index = index;
 }
 
@@ -110,8 +108,8 @@ void transfer_data_set_data(transfer_data_t transfer_data, flex_trit_t *data,
 
 // Get the number of transactions for this data transfer
 size_t transfer_data_transactions_count(transfer_data_t transfer_data) {
-  return (transfer_data_len(transfer_data) + TRITS_PER_MESSAGE - 1) /
-         TRITS_PER_MESSAGE;
+  return (transfer_data_len(transfer_data) + NUM_TRITS_SIGNATURE - 1) /
+         NUM_TRITS_SIGNATURE;
 }
 
 // Creates and returns a new transfer data
@@ -127,9 +125,7 @@ transfer_data_t transfer_data_new(void) {
 }
 
 // Free an existing transfer data
-void transfer_data_free(transfer_data_t transfer_data) {
-  free(transfer_data);
-}
+void transfer_data_free(transfer_data_t transfer_data) { free(transfer_data); }
 
 /***********************************************************************************************************
  * Transfer Value Out data structure
@@ -204,7 +200,8 @@ void transfer_value_out_free(transfer_value_out_t transfer_value_out) {
 // struct _transfer_value_in {...};
 
 // Get the address
-const flex_trit_t *transfer_value_in_address(transfer_value_in_t transfer_value_in) {
+const flex_trit_t *transfer_value_in_address(
+    transfer_value_in_t transfer_value_in) {
   return transfer_value_in->address;
 }
 
@@ -231,7 +228,8 @@ size_t transfer_value_in_len(transfer_value_in_t transfer_value_in) {
 }
 
 // Get the data
-const flex_trit_t *transfer_value_in_data(transfer_value_in_t transfer_value_in) {
+const flex_trit_t *transfer_value_in_data(
+    transfer_value_in_t transfer_value_in) {
   return transfer_value_in->data;
 }
 
@@ -508,11 +506,11 @@ void transfer_iterator_next_data_transaction(
   // Length of message in trits
   size_t data_len = transfer_data_len(trans_data);
   // Offset of message data for current index
-  size_t offset =
-      transfer_iterator->current_transfer_transaction_index * TRITS_PER_MESSAGE;
+  size_t offset = transfer_iterator->current_transfer_transaction_index *
+                  NUM_TRITS_SIGNATURE;
   // Length of the message data for the current transaction
   size_t len = data_len - offset;
-  len = len > TRITS_PER_MESSAGE ? TRITS_PER_MESSAGE : len;
+  len = len > NUM_TRITS_SIGNATURE ? NUM_TRITS_SIGNATURE : len;
   size_t flex_size = flex_trits_num_for_trits(len);
   flex_trit_t *trits = transaction_message(transfer_iterator->transaction);
   memset(trits, FLEX_TRIT_NULL_VALUE, flex_size);
@@ -521,9 +519,9 @@ void transfer_iterator_next_data_transaction(
 
 void transfer_iterator_next_output_transaction(
     transfer_iterator_t transfer_iterator, transfer_t transfer) {
+  transfer_value_out_t value_out = transfer_value_out(transfer);
+  transfer_output_t output = transfer_value_out_output(value_out);
   if (transfer_iterator->current_transfer_transaction_index == 0) {
-    transfer_value_out_t value_out = transfer_value_out(transfer);
-    transfer_output_t output = transfer_value_out_output(value_out);
     if (transfer_iterator->transaction_signature) {
       free(transfer_iterator->transaction_signature);
     }
@@ -536,11 +534,13 @@ void transfer_iterator_next_output_transaction(
     transaction_set_value(transfer_iterator->transaction,
                           transfer_value(transfer));
   }
-  transaction_set_signature(
-      transfer_iterator->transaction,
-      transfer_iterator->transaction_signature +
-          (transfer_iterator->current_transfer_transaction_index *
-           TRYTES_PER_MESSAGE));
+  flex_trit_array_slice(
+      transaction_signature(transfer_iterator->transaction),
+      NUM_TRITS_SIGNATURE, transfer_iterator->transaction_signature,
+      NUM_TRITS_SIGNATURE * transfer_output_security(output),
+      NUM_TRITS_SIGNATURE *
+          transfer_iterator->current_transfer_transaction_index,
+      NUM_TRITS_SIGNATURE);
 }
 
 void transfer_iterator_next_input_transaction(

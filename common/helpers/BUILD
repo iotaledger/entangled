@@ -31,48 +31,6 @@ cc_library(
 )
 
 cc_library(
-    name = "sign_3",
-    srcs = ["sign.c"],
-    hdrs = ["sign.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":pow",
-        "//common/kerl",
-        "//common/sign/v1:iss_kerl",
-        "//common/trinary:trit_tryte",
-        "//common/trinary:trit_array_3",
-    ],
-)
-
-cc_library(
-    name = "sign_4",
-    srcs = ["sign.c"],
-    hdrs = ["sign.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":pow",
-        "//common/kerl",
-        "//common/sign/v1:iss_kerl",
-        "//common/trinary:trit_tryte",
-        "//common/trinary:trit_array_4",
-    ],
-)
-
-cc_library(
-    name = "sign_5",
-    srcs = ["sign.c"],
-    hdrs = ["sign.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":pow",
-        "//common/kerl",
-        "//common/sign/v1:iss_kerl",
-        "//common/trinary:trit_tryte",
-        "//common/trinary:trit_array_5",
-    ],
-)
-
-cc_library(
     name = "pow",
     srcs = ["pow.c"],
     hdrs = ["pow.h"],
@@ -118,48 +76,6 @@ cc_test(
     tags = ["exclusive"],
     deps = [
         ":helpers",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "tests_sign_3",
-    timeout = "short",
-    srcs = glob([
-        "tests/**/test_sign.cpp",
-        "**/*.hpp",
-    ]),
-    tags = ["exclusive"],
-    deps = [
-        ":sign_3",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "tests_sign_4",
-    timeout = "short",
-    srcs = glob([
-        "tests/**/test_sign.cpp",
-        "**/*.hpp",
-    ]),
-    tags = ["exclusive"],
-    deps = [
-        ":sign_4",
-        "@com_google_googletest//:gtest_main",
-    ],
-)
-
-cc_test(
-    name = "tests_sign_5",
-    timeout = "short",
-    srcs = glob([
-        "tests/**/test_sign.cpp",
-        "**/*.hpp",
-    ]),
-    tags = ["exclusive"],
-    deps = [
-        ":sign_5",
         "@com_google_googletest//:gtest_main",
     ],
 )
