@@ -15,6 +15,41 @@
 #include "common/storage/tests/helpers/defs.h"
 #include "utils/files.h"
 
+#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+const flex_trit_t HASH[] = {
+    1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+    0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+    0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+    1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+    0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+    0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+    1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+    0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+    0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+    1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+};
+#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+const flex_trit_t HASH[] = {
+    65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+    65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+    65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+    65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+    65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+};
+#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
+const flex_trit_t HASH[] = {
+    65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4,
+    65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4,
+    65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 1,
+};
+#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+const flex_trit_t HASH[] = {
+    28, 84, 9,  28, 84, 9,  28, 84, 9,  28, 84, 9,  28, 84, 9,  28, 84,
+    9,  28, 84, 9,  28, 84, 9,  28, 84, 9,  28, 84, 9,  28, 84, 9,  28,
+    84, 9,  28, 84, 9,  28, 84, 9,  28, 84, 9,  28, 84, 9,  1,
+};
+#endif
+
 static connection_t conn;
 
 void test_init_connection(void) {
@@ -31,10 +66,8 @@ void test_init_connection(void) {
 void test_initialized_db_empty(void) {
   bool exist = false;
 
-  trit_array_p col_value = trit_array_new(FLEX_TRIT_SIZE_243);
-  col_value->trits = (flex_trit_t *)
-      "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-      "AAAAAAAAA";
+  trit_array_p col_value = trit_array_new(NUM_TRITS_HASH);
+  col_value->trits = (flex_trit_t *)HASH;
   TEST_ASSERT(iota_stor_exist(&conn, COL_HASH, col_value, &exist) == RC_OK);
   TEST_ASSERT(exist == false);
 }
@@ -111,7 +144,7 @@ void test_stored_load_hashes_by_address(void) {
   memcpy(key->trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
   TEST_ASSERT(iota_stor_load_hashes(&conn, COL_ADDRESS, key, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-  TEST_ASSERT_EQUAL_MEMORY(TEST_TRANSACTION.hash, pack.hashes[0]->trits, 81);
+  TEST_ASSERT_EQUAL_MEMORY(TEST_TRANSACTION.hash, pack.hashes[0]->trits, FLEX_TRIT_SIZE_243);
 
   for (int i = 0; i < pack.hashes_capacity; ++i) {
     trit_array_free(pack.hashes[i]);
