@@ -18,9 +18,40 @@ typedef struct core_s {
   connection_config_t db_conf;
 } core_t;
 
+/**
+ * Initializes a core
+ *
+ * @param core The core
+ *
+ * @return a status code
+ */
 retcode_t core_init(core_t *const core);
+
+/**
+ * Starts a core
+ *
+ * @param core The core
+ *
+ * @return a status code
+ */
 retcode_t core_start(core_t *const core);
+
+/**
+ * Stops a core
+ *
+ * @param core The core
+ *
+ * @return a status code
+ */
 retcode_t core_stop(core_t *const core);
+
+/**
+ * Destroys a core
+ *
+ * @param core The core
+ *
+ * @return a status code
+ */
 retcode_t core_destroy(core_t *const core);
 
 #endif  // __CIRI_CORE_H__
