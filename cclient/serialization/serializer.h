@@ -15,13 +15,13 @@ typedef struct serializer_base serializer_t;
 
 typedef struct {
   // find_transactions_request
-  void (*find_transactions_serialize_request)(
-      const serializer_t* const, const find_transactions_req_t* const obj,
-      char* out);
+  retcode_t (*find_transactions_serialize_request)(
+      const serializer_t* const s, const find_transactions_req_t* const obj,
+      char_buffer* out);
 
-  void (*find_transactions_deserialize_response)(const serializer_t* const,
-                                                 const char* const obj,
-                                                 find_transactions_res_t* out);
+  retcode_t (*find_transactions_deserialize_response)(
+      const serializer_t* const s, const char* const obj,
+      find_transactions_res_t* out);
 
   size_t (*find_transactions_serialize_request_get_size)(
       const serializer_t* const,

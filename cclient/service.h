@@ -9,6 +9,7 @@ extern "C" {
 
 #include <stdlib.h>
 
+#include "common/errors.h"
 #include "serialization/serializer.h"
 
 typedef struct {
@@ -26,8 +27,8 @@ void init_iota_http_service(iota_http_service_t*, const char* const host,
                             size_t port);
 
 typedef struct {
-  size_t is_error;
   size_t duration;
+  retcode_t is_error;
 } iota_api_result_t;
 
 typedef struct {
