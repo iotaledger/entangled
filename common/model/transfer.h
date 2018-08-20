@@ -40,7 +40,8 @@ void transfer_output_set_security(transfer_output_t transfer_output,
 // Get the index
 size_t transfer_output_seed_index(transfer_output_t transfer_output);
 // Set the index
-void transfer_output_set_seed_index(transfer_output_t transfer_output, size_t index);
+void transfer_output_set_seed_index(transfer_output_t transfer_output,
+                                    size_t index);
 // Creates and returns a new transfer input
 transfer_output_t transfer_output_new(void);
 // Free an existing transfer input
@@ -115,7 +116,8 @@ struct _transfer_value_in {
 };
 
 // Get the address
-const flex_trit_t *transfer_value_in_address(transfer_value_in_t transfer_value_in);
+const flex_trit_t *transfer_value_in_address(
+    transfer_value_in_t transfer_value_in);
 // Set the address (assign)
 void transfer_value_in_set_address(transfer_value_in_t transfer_value_in,
                                    const flex_trit_t *address);
@@ -127,7 +129,8 @@ void transfer_value_in_set_value(transfer_value_in_t transfer_value_in,
 // Get the length of the data
 size_t transfer_value_in_len(transfer_value_in_t transfer_value_in);
 // Get the data
-const flex_trit_t *transfer_value_in_data(transfer_value_in_t transfer_value_in);
+const flex_trit_t *transfer_value_in_data(
+    transfer_value_in_t transfer_value_in);
 // Set the data (assign)
 void transfer_value_in_set_data(transfer_value_in_t transfer_value_in,
                                 flex_trit_t *data, size_t len);
