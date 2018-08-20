@@ -1,12 +1,12 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "concurrent_queue",
-    srcs = ["concurrent_queue.c.inc"],
-    hdrs = ["concurrent_queue.h.inc"],
+    name = "concurrent_queue_packet",
+    srcs = ["concurrent_queue_packet.c"],
+    hdrs = ["concurrent_queue_packet.h"],
     deps = [
-        "//utils/handles:cond",
-        "//utils/handles:lock",
+        ":concurrent_queue",
+        "//common/network:iota_packet",
     ],
 )
 
@@ -31,11 +31,11 @@ cc_library(
 )
 
 cc_library(
-    name = "concurrent_queue_packet",
-    srcs = ["concurrent_queue_packet.c"],
-    hdrs = ["concurrent_queue_packet.h"],
+    name = "concurrent_queue",
+    srcs = ["concurrent_queue.c.inc"],
+    hdrs = ["concurrent_queue.h.inc"],
     deps = [
-        ":concurrent_queue",
-        "//common/network:iota_packet",
+        "//utils/handles:cond",
+        "//utils/handles:lock",
     ],
 )
