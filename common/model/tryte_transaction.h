@@ -26,15 +26,15 @@ class TryteTransaction {
   ~TryteTransaction(void);
 
   std::string signature(void);
-  // Set the transaction signature (copy argument)
+  // Set the transaction signature (assign)
   void setSignature(const std::string& signature);
   // Get the transaction message
   std::string message(void);
-  // Set the transaction message (copy argument)
+  // Set the transaction message (assign)
   void setMessage(const std::string& message);
   // Get the transaction address
   std::string address(void);
-  // Set the transaction address (copy argument)
+  // Set the transaction address (assign)
   void setAddress(const std::string& address);
   // Get the transaction value
   int64_t value(void);
@@ -58,19 +58,19 @@ class TryteTransaction {
   void setLastIndex(int64_t last_index);
   // Get the transaction bundle
   std::string bundle(void);
-  // Set the transaction bundle (copy argument)
+  // Set the transaction bundle (assign)
   void setBundle(const std::string& bundle);
   // Get the transaction trunk
   std::string trunk(void);
-  // Set the transaction trunk (copy argument)
+  // Set the transaction trunk (assign)
   void setTrunk(const std::string& trunk);
   // Get the transaction branch
   std::string branch(void);
-  // Set the transaction branch (copy argument)
+  // Set the transaction branch (assign)
   void setBranch(const std::string& branch);
   // Get the transaction tag
   std::string tag(void);
-  // Set the transaction tag (copy argument)
+  // Set the transaction tag (assign)
   void setTag(const std::string& tag);
   // Get the transaction attachement timestamp
   int64_t attachmentTimestamp(void);
@@ -86,11 +86,11 @@ class TryteTransaction {
   void setAttachmentTimestampUpper(int64_t timestamp);
   // Get the transaction nonce
   std::string nonce(void);
-  // Set the transaction nonce (copy argument)
+  // Set the transaction nonce (assign)
   void setNonce(const std::string& nonce);
   // Get the transaction hash
   std::string hash(void);
-  // Set the transaction hash (copy argument)
+  // Set the transaction hash (assign)
   void setHash(const std::string& hash);
 
   std::vector<flex_trit_t> serialize(void);

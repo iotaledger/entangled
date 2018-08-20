@@ -31,8 +31,7 @@ FlexTritArray FlexTritArray::createFromTrytes(
 
 FlexTritArray::FlexTritArray(size_t num_trits) : num_trits_(num_trits) {
   size_t flex_len = FlexTritArray::numBytesForTrits(num_trits);
-  flex_trits_.resize(flex_len, 0);
-  num_trits_ = num_trits;
+  flex_trits_.resize(flex_len, FLEX_TRIT_NULL_VALUE);
 }
 
 FlexTritArray FlexTritArray::slice(size_t start, size_t num_trits) {

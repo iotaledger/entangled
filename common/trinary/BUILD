@@ -155,8 +155,8 @@ cc_library(
     defines = ["TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE"],
     deps = [
         ":trit_byte",
-        ":trit_tryte",
         ":trits",
+        ":trit_tryte",
         "//common:stdint",
     ],
 )
