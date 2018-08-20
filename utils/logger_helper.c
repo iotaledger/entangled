@@ -5,11 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdio.h>
-#include <time.h>
-
-#include "utils/handles/lock.h"
 #include "utils/logger_helper.h"
+#include "utils/handles/lock.h"
 
 static lock_handle_t lock;
 

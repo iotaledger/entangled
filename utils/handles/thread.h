@@ -39,6 +39,7 @@ static inline int thread_handle_join(thread_handle_t thread, void **status) {
 }
 
 #elif defined(_WIN32)
+
 typedef HANDLE thread_handle_t;
 
 static inline int thread_handle_create(thread_handle_t *const thread,

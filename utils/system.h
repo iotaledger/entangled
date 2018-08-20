@@ -8,12 +8,14 @@
 #ifndef __UTILS_SYSTEM_H
 #define __UTILS_SYSTEM_H
 
+#include <stdlib.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * Returns the number of available processor cores
+ * @return The number of available processor cores
  **/
 size_t system_cpu_available();
 
