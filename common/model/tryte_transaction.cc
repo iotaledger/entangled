@@ -208,32 +208,32 @@ void TryteTransaction::setTag(const std::string &trytes) {
   transaction_set_tag(iota_transaction, trits);
 }
 
-// Get the transaction attachement timestamp
+// Get the transaction attachment timestamp
 int64_t TryteTransaction::attachmentTimestamp(void) {
   return transaction_attachment_timestamp(iota_transaction);
 }
 
-// Set the transaction attachement timestamp
+// Set the transaction attachment timestamp
 void TryteTransaction::setAttachmentTimestamp(int64_t timestamp) {
   transaction_set_attachment_timestamp(iota_transaction, timestamp);
 }
 
-// Get the transaction attachement timestamp lower
+// Get the transaction attachment timestamp lower
 int64_t TryteTransaction::attachmentTimestampLower(void) {
   return transaction_attachment_timestamp_lower(iota_transaction);
 }
 
-// Set the transaction attachement timestamp lower
+// Set the transaction attachment timestamp lower
 void TryteTransaction::setAttachmentTimestampLower(int64_t timestamp) {
   transaction_set_attachment_timestamp_lower(iota_transaction, timestamp);
 }
 
-// Get the transaction attachement timestamp upper
+// Get the transaction attachment timestamp upper
 int64_t TryteTransaction::attachmentTimestampUpper(void) {
   return transaction_attachment_timestamp_upper(iota_transaction);
 }
 
-// Set the transaction attachement timestamp upper
+// Set the transaction attachment timestamp upper
 void TryteTransaction::setAttachmentTimestampUpper(int64_t timestamp) {
   transaction_set_attachment_timestamp_upper(iota_transaction, timestamp);
 }
