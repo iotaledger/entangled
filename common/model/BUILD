@@ -19,3 +19,16 @@ cc_library(
         "//common/trinary:trit_long",
     ],
 )
+
+cc_library(
+    name="transfer",
+    srcs=["transfer.c"],
+    hdrs=["transfer.h"],
+    deps=[
+        "//common/trinary:tryte_long",
+        "//common/trinary:trit_tryte",
+        "//common/kerl:kerl",
+        "//common/helpers:sign",
+        "//common/model:transaction"
+    ], )
+
