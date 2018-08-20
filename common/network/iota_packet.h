@@ -17,7 +17,7 @@
 #define TX_TRITS_SIZE 8019
 #define REQ_HASH_BYTES_SIZE 46
 
-typedef struct {
+typedef struct iota_packet_s {
   byte_t content[PACKET_SIZE];
   size_t length;
   endpoint_t source;

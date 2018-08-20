@@ -11,7 +11,7 @@
 #include "common/network/neighbor.h"
 #include "common/trinary/trit_array.h"
 
-typedef struct {
+typedef struct transaction_request_s {
   neighbor_t *neighbor;
   trit_array_p hash;
 } transaction_request_t;
