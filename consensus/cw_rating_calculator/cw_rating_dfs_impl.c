@@ -40,6 +40,7 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
   hash_entry_t *tmpDirectApprover = NULL;
   size_t subTangleSize;
   size_t maxSubTangleSize;
+  size_t bitsetSize;
 
   if (!entry_point) {
     return RC_OK;
@@ -64,18 +65,19 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
     return RC_OK;
   }
 
-  int64_t visitedTxsBitset[subTangleSize / (sizeof(int64_t) * 8) + 1];
+  bitsetSize = maxSubTangleSize / (sizeof(int64_t) * 8) + 1;
+  int64_t visitedTxsBitset[bitsetSize];
 
   HASH_ITER(hh, out->tx_to_approvers, currHashToApproversEntry,
             tmpHashToApproversEntry) {
     if (currHashToApproversEntry->idx == 0) {
       continue;
     }
-    // Each iteration is a DFS, so we must clean "visitedTxsBitset" because no
-    // tx has been visited yet
-    memset(visitedTxsBitset, maxSubTangleSize / (sizeof(int64_t) * 8), 0);
-    res = cw_rating_dfs_do_dfs_light(out->tx_to_approvers,
-                                     currHashToApproversEntry->hash,
+
+    memset(visitedTxsBitset, 0, bitsetSize * sizeof(int64_t));
+    flex_trit_t currHash[FLEX_TRIT_SIZE_243];
+    memcpy(currHash, currHashToApproversEntry->hash, FLEX_TRIT_SIZE_243);
+    res = cw_rating_dfs_do_dfs_light(out->tx_to_approvers, currHash,
                                      visitedTxsBitset, &subTangleSize);
 
     if (res != RC_OK) {
@@ -152,8 +154,6 @@ retcode_t cw_rating_dfs_do_dfs_from_db(
       currTx->idx = (*subTangleSize)++;
       memcpy(currTx->hash, currTxHash, FLEX_TRIT_SIZE_243);
 
-      HASH_ADD(hh, *txToApprovers, hash, FLEX_TRIT_SIZE_243, currTx);
-
       while (pack.num_loaded > 0) {
         currApproverIndex = --pack.num_loaded;
         // Add each found approver to the currently traversed tx
@@ -171,6 +171,8 @@ retcode_t cw_rating_dfs_do_dfs_from_db(
           utarray_push_back(stack, pack.hashes[currApproverIndex]->trits);
         }
       }
+
+      HASH_ADD(hh, *txToApprovers, hash, FLEX_TRIT_SIZE_243, currTx);
     }
   }
 
@@ -184,47 +186,52 @@ retcode_t cw_rating_dfs_do_dfs_light(
     hash_to_direct_approvers_map_t txToApprovers, flex_trit_t *ep,
     int64_t *visitedBitSet, size_t *subTangleSize) {
   *subTangleSize = 1;
-  flex_trit_t *curr_hash_prefix = NULL;
+  flex_trit_t *currHash = NULL;
   hash_to_direct_approvers_entry_t *visitedApproversEntry = NULL;
   size_t numApprover;
+  hash_entry_t *currDirectApprover = NULL;
+  hash_entry_t *tmpDirectApprover = NULL;
 
-  int txBitSetIntegerIndex;
-  int txBitSetWithinIntegerRelativeIndex;
+  uint64_t txBitsetIntegerIndex;
+  uint64_t txBitsetWithinIntegerRelativeIndex;
 
   UT_array *stack = NULL;
   utarray_new(stack, &cw_stack_trit_array_hash_icd);
   utarray_push_back(stack, ep);
 
   while (utarray_len(stack)) {
-    curr_hash_prefix = utarray_back(stack);
+    currHash = utarray_back(stack);
     utarray_pop_back(stack);
 
-    HASH_FIND(hh, txToApprovers, curr_hash_prefix, FLEX_TRIT_SIZE_243,
+    HASH_FIND(hh, txToApprovers, currHash, FLEX_TRIT_SIZE_243,
               visitedApproversEntry);
 
-    if (!visitedApproversEntry || visitedApproversEntry->idx == 0) {
+    if (!visitedApproversEntry) {
       continue;
     }
 
-    txBitSetIntegerIndex =
+    txBitsetIntegerIndex =
         visitedApproversEntry->idx / (sizeof(*visitedBitSet) * 8);
-    txBitSetWithinIntegerRelativeIndex =
+    txBitsetWithinIntegerRelativeIndex =
         visitedApproversEntry->idx % (sizeof(*visitedBitSet) * 8);
 
-    if (visitedBitSet[txBitSetIntegerIndex] &
-        (1 << txBitSetWithinIntegerRelativeIndex)) {
+    if (visitedBitSet[txBitsetIntegerIndex] &
+        (1 << txBitsetWithinIntegerRelativeIndex)) {
       continue;
     }
-    ++(subTangleSize);
+    ++(*subTangleSize);
 
-    visitedBitSet[txBitSetIntegerIndex] &= (1 << visitedApproversEntry->idx);
+    visitedBitSet[txBitsetIntegerIndex] |= (1 << visitedApproversEntry->idx);
 
-    size_t numApprovers = HASH_COUNT(visitedApproversEntry->approvers);
-    for (numApprover = 0; numApprover < numApprovers; ++numApprover) {
-      HASH_FIND(hh, txToApprovers, visitedApproversEntry->hash,
-                FLEX_TRIT_SIZE_243, visitedApproversEntry);
+    HASH_ITER(hh, visitedApproversEntry->approvers, currDirectApprover,
+              tmpDirectApprover) {
+      HASH_FIND(hh, txToApprovers, currDirectApprover->hash, FLEX_TRIT_SIZE_243,
+                visitedApproversEntry);
+      if (!visitedApproversEntry) {
+        continue;
+      }
 
-      if (visitedBitSet[txBitSetIntegerIndex] &
+      if (visitedBitSet[txBitsetIntegerIndex] &
           (1 << visitedApproversEntry->idx) == 0) {
         utarray_push_back(stack, visitedApproversEntry->hash);
       }
