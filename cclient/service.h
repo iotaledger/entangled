@@ -28,7 +28,7 @@ void init_iota_http_service(iota_http_service_t*, const char* const host,
 
 typedef struct {
   size_t duration;
-  retcode_t is_error;
+  retcode_t error;
 } iota_api_result_t;
 
 typedef struct {

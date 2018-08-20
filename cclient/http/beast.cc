@@ -31,7 +31,7 @@ iota_api_result_t iota_service_query(const void* const service_opaque,
       reinterpret_cast<const iota_http_service_t* const>(service_opaque);
 
   iota_api_result_t result;
-  result.is_error = RC_OK;
+  result.error = RC_OK;
 
   try {
     auto const results =
@@ -54,8 +54,8 @@ iota_api_result_t iota_service_query(const void* const service_opaque,
     http::response<http::string_body> res;
 
     http::read(socket, buffer, res);
-    result.is_error = char_buffer_allocate(response, res.body().size());
-    if (result.is_error != RC_OK) return result;
+    result.error = char_buffer_allocate(response, res.body().size());
+    if (result.error != RC_OK) return result;
 
     std::memcpy(response->data, res.body().data(), res.body().size());
 
@@ -64,9 +64,9 @@ iota_api_result_t iota_service_query(const void* const service_opaque,
     socket.shutdown(tcp::socket::shutdown_both, ec);
 
     if (ec && ec != boost::system::errc::not_connected)
-      result.is_error = RC_CCLIENT_HTTP;
+      result.error = RC_CCLIENT_HTTP;
   } catch (const std::exception& ex) {
-    result.is_error = RC_CCLIENT_HTTP;
+    result.error = RC_CCLIENT_HTTP;
   }
 
   return result;

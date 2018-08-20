@@ -25,62 +25,48 @@ retcode_t json_array_to_utarray(cJSON* obj, const char* obj_name,
   return RC_OK;
 }
 
+retcode_t utarray_to_json_array(UT_array* ut, cJSON* json_root,
+                                const char* obj_name) {
+  if (utarray_len(ut) > 0) {
+    cJSON* array_obj = cJSON_CreateArray();
+    if (array_obj == NULL) return RC_CCLIENT_JSON_CREATE;
+
+    cJSON_AddItemToObject(json_root, obj_name, array_obj);
+    char** p = NULL;
+    while ((p = (char**)utarray_next(ut, p))) {
+      cJSON_AddItemToArray(array_obj, cJSON_CreateString(*p));
+    }
+  }
+  return RC_OK;
+}
+
 retcode_t json_find_transactions_serialize_request(
     const serializer_t* const s, const find_transactions_req_t* const obj,
     char_buffer* out) {
+  retcode_t ret = RC_OK;
+  const char* json_text = NULL;
+  size_t len = 0;
   cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) return RC_CCLIENT_JSON_CREATE;
 
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("findTransactions"));
 
-  if (utarray_len(obj->addresses) > 0) {
-    cJSON* addrs = cJSON_CreateArray();
-    if (addrs == NULL) goto err;
+  ret = utarray_to_json_array(obj->addresses, json_root, "addresses");
+  if (ret != RC_OK) goto err;
 
-    cJSON_AddItemToObject(json_root, "addresses", addrs);
-    char** p = NULL;
-    while ((p = (char**)utarray_next(obj->addresses, p))) {
-      cJSON_AddItemToArray(addrs, cJSON_CreateString(*p));
-    }
-  }
+  ret = utarray_to_json_array(obj->approvees, json_root, "approvees");
+  if (ret != RC_OK) goto err;
 
-  if (utarray_len(obj->approvees) > 0) {
-    cJSON* approvees = cJSON_CreateArray();
-    if (approvees == NULL) goto err;
+  ret = utarray_to_json_array(obj->bundles, json_root, "bundles");
+  if (ret != RC_OK) goto err;
 
-    cJSON_AddItemToObject(json_root, "approvees", approvees);
-    char** p = NULL;
-    while ((p = (char**)utarray_next(obj->approvees, p))) {
-      cJSON_AddItemToArray(approvees, cJSON_CreateString(*p));
-    }
-  }
+  ret = utarray_to_json_array(obj->tags, json_root, "tags");
+  if (ret != RC_OK) goto err;
 
-  if (utarray_len(obj->bundles) > 0) {
-    cJSON* bundles = cJSON_CreateArray();
-    if (bundles == NULL) goto err;
-
-    cJSON_AddItemToObject(json_root, "bundles", bundles);
-    char** p = NULL;
-    while ((p = (char**)utarray_next(obj->bundles, p))) {
-      cJSON_AddItemToArray(bundles, cJSON_CreateString(*p));
-    }
-  }
-
-  if (utarray_len(obj->tags) > 0) {
-    cJSON* tags = cJSON_CreateArray();
-    if (tags == NULL) goto err;
-
-    cJSON_AddItemToObject(json_root, "tags", tags);
-    char** p = NULL;
-    while ((p = (char**)utarray_next(obj->tags, p))) {
-      cJSON_AddItemToArray(tags, cJSON_CreateString(*p));
-    }
-  }
-
-  const char* json_text = cJSON_PrintUnformatted(json_root);
-  size_t len = strlen(json_text);
-  retcode_t ret = char_buffer_allocate(out, len);
+  json_text = cJSON_PrintUnformatted(json_root);
+  len = strlen(json_text);
+  ret = char_buffer_allocate(out, len);
   if (ret == RC_OK) {
     strncpy(out->data, json_text, len);
   }
@@ -91,7 +77,7 @@ retcode_t json_find_transactions_serialize_request(
 
 err:
   cJSON_Delete(json_root);
-  return RC_CCLIENT_JSON_CREATE;
+  return ret;
 }
 
 retcode_t json_find_transactions_deserialize_response(
