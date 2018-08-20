@@ -136,7 +136,6 @@ void test_stored_load_hashes_of_approvers(void) {
   for (int i = 0; i < pack.hashes_capacity; ++i) {
     trit_array_free(pack.hashes[i]);
   }
-  // TODO - complete the test with 2 transaction's that one approves the other
 }
 
 int main(void) {

@@ -1,0 +1,252 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://gitlab.com/iota-foundation/software/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+#include <stdlib.h>
+#include <string.h>
+#include <unity/unity.h>
+
+#include "common/model/transaction.h"
+#include "common/storage/connection.h"
+#include "common/storage/sql/defs.h"
+#include "common/storage/storage.h"
+#include "common/storage/tests/helpers/defs.h"
+#include "consensus/cw_rating_calculator/cw_rating_calculator.h"
+#include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
+#include "utarray.h"
+#include "utils/files.h"
+
+static cw_rating_calculator_t calc;
+static tangle_t tangle;
+
+// gdb --args ./test_cw_ratings_dfs 1
+static bool debugMode = false;
+
+static char *testDbPath = "consensus/cw_rating_calculator/tests/test.db";
+static char *ciriDbPath = "consensus/cw_rating_calculator/tests/ciri.db";
+
+enum TestTangleTopology {
+  OnlyDirectApprovers,
+  Blockchain,
+};
+typedef enum TestTangleTopology TestTangleTopology;
+
+void test_init_cw(void) {
+  connection_config_t config;
+
+  config.db_path = testDbPath;
+  config.index_address = true;
+  config.index_approvee = true;
+  config.index_bundle = true;
+  config.index_tag = true;
+  config.index_hash = true;
+  TEST_ASSERT(iota_tangle_init(&tangle, &config) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, NaiveDFS));
+}
+
+void test_setup() {
+  TEST_ASSERT(copy_file(testDbPath, ciriDbPath) == RC_OK);
+  RUN_TEST(test_init_cw);
+}
+void test_cleanup() {
+  TEST_ASSERT(iota_tangle_destroy(&tangle) == RC_OK);
+  TEST_ASSERT(remove_file(testDbPath) == RC_OK);
+}
+
+void test_cw_gen_topology(TestTangleTopology topology) {
+  hash_to_direct_approvers_entry_t *currTxApproverEntry = NULL;
+  hash_to_direct_approvers_entry_t *tmpTxApproverEntry = NULL;
+  hash_entry_t *currDirectApprover = NULL;
+  hash_entry_t *tmpDirectApprover = NULL;
+  cw_entry_t *currCwEntry = NULL;
+  cw_entry_t *tmpCwEntry = NULL;
+
+  size_t numDirectApprovers = 200;
+
+  test_setup();
+
+  struct _iota_transaction txs[numDirectApprovers];
+  txs[0] = TEST_TRANSACTION;
+  txs[0].hash[0] += 1;
+  memcpy(txs[0].branch, TEST_TRANSACTION.hash, FLEX_TRIT_SIZE_243);
+  for (int i = 1; i < numDirectApprovers; i++) {
+    txs[i] = TEST_TRANSACTION;
+    // Different hash for each tx,
+    // we don't worry about it not being valid encoding
+    txs[i].hash[i / 256] += (i + 1);
+    if (topology == OnlyDirectApprovers) {
+      memcpy(txs[i].branch, txs[i - 1].branch, FLEX_TRIT_SIZE_243);
+    } else if (topology == Blockchain) {
+      memcpy(txs[i].branch, txs[i - 1].hash, FLEX_TRIT_SIZE_243);
+    }
+  }
+
+  for (int i = 0; i < numDirectApprovers; i++) {
+    TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
+  }
+
+  trit_array_p ep = trit_array_new(FLEX_TRIT_SIZE_243);
+  trit_array_set_trits(ep, TEST_TRANSACTION.hash, NUM_TRITS_HASH);
+  iota_hashes_pack pack;
+  hash_pack_init(&pack, numDirectApprovers);
+
+  cw_calc_result out;
+
+  trit_array_p currHash = trit_array_new(FLEX_TRIT_SIZE_243);
+  for (int i = 0; i < numDirectApprovers; i++) {
+    trit_array_set_trits(currHash, txs[i].hash, NUM_TRITS_HASH);
+    TEST_ASSERT(iota_tangle_hashes_load(&tangle, COL_HASH, currHash, &pack) ==
+                RC_OK);
+    TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
+  }
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, NaiveDFS));
+  TEST_ASSERT(cw_rating_calculate_dfs(&calc, ep, &out) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers),
+                        numDirectApprovers + 1);
+  TEST_ASSERT_EQUAL_INT(out.cw_ratings->cw, numDirectApprovers + 1);
+
+  test_cleanup();
+}
+
+void test_single_tx_tangle(void) {
+  hash_to_direct_approvers_entry_t *currTxApproverEntry = NULL;
+  hash_to_direct_approvers_entry_t *tmpTxApproverEntry = NULL;
+  hash_entry_t *currDirectApprover = NULL;
+  hash_entry_t *tmpDirectApprover = NULL;
+  cw_entry_t *currCwEntry = NULL;
+  cw_entry_t *tmpCwEntry = NULL;
+
+  test_setup();
+
+  trit_array_p ep = trit_array_new(FLEX_TRIT_SIZE_243);
+  trit_array_set_trits(ep, TEST_TRANSACTION.hash, NUM_TRITS_HASH);
+  iota_hashes_pack pack;
+  hash_pack_init(&pack, 5);
+
+  cw_calc_result out;
+  bool exist = false;
+  TEST_ASSERT(iota_tangle_transaction_store(&tangle, &TEST_TRANSACTION) ==
+              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
+              RC_OK);
+  TEST_ASSERT(exist == true);
+  TEST_ASSERT(iota_tangle_hashes_load(&tangle, COL_HASH, ep, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
+  TEST_ASSERT_EQUAL_MEMORY(pack.hashes[0]->trits, ep->trits,
+                           FLEX_TRIT_SIZE_243);
+
+  TEST_ASSERT(cw_rating_calculate_dfs(&calc, ep, &out) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), 1);
+
+  TEST_ASSERT_EQUAL_INT(out.cw_ratings->cw, 1);
+
+  int64_t singleElementBitset = 0;
+  size_t subTangleSize = 0;
+
+  out.tx_to_approvers = NULL;
+  TEST_ASSERT(cw_rating_dfs_do_dfs_light(out.tx_to_approvers, ep->trits,
+                                         &singleElementBitset,
+                                         &subTangleSize) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(subTangleSize, 1);
+
+  // Clean up txToApproverMap
+  HASH_ITER(hh, out.tx_to_approvers, currTxApproverEntry, tmpTxApproverEntry) {
+    HASH_ITER(hh, out.tx_to_approvers->approvers, currDirectApprover,
+              tmpDirectApprover) {
+      HASH_DEL(out.tx_to_approvers->approvers, currDirectApprover);
+      free(currDirectApprover);
+    }
+    HASH_DEL(out.tx_to_approvers, currTxApproverEntry);
+    free(currTxApproverEntry);
+  }
+
+  // Cleanup CWRatings Map
+  HASH_ITER(hh, out.cw_ratings, currCwEntry, tmpCwEntry) {
+    HASH_DEL(out.cw_ratings, currCwEntry);
+    free(currCwEntry);
+  }
+
+  hash_pack_free(&pack);
+
+  test_cleanup();
+}
+
+void test_cw_topology_only_direct_approvers(void) {
+  test_cw_gen_topology(OnlyDirectApprovers);
+}
+void test_cw_topology_blockchain(void) { test_cw_gen_topology(Blockchain); }
+
+void test_cw_topology_four_transactions_diamond(void) {
+  hash_to_direct_approvers_entry_t *currTxApproverEntry = NULL;
+  hash_to_direct_approvers_entry_t *tmpTxApproverEntry = NULL;
+  hash_entry_t *currDirectApprover = NULL;
+  hash_entry_t *tmpDirectApprover = NULL;
+  cw_entry_t *currCwEntry = NULL;
+  cw_entry_t *tmpCwEntry = NULL;
+
+  size_t numTxs = 3;
+
+  test_setup();
+
+  struct _iota_transaction txs[numTxs];
+  for (int i = 0; i < numTxs; i++) {
+    txs[i] = TEST_TRANSACTION;
+    // Different hash for each tx,
+    // we don't worry about it not being valid encoding
+    txs[i].hash[0] += (i + 1);
+  }
+
+  /// First two transactions approve entry point.
+  memcpy(txs[0].branch, TEST_TRANSACTION.hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[1].branch, TEST_TRANSACTION.hash, FLEX_TRIT_SIZE_243);
+  /// Third transaction approves first two via branch+trunk
+  memcpy(txs[2].branch, txs[0].hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[2].trunk, txs[1].hash, FLEX_TRIT_SIZE_243);
+
+  for (int i = 0; i < numTxs; i++) {
+    TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
+  }
+
+  trit_array_p ep = trit_array_new(FLEX_TRIT_SIZE_243);
+  trit_array_set_trits(ep, TEST_TRANSACTION.hash, NUM_TRITS_HASH);
+  iota_hashes_pack pack;
+  hash_pack_init(&pack, numTxs);
+
+  cw_calc_result out;
+
+  trit_array_p currHash = trit_array_new(FLEX_TRIT_SIZE_243);
+  for (int i = 0; i < numTxs; i++) {
+    trit_array_set_trits(currHash, txs[i].hash, NUM_TRITS_HASH);
+    TEST_ASSERT(iota_tangle_hashes_load(&tangle, COL_HASH, currHash, &pack) ==
+                RC_OK);
+    TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
+  }
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, NaiveDFS));
+  TEST_ASSERT(cw_rating_calculate_dfs(&calc, ep, &out) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), numTxs + 1);
+  TEST_ASSERT_EQUAL_INT(out.cw_ratings->cw, numTxs + 1);
+
+  test_cleanup();
+}
+
+int main(int argc, char *argv[]) {
+  UNITY_BEGIN();
+
+  if (argc >= 2) {
+    debugMode = true;
+  }
+  if (debugMode) {
+    testDbPath = "test.db";
+    ciriDbPath = "ciri.db";
+  }
+
+  RUN_TEST(test_single_tx_tangle);
+  RUN_TEST(test_cw_topology_only_direct_approvers);
+  RUN_TEST(test_cw_topology_blockchain);
+  RUN_TEST(test_cw_topology_four_transactions_diamond);
+
+  return UNITY_END();
+}

@@ -22,13 +22,16 @@
 
 #define SQLITE3_LOGGER_ID "stor_sqlite3"
 
-retcode_t iota_stor_init() {
+retcode_t iota_stor_init(const connection_t* const conn,
+                         const connection_config_t* const config) {
   logger_helper_init(SQLITE3_LOGGER_ID, LOGGER_INFO, true);
+  init_connection(conn, config);
   return RC_OK;
 }
 
-retcode_t iota_stor_destroy() {
+retcode_t iota_stor_destroy(const connection_t* const conn) {
   logger_helper_destroy(SQLITE3_LOGGER_ID);
+  destroy_connection(conn);
   return RC_OK;
 }
 
@@ -103,6 +106,8 @@ retcode_t iota_stor_store(const connection_t* const conn,
   }
   rc = sqlite3_step(sqlite_statement);
   if (rc != SQLITE_OK && rc != SQLITE_DONE) {
+    rc = sqlite3_finalize(
+        sqlite_statement);  //  Finalize the prepared statement.
     log_error(SQLITE3_LOGGER_ID,
               "Failed in step, sqlite3 code is: %\" PRIu64 \"", rc);
     return RC_SQLITE3_FAILED_STEP;

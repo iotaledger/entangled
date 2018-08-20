@@ -9,6 +9,10 @@ cc_library(
     name = "files",
     srcs = ["files.c"],
     hdrs = ["files.h"],
+    deps = [
+        ":logger_helper",
+        "//common:errors",
+    ],
 )
 
 cc_library(
