@@ -74,11 +74,12 @@ typedef struct {
 
   size_t (*get_node_info_serialize_request_get_size)(
       const serializer_t* const s);
-  void (*get_node_info_serialize_request)(const serializer_t* const, char* out);
+  retcode_t (*get_node_info_serialize_request)(const serializer_t* const,
+                                               char_buffer* out);
 
-  void (*get_node_info_deserialize_response)(const serializer_t* const,
-                                             const char* const obj,
-                                             get_node_info_res_t* out);
+  retcode_t (*get_node_info_deserialize_response)(const serializer_t* const,
+                                                  const char* const obj,
+                                                  get_node_info_res_t* out);
 
   size_t (*get_node_info_deserialize_response_get_size)(
       const serializer_t* const, const char* const toDeserialize);

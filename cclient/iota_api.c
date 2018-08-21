@@ -7,24 +7,23 @@
 iota_api_result_t iota_api_get_node_info(
     const iota_http_service_t* const service, get_node_info_res_t* const res) {
   iota_api_result_t result = {0};
-  /*
-  iota_response_t response;
-  char buffer[660];
-  response.data = buffer;
-  response.length = 660;
-  size_t req_size =
-      service->serializer.vtable.get_node_info_serialize_request_get_size(
-          &service->serializer);
-  char request_data[req_size];
 
-  service->serializer.vtable.get_node_info_serialize_request(
-      &service->serializer, request_data);
+  char_buffer* req_buff = char_buffer_new();
+  char_buffer* res_buff = char_buffer_new();
 
-  result = iota_service_query(service, request_data, &response);
-  */
+  result.error = service->serializer.vtable.get_node_info_serialize_request(
+      &service->serializer, req_buff);
+  if (result.error != RC_OK) goto done;
 
-  // TODO - deserialize response
+  result = iota_service_query(service, req_buff, res_buff);
+  if (result.error != RC_OK) goto done;
 
+  result.error = service->serializer.vtable.get_node_info_deserialize_response(
+      &service->serializer, res_buff->data, res);
+
+done:
+  char_buffer_free(req_buff);
+  char_buffer_free(res_buff);
   return result;
 }
 

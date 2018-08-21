@@ -64,9 +64,9 @@ iota_api_result_t iota_service_query(const void* const service_opaque,
     socket.shutdown(tcp::socket::shutdown_both, ec);
 
     if (ec && ec != boost::system::errc::not_connected)
-      result.error = RC_CCLIENT_HTTP;
+      result.error = RC_CCLIENT_HTTP_REQ;
   } catch (const std::exception& ex) {
-    result.error = RC_CCLIENT_HTTP;
+    result.error = RC_CCLIENT_HTTP_REQ;
   }
 
   return result;
