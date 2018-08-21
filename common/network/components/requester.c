@@ -9,6 +9,7 @@
 #include "ciri/core.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
+#include "utils/containers/lists/concurrent_list_trit_array.h"
 #include "utils/logger_helper.h"
 
 // TODO(thibault) configuration variable

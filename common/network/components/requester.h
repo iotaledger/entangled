@@ -8,9 +8,12 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_REQUESTER_H__
 #define __COMMON_NETWORK_COMPONENTS_REQUESTER_H__
 
-#include "utils/containers/lists/concurrent_list_trit_array.h"
+#include <stdbool.h>
+#include <stdlib.h>
 
-typedef concurrent_list_trit_array_p requester_list_t;
+// Forward declarations
+typedef struct concurrent_list_trit_array_p_s requester_list_t;
+typedef struct _trit_array *trit_array_p;
 typedef struct node_s node_t;
 
 typedef struct requester_state_s {

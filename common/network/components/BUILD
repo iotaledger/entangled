@@ -50,6 +50,22 @@ cc_library(
 )
 
 cc_library(
+    name = "requester_shared",
+    hdrs = ["requester.h"],
+)
+
+cc_library(
+    name = "requester",
+    srcs = ["requester.c"],
+    deps = [
+        ":requester_shared",
+        "//ciri:core_shared",
+        "//utils:logger_helper",
+        "//utils/containers/lists:concurrent_list_trit_array",
+    ],
+)
+
+cc_library(
     name = "responder_shared",
     hdrs = ["responder.h"],
     deps = [
@@ -69,23 +85,5 @@ cc_library(
         "//common/network:neighbor_shared",
         "//common/storage",
         "//utils/containers/queues:concurrent_queue_transaction_request",
-    ],
-)
-
-cc_library(
-    name = "requester_shared",
-    hdrs = ["requester.h"],
-    deps = [
-        "//utils/containers/lists:concurrent_list_trit_array",
-    ],
-)
-
-cc_library(
-    name = "requester",
-    srcs = ["requester.c"],
-    deps = [
-        ":requester_shared",
-        "//ciri:core_shared",
-        "//utils:logger_helper",
     ],
 )
