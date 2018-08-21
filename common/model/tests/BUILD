@@ -21,7 +21,6 @@ cc_test(
 cc_test (
     name = "test_transfer",
     srcs = ["test_transfer.c"],
-    linkopts = ["-lpthread"],
     deps = [
         "//common/model:transfer",
         "@unity//:unity",
