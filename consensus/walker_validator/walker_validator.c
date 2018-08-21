@@ -10,6 +10,7 @@ retcode_t iota_consensus_walker_validator_init(const tangle_t *tangle,
   wv->tangle = tangle;
   wv->milestone = milestone;
   wv->lv = lv;
+  return RC_OK;
 }
 
 retcode_t iota_consensus_walker_validator_is_valid(const walker_validator_t *wv,

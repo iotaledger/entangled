@@ -64,15 +64,16 @@ void test_cw_gen_topology(TestTangleTopology topology) {
   cw_entry_t *currCwEntry = NULL;
   cw_entry_t *tmpCwEntry = NULL;
 
-  size_t numDirectApprovers = 200;
+  size_t numApprovers = 200;
+  size_t numTxs = numApprovers + 1;
 
   test_setup();
 
-  struct _iota_transaction txs[numDirectApprovers];
+  struct _iota_transaction txs[numApprovers];
   txs[0] = TEST_TRANSACTION;
   txs[0].hash[0] += 1;
   memcpy(txs[0].branch, TEST_TRANSACTION.hash, FLEX_TRIT_SIZE_243);
-  for (int i = 1; i < numDirectApprovers; i++) {
+  for (int i = 1; i < numApprovers; i++) {
     txs[i] = TEST_TRANSACTION;
     // Different hash for each tx,
     // we don't worry about it not being valid encoding
@@ -84,19 +85,19 @@ void test_cw_gen_topology(TestTangleTopology topology) {
     }
   }
 
-  for (int i = 0; i < numDirectApprovers; i++) {
+  for (int i = 0; i < numApprovers; i++) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
   }
 
   trit_array_p ep = trit_array_new(FLEX_TRIT_SIZE_243);
   trit_array_set_trits(ep, TEST_TRANSACTION.hash, NUM_TRITS_HASH);
   iota_hashes_pack pack;
-  hash_pack_init(&pack, numDirectApprovers);
+  hash_pack_init(&pack, numApprovers);
 
   cw_calc_result out;
 
   trit_array_p currHash = trit_array_new(FLEX_TRIT_SIZE_243);
-  for (int i = 0; i < numDirectApprovers; i++) {
+  for (int i = 0; i < numApprovers; i++) {
     trit_array_set_trits(currHash, txs[i].hash, NUM_TRITS_HASH);
     TEST_ASSERT(iota_tangle_hashes_load(&tangle, COL_HASH, currHash, &pack) ==
                 RC_OK);
@@ -104,9 +105,39 @@ void test_cw_gen_topology(TestTangleTopology topology) {
   }
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, NaiveDFS));
   TEST_ASSERT(cw_rating_calculate_dfs(&calc, ep, &out) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers),
-                        numDirectApprovers + 1);
-  TEST_ASSERT_EQUAL_INT(out.cw_ratings->cw, numDirectApprovers + 1);
+  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), numApprovers + 1);
+
+  size_t totalWeight = 0;
+
+  HASH_ITER(hh, out.cw_ratings, currCwEntry, tmpCwEntry) {
+    totalWeight += currCwEntry->cw;
+  }
+  // First Entry, for both topologies, has to equal the number of total
+  // approvers + own weight
+  TEST_ASSERT_EQUAL_INT(out.cw_ratings->cw, numApprovers + 1);
+  if (topology == OnlyDirectApprovers) {
+    TEST_ASSERT_EQUAL_INT(totalWeight, numApprovers + 1 + numApprovers);
+  } else if (topology == Blockchain) {
+    // Sum of series 1 + 2 + ... + (numTxs)
+    TEST_ASSERT_EQUAL_INT(totalWeight, (numTxs * (numTxs + 1)) / 2);
+  }
+
+  // Clean up txToApproverMap
+  HASH_ITER(hh, out.tx_to_approvers, currTxApproverEntry, tmpTxApproverEntry) {
+    HASH_ITER(hh, out.tx_to_approvers->approvers, currDirectApprover,
+              tmpDirectApprover) {
+      HASH_DEL(out.tx_to_approvers->approvers, currDirectApprover);
+      free(currDirectApprover);
+    }
+    HASH_DEL(out.tx_to_approvers, currTxApproverEntry);
+    free(currTxApproverEntry);
+  }
+
+  // Cleanup CWRatings Map
+  HASH_ITER(hh, out.cw_ratings, currCwEntry, tmpCwEntry) {
+    HASH_DEL(out.cw_ratings, currCwEntry);
+    free(currCwEntry);
+  }
 
   test_cleanup();
 }
@@ -141,8 +172,6 @@ void test_single_tx_tangle(void) {
   TEST_ASSERT(cw_rating_calculate_dfs(&calc, ep, &out) == RC_OK);
   TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), 1);
 
-  TEST_ASSERT_EQUAL_INT(out.cw_ratings->cw, 1);
-
   int64_t singleElementBitset = 0;
   size_t subTangleSize = 0;
 
@@ -150,7 +179,6 @@ void test_single_tx_tangle(void) {
   TEST_ASSERT(cw_rating_dfs_do_dfs_light(out.tx_to_approvers, ep->trits,
                                          &singleElementBitset,
                                          &subTangleSize) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(subTangleSize, 1);
 
   // Clean up txToApproverMap
   HASH_ITER(hh, out.tx_to_approvers, currTxApproverEntry, tmpTxApproverEntry) {
@@ -187,12 +215,13 @@ void test_cw_topology_four_transactions_diamond(void) {
   cw_entry_t *currCwEntry = NULL;
   cw_entry_t *tmpCwEntry = NULL;
 
-  size_t numTxs = 3;
+  size_t numTxs = 4;
 
   test_setup();
 
   struct _iota_transaction txs[numTxs];
-  for (int i = 0; i < numTxs; i++) {
+  txs[0] = TEST_TRANSACTION;
+  for (int i = 1; i < numTxs; i++) {
     txs[i] = TEST_TRANSACTION;
     // Different hash for each tx,
     // we don't worry about it not being valid encoding
@@ -200,18 +229,18 @@ void test_cw_topology_four_transactions_diamond(void) {
   }
 
   /// First two transactions approve entry point.
-  memcpy(txs[0].branch, TEST_TRANSACTION.hash, FLEX_TRIT_SIZE_243);
-  memcpy(txs[1].branch, TEST_TRANSACTION.hash, FLEX_TRIT_SIZE_243);
-  /// Third transaction approves first two via branch+trunk
+  memcpy(txs[1].branch, txs[0].hash, FLEX_TRIT_SIZE_243);
   memcpy(txs[2].branch, txs[0].hash, FLEX_TRIT_SIZE_243);
-  memcpy(txs[2].trunk, txs[1].hash, FLEX_TRIT_SIZE_243);
+  /// Third transaction approves first two via branch+trunk
+  memcpy(txs[3].branch, txs[1].hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[3].trunk, txs[2].hash, FLEX_TRIT_SIZE_243);
 
   for (int i = 0; i < numTxs; i++) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
   }
 
   trit_array_p ep = trit_array_new(FLEX_TRIT_SIZE_243);
-  trit_array_set_trits(ep, TEST_TRANSACTION.hash, NUM_TRITS_HASH);
+  trit_array_set_trits(ep, txs[0].hash, NUM_TRITS_HASH);
   iota_hashes_pack pack;
   hash_pack_init(&pack, numTxs);
 
@@ -226,8 +255,15 @@ void test_cw_topology_four_transactions_diamond(void) {
   }
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, NaiveDFS));
   TEST_ASSERT(cw_rating_calculate_dfs(&calc, ep, &out) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), numTxs + 1);
-  TEST_ASSERT_EQUAL_INT(out.cw_ratings->cw, numTxs + 1);
+  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), numTxs);
+
+  size_t totalWeight = 0;
+
+  HASH_ITER(hh, out.cw_ratings, currCwEntry, tmpCwEntry) {
+    totalWeight += currCwEntry->cw;
+  }
+
+  TEST_ASSERT_EQUAL_INT(totalWeight, 4 + 2 + 2 + 1);
 
   test_cleanup();
 }

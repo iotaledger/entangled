@@ -15,7 +15,7 @@
 #include "common/storage/connection.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/milestone/milestone.h"
-#include "consensus/structs.h"
+#include "consensus/model.h"
 #include "consensus/tangle/tangle.h"
 
 #ifdef __cplusplus

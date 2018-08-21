@@ -12,14 +12,7 @@
  * utarray definitions
  */
 
-void uthash_trit_hash_array_copy(void *_dst, const void *_src) {
-  flex_trit_t *dst = (flex_trit_t *)_dst;
-  flex_trit_t *src = (flex_trit_t *)_src;
-  memcpy(dst, src, FLEX_TRIT_SIZE_243);
-}
-
-UT_icd cw_stack_trit_array_hash_icd = {FLEX_TRIT_SIZE_243, 0,
-                                       uthash_trit_hash_array_copy, 0};
+UT_icd cw_stack_trit_array_hash_icd = {FLEX_TRIT_SIZE_243, 0, 0, 0};
 
 void init_cw_calculator_dfs(cw_rating_calculator_base_t *calculator) {
   calculator->vtable = cw_topological_vtable;
@@ -35,7 +28,6 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
   cw_entry_t *cw_entry = NULL;
   hash_to_direct_approvers_entry_t *currHashToApproversEntry = NULL;
   hash_to_direct_approvers_entry_t *tmpHashToApproversEntry = NULL;
-  hash_to_direct_approvers_entry_t *firstHashToApproversEntry = NULL;
   hash_entry_t *currDirectApprover = NULL;
   hash_entry_t *tmpDirectApprover = NULL;
   size_t subTangleSize;
@@ -87,10 +79,9 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
     }
 
     cw_entry = (cw_entry_t *)malloc(sizeof(cw_entry_t));
-    memcpy(cw_entry->hash, entry_point->trits, FLEX_TRIT_SIZE_243);
+    memcpy(cw_entry->hash, currHash, FLEX_TRIT_SIZE_243);
     cw_entry->cw = subTangleSize;
-    HASH_ADD(hh, out->cw_ratings, hash, FLEX_TRIT_SIZE_243,
-             currHashToApproversEntry);
+    HASH_ADD(hh, out->cw_ratings, hash, FLEX_TRIT_SIZE_243, cw_entry);
   }
 
   return RC_OK;
@@ -185,10 +176,9 @@ retcode_t cw_rating_dfs_do_dfs_from_db(
 retcode_t cw_rating_dfs_do_dfs_light(
     hash_to_direct_approvers_map_t txToApprovers, flex_trit_t *ep,
     int64_t *visitedBitSet, size_t *subTangleSize) {
-  *subTangleSize = 1;
+  *subTangleSize = 0;
   flex_trit_t *currHash = NULL;
-  hash_to_direct_approvers_entry_t *visitedApproversEntry = NULL;
-  size_t numApprover;
+  hash_to_direct_approvers_entry_t *currTxEntry = NULL;
   hash_entry_t *currDirectApprover = NULL;
   hash_entry_t *tmpDirectApprover = NULL;
 
@@ -203,38 +193,27 @@ retcode_t cw_rating_dfs_do_dfs_light(
     currHash = utarray_back(stack);
     utarray_pop_back(stack);
 
-    HASH_FIND(hh, txToApprovers, currHash, FLEX_TRIT_SIZE_243,
-              visitedApproversEntry);
+    HASH_FIND(hh, txToApprovers, currHash, FLEX_TRIT_SIZE_243, currTxEntry);
 
-    if (!visitedApproversEntry) {
+    if (!currTxEntry) {
       continue;
     }
 
-    txBitsetIntegerIndex =
-        visitedApproversEntry->idx / (sizeof(*visitedBitSet) * 8);
+    txBitsetIntegerIndex = currTxEntry->idx / (sizeof(*visitedBitSet) * 8);
     txBitsetWithinIntegerRelativeIndex =
-        visitedApproversEntry->idx % (sizeof(*visitedBitSet) * 8);
+        currTxEntry->idx % (sizeof(*visitedBitSet) * 8);
 
     if (visitedBitSet[txBitsetIntegerIndex] &
-        (1 << txBitsetWithinIntegerRelativeIndex)) {
+        (1ULL << txBitsetWithinIntegerRelativeIndex)) {
       continue;
     }
     ++(*subTangleSize);
 
-    visitedBitSet[txBitsetIntegerIndex] |= (1 << visitedApproversEntry->idx);
+    visitedBitSet[txBitsetIntegerIndex] |= (1ULL << currTxEntry->idx);
 
-    HASH_ITER(hh, visitedApproversEntry->approvers, currDirectApprover,
+    HASH_ITER(hh, currTxEntry->approvers, currDirectApprover,
               tmpDirectApprover) {
-      HASH_FIND(hh, txToApprovers, currDirectApprover->hash, FLEX_TRIT_SIZE_243,
-                visitedApproversEntry);
-      if (!visitedApproversEntry) {
-        continue;
-      }
-
-      if (visitedBitSet[txBitsetIntegerIndex] &
-          (1 << visitedApproversEntry->idx) == 0) {
-        utarray_push_back(stack, visitedApproversEntry->hash);
-      }
+      utarray_push_back(stack, currDirectApprover->hash);
     }
   }
 

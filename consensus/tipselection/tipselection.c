@@ -22,20 +22,21 @@ retcode_t iota_consensus_tipselection_init(
   impl->wv = wv;
   impl->walker = walker;
   rw_lock_handle_init(&impl->milestone->latest_snapshot.rw_lock);
+  return RC_OK;
 }
 
 retcode_t iota_consensus_get_transactions_to_approve(
     tipselection_t *impl, size_t depth, const trit_array_p reference,
     tips_pair *tips) {
-  retcode_t res;
-  trit_array_p ep;
+  retcode_t res = RC_OK;
+  trit_array_p ep ;
 
   rw_lock_handle_rdlock(&impl->milestone->latest_snapshot.rw_lock);
 
   res = iota_consensus_get_entry_point(impl->ep_selector, depth, ep);
 
-  cw_map_t ratings;
-  res = iota_consensus_cw_rating_calculate(impl->cw_calc, ep, ratings);
+  cw_calc_result ratings_result;
+  res = iota_consensus_cw_rating_calculate(impl->cw_calc, ep, &ratings_result);
   if (res != RC_OK) {
     // TODO
     rw_lock_handle_unlock(&impl->milestone->latest_snapshot.rw_lock);
@@ -46,13 +47,13 @@ retcode_t iota_consensus_get_transactions_to_approve(
   iota_consensus_walker_validator_init(impl->tangle, impl->milestone, impl->lv,
                                        impl->wv);
 
-  iota_consensus_walker_walk(impl->walker, ep, ratings, &wv, tips->trunk);
+  iota_consensus_walker_walk(impl->walker, ep, ratings_result.cw_ratings, &wv, tips->trunk);
 
   if (reference != NULL) {
     // TODO
   }
 
-  iota_consensus_walker_walk(impl->walker, ep, ratings, &wv, tips->branch);
+  iota_consensus_walker_walk(impl->walker, ep, ratings_result.cw_ratings, &wv, tips->branch);
 
   res = iota_consensus_ledeger_validator_validate(impl->lv, tips);
   if (res != RC_OK) {

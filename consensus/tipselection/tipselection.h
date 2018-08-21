@@ -16,7 +16,7 @@
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone/milestone.h"
-#include "consensus/structs.h"
+#include "consensus/model.h"
 #include "consensus/tangle/tangle.h"
 #include "consensus/walker/walker.h"
 #include "consensus/walker_validator/walker_validator.h"
@@ -43,7 +43,7 @@ typedef struct tipselection_t {
   milestone_t *milestone;
   ledger_validator_t *lv;
   walker_validator_t *wv;
-  walker_t *walker
+  walker_t *walker;
 } tipselection_t;
 
 extern retcode_t iota_consensus_tipselection_init(

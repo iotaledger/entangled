@@ -1,6 +1,6 @@
 cc_library(
-    name = "structs",
-    hdrs = ["structs.h"],
+    name = "model",
+    hdrs = ["model.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",

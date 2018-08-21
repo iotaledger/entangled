@@ -8,6 +8,7 @@ retcode_t iota_consensus_walker_validator_init(const tangle_t *tangle,
   logger_helper_init(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_INFO, true);
   lv->tangle = tangle;
   lv->milestone = milestone;
+  return RC_OK;
 }
 
 retcode_t iota_consensus_ledeger_validator_validate(

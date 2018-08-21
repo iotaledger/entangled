@@ -6,7 +6,7 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/trinary:trit_array",
-        "//consensus:structs",
+        "//consensus:model",
         "//consensus/entry_point_selector",
         "//consensus/milestone",
         "//consensus/tangle",
