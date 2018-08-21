@@ -8,11 +8,13 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_BROADCASTER_H__
 #define __COMMON_NETWORK_COMPONENTS_BROADCASTER_H__
 
-#include "utils/containers/queues/concurrent_queue_packet.h"
+#include <stdbool.h>
+
 #include "utils/handles/thread.h"
 
 // Forward declarations
-typedef concurrent_queue_iota_packet_t broadcaster_queue_t;
+typedef struct concurrent_queue_iota_packet_t_s broadcaster_queue_t;
+typedef struct iota_packet_s iota_packet_t;
 typedef struct node_s node_t;
 
 typedef struct broadcaster_state_s {

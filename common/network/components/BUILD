@@ -4,8 +4,6 @@ cc_library(
     name = "broadcaster_shared",
     hdrs = ["broadcaster.h"],
     deps = [
-        "//utils:logger_helper",
-        "//utils/containers/queues:concurrent_queue_trit_array",
         "//utils/handles:thread",
     ],
 )
