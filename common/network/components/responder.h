@@ -29,11 +29,53 @@ typedef struct responder_state_s {
 extern "C" {
 #endif
 
+/**
+ * Initializes a responder
+ *
+ * @param state The responder state
+ * @param node A node
+ *
+ * @return a status code
+ */
 bool responder_init(responder_state_t *const state, node_t *const node);
+
+/**
+ * Starts a responder
+ *
+ * @param state The responder state
+ *
+ * @return a status code
+ */
 bool responder_start(responder_state_t *const state);
+
+/**
+ * Adds a request to a responder
+ *
+ * @param state The responder state
+ * @param neighbor Requesting neighbor
+ * @param hash Requested hash
+ *
+ * @return a status code
+ */
 bool responder_on_next(responder_state_t *const state,
                        neighbor_t *const neighbor, trit_array_p const hash);
+
+/**
+ * Stops a responder
+ *
+ * @param state The responder state
+ *
+ * @return a status code
+ */
 bool responder_stop(responder_state_t *const state);
+
+/**
+ * Destroys a responder
+ *
+ * @param state The responder state
+ *
+ * @return a status code
+ */
 bool responder_destroy(responder_state_t *const state);
 
 #ifdef __cplusplus
