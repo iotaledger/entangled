@@ -3,11 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "broadcaster_shared",
     hdrs = ["broadcaster.h"],
-    deps = [
-        "//utils:logger_helper",
-        "//utils/containers/queues:concurrent_queue_trit_array",
-        "//utils/handles:thread",
-    ],
+    deps = ["//utils/handles:thread"],
 )
 
 cc_library(
@@ -17,16 +13,15 @@ cc_library(
         ":broadcaster_shared",
         "//ciri:node_shared",
         "//utils:logger_helper",
+        "//utils/containers/lists:concurrent_list_neighbor",
+        "//utils/containers/queues:concurrent_queue_packet",
     ],
 )
 
 cc_library(
     name = "processor_shared",
     hdrs = ["processor.h"],
-    deps = [
-        "//utils/containers/queues:concurrent_queue_packet",
-        "//utils/handles:thread",
-    ],
+    deps = ["//utils/handles:thread"],
 )
 
 cc_library(
@@ -35,41 +30,15 @@ cc_library(
     deps = [
         ":processor_shared",
         "//ciri:core_shared",
-        "//ciri:node_shared",
-        "//common/model:transaction",
-    ],
-)
-
-cc_library(
-    name = "responder_shared",
-    hdrs = ["responder.h"],
-    deps = [
-        "//utils/containers/queues:concurrent_queue_transaction_request",
-        "//utils/handles:thread",
-    ],
-)
-
-cc_library(
-    name = "responder",
-    srcs = ["responder.c"],
-    hdrs = ["responder.h"],
-    deps = [
-        ":responder_shared",
-        "//ciri:core_shared",
-        "//ciri:node_shared",
-        "//common/storage",
-        "//utils/containers/queues:concurrent_queue_transaction_request",
+        "//utils/containers/lists:concurrent_list_neighbor",
+        "//utils/containers/queues:concurrent_queue_packet",
     ],
 )
 
 cc_library(
     name = "receiver_shared",
     hdrs = ["receiver.h"],
-    deps = [
-        "//common/network:iota_packet",
-        "//common/network/services:receiver_shared",
-        "//utils/handles:thread",
-    ],
+    deps = ["//common/network/services:receiver_shared"],
 )
 
 cc_library(
@@ -85,9 +54,6 @@ cc_library(
 cc_library(
     name = "requester_shared",
     hdrs = ["requester.h"],
-    deps = [
-        "//utils/containers/lists:concurrent_list_trit_array",
-    ],
 )
 
 cc_library(
@@ -97,5 +63,25 @@ cc_library(
         ":requester_shared",
         "//ciri:core_shared",
         "//utils:logger_helper",
+        "//utils/containers/lists:concurrent_list_trit_array",
+    ],
+)
+
+cc_library(
+    name = "responder_shared",
+    hdrs = ["responder.h"],
+    deps = ["//utils/handles:thread"],
+)
+
+cc_library(
+    name = "responder",
+    srcs = ["responder.c"],
+    hdrs = ["responder.h"],
+    deps = [
+        ":responder_shared",
+        "//ciri:core_shared",
+        "//common/network:neighbor_shared",
+        "//utils/containers/queues:concurrent_queue_packet",
+        "//utils/containers/queues:concurrent_queue_transaction_request",
     ],
 )

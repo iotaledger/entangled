@@ -9,6 +9,7 @@
 #include "ciri/core.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
+#include "utils/containers/lists/concurrent_list_trit_array.h"
 #include "utils/logger_helper.h"
 
 // TODO(thibault) configuration variable
@@ -129,7 +130,7 @@ bool requester_destroy(requester_state_t *const state) {
   if (state == NULL) {
     return false;
   }
-  if (CL_DESTROY(trit_array_p, state->list) != CQ_SUCCESS) {
+  if (CL_DESTROY(trit_array_p, state->list) != CL_SUCCESS) {
     ret = false;
   }
   logger_helper_destroy(REQUESTER_COMPONENT_LOGGER_ID);

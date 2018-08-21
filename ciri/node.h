@@ -14,10 +14,10 @@
 #include "common/network/components/receiver.h"
 #include "common/network/components/requester.h"
 #include "common/network/components/responder.h"
-#include "utils/containers/lists/concurrent_list_neighbor.h"
 
+// Forward declarations
 typedef struct core_s core_t;
-typedef concurrent_list_neighbor_t neighbors_list_t;
+typedef struct concurrent_list_neighbor_t_s neighbors_list_t;
 
 typedef struct node_s {
   bool running;
@@ -30,9 +30,41 @@ typedef struct node_s {
   neighbors_list_t* neighbors;
 } node_t;
 
+/**
+ * Initializes a node
+ *
+ * @param node The node
+ * @param core A core
+ *
+ * @return a status code
+ */
 retcode_t node_init(node_t* const node, core_t* const core);
+
+/**
+ * Starts a node
+ *
+ * @param node The node
+ *
+ * @return a status code
+ */
 retcode_t node_start(node_t* const node);
+
+/**
+ * Stops a node
+ *
+ * @param node The node
+ *
+ * @return a status code
+ */
 retcode_t node_stop(node_t* const node);
+
+/**
+ * Destroys a node
+ *
+ * @param node The node
+ *
+ * @return a status code
+ */
 retcode_t node_destroy(node_t* const node);
 
 #endif  // __CIRI_NODE_H__

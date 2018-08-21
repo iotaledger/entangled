@@ -1,9 +1,8 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "system",
-    srcs = ["system.c"],
-    hdrs = ["system.h"],
+    name = "export",
+    hdrs = ["export.h"],
 )
 
 cc_library(
@@ -24,6 +23,7 @@ cc_library(
 )
 
 cc_library(
-    name = "export",
-    hdrs = ["export.h"],
+    name = "system",
+    srcs = ["system.c"],
+    hdrs = ["system.h"],
 )

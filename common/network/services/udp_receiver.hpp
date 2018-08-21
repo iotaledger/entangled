@@ -9,7 +9,10 @@
 
 #include <boost/asio.hpp>
 
-#include "common/network/components/receiver.h"
+#include "common/network/iota_packet.h"
+
+// Forward declarations
+typedef struct receiver_service_s receiver_service_t;
 
 class UdpReceiverService {
  public:

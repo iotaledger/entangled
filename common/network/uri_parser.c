@@ -5,7 +5,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdlib.h>
 #include <string.h>
 
 #include "common/network/network.h"
@@ -16,7 +15,7 @@ bool uri_parse(char const *const uri, char *const scheme,
                uint16_t *const port) {
   size_t length = 0;
   size_t offset = 0;
-  char *delim = 0;
+  char *delim = NULL;
 
   if (uri == NULL) {
     return false;
@@ -28,7 +27,7 @@ bool uri_parse(char const *const uri, char *const scheme,
   if (length > MAX_SCHEME_LENGTH || length + 1 > scheme_len) {
     return false;
   }
-  if (scheme != NULL) {
+  if (scheme) {
     memcpy(scheme, uri + offset, length);
     scheme[length] = '\0';
   }
@@ -44,12 +43,12 @@ bool uri_parse(char const *const uri, char *const scheme,
   if (length > MAX_HOST_LENGTH || length + 1 > host_len) {
     return false;
   }
-  if (host != NULL) {
+  if (host) {
     memcpy(host, uri + offset, length);
     host[length] = '\0';
   }
   offset += length + 1;
-  if (port != NULL) {
+  if (port) {
     *port = atoi(uri + offset);
   }
   return true;

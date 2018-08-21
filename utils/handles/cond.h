@@ -56,8 +56,11 @@ static inline int cond_handle_timedwait(cond_handle_t* const cond,
 static inline int cond_handle_destroy(cond_handle_t* const cond) {
   return pthread_cond_destroy(cond);
 }
+
 #elif defined(_WIN32)
+
 typedef CONDITION_VARIABLE cond_handle_t;
+
 static inline int cond_handle_init(cond_handle_t* const cond) {
   InitializeConditionVariable(cond);
   return 0;

@@ -1,17 +1,9 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "network",
-    hdrs = ["network.h"],
-)
-
-cc_library(
-    name = "transaction_request",
-    hdrs = ["transaction_request.h"],
-    deps = [
-        ":neighbor_shared",
-        "//common/trinary:trit_array",
-    ],
+    name = "endpoint",
+    hdrs = ["endpoint.h"],
+    deps = [":network"],
 )
 
 cc_library(
@@ -23,13 +15,6 @@ cc_library(
         "//common/model:transaction",
         "//common/trinary:bytes",
     ],
-)
-
-cc_library(
-    name = "uri_parser",
-    srcs = ["uri_parser.c"],
-    hdrs = ["uri_parser.h"],
-    deps = [":network"],
 )
 
 cc_library(
@@ -49,14 +34,24 @@ cc_library(
         ":uri_parser",
         "//ciri:node_shared",
         "//common/model:transaction",
-        "//common/network/components:requester_shared",
         "//common/network/services:tcp_sender",
         "//common/network/services:udp_sender",
     ],
 )
 
 cc_library(
-    name = "endpoint",
-    hdrs = ["endpoint.h"],
+    name = "network",
+    hdrs = ["network.h"],
+)
+
+cc_library(
+    name = "transaction_request",
+    hdrs = ["transaction_request.h"],
+)
+
+cc_library(
+    name = "uri_parser",
+    srcs = ["uri_parser.c"],
+    hdrs = ["uri_parser.h"],
     deps = [":network"],
 )

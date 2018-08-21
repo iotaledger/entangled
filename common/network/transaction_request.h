@@ -8,10 +8,11 @@
 #ifndef __COMMON_NETWORK_TRANSACTION_REQUEST_H__
 #define __COMMON_NETWORK_TRANSACTION_REQUEST_H__
 
-#include "common/network/neighbor.h"
-#include "common/trinary/trit_array.h"
+// Forward declarations
+typedef struct neighbor_s neighbor_t;
+typedef struct _trit_array *trit_array_p;
 
-typedef struct {
+typedef struct transaction_request_s {
   neighbor_t *neighbor;
   trit_array_p hash;
 } transaction_request_t;

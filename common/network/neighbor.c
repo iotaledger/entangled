@@ -9,12 +9,11 @@
 
 #include "ciri/node.h"
 #include "common/model/transaction.h"
-#include "common/network/components/requester.h"
+#include "common/network/iota_packet.h"
 #include "common/network/neighbor.h"
 #include "common/network/services/tcp_sender.hpp"
 #include "common/network/services/udp_sender.hpp"
 #include "common/network/uri_parser.h"
-#include "common/trinary/trit_array.h"
 
 retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
                                  char const *const uri) {
@@ -42,9 +41,8 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
 }
 
 retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
-                                    protocol_type_t const protocol,
-                                    char const *const host,
-                                    uint16_t const port) {
+                                    char const *const host, uint16_t const port,
+                                    protocol_type_t const protocol) {
   if (neighbor == NULL) {
     return RC_NEIGHBOR_NULL_NEIGHBOR;
   }
@@ -65,6 +63,9 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
   trit_t hash_trits[NUM_TRITS_HASH];
   trit_array_p hash = NULL;
 
+  if (node == NULL) {
+    return RC_NEIGHBOR_NULL_NODE;
+  }
   if (neighbor == NULL) {
     return RC_NEIGHBOR_NULL_NEIGHBOR;
   }
@@ -75,6 +76,7 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
     return RC_NEIGHBOR_FAILED_REQUESTER;
   }
   if (hash != NULL) {
+    // TODO(thibault): iota_packet_set_request
     flex_trit_array_to_int8(hash_trits, NUM_TRITS_HASH, hash->trits,
                             hash->num_trits, hash->num_trits);
     trits_to_bytes(hash_trits, packet->content + PACKET_SIZE, NUM_TRITS_HASH);

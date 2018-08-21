@@ -7,7 +7,8 @@
 
 #include "common/network/services/udp_receiver.hpp"
 #include "ciri/node.h"
-#include "common/network/neighbor.h"
+#include "utils/containers/lists/concurrent_list_neighbor.h"
+#include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/logger_helper.h"
 
 #define UDP_RECEIVER_SERVICE_LOGGER_ID "udp_receiver_service"
@@ -34,7 +35,7 @@ void UdpReceiverService::receive() {
           auto host = senderEndpoint_.address().to_string().c_str();
           auto port = senderEndpoint_.port();
           neighbor_t* neighbor = neighbor_find_by_endpoint_values(
-              service_->state->node->neighbors, PROTOCOL_UDP, host, port);
+              service_->state->node->neighbors, host, port, PROTOCOL_UDP);
           if (neighbor == NULL) {
             log_debug(UDP_RECEIVER_SERVICE_LOGGER_ID,
                       "Packet denied from non-tethered neighbor udp://%s:%d\n",

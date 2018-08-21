@@ -9,8 +9,11 @@
 
 #include <boost/asio.hpp>
 
-#include "common/network/components/receiver.h"
-#include "common/network/neighbor.h"
+#include "common/network/iota_packet.h"
+
+// Forward declarations
+typedef struct receiver_service_s receiver_service_t;
+typedef struct neighbor_s neighbor_t;
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
  public:

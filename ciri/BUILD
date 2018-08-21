@@ -6,6 +6,7 @@ cc_binary(
     copts = ["-DLOGGER_ENABLE"],
     deps = [
         ":core",
+        "//utils/containers/lists:concurrent_list_neighbor",
     ],
 )
 
@@ -31,13 +32,11 @@ cc_library(
     name = "node_shared",
     hdrs = ["node.h"],
     deps = [
-        "//common:errors",
         "//common/network/components:broadcaster_shared",
         "//common/network/components:processor_shared",
         "//common/network/components:receiver_shared",
         "//common/network/components:requester_shared",
         "//common/network/components:responder_shared",
-        "//utils/containers/lists:concurrent_list_neighbor",
     ],
 )
 

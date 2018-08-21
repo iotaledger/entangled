@@ -8,10 +8,13 @@
 #ifndef __COMMON_NETWORK_SERVICES_RECEIVER_H__
 #define __COMMON_NETWORK_SERVICES_RECEIVER_H__
 
-#include "utils/containers/queues/concurrent_queue_packet.h"
+#include <stdint.h>
+
+#include "common/network/network.h"
 #include "utils/handles/thread.h"
 
-typedef concurrent_queue_iota_packet_t receive_queue_t;
+// Forward declarations
+typedef struct concurrent_queue_iota_packet_t_s receive_queue_t;
 typedef struct receiver_state_s receiver_state_t;
 
 typedef struct receiver_service_s {
@@ -27,7 +30,22 @@ typedef struct receiver_service_s {
 extern "C" {
 #endif
 
+/**
+ * Starts a receiver service
+ *
+ * @param service The receiver service
+ *
+ * @return a status code
+ */
 bool receiver_service_start(receiver_service_t* const service);
+
+/**
+ * Stops a receiver service
+ *
+ * @param service The receiver service
+ *
+ * @return a status code
+ */
 bool receiver_service_stop(receiver_service_t* const service);
 
 #ifdef __cplusplus

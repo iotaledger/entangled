@@ -6,11 +6,13 @@
  */
 
 #include "ciri/node.h"
+#include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
 #define NODE_LOGGER_ID "node"
 
-// TODO(thibault) configuration variable
+// FIXME: Initialize TCP/UDP receiver services with ports from conf variables
+// https://github.com/iotaledger/entangled/issues/104
 static uint16_t tcp_port_g = 14260;
 static uint16_t udp_port_g = 14261;
 
@@ -24,7 +26,7 @@ retcode_t node_init(node_t* const node, core_t* const core) {
 
   logger_helper_init(NODE_LOGGER_ID, LOGGER_DEBUG, true);
 
-  log_info(NODE_LOGGER_ID, "Initializing neighbors list\n");
+  log_debug(NODE_LOGGER_ID, "Initializing neighbors list\n");
   if (CL_INIT(neighbor_t, node->neighbors, neighbor_cmp) != CL_SUCCESS) {
     log_critical(NODE_LOGGER_ID, "Initializing neighbors list failed\n");
     return RC_NODE_FAILED_NEIGHBORS_INIT;
@@ -177,10 +179,10 @@ retcode_t node_destroy(node_t* const node) {
     ret = RC_NODE_FAILED_RESPONDER_DESTROY;
   }
 
-  log_info(NODE_LOGGER_ID, "Destroying neighbors list\n");
+  log_debug(NODE_LOGGER_ID, "Destroying neighbors list\n");
   if (CL_DESTROY(neighbor_t, node->neighbors) != CL_SUCCESS) {
     log_error(NODE_LOGGER_ID, "Destroying neighbors list failed\n");
-    ret = false;
+    ret = RC_NODE_FAILED_NEIGHBORS_DESTROY;
   }
 
   logger_helper_destroy(NODE_LOGGER_ID);

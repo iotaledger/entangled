@@ -7,9 +7,11 @@
 
 #include "common/network/components/responder.h"
 #include "ciri/core.h"
-#include "ciri/node.h"
+#include "common/network/neighbor.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
+#include "utils/containers/queues/concurrent_queue_packet.h"
+#include "utils/containers/queues/concurrent_queue_transaction_request.h"
 #include "utils/logger_helper.h"
 
 #define RESPONDER_COMPONENT_LOGGER_ID "responder_component"

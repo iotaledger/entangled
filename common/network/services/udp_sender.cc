@@ -7,6 +7,7 @@
 
 #include <boost/asio.hpp>
 
+#include "common/network/iota_packet.h"
 #include "common/network/services/udp_sender.hpp"
 #include "utils/logger_helper.h"
 

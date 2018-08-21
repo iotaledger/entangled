@@ -19,16 +19,62 @@ DECLARE_CL(neighbor_t);
 
 typedef concurrent_list_neighbor_t neighbors_list_t;
 
+/**
+ * neighbor_t comparator for list operations
+ *
+ * @param lhs Left hand side neighbor_t
+ * @param rhs Right hand side neighbor_t
+ *
+ * @return true if equal, false otherwise
+ */
 bool neighbor_cmp(neighbor_t const *const lhs, neighbor_t const *const rhs);
+
+/**
+ * Add a neighbor to a list
+ *
+ * @param neighbors The neighbors list
+ * @param neighbor The neighbor
+ *
+ * @return true if the neighbor was added, false otherwise
+ */
 bool neighbor_add(neighbors_list_t *const neighbors, neighbor_t const neighbor);
+
+/**
+ * Remove a neighbor from a list
+ *
+ * @param neighbors The neighbors list
+ * @pram neighbor The neighbor
+ *
+ * @return true if the neighbor was removed, false otherwise
+ */
 bool neighbor_remove(neighbors_list_t *const neighbors,
                      neighbor_t const neighbor);
+
+/**
+ * Find a neigbor matching given endpoint
+ *
+ * @param neighbors The neighbors list
+ * @param endpoint The endpoint
+ *
+ * @return a pointer to the neigbor if found, NULL otherwise
+ */
 neighbor_t *neighbor_find_by_endpoint(neighbors_list_t *const neighbors,
                                       endpoint_t *endpoint);
+
+/**
+ * Find a neigbor matching given endpoint values
+ *
+ * @param neighbors The neighbors list
+ * @param host The endpoint host
+ * @param port The endpoint port
+ * @param protocol The endpoint protocol
+ *
+ * @return a pointer to the neigbor if found, NULL otherwise
+ */
 neighbor_t *neighbor_find_by_endpoint_values(neighbors_list_t *const neighbors,
-                                             protocol_type_t const protocol,
                                              char const *const host,
-                                             uint16_t const port);
+                                             uint16_t const port,
+                                             protocol_type_t const protocol);
 
 #ifdef __cplusplus
 }

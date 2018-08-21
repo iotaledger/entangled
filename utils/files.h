@@ -5,10 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef ENTANGLED_COMMON_FILES_H
-#define ENTANGLED_COMMON_FILES_H
-
-#include <stddef.h>
+#ifndef __UTILS_FILES_H__
+#define __UTILS_FILES_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,4 +18,4 @@ int copy_file(const char *to, const char *from);
 }
 #endif
 
-#endif  // ENTANGLED_COMMON_FILES_H
+#endif  // __UTILS_FILES_H__
