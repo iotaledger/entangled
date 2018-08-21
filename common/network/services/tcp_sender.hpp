@@ -15,6 +15,14 @@ typedef struct endpoint_s endpoint_t;
 extern "C" {
 #endif
 
+/**
+ * Sends a TCP packet to an endpoint
+ *
+ * @param endpoint The endpoint
+ * @param packet The packet
+ *
+ * @return true if sending succeeded, false otherwise
+ */
 bool tcp_send(endpoint_t *const endpoint, iota_packet_t *const packet);
 
 #ifdef __cplusplus
