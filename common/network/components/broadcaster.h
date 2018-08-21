@@ -11,6 +11,7 @@
 #include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/handles/thread.h"
 
+// Forward declarations
 typedef concurrent_queue_iota_packet_t broadcaster_queue_t;
 typedef struct node_s node_t;
 
@@ -25,11 +26,52 @@ typedef struct broadcaster_state_s {
 extern "C" {
 #endif
 
+/**
+ * Initializes a broadcaster
+ *
+ * @param state The broadcaster state
+ * @param node A node
+ *
+ * @return a status code
+ */
 bool broadcaster_init(broadcaster_state_t *const state, node_t *const node);
+
+/**
+ * Starts a broadcaster
+ *
+ * @param state The broadcaster state
+ *
+ * @return a status code
+ */
 bool broadcaster_start(broadcaster_state_t *const state);
+
+/**
+ * Adds a packet to the broadcaster queue
+ *
+ * @param state The broadcaster state
+ * @param packet The packet
+ *
+ * @return a status code
+ */
 bool broadcaster_on_next(broadcaster_state_t *const state,
                          iota_packet_t const packet);
+
+/**
+ * Stops a broadcaster
+ *
+ * @param state The broadcaster state
+ *
+ * @return a status code
+ */
 bool broadcaster_stop(broadcaster_state_t *const state);
+
+/**
+ * Destroys a broadcaster
+ *
+ * @param state The broadcaster state
+ *
+ * @return a status code
+ */
 bool broadcaster_destroy(broadcaster_state_t *const state);
 
 #ifdef __cplusplus
