@@ -9,7 +9,10 @@
 #define __COMMON_CONFIGURATION__
 #include <stdint.h>
 
-extern uint16_t tcp_port_g;
-extern uint16_t udp_port_g;
+typedef struct {
+    uint16_t tcp_port_g;
+    uint16_t udp_port_g;
+    // add other config variables here
+} ciri_config_t;
 
 #endif // __COMMON_CONFIGURATION__

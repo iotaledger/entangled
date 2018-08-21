@@ -14,6 +14,7 @@
 #include "gossip/components/receiver.h"
 #include "gossip/components/requester.h"
 #include "gossip/components/responder.h"
+#include "ciri/conf/config.h"
 
 // Forward declarations
 typedef struct core_s core_t;
@@ -38,7 +39,7 @@ typedef struct node_s {
  *
  * @return a status code
  */
-retcode_t node_init(node_t* const node, core_t* const core);
+retcode_t node_init(node_t* const node, core_t* const core, ciri_config_t* config);
 
 /**
  * Starts a node

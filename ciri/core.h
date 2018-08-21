@@ -10,6 +10,7 @@
 
 #include "ciri/node.h"
 #include "consensus/tangle/tangle.h"
+#include "ciri/conf/config.h"
 
 typedef struct core_s {
   bool running;
@@ -25,7 +26,7 @@ typedef struct core_s {
  *
  * @return a status code
  */
-retcode_t core_init(core_t *const core);
+retcode_t core_init(core_t *const core, ciri_config_t* config);
 
 /**
  * Starts a core

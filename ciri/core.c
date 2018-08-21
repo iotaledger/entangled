@@ -16,7 +16,7 @@
 
 #define CORE_LOGGER_ID "core"
 
-retcode_t core_init(core_t* const core) {
+retcode_t core_init(core_t* const core, ciri_config_t* config) {
   if (core == NULL) {
     return RC_CORE_NULL_CORE;
   }
@@ -38,7 +38,7 @@ retcode_t core_init(core_t* const core) {
   }
 
   log_info(CORE_LOGGER_ID, "Initializing cIRI node\n");
-  if (node_init(&core->node, core)) {
+  if (node_init(&core->node, core, config)) {
     log_critical(CORE_LOGGER_ID, "Initializing cIRI node failed\n");
     return RC_CORE_FAILED_NODE_INIT;
   }
