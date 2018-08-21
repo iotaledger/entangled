@@ -9,6 +9,7 @@
 
 #include "ciri/node.h"
 #include "common/model/transaction.h"
+#include "common/network/iota_packet.h"
 #include "common/network/neighbor.h"
 #include "common/network/services/tcp_sender.hpp"
 #include "common/network/services/udp_sender.hpp"

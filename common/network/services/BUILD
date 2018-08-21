@@ -10,6 +10,7 @@ cc_library(
     name = "receiver",
     srcs = ["receiver.cc"],
     deps = [
+        ":receiver_shared",
         "//common/network/services:tcp_receiver",
         "//common/network/services:udp_receiver",
         "//utils/containers/queues:concurrent_queue_packet",
@@ -22,9 +23,6 @@ cc_library(
     hdrs = ["tcp_receiver.hpp"],
     deps = [
         "//ciri:node_shared",
-        "//common/network:neighbor",
-        "//common/network/components:receiver_shared",
-        "//common/network/services:receiver_shared",
         "//utils:logger_helper",
         "//utils/containers/lists:concurrent_list_neighbor",
         "//utils/containers/queues:concurrent_queue_packet",
@@ -48,10 +46,7 @@ cc_library(
     srcs = ["udp_receiver.cc"],
     hdrs = ["udp_receiver.hpp"],
     deps = [
-        "//ciri:node_shared",
         "//common/network:neighbor",
-        "//common/network/components:receiver_shared",
-        "//common/network/services:receiver_shared",
         "//utils:logger_helper",
         "//utils/containers/lists:concurrent_list_neighbor",
         "//utils/containers/queues:concurrent_queue_packet",

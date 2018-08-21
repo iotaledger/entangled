@@ -12,6 +12,7 @@
 
 #include "common/network/services/receiver.h"
 
+// Forward declarations
 typedef struct node_s node_t;
 
 typedef struct receiver_state_s {

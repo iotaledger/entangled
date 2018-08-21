@@ -7,7 +7,9 @@
 
 #pragma once
 
-#include "common/network/iota_packet.h"
+// Forward declarations
+typedef struct iota_packet_s iota_packet_t;
+typedef struct endpoint_s endpoint_t;
 
 #ifdef __cplusplus
 extern "C" {

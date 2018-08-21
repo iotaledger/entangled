@@ -13,6 +13,7 @@
 #include "common/network/network.h"
 #include "utils/handles/thread.h"
 
+// Forward declarations
 typedef struct concurrent_queue_iota_packet_t_s receive_queue_t;
 typedef struct receiver_state_s receiver_state_t;
 
