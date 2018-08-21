@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <string.h>
+
 #include "ciri/core.h"
 #include "utils/logger_helper.h"
 
