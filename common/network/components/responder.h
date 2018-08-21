@@ -8,10 +8,14 @@
 #ifndef __COMMON_NETWORK_COMPONENTS_RESPONDER_H__
 #define __COMMON_NETWORK_COMPONENTS_RESPONDER_H__
 
-#include "utils/containers/queues/concurrent_queue_transaction_request.h"
+#include <stdbool.h>
+
 #include "utils/handles/thread.h"
 
-typedef concurrent_queue_transaction_request_t responder_queue_t;
+// Forward declarations
+typedef struct concurrent_queue_transaction_request_t_s responder_queue_t;
+typedef struct neighbor_s neighbor_t;
+typedef struct _trit_array *trit_array_p;
 typedef struct node_s node_t;
 
 typedef struct responder_state_s {
