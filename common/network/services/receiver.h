@@ -29,7 +29,22 @@ typedef struct receiver_service_s {
 extern "C" {
 #endif
 
+/**
+ * Starts a receiver service
+ *
+ * @param service The receiver service
+ *
+ * @return a status code
+ */
 bool receiver_service_start(receiver_service_t* const service);
+
+/**
+ * Stops a receiver service
+ *
+ * @param service The receiver service
+ *
+ * @return a status code
+ */
 bool receiver_service_stop(receiver_service_t* const service);
 
 #ifdef __cplusplus
