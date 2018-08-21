@@ -5,13 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <string.h>
-
-#include "ciri/core.h"
-#include "ciri/node.h"
-#include "common/model/transaction.h"
 #include "common/network/components/processor.h"
-#include "common/network/neighbor.h"
+#include "ciri/core.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
