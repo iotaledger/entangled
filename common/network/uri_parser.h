@@ -9,6 +9,7 @@
 #define __COMMON_NETWORK_URI_PARSER_H__
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #ifdef __cplusplus
