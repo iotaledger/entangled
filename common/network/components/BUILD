@@ -34,6 +34,22 @@ cc_library(
 )
 
 cc_library(
+    name = "receiver_shared",
+    hdrs = ["receiver.h"],
+    deps = ["//common/network/services:receiver_shared"],
+)
+
+cc_library(
+    name = "receiver",
+    srcs = ["receiver.c"],
+    deps = [
+        ":receiver_shared",
+        "//ciri:node_shared",
+        "//common/network/services:receiver",
+    ],
+)
+
+cc_library(
     name = "responder_shared",
     hdrs = ["responder.h"],
     deps = [
@@ -53,26 +69,6 @@ cc_library(
         "//common/network:neighbor_shared",
         "//common/storage",
         "//utils/containers/queues:concurrent_queue_transaction_request",
-    ],
-)
-
-cc_library(
-    name = "receiver_shared",
-    hdrs = ["receiver.h"],
-    deps = [
-        "//common/network:iota_packet",
-        "//common/network/services:receiver_shared",
-        "//utils/handles:thread",
-    ],
-)
-
-cc_library(
-    name = "receiver",
-    srcs = ["receiver.c"],
-    deps = [
-        ":receiver_shared",
-        "//ciri:node_shared",
-        "//common/network/services:receiver",
     ],
 )
 

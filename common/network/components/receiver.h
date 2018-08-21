@@ -25,10 +25,44 @@ typedef struct receiver_state_s {
 extern "C" {
 #endif
 
+/**
+ * Initializes a receiver
+ *
+ * @param state The receiver state
+ * @param node A node
+ * @param tcp_port A TCP port to listen
+ * @param udp_port A UDP port to listen
+ *
+ * @return a status code
+ */
 bool receiver_init(receiver_state_t *const state, node_t *const node,
                    uint16_t tcp_port, uint16_t udp_port);
+
+/**
+ * Starts a receiver
+ *
+ * @param state The receiver state
+ *
+ * @return a status code
+ */
 bool receiver_start(receiver_state_t *const state);
+
+/**
+ * Stops a receiver
+ *
+ * @param state The receiver state
+ *
+ * @return a status code
+ */
 bool receiver_stop(receiver_state_t *const state);
+
+/**
+ * Destroys a receiver
+ *
+ * @param state The receiver state
+ *
+ * @return a status code
+ */
 bool receiver_destroy(receiver_state_t *const state);
 
 #ifdef __cplusplus
