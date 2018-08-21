@@ -48,7 +48,7 @@ bool broadcaster_init(broadcaster_state_t *const state, node_t *const node);
 bool broadcaster_start(broadcaster_state_t *const state);
 
 /**
- * Adds a packet to the broadcaster queue
+ * Adds a packet to a broadcaster queue
  *
  * @param state The broadcaster state
  * @param packet The packet
