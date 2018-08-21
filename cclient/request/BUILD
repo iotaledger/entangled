@@ -2,6 +2,7 @@ cc_library(
     name = "requests",
     srcs = glob([
         "*.h",
+        "*.c",
     ]),
     hdrs = glob([
         "*.h",

@@ -81,3 +81,6 @@ cclient/cmake-*
 
 # Database
 ciri/ciri.db*
+
+# Visual Studio Code conf
+.vscode/

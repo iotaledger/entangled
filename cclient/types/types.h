@@ -8,9 +8,15 @@
 #include "common/trinary/trit_array.h"
 #include "common/trinary/tryte.h"
 
+#include "common/errors.h"
+#include "utarray.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#undef oom
+#define oom() printf("cclient oom\n")
 
 #define NUM_TRITS_ADDRESS 243
 #define NUM_TRITS_BUNDLE_HASH 243
@@ -21,6 +27,11 @@ typedef trit_array_p address_t;
 typedef trit_array_p bundle_hash_t;
 typedef trit_array_p tag_t;
 typedef trit_array_p tx_hash_t;
+
+typedef struct {
+  size_t length;
+  char* data;
+} char_buffer;
 
 typedef struct {
   size_t size;
@@ -46,6 +57,10 @@ typedef struct {
   size_t size;
   tx_hash_t* array;
 } tx_hash_array;
+
+char_buffer* char_buffer_new();
+retcode_t char_buffer_allocate(char_buffer* in, size_t n);
+void char_buffer_free(char_buffer* in);
 
 #ifdef __cplusplus
 }

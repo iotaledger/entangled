@@ -7,6 +7,7 @@ cc_library(
     hdrs = glob([
         "json/*.h",
     ]),
+    include_prefix = "serializer",
     visibility = ["//visibility:public"],
     deps = [
         ":serializer_base",
@@ -27,5 +28,15 @@ cc_library(
     deps = [
         "//cclient/request:requests",
         "//cclient/response:responses",
+    ],
+)
+
+cc_test(
+    name = "test_json",
+    srcs = ["tests/test_json.c"],
+    deps = [
+        ":serializer_base",
+        ":serializer_json",
+        "@unity",
     ],
 )

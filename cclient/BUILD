@@ -6,6 +6,7 @@ cc_library(
         "**/*.h",
     ]),
     hdrs = ["iota_api.h"],
+    visibility = ["//visibility:public"],
     deps = [
         "//cclient/http:beast",
     ],
