@@ -5,8 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "utils/containers/lists/concurrent_list_neighbor.h"
+#include <string.h>
+
 #include "utils/containers/lists/concurrent_list.c.inc"
+#include "utils/containers/lists/concurrent_list_neighbor.h"
 
 DEFINE_CL(neighbor_t);
 
@@ -62,7 +64,7 @@ neighbor_t *neighbor_find_by_endpoint_values(neighbors_list_t *const neighbors,
   if (neighbors == NULL) {
     return NULL;
   }
-  if (neighbor_init_with_values(&cmp, protocol, host, port)) {
+  if (neighbor_init_with_values(&cmp, host, port, protocol)) {
     return NULL;
   }
   return CL_FIND(neighbors, cmp);

@@ -59,6 +59,7 @@ cc_library(
         ":responder_shared",
         "//ciri:core_shared",
         "//ciri:node_shared",
+        "//common/network:neighbor_shared",
         "//common/storage",
         "//utils/containers/queues:concurrent_queue_transaction_request",
     ],

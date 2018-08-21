@@ -11,9 +11,11 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
-#include "common/network/iota_packet.h"
+#include "common/network/endpoint.h"
 
+// Forward declarations
 typedef struct node_s node_t;
+typedef struct iota_packet_s iota_packet_t;
 
 typedef struct neighbor_s {
   endpoint_t endpoint;
@@ -29,12 +31,40 @@ typedef struct neighbor_s {
 extern "C" {
 #endif
 
+/**
+ * Initializes a neighbor with an URI
+ *
+ * @param neighbor The neighbor
+ * @param uri The URI (e.g udp://8.8.8.8:14265)
+ *
+ * @return a status code
+ */
 retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
                                  char const *const uri);
+
+/**
+ * Initializes a neighbor with endpoint values
+ *
+ * @param neighbor The neighbor
+ * @param host The endpoint host
+ * @param port The endpoint port
+ * @param protocol The endpoint protocol
+ *
+ * @return a status code
+ */
 retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
-                                    protocol_type_t const protocol,
-                                    char const *const host,
-                                    uint16_t const port);
+                                    char const *const host, uint16_t const port,
+                                    protocol_type_t const protocol);
+
+/**
+ * Sends a packet to a neighbor
+ *
+ * @param node A node
+ * @param neighbor The neighbor
+ * @param packet The packet
+ *
+ * @return a status code
+ */
 retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
                         iota_packet_t *const packet);
 

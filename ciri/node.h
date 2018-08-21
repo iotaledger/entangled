@@ -8,6 +8,7 @@
 #ifndef __CIRI_NODE_H__
 #define __CIRI_NODE_H__
 
+#include "common/errors.h"
 #include "common/network/components/broadcaster.h"
 #include "common/network/components/processor.h"
 #include "common/network/components/receiver.h"
