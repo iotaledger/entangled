@@ -10,6 +10,7 @@
 #include <boost/asio.hpp>
 
 #include "common/network/components/receiver.h"
+#include "common/network/iota_packet.h"
 #include "common/network/neighbor.h"
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection> {

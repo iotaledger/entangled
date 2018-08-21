@@ -10,6 +10,7 @@
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
+#include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_COMPONENT_LOGGER_ID "processor_component"

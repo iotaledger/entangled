@@ -3,7 +3,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "receiver_shared",
     hdrs = ["receiver.h"],
-    deps = ["//utils/containers/queues:concurrent_queue_packet"],
+    deps = ["//common/network"],
 )
 
 cc_library(
@@ -12,21 +12,7 @@ cc_library(
     deps = [
         "//common/network/services:tcp_receiver",
         "//common/network/services:udp_receiver",
-    ],
-)
-
-cc_library(
-    name = "udp_receiver",
-    srcs = ["udp_receiver.cc"],
-    hdrs = ["udp_receiver.hpp"],
-    deps = [
-        "//ciri:node_shared",
-        "//common/network:neighbor",
-        "//common/network/components:receiver_shared",
-        "//common/network/services:receiver_shared",
-        "//utils:logger_helper",
-        "//utils/containers/lists:concurrent_list_neighbor",
-        "@boost//:asio",
+        "//utils/containers/queues:concurrent_queue_packet",
     ],
 )
 
@@ -41,6 +27,7 @@ cc_library(
         "//common/network/services:receiver_shared",
         "//utils:logger_helper",
         "//utils/containers/lists:concurrent_list_neighbor",
+        "//utils/containers/queues:concurrent_queue_packet",
         "@boost//:asio",
     ],
 )
@@ -52,6 +39,22 @@ cc_library(
     deps = [
         "//common/network:iota_packet",
         "//utils:logger_helper",
+        "@boost//:asio",
+    ],
+)
+
+cc_library(
+    name = "udp_receiver",
+    srcs = ["udp_receiver.cc"],
+    hdrs = ["udp_receiver.hpp"],
+    deps = [
+        "//ciri:node_shared",
+        "//common/network:neighbor",
+        "//common/network/components:receiver_shared",
+        "//common/network/services:receiver_shared",
+        "//utils:logger_helper",
+        "//utils/containers/lists:concurrent_list_neighbor",
+        "//utils/containers/queues:concurrent_queue_packet",
         "@boost//:asio",
     ],
 )

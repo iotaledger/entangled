@@ -8,6 +8,7 @@
 #include "common/network/components/broadcaster.h"
 #include "ciri/node.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
+#include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/logger_helper.h"
 
 #define BROADCASTER_COMPONENT_LOGGER_ID "broadcaster_component"
