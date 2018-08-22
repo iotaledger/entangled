@@ -67,7 +67,8 @@ retcode_t json_get_int(const cJSON* json_obj, const char* obj_name, int* num) {
   return RC_OK;
 }
 
-retcode_t json_get_string(cJSON* json_obj, char* obj_name, char_buffer* text) {
+retcode_t json_get_string(cJSON* json_obj, char* obj_name,
+                          char_buffer_t* text) {
   retcode_t ret = RC_OK;
   size_t str_len = 0;
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
@@ -88,7 +89,7 @@ retcode_t json_get_string(cJSON* json_obj, char* obj_name, char_buffer* text) {
 
 retcode_t json_find_transactions_serialize_request(
     const serializer_t* const s, const find_transactions_req_t* const obj,
-    char_buffer* out) {
+    char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
@@ -218,7 +219,7 @@ size_t json_get_node_info_serialize_request_get_size(
 }
 
 retcode_t json_get_node_info_serialize_request(const serializer_t* const s,
-                                               char_buffer* out) {
+                                               char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* req_text = "{\"command\":\"getNodeInfo\"}";
   ret = char_buffer_allocate(out, strlen(req_text));

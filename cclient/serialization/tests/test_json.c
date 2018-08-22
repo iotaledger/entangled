@@ -17,7 +17,7 @@ void test_serialize_find_transactions(void) {
       "LKUSJNAECEW\"],\"tags\":[\"MINEIOTADOTCOM9999999999999\"]}";
 
   find_transactions_req_t* find_tran = find_transactions_req_new();
-  char_buffer* serializer_out = char_buffer_new();
+  char_buffer_t* serializer_out = char_buffer_new();
 
   find_transactions_req_add_tag(find_tran, "MINEIOTADOTCOM9999999999999");
   find_transactions_req_add_approvee(
@@ -74,7 +74,7 @@ void test_serialize_get_node_info(void) {
   serializer_t serializer;
   const char* json_text = "{\"command\":\"getNodeInfo\"}";
 
-  char_buffer* serializer_out = char_buffer_new();
+  char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
 
   serializer.vtable.get_node_info_serialize_request(&serializer,

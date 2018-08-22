@@ -17,7 +17,7 @@ typedef struct {
   // find_transactions_request
   retcode_t (*find_transactions_serialize_request)(
       const serializer_t* const s, const find_transactions_req_t* const obj,
-      char_buffer* out);
+      char_buffer_t* out);
 
   retcode_t (*find_transactions_deserialize_response)(
       const serializer_t* const s, const char* const obj,
@@ -75,7 +75,7 @@ typedef struct {
   size_t (*get_node_info_serialize_request_get_size)(
       const serializer_t* const s);
   retcode_t (*get_node_info_serialize_request)(const serializer_t* const,
-                                               char_buffer* out);
+                                               char_buffer_t* out);
 
   retcode_t (*get_node_info_deserialize_response)(const serializer_t* const,
                                                   const char* const obj,

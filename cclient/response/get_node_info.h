@@ -14,11 +14,11 @@ typedef struct {
    * Name of the IOTA software you're currently using (IRI stands for Initial
    * Reference Implementation).
    */
-  char_buffer* appName;
+  char_buffer_t* appName;
   /**
    * The version of the IOTA software you're currently running.
    */
-  char_buffer* appVersion;
+  char_buffer_t* appVersion;
   /**
    * Available cores on your machine for JRE.
    */
@@ -39,7 +39,7 @@ typedef struct {
   /**
    * Latest milestone that was signed off by the coordinator.
    */
-  char_buffer* latestMilestone;
+  char_buffer_t* latestMilestone;
   /**
    * Index of the latest milestone.
    */
@@ -50,7 +50,7 @@ typedef struct {
    * subtangle of coordinator-approved transactions, and have a consistent view
    * of all referenced transactions.
    */
-  char_buffer* latestSolidSubtangleMilestone;
+  char_buffer_t* latestSolidSubtangleMilestone;
   /**
    * Index of the latest solid subtangle.
    */

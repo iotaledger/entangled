@@ -18,7 +18,8 @@
 #include <boost/beast/version.hpp>
 
 iota_api_result_t iota_service_query(const void* const service_opaque,
-                                     char_buffer* obj, char_buffer* response) {
+                                     char_buffer_t* obj,
+                                     char_buffer_t* response) {
   using tcp = boost::asio::ip::tcp;
   namespace http = boost::beast::http;
 

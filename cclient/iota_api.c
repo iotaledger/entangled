@@ -8,8 +8,8 @@ iota_api_result_t iota_api_get_node_info(
     const iota_http_service_t* const service, get_node_info_res_t* const res) {
   iota_api_result_t result = {0};
 
-  char_buffer* req_buff = char_buffer_new();
-  char_buffer* res_buff = char_buffer_new();
+  char_buffer_t* req_buff = char_buffer_new();
+  char_buffer_t* res_buff = char_buffer_new();
 
   result.error = service->serializer.vtable.get_node_info_serialize_request(
       &service->serializer, req_buff);
@@ -58,8 +58,8 @@ iota_api_result_t iota_api_find_transactions(
     const find_transactions_req_t* const req,
     find_transactions_res_t* const res) {
   iota_api_result_t result = {0};
-  char_buffer* res_buff = char_buffer_new();
-  char_buffer* req_buff = char_buffer_new();
+  char_buffer_t* res_buff = char_buffer_new();
+  char_buffer_t* req_buff = char_buffer_new();
 
   service->serializer.vtable.find_transactions_serialize_request(
       &service->serializer, req, req_buff);
