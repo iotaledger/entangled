@@ -25,8 +25,10 @@ namespace statscollector {
 
 std::map<std::string, std::string> ZMQCollectorImpl::nameToDescCounters = {
     {"transactions_new", "New TXs count"},
+    {"value_transactions_new", "Value TXs count"},
     {"transactions_reattached", "Reattached TXs count"},
     {"transactions_confirmed", "confirmed TXs count"},
+    {"value_transactions_confirmed", "Confirmed value TX's count"},
     {"bundles_new", "new bundles count"},
     {"bundles_confirmed", "confirmed bundles count"},
     {"value_new", "new tx's accumulated value"},
