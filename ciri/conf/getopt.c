@@ -30,5 +30,5 @@ retcode_t ciri_conf_parse(ciri_config_t* out, size_t argc, char** argv) {
           break;
       }
   }
-  return 0;
+  return RC_OK;
 };
