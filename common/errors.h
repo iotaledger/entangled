@@ -161,10 +161,20 @@ enum retcode_t {
   RC_NEIGHBOR_FAILED_REQUESTER = 0x0A | RC_MODULE_NEIGHBOR | RC_SEVERITY_FATAL,
 
   // Cclient Module
+  // json create object error, might OOM.
   RC_CCLIENT_JSON_CREATE = 0x01 | RC_MODULE_CCLIENT | RC_SEVERITY_FATAL,
-  RC_CCLIENT_JSON_PARSE = 0x02 | RC_MODULE_CCLIENT | RC_SEVERITY_FATAL,
+  // json parsing error, might the wrong format
+  RC_CCLIENT_JSON_PARSE = 0x02 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,
+  // Out of Memory
   RC_CCLIENT_OOM = 0x03 | RC_MODULE_CCLIENT | RC_SEVERITY_FATAL,
-  RC_CCLIENT_HTTP = 0x04 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,
+  // errors during issuing a HTTP request
+  RC_CCLIENT_HTTP_REQ = 0x04 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,
+  // http response error
+  RC_CCLIENT_HTTP_RES = 0x05 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,
+  // has error messages in the response
+  RC_CCLIENT_RES_ERROR = 0x06 | RC_MODULE_CCLIENT | RC_SEVERITY_MODERATE,
+  // json parsing error, key no found in the json object
+  RC_CCLIENT_JSON_KEY = 0x07 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,
 };
 
 typedef enum retcode_t retcode_t;
