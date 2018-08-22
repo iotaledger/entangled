@@ -10,8 +10,8 @@ ciri_config_t* ciri_conf_init() {
       return NULL;
   }
   memset(config, 0, sizeof(ciri_config_t));
-  config->tcp_port_g = 14260;
-  config->udp_port_g = 14261;
+  config->tcp_port = 14260;
+  config->udp_port = 14261;
 
   return config;
 }
@@ -21,10 +21,10 @@ retcode_t ciri_conf_parse(ciri_config_t* out, size_t argc, char** argv) {
   while ((arg = getopt_long(argc, argv, short_options, long_options, NULL)) != -1) {
     switch (arg) {
         case 't':
-          out->tcp_port_g = atoi(optarg);
+          out->tcp_port = atoi(optarg);
           break;
         case 'u':
-          out->udp_port_g = atoi(optarg);
+          out->udp_port = atoi(optarg);
           break;
         default:
           break;
