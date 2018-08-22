@@ -13,10 +13,7 @@
 static trit_t const merkle_null_hash[HASH_LENGTH_TRIT] = {0};
 
 static size_t binary_tree_size(size_t const acc, size_t const depth) {
-  if (depth == 0) {
-    return acc + 1;
-  }
-  return binary_tree_size(acc + (1 << depth), depth - 1);
+  return (1 << (depth + 1)) - 1 + acc;
 }
 
 size_t merkle_size(size_t const leaf_count) {
@@ -35,7 +32,6 @@ size_t merkle_size(size_t const leaf_count) {
 
 size_t merkle_depth(size_t const node_count) {
   size_t depth = 0;
-
   while (binary_tree_size(0, depth) < node_count) {
     depth++;
   }
@@ -45,15 +41,26 @@ size_t merkle_depth(size_t const node_count) {
 static size_t merkle_node_index_traverse(size_t const acc, size_t const depth,
                                          size_t const width,
                                          size_t const tree_depth) {
-  if (depth == 0) return acc;
-  if (width < (1 << (depth - 1))) {
-    return merkle_node_index_traverse(acc + 1, depth - 1, width,
-                                      tree_depth - 1);
-  } else {
-    return merkle_node_index_traverse(
-        1 + acc + binary_tree_size(0, tree_depth - 1), depth - 1,
-        width - (1 << (depth - 1)), tree_depth - 1);
+  if (!tree_depth)
+    return 0;
+
+  int depth_cursor = 1;
+  int tree_depth_width_divide_scale = 1;
+  int index = 0;
+  int width_cursor = width;
+  int tree_depth_width = 1 << depth;
+
+  while (depth_cursor <= depth) {
+    if (width_cursor >= (tree_depth_width >> tree_depth_width_divide_scale)) {
+      index += binary_tree_size(0, (tree_depth - depth_cursor));
+      width_cursor =
+          width_cursor - (tree_depth_width >> tree_depth_width_divide_scale);
+    }
+    tree_depth_width_divide_scale++;
+    depth_cursor++;
   }
+  index += depth;
+  return index;
 }
 
 size_t merkle_node_index(size_t const depth, size_t const width,
