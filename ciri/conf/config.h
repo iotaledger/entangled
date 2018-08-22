@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONFIGURATION__
-#define __COMMON_CONFIGURATION__
+#ifndef __CIRI_CONF_CONFIG_H__
+#define __CIRI_CONF_CONFIG_H__
 #include <stdint.h>
 
 typedef struct {
@@ -15,4 +15,4 @@ typedef struct {
     // add other config variables here
 } ciri_config_t;
 
-#endif // __COMMON_CONFIGURATION__
+#endif // __CIRI_CONF_CONFIG_H__

@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONFIGURATION_ARGS__
-#define __COMMON_CONFIGURATION_ARGS__
+#ifndef __CIRI_CONF_ARGS_H__
+#define __CIRI_CONF_ARGS_H__
 
 char* short_options = "u:t:";
 struct option long_options[] = {                                                                    
@@ -14,4 +14,4 @@ struct option long_options[] = {
     {"tcp-receiver-port", required_argument, 0, 't'},
 };
 
-#endif // __COMMON_CONFIGURATION_ARGS__
+#endif // __CIRI_CONF_ARGS_H__

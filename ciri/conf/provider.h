@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONFIG_PROVIDER__
-#define __COMMON_CONFIG_PROVIDER__
+#ifndef __CIRI_CONF_PROVIDER_H__
+#define __CIRI_CONF_PROVIDER_H__
 #include <getopt.h>
 
 #include "common/errors.h"
@@ -15,4 +15,4 @@
 ciri_config_t* ciri_conf_init();
 retcode_t ciri_conf_parse(ciri_config_t* out, size_t argc, char** argv);
 
-#endif // __COMMON_CONFIGUR_PROVIDER__
+#endif // __CIRI_CONF_PROVIDER_H__
