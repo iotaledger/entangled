@@ -16,13 +16,12 @@
 
 #define CORE_LOGGER_ID "core"
 
-retcode_t core_init(core_t* const core, ciri_config_t* config) {
+retcode_t core_init(core_t* const core) {
   if (core == NULL) {
     return RC_CORE_NULL_CORE;
   }
 
   logger_helper_init(CORE_LOGGER_ID, LOGGER_DEBUG, true);
-  memset(core, 0, sizeof(core_t));
   core->running = false;
 
   log_info(CORE_LOGGER_ID, "Initializing tangle\n");
@@ -38,7 +37,7 @@ retcode_t core_init(core_t* const core, ciri_config_t* config) {
   }
 
   log_info(CORE_LOGGER_ID, "Initializing cIRI node\n");
-  if (node_init(&core->node, core, config)) {
+  if (node_init(&core->node, core, &core->config)) {
     log_critical(CORE_LOGGER_ID, "Initializing cIRI node failed\n");
     return RC_CORE_FAILED_NODE_INIT;
   }

@@ -6,6 +6,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "ciri/core.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
@@ -15,7 +16,6 @@
 #define MAIN_LOGGER_ID "main"
 
 static core_t core_g;
-static ciri_config_t* config;
 
 int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
@@ -27,18 +27,19 @@ int main(int argc, char* argv[]) {
   logger_output_register(stdout);
   logger_output_level_set(stdout, LOGGER_DEBUG);
   logger_helper_init(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
+  memset(&core_g, 0, sizeof(core_t));
 
   // configuration argument parser
-  if ((config = ciri_conf_init()) == NULL) {
+  if (ciri_conf_init(&core_g.config)) {
       return EXIT_FAILURE;
   }
 
-  if (ciri_conf_parse(config, argc, argv)) {
+  if (ciri_conf_parse(&core_g.config, argc, argv)) {
       return EXIT_FAILURE;
   }
 
   log_info(MAIN_LOGGER_ID, "Initializing cIRI core\n");
-  if (core_init(&core_g, config)) {
+  if (core_init(&core_g)) {
     log_critical(MAIN_LOGGER_ID, "Initializing cIRI core failed\n");
     return EXIT_FAILURE;
   }

@@ -12,7 +12,7 @@
 #include "common/errors.h"
 #include "ciri/conf/config.h"
 
-ciri_config_t* ciri_conf_init();
+retcode_t ciri_conf_init(ciri_config_t* config);
 retcode_t ciri_conf_parse(ciri_config_t* out, size_t argc, char** argv);
 
 #endif // __CIRI_CONF_PROVIDER_H__

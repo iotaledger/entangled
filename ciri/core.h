@@ -14,6 +14,7 @@
 
 typedef struct core_s {
   bool running;
+  ciri_config_t config;
   node_t node;
   tangle_t tangle;
   connection_config_t db_conf;
@@ -26,7 +27,7 @@ typedef struct core_s {
  *
  * @return a status code
  */
-retcode_t core_init(core_t *const core, ciri_config_t* config);
+retcode_t core_init(core_t *const core);
 
 /**
  * Starts a core

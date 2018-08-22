@@ -1,19 +1,16 @@
 #include <stdlib.h>
-#include <string.h>
 
 #include "ciri/conf/provider.h"
 #include "ciri/conf/config_args.h"
 
-ciri_config_t* ciri_conf_init() {
-  ciri_config_t *config = (ciri_config_t* )malloc(sizeof(ciri_config_t));
+retcode_t ciri_conf_init(ciri_config_t* config) {
   if (config == NULL) {
-      return NULL;
+      return 1;
   }
-  memset(config, 0, sizeof(ciri_config_t));
   config->tcp_port = 14260;
   config->udp_port = 14261;
 
-  return config;
+  return RC_OK;
 }
 
 retcode_t ciri_conf_parse(ciri_config_t* out, size_t argc, char** argv) {
