@@ -32,6 +32,7 @@ size_t merkle_size(size_t const leaf_count) {
 
 size_t merkle_depth(size_t const node_count) {
   size_t depth = 0;
+
   while (binary_tree_size(0, depth) < node_count) {
     depth++;
   }
@@ -45,18 +46,18 @@ static size_t merkle_node_index_traverse(size_t const acc, size_t const depth,
     return 0;
 
   int depth_cursor = 1;
-  int tree_depth_width_divide_scale = 1;
+  int width_of_leaves_divide_scale = 1;
   int index = 0;
   int width_cursor = width;
-  int tree_depth_width = 1 << depth;
+  int width_of_leaves = 1 << depth;
 
   while (depth_cursor <= depth) {
-    if (width_cursor >= (tree_depth_width >> tree_depth_width_divide_scale)) {
+    if (width_cursor >= (width_of_leaves >> width_of_leaves_divide_scale)) {
       index += binary_tree_size(0, (tree_depth - depth_cursor));
       width_cursor =
-          width_cursor - (tree_depth_width >> tree_depth_width_divide_scale);
+          width_cursor - (width_of_leaves >> width_of_leaves_divide_scale);
     }
-    tree_depth_width_divide_scale++;
+    width_of_leaves_divide_scale++;
     depth_cursor++;
   }
   index += depth;
