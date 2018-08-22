@@ -13,8 +13,6 @@
 #include "utarray.h"
 #include "uthash.h"
 
-#define CW_RATING_CALCULATOR_LOGGER_ID "consensus_cw_rating_calculator"
-
 void init_cw_calculator_dfs(cw_rating_calculator_base_t *calculator);
 /**
  *

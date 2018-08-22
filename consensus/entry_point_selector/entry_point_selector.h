@@ -41,7 +41,7 @@ testnet, int milestoneStartIndex) {
  */
 
 typedef struct entry_point_selector_t {
-  tangle_t tangle;
+  tangle_t *tangle;
   milestone_t milestone;
   bool testnet;
   size_t start_index;
@@ -52,6 +52,9 @@ extern retcode_t iota_consensus_get_entry_point(
 
 extern retcode_t iota_consensus_entry_point_selector_init(
     bool testnet, entry_point_selector_t *ep_selector);
+
+extern retcode_t iota_consensus_entry_point_selector_destroy(
+    entry_point_selector_t *ep_selector);
 
 #ifdef __cplusplus
 }

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include "consensus/tipselection/tipselection.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
@@ -21,6 +28,7 @@ retcode_t iota_consensus_tipselection_init(
   impl->lv = lv;
   impl->wv = wv;
   impl->walker = walker;
+  impl->ep_selector = ep;
   rw_lock_handle_init(&impl->milestone->latest_snapshot.rw_lock);
   return RC_OK;
 }
@@ -29,7 +37,7 @@ retcode_t iota_consensus_get_transactions_to_approve(
     tipselection_t *impl, size_t depth, const trit_array_p reference,
     tips_pair *tips) {
   retcode_t res = RC_OK;
-  trit_array_p ep ;
+  trit_array_p ep;
 
   rw_lock_handle_rdlock(&impl->milestone->latest_snapshot.rw_lock);
 
@@ -38,8 +46,10 @@ retcode_t iota_consensus_get_transactions_to_approve(
   cw_calc_result ratings_result;
   res = iota_consensus_cw_rating_calculate(impl->cw_calc, ep, &ratings_result);
   if (res != RC_OK) {
-    // TODO
+    log_error(TIPSELECTION_LOGGER_ID,
+              "Failed to calculate CW with error %\" PRIu64 \"\n", res);
     rw_lock_handle_unlock(&impl->milestone->latest_snapshot.rw_lock);
+    return res;
   }
 
   walker_validator_t wv;
@@ -47,16 +57,21 @@ retcode_t iota_consensus_get_transactions_to_approve(
   iota_consensus_walker_validator_init(impl->tangle, impl->milestone, impl->lv,
                                        impl->wv);
 
-  iota_consensus_walker_walk(impl->walker, ep, ratings_result.cw_ratings, &wv, tips->trunk);
+  iota_consensus_walker_walk(impl->walker, ep, ratings_result.cw_ratings, &wv,
+                             tips->trunk);
 
   if (reference != NULL) {
     // TODO
   }
 
-  iota_consensus_walker_walk(impl->walker, ep, ratings_result.cw_ratings, &wv, tips->branch);
+  iota_consensus_walker_walk(impl->walker, ep, ratings_result.cw_ratings, &wv,
+                             tips->branch);
 
   res = iota_consensus_ledeger_validator_validate(impl->lv, tips);
   if (res != RC_OK) {
+    log_error(TIPSELECTION_LOGGER_ID,
+              "Failed to validate tips with error %\" PRIu64 \"\n", res);
+    rw_lock_handle_unlock(&impl->milestone->latest_snapshot.rw_lock);
     return res;
   }
 
@@ -65,6 +80,13 @@ retcode_t iota_consensus_get_transactions_to_approve(
   return res;
 }
 
-retcode_t iota_consensus_tipselection_destroy() {
+retcode_t iota_consensus_tipselection_destroy(tipselection_t *impl) {
   logger_helper_destroy(TIPSELECTION_LOGGER_ID);
+  rw_lock_handle_destroy(&impl->milestone->latest_snapshot.rw_lock);
+  impl->cw_calc = NULL;
+  impl->milestone = NULL;
+  impl->tangle = NULL;
+  impl->lv = NULL;
+  impl->wv = NULL;
+  impl->walker = NULL;
 }

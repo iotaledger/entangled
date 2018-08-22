@@ -16,6 +16,8 @@
 #include "consensus/tangle/tangle.h"
 #include "uthash.h"
 
+#define CW_RATING_CALCULATOR_LOGGER_ID "consensus_cw_rating_calculator"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -75,6 +77,9 @@ struct cw_rating_calculator_t {
 extern retcode_t iota_consensus_cw_rating_init(
     cw_rating_calculator_t *cw_calc, const tangle_t *tangle,
     enum CWCalculationImplementation impl);
+
+extern retcode_t iota_consensus_cw_rating_destroy(
+    cw_rating_calculator_t *cw_calc);
 
 extern retcode_t iota_consensus_cw_rating_calculate(
     const cw_rating_calculator_t *cw_calc, trit_array_p entry_point,

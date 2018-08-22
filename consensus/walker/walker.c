@@ -16,3 +16,7 @@ retcode_t iota_consensus_walker_walk(const walker_t *walker,
                                      trit_array_p tip) {
   return RC_CONSENSUS_NOT_IMPLEMENTED;
 }
+
+retcode_t iota_consensus_walker_destroy(walker_t *walker) {
+  return RC_CONSENSUS_NOT_IMPLEMENTED;
+}

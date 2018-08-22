@@ -276,9 +276,9 @@ extern retcode_t iota_stor_load_hashes(const connection_t* const conn,
   return RC_OK;
 }
 
-retcode_t iota_stor_load_hashes_approvers(const connection_t* const conn,
-                                          const trit_array_p approvee_hash,
-                                          iota_hashes_pack* pack) {
+retcode_t iota_stor_load_hashes_of_approvers(const connection_t* const conn,
+                                             const trit_array_p approvee_hash,
+                                             iota_hashes_pack* pack) {
   char statement[MAX_SELECT_STATEMENT_SIZE];
   iota_transactions_select_hashes_approvers_statement(
       approvee_hash, statement, MAX_SELECT_STATEMENT_SIZE);

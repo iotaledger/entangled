@@ -99,7 +99,7 @@ void test_cw_gen_topology(TestTangleTopology topology) {
   trit_array_p currHash = trit_array_new(FLEX_TRIT_SIZE_243);
   for (int i = 0; i < numApprovers; i++) {
     trit_array_set_trits(currHash, txs[i].hash, NUM_TRITS_HASH);
-    TEST_ASSERT(iota_tangle_hashes_load(&tangle, COL_HASH, currHash, &pack) ==
+    TEST_ASSERT(iota_tangle_load_hashes(&tangle, COL_HASH, currHash, &pack) ==
                 RC_OK);
     TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
   }
@@ -164,7 +164,7 @@ void test_single_tx_tangle(void) {
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
               RC_OK);
   TEST_ASSERT(exist == true);
-  TEST_ASSERT(iota_tangle_hashes_load(&tangle, COL_HASH, ep, &pack) == RC_OK);
+  TEST_ASSERT(iota_tangle_load_hashes(&tangle, COL_HASH, ep, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_MEMORY(pack.hashes[0]->trits, ep->trits,
                            FLEX_TRIT_SIZE_243);
@@ -249,7 +249,7 @@ void test_cw_topology_four_transactions_diamond(void) {
   trit_array_p currHash = trit_array_new(FLEX_TRIT_SIZE_243);
   for (int i = 0; i < numTxs; i++) {
     trit_array_set_trits(currHash, txs[i].hash, NUM_TRITS_HASH);
-    TEST_ASSERT(iota_tangle_hashes_load(&tangle, COL_HASH, currHash, &pack) ==
+    TEST_ASSERT(iota_tangle_load_hashes(&tangle, COL_HASH, currHash, &pack) ==
                 RC_OK);
     TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
   }

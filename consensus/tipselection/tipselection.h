@@ -25,17 +25,6 @@
 extern "C" {
 #endif
 
-/*
-private final EntryPointSelector entryPointSelector;
-private final RatingCalculator ratingCalculator;
-private final Walker walker;
-
-private final int maxDepth;
-private final LedgerValidator ledgerValidator;
-private final TransactionValidator transactionValidator;
-private final Tangle tangle;
-*/
-
 typedef struct tipselection_t {
   tangle_t *tangle;
   entry_point_selector_t *ep_selector;
@@ -56,7 +45,7 @@ extern retcode_t iota_consensus_get_transactions_to_approve(
     tipselection_t *impl, size_t depth, const trit_array_p reference,
     tips_pair *tips);
 
-extern retcode_t iota_consensus_tipselection_destroy();
+extern retcode_t iota_consensus_tipselection_destroy(tipselection_t *impl);
 
 #ifdef __cplusplus
 }

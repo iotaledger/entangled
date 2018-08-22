@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include "consensus/trnasaction_validator/transaction_validator.h"
 
 #define TRANSACTION_VALIDATOR_LOGGER_ID "consensus_transaction_validator"

@@ -20,7 +20,7 @@ extern "C" {
 
 typedef trit_array_p milestone_view_t;
 
-retcode_t iota_concencues_find_closest_next_milestone(
+retcode_t iota_consencues_find_closest_next_milestone(
     const tangle_t tangle, size_t index, bool testnet,
     size_t milestone_start_index, milestone_view_t closest_milestone_found);
 

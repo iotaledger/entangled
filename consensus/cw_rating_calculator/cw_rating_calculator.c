@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "common/errors.h"
 #include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
@@ -11,6 +18,11 @@ retcode_t iota_consensus_cw_rating_init(cw_rating_calculator_t *cw_calc,
     init_cw_calculator_dfs(&cw_calc->base);
   } else if (impl == NoImplementation) {
   }
+}
+
+retcode_t iota_consensus_cw_rating_destroy(cw_rating_calculator_t *cw_calc) {
+  logger_helper_destroy(CW_RATING_CALCULATOR_LOGGER_ID);
+  cw_calc->tangle = NULL;
 }
 
 retcode_t iota_consensus_cw_rating_calculate(

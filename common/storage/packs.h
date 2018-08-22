@@ -12,7 +12,6 @@
 #include <stdint.h>
 #include "common/errors.h"
 #include "common/model/transaction.h"
-#include "common/storage/connection.h"
 #include "common/trinary/trit_array.h"
 #include "utils/logger_helper.h"
 

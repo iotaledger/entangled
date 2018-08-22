@@ -116,8 +116,8 @@ retcode_t cw_rating_dfs_do_dfs_from_db(
     utarray_pop_back(stack);
     pack.num_loaded = 0;
     trit_array_set_trits(currTxTritArray, currTxHash, NUM_TRITS_HASH);
-    res = iota_tangle_load_approvers_hashes(cw_calc->tangle, currTxTritArray,
-                                            &pack);
+    res = iota_tangle_load_hashes_of_approvers(cw_calc->tangle, currTxTritArray,
+                                               &pack);
 
     if (res != RC_OK) {
       log_error(CW_RATING_CALCULATOR_LOGGER_ID,

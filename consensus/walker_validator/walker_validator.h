@@ -52,6 +52,9 @@ extern retcode_t iota_consensus_walker_validator_init(
     const tangle_t *tangle, const milestone_t *milestone,
     const ledger_validator_t *lv, walker_validator_t *wv);
 
+extern retcode_t iota_consensus_walker_validator_destroy(
+    walker_validator_t *wv);
+
 extern retcode_t iota_consensus_walker_validator_is_valid(
     const walker_validator_t *wv, trit_array_p tx_hash);
 

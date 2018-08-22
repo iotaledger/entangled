@@ -48,6 +48,7 @@ typedef struct walker_t {
 
 extern retcode_t iota_consensus_walker_init(const tangle_t *tangle,
                                             double alpha, walker_t *walker);
+extern retcode_t iota_consensus_walker_destroy(walker_t *walker);
 
 extern retcode_t iota_consensus_walker_walk(const walker_t *walker,
                                             const trit_array_p ep,
