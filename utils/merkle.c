@@ -53,7 +53,7 @@ static size_t merkle_node_index_traverse(size_t const acc, size_t const depth,
 
   while (depth_cursor <= depth) {
     if (width_cursor >= (width_of_leaves >> width_of_leaves_divide_scale)) {
-      index += binary_tree_size(0, (tree_depth - depth_cursor));
+      index += ((1 << (depth + 1)) - 1);
       width_cursor =
           width_cursor - (width_of_leaves >> width_of_leaves_divide_scale);
     }
