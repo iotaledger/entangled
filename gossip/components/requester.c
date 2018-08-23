@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/network/components/requester.h"
+#include "gossip/components/requester.h"
 #include "ciri/core.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"

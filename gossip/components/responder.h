@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_COMPONENTS_RESPONDER_H__
-#define __COMMON_NETWORK_COMPONENTS_RESPONDER_H__
+#ifndef __GOSSIP_COMPONENTS_RESPONDER_H__
+#define __GOSSIP_COMPONENTS_RESPONDER_H__
 
 #include <stdbool.h>
 
@@ -84,4 +84,4 @@ retcode_t responder_destroy(responder_state_t *const state);
 }
 #endif
 
-#endif  //__COMMON_NETWORK_COMPONENTS_RESPONDER_H__
+#endif  //__GOSSIP_COMPONENTS_RESPONDER_H__

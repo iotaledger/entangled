@@ -5,11 +5,11 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/network/components/responder.h"
+#include "gossip/components/responder.h"
 #include "ciri/core.h"
-#include "common/network/neighbor.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
+#include "gossip/neighbor.h"
 #include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/containers/queues/concurrent_queue_transaction_request.h"
 #include "utils/logger_helper.h"

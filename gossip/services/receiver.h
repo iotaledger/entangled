@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_SERVICES_RECEIVER_H__
-#define __COMMON_NETWORK_SERVICES_RECEIVER_H__
+#ifndef __GOSSIP_SERVICES_RECEIVER_H__
+#define __GOSSIP_SERVICES_RECEIVER_H__
 
 #include <stdint.h>
 
@@ -52,4 +52,4 @@ bool receiver_service_stop(receiver_service_t* const service);
 }
 #endif
 
-#endif  // __COMMON_NETWORK_SERVICES_RECEIVER_H__
+#endif  // __GOSSIP_SERVICES_RECEIVER_H__

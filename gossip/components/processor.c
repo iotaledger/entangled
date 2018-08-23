@@ -8,9 +8,9 @@
 #include <string.h>
 
 #include "ciri/core.h"
-#include "common/network/components/processor.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
+#include "gossip/components/processor.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/logger_helper.h"

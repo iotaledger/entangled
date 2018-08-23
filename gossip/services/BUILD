@@ -11,8 +11,8 @@ cc_library(
     srcs = ["receiver.cc"],
     deps = [
         ":receiver_shared",
-        "//common/network/services:tcp_receiver",
-        "//common/network/services:udp_receiver",
+        "//gossip/services:tcp_receiver",
+        "//gossip/services:udp_receiver",
         "//utils/containers/queues:concurrent_queue_packet",
     ],
 )
@@ -35,7 +35,7 @@ cc_library(
     srcs = ["tcp_sender.cc"],
     hdrs = ["tcp_sender.hpp"],
     deps = [
-        "//common/network:iota_packet",
+        "//gossip:iota_packet",
         "//utils:logger_helper",
         "@boost//:asio",
     ],
@@ -46,7 +46,7 @@ cc_library(
     srcs = ["udp_receiver.cc"],
     hdrs = ["udp_receiver.hpp"],
     deps = [
-        "//common/network:neighbor",
+        "//gossip:neighbor",
         "//utils:logger_helper",
         "//utils/containers/lists:concurrent_list_neighbor",
         "//utils/containers/queues:concurrent_queue_packet",
@@ -59,7 +59,7 @@ cc_library(
     srcs = ["udp_sender.cc"],
     hdrs = ["udp_sender.hpp"],
     deps = [
-        "//common/network:iota_packet",
+        "//gossip:iota_packet",
         "//utils:logger_helper",
         "@boost//:asio",
     ],
