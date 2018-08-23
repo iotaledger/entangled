@@ -11,6 +11,11 @@ cc_library(
 )
 
 cc_library(
+    name = "config_default",
+    hdrs = ["config_default.h"],
+)
+
+cc_library(
     name = "conf_provider",
     hdrs = ["provider.h"],
     srcs = ["getopt.c"],
@@ -18,5 +23,6 @@ cc_library(
         "//common:errors",
         ":config",
         ":config_args",
+        ":config_default",
     ],
 )

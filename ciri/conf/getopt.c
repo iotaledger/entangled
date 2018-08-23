@@ -9,13 +9,14 @@
 
 #include "ciri/conf/provider.h"
 #include "ciri/conf/config_args.h"
+#include "ciri/conf/config_default.h"
 
 retcode_t ciri_conf_init(ciri_config_t* config) {
   if (config == NULL) {
       return RC_CONF_NULL_CONF;
   }
-  config->tcp_port = 14260;
-  config->udp_port = 14261;
+  config->tcp_port = TCP_PORT;
+  config->udp_port = UDP_PORT;
 
   return RC_OK;
 }
