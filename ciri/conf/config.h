@@ -7,6 +7,7 @@
 
 #ifndef __CIRI_CONF_CONFIG_H__
 #define __CIRI_CONF_CONFIG_H__
+
 #include <stdint.h>
 
 typedef struct ciri_config_s {
