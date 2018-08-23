@@ -10,7 +10,7 @@
 
 #include <cstdint>
 #include <vector>
-#include "common/trinary/trit_array.h"
+#include "common/trinary/flex_trit.h"
 
 namespace iota {
 namespace trinary {
@@ -25,12 +25,12 @@ class FlexTritArray {
     FlexTritArrayProxy(FlexTritArray &flex_trit_array, int index)
         : flex_trit_array(flex_trit_array), index(index) {}
     operator trit_t() const {
-      return flex_trit_array_at(flex_trit_array.flex_trits_.data(),
-                                flex_trit_array.num_trits_, index);
+      return flex_trits_at(flex_trit_array.flex_trits_.data(),
+                           flex_trit_array.num_trits_, index);
     }
     FlexTritArrayProxy operator=(trit_t t) {
-      flex_trit_array_set_at(flex_trit_array.flex_trits_.data(),
-                             flex_trit_array.num_trits_, index, t);
+      flex_trits_set_at(flex_trit_array.flex_trits_.data(),
+                        flex_trit_array.num_trits_, index, t);
       return *this;
     }
   };
@@ -41,7 +41,7 @@ class FlexTritArray {
   /// @param[in] num_trits - number of trits to store
   /// @return size_t - the number of bytes need
   static size_t numBytesForTrits(size_t num_trits) {
-    return flex_trits_num_for_trits(num_trits);
+    return num_flex_trits_for_trits(num_trits);
   };
 
   /// Returns a new FlexTritArray from a vector of trits.
@@ -112,4 +112,4 @@ class FlexTritArray {
 }  // namespace trinary
 }  // namespace iota
 
-#endif  // COMMON_TRINARY_FLEX_TRIT_H_
+#endif  // COMMON_TRINARY_FLEX_TRIT_ARRAY_H_

@@ -31,11 +31,11 @@ void iota_packet_set_transaction(iota_packet_t* const packet,
     return;
   }
 
-  // FIXME: Tracked via #166: Efficient flex_trit_array_to_bytes
+  // FIXME: Tracked via #166: Efficient flex_trits_to_bytes
   // https://github.com/iotaledger/entangled/issues/166
   transaction_serialize_on_flex_trits(tx, tx_flex_trits);
-  flex_trit_array_to_int8(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                          tx_flex_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                          NUM_TRITS_SERIALIZED_TRANSACTION);
+  flex_trits_to_trits(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, tx_flex_trits,
+                      NUM_TRITS_SERIALIZED_TRANSACTION,
+                      NUM_TRITS_SERIALIZED_TRANSACTION);
   trits_to_bytes(tx_trits, packet->content, NUM_TRITS_SERIALIZED_TRANSACTION);
 }

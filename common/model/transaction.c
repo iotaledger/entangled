@@ -29,94 +29,87 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
   trit_t buffer[81];
   size_t offset = 0;
   memset(transaction, 0, sizeof(struct _iota_transaction));
-  flex_trit_array_slice(transaction->signature_or_message, NUM_TRITS_SIGNATURE,
-                        trits, NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_SIGNATURE);
+  flex_trits_slice(transaction->signature_or_message, NUM_TRITS_SIGNATURE,
+                   trits, NUM_TRITS_SERIALIZED_TRANSACTION, offset,
+                   NUM_TRITS_SIGNATURE);
   offset += NUM_TRITS_SIGNATURE;
-  flex_trit_array_slice(transaction->address, NUM_TRITS_ADDRESS, trits,
-                        NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_ADDRESS);
+  flex_trits_slice(transaction->address, NUM_TRITS_ADDRESS, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_ADDRESS);
   offset += NUM_TRITS_ADDRESS;
-  flex_trit_array_slice(partial, NUM_TRITS_VALUE, trits,
-                        NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_VALUE);
-  flex_trit_array_to_int8(buffer, NUM_TRITS_VALUE, partial, NUM_TRITS_VALUE,
-                          NUM_TRITS_VALUE);
+  flex_trits_slice(partial, NUM_TRITS_VALUE, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_VALUE);
+  flex_trits_to_trits(buffer, NUM_TRITS_VALUE, partial, NUM_TRITS_VALUE,
+                      NUM_TRITS_VALUE);
   transaction_set_value(transaction, trits_to_long(buffer, NUM_TRITS_VALUE));
   offset += NUM_TRITS_VALUE;
-  flex_trit_array_slice(transaction->obsolete_tag, NUM_TRITS_OBSOLETE_TAG,
-                        trits, NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_OBSOLETE_TAG);
+  flex_trits_slice(transaction->obsolete_tag, NUM_TRITS_OBSOLETE_TAG, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset,
+                   NUM_TRITS_OBSOLETE_TAG);
   offset += NUM_TRITS_OBSOLETE_TAG;
-  flex_trit_array_slice(partial, NUM_TRITS_TIMESTAMP, trits,
-                        NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_TIMESTAMP);
-  flex_trit_array_to_int8(buffer, NUM_TRITS_TIMESTAMP, partial,
-                          NUM_TRITS_TIMESTAMP, NUM_TRITS_TIMESTAMP);
+  flex_trits_slice(partial, NUM_TRITS_TIMESTAMP, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset,
+                   NUM_TRITS_TIMESTAMP);
+  flex_trits_to_trits(buffer, NUM_TRITS_TIMESTAMP, partial, NUM_TRITS_TIMESTAMP,
+                      NUM_TRITS_TIMESTAMP);
   transaction_set_timestamp(transaction,
                             trits_to_long(buffer, NUM_TRITS_TIMESTAMP));
   offset += NUM_TRITS_TIMESTAMP;
-  flex_trit_array_slice(partial, NUM_TRITS_CURRENT_INDEX, trits,
-                        NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_CURRENT_INDEX);
-  flex_trit_array_to_int8(buffer, NUM_TRITS_CURRENT_INDEX, partial,
-                          NUM_TRITS_CURRENT_INDEX, NUM_TRITS_CURRENT_INDEX);
+  flex_trits_slice(partial, NUM_TRITS_CURRENT_INDEX, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset,
+                   NUM_TRITS_CURRENT_INDEX);
+  flex_trits_to_trits(buffer, NUM_TRITS_CURRENT_INDEX, partial,
+                      NUM_TRITS_CURRENT_INDEX, NUM_TRITS_CURRENT_INDEX);
   transaction_set_current_index(transaction, trits_to_long(buffer, 27));
   offset += NUM_TRITS_CURRENT_INDEX;
-  flex_trit_array_slice(partial, NUM_TRITS_LAST_INDEX, trits,
-                        NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_LAST_INDEX);
-  flex_trit_array_to_int8(buffer, NUM_TRITS_LAST_INDEX, partial,
-                          NUM_TRITS_LAST_INDEX, NUM_TRITS_LAST_INDEX);
+  flex_trits_slice(partial, NUM_TRITS_LAST_INDEX, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset,
+                   NUM_TRITS_LAST_INDEX);
+  flex_trits_to_trits(buffer, NUM_TRITS_LAST_INDEX, partial,
+                      NUM_TRITS_LAST_INDEX, NUM_TRITS_LAST_INDEX);
   transaction_set_last_index(transaction,
                              trits_to_long(buffer, NUM_TRITS_LAST_INDEX));
   offset += NUM_TRITS_LAST_INDEX;
-  flex_trit_array_slice(transaction->bundle, NUM_TRITS_BUNDLE, trits,
-                        NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_BUNDLE);
+  flex_trits_slice(transaction->bundle, NUM_TRITS_BUNDLE, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_BUNDLE);
   offset += NUM_TRITS_BUNDLE;
-  flex_trit_array_slice(transaction->trunk, NUM_TRITS_TRUNK, trits,
-                        NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_TRUNK);
+  flex_trits_slice(transaction->trunk, NUM_TRITS_TRUNK, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_TRUNK);
   offset += NUM_TRITS_TRUNK;
-  flex_trit_array_slice(transaction->branch, NUM_TRITS_BRANCH, trits,
-                        NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_BRANCH);
+  flex_trits_slice(transaction->branch, NUM_TRITS_BRANCH, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_BRANCH);
   offset += NUM_TRITS_BRANCH;
-  flex_trit_array_slice(transaction->tag, NUM_TRITS_TAG, trits,
-                        NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_TAG);
+  flex_trits_slice(transaction->tag, NUM_TRITS_TAG, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_TAG);
   offset += NUM_TRITS_TAG;
-  flex_trit_array_slice(partial, NUM_TRITS_ATTACHMENT_TIMESTAMP, trits,
-                        NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_ATTACHMENT_TIMESTAMP);
-  flex_trit_array_to_int8(buffer, NUM_TRITS_ATTACHMENT_TIMESTAMP, partial,
-                          NUM_TRITS_ATTACHMENT_TIMESTAMP,
-                          NUM_TRITS_ATTACHMENT_TIMESTAMP);
+  flex_trits_slice(partial, NUM_TRITS_ATTACHMENT_TIMESTAMP, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset,
+                   NUM_TRITS_ATTACHMENT_TIMESTAMP);
+  flex_trits_to_trits(buffer, NUM_TRITS_ATTACHMENT_TIMESTAMP, partial,
+                      NUM_TRITS_ATTACHMENT_TIMESTAMP,
+                      NUM_TRITS_ATTACHMENT_TIMESTAMP);
   transaction_set_attachment_timestamp(
       transaction, trits_to_long(buffer, NUM_TRITS_ATTACHMENT_TIMESTAMP));
   offset += NUM_TRITS_ATTACHMENT_TIMESTAMP;
-  flex_trit_array_slice(partial, NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER, trits,
-                        NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER);
-  flex_trit_array_to_int8(buffer, NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER, partial,
-                          NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER,
-                          NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER);
+  flex_trits_slice(partial, NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset,
+                   NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER);
+  flex_trits_to_trits(buffer, NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER, partial,
+                      NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER,
+                      NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER);
   transaction_set_attachment_timestamp_lower(
       transaction, trits_to_long(buffer, NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER));
   offset += NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER;
-  flex_trit_array_slice(partial, NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER, trits,
-                        NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER);
-  flex_trit_array_to_int8(buffer, NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER, partial,
-                          NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER,
-                          NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER);
+  flex_trits_slice(partial, NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset,
+                   NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER);
+  flex_trits_to_trits(buffer, NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER, partial,
+                      NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER,
+                      NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER);
   transaction_set_attachment_timestamp_upper(
       transaction, trits_to_long(buffer, NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER));
   offset += NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER;
-  flex_trit_array_slice(transaction->nonce, NUM_TRITS_NONCE, trits,
-                        NUM_TRITS_SERIALIZED_TRANSACTION, offset,
-                        NUM_TRITS_NONCE);
+  flex_trits_slice(transaction->nonce, NUM_TRITS_NONCE, trits,
+                   NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_NONCE);
   offset += NUM_TRITS_NONCE;
 
   // Compute the transaction hash
@@ -126,11 +119,11 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
   curl.type = CURL_P_81;
   trit_t tx_trits[NUM_TRITS_SERIALIZED_TRANSACTION];
   trit_t hash[NUM_TRITS_HASH];
-  flex_trit_array_to_int8(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, trits,
-                          offset, offset);
+  flex_trits_to_trits(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, trits, offset,
+                      offset);
   curl_digest(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, hash, &curl);
-  int8_to_flex_trit_array(transaction->hash, NUM_TRITS_HASH, hash,
-                          NUM_TRITS_HASH, NUM_TRITS_HASH);
+  flex_trits_from_trits(transaction->hash, NUM_TRITS_HASH, hash, NUM_TRITS_HASH,
+                        NUM_TRITS_HASH);
   return offset;
 }
 
@@ -138,8 +131,8 @@ size_t _long_to_flex_trit(int64_t value, flex_trit_t *trits) {
   trit_t buffer[NUM_TRITS_VALUE];
   memset(buffer, 0, NUM_TRITS_VALUE);
   size_t long_size = long_to_trits(value, buffer);
-  int8_to_flex_trit_array(trits, NUM_TRITS_VALUE, buffer, NUM_TRITS_VALUE,
-                          NUM_TRITS_VALUE);
+  flex_trits_from_trits(trits, NUM_TRITS_VALUE, buffer, NUM_TRITS_VALUE,
+                        NUM_TRITS_VALUE);
   return long_size;
 }
 // Serialize an existing transaction
@@ -148,74 +141,70 @@ size_t transaction_serialize_to_flex_trits(const iota_transaction_t transaction,
                                            flex_trit_t *trits) {
   flex_trit_t partial[FLEX_TRIT_SIZE_81];
   size_t offset = 0, long_size;
-  size_t num_bytes = flex_trits_num_for_trits(NUM_TRITS_SERIALIZED_TRANSACTION);
+  size_t num_bytes = num_flex_trits_for_trits(NUM_TRITS_SERIALIZED_TRANSACTION);
   memset(trits, FLEX_TRIT_NULL_VALUE, num_bytes);
 
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         transaction->signature_or_message, NUM_TRITS_SIGNATURE,
-                         offset, NUM_TRITS_SIGNATURE);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                    transaction->signature_or_message, NUM_TRITS_SIGNATURE,
+                    offset, NUM_TRITS_SIGNATURE);
   offset += NUM_TRITS_SIGNATURE;
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         transaction->address, NUM_TRITS_ADDRESS, offset,
-                         NUM_TRITS_ADDRESS);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                    transaction->address, NUM_TRITS_ADDRESS, offset,
+                    NUM_TRITS_ADDRESS);
   offset += NUM_TRITS_ADDRESS;
   long_size = _long_to_flex_trit(transaction->value, partial);
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
-                         NUM_TRITS_VALUE, offset, NUM_TRITS_VALUE);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
+                    NUM_TRITS_VALUE, offset, NUM_TRITS_VALUE);
   offset += NUM_TRITS_VALUE;
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         transaction->obsolete_tag, NUM_TRITS_OBSOLETE_TAG,
-                         offset, NUM_TRITS_OBSOLETE_TAG);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                    transaction->obsolete_tag, NUM_TRITS_OBSOLETE_TAG, offset,
+                    NUM_TRITS_OBSOLETE_TAG);
   offset += NUM_TRITS_OBSOLETE_TAG;
   long_size = _long_to_flex_trit(transaction->timestamp, partial);
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
-                         NUM_TRITS_TIMESTAMP, offset, NUM_TRITS_TIMESTAMP);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
+                    NUM_TRITS_TIMESTAMP, offset, NUM_TRITS_TIMESTAMP);
   offset += NUM_TRITS_TIMESTAMP;
   long_size = _long_to_flex_trit(transaction->current_index, partial);
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
-                         NUM_TRITS_CURRENT_INDEX, offset,
-                         NUM_TRITS_CURRENT_INDEX);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
+                    NUM_TRITS_CURRENT_INDEX, offset, NUM_TRITS_CURRENT_INDEX);
   offset += NUM_TRITS_CURRENT_INDEX;
   long_size = _long_to_flex_trit(transaction->last_index, partial);
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
-                         NUM_TRITS_LAST_INDEX, offset, NUM_TRITS_LAST_INDEX);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
+                    NUM_TRITS_LAST_INDEX, offset, NUM_TRITS_LAST_INDEX);
   offset += NUM_TRITS_LAST_INDEX;
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         transaction->bundle, NUM_TRITS_BUNDLE, offset,
-                         NUM_TRITS_BUNDLE);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                    transaction->bundle, NUM_TRITS_BUNDLE, offset,
+                    NUM_TRITS_BUNDLE);
   offset += NUM_TRITS_BUNDLE;
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         transaction->trunk, NUM_TRITS_TRUNK, offset,
-                         NUM_TRITS_TRUNK);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, transaction->trunk,
+                    NUM_TRITS_TRUNK, offset, NUM_TRITS_TRUNK);
   offset += NUM_TRITS_TRUNK;
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         transaction->branch, NUM_TRITS_BRANCH, offset,
-                         NUM_TRITS_BRANCH);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                    transaction->branch, NUM_TRITS_BRANCH, offset,
+                    NUM_TRITS_BRANCH);
   offset += NUM_TRITS_BRANCH;
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         transaction->tag, NUM_TRITS_TAG, offset,
-                         NUM_TRITS_TAG);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, transaction->tag,
+                    NUM_TRITS_TAG, offset, NUM_TRITS_TAG);
   offset += NUM_TRITS_TAG;
   long_size = _long_to_flex_trit(transaction->attachment_timestamp, partial);
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
-                         NUM_TRITS_ATTACHMENT_TIMESTAMP, offset,
-                         NUM_TRITS_ATTACHMENT_TIMESTAMP);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
+                    NUM_TRITS_ATTACHMENT_TIMESTAMP, offset,
+                    NUM_TRITS_ATTACHMENT_TIMESTAMP);
   offset += NUM_TRITS_ATTACHMENT_TIMESTAMP;
   long_size =
       _long_to_flex_trit(transaction->attachment_timestamp_lower, partial);
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
-                         NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER, offset,
-                         NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
+                    NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER, offset,
+                    NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER);
   offset += NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER;
   long_size =
       _long_to_flex_trit(transaction->attachment_timestamp_upper, partial);
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
-                         NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER, offset,
-                         NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, partial,
+                    NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER, offset,
+                    NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER);
   offset += NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER;
-  flex_trit_array_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         transaction->nonce, NUM_TRITS_NONCE, offset,
-                         NUM_TRITS_NONCE);
+  flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, transaction->nonce,
+                    NUM_TRITS_NONCE, offset, NUM_TRITS_NONCE);
   offset += NUM_TRITS_NONCE;
   return offset;
 }

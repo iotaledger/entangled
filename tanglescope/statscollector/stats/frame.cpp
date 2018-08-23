@@ -34,6 +34,7 @@ void FrameTXStats::trackNewTX(iri::TXMessage& tx,
   if (tx.value() > 0) {
     auto value = static_cast<int64_t>(tx.value());
     counters.at("value_new").get().Add({}).Increment(value);
+    counters.at("value_transactions_new").get().Add({}).Increment();
   }
 }
 void FrameTXStats::trackReattachedTX(
@@ -63,6 +64,7 @@ void FrameTXStats::trackConfirmedBundle(
   counters.at("value_confirmed").get().Add({}).Increment(totalValue);
 
   counters.at("transactions_confirmed").get().Add({}).Increment(size);
+  counters.at("value_transactions_confirmed").get().Add({}).Increment(size);
 }
 }  // namespace statscollector
 }  // namespace tanglescope

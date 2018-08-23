@@ -2,14 +2,14 @@
 
 #include "types.h"
 
-char_buffer* char_buffer_new() {
-  char_buffer* out = malloc(sizeof(char_buffer));
+char_buffer_t* char_buffer_new() {
+  char_buffer_t* out = malloc(sizeof(char_buffer_t));
   out->length = 0;
   out->data = NULL;
   return out;
 }
 
-retcode_t char_buffer_allocate(char_buffer* in, size_t n) {
+retcode_t char_buffer_allocate(char_buffer_t* in, size_t n) {
   if (in->length != 0) {
     return RC_OK;
   }
@@ -20,7 +20,7 @@ retcode_t char_buffer_allocate(char_buffer* in, size_t n) {
   return RC_OK;
 }
 
-void char_buffer_free(char_buffer* in) {
+void char_buffer_free(char_buffer_t* in) {
   if (in) {
     if (in->data) free(in->data);
     free(in);

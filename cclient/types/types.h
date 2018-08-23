@@ -31,7 +31,7 @@ typedef trit_array_p tx_hash_t;
 typedef struct {
   size_t length;
   char* data;
-} char_buffer;
+} char_buffer_t;
 
 typedef struct {
   size_t size;
@@ -58,9 +58,9 @@ typedef struct {
   tx_hash_t* array;
 } tx_hash_array;
 
-char_buffer* char_buffer_new();
-retcode_t char_buffer_allocate(char_buffer* in, size_t n);
-void char_buffer_free(char_buffer* in);
+char_buffer_t* char_buffer_new();
+retcode_t char_buffer_allocate(char_buffer_t* in, size_t n);
+void char_buffer_free(char_buffer_t* in);
 
 #ifdef __cplusplus
 }

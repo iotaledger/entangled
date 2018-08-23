@@ -46,8 +46,10 @@ statscollector:
 **Metrics**:
 
 - statscollector_bundles_confirmed (confirmed bundles count) [Counter]
+- statscollector_value_transactions_new  (Value TXs count) [Counter]
 - statscollector_bundles_new (new bundles count) [Counter]
 - statscollector_transactions_confirmed (confirmed TXs count) [Counter]
+- statscollector_value_transactions_confirmed  (Confirmed value TX's count) [Counter]
 - statscollector_transactions_new (new TXs count) [Counter]
 - statscollector_transactions_reattached (Reattached TXs count) [Counter]
 - statscollector_value_confirmed (Confirmed tx's accumulated value) [Counter]

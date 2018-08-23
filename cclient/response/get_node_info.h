@@ -7,52 +7,54 @@
 extern "C" {
 #endif
 
+#include "types/types.h"
+
 typedef struct {
   /**
    * Name of the IOTA software you're currently using (IRI stands for Initial
    * Reference Implementation).
    */
-  char* appName;
+  char_buffer_t* appName;
   /**
    * The version of the IOTA software you're currently running.
    */
-  char* appVersion;
+  char_buffer_t* appVersion;
   /**
    * Available cores on your machine for JRE.
    */
-  short jreAvailableProcessors;
+  int jreAvailableProcessors;
   /**
    * Returns the amount of free memory in the Java Virtual Machine.
    */
-  int jreFreeMemory;
+  size_t jreFreeMemory;
   /**
    * Returns the maximum amount of memory that the Java virtual machine will
    * attempt to use.
    */
-  int jreMaxMemory;
+  size_t jreMaxMemory;
   /**
    * Returns the total amount of memory in the Java virtual machine.
    */
-  int jreTotalMemory;
+  size_t jreTotalMemory;
   /**
    * Latest milestone that was signed off by the coordinator.
    */
-  address_t latestMilestone;
+  char_buffer_t* latestMilestone;
   /**
    * Index of the latest milestone.
    */
-  int latestMilestoneIndex;
+  size_t latestMilestoneIndex;
   /**
    * The latest milestone which is solid and is used for sending transactions.
    * For a milestone to become solid your local node must basically approve the
    * subtangle of coordinator-approved transactions, and have a consistent view
    * of all referenced transactions.
    */
-  address_t latestSolidSubtangleMilestone;
+  char_buffer_t* latestSolidSubtangleMilestone;
   /**
    * Index of the latest solid subtangle.
    */
-  int latestSolidSubtangleMilestoneIndex;
+  size_t latestSolidSubtangleMilestoneIndex;
   /**
    * Number of neighbors you are directly connected with.
    */
@@ -64,7 +66,7 @@ typedef struct {
   /**
    * Current UNIX timestamp.
    */
-  int time;
+  size_t time;
   /**
    * Number of tips in the network.
    */
@@ -74,6 +76,9 @@ typedef struct {
    */
   int transactionsToRequest;
 } get_node_info_res_t;
+
+get_node_info_res_t* get_node_info_res_new();
+void get_node_info_res_free(get_node_info_res_t* res);
 
 #ifdef __cplusplus
 }
