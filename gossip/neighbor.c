@@ -9,9 +9,9 @@
 
 #include "ciri/node.h"
 #include "common/model/transaction.h"
-#include "common/network/iota_packet.h"
-#include "common/network/neighbor.h"
 #include "common/network/uri_parser.h"
+#include "gossip/iota_packet.h"
+#include "gossip/neighbor.h"
 #include "gossip/services/tcp_sender.hpp"
 #include "gossip/services/udp_sender.hpp"
 

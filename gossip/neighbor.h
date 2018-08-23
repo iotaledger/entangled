@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_NEIGHBOR_H__
-#define __COMMON_NETWORK_NEIGHBOR_H__
+#ifndef __GOSSIP_NEIGHBOR_H__
+#define __GOSSIP_NEIGHBOR_H__
 
 #include <stdbool.h>
 
@@ -72,4 +72,4 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
 }
 #endif
 
-#endif  // __COMMON_NETWORK_NEIGHBOR_H__
+#endif  // __GOSSIP_NEIGHBOR_H__

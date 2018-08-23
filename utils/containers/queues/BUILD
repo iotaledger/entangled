@@ -6,7 +6,7 @@ cc_library(
     hdrs = ["concurrent_queue_packet.h"],
     deps = [
         ":concurrent_queue",
-        "//common/network:iota_packet",
+        "//gossip:iota_packet",
     ],
 )
 
@@ -16,7 +16,7 @@ cc_library(
     hdrs = ["concurrent_queue_transaction_request.h"],
     deps = [
         ":concurrent_queue",
-        "//common/network:transaction_request",
+        "//gossip:transaction_request",
     ],
 )
 

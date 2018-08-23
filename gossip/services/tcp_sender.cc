@@ -7,7 +7,7 @@
 
 #include <boost/asio.hpp>
 
-#include "common/network/iota_packet.h"
+#include "gossip/iota_packet.h"
 #include "gossip/services/tcp_sender.hpp"
 #include "utils/logger_helper.h"
 

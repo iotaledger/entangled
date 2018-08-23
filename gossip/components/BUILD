@@ -80,7 +80,7 @@ cc_library(
     deps = [
         ":responder_shared",
         "//ciri:core_shared",
-        "//common/network:neighbor_shared",
+        "//gossip:neighbor_shared",
         "//utils/containers/queues:concurrent_queue_packet",
         "//utils/containers/queues:concurrent_queue_transaction_request",
     ],
