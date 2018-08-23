@@ -36,6 +36,7 @@ typedef struct iota_hashes_pack {
 extern retcode_t hash_pack_resize(iota_hashes_pack *pack, size_t resize_factor);
 extern retcode_t hash_pack_init(iota_hashes_pack *pack, size_t size);
 extern retcode_t hash_pack_free(iota_hashes_pack *pack);
+
 #ifdef __cplusplus
 }
 #endif
