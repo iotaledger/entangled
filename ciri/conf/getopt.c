@@ -12,7 +12,7 @@
 
 retcode_t ciri_conf_init(ciri_config_t* config) {
   if (config == NULL) {
-      return 1;
+      return RC_CONF_NULL_CONF;
   }
   config->tcp_port = 14260;
   config->udp_port = 14261;
@@ -22,6 +22,7 @@ retcode_t ciri_conf_init(ciri_config_t* config) {
 
 retcode_t ciri_conf_parse(ciri_config_t* out, size_t argc, char** argv) {
   int arg;
+
   while ((arg = getopt_long(argc, argv, short_options, long_options, NULL)) != -1) {
     switch (arg) {
         case 't':
