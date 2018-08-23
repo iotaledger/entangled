@@ -26,6 +26,7 @@ cc_library(
         "//common/sign/v1:iss_kerl",
         "//common/trinary:trit_tryte",
         "//utils:export",
+        "//common/trinary:trit_array",
     ],
 )
 

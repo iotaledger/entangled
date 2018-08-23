@@ -12,7 +12,7 @@ extern "C" {
 #ifndef __COMMON_MODEL_TRANSACTION_H_
 #define __COMMON_MODEL_TRANSACTION_H_
 
-#include "common/trinary/trit_array.h"
+#include "common/trinary/flex_trit.h"
 
 #define NUM_TRITS_SERIALIZED_TRANSACTION 8019
 #define NUM_TRITS_SIGNATURE 6561
@@ -111,9 +111,9 @@ struct _iota_transaction {
   int64_t attachment_timestamp_upper;
   // 27 trytes = 81 trits
   flex_trit_t nonce[FLEX_TRIT_SIZE_81];
-  // Total 2673 trytes
   // 81 trytes = 243 trits
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  // Total 2754 trytes
 };
 
 /***********************************************************************************************************
@@ -204,6 +204,8 @@ flex_trit_t *transaction_hash(iota_transaction_t transaction);
 void transaction_set_hash(iota_transaction_t transaction,
                           const flex_trit_t *hash);
 
+void transaction_reset(iota_transaction_t transaction);
+
 /***********************************************************************************************************
  * Constructors
  ***********************************************************************************************************/
@@ -231,7 +233,7 @@ size_t transaction_deserialize_from_trits(iota_transaction_t transaction,
  * Destructor
  ***********************************************************************************************************/
 // Free an existing transaction - compatible with free()
-void transaction_free(void *transaction);
+void transaction_free(iota_transaction_t transaction);
 
 #endif  // __COMMON_MODEL_TRANSACTION_H_
 #ifdef __cplusplus
