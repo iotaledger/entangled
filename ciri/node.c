@@ -6,12 +6,13 @@
  */
 
 #include "ciri/node.h"
+#include "ciri/core.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
 #define NODE_LOGGER_ID "node"
 
-retcode_t node_init(node_t* const node, core_t* const core, ciri_config_t* config) {
+retcode_t node_init(node_t* const node, core_t* const core) {
   if (node == NULL) {
     return RC_NODE_NULL_NODE;
   }
@@ -40,7 +41,7 @@ retcode_t node_init(node_t* const node, core_t* const core, ciri_config_t* confi
   }
 
   log_info(NODE_LOGGER_ID, "Initializing receiver component\n");
-  if (receiver_init(&node->receiver, node, config->tcp_port, config->udp_port) == false) {
+  if (receiver_init(&node->receiver, node, core->config.tcp_port, core->config.udp_port) == false) {
     log_critical(NODE_LOGGER_ID, "Initializing receiver component failed\n");
     return RC_NODE_FAILED_RECEIVER_INIT;
   }

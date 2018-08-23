@@ -39,7 +39,7 @@ typedef struct node_s {
  *
  * @return a status code
  */
-retcode_t node_init(node_t* const node, core_t* const core, ciri_config_t* config);
+retcode_t node_init(node_t* const node, core_t* const core);
 
 /**
  * Starts a node
