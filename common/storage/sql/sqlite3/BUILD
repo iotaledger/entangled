@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//common/storage",
         "//common/storage/sql:connection",
+        "//utils:logger_helper",
         "@sqlite3",
     ],
 )

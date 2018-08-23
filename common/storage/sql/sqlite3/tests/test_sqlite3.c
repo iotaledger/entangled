@@ -130,13 +130,12 @@ void test_stored_load_hashes_of_approvers(void) {
   pack.hashes_capacity = 5;
   trit_array_p key = trit_array_new(NUM_TRITS_HASH);
   memcpy(key->trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_stor_load_hashes_approvers(&conn, key, &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_load_hashes_of_approvers(&conn, key, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(0, pack.num_loaded);
 
   for (int i = 0; i < pack.hashes_capacity; ++i) {
     trit_array_free(pack.hashes[i]);
   }
-  // TODO - complete the test with 2 transaction's that one approves the other
 }
 
 int main(void) {

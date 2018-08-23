@@ -15,9 +15,13 @@
 #include <errno.h>
 #include <fcntl.h>
 
+#include "utils/logger_helper.h"
+
 #include "utils/files.h"
 
-int copy_file(const char *to, const char *from) {
+#define UTILS_FILES_LOGGER_ID "utils_files"
+
+retcode_t copy_file(const char *to, const char *from) {
   int fd_to, fd_from;
   char buf[4096];
   ssize_t nread;
@@ -52,16 +56,28 @@ int copy_file(const char *to, const char *from) {
     }
     close(fd_from);
 
-    /* Success! */
-    return 0;
+    return RC_OK;
   }
 
 out_error:
+  log_error(UTILS_FILES_LOGGER_ID, "Failed with errno %\" PRIu64 \"\n", errno);
   saved_errno = errno;
 
   close(fd_from);
   if (fd_to >= 0) close(fd_to);
 
   errno = saved_errno;
-  return -1;
+  return RC_UTILS_FAILED_TO_COPY_FILE;
+}
+
+retcode_t remove_file(const char *file_path) {
+  int status;
+
+  status = remove(file_path);
+  if (status) {
+    log_error(UTILS_FILES_LOGGER_ID, "Failed with status %\" PRIu64 \"\n",
+              status);
+    return RC_UTILS_FAILED_REMOVE_FILE;
+  }
+  return RC_OK;
 }
