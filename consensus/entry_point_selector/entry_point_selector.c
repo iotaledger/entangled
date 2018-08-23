@@ -30,7 +30,7 @@ retcode_t iota_consensus_entry_point_selector_destroy(
 retcode_t iota_consensus_get_entry_point(
     const entry_point_selector_t *ep_selector, size_t depth, trit_array_p ep) {
   size_t idx =
-      MAX(ep_selector->milestone.latest_milestone_index - depth - 1, 0);
+      MAX(ep_selector->milestone->latest_milestone_index - depth - 1, 0);
   milestone_view_t msv = NULL;
   if (iota_consencues_find_closest_next_milestone(
           ep_selector->tangle, idx, ep_selector->testnet,
@@ -38,7 +38,7 @@ retcode_t iota_consensus_get_entry_point(
     // TODO
   }
   if (msv == NULL) {
-    msv = ep_selector->milestone.latest_solid_milestone_hash;
+    msv = ep_selector->milestone->latest_solid_milestone_hash;
   }
 
   return RC_OK;

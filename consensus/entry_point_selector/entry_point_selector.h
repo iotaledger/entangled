@@ -42,7 +42,7 @@ testnet, int milestoneStartIndex) {
 
 typedef struct entry_point_selector_t {
   tangle_t *tangle;
-  milestone_t milestone;
+  milestone_t *milestone;
   bool testnet;
   size_t start_index;
 } entry_point_selector_t;

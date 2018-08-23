@@ -26,20 +26,18 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
   out->tx_to_approvers = NULL;
   out->cw_ratings = NULL;
   cw_entry_t *cw_entry = NULL;
-  hash_to_direct_approvers_entry_t *currHashToApproversEntry = NULL;
-  hash_to_direct_approvers_entry_t *tmpHashToApproversEntry = NULL;
-  hash_entry_t *currDirectApprover = NULL;
-  hash_entry_t *tmpDirectApprover = NULL;
-  size_t subTangleSize;
-  size_t maxSubTangleSize;
-  size_t bitsetSize;
+  hash_to_direct_approvers_entry_t *curr_hash_to_approvers_entry = NULL;
+  hash_to_direct_approvers_entry_t *tmp_hash_to_approvers_entry = NULL;
+  size_t sub_tangle_size;
+  size_t max_subtangle_size;
+  size_t bitset_size;
 
   if (!entry_point) {
     return RC_OK;
   }
 
-  res = cw_rating_dfs_do_dfs_from_db(cw_calc, entry_point,
-                                     &out->tx_to_approvers, &maxSubTangleSize);
+  res = cw_rating_dfs_do_dfs_from_db(
+      cw_calc, entry_point, &out->tx_to_approvers, &max_subtangle_size);
 
   if (res != RC_OK) {
     log_error(CW_RATING_CALCULATOR_LOGGER_ID,
@@ -49,38 +47,47 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
 
   // Insert first "ratings" entry
   cw_entry = (cw_entry_t *)malloc(sizeof(cw_entry_t));
+  if (cw_entry == NULL) {
+    log_error(CW_RATING_CALCULATOR_LOGGER_ID, "Failed in memory allocation\n");
+    return RC_CONSENSUS_OOM;
+  }
   memcpy(cw_entry->hash, entry_point->trits, FLEX_TRIT_SIZE_243);
-  cw_entry->cw = maxSubTangleSize;
+  cw_entry->cw = max_subtangle_size;
   HASH_ADD(hh, out->cw_ratings, hash, FLEX_TRIT_SIZE_243, cw_entry);
 
-  if (maxSubTangleSize <= 1) {
+  if (max_subtangle_size <= 1) {
     return RC_OK;
   }
 
-  bitsetSize = maxSubTangleSize / (sizeof(int64_t) * 8) + 1;
-  int64_t visitedTxsBitset[bitsetSize];
+  bitset_size = max_subtangle_size / (sizeof(int64_t) * 8) + 1;
+  int64_t visitedTxsBitset[bitset_size];
 
-  HASH_ITER(hh, out->tx_to_approvers, currHashToApproversEntry,
-            tmpHashToApproversEntry) {
-    if (currHashToApproversEntry->idx == 0) {
+  HASH_ITER(hh, out->tx_to_approvers, curr_hash_to_approvers_entry,
+            tmp_hash_to_approvers_entry) {
+    if (curr_hash_to_approvers_entry->idx == 0) {
       continue;
     }
 
-    memset(visitedTxsBitset, 0, bitsetSize * sizeof(int64_t));
-    flex_trit_t currHash[FLEX_TRIT_SIZE_243];
-    memcpy(currHash, currHashToApproversEntry->hash, FLEX_TRIT_SIZE_243);
-    res = cw_rating_dfs_do_dfs_light(out->tx_to_approvers, currHash,
-                                     visitedTxsBitset, &subTangleSize);
+    memset(visitedTxsBitset, 0, bitset_size * sizeof(int64_t));
+    flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
+    memcpy(curr_hash, curr_hash_to_approvers_entry->hash, FLEX_TRIT_SIZE_243);
+    res = cw_rating_dfs_do_dfs_light(out->tx_to_approvers, curr_hash,
+                                     visitedTxsBitset, &sub_tangle_size);
 
     if (res != RC_OK) {
       log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-                "Failed in light DFS, error code is: %\" PRIu64 \"", res);
+                "Failed in light DFS, error code is: %\" PRIu64 \"\n", res);
       return RC_CONSENSUS_CW_FAILED_IN_LIGHT_DFS;
     }
 
     cw_entry = (cw_entry_t *)malloc(sizeof(cw_entry_t));
-    memcpy(cw_entry->hash, currHash, FLEX_TRIT_SIZE_243);
-    cw_entry->cw = subTangleSize;
+    if (cw_entry == NULL) {
+      log_error(CW_RATING_CALCULATOR_LOGGER_ID,
+                "Failed in memory allocation\n");
+      return RC_CONSENSUS_OOM;
+    }
+    memcpy(cw_entry->hash, curr_hash, FLEX_TRIT_SIZE_243);
+    cw_entry->cw = sub_tangle_size;
     HASH_ADD(hh, out->cw_ratings, hash, FLEX_TRIT_SIZE_243, cw_entry);
   }
 
@@ -89,16 +96,16 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
 
 retcode_t cw_rating_dfs_do_dfs_from_db(
     const cw_rating_calculator_t *const cw_calc, trit_array_p entry_point,
-    hash_to_direct_approvers_map_t *txToApprovers, size_t *subTangleSize) {
-  hash_to_direct_approvers_entry_t *currTx = NULL;
-  hash_to_direct_approvers_entry_t *currApproverTx = NULL;
-  hash_entry_t *currDirectApprover = NULL;
-  trit_array_p currTxTritArray = NULL;
-  size_t currApproverIndex;
+    hash_to_direct_approvers_map_t *tx_to_approvers, size_t *subtangle_size) {
+  hash_to_direct_approvers_entry_t *curr_tx = NULL;
+  hash_to_direct_approvers_entry_t *curr_approver_tx = NULL;
+  hash_entry_t *curr_direct_approver = NULL;
+  trit_array_t curr_tx_trit_array;
+  size_t curr_approver_index;
 
   retcode_t res = RC_OK;
   iota_hashes_pack pack;
-  *subTangleSize = 0;
+  *subtangle_size = 0;
 
   if (res = hash_pack_init(&pack, 10) != RC_OK) {
     return res;
@@ -106,22 +113,27 @@ retcode_t cw_rating_dfs_do_dfs_from_db(
 
   UT_array *stack = NULL;
   utarray_new(stack, &cw_stack_trit_array_hash_icd);
+  if (stack == NULL) {
+    log_error(CW_RATING_CALCULATOR_LOGGER_ID, "Failed in memory allocation\n");
+    return RC_CONSENSUS_OOM;
+  }
   utarray_push_back(stack, entry_point->trits);
 
-  currTxTritArray = trit_array_new(FLEX_TRIT_SIZE_243);
-  flex_trit_t *currTxHash = NULL;
+  curr_tx_trit_array.num_bytes = trit_array_bytes_for_trits(NUM_TRITS_HASH);
+  flex_trit_t *curr_tx_hash = NULL;
 
   while (utarray_len(stack)) {
-    currTxHash = utarray_back(stack);
+    curr_tx_hash = utarray_back(stack);
     utarray_pop_back(stack);
     pack.num_loaded = 0;
-    trit_array_set_trits(currTxTritArray, currTxHash, NUM_TRITS_HASH);
-    res = iota_tangle_load_hashes_of_approvers(cw_calc->tangle, currTxTritArray,
-                                               &pack);
+    pack.insufficient_capacity = false;
+    curr_tx_trit_array.trits = curr_tx_hash;
+    res = iota_tangle_load_hashes_of_approvers(cw_calc->tangle,
+                                               &curr_tx_trit_array, &pack);
 
     if (res != RC_OK) {
       log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-                "Failed in loading approvers, error code is: %\" PRIu64 \"",
+                "Failed in loading approvers, error code is: %\" PRIu64 \"\n",
                 res);
       return res;
     } else if (pack.insufficient_capacity) {
@@ -129,41 +141,52 @@ retcode_t cw_rating_dfs_do_dfs_from_db(
       if (res != RC_OK) {
         return res;
       }
-      utarray_push_back(stack, currTxHash);
+      utarray_push_back(stack, curr_tx_hash);
       continue;
     }
 
-    if (*txToApprovers) {
-      HASH_FIND(hh, *txToApprovers, currTxHash, FLEX_TRIT_SIZE_243, currTx);
+    if (*tx_to_approvers) {
+      HASH_FIND(hh, *tx_to_approvers, curr_tx_hash, FLEX_TRIT_SIZE_243,
+                curr_tx);
     }
 
-    if (!currTx) {
-      currTx = (hash_to_direct_approvers_entry_t *)malloc(
+    if (!curr_tx) {
+      curr_tx = (hash_to_direct_approvers_entry_t *)malloc(
           sizeof(hash_to_direct_approvers_entry_t));
+      if (curr_tx == NULL) {
+        log_error(CW_RATING_CALCULATOR_LOGGER_ID,
+                  "Failed in memory allocation\n");
+        return RC_CONSENSUS_OOM;
+      }
 
-      currTx->approvers = NULL;
-      currTx->idx = (*subTangleSize)++;
-      memcpy(currTx->hash, currTxHash, FLEX_TRIT_SIZE_243);
+      curr_tx->approvers = NULL;
+      curr_tx->idx = (*subtangle_size)++;
+      memcpy(curr_tx->hash, curr_tx_hash, FLEX_TRIT_SIZE_243);
 
       while (pack.num_loaded > 0) {
-        currApproverIndex = --pack.num_loaded;
+        curr_approver_index = --pack.num_loaded;
         // Add each found approver to the currently traversed tx
-        currDirectApprover = (hash_entry_t *)malloc(sizeof(hash_entry_t));
-        memcpy(currDirectApprover->hash, pack.hashes[pack.num_loaded]->trits,
+        curr_direct_approver = (hash_entry_t *)malloc(sizeof(hash_entry_t));
+        if (curr_direct_approver == NULL) {
+          log_error(CW_RATING_CALCULATOR_LOGGER_ID,
+                    "Failed in memory allocation\n");
+          return RC_CONSENSUS_OOM;
+        }
+        memcpy(curr_direct_approver->hash, pack.hashes[pack.num_loaded]->trits,
                FLEX_TRIT_SIZE_243);
 
-        HASH_ADD(hh, currTx->approvers, hash, FLEX_TRIT_SIZE_243,
-                 currDirectApprover);
+        HASH_ADD(hh, curr_tx->approvers, hash, FLEX_TRIT_SIZE_243,
+                 curr_direct_approver);
 
         // push approver to stack only if it hasn't been found yet
-        HASH_FIND(hh, *txToApprovers, pack.hashes[currApproverIndex]->trits,
-                  FLEX_TRIT_SIZE_243, currApproverTx);
-        if (!currApproverTx) {
-          utarray_push_back(stack, pack.hashes[currApproverIndex]->trits);
+        HASH_FIND(hh, *tx_to_approvers, pack.hashes[curr_approver_index]->trits,
+                  FLEX_TRIT_SIZE_243, curr_approver_tx);
+        if (!curr_approver_tx) {
+          utarray_push_back(stack, pack.hashes[curr_approver_index]->trits);
         }
       }
 
-      HASH_ADD(hh, *txToApprovers, hash, FLEX_TRIT_SIZE_243, currTx);
+      HASH_ADD(hh, *tx_to_approvers, hash, FLEX_TRIT_SIZE_243, curr_tx);
     }
   }
 
@@ -174,46 +197,52 @@ retcode_t cw_rating_dfs_do_dfs_from_db(
 }
 
 retcode_t cw_rating_dfs_do_dfs_light(
-    hash_to_direct_approvers_map_t txToApprovers, flex_trit_t *ep,
-    int64_t *visitedBitSet, size_t *subTangleSize) {
-  *subTangleSize = 0;
-  flex_trit_t *currHash = NULL;
-  hash_to_direct_approvers_entry_t *currTxEntry = NULL;
-  hash_entry_t *currDirectApprover = NULL;
-  hash_entry_t *tmpDirectApprover = NULL;
+    hash_to_direct_approvers_map_t tx_to_approvers, flex_trit_t *ep,
+    int64_t *visited_bitset, size_t *subtangle_size) {
+  *subtangle_size = 0;
+  flex_trit_t *curr_hash = NULL;
+  hash_to_direct_approvers_entry_t *curr_tx_entry = NULL;
+  hash_entry_t *curr_direct_approver = NULL;
+  hash_entry_t *tmp_direct_approver = NULL;
 
-  uint64_t txBitsetIntegerIndex;
-  uint64_t txBitsetWithinIntegerRelativeIndex;
+  uint64_t tx_bitset_integer_index;
+  uint64_t tx_bitset_within_integer_relative_index;
 
   UT_array *stack = NULL;
   utarray_new(stack, &cw_stack_trit_array_hash_icd);
+  if (stack == NULL) {
+    log_error(CW_RATING_CALCULATOR_LOGGER_ID, "Failed in memory allocation\n");
+    return RC_CONSENSUS_OOM;
+  }
   utarray_push_back(stack, ep);
 
   while (utarray_len(stack)) {
-    currHash = utarray_back(stack);
+    curr_hash = utarray_back(stack);
     utarray_pop_back(stack);
 
-    HASH_FIND(hh, txToApprovers, currHash, FLEX_TRIT_SIZE_243, currTxEntry);
+    HASH_FIND(hh, tx_to_approvers, curr_hash, FLEX_TRIT_SIZE_243,
+              curr_tx_entry);
 
-    if (!currTxEntry) {
+    if (!curr_tx_entry) {
       continue;
     }
 
-    txBitsetIntegerIndex = currTxEntry->idx / (sizeof(*visitedBitSet) * 8);
-    txBitsetWithinIntegerRelativeIndex =
-        currTxEntry->idx % (sizeof(*visitedBitSet) * 8);
+    tx_bitset_integer_index =
+        curr_tx_entry->idx / (sizeof(*visited_bitset) * 8);
+    tx_bitset_within_integer_relative_index =
+        curr_tx_entry->idx % (sizeof(*visited_bitset) * 8);
 
-    if (visitedBitSet[txBitsetIntegerIndex] &
-        (1ULL << txBitsetWithinIntegerRelativeIndex)) {
+    if (visited_bitset[tx_bitset_integer_index] &
+        (1ULL << tx_bitset_within_integer_relative_index)) {
       continue;
     }
-    ++(*subTangleSize);
+    ++(*subtangle_size);
 
-    visitedBitSet[txBitsetIntegerIndex] |= (1ULL << currTxEntry->idx);
+    visited_bitset[tx_bitset_integer_index] |= (1ULL << curr_tx_entry->idx);
 
-    HASH_ITER(hh, currTxEntry->approvers, currDirectApprover,
-              tmpDirectApprover) {
-      utarray_push_back(stack, currDirectApprover->hash);
+    HASH_ITER(hh, curr_tx_entry->approvers, curr_direct_approver,
+              tmp_direct_approver) {
+      utarray_push_back(stack, curr_direct_approver->hash);
     }
   }
 

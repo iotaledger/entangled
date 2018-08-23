@@ -22,9 +22,9 @@
 extern "C" {
 #endif
 
-enum CWCalculationImplementation {
-  NoImplementation,
-  NaiveDFS,
+enum cw_calculation_implementation {
+  NO_IMPLEMENTATION,
+  DFS,
 };
 
 typedef struct cw_entry_t {
@@ -76,7 +76,7 @@ struct cw_rating_calculator_t {
 
 extern retcode_t iota_consensus_cw_rating_init(
     cw_rating_calculator_t *cw_calc, const tangle_t *tangle,
-    enum CWCalculationImplementation impl);
+    enum cw_calculation_implementation impl);
 
 extern retcode_t iota_consensus_cw_rating_destroy(
     cw_rating_calculator_t *cw_calc);
@@ -85,6 +85,7 @@ extern retcode_t iota_consensus_cw_rating_calculate(
     const cw_rating_calculator_t *cw_calc, trit_array_p entry_point,
     cw_calc_result *out);
 
+extern void cw_calc_result_destroy(cw_calc_result *const calc_result);
 #ifdef __cplusplus
 }
 #endif

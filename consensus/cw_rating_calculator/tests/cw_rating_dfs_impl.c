@@ -44,7 +44,7 @@ void test_init_cw(void) {
   config.index_tag = true;
   config.index_hash = true;
   TEST_ASSERT(iota_tangle_init(&tangle, &config) == RC_OK);
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, NaiveDFS));
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS));
 }
 
 void test_setup() {
@@ -57,13 +57,8 @@ void test_cleanup() {
 }
 
 void test_cw_gen_topology(TestTangleTopology topology) {
-  hash_to_direct_approvers_entry_t *currTxApproverEntry = NULL;
-  hash_to_direct_approvers_entry_t *tmpTxApproverEntry = NULL;
-  hash_entry_t *currDirectApprover = NULL;
-  hash_entry_t *tmpDirectApprover = NULL;
   cw_entry_t *currCwEntry = NULL;
   cw_entry_t *tmpCwEntry = NULL;
-
   size_t numApprovers = 200;
   size_t numTxs = numApprovers + 1;
 
@@ -103,8 +98,8 @@ void test_cw_gen_topology(TestTangleTopology topology) {
                 RC_OK);
     TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
   }
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, NaiveDFS));
-  TEST_ASSERT(cw_rating_calculate_dfs(&calc, ep, &out) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS));
+  TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
   TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), numApprovers + 1);
 
   size_t totalWeight = 0;
@@ -122,34 +117,11 @@ void test_cw_gen_topology(TestTangleTopology topology) {
     TEST_ASSERT_EQUAL_INT(totalWeight, (numTxs * (numTxs + 1)) / 2);
   }
 
-  // Clean up txToApproverMap
-  HASH_ITER(hh, out.tx_to_approvers, currTxApproverEntry, tmpTxApproverEntry) {
-    HASH_ITER(hh, out.tx_to_approvers->approvers, currDirectApprover,
-              tmpDirectApprover) {
-      HASH_DEL(out.tx_to_approvers->approvers, currDirectApprover);
-      free(currDirectApprover);
-    }
-    HASH_DEL(out.tx_to_approvers, currTxApproverEntry);
-    free(currTxApproverEntry);
-  }
-
-  // Cleanup CWRatings Map
-  HASH_ITER(hh, out.cw_ratings, currCwEntry, tmpCwEntry) {
-    HASH_DEL(out.cw_ratings, currCwEntry);
-    free(currCwEntry);
-  }
-
+  cw_calc_result_destroy(&out);
   test_cleanup();
 }
 
 void test_single_tx_tangle(void) {
-  hash_to_direct_approvers_entry_t *currTxApproverEntry = NULL;
-  hash_to_direct_approvers_entry_t *tmpTxApproverEntry = NULL;
-  hash_entry_t *currDirectApprover = NULL;
-  hash_entry_t *tmpDirectApprover = NULL;
-  cw_entry_t *currCwEntry = NULL;
-  cw_entry_t *tmpCwEntry = NULL;
-
   test_setup();
 
   trit_array_p ep = trit_array_new(FLEX_TRIT_SIZE_243);
@@ -169,36 +141,11 @@ void test_single_tx_tangle(void) {
   TEST_ASSERT_EQUAL_MEMORY(pack.hashes[0]->trits, ep->trits,
                            FLEX_TRIT_SIZE_243);
 
-  TEST_ASSERT(cw_rating_calculate_dfs(&calc, ep, &out) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
   TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), 1);
 
-  int64_t singleElementBitset = 0;
-  size_t subTangleSize = 0;
-
-  out.tx_to_approvers = NULL;
-  TEST_ASSERT(cw_rating_dfs_do_dfs_light(out.tx_to_approvers, ep->trits,
-                                         &singleElementBitset,
-                                         &subTangleSize) == RC_OK);
-
-  // Clean up txToApproverMap
-  HASH_ITER(hh, out.tx_to_approvers, currTxApproverEntry, tmpTxApproverEntry) {
-    HASH_ITER(hh, out.tx_to_approvers->approvers, currDirectApprover,
-              tmpDirectApprover) {
-      HASH_DEL(out.tx_to_approvers->approvers, currDirectApprover);
-      free(currDirectApprover);
-    }
-    HASH_DEL(out.tx_to_approvers, currTxApproverEntry);
-    free(currTxApproverEntry);
-  }
-
-  // Cleanup CWRatings Map
-  HASH_ITER(hh, out.cw_ratings, currCwEntry, tmpCwEntry) {
-    HASH_DEL(out.cw_ratings, currCwEntry);
-    free(currCwEntry);
-  }
-
+  cw_calc_result_destroy(&out);
   hash_pack_free(&pack);
-
   test_cleanup();
 }
 
@@ -253,8 +200,8 @@ void test_cw_topology_four_transactions_diamond(void) {
                 RC_OK);
     TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
   }
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, NaiveDFS));
-  TEST_ASSERT(cw_rating_calculate_dfs(&calc, ep, &out) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS));
+  TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
   TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), numTxs);
 
   size_t totalWeight = 0;
