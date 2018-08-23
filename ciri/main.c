@@ -30,11 +30,15 @@ int main(int argc, char* argv[]) {
   memset(&core_g, 0, sizeof(core_t));
 
   // configuration argument parser
+  log_info(MAIN_LOGGER_ID, "Initializing configuration variables\n");
   if (ciri_conf_init(&core_g.config)) {
+      log_critical(MAIN_LOGGER_ID, "Initializing configuration variables failed\n");
       return EXIT_FAILURE;
   }
 
+  log_info(MAIN_LOGGER_ID, "Parsing configuration variables\n");
   if (ciri_conf_parse(&core_g.config, argc, argv)) {
+      log_critical(MAIN_LOGGER_ID, "Parsing configuration variables failed\n");
       return EXIT_FAILURE;
   }
 
