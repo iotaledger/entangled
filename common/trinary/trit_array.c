@@ -181,6 +181,7 @@ size_t tryte_to_flex_trit(flex_trit_t *trit_array, size_t to_len,
 #elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE) || \
     defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
   trit_t trits[to_len];
+  memset(trits, 0, to_len);
   trytes_to_trits((tryte_t *)trytes, trits, num_trytes);
   int8_to_flex_trit_array(trit_array, to_len, trits, to_len, to_len);
 #endif

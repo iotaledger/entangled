@@ -32,3 +32,24 @@ IOTA_EXPORT char* iota_pow(char const* const trytes_in, uint8_t const mwm) {
 
   return (char*)nonce_trytes;
 }
+
+IOTA_EXPORT flex_trit_t* iota_flex_pow(flex_trit_t const* const flex_trits_in,
+                                       size_t num_trits, uint8_t const mwm) {
+  Curl curl;
+  init_curl(&curl);
+  curl.type = CURL_P_81;
+
+  trit_t* trits = (trit_t*)calloc(num_trits, sizeof(trit_t));
+  flex_trit_array_to_int8(trits, num_trits, flex_trits_in, num_trits,
+                          num_trits);
+  trit_t* nonce_trits = do_pow(&curl, trits, num_trits, mwm);
+  free(trits);
+  size_t flex_len = flex_trits_num_for_trits(NONCE_LENGTH);
+  flex_trit_t* nonce_flex_trits =
+      (flex_trit_t*)calloc(flex_len, sizeof(flex_trit_t));
+  int8_to_flex_trit_array(nonce_flex_trits, NONCE_LENGTH, nonce_trits,
+                          NONCE_LENGTH, NONCE_LENGTH);
+  free(nonce_trits);
+
+  return nonce_flex_trits;
+}

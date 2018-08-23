@@ -32,3 +32,28 @@ IOTA_EXPORT char* iota_checksum(const char* input, const size_t inputLength,
 
   return checksumTrytes;
 }
+
+IOTA_EXPORT flex_trit_t* iota_flex_checksum(const flex_trit_t* flex_trits,
+                                            const size_t num_trits,
+                                            const size_t checksumLength) {
+  Kerl kerl;
+  init_kerl(&kerl);
+
+  if (checksumLength == 0) {
+    return NULL;
+  }
+
+  trit_t trits_hash[HASH_LENGTH];
+  trit_t* trits = (trit_t*)calloc(num_trits, sizeof(trit_t));
+  flex_trit_array_to_int8(trits, num_trits, flex_trits, num_trits, num_trits);
+  kerl_hash(trits, num_trits, trits_hash, &kerl);
+  free(trits);
+  size_t flex_len = flex_trits_num_for_trits(num_trits);
+  flex_trit_t* checksum_flex_trits =
+      (flex_trit_t*)calloc(flex_len, sizeof(flex_trit_t));
+  int8_to_flex_trit_array(checksum_flex_trits, HASH_LENGTH,
+                          &trits_hash[HASH_LENGTH - checksumLength],
+                          HASH_LENGTH, checksumLength);
+
+  return checksum_flex_trits;
+}

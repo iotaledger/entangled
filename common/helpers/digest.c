@@ -29,3 +29,23 @@ IOTA_EXPORT char* iota_digest(const char* trytes) {
 
   return hash;
 }
+
+IOTA_EXPORT flex_trit_t* iota_flex_digest(flex_trit_t const* const flex_trits,
+                                          size_t num_trits) {
+  Curl curl;
+  init_curl(&curl);
+  curl.type = CURL_P_81;
+
+  trit_t* trits = (trit_t*)calloc(num_trits, sizeof(trit_t));
+  flex_trit_array_to_int8(trits, num_trits, flex_trits, num_trits, num_trits);
+  trit_t trits_hash[HASH_LENGTH];
+  curl_digest(trits, num_trits, trits_hash, &curl);
+  free(trits);
+  size_t flex_len = flex_trits_num_for_trits(num_trits);
+  flex_trit_t* hash_flex_trits =
+      (flex_trit_t*)calloc(flex_len, sizeof(flex_trit_t));
+  int8_to_flex_trit_array(hash_flex_trits, num_trits, trits_hash, num_trits,
+                          num_trits);
+
+  return hash_flex_trits;
+}

@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 
+#include "common/trinary/trit_array.h"
 #include "utils/export.h"
 
 #ifdef __cplusplus
@@ -11,6 +12,10 @@ extern "C" {
 
 IOTA_EXPORT char* iota_checksum(const char* input, const size_t inputLength,
                                 const size_t checksumLength);
+
+IOTA_EXPORT flex_trit_t* iota_flex_checksum(const flex_trit_t* flex_trits,
+                                            const size_t num_trits,
+                                            const size_t checksumLength);
 
 #ifdef __cplusplus
 }
