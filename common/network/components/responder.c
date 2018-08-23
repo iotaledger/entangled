@@ -39,7 +39,8 @@ static retcode_t regular_transaction_request(
     return ret;
   }
   if (pack.num_loaded == 0) {
-    return false;
+    transaction_free(*tx);
+    *tx = NULL;
   }
   return RC_OK;
 }

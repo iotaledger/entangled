@@ -28,7 +28,10 @@ static void *broadcaster_routine(broadcaster_state_t *const state) {
       log_debug(BROADCASTER_COMPONENT_LOGGER_ID, "Broadcasting transaction\n");
       iter = state->node->neighbors->front;
       while (iter) {
-        neighbor_send(state->node, &iter->data, &packet);
+        if (neighbor_send(state->node, &iter->data, &packet)) {
+          log_warning(BROADCASTER_COMPONENT_LOGGER_ID,
+                      "Broadcasting transaction failed\n");
+        }
         iter = iter->next;
       }
     }
