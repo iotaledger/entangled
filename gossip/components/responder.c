@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/network/components/responder.h"
+#include "gossip/components/responder.h"
 #include "ciri/core.h"
 #include "common/network/neighbor.h"
 #include "common/storage/sql/defs.h"

@@ -38,7 +38,7 @@ cc_library(
 cc_library(
     name = "receiver_shared",
     hdrs = ["receiver.h"],
-    deps = ["//common/network/services:receiver_shared"],
+    deps = ["//gossip/services:receiver_shared"],
 )
 
 cc_library(
@@ -47,7 +47,7 @@ cc_library(
     deps = [
         ":receiver_shared",
         "//ciri:node_shared",
-        "//common/network/services:receiver",
+        "//gossip/services:receiver",
     ],
 )
 

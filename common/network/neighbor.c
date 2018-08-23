@@ -11,9 +11,9 @@
 #include "common/model/transaction.h"
 #include "common/network/iota_packet.h"
 #include "common/network/neighbor.h"
-#include "common/network/services/tcp_sender.hpp"
-#include "common/network/services/udp_sender.hpp"
 #include "common/network/uri_parser.h"
+#include "gossip/services/tcp_sender.hpp"
+#include "gossip/services/udp_sender.hpp"
 
 retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
                                  char const *const uri) {

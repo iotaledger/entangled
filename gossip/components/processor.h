@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_COMPONENTS_PROCESSOR_H__
-#define __COMMON_NETWORK_COMPONENTS_PROCESSOR_H__
+#ifndef __GOSSIP_COMPONENTS_PROCESSOR_H__
+#define __GOSSIP_COMPONENTS_PROCESSOR_H__
 
 #include <stdbool.h>
 
@@ -80,4 +80,4 @@ bool processor_destroy(processor_state_t *const state);
 }
 #endif
 
-#endif  //__COMMON_NETWORK_COMPONENTS_PROCESSOR_H__
+#endif  //__GOSSIP_COMPONENTS_PROCESSOR_H__

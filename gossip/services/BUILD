@@ -11,8 +11,8 @@ cc_library(
     srcs = ["receiver.cc"],
     deps = [
         ":receiver_shared",
-        "//common/network/services:tcp_receiver",
-        "//common/network/services:udp_receiver",
+        "//gossip/services:tcp_receiver",
+        "//gossip/services:udp_receiver",
         "//utils/containers/queues:concurrent_queue_packet",
     ],
 )

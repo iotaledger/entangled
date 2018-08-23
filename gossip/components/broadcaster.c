@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/network/components/broadcaster.h"
+#include "gossip/components/broadcaster.h"
 #include "ciri/node.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/containers/queues/concurrent_queue_packet.h"

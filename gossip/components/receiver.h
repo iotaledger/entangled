@@ -5,12 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_COMPONENTS_RECEIVER_H__
-#define __COMMON_NETWORK_COMPONENTS_RECEIVER_H__
+#ifndef __GOSSIP_COMPONENTS_RECEIVER_H__
+#define __GOSSIP_COMPONENTS_RECEIVER_H__
 
 #include <stdbool.h>
 
-#include "common/network/services/receiver.h"
+#include "gossip/services/receiver.h"
 
 // Forward declarations
 typedef struct node_s node_t;
@@ -70,4 +70,4 @@ bool receiver_destroy(receiver_state_t *const state);
 }
 #endif
 
-#endif  //__COMMON_NETWORK_COMPONENTS_RECEIVER_H__
+#endif  //__GOSSIP_COMPONENTS_RECEIVER_H__

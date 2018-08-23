@@ -8,7 +8,7 @@
 #include <boost/asio.hpp>
 
 #include "common/network/iota_packet.h"
-#include "common/network/services/tcp_sender.hpp"
+#include "gossip/services/tcp_sender.hpp"
 #include "utils/logger_helper.h"
 
 bool tcp_send(endpoint_t *const endpoint, iota_packet_t *const packet) {

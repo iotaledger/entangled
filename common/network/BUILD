@@ -34,8 +34,8 @@ cc_library(
         ":uri_parser",
         "//ciri:node_shared",
         "//common/model:transaction",
-        "//common/network/services:tcp_sender",
-        "//common/network/services:udp_sender",
+        "//gossip/services:tcp_sender",
+        "//gossip/services:udp_sender",
     ],
 )
 
