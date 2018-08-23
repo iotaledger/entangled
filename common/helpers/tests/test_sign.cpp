@@ -118,7 +118,7 @@ TEST(KerlTest, testSignature) {
 TEST(KerlTest, testFlexAddressGeneration) {
   using namespace testing;
 
-#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+#if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   const flex_trit_t SEED[] = {
       1, 0,  0,  -1, 1,  0,  0, 1,  0,  1, 1,  0,  -1, -1, 1,  0, -1, 1,
       1, -1, 1,  -1, 0,  1,  0, 0,  1,  1, 0,  1,  -1, 1,  1,  0, 1,  1,
@@ -179,7 +179,7 @@ TEST(KerlTest, testFlexAddressGeneration) {
       1,  1,  0,  1,  0,  0,  1,  1,  -1, 0,  -1, 0,  -1, 0,  0,  1,  1,  1,
       0,  0,  -1, -1, -1, 0,  -1, 0,  -1, 0,  -1, -1, 1,  0,  1,  -1, 0,  1,
       0,  0,  0,  0,  0,  -1, 1,  -1, 0};
-#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
   const flex_trit_t SEED[] =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQ"
       "RSTUVWXYZ9";
@@ -192,7 +192,7 @@ TEST(KerlTest, testFlexAddressGeneration) {
   const flex_trit_t EX_ADD_2_3[] =
       "MLAUELWJHZ9QBPCIYLOXAWCVSZTK9XUEIWQSRLFDWEORDOLVOMOF9RUMFXSAMYWCGXDAVXZM"
       "RWQOJH9RY";
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
   const flex_trit_t SEED[] = {
       -63, 65,  20,  31, -41, 77,  80,  116, 81,  -43, -49, -9,  51,
       28,  -33, 116, -3, 48,  -51, 0,   4,   7,   81,  124, 92,  55,
@@ -217,7 +217,7 @@ TEST(KerlTest, testFlexAddressGeneration) {
       -57, 48, -59, 21, -49, -57, -61, 5,   79,  -43, 124, -59, 115,
       0,   76, 87,  28, 19,  7,   85,  -13, 16,  29,  83,  4,   53,
       51,  84, -16, 51, -13, -47, 4,   -64, 13};
-#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
   const flex_trit_t SEED[] = {
       55,  90,  46,   -48, 25,   93,   92,   -41, -112, -38, 53,  -66, 102,
       -13, -19, -1,   -78, 28,   -104, 100,  74,  36,   34,  121, -94, -115,
@@ -258,7 +258,7 @@ TEST(KerlTest, testFlexAddressGeneration) {
 }
 
 TEST(KerlTest, testFlexSignature) {
-#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+#if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   const flex_trit_t SEED[] = {
       1, 0,  0,  -1, 1,  0,  0, 1,  0,  1, 1,  0,  -1, -1, 1,  0, -1, 1,
       1, -1, 1,  -1, 0,  1,  0, 0,  1,  1, 0,  1,  -1, 1,  1,  0, 1,  1,
@@ -1006,7 +1006,7 @@ TEST(KerlTest, testFlexSignature) {
       1,  0,  -1, -1, -1, -1, 1,  -1, 0,  1,  -1, 0,  -1, 0,  0,  -1, 0,  -1,
       -1, 1,  1,  0,  0,  0,  -1, 1,  1,  -1, 1,  0,  -1, 1,  1,  1,  0,  0,
   };
-#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
   const flex_trit_t SEED[] =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQ"
       "RSTUVWXYZ9";
@@ -1074,7 +1074,7 @@ TEST(KerlTest, testFlexSignature) {
       "AFIXT9NY99GLSIFY9ISFBQKUCQQZ9WVMLVRIQWYOGWUBIHLMJAXY99DJFOXMIIRBBGNVVUKE"
       "GMV99T9HTXML9EUZYADINHCSQISPTQXKTIHAWYCGYFTRFT99IHJCURQUYMVYKXSBYUALS9GK"
       "Q9LOWROQSZANOVISNYYZQK9KBKA";
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
   const flex_trit_t SEED[] = {
       -63, 65,  20,  31, -41, 77,  80,  116, 81,  -43, -49, -9,  51,
       28,  -33, 116, -3, 48,  -51, 0,   4,   7,   81,  124, 92,  55,
@@ -1303,7 +1303,7 @@ TEST(KerlTest, testFlexSignature) {
       116, 64,  -59, 64,  119, -51, 0,   -59, 63,  48,  63,  -57, 67,  -16, -13,
       53,  20,  -1,  77,  51,  -52, 23,  112, 29,  87,  0,
   };
-#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
   const flex_trit_t SEED[] = {
       55,  90,  46,   -48, 25,   93,   92,   -41, -112, -38, 53,  -66, 102,
       -13, -19, -1,   -78, 28,   -104, 100,  74,  36,   34,  121, -94, -115,

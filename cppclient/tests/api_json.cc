@@ -82,9 +82,10 @@ TEST_F(IotaJsonAPITest, GetNodeInfo) {
 
   EXPECT_EQ(api.request, req);
   EXPECT_EQ((*response).latestMilestone, res["latestMilestone"]);
-  EXPECT_EQ((*response).latestMilestoneIndex, res["latestMilestoneIndex"]);
-  EXPECT_EQ((*response).latestSolidMilestoneIndex,
-            res["latestSolidSubtangleMilestoneIndex"]);
+  int latestMilestoneIndex = res["latestMilestoneIndex"];
+  EXPECT_EQ((*response).latestMilestoneIndex, latestMilestoneIndex);
+  int latestSolidMilestoneIndex = res["latestSolidSubtangleMilestoneIndex"];
+  EXPECT_EQ((*response).latestSolidMilestoneIndex, latestSolidMilestoneIndex);
 }
 
 };  // namespace

@@ -3,7 +3,6 @@ cc_test(
     srcs = ["test_transaction.c"],
     deps = [
         "//common/model:transaction",
-        "//common/trinary:trit_tryte",
         "@unity",
     ],
 )
@@ -13,7 +12,6 @@ cc_test(
     srcs = ["test_tryte_transaction.cc"],
     deps = [
         "//common/model:tryte_transaction",
-        "//common/trinary:trit_tryte",
         "@com_google_googletest//:gtest_main",
     ],
 )

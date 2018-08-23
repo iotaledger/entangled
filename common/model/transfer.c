@@ -439,15 +439,15 @@ int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl *kerl,
       memset(essence, '9', TRYTES_PER_ESSENCE);
       // essence = Address + Value + Tag + Timestamp + Current Index + Last
       // Index
-      flex_trit_to_tryte(essence, NUM_TRYTES_ADDRESS,
-                         transfer_address(transfer), NUM_TRITS_ADDRESS,
-                         NUM_TRITS_ADDRESS);
+      flex_trits_to_trytes(essence, NUM_TRYTES_ADDRESS,
+                           transfer_address(transfer), NUM_TRITS_ADDRESS,
+                           NUM_TRITS_ADDRESS);
       int64_t value = transfer_type(transfer) == VALUE_OUT
                           ? j == 0 ? transfer_value(transfer) : 0
                           : 0;
       long_to_trytes(value, &essence[81]);
-      flex_trit_to_tryte(&essence[108], NUM_TRYTES_TAG, transfer_tag(transfer),
-                         NUM_TRITS_TAG, NUM_TRITS_TAG);
+      flex_trits_to_trytes(&essence[108], NUM_TRYTES_TAG, transfer_tag(transfer),
+                           NUM_TRITS_TAG, NUM_TRITS_TAG);
       long_to_trytes(transfer_timestamp(transfer), essence + 135);
       long_to_trytes(current_index, essence + 144);
       long_to_trytes(transfer_ctx->count - 1, essence + 153);
@@ -461,9 +461,9 @@ int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl *kerl,
   trit_t bundle_trit[TRITS_PER_BUNDLE_HASH];
   // Squeeze kerl to get the bundle hash
   kerl_squeeze(kerl, bundle_trit, TRITS_PER_BUNDLE_HASH);
-  int8_to_flex_trit_array(transfer_ctx->bundle, TRITS_PER_BUNDLE_HASH,
-                          bundle_trit, TRITS_PER_BUNDLE_HASH,
-                          TRITS_PER_BUNDLE_HASH);
+  flex_trits_from_trits(transfer_ctx->bundle, TRITS_PER_BUNDLE_HASH,
+                        bundle_trit, TRITS_PER_BUNDLE_HASH,
+                        TRITS_PER_BUNDLE_HASH);
   return 0;
 }
 
@@ -511,10 +511,10 @@ void transfer_iterator_next_data_transaction(
   // Length of the message data for the current transaction
   size_t len = data_len - offset;
   len = len > NUM_TRITS_SIGNATURE ? NUM_TRITS_SIGNATURE : len;
-  size_t flex_size = flex_trits_num_for_trits(len);
+  size_t flex_size = num_flex_trits_for_trits(len);
   flex_trit_t *trits = transaction_message(transfer_iterator->transaction);
   memset(trits, FLEX_TRIT_NULL_VALUE, flex_size);
-  flex_trit_array_slice(trits, flex_size, data, data_len, offset, len);
+  flex_trits_slice(trits, flex_size, data, data_len, offset, len);
 }
 
 void transfer_iterator_next_output_transaction(
@@ -534,7 +534,7 @@ void transfer_iterator_next_output_transaction(
     transaction_set_value(transfer_iterator->transaction,
                           transfer_value(transfer));
   }
-  flex_trit_array_slice(
+  flex_trits_slice(
       transaction_signature(transfer_iterator->transaction),
       NUM_TRITS_SIGNATURE, transfer_iterator->transaction_signature,
       NUM_TRITS_SIGNATURE * transfer_output_security(output),

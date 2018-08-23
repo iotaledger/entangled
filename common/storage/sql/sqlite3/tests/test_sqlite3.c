@@ -15,7 +15,7 @@
 #include "common/storage/tests/helpers/defs.h"
 #include "utils/files.h"
 
-#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+#if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
 const flex_trit_t HASH[] = {
     1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
     0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
@@ -28,7 +28,7 @@ const flex_trit_t HASH[] = {
     0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
     1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
 };
-#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
 const flex_trit_t HASH[] = {
     65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
     65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
@@ -36,13 +36,13 @@ const flex_trit_t HASH[] = {
     65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
     65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
 };
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
 const flex_trit_t HASH[] = {
     65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4,
     65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4,
     65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 65, 16, 4, 1,
 };
-#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
 const flex_trit_t HASH[] = {
     28, 84, 9,  28, 84, 9,  28, 84, 9,  28, 84, 9,  28, 84, 9,  28, 84,
     9,  28, 84, 9,  28, 84, 9,  28, 84, 9,  28, 84, 9,  28, 84, 9,  28,

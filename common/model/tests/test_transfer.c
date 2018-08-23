@@ -11,7 +11,7 @@
 
 #include "common/model/transfer.h"
 
-#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+#if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
 const flex_trit_t ADDRESS[] = {
     0,  0,  0,  0,  -1, 0,  1,  1,  -1, 0,  0,  0,  0,  0,  -1, 1,  0,  1, 1,
     -1, 1,  0,  -1, 1,  1,  0,  1,  1,  0,  1,  -1, 0,  0,  -1, -1, 0,  0, 0,
@@ -1105,7 +1105,7 @@ const flex_trit_t SIG3[] = {
     1,  -1, 0,  -1, 0,  -1, 1,  -1, 0,  0,  0,  1,  0,  0,  0,  0,  0,  -1, 1,
     -1, 0,  -1, 0,  -1, 0,
 };
-#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
 const flex_trit_t ADDRESS[] = {
     57, 88, 86, 57, 82, 74, 71, 70, 74, 74, 90, 87, 73, 84, 68, 80, 75,
     83, 81, 88, 82, 84, 72, 67, 75, 74, 65, 73, 90, 90, 89, 57, 66, 89,
@@ -1482,7 +1482,7 @@ const flex_trit_t SIG3[] = {
     65, 80, 77, 87, 83, 67, 79, 74, 74, 73, 65, 82, 74, 81, 70, 90, 67, 57, 70,
     81, 88,
 };
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
 const flex_trit_t ADDRESS[] = {
     0,  83,  3,  112, -44, 113, 81,  52, 60, -48, 93, -12, 87, 60, 51,  -16,
     61, 17,  87, 20,  64,  -61, -48, 0,  71, 67,  29, -33, 76, 51, -12, 79,
@@ -1841,7 +1841,7 @@ const flex_trit_t SIG3[] = {
     -35, 16,  -9,  23,  19,  -12, -43, 19,  19,  124, 20,  65,  1,   28,  -51,
     -36, 64,  0,   -36, -52, 0,
 };
-#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
 const flex_trit_t ADDRESS[] = {
     -81, -15, -81, -44, 100, 93, -109, -54, 34,   43,  -104, -30,  45,
     23,  100, 37,  -54, -9,  -2, 87,   107, -106, -29, -29,  -114, 8,

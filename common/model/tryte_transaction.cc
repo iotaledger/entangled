@@ -6,7 +6,6 @@
  */
 
 #include "common/model/tryte_transaction.h"
-#include "common/trinary/trit_array.h"
 
 namespace iota {
 namespace model {

@@ -115,14 +115,14 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_address_gen(
     goto cleanup;
   }
   address =
-      calloc(flex_trits_num_for_trits(HASH_LENGTH) + 1, sizeof(flex_trit_t));
+      calloc(num_flex_trits_for_trits(HASH_LENGTH) + 1, sizeof(flex_trit_t));
   if (!address) {
     goto cleanup;
   }
 
   init_kerl(&kerl);
 
-  flex_trit_array_to_int8(subseed, HASH_LENGTH, seed, HASH_LENGTH, HASH_LENGTH);
+  flex_trits_to_trits(subseed, HASH_LENGTH, seed, HASH_LENGTH, HASH_LENGTH);
   iss_kerl_subseed(subseed, subseed, index, &kerl);
 
   iss_kerl_key(subseed, key, key_length, &kerl);
@@ -133,7 +133,7 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_address_gen(
 
   kerl_reset(&kerl);
 
-  int8_to_flex_trit_array(address, HASH_LENGTH, key, key_length, HASH_LENGTH);
+  flex_trits_from_trits(address, HASH_LENGTH, key, key_length, HASH_LENGTH);
   memset(key, 0, key_length * sizeof(trit_t));
   free(key);
 
@@ -160,15 +160,15 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_signature_gen(
     goto cleanup;
   }
   signature =
-      calloc(flex_trits_num_for_trits(key_length) + 1, sizeof(flex_trit_t));
+      calloc(num_flex_trits_for_trits(key_length) + 1, sizeof(flex_trit_t));
   if (!signature) {
     goto cleanup;
   }
 
   init_kerl(&kerl);
 
-  flex_trit_array_to_int8(subseed, HASH_LENGTH, seed, HASH_LENGTH, HASH_LENGTH);
-  flex_trit_array_to_int8(hash, HASH_LENGTH, bundle_hash, HASH_LENGTH,
+  flex_trits_to_trits(subseed, HASH_LENGTH, seed, HASH_LENGTH, HASH_LENGTH);
+  flex_trits_to_trits(hash, HASH_LENGTH, bundle_hash, HASH_LENGTH,
                           HASH_LENGTH);
 
   iss_kerl_subseed(subseed, subseed, index, &kerl);
@@ -176,7 +176,7 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_signature_gen(
   memset(subseed, 0, HASH_LENGTH * sizeof(trit_t));
 
   iss_kerl_signature(key, hash, key, key_length, &kerl);
-  int8_to_flex_trit_array(signature, key_length, key, key_length, key_length);
+  flex_trits_from_trits(signature, key_length, key, key_length, key_length);
   memset(key, 0, key_length * sizeof(trit_t));
   free(key);
 
