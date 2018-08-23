@@ -120,7 +120,7 @@ static retcode_t process_request_bytes(processor_state_t *const state,
   if ((ret = responder_on_next(&state->node->responder, neighbor,
                                request_hash))) {
     log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
-                "Propagating packet to responder\n");
+                "Propagating packet to responder failed\n");
     return ret;
   }
   return RC_OK;
