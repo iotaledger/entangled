@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/network/components/receiver.h"
+#include "gossip/components/receiver.h"
 #include "ciri/node.h"
 #include "utils/logger_helper.h"
 

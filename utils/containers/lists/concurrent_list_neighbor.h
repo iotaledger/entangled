@@ -8,7 +8,7 @@
 #ifndef __UTILS_CONTAINERS_LISTS_CONCURRENT_LIST_NEIGHBOR_H__
 #define __UTILS_CONTAINERS_LISTS_CONCURRENT_LIST_NEIGHBOR_H__
 
-#include "common/network/neighbor.h"
+#include "gossip/neighbor.h"
 #include "utils/containers/lists/concurrent_list.h.inc"
 
 #ifdef __cplusplus

@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_COMPONENTS_BROADCASTER_H__
-#define __COMMON_NETWORK_COMPONENTS_BROADCASTER_H__
+#ifndef __GOSSIP_COMPONENTS_BROADCASTER_H__
+#define __GOSSIP_COMPONENTS_BROADCASTER_H__
 
 #include <stdbool.h>
 
@@ -80,4 +80,4 @@ bool broadcaster_destroy(broadcaster_state_t *const state);
 }
 #endif
 
-#endif  //__COMMON_NETWORK_COMPONENTS_BROADCASTER_H__
+#endif  //__GOSSIP_COMPONENTS_BROADCASTER_H__

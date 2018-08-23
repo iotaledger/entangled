@@ -32,11 +32,11 @@ cc_library(
     name = "node_shared",
     hdrs = ["node.h"],
     deps = [
-        "//common/network/components:broadcaster_shared",
-        "//common/network/components:processor_shared",
-        "//common/network/components:receiver_shared",
-        "//common/network/components:requester_shared",
-        "//common/network/components:responder_shared",
+        "//gossip/components:broadcaster_shared",
+        "//gossip/components:processor_shared",
+        "//gossip/components:receiver_shared",
+        "//gossip/components:requester_shared",
+        "//gossip/components:responder_shared",
     ],
 )
 
@@ -45,10 +45,10 @@ cc_library(
     srcs = ["node.c"],
     deps = [
         ":node_shared",
-        "//common/network/components:broadcaster",
-        "//common/network/components:processor",
-        "//common/network/components:receiver",
-        "//common/network/components:requester",
-        "//common/network/components:responder",
+        "//gossip/components:broadcaster",
+        "//gossip/components:processor",
+        "//gossip/components:receiver",
+        "//gossip/components:requester",
+        "//gossip/components:responder",
     ],
 )

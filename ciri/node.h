@@ -9,11 +9,11 @@
 #define __CIRI_NODE_H__
 
 #include "common/errors.h"
-#include "common/network/components/broadcaster.h"
-#include "common/network/components/processor.h"
-#include "common/network/components/receiver.h"
-#include "common/network/components/requester.h"
-#include "common/network/components/responder.h"
+#include "gossip/components/broadcaster.h"
+#include "gossip/components/processor.h"
+#include "gossip/components/receiver.h"
+#include "gossip/components/requester.h"
+#include "gossip/components/responder.h"
 
 // Forward declarations
 typedef struct core_s core_t;

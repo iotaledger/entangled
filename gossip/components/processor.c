@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/network/components/processor.h"
+#include "gossip/components/processor.h"
 #include "ciri/core.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
