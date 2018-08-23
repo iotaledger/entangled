@@ -31,8 +31,8 @@ static bool process_transaction_bytes(processor_state_t *const state,
     flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
 
     bytes_to_trits(packet->content, TX_BYTES_SIZE, tx_trits, TX_TRITS_SIZE);
-    int8_to_flex_trit_array(tx_flex_trits, FLEX_TRIT_SIZE_8019, tx_trits,
-                            TX_TRITS_SIZE, TX_TRITS_SIZE);
+    flex_trits_from_trits(tx_flex_trits, FLEX_TRIT_SIZE_8019, tx_trits,
+                          TX_TRITS_SIZE, TX_TRITS_SIZE);
     if ((*tx = transaction_deserialize(tx_flex_trits)) == NULL) {
       return false;
     }
@@ -79,8 +79,8 @@ static bool process_request_bytes(processor_state_t *const state,
   if ((request_hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
     return false;
   }
-  int8_to_flex_trit_array(request_hash->trits, request_hash->num_bytes,
-                          request_hash_trits, NUM_TRITS_HASH, NUM_TRITS_HASH);
+  flex_trits_from_trits(request_hash->trits, request_hash->num_bytes,
+                        request_hash_trits, NUM_TRITS_HASH, NUM_TRITS_HASH);
   if (memcmp(request_hash->trits, tx->hash, request_hash->num_bytes) == 0) {
     // If requested hash is equal to transaction hash: request a random tip
     trit_array_set_null(request_hash);
