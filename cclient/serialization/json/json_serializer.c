@@ -208,11 +208,61 @@ size_t json_get_inclusion_state_deserialize_response_get_size(
   return 0;
 }
 
+retcode_t json_get_neighbors_serialize_request(const serializer_t* const s,
+                                               char_buffer_t* out) {
+  retcode_t ret = RC_OK;
+  const char* req_text = "{\"command\":\"getNeighbors\"}";
+  ret = char_buffer_allocate(out, strlen(req_text));
+  strcpy(out->data, req_text);
+  return ret;
+}
+
 // get_neighbors_response
 
-void json_get_neighbors_deserialize_response(const serializer_t* const s,
-                                             const char* const obj,
-                                             get_neighbors_res_t* out) {}
+retcode_t json_get_neighbors_deserialize_response(const serializer_t* const s,
+                                                  const char* const obj,
+                                                  get_neighbors_res_t* out) {
+  retcode_t ret = RC_OK;
+  cJSON* json_obj = cJSON_Parse(obj);
+  cJSON* json_item = NULL;
+
+  if (json_obj == NULL) {
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
+  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
+    // TODO log the error message from response.
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "neighbors");
+  if (cJSON_IsArray(json_item)) {
+    cJSON* current_obj = NULL;
+    cJSON_ArrayForEach(current_obj, json_item) {
+      char_buffer_t* addr = char_buffer_new();
+      int allTrans, invalidTrans, newTrans;
+      ret = json_get_string(current_obj, "address", addr);
+      if (ret != RC_OK) goto end;
+      ret = json_get_int(current_obj, "numberOfAllTransactions", &allTrans);
+      if (ret != RC_OK) goto end;
+      ret = json_get_int(current_obj, "numberOfInvalidTransactions",
+                         &invalidTrans);
+      if (ret != RC_OK) goto end;
+      ret = json_get_int(current_obj, "numberOfNewTransactions", &newTrans);
+      if (ret != RC_OK) goto end;
+
+      ret = get_neighbors_res_add_neighbor(out, addr, allTrans, invalidTrans,
+                                           newTrans);
+    }
+  }
+
+end:
+  cJSON_Delete(json_obj);
+  return ret;
+}
 
 size_t json_get_neighbors_deserialize_response_get_size(
     const serializer_t* const s, const char* const toDeserialize) {

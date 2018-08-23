@@ -67,10 +67,12 @@ typedef struct {
       const serializer_t* const, const char* const toDeserialize);
 
   // get_neighbors_request
+  retcode_t (*get_neighbors_serialize_request)(const serializer_t* const s,
+                                               char_buffer_t* out);
 
-  void (*get_neighbors_deserialize_response)(const serializer_t* const,
-                                             const char* const obj,
-                                             get_neighbors_res_t* out);
+  retcode_t (*get_neighbors_deserialize_response)(const serializer_t* const,
+                                                  const char* const obj,
+                                                  get_neighbors_res_t* out);
 
   size_t (*get_neighbors_deserialize_response_get_size)(
       const serializer_t* const, const char* const toDeserialize);

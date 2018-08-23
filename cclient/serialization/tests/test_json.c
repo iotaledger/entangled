@@ -137,6 +137,53 @@ void test_deserialize_get_node_info(void) {
 
   get_node_info_res_free(node_info);
 }
+
+void test_serialize_get_neighbors(void) {
+  serializer_t serializer;
+  const char* json_text = "{\"command\":\"getNeighbors\"}";
+
+  char_buffer_t* serializer_out = char_buffer_new();
+  init_json_serializer(&serializer);
+
+  serializer.vtable.get_neighbors_serialize_request(&serializer,
+                                                    serializer_out);
+
+  TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
+
+  char_buffer_free(serializer_out);
+}
+
+void test_deserialize_get_neighbors(void) {
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text =
+      "{\"duration\":37,\"neighbors\":[{\"address\":\"/"
+      "8.8.8.8:14265\",\"numberOfAllTransactions\":922,"
+      "\"numberOfInvalidTransactions\":0,\"numberOfNewTransactions\":92},{"
+      "\"address\":\"/"
+      "8.8.8.8:5000\",\"numberOfAllTransactions\":925,"
+      "\"numberOfInvalidTransactions\":0,\"numberOfNewTransactions\":20}]}";
+
+  get_neighbors_res_t* nbors = get_neighbors_res_new();
+
+  serializer.vtable.get_neighbors_deserialize_response(&serializer, json_text,
+                                                       nbors);
+
+  neighbor_t* nb = get_neighbors_res_neighbor_at(nbors, 0);
+  TEST_ASSERT_EQUAL_STRING("/8.8.8.8:14265", nb->address->data);
+  TEST_ASSERT_EQUAL_INT(922, nb->numberOfAllTransactions);
+  TEST_ASSERT_EQUAL_INT(0, nb->numberOfInvalidTransactions);
+  TEST_ASSERT_EQUAL_INT(92, nb->numberOfNewTransactions);
+  nb = get_neighbors_res_neighbor_at(nbors, 1);
+  TEST_ASSERT_EQUAL_STRING("/8.8.8.8:5000", nb->address->data);
+  TEST_ASSERT_EQUAL_INT(925, nb->numberOfAllTransactions);
+  TEST_ASSERT_EQUAL_INT(0, nb->numberOfInvalidTransactions);
+  TEST_ASSERT_EQUAL_INT(20, nb->numberOfNewTransactions);
+  nb = get_neighbors_res_neighbor_at(nbors, 2);
+  TEST_ASSERT_NULL(nb);
+  get_neighbors_res_free(nbors);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -148,5 +195,8 @@ int main(void) {
   RUN_TEST(test_serialize_get_node_info);
   RUN_TEST(test_deserialize_get_node_info);
 
+  // get_neighbors
+  RUN_TEST(test_serialize_get_neighbors);
+  RUN_TEST(test_deserialize_get_neighbors);
   return UNITY_END();
 }
