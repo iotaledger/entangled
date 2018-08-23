@@ -53,12 +53,19 @@ cc_test(
 )
 
 cc_test(
+    name = "test_flex_trit",
+    srcs = ["test_flex_trit.c"],
+    deps = [
+        "//common/trinary:flex_trit",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_trit_array",
     srcs = ["test_trit_array.c"],
     deps = [
         "//common/trinary:trit_array",
-        "//common/trinary:trit_byte",
-        "//common/trinary:trit_tryte",
         "@unity",
     ],
 )
@@ -68,7 +75,6 @@ cc_test(
     srcs = ["test_flex_trit_array.cc"],
     deps = [
         "//common/trinary:flex_trit_array",
-        "//common/trinary:trit_array",
         "@com_google_googletest//:gtest_main",
     ],
 )

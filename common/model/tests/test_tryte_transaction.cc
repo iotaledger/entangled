@@ -190,7 +190,7 @@ static const char TRYTES[] = {
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
     '9', '9', '9'};
 
-#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+#if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
 static const flex_trit_t TRITS[] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -615,7 +615,7 @@ static const flex_trit_t TRITS[] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0};
-#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
 static const flex_trit_t TRITS[] = {
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
@@ -796,7 +796,7 @@ static const flex_trit_t TRITS[] = {
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
     '9', '9', '9'};
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
 static const flex_trit_t TRITS[] = {
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
@@ -932,7 +932,7 @@ static const flex_trit_t TRITS[] = {
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0};
-#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
 static const flex_trit_t TRITS[] = {
     0,    0,   0,   0,    0,   0,    0,   0,    0,   0,   0,    0,   0,    0,
     0,    0,   0,   0,    0,   0,    0,   0,    0,   0,   0,    0,   0,    0,

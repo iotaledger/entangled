@@ -8,11 +8,14 @@
 #ifndef __UTILS_FILES_H__
 #define __UTILS_FILES_H__
 
+#include "common/errors.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int copy_file(const char *to, const char *from);
+retcode_t copy_file(const char *to, const char *from);
+retcode_t remove_file(const char *file_path);
 
 #ifdef __cplusplus
 }
