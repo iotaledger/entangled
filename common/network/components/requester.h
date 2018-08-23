@@ -11,6 +11,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "common/errors.h"
+
 // Forward declarations
 typedef struct concurrent_list_trit_array_p_s requester_list_t;
 typedef struct _trit_array *trit_array_p;
@@ -32,7 +34,7 @@ extern "C" {
  *
  * @return a status code
  */
-bool requester_init(requester_state_t *const state, node_t *const node);
+retcode_t requester_init(requester_state_t *const state, node_t *const node);
 
 /**
  * Gets the number of transactions to request
@@ -51,8 +53,8 @@ size_t requester_size(requester_state_t *const state);
  *
  * @return a status code
  */
-bool requester_clear_request(requester_state_t *const state,
-                             trit_array_p const hash);
+retcode_t requester_clear_request(requester_state_t *const state,
+                                  trit_array_p const hash);
 
 /**
  * Tells whether the requester is full or not
@@ -71,8 +73,8 @@ bool requester_is_full(requester_state_t *const state);
  *
  * @return a status code
  */
-bool request_transaction(requester_state_t *const state,
-                         trit_array_p const hash);
+retcode_t request_transaction(requester_state_t *const state,
+                              trit_array_p const hash);
 
 /**
  * Gets a transaction to request
@@ -82,8 +84,8 @@ bool request_transaction(requester_state_t *const state,
  *
  * @return a status code
  */
-bool get_transaction_to_request(requester_state_t *const state,
-                                trit_array_p *hash);
+retcode_t get_transaction_to_request(requester_state_t *const state,
+                                     trit_array_p *hash);
 
 /**
  * Destroys a requester
@@ -92,7 +94,7 @@ bool get_transaction_to_request(requester_state_t *const state,
  *
  * @return a status code
  */
-bool requester_destroy(requester_state_t *const state);
+retcode_t requester_destroy(requester_state_t *const state);
 
 #ifdef __cplusplus
 }
