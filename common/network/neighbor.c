@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "ciri/node.h"
+#include "common/trinary/trit_array.h"
 #include "common/model/transaction.h"
 #include "common/network/iota_packet.h"
 #include "common/network/neighbor.h"

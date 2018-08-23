@@ -6,7 +6,7 @@ extern "C" {
 #define __COMMON_SIGN_DEFAULT_H_
 
 #include <stddef.h>
-#include "common/trinary/trit_array.h"
+#include "common/trinary/flex_trit.h"
 #include "utils/export.h"
 
 IOTA_EXPORT char* iota_sign_address_gen(char const* const seed,

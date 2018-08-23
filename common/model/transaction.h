@@ -12,7 +12,7 @@ extern "C" {
 #ifndef __COMMON_MODEL_TRANSACTION_H_
 #define __COMMON_MODEL_TRANSACTION_H_
 
-#include "common/trinary/trit_array.h"
+#include "common/trinary/flex_trit.h"
 
 #define NUM_TRITS_SERIALIZED_TRANSACTION 8019
 #define NUM_TRITS_SIGNATURE 6561

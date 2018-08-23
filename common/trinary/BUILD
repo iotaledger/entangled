@@ -144,7 +144,6 @@ cc_library(
         ":trit_byte",
         ":trit_tryte",
         ":trits",
-        ":trit_tryte",
         "//common:stdint",
     ],
 )
@@ -158,7 +157,6 @@ cc_library(
         ":trit_byte",
         ":trit_tryte",
         ":trits",
-        ":trit_tryte",
         "//common:stdint",
     ],
 )
@@ -172,7 +170,6 @@ cc_library(
         ":trit_byte",
         ":trit_tryte",
         ":trits",
-        ":trit_tryte",
         "//common:stdint",
     ],
 )
@@ -186,7 +183,6 @@ cc_library(
         ":trit_byte",
         ":trit_tryte",
         ":trits",
-        ":trit_tryte",
         "//common:stdint",
     ],
 )

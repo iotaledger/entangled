@@ -15,7 +15,6 @@ extern "C" {
 #include <stdlib.h>
 #include "common/kerl/kerl.h"
 #include "common/model/transaction.h"
-#include "common/trinary/tryte.h"
 
 /***********************************************************************************************************
  * Transfer Input data structure
