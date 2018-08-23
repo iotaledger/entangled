@@ -125,21 +125,21 @@ config_setting(
 )
 
 cc_library(
-    name = "trit_array",
+    name = "flex_trit",
     deps = select({
-        ":trit_encoding_1": [":trit_array_1"],
-        ":trit_encoding_3": [":trit_array_3"],
-        ":trit_encoding_4": [":trit_array_4"],
-        ":trit_encoding_5": [":trit_array_5"],
-        "//conditions:default": [":trit_array_3"],
+        ":trit_encoding_1": [":flex_trit_1"],
+        ":trit_encoding_3": [":flex_trit_3"],
+        ":trit_encoding_4": [":flex_trit_4"],
+        ":trit_encoding_5": [":flex_trit_5"],
+        "//conditions:default": [":flex_trit_3"],
     }),
 )
 
 cc_library(
-    name = "trit_array_1",
-    srcs = ["trit_array.c"],
-    hdrs = ["trit_array.h"],
-    defines = ["TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE"],
+    name = "flex_trit_1",
+    srcs = ["flex_trit.c"],
+    hdrs = ["flex_trit.h"],
+    defines = ["FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE"],
     deps = [
         ":trit_byte",
         ":trit_tryte",
@@ -149,10 +149,10 @@ cc_library(
 )
 
 cc_library(
-    name = "trit_array_3",
-    srcs = ["trit_array.c"],
-    hdrs = ["trit_array.h"],
-    defines = ["TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE"],
+    name = "flex_trit_3",
+    srcs = ["flex_trit.c"],
+    hdrs = ["flex_trit.h"],
+    defines = ["FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE"],
     deps = [
         ":trit_byte",
         ":trit_tryte",
@@ -162,10 +162,10 @@ cc_library(
 )
 
 cc_library(
-    name = "trit_array_4",
-    srcs = ["trit_array.c"],
-    hdrs = ["trit_array.h"],
-    defines = ["TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE"],
+    name = "flex_trit_4",
+    srcs = ["flex_trit.c"],
+    hdrs = ["flex_trit.h"],
+    defines = ["FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE"],
     deps = [
         ":trit_byte",
         ":trit_tryte",
@@ -175,14 +175,24 @@ cc_library(
 )
 
 cc_library(
-    name = "trit_array_5",
-    srcs = ["trit_array.c"],
-    hdrs = ["trit_array.h"],
-    defines = ["TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE"],
+    name = "flex_trit_5",
+    srcs = ["flex_trit.c"],
+    hdrs = ["flex_trit.h"],
+    defines = ["FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE"],
     deps = [
         ":trit_byte",
         ":trit_tryte",
         ":trits",
+        "//common:stdint",
+    ],
+)
+
+cc_library(
+    name = "trit_array",
+    srcs = ["trit_array.c"],
+    hdrs = ["trit_array.h"],
+    deps = [
+        ":flex_trit",
         "//common:stdint",
     ],
 )
@@ -192,40 +202,7 @@ cc_library(
     srcs = ["flex_trit_array.cc"],
     hdrs = ["flex_trit_array.h"],
     deps = [
-        ":trit_array",
-        "//common:stdint",
-    ],
-)
-
-cc_library(
-    name = "flex_trit_array_3",
-    srcs = ["flex_trit_array.cc"],
-    hdrs = ["flex_trit_array.h"],
-    defines = ["TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE"],
-    deps = [
-        ":trit_array_3",
-        "//common:stdint",
-    ],
-)
-
-cc_library(
-    name = "flex_trit_array_4",
-    srcs = ["flex_trit_array.cc"],
-    hdrs = ["flex_trit_array.h"],
-    defines = ["TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE"],
-    deps = [
-        ":trit_array_4",
-        "//common:stdint",
-    ],
-)
-
-cc_library(
-    name = "flex_trit_array_5",
-    srcs = ["flex_trit_array.cc"],
-    hdrs = ["flex_trit_array.h"],
-    defines = ["TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE"],
-    deps = [
-        ":trit_array_5",
+        ":flex_trit",
         "//common:stdint",
     ],
 )

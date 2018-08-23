@@ -12,7 +12,7 @@
 #include "common/model/transaction.h"
 #include "common/trinary/tryte.h"
 
-#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+#if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
 static const flex_trit_t TRITS[] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -437,7 +437,7 @@ static const flex_trit_t TRITS[] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0};
-#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
 static const flex_trit_t TRITS[] = {
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
@@ -618,7 +618,7 @@ static const flex_trit_t TRITS[] = {
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
     '9', '9', '9'};
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
 static const flex_trit_t TRITS[] = {
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
@@ -754,7 +754,7 @@ static const flex_trit_t TRITS[] = {
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     0,   0,   0,   0,   0,   0,   0,   0,   0,   0};
-#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
 static const flex_trit_t TRITS[] = {
     0,    0,   0,   0,    0,   0,    0,   0,    0,   0,   0,    0,   0,    0,
     0,    0,   0,   0,    0,   0,    0,   0,    0,   0,   0,    0,   0,    0,
@@ -873,7 +873,7 @@ static const flex_trit_t TRITS[] = {
     0,    0,   0,   0,    0,   0,    0,   0};
 #endif
 
-#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
+#if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
 static const struct _iota_transaction TRANSACTION = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1216,7 +1216,7 @@ static const struct _iota_transaction TRANSACTION = {
      1,  -1, -1, 1,  -1, 0,  -1, 1,  1,  0,  1,  1,  0,  1,  -1, 0,  0, 1,  1,
      -1, 0,  -1, 0,  -1, 1,  -1, -1, -1, 0,  -1, -1, 0,  1,  -1, 0,  1, 1,  0,
      -1, -1, 0,  0,  -1, -1, -1, -1, -1, -1, 0,  -1, -1, 0,  -1}};
-#elif defined(TRIT_ARRAY_ENCODING_3_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
 static const struct _iota_transaction TRANSACTION = {
     {'9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
      '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
@@ -1407,7 +1407,7 @@ static const struct _iota_transaction TRANSACTION = {
      'Q', 'V', 'X', 'J', 'O', 'S', 'B', 'X', 'C', 'A', 'W', 'J', 'T', 'X',
      'S', 'C', 'G', 'R', 'Z', 'X', '9', 'V', 'T', 'F', 'J', 'J', 'Z', 'V',
      'X', 'T', 'W', 'W', 'Y', 'D', 'W', 'O', 'N', 'Q', 'Q'}};
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
 static const struct _iota_transaction TRANSACTION = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1505,7 +1505,7 @@ static const struct _iota_transaction TRANSACTION = {
      52,  61,  92,  -63, -47, 49,  -41, 76,  -60, -57, 7,   67, 4,
      79,  116, 51,  49,  -47, -63, 3,   3,   -44, 55,  23,  69, 67,
      -51, -36, -49, -45, 20,  15,  -1,  -49, 51}};
-#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
+#elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
 static const struct _iota_transaction TRANSACTION = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
