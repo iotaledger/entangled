@@ -8,7 +8,6 @@
 #include "gossip/components/requester.h"
 #include "ciri/core.h"
 #include "common/storage/sql/defs.h"
-#include "common/storage/storage.h"
 #include "utils/containers/lists/concurrent_list_trit_array.h"
 #include "utils/logger_helper.h"
 
@@ -83,8 +82,8 @@ retcode_t request_transaction(requester_state_t *const state,
   }
 
   // TODO(thibault) check null hash
-  if ((ret = iota_stor_exist(&state->node->core->db_conn, COL_HASH, hash,
-                             &exists))) {
+  if ((ret = iota_tangle_transaction_exist(&state->node->core->tangle, COL_HASH,
+                                           hash, &exists))) {
     return ret;
   }
   if (exists) {
@@ -122,8 +121,8 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
   while (iter) {
     *hash = iter->data;
     iter = iter->next;
-    if ((ret = iota_stor_exist(&state->node->core->db_conn, COL_HASH, *hash,
-                               &exists))) {
+    if ((ret = iota_tangle_transaction_exist(&state->node->core->tangle,
+                                             COL_HASH, *hash, &exists))) {
       return ret;
     }
     if (exists) {

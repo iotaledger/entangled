@@ -9,12 +9,12 @@
 #define __CIRI_CORE_H__
 
 #include "ciri/node.h"
-#include "common/storage/connection.h"
+#include "consensus/tangle/tangle.h"
 
 typedef struct core_s {
   bool running;
   node_t node;
-  connection_t db_conn;
+  tangle_t tangle;
   connection_config_t db_conf;
 } core_t;
 

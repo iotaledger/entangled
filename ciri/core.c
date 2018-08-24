@@ -25,15 +25,15 @@ retcode_t core_init(core_t* const core) {
   memset(core, 0, sizeof(core_t));
   core->running = false;
 
-  log_info(CORE_LOGGER_ID, "Initializing database connection\n");
+  log_info(CORE_LOGGER_ID, "Initializing tangle\n");
   core->db_conf.db_path = CIRI_DB_PATH;
   core->db_conf.index_address = true;
   core->db_conf.index_approvee = true;
   core->db_conf.index_bundle = true;
   core->db_conf.index_tag = true;
   core->db_conf.index_hash = true;
-  if (init_connection(&core->db_conn, &core->db_conf)) {
-    log_critical(CORE_LOGGER_ID, "Initializing database connection failed\n");
+  if (iota_tangle_init(&core->tangle, &core->db_conf)) {
+    log_critical(CORE_LOGGER_ID, "Initializing tangle\n");
     return RC_CORE_FAILED_DATABASE_INIT;
   }
 
@@ -97,9 +97,9 @@ retcode_t core_destroy(core_t* const core) {
     ret = RC_CORE_FAILED_NODE_DESTROY;
   }
 
-  log_info(CORE_LOGGER_ID, "Destroying database connection\n");
-  if (destroy_connection(&core->db_conn)) {
-    log_error(CORE_LOGGER_ID, "Destroying database connection failed\n");
+  log_info(CORE_LOGGER_ID, "Destroying tangle\n");
+  if (iota_tangle_destroy(&core->tangle)) {
+    log_error(CORE_LOGGER_ID, "Destroying tangle failed\n");
     ret = RC_CORE_FAILED_DATABASE_DESTROY;
   }
 
