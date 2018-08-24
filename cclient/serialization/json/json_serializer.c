@@ -329,56 +329,56 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_get_string(json_obj, "appName", out->appName);
+  ret = json_get_string(json_obj, "appName", out->app_name);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_string(json_obj, "appVersion", out->appVersion);
+  ret = json_get_string(json_obj, "appVersion", out->app_version);
   if (ret != RC_OK) {
     goto end;
   }
 
   ret = json_get_int(json_obj, "jreAvailableProcessors",
-                     &out->jreAvailableProcessors);
+                     &out->jre_available_processors);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_size(json_obj, "jreFreeMemory", &out->jreFreeMemory);
+  ret = json_get_size(json_obj, "jreFreeMemory", &out->jre_free_memory);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_size(json_obj, "jreMaxMemory", &out->jreMaxMemory);
+  ret = json_get_size(json_obj, "jreMaxMemory", &out->jre_max_memory);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_size(json_obj, "jreTotalMemory", &out->jreTotalMemory);
+  ret = json_get_size(json_obj, "jreTotalMemory", &out->jre_total_memory);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_string(json_obj, "latestMilestone", out->latestMilestone);
+  ret = json_get_string(json_obj, "latestMilestone", out->latest_milestone);
   if (ret != RC_OK) {
     goto end;
   }
 
   ret = json_get_size(json_obj, "latestMilestoneIndex",
-                      &out->latestMilestoneIndex);
+                      &out->latest_milestone_index);
   if (ret != RC_OK) {
     goto end;
   }
 
   ret = json_get_string(json_obj, "latestSolidSubtangleMilestone",
-                        out->latestSolidSubtangleMilestone);
+                        out->latest_solid_subtangle_milestone);
   if (ret != RC_OK) {
     goto end;
   }
 
   ret = json_get_size(json_obj, "latestSolidSubtangleMilestoneIndex",
-                      &out->latestSolidSubtangleMilestoneIndex);
+                      &out->latest_solid_subtangle_milestone_index);
   if (ret != RC_OK) {
     goto end;
   }
@@ -388,7 +388,7 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
     goto end;
   }
 
-  ret = json_get_int(json_obj, "packetsQueueSize", &out->packetsQueueSize);
+  ret = json_get_int(json_obj, "packetsQueueSize", &out->packets_queue_size);
   if (ret != RC_OK) {
     goto end;
   }
@@ -403,8 +403,7 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
     goto end;
   }
 
-  ret = json_get_int(json_obj, "transactionsToRequest",
-                     &out->transactionsToRequest);
+  ret = json_get_int(json_obj, "transactionsToRequest", &out->trans_to_request);
   if (ret != RC_OK) {
     goto end;
   }

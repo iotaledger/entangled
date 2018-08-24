@@ -113,27 +113,28 @@ void test_deserialize_get_node_info(void) {
   serializer.vtable.get_node_info_deserialize_response(&serializer, json_text,
                                                        node_info);
 
-  TEST_ASSERT_EQUAL_STRING("IRI", node_info->appName->data);
-  TEST_ASSERT_EQUAL_STRING("1.0.8.nu", node_info->appVersion->data);
-  TEST_ASSERT_EQUAL_INT(4, node_info->jreAvailableProcessors);
-  TEST_ASSERT_EQUAL_INT8(91707424, node_info->jreFreeMemory);
-  TEST_ASSERT_EQUAL_INT8(1908932608, node_info->jreMaxMemory);
-  TEST_ASSERT_EQUAL_INT8(122683392, node_info->jreTotalMemory);
+  TEST_ASSERT_EQUAL_STRING("IRI", node_info->app_name->data);
+  TEST_ASSERT_EQUAL_STRING("1.0.8.nu", node_info->app_version->data);
+  TEST_ASSERT_EQUAL_INT(4, node_info->jre_available_processors);
+  TEST_ASSERT_EQUAL_INT8(91707424, node_info->jre_free_memory);
+  TEST_ASSERT_EQUAL_INT8(1908932608, node_info->jre_max_memory);
+  TEST_ASSERT_EQUAL_INT8(122683392, node_info->jre_total_memory);
   TEST_ASSERT_EQUAL_STRING(
       "VBVEUQYE99LFWHDZRFKTGFHYGDFEAMAEBGUBTTJRFKHCFBRTXFAJQ9XIUEZQCJOQTZNOOHKU"
       "QIKOY9999",
-      node_info->latestMilestone->data);
-  TEST_ASSERT_EQUAL_INT8(107, node_info->latestMilestoneIndex);
+      node_info->latest_milestone->data);
+  TEST_ASSERT_EQUAL_INT8(107, node_info->latest_milestone_index);
   TEST_ASSERT_EQUAL_STRING(
       "VBVEUQYE99LFWHDZRFKTGFHYGDFEAMAEBGUBTTJRFKHCFBRTXFAJQ9XIUEZQCJOQTZNOOHKU"
       "QIKOY9999",
-      node_info->latestSolidSubtangleMilestone->data);
-  TEST_ASSERT_EQUAL_INT8(107, node_info->latestSolidSubtangleMilestoneIndex);
+      node_info->latest_solid_subtangle_milestone->data);
+  TEST_ASSERT_EQUAL_INT8(107,
+                         node_info->latest_solid_subtangle_milestone_index);
   TEST_ASSERT_EQUAL_INT(2, node_info->neighbors);
-  TEST_ASSERT_EQUAL_INT(0, node_info->packetsQueueSize);
+  TEST_ASSERT_EQUAL_INT(0, node_info->packets_queue_size);
   TEST_ASSERT_EQUAL_INT8(1477037811737, node_info->time);
   TEST_ASSERT_EQUAL_INT(3, node_info->tips);
-  TEST_ASSERT_EQUAL_INT(0, node_info->transactionsToRequest);
+  TEST_ASSERT_EQUAL_INT(0, node_info->trans_to_request);
 
   get_node_info_res_free(node_info);
 }
@@ -171,14 +172,14 @@ void test_deserialize_get_neighbors(void) {
 
   neighbor_t* nb = get_neighbors_res_neighbor_at(nbors, 0);
   TEST_ASSERT_EQUAL_STRING("/8.8.8.8:14265", nb->address->data);
-  TEST_ASSERT_EQUAL_INT(922, nb->numberOfAllTransactions);
-  TEST_ASSERT_EQUAL_INT(0, nb->numberOfInvalidTransactions);
-  TEST_ASSERT_EQUAL_INT(92, nb->numberOfNewTransactions);
+  TEST_ASSERT_EQUAL_INT(922, nb->all_trans_num);
+  TEST_ASSERT_EQUAL_INT(0, nb->invalid_trans_num);
+  TEST_ASSERT_EQUAL_INT(92, nb->new_trans_num);
   nb = get_neighbors_res_neighbor_at(nbors, 1);
   TEST_ASSERT_EQUAL_STRING("/8.8.8.8:5000", nb->address->data);
-  TEST_ASSERT_EQUAL_INT(925, nb->numberOfAllTransactions);
-  TEST_ASSERT_EQUAL_INT(0, nb->numberOfInvalidTransactions);
-  TEST_ASSERT_EQUAL_INT(20, nb->numberOfNewTransactions);
+  TEST_ASSERT_EQUAL_INT(925, nb->all_trans_num);
+  TEST_ASSERT_EQUAL_INT(0, nb->invalid_trans_num);
+  TEST_ASSERT_EQUAL_INT(20, nb->new_trans_num);
   nb = get_neighbors_res_neighbor_at(nbors, 2);
   TEST_ASSERT_NULL(nb);
   get_neighbors_res_free(nbors);

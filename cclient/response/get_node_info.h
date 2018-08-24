@@ -19,47 +19,47 @@ typedef struct {
    * Name of the IOTA software you're currently using (IRI stands for Initial
    * Reference Implementation).
    */
-  char_buffer_t* appName;
+  char_buffer_t* app_name;
   /**
    * The version of the IOTA software you're currently running.
    */
-  char_buffer_t* appVersion;
+  char_buffer_t* app_version;
   /**
    * Available cores on your machine for JRE.
    */
-  int jreAvailableProcessors;
+  int jre_available_processors;
   /**
    * Returns the amount of free memory in the Java Virtual Machine.
    */
-  size_t jreFreeMemory;
+  size_t jre_free_memory;
   /**
    * Returns the maximum amount of memory that the Java virtual machine will
    * attempt to use.
    */
-  size_t jreMaxMemory;
+  size_t jre_max_memory;
   /**
    * Returns the total amount of memory in the Java virtual machine.
    */
-  size_t jreTotalMemory;
+  size_t jre_total_memory;
   /**
    * Latest milestone that was signed off by the coordinator.
    */
-  char_buffer_t* latestMilestone;
+  char_buffer_t* latest_milestone;
   /**
    * Index of the latest milestone.
    */
-  size_t latestMilestoneIndex;
+  size_t latest_milestone_index;
   /**
    * The latest milestone which is solid and is used for sending transactions.
    * For a milestone to become solid your local node must basically approve the
    * subtangle of coordinator-approved transactions, and have a consistent view
    * of all referenced transactions.
    */
-  char_buffer_t* latestSolidSubtangleMilestone;
+  char_buffer_t* latest_solid_subtangle_milestone;
   /**
    * Index of the latest solid subtangle.
    */
-  size_t latestSolidSubtangleMilestoneIndex;
+  size_t latest_solid_subtangle_milestone_index;
   /**
    * Number of neighbors you are directly connected with.
    */
@@ -67,7 +67,7 @@ typedef struct {
   /**
    * Packets which are currently queued up.
    */
-  int packetsQueueSize;
+  int packets_queue_size;
   /**
    * Current UNIX timestamp.
    */
@@ -79,7 +79,7 @@ typedef struct {
   /**
    * Transactions to request during syncing process.
    */
-  int transactionsToRequest;
+  int trans_to_request;
 } get_node_info_res_t;
 
 get_node_info_res_t* get_node_info_res_new();
