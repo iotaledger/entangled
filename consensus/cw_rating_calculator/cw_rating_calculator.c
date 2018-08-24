@@ -10,7 +10,7 @@
 #include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
 
 retcode_t iota_consensus_cw_rating_init(
-    cw_rating_calculator_t *cw_calc, const tangle_t *tangle,
+    cw_rating_calculator_t *const cw_calc, tangle_t *const tangle,
     enum cw_calculation_implementation impl) {
   logger_helper_init(CW_RATING_CALCULATOR_LOGGER_ID, LOGGER_INFO, true);
   cw_calc->tangle = tangle;

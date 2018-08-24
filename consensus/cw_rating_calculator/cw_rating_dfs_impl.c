@@ -107,7 +107,7 @@ retcode_t cw_rating_dfs_do_dfs_from_db(
   iota_hashes_pack pack;
   *subtangle_size = 0;
 
-  if (res = hash_pack_init(&pack, 10) != RC_OK) {
+  if ((res = hash_pack_init(&pack, 10)) != RC_OK) {
     return res;
   }
 
@@ -123,7 +123,7 @@ retcode_t cw_rating_dfs_do_dfs_from_db(
   flex_trit_t *curr_tx_hash = NULL;
 
   while (utarray_len(stack)) {
-    curr_tx_hash = utarray_back(stack);
+    curr_tx_hash = (flex_trit_t *)utarray_back(stack);
     utarray_pop_back(stack);
     pack.num_loaded = 0;
     pack.insufficient_capacity = false;
@@ -217,7 +217,7 @@ retcode_t cw_rating_dfs_do_dfs_light(
   utarray_push_back(stack, ep);
 
   while (utarray_len(stack)) {
-    curr_hash = utarray_back(stack);
+    curr_hash = (flex_trit_t *)utarray_back(stack);
     utarray_pop_back(stack);
 
     HASH_FIND(hh, tx_to_approvers, curr_hash, FLEX_TRIT_SIZE_243,

@@ -17,10 +17,9 @@
 #define TIPSELECTION_LOGGER_ID "consensus_tipselection"
 
 retcode_t iota_consensus_tipselection_init(
-    tipselection_t *impl, const tangle_t *tangle, const ledger_validator_t *lv,
-    const walker_validator_t *wv, const cw_rating_calculator_t *cw_calc,
-    const milestone_t *milestone, const entry_point_selector_t *ep,
-    const walker_t *walker) {
+    tipselection_t *impl, tangle_t *tangle, ledger_validator_t *lv,
+    walker_validator_t *wv, cw_rating_calculator_t *cw_calc,
+    milestone_t *milestone, entry_point_selector_t *ep, walker_t *walker) {
   logger_helper_init(TIPSELECTION_LOGGER_ID, LOGGER_INFO, true);
   impl->cw_calc = cw_calc;
   impl->milestone = milestone;
@@ -37,7 +36,7 @@ retcode_t iota_consensus_get_transactions_to_approve(
     tipselection_t *impl, size_t depth, const trit_array_p reference,
     tips_pair *tips) {
   retcode_t res = RC_OK;
-  trit_array_p ep;
+  trit_array_p ep = NULL;
 
   rw_lock_handle_rdlock(&impl->milestone->latest_snapshot.rw_lock);
 
@@ -89,4 +88,5 @@ retcode_t iota_consensus_tipselection_destroy(tipselection_t *impl) {
   impl->lv = NULL;
   impl->wv = NULL;
   impl->walker = NULL;
+  return RC_OK;
 }

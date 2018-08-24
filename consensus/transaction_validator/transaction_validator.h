@@ -25,7 +25,7 @@ typedef struct transaction_validator_t {
 } transaction_validator_t;
 
 extern retcode_t iota_consensus_transaction_validator_init(
-    const tangle_t *tangle, transaction_validator_t *tv);
+    tangle_t *const tangle, transaction_validator_t *const tv);
 
 // TODO - complete
 

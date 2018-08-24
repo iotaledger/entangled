@@ -50,11 +50,11 @@ typedef struct ledger_validator_t {
 } ledger_validator_t;
 
 extern retcode_t iota_consensus_ledger_validator_init(
-    const tangle_t *tangle, const milestone_t *milestone,
-    ledger_validator_t *lv);
+    tangle_t *const tangle, milestone_t *const milestone,
+    ledger_validator_t *const lv);
 
 extern retcode_t iota_consensus_ledger_validator_destroy(
-    ledger_validator_t *lv);
+    ledger_validator_t *const lv);
 
 extern retcode_t iota_consensus_ledeger_validator_validate(
     const ledger_validator_t *lv, const tips_pair *pair);

@@ -25,6 +25,7 @@ retcode_t iota_consensus_entry_point_selector_destroy(
   logger_helper_destroy(ENTRY_POINT_SELECTOR_LOGGER_ID);
   ep_selector->milestone = NULL;
   ep_selector->tangle = NULL;
+  return RC_OK;
 }
 
 retcode_t iota_consensus_get_entry_point(

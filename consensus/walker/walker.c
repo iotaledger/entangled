@@ -3,11 +3,12 @@
 
 #define WALKER_LOGGER_ID "consensus_walker"
 
-retcode_t iota_consensus_walker_init(const tangle_t *tangle, double alpha,
-                                     walker_t *walker) {
+retcode_t iota_consensus_walker_init(tangle_t *const tangle, double alpha,
+                                     walker_t *const walker) {
   logger_helper_init(WALKER_LOGGER_ID, LOGGER_INFO, true);
   walker->alpha = alpha;
   walker->tangle = tangle;
+  return RC_OK;
 }
 
 retcode_t iota_consensus_walker_walk(const walker_t *walker,
