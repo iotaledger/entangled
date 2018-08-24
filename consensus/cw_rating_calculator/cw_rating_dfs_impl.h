@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_TOPOLOGICAL_SORT_IMPL_H__
-#define __CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_TOPOLOGICAL_SORT_IMPL_H__
+#ifndef __CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_DFS_IMPL_H__
+#define __CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_DFS_IMPL_H__
 
 #include "utarray.h"
 #include "uthash.h"
@@ -48,4 +48,4 @@ static cw_calculator_vtable cw_topological_vtable = {
 }
 #endif
 
-#endif  //__CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_TOPOLOGICAL_SORT_IMPL_H__
+#endif  //__CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_DFS_IMPL_H__
