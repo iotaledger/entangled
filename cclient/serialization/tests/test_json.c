@@ -170,7 +170,7 @@ void test_deserialize_get_neighbors(void) {
   serializer.vtable.get_neighbors_deserialize_response(&serializer, json_text,
                                                        nbors);
 
-  neighbor_t* nb = get_neighbors_res_neighbor_at(nbors, 0);
+  neighbor_info_t* nb = get_neighbors_res_neighbor_at(nbors, 0);
   TEST_ASSERT_EQUAL_STRING("/8.8.8.8:14265", nb->address->data);
   TEST_ASSERT_EQUAL_INT(922, nb->all_trans_num);
   TEST_ASSERT_EQUAL_INT(0, nb->invalid_trans_num);
