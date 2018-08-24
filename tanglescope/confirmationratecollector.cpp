@@ -159,6 +159,15 @@ void CRCollector::calcAndExposeImpl(
     it++;
   }
 
+  it = lt.begin();
+  while (it != lt.end()) {
+    if (it->second.tp < lb) {
+      it = lt.erase(it);
+    } else {
+      it++;
+    }
+  }
+
   for (auto kv : durationToTotal) {
     double cr = 0;
     if (durationToConfirmed.find(kv.first) != durationToConfirmed.end()) {
