@@ -9,7 +9,6 @@
 
 #include "ciri/core.h"
 #include "common/storage/sql/defs.h"
-#include "common/storage/storage.h"
 #include "gossip/components/processor.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/containers/queues/concurrent_queue_packet.h"
@@ -56,15 +55,16 @@ static retcode_t process_transaction_bytes(processor_state_t *const state,
     TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
     trit_array_set_trits(&hash, (*tx)->hash, NUM_TRITS_HASH);
 
-    if ((ret = iota_stor_exist(&state->node->core->db_conn, COL_HASH, &hash,
-                               &exists))) {
+    if ((ret = iota_tangle_transaction_exist(&state->node->core->tangle,
+                                             COL_HASH, &hash, &exists))) {
       return ret;
     }
     if (exists == false) {
       neighbor->nbr_new_tx++;
       // Store new transaction
       log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Storing new transaction\n");
-      if ((ret = iota_stor_store(&state->node->core->db_conn, *tx))) {
+      if ((ret = iota_tangle_transaction_store(&state->node->core->tangle,
+                                               *tx))) {
         log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                     "Storing new transaction failed\n");
         neighbor->nbr_invalid_tx++;

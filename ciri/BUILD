@@ -15,7 +15,7 @@ cc_library(
     hdrs = ["core.h"],
     deps = [
         ":node_shared",
-        "//common/storage/sql/sqlite3:sqlite3_storage",
+        "//consensus/tangle",
     ],
 )
 
