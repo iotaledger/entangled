@@ -118,6 +118,6 @@ confirmationratecollector:
   enable_cr_from_api: true
   #For checking the CR for various Latencies, define the latency in seconds,
   #"step" means that for 10 seconds we will check latency of 10,20,30 seconds
-  additional_latency_step_seconds: 10
+  additional_latency_step_seconds: 60
   #num different latencies to check
   additional_latency_num_steps: 3
