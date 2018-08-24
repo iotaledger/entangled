@@ -44,14 +44,6 @@ static cw_calculator_vtable cw_topological_vtable = {
     .cw_rating_calculate = cw_rating_calculate_dfs,
 };
 
-static retcode_t cw_rating_dfs_do_dfs_from_db(
-    const cw_rating_calculator_t *const cw_calc, trit_array_p entry_point,
-    hash_to_direct_approvers_map_t *tx_to_approvers, size_t *subtangle_size);
-
-static retcode_t cw_rating_dfs_do_dfs_light(
-    hash_to_direct_approvers_map_t tx_to_approvers, flex_trit_t *ep,
-    int64_t *visited_bitset, size_t *subtangle_size);
-
 #ifdef __cplusplus
 }
 #endif
