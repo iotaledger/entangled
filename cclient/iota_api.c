@@ -16,19 +16,31 @@ iota_api_result_t iota_api_get_node_info(
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();
 
+  if (req_buff == NULL || res_buff == NULL) {
+    result.error = RC_CCLIENT_OOM;
+    goto done;
+  }
   result.error = service->serializer.vtable.get_node_info_serialize_request(
       &service->serializer, req_buff);
-  if (result.error != RC_OK) goto done;
+  if (result.error != RC_OK) {
+    goto done;
+  }
 
   result = iota_service_query(service, req_buff, res_buff);
-  if (result.error != RC_OK) goto done;
+  if (result.error != RC_OK) {
+    goto done;
+  }
 
   result.error = service->serializer.vtable.get_node_info_deserialize_response(
       &service->serializer, res_buff->data, res);
 
 done:
-  char_buffer_free(req_buff);
-  char_buffer_free(res_buff);
+  if (req_buff) {
+    char_buffer_free(req_buff);
+  }
+  if (res_buff) {
+    char_buffer_free(res_buff);
+  }
   return result;
 }
 
@@ -38,20 +50,32 @@ iota_api_result_t iota_api_get_neighbors(
 
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();
+  if (req_buff == NULL || res_buff == NULL) {
+    result.error = RC_CCLIENT_OOM;
+    goto done;
+  }
 
   result.error = service->serializer.vtable.get_neighbors_serialize_request(
       &service->serializer, req_buff);
-  if (result.error != RC_OK) goto done;
+  if (result.error != RC_OK) {
+    goto done;
+  }
 
   result = iota_service_query(service, req_buff, res_buff);
-  if (result.error != RC_OK) goto done;
+  if (result.error != RC_OK) {
+    goto done;
+  }
 
   result.error = service->serializer.vtable.get_neighbors_deserialize_response(
       &service->serializer, res_buff->data, res);
 
 done:
-  char_buffer_free(req_buff);
-  char_buffer_free(res_buff);
+  if (req_buff) {
+    char_buffer_free(req_buff);
+  }
+  if (res_buff) {
+    char_buffer_free(res_buff);
+  }
   return result;
 }
 
@@ -82,17 +106,32 @@ iota_api_result_t iota_api_find_transactions(
   iota_api_result_t result = {0};
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
-
-  service->serializer.vtable.find_transactions_serialize_request(
+  if (req_buff == NULL || res_buff == NULL) {
+    result.error = RC_CCLIENT_OOM;
+    goto done;
+  }
+  result.error = service->serializer.vtable.find_transactions_serialize_request(
       &service->serializer, req, req_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
 
   result = iota_service_query(service, req_buff, res_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
 
-  service->serializer.vtable.find_transactions_deserialize_response(
-      &service->serializer, res_buff->data, res);
+  result.error =
+      service->serializer.vtable.find_transactions_deserialize_response(
+          &service->serializer, res_buff->data, res);
 
-  char_buffer_free(req_buff);
-  char_buffer_free(res_buff);
+done:
+  if (req_buff) {
+    char_buffer_free(req_buff);
+  }
+  if (res_buff) {
+    char_buffer_free(res_buff);
+  }
   return result;
 }
 

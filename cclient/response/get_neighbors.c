@@ -12,7 +12,9 @@ void neighbor_t_copy(void* _dst, const void* _src) {
 
 void neighbor_t_dtor(void* _elt) {
   neighbor_t* elt = (neighbor_t*)_elt;
-  if (elt->address) char_buffer_free(elt->address);
+  if (elt->address) {
+    char_buffer_free(elt->address);
+  }
 }
 
 UT_icd ut_neighbor_icd = {sizeof(neighbor_t), NULL, neighbor_t_copy,
@@ -20,6 +22,9 @@ UT_icd ut_neighbor_icd = {sizeof(neighbor_t), NULL, neighbor_t_copy,
 
 get_neighbors_res_t* get_neighbors_res_new() {
   get_neighbors_res_t* nbors = malloc(sizeof(get_neighbors_res_t));
+  if (nbors == NULL) {
+    return NULL;
+  }
   utarray_new(nbors, &ut_neighbor_icd);
   return nbors;
 }
@@ -29,6 +34,9 @@ void get_neighbors_res_free(get_neighbors_res_t* nbors) { utarray_free(nbors); }
 neighbor_t* get_neighbors_res_create_neighbor(char_buffer_t* addr, int allTrans,
                                               int invalidTrans, int newTrans) {
   neighbor_t* nb = malloc(sizeof(neighbor_t));
+  if (nb == NULL) {
+    return NULL;
+  }
   nb->address = addr;
   nb->numberOfAllTransactions = allTrans;
   nb->numberOfInvalidTransactions = invalidTrans;
@@ -41,6 +49,9 @@ retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* nbors,
                                          int invalidTrans, int newTrans) {
   retcode_t ret = RC_OK;
   neighbor_t* nb = malloc(sizeof(neighbor_t));
+  if (nb == NULL) {
+    return RC_CCLIENT_OOM;
+  }
   nb->address = addr;
   nb->numberOfAllTransactions = allTrans;
   nb->numberOfInvalidTransactions = invalidTrans;
@@ -54,7 +65,9 @@ neighbor_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* nbors,
   if (utarray_len(nbors) > index) {
     neighbor_t* p = NULL;
     p = (neighbor_t*)utarray_eltptr(nbors, index);
-    if (p) return p;
+    if (p) {
+      return p;
+    }
   }
   return NULL;
 }
