@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 
+#include "common/errors.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
@@ -36,7 +37,8 @@ extern "C" {
  *
  * @return a status code
  */
-bool broadcaster_init(broadcaster_state_t *const state, node_t *const node);
+retcode_t broadcaster_init(broadcaster_state_t *const state,
+                           node_t *const node);
 
 /**
  * Starts a broadcaster
@@ -45,7 +47,7 @@ bool broadcaster_init(broadcaster_state_t *const state, node_t *const node);
  *
  * @return a status code
  */
-bool broadcaster_start(broadcaster_state_t *const state);
+retcode_t broadcaster_start(broadcaster_state_t *const state);
 
 /**
  * Adds a packet to a broadcaster queue
@@ -55,8 +57,8 @@ bool broadcaster_start(broadcaster_state_t *const state);
  *
  * @return a status code
  */
-bool broadcaster_on_next(broadcaster_state_t *const state,
-                         iota_packet_t const packet);
+retcode_t broadcaster_on_next(broadcaster_state_t *const state,
+                              iota_packet_t const packet);
 
 /**
  * Stops a broadcaster
@@ -65,7 +67,7 @@ bool broadcaster_on_next(broadcaster_state_t *const state,
  *
  * @return a status code
  */
-bool broadcaster_stop(broadcaster_state_t *const state);
+retcode_t broadcaster_stop(broadcaster_state_t *const state);
 
 /**
  * Destroys a broadcaster
@@ -74,7 +76,7 @@ bool broadcaster_stop(broadcaster_state_t *const state);
  *
  * @return a status code
  */
-bool broadcaster_destroy(broadcaster_state_t *const state);
+retcode_t broadcaster_destroy(broadcaster_state_t *const state);
 
 #ifdef __cplusplus
 }

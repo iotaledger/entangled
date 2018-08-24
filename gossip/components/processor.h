@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 
+#include "common/errors.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
@@ -36,7 +37,7 @@ extern "C" {
  *
  * @return a status code
  */
-bool processor_init(processor_state_t *const state, node_t *const node);
+retcode_t processor_init(processor_state_t *const state, node_t *const node);
 
 /**
  * Starts a processor
@@ -45,7 +46,7 @@ bool processor_init(processor_state_t *const state, node_t *const node);
  *
  * @return a status code
  */
-bool processor_start(processor_state_t *const state);
+retcode_t processor_start(processor_state_t *const state);
 
 /**
  * Adds a packet to a processor queue
@@ -55,8 +56,8 @@ bool processor_start(processor_state_t *const state);
  *
  * @return a status code
  */
-bool processor_on_next(processor_state_t *const state,
-                       iota_packet_t const packet);
+retcode_t processor_on_next(processor_state_t *const state,
+                            iota_packet_t const packet);
 
 /**
  * Stops a processor
@@ -65,7 +66,7 @@ bool processor_on_next(processor_state_t *const state,
  *
  * @return a status code
  */
-bool processor_stop(processor_state_t *const state);
+retcode_t processor_stop(processor_state_t *const state);
 
 /**
  * Destroys a processor
@@ -74,7 +75,7 @@ bool processor_stop(processor_state_t *const state);
  *
  * @return a status code
  */
-bool processor_destroy(processor_state_t *const state);
+retcode_t processor_destroy(processor_state_t *const state);
 
 #ifdef __cplusplus
 }

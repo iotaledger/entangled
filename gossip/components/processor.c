@@ -5,36 +5,50 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "gossip/components/processor.h"
+#include <string.h>
+
 #include "ciri/core.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
+#include "gossip/components/processor.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_COMPONENT_LOGGER_ID "processor_component"
 
-static bool process_transaction_bytes(processor_state_t *const state,
-                                      neighbor_t *const neighbor,
-                                      iota_packet_t *const packet,
-                                      iota_transaction_t *const tx) {
+static retcode_t process_transaction_bytes(processor_state_t *const state,
+                                           neighbor_t *const neighbor,
+                                           iota_packet_t *const packet,
+                                           iota_transaction_t *const tx) {
+  retcode_t ret = RC_OK;
   bool exists = false;
 
-  if (state == NULL || neighbor == NULL || packet == NULL || tx == NULL) {
-    return false;
+  if (state == NULL) {
+    return RC_PROCESSOR_COMPONENT_NULL_STATE;
+  }
+  if (neighbor == NULL) {
+    return RC_PROCESSOR_COMPONENT_NULL_NEIGHBOR;
+  }
+  if (packet == NULL) {
+    return RC_PROCESSOR_COMPONENT_NULL_PACKET;
+  }
+  if (tx == NULL) {
+    return RC_PROCESSOR_COMPONENT_NULL_TX;
   }
 
-  log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing transaction\n");
   if (true /* TODO(thibault): if !cached */) {
     trit_t tx_trits[TX_TRITS_SIZE];
     flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
 
     bytes_to_trits(packet->content, TX_BYTES_SIZE, tx_trits, TX_TRITS_SIZE);
-    flex_trits_from_trits(tx_flex_trits, FLEX_TRIT_SIZE_8019, tx_trits,
-                          TX_TRITS_SIZE, TX_TRITS_SIZE);
+    flex_trits_from_trits(tx_flex_trits, TX_TRITS_SIZE, tx_trits, TX_TRITS_SIZE,
+                          TX_TRITS_SIZE);
     if ((*tx = transaction_deserialize(tx_flex_trits)) == NULL) {
-      return false;
+      neighbor->nbr_invalid_tx++;
+      log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
+                  "Deserializing transaction failed\n");
+      return RC_PROCESSOR_COMPONENT_INVALID_TX;
     }
     // TODO(thibault): Transaction validation
     // TODO(thibault): Add to cache
@@ -42,66 +56,88 @@ static bool process_transaction_bytes(processor_state_t *const state,
     TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
     trit_array_set_trits(&hash, (*tx)->hash, NUM_TRITS_HASH);
 
-    if (iota_stor_exist(&state->node->core->db_conn, COL_HASH, &hash,
-                        &exists)) {
-      return false;
+    if ((ret = iota_stor_exist(&state->node->core->db_conn, COL_HASH, &hash,
+                               &exists))) {
+      return ret;
     }
     if (exists == false) {
+      neighbor->nbr_new_tx++;
       // Store new transaction
       log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Storing new transaction\n");
-      if (iota_stor_store(&state->node->core->db_conn, *tx)) {
+      if ((ret = iota_stor_store(&state->node->core->db_conn, *tx))) {
+        log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
+                    "Storing new transaction failed\n");
         neighbor->nbr_invalid_tx++;
-        return false;
+        return ret;
       }
       // TODO(thibault): Store transaction metadata
-      neighbor->nbr_new_tx++;
       // Broadcast new transaction
-      broadcaster_on_next(&state->node->broadcaster, *packet);
+      log_debug(PROCESSOR_COMPONENT_LOGGER_ID,
+                "Propagating packet to broadcaster\n");
+      if ((ret = broadcaster_on_next(&state->node->broadcaster, *packet))) {
+        log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
+                    "Propagating packet to broadcaster failed\n");
+        return ret;
+      }
     }
   }
-  return true;
+  return RC_OK;
 }
 
-static bool process_request_bytes(processor_state_t *const state,
-                                  neighbor_t *const neighbor,
-                                  iota_packet_t *const packet,
-                                  iota_transaction_t const tx) {
+static retcode_t process_request_bytes(processor_state_t *const state,
+                                       neighbor_t *const neighbor,
+                                       iota_packet_t *const packet,
+                                       iota_transaction_t const tx) {
+  retcode_t ret = RC_OK;
   trit_t request_hash_trits[NUM_TRITS_HASH] = {0};
   trit_array_p request_hash = NULL;
 
-  if (state == NULL || neighbor == NULL || packet == NULL || tx == NULL) {
-    return false;
+  if (state == NULL) {
+    return RC_PROCESSOR_COMPONENT_NULL_STATE;
+  }
+  if (neighbor == NULL) {
+    return RC_PROCESSOR_COMPONENT_NULL_NEIGHBOR;
+  }
+  if (packet == NULL) {
+    return RC_PROCESSOR_COMPONENT_NULL_PACKET;
+  }
+  if (tx == NULL) {
+    return RC_PROCESSOR_COMPONENT_NULL_TX;
   }
 
-  log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing request\n");
   bytes_to_trits(packet->content + TX_BYTES_SIZE, REQ_HASH_BYTES_SIZE,
                  request_hash_trits, NUM_TRITS_HASH);
   if ((request_hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
-    return false;
+    return RC_PROCESSOR_COMPONENT_OOM;
   }
-  flex_trits_from_trits(request_hash->trits, request_hash->num_bytes,
-                        request_hash_trits, NUM_TRITS_HASH, NUM_TRITS_HASH);
+  flex_trits_from_trits(request_hash->trits, NUM_TRITS_HASH, request_hash_trits,
+                        NUM_TRITS_HASH, NUM_TRITS_HASH);
   if (memcmp(request_hash->trits, tx->hash, request_hash->num_bytes) == 0) {
     // If requested hash is equal to transaction hash: request a random tip
     trit_array_set_null(request_hash);
   }
-  responder_on_next(&state->node->responder, neighbor, request_hash);
-  return true;
+  log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Propagating packet to responder\n");
+  if ((ret = responder_on_next(&state->node->responder, neighbor,
+                               request_hash))) {
+    log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
+                "Propagating packet to responder failed\n");
+    return ret;
+  }
+  return RC_OK;
 }
 
-static bool process_packet(processor_state_t *const state,
-                           iota_packet_t *const packet) {
+static retcode_t process_packet(processor_state_t *const state,
+                                iota_packet_t *const packet) {
   neighbor_t *neighbor = NULL;
   iota_transaction_t tx = NULL;
 
   if (state == NULL) {
-    return false;
+    return RC_PROCESSOR_COMPONENT_NULL_STATE;
   }
   if (packet == NULL) {
-    return false;
+    return RC_PROCESSOR_COMPONENT_NULL_PACKET;
   }
 
-  log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing packet\n");
   neighbor = neighbor_find_by_endpoint(state->node->neighbors, &packet->source);
 
   if (neighbor) {
@@ -109,12 +145,18 @@ static bool process_packet(processor_state_t *const state,
 
     // TODO(thibault): Random drop transaction
 
-    if (process_transaction_bytes(state, neighbor, packet, &tx) == false) {
-      return false;
+    log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing transaction bytes\n");
+    if (process_transaction_bytes(state, neighbor, packet, &tx)) {
+      log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
+                  "Processing transaction bytes failed\n");
+      return RC_PROCESSOR_COMPONENT_FAILED_TX_PROCESSING;
     }
 
-    if (process_request_bytes(state, neighbor, packet, tx) == false) {
-      return false;
+    log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing request bytes\n");
+    if (process_request_bytes(state, neighbor, packet, tx)) {
+      log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
+                  "Processing request bytes failed\n");
+      return RC_PROCESSOR_COMPONENT_FAILED_REQ_PROCESSING;
     }
 
     // TODO(thibault): Recent seen bytes statistics
@@ -122,7 +164,7 @@ static bool process_packet(processor_state_t *const state,
     // TODO(thibault): Testnet add non-tethered neighbor
   }
 
-  return true;
+  return RC_OK;
 }
 
 static void *processor_routine(processor_state_t *const state) {
@@ -131,86 +173,104 @@ static void *processor_routine(processor_state_t *const state) {
   if (state == NULL) {
     return NULL;
   }
+
   while (state->running) {
     if (CQ_POP(state->queue, &packet) == CQ_SUCCESS) {
-      process_packet(state, &packet);
+      log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing packet\n");
+      if (process_packet(state, &packet)) {
+        log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
+                    "Processing packet failed\n");
+      }
     }
   }
   return NULL;
 }
 
-bool processor_init(processor_state_t *const state, node_t *const node) {
-  if (state == NULL || node == NULL) {
-    return false;
+retcode_t processor_init(processor_state_t *const state, node_t *const node) {
+  if (state == NULL) {
+    return RC_PROCESSOR_COMPONENT_NULL_STATE;
   }
+  if (node == NULL) {
+    return RC_PROCESSOR_COMPONENT_NULL_NODE;
+  }
+
   logger_helper_init(PROCESSOR_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
+  memset(state, 0, sizeof(processor_state_t));
   state->running = false;
+  state->node = node;
+
+  log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Initializing processor queue\n");
   if (CQ_INIT(iota_packet_t, state->queue) != CQ_SUCCESS) {
     log_critical(PROCESSOR_COMPONENT_LOGGER_ID,
                  "Initializing processor queue failed\n");
-    return false;
+    return RC_PROCESSOR_COMPONENT_FAILED_INIT_QUEUE;
   }
-  state->node = node;
-  return true;
+
+  return RC_OK;
 }
 
-bool processor_start(processor_state_t *const state) {
+retcode_t processor_start(processor_state_t *const state) {
   if (state == NULL) {
-    return false;
+    return RC_PROCESSOR_COMPONENT_NULL_STATE;
   }
+
   log_info(PROCESSOR_COMPONENT_LOGGER_ID, "Spawning processor thread\n");
   state->running = true;
   if (thread_handle_create(&state->thread, (thread_routine_t)processor_routine,
                            state) != 0) {
     log_critical(PROCESSOR_COMPONENT_LOGGER_ID,
                  "Spawning processor thread failed\n");
-    return false;
+    return RC_PROCESSOR_COMPONENT_FAILED_THREAD_SPAWN;
   }
-  return true;
+  return RC_OK;
 }
 
-bool processor_on_next(processor_state_t *const state,
-                       iota_packet_t const packet) {
+retcode_t processor_on_next(processor_state_t *const state,
+                            iota_packet_t const packet) {
   if (state == NULL) {
-    return false;
+    return RC_PROCESSOR_COMPONENT_NULL_STATE;
   }
+
   if (CQ_PUSH(state->queue, packet) != CQ_SUCCESS) {
     log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
-                "Pushing to processor queue failed\n");
-    return false;
+                "Adding packet to processor queue failed\n");
+    return RC_PROCESSOR_COMPONENT_FAILED_ADD_QUEUE;
   }
-  return true;
+  return RC_OK;
 }
 
-bool processor_stop(processor_state_t *const state) {
-  bool ret = true;
+retcode_t processor_stop(processor_state_t *const state) {
+  bool ret = RC_OK;
 
   if (state == NULL) {
-    return false;
+    return RC_PROCESSOR_COMPONENT_NULL_STATE;
   }
+
   log_info(PROCESSOR_COMPONENT_LOGGER_ID, "Shutting down processor thread\n");
   state->running = false;
   if (thread_handle_join(state->thread, NULL) != 0) {
     log_error(PROCESSOR_COMPONENT_LOGGER_ID,
               "Shutting down processor thread failed\n");
-    ret = false;
+    ret = RC_PROCESSOR_COMPONENT_FAILED_THREAD_JOIN;
   }
   return ret;
 }
 
-bool processor_destroy(processor_state_t *const state) {
-  bool ret = true;
+retcode_t processor_destroy(processor_state_t *const state) {
+  bool ret = RC_OK;
 
   if (state == NULL) {
-    return false;
+    return RC_PROCESSOR_COMPONENT_NULL_STATE;
   }
   if (state->running) {
-    return false;
+    return RC_PROCESSOR_COMPONENT_STILL_RUNNING;
   }
+
+  log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Destroying processor queue\n");
   if (CQ_DESTROY(iota_packet_t, state->queue) != CQ_SUCCESS) {
     log_error(PROCESSOR_COMPONENT_LOGGER_ID,
               "Destroying processor queue failed\n");
-    ret = false;
+    ret = RC_PROCESSOR_COMPONENT_FAILED_DESTROY_QUEUE;
   }
   return ret;
 }

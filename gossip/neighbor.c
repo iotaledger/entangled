@@ -60,6 +60,7 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
 
 retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
                         iota_packet_t *const packet) {
+  retcode_t ret = RC_OK;
   trit_t hash_trits[NUM_TRITS_HASH];
   trit_array_p hash = NULL;
 
@@ -72,8 +73,8 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
   if (packet == NULL) {
     return RC_NEIGHBOR_NULL_PACKET;
   }
-  if (get_transaction_to_request(&node->requester, &hash) == false) {
-    return RC_NEIGHBOR_FAILED_REQUESTER;
+  if ((ret = get_transaction_to_request(&node->requester, &hash))) {
+    return ret;
   }
   if (hash != NULL) {
     // TODO(thibault): iota_packet_set_request

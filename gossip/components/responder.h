@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 
+#include "common/errors.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
@@ -37,7 +38,7 @@ extern "C" {
  *
  * @return a status code
  */
-bool responder_init(responder_state_t *const state, node_t *const node);
+retcode_t responder_init(responder_state_t *const state, node_t *const node);
 
 /**
  * Starts a responder
@@ -46,7 +47,7 @@ bool responder_init(responder_state_t *const state, node_t *const node);
  *
  * @return a status code
  */
-bool responder_start(responder_state_t *const state);
+retcode_t responder_start(responder_state_t *const state);
 
 /**
  * Adds a request to a responder
@@ -57,8 +58,9 @@ bool responder_start(responder_state_t *const state);
  *
  * @return a status code
  */
-bool responder_on_next(responder_state_t *const state,
-                       neighbor_t *const neighbor, trit_array_p const hash);
+retcode_t responder_on_next(responder_state_t *const state,
+                            neighbor_t *const neighbor,
+                            trit_array_p const hash);
 
 /**
  * Stops a responder
@@ -67,7 +69,7 @@ bool responder_on_next(responder_state_t *const state,
  *
  * @return a status code
  */
-bool responder_stop(responder_state_t *const state);
+retcode_t responder_stop(responder_state_t *const state);
 
 /**
  * Destroys a responder
@@ -76,7 +78,7 @@ bool responder_stop(responder_state_t *const state);
  *
  * @return a status code
  */
-bool responder_destroy(responder_state_t *const state);
+retcode_t responder_destroy(responder_state_t *const state);
 
 #ifdef __cplusplus
 }
