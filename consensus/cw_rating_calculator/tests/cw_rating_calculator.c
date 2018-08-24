@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2018 IOTA Stiftung
- * https://gitlab.com/iota-foundation/software/entangled
+ * https://github.com/iotaledger/entangled
  *
  * Refer to the LICENSE file for licensing information
  */
-
+ 
 #include <stdlib.h>
 #include <string.h>
 #include <unity/unity.h>
@@ -15,7 +15,7 @@
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
-#include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
+#include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "utarray.h"
 #include "utils/files.h"
 
@@ -117,7 +117,9 @@ void test_cw_gen_topology(TestTangleTopology topology) {
     TEST_ASSERT_EQUAL_INT(totalWeight, (numTxs * (numTxs + 1)) / 2);
   }
 
+  hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
+  trit_array_free(ep);
   test_cleanup();
 }
 
@@ -144,8 +146,9 @@ void test_single_tx_tangle(void) {
   TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
   TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), 1);
 
-  cw_calc_result_destroy(&out);
   hash_pack_free(&pack);
+  cw_calc_result_destroy(&out);
+  trit_array_free(ep);
   test_cleanup();
 }
 
@@ -212,6 +215,9 @@ void test_cw_topology_four_transactions_diamond(void) {
 
   TEST_ASSERT_EQUAL_INT(totalWeight, 4 + 2 + 2 + 1);
 
+  hash_pack_free(&pack);
+  cw_calc_result_destroy(&out);
+  trit_array_free(ep);
   test_cleanup();
 }
 
