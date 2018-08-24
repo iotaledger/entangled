@@ -8,7 +8,6 @@
 #include "gossip/components/responder.h"
 #include "ciri/core.h"
 #include "common/storage/sql/defs.h"
-#include "common/storage/storage.h"
 #include "gossip/neighbor.h"
 #include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/containers/queues/concurrent_queue_transaction_request.h"
@@ -34,8 +33,8 @@ static retcode_t regular_transaction_request(
   pack.txs = tx;
   pack.num_loaded = 0;
   pack.txs_capacity = 1;
-  if ((ret = iota_stor_load(&state->node->core->db_conn, COL_HASH,
-                            request->hash, &pack))) {
+  if ((ret = iota_tangle_transactions_load(&state->node->core->tangle, COL_HASH,
+                                           request->hash, &pack))) {
     return ret;
   }
   if (pack.num_loaded == 0) {
