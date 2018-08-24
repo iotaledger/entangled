@@ -5,13 +5,17 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_CW_RATING_CALCULATOR_CW_RATING_TOPOLOGICAL_SORT_IMPL_H__
-#define __COMMON_CONCENSUS_CW_RATING_CALCULATOR_CW_RATING_TOPOLOGICAL_SORT_IMPL_H__
-
-#include "consensus/cw_rating_calculator/cw_rating_calculator.h"
+#ifndef __CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_TOPOLOGICAL_SORT_IMPL_H__
+#define __CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_TOPOLOGICAL_SORT_IMPL_H__
 
 #include "utarray.h"
 #include "uthash.h"
+
+#include "consensus/cw_rating_calculator/cw_rating_calculator.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void init_cw_calculator_dfs(cw_rating_calculator_base_t *calculator);
 /**
@@ -48,4 +52,8 @@ static retcode_t cw_rating_dfs_do_dfs_light(
     hash_to_direct_approvers_map_t tx_to_approvers, flex_trit_t *ep,
     int64_t *visited_bitset, size_t *subtangle_size);
 
-#endif  //__COMMON_CONCENSUS_CW_RATING_CALCULATOR_CW_RATING_TOPOLOGICAL_SORT_IMPL_H__
+#ifdef __cplusplus
+}
+#endif
+
+#endif  //__CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_TOPOLOGICAL_SORT_IMPL_H__

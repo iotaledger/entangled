@@ -5,13 +5,13 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
-#define __COMMON_CONCENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
+#ifndef __CONSENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
+#define __CONSENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "common/errors.h"
 
+#include "common/errors.h"
 #include "common/storage/connection.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/milestone/milestone.h"
@@ -65,4 +65,4 @@ extern retcode_t iota_consensus_ledeger_validator_validate(
 }
 #endif
 
-#endif  // __COMMON_CONCENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
+#endif  // __CONSENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__

@@ -5,11 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_TIPSELECTION_TIPSELECTION_H__
-#define __COMMON_CONCENSUS_TIPSELECTION_TIPSELECTION_H__
+#ifndef __CONSENSUS_TIPSELECTION_TIPSELECTION_H__
+#define __CONSENSUS_TIPSELECTION_TIPSELECTION_H__
 
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
@@ -51,4 +52,4 @@ extern retcode_t iota_consensus_tipselection_destroy(tipselection_t *impl);
 }
 #endif
 
-#endif  // __COMMON_CONCENSUS_TIPSELECTION_TIPSELECTION_H__
+#endif  // __CONSENSUS_TIPSELECTION_TIPSELECTION_H__

@@ -5,16 +5,17 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_CW_RATING_CALCULATOR_CW_RATING_CALCULATOR_H__
-#define __COMMON_CONCENSUS_CW_RATING_CALCULATOR_CW_RATING_CALCULATOR_H__
+#ifndef __CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_CALCULATOR_H__
+#define __CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_CALCULATOR_H__
 
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "uthash.h"
+
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/tangle/tangle.h"
-#include "uthash.h"
 
 #define CW_RATING_CALCULATOR_LOGGER_ID "consensus_cw_rating_calculator"
 
@@ -86,8 +87,9 @@ extern retcode_t iota_consensus_cw_rating_calculate(
     cw_calc_result *out);
 
 extern void cw_calc_result_destroy(cw_calc_result *const calc_result);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // __COMMON_CONCENSUS_CW_RATING_CALCULATOR_CW_RATING_CALCULATOR_H__
+#endif  // __CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_CALCULATOR_H__

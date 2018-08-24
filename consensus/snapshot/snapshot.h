@@ -5,15 +5,17 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_SNAPSHOT_SNAPSHOT_H__
-#define __COMMON_CONCENSUS_SNAPSHOT_SNAPSHOT_H__
+#ifndef __CONSENSUS_SNAPSHOT_SNAPSHOT_H__
+#define __CONSENSUS_SNAPSHOT_SNAPSHOT_H__
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#include "uthash.h"
+
 #include "common/errors.h"
 #include "common/model/transaction.h"
 #include "common/trinary/trit_array.h"
-#include "uthash.h"
 #include "utils/handles/rw_lock.h"
 
 #ifdef __cplusplus
@@ -47,4 +49,4 @@ extern retcode_t iota_snapshot_apply();
 }
 #endif
 
-#endif  // __COMMON_CONCENSUS_SNAPSHOT_SNAPSHOT_H__
+#endif  // __CONSENSUS_SNAPSHOT_SNAPSHOT_H__

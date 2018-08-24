@@ -5,13 +5,13 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_WALKER_WALKER_H__
-#define __COMMON_CONCENSUS_WALKER_WALKER_H__
+#ifndef __CONSENSUS_WALKER_WALKER_H__
+#define __CONSENSUS_WALKER_WALKER_H__
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "common/errors.h"
 
+#include "common/errors.h"
 #include "common/storage/connection.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/milestone/milestone.h"
@@ -60,4 +60,4 @@ extern retcode_t iota_consensus_walker_walk(const walker_t *walker,
 }
 #endif
 
-#endif  // __COMMON_CONCENSUS_WALKER_WALKER_H__
+#endif  // __CONSENSUS_WALKER_WALKER_H__
