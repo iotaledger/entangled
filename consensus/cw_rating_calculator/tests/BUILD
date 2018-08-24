@@ -1,7 +1,7 @@
 cc_test(
     name = "test_cw_ratings_dfs",
     srcs = [
-        "cw_rating_dfs_impl.c",
+        "cw_rating_calculator.c",
     ],
     data = [":db_file"],
     visibility = ["//visibility:public"],
