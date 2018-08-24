@@ -19,11 +19,13 @@ retcode_t iota_consensus_cw_rating_init(
   } else if (impl == NO_IMPLEMENTATION) {
     return RC_CONSENSUS_NOT_IMPLEMENTED;
   }
+  return RC_OK;
 }
 
 retcode_t iota_consensus_cw_rating_destroy(cw_rating_calculator_t *cw_calc) {
   logger_helper_destroy(CW_RATING_CALCULATOR_LOGGER_ID);
   cw_calc->tangle = NULL;
+  return R_OK;
 }
 
 retcode_t iota_consensus_cw_rating_calculate(
