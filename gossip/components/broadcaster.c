@@ -5,8 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/network/components/broadcaster.h"
+#include <string.h>
+
 #include "ciri/node.h"
+#include "gossip/components/broadcaster.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/logger_helper.h"
@@ -26,7 +28,10 @@ static void *broadcaster_routine(broadcaster_state_t *const state) {
       log_debug(BROADCASTER_COMPONENT_LOGGER_ID, "Broadcasting transaction\n");
       iter = state->node->neighbors->front;
       while (iter) {
-        neighbor_send(state->node, &iter->data, &packet);
+        if (neighbor_send(state->node, &iter->data, &packet)) {
+          log_warning(BROADCASTER_COMPONENT_LOGGER_ID,
+                      "Broadcasting transaction failed\n");
+        }
         iter = iter->next;
       }
     }
@@ -34,79 +39,93 @@ static void *broadcaster_routine(broadcaster_state_t *const state) {
   return NULL;
 }
 
-bool broadcaster_init(broadcaster_state_t *const state, node_t *const node) {
-  if (state == NULL || node == NULL) {
-    return false;
+retcode_t broadcaster_init(broadcaster_state_t *const state,
+                           node_t *const node) {
+  if (state == NULL) {
+    return RC_BROADCASTER_COMPONENT_NULL_STATE;
   }
+  if (node == NULL) {
+    return RC_BROADCASTER_COMPONENT_NULL_NODE;
+  }
+
   logger_helper_init(BROADCASTER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
+  memset(state, 0, sizeof(broadcaster_state_t));
   state->running = false;
+  state->node = node;
+
+  log_debug(BROADCASTER_COMPONENT_LOGGER_ID,
+            "Initializing broadcaster queue\n");
   if (CQ_INIT(iota_packet_t, state->queue) != CQ_SUCCESS) {
     log_critical(BROADCASTER_COMPONENT_LOGGER_ID,
                  "Initializing broadcaster queue failed\n");
-    return false;
+    return RC_BROADCASTER_COMPONENT_FAILED_INIT_QUEUE;
   }
-  state->node = node;
-  return true;
+  return RC_OK;
 }
 
-bool broadcaster_start(broadcaster_state_t *const state) {
+retcode_t broadcaster_start(broadcaster_state_t *const state) {
   if (state == NULL) {
-    return false;
+    return RC_BROADCASTER_COMPONENT_NULL_STATE;
   }
+
   log_info(BROADCASTER_COMPONENT_LOGGER_ID, "Spawning broadcaster thread\n");
   state->running = true;
   if (thread_handle_create(&state->thread,
                            (thread_routine_t)broadcaster_routine, state) != 0) {
     log_critical(BROADCASTER_COMPONENT_LOGGER_ID,
                  "Spawning broadcaster thread failed\n");
-    return false;
+    return RC_BROADCASTER_COMPONENT_FAILED_THREAD_SPAWN;
   }
-  return true;
+  return RC_OK;
 }
 
-bool broadcaster_on_next(broadcaster_state_t *const state,
-                         iota_packet_t const packet) {
+retcode_t broadcaster_on_next(broadcaster_state_t *const state,
+                              iota_packet_t const packet) {
   if (state == NULL) {
-    return false;
+    return RC_BROADCASTER_COMPONENT_NULL_STATE;
   }
+
   if (CQ_PUSH(state->queue, packet) != CQ_SUCCESS) {
     log_warning(BROADCASTER_COMPONENT_LOGGER_ID,
-                "Pushing to broadcaster queue failed\n");
-    return false;
+                "Adding packet to broadcaster queue failed\n");
+    return RC_BROADCASTER_COMPONENT_FAILED_ADD_QUEUE;
   }
-  return true;
+  return RC_OK;
 }
 
-bool broadcaster_stop(broadcaster_state_t *const state) {
-  bool ret = true;
+retcode_t broadcaster_stop(broadcaster_state_t *const state) {
+  retcode_t ret = RC_OK;
 
   if (state == NULL) {
-    return false;
+    return RC_BROADCASTER_COMPONENT_NULL_STATE;
   }
+
   log_info(BROADCASTER_COMPONENT_LOGGER_ID,
            "Shutting down broadcaster thread\n");
   state->running = false;
   if (thread_handle_join(state->thread, NULL) != 0) {
     log_error(BROADCASTER_COMPONENT_LOGGER_ID,
               "Shutting down broadcaster thread failed\n");
-    ret = false;
+    ret = RC_BROADCASTER_COMPONENT_FAILED_THREAD_JOIN;
   }
   return ret;
 }
 
-bool broadcaster_destroy(broadcaster_state_t *const state) {
-  bool ret = true;
+retcode_t broadcaster_destroy(broadcaster_state_t *const state) {
+  retcode_t ret = RC_OK;
 
   if (state == NULL) {
-    return false;
+    return RC_BROADCASTER_COMPONENT_NULL_STATE;
   }
   if (state->running) {
-    return false;
+    return RC_BROADCASTER_COMPONENT_STILL_RUNNING;
   }
+
+  log_debug(BROADCASTER_COMPONENT_LOGGER_ID, "Destroying broadcaster queue\n");
   if (CQ_DESTROY(iota_packet_t, state->queue) != CQ_SUCCESS) {
     log_error(BROADCASTER_COMPONENT_LOGGER_ID,
               "Destroying broadcaster queue failed\n");
-    ret = false;
+    ret = RC_BROADCASTER_COMPONENT_FAILED_DESTROY_QUEUE;
   }
   logger_helper_destroy(BROADCASTER_COMPONENT_LOGGER_ID);
   return ret;

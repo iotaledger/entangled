@@ -8,7 +8,7 @@
 #ifndef __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_PACKET_H__
 #define __UTILS_CONTAINERS_QUEUES_CONCURRENT_QUEUE_PACKET_H__
 
-#include "common/network/iota_packet.h"
+#include "gossip/iota_packet.h"
 #include "utils/containers/queues/concurrent_queue.h.inc"
 
 #ifdef __cplusplus

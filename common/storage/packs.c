@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #include "common/storage/packs.h"
 
 #define STORAGE_PACKS_LOGGER_ID "storage_packs"
@@ -18,8 +20,8 @@ retcode_t hash_pack_resize(iota_hashes_pack *pack, size_t resize_factor) {
     trit_array_free(pack->hashes[i]);
   }
   pack->hashes_capacity *= resize_factor;
-  pack->hashes = (iota_transaction_t *)realloc(
-      pack->hashes, sizeof(iota_transaction_t) * pack->hashes_capacity);
+  pack->hashes = (trit_array_p *)realloc(
+      pack->hashes, sizeof(trit_array_p) * pack->hashes_capacity);
   if (pack->hashes == NULL) {
     log_error(STORAGE_PACKS_LOGGER_ID, "Failed in realloc\n");
     return RC_STORAGE_OOM;
@@ -38,8 +40,8 @@ retcode_t hash_pack_resize(iota_hashes_pack *pack, size_t resize_factor) {
 retcode_t hash_pack_init(iota_hashes_pack *pack, size_t size) {
   pack->hashes_capacity = size;
   pack->num_loaded = 0;
-  pack->hashes = (iota_transaction_t *)malloc(sizeof(iota_transaction_t) *
-                                              pack->hashes_capacity);
+  pack->hashes =
+      (trit_array_p *)malloc(sizeof(trit_array_p) * pack->hashes_capacity);
   if (pack->hashes == NULL) {
     log_error(STORAGE_PACKS_LOGGER_ID, "Failed in malloc\n");
     return RC_STORAGE_OOM;
@@ -60,4 +62,5 @@ retcode_t hash_pack_free(iota_hashes_pack *pack) {
     trit_array_free(pack->hashes[i]);
   }
   free(pack->hashes);
+  return RC_OK;
 }

@@ -33,31 +33,31 @@ retcode_t node_init(node_t* const node, core_t* const core) {
   }
 
   log_info(NODE_LOGGER_ID, "Initializing broadcaster component\n");
-  if (broadcaster_init(&node->broadcaster, node) == false) {
+  if (broadcaster_init(&node->broadcaster, node)) {
     log_critical(NODE_LOGGER_ID, "Initializing broadcaster component failed\n");
     return RC_NODE_FAILED_BROADCASTER_INIT;
   }
 
   log_info(NODE_LOGGER_ID, "Initializing processor component\n");
-  if (processor_init(&node->processor, node) == false) {
+  if (processor_init(&node->processor, node)) {
     log_critical(NODE_LOGGER_ID, "Initializing processor component failed\n");
     return RC_NODE_FAILED_PROCESSOR_INIT;
   }
 
   log_info(NODE_LOGGER_ID, "Initializing receiver component\n");
-  if (receiver_init(&node->receiver, node, tcp_port_g, udp_port_g) == false) {
+  if (receiver_init(&node->receiver, node, tcp_port_g, udp_port_g)) {
     log_critical(NODE_LOGGER_ID, "Initializing receiver component failed\n");
     return RC_NODE_FAILED_RECEIVER_INIT;
   }
 
   log_info(NODE_LOGGER_ID, "Initializing requester component\n");
-  if (requester_init(&node->requester, node) == false) {
+  if (requester_init(&node->requester, node)) {
     log_critical(NODE_LOGGER_ID, "Initializing requester component failed\n");
     return RC_NODE_FAILED_REQUESTER_INIT;
   }
 
   log_info(NODE_LOGGER_ID, "Initializing responder component\n");
-  if (responder_init(&node->responder, node) == false) {
+  if (responder_init(&node->responder, node)) {
     log_critical(NODE_LOGGER_ID, "Initializing responder component failed\n");
     return RC_NODE_FAILED_RESPONDER_INIT;
   }
@@ -74,25 +74,25 @@ retcode_t node_start(node_t* const node) {
   }
 
   log_info(NODE_LOGGER_ID, "Starting broadcaster component\n");
-  if (broadcaster_start(&node->broadcaster) == false) {
+  if (broadcaster_start(&node->broadcaster)) {
     log_critical(NODE_LOGGER_ID, "Starting broadcaster component failed\n");
     return RC_NODE_FAILED_BROADCASTER_START;
   }
 
   log_info(NODE_LOGGER_ID, "Starting processor component\n");
-  if (processor_start(&node->processor) == false) {
+  if (processor_start(&node->processor)) {
     log_critical(NODE_LOGGER_ID, "Starting processor component failed\n");
     return RC_NODE_FAILED_PROCESSOR_START;
   }
 
   log_info(NODE_LOGGER_ID, "Starting receiver component\n");
-  if (receiver_start(&node->receiver) == false) {
+  if (receiver_start(&node->receiver)) {
     log_critical(NODE_LOGGER_ID, "Starting receiver component failed\n");
     return RC_NODE_FAILED_RECEIVER_START;
   }
 
   log_info(NODE_LOGGER_ID, "Starting responder component\n");
-  if (responder_start(&node->responder) == false) {
+  if (responder_start(&node->responder)) {
     log_critical(NODE_LOGGER_ID, "Starting responder component failed\n");
     return RC_NODE_FAILED_RESPONDER_START;
   }
@@ -110,25 +110,25 @@ retcode_t node_stop(node_t* const node) {
   }
 
   log_info(NODE_LOGGER_ID, "Stopping broadcaster component\n");
-  if (broadcaster_stop(&node->broadcaster) == false) {
+  if (broadcaster_stop(&node->broadcaster)) {
     log_error(NODE_LOGGER_ID, "Stopping broadcaster component failed\n");
     ret = RC_NODE_FAILED_BROADCASTER_STOP;
   }
 
   log_info(NODE_LOGGER_ID, "Stopping processor component\n");
-  if (processor_stop(&node->processor) == false) {
+  if (processor_stop(&node->processor)) {
     log_error(NODE_LOGGER_ID, "Stopping processor component failed\n");
     ret = RC_NODE_FAILED_PROCESSOR_STOP;
   }
 
   log_info(NODE_LOGGER_ID, "Stopping receiver component\n");
-  if (receiver_stop(&node->receiver) == false) {
+  if (receiver_stop(&node->receiver)) {
     log_error(NODE_LOGGER_ID, "Stopping receiver component failed\n");
     ret = RC_NODE_FAILED_RECEIVER_STOP;
   }
 
   log_info(NODE_LOGGER_ID, "Stopping responder component\n");
-  if (responder_stop(&node->responder) == false) {
+  if (responder_stop(&node->responder)) {
     log_error(NODE_LOGGER_ID, "Stopping responder component failed\n");
     ret = RC_NODE_FAILED_RESPONDER_STOP;
   }
@@ -150,31 +150,31 @@ retcode_t node_destroy(node_t* const node) {
   }
 
   log_info(NODE_LOGGER_ID, "Destroying broadcaster component\n");
-  if (broadcaster_destroy(&node->broadcaster) == false) {
+  if (broadcaster_destroy(&node->broadcaster)) {
     log_error(NODE_LOGGER_ID, "Destroying broadcaster component failed\n");
     ret = RC_NODE_FAILED_BROADCASTER_DESTROY;
   }
 
   log_info(NODE_LOGGER_ID, "Destroying processor component\n");
-  if (processor_destroy(&node->processor) == false) {
+  if (processor_destroy(&node->processor)) {
     log_error(NODE_LOGGER_ID, "Destroying processor component failed\n");
     ret = RC_NODE_FAILED_PROCESSOR_DESTROY;
   }
 
   log_info(NODE_LOGGER_ID, "Destroying receiver component\n");
-  if (receiver_destroy(&node->receiver) == false) {
+  if (receiver_destroy(&node->receiver)) {
     log_error(NODE_LOGGER_ID, "Destroying receiver component failed\n");
     ret = RC_NODE_FAILED_RECEIVER_DESTROY;
   }
 
   log_info(NODE_LOGGER_ID, "Destroying processor component\n");
-  if (requester_destroy(&node->requester) == false) {
+  if (requester_destroy(&node->requester)) {
     log_error(NODE_LOGGER_ID, "Destroying processor component failed\n");
     ret = RC_NODE_FAILED_REQUESTER_DESTROY;
   }
 
   log_info(NODE_LOGGER_ID, "Destroying responder component\n");
-  if (responder_destroy(&node->responder) == false) {
+  if (responder_destroy(&node->responder)) {
     log_error(NODE_LOGGER_ID, "Destroying responder component failed\n");
     ret = RC_NODE_FAILED_RESPONDER_DESTROY;
   }

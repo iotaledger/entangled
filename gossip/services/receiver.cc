@@ -5,9 +5,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/network/services/receiver.h"
-#include "common/network/services/tcp_receiver.hpp"
-#include "common/network/services/udp_receiver.hpp"
+#include "gossip/services/receiver.h"
+#include "gossip/services/tcp_receiver.hpp"
+#include "gossip/services/udp_receiver.hpp"
 #include "utils/logger_helper.h"
 
 #define RECEIVER_SERVICE_LOGGER_ID "receiver_service"

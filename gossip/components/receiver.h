@@ -5,12 +5,13 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_COMPONENTS_RECEIVER_H__
-#define __COMMON_NETWORK_COMPONENTS_RECEIVER_H__
+#ifndef __GOSSIP_COMPONENTS_RECEIVER_H__
+#define __GOSSIP_COMPONENTS_RECEIVER_H__
 
 #include <stdbool.h>
 
-#include "common/network/services/receiver.h"
+#include "common/errors.h"
+#include "gossip/services/receiver.h"
 
 // Forward declarations
 typedef struct node_s node_t;
@@ -36,8 +37,8 @@ extern "C" {
  *
  * @return a status code
  */
-bool receiver_init(receiver_state_t *const state, node_t *const node,
-                   uint16_t tcp_port, uint16_t udp_port);
+retcode_t receiver_init(receiver_state_t *const state, node_t *const node,
+                        uint16_t tcp_port, uint16_t udp_port);
 
 /**
  * Starts a receiver
@@ -46,7 +47,7 @@ bool receiver_init(receiver_state_t *const state, node_t *const node,
  *
  * @return a status code
  */
-bool receiver_start(receiver_state_t *const state);
+retcode_t receiver_start(receiver_state_t *const state);
 
 /**
  * Stops a receiver
@@ -55,7 +56,7 @@ bool receiver_start(receiver_state_t *const state);
  *
  * @return a status code
  */
-bool receiver_stop(receiver_state_t *const state);
+retcode_t receiver_stop(receiver_state_t *const state);
 
 /**
  * Destroys a receiver
@@ -64,10 +65,10 @@ bool receiver_stop(receiver_state_t *const state);
  *
  * @return a status code
  */
-bool receiver_destroy(receiver_state_t *const state);
+retcode_t receiver_destroy(receiver_state_t *const state);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  //__COMMON_NETWORK_COMPONENTS_RECEIVER_H__
+#endif  //__GOSSIP_COMPONENTS_RECEIVER_H__

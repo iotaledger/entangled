@@ -49,7 +49,7 @@ retcode_t create_index_if_not_exists(const connection_t* const conn,
   return RC_OK;
 }
 
-retcode_t init_connection(connection_t* const conn,
+retcode_t init_connection(const connection_t* const conn,
                           const connection_config_t* const config) {
   retcode_t retcode = RC_OK;
   int rc;
@@ -139,7 +139,7 @@ retcode_t init_connection(connection_t* const conn,
   return retcode;
 }
 
-retcode_t destroy_connection(connection_t* const conn) {
+retcode_t destroy_connection(const connection_t* const conn) {
   log_info(CONNECTION_LOGGER_ID, "Destroying connection");
   sqlite3_close((sqlite3*)conn->db);
   return RC_OK;

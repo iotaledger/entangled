@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/network/iota_packet.h"
+#include "gossip/iota_packet.h"
 #include "common/model/transaction.h"
 
 void iota_packet_build(iota_packet_t* const packet, size_t const length,

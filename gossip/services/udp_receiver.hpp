@@ -9,7 +9,7 @@
 
 #include <boost/asio.hpp>
 
-#include "common/network/iota_packet.h"
+#include "gossip/iota_packet.h"
 
 // Forward declarations
 typedef struct receiver_service_s receiver_service_t;

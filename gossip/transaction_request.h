@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_NETWORK_TRANSACTION_REQUEST_H__
-#define __COMMON_NETWORK_TRANSACTION_REQUEST_H__
+#ifndef __GOSSIP_TRANSACTION_REQUEST_H__
+#define __GOSSIP_TRANSACTION_REQUEST_H__
 
 // Forward declarations
 typedef struct neighbor_s neighbor_t;
@@ -17,4 +17,4 @@ typedef struct transaction_request_s {
   trit_array_p hash;
 } transaction_request_t;
 
-#endif  // __COMMON_NETWORK_TRANSACTION_REQUEST_H__
+#endif  // __GOSSIP_TRANSACTION_REQUEST_H__
