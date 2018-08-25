@@ -27,6 +27,7 @@ cc_library(
         ":neighbor_shared",
         "//ciri:node_shared",
         "//common/model:transaction",
+        "//common/trinary:trit_array",
         "//common/network:uri_parser",
         "//gossip/services:tcp_sender",
         "//gossip/services:udp_sender",
