@@ -26,20 +26,19 @@ extern "C" {
 #endif
 
 typedef struct tipselection_t {
-  tangle_t *tangle;
-  entry_point_selector_t *ep_selector;
   cw_rating_calculator_t *cw_calc;
-  milestone_t *milestone;
+  entry_point_selector_t *ep_selector;
   ledger_validator_t *lv;
-  walker_validator_t *wv;
+  milestone_t *milestone;
+  tangle_t *tangle;
   walker_t *walker;
 } tipselection_t;
 
 extern retcode_t iota_consensus_tipselection_init(
-    tipselection_t *impl, const tangle_t *tangle, const ledger_validator_t *lv,
-    const walker_validator_t *wv, const cw_rating_calculator_t *cw_calc,
-    const milestone_t *milestone, const entry_point_selector_t *ep,
-    const walker_t *walker);
+    tipselection_t *impl, const cw_rating_calculator_t *cw_calc,
+    const entry_point_selector_t *ep, const ledger_validator_t *lv,
+    const milestone_t *milestone, const tangle_t *tangle,
+    const walker_t *walker, const walker_validator_t *wv);
 
 extern retcode_t iota_consensus_get_transactions_to_approve(
     tipselection_t *impl, size_t depth, const trit_array_p reference,
