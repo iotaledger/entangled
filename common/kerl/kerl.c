@@ -23,7 +23,7 @@ void kerl_absorb(Kerl* const ctx, trit_t const* trits, size_t const length) {
   assert(length % HASH_LENGTH == 0);
 
   for (; trits < end;) {
-    trits_to_bytes(trits, bytes);
+    convert_trits_to_bytes(trits, bytes);
     Keccak_HashUpdate(&ctx->keccak, bytes, HASH_BIT_LEN);
     trits = &trits[HASH_LENGTH];
   }
@@ -41,7 +41,7 @@ void kerl_squeeze(Kerl* const ctx, trit_t* trits, size_t const length) {
     Keccak_HashSqueeze(&ctx->keccak, bytes, HASH_BIT_LEN);
 
     memcpy(tmp, bytes, HASH_BYTE_LEN * sizeof(uint8_t));
-    bytes_to_trits(tmp, trits);
+    convert_bytes_to_trits(tmp, trits);
 
     for (i = 0; i < HASH_INT_LEN; i++) {
       ptr[i] = ptr[i] ^ 0xFFFFFFFF;
