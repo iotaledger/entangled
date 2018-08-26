@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-typedef struct milestone_t {
+typedef struct milestone_s {
   trit_array_p coordinator;
   // iota_transaction_validator
   bool testnet;
