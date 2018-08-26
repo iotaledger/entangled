@@ -16,11 +16,11 @@ cc_test(
     ],
 )
 
-cc_test (
+cc_test(
     name = "test_transfer",
     srcs = ["test_transfer.c"],
     deps = [
         "//common/model:transfer",
-        "@unity//:unity",
-        ]
+        "@unity",
+    ],
 )

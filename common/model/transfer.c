@@ -446,8 +446,9 @@ int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl *kerl,
                           ? j == 0 ? transfer_value(transfer) : 0
                           : 0;
       long_to_trytes(value, &essence[81]);
-      flex_trits_to_trytes(&essence[108], NUM_TRYTES_TAG, transfer_tag(transfer),
-                           NUM_TRITS_TAG, NUM_TRITS_TAG);
+      flex_trits_to_trytes(&essence[108], NUM_TRYTES_TAG,
+                           transfer_tag(transfer), NUM_TRITS_TAG,
+                           NUM_TRITS_TAG);
       long_to_trytes(transfer_timestamp(transfer), essence + 135);
       long_to_trytes(current_index, essence + 144);
       long_to_trytes(transfer_ctx->count - 1, essence + 153);
@@ -534,13 +535,13 @@ void transfer_iterator_next_output_transaction(
     transaction_set_value(transfer_iterator->transaction,
                           transfer_value(transfer));
   }
-  flex_trits_slice(
-      transaction_signature(transfer_iterator->transaction),
-      NUM_TRITS_SIGNATURE, transfer_iterator->transaction_signature,
-      NUM_TRITS_SIGNATURE * transfer_output_security(output),
-      NUM_TRITS_SIGNATURE *
-          transfer_iterator->current_transfer_transaction_index,
-      NUM_TRITS_SIGNATURE);
+  flex_trits_slice(transaction_signature(transfer_iterator->transaction),
+                   NUM_TRITS_SIGNATURE,
+                   transfer_iterator->transaction_signature,
+                   NUM_TRITS_SIGNATURE * transfer_output_security(output),
+                   NUM_TRITS_SIGNATURE *
+                       transfer_iterator->current_transfer_transaction_index,
+                   NUM_TRITS_SIGNATURE);
 }
 
 void transfer_iterator_next_input_transaction(

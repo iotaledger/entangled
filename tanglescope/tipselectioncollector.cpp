@@ -88,7 +88,8 @@ void TipSelectionCollector::queryTipSelectionPeriodically() {
 }
 
 void TipSelectionCollector::queryTipSelection() {
-  std::vector<boost::future<nonstd::optional<GetTransactionsToApproveResponse> >> futures;
+  std::vector<boost::future<nonstd::optional<GetTransactionsToApproveResponse>>>
+      futures;
 
   uint16_t branchEqTrunkCounter = 0;
   uint16_t numSelectedTXWasNotATip = 0;
@@ -106,7 +107,7 @@ void TipSelectionCollector::queryTipSelection() {
 
     for (uint16_t i = 0; i < _sampleSize; ++i) {
       const auto& maybeResp = futures[i].get();
-      if (!maybeResp.has_value()){
+      if (!maybeResp.has_value()) {
         return;
       }
 

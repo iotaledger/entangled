@@ -5,6 +5,8 @@
 #include <chrono>
 #include <cstring>
 #include <iostream>
+#include <iota/models/bundle.hpp>
+#include <iota/models/transaction.hpp>
 #include <iota/tanglescope/common/tangledb.hpp>
 #include <iota/tanglescope/common/txauxiliary.hpp>
 #include <iota/tanglescope/common/zmqpub.hpp>
@@ -12,8 +14,6 @@
 #include <map>
 #include <set>
 #include <unordered_set>
-#include <iota/models/bundle.hpp>
-#include <iota/models/transaction.hpp>
 
 #include "tanglescope/throwcatchcollector.hpp"
 
@@ -85,12 +85,12 @@ void BroadcastReceiveCollector::broadcastOneTransaction() {
     auto hashed = hashTXFuture.get();
     LOG(INFO) << "Hash: " << hashed.hash;
     artificialyDelay();
-    system_clock::time_point t2 =  system_clock::now();
+    system_clock::time_point t2 = system_clock::now();
 
-    auto duration = duration_cast<milliseconds>( t2 - t1 ).count();
+    auto duration = duration_cast<milliseconds>(t2 - t1).count();
 
     auto storeFuture = boost::async(boost::launch::async, [hashed, this] {
-        return _api->storeTransactions({hashed.tx});
+      return _api->storeTransactions({hashed.tx});
     });
     storeFuture.wait();
     auto broadcastFuture = boost::async(boost::launch::async, [hashed, this] {
@@ -98,7 +98,8 @@ void BroadcastReceiveCollector::broadcastOneTransaction() {
     });
 
     broadcastFuture.wait();
-    _hashToBroadcastTime.insert(hashed.hash, BroadcastInfo{std::chrono::system_clock::now(), duration});
+    _hashToBroadcastTime.insert(
+        hashed.hash, BroadcastInfo{std::chrono::system_clock::now(), duration});
   } catch (const std::exception& e) {
     LOG(ERROR) << __FUNCTION__ << " Exception: " << e.what();
   }

@@ -8,9 +8,9 @@
 #include <string.h>
 
 #include "ciri/node.h"
-#include "common/trinary/trit_array.h"
 #include "common/model/transaction.h"
 #include "common/network/uri_parser.h"
+#include "common/trinary/trit_array.h"
 #include "gossip/iota_packet.h"
 #include "gossip/neighbor.h"
 #include "gossip/services/tcp_sender.hpp"

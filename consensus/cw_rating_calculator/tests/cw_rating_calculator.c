@@ -4,7 +4,7 @@
  *
  * Refer to the LICENSE file for licensing information
  */
- 
+
 #include <stdlib.h>
 #include <string.h>
 #include <unity/unity.h>
@@ -14,7 +14,6 @@
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
-#include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "utarray.h"
 #include "utils/files.h"
