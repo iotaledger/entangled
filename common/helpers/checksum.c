@@ -10,25 +10,63 @@
 #include "common/trinary/trit_tryte.h"
 #include "utils/export.h"
 
-IOTA_EXPORT char* iota_checksum(const char* input, const size_t inputLength,
-                                const size_t checksumLength) {
+IOTA_EXPORT char* iota_checksum(const char* input, const size_t input_length,
+                                const size_t checksum_length) {
   Kerl kerl;
   init_kerl(&kerl);
 
-  if (checksumLength == 0) {
+  if (checksum_length == 0) {
     return NULL;
   }
 
-  trit_t* inputTrits = calloc(inputLength * RADIX, sizeof(trit_t));
   trit_t trits_hash[HASH_LENGTH];
-  char* checksumTrytes = calloc(checksumLength, sizeof(tryte_t));
+  trit_t* trits = calloc(sizeof(trit_t) * input_length * RADIX, sizeof(trit_t));
+  if (!trits) {
+    return NULL;
+  }
+  trytes_to_trits((tryte_t*)input, trits, input_length);
+  kerl_hash(trits, input_length * RADIX, trits_hash, &kerl);
+  free(trits);
 
-  trytes_to_trits((tryte_t*)input, inputTrits, inputLength);
-  kerl_hash(inputTrits, inputLength * RADIX, trits_hash, &kerl);
-  trits_to_trytes((trit_t*)(&trits_hash[HASH_LENGTH - checksumLength * RADIX]),
-                  (tryte_t*)checksumTrytes, checksumLength * RADIX);
+  char* checksum_trytes =
+      calloc(sizeof(tryte_t) * checksum_length, sizeof(tryte_t));
+  if (!checksum_trytes) {
+    return NULL;
+  }
+  trits_to_trytes((trit_t*)(&trits_hash[HASH_LENGTH - checksum_length * RADIX]),
+                  (tryte_t*)checksum_trytes, checksum_length * RADIX);
 
-  free(inputTrits);
+  return checksum_trytes;
+}
 
-  return checksumTrytes;
+IOTA_EXPORT flex_trit_t* iota_flex_checksum(const flex_trit_t* flex_trits,
+                                            const size_t num_trits,
+                                            const size_t checksum_length) {
+  Kerl kerl;
+  init_kerl(&kerl);
+
+  if (checksum_length == 0) {
+    return NULL;
+  }
+
+  trit_t trits_hash[HASH_LENGTH];
+  trit_t* trits = (trit_t*)calloc(sizeof(trit_t) * num_trits, sizeof(trit_t));
+  if (!trits) {
+    return NULL;
+  }
+  flex_trits_to_trits(trits, num_trits, flex_trits, num_trits, num_trits);
+  kerl_hash(trits, num_trits, trits_hash, &kerl);
+  free(trits);
+
+  size_t flex_len = num_flex_trits_for_trits(num_trits);
+  flex_trit_t* checksum_flex_trits =
+      (flex_trit_t*)calloc(sizeof(flex_trit_t) * flex_len, sizeof(flex_trit_t));
+  if (!checksum_flex_trits) {
+    return NULL;
+  }
+  flex_trits_from_trits(checksum_flex_trits, HASH_LENGTH,
+                        &trits_hash[HASH_LENGTH - checksum_length], HASH_LENGTH,
+                        checksum_length);
+
+  return checksum_flex_trits;
 }
