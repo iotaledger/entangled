@@ -122,15 +122,13 @@ TEST(ChecksumTest, testFlexChecksumEquality) {
 
   checksum = iota_flex_checksum(ADDRESS, NUM_TRITS, 9);
   memset(partial, FLEX_TRIT_NULL_VALUE, flex_len);
-  flex_trits_slice(partial, NUM_TRITS, CHECKSUM, NUM_TRITS, NUM_TRITS - 9,
-                        9);
+  flex_trits_slice(partial, NUM_TRITS, CHECKSUM, NUM_TRITS, NUM_TRITS - 9, 9);
   EXPECT_TRUE(memcmp(checksum, partial, num_flex_trits_for_trits(9)) == 0);
   free(checksum);
 
   checksum = iota_flex_checksum(ADDRESS, NUM_TRITS, 27);
   memset(partial, FLEX_TRIT_NULL_VALUE, flex_len);
-  flex_trits_slice(partial, NUM_TRITS, CHECKSUM, NUM_TRITS, NUM_TRITS - 27,
-                        27);
+  flex_trits_slice(partial, NUM_TRITS, CHECKSUM, NUM_TRITS, NUM_TRITS - 27, 27);
   EXPECT_TRUE(memcmp(checksum, partial, num_flex_trits_for_trits(27)) == 0);
   free(checksum);
 
