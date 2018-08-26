@@ -1,4 +1,9 @@
-// Copyright 2018 IOTA Foundation
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
 
 #ifndef CCLIENT_RESPONSE_GET_NEIGHBORS_H
 #define CCLIENT_RESPONSE_GET_NEIGHBORS_H
