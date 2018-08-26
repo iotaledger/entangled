@@ -10,5 +10,6 @@ cc_library(
         "//consensus/tangle",
         "//consensus/view_models",
         "//utils:logger_helper",
+        "//utils:macros",
     ],
 )

@@ -27,6 +27,11 @@ cc_library(
 )
 
 cc_library(
+    name = "macros",
+    hdrs = ["macros.h"],
+)
+
+cc_library(
     name = "system",
     srcs = ["system.c"],
     hdrs = ["system.h"],
