@@ -1615,6 +1615,17 @@ void test_deserialize_allocated(void) {
   TEST_ASSERT_EQUAL_MEMORY(&TRANSACTION, &transaction, sizeof(TRANSACTION));
 }
 
+void test_reset(void) {
+  iota_transaction_t transaction = transaction_new();
+  transaction_reset(transaction);
+  TEST_ASSERT_EQUAL_INT8(0, transaction->address[0]);
+  flex_trit_t obsolete_tag[sizeof(transaction->obsolete_tag)];
+  memset(obsolete_tag, FLEX_TRIT_NULL_VALUE, sizeof(transaction->obsolete_tag));
+  TEST_ASSERT_EQUAL_MEMORY(obsolete_tag, transaction->obsolete_tag,
+                           sizeof(transaction->obsolete_tag));
+  transaction_free(transaction);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -1622,6 +1633,7 @@ int main(void) {
   RUN_TEST(test_deserialize);
   RUN_TEST(test_serialize_allocated);
   RUN_TEST(test_deserialize_allocated);
+  RUN_TEST(test_reset);
 
   return UNITY_END();
 }
