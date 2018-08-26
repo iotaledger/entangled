@@ -48,7 +48,8 @@ bool EchoCollector::parseConfiguration(const YAML::Node& conf) {
 using namespace prometheus;
 
 void EchoCollector::subscribeToTransactions(
-    std::string zmqURL, const BroadcastReceiveCollector::ZmqObservable& zmqObservable,
+    std::string zmqURL,
+    const BroadcastReceiveCollector::ZmqObservable& zmqObservable,
     std::shared_ptr<Registry> registry) {
   std::atomic<bool> haveAllTXReturned = false;
   auto histograms = buildHistogramsMap(

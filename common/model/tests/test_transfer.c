@@ -2240,13 +2240,16 @@ void test_iterator(void) {
   iota_transaction_t transaction;
   transaction = transfer_iterator_next(transfer_iterator);
   TEST_ASSERT_NOT_NULL(transaction);
-  TEST_ASSERT_EQUAL_MEMORY(SIG1, transaction_signature(transaction), sizeof(SIG1));
+  TEST_ASSERT_EQUAL_MEMORY(SIG1, transaction_signature(transaction),
+                           sizeof(SIG1));
   transaction = transfer_iterator_next(transfer_iterator);
   TEST_ASSERT_NOT_NULL(transaction);
-  TEST_ASSERT_EQUAL_MEMORY(SIG2, transaction_signature(transaction), sizeof(SIG2));
+  TEST_ASSERT_EQUAL_MEMORY(SIG2, transaction_signature(transaction),
+                           sizeof(SIG2));
   transaction = transfer_iterator_next(transfer_iterator);
   TEST_ASSERT_NOT_NULL(transaction);
-  TEST_ASSERT_EQUAL_MEMORY(SIG3, transaction_signature(transaction), sizeof(SIG3));
+  TEST_ASSERT_EQUAL_MEMORY(SIG3, transaction_signature(transaction),
+                           sizeof(SIG3));
   transaction = transfer_iterator_next(transfer_iterator);
   TEST_ASSERT_NULL(transaction);
   transfer_iterator_free(transfer_iterator);

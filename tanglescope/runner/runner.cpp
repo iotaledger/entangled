@@ -10,8 +10,8 @@
 #include <iota/tanglescope/statscollector.hpp>
 #include <iota/tanglescope/tanglewidthcollector.hpp>
 #include <iota/tanglescope/tipselectioncollector.hpp>
-#include "tanglescope/confirmationratecollector.hpp"
 #include <list>
+#include "tanglescope/confirmationratecollector.hpp"
 
 DEFINE_string(ConfigurationPath, "", "YAML's configuration file path");
 
@@ -82,9 +82,8 @@ int main(int argc, char** argv) {
     }
 
     if (crCollector.parseConfiguration(conf["confirmationratecollector"])) {
-      auto task = boost::async(boost::launch::async, [&crCollector]() {
-          crCollector.collect();
-      });
+      auto task = boost::async(boost::launch::async,
+                               [&crCollector]() { crCollector.collect(); });
       tasks.push_back(std::move(task));
     }
 

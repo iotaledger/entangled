@@ -1,4 +1,9 @@
-// Copyright 2018 IOTA Foundation
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
 
 #ifndef CCLIENT_IOTA_API_H_
 #define CCLIENT_IOTA_API_H_
@@ -19,8 +24,8 @@ extern "C" {
  * @return The response.
  */
 
-iota_api_result_t iota_api_get_node_info(const iota_http_service_t* const service,
-                                         get_node_info_res_t* const res);
+iota_api_result_t iota_api_get_node_info(
+    const iota_http_service_t* const service, get_node_info_res_t* const res);
 
 /**
  * Returns the set of neighbors service node is connected with, as well as their
@@ -34,8 +39,8 @@ iota_api_result_t iota_api_get_node_info(const iota_http_service_t* const servic
  *
  * @return error value.
  */
-iota_api_result_t iota_api_get_neighbors(const iota_http_service_t* const service,
-                                         get_neighbors_res_t* const res);
+iota_api_result_t iota_api_get_neighbors(
+    const iota_http_service_t* const service, get_neighbors_res_t* const res);
 
 /**
  * Add a list of neighbors to iri node. It should be noted that this is only
@@ -49,8 +54,9 @@ iota_api_result_t iota_api_get_neighbors(const iota_http_service_t* const servic
  *
  * @return error value.
  */
-iota_api_result_t iota_api_add_neighbors(const iota_http_service_t* const service,
-                                         const add_neighbors_req_t* const req);
+iota_api_result_t iota_api_add_neighbors(
+    const iota_http_service_t* const service,
+    const add_neighbors_req_t* const req);
 
 /**
  * Removes a list of neighbors from your iri node. This is only temporary, and
@@ -144,9 +150,9 @@ iota_api_result_t iota_api_get_inclusion_states(
 /**
  * Similar to iota_api_get_inclusion_states. It returns the confirmed balance
  * which a list of addresses have at the latest confirmed milestone. In addition
- * to the balances, it also returns the milestone as well as the index with which
- * the confirmed balance was determined. The balances is returned as a list in the
- * same order as the addresses were provided as input.
+ * to the balances, it also returns the milestone as well as the index with
+ * which the confirmed balance was determined. The balances is returned as a
+ * list in the same order as the addresses were provided as input.
  *
  * https://iota.readme.io/reference#getbalances
  *
@@ -157,9 +163,9 @@ iota_api_result_t iota_api_get_inclusion_states(
  *
  * @return error value.
  */
-iota_api_result_t iota_api_get_balances(const iota_http_service_t* const service,
-                                        const get_balances_req_t* const req,
-                                        get_balances_res_t* res);
+iota_api_result_t iota_api_get_balances(
+    const iota_http_service_t* const service,
+    const get_balances_req_t* const req, get_balances_res_t* res);
 
 /**
  * Tip selection which returns trunkTransaction and branchTransaction. The input

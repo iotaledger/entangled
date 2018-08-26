@@ -20,24 +20,24 @@ namespace tanglescope {
 
 /*
  * Class Description:
- * This is a base class for collectors that generate transactions (broadcastTransactions)
- * And observe them via zmq (receivedTransactions) so they can collect data.
- * The actual handling of received transactions is done via `subscribeToTransactions` which
- * is pure virtual in this class
+ * This is a base class for collectors that generate transactions
+ * (broadcastTransactions) And observe them via zmq (receivedTransactions) so
+ * they can collect data. The actual handling of received transactions is done
+ * via `subscribeToTransactions` which is pure virtual in this class
  *
- * The Advantage in artificially generating transactions and monitoring them is certainty,
- * with artificial transactions, we know when they were broadcast, and we know if they were
- * approving transactions which are given by doing a tip selection
+ * The Advantage in artificially generating transactions and monitoring them is
+ * certainty, with artificial transactions, we know when they were broadcast,
+ * and we know if they were approving transactions which are given by doing a
+ * tip selection
  */
 
 class BroadcastReceiveCollector : public PrometheusCollector {
  public:
-
-    struct BroadcastInfo {
-        std::chrono::system_clock::time_point tp;
-        uint64_t msDuration;
-    };
-    using broadcastInfo = struct BroadcastInfo;
+  struct BroadcastInfo {
+    std::chrono::system_clock::time_point tp;
+    uint64_t msDuration;
+  };
+  using broadcastInfo = struct BroadcastInfo;
   constexpr static auto IRI_HOST = "iri_host";
   constexpr static auto IRI_PORT = "iri_port";
   constexpr static auto PUBLISHERS = "publishers";
@@ -59,7 +59,7 @@ class BroadcastReceiveCollector : public PrometheusCollector {
 
   void receivedTransactions();
 
-  virtual void doPeriodically()  = 0;
+  virtual void doPeriodically() = 0;
 
   // Configuration
   std::string _iriHost;
@@ -70,8 +70,7 @@ class BroadcastReceiveCollector : public PrometheusCollector {
   // Others
   std::shared_ptr<cppclient::IotaAPI> _api;
   std::map<std::string, ZmqObservable> _urlToZmqObservables;
-    cuckoohash_map<std::string, BroadcastInfo>
-            _hashToBroadcastTime;
+  cuckoohash_map<std::string, BroadcastInfo> _hashToBroadcastTime;
 };
 
 }  // namespace tanglescope

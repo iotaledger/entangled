@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #ifndef __COMMON_TRINARY_BCT_H__
 #define __COMMON_TRINARY_BCT_H__
 
