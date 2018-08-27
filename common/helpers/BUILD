@@ -24,10 +24,10 @@ cc_library(
     deps = [
         "//common/kerl",
         "//common/sign/v1:iss_kerl",
+        "//common/trinary:flex_trit",
         "//common/trinary:trit_array",
         "//common/trinary:trit_tryte",
         "//utils:export",
-        "//common/trinary:flex_trit",
     ],
 )
 
@@ -38,8 +38,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common/pow",
-        "//utils:export",
         "//common/trinary:flex_trit",
+        "//utils:export",
     ],
 )
 
@@ -50,8 +50,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common/curl-p:digest",
-        "//utils:export",
         "//common/trinary:flex_trit",
+        "//utils:export",
     ],
 )
 
@@ -64,9 +64,9 @@ cc_library(
         ":digest",
         "//common/kerl:hash",
         "//common/sign/v1:iss_kerl",
+        "//common/trinary:flex_trit",
         "//common/trinary:trit_tryte",
         "//utils:export",
-        "//common/trinary:flex_trit",
     ],
 )
 
