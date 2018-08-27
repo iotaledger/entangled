@@ -36,7 +36,7 @@ retcode_t iota_consensus_get_transactions_to_approve(
     tipselection_t *const ts, size_t const depth, trit_array_p const reference,
     tips_pair *tips) {
   retcode_t res = RC_OK;
-  trit_array_p ep;
+  trit_array_p ep = NULL;
   cw_calc_result ratings_result;
   walker_validator_t wv;
 
@@ -55,8 +55,8 @@ retcode_t iota_consensus_get_transactions_to_approve(
     goto ret;
   }
 
-  if ((res = iota_consensus_walker_validator_init(ts->tangle, ts->milestone,
-                                                  ts->lv, &wv))) {
+  if ((res = iota_consensus_walker_validator_init(&wv, ts->tangle,
+                                                  ts->milestone, ts->lv))) {
     log_error(TIPSELECTION_LOGGER_ID,
               "Initializing walker validator failed with error %\" PRIu64 \"\n",
               res);
