@@ -61,8 +61,7 @@ IOTA_EXPORT flex_trit_t* iota_flex_digest(flex_trit_t const* const flex_trits,
   if (!hash_flex_trits) {
     return NULL;
   }
-  flex_trits_from_trits(hash_flex_trits, num_trits, trits_hash, num_trits,
-                        num_trits);
-
+  flex_trits_from_trits(hash_flex_trits, HASH_LENGTH, trits_hash, HASH_LENGTH,
+                        HASH_LENGTH);
   return hash_flex_trits;
 }
