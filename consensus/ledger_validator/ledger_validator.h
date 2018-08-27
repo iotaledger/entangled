@@ -5,13 +5,13 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
-#define __COMMON_CONCENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
+#ifndef __CONSENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
+#define __CONSENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "common/errors.h"
 
+#include "common/errors.h"
 #include "common/storage/connection.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/milestone/milestone.h"
@@ -50,11 +50,11 @@ typedef struct ledger_validator_t {
 } ledger_validator_t;
 
 extern retcode_t iota_consensus_ledger_validator_init(
-    const tangle_t *tangle, const milestone_t *milestone,
-    ledger_validator_t *lv);
+    tangle_t *const tangle, milestone_t *const milestone,
+    ledger_validator_t *const lv);
 
 extern retcode_t iota_consensus_ledger_validator_destroy(
-    ledger_validator_t *lv);
+    ledger_validator_t *const lv);
 
 extern retcode_t iota_consensus_ledeger_validator_validate(
     const ledger_validator_t *lv, const tips_pair *pair);
@@ -65,4 +65,4 @@ extern retcode_t iota_consensus_ledeger_validator_validate(
 }
 #endif
 
-#endif  // __COMMON_CONCENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
+#endif  // __CONSENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__

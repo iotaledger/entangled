@@ -5,11 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_MILESTONE_MILESTONE_H__
-#define __COMMON_CONCENSUS_MILESTONE_MILESTONE_H__
+#ifndef __CONSENSUS_MILESTONE_MILESTONE_H__
+#define __CONSENSUS_MILESTONE_MILESTONE_H__
 
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "common/errors.h"
 #include "common/model/transaction.h"
 #include "consensus/snapshot/snapshot.h"
@@ -50,4 +51,4 @@ extern retcode_t iota_milestone_report_to_slack();
 }
 #endif
 
-#endif  // __COMMON_CONCENSUS_MILESTONE_MILESTONE_H__
+#endif  // __CONSENSUS_MILESTONE_MILESTONE_H__

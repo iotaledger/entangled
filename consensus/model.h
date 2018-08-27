@@ -5,11 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_STRUCTS_STRUCTS_H__
-#define __COMMON_CONCENSUS_STRUCTS_STRUCTS_H__
+#ifndef __CONSENSUS_MODEL_H__
+#define __CONSENSUS_MODEL_H__
 
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
 
@@ -26,4 +27,4 @@ typedef struct tips_pair {
 }
 #endif
 
-#endif  // __COMMON_CONCENSUS_STRUCTS_STRUCTS_H__
+#endif  // __CONSENSUS_MODEL_H__

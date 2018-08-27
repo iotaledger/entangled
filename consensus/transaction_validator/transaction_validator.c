@@ -9,8 +9,9 @@
 
 #define TRANSACTION_VALIDATOR_LOGGER_ID "consensus_transaction_validator"
 
-extern retcode_t iota_consensus_transaction_validator_init(
-    const tangle_t *tangle, transaction_validator_t *tv) {
+retcode_t iota_consensus_transaction_validator_init(
+    tangle_t* const tangle, transaction_validator_t* const tv) {
   logger_helper_init(TRANSACTION_VALIDATOR_LOGGER_ID, LOGGER_INFO, true);
   tv->tangle = tangle;
+  return RC_OK;
 }

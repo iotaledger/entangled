@@ -43,7 +43,7 @@ void test_init_cw(void) {
   config.index_tag = true;
   config.index_hash = true;
   TEST_ASSERT(iota_tangle_init(&tangle, &config) == RC_OK);
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS));
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
 }
 
 void test_setup() {
@@ -83,21 +83,22 @@ void test_cw_gen_topology(TestTangleTopology topology) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
   }
 
-  trit_array_p ep = trit_array_new(FLEX_TRIT_SIZE_243);
-  trit_array_set_trits(ep, TEST_TRANSACTION.hash, NUM_TRITS_HASH);
+  trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
+  trit_array_set_trits(ep, (flex_trit_t *)TEST_TRANSACTION.hash,
+                       NUM_TRITS_HASH);
   iota_hashes_pack pack;
   hash_pack_init(&pack, numApprovers);
 
   cw_calc_result out;
 
-  trit_array_p currHash = trit_array_new(FLEX_TRIT_SIZE_243);
+  trit_array_p currHash = trit_array_new(NUM_TRITS_HASH);
   for (int i = 0; i < numApprovers; i++) {
     trit_array_set_trits(currHash, txs[i].hash, NUM_TRITS_HASH);
     TEST_ASSERT(iota_tangle_load_hashes(&tangle, COL_HASH, currHash, &pack) ==
                 RC_OK);
     TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
   }
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS));
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
   TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), numApprovers + 1);
 
@@ -125,15 +126,16 @@ void test_cw_gen_topology(TestTangleTopology topology) {
 void test_single_tx_tangle(void) {
   test_setup();
 
-  trit_array_p ep = trit_array_new(FLEX_TRIT_SIZE_243);
-  trit_array_set_trits(ep, TEST_TRANSACTION.hash, NUM_TRITS_HASH);
+  trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
+  trit_array_set_trits(ep, (flex_trit_t *)TEST_TRANSACTION.hash,
+                       NUM_TRITS_HASH);
   iota_hashes_pack pack;
   hash_pack_init(&pack, 5);
 
   cw_calc_result out;
   bool exist = false;
-  TEST_ASSERT(iota_tangle_transaction_store(&tangle, &TEST_TRANSACTION) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_store(
+                  &tangle, (iota_transaction_t)&TEST_TRANSACTION) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
               RC_OK);
   TEST_ASSERT(exist == true);
@@ -157,10 +159,6 @@ void test_cw_topology_only_direct_approvers(void) {
 void test_cw_topology_blockchain(void) { test_cw_gen_topology(Blockchain); }
 
 void test_cw_topology_four_transactions_diamond(void) {
-  hash_to_direct_approvers_entry_t *currTxApproverEntry = NULL;
-  hash_to_direct_approvers_entry_t *tmpTxApproverEntry = NULL;
-  hash_entry_t *currDirectApprover = NULL;
-  hash_entry_t *tmpDirectApprover = NULL;
   cw_entry_t *currCwEntry = NULL;
   cw_entry_t *tmpCwEntry = NULL;
 
@@ -188,21 +186,21 @@ void test_cw_topology_four_transactions_diamond(void) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
   }
 
-  trit_array_p ep = trit_array_new(FLEX_TRIT_SIZE_243);
+  trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, txs[0].hash, NUM_TRITS_HASH);
   iota_hashes_pack pack;
   hash_pack_init(&pack, numTxs);
 
   cw_calc_result out;
 
-  trit_array_p currHash = trit_array_new(FLEX_TRIT_SIZE_243);
+  trit_array_p currHash = trit_array_new(NUM_TRITS_HASH);
   for (int i = 0; i < numTxs; i++) {
     trit_array_set_trits(currHash, txs[i].hash, NUM_TRITS_HASH);
     TEST_ASSERT(iota_tangle_load_hashes(&tangle, COL_HASH, currHash, &pack) ==
                 RC_OK);
     TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
   }
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS));
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
   TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), numTxs);
 

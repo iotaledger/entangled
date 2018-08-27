@@ -5,11 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_TIPSELECTION_TIPSELECTION_H__
-#define __COMMON_CONCENSUS_TIPSELECTION_TIPSELECTION_H__
+#ifndef __CONSENSUS_TIPSELECTION_TIPSELECTION_H__
+#define __CONSENSUS_TIPSELECTION_TIPSELECTION_H__
 
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
@@ -35,19 +36,19 @@ typedef struct tipselection_t {
 } tipselection_t;
 
 extern retcode_t iota_consensus_tipselection_init(
-    tipselection_t *impl, const cw_rating_calculator_t *cw_calc,
-    const entry_point_selector_t *ep, const ledger_validator_t *lv,
-    const milestone_t *milestone, const tangle_t *tangle,
-    const walker_t *walker, const walker_validator_t *wv);
+    tipselection_t *const ts, cw_rating_calculator_t *const cw_calc,
+    entry_point_selector_t *const ep, ledger_validator_t *const lv,
+    milestone_t *const milestone, tangle_t *const tangle,
+    walker_t *const walker, walker_validator_t *const wv);
 
 extern retcode_t iota_consensus_get_transactions_to_approve(
-    tipselection_t *impl, size_t depth, const trit_array_p reference,
-    tips_pair *tips);
+    tipselection_t *const ts, size_t const depth, trit_array_p const reference,
+    tips_pair *const tips);
 
-extern retcode_t iota_consensus_tipselection_destroy(tipselection_t *impl);
+extern retcode_t iota_consensus_tipselection_destroy(tipselection_t *const ts);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // __COMMON_CONCENSUS_TIPSELECTION_TIPSELECTION_H__
+#endif  // __CONSENSUS_TIPSELECTION_TIPSELECTION_H__
