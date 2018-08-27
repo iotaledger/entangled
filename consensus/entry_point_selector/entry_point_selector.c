@@ -30,8 +30,8 @@ retcode_t iota_consensus_get_entry_point(entry_point_selector_t *const eps,
       MAX(eps->milestone->latest_milestone_index - depth - 1, 0);
 
   if ((ret = iota_consensus_find_closest_next_milestone(
-           eps->tangle, eps->testnet, milestone_index, milestone_index,
-           eps->milestone.start_index, msv))) {
+           eps->tangle, eps->testnet, milestone_index,
+           eps->milestone->milestone_start_index, msv))) {
     log_error(
         ENTRY_POINT_SELECTOR_LOGGER_ID,
         "Finding closest next milestone failed with error %\" PRIu64 \"\n",
