@@ -26,7 +26,8 @@ UT_icd ut_neighbor_icd = {sizeof(neighbor_info_t), NULL, neighbor_info_t_copy,
                           neighbor_info_t_dtor};
 
 get_neighbors_res_t* get_neighbors_res_new() {
-  get_neighbors_res_t* nbors = malloc(sizeof(get_neighbors_res_t));
+  get_neighbors_res_t* nbors =
+      (get_neighbors_res_t*)malloc(sizeof(get_neighbors_res_t));
   if (nbors == NULL) {
     return NULL;
   }
@@ -40,7 +41,7 @@ neighbor_info_t* get_neighbors_res_create_neighbor(char_buffer_t* addr,
                                                    int all_trans,
                                                    int invalid_trans,
                                                    int new_trans) {
-  neighbor_info_t* nb = malloc(sizeof(neighbor_info_t));
+  neighbor_info_t* nb = (neighbor_info_t*)malloc(sizeof(neighbor_info_t));
   if (nb == NULL) {
     return NULL;
   }
@@ -55,7 +56,7 @@ retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* nbors,
                                          char_buffer_t* addr, int all_trans,
                                          int invalid_trans, int new_trans) {
   retcode_t ret = RC_OK;
-  neighbor_info_t* nb = malloc(sizeof(neighbor_info_t));
+  neighbor_info_t* nb = (neighbor_info_t*)malloc(sizeof(neighbor_info_t));
   if (nb == NULL) {
     return RC_CCLIENT_OOM;
   }
