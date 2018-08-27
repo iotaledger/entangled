@@ -8,7 +8,7 @@
 #include "types.h"
 
 char_buffer_t* char_buffer_new() {
-  char_buffer_t* out = malloc(sizeof(char_buffer_t));
+  char_buffer_t* out = (char_buffer_t*)malloc(sizeof(char_buffer_t));
   out->length = 0;
   out->data = NULL;
   return out;

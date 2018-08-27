@@ -62,11 +62,14 @@ size_t json_get_inclusion_state_serialize_request_get_size(
 size_t json_get_inclusion_state_deserialize_response_get_size(
     const serializer_t* const, const char* const toDeserialize);
 
+retcode_t json_get_neighbors_serialize_request(const serializer_t* const s,
+                                               char_buffer_t* out);
+
 // get_neighbors_response
 
-void json_get_neighbors_deserialize_response(const serializer_t* const s,
-                                             const char* const obj,
-                                             get_neighbors_res_t* out);
+retcode_t json_get_neighbors_deserialize_response(const serializer_t* const s,
+                                                  const char* const obj,
+                                                  get_neighbors_res_t* out);
 
 size_t json_get_neighbors_deserialize_response_get_size(
     const serializer_t* const, const char* const toDeserialize);
@@ -131,6 +134,7 @@ static serializer_vtable json_vtable = {
         json_get_inclusion_state_serialize_request_get_size,
     .get_inclusion_state_deserialize_response_get_size =
         json_get_inclusion_state_deserialize_response_get_size,
+    .get_neighbors_serialize_request = json_get_neighbors_serialize_request,
     .get_neighbors_deserialize_response =
         json_get_neighbors_deserialize_response,
     .get_neighbors_deserialize_response_get_size =

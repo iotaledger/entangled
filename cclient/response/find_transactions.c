@@ -18,7 +18,9 @@ char* find_transactions_res_hash_at(find_transactions_res_t* in, int index) {
   if (utarray_len(in->hashes) > index) {
     char** p = NULL;
     p = (char**)utarray_eltptr(in->hashes, index);
-    if (p) return *p;
+    if (p) {
+      return *p;
+    }
   }
   return '\0';
 }
