@@ -259,27 +259,27 @@ retcode_t json_get_neighbors_deserialize_response(const serializer_t* const s,
     cJSON* current_obj = NULL;
     cJSON_ArrayForEach(current_obj, json_item) {
       char_buffer_t* addr = char_buffer_new();
-      int allTrans, invalidTrans, newTrans;
+      int all_trans, invalid_trans, new_trans;
       ret = json_get_string(current_obj, "address", addr);
       if (ret != RC_OK) {
         goto end;
       }
-      ret = json_get_int(current_obj, "numberOfAllTransactions", &allTrans);
+      ret = json_get_int(current_obj, "numberOfAllTransactions", &all_trans);
       if (ret != RC_OK) {
         goto end;
       }
       ret = json_get_int(current_obj, "numberOfInvalidTransactions",
-                         &invalidTrans);
+                         &invalid_trans);
       if (ret != RC_OK) {
         goto end;
       }
-      ret = json_get_int(current_obj, "numberOfNewTransactions", &newTrans);
+      ret = json_get_int(current_obj, "numberOfNewTransactions", &new_trans);
       if (ret != RC_OK) {
         goto end;
       }
 
-      ret = get_neighbors_res_add_neighbor(out, addr, allTrans, invalidTrans,
-                                           newTrans);
+      ret = get_neighbors_res_add_neighbor(out, addr, all_trans, invalid_trans,
+                                           new_trans);
     }
   }
 
