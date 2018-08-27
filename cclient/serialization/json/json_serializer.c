@@ -84,14 +84,16 @@ retcode_t json_get_string(cJSON* json_obj, char* obj_name,
   if (cJSON_IsString(json_value) && (json_value->valuestring != NULL)) {
     str_len = strlen(json_value->valuestring);
     ret = char_buffer_allocate(text, str_len);
-    if (ret != RC_OK) return ret;
+    if (ret != RC_OK) {
+      return ret;
+    }
 
     strcpy(text->data, json_value->valuestring);
   } else {
     return RC_CCLIENT_JSON_PARSE;
   }
 
-  return RC_OK;
+  return ret;
 }
 
 retcode_t json_find_transactions_serialize_request(
@@ -107,16 +109,24 @@ retcode_t json_find_transactions_serialize_request(
                         cJSON_CreateString("findTransactions"));
 
   ret = utarray_to_json_array(obj->addresses, json_root, "addresses");
-  if (ret != RC_OK) goto err;
+  if (ret != RC_OK) {
+    goto err;
+  }
 
   ret = utarray_to_json_array(obj->approvees, json_root, "approvees");
-  if (ret != RC_OK) goto err;
+  if (ret != RC_OK) {
+    goto err;
+  }
 
   ret = utarray_to_json_array(obj->bundles, json_root, "bundles");
-  if (ret != RC_OK) goto err;
+  if (ret != RC_OK) {
+    goto err;
+  }
 
   ret = utarray_to_json_array(obj->tags, json_root, "tags");
-  if (ret != RC_OK) goto err;
+  if (ret != RC_OK) {
+    goto err;
+  }
 
   json_text = cJSON_PrintUnformatted(json_root);
   len = strlen(json_text);
@@ -125,7 +135,9 @@ retcode_t json_find_transactions_serialize_request(
     strncpy(out->data, json_text, len);
   }
 
-  if (json_text) cJSON_free((void*)json_text);
+  if (json_text) {
+    cJSON_free((void*)json_text);
+  }
   cJSON_Delete(json_root);
   return ret;
 
@@ -153,7 +165,9 @@ retcode_t json_find_transactions_deserialize_response(
   }
 
   retcode_t ret = json_array_to_utarray(json_obj, "hashes", out->hashes);
-  if (ret != RC_OK) return ret;
+  if (ret != RC_OK) {
+    return ret;
+  }
 
   return RC_OK;
 }
@@ -208,11 +222,71 @@ size_t json_get_inclusion_state_deserialize_response_get_size(
   return 0;
 }
 
+retcode_t json_get_neighbors_serialize_request(const serializer_t* const s,
+                                               char_buffer_t* out) {
+  retcode_t ret = RC_OK;
+  const char* req_text = "{\"command\":\"getNeighbors\"}";
+  ret = char_buffer_allocate(out, strlen(req_text));
+  if (ret == RC_OK) {
+    strcpy(out->data, req_text);
+  }
+  return ret;
+}
+
 // get_neighbors_response
 
-void json_get_neighbors_deserialize_response(const serializer_t* const s,
-                                             const char* const obj,
-                                             get_neighbors_res_t* out) {}
+retcode_t json_get_neighbors_deserialize_response(const serializer_t* const s,
+                                                  const char* const obj,
+                                                  get_neighbors_res_t* out) {
+  retcode_t ret = RC_OK;
+  cJSON* json_obj = cJSON_Parse(obj);
+  cJSON* json_item = NULL;
+
+  if (json_obj == NULL) {
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
+  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
+    // TODO log the error message from response.
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "neighbors");
+  if (cJSON_IsArray(json_item)) {
+    cJSON* current_obj = NULL;
+    cJSON_ArrayForEach(current_obj, json_item) {
+      char_buffer_t* addr = char_buffer_new();
+      int all_trans, invalid_trans, new_trans;
+      ret = json_get_string(current_obj, "address", addr);
+      if (ret != RC_OK) {
+        goto end;
+      }
+      ret = json_get_int(current_obj, "numberOfAllTransactions", &all_trans);
+      if (ret != RC_OK) {
+        goto end;
+      }
+      ret = json_get_int(current_obj, "numberOfInvalidTransactions",
+                         &invalid_trans);
+      if (ret != RC_OK) {
+        goto end;
+      }
+      ret = json_get_int(current_obj, "numberOfNewTransactions", &new_trans);
+      if (ret != RC_OK) {
+        goto end;
+      }
+
+      ret = get_neighbors_res_add_neighbor(out, addr, all_trans, invalid_trans,
+                                           new_trans);
+    }
+  }
+
+end:
+  cJSON_Delete(json_obj);
+  return ret;
+}
 
 size_t json_get_neighbors_deserialize_response_get_size(
     const serializer_t* const s, const char* const toDeserialize) {
@@ -230,7 +304,9 @@ retcode_t json_get_node_info_serialize_request(const serializer_t* const s,
   retcode_t ret = RC_OK;
   const char* req_text = "{\"command\":\"getNodeInfo\"}";
   ret = char_buffer_allocate(out, strlen(req_text));
-  strcpy(out->data, req_text);
+  if (ret == RC_OK) {
+    strcpy(out->data, req_text);
+  }
   return ret;
 }
 
@@ -253,55 +329,84 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_get_string(json_obj, "appName", out->appName);
-  if (ret != RC_OK) goto end;
+  ret = json_get_string(json_obj, "appName", out->app_name);
+  if (ret != RC_OK) {
+    goto end;
+  }
 
-  ret = json_get_string(json_obj, "appVersion", out->appVersion);
-  if (ret != RC_OK) goto end;
+  ret = json_get_string(json_obj, "appVersion", out->app_version);
+  if (ret != RC_OK) {
+    goto end;
+  }
 
   ret = json_get_int(json_obj, "jreAvailableProcessors",
-                     &out->jreAvailableProcessors);
-  if (ret != RC_OK) goto end;
+                     &out->jre_available_processors);
+  if (ret != RC_OK) {
+    goto end;
+  }
 
-  ret = json_get_size(json_obj, "jreFreeMemory", &out->jreFreeMemory);
-  if (ret != RC_OK) goto end;
+  ret = json_get_size(json_obj, "jreFreeMemory", &out->jre_free_memory);
+  if (ret != RC_OK) {
+    goto end;
+  }
 
-  ret = json_get_size(json_obj, "jreMaxMemory", &out->jreMaxMemory);
-  if (ret != RC_OK) goto end;
+  ret = json_get_size(json_obj, "jreMaxMemory", &out->jre_max_memory);
+  if (ret != RC_OK) {
+    goto end;
+  }
 
-  ret = json_get_size(json_obj, "jreTotalMemory", &out->jreTotalMemory);
-  if (ret != RC_OK) goto end;
+  ret = json_get_size(json_obj, "jreTotalMemory", &out->jre_total_memory);
+  if (ret != RC_OK) {
+    goto end;
+  }
 
-  ret = json_get_string(json_obj, "latestMilestone", out->latestMilestone);
-  if (ret != RC_OK) goto end;
+  ret = json_get_string(json_obj, "latestMilestone", out->latest_milestone);
+  if (ret != RC_OK) {
+    goto end;
+  }
 
   ret = json_get_size(json_obj, "latestMilestoneIndex",
-                      &out->latestMilestoneIndex);
-  if (ret != RC_OK) goto end;
+                      &out->latest_milestone_index);
+  if (ret != RC_OK) {
+    goto end;
+  }
 
   ret = json_get_string(json_obj, "latestSolidSubtangleMilestone",
-                        out->latestSolidSubtangleMilestone);
-  if (ret != RC_OK) goto end;
+                        out->latest_solid_subtangle_milestone);
+  if (ret != RC_OK) {
+    goto end;
+  }
 
   ret = json_get_size(json_obj, "latestSolidSubtangleMilestoneIndex",
-                      &out->latestSolidSubtangleMilestoneIndex);
-  if (ret != RC_OK) goto end;
+                      &out->latest_solid_subtangle_milestone_index);
+  if (ret != RC_OK) {
+    goto end;
+  }
 
   ret = json_get_int(json_obj, "neighbors", &out->neighbors);
-  if (ret != RC_OK) goto end;
+  if (ret != RC_OK) {
+    goto end;
+  }
 
-  ret = json_get_int(json_obj, "packetsQueueSize", &out->packetsQueueSize);
-  if (ret != RC_OK) goto end;
+  ret = json_get_int(json_obj, "packetsQueueSize", &out->packets_queue_size);
+  if (ret != RC_OK) {
+    goto end;
+  }
 
   ret = json_get_size(json_obj, "time", &out->time);
-  if (ret != RC_OK) goto end;
+  if (ret != RC_OK) {
+    goto end;
+  }
 
   ret = json_get_int(json_obj, "tips", &out->tips);
-  if (ret != RC_OK) goto end;
+  if (ret != RC_OK) {
+    goto end;
+  }
 
-  ret = json_get_int(json_obj, "transactionsToRequest",
-                     &out->transactionsToRequest);
-  if (ret != RC_OK) goto end;
+  ret = json_get_int(json_obj, "transactionsToRequest", &out->trans_to_request);
+  if (ret != RC_OK) {
+    goto end;
+  }
 
 end:
   cJSON_Delete(json_obj);
