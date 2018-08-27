@@ -68,11 +68,15 @@ void select_transactions_populate_from_row(sqlite3_stmt* statement,
 
 retcode_t iota_stor_store(const connection_t* const conn,
                           const iota_transaction_t data_in) {
+  retcode_t ret = RC_OK;
   char statement[MAX_STORE_STATEMENT_SIZE];
-  iota_transactions_insert_statement(data_in, statement,
-                                     MAX_STORE_STATEMENT_SIZE);
   char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
+
+  if ((ret = iota_transactions_insert_statement(data_in, statement,
+                                                MAX_STORE_STATEMENT_SIZE))) {
+    return ret;
+  }
 
   int rc = sqlite3_prepare_v2((sqlite3*)conn->db, statement, -1,
                               &sqlite_statement, &err_msg);
@@ -126,12 +130,15 @@ retcode_t iota_stor_store(const connection_t* const conn,
 retcode_t iota_stor_load(const connection_t* const conn, const char* col_name,
                          const trit_array_p key, iota_transactions_pack* pack) {
   assert(col_name && strcmp(col_name, ""));
+  retcode_t ret = RC_OK;
   char statement[MAX_SELECT_STATEMENT_SIZE];
-  iota_transactions_select_statement(col_name, statement,
-                                     MAX_SELECT_STATEMENT_SIZE);
-
   char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
+
+  if ((ret = iota_transactions_select_statement(col_name, statement,
+                                                MAX_SELECT_STATEMENT_SIZE))) {
+    return ret;
+  }
 
   pack->insufficient_capacity = false;
 
@@ -175,12 +182,15 @@ retcode_t iota_stor_load(const connection_t* const conn, const char* col_name,
 retcode_t iota_stor_exist(const connection_t* const conn,
                           const char* index_name, const trit_array_p key,
                           bool* exist) {
+  retcode_t ret = RC_OK;
   char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
   char statement[MAX_SELECT_STATEMENT_SIZE];
 
-  iota_transactions_exist_statement(index_name, statement,
-                                    MAX_SELECT_STATEMENT_SIZE);
+  if ((ret = iota_transactions_exist_statement(index_name, statement,
+                                               MAX_SELECT_STATEMENT_SIZE))) {
+    return ret;
+  }
 
   *exist = false;
 
@@ -226,13 +236,16 @@ extern retcode_t iota_stor_load_hashes(const connection_t* const conn,
                                        const trit_array_p key,
                                        iota_hashes_pack* pack) {
   assert(col_name && strcmp(col_name, ""));
+  retcode_t ret = RC_OK;
   char statement[MAX_SELECT_STATEMENT_SIZE];
-  iota_transactions_select_hashes_statement(col_name, statement,
-                                            MAX_SELECT_STATEMENT_SIZE);
-
   char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
   char const* buffer;
+
+  if ((ret = iota_transactions_select_hashes_statement(
+           col_name, statement, MAX_SELECT_STATEMENT_SIZE))) {
+    return ret;
+  }
 
   int rc = sqlite3_prepare_v2((sqlite3*)conn->db, statement, -1,
                               &sqlite_statement, &err_msg);
@@ -279,13 +292,16 @@ extern retcode_t iota_stor_load_hashes(const connection_t* const conn,
 retcode_t iota_stor_load_hashes_of_approvers(const connection_t* const conn,
                                              const trit_array_p approvee_hash,
                                              iota_hashes_pack* pack) {
+  retcode_t ret = RC_OK;
   char statement[MAX_SELECT_STATEMENT_SIZE];
-  iota_transactions_select_hashes_approvers_statement(
-      approvee_hash, statement, MAX_SELECT_STATEMENT_SIZE);
-
   char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
   char const* buffer;
+
+  if ((ret = iota_transactions_select_hashes_approvers_statement(
+           approvee_hash, statement, MAX_SELECT_STATEMENT_SIZE))) {
+    return ret;
+  }
 
   int rc = sqlite3_prepare_v2((sqlite3*)conn->db, statement, -1,
                               &sqlite_statement, &err_msg);

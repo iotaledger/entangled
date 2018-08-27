@@ -5,13 +5,13 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_ENTRY_POINT_SELECTOR_ENTRY_POINT_SELECTOR_H__
-#define __COMMON_CONCENSUS_ENTRY_POINT_SELECTOR_ENTRY_POINT_SELECTOR_H__
+#ifndef __CONSENSUS_ENTRY_POINT_SELECTOR_ENTRY_POINT_SELECTOR_H__
+#define __CONSENSUS_ENTRY_POINT_SELECTOR_ENTRY_POINT_SELECTOR_H__
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "common/errors.h"
 
+#include "common/errors.h"
 #include "common/storage/connection.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/milestone/milestone.h"
@@ -20,25 +20,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- *
- *
- *     private final Tangle tangle;
-private final boolean testnet;
-private final int milestoneStartIndex;
-
-public EntryPointSelectorImpl(Tangle tangle, Milestone milestone, boolean
-testnet, int milestoneStartIndex) {
-    this.tangle = tangle;
-    this.milestone = milestone;
-
-    this.testnet = testnet;
-    this.milestoneStartIndex = milestoneStartIndex;
-}
- * @param depth
- * @return
- */
 
 typedef struct entry_point_selector_t {
   tangle_t *tangle;
@@ -60,4 +41,4 @@ extern retcode_t iota_consensus_entry_point_selector_destroy(
 }
 #endif
 
-#endif  // __COMMON_CONCENSUS_ENTRY_POINT_SELECTOR_ENTRY_POINT_SELECTOR_H__
+#endif  // __CONSENSUS_ENTRY_POINT_SELECTOR_ENTRY_POINT_SELECTOR_H__

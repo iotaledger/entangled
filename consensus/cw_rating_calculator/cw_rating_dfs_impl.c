@@ -8,6 +8,14 @@
 #include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
 #include "common/storage/packs.h"
 
+static retcode_t cw_rating_dfs_do_dfs_from_db(
+    const cw_rating_calculator_t *const cw_calc, trit_array_p entry_point,
+    hash_to_direct_approvers_map_t *tx_to_approvers, size_t *subtangle_size);
+
+static retcode_t cw_rating_dfs_do_dfs_light(
+    hash_to_direct_approvers_map_t tx_to_approvers, flex_trit_t *ep,
+    int64_t *visited_bitset, size_t *subtangle_size);
+
 /*
  * utarray definitions
  */
@@ -94,7 +102,7 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
   return RC_OK;
 }
 
-retcode_t cw_rating_dfs_do_dfs_from_db(
+static retcode_t cw_rating_dfs_do_dfs_from_db(
     const cw_rating_calculator_t *const cw_calc, trit_array_p entry_point,
     hash_to_direct_approvers_map_t *tx_to_approvers, size_t *subtangle_size) {
   hash_to_direct_approvers_entry_t *curr_tx = NULL;
@@ -107,7 +115,7 @@ retcode_t cw_rating_dfs_do_dfs_from_db(
   iota_hashes_pack pack;
   *subtangle_size = 0;
 
-  if (res = hash_pack_init(&pack, 10) != RC_OK) {
+  if ((res = hash_pack_init(&pack, 10)) != RC_OK) {
     return res;
   }
 
@@ -123,7 +131,7 @@ retcode_t cw_rating_dfs_do_dfs_from_db(
   flex_trit_t *curr_tx_hash = NULL;
 
   while (utarray_len(stack)) {
-    curr_tx_hash = utarray_back(stack);
+    curr_tx_hash = (flex_trit_t *)utarray_back(stack);
     utarray_pop_back(stack);
     pack.num_loaded = 0;
     pack.insufficient_capacity = false;
@@ -196,7 +204,7 @@ retcode_t cw_rating_dfs_do_dfs_from_db(
   return res;
 }
 
-retcode_t cw_rating_dfs_do_dfs_light(
+static retcode_t cw_rating_dfs_do_dfs_light(
     hash_to_direct_approvers_map_t tx_to_approvers, flex_trit_t *ep,
     int64_t *visited_bitset, size_t *subtangle_size) {
   *subtangle_size = 0;
@@ -217,7 +225,7 @@ retcode_t cw_rating_dfs_do_dfs_light(
   utarray_push_back(stack, ep);
 
   while (utarray_len(stack)) {
-    curr_hash = utarray_back(stack);
+    curr_hash = (flex_trit_t *)utarray_back(stack);
     utarray_pop_back(stack);
 
     HASH_FIND(hh, tx_to_approvers, curr_hash, FLEX_TRIT_SIZE_243,

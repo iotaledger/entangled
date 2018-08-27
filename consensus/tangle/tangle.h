@@ -5,11 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_TANGLE_TANGLE_H__
-#define __COMMON_CONCENSUS_TANGLE_TANGLE_H__
+#ifndef __CONSENSUS_TANGLE_TANGLE_H__
+#define __CONSENSUS_TANGLE_TANGLE_H__
 
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "common/errors.h"
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
@@ -52,8 +53,9 @@ extern retcode_t iota_tangle_load_hashes(const tangle_t *const tangle,
 extern retcode_t iota_tangle_load_hashes_of_approvers(
     const tangle_t *const tangle, const trit_array_p approvee_hash,
     iota_hashes_pack *pack);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // __COMMON_CONCENSUS_TANGLE_TANGLE_H__
+#endif  // __CONSENSUS_TANGLE_TANGLE_H__

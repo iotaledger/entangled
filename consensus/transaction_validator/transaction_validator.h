@@ -5,13 +5,13 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_TRANSACTION_VALIDATOR_TRANSACTION_VALIDATOR_H__
-#define __COMMON_CONCENSUS_TRANSACTION_VALIDATOR_TRANSACTION_VALIDATOR_H__
+#ifndef __CONSENSUS_TRANSACTION_VALIDATOR_TRANSACTION_VALIDATOR_H__
+#define __CONSENSUS_TRANSACTION_VALIDATOR_TRANSACTION_VALIDATOR_H__
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "common/errors.h"
 
+#include "common/errors.h"
 #include "common/storage/connection.h"
 #include "consensus/tangle/tangle.h"
 
@@ -25,7 +25,7 @@ typedef struct transaction_validator_t {
 } transaction_validator_t;
 
 extern retcode_t iota_consensus_transaction_validator_init(
-    const tangle_t *tangle, transaction_validator_t *tv);
+    tangle_t *const tangle, transaction_validator_t *const tv);
 
 // TODO - complete
 
@@ -33,4 +33,4 @@ extern retcode_t iota_consensus_transaction_validator_init(
 }
 #endif
 
-#endif  // __COMMON_CONCENSUS_TRANSACTION_VALIDATOR_TRANSACTION_VALIDATOR_H__
+#endif  // __CONSENSUS_TRANSACTION_VALIDATOR_TRANSACTION_VALIDATOR_H__

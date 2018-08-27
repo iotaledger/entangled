@@ -5,11 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_VIEW_MODELS_MILESTONE_H__
-#define __COMMON_CONCENSUS_VIEW_MODELS_MILESTONE_H__
+#ifndef __CONSENSUS_VIEW_MODELS_MILESTONE_H__
+#define __CONSENSUS_VIEW_MODELS_MILESTONE_H__
 
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "common/errors.h"
 #include "common/model/transaction.h"
 #include "consensus/tangle/tangle.h"
@@ -28,4 +29,4 @@ retcode_t iota_consencues_find_closest_next_milestone(
 }
 #endif
 
-#endif  // __COMMON_CONCENSUS_VIEW_MODELS_MILESTONE_H__
+#endif  // __CONSENSUS_VIEW_MODELS_MILESTONE_H__

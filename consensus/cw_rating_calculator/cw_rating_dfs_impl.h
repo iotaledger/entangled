@@ -5,13 +5,17 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CONCENSUS_CW_RATING_CALCULATOR_CW_RATING_TOPOLOGICAL_SORT_IMPL_H__
-#define __COMMON_CONCENSUS_CW_RATING_CALCULATOR_CW_RATING_TOPOLOGICAL_SORT_IMPL_H__
-
-#include "consensus/cw_rating_calculator/cw_rating_calculator.h"
+#ifndef __CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_DFS_IMPL_H__
+#define __CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_DFS_IMPL_H__
 
 #include "utarray.h"
 #include "uthash.h"
+
+#include "consensus/cw_rating_calculator/cw_rating_calculator.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void init_cw_calculator_dfs(cw_rating_calculator_base_t *calculator);
 /**
@@ -40,12 +44,8 @@ static cw_calculator_vtable cw_topological_vtable = {
     .cw_rating_calculate = cw_rating_calculate_dfs,
 };
 
-static retcode_t cw_rating_dfs_do_dfs_from_db(
-    const cw_rating_calculator_t *const cw_calc, trit_array_p entry_point,
-    hash_to_direct_approvers_map_t *tx_to_approvers, size_t *subtangle_size);
+#ifdef __cplusplus
+}
+#endif
 
-static retcode_t cw_rating_dfs_do_dfs_light(
-    hash_to_direct_approvers_map_t tx_to_approvers, flex_trit_t *ep,
-    int64_t *visited_bitset, size_t *subtangle_size);
-
-#endif  //__COMMON_CONCENSUS_CW_RATING_CALCULATOR_CW_RATING_TOPOLOGICAL_SORT_IMPL_H__
+#endif  //__CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_DFS_IMPL_H__
