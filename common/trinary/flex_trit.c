@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018 IOTA Stiftung
- * https://github.com/iotaledger/entangled/
+ * https://github.com/iotaledger/entangled
  *
  * Refer to the LICENSE file for licensing information
  */
@@ -178,6 +178,7 @@ size_t flex_trits_from_trytes(flex_trit_t *to_flex_trits, size_t to_len,
 #elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE) || \
     defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
   trit_t trits[to_len];
+  memset(trits, 0, to_len);
   trytes_to_trits((tryte_t *)trytes, trits, num_trytes);
   flex_trits_from_trits(to_flex_trits, to_len, trits, to_len, to_len);
 #endif

@@ -119,7 +119,7 @@ void ZMQCollectorImpl::collect(uint32_t bundleConfirmationHistogramRange,
       rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
           [&](auto s) { zmqPublisher(std::move(s), _zmqURL); });
 
-  //Latest solid milestone index
+  // Latest solid milestone index
   uint64_t lmsi = 0;
 
   zmqObservable.observe_on(rxcpp::synchronize_new_thread())

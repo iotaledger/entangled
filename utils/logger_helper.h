@@ -8,8 +8,9 @@
 #ifndef COMMON_LOGGER_HELPER_H_
 #define COMMON_LOGGER_HELPER_H_
 
-#include <logger.h>
 #include <stdbool.h>
+
+#include "logger.h"
 
 #ifdef __cplusplus
 extern "C" {

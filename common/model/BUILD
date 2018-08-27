@@ -6,9 +6,10 @@ cc_library(
     hdrs = ["transaction.h"],
     deps = [
         "//common/curl-p:digest",
+        "//common/trinary:flex_trit",
         "//common/trinary:trit_long",
-        "//common/trinary:flex_trit"
-    ], )
+    ],
+)
 
 cc_library(
     name = "tryte_transaction",
@@ -20,14 +21,14 @@ cc_library(
 )
 
 cc_library(
-    name="transfer",
-    srcs=["transfer.c"],
-    hdrs=["transfer.h"],
-    deps=[
-        "//common/trinary:tryte_long",
-        "//common/trinary:trit_tryte",
-        "//common/kerl:kerl",
+    name = "transfer",
+    srcs = ["transfer.c"],
+    hdrs = ["transfer.h"],
+    deps = [
         "//common/helpers:sign",
-        "//common/model:transaction"
-    ], )
-
+        "//common/kerl",
+        "//common/model:transaction",
+        "//common/trinary:trit_tryte",
+        "//common/trinary:tryte_long",
+    ],
+)

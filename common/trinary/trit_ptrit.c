@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include "trit_ptrit.h"
 
 #define HIGH_BITS 0xFFFFFFFFFFFFFFFF
