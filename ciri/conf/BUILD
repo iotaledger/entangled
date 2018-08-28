@@ -1,35 +1,25 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "config",
-    hdrs = ["config.h"],
+    name = "conf_args",
+    hdrs = ["conf_args.h"],
 )
 
 cc_library(
-    name = "config_args",
-    hdrs = ["config_args.h"],
+    name = "conf_default",
+    hdrs = ["conf_default.h"],
 )
 
 cc_library(
-    name = "config_default",
-    hdrs = ["config_default.h"],
-)
-
-cc_library(
-    name = "conf_provider_shared",
-    hdrs = ["provider.h"],
-    deps = [
-        ":config",
-        "//common:errors",
+    name = "conf",
+    srcs = [
+        "conf.c",
+        "conf_provider_getopt.c",
     ],
-)
-
-cc_library(
-    name = "conf_provider",
-    srcs = ["getopt.c"],
+    hdrs = ["conf.h"],
     deps = [
-        ":conf_provider_shared",
-        ":config_args",
-        ":config_default",
+        ":conf_args",
+        ":conf_default",
+        "//common:errors",
     ],
 )
