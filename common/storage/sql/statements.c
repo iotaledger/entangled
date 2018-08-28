@@ -19,6 +19,54 @@
 #define SQL_STATEMENTS_ID "sql_statements"
 
 /*
+ * Generic statements
+ */
+
+static retcode_t iota_generic_select_statement(const char *table_name,
+                                               const char *index_col,
+                                               char statement[],
+                                               size_t statement_cap) {
+  int res;
+
+  if (index_col == NULL || strcmp(index_col, "") == 0) {
+    res = snprintf(statement, statement_cap, "SELECT * FROM %s", table_name);
+  } else {
+    res = snprintf(statement, statement_cap, "SELECT * FROM %s WHERE %s = ?",
+                   table_name, index_col);
+  }
+
+  if (res < 0 || res == statement_cap) {
+    log_error(SQL_STATEMENTS_ID,
+              "Failed in creating statement, statement: %s\n", statement);
+    return RC_SQL_FAILED_WRITE_STATEMENT;
+  }
+  return RC_OK;
+}
+
+static retcode_t iota_generic_exist_statement(const char *table_name,
+                                              const char *index_col,
+                                              char statement[],
+                                              size_t statement_cap) {
+  int res;
+
+  if (index_col == NULL || strcmp(index_col, "") == 0) {
+    res = snprintf(statement, statement_cap,
+                   "SELECT '1' WHERE EXISTS(SELECT 1 FROM %s)", table_name);
+  } else {
+    res = snprintf(statement, statement_cap,
+                   "SELECT '1' WHERE EXISTS(SELECT 1 FROM %s WHERE %s = ?)",
+                   table_name, index_col);
+  }
+
+  if (res < 0 || res == statement_cap) {
+    log_error(SQL_STATEMENTS_ID,
+              "Failed in creating statement, statement: %s\n", statement);
+    return RC_SQL_FAILED_WRITE_STATEMENT;
+  }
+  return RC_OK;
+}
+
+/*
  * Transaction statements
  */
 
@@ -53,45 +101,15 @@ retcode_t iota_transactions_insert_statement(const iota_transaction_t tx,
 retcode_t iota_transactions_select_statement(const char *index_col,
                                              char statement[],
                                              size_t statement_cap) {
-  int res;
-
-  if (index_col == NULL || strcmp(index_col, "") == 0) {
-    res = snprintf(statement, statement_cap, "SELECT * FROM %s",
-                   TRANSACTION_TABLE_NAME);
-  } else {
-    res = snprintf(statement, statement_cap, "SELECT * FROM %s WHERE %s = ?",
-                   TRANSACTION_TABLE_NAME, index_col);
-  }
-
-  if (res < 0 || res == statement_cap) {
-    log_error(SQL_STATEMENTS_ID,
-              "Failed in creating statement, statement: %s\n", statement);
-    return RC_SQL_FAILED_WRITE_STATEMENT;
-  }
-  return RC_OK;
+  return iota_generic_select_statement(TRANSACTION_TABLE_NAME, index_col,
+                                       statement, statement_cap);
 }
 
 retcode_t iota_transactions_exist_statement(const char *index_col,
                                             char statement[],
                                             size_t statement_cap) {
-  int res;
-
-  if (index_col == NULL || strcmp(index_col, "") == 0) {
-    res = snprintf(statement, statement_cap,
-                   "SELECT '1' WHERE EXISTS(SELECT 1 FROM %s)",
-                   TRANSACTION_TABLE_NAME);
-  } else {
-    res = snprintf(statement, statement_cap,
-                   "SELECT '1' WHERE EXISTS(SELECT 1 FROM %s WHERE %s = ?)",
-                   TRANSACTION_TABLE_NAME, index_col);
-  }
-
-  if (res < 0 || res == statement_cap) {
-    log_error(SQL_STATEMENTS_ID,
-              "Failed in creating statement, statement: %s\n", statement);
-    return RC_SQL_FAILED_WRITE_STATEMENT;
-  }
-  return RC_OK;
+  return iota_generic_exist_statement(TRANSACTION_TABLE_NAME, index_col,
+                                      statement, statement_cap);
 }
 
 retcode_t iota_transactions_update_statement(const char *index_col,
@@ -168,45 +186,15 @@ retcode_t iota_milestone_insert_statement(const milestone_t *milestone,
 retcode_t iota_milestone_select_statement(const char *index_col,
                                           char statement[],
                                           size_t statement_cap) {
-  int res;
-
-  if (index_col == NULL || strcmp(index_col, "") == 0) {
-    res = snprintf(statement, statement_cap, "SELECT * FROM %s",
-                   MILESTONE_TABLE_NAME);
-  } else {
-    res = snprintf(statement, statement_cap, "SELECT * FROM %s WHERE %s = ?",
-                   MILESTONE_TABLE_NAME, index_col);
-  }
-
-  if (res < 0 || res == statement_cap) {
-    log_error(SQL_STATEMENTS_ID,
-              "Failed in creating statement, statement: %s\n", statement);
-    return RC_SQL_FAILED_WRITE_STATEMENT;
-  }
-  return RC_OK;
+  return iota_generic_select_statement(MILESTONE_TABLE_NAME, index_col,
+                                       statement, statement_cap);
 }
 
 retcode_t iota_milestone_exist_statement(const char *index_col,
                                          char statement[],
                                          size_t statement_cap) {
-  int res;
-
-  if (index_col == NULL || strcmp(index_col, "") == 0) {
-    res = snprintf(statement, statement_cap,
-                   "SELECT '1' WHERE EXISTS(SELECT 1 FROM %s)",
-                   MILESTONE_TABLE_NAME);
-  } else {
-    res = snprintf(statement, statement_cap,
-                   "SELECT '1' WHERE EXISTS(SELECT 1 FROM %s WHERE %s = ?)",
-                   MILESTONE_TABLE_NAME, index_col);
-  }
-
-  if (res < 0 || res == statement_cap) {
-    log_error(SQL_STATEMENTS_ID,
-              "Failed in creating statement, statement: %s\n", statement);
-    return RC_SQL_FAILED_WRITE_STATEMENT;
-  }
-  return RC_OK;
+  return iota_generic_exist_statement(MILESTONE_TABLE_NAME, index_col,
+                                      statement, statement_cap);
 }
 
 retcode_t iota_milestone_update_statement(const char *index_col,
