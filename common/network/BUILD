@@ -17,3 +17,12 @@ cc_library(
     hdrs = ["uri_parser.h"],
     deps = [":network"],
 )
+
+cc_test(
+    name = "tests",
+    srcs = glob(["tests/*.c"]),
+    deps = [
+        ":uri_parser",
+        "@unity",
+    ],
+) 
