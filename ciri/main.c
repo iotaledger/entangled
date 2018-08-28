@@ -33,9 +33,9 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  log_info(MAIN_LOGGER_ID, "Parsing command lien arguments\n");
+  log_info(MAIN_LOGGER_ID, "Parsing command line arguments\n");
   if (ciri_conf_parse(&core_g.config, argc, argv)) {
-    log_critical(MAIN_LOGGER_ID, "Parsing configuration variables failed\n");
+    log_critical(MAIN_LOGGER_ID, "Parsing command line arguments failed\n");
     return EXIT_FAILURE;
   }
 

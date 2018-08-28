@@ -24,7 +24,7 @@ retcode_t ciri_conf_parse(ciri_conf_t* conf, int argc, char** argv) {
         conf->udp_receiver_port = atoi(optarg);
         break;
       default:
-        break;
+        return RC_CONF_INVALID_ARGUMENTS;
     }
   }
   return RC_OK;
