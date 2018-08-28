@@ -22,10 +22,10 @@ static cw_rating_calculator_t calc;
 static tangle_t tangle;
 
 // gdb --args ./test_cw_ratings_dfs 1
-static bool debugMode = false;
+static bool debug_mode = false;
 
-static char *testDbPath = "consensus/cw_rating_calculator/tests/test.db";
-static char *ciriDbPath = "consensus/cw_rating_calculator/tests/ciri.db";
+static char *test_db_path = "consensus/cw_rating_calculator/tests/test.db";
+static char *ciri_db_path = "consensus/cw_rating_calculator/tests/ciri.db";
 
 enum TestTangleTopology {
   OnlyDirectApprovers,
@@ -36,7 +36,7 @@ typedef enum TestTangleTopology TestTangleTopology;
 void test_init_cw(void) {
   connection_config_t config;
 
-  config.db_path = testDbPath;
+  config.db_path = test_db_path;
   config.index_address = true;
   config.index_approvee = true;
   config.index_bundle = true;
@@ -47,12 +47,12 @@ void test_init_cw(void) {
 }
 
 void test_setup() {
-  TEST_ASSERT(copy_file(testDbPath, ciriDbPath) == RC_OK);
+  TEST_ASSERT(copy_file(test_db_path, ciri_db_path) == RC_OK);
   RUN_TEST(test_init_cw);
 }
 void test_cleanup() {
   TEST_ASSERT(iota_tangle_destroy(&tangle) == RC_OK);
-  TEST_ASSERT(remove_file(testDbPath) == RC_OK);
+  TEST_ASSERT(remove_file(test_db_path) == RC_OK);
 }
 
 void test_cw_gen_topology(TestTangleTopology topology) {
@@ -94,8 +94,8 @@ void test_cw_gen_topology(TestTangleTopology topology) {
   trit_array_p currHash = trit_array_new(NUM_TRITS_HASH);
   for (int i = 0; i < numApprovers; i++) {
     trit_array_set_trits(currHash, txs[i].hash, NUM_TRITS_HASH);
-    TEST_ASSERT(iota_tangle_load_hashes(&tangle, COL_HASH, currHash, &pack) ==
-                RC_OK);
+    TEST_ASSERT(iota_tangle_transaction_load_hashes(
+                    &tangle, TRANSACTION_COL_HASH, currHash, &pack) == RC_OK);
     TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
   }
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
@@ -139,7 +139,8 @@ void test_single_tx_tangle(void) {
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
               RC_OK);
   TEST_ASSERT(exist == true);
-  TEST_ASSERT(iota_tangle_load_hashes(&tangle, COL_HASH, ep, &pack) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_load_hashes(&tangle, TRANSACTION_COL_HASH,
+                                                  ep, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_MEMORY(pack.hashes[0]->trits, ep->trits,
                            FLEX_TRIT_SIZE_243);
@@ -196,8 +197,8 @@ void test_cw_topology_four_transactions_diamond(void) {
   trit_array_p currHash = trit_array_new(NUM_TRITS_HASH);
   for (int i = 0; i < numTxs; i++) {
     trit_array_set_trits(currHash, txs[i].hash, NUM_TRITS_HASH);
-    TEST_ASSERT(iota_tangle_load_hashes(&tangle, COL_HASH, currHash, &pack) ==
-                RC_OK);
+    TEST_ASSERT(iota_tangle_transaction_load_hashes(
+                    &tangle, TRANSACTION_COL_HASH, currHash, &pack) == RC_OK);
     TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
   }
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
@@ -222,11 +223,11 @@ int main(int argc, char *argv[]) {
   UNITY_BEGIN();
 
   if (argc >= 2) {
-    debugMode = true;
+    debug_mode = true;
   }
-  if (debugMode) {
-    testDbPath = "test.db";
-    ciriDbPath = "ciri.db";
+  if (debug_mode) {
+    test_db_path = "test.db";
+    ciri_db_path = "ciri.db";
   }
 
   RUN_TEST(test_single_tx_tangle);

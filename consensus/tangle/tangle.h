@@ -45,12 +45,11 @@ extern retcode_t iota_tangle_transaction_update(
     const tangle_t *const tangle, const char *index_name,
     const trit_array_p key, const iota_transaction_t data_in);
 
-extern retcode_t iota_tangle_load_hashes(const tangle_t *const tangle,
-                                         const char *index_name,
-                                         const trit_array_p key,
-                                         iota_hashes_pack *pack);
+extern retcode_t iota_tangle_transaction_load_hashes(
+    const tangle_t *const tangle, const char *index_name,
+    const trit_array_p key, iota_hashes_pack *pack);
 
-extern retcode_t iota_tangle_load_hashes_of_approvers(
+extern retcode_t iota_tangle_transaction_load_hashes_of_approvers(
     const tangle_t *const tangle, const trit_array_p approvee_hash,
     iota_hashes_pack *pack);
 
