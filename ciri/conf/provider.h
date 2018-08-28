@@ -8,8 +8,6 @@
 #ifndef __CIRI_CONF_PROVIDER_H__
 #define __CIRI_CONF_PROVIDER_H__
 
-#include <getopt.h>
-
 #include "common/errors.h"
 #include "ciri/conf/config.h"
 

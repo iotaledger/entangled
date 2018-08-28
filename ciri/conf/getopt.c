@@ -6,6 +6,7 @@
  */
 
 #include <stdlib.h>
+#include <getopt.h>
 
 #include "ciri/conf/provider.h"
 #include "ciri/conf/config_args.h"
