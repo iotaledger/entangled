@@ -18,15 +18,15 @@
 
 retcode_t create_index_if_not_exists(const connection_t* const conn,
                                      const char* const table_name,
-                                     const char* const indexName,
-                                     const char* const colName) {
+                                     const char* const index_name,
+                                     const char* const col_name) {
   char* errMsg = 0;
 
   char statement[TRANSACTION_MAX_CREATE_INDEX_STATEMENT_SIZE];
 
   int res = snprintf(statement, TRANSACTION_MAX_CREATE_INDEX_STATEMENT_SIZE,
-                     "CREATE INDEX IF NOT EXISTS %s ON %s(%s)", indexName,
-                     TRANSACTION_TABLE_NAME, colName);
+                     "CREATE INDEX IF NOT EXISTS %s ON %s(%s)", index_name,
+                     TRANSACTION_TABLE_NAME, col_name);
 
   if (res < 0 || res == TRANSACTION_MAX_CREATE_INDEX_STATEMENT_SIZE) {
     log_error(CONNECTION_LOGGER_ID, "Failed to write statement, statement: %s",
@@ -44,7 +44,7 @@ retcode_t create_index_if_not_exists(const connection_t* const conn,
   }
 
   log_info(CONNECTION_LOGGER_ID, "created index: %s on column: %s successfully",
-           indexName, colName);
+           index_name, col_name);
 
   return RC_OK;
 }
