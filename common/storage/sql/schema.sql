@@ -14,5 +14,5 @@ CREATE TABLE IF NOT EXISTS iota_transaction (
   attachment_timestamp_lower TIMESTAMP NOT NULL,
   attachment_timestamp_upper TIMESTAMP NOT NULL,
   nonce BLOB NOT NULL,
-  hash BLOB NOT NULL
+  hash BLOB NOT NULL PRIMARY KEY
 );

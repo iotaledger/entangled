@@ -75,6 +75,9 @@ void test_initialized_db_empty(void) {
 void test_stored_transaction(void) {
   TEST_ASSERT(iota_stor_store(&conn, (iota_transaction_t)&TEST_TRANSACTION) ==
               RC_OK);
+  // Test primary key constraint violation
+  TEST_ASSERT(iota_stor_store(&conn, (iota_transaction_t)&TEST_TRANSACTION) ==
+              RC_SQLITE3_FAILED_STEP);
   bool exist = false;
   trit_array_p col_value = trit_array_new(NUM_TRITS_ADDRESS);
   col_value->trits = (flex_trit_t *)TEST_TRANSACTION.hash;
