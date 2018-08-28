@@ -11,9 +11,9 @@
 // Forward declarations
 typedef struct _trit_array *trit_array_p;
 
-typedef struct milestone_s {
+typedef struct iota_milestone_s {
   uint64_t index;
   trit_array_p hash;
-} milestone_t;
+} iota_milestone_t;
 
 #endif  //  __COMMON_MODEL_MILESTONE_H__

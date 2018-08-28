@@ -68,7 +68,7 @@ static void select_transactions_populate_from_row(sqlite3_stmt* statement,
 }
 
 static void select_milestones_populate_from_row(sqlite3_stmt* statement,
-                                                milestone_t* milestone) {
+                                                iota_milestone_t* milestone) {
   char const* buffer;
 
   milestone->index = sqlite3_column_int64(statement, 0);
@@ -377,7 +377,7 @@ retcode_t iota_stor_transaction_update(const connection_t* const conn,
  */
 
 retcode_t iota_stor_milestone_store(const connection_t* const conn,
-                                    const milestone_t* data_in) {
+                                    const iota_milestone_t* data_in) {
   retcode_t ret = RC_OK;
   char statement[MILESTONE_MAX_STORE_STATEMENT_SIZE];
   char const* err_msg = 0;
@@ -532,7 +532,7 @@ retcode_t iota_stor_milestone_exist(const connection_t* const conn,
 retcode_t iota_stor_milestone_update(const connection_t* const conn,
                                      const char* index_name,
                                      const trit_array_p key,
-                                     const milestone_t* data_in) {
+                                     const iota_milestone_t* data_in) {
   // TODO - implement
   return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
 }

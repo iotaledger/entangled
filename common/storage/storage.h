@@ -17,7 +17,7 @@
 #include "common/trinary/trit_array.h"
 
 // Forward declaration
-typedef struct milestone_s milestone_t;
+typedef struct iota_milestone_s iota_milestone_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,7 +63,7 @@ extern retcode_t iota_stor_transaction_load_hashes_of_approvers(
  */
 
 extern retcode_t iota_stor_milestone_store(const connection_t* const conn,
-                                           const milestone_t* data_in);
+                                           const iota_milestone_t* data_in);
 
 extern retcode_t iota_stor_milestone_load(const connection_t* const conn,
                                           const char* col_name,
@@ -77,7 +77,7 @@ extern retcode_t iota_stor_milestone_exist(const connection_t* const conn,
 extern retcode_t iota_stor_milestone_update(const connection_t* const conn,
                                             const char* index_name,
                                             const trit_array_p key,
-                                            const milestone_t* data_in);
+                                            const iota_milestone_t* data_in);
 
 #ifdef __cplusplus
 }

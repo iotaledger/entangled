@@ -33,9 +33,11 @@ extern retcode_t iota_tangle_destroy(tangle_t *tangle);
 extern retcode_t iota_tangle_transaction_store(
     const tangle_t *const tangle, const iota_transaction_t data_in);
 
-extern retcode_t iota_tangle_transactions_load(
-    const tangle_t *const tangle, const char *col_name, const trit_array_p key,
-    iota_transactions_pack *data_out);
+extern retcode_t iota_tangle_transaction_load(const tangle_t *const tangle,
+                                              const char *col_name,
+                                              const trit_array_p key,
+                                              iota_transactions_pack *data_out);
+
 extern retcode_t iota_tangle_transaction_exist(const tangle_t *const tangle,
                                                const char *index_name,
                                                const trit_array_p key,

@@ -13,7 +13,7 @@
 // Forward declarations
 typedef struct _trit_array* trit_array_p;
 typedef struct _iota_transaction* iota_transaction_t;
-typedef struct milestone_s milestone_t;
+typedef struct iota_milestone_s iota_milestone_t;
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,7 +51,7 @@ retcode_t iota_transactions_select_hashes_approvers_statement(
  * Milestone statements
  */
 
-retcode_t iota_milestone_insert_statement(const milestone_t* milestone,
+retcode_t iota_milestone_insert_statement(const iota_milestone_t* milestone,
                                           char statement[],
                                           size_t statement_cap);
 
@@ -65,7 +65,7 @@ retcode_t iota_milestone_exist_statement(const char* index_col,
 
 retcode_t iota_milestone_update_statement(const char* index_col,
                                           const trit_array_p key,
-                                          const milestone_t* milestone,
+                                          const iota_milestone_t* milestone,
                                           char statement[],
                                           size_t statement_cap);
 

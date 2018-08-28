@@ -16,7 +16,7 @@
 #include "utils/logger_helper.h"
 
 // Forward declaration
-typedef struct milestone_s milestone_t;
+typedef struct iota_milestone_s iota_milestone_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,7 +32,7 @@ typedef struct iota_transactions_pack {
 } iota_transactions_pack;
 
 typedef struct iota_milestones_pack {
-  milestone_t **milestones;
+  iota_milestone_t **milestones;
   size_t txs_capacity;
   size_t num_loaded;
   bool insufficient_capacity;

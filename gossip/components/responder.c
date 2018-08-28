@@ -33,8 +33,9 @@ static retcode_t regular_transaction_request(
   pack.txs = tx;
   pack.num_loaded = 0;
   pack.txs_capacity = 1;
-  if ((ret = iota_tangle_transactions_load(&state->node->core->tangle, COL_HASH,
-                                           request->hash, &pack))) {
+  if ((ret = iota_tangle_transaction_load(&state->node->core->tangle,
+                                          TRANSACTION_COL_HASH, request->hash,
+                                          &pack))) {
     return ret;
   }
   if (pack.num_loaded == 0) {
