@@ -16,3 +16,8 @@ CREATE TABLE IF NOT EXISTS iota_transaction (
   nonce BLOB NOT NULL,
   hash BLOB NOT NULL PRIMARY KEY
 );
+
+CREATE TABLE IF NOT EXISTS iota_milestone (
+  id INTEGER NOT NULL PRIMARY KEY,
+  hash BLOB NOT NULL
+);
