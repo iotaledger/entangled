@@ -15,9 +15,14 @@
 #include "common/trinary/trit_array.h"
 #include "utils/logger_helper.h"
 
+// Forward declaration
+typedef struct milestone_s milestone_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+// TODO: code duplication
 
 typedef struct iota_transactions_pack {
   iota_transaction_t *txs;
@@ -25,6 +30,13 @@ typedef struct iota_transactions_pack {
   size_t num_loaded;
   bool insufficient_capacity;
 } iota_transactions_pack;
+
+typedef struct iota_milestones_pack {
+  milestone_t **milestones;
+  size_t txs_capacity;
+  size_t num_loaded;
+  bool insufficient_capacity;
+} iota_milestones_pack;
 
 typedef struct iota_hashes_pack {
   trit_array_p *hashes;

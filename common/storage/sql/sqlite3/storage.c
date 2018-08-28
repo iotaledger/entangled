@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "common/model/milestone.h"
 #include "common/model/transaction.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/sql/statements.h"
@@ -35,8 +36,8 @@ retcode_t iota_stor_destroy(const connection_t* const conn) {
   return RC_OK;
 }
 
-void select_transactions_populate_from_row(sqlite3_stmt* statement,
-                                           iota_transaction_t tx) {
+static void select_transactions_populate_from_row(sqlite3_stmt* statement,
+                                                  iota_transaction_t tx) {
   char const* buffer;
 
   buffer = sqlite3_column_blob(statement, 0);
@@ -65,6 +66,19 @@ void select_transactions_populate_from_row(sqlite3_stmt* statement,
   buffer = sqlite3_column_blob(statement, 15);
   memcpy(tx->hash, buffer, FLEX_TRIT_SIZE_243);
 }
+
+static void select_milestones_populate_from_row(sqlite3_stmt* statement,
+                                                milestone_t* milestone) {
+  char const* buffer;
+
+  milestone->index = sqlite3_column_int64(statement, 0);
+  buffer = sqlite3_column_blob(statement, 1);
+  memcpy(milestone->hash, buffer, FLEX_TRIT_SIZE_243);
+}
+
+/*
+ * Transaction operations
+ */
 
 retcode_t iota_stor_transaction_store(const connection_t* const conn,
                                       const iota_transaction_t data_in) {
@@ -354,6 +368,171 @@ retcode_t iota_stor_transaction_update(const connection_t* const conn,
                                        const char* index_name,
                                        const trit_array_p key,
                                        const iota_transaction_t data_in) {
+  // TODO - implement
+  return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
+}
+
+/*
+ * Milestone operations
+ */
+
+retcode_t iota_stor_milestone_store(const connection_t* const conn,
+                                    const milestone_t* data_in) {
+  retcode_t ret = RC_OK;
+  char statement[MILESTONE_MAX_STORE_STATEMENT_SIZE];
+  char const* err_msg = 0;
+  sqlite3_stmt* sqlite_statement = 0;
+
+  if ((ret = iota_milestone_insert_statement(
+           data_in, statement, MILESTONE_MAX_STORE_STATEMENT_SIZE))) {
+    return ret;
+  }
+
+  int rc = sqlite3_prepare_v2((sqlite3*)conn->db, statement, -1,
+                              &sqlite_statement, &err_msg);
+  if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed preparing statement, sqlite3 code is: %\" PRIu64 \"\n",
+              rc);
+    return RC_SQLITE3_FAILED_PREPARED_STATEMENT;
+  }
+  rc = sqlite3_bind_blob(sqlite_statement, 1, data_in->hash, FLEX_TRIT_SIZE_243,
+                         NULL);
+  if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed in binding, sqlite3 code is: %\" PRIu64 \"\n", rc);
+    return RC_SQLITE3_FAILED_BINDING;
+  }
+  rc = sqlite3_step(sqlite_statement);
+  if (rc != SQLITE_OK && rc != SQLITE_DONE) {
+    rc = sqlite3_finalize(
+        sqlite_statement);  //  Finalize the prepared statement.
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed in step, sqlite3 code is: %\" PRIu64 \"", rc);
+    return RC_SQLITE3_FAILED_STEP;
+  }
+
+  rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
+  if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed finalizing statement, sqlite3 code is: %\" PRIu64 \"",
+              rc);
+    return RC_SQLITE3_FAILED_FINALIZE;
+  }
+
+  return RC_OK;
+}
+
+retcode_t iota_stor_milestone_load(const connection_t* const conn,
+                                   const char* col_name, const trit_array_p key,
+                                   iota_milestones_pack* pack) {
+  assert(col_name && strcmp(col_name, ""));
+  retcode_t ret = RC_OK;
+  char statement[MILESTONE_MAX_SELECT_STATEMENT_SIZE];
+  char const* err_msg = 0;
+  sqlite3_stmt* sqlite_statement = 0;
+
+  if ((ret = iota_milestone_select_statement(
+           col_name, statement, MILESTONE_MAX_SELECT_STATEMENT_SIZE))) {
+    return ret;
+  }
+
+  pack->insufficient_capacity = false;
+
+  int rc = sqlite3_prepare_v2((sqlite3*)conn->db, statement, -1,
+                              &sqlite_statement, &err_msg);
+  if (rc != SQLITE_OK) {
+    sqlite3_finalize(sqlite_statement);
+    return RC_SQLITE3_FAILED_PREPARED_STATEMENT;
+  }
+
+  rc = sqlite3_bind_blob(sqlite_statement, 1, (void*)key->trits, key->num_bytes,
+                         NULL);
+
+  if (rc != SQLITE_OK) {
+    sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed in binding, sqlite3 code is: %\" PRIu64 \"", rc);
+    return RC_SQLITE3_FAILED_BINDING;
+  }
+
+  pack->insufficient_capacity = false;
+  while (sqlite3_step(sqlite_statement) ==
+         SQLITE_ROW) {  // While query has result-rows.
+    if (pack->num_loaded == pack->txs_capacity) {
+      pack->insufficient_capacity = true;
+      break;
+    }
+    select_milestones_populate_from_row(sqlite_statement,
+                                        pack->milestones[pack->num_loaded++]);
+  }
+
+  rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement
+  if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed in finalizing, sqlite3 code is: %\" PRIu64 \"", rc);
+    return RC_SQLITE3_FAILED_FINALIZE;
+  }
+
+  return RC_OK;
+}
+
+retcode_t iota_stor_milestone_exist(const connection_t* const conn,
+                                    const char* index_name,
+                                    const trit_array_p key, bool* exist) {
+  retcode_t ret = RC_OK;
+  char const* err_msg = 0;
+  sqlite3_stmt* sqlite_statement = 0;
+  char statement[MILESTONE_MAX_SELECT_STATEMENT_SIZE];
+
+  if ((ret = iota_milestone_exist_statement(
+           index_name, statement, MILESTONE_MAX_SELECT_STATEMENT_SIZE))) {
+    return ret;
+  }
+
+  *exist = false;
+
+  int rc = sqlite3_prepare_v2((sqlite3*)conn->db, statement, -1,
+                              &sqlite_statement, &err_msg);
+
+  if (rc != SQLITE_OK) {
+    sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
+    log_error(
+        SQLITE3_LOGGER_ID,
+        "Failed in preparing the statement, sqlite3 code is: %\" PRIu64 \"",
+        rc);
+    return RC_SQLITE3_FAILED_PREPARED_STATEMENT;
+  }
+
+  if (key) {
+    rc = sqlite3_bind_blob(sqlite_statement, 1, (void*)key->trits,
+                           key->num_bytes, NULL);
+
+    if (rc != SQLITE_OK) {
+      return RC_SQLITE3_FAILED_BINDING;
+    }
+  }
+
+  if (sqlite3_step(sqlite_statement) == SQLITE_ROW) {
+    *exist = true;
+  }
+
+  rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement
+  if (rc != SQLITE_OK) {
+    log_error(
+        SQLITE3_LOGGER_ID,
+        "Failed in finalizing the statement, sqlite3 code is: %\" PRIu64 \"",
+        rc);
+    return RC_SQLITE3_FAILED_FINALIZE;
+  }
+
+  return RC_OK;
+}
+
+retcode_t iota_stor_milestone_update(const connection_t* const conn,
+                                     const char* index_name,
+                                     const trit_array_p key,
+                                     const milestone_t* data_in) {
   // TODO - implement
   return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
 }
