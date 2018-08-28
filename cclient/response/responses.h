@@ -8,6 +8,7 @@
 #ifndef CCLIENT_RESPONSE_RESPONSES_H
 #define CCLIENT_RESPONSE_RESPONSES_H
 
+#include "add_neighbors.h"
 #include "find_transactions.h"
 #include "get_balances.h"
 #include "get_inclusion_state.h"
