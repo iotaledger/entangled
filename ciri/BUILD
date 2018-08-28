@@ -6,8 +6,8 @@ cc_binary(
     copts = ["-DLOGGER_ENABLE"],
     deps = [
         ":core",
+        "//ciri/conf:conf_provider",
         "//utils/containers/lists:concurrent_list_neighbor",
-        "//ciri/conf:conf_provider"
     ],
 )
 
@@ -16,6 +16,7 @@ cc_library(
     hdrs = ["core.h"],
     deps = [
         ":node_shared",
+        "//ciri/conf:config",
         "//consensus/tangle",
     ],
 )
@@ -38,7 +39,6 @@ cc_library(
         "//gossip/components:receiver_shared",
         "//gossip/components:requester_shared",
         "//gossip/components:responder_shared",
-        "//ciri/conf:config"
     ],
 )
 

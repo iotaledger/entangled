@@ -8,9 +8,9 @@
 #ifndef __CIRI_CORE_H__
 #define __CIRI_CORE_H__
 
+#include "ciri/conf/config.h"
 #include "ciri/node.h"
 #include "consensus/tangle/tangle.h"
-#include "ciri/conf/config.h"
 
 typedef struct core_s {
   bool running;
