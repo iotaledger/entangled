@@ -11,9 +11,8 @@
 #include <stdint.h>
 
 typedef struct ciri_config_s {
-    uint16_t tcp_port;
-    uint16_t udp_port;
-    // add other config variables here
+  uint16_t tcp_port;
+  uint16_t udp_port;
 } ciri_config_t;
 
-#endif // __CIRI_CONF_CONFIG_H__
+#endif  // __CIRI_CONF_CONFIG_H__

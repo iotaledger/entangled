@@ -8,10 +8,10 @@
 #ifndef __CIRI_CONF_PROVIDER_H__
 #define __CIRI_CONF_PROVIDER_H__
 
-#include "common/errors.h"
 #include "ciri/conf/config.h"
+#include "common/errors.h"
 
 retcode_t ciri_conf_init(ciri_config_t* config);
 retcode_t ciri_conf_parse(ciri_config_t* out, size_t argc, char** argv);
 
-#endif // __CIRI_CONF_PROVIDER_H__
+#endif  // __CIRI_CONF_PROVIDER_H__

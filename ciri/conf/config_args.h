@@ -9,9 +9,9 @@
 #define __CIRI_CONF_ARGS_H__
 
 char* short_options = "u:t:";
-struct option long_options[] = {                                                                    
+struct option long_options[] = {
     {"udp-receiver-port", required_argument, 0, 'u'},
     {"tcp-receiver-port", required_argument, 0, 't'},
 };
 
-#endif // __CIRI_CONF_ARGS_H__
+#endif  // __CIRI_CONF_ARGS_H__
