@@ -14,7 +14,6 @@
 #include "gossip/components/receiver.h"
 #include "gossip/components/requester.h"
 #include "gossip/components/responder.h"
-#include "ciri/conf/config.h"
 
 // Forward declarations
 typedef struct core_s core_t;
