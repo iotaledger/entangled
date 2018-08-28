@@ -114,6 +114,13 @@ typedef struct {
   size_t (*get_transactions_to_approve_deserialize_response_get_size)(
       const serializer_t* const, const char* const toDeserialize);
 
+  // addNeighbors
+  retcode_t (*add_neighbors_serialize_request)(const serializer_t* const s,
+                                               add_neighbors_req_t* const obj,
+                                               char_buffer_t* out);
+  retcode_t (*add_neighbors_deserialize_response)(const serializer_t* const s,
+                                                  const char* const obj,
+                                                  add_neighbors_res_t* out);
 } serializer_vtable;
 
 typedef struct serializer_base {

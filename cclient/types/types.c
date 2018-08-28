@@ -21,7 +21,7 @@ retcode_t char_buffer_allocate(char_buffer_t* in, size_t n) {
   in->data = (char*)malloc(sizeof(char) * (n + 1));
   if (in->data == NULL) return RC_CCLIENT_OOM;
   in->length = n;
-  memset(in->data, '\0', 1);
+  *(in->data + n) = '\0';
   return RC_OK;
 }
 

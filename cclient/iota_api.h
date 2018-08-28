@@ -55,8 +55,8 @@ iota_api_result_t iota_api_get_neighbors(
  * @return error value.
  */
 iota_api_result_t iota_api_add_neighbors(
-    const iota_http_service_t* const service,
-    const add_neighbors_req_t* const req);
+    const iota_http_service_t* const service, add_neighbors_req_t* req,
+    add_neighbors_res_t* res);
 
 /**
  * Removes a list of neighbors from your iri node. This is only temporary, and

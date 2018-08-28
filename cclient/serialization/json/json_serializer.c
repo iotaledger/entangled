@@ -36,7 +36,9 @@ retcode_t utarray_to_json_array(UT_array* ut, cJSON* json_root,
                                 const char* obj_name) {
   if (utarray_len(ut) > 0) {
     cJSON* array_obj = cJSON_CreateArray();
-    if (array_obj == NULL) return RC_CCLIENT_JSON_CREATE;
+    if (array_obj == NULL) {
+      return RC_CCLIENT_JSON_CREATE;
+    }
 
     cJSON_AddItemToObject(json_root, obj_name, array_obj);
     char** p = NULL;
@@ -50,7 +52,9 @@ retcode_t utarray_to_json_array(UT_array* ut, cJSON* json_root,
 retcode_t json_get_size(const cJSON* json_obj, const char* obj_name,
                         size_t* num) {
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
-  if (json_value == NULL) return RC_CCLIENT_JSON_KEY;
+  if (json_value == NULL) {
+    return RC_CCLIENT_JSON_KEY;
+  }
 
   if (cJSON_IsNumber(json_value)) {
     *num = (size_t)json_value->valuedouble;
@@ -63,7 +67,9 @@ retcode_t json_get_size(const cJSON* json_obj, const char* obj_name,
 
 retcode_t json_get_int(const cJSON* json_obj, const char* obj_name, int* num) {
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
-  if (json_value == NULL) return RC_CCLIENT_JSON_KEY;
+  if (json_value == NULL) {
+    return RC_CCLIENT_JSON_KEY;
+  }
 
   if (cJSON_IsNumber(json_value)) {
     *num = json_value->valueint;
@@ -103,7 +109,9 @@ retcode_t json_find_transactions_serialize_request(
   const char* json_text = NULL;
   size_t len = 0;
   cJSON* json_root = cJSON_CreateObject();
-  if (json_root == NULL) return RC_CCLIENT_JSON_CREATE;
+  if (json_root == NULL) {
+    return RC_CCLIENT_JSON_CREATE;
+  }
 
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("findTransactions"));
@@ -129,15 +137,15 @@ retcode_t json_find_transactions_serialize_request(
   }
 
   json_text = cJSON_PrintUnformatted(json_root);
-  len = strlen(json_text);
-  ret = char_buffer_allocate(out, len);
-  if (ret == RC_OK) {
-    strncpy(out->data, json_text, len);
-  }
-
   if (json_text) {
+    len = strlen(json_text);
+    ret = char_buffer_allocate(out, len);
+    if (ret == RC_OK) {
+      strncpy(out->data, json_text, len);
+    }
     cJSON_free((void*)json_text);
   }
+
   cJSON_Delete(json_root);
   return ret;
 
@@ -444,4 +452,63 @@ size_t json_get_transactions_to_approve_serialize_request_get_size(
 size_t json_get_transactions_to_approve_deserialize_response_get_size(
     const serializer_t* const s, const char* const toDeserialize) {
   return 0;
+}
+
+retcode_t json_add_neighbors_serialize_request(const serializer_t* const s,
+                                               add_neighbors_req_t* obj,
+                                               char_buffer_t* out) {
+  retcode_t ret = RC_OK;
+  const char* json_text = NULL;
+  size_t len = 0;
+  cJSON* json_root = cJSON_CreateObject();
+  if (json_root == NULL) {
+    return RC_CCLIENT_JSON_CREATE;
+  }
+
+  cJSON_AddItemToObject(json_root, "command",
+                        cJSON_CreateString("addNeighbors"));
+
+  ret = utarray_to_json_array(obj, json_root, "uris");
+  if (ret != RC_OK) {
+    cJSON_Delete(json_root);
+    return ret;
+  }
+
+  json_text = cJSON_PrintUnformatted(json_root);
+  if (json_text) {
+    len = strlen(json_text);
+    ret = char_buffer_allocate(out, len);
+    if (ret == RC_OK) {
+      strncpy(out->data, json_text, len);
+    }
+    cJSON_free((void*)json_text);
+  }
+
+  cJSON_Delete(json_root);
+  return ret;
+}
+
+retcode_t json_add_neighbors_deserialize_response(const serializer_t* const s,
+                                                  const char* const obj,
+                                                  add_neighbors_res_t* out) {
+  retcode_t ret = RC_OK;
+  cJSON* json_obj = cJSON_Parse(obj);
+  cJSON* json_item = NULL;
+
+  if (json_obj == NULL) {
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
+  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
+    // TODO log the error message from response.
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_RES_ERROR;
+  }
+
+  ret = json_get_int(json_obj, "addedNeighbors", out);
+
+  cJSON_Delete(json_obj);
+  return ret;
 }

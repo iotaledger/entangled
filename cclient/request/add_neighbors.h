@@ -14,13 +14,12 @@ extern "C" {
 
 #include "types/types.h"
 
-typedef struct {
-  /**
-   * List of neighbors URIs
-   */
-  trit_array_array uris;
+/* List of neighbors URIs */
+typedef UT_array add_neighbors_req_t;
 
-} add_neighbors_req_t;
+add_neighbors_req_t* add_neighbors_req_new();
+void add_neighbors_req_add(add_neighbors_req_t* uris, const char* uri);
+void add_neighbors_req_free(add_neighbors_req_t* ut);
 
 #ifdef __cplusplus
 }

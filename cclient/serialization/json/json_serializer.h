@@ -111,6 +111,15 @@ size_t json_get_transactions_to_approve_serialize_request_get_size(
 size_t json_get_transactions_to_approve_deserialize_response_get_size(
     const serializer_t* const, const char* const toDeserialize);
 
+// addNeighbors
+retcode_t json_add_neighbors_serialize_request(const serializer_t* const s,
+                                               add_neighbors_req_t* obj,
+                                               char_buffer_t* out);
+
+retcode_t json_add_neighbors_deserialize_response(const serializer_t* const s,
+                                                  const char* const obj,
+                                                  add_neighbors_res_t* out);
+
 static serializer_vtable json_vtable = {
     .find_transactions_serialize_request =
         json_find_transactions_serialize_request,
@@ -155,6 +164,9 @@ static serializer_vtable json_vtable = {
         json_get_transactions_to_approve_deserialize_response,
     .get_transactions_to_approve_deserialize_response_get_size =
         json_get_transactions_to_approve_deserialize_response_get_size,
+    .add_neighbors_serialize_request = json_add_neighbors_serialize_request,
+    .add_neighbors_deserialize_response =
+        json_add_neighbors_deserialize_response,
 };
 
 #ifdef __cplusplus
