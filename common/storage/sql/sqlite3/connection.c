@@ -29,8 +29,8 @@ retcode_t create_index_if_not_exists(const connection_t* const conn,
                      TRANSACTION_TABLE_NAME, col_name);
 
   if (res < 0 || res == TRANSACTION_MAX_CREATE_INDEX_STATEMENT_SIZE) {
-    log_error(CONNECTION_LOGGER_ID, "Failed to write statement, statement: %s",
-              statement);
+    log_error(CONNECTION_LOGGER_ID,
+              "Failed to write statement, statement: %s\n", statement);
     return RC_SQLITE3_FAILED_WRITE_STATEMENT;
   }
 
@@ -43,8 +43,9 @@ retcode_t create_index_if_not_exists(const connection_t* const conn,
     return RC_SQLITE3_FAILED_CREATE_INDEX_DB;
   }
 
-  log_info(CONNECTION_LOGGER_ID, "created index: %s on column: %s successfully",
-           index_name, col_name);
+  log_info(CONNECTION_LOGGER_ID,
+           "created index: %s on column: %s successfully\n", index_name,
+           col_name);
 
   return RC_OK;
 }
@@ -57,7 +58,7 @@ retcode_t init_connection(const connection_t* const conn,
   char* sql;
 
   if (config->db_path == NULL) {
-    log_critical(CONNECTION_LOGGER_ID, "No path for db specified");
+    log_critical(CONNECTION_LOGGER_ID, "No path for db specified\n");
     return RC_SQLITE3_NO_PATH_FOR_DB_SPECIFIED;
   } else {
     rc = sqlite3_open_v2(config->db_path, (sqlite3**)&conn->db,
@@ -65,11 +66,12 @@ retcode_t init_connection(const connection_t* const conn,
   }
 
   if (rc) {
-    log_critical(CONNECTION_LOGGER_ID, "Failed to open db on path: %s",
+    log_critical(CONNECTION_LOGGER_ID, "Failed to open db on path: %s\n",
                  config->db_path);
   } else {
     log_info(CONNECTION_LOGGER_ID,
-             "Opened database (from path: %s ) successfully", config->db_path);
+             "Opened database (from path: %s ) successfully\n",
+             config->db_path);
   }
 
   if (config->index_approvee) {
@@ -126,7 +128,7 @@ retcode_t init_connection(const connection_t* const conn,
   rc = sqlite3_exec((sqlite3*)conn->db, sql, 0, 0, &err_msg);
 
   if (rc != SQLITE_OK) {
-    log_error(CONNECTION_LOGGER_ID, "Failed in statement: %s", sql);
+    log_error(CONNECTION_LOGGER_ID, "Failed in statement: %s\n", sql);
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
@@ -135,18 +137,18 @@ retcode_t init_connection(const connection_t* const conn,
   rc = sqlite3_exec((sqlite3*)conn->db, sql, 0, 0, &err_msg);
 
   if (rc != SQLITE_OK) {
-    log_error(CONNECTION_LOGGER_ID, "Failed in statement: %s", sql);
+    log_error(CONNECTION_LOGGER_ID, "Failed in statement: %s\n", sql);
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
 
-  log_info(CONNECTION_LOGGER_ID, "connection initialised successfully");
+  log_info(CONNECTION_LOGGER_ID, "connection initialised successfully\n");
 
   return retcode;
 }
 
 retcode_t destroy_connection(const connection_t* const conn) {
-  log_info(CONNECTION_LOGGER_ID, "Destroying connection");
+  log_info(CONNECTION_LOGGER_ID, "Destroying connection\n");
   sqlite3_close((sqlite3*)conn->db);
   return RC_OK;
 }
