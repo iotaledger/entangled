@@ -22,7 +22,6 @@ retcode_t core_init(core_t* const core) {
   }
 
   logger_helper_init(CORE_LOGGER_ID, LOGGER_DEBUG, true);
-  memset(core, 0, sizeof(core_t));
   core->running = false;
 
   log_info(CORE_LOGGER_ID, "Initializing tangle\n");

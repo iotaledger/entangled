@@ -8,11 +8,13 @@
 #ifndef __CIRI_CORE_H__
 #define __CIRI_CORE_H__
 
+#include "ciri/conf/config.h"
 #include "ciri/node.h"
 #include "consensus/tangle/tangle.h"
 
 typedef struct core_s {
   bool running;
+  ciri_config_t config;
   node_t node;
   tangle_t tangle;
   connection_config_t db_conf;
