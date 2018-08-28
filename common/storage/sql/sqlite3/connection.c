@@ -22,13 +22,13 @@ retcode_t create_index_if_not_exists(const connection_t* const conn,
                                      const char* const colName) {
   char* errMsg = 0;
 
-  char statement[MAX_CREATE_INDEX_STATEMENT_SIZE];
+  char statement[TRANSACTION_MAX_CREATE_INDEX_STATEMENT_SIZE];
 
-  int res = snprintf(statement, MAX_CREATE_INDEX_STATEMENT_SIZE,
+  int res = snprintf(statement, TRANSACTION_MAX_CREATE_INDEX_STATEMENT_SIZE,
                      "CREATE INDEX IF NOT EXISTS %s ON %s(%s)", indexName,
                      TRANSACTION_TABLE_NAME, colName);
 
-  if (res < 0 || res == MAX_CREATE_INDEX_STATEMENT_SIZE) {
+  if (res < 0 || res == TRANSACTION_MAX_CREATE_INDEX_STATEMENT_SIZE) {
     log_error(CONNECTION_LOGGER_ID, "Failed to write statement, statement: %s",
               statement);
     return RC_SQLITE3_FAILED_WRITE_STATEMENT;
@@ -74,39 +74,45 @@ retcode_t init_connection(const connection_t* const conn,
 
   if (config->index_approvee) {
     if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                              TRUNK_INDEX, COL_TRUNK))) {
+                                              TRANSACTION_TRUNK_INDEX,
+                                              TRANSACTION_COL_TRUNK))) {
       return retcode;
     }
-    if (create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME, BRANCH_INDEX,
-                                   COL_BRANCH)) {
+    if (create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                   TRANSACTION_BRANCH_INDEX,
+                                   TRANSACTION_COL_BRANCH)) {
       return retcode;
     }
   }
 
   if (config->index_address) {
     if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                              ADDRESS_INDEX, COL_ADDRESS))) {
+                                              TRANSACTION_ADDRESS_INDEX,
+                                              TRANSACTION_COL_ADDRESS))) {
       return retcode;
     }
   }
 
   if (config->index_bundle) {
     if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                              BUNDLE_INDEX, COL_BUNDLE))) {
+                                              TRANSACTION_BUNDLE_INDEX,
+                                              TRANSACTION_COL_BUNDLE))) {
       return retcode;
     }
   }
 
   if (config->index_tag) {
     if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                              TAG_INDEX, COL_TAG))) {
+                                              TRANSACTION_TAG_INDEX,
+                                              TRANSACTION_COL_TAG))) {
       return retcode;
     }
   }
 
   if (config->index_hash) {
     if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                              HASH_INDEX, COL_HASH))) {
+                                              TRANSACTION_HASH_INDEX,
+                                              TRANSACTION_COL_HASH))) {
       return retcode;
     }
   }

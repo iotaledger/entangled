@@ -68,7 +68,8 @@ void test_initialized_db_empty(void) {
 
   trit_array_p col_value = trit_array_new(NUM_TRITS_HASH);
   col_value->trits = (flex_trit_t *)HASH;
-  TEST_ASSERT(iota_stor_exist(&conn, COL_HASH, col_value, &exist) == RC_OK);
+  TEST_ASSERT(iota_stor_exist(&conn, TRANSACTION_COL_HASH, col_value, &exist) ==
+              RC_OK);
   TEST_ASSERT(exist == false);
 }
 
@@ -83,7 +84,8 @@ void test_stored_transaction(void) {
   col_value->trits = (flex_trit_t *)TEST_TRANSACTION.hash;
   TEST_ASSERT(iota_stor_exist(&conn, NULL, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
-  TEST_ASSERT(iota_stor_exist(&conn, COL_HASH, col_value, &exist) == RC_OK);
+  TEST_ASSERT(iota_stor_exist(&conn, TRANSACTION_COL_HASH, col_value, &exist) ==
+              RC_OK);
   TEST_ASSERT(exist == true);
 
   TEST_ASSERT(iota_stor_exist(&conn, NULL, NULL, &exist) == RC_OK);
@@ -99,7 +101,8 @@ void test_stored_transaction(void) {
     pack.txs[i] = transaction_new();
   }
 
-  TEST_ASSERT(iota_stor_load(&conn, COL_HASH, col_value, &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_load(&conn, TRANSACTION_COL_HASH, col_value, &pack) ==
+              RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
 
   TEST_ASSERT_EQUAL_MEMORY(txs[0]->nonce, TEST_TRANSACTION.nonce,
@@ -145,7 +148,8 @@ void test_stored_load_hashes_by_address(void) {
   pack.hashes_capacity = 5;
   trit_array_p key = trit_array_new(NUM_TRITS_ADDRESS);
   memcpy(key->trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_stor_load_hashes(&conn, COL_ADDRESS, key, &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_load_hashes(&conn, TRANSACTION_COL_ADDRESS, key,
+                                    &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_MEMORY(TEST_TRANSACTION.hash, pack.hashes[0]->trits,
                            FLEX_TRIT_SIZE_243);

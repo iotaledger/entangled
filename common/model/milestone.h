@@ -12,7 +12,7 @@
 typedef struct _trit_array *trit_array_p;
 
 typedef struct milestone_s {
-  size_t index;
+  uint64_t index;
   trit_array_p hash;
 } milestone_t;
 
