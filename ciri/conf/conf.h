@@ -22,7 +22,7 @@ typedef struct ciri_conf_s {
   bool testnet;
   bool remote;
   char *remote_auth_token;
-  char *remote_limite_api;
+  char *remote_limit_api;
   float send_limit;
   size_t max_peers;
   bool dns_resolution;

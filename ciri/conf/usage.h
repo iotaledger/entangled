@@ -40,17 +40,17 @@ static struct ciri_argument_s {
      NO_ARG},
     {"remote", 'r', "Remotely access your node and send API commands", NO_ARG},
     {"remote-auth", 'a',
-     "Require authentication password for accessing remotely. Requires a "
+     "Requires authentication password for accessing remotely. Requires a "
      "correct username:hashedpassword combination",
      REQUIRED_ARG},
     {"remote-limit-api", 'l',
-     "Exclude certain API calls from being able to be accessed remotely",
+     "Excludes certain API calls from being able to be accessed remotely",
      REQUIRED_ARG},
     {"send-limit", 's',
-     "Limit the outbound bandwidth consumption. Limit is set to mbit/s",
+     "Limits the outbound bandwidth consumption. Limit is set to mbit/s",
      REQUIRED_ARG},
     {"max-peers", 'm',
-     "Limit the number of max accepted peers. Default is set to 0 (mutual "
+     "Limits the number of max accepted peers. Default is set to 0 (mutual "
      "tethering)",
      REQUIRED_ARG},
     {"dns-resolution-false", 'd', "Ignores DNS resolution refreshing", NO_ARG},

@@ -74,7 +74,7 @@ retcode_t ciri_conf_parse(ciri_conf_t* conf, int argc, char** argv) {
         conf->remote_auth_token = optarg;
         break;
       case 'l':  // --remote-limit-api
-        conf->remote_limite_api = optarg;
+        conf->remote_limit_api = optarg;
         break;
       case 's':  // --send-limit
         conf->send_limit = atof(optarg);

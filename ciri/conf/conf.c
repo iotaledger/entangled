@@ -24,7 +24,7 @@ retcode_t ciri_conf_init(ciri_conf_t* conf) {
   conf->testnet = CONF_DEFAULT_TESTNET;
   conf->remote = CONF_DEFAULT_REMOTE;
   conf->remote_auth_token = CONF_DEFAULT_REMOTE_AUTH_TOKEN;
-  conf->remote_limite_api = CONF_DEFAULT_REMOTE_LIMIT_API;
+  conf->remote_limit_api = CONF_DEFAULT_REMOTE_LIMIT_API;
   conf->send_limit = CONF_DEFAULT_SEND_LIMIT;
   conf->max_peers = CONF_DEFAULT_MAX_PEERS;
   conf->dns_resolution = CONF_DEFAULT_DNS_RESOLUTION;
