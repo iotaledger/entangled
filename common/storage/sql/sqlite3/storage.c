@@ -379,6 +379,7 @@ static void select_milestones_populate_from_row(sqlite3_stmt* statement,
 
 retcode_t iota_stor_milestone_store(const connection_t* const conn,
                                     const iota_milestone_t* data_in) {
+  assert(data_in);
   retcode_t ret = RC_OK;
   char statement[MILESTONE_MAX_STORE_STATEMENT_SIZE];
   char const* err_msg = 0;
@@ -479,7 +480,7 @@ retcode_t iota_stor_milestone_load(const connection_t* const conn,
 }
 
 retcode_t iota_stor_milestone_exist(const connection_t* const conn,
-                                    const char* index_name,
+                                    const char* col_name,
                                     const trit_array_p key, bool* exist) {
   retcode_t ret = RC_OK;
   char const* err_msg = 0;
@@ -487,7 +488,7 @@ retcode_t iota_stor_milestone_exist(const connection_t* const conn,
   char statement[MILESTONE_MAX_EXIST_STATEMENT_SIZE];
 
   if ((ret = iota_statement_milestone_exist(
-           index_name, statement, MILESTONE_MAX_EXIST_STATEMENT_SIZE))) {
+           col_name, statement, MILESTONE_MAX_EXIST_STATEMENT_SIZE))) {
     return ret;
   }
 
