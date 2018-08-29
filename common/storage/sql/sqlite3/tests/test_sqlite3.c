@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+
 #include <unity/unity.h>
 
 #include "common/model/milestone.h"
@@ -69,9 +70,9 @@ void test_init_connection(void) {
 void test_initialized_db_empty_transaction(void) {
   bool exist = false;
 
-  trit_array_p col_value = trit_array_new(NUM_TRITS_HASH);
-  col_value->trits = (flex_trit_t *)HASH;
-  TEST_ASSERT(iota_stor_milestone_exist(&conn, MILESTONE_COL_HASH, col_value,
+  TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
+  memcpy(hash.trits, HASH, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT(iota_stor_milestone_exist(&conn, MILESTONE_COL_HASH, &hash,
                                         &exist) == RC_OK);
   TEST_ASSERT(exist == false);
 }
@@ -79,10 +80,10 @@ void test_initialized_db_empty_transaction(void) {
 void test_initialized_db_empty_milestone(void) {
   bool exist = false;
 
-  trit_array_p col_value = trit_array_new(NUM_TRITS_HASH);
-  col_value->trits = (flex_trit_t *)HASH;
-  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_COL_HASH,
-                                          col_value, &exist) == RC_OK);
+  TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
+  memcpy(hash.trits, HASH, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_COL_HASH, &hash,
+                                          &exist) == RC_OK);
   TEST_ASSERT(exist == false);
 }
 
@@ -94,12 +95,13 @@ void test_stored_transaction(void) {
                   &conn, (iota_transaction_t)&TEST_TRANSACTION) ==
               RC_SQLITE3_FAILED_STEP);
   bool exist = false;
-  trit_array_p col_value = trit_array_new(NUM_TRITS_ADDRESS);
-  col_value->trits = (flex_trit_t *)TEST_TRANSACTION.hash;
+
+  TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
+  memcpy(hash.trits, TEST_TRANSACTION.hash, FLEX_TRIT_SIZE_243);
   TEST_ASSERT(iota_stor_transaction_exist(&conn, NULL, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
-  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_COL_HASH,
-                                          col_value, &exist) == RC_OK);
+  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_COL_HASH, &hash,
+                                          &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
   TEST_ASSERT(iota_stor_transaction_exist(&conn, NULL, NULL, &exist) == RC_OK);
@@ -115,7 +117,7 @@ void test_stored_transaction(void) {
     pack.models[i] = transaction_new();
   }
 
-  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_COL_HASH, col_value,
+  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_COL_HASH, &hash,
                                          &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
 
@@ -205,10 +207,10 @@ void test_stored_load_hashes_by_address(void) {
     pack.models[i] = trit_array_new(NUM_TRITS_ADDRESS);
   }
   pack.capacity = 5;
-  trit_array_p key = trit_array_new(NUM_TRITS_ADDRESS);
-  memcpy(key->trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
+  TRIT_ARRAY_DECLARE(key, NUM_TRITS_HASH);
+  memcpy(key.trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
   TEST_ASSERT(iota_stor_transaction_load_hashes(&conn, TRANSACTION_COL_ADDRESS,
-                                                key, &pack) == RC_OK);
+                                                &key, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_MEMORY(TEST_TRANSACTION.hash,
                            ((trit_array_p)pack.models[0])->trits,
@@ -229,9 +231,9 @@ void test_stored_load_hashes_of_approvers(void) {
     pack.models[i] = trit_array_new(NUM_TRITS_HASH);
   }
   pack.capacity = 5;
-  trit_array_p key = trit_array_new(NUM_TRITS_HASH);
-  memcpy(key->trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_stor_transaction_load_hashes_of_approvers(&conn, key,
+  TRIT_ARRAY_DECLARE(key, NUM_TRITS_HASH);
+  memcpy(key.trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT(iota_stor_transaction_load_hashes_of_approvers(&conn, &key,
                                                              &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(0, pack.num_loaded);
 
