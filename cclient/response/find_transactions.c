@@ -33,6 +33,5 @@ void find_transactions_res_free(find_transactions_res_t* res) {
   if (res) {
     utarray_free(res->hashes);
     free(res);
-    res = NULL;
   }
 }

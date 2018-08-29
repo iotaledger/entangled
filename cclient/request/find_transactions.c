@@ -24,7 +24,6 @@ void find_transactions_req_free(find_transactions_req_t* req) {
     utarray_free(req->approvees);
     utarray_free(req->bundles);
     free(req);
-    req = NULL;
   }
 }
 
