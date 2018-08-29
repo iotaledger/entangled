@@ -6,7 +6,8 @@
  */
 
 #include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
-#include "common/storage/packs.h"
+#include "common/storage/pack.h"
+#include "utils/logger_helper.h"
 
 static retcode_t cw_rating_dfs_do_dfs_from_db(
     const cw_rating_calculator_t *const cw_calc, trit_array_p entry_point,

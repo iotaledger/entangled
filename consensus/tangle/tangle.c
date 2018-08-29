@@ -6,6 +6,7 @@
  */
 
 #include "consensus/tangle/tangle.h"
+#include "utils/logger_helper.h"
 
 #define TANGLE_LOGGER_ID "consensus_tangle"
 
