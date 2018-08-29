@@ -37,11 +37,12 @@ void test_init_cw(void) {
   connection_config_t config;
 
   config.db_path = test_db_path;
-  config.index_address = true;
-  config.index_approvee = true;
-  config.index_bundle = true;
-  config.index_tag = true;
-  config.index_hash = true;
+  config.index_transaction_address = true;
+  config.index_transaction_approvee = true;
+  config.index_transaction_bundle = true;
+  config.index_transaction_tag = true;
+  config.index_transaction_hash = true;
+  config.index_milestone_hash = true;
   TEST_ASSERT(iota_tangle_init(&tangle, &config) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
 }
