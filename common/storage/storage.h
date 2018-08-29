@@ -11,13 +11,13 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
-#include "common/model/transaction.h"
 #include "common/storage/connection.h"
-#include "common/storage/packs.h"
+#include "common/storage/pack.h"
 #include "common/trinary/trit_array.h"
 
 // Forward declaration
 typedef struct iota_milestone_s iota_milestone_t;
+typedef struct _iota_transaction* iota_transaction_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,11 +73,6 @@ extern retcode_t iota_stor_milestone_load(const connection_t* const conn,
 extern retcode_t iota_stor_milestone_exist(const connection_t* const conn,
                                            const char* index_name,
                                            const trit_array_p key, bool* exist);
-
-extern retcode_t iota_stor_milestone_update(const connection_t* const conn,
-                                            const char* index_name,
-                                            const trit_array_p key,
-                                            const iota_milestone_t* data_in);
 
 #ifdef __cplusplus
 }

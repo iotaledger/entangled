@@ -7,7 +7,10 @@
 
 #include <stdlib.h>
 
-#include "common/storage/packs.h"
+#include "common/model/transaction.h"
+#include "common/storage/pack.h"
+#include "common/trinary/trit_array.h"
+#include "utils/logger_helper.h"
 
 #define STORAGE_PACKS_LOGGER_ID "storage_packs"
 

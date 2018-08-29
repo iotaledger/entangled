@@ -9,11 +9,8 @@
 #define __COMMON_STORAGE_CONNECTION_H__
 
 #include <stdbool.h>
-#include <stdint.h>
 
 #include "common/errors.h"
-
-#include <logger.h>
 
 #ifdef __cplusplus
 extern "C" {

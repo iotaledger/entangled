@@ -530,11 +530,3 @@ retcode_t iota_stor_milestone_exist(const connection_t* const conn,
 
   return RC_OK;
 }
-
-retcode_t iota_stor_milestone_update(const connection_t* const conn,
-                                     const char* index_name,
-                                     const trit_array_p key,
-                                     const iota_milestone_t* data_in) {
-  // TODO - implement
-  return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
-}

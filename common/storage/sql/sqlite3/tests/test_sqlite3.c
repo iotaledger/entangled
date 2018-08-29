@@ -10,6 +10,7 @@
 #include <unity/unity.h>
 
 #include "common/model/milestone.h"
+#include "common/model/transaction.h"
 #include "common/storage/connection.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
