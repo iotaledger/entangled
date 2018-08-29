@@ -5,14 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/storage/connection.h"
-#include "common/storage/sql/defs.h"
-#include "utils/logger_helper.h"
-
-#include <sqlite3.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <sqlite3.h>
+
+#include "common/storage/connection.h"
+#include "common/storage/sql/defs.h"
+#include "utils/logger_helper.h"
 
 #define CONNECTION_LOGGER_ID "stor_sqlite3_conn"
 
@@ -20,7 +21,7 @@ retcode_t create_index_if_not_exists(const connection_t* const conn,
                                      const char* const table_name,
                                      const char* const index_name,
                                      const char* const col_name) {
-  char* errMsg = 0;
+  char* err_msg = 0;
 
   char statement[MAX_CREATE_INDEX_STATEMENT_SIZE];
 
@@ -34,12 +35,12 @@ retcode_t create_index_if_not_exists(const connection_t* const conn,
     return RC_SQLITE3_FAILED_WRITE_STATEMENT;
   }
 
-  int rc = sqlite3_exec((sqlite3*)conn->db, statement, 0, 0, &errMsg);
+  int rc = sqlite3_exec((sqlite3*)conn->db, statement, 0, 0, &err_msg);
   if (rc != SQLITE_OK) {
     log_error(CONNECTION_LOGGER_ID,
-              "Failed in creating index, statement: %s, errMsg: %s\n",
-              statement, errMsg);
-    sqlite3_free(errMsg);
+              "Failed in creating index, statement: %s, err_msg: %s\n",
+              statement, err_msg);
+    sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_CREATE_INDEX_DB;
   }
 

@@ -11,15 +11,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <sqlite3.h>
+
 #include "common/model/milestone.h"
 #include "common/model/transaction.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/sql/statements.h"
 #include "common/storage/storage.h"
 #include "utils/logger_helper.h"
-
-#include <logger.h>
-#include <sqlite3.h>
 
 #define SQLITE3_LOGGER_ID "stor_sqlite3"
 
@@ -35,6 +34,10 @@ retcode_t iota_stor_destroy(const connection_t* const conn) {
   destroy_connection(conn);
   return RC_OK;
 }
+
+/*
+ * Transaction operations
+ */
 
 static void select_transactions_populate_from_row(sqlite3_stmt* statement,
                                                   iota_transaction_t tx) {
@@ -66,19 +69,6 @@ static void select_transactions_populate_from_row(sqlite3_stmt* statement,
   buffer = sqlite3_column_blob(statement, 15);
   memcpy(tx->hash, buffer, FLEX_TRIT_SIZE_243);
 }
-
-static void select_milestones_populate_from_row(sqlite3_stmt* statement,
-                                                iota_milestone_t* milestone) {
-  char const* buffer;
-
-  milestone->index = sqlite3_column_int64(statement, 0);
-  buffer = sqlite3_column_blob(statement, 1);
-  memcpy(milestone->hash, buffer, FLEX_TRIT_SIZE_243);
-}
-
-/*
- * Transaction operations
- */
 
 retcode_t iota_stor_transaction_store(const connection_t* const conn,
                                       const iota_transaction_t data_in) {
@@ -377,6 +367,15 @@ retcode_t iota_stor_transaction_update(const connection_t* const conn,
 /*
  * Milestone operations
  */
+
+static void select_milestones_populate_from_row(sqlite3_stmt* statement,
+                                                iota_milestone_t* milestone) {
+  char const* buffer;
+
+  milestone->index = sqlite3_column_int64(statement, 0);
+  buffer = sqlite3_column_blob(statement, 1);
+  memcpy(milestone->hash, buffer, FLEX_TRIT_SIZE_243);
+}
 
 retcode_t iota_stor_milestone_store(const connection_t* const conn,
                                     const iota_milestone_t* data_in) {
