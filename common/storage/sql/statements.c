@@ -22,7 +22,7 @@
  * Generic statements
  */
 
-static retcode_t iota_generic_select_statement(const char *table_name,
+static retcode_t iota_statement_generic_select(const char *table_name,
                                                const char *select_col,
                                                const char *index_col,
                                                char statement[],
@@ -45,7 +45,7 @@ static retcode_t iota_generic_select_statement(const char *table_name,
   return RC_OK;
 }
 
-static retcode_t iota_generic_exist_statement(const char *table_name,
+static retcode_t iota_statement_generic_exist(const char *table_name,
                                               const char *index_col,
                                               char statement[],
                                               size_t statement_cap) {
@@ -72,7 +72,7 @@ static retcode_t iota_generic_exist_statement(const char *table_name,
  * Transaction statements
  */
 
-retcode_t iota_transaction_insert_statement(const iota_transaction_t tx,
+retcode_t iota_statement_transaction_insert(const iota_transaction_t tx,
                                             char statement[],
                                             size_t statement_cap) {
   int res = snprintf(
@@ -100,21 +100,21 @@ retcode_t iota_transaction_insert_statement(const iota_transaction_t tx,
   return RC_OK;
 }
 
-retcode_t iota_transaction_select_statement(const char *index_col,
+retcode_t iota_statement_transaction_select(const char *index_col,
                                             char statement[],
                                             size_t statement_cap) {
-  return iota_generic_select_statement(TRANSACTION_TABLE_NAME, "*", index_col,
+  return iota_statement_generic_select(TRANSACTION_TABLE_NAME, "*", index_col,
                                        statement, statement_cap);
 }
 
-retcode_t iota_transaction_exist_statement(const char *index_col,
+retcode_t iota_statement_transaction_exist(const char *index_col,
                                            char statement[],
                                            size_t statement_cap) {
-  return iota_generic_exist_statement(TRANSACTION_TABLE_NAME, index_col,
+  return iota_statement_generic_exist(TRANSACTION_TABLE_NAME, index_col,
                                       statement, statement_cap);
 }
 
-retcode_t iota_transaction_update_statement(const char *index_col,
+retcode_t iota_statement_transaction_update(const char *index_col,
                                             const trit_array_p key,
                                             const iota_transaction_t tx,
                                             char statement[],
@@ -122,15 +122,15 @@ retcode_t iota_transaction_update_statement(const char *index_col,
   return RC_OK;
 }
 
-retcode_t iota_transaction_select_hashes_statement(const char *index_col,
+retcode_t iota_statement_transaction_select_hashes(const char *index_col,
                                                    char statement[],
                                                    size_t statement_cap) {
-  return iota_generic_select_statement(TRANSACTION_TABLE_NAME,
+  return iota_statement_generic_select(TRANSACTION_TABLE_NAME,
                                        TRANSACTION_COL_HASH, index_col,
                                        statement, statement_cap);
 }
 
-retcode_t iota_transaction_select_hashes_approvers_statement(
+retcode_t iota_statement_transaction_select_hashes_approvers(
     const trit_array_p approvee_hash, char statement[], size_t statement_cap) {
   int res;
 
@@ -155,7 +155,7 @@ retcode_t iota_transaction_select_hashes_approvers_statement(
  * Milestone statements
  */
 
-retcode_t iota_milestone_insert_statement(const iota_milestone_t *milestone,
+retcode_t iota_statement_milestone_insert(const iota_milestone_t *milestone,
                                           char statement[],
                                           size_t statement_cap) {
   int res = snprintf(statement, statement_cap,
@@ -171,16 +171,16 @@ retcode_t iota_milestone_insert_statement(const iota_milestone_t *milestone,
   return RC_OK;
 }
 
-retcode_t iota_milestone_select_statement(const char *index_col,
+retcode_t iota_statement_milestone_select(const char *index_col,
                                           char statement[],
                                           size_t statement_cap) {
-  return iota_generic_select_statement(MILESTONE_TABLE_NAME, "*", index_col,
+  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", index_col,
                                        statement, statement_cap);
 }
 
-retcode_t iota_milestone_exist_statement(const char *index_col,
+retcode_t iota_statement_milestone_exist(const char *index_col,
                                          char statement[],
                                          size_t statement_cap) {
-  return iota_generic_exist_statement(MILESTONE_TABLE_NAME, index_col,
+  return iota_statement_generic_exist(MILESTONE_TABLE_NAME, index_col,
                                       statement, statement_cap);
 }
