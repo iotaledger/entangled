@@ -51,6 +51,7 @@ DEFINE_uint32(maxQuerySizeGetInclusionState, 1000,
 namespace cppclient {
 
 bool IotaJsonAPI::isNodeSolid() {
+  VLOG(3) << __FUNCTION__;
   auto maybeNodeInfo = getNodeInfo();
   if (!maybeNodeInfo.has_value()) {
     LOG(INFO) << __FUNCTION__ << " request failed.";
@@ -72,6 +73,7 @@ bool IotaJsonAPI::isNodeSolid() {
 }
 
 nonstd::optional<NodeInfo> IotaJsonAPI::getNodeInfo() {
+  VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "getNodeInfo";
 
@@ -93,6 +95,7 @@ nonstd::optional<NodeInfo> IotaJsonAPI::getNodeInfo() {
 
 nonstd::optional<std::unordered_map<std::string, uint64_t>>
 IotaJsonAPI::getBalances(const std::vector<std::string>& addresses) {
+  VLOG(3) << __FUNCTION__;
   std::unordered_map<std::string, uint64_t> result;
   json req;
   req["command"] = "getBalances";
@@ -139,7 +142,9 @@ std::vector<std::string> IotaJsonAPI::findTransactions(
     nonstd::optional<std::vector<std::string>> addresses,
     nonstd::optional<std::vector<std::string>> bundles,
     nonstd::optional<std::vector<std::string>> approvees) {
-  if (!addresses && !bundles && !approvees) {
+  VLOG(3) << __FUNCTION__;
+  if (!addresses.has_value() && !bundles.has_value() &&
+      !approvees.has_value()) {
     return {};
   }
 
@@ -195,6 +200,7 @@ std::vector<std::string> IotaJsonAPI::findTransactions(
 }
 std::vector<std::string> IotaJsonAPI::getTrytes(
     const std::vector<std::string>& hashes) {
+  VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "getTrytes";
 
@@ -226,6 +232,7 @@ std::vector<std::string> IotaJsonAPI::getTrytes(
 
 std::vector<Transaction> IotaJsonAPI::getTransactions(
     const std::vector<std::string>& hashes) {
+  VLOG(3) << __FUNCTION__;
   auto trytes = getTrytes(hashes);
 
   if (trytes.empty()) {
@@ -269,6 +276,7 @@ std::vector<Transaction> IotaJsonAPI::getTransactions(
 std::unordered_multimap<std::string, Bundle>
 IotaJsonAPI::getConfirmedBundlesForAddresses(
     const std::vector<std::string>& addresses) {
+  VLOG(3) << __FUNCTION__;
   // 1. Get all transactions for address [findTransactions, getTransactions]
   auto txHashes = findTransactions(addresses, {}, {});
   auto transactions = getTransactions(txHashes);
@@ -333,6 +341,7 @@ IotaJsonAPI::getConfirmedBundlesForAddresses(
 std::unordered_set<std::string> IotaJsonAPI::filterConfirmedTails(
     const std::vector<std::string>& tails,
     const nonstd::optional<std::string>& reference) {
+  VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "getInclusionStates";
 
@@ -390,6 +399,7 @@ std::unordered_set<std::string> IotaJsonAPI::filterConfirmedTails(
 nonstd::optional<GetTransactionsToApproveResponse>
 IotaJsonAPI::getTransactionsToApprove(
     size_t depth, const nonstd::optional<std::string>& reference) {
+  VLOG(3) << __FUNCTION__;
   json req;
 
   req["command"] = "getTransactionsToApprove";
@@ -415,6 +425,7 @@ IotaJsonAPI::getTransactionsToApprove(
 std::vector<std::string> IotaJsonAPI::attachToTangle(
     const std::string& trunkTransaction, const std::string& branchTransaction,
     size_t minWeightMagnitude, const std::vector<std::string>& trytes) {
+  VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "attachToTangle";
   req["trunkTransaction"] = trunkTransaction;
@@ -441,6 +452,7 @@ std::vector<std::string> IotaJsonAPI::attachToTangle(
 }
 
 bool IotaJsonAPI::storeTransactions(const std::vector<std::string>& trytes) {
+  VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "storeTransactions";
   req["trytes"] = trytes;
@@ -451,6 +463,7 @@ bool IotaJsonAPI::storeTransactions(const std::vector<std::string>& trytes) {
 
 bool IotaJsonAPI::broadcastTransactions(
     const std::vector<std::string>& trytes) {
+  VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "broadcastTransactions";
   req["trytes"] = trytes;
@@ -462,7 +475,7 @@ bool IotaJsonAPI::broadcastTransactions(
 std::unordered_set<std::string> IotaJsonAPI::filterConsistentTails(
     const std::vector<std::string>& tails) {
   std::unordered_set<std::string> ret;
-
+  VLOG(3) << __FUNCTION__;
   for (const auto& tail : tails) {
     json req;
     req["command"] = "checkConsistency";
@@ -486,6 +499,7 @@ std::unordered_set<std::string> IotaJsonAPI::filterConsistentTails(
 GetInclusionStatesResponse IotaJsonAPI::getInclusionStates(
     const std::vector<std::string>& trans,
     const std::vector<std::string>& tips) {
+  VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "getInclusionStates";
   req["transactions"] = trans;

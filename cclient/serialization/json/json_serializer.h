@@ -79,6 +79,14 @@ retcode_t json_add_neighbors_serialize_request(const serializer_t* const s,
 retcode_t json_add_neighbors_deserialize_response(const serializer_t* const s,
                                                   const char* const obj,
                                                   add_neighbors_res_t* out);
+// removeNeighbors
+retcode_t json_remove_neighbors_serialize_request(const serializer_t* const s,
+                                                  remove_neighbors_req_t* obj,
+                                                  char_buffer_t* out);
+
+retcode_t json_remove_neighbors_deserialize_response(
+    const serializer_t* const s, const char* const obj,
+    remove_neighbors_res_t* out);
 
 static serializer_vtable json_vtable = {
     .find_transactions_serialize_request =
@@ -105,6 +113,10 @@ static serializer_vtable json_vtable = {
     .add_neighbors_serialize_request = json_add_neighbors_serialize_request,
     .add_neighbors_deserialize_response =
         json_add_neighbors_deserialize_response,
+    .remove_neighbors_serialize_request =
+        json_remove_neighbors_serialize_request,
+    .remove_neighbors_deserialize_response =
+        json_remove_neighbors_deserialize_response,
 };
 
 #ifdef __cplusplus

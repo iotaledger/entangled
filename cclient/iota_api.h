@@ -73,8 +73,8 @@ iota_api_result_t iota_api_add_neighbors(
  * @return error value.
  */
 iota_api_result_t iota_api_remove_neighbors(
-    const iota_http_service_t* const service,
-    const remove_neighbors_req_t* const req);
+    const iota_http_service_t* const service, remove_neighbors_req_t* req,
+    remove_neighbors_res_t* res);
 
 /**
  * Returns the list of tips.
