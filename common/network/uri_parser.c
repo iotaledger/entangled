@@ -18,8 +18,9 @@ bool uri_parse(char const *const uri, char *const scheme,
   char *delim = NULL;
   ip_version_t uri_case;
   const char *possible_scheme[] = {"tcp", "udp", "http", "https"};
-  const int possible_scheme_num = sizeof(possible_scheme)/sizeof(*possible_scheme);
-  
+  const int possible_scheme_num =
+      sizeof(possible_scheme) / sizeof(*possible_scheme);
+
   if (uri == NULL) {
     return false;
   }
@@ -40,14 +41,12 @@ bool uri_parse(char const *const uri, char *const scheme,
     int len;
     if (strlen(possible_scheme[i]) > strlen(scheme)) {
       len = strlen(scheme);
-    }
-    else {
+    } else {
       len = strlen(possible_scheme[i]);
     }
     if (strncmp(possible_scheme[i], scheme, len) == 0) {
       break;
-    }
-    else if (i == (possible_scheme_num - 1)) {
+    } else if (i == (possible_scheme_num - 1)) {
       return false;
     }
   }
@@ -59,24 +58,25 @@ bool uri_parse(char const *const uri, char *const scheme,
       return false;
     }
   } else if (strncmp(uri + offset, "://", 3) == 0) {
-    uri_case = IPV4;  
-    
+    uri_case = IPV4;
+
     char *test_delim = delim + 1;
     char *last_delim = delim;
     int count = 1;
     while ((test_delim = strchr(last_delim + 1, ':'))) {
-      if ((test_delim -last_delim) <= 6) {
+      if ((test_delim - last_delim) <= 6) {
         count++;
       }
       last_delim = test_delim;
       test_delim = last_delim + 1;
       // There are 7 colon in the square bracket and 1 for separate scheme
       if (count >= 8) {
-        // if the IPV6 URI comes with no square bracket, this if statement will return false
+        // if the IPV6 URI comes with no square bracket, this if statement will
+        // return false
         return false;
       }
     }
-    
+
     offset += 3;
     if ((delim = strchr(uri + offset, ':')) == NULL) {
       return false;
