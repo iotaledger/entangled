@@ -12,7 +12,7 @@
 
 retcode_t ciri_conf_init(ciri_conf_t* conf) {
   if (conf == NULL) {
-    return RC_CONF_NULL_CONF;
+    return RC_CIRI_CONF_NULL_CONF;
   }
 
   memset(conf, 0, sizeof(ciri_conf_t));

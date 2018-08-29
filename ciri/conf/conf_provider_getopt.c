@@ -88,7 +88,7 @@ retcode_t ciri_conf_parse(ciri_conf_t* conf, int argc, char** argv) {
       default:
         iota_usage();
         free(long_options);
-        return RC_CONF_INVALID_ARGUMENTS;
+        return RC_CIRI_CONF_INVALID_ARGUMENTS;
     }
   }
   free(long_options);
