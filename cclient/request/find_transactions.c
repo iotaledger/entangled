@@ -17,13 +17,14 @@ find_transactions_req_t* find_transactions_req_new() {
   return req;
 }
 
-void find_transactions_req_free(find_transactions_req_t* req) {
-  if (req) {
-    utarray_free(req->addresses);
-    utarray_free(req->tags);
-    utarray_free(req->approvees);
-    utarray_free(req->bundles);
-    free(req);
+void find_transactions_req_free(find_transactions_req_t** req) {
+  if (*req) {
+    utarray_free((*req)->addresses);
+    utarray_free((*req)->tags);
+    utarray_free((*req)->approvees);
+    utarray_free((*req)->bundles);
+    free(*req);
+    *req = NULL;
   }
 }
 

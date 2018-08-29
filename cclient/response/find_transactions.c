@@ -29,9 +29,10 @@ int find_transactions_res_hash_num(find_transactions_res_t* in) {
   return utarray_len(in->hashes);
 }
 
-void find_transactions_res_free(find_transactions_res_t* res) {
-  if (res) {
-    utarray_free(res->hashes);
-    free(res);
+void find_transactions_res_free(find_transactions_res_t** res) {
+  if (*res) {
+    utarray_free((*res)->hashes);
+    free(*res);
+    *res = NULL;
   }
 }

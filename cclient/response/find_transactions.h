@@ -19,7 +19,7 @@ typedef struct {
 } find_transactions_res_t;
 
 find_transactions_res_t* find_transactions_res_new();
-void find_transactions_res_free(find_transactions_res_t* res);
+void find_transactions_res_free(find_transactions_res_t** res);
 char* find_transactions_res_hash_at(find_transactions_res_t* in, int index);
 int find_transactions_res_hash_num(find_transactions_res_t* in);
 
