@@ -1,8 +1,9 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "conf_args",
-    hdrs = ["conf_args.h"],
+    name = "usage",
+    srcs = ["usage.c"],
+    hdrs = ["usage.h"],
 )
 
 cc_library(
@@ -18,8 +19,8 @@ cc_library(
     ],
     hdrs = ["conf.h"],
     deps = [
-        ":conf_args",
         ":conf_default",
+        ":usage",
         "//common:errors",
     ],
 )
