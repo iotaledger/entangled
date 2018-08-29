@@ -14,13 +14,12 @@ extern "C" {
 
 #include "types/types.h"
 
-typedef struct {
-  /**
-   * List of tx hashes for which request should get trytes
-   */
-  tx_hash_array hashes;
+/* List of tx hashes for which request should get trytes */
+typedef UT_array get_trytes_req_t;
 
-} get_trytes_req_t;
+get_trytes_req_t* get_trytes_req_new();
+void get_trytes_req_add(get_trytes_req_t* hashes, const char* hash);
+void get_trytes_req_free(get_trytes_req_t* ut);
 
 #ifdef __cplusplus
 }

@@ -91,6 +91,12 @@ typedef struct {
   retcode_t (*remove_neighbors_deserialize_response)(
       const serializer_t* const s, const char* const obj,
       remove_neighbors_res_t* out);
+  retcode_t (*get_trytes_serialize_request)(const serializer_t* const s,
+                                            get_trytes_req_t* obj,
+                                            char_buffer_t* out);
+  retcode_t (*get_trytes_deserialize_response)(const serializer_t* const s,
+                                               const char* const obj,
+                                               get_trytes_res_t* out);
 } serializer_vtable;
 
 typedef struct serializer_base {

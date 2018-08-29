@@ -123,8 +123,8 @@ iota_api_result_t iota_api_find_transactions(
  * @return error value.
  */
 iota_api_result_t iota_api_get_trytes(const iota_http_service_t* const service,
-                                      const get_trytes_req_t* const req,
-                                      char* trytes[]);
+                                      get_trytes_req_t* req,
+                                      get_trytes_res_t* res);
 
 /**
  * Get the inclusion states of a set of transactions. This is for determining if

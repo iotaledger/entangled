@@ -539,3 +539,61 @@ retcode_t json_remove_neighbors_deserialize_response(
   cJSON_Delete(json_obj);
   return ret;
 }
+
+retcode_t json_get_trytes_serialize_request(const serializer_t* const s,
+                                            get_trytes_req_t* obj,
+                                            char_buffer_t* out) {
+  retcode_t ret = RC_OK;
+  const char* json_text = NULL;
+  size_t len = 0;
+  cJSON* json_root = cJSON_CreateObject();
+  if (json_root == NULL) {
+    return RC_CCLIENT_JSON_CREATE;
+  }
+
+  cJSON_AddItemToObject(json_root, "command", cJSON_CreateString("getTrytes"));
+
+  ret = utarray_to_json_array(obj, json_root, "hashes");
+  if (ret != RC_OK) {
+    cJSON_Delete(json_root);
+    return ret;
+  }
+
+  json_text = cJSON_PrintUnformatted(json_root);
+  if (json_text) {
+    len = strlen(json_text);
+    ret = char_buffer_allocate(out, len);
+    if (ret == RC_OK) {
+      strncpy(out->data, json_text, len);
+    }
+    cJSON_free((void*)json_text);
+  }
+
+  cJSON_Delete(json_root);
+  return ret;
+}
+
+retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
+                                               const char* const obj,
+                                               get_trytes_res_t* out) {
+  retcode_t ret = RC_OK;
+  cJSON* json_obj = cJSON_Parse(obj);
+  cJSON* json_item = NULL;
+
+  if (json_obj == NULL) {
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
+  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
+    // TODO log the error message from response.
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_RES_ERROR;
+  }
+
+  ret = json_array_to_utarray(json_obj, "trytes", out);
+
+  cJSON_Delete(json_obj);
+  return ret;
+}

@@ -14,10 +14,17 @@ extern "C" {
 
 #include "types/types.h"
 
-typedef struct {
-  trit_array_array* trytes;
-  size_t numTransactions;
-} get_trytes_res_t;
+/*
+The raw transaction data (trytes) of a specific transaction. These trytes can
+then be easily converted into the actual transaction object.
+*/
+typedef UT_array get_trytes_res_t;
+
+get_trytes_res_t* get_trytes_res_new();
+void get_trytes_res_add(get_trytes_res_t* trytes_array, const char* trytes);
+char* get_trytes_res_at(get_trytes_res_t* trytes_array, int index);
+int get_trytes_res_num(get_trytes_res_t* trytes_array);
+void get_trytes_res_free(get_trytes_res_t* ut);
 
 #ifdef __cplusplus
 }
