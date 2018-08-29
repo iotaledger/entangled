@@ -19,6 +19,10 @@ retcode_t iota_tangle_destroy(tangle_t *tangle) {
   return iota_stor_destroy(&tangle->conn);
 }
 
+/*
+ * Transaction operations
+ */
+
 retcode_t iota_tangle_transaction_store(const tangle_t *const tangle,
                                         const iota_transaction_t data_in) {
   return iota_stor_transaction_store(&tangle->conn, data_in);
@@ -59,4 +63,26 @@ retcode_t iota_tangle_transaction_load_hashes_of_approvers(
     iota_stor_pack_t *pack) {
   return iota_stor_transaction_load_hashes_of_approvers(&tangle->conn,
                                                         approvee_hash, pack);
+}
+
+/*
+ * Milestone operations
+ */
+
+retcode_t iota_tangle_milestone_store(const tangle_t *const tangle,
+                                      const iota_milestone_t *data_in) {
+  return iota_stor_milestone_store(&tangle->conn, data_in);
+}
+
+retcode_t iota_tangle_milestone_load(const tangle_t *const tangle,
+                                     const char *col_name,
+                                     const trit_array_p key,
+                                     iota_stor_pack_t *pack) {
+  return iota_stor_milestone_load(&tangle->conn, col_name, key, pack);
+}
+
+retcode_t iota_tangle_milestone_exist(const tangle_t *const tangle,
+                                      const char *index_name,
+                                      const trit_array_p key, bool *exist) {
+  return iota_stor_milestone_exist(&tangle->conn, index_name, key, exist);
 }
