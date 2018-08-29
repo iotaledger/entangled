@@ -33,7 +33,7 @@ typedef struct iota_transactions_pack {
 
 typedef struct iota_milestones_pack {
   iota_milestone_t **milestones;
-  size_t txs_capacity;
+  size_t milestones_capacity;
   size_t num_loaded;
   bool insufficient_capacity;
 } iota_milestones_pack;

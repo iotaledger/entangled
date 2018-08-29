@@ -9,6 +9,7 @@
 #include <string.h>
 #include <unity/unity.h>
 
+#include "common/model/milestone.h"
 #include "common/storage/connection.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
@@ -63,7 +64,17 @@ void test_init_connection(void) {
   TEST_ASSERT(init_connection(&conn, &config) == RC_OK);
 }
 
-void test_initialized_db_empty(void) {
+void test_initialized_db_empty_transaction(void) {
+  bool exist = false;
+
+  trit_array_p col_value = trit_array_new(NUM_TRITS_HASH);
+  col_value->trits = (flex_trit_t *)HASH;
+  TEST_ASSERT(iota_stor_milestone_exist(&conn, MILESTONE_COL_HASH, col_value,
+                                        &exist) == RC_OK);
+  TEST_ASSERT(exist == false);
+}
+
+void test_initialized_db_empty_milestone(void) {
   bool exist = false;
 
   trit_array_p col_value = trit_array_new(NUM_TRITS_HASH);
@@ -137,6 +148,51 @@ void test_stored_transaction(void) {
   }
 }
 
+void test_stored_milestone(void) {
+  TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
+  memcpy(hash.trits, HASH, FLEX_TRIT_SIZE_243);
+  iota_milestone_t milestone;
+  milestone.index = 42;
+  memcpy(milestone.hash, HASH, FLEX_TRIT_SIZE_243);
+
+  TEST_ASSERT(iota_stor_milestone_store(&conn, &milestone) == RC_OK);
+  // Test id primary key constraint violation
+  TEST_ASSERT(iota_stor_milestone_store(&conn, &milestone) ==
+              RC_SQLITE3_FAILED_STEP);
+  // Test hash unique constraint violation
+  milestone.index++;
+  TEST_ASSERT(iota_stor_milestone_store(&conn, &milestone) ==
+              RC_SQLITE3_FAILED_STEP);
+  milestone.index--;
+
+  bool exist = false;
+  TEST_ASSERT(iota_stor_milestone_exist(&conn, NULL, NULL, &exist) == RC_OK);
+  TEST_ASSERT(exist == true);
+  TEST_ASSERT(iota_stor_milestone_exist(&conn, MILESTONE_COL_HASH, &hash,
+                                        &exist) == RC_OK);
+  TEST_ASSERT(exist == true);
+  TEST_ASSERT(iota_stor_milestone_exist(&conn, NULL, NULL, &exist) == RC_OK);
+  TEST_ASSERT(exist == true);
+
+  iota_milestones_pack pack;
+  iota_milestone_t *milestones[5];
+  pack.milestones = milestones;
+  pack.num_loaded = 0;
+  pack.milestones_capacity = 5;
+
+  for (int i = 0; i < 5; ++i) {
+    pack.milestones[i] = malloc(sizeof(iota_milestone_t));
+  }
+  TEST_ASSERT(iota_stor_milestone_load(&conn, MILESTONE_COL_HASH, &hash,
+                                       &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
+  TEST_ASSERT_EQUAL_INT(milestones[0]->index, 42);
+  TEST_ASSERT_EQUAL_MEMORY(milestones[0]->hash, hash.trits, FLEX_TRIT_SIZE_243);
+  for (int i = 0; i < 5; ++i) {
+    free(pack.milestones[i]);
+  }
+}
+
 void test_stored_load_hashes_by_address(void) {
   trit_array_p hashes[5];
   iota_hashes_pack pack;
@@ -188,8 +244,10 @@ int main(void) {
             "common/storage/sql/sqlite3/tests/ciri.db");
 
   RUN_TEST(test_init_connection);
-  RUN_TEST(test_initialized_db_empty);
+  RUN_TEST(test_initialized_db_empty_transaction);
+  RUN_TEST(test_initialized_db_empty_milestone);
   RUN_TEST(test_stored_transaction);
+  RUN_TEST(test_stored_milestone);
   RUN_TEST(test_stored_load_hashes_by_address);
   RUN_TEST(test_stored_load_hashes_of_approvers);
 

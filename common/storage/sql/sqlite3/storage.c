@@ -459,7 +459,7 @@ retcode_t iota_stor_milestone_load(const connection_t* const conn,
   pack->insufficient_capacity = false;
   while (sqlite3_step(sqlite_statement) ==
          SQLITE_ROW) {  // While query has result-rows.
-    if (pack->num_loaded == pack->txs_capacity) {
+    if (pack->num_loaded == pack->milestones_capacity) {
       pack->insufficient_capacity = true;
       break;
     }

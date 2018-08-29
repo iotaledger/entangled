@@ -9,7 +9,7 @@
 #define __COMMON_STORAGE_STORAGE_H__
 
 #include <stdbool.h>
-#include <stdint.h>
+
 #include "common/errors.h"
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
@@ -29,7 +29,7 @@ extern retcode_t iota_stor_init(const connection_t* const conn,
 extern retcode_t iota_stor_destroy(const connection_t* const conn);
 
 /*
- * Transaction
+ * Transaction operations
  */
 
 extern retcode_t iota_stor_transaction_store(const connection_t* const conn,
@@ -59,7 +59,7 @@ extern retcode_t iota_stor_transaction_load_hashes_of_approvers(
     iota_hashes_pack* pack);
 
 /*
- * Milestone
+ * Milestone operations
  */
 
 extern retcode_t iota_stor_milestone_store(const connection_t* const conn,
