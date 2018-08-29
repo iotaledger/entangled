@@ -260,6 +260,7 @@ iota_api_result_t iota_api_get_inclusion_states(
     const get_inclusion_state_req_t* const req,
     get_inclusion_state_res_t* res) {
   iota_api_result_t result = {0};
+  // TODO
   return result;
 }
 
@@ -267,6 +268,7 @@ iota_api_result_t iota_api_get_balances(
     const iota_http_service_t* const service,
     const get_balances_req_t* const req, get_balances_res_t* res) {
   iota_api_result_t result = {0};
+  // TODO
   return result;
 }
 
@@ -274,6 +276,7 @@ iota_api_result_t iota_api_get_transactions_to_approve(
     const iota_http_service_t* const service, int depth,
     get_transactions_to_approve_res_t* res) {
   iota_api_result_t result = {0};
+  // TODO
   return result;
 }
 
@@ -281,12 +284,14 @@ iota_api_result_t iota_api_attach_to_tangle(
     const iota_http_service_t* const service,
     const attach_to_tangle_req_t* const req) {
   iota_api_result_t result = {0};
+  // TODO
   return result;
 }
 
 iota_api_result_t iota_api_interrupt_attaching_to_tangle(
     const iota_http_service_t* const service) {
   iota_api_result_t result = {0};
+  // TODO
   return result;
 }
 
@@ -294,6 +299,7 @@ iota_api_result_t iota_api_broadcast_transactions(
     const iota_http_service_t* const service,
     const broadcast_transactions_req_t* const req) {
   iota_api_result_t result = {0};
+  // TODO
   return result;
 }
 
@@ -301,5 +307,15 @@ iota_api_result_t iota_api_store_transactions(
     const iota_http_service_t* const service,
     const store_transactions_req_t* const req) {
   iota_api_result_t result = {0};
+  // TODO
+  return result;
+}
+
+iota_api_result_t iota_api_were_addresses_spent_from(
+    const iota_http_service_t* const service,
+    were_addresses_spent_from_req_t* req,
+    were_addresses_spent_from_res_t* res) {
+  iota_api_result_t result = {0};
+  // TODO
   return result;
 }

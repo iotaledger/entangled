@@ -13,15 +13,8 @@ extern "C" {
 #endif
 
 #include "types/types.h"
-
-typedef struct {
-  /**
-   * Trunk transaction to store
-   */
-  trit_array_array* txs;
-  size_t numTxs;
-
-} store_transactions_req_t;
+// List of raw data of transactions to be store.
+typedef UT_array store_transactions_req_t;
 
 #ifdef __cplusplus
 }

@@ -410,6 +410,54 @@ void test_deserialize_get_trytes(void) {
   get_trytes_res_free(tips);
 }
 
+void test_serialize_get_inclusion_states(void) {
+  // TODO
+}
+
+void test_deserialize_get_inclusion_states(void) {
+  // TODO
+}
+
+void test_serialize_get_balances(void) {
+  // TODO
+}
+
+void test_deserialize_get_balances(void) {
+  // TODO
+}
+
+void test_serialize_get_transactions_to_approve(void) {
+  // TODO
+}
+
+void test_deserialize_get_transactions_to_approve(void) {
+  // TODO
+}
+
+void test_serialize_attach_to_tangle(void) {
+  // TODO
+}
+
+void test_deserialize_attach_to_tangle(void) {
+  // TODO
+}
+
+void test_serialize_broadcast_transactions(void) {
+  // TODO
+}
+
+void test_serialize_store_transactions(void) {
+  // TODO
+}
+
+void test_serialize_were_addresses_spent_from(void) {
+  // TODO
+}
+
+void test_deserialize_were_addresses_spent_from(void) {
+  // TODO
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -438,5 +486,24 @@ int main(void) {
 
   RUN_TEST(test_serialize_get_trytes);
   RUN_TEST(test_deserialize_get_trytes);
+
+  RUN_TEST(test_serialize_get_inclusion_states);
+  RUN_TEST(test_deserialize_get_inclusion_states);
+
+  RUN_TEST(test_serialize_get_balances);
+  RUN_TEST(test_deserialize_get_balances);
+
+  RUN_TEST(test_serialize_get_transactions_to_approve);
+  RUN_TEST(test_deserialize_get_transactions_to_approve);
+
+  RUN_TEST(test_serialize_attach_to_tangle);
+  RUN_TEST(test_deserialize_attach_to_tangle);
+
+  RUN_TEST(test_serialize_broadcast_transactions);
+
+  RUN_TEST(test_serialize_store_transactions);
+
+  RUN_TEST(test_serialize_were_addresses_spent_from);
+  RUN_TEST(test_deserialize_were_addresses_spent_from);
   return UNITY_END();
 }

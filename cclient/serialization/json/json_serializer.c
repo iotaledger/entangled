@@ -597,3 +597,51 @@ retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
   cJSON_Delete(json_obj);
   return ret;
 }
+
+retcode_t json_attach_to_tangle_serialize_request(const serializer_t* const s,
+                                                  attach_to_tangle_req_t* obj,
+                                                  char_buffer_t* out) {
+  retcode_t ret = RC_OK;
+  // TODO
+  return ret;
+}
+
+retcode_t json_attach_to_tangle_deserialize_response(
+    const serializer_t* const s, const char* const obj,
+    attach_to_tangle_res_t* out) {
+  retcode_t ret = RC_OK;
+  // TODO
+  return ret;
+}
+
+retcode_t json_broadcast_transactions_serialize_request(
+    const serializer_t* const s, broadcast_transactions_req_t* obj,
+    char_buffer_t* out) {
+  retcode_t ret = RC_OK;
+  // TODO
+  return ret;
+}
+
+retcode_t json_store_transactions_serialize_request(
+    const serializer_t* const s, store_transactions_req_t* obj,
+    char_buffer_t* out) {
+  retcode_t ret = RC_OK;
+  // TODO
+  return ret;
+}
+
+retcode_t json_were_addresses_spent_from_serialize_request(
+    const serializer_t* const s, were_addresses_spent_from_req_t* obj,
+    char_buffer_t* out) {
+  retcode_t ret = RC_OK;
+  // TODO
+  return ret;
+}
+
+retcode_t json_were_addresses_spent_from_deserialize_response(
+    const serializer_t* const s, const char* const obj,
+    were_addresses_spent_from_res_t* out) {
+  retcode_t ret = RC_OK;
+  // TODO
+  return ret;
+}
