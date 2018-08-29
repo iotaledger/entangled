@@ -26,7 +26,7 @@ retcode_t create_index_if_not_exists(const connection_t* const conn,
 
   int res = snprintf(statement, TRANSACTION_MAX_CREATE_INDEX_STATEMENT_SIZE,
                      "CREATE INDEX IF NOT EXISTS %s ON %s(%s)", index_name,
-                     TRANSACTION_TABLE_NAME, col_name);
+                     table_name, col_name);
 
   if (res < 0 || res == TRANSACTION_MAX_CREATE_INDEX_STATEMENT_SIZE) {
     log_error(CONNECTION_LOGGER_ID,
@@ -74,7 +74,7 @@ retcode_t init_connection(const connection_t* const conn,
              config->db_path);
   }
 
-  if (config->index_approvee) {
+  if (config->index_transaction_approvee) {
     if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
                                               TRANSACTION_TRUNK_INDEX,
                                               TRANSACTION_COL_TRUNK))) {
@@ -87,7 +87,7 @@ retcode_t init_connection(const connection_t* const conn,
     }
   }
 
-  if (config->index_address) {
+  if (config->index_transaction_address) {
     if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
                                               TRANSACTION_ADDRESS_INDEX,
                                               TRANSACTION_COL_ADDRESS))) {
@@ -95,7 +95,7 @@ retcode_t init_connection(const connection_t* const conn,
     }
   }
 
-  if (config->index_bundle) {
+  if (config->index_transaction_bundle) {
     if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
                                               TRANSACTION_BUNDLE_INDEX,
                                               TRANSACTION_COL_BUNDLE))) {
@@ -103,7 +103,7 @@ retcode_t init_connection(const connection_t* const conn,
     }
   }
 
-  if (config->index_tag) {
+  if (config->index_transaction_tag) {
     if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
                                               TRANSACTION_TAG_INDEX,
                                               TRANSACTION_COL_TAG))) {
@@ -111,10 +111,18 @@ retcode_t init_connection(const connection_t* const conn,
     }
   }
 
-  if (config->index_hash) {
+  if (config->index_transaction_hash) {
     if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
                                               TRANSACTION_HASH_INDEX,
                                               TRANSACTION_COL_HASH))) {
+      return retcode;
+    }
+  }
+
+  if (config->index_milestone_hash) {
+    if ((retcode = create_index_if_not_exists(conn, MILESTONE_TABLE_NAME,
+                                              MILESTONE_HASH_INDEX,
+                                              MILESTONE_COL_HASH))) {
       return retcode;
     }
   }

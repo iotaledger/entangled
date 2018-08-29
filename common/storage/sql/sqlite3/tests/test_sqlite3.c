@@ -56,11 +56,12 @@ static connection_t conn;
 void test_init_connection(void) {
   connection_config_t config;
   config.db_path = "common/storage/sql/sqlite3/tests/test.db";
-  config.index_address = true;
-  config.index_approvee = true;
-  config.index_bundle = true;
-  config.index_tag = true;
-  config.index_hash = true;
+  config.index_transaction_address = true;
+  config.index_transaction_approvee = true;
+  config.index_transaction_bundle = true;
+  config.index_transaction_tag = true;
+  config.index_transaction_hash = true;
+  config.index_milestone_hash = true;
   TEST_ASSERT(init_connection(&conn, &config) == RC_OK);
 }
 
