@@ -87,7 +87,7 @@ void test_cw_gen_topology(TestTangleTopology topology) {
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, (flex_trit_t *)TEST_TRANSACTION.hash,
                        NUM_TRITS_HASH);
-  iota_hashes_pack pack;
+  iota_stor_pack_t pack;
   hash_pack_init(&pack, numApprovers);
 
   cw_calc_result out;
@@ -130,7 +130,7 @@ void test_single_tx_tangle(void) {
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, (flex_trit_t *)TEST_TRANSACTION.hash,
                        NUM_TRITS_HASH);
-  iota_hashes_pack pack;
+  iota_stor_pack_t pack;
   hash_pack_init(&pack, 5);
 
   cw_calc_result out;
@@ -143,7 +143,7 @@ void test_single_tx_tangle(void) {
   TEST_ASSERT(iota_tangle_transaction_load_hashes(&tangle, TRANSACTION_COL_HASH,
                                                   ep, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-  TEST_ASSERT_EQUAL_MEMORY(pack.hashes[0]->trits, ep->trits,
+  TEST_ASSERT_EQUAL_MEMORY(((trit_array_p)pack.models[0])->trits, ep->trits,
                            FLEX_TRIT_SIZE_243);
 
   TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
@@ -190,7 +190,7 @@ void test_cw_topology_four_transactions_diamond(void) {
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, txs[0].hash, NUM_TRITS_HASH);
-  iota_hashes_pack pack;
+  iota_stor_pack_t pack;
   hash_pack_init(&pack, numTxs);
 
   cw_calc_result out;

@@ -38,7 +38,7 @@ extern retcode_t iota_stor_transaction_store(const connection_t* const conn,
 extern retcode_t iota_stor_transaction_load(const connection_t* const conn,
                                             const char* col_name,
                                             const trit_array_p key,
-                                            iota_transactions_pack* pack);
+                                            iota_stor_pack_t* pack);
 
 extern retcode_t iota_stor_transaction_exist(const connection_t* const conn,
                                              const char* index_name,
@@ -52,11 +52,11 @@ extern retcode_t iota_stor_transaction_update(const connection_t* const conn,
 
 extern retcode_t iota_stor_transaction_load_hashes(
     const connection_t* const conn, const char* col_name,
-    const trit_array_p key, iota_hashes_pack* pack);
+    const trit_array_p key, iota_stor_pack_t* pack);
 
 extern retcode_t iota_stor_transaction_load_hashes_of_approvers(
     const connection_t* const conn, const trit_array_p approvee_hash,
-    iota_hashes_pack* pack);
+    iota_stor_pack_t* pack);
 
 /*
  * Milestone operations
@@ -68,7 +68,7 @@ extern retcode_t iota_stor_milestone_store(const connection_t* const conn,
 extern retcode_t iota_stor_milestone_load(const connection_t* const conn,
                                           const char* col_name,
                                           const trit_array_p key,
-                                          iota_milestones_pack* pack);
+                                          iota_stor_pack_t* pack);
 
 extern retcode_t iota_stor_milestone_exist(const connection_t* const conn,
                                            const char* index_name,

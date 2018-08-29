@@ -144,7 +144,7 @@ retcode_t iota_stor_transaction_store(const connection_t* const conn,
 retcode_t iota_stor_transaction_load(const connection_t* const conn,
                                      const char* col_name,
                                      const trit_array_p key,
-                                     iota_transactions_pack* pack) {
+                                     iota_stor_pack_t* pack) {
   assert(col_name && strcmp(col_name, ""));
   retcode_t ret = RC_OK;
   char statement[TRANSACTION_MAX_SELECT_STATEMENT_SIZE];
@@ -178,12 +178,12 @@ retcode_t iota_stor_transaction_load(const connection_t* const conn,
   pack->insufficient_capacity = false;
   while (sqlite3_step(sqlite_statement) ==
          SQLITE_ROW) {  // While query has result-rows.
-    if (pack->num_loaded == pack->txs_capacity) {
+    if (pack->num_loaded == pack->capacity) {
       pack->insufficient_capacity = true;
       break;
     }
     select_transactions_populate_from_row(sqlite_statement,
-                                          pack->txs[pack->num_loaded++]);
+                                          pack->models[pack->num_loaded++]);
   }
 
   rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
@@ -249,7 +249,7 @@ retcode_t iota_stor_transaction_exist(const connection_t* const conn,
 
 extern retcode_t iota_stor_transaction_load_hashes(
     const connection_t* const conn, const char* col_name,
-    const trit_array_p key, iota_hashes_pack* pack) {
+    const trit_array_p key, iota_stor_pack_t* pack) {
   assert(col_name && strcmp(col_name, ""));
   retcode_t ret = RC_OK;
   char statement[TRANSACTION_MAX_SELECT_STATEMENT_SIZE];
@@ -286,12 +286,13 @@ extern retcode_t iota_stor_transaction_load_hashes(
   pack->insufficient_capacity = false;
   while (sqlite3_step(sqlite_statement) ==
          SQLITE_ROW) {  // While query has result-rows.
-    if (pack->num_loaded == pack->hashes_capacity) {
+    if (pack->num_loaded == pack->capacity) {
       pack->insufficient_capacity = true;
       break;
     }
     buffer = sqlite3_column_blob(sqlite_statement, 0);
-    memcpy(pack->hashes[pack->num_loaded++]->trits, buffer, FLEX_TRIT_SIZE_243);
+    memcpy(((trit_array_p)pack->models[pack->num_loaded++])->trits, buffer,
+           FLEX_TRIT_SIZE_243);
   }
 
   rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
@@ -306,7 +307,7 @@ extern retcode_t iota_stor_transaction_load_hashes(
 
 retcode_t iota_stor_transaction_load_hashes_of_approvers(
     const connection_t* const conn, const trit_array_p approvee_hash,
-    iota_hashes_pack* pack) {
+    iota_stor_pack_t* pack) {
   retcode_t ret = RC_OK;
   char statement[TRANSACTION_MAX_SELECT_STATEMENT_SIZE];
   char const* err_msg = 0;
@@ -345,12 +346,13 @@ retcode_t iota_stor_transaction_load_hashes_of_approvers(
   pack->insufficient_capacity = false;
   while (sqlite3_step(sqlite_statement) ==
          SQLITE_ROW) {  // While query has result-rows.
-    if (pack->num_loaded == pack->hashes_capacity) {
+    if (pack->num_loaded == pack->capacity) {
       pack->insufficient_capacity = true;
       break;
     }
     buffer = sqlite3_column_blob(sqlite_statement, 0);
-    memcpy(pack->hashes[pack->num_loaded++]->trits, buffer, FLEX_TRIT_SIZE_243);
+    memcpy(((trit_array_p)pack->models[pack->num_loaded++])->trits, buffer,
+           FLEX_TRIT_SIZE_243);
   }
 
   rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
@@ -425,7 +427,7 @@ retcode_t iota_stor_milestone_store(const connection_t* const conn,
 
 retcode_t iota_stor_milestone_load(const connection_t* const conn,
                                    const char* col_name, const trit_array_p key,
-                                   iota_milestones_pack* pack) {
+                                   iota_stor_pack_t* pack) {
   assert(col_name && strcmp(col_name, ""));
   retcode_t ret = RC_OK;
   char statement[MILESTONE_MAX_SELECT_STATEMENT_SIZE];
@@ -459,12 +461,12 @@ retcode_t iota_stor_milestone_load(const connection_t* const conn,
   pack->insufficient_capacity = false;
   while (sqlite3_step(sqlite_statement) ==
          SQLITE_ROW) {  // While query has result-rows.
-    if (pack->num_loaded == pack->milestones_capacity) {
+    if (pack->num_loaded == pack->capacity) {
       pack->insufficient_capacity = true;
       break;
     }
     select_milestones_populate_from_row(sqlite_statement,
-                                        pack->milestones[pack->num_loaded++]);
+                                        pack->models[pack->num_loaded++]);
   }
 
   rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement

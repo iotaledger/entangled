@@ -104,14 +104,14 @@ void test_stored_transaction(void) {
   TEST_ASSERT(iota_stor_transaction_exist(&conn, NULL, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
-  iota_transactions_pack pack;
+  iota_stor_pack_t pack;
   iota_transaction_t txs[5];
-  pack.txs = txs;
+  pack.models = (void **)txs;
   pack.num_loaded = 0;
-  pack.txs_capacity = 5;
+  pack.capacity = 5;
 
   for (int i = 0; i < 5; ++i) {
-    pack.txs[i] = transaction_new();
+    pack.models[i] = transaction_new();
   }
 
   TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_COL_HASH, col_value,
@@ -145,7 +145,7 @@ void test_stored_transaction(void) {
                            FLEX_TRIT_SIZE_243);
 
   for (int i = 0; i < 5; ++i) {
-    transaction_free(pack.txs[i]);
+    transaction_free(pack.models[i]);
   }
 }
 
@@ -175,14 +175,14 @@ void test_stored_milestone(void) {
   TEST_ASSERT(iota_stor_milestone_exist(&conn, NULL, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
-  iota_milestones_pack pack;
+  iota_stor_pack_t pack;
   iota_milestone_t *milestones[5];
-  pack.milestones = milestones;
+  pack.models = (void **)milestones;
   pack.num_loaded = 0;
-  pack.milestones_capacity = 5;
+  pack.capacity = 5;
 
   for (int i = 0; i < 5; ++i) {
-    pack.milestones[i] = malloc(sizeof(iota_milestone_t));
+    pack.models[i] = malloc(sizeof(iota_milestone_t));
   }
   TEST_ASSERT(iota_stor_milestone_load(&conn, MILESTONE_COL_HASH, &hash,
                                        &pack) == RC_OK);
@@ -190,51 +190,52 @@ void test_stored_milestone(void) {
   TEST_ASSERT_EQUAL_INT(milestones[0]->index, 42);
   TEST_ASSERT_EQUAL_MEMORY(milestones[0]->hash, hash.trits, FLEX_TRIT_SIZE_243);
   for (int i = 0; i < 5; ++i) {
-    free(pack.milestones[i]);
+    free(pack.models[i]);
   }
 }
 
 void test_stored_load_hashes_by_address(void) {
   trit_array_p hashes[5];
-  iota_hashes_pack pack;
-  pack.hashes = hashes;
+  iota_stor_pack_t pack;
+  pack.models = (void **)hashes;
   pack.num_loaded = 0;
-  pack.hashes_capacity = 5;
-  for (int i = 0; i < pack.hashes_capacity; ++i) {
-    pack.hashes[i] = trit_array_new(NUM_TRITS_ADDRESS);
+  pack.capacity = 5;
+  for (int i = 0; i < pack.capacity; ++i) {
+    pack.models[i] = trit_array_new(NUM_TRITS_ADDRESS);
   }
-  pack.hashes_capacity = 5;
+  pack.capacity = 5;
   trit_array_p key = trit_array_new(NUM_TRITS_ADDRESS);
   memcpy(key->trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
   TEST_ASSERT(iota_stor_transaction_load_hashes(&conn, TRANSACTION_COL_ADDRESS,
                                                 key, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-  TEST_ASSERT_EQUAL_MEMORY(TEST_TRANSACTION.hash, pack.hashes[0]->trits,
+  TEST_ASSERT_EQUAL_MEMORY(TEST_TRANSACTION.hash,
+                           ((trit_array_p)pack.models[0])->trits,
                            FLEX_TRIT_SIZE_243);
 
-  for (int i = 0; i < pack.hashes_capacity; ++i) {
-    trit_array_free(pack.hashes[i]);
+  for (int i = 0; i < pack.capacity; ++i) {
+    trit_array_free(pack.models[i]);
   }
 }
 
 void test_stored_load_hashes_of_approvers(void) {
   trit_array_p hashes[5];
-  iota_hashes_pack pack;
-  pack.hashes = hashes;
+  iota_stor_pack_t pack;
+  pack.models = (void **)hashes;
   pack.num_loaded = 0;
-  pack.hashes_capacity = 5;
-  for (int i = 0; i < pack.hashes_capacity; ++i) {
-    pack.hashes[i] = trit_array_new(NUM_TRITS_HASH);
+  pack.capacity = 5;
+  for (int i = 0; i < pack.capacity; ++i) {
+    pack.models[i] = trit_array_new(NUM_TRITS_HASH);
   }
-  pack.hashes_capacity = 5;
+  pack.capacity = 5;
   trit_array_p key = trit_array_new(NUM_TRITS_HASH);
   memcpy(key->trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
   TEST_ASSERT(iota_stor_transaction_load_hashes_of_approvers(&conn, key,
                                                              &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(0, pack.num_loaded);
 
-  for (int i = 0; i < pack.hashes_capacity; ++i) {
-    trit_array_free(pack.hashes[i]);
+  for (int i = 0; i < pack.capacity; ++i) {
+    trit_array_free(pack.models[i]);
   }
 }
 

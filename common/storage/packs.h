@@ -18,36 +18,20 @@
 // Forward declaration
 typedef struct iota_milestone_s iota_milestone_t;
 
+typedef struct iota_stor_pack_s {
+  void **models;
+  size_t capacity;
+  size_t num_loaded;
+  bool insufficient_capacity;
+} iota_stor_pack_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// TODO: code duplication
-
-typedef struct iota_transactions_pack {
-  iota_transaction_t *txs;
-  size_t txs_capacity;
-  size_t num_loaded;
-  bool insufficient_capacity;
-} iota_transactions_pack;
-
-typedef struct iota_milestones_pack {
-  iota_milestone_t **milestones;
-  size_t milestones_capacity;
-  size_t num_loaded;
-  bool insufficient_capacity;
-} iota_milestones_pack;
-
-typedef struct iota_hashes_pack {
-  trit_array_p *hashes;
-  size_t hashes_capacity;
-  size_t num_loaded;
-  bool insufficient_capacity;
-} iota_hashes_pack;
-
-extern retcode_t hash_pack_resize(iota_hashes_pack *pack, size_t resize_factor);
-extern retcode_t hash_pack_init(iota_hashes_pack *pack, size_t size);
-extern retcode_t hash_pack_free(iota_hashes_pack *pack);
+extern retcode_t hash_pack_resize(iota_stor_pack_t *pack, size_t resize_factor);
+extern retcode_t hash_pack_init(iota_stor_pack_t *pack, size_t size);
+extern retcode_t hash_pack_free(iota_stor_pack_t *pack);
 
 #ifdef __cplusplus
 }

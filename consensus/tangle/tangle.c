@@ -26,7 +26,7 @@ retcode_t iota_tangle_transaction_store(const tangle_t *const tangle,
 retcode_t iota_tangle_transaction_load(const tangle_t *const tangle,
                                        const char *col_name,
                                        const trit_array_p key,
-                                       iota_transactions_pack *data_out) {
+                                       iota_stor_pack_t *data_out) {
   // TODO - when more "persistance provider are implemented - should loop
   return iota_stor_transaction_load(&tangle->conn, col_name, key, data_out);
 }
@@ -48,14 +48,14 @@ retcode_t iota_tangle_transaction_update(const tangle_t *const tangle,
 retcode_t iota_tangle_transaction_load_hashes(const tangle_t *const tangle,
                                               const char *index_name,
                                               const trit_array_p key,
-                                              iota_hashes_pack *pack) {
+                                              iota_stor_pack_t *pack) {
   return iota_stor_transaction_load_hashes(&tangle->conn, index_name, key,
                                            pack);
 }
 
 retcode_t iota_tangle_transaction_load_hashes_of_approvers(
     const tangle_t *const tangle, const trit_array_p approvee_hash,
-    iota_hashes_pack *pack) {
+    iota_stor_pack_t *pack) {
   return iota_stor_transaction_load_hashes_of_approvers(&tangle->conn,
                                                         approvee_hash, pack);
 }
