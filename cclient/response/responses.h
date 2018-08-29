@@ -16,5 +16,6 @@
 #include "get_node_info.h"
 #include "get_tips.h"
 #include "get_transactions_to_approve.h"
+#include "remove_neighbors.h"
 
 #endif  // CCLIENT_RESPONSE_RESPONSES_H

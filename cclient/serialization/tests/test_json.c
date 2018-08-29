@@ -219,6 +219,41 @@ void test_deserialize_add_neighbors(void) {
   TEST_ASSERT_EQUAL_INT(3, res);
 }
 
+void test_serialize_remove_neighbors(void) {
+  serializer_t serializer;
+  const char* json_text =
+      "{\"command\":\"removeNeighbors\",\"uris\":[\"udp://"
+      "8.8.8.8:14265\",\"udp://"
+      "9.9.9.9:443\"]}";
+
+  char_buffer_t* serializer_out = char_buffer_new();
+  init_json_serializer(&serializer);
+  remove_neighbors_req_t* req = remove_neighbors_req_new();
+  remove_neighbors_req_add(req, "udp://8.8.8.8:14265");
+  remove_neighbors_req_add(req, "udp://9.9.9.9:443");
+
+  serializer.vtable.remove_neighbors_serialize_request(&serializer, req,
+                                                       serializer_out);
+
+  TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
+
+  char_buffer_free(serializer_out);
+  remove_neighbors_req_free(req);
+}
+
+void test_deserialize_remove_neighbors(void) {
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text = "{\"removedNeighbors\":1,\"duration\":2}";
+
+  remove_neighbors_res_t res = 0;
+
+  serializer.vtable.remove_neighbors_deserialize_response(&serializer,
+                                                          json_text, &res);
+
+  TEST_ASSERT_EQUAL_INT(1, res);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -237,6 +272,10 @@ int main(void) {
   // add_neighbors
   RUN_TEST(test_serialize_add_neighbors);
   RUN_TEST(test_deserialize_add_neighbors);
+
+  // remove_neighbors
+  RUN_TEST(test_serialize_remove_neighbors);
+  RUN_TEST(test_deserialize_remove_neighbors);
 
   return UNITY_END();
 }
