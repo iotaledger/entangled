@@ -40,7 +40,7 @@ void test_uri_parser_ipv6(void) {
 }
 
 void test_uri_parser_http(void) {
-  char *uri_ipv4 = "http://iota.tangle.ncku:4242"; 
+  char *uri_http = "http://iota.tangle.ncku:4242";
   size_t scheme_len = 5;
   size_t host_len = 17;
   char scheme[scheme_len];
@@ -48,9 +48,16 @@ void test_uri_parser_http(void) {
   uint16_t port;
 
   TEST_ASSERT_TRUE(
-      uri_parse(uri_ipv4, scheme, scheme_len, host, host_len, &port));
+      uri_parse(uri_http, scheme, scheme_len, host, host_len, &port));
   TEST_ASSERT_EQUAL_STRING("http", scheme);
   TEST_ASSERT_EQUAL_STRING("iota.tangle.ncku", host);
+  TEST_ASSERT_EQUAL_INT(4242, port);
+  
+  char *uri_https = "https://iota.ncku:4242";
+  TEST_ASSERT_TRUE(
+      uri_parse(uri_https, scheme, scheme_len, host, host_len, &port));
+  TEST_ASSERT_EQUAL_STRING("https", scheme);
+  TEST_ASSERT_EQUAL_STRING("iota.ncku", host);
   TEST_ASSERT_EQUAL_INT(4242, port);
 }
 void test_wrong_uri(void) {

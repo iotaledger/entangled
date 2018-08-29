@@ -27,7 +27,7 @@ bool uri_parse(char const *const uri, char *const scheme,
     return false;
   }
   length = (size_t)(delim - (uri + offset));
-  if (length > MAX_SCHEME_LENGTH || length + 1 > scheme_len) {
+  if (length > MAX_SCHEME_LENGTH || length > scheme_len) {
     return false;
   }
   if (scheme) {
@@ -85,7 +85,7 @@ bool uri_parse(char const *const uri, char *const scheme,
     return false;
   }
   length = (size_t)(delim - (uri + offset));
-  if (length > MAX_HOST_LENGTH || length + 1 > host_len) {
+  if (length > MAX_HOST_LENGTH || length > host_len) {
     return false;
   }
   if (host != NULL) {
