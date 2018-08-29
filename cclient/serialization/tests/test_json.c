@@ -254,6 +254,47 @@ void test_deserialize_remove_neighbors(void) {
   TEST_ASSERT_EQUAL_INT(1, res);
 }
 
+void test_serialize_get_tips(void) {
+  serializer_t serializer;
+  const char* json_text = "{\"command\":\"getTips\"}";
+
+  char_buffer_t* serializer_out = char_buffer_new();
+  init_json_serializer(&serializer);
+
+  serializer.vtable.get_tips_serialize_request(&serializer, serializer_out);
+
+  TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
+
+  char_buffer_free(serializer_out);
+}
+
+void test_deserialize_get_tips(void) {
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text =
+      "{\"hashes\":["
+      "\"YVXJOEOP9JEPRQUVBPJMB9MGIB9OMTIJJLIUYPM9YBIWXPZ9PQCCGXYSLKQWKHBRVA9AKK"
+      "KXXMXF99999\","
+      "\"ZUMARCWKZOZRMJM9EEYJQCGXLHWXPRTMNWPBRCAGSGQNRHKGRUCIYQDAEUUEBRDBNBYHAQ"
+      "SSFZZQW9999\","
+      "\"QLQECHDVQBMXKD9YYLBMGQLLIQ9PSOVDRLYCLLFMS9O99XIKCUHWAFWSTARYNCPAVIQIBT"
+      "VJROOYZ9999\"],\"duration\":4}";
+
+  get_tips_res_t* tips = get_tips_res_new();
+
+  serializer.vtable.get_tips_deserialize_response(&serializer, json_text, tips);
+  TEST_ASSERT_EQUAL_STRING(
+      "YVXJOEOP9JEPRQUVBPJMB9MGIB9OMTIJJLIUYPM9YBIWXPZ9PQCCGXYSLKQWKHBRVA9AKKKX"
+      "XMXF99999",
+      get_tips_res_hash_at(tips, 0));
+  TEST_ASSERT_EQUAL_STRING(
+      "ZUMARCWKZOZRMJM9EEYJQCGXLHWXPRTMNWPBRCAGSGQNRHKGRUCIYQDAEUUEBRDBNBYHAQSS"
+      "FZZQW9999",
+      get_tips_res_hash_at(tips, 1));
+  TEST_ASSERT_EQUAL_STRING(NULL, get_tips_res_hash_at(tips, 3));
+  get_tips_res_free(tips);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -277,5 +318,7 @@ int main(void) {
   RUN_TEST(test_serialize_remove_neighbors);
   RUN_TEST(test_deserialize_remove_neighbors);
 
+  RUN_TEST(test_serialize_get_tips);
+  RUN_TEST(test_deserialize_get_tips);
   return UNITY_END();
 }

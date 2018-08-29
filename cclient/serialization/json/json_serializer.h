@@ -59,9 +59,11 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const,
                                                   get_node_info_res_t* out);
 
 // get_tips_response
-void json_get_tips_deserialize_response(const serializer_t* const,
-                                        const char* const obj,
-                                        get_tips_res_t* out);
+retcode_t json_get_tips_serialize_request(const serializer_t* const s,
+                                          char_buffer_t* out);
+retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
+                                             const char* const obj,
+                                             get_tips_res_t* out);
 
 // get_transactions_to_approve_response
 void json_get_transactions_to_approve_serialize_request(
@@ -105,6 +107,7 @@ static serializer_vtable json_vtable = {
     .get_node_info_serialize_request = json_get_node_info_serialize_request,
     .get_node_info_deserialize_response =
         json_get_node_info_deserialize_response,
+    .get_tips_serialize_request = json_get_tips_serialize_request,
     .get_tips_deserialize_response = json_get_tips_deserialize_response,
     .get_transactions_to_approve_serialize_request =
         json_get_transactions_to_approve_serialize_request,

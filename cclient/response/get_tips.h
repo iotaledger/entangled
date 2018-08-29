@@ -14,10 +14,13 @@ extern "C" {
 
 #include "types/types.h"
 
-typedef struct {
-  address_array tips;
-} get_tips_res_t;
+typedef UT_array get_tips_res_t;
 
+get_tips_res_t* get_tips_res_new();
+void get_tips_res_add(get_tips_res_t* hashes, const char* hash);
+char* get_tips_res_hash_at(get_tips_res_t* hashes, int index);
+int get_tips_res_hash_num(get_tips_res_t* hashes);
+void get_tips_res_free(get_tips_res_t* ut);
 #ifdef __cplusplus
 }
 #endif

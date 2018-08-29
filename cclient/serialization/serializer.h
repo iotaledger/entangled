@@ -63,10 +63,11 @@ typedef struct {
                                                   get_node_info_res_t* out);
 
   // get_tips_request
-
-  void (*get_tips_deserialize_response)(const serializer_t* const,
-                                        const char* const obj,
-                                        get_tips_res_t* out);
+  retcode_t (*get_tips_serialize_request)(const serializer_t* const,
+                                          char_buffer_t* out);
+  retcode_t (*get_tips_deserialize_response)(const serializer_t* const,
+                                             const char* const obj,
+                                             get_tips_res_t* out);
 
   // get_transactions_to_approve_response
   void (*get_transactions_to_approve_serialize_request)(

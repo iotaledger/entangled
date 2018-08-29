@@ -157,6 +157,7 @@ err:
 retcode_t json_find_transactions_deserialize_response(
     const serializer_t* const s, const char* const obj,
     find_transactions_res_t* out) {
+  retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
 
@@ -172,12 +173,10 @@ retcode_t json_find_transactions_deserialize_response(
     return RC_CCLIENT_JSON_PARSE;
   }
 
-  retcode_t ret = json_array_to_utarray(json_obj, "hashes", out->hashes);
-  if (ret != RC_OK) {
-    return ret;
-  }
+  ret = json_array_to_utarray(json_obj, "hashes", out->hashes);
 
-  return RC_OK;
+  cJSON_Delete(json_obj);
+  return ret;
 }
 
 // get_balances_response
@@ -379,9 +378,41 @@ end:
 }
 
 // get_tips_response
-void json_get_tips_deserialize_response(const serializer_t* const s,
-                                        const char* const obj,
-                                        get_tips_res_t* out) {}
+retcode_t json_get_tips_serialize_request(const serializer_t* const s,
+                                          char_buffer_t* out) {
+  retcode_t ret = RC_OK;
+  const char* req_text = "{\"command\":\"getTips\"}";
+  ret = char_buffer_allocate(out, strlen(req_text));
+  if (ret == RC_OK) {
+    strcpy(out->data, req_text);
+  }
+  return ret;
+}
+
+retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
+                                             const char* const obj,
+                                             get_tips_res_t* out) {
+  retcode_t ret = RC_OK;
+  cJSON* json_obj = cJSON_Parse(obj);
+  cJSON* json_item = NULL;
+
+  if (json_obj == NULL) {
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
+  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
+    // TODO log the error message from response.
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_RES_ERROR;
+  }
+
+  ret = json_array_to_utarray(json_obj, "hashes", out);
+
+  cJSON_Delete(json_obj);
+  return ret;
+}
 
 // get_transactions_to_approve_response
 void json_get_transactions_to_approve_serialize_request(
