@@ -23,16 +23,18 @@
  */
 
 static retcode_t iota_generic_select_statement(const char *table_name,
+                                               const char *select_col,
                                                const char *index_col,
                                                char statement[],
                                                size_t statement_cap) {
   int res;
 
   if (index_col == NULL || strcmp(index_col, "") == 0) {
-    res = snprintf(statement, statement_cap, "SELECT * FROM %s", table_name);
+    res = snprintf(statement, statement_cap, "SELECT %s FROM %s", select_col,
+                   table_name);
   } else {
-    res = snprintf(statement, statement_cap, "SELECT * FROM %s WHERE %s = ?",
-                   table_name, index_col);
+    res = snprintf(statement, statement_cap, "SELECT %s FROM %s WHERE %s = ?",
+                   select_col, table_name, index_col);
   }
 
   if (res < 0 || res == statement_cap) {
@@ -70,9 +72,9 @@ static retcode_t iota_generic_exist_statement(const char *table_name,
  * Transaction statements
  */
 
-retcode_t iota_transactions_insert_statement(const iota_transaction_t tx,
-                                             char statement[],
-                                             size_t statement_cap) {
+retcode_t iota_transaction_insert_statement(const iota_transaction_t tx,
+                                            char statement[],
+                                            size_t statement_cap) {
   int res = snprintf(
       statement, statement_cap,
       "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
@@ -98,51 +100,37 @@ retcode_t iota_transactions_insert_statement(const iota_transaction_t tx,
   return RC_OK;
 }
 
-retcode_t iota_transactions_select_statement(const char *index_col,
-                                             char statement[],
-                                             size_t statement_cap) {
-  return iota_generic_select_statement(TRANSACTION_TABLE_NAME, index_col,
+retcode_t iota_transaction_select_statement(const char *index_col,
+                                            char statement[],
+                                            size_t statement_cap) {
+  return iota_generic_select_statement(TRANSACTION_TABLE_NAME, "*", index_col,
                                        statement, statement_cap);
 }
 
-retcode_t iota_transactions_exist_statement(const char *index_col,
-                                            char statement[],
-                                            size_t statement_cap) {
+retcode_t iota_transaction_exist_statement(const char *index_col,
+                                           char statement[],
+                                           size_t statement_cap) {
   return iota_generic_exist_statement(TRANSACTION_TABLE_NAME, index_col,
                                       statement, statement_cap);
 }
 
-retcode_t iota_transactions_update_statement(const char *index_col,
-                                             const trit_array_p key,
-                                             const iota_transaction_t tx,
-                                             char statement[],
-                                             size_t statement_cap) {
+retcode_t iota_transaction_update_statement(const char *index_col,
+                                            const trit_array_p key,
+                                            const iota_transaction_t tx,
+                                            char statement[],
+                                            size_t statement_cap) {
   return RC_OK;
 }
 
-retcode_t iota_transactions_select_hashes_statement(const char *index_col,
-                                                    char statement[],
-                                                    size_t statement_cap) {
-  int res;
-
-  if (index_col == NULL || strcmp(index_col, "") == 0) {
-    res = snprintf(statement, statement_cap, "SELECT %s FROM %s",
-                   TRANSACTION_COL_HASH, TRANSACTION_TABLE_NAME);
-  } else {
-    res = snprintf(statement, statement_cap, "SELECT %s FROM %s WHERE %s=?",
-                   TRANSACTION_COL_HASH, TRANSACTION_TABLE_NAME, index_col);
-  }
-
-  if (res < 0 || res == statement_cap) {
-    log_error(SQL_STATEMENTS_ID,
-              "Failed in creating statement, statement: %s\n", statement);
-    return RC_SQL_FAILED_WRITE_STATEMENT;
-  }
-
-  return RC_OK;
+retcode_t iota_transaction_select_hashes_statement(const char *index_col,
+                                                   char statement[],
+                                                   size_t statement_cap) {
+  return iota_generic_select_statement(TRANSACTION_TABLE_NAME,
+                                       TRANSACTION_COL_HASH, index_col,
+                                       statement, statement_cap);
 }
 
-retcode_t iota_transactions_select_hashes_approvers_statement(
+retcode_t iota_transaction_select_hashes_approvers_statement(
     const trit_array_p approvee_hash, char statement[], size_t statement_cap) {
   int res;
 
@@ -186,7 +174,7 @@ retcode_t iota_milestone_insert_statement(const iota_milestone_t *milestone,
 retcode_t iota_milestone_select_statement(const char *index_col,
                                           char statement[],
                                           size_t statement_cap) {
-  return iota_generic_select_statement(MILESTONE_TABLE_NAME, index_col,
+  return iota_generic_select_statement(MILESTONE_TABLE_NAME, "*", index_col,
                                        statement, statement_cap);
 }
 
@@ -195,12 +183,4 @@ retcode_t iota_milestone_exist_statement(const char *index_col,
                                          size_t statement_cap) {
   return iota_generic_exist_statement(MILESTONE_TABLE_NAME, index_col,
                                       statement, statement_cap);
-}
-
-retcode_t iota_milestone_update_statement(const char *index_col,
-                                          const trit_array_p key,
-                                          const iota_milestone_t *milestone,
-                                          char statement[],
-                                          size_t statement_cap) {
-  return RC_OK;
 }

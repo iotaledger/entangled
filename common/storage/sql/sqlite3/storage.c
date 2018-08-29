@@ -87,7 +87,7 @@ retcode_t iota_stor_transaction_store(const connection_t* const conn,
   char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
 
-  if ((ret = iota_transactions_insert_statement(
+  if ((ret = iota_transaction_insert_statement(
            data_in, statement, TRANSACTION_MAX_STORE_STATEMENT_SIZE))) {
     return ret;
   }
@@ -151,7 +151,7 @@ retcode_t iota_stor_transaction_load(const connection_t* const conn,
   char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
 
-  if ((ret = iota_transactions_select_statement(
+  if ((ret = iota_transaction_select_statement(
            col_name, statement, TRANSACTION_MAX_SELECT_STATEMENT_SIZE))) {
     return ret;
   }
@@ -201,10 +201,10 @@ retcode_t iota_stor_transaction_exist(const connection_t* const conn,
   retcode_t ret = RC_OK;
   char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
-  char statement[TRANSACTION_MAX_SELECT_STATEMENT_SIZE];
+  char statement[TRANSACTION_MAX_EXIST_STATEMENT_SIZE];
 
-  if ((ret = iota_transactions_exist_statement(
-           index_name, statement, TRANSACTION_MAX_SELECT_STATEMENT_SIZE))) {
+  if ((ret = iota_transaction_exist_statement(
+           index_name, statement, TRANSACTION_MAX_EXIST_STATEMENT_SIZE))) {
     return ret;
   }
 
@@ -257,7 +257,7 @@ extern retcode_t iota_stor_transaction_load_hashes(
   sqlite3_stmt* sqlite_statement = 0;
   char const* buffer;
 
-  if ((ret = iota_transactions_select_hashes_statement(
+  if ((ret = iota_transaction_select_hashes_statement(
            col_name, statement, TRANSACTION_MAX_SELECT_STATEMENT_SIZE))) {
     return ret;
   }
@@ -314,7 +314,7 @@ retcode_t iota_stor_transaction_load_hashes_of_approvers(
   sqlite3_stmt* sqlite_statement = 0;
   char const* buffer;
 
-  if ((ret = iota_transactions_select_hashes_approvers_statement(
+  if ((ret = iota_transaction_select_hashes_approvers_statement(
            approvee_hash, statement, TRANSACTION_MAX_SELECT_STATEMENT_SIZE))) {
     return ret;
   }
@@ -485,10 +485,10 @@ retcode_t iota_stor_milestone_exist(const connection_t* const conn,
   retcode_t ret = RC_OK;
   char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
-  char statement[MILESTONE_MAX_SELECT_STATEMENT_SIZE];
+  char statement[MILESTONE_MAX_EXIST_STATEMENT_SIZE];
 
   if ((ret = iota_milestone_exist_statement(
-           index_name, statement, MILESTONE_MAX_SELECT_STATEMENT_SIZE))) {
+           index_name, statement, MILESTONE_MAX_EXIST_STATEMENT_SIZE))) {
     return ret;
   }
 

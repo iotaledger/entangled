@@ -22,13 +22,13 @@ retcode_t create_index_if_not_exists(const connection_t* const conn,
                                      const char* const col_name) {
   char* errMsg = 0;
 
-  char statement[TRANSACTION_MAX_CREATE_INDEX_STATEMENT_SIZE];
+  char statement[MAX_CREATE_INDEX_STATEMENT_SIZE];
 
-  int res = snprintf(statement, TRANSACTION_MAX_CREATE_INDEX_STATEMENT_SIZE,
+  int res = snprintf(statement, MAX_CREATE_INDEX_STATEMENT_SIZE,
                      "CREATE INDEX IF NOT EXISTS %s ON %s(%s)", index_name,
                      table_name, col_name);
 
-  if (res < 0 || res == TRANSACTION_MAX_CREATE_INDEX_STATEMENT_SIZE) {
+  if (res < 0 || res == MAX_CREATE_INDEX_STATEMENT_SIZE) {
     log_error(CONNECTION_LOGGER_ID,
               "Failed to write statement, statement: %s\n", statement);
     return RC_SQLITE3_FAILED_WRITE_STATEMENT;

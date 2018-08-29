@@ -1,5 +1,5 @@
 cc_library(
-    name = "connection",
+    name = "statements",
     srcs = ["statements.c"],
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
