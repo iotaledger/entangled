@@ -9,46 +9,52 @@
 #define __CONSENSUS_MILESTONE_TRACKER_MILESTONE_TRACKER_H__
 
 #include <stdbool.h>
-#include <stdint.h>
-
+// #include <stdint.h>
+//
 #include "common/errors.h"
-#include "common/model/transaction.h"
-#include "consensus/snapshot/snapshot.h"
-#include "consensus/view_models/milestone.h"
+// #include "common/model/transaction.h"
+// #include "consensus/snapshot/snapshot.h"
+// #include "consensus/view_models/milestone.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+// Foward declarations
+typedef struct tangle_s tangle_t;
+
 typedef struct milestone_tracker_s {
   bool running;
-  trit_array_p coordinator;
-  // iota_transaction_validator
-  bool testnet;
-  bool accept_any_testnet_coo;
-  size_t num_of_keys;
-  milestone_view_t latest_milestone_hash;
-  milestone_view_t latest_solid_milestone_hash;
-  uint64_t latest_milestone_index;
-  uint64_t latest_solid_milestone_index;
-  uint64_t milestone_start_index;
-  snapshot_t latest_snapshot;
-
-  /*
-  private final MessageQ messageQ;
-  private LedgerValidator ledgerValidator;
-  private final Set<Hash> analyzedMilestoneCandidates = new HashSet<>();
-   */
+  tangle_t* tangle;
+  // trit_array_p coordinator;
+  // // iota_transaction_validator
+  // bool testnet;
+  // bool accept_any_testnet_coo;
+  // size_t num_of_keys;
+  // milestone_view_t latest_milestone_hash;
+  // milestone_view_t latest_solid_milestone_hash;
+  // uint64_t latest_milestone_index;
+  // uint64_t latest_solid_milestone_index;
+  // uint64_t milestone_start_index;
+  // snapshot_t latest_snapshot;
+  //
+  // /*
+  // private final MessageQ messageQ;
+  // private LedgerValidator ledgerValidator;
+  // private final Set<Hash> analyzedMilestoneCandidates = new HashSet<>();
+  //  */
 } milestone_tracker_t;
 
 /**
  * Initializes a milestone tracker
  *
  * @param mt The milestone tracker
+ * @param tangle A tangle
  *
  * @return a status code
  */
-extern retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt);
+extern retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
+                                             tangle_t* const tangle);
 
 /**
  * Starts a milestone tracker
