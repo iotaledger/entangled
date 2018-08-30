@@ -45,7 +45,7 @@ void test_serialize_find_transactions(void) {
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
   char_buffer_free(serializer_out);
-  find_transactions_req_free(find_tran);
+  find_transactions_req_free(&find_tran);
 }
 
 void test_deserialize_find_transactions(void) {
@@ -74,7 +74,7 @@ void test_deserialize_find_transactions(void) {
       find_transactions_res_hash_at(deserialize_find_tran, 1));
   TEST_ASSERT_EQUAL_STRING(
       NULL, find_transactions_res_hash_at(deserialize_find_tran, 3));
-  find_transactions_res_free(deserialize_find_tran);
+  find_transactions_res_free(&deserialize_find_tran);
 }
 
 void test_serialize_get_node_info(void) {
