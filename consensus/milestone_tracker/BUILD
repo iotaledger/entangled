@@ -1,7 +1,7 @@
 cc_library(
-    name = "milestone",
-    srcs = ["milestone.c"],
-    hdrs = ["milestone.h"],
+    name = "milestone_tracker",
+    srcs = ["milestone_tracker.c"],
+    hdrs = ["milestone_tracker.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",

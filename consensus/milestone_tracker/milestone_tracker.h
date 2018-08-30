@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __CONSENSUS_MILESTONE_MILESTONE_H__
-#define __CONSENSUS_MILESTONE_MILESTONE_H__
+#ifndef __CONSENSUS_MILESTONE_TRACKER_MILESTONE_TRACKER_H__
+#define __CONSENSUS_MILESTONE_TRACKER_MILESTONE_TRACKER_H__
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -20,7 +20,7 @@
 extern "C" {
 #endif
 
-typedef struct milestone_s {
+typedef struct milestone_tracker_s {
   trit_array_p coordinator;
   // iota_transaction_validator
   bool testnet;
@@ -38,17 +38,18 @@ typedef struct milestone_s {
   private LedgerValidator ledgerValidator;
   private final Set<Hash> analyzedMilestoneCandidates = new HashSet<>();
    */
-} milestone_t;
+} milestone_tracker_t;
 
-extern retcode_t iota_milestone_init();
-extern retcode_t iota_milestone_validate();
-extern retcode_t iota_milestone_update_latest_solid_subtangle_milestone();
-extern retcode_t iota_milestone_get_index();
-extern retcode_t iota_milestone_shutdown();
-extern retcode_t iota_milestone_report_to_slack();
+extern retcode_t iota_milestone_tracker_init();
+extern retcode_t iota_milestone_tracker_validate();
+extern retcode_t
+iota_milestone_tracker_update_latest_solid_subtangle_milestone();
+extern retcode_t iota_milestone_tracker_get_index();
+extern retcode_t iota_milestone_tracker_shutdown();
+extern retcode_t iota_milestone_tracker_report_to_slack();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // __CONSENSUS_MILESTONE_MILESTONE_H__
+#endif  // __CONSENSUS_MILESTONE_TRACKER_MILESTONE_TRACKER_H__
