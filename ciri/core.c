@@ -33,8 +33,14 @@ retcode_t core_init(core_t* const core) {
   core->db_conf.index_transaction_hash = true;
   core->db_conf.index_milestone_hash = true;
   if (iota_tangle_init(&core->tangle, &core->db_conf)) {
-    log_critical(CORE_LOGGER_ID, "Initializing tangle\n");
+    log_critical(CORE_LOGGER_ID, "Initializing tangle failed\n");
     return RC_CORE_FAILED_DATABASE_INIT;
+  }
+
+  log_info(CORE_LOGGER_ID, "Initializing milestone tracker\n");
+  if (iota_milestone_tracker_init(&core->milestone_tracker)) {
+    log_critical(CORE_LOGGER_ID, "Initializing milestone tracker failed\n");
+    return RC_CORE_FAILED_MILESTONE_TRACKER_INIT;
   }
 
   log_info(CORE_LOGGER_ID, "Initializing cIRI node\n");
@@ -49,6 +55,12 @@ retcode_t core_init(core_t* const core) {
 retcode_t core_start(core_t* const core) {
   if (core == NULL) {
     return RC_CORE_NULL_CORE;
+  }
+
+  log_info(CORE_LOGGER_ID, "Starting milestone tracker\n");
+  if (iota_milestone_tracker_start(&core->milestone_tracker)) {
+    log_critical(CORE_LOGGER_ID, "Starting milestone tracker failed\n");
+    return RC_CORE_FAILED_MILESTONE_TRACKER_START;
   }
 
   log_info(CORE_LOGGER_ID, "Starting cIRI node\n");
@@ -67,6 +79,12 @@ retcode_t core_stop(core_t* const core) {
 
   if (core == NULL) {
     return RC_CORE_NULL_CORE;
+  }
+
+  log_info(CORE_LOGGER_ID, "Stopping milestone tracker\n");
+  if (iota_milestone_tracker_stop(&core->milestone_tracker)) {
+    log_critical(CORE_LOGGER_ID, "Stopping milestone tracker failed\n");
+    return RC_CORE_FAILED_MILESTONE_TRACKER_STOP;
   }
 
   log_info(CORE_LOGGER_ID, "Stopping cIRI node\n");
@@ -89,6 +107,12 @@ retcode_t core_destroy(core_t* const core) {
 
   if (core->running) {
     return RC_CORE_STILL_RUNNING;
+  }
+
+  log_info(CORE_LOGGER_ID, "Destroying milestone tracker\n");
+  if (iota_milestone_tracker_stop(&core->milestone_tracker)) {
+    log_critical(CORE_LOGGER_ID, "Destroying milestone tracker failed\n");
+    return RC_CORE_FAILED_MILESTONE_TRACKER_DESTROY;
   }
 
   log_info(CORE_LOGGER_ID, "Destroying cIRI node\n");

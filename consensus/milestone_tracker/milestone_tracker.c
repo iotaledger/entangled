@@ -6,5 +6,24 @@
  */
 
 #include "consensus/milestone_tracker/milestone_tracker.h"
+#include "utils/logger_helper.h"
 
-#define MILESTONE_LOGGER_ID "consensus_milestone_tracker"
+#define MILESTONE_TRACKER_LOGGER_ID "consensus_milestone_tracker"
+
+retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt) {
+  logger_helper_init(MILESTONE_TRACKER_LOGGER_ID, LOGGER_DEBUG, true);
+  return RC_OK;
+}
+
+retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt) {
+  return RC_OK;
+}
+
+retcode_t iota_milestone_tracker_stop(milestone_tracker_t* const mt) {
+  return RC_OK;
+}
+
+retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt) {
+  logger_helper_destroy(MILESTONE_TRACKER_LOGGER_ID);
+  return RC_OK;
+}

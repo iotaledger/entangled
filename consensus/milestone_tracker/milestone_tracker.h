@@ -21,6 +21,7 @@ extern "C" {
 #endif
 
 typedef struct milestone_tracker_s {
+  bool running;
   trit_array_p coordinator;
   // iota_transaction_validator
   bool testnet;
@@ -40,12 +41,46 @@ typedef struct milestone_tracker_s {
    */
 } milestone_tracker_t;
 
-extern retcode_t iota_milestone_tracker_init();
+/**
+ * Initializes a milestone tracker
+ *
+ * @param mt The milestone tracker
+ *
+ * @return a status code
+ */
+extern retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt);
+
+/**
+ * Starts a milestone tracker
+ *
+ * @param mt The milestone tracker
+ *
+ * @return a status code
+ */
+extern retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt);
+
+/**
+ * Stops a milestone tracker
+ *
+ * @param mt The milestone tracker
+ *
+ * @return a status code
+ */
+extern retcode_t iota_milestone_tracker_stop(milestone_tracker_t* const mt);
+
+/**
+ * Destroys a milestone tracker
+ *
+ * @param mt The milestone tracker
+ *
+ * @return a status code
+ */
+extern retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt);
+
 extern retcode_t iota_milestone_tracker_validate();
 extern retcode_t
 iota_milestone_tracker_update_latest_solid_subtangle_milestone();
 extern retcode_t iota_milestone_tracker_get_index();
-extern retcode_t iota_milestone_tracker_shutdown();
 extern retcode_t iota_milestone_tracker_report_to_slack();
 
 #ifdef __cplusplus

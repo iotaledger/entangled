@@ -16,6 +16,7 @@ cc_library(
     deps = [
         ":node_shared",
         "//ciri/conf",
+        "//consensus/milestone_tracker",
         "//consensus/tangle",
     ],
 )

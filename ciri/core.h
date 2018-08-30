@@ -10,6 +10,7 @@
 
 #include "ciri/conf/conf.h"
 #include "ciri/node.h"
+#include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
 
 typedef struct core_s {
@@ -17,6 +18,7 @@ typedef struct core_s {
   ciri_conf_t config;
   node_t node;
   tangle_t tangle;
+  milestone_tracker_t milestone_tracker;
   connection_config_t db_conf;
 } core_t;
 
