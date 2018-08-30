@@ -9,12 +9,9 @@
 #define __CONSENSUS_MILESTONE_TRACKER_MILESTONE_TRACKER_H__
 
 #include <stdbool.h>
-// #include <stdint.h>
-//
+
 #include "common/errors.h"
-// #include "common/model/transaction.h"
-// #include "consensus/snapshot/snapshot.h"
-// #include "consensus/view_models/milestone.h"
+#include "utils/handles/thread.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,6 +23,8 @@ typedef struct tangle_s tangle_t;
 typedef struct milestone_tracker_s {
   bool running;
   tangle_t* tangle;
+  thread_handle_t latest_milestone_tracker;
+  thread_handle_t solid_milestone_tracker;
   // trit_array_p coordinator;
   // // iota_transaction_validator
   // bool testnet;
