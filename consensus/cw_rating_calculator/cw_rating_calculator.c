@@ -8,6 +8,7 @@
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "common/errors.h"
 #include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
+#include "utils/logger_helper.h"
 
 retcode_t iota_consensus_cw_rating_init(
     cw_rating_calculator_t *const cw_calc, tangle_t *const tangle,

@@ -9,6 +9,7 @@
 #include "common/errors.h"
 #include "common/storage/storage.h"
 #include "consensus/view_models/milestone.h"
+#include "utils/logger_helper.h"
 
 #define ENTRY_POINT_SELECTOR_LOGGER_ID "consensus_entry_point_selector"
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))

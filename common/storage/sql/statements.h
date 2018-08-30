@@ -8,42 +8,61 @@
 #ifndef __COMMON_STORAGE_SQL_STATEMENTS_H__
 #define __COMMON_STORAGE_SQL_STATEMENTS_H__
 
-#include <stdbool.h>
-#include <stdint.h>
 #include "common/errors.h"
-#include "common/model/transaction.h"
-#include "common/storage/connection.h"
-#include "common/trinary/trit_array.h"
+
+// Forward declarations
+typedef struct _trit_array* trit_array_p;
+typedef struct _iota_transaction* iota_transaction_t;
+typedef struct iota_milestone_s iota_milestone_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*index_name = column name by to compare to key*/
-retcode_t iota_transactions_insert_statement(const iota_transaction_t tx,
-                                             char statement[],
-                                             size_t statement_cap);
+/*
+ * Transaction statements
+ */
 
-retcode_t iota_transactions_select_statement(const char* index_col,
-                                             char statement[],
-                                             size_t statement_cap);
-
-retcode_t iota_transactions_exist_statement(const char* index_col,
+retcode_t iota_statement_transaction_insert(const iota_transaction_t tx,
                                             char statement[],
                                             size_t statement_cap);
 
-retcode_t iota_transactions_update_statement(const char* index_col,
-                                             const trit_array_p key,
-                                             const iota_transaction_t tx,
-                                             char statement[],
-                                             size_t statement_cap);
+retcode_t iota_statement_transaction_select(const char* index_col,
+                                            char statement[],
+                                            size_t statement_cap);
 
-retcode_t iota_transactions_select_hashes_statement(const char* index_col,
-                                                    char statement[],
-                                                    size_t statement_cap);
+retcode_t iota_statement_transaction_exist(const char* index_col,
+                                           char statement[],
+                                           size_t statement_cap);
 
-retcode_t iota_transactions_select_hashes_approvers_statement(
+retcode_t iota_statement_transaction_update(const char* index_col,
+                                            const trit_array_p key,
+                                            const iota_transaction_t tx,
+                                            char statement[],
+                                            size_t statement_cap);
+
+retcode_t iota_statement_transaction_select_hashes(const char* index_col,
+                                                   char statement[],
+                                                   size_t statement_cap);
+
+retcode_t iota_statement_transaction_select_hashes_approvers(
     const trit_array_p approvee_hash, char statement[], size_t statement_cap);
+
+/*
+ * Milestone statements
+ */
+
+retcode_t iota_statement_milestone_insert(const iota_milestone_t* milestone,
+                                          char statement[],
+                                          size_t statement_cap);
+
+retcode_t iota_statement_milestone_select(const char* index_col,
+                                          char statement[],
+                                          size_t statement_cap);
+
+retcode_t iota_statement_milestone_exist(const char* index_col,
+                                         char statement[],
+                                         size_t statement_cap);
 
 #ifdef __cplusplus
 }
