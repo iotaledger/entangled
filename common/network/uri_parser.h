@@ -12,6 +12,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define PROTOCOL_TCP "tcp"
+#define PROTOCOL_UDP "udp"
+#define PROTOCOL_HTTP "http"
+#define PROTOCOL_HTTPS "https"
+#define HOST_IPv4 "8.8.8.8"
+#define HOST_IPv6 "FEDC:BA98:7654:3210:FEDC:BA98:7654:3210"
+#define HOST_HTTP "node04.iotatoken.nl"
+#define PORT "14265"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,4 +44,4 @@ bool uri_parse(char const *const uri, char *const scheme, size_t scheme_len,
 }
 #endif
 
-#endif  // __COMMON_NETWORK_URI_PARSER_H__
+#endif // __COMMON_NETWORK_URI_PARSER_H__

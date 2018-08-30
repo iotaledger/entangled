@@ -17,7 +17,8 @@ bool uri_parse(char const *const uri, char *const scheme,
   size_t offset = 0;
   char *delim = NULL;
   ip_version_t uri_case;
-  const char *possible_scheme[] = {"tcp", "udp", "http", "https"};
+  const char *possible_scheme[] = {PROTOCOL_TCP, PROTOCOL_UDP, PROTOCOL_HTTP,
+                                   PROTOCOL_HTTPS};
   const int possible_scheme_num =
       sizeof(possible_scheme) / sizeof(*possible_scheme);
 
@@ -28,7 +29,7 @@ bool uri_parse(char const *const uri, char *const scheme,
     return false;
   }
   length = (size_t)(delim - (uri + offset));
-  if (length > MAX_SCHEME_LENGTH || length > scheme_len) {
+  if (length > MAX_SCHEME_LENGTH || length + 1 > scheme_len) {
     return false;
   }
   if (scheme) {
@@ -38,13 +39,7 @@ bool uri_parse(char const *const uri, char *const scheme,
 
   // determine if scheme is acceptable type
   for (int i = 0; i < possible_scheme_num; i++) {
-    int len;
-    if (strlen(possible_scheme[i]) > strlen(scheme)) {
-      len = strlen(scheme);
-    } else {
-      len = strlen(possible_scheme[i]);
-    }
-    if (strncmp(possible_scheme[i], scheme, len) == 0) {
+    if (strncmp(possible_scheme[i], scheme, scheme_len) == 0) {
       break;
     } else if (i == (possible_scheme_num - 1)) {
       return false;
@@ -85,7 +80,7 @@ bool uri_parse(char const *const uri, char *const scheme,
     return false;
   }
   length = (size_t)(delim - (uri + offset));
-  if (length > MAX_HOST_LENGTH || length > host_len) {
+  if (length > MAX_HOST_LENGTH || length + 1 > host_len) {
     return false;
   }
   if (host != NULL) {
