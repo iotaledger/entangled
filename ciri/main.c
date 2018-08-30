@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ciri/conf/provider.h"
 #include "ciri/core.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
@@ -27,19 +26,16 @@ int main(int argc, char* argv[]) {
   logger_output_register(stdout);
   logger_output_level_set(stdout, LOGGER_DEBUG);
   logger_helper_init(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
-  memset(&core_g, 0, sizeof(core_t));
 
-  // configuration argument parser
-  log_info(MAIN_LOGGER_ID, "Initializing configuration variables\n");
+  log_info(MAIN_LOGGER_ID, "Initializing configuration\n");
   if (ciri_conf_init(&core_g.config)) {
-    log_critical(MAIN_LOGGER_ID,
-                 "Initializing configuration variables failed\n");
+    log_critical(MAIN_LOGGER_ID, "Initializing configuration failed\n");
     return EXIT_FAILURE;
   }
 
-  log_info(MAIN_LOGGER_ID, "Parsing configuration variables\n");
+  log_info(MAIN_LOGGER_ID, "Parsing command line arguments\n");
   if (ciri_conf_parse(&core_g.config, argc, argv)) {
-    log_critical(MAIN_LOGGER_ID, "Parsing configuration variables failed\n");
+    log_critical(MAIN_LOGGER_ID, "Parsing command line arguments failed\n");
     return EXIT_FAILURE;
   }
 
