@@ -123,8 +123,8 @@ iota_api_result_t iota_api_find_transactions(
  * @return error value.
  */
 iota_api_result_t iota_api_get_trytes(const iota_http_service_t* const service,
-                                      const get_trytes_req_t* const req,
-                                      char* trytes[]);
+                                      get_trytes_req_t* req,
+                                      get_trytes_res_t* res);
 
 /**
  * Get the inclusion states of a set of transactions. This is for determining if
@@ -253,6 +253,21 @@ iota_api_result_t iota_api_store_transactions(
     const iota_http_service_t* const service,
     const store_transactions_req_t* const req);
 
+/**
+ * Check if a list of addresses was ever spent from, in the current epoch, or in
+ * previous epochs.
+ *
+ * https://iota.readme.io/reference#wereaddressesspentfrom
+ *
+ * @param service IRI node end point.
+ * @param req - the request containing the addresses to check if they were ever
+ * spent from.
+ *
+ * @return The error value.
+ */
+iota_api_result_t iota_api_were_addresses_spent_from(
+    const iota_http_service_t* const service,
+    were_addresses_spent_from_req_t* req, were_addresses_spent_from_res_t* res);
 #ifdef __cplusplus
 }
 #endif

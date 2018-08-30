@@ -14,14 +14,8 @@ extern "C" {
 
 #include "types/types.h"
 
-typedef struct {
-  /**
-   * Trunk transaction to approve
-   */
-  trit_array_array* txs;
-  size_t numTxs;
-
-} broadcast_transactions_req_t;
+// List of raw data of transactions to be rebroadcast.
+typedef UT_array broadcast_transactions_req_t;
 
 #ifdef __cplusplus
 }
