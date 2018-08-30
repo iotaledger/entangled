@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "ciri/conf/conf.h"
-#include "ciri/conf/conf_default.h"
+#include "ciri/conf/conf_values.h"
 
 retcode_t ciri_conf_init(ciri_conf_t* conf) {
   if (conf == NULL) {

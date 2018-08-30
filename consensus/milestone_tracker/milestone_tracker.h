@@ -19,13 +19,14 @@ extern "C" {
 
 // Foward declarations
 typedef struct tangle_s tangle_t;
+typedef struct _trit_array* trit_array_p;
 
 typedef struct milestone_tracker_s {
   bool running;
   tangle_t* tangle;
   thread_handle_t latest_milestone_tracker;
   thread_handle_t solid_milestone_tracker;
-  // trit_array_p coordinator;
+  trit_array_p coordinator;
   // // iota_transaction_validator
   // bool testnet;
   // bool accept_any_testnet_coo;

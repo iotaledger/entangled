@@ -7,6 +7,8 @@
 
 #include <string.h>
 
+#include "ciri/conf/conf_values.h"
+#include "common/trinary/trit_array.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "utils/logger_helper.h"
 
@@ -34,6 +36,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   memset(mt, 0, sizeof(milestone_tracker_t));
   mt->running = false;
   mt->tangle = tangle;
+  mt->coordinator = trit_array_new_from_trytes((tryte_t*)COORDINATOR_ADDRESS);
 
   return RC_OK;
 }
@@ -105,6 +108,7 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt) {
     return RC_CONSENSUS_MT_STILL_RUNNING;
   }
 
+  trit_array_free(mt->coordinator);
   memset(mt, 0, sizeof(milestone_tracker_t));
   logger_helper_destroy(MILESTONE_TRACKER_LOGGER_ID);
 

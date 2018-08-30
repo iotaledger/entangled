@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __CIRI_CONF_CONF_DEFAULT_H__
-#define __CIRI_CONF_CONF_DEFAULT_H__
+#ifndef __CIRI_CONF_CONF_VALUES_H__
+#define __CIRI_CONF_CONF_VALUES_H__
 
 // Command line arguments default values
 
@@ -23,4 +23,10 @@
 #define CONF_DEFAULT_MAX_PEERS 0
 #define CONF_DEFAULT_DNS_RESOLUTION true
 
-#endif  // __CIRI_CONF_CONF_DEFAULT_H__
+// Coordinator config
+
+#define COORDINATOR_ADDRESS                                                  \
+  "KPWCHICGJZXKE9GSUDXZYUAPLHAKAHYHDXNPHENTERYMMBQOPSQIDENXKLKCEYCPVTZQLEEJ" \
+  "VYJZV9BWU"
+
+#endif  // __CIRI_CONF_CONF_VALUES_H__

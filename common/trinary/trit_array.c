@@ -101,6 +101,18 @@ trit_array_p trit_array_new(size_t const num_trits) {
   return trit_array;
 }
 
+trit_array_p trit_array_new_from_trytes(tryte_t const *const trytes) {
+  size_t num_trytes = strlen((char *)trytes);
+  size_t num_trits = num_trytes * 3;
+  trit_array_p trit_array;
+  if ((trit_array = trit_array_new(num_trits)) == NULL) {
+    return NULL;
+  }
+  flex_trits_from_trytes(trit_array->trits, num_trits, trytes, num_trytes,
+                         num_trytes);
+  return trit_array;
+}
+
 /***********************************************************************************************************
  * Destructor
  ***********************************************************************************************************/
