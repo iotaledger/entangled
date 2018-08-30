@@ -13,10 +13,6 @@ get_tips_res_t* get_tips_res_new() {
   return hashes;
 }
 
-void get_tips_res_add(get_tips_res_t* hashes, const char* hash) {
-  utarray_push_back(hashes, &hash);
-}
-
 char* get_tips_res_hash_at(get_tips_res_t* hashes, int index) {
   if (utarray_len(hashes) > index) {
     char** p = NULL;

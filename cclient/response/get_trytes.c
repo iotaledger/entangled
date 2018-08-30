@@ -13,10 +13,6 @@ get_trytes_res_t* get_trytes_res_new() {
   return hashes;
 }
 
-void get_trytes_res_add(get_trytes_res_t* trytes_array, const char* trytes) {
-  utarray_push_back(trytes_array, &trytes);
-}
-
 char* get_trytes_res_at(get_trytes_res_t* trytes_array, int index) {
   if (utarray_len(trytes_array) > index) {
     char** p = NULL;
