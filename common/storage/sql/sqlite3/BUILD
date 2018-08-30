@@ -8,7 +8,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common/storage",
-        "//common/storage/sql:connection",
+        "//common/storage/sql:statements",
         "//utils:logger_helper",
         "@sqlite3",
     ],
