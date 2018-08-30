@@ -34,6 +34,32 @@ typedef int8_t flex_trit_t;
 #define FLEX_TRIT_NULL_VALUE 0
 #endif
 
+#if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
+#define FLEX_TRIT_SIZE_27 27
+#define FLEX_TRIT_SIZE_81 81
+#define FLEX_TRIT_SIZE_243 243
+#define FLEX_TRIT_SIZE_6561 6561
+#define FLEX_TRIT_SIZE_8019 8019
+#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_27 9
+#define FLEX_TRIT_SIZE_81 27
+#define FLEX_TRIT_SIZE_243 81
+#define FLEX_TRIT_SIZE_6561 2187
+#define FLEX_TRIT_SIZE_8019 2673
+#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_27 7
+#define FLEX_TRIT_SIZE_81 21
+#define FLEX_TRIT_SIZE_243 61
+#define FLEX_TRIT_SIZE_6561 1641
+#define FLEX_TRIT_SIZE_8019 2005
+#elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_27 6
+#define FLEX_TRIT_SIZE_81 17
+#define FLEX_TRIT_SIZE_243 49
+#define FLEX_TRIT_SIZE_6561 1313
+#define FLEX_TRIT_SIZE_8019 1604
+#endif
+
 /// Returns the number of bytes needed to store a given number of trits in the
 /// current memory model.
 /// @param[in] num_trits - number of trits to store

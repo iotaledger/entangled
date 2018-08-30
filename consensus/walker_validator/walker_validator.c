@@ -6,6 +6,7 @@
  */
 
 #include "consensus/walker_validator/walker_validator.h"
+#include "utils/logger_helper.h"
 
 #define WALKER_VALIDATOR_LOGGER_ID "consensus_walker_validator"
 

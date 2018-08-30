@@ -6,6 +6,7 @@
  */
 
 #include "consensus/transaction_validator/transaction_validator.h"
+#include "utils/logger_helper.h"
 
 #define TRANSACTION_VALIDATOR_LOGGER_ID "consensus_transaction_validator"
 
