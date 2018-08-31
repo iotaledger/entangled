@@ -23,6 +23,7 @@ typedef struct _trit_array* trit_array_p;
 
 typedef struct milestone_tracker_s {
   bool running;
+  bool testnet;
   tangle_t* tangle;
   uint64_t milestone_start_index;
   thread_handle_t latest_milestone_tracker;
@@ -55,11 +56,13 @@ typedef struct milestone_tracker_s {
  *
  * @param mt The milestone tracker
  * @param tangle A tangle
+ * @param testnet Whether the node runs on testnet or not
  *
  * @return a status code
  */
 extern retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
-                                             tangle_t* const tangle);
+                                             tangle_t* const tangle,
+                                             bool testnet);
 
 /**
  * Starts a milestone tracker

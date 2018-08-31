@@ -73,7 +73,7 @@ static void* solid_milestone_tracker(void* arg) {
 }
 
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
-                                      tangle_t* const tangle) {
+                                      tangle_t* const tangle, bool testnet) {
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
   } else if (tangle == NULL) {
@@ -83,11 +83,17 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   logger_helper_init(MILESTONE_TRACKER_LOGGER_ID, LOGGER_DEBUG, true);
   memset(mt, 0, sizeof(milestone_tracker_t));
   mt->running = false;
+  mt->testnet = testnet;
   mt->tangle = tangle;
   // TODO: OOM check
   mt->lastest_milestone = trit_array_new(NUM_TRITS_HASH);
   mt->lastest_solid_subtangle_milestone = trit_array_new(NUM_TRITS_HASH);
-  mt->coordinator = trit_array_new_from_trytes((tryte_t*)COORDINATOR_ADDRESS);
+  if (mt->testnet) {
+    mt->coordinator =
+        trit_array_new_from_trytes((tryte_t*)TESTNET_COORDINATOR_ADDRESS);
+  } else {
+    mt->coordinator = trit_array_new_from_trytes((tryte_t*)COORDINATOR_ADDRESS);
+  }
   mt->latest_milestone_index = mt->milestone_start_index;
   mt->latest_solid_subtangle_milestone_index = mt->milestone_start_index;
 
