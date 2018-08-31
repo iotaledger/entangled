@@ -21,6 +21,29 @@ static void* latest_milestone_tracker(void* arg) {
 
 static void* solid_milestone_tracker(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
+  while (mt->running) {
+    log_debug(MILESTONE_TRACKER_LOGGER_ID,
+              "Scanning for latest solid subtangle milestone\n");
+    uint64_t scan_time = current_timestamp_ms();
+    uint64_t previous_solid_subtangle_latest_milestone_index =
+        mt->latest_solid_subtangle_milestone_index;
+
+    if (mt->latest_solid_subtangle_milestone_index <
+        mt->latest_milestone_index) {
+      // TODO updateLatestSolidSubtangleMilestone();
+    }
+    if (previous_solid_subtangle_latest_milestone_index !=
+        mt->latest_solid_subtangle_milestone_index) {
+      // TODO messageQ publish lmsi/lmhs
+      log_info(MILESTONE_TRACKER_LOGGER_ID,
+               "Latest solid subtangle milestone has changed from #%" PRIu64
+               " to #%" PRIu64 "\n",
+               previous_solid_subtangle_latest_milestone_index,
+               mt->latest_solid_subtangle_milestone_index);
+    }
+    sleep_ms(
+        MAX(1, SMT_RESCAN_INTERVAL - (current_timestamp_ms() - scan_time)));
+  }
   return NULL;
 }
 
