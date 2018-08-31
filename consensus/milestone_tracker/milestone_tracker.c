@@ -22,6 +22,25 @@
 
 static void* latest_milestone_tracker(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
+
+  while (mt->running) {
+    log_debug(MILESTONE_TRACKER_LOGGER_ID, "Scanning for latest milestone\n");
+    uint64_t scan_time = current_timestamp_ms();
+    uint64_t previous_latest_milestone_index = mt->latest_milestone_index;
+    iota_stor_pack_t hash_pack;
+    hash_pack_init(&hash_pack, 20);
+    for (size_t i = 0; i < hash_pack.num_loaded; ++i) {
+    }
+    if (previous_latest_milestone_index != mt->latest_milestone_index) {
+      // TODO messageQ publish lmi
+      log_info(MILESTONE_TRACKER_LOGGER_ID,
+               "Latest milestone has changed from #%" PRIu64 " to #%" PRIu64
+               "\n",
+               previous_latest_milestone_index, mt->latest_milestone_index);
+    }
+    sleep_ms(
+        MAX(1, LMT_RESCAN_INTERVAL - (current_timestamp_ms() - scan_time)));
+  }
   return NULL;
 }
 
