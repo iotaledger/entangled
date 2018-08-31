@@ -14,13 +14,13 @@ bazel test //...
 
 ### Tools needed in git hook
 We need tools below to run the checks:
-* buildifier
-* clang-format
+- buildifier
+- clang-format
 
 ### Buildifier
 Buildifier can be installed with `bazel` or `go`
 
-**#### *Install with go**
+#### Install with go
 1. change directory to `$GOPATH`
 2. run `$ go get github.com/bazelbuild/buildtools/buildifier`
    The executable file will be in `$GOPATH/bin`
@@ -37,5 +37,5 @@ Buildifier can be installed with `bazel` or `go`
 
 ### clang-format
 clang-format can be installed by command: 
-* Debian/Ubuntu based: `$ sudo apt-get install clang-format`
-* OSX: `$ brew install clang-format`
+- Debian/Ubuntu based: `$ sudo apt-get install clang-format`
+- OSX: `$ brew install clang-format`
