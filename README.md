@@ -12,8 +12,7 @@ bazel test //...
 - Be sure to run `./hooks/autohook.sh install` after initial checkout!
 - Pass `-c dbg` for building with debug symbols.
 
-### Tools needed in git hook
-We need tools below to run the checks:
+### Tools required for running git commit hook
 - buildifier
 - clang-format
 
@@ -23,7 +22,7 @@ Buildifier can be installed with `bazel` or `go`
 #### Install with go
 1. change directory to `$GOPATH`
 2. run `$ go get github.com/bazelbuild/buildtools/buildifier`
-   The executable file will be in `$GOPATH/bin`
+   The executable file will be located under `$GOPATH/bin`
 3. make a soft link for global usage, run 
    `$ sudo ln -s $HOME/go/bin/buildifier /usr/bin/buildifier`
 
@@ -32,7 +31,7 @@ Buildifier can be installed with `bazel` or `go`
    `$ git clone https://github.com/bazelbuild/buildtools.git`
 2. change directory to `buildtools`
 3. build it with bazel command, `$ bazel build //buildifier`
-   The executable file will be in `path/to/buildtools/bazel-bin`
+   The executable file will be located under `path/to/buildtools/bazel-bin`
 4. make a soft link
 
 ### clang-format
