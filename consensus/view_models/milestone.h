@@ -22,8 +22,8 @@ extern "C" {
 typedef trit_array_p milestone_view_t;
 
 extern retcode_t iota_consensus_find_closest_next_milestone(
-    tangle_t* const tangle, bool const testnet, size_t const milestone_index,
-    size_t const milestone_start_index,
+    tangle_t* const tangle, bool testnet, size_t milestone_index,
+    size_t milestone_start_index,
     milestone_view_t const closest_milestone_found);
 
 #ifdef __cplusplus
