@@ -39,7 +39,8 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   size_t num_approvers = 200;
   size_t num_txs = num_approvers + 1;
 
-  TEST_ASSERT(test_setup(&tangle, &config) == RC_OK);
+  TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
 
   struct _iota_transaction txs[num_approvers];
@@ -98,12 +99,13 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  TEST_ASSERT(test_cleanup(&tangle) == RC_OK);
+  TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
 void test_single_tx_tangle(void) {
-  TEST_ASSERT(test_setup(&tangle, &config) == RC_OK);
+  TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
@@ -131,7 +133,7 @@ void test_single_tx_tangle(void) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  TEST_ASSERT(test_cleanup(&tangle) == RC_OK);
+  TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
@@ -146,7 +148,8 @@ void test_cw_topology_four_transactions_diamond(void) {
 
   size_t num_txs = 4;
 
-  TEST_ASSERT(test_setup(&tangle, &config) == RC_OK);
+  TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
 
   struct _iota_transaction txs[num_txs];
@@ -198,7 +201,7 @@ void test_cw_topology_four_transactions_diamond(void) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  TEST_ASSERT(test_cleanup(&tangle) == RC_OK);
+  TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 

@@ -15,13 +15,10 @@
 extern "C" {
 #endif
 
-// void get_test_db_path(char *path);
-// void get_src_db_path(char *path);
+retcode_t test_setup(tangle_t *const tangle, connection_config_t *const config,
+                     char *test_db_path, char *ciri_db_path);
 
-// void get_db_path(bool debug_mode);
-
-retcode_t test_setup(tangle_t *const tangle, connection_config_t *const config);
-retcode_t test_cleanup(tangle_t *const tangle);
+retcode_t test_cleanup(tangle_t *const tangle, char *test_db_path);
 
 #ifdef __cplusplus
 }
