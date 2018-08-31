@@ -15,11 +15,12 @@
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
+#include "consensus/test_definitions/defs.h"
 #include "utarray.h"
-#include "utils/files.h"
 
 static cw_rating_calculator_t calc;
 static tangle_t tangle;
+static connection_config_t config;
 
 // gdb --args ./test_cw_ratings_dfs 1
 static bool debug_mode = false;
@@ -32,36 +33,14 @@ typedef enum test_tangle_topology {
   BLOCKCHAIN,
 } test_tangle_topology;
 
-void test_init_cw(void) {
-  connection_config_t config;
-
-  config.db_path = test_db_path;
-  config.index_transaction_address = true;
-  config.index_transaction_approvee = true;
-  config.index_transaction_bundle = true;
-  config.index_transaction_tag = true;
-  config.index_transaction_hash = true;
-  config.index_milestone_hash = true;
-  TEST_ASSERT(iota_tangle_init(&tangle, &config) == RC_OK);
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
-}
-
-void test_setup() {
-  TEST_ASSERT(copy_file(test_db_path, ciri_db_path) == RC_OK);
-  RUN_TEST(test_init_cw);
-}
-void test_cleanup() {
-  TEST_ASSERT(iota_tangle_destroy(&tangle) == RC_OK);
-  TEST_ASSERT(remove_file(test_db_path) == RC_OK);
-}
-
 void test_cw_gen_topology(test_tangle_topology topology) {
   cw_entry_t *curr_cw_entry = NULL;
   cw_entry_t *tmp_cw_entry = NULL;
   size_t num_approvers = 200;
   size_t num_txs = num_approvers + 1;
 
-  test_setup();
+  TEST_ASSERT(test_setup(&tangle, &config) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
 
   struct _iota_transaction txs[num_approvers];
   txs[0] = TEST_TRANSACTION;
@@ -119,11 +98,13 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  test_cleanup();
+  TEST_ASSERT(test_cleanup(&tangle) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
 void test_single_tx_tangle(void) {
-  test_setup();
+  TEST_ASSERT(test_setup(&tangle, &config) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, (flex_trit_t *)TEST_TRANSACTION.hash,
@@ -150,7 +131,8 @@ void test_single_tx_tangle(void) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  test_cleanup();
+  TEST_ASSERT(test_cleanup(&tangle) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
 void test_cw_topology_only_direct_approvers(void) {
@@ -164,7 +146,8 @@ void test_cw_topology_four_transactions_diamond(void) {
 
   size_t num_txs = 4;
 
-  test_setup();
+  TEST_ASSERT(test_setup(&tangle, &config) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
 
   struct _iota_transaction txs[num_txs];
   txs[0] = TEST_TRANSACTION;
@@ -215,7 +198,8 @@ void test_cw_topology_four_transactions_diamond(void) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  test_cleanup();
+  TEST_ASSERT(test_cleanup(&tangle) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
 int main(int argc, char *argv[]) {
@@ -228,6 +212,14 @@ int main(int argc, char *argv[]) {
     test_db_path = "test.db";
     ciri_db_path = "ciri.db";
   }
+
+  config.db_path = test_db_path;
+  config.index_transaction_address = true;
+  config.index_transaction_approvee = true;
+  config.index_transaction_bundle = true;
+  config.index_transaction_tag = true;
+  config.index_transaction_hash = true;
+  config.index_milestone_hash = true;
 
   RUN_TEST(test_single_tx_tangle);
   RUN_TEST(test_cw_topology_blockchain);

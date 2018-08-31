@@ -10,7 +10,7 @@ cc_test(
         "//common/storage/tests/helpers",
         "//common/trinary:trit_ptrit",
         "//consensus/cw_rating_calculator",
-        "//utils:files",
+        "//consensus/test_definitions:defs",
         "@unity",
     ],
 )
