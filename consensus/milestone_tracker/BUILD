@@ -6,8 +6,10 @@ cc_library(
     deps = [
         "//ciri/conf:conf_values",
         "//common:errors",
+        "//common/storage:pack",
         "//common/trinary:trit_array",
         "//utils:logger_helper",
+        "//utils:time",
         "//utils/handles:thread",
     ],
 )

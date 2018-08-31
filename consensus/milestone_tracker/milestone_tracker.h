@@ -24,8 +24,13 @@ typedef struct _trit_array* trit_array_p;
 typedef struct milestone_tracker_s {
   bool running;
   tangle_t* tangle;
+  uint64_t milestone_start_index;
   thread_handle_t latest_milestone_tracker;
+  uint64_t latest_milestone_index;
+  trit_array_p lastest_milestone;
   thread_handle_t solid_milestone_tracker;
+  uint64_t latest_solid_subtangle_milestone_index;
+  trit_array_p lastest_solid_subtangle_milestone;
   trit_array_p coordinator;
   // // iota_transaction_validator
   // bool testnet;
