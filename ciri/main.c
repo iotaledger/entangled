@@ -6,6 +6,7 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "ciri/core.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
@@ -15,7 +16,7 @@
 
 static core_t core_g;
 
-int main() {
+int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
 
   if (LOGGER_VERSION != logger_version()) {
@@ -25,6 +26,18 @@ int main() {
   logger_output_register(stdout);
   logger_output_level_set(stdout, LOGGER_DEBUG);
   logger_helper_init(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
+
+  log_info(MAIN_LOGGER_ID, "Initializing configuration\n");
+  if (ciri_conf_init(&core_g.config)) {
+    log_critical(MAIN_LOGGER_ID, "Initializing configuration failed\n");
+    return EXIT_FAILURE;
+  }
+
+  log_info(MAIN_LOGGER_ID, "Parsing command line arguments\n");
+  if (ciri_conf_parse(&core_g.config, argc, argv)) {
+    log_critical(MAIN_LOGGER_ID, "Parsing command line arguments failed\n");
+    return EXIT_FAILURE;
+  }
 
   log_info(MAIN_LOGGER_ID, "Initializing cIRI core\n");
   if (core_init(&core_g)) {

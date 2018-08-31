@@ -6,15 +6,11 @@
  */
 
 #include "ciri/node.h"
+#include "ciri/core.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
 #define NODE_LOGGER_ID "node"
-
-// FIXME: Initialize TCP/UDP receiver services with ports from conf variables
-// https://github.com/iotaledger/entangled/issues/104
-static uint16_t tcp_port_g = 14260;
-static uint16_t udp_port_g = 14261;
 
 retcode_t node_init(node_t* const node, core_t* const core) {
   if (node == NULL) {
@@ -45,7 +41,8 @@ retcode_t node_init(node_t* const node, core_t* const core) {
   }
 
   log_info(NODE_LOGGER_ID, "Initializing receiver component\n");
-  if (receiver_init(&node->receiver, node, tcp_port_g, udp_port_g)) {
+  if (receiver_init(&node->receiver, node, core->config.tcp_receiver_port,
+                    core->config.udp_receiver_port)) {
     log_critical(NODE_LOGGER_ID, "Initializing receiver component failed\n");
     return RC_NODE_FAILED_RECEIVER_INIT;
   }

@@ -6,6 +6,7 @@
  */
 
 #include "consensus/ledger_validator/ledger_validator.h"
+#include "utils/logger_helper.h"
 
 #define LEDGER_VALIDATOR_LOGGER_ID "consensus_ledger_validator"
 

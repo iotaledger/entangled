@@ -7,6 +7,7 @@
 
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/milestone/milestone.h"
+#include "utils/logger_helper.h"
 #include "utils/macros.h"
 
 #define ENTRY_POINT_SELECTOR_LOGGER_ID "consensus_entry_point_selector"

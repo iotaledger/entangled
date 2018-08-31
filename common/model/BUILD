@@ -1,6 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "milestone",
+    hdrs = ["milestone.h"],
+)
+
+cc_library(
     name = "transaction",
     srcs = ["transaction.c"],
     hdrs = ["transaction.h"],
@@ -8,15 +13,6 @@ cc_library(
         "//common/curl-p:digest",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_long",
-    ],
-)
-
-cc_library(
-    name = "tryte_transaction",
-    srcs = ["tryte_transaction.cc"],
-    hdrs = ["tryte_transaction.h"],
-    deps = [
-        "//common/model:transaction",
     ],
 )
 
@@ -30,5 +26,14 @@ cc_library(
         "//common/model:transaction",
         "//common/trinary:trit_tryte",
         "//common/trinary:tryte_long",
+    ],
+)
+
+cc_library(
+    name = "tryte_transaction",
+    srcs = ["tryte_transaction.cc"],
+    hdrs = ["tryte_transaction.h"],
+    deps = [
+        "//common/model:transaction",
     ],
 )

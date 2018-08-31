@@ -9,11 +9,8 @@
 #define __COMMON_STORAGE_CONNECTION_H__
 
 #include <stdbool.h>
-#include <stdint.h>
 
 #include "common/errors.h"
-
-#include <logger.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,11 +22,12 @@ typedef struct connection_t {
 
 typedef struct connection_config_t {
   const char* db_path;
-  bool index_address;
-  bool index_approvee;
-  bool index_bundle;
-  bool index_tag;
-  bool index_hash;
+  bool index_transaction_address;
+  bool index_transaction_approvee;
+  bool index_transaction_bundle;
+  bool index_transaction_tag;
+  bool index_transaction_hash;
+  bool index_milestone_hash;
 } connection_config_t;
 
 extern retcode_t init_connection(const connection_t* const,

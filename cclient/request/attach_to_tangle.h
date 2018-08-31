@@ -18,19 +18,19 @@ typedef struct {
   /**
    * Trunk transaction to approve
    */
-  tx_hash_t trunk;
+  char_buffer_t* trunk;
   /**
    * branch transaction to approve
    */
-  tx_hash_t branch;
+  char_buffer_t* branch;
   /**
-   * Proof of Work intensity.
+   * Min Weight Magnitude,Proof of Work intensity. Minimum value is 18
    */
-  int weightMagnitude;
+  int mwm;
   /**
-   * Transaction's raw trytes
+   * List of trytes (raw transaction data) to attach to the tangle.
    */
-  trit_array_array txToAttachTrytes;
+  UT_array* trytes;
 
 } attach_to_tangle_req_t;
 

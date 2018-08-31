@@ -22,16 +22,16 @@ retcode_t core_init(core_t* const core) {
   }
 
   logger_helper_init(CORE_LOGGER_ID, LOGGER_DEBUG, true);
-  memset(core, 0, sizeof(core_t));
   core->running = false;
 
   log_info(CORE_LOGGER_ID, "Initializing tangle\n");
   core->db_conf.db_path = CIRI_DB_PATH;
-  core->db_conf.index_address = true;
-  core->db_conf.index_approvee = true;
-  core->db_conf.index_bundle = true;
-  core->db_conf.index_tag = true;
-  core->db_conf.index_hash = true;
+  core->db_conf.index_transaction_address = true;
+  core->db_conf.index_transaction_approvee = true;
+  core->db_conf.index_transaction_bundle = true;
+  core->db_conf.index_transaction_tag = true;
+  core->db_conf.index_transaction_hash = true;
+  core->db_conf.index_milestone_hash = true;
   if (iota_tangle_init(&core->tangle, &core->db_conf)) {
     log_critical(CORE_LOGGER_ID, "Initializing tangle\n");
     return RC_CORE_FAILED_DATABASE_INIT;

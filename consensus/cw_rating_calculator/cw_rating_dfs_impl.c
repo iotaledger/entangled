@@ -6,7 +6,8 @@
  */
 
 #include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
-#include "common/storage/packs.h"
+#include "common/storage/pack.h"
+#include "utils/logger_helper.h"
 
 static retcode_t cw_rating_dfs_do_dfs_from_db(
     const cw_rating_calculator_t *const cw_calc, trit_array_p entry_point,
@@ -112,7 +113,7 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
   size_t curr_approver_index;
 
   retcode_t res = RC_OK;
-  iota_hashes_pack pack;
+  iota_stor_pack_t pack;
   *subtangle_size = 0;
 
   if ((res = hash_pack_init(&pack, 10)) != RC_OK) {
@@ -136,8 +137,8 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
     pack.num_loaded = 0;
     pack.insufficient_capacity = false;
     curr_tx_trit_array.trits = curr_tx_hash;
-    res = iota_tangle_load_hashes_of_approvers(cw_calc->tangle,
-                                               &curr_tx_trit_array, &pack);
+    res = iota_tangle_transaction_load_hashes_of_approvers(
+        cw_calc->tangle, &curr_tx_trit_array, &pack);
 
     if (res != RC_OK) {
       log_error(CW_RATING_CALCULATOR_LOGGER_ID,
@@ -180,17 +181,20 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
                     "Failed in memory allocation\n");
           return RC_CONSENSUS_OOM;
         }
-        memcpy(curr_direct_approver->hash, pack.hashes[pack.num_loaded]->trits,
+        memcpy(curr_direct_approver->hash,
+               ((trit_array_p)pack.models[pack.num_loaded])->trits,
                FLEX_TRIT_SIZE_243);
 
         HASH_ADD(hh, curr_tx->approvers, hash, FLEX_TRIT_SIZE_243,
                  curr_direct_approver);
 
         // push approver to stack only if it hasn't been found yet
-        HASH_FIND(hh, *tx_to_approvers, pack.hashes[curr_approver_index]->trits,
+        HASH_FIND(hh, *tx_to_approvers,
+                  ((trit_array_p)pack.models[curr_approver_index])->trits,
                   FLEX_TRIT_SIZE_243, curr_approver_tx);
         if (!curr_approver_tx) {
-          utarray_push_back(stack, pack.hashes[curr_approver_index]->trits);
+          utarray_push_back(
+              stack, ((trit_array_p)pack.models[curr_approver_index])->trits);
         }
       }
 

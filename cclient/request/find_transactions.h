@@ -42,7 +42,7 @@ typedef struct {
 } find_transactions_req_t;
 
 find_transactions_req_t* find_transactions_req_new();
-void find_transactions_req_free(find_transactions_req_t* req);
+void find_transactions_req_free(find_transactions_req_t** req);
 
 void find_transactions_req_add_address(find_transactions_req_t* req,
                                        char* addr);
