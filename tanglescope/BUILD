@@ -8,7 +8,7 @@ cc_library(
             "blowballcollector.cpp",
             "echocollector.cpp",
             "confirmationratecollector.cpp",
-            "throwcatchcollector.cpp",
+            "broadcastrecievecollecter.cpp",
             "tests/**/*.cpp",
         ],
     ),
@@ -75,8 +75,8 @@ cc_library(
 
 cc_library(
     name = "throwcatchcollector",
-    srcs = ["throwcatchcollector.cpp"],
-    hdrs = ["throwcatchcollector.hpp"],
+    srcs = ["broadcastrecievecollecter.cpp"],
+    hdrs = ["broadcastrecievecollecter.hpp"],
     visibility = ["//visibility:public"],
     deps = [
         ":shared",

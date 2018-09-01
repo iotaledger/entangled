@@ -12,7 +12,7 @@
 #include <shared_mutex>
 #include <string>
 
-#include "tanglescope/throwcatchcollector.hpp"
+#include "tanglescope/broadcastrecievecollecter.hpp"
 
 #include "cppclient/beast.h"
 
