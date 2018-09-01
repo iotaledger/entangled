@@ -419,11 +419,52 @@ void test_deserialize_get_inclusion_states(void) {
 }
 
 void test_serialize_get_balances(void) {
-  // TODO
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text =
+      "{\"command\":\"getBalances\",\"addresses\":["
+      "\"HBBYKAKTILIPVUKFOTSLHGENPTXYBNKXZFQFR9VQFWNBMTQNRV"
+      "OUKPVPRNBSZVVILMAFBKOTBLGLWLOHQ\"]"
+      ",\"threshold\":100}";
+
+  char_buffer_t* serializer_out = char_buffer_new();
+  get_balances_req_t* get_bal = get_balances_req_new();
+  get_balances_req_add_address(get_bal,
+                               "HBBYKAKTILIPVUKFOTSLHGENPTXYBNKXZFQFR9"
+                               "VQFWNBMTQNRVOUKPVPRNBSZVVILMAFBKOTBLGL"
+                               "WLOHQ");
+  get_bal->threshold = 100;
+  serializer.vtable.get_balances_serialize_request(&serializer, get_bal,
+                                                   serializer_out);
+
+  TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
+
+  char_buffer_free(serializer_out);
+  get_balances_req_free(get_bal);
 }
 
 void test_deserialize_get_balances(void) {
-  // TODO
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text =
+      "{\"balances\": "
+      "[\"114544444\"], "
+      "\"references\": "
+      "[\"INRTUYSZCWBHGFGGXXPWRWBZACYAFGVRRP9VYEQJOHYD9URME"
+      "LKWAFYFMNTSP9MCHLXRGAFMBOZPZ9999\"], "
+      "\"milestoneIndex\": 128}";
+
+  get_balances_res_t* deserialize_get_bal = get_balances_res_new();
+  serializer.vtable.get_balances_deserialize_response(&serializer, json_text,
+                                                      deserialize_get_bal);
+
+  TEST_ASSERT_EQUAL_INT(114544444,
+                        get_balances_res_balances_at(deserialize_get_bal, 0));
+  TEST_ASSERT_EQUAL_INT(128, deserialize_get_bal->milestoneIndex);
+  TEST_ASSERT_EQUAL_STRING(
+      "INRTUYSZCWBHGFGGXXPWRWBZACYAFGVRRP9VYEQJOHYD9URMELKWAFYFMNTSP9MCHLXRGAFM"
+      "BOZPZ9999",
+      get_balances_res_milestone_at(deserialize_get_bal, 0));
 }
 
 void test_serialize_get_transactions_to_approve(void) {

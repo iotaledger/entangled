@@ -67,6 +67,10 @@ char_buffer_t* char_buffer_new();
 retcode_t char_buffer_allocate(char_buffer_t* in, size_t n);
 void char_buffer_free(char_buffer_t* in);
 
+int_array* int_array_new();
+retcode_t int_array_allocate(int_array* in, size_t n);
+void int_array_free(int_array* in);
+
 #ifdef __cplusplus
 }
 #endif
