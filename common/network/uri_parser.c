@@ -83,7 +83,7 @@ bool uri_parse(char const *const uri, char *const scheme,
   if (length > MAX_HOST_LENGTH || length + 1 > host_len) {
     return false;
   }
-  if (host != NULL) {
+  if (host) {
     memcpy(host, uri + offset, length);
     host[length] = '\0';
   }

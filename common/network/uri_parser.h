@@ -44,4 +44,4 @@ bool uri_parse(char const *const uri, char *const scheme, size_t scheme_len,
 }
 #endif
 
-#endif // __COMMON_NETWORK_URI_PARSER_H__
+#endif  // __COMMON_NETWORK_URI_PARSER_H__
