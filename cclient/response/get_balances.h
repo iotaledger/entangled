@@ -15,11 +15,15 @@ extern "C" {
 #include "types/types.h"
 
 typedef struct {
-  int_array balances;
+  int_array_array* balances;
   int milestoneIndex;
-  const address_t milestone;
-
+  UT_array* milestone;
 } get_balances_res_t;
+
+get_balances_res_t* get_balances_res_new();
+void get_balances_res_free(get_balances_res_t* res);
+char* get_balances_res_balances_at(get_balances_res_t* in, int index);
+char* get_balances_res_milestone_at(get_balances_res_t* in, int index);
 
 #ifdef __cplusplus
 }
