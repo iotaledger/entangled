@@ -16,6 +16,11 @@ extern "C" {
 // List of raw data of transactions to be store.
 typedef UT_array store_transactions_req_t;
 
+store_transactions_req_t* store_transactions_req_new();
+void store_transactions_req_add(store_transactions_req_t* transactions,
+                                const char* trytes);
+void store_transactions_req_free(store_transactions_req_t* transactions);
+
 #ifdef __cplusplus
 }
 #endif
