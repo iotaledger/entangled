@@ -55,12 +55,12 @@ retcode_t json_array_to_int_array(cJSON* obj, const char* obj_name,
   if (cJSON_IsArray(json_item)) {
     cJSON* current_obj = NULL;
     int_array_allocate(in, cJSON_GetArraySize(json_item));
-    int* in_arr_p = in->array;
-
+    
+    int i = 0;
     cJSON_ArrayForEach(current_obj, json_item) {
       if (current_obj->valuestring != NULL) {
-        *in_arr_p = atoi(current_obj->valuestring);
-        in_arr_p++;
+        *(in->array + i) = atoi(current_obj->valuestring);
+        i++;
       }
     }
   } else {

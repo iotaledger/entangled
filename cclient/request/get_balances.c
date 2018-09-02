@@ -21,7 +21,6 @@ void get_balances_req_free(get_balances_req_t* req) {
     utarray_free(req->addresses);
     utarray_free(req->tips);
     free(req);
-    req = NULL;
   }
 }
 

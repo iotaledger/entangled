@@ -5,11 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdlib.h>
-#include <string.h>
-#include <unity/unity.h>
-
-#include "serializer/json/json_serializer.h"
+#include "test_json.h"
 
 void test_serialize_find_transactions(void) {
   serializer_t serializer;
@@ -423,8 +419,8 @@ void test_serialize_get_balances(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"command\":\"getBalances\",\"addresses\":["
-      "\"HBBYKAKTILIPVUKFOTSLHGENPTXYBNKXZFQFR9VQFWNBMTQNRV"
-      "OUKPVPRNBSZVVILMAFBKOTBLGLWLOHQ\"]"
+      "\"" GET_BALANCES_SERIALIZE_ADDRESS
+      "\"]"
       ",\"threshold\":100}";
 
   char_buffer_t* serializer_out = char_buffer_new();
@@ -448,23 +444,24 @@ void test_deserialize_get_balances(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"balances\": "
-      "[\"114544444\"], "
+      "[\"" GET_BALANCES_DESERIALIZE_BALANCE
+      "\"], "
       "\"references\": "
-      "[\"INRTUYSZCWBHGFGGXXPWRWBZACYAFGVRRP9VYEQJOHYD9URME"
-      "LKWAFYFMNTSP9MCHLXRGAFMBOZPZ9999\"], "
-      "\"milestoneIndex\": 128}";
+      "[\"" GET_BALANCES_DESERIALIZE_REFERENCE
+      "\"], "
+      "\"milestoneIndex\":" GET_BALANCES_DESERIALIZE_MILESTONEINDEX "}";
 
   get_balances_res_t* deserialize_get_bal = get_balances_res_new();
   serializer.vtable.get_balances_deserialize_response(&serializer, json_text,
                                                       deserialize_get_bal);
 
-  TEST_ASSERT_EQUAL_INT(114544444,
+  TEST_ASSERT_EQUAL_INT(atoi(GET_BALANCES_DESERIALIZE_BALANCE),
                         get_balances_res_balances_at(deserialize_get_bal, 0));
-  TEST_ASSERT_EQUAL_INT(128, deserialize_get_bal->milestoneIndex);
   TEST_ASSERT_EQUAL_STRING(
-      "INRTUYSZCWBHGFGGXXPWRWBZACYAFGVRRP9VYEQJOHYD9URMELKWAFYFMNTSP9MCHLXRGAFM"
-      "BOZPZ9999",
+      GET_BALANCES_DESERIALIZE_REFERENCE,
       get_balances_res_milestone_at(deserialize_get_bal, 0));
+  TEST_ASSERT_EQUAL_INT(atoi(GET_BALANCES_DESERIALIZE_MILESTONEINDEX),
+                        deserialize_get_bal->milestoneIndex);
 }
 
 void test_serialize_get_transactions_to_approve(void) {

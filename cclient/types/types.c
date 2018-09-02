@@ -44,14 +44,18 @@ retcode_t int_array_allocate(int_array* in, size_t n) {
     return RC_OK;
   }
   in->array = (int*)malloc(sizeof(int) * (n + 1));
-  if (in->array == NULL) return RC_CCLIENT_OOM;
+  if (in->array == NULL) {
+    return RC_CCLIENT_OOM;
+  }
   in->size = n;
   return RC_OK;
 }
 
 void int_array_free(int_array* in) {
   if (in) {
-    if (in->array) free(in->array);
+    if (in->array) {
+      free(in->array);
+    }
     free(in);
   }
 }
