@@ -25,11 +25,11 @@ retcode_t json_find_transactions_deserialize_response(
     find_transactions_res_t* out);
 
 // get_balances_response
-void json_get_balances_serialize_request(const serializer_t* const,
+retcode_t json_get_balances_serialize_request(const serializer_t* const,
                                          const get_balances_req_t* const obj,
-                                         char* out);
+                                         char_buffer_t* out);
 
-void json_get_balances_deserialize_response(const serializer_t* const,
+retcode_t json_get_balances_deserialize_response(const serializer_t* const,
                                             const char* const obj,
                                             get_balances_res_t* out);
 
