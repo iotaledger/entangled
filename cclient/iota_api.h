@@ -237,7 +237,7 @@ iota_api_result_t iota_api_interrupt_attaching_to_tangle(
  */
 iota_api_result_t iota_api_broadcast_transactions(
     const iota_http_service_t* const service,
-    const broadcast_transactions_req_t* const req);
+    broadcast_transactions_req_t* req);
 
 /**
  * Store transactions into the local storage. The trytes to be used for this
