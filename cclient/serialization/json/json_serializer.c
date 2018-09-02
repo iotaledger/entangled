@@ -49,17 +49,17 @@ retcode_t utarray_to_json_array(UT_array* ut, cJSON* json_root,
   return RC_OK;
 }
 
-retcode_t json_array_to_int_array(cJSON* obj, const char* obj_name,
-                                  int_array* in) {
+retcode_t json_array_to_int_array_array(cJSON* obj, const char* obj_name,
+                                  int_array_array* in) {
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
     cJSON* current_obj = NULL;
-    int_array_allocate(in, cJSON_GetArraySize(json_item));
+    int_array_array_allocate(in, cJSON_GetArraySize(json_item));
     
     int i = 0;
     cJSON_ArrayForEach(current_obj, json_item) {
       if (current_obj->valuestring != NULL) {
-        *(in->array + i) = atoi(current_obj->valuestring);
+        *(in->array + i) = *string_to_int_array(current_obj->valuestring);
         i++;
       }
     }
@@ -281,7 +281,7 @@ retcode_t json_get_balances_deserialize_response(const serializer_t* const s,
     return RC_CCLIENT_JSON_PARSE;
   }
 
-  ret = json_array_to_int_array(json_obj, "balances", out->balances);
+  ret = json_array_to_int_array_array(json_obj, "balances", out->balances);
   if (ret != RC_OK) {
     goto end;
   }
