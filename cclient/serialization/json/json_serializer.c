@@ -70,6 +70,22 @@ retcode_t json_array_to_int_array_array(cJSON* obj, const char* obj_name,
   return RC_OK;
 }
 
+retcode_t json_boolean_array_to_utarray(cJSON* obj, const char* obj_name,
+                                        UT_array* ut) {
+  cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
+  if (cJSON_IsArray(json_item)) {
+    cJSON* current_obj = NULL;
+    /* The type of json object is expected to be boolean type */
+    cJSON_ArrayForEach(current_obj, json_item) {
+      utarray_push_back(ut, &current_obj->type);
+    }
+  } else {
+    cJSON_Delete(obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+  return RC_OK;
+}
+
 retcode_t int_array_to_json_array(int_array* in, cJSON* json_root,
                                   const char* obj_name) {
   if (in->size > 0) {
@@ -304,13 +320,72 @@ end:
 }
 
 // get_inclusion_state_response
-void json_get_inclusion_state_serialize_request(
-    const serializer_t* const s, const get_inclusion_state_req_t* const obj,
-    char* out) {}
+retcode_t json_get_inclusion_state_serialize_request(
+    const serializer_t* const s, get_inclusion_state_req_t* obj,
+    char_buffer_t* out) {
+  retcode_t ret = RC_OK;
+  const char* json_text = NULL;
+  size_t len = 0;
+  cJSON* json_root = cJSON_CreateObject();
+  if (json_root == NULL) {
+    return RC_CCLIENT_JSON_CREATE;
+  }
 
-void json_get_inclusion_state_deserialize_response(
+  cJSON_AddItemToObject(json_root, "command",
+                        cJSON_CreateString("getInclusionStates"));
+
+  ret = utarray_to_json_array(obj->hashes, json_root, "transactions");
+  if (ret != RC_OK) {
+    goto err;
+  }
+
+  ret = utarray_to_json_array(obj->tips, json_root, "tips");
+  if (ret != RC_OK) {
+    goto err;
+  }
+
+  json_text = cJSON_PrintUnformatted(json_root);
+  if (json_text) {
+    len = strlen(json_text);
+    ret = char_buffer_allocate(out, len);
+    if (ret == RC_OK) {
+      strncpy(out->data, json_text, len);
+    }
+    cJSON_free((void*)json_text);
+  }
+
+  cJSON_Delete(json_root);
+  return ret;
+
+err:
+  cJSON_Delete(json_root);
+  return ret;
+}
+
+retcode_t json_get_inclusion_state_deserialize_response(
     const serializer_t* const s, const char* const obj,
-    get_inclusion_state_res_t* out) {}
+    get_inclusion_state_res_t* out) {
+  retcode_t ret = RC_OK;
+  cJSON* json_obj = cJSON_Parse(obj);
+  cJSON* json_item = NULL;
+
+  if (json_obj == NULL) {
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
+  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
+    // TODO log the error message from response.
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  ret = json_boolean_array_to_utarray(json_obj, "states", out->bitmap);
+
+  cJSON_Delete(json_obj);
+  return ret;
+}
 
 retcode_t json_get_neighbors_serialize_request(const serializer_t* const s,
                                                char_buffer_t* out) {

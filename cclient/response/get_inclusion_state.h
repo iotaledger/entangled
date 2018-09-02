@@ -15,8 +15,13 @@ extern "C" {
 #include "types/types.h"
 
 typedef struct {
-  int_array bitmap;
+  UT_array* bitmap;
 } get_inclusion_state_res_t;
+
+get_inclusion_state_res_t* get_inclusion_state_res_new();
+void get_inclusion_state_res_free(get_inclusion_state_res_t** res);
+bool get_inclusion_state_res_bool_at(get_inclusion_state_res_t* in, int index);
+int get_inclusion_state_res_bool_num(get_inclusion_state_res_t* in);
 
 #ifdef __cplusplus
 }
