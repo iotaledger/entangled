@@ -626,7 +626,34 @@ retcode_t json_store_transactions_serialize_request(
     const serializer_t* const s, store_transactions_req_t* obj,
     char_buffer_t* out) {
   retcode_t ret = RC_OK;
-  // TODO
+  const char* json_text = NULL;
+  size_t len = 0;
+  cJSON* json_root = cJSON_CreateObject();
+  if (json_root == NULL) {
+    return RC_CCLIENT_JSON_CREATE;
+  }
+
+  cJSON_AddItemToObject(json_root, "command",
+                        cJSON_CreateString("storeTransactions"));
+
+  ret = utarray_to_json_array(obj, json_root, "trytes");
+  if (ret != RC_OK) {
+    cJSON_Delete(json_root);
+    return ret;
+  }
+
+  json_text = cJSON_PrintUnformatted(json_root);
+  if (json_text) {
+    len = strlen(json_text);
+    ret = char_buffer_allocate(out, len);
+    if (ret == RC_OK) {
+      strncpy(out->data, json_text, len);
+    }
+    cJSON_free((void*)json_text);
+  }
+
+  cJSON_Delete(json_root);
+  return ret;
   return ret;
 }
 
