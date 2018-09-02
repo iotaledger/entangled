@@ -45,6 +45,11 @@ typedef struct {
 
 typedef struct {
   size_t size;
+  int_array* array;
+} int_array_array;
+
+typedef struct {
+  size_t size;
   trit_array_p* array;
 } trit_array_array;
 
@@ -70,6 +75,13 @@ void char_buffer_free(char_buffer_t* in);
 int_array* int_array_new();
 retcode_t int_array_allocate(int_array* in, size_t n);
 void int_array_free(int_array* in);
+
+int_array_array* int_array_array_new();
+retcode_t int_array_array_allocate(int_array_array* in, size_t n);
+void int_array_array_free(int_array_array* in);
+
+char* int_array_to_string(int_array* in);
+int_array* string_to_int_array(char* in);
 
 #ifdef __cplusplus
 }

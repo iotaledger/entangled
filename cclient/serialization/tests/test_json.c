@@ -455,7 +455,7 @@ void test_deserialize_get_balances(void) {
   serializer.vtable.get_balances_deserialize_response(&serializer, json_text,
                                                       deserialize_get_bal);
 
-  TEST_ASSERT_EQUAL_INT(atoi(GET_BALANCES_DESERIALIZE_BALANCE),
+  TEST_ASSERT_EQUAL_STRING(GET_BALANCES_DESERIALIZE_BALANCE,
                         get_balances_res_balances_at(deserialize_get_bal, 0));
   TEST_ASSERT_EQUAL_STRING(
       GET_BALANCES_DESERIALIZE_REFERENCE,
