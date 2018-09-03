@@ -455,8 +455,9 @@ void test_deserialize_get_balances(void) {
   serializer.vtable.get_balances_deserialize_response(&serializer, json_text,
                                                       deserialize_get_bal);
 
-  TEST_ASSERT_EQUAL_STRING(GET_BALANCES_DESERIALIZE_BALANCE,
-                        get_balances_res_balances_at(deserialize_get_bal, 0));
+  TEST_ASSERT_EQUAL_STRING(
+      GET_BALANCES_DESERIALIZE_BALANCE,
+      get_balances_res_balances_at(deserialize_get_bal, 0));
   TEST_ASSERT_EQUAL_STRING(
       GET_BALANCES_DESERIALIZE_REFERENCE,
       get_balances_res_milestone_at(deserialize_get_bal, 0));
@@ -465,11 +466,58 @@ void test_deserialize_get_balances(void) {
 }
 
 void test_serialize_get_transactions_to_approve(void) {
-  // TODO
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text =
+      "{\"command\":\"getTransactionsToApprove\",\"depth\":15"
+      ",\"reference\":"
+      "\"TKGDZ9GEI9CPNQGHEATIISAKYPPPSXVCXBSR9EIWCTHHSSEQCD9YLDPEXYERCNJVASRGWM"
+      "AVKFQTC9999\"}";
+
+  char_buffer_t* serializer_out = char_buffer_new();
+  get_transactions_to_approve_req_t* get_txn_approve =
+      get_transactions_to_approve_req_new();
+  get_transactions_to_approve_req_set_reference(
+      get_txn_approve,
+      "TKGDZ9GEI9CPNQGHEATIISAKYPPPSXVCXBSR9EIW"
+      "CTHHSSEQCD9YLDPEXYERCNJVASRGWMAVKFQTC9999");
+  get_txn_approve->depth = 15;
+  serializer.vtable.get_transactions_to_approve_serialize_request(
+      &serializer, get_txn_approve, serializer_out);
+
+  TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
+
+  char_buffer_free(serializer_out);
+  get_transactions_to_approve_req_free(&get_txn_approve);
 }
 
 void test_deserialize_get_transactions_to_approve(void) {
-  // TODO
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text =
+      "{\"trunkTransaction\": "
+      "\"INRTUYSZCWBHGFGGXXPWRWBZACYAFGVRRP9VY"
+      "EQJOHYD9URMELKWAFYFMNTSP9MCHLXRGAFMBOZP"
+      "Z9999\",\"branchTransaction\":"
+      "\"INRTUYSZCWBHGFGGXXPWRWBZACYAFGVRRP9VY"
+      "EQJOHYD9URMELKWAFYFMNTSP9MCHLXRGAFMBOZP"
+      "Z9999\"}";
+
+  get_transactions_to_approve_res_t* deserialize_get_txn_approve =
+      get_transactions_to_approve_res_new();
+  serializer.vtable.get_transactions_to_approve_deserialize_response(
+      &serializer, json_text, deserialize_get_txn_approve);
+
+  TEST_ASSERT_EQUAL_STRING(
+      "INRTUYSZCWBHGFGGXXPWRWBZACYAFGVRRP9VYEQJOHYD9URMELKWAFYFMNTSP9MCHLXRGAFM"
+      "BOZPZ9999",
+      deserialize_get_txn_approve->trunk->data);
+  TEST_ASSERT_EQUAL_STRING(
+      "INRTUYSZCWBHGFGGXXPWRWBZACYAFGVRRP9VYEQJOHYD9URMELKWAFYFMNTSP9MCHLXRGAFM"
+      "BOZPZ9999",
+      deserialize_get_txn_approve->branch->data);
+
+  get_transactions_to_approve_res_free(&deserialize_get_txn_approve);
 }
 
 void test_serialize_attach_to_tangle(void) {
