@@ -91,8 +91,11 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   if (mt->testnet) {
     mt->coordinator =
         trit_array_new_from_trytes((tryte_t*)TESTNET_COORDINATOR_ADDRESS);
+    mt->milestone_start_index = TESTNET_MILESTONE_START_INDEX;
   } else {
-    mt->coordinator = trit_array_new_from_trytes((tryte_t*)COORDINATOR_ADDRESS);
+    mt->coordinator =
+        trit_array_new_from_trytes((tryte_t*)MAINNET_COORDINATOR_ADDRESS);
+    mt->milestone_start_index = MAINNET_MILESTONE_START_INDEX;
   }
   mt->latest_milestone_index = mt->milestone_start_index;
   mt->latest_solid_subtangle_milestone_index = mt->milestone_start_index;
