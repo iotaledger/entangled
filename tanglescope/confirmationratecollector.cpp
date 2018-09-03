@@ -95,7 +95,7 @@ void CRCollector::calcConfirmationRateAPICall() {
   }
 
   auto resp = _api->getInclusionStates(transactions, tips);
-  if (resp.error.has_value()) {
+  if (resp.error.has_value() || resp.states.size() != transactions.size()) {
     return;
   }
   std::set<std::string> confirmedTransactions;

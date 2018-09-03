@@ -13,7 +13,7 @@
 #include <map>
 #include <set>
 #include <unordered_set>
-#include "tanglescope/throwcatchcollector.hpp"
+#include "tanglescope/broadcastrecievecollecter.hpp"
 
 constexpr static auto DEPTH = 3;
 

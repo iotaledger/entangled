@@ -15,7 +15,7 @@
 #include <set>
 #include <unordered_set>
 
-#include "tanglescope/throwcatchcollector.hpp"
+#include "tanglescope/broadcastrecievecollecter.hpp"
 
 constexpr static auto DEPTH = 3;
 
@@ -86,8 +86,9 @@ void BroadcastReceiveCollector::broadcastOneTransaction() {
     LOG(INFO) << "Hash: " << hashed.hash;
     artificialyDelay();
     system_clock::time_point t2 = system_clock::now();
-
     auto duration = duration_cast<milliseconds>(t2 - t1).count();
+    _hashToBroadcastTime.insert(
+            hashed.hash, BroadcastInfo{std::chrono::system_clock::now(), duration});
 
     auto storeFuture = boost::async(boost::launch::async, [hashed, this] {
       return _api->storeTransactions({hashed.tx});
@@ -98,8 +99,6 @@ void BroadcastReceiveCollector::broadcastOneTransaction() {
     });
 
     broadcastFuture.wait();
-    _hashToBroadcastTime.insert(
-        hashed.hash, BroadcastInfo{std::chrono::system_clock::now(), duration});
   } catch (const std::exception& e) {
     LOG(ERROR) << __FUNCTION__ << " Exception: " << e.what();
   }
