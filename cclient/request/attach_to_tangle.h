@@ -14,6 +14,8 @@ extern "C" {
 
 #include "types/types.h"
 
+#define ATTACH_TO_TANGLE_MIN_MWM 18
+
 typedef struct {
   /**
    * Trunk transaction to approve
@@ -26,13 +28,24 @@ typedef struct {
   /**
    * Min Weight Magnitude,Proof of Work intensity. Minimum value is 18
    */
-  int mwm;
+  int32_t mwm;
   /**
    * List of trytes (raw transaction data) to attach to the tangle.
    */
   UT_array* trytes;
 
 } attach_to_tangle_req_t;
+
+attach_to_tangle_req_t* attach_to_tangle_req_new();
+void attach_to_tangle_req_free(attach_to_tangle_req_t** req);
+retcode_t attach_to_tangle_req_set_trunk(attach_to_tangle_req_t* req,
+                                         const char* trunk);
+retcode_t attach_to_tangle_req_set_branch(attach_to_tangle_req_t* req,
+                                          const char* branch);
+void attach_to_tangle_req_set_mvm(attach_to_tangle_req_t* req,
+                                  const int32_t mwm);
+void attach_to_tangle_req_add_trytes(attach_to_tangle_req_t* req,
+                                     const char* trytes);
 
 #ifdef __cplusplus
 }
