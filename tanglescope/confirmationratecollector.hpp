@@ -13,7 +13,7 @@
 #include <set>
 #include <string>
 
-#include "tanglescope/throwcatchcollector.hpp"
+#include "tanglescope/broadcastrecievecollecter.hpp"
 
 #include "cppclient/beast.h"
 

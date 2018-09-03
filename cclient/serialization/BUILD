@@ -33,7 +33,10 @@ cc_library(
 
 cc_test(
     name = "test_json",
-    srcs = ["tests/test_json.c"],
+    srcs = [
+        "tests/test_json.c",
+        "tests/test_json.h",
+    ],
     deps = [
         ":serializer_base",
         ":serializer_json",

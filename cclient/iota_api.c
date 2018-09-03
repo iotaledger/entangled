@@ -268,7 +268,36 @@ iota_api_result_t iota_api_get_balances(
     const iota_http_service_t* const service,
     const get_balances_req_t* const req, get_balances_res_t* res) {
   iota_api_result_t result = {0};
-  // TODO
+
+  char_buffer_t* res_buff = char_buffer_new();
+  char_buffer_t* req_buff = char_buffer_new();
+  if (req_buff == NULL || res_buff == NULL) {
+    result.error = RC_CCLIENT_OOM;
+    goto done;
+  }
+
+  result.error = service->serializer.vtable.get_balances_serialize_request(
+      &service->serializer, req, req_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
+
+  result = iota_service_query(service, req_buff, res_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
+
+  result.error = service->serializer.vtable.get_balances_deserialize_response(
+      &service->serializer, res_buff->data, res);
+
+done:
+  if (req_buff) {
+    char_buffer_free(req_buff);
+  }
+  if (res_buff) {
+    char_buffer_free(res_buff);
+  }
+
   return result;
 }
 
@@ -304,10 +333,34 @@ iota_api_result_t iota_api_broadcast_transactions(
 }
 
 iota_api_result_t iota_api_store_transactions(
-    const iota_http_service_t* const service,
-    const store_transactions_req_t* const req) {
+    const iota_http_service_t* const service, store_transactions_req_t* req) {
   iota_api_result_t result = {0};
-  // TODO
+  char_buffer_t* res_buff = char_buffer_new();
+  char_buffer_t* req_buff = char_buffer_new();
+  if (req_buff == NULL || res_buff == NULL) {
+    result.error = RC_CCLIENT_OOM;
+    goto done;
+  }
+  result.error =
+      service->serializer.vtable.store_transactions_serialize_request(
+          &service->serializer, req, req_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
+
+  result = iota_service_query(service, req_buff, res_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
+
+done:
+  if (req_buff) {
+    char_buffer_free(req_buff);
+  }
+  if (res_buff) {
+    char_buffer_free(res_buff);
+  }
+
   return result;
 }
 

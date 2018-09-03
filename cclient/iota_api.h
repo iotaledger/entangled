@@ -250,8 +250,7 @@ iota_api_result_t iota_api_broadcast_transactions(
  * @return The error value.
  */
 iota_api_result_t iota_api_store_transactions(
-    const iota_http_service_t* const service,
-    const store_transactions_req_t* const req);
+    const iota_http_service_t* const service, store_transactions_req_t* req);
 
 /**
  * Check if a list of addresses was ever spent from, in the current epoch, or in
