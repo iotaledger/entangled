@@ -22,27 +22,54 @@
  * Generic statements
  */
 
-static retcode_t iota_statement_generic_select(const char *table_name,
-                                               const char *select_col,
-                                               const char *index_col,
-                                               char statement[],
-                                               size_t statement_cap) {
+static retcode_t iota_statement_generic_select(
+    const char *table_name, const char *select_col, const char *where_col,
+    const char *order_col, const char *order, int limit, char statement[],
+    size_t statement_cap) {
+  size_t offset = 0;
   int res;
 
-  if (index_col == NULL || strcmp(index_col, "") == 0) {
-    res = snprintf(statement, statement_cap, "SELECT %s FROM %s", select_col,
-                   table_name);
-  } else {
-    res = snprintf(statement, statement_cap, "SELECT %s FROM %s WHERE %s = ?",
-                   select_col, table_name, index_col);
+  res = snprintf(statement + offset, statement_cap - offset,
+                 "SELECT %s FROM %s", select_col, table_name);
+  offset += res;
+  if (res < 0 || res == statement_cap - offset) {
+    goto error;
   }
 
-  if (res < 0 || res == statement_cap) {
-    log_error(SQL_STATEMENTS_ID,
-              "Failed in creating statement, statement: %s\n", statement);
-    return RC_SQL_FAILED_WRITE_STATEMENT;
+  if (where_col != NULL && strcmp(where_col, "") != 0) {
+    res = snprintf(statement + offset, statement_cap - offset, " WHERE %s = ?",
+                   where_col);
+    offset += res;
+    if (res < 0 || res == statement_cap - offset) {
+      goto error;
+    }
   }
+
+  if (order_col != NULL && strcmp(order_col, "") != 0 && order != NULL &&
+      (strcmp(order, "ASC") == 0 || strcmp(order, "DESC") == 0)) {
+    res = snprintf(statement + offset, statement_cap - offset,
+                   " ORDER BY %s %s", order_col, order);
+    offset += res;
+    if (res < 0 || res == statement_cap - offset) {
+      goto error;
+    }
+  }
+
+  if (limit != 0) {
+    res = snprintf(statement + offset, statement_cap - offset, " LIMIT %d",
+                   limit);
+    offset += res;
+    if (res < 0 || res == statement_cap - offset) {
+      goto error;
+    }
+  }
+
   return RC_OK;
+
+error:
+  log_error(SQL_STATEMENTS_ID, "Failed in creating statement, statement: %s\n",
+            statement);
+  return RC_SQL_FAILED_WRITE_STATEMENT;
 }
 
 static retcode_t iota_statement_generic_exist(const char *table_name,
@@ -104,7 +131,7 @@ retcode_t iota_statement_transaction_select(const char *index_col,
                                             char statement[],
                                             size_t statement_cap) {
   return iota_statement_generic_select(TRANSACTION_TABLE_NAME, "*", index_col,
-                                       statement, statement_cap);
+                                       "", "", 0, statement, statement_cap);
 }
 
 retcode_t iota_statement_transaction_exist(const char *index_col,
@@ -126,8 +153,8 @@ retcode_t iota_statement_transaction_select_hashes(const char *index_col,
                                                    char statement[],
                                                    size_t statement_cap) {
   return iota_statement_generic_select(TRANSACTION_TABLE_NAME,
-                                       TRANSACTION_COL_HASH, index_col,
-                                       statement, statement_cap);
+                                       TRANSACTION_COL_HASH, index_col, "", "",
+                                       0, statement, statement_cap);
 }
 
 retcode_t iota_statement_transaction_select_hashes_approvers(
@@ -174,7 +201,14 @@ retcode_t iota_statement_milestone_insert(const iota_milestone_t *milestone,
 retcode_t iota_statement_milestone_select(const char *index_col,
                                           char statement[],
                                           size_t statement_cap) {
-  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", index_col,
+  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", index_col, "",
+                                       "", 0, statement, statement_cap);
+}
+
+retcode_t iota_statement_milestone_select_latest(char statement[],
+                                                 size_t statement_cap) {
+  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", "",
+                                       MILESTONE_COL_INDEX, "DESC", 1,
                                        statement, statement_cap);
 }
 
