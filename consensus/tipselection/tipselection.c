@@ -17,76 +17,89 @@
 #define TIPSELECTION_LOGGER_ID "consensus_tipselection"
 
 retcode_t iota_consensus_tipselection_init(
-    tipselection_t *impl, tangle_t *tangle, ledger_validator_t *lv,
-    walker_validator_t *wv, cw_rating_calculator_t *cw_calc,
-    milestone_t *milestone, entry_point_selector_t *ep, walker_t *walker) {
+    tipselection_t *const ts, cw_rating_calculator_t *const cw_calc,
+    entry_point_selector_t *const ep, ledger_validator_t *const lv,
+    milestone_t *const milestone, tangle_t *const tangle,
+    walker_t *const walker, walker_validator_t *const wv) {
   logger_helper_init(TIPSELECTION_LOGGER_ID, LOGGER_INFO, true);
-  impl->cw_calc = cw_calc;
-  impl->milestone = milestone;
-  impl->tangle = tangle;
-  impl->lv = lv;
-  impl->wv = wv;
-  impl->walker = walker;
-  impl->ep_selector = ep;
-  rw_lock_handle_init(&impl->milestone->latest_snapshot.rw_lock);
+  ts->cw_calc = cw_calc;
+  ts->ep_selector = ep;
+  ts->lv = lv;
+  ts->milestone = milestone;
+  ts->tangle = tangle;
+  ts->walker = walker;
+  rw_lock_handle_init(&ts->milestone->latest_snapshot.rw_lock);
   return RC_OK;
 }
 
 retcode_t iota_consensus_get_transactions_to_approve(
-    tipselection_t *impl, size_t depth, const trit_array_p reference,
+    tipselection_t *const ts, size_t const depth, trit_array_p const reference,
     tips_pair *tips) {
   retcode_t res = RC_OK;
   trit_array_p ep = NULL;
-
-  rw_lock_handle_rdlock(&impl->milestone->latest_snapshot.rw_lock);
-
-  res = iota_consensus_get_entry_point(impl->ep_selector, depth, ep);
-
   cw_calc_result ratings_result;
-  res = iota_consensus_cw_rating_calculate(impl->cw_calc, ep, &ratings_result);
-  if (res != RC_OK) {
-    log_error(TIPSELECTION_LOGGER_ID,
-              "Failed to calculate CW with error %\" PRIu64 \"\n", res);
-    rw_lock_handle_unlock(&impl->milestone->latest_snapshot.rw_lock);
-    return res;
-  }
-
   walker_validator_t wv;
 
-  iota_consensus_walker_validator_init(impl->tangle, impl->milestone, impl->lv,
-                                       impl->wv);
+  rw_lock_handle_rdlock(&ts->milestone->latest_snapshot.rw_lock);
 
-  iota_consensus_walker_walk(impl->walker, ep, ratings_result.cw_ratings, &wv,
-                             tips->trunk);
+  if ((res = iota_consensus_get_entry_point(ts->ep_selector, depth, ep))) {
+    log_error(TIPSELECTION_LOGGER_ID,
+              "Getting entry point failed with error %\" PRIu64 \"\n", res);
+    goto ret;
+  }
+
+  if ((res = iota_consensus_cw_rating_calculate(ts->cw_calc, ep,
+                                                &ratings_result))) {
+    log_error(TIPSELECTION_LOGGER_ID,
+              "Calculating CW ratings failed with error %\" PRIu64 \"\n", res);
+    goto ret;
+  }
+
+  if ((res = iota_consensus_walker_validator_init(&wv, ts->tangle,
+                                                  ts->milestone, ts->lv))) {
+    log_error(TIPSELECTION_LOGGER_ID,
+              "Initializing walker validator failed with error %\" PRIu64 \"\n",
+              res);
+    goto ret;
+  }
+
+  if ((res = iota_consensus_walker_walk(
+           ts->walker, ep, ratings_result.cw_ratings, &wv, tips->trunk))) {
+    log_error(TIPSELECTION_LOGGER_ID,
+              "First walking failed with error %\" PRIu64 \"\n", res);
+    goto ret;
+  }
 
   if (reference != NULL) {
     // TODO
   }
 
-  iota_consensus_walker_walk(impl->walker, ep, ratings_result.cw_ratings, &wv,
-                             tips->branch);
-
-  res = iota_consensus_ledeger_validator_validate(impl->lv, tips);
-  if (res != RC_OK) {
+  if ((res = iota_consensus_walker_walk(
+           ts->walker, ep, ratings_result.cw_ratings, &wv, tips->branch))) {
     log_error(TIPSELECTION_LOGGER_ID,
-              "Failed to validate tips with error %\" PRIu64 \"\n", res);
-    rw_lock_handle_unlock(&impl->milestone->latest_snapshot.rw_lock);
-    return res;
+              "Second walking failed with error %\" PRIu64 \"\n", res);
+    goto ret;
   }
 
-  rw_lock_handle_unlock(&impl->milestone->latest_snapshot.rw_lock);
+  if ((res = iota_consensus_ledeger_validator_validate(ts->lv, tips))) {
+    log_error(TIPSELECTION_LOGGER_ID,
+              "Validating tips failed with error %\" PRIu64 \"\n", res);
+    goto ret;
+  }
 
+ret:
+  rw_lock_handle_unlock(&ts->milestone->latest_snapshot.rw_lock);
   return res;
 }
 
-retcode_t iota_consensus_tipselection_destroy(tipselection_t *impl) {
+retcode_t iota_consensus_tipselection_destroy(tipselection_t *const ts) {
   logger_helper_destroy(TIPSELECTION_LOGGER_ID);
-  rw_lock_handle_destroy(&impl->milestone->latest_snapshot.rw_lock);
-  impl->cw_calc = NULL;
-  impl->milestone = NULL;
-  impl->tangle = NULL;
-  impl->lv = NULL;
-  impl->wv = NULL;
-  impl->walker = NULL;
+  ts->cw_calc = NULL;
+  ts->ep_selector = NULL;
+  ts->lv = NULL;
+  ts->milestone = NULL;
+  ts->tangle = NULL;
+  ts->walker = NULL;
+  rw_lock_handle_destroy(&ts->milestone->latest_snapshot.rw_lock);
   return RC_OK;
 }

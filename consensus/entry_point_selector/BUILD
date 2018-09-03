@@ -4,11 +4,7 @@ cc_library(
     hdrs = ["entry_point_selector.h"],
     visibility = ["//visibility:public"],
     deps = [
-        "//common:errors",
-        "//common/trinary:trit_array",
         "//consensus/milestone",
-        "//consensus/tangle",
-        "//consensus/view_models",
-        "//utils:logger_helper",
+        "//utils:macros",
     ],
 )

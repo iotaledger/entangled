@@ -69,17 +69,3 @@ cc_library(
         "//utils:export",
     ],
 )
-
-cc_test(
-    name = "tests",
-    timeout = "short",
-    srcs = glob([
-        "tests/**/*.cpp",
-        "**/*.hpp",
-    ]),
-    tags = ["exclusive"],
-    deps = [
-        ":helpers",
-        "@com_google_googletest//:gtest_main",
-    ],
-)

@@ -21,7 +21,7 @@
 extern "C" {
 #endif
 
-typedef struct tangle_t {
+typedef struct tangle_s {
   connection_t conn;
 } tangle_t;
 

@@ -27,25 +27,25 @@ extern "C" {
 #endif
 
 typedef struct tipselection_t {
-  tangle_t *tangle;
-  entry_point_selector_t *ep_selector;
   cw_rating_calculator_t *cw_calc;
-  milestone_t *milestone;
+  entry_point_selector_t *ep_selector;
   ledger_validator_t *lv;
-  walker_validator_t *wv;
+  milestone_t *milestone;
+  tangle_t *tangle;
   walker_t *walker;
 } tipselection_t;
 
 extern retcode_t iota_consensus_tipselection_init(
-    tipselection_t *impl, tangle_t *tangle, ledger_validator_t *lv,
-    walker_validator_t *wv, cw_rating_calculator_t *cw_calc,
-    milestone_t *milestone, entry_point_selector_t *ep, walker_t *walker);
+    tipselection_t *const ts, cw_rating_calculator_t *const cw_calc,
+    entry_point_selector_t *const ep, ledger_validator_t *const lv,
+    milestone_t *const milestone, tangle_t *const tangle,
+    walker_t *const walker, walker_validator_t *const wv);
 
 extern retcode_t iota_consensus_get_transactions_to_approve(
-    tipselection_t *impl, size_t depth, const trit_array_p reference,
-    tips_pair *tips);
+    tipselection_t *const ts, size_t const depth, trit_array_p const reference,
+    tips_pair *const tips);
 
-extern retcode_t iota_consensus_tipselection_destroy(tipselection_t *impl);
+extern retcode_t iota_consensus_tipselection_destroy(tipselection_t *const ts);
 
 #ifdef __cplusplus
 }

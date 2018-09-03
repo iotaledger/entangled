@@ -49,17 +49,17 @@ typedef struct walker_validator_t {
 } walker_validator_t;
 
 extern retcode_t iota_consensus_walker_validator_init(
-    tangle_t *const tangle, milestone_t *const milestone,
-    ledger_validator_t *const lv, walker_validator_t *const wv);
+    walker_validator_t *const wv, tangle_t *const tangle,
+    milestone_t *const milestone, ledger_validator_t *const lv);
+
+extern retcode_t iota_consensus_walker_validator_is_valid(
+    walker_validator_t *const wv, trit_array_p const tx_hash);
+
+extern retcode_t iota_consensus_walker_validator_below_max_depth(
+    walker_validator_t *const wv, trit_array_p const tip, size_t const depth);
 
 extern retcode_t iota_consensus_walker_validator_destroy(
     walker_validator_t *const wv);
-
-extern retcode_t iota_consensus_walker_validator_is_valid(
-    const walker_validator_t *wv, trit_array_p tx_hash);
-
-extern retcode_t iota_consensus_walker_validator_below_max_depth(
-    const walker_validator_t *wv, trit_array_p tip, size_t depth);
 
 #ifdef __cplusplus
 }

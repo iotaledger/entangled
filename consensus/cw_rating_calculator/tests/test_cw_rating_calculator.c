@@ -15,11 +15,12 @@
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
+#include "consensus/test_definitions/defs.h"
 #include "utarray.h"
-#include "utils/files.h"
 
 static cw_rating_calculator_t calc;
 static tangle_t tangle;
+static connection_config_t config;
 
 // gdb --args ./test_cw_ratings_dfs 1
 static bool debug_mode = false;
@@ -27,60 +28,38 @@ static bool debug_mode = false;
 static char *test_db_path = "consensus/cw_rating_calculator/tests/test.db";
 static char *ciri_db_path = "consensus/cw_rating_calculator/tests/ciri.db";
 
-enum TestTangleTopology {
-  OnlyDirectApprovers,
-  Blockchain,
-};
-typedef enum TestTangleTopology TestTangleTopology;
+typedef enum test_tangle_topology {
+  ONLY_DIRECT_APPROVERS,
+  BLOCKCHAIN,
+} test_tangle_topology;
 
-void test_init_cw(void) {
-  connection_config_t config;
+void test_cw_gen_topology(test_tangle_topology topology) {
+  cw_entry_t *curr_cw_entry = NULL;
+  cw_entry_t *tmp_cw_entry = NULL;
+  size_t num_approvers = 200;
+  size_t num_txs = num_approvers + 1;
 
-  config.db_path = test_db_path;
-  config.index_transaction_address = true;
-  config.index_transaction_approvee = true;
-  config.index_transaction_bundle = true;
-  config.index_transaction_tag = true;
-  config.index_transaction_hash = true;
-  config.index_milestone_hash = true;
-  TEST_ASSERT(iota_tangle_init(&tangle, &config) == RC_OK);
+  TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
-}
 
-void test_setup() {
-  TEST_ASSERT(copy_file(test_db_path, ciri_db_path) == RC_OK);
-  RUN_TEST(test_init_cw);
-}
-void test_cleanup() {
-  TEST_ASSERT(iota_tangle_destroy(&tangle) == RC_OK);
-  TEST_ASSERT(remove_file(test_db_path) == RC_OK);
-}
-
-void test_cw_gen_topology(TestTangleTopology topology) {
-  cw_entry_t *currCwEntry = NULL;
-  cw_entry_t *tmpCwEntry = NULL;
-  size_t numApprovers = 200;
-  size_t numTxs = numApprovers + 1;
-
-  test_setup();
-
-  struct _iota_transaction txs[numApprovers];
+  struct _iota_transaction txs[num_approvers];
   txs[0] = TEST_TRANSACTION;
   txs[0].hash[0] += 1;
   memcpy(txs[0].branch, TEST_TRANSACTION.hash, FLEX_TRIT_SIZE_243);
-  for (int i = 1; i < numApprovers; i++) {
+  for (int i = 1; i < num_approvers; i++) {
     txs[i] = TEST_TRANSACTION;
     // Different hash for each tx,
     // we don't worry about it not being valid encoding
     txs[i].hash[i / 256] += (i + 1);
-    if (topology == OnlyDirectApprovers) {
+    if (topology == ONLY_DIRECT_APPROVERS) {
       memcpy(txs[i].branch, txs[i - 1].branch, FLEX_TRIT_SIZE_243);
-    } else if (topology == Blockchain) {
+    } else if (topology == BLOCKCHAIN) {
       memcpy(txs[i].branch, txs[i - 1].hash, FLEX_TRIT_SIZE_243);
     }
   }
 
-  for (int i = 0; i < numApprovers; i++) {
+  for (int i = 0; i < num_approvers; i++) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
   }
 
@@ -88,44 +67,46 @@ void test_cw_gen_topology(TestTangleTopology topology) {
   trit_array_set_trits(ep, (flex_trit_t *)TEST_TRANSACTION.hash,
                        NUM_TRITS_HASH);
   iota_stor_pack_t pack;
-  hash_pack_init(&pack, numApprovers);
+  hash_pack_init(&pack, num_approvers);
 
   cw_calc_result out;
-
-  trit_array_p currHash = trit_array_new(NUM_TRITS_HASH);
-  for (int i = 0; i < numApprovers; i++) {
-    trit_array_set_trits(currHash, txs[i].hash, NUM_TRITS_HASH);
+  trit_array_p curr_hash = trit_array_new(NUM_TRITS_HASH);
+  for (int i = 0; i < num_approvers; i++) {
+    trit_array_set_trits(curr_hash, txs[i].hash, NUM_TRITS_HASH);
     TEST_ASSERT(iota_tangle_transaction_load_hashes(
-                    &tangle, TRANSACTION_COL_HASH, currHash, &pack) == RC_OK);
+                    &tangle, TRANSACTION_COL_HASH, curr_hash, &pack) == RC_OK);
     TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
   }
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), numApprovers + 1);
+  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), num_approvers + 1);
 
-  size_t totalWeight = 0;
+  size_t total_weight = 0;
 
-  HASH_ITER(hh, out.cw_ratings, currCwEntry, tmpCwEntry) {
-    totalWeight += currCwEntry->cw;
+  HASH_ITER(hh, out.cw_ratings, curr_cw_entry, tmp_cw_entry) {
+    total_weight += curr_cw_entry->cw;
   }
   // First Entry, for both topologies, has to equal the number of total
   // approvers + own weight
-  TEST_ASSERT_EQUAL_INT(out.cw_ratings->cw, numApprovers + 1);
-  if (topology == OnlyDirectApprovers) {
-    TEST_ASSERT_EQUAL_INT(totalWeight, numApprovers + 1 + numApprovers);
-  } else if (topology == Blockchain) {
-    // Sum of series 1 + 2 + ... + (numTxs)
-    TEST_ASSERT_EQUAL_INT(totalWeight, (numTxs * (numTxs + 1)) / 2);
+  TEST_ASSERT_EQUAL_INT(out.cw_ratings->cw, num_approvers + 1);
+  if (topology == ONLY_DIRECT_APPROVERS) {
+    TEST_ASSERT_EQUAL_INT(total_weight, num_approvers + 1 + num_approvers);
+  } else if (topology == BLOCKCHAIN) {
+    // Sum of series 1 + 2 + ... + (num_txs)
+    TEST_ASSERT_EQUAL_INT(total_weight, (num_txs * (num_txs + 1)) / 2);
   }
 
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  test_cleanup();
+  TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
 void test_single_tx_tangle(void) {
-  test_setup();
+  TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, (flex_trit_t *)TEST_TRANSACTION.hash,
@@ -152,25 +133,28 @@ void test_single_tx_tangle(void) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  test_cleanup();
+  TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
 void test_cw_topology_only_direct_approvers(void) {
-  test_cw_gen_topology(OnlyDirectApprovers);
+  test_cw_gen_topology(ONLY_DIRECT_APPROVERS);
 }
-void test_cw_topology_blockchain(void) { test_cw_gen_topology(Blockchain); }
+void test_cw_topology_blockchain(void) { test_cw_gen_topology(BLOCKCHAIN); }
 
 void test_cw_topology_four_transactions_diamond(void) {
-  cw_entry_t *currCwEntry = NULL;
-  cw_entry_t *tmpCwEntry = NULL;
+  cw_entry_t *curr_cw_entry = NULL;
+  cw_entry_t *tmp_cw_entry = NULL;
 
-  size_t numTxs = 4;
+  size_t num_txs = 4;
 
-  test_setup();
+  TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
 
-  struct _iota_transaction txs[numTxs];
+  struct _iota_transaction txs[num_txs];
   txs[0] = TEST_TRANSACTION;
-  for (int i = 1; i < numTxs; i++) {
+  for (int i = 1; i < num_txs; i++) {
     txs[i] = TEST_TRANSACTION;
     // Different hash for each tx,
     // we don't worry about it not being valid encoding
@@ -184,40 +168,41 @@ void test_cw_topology_four_transactions_diamond(void) {
   memcpy(txs[3].branch, txs[1].hash, FLEX_TRIT_SIZE_243);
   memcpy(txs[3].trunk, txs[2].hash, FLEX_TRIT_SIZE_243);
 
-  for (int i = 0; i < numTxs; i++) {
+  for (int i = 0; i < num_txs; i++) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
   }
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, txs[0].hash, NUM_TRITS_HASH);
   iota_stor_pack_t pack;
-  hash_pack_init(&pack, numTxs);
+  hash_pack_init(&pack, num_txs);
 
   cw_calc_result out;
 
-  trit_array_p currHash = trit_array_new(NUM_TRITS_HASH);
-  for (int i = 0; i < numTxs; i++) {
-    trit_array_set_trits(currHash, txs[i].hash, NUM_TRITS_HASH);
+  trit_array_p curr_hash = trit_array_new(NUM_TRITS_HASH);
+  for (int i = 0; i < num_txs; i++) {
+    trit_array_set_trits(curr_hash, txs[i].hash, NUM_TRITS_HASH);
     TEST_ASSERT(iota_tangle_transaction_load_hashes(
-                    &tangle, TRANSACTION_COL_HASH, currHash, &pack) == RC_OK);
+                    &tangle, TRANSACTION_COL_HASH, curr_hash, &pack) == RC_OK);
     TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
   }
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), numTxs);
+  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), num_txs);
 
-  size_t totalWeight = 0;
+  size_t total_weight = 0;
 
-  HASH_ITER(hh, out.cw_ratings, currCwEntry, tmpCwEntry) {
-    totalWeight += currCwEntry->cw;
+  HASH_ITER(hh, out.cw_ratings, curr_cw_entry, tmp_cw_entry) {
+    total_weight += curr_cw_entry->cw;
   }
 
-  TEST_ASSERT_EQUAL_INT(totalWeight, 4 + 2 + 2 + 1);
+  TEST_ASSERT_EQUAL_INT(total_weight, 4 + 2 + 2 + 1);
 
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  test_cleanup();
+  TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
 int main(int argc, char *argv[]) {
@@ -230,6 +215,14 @@ int main(int argc, char *argv[]) {
     test_db_path = "test.db";
     ciri_db_path = "ciri.db";
   }
+
+  config.db_path = test_db_path;
+  config.index_transaction_address = true;
+  config.index_transaction_approvee = true;
+  config.index_transaction_bundle = true;
+  config.index_transaction_tag = true;
+  config.index_transaction_hash = true;
+  config.index_milestone_hash = true;
 
   RUN_TEST(test_single_tx_tangle);
   RUN_TEST(test_cw_topology_blockchain);

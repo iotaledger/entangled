@@ -9,33 +9,34 @@
 #define __CONSENSUS_ENTRY_POINT_SELECTOR_ENTRY_POINT_SELECTOR_H__
 
 #include <stdbool.h>
-#include <stdint.h>
 
 #include "common/errors.h"
-#include "common/storage/connection.h"
-#include "consensus/entry_point_selector/entry_point_selector.h"
-#include "consensus/milestone/milestone.h"
-#include "consensus/tangle/tangle.h"
+
+// Forward declarations
+typedef struct milestone_s milestone_t;
+typedef struct tangle_s tangle_t;
+typedef struct _trit_array *trit_array_p;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct entry_point_selector_t {
-  tangle_t *tangle;
+typedef struct entry_point_selector_s {
   milestone_t *milestone;
+  tangle_t *tangle;
   bool testnet;
-  size_t start_index;
 } entry_point_selector_t;
 
-extern retcode_t iota_consensus_get_entry_point(
-    const entry_point_selector_t *ep_selector, size_t depth, trit_array_p ep);
-
 extern retcode_t iota_consensus_entry_point_selector_init(
-    bool testnet, entry_point_selector_t *ep_selector);
+    entry_point_selector_t *const eps, milestone_t *const milestone,
+    tangle_t *const tangle, bool const testnet);
+
+extern retcode_t iota_consensus_get_entry_point(
+    entry_point_selector_t *const eps, size_t const depth,
+    trit_array_p const ep);
 
 extern retcode_t iota_consensus_entry_point_selector_destroy(
-    entry_point_selector_t *ep_selector);
+    entry_point_selector_t *const eps);
 
 #ifdef __cplusplus
 }

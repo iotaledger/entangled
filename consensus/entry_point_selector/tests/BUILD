@@ -1,16 +1,14 @@
 cc_test(
-    name = "test_cw_ratings_dfs",
-    srcs = [
-        "test_cw_rating_calculator.c",
-    ],
+    name = "test_entry_point_selector",
+    srcs = ["test_entry_point_selector.c"],
     data = [":db_file"],
     visibility = ["//visibility:public"],
     deps = [
-        "//common/storage/sql/sqlite3:sqlite3_storage",
-        "//common/storage/tests/helpers",
-        "//common/trinary:trit_ptrit",
-        "//consensus/cw_rating_calculator",
+        "//common/helpers:digest",
+        "//common/model/tests:defs",
+        "//consensus/entry_point_selector",
         "//consensus/test_definitions:defs",
+        "//utils:files",
         "@unity",
     ],
 )
