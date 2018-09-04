@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include "broadcast_transactions.h"
 
 broadcast_transactions_req_t* broadcast_transactions_req_new() {
