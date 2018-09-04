@@ -10,10 +10,12 @@
 attach_to_tangle_req_t* attach_to_tangle_req_new() {
   attach_to_tangle_req_t* req =
       (attach_to_tangle_req_t*)malloc(sizeof(attach_to_tangle_req_t));
-  req->trunk = char_buffer_new();
-  req->branch = char_buffer_new();
-  req->mwm = ATTACH_TO_TANGLE_MIN_MWM;
-  utarray_new(req->trytes, &ut_str_icd);
+  if (req) {
+    req->trunk = char_buffer_new();
+    req->branch = char_buffer_new();
+    req->mwm = ATTACH_TO_TANGLE_MAIN_MWM;
+    utarray_new(req->trytes, &ut_str_icd);
+  }
   return req;
 }
 
@@ -45,13 +47,9 @@ retcode_t attach_to_tangle_req_set_branch(attach_to_tangle_req_t* req,
   return ret;
 }
 
-void attach_to_tangle_req_set_mvm(attach_to_tangle_req_t* req,
+void attach_to_tangle_req_set_mwm(attach_to_tangle_req_t* req,
                                   const int32_t mwm) {
-  if (mwm < ATTACH_TO_TANGLE_MIN_MWM) {
-    req->mwm = ATTACH_TO_TANGLE_MIN_MWM;
-  } else {
-    req->mwm = mwm;
-  }
+  req->mwm = mwm;
 }
 
 void attach_to_tangle_req_add_trytes(attach_to_tangle_req_t* req,

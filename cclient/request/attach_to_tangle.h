@@ -14,7 +14,8 @@ extern "C" {
 
 #include "types/types.h"
 
-#define ATTACH_TO_TANGLE_MIN_MWM 18
+#define ATTACH_TO_TANGLE_MAIN_MWM 14
+#define ATTACH_TO_TANGLE_TEST_MWM 9
 
 typedef struct {
   /**
@@ -42,7 +43,7 @@ retcode_t attach_to_tangle_req_set_trunk(attach_to_tangle_req_t* req,
                                          const char* trunk);
 retcode_t attach_to_tangle_req_set_branch(attach_to_tangle_req_t* req,
                                           const char* branch);
-void attach_to_tangle_req_set_mvm(attach_to_tangle_req_t* req,
+void attach_to_tangle_req_set_mwm(attach_to_tangle_req_t* req,
                                   const int32_t mwm);
 void attach_to_tangle_req_add_trytes(attach_to_tangle_req_t* req,
                                      const char* trytes);
