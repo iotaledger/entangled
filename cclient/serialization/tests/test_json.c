@@ -584,9 +584,8 @@ void test_serialize_were_addresses_spent_from(void) {
   serializer_t serializer;
   const char* json_text =
       "{"
-      "\"command\":\"storeTransactions\","
-      "\"trytes\":[\"" WERE_ADDRESSES_SPENT_FROM_TRYTES
-      "\"]"
+      "\"command\":\"wereAddressesSpentFrom\","
+      "\"trytes\":[\"" WERE_ADDRESSES_SPENT_FROM_TRYTES "\"]"
       "}";
 
   char_buffer_t* serializer_out = char_buffer_new();

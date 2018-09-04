@@ -783,7 +783,7 @@ retcode_t json_were_addresses_spent_from_serialize_request(
   }
 
   cJSON_AddItemToObject(json_root, "command",
-                        cJSON_CreateString("storeTransactions"));
+                        cJSON_CreateString("wereAddressesSpentFrom"));
 
   ret = utarray_to_json_array(obj, json_root, "trytes");
   if (ret != RC_OK) {
