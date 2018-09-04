@@ -16,9 +16,6 @@ get_transactions_to_approve_req_t* get_transactions_to_approve_req_new() {
   }
 
   req->reference = char_buffer_new();
-  if (req->reference == NULL) {
-    return NULL;
-  }
   return req;
 }
 
