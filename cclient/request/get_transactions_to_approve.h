@@ -15,7 +15,7 @@ extern "C" {
 #include "types/types.h"
 
 typedef struct {
-  int32_t depth;
+  uint32_t depth;
   char_buffer_t* reference;
 } get_transactions_to_approve_req_t;
 
