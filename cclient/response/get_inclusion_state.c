@@ -1,9 +1,18 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include "get_inclusion_state.h"
 
 get_inclusion_state_res_t* get_inclusion_state_res_new() {
   get_inclusion_state_res_t* res =
       (get_inclusion_state_res_t*)malloc(sizeof(get_inclusion_state_res_t));
-  utarray_new(res->states, &ut_int_icd);
+  if (res) {
+    utarray_new(res->states, &ut_int_icd);
+  }
   return res;
 }
 
