@@ -77,7 +77,8 @@ retcode_t json_boolean_array_to_utarray(cJSON* obj, const char* obj_name,
     cJSON* current_obj = NULL;
     /* The type of json object is expected to be boolean type */
     cJSON_ArrayForEach(current_obj, json_item) {
-      utarray_push_back(ut, &current_obj->type);
+      int bl = (int)cJSON_IsTrue(current_obj);
+      utarray_push_back(ut, &bl);
     }
   } else {
     cJSON_Delete(obj);

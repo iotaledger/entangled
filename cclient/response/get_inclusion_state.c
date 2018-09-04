@@ -17,8 +17,11 @@ get_inclusion_state_res_t* get_inclusion_state_res_new() {
 }
 
 bool get_inclusion_state_res_bool_at(get_inclusion_state_res_t* in, int index) {
-  bool* b = (bool*)utarray_eltptr(in->states, index);
-  return *b;
+  int* b = (int*)utarray_eltptr(in->states, index);
+  if (b != NULL) {
+    return (*b > 0) ? true : false;
+  }
+  return false;
 }
 
 int get_inclusion_state_res_bool_num(get_inclusion_state_res_t* in) {

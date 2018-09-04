@@ -440,12 +440,19 @@ void test_serialize_get_inclusion_states(void) {
 void test_deserialize_get_inclusion_states(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
-  const char* json_text = "{\"states\": [true]}";
+  const char* json_text = "{\"states\": [true,false]}";
   get_inclusion_state_res_t* deserialize_get_is = get_inclusion_state_res_new();
 
   serializer.vtable.get_inclusion_state_deserialize_response(
       &serializer, json_text, deserialize_get_is);
-  TEST_ASSERT_TRUE(get_inclusion_state_res_bool_at(deserialize_get_is, 0));
+  TEST_ASSERT_TRUE(get_inclusion_state_res_bool_at(deserialize_get_is, 0) ==
+                   true);
+  TEST_ASSERT_TRUE(get_inclusion_state_res_bool_at(deserialize_get_is, 1) ==
+                   false);
+  TEST_ASSERT_TRUE(get_inclusion_state_res_bool_at(deserialize_get_is, 2) ==
+                   false);
+  TEST_ASSERT_FALSE(get_inclusion_state_res_bool_at(deserialize_get_is, 2) ==
+                    true);
   get_inclusion_state_res_free(&deserialize_get_is);
 }
 
