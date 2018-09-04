@@ -6,13 +6,16 @@
  */
 
 #include <inttypes.h>
-#include <string.h>
+#include <stdlib.h>
 
 #include "ciri/conf/conf_values.h"
-#include "common/storage/pack.h"
-#include "common/trinary/trit_array.h"
+#include "common/model/milestone.h"
+#include "common/storage/sql/defs.h"
+#include "common/trinary/trit_long.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/tangle/tangle.h"
 #include "utils/logger_helper.h"
+#include "utils/macros.h"
 #include "utils/time.h"
 
 #define MILESTONE_TRACKER_LOGGER_ID "consensus_milestone_tracker"
@@ -100,12 +103,14 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
       goto oom;
     }
     mt->milestone_start_index = TESTNET_MILESTONE_START_INDEX;
+    mt->num_keys_in_milestone = TESTNET_NUM_KEYS_IN_MILESTONE;
   } else {
     if ((mt->coordinator = trit_array_new_from_trytes(
              (tryte_t*)MAINNET_COORDINATOR_ADDRESS)) == NULL) {
       goto oom;
     }
     mt->milestone_start_index = MAINNET_MILESTONE_START_INDEX;
+    mt->num_keys_in_milestone = MAINNET_NUM_KEYS_IN_MILESTONE;
   }
   mt->latest_milestone_index = mt->milestone_start_index;
   mt->latest_solid_subtangle_milestone_index = mt->milestone_start_index;

@@ -33,8 +33,8 @@ typedef struct milestone_tracker_s {
   uint64_t latest_solid_subtangle_milestone_index;
   trit_array_p latest_solid_subtangle_milestone;
   trit_array_p coordinator;
+  size_t num_keys_in_milestone;
   // bool accept_any_testnet_coo;
-  // size_t num_of_keys;
   // private final Set<Hash> analyzedMilestoneCandidates = new HashSet<>();
 } milestone_tracker_t;
 
