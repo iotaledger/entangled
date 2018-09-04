@@ -558,6 +558,7 @@ void test_serialize_attach_to_tangle(void) {
   attach_to_tangle_req_set_branch(attach_req, TEST_HASH2);
   attach_to_tangle_req_add_trytes(attach_req, TEST_RAW_TRYTES1);
   attach_to_tangle_req_add_trytes(attach_req, TEST_RAW_TRYTES2);
+  attach_to_tangle_req_set_mwm(attach_req, 18);
   serializer.vtable.attach_to_tangle_serialize_request(&serializer, attach_req,
                                                        serializer_out);
 
