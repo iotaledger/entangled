@@ -15,7 +15,7 @@ extern "C" {
 #include "types/types.h"
 
 typedef struct {
-  UT_array* bitmap;
+  UT_array* states;
 } get_inclusion_state_res_t;
 
 get_inclusion_state_res_t* get_inclusion_state_res_new();

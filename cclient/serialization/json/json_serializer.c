@@ -381,7 +381,7 @@ retcode_t json_get_inclusion_state_deserialize_response(
     return RC_CCLIENT_JSON_PARSE;
   }
 
-  ret = json_boolean_array_to_utarray(json_obj, "states", out->bitmap);
+  ret = json_boolean_array_to_utarray(json_obj, "states", out->states);
 
   cJSON_Delete(json_obj);
   return ret;
