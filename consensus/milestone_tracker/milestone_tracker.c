@@ -17,8 +17,6 @@
 
 #define MILESTONE_TRACKER_LOGGER_ID "consensus_milestone_tracker"
 
-// TODO: remove when eps PR merged
-#define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 static void* latest_milestone_tracker(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
@@ -85,22 +83,42 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   mt->running = false;
   mt->testnet = testnet;
   mt->tangle = tangle;
-  // TODO: OOM check
-  mt->lastest_milestone = trit_array_new(NUM_TRITS_HASH);
-  mt->lastest_solid_subtangle_milestone = trit_array_new(NUM_TRITS_HASH);
+  if ((mt->latest_milestone = trit_array_new(NUM_TRITS_HASH)) == NULL) {
+    goto oom;
+  }
+  if ((mt->latest_solid_subtangle_milestone = trit_array_new(NUM_TRITS_HASH)) ==
+      NULL) {
+    goto oom;
+  }
   if (mt->testnet) {
-    mt->coordinator =
-        trit_array_new_from_trytes((tryte_t*)TESTNET_COORDINATOR_ADDRESS);
+    if ((mt->coordinator = trit_array_new_from_trytes(
+             (tryte_t*)TESTNET_COORDINATOR_ADDRESS)) == NULL) {
+      goto oom;
+    }
     mt->milestone_start_index = TESTNET_MILESTONE_START_INDEX;
   } else {
-    mt->coordinator =
-        trit_array_new_from_trytes((tryte_t*)MAINNET_COORDINATOR_ADDRESS);
+    if ((mt->coordinator = trit_array_new_from_trytes(
+             (tryte_t*)MAINNET_COORDINATOR_ADDRESS)) == NULL) {
+      goto oom;
+    }
     mt->milestone_start_index = MAINNET_MILESTONE_START_INDEX;
   }
   mt->latest_milestone_index = mt->milestone_start_index;
   mt->latest_solid_subtangle_milestone_index = mt->milestone_start_index;
 
   return RC_OK;
+
+oom:
+  if (mt->latest_milestone) {
+    free(mt->latest_milestone);
+  }
+  if (mt->latest_solid_subtangle_milestone) {
+    free(mt->latest_solid_subtangle_milestone);
+  }
+  if (mt->coordinator) {
+    free(mt->coordinator);
+  }
+  return RC_CONSENSUS_MT_OOM;
 }
 
 retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt) {
@@ -170,8 +188,8 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt) {
     return RC_CONSENSUS_MT_STILL_RUNNING;
   }
 
-  trit_array_free(mt->lastest_milestone);
-  trit_array_free(mt->lastest_solid_subtangle_milestone);
+  trit_array_free(mt->latest_milestone);
+  trit_array_free(mt->latest_solid_subtangle_milestone);
   trit_array_free(mt->coordinator);
   memset(mt, 0, sizeof(milestone_tracker_t));
   logger_helper_destroy(MILESTONE_TRACKER_LOGGER_ID);

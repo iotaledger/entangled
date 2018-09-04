@@ -28,27 +28,14 @@ typedef struct milestone_tracker_s {
   uint64_t milestone_start_index;
   thread_handle_t latest_milestone_tracker;
   uint64_t latest_milestone_index;
-  trit_array_p lastest_milestone;
+  trit_array_p latest_milestone;
   thread_handle_t solid_milestone_tracker;
   uint64_t latest_solid_subtangle_milestone_index;
-  trit_array_p lastest_solid_subtangle_milestone;
+  trit_array_p latest_solid_subtangle_milestone;
   trit_array_p coordinator;
-  // // iota_transaction_validator
-  // bool testnet;
   // bool accept_any_testnet_coo;
   // size_t num_of_keys;
-  // milestone_view_t latest_milestone_hash;
-  // milestone_view_t latest_solid_milestone_hash;
-  // uint64_t latest_milestone_index;
-  // uint64_t latest_solid_milestone_index;
-  // uint64_t milestone_start_index;
-  // snapshot_t latest_snapshot;
-  //
-  // /*
-  // private final MessageQ messageQ;
-  // private LedgerValidator ledgerValidator;
   // private final Set<Hash> analyzedMilestoneCandidates = new HashSet<>();
-  //  */
 } milestone_tracker_t;
 
 /**
@@ -90,12 +77,6 @@ extern retcode_t iota_milestone_tracker_stop(milestone_tracker_t* const mt);
  * @return a status code
  */
 extern retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt);
-
-extern retcode_t iota_milestone_tracker_validate();
-extern retcode_t
-iota_milestone_tracker_update_latest_solid_subtangle_milestone();
-extern retcode_t iota_milestone_tracker_get_index();
-extern retcode_t iota_milestone_tracker_report_to_slack();
 
 #ifdef __cplusplus
 }
