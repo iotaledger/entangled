@@ -24,8 +24,8 @@
 
 static retcode_t iota_statement_generic_select(
     const char *table_name, const char *select_col, const char *where_col,
-    const char *order_col, const char *order, int limit, char statement[],
-    size_t statement_cap) {
+    const char *where_cmp, const char *order_col, const char *order, int limit,
+    char statement[], size_t statement_cap) {
   size_t offset = 0;
   int res;
 
@@ -36,9 +36,10 @@ static retcode_t iota_statement_generic_select(
     goto error;
   }
 
-  if (where_col != NULL && strcmp(where_col, "") != 0) {
-    res = snprintf(statement + offset, statement_cap - offset, " WHERE %s = ?",
-                   where_col);
+  if (where_col != NULL && strcmp(where_col, "") != 0 && where_cmp != NULL &&
+      strcmp(where_cmp, "") != 0) {
+    res = snprintf(statement + offset, statement_cap - offset, " WHERE %s %s ?",
+                   where_col, where_cmp);
     offset += res;
     if (res < 0 || res == statement_cap - offset) {
       goto error;
@@ -131,7 +132,8 @@ retcode_t iota_statement_transaction_select(const char *index_col,
                                             char statement[],
                                             size_t statement_cap) {
   return iota_statement_generic_select(TRANSACTION_TABLE_NAME, "*", index_col,
-                                       "", "", 0, statement, statement_cap);
+                                       "=", "", "", 0, statement,
+                                       statement_cap);
 }
 
 retcode_t iota_statement_transaction_exist(const char *index_col,
@@ -153,8 +155,8 @@ retcode_t iota_statement_transaction_select_hashes(const char *index_col,
                                                    char statement[],
                                                    size_t statement_cap) {
   return iota_statement_generic_select(TRANSACTION_TABLE_NAME,
-                                       TRANSACTION_COL_HASH, index_col, "", "",
-                                       0, statement, statement_cap);
+                                       TRANSACTION_COL_HASH, index_col, "=", "",
+                                       "", 0, statement, statement_cap);
 }
 
 retcode_t iota_statement_transaction_select_hashes_approvers(
@@ -201,14 +203,22 @@ retcode_t iota_statement_milestone_insert(const iota_milestone_t *milestone,
 retcode_t iota_statement_milestone_select(const char *index_col,
                                           char statement[],
                                           size_t statement_cap) {
-  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", index_col, "",
-                                       "", 0, statement, statement_cap);
+  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", index_col,
+                                       "=", "", "", 0, statement,
+                                       statement_cap);
 }
 
 retcode_t iota_statement_milestone_select_latest(char statement[],
                                                  size_t statement_cap) {
-  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", "",
+  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", "", "",
                                        MILESTONE_COL_INDEX, "DESC", 1,
+                                       statement, statement_cap);
+}
+
+retcode_t iota_statement_milestone_select_next(char statement[],
+                                               size_t statement_cap) {
+  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*",
+                                       MILESTONE_COL_INDEX, ">", "", "", 1,
                                        statement, statement_cap);
 }
 

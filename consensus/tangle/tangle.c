@@ -86,6 +86,12 @@ retcode_t iota_tangle_milestone_load_latest(const tangle_t *const tangle,
   return iota_stor_milestone_load_latest(&tangle->conn, pack);
 }
 
+retcode_t iota_tangle_milestone_load_next(const tangle_t *const tangle,
+                                          uint64_t index,
+                                          iota_stor_pack_t *pack) {
+  return iota_stor_milestone_load_next(&tangle->conn, index, pack);
+}
+
 retcode_t iota_tangle_milestone_exist(const tangle_t *const tangle,
                                       const char *index_name,
                                       const trit_array_p key, bool *exist) {

@@ -62,6 +62,9 @@ extern retcode_t iota_statement_milestone_select(const char* index_col,
 extern retcode_t iota_statement_milestone_select_latest(char statement[],
                                                         size_t statement_cap);
 
+extern retcode_t iota_statement_milestone_select_next(char statement[],
+                                                      size_t statement_cap);
+
 extern retcode_t iota_statement_milestone_exist(const char* index_col,
                                                 char statement[],
                                                 size_t statement_cap);
