@@ -5,10 +5,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//ciri/conf:conf_values",
-        "//common:errors",
-        "//common/storage:pack",
-        "//common/trinary:trit_array",
-        "//utils:logger_helper",
+        "//consensus/tangle",
+        "//utils:macros",
         "//utils:time",
         "//utils/handles:thread",
     ],
