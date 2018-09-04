@@ -12,12 +12,12 @@ get_transactions_to_approve_req_t* get_transactions_to_approve_req_new() {
       (get_transactions_to_approve_req_t*)malloc(
           sizeof(get_transactions_to_approve_req_t));
   if (req == NULL) {
-      return NULL;
+    return NULL;
   }
 
   req->reference = char_buffer_new();
   if (req->reference == NULL) {
-      return NULL;
+    return NULL;
   }
   return req;
 }
