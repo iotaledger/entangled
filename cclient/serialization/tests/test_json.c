@@ -469,22 +469,17 @@ void test_serialize_get_transactions_to_approve(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
   const char* json_text =
-      "{\"command\":\"getTransactionsToApprove\",\"depth\":15"
-      ",\"reference\":"
-      "\"TKGDZ9GEI9CPNQGHEATIISAKYPPPSXVCXBSR9EIWCTHHSSEQCD9YLDPEXYERCNJVASRGWM"
-      "AVKFQTC9999\"}";
+      "{\"command\":\"getTransactionsToApprove\",\"depth\":" STR(GET_TRANSACTION_TO_APPROVE_DEPTH) 
+      ",\"reference\":\"" GET_TRANSACTION_TO_APPROVE_HASH "\"}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   get_transactions_to_approve_req_t* get_txn_approve =
       get_transactions_to_approve_req_new();
   get_transactions_to_approve_req_set_reference(
-      get_txn_approve,
-      "TKGDZ9GEI9CPNQGHEATIISAKYPPPSXVCXBSR9EIW"
-      "CTHHSSEQCD9YLDPEXYERCNJVASRGWMAVKFQTC9999");
-  get_txn_approve->depth = 15;
+      get_txn_approve, GET_TRANSACTION_TO_APPROVE_HASH);
+  get_txn_approve->depth = GET_TRANSACTION_TO_APPROVE_DEPTH;
   serializer.vtable.get_transactions_to_approve_serialize_request(
       &serializer, get_txn_approve, serializer_out);
-
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
   char_buffer_free(serializer_out);
@@ -496,26 +491,19 @@ void test_deserialize_get_transactions_to_approve(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"trunkTransaction\": "
-      "\"INRTUYSZCWBHGFGGXXPWRWBZACYAFGVRRP9VY"
-      "EQJOHYD9URMELKWAFYFMNTSP9MCHLXRGAFMBOZP"
-      "Z9999\",\"branchTransaction\":"
-      "\"INRTUYSZCWBHGFGGXXPWRWBZACYAFGVRRP9VY"
-      "EQJOHYD9URMELKWAFYFMNTSP9MCHLXRGAFMBOZP"
-      "Z9999\"}";
+      "\"" GET_TRANSACTION_TO_APPROVE_HASH
+      "\",\"branchTransaction\":"
+      "\"" GET_TRANSACTION_TO_APPROVE_HASH "\"}";
 
   get_transactions_to_approve_res_t* deserialize_get_txn_approve =
       get_transactions_to_approve_res_new();
   serializer.vtable.get_transactions_to_approve_deserialize_response(
       &serializer, json_text, deserialize_get_txn_approve);
 
-  TEST_ASSERT_EQUAL_STRING(
-      "INRTUYSZCWBHGFGGXXPWRWBZACYAFGVRRP9VYEQJOHYD9URMELKWAFYFMNTSP9MCHLXRGAFM"
-      "BOZPZ9999",
-      deserialize_get_txn_approve->trunk->data);
-  TEST_ASSERT_EQUAL_STRING(
-      "INRTUYSZCWBHGFGGXXPWRWBZACYAFGVRRP9VYEQJOHYD9URMELKWAFYFMNTSP9MCHLXRGAFM"
-      "BOZPZ9999",
-      deserialize_get_txn_approve->branch->data);
+  TEST_ASSERT_EQUAL_STRING(GET_TRANSACTION_TO_APPROVE_HASH,
+                           deserialize_get_txn_approve->trunk->data);
+  TEST_ASSERT_EQUAL_STRING(GET_TRANSACTION_TO_APPROVE_HASH,
+                           deserialize_get_txn_approve->branch->data);
 
   get_transactions_to_approve_res_free(&deserialize_get_txn_approve);
 }
