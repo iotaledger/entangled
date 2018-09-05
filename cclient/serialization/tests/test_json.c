@@ -411,22 +411,14 @@ void test_serialize_get_inclusion_states(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"command\":\"getInclusionStates\",\"transactions\":["
-      "\"QHBYXQWRAHQJZEIARWSQGZJTAIITOZRMBFICIPAVD9YRJMXFXBDPFDTRAHHHP9YPDUVTNO"
-      "FWZGFGWMYHEKNAGNJHMW\"],\"tips\":["
-      "\"ZIJGAJ9AADLRPWNCYNNHUHRRAC9QOUDATEDQUMTNOTABUVRPTSTFQDGZKFYUUIE9ZEBIVC"
-      "CXXXLKX9999\"]}";
+      "\"" INCLUSION_STATES_HASH "\"],\"tips\":[\"" INCLUSION_STATES_TIPS
+      "\"]}";
 
   get_inclusion_state_req_t* get_is = get_inclusion_state_req_new();
   char_buffer_t* serializer_out = char_buffer_new();
 
-  get_inclusion_state_req_add_hash(
-      get_is,
-      "QHBYXQWRAHQJZEIARWSQGZJTAIITOZRMBFICIPAVD9YRJMXFXBDPFDTRAHHHP9YPDUVTNOFW"
-      "ZGFGWMYHEKNAGNJHMW");
-  get_inclusion_state_req_add_tip(
-      get_is,
-      "ZIJGAJ9AADLRPWNCYNNHUHRRAC9QOUDATEDQUMTNOTABUVRPTSTFQDGZKFYUUIE9ZEBIVCCX"
-      "XXLKX9999");
+  get_inclusion_state_req_add_hash(get_is, INCLUSION_STATES_HASH);
+  get_inclusion_state_req_add_tip(get_is, INCLUSION_STATES_TIPS);
 
   serializer.vtable.get_inclusion_state_serialize_request(&serializer, get_is,
                                                           serializer_out);

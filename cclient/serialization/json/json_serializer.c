@@ -337,12 +337,12 @@ retcode_t json_get_inclusion_state_serialize_request(
 
   ret = utarray_to_json_array(obj->hashes, json_root, "transactions");
   if (ret != RC_OK) {
-    goto err;
+    goto done;
   }
 
   ret = utarray_to_json_array(obj->tips, json_root, "tips");
   if (ret != RC_OK) {
-    goto err;
+    goto done;
   }
 
   json_text = cJSON_PrintUnformatted(json_root);
@@ -355,10 +355,7 @@ retcode_t json_get_inclusion_state_serialize_request(
     cJSON_free((void*)json_text);
   }
 
-  cJSON_Delete(json_root);
-  return ret;
-
-err:
+done:
   cJSON_Delete(json_root);
   return ret;
 }
