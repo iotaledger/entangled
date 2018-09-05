@@ -122,14 +122,37 @@ static uint64_t get_milestone_index(iota_transaction_t const tx) {
 
 static void* latest_milestone_tracker(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
+  iota_stor_pack_t hash_pack;
+  iota_milestone_t candidate;
+  iota_transaction_t tx;
+  iota_stor_pack_t tx_pack = {(void**)&tx, 1, 0, false};
 
+  if (mt == NULL) {
+    return NULL;
+  }
+  if ((tx = transaction_new()) == NULL) {
+    return NULL;
+  }
+  hash_pack_init(&hash_pack, 200);  // TODO based on database index
   while (mt->running) {
     log_debug(MILESTONE_TRACKER_LOGGER_ID, "Scanning for latest milestone\n");
     uint64_t scan_time = current_timestamp_ms();
     uint64_t previous_latest_milestone_index = mt->latest_milestone_index;
-    iota_stor_pack_t hash_pack;
-    hash_pack_init(&hash_pack, 20);
+
+    hash_pack.num_loaded = 0;
+    hash_pack.insufficient_capacity = false;
+    iota_tangle_transaction_load_hashes(mt->tangle, TRANSACTION_COL_ADDRESS,
+                                        mt->coordinator, &hash_pack);
     for (size_t i = 0; i < hash_pack.num_loaded; ++i) {
+      tx_pack.num_loaded = 0;
+      tx_pack.insufficient_capacity = false;
+      iota_tangle_transaction_load(mt->tangle, TRANSACTION_COL_HASH,
+                                   hash_pack.models[i], &tx_pack);
+      if (tx_pack.num_loaded > 0 && tx->current_index == 0) {
+        candidate.index = get_milestone_index(tx);
+        memcpy(candidate.hash, tx->hash, FLEX_TRIT_SIZE_243);
+        validate_milestone(mt, &candidate);
+      }
     }
     if (previous_latest_milestone_index != mt->latest_milestone_index) {
       // TODO messageQ publish lmi
