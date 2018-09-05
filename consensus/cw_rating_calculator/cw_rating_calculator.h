@@ -24,8 +24,12 @@ extern "C" {
 #endif
 
 enum cw_calculation_implementation {
-  NO_IMPLEMENTATION,
-  DFS,
+  CW_NO_IMPLEMENTATION,
+  /// time - O(n^2), place - O(n^2)
+  DFS_FROM_ENTRY_POINT,
+  /// time - O(n), place - O(n^2) implementation with the cost of
+  /// Performing propogation on each incoming transaction
+  BACKWARD_WEIGHT_PROPOGATION,
 };
 
 typedef struct cw_entry_t {

@@ -41,7 +41,8 @@ void test_cw_gen_topology(test_tangle_topology topology) {
 
   TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
+                                            DFS_FROM_ENTRY_POINT) == RC_OK);
 
   struct _iota_transaction txs[num_approvers];
   txs[0] = TEST_TRANSACTION;
@@ -77,9 +78,10 @@ void test_cw_gen_topology(test_tangle_topology topology) {
                     &tangle, TRANSACTION_COL_HASH, curr_hash, &pack) == RC_OK);
     TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
   }
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
+                                            DFS_FROM_ENTRY_POINT) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), num_approvers + 1);
+  TEST_ASSERT_EQUAL_INT(num_approvers + 1, HASH_COUNT(out.tx_to_approvers));
 
   size_t total_weight = 0;
 
@@ -106,7 +108,8 @@ void test_cw_gen_topology(test_tangle_topology topology) {
 void test_single_tx_tangle(void) {
   TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
+                                            DFS_FROM_ENTRY_POINT) == RC_OK);
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, (flex_trit_t *)TEST_TRANSACTION.hash,
@@ -150,7 +153,8 @@ void test_cw_topology_four_transactions_diamond(void) {
 
   TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
+                                            DFS_FROM_ENTRY_POINT) == RC_OK);
 
   struct _iota_transaction txs[num_txs];
   txs[0] = TEST_TRANSACTION;
@@ -186,7 +190,8 @@ void test_cw_topology_four_transactions_diamond(void) {
                     &tangle, TRANSACTION_COL_HASH, curr_hash, &pack) == RC_OK);
     TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
   }
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle, DFS) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
+                                            DFS_FROM_ENTRY_POINT) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
   TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), num_txs);
 

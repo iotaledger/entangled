@@ -8,27 +8,30 @@
 #include "consensus/tipselection/tipselection.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
+#include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
+#include "consensus/exit_probability_validator/exit_probability_validator.h"
 #include "consensus/milestone/milestone.h"
-#include "consensus/walker/walker.h"
-#include "consensus/walker_validator/walker_validator.h"
 
 #include "utils/logger_helper.h"
 
 #define TIPSELECTION_LOGGER_ID "consensus_tipselection"
 
 retcode_t iota_consensus_tipselection_init(
-    tipselection_t *const ts, cw_rating_calculator_t *const cw_calc,
-    entry_point_selector_t *const ep, ledger_validator_t *const lv,
-    milestone_t *const milestone, tangle_t *const tangle,
-    walker_t *const walker, walker_validator_t *const wv) {
+
+    tipselection_t *impl, const tangle_t *tangle, const ledger_validator_t *lv,
+    const exit_prob_transaction_validator_t *wv,
+    const cw_rating_calculator_t *cw_calc, const milestone_t *milestone,
+    const entry_point_selector_t *ep, const ep_randomizer_t *ep_randomizer,
+    double alpha) {
   logger_helper_init(TIPSELECTION_LOGGER_ID, LOGGER_INFO, true);
-  ts->cw_calc = cw_calc;
-  ts->ep_selector = ep;
-  ts->lv = lv;
-  ts->milestone = milestone;
-  ts->tangle = tangle;
-  ts->walker = walker;
-  rw_lock_handle_init(&ts->milestone->latest_snapshot.rw_lock);
+  impl->cw_calc = cw_calc;
+  impl->milestone = milestone;
+  impl->tangle = tangle;
+  impl->lv = lv;
+  impl->wv = wv;
+  impl->ep_randomizer = ep_randomizer;
+  impl->ep_selector = ep;
+  rw_lock_handle_init(&impl->milestone->latest_snapshot.rw_lock);
   return RC_OK;
 }
 
@@ -38,7 +41,6 @@ retcode_t iota_consensus_get_transactions_to_approve(
   retcode_t res = RC_OK;
   trit_array_p ep = NULL;
   cw_calc_result ratings_result;
-  walker_validator_t wv;
 
   rw_lock_handle_rdlock(&ts->milestone->latest_snapshot.rw_lock);
 
@@ -55,27 +57,23 @@ retcode_t iota_consensus_get_transactions_to_approve(
     goto ret;
   }
 
-  if ((res = iota_consensus_walker_validator_init(&wv, ts->tangle,
-                                                  ts->milestone, ts->lv))) {
-    log_error(TIPSELECTION_LOGGER_ID,
-              "Initializing walker validator failed with error %\" PRIu64 \"\n",
-              res);
-    goto ret;
-  }
+  exit_prob_transaction_validator_t wv;
 
-  if ((res = iota_consensus_walker_walk(
-           ts->walker, ep, ratings_result.cw_ratings, &wv, tips->trunk))) {
-    log_error(TIPSELECTION_LOGGER_ID,
-              "First walking failed with error %\" PRIu64 \"\n", res);
-    goto ret;
-  }
+  iota_consensus_exit_prob_transaction_validator_init(ts->tangle, ts->milestone,
+                                                      ts->lv, ts->wv);
+
+  iota_consensus_exit_probability_randomize(
+      &ratings_result, ep, ratings_result.cw_ratings, &wv, tips->trunk);
 
   if (reference != NULL) {
     // TODO
   }
 
-  if ((res = iota_consensus_walker_walk(
-           ts->walker, ep, ratings_result.cw_ratings, &wv, tips->branch))) {
+  iota_consensus_exit_probability_randomize(
+      ts->ep_randomizer, ep, ratings_result.cw_ratings, &wv, tips->branch);
+
+  res = iota_consensus_ledeger_validator_validate(ts->lv, tips);
+  if (res != RC_OK) {
     log_error(TIPSELECTION_LOGGER_ID,
               "Second walking failed with error %\" PRIu64 \"\n", res);
     goto ret;
@@ -99,7 +97,7 @@ retcode_t iota_consensus_tipselection_destroy(tipselection_t *const ts) {
   ts->lv = NULL;
   ts->milestone = NULL;
   ts->tangle = NULL;
-  ts->walker = NULL;
+  ts->ep_randomizer = NULL;
   rw_lock_handle_destroy(&ts->milestone->latest_snapshot.rw_lock);
   return RC_OK;
 }
