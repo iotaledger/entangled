@@ -70,6 +70,7 @@ retcode_t init_connection(const connection_t* const conn,
   if (rc) {
     log_critical(CONNECTION_LOGGER_ID, "Failed to open db on path: %s\n",
                  config->db_path);
+    return RC_SQLITE3_FAILED_OPEN_DB;
   } else {
     log_info(CONNECTION_LOGGER_ID,
              "Opened database (from path: %s ) successfully\n",
