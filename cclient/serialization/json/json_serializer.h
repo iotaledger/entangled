@@ -25,13 +25,13 @@ retcode_t json_find_transactions_deserialize_response(
     find_transactions_res_t* out);
 
 // get_balances_response
-retcode_t json_get_balances_serialize_request(const serializer_t* const,
-                                         const get_balances_req_t* const obj,
-                                         char_buffer_t* out);
+retcode_t json_get_balances_serialize_request(
+    const serializer_t* const, const get_balances_req_t* const obj,
+    char_buffer_t* out);
 
 retcode_t json_get_balances_deserialize_response(const serializer_t* const,
-                                            const char* const obj,
-                                            get_balances_res_t* out);
+                                                 const char* const obj,
+                                                 get_balances_res_t* out);
 
 // get_inclusion_state_response
 void json_get_inclusion_state_serialize_request(
@@ -66,10 +66,11 @@ retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
                                              get_tips_res_t* out);
 
 // get_transactions_to_approve_response
-void json_get_transactions_to_approve_serialize_request(
-    const serializer_t* const, int depth, char* out);
+retcode_t json_get_transactions_to_approve_serialize_request(
+    const serializer_t* const, get_transactions_to_approve_req_t* const obj,
+    char_buffer_t* out);
 
-void json_get_transactions_to_approve_deserialize_response(
+retcode_t json_get_transactions_to_approve_deserialize_response(
     const serializer_t* const, const char* const obj,
     get_transactions_to_approve_res_t* out);
 

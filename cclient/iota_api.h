@@ -184,7 +184,8 @@ iota_api_result_t iota_api_get_balances(
  * @return error value.
  */
 iota_api_result_t iota_api_get_transactions_to_approve(
-    const iota_http_service_t* const service, int depth,
+    const iota_http_service_t* const service,
+    get_transactions_to_approve_req_t* req,
     get_transactions_to_approve_res_t* res);
 
 /**
