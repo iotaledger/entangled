@@ -20,6 +20,97 @@
 
 #define MILESTONE_TRACKER_LOGGER_ID "consensus_milestone_tracker"
 
+static retcode_t validate_milestone(milestone_tracker_t* const mt,
+                                    iota_milestone_t* const candidate) {
+  retcode_t ret = RC_OK;
+  bool exists = false;
+  trit_array_p hash;
+
+  if (candidate->index >= 0x200000) {
+    return RC_OK;
+  }
+
+  // Checking if milestone is already persisted/validated in database
+  if ((hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
+    return RC_CONSENSUS_MT_OOM;
+  }
+  memcpy(hash->trits, candidate->hash, FLEX_TRIT_SIZE_243);
+  if ((ret = iota_tangle_milestone_exist(mt->tangle, MILESTONE_COL_HASH, hash,
+                                         &exists))) {
+    goto done;
+  } else if (exists) {
+    goto valid;
+  }
+
+  {  // TODO remove
+    iota_tangle_milestone_store(mt->tangle, candidate);
+    goto valid;
+  }
+  // final List<List<TransactionViewModel>> bundleTransactions =
+  //     BundleValidator.validate(tangle, transactionViewModel.getHash());
+  // if (bundleTransactions.size() == 0) {
+  //   return INCOMPLETE;
+  // } else {
+  //   for (final List<TransactionViewModel> bundleTransactionViewModels :
+  //        bundleTransactions) {
+  //     // if
+  //     //
+  //     (Arrays.equals(bundleTransactionViewModels.get(0).getHash(),transactionViewModel.getHash()))
+  //     // {
+  //     if (bundleTransactionViewModels.get(0).getHash().equals(
+  //             transactionViewModel.getHash())) {
+  //       // final TransactionViewModel transactionViewModel2 =
+  //       //
+  //       StorageTransactions.instance().loadTransaction(transactionViewModel.trunkTransactionPointer);
+  //       final TransactionViewModel transactionViewModel2 =
+  //           transactionViewModel.getTrunkTransaction(tangle);
+  //       if (transactionViewModel2.getType() ==
+  //               TransactionViewModel.FILLED_SLOT &&
+  //           transactionViewModel.getBranchTransactionHash().equals(
+  //               transactionViewModel2.getTrunkTransactionHash()) &&
+  //           transactionViewModel.getBundleHash().equals(
+  //               transactionViewModel2.getBundleHash())) {
+  //         final byte[] trunkTransactionTrits =
+  //             transactionViewModel.getTrunkTransactionHash().trits();
+  //         final byte[] signatureFragmentTrits = Arrays.copyOfRange(
+  //             transactionViewModel.trits(),
+  //             TransactionViewModel.SIGNATURE_MESSAGE_FRAGMENT_TRINARY_OFFSET,
+  //             TransactionViewModel.SIGNATURE_MESSAGE_FRAGMENT_TRINARY_OFFSET
+  //             +
+  //                 TransactionViewModel.SIGNATURE_MESSAGE_FRAGMENT_TRINARY_SIZE);
+  //
+  //         final byte[] merkleRoot = ISS.getMerkleRoot(
+  //             mode,
+  //             ISS.address(
+  //                 mode, ISS.digest(mode,
+  //                                  Arrays.copyOf(ISS.normalizedBundle(
+  //                                                    trunkTransactionTrits),
+  //                                                ISS.NUMBER_OF_FRAGMENT_CHUNKS),
+  //                                  signatureFragmentTrits)),
+  //             transactionViewModel2.trits(), 0, index, numOfKeysInMilestone);
+  //         if ((testnet && acceptAnyTestnetCoo) ||
+  //             (new Hash(merkleRoot)).equals(coordinator)) {
+  //           new MilestoneViewModel(index, transactionViewModel.getHash())
+  //               .store(tangle);
+  //           return VALID;
+  //         } else {
+  //           return INVALID;
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+  // return INVALID;
+
+valid:
+  if (candidate->index > mt->latest_milestone_index) {
+    mt->latest_milestone_index = candidate->index;
+    memcpy(mt->latest_milestone->trits, candidate->hash, FLEX_TRIT_SIZE_243);
+  }
+done:
+  trit_array_free(hash);
+  return ret;
+}
 
 static uint64_t get_milestone_index(iota_transaction_t const tx) {
   trit_t buffer[NUM_TRITS_OBSOLETE_TAG];
