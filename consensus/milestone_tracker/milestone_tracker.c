@@ -21,6 +21,14 @@
 #define MILESTONE_TRACKER_LOGGER_ID "consensus_milestone_tracker"
 
 
+static uint64_t get_milestone_index(iota_transaction_t const tx) {
+  trit_t buffer[NUM_TRITS_OBSOLETE_TAG];
+
+  flex_trits_to_trits(buffer, NUM_TRITS_OBSOLETE_TAG, tx->obsolete_tag,
+                      NUM_TRITS_OBSOLETE_TAG, NUM_TRITS_OBSOLETE_TAG);
+  return trits_to_long(buffer, NUM_TRITS_VALUE);
+}
+
 static void* latest_milestone_tracker(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
 

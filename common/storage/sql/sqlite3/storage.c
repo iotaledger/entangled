@@ -147,8 +147,6 @@ retcode_t iota_stor_transaction_load(const connection_t* const conn,
     return ret;
   }
 
-  pack->insufficient_capacity = false;
-
   int rc = sqlite3_prepare_v2((sqlite3*)conn->db, statement, -1,
                               &sqlite_statement, &err_msg);
   if (rc != SQLITE_OK) {
@@ -457,7 +455,6 @@ retcode_t iota_stor_milestone_load(const connection_t* const conn,
     return RC_SQLITE3_FAILED_BINDING;
   }
 
-  pack->num_loaded = 0;
   pack->insufficient_capacity = false;
   while (sqlite3_step(sqlite_statement) ==
          SQLITE_ROW) {  // While query has result-rows.
@@ -498,7 +495,6 @@ extern retcode_t iota_stor_milestone_load_latest(const connection_t* const conn,
     return RC_SQLITE3_FAILED_PREPARED_STATEMENT;
   }
 
-  pack->num_loaded = 0;
   pack->insufficient_capacity = false;
   if (pack->capacity >= 1) {
     if (sqlite3_step(sqlite_statement) ==
@@ -549,7 +545,6 @@ retcode_t iota_stor_milestone_load_next(const connection_t* const conn,
     return RC_SQLITE3_FAILED_BINDING;
   }
 
-  pack->num_loaded = 0;
   pack->insufficient_capacity = false;
   if (pack->capacity >= 1) {
     if (sqlite3_step(sqlite_statement) ==

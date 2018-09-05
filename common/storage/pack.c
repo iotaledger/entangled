@@ -42,6 +42,7 @@ retcode_t hash_pack_resize(iota_stor_pack_t *pack, size_t resize_factor) {
 retcode_t hash_pack_init(iota_stor_pack_t *pack, size_t size) {
   pack->capacity = size;
   pack->num_loaded = 0;
+  pack->insufficient_capacity = false;
   pack->models = malloc(sizeof(trit_array_p) * pack->capacity);
   if (pack->models == NULL) {
     log_error(STORAGE_PACKS_LOGGER_ID, "Failed in malloc\n");

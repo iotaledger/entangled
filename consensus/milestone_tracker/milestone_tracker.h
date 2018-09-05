@@ -34,8 +34,12 @@ typedef struct milestone_tracker_s {
   trit_array_p latest_solid_subtangle_milestone;
   trit_array_p coordinator;
   size_t num_keys_in_milestone;
+  // TODO
+  // private final TransactionValidator transactionValidator;
+  // public Snapshot latestSnapshot;
+  // private LedgerValidator ledgerValidator;
+  // private final MessageQ messageQ;
   // bool accept_any_testnet_coo;
-  // private final Set<Hash> analyzedMilestoneCandidates = new HashSet<>();
 } milestone_tracker_t;
 
 /**
