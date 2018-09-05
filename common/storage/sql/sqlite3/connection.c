@@ -58,6 +58,7 @@ retcode_t init_connection(const connection_t* const conn,
   char* err_msg = 0;
   char* sql;
 
+  logger_helper_init(CONNECTION_LOGGER_ID, LOGGER_DEBUG, true);
   if (config->db_path == NULL) {
     log_critical(CONNECTION_LOGGER_ID, "No path for db specified\n");
     return RC_SQLITE3_NO_PATH_FOR_DB_SPECIFIED;
@@ -159,5 +160,6 @@ retcode_t init_connection(const connection_t* const conn,
 retcode_t destroy_connection(const connection_t* const conn) {
   log_info(CONNECTION_LOGGER_ID, "Destroying connection\n");
   sqlite3_close((sqlite3*)conn->db);
+  logger_helper_destroy(CONNECTION_LOGGER_ID);
   return RC_OK;
 }
