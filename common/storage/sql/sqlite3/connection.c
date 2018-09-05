@@ -44,9 +44,9 @@ retcode_t create_index_if_not_exists(const connection_t* const conn,
     return RC_SQLITE3_FAILED_CREATE_INDEX_DB;
   }
 
-  log_info(CONNECTION_LOGGER_ID,
-           "created index: %s on column: %s successfully\n", index_name,
-           col_name);
+  log_debug(CONNECTION_LOGGER_ID,
+            "Created index: %s on column: %s of table: %s\n", index_name,
+            col_name, table_name);
 
   return RC_OK;
 }
@@ -72,8 +72,7 @@ retcode_t init_connection(const connection_t* const conn,
                  config->db_path);
     return RC_SQLITE3_FAILED_OPEN_DB;
   } else {
-    log_info(CONNECTION_LOGGER_ID,
-             "Opened database (from path: %s ) successfully\n",
+    log_info(CONNECTION_LOGGER_ID, "Connection to database %s created\n",
              config->db_path);
   }
 
@@ -153,7 +152,8 @@ retcode_t init_connection(const connection_t* const conn,
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
 
-  log_info(CONNECTION_LOGGER_ID, "connection initialised successfully\n");
+  log_info(CONNECTION_LOGGER_ID, "Connection to database %s initialized\n",
+           config->db_path);
 
   return retcode;
 }
