@@ -407,11 +407,45 @@ void test_deserialize_get_trytes(void) {
 }
 
 void test_serialize_get_inclusion_states(void) {
-  // TODO
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text =
+      "{\"command\":\"getInclusionStates\",\"transactions\":["
+      "\"" INCLUSION_STATES_HASH "\"],\"tips\":[\"" INCLUSION_STATES_TIPS
+      "\"]}";
+
+  get_inclusion_state_req_t* get_is = get_inclusion_state_req_new();
+  char_buffer_t* serializer_out = char_buffer_new();
+
+  get_inclusion_state_req_add_hash(get_is, INCLUSION_STATES_HASH);
+  get_inclusion_state_req_add_tip(get_is, INCLUSION_STATES_TIPS);
+
+  serializer.vtable.get_inclusion_state_serialize_request(&serializer, get_is,
+                                                          serializer_out);
+
+  TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
+
+  char_buffer_free(serializer_out);
+  get_inclusion_state_req_free(&get_is);
 }
 
 void test_deserialize_get_inclusion_states(void) {
-  // TODO
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text = "{\"states\": [true,false]}";
+  get_inclusion_state_res_t* deserialize_get_is = get_inclusion_state_res_new();
+
+  serializer.vtable.get_inclusion_state_deserialize_response(
+      &serializer, json_text, deserialize_get_is);
+  TEST_ASSERT_TRUE(get_inclusion_state_res_bool_at(deserialize_get_is, 0) ==
+                   true);
+  TEST_ASSERT_TRUE(get_inclusion_state_res_bool_at(deserialize_get_is, 1) ==
+                   false);
+  TEST_ASSERT_TRUE(get_inclusion_state_res_bool_at(deserialize_get_is, 2) ==
+                   false);
+  TEST_ASSERT_FALSE(get_inclusion_state_res_bool_at(deserialize_get_is, 2) ==
+                    true);
+  get_inclusion_state_res_free(&deserialize_get_is);
 }
 
 void test_serialize_get_balances(void) {

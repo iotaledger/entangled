@@ -144,8 +144,8 @@ iota_api_result_t iota_api_get_trytes(const iota_http_service_t* const service,
  * @return error value.
  */
 iota_api_result_t iota_api_get_inclusion_states(
-    const iota_http_service_t* const service,
-    const get_inclusion_state_req_t* const req, get_inclusion_state_res_t* res);
+    const iota_http_service_t* const service, get_inclusion_state_req_t* req,
+    get_inclusion_state_res_t* res);
 
 /**
  * Similar to iota_api_get_inclusion_states. It returns the confirmed balance
