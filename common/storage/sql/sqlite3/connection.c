@@ -44,9 +44,9 @@ retcode_t create_index_if_not_exists(const connection_t* const conn,
     return RC_SQLITE3_FAILED_CREATE_INDEX_DB;
   }
 
-  log_info(CONNECTION_LOGGER_ID,
-           "created index: %s on column: %s successfully\n", index_name,
-           col_name);
+  log_debug(CONNECTION_LOGGER_ID,
+            "Created index: %s on column: %s of table: %s\n", index_name,
+            col_name, table_name);
 
   return RC_OK;
 }
@@ -58,6 +58,7 @@ retcode_t init_connection(const connection_t* const conn,
   char* err_msg = 0;
   char* sql;
 
+  logger_helper_init(CONNECTION_LOGGER_ID, LOGGER_DEBUG, true);
   if (config->db_path == NULL) {
     log_critical(CONNECTION_LOGGER_ID, "No path for db specified\n");
     return RC_SQLITE3_NO_PATH_FOR_DB_SPECIFIED;
@@ -69,9 +70,9 @@ retcode_t init_connection(const connection_t* const conn,
   if (rc) {
     log_critical(CONNECTION_LOGGER_ID, "Failed to open db on path: %s\n",
                  config->db_path);
+    return RC_SQLITE3_FAILED_OPEN_DB;
   } else {
-    log_info(CONNECTION_LOGGER_ID,
-             "Opened database (from path: %s ) successfully\n",
+    log_info(CONNECTION_LOGGER_ID, "Connection to database %s created\n",
              config->db_path);
   }
 
@@ -151,7 +152,8 @@ retcode_t init_connection(const connection_t* const conn,
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
 
-  log_info(CONNECTION_LOGGER_ID, "connection initialised successfully\n");
+  log_info(CONNECTION_LOGGER_ID, "Connection to database %s initialized\n",
+           config->db_path);
 
   return retcode;
 }
@@ -159,5 +161,6 @@ retcode_t init_connection(const connection_t* const conn,
 retcode_t destroy_connection(const connection_t* const conn) {
   log_info(CONNECTION_LOGGER_ID, "Destroying connection\n");
   sqlite3_close((sqlite3*)conn->db);
+  logger_helper_destroy(CONNECTION_LOGGER_ID);
   return RC_OK;
 }
