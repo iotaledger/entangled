@@ -84,11 +84,13 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
     trits_to_bytes(hash_trits, packet->content + PACKET_SIZE, NUM_TRITS_HASH);
   }
   if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
-    if (tcp_send(&neighbor->endpoint, packet) == false) {
+    if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, packet) ==
+        false) {
       return RC_NEIGHBOR_FAILED_SEND;
     }
   } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
-    if (udp_send(&neighbor->endpoint, packet) == false) {
+    if (udp_send(&node->receiver.udp_service, &neighbor->endpoint, packet) ==
+        false) {
       return RC_NEIGHBOR_FAILED_SEND;
     }
   } else {
