@@ -19,13 +19,11 @@ extern "C" {
 /**
  * Initializes an UDP endpoint
  *
- * @param service An UDP service
  * @param endpoint The endpoint
  *
  * @return true on success, false otherwise
  */
-bool udp_endpoint_init(receiver_service_t *const service,
-                       endpoint_t *const endpoint);
+bool udp_endpoint_init(endpoint_t *const endpoint);
 
 /**
  * Destroys an UDP endpoint

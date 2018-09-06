@@ -12,15 +12,14 @@
 #include "gossip/services/udp_sender.hpp"
 #include "utils/logger_helper.h"
 
-bool udp_endpoint_init(receiver_service_t *const service,
-                       endpoint_t *const endpoint) {
-  if (service == NULL || service->context == NULL || endpoint == NULL) {
+bool udp_endpoint_init(endpoint_t *const endpoint) {
+  if (endpoint == NULL) {
     return false;
   }
 
   try {
-    auto ctx = reinterpret_cast<boost::asio::io_context *>(service->context);
-    boost::asio::ip::udp::resolver resolver(*ctx);
+    boost::asio::io_context ctx;
+    boost::asio::ip::udp::resolver resolver(ctx);
     boost::asio::ip::udp::resolver::query query(endpoint->host,
                                                 std::to_string(endpoint->port));
     boost::asio::ip::udp::endpoint destination = *resolver.resolve(query);
