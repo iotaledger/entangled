@@ -68,12 +68,11 @@ bool TcpConnection::handlePacket(std::size_t const length) {
   if (length != PACKET_SIZE) {
     return false;
   }
-  iota_packet_build(&packet_, length,
-                    socket_.remote_endpoint().address().to_string().c_str(),
-                    socket_.remote_endpoint().port(), PROTOCOL_TCP);
+  iota_packet_build(&packet_, length, neighbor_->endpoint.ip,
+                    neighbor_->endpoint.port, PROTOCOL_TCP);
   log_debug(TCP_RECEIVER_SERVICE_LOGGER_ID,
             "Packet received from tethered neighbor tcp://%s:%d\n",
-            &packet_.source.host, packet_.source.port);
+            neighbor_->endpoint.host, neighbor_->endpoint.port);
   if (CQ_PUSH(service_->queue, packet_) != CQ_SUCCESS) {
     return false;
   }
