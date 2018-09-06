@@ -34,11 +34,13 @@ retcode_t receiver_init(receiver_state_t *const state, node_t *const node,
   state->tcp_service.context = NULL;
   state->tcp_service.state = state;
   state->tcp_service.queue = node->processor.queue;
+  state->tcp_service.opaque_inetaddr = NULL;
   state->udp_service.port = udp_port;
   state->udp_service.protocol = PROTOCOL_UDP;
   state->udp_service.context = NULL;
   state->udp_service.state = state;
   state->udp_service.queue = node->processor.queue;
+  state->udp_service.opaque_inetaddr = NULL;
   state->node = node;
   return RC_OK;
 }

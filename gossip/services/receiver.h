@@ -24,6 +24,7 @@ typedef struct receiver_service_s {
   void* context;
   receiver_state_t* state;
   receive_queue_t* queue;
+  void* opaque_inetaddr;
 } receiver_service_t;
 
 #ifdef __cplusplus

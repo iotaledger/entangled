@@ -20,6 +20,7 @@ UdpReceiverService::UdpReceiverService(receiver_service_t* const service,
       socket_(context, boost::asio::ip::udp::endpoint(
                            boost::asio::ip::udp::v4(), port)) {
   logger_helper_init(UDP_RECEIVER_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
+  service->opaque_inetaddr = &socket_;
   receive();
 }
 

@@ -38,6 +38,7 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
   } else {
     return RC_NEIGHBOR_INVALID_PROTOCOL;
   }
+  strcpy(neighbor->endpoint.ip, neighbor->endpoint.host);  // TODO
   return RC_OK;
 }
 
@@ -54,6 +55,7 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
       return RC_NEIGHBOR_INVALID_HOST;
     }
     strcpy(neighbor->endpoint.host, host);
+    strcpy(neighbor->endpoint.ip, host);  // TODO
   }
   neighbor->endpoint.port = port;
   return RC_OK;
@@ -89,6 +91,9 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
       return RC_NEIGHBOR_FAILED_SEND;
     }
   } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
+    if (neighbor->endpoint.opaque_inetaddr == NULL) {
+      udp_endpoint_init(&node->receiver.udp_service, &neighbor->endpoint);
+    }
     if (udp_send(&node->receiver.udp_service, &neighbor->endpoint, packet) ==
         false) {
       return RC_NEIGHBOR_FAILED_SEND;
