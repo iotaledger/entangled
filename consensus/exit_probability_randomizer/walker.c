@@ -174,9 +174,6 @@ retcode_t select_approver(const ep_randomizer_t *exit_probability_randomizer,
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
     HASH_FIND(hh, cw_ratings, curr_approver->hash, FLEX_TRIT_SIZE_243,
               curr_rating);
-    if (!curr_rating) {
-      // TODO - should never happen, figure error
-    }
     weights[idx++] = curr_rating->cw;
   }
 

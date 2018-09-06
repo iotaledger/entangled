@@ -327,10 +327,10 @@ int main(int argc, char *argv[]) {
   config.index_transaction_hash = true;
   config.index_milestone_hash = true;
 
-  // RUN_TEST(test_single_tx_tangle);
-  // RUN_TEST(test_cw_topology_blockchain);
+  RUN_TEST(test_single_tx_tangle);
+  RUN_TEST(test_cw_topology_blockchain);
   RUN_TEST(test_cw_topology_only_direct_approvers);
-  // RUN_TEST(test_cw_topology_four_transactions_diamond);
+  RUN_TEST(test_cw_topology_four_transactions_diamond);
 
   return UNITY_END();
 }
