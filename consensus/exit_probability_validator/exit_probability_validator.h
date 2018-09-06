@@ -35,11 +35,10 @@ typedef struct exit_prob_transaction_validator_s {
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_init(
     const tangle_t *tangle, const milestone_t *milestone,
-    const ledger_validator_t *lv,
-    exit_prob_transaction_validator_t *ep_validator);
+    const ledger_validator_t *lv, exit_prob_transaction_validator_t *epv);
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
-    exit_prob_transaction_validator_t *wv);
+    exit_prob_transaction_validator_t *epv);
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
     const exit_prob_transaction_validator_t *ep_validator, trit_array_p tx_hash,

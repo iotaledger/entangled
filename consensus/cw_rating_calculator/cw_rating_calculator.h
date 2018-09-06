@@ -29,7 +29,7 @@ enum cw_calculation_implementation {
   DFS_FROM_ENTRY_POINT,
   /// time - O(n), place - O(n^2) implementation with the cost of
   /// Performing propogation on each incoming transaction
-  BACKWARD_WEIGHT_PROPOGATION,
+  BACKWARD_WEIGHT_PROPAGATION,
 };
 
 typedef struct cw_entry_t {

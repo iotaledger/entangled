@@ -9,12 +9,6 @@
 #define __COMMON_STORAGE_DEFS_H__
 
 /*
- * Common definitions
- */
-
-#define MAX_CREATE_INDEX_STATEMENT_SIZE 128
-
-/*
  * Transaction definitions
  */
 

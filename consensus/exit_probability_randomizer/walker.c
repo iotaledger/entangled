@@ -57,7 +57,7 @@ retcode_t iota_consensus_random_walker_randomize(
                                                                 ep, &is_valid);
   if (ret) {
     log_error(RANDOM_WALKER_ID,
-              "Failed in entrypoint validation: %\" PRIu64 \"", ret);
+              "Failed in entrypoint validation: %\" PRIu64 \"\n", ret);
     return ret;
   }
 
@@ -96,7 +96,7 @@ retcode_t iota_consensus_random_walker_randomize(
     }
   } while (has_next_approver_tail);
 
-  memcpy(tip->trits, next_approver_tail.trits, FLEX_TRIT_SIZE_243);
+  memcpy(tip->trits, curr_tail->hash, FLEX_TRIT_SIZE_243);
   DL_COUNT(traversed_tails, tmp_element, num_traversed_tails);
   log_debug(RANDOM_WALKER_ID,
             "Number of tails traversed to find tip: \"%\" PRIu64 \"",
@@ -189,9 +189,6 @@ retcode_t select_approver(const ep_randomizer_t *exit_probability_randomizer,
 
   for (idx = 0; idx < num_approvers; ++idx) {
     weights[idx] -= max_weight;
-  }
-
-  for (idx = 0; idx < num_approvers; ++idx) {
     weights[idx] = exp(weights[idx] * exit_probability_randomizer->alpha);
     sum_weights += weights[idx];
   }
@@ -280,8 +277,8 @@ retcode_t find_tail_if_valid(const ep_randomizer_t *exit_probability_randomizer,
       tx_pack.insufficient_capacity = false;
       tx_pack.models = (void **)(&next_tx);
       res = iota_tangle_transaction_load(exit_probability_randomizer->tangle,
-                                         TRANSACTION_COL_HASH,
-                                         approver_hash, &tx_pack);
+                                         TRANSACTION_COL_HASH, approver_hash,
+                                         &tx_pack);
       if (res != RC_OK || tx_pack.num_loaded == 0) {
         break;
       }

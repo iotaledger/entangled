@@ -12,34 +12,31 @@
 
 retcode_t iota_consensus_exit_prob_transaction_validator_init(
     const tangle_t *tangle, const milestone_t *milestone,
-    const ledger_validator_t *lv, exit_prob_transaction_validator_t *wv) {
+    const ledger_validator_t *lv, exit_prob_transaction_validator_t *epv) {
   logger_helper_init(WALKER_VALIDATOR_LOGGER_ID, LOGGER_INFO, true);
-  wv->tangle = tangle;
-  wv->milestone = milestone;
-  wv->lv = lv;
+  epv->tangle = tangle;
+  epv->milestone = milestone;
+  epv->lv = lv;
   return RC_OK;
 }
 
 retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
-    exit_prob_transaction_validator_t *wv) {
+    exit_prob_transaction_validator_t *epv) {
   logger_helper_destroy(WALKER_VALIDATOR_LOGGER_ID);
-  wv->tangle = NULL;
-  wv->milestone = NULL;
-  wv->lv = NULL;
+  epv->tangle = NULL;
+  epv->milestone = NULL;
+  epv->lv = NULL;
+  return RC_OK;
 }
 retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
     const exit_prob_transaction_validator_t *ep_validator, trit_array_p tx_hash,
     bool *is_valid) {
   retcode_t ret = RC_OK;
 
-  iota_stor_pack_t tx_pack;
-
-  tx_pack.capacity = 1;
-  tx_pack.num_loaded = 0;
-  tx_pack.insufficient_capacity = false;
   struct _iota_transaction tx;
   iota_transaction_t tx_models = &tx;
-  tx_pack.models = (void **)(&tx_models);
+
+  iota_stor_pack_t tx_pack = {(void **)(&tx_models), 1, 0, false};
 
   ret = iota_tangle_transaction_load(ep_validator->tangle, TRANSACTION_COL_HASH,
                                      tx_hash, &tx_pack);
