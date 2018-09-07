@@ -8,21 +8,16 @@
 #ifndef __GOSSIP_IOTA_PACKET_H__
 #define __GOSSIP_IOTA_PACKET_H__
 
+#include "ciri/conf/conf_default.h"
 #include "common/network/endpoint.h"
 #include "common/trinary/bytes.h"
-
-#define PACKET_SIZE 1650
-#define TX_BYTES_SIZE 1604
-#define TX_TRITS_SIZE 8019
-#define REQ_HASH_BYTES_SIZE 46
 
 // Forward declarations
 typedef struct _iota_transaction* iota_transaction_t;
 typedef struct _trit_array* trit_array_p;
 
 typedef struct iota_packet_s {
-  byte_t content[PACKET_SIZE];
-  size_t length;
+  byte_t content[TESTNET_PACKET_SIZE];
   endpoint_t source;
 } iota_packet_t;
 
@@ -34,14 +29,12 @@ extern "C" {
  * Fills a packet except the content part
  *
  * @param packet The packet
- * @param length The packet length
  * @param host The endpoint host
  * @param port The endpoint port
  * @param protocol The endpoint protocol
  */
-void iota_packet_build(iota_packet_t* const packet, size_t const length,
-                       char const* const host, uint16_t const port,
-                       protocol_type_t const protocol);
+void iota_packet_build(iota_packet_t* const packet, char const* const host,
+                       uint16_t const port, protocol_type_t const protocol);
 
 /**
  * Fills the transaction part of a packet content

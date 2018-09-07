@@ -84,7 +84,8 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
     // TODO(thibault): iota_packet_set_request
     flex_trits_to_trits(hash_trits, NUM_TRITS_HASH, hash->trits,
                         hash->num_trits, hash->num_trits);
-    trits_to_bytes(hash_trits, packet->content + PACKET_SIZE, NUM_TRITS_HASH);
+    trits_to_bytes(hash_trits, packet->content + PACKET_TX_SIZE,
+                   NUM_TRITS_HASH);
   }
   if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
     if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, packet) ==
