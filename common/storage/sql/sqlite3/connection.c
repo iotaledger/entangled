@@ -12,6 +12,7 @@
 #include <sqlite3.h>
 
 #include "common/storage/connection.h"
+#include "common/storage/defs.h"
 #include "common/storage/sql/defs.h"
 #include "utils/logger_helper.h"
 
