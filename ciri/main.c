@@ -7,6 +7,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
+#include <unistd.h>
 
 #include "ciri/core.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
@@ -16,6 +18,15 @@
 #define MAIN_LOGGER_ID "main"
 
 static core_t core_g;
+static bool keyboard_interrupt = false;
+int ret = EXIT_SUCCESS;
+
+void sig_handler(int signo)
+{
+  if (signo == SIGINT) {
+	  keyboard_interrupt = true;
+  }
+}
 
 int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
@@ -83,6 +94,6 @@ int main(int argc, char* argv[]) {
     log_error(MAIN_LOGGER_ID, "Destroying cIRI core failed\n");
     ret = EXIT_FAILURE;
   }
-
+  
   return ret;
 }
