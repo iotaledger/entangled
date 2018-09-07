@@ -21,10 +21,10 @@ typedef struct receiver_service_s {
   thread_handle_t thread;
   uint16_t port;
   protocol_type_t protocol;
-  void* context;
   receiver_state_t* state;
   receive_queue_t* queue;
-  void* opaque_inetaddr;
+  void* context;
+  void* opaque_socket;
 } receiver_service_t;
 
 #ifdef __cplusplus

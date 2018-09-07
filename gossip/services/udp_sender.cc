@@ -47,14 +47,14 @@ bool udp_endpoint_destroy(endpoint_t *const endpoint) {
 
 bool udp_send(receiver_service_t *const service, endpoint_t *const endpoint,
               iota_packet_t *const packet) {
-  if (service == NULL || service->opaque_inetaddr == NULL || endpoint == NULL ||
+  if (service == NULL || service->opaque_socket == NULL || endpoint == NULL ||
       endpoint->opaque_inetaddr == NULL) {
     return false;
   }
 
   try {
     auto socket = reinterpret_cast<boost::asio::ip::udp::socket *>(
-        service->opaque_inetaddr);
+        service->opaque_socket);
     socket->async_send_to(
         boost::asio::buffer(packet->content, PACKET_SIZE),
         *reinterpret_cast<boost::asio::ip::udp::endpoint *>(

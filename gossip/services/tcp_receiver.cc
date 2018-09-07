@@ -20,7 +20,7 @@
 TcpConnection::TcpConnection(receiver_service_t* const service,
                              boost::asio::ip::tcp::socket socket)
     : service_(service), socket_(std::move(socket)) {
-  service->opaque_inetaddr = &socket_;
+  service->opaque_socket = &socket_;
 }
 
 TcpConnection::~TcpConnection() {
