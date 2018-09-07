@@ -17,13 +17,6 @@ void init_ep_randomizer_walker(ep_randomizer_t *randomizer) {
   randomizer->base.vtable = random_walk_vtable;
 }
 
-typedef struct tail_el_s {
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  struct tail_el_s *next, *prev;
-} tail_el_t;
-
-void tail_list_cleanup(tail_el_t **head);
-
 static retcode_t random_walker_select_approver_tail(
     const ep_randomizer_t *exit_probability_randomizer, flex_trit_t *curr_tail,
     cw_calc_result *cw_result, const exit_prob_transaction_validator_t *epv,
@@ -43,9 +36,7 @@ retcode_t iota_consensus_random_walker_randomize(
     cw_calc_result *cw_result, const trit_array_p ep, trit_array_p tip) {
   retcode_t ret = RC_OK;
   bool is_valid = false;
-  tail_el_t *traversed_tails = NULL;
-  tail_el_t *curr_tail = NULL;
-  tail_el_t *tmp_element = NULL;
+  flex_trit_t curr_tail_hash[FLEX_TRIT_SIZE_243];
   bool has_next_approver_tail = false;
   size_t num_traversed_tails = 0;
   trit_array_t next_approver_tail;
@@ -67,41 +58,27 @@ retcode_t iota_consensus_random_walker_randomize(
     return RC_CONSENSUS_EXIT_PROBABILITIES_INVALID_ENTRYPOINT;
   }
 
-  curr_tail = (tail_el_t *)malloc(sizeof(tail_el_t));
-  if (!curr_tail) {
-    log_error(RANDOM_WALKER_ID, "Failed in memory allocation\n");
-    return RC_CONSENSUS_OOM;
-  }
-
-  memcpy(curr_tail->hash, ep->trits, ep->num_bytes);
-  DL_APPEND(traversed_tails, curr_tail);
+  memcpy(curr_tail_hash, ep->trits, ep->num_bytes);
+  num_traversed_tails++;
 
   do {
     ret = random_walker_select_approver_tail(
-        exit_probability_randomizer, curr_tail->hash, cw_result, ep_validator,
+        exit_probability_randomizer, curr_tail_hash, cw_result, ep_validator,
         &next_approver_tail, &has_next_approver_tail);
     if (ret) {
-      tail_list_cleanup(&traversed_tails);
       return ret;
     } else if (has_next_approver_tail) {
-      curr_tail = (tail_el_t *)malloc(sizeof(tail_el_t));
-      if (!curr_tail) {
-        tail_list_cleanup(&traversed_tails);
-        log_error(RANDOM_WALKER_ID, "Failed in memory allocation\n");
-        return RC_CONSENSUS_OOM;
-      }
-      memcpy(curr_tail->hash, next_approver_tail.trits,
+      memcpy(curr_tail_hash, next_approver_tail.trits,
              next_approver_tail.num_bytes);
-      DL_APPEND(traversed_tails, curr_tail);
+      num_traversed_tails++;
     }
   } while (has_next_approver_tail);
 
-  memcpy(tip->trits, curr_tail->hash, FLEX_TRIT_SIZE_243);
-  DL_COUNT(traversed_tails, tmp_element, num_traversed_tails);
+  memcpy(tip->trits, curr_tail_hash, FLEX_TRIT_SIZE_243);
+  //(traversed_tails, tmp_element, num_traversed_tails);
   log_debug(RANDOM_WALKER_ID,
             "Number of tails traversed to find tip: \"%\" PRIu64 \"",
             num_traversed_tails);
-  tail_list_cleanup(&traversed_tails);
 
   return ret;
 }
@@ -303,12 +280,3 @@ retcode_t find_tail_if_valid(const ep_randomizer_t *exit_probability_randomizer,
   return res;
 }
 
-void tail_list_cleanup(tail_el_t **head) {
-  tail_el_t *curr = NULL;
-  tail_el_t *tmp = NULL;
-
-  DL_FOREACH_SAFE(*head, curr, tmp) {
-    DL_DELETE(*head, curr);
-    free(curr);
-  }
-}
