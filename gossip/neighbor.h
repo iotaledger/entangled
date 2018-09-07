@@ -46,14 +46,14 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
  * Initializes a neighbor with endpoint values
  *
  * @param neighbor The neighbor
- * @param host The endpoint host
+ * @param ip The endpoint ip
  * @param port The endpoint port
  * @param protocol The endpoint protocol
  *
  * @return a status code
  */
 retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
-                                    char const *const host, uint16_t const port,
+                                    char const *const ip, uint16_t const port,
                                     protocol_type_t const protocol);
 
 /**

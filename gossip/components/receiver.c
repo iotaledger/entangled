@@ -7,6 +7,7 @@
 
 #include <string.h>
 
+#include "ciri/conf/conf_default.h"
 #include "ciri/node.h"
 #include "gossip/components/receiver.h"
 #include "utils/logger_helper.h"
@@ -14,7 +15,7 @@
 #define RECEIVER_COMPONENT_LOGGER_ID "receiver_component"
 
 retcode_t receiver_init(receiver_state_t *const state, node_t *const node,
-                        uint16_t tcp_port, uint16_t udp_port) {
+                        bool testnet, uint16_t tcp_port, uint16_t udp_port) {
   if (state == NULL) {
     return RC_RECEIVER_COMPONENT_NULL_STATE;
   }
@@ -42,6 +43,13 @@ retcode_t receiver_init(receiver_state_t *const state, node_t *const node,
   state->udp_service.context = NULL;
   state->udp_service.opaque_socket = NULL;
   state->node = node;
+  if (testnet) {
+    state->tcp_service.packet_size = TESTNET_PACKET_SIZE;
+    state->udp_service.packet_size = TESTNET_PACKET_SIZE;
+  } else {
+    state->tcp_service.packet_size = MAINNET_PACKET_SIZE;
+    state->udp_service.packet_size = MAINNET_PACKET_SIZE;
+  }
   return RC_OK;
 }
 

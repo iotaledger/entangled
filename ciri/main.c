@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
   // TODO remove
   // Dummy broadcasted packet to begin receiving from UDP neighbors
   sleep(2);
-  iota_packet_t p;
+  iota_packet_t p = {{0}};
   broadcaster_on_next(&core_g.node.broadcaster, p);
   sleep(1000);
 
