@@ -209,8 +209,8 @@ iota_api_result_t iota_api_get_transactions_to_approve(
  * @return error value.
  */
 iota_api_result_t iota_api_attach_to_tangle(
-    const iota_http_service_t* const service,
-    const attach_to_tangle_req_t* const req);
+    const iota_http_service_t* const service, attach_to_tangle_req_t* req,
+    attach_to_tangle_res_t* res);
 
 /**
  * Interrupts and completely aborts the iota_api_attach_to_tangle process.

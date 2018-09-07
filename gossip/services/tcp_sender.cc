@@ -8,10 +8,12 @@
 #include <boost/asio.hpp>
 
 #include "gossip/iota_packet.h"
+#include "gossip/services/receiver.h"
 #include "gossip/services/tcp_sender.hpp"
 #include "utils/logger_helper.h"
 
-bool tcp_send(endpoint_t *const endpoint, iota_packet_t *const packet) {
+bool tcp_send(receiver_service_t *const service, endpoint_t *const endpoint,
+              iota_packet_t *const packet) {
   if (endpoint == NULL || endpoint->opaque_inetaddr == NULL) {
     return false;
   }

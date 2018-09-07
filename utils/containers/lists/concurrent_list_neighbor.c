@@ -16,7 +16,7 @@ bool neighbor_cmp(neighbor_t const *const lhs, neighbor_t const *const rhs) {
   if (lhs == NULL || rhs == NULL) {
     return false;
   }
-  return strcmp(lhs->endpoint.host, rhs->endpoint.host) == 0 &&
+  return strcmp(lhs->endpoint.ip, rhs->endpoint.ip) == 0 &&
          lhs->endpoint.port == rhs->endpoint.port &&
          lhs->endpoint.protocol == rhs->endpoint.protocol;
 }
