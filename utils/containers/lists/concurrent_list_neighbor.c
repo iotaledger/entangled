@@ -51,12 +51,12 @@ neighbor_t *neighbor_find_by_endpoint(neighbors_list_t *const neighbors,
   if (neighbors == NULL || endpoint == NULL) {
     return NULL;
   }
-  return neighbor_find_by_endpoint_values(neighbors, endpoint->host,
+  return neighbor_find_by_endpoint_values(neighbors, endpoint->ip,
                                           endpoint->port, endpoint->protocol);
 }
 
 neighbor_t *neighbor_find_by_endpoint_values(neighbors_list_t *const neighbors,
-                                             char const *const host,
+                                             char const *const ip,
                                              uint16_t const port,
                                              protocol_type_t const protocol) {
   neighbor_t cmp;
@@ -64,7 +64,7 @@ neighbor_t *neighbor_find_by_endpoint_values(neighbors_list_t *const neighbors,
   if (neighbors == NULL) {
     return NULL;
   }
-  if (neighbor_init_with_values(&cmp, host, port, protocol)) {
+  if (neighbor_init_with_values(&cmp, ip, port, protocol)) {
     return NULL;
   }
   return CL_FIND(neighbors, cmp);

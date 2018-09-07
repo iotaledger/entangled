@@ -29,11 +29,11 @@ extern "C" {
  * Fills a packet except the content part
  *
  * @param packet The packet
- * @param host The endpoint host
+ * @param ip The endpoint ip
  * @param port The endpoint port
  * @param protocol The endpoint protocol
  */
-void iota_packet_build(iota_packet_t* const packet, char const* const host,
+void iota_packet_build(iota_packet_t* const packet, char const* const ip,
                        uint16_t const port, protocol_type_t const protocol);
 
 /**

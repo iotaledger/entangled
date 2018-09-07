@@ -45,18 +45,18 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
 }
 
 retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
-                                    char const *const host, uint16_t const port,
+                                    char const *const ip, uint16_t const port,
                                     protocol_type_t const protocol) {
   if (neighbor == NULL) {
     return RC_NEIGHBOR_NULL_NEIGHBOR;
   }
   memset(neighbor, 0, sizeof(neighbor_t));
   neighbor->endpoint.protocol = protocol;
-  if (host) {
-    if (strlen(host) > MAX_HOST_LENGTH) {
+  if (ip) {
+    if (strlen(ip) > MAX_HOST_LENGTH) {
       return RC_NEIGHBOR_INVALID_HOST;
     }
-    strcpy(neighbor->endpoint.ip, host);
+    strcpy(neighbor->endpoint.ip, ip);
   }
   neighbor->endpoint.port = port;
   return RC_OK;

@@ -8,13 +8,13 @@
 #include "gossip/iota_packet.h"
 #include "common/model/transaction.h"
 
-void iota_packet_build(iota_packet_t* const packet, char const* const host,
+void iota_packet_build(iota_packet_t* const packet, char const* const ip,
                        uint16_t const port, protocol_type_t const protocol) {
   if (packet == NULL) {
     return;
   }
-  if (host != NULL) {
-    strcpy(packet->source.host, host);
+  if (ip != NULL) {
+    strcpy(packet->source.ip, ip);
   }
   packet->source.port = port;
   packet->source.protocol = protocol;
