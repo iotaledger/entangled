@@ -61,8 +61,27 @@ retcode_t iota_tangle_transaction_load_hashes(const tangle_t *const tangle,
 retcode_t iota_tangle_transaction_load_hashes_of_approvers(
     const tangle_t *const tangle, const trit_array_p approvee_hash,
     iota_stor_pack_t *pack) {
-  return iota_stor_transaction_load_hashes_of_approvers(&tangle->conn,
-                                                        approvee_hash, pack);
+  retcode_t res = RC_OK;
+
+  res = iota_stor_transaction_load_hashes_of_approvers(&tangle->conn,
+                                                       approvee_hash, pack);
+
+  while (res == RC_OK && pack->insufficient_capacity) {
+    res = hash_pack_resize(pack, 2);
+    if (res == RC_OK) {
+      pack->num_loaded = 0;
+      res = iota_stor_transaction_load_hashes_of_approvers(&tangle->conn,
+                                                           approvee_hash, pack);
+    }
+  }
+
+  if (res != RC_OK) {
+    log_error(TANGLE_LOGGER_ID,
+              "Failed in loading approvers, error code is: %\" PRIu64 \"\n",
+              res);
+  }
+
+  return res;
 }
 
 /*

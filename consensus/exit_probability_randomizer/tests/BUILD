@@ -1,7 +1,7 @@
 cc_test(
-    name = "test_cw_ratings_dfs",
+    name = "test_exit_probability_randomizer",
     srcs = [
-        "test_cw_rating_calculator.c",
+        "test_exit_probability_randomizer.c",
     ],
     data = [":db_file"],
     visibility = ["//visibility:public"],
@@ -10,6 +10,7 @@ cc_test(
         "//common/storage/tests/helpers",
         "//common/trinary:trit_ptrit",
         "//consensus/cw_rating_calculator",
+        "//consensus/exit_probability_randomizer",
         "//consensus/test_definitions:defs",
         "@unity",
     ],

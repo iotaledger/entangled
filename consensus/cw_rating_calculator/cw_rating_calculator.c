@@ -15,10 +15,9 @@ retcode_t iota_consensus_cw_rating_init(
     enum cw_calculation_implementation impl) {
   logger_helper_init(CW_RATING_CALCULATOR_LOGGER_ID, LOGGER_INFO, true);
   cw_calc->tangle = tangle;
-  if (impl == DFS) {
+  if (impl == DFS_FROM_ENTRY_POINT) {
     init_cw_calculator_dfs(&cw_calc->base);
-  } else if (impl == NO_IMPLEMENTATION) {
-    return RC_CONSENSUS_NOT_IMPLEMENTED;
+    return RC_OK;
   }
   return RC_OK;
 }
