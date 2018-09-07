@@ -35,6 +35,9 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
     neighbor->endpoint.protocol = PROTOCOL_TCP;
   } else if (strcmp(scheme, "udp") == 0) {
     neighbor->endpoint.protocol = PROTOCOL_UDP;
+    if (udp_endpoint_init(&neighbor->endpoint) == false) {
+      return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
+    }
   } else {
     return RC_NEIGHBOR_INVALID_PROTOCOL;
   }
@@ -53,7 +56,7 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
     if (strlen(host) > MAX_HOST_LENGTH) {
       return RC_NEIGHBOR_INVALID_HOST;
     }
-    strcpy(neighbor->endpoint.host, host);
+    strcpy(neighbor->endpoint.ip, host);
   }
   neighbor->endpoint.port = port;
   return RC_OK;
@@ -84,11 +87,13 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
     trits_to_bytes(hash_trits, packet->content + PACKET_SIZE, NUM_TRITS_HASH);
   }
   if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
-    if (tcp_send(&neighbor->endpoint, packet) == false) {
+    if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, packet) ==
+        false) {
       return RC_NEIGHBOR_FAILED_SEND;
     }
   } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
-    if (udp_send(&neighbor->endpoint, packet) == false) {
+    if (udp_send(&node->receiver.udp_service, &neighbor->endpoint, packet) ==
+        false) {
       return RC_NEIGHBOR_FAILED_SEND;
     }
   } else {
