@@ -22,7 +22,7 @@ const char* attach_to_tangle_res_trytes_at(attach_to_tangle_res_t* res,
       return *p;
     }
   }
-  return '\0';
+  return NULL;
 }
 
 int attach_to_tangle_res_trytes_cnt(attach_to_tangle_res_t* res) {
