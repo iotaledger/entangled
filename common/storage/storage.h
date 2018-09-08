@@ -12,6 +12,7 @@
 
 #include "common/errors.h"
 #include "common/storage/connection.h"
+#include "common/storage/defs.h"
 #include "common/storage/pack.h"
 #include "common/trinary/trit_array.h"
 
