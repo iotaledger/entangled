@@ -45,18 +45,18 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
 }
 
 retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
-                                    char const *const host, uint16_t const port,
+                                    char const *const ip, uint16_t const port,
                                     protocol_type_t const protocol) {
   if (neighbor == NULL) {
     return RC_NEIGHBOR_NULL_NEIGHBOR;
   }
   memset(neighbor, 0, sizeof(neighbor_t));
   neighbor->endpoint.protocol = protocol;
-  if (host) {
-    if (strlen(host) > MAX_HOST_LENGTH) {
+  if (ip) {
+    if (strlen(ip) > MAX_HOST_LENGTH) {
       return RC_NEIGHBOR_INVALID_HOST;
     }
-    strcpy(neighbor->endpoint.ip, host);
+    strcpy(neighbor->endpoint.ip, ip);
   }
   neighbor->endpoint.port = port;
   return RC_OK;
@@ -84,7 +84,8 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
     // TODO(thibault): iota_packet_set_request
     flex_trits_to_trits(hash_trits, NUM_TRITS_HASH, hash->trits,
                         hash->num_trits, hash->num_trits);
-    trits_to_bytes(hash_trits, packet->content + PACKET_SIZE, NUM_TRITS_HASH);
+    trits_to_bytes(hash_trits, packet->content + PACKET_TX_SIZE,
+                   NUM_TRITS_HASH);
   }
   if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
     if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, packet) ==

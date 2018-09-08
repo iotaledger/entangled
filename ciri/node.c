@@ -72,13 +72,14 @@ retcode_t node_init(node_t* const node, core_t* const core) {
   }
 
   log_info(NODE_LOGGER_ID, "Initializing processor component\n");
-  if (processor_init(&node->processor, node)) {
+  if (processor_init(&node->processor, node, core->config.testnet)) {
     log_critical(NODE_LOGGER_ID, "Initializing processor component failed\n");
     return RC_NODE_FAILED_PROCESSOR_INIT;
   }
 
   log_info(NODE_LOGGER_ID, "Initializing receiver component\n");
-  if (receiver_init(&node->receiver, node, core->config.tcp_receiver_port,
+  if (receiver_init(&node->receiver, node, core->config.testnet,
+                    core->config.tcp_receiver_port,
                     core->config.udp_receiver_port)) {
     log_critical(NODE_LOGGER_ID, "Initializing receiver component failed\n");
     return RC_NODE_FAILED_RECEIVER_INIT;
