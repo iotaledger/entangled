@@ -49,3 +49,9 @@ cc_library(
         "//conditions:default": [],
     }),
 )
+
+cc_library(
+    name = "signal",
+    srcs = ["sig.c"],
+    hdrs = ["sig.h"],
+)

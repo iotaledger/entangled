@@ -5,10 +5,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
+
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
-#include <unistd.h>
 
 #include "ciri/core.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
@@ -18,13 +17,13 @@
 #define MAIN_LOGGER_ID "main"
 
 static core_t core_g;
-static bool keyboard_interrupt = false;
-int ret = EXIT_SUCCESS;
 
-void sig_handler(int signo)
-{
-  if (signo == SIGINT) {
-	  keyboard_interrupt = true;
+void signal_handler_core_end(int signo) {
+  if (signo == ctrl_c_signal) {
+    log_info(MAIN_LOGGER_ID, "Stopping cIRI core\n");
+    if (core_stop(&core_g)) {
+      log_error(MAIN_LOGGER_ID, "Stopping cIRI core failed\n");
+    }
   }
 }
 
@@ -94,6 +93,6 @@ int main(int argc, char* argv[]) {
     log_error(MAIN_LOGGER_ID, "Destroying cIRI core failed\n");
     ret = EXIT_FAILURE;
   }
-  
+
   return ret;
 }
