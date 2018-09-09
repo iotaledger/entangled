@@ -967,7 +967,7 @@ retcode_t json_were_addresses_spent_from_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("wereAddressesSpentFrom"));
 
-  ret = utarray_to_json_array(obj, json_root, "trytes");
+  ret = utarray_to_json_array(obj, json_root, "addresses");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;
