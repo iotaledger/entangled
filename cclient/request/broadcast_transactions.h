@@ -17,6 +17,12 @@ extern "C" {
 // List of raw data of transactions to be rebroadcast.
 typedef UT_array broadcast_transactions_req_t;
 
+broadcast_transactions_req_t* broadcast_transactions_req_new();
+void broadcast_transactions_req_add(broadcast_transactions_req_t* transactions,
+                                    const char* trytes);
+void broadcast_transactions_req_free(
+    broadcast_transactions_req_t* transactions);
+
 #ifdef __cplusplus
 }
 #endif

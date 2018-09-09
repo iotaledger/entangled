@@ -106,6 +106,7 @@ typedef struct {
       const serializer_t* const s, const char* const obj,
       attach_to_tangle_res_t* out);
 
+  // broadcastTransactions
   retcode_t (*broadcast_transactions_serialize_request)(
       const serializer_t* const s, broadcast_transactions_req_t* obj,
       char_buffer_t* out);
