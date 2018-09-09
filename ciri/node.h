@@ -15,6 +15,10 @@
 #include "gossip/components/requester.h"
 #include "gossip/components/responder.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Forward declarations
 typedef struct core_s core_t;
 typedef struct concurrent_list_neighbor_t_s neighbors_list_t;
@@ -66,5 +70,9 @@ retcode_t node_stop(node_t* const node);
  * @return a status code
  */
 retcode_t node_destroy(node_t* const node);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __CIRI_NODE_H__

@@ -587,7 +587,22 @@ void test_deserialize_attach_to_tangle(void) {
 }
 
 void test_serialize_broadcast_transactions(void) {
-  // TODO
+  serializer_t serializer;
+  const char* json_text =
+      "{\"command\":\"broadcastTransactions\",\"trytes\":["
+      "\"" BROADCAST_TX_TRYTES "\"]}";
+
+  char_buffer_t* serializer_out = char_buffer_new();
+  init_json_serializer(&serializer);
+  broadcast_transactions_req_t* req = broadcast_transactions_req_new();
+  broadcast_transactions_req_add(req, BROADCAST_TX_TRYTES);
+
+  serializer.vtable.broadcast_transactions_serialize_request(&serializer, req,
+                                                             serializer_out);
+  TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
+
+  char_buffer_free(serializer_out);
+  broadcast_transactions_req_free(req);
 }
 
 void test_serialize_store_transactions(void) {
