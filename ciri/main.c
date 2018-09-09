@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "ciri/core.h"
+#include "gossip/iota_packet.h"  // TODO remove
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
@@ -51,13 +52,11 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  // TODO(thibault) neighbors configuration
-  neighbor_t neighbor;
-  neighbor_init_with_uri(&neighbor, "tcp://127.0.0.1:14262");
-  neighbor_add(core_g.node.neighbors, neighbor);
-  neighbor_init_with_uri(&neighbor, "udp://127.0.0.1:14263");
-  neighbor_add(core_g.node.neighbors, neighbor);
-
+  // TODO remove
+  // Dummy broadcasted packet to begin receiving from UDP neighbors
+  sleep(2);
+  iota_packet_t p = {{0}};
+  broadcaster_on_next(&core_g.node.broadcaster, p);
   sleep(1000);
 
   log_info(MAIN_LOGGER_ID, "Stopping cIRI core\n");

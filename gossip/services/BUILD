@@ -3,7 +3,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "receiver_shared",
     hdrs = ["receiver.h"],
-    deps = ["//common/network"],
+    deps = [
+        "//common/network",
+        "//utils/handles:thread",
+    ],
 )
 
 cc_library(
@@ -35,6 +38,7 @@ cc_library(
     srcs = ["tcp_sender.cc"],
     hdrs = ["tcp_sender.hpp"],
     deps = [
+        ":receiver_shared",
         "//gossip:iota_packet",
         "//utils:logger_helper",
         "@boost//:asio",
@@ -59,6 +63,7 @@ cc_library(
     srcs = ["udp_sender.cc"],
     hdrs = ["udp_sender.hpp"],
     deps = [
+        ":receiver_shared",
         "//gossip:iota_packet",
         "//utils:logger_helper",
         "@boost//:asio",

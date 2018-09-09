@@ -5,6 +5,7 @@ cc_library(
     srcs = ["iota_packet.c"],
     hdrs = ["iota_packet.h"],
     deps = [
+        "//ciri/conf:conf_default",
         "//common/model:transaction",
         "//common/network:endpoint",
         "//common/trinary:bytes",

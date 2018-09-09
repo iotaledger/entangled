@@ -543,11 +543,47 @@ void test_deserialize_get_transactions_to_approve(void) {
 }
 
 void test_serialize_attach_to_tangle(void) {
-  // TODO
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text =
+      "{\"command\":\"attachToTangle\",\"trunkTransaction\":\"" TEST_HASH1
+      "\",\"branchTransaction\":\"" TEST_HASH2
+      "\",\"minWeightMagnitude\":18,\"trytes\":[\"" TEST_RAW_TRYTES1
+      "\",\"" TEST_RAW_TRYTES2 "\"]}";
+
+  char_buffer_t* serializer_out = char_buffer_new();
+  attach_to_tangle_req_t* attach_req = attach_to_tangle_req_new();
+
+  attach_to_tangle_req_set_trunk(attach_req, TEST_HASH1);
+  attach_to_tangle_req_set_branch(attach_req, TEST_HASH2);
+  attach_to_tangle_req_add_trytes(attach_req, TEST_RAW_TRYTES1);
+  attach_to_tangle_req_add_trytes(attach_req, TEST_RAW_TRYTES2);
+  attach_to_tangle_req_set_mwm(attach_req, 18);
+  serializer.vtable.attach_to_tangle_serialize_request(&serializer, attach_req,
+                                                       serializer_out);
+
+  TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
+
+  char_buffer_free(serializer_out);
+  attach_to_tangle_req_free(&attach_req);
 }
 
 void test_deserialize_attach_to_tangle(void) {
-  // TODO
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text =
+      "{\"trytes\":[\"" TEST_HASH1 "\",\"" TEST_HASH2 "\"],\"duration\":4}";
+
+  attach_to_tangle_res_t* trytes = attach_to_tangle_res_new();
+
+  serializer.vtable.attach_to_tangle_deserialize_response(&serializer,
+                                                          json_text, trytes);
+  TEST_ASSERT_EQUAL_STRING(TEST_HASH1,
+                           attach_to_tangle_res_trytes_at(trytes, 0));
+  TEST_ASSERT_EQUAL_STRING(TEST_HASH2,
+                           attach_to_tangle_res_trytes_at(trytes, 1));
+  TEST_ASSERT_EQUAL_STRING(NULL, attach_to_tangle_res_trytes_at(trytes, 3));
+  attach_to_tangle_res_free(trytes);
 }
 
 void test_serialize_broadcast_transactions(void) {

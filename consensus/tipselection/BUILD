@@ -9,11 +9,11 @@ cc_library(
         "//consensus:model",
         "//consensus/cw_rating_calculator",
         "//consensus/entry_point_selector",
+        "//consensus/exit_probability_randomizer",
+        "//consensus/exit_probability_validator",
         "//consensus/ledger_validator",
         "//consensus/milestone",
         "//consensus/view_models",
-        "//consensus/walker",
-        "//consensus/walker_validator",
         "//utils:logger_helper",
     ],
 )
