@@ -1006,7 +1006,7 @@ retcode_t json_were_addresses_spent_from_deserialize_response(
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_array_to_utarray(json_obj, "states", out);
+  ret = json_boolean_array_to_utarray(json_obj, "states", out);
 
   cJSON_Delete(json_obj);
   return ret;

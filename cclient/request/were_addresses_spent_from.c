@@ -8,14 +8,14 @@
 #include "were_addresses_spent_from.h"
 
 were_addresses_spent_from_req_t* were_addresses_spent_from_req_new() {
-  were_addresses_spent_from_req_t* addresses = NULL;
-  utarray_new(addresses, &ut_str_icd);
-  return addresses;
+  were_addresses_spent_from_req_t* trytes = NULL;
+  utarray_new(trytes, &ut_str_icd);
+  return trytes;
 }
 
-void were_addresses_spent_from_req_add(
-    were_addresses_spent_from_req_t* addresses, const char* addr) {
-  utarray_push_back(addresses, &addr);
+void were_addresses_spent_from_req_add(were_addresses_spent_from_req_t* req,
+                                       const char* trytes) {
+  utarray_push_back(req, &trytes);
 }
 
 void were_addresses_spent_from_req_free(were_addresses_spent_from_req_t* ut) {

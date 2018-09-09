@@ -18,8 +18,8 @@ extern "C" {
 typedef UT_array were_addresses_spent_from_req_t;
 
 were_addresses_spent_from_req_t* were_addresses_spent_from_req_new();
-void were_addresses_spent_from_req_add(
-    were_addresses_spent_from_req_t* addresses, const char* addr);
+void were_addresses_spent_from_req_add(were_addresses_spent_from_req_t* req,
+                                       const char* trytes);
 void were_addresses_spent_from_req_free(were_addresses_spent_from_req_t* ut);
 
 #ifdef __cplusplus

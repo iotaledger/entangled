@@ -690,7 +690,8 @@ void test_serialize_were_addresses_spent_from(void) {
   const char* json_text =
       "{"
       "\"command\":\"wereAddressesSpentFrom\","
-      "\"trytes\":[\"" WERE_ADDRESSES_SPENT_FROM_TRYTES "\"]"
+      "\"trytes\":[\"" WERE_ADDRESSES_SPENT_FROM_TRYTES
+      "\"]"
       "}";
 
   char_buffer_t* serializer_out = char_buffer_new();
@@ -712,14 +713,14 @@ void test_deserialize_were_addresses_spent_from(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{"
-      "\"states\":[\"true\"]"
+      "\"states\":[true]"
       "}";
 
   were_addresses_spent_from_res_t* res = were_addresses_spent_from_res_new();
   serializer.vtable.were_addresses_spent_from_deserialize_response(
       &serializer, json_text, res);
 
-  TEST_ASSERT_EQUAL_STRING("true", were_addresses_spent_from_res_at(res, 0));
+  TEST_ASSERT_TRUE(were_addresses_spent_from_res_at(res, 0));
 }
 
 int main(void) {
