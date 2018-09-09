@@ -18,8 +18,8 @@ typedef UT_array were_addresses_spent_from_res_t;
 
 were_addresses_spent_from_res_t* were_addresses_spent_from_res_new();
 void were_addresses_spent_from_res_free(were_addresses_spent_from_res_t* res);
-retcode_t were_addresses_spent_from_res_at(were_addresses_spent_from_res_t* in,
-                                           int index, bool** states);
+bool were_addresses_spent_from_res_at(were_addresses_spent_from_res_t* in,
+                                      int index);
 int were_addresses_spent_from_res_num(were_addresses_spent_from_res_t* in);
 
 #ifdef __cplusplus

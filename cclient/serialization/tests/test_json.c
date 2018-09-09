@@ -374,16 +374,14 @@ void test_serialize_get_balances(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"command\":\"getBalances\",\"addresses\":["
-      "\"" GET_BALANCES_SERIALIZE_ADDRESS
+      "\"" ADDRESS_1 "\",\"" ADDRESS_2
       "\"]"
       ",\"threshold\":100}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   get_balances_req_t* get_bal = get_balances_req_new();
-  get_balances_req_add_address(get_bal,
-                               "HBBYKAKTILIPVUKFOTSLHGENPTXYBNKXZFQFR9"
-                               "VQFWNBMTQNRVOUKPVPRNBSZVVILMAFBKOTBLGL"
-                               "WLOHQ");
+  get_balances_req_add_address(get_bal, ADDRESS_1);
+  get_balances_req_add_address(get_bal, ADDRESS_2);
   get_bal->threshold = 100;
   serializer.vtable.get_balances_serialize_request(&serializer, get_bal,
                                                    serializer_out);
@@ -494,7 +492,7 @@ void test_deserialize_attach_to_tangle(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
   const char* json_text =
-      "{\"trytes\":[\"" TEST_HASH1 "\",\"" TEST_HASH2 "\"],\"duration\":4}";
+      "{\"trytes\":[\"" TEST_HASH1 "\",\"" TEST_HASH2 "\"]}";
 
   attach_to_tangle_res_t* trytes = attach_to_tangle_res_new();
 
@@ -516,7 +514,7 @@ void test_serialize_store_transactions(void) {
   serializer_t serializer;
   const char* json_text =
       "{\"command\":\"storeTransactions\",\"trytes\":["
-      "\"" TRANSACTION_TRYTES_1
+      "\"" TRANSACTION_TRYTES_1 "\",\"" TRANSACTION_TRYTES_2
       "\"]"
       "}";
 
@@ -524,6 +522,7 @@ void test_serialize_store_transactions(void) {
   init_json_serializer(&serializer);
   store_transactions_req_t* req = store_transactions_req_new();
   store_transactions_req_add(req, TRANSACTION_TRYTES_1);
+  store_transactions_req_add(req, TRANSACTION_TRYTES_2);
 
   serializer.vtable.store_transactions_serialize_request(&serializer, req,
                                                          serializer_out);
@@ -538,7 +537,7 @@ void test_serialize_were_addresses_spent_from(void) {
   const char* json_text =
       "{"
       "\"command\":\"wereAddressesSpentFrom\","
-      "\"addresses\":[\"" TRANSACTION_TRYTES_1 "\",\"" TRANSACTION_TRYTES_2
+      "\"addresses\":[\"" ADDRESS_1 "\",\"" ADDRESS_2
       "\"]"
       "}";
 
@@ -546,8 +545,8 @@ void test_serialize_were_addresses_spent_from(void) {
   init_json_serializer(&serializer);
 
   were_addresses_spent_from_req_t* req = were_addresses_spent_from_req_new();
-  were_addresses_spent_from_req_add(req, TRANSACTION_TRYTES_1);
-  were_addresses_spent_from_req_add(req, TRANSACTION_TRYTES_2);
+  were_addresses_spent_from_req_add(req, ADDRESS_1);
+  were_addresses_spent_from_req_add(req, ADDRESS_2);
 
   serializer.vtable.were_addresses_spent_from_serialize_request(
       &serializer, req, serializer_out);
@@ -562,7 +561,7 @@ void test_deserialize_were_addresses_spent_from(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{"
-      "\"states\":[" BOOL_TRUE "," BOOL_FALSE
+      "\"states\":[" BOOL_FALSE "," BOOL_TRUE
       "]"
       "}";
 
@@ -570,18 +569,9 @@ void test_deserialize_were_addresses_spent_from(void) {
   serializer.vtable.were_addresses_spent_from_deserialize_response(
       &serializer, json_text, res);
 
-  bool* states = NULL;
-  retcode_t ret = were_addresses_spent_from_res_at(res, 0, &states);
-  TEST_ASSERT_EQUAL_INT(RC_OK, ret);
-  TEST_ASSERT_TRUE(*states);
-
-  ret = were_addresses_spent_from_res_at(res, 1, &states);
-  TEST_ASSERT_EQUAL_INT(RC_OK, ret);
-  TEST_ASSERT_FALSE(*states);
-
-  ret = were_addresses_spent_from_res_at(res, 2, &states);
-  TEST_ASSERT_EQUAL_INT(RC_CCLIENT_RES_ERROR, ret);
-  TEST_ASSERT_NULL(states);
+  TEST_ASSERT_FALSE(were_addresses_spent_from_res_at(res, 0));
+  TEST_ASSERT_TRUE(were_addresses_spent_from_res_at(res, 1));
+  TEST_ASSERT_EQUAL_INT(NULL, were_addresses_spent_from_res_at(res, 2));
 }
 
 int main(void) {
