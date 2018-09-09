@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include <unity/unity.h>
 
 #include "common/curl-p/hashcash.h"
@@ -36,11 +43,7 @@ void run_pd_test(CurlType type, unsigned short mwm) {
 
 void test_pd_27_works(void) { run_pd_test(CURL_P_27, 13); }
 
-void test_pd_81_works(void) {
-  for (int i = 12; i < 15; i++) {
-    run_pd_test(CURL_P_81, i);
-  }
-}
+void test_pd_81_works(void) { run_pd_test(CURL_P_81, 10); }
 
 int main(void) {
   UNITY_BEGIN();

@@ -53,34 +53,28 @@ cc_test(
 )
 
 cc_test(
-    name = "test_trit_array_1",
-    srcs = ["test_trit_array.c"],
-    copts = ["-DTRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE"],
+    name = "test_flex_trit",
+    srcs = ["test_flex_trit.c"],
     deps = [
-        "//common/trinary:trit_array_1",
-        "//common/trinary:trit_byte",
+        "//common/trinary:flex_trit",
         "@unity",
     ],
 )
 
 cc_test(
-    name = "test_trit_array_4",
+    name = "test_trit_array",
     srcs = ["test_trit_array.c"],
-    copts = ["-DTRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE"],
     deps = [
-        "//common/trinary:trit_array_4",
-        "//common/trinary:trit_byte",
+        "//common/trinary:trit_array",
         "@unity",
     ],
 )
 
 cc_test(
-    name = "test_trit_array_5",
-    srcs = ["test_trit_array.c"],
-    copts = ["-DTRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE"],
+    name = "test_flex_trit_array",
+    srcs = ["test_flex_trit_array.cc"],
     deps = [
-        "//common/trinary:trit_array_5",
-        "//common/trinary:trit_byte",
-        "@unity",
+        "//common/trinary:flex_trit_array",
+        "@com_google_googletest//:gtest_main",
     ],
 )

@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #ifndef __ISS_CURL_H_
 #define __ISS_CURL_H_
 

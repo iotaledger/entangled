@@ -1,4 +1,9 @@
-// Copyright 2018 IOTA Foundation
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
 
 #include <chrono>
 #include <iostream>
@@ -12,8 +17,8 @@
 
 #include "cppclient/api_json.h"
 
-using namespace testing;
-using namespace cppclient;
+using cppclient::IotaJsonAPI;
+using testing::Return;
 
 using json = nlohmann::json;
 
@@ -23,10 +28,16 @@ class IotaJsonAPITest : public ::testing::Test {};
 
 class MockAPI : public IotaJsonAPI {
  public:
-  json req;
-  json res;
+  json request;
+  nonstd::optional<json> response;
 
-  MOCK_METHOD1(post, nonstd::optional<json>(const json&));
+  MOCK_METHOD0(post_, void(void));
+
+  nonstd::optional<json> post(const json& in) {
+    request = in;
+    post_();
+    return response;
+  }
 };
 
 TEST_F(IotaJsonAPITest, GetBalances) {
@@ -38,7 +49,7 @@ TEST_F(IotaJsonAPITest, GetBalances) {
   uint64_t balance = 1000;
 
   std::vector<std::string> addresses = {address};
-  std::unordered_map<std::string, uint64_t> expected = {{address, 1000}};
+  std::unordered_map<std::string, uint64_t> expected = {{address, balance}};
 
   json req;
   req["command"] = "getBalances";
@@ -47,11 +58,39 @@ TEST_F(IotaJsonAPITest, GetBalances) {
   json res;
   res["balances"] = std::vector<std::string>{"1000"};
 
-  EXPECT_CALL(api, post(req)).Times(1).WillOnce(Return(res));
+  api.response = res;
+  EXPECT_CALL(api, post_()).Times(1);
 
   auto response = api.getBalances(addresses);
 
+  EXPECT_EQ(api.request, req);
   EXPECT_EQ(response, expected);
+}
+
+TEST_F(IotaJsonAPITest, GetNodeInfo) {
+  MockAPI api;
+
+  json req;
+  req["command"] = "getNodeInfo";
+  json res;
+  res["latestMilestone"] =
+      "VBVEUQYE99LFWHDZRFKTGFHYGDFEAMAEBGUBTTJRFKHCFBRTXFA"
+      "JQ9XIUEZQCJOQTZNOOHKUQIKOY9999";
+  res["latestMilestoneIndex"] = 107;
+  res["latestSolidSubtangleMilestoneIndex"] = 107;
+
+  api.response = res;
+
+  EXPECT_CALL(api, post_()).Times(1);
+
+  auto response = api.getNodeInfo();
+
+  EXPECT_EQ(api.request, req);
+  EXPECT_EQ((*response).latestMilestone, res["latestMilestone"]);
+  int latestMilestoneIndex = res["latestMilestoneIndex"];
+  EXPECT_EQ((*response).latestMilestoneIndex, latestMilestoneIndex);
+  int latestSolidMilestoneIndex = res["latestSolidSubtangleMilestoneIndex"];
+  EXPECT_EQ((*response).latestSolidMilestoneIndex, latestSolidMilestoneIndex);
 }
 
 };  // namespace

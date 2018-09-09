@@ -1,14 +1,13 @@
-#include "../lib/util/converter.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../lib/util/converter.h"
 
 #define HINTS                                                                  \
   "### TRYTES TO LONG ###\nUsage:\n\t trytes-to-long <Tryte string all caps> " \
   "\n"
 
 int get_stdin(char* str, int len) {
-
   int i = 0;
   char chr;
   struct timeval timeout;
@@ -23,8 +22,7 @@ int get_stdin(char* str, int len) {
 
   if (select(1, &readfds, NULL, NULL, &timeout)) {
     while ((chr = getchar()) != EOF) {
-      if (i > len)
-        return -1;
+      if (i > len) return -1;
       str[i++] = chr;
     }
   }

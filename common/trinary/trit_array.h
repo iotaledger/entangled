@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018 IOTA Stiftung
- * https://github.com/iotaledger/entangled/
+ * https://github.com/iotaledger/entangled
  *
  * Refer to the LICENSE file for licensing information
  */
@@ -12,153 +12,10 @@ extern "C" {
 #ifndef __COMMON_TRINARY_TRIT_ARRAY_H_
 #define __COMMON_TRINARY_TRIT_ARRAY_H_
 
-#if !defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE) &&  \
-    !defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE) && \
-    !defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
-#define TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE
-#endif
+#include <stdbool.h>
+#include <string.h>
+#include "common/trinary/flex_trit.h"
 
-#include "trit_byte.h"
-#include "trits.h"
-
-typedef int8_t flex_trit_t;
-
-/// Returns the number of bytes needed to store a given number of trits in the
-/// current memory model.
-/// @param[in] num_trits - number of trits to store
-/// @return size_t - the number of bytes need
-static inline size_t flex_trits_num_for_trits(size_t const num_trits) {
-#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
-  return num_trits;
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
-  return (num_trits + 3) >> 2U;
-#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
-  return min_bytes(num_trits);
-#endif
-}
-
-/// Returns the trit at a given index in an array of trits
-/// @param[in] trit_array - an array of trits
-/// @param[in] index - the index of the trit to access
-/// @return trit_t - the trit at the given index
-static inline trit_t flex_trit_array_at(flex_trit_t const *const trit_array,
-                                        size_t const len, size_t index) {
-  // Bounds checking
-  if (index >= len) {
-    return 0;
-  }
-#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
-  // Straight forward 1 trit per byte
-  return trit_array[index];
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
-  // Find out the position of the trit in the byte
-  uint8_t mshift = (index & 3) << 1U;
-  // Calculate the shift to sign extend the result
-  uint8_t tshift = 6U - mshift;
-  // Find out the index of the byte in the array
-  index = index >> 2U;
-  // Get the trit and sign extend it
-  return (flex_trit_t)(trit_array[index] << tshift) >> 6U;
-#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
-  trit_t trits[5];
-  // Find out the index of the trit in the byte
-  uint8_t tindex = index % 5U;
-  // Find out the index of the byte in the array
-  index = index / 5U;
-  bytes_to_trits(((byte_t *)trit_array + index), 1, trits, 5);
-  return trits[tindex];
-#endif
-}
-
-/// Set the trit at a given index in an array of trits to the given value
-/// @param[in] trit_array - an array of trits
-/// @param[in] index - the index of the trit to access
-/// @param[in] trit - the trit value to set
-static inline uint8_t flex_trit_array_set_at(flex_trit_t *const trit_array,
-                                             size_t const len, size_t index,
-                                             trit_t trit) {
-  // Bounds checking
-  if (index >= len) {
-    return 0;
-  }
-#if defined(TRIT_ARRAY_ENCODING_1_TRIT_PER_BYTE)
-  // Straight forward 1 trit per byte
-  trit_array[index] = trit;
-#elif defined(TRIT_ARRAY_ENCODING_4_TRITS_PER_BYTE)
-  // Calculate the final position of the trit in the byte
-  uint8_t shift = (index & 3) << 1U;
-  // Position the trit at its place in the byte
-  trit = (trit & 0x03) << shift;
-  // Create a mask to reset the target trit
-  uint8_t mask = ~(0x03 << shift);
-  // Find out the index of the byte in the array
-  index = index >> 2U;
-  // bitblit the trit in place
-  trit_array[index] = (trit_array[index] & mask) | trit;
-#elif defined(TRIT_ARRAY_ENCODING_5_TRITS_PER_BYTE)
-  byte_t buffer = 0;
-  trit_t trits[5];
-  // Find out the index of the trit in the byte
-  uint8_t tindex = index % 5U;
-  // Find out the index of the byte in the array
-  index = index / 5U;
-  bytes_to_trits(((byte_t *)trit_array + index), 1, trits, 5);
-  trits[tindex] = trit;
-  trit_array[index] = trits_to_byte(trits, buffer, 5);
-#endif
-  return 1;
-}
-
-/// Returns a portion of length num_trits of an array into a new array from
-/// start. The original array will not be modified.
-/// @param[in] to_trit_array - the array containing the selected portion
-/// @param[in] to_len - the number of trits the target array can store
-/// @param[in] trit_array - the original array
-/// @param[in] len - the number of trits the original array stores
-/// @param[in] start - the start index in the original array
-/// @param[in] num_trits - the number of trits to copy over
-/// @return size_t - the number of trits copied over
-size_t flex_trit_array_slice(flex_trit_t *const to_trit_array,
-                             size_t const to_len,
-                             flex_trit_t const *const trit_array,
-                             size_t const len, size_t const start,
-                             size_t const num_trits);
-
-/// Inserts the contents of an array into another array starting at a given
-/// index.
-/// @param[in] trit_array - the array to insert into
-/// @param[in] from_trit_array - the array containing the trits to copy over
-/// @param[in] start - the start index in the target array
-/// @param[in] num_trits - the number of trits to copy over
-/// @return size_t - the number of trits copied over
-size_t flex_trit_array_insert(flex_trit_t *const to_trit_array,
-                              size_t const to_len,
-                              flex_trit_t const *const trit_array,
-                              size_t const len, size_t const start,
-                              size_t const num_trits);
-
-/// Returns an array of trits regardless of the current memory storage
-/// scheme
-/// @param[in] trits - an array of individual trits
-/// @param[in] trit_array - the array of packed trits
-/// @param[in] num_trits - the number of trits to extract
-/// @return size_t - the number of trits extracted
-size_t flex_trit_array_to_int8(trit_t *const trits, size_t const to_len,
-                               flex_trit_t const *const trit_array,
-                               size_t const len, size_t const num_trits);
-
-/// Returns an array of trits packed in the current memory storage scheme
-/// @param[in] trit_array - the array of packed trits
-/// @param[in] trits - an array of individual trits
-/// @param[in] num_trits - the number of trits to pack
-/// @return size_t - the number of trits packed
-size_t int8_to_flex_trit_array(flex_trit_t *const to_trit_array,
-                               size_t const to_len, trit_t const *const trits,
-                               size_t const len, size_t const num_trits);
-
-/***********************************************************************************************************
- * Trits array
- ***********************************************************************************************************/
 /// A trit array represents an array of trits packed according to the
 /// current memory model.
 typedef struct _trit_array *trit_array_p;
@@ -179,26 +36,32 @@ size_t trit_array_bytes_for_trits(size_t const num_trits);
  * Accessors
  ***********************************************************************************************************/
 /// Returns the trit at a given index in an array of trits
-/// @param[in] trit_array - a pointer to a tri_array_t
+/// @param[in] trit_array - a pointer to a trit_array_t
 /// @param[in] index - the index of the trit to access
 /// @return trit_t - the trit at the given index
 static inline trit_t trit_array_at(trit_array_p const trit_array,
                                    size_t const index) {
-  return flex_trit_array_at(trit_array->trits, trit_array->num_trits, index);
+  return flex_trits_at(trit_array->trits, trit_array->num_trits, index);
 }
 
 /// Set the trit at a given index in an array of trits to the given value
-/// @param[in] trit_array - a pointer to a tri_array_t
+/// @param[in] trit_array - a pointer to a trit_array_t
 /// @param[in] index - the index of the trit to access
 /// @param[in] trit - the trit value to set
 static inline uint8_t trit_array_set_at(trit_array_p const trit_array,
                                         size_t const index, trit_t const trit) {
-  return flex_trit_array_set_at(trit_array->trits, trit_array->num_trits, index,
-                                trit);
+  return flex_trits_set_at(trit_array->trits, trit_array->num_trits, index,
+                           trit);
 }
 
 void trit_array_set_trits(trit_array_p const trit_array,
                           flex_trit_t *const trits, size_t const num_trits);
+
+bool trit_array_is_null(trit_array_p const trit_array);
+
+static inline void trit_array_set_null(trit_array_p const trit_array) {
+  memset(trit_array->trits, FLEX_TRIT_NULL_VALUE, trit_array->num_bytes);
+}
 
 /// Returns a new trit_array containing a portion of length num_trits of the
 /// trits of another trit_array, from index start.
@@ -210,6 +73,17 @@ void trit_array_set_trits(trit_array_p const trit_array,
 trit_array_p trit_array_slice(trit_array_p const trit_array,
                               trit_array_p const to_trit_array,
                               size_t const start, size_t const num_trits);
+
+/// Inserts the contents of an array into the receiver starting at a given
+/// index.
+/// @param[in] trit_array - the array to insert into
+/// @param[in] from_trit_array - the array containing the trits to copy over
+/// @param[in] start - the start index in the target array
+/// @param[in] num_trits - the number of trits to copy over
+/// @return trit_array_p - the receiver
+trit_array_p trit_array_insert(trit_array_p const trit_array,
+                               trit_array_p const from_trit_array,
+                               size_t const start, size_t const num_trits);
 
 /// Returns an array of trits regardless of the current memory storage scheme
 /// @param[in] trit_array - the array of packed trits
@@ -240,6 +114,7 @@ void trit_array_free(trit_array_p const trit_array);
 #define TRIT_ARRAY_DECLARE(NAME, NUM_TRITS)                           \
   size_t NAME##_num_bytes = trit_array_bytes_for_trits(NUM_TRITS);    \
   flex_trit_t NAME##_trits[NAME##_num_bytes];                         \
+  memset(&NAME##_trits, 0, NAME##_num_bytes);                         \
   struct _trit_array NAME = {(flex_trit_t *)&NAME##_trits, NUM_TRITS, \
                              NAME##_num_bytes};
 
@@ -257,4 +132,4 @@ void trit_array_free(trit_array_p const trit_array);
 #endif
 #ifdef __cplusplus
 }
-#endif
+#endif  // __COMMON_TRINARY_TRIT_ARRAY_H_

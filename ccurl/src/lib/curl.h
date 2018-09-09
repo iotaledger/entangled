@@ -1,13 +1,14 @@
 
 #ifndef CURL_H
 #define CURL_H
-#include "hash.h"
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "hash.h"
 
-
-typedef struct { char state[STATE_LENGTH]; } curl_t;
+typedef struct {
+  char state[STATE_LENGTH];
+} curl_t;
 
 EXPORT void init_curl(curl_t* ctx);
 

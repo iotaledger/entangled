@@ -8,9 +8,9 @@
 #ifndef CPPCLIENT_MESSAGES_H_
 #define CPPCLIENT_MESSAGES_H_
 
+#include <nonstd/optional.hpp>
 #include <string>
 #include <vector>
-#include <nonstd/optional.hpp>
 
 namespace cppclient {
 

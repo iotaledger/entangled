@@ -1,6 +1,6 @@
 
-#include "../lib/hash.h"
 #include <stdint.h>
+#include "../lib/hash.h"
 
 static const trit_t iotacurl_tryte2trits_tbl[27][3] = {
     {0, 0, 0},  {1, 0, 0},  {-1, 1, 0},   {0, 1, 0},   {1, 1, 0},   {-1, -1, 1},

@@ -1,14 +1,14 @@
 Tanglescope
 ===========
 
-Tanglescope is a program composed of metrics collectors,
-each collector is responsible for collecting different metrics about
-the tangle and exposing them to a configurable prometheus (https://github.com/prometheus/prometheus) end point.
+Tanglescope is a program composed of metric collectors,
+Each collector is responsible for a different aspect of the Tangle behavior and collects different set of metrics
+and exposes them to a configurable prometheus end point. (https://github.com/prometheus/prometheus) 
 
 Configuration
 ==============
 
-Each collector has its own section defined in a yaml file whose path is specified by --ConfigurationPath flag
+Each collector has its own section defined in a yaml file whose path is specified by `--ConfigurationPath` flag
 (Default example yaml file in runner/configuration.yaml)
 
 Collectors:
@@ -46,19 +46,21 @@ statscollector:
 **Metrics**:
 
 - statscollector_bundles_confirmed (confirmed bundles count) [Counter]
+- statscollector_value_transactions_new  (Value TXs count) [Counter]
 - statscollector_bundles_new (new bundles count) [Counter]
 - statscollector_transactions_confirmed (confirmed TXs count) [Counter]
+- statscollector_value_transactions_confirmed  (Confirmed value TX's count) [Counter]
 - statscollector_transactions_new (new TXs count) [Counter]
 - statscollector_transactions_reattached (Reattached TXs count) [Counter]
 - statscollector_value_confirmed (Confirmed tx's accumulated value) [Counter]
 - statscollector_value_new (new tx's accumulated value) [Counter]
-- statscollector_bundle_confirmation_duration (bundle's confirmation duration [ms]) [Histogram]
+- statscollector_bundle_confirmation_duration (bundle's confirmation duration [seconds]) [Histogram]
 - statscollector_to_broadcast (Number of transactions to broadcast to other nodes) [Gauge]
 - statscollector_to_process (Number of transactions to process) [Gauge]
 - statscollector_to_reply (Number of transactions to reply to nodes who requested) [Gauge]
 - statscollector_to_request (Number of transactions to request from other nodes) [Gauge]
 - statscollector_total_transactions (Number of transactions stored in node) [Counter]
-
+- statscollector_milestones_count (Number of received milestones) [Counter]
 
 Echo collector
 ---------------
@@ -128,7 +130,7 @@ Blowball collector
 **Purpose:**
 
 Identifying blowballs which can indicate network problems/malice behavior.
-By listening to a list of zmq publisher (IRI nodes with `ZMQ_ENABLED = true`)
+By listening to a list of zmq publishers (IRI nodes with `ZMQ_ENABLED = true`)
 and ref counting transaction's direct approvers
 
 **Configuration section example:**
@@ -241,6 +243,53 @@ dbloader:
 
 - tanglewidthcollector_measure_line (Measure line's timestamp) [Gauge]  
 - tanglewidthcollector_tangle_width (Width/Number of edges crossing a measure line) [Gauge]
+
+Confirmation rate collector
+---------------------------
+
+
+**Purpose:**
+
+Measuring transaction's confirmation rate
+
+
+**Configuration section example:**
+
+
+```yaml
+confirmationratecollector:
+  #list of publisher to listen to. (they should return the echo)
+  publishers:
+      - "tcp://zmq.testnet.iota.org:5556"
+
+  #url of iri node
+  iri_host: "iri01.testnet.iota.cafe"
+  iri_port: 14265
+  #IP/Port that the Prometheus Exposer binds to
+  prometheus_exposer_uri: "0.0.0.0:8085"
+  #MWM for transaction's POW
+  mwm: 9
+  #in-between transactions interval [seconds]
+  broadcast_interval: 3
+
+  #Time after which we should expect transaction to be approved
+  measurement_upper_bound: 60
+  #Time after which if a transaction hasn't been approved, we give up
+  measurement_lower_bound: 360
+  #should calculate confirmation rate using API calls
+  enable_cr_from_api: true
+  #For checking the CR for various Latencies, define the latency in seconds,
+  #"step" means that for 10 seconds we will check latency of 10,20,30 seconds
+  additional_latency_step_seconds: 10
+  #num different latencies to check
+  additional_latency_num_steps: 3
+```
+
+**Metrics**:
+
+- confirmationratecollector_confirmation_rate_api (Confirmation rate ratio [0,1] as it is perceived by making api calls to "getInclusionStates") [Gauge]  
+
+- confirmationratecollector_confirmation_rate_zmq (Confirmation rate ratio [0,1] as it is perceived by inspecting the zmq stream) [Gauge]
 
 
 

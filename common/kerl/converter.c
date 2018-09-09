@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include <stdio.h>
 #include <string.h>
 
@@ -37,7 +44,7 @@ void space_reverse(uint8_t *const bytes) {
   }
 }
 
-void trits_to_bytes(trit_t const *const trits, uint8_t *const bytes) {
+void convert_trits_to_bytes(trit_t const *const trits, uint8_t *const bytes) {
   size_t i = 0, j = 0;
   size_t sz = 1, size = 1;
   uint8_t all_minus_1 = 1;
@@ -107,7 +114,7 @@ void trits_to_bytes(trit_t const *const trits, uint8_t *const bytes) {
   space_reverse(bytes);
 }
 
-void bytes_to_trits(uint8_t *const bytes, trit_t *const trits) {
+void convert_bytes_to_trits(uint8_t *const bytes, trit_t *const trits) {
   size_t i = 0, j = 0;
   uint8_t flip_trits = 0;
   uint64_t lhs, rem;

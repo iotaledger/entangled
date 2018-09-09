@@ -1,3 +1,14 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef __COMMON_TRINARY_TRIT_LONG_H__
 #define __COMMON_TRINARY_TRIT_LONG_H__
 
@@ -14,4 +25,7 @@ int encode_long(int64_t const value, trit_t *const trits, size_t const size);
 int64_t decode_long(trit_t const *const trits, size_t const length,
                     size_t *const end);
 
+#endif
+#ifdef __cplusplus
+}
 #endif

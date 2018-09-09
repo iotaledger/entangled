@@ -1,4 +1,5 @@
 *.class
+.#*
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -43,6 +44,9 @@ hs_err_pid*
 /out/
 /lib/
 
+# Visual Studio
+.vs/
+
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 
@@ -67,7 +71,7 @@ pom.xml
 *.log
 .gdb_history
 
-/bazel*
+bazel*
 .bazelrc
 cclient/bazel*
 cclient/cmake-*
@@ -92,8 +96,7 @@ Icon
 .TemporaryItems
 .Trashes
 .VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-
+.com.apple.timemachine.donotpre
 # Directories potentially created on remote AFP share
 .AppleDB
 .AppleDesktop
@@ -147,3 +150,9 @@ xcuserdata/
 
 # Atom conf
 .clang_complete
+
+# Database
+ciri/ciri.db*
+
+# Visual Studio Code conf
+.vscode/

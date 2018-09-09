@@ -11,6 +11,7 @@
 #include <iota/tanglescope/tanglewidthcollector.hpp>
 #include <iota/tanglescope/tipselectioncollector.hpp>
 #include <list>
+#include "tanglescope/confirmationratecollector.hpp"
 
 DEFINE_string(ConfigurationPath, "", "YAML's configuration file path");
 
@@ -30,6 +31,7 @@ int main(int argc, char** argv) {
     iota::tanglescope::BlowballCollector blowballCollector;
     iota::tanglescope::TipSelectionCollector tipSelectionCollector;
     iota::tanglescope::TangleWidthCollector widthCollector;
+    iota::tanglescope::CRCollector crCollector;
     iota::tanglescope::ZmqDBLoader dbLoader;
 
     if (conf["echocollector"] || conf["tanglewidthcollector"]) {
@@ -76,6 +78,12 @@ int main(int argc, char** argv) {
       auto task = boost::async(boost::launch::async, [&widthCollector]() {
         widthCollector.collect();
       });
+      tasks.push_back(std::move(task));
+    }
+
+    if (crCollector.parseConfiguration(conf["confirmationratecollector"])) {
+      auto task = boost::async(boost::launch::async,
+                               [&crCollector]() { crCollector.collect(); });
       tasks.push_back(std::move(task));
     }
 

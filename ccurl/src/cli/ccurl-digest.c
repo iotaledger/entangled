@@ -1,15 +1,22 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "../lib/ccurl.h"
 #include "../lib/hash.h"
 #include "../lib/pearl_diver.h"
 #include "../lib/util/converter.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define TRYTE_LENGTH 2673
 
-#define HINTS                                                                  \
-  "### CCURL DIGEST ###\nUsage:\n\tccurl-cli [TRYTES (length: %d)] \n\techo "  \
+#define HINTS                                                                 \
+  "### CCURL DIGEST ###\nUsage:\n\tccurl-cli [TRYTES (length: %d)] \n\techo " \
   "TRYTES | ccurl-cli \n"
 
 int main(int argc, char* argv[]) {

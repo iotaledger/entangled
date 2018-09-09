@@ -1,9 +1,16 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include "../lib/ccurl.h"
-#include "../lib/hash.h"
-#include "../lib/pearl_diver.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../lib/hash.h"
+#include "../lib/pearl_diver.h"
 
 /*
 #include "Windows.h"
@@ -18,12 +25,11 @@
 
 #define TRYTE_LENGTH 2673
 
-#define HINTS                                                                  \
-  "### CCURL ###\nUsage:\n\tccurl-cli <MinWeightMagnitude> [TRYTES (length: "  \
+#define HINTS                                                                 \
+  "### CCURL ###\nUsage:\n\tccurl-cli <MinWeightMagnitude> [TRYTES (length: " \
   "%d)] \n\techo TRYTES | ccurl-cli <MinWeightMagnitude>\n"
 
 int get_stdin(char* str, int len) {
-
   int i = 0;
   char chr;
   struct timeval timeout;
@@ -38,8 +44,7 @@ int get_stdin(char* str, int len) {
 
   if (select(1, &readfds, NULL, NULL, &timeout)) {
     while ((chr = getchar()) != EOF) {
-      if (i > len)
-        return -1;
+      if (i > len) return -1;
       str[i++] = chr;
     }
   }

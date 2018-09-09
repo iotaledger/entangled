@@ -7,6 +7,8 @@ cc_library(
             "tanglewidthcollector.cpp",
             "blowballcollector.cpp",
             "echocollector.cpp",
+            "confirmationratecollector.cpp",
+            "broadcastrecievecollecter.cpp",
             "tests/**/*.cpp",
         ],
     ),
@@ -67,7 +69,27 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":shared",
-        "//common/helpers",
-        "//common/trinary:tryte_long",
+        ":throwcatchcollector",
+    ],
+)
+
+cc_library(
+    name = "throwcatchcollector",
+    srcs = ["broadcastrecievecollecter.cpp"],
+    hdrs = ["broadcastrecievecollecter.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":shared",
+    ],
+)
+
+cc_library(
+    name = "confirmationratecollector",
+    srcs = ["confirmationratecollector.cpp"],
+    hdrs = ["confirmationratecollector.hpp"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":shared",
+        ":throwcatchcollector",
     ],
 )

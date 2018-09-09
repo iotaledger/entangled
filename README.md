@@ -12,22 +12,29 @@ bazel test //...
 - Be sure to run `./hooks/autohook.sh install` after initial checkout!
 - Pass `-c dbg` for building with debug symbols.
 
-## Building a docker image and running a container with BAZEL (cc_image target)
+### Tools required for running git commit hook
+- buildifier
+- clang-format
 
-* [Rules for building and handling Docker images with Bazel](https://github.com/bazelbuild/rules_docker)
-* build image:
-```shell
-bazel run //path/tanglescope_img -- --norun
-```
-* create container and copy configuration file to container environment:
-```shell
-docker create --name ##the_name \
-              --expose 8080 --expose 8081 -p 8080:8080 -p 8081:8081 \
-              bazel/utils/ tanglescope:tanglescope_img
-docker cp ##path_to_configuration_file ##the_name:/app/default_configuration.yaml
-```
-* start container
-```shell
-docker start ##the_name
-```
+### Buildifier
+Buildifier can be installed with `bazel` or `go`
 
+#### Install with go
+1. change directory to `$GOPATH`
+2. run `$ go get github.com/bazelbuild/buildtools/buildifier`
+   The executable file will be located under `$GOPATH/bin`
+3. make a soft link for global usage, run 
+   `$ sudo ln -s $HOME/go/bin/buildifier /usr/bin/buildifier`
+
+#### Install with bazel
+1. clone `bazelbuild/buildtools` repository
+   `$ git clone https://github.com/bazelbuild/buildtools.git`
+2. change directory to `buildtools`
+3. build it with bazel command, `$ bazel build //buildifier`
+   The executable file will be located under `path/to/buildtools/bazel-bin`
+4. make a soft link
+
+### clang-format
+clang-format can be installed by command: 
+- Debian/Ubuntu based: `$ sudo apt-get install clang-format`
+- OSX: `$ brew install clang-format`

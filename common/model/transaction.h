@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018 IOTA Stiftung
- * https://gitlab.com/iota-foundation/software/entangled
+ * https://github.com/iotaledger/entangled
  *
  * Refer to the LICENSE file for licensing information
  */
@@ -12,73 +12,111 @@ extern "C" {
 #ifndef __COMMON_MODEL_TRANSACTION_H_
 #define __COMMON_MODEL_TRANSACTION_H_
 
-#include "common/trinary/tryte.h"
+#include "common/trinary/flex_trit.h"
+
+#define NUM_TRITS_SERIALIZED_TRANSACTION 8019
+#define NUM_TRITS_SIGNATURE 6561
+#define NUM_TRITS_ADDRESS 243
+#define NUM_TRITS_VALUE 81
+#define NUM_TRITS_OBSOLETE_TAG 81
+#define NUM_TRITS_TIMESTAMP 27
+#define NUM_TRITS_CURRENT_INDEX 27
+#define NUM_TRITS_LAST_INDEX 27
+#define NUM_TRITS_BUNDLE 243
+#define NUM_TRITS_TRUNK 243
+#define NUM_TRITS_BRANCH 243
+#define NUM_TRITS_TAG 81
+#define NUM_TRITS_ATTACHMENT_TIMESTAMP 27
+#define NUM_TRITS_ATTACHMENT_TIMESTAMP_LOWER 27
+#define NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER 27
+#define NUM_TRITS_NONCE 81
+#define NUM_TRITS_HASH 243
+
+#define NUM_TRYTES_SERIALIZED_TRANSACTION 2673
+#define NUM_TRYTES_SIGNATURE 2187
+#define NUM_TRYTES_ADDRESS 81
+#define NUM_TRYTES_VALUE 27
+#define NUM_TRYTES_OBSOLETE_TAG 27
+#define NUM_TRYTES_TIMESTAMP 9
+#define NUM_TRYTES_CURRENT_INDEX 9
+#define NUM_TRYTES_LAST_INDEX 9
+#define NUM_TRYTES_BUNDLE 81
+#define NUM_TRYTES_TRUNK 81
+#define NUM_TRYTES_BRANCH 81
+#define NUM_TRYTES_TAG 27
+#define NUM_TRYTES_ATTACHMENT_TIMESTAMP 9
+#define NUM_TRYTES_ATTACHMENT_TIMESTAMP_LOWER 9
+#define NUM_TRYTES_ATTACHMENT_TIMESTAMP_UPPER 9
+#define NUM_TRYTES_NONCE 27
+#define NUM_TRYTES_HASH 81
 
 /***********************************************************************************************************
  * Transaction data structure
  ***********************************************************************************************************/
 typedef struct _iota_transaction *iota_transaction_t;
 struct _iota_transaction {
-  // 2187 trytes
-  tryte_t signature_or_message[2187];
-  // 81 trytes
-  tryte_t address[81];
-  // 27 trytes
+  // 2187 trytes = 6561 trits
+  flex_trit_t signature_or_message[FLEX_TRIT_SIZE_6561];
+  // 81 trytes = 243 trits
+  flex_trit_t address[FLEX_TRIT_SIZE_243];
+  // 27 trytes = 81 trits
   int64_t value;
-  // 27 trytes
-  tryte_t obsolete_tag[27];
-  // 9 trytes
+  // 27 trytes = 81 trits
+  flex_trit_t obsolete_tag[FLEX_TRIT_SIZE_81];
+  // 9 trytes = 27 trits
   uint64_t timestamp;
-  // 9 trytes
+  // 9 trytes = 27 trits
   int64_t current_index;
-  // 9 trytes
+  // 9 trytes = 27 trits
   int64_t last_index;
-  // 81 trytes
-  tryte_t bundle[81];
-  // 81 trytes
-  tryte_t trunk[81];
-  // 81 trytes
-  tryte_t branch[81];
-  // 27 trytes
-  tryte_t tag[27];
-  // 9 trytes
+  // 81 trytes = 243 trits
+  flex_trit_t bundle[FLEX_TRIT_SIZE_243];
+  // 81 trytes = 243 trits
+  flex_trit_t trunk[FLEX_TRIT_SIZE_243];
+  // 81 trytes = 243 trits
+  flex_trit_t branch[FLEX_TRIT_SIZE_243];
+  // 27 trytes = 81 trits
+  flex_trit_t tag[FLEX_TRIT_SIZE_81];
+  // 9 trytes = 27 trits
   int64_t attachment_timestamp;
-  // 9 trytes
+  // 9 trytes = 27 trits
   int64_t attachment_timestamp_lower;
-  // 9 trytes
+  // 9 trytes = 27 trits
   int64_t attachment_timestamp_upper;
-  // 27 trytes
-  tryte_t nonce[27];
-  // Total 2673 trytes
+  // 27 trytes = 81 trits
+  flex_trit_t nonce[FLEX_TRIT_SIZE_81];
+  // 81 trytes = 243 trits
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  // Total 2754 trytes
 };
 
 /***********************************************************************************************************
  * Accessors
  ***********************************************************************************************************/
 // Get the transaction signature
-tryte_t *transaction_signature(iota_transaction_t transaction);
+flex_trit_t *transaction_signature(iota_transaction_t transaction);
 // Set the transaction signature (copy argument)
 void transaction_set_signature(iota_transaction_t transaction,
-                               const tryte_t *signature);
+                               const flex_trit_t *signature);
 // Get the transaction message
-tryte_t *transaction_message(iota_transaction_t transaction);
+flex_trit_t *transaction_message(iota_transaction_t transaction);
 // Set the transaction message (copy argument)
 void transaction_set_message(iota_transaction_t transaction,
-                             const tryte_t *message);
+                             const flex_trit_t *message);
 // Get the transaction address
-tryte_t *transaction_address(iota_transaction_t transaction);
+flex_trit_t *transaction_address(iota_transaction_t transaction);
 // Set the transaction address (copy argument)
 void transaction_set_address(iota_transaction_t transaction,
-                             const tryte_t *address);
+                             const flex_trit_t *address);
 // Get the transaction value
 int64_t transaction_value(iota_transaction_t transaction);
 // Set the transaction value
 void transaction_set_value(iota_transaction_t transaction, int64_t value);
 // Get the transaction obsolete tag
-tryte_t *transaction_obsolete_tag(iota_transaction_t transaction);
+flex_trit_t *transaction_obsolete_tag(iota_transaction_t transaction);
 // Set the transaction obsolete tag
 void transaction_set_obsolete_tag(iota_transaction_t transaction,
-                                  const tryte_t *obsolete_tag);
+                                  const flex_trit_t *obsolete_tag);
 // Get the transaction timestamp
 uint64_t transaction_timestamp(iota_transaction_t transaction);
 // Set the transaction timestamp
@@ -95,44 +133,52 @@ int64_t transaction_last_index(iota_transaction_t transaction);
 void transaction_set_last_index(iota_transaction_t transaction,
                                 int64_t last_index);
 // Get the transaction bundle
-tryte_t *transaction_bundle(iota_transaction_t transaction);
+flex_trit_t *transaction_bundle(iota_transaction_t transaction);
 // Set the transaction bundle (copy argument)
 void transaction_set_bundle(iota_transaction_t transaction,
-                            const tryte_t *bundle);
+                            const flex_trit_t *bundle);
 // Get the transaction trunk
-tryte_t *transaction_trunk(iota_transaction_t transaction);
+flex_trit_t *transaction_trunk(iota_transaction_t transaction);
 // Set the transaction trunk (copy argument)
 void transaction_set_trunk(iota_transaction_t transaction,
-                           const tryte_t *trunk);
+                           const flex_trit_t *trunk);
 // Get the transaction branch
-tryte_t *transaction_branch(iota_transaction_t transaction);
+flex_trit_t *transaction_branch(iota_transaction_t transaction);
 // Set the transaction branch (copy argument)
 void transaction_set_branch(iota_transaction_t transaction,
-                            const tryte_t *branch);
+                            const flex_trit_t *branch);
 // Get the transaction tag
-tryte_t *transaction_tag(iota_transaction_t transaction);
+flex_trit_t *transaction_tag(iota_transaction_t transaction);
 // Set the transaction tag (copy argument)
-void transaction_set_tag(iota_transaction_t transaction, const tryte_t *tag);
-// Get the transaction attachement timestamp
+void transaction_set_tag(iota_transaction_t transaction,
+                         const flex_trit_t *tag);
+// Get the transaction attachment timestamp
 int64_t transaction_attachment_timestamp(iota_transaction_t transaction);
-// Set the transaction attachement timestamp
+// Set the transaction attachment timestamp
 void transaction_set_attachment_timestamp(iota_transaction_t transaction,
                                           int64_t timestamp);
-// Get the transaction attachement timestamp lower
+// Get the transaction attachment timestamp lower
 int64_t transaction_attachment_timestamp_lower(iota_transaction_t transaction);
-// Set the transaction attachement timestamp lower
+// Set the transaction attachment timestamp lower
 void transaction_set_attachment_timestamp_lower(iota_transaction_t transaction,
                                                 int64_t timestamp);
-// Get the transaction attachement timestamp upper
+// Get the transaction attachment timestamp upper
 int64_t transaction_attachment_timestamp_upper(iota_transaction_t transaction);
-// Set the transaction attachement timestamp upper
+// Set the transaction attachment timestamp upper
 void transaction_set_attachment_timestamp_upper(iota_transaction_t transaction,
                                                 int64_t timestamp);
 // Get the transaction nonce
-tryte_t *transaction_nonce(iota_transaction_t transaction);
+flex_trit_t *transaction_nonce(iota_transaction_t transaction);
 // Set the transaction nonce (copy argument)
 void transaction_set_nonce(iota_transaction_t transaction,
-                           const tryte_t *nonce);
+                           const flex_trit_t *nonce);
+// Get the transaction hash
+flex_trit_t *transaction_hash(iota_transaction_t transaction);
+// Set the transaction hash (copy argument)
+void transaction_set_hash(iota_transaction_t transaction,
+                          const flex_trit_t *hash);
+
+void transaction_reset(iota_transaction_t transaction);
 
 /***********************************************************************************************************
  * Constructors
@@ -140,28 +186,28 @@ void transaction_set_nonce(iota_transaction_t transaction,
 // Creates and returns a new transaction without data
 iota_transaction_t transaction_new(void);
 // Creates and returns a new transaction from serialized data - NULL if failed
-iota_transaction_t transaction_deserialize(const tryte_t *trytes);
+iota_transaction_t transaction_deserialize(const flex_trit_t *trits);
 /***********************************************************************************************************
  * Serialization
  ***********************************************************************************************************/
 // Returns the serialized data from an existing transaction - NULL if failed
-tryte_t *transaction_serialize(const iota_transaction_t transaction);
+flex_trit_t *transaction_serialize(const iota_transaction_t transaction);
 // Places the serialized data from an existing transaction in pre-allocated
 // string - returns non 0 on success
-uint16_t transaction_serialize_on_trytes(const iota_transaction_t transaction,
-                                         tryte_t *trytes);
+size_t transaction_serialize_on_flex_trits(const iota_transaction_t transaction,
+                                           flex_trit_t *trits);
 /***********************************************************************************************************
  * Deserialization
  ***********************************************************************************************************/
-// Fills up an existing transaction with the serialized data in trytes - returns
+// Fills up an existing transaction with the serialized data in trits - returns
 // non 0 on success
-uint16_t transaction_deserialize_from_trytes(iota_transaction_t transaction,
-                                             const tryte_t *trytes);
+size_t transaction_deserialize_from_trits(iota_transaction_t transaction,
+                                          const flex_trit_t *trits);
 /***********************************************************************************************************
  * Destructor
  ***********************************************************************************************************/
 // Free an existing transaction - compatible with free()
-void transaction_free(void *transaction);
+void transaction_free(iota_transaction_t transaction);
 
 #endif  // __COMMON_MODEL_TRANSACTION_H_
 #ifdef __cplusplus

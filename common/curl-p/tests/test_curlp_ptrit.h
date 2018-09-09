@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #ifndef __CURL_P_BCT_1_H__
 #define __CURL_P_BCT_1_H__
 #include "common/trinary/ptrit.h"

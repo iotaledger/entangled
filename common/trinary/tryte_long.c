@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018 IOTA Stiftung
- * https://github.com/iotaledger/entangled/
+ * https://github.com/iotaledger/entangled
  *
  * Refer to the LICENSE file for licensing information
  */
@@ -44,7 +44,7 @@ int64_t trytes_to_long(tryte_t const *const trytes, size_t const i) {
 
 // Return the number of trytes needed to encode the value
 size_t long_to_trytes(int64_t const value, tryte_t *const trytes) {
-  // Calculate numer of iterations (number of trytes)
+  // Calculate number of iterations (number of trytes)
   size_t num_trytes = min_trytes(value);
   int64_t v_abs = value;
   for (int i = num_trytes - 1; i >= 0; i--) {

@@ -19,5 +19,4 @@ typedef struct __attribute__((packed)) {
   trit_t attachment_timestamp_upper_bound[INT_LENGTH];
   trit_t nonce[NONCE_LENGTH];
 } transaction_t;
-#endif // __TRANSACTION_H__
-
+#endif  // __TRANSACTION_H__

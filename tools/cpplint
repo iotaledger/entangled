@@ -1,4 +1,4 @@
 #!/bin/sh
 
-python tools/cpplint.py --filter=-build/include_order,-whitespace/comments --extensions=h,cc ./**/*.h ./**/*.cc
-
+root=$(git rev-parse --show-toplevel)
+python $root/tools/cpplint.py --filter=-build/include_order,-whitespace/comments,-runtime/references --extensions=h,cc $(find $root/cppclient | grep -E "\.(cc|cpp|h|hh|hpp)\$")

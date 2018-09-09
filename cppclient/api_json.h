@@ -27,7 +27,7 @@ class IotaJsonAPI : virtual public IotaAPI {
  public:
   bool isNodeSolid() override;
 
-  std::unordered_map<std::string, uint64_t> getBalances(
+  nonstd::optional<std::unordered_map<std::string, uint64_t>> getBalances(
       const std::vector<std::string>& addresses) override;
 
   std::unordered_multimap<std::string, Bundle> getConfirmedBundlesForAddresses(
@@ -45,14 +45,14 @@ class IotaJsonAPI : virtual public IotaAPI {
   std::unordered_set<std::string> filterConsistentTails(
       const std::vector<std::string>& tails) override;
 
-  NodeInfo getNodeInfo() override;
+  nonstd::optional<NodeInfo> getNodeInfo() override;
   std::vector<Transaction> getTransactions(
       const std::vector<std::string>& hashes) override;
 
   std::vector<std::string> getTrytes(
       const std::vector<std::string>& hashes) override;
 
-  GetTransactionsToApproveResponse getTransactionsToApprove(
+  nonstd::optional<GetTransactionsToApproveResponse> getTransactionsToApprove(
       size_t depth,
       const nonstd::optional<std::string>& reference = {}) override;
 
@@ -70,6 +70,12 @@ class IotaJsonAPI : virtual public IotaAPI {
 
   virtual nonstd::optional<nlohmann::json> post(
       const nlohmann::json& input) = 0;
+
+ private:
+  template <typename T>
+  static std::vector<T> nextBatch(const std::vector<T>& vec,
+                                  uint32_t& numBatchedEntries,
+                                  uint32_t batchSize);
 };
 }  // namespace cppclient
 

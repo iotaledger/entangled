@@ -17,6 +17,11 @@ namespace iota {
 namespace tanglescope {
 namespace txAuxiliary {
 
+struct HashedTX {
+  std::string hash;
+  std::string tx;
+};
+
 boost::future<void> handleUnseenTransactions(
     std::shared_ptr<iri::TXMessage> tx,
     cuckoohash_map<std::string, std::chrono::system_clock::time_point>&
@@ -31,6 +36,14 @@ std::set<std::string> getUnconfirmedTXs(
 boost::future<void> removeConfirmedTransactions(
     std::weak_ptr<cppclient::IotaAPI> client,
     const std::vector<std::string>& tips, std::vector<std::string>& txs);
+
+nonstd::optional<std::string> fillTX(
+    boost::future<nonstd::optional<cppclient::GetTransactionsToApproveResponse>>
+        response);
+
+nonstd::optional<std::string> powTX(nonstd::optional<std::string>, int mwm);
+
+HashedTX hashTX(boost::future<nonstd::optional<std::string>> fuTx);
 
 }  // namespace txAuxiliary
 }  // namespace tanglescope

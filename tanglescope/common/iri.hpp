@@ -174,6 +174,24 @@ class LMHSMessage : public IRIMessage {
   std::string _latestSolidMilestoneHash;
 };
 
+class LMSIMessage : public IRIMessage {
+ public:
+  explicit LMSIMessage(std::string_view from) {
+    auto chunks = IRIMessage::chunks(from);
+    this->_latestSolidMilestoneIndex = std::stoull(std::move(chunks[1]));
+  }
+
+  inline IRIMessageType type() { return IRIMessageType::LMSI; }
+
+ public:
+  const uint64_t latestSolidMilestoneIndex() {
+    return this->_latestSolidMilestoneIndex;
+  }
+
+ private:
+  uint64_t _latestSolidMilestoneIndex;
+};
+
 class RSTATMessage : public IRIMessage {
  public:
   explicit RSTATMessage(std::string_view from) {

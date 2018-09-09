@@ -60,8 +60,8 @@ class IotaAPI {
  public:
   virtual bool isNodeSolid() = 0;
 
-  virtual std::unordered_map<std::string, uint64_t> getBalances(
-      const std::vector<std::string>& addresses) = 0;
+  virtual nonstd::optional<std::unordered_map<std::string, uint64_t>>
+  getBalances(const std::vector<std::string>& addresses) = 0;
 
   virtual std::unordered_multimap<std::string, Bundle>
   getConfirmedBundlesForAddresses(
@@ -79,7 +79,7 @@ class IotaAPI {
       nonstd::optional<std::vector<std::string>> bundles,
       nonstd::optional<std::vector<std::string>> approvees) = 0;
 
-  virtual NodeInfo getNodeInfo() = 0;
+  virtual nonstd::optional<NodeInfo> getNodeInfo() = 0;
 
   virtual std::vector<Transaction> getTransactions(
       const std::vector<std::string>& hashes) = 0;
@@ -91,7 +91,8 @@ class IotaAPI {
       const std::string& trunkTransaction, const std::string& branchTransaction,
       size_t minWeightMagnitude, const std::vector<std::string>& trytes) = 0;
 
-  virtual GetTransactionsToApproveResponse getTransactionsToApprove(
+  virtual nonstd::optional<GetTransactionsToApproveResponse>
+  getTransactionsToApprove(
       size_t depth, const nonstd::optional<std::string>& reference = {}) = 0;
 
   virtual bool storeTransactions(const std::vector<std::string>& trytes) = 0;

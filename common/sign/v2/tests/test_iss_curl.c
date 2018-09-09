@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include <stdio.h>
 #include <unity/unity.h>
 
@@ -127,7 +134,6 @@ void test_iss() {
 
   test_key(subseed, key, key_length, &curl);
   test_sig(key, key_length, &curl);
-  // printf("%s\n", addy_trytes);
 }
 
 int main(void) {

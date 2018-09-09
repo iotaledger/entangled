@@ -68,8 +68,7 @@ int clean_suites(void) { return 0; }
 bool test_last_n_nines(char* hash, int length, int numNines) {
   int i;
   for (i = 1; i <= numNines; i++) {
-    if (hash[length - i] != '9')
-      return false;
+    if (hash[length - i] != '9') return false;
   }
   return true;
 }

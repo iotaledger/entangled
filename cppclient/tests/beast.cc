@@ -1,4 +1,9 @@
-// Copyright 2018 IOTA Foundation
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
 
 #include <chrono>
 #include <iostream>
@@ -11,9 +16,7 @@
 
 #include "cppclient/beast.h"
 
-using namespace testing;
-using namespace cppclient;
-
+using cppclient::BeastIotaAPI;
 
 using json = nlohmann::json;
 
