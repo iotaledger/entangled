@@ -14,6 +14,7 @@
 #include "find_transactions.h"
 #include "get_balances.h"
 #include "get_inclusion_state.h"
+#include "get_transactions_to_approve.h"
 #include "get_trytes.h"
 #include "remove_neighbors.h"
 #include "store_transactions.h"

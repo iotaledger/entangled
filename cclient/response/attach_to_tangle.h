@@ -18,6 +18,12 @@ extern "C" {
 // broadcastTransactions and storeTransactions.
 typedef UT_array attach_to_tangle_res_t;
 
+attach_to_tangle_res_t* attach_to_tangle_res_new();
+const char* attach_to_tangle_res_trytes_at(attach_to_tangle_res_t* res,
+                                           int index);
+int attach_to_tangle_res_trytes_cnt(attach_to_tangle_res_t* res);
+void attach_to_tangle_res_free(attach_to_tangle_res_t* ut);
+
 #ifdef __cplusplus
 }
 #endif

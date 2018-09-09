@@ -33,7 +33,7 @@ void init_cw_calculator_dfs(cw_rating_calculator_base_t *calculator);
  * approvers using the map we got from initial DFS Complexity: DFS + (num
  * vertices)*DFS = (E+V) + V*(E+V) ~ V*(E+V)~O(V^2)
  *
- * (E ~ 2*V - because each transaction has two edges)
+ * (E ~ 2*V - because each transaction has two outcoming edges)
  */
 
 extern retcode_t cw_rating_calculate_dfs(

@@ -8,6 +8,7 @@
 #ifndef CCLIENT_TYPES_H
 #define CCLIENT_TYPES_H
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 #include "common/trinary/trit_array.h"

@@ -144,8 +144,8 @@ iota_api_result_t iota_api_get_trytes(const iota_http_service_t* const service,
  * @return error value.
  */
 iota_api_result_t iota_api_get_inclusion_states(
-    const iota_http_service_t* const service,
-    const get_inclusion_state_req_t* const req, get_inclusion_state_res_t* res);
+    const iota_http_service_t* const service, get_inclusion_state_req_t* req,
+    get_inclusion_state_res_t* res);
 
 /**
  * Similar to iota_api_get_inclusion_states. It returns the confirmed balance
@@ -184,7 +184,8 @@ iota_api_result_t iota_api_get_balances(
  * @return error value.
  */
 iota_api_result_t iota_api_get_transactions_to_approve(
-    const iota_http_service_t* const service, int depth,
+    const iota_http_service_t* const service,
+    get_transactions_to_approve_req_t* req,
     get_transactions_to_approve_res_t* res);
 
 /**
@@ -208,8 +209,8 @@ iota_api_result_t iota_api_get_transactions_to_approve(
  * @return error value.
  */
 iota_api_result_t iota_api_attach_to_tangle(
-    const iota_http_service_t* const service,
-    const attach_to_tangle_req_t* const req);
+    const iota_http_service_t* const service, attach_to_tangle_req_t* req,
+    attach_to_tangle_res_t* res);
 
 /**
  * Interrupts and completely aborts the iota_api_attach_to_tangle process.

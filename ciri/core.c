@@ -33,7 +33,7 @@ retcode_t core_init(core_t* const core) {
   core->db_conf.index_transaction_hash = true;
   core->db_conf.index_milestone_hash = true;
   if (iota_tangle_init(&core->tangle, &core->db_conf)) {
-    log_critical(CORE_LOGGER_ID, "Initializing tangle\n");
+    log_critical(CORE_LOGGER_ID, "Initializing tangle failed\n");
     return RC_CORE_FAILED_DATABASE_INIT;
   }
 

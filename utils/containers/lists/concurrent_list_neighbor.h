@@ -65,14 +65,14 @@ neighbor_t *neighbor_find_by_endpoint(neighbors_list_t *const neighbors,
  * Find a neigbor matching given endpoint values
  *
  * @param neighbors The neighbors list
- * @param host The endpoint host
+ * @param ip The endpoint ip
  * @param port The endpoint port
  * @param protocol The endpoint protocol
  *
  * @return a pointer to the neigbor if found, NULL otherwise
  */
 neighbor_t *neighbor_find_by_endpoint_values(neighbors_list_t *const neighbors,
-                                             char const *const host,
+                                             char const *const ip,
                                              uint16_t const port,
                                              protocol_type_t const protocol);
 

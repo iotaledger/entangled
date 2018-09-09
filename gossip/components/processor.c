@@ -37,12 +37,13 @@ static retcode_t process_transaction_bytes(processor_state_t *const state,
   }
 
   if (true /* TODO(thibault): if !cached */) {
-    trit_t tx_trits[TX_TRITS_SIZE];
+    trit_t tx_trits[PACKET_TX_TRITS_SIZE];
     flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
 
-    bytes_to_trits(packet->content, TX_BYTES_SIZE, tx_trits, TX_TRITS_SIZE);
-    flex_trits_from_trits(tx_flex_trits, TX_TRITS_SIZE, tx_trits, TX_TRITS_SIZE,
-                          TX_TRITS_SIZE);
+    bytes_to_trits(packet->content, PACKET_TX_SIZE, tx_trits,
+                   PACKET_TX_TRITS_SIZE);
+    flex_trits_from_trits(tx_flex_trits, PACKET_TX_TRITS_SIZE, tx_trits,
+                          PACKET_TX_TRITS_SIZE, PACKET_TX_TRITS_SIZE);
     if ((*tx = transaction_deserialize(tx_flex_trits)) == NULL) {
       neighbor->nbr_invalid_tx++;
       log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
@@ -106,7 +107,7 @@ static retcode_t process_request_bytes(processor_state_t *const state,
     return RC_PROCESSOR_COMPONENT_NULL_TX;
   }
 
-  bytes_to_trits(packet->content + TX_BYTES_SIZE, REQ_HASH_BYTES_SIZE,
+  bytes_to_trits(packet->content + PACKET_TX_SIZE, state->req_hash_size,
                  request_hash_trits, NUM_TRITS_HASH);
   if ((request_hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
     return RC_PROCESSOR_COMPONENT_OOM;
@@ -187,7 +188,8 @@ static void *processor_routine(processor_state_t *const state) {
   return NULL;
 }
 
-retcode_t processor_init(processor_state_t *const state, node_t *const node) {
+retcode_t processor_init(processor_state_t *const state, node_t *const node,
+                         bool testnet) {
   if (state == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_STATE;
   }
@@ -199,6 +201,11 @@ retcode_t processor_init(processor_state_t *const state, node_t *const node) {
   memset(state, 0, sizeof(processor_state_t));
   state->running = false;
   state->node = node;
+  if (testnet) {
+    state->req_hash_size = TESTNET_PACKET_REQ_HASH_SIZE;
+  } else {
+    state->req_hash_size = MAINNET_PACKET_REQ_HASH_SIZE;
+  }
 
   log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Initializing processor queue\n");
   if (CQ_INIT(iota_packet_t, state->queue) != CQ_SUCCESS) {

@@ -12,11 +12,16 @@
 extern "C" {
 #endif
 
-typedef struct {
-  address_t branchTransaction;
-  address_t trunkTransaction;
+#include "types/types.h"
 
+typedef struct {
+  char_buffer_t* branch;
+  char_buffer_t* trunk;
 } get_transactions_to_approve_res_t;
+
+get_transactions_to_approve_res_t* get_transactions_to_approve_res_new();
+void get_transactions_to_approve_res_free(
+    get_transactions_to_approve_res_t** res);
 
 #ifdef __cplusplus
 }

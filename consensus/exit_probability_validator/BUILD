@@ -1,7 +1,7 @@
 cc_library(
-    name = "walker_validator",
-    srcs = ["walker_validator.c"],
-    hdrs = ["walker_validator.h"],
+    name = "exit_probability_validator",
+    srcs = ["exit_probability_validator.c"],
+    hdrs = ["exit_probability_validator.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",

@@ -70,6 +70,23 @@ retcode_t json_array_to_int_array_array(cJSON* obj, const char* obj_name,
   return RC_OK;
 }
 
+retcode_t json_boolean_array_to_utarray(cJSON* obj, const char* obj_name,
+                                        UT_array* ut) {
+  cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
+  if (cJSON_IsArray(json_item)) {
+    cJSON* current_obj = NULL;
+    /* The type of json object is expected to be boolean type */
+    cJSON_ArrayForEach(current_obj, json_item) {
+      int bl = (int)cJSON_IsTrue(current_obj);
+      utarray_push_back(ut, &bl);
+    }
+  } else {
+    cJSON_Delete(obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+  return RC_OK;
+}
+
 retcode_t int_array_to_json_array(int_array* in, cJSON* json_root,
                                   const char* obj_name) {
   if (in->size > 0) {
@@ -304,13 +321,69 @@ end:
 }
 
 // get_inclusion_state_response
-void json_get_inclusion_state_serialize_request(
-    const serializer_t* const s, const get_inclusion_state_req_t* const obj,
-    char* out) {}
+retcode_t json_get_inclusion_state_serialize_request(
+    const serializer_t* const s, get_inclusion_state_req_t* obj,
+    char_buffer_t* out) {
+  retcode_t ret = RC_OK;
+  const char* json_text = NULL;
+  size_t len = 0;
+  cJSON* json_root = cJSON_CreateObject();
+  if (json_root == NULL) {
+    return RC_CCLIENT_JSON_CREATE;
+  }
 
-void json_get_inclusion_state_deserialize_response(
+  cJSON_AddItemToObject(json_root, "command",
+                        cJSON_CreateString("getInclusionStates"));
+
+  ret = utarray_to_json_array(obj->hashes, json_root, "transactions");
+  if (ret != RC_OK) {
+    goto done;
+  }
+
+  ret = utarray_to_json_array(obj->tips, json_root, "tips");
+  if (ret != RC_OK) {
+    goto done;
+  }
+
+  json_text = cJSON_PrintUnformatted(json_root);
+  if (json_text) {
+    len = strlen(json_text);
+    ret = char_buffer_allocate(out, len);
+    if (ret == RC_OK) {
+      strncpy(out->data, json_text, len);
+    }
+    cJSON_free((void*)json_text);
+  }
+
+done:
+  cJSON_Delete(json_root);
+  return ret;
+}
+
+retcode_t json_get_inclusion_state_deserialize_response(
     const serializer_t* const s, const char* const obj,
-    get_inclusion_state_res_t* out) {}
+    get_inclusion_state_res_t* out) {
+  retcode_t ret = RC_OK;
+  cJSON* json_obj = cJSON_Parse(obj);
+  cJSON* json_item = NULL;
+
+  if (json_obj == NULL) {
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
+  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
+    // TODO log the error message from response.
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  ret = json_boolean_array_to_utarray(json_obj, "states", out->states);
+
+  cJSON_Delete(json_obj);
+  return ret;
+}
 
 retcode_t json_get_neighbors_serialize_request(const serializer_t* const s,
                                                char_buffer_t* out) {
@@ -530,12 +603,72 @@ retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
 }
 
 // get_transactions_to_approve_response
-void json_get_transactions_to_approve_serialize_request(
-    const serializer_t* const s, int depth, char* out) {}
+retcode_t json_get_transactions_to_approve_serialize_request(
+    const serializer_t* const s, get_transactions_to_approve_req_t* const obj,
+    char_buffer_t* out) {
+  retcode_t ret = RC_OK;
+  const char* json_text = NULL;
+  size_t len = 0;
+  cJSON* json_root = cJSON_CreateObject();
+  if (json_root == NULL) {
+    return RC_CCLIENT_JSON_CREATE;
+  }
 
-void json_get_transactions_to_approve_deserialize_response(
+  cJSON_AddItemToObject(json_root, "command",
+                        cJSON_CreateString("getTransactionsToApprove"));
+
+  cJSON_AddItemToObject(json_root, "depth", cJSON_CreateNumber(obj->depth));
+
+  cJSON_AddItemToObject(json_root, "reference",
+                        cJSON_CreateString(obj->reference->data));
+
+  json_text = cJSON_PrintUnformatted(json_root);
+  if (json_text) {
+    len = strlen(json_text);
+    ret = char_buffer_allocate(out, len);
+    if (ret == RC_OK) {
+      strncpy(out->data, json_text, len);
+    }
+    cJSON_free((void*)json_text);
+  }
+
+  cJSON_Delete(json_root);
+  return ret;
+}
+
+retcode_t json_get_transactions_to_approve_deserialize_response(
     const serializer_t* const s, const char* const obj,
-    get_transactions_to_approve_res_t* out) {}
+    get_transactions_to_approve_res_t* out) {
+  retcode_t ret = RC_OK;
+  cJSON* json_obj = cJSON_Parse(obj);
+  cJSON* json_item = NULL;
+
+  if (json_obj == NULL) {
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
+  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
+    // TODO log the error message from response.
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_RES_ERROR;
+  }
+
+  ret = json_get_string(json_obj, "trunkTransaction", out->trunk);
+  if (ret != RC_OK) {
+    goto end;
+  }
+
+  ret = json_get_string(json_obj, "branchTransaction", out->branch);
+  if (ret != RC_OK) {
+    goto end;
+  }
+
+end:
+  cJSON_Delete(json_obj);
+  return ret;
+}
 
 retcode_t json_add_neighbors_serialize_request(const serializer_t* const s,
                                                add_neighbors_req_t* obj,
@@ -717,7 +850,39 @@ retcode_t json_attach_to_tangle_serialize_request(const serializer_t* const s,
                                                   attach_to_tangle_req_t* obj,
                                                   char_buffer_t* out) {
   retcode_t ret = RC_OK;
-  // TODO
+  const char* json_text = NULL;
+  size_t len = 0;
+  cJSON* json_root = cJSON_CreateObject();
+  if (json_root == NULL) {
+    return RC_CCLIENT_JSON_CREATE;
+  }
+
+  cJSON_AddItemToObject(json_root, "command",
+                        cJSON_CreateString("attachToTangle"));
+
+  cJSON_AddItemToObject(json_root, "trunkTransaction",
+                        cJSON_CreateString(obj->trunk->data));
+  cJSON_AddItemToObject(json_root, "branchTransaction",
+                        cJSON_CreateString(obj->branch->data));
+  cJSON_AddItemToObject(json_root, "minWeightMagnitude",
+                        cJSON_CreateNumber(obj->mwm));
+  ret = utarray_to_json_array(obj->trytes, json_root, "trytes");
+  if (ret != RC_OK) {
+    goto done;
+  }
+
+  json_text = cJSON_PrintUnformatted(json_root);
+  if (json_text) {
+    len = strlen(json_text);
+    ret = char_buffer_allocate(out, len);
+    if (ret == RC_OK) {
+      strncpy(out->data, json_text, len);
+    }
+    cJSON_free((void*)json_text);
+  }
+
+done:
+  cJSON_Delete(json_root);
   return ret;
 }
 
@@ -725,7 +890,24 @@ retcode_t json_attach_to_tangle_deserialize_response(
     const serializer_t* const s, const char* const obj,
     attach_to_tangle_res_t* out) {
   retcode_t ret = RC_OK;
-  // TODO
+  cJSON* json_obj = cJSON_Parse(obj);
+  cJSON* json_item = NULL;
+
+  if (json_obj == NULL) {
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
+  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
+    // TODO log the error message from response.
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_RES_ERROR;
+  }
+
+  ret = json_array_to_utarray(json_obj, "trytes", out);
+
+  cJSON_Delete(json_obj);
   return ret;
 }
 
