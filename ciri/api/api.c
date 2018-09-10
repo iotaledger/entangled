@@ -52,9 +52,12 @@ retcode_t iota_api_stop(iota_api_t *const api) {
 
   if (api == NULL) {
     return RC_CIRI_API_NULL_SELF;
+  } else if (api->running == false) {
+    return RC_OK;
   }
 
   api->running = false;
+
   log_info(API_LOGGER_ID, "Shutting down cIRI API thread\n");
   if (thread_handle_join(api->thread, NULL) != 0) {
     log_error(API_LOGGER_ID, "Shutting down cIRI API thread failed\n");
@@ -66,8 +69,7 @@ retcode_t iota_api_stop(iota_api_t *const api) {
 retcode_t iota_api_destroy(iota_api_t *const api) {
   if (api == NULL) {
     return RC_CIRI_API_NULL_SELF;
-  }
-  if (api->running) {
+  } else if (api->running) {
     return RC_CIRI_API_STILL_RUNNING;
   }
 
