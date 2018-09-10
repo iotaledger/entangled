@@ -9,18 +9,15 @@
 #define __UTILS_HANDLES_SIG_H__
 
 /**
- * We declare a function register_signal() to a system available condition
- * variable primitive and its associated functions, some of them might have no
- * effect if not needed by the underlying API
+ * We declare a function register_signal() to handle signals while the program
+ * executing. This function will catch some exceptional behavior with the
+ * program.
  */
 
 #include <signal.h>
 #include <stdlib.h>
 
-typedef enum UNIVERSAL_SINGAL_NUM {
-    null,
-    ctrl_c
-} universal_singal_num_t;
+typedef enum UNIVERSAL_SINGAL_NUM { null, ctrl_c } universal_singal_num_t;
 
 #if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
     (defined(__APPLE__) && defined(__MACH__))
@@ -34,7 +31,7 @@ void (*end_core)(universal_singal_num_t);
 
 static inline __sighandler_t register_signal(
     int SIG, void (*handler_core_end)(universal_singal_num_t)) {
-        end_core = handler_core_end;
+  end_core = handler_core_end;
   return signal(SIG, signal_handler_posix);
 }
 
@@ -49,24 +46,24 @@ void (*end_core)(universal_singal_num_t);
 
 static inline __sighandler_t register_signal(
     int SIG, void (*handler_core_end)(universal_singal_num_t)) {
-        end_core = handler_core_end;
+  end_core = handler_core_end;
   return SetConsoleCtrlHandler((PHANDLER_ROUTINE)signal_handler_WIN, TRUE);
 }
 
 #else
 
-#error "No lock primitive found"
+#error "No signal process library found"
 
 #endif  // __unix__
-/*
- * Register signal
- *
- * @param the signal(interrupt) eed to be caught
- *
- * @param the function stop and destroy core
- *
- * @return signal_error if singal_handler went wrong
- */
+        /*
+         * Register signal
+         *
+         * @param the signal(interrupt) we hope to be caught
+         *
+         * @param the function stop and destroy core
+         *
+         * @return signal_error if singal_handler went wrong
+         */
 
 static inline __sighandler_t register_signal(
     int SIG, void (*handler_core_end)(universal_singal_num_t));
