@@ -49,8 +49,7 @@ static retcode_t node_neighbors_init(node_t* const node) {
 retcode_t node_init(node_t* const node, core_t* const core) {
   if (node == NULL) {
     return RC_NODE_NULL_NODE;
-  }
-  if (core == NULL) {
+  } else if (core == NULL) {
     return RC_NODE_NULL_CORE;
   }
 
@@ -139,7 +138,11 @@ retcode_t node_stop(node_t* const node) {
 
   if (node == NULL) {
     return RC_NODE_NULL_NODE;
+  } else if (node->running == false) {
+    return RC_OK;
   }
+
+  node->running = false;
 
   log_info(NODE_LOGGER_ID, "Stopping broadcaster component\n");
   if (broadcaster_stop(&node->broadcaster)) {
@@ -165,8 +168,6 @@ retcode_t node_stop(node_t* const node) {
     ret = RC_NODE_FAILED_RESPONDER_STOP;
   }
 
-  node->running = false;
-
   return ret;
 }
 
@@ -175,9 +176,7 @@ retcode_t node_destroy(node_t* const node) {
 
   if (node == NULL) {
     return RC_NODE_NULL_NODE;
-  }
-
-  if (node->running) {
+  } else if (node->running) {
     return RC_NODE_STILL_RUNNING;
   }
 

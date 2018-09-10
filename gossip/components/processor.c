@@ -25,14 +25,11 @@ static retcode_t process_transaction_bytes(processor_state_t *const state,
 
   if (state == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_STATE;
-  }
-  if (neighbor == NULL) {
+  } else if (neighbor == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_NEIGHBOR;
-  }
-  if (packet == NULL) {
+  } else if (packet == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_PACKET;
-  }
-  if (tx == NULL) {
+  } else if (tx == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_TX;
   }
 
@@ -96,14 +93,11 @@ static retcode_t process_request_bytes(processor_state_t *const state,
 
   if (state == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_STATE;
-  }
-  if (neighbor == NULL) {
+  } else if (neighbor == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_NEIGHBOR;
-  }
-  if (packet == NULL) {
+  } else if (packet == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_PACKET;
-  }
-  if (tx == NULL) {
+  } else if (tx == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_TX;
   }
 
@@ -135,8 +129,7 @@ static retcode_t process_packet(processor_state_t *const state,
 
   if (state == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_STATE;
-  }
-  if (packet == NULL) {
+  } else if (packet == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_PACKET;
   }
 
@@ -192,8 +185,7 @@ retcode_t processor_init(processor_state_t *const state, node_t *const node,
                          bool testnet) {
   if (state == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_STATE;
-  }
-  if (node == NULL) {
+  } else if (node == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_NODE;
   }
 
@@ -252,6 +244,8 @@ retcode_t processor_stop(processor_state_t *const state) {
 
   if (state == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_STATE;
+  } else if (state->running == false) {
+    return RC_OK;
   }
 
   log_info(PROCESSOR_COMPONENT_LOGGER_ID, "Shutting down processor thread\n");
@@ -269,8 +263,7 @@ retcode_t processor_destroy(processor_state_t *const state) {
 
   if (state == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_STATE;
-  }
-  if (state->running) {
+  } else if (state->running) {
     return RC_PROCESSOR_COMPONENT_STILL_RUNNING;
   }
 

@@ -18,8 +18,7 @@ retcode_t receiver_init(receiver_state_t *const state, node_t *const node,
                         bool testnet, uint16_t tcp_port, uint16_t udp_port) {
   if (state == NULL) {
     return RC_RECEIVER_COMPONENT_NULL_STATE;
-  }
-  if (node == NULL) {
+  } else if (node == NULL) {
     return RC_RECEIVER_COMPONENT_NULL_NODE;
   }
 
@@ -87,6 +86,8 @@ retcode_t receiver_stop(receiver_state_t *const state) {
 
   if (state == NULL) {
     return RC_RECEIVER_COMPONENT_NULL_STATE;
+  } else if (state->running == false) {
+    return RC_OK;
   }
 
   state->running = false;
@@ -110,8 +111,7 @@ retcode_t receiver_stop(receiver_state_t *const state) {
 retcode_t receiver_destroy(receiver_state_t *const state) {
   if (state == NULL) {
     return RC_RECEIVER_COMPONENT_NULL_STATE;
-  }
-  if (state->running) {
+  } else if (state->running) {
     return RC_RECEIVER_COMPONENT_STILL_RUNNING;
   }
 

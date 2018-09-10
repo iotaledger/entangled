@@ -79,7 +79,11 @@ retcode_t core_stop(core_t* const core) {
 
   if (core == NULL) {
     return RC_CORE_NULL_CORE;
+  } else if (core->running == false) {
+    return RC_OK;
   }
+
+  core->running = false;
 
   log_info(CORE_LOGGER_ID, "Stopping cIRI node\n");
   if (node_stop(&core->node)) {
@@ -93,8 +97,6 @@ retcode_t core_stop(core_t* const core) {
     ret = RC_CORE_FAILED_API_STOP;
   }
 
-  core->running = false;
-
   return ret;
 }
 
@@ -103,9 +105,7 @@ retcode_t core_destroy(core_t* const core) {
 
   if (core == NULL) {
     return RC_CORE_NULL_CORE;
-  }
-
-  if (core->running) {
+  } else if (core->running) {
     return RC_CORE_STILL_RUNNING;
   }
 
