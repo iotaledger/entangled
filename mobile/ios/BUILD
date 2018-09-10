@@ -5,12 +5,5 @@ ios_static_framework(
     hdrs = ["Interface.h"],
     bundle_name = "EntangledKit",
     minimum_os_version = "9.0",
-    deps = [":ios_bindings_classes"],
-)
-
-objc_library(
-    name = "ios_bindings_classes",
-    srcs = ["Interface.m"],
-    hdrs = ["Interface.h"],
     deps = ["//common/helpers"],
 )

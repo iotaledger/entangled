@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6048DE962145F04D0092F128 /* EntangledKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048DE952145F04D0092F128 /* EntangledKit.framework */; };
 		60614B4520E2CDB6002BC518 /* DemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 60614B4420E2CDB6002BC518 /* DemoTests.m */; };
 		60614BB920E2D13B002BC518 /* TestConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 60614BB820E2D13B002BC518 /* TestConstants.m */; };
 		60CD81D020918E5A00D3C2A7 /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CD81C320918E5A00D3C2A7 /* Constants.m */; };
@@ -30,6 +31,7 @@
 
 /* Begin PBXFileReference section */
 		600C4AE920813DFF00BB72E1 /* EntangledDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EntangledDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6048DE952145F04D0092F128 /* EntangledKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = EntangledKit.framework; sourceTree = "<group>"; };
 		60614B4220E2CDB5002BC518 /* EntangledDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EntangledDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		60614B4420E2CDB6002BC518 /* DemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DemoTests.m; sourceTree = "<group>"; };
 		60614B4620E2CDB6002BC518 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -53,6 +55,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6048DE962145F04D0092F128 /* EntangledKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +102,7 @@
 		60CCCCFD20DECB450080348B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6048DE952145F04D0092F128 /* EntangledKit.framework */,
 			);
 			path = Frameworks;
 			sourceTree = "<group>";
@@ -389,6 +393,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Frameworks",
 				);
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Demo/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.iota.EntangledDemo;
@@ -409,6 +414,7 @@
 					"$(PROJECT_DIR)/Frameworks",
 				);
 				GCC_OPTIMIZATION_LEVEL = s;
+				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "$(SRCROOT)/Demo/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.iota.EntangledDemo;

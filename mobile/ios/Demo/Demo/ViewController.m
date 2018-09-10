@@ -24,7 +24,7 @@
     NSLog(@"Starting PoW");
     NSDate* startPoW = [NSDate date];
     char * trytesChars = [TX_TRYTES cStringUsingEncoding:NSUTF8StringEncoding];
-    char * nonce = doPOW(trytesChars, 14);
+    char * nonce = iota_pow(trytesChars, 14);
     NSString * nonceString = [NSString stringWithFormat:@"%s", nonce];
     NSLog(@"Received nonce: %@ ", nonceString);
     NSDate* endPoW = [NSDate date];
@@ -35,7 +35,7 @@
     NSLog(@"Starting Address");
     NSDate* startAddress = [NSDate date];
     char * seedChars = [SEED cStringUsingEncoding:NSUTF8StringEncoding];
-    char * address = generateAddress(seedChars, 2, 2);
+    char * address = iota_sign_address_gen(seedChars, 2, 2);
     NSString * addressString = [NSString stringWithFormat:@"%s", address];
     NSLog(@"Calculated address: %@ ", addressString);
     NSDate* endAddress = [NSDate date];
@@ -45,12 +45,32 @@
     // Signature
     NSLog(@"Starting Signature");
     NSDate* startSignature = [NSDate date];
-    char * signature = generateSignature(seedChars, 2, 2, seedChars);
+    char * signature = iota_sign_signature_gen(seedChars, 2, 2, seedChars);
     NSString * signatureString = [NSString stringWithFormat:@"%s", signature];
     NSLog(@"Caluclated signature: %@ ", signatureString);
     NSDate* endSignature = [NSDate date];
     NSTimeInterval durationSignature = [endSignature timeIntervalSinceDate:startSignature] * 1000;
     NSLog(@"%@", [empty stringByAppendingFormat:@"%@ %f %@", @"Completed in", durationSignature, @"ms"]);
+    
+    // Checksum
+    NSLog(@"Starting Checksum");
+    NSDate* startChecksum = [NSDate date];
+    char * checksum = iota_checksum(address, strlen(address), 9);
+    NSString * checksumString = [NSString stringWithFormat:@"%s", checksum];
+    NSLog(@"Calculated checksum: %@ ", checksumString);
+    NSDate* endChecksum = [NSDate date];
+    NSTimeInterval durationChecksum = [endChecksum timeIntervalSinceDate:startChecksum] * 1000;
+    NSLog(@"%@", [empty stringByAppendingFormat:@"%@ %f %@", @"Completed in", durationChecksum, @"ms"]);
+    
+    // Digest
+    NSLog(@"Starting Digest");
+    NSDate* startDigest = [NSDate date];
+    char * digest = iota_digest(trytesChars);
+    NSString * digestString = [NSString stringWithFormat:@"%s", digest];
+    NSLog(@"Calculated digest: %@ ", digestString);
+    NSDate* endDigest = [NSDate date];
+    NSTimeInterval durationDigest = [endDigest timeIntervalSinceDate:startDigest] * 1000;
+    NSLog(@"%@", [empty stringByAppendingFormat:@"%@ %f %@", @"Completed in", durationDigest, @"ms"]);
 }
     
     

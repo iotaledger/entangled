@@ -35,6 +35,12 @@ git_repository(
     tag = "0.6.0",
 )
 
+git_repository(
+    name = "bazel_skylib",
+    remote = "https://github.com/bazelbuild/bazel-skylib.git",
+    tag = "0.5.0",
+)
+
 load(
     "@build_bazel_rules_apple//apple:repositories.bzl",
     "apple_rules_dependencies",
@@ -42,11 +48,6 @@ load(
 
 apple_rules_dependencies()
 
-git_repository(
-    name = "bazel_skylib",
-    remote = "https://github.com/bazelbuild/bazel-skylib.git",
-    tag = "0.5.0",
-)
 
 load("@rules_iota//:defs.bzl", "iota_deps")
 
