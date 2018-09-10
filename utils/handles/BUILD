@@ -52,6 +52,6 @@ cc_library(
 
 cc_library(
     name = "signal",
-    srcs = ["sig.c"],
-    hdrs = ["sig.h"],
+    srcs = ["signal.c"],
+    hdrs = ["signal.h"],
 )

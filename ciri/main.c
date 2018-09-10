@@ -12,14 +12,15 @@
 #include "ciri/core.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/handles/rand.h"
+#include "utils/handles/signal.h"
 #include "utils/logger_helper.h"
 
 #define MAIN_LOGGER_ID "main"
 
 static core_t core_g;
 
-void signal_handler_core_end(int signo) {
-  if (signo == ctrl_c_signal) {
+void signal_handler_core_end(universal_singal_num_t signo) {
+  if (signo == ctrl_c) {
     log_info(MAIN_LOGGER_ID, "Stopping cIRI core\n");
     if (core_stop(&core_g)) {
       log_error(MAIN_LOGGER_ID, "Stopping cIRI core failed\n");
