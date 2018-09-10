@@ -164,12 +164,15 @@ static void* latest_milestone_tracker(void* arg) {
     sleep_ms(
         MAX(1, LMT_RESCAN_INTERVAL - (current_timestamp_ms() - scan_time)));
   }
+  if (tx) {
+    transaction_free(tx);
+  }
   return NULL;
 }
 
 static retcode_t update_latest_solid_subtangle_milestone(
     milestone_tracker_t* const mt) {
-  retcode_t res = RC_OK;
+  retcode_t ret = RC_OK;
   iota_milestone_t* milestone = NULL;
   iota_milestone_t* latest_milestone = NULL;
   iota_stor_pack_t pack = {(void**)&latest_milestone, 1, 0, false};
@@ -178,15 +181,15 @@ static retcode_t update_latest_solid_subtangle_milestone(
     return RC_CONSENSUS_MT_NULL_SELF;
   }
   if ((milestone = malloc(sizeof(iota_milestone_t))) == NULL) {
-    res = RC_CONSENSUS_MT_OOM;
-    goto ret;
+    ret = RC_CONSENSUS_MT_OOM;
+    goto done;
   }
   if ((latest_milestone = malloc(sizeof(iota_milestone_t))) == NULL) {
-    res = RC_CONSENSUS_MT_OOM;
-    goto ret;
+    ret = RC_CONSENSUS_MT_OOM;
+    goto done;
   }
-  if ((res = iota_tangle_milestone_load_latest(mt->tangle, &pack))) {
-    goto ret;
+  if ((ret = iota_tangle_milestone_load_latest(mt->tangle, &pack))) {
+    goto done;
   }
   if (pack.num_loaded != 0) {
     pack.models = (void**)&milestone;
@@ -210,10 +213,10 @@ static retcode_t update_latest_solid_subtangle_milestone(
     }
   }
 
-ret:
+done:
   free(milestone);
   free(latest_milestone);
-  return res;
+  return ret;
 }
 
 static void* solid_milestone_tracker(void* arg) {
@@ -290,13 +293,13 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
 
 oom:
   if (mt->latest_milestone) {
-    free(mt->latest_milestone);
+    trit_array_free(mt->latest_milestone);
   }
   if (mt->latest_solid_subtangle_milestone) {
-    free(mt->latest_solid_subtangle_milestone);
+    trit_array_free(mt->latest_solid_subtangle_milestone);
   }
   if (mt->coordinator) {
-    free(mt->coordinator);
+    trit_array_free(mt->coordinator);
   }
   return RC_CONSENSUS_MT_OOM;
 }
