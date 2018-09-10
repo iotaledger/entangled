@@ -50,14 +50,11 @@ static retcode_t get_transaction_for_request(
     iota_transaction_t *const tx) {
   if (state == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_STATE;
-  }
-  if (request == NULL) {
+  } else if (request == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_REQ;
-  }
-  if (request->neighbor == NULL) {
+  } else if (request->neighbor == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_NEIGHBOR;
-  }
-  if (tx == NULL) {
+  } else if (tx == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_TX;
   }
 
@@ -78,11 +75,9 @@ static retcode_t reply_to_request(responder_state_t *const state,
 
   if (state == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_STATE;
-  }
-  if (request == NULL) {
+  } else if (request == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_REQ;
-  }
-  if (request->neighbor == NULL) {
+  } else if (request->neighbor == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_NEIGHBOR;
   }
 
@@ -135,8 +130,7 @@ static void *responder_routine(responder_state_t *const state) {
 retcode_t responder_init(responder_state_t *const state, node_t *const node) {
   if (state == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_STATE;
-  }
-  if (node == NULL) {
+  } else if (node == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_NODE;
   }
 
@@ -192,6 +186,8 @@ retcode_t responder_stop(responder_state_t *const state) {
 
   if (state == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_STATE;
+  } else if (state->running == false) {
+    return RC_OK;
   }
 
   log_info(RESPONDER_COMPONENT_LOGGER_ID, "Shutting down responder thread\n");
@@ -209,8 +205,7 @@ retcode_t responder_destroy(responder_state_t *const state) {
 
   if (state == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_STATE;
-  }
-  if (state->running) {
+  } else if (state->running) {
     return RC_RESPONDER_COMPONENT_STILL_RUNNING;
   }
 

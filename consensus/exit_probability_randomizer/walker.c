@@ -279,4 +279,3 @@ retcode_t find_tail_if_valid(const ep_randomizer_t *exit_probability_randomizer,
 
   return res;
 }
-

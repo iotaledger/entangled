@@ -43,8 +43,7 @@ retcode_t broadcaster_init(broadcaster_state_t *const state,
                            node_t *const node) {
   if (state == NULL) {
     return RC_BROADCASTER_COMPONENT_NULL_STATE;
-  }
-  if (node == NULL) {
+  } else if (node == NULL) {
     return RC_BROADCASTER_COMPONENT_NULL_NODE;
   }
 
@@ -98,6 +97,8 @@ retcode_t broadcaster_stop(broadcaster_state_t *const state) {
 
   if (state == NULL) {
     return RC_BROADCASTER_COMPONENT_NULL_STATE;
+  } else if (state->running == false) {
+    return RC_OK;
   }
 
   log_info(BROADCASTER_COMPONENT_LOGGER_ID,
@@ -116,8 +117,7 @@ retcode_t broadcaster_destroy(broadcaster_state_t *const state) {
 
   if (state == NULL) {
     return RC_BROADCASTER_COMPONENT_NULL_STATE;
-  }
-  if (state->running) {
+  } else if (state->running) {
     return RC_BROADCASTER_COMPONENT_STILL_RUNNING;
   }
 

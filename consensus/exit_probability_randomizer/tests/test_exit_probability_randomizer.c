@@ -135,9 +135,9 @@ void test_cw_gen_topology(test_tangle_topology topology) {
     // binomial distribution where `p` = 1/num_approvers, `n` = selections,
     // so we get (mean = `np`, stdev = `np*(1-p)`):
     double expected_mean = selections / num_approvers;
-    double expected_stdev = expected_mean * (1 - 1 / num_approvers);
-    TEST_ASSERT(selected_tip_count < expected_mean + expected_stdev);
-    TEST_ASSERT(selected_tip_count > expected_mean - expected_stdev);
+    double expected_stdev = sqrt(expected_mean * (1 - 1 / num_approvers));
+    TEST_ASSERT(selected_tip_count < expected_mean + 3 * expected_stdev);
+    TEST_ASSERT(selected_tip_count > expected_mean - 3 * expected_stdev);
   } else if (topology == BLOCKCHAIN) {
     // Sum of series 1 + 2 + ... + (num_txs)
     TEST_ASSERT_EQUAL_INT(selections, selected_tip_count);
