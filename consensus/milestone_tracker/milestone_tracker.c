@@ -122,6 +122,7 @@ static void* latest_milestone_tracker(void* arg) {
   iota_milestone_t candidate;
   iota_transaction_t tx;
   iota_stor_pack_t tx_pack = {(void**)&tx, 1, 0, false};
+  uint64_t scan_time, previous_latest_milestone_index;
 
   if (mt == NULL) {
     return NULL;
@@ -129,11 +130,12 @@ static void* latest_milestone_tracker(void* arg) {
   if ((tx = transaction_new()) == NULL) {
     return NULL;
   }
-  hash_pack_init(&hash_pack, 200);  // TODO based on database index
+
+  hash_pack_init(&hash_pack, MILESTONE_TRACKER_INITIAL_HASH_PACK_SIZE);
   while (mt->running) {
     log_debug(MILESTONE_TRACKER_LOGGER_ID, "Scanning for latest milestone\n");
-    uint64_t scan_time = current_timestamp_ms();
-    uint64_t previous_latest_milestone_index = mt->latest_milestone_index;
+    scan_time = current_timestamp_ms();
+    previous_latest_milestone_index = mt->latest_milestone_index;
 
     hash_pack.num_loaded = 0;
     hash_pack.insufficient_capacity = false;
@@ -157,8 +159,8 @@ static void* latest_milestone_tracker(void* arg) {
                "\n",
                previous_latest_milestone_index, mt->latest_milestone_index);
     }
-    sleep_ms(
-        MAX(1, LMT_RESCAN_INTERVAL - (current_timestamp_ms() - scan_time)));
+    sleep_ms(MAX(1, LATEST_MILESTONE_RESCAN_INTERVAL -
+                        (current_timestamp_ms() - scan_time)));
   }
   if (tx) {
     transaction_free(tx);
@@ -169,8 +171,7 @@ static void* latest_milestone_tracker(void* arg) {
 static retcode_t update_latest_solid_subtangle_milestone(
     milestone_tracker_t* const mt) {
   retcode_t ret = RC_OK;
-  iota_milestone_t* milestone = NULL;
-  iota_milestone_t* latest_milestone = NULL;
+  iota_milestone_t *milestone = NULL, *latest_milestone = NULL;
   iota_stor_pack_t pack = {(void**)&latest_milestone, 1, 0, false};
 
   if (mt == NULL) {
@@ -217,8 +218,7 @@ done:
 
 static void* solid_milestone_tracker(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
-  uint64_t scan_time;
-  uint64_t previous_solid_subtangle_latest_milestone_index;
+  uint64_t scan_time, previous_solid_subtangle_latest_milestone_index;
 
   if (mt != NULL) {
     while (mt->running) {
@@ -240,8 +240,8 @@ static void* solid_milestone_tracker(void* arg) {
                  previous_solid_subtangle_latest_milestone_index,
                  mt->latest_solid_subtangle_milestone_index);
       }
-      sleep_ms(
-          MAX(1, SMT_RESCAN_INTERVAL - (current_timestamp_ms() - scan_time)));
+      sleep_ms(MAX(1, SOLID_MILESTONE_RESCAN_INTERVAL -
+                          (current_timestamp_ms() - scan_time)));
     }
   }
   return NULL;

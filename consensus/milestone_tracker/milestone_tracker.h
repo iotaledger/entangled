@@ -13,6 +13,10 @@
 #include "common/errors.h"
 #include "utils/handles/thread.h"
 
+#define MILESTONE_TRACKER_INITIAL_HASH_PACK_SIZE 10
+#define LATEST_MILESTONE_RESCAN_INTERVAL 5000
+#define SOLID_MILESTONE_RESCAN_INTERVAL 5000
+
 #ifdef __cplusplus
 extern "C" {
 #endif
