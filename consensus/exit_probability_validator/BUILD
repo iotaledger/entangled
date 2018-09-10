@@ -8,7 +8,6 @@ cc_library(
         "//common/trinary:trit_array",
         "//consensus/entry_point_selector",
         "//consensus/ledger_validator",
-        "//consensus/milestone",
         "//consensus/tangle",
         "//utils:logger_helper",
     ],

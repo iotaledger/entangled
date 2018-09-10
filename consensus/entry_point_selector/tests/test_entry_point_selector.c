@@ -10,14 +10,14 @@
 #include "common/helpers/digest.h"
 #include "common/model/tests/defs.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
-#include "consensus/milestone/milestone.h"
+#include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
 #include "consensus/test_definitions/defs.h"
 #include "utils/files.h"
 
 static entry_point_selector_t eps;
 static tangle_t tangle;
-static milestone_t milestone;
+static milestone_tracker_t mt;
 connection_config_t config;
 
 // gdb --args ./test_cw_ratings_dfs 1
@@ -29,8 +29,8 @@ static char* ciri_db_path = "consensus/entry_point_selector/tests/ciri.db";
 void test_entry_point_with_tangle_data() {
   TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
-  TEST_ASSERT(iota_consensus_entry_point_selector_init(&eps, &milestone,
-                                                       &tangle, true) == RC_OK);
+  TEST_ASSERT(iota_consensus_entry_point_selector_init(&eps, &mt, &tangle,
+                                                       true) == RC_OK);
   TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_entry_point_selector_destroy(&eps) == RC_OK);
 }
@@ -38,8 +38,8 @@ void test_entry_point_with_tangle_data() {
 void test_entry_point_without_tangle_data() {
   TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
-  TEST_ASSERT(iota_consensus_entry_point_selector_init(&eps, &milestone,
-                                                       &tangle, true) == RC_OK);
+  TEST_ASSERT(iota_consensus_entry_point_selector_init(&eps, &mt, &tangle,
+                                                       true) == RC_OK);
   TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_entry_point_selector_destroy(&eps) == RC_OK);
 }

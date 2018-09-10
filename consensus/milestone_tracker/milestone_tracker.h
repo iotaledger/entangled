@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
+#include "consensus/snapshot/snapshot.h"
 #include "utils/handles/thread.h"
 
 #define MILESTONE_TRACKER_INITIAL_HASH_PACK_SIZE 10
@@ -44,6 +45,7 @@ typedef struct milestone_tracker_s {
   // private LedgerValidator ledgerValidator;
   // private final MessageQ messageQ;
   // bool accept_any_testnet_coo;
+  snapshot_t latest_snapshot;
 } milestone_tracker_t;
 
 /**

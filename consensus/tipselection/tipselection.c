@@ -10,7 +10,6 @@
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
-#include "consensus/milestone/milestone.h"
 
 #include "utils/logger_helper.h"
 
@@ -18,20 +17,20 @@
 
 retcode_t iota_consensus_tipselection_init(
 
-    tipselection_t *impl, const tangle_t *tangle, const ledger_validator_t *lv,
-    const exit_prob_transaction_validator_t *wv,
-    const cw_rating_calculator_t *cw_calc, const milestone_t *milestone,
-    const entry_point_selector_t *ep, const ep_randomizer_t *ep_randomizer,
+    tipselection_t *impl, tangle_t *const tangle, ledger_validator_t *const lv,
+    exit_prob_transaction_validator_t *const wv,
+    cw_rating_calculator_t *const cw_calc, milestone_tracker_t *const mt,
+    entry_point_selector_t *const ep, ep_randomizer_t *const ep_randomizer,
     double alpha) {
   logger_helper_init(TIPSELECTION_LOGGER_ID, LOGGER_INFO, true);
   impl->cw_calc = cw_calc;
-  impl->milestone = milestone;
+  impl->mt = mt;
   impl->tangle = tangle;
   impl->lv = lv;
   impl->wv = wv;
   impl->ep_randomizer = ep_randomizer;
   impl->ep_selector = ep;
-  rw_lock_handle_init(&impl->milestone->latest_snapshot.rw_lock);
+  rw_lock_handle_init(&impl->mt->latest_snapshot.rw_lock);
   return RC_OK;
 }
 
@@ -42,7 +41,7 @@ retcode_t iota_consensus_get_transactions_to_approve(
   trit_array_p ep = NULL;
   cw_calc_result ratings_result;
 
-  rw_lock_handle_rdlock(&ts->milestone->latest_snapshot.rw_lock);
+  rw_lock_handle_rdlock(&ts->mt->latest_snapshot.rw_lock);
 
   if ((res = iota_consensus_get_entry_point(ts->ep_selector, depth, ep))) {
     log_error(TIPSELECTION_LOGGER_ID,
@@ -57,20 +56,20 @@ retcode_t iota_consensus_get_transactions_to_approve(
     goto ret;
   }
 
-  exit_prob_transaction_validator_t wv;
+  exit_prob_transaction_validator_t eptv;
 
-  iota_consensus_exit_prob_transaction_validator_init(ts->tangle, ts->milestone,
+  iota_consensus_exit_prob_transaction_validator_init(ts->tangle, ts->mt,
                                                       ts->lv, ts->wv);
 
-  iota_consensus_exit_probability_randomize(
-      &ratings_result, ep, ratings_result.cw_ratings, &wv, tips->trunk);
+  iota_consensus_exit_probability_randomize(ts->ep_randomizer, &eptv,
+                                            &ratings_result, ep, tips->trunk);
 
   if (reference != NULL) {
     // TODO
   }
 
-  iota_consensus_exit_probability_randomize(
-      ts->ep_randomizer, ep, ratings_result.cw_ratings, &wv, tips->branch);
+  iota_consensus_exit_probability_randomize(ts->ep_randomizer, &eptv,
+                                            &ratings_result, ep, tips->branch);
 
   res = iota_consensus_ledeger_validator_validate(ts->lv, tips);
   if (res != RC_OK) {
@@ -86,7 +85,7 @@ retcode_t iota_consensus_get_transactions_to_approve(
   }
 
 ret:
-  rw_lock_handle_unlock(&ts->milestone->latest_snapshot.rw_lock);
+  rw_lock_handle_unlock(&ts->mt->latest_snapshot.rw_lock);
   return res;
 }
 
@@ -95,9 +94,9 @@ retcode_t iota_consensus_tipselection_destroy(tipselection_t *const ts) {
   ts->cw_calc = NULL;
   ts->ep_selector = NULL;
   ts->lv = NULL;
-  ts->milestone = NULL;
+  ts->mt = NULL;
   ts->tangle = NULL;
   ts->ep_randomizer = NULL;
-  rw_lock_handle_destroy(&ts->milestone->latest_snapshot.rw_lock);
+  rw_lock_handle_destroy(&ts->mt->latest_snapshot.rw_lock);
   return RC_OK;
 }

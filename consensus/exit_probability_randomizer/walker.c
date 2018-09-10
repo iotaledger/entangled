@@ -93,7 +93,7 @@ retcode_t random_walker_select_approver_tail(
   hash_entry_t *curr_approver = NULL;
   trit_array_t approver;
   flex_trit_t approver_trits[FLEX_TRIT_SIZE_243];
-  approver.trits = &approver_trits;
+  approver.trits = (flex_trit_t *)&approver_trits;
 
   memcpy(approver.trits, curr_tail, FLEX_TRIT_SIZE_243);
   approver.num_bytes = FLEX_TRIT_SIZE_243;
@@ -137,7 +137,6 @@ retcode_t random_walker_select_approver_tail(
 retcode_t select_approver(const ep_randomizer_t *exit_probability_randomizer,
                           cw_map_t cw_ratings, hash_set_t *approvers,
                           trit_array_t *approver, bool *has_next_approver) {
-  retcode_t ret = RC_OK;
   hash_entry_t *curr_approver = NULL;
   hash_entry_t *tmp_approver = NULL;
   cw_entry_t *curr_rating = NULL;

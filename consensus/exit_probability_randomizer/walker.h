@@ -16,7 +16,6 @@
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
-#include "consensus/milestone/milestone.h"
 #include "consensus/tangle/tangle.h"
 
 #ifdef __cplusplus

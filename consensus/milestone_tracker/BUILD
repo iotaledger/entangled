@@ -5,6 +5,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//ciri/conf:conf_values",
+        "//consensus/snapshot",
         "//consensus/tangle",
         "//utils:macros",
         "//utils:time",
