@@ -165,6 +165,7 @@ static void* latest_milestone_tracker(void* arg) {
   if (tx) {
     transaction_free(tx);
   }
+  hash_pack_free(&hash_pack);
   return NULL;
 }
 
@@ -211,8 +212,12 @@ static retcode_t update_latest_solid_subtangle_milestone(
   }
 
 done:
-  free(milestone);
-  free(latest_milestone);
+  if (milestone) {
+    free(milestone);
+  }
+  if (latest_milestone) {
+    free(latest_milestone);
+  }
   return ret;
 }
 
@@ -335,6 +340,8 @@ retcode_t iota_milestone_tracker_stop(milestone_tracker_t* const mt) {
 
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
+  } else if (mt->running == false) {
+    return RC_OK;
   }
 
   mt->running = false;
