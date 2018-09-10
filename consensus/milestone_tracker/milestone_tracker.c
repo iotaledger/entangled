@@ -24,18 +24,15 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
                                     iota_milestone_t* const candidate) {
   retcode_t ret = RC_OK;
   bool exists = false;
-  trit_array_p hash;
 
   if (candidate->index >= 0x200000) {
     return RC_OK;
   }
 
   // Checking if milestone is already persisted/validated in database
-  if ((hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
-    return RC_CONSENSUS_MT_OOM;
-  }
-  memcpy(hash->trits, candidate->hash, FLEX_TRIT_SIZE_243);
-  if ((ret = iota_tangle_milestone_exist(mt->tangle, MILESTONE_COL_HASH, hash,
+  TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
+  memcpy(hash.trits, candidate->hash, FLEX_TRIT_SIZE_243);
+  if ((ret = iota_tangle_milestone_exist(mt->tangle, MILESTONE_COL_HASH, &hash,
                                          &exists))) {
     goto done;
   } else if (exists) {
@@ -108,7 +105,6 @@ valid:
     memcpy(mt->latest_milestone->trits, candidate->hash, FLEX_TRIT_SIZE_243);
   }
 done:
-  trit_array_free(hash);
   return ret;
 }
 
