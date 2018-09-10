@@ -15,6 +15,7 @@ cc_library(
     hdrs = ["core.h"],
     deps = [
         ":node_shared",
+        "//ciri/api",
         "//ciri/conf",
         "//consensus/milestone_tracker",
         "//consensus/tangle",

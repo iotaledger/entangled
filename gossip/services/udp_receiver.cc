@@ -20,6 +20,7 @@ UdpReceiverService::UdpReceiverService(receiver_service_t* const service,
       socket_(context, boost::asio::ip::udp::endpoint(
                            boost::asio::ip::udp::v4(), port)) {
   logger_helper_init(UDP_RECEIVER_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
+  service->opaque_socket = &socket_;
   receive();
 }
 
@@ -29,7 +30,8 @@ UdpReceiverService::~UdpReceiverService() {
 
 void UdpReceiverService::receive() {
   socket_.async_receive_from(
-      boost::asio::buffer(packet_.content, PACKET_SIZE), senderEndpoint_,
+      boost::asio::buffer(packet_.content, service_->packet_size),
+      senderEndpoint_,
       [this](boost::system::error_code ec, std::size_t length) {
         if (!ec && length > 0) {
           auto host = senderEndpoint_.address().to_string().c_str();
@@ -41,24 +43,22 @@ void UdpReceiverService::receive() {
                       "Packet denied from non-tethered neighbor udp://%s:%d\n",
                       host, port);
           } else {
-            neighbor->endpoint.opaque_inetaddr = &socket_;
-            handlePacket(length);
+            handlePacket(&neighbor->endpoint, length);
           }
         }
         receive();
       });
 }
 
-bool UdpReceiverService::handlePacket(std::size_t const length) {
-  if (length != PACKET_SIZE) {
+bool UdpReceiverService::handlePacket(endpoint_t* const endpoint,
+                                      std::size_t const length) {
+  if (length != service_->packet_size) {
     return false;
   }
-  iota_packet_build(&packet_, length,
-                    senderEndpoint_.address().to_string().c_str(),
-                    senderEndpoint_.port(), PROTOCOL_UDP);
+  iota_packet_build(&packet_, endpoint->ip, endpoint->port, PROTOCOL_UDP);
   log_debug(UDP_RECEIVER_SERVICE_LOGGER_ID,
             "Packet received from tethered neighbor udp://%s:%d\n",
-            &packet_.source.host, packet_.source.port);
+            endpoint->host, endpoint->port);
   if (CQ_PUSH(service_->queue, packet_) != CQ_SUCCESS) {
     return false;
   }

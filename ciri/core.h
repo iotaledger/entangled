@@ -8,18 +8,24 @@
 #ifndef __CIRI_CORE_H__
 #define __CIRI_CORE_H__
 
+#include "ciri/api/api.h"
 #include "ciri/conf/conf.h"
 #include "ciri/node.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct core_s {
   bool running;
   ciri_conf_t config;
-  node_t node;
   tangle_t tangle;
   milestone_tracker_t milestone_tracker;
   connection_config_t db_conf;
+  node_t node;
+  iota_api_t api;
 } core_t;
 
 /**
@@ -57,5 +63,9 @@ retcode_t core_stop(core_t *const core);
  * @return a status code
  */
 retcode_t core_destroy(core_t *const core);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __CIRI_CORE_H__

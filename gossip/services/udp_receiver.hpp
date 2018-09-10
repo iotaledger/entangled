@@ -22,7 +22,7 @@ class UdpReceiverService {
 
  public:
   void receive();
-  bool handlePacket(std::size_t const length);
+  bool handlePacket(endpoint_t* const endpoint, std::size_t const length);
 
  private:
   receiver_service_t* service_;

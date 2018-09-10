@@ -256,11 +256,38 @@ done:
 }
 
 iota_api_result_t iota_api_get_inclusion_states(
-    const iota_http_service_t* const service,
-    const get_inclusion_state_req_t* const req,
+    const iota_http_service_t* const service, get_inclusion_state_req_t* req,
     get_inclusion_state_res_t* res) {
   iota_api_result_t result = {0};
-  // TODO
+  char_buffer_t* res_buff = char_buffer_new();
+  char_buffer_t* req_buff = char_buffer_new();
+  if (req_buff == NULL || res_buff == NULL) {
+    result.error = RC_CCLIENT_OOM;
+    goto done;
+  }
+  result.error =
+      service->serializer.vtable.get_inclusion_state_serialize_request(
+          &service->serializer, req, req_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
+
+  result = iota_service_query(service, req_buff, res_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
+
+  result.error =
+      service->serializer.vtable.get_inclusion_state_deserialize_response(
+          &service->serializer, res_buff->data, res);
+
+done:
+  if (req_buff) {
+    char_buffer_free(req_buff);
+  }
+  if (res_buff) {
+    char_buffer_free(res_buff);
+  }
   return result;
 }
 
@@ -340,10 +367,39 @@ done:
 }
 
 iota_api_result_t iota_api_attach_to_tangle(
-    const iota_http_service_t* const service,
-    const attach_to_tangle_req_t* const req) {
+    const iota_http_service_t* const service, attach_to_tangle_req_t* req,
+    attach_to_tangle_res_t* res) {
   iota_api_result_t result = {0};
-  // TODO
+
+  char_buffer_t* res_buff = char_buffer_new();
+  char_buffer_t* req_buff = char_buffer_new();
+  if (req_buff == NULL || res_buff == NULL) {
+    result.error = RC_CCLIENT_OOM;
+    goto done;
+  }
+
+  result.error = service->serializer.vtable.attach_to_tangle_serialize_request(
+      &service->serializer, req, req_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
+
+  result = iota_service_query(service, req_buff, res_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
+
+  result.error =
+      service->serializer.vtable.attach_to_tangle_deserialize_response(
+          &service->serializer, res_buff->data, res);
+
+done:
+  if (req_buff) {
+    char_buffer_free(req_buff);
+  }
+  if (res_buff) {
+    char_buffer_free(res_buff);
+  }
   return result;
 }
 
@@ -356,9 +412,34 @@ iota_api_result_t iota_api_interrupt_attaching_to_tangle(
 
 iota_api_result_t iota_api_broadcast_transactions(
     const iota_http_service_t* const service,
-    const broadcast_transactions_req_t* const req) {
+    broadcast_transactions_req_t* req) {
   iota_api_result_t result = {0};
-  // TODO
+  char_buffer_t* res_buff = char_buffer_new();
+  char_buffer_t* req_buff = char_buffer_new();
+  if (req_buff == NULL || res_buff == NULL) {
+    result.error = RC_CCLIENT_OOM;
+    goto done;
+  }
+  result.error =
+      service->serializer.vtable.broadcast_transactions_serialize_request(
+          &service->serializer, req, req_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
+
+  result = iota_service_query(service, req_buff, res_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
+
+done:
+  if (req_buff) {
+    char_buffer_free(req_buff);
+  }
+  if (res_buff) {
+    char_buffer_free(res_buff);
+  }
+
   return result;
 }
 

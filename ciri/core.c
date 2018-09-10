@@ -50,6 +50,12 @@ retcode_t core_init(core_t* const core) {
     return RC_CORE_FAILED_NODE_INIT;
   }
 
+  log_info(CORE_LOGGER_ID, "Initializing cIRI API\n");
+  if (iota_api_init(&core->api, core->config.api_port)) {
+    log_critical(CORE_LOGGER_ID, "Initializing cIRI API failed\n");
+    return RC_CORE_FAILED_API_INIT;
+  }
+
   return RC_OK;
 }
 
@@ -68,6 +74,12 @@ retcode_t core_start(core_t* const core) {
   if (node_start(&core->node)) {
     log_critical(CORE_LOGGER_ID, "Starting cIRI node failed\n");
     return RC_CORE_FAILED_NODE_START;
+  }
+
+  log_info(CORE_LOGGER_ID, "Starting cIRI API\n");
+  if (iota_api_start(&core->api)) {
+    log_critical(CORE_LOGGER_ID, "Starting cIRI API failed\n");
+    return RC_CORE_FAILED_API_START;
   }
 
   core->running = true;
@@ -94,6 +106,12 @@ retcode_t core_stop(core_t* const core) {
     ret = RC_CORE_FAILED_NODE_STOP;
   }
 
+  log_info(CORE_LOGGER_ID, "Stopping cIRI API\n");
+  if (iota_api_stop(&core->api)) {
+    log_error(CORE_LOGGER_ID, "Stopping cIRI API failed\n");
+    ret = RC_CORE_FAILED_API_STOP;
+  }
+
   core->running = false;
 
   return ret;
@@ -110,16 +128,22 @@ retcode_t core_destroy(core_t* const core) {
     return RC_CORE_STILL_RUNNING;
   }
 
-  log_info(CORE_LOGGER_ID, "Destroying milestone tracker\n");
-  if (iota_milestone_tracker_stop(&core->milestone_tracker)) {
-    log_critical(CORE_LOGGER_ID, "Destroying milestone tracker failed\n");
-    return RC_CORE_FAILED_MILESTONE_TRACKER_DESTROY;
+  log_info(CORE_LOGGER_ID, "Destroying cIRI API\n");
+  if (iota_api_destroy(&core->api)) {
+    log_error(CORE_LOGGER_ID, "Destroying cIRI API failed\n");
+    ret = RC_CORE_FAILED_API_DESTROY;
   }
 
   log_info(CORE_LOGGER_ID, "Destroying cIRI node\n");
   if (node_destroy(&core->node)) {
     log_error(CORE_LOGGER_ID, "Destroying cIRI node failed\n");
     ret = RC_CORE_FAILED_NODE_DESTROY;
+  }
+
+  log_info(CORE_LOGGER_ID, "Destroying milestone tracker\n");
+  if (iota_milestone_tracker_stop(&core->milestone_tracker)) {
+    log_critical(CORE_LOGGER_ID, "Destroying milestone tracker failed\n");
+    return RC_CORE_FAILED_MILESTONE_TRACKER_DESTROY;
   }
 
   log_info(CORE_LOGGER_ID, "Destroying tangle\n");

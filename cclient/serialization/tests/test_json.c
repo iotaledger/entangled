@@ -407,11 +407,45 @@ void test_deserialize_get_trytes(void) {
 }
 
 void test_serialize_get_inclusion_states(void) {
-  // TODO
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text =
+      "{\"command\":\"getInclusionStates\",\"transactions\":["
+      "\"" INCLUSION_STATES_HASH "\"],\"tips\":[\"" INCLUSION_STATES_TIPS
+      "\"]}";
+
+  get_inclusion_state_req_t* get_is = get_inclusion_state_req_new();
+  char_buffer_t* serializer_out = char_buffer_new();
+
+  get_inclusion_state_req_add_hash(get_is, INCLUSION_STATES_HASH);
+  get_inclusion_state_req_add_tip(get_is, INCLUSION_STATES_TIPS);
+
+  serializer.vtable.get_inclusion_state_serialize_request(&serializer, get_is,
+                                                          serializer_out);
+
+  TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
+
+  char_buffer_free(serializer_out);
+  get_inclusion_state_req_free(&get_is);
 }
 
 void test_deserialize_get_inclusion_states(void) {
-  // TODO
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text = "{\"states\": [true,false]}";
+  get_inclusion_state_res_t* deserialize_get_is = get_inclusion_state_res_new();
+
+  serializer.vtable.get_inclusion_state_deserialize_response(
+      &serializer, json_text, deserialize_get_is);
+  TEST_ASSERT_TRUE(get_inclusion_state_res_bool_at(deserialize_get_is, 0) ==
+                   true);
+  TEST_ASSERT_TRUE(get_inclusion_state_res_bool_at(deserialize_get_is, 1) ==
+                   false);
+  TEST_ASSERT_TRUE(get_inclusion_state_res_bool_at(deserialize_get_is, 2) ==
+                   false);
+  TEST_ASSERT_FALSE(get_inclusion_state_res_bool_at(deserialize_get_is, 2) ==
+                    true);
+  get_inclusion_state_res_free(&deserialize_get_is);
 }
 
 void test_serialize_get_balances(void) {
@@ -509,15 +543,66 @@ void test_deserialize_get_transactions_to_approve(void) {
 }
 
 void test_serialize_attach_to_tangle(void) {
-  // TODO
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text =
+      "{\"command\":\"attachToTangle\",\"trunkTransaction\":\"" TEST_HASH1
+      "\",\"branchTransaction\":\"" TEST_HASH2
+      "\",\"minWeightMagnitude\":18,\"trytes\":[\"" TEST_RAW_TRYTES1
+      "\",\"" TEST_RAW_TRYTES2 "\"]}";
+
+  char_buffer_t* serializer_out = char_buffer_new();
+  attach_to_tangle_req_t* attach_req = attach_to_tangle_req_new();
+
+  attach_to_tangle_req_set_trunk(attach_req, TEST_HASH1);
+  attach_to_tangle_req_set_branch(attach_req, TEST_HASH2);
+  attach_to_tangle_req_add_trytes(attach_req, TEST_RAW_TRYTES1);
+  attach_to_tangle_req_add_trytes(attach_req, TEST_RAW_TRYTES2);
+  attach_to_tangle_req_set_mwm(attach_req, 18);
+  serializer.vtable.attach_to_tangle_serialize_request(&serializer, attach_req,
+                                                       serializer_out);
+
+  TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
+
+  char_buffer_free(serializer_out);
+  attach_to_tangle_req_free(&attach_req);
 }
 
 void test_deserialize_attach_to_tangle(void) {
-  // TODO
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* json_text =
+      "{\"trytes\":[\"" TEST_HASH1 "\",\"" TEST_HASH2 "\"],\"duration\":4}";
+
+  attach_to_tangle_res_t* trytes = attach_to_tangle_res_new();
+
+  serializer.vtable.attach_to_tangle_deserialize_response(&serializer,
+                                                          json_text, trytes);
+  TEST_ASSERT_EQUAL_STRING(TEST_HASH1,
+                           attach_to_tangle_res_trytes_at(trytes, 0));
+  TEST_ASSERT_EQUAL_STRING(TEST_HASH2,
+                           attach_to_tangle_res_trytes_at(trytes, 1));
+  TEST_ASSERT_EQUAL_STRING(NULL, attach_to_tangle_res_trytes_at(trytes, 3));
+  attach_to_tangle_res_free(trytes);
 }
 
 void test_serialize_broadcast_transactions(void) {
-  // TODO
+  serializer_t serializer;
+  const char* json_text =
+      "{\"command\":\"broadcastTransactions\",\"trytes\":["
+      "\"" BROADCAST_TX_TRYTES "\"]}";
+
+  char_buffer_t* serializer_out = char_buffer_new();
+  init_json_serializer(&serializer);
+  broadcast_transactions_req_t* req = broadcast_transactions_req_new();
+  broadcast_transactions_req_add(req, BROADCAST_TX_TRYTES);
+
+  serializer.vtable.broadcast_transactions_serialize_request(&serializer, req,
+                                                             serializer_out);
+  TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
+
+  char_buffer_free(serializer_out);
+  broadcast_transactions_req_free(req);
 }
 
 void test_serialize_store_transactions(void) {

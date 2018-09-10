@@ -25,14 +25,12 @@
 retcode_t iota_stor_init(const connection_t* const conn,
                          const connection_config_t* const config) {
   logger_helper_init(SQLITE3_LOGGER_ID, LOGGER_INFO, true);
-  init_connection(conn, config);
-  return RC_OK;
+  return init_connection(conn, config);
 }
 
 retcode_t iota_stor_destroy(const connection_t* const conn) {
   logger_helper_destroy(SQLITE3_LOGGER_ID);
-  destroy_connection(conn);
-  return RC_OK;
+  return destroy_connection(conn);
 }
 
 /*

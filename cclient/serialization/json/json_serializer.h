@@ -34,11 +34,11 @@ retcode_t json_get_balances_deserialize_response(const serializer_t* const,
                                                  get_balances_res_t* out);
 
 // get_inclusion_state_response
-void json_get_inclusion_state_serialize_request(
-    const serializer_t* const, const get_inclusion_state_req_t* const obj,
-    char* out);
+retcode_t json_get_inclusion_state_serialize_request(
+    const serializer_t* const, get_inclusion_state_req_t* obj,
+    char_buffer_t* out);
 
-void json_get_inclusion_state_deserialize_response(
+retcode_t json_get_inclusion_state_deserialize_response(
     const serializer_t* const, const char* const obj,
     get_inclusion_state_res_t* out);
 
@@ -105,6 +105,7 @@ retcode_t json_attach_to_tangle_deserialize_response(
     const serializer_t* const s, const char* const obj,
     attach_to_tangle_res_t* out);
 
+// broadcast_transactions_request
 retcode_t json_broadcast_transactions_serialize_request(
     const serializer_t* const s, broadcast_transactions_req_t* obj,
     char_buffer_t* out);

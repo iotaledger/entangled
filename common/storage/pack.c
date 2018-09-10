@@ -19,6 +19,8 @@ retcode_t hash_pack_resize(iota_stor_pack_t *pack, size_t resize_factor) {
     return RC_OK;
   }
 
+  pack->insufficient_capacity = false;
+
   for (int i = 0; i < pack->capacity; ++i) {
     trit_array_free(pack->models[i]);
   }

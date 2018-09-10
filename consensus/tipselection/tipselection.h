@@ -15,12 +15,12 @@
 #include "common/trinary/trit_array.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
+#include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
+#include "consensus/exit_probability_validator/exit_probability_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone/milestone.h"
 #include "consensus/model.h"
 #include "consensus/tangle/tangle.h"
-#include "consensus/walker/walker.h"
-#include "consensus/walker_validator/walker_validator.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,14 +32,16 @@ typedef struct tipselection_t {
   ledger_validator_t *lv;
   milestone_t *milestone;
   tangle_t *tangle;
-  walker_t *walker;
+  exit_prob_transaction_validator_t *wv;
+  ep_randomizer_t *ep_randomizer;
 } tipselection_t;
 
 extern retcode_t iota_consensus_tipselection_init(
-    tipselection_t *const ts, cw_rating_calculator_t *const cw_calc,
-    entry_point_selector_t *const ep, ledger_validator_t *const lv,
-    milestone_t *const milestone, tangle_t *const tangle,
-    walker_t *const walker, walker_validator_t *const wv);
+    tipselection_t *impl, const tangle_t *tangle, const ledger_validator_t *lv,
+    const exit_prob_transaction_validator_t *wv,
+    const cw_rating_calculator_t *cw_calc, const milestone_t *milestone,
+    const entry_point_selector_t *ep, const ep_randomizer_t *ep_randomizer,
+    double alpha);
 
 extern retcode_t iota_consensus_get_transactions_to_approve(
     tipselection_t *const ts, size_t const depth, trit_array_p const reference,

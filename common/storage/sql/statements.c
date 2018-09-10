@@ -11,6 +11,7 @@
 
 #include "common/model/milestone.h"
 #include "common/model/transaction.h"
+#include "common/storage/defs.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/sql/statements.h"
 #include "common/trinary/trit_array.h"
