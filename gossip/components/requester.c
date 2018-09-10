@@ -18,8 +18,7 @@
 retcode_t requester_init(requester_state_t *const state, node_t *const node) {
   if (state == NULL) {
     return RC_REQUESTER_COMPONENT_NULL_STATE;
-  }
-  if (node == NULL) {
+  } else if (node == NULL) {
     return RC_REQUESTER_COMPONENT_NULL_NODE;
   }
 
@@ -48,8 +47,7 @@ retcode_t requester_clear_request(requester_state_t *const state,
                                   trit_array_p const hash) {
   if (state == NULL) {
     return RC_REQUESTER_COMPONENT_NULL_STATE;
-  }
-  if (hash == NULL) {
+  } else if (hash == NULL) {
     return RC_REQUESTER_COMPONENT_NULL_HASH;
   }
 
@@ -76,8 +74,7 @@ retcode_t request_transaction(requester_state_t *const state,
 
   if (state == NULL) {
     return RC_REQUESTER_COMPONENT_NULL_STATE;
-  }
-  if (hash == NULL) {
+  } else if (hash == NULL) {
     return RC_REQUESTER_COMPONENT_NULL_HASH;
   }
 
@@ -112,8 +109,7 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
 
   if (state == NULL) {
     return RC_REQUESTER_COMPONENT_NULL_STATE;
-  }
-  if (hash == NULL) {
+  } else if (hash == NULL) {
     return RC_REQUESTER_COMPONENT_NULL_HASH;
   }
 
