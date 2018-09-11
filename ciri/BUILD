@@ -17,6 +17,7 @@ cc_library(
         ":node_shared",
         "//ciri/api",
         "//ciri/conf",
+        "//consensus/snapshot",
         "//consensus/tangle",
     ],
 )

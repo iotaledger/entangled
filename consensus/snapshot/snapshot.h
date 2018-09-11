@@ -42,8 +42,23 @@ typedef struct snapshot_t {
   state_map_t state;
 } snapshot_t;
 
-extern retcode_t iota_snapshot_init();
-extern retcode_t iota_snapshot_apply();
+/**
+ * Initializes a snapshot
+ *
+ * @param snapshot The snapshot
+ *
+ * @return a status code
+ */
+extern retcode_t iota_snapshot_init(snapshot_t *const snapshot);
+
+/**
+ * Destroys a snapshot
+ *
+ * @param snapshot The snapshot
+ *
+ * @return a status code
+ */
+extern retcode_t iota_snapshot_destroy(snapshot_t *const snapshot);
 
 #ifdef __cplusplus
 }
