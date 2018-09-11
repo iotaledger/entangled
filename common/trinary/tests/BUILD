@@ -44,6 +44,15 @@ cc_test(
 )
 
 cc_test(
+    name = "test_tryte_ascii",
+    srcs = ["test_tryte_ascii.c"],
+    deps = [
+        "//common/trinary:tryte_ascii",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_add",
     srcs = ["test_add.c"],
     deps = [
