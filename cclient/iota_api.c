@@ -480,6 +480,35 @@ iota_api_result_t iota_api_were_addresses_spent_from(
     were_addresses_spent_from_req_t* req,
     were_addresses_spent_from_res_t* res) {
   iota_api_result_t result = {0};
-  // TODO
+  char_buffer_t* res_buff = char_buffer_new();
+  char_buffer_t* req_buff = char_buffer_new();
+  if (req_buff == NULL || res_buff == NULL) {
+    result.error = RC_CCLIENT_OOM;
+    goto done;
+  }
+  result.error =
+      service->serializer.vtable.were_addresses_spent_from_serialize_request(
+          &service->serializer, req, req_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
+
+  result = iota_service_query(service, req_buff, res_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
+
+  result.error =
+      service->serializer.vtable.were_addresses_spent_from_deserialize_response(
+          &service->serializer, res_buff->data, res);
+
+done:
+  if (req_buff) {
+    char_buffer_free(req_buff);
+  }
+  if (res_buff) {
+    char_buffer_free(res_buff);
+  }
+
   return result;
 }
