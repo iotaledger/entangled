@@ -80,6 +80,17 @@ extern bool iota_snapshot_is_state_consistent(state_map_t *const state);
  */
 extern size_t iota_snapshot_get_index(snapshot_t *const snapshot);
 
+/**
+ * Gets the balance of a given address hash
+ *
+ * @param snapshot The snapshot
+ * @param hash The address hash
+ *
+ * @return the balance
+ */
+extern int64_t iota_snapshot_get_balance(snapshot_t *const snapshot,
+                                         flex_trit_t *const hash);
+
 #ifdef __cplusplus
 }
 #endif

@@ -148,8 +148,23 @@ bool iota_snapshot_is_state_consistent(state_map_t *const state) {
 
 size_t iota_snapshot_get_index(snapshot_t *const snapshot) {
   size_t index;
+
   rw_lock_handle_rdlock(&snapshot->rw_lock);
   index = snapshot->index;
   rw_lock_handle_unlock(&snapshot->rw_lock);
   return index;
+}
+
+int64_t iota_snapshot_get_balance(snapshot_t *const snapshot,
+                                  flex_trit_t *const hash) {
+  state_entry_t *entry;
+  int64_t balance = 0;
+
+  rw_lock_handle_rdlock(&snapshot->rw_lock);
+  HASH_FIND(hh, snapshot->state, &hash, FLEX_TRIT_SIZE_243, entry);
+  if (entry) {
+    balance = entry->value;
+  }
+  rw_lock_handle_unlock(&snapshot->rw_lock);
+  return balance;
 }
