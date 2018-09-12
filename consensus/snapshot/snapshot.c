@@ -6,6 +6,7 @@
  */
 
 #include "consensus/snapshot/snapshot.h"
+#include "common/model/transaction.h"
 #include "utils/logger_helper.h"
 
 #define SNAPSHOT_LOGGER_ID "consensus_snapshot"
@@ -44,9 +45,10 @@ static retcode_t iota_snapshot_initial_state(snapshot_t *const snapshot,
         ret = RC_SNAPSHOT_OOM;
         goto done;
       }
-      memcpy(entry->hash, line, 81);  // TODO
+      flex_trits_from_trytes(entry->hash, FLEX_TRIT_SIZE_243, (tryte_t *)line,
+                             NUM_TRYTES_HASH, NUM_TRYTES_HASH);
       entry->value = value;
-      HASH_ADD(hh, snapshot->state, hash, sizeof(entry->hash), entry);
+      HASH_ADD(hh, snapshot->state, hash, FLEX_TRIT_SIZE_243, entry);
       supply += value;
     } else if (value < 0) {
       ret = RC_SNAPSHOT_INCONSISTENT_SNAPSHOT;

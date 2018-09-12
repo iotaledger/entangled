@@ -30,8 +30,7 @@ extern "C" {
 #endif
 
 typedef struct state_entry_t {
-  // TODO trit array
-  tryte_t hash[81];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
   int64_t value;
   UT_hash_handle hh;
 } state_entry_t;
