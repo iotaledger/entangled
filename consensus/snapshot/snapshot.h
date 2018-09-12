@@ -72,6 +72,15 @@ extern retcode_t iota_snapshot_destroy(snapshot_t *const snapshot);
  */
 extern bool iota_snapshot_is_state_consistent(state_map_t *const state);
 
+/**
+ * Gets the index of a snapshot
+ *
+ * @param snapshot The snapshot
+ *
+ * @return the snapshot index
+ */
+extern size_t iota_snapshot_get_index(snapshot_t *const snapshot);
+
 #ifdef __cplusplus
 }
 #endif

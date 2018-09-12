@@ -143,3 +143,11 @@ bool iota_snapshot_is_state_consistent(state_map_t *const state) {
   }
   return true;
 }
+
+size_t iota_snapshot_get_index(snapshot_t *const snapshot) {
+  size_t index;
+  rw_lock_handle_rdlock(&snapshot->rw_lock);
+  index = snapshot->index;
+  rw_lock_handle_unlock(&snapshot->rw_lock);
+  return index;
+}
