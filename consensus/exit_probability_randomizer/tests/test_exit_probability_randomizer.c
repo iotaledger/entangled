@@ -307,6 +307,7 @@ void test_cw_topology_four_transactions_diamond(void) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
+  trit_array_free(curr_hash);
   TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
@@ -426,6 +427,14 @@ void test_cw_topology_two_inequal_tips(void) {
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
 
   /// Exit Probabilities - end
+
+  /// Exit Probabilities - end
+
+  hash_pack_free(&pack);
+  cw_calc_result_destroy(&out);
+  trit_array_free(ep);
+  TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
 int main(int argc, char *argv[]) {
