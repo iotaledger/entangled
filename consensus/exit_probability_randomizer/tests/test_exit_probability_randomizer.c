@@ -31,6 +31,9 @@ static char *test_db_path =
 static char *ciri_db_path =
     "consensus/exit_probability_randomizer/tests/ciri.db";
 
+static double low_alpha = 0;
+static double high_alpha = 1;
+
 typedef enum test_tangle_topology {
   ONLY_DIRECT_APPROVERS,
   BLOCKCHAIN,
@@ -308,6 +311,123 @@ void test_cw_topology_four_transactions_diamond(void) {
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
+void test_cw_topology_two_inequal_tips(void) {
+  cw_entry_t *curr_cw_entry = NULL;
+  cw_entry_t *tmp_cw_entry = NULL;
+
+  size_t num_txs = 4;
+
+  TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
+                                            DFS_FROM_ENTRY_POINT) == RC_OK);
+
+  bool exist;
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
+              RC_OK);
+
+  TEST_ASSERT(!exist);
+
+  struct _iota_transaction txs[num_txs];
+  txs[0] = TEST_TRANSACTION;
+  for (int i = 1; i < num_txs; i++) {
+    txs[i] = TEST_TRANSACTION;
+    // Different hash for each tx,
+    // we don't worry about it not being valid encoding
+    txs[i].hash[0] += (i + 1);
+  }
+
+  /// First two transactions approve entry point.
+  memcpy(txs[1].branch, txs[0].hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[2].branch, txs[0].hash, FLEX_TRIT_SIZE_243);
+  /// Third transaction approves second transaction so we now have two tips
+  /// (txs[3],txs[2])
+  memcpy(txs[3].branch, txs[1].hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[3].trunk, txs[1].hash, FLEX_TRIT_SIZE_243);
+
+  for (int i = 0; i < num_txs; i++) {
+    TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
+  }
+
+  trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
+  trit_array_set_trits(ep, txs[0].hash, NUM_TRITS_HASH);
+  iota_stor_pack_t pack;
+  hash_pack_init(&pack, num_txs);
+
+  cw_calc_result out;
+
+  trit_array_p curr_hash = trit_array_new(NUM_TRITS_HASH);
+  for (int i = 0; i < num_txs; i++) {
+    trit_array_set_trits(curr_hash, txs[i].hash, NUM_TRITS_HASH);
+    TEST_ASSERT(iota_tangle_transaction_load_hashes(
+                    &tangle, TRANSACTION_COL_HASH, curr_hash, &pack) == RC_OK);
+    TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
+  }
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
+                                            DFS_FROM_ENTRY_POINT) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), num_txs);
+
+  size_t total_weight = 0;
+
+  HASH_ITER(hh, out.cw_ratings, curr_cw_entry, tmp_cw_entry) {
+    total_weight += curr_cw_entry->cw;
+  }
+
+  TEST_ASSERT_EQUAL_INT(total_weight, 4 + 2 + 1 + 1);
+
+  /// Exit Probabilities - start
+
+  ep_randomizer_t ep_randomizer;
+  TEST_ASSERT(iota_consensus_ep_randomizer_init(
+                  &tangle, &ep_randomizer, low_alpha, EP_RANDOM_WALK) == RC_OK);
+
+  trit_array_t tip;
+  flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
+  tip.trits = tip_trits;
+
+  exit_prob_transaction_validator_t epv;
+  TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(
+                  &tangle, NULL, NULL, &epv) == RC_OK);
+  /// Select the tip
+
+  size_t selected_tip_count = 0;
+  int selections = 1000;
+  for (size_t i = 0; i < selections; ++i) {
+    TEST_ASSERT(iota_consensus_exit_probability_randomize(
+                    &ep_randomizer, &epv, &out, ep, &tip) == RC_OK);
+    if (memcmp(tip.trits, txs[num_txs - 1].hash, FLEX_TRIT_SIZE_243) == 0) {
+      selected_tip_count++;
+    }
+  }
+
+  // We can look on the previous trial as a sample from
+  // binomial distribution where `p` = 1/num_approvers, `n` = selections,
+  // so we get (mean = `np`, stdev = `np*(1-p)`):
+  double expected_mean = selections / 2;
+  double expected_stdev = sqrt(expected_mean * (1 - 1 / 2));
+  TEST_ASSERT(selected_tip_count < expected_mean + 3 * expected_stdev);
+  TEST_ASSERT(selected_tip_count > expected_mean - 3 * expected_stdev);
+
+  /// High alpha
+  ep_randomizer.alpha = high_alpha;
+  selected_tip_count = 0;
+
+  for (size_t i = 0; i < selections; ++i) {
+    TEST_ASSERT(iota_consensus_exit_probability_randomize(
+                    &ep_randomizer, &epv, &out, ep, &tip) == RC_OK);
+    if (memcmp(tip.trits, txs[num_txs - 1].hash, FLEX_TRIT_SIZE_243) == 0) {
+      selected_tip_count++;
+    }
+  }
+
+  TEST_ASSERT_EQUAL_INT(selected_tip_count, selections);
+
+  TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
+
+  /// Exit Probabilities - end
+}
+
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
 
@@ -331,6 +451,7 @@ int main(int argc, char *argv[]) {
   RUN_TEST(test_cw_topology_blockchain);
   RUN_TEST(test_cw_topology_only_direct_approvers);
   RUN_TEST(test_cw_topology_four_transactions_diamond);
+  RUN_TEST(test_cw_topology_two_inequal_tips);
 
   return UNITY_END();
 }
