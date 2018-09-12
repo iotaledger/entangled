@@ -124,3 +124,22 @@ retcode_t iota_snapshot_destroy(snapshot_t *const snapshot) {
   logger_helper_destroy(SNAPSHOT_LOGGER_ID);
   return RC_OK;
 }
+
+bool iota_snapshot_is_state_consistent(state_map_t *const state) {
+  state_entry_t *entry, *tmp;
+
+  if (state == NULL) {
+    return false;
+  }
+
+  HASH_ITER(hh, *state, entry, tmp) {
+    if (entry->value <= 0) {
+      if (entry->value < 0) {
+        return false;
+      }
+      HASH_DEL(*state, entry);
+      free(entry);
+    }
+  }
+  return true;
+}

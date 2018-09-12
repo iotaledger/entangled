@@ -63,6 +63,15 @@ extern retcode_t iota_snapshot_init(snapshot_t *const snapshot, bool testnet);
  */
 extern retcode_t iota_snapshot_destroy(snapshot_t *const snapshot);
 
+/**
+ * Checks if a given state is consistent
+ *
+ * @param state The state
+ *
+ * @return true if consistent, false otherwise
+ */
+extern bool iota_snapshot_is_state_consistent(state_map_t *const state);
+
 #ifdef __cplusplus
 }
 #endif
