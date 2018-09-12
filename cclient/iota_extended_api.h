@@ -32,7 +32,7 @@ typedef struct {
 
 typedef struct {
   int64_t balance;
-  int32_t keyIndex;
+  int32_t key_index;
   int security;
   hash_t address;
 } input_t;
