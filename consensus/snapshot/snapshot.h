@@ -63,6 +63,15 @@ extern retcode_t iota_snapshot_init(snapshot_t *const snapshot, bool testnet);
 extern retcode_t iota_snapshot_destroy(snapshot_t *const snapshot);
 
 /**
+ * Destroys a snapshot state
+ *
+ * @param state The state
+ *
+ * @return a status code
+ */
+extern retcode_t iota_snapshot_state_destroy(state_map_t *const state);
+
+/**
  * Checks if a given state is consistent
  *
  * @param state The state

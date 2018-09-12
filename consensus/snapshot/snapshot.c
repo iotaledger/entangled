@@ -112,18 +112,29 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, bool testnet) {
 }
 
 retcode_t iota_snapshot_destroy(snapshot_t *const snapshot) {
-  state_entry_t *entry, *tmp;
+  retcode_t ret = RC_OK;
 
   if (snapshot == NULL) {
     return RC_SNAPSHOT_NULL_SELF;
   }
 
-  HASH_ITER(hh, snapshot->state, entry, tmp) {
-    HASH_DEL(snapshot->state, entry);
-    free(entry);
-  }
+  ret = iota_snapshot_state_destroy(&snapshot->state);
   rw_lock_handle_destroy(&snapshot->rw_lock);
   logger_helper_destroy(SNAPSHOT_LOGGER_ID);
+  return ret;
+}
+
+retcode_t iota_snapshot_state_destroy(state_map_t *const state) {
+  state_entry_t *entry, *tmp;
+
+  if (state == NULL || *state == NULL) {
+    return RC_SNAPSHOT_NULL_STATE;
+  }
+
+  HASH_ITER(hh, *state, entry, tmp) {
+    HASH_DEL(*state, entry);
+    free(entry);
+  }
   return RC_OK;
 }
 
