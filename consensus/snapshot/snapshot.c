@@ -97,10 +97,7 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, bool testnet) {
   //   throw new RuntimeException("Snapshot signature failed.");
   // }
   // TODO snapshot file
-  if ((ret = iota_snapshot_initial_state(
-           snapshot,
-           "/Users/thibault/iota/entangled/ciri/resources/"
-           "snapshot_testnet.txt"))) {
+  if ((ret = iota_snapshot_initial_state(snapshot, "snapshot_testnet.txt"))) {
     log_critical(SNAPSHOT_LOGGER_ID,
                  "Initializing snapshot initial state failed\n");
     return ret;
