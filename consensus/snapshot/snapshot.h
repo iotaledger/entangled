@@ -14,13 +14,8 @@
 #include "uthash.h"
 
 #include "common/errors.h"
-#include "common/model/transaction.h"
 #include "common/trinary/trit_array.h"
 #include "utils/handles/rw_lock.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #define SNAPSHOT_PUBKEY                                                        \
   "TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD" \
@@ -28,9 +23,15 @@ extern "C" {
 #define SNAPSHOT_PUBKEY_DEPTH 6
 #define SNAPSHOT_INDEX 4
 #define SPENT_ADDRESSES_INDEX 5
+#define IOTA_SUPPLY 2779530283277761L
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct state_entry_t {
-  trit_array_p hash;
+  // TODO trit array
+  tryte_t hash[81];
   int64_t value;
   UT_hash_handle hh;
 } state_entry_t;
@@ -39,6 +40,7 @@ typedef state_entry_t *state_map_t;
 
 typedef struct snapshot_t {
   rw_lock_handle_t rw_lock;
+  size_t index;
   state_map_t state;
 } snapshot_t;
 
@@ -46,10 +48,11 @@ typedef struct snapshot_t {
  * Initializes a snapshot
  *
  * @param snapshot The snapshot
+ * @param testnet Whether the node runs on testnet or not
  *
  * @return a status code
  */
-extern retcode_t iota_snapshot_init(snapshot_t *const snapshot);
+extern retcode_t iota_snapshot_init(snapshot_t *const snapshot, bool testnet);
 
 /**
  * Destroys a snapshot

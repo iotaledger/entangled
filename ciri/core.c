@@ -25,7 +25,7 @@ retcode_t core_init(core_t* const core) {
   core->running = false;
 
   log_info(CORE_LOGGER_ID, "Initializing snapshot\n");
-  if (iota_snapshot_init(&core->snapshot)) {
+  if (iota_snapshot_init(&core->snapshot, core->config.testnet)) {
     log_critical(CORE_LOGGER_ID, "Initializing snapshot failed\n");
     return RC_CORE_FAILED_SNAPSHOT_INIT;
   }
