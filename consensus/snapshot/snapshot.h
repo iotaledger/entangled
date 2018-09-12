@@ -91,6 +91,19 @@ extern size_t iota_snapshot_get_index(snapshot_t *const snapshot);
 extern int64_t iota_snapshot_get_balance(snapshot_t *const snapshot,
                                          flex_trit_t *const hash);
 
+/**
+ * Gets a patch of the snapshot state and a diff
+ *
+ * @param snapshot The snapshot
+ * @param diff The diff
+ * @param patch The patch
+ *
+ * @return a status code
+ */
+extern retcode_t iota_snapshot_patched_diff(snapshot_t *const snapshot,
+                                            state_map_t *const diff,
+                                            state_map_t *const patch);
+
 #ifdef __cplusplus
 }
 #endif

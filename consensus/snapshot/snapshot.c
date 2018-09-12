@@ -168,3 +168,23 @@ int64_t iota_snapshot_get_balance(snapshot_t *const snapshot,
   rw_lock_handle_unlock(&snapshot->rw_lock);
   return balance;
 }
+
+retcode_t iota_snapshot_patched_diff(snapshot_t *const snapshot,
+                                     state_map_t *const diff,
+                                     state_map_t *const patch) {
+  state_entry_t *iter, *entry, *new, *tmp;
+
+  HASH_CLEAR(hh, *patch);
+  rw_lock_handle_rdlock(&snapshot->rw_lock);
+  HASH_ITER(hh, *diff, iter, tmp) {
+    HASH_FIND(hh, snapshot->state, &iter->hash, FLEX_TRIT_SIZE_243, entry);
+    if ((new = malloc(sizeof(state_entry_t))) == NULL) {
+      return RC_SNAPSHOT_OOM;
+    }
+    memcpy(new->hash, iter->hash, FLEX_TRIT_SIZE_243);
+    new->value = (entry ? entry->value : 0) + iter->value;
+    HASH_ADD(hh, *patch, hash, FLEX_TRIT_SIZE_243, new);
+  }
+  rw_lock_handle_unlock(&snapshot->rw_lock);
+  return RC_OK;
+}
