@@ -169,10 +169,14 @@ int64_t iota_snapshot_get_balance(snapshot_t *const snapshot,
   return balance;
 }
 
-retcode_t iota_snapshot_patched_diff(snapshot_t *const snapshot,
+retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
                                      state_map_t *const diff,
                                      state_map_t *const patch) {
   state_entry_t *iter, *entry, *new, *tmp;
+
+  if (snapshot == NULL) {
+    return RC_SNAPSHOT_NULL_SELF;
+  }
 
   HASH_CLEAR(hh, *patch);
   rw_lock_handle_rdlock(&snapshot->rw_lock);
@@ -185,6 +189,40 @@ retcode_t iota_snapshot_patched_diff(snapshot_t *const snapshot,
     new->value = (entry ? entry->value : 0) + iter->value;
     HASH_ADD(hh, *patch, hash, FLEX_TRIT_SIZE_243, new);
   }
+  rw_lock_handle_unlock(&snapshot->rw_lock);
+  return RC_OK;
+}
+
+retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
+                                    state_map_t *const patch, size_t index) {
+  state_entry_t *iter, *entry, *new, *tmp;
+  ssize_t sum = 0;
+
+  if (snapshot == NULL) {
+    return RC_SNAPSHOT_NULL_SELF;
+  }
+
+  HASH_ITER(hh, *patch, iter, tmp) { sum += iter->value; }
+  if (sum != 0) {
+    log_warning(SNAPSHOT_LOGGER_ID, "Inconsistent snapshot patch\n");
+    return RC_SNAPSHOT_INCONSISTENT_PATCH;
+  }
+
+  rw_lock_handle_wrlock(&snapshot->rw_lock);
+  HASH_ITER(hh, *patch, iter, tmp) {
+    HASH_FIND(hh, snapshot->state, &iter->hash, FLEX_TRIT_SIZE_243, entry);
+    if (entry) {
+      entry += iter->value;
+    } else {
+      if ((new = malloc(sizeof(state_entry_t))) == NULL) {
+        return RC_SNAPSHOT_OOM;
+      }
+      memcpy(new->hash, iter->hash, FLEX_TRIT_SIZE_243);
+      new->value = iter->value;
+      HASH_ADD(hh, snapshot->state, hash, FLEX_TRIT_SIZE_243, new);
+    }
+  }
+  snapshot->index = index;
   rw_lock_handle_unlock(&snapshot->rw_lock);
   return RC_OK;
 }
