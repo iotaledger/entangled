@@ -47,11 +47,16 @@ typedef struct snapshot_t {
  * Initializes a snapshot
  *
  * @param snapshot The snapshot
+ * @param snapshot_file The snapshot file path
+ * @param snapshot_sig_file The snapshot signature file path
  * @param testnet Whether the node runs on testnet or not
  *
  * @return a status code
  */
-extern retcode_t iota_snapshot_init(snapshot_t *const snapshot, bool testnet);
+extern retcode_t iota_snapshot_init(snapshot_t *const snapshot,
+                                    char const *const snapshot_file,
+                                    char const *const snapshot_sig_file,
+                                    bool testnet);
 
 /**
  * Destroys a snapshot

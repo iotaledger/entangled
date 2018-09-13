@@ -76,7 +76,10 @@ done:
  * Public functions
  */
 
-retcode_t iota_snapshot_init(snapshot_t *const snapshot, bool testnet) {
+retcode_t iota_snapshot_init(snapshot_t *const snapshot,
+                             char const *const snapshot_file,
+                             char const *const snapshot_sig_file,
+                             bool testnet) {
   retcode_t ret = RC_OK;
 
   if (snapshot == NULL) {
@@ -96,8 +99,7 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot, bool testnet) {
   //         SNAPSHOT_PUBKEY_DEPTH, SNAPSHOT_INDEX)) {
   //   throw new RuntimeException("Snapshot signature failed.");
   // }
-  // TODO snapshot file
-  if ((ret = iota_snapshot_initial_state(snapshot, "snapshot_testnet.txt"))) {
+  if ((ret = iota_snapshot_initial_state(snapshot, snapshot_file))) {
     log_critical(SNAPSHOT_LOGGER_ID,
                  "Initializing snapshot initial state failed\n");
     return ret;
