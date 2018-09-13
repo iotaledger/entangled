@@ -1,6 +1,15 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "bundle",
+    srcs = ["bundle.c"],
+    hdrs = ["bundle.h"],
+    deps = [
+        "//common/trinary:trits",
+    ],
+)
+
+cc_library(
     name = "milestone",
     hdrs = ["milestone.h"],
 )
