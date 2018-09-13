@@ -19,6 +19,5 @@
 #include "get_transactions_to_approve.h"
 #include "get_trytes.h"
 #include "remove_neighbors.h"
-#include "were_addresses_spent_from.h"
 
 #endif  // CCLIENT_RESPONSE_RESPONSES_H

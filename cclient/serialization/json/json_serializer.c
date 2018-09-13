@@ -980,19 +980,3 @@ retcode_t json_store_transactions_serialize_request(
   return ret;
   return ret;
 }
-
-retcode_t json_were_addresses_spent_from_serialize_request(
-    const serializer_t* const s, were_addresses_spent_from_req_t* obj,
-    char_buffer_t* out) {
-  retcode_t ret = RC_OK;
-  // TODO
-  return ret;
-}
-
-retcode_t json_were_addresses_spent_from_deserialize_response(
-    const serializer_t* const s, const char* const obj,
-    were_addresses_spent_from_res_t* out) {
-  retcode_t ret = RC_OK;
-  // TODO
-  return ret;
-}

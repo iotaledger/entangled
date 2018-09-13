@@ -115,13 +115,6 @@ retcode_t json_store_transactions_serialize_request(
     const serializer_t* const s, store_transactions_req_t* obj,
     char_buffer_t* out);
 
-retcode_t json_were_addresses_spent_from_serialize_request(
-    const serializer_t* const s, were_addresses_spent_from_req_t* obj,
-    char_buffer_t* out);
-retcode_t json_were_addresses_spent_from_deserialize_response(
-    const serializer_t* const s, const char* const obj,
-    were_addresses_spent_from_res_t* out);
-
 static serializer_vtable json_vtable = {
     .find_transactions_serialize_request =
         json_find_transactions_serialize_request,
@@ -162,10 +155,6 @@ static serializer_vtable json_vtable = {
         json_broadcast_transactions_serialize_request,
     .store_transactions_serialize_request =
         json_store_transactions_serialize_request,
-    .were_addresses_spent_from_serialize_request =
-        json_were_addresses_spent_from_serialize_request,
-    .were_addresses_spent_from_deserialize_response =
-        json_were_addresses_spent_from_deserialize_response,
 };
 
 #ifdef __cplusplus

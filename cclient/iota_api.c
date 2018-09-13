@@ -474,12 +474,3 @@ done:
 
   return result;
 }
-
-iota_api_result_t iota_api_were_addresses_spent_from(
-    const iota_http_service_t* const service,
-    were_addresses_spent_from_req_t* req,
-    were_addresses_spent_from_res_t* res) {
-  iota_api_result_t result = {0};
-  // TODO
-  return result;
-}
