@@ -8,7 +8,7 @@
 #ifndef __COMMON_MODEL_BUNDLE_H__
 #define __COMMON_MODEL_BUNDLE_H__
 
-#include "common/trinary/trits.h"
+#include "common/trinary/flex_trit.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,6 +16,8 @@ extern "C" {
 
 void normalized_bundle(trit_t const *const bundle,
                        trit_t *const normalized_bundle);
+void flex_normalized_bundle(flex_trit_t const *const bundle,
+                            flex_trit_t *const normalized_bundle);
 
 #ifdef __cplusplus
 }

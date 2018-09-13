@@ -5,7 +5,7 @@ cc_library(
     srcs = ["bundle.c"],
     hdrs = ["bundle.h"],
     deps = [
-        "//common/trinary:trits",
+        "//common/trinary:flex_trit",
     ],
 )
 
