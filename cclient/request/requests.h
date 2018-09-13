@@ -18,6 +18,5 @@
 #include "get_trytes.h"
 #include "remove_neighbors.h"
 #include "store_transactions.h"
-#include "were_addresses_spent_from.h"
 
 #endif  // CCLIENT_REQUEST_REQUESTS_H

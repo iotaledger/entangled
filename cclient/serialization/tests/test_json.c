@@ -557,14 +557,6 @@ void test_serialize_store_transactions(void) {
   store_transactions_req_free(req);
 }
 
-void test_serialize_were_addresses_spent_from(void) {
-  // TODO
-}
-
-void test_deserialize_were_addresses_spent_from(void) {
-  // TODO
-}
-
 int main(void) {
   UNITY_BEGIN();
 
@@ -610,7 +602,5 @@ int main(void) {
 
   RUN_TEST(test_serialize_store_transactions);
 
-  RUN_TEST(test_serialize_were_addresses_spent_from);
-  RUN_TEST(test_deserialize_were_addresses_spent_from);
   return UNITY_END();
 }
