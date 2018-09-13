@@ -26,14 +26,24 @@ static tryte_t trytes[] =
 void test_ascii_to_trytes(void) {
   size_t size = strlen(ascii) * 2;
   tryte_t buffer[size];
-  TEST_ASSERT_TRUE(ascii_to_trytes(ascii, buffer));
+
+  ascii_to_trytes(ascii, buffer);
   TEST_ASSERT_EQUAL_MEMORY(trytes, buffer, size);
+}
+
+void test_trytes_to_ascii(void) {
+  size_t size = strlen((char *)trytes) / 2;
+  char buffer[size];
+
+  trytes_to_ascii(trytes, buffer);
+  TEST_ASSERT_EQUAL_MEMORY(ascii, buffer, size);
 }
 
 int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_ascii_to_trytes);
+  RUN_TEST(test_trytes_to_ascii);
 
   return UNITY_END();
 }
