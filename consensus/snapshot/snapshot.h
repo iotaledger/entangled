@@ -95,10 +95,11 @@ extern size_t iota_snapshot_get_index(snapshot_t *const snapshot);
  * @param snapshot The snapshot
  * @param hash The address hash
  *
- * @return the balance
+ * @return a status code
  */
-extern int64_t iota_snapshot_get_balance(snapshot_t *const snapshot,
-                                         flex_trit_t *const hash);
+extern retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
+                                           flex_trit_t *const hash,
+                                           int64_t *balance);
 
 /**
  * Creates a patch of a snapshot state and a diff

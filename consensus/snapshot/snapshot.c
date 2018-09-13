@@ -163,18 +163,28 @@ size_t iota_snapshot_get_index(snapshot_t *const snapshot) {
   return index;
 }
 
-int64_t iota_snapshot_get_balance(snapshot_t *const snapshot,
-                                  flex_trit_t *const hash) {
+retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
+                                    flex_trit_t *const hash, int64_t *balance) {
+  retcode_t ret = RC_OK;
   state_entry_t *entry;
-  int64_t balance = 0;
+
+  if (snapshot == NULL) {
+    return RC_SNAPSHOT_NULL_SELF;
+  } else if (hash == NULL) {
+    return RC_SNAPSHOT_NULL_HASH;
+  } else if (balance == NULL) {
+    return RC_SNAPSHOT_NULL_BALANCE;
+  }
 
   rw_lock_handle_rdlock(&snapshot->rw_lock);
   HASH_FIND(hh, snapshot->state, &hash, FLEX_TRIT_SIZE_243, entry);
-  if (entry) {
-    balance = entry->value;
+  if (entry == NULL) {
+    ret = RC_SNAPSHOT_BALANCE_NOT_FOUND;
+  } else {
+    *balance = entry->value;
   }
   rw_lock_handle_unlock(&snapshot->rw_lock);
-  return balance;
+  return ret;
 }
 
 retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
