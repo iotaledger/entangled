@@ -115,6 +115,13 @@ retcode_t json_store_transactions_serialize_request(
     const serializer_t* const s, store_transactions_req_t* obj,
     char_buffer_t* out);
 
+retcode_t json_check_consistency_serialize_request(const serializer_t* const s,
+                                                   check_consistency_req_t* obj,
+                                                   char_buffer_t* out);
+retcode_t json_check_consistency_deserialize_response(
+    const serializer_t* const s, const char* const obj,
+    check_consistency_res_t* out);
+
 static serializer_vtable json_vtable = {
     .find_transactions_serialize_request =
         json_find_transactions_serialize_request,
@@ -155,6 +162,10 @@ static serializer_vtable json_vtable = {
         json_broadcast_transactions_serialize_request,
     .store_transactions_serialize_request =
         json_store_transactions_serialize_request,
+    .check_consistency_serialize_request =
+        json_check_consistency_serialize_request,
+    .check_consistency_deserialize_response =
+        json_check_consistency_deserialize_response,
 };
 
 #ifdef __cplusplus

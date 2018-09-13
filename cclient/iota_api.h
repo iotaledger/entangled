@@ -253,6 +253,26 @@ iota_api_result_t iota_api_broadcast_transactions(
 iota_api_result_t iota_api_store_transactions(
     const iota_http_service_t* const service, store_transactions_req_t* req);
 
+/**
+ * Checks if a transaction is _consistent_ or a set of transactions are
+ * _co-consistent_.
+ * As long as a transaction is consistent it might be accepted
+ * by the network. In case transaction is inconsistent, it will not be accepted,
+ * and a reattachment is required by calling iota_api_replay_bundle().
+ *
+ * https://iota.readme.io/reference#checkconsistency
+ *
+ * @param service IRI node end point.
+ * @param req - the request containing tail transaction hash (hash of
+ * transaction with `currentIndex=0`), or array of tail transaction hashes.
+ * @param res - the response containing consistency state of given transaction
+ * or co-consistency of given transactions.
+ *
+ * @return The error value.
+ */
+iota_api_result_t iota_api_check_consistency(
+    const iota_http_service_t* const service, check_consistency_req_t* req,
+    check_consistency_res_t* res);
 #ifdef __cplusplus
 }
 #endif
