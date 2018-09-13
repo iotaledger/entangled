@@ -49,6 +49,16 @@ void test_snapshot_init_file_invalid_supply() {
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 
+void test_snapshot_init_check_consistency() {
+  TEST_ASSERT(iota_snapshot_init(
+                  &snapshot, "consensus/snapshot/tests/snapshot.txt",
+                  "consensus/snapshot/tests/snapshot.sig", true) == RC_OK);
+  TEST_ASSERT(iota_snapshot_is_state_consistent(&snapshot.state) == true);
+  snapshot.state->value *= -1;
+  TEST_ASSERT(iota_snapshot_is_state_consistent(&snapshot.state) == false);
+  TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
+}
+
 int main(int argc, char* argv[]) {
   UNITY_BEGIN();
 
@@ -56,6 +66,7 @@ int main(int argc, char* argv[]) {
   RUN_TEST(test_snapshot_init_file_badly_formatted);
   RUN_TEST(test_snapshot_init_file_inconsistent);
   RUN_TEST(test_snapshot_init_file_invalid_supply);
+  RUN_TEST(test_snapshot_init_check_consistency);
 
   return UNITY_END();
 }
