@@ -126,8 +126,10 @@ retcode_t iota_snapshot_destroy(snapshot_t *const snapshot) {
 retcode_t iota_snapshot_state_destroy(state_map_t *const state) {
   state_entry_t *entry, *tmp;
 
-  if (state == NULL || *state == NULL) {
+  if (state == NULL) {
     return RC_SNAPSHOT_NULL_STATE;
+  } else if (*state == NULL) {
+    return RC_OK;
   }
 
   HASH_ITER(hh, *state, entry, tmp) {
