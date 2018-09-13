@@ -8,6 +8,15 @@ cc_library(
 )
 
 cc_test(
+    name = "test_bundle",
+    srcs = ["test_bundle.c"],
+    deps = [
+        "//common/model:bundle",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_transaction",
     srcs = ["test_transaction.c"],
     deps = [
