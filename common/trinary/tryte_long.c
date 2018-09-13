@@ -56,7 +56,7 @@ size_t long_to_trytes(int64_t const value, tryte_t *const trytes) {
     // Precalculate the current power order (27^i)
     int64_t radix_pow = pow(TRYTE_SPACE, i);
     // Find out the highest order tryte for this value
-    int64_t tryte = (v_abs + radix_pow / 2) / radix_pow;
+    int64_t tryte = (v_abs + radix_pow / 2ULL) / radix_pow;
     // Store the remainder of value minus the value of the highest order tryte
     v_abs -= radix_pow * tryte;
     // If the original value was negative, the tryte value should also be
