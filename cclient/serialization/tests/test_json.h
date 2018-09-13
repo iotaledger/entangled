@@ -260,6 +260,10 @@ extern "C" {
   "IROUICDOXKSYZTDPEDKOQENTJOWJONDEWROCEJIEWFWLUAACVSJFTMCHHXJBJRKAAPUDXXVX" \
   "FWP9X9999"
 
+#define CONSISTENCY_INFO                                                  \
+  "tails are not consistent (would lead to inconsistent ledger state or " \
+  "below max depth)"
+
 #ifdef __cplusplus
 }
 #endif
