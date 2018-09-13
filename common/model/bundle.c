@@ -7,7 +7,8 @@
 
 #include "common/model/bundle.h"
 
-#define HASH_LENGTH 243
+#define TRYTE_HASH_LENGTH 81
+#define TRIT_HASH_LENGTH 243
 #define MAX_TRYTE_VALUE 13
 #define MIN_TRYTE_VALUE -13
 #define TRYTE_WIDTH 3
@@ -15,7 +16,7 @@
 #define NORMALIZED_FRAGMENT_LENGTH 27
 
 void normalized_bundle(trit_t const *const bundle_hash,
-                       trit_t *const normalized_bundle_hash) {
+                       byte_t *const normalized_bundle_hash) {
   for (int i = 0; i < NUMBER_OF_SECURITY_LEVELS; i++) {
     int sum = 0;
     for (int j = i * NORMALIZED_FRAGMENT_LENGTH;
@@ -50,13 +51,10 @@ void normalized_bundle(trit_t const *const bundle_hash,
 }
 
 void flex_normalized_bundle(flex_trit_t const *const bundle_hash,
-                            flex_trit_t *const normalized_bundle_hash) {
-  trit_t bundle_hash_trits[HASH_LENGTH];
-  trit_t normalized_bundle_hash_trits[HASH_LENGTH];
+                            byte_t *const normalized_bundle_hash) {
+  trit_t bundle_hash_trits[TRIT_HASH_LENGTH];
 
-  flex_trits_to_trits(bundle_hash_trits, HASH_LENGTH, bundle_hash, HASH_LENGTH,
-                      HASH_LENGTH);
-  normalized_bundle(bundle_hash_trits, normalized_bundle_hash_trits);
-  flex_trits_from_trits(normalized_bundle_hash, HASH_LENGTH,
-                        normalized_bundle_hash_trits, HASH_LENGTH, HASH_LENGTH);
+  flex_trits_to_trits(bundle_hash_trits, TRIT_HASH_LENGTH, bundle_hash,
+                      TRIT_HASH_LENGTH, TRIT_HASH_LENGTH);
+  normalized_bundle(bundle_hash_trits, normalized_bundle_hash);
 }

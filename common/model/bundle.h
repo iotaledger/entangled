@@ -14,10 +14,11 @@
 extern "C" {
 #endif
 
-void normalized_bundle(trit_t const *const bundle,
-                       trit_t *const normalized_bundle);
-void flex_normalized_bundle(flex_trit_t const *const bundle,
-                            flex_trit_t *const normalized_bundle);
+void normalized_bundle(trit_t const *const bundle_hash,
+                       byte_t *const normalized_bundle_hash);
+
+void flex_normalized_bundle(flex_trit_t const *const bundle_hash,
+                            byte_t *const normalized_bundle_hash);
 
 #ifdef __cplusplus
 }
