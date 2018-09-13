@@ -45,7 +45,7 @@ static retcode_t iota_snapshot_initial_state(snapshot_t *const snapshot,
         ret = RC_SNAPSHOT_OOM;
         goto done;
       }
-      flex_trits_from_trytes(entry->hash, FLEX_TRIT_SIZE_243, (tryte_t *)line,
+      flex_trits_from_trytes(entry->hash, NUM_TRITS_HASH, (tryte_t *)line,
                              NUM_TRYTES_HASH, NUM_TRYTES_HASH);
       entry->value = value;
       HASH_ADD(hh, snapshot->state, hash, FLEX_TRIT_SIZE_243, entry);
@@ -181,7 +181,7 @@ retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
   }
 
   rw_lock_handle_rdlock(&snapshot->rw_lock);
-  HASH_FIND(hh, snapshot->state, &hash, FLEX_TRIT_SIZE_243, entry);
+  HASH_FIND(hh, snapshot->state, hash, FLEX_TRIT_SIZE_243, entry);
   if (entry == NULL) {
     ret = RC_SNAPSHOT_BALANCE_NOT_FOUND;
   } else {

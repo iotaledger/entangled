@@ -7,6 +7,7 @@
 
 #include <unity/unity.h>
 
+#include "common/model/transaction.h"
 #include "consensus/snapshot/snapshot.h"
 
 #define SNAPSHOT_FILE "consensus/snapshot/tests/snapshot.txt"
@@ -49,7 +50,7 @@ void test_snapshot_init_file_invalid_supply() {
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 
-void test_snapshot_init_check_consistency() {
+void test_snapshot_check_consistency() {
   TEST_ASSERT(iota_snapshot_init(
                   &snapshot, "consensus/snapshot/tests/snapshot.txt",
                   "consensus/snapshot/tests/snapshot.sig", true) == RC_OK);
@@ -59,14 +60,37 @@ void test_snapshot_init_check_consistency() {
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 
-int main(int argc, char* argv[]) {
+void test_snapshot_get_balance() {
+  flex_trit_t address[FLEX_TRIT_SIZE_243];
+  int64_t balance;
+
+  TEST_ASSERT(iota_snapshot_init(
+                  &snapshot, "consensus/snapshot/tests/snapshot.txt",
+                  "consensus/snapshot/tests/snapshot.sig", true) == RC_OK);
+  flex_trits_from_trytes(address, NUM_TRITS_HASH,
+                         (tryte_t*)"J9999999999999999999999999999999999999999999999999999"
+                         "9999999999999999999999999999",
+                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  TEST_ASSERT(iota_snapshot_get_balance(&snapshot, address, &balance) == RC_OK);
+  flex_trits_from_trytes(address, NUM_TRITS_HASH,
+                         (tryte_t*)"Z9999999999999999999999999999999999999999999999999999"
+                         "9999999999999999999999999999",
+                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  TEST_ASSERT(iota_snapshot_get_balance(&snapshot, address, &balance) ==
+              RC_SNAPSHOT_BALANCE_NOT_FOUND);
+  TEST_ASSERT_EQUAL_INT(balance, 3000000);
+  TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
+}
+
+int main(int argc, char *argv[]) {
   UNITY_BEGIN();
 
   RUN_TEST(test_snapshot_init_file_not_found);
   RUN_TEST(test_snapshot_init_file_badly_formatted);
   RUN_TEST(test_snapshot_init_file_inconsistent);
   RUN_TEST(test_snapshot_init_file_invalid_supply);
-  RUN_TEST(test_snapshot_init_check_consistency);
+  RUN_TEST(test_snapshot_check_consistency);
+  RUN_TEST(test_snapshot_get_balance);
 
   return UNITY_END();
 }

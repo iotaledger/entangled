@@ -9,6 +9,7 @@ cc_test(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//common/model:transaction",
         "//consensus/snapshot",
         "@unity",
     ],
