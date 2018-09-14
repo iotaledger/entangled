@@ -20,6 +20,8 @@ static retcode_t node_neighbors_init(node_t* const node) {
 
   if (node == NULL) {
     return RC_NODE_NULL_NODE;
+  } else if (node->core->config.neighbors == NULL) {
+    return RC_OK;
   }
 
   log_debug(NODE_LOGGER_ID, "Initializing neighbors list\n");

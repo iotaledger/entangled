@@ -13,6 +13,9 @@
 // FIXME: Get cIRI database path from configuration variables
 // https://github.com/iotaledger/entangled/issues/132
 #define CIRI_DB_PATH "ciri/ciri.db"
+// FIXME: waiting for a stable location of these files
+#define CIRI_SNAPSHOT_FILE "ciri/snapshotTestnet.txt"
+#define CIRI_SNAPSHOT_SIG_FILE "ciri/snapshotTestnet.sig"
 
 #define CORE_LOGGER_ID "core"
 
@@ -23,6 +26,13 @@ retcode_t core_init(core_t* const core) {
 
   logger_helper_init(CORE_LOGGER_ID, LOGGER_DEBUG, true);
   core->running = false;
+
+  log_info(CORE_LOGGER_ID, "Initializing snapshot\n");
+  if (iota_snapshot_init(&core->snapshot, CIRI_SNAPSHOT_FILE,
+                         CIRI_SNAPSHOT_SIG_FILE, core->config.testnet)) {
+    log_critical(CORE_LOGGER_ID, "Initializing snapshot failed\n");
+    return RC_CORE_FAILED_SNAPSHOT_INIT;
+  }
 
   log_info(CORE_LOGGER_ID, "Initializing tangle\n");
   core->db_conf.db_path = CIRI_DB_PATH;
@@ -125,6 +135,12 @@ retcode_t core_destroy(core_t* const core) {
   if (iota_tangle_destroy(&core->tangle)) {
     log_error(CORE_LOGGER_ID, "Destroying tangle failed\n");
     ret = RC_CORE_FAILED_DATABASE_DESTROY;
+  }
+
+  log_info(CORE_LOGGER_ID, "Destroying snapshot\n");
+  if (iota_snapshot_destroy(&core->snapshot)) {
+    log_error(CORE_LOGGER_ID, "Destroying snapshot failed\n");
+    ret = RC_CORE_FAILED_SNAPSHOT_DESTROY;
   }
 
   logger_helper_destroy(CORE_LOGGER_ID);

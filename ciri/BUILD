@@ -1,9 +1,19 @@
 package(default_visibility = ["//visibility:public"])
 
+genrule(
+    name = "snapshot_testnet",
+    outs = ["snapshotTestnet.txt"],
+    cmd = "wget -q https://raw.githubusercontent.com/iotaledger/iri/dev/src/main/resources/$$(basename $@) -O $@",
+)
+
 cc_binary(
     name = "ciri",
     srcs = ["main.c"],
     copts = ["-DLOGGER_ENABLE"],
+    data = [
+        "ciri.db",
+        ":snapshot_testnet",
+    ],
     deps = [
         ":core",
         "//utils/containers/lists:concurrent_list_neighbor",
@@ -17,6 +27,7 @@ cc_library(
         ":node_shared",
         "//ciri/api",
         "//ciri/conf",
+        "//consensus/snapshot",
         "//consensus/tangle",
     ],
 )
