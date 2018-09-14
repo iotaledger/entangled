@@ -16,6 +16,19 @@ cc_library(
 )
 
 cc_library(
+    name = "signed_files",
+    srcs = ["signed_files.c"],
+    hdrs = ["signed_files.h"],
+    deps = [
+        "//common:errors",
+        "//common/curl-p:trit",
+        "//common/kerl",
+        "//common/model:bundle",
+        "//common/trinary:tryte_ascii",
+    ],
+)
+
+cc_library(
     name = "logger_helper",
     srcs = ["logger_helper.c"],
     hdrs = ["logger_helper.h"],
