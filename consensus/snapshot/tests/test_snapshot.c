@@ -82,6 +82,41 @@ void test_snapshot_get_balance() {
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 
+void test_snapshot_create_and_apply_patch() {
+  state_map_t diff = NULL;
+  state_map_t patch = NULL;
+  int64_t balance;
+
+  TEST_ASSERT(iota_snapshot_init(
+                  &snapshot, "consensus/snapshot/tests/snapshot.txt",
+                  "consensus/snapshot/tests/snapshot.sig", true) == RC_OK);
+  state_entry_t *new1 = malloc(sizeof(state_entry_t));
+  flex_trits_from_trytes(new1->hash, NUM_TRITS_HASH,
+                         (tryte_t*)"O99999999999999999999999999999999999999999999999999999999999999999999999999999999",
+                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  new1->value = -50;
+  HASH_ADD(hh, diff, hash, FLEX_TRIT_SIZE_243, new1);
+  TEST_ASSERT(iota_snapshot_create_patch(&snapshot, &diff, &patch) == RC_OK);
+  TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &diff, 1) ==
+              RC_SNAPSHOT_INCONSISTENT_PATCH);
+  state_entry_t *new2 = malloc(sizeof(state_entry_t));
+  flex_trits_from_trytes(new2->hash, NUM_TRITS_HASH,
+                                     (tryte_t*)"Q99999999999999999999999999999999999999999999999999999999999999999999999999999999",
+                                     NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  new2->value = 50;
+  HASH_ADD(hh, diff, hash, FLEX_TRIT_SIZE_243, new2);
+  TEST_ASSERT(iota_snapshot_create_patch(&snapshot, &diff, &patch) == RC_OK);
+  TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &diff, 2) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(iota_snapshot_get_index(&snapshot), 2);
+  TEST_ASSERT(iota_snapshot_get_balance(&snapshot, new1->hash, &balance) ==
+              RC_OK);
+  TEST_ASSERT_EQUAL_INT(balance, 10);
+  TEST_ASSERT(iota_snapshot_get_balance(&snapshot, new2->hash, &balance) ==
+              RC_OK);
+  TEST_ASSERT_EQUAL_INT(balance, 50);
+  TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
+}
+
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
 
@@ -91,6 +126,7 @@ int main(int argc, char *argv[]) {
   RUN_TEST(test_snapshot_init_file_invalid_supply);
   RUN_TEST(test_snapshot_check_consistency);
   RUN_TEST(test_snapshot_get_balance);
+  RUN_TEST(test_snapshot_create_and_apply_patch);
 
   return UNITY_END();
 }

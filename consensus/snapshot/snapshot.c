@@ -203,7 +203,7 @@ retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
   HASH_CLEAR(hh, *patch);
   rw_lock_handle_rdlock(&snapshot->rw_lock);
   HASH_ITER(hh, *diff, iter, tmp) {
-    HASH_FIND(hh, snapshot->state, &iter->hash, FLEX_TRIT_SIZE_243, entry);
+    HASH_FIND(hh, snapshot->state, iter->hash, FLEX_TRIT_SIZE_243, entry);
     if ((new = malloc(sizeof(state_entry_t))) == NULL) {
       return RC_SNAPSHOT_OOM;
     }
@@ -232,9 +232,9 @@ retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
 
   rw_lock_handle_wrlock(&snapshot->rw_lock);
   HASH_ITER(hh, *patch, iter, tmp) {
-    HASH_FIND(hh, snapshot->state, &iter->hash, FLEX_TRIT_SIZE_243, entry);
+    HASH_FIND(hh, snapshot->state, iter->hash, FLEX_TRIT_SIZE_243, entry);
     if (entry) {
-      entry += iter->value;
+      entry->value += iter->value;
     } else {
       if ((new = malloc(sizeof(state_entry_t))) == NULL) {
         return RC_SNAPSHOT_OOM;
