@@ -24,6 +24,8 @@ retcode_t is_file_signature_valid(char const *const filename,
                                   size_t index, bool *const valid);
 
 
+retcode_t digest_file(char const *const filename, trit_t *const trits);
+
 #ifdef __cplusplus
 }
 #endif
