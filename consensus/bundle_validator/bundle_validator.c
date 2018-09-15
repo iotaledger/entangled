@@ -75,11 +75,11 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
       flex_trit_t bundle_flex_trits[FLEX_TRIT_SIZE_243];
       trit_t bundle_trits[NUM_TRITS_HASH];
       trit_t normalized_bundle_trits[NUM_TRITS_HASH];
-      flex_trit_t normalized_bundle_bytes[FLEX_TRIT_SIZE_243];
+      byte_t normalized_bundle_bytes[NUM_TRYTES_HASH];
 
       *is_valid = true;
       calculate_bundle_hash(bundle, bundle_trits);
-      flex_trits_from_trits(bundle_flex_trits, FLEX_TRIT_SIZE_243, bundle_trits,
+      flex_trits_from_trits(bundle_flex_trits, NUM_TRITS_HASH, bundle_trits,
                             NUM_TRITS_HASH, NUM_TRITS_HASH);
       if (memcmp(bundle_hash, bundle_flex_trits, FLEX_TRIT_SIZE_243) != 0) {
         log_error(BUNDLE_VALIDATOR_ID,
@@ -183,7 +183,7 @@ retcode_t validate_signature(bundle_transactions_t* bundle,
       next_offset = (offset + ISS_FRAGMENTS * RADIX - 1) % NUM_TRITS_HASH + 1;
       flex_trits_to_trits(key, NUM_TRITS_SIGNATURE,
                           curr_inp_tx->signature_or_message,
-                          FLEX_TRIT_SIZE_6561, NUM_TRITS_SIGNATURE);
+                          NUM_TRITS_SIGNATURE, NUM_TRITS_SIGNATURE);
 
       iss_kerl_sig_digest(digested_sig_trits,
                           &normalized_bundle[offset % NUM_TRITS_HASH], key,
@@ -198,10 +198,10 @@ retcode_t validate_signature(bundle_transactions_t* bundle,
 
     flex_trit_t digest[FLEX_TRIT_SIZE_243];
 
-    flex_trits_from_trits(digest, FLEX_TRIT_SIZE_243, digested_address,
+    flex_trits_from_trits(digest, NUM_TRITS_HASH, digested_address,
                           NUM_TRITS_HASH, NUM_TRITS_HASH);
     flex_trits_to_trits(tx_address_trits, NUM_TRITS_ADDRESS, curr_tx->address,
-                        FLEX_TRIT_SIZE_243, NUM_TRITS_ADDRESS);
+                        NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
     curr_tx = curr_inp_tx;
     if (memcmp(tx_address_trits, digested_address, NUM_TRITS_ADDRESS) != 0) {
       *is_valid = false;

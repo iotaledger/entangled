@@ -22,9 +22,10 @@
 UT_icd bundle_transactions_icd = {sizeof(struct _iota_transaction), 0, 0, 0};
 UT_icd bundle_hashes_icd = {FLEX_TRIT_SIZE_243, 0, 0, 0};
 
-void bundle_transactions_new(UT_array **const bundle) {
+void bundle_transactions_new(bundle_transactions_t **const bundle) {
   utarray_new(*bundle, &bundle_transactions_icd);
 }
+
 void bundle_transactions_free(bundle_transactions_t **const bundle) {
   utarray_clear(*bundle);
   utarray_free(*bundle);
@@ -46,11 +47,11 @@ void calculate_bundle_hash(bundle_transactions_t *bundle, trit_t *out) {
     memset(essence_trits, 0, NUM_TRITS_ESSENCE);
 
     flex_trits_to_trits(essence_trits, NUM_TRITS_ADDRESS, curr_tx->address,
-                        FLEX_TRIT_SIZE_243, NUM_TRITS_ADDRESS);
+                        NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
     long_to_trits(curr_tx->value, &essence_trits[NUM_TRITS_ADDRESS]);
     flex_trits_to_trits(&essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE],
-                        NUM_TRITS_TAG, curr_tx->obsolete_tag, FLEX_TRIT_SIZE_81,
-                        NUM_TRITS_TAG);
+                        NUM_TRITS_OBSOLETE_TAG, curr_tx->obsolete_tag,
+                        NUM_TRITS_OBSOLETE_TAG, NUM_TRITS_OBSOLETE_TAG);
     long_to_trits(
         curr_tx->timestamp,
         &essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE + NUM_TRITS_TAG]);

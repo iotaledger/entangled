@@ -124,7 +124,7 @@ size_t flex_trits_from_trits(flex_trit_t *const to_flex_trits,
                              size_t const to_len, trit_t const *const trits,
                              size_t const len, size_t const num_trits) {
   // Bounds checking
-  if (num_trits > len) {
+  if (num_trits > len || num_trits > to_len) {
     return 0;
   }
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
