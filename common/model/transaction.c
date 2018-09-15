@@ -28,7 +28,6 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
   flex_trit_t partial[FLEX_TRIT_SIZE_81];
   trit_t buffer[81];
   size_t offset = 0;
-  memset(transaction, 0, sizeof(struct _iota_transaction));
   flex_trits_slice(transaction->signature_or_message, NUM_TRITS_SIGNATURE,
                    trits, NUM_TRITS_SERIALIZED_TRANSACTION, offset,
                    NUM_TRITS_SIGNATURE);

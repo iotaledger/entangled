@@ -15,6 +15,7 @@
 
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
+#include "consensus/defs.h"
 #include "utils/handles/rw_lock.h"
 
 #define SNAPSHOT_PUBKEY                                                        \
@@ -23,7 +24,6 @@
 #define SNAPSHOT_PUBKEY_DEPTH 6
 #define SNAPSHOT_INDEX 4
 #define SPENT_ADDRESSES_INDEX 5
-#define IOTA_SUPPLY 2779530283277761L
 
 #ifdef __cplusplus
 extern "C" {

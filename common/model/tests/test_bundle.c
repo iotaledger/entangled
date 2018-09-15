@@ -29,7 +29,7 @@ void test_normalized_bundle(void) {
   tryte_t normalized_bundle_bytes[length];
 
   trytes_to_trits(trytes, bundle_trits, length);
-  normalized_bundle(bundle_trits, normalized_bundle_bytes);
+  normalize_bundle(bundle_trits, normalized_bundle_bytes);
   TEST_ASSERT_EQUAL_MEMORY(bytes, normalized_bundle_bytes, length);
 }
 
@@ -40,7 +40,7 @@ void test_flex_normalized_bundle(void) {
 
   flex_trits_from_trytes(bundle_flex_trits, HASH_LENGTH, trytes, length,
                          length);
-  flex_normalized_bundle(bundle_flex_trits, normalized_bundle_bytes);
+  flex_normalize_bundle(bundle_flex_trits, normalized_bundle_bytes);
   TEST_ASSERT_EQUAL_MEMORY(bytes, normalized_bundle_bytes, length);
 }
 

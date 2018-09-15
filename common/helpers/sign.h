@@ -14,7 +14,9 @@ extern "C" {
 
 #include <stddef.h>
 #include "common/trinary/flex_trit.h"
+#include "common/sign/v1/iss_kerl.h"
 #include "utils/export.h"
+
 
 IOTA_EXPORT char* iota_sign_address_gen(char const* const seed,
                                         size_t const index,

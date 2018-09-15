@@ -11,11 +11,6 @@
 #include "common/trinary/trit_tryte.h"
 #include "common/trinary/tryte_long.h"
 
-#define TRITS_PER_ESSENCE 486
-#define TRITS_PER_BUNDLE_HASH 243
-#define TRYTES_PER_ESSENCE 162
-#define TRYTES_PER_BUNDLE_HASH 81
-
 /***********************************************************************************************************
  * Transfer Input data structure
  ***********************************************************************************************************/
@@ -427,8 +422,8 @@ int transfer_ctx_count(transfer_ctx_t transfer_ctx) {
 int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl *kerl,
                       transfer_t *transfers, size_t len) {
   size_t i, j, count, current_index = 0;
-  tryte_t essence[TRYTES_PER_ESSENCE];
-  trit_t essence_trits[TRITS_PER_ESSENCE];
+  tryte_t essence[NUM_TRYTES_ESSENCE];
+  trit_t essence_trits[NUM_TRITS_ESSENCE];
 
   // Calculate bundle hash
   for (i = 0; i < len; i++) {
@@ -436,7 +431,7 @@ int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl *kerl,
     count = transfer_transactions_count(transfer);
     for (j = 0; j < count; j++) {
       // Set essence trytes to 9
-      memset(essence, '9', TRYTES_PER_ESSENCE);
+      memset(essence, '9', NUM_TRYTES_ESSENCE);
       // essence = Address + Value + Tag + Timestamp + Current Index + Last
       // Index
       flex_trits_to_trytes(essence, NUM_TRYTES_ADDRESS,
@@ -453,9 +448,9 @@ int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl *kerl,
       long_to_trytes(current_index, essence + 144);
       long_to_trytes(transfer_ctx->count - 1, essence + 153);
       // essence in in trytes, convert to trits
-      trytes_to_trits(essence, essence_trits, TRYTES_PER_ESSENCE);
+      trytes_to_trits(essence, essence_trits, NUM_TRYTES_ESSENCE);
       // Absorb essence in kerl
-      kerl_absorb(kerl, essence_trits, TRITS_PER_ESSENCE);
+      kerl_absorb(kerl, essence_trits, NUM_TRITS_ESSENCE);
       current_index++;
     }
   }

@@ -79,7 +79,7 @@ retcode_t iota_statement_transaction_insert(const iota_transaction_t tx,
   int res = snprintf(
       statement, statement_cap,
       "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
-      "VALUES (?,?,%" PRIu64 ",?,%" PRIu64 ",%" PRIu64 ",%" PRIu64
+      "VALUES (?,?,%" PRIi64 ",?,%" PRIu64 ",%" PRIu64 ",%" PRIu64
       ",?,?,?,?,%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",?,?)",
       TRANSACTION_TABLE_NAME, TRANSACTION_COL_SIG_OR_MSG,
       TRANSACTION_COL_ADDRESS, TRANSACTION_COL_VALUE,

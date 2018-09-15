@@ -57,6 +57,7 @@ size_t long_to_trits(int64_t const value, trit_t *const trits) {
   negative = value < 0;
   size = min_trits(value);
   int64_t v_abs = negative ? -value : value;
+  memset(trits,0,RADIX);
   for (i = 0; i < size; i++) {
     if (v_abs == 0) {
       break;
