@@ -72,23 +72,20 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
     }
 
     if (curr_tx->current_index == last_index) {
-      flex_trit_t bundle_flex_trits[FLEX_TRIT_SIZE_243];
-      trit_t bundle_trits[NUM_TRITS_HASH];
+      flex_trit_t bundle_hash_calculated[FLEX_TRIT_SIZE_243];
       trit_t normalized_bundle_trits[NUM_TRITS_HASH];
       byte_t normalized_bundle_bytes[NUM_TRYTES_HASH];
 
       *is_valid = true;
-      calculate_bundle_hash(bundle, bundle_trits);
-      flex_trits_from_trits(bundle_flex_trits, NUM_TRITS_HASH, bundle_trits,
-                            NUM_TRITS_HASH, NUM_TRITS_HASH);
-      if (memcmp(bundle_hash, bundle_flex_trits, FLEX_TRIT_SIZE_243) != 0) {
+      calculate_bundle_hash(bundle, bundle_hash_calculated);
+      if (memcmp(bundle_hash, bundle_hash_calculated, FLEX_TRIT_SIZE_243) != 0) {
         log_error(BUNDLE_VALIDATOR_ID,
                   "Bundle hash provided differs from calculated \n");
         *is_valid = false;
         break;
       }
 
-      normalize_bundle(bundle_trits, normalized_bundle_bytes);
+      normalize_bundle(bundle_hash_calculated, normalized_bundle_bytes);
       for (int c = 0; c < NUM_TRYTES_HASH; ++c) {
         long_to_trits(normalized_bundle_bytes[c],
                       &normalized_bundle_trits[c * RADIX]);
