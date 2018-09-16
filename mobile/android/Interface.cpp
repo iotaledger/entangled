@@ -31,7 +31,7 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_generateAddress(
   const char* seed = env->GetStringUTFChars(jseed, 0);
 
   char* address = iota_sign_address_gen(seed, index, security);
-  std::memset((void*)seed, 0, 81);
+  std::memset_s((void*)seed, 81, 0, 81);
 
   jstring out = env->NewStringUTF(address);
   free(address);
@@ -51,7 +51,7 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_generateSignature(
   const char* bundleHash = env->GetStringUTFChars(jBundleHash, 0);
 
   char* signature = iota_sign_signature_gen(seed, index, security, bundleHash);
-  std::memset((void*)seed, 0, 81);
+  std::memset_s((void*)seed, 81, 0, 81);
 
   jstring out = env->NewStringUTF(signature);
   free(signature);
