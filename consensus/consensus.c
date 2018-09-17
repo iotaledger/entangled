@@ -81,6 +81,15 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   }
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing snapshot\n");
+  char *snapshot_file = NULL;
+  char *snapshot_sig_file = NULL;
+  if (core->config.testnet) {
+    snapshot_file = TESTNET_SNAPSHOT_FILE;
+    snapshot_sig_file = TESTNET_SNAPSHOT_SIG_FILE;
+  } else {
+    snapshot_file = MAINNET_SNAPSHOT_FILE;
+    snapshot_sig_file = MAINNET_SNAPSHOT_SIG_FILE;
+  }
   if ((ret = iota_snapshot_init(&consensus->snapshot, CIRI_SNAPSHOT_FILE,
                                 CIRI_SNAPSHOT_SIG_FILE, testnet)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Initializing snapshot failed\n");

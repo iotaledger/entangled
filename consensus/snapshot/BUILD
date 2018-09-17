@@ -10,6 +10,7 @@ cc_library(
         "//consensus:defs",
         "//consensus/snapshot:state_delta",
         "//utils:logger_helper",
+        "//utils:signed_files",
         "//utils/handles:rw_lock",
     ],
 )

@@ -8,6 +8,7 @@
 #include "consensus/snapshot/snapshot.h"
 #include "common/model/transaction.h"
 #include "utils/logger_helper.h"
+#include "utils/signed_files.h"
 
 #define SNAPSHOT_LOGGER_ID "consensus_snapshot"
 
@@ -88,14 +89,19 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot,
   snapshot->index = 0;
   snapshot->state = NULL;
 
-  // TODO signature validation
-  // String snapshotFile = config.getSnapshotFile();
-  // if (!config.isTestnet() &&
-  //     !SignedFiles.isFileSignatureValid(
-  //         snapshotFile, config.getSnapshotSignatureFile(), SNAPSHOT_PUBKEY,
-  //         SNAPSHOT_PUBKEY_DEPTH, SNAPSHOT_INDEX)) {
-  //   throw new RuntimeException("Snapshot signature failed.");
-  // }
+  if (!testnet) {
+    bool valid = false;
+    if ((ret = is_file_signature_valid(
+             snapshot_file, snapshot_sig_file, (tryte_t *)SNAPSHOT_PUBKEY,
+             SNAPSHOT_PUBKEY_DEPTH, SNAPSHOT_INDEX, &valid)) != RC_OK) {
+      log_critical(SNAPSHOT_LOGGER_ID,
+                   "Validating snapshot signature failed\n");
+      return ret;
+    } else if (!valid) {
+      log_critical(SNAPSHOT_LOGGER_ID, "Invalid snapshot signature\n");
+      return RC_SNAPSHOT_INVALID_SIGNATURE;
+    }
+  }
   if ((ret = iota_snapshot_initial_state(snapshot, snapshot_file))) {
     log_critical(SNAPSHOT_LOGGER_ID,
                  "Initializing snapshot initial state failed\n");
