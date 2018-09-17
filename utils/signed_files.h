@@ -23,6 +23,9 @@ retcode_t is_file_signature_valid(char const *const filename,
                                   tryte_t const *const public_key, size_t depth,
                                   size_t index, bool *const valid);
 
+retcode_t validate_signature(char const *const signature_filename,
+                             tryte_t const *const public_key, size_t depth,
+                             size_t index, trit_t *digest, bool *const valid);
 
 retcode_t digest_file(char const *const filename, trit_t *const trits);
 

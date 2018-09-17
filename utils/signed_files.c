@@ -10,7 +10,9 @@
 #include "common/curl-p/trit.h"
 #include "common/kerl/kerl.h"
 #include "common/model/bundle.h"
+#include "common/sign/v1/iss_curl.h"
 #include "common/trinary/tryte_ascii.h"
+#include "mam/v1/merkle.h"
 #include "utils/signed_files.h"
 
 retcode_t is_file_signature_valid(char const *const filename,
@@ -27,6 +29,48 @@ retcode_t is_file_signature_valid(char const *const filename,
                             digest, valid);
 }
 
+retcode_t validate_signature(char const *const signature_filename,
+                             tryte_t const *const public_key, size_t depth,
+                             size_t index, trit_t *digest, bool *const valid) {
+  retcode_t ret = RC_OK;
+  Curl curl;
+  FILE *fp = NULL;
+  ssize_t read = 0;
+  char *line = NULL;
+  size_t len = 0;
+  byte_t normalized_digest[81];  // TODO SIZE
+  trit_t sig_digests[3 * HASH_LENGTH];
+  trit_t root[HASH_LENGTH];
+  trit_t public_key_trits[HASH_LENGTH];
+
+  if ((fp = fopen(signature_filename, "r")) == NULL) {
+    return RC_UTILS_FAILED_TO_OPEN_FILE;
+  }
+
+  curl.type = CURL_P_81;
+  init_curl(&curl);
+
+  normalized_bundle(digest, normalized_digest);
+
+  for (int i = 0; i < 3 && (read = getline(&line, &len, fp)) > 0; i++) {
+    line[--read] = '\0';
+    trit_t sig_trits[3 * read];
+    trytes_to_trits((tryte_t *)line, sig_trits, read);
+    iss_curl_sig_digest(sig_digests + i * HASH_LENGTH,
+                        normalized_digest + i * NORMALIZED_FRAGMENT_LENGTH,
+                        sig_trits, 3 * read, &curl);
+    curl_reset(&curl);
+  }
+  iss_curl_address(sig_digests, root, 3 * HASH_LENGTH, &curl);
+  if ((read = getline(&line, &len, fp)) > 0) {
+    line[--read] = '\0';
+    trit_t siblings[3 * read];
+    trytes_to_trits((tryte_t *)line, siblings, read);
+    merkle_root(root, siblings, depth, index, &curl);
+  }
+  trytes_to_trits(public_key, public_key_trits, 81);  // TODO SIZE
+  *valid = (memcmp(public_key_trits, root, HASH_LENGTH) == 0);
+  return ret;
 }
 
 retcode_t digest_file(char const *const filename, trit_t *const digest) {

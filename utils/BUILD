@@ -24,7 +24,9 @@ cc_library(
         "//common/curl-p:trit",
         "//common/kerl",
         "//common/model:bundle",
+        "//common/sign/v1:iss_curl",
         "//common/trinary:tryte_ascii",
+        "//mam/v1:merkle",
     ],
 )
 
