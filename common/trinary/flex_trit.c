@@ -102,7 +102,7 @@ size_t flex_trits_to_trits(trit_t *const trits, size_t const to_len,
                            flex_trit_t const *const flex_trits,
                            size_t const len, size_t const num_trits) {
   // Bounds checking
-  if (num_trits < len || num_trits < to_len) {
+  if (num_trits > len || num_trits > to_len) {
     return 0;
   }
   size_t num_bytes = num_flex_trits_for_trits(num_trits);
