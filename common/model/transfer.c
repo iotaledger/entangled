@@ -8,9 +8,9 @@
 #include "common/model/transfer.h"
 #include <string.h>
 #include "common/helpers/sign.h"
+#include "common/trinary/trit_long.h"
 #include "common/trinary/trit_tryte.h"
 #include "common/trinary/tryte_long.h"
-#include "common/trinary/trit_long.h"
 
 /***********************************************************************************************************
  * Transfer Input data structure
@@ -653,28 +653,27 @@ void transfer_iterator_free(transfer_iterator_t transfer_iterator) {
   free(transfer_iterator);
 }
 
-
 void absorb_essence(Kerl *const kerl, flex_trit_t *address, int64_t value,
                     flex_trit_t *obsolete_tag, uint64_t timestamp,
                     int64_t current_index, int64_t last_index,
                     trit_t *const essence_trits) {
   memset(essence_trits, 0, NUM_TRITS_ESSENCE);
 
-  flex_trits_to_trits(essence_trits, NUM_TRITS_ADDRESS, address,
-                      NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
-  long_to_trits(value, &essence_trits[NUM_TRITS_ADDRESS]);
-  flex_trits_to_trits(&essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE],
-                      NUM_TRITS_OBSOLETE_TAG, obsolete_tag,
+  trit_t *curr_pos = essence_trits;
+
+  flex_trits_to_trits(curr_pos, NUM_TRITS_ADDRESS, address, NUM_TRITS_ADDRESS,
+                      NUM_TRITS_ADDRESS);
+  curr_pos = &curr_pos[NUM_TRITS_ADDRESS];
+  long_to_trits(value, curr_pos);
+  curr_pos = &curr_pos[NUM_TRITS_VALUE];
+  flex_trits_to_trits(curr_pos, NUM_TRITS_OBSOLETE_TAG, obsolete_tag,
                       NUM_TRITS_OBSOLETE_TAG, NUM_TRITS_OBSOLETE_TAG);
-  long_to_trits(timestamp, &essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE +
-                                          NUM_TRITS_OBSOLETE_TAG]);
-  long_to_trits(current_index,
-                &essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE +
-                               NUM_TRITS_OBSOLETE_TAG + NUM_TRITS_TIMESTAMP]);
-  long_to_trits(last_index,
-                &essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE +
-                               NUM_TRITS_OBSOLETE_TAG + NUM_TRITS_TIMESTAMP +
-                               NUM_TRITS_CURRENT_INDEX]);
+  curr_pos = &curr_pos[NUM_TRITS_OBSOLETE_TAG];
+  long_to_trits(timestamp, curr_pos);
+  curr_pos = &curr_pos[NUM_TRITS_TIMESTAMP];
+  long_to_trits(current_index, curr_pos);
+  curr_pos = &curr_pos[NUM_TRITS_CURRENT_INDEX];
+  long_to_trits(last_index, curr_pos);
   // Absorb essence in kerl
   kerl_absorb(kerl, essence_trits, NUM_TRITS_ESSENCE);
 }
