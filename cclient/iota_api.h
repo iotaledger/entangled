@@ -11,10 +11,12 @@
 #include "cclient/service.h"
 #include "request/requests.h"
 #include "response/responses.h"
+#include "utils/logger_helper.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+void logger_init_cclient_core();
 
 /**
  * Returns information about your node.

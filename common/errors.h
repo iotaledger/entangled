@@ -373,6 +373,15 @@ enum retcode_t {
 
 typedef enum retcode_t retcode_t;
 
+#define STR_CCLIENT_JSON_CREATE "Create JSON object error!"
+#define STR_CCLIENT_JSON_PARSE "JSON parsing failed"
+#define STR_CCLIENT_OOM "Out of Memory!"
+#define STR_CCLIENT_HTTP "HTTP service error"
+#define STR_CCLIENT_HTTP_REQ "HTTP request error"
+#define STR_CCLIENT_HTTP_RES "HTTP response error"
+#define STR_CCLIENT_RES_ERROR "IRI response:"
+#define STR_CCLIENT_JSON_KEY "JSON key not found"
+
 #ifdef __cplusplus
 }
 #endif

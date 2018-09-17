@@ -10,10 +10,12 @@
 
 #include <stdlib.h>
 #include "serializer/serializer.h"
+#include "utils/logger_helper.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+void logger_init_json_serializer();
 void init_json_serializer(serializer_t* serializer);
 
 retcode_t json_find_transactions_serialize_request(
