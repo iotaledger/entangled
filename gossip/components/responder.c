@@ -25,14 +25,12 @@ static retcode_t regular_transaction_request(
     responder_state_t *const state, transaction_request_t *const request,
     iota_transaction_t *const tx) {
   retcode_t ret = RC_OK;
-  iota_stor_pack_t pack;
 
   if ((*tx = transaction_new()) == NULL) {
     return RC_RESPONDER_COMPONENT_OOM;
   }
-  pack.models = (void **)tx;
-  pack.num_loaded = 0;
-  pack.capacity = 1;
+
+  iota_stor_pack_t pack = {(void **)(&tx), 1, 0, false};
   if ((ret = iota_tangle_transaction_load(&state->node->core->tangle,
                                           TRANSACTION_COL_HASH, request->hash,
                                           &pack))) {

@@ -114,13 +114,10 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
 
-  iota_stor_pack_t pack;
-  pack.capacity = 1;
-  pack.num_loaded = 0;
-  pack.insufficient_capacity = false;
   struct _iota_transaction curr_tx_s;
   iota_transaction_t curr_tx1 = &curr_tx_s;
-  pack.models = (void **)(&curr_tx1);
+
+  iota_stor_pack_t tx_pack = {(void **)(&curr_tx1), 1, 0, false};
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, tx1->trunk, NUM_TRITS_HASH);
@@ -167,13 +164,10 @@ void test_bundle_exceed_supply_pos_invalid() {
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
 
-  iota_stor_pack_t pack;
-  pack.capacity = 1;
-  pack.num_loaded = 0;
-  pack.insufficient_capacity = false;
   struct _iota_transaction curr_tx_s;
   iota_transaction_t curr_tx1 = &curr_tx_s;
-  pack.models = (void **)(&curr_tx1);
+
+  iota_stor_pack_t tx_pack = {(void **)(&curr_tx1), 1, 0, false};
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, tx1->trunk, NUM_TRITS_HASH);
@@ -220,13 +214,10 @@ void test_bundle_exceed_supply_neg_invalid() {
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
 
-  iota_stor_pack_t pack;
-  pack.capacity = 1;
-  pack.num_loaded = 0;
-  pack.insufficient_capacity = false;
   struct _iota_transaction curr_tx_s;
   iota_transaction_t curr_tx1 = &curr_tx_s;
-  pack.models = (void **)(&curr_tx1);
+
+  iota_stor_pack_t tx_pack = {(void **)(&curr_tx1), 1, 0, false};
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, tx1->trunk, NUM_TRITS_HASH);
@@ -292,13 +283,10 @@ void test_bundle_validate_size_4_value_wrong_sig_invalid() {
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx3) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx4) == RC_OK);
 
-  iota_stor_pack_t pack;
-  pack.capacity = 1;
-  pack.num_loaded = 0;
-  pack.insufficient_capacity = false;
   struct _iota_transaction curr_tx_s;
   iota_transaction_t curr_tx1 = &curr_tx_s;
-  pack.models = (void **)(&curr_tx1);
+
+  iota_stor_pack_t tx_pack = {(void **)(&curr_tx1), 1, 0, false};
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, tx1->trunk, NUM_TRITS_HASH);
@@ -365,13 +353,10 @@ void test_bundle_validate_size_4_value_valid() {
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx3) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx4) == RC_OK);
 
-  iota_stor_pack_t pack;
-  pack.capacity = 1;
-  pack.num_loaded = 0;
-  pack.insufficient_capacity = false;
   struct _iota_transaction curr_tx_s;
   iota_transaction_t curr_tx1 = &curr_tx_s;
-  pack.models = (void **)(&curr_tx1);
+
+  iota_stor_pack_t tx_pack = {(void **)(&curr_tx1), 1, 0, false};
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, tx1->trunk, NUM_TRITS_HASH);
