@@ -12,7 +12,7 @@
 #include "common/sign/v2/iss_curl.h"
 #include "common/trinary/trit_tryte.h"
 #include "mam/v1/mam.h"
-#include "mam/v1/merkle.h"
+#include "utils/merkle.h"
 
 void test_create(void) {
   char *const seed =

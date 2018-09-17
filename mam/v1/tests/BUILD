@@ -20,14 +20,3 @@ cc_test(
             "@unity",
         ],
 )
-
-cc_test(
-    name = "test_merkle",
-    srcs = ["test_merkle.c"],
-    deps =
-        [
-            "//common/trinary:trit_tryte",
-            "//mam/v1:merkle",
-            "@unity",
-        ],
-)

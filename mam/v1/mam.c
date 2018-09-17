@@ -12,7 +12,7 @@
 #include "common/sign/v2/iss_curl.h"
 #include "common/trinary/trit_long.h"
 #include "mam/v1/mask.h"
-#include "mam/v1/merkle.h"
+#include "utils/merkle.h"
 
 void mam_init_encryption(trit_t const *const side_key,
                          size_t const side_key_length,

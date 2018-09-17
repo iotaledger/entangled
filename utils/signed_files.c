@@ -12,7 +12,7 @@
 #include "common/model/bundle.h"
 #include "common/sign/v1/iss_curl.h"
 #include "common/trinary/tryte_ascii.h"
-#include "mam/v1/merkle.h"
+#include "utils/merkle.h"
 #include "utils/signed_files.h"
 
 retcode_t is_file_signature_valid(char const *const filename,

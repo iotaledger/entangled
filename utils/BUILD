@@ -16,21 +16,6 @@ cc_library(
 )
 
 cc_library(
-    name = "signed_files",
-    srcs = ["signed_files.c"],
-    hdrs = ["signed_files.h"],
-    deps = [
-        "//common:errors",
-        "//common/curl-p:trit",
-        "//common/kerl",
-        "//common/model:bundle",
-        "//common/sign/v1:iss_curl",
-        "//common/trinary:tryte_ascii",
-        "//mam/v1:merkle",
-    ],
-)
-
-cc_library(
     name = "logger_helper",
     srcs = ["logger_helper.c"],
     hdrs = ["logger_helper.h"],
@@ -44,6 +29,28 @@ cc_library(
 cc_library(
     name = "macros",
     hdrs = ["macros.h"],
+)
+
+cc_library(
+    name = "merkle",
+    srcs = ["merkle.c"],
+    hdrs = ["merkle.h"],
+    deps = ["//common/sign/v2:iss_curl"],
+)
+
+cc_library(
+    name = "signed_files",
+    srcs = ["signed_files.c"],
+    hdrs = ["signed_files.h"],
+    deps = [
+        ":merkle",
+        "//common:errors",
+        "//common/curl-p:trit",
+        "//common/kerl",
+        "//common/model:bundle",
+        "//common/sign/v1:iss_curl",
+        "//common/trinary:tryte_ascii",
+    ],
 )
 
 cc_library(
