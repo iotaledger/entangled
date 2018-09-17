@@ -1,7 +1,30 @@
+genrule(
+    name = "snapshot_mainnet",
+    outs = ["snapshotMainnet.txt"],
+    cmd = "wget -q https://raw.githubusercontent.com/iotaledger/iri/dev/src/main/resources/$$(basename $@) -O $@",
+)
+
+genrule(
+    name = "snapshot_mainnet_sig",
+    outs = ["snapshotMainnet.sig"],
+    cmd = "wget -q https://raw.githubusercontent.com/iotaledger/iri/dev/src/main/resources/$$(basename $@) -O $@",
+)
+
+genrule(
+    name = "snapshot_testnet",
+    outs = ["snapshotTestnet.txt"],
+    cmd = "wget -q https://raw.githubusercontent.com/iotaledger/iri/dev/src/main/resources/$$(basename $@) -O $@",
+)
+
 cc_library(
     name = "snapshot",
     srcs = ["snapshot.c"],
     hdrs = ["snapshot.h"],
+    data = [
+        ":snapshot_mainnet",
+        ":snapshot_mainnet_sig",
+        ":snapshot_testnet",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
