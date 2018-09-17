@@ -16,11 +16,11 @@
 
 #define BUNDLE_VALIDATOR_ID "bundle_validator_id"
 
-retcode_t bundle_validate_init(){
+retcode_t bundle_validate_init() {
   logger_helper_init(BUNDLE_VALIDATOR_ID, LOGGER_INFO, true);
   return RC_OK;
 }
-retcode_t bundle_validate_destroy(){
+retcode_t bundle_validate_destroy() {
   logger_helper_destroy(BUNDLE_VALIDATOR_ID);
   return RC_OK;
 }
@@ -88,7 +88,8 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
 
       *is_valid = true;
       calculate_bundle_hash(bundle, bundle_hash_calculated);
-      if (memcmp(bundle_hash, bundle_hash_calculated, FLEX_TRIT_SIZE_243) != 0) {
+      if (memcmp(bundle_hash, bundle_hash_calculated, FLEX_TRIT_SIZE_243) !=
+          0) {
         log_error(BUNDLE_VALIDATOR_ID,
                   "Bundle hash provided differs from calculated \n");
         *is_valid = false;
@@ -121,7 +122,7 @@ retcode_t load_bundle_transactions(const tangle_t* const tangle,
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   flex_trit_t curr_tx_trunk_trits[FLEX_TRIT_SIZE_243];
 
-  iota_stor_pack_t pack = {(void **)(&curr_tx), 1, 0, false};
+  iota_stor_pack_t pack = {(void**)(&curr_tx), 1, 0, false};
 
   res = iota_tangle_transaction_load(tangle, TRANSACTION_COL_HASH, tail_hash,
                                      &pack);
@@ -201,16 +202,14 @@ retcode_t validate_signature(bundle_transactions_t* bundle,
     kerl_squeeze(&address_kerl, digested_address, NUM_TRITS_ADDRESS);
 
     flex_trit_t digest[FLEX_TRIT_SIZE_243];
-
     flex_trits_from_trits(digest, NUM_TRITS_HASH, digested_address,
                           NUM_TRITS_HASH, NUM_TRITS_HASH);
-    flex_trits_to_trits(tx_address_trits, NUM_TRITS_ADDRESS, curr_tx->address,
-                        NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
-    curr_tx = curr_inp_tx;
-    if (memcmp(tx_address_trits, digested_address, NUM_TRITS_ADDRESS) != 0) {
+
+    if (memcmp(digest, curr_tx->address, FLEX_TRIT_SIZE_243) != 0) {
       *is_valid = false;
       break;
     }
+    curr_tx = curr_inp_tx;
   }
 
   return RC_OK;

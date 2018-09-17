@@ -6,7 +6,6 @@
  */
 
 #include "common/model/bundle.h"
-#include "common/kerl/kerl.h"
 #include "common/model/transfer.h"
 #include "common/trinary/trit_long.h"
 #include "common/trinary/tryte_long.h"
@@ -47,26 +46,9 @@ void calculate_bundle_hash(bundle_transactions_t *bundle, flex_trit_t *out) {
 
   for (curr_tx = (iota_transaction_t)utarray_front(bundle); curr_tx != NULL;
        curr_tx = (iota_transaction_t *)utarray_next(bundle, curr_tx)) {
-    memset(essence_trits, 0, NUM_TRITS_ESSENCE);
-
-    flex_trits_to_trits(essence_trits, NUM_TRITS_ADDRESS, curr_tx->address,
-                        NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
-    long_to_trits(curr_tx->value, &essence_trits[NUM_TRITS_ADDRESS]);
-    flex_trits_to_trits(&essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE],
-                        NUM_TRITS_OBSOLETE_TAG, curr_tx->obsolete_tag,
-                        NUM_TRITS_OBSOLETE_TAG, NUM_TRITS_OBSOLETE_TAG);
-    long_to_trits(curr_tx->timestamp,
-                  &essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE +
-                                 NUM_TRITS_OBSOLETE_TAG]);
-    long_to_trits(curr_tx->current_index,
-                  &essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE +
-                                 NUM_TRITS_OBSOLETE_TAG + NUM_TRITS_TIMESTAMP]);
-    long_to_trits(curr_tx->last_index,
-                  &essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE +
-                                 NUM_TRITS_OBSOLETE_TAG + NUM_TRITS_TIMESTAMP +
-                                 NUM_TRITS_CURRENT_INDEX]);
-    // Absorb essence in kerl
-    kerl_absorb(&kerl, essence_trits, NUM_TRITS_ESSENCE);
+    absorb_essence(&kerl, curr_tx->address, curr_tx->value,
+                   curr_tx->obsolete_tag, curr_tx->timestamp,
+                   curr_tx->current_index, curr_tx->last_index, essence_trits);
   }
 
   // Squeeze kerl to get the bundle hash

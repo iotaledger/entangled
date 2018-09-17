@@ -10,6 +10,7 @@
 #include "common/helpers/sign.h"
 #include "common/trinary/trit_tryte.h"
 #include "common/trinary/tryte_long.h"
+#include "common/trinary/trit_long.h"
 
 /***********************************************************************************************************
  * Transfer Input data structure
@@ -422,7 +423,6 @@ int transfer_ctx_count(transfer_ctx_t transfer_ctx) {
 int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl *kerl,
                       transfer_t *transfers, size_t len) {
   size_t i, j, count, current_index = 0;
-  tryte_t essence[NUM_TRYTES_ESSENCE];
   trit_t essence_trits[NUM_TRITS_ESSENCE];
 
   // Calculate bundle hash
@@ -430,27 +430,12 @@ int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl *kerl,
     transfer_t transfer = transfers[i];
     count = transfer_transactions_count(transfer);
     for (j = 0; j < count; j++) {
-      // Set essence trytes to 9
-      memset(essence, '9', NUM_TRYTES_ESSENCE);
-      // essence = Address + Value + Tag + Timestamp + Current Index + Last
-      // Index
-      flex_trits_to_trytes(essence, NUM_TRYTES_ADDRESS,
-                           transfer_address(transfer), NUM_TRITS_ADDRESS,
-                           NUM_TRITS_ADDRESS);
       int64_t value = transfer_type(transfer) == VALUE_OUT
                           ? j == 0 ? transfer_value(transfer) : 0
                           : 0;
-      long_to_trytes(value, &essence[81]);
-      flex_trits_to_trytes(&essence[108], NUM_TRYTES_TAG,
-                           transfer_tag(transfer), NUM_TRITS_TAG,
-                           NUM_TRITS_TAG);
-      long_to_trytes(transfer_timestamp(transfer), essence + 135);
-      long_to_trytes(current_index, essence + 144);
-      long_to_trytes(transfer_ctx->count - 1, essence + 153);
-      // essence in in trytes, convert to trits
-      trytes_to_trits(essence, essence_trits, NUM_TRYTES_ESSENCE);
-      // Absorb essence in kerl
-      kerl_absorb(kerl, essence_trits, NUM_TRITS_ESSENCE);
+      absorb_essence(kerl, transfer_address(transfer), value,
+                     transfer_tag(transfer), transfer_timestamp(transfer),
+                     current_index, transfer_ctx->count - 1, essence_trits);
       current_index++;
     }
   }
@@ -666,4 +651,30 @@ void transfer_iterator_free(transfer_iterator_t transfer_iterator) {
     free(transfer_iterator->transaction_signature);
   }
   free(transfer_iterator);
+}
+
+
+void absorb_essence(Kerl *const kerl, flex_trit_t *address, int64_t value,
+                    flex_trit_t *obsolete_tag, uint64_t timestamp,
+                    int64_t current_index, int64_t last_index,
+                    trit_t *const essence_trits) {
+  memset(essence_trits, 0, NUM_TRITS_ESSENCE);
+
+  flex_trits_to_trits(essence_trits, NUM_TRITS_ADDRESS, address,
+                      NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
+  long_to_trits(value, &essence_trits[NUM_TRITS_ADDRESS]);
+  flex_trits_to_trits(&essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE],
+                      NUM_TRITS_OBSOLETE_TAG, obsolete_tag,
+                      NUM_TRITS_OBSOLETE_TAG, NUM_TRITS_OBSOLETE_TAG);
+  long_to_trits(timestamp, &essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE +
+                                          NUM_TRITS_OBSOLETE_TAG]);
+  long_to_trits(current_index,
+                &essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE +
+                               NUM_TRITS_OBSOLETE_TAG + NUM_TRITS_TIMESTAMP]);
+  long_to_trits(last_index,
+                &essence_trits[NUM_TRITS_ADDRESS + NUM_TRITS_VALUE +
+                               NUM_TRITS_OBSOLETE_TAG + NUM_TRITS_TIMESTAMP +
+                               NUM_TRITS_CURRENT_INDEX]);
+  // Absorb essence in kerl
+  kerl_absorb(kerl, essence_trits, NUM_TRITS_ESSENCE);
 }
