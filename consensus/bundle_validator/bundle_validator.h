@@ -18,6 +18,10 @@ extern "C" {
 retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
                           bundle_transactions_t* bundle, bool* is_valid);
 
+
+retcode_t bundle_validate_init();
+retcode_t bundle_validate_destroy();
+
 #ifdef __cplusplus
 }
 #endif

@@ -10,10 +10,20 @@
 #include "common/kerl/kerl.h"
 #include "common/trinary/trit_long.h"
 #include "consensus/defs.h"
-#include "math.h"
 #include "utils/logger_helper.h"
 
+#include "math.h"
+
 #define BUNDLE_VALIDATOR_ID "bundle_validator_id"
+
+retcode_t bundle_validate_init(){
+  logger_helper_init(BUNDLE_VALIDATOR_ID, LOGGER_INFO, true);
+  return RC_OK;
+}
+retcode_t bundle_validate_destroy(){
+  logger_helper_destroy(BUNDLE_VALIDATOR_ID);
+  return RC_OK;
+}
 
 static retcode_t load_bundle_transactions(const tangle_t* const tangle,
                                           trit_array_p tail_hash,
@@ -29,8 +39,8 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
   iota_transaction_t curr_inp_tx;
 
   if (bundle == NULL) {
-    log_error(BUNDLE_VALIDATOR_ID, "Failed in memory allocation\n");
-    return RC_CONSENSUS_OOM;
+    log_error(BUNDLE_VALIDATOR_ID, "Bundle is not initialized\n");
+    return RC_CONSENSUS_NULL_BUNDLE_PTR;
   }
 
   res = load_bundle_transactions(tangle, tail_hash, bundle);

@@ -35,6 +35,8 @@ void test_bundle_validate_empty_invalid() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
 
+  TEST_ASSERT(bundle_validate_init() == RC_OK);
+
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
 
@@ -47,6 +49,7 @@ void test_bundle_validate_empty_invalid() {
   TEST_ASSERT(bundle_validate(&tangle, ep, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
+  TEST_ASSERT(bundle_validate_destroy() == RC_OK);
   trit_array_free(ep);
   bundle_transactions_free(&bundle);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
@@ -55,6 +58,8 @@ void test_bundle_validate_empty_invalid() {
 void test_bundle_size_1_value_with_wrong_address_invalid() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
+
+  TEST_ASSERT(bundle_validate_init() == RC_OK);
 
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
@@ -133,6 +138,7 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
   TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
+  TEST_ASSERT(bundle_validate_destroy() == RC_OK);
   trit_array_free(tail_hash);
   bundle_transactions_free(&bundle);
   transaction_free(tx1);
@@ -142,6 +148,8 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
 void test_bundle_exceed_supply_pos_invalid() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
+
+  TEST_ASSERT(bundle_validate_init() == RC_OK);
 
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
@@ -183,6 +191,7 @@ void test_bundle_exceed_supply_pos_invalid() {
   TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
+  TEST_ASSERT(bundle_validate_destroy() == RC_OK);
   trit_array_free(tail_hash);
   bundle_transactions_free(&bundle);
   transaction_free(tx1);
@@ -192,6 +201,8 @@ void test_bundle_exceed_supply_pos_invalid() {
 void test_bundle_exceed_supply_neg_invalid() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
+
+  TEST_ASSERT(bundle_validate_init() == RC_OK);
 
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
@@ -233,6 +244,7 @@ void test_bundle_exceed_supply_neg_invalid() {
   TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
+  TEST_ASSERT(bundle_validate_destroy() == RC_OK);
   trit_array_free(tail_hash);
   bundle_transactions_free(&bundle);
   transaction_free(tx1);
@@ -242,6 +254,8 @@ void test_bundle_exceed_supply_neg_invalid() {
 void test_bundle_validate_size_4_value_wrong_sig_invalid() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
+
+  TEST_ASSERT(bundle_validate_init() == RC_OK);
 
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
@@ -302,6 +316,7 @@ void test_bundle_validate_size_4_value_wrong_sig_invalid() {
   TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
+  TEST_ASSERT(bundle_validate_destroy() == RC_OK);
   trit_array_free(tail_hash);
   bundle_transactions_free(&bundle);
   transaction_free(tx1);
@@ -314,6 +329,8 @@ void test_bundle_validate_size_4_value_wrong_sig_invalid() {
 void test_bundle_validate_size_4_value_valid() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
+
+  TEST_ASSERT(bundle_validate_init() == RC_OK);
 
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
@@ -372,6 +389,7 @@ void test_bundle_validate_size_4_value_valid() {
   TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(is_valid);
 
+  TEST_ASSERT(bundle_validate_destroy() == RC_OK);
   trit_array_free(tail_hash);
   bundle_transactions_free(&bundle);
   transaction_free(tx1);
