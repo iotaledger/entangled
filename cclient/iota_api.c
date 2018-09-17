@@ -36,8 +36,8 @@ iota_api_result_t iota_api_get_node_info(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -75,8 +75,8 @@ iota_api_result_t iota_api_get_neighbors(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -116,8 +116,8 @@ iota_api_result_t iota_api_add_neighbors(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -156,8 +156,8 @@ iota_api_result_t iota_api_remove_neighbors(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -196,8 +196,8 @@ iota_api_result_t iota_api_get_tips(const iota_http_service_t* const service,
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -236,8 +236,8 @@ iota_api_result_t iota_api_find_transactions(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -276,8 +276,8 @@ iota_api_result_t iota_api_get_trytes(const iota_http_service_t* const service,
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -316,8 +316,8 @@ iota_api_result_t iota_api_get_inclusion_states(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -358,8 +358,8 @@ iota_api_result_t iota_api_get_balances(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -401,8 +401,8 @@ iota_api_result_t iota_api_get_transactions_to_approve(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -443,8 +443,8 @@ iota_api_result_t iota_api_attach_to_tangle(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -492,8 +492,8 @@ iota_api_result_t iota_api_broadcast_transactions(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -529,8 +529,8 @@ iota_api_result_t iota_api_store_transactions(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -568,8 +568,8 @@ iota_api_result_t iota_api_check_consistency(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
-    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] HTTP request filed. %x\n",
-              __func__, __LINE__, result.error);
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
