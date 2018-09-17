@@ -1,7 +1,7 @@
 ## IOTA Entangled Monorepo
 [![Build status](https://badge.buildkite.com/42ef0512276a270bd34cb0010fd641558b344dab4aa2225fba.svg)](https://buildkite.com/iota-foundation/entangled)
 
-This is a monorepo containing all you need get [[IOTA]](https://iota.org/) operating in C/C++
+This is a monorepo containing all you need to get [[IOTA]](https://iota.org/) operating in C/C++
 
 Containing IOTA components, models as well as cryptography primitives used in IOTA.  
 
