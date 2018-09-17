@@ -16,7 +16,7 @@
 #include "common/storage/tests/helpers/defs.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
-#include "consensus/test_definitions/defs.h"
+#include "consensus/test_utils/tangle.h"
 #include "utarray.h"
 
 static cw_rating_calculator_t calc;
@@ -45,7 +45,7 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   size_t num_approvers = 150;
   size_t num_txs = num_approvers + 1;
 
-  TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
@@ -153,12 +153,12 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
 void test_single_tx_tangle(void) {
-  TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
@@ -211,7 +211,7 @@ void test_single_tx_tangle(void) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
@@ -226,7 +226,7 @@ void test_cw_topology_four_transactions_diamond(void) {
 
   size_t num_txs = 4;
 
-  TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
@@ -308,7 +308,7 @@ void test_cw_topology_four_transactions_diamond(void) {
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
   trit_array_free(curr_hash);
-  TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
@@ -318,7 +318,7 @@ void test_cw_topology_two_inequal_tips(void) {
 
   size_t num_txs = 4;
 
-  TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
@@ -433,7 +433,7 @@ void test_cw_topology_two_inequal_tips(void) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 

@@ -8,11 +8,11 @@
 #include <string.h>
 
 #include "consensus/tangle/tangle.h"
-#include "consensus/test_definitions/defs.h"
+#include "consensus/test_utils/tangle.h"
 #include "utils/files.h"
 
-retcode_t test_setup(tangle_t *const tangle, connection_config_t *const config,
-                     char *test_db_path, char *ciri_db_path) {
+retcode_t tangle_setup(tangle_t *const tangle, connection_config_t *const config,
+                       char *test_db_path, char *ciri_db_path) {
   retcode_t ret = RC_OK;
 
   if ((ret = copy_file(test_db_path, ciri_db_path))) {
@@ -24,7 +24,7 @@ retcode_t test_setup(tangle_t *const tangle, connection_config_t *const config,
   return ret;
 }
 
-retcode_t test_cleanup(tangle_t *const tangle, char *test_db_path) {
+retcode_t tangle_cleanup(tangle_t *const tangle, char *test_db_path) {
   retcode_t ret = RC_OK;
 
   if ((ret = iota_tangle_destroy(tangle))) {

@@ -1,16 +1,15 @@
 cc_test(
-    name = "test_exit_probability_randomizer",
+    name = "bundle_validator",
     srcs = [
-        "test_exit_probability_randomizer.c",
+        "bundle_validator.c",
     ],
     data = [":db_file"],
     visibility = ["//visibility:public"],
     deps = [
-        "//common/storage/sql/sqlite3:sqlite3_storage",
         "//common/storage/tests/helpers",
-        "//common/trinary:trit_ptrit",
-        "//consensus/cw_rating_calculator",
-        "//consensus/exit_probability_randomizer",
+        "//common/trinary:flex_trit",
+        "//consensus:defs",
+        "//consensus/bundle_validator",
         "//consensus/test_utils",
         "@unity",
     ],
