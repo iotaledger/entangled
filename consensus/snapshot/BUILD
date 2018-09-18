@@ -1,30 +1,26 @@
 genrule(
-    name = "snapshot_mainnet",
-    outs = ["snapshotMainnet.txt"],
-    cmd = "wget -q https://raw.githubusercontent.com/iotaledger/iri/dev/src/main/resources/$$(basename $@) -O $@",
-)
-
-genrule(
-    name = "snapshot_mainnet_sig",
-    outs = ["snapshotMainnet.sig"],
-    cmd = "wget -q https://raw.githubusercontent.com/iotaledger/iri/dev/src/main/resources/$$(basename $@) -O $@",
-)
-
-genrule(
-    name = "snapshot_testnet",
-    outs = ["snapshotTestnet.txt"],
-    cmd = "wget -q https://raw.githubusercontent.com/iotaledger/iri/dev/src/main/resources/$$(basename $@) -O $@",
+    name = "snapshot_files",
+    outs = [
+        "snapshotMainnet.txt",
+        "snapshotMainnet.sig",
+        "snapshotTestnet.txt",
+        "snapshotTestnet.sig",
+    ],
+    cmd =
+        """
+        url="https://raw.githubusercontent.com/iotaledger/iri/master/src/main/resources"
+        wget -q $$url/snapshotMainnet.txt -O $(location snapshotMainnet.txt) && dos2unix $(location snapshotMainnet.txt)
+        wget -q $$url/snapshotMainnet.sig -O $(location snapshotMainnet.sig) && dos2unix $(location snapshotMainnet.sig)
+        wget -q $$url/snapshotTestnet.txt -O $(location snapshotTestnet.txt) && dos2unix $(location snapshotTestnet.txt)
+        wget -q $$url/snapshotTestnet.sig -O $(location snapshotTestnet.sig) && dos2unix $(location snapshotTestnet.sig)
+      """,
 )
 
 cc_library(
     name = "snapshot",
     srcs = ["snapshot.c"],
     hdrs = ["snapshot.h"],
-    data = [
-        ":snapshot_mainnet",
-        ":snapshot_mainnet_sig",
-        ":snapshot_testnet",
-    ],
+    data = [":snapshot_files"],
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
