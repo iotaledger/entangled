@@ -190,6 +190,7 @@ static retcode_t update_latest_solid_subtangle_milestone(
     goto done;
   }
   if (pack.num_loaded != 0) {
+    pack.num_loaded = 0;
     pack.models = (void**)&milestone;
     iota_tangle_milestone_load_next(
         mt->tangle, mt->latest_solid_subtangle_milestone_index, &pack);
@@ -206,6 +207,7 @@ static retcode_t update_latest_solid_subtangle_milestone(
       } else {
         break;
       }
+      pack.num_loaded = 0;
       iota_tangle_milestone_load_next(
           mt->tangle, mt->latest_solid_subtangle_milestone_index, &pack);
     }
