@@ -43,13 +43,14 @@ cc_library(
     srcs = ["signed_files.c"],
     hdrs = ["signed_files.h"],
     deps = [
-        ":merkle",
         "//common:errors",
         "//common/curl-p:trit",
         "//common/kerl",
         "//common/model:bundle",
         "//common/sign/v1:iss_curl",
+        "//common/trinary:trit_long",
         "//common/trinary:tryte_ascii",
+        "//utils:merkle",
     ],
 )
 

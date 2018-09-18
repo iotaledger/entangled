@@ -11,6 +11,7 @@
 #include "common/kerl/kerl.h"
 #include "common/model/bundle.h"
 #include "common/sign/v1/iss_curl.h"
+#include "common/trinary/trit_long.h"
 #include "common/trinary/tryte_ascii.h"
 #include "utils/merkle.h"
 #include "utils/signed_files.h"
@@ -20,7 +21,7 @@ retcode_t is_file_signature_valid(char const *const filename,
                                   tryte_t const *const public_key, size_t depth,
                                   size_t index, bool *const valid) {
   retcode_t ret = RC_OK;
-  trit_t digest[HASH_LENGTH];
+  flex_trit_t digest[FLEX_TRIT_SIZE_243];
 
   if ((ret = digest_file(filename, digest))) {
     return ret;
@@ -31,7 +32,8 @@ retcode_t is_file_signature_valid(char const *const filename,
 
 retcode_t validate_signature(char const *const signature_filename,
                              tryte_t const *const public_key, size_t depth,
-                             size_t index, trit_t *digest, bool *const valid) {
+                             size_t index, flex_trit_t *const digest,
+                             bool *const valid) {
   retcode_t ret = RC_OK;
   Curl curl;
   FILE *fp = NULL;
@@ -42,6 +44,7 @@ retcode_t validate_signature(char const *const signature_filename,
   trit_t sig_digests[3 * HASH_LENGTH];
   trit_t root[HASH_LENGTH];
   trit_t public_key_trits[HASH_LENGTH];
+  trit_t normalized_digest_trits[HASH_LENGTH];
 
   if ((fp = fopen(signature_filename, "r")) == NULL) {
     return RC_UTILS_FAILED_TO_OPEN_FILE;
@@ -50,15 +53,19 @@ retcode_t validate_signature(char const *const signature_filename,
   curl.type = CURL_P_81;
   init_curl(&curl);
 
-  normalized_bundle(digest, normalized_digest);
+  normalize_bundle(digest, normalized_digest);
+  for (int c = 0; c < 81; ++c) {
+    long_to_trits(normalized_digest[c], &normalized_digest_trits[c * RADIX]);
+  }
 
   for (int i = 0; i < 3 && (read = getline(&line, &len, fp)) > 0; i++) {
     line[--read] = '\0';
     trit_t sig_trits[3 * read];
     trytes_to_trits((tryte_t *)line, sig_trits, read);
-    iss_curl_sig_digest(sig_digests + i * HASH_LENGTH,
-                        normalized_digest + i * NORMALIZED_FRAGMENT_LENGTH,
-                        sig_trits, 3 * read, &curl);
+    iss_curl_sig_digest(
+        sig_digests + i * HASH_LENGTH,
+        normalized_digest_trits + i * NORMALIZED_FRAGMENT_LENGTH * 3, sig_trits,
+        3 * read, &curl);
     curl_reset(&curl);
   }
   iss_curl_address(sig_digests, root, 3 * HASH_LENGTH, &curl);
@@ -73,7 +80,7 @@ retcode_t validate_signature(char const *const signature_filename,
   return ret;
 }
 
-retcode_t digest_file(char const *const filename, trit_t *const digest) {
+retcode_t digest_file(char const *const filename, flex_trit_t *const digest) {
   retcode_t ret = RC_OK;
   FILE *fp = NULL;
   ssize_t read = 0;
@@ -81,6 +88,7 @@ retcode_t digest_file(char const *const filename, trit_t *const digest) {
   size_t len = 0;
   tryte_t *trytes = NULL;
   trit_t trits[HASH_LENGTH * 3] = {0};  // TODO change size
+  trit_t digest_trits[HASH_LENGTH];
   Kerl kerl;
 
   if ((fp = fopen(filename, "r")) == NULL) {
@@ -99,7 +107,9 @@ retcode_t digest_file(char const *const filename, trit_t *const digest) {
     kerl_absorb(&kerl, trits, HASH_LENGTH * 3);  // TODO change size
     memset(trits, 0, read * 6);                  // TODO change size
   }
-  kerl_squeeze(&kerl, digest, HASH_LENGTH);
+  kerl_squeeze(&kerl, digest_trits, HASH_LENGTH);
+  flex_trits_from_trits(digest, HASH_LENGTH, digest_trits, HASH_LENGTH,
+                        HASH_LENGTH);
 
 done:
   if (fp) {
