@@ -40,11 +40,13 @@ retcode_t validate_signature(char const *const signature_filename,
   ssize_t read = 0;
   char *line = NULL;
   size_t len = 0;
-  byte_t normalized_digest[81];  // TODO SIZE
+  byte_t normalized_digest[TRYTE_HASH_LENGTH];
+  trit_t normalized_digest_trits[HASH_LENGTH];
   trit_t sig_digests[3 * HASH_LENGTH];
+  trit_t sig_trits[NORMALIZED_FRAGMENT_LENGTH * TRYTE_HASH_LENGTH * RADIX];
   trit_t root[HASH_LENGTH];
   trit_t public_key_trits[HASH_LENGTH];
-  trit_t normalized_digest_trits[HASH_LENGTH];
+  trit_t siblings[depth * TRYTE_HASH_LENGTH * RADIX];
 
   if ((fp = fopen(signature_filename, "r")) == NULL) {
     return RC_UTILS_FAILED_TO_OPEN_FILE;
@@ -54,29 +56,49 @@ retcode_t validate_signature(char const *const signature_filename,
   init_curl(&curl);
 
   normalize_bundle(digest, normalized_digest);
-  for (int c = 0; c < 81; ++c) {
+  for (int c = 0; c < TRYTE_HASH_LENGTH; ++c) {
     long_to_trits(normalized_digest[c], &normalized_digest_trits[c * RADIX]);
   }
 
-  for (int i = 0; i < 3 && (read = getline(&line, &len, fp)) > 0; i++) {
+  int i;
+  for (i = 0; i < 3 && (read = getline(&line, &len, fp)) > 0; i++) {
     line[--read] = '\0';
-    trit_t sig_trits[3 * read];
+    if (read != NORMALIZED_FRAGMENT_LENGTH * TRYTE_HASH_LENGTH) {
+      ret = RC_UTILS_INVALID_SIG_FILE;
+      goto done;
+    }
     trytes_to_trits((tryte_t *)line, sig_trits, read);
     iss_curl_sig_digest(
         sig_digests + i * HASH_LENGTH,
-        normalized_digest_trits + i * NORMALIZED_FRAGMENT_LENGTH * 3, sig_trits,
-        3 * read, &curl);
+        normalized_digest_trits + i * NORMALIZED_FRAGMENT_LENGTH * RADIX,
+        sig_trits, RADIX * read, &curl);
     curl_reset(&curl);
   }
-  iss_curl_address(sig_digests, root, 3 * HASH_LENGTH, &curl);
+  if (i != 3 || read < 0) {
+    ret = RC_UTILS_INVALID_SIG_FILE;
+    goto done;
+  }
+
+  iss_curl_address(sig_digests, root, sizeof(sig_digests), &curl);
   if ((read = getline(&line, &len, fp)) > 0) {
     line[--read] = '\0';
-    trit_t siblings[3 * read];
+    if (read != depth * TRYTE_HASH_LENGTH) {
+      ret = RC_UTILS_INVALID_SIG_FILE;
+      goto done;
+    }
     trytes_to_trits((tryte_t *)line, siblings, read);
     merkle_root(root, siblings, depth, index, &curl);
+  } else if (read < 0) {
+    ret = RC_UTILS_INVALID_SIG_FILE;
+    goto done;
   }
-  trytes_to_trits(public_key, public_key_trits, 81);  // TODO SIZE
+  trytes_to_trits(public_key, public_key_trits, TRYTE_HASH_LENGTH);
   *valid = (memcmp(public_key_trits, root, HASH_LENGTH) == 0);
+
+done:
+  if (fp) {
+    fclose(fp);
+  }
   return ret;
 }
 
@@ -87,7 +109,7 @@ retcode_t digest_file(char const *const filename, flex_trit_t *const digest) {
   char *line = NULL;
   size_t len = 0;
   tryte_t *trytes = NULL;
-  trit_t trits[HASH_LENGTH * 3] = {0};  // TODO change size
+  trit_t *trits = NULL;
   trit_t digest_trits[HASH_LENGTH];
   Kerl kerl;
 
@@ -98,14 +120,21 @@ retcode_t digest_file(char const *const filename, flex_trit_t *const digest) {
   init_kerl(&kerl);
   while ((read = getline(&line, &len, fp)) > 0) {
     line[--read] = '\0';
+    // 2 trytes by ASCII character
     if ((trytes = realloc(trytes, read * 2)) == NULL) {
       ret = RC_UTILS_OOM;
       goto done;
     }
     ascii_to_trytes(line, trytes);
+    // 3 trits by tryte and size needs to be a multiple of HASH_LENGTH (kerl)
+    if ((trits = realloc(
+             trits, HASH_LENGTH * (((read * 6) / HASH_LENGTH) + 1))) == NULL) {
+      ret = RC_UTILS_OOM;
+      goto done;
+    }
+    memset(trits, 0, HASH_LENGTH * (((read * 6) / HASH_LENGTH) + 1));
     trytes_to_trits(trytes, trits, read * 2);
-    kerl_absorb(&kerl, trits, HASH_LENGTH * 3);  // TODO change size
-    memset(trits, 0, read * 6);                  // TODO change size
+    kerl_absorb(&kerl, trits, HASH_LENGTH * (((read * 6) / HASH_LENGTH) + 1));
   }
   kerl_squeeze(&kerl, digest_trits, HASH_LENGTH);
   flex_trits_from_trits(digest, HASH_LENGTH, digest_trits, HASH_LENGTH,
@@ -120,6 +149,9 @@ done:
   }
   if (trytes) {
     free(trytes);
+  }
+  if (trits) {
+    free(trits);
   }
 
   return ret;
