@@ -9,14 +9,22 @@
 #include "cclient/http/http.h"
 #include "cclient/service.h"
 
+#define CCLIENT_CORE_LOGGER_ID "cclient_core_api"
+
+void logger_init_cclient_core() {
+  logger_helper_init(CCLIENT_CORE_LOGGER_ID, LOGGER_DEBUG, true);
+}
+
 iota_api_result_t iota_api_get_node_info(
     const iota_http_service_t* const service, get_node_info_res_t* const res) {
   iota_api_result_t result = {0};
 
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();
-
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
     result.error = RC_CCLIENT_OOM;
     goto done;
   }
@@ -28,6 +36,8 @@ iota_api_result_t iota_api_get_node_info(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -47,10 +57,12 @@ done:
 iota_api_result_t iota_api_get_neighbors(
     const iota_http_service_t* const service, get_neighbors_res_t* const res) {
   iota_api_result_t result = {0};
-
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
     result.error = RC_CCLIENT_OOM;
     goto done;
   }
@@ -63,6 +75,8 @@ iota_api_result_t iota_api_get_neighbors(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -86,7 +100,10 @@ iota_api_result_t iota_api_add_neighbors(
 
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
     result.error = RC_CCLIENT_OOM;
     goto done;
   }
@@ -99,6 +116,8 @@ iota_api_result_t iota_api_add_neighbors(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -121,7 +140,10 @@ iota_api_result_t iota_api_remove_neighbors(
   iota_api_result_t result = {0};
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
     result.error = RC_CCLIENT_OOM;
     goto done;
   }
@@ -134,6 +156,8 @@ iota_api_result_t iota_api_remove_neighbors(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -156,7 +180,10 @@ iota_api_result_t iota_api_get_tips(const iota_http_service_t* const service,
   iota_api_result_t result = {0};
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
     result.error = RC_CCLIENT_OOM;
     goto done;
   }
@@ -169,6 +196,8 @@ iota_api_result_t iota_api_get_tips(const iota_http_service_t* const service,
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -192,7 +221,10 @@ iota_api_result_t iota_api_find_transactions(
   iota_api_result_t result = {0};
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
     result.error = RC_CCLIENT_OOM;
     goto done;
   }
@@ -204,6 +236,8 @@ iota_api_result_t iota_api_find_transactions(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -227,7 +261,10 @@ iota_api_result_t iota_api_get_trytes(const iota_http_service_t* const service,
   iota_api_result_t result = {0};
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
     result.error = RC_CCLIENT_OOM;
     goto done;
   }
@@ -239,6 +276,8 @@ iota_api_result_t iota_api_get_trytes(const iota_http_service_t* const service,
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -261,7 +300,10 @@ iota_api_result_t iota_api_get_inclusion_states(
   iota_api_result_t result = {0};
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
     result.error = RC_CCLIENT_OOM;
     goto done;
   }
@@ -274,6 +316,8 @@ iota_api_result_t iota_api_get_inclusion_states(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -298,7 +342,10 @@ iota_api_result_t iota_api_get_balances(
 
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
     result.error = RC_CCLIENT_OOM;
     goto done;
   }
@@ -311,6 +358,8 @@ iota_api_result_t iota_api_get_balances(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -335,7 +384,10 @@ iota_api_result_t iota_api_get_transactions_to_approve(
   iota_api_result_t result = {0};
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
     result.error = RC_CCLIENT_OOM;
     goto done;
   }
@@ -349,6 +401,8 @@ iota_api_result_t iota_api_get_transactions_to_approve(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -373,7 +427,10 @@ iota_api_result_t iota_api_attach_to_tangle(
 
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
     result.error = RC_CCLIENT_OOM;
     goto done;
   }
@@ -386,6 +443,8 @@ iota_api_result_t iota_api_attach_to_tangle(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -406,6 +465,7 @@ done:
 iota_api_result_t iota_api_interrupt_attaching_to_tangle(
     const iota_http_service_t* const service) {
   iota_api_result_t result = {0};
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   // TODO
   return result;
 }
@@ -416,7 +476,10 @@ iota_api_result_t iota_api_broadcast_transactions(
   iota_api_result_t result = {0};
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
     result.error = RC_CCLIENT_OOM;
     goto done;
   }
@@ -429,6 +492,8 @@ iota_api_result_t iota_api_broadcast_transactions(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -448,7 +513,10 @@ iota_api_result_t iota_api_store_transactions(
   iota_api_result_t result = {0};
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
     result.error = RC_CCLIENT_OOM;
     goto done;
   }
@@ -461,6 +529,8 @@ iota_api_result_t iota_api_store_transactions(
 
   result = iota_service_query(service, req_buff, res_buff);
   if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
     goto done;
   }
 
@@ -475,11 +545,44 @@ done:
   return result;
 }
 
-iota_api_result_t iota_api_were_addresses_spent_from(
-    const iota_http_service_t* const service,
-    were_addresses_spent_from_req_t* req,
-    were_addresses_spent_from_res_t* res) {
+iota_api_result_t iota_api_check_consistency(
+    const iota_http_service_t* const service, check_consistency_req_t* req,
+    check_consistency_res_t* res) {
   iota_api_result_t result = {0};
-  // TODO
+
+  char_buffer_t* res_buff = char_buffer_new();
+  char_buffer_t* req_buff = char_buffer_new();
+  log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  if (req_buff == NULL || res_buff == NULL) {
+    log_critical(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_OOM);
+    result.error = RC_CCLIENT_OOM;
+    goto done;
+  }
+
+  result.error = service->serializer.vtable.check_consistency_serialize_request(
+      &service->serializer, req, req_buff);
+  if (result.error != RC_OK) {
+    goto done;
+  }
+
+  result = iota_service_query(service, req_buff, res_buff);
+  if (result.error != RC_OK) {
+    log_error(CCLIENT_CORE_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+              error_2_string(result.error));
+    goto done;
+  }
+
+  result.error =
+      service->serializer.vtable.check_consistency_deserialize_response(
+          &service->serializer, res_buff->data, res);
+
+done:
+  if (req_buff) {
+    char_buffer_free(req_buff);
+  }
+  if (res_buff) {
+    char_buffer_free(res_buff);
+  }
   return result;
 }

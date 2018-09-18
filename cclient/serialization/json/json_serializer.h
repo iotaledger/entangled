@@ -10,10 +10,12 @@
 
 #include <stdlib.h>
 #include "serializer/serializer.h"
+#include "utils/logger_helper.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+void logger_init_json_serializer();
 void init_json_serializer(serializer_t* serializer);
 
 retcode_t json_find_transactions_serialize_request(
@@ -115,12 +117,12 @@ retcode_t json_store_transactions_serialize_request(
     const serializer_t* const s, store_transactions_req_t* obj,
     char_buffer_t* out);
 
-retcode_t json_were_addresses_spent_from_serialize_request(
-    const serializer_t* const s, were_addresses_spent_from_req_t* obj,
-    char_buffer_t* out);
-retcode_t json_were_addresses_spent_from_deserialize_response(
+retcode_t json_check_consistency_serialize_request(const serializer_t* const s,
+                                                   check_consistency_req_t* obj,
+                                                   char_buffer_t* out);
+retcode_t json_check_consistency_deserialize_response(
     const serializer_t* const s, const char* const obj,
-    were_addresses_spent_from_res_t* out);
+    check_consistency_res_t* out);
 
 static serializer_vtable json_vtable = {
     .find_transactions_serialize_request =
@@ -162,10 +164,10 @@ static serializer_vtable json_vtable = {
         json_broadcast_transactions_serialize_request,
     .store_transactions_serialize_request =
         json_store_transactions_serialize_request,
-    .were_addresses_spent_from_serialize_request =
-        json_were_addresses_spent_from_serialize_request,
-    .were_addresses_spent_from_deserialize_response =
-        json_were_addresses_spent_from_deserialize_response,
+    .check_consistency_serialize_request =
+        json_check_consistency_serialize_request,
+    .check_consistency_deserialize_response =
+        json_check_consistency_deserialize_response,
 };
 
 #ifdef __cplusplus

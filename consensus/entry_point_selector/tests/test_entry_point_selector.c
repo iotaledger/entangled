@@ -12,7 +12,7 @@
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
-#include "consensus/test_definitions/defs.h"
+#include "consensus/test_utils/tangle.h"
 #include "utils/files.h"
 
 static entry_point_selector_t eps;
@@ -27,20 +27,20 @@ static char* test_db_path = "consensus/entry_point_selector/tests/test.db";
 static char* ciri_db_path = "consensus/entry_point_selector/tests/ciri.db";
 
 void test_entry_point_with_tangle_data() {
-  TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
   TEST_ASSERT(iota_consensus_entry_point_selector_init(&eps, &mt, &tangle,
                                                        true) == RC_OK);
-  TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_entry_point_selector_destroy(&eps) == RC_OK);
 }
 
 void test_entry_point_without_tangle_data() {
-  TEST_ASSERT(test_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
   TEST_ASSERT(iota_consensus_entry_point_selector_init(&eps, &mt, &tangle,
                                                        true) == RC_OK);
-  TEST_ASSERT(test_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_entry_point_selector_destroy(&eps) == RC_OK);
 }
 

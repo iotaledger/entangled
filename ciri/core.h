@@ -12,6 +12,7 @@
 #include "ciri/conf/conf.h"
 #include "ciri/node.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/snapshot/snapshot.h"
 #include "consensus/tangle/tangle.h"
 
 #ifdef __cplusplus
@@ -25,6 +26,7 @@ typedef struct core_s {
   milestone_tracker_t milestone_tracker;
   connection_config_t db_conf;
   node_t node;
+  snapshot_t snapshot;
   iota_api_t api;
 } core_t;
 

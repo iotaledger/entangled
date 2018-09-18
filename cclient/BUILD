@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["iota_api.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":service",
         "//cclient/http:beast",
     ],
 )
@@ -22,5 +23,6 @@ cc_library(
         "//cclient/request:requests",
         "//cclient/response:responses",
         "//cclient/serialization:serializer_json",
+        "//utils:logger_helper",
     ],
 )

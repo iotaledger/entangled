@@ -7,7 +7,7 @@ cc_test(
         "//common/helpers:digest",
         "//common/model/tests:defs",
         "//consensus/entry_point_selector",
-        "//consensus/test_definitions:defs",
+        "//consensus/test_utils",
         "//utils:files",
         "@unity",
     ],

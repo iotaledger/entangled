@@ -104,6 +104,15 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "tryte_ascii",
+    srcs = ["tryte_ascii.c"],
+    hdrs = ["tryte_ascii.h"],
+    deps = [
+        ":tryte",
+    ],
+)
+
 config_setting(
     name = "trit_encoding_1",
     values = {"define": "trit_encoding=1"},
