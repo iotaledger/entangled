@@ -1,5 +1,5 @@
 build --cxxopt='-std=c++1z'
-build --fat_apk_cpu='armeabi,armeabi-v7a,arm64-v8a,x86,x86_64'
+build --fat_apk_cpu='armeabi-v7a,arm64-v8a,x86,x86_64'
 
 test --copt='-ggdb3'
 
