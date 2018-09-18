@@ -9,6 +9,7 @@
 #define COMMON_ERRORS_H_
 
 #include <stdio.h>
+#include "common/error_strings.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -372,18 +373,6 @@ enum retcode_t {
 };
 
 typedef enum retcode_t retcode_t;
-
-#define STR_OK "OK"
-
-// Cclient Module
-#define STR_CCLIENT_JSON_CREATE "Create JSON object error!"
-#define STR_CCLIENT_JSON_PARSE "JSON parsing failed"
-#define STR_CCLIENT_OOM "Out of Memory!"
-#define STR_CCLIENT_HTTP "HTTP service error"
-#define STR_CCLIENT_HTTP_REQ "HTTP request error"
-#define STR_CCLIENT_HTTP_RES "HTTP response error"
-#define STR_CCLIENT_RES_ERROR "IRI response:"
-#define STR_CCLIENT_JSON_KEY "JSON key not found"
 
 const char* error_2_string(retcode_t err);
 
