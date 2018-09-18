@@ -14,6 +14,7 @@ genrule(
         wget -q $$url/snapshotTestnet.txt -O $(location snapshotTestnet.txt) && dos2unix $(location snapshotTestnet.txt)
         wget -q $$url/snapshotTestnet.sig -O $(location snapshotTestnet.sig) && dos2unix $(location snapshotTestnet.sig)
       """,
+    visibility = ["//visibility:public"],
 )
 
 cc_library(

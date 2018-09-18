@@ -12,7 +12,9 @@ cc_test(
 cc_test(
     name = "test_signed_files",
     srcs = ["test_signed_files.c"],
+    data = ["//consensus/snapshot:snapshot_files"],
     deps = [
+        "//consensus/snapshot",
         "//utils:signed_files",
         "@unity",
     ],
