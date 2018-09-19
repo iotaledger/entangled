@@ -49,7 +49,7 @@ retcode_t core_init(core_t* const core) {
 
   log_info(CORE_LOGGER_ID, "Initializing milestone tracker\n");
   if (iota_milestone_tracker_init(&core->milestone_tracker, &core->tangle,
-                                  core->config.testnet)) {
+                                  &core->snapshot, core->config.testnet)) {
     log_critical(CORE_LOGGER_ID, "Initializing milestone tracker failed\n");
     return RC_CORE_FAILED_MILESTONE_TRACKER_INIT;
   }

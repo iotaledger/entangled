@@ -37,7 +37,7 @@ typedef struct state_entry_t {
 
 typedef state_entry_t *state_map_t;
 
-typedef struct snapshot_t {
+typedef struct snapshot_s {
   rw_lock_handle_t rw_lock;
   size_t index;
   state_map_t state;

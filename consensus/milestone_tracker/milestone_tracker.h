@@ -11,7 +11,6 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
-#include "consensus/snapshot/snapshot.h"
 #include "utils/handles/thread.h"
 
 #define MILESTONE_TRACKER_INITIAL_HASH_PACK_SIZE 10
@@ -24,12 +23,14 @@ extern "C" {
 
 // Foward declarations
 typedef struct tangle_s tangle_t;
+typedef struct snapshot_s snapshot_t;
 typedef struct _trit_array* trit_array_p;
 
 typedef struct milestone_tracker_s {
   bool running;
   bool testnet;
   tangle_t* tangle;
+  snapshot_t* latest_snapshot;
   uint64_t milestone_start_index;
   thread_handle_t latest_milestone_tracker;
   uint64_t latest_milestone_index;
@@ -41,11 +42,9 @@ typedef struct milestone_tracker_s {
   size_t num_keys_in_milestone;
   // TODO
   // private final TransactionValidator transactionValidator;
-  // public Snapshot latestSnapshot;
   // private LedgerValidator ledgerValidator;
   // private final MessageQ messageQ;
   // bool accept_any_testnet_coo;
-  snapshot_t latest_snapshot;
 } milestone_tracker_t;
 
 /**
@@ -53,12 +52,14 @@ typedef struct milestone_tracker_s {
  *
  * @param mt The milestone tracker
  * @param tangle A tangle
+ * @param snapshot An initial snapshot
  * @param testnet Whether the node runs on testnet or not
  *
  * @return a status code
  */
 extern retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
                                              tangle_t* const tangle,
+                                             snapshot_t* const snapshot,
                                              bool testnet);
 
 /**
