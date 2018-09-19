@@ -25,81 +25,81 @@
 static retcode_t validate_milestone(milestone_tracker_t* const mt,
                                     iota_milestone_t* const candidate) {
   retcode_t ret = RC_OK;
-  bool exists = false;
+  bundle_transactions_t* bundle = NULL;
+  bool exists = false, valid = false;
 
   if (candidate->index >= 0x200000) {
     return RC_OK;
   }
 
-  // Checking if milestone is already persisted/validated in database
+  // Check if milestone is already present in database i.e. validated
   TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
   memcpy(hash.trits, candidate->hash, FLEX_TRIT_SIZE_243);
   if ((ret = iota_tangle_milestone_exist(mt->tangle, MILESTONE_COL_HASH, &hash,
-                                         &exists))) {
+                                         &exists)) != RC_OK) {
     goto done;
   } else if (exists) {
     goto valid;
   }
 
-  {  // TODO remove
-    iota_tangle_milestone_store(mt->tangle, candidate);
-    goto valid;
+  bundle_transactions_new(&bundle);
+  if (bundle == NULL) {
+    ret = RC_CONSENSUS_MT_OOM;
+    goto done;
   }
-  // final List<List<TransactionViewModel>> bundleTransactions =
-  //     BundleValidator.validate(tangle, transactionViewModel.getHash());
-  // if (bundleTransactions.size() == 0) {
-  //   return INCOMPLETE;
-  // } else {
-  //   for (final List<TransactionViewModel> bundleTransactionViewModels :
-  //        bundleTransactions) {
-  //     // if
-  //     //
-  //     (Arrays.equals(bundleTransactionViewModels.get(0).getHash(),transactionViewModel.getHash()))
-  //     // {
-  //     if (bundleTransactionViewModels.get(0).getHash().equals(
-  //             transactionViewModel.getHash())) {
-  //       // final TransactionViewModel transactionViewModel2 =
-  //       //
-  //       StorageTransactions.instance().loadTransaction(transactionViewModel.trunkTransactionPointer);
-  //       final TransactionViewModel transactionViewModel2 =
-  //           transactionViewModel.getTrunkTransaction(tangle);
-  //       if (transactionViewModel2.getType() ==
-  //               TransactionViewModel.FILLED_SLOT &&
-  //           transactionViewModel.getBranchTransactionHash().equals(
-  //               transactionViewModel2.getTrunkTransactionHash()) &&
-  //           transactionViewModel.getBundleHash().equals(
-  //               transactionViewModel2.getBundleHash())) {
-  //         final byte[] trunkTransactionTrits =
-  //             transactionViewModel.getTrunkTransactionHash().trits();
-  //         final byte[] signatureFragmentTrits = Arrays.copyOfRange(
-  //             transactionViewModel.trits(),
-  //             TransactionViewModel.SIGNATURE_MESSAGE_FRAGMENT_TRINARY_OFFSET,
-  //             TransactionViewModel.SIGNATURE_MESSAGE_FRAGMENT_TRINARY_OFFSET
-  //             +
-  //                 TransactionViewModel.SIGNATURE_MESSAGE_FRAGMENT_TRINARY_SIZE);
-  //
-  //         final byte[] merkleRoot = ISS.getMerkleRoot(
-  //             mode,
-  //             ISS.address(
-  //                 mode, ISS.digest(mode,
-  //                                  Arrays.copyOf(ISS.normalizedBundle(
-  //                                                    trunkTransactionTrits),
-  //                                                ISS.NUMBER_OF_FRAGMENT_CHUNKS),
-  //                                  signatureFragmentTrits)),
-  //             transactionViewModel2.trits(), 0, index, numOfKeysInMilestone);
-  //         if ((testnet && acceptAnyTestnetCoo) ||
-  //             (new Hash(merkleRoot)).equals(coordinator)) {
-  //           new MilestoneViewModel(index, transactionViewModel.getHash())
-  //               .store(tangle);
-  //           return VALID;
-  //         } else {
-  //           return INVALID;
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
-  // return INVALID;
+  if ((ret = bundle_validate(mt->tangle, &hash, bundle, &valid)) != RC_OK) {
+    log_warning(MILESTONE_TRACKER_LOGGER_ID, "Validating bundle failed\n");
+    goto done;
+  } else if (!valid) {
+    goto done;
+  } else {
+    trit_t signature_trits[NUM_TRITS_SIGNATURE];
+    trit_t siblings_trits[NUM_TRITS_SIGNATURE];
+    byte_t normalized_trunk[81];  // TODO size
+    trit_t normalized_trunk_trits[HASH_LENGTH];
+    trit_t sig_digest[HASH_LENGTH];
+    trit_t root[HASH_LENGTH];
+    flex_trit_t coo[FLEX_TRIT_SIZE_243];
+    iota_transaction_t tx1 = NULL;
+    iota_transaction_t tx2 = NULL;
+    Curl curl;
+
+    if ((tx1 = (iota_transaction_t)utarray_eltptr(bundle, 0)) == NULL ||
+        memcmp(tx1->hash, candidate->hash, FLEX_TRIT_SIZE_243) != 0) {
+      goto done;
+    }
+    if ((tx2 = (iota_transaction_t)utarray_eltptr(bundle, 1)) == NULL) {
+      goto done;
+    }
+
+
+    flex_trits_to_trits(signature_trits, NUM_TRITS_SIGNATURE,
+                        tx1->signature_or_message, NUM_TRITS_SIGNATURE,
+                        NUM_TRITS_SIGNATURE);
+    flex_trits_to_trits(siblings_trits, NUM_TRITS_SIGNATURE,
+                        tx2->signature_or_message, NUM_TRITS_SIGNATURE,
+                        NUM_TRITS_SIGNATURE);
+    curl.type = CURL_P_27;
+    init_curl(&curl);
+    normalize_bundle(tx1->trunk, normalized_trunk);
+    for (int c = 0; c < 81; ++c) {  // TODO size
+      long_to_trits(normalized_trunk[c], &normalized_trunk_trits[c * RADIX]);
+    }
+    iss_curl_sig_digest(sig_digest, normalized_trunk_trits, signature_trits,
+                        NUM_TRITS_SIGNATURE, &curl);
+    curl_reset(&curl);
+    iss_curl_address(sig_digest, root, HASH_LENGTH, &curl);
+    merkle_root(root, siblings_trits, mt->num_keys_in_milestone,
+                candidate->index, &curl);
+    flex_trits_from_trits(coo, HASH_LENGTH, root, HASH_LENGTH, HASH_LENGTH);
+
+    if (memcmp(coo, mt->coordinator->trits, FLEX_TRIT_SIZE_243) == 0) {
+      iota_tangle_milestone_store(mt->tangle, candidate);
+      goto valid;
+    } else {
+      goto done;
+    }
+  }
 
 valid:
   if (candidate->index > mt->latest_milestone_index) {
@@ -107,6 +107,9 @@ valid:
     memcpy(mt->latest_milestone->trits, candidate->hash, FLEX_TRIT_SIZE_243);
   }
 done:
+  if (bundle) {
+    bundle_transactions_free(&bundle);
+  }
   return ret;
 }
 
