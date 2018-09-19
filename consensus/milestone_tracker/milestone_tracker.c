@@ -68,10 +68,11 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
         memcmp(tx1->hash, candidate->hash, FLEX_TRIT_SIZE_243) != 0) {
       goto done;
     }
-    if ((tx2 = (iota_transaction_t)utarray_eltptr(bundle, 1)) == NULL) {
+    if ((tx2 = (iota_transaction_t)utarray_eltptr(bundle, 1)) == NULL ||
+        memcmp(tx1->branch, tx2->trunk, FLEX_TRIT_SIZE_243) != 0 ||
+        memcmp(tx1->bundle, tx2->bundle, FLEX_TRIT_SIZE_243) != 0) {
       goto done;
     }
-
 
     flex_trits_to_trits(signature_trits, NUM_TRITS_SIGNATURE,
                         tx1->signature_or_message, NUM_TRITS_SIGNATURE,
