@@ -32,7 +32,7 @@ void char_buffer_free(char_buffer_t* in) {
   }
 }
 
-int_array* int_array_new(){
+int_array* int_array_new() {
   int_array* out = (int_array*)malloc(sizeof(int_array));
   out->size = 0;
   out->array = NULL;
@@ -60,7 +60,7 @@ void int_array_free(int_array* in) {
   }
 }
 
-int_array_array* int_array_array_new(){
+int_array_array* int_array_array_new() {
   int_array_array* out = (int_array_array*)malloc(sizeof(int_array_array));
   out->size = 0;
   out->array = NULL;
@@ -102,7 +102,7 @@ int_array* string_to_int_array(char* in) {
   int len = strlen(in);
   int_array* in_arr = int_array_new();
   int_array_allocate(in_arr, len);
-  
+
   for (int i = 0; i < len; i++) {
     *(in_arr->array + i) = atoi(in + i);
   }
