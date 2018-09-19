@@ -174,37 +174,31 @@ static void* latest_milestone_tracker(void* arg) {
 static retcode_t update_latest_solid_subtangle_milestone(
     milestone_tracker_t* const mt) {
   retcode_t ret = RC_OK;
-  iota_milestone_t *milestone = NULL, *latest_milestone = NULL;
-  iota_stor_pack_t pack = {(void**)&latest_milestone, 1, 0, false};
+  iota_milestone_t milestone, latest_milestone;
+  iota_milestone_t *milestone_ptr = &milestone,
+                   *latest_milestone_ptr = &latest_milestone;
+  iota_stor_pack_t pack = {(void**)&latest_milestone_ptr, 1, 0, false};
 
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
   }
-  if ((milestone = malloc(sizeof(iota_milestone_t))) == NULL) {
-    ret = RC_CONSENSUS_MT_OOM;
-    goto done;
-  }
-  if ((latest_milestone = malloc(sizeof(iota_milestone_t))) == NULL) {
-    ret = RC_CONSENSUS_MT_OOM;
-    goto done;
-  }
   if ((ret = iota_tangle_milestone_load_latest(mt->tangle, &pack))) {
-    goto done;
+    return ret;
   }
   if (pack.num_loaded != 0) {
     pack.num_loaded = 0;
-    pack.models = (void**)&milestone;
+    pack.models = (void**)&milestone_ptr;
     iota_tangle_milestone_load_next(
         mt->tangle, mt->latest_solid_subtangle_milestone_index, &pack);
-    while (pack.num_loaded != 0 &&
-           milestone->index <= latest_milestone->index && mt->running) {
+    while (pack.num_loaded != 0 && milestone.index <= latest_milestone.index &&
+           mt->running) {
       if (true  // TODO
                 // transactionValidator.checkSolidity(milestoneViewModel.getHash(),
                 // true)
-          && milestone->index >= mt->latest_solid_subtangle_milestone_index &&
+          && milestone.index >= mt->latest_solid_subtangle_milestone_index &&
           true /* TODO ledgerValidator.updateSnapshot(milestoneViewModel) */) {
-        mt->latest_solid_subtangle_milestone_index = milestone->index;
-        memcpy(mt->latest_solid_subtangle_milestone->trits, milestone->hash,
+        mt->latest_solid_subtangle_milestone_index = milestone.index;
+        memcpy(mt->latest_solid_subtangle_milestone->trits, milestone.hash,
                FLEX_TRIT_SIZE_243);
       } else {
         break;
@@ -213,14 +207,6 @@ static retcode_t update_latest_solid_subtangle_milestone(
       iota_tangle_milestone_load_next(
           mt->tangle, mt->latest_solid_subtangle_milestone_index, &pack);
     }
-  }
-
-done:
-  if (milestone) {
-    free(milestone);
-  }
-  if (latest_milestone) {
-    free(latest_milestone);
   }
   return ret;
 }
