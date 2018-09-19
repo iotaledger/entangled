@@ -42,5 +42,5 @@ char* get_balances_res_milestone_at(get_balances_res_t* in, int index) {
       return *p;
     }
   }
-  return '\0';
+  return NULL;
 }

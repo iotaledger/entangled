@@ -21,7 +21,7 @@ char* get_tips_res_hash_at(get_tips_res_t* hashes, int index) {
       return *p;
     }
   }
-  return '\0';
+  return NULL;
 }
 
 int get_tips_res_hash_num(get_tips_res_t* hashes) {
