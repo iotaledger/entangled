@@ -653,8 +653,8 @@ void transfer_iterator_free(transfer_iterator_t transfer_iterator) {
   free(transfer_iterator);
 }
 
-void absorb_essence(Kerl *const kerl, flex_trit_t *address, int64_t value,
-                    flex_trit_t *obsolete_tag, uint64_t timestamp,
+void absorb_essence(Kerl *const kerl, flex_trit_t const *address, int64_t value,
+                    flex_trit_t const *obsolete_tag, uint64_t timestamp,
                     int64_t current_index, int64_t last_index,
                     trit_t *const essence_trits) {
   memset(essence_trits, 0, NUM_TRITS_ESSENCE);
