@@ -55,7 +55,7 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
   } else {
     trit_t signature_trits[NUM_TRITS_SIGNATURE];
     trit_t siblings_trits[NUM_TRITS_SIGNATURE];
-    byte_t normalized_trunk[81];  // TODO size
+    byte_t normalized_trunk[TRYTE_HASH_LENGTH];
     trit_t normalized_trunk_trits[HASH_LENGTH];
     trit_t sig_digest[HASH_LENGTH];
     trit_t root[HASH_LENGTH];
@@ -82,7 +82,7 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
     curl.type = CURL_P_27;
     init_curl(&curl);
     normalize_bundle(tx1->trunk, normalized_trunk);
-    for (int c = 0; c < 81; ++c) {  // TODO size
+    for (int c = 0; c < TRYTE_HASH_LENGTH; ++c) {
       long_to_trits(normalized_trunk[c], &normalized_trunk_trits[c * RADIX]);
     }
     iss_curl_sig_digest(sig_digest, normalized_trunk_trits, signature_trits,
