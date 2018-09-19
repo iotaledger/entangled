@@ -5,8 +5,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//ciri/conf:conf_values",
+        "//common/sign/v1:iss_curl",
+        "//consensus/bundle_validator",
         "//consensus/snapshot",
-        "//consensus/tangle",
+        "//mam/v1:merkle",
         "//utils:macros",
         "//utils:time",
         "//utils/handles:thread",

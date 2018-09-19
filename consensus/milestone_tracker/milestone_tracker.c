@@ -10,10 +10,12 @@
 
 #include "ciri/conf/conf_values.h"
 #include "common/model/milestone.h"
+#include "common/sign/v1/iss_curl.h"
 #include "common/storage/sql/defs.h"
 #include "common/trinary/trit_long.h"
+#include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
-#include "consensus/tangle/tangle.h"
+#include "mam/v1/merkle.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
 #include "utils/time.h"
