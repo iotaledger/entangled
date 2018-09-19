@@ -489,8 +489,10 @@ void test_serialize_attach_to_tangle(void) {
 
   attach_to_tangle_req_set_trunk(attach_req, TEST_HASH1);
   attach_to_tangle_req_set_branch(attach_req, TEST_HASH2);
-  attach_to_tangle_req_add_trytes(attach_req, TEST_RAW_TRYTES1);
-  attach_to_tangle_req_add_trytes(attach_req, TEST_RAW_TRYTES2);
+  attach_req->trytes =
+      attach_to_tangle_req_add_trytes(attach_req->trytes, TEST_RAW_TRYTES1);
+  attach_req->trytes =
+      attach_to_tangle_req_add_trytes(attach_req->trytes, TEST_RAW_TRYTES2);
   attach_to_tangle_req_set_mwm(attach_req, TEST_MWM);
   serializer.vtable.attach_to_tangle_serialize_request(&serializer, attach_req,
                                                        serializer_out);
@@ -507,15 +509,23 @@ void test_deserialize_attach_to_tangle(void) {
   const char* json_text =
       "{\"trytes\":[\"" TEST_HASH1 "\",\"" TEST_HASH2 "\"],\"duration\":4}";
 
+  char_buffer_t* tmp_text = NULL;
   attach_to_tangle_res_t* trytes = attach_to_tangle_res_new();
 
   serializer.vtable.attach_to_tangle_deserialize_response(&serializer,
-                                                          json_text, trytes);
-  TEST_ASSERT_EQUAL_STRING(TEST_HASH1,
-                           attach_to_tangle_res_trytes_at(trytes, 0));
-  TEST_ASSERT_EQUAL_STRING(TEST_HASH2,
-                           attach_to_tangle_res_trytes_at(trytes, 1));
-  TEST_ASSERT_EQUAL_STRING(NULL, attach_to_tangle_res_trytes_at(trytes, 3));
+                                                          json_text, &trytes);
+  tmp_text = attach_to_tangle_res_trytes_at(trytes, 0);
+  TEST_ASSERT_EQUAL_STRING(TEST_HASH1, tmp_text->data);
+  char_buffer_free(tmp_text);
+
+  tmp_text = attach_to_tangle_res_trytes_at(trytes, 1);
+  TEST_ASSERT_EQUAL_STRING(TEST_HASH2, tmp_text->data);
+  char_buffer_free(tmp_text);
+
+  tmp_text = attach_to_tangle_res_trytes_at(trytes, 3);
+  TEST_ASSERT_EQUAL_STRING(NULL, tmp_text);
+  char_buffer_free(tmp_text);
+
   attach_to_tangle_res_free(trytes);
 }
 
@@ -528,7 +538,7 @@ void test_serialize_broadcast_transactions(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   broadcast_transactions_req_t* req = broadcast_transactions_req_new();
-  broadcast_transactions_req_add(req, BROADCAST_TX_TRYTES);
+  req = broadcast_transactions_req_add(req, BROADCAST_TX_TRYTES);
 
   serializer.vtable.broadcast_transactions_serialize_request(&serializer, req,
                                                              serializer_out);

@@ -22,6 +22,8 @@ extern "C" {
 #define STR_CCLIENT_HTTP_RES "HTTP response error"
 #define STR_CCLIENT_RES_ERROR "IRI response:"
 #define STR_CCLIENT_JSON_KEY "JSON key not found"
+#define STR_CCLIENT_UTLIST "utlist error"
+#define STR_CCLIENT_FLEX_TRITS "converting flex_trits failed"
 
 #ifdef __cplusplus
 }
