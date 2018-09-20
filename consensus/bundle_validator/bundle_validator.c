@@ -8,6 +8,7 @@
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "common/helpers/sign.h"
 #include "common/kerl/kerl.h"
+#include "common/sign/normalize.h"
 #include "common/trinary/trit_long.h"
 #include "consensus/defs.h"
 #include "utils/logger_helper.h"
@@ -96,7 +97,7 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
         break;
       }
 
-      normalize_bundle(bundle_hash_calculated, normalized_bundle_bytes);
+      normalize_hash(bundle_hash_calculated, normalized_bundle_bytes);
       for (int c = 0; c < NUM_TRYTES_HASH; ++c) {
         long_to_trits(normalized_bundle_bytes[c],
                       &normalized_bundle_trits[c * RADIX]);

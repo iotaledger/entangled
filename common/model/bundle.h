@@ -13,14 +13,6 @@
 #include "common/trinary/flex_trit.h"
 #include "utarray.h"
 
-#define TRYTE_HASH_LENGTH 81
-#define TRIT_HASH_LENGTH 243
-#define MAX_TRYTE_VALUE 13
-#define MIN_TRYTE_VALUE -13
-#define TRYTE_WIDTH 3
-#define NUMBER_OF_SECURITY_LEVELS 3
-#define NORMALIZED_FRAGMENT_LENGTH 27
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,8 +26,6 @@ void bundle_transactions_add(bundle_transactions_t *const bundle,
                              iota_transaction_t transaction);
 
 void calculate_bundle_hash(bundle_transactions_t *bundle, flex_trit_t *out);
-void normalize_bundle(flex_trit_t const *const bundle_hash,
-                      byte_t *const normalized_bundle_hash);
 
 #ifdef __cplusplus
 }

@@ -12,6 +12,7 @@ cc_test(
     srcs = ["test_bundle.c"],
     deps = [
         "//common/model:bundle",
+        "//common/sign:normalize",
         "@unity",
     ],
 )

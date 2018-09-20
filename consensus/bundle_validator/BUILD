@@ -8,6 +8,7 @@ cc_library(
         "//common/helpers:sign",
         "//common/model:bundle",
         "//common/model:transfer",
+        "//common/sign:normalize",
         "//common/sign/v1:iss_kerl",
         "//common/trinary:trit_array",
         "//common/trinary:trit_tryte",

@@ -10,6 +10,7 @@
 
 #include "ciri/conf/conf_values.h"
 #include "common/model/milestone.h"
+#include "common/sign/normalize.h"
 #include "common/sign/v1/iss_curl.h"
 #include "common/storage/sql/defs.h"
 #include "common/trinary/trit_long.h"
@@ -45,7 +46,7 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt,
                       NUM_TRITS_SIGNATURE);
   curl.type = CURL_P_27;
   init_curl(&curl);
-  normalize_bundle(tx1->trunk, normalized_trunk);
+  normalize_hash(tx1->trunk, normalized_trunk);
   for (int c = 0; c < TRYTE_HASH_LENGTH; ++c) {
     long_to_trits(normalized_trunk[c], &normalized_trunk_trits[c * RADIX]);
   }
