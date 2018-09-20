@@ -10,6 +10,7 @@
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
+#include "consensus/snapshot/snapshot.h"
 
 #include "utils/logger_helper.h"
 
@@ -30,7 +31,7 @@ retcode_t iota_consensus_tipselection_init(
   impl->wv = wv;
   impl->ep_randomizer = ep_randomizer;
   impl->ep_selector = ep;
-  rw_lock_handle_init(&impl->mt->latest_snapshot.rw_lock);
+  rw_lock_handle_init(&impl->mt->latest_snapshot->rw_lock);
   return RC_OK;
 }
 
@@ -41,7 +42,7 @@ retcode_t iota_consensus_get_transactions_to_approve(
   trit_array_p ep = NULL;
   cw_calc_result ratings_result;
 
-  rw_lock_handle_rdlock(&ts->mt->latest_snapshot.rw_lock);
+  rw_lock_handle_rdlock(&ts->mt->latest_snapshot->rw_lock);
 
   if ((res = iota_consensus_get_entry_point(ts->ep_selector, depth, ep))) {
     log_error(TIPSELECTION_LOGGER_ID,
@@ -85,7 +86,7 @@ retcode_t iota_consensus_get_transactions_to_approve(
   }
 
 ret:
-  rw_lock_handle_unlock(&ts->mt->latest_snapshot.rw_lock);
+  rw_lock_handle_unlock(&ts->mt->latest_snapshot->rw_lock);
   return res;
 }
 
@@ -97,6 +98,6 @@ retcode_t iota_consensus_tipselection_destroy(tipselection_t *const ts) {
   ts->mt = NULL;
   ts->tangle = NULL;
   ts->ep_randomizer = NULL;
-  rw_lock_handle_destroy(&ts->mt->latest_snapshot.rw_lock);
+  rw_lock_handle_destroy(&ts->mt->latest_snapshot->rw_lock);
   return RC_OK;
 }
