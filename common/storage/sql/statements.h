@@ -23,46 +23,51 @@ extern "C" {
  * Transaction statements
  */
 
-retcode_t iota_statement_transaction_insert(const iota_transaction_t tx,
-                                            char statement[],
-                                            size_t statement_cap);
-
-retcode_t iota_statement_transaction_select(const char* index_col,
-                                            char statement[],
-                                            size_t statement_cap);
-
-retcode_t iota_statement_transaction_exist(const char* index_col,
-                                           char statement[],
-                                           size_t statement_cap);
-
-retcode_t iota_statement_transaction_update(const char* index_col,
-                                            const trit_array_p key,
-                                            const iota_transaction_t tx,
-                                            char statement[],
-                                            size_t statement_cap);
-
-retcode_t iota_statement_transaction_select_hashes(const char* index_col,
+extern retcode_t iota_statement_transaction_insert(const iota_transaction_t tx,
                                                    char statement[],
                                                    size_t statement_cap);
 
-retcode_t iota_statement_transaction_select_hashes_approvers(
+extern retcode_t iota_statement_transaction_select(const char* index_col,
+                                                   char statement[],
+                                                   size_t statement_cap);
+
+extern retcode_t iota_statement_transaction_exist(const char* index_col,
+                                                  char statement[],
+                                                  size_t statement_cap);
+
+extern retcode_t iota_statement_transaction_update(const char* index_col,
+                                                   const trit_array_p key,
+                                                   const iota_transaction_t tx,
+                                                   char statement[],
+                                                   size_t statement_cap);
+
+extern retcode_t iota_statement_transaction_select_hashes(const char* index_col,
+                                                          char statement[],
+                                                          size_t statement_cap);
+
+extern retcode_t iota_statement_transaction_select_hashes_approvers(
     const trit_array_p approvee_hash, char statement[], size_t statement_cap);
 
 /*
  * Milestone statements
  */
 
-retcode_t iota_statement_milestone_insert(const iota_milestone_t* milestone,
-                                          char statement[],
-                                          size_t statement_cap);
+extern retcode_t iota_statement_milestone_insert(
+    const iota_milestone_t* milestone, char statement[], size_t statement_cap);
 
-retcode_t iota_statement_milestone_select(const char* index_col,
-                                          char statement[],
-                                          size_t statement_cap);
+extern retcode_t iota_statement_milestone_select(const char* index_col,
+                                                 char statement[],
+                                                 size_t statement_cap);
 
-retcode_t iota_statement_milestone_exist(const char* index_col,
-                                         char statement[],
-                                         size_t statement_cap);
+extern retcode_t iota_statement_milestone_select_latest(char statement[],
+                                                        size_t statement_cap);
+
+extern retcode_t iota_statement_milestone_select_next(char statement[],
+                                                      size_t statement_cap);
+
+extern retcode_t iota_statement_milestone_exist(const char* index_col,
+                                                char statement[],
+                                                size_t statement_cap);
 
 #ifdef __cplusplus
 }

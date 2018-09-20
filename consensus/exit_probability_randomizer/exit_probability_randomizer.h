@@ -15,7 +15,6 @@
 #include "common/storage/connection.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
-#include "consensus/milestone/milestone.h"
 #include "consensus/tangle/tangle.h"
 
 #ifdef __cplusplus
@@ -49,7 +48,7 @@ struct ep_randomizer_s {
 };
 
 extern retcode_t iota_consensus_ep_randomizer_init(
-    const tangle_t *tangle, ep_randomizer_t *ep_randomizer, double alpha,
+    tangle_t *const tangle, ep_randomizer_t *ep_randomizer, double alpha,
     enum ep_randomizer_implementation);
 extern retcode_t iota_consensus_ep_randomizer_destroy(
     ep_randomizer_t *ep_randomizer);

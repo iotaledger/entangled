@@ -12,8 +12,6 @@ cc_library(
         "//consensus/exit_probability_randomizer",
         "//consensus/exit_probability_validator",
         "//consensus/ledger_validator",
-        "//consensus/milestone",
-        "//consensus/view_models",
         "//utils:logger_helper",
     ],
 )

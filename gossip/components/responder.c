@@ -30,7 +30,7 @@ static retcode_t regular_transaction_request(
     return RC_RESPONDER_COMPONENT_OOM;
   }
 
-  iota_stor_pack_t pack = {(void **)(&tx), 1, 0, false};
+  iota_stor_pack_t pack = {(void **)tx, 1, 0, false};
   if ((ret = iota_tangle_transaction_load(&state->node->core->tangle,
                                           TRANSACTION_COL_HASH, request->hash,
                                           &pack))) {

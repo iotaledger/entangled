@@ -11,11 +11,11 @@
 #define WALKER_VALIDATOR_LOGGER_ID "consensus_walker_validator"
 
 retcode_t iota_consensus_exit_prob_transaction_validator_init(
-    const tangle_t *tangle, const milestone_t *milestone,
-    const ledger_validator_t *lv, exit_prob_transaction_validator_t *epv) {
+    tangle_t *const tangle, milestone_tracker_t *const mt,
+    ledger_validator_t *const lv, exit_prob_transaction_validator_t *epv) {
   logger_helper_init(WALKER_VALIDATOR_LOGGER_ID, LOGGER_INFO, true);
   epv->tangle = tangle;
-  epv->milestone = milestone;
+  epv->mt = mt;
   epv->lv = lv;
   return RC_OK;
 }
@@ -24,7 +24,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
     exit_prob_transaction_validator_t *epv) {
   logger_helper_destroy(WALKER_VALIDATOR_LOGGER_ID);
   epv->tangle = NULL;
-  epv->milestone = NULL;
+  epv->mt = NULL;
   epv->lv = NULL;
   return RC_OK;
 }

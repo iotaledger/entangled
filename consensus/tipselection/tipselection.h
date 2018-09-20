@@ -18,7 +18,7 @@
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
-#include "consensus/milestone/milestone.h"
+#include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/model.h"
 #include "consensus/tangle/tangle.h"
 
@@ -30,17 +30,17 @@ typedef struct tipselection_t {
   cw_rating_calculator_t *cw_calc;
   entry_point_selector_t *ep_selector;
   ledger_validator_t *lv;
-  milestone_t *milestone;
+  milestone_tracker_t *mt;
   tangle_t *tangle;
   exit_prob_transaction_validator_t *wv;
   ep_randomizer_t *ep_randomizer;
 } tipselection_t;
 
 extern retcode_t iota_consensus_tipselection_init(
-    tipselection_t *impl, const tangle_t *tangle, const ledger_validator_t *lv,
-    const exit_prob_transaction_validator_t *wv,
-    const cw_rating_calculator_t *cw_calc, const milestone_t *milestone,
-    const entry_point_selector_t *ep, const ep_randomizer_t *ep_randomizer,
+    tipselection_t *impl, tangle_t *const tangle, ledger_validator_t *const lv,
+    exit_prob_transaction_validator_t *const wv,
+    cw_rating_calculator_t *const cw_calc, milestone_tracker_t *const mt,
+    entry_point_selector_t *const ep, ep_randomizer_t *const ep_randomizer,
     double alpha);
 
 extern retcode_t iota_consensus_get_transactions_to_approve(

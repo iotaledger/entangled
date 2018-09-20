@@ -7,8 +7,8 @@ cc_library(
 )
 
 cc_library(
-    name = "conf_default",
-    hdrs = ["conf_default.h"],
+    name = "conf_values",
+    hdrs = ["conf_values.h"],
 )
 
 cc_library(
@@ -19,7 +19,7 @@ cc_library(
     ],
     hdrs = ["conf.h"],
     deps = [
-        ":conf_default",
+        ":conf_values",
         ":usage",
         "//common:errors",
     ],
