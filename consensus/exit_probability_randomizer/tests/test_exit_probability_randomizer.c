@@ -463,21 +463,25 @@ void test_1_bundle(void) {
   flex_trit_t ep_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
   flex_trits_from_trytes(transaction_2_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_2_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
   flex_trits_from_trytes(transaction_3_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_3_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         TX_3_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
   flex_trits_from_trytes(transaction_4_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_4_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         TX_4_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  flex_trits_from_trytes(ep_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         BUNDLE_OF_4_TRUNK_TRANSACTION, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+  flex_trits_from_trytes(
+      ep_trits, NUM_TRITS_SERIALIZED_TRANSACTION, BUNDLE_OF_4_TRUNK_TRANSACTION,
+      NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
   iota_transaction_t tx2 = transaction_deserialize(transaction_2_trits);
@@ -601,27 +605,33 @@ void test_2_chained_bundles(void) {
   flex_trit_t ep_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(tx_1_of_4_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
   flex_trits_from_trytes(tx_2_of_4_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_2_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
   flex_trits_from_trytes(tx_3_of_4_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_3_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         TX_3_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
   flex_trits_from_trytes(tx_4_of_4_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_4_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         TX_4_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   flex_trits_from_trytes(tx_1_of_2_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_2, FLEX_TRIT_SIZE_8019, FLEX_TRIT_SIZE_8019);
+                         TX_1_OF_2, NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   flex_trits_from_trytes(tx_2_of_2_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_2_OF_2, FLEX_TRIT_SIZE_8019, FLEX_TRIT_SIZE_8019);
+                         TX_2_OF_2, NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  flex_trits_from_trytes(ep_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         BUNDLE_OF_2_TRUNK_TX, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+  flex_trits_from_trytes(
+      ep_trits, NUM_TRITS_SERIALIZED_TRANSACTION, BUNDLE_OF_2_TRUNK_TX,
+      NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t tx1_of_2 = transaction_deserialize(tx_1_of_2_trits);
   iota_transaction_t tx2_of_2 = transaction_deserialize(tx_2_of_2_trits);
@@ -692,7 +702,7 @@ void test_2_chained_bundles(void) {
     }
   }
 
-  // TEST_ASSERT_EQUAL_INT(selected_tip_count,selections);
+  TEST_ASSERT_EQUAL_INT(selected_tip_count, selections);
 
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
