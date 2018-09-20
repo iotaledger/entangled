@@ -14,7 +14,6 @@
 #include "common/storage/defs.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/sql/statements.h"
-#include "common/trinary/trit_array.h"
 #include "utils/logger_helper.h"
 
 #define SQL_STATEMENTS_ID "sql_statements"
@@ -161,13 +160,8 @@ retcode_t iota_statement_transaction_select_hashes(const char *index_col,
 }
 
 retcode_t iota_statement_transaction_select_hashes_approvers(
-    const trit_array_p approvee_hash, char statement[], size_t statement_cap) {
-  int res;
-
-  char key_str[approvee_hash->num_bytes + 1];
-  memcpy(key_str, approvee_hash->trits, approvee_hash->num_bytes);
-  key_str[approvee_hash->num_bytes] = 0;
-  res =
+    const flex_trit_t *approvee_hash, char statement[], size_t statement_cap) {
+  int res =
       snprintf(statement, statement_cap, "SELECT %s FROM %s WHERE %s=? OR %s=?",
                TRANSACTION_COL_HASH, TRANSACTION_TABLE_NAME,
                TRANSACTION_COL_BRANCH, TRANSACTION_COL_TRUNK);

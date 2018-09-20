@@ -56,7 +56,7 @@ extern retcode_t iota_tangle_transaction_load_hashes(
     const trit_array_p key, iota_stor_pack_t *pack);
 
 extern retcode_t iota_tangle_transaction_load_hashes_of_approvers(
-    const tangle_t *const tangle, const trit_array_p approvee_hash,
+    const tangle_t *const tangle, const flex_trit_t *approvee_hash,
     iota_stor_pack_t *pack);
 
 /*
