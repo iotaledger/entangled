@@ -306,7 +306,7 @@ extern retcode_t iota_stor_transaction_load_hashes(
 }
 
 retcode_t iota_stor_transaction_load_hashes_of_approvers(
-    const connection_t* const conn, const trit_array_p approvee_hash,
+    const connection_t* const conn, const flex_trit_t* approvee_hash,
     iota_stor_pack_t* pack) {
   retcode_t ret = RC_OK;
   char statement[TRANSACTION_MAX_SELECT_STATEMENT_SIZE];
@@ -324,8 +324,8 @@ retcode_t iota_stor_transaction_load_hashes_of_approvers(
     return RC_SQLITE3_FAILED_PREPARED_STATEMENT;
   }
 
-  rc = column_compress_bind(sqlite_statement, 1, (void*)approvee_hash->trits,
-                            approvee_hash->num_bytes);
+  rc = column_compress_bind(sqlite_statement, 1, (void*)approvee_hash,
+                            FLEX_TRIT_SIZE_243);
   if (rc != SQLITE_OK) {
     sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
     log_error(SQLITE3_LOGGER_ID,
@@ -333,8 +333,8 @@ retcode_t iota_stor_transaction_load_hashes_of_approvers(
     return RC_SQLITE3_FAILED_BINDING;
   }
 
-  rc = column_compress_bind(sqlite_statement, 2, (void*)approvee_hash->trits,
-                            approvee_hash->num_bytes);
+  rc = column_compress_bind(sqlite_statement, 2, (void*)approvee_hash,
+                            FLEX_TRIT_SIZE_243);
   if (rc != SQLITE_OK) {
     sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
     log_error(SQLITE3_LOGGER_ID,

@@ -9,6 +9,7 @@
 #define __COMMON_STORAGE_SQL_STATEMENTS_H__
 
 #include "common/errors.h"
+#include "common/trinary/trit_array.h"
 
 // Forward declarations
 typedef struct _trit_array* trit_array_p;
@@ -46,7 +47,7 @@ extern retcode_t iota_statement_transaction_select_hashes(const char* index_col,
                                                           size_t statement_cap);
 
 extern retcode_t iota_statement_transaction_select_hashes_approvers(
-    const trit_array_p approvee_hash, char statement[], size_t statement_cap);
+    const flex_trit_t* approvee_hash, char statement[], size_t statement_cap);
 
 /*
  * Milestone statements

@@ -195,7 +195,6 @@ retcode_t find_tail_if_valid(const ep_randomizer_t *exit_probability_randomizer,
   struct _iota_transaction next_tx_s;
   iota_transaction_t curr_tx = &curr_tx_s;
   iota_transaction_t next_tx = &next_tx_s;
-  trit_array_t curr_tx_hash;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   bool found_approver = false;
   *found_tail = false;
@@ -223,10 +222,8 @@ retcode_t find_tail_if_valid(const ep_randomizer_t *exit_probability_randomizer,
          memcmp(curr_tx->bundle, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
     hash_pack.num_loaded = 0;
     hash_pack.insufficient_capacity = false;
-    curr_tx_hash.num_bytes = FLEX_TRIT_SIZE_243;
-    curr_tx_hash.trits = curr_tx->hash;
     res = iota_tangle_transaction_load_hashes_of_approvers(
-        exit_probability_randomizer->tangle, &curr_tx_hash, &hash_pack);
+        exit_probability_randomizer->tangle, curr_tx->hash, &hash_pack);
 
     if (res != RC_OK) {
       log_error(CW_RATING_CALCULATOR_LOGGER_ID,
@@ -252,7 +249,7 @@ retcode_t find_tail_if_valid(const ep_randomizer_t *exit_probability_randomizer,
         break;
       }
       if (next_tx->current_index == index &&
-          memcmp(next_tx->hash, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
+          memcmp(next_tx->bundle, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
         curr_tx = next_tx;
         found_approver = true;
         break;

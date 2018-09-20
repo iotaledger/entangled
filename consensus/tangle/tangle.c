@@ -75,7 +75,7 @@ retcode_t iota_tangle_transaction_load_hashes(const tangle_t *const tangle,
 }
 
 retcode_t iota_tangle_transaction_load_hashes_of_approvers(
-    const tangle_t *const tangle, const trit_array_p approvee_hash,
+    const tangle_t *const tangle, const flex_trit_t *approvee_hash,
     iota_stor_pack_t *pack) {
   retcode_t res = RC_OK;
 
