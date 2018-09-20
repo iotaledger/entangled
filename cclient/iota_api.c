@@ -450,7 +450,7 @@ iota_api_result_t iota_api_attach_to_tangle(
 
   result.error =
       service->serializer.vtable.attach_to_tangle_deserialize_response(
-          &service->serializer, res_buff->data, res);
+          &service->serializer, res_buff->data, &res);
 
 done:
   if (req_buff) {

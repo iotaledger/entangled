@@ -21,11 +21,11 @@ typedef struct {
   /**
    * Trunk transaction to approve
    */
-  flex_hash_t trunk;
+  trit_array_p trunk;
   /**
    * branch transaction to approve
    */
-  flex_hash_t branch;
+  trit_array_p branch;
   /**
    * Min Weight Magnitude,Proof of Work intensity. Minimum value is 18
    */

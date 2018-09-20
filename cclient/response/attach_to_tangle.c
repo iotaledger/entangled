@@ -16,9 +16,10 @@ char_buffer_t* attach_to_tangle_res_trytes_at(attach_to_tangle_res_t* res,
   retcode_t ret = RC_OK;
   char_buffer_t* out_trytes = char_buffer_new();
   if (out_trytes) {
-    flex_hash_t* hash = flex_hash_array_at((flex_hash_array_t*)res, index);
+    trit_array_p hash = flex_hash_array_at((flex_hash_array_t*)res, index);
     if (hash) {
-      ret = char_buffer_allocate(out_trytes, hash->len_trits);
+      ret = char_buffer_allocate(out_trytes,
+                                 num_flex_trits_for_trits(hash->num_trits));
       if (ret != RC_OK) {
         return NULL;
       }

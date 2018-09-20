@@ -113,33 +113,33 @@ int_array* string_to_int_array(char* in) {
   return in_arr;
 }
 
-retcode_t flex_hash_to_trytes(flex_hash_t* hash, char* trytes) {
+retcode_t flex_hash_to_trytes(trit_array_p hash, char* trytes) {
   size_t trits_len = 0;
   if (trytes == NULL) {
     return RC_CCLIENT_FLEX_TRITS;
   }
-  trits_len = flex_trits_to_trytes((signed char*)trytes, hash->len_trits,
-                                   hash->trits, hash->len_flex, hash->len_flex);
+
+  trits_len = flex_trits_to_trytes(
+      (signed char*)trytes, num_flex_trits_for_trits(hash->num_trits),
+      hash->trits, hash->num_trits, hash->num_trits);
+
   if (trits_len == 0) {
     return RC_CCLIENT_FLEX_TRITS;
   }
   return RC_OK;
 }
 
-retcode_t trytes_to_flex_hash(flex_hash_t* hash, const char* trytes) {
+retcode_t trytes_to_flex_hash(trit_array_p hash, const char* trytes) {
   size_t str_len = strlen(trytes);
-  size_t flex_len = str_len * 3;
-  flex_trit_t* flex_trytes =
-      (flex_trit_t*)malloc(sizeof(flex_trit_t) * flex_len);
-  hash->len_trits = flex_trits_from_trytes(
-      flex_trytes, flex_len, (const tryte_t*)trytes, str_len, str_len);
+  size_t trits_len = str_len * 3;
+  size_t ret_trytes = flex_trits_from_trytes(
+      hash->trits, trits_len, (const tryte_t*)trytes, str_len, str_len);
 
-  if (hash->len_trits > 0) {
-    hash->trits = flex_trytes;
-    hash->len_flex = flex_len;
-  } else {
+  if (ret_trytes == 0) {
+    trit_array_set_null(hash);
     return RC_CCLIENT_FLEX_TRITS;
   }
+
   return RC_OK;
 }
 
@@ -150,20 +150,18 @@ flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
   flex_hash_array_t* elt =
       (flex_hash_array_t*)malloc(sizeof(flex_hash_array_t));
 
-  size_t len_trytes = strlen(trytes);
+  size_t len_flex = 0;
+  size_t len_trits = strlen(trytes) * 3;
+  elt->hash = trit_array_new(len_trits);
   // trytes to flex_trits
-  flex_trit_t* flex_trytes =
-      (flex_trit_t*)malloc(sizeof(flex_trit_t) * (len_trytes * 3));
-
-  elt->hash.len_trits =
-      flex_trits_from_trytes(flex_trytes, (len_trytes * 3),
-                             (const tryte_t*)trytes, len_trytes, len_trytes);
-  elt->hash.len_flex = (len_trytes * 3);
-  if (elt->hash.len_trits != 0) {
-    elt->hash.trits = flex_trytes;
+  len_flex = flex_trits_from_trytes(elt->hash->trits, elt->hash->num_trits,
+                                    (const tryte_t*)trytes,
+                                    elt->hash->num_bytes, elt->hash->num_bytes);
+  if (len_flex > 0) {
     LL_APPEND(head, elt);
   } else {
-    return NULL;
+    trit_array_free(elt->hash);
+    free(elt);
   }
   return head;
 }
@@ -175,12 +173,12 @@ int flex_hash_array_count(flex_hash_array_t* head) {
   return count;
 }
 
-flex_hash_t* flex_hash_array_at(flex_hash_array_t* head, size_t index) {
+trit_array_p flex_hash_array_at(flex_hash_array_t* head, size_t index) {
   flex_hash_array_t* elt = NULL;
   int count = 0;
   LL_FOREACH(head, elt) {
     if (count == index) {
-      return &(elt->hash);
+      return elt->hash;
     }
     count++;
   }
@@ -191,7 +189,7 @@ void flex_hash_array_free(flex_hash_array_t* head) {
   flex_hash_array_t *elt, *tmp;
   LL_FOREACH_SAFE(head, elt, tmp) {
     LL_DELETE(head, elt);
-    free(elt->hash.trits);
+    trit_array_free(elt->hash);
     free(elt);
   }
 }

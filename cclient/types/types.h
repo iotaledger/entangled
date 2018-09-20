@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "common/model/transaction.h"
 #include "common/trinary/trit_array.h"
 #include "common/trinary/tryte.h"
 
@@ -70,14 +71,8 @@ typedef struct {
   tx_hash_t* array;
 } tx_hash_array;
 
-typedef struct flex_hash {
-  flex_trit_t* trits;  // flex_trits object
-  size_t len_trits;    // size of trits
-  size_t len_flex;     // size of flex_trits
-} flex_hash_t;
-
 typedef struct flex_hash_array {
-  flex_hash_t hash;
+  trit_array_p hash;  // trit_array_t is an array of flex_trit.
   struct flex_hash_array* next;
 } flex_hash_array_t;
 
@@ -96,12 +91,12 @@ void int_array_array_free(int_array_array* in);
 char* int_array_to_string(int_array* in);
 int_array* string_to_int_array(char* in);
 
-retcode_t flex_hash_to_trytes(flex_hash_t* hash, char* trytes);
-retcode_t trytes_to_flex_hash(flex_hash_t* hash, const char* trytes);
+retcode_t flex_hash_to_trytes(trit_array_t* hash, char* trytes);
+retcode_t trytes_to_flex_hash(trit_array_t* hash, const char* trytes);
 flex_hash_array_t* flex_hash_array_new();
 flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
                                           const char* trytes);
-flex_hash_t* flex_hash_array_at(flex_hash_array_t* head, size_t index);
+trit_array_t* flex_hash_array_at(flex_hash_array_t* head, size_t index);
 int flex_hash_array_count(flex_hash_array_t* head);
 void flex_hash_array_free(flex_hash_array_t* head);
 

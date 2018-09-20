@@ -96,11 +96,12 @@ retcode_t flex_hash_array_to_json_array(flex_hash_array_t* head,
     cJSON_AddItemToObject(json_root, obj_name, array_obj);
     LL_FOREACH(head, elt) {
       // flex to trytes;
-      trit_t trytes_out[elt->hash.len_trits + 1];
+      size_t len_trytes = num_flex_trits_for_trits(elt->hash->num_trits);
+      trit_t trytes_out[len_trytes + 1];
       size_t trits_count =
-          flex_trits_to_trytes(trytes_out, elt->hash.len_trits, elt->hash.trits,
-                               elt->hash.len_flex, elt->hash.len_flex);
-      trytes_out[elt->hash.len_trits] = '\0';
+          flex_trits_to_trytes(trytes_out, len_trytes, elt->hash->trits,
+                               elt->hash->num_trits, elt->hash->num_trits);
+      trytes_out[len_trytes] = '\0';
       if (trits_count != 0) {
         cJSON_AddItemToArray(array_obj,
                              cJSON_CreateString((const char*)trytes_out));
@@ -113,12 +114,13 @@ retcode_t flex_hash_array_to_json_array(flex_hash_array_t* head,
 }
 
 retcode_t flex_hash_to_json_string(cJSON* json_obj, const char* key,
-                                   flex_hash_t* hash) {
+                                   trit_array_p hash) {
   // flex to trytes;
-  trit_t trytes_out[hash->len_trits + 1];
-  size_t trits_count = flex_trits_to_trytes(
-      trytes_out, hash->len_trits, hash->trits, hash->len_flex, hash->len_flex);
-  trytes_out[hash->len_trits] = '\0';
+  size_t len_trytes = num_flex_trits_for_trits(hash->num_trits);
+  trit_t trytes_out[len_trytes + 1];
+  size_t trits_count = flex_trits_to_trytes(trytes_out, len_trytes, hash->trits,
+                                            hash->num_trits, hash->num_trits);
+  trytes_out[len_trytes] = '\0';
 
   if (trits_count != 0) {
     cJSON_AddItemToObject(json_obj, key,
@@ -1029,12 +1031,12 @@ retcode_t json_attach_to_tangle_serialize_request(const serializer_t* const s,
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("attachToTangle"));
 
-  ret = flex_hash_to_json_string(json_root, "trunkTransaction", &obj->trunk);
+  ret = flex_hash_to_json_string(json_root, "trunkTransaction", obj->trunk);
   if (ret != RC_OK) {
     goto done;
   }
 
-  ret = flex_hash_to_json_string(json_root, "branchTransaction", &obj->branch);
+  ret = flex_hash_to_json_string(json_root, "branchTransaction", obj->branch);
   if (ret != RC_OK) {
     goto done;
   }
