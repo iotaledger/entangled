@@ -12,7 +12,6 @@
 
 static UT_icd bundle_transactions_icd = {sizeof(struct _iota_transaction), 0, 0,
                                          0};
-static UT_icd bundle_hashes_icd = {FLEX_TRIT_SIZE_243, 0, 0, 0};
 
 void bundle_transactions_new(bundle_transactions_t **const bundle) {
   utarray_new(*bundle, &bundle_transactions_icd);
@@ -37,7 +36,7 @@ void calculate_bundle_hash(bundle_transactions_t *bundle, flex_trit_t *out) {
   trit_t bundle_hash_trits[NUM_TRITS_HASH];
 
   for (curr_tx = (iota_transaction_t)utarray_front(bundle); curr_tx != NULL;
-       curr_tx = (iota_transaction_t *)utarray_next(bundle, curr_tx)) {
+       curr_tx = (iota_transaction_t)utarray_next(bundle, curr_tx)) {
     absorb_essence(&kerl, curr_tx->address, curr_tx->value,
                    curr_tx->obsolete_tag, curr_tx->timestamp,
                    curr_tx->current_index, curr_tx->last_index, essence_trits);
