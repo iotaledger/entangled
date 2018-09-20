@@ -91,12 +91,12 @@ void int_array_array_free(int_array_array* in);
 char* int_array_to_string(int_array* in);
 int_array* string_to_int_array(char* in);
 
-retcode_t flex_hash_to_trytes(trit_array_t* hash, char* trytes);
-retcode_t trytes_to_flex_hash(trit_array_t* hash, const char* trytes);
+retcode_t flex_hash_to_trytes(trit_array_p hash,char* trytes);
+retcode_t trytes_to_flex_hash(trit_array_p hash,const char* trytes);
 flex_hash_array_t* flex_hash_array_new();
 flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
                                           const char* trytes);
-trit_array_t* flex_hash_array_at(flex_hash_array_t* head, size_t index);
+trit_array_p flex_hash_array_at(flex_hash_array_t* head,size_t index);
 int flex_hash_array_count(flex_hash_array_t* head);
 void flex_hash_array_free(flex_hash_array_t* head);
 
