@@ -103,8 +103,7 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
       goto done;
     }
     if ((tx2 = (iota_transaction_t)utarray_eltptr(bundle, 1)) == NULL ||
-        memcmp(tx1->branch, tx2->trunk, FLEX_TRIT_SIZE_243) != 0 ||
-        memcmp(tx1->bundle, tx2->bundle, FLEX_TRIT_SIZE_243) != 0) {
+        memcmp(tx1->branch, tx2->trunk, FLEX_TRIT_SIZE_243) != 0) {
       goto done;
     }
 
