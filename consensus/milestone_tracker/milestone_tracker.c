@@ -22,6 +22,47 @@
 
 #define MILESTONE_TRACKER_LOGGER_ID "consensus_milestone_tracker"
 
+static retcode_t validate_coordinator(milestone_tracker_t* const mt,
+                                      iota_milestone_t* const candidate,
+                                      iota_transaction_t tx1,
+                                      iota_transaction_t tx2, bool* valid) {
+  trit_t signature_trits[NUM_TRITS_SIGNATURE];
+  trit_t siblings_trits[NUM_TRITS_SIGNATURE];
+  byte_t normalized_trunk[TRYTE_HASH_LENGTH];
+  trit_t normalized_trunk_trits[HASH_LENGTH];
+  trit_t sig_digest[HASH_LENGTH];
+  trit_t root[HASH_LENGTH];
+  flex_trit_t coo[FLEX_TRIT_SIZE_243];
+  Curl curl;
+
+  *valid = false;
+
+  flex_trits_to_trits(signature_trits, NUM_TRITS_SIGNATURE,
+                      tx1->signature_or_message, NUM_TRITS_SIGNATURE,
+                      NUM_TRITS_SIGNATURE);
+  flex_trits_to_trits(siblings_trits, NUM_TRITS_SIGNATURE,
+                      tx2->signature_or_message, NUM_TRITS_SIGNATURE,
+                      NUM_TRITS_SIGNATURE);
+  curl.type = CURL_P_27;
+  init_curl(&curl);
+  normalize_bundle(tx1->trunk, normalized_trunk);
+  for (int c = 0; c < TRYTE_HASH_LENGTH; ++c) {
+    long_to_trits(normalized_trunk[c], &normalized_trunk_trits[c * RADIX]);
+  }
+  iss_curl_sig_digest(sig_digest, normalized_trunk_trits, signature_trits,
+                      NUM_TRITS_SIGNATURE, &curl);
+  curl_reset(&curl);
+  iss_curl_address(sig_digest, root, HASH_LENGTH, &curl);
+  merkle_root(root, siblings_trits, mt->num_keys_in_milestone, candidate->index,
+              &curl);
+  flex_trits_from_trits(coo, HASH_LENGTH, root, HASH_LENGTH, HASH_LENGTH);
+
+  if (memcmp(coo, mt->coordinator->trits, FLEX_TRIT_SIZE_243) == 0) {
+    *valid = true;
+  }
+  return RC_OK;
+}
+
 static retcode_t validate_milestone(milestone_tracker_t* const mt,
                                     iota_milestone_t* const candidate) {
   retcode_t ret = RC_OK;
@@ -53,16 +94,8 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
   } else if (!valid) {
     goto done;
   } else {
-    trit_t signature_trits[NUM_TRITS_SIGNATURE];
-    trit_t siblings_trits[NUM_TRITS_SIGNATURE];
-    byte_t normalized_trunk[TRYTE_HASH_LENGTH];
-    trit_t normalized_trunk_trits[HASH_LENGTH];
-    trit_t sig_digest[HASH_LENGTH];
-    trit_t root[HASH_LENGTH];
-    flex_trit_t coo[FLEX_TRIT_SIZE_243];
     iota_transaction_t tx1 = NULL;
     iota_transaction_t tx2 = NULL;
-    Curl curl;
 
     if ((tx1 = (iota_transaction_t)utarray_eltptr(bundle, 0)) == NULL ||
         memcmp(tx1->hash, candidate->hash, FLEX_TRIT_SIZE_243) != 0) {
@@ -74,31 +107,16 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
       goto done;
     }
 
-    flex_trits_to_trits(signature_trits, NUM_TRITS_SIGNATURE,
-                        tx1->signature_or_message, NUM_TRITS_SIGNATURE,
-                        NUM_TRITS_SIGNATURE);
-    flex_trits_to_trits(siblings_trits, NUM_TRITS_SIGNATURE,
-                        tx2->signature_or_message, NUM_TRITS_SIGNATURE,
-                        NUM_TRITS_SIGNATURE);
-    curl.type = CURL_P_27;
-    init_curl(&curl);
-    normalize_bundle(tx1->trunk, normalized_trunk);
-    for (int c = 0; c < TRYTE_HASH_LENGTH; ++c) {
-      long_to_trits(normalized_trunk[c], &normalized_trunk_trits[c * RADIX]);
-    }
-    iss_curl_sig_digest(sig_digest, normalized_trunk_trits, signature_trits,
-                        NUM_TRITS_SIGNATURE, &curl);
-    curl_reset(&curl);
-    iss_curl_address(sig_digest, root, HASH_LENGTH, &curl);
-    merkle_root(root, siblings_trits, mt->num_keys_in_milestone,
-                candidate->index, &curl);
-    flex_trits_from_trits(coo, HASH_LENGTH, root, HASH_LENGTH, HASH_LENGTH);
-
-    if (memcmp(coo, mt->coordinator->trits, FLEX_TRIT_SIZE_243) == 0) {
+    if ((ret = validate_coordinator(mt, candidate, tx1, tx2, &valid)) !=
+        RC_OK) {
+      log_warning(MILESTONE_TRACKER_LOGGER_ID,
+                  "Validating coordinator failed\n");
+      goto done;
+    } else if (!valid) {
+      goto done;
+    } else {
       iota_tangle_milestone_store(mt->tangle, candidate);
       goto valid;
-    } else {
-      goto done;
     }
   }
 
