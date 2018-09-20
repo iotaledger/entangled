@@ -22,7 +22,7 @@ char* find_transactions_res_hash_at(find_transactions_res_t* in, int index) {
       return *p;
     }
   }
-  return '\0';
+  return NULL;
 }
 
 int find_transactions_res_hash_num(find_transactions_res_t* in) {

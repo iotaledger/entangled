@@ -21,7 +21,7 @@ char* get_trytes_res_at(get_trytes_res_t* trytes_array, int index) {
       return *p;
     }
   }
-  return '\0';
+  return NULL;
 }
 
 int get_trytes_res_num(get_trytes_res_t* trytes_array) {
