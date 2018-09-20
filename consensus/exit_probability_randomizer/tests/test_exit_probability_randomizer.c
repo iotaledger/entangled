@@ -17,6 +17,7 @@
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/test_utils/tangle.h"
+#include "consensus/test_utils/bundle.h"
 #include "utarray.h"
 
 static cw_rating_calculator_t calc;
@@ -437,6 +438,140 @@ void test_cw_topology_two_inequal_tips(void) {
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
 
+void test_1_bundle(void) {
+
+  cw_entry_t *curr_cw_entry = NULL;
+  cw_entry_t *tmp_cw_entry = NULL;
+
+  size_t bundle_size = 4;
+
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
+                                            DFS_FROM_ENTRY_POINT) == RC_OK);
+
+  bool exist;
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
+              RC_OK);
+
+  TEST_ASSERT(!exist);
+
+
+  flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
+  flex_trit_t transaction_2_trits[FLEX_TRIT_SIZE_8019];
+  flex_trit_t transaction_3_trits[FLEX_TRIT_SIZE_8019];
+  flex_trit_t transaction_4_trits[FLEX_TRIT_SIZE_8019];
+
+  flex_trit_t ep_trits[FLEX_TRIT_SIZE_8019];
+
+
+  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         TX_1_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
+                         FLEX_TRIT_SIZE_8019);
+  flex_trits_from_trytes(transaction_2_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         TX_2_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
+                         FLEX_TRIT_SIZE_8019);
+  flex_trits_from_trytes(transaction_3_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         TX_3_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
+                         FLEX_TRIT_SIZE_8019);
+  flex_trits_from_trytes(transaction_4_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         TX_4_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
+                         FLEX_TRIT_SIZE_8019);
+
+  flex_trits_from_trytes(ep_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         BUNDLE_OF_4_TRUNK_TRANSACTION, FLEX_TRIT_SIZE_8019,
+                         FLEX_TRIT_SIZE_8019);
+
+  iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
+  iota_transaction_t tx2 = transaction_deserialize(transaction_2_trits);
+  iota_transaction_t tx3 = transaction_deserialize(transaction_3_trits);
+  iota_transaction_t tx4 = transaction_deserialize(transaction_4_trits);
+  iota_transaction_t txEp = transaction_deserialize(ep_trits);
+
+  iota_transaction_t curr_tx = NULL;
+
+  TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx2) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx3) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx4) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_store(&tangle, txEp) == RC_OK);
+
+  iota_stor_pack_t pack;
+  hash_pack_init(&pack, bundle_size + 1);
+
+  cw_calc_result out;
+
+  TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(&tangle, tx1->trunk, &pack) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(&tangle, tx2->trunk, &pack) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(&tangle, tx3->trunk, &pack) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(&tangle, tx4->hash, &pack) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(&tangle, txEp->hash, &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded,bundle_size);
+
+  trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
+  trit_array_set_trits(ep, txEp->hash, NUM_TRITS_HASH);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
+                                            DFS_FROM_ENTRY_POINT) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), bundle_size+1);
+
+  size_t total_weight = 0;
+
+  HASH_ITER(hh, out.cw_ratings, curr_cw_entry, tmp_cw_entry) {
+    total_weight += curr_cw_entry->cw;
+  }
+
+  TEST_ASSERT_EQUAL_INT(total_weight, 5 + 4 + 3 + 2 + 1);
+
+  /// Exit Probabilities - start
+
+  ep_randomizer_t ep_randomizer;
+  TEST_ASSERT(iota_consensus_ep_randomizer_init(
+          &tangle, &ep_randomizer, low_alpha, EP_RANDOM_WALK) == RC_OK);
+
+  trit_array_t tip;
+  flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
+  tip.trits = tip_trits;
+
+  exit_prob_transaction_validator_t epv;
+  TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(
+          &tangle, NULL, NULL, &epv) == RC_OK);
+  /// Select the tip
+
+  struct _iota_transaction tx;
+  iota_transaction_t tx_models = &tx;
+
+  iota_stor_pack_t tx_pack = {(void **)(&tx_models), 1, 0, false};
+
+  TEST_ASSERT(iota_tangle_transaction_load(&tangle, TRANSACTION_COL_HASH,
+                                     ep, &tx_pack) == RC_OK);
+
+  TEST_ASSERT_EQUAL_INT(1,tx_pack.num_loaded);
+  size_t selected_tip_count = 0;
+  int selections = 100;
+  for (size_t i = 0; i < selections; ++i) {
+    TEST_ASSERT(iota_consensus_exit_probability_randomize(
+            &ep_randomizer, &epv, &out, ep, &tip) == RC_OK);
+    if (memcmp(tip.trits, tx1->hash, FLEX_TRIT_SIZE_243) == 0) {
+      selected_tip_count++;
+    }
+  }
+
+  TEST_ASSERT_EQUAL_INT(selected_tip_count,selections);
+
+  hash_pack_free(&pack);
+  cw_calc_result_destroy(&out);
+  trit_array_free(ep);
+  transaction_free(tx1);
+  transaction_free(tx2);
+  transaction_free(tx3);
+  transaction_free(tx4);
+  transaction_free(txEp);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
+
+}
+
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
 
@@ -462,5 +597,7 @@ int main(int argc, char *argv[]) {
   RUN_TEST(test_cw_topology_four_transactions_diamond);
   RUN_TEST(test_cw_topology_two_inequal_tips);
 
+  //Bundles
+  RUN_TEST(test_1_bundle);
   return UNITY_END();
 }

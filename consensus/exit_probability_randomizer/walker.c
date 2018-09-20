@@ -249,7 +249,7 @@ retcode_t find_tail_if_valid(const ep_randomizer_t *exit_probability_randomizer,
         break;
       }
       if (next_tx->current_index == index &&
-          memcmp(next_tx->hash, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
+          memcmp(next_tx->bundle, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
         curr_tx = next_tx;
         found_approver = true;
         break;
