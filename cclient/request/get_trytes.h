@@ -15,10 +15,11 @@ extern "C" {
 #include "types/types.h"
 
 /* List of tx hashes for which request should get trytes */
-typedef UT_array get_trytes_req_t;
+typedef flex_hash_array_t get_trytes_req_t;
 
 get_trytes_req_t* get_trytes_req_new();
-void get_trytes_req_add(get_trytes_req_t* hashes, const char* hash);
+get_trytes_req_t* get_trytes_req_add(get_trytes_req_t* hashes,
+                                     const char* hash);
 void get_trytes_req_free(get_trytes_req_t* ut);
 
 #ifdef __cplusplus

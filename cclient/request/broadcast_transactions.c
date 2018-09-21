@@ -13,7 +13,7 @@ broadcast_transactions_req_t* broadcast_transactions_req_new() {
 
 broadcast_transactions_req_t* broadcast_transactions_req_add(
     broadcast_transactions_req_t* transactions, const char* trytes) {
-  return flex_hash_array_append((flex_hash_array_t*)transactions, trytes);
+  return flex_hash_array_append(transactions, trytes);
 }
 
 void broadcast_transactions_req_free(

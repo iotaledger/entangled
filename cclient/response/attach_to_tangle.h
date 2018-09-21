@@ -19,8 +19,8 @@ extern "C" {
 typedef flex_hash_array_t attach_to_tangle_res_t;
 
 attach_to_tangle_res_t* attach_to_tangle_res_new();
-char_buffer_t* attach_to_tangle_res_trytes_at(attach_to_tangle_res_t* res,
-                                              int index);
+trit_array_p attach_to_tangle_res_trytes_at(attach_to_tangle_res_t* res,
+                                            int index);
 int attach_to_tangle_res_trytes_cnt(attach_to_tangle_res_t* res);
 void attach_to_tangle_res_free(attach_to_tangle_res_t* hashes);
 

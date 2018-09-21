@@ -150,17 +150,10 @@ flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
   flex_hash_array_t* elt =
       (flex_hash_array_t*)malloc(sizeof(flex_hash_array_t));
 
-  size_t len_flex = 0;
-  size_t len_trits = strlen(trytes) * 3;
-  elt->hash = trit_array_new(len_trits);
-  // trytes to flex_trits
-  len_flex = flex_trits_from_trytes(elt->hash->trits, elt->hash->num_trits,
-                                    (const tryte_t*)trytes,
-                                    elt->hash->num_bytes, elt->hash->num_bytes);
-  if (len_flex > 0) {
+  elt->hash = trit_array_new_from_trytes((tryte_t*)trytes);
+  if (elt->hash) {
     LL_APPEND(head, elt);
   } else {
-    trit_array_free(elt->hash);
     free(elt);
   }
   return head;
