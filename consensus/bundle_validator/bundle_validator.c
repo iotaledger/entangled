@@ -37,7 +37,6 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
                           bundle_transactions_t* bundle, bool* is_valid) {
   retcode_t res = RC_OK;
   iota_transaction_t curr_tx;
-  iota_transaction_t curr_inp_tx;
 
   if (bundle == NULL) {
     log_error(BUNDLE_VALIDATOR_ID, "Bundle is not initialized\n");
@@ -161,16 +160,13 @@ retcode_t load_bundle_transactions(const tangle_t* const tangle,
 
 retcode_t validate_signature(bundle_transactions_t* bundle,
                              trit_t* normalized_bundle, bool* is_valid) {
-  retcode_t res = RC_OK;
   iota_transaction_t curr_tx;
   iota_transaction_t curr_inp_tx;
   Kerl address_kerl;
   Kerl sig_frag_kerl;
   trit_t digested_sig_trits[NUM_TRITS_ADDRESS];
   trit_t digested_address[NUM_TRITS_ADDRESS];
-  trit_t tx_address_trits[NUM_TRITS_ADDRESS];
   trit_t key[NUM_TRITS_SIGNATURE];
-  size_t i = 0;
 
   init_kerl(&address_kerl);
   init_kerl(&sig_frag_kerl);
@@ -197,9 +193,10 @@ retcode_t validate_signature(bundle_transactions_t* bundle,
       kerl_absorb(&address_kerl, digested_sig_trits, NUM_TRITS_ADDRESS);
       curr_inp_tx = (iota_transaction_t)utarray_next(bundle, curr_inp_tx);
       offset = next_offset;
-    } while (curr_inp_tx != NULL, memcmp(curr_inp_tx->address, curr_tx->address,
-                                         FLEX_TRIT_SIZE_243) == 0 &&
-                                      curr_inp_tx->value == 0);
+    } while (curr_inp_tx != NULL &&
+             memcmp(curr_inp_tx->address, curr_tx->address,
+                    FLEX_TRIT_SIZE_243) == 0 &&
+             curr_inp_tx->value == 0);
     kerl_squeeze(&address_kerl, digested_address, NUM_TRITS_ADDRESS);
 
     flex_trit_t digest[FLEX_TRIT_SIZE_243];
