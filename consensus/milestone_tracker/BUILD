@@ -1,16 +1,25 @@
 cc_library(
-    name = "milestone_tracker",
-    srcs = ["milestone_tracker.c"],
+    name = "milestone_tracker_shared",
     hdrs = ["milestone_tracker.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//common:errors",
+        "//utils/handles:thread",
+    ],
+)
+
+cc_library(
+    name = "milestone_tracker",
+    srcs = ["milestone_tracker.c"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":milestone_tracker_shared",
         "//ciri/conf:conf_values",
         "//common/sign/v1:iss_curl",
         "//consensus/bundle_validator",
-        "//consensus/snapshot",
+        "//consensus/ledger_validator:ledger_validator_shared",
         "//mam/v1:merkle",
         "//utils:macros",
         "//utils:time",
-        "//utils/handles:thread",
     ],
 )
