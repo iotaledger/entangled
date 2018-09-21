@@ -24,7 +24,7 @@ retcode_t json_find_transactions_serialize_request(
 
 retcode_t json_find_transactions_deserialize_response(
     const serializer_t* const, const char* const obj,
-    find_transactions_res_t* out);
+    find_transactions_res_t** out);
 
 // get_balances_response
 retcode_t json_get_balances_serialize_request(
@@ -33,7 +33,7 @@ retcode_t json_get_balances_serialize_request(
 
 retcode_t json_get_balances_deserialize_response(const serializer_t* const,
                                                  const char* const obj,
-                                                 get_balances_res_t* out);
+                                                 get_balances_res_t** out);
 
 // get_inclusion_state_response
 retcode_t json_get_inclusion_state_serialize_request(
@@ -58,14 +58,14 @@ retcode_t json_get_node_info_serialize_request(const serializer_t* const s,
 
 retcode_t json_get_node_info_deserialize_response(const serializer_t* const,
                                                   const char* const obj,
-                                                  get_node_info_res_t* out);
+                                                  get_node_info_res_t** out);
 
 // get_tips_response
 retcode_t json_get_tips_serialize_request(const serializer_t* const s,
                                           char_buffer_t* out);
 retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
                                              const char* const obj,
-                                             get_tips_res_t* out);
+                                             get_tips_res_t** out);
 
 // get_transactions_to_approve_response
 retcode_t json_get_transactions_to_approve_serialize_request(
@@ -74,7 +74,7 @@ retcode_t json_get_transactions_to_approve_serialize_request(
 
 retcode_t json_get_transactions_to_approve_deserialize_response(
     const serializer_t* const, const char* const obj,
-    get_transactions_to_approve_res_t* out);
+    get_transactions_to_approve_res_t** out);
 
 // addNeighbors
 retcode_t json_add_neighbors_serialize_request(const serializer_t* const s,
@@ -98,7 +98,7 @@ retcode_t json_get_trytes_serialize_request(const serializer_t* const s,
                                             char_buffer_t* out);
 retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
                                                const char* const obj,
-                                               get_trytes_res_t* out);
+                                               get_trytes_res_t** out);
 
 retcode_t json_attach_to_tangle_serialize_request(const serializer_t* const s,
                                                   attach_to_tangle_req_t* obj,

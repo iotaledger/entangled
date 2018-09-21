@@ -14,13 +14,12 @@ extern "C" {
 
 #include "types/types.h"
 
-typedef struct {
-  UT_array* hashes;
-} find_transactions_res_t;
+typedef flex_hash_array_t find_transactions_res_t;
 
 find_transactions_res_t* find_transactions_res_new();
-void find_transactions_res_free(find_transactions_res_t** res);
-char* find_transactions_res_hash_at(find_transactions_res_t* in, int index);
+void find_transactions_res_free(find_transactions_res_t* res);
+trit_array_p find_transactions_res_hash_at(find_transactions_res_t* in,
+                                           int index);
 int find_transactions_res_hash_num(find_transactions_res_t* in);
 
 #ifdef __cplusplus

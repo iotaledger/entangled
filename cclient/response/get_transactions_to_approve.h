@@ -15,8 +15,8 @@ extern "C" {
 #include "types/types.h"
 
 typedef struct {
-  char_buffer_t* branch;
-  char_buffer_t* trunk;
+  trit_array_p branch;
+  trit_array_p trunk;
 } get_transactions_to_approve_res_t;
 
 get_transactions_to_approve_res_t* get_transactions_to_approve_res_new();

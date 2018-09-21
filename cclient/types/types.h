@@ -93,6 +93,8 @@ int_array* string_to_int_array(char* in);
 
 retcode_t flex_hash_to_trytes(trit_array_p hash, char* trytes);
 retcode_t trytes_to_flex_hash(trit_array_p hash, const char* trytes);
+retcode_t flex_hash_to_char_buffer(trit_array_p hash, char_buffer_t* out);
+
 flex_hash_array_t* flex_hash_array_new();
 flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
                                           const char* trytes);

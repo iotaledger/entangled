@@ -14,12 +14,12 @@ extern "C" {
 
 #include "types/types.h"
 
-typedef UT_array get_tips_res_t;
+typedef flex_hash_array_t get_tips_res_t;
 
 get_tips_res_t* get_tips_res_new();
-char* get_tips_res_hash_at(get_tips_res_t* hashes, int index);
+trit_array_p get_tips_res_hash_at(get_tips_res_t* hashes, size_t index);
 int get_tips_res_hash_num(get_tips_res_t* hashes);
-void get_tips_res_free(get_tips_res_t* ut);
+void get_tips_res_free(get_tips_res_t* hashes);
 #ifdef __cplusplus
 }
 #endif
