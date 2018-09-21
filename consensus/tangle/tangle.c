@@ -117,6 +117,11 @@ retcode_t iota_tangle_milestone_load(const tangle_t *const tangle,
   return iota_stor_milestone_load(&tangle->conn, col_name, key, pack);
 }
 
+retcode_t iota_tangle_milestone_load_first(const tangle_t *const tangle,
+                                           iota_stor_pack_t *pack) {
+  return iota_stor_milestone_load_first(&tangle->conn, pack);
+}
+
 retcode_t iota_tangle_milestone_load_last(const tangle_t *const tangle,
                                           iota_stor_pack_t *pack) {
   return iota_stor_milestone_load_last(&tangle->conn, pack);

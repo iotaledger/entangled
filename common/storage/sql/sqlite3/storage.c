@@ -464,6 +464,46 @@ retcode_t iota_stor_milestone_load(const connection_t* const conn,
   return RC_OK;
 }
 
+extern retcode_t iota_stor_milestone_load_first(const connection_t* const conn,
+                                                iota_stor_pack_t* pack) {
+  retcode_t ret = RC_OK;
+  char statement[MILESTONE_MAX_SELECT_STATEMENT_SIZE];
+  char const* err_msg = 0;
+  sqlite3_stmt* sqlite_statement = 0;
+
+  if ((ret = iota_statement_milestone_select_first(
+           statement, MILESTONE_MAX_SELECT_STATEMENT_SIZE))) {
+    return ret;
+  }
+
+  int rc = sqlite3_prepare_v2((sqlite3*)conn->db, statement, -1,
+                              &sqlite_statement, &err_msg);
+  if (rc != SQLITE_OK) {
+    sqlite3_finalize(sqlite_statement);
+    return RC_SQLITE3_FAILED_PREPARED_STATEMENT;
+  }
+
+  pack->insufficient_capacity = false;
+  if (pack->capacity >= 1) {
+    if (sqlite3_step(sqlite_statement) ==
+        SQLITE_ROW) {  // If query has at least one result-row.
+      select_milestones_populate_from_row(sqlite_statement, *pack->models);
+      pack->num_loaded++;
+    }
+  } else {
+    pack->insufficient_capacity = true;
+  }
+
+  rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement
+  if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed in finalizing, sqlite3 code is: %\" PRIu64 \"\n", rc);
+    return RC_SQLITE3_FAILED_FINALIZE;
+  }
+
+  return RC_OK;
+}
+
 extern retcode_t iota_stor_milestone_load_last(const connection_t* const conn,
                                                iota_stor_pack_t* pack) {
   retcode_t ret = RC_OK;
