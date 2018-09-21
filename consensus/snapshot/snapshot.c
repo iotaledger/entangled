@@ -194,6 +194,7 @@ retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
 retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
                                      state_map_t *const diff,
                                      state_map_t *const patch) {
+  retcode_t ret = RC_OK;
   state_entry_t *iter, *entry, *new, *tmp;
 
   if (snapshot == NULL) {
@@ -205,18 +206,21 @@ retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
   HASH_ITER(hh, *diff, iter, tmp) {
     HASH_FIND(hh, snapshot->state, iter->hash, FLEX_TRIT_SIZE_243, entry);
     if ((new = malloc(sizeof(state_entry_t))) == NULL) {
-      return RC_SNAPSHOT_OOM;
+      ret = RC_SNAPSHOT_OOM;
+      goto done;
     }
     memcpy(new->hash, iter->hash, FLEX_TRIT_SIZE_243);
     new->value = (entry ? entry->value : 0) + iter->value;
     HASH_ADD(hh, *patch, hash, FLEX_TRIT_SIZE_243, new);
   }
+done:
   rw_lock_handle_unlock(&snapshot->rw_lock);
-  return RC_OK;
+  return ret;
 }
 
 retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
                                     state_map_t *const patch, size_t index) {
+  retcode_t ret = RC_OK;
   state_entry_t *iter, *entry, *new, *tmp;
   ssize_t sum = 0;
 
@@ -237,7 +241,8 @@ retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
       entry->value += iter->value;
     } else {
       if ((new = malloc(sizeof(state_entry_t))) == NULL) {
-        return RC_SNAPSHOT_OOM;
+        ret = RC_SNAPSHOT_OOM;
+        goto done;
       }
       memcpy(new->hash, iter->hash, FLEX_TRIT_SIZE_243);
       new->value = iter->value;
@@ -245,6 +250,7 @@ retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
     }
   }
   snapshot->index = index;
+done:
   rw_lock_handle_unlock(&snapshot->rw_lock);
-  return RC_OK;
+  return ret;
 }
