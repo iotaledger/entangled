@@ -212,7 +212,7 @@ static retcode_t update_latest_solid_subtangle_milestone(
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
   }
-  if ((ret = iota_tangle_milestone_load_latest(mt->tangle, &pack)) != RC_OK) {
+  if ((ret = iota_tangle_milestone_load_last(mt->tangle, &pack)) != RC_OK) {
     return ret;
   }
   if (pack.num_loaded != 0) {

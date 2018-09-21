@@ -203,8 +203,8 @@ retcode_t iota_statement_milestone_select(const char *index_col,
                                        statement_cap);
 }
 
-retcode_t iota_statement_milestone_select_latest(char statement[],
-                                                 size_t statement_cap) {
+retcode_t iota_statement_milestone_select_last(char statement[],
+                                               size_t statement_cap) {
   return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", "", "",
                                        MILESTONE_COL_INDEX, "DESC", 1,
                                        statement, statement_cap);

@@ -464,14 +464,14 @@ retcode_t iota_stor_milestone_load(const connection_t* const conn,
   return RC_OK;
 }
 
-extern retcode_t iota_stor_milestone_load_latest(const connection_t* const conn,
-                                                 iota_stor_pack_t* pack) {
+extern retcode_t iota_stor_milestone_load_last(const connection_t* const conn,
+                                               iota_stor_pack_t* pack) {
   retcode_t ret = RC_OK;
   char statement[MILESTONE_MAX_SELECT_STATEMENT_SIZE];
   char const* err_msg = 0;
   sqlite3_stmt* sqlite_statement = 0;
 
-  if ((ret = iota_statement_milestone_select_latest(
+  if ((ret = iota_statement_milestone_select_last(
            statement, MILESTONE_MAX_SELECT_STATEMENT_SIZE))) {
     return ret;
   }
