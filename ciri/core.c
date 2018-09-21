@@ -60,6 +60,13 @@ retcode_t core_init(core_t* const core) {
     return RC_CORE_FAILED_NODE_INIT;
   }
 
+  log_info(CORE_LOGGER_ID, "Initializing ledger validator\n");
+  if (iota_consensus_ledger_validator_init(
+          &core->ledger_validator, &core->tangle, &core->milestone_tracker)) {
+    log_critical(CORE_LOGGER_ID, "Initializing ledger validator\n");
+    return RC_CORE_FAILED_LEDGER_VALIDATOR_INIT;
+  }
+
   log_info(CORE_LOGGER_ID, "Initializing cIRI API\n");
   if (iota_api_init(&core->api, core->config.api_port)) {
     log_critical(CORE_LOGGER_ID, "Initializing cIRI API failed\n");
@@ -142,6 +149,12 @@ retcode_t core_destroy(core_t* const core) {
   if (iota_api_destroy(&core->api)) {
     log_error(CORE_LOGGER_ID, "Destroying cIRI API failed\n");
     ret = RC_CORE_FAILED_API_DESTROY;
+  }
+
+  log_info(CORE_LOGGER_ID, "Destroying ledger validator\n");
+  if (iota_consensus_ledger_validator_destroy(&core->ledger_validator)) {
+    log_error(CORE_LOGGER_ID, "Destroying ledger validator failed\n");
+    ret = RC_CORE_FAILED_LEDGER_VALIDATOR_DESTROY;
   }
 
   log_info(CORE_LOGGER_ID, "Destroying cIRI node\n");
