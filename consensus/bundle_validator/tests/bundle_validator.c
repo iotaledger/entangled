@@ -65,12 +65,7 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
   bundle_transactions_new(&bundle);
 
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
-
-  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
-
-  iota_transaction_t tx1 = transaction_deserialize(
+  tryte_t tx1_trytes[] =
       "999999999999999999999999999999999999999999999999999999999999999999999999"
       "999999999999999999999999999999999999999999999999999999999999999999999999"
       "999999999999999999999999999999999999999999999999999999999999999999999999"
@@ -108,16 +103,15 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
       "QTAQFCZZACGXQEGPTUUMGYXWSEFUK9MKTVJRPUUJESLUSN9FPRHMMLBRNG99999IHAVDVHYJ"
       "DKRYAOTUYNJCSNERFHACSDTCQIO9IPWSUGQN9DAVNJRUNLMZSRRFLUFLTRSGYVJLKOCW9999"
       "RDDGUFUSZZMJIGAHCWHWCNNBHSLYVCPBZOHGQQPMIPTWCMREXAQY9IIWOSYSUUWMBQOAUTXB"
-      "Z9DOWWMPF");
+      "Z9DOWWMPF";
 
-  iota_transaction_t curr_tx = NULL;
+  flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         tx1_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+
+  iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
-
-  struct _iota_transaction curr_tx_s;
-  iota_transaction_t curr_tx1 = &curr_tx_s;
-
-  iota_stor_pack_t tx_pack = {(void **)(&curr_tx1), 1, 0, false};
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, tx1->trunk, NUM_TRITS_HASH);
@@ -154,20 +148,14 @@ void test_bundle_exceed_supply_pos_invalid() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
   tx1->value = IOTA_SUPPLY + 1;
 
-  iota_transaction_t curr_tx = NULL;
-
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
-
-  struct _iota_transaction curr_tx_s;
-  iota_transaction_t curr_tx1 = &curr_tx_s;
-
-  iota_stor_pack_t tx_pack = {(void **)(&curr_tx1), 1, 0, false};
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, tx1->trunk, NUM_TRITS_HASH);
@@ -204,20 +192,14 @@ void test_bundle_exceed_supply_neg_invalid() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
   tx1->value = -IOTA_SUPPLY - 1;
 
-  iota_transaction_t curr_tx = NULL;
-
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
-
-  struct _iota_transaction curr_tx_s;
-  iota_transaction_t curr_tx1 = &curr_tx_s;
-
-  iota_stor_pack_t tx_pack = {(void **)(&curr_tx1), 1, 0, false};
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, tx1->trunk, NUM_TRITS_HASH);
@@ -257,17 +239,21 @@ void test_bundle_validate_size_4_value_wrong_sig_invalid() {
   flex_trit_t transaction_4_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
   flex_trits_from_trytes(transaction_2_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_2_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         (tryte_t *)TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
   flex_trits_from_trytes(transaction_3_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_3_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         (tryte_t *)TX_3_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
   flex_trits_from_trytes(transaction_4_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_4_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         (tryte_t *)TX_4_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
   iota_transaction_t tx2 = transaction_deserialize(transaction_2_trits);
@@ -276,17 +262,10 @@ void test_bundle_validate_size_4_value_wrong_sig_invalid() {
 
   tx2->signature_or_message[0] = 'A';
 
-  iota_transaction_t curr_tx = NULL;
-
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx2) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx3) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx4) == RC_OK);
-
-  struct _iota_transaction curr_tx_s;
-  iota_transaction_t curr_tx1 = &curr_tx_s;
-
-  iota_stor_pack_t tx_pack = {(void **)(&curr_tx1), 1, 0, false};
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, tx1->trunk, NUM_TRITS_HASH);
@@ -329,37 +308,31 @@ void test_bundle_validate_size_4_value_valid() {
   flex_trit_t transaction_4_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
   flex_trits_from_trytes(transaction_2_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_2_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         (tryte_t *)TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
   flex_trits_from_trytes(transaction_3_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_3_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         (tryte_t *)TX_3_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
   flex_trits_from_trytes(transaction_4_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_4_OF_4_VALUE_BUNDLE_TRYTES, FLEX_TRIT_SIZE_8019,
-                         FLEX_TRIT_SIZE_8019);
+                         (tryte_t *)TX_4_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
   iota_transaction_t tx2 = transaction_deserialize(transaction_2_trits);
   iota_transaction_t tx3 = transaction_deserialize(transaction_3_trits);
   iota_transaction_t tx4 = transaction_deserialize(transaction_4_trits);
 
-  iota_transaction_t curr_tx = NULL;
-
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx2) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx3) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx4) == RC_OK);
-
-  struct _iota_transaction curr_tx_s;
-  iota_transaction_t curr_tx1 = &curr_tx_s;
-
-  iota_stor_pack_t tx_pack = {(void **)(&curr_tx1), 1, 0, false};
-
-  trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(ep, tx1->trunk, NUM_TRITS_HASH);
 
   bool exist = false;
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
