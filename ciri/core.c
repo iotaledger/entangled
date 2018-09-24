@@ -68,7 +68,8 @@ retcode_t core_init(core_t* const core) {
 
   log_info(CORE_LOGGER_ID, "Initializing ledger validator\n");
   if (iota_consensus_ledger_validator_init(
-          &core->ledger_validator, &core->tangle, &core->milestone_tracker)) {
+          &core->ledger_validator, &core->tangle, &core->milestone_tracker,
+          &core->transaction_requester)) {
     log_critical(CORE_LOGGER_ID, "Initializing ledger validator\n");
     return RC_CORE_FAILED_LEDGER_VALIDATOR_INIT;
   }

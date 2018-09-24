@@ -11,6 +11,7 @@
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/snapshot/snapshot.h"
 #include "consensus/tangle/tangle.h"
+#include "gossip/components/requester.h"
 #include "utils/logger_helper.h"
 
 #define LEDGER_VALIDATOR_LOGGER_ID "consensus_ledger_validator"
@@ -43,7 +44,8 @@ done:
 
 retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv,
                                                tangle_t *const tangle,
-                                               milestone_tracker_t *const mt) {
+                                               milestone_tracker_t *const mt,
+                                               requester_state_t *const tr) {
   retcode_t ret = RC_OK;
   iota_milestone_t consistent_milestone;
 
@@ -51,6 +53,7 @@ retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv,
   lv->tangle = tangle;
   lv->milestone_tracker = mt;
   mt->ledger_validator = lv;
+  lv->transaction_requester = tr;
 
   if ((ret = build_snapshot(lv, &consistent_milestone)) != RC_OK) {
     log_critical(LEDGER_VALIDATOR_LOGGER_ID, "Building snapshot failed\n");
