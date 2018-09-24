@@ -6,8 +6,8 @@
  */
 
 #include "gossip/components/requester.h"
-#include "ciri/core.h"
 #include "common/storage/sql/defs.h"
+#include "consensus/tangle/tangle.h"
 #include "utils/containers/lists/concurrent_list_trit_array.h"
 #include "utils/logger_helper.h"
 
@@ -15,16 +15,17 @@
 #define MAX_TX_REQ_NBR 10000
 #define REQUESTER_COMPONENT_LOGGER_ID "requester_component"
 
-retcode_t requester_init(requester_state_t *const state, node_t *const node) {
+retcode_t requester_init(requester_state_t *const state,
+                         tangle_t *const tangle) {
   if (state == NULL) {
     return RC_REQUESTER_COMPONENT_NULL_STATE;
-  } else if (node == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_NODE;
+  } else if (tangle == NULL) {
+    return RC_REQUESTER_COMPONENT_NULL_TANGLE;
   }
 
   logger_helper_init(REQUESTER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
   memset(state, 0, sizeof(requester_state_t));
-  state->node = node;
+  state->tangle = tangle;
 
   log_debug(REQUESTER_COMPONENT_LOGGER_ID, "Initializing requester list\n");
   if (CL_INIT(trit_array_p, state->list, trit_array_cmp) != CL_SUCCESS) {
@@ -79,8 +80,8 @@ retcode_t request_transaction(requester_state_t *const state,
   }
 
   // TODO(thibault) check null hash
-  if ((ret = iota_tangle_transaction_exist(
-           &state->node->core->tangle, TRANSACTION_COL_HASH, hash, &exists))) {
+  if ((ret = iota_tangle_transaction_exist(state->tangle, TRANSACTION_COL_HASH,
+                                           hash, &exists))) {
     return ret;
   }
   if (exists) {
@@ -117,9 +118,8 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
   while (iter) {
     *hash = iter->data;
     iter = iter->next;
-    if ((ret = iota_tangle_transaction_exist(&state->node->core->tangle,
-                                             TRANSACTION_COL_HASH, *hash,
-                                             &exists))) {
+    if ((ret = iota_tangle_transaction_exist(
+             state->tangle, TRANSACTION_COL_HASH, *hash, &exists))) {
       return ret;
     }
     if (exists) {

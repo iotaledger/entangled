@@ -15,6 +15,7 @@
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/snapshot/snapshot.h"
 #include "consensus/tangle/tangle.h"
+#include "gossip/components/requester.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,6 +26,7 @@ typedef struct core_s {
   ciri_conf_t config;
   tangle_t tangle;
   connection_config_t db_conf;
+  requester_state_t transaction_requester;
   milestone_tracker_t milestone_tracker;
   node_t node;
   snapshot_t snapshot;

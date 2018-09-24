@@ -54,8 +54,14 @@ retcode_t core_init(core_t* const core) {
     return RC_CORE_FAILED_MILESTONE_TRACKER_INIT;
   }
 
+  log_info(CORE_LOGGER_ID, "Initializing transaction requester\n");
+  if (requester_init(&core->transaction_requester, &core->tangle)) {
+    log_critical(CORE_LOGGER_ID, "Initializing transaction requester failed\n");
+    return RC_CORE_FAILED_REQUESTER_INIT;
+  }
+
   log_info(CORE_LOGGER_ID, "Initializing cIRI node\n");
-  if (node_init(&core->node, core)) {
+  if (node_init(&core->node, core, &core->transaction_requester)) {
     log_critical(CORE_LOGGER_ID, "Initializing cIRI node failed\n");
     return RC_CORE_FAILED_NODE_INIT;
   }
@@ -163,10 +169,16 @@ retcode_t core_destroy(core_t* const core) {
     ret = RC_CORE_FAILED_NODE_DESTROY;
   }
 
+  log_info(CORE_LOGGER_ID, "Destroying transaction requester\n");
+  if (requester_destroy(&core->transaction_requester)) {
+    log_error(CORE_LOGGER_ID, "Destroying transaction requester failed\n");
+    ret = RC_CORE_FAILED_REQUESTER_DESTROY;
+  }
+
   log_info(CORE_LOGGER_ID, "Destroying milestone tracker\n");
   if (iota_milestone_tracker_stop(&core->milestone_tracker)) {
-    log_critical(CORE_LOGGER_ID, "Destroying milestone tracker failed\n");
-    return RC_CORE_FAILED_MILESTONE_TRACKER_DESTROY;
+    log_error(CORE_LOGGER_ID, "Destroying milestone tracker failed\n");
+    ret = RC_CORE_FAILED_MILESTONE_TRACKER_DESTROY;
   }
 
   log_info(CORE_LOGGER_ID, "Destroying tangle\n");
