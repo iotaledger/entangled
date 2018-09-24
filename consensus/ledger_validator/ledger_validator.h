@@ -20,7 +20,7 @@ extern "C" {
 
 typedef struct ledger_validator_s {
   tangle_t *tangle;
-  milestone_tracker_t *mt;
+  milestone_tracker_t *milestone_tracker;
 } ledger_validator_t;
 
 extern retcode_t iota_consensus_ledger_validator_init(

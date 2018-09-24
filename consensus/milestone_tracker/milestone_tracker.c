@@ -15,6 +15,7 @@
 #include "common/storage/sql/defs.h"
 #include "common/trinary/trit_long.h"
 #include "consensus/bundle_validator/bundle_validator.h"
+#include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "mam/v1/merkle.h"
 #include "utils/logger_helper.h"
@@ -321,6 +322,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   }
   mt->latest_milestone_index = mt->milestone_start_index;
   mt->latest_solid_subtangle_milestone_index = mt->milestone_start_index;
+  mt->ledger_validator = NULL;
 
   return RC_OK;
 

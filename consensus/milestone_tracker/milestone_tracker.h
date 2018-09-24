@@ -25,6 +25,7 @@ extern "C" {
 typedef struct tangle_s tangle_t;
 typedef struct snapshot_s snapshot_t;
 typedef struct _trit_array* trit_array_p;
+typedef struct ledger_validator_s ledger_validator_t;
 
 typedef struct milestone_tracker_s {
   bool running;
@@ -40,9 +41,9 @@ typedef struct milestone_tracker_s {
   trit_array_p latest_solid_subtangle_milestone;
   trit_array_p coordinator;
   size_t num_keys_in_milestone;
+  ledger_validator_t* ledger_validator;
   // TODO
   // private final TransactionValidator transactionValidator;
-  // private LedgerValidator ledgerValidator;
   // private final MessageQ messageQ;
   // bool accept_any_testnet_coo;
 } milestone_tracker_t;
