@@ -105,9 +105,9 @@ retcode_t iota_statement_transaction_insert(const iota_transaction_t tx,
                                             size_t statement_cap) {
   int res = snprintf(
       statement, statement_cap,
-      "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
+      "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
       "VALUES (?,?,%" PRIi64 ",?,%" PRIu64 ",%" PRIu64 ",%" PRIu64
-      ",?,?,?,?,%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",?,?)",
+      ",?,?,?,?,%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",?,?,%" PRIu64 ")",
       TRANSACTION_TABLE_NAME, TRANSACTION_COL_SIG_OR_MSG,
       TRANSACTION_COL_ADDRESS, TRANSACTION_COL_VALUE,
       TRANSACTION_COL_OBSOLETE_TAG, TRANSACTION_COL_TIMESTAMP,
@@ -116,9 +116,10 @@ retcode_t iota_statement_transaction_insert(const iota_transaction_t tx,
       TRANSACTION_COL_TAG, TRANSACTION_COL_ATTACHMENT_TIMESTAMP,
       TRANSACTION_COL_ATTACHMENT_TIMESTAMP_UPPER,
       TRANSACTION_COL_ATTACHMENT_TIMESTAMP_LOWER, TRANSACTION_COL_NONCE,
-      TRANSACTION_COL_HASH, tx->value, tx->timestamp, tx->current_index,
-      tx->last_index, tx->attachment_timestamp, tx->attachment_timestamp_upper,
-      tx->attachment_timestamp_lower);
+      TRANSACTION_COL_HASH, TRANSACTION_COL_SNAPSHOT_INDEX, tx->value,
+      tx->timestamp, tx->current_index, tx->last_index,
+      tx->attachment_timestamp, tx->attachment_timestamp_upper,
+      tx->attachment_timestamp_lower, tx->snapshot_index);
 
   if (res < 0 || res == statement_cap) {
     log_error(SQL_STATEMENTS_ID,

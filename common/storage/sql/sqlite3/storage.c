@@ -108,6 +108,7 @@ static void select_transactions_populate_from_row(sqlite3_stmt* statement,
   tx->attachment_timestamp_lower = sqlite3_column_int64(statement, 13);
   column_decompress_load(statement, 14, tx->nonce, FLEX_TRIT_SIZE_81);
   column_decompress_load(statement, 15, tx->hash, FLEX_TRIT_SIZE_243);
+  tx->snapshot_index = sqlite3_column_int64(statement, 16);
 }
 
 enum load_model {

@@ -146,6 +146,8 @@ void test_stored_transaction(void) {
   TEST_ASSERT_EQUAL_INT(txs[0]->last_index, TEST_TRANSACTION.last_index);
   TEST_ASSERT_EQUAL_MEMORY(txs[0]->hash, TEST_TRANSACTION.hash,
                            FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_INT(txs[0]->snapshot_index,
+                        TEST_TRANSACTION.snapshot_index);
 
   for (int i = 0; i < 5; ++i) {
     transaction_free(pack.models[i]);
