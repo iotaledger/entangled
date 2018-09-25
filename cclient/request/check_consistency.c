@@ -8,14 +8,12 @@
 #include "check_consistency.h"
 
 check_consistency_req_t* check_consistency_req_new() {
-  check_consistency_req_t* tails = NULL;
-  utarray_new(tails, &ut_str_icd);
-  return tails;
+  return flex_hash_array_new();
 }
-void check_consistency_req_add(check_consistency_req_t* tails,
-                               const char* tail) {
-  utarray_push_back(tails, &tail);
+flex_hash_array_t* check_consistency_req_add(check_consistency_req_t* tails,
+                                             const char* tail) {
+  return flex_hash_array_append(tails, tail);
 }
-void check_consistency_req_free(check_consistency_req_t* ut) {
-  utarray_free(ut);
+void check_consistency_req_free(check_consistency_req_t* tails) {
+  flex_hash_array_free(tails);
 }

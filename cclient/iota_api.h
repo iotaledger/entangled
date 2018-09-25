@@ -27,7 +27,7 @@ void logger_init_cclient_core();
  */
 
 iota_api_result_t iota_api_get_node_info(
-    const iota_http_service_t* const service, get_node_info_res_t* const res);
+    const iota_http_service_t* const service, get_node_info_res_t** res);
 
 /**
  * Returns the set of neighbors service node is connected with, as well as their
@@ -89,7 +89,7 @@ iota_api_result_t iota_api_remove_neighbors(
  * @return error value.
  */
 iota_api_result_t iota_api_get_tips(const iota_http_service_t* const service,
-                                    get_tips_res_t* const res);
+                                    get_tips_res_t** res);
 /**
  * Find the transactions which attach the specified input and return. All input
  * values are lists (in req), for which a list of return values (transaction
@@ -109,7 +109,7 @@ iota_api_result_t iota_api_get_tips(const iota_http_service_t* const service,
 iota_api_result_t iota_api_find_transactions(
     const iota_http_service_t* const service,
     const find_transactions_req_t* const req,
-    find_transactions_res_t* const res);
+    find_transactions_res_t** const res);
 
 /**
  * Returns the raw transaction data (trytes) of a specific transaction. These
@@ -126,7 +126,7 @@ iota_api_result_t iota_api_find_transactions(
  */
 iota_api_result_t iota_api_get_trytes(const iota_http_service_t* const service,
                                       get_trytes_req_t* req,
-                                      get_trytes_res_t* res);
+                                      get_trytes_res_t** res);
 
 /**
  * Get the inclusion states of a set of transactions. This is for determining if
@@ -167,7 +167,7 @@ iota_api_result_t iota_api_get_inclusion_states(
  */
 iota_api_result_t iota_api_get_balances(
     const iota_http_service_t* const service,
-    const get_balances_req_t* const req, get_balances_res_t* res);
+    const get_balances_req_t* const req, get_balances_res_t** res);
 
 /**
  * Tip selection which returns trunkTransaction and branchTransaction. The input
@@ -188,7 +188,7 @@ iota_api_result_t iota_api_get_balances(
 iota_api_result_t iota_api_get_transactions_to_approve(
     const iota_http_service_t* const service,
     get_transactions_to_approve_req_t* req,
-    get_transactions_to_approve_res_t* res);
+    get_transactions_to_approve_res_t** res);
 
 /**
  * Attaches the specified transactions (trytes) to the Tangle by doing Proof of
@@ -212,7 +212,7 @@ iota_api_result_t iota_api_get_transactions_to_approve(
  */
 iota_api_result_t iota_api_attach_to_tangle(
     const iota_http_service_t* const service, attach_to_tangle_req_t* req,
-    attach_to_tangle_res_t* res);
+    attach_to_tangle_res_t** res);
 
 /**
  * Interrupts and completely aborts the iota_api_attach_to_tangle process.
