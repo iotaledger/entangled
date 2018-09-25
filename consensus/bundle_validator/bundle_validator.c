@@ -121,7 +121,6 @@ retcode_t load_bundle_transactions(const tangle_t* const tangle,
   struct _iota_transaction curr_tx_s;
   iota_transaction_t curr_tx = &curr_tx_s;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
-  flex_trit_t curr_tx_trunk_trits[FLEX_TRIT_SIZE_243];
 
   iota_stor_pack_t pack = {(void**)(&curr_tx), 1, 0, false};
 
@@ -139,7 +138,6 @@ retcode_t load_bundle_transactions(const tangle_t* const tangle,
   memcpy(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243);
   trit_array_t curr_tx_trunk;
   curr_tx_trunk.dynamic = 0;
-  curr_tx_trunk.trits = curr_tx_trunk_trits;
   while (curr_index < last_index &&
          memcmp(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243) == 0) {
     bundle_transactions_add(bundle, curr_tx);

@@ -503,11 +503,11 @@ void test_1_bundle(void) {
   cw_calc_result out;
 
   TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(
-                  &tangle, tx1->trunk, &pack) == RC_OK);
+                  &tangle, tx1->hash, &pack) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(
-                  &tangle, tx2->trunk, &pack) == RC_OK);
+                  &tangle, tx2->hash, &pack) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(
-                  &tangle, tx3->trunk, &pack) == RC_OK);
+                  &tangle, tx3->hash, &pack) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(
                   &tangle, tx4->hash, &pack) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(

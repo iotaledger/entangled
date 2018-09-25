@@ -245,7 +245,7 @@ void test_stored_load_hashes_of_approvers(void) {
   pack.capacity = 5;
   TRIT_ARRAY_DECLARE(key, NUM_TRITS_HASH);
   memcpy(key.trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_stor_transaction_load_hashes_of_approvers(&conn, &key,
+  TEST_ASSERT(iota_stor_transaction_load_hashes_of_approvers(&conn, key.trits,
                                                              &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(0, pack.num_loaded);
 
