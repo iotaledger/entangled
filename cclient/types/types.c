@@ -7,10 +7,25 @@
 
 #include "types.h"
 
+#define TYPES_LOGGER_ID "types"
+
+void logger_init_types() {
+  logger_helper_init(TYPES_LOGGER_ID, LOGGER_DEBUG, true);
+  log_info(TYPES_LOGGER_ID, "[%s:%d] enable types debug message.\n", __func__,
+           __LINE__);
+}
+
 char_buffer_t* char_buffer_new() {
   char_buffer_t* out = (char_buffer_t*)malloc(sizeof(char_buffer_t));
-  out->length = 0;
-  out->data = NULL;
+  if (out != NULL) {
+    out->length = 0;
+    out->data = NULL;
+  } else {
+    log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
+              STR_CCLIENT_NULL_PTR);
+  }
+  log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
+            STR_CCLIENT_NULL_PTR);
   return out;
 }
 
@@ -20,6 +35,8 @@ retcode_t char_buffer_allocate(char_buffer_t* in, size_t n) {
   }
   in->data = (char*)malloc(sizeof(char) * (n + 1));
   if (in->data == NULL) {
+    log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
+              STR_CCLIENT_OOM);
     return RC_CCLIENT_OOM;
   }
   in->length = n;
@@ -38,8 +55,10 @@ void char_buffer_free(char_buffer_t* in) {
 
 int_array* int_array_new() {
   int_array* out = (int_array*)malloc(sizeof(int_array));
-  out->size = 0;
-  out->array = NULL;
+  if (out != NULL) {
+    out->size = 0;
+    out->array = NULL;
+  }
   return out;
 }
 
@@ -49,6 +68,8 @@ retcode_t int_array_allocate(int_array* in, size_t n) {
   }
   in->array = (int*)malloc(sizeof(int) * (n + 1));
   if (in->array == NULL) {
+    log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
+              STR_CCLIENT_OOM);
     return RC_CCLIENT_OOM;
   }
   in->size = n;
@@ -66,8 +87,10 @@ void int_array_free(int_array* in) {
 
 int_array_array* int_array_array_new() {
   int_array_array* out = (int_array_array*)malloc(sizeof(int_array_array));
-  out->size = 0;
-  out->array = NULL;
+  if (out != NULL) {
+    out->size = 0;
+    out->array = NULL;
+  }
   return out;
 }
 
@@ -77,6 +100,8 @@ retcode_t int_array_array_allocate(int_array_array* in, size_t n) {
   }
   in->array = (int_array*)malloc(sizeof(int_array) * (n + 1));
   if (in->array == NULL) {
+    log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
+              STR_CCLIENT_OOM);
     return RC_CCLIENT_OOM;
   }
   in->size = n;
@@ -95,9 +120,10 @@ void int_array_array_free(int_array_array* in) {
 char* int_array_to_string(int_array* in) {
   int len = in->size;
   char* str = (char*)malloc(sizeof(char) * len);
-
-  for (int i = 0; i < len; i++) {
-    sprintf(str + i, "%d", *(in->array + i));
+  if (str != NULL) {
+    for (int i = 0; i < len; i++) {
+      sprintf(str + i, "%d", *(in->array + i));
+    }
   }
   return str;
 }
@@ -105,10 +131,10 @@ char* int_array_to_string(int_array* in) {
 int_array* string_to_int_array(char* in) {
   int len = strlen(in);
   int_array* in_arr = int_array_new();
-  int_array_allocate(in_arr, len);
-
-  for (int i = 0; i < len; i++) {
-    *(in_arr->array + i) = atoi(in + i);
+  if (int_array_allocate(in_arr, len) == RC_OK && in_arr != NULL) {
+    for (int i = 0; i < len; i++) {
+      *(in_arr->array + i) = atoi(in + i);
+    }
   }
   return in_arr;
 }
@@ -148,6 +174,7 @@ retcode_t trytes_to_flex_hash(trit_array_p hash, const char* trytes) {
   return RC_OK;
 }
 
+// For utlist marcos, we must initialize head to NULL.
 flex_hash_array_t* flex_hash_array_new() { return NULL; }
 
 flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
@@ -155,11 +182,16 @@ flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
   flex_hash_array_t* elt =
       (flex_hash_array_t*)malloc(sizeof(flex_hash_array_t));
 
-  elt->hash = trit_array_new_from_trytes((tryte_t*)trytes);
-  if (elt->hash) {
-    LL_APPEND(head, elt);
+  if (elt != NULL) {
+    elt->hash = trit_array_new_from_trytes((tryte_t*)trytes);
+    if (elt->hash) {
+      LL_APPEND(head, elt);
+    } else {
+      free(elt);
+    }
   } else {
-    free(elt);
+    log_warning(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
+                STR_CCLIENT_NULL_PTR);
   }
   return head;
 }
@@ -196,10 +228,14 @@ retcode_t flex_hash_to_char_buffer(trit_array_p hash, char_buffer_t* out) {
   retcode_t ret = RC_OK;
   size_t trits_len = 0;
   if (hash == NULL || hash->trits == NULL) {
-    return RC_CCLIENT_FLEX_TRITS;
+    log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
+              STR_CCLIENT_NULL_PTR);
+    return RC_CCLIENT_NULL_PTR;
   }
   ret = char_buffer_allocate(out, hash->num_trits / 3);
   if (ret != RC_OK) {
+    log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
+              error_2_string(ret));
     return ret;
   }
 

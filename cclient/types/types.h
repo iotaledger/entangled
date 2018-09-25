@@ -11,11 +11,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "common/errors.h"
 #include "common/model/transaction.h"
 #include "common/trinary/trit_array.h"
 #include "common/trinary/tryte.h"
 
-#include "common/errors.h"
+#include "utils/logger_helper.h"
+
 #include "utarray.h"
 #include "utlist.h"
 
@@ -75,6 +77,8 @@ typedef struct flex_hash_array {
   trit_array_p hash;  // trit_array_t is an array of flex_trit.
   struct flex_hash_array* next;
 } flex_hash_array_t;
+
+void logger_init_types();
 
 char_buffer_t* char_buffer_new();
 retcode_t char_buffer_allocate(char_buffer_t* in, size_t n);

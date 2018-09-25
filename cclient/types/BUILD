@@ -14,6 +14,7 @@ cc_library(
         "//common/model:transaction",
         "//common/trinary:trit_array",
         "//common/trinary:tryte",
+        "//utils:logger_helper",
         "@com_github_uthash//:uthash",
     ],
 )

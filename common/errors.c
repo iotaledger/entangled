@@ -98,10 +98,10 @@ const char* error_2_string(retcode_t err) {
       return STR_CCLIENT_RES_ERROR;
     case RC_CCLIENT_JSON_KEY:
       return STR_CCLIENT_JSON_KEY;
-    case RC_CCLIENT_UTLIST:
-      return STR_CCLIENT_UTLIST;
     case RC_CCLIENT_FLEX_TRITS:
       return STR_CCLIENT_FLEX_TRITS;
+    case RC_CCLIENT_NULL_PTR:
+      return STR_CCLIENT_NULL_PTR;
 
     // Consensus module
     case RC_CONSENSUS_NOT_IMPLEMENTED:
