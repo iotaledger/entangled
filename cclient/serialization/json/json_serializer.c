@@ -59,6 +59,100 @@ retcode_t utarray_to_json_array(UT_array* ut, cJSON* json_root,
   return RC_OK;
 }
 
+flex_hash_array_t* json_array_to_flex_hash_array(cJSON* obj,
+                                                 const char* obj_name,
+                                                 flex_hash_array_t* head) {
+  cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
+  if (cJSON_IsArray(json_item)) {
+    cJSON* current_obj = NULL;
+    cJSON_ArrayForEach(current_obj, json_item) {
+      if (current_obj->valuestring != NULL) {
+        head =
+            flex_hash_array_append(head, (const char*)current_obj->valuestring);
+      }
+    }
+  } else {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_PARSE);
+    cJSON_Delete(obj);
+    return NULL;
+  }
+  return head;
+}
+
+retcode_t flex_hash_array_to_json_array(flex_hash_array_t* head,
+                                        cJSON* json_root,
+                                        const char* obj_name) {
+  flex_hash_array_t* elt;
+  int array_count;
+  cJSON* array_obj = NULL;
+
+  LL_COUNT(head, elt, array_count);
+  if (array_count > 0) {
+    array_obj = cJSON_CreateArray();
+    if (array_obj == NULL) {
+      return RC_CCLIENT_JSON_CREATE;
+    }
+    cJSON_AddItemToObject(json_root, obj_name, array_obj);
+    LL_FOREACH(head, elt) {
+      // flex to trytes;
+      size_t len_trytes = num_flex_trits_for_trits(elt->hash->num_trits);
+      trit_t trytes_out[len_trytes + 1];
+      size_t trits_count =
+          flex_trits_to_trytes(trytes_out, len_trytes, elt->hash->trits,
+                               elt->hash->num_trits, elt->hash->num_trits);
+      trytes_out[len_trytes] = '\0';
+      if (trits_count != 0) {
+        cJSON_AddItemToArray(array_obj,
+                             cJSON_CreateString((const char*)trytes_out));
+      } else {
+        return RC_CCLIENT_FLEX_TRITS;
+      }
+    }
+  }
+  return RC_OK;
+}
+
+retcode_t flex_hash_to_json_string(cJSON* json_obj, const char* key,
+                                   trit_array_p hash) {
+  // flex to trytes;
+  size_t len_trytes = num_flex_trits_for_trits(hash->num_trits);
+  trit_t trytes_out[len_trytes + 1];
+  size_t trits_count = flex_trits_to_trytes(trytes_out, len_trytes, hash->trits,
+                                            hash->num_trits, hash->num_trits);
+  trytes_out[len_trytes] = '\0';
+
+  if (trits_count != 0) {
+    cJSON_AddItemToObject(json_obj, key,
+                          cJSON_CreateString((const char*)trytes_out));
+  } else {
+    return RC_CCLIENT_FLEX_TRITS;
+  }
+  return RC_OK;
+}
+
+retcode_t json_string_to_flex_hash(cJSON* json_obj, const char* key,
+                                   trit_array_p hash) {
+  retcode_t ret = RC_OK;
+  cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, key);
+  if (json_value == NULL) {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_KEY, key);
+    return RC_CCLIENT_JSON_KEY;
+  }
+  if (cJSON_IsString(json_value) && (json_value->valuestring != NULL)) {
+    ret = trytes_to_flex_hash(hash, json_value->valuestring);
+    if (ret != RC_OK) {
+      return ret;
+    }
+  } else {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s not string\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_PARSE);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+  return ret;
+}
+
 retcode_t json_array_to_int_array_array(cJSON* obj, const char* obj_name,
                                         int_array_array* in) {
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
@@ -206,22 +300,22 @@ retcode_t json_find_transactions_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("findTransactions"));
 
-  ret = utarray_to_json_array(obj->addresses, json_root, "addresses");
+  ret = flex_hash_array_to_json_array(obj->addresses, json_root, "addresses");
   if (ret != RC_OK) {
     goto err;
   }
 
-  ret = utarray_to_json_array(obj->approvees, json_root, "approvees");
+  ret = flex_hash_array_to_json_array(obj->approvees, json_root, "approvees");
   if (ret != RC_OK) {
     goto err;
   }
 
-  ret = utarray_to_json_array(obj->bundles, json_root, "bundles");
+  ret = flex_hash_array_to_json_array(obj->bundles, json_root, "bundles");
   if (ret != RC_OK) {
     goto err;
   }
 
-  ret = utarray_to_json_array(obj->tags, json_root, "tags");
+  ret = flex_hash_array_to_json_array(obj->tags, json_root, "tags");
   if (ret != RC_OK) {
     goto err;
   }
@@ -247,7 +341,7 @@ err:
 
 retcode_t json_find_transactions_deserialize_response(
     const serializer_t* const s, const char* const obj,
-    find_transactions_res_t* out) {
+    find_transactions_res_t** out) {
   log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
@@ -268,7 +362,7 @@ retcode_t json_find_transactions_deserialize_response(
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_array_to_utarray(json_obj, "hashes", out->hashes);
+  *out = json_array_to_flex_hash_array(json_obj, "hashes", *out);
 
   cJSON_Delete(json_obj);
   return ret;
@@ -292,7 +386,7 @@ retcode_t json_get_balances_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("getBalances"));
 
-  ret = utarray_to_json_array(obj->addresses, json_root, "addresses");
+  ret = flex_hash_array_to_json_array(obj->addresses, json_root, "addresses");
   if (ret != RC_OK) {
     goto err;
   }
@@ -300,7 +394,7 @@ retcode_t json_get_balances_serialize_request(
   cJSON_AddItemToObject(json_root, "threshold",
                         cJSON_CreateNumber(obj->threshold));
 
-  ret = utarray_to_json_array(obj->tips, json_root, "tips");
+  ret = flex_hash_array_to_json_array(obj->tips, json_root, "tips");
   if (ret != RC_OK) {
     goto err;
   }
@@ -324,7 +418,7 @@ err:
 
 retcode_t json_get_balances_deserialize_response(const serializer_t* const s,
                                                  const char* const obj,
-                                                 get_balances_res_t* out) {
+                                                 get_balances_res_t** out) {
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
@@ -345,18 +439,18 @@ retcode_t json_get_balances_deserialize_response(const serializer_t* const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_array_to_int_array_array(json_obj, "balances", out->balances);
+  ret = json_array_to_int_array_array(json_obj, "balances", (*out)->balances);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_array_to_utarray(json_obj, "references", out->milestone);
+  (*out)->milestone =
+      json_array_to_flex_hash_array(json_obj, "references", (*out)->milestone);
   if (ret != RC_OK) {
-    printf("get balances ERROR \n");
     goto end;
   }
 
-  ret = json_get_int(json_obj, "milestoneIndex", &out->milestoneIndex);
+  ret = json_get_int(json_obj, "milestoneIndex", &(*out)->milestoneIndex);
   if (ret != RC_OK) {
     goto end;
   }
@@ -385,12 +479,12 @@ retcode_t json_get_inclusion_state_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("getInclusionStates"));
 
-  ret = utarray_to_json_array(obj->hashes, json_root, "transactions");
+  ret = flex_hash_array_to_json_array(obj->hashes, json_root, "transactions");
   if (ret != RC_OK) {
     goto done;
   }
 
-  ret = utarray_to_json_array(obj->tips, json_root, "tips");
+  ret = flex_hash_array_to_json_array(obj->tips, json_root, "tips");
   if (ret != RC_OK) {
     goto done;
   }
@@ -524,7 +618,7 @@ retcode_t json_get_node_info_serialize_request(const serializer_t* const s,
 
 retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
                                                   const char* const obj,
-                                                  get_node_info_res_t* out) {
+                                                  get_node_info_res_t** out) {
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
@@ -545,81 +639,83 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_get_string(json_obj, "appName", out->app_name);
+  ret = json_get_string(json_obj, "appName", (*out)->app_name);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_string(json_obj, "appVersion", out->app_version);
+  ret = json_get_string(json_obj, "appVersion", (*out)->app_version);
   if (ret != RC_OK) {
     goto end;
   }
 
   ret = json_get_int(json_obj, "jreAvailableProcessors",
-                     &out->jre_available_processors);
+                     &(*out)->jre_available_processors);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_size(json_obj, "jreFreeMemory", &out->jre_free_memory);
+  ret = json_get_size(json_obj, "jreFreeMemory", &(*out)->jre_free_memory);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_size(json_obj, "jreMaxMemory", &out->jre_max_memory);
+  ret = json_get_size(json_obj, "jreMaxMemory", &(*out)->jre_max_memory);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_size(json_obj, "jreTotalMemory", &out->jre_total_memory);
+  ret = json_get_size(json_obj, "jreTotalMemory", &(*out)->jre_total_memory);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_string(json_obj, "latestMilestone", out->latest_milestone);
+  ret = json_string_to_flex_hash(json_obj, "latestMilestone",
+                                 (*out)->latest_milestone);
   if (ret != RC_OK) {
     goto end;
   }
 
   ret = json_get_size(json_obj, "latestMilestoneIndex",
-                      &out->latest_milestone_index);
+                      &(*out)->latest_milestone_index);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_string(json_obj, "latestSolidSubtangleMilestone",
-                        out->latest_solid_subtangle_milestone);
+  ret = json_string_to_flex_hash(json_obj, "latestSolidSubtangleMilestone",
+                                 (*out)->latest_solid_subtangle_milestone);
   if (ret != RC_OK) {
     goto end;
   }
 
   ret = json_get_size(json_obj, "latestSolidSubtangleMilestoneIndex",
-                      &out->latest_solid_subtangle_milestone_index);
+                      &(*out)->latest_solid_subtangle_milestone_index);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_int(json_obj, "neighbors", &out->neighbors);
+  ret = json_get_int(json_obj, "neighbors", &(*out)->neighbors);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_int(json_obj, "packetsQueueSize", &out->packets_queue_size);
+  ret = json_get_int(json_obj, "packetsQueueSize", &(*out)->packets_queue_size);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_size(json_obj, "time", &out->time);
+  ret = json_get_size(json_obj, "time", &(*out)->time);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_int(json_obj, "tips", &out->tips);
+  ret = json_get_int(json_obj, "tips", &(*out)->tips);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_int(json_obj, "transactionsToRequest", &out->trans_to_request);
+  ret = json_get_int(json_obj, "transactionsToRequest",
+                     &(*out)->trans_to_request);
   if (ret != RC_OK) {
     goto end;
   }
@@ -644,7 +740,7 @@ retcode_t json_get_tips_serialize_request(const serializer_t* const s,
 
 retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
                                              const char* const obj,
-                                             get_tips_res_t* out) {
+                                             get_tips_res_t** out) {
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
@@ -665,7 +761,7 @@ retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_array_to_utarray(json_obj, "hashes", out);
+  *out = json_array_to_flex_hash_array(json_obj, "hashes", *out);
 
   cJSON_Delete(json_obj);
   return ret;
@@ -710,7 +806,7 @@ retcode_t json_get_transactions_to_approve_serialize_request(
 
 retcode_t json_get_transactions_to_approve_deserialize_response(
     const serializer_t* const s, const char* const obj,
-    get_transactions_to_approve_res_t* out) {
+    get_transactions_to_approve_res_t** out) {
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
@@ -731,12 +827,12 @@ retcode_t json_get_transactions_to_approve_deserialize_response(
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_get_string(json_obj, "trunkTransaction", out->trunk);
+  ret = json_string_to_flex_hash(json_obj, "trunkTransaction", (*out)->trunk);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_string(json_obj, "branchTransaction", out->branch);
+  ret = json_string_to_flex_hash(json_obj, "branchTransaction", (*out)->branch);
   if (ret != RC_OK) {
     goto end;
   }
@@ -894,7 +990,7 @@ retcode_t json_get_trytes_serialize_request(const serializer_t* const s,
 
   cJSON_AddItemToObject(json_root, "command", cJSON_CreateString("getTrytes"));
 
-  ret = utarray_to_json_array(obj, json_root, "hashes");
+  ret = flex_hash_array_to_json_array(obj, json_root, "hashes");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;
@@ -916,7 +1012,7 @@ retcode_t json_get_trytes_serialize_request(const serializer_t* const s,
 
 retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
                                                const char* const obj,
-                                               get_trytes_res_t* out) {
+                                               get_trytes_res_t** out) {
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
@@ -937,7 +1033,7 @@ retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_array_to_utarray(json_obj, "trytes", out);
+  *out = json_array_to_flex_hash_array(json_obj, "trytes", *out);
 
   cJSON_Delete(json_obj);
   return ret;
@@ -960,13 +1056,20 @@ retcode_t json_attach_to_tangle_serialize_request(const serializer_t* const s,
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("attachToTangle"));
 
-  cJSON_AddItemToObject(json_root, "trunkTransaction",
-                        cJSON_CreateString(obj->trunk->data));
-  cJSON_AddItemToObject(json_root, "branchTransaction",
-                        cJSON_CreateString(obj->branch->data));
+  ret = flex_hash_to_json_string(json_root, "trunkTransaction", obj->trunk);
+  if (ret != RC_OK) {
+    goto done;
+  }
+
+  ret = flex_hash_to_json_string(json_root, "branchTransaction", obj->branch);
+  if (ret != RC_OK) {
+    goto done;
+  }
+
   cJSON_AddItemToObject(json_root, "minWeightMagnitude",
                         cJSON_CreateNumber(obj->mwm));
-  ret = utarray_to_json_array(obj->trytes, json_root, "trytes");
+
+  ret = flex_hash_array_to_json_array(obj->trytes, json_root, "trytes");
   if (ret != RC_OK) {
     goto done;
   }
@@ -980,7 +1083,6 @@ retcode_t json_attach_to_tangle_serialize_request(const serializer_t* const s,
     }
     cJSON_free((void*)json_text);
   }
-
 done:
   cJSON_Delete(json_root);
   return ret;
@@ -988,7 +1090,7 @@ done:
 
 retcode_t json_attach_to_tangle_deserialize_response(
     const serializer_t* const s, const char* const obj,
-    attach_to_tangle_res_t* out) {
+    attach_to_tangle_res_t** out) {
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
@@ -1009,7 +1111,10 @@ retcode_t json_attach_to_tangle_deserialize_response(
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_array_to_utarray(json_obj, "trytes", out);
+  *out = json_array_to_flex_hash_array(json_obj, "trytes", *out);
+  if (*out == NULL) {
+    return RC_CCLIENT_FLEX_TRITS;
+  }
 
   cJSON_Delete(json_obj);
   return ret;
@@ -1033,7 +1138,7 @@ retcode_t json_broadcast_transactions_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("broadcastTransactions"));
 
-  ret = utarray_to_json_array(obj, json_root, "trytes");
+  ret = flex_hash_array_to_json_array(obj, json_root, "trytes");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;
@@ -1070,7 +1175,7 @@ retcode_t json_store_transactions_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("storeTransactions"));
 
-  ret = utarray_to_json_array(obj, json_root, "trytes");
+  ret = flex_hash_array_to_json_array(obj, json_root, "trytes");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;
@@ -1107,7 +1212,7 @@ retcode_t json_check_consistency_serialize_request(const serializer_t* const s,
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("checkConsistency"));
 
-  ret = utarray_to_json_array(obj, json_root, "tails");
+  ret = flex_hash_array_to_json_array(obj, json_root, "tails");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;

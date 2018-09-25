@@ -18,12 +18,12 @@ extern "C" {
  * Tail transaction hash (hash of transaction with `currentIndex=0`), or array
  * of tail transaction hashes.
  */
-typedef UT_array check_consistency_req_t;
+typedef flex_hash_array_t check_consistency_req_t;
 
 check_consistency_req_t* check_consistency_req_new();
-void check_consistency_req_add(check_consistency_req_t* tails,
-                               const char* tail);
-void check_consistency_req_free(check_consistency_req_t* ut);
+flex_hash_array_t* check_consistency_req_add(check_consistency_req_t* tails,
+                                             const char* tail);
+void check_consistency_req_free(check_consistency_req_t* tails);
 
 #ifdef __cplusplus
 }

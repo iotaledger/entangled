@@ -15,11 +15,11 @@ extern "C" {
 #include "types/types.h"
 
 // List of raw data of transactions to be rebroadcast.
-typedef UT_array broadcast_transactions_req_t;
+typedef flex_hash_array_t broadcast_transactions_req_t;
 
 broadcast_transactions_req_t* broadcast_transactions_req_new();
-void broadcast_transactions_req_add(broadcast_transactions_req_t* transactions,
-                                    const char* trytes);
+broadcast_transactions_req_t* broadcast_transactions_req_add(
+    broadcast_transactions_req_t* transactions, const char* trytes);
 void broadcast_transactions_req_free(
     broadcast_transactions_req_t* transactions);
 

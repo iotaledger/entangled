@@ -10,36 +10,41 @@
 find_transactions_req_t* find_transactions_req_new() {
   find_transactions_req_t* req =
       (find_transactions_req_t*)malloc(sizeof(find_transactions_req_t));
-  utarray_new(req->addresses, &ut_str_icd);
-  utarray_new(req->tags, &ut_str_icd);
-  utarray_new(req->approvees, &ut_str_icd);
-  utarray_new(req->bundles, &ut_str_icd);
+  req->addresses = flex_hash_array_new();
+  req->tags = flex_hash_array_new();
+  req->approvees = flex_hash_array_new();
+  req->bundles = flex_hash_array_new();
   return req;
 }
 
 void find_transactions_req_free(find_transactions_req_t** req) {
   if (*req) {
-    utarray_free((*req)->addresses);
-    utarray_free((*req)->tags);
-    utarray_free((*req)->approvees);
-    utarray_free((*req)->bundles);
+    flex_hash_array_free((*req)->addresses);
+    flex_hash_array_free((*req)->tags);
+    flex_hash_array_free((*req)->approvees);
+    flex_hash_array_free((*req)->bundles);
     free(*req);
     *req = NULL;
   }
 }
 
-void find_transactions_req_add_address(find_transactions_req_t* req,
-                                       char* addr) {
-  utarray_push_back(req->addresses, &addr);
+find_transactions_req_t* find_transactions_req_add_address(
+    find_transactions_req_t* req, char* addr) {
+  req->addresses = flex_hash_array_append(req->addresses, addr);
+  return req;
 }
-void find_transactions_req_add_tag(find_transactions_req_t* req, char* tag) {
-  utarray_push_back(req->tags, &tag);
+find_transactions_req_t* find_transactions_req_add_tag(
+    find_transactions_req_t* req, char* tag) {
+  req->tags = flex_hash_array_append(req->tags, tag);
+  return req;
 }
-void find_transactions_req_add_approvee(find_transactions_req_t* req,
-                                        char* approvee) {
-  utarray_push_back(req->approvees, &approvee);
+find_transactions_req_t* find_transactions_req_add_approvee(
+    find_transactions_req_t* req, char* approvee) {
+  req->approvees = flex_hash_array_append(req->approvees, approvee);
+  return req;
 }
-void find_transactions_req_add_bundle(find_transactions_req_t* req,
-                                      char* bundle) {
-  utarray_push_back(req->bundles, &bundle);
+find_transactions_req_t* find_transactions_req_add_bundle(
+    find_transactions_req_t* req, char* bundle) {
+  req->bundles = flex_hash_array_append(req->bundles, bundle);
+  return req;
 }
