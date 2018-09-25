@@ -5,9 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/trinary/flex_trit.h"
 #include <stdlib.h>
 #include <string.h>
+
+#include "common/trinary/flex_trit.h"
 #include "common/trinary/trit_byte.h"
 
 size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
@@ -42,21 +43,22 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
   uint8_t tshift = (start & 3) << 1U;
   uint8_t rshift = (8U - tshift) % 8U;
   size_t index = start >> 2U;
-  size_t end_index = (start + num_trits - 1) >> 2U;
+  size_t end_index = index + num_bytes - 1;
   size_t i, j;
+  size_t total_bytes = num_flex_trits_for_trits(len);
   // Calculate the number of bytes to copy over
-  for (i = index, j = 0; i < index + num_bytes; i++, j++) {
+  for (i = index, j = 0; i <= end_index; i++, j++) {
     buffer = flex_trits[i];
     buffer = buffer >> tshift;
-    if (i < end_index) {
-      if (rshift) {
-        buffer |= (flex_trits[i + 1] << rshift);
-      }
-    } else {
+    if (rshift && i < total_bytes - 1) {
+      buffer |= (flex_trits[i + 1] << rshift);
+    }
+    if (i == end_index) {
       uint8_t residual = (num_trits & 3);
       if (residual) {
         uint8_t shift = (4 - residual) << 1U;
-        buffer = (uint8_t)(buffer << shift) >> shift;
+        buffer <<= shift;
+        buffer >>= shift;
       }
     }
     to_flex_trits[j] = buffer;
@@ -133,6 +135,7 @@ size_t flex_trits_from_trits(flex_trit_t *const to_flex_trits,
   memset(to_flex_trits, FLEX_TRIT_NULL_VALUE, num_flex_trits_for_trits(to_len));
   trits_to_trytes(trits, to_flex_trits, num_trits);
 #elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
+  memset(to_flex_trits, FLEX_TRIT_NULL_VALUE, num_flex_trits_for_trits(to_len));
   for (size_t i = 0; i < num_trits; i++) {
     flex_trits_set_at(to_flex_trits, to_len, i, trits[i]);
   }
