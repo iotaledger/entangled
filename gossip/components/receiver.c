@@ -7,7 +7,7 @@
 
 #include <string.h>
 
-#include "ciri/conf/conf_default.h"
+#include "ciri/conf/conf_values.h"
 #include "ciri/node.h"
 #include "gossip/components/receiver.h"
 #include "utils/logger_helper.h"

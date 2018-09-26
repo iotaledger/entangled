@@ -14,7 +14,7 @@
 #include "common/errors.h"
 #include "common/storage/connection.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
-#include "consensus/milestone/milestone.h"
+#include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/model.h"
 #include "consensus/tangle/tangle.h"
 
@@ -43,14 +43,14 @@ testnet, int milestoneStartIndex) {
 
 typedef struct ledger_validator_t {
   tangle_t *tangle;
-  milestone_t *milestone;
+  milestone_tracker_t *mt;
   // private final TransactionRequester transactionRequester;
   // private final MessageQ messageQ;
   // private volatile int numberOfConfirmedTransactions;
 } ledger_validator_t;
 
 extern retcode_t iota_consensus_ledger_validator_init(
-    tangle_t *const tangle, milestone_t *const milestone,
+    tangle_t *const tangle, milestone_tracker_t *const mt,
     ledger_validator_t *const lv);
 
 extern retcode_t iota_consensus_ledger_validator_destroy(

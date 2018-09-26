@@ -8,6 +8,7 @@
 #include <unity/unity.h>
 
 #include "common/model/bundle.h"
+#include "common/sign/normalize.h"
 
 #define HASH_LENGTH 243
 
@@ -25,22 +26,12 @@ static byte_t bytes[] = {
 
 void test_normalized_bundle(void) {
   size_t length = strlen((char *)trytes);
-  trit_t bundle_trits[HASH_LENGTH];
-  tryte_t normalized_bundle_bytes[length];
-
-  trytes_to_trits(trytes, bundle_trits, length);
-  normalized_bundle(bundle_trits, normalized_bundle_bytes);
-  TEST_ASSERT_EQUAL_MEMORY(bytes, normalized_bundle_bytes, length);
-}
-
-void test_flex_normalized_bundle(void) {
-  size_t length = strlen((char *)trytes);
   tryte_t normalized_bundle_bytes[length];
   flex_trit_t bundle_flex_trits[FLEX_TRIT_SIZE_243];
 
   flex_trits_from_trytes(bundle_flex_trits, HASH_LENGTH, trytes, length,
                          length);
-  flex_normalized_bundle(bundle_flex_trits, normalized_bundle_bytes);
+  normalize_hash(bundle_flex_trits, normalized_bundle_bytes);
   TEST_ASSERT_EQUAL_MEMORY(bytes, normalized_bundle_bytes, length);
 }
 
@@ -48,7 +39,6 @@ int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_normalized_bundle);
-  RUN_TEST(test_flex_normalized_bundle);
 
   return UNITY_END();
 }

@@ -10,3 +10,16 @@ cc_library(
         "//utils:logger_helper",
     ],
 )
+
+cc_library(
+    name = "pack",
+    srcs = ["pack.c"],
+    hdrs = ["pack.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common:errors",
+        "//common/model:transaction",
+        "//common/trinary:trit_array",
+        "//utils:logger_helper",
+    ],
+)

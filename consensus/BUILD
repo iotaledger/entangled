@@ -7,3 +7,9 @@ cc_library(
         "//common/trinary:trit_array",
     ],
 )
+
+cc_library(
+    name = "defs",
+    hdrs = ["defs.h"],
+    visibility = ["//visibility:public"],
+)

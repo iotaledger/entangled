@@ -11,6 +11,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":serializer_base",
+        "//utils:logger_helper",
         "@cJSON",
     ],
 )

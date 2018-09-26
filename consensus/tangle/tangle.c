@@ -54,12 +54,28 @@ retcode_t iota_tangle_transaction_load_hashes(const tangle_t *const tangle,
                                               const char *index_name,
                                               const trit_array_p key,
                                               iota_stor_pack_t *pack) {
-  return iota_stor_transaction_load_hashes(&tangle->conn, index_name, key,
-                                           pack);
+  retcode_t res = RC_OK;
+
+  res = iota_stor_transaction_load_hashes(&tangle->conn, index_name, key, pack);
+  while (res == RC_OK && pack->insufficient_capacity) {
+    res = hash_pack_resize(pack, 2);
+    if (res == RC_OK) {
+      pack->num_loaded = 0;
+      res = iota_stor_transaction_load_hashes(&tangle->conn, index_name, key,
+                                              pack);
+    }
+  }
+
+  if (res != RC_OK) {
+    log_error(TANGLE_LOGGER_ID,
+              "Failed in loading hashes, error code is: %\" PRIu64 \"\n", res);
+  }
+
+  return res;
 }
 
 retcode_t iota_tangle_transaction_load_hashes_of_approvers(
-    const tangle_t *const tangle, const trit_array_p approvee_hash,
+    const tangle_t *const tangle, const flex_trit_t *approvee_hash,
     iota_stor_pack_t *pack) {
   retcode_t res = RC_OK;
 
@@ -98,6 +114,17 @@ retcode_t iota_tangle_milestone_load(const tangle_t *const tangle,
                                      const trit_array_p key,
                                      iota_stor_pack_t *pack) {
   return iota_stor_milestone_load(&tangle->conn, col_name, key, pack);
+}
+
+retcode_t iota_tangle_milestone_load_latest(const tangle_t *const tangle,
+                                            iota_stor_pack_t *pack) {
+  return iota_stor_milestone_load_latest(&tangle->conn, pack);
+}
+
+retcode_t iota_tangle_milestone_load_next(const tangle_t *const tangle,
+                                          uint64_t index,
+                                          iota_stor_pack_t *pack) {
+  return iota_stor_milestone_load_next(&tangle->conn, index, pack);
 }
 
 retcode_t iota_tangle_milestone_exist(const tangle_t *const tangle,

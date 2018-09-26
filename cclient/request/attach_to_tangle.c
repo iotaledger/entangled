@@ -11,19 +11,19 @@ attach_to_tangle_req_t* attach_to_tangle_req_new() {
   attach_to_tangle_req_t* req =
       (attach_to_tangle_req_t*)malloc(sizeof(attach_to_tangle_req_t));
   if (req) {
-    req->trunk = char_buffer_new();
-    req->branch = char_buffer_new();
     req->mwm = ATTACH_TO_TANGLE_MAIN_MWM;
-    utarray_new(req->trytes, &ut_str_icd);
+    req->trytes = flex_hash_array_new();
+    req->trunk = trit_array_new(NUM_TRITS_TRUNK);
+    req->branch = trit_array_new(NUM_TRITS_BRANCH);
   }
   return req;
 }
 
 void attach_to_tangle_req_free(attach_to_tangle_req_t** req) {
   if (*req) {
-    char_buffer_free((*req)->trunk);
-    char_buffer_free((*req)->branch);
-    utarray_free((*req)->trytes);
+    trit_array_free((*req)->trunk);
+    trit_array_free((*req)->branch);
+    flex_hash_array_free((*req)->trytes);
     free(*req);
     *req = NULL;
   }
@@ -31,20 +31,12 @@ void attach_to_tangle_req_free(attach_to_tangle_req_t** req) {
 
 retcode_t attach_to_tangle_req_set_trunk(attach_to_tangle_req_t* req,
                                          const char* trunk) {
-  retcode_t ret = RC_OK;
-  size_t str_len = strlen(trunk);
-  ret = char_buffer_allocate(req->trunk, str_len);
-  strncpy(req->trunk->data, trunk, str_len);
-  return ret;
+  return trytes_to_flex_hash(req->trunk, trunk);
 }
 
 retcode_t attach_to_tangle_req_set_branch(attach_to_tangle_req_t* req,
                                           const char* branch) {
-  retcode_t ret = RC_OK;
-  size_t str_len = strlen(branch);
-  ret = char_buffer_allocate(req->branch, str_len);
-  strncpy(req->branch->data, branch, str_len);
-  return ret;
+  return trytes_to_flex_hash(req->branch, branch);
 }
 
 void attach_to_tangle_req_set_mwm(attach_to_tangle_req_t* req,
@@ -52,7 +44,7 @@ void attach_to_tangle_req_set_mwm(attach_to_tangle_req_t* req,
   req->mwm = mwm;
 }
 
-void attach_to_tangle_req_add_trytes(attach_to_tangle_req_t* req,
-                                     const char* trytes) {
-  utarray_push_back(req->trytes, &trytes);
+flex_hash_array_t* attach_to_tangle_req_add_trytes(flex_hash_array_t* hash,
+                                                   const char* trytes) {
+  return flex_hash_array_append(hash, trytes);
 }

@@ -7,5 +7,10 @@ cc_library(
 
 cc_library(
     name = "errors",
+    srcs = [
+        "error_strings.h",
+        "errors.c",
+        "errors.h",
+    ],
     hdrs = ["errors.h"],
 )

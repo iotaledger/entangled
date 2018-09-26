@@ -4,7 +4,8 @@ cc_library(
     hdrs = ["entry_point_selector.h"],
     visibility = ["//visibility:public"],
     deps = [
-        "//consensus/milestone",
+        "//common:errors",
+        "//consensus/milestone_tracker",
         "//utils:macros",
     ],
 )

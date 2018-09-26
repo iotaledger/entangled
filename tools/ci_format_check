@@ -1,0 +1,16 @@
+#!/bin/bash
+
+root=$(git rev-parse --show-toplevel)
+status=0
+for file in $(find ${1} -type f | grep -E "\.(c|cc|cpp|h|hh|hpp)\$")
+do
+  filepath="$root/$file"
+  output=$(diff <(cat $filepath) <(clang-format -style=file -fallback-style=none $filepath))
+  if [ $? -ne 0 ]
+  then
+    echo -e "\nFile \e[31m\""$file"\"\e[39m is not compliant with the coding style"
+    echo "$output"
+    status=1
+  fi
+done
+exit $status

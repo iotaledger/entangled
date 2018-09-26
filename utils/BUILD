@@ -36,3 +36,9 @@ cc_library(
     srcs = ["system.c"],
     hdrs = ["system.h"],
 )
+
+cc_library(
+    name = "time",
+    srcs = ["time.c"],
+    hdrs = ["time.h"],
+)

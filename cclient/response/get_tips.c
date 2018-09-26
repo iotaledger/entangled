@@ -7,25 +7,14 @@
 
 #include "get_tips.h"
 
-get_tips_res_t* get_tips_res_new() {
-  get_tips_res_t* hashes = NULL;
-  utarray_new(hashes, &ut_str_icd);
-  return hashes;
-}
+get_tips_res_t* get_tips_res_new() { return flex_hash_array_new(); }
 
-char* get_tips_res_hash_at(get_tips_res_t* hashes, int index) {
-  if (utarray_len(hashes) > index) {
-    char** p = NULL;
-    p = (char**)utarray_eltptr(hashes, index);
-    if (p) {
-      return *p;
-    }
-  }
-  return '\0';
+trit_array_p get_tips_res_hash_at(get_tips_res_t* hashes, size_t index) {
+  return flex_hash_array_at(hashes, index);
 }
 
 int get_tips_res_hash_num(get_tips_res_t* hashes) {
-  return utarray_len(hashes);
+  return flex_hash_array_count(hashes);
 }
 
-void get_tips_res_free(get_tips_res_t* ut) { utarray_free(ut); }
+void get_tips_res_free(get_tips_res_t* hashes) { flex_hash_array_free(hashes); }
