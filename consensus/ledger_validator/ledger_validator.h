@@ -29,6 +29,10 @@ extern retcode_t iota_consensus_ledger_validator_init(
     ledger_validator_t *const lv, tangle_t *const tangle,
     milestone_tracker_t *const mt, requester_state_t *const tr);
 
+extern retcode_t iota_consensus_ledger_validator_update_snapshot(
+    ledger_validator_t *const lv, iota_milestone_t *const milestone,
+    bool *const has_snapshot);
+
 extern retcode_t iota_consensus_ledger_validator_destroy(
     ledger_validator_t *const lv);
 

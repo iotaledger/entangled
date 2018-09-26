@@ -13,6 +13,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":ledger_validator_shared",
+        "//consensus/bundle_validator",
         "//consensus/milestone_tracker:milestone_tracker_shared",
         "//consensus/snapshot",
         "//consensus/tangle",
