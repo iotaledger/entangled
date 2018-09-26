@@ -96,7 +96,7 @@ retcode_t flex_hash_array_to_json_array(flex_hash_array_t* head,
     cJSON_AddItemToObject(json_root, obj_name, array_obj);
     LL_FOREACH(head, elt) {
       // flex to trytes;
-      size_t len_trytes = num_flex_trits_for_trits(elt->hash->num_trits);
+      size_t len_trytes = elt->hash->num_trits / 3;
       trit_t trytes_out[len_trytes + 1];
       size_t trits_count =
           flex_trits_to_trytes(trytes_out, len_trytes, elt->hash->trits,
@@ -116,7 +116,7 @@ retcode_t flex_hash_array_to_json_array(flex_hash_array_t* head,
 retcode_t flex_hash_to_json_string(cJSON* json_obj, const char* key,
                                    trit_array_p hash) {
   // flex to trytes;
-  size_t len_trytes = num_flex_trits_for_trits(hash->num_trits);
+  size_t len_trytes = hash->num_trits / 3;
   trit_t trytes_out[len_trytes + 1];
   size_t trits_count = flex_trits_to_trytes(trytes_out, len_trytes, hash->trits,
                                             hash->num_trits, hash->num_trits);

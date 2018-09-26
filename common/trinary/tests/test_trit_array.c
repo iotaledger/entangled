@@ -75,6 +75,13 @@ void test_trit_array_static_to_int8(void) {
   TEST_ASSERT_EQUAL_MEMORY(trits_out, trits, NUM_TRITS);
 }
 
+void test_trytes_to_trit_array(void) {
+  trit_t trits_out[] = {TRITS_IN};
+  trit_array_p out_array = trit_array_new_from_trytes((tryte_t*)TRYTES);
+  TEST_ASSERT_EQUAL_MEMORY(trits_out, out_array->trits, out_array->num_bytes);
+  trit_array_free(out_array);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -83,6 +90,7 @@ int main(void) {
   RUN_TEST(test_trit_array_static_slice);
   RUN_TEST(test_trit_array_static_insert);
   RUN_TEST(test_trit_array_static_to_int8);
+  RUN_TEST(test_trytes_to_trit_array);
 
   return UNITY_END();
 }
