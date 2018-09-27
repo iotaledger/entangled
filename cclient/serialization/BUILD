@@ -10,8 +10,7 @@ cc_library(
     include_prefix = "serializer",
     visibility = ["//visibility:public"],
     deps = [
-        ":serializer_base",
-        "//utils:logger_helper",
+        "//cclient/serialization:serializer_base",
         "@cJSON",
     ],
 )
@@ -19,10 +18,10 @@ cc_library(
 cc_library(
     name = "serializer_base",
     srcs = glob([
-        "*.h",
+        "serializer.h",
     ]),
     hdrs = glob([
-        "*.h",
+        "serializer.h",
     ]),
     include_prefix = "serializer",
     visibility = ["//visibility:public"],
@@ -39,8 +38,7 @@ cc_test(
         "tests/test_json.h",
     ],
     deps = [
-        ":serializer_base",
-        ":serializer_json",
+        "//cclient/serialization:serializer_json",
         "@unity",
     ],
 )

@@ -16,6 +16,8 @@
 extern "C" {
 #endif
 void logger_init_json_serializer();
+void logger_destroy_json_serializer();
+
 void init_json_serializer(serializer_t* serializer);
 
 retcode_t json_find_transactions_serialize_request(
