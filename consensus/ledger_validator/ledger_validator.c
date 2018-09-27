@@ -5,9 +5,11 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/ledger_validator/ledger_validator.h"
+#include "utlist.h"
+
 #include "common/model/milestone.h"
 #include "common/storage/pack.h"
+#include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/snapshot/snapshot.h"
@@ -17,14 +19,100 @@
 
 #define LEDGER_VALIDATOR_LOGGER_ID "consensus_ledger_validator"
 
+// TODO move ?
+typedef struct hash_queue_s {
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  struct hash_queue_s *next;
+  struct hash_queue_s *prev;
+} hash_queue_t;
+
+// TODO move ?
+typedef struct hash_set_s {
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  UT_hash_handle hh;
+} hash_set_t;
+
 /*
  * Private functions
  */
 
-static retcode_t update_snapshot_milestone(flex_trit_t *const hash,
+static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
+                                           flex_trit_t *const milestone_hash,
                                            uint64_t index) {
   retcode_t ret = RC_OK;
+  hash_queue_t *non_analyzed_hashes = NULL, *hash_queue_elem = NULL,
+               *tmp = NULL;
+  hash_set_t *analyzed_hashes = NULL, *hash_set_elem = NULL;
 
+  struct _iota_transaction tx;
+  iota_transaction_t tx_ptr = &tx;
+  iota_stor_pack_t pack = {(void **)&tx_ptr, 1, 0, false};
+  struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
+
+  // Add milestone hash to the queue as entry point for the traversal
+  if ((hash_queue_elem = malloc(sizeof(hash_queue_t))) == NULL) {
+    ret = RC_LEDGER_VALIDATOR_OOM;
+    goto done;
+  }
+  memcpy(hash_queue_elem->hash, milestone_hash, FLEX_TRIT_SIZE_243);
+  CDL_APPEND(non_analyzed_hashes, hash_queue_elem);
+
+  while (non_analyzed_hashes != NULL) {
+    tx_hash.trits = non_analyzed_hashes->hash;
+    HASH_FIND(hh, analyzed_hashes, tx_hash.trits, FLEX_TRIT_SIZE_243,
+              hash_set_elem);
+    if (hash_set_elem == NULL) {
+      hash_pack_reset(&pack);
+      if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_COL_HASH,
+                                              &tx_hash, &pack)) != RC_OK) {
+        goto done;
+      }
+      if (tx.snapshot_index == 0) {
+        // TODO update snapshot index
+        // TODO messageQ publish
+        // Add trunk hash to the queue
+        if ((hash_queue_elem = malloc(sizeof(hash_queue_t))) == NULL) {
+          ret = RC_LEDGER_VALIDATOR_OOM;
+          goto done;
+        }
+        memcpy(hash_queue_elem->hash, tx.trunk, FLEX_TRIT_SIZE_243);
+        CDL_APPEND(non_analyzed_hashes, hash_queue_elem);
+        // Add branch hash to the queue
+        if ((hash_queue_elem = malloc(sizeof(hash_queue_t))) == NULL) {
+          ret = RC_LEDGER_VALIDATOR_OOM;
+          goto done;
+        }
+        memcpy(hash_queue_elem->hash, tx.branch, FLEX_TRIT_SIZE_243);
+        CDL_APPEND(non_analyzed_hashes, hash_queue_elem);
+      }
+      // Mark current hash as visited
+      if ((hash_set_elem = malloc(sizeof(hash_set_t))) == NULL) {
+        ret = RC_LEDGER_VALIDATOR_OOM;
+        goto done;
+      }
+      memcpy(hash_set_elem->hash, tx_hash.trits, FLEX_TRIT_SIZE_243);
+      HASH_ADD(hh, analyzed_hashes, hash, FLEX_TRIT_SIZE_243, hash_set_elem);
+    }
+    // Remove current hash from the queue
+    tmp = non_analyzed_hashes;
+    CDL_DELETE(non_analyzed_hashes, non_analyzed_hashes);
+    free(tmp);
+  }
+
+done : {
+  hash_queue_t *iter_q, *tmp_q1, *tmp_q2;
+  hash_set_t *iter_s, *tmp_s;
+
+  CDL_FOREACH_SAFE(non_analyzed_hashes, iter_q, tmp_q1, tmp_q2) {
+    CDL_DELETE(non_analyzed_hashes, iter_q);
+    free(iter_q);
+  }
+
+  HASH_ITER(hh, analyzed_hashes, iter_s, tmp_s) {
+    HASH_DEL(analyzed_hashes, iter_s);
+    free(iter_s);
+  }
+}
   return ret;
 }
 
@@ -125,7 +213,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
     }
     *has_snapshot = iota_snapshot_is_state_consistent(&patch);
     if (*has_snapshot) {
-      if ((ret = update_snapshot_milestone(milestone->hash,
+      if ((ret = update_snapshot_milestone(lv, milestone->hash,
                                            milestone->index)) != RC_OK) {
         log_error(LEDGER_VALIDATOR_LOGGER_ID,
                   "Updating snapshot milestone failed\n");

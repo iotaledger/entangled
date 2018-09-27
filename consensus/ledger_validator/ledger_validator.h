@@ -13,6 +13,7 @@
 // Forward declarations
 typedef struct tangle_s tangle_t;
 typedef struct milestone_tracker_s milestone_tracker_t;
+typedef struct iota_milestone_s iota_milestone_t;
 typedef struct requester_state_s requester_state_t;
 
 #ifdef __cplusplus
