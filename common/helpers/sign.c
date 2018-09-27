@@ -15,6 +15,7 @@
 #include "common/sign/v1/iss_kerl.h"
 #include "common/trinary/trit_tryte.h"
 #include "utils/export.h"
+#include "utils/memset_secure.h"
 
 IOTA_EXPORT char* iota_sign_address_gen(char const* const seed,
                                         size_t const index,
@@ -44,8 +45,8 @@ IOTA_EXPORT char* iota_sign_address_gen(char const* const seed,
   iss_kerl_subseed(subseed, subseed, index, &kerl);
 
   iss_kerl_key(subseed, key, key_length, &kerl);
-  memset_s(subseed, HASH_LENGTH * sizeof(trit_t), 0,
-           HASH_LENGTH * sizeof(trit_t));
+  memset_secure(subseed, HASH_LENGTH * sizeof(trit_t), 0,
+                HASH_LENGTH * sizeof(trit_t));
 
   iss_kerl_key_digest(key, key, key_length, &kerl);
   iss_kerl_address(key, key, security * HASH_LENGTH, &kerl);
@@ -55,7 +56,8 @@ IOTA_EXPORT char* iota_sign_address_gen(char const* const seed,
   trits_to_trytes(key, (tryte_t*)address, HASH_LENGTH);
 
 cleanup:
-  memset_s(key, key_length * sizeof(trit_t), 0, key_length * sizeof(trit_t));
+  memset_secure(key, key_length * sizeof(trit_t), 0,
+                key_length * sizeof(trit_t));
   free(key);
 
   return address;
@@ -88,14 +90,15 @@ IOTA_EXPORT char* iota_sign_signature_gen(char const* const seed,
   trytes_to_trits((tryte_t*)bundle_hash, hash, HASH_LENGTH / RADIX);
   iss_kerl_subseed(subseed, subseed, index, &kerl);
   iss_kerl_key(subseed, key, key_length, &kerl);
-  memset_s(subseed, HASH_LENGTH * sizeof(trit_t), 0,
-           HASH_LENGTH * sizeof(trit_t));
+  memset_secure(subseed, HASH_LENGTH * sizeof(trit_t), 0,
+                HASH_LENGTH * sizeof(trit_t));
 
   iss_kerl_signature(key, hash, key, key_length, &kerl);
   trits_to_trytes(key, (tryte_t*)signature, key_length);
 
 cleanup:
-  memset_s(key, key_length * sizeof(trit_t), 0, key_length * sizeof(trit_t));
+  memset_secure(key, key_length * sizeof(trit_t), 0,
+                key_length * sizeof(trit_t));
   free(key);
 
   return (char*)signature;
@@ -130,8 +133,8 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_address_gen(
   iss_kerl_subseed(subseed, subseed, index, &kerl);
 
   iss_kerl_key(subseed, key, key_length, &kerl);
-  memset_s(subseed, HASH_LENGTH * sizeof(trit_t), 0,
-           HASH_LENGTH * sizeof(trit_t));
+  memset_secure(subseed, HASH_LENGTH * sizeof(trit_t), 0,
+                HASH_LENGTH * sizeof(trit_t));
 
   iss_kerl_key_digest(key, key, key_length, &kerl);
   iss_kerl_address(key, key, security * HASH_LENGTH, &kerl);
@@ -141,7 +144,8 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_address_gen(
   flex_trits_from_trits(address, HASH_LENGTH, key, key_length, HASH_LENGTH);
 
 cleanup:
-  memset_s(key, key_length * sizeof(trit_t), 0, key_length * sizeof(trit_t));
+  memset_secure(key, key_length * sizeof(trit_t), 0,
+                key_length * sizeof(trit_t));
   free(key);
 
   return address;
@@ -175,14 +179,15 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_signature_gen(
 
   iss_kerl_subseed(subseed, subseed, index, &kerl);
   iss_kerl_key(subseed, key, key_length, &kerl);
-  memset_s(subseed, HASH_LENGTH * sizeof(trit_t), 0,
-           HASH_LENGTH * sizeof(trit_t));
+  memset_secure(subseed, HASH_LENGTH * sizeof(trit_t), 0,
+                HASH_LENGTH * sizeof(trit_t));
 
   iss_kerl_signature(key, hash, key, key_length, &kerl);
   flex_trits_from_trits(signature, key_length, key, key_length, key_length);
 
 cleanup:
-  memset_s(key, key_length * sizeof(trit_t), 0, key_length * sizeof(trit_t));
+  memset_secure(key, key_length * sizeof(trit_t), 0,
+                key_length * sizeof(trit_t));
   free(key);
 
   return signature;

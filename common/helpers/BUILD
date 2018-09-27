@@ -28,6 +28,7 @@ cc_library(
         "//common/trinary:trit_array",
         "//common/trinary:trit_tryte",
         "//utils:export",
+        "//utils:memset_secure",
     ],
 )
 
