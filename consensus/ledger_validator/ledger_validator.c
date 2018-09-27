@@ -174,6 +174,7 @@ retcode_t iota_consensus_ledger_validator_destroy(
   logger_helper_destroy(LEDGER_VALIDATOR_LOGGER_ID);
   lv->tangle = NULL;
   lv->milestone_tracker = NULL;
+  lv->transaction_requester = NULL;
   return RC_OK;
 }
 
