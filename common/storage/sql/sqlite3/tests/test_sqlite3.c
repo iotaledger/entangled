@@ -271,6 +271,27 @@ void test_stored_load_hashes_of_approvers(void) {
   }
 }
 
+void test_update_snapshot_index(void) {
+  struct _iota_transaction tx;
+  iota_transaction_t tx_ptr = &tx;
+  iota_stor_pack_t pack = {(void **)&tx_ptr, 1, 0, false};
+  struct _trit_array hash = {(flex_trit_t *)TEST_TRANSACTION.hash,
+                             NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
+
+  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_COL_HASH, &hash,
+                                         &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
+  TEST_ASSERT_EQUAL_INT(tx.snapshot_index, TEST_TRANSACTION.snapshot_index);
+  TEST_ASSERT(iota_stor_transaction_update_snapshot_index(
+                  &conn, (flex_trit_t *)TEST_TRANSACTION.hash, 123456) ==
+              RC_OK);
+  hash_pack_reset(&pack);
+  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_COL_HASH, &hash,
+                                         &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
+  TEST_ASSERT_EQUAL_INT(tx.snapshot_index, 123456);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -284,6 +305,7 @@ int main(void) {
   RUN_TEST(test_stored_milestone);
   RUN_TEST(test_stored_load_hashes_by_address);
   RUN_TEST(test_stored_load_hashes_of_approvers);
+  RUN_TEST(test_update_snapshot_index);
 
   return UNITY_END();
 }

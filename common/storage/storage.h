@@ -46,6 +46,10 @@ extern retcode_t iota_stor_transaction_exist(const connection_t* const conn,
                                              const trit_array_p key,
                                              bool* exist);
 
+extern retcode_t iota_stor_transaction_update_snapshot_index(
+    const connection_t* const conn, flex_trit_t* const hash,
+    uint64_t snapshot_index);
+
 extern retcode_t iota_stor_transaction_update(const connection_t* const conn,
                                               const char* index_name,
                                               const trit_array_p key,

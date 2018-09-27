@@ -144,11 +144,18 @@ retcode_t iota_statement_transaction_exist(const char *index_col,
                                       statement, statement_cap);
 }
 
-retcode_t iota_statement_transaction_update(const char *index_col,
-                                            const trit_array_p key,
-                                            const iota_transaction_t tx,
-                                            char statement[],
-                                            size_t statement_cap) {
+retcode_t iota_statement_transaction_update_snapshot_index(
+    uint64_t snapshot_index, char statement[], size_t statement_cap) {
+  int res = snprintf(statement, statement_cap,
+                     "UPDATE %s SET %s=%" PRIu64 " WHERE %s=?",
+                     TRANSACTION_TABLE_NAME, TRANSACTION_COL_SNAPSHOT_INDEX,
+                     snapshot_index, TRANSACTION_COL_HASH);
+
+  if (res < 0 || res == statement_cap) {
+    log_error(SQL_STATEMENTS_ID,
+              "Failed in creating statement, statement: %s\n", statement);
+    return RC_SQL_FAILED_WRITE_STATEMENT;
+  }
   return RC_OK;
 }
 

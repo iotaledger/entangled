@@ -68,6 +68,10 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
         goto done;
       }
       if (tx.snapshot_index == 0) {
+        if ((ret = iota_tangle_transaction_update_snapshot_index(
+                 lv->tangle, tx.hash, index)) != RC_OK) {
+          goto done;
+        }
         // TODO update snapshot index
         // TODO messageQ publish
         // Add trunk hash to the queue

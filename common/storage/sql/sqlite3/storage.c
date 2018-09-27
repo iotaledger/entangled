@@ -318,6 +318,53 @@ retcode_t iota_stor_transaction_exist(const connection_t* const conn,
   return RC_OK;
 }
 
+retcode_t iota_stor_transaction_update_snapshot_index(
+    const connection_t* const conn, flex_trit_t* const hash,
+    uint64_t snapshot_index) {
+  retcode_t ret = RC_OK;
+  char const* err_msg = 0;
+  sqlite3_stmt* sqlite_statement = 0;
+  char statement[TRANSACTION_MAX_EXIST_STATEMENT_SIZE];
+
+  if ((ret = iota_statement_transaction_update_snapshot_index(
+           snapshot_index, statement, TRANSACTION_MAX_UPDATE_STATEMENT_SIZE))) {
+    return ret;
+  }
+
+  int rc = sqlite3_prepare_v2((sqlite3*)conn->db, statement, -1,
+                              &sqlite_statement, &err_msg);
+  if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed preparing statement, sqlite3 code is: %\" PRIu64 \"\n",
+              rc);
+    return RC_SQLITE3_FAILED_PREPARED_STATEMENT;
+  }
+  rc = column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243);
+  if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed in binding, sqlite3 code is: %\" PRIu64 \"\n", rc);
+    return RC_SQLITE3_FAILED_BINDING;
+  }
+  rc = sqlite3_step(sqlite_statement);
+  if (rc != SQLITE_OK && rc != SQLITE_DONE) {
+    rc = sqlite3_finalize(
+        sqlite_statement);  //  Finalize the prepared statement.
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed in step, sqlite3 code is: %\" PRIu64 \"\n", rc);
+    return RC_SQLITE3_FAILED_STEP;
+  }
+
+  rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
+  if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed finalizing statement, sqlite3 code is: %\" PRIu64 \"\n",
+              rc);
+    return RC_SQLITE3_FAILED_FINALIZE;
+  }
+
+  return ret;
+}
+
 extern retcode_t iota_stor_transaction_load_hashes(
     const connection_t* const conn, const char* col_name,
     const trit_array_p key, iota_stor_pack_t* pack) {
