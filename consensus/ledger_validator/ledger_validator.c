@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <inttypes.h>
+
 #include "utlist.h"
 
 #include "common/model/milestone.h"
@@ -121,20 +123,41 @@ done : {
 }
 
 static retcode_t build_snapshot(ledger_validator_t *const lv,
-                                iota_milestone_t *const consistent_milestone) {
+                                uint64_t *const consistent_index,
+                                flex_trit_t *const consistent_hash) {
   retcode_t ret = RC_OK;
   iota_milestone_t milestone;
   iota_milestone_t *milestone_ptr = &milestone;
   iota_stor_pack_t pack = {(void **)&milestone_ptr, 1, 0, false};
-
-  rw_lock_handle_wrlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
 
   if ((ret = iota_tangle_milestone_load_first(lv->tangle, &pack)) != RC_OK) {
     goto done;
   }
 
   while (pack.num_loaded != 0) {
-    pack.num_loaded = 0;
+    if (milestone.index % 10000 == 0) {
+      log_info(LEDGER_VALIDATOR_LOGGER_ID,
+               "Building snapshot... Consistent: #%" PRIu64
+               ", Candidate: #%" PRIu64 "\n",
+               *consistent_index, milestone.index);
+    }
+    // TODO state diff model
+    //       StateDiffViewModel stateDiffViewModel =
+    //           StateDiffViewModel.load(tangle, candidateMilestone.getHash());
+    //
+    //       if (stateDiffViewModel != null && !stateDiffViewModel.isEmpty()) {
+    //         if
+    //         (Snapshot.isConsistent(milestoneTracker.latestSnapshot.patchedDiff(
+    //                 stateDiffViewModel.getDiff()))) {
+    //           milestoneTracker.latestSnapshot.apply(stateDiffViewModel.getDiff(),
+    //                                                 candidateMilestone.index());
+    *consistent_index = milestone.index;
+    memcpy(consistent_hash, milestone.hash, FLEX_TRIT_SIZE_243);
+    //         } else {
+    //           break;
+    //         }
+    //       }
+    hash_pack_reset(&pack);
     if ((ret = iota_tangle_milestone_load_next(lv->tangle, milestone.index,
                                                &pack)) != RC_OK) {
       goto done;
@@ -142,8 +165,8 @@ static retcode_t build_snapshot(ledger_validator_t *const lv,
   }
 
 done:
-  rw_lock_handle_unlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
-  return RC_OK;
+  return ret;
+}
 }
 
 /*
@@ -155,7 +178,6 @@ retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv,
                                                milestone_tracker_t *const mt,
                                                requester_state_t *const tr) {
   retcode_t ret = RC_OK;
-  iota_milestone_t consistent_milestone;
 
   logger_helper_init(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   lv->tangle = tangle;
@@ -163,11 +185,18 @@ retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv,
   mt->ledger_validator = lv;
   lv->transaction_requester = tr;
 
-  if ((ret = build_snapshot(lv, &consistent_milestone)) != RC_OK) {
+  if ((ret = build_snapshot(lv, &mt->latest_solid_subtangle_milestone_index,
+                            mt->latest_solid_subtangle_milestone->trits)) !=
+      RC_OK) {
     log_critical(LEDGER_VALIDATOR_LOGGER_ID, "Building snapshot failed\n");
     return ret;
   }
 
+  log_info(LEDGER_VALIDATOR_LOGGER_ID,
+           "Loaded consistent milestone: #%" PRIu64 "\n",
+           mt->latest_solid_subtangle_milestone_index);
+  return ret;
+}
 
 retcode_t iota_consensus_ledger_validator_destroy(
     ledger_validator_t *const lv) {
