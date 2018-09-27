@@ -42,3 +42,9 @@ cc_library(
     srcs = ["time.c"],
     hdrs = ["time.h"],
 )
+
+cc_library(
+    name = "memset_secure",
+    srcs = ["memset_secure.c"],
+    hdrs = ["memset_secure.h"],
+)
