@@ -18,7 +18,7 @@
 #define BUNDLE_VALIDATOR_ID "bundle_validator_id"
 
 retcode_t bundle_validate_init() {
-  logger_helper_init(BUNDLE_VALIDATOR_ID, LOGGER_INFO, true);
+  logger_helper_init(BUNDLE_VALIDATOR_ID, LOGGER_DEBUG, true);
   return RC_OK;
 }
 retcode_t bundle_validate_destroy() {

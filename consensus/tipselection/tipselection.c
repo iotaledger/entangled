@@ -23,7 +23,7 @@ retcode_t iota_consensus_tipselection_init(
     cw_rating_calculator_t *const cw_calc, milestone_tracker_t *const mt,
     entry_point_selector_t *const ep, ep_randomizer_t *const ep_randomizer,
     double alpha) {
-  logger_helper_init(TIPSELECTION_LOGGER_ID, LOGGER_INFO, true);
+  logger_helper_init(TIPSELECTION_LOGGER_ID, LOGGER_DEBUG, true);
   impl->cw_calc = cw_calc;
   impl->mt = mt;
   impl->tangle = tangle;

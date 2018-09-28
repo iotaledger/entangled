@@ -14,7 +14,7 @@
 retcode_t iota_consensus_ep_randomizer_init(
     tangle_t *const tangle, ep_randomizer_t *ep_randomizer, double alpha,
     enum ep_randomizer_implementation impl) {
-  logger_helper_init(EXIT_PROBABILITY_RANDOMIZER_ID, LOGGER_INFO, true);
+  logger_helper_init(EXIT_PROBABILITY_RANDOMIZER_ID, LOGGER_DEBUG, true);
   int seed = time(NULL);
   srand(seed);
   ep_randomizer->tangle = tangle;
