@@ -12,8 +12,10 @@
 #include <stdint.h>
 
 #include "common/errors.h"
+#include "utils/logger_helper.h"
 
 typedef struct ciri_conf_s {
+  logger_level_t log_level;
   uint16_t api_port;
   char *neighbors;
   char *conf_file;

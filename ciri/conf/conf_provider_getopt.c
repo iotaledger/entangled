@@ -7,6 +7,7 @@
 
 #include <getopt.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "ciri/conf/conf.h"
 #include "ciri/conf/usage.h"
@@ -37,10 +38,29 @@ static struct option* build_options() {
   return options;
 }
 
-retcode_t ciri_conf_parse(ciri_conf_t* conf, int argc, char** argv) {
-  int arg;
+static logger_level_t get_log_level(char const* const log_level) {
+  static struct log_level_map {
+    char* str;
+    logger_level_t level;
+  } map[] = {{"debug", LOGGER_DEBUG},   {"info", LOGGER_INFO},
+             {"notice", LOGGER_NOTICE}, {"warning", LOGGER_WARNING},
+             {"error", LOGGER_ERR},     {"critical", LOGGER_CRIT},
+             {"alert", LOGGER_ALERT},   {"emergency", LOGGER_EMERG},
+             {NULL, LOGGER_INFO}};
+  size_t i;
+  for (i = 0; map[i].str != NULL && strcmp(map[i].str, log_level) != 0; i++)
+    ;
+  return map[i].level;
+}
 
+retcode_t ciri_conf_parse(ciri_conf_t* conf, int argc, char** argv) {
+  retcode_t ret = RC_OK;
+  int arg;
   struct option* long_options = build_options();
+
+  if ((ret = ciri_conf_init(conf))) {
+    return ret;
+  }
   while ((arg = getopt_long(argc, argv, short_options, long_options, NULL)) !=
          -1) {
     switch (arg) {
@@ -48,6 +68,9 @@ retcode_t ciri_conf_parse(ciri_conf_t* conf, int argc, char** argv) {
         iota_usage();
         free(long_options);
         exit(EXIT_SUCCESS);
+        break;
+      case 'l':  // --log-level
+        conf->log_level = get_log_level(optarg);
         break;
       case 'p':  // --port
         conf->api_port = atoi(optarg);
@@ -73,7 +96,7 @@ retcode_t ciri_conf_parse(ciri_conf_t* conf, int argc, char** argv) {
       case 'a':  // --remote-auth
         conf->remote_auth_token = optarg;
         break;
-      case 'l':  // --remote-limit-api
+      case 'i':  // --remote-limit-api
         conf->remote_limit_api = optarg;
         break;
       case 's':  // --send-limit
