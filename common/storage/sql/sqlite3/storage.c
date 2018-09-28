@@ -152,7 +152,6 @@ static retcode_t execute_statement_load_gen(sqlite3_stmt* sqlite_statement,
 static retcode_t execute_statement_load_milestones(
     sqlite3_stmt* sqlite_statement, iota_stor_pack_t* pack,
     uint32_t max_records) {
-  pack->insufficient_capacity = false;
   return execute_statement_load_gen(sqlite_statement, pack, max_records,
                                     MODEL_MILESTONE);
 }
