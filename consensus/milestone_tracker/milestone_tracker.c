@@ -209,6 +209,7 @@ static retcode_t update_latest_solid_subtangle_milestone(
                            .capacity = 1,
                            .num_loaded = 0,
                            .insufficient_capacity = false};
+  bool has_snapshot = false;
 
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
@@ -226,14 +227,23 @@ static retcode_t update_latest_solid_subtangle_milestone(
     }
     while (pack.num_loaded != 0 && milestone.index <= latest_milestone.index &&
            mt->running) {
-      if (true  // TODO
-                // transactionValidator.checkSolidity(milestoneViewModel.getHash(),
-                // true)
-          && milestone.index >= mt->latest_solid_subtangle_milestone_index &&
-          true /* TODO ledgerValidator.updateSnapshot(milestoneViewModel) */) {
-        mt->latest_solid_subtangle_milestone_index = milestone.index;
-        memcpy(mt->latest_solid_subtangle_milestone->trits, milestone.hash,
-               FLEX_TRIT_SIZE_243);
+      has_snapshot = false;
+      if (milestone.index >= mt->latest_solid_subtangle_milestone_index
+          // TODO &&
+          // transactionValidator.checkSolidity(milestoneViewModel.getHash(),
+          // true))
+      ) {
+        if ((ret = iota_consensus_ledger_validator_update_snapshot(
+                 mt->ledger_validator, &milestone, &has_snapshot)) != RC_OK) {
+          log_error(MILESTONE_TRACKER_LOGGER_ID, "Updating snapshot failed\n");
+          return ret;
+        } else if (has_snapshot) {
+          mt->latest_solid_subtangle_milestone_index = milestone.index;
+          memcpy(mt->latest_solid_subtangle_milestone->trits, milestone.hash,
+                 FLEX_TRIT_SIZE_243);
+        } else {
+          break;
+        }
       } else {
         break;
       }
