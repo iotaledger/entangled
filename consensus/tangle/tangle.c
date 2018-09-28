@@ -11,7 +11,7 @@
 #define TANGLE_LOGGER_ID "consensus_tangle"
 
 retcode_t iota_tangle_init(tangle_t *tangle, const connection_config_t *conf) {
-  logger_helper_init(TANGLE_LOGGER_ID, LOGGER_INFO, true);
+  logger_helper_init(TANGLE_LOGGER_ID, LOGGER_DEBUG, true);
   return iota_stor_init(&tangle->conn, conf);
 }
 retcode_t iota_tangle_destroy(tangle_t *tangle) {

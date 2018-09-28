@@ -13,7 +13,7 @@
 retcode_t iota_consensus_exit_prob_transaction_validator_init(
     tangle_t *const tangle, milestone_tracker_t *const mt,
     ledger_validator_t *const lv, exit_prob_transaction_validator_t *epv) {
-  logger_helper_init(WALKER_VALIDATOR_LOGGER_ID, LOGGER_INFO, true);
+  logger_helper_init(WALKER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   epv->tangle = tangle;
   epv->mt = mt;
   epv->lv = lv;

@@ -41,7 +41,7 @@ static retcode_t prepare_statement(sqlite3* db, sqlite3_stmt** sqlite_statement,
 
 retcode_t iota_stor_init(const connection_t* const conn,
                          const connection_config_t* const config) {
-  logger_helper_init(SQLITE3_LOGGER_ID, LOGGER_INFO, true);
+  logger_helper_init(SQLITE3_LOGGER_ID, LOGGER_DEBUG, true);
   return init_connection(conn, config);
 }
 

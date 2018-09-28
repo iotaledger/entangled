@@ -22,5 +22,6 @@ cc_library(
         ":conf_values",
         ":usage",
         "//common:errors",
+        "//utils:logger_helper",
     ],
 )
