@@ -15,7 +15,7 @@
 #include "common/storage/connection.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/ledger_validator/ledger_validator.h"
-#include "consensus/milestone/milestone.h"
+#include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
 
 #ifdef __cplusplus
@@ -28,14 +28,14 @@ extern "C" {
 
 typedef struct exit_prob_transaction_validator_s {
   tangle_t *tangle;
-  milestone_t *milestone;
+  milestone_tracker_t *mt;
   ledger_validator_t *lv;
   // private final TransactionValidator transactionValidator;
 } exit_prob_transaction_validator_t;
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_init(
-    const tangle_t *tangle, const milestone_t *milestone,
-    const ledger_validator_t *lv, exit_prob_transaction_validator_t *epv);
+    tangle_t *const tangle, milestone_tracker_t *const mt,
+    ledger_validator_t *const lv, exit_prob_transaction_validator_t *epv);
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
     exit_prob_transaction_validator_t *epv);

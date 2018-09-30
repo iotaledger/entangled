@@ -44,7 +44,7 @@ typedef struct {
   /**
    * Latest milestone that was signed off by the coordinator.
    */
-  char_buffer_t* latest_milestone;
+  trit_array_p latest_milestone;
   /**
    * Index of the latest milestone.
    */
@@ -55,7 +55,7 @@ typedef struct {
    * subtangle of coordinator-approved transactions, and have a consistent view
    * of all referenced transactions.
    */
-  char_buffer_t* latest_solid_subtangle_milestone;
+  trit_array_p latest_solid_subtangle_milestone;
   /**
    * Index of the latest solid subtangle.
    */
@@ -83,7 +83,7 @@ typedef struct {
 } get_node_info_res_t;
 
 get_node_info_res_t* get_node_info_res_new();
-void get_node_info_res_free(get_node_info_res_t* res);
+void get_node_info_res_free(get_node_info_res_t** res);
 
 #ifdef __cplusplus
 }

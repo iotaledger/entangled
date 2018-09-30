@@ -1,6 +1,21 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "bundle",
+    srcs = ["bundle.c"],
+    hdrs = ["bundle.h"],
+    deps = [
+        ":transaction",
+        "//common/model:transfer",
+        "//common/sign/v1:iss_kerl",
+        "//common/trinary:flex_trit",
+        "//common/trinary:trit_tryte",
+        "//common/trinary:tryte_long",
+        "@com_github_uthash//:uthash",
+    ],
+)
+
+cc_library(
     name = "milestone",
     hdrs = ["milestone.h"],
 )

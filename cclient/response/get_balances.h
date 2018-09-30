@@ -17,13 +17,13 @@ extern "C" {
 typedef struct {
   int_array_array* balances;
   int milestoneIndex;
-  UT_array* milestone;
+  flex_hash_array_t* milestone;
 } get_balances_res_t;
 
 get_balances_res_t* get_balances_res_new();
 void get_balances_res_free(get_balances_res_t* res);
 char* get_balances_res_balances_at(get_balances_res_t* in, int index);
-char* get_balances_res_milestone_at(get_balances_res_t* in, int index);
+trit_array_p get_balances_res_milestone_at(get_balances_res_t* in, int index);
 
 #ifdef __cplusplus
 }

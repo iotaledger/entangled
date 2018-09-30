@@ -26,7 +26,7 @@ typedef struct {
 
   retcode_t (*find_transactions_deserialize_response)(
       const serializer_t* const s, const char* const obj,
-      find_transactions_res_t* out);
+      find_transactions_res_t** out);
 
   // get_balances_response
   retcode_t (*get_balances_serialize_request)(
@@ -35,7 +35,7 @@ typedef struct {
 
   retcode_t (*get_balances_deserialize_response)(const serializer_t* const,
                                                  const char* const obj,
-                                                 get_balances_res_t* out);
+                                                 get_balances_res_t** out);
 
   // get_inclusion_state_response
   retcode_t (*get_inclusion_state_serialize_request)(
@@ -60,14 +60,14 @@ typedef struct {
 
   retcode_t (*get_node_info_deserialize_response)(const serializer_t* const,
                                                   const char* const obj,
-                                                  get_node_info_res_t* out);
+                                                  get_node_info_res_t** out);
 
   // get_tips_request
   retcode_t (*get_tips_serialize_request)(const serializer_t* const,
                                           char_buffer_t* out);
   retcode_t (*get_tips_deserialize_response)(const serializer_t* const,
                                              const char* const obj,
-                                             get_tips_res_t* out);
+                                             get_tips_res_t** out);
 
   // get_transactions_to_approve_response
   retcode_t (*get_transactions_to_approve_serialize_request)(
@@ -76,7 +76,7 @@ typedef struct {
 
   retcode_t (*get_transactions_to_approve_deserialize_response)(
       const serializer_t* const, const char* const obj,
-      get_transactions_to_approve_res_t* out);
+      get_transactions_to_approve_res_t** out);
 
   // addNeighbors
   retcode_t (*add_neighbors_serialize_request)(const serializer_t* const s,
@@ -97,14 +97,14 @@ typedef struct {
                                             char_buffer_t* out);
   retcode_t (*get_trytes_deserialize_response)(const serializer_t* const s,
                                                const char* const obj,
-                                               get_trytes_res_t* out);
+                                               get_trytes_res_t** out);
 
   retcode_t (*attach_to_tangle_serialize_request)(const serializer_t* const s,
                                                   attach_to_tangle_req_t* obj,
                                                   char_buffer_t* out);
   retcode_t (*attach_to_tangle_deserialize_response)(
       const serializer_t* const s, const char* const obj,
-      attach_to_tangle_res_t* out);
+      attach_to_tangle_res_t** out);
 
   // broadcastTransactions
   retcode_t (*broadcast_transactions_serialize_request)(
@@ -115,12 +115,12 @@ typedef struct {
       const serializer_t* const s, store_transactions_req_t* obj,
       char_buffer_t* out);
 
-  retcode_t (*were_addresses_spent_from_serialize_request)(
-      const serializer_t* const s, were_addresses_spent_from_req_t* obj,
-      char_buffer_t* out);
-  retcode_t (*were_addresses_spent_from_deserialize_response)(
+  retcode_t (*check_consistency_serialize_request)(const serializer_t* const s,
+                                                   check_consistency_req_t* obj,
+                                                   char_buffer_t* out);
+  retcode_t (*check_consistency_deserialize_response)(
       const serializer_t* const s, const char* const obj,
-      were_addresses_spent_from_res_t* out);
+      check_consistency_res_t* out);
 } serializer_vtable;
 
 typedef struct serializer_base {

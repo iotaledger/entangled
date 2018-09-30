@@ -100,6 +100,7 @@ trit_t *trit_array_to_int8(trit_array_p const trit_array, trit_t *const trits,
 /// @param[in] num_trits - the number of trits to store
 /// @return trit_array_p - the new trit_array
 trit_array_p trit_array_new(size_t const num_trits);
+trit_array_p trit_array_new_from_trytes(tryte_t const *const trytes);
 
 /***********************************************************************************************************
  * Destructor

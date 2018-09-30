@@ -26,13 +26,15 @@ static void *broadcaster_routine(broadcaster_state_t *const state) {
   while (state->running) {
     if (CQ_POP(state->queue, &packet) == CQ_SUCCESS) {
       log_debug(BROADCASTER_COMPONENT_LOGGER_ID, "Broadcasting transaction\n");
-      iter = state->node->neighbors->front;
-      while (iter) {
-        if (neighbor_send(state->node, &iter->data, &packet)) {
-          log_warning(BROADCASTER_COMPONENT_LOGGER_ID,
-                      "Broadcasting transaction failed\n");
+      if (state->node->neighbors) {
+        iter = state->node->neighbors->front;
+        while (iter) {
+          if (neighbor_send(state->node, &iter->data, &packet)) {
+            log_warning(BROADCASTER_COMPONENT_LOGGER_ID,
+                        "Broadcasting transaction failed\n");
+          }
+          iter = iter->next;
         }
-        iter = iter->next;
       }
     }
   }

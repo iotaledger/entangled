@@ -8,17 +8,15 @@
 #include "broadcast_transactions.h"
 
 broadcast_transactions_req_t* broadcast_transactions_req_new() {
-  broadcast_transactions_req_t* transactions = NULL;
-  utarray_new(transactions, &ut_str_icd);
-  return transactions;
+  return (broadcast_transactions_req_t*)flex_hash_array_new();
 }
 
-void broadcast_transactions_req_add(broadcast_transactions_req_t* transactions,
-                                    const char* trytes) {
-  utarray_push_back(transactions, &trytes);
+broadcast_transactions_req_t* broadcast_transactions_req_add(
+    broadcast_transactions_req_t* transactions, const char* trytes) {
+  return flex_hash_array_append(transactions, trytes);
 }
 
 void broadcast_transactions_req_free(
     broadcast_transactions_req_t* transactions) {
-  utarray_free(transactions);
+  flex_hash_array_free(transactions);
 }

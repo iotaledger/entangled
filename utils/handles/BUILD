@@ -11,17 +11,29 @@ config_setting(
 cc_library(
     name = "cond",
     hdrs = ["cond.h"],
+    linkopts = select({
+        ":linux": ["-pthread"],
+        "//conditions:default": [],
+    }),
     deps = [":lock"],
 )
 
 cc_library(
     name = "lock",
     hdrs = ["lock.h"],
+    linkopts = select({
+        ":linux": ["-pthread"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_library(
     name = "rw_lock",
     hdrs = ["rw_lock.h"],
+    linkopts = select({
+        ":linux": ["-pthread"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_library(

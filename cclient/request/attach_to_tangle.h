@@ -21,11 +21,11 @@ typedef struct {
   /**
    * Trunk transaction to approve
    */
-  char_buffer_t* trunk;
+  trit_array_p trunk;
   /**
    * branch transaction to approve
    */
-  char_buffer_t* branch;
+  trit_array_p branch;
   /**
    * Min Weight Magnitude,Proof of Work intensity. Minimum value is 18
    */
@@ -33,7 +33,7 @@ typedef struct {
   /**
    * List of trytes (raw transaction data) to attach to the tangle.
    */
-  UT_array* trytes;
+  flex_hash_array_t* trytes;
 
 } attach_to_tangle_req_t;
 
@@ -45,8 +45,8 @@ retcode_t attach_to_tangle_req_set_branch(attach_to_tangle_req_t* req,
                                           const char* branch);
 void attach_to_tangle_req_set_mwm(attach_to_tangle_req_t* req,
                                   const int32_t mwm);
-void attach_to_tangle_req_add_trytes(attach_to_tangle_req_t* req,
-                                     const char* trytes);
+flex_hash_array_t* attach_to_tangle_req_add_trytes(flex_hash_array_t* hash,
+                                                   const char* trytes);
 
 #ifdef __cplusplus
 }

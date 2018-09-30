@@ -11,6 +11,7 @@
 #include "add_neighbors.h"
 #include "attach_to_tangle.h"
 #include "broadcast_transactions.h"
+#include "check_consistency.h"
 #include "find_transactions.h"
 #include "get_balances.h"
 #include "get_inclusion_state.h"
@@ -18,6 +19,5 @@
 #include "get_trytes.h"
 #include "remove_neighbors.h"
 #include "store_transactions.h"
-#include "were_addresses_spent_from.h"
 
 #endif  // CCLIENT_REQUEST_REQUESTS_H

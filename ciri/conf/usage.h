@@ -23,6 +23,11 @@ static struct ciri_argument_s {
   ciri_arg_requirement_t has_arg;
 } ciri_arguments_g[] = {
     {"help", 'h', "Displays this usage", NO_ARG},
+    {"log-level", 'l',
+     "Log level amongst: \"debug\", \"info\", \"notice\", \"warning\", "
+     "\"error\", \"critical\", \"alert\" "
+     "and \"emergency\"",
+     REQUIRED_ARG},
     {"port", 'p',
      "This is a mandatory option that defines the port to be used to send API "
      "commands to your node",
@@ -43,7 +48,7 @@ static struct ciri_argument_s {
      "Requires authentication password for accessing remotely. Requires a "
      "correct username:hashedpassword combination",
      REQUIRED_ARG},
-    {"remote-limit-api", 'l',
+    {"remote-limit-api", 'i',
      "Excludes certain API calls from being able to be accessed remotely",
      REQUIRED_ARG},
     {"send-limit", 's',

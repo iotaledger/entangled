@@ -13,7 +13,7 @@
 #include "common/errors.h"
 
 // Forward declarations
-typedef struct milestone_s milestone_t;
+typedef struct milestone_tracker_s milestone_tracker_t;
 typedef struct tangle_s tangle_t;
 typedef struct _trit_array *trit_array_p;
 
@@ -22,13 +22,13 @@ extern "C" {
 #endif
 
 typedef struct entry_point_selector_s {
-  milestone_t *milestone;
+  milestone_tracker_t *mt;
   tangle_t *tangle;
   bool testnet;
 } entry_point_selector_t;
 
 extern retcode_t iota_consensus_entry_point_selector_init(
-    entry_point_selector_t *const eps, milestone_t *const milestone,
+    entry_point_selector_t *const eps, milestone_tracker_t *const mt,
     tangle_t *const tangle, bool const testnet);
 
 extern retcode_t iota_consensus_get_entry_point(

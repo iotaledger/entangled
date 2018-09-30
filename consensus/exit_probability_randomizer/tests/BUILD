@@ -11,7 +11,7 @@ cc_test(
         "//common/trinary:trit_ptrit",
         "//consensus/cw_rating_calculator",
         "//consensus/exit_probability_randomizer",
-        "//consensus/test_definitions:defs",
+        "//consensus/test_utils",
         "@unity",
     ],
 )

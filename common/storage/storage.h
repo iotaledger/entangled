@@ -56,7 +56,7 @@ extern retcode_t iota_stor_transaction_load_hashes(
     const trit_array_p key, iota_stor_pack_t* pack);
 
 extern retcode_t iota_stor_transaction_load_hashes_of_approvers(
-    const connection_t* const conn, const trit_array_p approvee_hash,
+    const connection_t* const conn, const flex_trit_t* approvee_hash,
     iota_stor_pack_t* pack);
 
 /*
@@ -70,6 +70,13 @@ extern retcode_t iota_stor_milestone_load(const connection_t* const conn,
                                           const char* col_name,
                                           const trit_array_p key,
                                           iota_stor_pack_t* pack);
+
+extern retcode_t iota_stor_milestone_load_latest(const connection_t* const conn,
+                                                 iota_stor_pack_t* pack);
+
+extern retcode_t iota_stor_milestone_load_next(const connection_t* const conn,
+                                               uint64_t index,
+                                               iota_stor_pack_t* pack);
 
 extern retcode_t iota_stor_milestone_exist(const connection_t* const conn,
                                            const char* index_name,

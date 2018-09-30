@@ -14,6 +14,10 @@
 
 #include "serializer/json/json_serializer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define FIND_TRANSACTIONS_SERIALIZE_ADDRESS                                    \
   "RVORZ9SIIP9RCYMREUIXXVPQIPHVCNPQ9HZWYKFWYWZRE9JQKG9REPKIASHUUECPSQO9JT9XNM" \
   "VKWYGVAZETAIRPTM"
@@ -256,9 +260,9 @@
   "IROUICDOXKSYZTDPEDKOQENTJOWJONDEWROCEJIEWFWLUAACVSJFTMCHHXJBJRKAAPUDXXVX" \
   "FWP9X9999"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define CONSISTENCY_INFO                                                  \
+  "tails are not consistent (would lead to inconsistent ledger state or " \
+  "below max depth)"
 
 #ifdef __cplusplus
 }

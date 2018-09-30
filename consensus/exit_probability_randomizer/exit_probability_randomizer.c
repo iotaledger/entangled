@@ -12,15 +12,15 @@
 #define EXIT_PROBABILITY_RANDOMIZER_ID "consensus_exit_probability_randomizer"
 
 retcode_t iota_consensus_ep_randomizer_init(
-    const tangle_t *tangle, ep_randomizer_t *ep_randomizer, double alpha,
+    tangle_t *const tangle, ep_randomizer_t *ep_randomizer, double alpha,
     enum ep_randomizer_implementation impl) {
-  logger_helper_init(EXIT_PROBABILITY_RANDOMIZER_ID, LOGGER_INFO, true);
+  logger_helper_init(EXIT_PROBABILITY_RANDOMIZER_ID, LOGGER_DEBUG, true);
   int seed = time(NULL);
   srand(seed);
   ep_randomizer->tangle = tangle;
   ep_randomizer->alpha = alpha;
   if (impl == EP_RANDOM_WALK) {
-    init_ep_randomizer_walker(&ep_randomizer->base);
+    init_ep_randomizer_walker(ep_randomizer);
   } else if (impl == EP_NO_IMPLEMENTATION) {
     return RC_CONSENSUS_NOT_IMPLEMENTED;
   }

@@ -167,6 +167,18 @@ void test_stored_milestone(void) {
   milestone.index++;
   TEST_ASSERT(iota_stor_milestone_store(&conn, &milestone) ==
               RC_SQLITE3_FAILED_STEP);
+
+  // Test get latest
+  milestone.hash[0]++;
+  TEST_ASSERT(iota_stor_milestone_store(&conn, &milestone) == RC_OK);
+  iota_milestone_t *ms = malloc(sizeof(iota_milestone_t));
+  iota_stor_pack_t ms_pack = {(void **)&ms, 1, 0, false};
+  iota_stor_milestone_load_latest(&conn, &ms_pack);
+  TEST_ASSERT_EQUAL_INT(1, ms_pack.num_loaded);
+  TEST_ASSERT_EQUAL_INT(ms->index, milestone.index);
+  TEST_ASSERT_EQUAL_MEMORY(ms->hash, milestone.hash, FLEX_TRIT_SIZE_243);
+  free(ms);
+  milestone.hash[0]--;
   milestone.index--;
 
   bool exist = false;
@@ -233,7 +245,7 @@ void test_stored_load_hashes_of_approvers(void) {
   pack.capacity = 5;
   TRIT_ARRAY_DECLARE(key, NUM_TRITS_HASH);
   memcpy(key.trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_stor_transaction_load_hashes_of_approvers(&conn, &key,
+  TEST_ASSERT(iota_stor_transaction_load_hashes_of_approvers(&conn, key.trits,
                                                              &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(0, pack.num_loaded);
 

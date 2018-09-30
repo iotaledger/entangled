@@ -13,6 +13,8 @@ extern "C" {
 #define __COMMON_SIGN_DEFAULT_H_
 
 #include <stddef.h>
+
+#include "common/sign/v1/iss_kerl.h"
 #include "common/trinary/flex_trit.h"
 #include "utils/export.h"
 

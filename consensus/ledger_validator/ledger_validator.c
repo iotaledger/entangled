@@ -11,11 +11,11 @@
 #define LEDGER_VALIDATOR_LOGGER_ID "consensus_ledger_validator"
 
 retcode_t iota_consensus_walker_validator_init(tangle_t *const tangle,
-                                               milestone_t *const milestone,
+                                               milestone_tracker_t *const mt,
                                                ledger_validator_t *const lv) {
-  logger_helper_init(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_INFO, true);
+  logger_helper_init(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   lv->tangle = tangle;
-  lv->milestone = milestone;
+  lv->mt = mt;
   return RC_OK;
 }
 

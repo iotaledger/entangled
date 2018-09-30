@@ -5,11 +5,13 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/exit_probability_randomizer/walker.h"
-#include "utils/logger_helper.h"
+#include <inttypes.h>
+#include <math.h>
+
 #include "utlist.h"
 
-#include <math.h>
+#include "consensus/exit_probability_randomizer/walker.h"
+#include "utils/logger_helper.h"
 
 #define RANDOM_WALKER_ID "consensus_random_walker"
 
@@ -48,7 +50,7 @@ retcode_t iota_consensus_random_walker_randomize(
                                                                 ep, &is_valid);
   if (ret) {
     log_error(RANDOM_WALKER_ID,
-              "Failed in entrypoint validation: %\" PRIu64 \"\n", ret);
+              "Failed in entrypoint validation: %" PRIu64 "\n", ret);
     return ret;
   }
 
@@ -77,7 +79,7 @@ retcode_t iota_consensus_random_walker_randomize(
   memcpy(tip->trits, curr_tail_hash, FLEX_TRIT_SIZE_243);
   //(traversed_tails, tmp_element, num_traversed_tails);
   log_debug(RANDOM_WALKER_ID,
-            "Number of tails traversed to find tip: \"%\" PRIu64 \"",
+            "Number of tails traversed to find tip: %" PRIu64 "\n",
             num_traversed_tails);
 
   return ret;
@@ -93,7 +95,7 @@ retcode_t random_walker_select_approver_tail(
   hash_entry_t *curr_approver = NULL;
   trit_array_t approver;
   flex_trit_t approver_trits[FLEX_TRIT_SIZE_243];
-  approver.trits = &approver_trits;
+  approver.trits = (flex_trit_t *)&approver_trits;
 
   memcpy(approver.trits, curr_tail, FLEX_TRIT_SIZE_243);
   approver.num_bytes = FLEX_TRIT_SIZE_243;
@@ -137,7 +139,6 @@ retcode_t random_walker_select_approver_tail(
 retcode_t select_approver(const ep_randomizer_t *exit_probability_randomizer,
                           cw_map_t cw_ratings, hash_set_t *approvers,
                           trit_array_t *approver, bool *has_next_approver) {
-  retcode_t ret = RC_OK;
   hash_entry_t *curr_approver = NULL;
   hash_entry_t *tmp_approver = NULL;
   cw_entry_t *curr_rating = NULL;
@@ -192,20 +193,15 @@ retcode_t find_tail_if_valid(const ep_randomizer_t *exit_probability_randomizer,
                              trit_array_t *tail_hash, bool *found_tail) {
   retcode_t res;
 
-  iota_stor_pack_t tx_pack;
-
-  tx_pack.capacity = 1;
-  tx_pack.num_loaded = 0;
-  tx_pack.insufficient_capacity = false;
   struct _iota_transaction curr_tx_s;
   struct _iota_transaction next_tx_s;
   iota_transaction_t curr_tx = &curr_tx_s;
   iota_transaction_t next_tx = &next_tx_s;
-  tx_pack.models = (void **)(&curr_tx);
-  trit_array_t curr_tx_hash;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   bool found_approver = false;
   *found_tail = false;
+
+  iota_stor_pack_t tx_pack = {(void **)(&curr_tx), 1, 0, false};
 
   res = iota_tangle_transaction_load(exit_probability_randomizer->tangle,
                                      TRANSACTION_COL_HASH, tx_hash, &tx_pack);
@@ -228,14 +224,12 @@ retcode_t find_tail_if_valid(const ep_randomizer_t *exit_probability_randomizer,
          memcmp(curr_tx->bundle, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
     hash_pack.num_loaded = 0;
     hash_pack.insufficient_capacity = false;
-    curr_tx_hash.num_bytes = FLEX_TRIT_SIZE_243;
-    curr_tx_hash.trits = curr_tx->hash;
     res = iota_tangle_transaction_load_hashes_of_approvers(
-        exit_probability_randomizer->tangle, &curr_tx_hash, &hash_pack);
+        exit_probability_randomizer->tangle, curr_tx->hash, &hash_pack);
 
     if (res != RC_OK) {
       log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-                "Failed in loading approvers, error code is: %\" PRIu64 \"\n",
+                "Failed in loading approvers, error code is: %" PRIu64 "\n",
                 res);
       break;
     }
@@ -257,7 +251,7 @@ retcode_t find_tail_if_valid(const ep_randomizer_t *exit_probability_randomizer,
         break;
       }
       if (next_tx->current_index == index &&
-          memcmp(next_tx->hash, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
+          memcmp(next_tx->bundle, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
         curr_tx = next_tx;
         found_approver = true;
         break;

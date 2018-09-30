@@ -1,16 +1,21 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 #include "store_transactions.h"
 
 store_transactions_req_t* store_transactions_req_new() {
-  store_transactions_req_t* transactions = NULL;
-  utarray_new(transactions, &ut_str_icd);
-  return transactions;
+  return flex_hash_array_new();
 }
 
-void store_transactions_req_add(store_transactions_req_t* transactions,
-                                const char* trytes) {
-  utarray_push_back(transactions, &trytes);
+store_transactions_req_t* store_transactions_req_add(
+    store_transactions_req_t* transactions, const char* trytes) {
+  return flex_hash_array_append(transactions, trytes);
 }
 
 void store_transactions_req_free(store_transactions_req_t* transactions) {
-  utarray_free(transactions);
+  flex_hash_array_free(transactions);
 }

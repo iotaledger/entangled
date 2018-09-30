@@ -5,8 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
+#include <inttypes.h>
+
 #include "common/storage/pack.h"
+#include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
 #include "utils/logger_helper.h"
 
 static retcode_t cw_rating_dfs_do_dfs_from_db(
@@ -50,7 +52,7 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
 
   if (res != RC_OK) {
     log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-              "Failed in DFS from DB, error code is: %\" PRIu64 \"", res);
+              "Failed in DFS from DB, error code is: %" PRIu64 "\n", res);
     return RC_CONSENSUS_CW_FAILED_IN_DFS_FROM_DB;
   }
 
@@ -85,7 +87,7 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
 
     if (res != RC_OK) {
       log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-                "Failed in light DFS, error code is: %\" PRIu64 \"\n", res);
+                "Failed in light DFS, error code is: %" PRIu64 "\n", res);
       return RC_CONSENSUS_CW_FAILED_IN_LIGHT_DFS;
     }
 
@@ -109,7 +111,6 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
   hash_to_direct_approvers_entry_t *curr_tx = NULL;
   hash_to_direct_approvers_entry_t *curr_approver_tx = NULL;
   hash_entry_t *curr_direct_approver = NULL;
-  trit_array_t curr_tx_trit_array;
   size_t curr_approver_index;
 
   retcode_t res = RC_OK;
@@ -128,7 +129,6 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
   }
   utarray_push_back(stack, entry_point->trits);
 
-  curr_tx_trit_array.num_bytes = trit_array_bytes_for_trits(NUM_TRITS_HASH);
   flex_trit_t *curr_tx_hash = NULL;
 
   while (utarray_len(stack)) {
@@ -136,13 +136,12 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
     utarray_pop_back(stack);
     pack.num_loaded = 0;
     pack.insufficient_capacity = false;
-    curr_tx_trit_array.trits = curr_tx_hash;
-    res = iota_tangle_transaction_load_hashes_of_approvers(
-        cw_calc->tangle, &curr_tx_trit_array, &pack);
+    res = iota_tangle_transaction_load_hashes_of_approvers(cw_calc->tangle,
+                                                           curr_tx_hash, &pack);
 
     if (res != RC_OK) {
       log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-                "Failed in loading approvers, error code is: %\" PRIu64 \"\n",
+                "Failed in loading approvers, error code is: %" PRIu64 "\n",
                 res);
       return res;
     }

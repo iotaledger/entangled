@@ -8,7 +8,7 @@
 #ifndef __GOSSIP_IOTA_PACKET_H__
 #define __GOSSIP_IOTA_PACKET_H__
 
-#include "ciri/conf/conf_default.h"
+#include "ciri/conf/conf_values.h"
 #include "common/network/endpoint.h"
 #include "common/trinary/bytes.h"
 

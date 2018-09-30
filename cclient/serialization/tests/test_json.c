@@ -22,13 +22,14 @@ void test_serialize_find_transactions(void) {
   find_transactions_req_t* find_tran = find_transactions_req_new();
   char_buffer_t* serializer_out = char_buffer_new();
 
-  find_transactions_req_add_tag(find_tran, FIND_TRANSACTIONS_SERIALIZE_TAG);
-  find_transactions_req_add_approvee(find_tran,
-                                     FIND_TRANSACTIONS_SERIALIZE_APPROVEE);
-  find_transactions_req_add_address(find_tran,
-                                    FIND_TRANSACTIONS_SERIALIZE_ADDRESS);
-  find_transactions_req_add_bundle(find_tran,
-                                   FIND_TRANSACTIONS_SERIALIZE_BUNDLE);
+  find_tran =
+      find_transactions_req_add_tag(find_tran, FIND_TRANSACTIONS_SERIALIZE_TAG);
+  find_tran = find_transactions_req_add_approvee(
+      find_tran, FIND_TRANSACTIONS_SERIALIZE_APPROVEE);
+  find_tran = find_transactions_req_add_address(
+      find_tran, FIND_TRANSACTIONS_SERIALIZE_ADDRESS);
+  find_tran = find_transactions_req_add_bundle(
+      find_tran, FIND_TRANSACTIONS_SERIALIZE_BUNDLE);
 
   serializer.vtable.find_transactions_serialize_request(&serializer, find_tran,
                                                         serializer_out);
@@ -50,17 +51,32 @@ void test_deserialize_find_transactions(void) {
       "\", "
       "\"" TEST_HASH3 "\"]}";
 
+  trit_array_p tmp_hash = NULL;
+  trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_HASH1);
+  trit_array_p hash2 = trit_array_new_from_trytes((tryte_t*)TEST_HASH2);
+  trit_array_p hash3 = trit_array_new_from_trytes((tryte_t*)TEST_HASH3);
+
   find_transactions_res_t* deserialize_find_tran = find_transactions_res_new();
 
   serializer.vtable.find_transactions_deserialize_response(
-      &serializer, json_text, deserialize_find_tran);
-  TEST_ASSERT_EQUAL_STRING(
-      TEST_HASH1, find_transactions_res_hash_at(deserialize_find_tran, 0));
-  TEST_ASSERT_EQUAL_STRING(
-      TEST_HASH2, find_transactions_res_hash_at(deserialize_find_tran, 1));
-  TEST_ASSERT_EQUAL_STRING(
-      NULL, find_transactions_res_hash_at(deserialize_find_tran, 3));
-  find_transactions_res_free(&deserialize_find_tran);
+      &serializer, json_text, &deserialize_find_tran);
+
+  tmp_hash = find_transactions_res_hash_at(deserialize_find_tran, 0);
+  TEST_ASSERT_EQUAL_MEMORY(hash1->trits, tmp_hash->trits, tmp_hash->num_bytes);
+
+  tmp_hash = find_transactions_res_hash_at(deserialize_find_tran, 1);
+  TEST_ASSERT_EQUAL_MEMORY(hash2->trits, tmp_hash->trits, tmp_hash->num_bytes);
+
+  tmp_hash = find_transactions_res_hash_at(deserialize_find_tran, 2);
+  TEST_ASSERT_EQUAL_MEMORY(hash3->trits, tmp_hash->trits, tmp_hash->num_bytes);
+
+  tmp_hash = find_transactions_res_hash_at(deserialize_find_tran, 3);
+  TEST_ASSERT_NULL(tmp_hash);
+
+  find_transactions_res_free(deserialize_find_tran);
+  trit_array_free(hash1);
+  trit_array_free(hash2);
+  trit_array_free(hash3);
 }
 
 void test_serialize_get_node_info(void) {
@@ -111,10 +127,14 @@ void test_deserialize_get_node_info(void) {
       "\"transactionsToRequest\""
       ":" STR(GET_NODE_INFO_DESERIALIZE_TRANSACTIONS_TO_REQUEST) "}";
 
+  trit_array_p last_m = trit_array_new_from_trytes(
+      (tryte_t*)GET_NODE_INFO_DESERIALIZE_LATEST_MILESTONE);
+  trit_array_p last_sm = trit_array_new_from_trytes(
+      (tryte_t*)GET_NODE_INFO_DESERIALIZE_LATEST_SS_MILESTONE);
   get_node_info_res_t* node_info = get_node_info_res_new();
 
   serializer.vtable.get_node_info_deserialize_response(&serializer, json_text,
-                                                       node_info);
+                                                       &node_info);
 
   TEST_ASSERT_EQUAL_STRING(GET_NODE_INFO_DESERIALIZE_APP_NAME,
                            node_info->app_name->data);
@@ -128,12 +148,17 @@ void test_deserialize_get_node_info(void) {
                          node_info->jre_max_memory);
   TEST_ASSERT_EQUAL_INT8(GET_NODE_INFO_DESERIALIZE_JRE_TOTAL_MEMORY,
                          node_info->jre_total_memory);
-  TEST_ASSERT_EQUAL_STRING(GET_NODE_INFO_DESERIALIZE_LATEST_MILESTONE,
-                           node_info->latest_milestone->data);
+  /*TEST_ASSERT_EQUAL_STRING(GET_NODE_INFO_DESERIALIZE_LATEST_MILESTONE,*/
+  /*node_info->latest_milestone->data);*/
+  TEST_ASSERT_EQUAL_MEMORY(last_m->trits, node_info->latest_milestone->trits,
+                           last_m->num_bytes);
   TEST_ASSERT_EQUAL_INT8(GET_NODE_INFO_DESERIALIZE_LATEST_MILESTONE_INDEX,
                          node_info->latest_milestone_index);
-  TEST_ASSERT_EQUAL_STRING(GET_NODE_INFO_DESERIALIZE_LATEST_SS_MILESTONE,
-                           node_info->latest_solid_subtangle_milestone->data);
+  /*TEST_ASSERT_EQUAL_STRING(GET_NODE_INFO_DESERIALIZE_LATEST_SS_MILESTONE,*/
+  /*node_info->latest_solid_subtangle_milestone->data);*/
+  TEST_ASSERT_EQUAL_MEMORY(last_sm->trits,
+                           node_info->latest_solid_subtangle_milestone->trits,
+                           last_sm->num_bytes);
   TEST_ASSERT_EQUAL_INT8(GET_NODE_INFO_DESERIALIZE_LATEST_SS_MILESTONE_INDEX,
                          node_info->latest_solid_subtangle_milestone_index);
   TEST_ASSERT_EQUAL_INT(GET_NODE_INFO_DESERIALIZE_NEIGHBORS,
@@ -145,7 +170,7 @@ void test_deserialize_get_node_info(void) {
   TEST_ASSERT_EQUAL_INT(GET_NODE_INFO_DESERIALIZE_TRANSACTIONS_TO_REQUEST,
                         node_info->trans_to_request);
 
-  get_node_info_res_free(node_info);
+  get_node_info_res_free(&node_info);
 }
 
 void test_serialize_get_neighbors(void) {
@@ -296,13 +321,22 @@ void test_deserialize_get_tips(void) {
       "\","
       "\"" TEST_HASH3 "\"],\"duration\":4}";
 
+  trit_array_p tmp_tip = NULL;
+  trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_HASH1);
+  trit_array_p hash2 = trit_array_new_from_trytes((tryte_t*)TEST_HASH2);
   get_tips_res_t* tips = get_tips_res_new();
 
-  serializer.vtable.get_tips_deserialize_response(&serializer, json_text, tips);
-  TEST_ASSERT_EQUAL_STRING(TEST_HASH1, get_tips_res_hash_at(tips, 0));
-  TEST_ASSERT_EQUAL_STRING(TEST_HASH2, get_tips_res_hash_at(tips, 1));
-  TEST_ASSERT_EQUAL_STRING(NULL, get_tips_res_hash_at(tips, 3));
+  serializer.vtable.get_tips_deserialize_response(&serializer, json_text,
+                                                  &tips);
+  tmp_tip = get_tips_res_hash_at(tips, 0);
+  TEST_ASSERT_EQUAL_MEMORY(tmp_tip->trits, hash1->trits, hash1->num_bytes);
+  tmp_tip = get_tips_res_hash_at(tips, 1);
+  TEST_ASSERT_EQUAL_MEMORY(tmp_tip->trits, hash2->trits, hash2->num_bytes);
+  tmp_tip = get_tips_res_hash_at(tips, 3);
+  TEST_ASSERT_NULL(tmp_tip);
   get_tips_res_free(tips);
+  trit_array_free(hash1);
+  trit_array_free(hash2);
 }
 
 void test_serialize_get_trytes(void) {
@@ -314,7 +348,7 @@ void test_serialize_get_trytes(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   get_trytes_req_t* req = get_trytes_req_new();
-  get_trytes_req_add(req, GET_TRYTES_SERIALIZE_HASH);
+  req = get_trytes_req_add(req, GET_TRYTES_SERIALIZE_HASH);
 
   serializer.vtable.get_trytes_serialize_request(&serializer, req,
                                                  serializer_out);
@@ -332,14 +366,20 @@ void test_deserialize_get_trytes(void) {
       "{\"trytes\":["
       "\"" GET_TRYTES_DESERIALIZE_TX "\"]}";
 
-  get_trytes_res_t* tips = get_trytes_res_new();
+  trit_array_p tmp_trytes = NULL;
+  trit_array_p hash1 =
+      trit_array_new_from_trytes((tryte_t*)GET_TRYTES_DESERIALIZE_TX);
+  get_trytes_res_t* trytes_array = get_trytes_res_new();
 
   serializer.vtable.get_trytes_deserialize_response(&serializer, json_text,
-                                                    tips);
-  TEST_ASSERT_EQUAL_STRING(GET_TRYTES_DESERIALIZE_TX,
-                           get_trytes_res_at(tips, 0));
-  TEST_ASSERT_EQUAL_STRING(NULL, get_trytes_res_at(tips, 3));
-  get_trytes_res_free(tips);
+                                                    &trytes_array);
+  tmp_trytes = get_trytes_res_at(trytes_array, 0);
+  TEST_ASSERT_EQUAL_MEMORY(tmp_trytes->trits, hash1->trits, hash1->num_bytes);
+  tmp_trytes = get_trytes_res_at(trytes_array, 1);
+  TEST_ASSERT_NULL(tmp_trytes);
+
+  get_trytes_res_free(trytes_array);
+  trit_array_free(hash1);
 }
 
 void test_serialize_get_inclusion_states(void) {
@@ -353,8 +393,8 @@ void test_serialize_get_inclusion_states(void) {
   get_inclusion_state_req_t* get_is = get_inclusion_state_req_new();
   char_buffer_t* serializer_out = char_buffer_new();
 
-  get_inclusion_state_req_add_hash(get_is, INCLUSION_STATES_HASH);
-  get_inclusion_state_req_add_tip(get_is, INCLUSION_STATES_TIPS);
+  get_is = get_inclusion_state_req_add_hash(get_is, INCLUSION_STATES_HASH);
+  get_is = get_inclusion_state_req_add_tip(get_is, INCLUSION_STATES_TIPS);
 
   serializer.vtable.get_inclusion_state_serialize_request(&serializer, get_is,
                                                           serializer_out);
@@ -395,7 +435,8 @@ void test_serialize_get_balances(void) {
 
   char_buffer_t* serializer_out = char_buffer_new();
   get_balances_req_t* get_bal = get_balances_req_new();
-  get_balances_req_add_address(get_bal, GET_BALANCES_SERIALIZE_ADDRESS);
+  get_bal =
+      get_balances_req_add_address(get_bal, GET_BALANCES_SERIALIZE_ADDRESS);
   get_bal->threshold = GET_BALANCES_SERIALIZE_THRESHOLD;
   serializer.vtable.get_balances_serialize_request(&serializer, get_bal,
                                                    serializer_out);
@@ -403,7 +444,7 @@ void test_serialize_get_balances(void) {
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
   char_buffer_free(serializer_out);
-  get_balances_req_free(get_bal);
+  get_balances_req_free(&get_bal);
 }
 
 void test_deserialize_get_balances(void) {
@@ -418,18 +459,24 @@ void test_deserialize_get_balances(void) {
       "\"], "
       "\"milestoneIndex\":" STR(GET_BALANCES_DESERIALIZE_MILESTONEINDEX) "}";
 
+  trit_array_p tmp_ref = NULL;
+  trit_array_p ref =
+      trit_array_new_from_trytes((tryte_t*)GET_BALANCES_DESERIALIZE_REFERENCE);
+
   get_balances_res_t* deserialize_get_bal = get_balances_res_new();
   serializer.vtable.get_balances_deserialize_response(&serializer, json_text,
-                                                      deserialize_get_bal);
+                                                      &deserialize_get_bal);
 
   TEST_ASSERT_EQUAL_STRING(
       GET_BALANCES_DESERIALIZE_BALANCE,
       get_balances_res_balances_at(deserialize_get_bal, 0));
-  TEST_ASSERT_EQUAL_STRING(
-      GET_BALANCES_DESERIALIZE_REFERENCE,
-      get_balances_res_milestone_at(deserialize_get_bal, 0));
+  tmp_ref = get_balances_res_milestone_at(deserialize_get_bal, 0);
+  TEST_ASSERT_EQUAL_MEMORY(ref->trits, tmp_ref->trits, tmp_ref->num_bytes);
   TEST_ASSERT_EQUAL_INT(GET_BALANCES_DESERIALIZE_MILESTONEINDEX,
                         deserialize_get_bal->milestoneIndex);
+
+  get_balances_res_free(deserialize_get_bal);
+  trit_array_free(ref);
 }
 
 void test_serialize_get_transactions_to_approve(void) {
@@ -462,17 +509,25 @@ void test_deserialize_get_transactions_to_approve(void) {
       "\",\"branchTransaction\":"
       "\"" GET_TRANSACTION_TO_APPROVE_HASH "\"}";
 
+  trit_array_p trunk =
+      trit_array_new_from_trytes((tryte_t*)GET_TRANSACTION_TO_APPROVE_HASH);
+  trit_array_p branch =
+      trit_array_new_from_trytes((tryte_t*)GET_TRANSACTION_TO_APPROVE_HASH);
   get_transactions_to_approve_res_t* deserialize_get_txn_approve =
       get_transactions_to_approve_res_new();
   serializer.vtable.get_transactions_to_approve_deserialize_response(
-      &serializer, json_text, deserialize_get_txn_approve);
+      &serializer, json_text, &deserialize_get_txn_approve);
 
-  TEST_ASSERT_EQUAL_STRING(GET_TRANSACTION_TO_APPROVE_HASH,
-                           deserialize_get_txn_approve->trunk->data);
-  TEST_ASSERT_EQUAL_STRING(GET_TRANSACTION_TO_APPROVE_HASH,
-                           deserialize_get_txn_approve->branch->data);
+  TEST_ASSERT_EQUAL_MEMORY(trunk->trits,
+                           deserialize_get_txn_approve->trunk->trits,
+                           trunk->num_bytes);
+  TEST_ASSERT_EQUAL_MEMORY(branch->trits,
+                           deserialize_get_txn_approve->branch->trits,
+                           branch->num_bytes);
 
   get_transactions_to_approve_res_free(&deserialize_get_txn_approve);
+  trit_array_free(trunk);
+  trit_array_free(branch);
 }
 
 void test_serialize_attach_to_tangle(void) {
@@ -489,8 +544,10 @@ void test_serialize_attach_to_tangle(void) {
 
   attach_to_tangle_req_set_trunk(attach_req, TEST_HASH1);
   attach_to_tangle_req_set_branch(attach_req, TEST_HASH2);
-  attach_to_tangle_req_add_trytes(attach_req, TEST_RAW_TRYTES1);
-  attach_to_tangle_req_add_trytes(attach_req, TEST_RAW_TRYTES2);
+  attach_req->trytes =
+      attach_to_tangle_req_add_trytes(attach_req->trytes, TEST_RAW_TRYTES1);
+  attach_req->trytes =
+      attach_to_tangle_req_add_trytes(attach_req->trytes, TEST_RAW_TRYTES2);
   attach_to_tangle_req_set_mwm(attach_req, TEST_MWM);
   serializer.vtable.attach_to_tangle_serialize_request(&serializer, attach_req,
                                                        serializer_out);
@@ -506,17 +563,27 @@ void test_deserialize_attach_to_tangle(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"trytes\":[\"" TEST_HASH1 "\",\"" TEST_HASH2 "\"],\"duration\":4}";
+  trit_array_p tmp_hash = NULL;
+  trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_HASH1);
+  trit_array_p hash2 = trit_array_new_from_trytes((tryte_t*)TEST_HASH2);
 
   attach_to_tangle_res_t* trytes = attach_to_tangle_res_new();
 
   serializer.vtable.attach_to_tangle_deserialize_response(&serializer,
-                                                          json_text, trytes);
-  TEST_ASSERT_EQUAL_STRING(TEST_HASH1,
-                           attach_to_tangle_res_trytes_at(trytes, 0));
-  TEST_ASSERT_EQUAL_STRING(TEST_HASH2,
-                           attach_to_tangle_res_trytes_at(trytes, 1));
-  TEST_ASSERT_EQUAL_STRING(NULL, attach_to_tangle_res_trytes_at(trytes, 3));
+                                                          json_text, &trytes);
+
+  tmp_hash = attach_to_tangle_res_trytes_at(trytes, 0);
+  TEST_ASSERT_EQUAL_MEMORY(hash1->trits, tmp_hash->trits, hash1->num_bytes);
+
+  tmp_hash = attach_to_tangle_res_trytes_at(trytes, 1);
+  TEST_ASSERT_EQUAL_MEMORY(hash2->trits, tmp_hash->trits, hash2->num_bytes);
+
+  tmp_hash = attach_to_tangle_res_trytes_at(trytes, 3);
+  TEST_ASSERT_NULL(tmp_hash);
+
   attach_to_tangle_res_free(trytes);
+  trit_array_free(hash1);
+  trit_array_free(hash2);
 }
 
 void test_serialize_broadcast_transactions(void) {
@@ -528,7 +595,7 @@ void test_serialize_broadcast_transactions(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   broadcast_transactions_req_t* req = broadcast_transactions_req_new();
-  broadcast_transactions_req_add(req, BROADCAST_TX_TRYTES);
+  req = broadcast_transactions_req_add(req, BROADCAST_TX_TRYTES);
 
   serializer.vtable.broadcast_transactions_serialize_request(&serializer, req,
                                                              serializer_out);
@@ -547,7 +614,7 @@ void test_serialize_store_transactions(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   store_transactions_req_t* req = store_transactions_req_new();
-  store_transactions_req_add(req, STORE_TX_TRYTES);
+  req = store_transactions_req_add(req, STORE_TX_TRYTES);
 
   serializer.vtable.store_transactions_serialize_request(&serializer, req,
                                                          serializer_out);
@@ -557,12 +624,49 @@ void test_serialize_store_transactions(void) {
   store_transactions_req_free(req);
 }
 
-void test_serialize_were_addresses_spent_from(void) {
-  // TODO
+void test_serialize_check_consistency(void) {
+  serializer_t serializer;
+  const char* json_text =
+      "{\"command\":\"checkConsistency\",\"tails\":"
+      "[\"" TEST_HASH1
+      "\","
+      "\"" TEST_HASH2 "\"]}";
+
+  char_buffer_t* serializer_out = char_buffer_new();
+  init_json_serializer(&serializer);
+  check_consistency_req_t* req = check_consistency_req_new();
+  req = check_consistency_req_add(req, TEST_HASH1);
+  req = check_consistency_req_add(req, TEST_HASH2);
+
+  serializer.vtable.check_consistency_serialize_request(&serializer, req,
+                                                        serializer_out);
+
+  TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
+
+  char_buffer_free(serializer_out);
+  check_consistency_req_free(req);
 }
 
-void test_deserialize_were_addresses_spent_from(void) {
-  // TODO
+void test_deserialize_check_consistency(void) {
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  const char* res_true = "{\"state\":true,\"info\":\" \",\"duration\":0}";
+  const char* res_false =
+      "{\"state\":false,\"info\":\"" CONSISTENCY_INFO "\",\"duration\":0}";
+
+  check_consistency_res_t* consistent_res = check_consistency_res_new();
+  serializer.vtable.check_consistency_deserialize_response(
+      &serializer, res_true, consistent_res);
+  TEST_ASSERT_TRUE(consistent_res->state == true);
+  TEST_ASSERT_EQUAL_STRING(" ", consistent_res->info->data);
+  check_consistency_res_free(consistent_res);
+
+  consistent_res = check_consistency_res_new();
+  serializer.vtable.check_consistency_deserialize_response(
+      &serializer, res_false, consistent_res);
+  TEST_ASSERT_TRUE(consistent_res->state == false);
+  TEST_ASSERT_EQUAL_STRING(CONSISTENCY_INFO, consistent_res->info->data);
+  check_consistency_res_free(consistent_res);
 }
 
 int main(void) {
@@ -610,7 +714,7 @@ int main(void) {
 
   RUN_TEST(test_serialize_store_transactions);
 
-  RUN_TEST(test_serialize_were_addresses_spent_from);
-  RUN_TEST(test_deserialize_were_addresses_spent_from);
+  RUN_TEST(test_serialize_check_consistency);
+  RUN_TEST(test_deserialize_check_consistency);
   return UNITY_END();
 }
