@@ -14,10 +14,10 @@
 
 #include <errno.h>
 #include <fcntl.h>
-
-#include "utils/logger_helper.h"
+#include <inttypes.h>
 
 #include "utils/files.h"
+#include "utils/logger_helper.h"
 
 #define UTILS_FILES_LOGGER_ID "utils_files"
 
@@ -60,7 +60,7 @@ retcode_t copy_file(const char *to, const char *from) {
   }
 
 out_error:
-  log_error(UTILS_FILES_LOGGER_ID, "Failed with errno %\" PRIu64 \"\n", errno);
+  log_error(UTILS_FILES_LOGGER_ID, "Failed with errno %" PRIu64 "\n", errno);
   saved_errno = errno;
 
   close(fd_from);
@@ -75,7 +75,7 @@ retcode_t remove_file(const char *file_path) {
 
   status = remove(file_path);
   if (status) {
-    log_error(UTILS_FILES_LOGGER_ID, "Failed with status %\" PRIu64 \"\n",
+    log_error(UTILS_FILES_LOGGER_ID, "Failed with status %" PRIu64 "\n",
               status);
     return RC_UTILS_FAILED_REMOVE_FILE;
   }
