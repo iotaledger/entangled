@@ -5,8 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
+#include <inttypes.h>
+
 #include "common/storage/pack.h"
+#include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
 #include "utils/logger_helper.h"
 
 static retcode_t cw_rating_dfs_do_dfs_from_db(
@@ -50,7 +52,7 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
 
   if (res != RC_OK) {
     log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-              "Failed in DFS from DB, error code is: %\" PRIu64 \"", res);
+              "Failed in DFS from DB, error code is: %" PRIu64 "\n", res);
     return RC_CONSENSUS_CW_FAILED_IN_DFS_FROM_DB;
   }
 
@@ -85,7 +87,7 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
 
     if (res != RC_OK) {
       log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-                "Failed in light DFS, error code is: %\" PRIu64 \"\n", res);
+                "Failed in light DFS, error code is: %" PRIu64 "\n", res);
       return RC_CONSENSUS_CW_FAILED_IN_LIGHT_DFS;
     }
 
@@ -139,7 +141,7 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
 
     if (res != RC_OK) {
       log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-                "Failed in loading approvers, error code is: %\" PRIu64 \"\n",
+                "Failed in loading approvers, error code is: %" PRIu64 "\n",
                 res);
       return res;
     }

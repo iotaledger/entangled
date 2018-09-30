@@ -506,7 +506,7 @@ retcode_t iota_stor_milestone_load_next(const connection_t* const conn,
   if (rc != SQLITE_OK) {
     sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
     log_error(SQLITE3_LOGGER_ID,
-              "Failed in binding, sqlite3 code is: %\" PRIu64 \"\n", rc);
+              "Failed in binding, sqlite3 code is: %" PRIu64 "\n", rc);
     return RC_SQLITE3_FAILED_BINDING;
   }
 
