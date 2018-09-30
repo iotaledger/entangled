@@ -7,8 +7,6 @@
 
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "common/model/milestone.h"
-#include "common/storage/pack.h"
-#include "common/trinary/trit_array.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/logger_helper.h"
