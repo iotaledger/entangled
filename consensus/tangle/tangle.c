@@ -5,13 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <inttypes.h>
+
 #include "consensus/tangle/tangle.h"
 #include "utils/logger_helper.h"
 
 #define TANGLE_LOGGER_ID "consensus_tangle"
 
 retcode_t iota_tangle_init(tangle_t *tangle, const connection_config_t *conf) {
-  logger_helper_init(TANGLE_LOGGER_ID, LOGGER_INFO, true);
+  logger_helper_init(TANGLE_LOGGER_ID, LOGGER_DEBUG, true);
   return iota_stor_init(&tangle->conn, conf);
 }
 retcode_t iota_tangle_destroy(tangle_t *tangle) {
@@ -68,7 +70,7 @@ retcode_t iota_tangle_transaction_load_hashes(const tangle_t *const tangle,
 
   if (res != RC_OK) {
     log_error(TANGLE_LOGGER_ID,
-              "Failed in loading hashes, error code is: %\" PRIu64 \"\n", res);
+              "Failed in loading hashes, error code is: %" PRIu64 "\n", res);
   }
 
   return res;
@@ -93,8 +95,7 @@ retcode_t iota_tangle_transaction_load_hashes_of_approvers(
 
   if (res != RC_OK) {
     log_error(TANGLE_LOGGER_ID,
-              "Failed in loading approvers, error code is: %\" PRIu64 \"\n",
-              res);
+              "Failed in loading approvers, error code is: %" PRIu64 "\n", res);
   }
 
   return res;

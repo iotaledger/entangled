@@ -16,6 +16,7 @@ retcode_t ciri_conf_init(ciri_conf_t* conf) {
   }
 
   memset(conf, 0, sizeof(ciri_conf_t));
+  conf->log_level = CONF_DEFAULT_LOG_LEVEL;
   conf->api_port = CONF_DEFAULT_API_PORT;
   conf->neighbors = CONF_DEFAULT_NEIGHBORS;
   conf->conf_file = CONF_DEFAULT_CONF_FILE;

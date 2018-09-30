@@ -5,11 +5,13 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/exit_probability_randomizer/walker.h"
-#include "utils/logger_helper.h"
+#include <inttypes.h>
+#include <math.h>
+
 #include "utlist.h"
 
-#include <math.h>
+#include "consensus/exit_probability_randomizer/walker.h"
+#include "utils/logger_helper.h"
 
 #define RANDOM_WALKER_ID "consensus_random_walker"
 
@@ -48,7 +50,7 @@ retcode_t iota_consensus_random_walker_randomize(
                                                                 ep, &is_valid);
   if (ret) {
     log_error(RANDOM_WALKER_ID,
-              "Failed in entrypoint validation: %\" PRIu64 \"\n", ret);
+              "Failed in entrypoint validation: %" PRIu64 "\n", ret);
     return ret;
   }
 
@@ -77,7 +79,7 @@ retcode_t iota_consensus_random_walker_randomize(
   memcpy(tip->trits, curr_tail_hash, FLEX_TRIT_SIZE_243);
   //(traversed_tails, tmp_element, num_traversed_tails);
   log_debug(RANDOM_WALKER_ID,
-            "Number of tails traversed to find tip: \"%\" PRIu64 \"",
+            "Number of tails traversed to find tip: %" PRIu64 "\n",
             num_traversed_tails);
 
   return ret;
@@ -227,7 +229,7 @@ retcode_t find_tail_if_valid(const ep_randomizer_t *exit_probability_randomizer,
 
     if (res != RC_OK) {
       log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-                "Failed in loading approvers, error code is: %\" PRIu64 \"\n",
+                "Failed in loading approvers, error code is: %" PRIu64 "\n",
                 res);
       break;
     }

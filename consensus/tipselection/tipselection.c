@@ -5,13 +5,14 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/tipselection/tipselection.h"
+#include <inttypes.h>
+
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
 #include "consensus/snapshot/snapshot.h"
-
+#include "consensus/tipselection/tipselection.h"
 #include "utils/logger_helper.h"
 
 #define TIPSELECTION_LOGGER_ID "consensus_tipselection"
@@ -23,7 +24,7 @@ retcode_t iota_consensus_tipselection_init(
     cw_rating_calculator_t *const cw_calc, milestone_tracker_t *const mt,
     entry_point_selector_t *const ep, ep_randomizer_t *const ep_randomizer,
     double alpha) {
-  logger_helper_init(TIPSELECTION_LOGGER_ID, LOGGER_INFO, true);
+  logger_helper_init(TIPSELECTION_LOGGER_ID, LOGGER_DEBUG, true);
   impl->cw_calc = cw_calc;
   impl->mt = mt;
   impl->tangle = tangle;
@@ -46,14 +47,14 @@ retcode_t iota_consensus_get_transactions_to_approve(
 
   if ((res = iota_consensus_get_entry_point(ts->ep_selector, depth, ep))) {
     log_error(TIPSELECTION_LOGGER_ID,
-              "Getting entry point failed with error %\" PRIu64 \"\n", res);
+              "Getting entry point failed with error %" PRIu64 "\n", res);
     goto ret;
   }
 
   if ((res = iota_consensus_cw_rating_calculate(ts->cw_calc, ep,
                                                 &ratings_result))) {
     log_error(TIPSELECTION_LOGGER_ID,
-              "Calculating CW ratings failed with error %\" PRIu64 \"\n", res);
+              "Calculating CW ratings failed with error %" PRIu64 "\n", res);
     goto ret;
   }
 
@@ -75,13 +76,13 @@ retcode_t iota_consensus_get_transactions_to_approve(
   res = iota_consensus_ledeger_validator_validate(ts->lv, tips);
   if (res != RC_OK) {
     log_error(TIPSELECTION_LOGGER_ID,
-              "Second walking failed with error %\" PRIu64 \"\n", res);
+              "Second walking failed with error %" PRIu64 "\n", res);
     goto ret;
   }
 
   if ((res = iota_consensus_ledeger_validator_validate(ts->lv, tips))) {
     log_error(TIPSELECTION_LOGGER_ID,
-              "Validating tips failed with error %\" PRIu64 \"\n", res);
+              "Validating tips failed with error %" PRIu64 "\n", res);
     goto ret;
   }
 

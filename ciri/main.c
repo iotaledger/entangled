@@ -20,25 +20,17 @@ static core_t core_g;
 int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
 
+  if (ciri_conf_parse(&core_g.config, argc, argv)) {
+    return EXIT_FAILURE;
+  }
+
   if (LOGGER_VERSION != logger_version()) {
     return EXIT_FAILURE;
   }
   logger_init();
   logger_output_register(stdout);
-  logger_output_level_set(stdout, LOGGER_DEBUG);
+  logger_output_level_set(stdout, core_g.config.log_level);
   logger_helper_init(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
-
-  log_info(MAIN_LOGGER_ID, "Initializing configuration\n");
-  if (ciri_conf_init(&core_g.config)) {
-    log_critical(MAIN_LOGGER_ID, "Initializing configuration failed\n");
-    return EXIT_FAILURE;
-  }
-
-  log_info(MAIN_LOGGER_ID, "Parsing command line arguments\n");
-  if (ciri_conf_parse(&core_g.config, argc, argv)) {
-    log_critical(MAIN_LOGGER_ID, "Parsing command line arguments failed\n");
-    return EXIT_FAILURE;
-  }
 
   log_info(MAIN_LOGGER_ID, "Initializing cIRI core\n");
   if (core_init(&core_g)) {

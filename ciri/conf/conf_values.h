@@ -10,6 +10,7 @@
 
 // Command line arguments default values
 
+#define CONF_DEFAULT_LOG_LEVEL LOGGER_INFO
 #define CONF_DEFAULT_API_PORT 14265
 #define CONF_DEFAULT_NEIGHBORS NULL
 #define CONF_DEFAULT_CONF_FILE NULL
