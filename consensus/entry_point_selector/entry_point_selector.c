@@ -26,9 +26,9 @@ retcode_t iota_consensus_entry_point_selector_init(
   return RC_OK;
 }
 
-retcode_t iota_consensus_get_entry_point(entry_point_selector_t *const eps,
-                                         size_t const depth,
-                                         trit_array_p const ep) {
+retcode_t iota_consensus_entry_point_selector_get_entry_point(
+    entry_point_selector_t *const eps, size_t const depth,
+    trit_array_p const ep) {
   retcode_t ret = RC_OK;
   size_t milestone_index = MAX(eps->mt->latest_milestone_index - depth - 1, 0);
   iota_milestone_t milestone;

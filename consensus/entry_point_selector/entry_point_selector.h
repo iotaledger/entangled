@@ -31,7 +31,7 @@ extern retcode_t iota_consensus_entry_point_selector_init(
     entry_point_selector_t *const eps, milestone_tracker_t *const mt,
     tangle_t *const tangle, bool const testnet);
 
-extern retcode_t iota_consensus_get_entry_point(
+extern retcode_t iota_consensus_entry_point_selector_get_entry_point(
     entry_point_selector_t *const eps, size_t const depth,
     trit_array_p const ep);
 
