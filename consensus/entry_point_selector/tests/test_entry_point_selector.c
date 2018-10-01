@@ -8,12 +8,17 @@
 #include <unity/unity.h>
 
 #include "common/helpers/digest.h"
+#include "common/model/milestone.h"
 #include "common/model/tests/defs.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
 #include "consensus/test_utils/tangle.h"
 #include "utils/files.h"
+
+#define START_MILESTONE 814854
+#define LATEST_SOLID_MILESTONE 814904
+#define DEPTH 10
 
 static entry_point_selector_t eps;
 static tangle_t tangle;
@@ -26,20 +31,35 @@ static bool debug_mode = false;
 static char* test_db_path = "consensus/entry_point_selector/tests/test.db";
 static char* ciri_db_path = "consensus/entry_point_selector/tests/ciri.db";
 
-void test_entry_point_with_tangle_data() {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
-  TEST_ASSERT(iota_consensus_entry_point_selector_init(&eps, &mt, &tangle,
-                                                       true) == RC_OK);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
-  TEST_ASSERT(iota_consensus_entry_point_selector_destroy(&eps) == RC_OK);
-}
+void test_entry_point() {
+  iota_milestone_t milestone = {START_MILESTONE, {0}};
+  TRIT_ARRAY_DECLARE(ep, NUM_TRITS_HASH);
+  iota_milestone_t ep_milestone;
+  iota_milestone_t* ep_milestone_ptr = &ep_milestone;
+  iota_stor_pack_t pack = {(void**)&ep_milestone_ptr, 1, 0, false};
 
-void test_entry_point_without_tangle_data() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
   TEST_ASSERT(iota_consensus_entry_point_selector_init(&eps, &mt, &tangle,
                                                        true) == RC_OK);
+
+  mt.latest_solid_subtangle_milestone_index = LATEST_SOLID_MILESTONE;
+
+  for (size_t i = 0; i < 100; i++) {
+    TEST_ASSERT(iota_tangle_milestone_store(&tangle, &milestone) == RC_OK);
+    milestone.index++;
+    milestone.hash[0]++;
+  }
+
+  TEST_ASSERT(iota_consensus_entry_point_selector_get_entry_point(
+                  &eps, DEPTH, &ep) == RC_OK);
+
+  TEST_ASSERT(iota_tangle_milestone_load(&tangle, MILESTONE_COL_HASH, &ep,
+                                         &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
+
+  TEST_ASSERT_EQUAL_INT(ep_milestone.index, LATEST_SOLID_MILESTONE - DEPTH);
+
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_entry_point_selector_destroy(&eps) == RC_OK);
 }
@@ -64,8 +84,7 @@ int main(int argc, char* argv[]) {
   config.index_milestone_hash = true;
 
   if (TEST_PROTECT()) {
-    RUN_TEST(test_entry_point_with_tangle_data);
-    RUN_TEST(test_entry_point_without_tangle_data);
+    RUN_TEST(test_entry_point);
   }
 
   return UNITY_END();
