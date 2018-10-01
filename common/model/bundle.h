@@ -13,14 +13,6 @@
 #include "common/trinary/flex_trit.h"
 #include "utarray.h"
 
-#define TRYTE_HASH_LENGTH 81
-#define TRIT_HASH_LENGTH 243
-#define MAX_TRYTE_VALUE 13
-#define MIN_TRYTE_VALUE -13
-#define TRYTE_WIDTH 3
-#define NUMBER_OF_SECURITY_LEVELS 3
-#define NORMALIZED_FRAGMENT_LENGTH 27
-
 #ifdef __cplusplus
 extern "C" {
 #endif
