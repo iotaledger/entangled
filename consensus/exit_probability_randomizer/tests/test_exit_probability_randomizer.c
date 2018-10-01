@@ -547,7 +547,10 @@ void test_1_bundle(void) {
   struct _iota_transaction tx;
   iota_transaction_t tx_models = &tx;
 
-  iota_stor_pack_t tx_pack = {(void **)(&tx_models), 1, 0, false};
+  iota_stor_pack_t tx_pack = {.models = (void **)(&tx_models),
+                              .capacity = 1,
+                              .num_loaded = 0,
+                              .insufficient_capacity = false};
 
   TEST_ASSERT(iota_tangle_transaction_load(&tangle, TRANSACTION_COL_HASH, ep,
                                            &tx_pack) == RC_OK);
@@ -686,7 +689,10 @@ void test_2_chained_bundles(void) {
   struct _iota_transaction tx;
   iota_transaction_t tx_models = &tx;
 
-  iota_stor_pack_t tx_pack = {(void **)(&tx_models), 1, 0, false};
+  iota_stor_pack_t tx_pack = {.models = (void **)(&tx_models),
+                              .capacity = 1,
+                              .num_loaded = 0,
+                              .insufficient_capacity = false};
 
   TEST_ASSERT(iota_tangle_transaction_load(&tangle, TRANSACTION_COL_HASH, ep,
                                            &tx_pack) == RC_OK);

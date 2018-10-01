@@ -32,7 +32,10 @@ retcode_t iota_consensus_get_entry_point(entry_point_selector_t *const eps,
   retcode_t ret = RC_OK;
   size_t milestone_index = MAX(eps->mt->latest_milestone_index - depth - 1, 0);
   iota_milestone_t milestone;
-  iota_stor_pack_t pack = {(void **)&milestone, 1, 0, false};
+  iota_stor_pack_t pack = {.models = (void **)&milestone,
+                           .capacity = 1,
+                           .num_loaded = 0,
+                           .insufficient_capacity = false};
 
   if ((ret = iota_tangle_milestone_load_next(eps->tangle, milestone_index,
                                              &pack))) {
