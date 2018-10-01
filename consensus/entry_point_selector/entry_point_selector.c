@@ -5,8 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/entry_point_selector/entry_point_selector.h"
+#include <inttypes.h>
+
 #include "common/model/milestone.h"
+#include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/logger_helper.h"
@@ -39,10 +41,9 @@ retcode_t iota_consensus_entry_point_selector_get_entry_point(
 
   if ((ret = iota_tangle_milestone_load_next(eps->tangle, milestone_index,
                                              &pack))) {
-    log_error(
-        ENTRY_POINT_SELECTOR_LOGGER_ID,
-        "Finding closest next milestone failed with error %\" PRIu64 \"\n",
-        ret);
+    log_error(ENTRY_POINT_SELECTOR_LOGGER_ID,
+              "Finding closest next milestone failed with error %" PRIu64 "\n",
+              ret);
     return ret;
   }
 
