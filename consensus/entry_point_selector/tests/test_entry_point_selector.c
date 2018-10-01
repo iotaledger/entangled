@@ -36,7 +36,10 @@ void test_entry_point() {
   TRIT_ARRAY_DECLARE(ep, NUM_TRITS_HASH);
   iota_milestone_t ep_milestone;
   iota_milestone_t* ep_milestone_ptr = &ep_milestone;
-  iota_stor_pack_t pack = {(void**)&ep_milestone_ptr, 1, 0, false};
+  iota_stor_pack_t pack = {.models = (void**)&ep_milestone_ptr,
+                           .capacity = 1,
+                           .num_loaded = 0,
+                           .insufficient_capacity = false};
 
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
