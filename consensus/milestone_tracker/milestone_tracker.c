@@ -17,9 +17,9 @@
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
-#include "mam/v1/merkle.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
+#include "utils/merkle.h"
 #include "utils/time.h"
 
 #define MILESTONE_TRACKER_LOGGER_ID "consensus_milestone_tracker"
