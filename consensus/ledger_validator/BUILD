@@ -18,5 +18,6 @@ cc_library(
         "//consensus/snapshot",
         "//consensus/tangle",
         "//gossip/components:requester",
+        "//utils:traversal",
     ],
 )

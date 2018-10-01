@@ -42,3 +42,8 @@ cc_library(
     srcs = ["time.c"],
     hdrs = ["time.h"],
 )
+
+cc_library(
+    name = "traversal",
+    hdrs = ["traversal.h"],
+)

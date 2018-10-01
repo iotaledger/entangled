@@ -7,32 +7,15 @@
 
 #include <inttypes.h>
 
-#include "utlist.h"
-
 #include "common/model/milestone.h"
-#include "common/storage/pack.h"
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/snapshot/snapshot.h"
-#include "consensus/tangle/tangle.h"
-#include "gossip/components/requester.h"
 #include "utils/logger_helper.h"
+#include "utils/traversal.h"
 
 #define LEDGER_VALIDATOR_LOGGER_ID "consensus_ledger_validator"
-
-// TODO move ?
-typedef struct hash_queue_s {
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  struct hash_queue_s *next;
-  struct hash_queue_s *prev;
-} hash_queue_t;
-
-// TODO move ?
-typedef struct hash_set_s {
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  UT_hash_handle hh;
-} hash_set_t;
 
 /*
  * Private functions
