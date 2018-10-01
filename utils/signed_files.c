@@ -10,6 +10,7 @@
 #include "common/curl-p/trit.h"
 #include "common/kerl/kerl.h"
 #include "common/model/bundle.h"
+#include "common/sign/normalize.h"
 #include "common/sign/v1/iss_curl.h"
 #include "common/trinary/trit_long.h"
 #include "common/trinary/tryte_ascii.h"
@@ -55,7 +56,7 @@ retcode_t validate_signature(char const *const signature_filename,
   curl.type = CURL_P_81;
   init_curl(&curl);
 
-  normalize_bundle(digest, normalized_digest);
+  normalize_hash(digest, normalized_digest);
   for (int c = 0; c < TRYTE_HASH_LENGTH; ++c) {
     long_to_trits(normalized_digest[c], &normalized_digest_trits[c * RADIX]);
   }
