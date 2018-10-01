@@ -91,7 +91,7 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot,
 
   if (!testnet) {
     bool valid = false;
-    if ((ret = is_file_signature_valid(
+    if ((ret = iota_file_signature_validate(
              snapshot_file, snapshot_sig_file, (tryte_t *)SNAPSHOT_PUBKEY,
              SNAPSHOT_PUBKEY_DEPTH, SNAPSHOT_INDEX, &valid)) != RC_OK) {
       log_critical(SNAPSHOT_LOGGER_ID,

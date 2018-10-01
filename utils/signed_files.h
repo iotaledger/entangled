@@ -19,20 +19,11 @@
 extern "C" {
 #endif
 
-extern retcode_t is_file_signature_valid(char const *const filename,
-                                         char const *const signature_filename,
-                                         tryte_t const *const public_key,
-                                         size_t depth, size_t index,
-                                         bool *const valid);
-
-extern retcode_t validate_signature(char const *const signature_filename,
-                                    tryte_t const *const public_key,
-                                    size_t depth, size_t index,
-                                    flex_trit_t *const digest,
-                                    bool *const valid);
-
-extern retcode_t digest_file(char const *const filename,
-                             flex_trit_t *const digest);
+retcode_t iota_file_signature_validate(char const *const filename,
+                                       char const *const signature_filename,
+                                       tryte_t const *const public_key,
+                                       size_t depth, size_t index,
+                                       bool *const valid);
 
 #ifdef __cplusplus
 }

@@ -17,24 +17,15 @@
 #include "utils/merkle.h"
 #include "utils/signed_files.h"
 
-retcode_t is_file_signature_valid(char const *const filename,
-                                  char const *const signature_filename,
-                                  tryte_t const *const public_key, size_t depth,
-                                  size_t index, bool *const valid) {
-  retcode_t ret = RC_OK;
-  flex_trit_t digest[FLEX_TRIT_SIZE_243];
+/*
+ * Private functions
+ */
 
-  if ((ret = digest_file(filename, digest))) {
-    return ret;
-  }
-  return validate_signature(signature_filename, public_key, depth, index,
-                            digest, valid);
-}
-
-retcode_t validate_signature(char const *const signature_filename,
-                             tryte_t const *const public_key, size_t depth,
-                             size_t index, flex_trit_t *const digest,
-                             bool *const valid) {
+static retcode_t validate_signature(char const *const signature_filename,
+                                    tryte_t const *const public_key,
+                                    size_t depth, size_t index,
+                                    flex_trit_t *const digest,
+                                    bool *const valid) {
   retcode_t ret = RC_OK;
   Curl curl;
   FILE *fp = NULL;
@@ -103,7 +94,8 @@ done:
   return ret;
 }
 
-retcode_t digest_file(char const *const filename, flex_trit_t *const digest) {
+static retcode_t digest_file(char const *const filename,
+                             flex_trit_t *const digest) {
   retcode_t ret = RC_OK;
   FILE *fp = NULL;
   ssize_t read = 0;
@@ -156,4 +148,23 @@ done:
   }
 
   return ret;
+}
+
+/*
+ * Public functions
+ */
+
+retcode_t iota_file_signature_validate(char const *const filename,
+                                       char const *const signature_filename,
+                                       tryte_t const *const public_key,
+                                       size_t depth, size_t index,
+                                       bool *const valid) {
+  retcode_t ret = RC_OK;
+  flex_trit_t digest[FLEX_TRIT_SIZE_243];
+
+  if ((ret = digest_file(filename, digest))) {
+    return ret;
+  }
+  return validate_signature(signature_filename, public_key, depth, index,
+                            digest, valid);
 }
