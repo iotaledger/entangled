@@ -407,6 +407,8 @@ void transaction_reset(iota_transaction_t transaction) {
   memset(transaction, 0, sizeof(struct _iota_transaction));
   memset(transaction->signature_or_message, FLEX_TRIT_NULL_VALUE,
          sizeof(transaction->signature_or_message));
+  memset(transaction->address, FLEX_TRIT_NULL_VALUE,
+         sizeof(transaction->address));
   memset(transaction->obsolete_tag, FLEX_TRIT_NULL_VALUE,
          sizeof(transaction->obsolete_tag));
   memset(transaction->bundle, FLEX_TRIT_NULL_VALUE,
@@ -416,6 +418,7 @@ void transaction_reset(iota_transaction_t transaction) {
          sizeof(transaction->branch));
   memset(transaction->tag, FLEX_TRIT_NULL_VALUE, sizeof(transaction->tag));
   memset(transaction->nonce, FLEX_TRIT_NULL_VALUE, sizeof(transaction->nonce));
+  memset(transaction->hash, FLEX_TRIT_NULL_VALUE, sizeof(transaction->hash));
 }
 
 /***********************************************************************************************************
