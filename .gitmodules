@@ -1,3 +1,0 @@
-[submodule "ccurl/deps/libopencl-stub"]
-	path = ccurl/deps/libopencl-stub
-	url = https://github.com/iotaledger/libopencl-stub.git
