@@ -15,6 +15,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 void logger_init_json_serializer();
 void logger_destroy_json_serializer();
 

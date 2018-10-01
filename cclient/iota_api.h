@@ -16,6 +16,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 void iota_client_core_init(iota_client_service_t* serv);
 void iota_client_core_destroy();
 
@@ -274,6 +275,7 @@ retcode_t iota_api_store_transactions(
 retcode_t iota_api_check_consistency(const iota_client_service_t* const service,
                                      check_consistency_req_t* req,
                                      check_consistency_res_t* res);
+
 #ifdef __cplusplus
 }
 #endif

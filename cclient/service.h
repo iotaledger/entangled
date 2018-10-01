@@ -8,14 +8,14 @@
 #ifndef CCLIENT_SERVICE_H_
 #define CCLIENT_SERVICE_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdlib.h>
 
 #include "common/errors.h"
 #include "serialization/serializer.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct {
   const char* host;
@@ -30,6 +30,7 @@ typedef struct {
 
 void iota_client_service_init(iota_client_service_t* serv);
 void iota_client_service_destroy();
+
 #ifdef __cplusplus
 }
 #endif

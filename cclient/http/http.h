@@ -17,6 +17,7 @@ extern "C" {
 
 retcode_t iota_service_query(const void* const service_opaque,
                              char_buffer_t* obj, char_buffer_t* response);
+
 #ifdef __cplusplus
 }
 #endif

@@ -8,11 +8,11 @@
 #ifndef CCLIENT_REQUEST_FIND_TRANSACTIONS_H
 #define CCLIENT_REQUEST_FIND_TRANSACTIONS_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 typedef struct {
   /**
