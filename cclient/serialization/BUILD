@@ -10,7 +10,7 @@ cc_library(
     include_prefix = "serializer",
     visibility = ["//visibility:public"],
     deps = [
-        "//cclient/serialization:serializer_base",
+        ":serializer_base",
         "@cJSON",
     ],
 )
@@ -38,7 +38,7 @@ cc_test(
         "tests/test_json.h",
     ],
     deps = [
-        "//cclient/serialization:serializer_json",
+        ":serializer_json",
         "@unity",
     ],
 )
