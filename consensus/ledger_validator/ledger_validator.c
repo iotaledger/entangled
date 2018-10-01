@@ -31,7 +31,10 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
 
   struct _iota_transaction tx;
   iota_transaction_t tx_ptr = &tx;
-  iota_stor_pack_t pack = {(void **)&tx_ptr, 1, 0, false};
+  iota_stor_pack_t pack = {.models = (void **)&tx_ptr,
+                           .capacity = 1,
+                           .num_loaded = 0,
+                           .insufficient_capacity = false};
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 
   // Add milestone hash to the queue as entry point for the traversal
@@ -111,7 +114,10 @@ static retcode_t build_snapshot(ledger_validator_t *const lv,
   retcode_t ret = RC_OK;
   iota_milestone_t milestone;
   iota_milestone_t *milestone_ptr = &milestone;
-  iota_stor_pack_t pack = {(void **)&milestone_ptr, 1, 0, false};
+  iota_stor_pack_t pack = {.models = (void **)&milestone_ptr,
+                           .capacity = 1,
+                           .num_loaded = 0,
+                           .insufficient_capacity = false};
 
   if ((ret = iota_tangle_milestone_load_first(lv->tangle, &pack)) != RC_OK) {
     goto done;
@@ -165,7 +171,10 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
 
   struct _iota_transaction tx;
   iota_transaction_t tx_ptr = &tx, tx_bundle = NULL;
-  iota_stor_pack_t pack = {(void **)&tx_ptr, 1, 0, false};
+  iota_stor_pack_t pack = {.models = (void **)&tx_ptr,
+                           .capacity = 1,
+                           .num_loaded = 0,
+                           .insufficient_capacity = false};
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 
   bool valid_bundle = false;
@@ -331,7 +340,10 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   state_map_t diff = NULL, patch = NULL;
   struct _iota_transaction tx;
   iota_transaction_t tx_ptr = &tx;
-  iota_stor_pack_t pack = {(void **)&tx_ptr, 1, 0, false};
+  iota_stor_pack_t pack = {.models = (void **)&tx_ptr,
+                           .capacity = 1,
+                           .num_loaded = 0,
+                           .insufficient_capacity = false};
   struct _trit_array milestone_hash = {milestone->hash, NUM_TRITS_HASH,
                                        FLEX_TRIT_SIZE_243, 0};
 
