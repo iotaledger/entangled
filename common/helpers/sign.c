@@ -29,12 +29,11 @@ IOTA_EXPORT char* iota_sign_address_gen(char const* const seed,
   trit_t subseed[HASH_LENGTH];
   const size_t key_length = security * ISS_KEY_LENGTH;
 
-  key = calloc(sizeof(trit_t) * key_length, sizeof(trit_t));
+  key = calloc(key_length, sizeof(trit_t));
   if (!key) {
     return NULL;
   }
-  address =
-      calloc(sizeof(tryte_t) * (HASH_LENGTH / RADIX + 1), sizeof(tryte_t));
+  address = calloc(HASH_LENGTH / RADIX + 1, sizeof(tryte_t));
   if (!address) {
     goto cleanup;
   }
@@ -71,12 +70,11 @@ IOTA_EXPORT char* iota_sign_signature_gen(char const* const seed,
   trit_t subseed[HASH_LENGTH];
   const size_t key_length = security * ISS_KEY_LENGTH;
 
-  key = calloc(sizeof(trit_t) * key_length, sizeof(trit_t));
+  key = calloc(key_length, sizeof(trit_t));
   if (!key) {
     return NULL;
   }
-  signature =
-      calloc(sizeof(tryte_t) * (key_length / RADIX + 1), sizeof(tryte_t));
+  signature = calloc(key_length / RADIX + 1, sizeof(tryte_t));
   if (!signature) {
     goto cleanup;
   }
@@ -111,13 +109,12 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_address_gen(
   trit_t subseed[HASH_LENGTH];
   const size_t key_length = security * ISS_KEY_LENGTH;
 
-  key = calloc(sizeof(trit_t) * key_length, sizeof(trit_t));
+  key = calloc(key_length, sizeof(trit_t));
   if (!key) {
     return NULL;
   }
   address =
-      calloc(sizeof(flex_trit_t) * (num_flex_trits_for_trits(HASH_LENGTH) + 1),
-             sizeof(flex_trit_t));
+      calloc(num_flex_trits_for_trits(HASH_LENGTH) + 1, sizeof(flex_trit_t));
   if (!address) {
     goto cleanup;
   }
@@ -154,13 +151,12 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_signature_gen(
   trit_t subseed[HASH_LENGTH];
   const size_t key_length = security * ISS_KEY_LENGTH;
 
-  key = calloc(sizeof(trit_t) * key_length, sizeof(trit_t));
+  key = calloc(key_length, sizeof(trit_t));
   if (!key) {
     return NULL;
   }
   signature =
-      calloc(sizeof(flex_trit_t) * (num_flex_trits_for_trits(key_length) + 1),
-             sizeof(flex_trit_t));
+      calloc(num_flex_trits_for_trits(key_length) + 1, sizeof(flex_trit_t));
   if (!signature) {
     goto cleanup;
   }
