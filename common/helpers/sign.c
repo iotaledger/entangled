@@ -51,9 +51,9 @@ IOTA_EXPORT char* iota_sign_address_gen(char const* const seed,
   kerl_reset(&kerl);
 
   trits_to_trytes(key, (tryte_t*)address, HASH_LENGTH);
+  memset(key, 0, key_length * sizeof(trit_t));
 
 cleanup:
-  memset(key, 0, key_length * sizeof(trit_t));
   free(key);
 
   return address;
@@ -90,8 +90,9 @@ IOTA_EXPORT char* iota_sign_signature_gen(char const* const seed,
   iss_kerl_signature(key, hash, key, key_length, &kerl);
   trits_to_trytes(key, (tryte_t*)signature, key_length);
 
-cleanup:
   memset(key, 0, key_length * sizeof(trit_t));
+
+cleanup:
   free(key);
 
   return (char*)signature;
@@ -134,8 +135,9 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_address_gen(
 
   flex_trits_from_trits(address, HASH_LENGTH, key, key_length, HASH_LENGTH);
 
-cleanup:
   memset(key, 0, key_length * sizeof(trit_t));
+
+cleanup:
   free(key);
 
   return address;
@@ -173,8 +175,9 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_signature_gen(
   iss_kerl_signature(key, hash, key, key_length, &kerl);
   flex_trits_from_trits(signature, key_length, key, key_length, key_length);
 
-cleanup:
   memset(key, 0, key_length * sizeof(trit_t));
+
+cleanup:
   free(key);
 
   return signature;
