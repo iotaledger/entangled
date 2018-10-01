@@ -35,6 +35,7 @@ static retcode_t node_neighbors_init(node_t* const node) {
     if (neighbor_init_with_uri(&neighbor, neighbor_uri)) {
       log_warning(NODE_LOGGER_ID, "Initializing neighbor with URI %s failed\n",
                   neighbor_uri);
+      continue;
     }
     log_info(NODE_LOGGER_ID, "Adding neighbor %s\n", neighbor_uri);
     if (neighbor_add(node->neighbors, neighbor) == false) {
