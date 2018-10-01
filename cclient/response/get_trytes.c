@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "get_trytes.h"
+#include "response/get_trytes.h"
 
 get_trytes_res_t* get_trytes_res_new() { return flex_hash_array_new(); }
 

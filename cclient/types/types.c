@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "types.h"
+#include "types/types.h"
 
 #define TYPES_LOGGER_ID "types"
 

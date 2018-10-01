@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "check_consistency.h"
+#include "request/check_consistency.h"
 
 check_consistency_req_t* check_consistency_req_new() {
   return flex_hash_array_new();

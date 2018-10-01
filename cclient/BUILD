@@ -2,7 +2,6 @@ cc_library(
     name = "api",
     srcs = [
         "iota_api.c",
-        "iota_api.h",
     ],
     hdrs = ["iota_api.h"],
     visibility = ["//visibility:public"],
@@ -16,7 +15,6 @@ cc_library(
     name = "service",
     srcs = [
         "service.c",
-        "service.h",
     ],
     hdrs = ["service.h"],
     visibility = ["//visibility:public"],

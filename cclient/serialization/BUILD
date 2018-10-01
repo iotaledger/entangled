@@ -2,7 +2,6 @@ cc_library(
     name = "serializer_json",
     srcs = glob([
         "json/*.c",
-        "json/*.h",
     ]),
     hdrs = glob([
         "json/*.h",
