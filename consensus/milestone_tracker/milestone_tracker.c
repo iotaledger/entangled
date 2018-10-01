@@ -147,8 +147,8 @@ static void* latest_milestone_tracker(void* arg) {
   struct _iota_transaction tx;
   iota_transaction_t tx_ptr = &tx;
   iota_stor_pack_t tx_pack = {.models = (void**)&tx_ptr,
-                              .num_loaded = 1,
-                              .capacity = 0,
+                              .capacity = 1,
+                              .num_loaded = 0,
                               .insufficient_capacity = false};
   uint64_t scan_time, previous_latest_milestone_index;
 
