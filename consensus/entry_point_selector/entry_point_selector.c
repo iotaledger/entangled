@@ -49,7 +49,7 @@ retcode_t iota_consensus_entry_point_selector_get_entry_point(
   if (pack.num_loaded != 0) {
     memcpy(ep->trits, milestone.hash, FLEX_TRIT_SIZE_243);
   } else {
-    memcpy(ep->trits, eps->mt->latest_solid_subtangle_milestone,
+    memcpy(ep->trits, eps->mt->latest_solid_subtangle_milestone->trits,
            FLEX_TRIT_SIZE_243);
   }
 
