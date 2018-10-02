@@ -131,6 +131,7 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
 
   TEST_ASSERT(bundle_validate_destroy() == RC_OK);
   trit_array_free(tail_hash);
+  trit_array_free(ep);
   bundle_transactions_free(&bundle);
   transaction_free(tx1);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
@@ -175,6 +176,7 @@ void test_bundle_exceed_supply_pos_invalid() {
 
   TEST_ASSERT(bundle_validate_destroy() == RC_OK);
   trit_array_free(tail_hash);
+  trit_array_free(ep);
   bundle_transactions_free(&bundle);
   transaction_free(tx1);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
@@ -219,6 +221,7 @@ void test_bundle_exceed_supply_neg_invalid() {
 
   TEST_ASSERT(bundle_validate_destroy() == RC_OK);
   trit_array_free(tail_hash);
+  trit_array_free(ep);
   bundle_transactions_free(&bundle);
   transaction_free(tx1);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
@@ -285,6 +288,7 @@ void test_bundle_validate_size_4_value_wrong_sig_invalid() {
 
   TEST_ASSERT(bundle_validate_destroy() == RC_OK);
   trit_array_free(tail_hash);
+  trit_array_free(ep);
   bundle_transactions_free(&bundle);
   transaction_free(tx1);
   transaction_free(tx2);
