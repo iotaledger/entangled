@@ -171,6 +171,9 @@ void test_deserialize_get_node_info(void) {
                         node_info->trans_to_request);
 
   get_node_info_res_free(&node_info);
+
+  trit_array_free(last_m);
+  trit_array_free(last_sm);
 }
 
 void test_serialize_get_neighbors(void) {
