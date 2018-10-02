@@ -121,7 +121,10 @@ retcode_t load_bundle_transactions(const tangle_t* const tangle,
   iota_transaction_t curr_tx = &curr_tx_s;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
 
-  iota_stor_pack_t pack = {(void**)(&curr_tx), 1, 0, false};
+  iota_stor_pack_t pack = {.models = (void**)(&curr_tx),
+                           .capacity = 1,
+                           .num_loaded = 0,
+                           .insufficient_capacity = false};
 
   res = iota_tangle_transaction_load(tangle, TRANSACTION_COL_HASH, tail_hash,
                                      &pack);

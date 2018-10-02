@@ -146,7 +146,10 @@ static void* latest_milestone_tracker(void* arg) {
   iota_milestone_t candidate;
   struct _iota_transaction tx;
   iota_transaction_t tx_ptr = &tx;
-  iota_stor_pack_t tx_pack = {(void**)&tx_ptr, 1, 0, false};
+  iota_stor_pack_t tx_pack = {.models = (void**)&tx_ptr,
+                              .capacity = 1,
+                              .num_loaded = 0,
+                              .insufficient_capacity = false};
   uint64_t scan_time, previous_latest_milestone_index;
 
   if (mt == NULL) {
@@ -201,7 +204,10 @@ static retcode_t update_latest_solid_subtangle_milestone(
   iota_milestone_t milestone, latest_milestone;
   iota_milestone_t *milestone_ptr = &milestone,
                    *latest_milestone_ptr = &latest_milestone;
-  iota_stor_pack_t pack = {(void**)&latest_milestone_ptr, 1, 0, false};
+  iota_stor_pack_t pack = {.models = (void**)&latest_milestone_ptr,
+                           .capacity = 1,
+                           .num_loaded = 0,
+                           .insufficient_capacity = false};
 
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;

@@ -27,7 +27,7 @@ IOTA_EXPORT char* iota_checksum(const char* input, const size_t input_length,
   }
 
   trit_t trits_hash[HASH_LENGTH];
-  trit_t* trits = calloc(sizeof(trit_t) * input_length * RADIX, sizeof(trit_t));
+  trit_t* trits = calloc(input_length * RADIX, sizeof(trit_t));
   if (!trits) {
     return NULL;
   }
@@ -35,8 +35,7 @@ IOTA_EXPORT char* iota_checksum(const char* input, const size_t input_length,
   kerl_hash(trits, input_length * RADIX, trits_hash, &kerl);
   free(trits);
 
-  char* checksum_trytes =
-      calloc(sizeof(tryte_t) * checksum_length, sizeof(tryte_t));
+  char* checksum_trytes = calloc(checksum_length, sizeof(tryte_t));
   if (!checksum_trytes) {
     return NULL;
   }
@@ -57,7 +56,7 @@ IOTA_EXPORT flex_trit_t* iota_flex_checksum(const flex_trit_t* flex_trits,
   }
 
   trit_t trits_hash[HASH_LENGTH];
-  trit_t* trits = (trit_t*)calloc(sizeof(trit_t) * num_trits, sizeof(trit_t));
+  trit_t* trits = (trit_t*)calloc(num_trits, sizeof(trit_t));
   if (!trits) {
     return NULL;
   }
@@ -67,7 +66,7 @@ IOTA_EXPORT flex_trit_t* iota_flex_checksum(const flex_trit_t* flex_trits,
 
   size_t flex_len = num_flex_trits_for_trits(num_trits);
   flex_trit_t* checksum_flex_trits =
-      (flex_trit_t*)calloc(sizeof(flex_trit_t) * flex_len, sizeof(flex_trit_t));
+      (flex_trit_t*)calloc(flex_len, sizeof(flex_trit_t));
   if (!checksum_flex_trits) {
     return NULL;
   }
