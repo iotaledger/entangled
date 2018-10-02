@@ -154,6 +154,7 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
+  trit_array_free(curr_hash);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
@@ -434,6 +435,7 @@ void test_cw_topology_two_inequal_tips(void) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
+  trit_array_free(curr_hash);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
 }
