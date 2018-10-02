@@ -17,8 +17,8 @@
 extern "C" {
 #endif
 
-void iota_client_core_init(iota_client_service_t* serv);
-void iota_client_core_destroy();
+retcode_t iota_client_core_init(iota_client_service_t* serv);
+void iota_client_core_destroy(iota_client_service_t* serv);
 
 /**
  * Returns information about your node.

@@ -17,6 +17,12 @@
 extern "C" {
 #endif
 
+enum serializer_type_t {
+  SR_JSON = 0,
+  SR_UNIMPLEMENTED,
+};
+typedef enum serializer_type_t serializer_type_t;
+
 typedef struct {
   const char* host;
   size_t port;
@@ -26,10 +32,11 @@ typedef struct {
 typedef struct {
   http_info_t http;
   serializer_t serializer;
+  serializer_type_t serializer_type;
 } iota_client_service_t;
 
-void iota_client_service_init(iota_client_service_t* serv);
-void iota_client_service_destroy();
+retcode_t iota_client_service_init(iota_client_service_t* serv);
+void iota_client_service_destroy(iota_client_service_t* serv);
 
 #ifdef __cplusplus
 }
