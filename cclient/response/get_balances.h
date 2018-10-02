@@ -15,7 +15,7 @@ extern "C" {
 #include "types/types.h"
 
 typedef struct {
-  int_array_array* balances;
+  UT_array* balances;
   int milestoneIndex;
   flex_hash_array_t* milestone;
 } get_balances_res_t;

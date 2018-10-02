@@ -439,7 +439,7 @@ retcode_t json_get_balances_deserialize_response(const serializer_t* const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_array_to_int_array_array(json_obj, "balances", (*out)->balances);
+  ret = json_array_to_utarray(json_obj, "balances", (*out)->balances);
   if (ret != RC_OK) {
     goto end;
   }

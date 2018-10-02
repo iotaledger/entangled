@@ -26,11 +26,7 @@ UT_icd ut_neighbor_icd = {sizeof(neighbor_info_t), NULL, neighbor_info_t_copy,
                           neighbor_info_t_dtor};
 
 get_neighbors_res_t* get_neighbors_res_new() {
-  get_neighbors_res_t* nbors =
-      (get_neighbors_res_t*)malloc(sizeof(get_neighbors_res_t));
-  if (nbors == NULL) {
-    return NULL;
-  }
+  get_neighbors_res_t* nbors = NULL;
   utarray_new(nbors, &ut_neighbor_icd);
   return nbors;
 }
@@ -55,17 +51,12 @@ neighbor_info_t* get_neighbors_res_create_neighbor(char_buffer_t* addr,
 retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* nbors,
                                          char_buffer_t* addr, int all_trans,
                                          int invalid_trans, int new_trans) {
-  retcode_t ret = RC_OK;
-  neighbor_info_t* nb = (neighbor_info_t*)malloc(sizeof(neighbor_info_t));
-  if (nb == NULL) {
-    return RC_CCLIENT_OOM;
-  }
-  nb->address = addr;
-  nb->all_trans_num = all_trans;
-  nb->invalid_trans_num = invalid_trans;
-  nb->new_trans_num = new_trans;
-  utarray_push_back(nbors, nb);
-  return ret;
+  neighbor_info_t nb = {.address = addr,
+                        .all_trans_num = all_trans,
+                        .invalid_trans_num = invalid_trans,
+                        .new_trans_num = new_trans};
+  utarray_push_back(nbors, &nb);
+  return RC_OK;
 }
 
 neighbor_info_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* nbors,

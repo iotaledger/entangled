@@ -10,25 +10,24 @@
 get_balances_res_t* get_balances_res_new() {
   get_balances_res_t* res =
       (get_balances_res_t*)malloc(sizeof(get_balances_res_t));
-
-  res->balances = int_array_array_new();
-  res->milestone = flex_hash_array_new();
+  if (res) {
+    utarray_new(res->balances, &ut_str_icd);
+    res->milestone = flex_hash_array_new();
+  }
   return res;
 }
 
 void get_balances_res_free(get_balances_res_t* res) {
   if (res) {
-    int_array_array_free(res->balances);
+    utarray_free(res->balances);
     flex_hash_array_free(res->milestone);
     free(res);
   }
 }
 
 char* get_balances_res_balances_at(get_balances_res_t* in, int index) {
-  if (in->balances->size > index) {
-    return int_array_to_string(in->balances->array + index);
-  }
-  return NULL;
+  char** p = (char**)utarray_eltptr(in->balances, index);
+  return *p;
 }
 
 trit_array_p get_balances_res_milestone_at(get_balances_res_t* in, int index) {
