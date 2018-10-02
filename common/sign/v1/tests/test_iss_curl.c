@@ -25,7 +25,7 @@ void test_subseed(trit_t *seed, trit_t *subseed, int64_t i, Curl *curl) {
 
   iss_curl_subseed(seed, subseed, i, curl);
 
-  trits_to_trytes(subseed, tryte_seed, HASH_LENGTH);
+  trits_to_trytes(subseed, tryte_seed, HASH_LENGTH_TRIT);
   TEST_ASSERT_EQUAL_MEMORY(EXPECT_SUBSEED, tryte_seed, strlen(EXPECT_SUBSEED));
 }
 #undef EXPECT_SUBSEED
@@ -78,22 +78,22 @@ void test_key(trit_t *s, trit_t *k, size_t l, Curl *c) {
 
 void test_addy(trit_t *k, size_t l, Curl *c) {
   tryte_t addy_trytes[l];
-  addy_trytes[HASH_LENGTH / 3] = 0;
+  addy_trytes[HASH_LENGTH_TRIT / 3] = 0;
 
   iss_curl_key_digest(k, k, l, c);
-  iss_curl_address(k, k, HASH_LENGTH, c);
+  iss_curl_address(k, k, HASH_LENGTH_TRIT, c);
 
   trits_to_trytes(k, addy_trytes, l);
 
   TEST_ASSERT_EQUAL_MEMORY(EXP_ADDY, addy_trytes,
-                           HASH_LENGTH / 3 * sizeof(tryte_t));
+                           HASH_LENGTH_TRIT / 3 * sizeof(tryte_t));
 }
 #undef EXP_ADDY
 
 void test_iss() {
   const size_t key_length = ISS_KEY_LENGTH;
-  trit_t seed[HASH_LENGTH];
-  trit_t subseed[HASH_LENGTH];
+  trit_t seed[HASH_LENGTH_TRIT];
+  trit_t subseed[HASH_LENGTH_TRIT];
   trit_t key[key_length];
   int64_t index = 0;
 

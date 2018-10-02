@@ -5,11 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "hamming.h"
 #include <stdio.h>
-#include "ptrit.h"
-#include "search.h"
-#include "trit.h"
+
+#include "common/curl-p/hamming.h"
+#include "common/curl-p/ptrit.h"
+#include "common/curl-p/search.h"
+#include "common/curl-p/trit.h"
 
 short test(PCurl *const curl, unsigned short const security) {
   unsigned short i, j, k;
@@ -18,7 +19,8 @@ short test(PCurl *const curl, unsigned short const security) {
     sum = 0;
 
     for (j = 0; j < security; j++) {
-      for (k = j * HASH_LENGTH / 3; k < (j + 1) * HASH_LENGTH / 3; k++) {
+      for (k = j * HASH_LENGTH_TRIT / 3; k < (j + 1) * HASH_LENGTH_TRIT / 3;
+           k++) {
         if ((curl->state[k].low & (1uLL << i)) == 0) {
           sum--;
         } else if ((curl->state[k].high & (1uLL << i)) == 0) {

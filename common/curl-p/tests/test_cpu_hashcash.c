@@ -23,20 +23,20 @@
       1, -1, -1, -1, 0, 1, 0, -1, -1, 0, 1, 0, 0, 0, 1, -1, 1, -1, 0, 1, -1,   \
       -1, 0, 0, 0, -1, -1, 1, 1, 0, 1, -1, 0, 0, 0, -1, 0, -1, 0, -1, -1, -1,  \
       -1, 0, 1, -1, -1, 0, 1
-const trit_t zeros[HASH_LENGTH] = {0};
+const trit_t zeros[HASH_LENGTH_TRIT] = {0};
 
 void run_pd_test(CurlType type, unsigned short mwm) {
   Curl curl;
   curl.type = type;
   trit_t trits[] = {TRYTES_IN};
-  trit_t hash[HASH_LENGTH];
+  trit_t hash[HASH_LENGTH_TRIT];
   init_curl(&curl);
-  curl_absorb(&curl, trits, HASH_LENGTH);
-  PearlDiverStatus result = hashcash(&curl, BODY, 0, HASH_LENGTH, mwm);
-  curl_squeeze(&curl, hash, HASH_LENGTH);
+  curl_absorb(&curl, trits, HASH_LENGTH_TRIT);
+  PearlDiverStatus result = hashcash(&curl, BODY, 0, HASH_LENGTH_TRIT, mwm);
+  curl_squeeze(&curl, hash, HASH_LENGTH_TRIT);
 
   TEST_ASSERT_EQUAL_INT8(PEARL_DIVER_SUCCESS, result);
-  TEST_ASSERT_EQUAL_INT8_ARRAY(zeros, &(curl.state[HASH_LENGTH - mwm]),
+  TEST_ASSERT_EQUAL_INT8_ARRAY(zeros, &(curl.state[HASH_LENGTH_TRIT - mwm]),
                                mwm * sizeof(trit_t));
   curl_reset(&curl);
 }

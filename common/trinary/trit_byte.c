@@ -5,11 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "trit_byte.h"
 #include <assert.h>
+
+#include "common/defs.h"
+#include "common/trinary/trit_byte.h"
 #include "utils/macros.h"
 
-#define RADIX 3
 static const byte_t byte_radix[] = {1, 3, 9, 27, 81};
 
 void trits_to_bytes(trit_t *trits, byte_t *bytes, size_t num_trits) {

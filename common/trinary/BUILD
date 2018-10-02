@@ -53,6 +53,7 @@ cc_library(
         ":bytes",
         ":trits",
         "//utils:macros",
+        "//common:defs",
     ],
 )
 
@@ -63,6 +64,7 @@ cc_library(
     deps = [
         ":trits",
         ":tryte",
+        "//common:defs",
     ],
 )
 
@@ -72,6 +74,7 @@ cc_library(
     hdrs = ["trit_long.h"],
     deps = [
         ":trits",
+        "//common:defs",
         "//common:stdint",
     ],
 )
@@ -111,6 +114,7 @@ cc_library(
     hdrs = ["tryte_ascii.h"],
     deps = [
         ":tryte",
+        "//common:defs",
     ],
 )
 

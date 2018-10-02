@@ -6,8 +6,7 @@
  */
 
 #include "common/trinary/tryte_ascii.h"
-
-#define TRYTE_ALPHABET "9ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#include "common/defs.h"
 
 void ascii_to_trytes(char const *const input, tryte_t *const output) {
   int j = 0, dec = 0, first = 0, second = 0;

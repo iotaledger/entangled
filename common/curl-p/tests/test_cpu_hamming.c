@@ -25,21 +25,22 @@
       1, -1, -1, -1, 0, 1, 0, -1, -1, 0, 1, 0, 0, 0, 1, -1, 1, -1, 0, 1, -1,   \
       -1, 0, 0, 0, -1, -1, 1, 1, 0, 1, -1, 0, 0, 0, -1, 0, -1, 0, -1, -1, -1,  \
       -1, 0, 1, -1, -1, 0, 1
-const trit_t zeros[HASH_LENGTH] = {0};
+const trit_t zeros[HASH_LENGTH_TRIT] = {0};
 
 void run_pd_test(Curl *curl, size_t security) {
   unsigned short i, j;
   short sum;
   trit_t trits[] = {TRYTES_IN};
-  trit_t hash[HASH_LENGTH];
+  trit_t hash[HASH_LENGTH_TRIT];
   init_curl(curl);
-  curl_absorb(curl, trits, HASH_LENGTH);
-  PearlDiverStatus result = hamming(curl, 0, HASH_LENGTH, security);
+  curl_absorb(curl, trits, HASH_LENGTH_TRIT);
+  PearlDiverStatus result = hamming(curl, 0, HASH_LENGTH_TRIT, security);
   TEST_ASSERT_EQUAL_INT(PEARL_DIVER_SUCCESS, result);
-  curl_squeeze(curl, hash, HASH_LENGTH);
+  curl_squeeze(curl, hash, HASH_LENGTH_TRIT);
 
   for (sum = 0, i = 0; i < security; i++) {
-    for (j = i * HASH_LENGTH / 3; j < (i + 1) * HASH_LENGTH / 3; j++) {
+    for (j = i * HASH_LENGTH_TRIT / 3; j < (i + 1) * HASH_LENGTH_TRIT / 3;
+         j++) {
       sum += curl->state[j];
     }
     if (i < security - 1) {

@@ -6,15 +6,16 @@
  */
 
 #include "common/sign/normalize.h"
+#include "common/defs.h"
 #include "common/trinary/trit_long.h"
 
 void normalize_hash(flex_trit_t const *const hash,
                     byte_t *const normalized_hash) {
-  trit_t hash_trits[NUM_TRITS_HASH];
-  flex_trits_to_trits(hash_trits, NUM_TRITS_HASH, hash, NUM_TRITS_HASH,
-                      NUM_TRITS_HASH);
+  trit_t hash_trits[HASH_LENGTH_TRIT];
+  flex_trits_to_trits(hash_trits, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT,
+                      HASH_LENGTH_TRIT);
 
-  for (int i = 0; i < NUMBER_OF_SECURITY_LEVELS; i++) {
+  for (int i = 0; i < SECURITY_LEVEL_MAX; i++) {
     int sum = 0;
     for (int j = i * NORMALIZED_FRAGMENT_LENGTH;
          j < (i + 1) * NORMALIZED_FRAGMENT_LENGTH; j++) {
@@ -27,7 +28,7 @@ void normalize_hash(flex_trit_t const *const hash,
       while (sum-- > 0) {
         for (int j = i * NORMALIZED_FRAGMENT_LENGTH;
              j < (i + 1) * NORMALIZED_FRAGMENT_LENGTH; j++) {
-          if (normalized_hash[j] > MIN_TRYTE_VALUE) {
+          if (normalized_hash[j] > TRYTE_VALUE_MIN) {
             normalized_hash[j]--;
             break;
           }
@@ -37,7 +38,7 @@ void normalize_hash(flex_trit_t const *const hash,
       while (sum++ < 0) {
         for (int j = i * NORMALIZED_FRAGMENT_LENGTH;
              j < (i + 1) * NORMALIZED_FRAGMENT_LENGTH; j++) {
-          if (normalized_hash[j] < MAX_TRYTE_VALUE) {
+          if (normalized_hash[j] < TRYTE_VALUE_MAX) {
             normalized_hash[j]++;
             break;
           }

@@ -12,11 +12,11 @@
 
 void run_curl_p_test(PCurl *curl, ptrit_t *exp) {
   ptrit_t trits[] = {TRYTES_IN};
-  ptrit_t hash[HASH_LENGTH];
+  ptrit_t hash[HASH_LENGTH_TRIT];
 
   init_ptrit_curl(curl);
   ptrit_curl_absorb(curl, trits, 6);
-  ptrit_curl_squeeze(curl, hash, HASH_LENGTH);
+  ptrit_curl_squeeze(curl, hash, HASH_LENGTH_TRIT);
   ptrit_curl_reset(curl);
 
   // TEST_ASSERT_EQUAL_MEMORY (exp, hash, sizeof(hash));

@@ -7,5 +7,6 @@ cc_library(
     deps = [
         "//common/trinary:flex_trit",
         "//common/trinary:trit_long",
+        "//common:defs",
     ],
 )
