@@ -35,7 +35,7 @@ IOTA_EXPORT char* iota_checksum(const char* input, const size_t input_length,
   kerl_hash(trits, input_length * RADIX, trits_hash, &kerl);
   free(trits);
 
-  char* checksum_trytes = calloc(checksum_length, sizeof(tryte_t));
+  char* checksum_trytes = calloc(checksum_length + 1, sizeof(tryte_t));
   if (!checksum_trytes) {
     return NULL;
   }
