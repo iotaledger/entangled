@@ -78,20 +78,9 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
     free(tmp);
   }
 
-done : {
-  hash_queue_t *iter_q, *tmp_q1, *tmp_q2;
-  hash_set_t *iter_s, *tmp_s;
-
-  CDL_FOREACH_SAFE(non_analyzed_hashes, iter_q, tmp_q1, tmp_q2) {
-    CDL_DELETE(non_analyzed_hashes, iter_q);
-    free(iter_q);
-  }
-
-  HASH_ITER(hh, analyzed_hashes, iter_s, tmp_s) {
-    HASH_DEL(analyzed_hashes, iter_s);
-    free(iter_s);
-  }
-}
+done:
+  hash_queue_free(&non_analyzed_hashes);
+  hash_set_free(&analyzed_hashes);
   return ret;
 }
 
@@ -250,20 +239,9 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
     CDL_DELETE(non_analyzed_hashes, non_analyzed_hashes);
     free(tmp);
   }
-done : {
-  hash_queue_t *iter_q, *tmp_q1, *tmp_q2;
-  hash_set_t *iter_s, *tmp_s;
-
-  CDL_FOREACH_SAFE(non_analyzed_hashes, iter_q, tmp_q1, tmp_q2) {
-    CDL_DELETE(non_analyzed_hashes, iter_q);
-    free(iter_q);
-  }
-
-  HASH_ITER(hh, *analyzed_hashes, iter_s, tmp_s) {
-    HASH_DEL(*analyzed_hashes, iter_s);
-    free(iter_s);
-  }
-}
+done:
+  hash_queue_free(&non_analyzed_hashes);
+  hash_set_free(&analyzed_hashes);
   return ret;
 }
 

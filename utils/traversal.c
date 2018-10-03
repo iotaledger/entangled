@@ -18,6 +18,16 @@ extern retcode_t hash_queue_add(hash_queue_t **queue, flex_trit_t *hash) {
   return RC_OK;
 }
 
+extern retcode_t hash_queue_free(hash_queue_t **queue) {
+  hash_queue_t *iter, *tmp1, *tmp2;
+
+  CDL_FOREACH_SAFE(*queue, iter, tmp1, tmp2) {
+    CDL_DELETE(*queue, iter);
+    free(iter);
+  }
+  return RC_OK;
+}
+
 extern retcode_t hash_set_add(hash_set_t **set, flex_trit_t *hash) {
   hash_set_t *elem = NULL;
 
@@ -26,5 +36,15 @@ extern retcode_t hash_set_add(hash_set_t **set, flex_trit_t *hash) {
   }
   memcpy(elem->hash, hash, FLEX_TRIT_SIZE_243);
   HASH_ADD(hh, *set, hash, FLEX_TRIT_SIZE_243, elem);
+  return RC_OK;
+}
+
+extern retcode_t hash_set_free(hash_set_t **set) {
+  hash_set_t *iter, *tmp;
+
+  HASH_ITER(hh, *set, iter, tmp) {
+    HASH_DEL(*set, iter);
+    free(iter);
+  }
   return RC_OK;
 }
