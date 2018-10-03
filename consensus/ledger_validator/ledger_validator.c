@@ -231,7 +231,7 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
         }
       }
       // Mark current hash as visited
-      if ((ret = hash_set_add(&analyzed_hashes, tx_hash.trits)) != RC_OK) {
+      if ((ret = hash_set_add(analyzed_hashes, tx_hash.trits)) != RC_OK) {
         goto done;
       }
     }
@@ -241,7 +241,7 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
   }
 done:
   hash_queue_free(&non_analyzed_hashes);
-  hash_set_free(&analyzed_hashes);
+  hash_set_free(analyzed_hashes);
   return ret;
 }
 
