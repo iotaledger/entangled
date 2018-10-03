@@ -131,7 +131,6 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
   retcode_t ret = RC_OK;
   int number_of_analyzed_transactions = 0;
   hash_queue_t *non_analyzed_hashes = NULL;
-  hash_set_t *hash_set_elem = NULL;
   state_entry_t *entry, *new;
 
   struct _iota_transaction tx;
@@ -150,13 +149,12 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
     goto done;
   }
 
-  // Add null hash to the set of visited hashes
-  if ((hash_set_elem = malloc(sizeof(hash_set_t))) == NULL) {
-    ret = RC_LEDGER_VALIDATOR_OOM;
-    goto done;
+  {
+    flex_trit_t null_hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
+    if ((ret = hash_set_add(analyzed_hashes, null_hash)) != RC_OK) {
+      goto done;
+    }
   }
-  memset(hash_set_elem->hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
-  HASH_ADD(hh, *analyzed_hashes, hash, FLEX_TRIT_SIZE_243, hash_set_elem);
 
   while (non_analyzed_hashes != NULL) {
     tx_hash.trits = hash_queue_peek(non_analyzed_hashes);
