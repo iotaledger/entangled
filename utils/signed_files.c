@@ -80,9 +80,6 @@ static retcode_t validate_signature(char const *const signature_filename,
     }
     trytes_to_trits((tryte_t *)line, siblings, read);
     merkle_root(root, siblings, depth, index, &curl);
-  } else if (read < 0) {
-    ret = RC_UTILS_INVALID_SIG_FILE;
-    goto done;
   }
   trytes_to_trits(public_key, public_key_trits, HASH_LENGTH_TRYTE);
   *valid = (memcmp(public_key_trits, root, HASH_LENGTH_TRIT) == 0);
@@ -90,6 +87,9 @@ static retcode_t validate_signature(char const *const signature_filename,
 done:
   if (fp) {
     fclose(fp);
+  }
+  if (line) {
+    free(line);
   }
   return ret;
 }
