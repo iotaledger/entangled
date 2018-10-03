@@ -177,10 +177,8 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
                                      &valid_bundle)) != RC_OK) {
             goto done;
           }
-          if (valid_bundle &&
-              (tx_bundle = (iota_transaction_t)utarray_eltptr(bundle, 0)) !=
-                  NULL &&
-              memcmp(tx_bundle->hash, tx_hash.trits, FLEX_TRIT_SIZE_243) == 0) {
+          if (valid_bundle && (tx_bundle = (iota_transaction_t)utarray_eltptr(
+                                   bundle, 0)) != NULL) {
             while (tx_bundle != NULL) {
               if (tx_bundle->value != 0) {
                 // TODO countedTx.add(bundleTransactionViewModel.getHash()))
