@@ -17,3 +17,14 @@ extern retcode_t hash_queue_add(hash_queue_t **queue, flex_trit_t *hash) {
   CDL_APPEND(*queue, elem);
   return RC_OK;
 }
+
+extern retcode_t hash_set_add(hash_set_t **set, flex_trit_t *hash) {
+  hash_set_t *elem = NULL;
+
+  if ((elem = malloc(sizeof(hash_set_t))) == NULL) {
+    return RC_UTILS_OOM;
+  }
+  memcpy(elem->hash, hash, FLEX_TRIT_SIZE_243);
+  HASH_ADD(hh, *set, hash, FLEX_TRIT_SIZE_243, elem);
+  return RC_OK;
+}

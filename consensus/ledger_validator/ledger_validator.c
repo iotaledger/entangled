@@ -68,12 +68,9 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
         }
       }
       // Mark current hash as visited
-      if ((hash_set_elem = malloc(sizeof(hash_set_t))) == NULL) {
-        ret = RC_LEDGER_VALIDATOR_OOM;
+      if ((ret = hash_set_add(&analyzed_hashes, tx_hash.trits)) != RC_OK) {
         goto done;
       }
-      memcpy(hash_set_elem->hash, tx_hash.trits, FLEX_TRIT_SIZE_243);
-      HASH_ADD(hh, analyzed_hashes, hash, FLEX_TRIT_SIZE_243, hash_set_elem);
     }
     // Remove current hash from the queue
     tmp = non_analyzed_hashes;
@@ -245,12 +242,9 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
         }
       }
       // Mark current hash as visited
-      if ((hash_set_elem = malloc(sizeof(hash_set_t))) == NULL) {
-        ret = RC_LEDGER_VALIDATOR_OOM;
+      if ((ret = hash_set_add(&analyzed_hashes, tx_hash.trits)) != RC_OK) {
         goto done;
       }
-      memcpy(hash_set_elem->hash, tx_hash.trits, FLEX_TRIT_SIZE_243);
-      HASH_ADD(hh, *analyzed_hashes, hash, FLEX_TRIT_SIZE_243, hash_set_elem);
     }
     tmp = non_analyzed_hashes;
     CDL_DELETE(non_analyzed_hashes, non_analyzed_hashes);
