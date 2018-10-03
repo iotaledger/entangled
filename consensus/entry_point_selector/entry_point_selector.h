@@ -37,7 +37,7 @@ typedef struct entry_point_selector_s {
  *
  * @return a status code
  */
-extern retcode_t iota_consensus_entry_point_selector_init(
+retcode_t iota_consensus_entry_point_selector_init(
     entry_point_selector_t *const eps, milestone_tracker_t *const mt,
     tangle_t *const tangle, bool const testnet);
 
@@ -52,7 +52,7 @@ extern retcode_t iota_consensus_entry_point_selector_init(
  *
  * @return a status code
  */
-extern retcode_t iota_consensus_entry_point_selector_get_entry_point(
+retcode_t iota_consensus_entry_point_selector_get_entry_point(
     entry_point_selector_t *const eps, size_t const depth,
     trit_array_p const ep);
 
@@ -63,7 +63,7 @@ extern retcode_t iota_consensus_entry_point_selector_get_entry_point(
  *
  * @return a status code
  */
-extern retcode_t iota_consensus_entry_point_selector_destroy(
+retcode_t iota_consensus_entry_point_selector_destroy(
     entry_point_selector_t *const eps);
 
 #ifdef __cplusplus
