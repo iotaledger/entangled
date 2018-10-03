@@ -36,6 +36,12 @@ extern char* iota_statement_milestone_select_next;
 extern char* iota_statement_milestone_exist;
 extern char* iota_statement_milestone_exist_by_hash;
 
+/*
+ * State diff statements
+ */
+
+extern char* iota_statement_state_diff_store;
+
 #ifdef __cplusplus
 }
 #endif

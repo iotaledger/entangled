@@ -77,3 +77,11 @@ char *iota_statement_milestone_exist =
 char *iota_statement_milestone_exist_by_hash =
     "SELECT 1 WHERE EXISTS(SELECT 1 "
     "FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?)";
+
+/*
+ * State diff statements
+ */
+
+char *iota_statement_state_diff_store =
+    "UPDATE " MILESTONE_TABLE_NAME " SET " MILESTONE_COL_DIFF
+    "=? WHERE " MILESTONE_COL_INDEX "=?";
