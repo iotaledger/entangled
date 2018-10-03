@@ -308,7 +308,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
       log_error(LEDGER_VALIDATOR_LOGGER_ID, "Creating patch failed\n");
       goto done;
     }
-    *has_snapshot = iota_snapshot_is_state_consistent(&patch);
+    *has_snapshot = patch != NULL && iota_snapshot_is_state_consistent(&patch);
     if (*has_snapshot) {
       if ((ret = update_snapshot_milestone(lv, milestone->hash,
                                            milestone->index)) != RC_OK) {
