@@ -4,6 +4,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
+        "//consensus/snapshot",
+        "//utils:traversal",
     ],
 )
 
