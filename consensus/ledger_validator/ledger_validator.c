@@ -53,7 +53,6 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
                  lv->tangle, tx.hash, index)) != RC_OK) {
           goto done;
         }
-        // TODO update snapshot index
         // TODO messageQ publish
         if ((ret = hash_queue_push(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
           goto done;
