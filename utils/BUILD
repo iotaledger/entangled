@@ -45,5 +45,11 @@ cc_library(
 
 cc_library(
     name = "traversal",
+    srcs = ["traversal.c"],
     hdrs = ["traversal.h"],
+    deps = [
+        "//common:errors",
+        "//common/trinary:flex_trit",
+        "@com_github_uthash//:uthash",
+    ],
 )

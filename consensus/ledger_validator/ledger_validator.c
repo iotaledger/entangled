@@ -25,8 +25,7 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
                                            flex_trit_t *const milestone_hash,
                                            uint64_t index) {
   retcode_t ret = RC_OK;
-  hash_queue_t *non_analyzed_hashes = NULL, *hash_queue_elem = NULL,
-               *tmp = NULL;
+  hash_queue_t *non_analyzed_hashes = NULL, *tmp = NULL;
   hash_set_t *analyzed_hashes = NULL, *hash_set_elem = NULL;
 
   struct _iota_transaction tx;
@@ -38,12 +37,9 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 
   // Add milestone hash to the queue as entry point for the traversal
-  if ((hash_queue_elem = malloc(sizeof(hash_queue_t))) == NULL) {
-    ret = RC_LEDGER_VALIDATOR_OOM;
+  if ((ret = hash_queue_add(&non_analyzed_hashes, milestone_hash)) != RC_OK) {
     goto done;
   }
-  memcpy(hash_queue_elem->hash, milestone_hash, FLEX_TRIT_SIZE_243);
-  CDL_APPEND(non_analyzed_hashes, hash_queue_elem);
 
   while (non_analyzed_hashes != NULL) {
     tx_hash.trits = non_analyzed_hashes->hash;
@@ -63,19 +59,13 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
         // TODO update snapshot index
         // TODO messageQ publish
         // Add trunk hash to the queue
-        if ((hash_queue_elem = malloc(sizeof(hash_queue_t))) == NULL) {
-          ret = RC_LEDGER_VALIDATOR_OOM;
+        if ((ret = hash_queue_add(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
           goto done;
         }
-        memcpy(hash_queue_elem->hash, tx.trunk, FLEX_TRIT_SIZE_243);
-        CDL_APPEND(non_analyzed_hashes, hash_queue_elem);
         // Add branch hash to the queue
-        if ((hash_queue_elem = malloc(sizeof(hash_queue_t))) == NULL) {
-          ret = RC_LEDGER_VALIDATOR_OOM;
+        if ((ret = hash_queue_add(&non_analyzed_hashes, tx.branch)) != RC_OK) {
           goto done;
         }
-        memcpy(hash_queue_elem->hash, tx.branch, FLEX_TRIT_SIZE_243);
-        CDL_APPEND(non_analyzed_hashes, hash_queue_elem);
       }
       // Mark current hash as visited
       if ((hash_set_elem = malloc(sizeof(hash_set_t))) == NULL) {
@@ -164,8 +154,7 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
                                  bool is_milestone, bool *valid_diff) {
   retcode_t ret = RC_OK;
   int number_of_analyzed_transactions = 0;
-  hash_queue_t *non_analyzed_hashes = NULL, *hash_queue_elem = NULL,
-               *tmp = NULL;
+  hash_queue_t *non_analyzed_hashes = NULL, *tmp = NULL;
   hash_set_t *hash_set_elem = NULL;
   state_entry_t *entry, *new;
 
@@ -182,12 +171,9 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
   bundle_transactions_new(&bundle);
 
   // Add tip hash to the queue as entry point for the traversal
-  if ((hash_queue_elem = malloc(sizeof(hash_queue_t))) == NULL) {
-    ret = RC_LEDGER_VALIDATOR_OOM;
+  if ((ret = hash_queue_add(&non_analyzed_hashes, tip)) != RC_OK) {
     goto done;
   }
-  memcpy(hash_queue_elem->hash, tip, FLEX_TRIT_SIZE_243);
-  CDL_APPEND(non_analyzed_hashes, hash_queue_elem);
 
   // Add null hash to the set of visited hashes
   if ((hash_set_elem = malloc(sizeof(hash_set_t))) == NULL) {
@@ -250,19 +236,13 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
           }
         }
         // Add trunk hash to the queue
-        if ((hash_queue_elem = malloc(sizeof(hash_queue_t))) == NULL) {
-          ret = RC_LEDGER_VALIDATOR_OOM;
+        if ((ret = hash_queue_add(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
           goto done;
         }
-        memcpy(hash_queue_elem->hash, tx.trunk, FLEX_TRIT_SIZE_243);
-        CDL_APPEND(non_analyzed_hashes, hash_queue_elem);
         // Add branch hash to the queue
-        if ((hash_queue_elem = malloc(sizeof(hash_queue_t))) == NULL) {
-          ret = RC_LEDGER_VALIDATOR_OOM;
+        if ((ret = hash_queue_add(&non_analyzed_hashes, tx.branch)) != RC_OK) {
           goto done;
         }
-        memcpy(hash_queue_elem->hash, tx.branch, FLEX_TRIT_SIZE_243);
-        CDL_APPEND(non_analyzed_hashes, hash_queue_elem);
       }
       // Mark current hash as visited
       if ((hash_set_elem = malloc(sizeof(hash_set_t))) == NULL) {
