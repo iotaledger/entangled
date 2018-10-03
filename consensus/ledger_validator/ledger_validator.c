@@ -149,7 +149,8 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
   }
 
   {
-    flex_trit_t null_hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
+    flex_trit_t null_hash[FLEX_TRIT_SIZE_243];
+    memset(null_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
     if ((ret = hash_set_add(analyzed_hashes, null_hash)) != RC_OK) {
       goto done;
     }
