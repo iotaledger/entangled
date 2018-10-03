@@ -29,14 +29,15 @@ typedef struct hash_set_s {
   UT_hash_handle hh;
 } hash_set_t;
 
-extern retcode_t hash_queue_push(hash_queue_t **queue, flex_trit_t *hash);
-extern retcode_t hash_queue_pop(hash_queue_t **queue);
-extern flex_trit_t *hash_queue_peek(hash_queue_t *queue);
-extern retcode_t hash_queue_free(hash_queue_t **queue);
+retcode_t hash_queue_push(hash_queue_t **queue, flex_trit_t *hash);
+retcode_t hash_queue_pop(hash_queue_t **queue);
+flex_trit_t *hash_queue_peek(hash_queue_t *queue);
+retcode_t hash_queue_free(hash_queue_t **queue);
 
-extern retcode_t hash_set_add(hash_set_t **set, flex_trit_t *hash);
-extern bool hash_set_contains(hash_set_t **set, flex_trit_t *hash);
-extern retcode_t hash_set_free(hash_set_t **set);
+retcode_t hash_set_add(hash_set_t **set, flex_trit_t *hash);
+retcode_t hash_set_append(hash_set_t **set, hash_set_t **clone);
+bool hash_set_contains(hash_set_t **set, flex_trit_t *hash);
+retcode_t hash_set_free(hash_set_t **set);
 
 #ifdef __cplusplus
 }

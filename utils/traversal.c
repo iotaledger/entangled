@@ -52,6 +52,20 @@ retcode_t hash_set_add(hash_set_t **set, flex_trit_t *hash) {
   return RC_OK;
 }
 
+retcode_t hash_set_append(hash_set_t **set1, hash_set_t **set2) {
+  retcode_t ret = RC_OK;
+  hash_set_t *iter, *tmp;
+
+  HASH_ITER(hh, *set1, iter, tmp) {
+    if (!hash_set_contains(set2, iter->hash)) {
+      if ((ret = hash_set_add(set2, iter->hash)) != RC_OK) {
+        return ret;
+      }
+    }
+  }
+  return ret;
+}
+
 bool hash_set_contains(hash_set_t **set, flex_trit_t *hash) {
   hash_set_t *elem = NULL;
 
