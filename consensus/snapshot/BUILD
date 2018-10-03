@@ -8,8 +8,18 @@ cc_library(
         "//common/model:transaction",
         "//common/trinary:trit_array",
         "//consensus:defs",
+        "//consensus/snapshot:state_diff",
         "//utils:logger_helper",
         "//utils/handles:rw_lock",
+    ],
+)
+
+cc_library(
+    name = "state_diff",
+    hdrs = ["state_diff.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common/trinary:flex_trit",
         "@com_github_uthash//:uthash",
     ],
 )

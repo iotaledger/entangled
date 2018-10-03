@@ -11,11 +11,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "uthash.h"
-
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/defs.h"
+#include "consensus/snapshot/state_diff.h"
 #include "utils/handles/rw_lock.h"
 
 #define SNAPSHOT_PUBKEY                                                        \
@@ -28,14 +27,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct state_entry_t {
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  int64_t value;
-  UT_hash_handle hh;
-} state_entry_t;
-
-typedef state_entry_t *state_map_t;
 
 typedef struct snapshot_s {
   rw_lock_handle_t rw_lock;
