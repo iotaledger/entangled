@@ -29,7 +29,7 @@ typedef struct hash_set_s {
   UT_hash_handle hh;
 } hash_set_t;
 
-extern retcode_t hash_queue_add(hash_queue_t **queue, flex_trit_t *hash);
+extern retcode_t hash_queue_push(hash_queue_t **queue, flex_trit_t *hash);
 extern flex_trit_t *hash_queue_peek(hash_queue_t *queue);
 extern retcode_t hash_queue_free(hash_queue_t **queue);
 

@@ -36,7 +36,7 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
                            .insufficient_capacity = false};
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 
-  if ((ret = hash_queue_add(&non_analyzed_hashes, milestone_hash)) != RC_OK) {
+  if ((ret = hash_queue_push(&non_analyzed_hashes, milestone_hash)) != RC_OK) {
     goto done;
   }
 
@@ -55,10 +55,10 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
         }
         // TODO update snapshot index
         // TODO messageQ publish
-        if ((ret = hash_queue_add(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
+        if ((ret = hash_queue_push(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
           goto done;
         }
-        if ((ret = hash_queue_add(&non_analyzed_hashes, tx.branch)) != RC_OK) {
+        if ((ret = hash_queue_push(&non_analyzed_hashes, tx.branch)) != RC_OK) {
           goto done;
         }
       }
@@ -150,7 +150,7 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
   bundle_transactions_t *bundle = NULL;
   bundle_transactions_new(&bundle);
 
-  if ((ret = hash_queue_add(&non_analyzed_hashes, tip)) != RC_OK) {
+  if ((ret = hash_queue_push(&non_analyzed_hashes, tip)) != RC_OK) {
     goto done;
   }
 
@@ -212,10 +212,10 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
             goto done;
           }
         }
-        if ((ret = hash_queue_add(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
+        if ((ret = hash_queue_push(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
           goto done;
         }
-        if ((ret = hash_queue_add(&non_analyzed_hashes, tx.branch)) != RC_OK) {
+        if ((ret = hash_queue_push(&non_analyzed_hashes, tx.branch)) != RC_OK) {
           goto done;
         }
       }

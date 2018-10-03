@@ -7,7 +7,7 @@
 
 #include "utils/traversal.h"
 
-extern retcode_t hash_queue_add(hash_queue_t **queue, flex_trit_t *hash) {
+extern retcode_t hash_queue_push(hash_queue_t **queue, flex_trit_t *hash) {
   hash_queue_t *elem = NULL;
 
   if ((elem = malloc(sizeof(hash_queue_t))) == NULL) {
