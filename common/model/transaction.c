@@ -422,6 +422,15 @@ void transaction_reset(iota_transaction_t transaction) {
   memset(transaction->hash, FLEX_TRIT_NULL_VALUE, sizeof(transaction->hash));
 }
 
+uint16_t transaction_weight_magnitude(const iota_transaction_t transaction) {
+  uint16_t num_trailing_null_values = FLEX_TRIT_SIZE_243;
+  uint16_t i = 0;
+  while (i-- > 0 && transaction->hash[i] == FLEX_TRIT_NULL_VALUE) {
+    ++num_trailing_null_values;
+  }
+  return num_trailing_null_values;
+}
+
 /***********************************************************************************************************
  * Constructors
  ***********************************************************************************************************/

@@ -21,11 +21,20 @@ extern "C" {
 
 typedef struct transaction_validator_t {
   tangle_t *tangle;
-  // TODO - lots
+  uint64_t snapshot_timestamp_ms;
+  uint16_t mwm;
 } transaction_validator_t;
 
 extern retcode_t iota_consensus_transaction_validator_init(
-    tangle_t *const tangle, transaction_validator_t *const tv);
+    tangle_t *const tangle, transaction_validator_t *const tv,
+    uint64_t snapshot_timestamp_ms, uint16_t mwm);
+
+extern retcode_t iota_consensus_transaction_validator_destroy(
+    transaction_validator_t *const tv);
+
+extern bool iota_consensus_transaction_validate(
+    transaction_validator_t *const tv,
+    const iota_transaction_t const transaction);
 
 // TODO - complete
 
