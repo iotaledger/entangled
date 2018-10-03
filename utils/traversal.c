@@ -39,6 +39,13 @@ extern retcode_t hash_set_add(hash_set_t **set, flex_trit_t *hash) {
   return RC_OK;
 }
 
+extern bool hash_set_contains(hash_set_t **set, flex_trit_t *hash) {
+  hash_set_t *elem = NULL;
+
+  HASH_FIND(hh, *set, hash, FLEX_TRIT_SIZE_243, elem);
+  return elem != NULL;
+}
+
 extern retcode_t hash_set_free(hash_set_t **set) {
   hash_set_t *iter, *tmp;
 

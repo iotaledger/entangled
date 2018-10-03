@@ -26,7 +26,7 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
                                            uint64_t index) {
   retcode_t ret = RC_OK;
   hash_queue_t *non_analyzed_hashes = NULL, *tmp = NULL;
-  hash_set_t *analyzed_hashes = NULL, *hash_set_elem = NULL;
+  hash_set_t *analyzed_hashes = NULL;
 
   struct _iota_transaction tx;
   iota_transaction_t tx_ptr = &tx;
@@ -43,9 +43,7 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
 
   while (non_analyzed_hashes != NULL) {
     tx_hash.trits = non_analyzed_hashes->hash;
-    HASH_FIND(hh, analyzed_hashes, tx_hash.trits, FLEX_TRIT_SIZE_243,
-              hash_set_elem);
-    if (hash_set_elem == NULL) {
+    if (!hash_set_contains(&analyzed_hashes, tx_hash.trits)) {
       hash_pack_reset(&pack);
       if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_COL_HASH,
                                               &tx_hash, &pack)) != RC_OK) {
@@ -171,9 +169,7 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
 
   while (non_analyzed_hashes != NULL) {
     tx_hash.trits = non_analyzed_hashes->hash;
-    HASH_FIND(hh, *analyzed_hashes, tx_hash.trits, FLEX_TRIT_SIZE_243,
-              hash_set_elem);
-    if (hash_set_elem == NULL) {
+    if (!hash_set_contains(analyzed_hashes, tx_hash.trits)) {
       hash_pack_reset(&pack);
       if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_COL_HASH,
                                               &tx_hash, &pack)) != RC_OK) {

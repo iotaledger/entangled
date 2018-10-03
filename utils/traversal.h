@@ -33,6 +33,7 @@ extern retcode_t hash_queue_add(hash_queue_t **queue, flex_trit_t *hash);
 extern retcode_t hash_queue_free(hash_queue_t **queue);
 
 extern retcode_t hash_set_add(hash_set_t **set, flex_trit_t *hash);
+extern bool hash_set_contains(hash_set_t **set, flex_trit_t *hash);
 extern retcode_t hash_set_free(hash_set_t **set);
 
 #ifdef __cplusplus
