@@ -333,3 +333,86 @@ done:
   }
   return ret;
 }
+retcode_t iota_consensus_ledger_validator_update_diff(
+    ledger_validator_t *const lv, hash_set_t **analyzed_hashes,
+    state_map_t *diff, flex_trit_t *tip, bool *is_consistent) {
+  retcode_t ret = RC_OK;
+  state_map_t current_state = NULL, patch = NULL;
+  state_entry_t *iter, *entry, *new, *tmp;
+  hash_set_t *visited_hashes = NULL;
+  bool valid_diff = true;
+
+  // TODO
+  // if (!TransactionViewModel.fromHash(tangle, tip).isSolid()) {
+  //   return false;
+  // }
+
+  if (hash_set_contains(analyzed_hashes, tip)) {
+    *is_consistent = true;
+    goto done;
+  }
+
+  if ((ret = hash_set_append(analyzed_hashes, &visited_hashes))) {
+    goto done;
+  }
+
+  if ((ret = get_latest_diff(
+           lv, &visited_hashes, &current_state, tip,
+           iota_snapshot_get_index(lv->milestone_tracker->latest_snapshot),
+           false, &valid_diff)) != RC_OK) {
+    log_error(LEDGER_VALIDATOR_LOGGER_ID, "Getting latest diff failed\n");
+    goto done;
+  }
+
+  if (!valid_diff) {
+    *is_consistent = false;
+    goto done;
+  }
+
+  // TODO Extract state_map_t from snapshot #345
+  HASH_ITER(hh, *diff, iter, tmp) {
+    HASH_FIND(hh, current_state, iter->hash, FLEX_TRIT_SIZE_243, entry);
+    if (entry) {
+      entry->value += iter->value;
+    } else {
+      if ((new = malloc(sizeof(state_entry_t))) == NULL) {
+        ret = RC_LEDGER_VALIDATOR_OOM;
+        goto done;
+      }
+      memcpy(new->hash, iter->hash, FLEX_TRIT_SIZE_243);
+      new->value = iter->value;
+      HASH_ADD(hh, current_state, hash, FLEX_TRIT_SIZE_243, new);
+    }
+  }
+
+  if ((ret = iota_snapshot_create_patch(lv->milestone_tracker->latest_snapshot,
+                                        &current_state, &patch)) != RC_OK) {
+    log_error(LEDGER_VALIDATOR_LOGGER_ID, "Creating patch failed\n");
+    goto done;
+  }
+  *is_consistent = iota_snapshot_is_state_consistent(&patch);
+
+  if (is_consistent) {
+    // TODO Extract state_map_t from snapshot #345
+    HASH_ITER(hh, current_state, iter, tmp) {
+      HASH_FIND(hh, *diff, iter->hash, FLEX_TRIT_SIZE_243, entry);
+      if (entry) {
+        entry->value = iter->value;
+      } else {
+        if ((new = malloc(sizeof(state_entry_t))) == NULL) {
+          ret = RC_LEDGER_VALIDATOR_OOM;
+          goto done;
+        }
+        memcpy(new->hash, iter->hash, FLEX_TRIT_SIZE_243);
+        new->value = iter->value;
+        HASH_ADD(hh, *diff, hash, FLEX_TRIT_SIZE_243, new);
+      }
+    }
+    if ((ret = hash_set_append(&visited_hashes, analyzed_hashes))) {
+      goto done;
+    }
+  }
+
+done:
+  return ret;
+}

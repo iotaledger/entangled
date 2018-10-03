@@ -9,12 +9,15 @@
 #define __CONSENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
 
 #include "common/errors.h"
+#include "consensus/snapshot/snapshot.h"
+#include "utils/traversal.h"
 
 // Forward declarations
 typedef struct tangle_s tangle_t;
 typedef struct milestone_tracker_s milestone_tracker_t;
 typedef struct iota_milestone_s iota_milestone_t;
 typedef struct requester_state_s requester_state_t;
+typedef int8_t flex_trit_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,16 +30,20 @@ typedef struct ledger_validator_s {
   // TODO volatile int numberOfConfirmedTransactions;
 } ledger_validator_t;
 
-extern retcode_t iota_consensus_ledger_validator_init(
-    ledger_validator_t *const lv, tangle_t *const tangle,
-    milestone_tracker_t *const mt, requester_state_t *const tr);
+retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv,
+                                               tangle_t *const tangle,
+                                               milestone_tracker_t *const mt,
+                                               requester_state_t *const tr);
 
-extern retcode_t iota_consensus_ledger_validator_update_snapshot(
+retcode_t iota_consensus_ledger_validator_update_snapshot(
     ledger_validator_t *const lv, iota_milestone_t *const milestone,
     bool *const has_snapshot);
 
-extern retcode_t iota_consensus_ledger_validator_destroy(
-    ledger_validator_t *const lv);
+retcode_t iota_consensus_ledger_validator_update_diff(
+    ledger_validator_t *const lv, hash_set_t **analyzed_hashes,
+    state_map_t *diff, flex_trit_t *tip, bool *is_consistent);
+
+retcode_t iota_consensus_ledger_validator_destroy(ledger_validator_t *const lv);
 
 #ifdef __cplusplus
 }

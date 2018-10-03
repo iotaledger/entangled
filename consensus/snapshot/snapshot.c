@@ -142,10 +142,6 @@ retcode_t iota_snapshot_state_destroy(state_map_t *const state) {
 bool iota_snapshot_is_state_consistent(state_map_t *const state) {
   state_entry_t *entry, *tmp;
 
-  if (state == NULL) {
-    return false;
-  }
-
   HASH_ITER(hh, *state, entry, tmp) {
     if (entry->value <= 0) {
       if (entry->value < 0) {
