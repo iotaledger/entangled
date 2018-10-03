@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "utils/traversal.h"
+#include "utils/hash_containers.h"
 
 retcode_t hash_queue_push(hash_queue_t **queue, flex_trit_t *hash) {
   hash_queue_t *elem = NULL;

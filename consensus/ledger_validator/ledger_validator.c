@@ -13,7 +13,6 @@
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/snapshot/snapshot.h"
 #include "utils/logger_helper.h"
-#include "utils/traversal.h"
 
 #define LEDGER_VALIDATOR_LOGGER_ID "consensus_ledger_validator"
 
@@ -304,7 +303,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
       log_error(LEDGER_VALIDATOR_LOGGER_ID, "Creating patch failed\n");
       goto done;
     }
-    *has_snapshot = patch != NULL && iota_snapshot_is_state_consistent(&patch);
+    *has_snapshot = iota_snapshot_is_state_consistent(&patch);
     if (*has_snapshot) {
       if ((ret = update_snapshot_milestone(lv, milestone->hash,
                                            milestone->index)) != RC_OK) {
@@ -333,6 +332,25 @@ done:
   }
   return ret;
 }
+
+retcode_t iota_consensus_ledger_validator_check_consistency(
+    ledger_validator_t *const lv, hash_list_t **hashes, bool *consistent) {
+  retcode_t ret = RC_OK;
+  hash_list_t *iter;
+  hash_set_t *analyzed_hashes = NULL;
+  state_map_t diff = NULL;
+
+  LL_FOREACH(*hashes, iter) {
+    if ((ret = iota_consensus_ledger_validator_update_diff(
+             lv, &analyzed_hashes, &diff, iter->hash, consistent)) != RC_OK) {
+      return ret;
+    } else if (*consistent == false) {
+      return ret;
+    }
+  }
+  return ret;
+}
+
 retcode_t iota_consensus_ledger_validator_update_diff(
     ledger_validator_t *const lv, hash_set_t **analyzed_hashes,
     state_map_t *diff, flex_trit_t *tip, bool *is_consistent) {

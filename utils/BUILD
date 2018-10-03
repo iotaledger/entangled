@@ -44,9 +44,9 @@ cc_library(
 )
 
 cc_library(
-    name = "traversal",
-    srcs = ["traversal.c"],
-    hdrs = ["traversal.h"],
+    name = "hash_containers",
+    srcs = ["hash_containers.c"],
+    hdrs = ["hash_containers.h"],
     deps = [
         "//common:errors",
         "//common/trinary:flex_trit",

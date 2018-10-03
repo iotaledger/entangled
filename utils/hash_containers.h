@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __UTILS_TRAVERSAL_H__
-#define __UTILS_TRAVERSAL_H__
+#ifndef __UTILS_HASH_CONTAINERS_H__
+#define __UTILS_HASH_CONTAINERS_H__
 
 #include "uthash.h"
 #include "utlist.h"
@@ -17,6 +17,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct hash_list_s {
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  struct hash_list_s *next;
+} hash_list_t;
 
 typedef struct hash_queue_s {
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
@@ -43,4 +48,4 @@ retcode_t hash_set_free(hash_set_t **set);
 }
 #endif
 
-#endif  // __UTILS_TRAVERSAL_H__
+#endif  // __UTILS_HASH_CONTAINERS_H__

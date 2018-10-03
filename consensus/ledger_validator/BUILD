@@ -5,7 +5,7 @@ cc_library(
     deps = [
         "//common:errors",
         "//consensus/snapshot",
-        "//utils:traversal",
+        "//utils:hash_containers",
     ],
 )
 
@@ -20,6 +20,6 @@ cc_library(
         "//consensus/snapshot",
         "//consensus/tangle",
         "//gossip/components:requester",
-        "//utils:traversal",
+        "//utils:hash_containers",
     ],
 )
