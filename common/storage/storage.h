@@ -15,6 +15,7 @@
 #include "common/storage/defs.h"
 #include "common/storage/pack.h"
 #include "common/trinary/trit_array.h"
+#include "consensus/snapshot/state_diff.h"
 
 // Forward declaration
 typedef struct iota_milestone_s iota_milestone_t;
@@ -88,6 +89,13 @@ extern retcode_t iota_stor_milestone_load_next(connection_t const* const conn,
 extern retcode_t iota_stor_milestone_exist(connection_t const* const conn,
                                            flex_trit_t const* const hash,
                                            bool* const exist);
+
+/*
+ * State diff operations
+ */
+
+extern retcode_t iota_stor_state_diff_store(const connection_t* const conn,
+                                            uint64_t index, state_map_t diff);
 
 #ifdef __cplusplus
 }

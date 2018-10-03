@@ -621,3 +621,10 @@ done:
   finalize_statement(sqlite_statement);
   return ret;
 }
+
+/*
+ * State diff operations
+ */
+
+retcode_t iota_stor_state_diff_store(const connection_t* const conn,
+                                     uint64_t index, state_map_t diff) {}
