@@ -25,7 +25,7 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
                                            flex_trit_t *const milestone_hash,
                                            uint64_t index) {
   retcode_t ret = RC_OK;
-  hash_queue_t *non_analyzed_hashes = NULL, *tmp = NULL;
+  hash_queue_t *non_analyzed_hashes = NULL;
   hash_set_t *analyzed_hashes = NULL;
 
   struct _iota_transaction tx;
@@ -66,10 +66,7 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
         goto done;
       }
     }
-    // Remove current hash from the queue
-    tmp = non_analyzed_hashes;
-    CDL_DELETE(non_analyzed_hashes, non_analyzed_hashes);
-    free(tmp);
+    hash_queue_pop(&non_analyzed_hashes);
   }
 
 done:
@@ -134,7 +131,7 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
                                  bool is_milestone, bool *valid_diff) {
   retcode_t ret = RC_OK;
   int number_of_analyzed_transactions = 0;
-  hash_queue_t *non_analyzed_hashes = NULL, *tmp = NULL;
+  hash_queue_t *non_analyzed_hashes = NULL;
   hash_set_t *hash_set_elem = NULL;
   state_entry_t *entry, *new;
 
@@ -223,9 +220,7 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
         goto done;
       }
     }
-    tmp = non_analyzed_hashes;
-    CDL_DELETE(non_analyzed_hashes, non_analyzed_hashes);
-    free(tmp);
+    hash_queue_pop(&non_analyzed_hashes);
   }
 done:
   hash_queue_free(&non_analyzed_hashes);
