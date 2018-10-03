@@ -36,13 +36,12 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
                            .insufficient_capacity = false};
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 
-  // Add milestone hash to the queue as entry point for the traversal
   if ((ret = hash_queue_add(&non_analyzed_hashes, milestone_hash)) != RC_OK) {
     goto done;
   }
 
   while (non_analyzed_hashes != NULL) {
-    tx_hash.trits = non_analyzed_hashes->hash;
+    tx_hash.trits = hash_queue_peek(non_analyzed_hashes);
     if (!hash_set_contains(&analyzed_hashes, tx_hash.trits)) {
       hash_pack_reset(&pack);
       if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_COL_HASH,
@@ -56,16 +55,13 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
         }
         // TODO update snapshot index
         // TODO messageQ publish
-        // Add trunk hash to the queue
         if ((ret = hash_queue_add(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
           goto done;
         }
-        // Add branch hash to the queue
         if ((ret = hash_queue_add(&non_analyzed_hashes, tx.branch)) != RC_OK) {
           goto done;
         }
       }
-      // Mark current hash as visited
       if ((ret = hash_set_add(&analyzed_hashes, tx_hash.trits)) != RC_OK) {
         goto done;
       }
@@ -154,7 +150,6 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
   bundle_transactions_t *bundle = NULL;
   bundle_transactions_new(&bundle);
 
-  // Add tip hash to the queue as entry point for the traversal
   if ((ret = hash_queue_add(&non_analyzed_hashes, tip)) != RC_OK) {
     goto done;
   }
@@ -168,7 +163,7 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
   HASH_ADD(hh, *analyzed_hashes, hash, FLEX_TRIT_SIZE_243, hash_set_elem);
 
   while (non_analyzed_hashes != NULL) {
-    tx_hash.trits = non_analyzed_hashes->hash;
+    tx_hash.trits = hash_queue_peek(non_analyzed_hashes);
     if (!hash_set_contains(analyzed_hashes, tx_hash.trits)) {
       hash_pack_reset(&pack);
       if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_COL_HASH,
@@ -217,16 +212,13 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
             goto done;
           }
         }
-        // Add trunk hash to the queue
         if ((ret = hash_queue_add(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
           goto done;
         }
-        // Add branch hash to the queue
         if ((ret = hash_queue_add(&non_analyzed_hashes, tx.branch)) != RC_OK) {
           goto done;
         }
       }
-      // Mark current hash as visited
       if ((ret = hash_set_add(analyzed_hashes, tx_hash.trits)) != RC_OK) {
         goto done;
       }

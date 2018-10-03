@@ -18,6 +18,10 @@ extern retcode_t hash_queue_add(hash_queue_t **queue, flex_trit_t *hash) {
   return RC_OK;
 }
 
+extern flex_trit_t *hash_queue_peek(hash_queue_t *queue) {
+  return (flex_trit_t *)(queue->hash);
+}
+
 extern retcode_t hash_queue_free(hash_queue_t **queue) {
   hash_queue_t *iter, *tmp1, *tmp2;
 
