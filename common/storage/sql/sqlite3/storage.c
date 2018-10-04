@@ -628,3 +628,40 @@ done:
 
 retcode_t iota_stor_state_diff_store(const connection_t* const conn,
                                      uint64_t index, state_map_t* diff) {
+  retcode_t ret = RC_OK;
+  char const* err_msg = 0;
+  sqlite3_stmt* sqlite_statement = 0;
+  char statement[MILESTONE_MAX_UPDATE_STATEMENT_SIZE];
+  size_t size = 0;
+  byte_t* bytes = NULL;
+
+  if ((ret = iota_statement_state_diff_store(
+           index, statement, MILESTONE_MAX_UPDATE_STATEMENT_SIZE))) {
+    return ret;
+  }
+
+  if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement, statement,
+                               &err_msg))) {
+    return ret;
+  }
+
+  size = iota_state_diff_serialized_size(diff);
+  bytes = calloc(size, sizeof(byte_t));
+  if ((ret = iota_state_diff_serialize(diff, bytes)) != RC_OK) {
+    free(bytes);
+    return ret;
+  }
+  int rc = sqlite3_bind_blob(sqlite_statement, 1, bytes, size, NULL);
+  free(bytes);
+  if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed in binding, sqlite3 code is: %" PRIu64 "\n", rc);
+    return RC_SQLITE3_FAILED_BINDING;
+  }
+
+  if ((ret = execute_statement_store(sqlite_statement))) {
+    return ret;
+  }
+
+  return RC_OK;
+}
