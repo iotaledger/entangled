@@ -85,3 +85,7 @@ char *iota_statement_milestone_exist_by_hash =
 char *iota_statement_state_diff_store =
     "UPDATE " MILESTONE_TABLE_NAME " SET " MILESTONE_COL_DIFF
     "=? WHERE " MILESTONE_COL_INDEX "=?";
+
+char *iota_statement_state_diff_load =
+    "SELECT " MILESTONE_COL_DIFF " FROM " MILESTONE_TABLE_NAME
+    " WHERE " MILESTONE_COL_INDEX "=?";
