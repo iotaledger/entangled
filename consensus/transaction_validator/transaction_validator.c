@@ -23,14 +23,13 @@ static bool has_invalid_timestamp(transaction_validator_t* const tv,
   uint64_t max_future_timestamp_ms =
       current_timestamp_ms() + MAX_TIMESTAMP_FUTURE_MS;
   if (transaction->attachment_timestamp == 0) {
-    return (transaction->timestamp < tv->snapshot_timestamp_ms &&
+    return (transaction->timestamp * 1000 < tv->snapshot_timestamp_ms &&
             memcmp(genesis_hash, transaction->hash, FLEX_TRIT_SIZE_243)) ||
-           transaction->timestamp > max_future_timestamp_ms;
+           transaction->timestamp * 1000 > max_future_timestamp_ms;
   }
 
   return transaction->attachment_timestamp < tv->snapshot_timestamp_ms ||
-         transaction->attachment_timestamp >
-             tv->snapshot_timestamp_ms + MAX_TIMESTAMP_FUTURE_MS;
+         transaction->attachment_timestamp > max_future_timestamp_ms;
 }
 
 retcode_t iota_consensus_transaction_validator_init(
