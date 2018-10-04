@@ -648,19 +648,63 @@ retcode_t iota_stor_state_diff_store(const connection_t* const conn,
   size = iota_state_diff_serialized_size(diff);
   bytes = calloc(size, sizeof(byte_t));
   if ((ret = iota_state_diff_serialize(diff, bytes)) != RC_OK) {
-    free(bytes);
-    return ret;
+    goto done;
   }
   int rc = sqlite3_bind_blob(sqlite_statement, 1, bytes, size, NULL);
-  free(bytes);
+
   if (rc != SQLITE_OK) {
     log_error(SQLITE3_LOGGER_ID,
               "Failed in binding, sqlite3 code is: %" PRIu64 "\n", rc);
-    return RC_SQLITE3_FAILED_BINDING;
+    ret = RC_SQLITE3_FAILED_BINDING;
+    goto done;
   }
 
   if ((ret = execute_statement_store(sqlite_statement))) {
+    goto done;
+  }
+
+done:
+  if (bytes) {
+    free(bytes);
+  }
+  return RC_OK;
+}
+
+extern retcode_t iota_stor_state_diff_load(const connection_t* const conn,
+                                           uint64_t index, state_map_t* diff) {
+  retcode_t ret = RC_OK;
+  char const* err_msg = 0;
+  sqlite3_stmt* sqlite_statement = 0;
+  char statement[MILESTONE_MAX_SELECT_STATEMENT_SIZE];
+  byte_t* bytes;
+  size_t size = 0;
+
+  if ((ret = iota_statement_state_diff_load(
+           index, statement, MILESTONE_MAX_SELECT_STATEMENT_SIZE))) {
     return ret;
+  }
+
+  if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement, statement,
+                               &err_msg))) {
+    return ret;
+  }
+
+  if (sqlite3_step(sqlite_statement) == SQLITE_ROW) {
+    bytes = (byte_t*)sqlite3_column_blob(sqlite_statement, 0);
+    size = sqlite3_column_bytes(sqlite_statement, 0);
+    if ((ret = iota_state_diff_deserialize(bytes, size, diff)) != RC_OK) {
+      return ret;
+    }
+  } else {
+    *diff = NULL;
+  }
+
+  int rc =
+      sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
+  if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed in finalizing, sqlite3 code is: %" PRIu64 "\n", rc);
+    return RC_SQLITE3_FAILED_FINALIZE;
   }
 
   return RC_OK;
