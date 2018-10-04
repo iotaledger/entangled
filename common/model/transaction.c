@@ -422,9 +422,9 @@ void transaction_reset(iota_transaction_t transaction) {
   memset(transaction->hash, FLEX_TRIT_NULL_VALUE, sizeof(transaction->hash));
 }
 
-uint16_t transaction_weight_magnitude(const iota_transaction_t transaction) {
-  uint16_t num_trailing_null_values = 0;
-  uint16_t pos = FLEX_TRIT_SIZE_243;
+uint8_t transaction_weight_magnitude(const iota_transaction_t transaction) {
+  uint8_t num_trailing_null_values = 0;
+  uint8_t pos = FLEX_TRIT_SIZE_243;
 
   while (pos-- > 0 && transaction->hash[pos] == FLEX_TRIT_NULL_VALUE) {
     num_trailing_null_values += NUM_TRITS_FOR_FLEX_TRIT;

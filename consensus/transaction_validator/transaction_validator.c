@@ -35,7 +35,7 @@ static bool has_invalid_timestamp(transaction_validator_t* const tv,
 
 retcode_t iota_consensus_transaction_validator_init(
     transaction_validator_t* const tv, uint64_t snapshot_timestamp_ms,
-    uint16_t mwm) {
+    uint8_t mwm) {
   logger_helper_init(TRANSACTION_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   tv->snapshot_timestamp_ms = snapshot_timestamp_ms;
   tv->mwm = mwm;
@@ -52,6 +52,12 @@ retcode_t iota_consensus_transaction_validator_destroy(
 bool iota_consensus_transaction_validate(
     transaction_validator_t* const tv,
     const iota_transaction_t const transaction) {
+  if (transaction_weight_magnitude(transaction) < tv->mwm) {
+    log_error(TRANSACTION_VALIDATOR_LOGGER_ID,
+              "Validation failed, Invalid hash\n");
+    return false;
+  }
+
   if (has_invalid_timestamp(tv, transaction)) {
     log_error(TRANSACTION_VALIDATOR_LOGGER_ID,
               "Validation failed, Invalid timestamp\n");
@@ -60,12 +66,6 @@ bool iota_consensus_transaction_validate(
   if (llabs(transaction->value) > IOTA_SUPPLY) {
     log_error(TRANSACTION_VALIDATOR_LOGGER_ID,
               "Validation failed, Invalid value\n");
-    return false;
-  }
-
-  if (transaction_weight_magnitude(transaction) < tv->mwm) {
-    log_error(TRANSACTION_VALIDATOR_LOGGER_ID,
-              "Validation failed, Invalid hash\n");
     return false;
   }
 
