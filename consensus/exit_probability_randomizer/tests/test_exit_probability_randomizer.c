@@ -143,7 +143,8 @@ void test_cw_gen_topology(test_tangle_topology topology) {
     // binomial distribution where `p` = 1/num_approvers, `n` = selections,
     // so we get (mean = `np`, stdev = `np*(1-p)`):
     double expected_mean = selections / num_approvers;
-    double expected_stdev = sqrt(expected_mean * (1 - 1 / num_approvers));
+    double expected_stdev =
+        sqrt(expected_mean * (1.0 - 1.0 / ((double)num_approvers)));
     for (size_t a = 0; a < num_approvers; ++a) {
       TEST_ASSERT(selected_tip_counts[a] < expected_mean + 3 * expected_stdev);
       TEST_ASSERT(selected_tip_counts[a] > expected_mean - 3 * expected_stdev);
