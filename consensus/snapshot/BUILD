@@ -16,9 +16,11 @@ cc_library(
 
 cc_library(
     name = "state_diff",
+    srcs = ["state_diff.c"],
     hdrs = ["state_diff.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//common:errors",
         "//common/trinary:flex_trit",
         "@com_github_uthash//:uthash",
     ],

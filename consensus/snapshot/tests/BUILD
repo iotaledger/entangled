@@ -14,3 +14,15 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_state_diff",
+    srcs = ["test_state_diff.c"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common/helpers:digest",
+        "//consensus/snapshot",
+        "//consensus/snapshot:state_diff",
+        "@unity",
+    ],
+)
