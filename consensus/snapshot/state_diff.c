@@ -8,6 +8,9 @@
 #include "consensus/snapshot/state_diff.h"
 
 size_t iota_state_diff_serialized_size(state_map_t const *const state_diff) {
+  if (state_diff == NULL) {
+    return 0;
+  }
   return HASH_COUNT(*state_diff) * (FLEX_TRIT_SIZE_243 + sizeof(int64_t));
 }
 
