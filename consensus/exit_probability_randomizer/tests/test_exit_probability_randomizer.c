@@ -43,7 +43,7 @@ typedef enum test_tangle_topology {
 void test_cw_gen_topology(test_tangle_topology topology) {
   cw_entry_t *curr_cw_entry = NULL;
   cw_entry_t *tmp_cw_entry = NULL;
-  size_t num_approvers = 150;
+  size_t num_approvers = 50;
   size_t num_txs = num_approvers + 1;
 
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
@@ -122,30 +122,38 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(
                   &tangle, NULL, NULL, &epv) == RC_OK);
   /// Select the tip
+  uint16_t selected_tip_counts[num_approvers];
+  memset(selected_tip_counts, 0, sizeof(selected_tip_counts));
 
-  size_t selected_tip_count = 0;
-  int selections = 1000;
+  int selections = 200;
   for (size_t i = 0; i < selections; ++i) {
     TEST_ASSERT(iota_consensus_exit_probability_randomize(
                     &ep_randomizer, &epv, &out, ep, &tip) == RC_OK);
-    if (memcmp(tip.trits, txs[num_approvers - 1].hash, FLEX_TRIT_SIZE_243) ==
-        0) {
-      selected_tip_count++;
+
+    for (size_t a = 0; a < num_approvers; ++a) {
+      if (memcmp(tip.trits, txs[a].hash, FLEX_TRIT_SIZE_243) == 0) {
+        selected_tip_counts[a] += 1;
+      }
     }
   }
 
+  uint16_t total_selections = 0;
   if (topology == ONLY_DIRECT_APPROVERS) {
     // We can look on the previous trial as a sample from
     // binomial distribution where `p` = 1/num_approvers, `n` = selections,
     // so we get (mean = `np`, stdev = `np*(1-p)`):
     double expected_mean = selections / num_approvers;
     double expected_stdev = sqrt(expected_mean * (1 - 1 / num_approvers));
-    TEST_ASSERT(selected_tip_count < expected_mean + 3 * expected_stdev);
-    TEST_ASSERT(selected_tip_count > expected_mean - 3 * expected_stdev);
-  } else if (topology == BLOCKCHAIN) {
-    // Sum of series 1 + 2 + ... + (num_txs)
-    TEST_ASSERT_EQUAL_INT(selections, selected_tip_count);
+    for (size_t a = 0; a < num_approvers; ++a) {
+      TEST_ASSERT(selected_tip_counts[a] < expected_mean + 3 * expected_stdev);
+      TEST_ASSERT(selected_tip_counts[a] > expected_mean - 3 * expected_stdev);
+    }
   }
+
+  for (size_t a = 0; a < num_approvers; ++a) {
+    total_selections += selected_tip_counts[a];
+  }
+  TEST_ASSERT(total_selections == selections);
 
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
 
@@ -395,7 +403,7 @@ void test_cw_topology_two_inequal_tips(void) {
   /// Select the tip
 
   size_t selected_tip_count = 0;
-  int selections = 1000;
+  int selections = 200;
   for (size_t i = 0; i < selections; ++i) {
     TEST_ASSERT(iota_consensus_exit_probability_randomize(
                     &ep_randomizer, &epv, &out, ep, &tip) == RC_OK);
