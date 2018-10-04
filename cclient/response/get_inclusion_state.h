@@ -8,11 +8,11 @@
 #ifndef CCLIENT_RESPONSE_GET_INCLUSION_STATE_H
 #define CCLIENT_RESPONSE_GET_INCLUSION_STATE_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 typedef struct {
   UT_array* states;

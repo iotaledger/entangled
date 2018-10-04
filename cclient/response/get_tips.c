@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "get_tips.h"
+#include "response/get_tips.h"
 
 get_tips_res_t* get_tips_res_new() { return flex_hash_array_new(); }
 

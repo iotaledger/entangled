@@ -8,11 +8,12 @@
 #ifndef CCLIENT_REQUEST_STORE_TRANSACTIONS_H
 #define CCLIENT_REQUEST_STORE_TRANSACTIONS_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "types/types.h"
 // List of raw data of transactions to be store.
 typedef flex_hash_array_t store_transactions_req_t;
 

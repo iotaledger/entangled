@@ -8,11 +8,11 @@
 #ifndef CCLIENT_RESPONSE_GET_TRANSACTIONS_TO_APPROVE_H
 #define CCLIENT_RESPONSE_GET_TRANSACTIONS_TO_APPROVE_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 typedef struct {
   trit_array_p branch;

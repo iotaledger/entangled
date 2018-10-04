@@ -8,11 +8,11 @@
 #ifndef CCLIENT_RESPONSE_CHECK_CONSISTENCY_H
 #define CCLIENT_RESPONSE_CHECK_CONSISTENCY_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 typedef struct {
   bool state;

@@ -102,6 +102,8 @@ const char* error_2_string(retcode_t err) {
       return STR_CCLIENT_FLEX_TRITS;
     case RC_CCLIENT_NULL_PTR:
       return STR_CCLIENT_NULL_PTR;
+    case RC_CCLIENT_UNIMPLEMENTED:
+      return STR_CCLIENT_UNIMPLEMENTED;
 
     // Consensus module
     case RC_CONSENSUS_NOT_IMPLEMENTED:
