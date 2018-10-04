@@ -75,10 +75,14 @@ static void column_decompress_load(sqlite3_stmt* statement, size_t index,
   size_t column_size;
 
   buffer = sqlite3_column_blob(statement, index);
-  column_size = sqlite3_column_bytes(statement, index);
-  memcpy(flex_trits, buffer, column_size);
-  memset(flex_trits + column_size, FLEX_TRIT_NULL_VALUE,
-         num_bytes - column_size);
+  if (buffer) {
+    column_size = sqlite3_column_bytes(statement, index);
+    memcpy(flex_trits, buffer, column_size);
+    memset(flex_trits + column_size, FLEX_TRIT_NULL_VALUE,
+           num_bytes - column_size);
+  } else {
+    memset(flex_trits, FLEX_TRIT_NULL_VALUE, num_bytes);
+  }
 }
 
 /*
