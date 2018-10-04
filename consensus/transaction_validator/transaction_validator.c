@@ -34,10 +34,9 @@ static bool has_invalid_timestamp(transaction_validator_t* const tv,
 }
 
 retcode_t iota_consensus_transaction_validator_init(
-    tangle_t* const tangle, transaction_validator_t* const tv,
-    uint64_t snapshot_timestamp_ms, uint16_t mwm) {
+    transaction_validator_t* const tv, uint64_t snapshot_timestamp_ms,
+    uint16_t mwm) {
   logger_helper_init(TRANSACTION_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
-  tv->tangle = tangle;
   tv->snapshot_timestamp_ms = snapshot_timestamp_ms;
   tv->mwm = mwm;
   memset(genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
@@ -47,7 +46,6 @@ retcode_t iota_consensus_transaction_validator_init(
 retcode_t iota_consensus_transaction_validator_destroy(
     transaction_validator_t* const tv) {
   logger_helper_destroy(TRANSACTION_VALIDATOR_LOGGER_ID);
-  tv->tangle = NULL;
   return RC_OK;
 }
 
@@ -71,8 +69,11 @@ bool iota_consensus_transaction_validate(
     return false;
   }
 
-  if (transaction->value != 0 &&
-      transaction->address[FLEX_TRIT_SIZE_243 - 1] != FLEX_TRIT_NULL_VALUE) {
+  trit_t buffer[NUM_TRITS_FOR_FLEX_TRIT];
+  flex_trits_to_trits(buffer, NUM_TRITS_FOR_FLEX_TRIT,
+                      &transaction->address[FLEX_TRIT_SIZE_243 - 1],
+                      NUM_TRITS_FOR_FLEX_TRIT, NUM_TRITS_FOR_FLEX_TRIT);
+  if (transaction->value != 0 && buffer[NUM_TRITS_FOR_FLEX_TRIT - 1] != 0) {
     log_error(TRANSACTION_VALIDATOR_LOGGER_ID,
               "Validation failed, Invalid address for value transaction\n");
     return false;

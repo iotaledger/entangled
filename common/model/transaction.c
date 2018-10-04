@@ -423,11 +423,25 @@ void transaction_reset(iota_transaction_t transaction) {
 }
 
 uint16_t transaction_weight_magnitude(const iota_transaction_t transaction) {
-  uint16_t num_trailing_null_values = FLEX_TRIT_SIZE_243;
-  uint16_t i = 0;
-  while (i-- > 0 && transaction->hash[i] == FLEX_TRIT_NULL_VALUE) {
-    ++num_trailing_null_values;
+  uint16_t num_trailing_null_values = 0;
+  uint16_t pos = FLEX_TRIT_SIZE_243;
+
+  while (pos-- > 0 && transaction->hash[pos] == FLEX_TRIT_NULL_VALUE) {
+    num_trailing_null_values += NUM_TRITS_FOR_FLEX_TRIT;
   }
+
+  if (pos > 0) {
+    trit_t one_trit_buffer[NUM_TRITS_FOR_FLEX_TRIT];
+    flex_trits_to_trits(one_trit_buffer, NUM_TRITS_FOR_FLEX_TRIT,
+                        &transaction->hash[pos], NUM_TRITS_FOR_FLEX_TRIT,
+                        NUM_TRITS_FOR_FLEX_TRIT);
+
+    pos = NUM_TRITS_FOR_FLEX_TRIT;
+    while (pos-- > 0 && one_trit_buffer[pos] == 0) {
+      ++num_trailing_null_values;
+    }
+  }
+
   return num_trailing_null_values;
 }
 
