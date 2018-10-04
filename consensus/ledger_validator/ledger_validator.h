@@ -40,7 +40,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
     bool *const has_snapshot);
 
 retcode_t iota_consensus_ledger_validator_check_consistency(
-    ledger_validator_t *const lv, hash_list_t **hashes, bool *consistent);
+    ledger_validator_t *const lv, hash_list_t *hashes, bool *consistent);
 
 retcode_t iota_consensus_ledger_validator_update_diff(
     ledger_validator_t *const lv, hash_set_t **analyzed_hashes,

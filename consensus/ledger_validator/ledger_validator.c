@@ -335,13 +335,13 @@ done:
 }
 
 retcode_t iota_consensus_ledger_validator_check_consistency(
-    ledger_validator_t *const lv, hash_list_t **hashes, bool *consistent) {
+    ledger_validator_t *const lv, hash_list_t *hashes, bool *consistent) {
   retcode_t ret = RC_OK;
   hash_list_t *iter;
   hash_set_t *analyzed_hashes = NULL;
   state_map_t diff = NULL;
 
-  LL_FOREACH(*hashes, iter) {
+  LL_FOREACH(hashes, iter) {
     if ((ret = iota_consensus_ledger_validator_update_diff(
              lv, &analyzed_hashes, &diff, iter->hash, consistent)) != RC_OK) {
       return ret;
