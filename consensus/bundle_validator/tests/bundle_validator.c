@@ -44,7 +44,7 @@ void test_bundle_validate_empty_invalid() {
   trit_array_set_trits(ep, (flex_trit_t *)TEST_TRANSACTION.hash,
                        NUM_TRITS_HASH);
 
-  bool is_valid;
+  bool is_valid = false;
 
   TEST_ASSERT(bundle_validate(&tangle, ep, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
@@ -124,7 +124,7 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(tail_hash, tx1->hash, NUM_TRITS_HASH);
 
-  bool is_valid;
+  bool is_valid = false;
 
   TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
@@ -169,7 +169,7 @@ void test_bundle_exceed_supply_pos_invalid() {
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(tail_hash, tx1->hash, NUM_TRITS_HASH);
 
-  bool is_valid;
+  bool is_valid = false;
 
   TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
@@ -214,7 +214,7 @@ void test_bundle_exceed_supply_neg_invalid() {
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(tail_hash, tx1->hash, NUM_TRITS_HASH);
 
-  bool is_valid;
+  bool is_valid = false;
 
   TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
@@ -281,7 +281,7 @@ void test_bundle_validate_size_4_value_wrong_sig_invalid() {
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(tail_hash, tx1->hash, NUM_TRITS_HASH);
 
-  bool is_valid;
+  bool is_valid = false;
 
   TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
@@ -346,7 +346,7 @@ void test_bundle_validate_size_4_value_valid() {
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(tail_hash, tx1->hash, NUM_TRITS_HASH);
 
-  bool is_valid;
+  bool is_valid = false;
 
   TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(is_valid);
