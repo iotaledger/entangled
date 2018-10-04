@@ -90,7 +90,7 @@ retcode_t iota_tangle_milestone_exist(const tangle_t *const tangle,
  */
 
 retcode_t iota_tangle_state_diff_store(const tangle_t *const tangle,
-                                       uint64_t index, state_map_t diff);
+                                       uint64_t index, state_map_t *diff);
 
 /*
  * Utilities

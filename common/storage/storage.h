@@ -95,7 +95,7 @@ extern retcode_t iota_stor_milestone_exist(connection_t const* const conn,
  */
 
 extern retcode_t iota_stor_state_diff_store(const connection_t* const conn,
-                                            uint64_t index, state_map_t diff);
+                                            uint64_t index, state_map_t* diff);
 
 #ifdef __cplusplus
 }

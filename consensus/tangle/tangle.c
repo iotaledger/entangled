@@ -218,6 +218,6 @@ retcode_t iota_tangle_find_tail(const tangle_t *const tangle,
  */
 
 retcode_t iota_tangle_state_diff_store(const tangle_t *const tangle,
-                                       uint64_t index, state_map_t diff) {
+                                       uint64_t index, state_map_t *diff) {
   return iota_stor_state_diff_store(&tangle->conn, index, diff);
 }
