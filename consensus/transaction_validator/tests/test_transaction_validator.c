@@ -29,7 +29,7 @@ void transaction_invalid_value() {
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
   transaction_validator_t tv;
   TEST_ASSERT(iota_consensus_transaction_validator_init(
-                  &tv, tx1->attachment_timestamp, 14) == RC_OK);
+                  &tv, tx1->attachment_timestamp, mwm) == RC_OK);
   tx1->value = -IOTA_SUPPLY - 1;
   TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
 
@@ -47,7 +47,7 @@ void transaction_invalid_hash() {
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
   transaction_validator_t tv;
   TEST_ASSERT(iota_consensus_transaction_validator_init(
-                  &tv, tx1->attachment_timestamp, 14) == RC_OK);
+                  &tv, tx1->attachment_timestamp, mwm) == RC_OK);
   tx1->hash[FLEX_TRIT_SIZE_243 - 1] = tx1->hash[0];
   TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
 
@@ -64,7 +64,7 @@ void transaction_invalid_attachment_timestamp_too_futuristic() {
 
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
   transaction_validator_t tv;
-  TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, 0, 14) == RC_OK);
+  TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, 0, mwm) == RC_OK);
   TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
@@ -81,7 +81,7 @@ void transaction_invalid_attachment_timestamp_too_old() {
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
   transaction_validator_t tv;
   TEST_ASSERT(iota_consensus_transaction_validator_init(
-                  &tv, current_timestamp_ms(), 14) == RC_OK);
+                  &tv, current_timestamp_ms(), mwm) == RC_OK);
   tx1->hash[FLEX_TRIT_SIZE_243 - 1] = tx1->hash[0];
   TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
 
@@ -99,8 +99,8 @@ void transaction_invalid_value_tx_wrong_address() {
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
   transaction_validator_t tv;
   TEST_ASSERT(iota_consensus_transaction_validator_init(
-                  &tv, tx1->attachment_timestamp, 14) == RC_OK);
-  tx1->address[FLEX_TRIT_SIZE_243 - 1] = tx1->address[2];
+                  &tv, tx1->attachment_timestamp, mwm) == RC_OK);
+  tx1->address[FLEX_TRIT_SIZE_243 - 1] = tx1->address[1];
   TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
@@ -138,7 +138,7 @@ void transaction_invalid_timestamp_too_old() {
   tx1->timestamp = current_time - 1;
   transaction_validator_t tv;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, current_time,
-                                                        14) == RC_OK);
+                                                        mwm) == RC_OK);
   TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
@@ -155,7 +155,7 @@ void transaction_is_valid() {
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
   transaction_validator_t tv;
   TEST_ASSERT(iota_consensus_transaction_validator_init(
-                  &tv, tx1->attachment_timestamp, 14) == RC_OK);
+                  &tv, tx1->attachment_timestamp, mwm) == RC_OK);
   TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1));
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
