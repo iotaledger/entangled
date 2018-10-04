@@ -175,6 +175,7 @@ retcode_t validate_signature(bundle_transactions_t* bundle,
   init_kerl(&address_kerl);
   init_kerl(&sig_frag_kerl);
 
+  *is_valid = true;
   for (curr_tx = (iota_transaction_t)utarray_eltptr(bundle, 0);
        curr_tx != NULL;) {
     if (curr_tx->value >= 0) {
