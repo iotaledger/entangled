@@ -28,7 +28,7 @@ int payload_min_length(size_t const message_length,
   size_t sibling_number =
       merkle_depth(merkle_tree_length / HASH_LENGTH_TRIT) - 1;
   return encoded_length(index) + encoded_length(message_length) +
-         HASH_LENGTH_TRIT + message_length + (HASH_LENGTH_TRIT / 3) +
+         HASH_LENGTH_TRIT + message_length + HASH_LENGTH_TRYTE +
          security * ISS_KEY_LENGTH + encoded_length(sibling_number) +
          (sibling_number * HASH_LENGTH_TRIT);
 }
@@ -54,7 +54,7 @@ int mam_create(trit_t *const payload, size_t const payload_length,
   size_t enc_siblings_number_length = encoded_length(siblings_number);
   size_t payload_min_length =
       enc_index_length + enc_message_length_length + HASH_LENGTH_TRIT +
-      message_length + (HASH_LENGTH_TRIT / 3) + signature_length +
+      message_length + HASH_LENGTH_TRYTE + signature_length +
       enc_siblings_number_length + (siblings_number * HASH_LENGTH_TRIT);
 
   if (payload_length < payload_min_length) {
@@ -90,9 +90,9 @@ int mam_create(trit_t *const payload, size_t const payload_length,
   Curl curl;
   curl.type = CURL_P_27;
   memcpy(curl.state, enc_curl->state, sizeof(enc_curl->state));
-  hamming(&curl, 0, HASH_LENGTH_TRIT / 3, security);
-  mask(payload + offset, curl.state, HASH_LENGTH_TRIT / 3, enc_curl);
-  offset += HASH_LENGTH_TRIT / 3;
+  hamming(&curl, 0, HASH_LENGTH_TRYTE, security);
+  mask(payload + offset, curl.state, HASH_LENGTH_TRYTE, enc_curl);
+  offset += HASH_LENGTH_TRYTE;
 
   // encrypt signature to payload
   curl_reset(&curl);
@@ -159,8 +159,8 @@ int mam_parse(trit_t *const payload, size_t const payload_length,
 
   // decrypt nonce from payload
   if (offset >= payload_length) return -1;
-  unmask(payload + offset, payload + offset, HASH_LENGTH_TRIT / 3, enc_curl);
-  offset += HASH_LENGTH_TRIT / 3;
+  unmask(payload + offset, payload + offset, HASH_LENGTH_TRYTE, enc_curl);
+  offset += HASH_LENGTH_TRYTE;
 
   // get security back from state
   if (offset >= payload_length) return -1;

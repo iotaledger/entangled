@@ -39,8 +39,7 @@ void run_pd_test(Curl *curl, size_t security) {
   curl_squeeze(curl, hash, HASH_LENGTH_TRIT);
 
   for (sum = 0, i = 0; i < security; i++) {
-    for (j = i * HASH_LENGTH_TRIT / 3; j < (i + 1) * HASH_LENGTH_TRIT / 3;
-         j++) {
+    for (j = i * HASH_LENGTH_TRYTE; j < (i + 1) * HASH_LENGTH_TRYTE; j++) {
       sum += curl->state[j];
     }
     if (i < security - 1) {

@@ -85,10 +85,10 @@ void test_addy(trit_t *k, size_t l, Kerl *c) {
 
   trits_to_trytes(k, addy_trytes, l);
 
-  addy_trytes[HASH_LENGTH_TRIT / 3] = 0;
+  addy_trytes[HASH_LENGTH_TRYTE] = 0;
 
   TEST_ASSERT_EQUAL_MEMORY(EXP_ADDY, addy_trytes,
-                           HASH_LENGTH_TRIT / 3 * sizeof(tryte_t));
+                           HASH_LENGTH_TRYTE * sizeof(tryte_t));
 }
 #undef EXP_ADDY
 

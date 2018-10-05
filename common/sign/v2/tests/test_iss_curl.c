@@ -79,8 +79,8 @@ void test_key(trit_t *s, trit_t *k, size_t l, Curl *c) {
   "KZFP9ZR"
 
 void test_addy(trit_t *k, size_t l, Curl *c) {
-  tryte_t addy_trytes[HASH_LENGTH_TRIT / 3 + 1];
-  addy_trytes[HASH_LENGTH_TRIT / 3] = 0;
+  tryte_t addy_trytes[HASH_LENGTH_TRYTE + 1];
+  addy_trytes[HASH_LENGTH_TRYTE] = 0;
 
   iss_curl_key_digest(k, k, l, c);
   iss_curl_address(k, k, l * 243 / 6561, c);
@@ -88,7 +88,7 @@ void test_addy(trit_t *k, size_t l, Curl *c) {
   trits_to_trytes(k, addy_trytes, l * 243 / 6561);
 
   TEST_ASSERT_EQUAL_MEMORY(EXP_ADDY, addy_trytes,
-                           HASH_LENGTH_TRIT / 3 * sizeof(tryte_t));
+                           HASH_LENGTH_TRYTE * sizeof(tryte_t));
 }
 
 #define EX_SIG                                                                 \
@@ -109,10 +109,10 @@ void test_sig(trit_t *k, size_t l, Curl *c) {
 
   trits_to_trytes(k, addy_trytes, HASH_LENGTH_TRIT);
 
-  addy_trytes[HASH_LENGTH_TRIT / 3] = 0;
+  addy_trytes[HASH_LENGTH_TRYTE] = 0;
 
   TEST_ASSERT_EQUAL_MEMORY(EXP_ADDY, addy_trytes,
-                           HASH_LENGTH_TRIT / 3 * sizeof(tryte_t));
+                           HASH_LENGTH_TRYTE * sizeof(tryte_t));
 }
 #undef EX_SIG
 #undef EXP_ADDY

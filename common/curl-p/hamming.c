@@ -19,8 +19,7 @@ short test(PCurl *const curl, unsigned short const security) {
     sum = 0;
 
     for (j = 0; j < security; j++) {
-      for (k = j * HASH_LENGTH_TRIT / 3; k < (j + 1) * HASH_LENGTH_TRIT / 3;
-           k++) {
+      for (k = j * HASH_LENGTH_TRYTE; k < (j + 1) * HASH_LENGTH_TRYTE; k++) {
         if ((curl->state[k].low & (1uLL << i)) == 0) {
           sum--;
         } else if ((curl->state[k].high & (1uLL << i)) == 0) {

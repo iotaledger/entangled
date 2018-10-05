@@ -31,7 +31,7 @@ IOTA_EXPORT char* iota_digest(const char* trytes) {
   curl_digest(trits, length * 3, trits_hash, &curl);
   free(trits);
 
-  char* hash = calloc(HASH_LENGTH_TRIT / 3 + 1, sizeof(trit_t));
+  char* hash = calloc(HASH_LENGTH_TRYTE + 1, sizeof(trit_t));
   if (!hash) {
     return NULL;
   }

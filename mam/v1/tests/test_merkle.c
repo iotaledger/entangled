@@ -19,7 +19,7 @@ void test_merkle(void) {
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQR"
       "STUVWXYZ9";
   trit_t seed_trits[HASH_LENGTH_TRIT];
-  trytes_to_trits((tryte_t *)seed, seed_trits, HASH_LENGTH_TRIT / 3);
+  trytes_to_trits((tryte_t *)seed, seed_trits, HASH_LENGTH_TRYTE);
   size_t start = 7;
   size_t leaf_count = 32;
   size_t security = 1;
