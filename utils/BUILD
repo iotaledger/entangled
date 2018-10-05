@@ -42,3 +42,14 @@ cc_library(
     srcs = ["time.c"],
     hdrs = ["time.h"],
 )
+
+cc_library(
+    name = "hash_containers",
+    srcs = ["hash_containers.c"],
+    hdrs = ["hash_containers.h"],
+    deps = [
+        "//common:errors",
+        "//common/trinary:flex_trit",
+        "@com_github_uthash//:uthash",
+    ],
+)

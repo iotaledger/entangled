@@ -117,7 +117,7 @@ void trit_array_free(trit_array_p const trit_array);
   flex_trit_t NAME##_trits[NAME##_num_bytes];                         \
   memset(&NAME##_trits, 0, NAME##_num_bytes);                         \
   struct _trit_array NAME = {(flex_trit_t *)&NAME##_trits, NUM_TRITS, \
-                             NAME##_num_bytes};
+                             NAME##_num_bytes, 0};
 
 /// Macro to declare a new trit_array and initialize it with an array of trits
 /// stored according to the current memory model.
@@ -128,7 +128,7 @@ void trit_array_free(trit_array_p const trit_array);
   size_t NAME##_num_bytes = trit_array_bytes_for_trits(NUM_TRITS);   \
   flex_trit_t NAME##_trits[] = {TRITS};                              \
   struct _trit_array NAME = {(flex_trit_t *)NAME##_trits, NUM_TRITS, \
-                             NAME##_num_bytes};
+                             NAME##_num_bytes, 0};
 
 #endif
 #ifdef __cplusplus

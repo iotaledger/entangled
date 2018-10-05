@@ -146,6 +146,8 @@ void test_stored_transaction(void) {
   TEST_ASSERT_EQUAL_INT(txs[0]->last_index, TEST_TRANSACTION.last_index);
   TEST_ASSERT_EQUAL_MEMORY(txs[0]->hash, TEST_TRANSACTION.hash,
                            FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_INT(txs[0]->snapshot_index,
+                        TEST_TRANSACTION.snapshot_index);
 
   for (int i = 0; i < 5; ++i) {
     transaction_free(pack.models[i]);
@@ -168,21 +170,31 @@ void test_stored_milestone(void) {
   TEST_ASSERT(iota_stor_milestone_store(&conn, &milestone) ==
               RC_SQLITE3_FAILED_STEP);
 
-  // Test get latest
+  // Test get last
   milestone.hash[0]++;
   TEST_ASSERT(iota_stor_milestone_store(&conn, &milestone) == RC_OK);
+
   iota_milestone_t *ms = malloc(sizeof(iota_milestone_t));
   iota_stor_pack_t ms_pack = {.models = (void **)&ms,
                               .capacity = 1,
                               .num_loaded = 0,
                               .insufficient_capacity = false};
-  iota_stor_milestone_load_latest(&conn, &ms_pack);
+
+  iota_stor_milestone_load_last(&conn, &ms_pack);
   TEST_ASSERT_EQUAL_INT(1, ms_pack.num_loaded);
   TEST_ASSERT_EQUAL_INT(ms->index, milestone.index);
   TEST_ASSERT_EQUAL_MEMORY(ms->hash, milestone.hash, FLEX_TRIT_SIZE_243);
-  free(ms);
   milestone.hash[0]--;
   milestone.index--;
+
+  // Test get first
+  ms_pack.num_loaded = 0;
+  iota_stor_milestone_load_first(&conn, &ms_pack);
+  TEST_ASSERT_EQUAL_INT(1, ms_pack.num_loaded);
+  TEST_ASSERT_EQUAL_INT(ms->index, milestone.index);
+  TEST_ASSERT_EQUAL_MEMORY(ms->hash, milestone.hash, FLEX_TRIT_SIZE_243);
+
+  free(ms);
 
   bool exist = false;
   TEST_ASSERT(iota_stor_milestone_exist(&conn, NULL, NULL, &exist) == RC_OK);
@@ -259,6 +271,27 @@ void test_stored_load_hashes_of_approvers(void) {
   }
 }
 
+void test_update_snapshot_index(void) {
+  struct _iota_transaction tx;
+  iota_transaction_t tx_ptr = &tx;
+  iota_stor_pack_t pack = {(void **)&tx_ptr, 1, 0, false};
+  struct _trit_array hash = {(flex_trit_t *)TEST_TRANSACTION.hash,
+                             NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
+
+  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_COL_HASH, &hash,
+                                         &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
+  TEST_ASSERT_EQUAL_INT(tx.snapshot_index, TEST_TRANSACTION.snapshot_index);
+  TEST_ASSERT(iota_stor_transaction_update_snapshot_index(
+                  &conn, (flex_trit_t *)TEST_TRANSACTION.hash, 123456) ==
+              RC_OK);
+  hash_pack_reset(&pack);
+  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_COL_HASH, &hash,
+                                         &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
+  TEST_ASSERT_EQUAL_INT(tx.snapshot_index, 123456);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -272,6 +305,7 @@ int main(void) {
   RUN_TEST(test_stored_milestone);
   RUN_TEST(test_stored_load_hashes_by_address);
   RUN_TEST(test_stored_load_hashes_of_approvers);
+  RUN_TEST(test_update_snapshot_index);
 
   return UNITY_END();
 }

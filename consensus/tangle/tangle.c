@@ -45,11 +45,11 @@ retcode_t iota_tangle_transaction_exist(const tangle_t *const tangle,
   return iota_stor_transaction_exist(&tangle->conn, index_name, key, exist);
 }
 
-retcode_t iota_tangle_transaction_update(const tangle_t *const tangle,
-                                         const char *index_name,
-                                         const trit_array_p key,
-                                         const iota_transaction_t data_in) {
-  return RC_CONSENSUS_NOT_IMPLEMENTED;
+retcode_t iota_tangle_transaction_update_snapshot_index(
+    const tangle_t *const tangle, flex_trit_t *const hash,
+    uint64_t snapshot_index) {
+  return iota_stor_transaction_update_snapshot_index(&tangle->conn, hash,
+                                                     snapshot_index);
 }
 
 retcode_t iota_tangle_transaction_load_hashes(const tangle_t *const tangle,
@@ -117,9 +117,14 @@ retcode_t iota_tangle_milestone_load(const tangle_t *const tangle,
   return iota_stor_milestone_load(&tangle->conn, col_name, key, pack);
 }
 
-retcode_t iota_tangle_milestone_load_latest(const tangle_t *const tangle,
-                                            iota_stor_pack_t *pack) {
-  return iota_stor_milestone_load_latest(&tangle->conn, pack);
+retcode_t iota_tangle_milestone_load_first(const tangle_t *const tangle,
+                                           iota_stor_pack_t *pack) {
+  return iota_stor_milestone_load_first(&tangle->conn, pack);
+}
+
+retcode_t iota_tangle_milestone_load_last(const tangle_t *const tangle,
+                                          iota_stor_pack_t *pack) {
+  return iota_stor_milestone_load_last(&tangle->conn, pack);
 }
 
 retcode_t iota_tangle_milestone_load_next(const tangle_t *const tangle,

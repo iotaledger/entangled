@@ -49,7 +49,8 @@ static retcode_t node_neighbors_init(node_t* const node) {
 
 // Public functions
 
-retcode_t node_init(node_t* const node, core_t* const core) {
+retcode_t node_init(node_t* const node, core_t* const core,
+                    requester_state_t* const transaction_requester) {
   if (node == NULL) {
     return RC_NODE_NULL_NODE;
   } else if (core == NULL) {
@@ -60,6 +61,7 @@ retcode_t node_init(node_t* const node, core_t* const core) {
   memset(node, 0, sizeof(node_t));
   node->running = false;
   node->core = core;
+  node->requester = transaction_requester;
 
   log_info(NODE_LOGGER_ID, "Initializing neighbors\n");
   if (node_neighbors_init(node)) {
@@ -85,12 +87,6 @@ retcode_t node_init(node_t* const node, core_t* const core) {
                     core->config.udp_receiver_port)) {
     log_critical(NODE_LOGGER_ID, "Initializing receiver component failed\n");
     return RC_NODE_FAILED_RECEIVER_INIT;
-  }
-
-  log_info(NODE_LOGGER_ID, "Initializing requester component\n");
-  if (requester_init(&node->requester, node)) {
-    log_critical(NODE_LOGGER_ID, "Initializing requester component failed\n");
-    return RC_NODE_FAILED_REQUESTER_INIT;
   }
 
   log_info(NODE_LOGGER_ID, "Initializing responder component\n");
@@ -199,12 +195,6 @@ retcode_t node_destroy(node_t* const node) {
   if (receiver_destroy(&node->receiver)) {
     log_error(NODE_LOGGER_ID, "Destroying receiver component failed\n");
     ret = RC_NODE_FAILED_RECEIVER_DESTROY;
-  }
-
-  log_info(NODE_LOGGER_ID, "Destroying processor component\n");
-  if (requester_destroy(&node->requester)) {
-    log_error(NODE_LOGGER_ID, "Destroying processor component failed\n");
-    ret = RC_NODE_FAILED_REQUESTER_DESTROY;
   }
 
   log_info(NODE_LOGGER_ID, "Destroying responder component\n");
