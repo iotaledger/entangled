@@ -16,6 +16,7 @@
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/tangle/tangle.h"
+#include "utils/hash_containers.h"
 
 #define CW_RATING_CALCULATOR_LOGGER_ID "consensus_cw_rating_calculator"
 
@@ -38,12 +39,6 @@ typedef struct cw_entry_t {
   UT_hash_handle hh;
 } cw_entry_t;
 typedef cw_entry_t *cw_map_t;
-
-typedef struct hash_entry_t {
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  UT_hash_handle hh;
-} hash_entry_t;
-typedef hash_entry_t *hash_set_t;
 
 typedef struct hash_to_direct_approvers_entry_t {
   flex_trit_t hash[FLEX_TRIT_SIZE_243]; /*key*/
