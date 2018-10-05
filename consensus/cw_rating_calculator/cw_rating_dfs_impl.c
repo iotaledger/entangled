@@ -110,7 +110,7 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
     hash_to_direct_approvers_map_t *tx_to_approvers, size_t *subtangle_size) {
   hash_to_direct_approvers_entry_t *curr_tx = NULL;
   hash_to_direct_approvers_entry_t *curr_approver_tx = NULL;
-  hash_entry_t *curr_direct_approver = NULL;
+  hash_set_entry_t *curr_direct_approver = NULL;
   size_t curr_approver_index;
 
   retcode_t res = RC_OK;
@@ -167,7 +167,8 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
       while (pack.num_loaded > 0) {
         curr_approver_index = --pack.num_loaded;
         // Add each found approver to the currently traversed tx
-        curr_direct_approver = (hash_entry_t *)malloc(sizeof(hash_entry_t));
+        curr_direct_approver =
+            (hash_set_entry_t *)malloc(sizeof(hash_set_entry_t));
         if (curr_direct_approver == NULL) {
           log_error(CW_RATING_CALCULATOR_LOGGER_ID,
                     "Failed in memory allocation\n");
@@ -206,8 +207,8 @@ static retcode_t cw_rating_dfs_do_dfs_light(
   *subtangle_size = 0;
   flex_trit_t *curr_hash = NULL;
   hash_to_direct_approvers_entry_t *curr_tx_entry = NULL;
-  hash_entry_t *curr_direct_approver = NULL;
-  hash_entry_t *tmp_direct_approver = NULL;
+  hash_set_entry_t *curr_direct_approver = NULL;
+  hash_set_entry_t *tmp_direct_approver = NULL;
 
   uint64_t tx_bitset_integer_index;
   uint64_t tx_bitset_within_integer_relative_index;

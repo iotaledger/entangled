@@ -8,58 +8,45 @@
 #ifndef __CONSENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
 #define __CONSENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include "common/errors.h"
-#include "common/storage/connection.h"
-#include "consensus/entry_point_selector/entry_point_selector.h"
-#include "consensus/milestone_tracker/milestone_tracker.h"
-#include "consensus/model.h"
-#include "consensus/tangle/tangle.h"
+#include "consensus/snapshot/snapshot.h"
+#include "utils/hash_containers.h"
+
+// Forward declarations
+typedef struct tangle_s tangle_t;
+typedef struct milestone_tracker_s milestone_tracker_t;
+typedef struct iota_milestone_s iota_milestone_t;
+typedef struct requester_state_s requester_state_t;
+typedef int8_t flex_trit_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/**
- *
- *
- *     private final Tangle tangle;
-private final boolean testnet;
-private final int milestoneStartIndex;
-
-public EntryPointSelectorImpl(Tangle tangle, Milestone milestone, boolean
-testnet, int milestoneStartIndex) {
-    this.tangle = tangle;
-    this.milestone = milestone;
-
-    this.testnet = testnet;
-    this.milestoneStartIndex = milestoneStartIndex;
-}
- * @param depth
- * @return
- */
-
-typedef struct ledger_validator_t {
+typedef struct ledger_validator_s {
   tangle_t *tangle;
-  milestone_tracker_t *mt;
-  // private final TransactionRequester transactionRequester;
-  // private final MessageQ messageQ;
-  // private volatile int numberOfConfirmedTransactions;
+  milestone_tracker_t *milestone_tracker;
+  requester_state_t *transaction_requester;
+  // TODO volatile int numberOfConfirmedTransactions;
 } ledger_validator_t;
 
-extern retcode_t iota_consensus_ledger_validator_init(
-    tangle_t *const tangle, milestone_tracker_t *const mt,
-    ledger_validator_t *const lv);
+retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv,
+                                               tangle_t *const tangle,
+                                               milestone_tracker_t *const mt,
+                                               requester_state_t *const tr);
 
-extern retcode_t iota_consensus_ledger_validator_destroy(
-    ledger_validator_t *const lv);
+retcode_t iota_consensus_ledger_validator_update_snapshot(
+    ledger_validator_t *const lv, iota_milestone_t *const milestone,
+    bool *const has_snapshot);
 
-extern retcode_t iota_consensus_ledeger_validator_validate(
-    const ledger_validator_t *lv, const tips_pair *pair);
+retcode_t iota_consensus_ledger_validator_check_consistency(
+    ledger_validator_t *const lv, hash_list_t hashes, bool *consistent);
 
-// TODO - complete
+retcode_t iota_consensus_ledger_validator_update_diff(
+    ledger_validator_t *const lv, hash_set_t *analyzed_hashes,
+    state_map_t *diff, flex_trit_t *tip, bool *is_consistent);
+
+retcode_t iota_consensus_ledger_validator_destroy(ledger_validator_t *const lv);
 
 #ifdef __cplusplus
 }

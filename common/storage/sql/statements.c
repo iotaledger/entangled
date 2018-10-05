@@ -105,9 +105,9 @@ retcode_t iota_statement_transaction_insert(const iota_transaction_t tx,
                                             size_t statement_cap) {
   int res = snprintf(
       statement, statement_cap,
-      "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
+      "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
       "VALUES (?,?,%" PRIi64 ",?,%" PRIu64 ",%" PRIu64 ",%" PRIu64
-      ",?,?,?,?,%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",?,?)",
+      ",?,?,?,?,%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",?,?,%" PRIu64 ")",
       TRANSACTION_TABLE_NAME, TRANSACTION_COL_SIG_OR_MSG,
       TRANSACTION_COL_ADDRESS, TRANSACTION_COL_VALUE,
       TRANSACTION_COL_OBSOLETE_TAG, TRANSACTION_COL_TIMESTAMP,
@@ -116,9 +116,10 @@ retcode_t iota_statement_transaction_insert(const iota_transaction_t tx,
       TRANSACTION_COL_TAG, TRANSACTION_COL_ATTACHMENT_TIMESTAMP,
       TRANSACTION_COL_ATTACHMENT_TIMESTAMP_UPPER,
       TRANSACTION_COL_ATTACHMENT_TIMESTAMP_LOWER, TRANSACTION_COL_NONCE,
-      TRANSACTION_COL_HASH, tx->value, tx->timestamp, tx->current_index,
-      tx->last_index, tx->attachment_timestamp, tx->attachment_timestamp_upper,
-      tx->attachment_timestamp_lower);
+      TRANSACTION_COL_HASH, TRANSACTION_COL_SNAPSHOT_INDEX, tx->value,
+      tx->timestamp, tx->current_index, tx->last_index,
+      tx->attachment_timestamp, tx->attachment_timestamp_upper,
+      tx->attachment_timestamp_lower, tx->snapshot_index);
 
   if (res < 0 || res == statement_cap) {
     log_error(SQL_STATEMENTS_ID,
@@ -143,11 +144,18 @@ retcode_t iota_statement_transaction_exist(const char *index_col,
                                       statement, statement_cap);
 }
 
-retcode_t iota_statement_transaction_update(const char *index_col,
-                                            const trit_array_p key,
-                                            const iota_transaction_t tx,
-                                            char statement[],
-                                            size_t statement_cap) {
+retcode_t iota_statement_transaction_update_snapshot_index(
+    uint64_t snapshot_index, char statement[], size_t statement_cap) {
+  int res = snprintf(statement, statement_cap,
+                     "UPDATE %s SET %s=%" PRIu64 " WHERE %s=?",
+                     TRANSACTION_TABLE_NAME, TRANSACTION_COL_SNAPSHOT_INDEX,
+                     snapshot_index, TRANSACTION_COL_HASH);
+
+  if (res < 0 || res == statement_cap) {
+    log_error(SQL_STATEMENTS_ID,
+              "Failed in creating statement, statement: %s\n", statement);
+    return RC_SQL_FAILED_WRITE_STATEMENT;
+  }
   return RC_OK;
 }
 
@@ -203,8 +211,15 @@ retcode_t iota_statement_milestone_select(const char *index_col,
                                        statement_cap);
 }
 
-retcode_t iota_statement_milestone_select_latest(char statement[],
-                                                 size_t statement_cap) {
+retcode_t iota_statement_milestone_select_first(char statement[],
+                                                size_t statement_cap) {
+  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", "", "",
+                                       MILESTONE_COL_INDEX, "ASC", 1, statement,
+                                       statement_cap);
+}
+
+retcode_t iota_statement_milestone_select_last(char statement[],
+                                               size_t statement_cap) {
   return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", "", "",
                                        MILESTONE_COL_INDEX, "DESC", 1,
                                        statement, statement_cap);

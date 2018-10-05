@@ -8,11 +8,11 @@
 #ifndef CCLIENT_REQUEST_CHECK_CONSISTENCY_H
 #define CCLIENT_REQUEST_CHECK_CONSISTENCY_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 /*
  * Tail transaction hash (hash of transaction with `currentIndex=0`), or array

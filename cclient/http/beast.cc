@@ -17,9 +17,8 @@
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
 
-iota_api_result_t iota_service_query(const void* const service_opaque,
-                                     char_buffer_t* obj,
-                                     char_buffer_t* response) {
+retcode_t iota_service_query(const void* const service_opaque,
+                             char_buffer_t* obj, char_buffer_t* response) {
   using tcp = boost::asio::ip::tcp;
   namespace http = boost::beast::http;
 
@@ -28,23 +27,23 @@ iota_api_result_t iota_service_query(const void* const service_opaque,
   tcp::resolver resolver{ioc};
   tcp::socket socket{ioc};
 
-  const iota_http_service_t* const service =
-      reinterpret_cast<const iota_http_service_t* const>(service_opaque);
+  const iota_client_service_t* const service =
+      reinterpret_cast<const iota_client_service_t* const>(service_opaque);
+  const http_info_t* http_setting = &service->http;
 
-  iota_api_result_t result;
-  result.error = RC_OK;
+  retcode_t result = RC_OK;
 
   try {
-    auto const results =
-        resolver.resolve(service->host, std::to_string(service->port));
+    auto const results = resolver.resolve(http_setting->host,
+                                          std::to_string(http_setting->port));
 
     boost::asio::connect(socket, results.begin(), results.end());
 
     http::request<http::string_body> req{http::verb::post, "/", 11};
-    req.set(http::field::host, service->host);
+    req.set(http::field::host, http_setting->host);
     req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-    req.set(http::field::content_type, service->content_type);
-    req.set("X-IOTA-API-Version", service->version);
+    req.set(http::field::content_type, "application/json");
+    req.set("X-IOTA-API-Version", http_setting->api_version);
     req.body() = obj->data;
     req.content_length(req.body().size());
 
@@ -55,8 +54,10 @@ iota_api_result_t iota_service_query(const void* const service_opaque,
     http::response<http::string_body> res;
 
     http::read(socket, buffer, res);
-    result.error = char_buffer_allocate(response, res.body().size());
-    if (result.error != RC_OK) return result;
+    result = char_buffer_allocate(response, res.body().size());
+    if (result != RC_OK) {
+      return result;
+    }
 
     std::memcpy(response->data, res.body().data(), res.body().size());
 
@@ -65,9 +66,9 @@ iota_api_result_t iota_service_query(const void* const service_opaque,
     socket.shutdown(tcp::socket::shutdown_both, ec);
 
     if (ec && ec != boost::system::errc::not_connected)
-      result.error = RC_CCLIENT_HTTP_REQ;
+      result = RC_CCLIENT_HTTP_REQ;
   } catch (const std::exception& ex) {
-    result.error = RC_CCLIENT_HTTP_REQ;
+    result = RC_CCLIENT_HTTP_REQ;
   }
 
   return result;

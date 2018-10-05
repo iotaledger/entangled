@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "attach_to_tangle.h"
+#include "request/attach_to_tangle.h"
 
 attach_to_tangle_req_t* attach_to_tangle_req_new() {
   attach_to_tangle_req_t* req =

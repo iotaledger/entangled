@@ -8,11 +8,11 @@
 #ifndef CCLIENT_REQUEST_GET_TRYTES_H
 #define CCLIENT_REQUEST_GET_TRYTES_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 /* List of tx hashes for which request should get trytes */
 typedef flex_hash_array_t get_trytes_req_t;

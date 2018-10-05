@@ -8,38 +8,35 @@
 #ifndef CCLIENT_SERVICE_H_
 #define CCLIENT_SERVICE_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdlib.h>
 
 #include "common/errors.h"
 #include "serialization/serializer.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+enum serializer_type_t {
+  SR_JSON = 0,
+  SR_UNIMPLEMENTED,
+};
+typedef enum serializer_type_t serializer_type_t;
+
 typedef struct {
   const char* host;
   size_t port;
-  const char* content_type;
-  int version;
-  unsigned int timeout;
+  int api_version;  // IOTA API version number.
+} http_info_t;
+
+typedef struct {
+  http_info_t http;
   serializer_t serializer;
-} iota_http_service_t;
+  serializer_type_t serializer_type;
+} iota_client_service_t;
 
-// TODO - implement + figure a way to pass serializer/serializer_enum and other
-// TODO - params, should they be loaded from conf?
-void init_iota_http_service(iota_http_service_t*, const char* const host,
-                            size_t port);
-
-typedef struct {
-  size_t duration;
-  retcode_t error;
-} iota_api_result_t;
-
-typedef struct {
-  char* data;
-  size_t length;
-} iota_response_t;
+retcode_t iota_client_service_init(iota_client_service_t* serv);
+void iota_client_service_destroy(iota_client_service_t* serv);
 
 #ifdef __cplusplus
 }

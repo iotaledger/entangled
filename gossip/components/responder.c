@@ -94,7 +94,7 @@ static retcode_t reply_to_request(responder_state_t *const state,
     // TODO(thibault): Randomly doesn't propagate request
     if (trit_array_is_null(request->hash) == false) {
       // Request is an actual missing transaction
-      if ((ret = request_transaction(&state->node->requester, request->hash))) {
+      if ((ret = request_transaction(state->node->requester, request->hash))) {
         return ret;
       }
     }

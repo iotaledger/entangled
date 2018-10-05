@@ -62,6 +62,7 @@ int mam_create(trit_t *const payload, size_t const payload_length,
 
   size_t offset = 0;
 
+  memset(payload, 0, payload_length * sizeof(trit_t));
   mam_init_encryption(side_key, side_key_length, merkle_tree, enc_curl);
 
   // encode index to payload

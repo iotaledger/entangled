@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "store_transactions.h"
+#include "request/store_transactions.h"
 
 store_transactions_req_t* store_transactions_req_new() {
   return flex_hash_array_new();

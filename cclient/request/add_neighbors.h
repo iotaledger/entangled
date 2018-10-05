@@ -8,11 +8,11 @@
 #ifndef CCLIENT_REQUEST_ADD_NEIGHBORS_H
 #define CCLIENT_REQUEST_ADD_NEIGHBORS_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 /* List of neighbors URIs */
 typedef UT_array add_neighbors_req_t;

@@ -54,6 +54,7 @@ cc_library(
 cc_library(
     name = "requester_shared",
     hdrs = ["requester.h"],
+    deps = ["//common:errors"],
 )
 
 cc_library(
@@ -61,7 +62,7 @@ cc_library(
     srcs = ["requester.c"],
     deps = [
         ":requester_shared",
-        "//ciri:core_shared",
+        "//consensus/tangle",
         "//utils:logger_helper",
         "//utils/containers/lists:concurrent_list_trit_array",
     ],

@@ -30,8 +30,9 @@
 #define TRANSACTION_COL_ATTACHMENT_TIMESTAMP_LOWER "attachment_timestamp_lower"
 #define TRANSACTION_COL_NONCE "nonce"
 #define TRANSACTION_COL_HASH "hash"
+#define TRANSACTION_COL_SNAPSHOT_INDEX "snapshot_index"
 
-#define TRANSACTION_NUM_COLS 16
+#define TRANSACTION_NUM_COLS 17
 
 /*
  * Milestone definitions

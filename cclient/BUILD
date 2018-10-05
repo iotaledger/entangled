@@ -1,10 +1,8 @@
 cc_library(
     name = "api",
-    srcs = glob([
-        "*.c",
-        "**/*.c",
-        "**/*.h",
-    ]),
+    srcs = [
+        "iota_api.c",
+    ],
     hdrs = ["iota_api.h"],
     visibility = ["//visibility:public"],
     deps = [
@@ -16,13 +14,13 @@ cc_library(
 cc_library(
     name = "service",
     srcs = [
-        "service.h",
+        "service.c",
     ],
+    hdrs = ["service.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//cclient/request:requests",
         "//cclient/response:responses",
         "//cclient/serialization:serializer_json",
-        "//utils:logger_helper",
     ],
 )

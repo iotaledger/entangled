@@ -8,11 +8,11 @@
 #ifndef CCLIENT_REQUEST_BROADCAST_TRANSACTIONS_H
 #define CCLIENT_REQUEST_BROADCAST_TRANSACTIONS_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 // List of raw data of transactions to be rebroadcast.
 typedef flex_hash_array_t broadcast_transactions_req_t;

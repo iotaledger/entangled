@@ -8,11 +8,11 @@
 #ifndef CCLIENT_REQUEST_GET_TRANSACTIONS_TO_APPROVE_H
 #define CCLIENT_REQUEST_GET_TRANSACTIONS_TO_APPROVE_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 typedef struct {
   uint32_t depth;

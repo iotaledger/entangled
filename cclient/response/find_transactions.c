@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "find_transactions.h"
+#include "response/find_transactions.h"
 
 find_transactions_res_t* find_transactions_res_new() {
   return flex_hash_array_new();

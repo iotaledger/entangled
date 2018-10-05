@@ -38,8 +38,10 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
   retcode_t res = RC_OK;
   iota_transaction_t curr_tx;
 
+  *is_valid = true;
   if (bundle == NULL) {
     log_error(BUNDLE_VALIDATOR_ID, "Bundle is not initialized\n");
+    *is_valid = false;
     return RC_CONSENSUS_NULL_BUNDLE_PTR;
   }
 
@@ -47,6 +49,7 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
 
   if (res || (utarray_len(bundle) == 0)) {
     log_error(BUNDLE_VALIDATOR_ID, "Failed loading transactions for tail\n");
+    *is_valid = false;
     return res;
   }
 
@@ -86,7 +89,6 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
       trit_t normalized_bundle_trits[NUM_TRITS_HASH];
       byte_t normalized_bundle_bytes[NUM_TRYTES_HASH];
 
-      *is_valid = true;
       calculate_bundle_hash(bundle, bundle_hash_calculated);
       if (memcmp(bundle_hash, bundle_hash_calculated, FLEX_TRIT_SIZE_243) !=
           0) {
@@ -105,6 +107,7 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
       res = validate_signature(bundle, normalized_bundle_trits, is_valid);
       if (res || !(*is_valid)) {
         log_error(BUNDLE_VALIDATOR_ID, "Invalid signature.\n");
+        *is_valid = false;
         break;
       }
     }
@@ -172,6 +175,7 @@ retcode_t validate_signature(bundle_transactions_t* bundle,
   init_kerl(&address_kerl);
   init_kerl(&sig_frag_kerl);
 
+  *is_valid = true;
   for (curr_tx = (iota_transaction_t)utarray_eltptr(bundle, 0);
        curr_tx != NULL;) {
     if (curr_tx->value >= 0) {
