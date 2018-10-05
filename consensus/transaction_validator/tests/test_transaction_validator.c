@@ -105,7 +105,7 @@ void transaction_invalid_value_tx_wrong_address() {
   transaction_validator_t tv;
   TEST_ASSERT(iota_consensus_transaction_validator_init(
                   &tv, tx1->attachment_timestamp, mwm) == RC_OK);
-  tx1->address[FLEX_TRIT_SIZE_243 - 1] = tx1->address[1];
+  tx1->address[FLEX_TRIT_SIZE_243 - 1] = tx1->address[4];
   TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
