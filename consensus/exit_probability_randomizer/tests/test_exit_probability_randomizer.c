@@ -9,6 +9,8 @@
 #include <string.h>
 #include <unity/unity.h>
 
+#include "math.h"
+
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
 #include "common/storage/sql/defs.h"
@@ -19,6 +21,7 @@
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
 #include "utarray.h"
+#include "utils/macros.h"
 
 static cw_rating_calculator_t calc;
 static tangle_t tangle;
@@ -142,12 +145,14 @@ void test_cw_gen_topology(test_tangle_topology topology) {
     // We can look on the previous trial as a sample from
     // binomial distribution where `p` = 1/num_approvers, `n` = selections,
     // so we get (mean = `np`, stdev = `np*(1-p)`):
-    double expected_mean = selections / num_approvers;
+    double expected_mean = ((double)selections / (double)num_approvers);
     double expected_stdev =
         sqrt(expected_mean * (1.0 - 1.0 / ((double)num_approvers)));
     for (size_t a = 0; a < num_approvers; ++a) {
-      TEST_ASSERT(selected_tip_counts[a] < expected_mean + 3 * expected_stdev);
-      TEST_ASSERT(selected_tip_counts[a] > expected_mean - 3 * expected_stdev);
+      uint16_t comp_up = expected_mean + 5 * expected_stdev;
+      uint16_t comp_low = MAX((expected_mean - 5 * expected_stdev), 0);
+      TEST_ASSERT(selected_tip_counts[a] < comp_up);
+      TEST_ASSERT(selected_tip_counts[a] >= comp_low);
     }
   }
 
