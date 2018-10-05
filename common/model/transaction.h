@@ -183,6 +183,8 @@ void transaction_set_hash(iota_transaction_t transaction,
 
 void transaction_reset(iota_transaction_t transaction);
 
+uint8_t transaction_weight_magnitude(const iota_transaction_t transaction);
+
 /***********************************************************************************************************
  * Constructors
  ***********************************************************************************************************/
