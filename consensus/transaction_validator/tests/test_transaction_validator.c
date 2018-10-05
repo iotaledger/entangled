@@ -124,7 +124,7 @@ void transaction_invalid_timestamp_too_futuristic() {
   tx1->attachment_timestamp = 0;
   tx1->timestamp = current_timestamp_ms() + 99 * 60 * 60 * 1000;
   transaction_validator_t tv;
-  TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, 0, 14) == RC_OK);
+  TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, 0, mwm) == RC_OK);
   TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
