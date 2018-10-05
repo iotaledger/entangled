@@ -17,7 +17,7 @@ cc_library(
         "//ciri/conf:conf_values",
         "//common/sign/v1:iss_curl",
         "//consensus/bundle_validator",
-        "//consensus/ledger_validator:ledger_validator_shared",
+        "//consensus/ledger_validator",
         "//mam/v1:merkle",
         "//utils:macros",
         "//utils:time",
