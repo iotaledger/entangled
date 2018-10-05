@@ -24,8 +24,8 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
                                            flex_trit_t *const milestone_hash,
                                            uint64_t index) {
   retcode_t ret = RC_OK;
-  hash_queue_t *non_analyzed_hashes = NULL;
-  hash_set_t *analyzed_hashes = NULL;
+  hash_queue_t non_analyzed_hashes = NULL;
+  hash_set_t analyzed_hashes = NULL;
 
   struct _iota_transaction tx;
   iota_transaction_t tx_ptr = &tx;
@@ -123,13 +123,13 @@ done:
 }
 
 static retcode_t get_latest_diff(ledger_validator_t *const lv,
-                                 hash_set_t **const analyzed_hashes,
+                                 hash_set_t *const analyzed_hashes,
                                  state_map_t *state, flex_trit_t *const tip,
                                  uint64_t latest_snapshot_index,
                                  bool is_milestone, bool *valid_diff) {
   retcode_t ret = RC_OK;
   int number_of_analyzed_transactions = 0;
-  hash_queue_t *non_analyzed_hashes = NULL;
+  hash_queue_t non_analyzed_hashes = NULL;
   state_entry_t *entry, *diff_elem;
 
   struct _iota_transaction tx;
@@ -267,7 +267,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
     bool *const has_snapshot) {
   retcode_t ret = RC_OK;
   bool valid_diff = true;
-  hash_set_t *analyzed_hashes = NULL;
+  hash_set_t analyzed_hashes = NULL;
   state_map_t diff = NULL, patch = NULL;
   struct _iota_transaction tx;
   iota_transaction_t tx_ptr = &tx;
@@ -336,10 +336,10 @@ done:
 }
 
 retcode_t iota_consensus_ledger_validator_check_consistency(
-    ledger_validator_t *const lv, hash_list_t *hashes, bool *consistent) {
+    ledger_validator_t *const lv, hash_list_t hashes, bool *consistent) {
   retcode_t ret = RC_OK;
-  hash_list_t *iter;
-  hash_set_t *analyzed_hashes = NULL;
+  hash_list_entry_t *iter = NULL;
+  hash_set_t analyzed_hashes = NULL;
   state_map_t diff = NULL;
 
   LL_FOREACH(hashes, iter) {
@@ -354,12 +354,12 @@ retcode_t iota_consensus_ledger_validator_check_consistency(
 }
 
 retcode_t iota_consensus_ledger_validator_update_diff(
-    ledger_validator_t *const lv, hash_set_t **analyzed_hashes,
+    ledger_validator_t *const lv, hash_set_t *analyzed_hashes,
     state_map_t *diff, flex_trit_t *tip, bool *is_consistent) {
   retcode_t ret = RC_OK;
   state_map_t current_state = NULL, patch = NULL;
   state_entry_t *iter, *entry, *diff_elem, *tmp;
-  hash_set_t *visited_hashes = NULL;
+  hash_set_t visited_hashes = NULL;
   bool valid_diff = true;
 
   // TODO
