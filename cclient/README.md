@@ -17,7 +17,7 @@ Output
 
 ## Using CClient library  
 
-C Client library is a subproject under the entangled, for using this library you should create a new bazel project and add this library to the deptendance.  
+C Client library is a subproject in the entangled repository, for using this library you should create a new bazel project and add this library to the dependence.  
 First thing is to create **WORKSPACE** and **BUILD** files in your project folder, second include `iota_client_core_api.h` in the source code.  
 
 The **WORKSPACE** file  
@@ -62,3 +62,32 @@ cc_binary(
 ```
 
 C Client application example [iota_cclient_example](https://github.com/oopsmonk/iota_cclient_example)  
+
+## API List  
+C Client API consisted of two API sets:  
+* **Core APIs** are basic APIs provide by [IRI](https://github.com/iotaledger/iri).  
+* **Extended APIs** are commonly used API functions for applications.
+
+**Core APIs**  
+
+* iota_client_get_node_info()
+* iota_client_get_neighbors()
+* iota_client_add_neighbors()
+* iota_client_remove_neighbors()
+* iota_client_get_tips()
+* iota_client_find_transactions()
+* iota_client_get_trytes()
+* iota_client_get_inclusion_states()
+* iota_client_get_balances()
+* iota_client_get_transactions_to_approve()
+* iota_client_attach_to_tangle()
+* iota_client_interrupt_attaching_to_tangle()
+* iota_client_broadcast_transactions()
+* iota_client_store_transactions()
+* iota_client_check_consistency()
+
+**Extended AIPs**  
+*Work in progress.*  
+
+## API Documentation  
+*Work in progress.*  
