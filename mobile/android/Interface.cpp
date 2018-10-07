@@ -9,10 +9,8 @@
 #include "Interface.h"
 
 extern "C" {
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_pow(JNIEnv* env,
-                                                               jclass thiz,
-                                                               jstring jtrytes,
-                                                               jint mwm) {
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_pow(
+    JNIEnv* env, jclass thiz, jstring jtrytes, jint mwm) {
   const char* trytes = env->GetStringUTFChars(jtrytes, 0);
   char* nonce = (char*)calloc(27 + 1, sizeof(char));
 
@@ -44,9 +42,12 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_sign_address_gen(
  * Method:    generateSignature
  * Signature: (Ljava/lang/String;IILjava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_sign_signature_gen(
-    JNIEnv* env, jclass thiz, jstring jseed, jint index, jint security,
-    jstring jBundleHash) {
+JNIEXPORT jstring JNICALL
+Java_org_iota_mobile_Interface_iota_sign_signature_gen(JNIEnv* env, jclass thiz,
+                                                       jstring jseed,
+                                                       jint index,
+                                                       jint security,
+                                                       jstring jBundleHash) {
   const char* seed = env->GetStringUTFChars(jseed, 0);
   const char* bundleHash = env->GetStringUTFChars(jBundleHash, 0);
 
