@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <unity/unity.h>
 
 #include "common/trinary/trit_byte.h"
