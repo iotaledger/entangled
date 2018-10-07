@@ -86,7 +86,7 @@ C Client API consists of two API sets:
 * iota_client_store_transactions()
 * iota_client_check_consistency()
 
-**Extended AIPs**  
+**Extended APIs**  
 *Work in progress.*  
 
 ## API Documentation  
