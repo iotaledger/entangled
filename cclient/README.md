@@ -64,8 +64,8 @@ cc_binary(
 C Client application example [iota_cclient_example](https://github.com/oopsmonk/iota_cclient_example)  
 
 ## API List  
-C Client API consisted of two API sets:  
-* **Core APIs** are basic APIs provide by [IRI](https://github.com/iotaledger/iri).  
+C Client API consists of two API sets:  
+* **Core APIs** are basic APIs provided by [IRI](https://github.com/iotaledger/iri).  
 * **Extended APIs** are commonly used API functions for applications.
 
 **Core APIs**  
