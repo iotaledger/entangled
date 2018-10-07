@@ -19,7 +19,7 @@
  * Public interface
  ***********************************************************************************************************/
 size_t trit_array_bytes_for_trits(size_t const num_trits) {
-  return num_flex_trits_for_trits(num_trits);
+  return NUM_FLEX_TRITS_FOR_TRITS(num_trits);
 }
 
 /***********************************************************************************************************

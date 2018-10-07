@@ -80,17 +80,17 @@ typedef int8_t flex_trit_t;
 /// current memory model.
 /// @param[in] num_trits - number of trits to store
 /// @return size_t - the number of flex_trits (bytes) needed
-static inline size_t num_flex_trits_for_trits(size_t const num_trits) {
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
-  return num_trits;
+  #define NUM_FLEX_TRITS_FOR_TRITS(num_trits) num_trits
 #elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
-  return num_trytes_for_trits(num_trits);
+  #define NUM_FLEX_TRITS_FOR_TRITS(num_trits) \
+  ((num_trits + NUMBER_OF_TRITS_IN_A_TRYTE - 1) / NUMBER_OF_TRITS_IN_A_TRYTE)
 #elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
-  return (num_trits + 3) >> 2U;
+  #define NUM_FLEX_TRITS_FOR_TRITS(num_trits) ((num_trits + 3) >> 2U)
 #elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
-  return min_bytes(num_trits);
+  #define NUM_FLEX_TRITS_FOR_TRITS(num_trits) \
+  ((num_trits + NUMBER_OF_TRITS_IN_A_BYTE - 1) / NUMBER_OF_TRITS_IN_A_BYTE)
 #endif
-}
 
 /// Returns the trit at a given index in an array of flex_trits
 /// @param[in] flex_trits - an array of flex_trits
@@ -107,7 +107,7 @@ static inline trit_t flex_trits_at(flex_trit_t const *const flex_trits,
   // Straight forward 1 trit per byte
   return flex_trits[index];
 #elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
-  return get_trit_at((tryte_t *)flex_trits, num_flex_trits_for_trits(len),
+  return get_trit_at((tryte_t *)flex_trits, NUM_FLEX_TRITS_FOR_TRITS(len),
                      index);
 #elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
   // Find out the position of the trit in the byte
@@ -145,7 +145,7 @@ static inline uint8_t flex_trits_set_at(flex_trit_t *const flex_trits,
   // Straight forward 1 trit per byte
   flex_trits[index] = trit;
 #elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
-  set_trit_at(flex_trits, num_flex_trits_for_trits(len), index, trit);
+  set_trit_at(flex_trits, NUM_FLEX_TRITS_FOR_TRITS(len), index, trit);
 #elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
   // Calculate the final position of the trit in the byte
   uint8_t shift = (index & 3) << 1U;

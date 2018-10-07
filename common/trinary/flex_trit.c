@@ -18,8 +18,8 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
   if (num_trits == 0 || num_trits > to_len || (start + num_trits) > len) {
     return 0;
   }
-  size_t num_bytes = num_flex_trits_for_trits(num_trits);
-  memset(to_flex_trits, FLEX_TRIT_NULL_VALUE, num_flex_trits_for_trits(to_len));
+  size_t num_bytes = NUM_FLEX_TRITS_FOR_TRITS(num_trits);
+  memset(to_flex_trits, FLEX_TRIT_NULL_VALUE, NUM_FLEX_TRITS_FOR_TRITS(to_len));
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   // num_bytes == num_trits in a 1:1 scheme
   memcpy(to_flex_trits, flex_trits + start, num_bytes);
@@ -28,7 +28,7 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
   size_t index = start / 3U;
   size_t offset = start % 3U;
   size_t i, j;
-  size_t end_index = num_flex_trits_for_trits(len) - 1;
+  size_t end_index = NUM_FLEX_TRITS_FOR_TRITS(len) - 1;
   for (i = index, j = 0; j < num_bytes; i++, j++) {
     trytes_to_trits(&flex_trits[i], trits, 1);
     if (offset && i < end_index) {
@@ -48,7 +48,7 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
   uint8_t rshift = (8U - tshift) & 7;
   size_t index = start >> 2U;
   size_t i, j;
-  size_t end_index = num_flex_trits_for_trits(len) - 1;
+  size_t end_index = NUM_FLEX_TRITS_FOR_TRITS(len) - 1;
   // Calculate the number of bytes to copy over
   for (i = index, j = 0; j < num_bytes; i++, j++) {
     buffer = flex_trits[i];
@@ -71,7 +71,7 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
   size_t index = start / 5U;
   size_t offset = start % 5U;
   size_t i, j;
-  size_t end_index = num_flex_trits_for_trits(len) - 1;
+  size_t end_index = NUM_FLEX_TRITS_FOR_TRITS(len) - 1;
   for (i = index, j = 0; j < num_bytes; i++, j++) {
     bytes_to_trits(((byte_t *)flex_trits + i), 1, trits, 5);
     if (offset && i < end_index) {
@@ -115,7 +115,7 @@ size_t flex_trits_to_trits(trit_t *const trits, size_t const to_len,
   if (num_trits == 0 || num_trits > len || num_trits > to_len) {
     return 0;
   }
-  size_t num_bytes = num_flex_trits_for_trits(num_trits);
+  size_t num_bytes = NUM_FLEX_TRITS_FOR_TRITS(num_trits);
   memset(trits, 0, to_len);
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   // num_bytes == num_trits in a 1:1 scheme
@@ -139,7 +139,7 @@ size_t flex_trits_from_trits(flex_trit_t *const to_flex_trits,
   if (num_trits > len || num_trits > to_len) {
     return 0;
   }
-  memset(to_flex_trits, FLEX_TRIT_NULL_VALUE, num_flex_trits_for_trits(to_len));
+  memset(to_flex_trits, FLEX_TRIT_NULL_VALUE, NUM_FLEX_TRITS_FOR_TRITS(to_len));
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   // num_bytes == num_trits in a 1:1 scheme
   memcpy(to_flex_trits, trits, num_trits);
@@ -167,7 +167,7 @@ size_t flex_trits_to_trytes(tryte_t *trytes, size_t to_len,
   trits_to_trytes((trit_t *)flex_trits, trytes, num_trits);
 #elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
   uint8_t residual = num_trits % 3U;
-  size_t num_bytes = num_flex_trits_for_trits(num_trits);
+  size_t num_bytes = NUM_FLEX_TRITS_FOR_TRITS(num_trits);
   // There is a risk of noise after the last trit so we need to clean up
   if (residual) {
     trit_t trits[3];
@@ -213,7 +213,7 @@ size_t flex_trits_from_trytes(flex_trit_t *to_flex_trits, size_t to_len,
   if (num_trytes > len || num_trytes * 3 > to_len) {
     return 0;
   }
-  memset(to_flex_trits, FLEX_TRIT_NULL_VALUE, num_flex_trits_for_trits(to_len));
+  memset(to_flex_trits, FLEX_TRIT_NULL_VALUE, NUM_FLEX_TRITS_FOR_TRITS(to_len));
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   trytes_to_trits((tryte_t *)trytes, to_flex_trits, num_trytes);
 #elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
@@ -315,7 +315,7 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
   if (num_trits > len || num_trits > to_len) {
     return 0;
   }
-  memset(to_flex_trits, FLEX_TRIT_NULL_VALUE, num_flex_trits_for_trits(to_len));
+  memset(to_flex_trits, FLEX_TRIT_NULL_VALUE, NUM_FLEX_TRITS_FOR_TRITS(to_len));
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   size_t num_bytes = min_bytes(num_trits);
   bytes_to_trits(bytes, num_bytes, to_flex_trits, num_trits);
