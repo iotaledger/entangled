@@ -5,14 +5,20 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "types.h"
+#include "types/types.h"
 
 #define TYPES_LOGGER_ID "types"
 
 void logger_init_types() {
   logger_helper_init(TYPES_LOGGER_ID, LOGGER_DEBUG, true);
-  log_info(TYPES_LOGGER_ID, "[%s:%d] enable types debug message.\n", __func__,
-           __LINE__);
+  log_info(TYPES_LOGGER_ID, "[%s:%d] enable logger %s.\n", __func__, __LINE__,
+           TYPES_LOGGER_ID);
+}
+
+void logger_destroy_types() {
+  log_info(TYPES_LOGGER_ID, "[%s:%d] destroy logger %s.\n", __func__, __LINE__,
+           TYPES_LOGGER_ID);
+  logger_helper_destroy(TYPES_LOGGER_ID);
 }
 
 char_buffer_t* char_buffer_new() {
@@ -24,8 +30,6 @@ char_buffer_t* char_buffer_new() {
     log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
               STR_CCLIENT_NULL_PTR);
   }
-  log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
-            STR_CCLIENT_NULL_PTR);
   return out;
 }
 

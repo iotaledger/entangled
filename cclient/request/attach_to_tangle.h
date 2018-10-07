@@ -8,11 +8,11 @@
 #ifndef CCLIENT_REQUEST_ATTACH_TO_TANGLE_H
 #define CCLIENT_REQUEST_ATTACH_TO_TANGLE_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 #define ATTACH_TO_TANGLE_MAIN_MWM 14
 #define ATTACH_TO_TANGLE_TEST_MWM 9

@@ -61,6 +61,12 @@ retcode_t hash_pack_init(iota_stor_pack_t *pack, size_t size) {
   return RC_OK;
 }
 
+retcode_t hash_pack_reset(iota_stor_pack_t *pack) {
+  pack->num_loaded = 0;
+  pack->insufficient_capacity = false;
+  return RC_OK;
+}
+
 retcode_t hash_pack_free(iota_stor_pack_t *pack) {
   for (int i = 0; i < pack->capacity; ++i) {
     trit_array_free(pack->models[i]);

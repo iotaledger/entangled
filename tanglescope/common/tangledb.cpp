@@ -9,7 +9,7 @@ TangleDB& TangleDB::instance() {
   return db;
 }
 
-std::optional<TangleDB::TXRecord> TangleDB::find(const std::string& hash) {
+nonstd::optional<TangleDB::TXRecord> TangleDB::find(const std::string& hash) {
   std::shared_lock<std::shared_mutex> lock(mutex_);
   auto tx = _txs.find(hash);
   if (tx != _txs.end()) {

@@ -27,6 +27,7 @@ cc_library(
         ":node_shared",
         "//ciri/api",
         "//ciri/conf",
+        "//consensus/ledger_validator",
         "//consensus/milestone_tracker",
         "//consensus/snapshot",
         "//consensus/tangle",

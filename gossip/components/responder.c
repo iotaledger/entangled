@@ -30,7 +30,10 @@ static retcode_t regular_transaction_request(
     return RC_RESPONDER_COMPONENT_OOM;
   }
 
-  iota_stor_pack_t pack = {(void **)tx, 1, 0, false};
+  iota_stor_pack_t pack = {.models = (void **)tx,
+                           .capacity = 1,
+                           .num_loaded = 0,
+                           .insufficient_capacity = false};
   if ((ret = iota_tangle_transaction_load(&state->node->core->tangle,
                                           TRANSACTION_COL_HASH, request->hash,
                                           &pack))) {
@@ -91,7 +94,7 @@ static retcode_t reply_to_request(responder_state_t *const state,
     // TODO(thibault): Randomly doesn't propagate request
     if (trit_array_is_null(request->hash) == false) {
       // Request is an actual missing transaction
-      if ((ret = request_transaction(&state->node->requester, request->hash))) {
+      if ((ret = request_transaction(state->node->requester, request->hash))) {
         return ret;
       }
     }

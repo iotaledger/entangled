@@ -8,11 +8,11 @@
 #ifndef CCLIENT_RESPONSE_ATTACH_TO_TANGLE_H
 #define CCLIENT_RESPONSE_ATTACH_TO_TANGLE_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 // response is a different set of tryte values which you can input into
 // broadcastTransactions and storeTransactions.

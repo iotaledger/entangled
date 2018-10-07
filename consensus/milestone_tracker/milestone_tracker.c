@@ -15,6 +15,7 @@
 #include "common/storage/sql/defs.h"
 #include "common/trinary/trit_long.h"
 #include "consensus/bundle_validator/bundle_validator.h"
+#include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "mam/v1/merkle.h"
 #include "utils/logger_helper.h"
@@ -146,7 +147,10 @@ static void* latest_milestone_tracker(void* arg) {
   iota_milestone_t candidate;
   struct _iota_transaction tx;
   iota_transaction_t tx_ptr = &tx;
-  iota_stor_pack_t tx_pack = {(void**)&tx_ptr, 1, 0, false};
+  iota_stor_pack_t tx_pack = {.models = (void**)&tx_ptr,
+                              .capacity = 1,
+                              .num_loaded = 0,
+                              .insufficient_capacity = false};
   uint64_t scan_time, previous_latest_milestone_index;
 
   if (mt == NULL) {
@@ -201,12 +205,16 @@ static retcode_t update_latest_solid_subtangle_milestone(
   iota_milestone_t milestone, latest_milestone;
   iota_milestone_t *milestone_ptr = &milestone,
                    *latest_milestone_ptr = &latest_milestone;
-  iota_stor_pack_t pack = {(void**)&latest_milestone_ptr, 1, 0, false};
+  iota_stor_pack_t pack = {.models = (void**)&latest_milestone_ptr,
+                           .capacity = 1,
+                           .num_loaded = 0,
+                           .insufficient_capacity = false};
+  bool has_snapshot = false;
 
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
   }
-  if ((ret = iota_tangle_milestone_load_latest(mt->tangle, &pack)) != RC_OK) {
+  if ((ret = iota_tangle_milestone_load_last(mt->tangle, &pack)) != RC_OK) {
     return ret;
   }
   if (pack.num_loaded != 0) {
@@ -219,14 +227,23 @@ static retcode_t update_latest_solid_subtangle_milestone(
     }
     while (pack.num_loaded != 0 && milestone.index <= latest_milestone.index &&
            mt->running) {
-      if (true  // TODO
-                // transactionValidator.checkSolidity(milestoneViewModel.getHash(),
-                // true)
-          && milestone.index >= mt->latest_solid_subtangle_milestone_index &&
-          true /* TODO ledgerValidator.updateSnapshot(milestoneViewModel) */) {
-        mt->latest_solid_subtangle_milestone_index = milestone.index;
-        memcpy(mt->latest_solid_subtangle_milestone->trits, milestone.hash,
-               FLEX_TRIT_SIZE_243);
+      has_snapshot = false;
+      if (milestone.index >= mt->latest_solid_subtangle_milestone_index
+          // TODO &&
+          // transactionValidator.checkSolidity(milestoneViewModel.getHash(),
+          // true))
+      ) {
+        if ((ret = iota_consensus_ledger_validator_update_snapshot(
+                 mt->ledger_validator, &milestone, &has_snapshot)) != RC_OK) {
+          log_error(MILESTONE_TRACKER_LOGGER_ID, "Updating snapshot failed\n");
+          return ret;
+        } else if (has_snapshot) {
+          mt->latest_solid_subtangle_milestone_index = milestone.index;
+          memcpy(mt->latest_solid_subtangle_milestone->trits, milestone.hash,
+                 FLEX_TRIT_SIZE_243);
+        } else {
+          break;
+        }
       } else {
         break;
       }
@@ -315,6 +332,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   }
   mt->latest_milestone_index = mt->milestone_start_index;
   mt->latest_solid_subtangle_milestone_index = mt->milestone_start_index;
+  mt->ledger_validator = NULL;
 
   return RC_OK;
 

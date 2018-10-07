@@ -44,6 +44,17 @@ cc_library(
 )
 
 cc_library(
+    name = "hash_containers",
+    srcs = ["hash_containers.c"],
+    hdrs = ["hash_containers.h"],
+    deps = [
+        "//common:errors",
+        "//common/trinary:flex_trit",
+        "@com_github_uthash//:uthash",
+    ],
+)
+
+cc_library(
     name = "memset_secure",
     srcs = ["memset_secure.c"],
     hdrs = ["memset_secure.h"],

@@ -8,11 +8,11 @@
 #ifndef CCLIENT_RESPONSE_FIND_TRANSACTIONS_H
 #define CCLIENT_RESPONSE_FIND_TRANSACTIONS_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 typedef flex_hash_array_t find_transactions_res_t;
 

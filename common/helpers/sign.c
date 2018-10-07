@@ -30,12 +30,11 @@ IOTA_EXPORT char* iota_sign_address_gen(char const* const seed,
   trit_t subseed[HASH_LENGTH];
   const size_t key_length = security * ISS_KEY_LENGTH;
 
-  key = calloc(sizeof(trit_t) * key_length, sizeof(trit_t));
+  key = calloc(key_length, sizeof(trit_t));
   if (!key) {
     return NULL;
   }
-  address =
-      calloc(sizeof(tryte_t) * (HASH_LENGTH / RADIX + 1), sizeof(tryte_t));
+  address = calloc(HASH_LENGTH / RADIX + 1, sizeof(tryte_t));
   if (!address) {
     goto cleanup;
   }
@@ -54,10 +53,10 @@ IOTA_EXPORT char* iota_sign_address_gen(char const* const seed,
   kerl_reset(&kerl);
 
   trits_to_trytes(key, (tryte_t*)address, HASH_LENGTH);
-
-cleanup:
   memset_secure(key, key_length * sizeof(trit_t), 0,
                 key_length * sizeof(trit_t));
+
+cleanup:
   free(key);
 
   return address;
@@ -74,12 +73,11 @@ IOTA_EXPORT char* iota_sign_signature_gen(char const* const seed,
   trit_t subseed[HASH_LENGTH];
   const size_t key_length = security * ISS_KEY_LENGTH;
 
-  key = calloc(sizeof(trit_t) * key_length, sizeof(trit_t));
+  key = calloc(key_length, sizeof(trit_t));
   if (!key) {
     return NULL;
   }
-  signature =
-      calloc(sizeof(tryte_t) * (key_length / RADIX + 1), sizeof(tryte_t));
+  signature = calloc(key_length / RADIX + 1, sizeof(tryte_t));
   if (!signature) {
     goto cleanup;
   }
@@ -95,10 +93,10 @@ IOTA_EXPORT char* iota_sign_signature_gen(char const* const seed,
 
   iss_kerl_signature(key, hash, key, key_length, &kerl);
   trits_to_trytes(key, (tryte_t*)signature, key_length);
-
-cleanup:
   memset_secure(key, key_length * sizeof(trit_t), 0,
                 key_length * sizeof(trit_t));
+
+cleanup:
   free(key);
 
   return (char*)signature;
@@ -116,13 +114,12 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_address_gen(
   trit_t subseed[HASH_LENGTH];
   const size_t key_length = security * ISS_KEY_LENGTH;
 
-  key = calloc(sizeof(trit_t) * key_length, sizeof(trit_t));
+  key = calloc(key_length, sizeof(trit_t));
   if (!key) {
     return NULL;
   }
   address =
-      calloc(sizeof(flex_trit_t) * (num_flex_trits_for_trits(HASH_LENGTH) + 1),
-             sizeof(flex_trit_t));
+      calloc(num_flex_trits_for_trits(HASH_LENGTH) + 1, sizeof(flex_trit_t));
   if (!address) {
     goto cleanup;
   }
@@ -143,9 +140,10 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_address_gen(
 
   flex_trits_from_trits(address, HASH_LENGTH, key, key_length, HASH_LENGTH);
 
-cleanup:
   memset_secure(key, key_length * sizeof(trit_t), 0,
                 key_length * sizeof(trit_t));
+
+cleanup:
   free(key);
 
   return address;
@@ -161,13 +159,12 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_signature_gen(
   trit_t subseed[HASH_LENGTH];
   const size_t key_length = security * ISS_KEY_LENGTH;
 
-  key = calloc(sizeof(trit_t) * key_length, sizeof(trit_t));
+  key = calloc(key_length, sizeof(trit_t));
   if (!key) {
     return NULL;
   }
   signature =
-      calloc(sizeof(flex_trit_t) * (num_flex_trits_for_trits(key_length) + 1),
-             sizeof(flex_trit_t));
+      calloc(num_flex_trits_for_trits(key_length) + 1, sizeof(flex_trit_t));
   if (!signature) {
     goto cleanup;
   }
@@ -185,9 +182,10 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_signature_gen(
   iss_kerl_signature(key, hash, key, key_length, &kerl);
   flex_trits_from_trits(signature, key_length, key, key_length, key_length);
 
-cleanup:
   memset_secure(key, key_length * sizeof(trit_t), 0,
                 key_length * sizeof(trit_t));
+
+cleanup:
   free(key);
 
   return signature;

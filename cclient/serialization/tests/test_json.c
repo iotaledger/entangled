@@ -12,24 +12,21 @@ void test_serialize_find_transactions(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"command\":\"findTransactions\",\"addresses\":["
-      "\"" FIND_TRANSACTIONS_SERIALIZE_ADDRESS
+      "\"" TEST_81_TRYRES_1
       "\"],\"approvees\":["
-      "\"" FIND_TRANSACTIONS_SERIALIZE_APPROVEE
+      "\"" TEST_81_TRYRES_2
       "\"],\"bundles\":["
-      "\"" FIND_TRANSACTIONS_SERIALIZE_BUNDLE
-      "\"],\"tags\":[\"" FIND_TRANSACTIONS_SERIALIZE_TAG "\"]}";
+      "\"" TEST_81_TRYRES_3
+      "\"],\"tags\":["
+      "\"" TEST_27_TRYRES_1 "\"]}";
 
   find_transactions_req_t* find_tran = find_transactions_req_new();
   char_buffer_t* serializer_out = char_buffer_new();
 
-  find_tran =
-      find_transactions_req_add_tag(find_tran, FIND_TRANSACTIONS_SERIALIZE_TAG);
-  find_tran = find_transactions_req_add_approvee(
-      find_tran, FIND_TRANSACTIONS_SERIALIZE_APPROVEE);
-  find_tran = find_transactions_req_add_address(
-      find_tran, FIND_TRANSACTIONS_SERIALIZE_ADDRESS);
-  find_tran = find_transactions_req_add_bundle(
-      find_tran, FIND_TRANSACTIONS_SERIALIZE_BUNDLE);
+  find_tran = find_transactions_req_add_tag(find_tran, TEST_27_TRYRES_1);
+  find_tran = find_transactions_req_add_approvee(find_tran, TEST_81_TRYRES_2);
+  find_tran = find_transactions_req_add_address(find_tran, TEST_81_TRYRES_1);
+  find_tran = find_transactions_req_add_bundle(find_tran, TEST_81_TRYRES_3);
 
   serializer.vtable.find_transactions_serialize_request(&serializer, find_tran,
                                                         serializer_out);
@@ -45,16 +42,16 @@ void test_deserialize_find_transactions(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"hashes\": "
-      "[\"" TEST_HASH1
+      "[\"" TEST_81_TRYRES_1
       "\", "
-      "\"" TEST_HASH2
+      "\"" TEST_81_TRYRES_2
       "\", "
-      "\"" TEST_HASH3 "\"]}";
+      "\"" TEST_81_TRYRES_3 "\"]}";
 
   trit_array_p tmp_hash = NULL;
-  trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_HASH1);
-  trit_array_p hash2 = trit_array_new_from_trytes((tryte_t*)TEST_HASH2);
-  trit_array_p hash3 = trit_array_new_from_trytes((tryte_t*)TEST_HASH3);
+  trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_1);
+  trit_array_p hash2 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_2);
+  trit_array_p hash3 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_3);
 
   find_transactions_res_t* deserialize_find_tran = find_transactions_res_new();
 
@@ -98,79 +95,71 @@ void test_deserialize_get_node_info(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
   const char* json_text =
-      "{\"appName\":\"" GET_NODE_INFO_DESERIALIZE_APP_NAME
-      "\",\"appVersion\":\"" GET_NODE_INFO_DESERIALIZE_APP_VERSION
+      "{\"appName\":\"" TEST_INFO_APP_NAME
+      "\",\"appVersion\":\"" TEST_INFO_APP_VERSION
       "\",\"duration\":1,"
       "\"jreAvailableProcessors\""
-      ":" STR(GET_NODE_INFO_DESERIALIZE_JRE_AVAILABLE_PROCESSORS)
-      ",\"jreFreeMemory\":" STR(GET_NODE_INFO_DESERIALIZE_JRE_FREE_MEMORY)
+      ":" STR(TEST_INFO_JRE_AVAILABLE_PROCESSORS)
+      ",\"jreFreeMemory\":" STR(TEST_INFO_JRE_FREE_MEMORY)
       ","
-      "\"jreMaxMemory\":" STR(GET_NODE_INFO_DESERIALIZE_JRE_MAX_MEMORY)
-      ",\"jreTotalMemory\":" STR(GET_NODE_INFO_DESERIALIZE_JRE_TOTAL_MEMORY)
+      "\"jreMaxMemory\":" STR(TEST_INFO_JRE_MAX_MEMORY)
+      ",\"jreTotalMemory\":" STR(TEST_INFO_JRE_TOTAL_MEMORY)
       ","
       "\"latestMilestone\":"
-      "\"" GET_NODE_INFO_DESERIALIZE_LATEST_MILESTONE
+      "\"" TEST_81_TRYRES_1
       "\","
       "\"latestMilestoneIndex\""
-      ":" STR(GET_NODE_INFO_DESERIALIZE_LATEST_MILESTONE_INDEX)
+      ":" STR(TEST_INFO_LATEST_MILESTONE_INDEX)
       ","
       "\"latestSolidSubtangleMilestone\":"
-      "\"" GET_NODE_INFO_DESERIALIZE_LATEST_SS_MILESTONE
+      "\"" TEST_81_TRYRES_2
       "\","
       "\"latestSolidSubtangleMilestoneIndex\""
-      ":" STR(GET_NODE_INFO_DESERIALIZE_LATEST_SS_MILESTONE_INDEX)
-      ",\"neighbors\":" STR(GET_NODE_INFO_DESERIALIZE_NEIGHBORS)
-      ",\"packetsQueueSize\":" STR(GET_NODE_INFO_DESERIALIZE_PACKETS_QUEUE_SIZE)
-      ",\"time\":" STR(GET_NODE_INFO_DESERIALIZE_TIME)
-      ",\"tips\":" STR(GET_NODE_INFO_DESERIALIZE_TIPS)
+      ":" STR(TEST_INFO_LATEST_SS_MILESTONE_INDEX)
+      ",\"neighbors\":" STR(TEST_INFO_NEIGHBORS)
+      ",\"packetsQueueSize\":" STR(TEST_INFO_PACKETS_QUEUE_SIZE)
+      ",\"time\":" STR(TEST_INFO_TIME)
+      ",\"tips\":" STR(TEST_INFO_TIPS)
       ","
       "\"transactionsToRequest\""
-      ":" STR(GET_NODE_INFO_DESERIALIZE_TRANSACTIONS_TO_REQUEST) "}";
+      ":" STR(TEST_INFO_TRANSACTIONS_TO_REQUEST) "}";
 
-  trit_array_p last_m = trit_array_new_from_trytes(
-      (tryte_t*)GET_NODE_INFO_DESERIALIZE_LATEST_MILESTONE);
-  trit_array_p last_sm = trit_array_new_from_trytes(
-      (tryte_t*)GET_NODE_INFO_DESERIALIZE_LATEST_SS_MILESTONE);
+  trit_array_p last_m = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_1);
+  trit_array_p last_sm = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_2);
   get_node_info_res_t* node_info = get_node_info_res_new();
 
   serializer.vtable.get_node_info_deserialize_response(&serializer, json_text,
                                                        &node_info);
 
-  TEST_ASSERT_EQUAL_STRING(GET_NODE_INFO_DESERIALIZE_APP_NAME,
-                           node_info->app_name->data);
-  TEST_ASSERT_EQUAL_STRING(GET_NODE_INFO_DESERIALIZE_APP_VERSION,
-                           node_info->app_version->data);
-  TEST_ASSERT_EQUAL_INT(GET_NODE_INFO_DESERIALIZE_JRE_AVAILABLE_PROCESSORS,
+  TEST_ASSERT_EQUAL_STRING(TEST_INFO_APP_NAME, node_info->app_name->data);
+  TEST_ASSERT_EQUAL_STRING(TEST_INFO_APP_VERSION, node_info->app_version->data);
+  TEST_ASSERT_EQUAL_INT(TEST_INFO_JRE_AVAILABLE_PROCESSORS,
                         node_info->jre_available_processors);
-  TEST_ASSERT_EQUAL_INT8(GET_NODE_INFO_DESERIALIZE_JRE_FREE_MEMORY,
-                         node_info->jre_free_memory);
-  TEST_ASSERT_EQUAL_INT8(GET_NODE_INFO_DESERIALIZE_JRE_MAX_MEMORY,
-                         node_info->jre_max_memory);
-  TEST_ASSERT_EQUAL_INT8(GET_NODE_INFO_DESERIALIZE_JRE_TOTAL_MEMORY,
+  TEST_ASSERT_EQUAL_INT8(TEST_INFO_JRE_FREE_MEMORY, node_info->jre_free_memory);
+  TEST_ASSERT_EQUAL_INT8(TEST_INFO_JRE_MAX_MEMORY, node_info->jre_max_memory);
+  TEST_ASSERT_EQUAL_INT8(TEST_INFO_JRE_TOTAL_MEMORY,
                          node_info->jre_total_memory);
-  /*TEST_ASSERT_EQUAL_STRING(GET_NODE_INFO_DESERIALIZE_LATEST_MILESTONE,*/
-  /*node_info->latest_milestone->data);*/
   TEST_ASSERT_EQUAL_MEMORY(last_m->trits, node_info->latest_milestone->trits,
                            last_m->num_bytes);
-  TEST_ASSERT_EQUAL_INT8(GET_NODE_INFO_DESERIALIZE_LATEST_MILESTONE_INDEX,
+  TEST_ASSERT_EQUAL_INT8(TEST_INFO_LATEST_MILESTONE_INDEX,
                          node_info->latest_milestone_index);
-  /*TEST_ASSERT_EQUAL_STRING(GET_NODE_INFO_DESERIALIZE_LATEST_SS_MILESTONE,*/
-  /*node_info->latest_solid_subtangle_milestone->data);*/
   TEST_ASSERT_EQUAL_MEMORY(last_sm->trits,
                            node_info->latest_solid_subtangle_milestone->trits,
                            last_sm->num_bytes);
-  TEST_ASSERT_EQUAL_INT8(GET_NODE_INFO_DESERIALIZE_LATEST_SS_MILESTONE_INDEX,
+  TEST_ASSERT_EQUAL_INT8(TEST_INFO_LATEST_SS_MILESTONE_INDEX,
                          node_info->latest_solid_subtangle_milestone_index);
-  TEST_ASSERT_EQUAL_INT(GET_NODE_INFO_DESERIALIZE_NEIGHBORS,
-                        node_info->neighbors);
-  TEST_ASSERT_EQUAL_INT(GET_NODE_INFO_DESERIALIZE_PACKETS_QUEUE_SIZE,
+  TEST_ASSERT_EQUAL_INT(TEST_INFO_NEIGHBORS, node_info->neighbors);
+  TEST_ASSERT_EQUAL_INT(TEST_INFO_PACKETS_QUEUE_SIZE,
                         node_info->packets_queue_size);
-  TEST_ASSERT_EQUAL_INT8(GET_NODE_INFO_DESERIALIZE_TIME, node_info->time);
-  TEST_ASSERT_EQUAL_INT(GET_NODE_INFO_DESERIALIZE_TIPS, node_info->tips);
-  TEST_ASSERT_EQUAL_INT(GET_NODE_INFO_DESERIALIZE_TRANSACTIONS_TO_REQUEST,
+  TEST_ASSERT_EQUAL_INT8(TEST_INFO_TIME, node_info->time);
+  TEST_ASSERT_EQUAL_INT(TEST_INFO_TIPS, node_info->tips);
+  TEST_ASSERT_EQUAL_INT(TEST_INFO_TRANSACTIONS_TO_REQUEST,
                         node_info->trans_to_request);
 
   get_node_info_res_free(&node_info);
+
+  trit_array_free(last_m);
+  trit_array_free(last_sm);
 }
 
 void test_serialize_get_neighbors(void) {
@@ -193,14 +182,14 @@ void test_deserialize_get_neighbors(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"duration\":37,\"neighbors\":[{"
-      "\"address\":\"" GET_NEIGHBORS_DESERIALIZE_NEIGHBOR1
-      "\",\"numberOfAllTransactions\":" STR(GET_NEIGHBORS_DESERIALIZE_NUMALLTX1)
-      ",\"numberOfInvalidTransactions\":" STR(GET_NEIGHBORS_DESERIALIZE_NUMINVALIDTX1)
-      ",\"numberOfNewTransactions\":" STR(GET_NEIGHBORS_DESERIALIZE_NUMNEWTX1)
-      "},{\"address\":\"" GET_NEIGHBORS_DESERIALIZE_NEIGHBOR2
-      "\",\"numberOfAllTransactions\":" STR(GET_NEIGHBORS_DESERIALIZE_NUMALLTX2)
-      ",\"numberOfInvalidTransactions\":" STR(GET_NEIGHBORS_DESERIALIZE_NUMINVALIDTX2)
-      ",\"numberOfNewTransactions\":" STR(GET_NEIGHBORS_DESERIALIZE_NUMNEWTX2) "}]}";
+      "\"address\":\"" TEST_NEIGHBORS_NEIGHBOR1
+      "\",\"numberOfAllTransactions\":" STR(TEST_NEIGHBORS_NUMALLTX1)
+      ",\"numberOfInvalidTransactions\":" STR(TEST_NEIGHBORS_NUMINVALIDTX1)
+      ",\"numberOfNewTransactions\":" STR(TEST_NEIGHBORS_NUMNEWTX1)
+      "},{\"address\":\"" TEST_NEIGHBORS_NEIGHBOR2
+      "\",\"numberOfAllTransactions\":" STR(TEST_NEIGHBORS_NUMALLTX2)
+      ",\"numberOfInvalidTransactions\":" STR(TEST_NEIGHBORS_NUMINVALIDTX2)
+      ",\"numberOfNewTransactions\":" STR(TEST_NEIGHBORS_NUMNEWTX2) "}]}";
 
   get_neighbors_res_t* nbors = get_neighbors_res_new();
 
@@ -208,19 +197,15 @@ void test_deserialize_get_neighbors(void) {
                                                        nbors);
 
   neighbor_info_t* nb = get_neighbors_res_neighbor_at(nbors, 0);
-  TEST_ASSERT_EQUAL_STRING(GET_NEIGHBORS_DESERIALIZE_NEIGHBOR1,
-                           nb->address->data);
-  TEST_ASSERT_EQUAL_INT(GET_NEIGHBORS_DESERIALIZE_NUMALLTX1, nb->all_trans_num);
-  TEST_ASSERT_EQUAL_INT(GET_NEIGHBORS_DESERIALIZE_NUMINVALIDTX1,
-                        nb->invalid_trans_num);
-  TEST_ASSERT_EQUAL_INT(GET_NEIGHBORS_DESERIALIZE_NUMNEWTX1, nb->new_trans_num);
+  TEST_ASSERT_EQUAL_STRING(TEST_NEIGHBORS_NEIGHBOR1, nb->address->data);
+  TEST_ASSERT_EQUAL_INT(TEST_NEIGHBORS_NUMALLTX1, nb->all_trans_num);
+  TEST_ASSERT_EQUAL_INT(TEST_NEIGHBORS_NUMINVALIDTX1, nb->invalid_trans_num);
+  TEST_ASSERT_EQUAL_INT(TEST_NEIGHBORS_NUMNEWTX1, nb->new_trans_num);
   nb = get_neighbors_res_neighbor_at(nbors, 1);
-  TEST_ASSERT_EQUAL_STRING(GET_NEIGHBORS_DESERIALIZE_NEIGHBOR2,
-                           nb->address->data);
-  TEST_ASSERT_EQUAL_INT(GET_NEIGHBORS_DESERIALIZE_NUMALLTX2, nb->all_trans_num);
-  TEST_ASSERT_EQUAL_INT(GET_NEIGHBORS_DESERIALIZE_NUMINVALIDTX2,
-                        nb->invalid_trans_num);
-  TEST_ASSERT_EQUAL_INT(GET_NEIGHBORS_DESERIALIZE_NUMNEWTX2, nb->new_trans_num);
+  TEST_ASSERT_EQUAL_STRING(TEST_NEIGHBORS_NEIGHBOR2, nb->address->data);
+  TEST_ASSERT_EQUAL_INT(TEST_NEIGHBORS_NUMALLTX2, nb->all_trans_num);
+  TEST_ASSERT_EQUAL_INT(TEST_NEIGHBORS_NUMINVALIDTX2, nb->invalid_trans_num);
+  TEST_ASSERT_EQUAL_INT(TEST_NEIGHBORS_NUMNEWTX2, nb->new_trans_num);
   nb = get_neighbors_res_neighbor_at(nbors, 2);
   TEST_ASSERT_NULL(nb);
   get_neighbors_res_free(nbors);
@@ -250,15 +235,15 @@ void test_serialize_add_neighbors(void) {
 void test_deserialize_add_neighbors(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
-  const char* json_text = "{\"addedNeighbors\":" STR(
-      ADD_NEIGHBORS_DESERIALIZE_RES) ",\"duration\":2}";
+  const char* json_text =
+      "{\"addedNeighbors\":" STR(ADD_NEIGHBORS_RES) ",\"duration\":2}";
 
   add_neighbors_res_t res = 0;
 
   serializer.vtable.add_neighbors_deserialize_response(&serializer, json_text,
                                                        &res);
 
-  TEST_ASSERT_EQUAL_INT(ADD_NEIGHBORS_DESERIALIZE_RES, res);
+  TEST_ASSERT_EQUAL_INT(ADD_NEIGHBORS_RES, res);
 }
 
 void test_serialize_remove_neighbors(void) {
@@ -285,15 +270,15 @@ void test_serialize_remove_neighbors(void) {
 void test_deserialize_remove_neighbors(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
-  const char* json_text = "{\"removedNeighbors\":" STR(
-      REMOVE_NEIGHBORS_DESERIALIZE_RES) ",\"duration\":2}";
+  const char* json_text =
+      "{\"removedNeighbors\":" STR(REMOVE_NEIGHBORS_RES) ",\"duration\":2}";
 
   remove_neighbors_res_t res = 0;
 
   serializer.vtable.remove_neighbors_deserialize_response(&serializer,
                                                           json_text, &res);
 
-  TEST_ASSERT_EQUAL_INT(REMOVE_NEIGHBORS_DESERIALIZE_RES, res);
+  TEST_ASSERT_EQUAL_INT(REMOVE_NEIGHBORS_RES, res);
 }
 
 void test_serialize_get_tips(void) {
@@ -315,15 +300,15 @@ void test_deserialize_get_tips(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"hashes\":["
-      "\"" TEST_HASH1
+      "\"" TEST_81_TRYRES_1
       "\","
-      "\"" TEST_HASH2
+      "\"" TEST_81_TRYRES_2
       "\","
-      "\"" TEST_HASH3 "\"],\"duration\":4}";
+      "\"" TEST_81_TRYRES_3 "\"],\"duration\":4}";
 
   trit_array_p tmp_tip = NULL;
-  trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_HASH1);
-  trit_array_p hash2 = trit_array_new_from_trytes((tryte_t*)TEST_HASH2);
+  trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_1);
+  trit_array_p hash2 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_2);
   get_tips_res_t* tips = get_tips_res_new();
 
   serializer.vtable.get_tips_deserialize_response(&serializer, json_text,
@@ -343,12 +328,12 @@ void test_serialize_get_trytes(void) {
   serializer_t serializer;
   const char* json_text =
       "{\"command\":\"getTrytes\",\"hashes\":["
-      "\"" GET_TRYTES_SERIALIZE_HASH "\"]}";
+      "\"" TEST_81_TRYRES_1 "\"]}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   get_trytes_req_t* req = get_trytes_req_new();
-  req = get_trytes_req_add(req, GET_TRYTES_SERIALIZE_HASH);
+  req = get_trytes_req_add(req, TEST_81_TRYRES_1);
 
   serializer.vtable.get_trytes_serialize_request(&serializer, req,
                                                  serializer_out);
@@ -364,11 +349,10 @@ void test_deserialize_get_trytes(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"trytes\":["
-      "\"" GET_TRYTES_DESERIALIZE_TX "\"]}";
+      "\"" TEST_2673_TRYRES_1 "\"]}";
 
   trit_array_p tmp_trytes = NULL;
-  trit_array_p hash1 =
-      trit_array_new_from_trytes((tryte_t*)GET_TRYTES_DESERIALIZE_TX);
+  trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_2673_TRYRES_1);
   get_trytes_res_t* trytes_array = get_trytes_res_new();
 
   serializer.vtable.get_trytes_deserialize_response(&serializer, json_text,
@@ -387,14 +371,13 @@ void test_serialize_get_inclusion_states(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"command\":\"getInclusionStates\",\"transactions\":["
-      "\"" INCLUSION_STATES_HASH "\"],\"tips\":[\"" INCLUSION_STATES_TIPS
-      "\"]}";
+      "\"" TEST_81_TRYRES_1 "\"],\"tips\":[\"" TEST_81_TRYRES_2 "\"]}";
 
   get_inclusion_state_req_t* get_is = get_inclusion_state_req_new();
   char_buffer_t* serializer_out = char_buffer_new();
 
-  get_is = get_inclusion_state_req_add_hash(get_is, INCLUSION_STATES_HASH);
-  get_is = get_inclusion_state_req_add_tip(get_is, INCLUSION_STATES_TIPS);
+  get_is = get_inclusion_state_req_add_hash(get_is, TEST_81_TRYRES_1);
+  get_is = get_inclusion_state_req_add_tip(get_is, TEST_81_TRYRES_2);
 
   serializer.vtable.get_inclusion_state_serialize_request(&serializer, get_is,
                                                           serializer_out);
@@ -429,15 +412,14 @@ void test_serialize_get_balances(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"command\":\"getBalances\",\"addresses\":["
-      "\"" GET_BALANCES_SERIALIZE_ADDRESS
+      "\"" TEST_81_TRYRES_1
       "\"]"
-      ",\"threshold\":" STR(GET_BALANCES_SERIALIZE_THRESHOLD) "}";
+      ",\"threshold\":" STR(TEST_BALANCES_SERIALIZE_THRESHOLD) "}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   get_balances_req_t* get_bal = get_balances_req_new();
-  get_bal =
-      get_balances_req_add_address(get_bal, GET_BALANCES_SERIALIZE_ADDRESS);
-  get_bal->threshold = GET_BALANCES_SERIALIZE_THRESHOLD;
+  get_bal = get_balances_req_add_address(get_bal, TEST_81_TRYRES_1);
+  get_bal->threshold = TEST_BALANCES_SERIALIZE_THRESHOLD;
   serializer.vtable.get_balances_serialize_request(&serializer, get_bal,
                                                    serializer_out);
 
@@ -452,27 +434,25 @@ void test_deserialize_get_balances(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"balances\": "
-      "[\"" GET_BALANCES_DESERIALIZE_BALANCE
+      "[\"" TEST_BALANCES_BALANCE
       "\"], "
       "\"references\": "
-      "[\"" GET_BALANCES_DESERIALIZE_REFERENCE
+      "[\"" TEST_81_TRYRES_1
       "\"], "
-      "\"milestoneIndex\":" STR(GET_BALANCES_DESERIALIZE_MILESTONEINDEX) "}";
+      "\"milestoneIndex\":" STR(TEST_BALANCES_MILESTONEINDEX) "}";
 
   trit_array_p tmp_ref = NULL;
-  trit_array_p ref =
-      trit_array_new_from_trytes((tryte_t*)GET_BALANCES_DESERIALIZE_REFERENCE);
+  trit_array_p ref = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_1);
 
   get_balances_res_t* deserialize_get_bal = get_balances_res_new();
   serializer.vtable.get_balances_deserialize_response(&serializer, json_text,
                                                       &deserialize_get_bal);
 
-  TEST_ASSERT_EQUAL_STRING(
-      GET_BALANCES_DESERIALIZE_BALANCE,
-      get_balances_res_balances_at(deserialize_get_bal, 0));
+  TEST_ASSERT_EQUAL_STRING(TEST_BALANCES_BALANCE, get_balances_res_balances_at(
+                                                      deserialize_get_bal, 0));
   tmp_ref = get_balances_res_milestone_at(deserialize_get_bal, 0);
   TEST_ASSERT_EQUAL_MEMORY(ref->trits, tmp_ref->trits, tmp_ref->num_bytes);
-  TEST_ASSERT_EQUAL_INT(GET_BALANCES_DESERIALIZE_MILESTONEINDEX,
+  TEST_ASSERT_EQUAL_INT(TEST_BALANCES_MILESTONEINDEX,
                         deserialize_get_bal->milestoneIndex);
 
   get_balances_res_free(deserialize_get_bal);
@@ -483,15 +463,16 @@ void test_serialize_get_transactions_to_approve(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
   const char* json_text =
-      "{\"command\":\"getTransactionsToApprove\",\"depth\":" STR(GET_TRANSACTION_TO_APPROVE_DEPTH)
-      ",\"reference\":\"" GET_TRANSACTION_TO_APPROVE_HASH "\"}";
+      "{\"command\":\"getTransactionsToApprove\",\"depth\":" STR(
+          TEST_TRANSACTION_TO_APPROVE_DEPTH) ",\"reference\":"
+                                             "\"" TEST_81_TRYRES_1 "\"}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   get_transactions_to_approve_req_t* get_txn_approve =
       get_transactions_to_approve_req_new();
-  get_transactions_to_approve_req_set_reference(
-      get_txn_approve, GET_TRANSACTION_TO_APPROVE_HASH);
-  get_txn_approve->depth = GET_TRANSACTION_TO_APPROVE_DEPTH;
+  get_transactions_to_approve_req_set_reference(get_txn_approve,
+                                                TEST_81_TRYRES_1);
+  get_txn_approve->depth = TEST_TRANSACTION_TO_APPROVE_DEPTH;
   serializer.vtable.get_transactions_to_approve_serialize_request(
       &serializer, get_txn_approve, serializer_out);
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
@@ -505,14 +486,12 @@ void test_deserialize_get_transactions_to_approve(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"trunkTransaction\": "
-      "\"" GET_TRANSACTION_TO_APPROVE_HASH
+      "\"" TEST_81_TRYRES_1
       "\",\"branchTransaction\":"
-      "\"" GET_TRANSACTION_TO_APPROVE_HASH "\"}";
+      "\"" TEST_81_TRYRES_2 "\"}";
 
-  trit_array_p trunk =
-      trit_array_new_from_trytes((tryte_t*)GET_TRANSACTION_TO_APPROVE_HASH);
-  trit_array_p branch =
-      trit_array_new_from_trytes((tryte_t*)GET_TRANSACTION_TO_APPROVE_HASH);
+  trit_array_p trunk = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_1);
+  trit_array_p branch = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_2);
   get_transactions_to_approve_res_t* deserialize_get_txn_approve =
       get_transactions_to_approve_res_new();
   serializer.vtable.get_transactions_to_approve_deserialize_response(
@@ -534,20 +513,21 @@ void test_serialize_attach_to_tangle(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
   const char* json_text =
-      "{\"command\":\"attachToTangle\",\"trunkTransaction\":\"" TEST_HASH1
-      "\",\"branchTransaction\":\"" TEST_HASH2 "\",\"minWeightMagnitude\":" STR(
-          TEST_MWM) ",\"trytes\":[\"" TEST_RAW_TRYTES1 "\",\"" TEST_RAW_TRYTES2
-                    "\"]}";
+      "{\"command\":\"attachToTangle\",\"trunkTransaction\":\"" TEST_81_TRYRES_1
+      "\",\"branchTransaction\":\"" TEST_81_TRYRES_2
+      "\",\"minWeightMagnitude\":" STR(
+          TEST_MWM) ",\"trytes\":[\"" TEST_2673_TRYRES_1
+                    "\",\"" TEST_2673_TRYRES_2 "\"]}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   attach_to_tangle_req_t* attach_req = attach_to_tangle_req_new();
 
-  attach_to_tangle_req_set_trunk(attach_req, TEST_HASH1);
-  attach_to_tangle_req_set_branch(attach_req, TEST_HASH2);
+  attach_to_tangle_req_set_trunk(attach_req, TEST_81_TRYRES_1);
+  attach_to_tangle_req_set_branch(attach_req, TEST_81_TRYRES_2);
   attach_req->trytes =
-      attach_to_tangle_req_add_trytes(attach_req->trytes, TEST_RAW_TRYTES1);
+      attach_to_tangle_req_add_trytes(attach_req->trytes, TEST_2673_TRYRES_1);
   attach_req->trytes =
-      attach_to_tangle_req_add_trytes(attach_req->trytes, TEST_RAW_TRYTES2);
+      attach_to_tangle_req_add_trytes(attach_req->trytes, TEST_2673_TRYRES_2);
   attach_to_tangle_req_set_mwm(attach_req, TEST_MWM);
   serializer.vtable.attach_to_tangle_serialize_request(&serializer, attach_req,
                                                        serializer_out);
@@ -561,11 +541,11 @@ void test_serialize_attach_to_tangle(void) {
 void test_deserialize_attach_to_tangle(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
-  const char* json_text =
-      "{\"trytes\":[\"" TEST_HASH1 "\",\"" TEST_HASH2 "\"],\"duration\":4}";
+  const char* json_text = "{\"trytes\":[\"" TEST_81_TRYRES_1
+                          "\",\"" TEST_81_TRYRES_2 "\"],\"duration\":4}";
   trit_array_p tmp_hash = NULL;
-  trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_HASH1);
-  trit_array_p hash2 = trit_array_new_from_trytes((tryte_t*)TEST_HASH2);
+  trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_1);
+  trit_array_p hash2 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_2);
 
   attach_to_tangle_res_t* trytes = attach_to_tangle_res_new();
 
@@ -590,12 +570,12 @@ void test_serialize_broadcast_transactions(void) {
   serializer_t serializer;
   const char* json_text =
       "{\"command\":\"broadcastTransactions\",\"trytes\":["
-      "\"" BROADCAST_TX_TRYTES "\"]}";
+      "\"" TEST_2673_TRYRES_3 "\"]}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   broadcast_transactions_req_t* req = broadcast_transactions_req_new();
-  req = broadcast_transactions_req_add(req, BROADCAST_TX_TRYTES);
+  req = broadcast_transactions_req_add(req, TEST_2673_TRYRES_3);
 
   serializer.vtable.broadcast_transactions_serialize_request(&serializer, req,
                                                              serializer_out);
@@ -609,12 +589,12 @@ void test_serialize_store_transactions(void) {
   serializer_t serializer;
   const char* json_text =
       "{\"command\":\"storeTransactions\",\"trytes\":["
-      "\"" STORE_TX_TRYTES "\"]}";
+      "\"" TEST_2673_TRYRES_1 "\"]}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   store_transactions_req_t* req = store_transactions_req_new();
-  req = store_transactions_req_add(req, STORE_TX_TRYTES);
+  req = store_transactions_req_add(req, TEST_2673_TRYRES_1);
 
   serializer.vtable.store_transactions_serialize_request(&serializer, req,
                                                          serializer_out);
@@ -628,15 +608,15 @@ void test_serialize_check_consistency(void) {
   serializer_t serializer;
   const char* json_text =
       "{\"command\":\"checkConsistency\",\"tails\":"
-      "[\"" TEST_HASH1
+      "[\"" TEST_81_TRYRES_1
       "\","
-      "\"" TEST_HASH2 "\"]}";
+      "\"" TEST_81_TRYRES_2 "\"]}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   check_consistency_req_t* req = check_consistency_req_new();
-  req = check_consistency_req_add(req, TEST_HASH1);
-  req = check_consistency_req_add(req, TEST_HASH2);
+  req = check_consistency_req_add(req, TEST_81_TRYRES_1);
+  req = check_consistency_req_add(req, TEST_81_TRYRES_2);
 
   serializer.vtable.check_consistency_serialize_request(&serializer, req,
                                                         serializer_out);

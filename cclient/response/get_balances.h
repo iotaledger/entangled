@@ -8,14 +8,14 @@
 #ifndef CCLIENT_RESPONSE_GET_BALANCES_H
 #define CCLIENT_RESPONSE_GET_BALANCES_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "types/types.h"
-
 typedef struct {
-  int_array_array* balances;
+  UT_array* balances;
   int milestoneIndex;
   flex_hash_array_t* milestone;
 } get_balances_res_t;
