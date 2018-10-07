@@ -37,25 +37,22 @@ byte_t trits_to_byte(trit_t const *const trits, byte_t const cum,
   return trits_to_byte(trits, byte, num_trits - 1);
 }
 
-void _byte_to_trits(byte_t byte, trit_t *const trits, size_t const j,
-                    size_t const i) {
-  trit_t trit;
-  if (byte > (byte_radix[j] >> 1)) {
-    byte -= byte_radix[j];
-    trit = 1;
-  } else if (byte < -(byte_radix[j] >> 1)) {
-    byte += byte_radix[j];
-    trit = -1;
-  } else {
-    trit = 0;
+void _byte_to_trits(byte_t byte, trit_t *const trits, size_t j, size_t i) {
+  while (j < -1) {
+    trit_t trit = 0;
+    if (byte > (byte_radix[j] >> 1)) {
+      byte -= byte_radix[j];
+      trit = 1;
+    } else if (byte < -(byte_radix[j] >> 1)) {
+      byte += byte_radix[j];
+      trit = -1;
+    }
+    if (j == i) {
+      trits[i] = trit;
+      i -= 1;
+    }
+    j -= 1;
   }
-  if (j == i) {
-    trits[i] = trit;
-  }
-  if (j == 0) {
-    return;
-  }
-  _byte_to_trits(byte, trits, j - 1, j == i ? i - 1 : i);
 }
 
 void bytes_to_trits(byte_t const *const bytes, size_t const num_bytes,
