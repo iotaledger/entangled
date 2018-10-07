@@ -43,10 +43,18 @@ void test_flex_trits_from_trits(void) {
 
 void test_flex_trits_to_trytes(void) {
   flex_trit_t trits[] = {TRITS_IN};
-  tryte_t trytes[] = {TRYTES};
+  trit_t all_trits[] = {TRITS_OUT};
+  trit_t partial_trits[NUM_TRITS];
+  trit_t extracted_trits[NUM_TRITS];
   tryte_t trytes_out[6];
-  flex_trits_to_trytes(trytes_out, 6, trits, NUM_TRITS, NUM_TRITS);
-  TEST_ASSERT_EQUAL_MEMORY(trytes, trytes_out, sizeof(trytes_out));
+  for (int len = 0; len <= NUM_TRITS; len++) {
+    memset(extracted_trits, 0, NUM_TRITS);
+    memset(partial_trits, 0, NUM_TRITS);
+    memcpy(partial_trits, all_trits, len);
+    flex_trits_to_trytes(trytes_out, 6, trits, NUM_TRITS, len);
+    trytes_to_trits(trytes_out, extracted_trits, 6);
+    TEST_ASSERT_EQUAL_MEMORY(partial_trits, extracted_trits, NUM_TRITS);
+  }
 }
 
 void test_flex_trits_from_trytes(void) {
