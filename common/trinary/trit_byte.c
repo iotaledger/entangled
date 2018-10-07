@@ -6,8 +6,8 @@
  */
 
 #include "trit_byte.h"
-#include "utils/macros.h"
 #include <assert.h>
+#include "utils/macros.h"
 
 #define NUMBER_OF_TRITS_IN_A_BYTE 5
 #define RADIX 3
