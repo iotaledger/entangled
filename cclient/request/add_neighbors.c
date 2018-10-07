@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "add_neighbors.h"
+#include "request/add_neighbors.h"
 
 add_neighbors_req_t* add_neighbors_req_new() {
   add_neighbors_req_t* uris = NULL;

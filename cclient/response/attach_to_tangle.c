@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "attach_to_tangle.h"
+#include "response/attach_to_tangle.h"
 
 attach_to_tangle_res_t* attach_to_tangle_res_new() {
   return flex_hash_array_new();

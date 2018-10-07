@@ -47,9 +47,9 @@ extern retcode_t iota_tangle_transaction_exist(const tangle_t *const tangle,
                                                const trit_array_p key,
                                                bool *exist);
 
-extern retcode_t iota_tangle_transaction_update(
-    const tangle_t *const tangle, const char *index_name,
-    const trit_array_p key, const iota_transaction_t data_in);
+extern retcode_t iota_tangle_transaction_update_snapshot_index(
+    const tangle_t *const tangle, flex_trit_t *const hash,
+    uint64_t snapshot_index);
 
 extern retcode_t iota_tangle_transaction_load_hashes(
     const tangle_t *const tangle, const char *index_name,
@@ -71,8 +71,11 @@ extern retcode_t iota_tangle_milestone_load(const tangle_t *const tangle,
                                             const trit_array_p key,
                                             iota_stor_pack_t *pack);
 
-extern retcode_t iota_tangle_milestone_load_latest(const tangle_t *const tangle,
-                                                   iota_stor_pack_t *pack);
+extern retcode_t iota_tangle_milestone_load_first(const tangle_t *const tangle,
+                                                  iota_stor_pack_t *pack);
+
+extern retcode_t iota_tangle_milestone_load_last(const tangle_t *const tangle,
+                                                 iota_stor_pack_t *pack);
 
 extern retcode_t iota_tangle_milestone_load_next(const tangle_t *const tangle,
                                                  uint64_t index,

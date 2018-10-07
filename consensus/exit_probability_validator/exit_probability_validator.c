@@ -36,7 +36,10 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
   struct _iota_transaction tx;
   iota_transaction_t tx_models = &tx;
 
-  iota_stor_pack_t tx_pack = {(void **)(&tx_models), 1, 0, false};
+  iota_stor_pack_t tx_pack = {.models = (void **)(&tx_models),
+                              .capacity = 1,
+                              .num_loaded = 0,
+                              .insufficient_capacity = false};
 
   ret = iota_tangle_transaction_load(ep_validator->tangle, TRANSACTION_COL_HASH,
                                      tx_hash, &tx_pack);

@@ -77,7 +77,7 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
   if (packet == NULL) {
     return RC_NEIGHBOR_NULL_PACKET;
   }
-  if ((ret = get_transaction_to_request(&node->requester, &hash))) {
+  if ((ret = get_transaction_to_request(node->requester, &hash))) {
     return ret;
   }
   if (hash != NULL) {

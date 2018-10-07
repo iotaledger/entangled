@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "broadcast_transactions.h"
+#include "request/broadcast_transactions.h"
 
 broadcast_transactions_req_t* broadcast_transactions_req_new() {
   return (broadcast_transactions_req_t*)flex_hash_array_new();

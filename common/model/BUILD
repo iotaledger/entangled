@@ -18,6 +18,7 @@ cc_library(
 cc_library(
     name = "milestone",
     hdrs = ["milestone.h"],
+    deps = ["//common/trinary:flex_trit"],
 )
 
 cc_library(

@@ -16,11 +16,11 @@
 // Forward declarations
 typedef struct concurrent_list_trit_array_p_s requester_list_t;
 typedef struct _trit_array *trit_array_p;
-typedef struct node_s node_t;
+typedef struct tangle_s tangle_t;
 
 typedef struct requester_state_s {
   requester_list_t *list;
-  node_t *node;
+  tangle_t *tangle;
 } requester_state_t;
 
 #ifdef __cplusplus
@@ -31,10 +31,12 @@ extern "C" {
  * Initializes a requester
  *
  * @param state The requester state
+ * @param tangle A tangle
  *
  * @return a status code
  */
-retcode_t requester_init(requester_state_t *const state, node_t *const node);
+retcode_t requester_init(requester_state_t *const state,
+                         tangle_t *const tangle);
 
 /**
  * Gets the number of transactions to request

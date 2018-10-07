@@ -26,7 +26,7 @@ IOTA_EXPORT char* iota_pow(char const* const trytes_in, uint8_t const mwm) {
   int tryte_len = strlen(trytes_in);
   int trits_len = tryte_len * 3;
 
-  trit_t* trits = (trit_t*)calloc(sizeof(trit_t) * trits_len, sizeof(trit_t));
+  trit_t* trits = (trit_t*)calloc(trits_len, sizeof(trit_t));
   if (!trits) {
     return NULL;
   }
@@ -37,8 +37,8 @@ IOTA_EXPORT char* iota_pow(char const* const trytes_in, uint8_t const mwm) {
   if (!nonce_trits) {
     return NULL;
   }
-  tryte_t* nonce_trytes = (tryte_t*)calloc(
-      sizeof(tryte_t) * (NONCE_LENGTH / 3 + 1), sizeof(tryte_t));
+  tryte_t* nonce_trytes =
+      (tryte_t*)calloc(NONCE_LENGTH / 3 + 1, sizeof(tryte_t));
   if (!nonce_trytes) {
     free(nonce_trits);
     return NULL;
@@ -55,7 +55,7 @@ IOTA_EXPORT flex_trit_t* iota_flex_pow(flex_trit_t const* const flex_trits_in,
   init_curl(&curl);
   curl.type = CURL_P_81;
 
-  trit_t* trits = (trit_t*)calloc(sizeof(trit_t) * num_trits, sizeof(trit_t));
+  trit_t* trits = (trit_t*)calloc(num_trits, sizeof(trit_t));
   if (!trits) {
     return NULL;
   }
@@ -67,7 +67,7 @@ IOTA_EXPORT flex_trit_t* iota_flex_pow(flex_trit_t const* const flex_trits_in,
   }
   size_t flex_len = num_flex_trits_for_trits(NONCE_LENGTH);
   flex_trit_t* nonce_flex_trits =
-      (flex_trit_t*)calloc(sizeof(flex_trit_t) * flex_len, sizeof(flex_trit_t));
+      (flex_trit_t*)calloc(flex_len, sizeof(flex_trit_t));
   if (!nonce_flex_trits) {
     free(nonce_trits);
     return NULL;
