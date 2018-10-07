@@ -38,6 +38,26 @@ byte_t trits_to_byte(trit_t const *const trits, byte_t const cum,
   return trits_to_byte(trits, cum * RADIX + trits[i], i - 1);
 }
 
+void _byte_to_trits(byte_t byte, trit_t *const trits, size_t const j, size_t const i) {
+  trit_t trit;
+  if (byte > (byte_radix[j] >> 1)) {
+    byte -= byte_radix[j];
+    trit = 1;
+  } else if (byte < -(byte_radix[j] >> 1)) {
+    byte += byte_radix[j];
+    trit = -1;
+  } else {
+    trit = 0;
+  }
+  if (j == i) {
+    trits[i] = trit;
+  }
+  if (j == 0) {
+    return;
+  }
+  _byte_to_trits(byte, trits, j - 1, j == i ? i - 1 : i);
+}
+
 void bytes_to_trits(byte_t const *const byte, size_t const n_bytes,
                     trit_t *const trit, size_t const n_trits) {
   if (n_bytes == 0 || n_trits == 0) {
@@ -45,22 +65,10 @@ void bytes_to_trits(byte_t const *const byte, size_t const n_bytes,
   }
   size_t end =
       n_trits < NUMBER_OF_TRITS_IN_A_BYTE ? n_trits : NUMBER_OF_TRITS_IN_A_BYTE;
-  byte_to_trits(*byte, trit, end - 1);
+  _byte_to_trits(*byte, trit, NUMBER_OF_TRITS_IN_A_BYTE - 1, end - 1);
   bytes_to_trits(&byte[1], n_bytes - 1, &trit[end], n_trits - end);
 }
 
 void byte_to_trits(byte_t byte, trit_t *const trit, size_t const i) {
-  if (byte > (byte_radix[i] >> 1)) {
-    byte -= byte_radix[i];
-    trit[i] = 1;
-  } else if (byte < -(byte_radix[i] >> 1)) {
-    byte += byte_radix[i];
-    trit[i] = -1;
-  } else {
-    trit[i] = 0;
-  }
-  if (i == 0) {
-    return;
-  }
-  byte_to_trits(byte, trit, i - 1);
+  _byte_to_trits(byte, trit, NUMBER_OF_TRITS_IN_A_BYTE, i);
 }

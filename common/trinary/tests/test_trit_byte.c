@@ -33,11 +33,28 @@ void test_to_from_byte(void) {
   TEST_ASSERT_EQUAL_MEMORY(trits, trits_out, sizeof(trits));
 }
 
+void test_from_byte(void) {
+  trit_t trits[] = {TRITS_IN};
+  byte_t bytes[] = {BYTES_EXP};
+  size_t trits_size = sizeof(trits) / sizeof(trit_t);
+  trit_t trits_out[trits_size];
+  trit_t partial_trits[trits_size];
+  size_t bytes_size = min_bytes(trits_size);
+  for (int len = 0; len <= trits_size; len++) {
+    memset(trits_out, 0, trits_size);
+    memset(partial_trits, 0, trits_size);
+    memcpy(partial_trits, trits, len);
+    bytes_to_trits(bytes, bytes_size, trits_out, len);
+    TEST_ASSERT_EQUAL_MEMORY(partial_trits, trits_out, trits_size);
+  }
+}
+
 int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_trit_to_byte);
   RUN_TEST(test_to_from_byte);
+  RUN_TEST(test_from_byte);
 
   return UNITY_END();
 }
