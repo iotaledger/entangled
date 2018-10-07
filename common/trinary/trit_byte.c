@@ -38,7 +38,8 @@ byte_t trits_to_byte(trit_t const *const trits, byte_t const cum,
   return trits_to_byte(trits, cum * RADIX + trits[i], i - 1);
 }
 
-void _byte_to_trits(byte_t byte, trit_t *const trits, size_t const j, size_t const i) {
+void _byte_to_trits(byte_t byte, trit_t *const trits, size_t const j,
+                    size_t const i) {
   trit_t trit;
   if (byte > (byte_radix[j] >> 1)) {
     byte -= byte_radix[j];
