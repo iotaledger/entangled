@@ -71,5 +71,5 @@ void bytes_to_trits(byte_t const *const byte, size_t const n_bytes,
 }
 
 void byte_to_trits(byte_t byte, trit_t *const trit, size_t const i) {
-  _byte_to_trits(byte, trit, NUMBER_OF_TRITS_IN_A_BYTE, i);
+  _byte_to_trits(byte, trit, NUMBER_OF_TRITS_IN_A_BYTE - 1, i);
 }
