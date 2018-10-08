@@ -19,8 +19,8 @@
  */
 
 static retcode_t load_bundle_transactions(const tangle_t* const tangle,
-                                          trit_array_p tail_hash,
-                                          bundle_transactions_t* bundle) {
+                                          trit_array_p const tail_hash,
+                                          bundle_transactions_t* const bundle) {
   retcode_t res = RC_OK;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   size_t last_index = 0, curr_index = 0;
@@ -59,8 +59,9 @@ static retcode_t load_bundle_transactions(const tangle_t* const tangle,
   return RC_OK;
 }
 
-static retcode_t validate_signature(bundle_transactions_t* bundle,
-                                    trit_t* normalized_bundle, bool* is_valid) {
+static retcode_t validate_signature(bundle_transactions_t const* const bundle,
+                                    trit_t const* const normalized_bundle,
+                                    bool* const is_valid) {
   iota_transaction_t curr_tx = NULL, curr_inp_tx = NULL;
   Kerl address_kerl, sig_frag_kerl;
   trit_t digested_sig_trits[NUM_TRITS_ADDRESS];
@@ -130,8 +131,8 @@ retcode_t iota_consensus_bundle_validator_destroy() {
 }
 
 retcode_t iota_consensus_bundle_validator_validate(
-    const tangle_t* const tangle, trit_array_p tail_hash,
-    bundle_transactions_t* bundle, bool* is_valid) {
+    const tangle_t* const tangle, trit_array_p const tail_hash,
+    bundle_transactions_t* const bundle, bool* const is_valid) {
   retcode_t res = RC_OK;
   iota_transaction_t curr_tx = NULL;
   size_t index = 0, last_index = 0;
