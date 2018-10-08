@@ -22,8 +22,10 @@
 extern "C" {
 #endif
 
-extern void normalize_hash(flex_trit_t const *const hash,
-                           byte_t *const normalized_hash);
+void normalize_hash(flex_trit_t const *const hash,
+                    byte_t *const normalized_hash);
+void normalize_hash_trits(flex_trit_t const *const hash,
+                          trit_t *const normalized_hash);
 
 #ifdef __cplusplus
 }

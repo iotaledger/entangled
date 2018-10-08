@@ -4,5 +4,8 @@ cc_library(
     name = "normalize",
     srcs = ["normalize.c"],
     hdrs = ["normalize.h"],
-    deps = ["//common/trinary:flex_trit"],
+    deps = [
+        "//common/trinary:flex_trit",
+        "//common/trinary:trit_long",
+    ],
 )

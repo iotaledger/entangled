@@ -87,7 +87,6 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
     if (curr_tx->current_index == last_index) {
       flex_trit_t bundle_hash_calculated[FLEX_TRIT_SIZE_243];
       trit_t normalized_bundle_trits[NUM_TRITS_HASH];
-      byte_t normalized_bundle_bytes[NUM_TRYTES_HASH];
 
       calculate_bundle_hash(bundle, bundle_hash_calculated);
       if (memcmp(bundle_hash, bundle_hash_calculated, FLEX_TRIT_SIZE_243) !=
@@ -98,11 +97,7 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
         break;
       }
 
-      normalize_hash(bundle_hash_calculated, normalized_bundle_bytes);
-      for (int c = 0; c < NUM_TRYTES_HASH; ++c) {
-        long_to_trits(normalized_bundle_bytes[c],
-                      &normalized_bundle_trits[c * RADIX]);
-      }
+      normalize_hash_trits(bundle_hash_calculated, normalized_bundle_trits);
 
       res = validate_signature(bundle, normalized_bundle_trits, is_valid);
       if (res || !(*is_valid)) {
