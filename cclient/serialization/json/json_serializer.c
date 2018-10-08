@@ -29,7 +29,7 @@ void init_json_serializer(serializer_t* serializer) {
   serializer->vtable = json_vtable;
 }
 
-retcode_t json_array_to_utarray(cJSON* obj, const char* obj_name,
+retcode_t json_array_to_utarray(const cJSON* obj, const char* obj_name,
                                 UT_array* ut) {
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
@@ -42,13 +42,12 @@ retcode_t json_array_to_utarray(cJSON* obj, const char* obj_name,
   } else {
     log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
-    cJSON_Delete(obj);
     return RC_CCLIENT_JSON_PARSE;
   }
   return RC_OK;
 }
 
-retcode_t utarray_to_json_array(UT_array* ut, cJSON* json_root,
+retcode_t utarray_to_json_array(const UT_array* ut, cJSON* json_root,
                                 const char* obj_name) {
   if (utarray_len(ut) > 0) {
     cJSON* array_obj = cJSON_CreateArray();
@@ -67,7 +66,7 @@ retcode_t utarray_to_json_array(UT_array* ut, cJSON* json_root,
   return RC_OK;
 }
 
-flex_hash_array_t* json_array_to_flex_hash_array(cJSON* obj,
+flex_hash_array_t* json_array_to_flex_hash_array(const cJSON* obj,
                                                  const char* obj_name,
                                                  flex_hash_array_t* head) {
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
@@ -82,7 +81,6 @@ flex_hash_array_t* json_array_to_flex_hash_array(cJSON* obj,
   } else {
     log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
-    cJSON_Delete(obj);
     return NULL;
   }
   return head;
@@ -122,7 +120,7 @@ retcode_t flex_hash_array_to_json_array(flex_hash_array_t* head,
 }
 
 retcode_t flex_hash_to_json_string(cJSON* json_obj, const char* key,
-                                   trit_array_p hash) {
+                                   const trit_array_p hash) {
   // flex to trytes;
   size_t len_trytes = hash->num_trits / 3;
   trit_t trytes_out[len_trytes + 1];
@@ -139,7 +137,7 @@ retcode_t flex_hash_to_json_string(cJSON* json_obj, const char* key,
   return RC_OK;
 }
 
-retcode_t json_string_to_flex_hash(cJSON* json_obj, const char* key,
+retcode_t json_string_to_flex_hash(const cJSON* json_obj, const char* key,
                                    trit_array_p hash) {
   retcode_t ret = RC_OK;
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, key);
@@ -161,30 +159,7 @@ retcode_t json_string_to_flex_hash(cJSON* json_obj, const char* key,
   return ret;
 }
 
-retcode_t json_array_to_int_array_array(cJSON* obj, const char* obj_name,
-                                        int_array_array* in) {
-  cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
-  if (cJSON_IsArray(json_item)) {
-    cJSON* current_obj = NULL;
-    int_array_array_allocate(in, cJSON_GetArraySize(json_item));
-
-    int i = 0;
-    cJSON_ArrayForEach(current_obj, json_item) {
-      if (current_obj->valuestring != NULL) {
-        *(in->array + i) = *string_to_int_array(current_obj->valuestring);
-        i++;
-      }
-    }
-  } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
-              STR_CCLIENT_JSON_PARSE);
-    cJSON_Delete(obj);
-    return RC_CCLIENT_JSON_PARSE;
-  }
-  return RC_OK;
-}
-
-retcode_t json_boolean_array_to_utarray(cJSON* obj, const char* obj_name,
+retcode_t json_boolean_array_to_utarray(const cJSON* obj, const char* obj_name,
                                         UT_array* ut) {
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
@@ -197,27 +172,7 @@ retcode_t json_boolean_array_to_utarray(cJSON* obj, const char* obj_name,
   } else {
     log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
-    cJSON_Delete(obj);
     return RC_CCLIENT_JSON_PARSE;
-  }
-  return RC_OK;
-}
-
-retcode_t int_array_to_json_array(int_array* in, cJSON* json_root,
-                                  const char* obj_name) {
-  if (in->size > 0) {
-    cJSON* array_obj = cJSON_CreateArray();
-    if (array_obj == NULL) {
-      log_critical(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
-                   STR_CCLIENT_JSON_CREATE);
-      return RC_CCLIENT_JSON_CREATE;
-    }
-    cJSON_AddItemToObject(json_root, obj_name, array_obj);
-    char** p = NULL;
-    for (int i = 0; i < in->size; i++) {
-      sprintf(*p, "%d", *(in->array + i));
-      cJSON_AddItemToArray(array_obj, cJSON_CreateString(*p));
-    }
   }
   return RC_OK;
 }
@@ -471,7 +426,7 @@ end:
 
 // get_inclusion_state_response
 retcode_t json_get_inclusion_state_serialize_request(
-    const serializer_t* const s, get_inclusion_state_req_t* obj,
+    const serializer_t* const s, get_inclusion_state_req_t* const obj,
     char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
@@ -777,8 +732,8 @@ retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
 
 // get_transactions_to_approve_response
 retcode_t json_get_transactions_to_approve_serialize_request(
-    const serializer_t* const s, get_transactions_to_approve_req_t* const obj,
-    char_buffer_t* out) {
+    const serializer_t* const s,
+    const get_transactions_to_approve_req_t* const obj, char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
@@ -850,9 +805,9 @@ end:
   return ret;
 }
 
-retcode_t json_add_neighbors_serialize_request(const serializer_t* const s,
-                                               add_neighbors_req_t* obj,
-                                               char_buffer_t* out) {
+retcode_t json_add_neighbors_serialize_request(
+    const serializer_t* const s, const add_neighbors_req_t* const obj,
+    char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
@@ -916,9 +871,9 @@ retcode_t json_add_neighbors_deserialize_response(const serializer_t* const s,
   return ret;
 }
 
-retcode_t json_remove_neighbors_serialize_request(const serializer_t* const s,
-                                                  remove_neighbors_req_t* obj,
-                                                  char_buffer_t* out) {
+retcode_t json_remove_neighbors_serialize_request(
+    const serializer_t* const s, const remove_neighbors_req_t* const obj,
+    char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
@@ -983,7 +938,7 @@ retcode_t json_remove_neighbors_deserialize_response(
 }
 
 retcode_t json_get_trytes_serialize_request(const serializer_t* const s,
-                                            get_trytes_req_t* obj,
+                                            get_trytes_req_t* const obj,
                                             char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
@@ -1047,9 +1002,9 @@ retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
   return ret;
 }
 
-retcode_t json_attach_to_tangle_serialize_request(const serializer_t* const s,
-                                                  attach_to_tangle_req_t* obj,
-                                                  char_buffer_t* out) {
+retcode_t json_attach_to_tangle_serialize_request(
+    const serializer_t* const s, const attach_to_tangle_req_t* const obj,
+    char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
@@ -1130,7 +1085,7 @@ retcode_t json_attach_to_tangle_deserialize_response(
 
 // broadcast_transactions_request
 retcode_t json_broadcast_transactions_serialize_request(
-    const serializer_t* const s, broadcast_transactions_req_t* obj,
+    const serializer_t* const s, broadcast_transactions_req_t* const obj,
     char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
@@ -1167,7 +1122,7 @@ retcode_t json_broadcast_transactions_serialize_request(
 }
 
 retcode_t json_store_transactions_serialize_request(
-    const serializer_t* const s, store_transactions_req_t* obj,
+    const serializer_t* const s, store_transactions_req_t* const obj,
     char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
@@ -1203,9 +1158,9 @@ retcode_t json_store_transactions_serialize_request(
   return ret;
 }
 
-retcode_t json_check_consistency_serialize_request(const serializer_t* const s,
-                                                   check_consistency_req_t* obj,
-                                                   char_buffer_t* out) {
+retcode_t json_check_consistency_serialize_request(
+    const serializer_t* const s, check_consistency_req_t* const obj,
+    char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
