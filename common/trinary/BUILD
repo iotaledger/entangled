@@ -153,8 +153,8 @@ cc_library(
         ":trit_byte",
         ":trit_tryte",
         ":trits",
-        "//utils:macros",
         "//common:stdint",
+        "//utils:macros",
     ],
 )
 
@@ -167,8 +167,8 @@ cc_library(
         ":trit_byte",
         ":trit_tryte",
         ":trits",
-        "//utils:macros",
         "//common:stdint",
+        "//utils:macros",
     ],
 )
 
@@ -181,8 +181,8 @@ cc_library(
         ":trit_byte",
         ":trit_tryte",
         ":trits",
-        "//utils:macros",
         "//common:stdint",
+        "//utils:macros",
     ],
 )
 
@@ -195,8 +195,8 @@ cc_library(
         ":trit_byte",
         ":trit_tryte",
         ":trits",
-        "//utils:macros",
         "//common:stdint",
+        "//utils:macros",
     ],
 )
 
