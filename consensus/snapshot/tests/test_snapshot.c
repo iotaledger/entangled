@@ -99,6 +99,7 @@ void test_snapshot_create_and_apply_patch() {
   TEST_ASSERT(iota_snapshot_create_patch(&snapshot, &diff, &patch) == RC_OK);
   TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &diff, 1) ==
               RC_SNAPSHOT_INCONSISTENT_PATCH);
+  TEST_ASSERT(iota_snapshot_state_destroy(&patch) == RC_OK);
   state_entry_t *new2 = malloc(sizeof(state_entry_t));
   flex_trits_from_trytes(new2->hash, NUM_TRITS_HASH,
                                      (tryte_t*)"Q99999999999999999999999999999999999999999999999999999999999999999999999999999999",
@@ -107,6 +108,7 @@ void test_snapshot_create_and_apply_patch() {
   HASH_ADD(hh, diff, hash, FLEX_TRIT_SIZE_243, new2);
   TEST_ASSERT(iota_snapshot_create_patch(&snapshot, &diff, &patch) == RC_OK);
   TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &diff, 2) == RC_OK);
+  TEST_ASSERT(iota_snapshot_state_destroy(&patch) == RC_OK);
   TEST_ASSERT_EQUAL_INT(iota_snapshot_get_index(&snapshot), 2);
   TEST_ASSERT(iota_snapshot_get_balance(&snapshot, new1->hash, &balance) ==
               RC_OK);
@@ -115,6 +117,7 @@ void test_snapshot_create_and_apply_patch() {
               RC_OK);
   TEST_ASSERT_EQUAL_INT(balance, 50);
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
+  TEST_ASSERT(iota_snapshot_state_destroy(&diff) == RC_OK);
 }
 
 int main(int argc, char *argv[]) {

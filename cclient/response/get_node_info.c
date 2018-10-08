@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "get_node_info.h"
+#include "response/get_node_info.h"
 
 get_node_info_res_t* get_node_info_res_new() {
   get_node_info_res_t* res =

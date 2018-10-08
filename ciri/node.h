@@ -29,8 +29,8 @@ typedef struct node_s {
   broadcaster_state_t broadcaster;
   processor_state_t processor;
   receiver_state_t receiver;
-  requester_state_t requester;
   responder_state_t responder;
+  requester_state_t* requester;
   neighbors_list_t* neighbors;
 } node_t;
 
@@ -39,10 +39,12 @@ typedef struct node_s {
  *
  * @param node The node
  * @param core A core
+ * @param transaction_requester A transaction requester
  *
  * @return a status code
  */
-retcode_t node_init(node_t* const node, core_t* const core);
+retcode_t node_init(node_t* const node, core_t* const core,
+                    requester_state_t* const transaction_requester);
 
 /**
  * Starts a node

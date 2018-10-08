@@ -27,15 +27,43 @@ typedef struct entry_point_selector_s {
   bool testnet;
 } entry_point_selector_t;
 
-extern retcode_t iota_consensus_entry_point_selector_init(
+/**
+ * Initializes an entry point selector
+ *
+ * @param eps The entry point selector
+ * @param mt A milestone tracker
+ * @param tangle A tangle
+ * @param tester True if testnet, false otherwise
+ *
+ * @return a status code
+ */
+retcode_t iota_consensus_entry_point_selector_init(
     entry_point_selector_t *const eps, milestone_tracker_t *const mt,
     tangle_t *const tangle, bool const testnet);
 
-extern retcode_t iota_consensus_get_entry_point(
+/**
+ * Gets an entry point for the random walk.
+ * Given a depth N, returns a N-deep milestone, i.e. (latest_solid - depth)th
+ * milestone.
+ *
+ * @param eps The entry point selector
+ * @param depth The depth
+ * @param ep The entry point
+ *
+ * @return a status code
+ */
+retcode_t iota_consensus_entry_point_selector_get_entry_point(
     entry_point_selector_t *const eps, size_t const depth,
     trit_array_p const ep);
 
-extern retcode_t iota_consensus_entry_point_selector_destroy(
+/**
+ * Destroys an entry point selector
+ *
+ * @param eps The entry point selector
+ *
+ * @return a status code
+ */
+retcode_t iota_consensus_entry_point_selector_destroy(
     entry_point_selector_t *const eps);
 
 #ifdef __cplusplus

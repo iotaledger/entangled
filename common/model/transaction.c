@@ -123,6 +123,7 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
   curl_digest(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, hash, &curl);
   flex_trits_from_trits(transaction->hash, NUM_TRITS_HASH, hash, NUM_TRITS_HASH,
                         NUM_TRITS_HASH);
+  transaction->snapshot_index = 0;
   return offset;
 }
 
@@ -407,6 +408,8 @@ void transaction_reset(iota_transaction_t transaction) {
   memset(transaction, 0, sizeof(struct _iota_transaction));
   memset(transaction->signature_or_message, FLEX_TRIT_NULL_VALUE,
          sizeof(transaction->signature_or_message));
+  memset(transaction->address, FLEX_TRIT_NULL_VALUE,
+         sizeof(transaction->address));
   memset(transaction->obsolete_tag, FLEX_TRIT_NULL_VALUE,
          sizeof(transaction->obsolete_tag));
   memset(transaction->bundle, FLEX_TRIT_NULL_VALUE,
@@ -416,6 +419,30 @@ void transaction_reset(iota_transaction_t transaction) {
          sizeof(transaction->branch));
   memset(transaction->tag, FLEX_TRIT_NULL_VALUE, sizeof(transaction->tag));
   memset(transaction->nonce, FLEX_TRIT_NULL_VALUE, sizeof(transaction->nonce));
+  memset(transaction->hash, FLEX_TRIT_NULL_VALUE, sizeof(transaction->hash));
+}
+
+uint8_t transaction_weight_magnitude(const iota_transaction_t transaction) {
+  uint8_t num_trailing_null_values = 0;
+  uint8_t pos = FLEX_TRIT_SIZE_243;
+
+  while (pos-- > 0 && transaction->hash[pos] == FLEX_TRIT_NULL_VALUE) {
+    num_trailing_null_values += NUM_TRITS_FOR_FLEX_TRIT;
+  }
+
+  if (pos > 0) {
+    trit_t one_trit_buffer[NUM_TRITS_FOR_FLEX_TRIT];
+    flex_trits_to_trits(one_trit_buffer, NUM_TRITS_FOR_FLEX_TRIT,
+                        &transaction->hash[pos], NUM_TRITS_FOR_FLEX_TRIT,
+                        NUM_TRITS_FOR_FLEX_TRIT);
+
+    pos = NUM_TRITS_FOR_FLEX_TRIT;
+    while (pos-- > 0 && one_trit_buffer[pos] == 0) {
+      ++num_trailing_null_values;
+    }
+  }
+
+  return num_trailing_null_values;
 }
 
 /***********************************************************************************************************
@@ -429,6 +456,7 @@ iota_transaction_t transaction_new(void) {
     // errno = IOTA_OUT_OF_MEMORY
   }
   transaction_reset(transaction);
+  transaction->snapshot_index = 0;
   return transaction;
 }
 

@@ -122,7 +122,7 @@ int64_t decode_long(trit_t const *const trits, size_t const length,
   int64_t value = 0;
   size_t encoding_start = 0;
   while (encoding_start < length &&
-         trits_to_long(&trits[encoding_start], RADIX) < 0)
+         trits_to_long(&trits[encoding_start], RADIX) <= 0)
     encoding_start += RADIX;
   if (encoding_start >= length) return -1;
   encoding_start += RADIX;

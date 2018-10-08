@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "remove_neighbors.h"
+#include "request/remove_neighbors.h"
 
 remove_neighbors_req_t* remove_neighbors_req_new() {
   remove_neighbors_req_t* uris = NULL;

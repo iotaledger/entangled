@@ -92,7 +92,7 @@ retcode_t random_walker_select_approver_tail(
   retcode_t ret = RC_OK;
   bool has_next_approver;
   hash_to_direct_approvers_entry_t *curr_approver_entry = NULL;
-  hash_entry_t *curr_approver = NULL;
+  hash_set_entry_t *curr_approver = NULL;
   trit_array_t approver;
   flex_trit_t approver_trits[FLEX_TRIT_SIZE_243];
   approver.trits = (flex_trit_t *)&approver_trits;
@@ -139,8 +139,8 @@ retcode_t random_walker_select_approver_tail(
 retcode_t select_approver(const ep_randomizer_t *exit_probability_randomizer,
                           cw_map_t cw_ratings, hash_set_t *approvers,
                           trit_array_t *approver, bool *has_next_approver) {
-  hash_entry_t *curr_approver = NULL;
-  hash_entry_t *tmp_approver = NULL;
+  hash_set_entry_t *curr_approver = NULL;
+  hash_set_entry_t *tmp_approver = NULL;
   cw_entry_t *curr_rating = NULL;
   size_t num_approvers = HASH_COUNT(*approvers);
   int64_t weights[num_approvers];
@@ -201,7 +201,10 @@ retcode_t find_tail_if_valid(const ep_randomizer_t *exit_probability_randomizer,
   bool found_approver = false;
   *found_tail = false;
 
-  iota_stor_pack_t tx_pack = {(void **)(&curr_tx), 1, 0, false};
+  iota_stor_pack_t tx_pack = {.models = (void **)(&curr_tx),
+                              .capacity = 1,
+                              .num_loaded = 0,
+                              .insufficient_capacity = false};
 
   res = iota_tangle_transaction_load(exit_probability_randomizer->tangle,
                                      TRANSACTION_COL_HASH, tx_hash, &tx_pack);

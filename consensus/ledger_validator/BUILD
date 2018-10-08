@@ -1,14 +1,25 @@
 cc_library(
-    name = "ledger_validator",
-    srcs = ["ledger_validator.c"],
+    name = "ledger_validator_shared",
     hdrs = ["ledger_validator.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
-        "//common/trinary:trit_array",
-        "//consensus:model",
-        "//consensus/entry_point_selector",
+        "//consensus/snapshot",
+        "//utils:hash_containers",
+    ],
+)
+
+cc_library(
+    name = "ledger_validator",
+    srcs = ["ledger_validator.c"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":ledger_validator_shared",
+        "//consensus/bundle_validator",
+        "//consensus/milestone_tracker:milestone_tracker_shared",
+        "//consensus/snapshot",
         "//consensus/tangle",
-        "//utils:logger_helper",
+        "//gossip/components:requester",
+        "//utils:hash_containers",
     ],
 )

@@ -8,11 +8,11 @@
 #ifndef CCLIENT_RESPONSE_GET_TRYTES_H
 #define CCLIENT_RESPONSE_GET_TRYTES_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 /*
 The raw transaction data (trytes) of a specific transaction. These trytes can

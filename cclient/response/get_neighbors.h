@@ -8,11 +8,11 @@
 #ifndef CCLIENT_RESPONSE_GET_NEIGHBORS_H
 #define CCLIENT_RESPONSE_GET_NEIGHBORS_H
 
+#include "types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "types/types.h"
 
 typedef struct {
   /**
@@ -52,6 +52,7 @@ void get_neighbors_res_dump(get_neighbors_res_t* nbors);
 retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* nbors,
                                          char_buffer_t* addr, int all_trans,
                                          int invalid_trans, int new_trans);
+
 #ifdef __cplusplus
 }
 #endif

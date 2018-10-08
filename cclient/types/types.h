@@ -9,6 +9,7 @@
 #define CCLIENT_TYPES_H
 
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "common/errors.h"
@@ -79,6 +80,7 @@ typedef struct flex_hash_array {
 } flex_hash_array_t;
 
 void logger_init_types();
+void logger_destroy_types();
 
 char_buffer_t* char_buffer_new();
 retcode_t char_buffer_allocate(char_buffer_t* in, size_t n);

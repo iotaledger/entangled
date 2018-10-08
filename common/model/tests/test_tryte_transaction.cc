@@ -17,7 +17,7 @@ TEST(TransactionTest, testTransaction) {
   using namespace iota;
   using namespace model;
 
-  std::string trytes(reinterpret_cast<char const*>(TRYTES));
+  std::string trytes(TRYTES, sizeof(TRYTES));
 
   TryteTransaction transaction = TryteTransaction(trytes);
   std::vector<flex_trit_t> value = transaction.serialize();
