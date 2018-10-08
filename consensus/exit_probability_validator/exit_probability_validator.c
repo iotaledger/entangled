@@ -140,10 +140,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
       break;
     }
 
-    memcpy(curr_hash_trits, hash_queue_peek(non_analyzed_hashes),
-           FLEX_TRIT_SIZE_243);
-    hash_queue_pop(&non_analyzed_hashes);
-
+    flex_trit_t *curr_hash_trits = hash_queue_peek(non_analyzed_hashes);
     if (hash_set_contains(&visited_hashes, curr_hash_trits)) {
       continue;
     }
@@ -171,6 +168,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
       hash_queue_push(&non_analyzed_hashes, curr_tx->trunk);
       hash_queue_push(&non_analyzed_hashes, curr_tx->branch);
     }
+    hash_queue_pop(&non_analyzed_hashes);
   }
 
   hash_queue_free(&non_analyzed_hashes);
