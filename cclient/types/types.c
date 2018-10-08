@@ -68,7 +68,7 @@ retcode_t flex_hash_to_trytes(const trit_array_p hash, char* trytes) {
   }
 
   trits_len = flex_trits_to_trytes(
-      (signed char*)trytes, num_flex_trits_for_trits(hash->num_trits),
+      (signed char*)trytes, NUM_FLEX_TRITS_FOR_TRITS(hash->num_trits),
       hash->trits, hash->num_trits, hash->num_trits);
 
   if (trits_len == 0) {
@@ -162,7 +162,7 @@ retcode_t flex_hash_to_char_buffer(trit_array_p hash, char_buffer_t* out) {
   }
 
   trits_len = flex_trits_to_trytes(
-      (signed char*)out->data, num_flex_trits_for_trits(hash->num_trits),
+      (signed char*)out->data, NUM_FLEX_TRITS_FOR_TRITS(hash->num_trits),
       hash->trits, hash->num_trits, hash->num_trits);
 
   if (trits_len == 0) {
