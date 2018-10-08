@@ -1,9 +1,9 @@
 cc_library(
     name = "api",
     srcs = [
-        "iota_api.c",
+        "iota_client_core_api.c",
     ],
-    hdrs = ["iota_api.h"],
+    hdrs = ["iota_client_core_api.h"],
     visibility = ["//visibility:public"],
     deps = [
         ":service",

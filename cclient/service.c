@@ -9,7 +9,7 @@
 #include "serializer/json/json_serializer.h"
 #include "utils/logger_helper.h"
 
-retcode_t iota_client_service_init(iota_client_service_t* serv) {
+retcode_t iota_client_service_init(iota_client_service_t* const serv) {
   // enable logger
   logger_init_types();
   // init serializer
@@ -22,7 +22,7 @@ retcode_t iota_client_service_init(iota_client_service_t* serv) {
   return RC_OK;
 }
 
-void iota_client_service_destroy(iota_client_service_t* serv) {
+void iota_client_service_destroy(iota_client_service_t* const serv) {
   // clear logger
   if (serv->serializer_type == SR_JSON) {
     logger_destroy_json_serializer();
