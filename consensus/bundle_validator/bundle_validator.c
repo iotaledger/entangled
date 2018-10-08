@@ -91,7 +91,6 @@ static retcode_t validate_signature(bundle_transactions_t const* const bundle,
       flex_trits_to_trits(key, NUM_TRITS_SIGNATURE,
                           curr_inp_tx->signature_or_message,
                           NUM_TRITS_SIGNATURE, NUM_TRITS_SIGNATURE);
-
       iss_kerl_sig_digest(digested_sig_trits,
                           &normalized_bundle[offset % NUM_TRITS_HASH], key,
                           NUM_TRITS_SIGNATURE, &sig_frag_kerl);
@@ -102,9 +101,10 @@ static retcode_t validate_signature(bundle_transactions_t const* const bundle,
              memcmp(curr_inp_tx->address, curr_tx->address,
                     FLEX_TRIT_SIZE_243) == 0 &&
              curr_inp_tx->value == 0);
+
     kerl_squeeze(&address_kerl, digested_address, NUM_TRITS_ADDRESS);
     flex_trits_from_trits(digest, NUM_TRITS_HASH, digested_address,
-                          NUM_TRITS_HASH, NUM_TRITS_HASH);
+                          NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
 
     if (memcmp(digest, curr_tx->address, FLEX_TRIT_SIZE_243) != 0) {
       *is_valid = false;
