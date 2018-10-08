@@ -73,6 +73,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
   iota_consensus_ledger_validator_destroy(&epv->lv);
   iota_snapshot_destroy(&snapshot);
+  iota_milestone_tracker_destroy(&mt);
   iota_consensus_exit_prob_transaction_validator_destroy(epv);
 }
 

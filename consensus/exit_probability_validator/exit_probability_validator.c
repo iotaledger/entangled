@@ -38,8 +38,6 @@ retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
 
   hash_set_free(&epv->max_depth_ok_memoization);
   hash_set_free(&epv->analyzed_hashes);
-  epv->analyzed_hashes = NULL;
-  epv->max_depth_ok_memoization = NULL;
   iota_snapshot_state_destroy(&epv->diff);
   epv->diff = NULL;
 

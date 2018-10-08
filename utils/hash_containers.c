@@ -84,6 +84,7 @@ void hash_set_free(hash_set_t *set) {
     HASH_DEL(*set, iter);
     free(iter);
   }
+  *set = NULL;
 }
 
 /*
