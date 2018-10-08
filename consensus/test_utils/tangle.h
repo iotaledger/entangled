@@ -22,14 +22,13 @@ retcode_t tangle_setup(tangle_t *const tangle,
 
 retcode_t tangle_cleanup(tangle_t *const tangle, char *test_db_path);
 
-void deserialize_transactions(tryte_t *transactions_trytes[],
-                              iota_transaction_t txs[],
-                              size_t num_transactions);
+void transactions_deserialize(tryte_t **transactions_trytes,
+                              iota_transaction_t *txs, size_t num_transactions);
 
 retcode_t build_tangle(tangle_t *const tangle, iota_transaction_t txs[],
                        size_t num_transactions);
 
-void destroy_tangle(iota_transaction_t txs[], size_t num_transactions);
+void transactions_free(iota_transaction_t *txs, size_t num_transactions);
 
 #ifdef __cplusplus
 }

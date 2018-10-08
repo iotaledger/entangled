@@ -37,8 +37,6 @@ static char *ciri_db_path =
 
 static char *snapshot_path =
     "consensus/exit_probability_randomizer/tests/snapshot.txt";
-static char *snapshot_sig_path =
-    "consensus/exit_probability_randomizer/tests/snapshot.sig";
 
 static double low_alpha = 0;
 static double high_alpha = 1;
@@ -57,8 +55,8 @@ static milestone_tracker_t mt;
 static ledger_validator_t lv;
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
-  TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, snapshot_sig_path,
-                                 true) == RC_OK);
+  TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL, true) ==
+              RC_OK);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, true) ==
               RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &mt, NULL) ==
@@ -74,6 +72,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
 
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
   iota_consensus_ledger_validator_destroy(&epv->lv);
+  iota_snapshot_destroy(&snapshot);
   iota_consensus_exit_prob_transaction_validator_destroy(epv);
 }
 
@@ -203,6 +202,7 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   trit_array_free(curr_hash);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
+  destroy_epv(&epv);
 }
 
 void test_single_tx_tangle(void) {
@@ -506,7 +506,7 @@ void test_1_bundle(void) {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES,
       BUNDLE_OF_4_TRUNK_TRANSACTION};
-  deserialize_transactions(trytes, txs, 5);
+  transactions_deserialize(trytes, txs, 5);
   for (size_t i = 0; i < 5; ++i) {
     txs[i]->snapshot_index = max_depth + 1;
   }
@@ -526,7 +526,7 @@ void test_1_bundle(void) {
 
   TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(
                   &tangle, txs[4]->hash, &pack) == RC_OK);
-  // TEST_ASSERT_EQUAL_INT(pack.num_loaded, bundle_size);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, bundle_size);
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, txs[4]->hash, NUM_TRITS_HASH);
@@ -578,7 +578,7 @@ void test_1_bundle(void) {
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
 
-  destroy_tangle(txs, bundle_size);
+  transactions_free(txs, 5);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
   destroy_epv(&epv);
@@ -607,7 +607,7 @@ void test_2_chained_bundles(void) {
                         TX_4_OF_4_VALUE_BUNDLE_TRYTES,
                         TX_1_OF_2,
                         TX_2_OF_2};
-  deserialize_transactions(trytes, txs, 6);
+  transactions_deserialize(trytes, txs, 6);
   for (size_t i = 0; i < 6; ++i) {
     txs[i]->snapshot_index = max_depth + 1;
   }
@@ -678,7 +678,7 @@ void test_2_chained_bundles(void) {
 
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  destroy_tangle(txs, 6);
+  transactions_free(txs, 6);
   transaction_free(txEp);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
@@ -695,7 +695,6 @@ int main(int argc, char *argv[]) {
     test_db_path = "test.db";
     ciri_db_path = "ciri.db";
     snapshot_path = "snapshot.txt";
-    snapshot_sig_path = "snapshot_sig_path";
   }
 
   config.db_path = test_db_path;

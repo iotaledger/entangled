@@ -36,8 +36,9 @@ retcode_t tangle_cleanup(tangle_t *const tangle, char *test_db_path) {
   }
   return ret;
 }
-void deserialize_transactions(tryte_t *transactions_trytes[],
-                              iota_transaction_t txs[],
+
+void transactions_deserialize(tryte_t **transactions_trytes,
+                              iota_transaction_t *txs,
                               size_t num_transactions) {
   for (size_t i = 0; i < num_transactions; ++i) {
     flex_trit_t trits[FLEX_TRIT_SIZE_8019];
@@ -47,6 +48,13 @@ void deserialize_transactions(tryte_t *transactions_trytes[],
     txs[i] = transaction_deserialize(trits);
   }
 }
+
+void transactions_free(iota_transaction_t *txs, size_t num_transactions) {
+  for (size_t i = 0; i < num_transactions; ++i) {
+    transaction_free(txs[i]);
+  }
+}
+
 retcode_t build_tangle(tangle_t *const tangle, iota_transaction_t txs[],
                        size_t num_transactions) {
   retcode_t ret;
@@ -57,10 +65,4 @@ retcode_t build_tangle(tangle_t *const tangle, iota_transaction_t txs[],
   }
 
   return RC_OK;
-}
-
-void destroy_tangle(iota_transaction_t txs[], size_t num_transactions) {
-  for (size_t i = 0; i < num_transactions; ++i) {
-    transaction_free(txs[i]);
-  }
 }

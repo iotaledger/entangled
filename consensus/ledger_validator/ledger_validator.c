@@ -204,6 +204,7 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
     hash_queue_pop(&non_analyzed_hashes);
   }
 done:
+  bundle_transactions_free(&bundle);
   hash_queue_free(&non_analyzed_hashes);
   hash_set_free(analyzed_hashes);
   return ret;

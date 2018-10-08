@@ -17,7 +17,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_init(
     tangle_t *const tangle, milestone_tracker_t *const mt,
     ledger_validator_t *const lv, exit_prob_transaction_validator_t *epv,
     uint32_t max_analyzed_txs, uint32_t max_depth) {
-  logger_helper_init(WALKER_VALIDATOR_LOGGER_ID, LOGGER_INFO, true);
+  logger_helper_init(WALKER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   epv->tangle = tangle;
   epv->mt = mt;
   epv->lv = lv;
@@ -33,23 +33,19 @@ retcode_t iota_consensus_exit_prob_transaction_validator_init(
 retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
     exit_prob_transaction_validator_t *epv) {
   logger_helper_destroy(WALKER_VALIDATOR_LOGGER_ID);
+
+  iota_milestone_tracker_destroy(epv->mt);
+
+  hash_set_free(&epv->max_depth_ok_memoization);
+  hash_set_free(&epv->analyzed_hashes);
+  epv->analyzed_hashes = NULL;
+  epv->max_depth_ok_memoization = NULL;
+  iota_snapshot_state_destroy(&epv->diff);
+  epv->diff = NULL;
+
   epv->tangle = NULL;
   epv->mt = NULL;
   epv->lv = NULL;
-
-  hash_set_entry_t *curr_entry = NULL;
-  hash_set_entry_t *tmp_entry = NULL;
-
-  // Cleanup
-  HASH_ITER(hh, epv->max_depth_ok_memoization, curr_entry, tmp_entry) {
-    HASH_DEL(epv->max_depth_ok_memoization, curr_entry);
-    free(curr_entry);
-  }
-
-  hash_set_free(&epv->analyzed_hashes);
-  epv->analyzed_hashes = NULL;
-  iota_snapshot_state_destroy(&epv->diff);
-  epv->diff = NULL;
 
   return RC_OK;
 }
@@ -150,7 +146,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
 
     // Mark the transaction as visited
     if ((res = hash_set_add(&visited_hashes, curr_hash_trits))) {
-      return res;
+      break;
     }
 
     // Load the transaction
@@ -175,7 +171,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
       log_error(WALKER_VALIDATOR_LOGGER_ID,
                 "Validation failed, transaction is below max depth\n");
       *below_max_depth = true;
-      return RC_OK;
+      break;
     }
     if (curr_tx->snapshot_index == 0) {
       hash_queue_push(&non_analyzed_hashes, curr_tx->trunk);
@@ -187,5 +183,5 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
   hash_set_free(&visited_hashes);
   hash_set_add(&epv->max_depth_ok_memoization, tail_hash->trits);
 
-  return RC_OK;
+  return res;
 }

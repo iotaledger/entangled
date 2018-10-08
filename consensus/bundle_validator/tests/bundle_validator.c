@@ -241,8 +241,15 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invali
   tryte_t *trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
-  deserialize_transactions(trytes, txs, 4);
-  txs[1]->address[FLEX_TRIT_SIZE_243 - 1] = 'A';
+  transactions_deserialize(trytes, txs, 4);
+  trit_t buffer[NUM_TRITS_FOR_FLEX_TRIT];
+  flex_trits_to_trits(buffer, NUM_TRITS_FOR_FLEX_TRIT,
+                      txs[1]->signature_or_message, NUM_TRITS_FOR_FLEX_TRIT,
+                      NUM_TRITS_FOR_FLEX_TRIT);
+  buffer[NUM_TRITS_FOR_FLEX_TRIT - 1] = 1;
+  flex_trits_from_trits(&txs[1]->signature_or_message[FLEX_TRIT_SIZE_243 - 1],
+                        NUM_TRITS_FOR_FLEX_TRIT, buffer,
+                        NUM_TRITS_FOR_FLEX_TRIT, NUM_TRITS_FOR_FLEX_TRIT);
   build_tangle(&tangle, txs, 4);
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
@@ -266,7 +273,7 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invali
   trit_array_free(tail_hash);
   trit_array_free(ep);
   bundle_transactions_free(&bundle);
-  destroy_tangle(txs, 4);
+  transactions_free(txs, 4);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
@@ -284,7 +291,7 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_valid() {
   tryte_t *trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
-  deserialize_transactions(trytes, txs, 4);
+  transactions_deserialize(trytes, txs, 4);
   build_tangle(&tangle, txs, 4);
 
   bool exist = false;
@@ -304,7 +311,7 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_valid() {
   TEST_ASSERT(iota_consensus_bundle_validator_destroy() == RC_OK);
   trit_array_free(tail_hash);
   bundle_transactions_free(&bundle);
-  destroy_tangle(txs, 4);
+  transactions_free(txs, 4);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 

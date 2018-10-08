@@ -34,8 +34,6 @@ static char *ciri_db_path =
 
 static char *snapshot_path =
     "consensus/exit_probability_validator/tests/snapshot.txt";
-static char *snapshot_sig_path =
-    "consensus/exit_probability_validator/tests/snapshot.sig";
 
 static uint32_t max_depth = 15;
 static uint32_t max_txs_below_max_depth = 10;
@@ -46,8 +44,8 @@ static milestone_tracker_t mt;
 static ledger_validator_t lv;
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
-  TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, snapshot_sig_path,
-                                 true) == RC_OK);
+  TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL, true) ==
+              RC_OK);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, true) ==
               RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &mt, NULL) ==
@@ -63,6 +61,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
 
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
   iota_consensus_ledger_validator_destroy(&epv->lv);
+  iota_snapshot_destroy(&snapshot);
   iota_consensus_exit_prob_transaction_validator_destroy(epv);
 }
 
@@ -170,7 +169,7 @@ void test_transaction_below_max_depth() {
   iota_transaction_t txs[2];
 
   tryte_t *trytes[2] = {TX_1_OF_2, TX_2_OF_2};
-  deserialize_transactions(trytes, txs, 2);
+  transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = max_depth - 1;
   build_tangle(&tangle, txs, 2);
 
@@ -189,7 +188,7 @@ void test_transaction_below_max_depth() {
   TEST_ASSERT(!is_valid);
 
   trit_array_free(tail);
-  destroy_tangle(txs, 2);
+  transactions_free(txs, 2);
   destroy_epv(&epv);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
@@ -205,7 +204,7 @@ void test_transaction_exceed_max_transactions() {
   iota_transaction_t txs[2];
 
   tryte_t *trytes[2] = {TX_1_OF_2, TX_2_OF_2};
-  deserialize_transactions(trytes, txs, 2);
+  transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = max_depth + 1;
   txs[1]->snapshot_index = max_depth + 1;
   build_tangle(&tangle, txs, 2);
@@ -223,7 +222,7 @@ void test_transaction_exceed_max_transactions() {
   TEST_ASSERT(is_valid);
 
   trit_array_free(tail);
-  destroy_tangle(txs, 2);
+  transactions_free(txs, 2);
   destroy_epv(&epv);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   max_txs_below_max_depth = 15;
@@ -239,7 +238,7 @@ void test_transaction_is_genesis() {
   iota_transaction_t txs[2];
 
   tryte_t *trytes[2] = {TX_1_OF_2, TX_2_OF_2};
-  deserialize_transactions(trytes, txs, 2);
+  transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = 0;
   build_tangle(&tangle, txs, 2);
 
@@ -256,7 +255,7 @@ void test_transaction_is_genesis() {
   TEST_ASSERT(!is_valid);
 
   trit_array_free(tail);
-  destroy_tangle(txs, 2);
+  transactions_free(txs, 2);
   destroy_epv(&epv);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
@@ -271,7 +270,7 @@ void test_transaction_valid() {
   iota_transaction_t txs[2];
 
   tryte_t *trytes[2] = {TX_1_OF_2, TX_2_OF_2};
-  deserialize_transactions(trytes, txs, 2);
+  transactions_deserialize(trytes, txs, 2);
   build_tangle(&tangle, txs, 2);
 
   flex_trit_t ep_trits[FLEX_TRIT_SIZE_8019];
@@ -289,7 +288,7 @@ void test_transaction_valid() {
   TEST_ASSERT(!is_valid);
 
   trit_array_free(tail);
-  destroy_tangle(txs, 2);
+  transactions_free(txs, 2);
   destroy_epv(&epv);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
@@ -304,7 +303,6 @@ int main(int argc, char *argv[]) {
     test_db_path = "test.db";
     ciri_db_path = "ciri.db";
     snapshot_path = "snapshot.txt";
-    snapshot_sig_path = "snapshot_sig_path";
   }
 
   config.db_path = test_db_path;
