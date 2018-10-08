@@ -34,13 +34,10 @@ retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
     exit_prob_transaction_validator_t *epv) {
   logger_helper_destroy(WALKER_VALIDATOR_LOGGER_ID);
 
-  iota_milestone_tracker_destroy(epv->mt);
-
   hash_set_free(&epv->max_depth_ok_memoization);
   hash_set_free(&epv->analyzed_hashes);
   iota_snapshot_state_destroy(&epv->diff);
   epv->diff = NULL;
-
   epv->tangle = NULL;
   epv->mt = NULL;
   epv->lv = NULL;
@@ -125,6 +122,15 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
   hash_queue_t non_analyzed_hashes = NULL;
   hash_queue_push(&non_analyzed_hashes, tail_hash->trits);
 
+  // Load the transaction
+  struct _iota_transaction curr_tx_s;
+  iota_transaction_t curr_tx = &curr_tx_s;
+
+  iota_stor_pack_t pack = {.models = (void **)(&curr_tx),
+                           .capacity = 1,
+                           .num_loaded = 0,
+                           .insufficient_capacity = false};
+
   hash_set_t visited_hashes = NULL;
   while (non_analyzed_hashes != NULL) {
     if (hash_set_size(&visited_hashes) == epv->max_analyzed_txs) {
@@ -147,25 +153,15 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
       break;
     }
 
-    // Load the transaction
-    struct _iota_transaction curr_tx_s;
-    iota_transaction_t curr_tx = &curr_tx_s;
-
-    iota_stor_pack_t pack = {.models = (void **)(&curr_tx),
-                             .capacity = 1,
-                             .num_loaded = 0,
-                             .insufficient_capacity = false};
-
     TRIT_ARRAY_DECLARE(hash_trits_array, NUM_TRITS_HASH);
     memcpy(hash_trits_array.trits, curr_hash_trits, FLEX_TRIT_SIZE_243);
     res = iota_tangle_transaction_load(epv->tangle, TRANSACTION_COL_HASH,
                                        &hash_trits_array, &pack);
-    curr_tx = (iota_transaction_t)pack.models[0];
     bool tail_is_not_genesis =
-        (curr_tx->snapshot_index != 0 ||
-         memcmp(null_hash, curr_tx->hash, FLEX_TRIT_SIZE_243) == 0);
+        (curr_tx_s.snapshot_index != 0 ||
+         memcmp(null_hash, curr_tx_s.hash, FLEX_TRIT_SIZE_243) == 0);
     if (tail_is_not_genesis &&
-        (curr_tx->snapshot_index < lowest_allowed_depth)) {
+        (curr_tx_s.snapshot_index < lowest_allowed_depth)) {
       log_error(WALKER_VALIDATOR_LOGGER_ID,
                 "Validation failed, transaction is below max depth\n");
       *below_max_depth = true;
