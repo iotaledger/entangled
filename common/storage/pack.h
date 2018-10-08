@@ -24,13 +24,10 @@ typedef struct iota_stor_pack_s {
 extern "C" {
 #endif
 
-extern retcode_t hash_pack_resize(iota_stor_pack_t *pack, size_t resize_factor);
-
-extern retcode_t hash_pack_init(iota_stor_pack_t *pack, size_t size);
-
-extern retcode_t hash_pack_reset(iota_stor_pack_t *pack);
-
-extern retcode_t hash_pack_free(iota_stor_pack_t *pack);
+retcode_t hash_pack_resize(iota_stor_pack_t *pack, size_t resize_factor);
+retcode_t hash_pack_init(iota_stor_pack_t *pack, size_t size);
+retcode_t hash_pack_reset(iota_stor_pack_t *pack);
+retcode_t hash_pack_free(iota_stor_pack_t *pack);
 
 #ifdef __cplusplus
 }
