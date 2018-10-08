@@ -20,6 +20,20 @@ typedef struct iota_stor_pack_s {
   bool insufficient_capacity;
 } iota_stor_pack_t;
 
+#define DECLARE_PACK_SINGLE(TYPE, NAME, PTR_NAME, PACK_NAME)    \
+  TYPE NAME;                                                    \
+  TYPE *PTR_NAME = &NAME;                                       \
+  iota_stor_pack_t PACK_NAME = {.models = (void **)(&PTR_NAME), \
+                                .capacity = 1,                  \
+                                .num_loaded = 0,                \
+                                .insufficient_capacity = false};
+
+#define DECLARE_PACK_SINGLE_TX(NAME, PTR_NAME, PACK_NAME) \
+  DECLARE_PACK_SINGLE(struct _iota_transaction, NAME, PTR_NAME, PACK_NAME)
+
+#define DECLARE_PACK_SINGLE_MILESTONE(NAME, PTR_NAME, PACK_NAME) \
+  DECLARE_PACK_SINGLE(iota_milestone_t, NAME, PTR_NAME, PACK_NAME)
+
 #ifdef __cplusplus
 extern "C" {
 #endif

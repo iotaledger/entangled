@@ -145,12 +145,7 @@ static void* latest_milestone_tracker(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
   iota_stor_pack_t hash_pack;
   iota_milestone_t candidate;
-  struct _iota_transaction tx;
-  iota_transaction_t tx_ptr = &tx;
-  iota_stor_pack_t tx_pack = {.models = (void**)&tx_ptr,
-                              .capacity = 1,
-                              .num_loaded = 0,
-                              .insufficient_capacity = false};
+  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, tx_pack);
   uint64_t scan_time, previous_latest_milestone_index;
 
   if (mt == NULL) {
@@ -202,13 +197,9 @@ static void* latest_milestone_tracker(void* arg) {
 static retcode_t update_latest_solid_subtangle_milestone(
     milestone_tracker_t* const mt) {
   retcode_t ret = RC_OK;
-  iota_milestone_t milestone, latest_milestone;
-  iota_milestone_t *milestone_ptr = &milestone,
-                   *latest_milestone_ptr = &latest_milestone;
-  iota_stor_pack_t pack = {.models = (void**)&latest_milestone_ptr,
-                           .capacity = 1,
-                           .num_loaded = 0,
-                           .insufficient_capacity = false};
+  iota_milestone_t milestone;
+  iota_milestone_t* milestone_ptr = &milestone;
+  DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr, pack);
   bool has_snapshot = false;
 
   if (mt == NULL) {
