@@ -78,13 +78,13 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
       bytes_to_trits(((byte_t *)flex_trits + i + 1), 1, ((trit_t *)trits + 5),
                      5);
     }
-    to_flex_trits[j] = trits_to_byte(trits + offset, 0, 4);
+    to_flex_trits[j] = trits_to_byte(trits + offset, 0, 5);
   }
   // There is a risk of noise after the last trit so we need to clean up
   uint8_t residual = num_trits % 5U;
   if (residual) {
     to_flex_trits[num_bytes - 1] =
-        trits_to_byte(trits + offset, 0, residual - 1);
+        trits_to_byte(trits + offset, 0, residual);
   }
 #endif
   return num_bytes;
@@ -232,7 +232,7 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
       num_trits -= max_trits;
       offset += max_trits;
     }
-    trits_for_byte = MIN(4, (offset - 1));
+    trits_for_byte = MIN(5, offset);
     bytes[j] = trits_to_byte(shifter.trits, 0, trits_for_byte);
 #if BYTE_ORDER == LITTLE_ENDIAN
     shifter.val = shifter.val >> 40;
@@ -248,8 +248,8 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
   if (residual) {
     trit_t last_byte[5] = {0};
     size_t index = num_bytes - 1;
-    byte_to_trits(flex_trits[index], last_byte, 4);
-    bytes[index] = trits_to_byte(last_byte, 0, residual - 1);
+    byte_to_trits(flex_trits[index], last_byte, 5);
+    bytes[index] = trits_to_byte(last_byte, 0, residual);
   }
 #endif
   return num_trits;
@@ -278,7 +278,7 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
   for (int i = 0, j = 0; num_trits; j++) {
     max_trits = MIN(5, num_trits);
     if (offset < NUM_TRITS_PER_FLEX_TRIT) {
-      byte_to_trits(bytes[i], shifter.trits + offset, max_trits - 1);
+      byte_to_trits(bytes[i], shifter.trits + offset, max_trits);
       offset += max_trits;
       i++;
     }
@@ -296,8 +296,8 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
   if (residual) {
     trit_t last_byte[5] = {0};
     size_t index = num_bytes - 1;
-    byte_to_trits(bytes[index], last_byte, 4);
-    to_flex_trits[index] = trits_to_byte(last_byte, 0, residual - 1);
+    byte_to_trits(bytes[index], last_byte, 5);
+    to_flex_trits[index] = trits_to_byte(last_byte, 0, residual);
   }
 #endif
   return num_trits;
