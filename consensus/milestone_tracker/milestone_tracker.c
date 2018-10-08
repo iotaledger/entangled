@@ -86,7 +86,8 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
     ret = RC_CONSENSUS_MT_OOM;
     goto done;
   }
-  if ((ret = bundle_validate(mt->tangle, &hash, bundle, &valid)) != RC_OK) {
+  if ((ret = iota_consensus_bundle_validator_validate(mt->tangle, &hash, bundle,
+                                                      &valid)) != RC_OK) {
     log_warning(MILESTONE_TRACKER_LOGGER_ID, "Validating bundle failed\n");
     goto done;
   } else if (!valid) {

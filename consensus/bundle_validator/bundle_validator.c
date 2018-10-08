@@ -119,17 +119,19 @@ static retcode_t validate_signature(bundle_transactions_t* bundle,
  * Public functions
  */
 
-retcode_t bundle_validate_init() {
+retcode_t iota_consensus_bundle_validator_init() {
   logger_helper_init(BUNDLE_VALIDATOR_ID, LOGGER_DEBUG, true);
   return RC_OK;
 }
-retcode_t bundle_validate_destroy() {
+
+retcode_t iota_consensus_bundle_validator_destroy() {
   logger_helper_destroy(BUNDLE_VALIDATOR_ID);
   return RC_OK;
 }
 
-retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
-                          bundle_transactions_t* bundle, bool* is_valid) {
+retcode_t iota_consensus_bundle_validator_validate(
+    const tangle_t* const tangle, trit_array_p tail_hash,
+    bundle_transactions_t* bundle, bool* is_valid) {
   retcode_t res = RC_OK;
   iota_transaction_t curr_tx;
 

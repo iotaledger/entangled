@@ -15,11 +15,11 @@
 extern "C" {
 #endif
 
-retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
-                          bundle_transactions_t* bundle, bool* is_valid);
-
-retcode_t bundle_validate_init();
-retcode_t bundle_validate_destroy();
+retcode_t iota_consensus_bundle_validator_init();
+retcode_t iota_consensus_bundle_validator_destroy();
+retcode_t iota_consensus_bundle_validator_validate(
+    const tangle_t* const tangle, trit_array_p tail_hash,
+    bundle_transactions_t* bundle, bool* is_valid);
 
 #ifdef __cplusplus
 }
