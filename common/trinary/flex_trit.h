@@ -81,14 +81,14 @@ typedef int8_t flex_trit_t;
 /// @param[in] num_trits - number of trits to store
 /// @return size_t - the number of flex_trits (bytes) needed
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
-  #define NUM_FLEX_TRITS_FOR_TRITS(num_trits) num_trits
+#define NUM_FLEX_TRITS_FOR_TRITS(num_trits) num_trits
 #elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
-  #define NUM_FLEX_TRITS_FOR_TRITS(num_trits) \
+#define NUM_FLEX_TRITS_FOR_TRITS(num_trits) \
   ((num_trits + NUMBER_OF_TRITS_IN_A_TRYTE - 1) / NUMBER_OF_TRITS_IN_A_TRYTE)
 #elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
-  #define NUM_FLEX_TRITS_FOR_TRITS(num_trits) ((num_trits + 3) >> 2U)
+#define NUM_FLEX_TRITS_FOR_TRITS(num_trits) ((num_trits + 3) >> 2U)
 #elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
-  #define NUM_FLEX_TRITS_FOR_TRITS(num_trits) \
+#define NUM_FLEX_TRITS_FOR_TRITS(num_trits) \
   ((num_trits + NUMBER_OF_TRITS_IN_A_BYTE - 1) / NUMBER_OF_TRITS_IN_A_BYTE)
 #endif
 

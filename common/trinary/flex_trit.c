@@ -177,12 +177,12 @@ size_t flex_trits_to_trytes(tryte_t *trytes, size_t to_len,
   }
   memcpy(trytes, flex_trits, num_bytes);
 #elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE) || \
-      defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
+    defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
   union _shifter {
     uint64_t val;
     trit_t trits[8];
   };
-  union _shifter shifter = { 0 };
+  union _shifter shifter = {0};
   size_t offset = 0;
   size_t max_trits, trits_for_tryte;
   for (int i = 0, j = 0; num_trits || offset; j++) {
@@ -240,7 +240,8 @@ size_t flex_trits_from_trytes(flex_trit_t *to_flex_trits, size_t to_len,
       }
     }
     num_trits = MIN(NUM_TRITS_PER_FLEX_TRIT, offset);
-    flex_trits_from_trits(to_flex_trits + j, num_trits, shifter.trits, num_trits, num_trits);
+    flex_trits_from_trits(to_flex_trits + j, num_trits, shifter.trits,
+                          num_trits, num_trits);
 #if BYTE_ORDER == LITTLE_ENDIAN
     shifter.val = shifter.val >> (num_trits << 3);
 #elif BYTE_ORDER == BIG_ENDIAN
