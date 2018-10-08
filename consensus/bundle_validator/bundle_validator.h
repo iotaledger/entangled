@@ -25,4 +25,4 @@ retcode_t iota_consensus_bundle_validator_validate(
 }
 #endif
 
-#endif  //__CONSENSUS_BUNDLE_VALIDATOR_BUNDLE_VALIDATOR_H__
+#endif  // __CONSENSUS_BUNDLE_VALIDATOR_BUNDLE_VALIDATOR_H__

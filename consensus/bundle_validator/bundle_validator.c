@@ -13,7 +13,7 @@
 #include "consensus/defs.h"
 #include "utils/logger_helper.h"
 
-#define BUNDLE_VALIDATOR_ID "bundle_validator_id"
+#define BUNDLE_VALIDATOR_LOGGER_ID "consensus_bundle_validator"
 
 /*
  * Private functions
@@ -30,7 +30,7 @@ static retcode_t load_bundle_transactions(const tangle_t* const tangle,
                                      &pack);
 
   if (res != RC_OK || pack.num_loaded == 0) {
-    log_error(BUNDLE_VALIDATOR_ID,
+    log_error(BUNDLE_VALIDATOR_LOGGER_ID,
               "No transactions were loaded for the provided tail hash\n");
     return res;
   }
@@ -50,7 +50,7 @@ static retcode_t load_bundle_transactions(const tangle_t* const tangle,
                                        &curr_tx_trunk, &pack);
 
     if (res != RC_OK || pack.num_loaded == 0) {
-      log_error(BUNDLE_VALIDATOR_ID,
+      log_error(BUNDLE_VALIDATOR_LOGGER_ID,
                 "No transactions were loaded for the provided tail hash\n");
       return res;
     }
@@ -120,12 +120,12 @@ static retcode_t validate_signature(bundle_transactions_t* bundle,
  */
 
 retcode_t iota_consensus_bundle_validator_init() {
-  logger_helper_init(BUNDLE_VALIDATOR_ID, LOGGER_DEBUG, true);
+  logger_helper_init(BUNDLE_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   return RC_OK;
 }
 
 retcode_t iota_consensus_bundle_validator_destroy() {
-  logger_helper_destroy(BUNDLE_VALIDATOR_ID);
+  logger_helper_destroy(BUNDLE_VALIDATOR_LOGGER_ID);
   return RC_OK;
 }
 
@@ -137,7 +137,7 @@ retcode_t iota_consensus_bundle_validator_validate(
 
   *is_valid = true;
   if (bundle == NULL) {
-    log_error(BUNDLE_VALIDATOR_ID, "Bundle is not initialized\n");
+    log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Bundle is not initialized\n");
     *is_valid = false;
     return RC_CONSENSUS_NULL_BUNDLE_PTR;
   }
@@ -145,7 +145,8 @@ retcode_t iota_consensus_bundle_validator_validate(
   res = load_bundle_transactions(tangle, tail_hash, bundle);
 
   if (res || (utarray_len(bundle) == 0)) {
-    log_error(BUNDLE_VALIDATOR_ID, "Failed loading transactions for tail\n");
+    log_error(BUNDLE_VALIDATOR_LOGGER_ID,
+              "Failed loading transactions for tail\n");
     *is_valid = false;
     return res;
   }
@@ -162,7 +163,7 @@ retcode_t iota_consensus_bundle_validator_validate(
     bundle_value += curr_tx->value;
     if (curr_tx->current_index != i++ || curr_tx->last_index != last_index ||
         llabs(bundle_value) > IOTA_SUPPLY) {
-      log_error(BUNDLE_VALIDATOR_ID, "Invalid transaction in bundle\n");
+      log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Invalid transaction in bundle\n");
       *is_valid = false;
       break;
     }
@@ -170,13 +171,13 @@ retcode_t iota_consensus_bundle_validator_validate(
     if (curr_tx->value != 0 &&
         flex_trits_at(curr_tx->address, NUM_TRITS_ADDRESS,
                       NUM_TRITS_HASH - 1) != 0) {
-      log_error(BUNDLE_VALIDATOR_ID, "Invalid input address\n");
+      log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Invalid input address\n");
       *is_valid = false;
       break;
     }
 
     if (curr_tx->current_index == last_index && bundle_value != 0) {
-      log_error(BUNDLE_VALIDATOR_ID, "Bundle value is not zero\n");
+      log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Bundle value is not zero\n");
       *is_valid = false;
       break;
     }
@@ -189,7 +190,7 @@ retcode_t iota_consensus_bundle_validator_validate(
       calculate_bundle_hash(bundle, bundle_hash_calculated);
       if (memcmp(bundle_hash, bundle_hash_calculated, FLEX_TRIT_SIZE_243) !=
           0) {
-        log_error(BUNDLE_VALIDATOR_ID,
+        log_error(BUNDLE_VALIDATOR_LOGGER_ID,
                   "Bundle hash provided differs from calculated \n");
         *is_valid = false;
         break;
@@ -203,7 +204,7 @@ retcode_t iota_consensus_bundle_validator_validate(
 
       res = validate_signature(bundle, normalized_bundle_trits, is_valid);
       if (res || !(*is_valid)) {
-        log_error(BUNDLE_VALIDATOR_ID, "Invalid signature.\n");
+        log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Invalid signature.\n");
         *is_valid = false;
         break;
       }
