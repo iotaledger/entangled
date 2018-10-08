@@ -15,10 +15,10 @@ Output
 ./bazel-bin/cclient/libapi.so
 ```
 
-## Using CClient library  
+## Using C Client library  
 
 C Client library is a subproject in the entangled repository, for using this library you should create a new bazel project and add this library to the dependence.  
-First thing is to create **WORKSPACE** and **BUILD** files in your project folder, second include `iota_client_core_api.h` in the source code.  
+First thing is to create **WORKSPACE** and **BUILD** files in your project folder, second include `cclient/iota_client_core_api.h` in the source code.  
 
 The **WORKSPACE** file  
 
@@ -30,13 +30,13 @@ The **WORKSPACE** file
 
 git_repository(
     name = "entangled",
-    commit = "b57bd1fce59c8d9b6fcc2bcfbb960c0ef14ee261",
+    commit = "b76278278c8481ee8c4fd52f16d64594bc0a48ed",
     remote = "https://github.com/iotaledger/entangled.git",
 )
 
 git_repository(
     name = "rules_iota",
-    commit = "18179db1ce0be893643de847a4e673f371d89ec8",
+    commit = "39eeaf4fad15929b0fcc88b8fc473925a6bd9060",
     remote = "https://github.com/iotaledger/rules_iota.git",
 )
 
@@ -54,7 +54,6 @@ cc_binary(
     name = "app",
     copts = ["-DLOGGER_ENABLE"],
     srcs = ["cclient_app.c", "cclient_app.h",],
-    includes = ["external/entangled/cclient/"],
     deps = ["@entangled//cclient:api",],
     visibility = ["//visibility:public"],
 )
