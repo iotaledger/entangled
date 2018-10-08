@@ -8,7 +8,9 @@
 #ifndef __CONSENSUS_BUNDLE_VALIDATOR_BUNDLE_VALIDATOR_H__
 #define __CONSENSUS_BUNDLE_VALIDATOR_BUNDLE_VALIDATOR_H__
 
+#include "common/errors.h"
 #include "common/model/bundle.h"
+#include "common/trinary/trit_array.h"
 #include "consensus/tangle/tangle.h"
 
 #ifdef __cplusplus

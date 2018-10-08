@@ -7,20 +7,16 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <unity/unity.h>
+
+#include "unity/unity.h"
+#include "utarray.h"
 
 #include "common/model/transaction.h"
-#include "common/storage/connection.h"
-#include "common/storage/sql/defs.h"
-#include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
-#include "common/trinary/flex_trit.h"
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/defs.h"
-#include "consensus/tangle/tangle.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
-#include "utarray.h"
 
 static tangle_t tangle;
 static connection_config_t config;

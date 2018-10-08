@@ -7,8 +7,6 @@ cc_test(
     visibility = ["//visibility:public"],
     deps = [
         "//common/storage/tests/helpers",
-        "//common/trinary:flex_trit",
-        "//consensus:defs",
         "//consensus/bundle_validator",
         "//consensus/test_utils",
         "@unity",
