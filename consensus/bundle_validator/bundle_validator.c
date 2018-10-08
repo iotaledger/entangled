@@ -13,9 +13,111 @@
 #include "consensus/defs.h"
 #include "utils/logger_helper.h"
 
-#include "math.h"
-
 #define BUNDLE_VALIDATOR_ID "bundle_validator_id"
+
+/*
+ * Private functions
+ */
+
+static retcode_t load_bundle_transactions(const tangle_t* const tangle,
+                                          trit_array_p tail_hash,
+                                          bundle_transactions_t* bundle) {
+  retcode_t res = RC_OK;
+  flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
+  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
+
+  res = iota_tangle_transaction_load(tangle, TRANSACTION_COL_HASH, tail_hash,
+                                     &pack);
+
+  if (res != RC_OK || pack.num_loaded == 0) {
+    log_error(BUNDLE_VALIDATOR_ID,
+              "No transactions were loaded for the provided tail hash\n");
+    return res;
+  }
+
+  size_t last_index = curr_tx->last_index;
+  size_t curr_index = 0;
+  memcpy(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243);
+  trit_array_t curr_tx_trunk;
+  curr_tx_trunk.dynamic = 0;
+  while (curr_index < last_index &&
+         memcmp(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243) == 0) {
+    bundle_transactions_add(bundle, curr_tx);
+    pack.num_loaded = 0;
+    pack.insufficient_capacity = false;
+    trit_array_set_trits(&curr_tx_trunk, curr_tx->trunk, NUM_TRITS_HASH);
+    res = iota_tangle_transaction_load(tangle, TRANSACTION_COL_HASH,
+                                       &curr_tx_trunk, &pack);
+
+    if (res != RC_OK || pack.num_loaded == 0) {
+      log_error(BUNDLE_VALIDATOR_ID,
+                "No transactions were loaded for the provided tail hash\n");
+      return res;
+    }
+  }
+
+  return RC_OK;
+}
+
+static retcode_t validate_signature(bundle_transactions_t* bundle,
+                                    trit_t* normalized_bundle, bool* is_valid) {
+  iota_transaction_t curr_tx;
+  iota_transaction_t curr_inp_tx;
+  Kerl address_kerl;
+  Kerl sig_frag_kerl;
+  trit_t digested_sig_trits[NUM_TRITS_ADDRESS];
+  trit_t digested_address[NUM_TRITS_ADDRESS];
+  trit_t key[NUM_TRITS_SIGNATURE];
+
+  init_kerl(&address_kerl);
+  init_kerl(&sig_frag_kerl);
+
+  *is_valid = true;
+  for (curr_tx = (iota_transaction_t)utarray_eltptr(bundle, 0);
+       curr_tx != NULL;) {
+    if (curr_tx->value >= 0) {
+      curr_tx = (iota_transaction_t)utarray_next(bundle, curr_tx);
+      continue;
+    }
+    curr_inp_tx = curr_tx;
+    size_t offset = 0, next_offset = 0;
+    kerl_reset(&address_kerl);
+    do {
+      kerl_reset(&sig_frag_kerl);
+      next_offset = (offset + ISS_FRAGMENTS * RADIX - 1) % NUM_TRITS_HASH + 1;
+      flex_trits_to_trits(key, NUM_TRITS_SIGNATURE,
+                          curr_inp_tx->signature_or_message,
+                          NUM_TRITS_SIGNATURE, NUM_TRITS_SIGNATURE);
+
+      iss_kerl_sig_digest(digested_sig_trits,
+                          &normalized_bundle[offset % NUM_TRITS_HASH], key,
+                          NUM_TRITS_SIGNATURE, &sig_frag_kerl);
+      kerl_absorb(&address_kerl, digested_sig_trits, NUM_TRITS_ADDRESS);
+      curr_inp_tx = (iota_transaction_t)utarray_next(bundle, curr_inp_tx);
+      offset = next_offset;
+    } while (curr_inp_tx != NULL &&
+             memcmp(curr_inp_tx->address, curr_tx->address,
+                    FLEX_TRIT_SIZE_243) == 0 &&
+             curr_inp_tx->value == 0);
+    kerl_squeeze(&address_kerl, digested_address, NUM_TRITS_ADDRESS);
+
+    flex_trit_t digest[FLEX_TRIT_SIZE_243];
+    flex_trits_from_trits(digest, NUM_TRITS_HASH, digested_address,
+                          NUM_TRITS_HASH, NUM_TRITS_HASH);
+
+    if (memcmp(digest, curr_tx->address, FLEX_TRIT_SIZE_243) != 0) {
+      *is_valid = false;
+      break;
+    }
+    curr_tx = curr_inp_tx;
+  }
+
+  return RC_OK;
+}
+
+/*
+ * Public functions
+ */
 
 retcode_t bundle_validate_init() {
   logger_helper_init(BUNDLE_VALIDATOR_ID, LOGGER_DEBUG, true);
@@ -25,13 +127,6 @@ retcode_t bundle_validate_destroy() {
   logger_helper_destroy(BUNDLE_VALIDATOR_ID);
   return RC_OK;
 }
-
-static retcode_t load_bundle_transactions(const tangle_t* const tangle,
-                                          trit_array_p tail_hash,
-                                          bundle_transactions_t* bundle);
-
-static retcode_t validate_signature(bundle_transactions_t* bundle,
-                                    trit_t* normalized_bundle, bool* is_valid);
 
 retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
                           bundle_transactions_t* bundle, bool* is_valid) {
@@ -87,6 +182,7 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
     if (curr_tx->current_index == last_index) {
       flex_trit_t bundle_hash_calculated[FLEX_TRIT_SIZE_243];
       trit_t normalized_bundle_trits[NUM_TRITS_HASH];
+      byte_t normalized_bundle_bytes[NUM_TRYTES_HASH];
 
       calculate_bundle_hash(bundle, bundle_hash_calculated);
       if (memcmp(bundle_hash, bundle_hash_calculated, FLEX_TRIT_SIZE_243) !=
@@ -97,7 +193,11 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
         break;
       }
 
-      normalize_hash_trits(bundle_hash_calculated, normalized_bundle_trits);
+      normalize_hash(bundle_hash_calculated, normalized_bundle_bytes);
+      for (int c = 0; c < NUM_TRYTES_HASH; ++c) {
+        long_to_trits(normalized_bundle_bytes[c],
+                      &normalized_bundle_trits[c * RADIX]);
+      }
 
       res = validate_signature(bundle, normalized_bundle_trits, is_valid);
       if (res || !(*is_valid)) {
@@ -106,102 +206,6 @@ retcode_t bundle_validate(const tangle_t* const tangle, trit_array_p tail_hash,
         break;
       }
     }
-  }
-
-  return RC_OK;
-}
-
-retcode_t load_bundle_transactions(const tangle_t* const tangle,
-                                   trit_array_p tail_hash,
-                                   bundle_transactions_t* bundle) {
-  retcode_t res = RC_OK;
-  flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
-  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
-
-  res = iota_tangle_transaction_load(tangle, TRANSACTION_COL_HASH, tail_hash,
-                                     &pack);
-
-  if (res != RC_OK || pack.num_loaded == 0) {
-    log_error(BUNDLE_VALIDATOR_ID,
-              "No transactions were loaded for the provided tail hash\n");
-    return res;
-  }
-
-  size_t last_index = curr_tx->last_index;
-  size_t curr_index = 0;
-  memcpy(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243);
-  trit_array_t curr_tx_trunk;
-  curr_tx_trunk.dynamic = 0;
-  while (curr_index < last_index &&
-         memcmp(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243) == 0) {
-    bundle_transactions_add(bundle, curr_tx);
-    pack.num_loaded = 0;
-    pack.insufficient_capacity = false;
-    trit_array_set_trits(&curr_tx_trunk, curr_tx->trunk, NUM_TRITS_HASH);
-    res = iota_tangle_transaction_load(tangle, TRANSACTION_COL_HASH,
-                                       &curr_tx_trunk, &pack);
-
-    if (res != RC_OK || pack.num_loaded == 0) {
-      log_error(BUNDLE_VALIDATOR_ID,
-                "No transactions were loaded for the provided tail hash\n");
-      return res;
-    }
-  }
-
-  return RC_OK;
-}
-
-retcode_t validate_signature(bundle_transactions_t* bundle,
-                             trit_t* normalized_bundle, bool* is_valid) {
-  iota_transaction_t curr_tx;
-  iota_transaction_t curr_inp_tx;
-  Kerl address_kerl;
-  Kerl sig_frag_kerl;
-  trit_t digested_sig_trits[NUM_TRITS_ADDRESS];
-  trit_t digested_address[NUM_TRITS_ADDRESS];
-  trit_t key[NUM_TRITS_SIGNATURE];
-
-  init_kerl(&address_kerl);
-  init_kerl(&sig_frag_kerl);
-
-  *is_valid = true;
-  for (curr_tx = (iota_transaction_t)utarray_eltptr(bundle, 0);
-       curr_tx != NULL;) {
-    if (curr_tx->value >= 0) {
-      curr_tx = (iota_transaction_t)utarray_next(bundle, curr_tx);
-      continue;
-    }
-    curr_inp_tx = curr_tx;
-    size_t offset = 0, next_offset = 0;
-    kerl_reset(&address_kerl);
-    do {
-      kerl_reset(&sig_frag_kerl);
-      next_offset = (offset + ISS_FRAGMENTS * RADIX - 1) % NUM_TRITS_HASH + 1;
-      flex_trits_to_trits(key, NUM_TRITS_SIGNATURE,
-                          curr_inp_tx->signature_or_message,
-                          NUM_TRITS_SIGNATURE, NUM_TRITS_SIGNATURE);
-
-      iss_kerl_sig_digest(digested_sig_trits,
-                          &normalized_bundle[offset % NUM_TRITS_HASH], key,
-                          NUM_TRITS_SIGNATURE, &sig_frag_kerl);
-      kerl_absorb(&address_kerl, digested_sig_trits, NUM_TRITS_ADDRESS);
-      curr_inp_tx = (iota_transaction_t)utarray_next(bundle, curr_inp_tx);
-      offset = next_offset;
-    } while (curr_inp_tx != NULL &&
-             memcmp(curr_inp_tx->address, curr_tx->address,
-                    FLEX_TRIT_SIZE_243) == 0 &&
-             curr_inp_tx->value == 0);
-    kerl_squeeze(&address_kerl, digested_address, NUM_TRITS_ADDRESS);
-
-    flex_trit_t digest[FLEX_TRIT_SIZE_243];
-    flex_trits_from_trits(digest, NUM_TRITS_HASH, digested_address,
-                          NUM_TRITS_HASH, NUM_TRITS_HASH);
-
-    if (memcmp(digest, curr_tx->address, FLEX_TRIT_SIZE_243) != 0) {
-      *is_valid = false;
-      break;
-    }
-    curr_tx = curr_inp_tx;
   }
 
   return RC_OK;
