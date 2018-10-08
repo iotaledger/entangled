@@ -83,8 +83,7 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
   // There is a risk of noise after the last trit so we need to clean up
   uint8_t residual = num_trits % 5U;
   if (residual) {
-    to_flex_trits[num_bytes - 1] =
-        trits_to_byte(trits + offset, 0, residual);
+    to_flex_trits[num_bytes - 1] = trits_to_byte(trits + offset, 0, residual);
   }
 #endif
   return num_bytes;
