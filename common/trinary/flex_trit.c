@@ -242,14 +242,14 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
   }
 #elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
   size_t num_bytes = min_bytes(num_trits);
-  memcpy(bytes, flex_trits, num_bytes);
   size_t residual = num_trits % 5;
   if (residual) {
     trit_t last_byte[5] = {0};
-    size_t index = num_bytes - 1;
-    byte_to_trits(flex_trits[index], last_byte, 5);
-    bytes[index] = trits_to_byte(last_byte, 0, residual);
+    num_bytes--;
+    byte_to_trits(flex_trits[num_bytes], last_byte, 5);
+    bytes[num_bytes] = trits_to_byte(last_byte, 0, residual);
   }
+  memcpy(bytes, flex_trits, num_bytes);
 #endif
   return num_trits;
 }
@@ -290,14 +290,14 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
   }
 #elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
   size_t num_bytes = min_bytes(num_trits);
-  memcpy(to_flex_trits, bytes, num_bytes);
   size_t residual = num_trits % 5;
   if (residual) {
     trit_t last_byte[5] = {0};
-    size_t index = num_bytes - 1;
-    byte_to_trits(bytes[index], last_byte, 5);
-    to_flex_trits[index] = trits_to_byte(last_byte, 0, residual);
+    num_bytes--;
+    byte_to_trits(bytes[num_bytes], last_byte, 5);
+    to_flex_trits[num_bytes] = trits_to_byte(last_byte, 0, residual);
   }
+  memcpy(to_flex_trits, bytes, num_bytes);
 #endif
   return num_trits;
 }
