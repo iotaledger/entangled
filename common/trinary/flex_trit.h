@@ -124,7 +124,7 @@ static inline trit_t flex_trits_at(flex_trit_t const *const flex_trits,
   uint8_t tindex = index % 5U;
   // Find out the index of the byte in the array
   index = index / 5U;
-  byte_to_trits(*(flex_trits + index), trits, 4);
+  byte_to_trits(*(flex_trits + index), trits, 5);
   return trits[tindex];
 #endif
 }
@@ -163,9 +163,9 @@ static inline uint8_t flex_trits_set_at(flex_trit_t *const flex_trits,
   uint8_t tindex = index % 5U;
   // Find out the index of the byte in the array
   index = index / 5U;
-  byte_to_trits(*(flex_trits + index), trits, 4);
+  byte_to_trits(*(flex_trits + index), trits, 5);
   trits[tindex] = trit;
-  flex_trits[index] = trits_to_byte(trits, 0, 4);
+  flex_trits[index] = trits_to_byte(trits, 0, 5);
 #endif
   return 1;
 }
