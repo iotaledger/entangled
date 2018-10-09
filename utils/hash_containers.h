@@ -84,14 +84,14 @@ typedef struct hash_to_indexed_hash_set_entry_s {
 
 typedef hash_to_indexed_hash_set_entry_t *hash_to_indexed_hash_set_map_t;
 
-bool hash_to_hash_set_map_contains(hash_to_indexed_hash_set_map_t *map,
-                                   flex_trit_t *hash);
+bool hash_to_indexed_hash_set_map_contains(hash_to_indexed_hash_set_map_t *map,
+                                           flex_trit_t *hash);
 
-retcode_t hash_to_hash_set_create_map_new_set(
+retcode_t hash_to_indexed_hash_set_map_add_new_set(
     hash_to_indexed_hash_set_map_t *map, flex_trit_t *hash,
     hash_to_indexed_hash_set_entry_t **new_set_entry, size_t index);
 
-void hash_to_hash_set_map_free(hash_to_indexed_hash_set_map_t *map);
+void hash_to_indexed_hash_set_map_free(hash_to_indexed_hash_set_map_t *map);
 
 #ifdef __cplusplus
 }

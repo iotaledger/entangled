@@ -104,7 +104,6 @@ void hash_int_map_free(hash_int_map_t *map) {
   hash_to_int_value_map_entry *curr_entry = NULL;
   hash_to_int_value_map_entry *tmp_entry = NULL;
 
-  // Cleanup CWRatings Map
   HASH_ITER(hh, *map, curr_entry, tmp_entry) {
     HASH_DEL(*map, curr_entry);
     free(curr_entry);
@@ -114,8 +113,8 @@ void hash_int_map_free(hash_int_map_t *map) {
 /*
  *  hash_to_indexed_hash_set_map_t
  */
-bool hash_to_hash_set_map_contains(hash_to_indexed_hash_set_map_t *map,
-                                   flex_trit_t *hash) {
+bool hash_to_indexed_hash_set_map_contains(hash_to_indexed_hash_set_map_t *map,
+                                           flex_trit_t *hash) {
   hash_to_indexed_hash_set_entry_t *entry = NULL;
   if (!(*map)) {
     return false;
@@ -124,7 +123,7 @@ bool hash_to_hash_set_map_contains(hash_to_indexed_hash_set_map_t *map,
   return entry != NULL;
 }
 
-retcode_t hash_to_hash_set_create_map_new_set(
+retcode_t hash_to_indexed_hash_set_map_add_new_set(
     hash_to_indexed_hash_set_map_t *map, flex_trit_t *hash,
     hash_to_indexed_hash_set_entry_t **new_set_entry, size_t index) {
   *new_set_entry = (hash_to_indexed_hash_set_entry_t *)malloc(
@@ -142,7 +141,7 @@ retcode_t hash_to_hash_set_create_map_new_set(
   return RC_OK;
 }
 
-void hash_to_hash_set_map_free(hash_to_indexed_hash_set_map_t *map) {
+void hash_to_indexed_hash_set_map_free(hash_to_indexed_hash_set_map_t *map) {
   hash_to_indexed_hash_set_entry_t *curr_entry = NULL;
   hash_to_indexed_hash_set_entry_t *tmp_entry = NULL;
   HASH_ITER(hh, *map, curr_entry, tmp_entry) {

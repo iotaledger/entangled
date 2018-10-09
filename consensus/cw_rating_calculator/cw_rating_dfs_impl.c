@@ -143,15 +143,15 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
       return res;
     }
 
-    if (!hash_to_hash_set_map_contains(tx_to_approvers, curr_tx_hash)) {
-      hash_to_hash_set_create_map_new_set(tx_to_approvers, curr_tx_hash,
-                                          &curr_tx, (*subtangle_size)++);
+    if (!hash_to_indexed_hash_set_map_contains(tx_to_approvers, curr_tx_hash)) {
+      hash_to_indexed_hash_set_map_add_new_set(tx_to_approvers, curr_tx_hash,
+                                               &curr_tx, (*subtangle_size)++);
 
       while (pack.num_loaded > 0) {
         curr_approver_index = --pack.num_loaded;
         // Add each found approver to the currently traversed tx
 
-        if (!hash_to_hash_set_map_contains(
+        if (!hash_to_indexed_hash_set_map_contains(
                 tx_to_approvers,
                 ((trit_array_p)pack.models[curr_approver_index])->trits)) {
           utarray_push_back(

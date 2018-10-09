@@ -40,6 +40,6 @@ retcode_t iota_consensus_cw_rating_calculate(
 }
 
 void cw_calc_result_destroy(cw_calc_result *const calc_result) {
-  hash_to_hash_set_map_free(&calc_result->tx_to_approvers);
+  hash_to_indexed_hash_set_map_free(&calc_result->tx_to_approvers);
   hash_int_map_free(&calc_result->cw_ratings);
 }
