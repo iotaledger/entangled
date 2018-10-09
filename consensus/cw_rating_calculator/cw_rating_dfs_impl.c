@@ -12,6 +12,8 @@
 #include "utils/containers/bitset.h"
 #include "utils/logger_helper.h"
 
+UT_icd trits_hash_icd = {FLEX_TRIT_SIZE_243, 0, 0, 0};
+
 static retcode_t cw_rating_dfs_do_dfs_from_db(
     const cw_rating_calculator_t *const cw_calc, trit_array_p entry_point,
     hash_to_indexed_hash_set_map_t *tx_to_approvers, size_t *subtangle_size);
@@ -19,12 +21,6 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
 static retcode_t cw_rating_dfs_do_dfs_light(
     hash_to_indexed_hash_set_map_t tx_to_approvers, flex_trit_t *ep,
     bitset_t *visited_bitset, size_t *subtangle_size);
-
-/*
- * utarray definitions
- */
-
-UT_icd cw_stack_trit_array_hash_icd = {FLEX_TRIT_SIZE_243, 0, 0, 0};
 
 void init_cw_calculator_dfs(cw_rating_calculator_base_t *calculator) {
   calculator->vtable = cw_topological_vtable;
@@ -119,7 +115,7 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
   }
 
   UT_array *stack = NULL;
-  utarray_new(stack, &cw_stack_trit_array_hash_icd);
+  utarray_new(stack, &trits_hash_icd);
   if (stack == NULL) {
     log_error(CW_RATING_CALCULATOR_LOGGER_ID, "Failed in memory allocation\n");
     return RC_CONSENSUS_OOM;
@@ -183,7 +179,7 @@ static retcode_t cw_rating_dfs_do_dfs_light(
   hash_set_entry_t *tmp_direct_approver = NULL;
 
   UT_array *stack = NULL;
-  utarray_new(stack, &cw_stack_trit_array_hash_icd);
+  utarray_new(stack, &trits_hash_icd);
   if (stack == NULL) {
     log_error(CW_RATING_CALCULATOR_LOGGER_ID, "Failed in memory allocation\n");
     return RC_CONSENSUS_OOM;

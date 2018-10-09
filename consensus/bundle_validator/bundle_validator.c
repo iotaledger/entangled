@@ -41,7 +41,7 @@ static retcode_t load_bundle_transactions(tangle_t const* const tangle,
   last_index = curr_tx->last_index;
   memcpy(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243);
 
-  while (curr_index < last_index &&
+  while (curr_index <= last_index &&
          memcmp(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243) == 0) {
     bundle_transactions_add(bundle, curr_tx);
     curr_tx_trunk.trits = curr_tx->trunk;

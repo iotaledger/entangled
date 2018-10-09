@@ -1,7 +1,7 @@
 cc_test(
-    name = "test_exit_probability_randomizer",
+    name = "test_exit_probability_validator",
     srcs = [
-        "test_exit_probability_randomizer.c",
+        "exit_probability_validator.c",
     ],
     data = [
         "snapshot.txt",
@@ -9,11 +9,9 @@ cc_test(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//common/storage/sql/sqlite3:sqlite3_storage",
         "//common/storage/tests/helpers",
         "//common/trinary:trit_ptrit",
-        "//consensus/cw_rating_calculator",
-        "//consensus/exit_probability_randomizer",
+        "//consensus/exit_probability_validator",
         "//consensus/test_utils",
         "@unity",
     ],

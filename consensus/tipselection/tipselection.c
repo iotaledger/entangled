@@ -18,13 +18,11 @@
 #define TIPSELECTION_LOGGER_ID "consensus_tipselection"
 
 retcode_t iota_consensus_tipselection_init(
-
     tipselection_t *impl, tangle_t *const tangle, ledger_validator_t *const lv,
     exit_prob_transaction_validator_t *const wv,
     cw_rating_calculator_t *const cw_calc, milestone_tracker_t *const mt,
     entry_point_selector_t *const ep, ep_randomizer_t *const ep_randomizer,
-    double alpha) {
-  logger_helper_init(TIPSELECTION_LOGGER_ID, LOGGER_DEBUG, true);
+    double alpha, uint32_t max_txs_below_max_depth, uint32_t max_depth) {
   impl->cw_calc = cw_calc;
   impl->mt = mt;
   impl->tangle = tangle;
@@ -32,6 +30,8 @@ retcode_t iota_consensus_tipselection_init(
   impl->wv = wv;
   impl->ep_randomizer = ep_randomizer;
   impl->ep_selector = ep;
+  impl->max_txs_below_max_depth = max_txs_below_max_depth;
+  impl->max_depth = max_depth;
   rw_lock_handle_init(&impl->mt->latest_snapshot->rw_lock);
   return RC_OK;
 }
@@ -60,8 +60,9 @@ retcode_t iota_consensus_get_transactions_to_approve(
 
   exit_prob_transaction_validator_t eptv;
 
-  iota_consensus_exit_prob_transaction_validator_init(ts->tangle, ts->mt,
-                                                      ts->lv, ts->wv);
+  iota_consensus_exit_prob_transaction_validator_init(
+      ts->tangle, ts->mt, ts->lv, ts->wv, ts->max_txs_below_max_depth,
+      ts->max_depth);
 
   iota_consensus_exit_probability_randomize(ts->ep_randomizer, &eptv,
                                             &ratings_result, ep, tips->trunk);

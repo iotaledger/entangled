@@ -18,13 +18,12 @@ retcode_t hash_queue_push(hash_queue_t *queue, flex_trit_t *hash) {
   return RC_OK;
 }
 
-retcode_t hash_queue_pop(hash_queue_t *queue) {
+void hash_queue_pop(hash_queue_t *queue) {
   hash_queue_entry_t *tmp = NULL;
 
   tmp = *queue;
   CDL_DELETE(*queue, *queue);
   free(tmp);
-  return RC_OK;
 }
 
 flex_trit_t *hash_queue_peek(hash_queue_t queue) {
@@ -67,11 +66,16 @@ retcode_t hash_set_append(hash_set_t *set1, hash_set_t *set2) {
 }
 
 bool hash_set_contains(hash_set_t *set, flex_trit_t *hash) {
+  if (*set == NULL) {
+    return false;
+  }
   hash_set_entry_t *entry = NULL;
 
   HASH_FIND(hh, *set, hash, FLEX_TRIT_SIZE_243, entry);
   return entry != NULL;
 }
+
+uint32_t hash_set_size(hash_set_t *set) { return HASH_COUNT(*set); }
 
 void hash_set_free(hash_set_t *set) {
   hash_set_entry_t *iter = NULL, *tmp = NULL;
@@ -80,6 +84,7 @@ void hash_set_free(hash_set_t *set) {
     HASH_DEL(*set, iter);
     free(iter);
   }
+  *set = NULL;
 }
 
 /*
