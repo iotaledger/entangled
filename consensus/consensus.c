@@ -60,12 +60,13 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
     return ret;
   }
 
+  // TODO fill params
   log_info(CONSENSUS_LOGGER_ID,
            "Initializing exit probability transaction validator\n");
   if ((ret = iota_consensus_exit_prob_transaction_validator_init(
            &consensus->tangle, &consensus->milestone_tracker,
            &consensus->ledger_validator,
-           &consensus->exit_prob_transaction_validator)) != RC_OK) {
+           &consensus->exit_prob_transaction_validator, 0, 0)) != RC_OK) {
     log_critical(
         CONSENSUS_LOGGER_ID,
         "Initializing exit probability transaction validator failed\n");
@@ -95,14 +96,15 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
     return ret;
   }
 
+  // TODO fill params
   log_info(CONSENSUS_LOGGER_ID, "Initializing tip selection\n");
   if ((ret = iota_consensus_tipselection_init(
            &consensus->tipselection, &consensus->tangle,
            &consensus->ledger_validator,
            &consensus->exit_prob_transaction_validator,
            &consensus->cw_rating_calculator, &consensus->milestone_tracker,
-           &consensus->entry_point_selector, &consensus->ep_randomizer,
-           alpha)) != RC_OK) {
+           &consensus->entry_point_selector, &consensus->ep_randomizer, alpha,
+           0, 0)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Initializing tip selection failed\n");
     return ret;
   }
