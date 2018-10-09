@@ -86,9 +86,10 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
 
   bool below_max_depth = false;
 
-  // TODO - lowest_allowed_depth
   ret = iota_consensus_exit_prob_transaction_validator_below_max_depth(
-      epv, tail_hash, epv->max_depth, &below_max_depth);
+      epv, tail_hash,
+      epv->mt->latest_solid_subtangle_milestone_index - epv->max_depth,
+      &below_max_depth);
   if (ret != RC_OK) {
     return ret;
   }
@@ -99,14 +100,6 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
               "Validation failed, tail is below max depth\n");
     return RC_OK;
   }
-
-  // TODO - change schema and update solidity
-  /*TransactionViewModel transactionViewModel =
-  TransactionViewModel.fromHash(tangle, transactionHash); if
-  if (!transactionViewModel.isSolid()) {
-    log.debug("Validation failed: {} is not solid", transactionHash);
-    return false;
-  }*/
 
   *is_valid = true;
 

@@ -24,7 +24,6 @@
 static tangle_t tangle;
 static connection_config_t config;
 
-// gdb --args ./test_cw_ratings_dfs 1
 static bool debug_mode = false;
 
 static char *test_db_path =
@@ -51,7 +50,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &mt, NULL) ==
               RC_OK);
 
-  // We want to avoid un necessary validation
+  // We want to avoid unnecessary validation
   mt.latest_snapshot->index = 99999999999;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(

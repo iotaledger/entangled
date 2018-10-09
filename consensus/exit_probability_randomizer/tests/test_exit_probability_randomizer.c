@@ -509,7 +509,7 @@ void test_1_bundle(void) {
       BUNDLE_OF_4_TRUNK_TRANSACTION};
   transactions_deserialize(trytes, txs, 5);
   for (size_t i = 0; i < 5; ++i) {
-    txs[i]->snapshot_index = max_depth + 1;
+    txs[i]->snapshot_index = 9999999;
   }
   build_tangle(&tangle, txs, bundle_size + 1);
 
@@ -623,7 +623,7 @@ void test_2_chained_bundles(void) {
       NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t txEp = transaction_deserialize(ep_trits);
-  txEp->snapshot_index = max_depth + 1;
+  txEp->snapshot_index = 9999999;
 
   iota_transaction_t curr_tx = NULL;
 
