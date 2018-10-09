@@ -4,18 +4,9 @@ cc_library(
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//common:errors",
-        "//common/helpers:sign",
         "//common/model:bundle",
-        "//common/model:transfer",
         "//common/sign:normalize",
-        "//common/sign/v1:iss_kerl",
-        "//common/trinary:trit_array",
-        "//common/trinary:trit_tryte",
-        "//common/trinary:tryte_long",
         "//consensus:defs",
         "//consensus/tangle",
-        "//utils:logger_helper",
-        "@com_github_uthash//:uthash",
     ],
 )

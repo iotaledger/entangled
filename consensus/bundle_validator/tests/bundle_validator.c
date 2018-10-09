@@ -7,20 +7,16 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <unity/unity.h>
+
+#include "unity/unity.h"
+#include "utarray.h"
 
 #include "common/model/transaction.h"
-#include "common/storage/connection.h"
-#include "common/storage/sql/defs.h"
-#include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
-#include "common/trinary/flex_trit.h"
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/defs.h"
-#include "consensus/tangle/tangle.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
-#include "utarray.h"
 
 static tangle_t tangle;
 static connection_config_t config;
@@ -31,11 +27,11 @@ static bool debug_mode = false;
 static char *test_db_path = "consensus/bundle_validator/tests/test.db";
 static char *ciri_db_path = "consensus/bundle_validator/tests/ciri.db";
 
-void test_bundle_validate_empty_invalid() {
+void test_iota_consensus_bundle_validator_validate_empty_invalid() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
 
-  TEST_ASSERT(bundle_validate_init() == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_init() == RC_OK);
 
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
@@ -46,10 +42,11 @@ void test_bundle_validate_empty_invalid() {
 
   bool is_valid = false;
 
-  TEST_ASSERT(bundle_validate(&tangle, ep, bundle, &is_valid) == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_validate(&tangle, ep, bundle,
+                                                       &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
-  TEST_ASSERT(bundle_validate_destroy() == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_destroy() == RC_OK);
   trit_array_free(ep);
   bundle_transactions_free(&bundle);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
@@ -59,7 +56,7 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
 
-  TEST_ASSERT(bundle_validate_init() == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_init() == RC_OK);
 
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
@@ -126,10 +123,11 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
 
   bool is_valid = false;
 
-  TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_validate(
+                  &tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
-  TEST_ASSERT(bundle_validate_destroy() == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_destroy() == RC_OK);
   trit_array_free(tail_hash);
   trit_array_free(ep);
   bundle_transactions_free(&bundle);
@@ -141,7 +139,7 @@ void test_bundle_exceed_supply_pos_invalid() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
 
-  TEST_ASSERT(bundle_validate_init() == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_init() == RC_OK);
 
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
@@ -171,10 +169,11 @@ void test_bundle_exceed_supply_pos_invalid() {
 
   bool is_valid = false;
 
-  TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_validate(
+                  &tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
-  TEST_ASSERT(bundle_validate_destroy() == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_destroy() == RC_OK);
   trit_array_free(tail_hash);
   trit_array_free(ep);
   bundle_transactions_free(&bundle);
@@ -186,7 +185,7 @@ void test_bundle_exceed_supply_neg_invalid() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
 
-  TEST_ASSERT(bundle_validate_init() == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_init() == RC_OK);
 
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
@@ -216,10 +215,11 @@ void test_bundle_exceed_supply_neg_invalid() {
 
   bool is_valid = false;
 
-  TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_validate(
+                  &tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
-  TEST_ASSERT(bundle_validate_destroy() == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_destroy() == RC_OK);
   trit_array_free(tail_hash);
   trit_array_free(ep);
   bundle_transactions_free(&bundle);
@@ -227,11 +227,11 @@ void test_bundle_exceed_supply_neg_invalid() {
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
-void test_bundle_validate_size_4_value_wrong_sig_invalid() {
+void test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invalid() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
 
-  TEST_ASSERT(bundle_validate_init() == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_init() == RC_OK);
 
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
@@ -283,10 +283,11 @@ void test_bundle_validate_size_4_value_wrong_sig_invalid() {
 
   bool is_valid = false;
 
-  TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_validate(
+                  &tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
-  TEST_ASSERT(bundle_validate_destroy() == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_destroy() == RC_OK);
   trit_array_free(tail_hash);
   trit_array_free(ep);
   bundle_transactions_free(&bundle);
@@ -297,11 +298,11 @@ void test_bundle_validate_size_4_value_wrong_sig_invalid() {
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
-void test_bundle_validate_size_4_value_valid() {
+void test_iota_consensus_bundle_validator_validate_size_4_value_valid() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
 
-  TEST_ASSERT(bundle_validate_init() == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_init() == RC_OK);
 
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
@@ -348,10 +349,11 @@ void test_bundle_validate_size_4_value_valid() {
 
   bool is_valid = false;
 
-  TEST_ASSERT(bundle_validate(&tangle, tail_hash, bundle, &is_valid) == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_validate(
+                  &tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(is_valid);
 
-  TEST_ASSERT(bundle_validate_destroy() == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_destroy() == RC_OK);
   trit_array_free(tail_hash);
   bundle_transactions_free(&bundle);
   transaction_free(tx1);
@@ -380,13 +382,14 @@ int main(int argc, char *argv[]) {
   config.index_transaction_hash = true;
   config.index_milestone_hash = true;
 
-  RUN_TEST(test_bundle_validate_empty_invalid);
+  RUN_TEST(test_iota_consensus_bundle_validator_validate_empty_invalid);
   RUN_TEST(test_bundle_size_1_value_with_wrong_address_invalid);
   RUN_TEST(test_bundle_exceed_supply_pos_invalid);
   RUN_TEST(test_bundle_exceed_supply_neg_invalid);
-  RUN_TEST(test_bundle_validate_size_4_value_wrong_sig_invalid);
+  RUN_TEST(
+      test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invalid);
 
-  RUN_TEST(test_bundle_validate_size_4_value_valid);
+  RUN_TEST(test_iota_consensus_bundle_validator_validate_size_4_value_valid);
 
   return UNITY_END();
 }
