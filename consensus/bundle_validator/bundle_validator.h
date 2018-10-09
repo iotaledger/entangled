@@ -20,7 +20,7 @@ extern "C" {
 retcode_t iota_consensus_bundle_validator_init();
 retcode_t iota_consensus_bundle_validator_destroy();
 retcode_t iota_consensus_bundle_validator_validate(
-    const tangle_t* const tangle, trit_array_p const tail_hash,
+    tangle_t const* const tangle, trit_array_p const tail_hash,
     bundle_transactions_t* const bundle, bool* const is_valid);
 
 #ifdef __cplusplus
