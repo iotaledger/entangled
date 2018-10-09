@@ -127,17 +127,33 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   return ret;
 }
 
-retcode_t iota_consensus_start(iota_consensus_t* const consensus) {
+retcode_t iota_consensus_start(iota_consensus_t *const consensus) {
   retcode_t ret = RC_OK;
+
+  log_info(CONSENSUS_LOGGER_ID, "Starting milestone tracker\n");
+  if ((ret = iota_milestone_tracker_start(&consensus->milestone_tracker)) !=
+      RC_OK) {
+    log_critical(CONSENSUS_LOGGER_ID, "Starting milestone tracker failed\n");
+    return ret;
+  }
+
   return ret;
 }
 
-retcode_t iota_consensus_stop(iota_consensus_t* const consensus) {
+retcode_t iota_consensus_stop(iota_consensus_t *const consensus) {
   retcode_t ret = RC_OK;
+
+  log_info(CONSENSUS_LOGGER_ID, "Stopping milestone tracker\n");
+  if ((ret = iota_milestone_tracker_start(&consensus->milestone_tracker)) !=
+      RC_OK) {
+    log_critical(CONSENSUS_LOGGER_ID, "Stopping milestone tracker failed\n");
+    return ret;
+  }
+
   return ret;
 }
 
-retcode_t iota_consensus_destroy(iota_consensus_t* const consensus) {
+retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
   retcode_t ret = RC_OK;
 
   log_info(CONSENSUS_LOGGER_ID, "Destroying bundle validator\n");
@@ -156,6 +172,25 @@ retcode_t iota_consensus_destroy(iota_consensus_t* const consensus) {
     log_error(CONSENSUS_LOGGER_ID, "Destroying transaction validator failed\n");
   }
 
+  // iota_consensus_cw_rating_destroy(cw_rating_calculator_t * cw_calc);
+
+  // iota_consensus_entry_point_selector_destroy(
+  //     entry_point_selector_t *const eps);
+
+  //  retcode_t iota_consensus_ep_randomizer_destroy(
+  //     ep_randomizer_t *ep_randomizer);
+
+  // extern retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
+  //     exit_prob_transaction_validator_t *epv);
+
+  // retcode_t iota_consensus_ledger_validator_destroy(ledger_validator_t
+  // *const lv);
+
+  // extern retcode_t iota_milestone_tracker_destroy(milestone_tracker_t*
+  // const mt);
+
+  // extern retcode_t iota_consensus_tipselection_destroy(tipselection_t
+  // *const ts);
 
   log_info(CONSENSUS_LOGGER_ID, "Destroying tangle\n");
   if ((ret = iota_tangle_destroy(&consensus->tangle)) != RC_OK) {

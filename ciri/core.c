@@ -99,12 +99,6 @@ retcode_t core_stop(core_t* const core) {
 
   core->running = false;
 
-  log_info(CORE_LOGGER_ID, "Stopping consensus\n");
-  if (iota_consensus_stop(&core->consensus) != RC_OK) {
-    log_critical(CORE_LOGGER_ID, "Stopping consensus failed\n");
-    return RC_CORE_FAILED_CONSENSUS_STOP;
-  }
-
   log_info(CORE_LOGGER_ID, "Stopping cIRI node\n");
   if (node_stop(&core->node)) {
     log_error(CORE_LOGGER_ID, "Stopping cIRI node failed\n");
@@ -115,6 +109,12 @@ retcode_t core_stop(core_t* const core) {
   if (iota_api_stop(&core->api)) {
     log_error(CORE_LOGGER_ID, "Stopping cIRI API failed\n");
     ret = RC_CORE_FAILED_API_STOP;
+  }
+
+  log_info(CORE_LOGGER_ID, "Stopping consensus\n");
+  if (iota_consensus_stop(&core->consensus) != RC_OK) {
+    log_critical(CORE_LOGGER_ID, "Stopping consensus failed\n");
+    return RC_CORE_FAILED_CONSENSUS_STOP;
   }
 
   return ret;
@@ -141,16 +141,16 @@ retcode_t core_destroy(core_t* const core) {
     ret = RC_CORE_FAILED_NODE_DESTROY;
   }
 
-  log_info(CORE_LOGGER_ID, "Destroying transaction requester\n");
-  if (requester_destroy(&core->transaction_requester)) {
-    log_error(CORE_LOGGER_ID, "Destroying transaction requester failed\n");
-    ret = RC_CORE_FAILED_REQUESTER_DESTROY;
-  }
-
   log_info(CORE_LOGGER_ID, "Destroying consensus\n");
   if (iota_consensus_stop(&core->consensus) != RC_OK) {
     log_critical(CORE_LOGGER_ID, "Destroying consensus failed\n");
     return RC_CORE_FAILED_CONSENSUS_DESTROY;
+  }
+
+  log_info(CORE_LOGGER_ID, "Destroying transaction requester\n");
+  if (requester_destroy(&core->transaction_requester)) {
+    log_error(CORE_LOGGER_ID, "Destroying transaction requester failed\n");
+    ret = RC_CORE_FAILED_REQUESTER_DESTROY;
   }
 
   logger_helper_destroy(CORE_LOGGER_ID);
