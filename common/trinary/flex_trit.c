@@ -339,7 +339,7 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
     trits_for_byte = MIN(max_trits, NUM_TRITS_PER_FLEX_TRIT);
     flex_trits_from_trits(&to_flex_trits[j], trits_counter, shifter.trits,
                           trits_for_byte, trits_for_byte);
-    trits_counter -= trits_for_byte;  // MIN(max_trits, NUM_TRITS_PER_FLEX_TRIT);
+    trits_counter -= trits_for_byte;
 #if BYTE_ORDER == LITTLE_ENDIAN
     shifter.val = shifter.val >> (trits_for_byte << 3);
 #elif BYTE_ORDER == BIG_ENDIAN
