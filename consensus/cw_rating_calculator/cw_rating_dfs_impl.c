@@ -112,15 +112,15 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
     return res;
   }
 
-  hash_queue_t queue = NULL;
-  if ((res = hash_queue_push(&queue, entry_point->trits))) {
+  hash_stack_t stack = NULL;
+  if ((res = hash_stack_push(&stack, entry_point->trits))) {
     return res;
   }
 
   flex_trit_t *curr_tx_hash = NULL;
 
-  while (!hash_queue_empty(queue)) {
-    curr_tx_hash = hash_queue_peek(queue);
+  while (!hash_stack_empty(stack)) {
+    curr_tx_hash = hash_stack_peek(stack);
     pack.num_loaded = 0;
     pack.insufficient_capacity = false;
     res = iota_tangle_transaction_load_hashes_of_approvers(cw_calc->tangle,
@@ -137,6 +137,8 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
       hash_to_indexed_hash_set_map_add_new_set(tx_to_approvers, curr_tx_hash,
                                                &curr_tx, (*subtangle_size)++);
 
+      hash_stack_pop(&stack);
+
       while (pack.num_loaded > 0) {
         curr_approver_index = --pack.num_loaded;
         // Add each found approver to the currently traversed tx
@@ -144,8 +146,11 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
         if (!hash_to_indexed_hash_set_map_contains(
                 tx_to_approvers,
                 ((trit_array_p)pack.models[curr_approver_index])->trits)) {
-          hash_queue_push(
-              &queue, ((trit_array_p)pack.models[curr_approver_index])->trits);
+          if ((res = hash_stack_push(
+                   &stack,
+                   ((trit_array_p)pack.models[curr_approver_index])->trits))) {
+            return res;
+          }
         }
 
         if ((res = hash_set_add(
@@ -154,12 +159,13 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
           return res;
         }
       }
+      continue;
     }
-    hash_queue_pop(&queue);
+    hash_stack_pop(&stack);
   }
 
   hash_pack_free(&pack);
-  hash_queue_free(&queue);
+  hash_stack_free(&stack);
 
   return res;
 }
@@ -174,18 +180,18 @@ static retcode_t cw_rating_dfs_do_dfs_light(
   hash_set_entry_t *tmp_direct_approver = NULL;
   retcode_t ret;
 
-  hash_queue_t queue = NULL;
-  if ((ret = hash_queue_push(&queue, ep))) {
+  hash_stack_t stack = NULL;
+  if ((ret = hash_stack_push(&stack, ep))) {
     return ret;
   }
 
-  while (!hash_queue_empty(queue)) {
-    curr_hash = hash_queue_peek(queue);
+  while (!hash_stack_empty(stack)) {
+    curr_hash = hash_stack_peek(stack);
 
     HASH_FIND(hh, tx_to_approvers, curr_hash, FLEX_TRIT_SIZE_243,
               curr_tx_entry);
 
-    hash_queue_pop(&queue);
+    hash_stack_pop(&stack);
 
     if (!curr_tx_entry) {
       continue;
@@ -200,12 +206,12 @@ static retcode_t cw_rating_dfs_do_dfs_light(
 
     HASH_ITER(hh, curr_tx_entry->approvers, curr_direct_approver,
               tmp_direct_approver) {
-      if (ret = hash_queue_push(&queue, curr_direct_approver->hash)) {
+      if ((ret = hash_stack_push(&stack, curr_direct_approver->hash))) {
         return ret;
       }
     }
   }
 
-  hash_queue_free(&queue);
+  hash_stack_free(&stack);
   return RC_OK;
 }
