@@ -184,13 +184,13 @@ size_t flex_trits_to_trytes(tryte_t *trytes, size_t to_len,
   };
   union _shifter shifter = {0};
   size_t offset = 0;
-  size_t max_trits, trits_for_tryte, n_trits = num_trits;
-  for (int i = 0, j = 0; n_trits || offset; j++) {
+  size_t max_trits, trits_for_tryte, trits_counter = num_trits;
+  for (int i = 0, j = 0; trits_counter || offset; j++) {
     if (offset < 3) {
-      max_trits = MIN(NUM_TRITS_PER_FLEX_TRIT, n_trits);
+      max_trits = MIN(NUM_TRITS_PER_FLEX_TRIT, trits_counter);
       flex_trits_to_trits(shifter.trits + offset, max_trits, &flex_trits[i++],
                           max_trits, max_trits);
-      n_trits -= max_trits;
+      trits_counter -= max_trits;
       offset += max_trits;
     }
     trits_for_tryte = MIN(3, offset);
@@ -271,19 +271,19 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
   };
   union _shifter shifter = {0};
   size_t offset = 0;
-  size_t max_trits, trits_for_byte, n_trits = num_trits;
-  for (int i = 0, j = 0; n_trits; i++, j++) {
-    max_trits = MIN(NUM_TRITS_PER_FLEX_TRIT, n_trits);
+  size_t max_trits, trits_for_byte, trits_counter = num_trits;
+  for (int i = 0, j = 0; trits_counter; i++, j++) {
+    max_trits = MIN(NUM_TRITS_PER_FLEX_TRIT, trits_counter);
     flex_trits_to_trits(shifter.trits + offset, max_trits, &flex_trits[i],
                         max_trits, max_trits);
-    n_trits -= max_trits;
+    trits_counter -= max_trits;
     offset += max_trits;
-    if (offset < 5 && n_trits) {
+    if (offset < 5 && trits_counter) {
       i++;
-      max_trits = MIN(NUM_TRITS_PER_FLEX_TRIT, n_trits);
+      max_trits = MIN(NUM_TRITS_PER_FLEX_TRIT, trits_counter);
       flex_trits_to_trits(shifter.trits + offset, max_trits, &flex_trits[i],
                           max_trits, max_trits);
-      n_trits -= max_trits;
+      trits_counter -= max_trits;
       offset += max_trits;
     }
     trits_for_byte = MIN(5, offset);
@@ -328,18 +328,18 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
   };
   union _shifter shifter = {0};
   size_t offset = 0;
-  size_t max_trits, trits_for_byte, n_trits = num_trits;
-  for (int i = 0, j = 0; n_trits; j++) {
-    max_trits = MIN(5, n_trits);
+  size_t max_trits, trits_for_byte, trits_counter = num_trits;
+  for (int i = 0, j = 0; trits_counter; j++) {
+    max_trits = MIN(5, trits_counter);
     if (offset < NUM_TRITS_PER_FLEX_TRIT) {
       byte_to_trits(bytes[i], shifter.trits + offset, max_trits);
       offset += max_trits;
       i++;
     }
     trits_for_byte = MIN(max_trits, NUM_TRITS_PER_FLEX_TRIT);
-    flex_trits_from_trits(&to_flex_trits[j], n_trits, shifter.trits,
+    flex_trits_from_trits(&to_flex_trits[j], trits_counter, shifter.trits,
                           trits_for_byte, trits_for_byte);
-    n_trits -= trits_for_byte;  // MIN(max_trits, NUM_TRITS_PER_FLEX_TRIT);
+    trits_counter -= trits_for_byte;  // MIN(max_trits, NUM_TRITS_PER_FLEX_TRIT);
 #if BYTE_ORDER == LITTLE_ENDIAN
     shifter.val = shifter.val >> (trits_for_byte << 3);
 #elif BYTE_ORDER == BIG_ENDIAN
