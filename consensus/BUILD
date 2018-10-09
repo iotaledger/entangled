@@ -5,6 +5,17 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
+        "//consensus/bundle_validator",
+        "//consensus/cw_rating_calculator",
+        "//consensus/entry_point_selector",
+        "//consensus/exit_probability_randomizer",
+        "//consensus/exit_probability_validator",
+        "//consensus/ledger_validator",
+        "//consensus/milestone_tracker",
+        "//consensus/snapshot",
+        "//consensus/tangle",
+        "//consensus/tipselection",
+        "//consensus/transaction_validator",
     ],
 )
 

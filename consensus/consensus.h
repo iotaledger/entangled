@@ -9,6 +9,30 @@
 #define __CONSENSUS_CONSENSUS_H__
 
 #include "common/errors.h"
+#include "consensus/bundle_validator/bundle_validator.h"
+#include "consensus/cw_rating_calculator/cw_rating_calculator.h"
+#include "consensus/entry_point_selector/entry_point_selector.h"
+#include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
+#include "consensus/exit_probability_validator/exit_probability_validator.h"
+#include "consensus/ledger_validator/ledger_validator.h"
+#include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/snapshot/snapshot.h"
+#include "consensus/tangle/tangle.h"
+#include "consensus/tipselection/tipselection.h"
+#include "consensus/transaction_validator/transaction_validator.h"
+
+typedef struct iota_consensus_s {
+  cw_rating_calculator_t cw_rating_calculator;
+  entry_point_selector_t entry_point_selector;
+  ep_randomizer_t ep_randomizer;
+  exit_prob_transaction_validator_t exit_prob_transaction_validator;
+  ledger_validator_t ledger_validator;
+  milestone_tracker_t milestone_tracker;
+  snapshot_t snapshot;
+  tangle_t tangle;
+  tipselection_t tipselection;
+  transaction_validator_t transaction_validator;
+} iota_consensus_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,28 +43,28 @@ extern "C" {
  *
  * @return a status code
  */
-retcode_t iota_consensus_init();
+retcode_t iota_consensus_init(iota_consensus_t* const consensus);
 
 /**
  * Starts all consensus components
  *
  * @return a status code
  */
-retcode_t iota_consensus_start();
+retcode_t iota_consensus_start(iota_consensus_t* const consensus);
 
 /**
  * Stops all consensus components
  *
  * @return a status code
  */
-retcode_t iota_consensus_stop();
+retcode_t iota_consensus_stop(iota_consensus_t* const consensus);
 
 /**
  * Destroys all consensus components
  *
  * @return a status code
  */
-retcode_t iota_consensus_destroy();
+retcode_t iota_consensus_destroy(iota_consensus_t* const consensus);
 
 #ifdef __cplusplus
 }
