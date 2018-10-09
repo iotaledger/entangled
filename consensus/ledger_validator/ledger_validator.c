@@ -158,8 +158,8 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
         number_of_analyzed_transactions++;
         if (tx.current_index == 0) {
           valid_bundle = false;
-          if ((ret = bundle_validate(lv->tangle, &tx_hash, bundle,
-                                     &valid_bundle)) != RC_OK) {
+          if ((ret = iota_consensus_bundle_validator_validate(
+                   lv->tangle, &tx_hash, bundle, &valid_bundle)) != RC_OK) {
             goto done;
           }
           if (valid_bundle && (tx_bundle = (iota_transaction_t)utarray_eltptr(
