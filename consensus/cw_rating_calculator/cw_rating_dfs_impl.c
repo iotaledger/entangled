@@ -12,8 +12,6 @@
 #include "utils/containers/bitset.h"
 #include "utils/logger_helper.h"
 
-UT_icd trits_hash_icd = {FLEX_TRIT_SIZE_243, 0, 0, 0};
-
 static retcode_t cw_rating_dfs_do_dfs_from_db(
     const cw_rating_calculator_t *const cw_calc, trit_array_p entry_point,
     hash_to_indexed_hash_set_map_t *tx_to_approvers, size_t *subtangle_size);
@@ -114,19 +112,15 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
     return res;
   }
 
-  UT_array *stack = NULL;
-  utarray_new(stack, &trits_hash_icd);
-  if (stack == NULL) {
-    log_error(CW_RATING_CALCULATOR_LOGGER_ID, "Failed in memory allocation\n");
-    return RC_CONSENSUS_OOM;
+  hash_queue_t queue = NULL;
+  if ((res = hash_queue_push(&queue, entry_point->trits))) {
+    return res;
   }
-  utarray_push_back(stack, entry_point->trits);
 
   flex_trit_t *curr_tx_hash = NULL;
 
-  while (utarray_len(stack)) {
-    curr_tx_hash = (flex_trit_t *)utarray_back(stack);
-    utarray_pop_back(stack);
+  while (!hash_queue_empty(queue)) {
+    curr_tx_hash = hash_queue_peek(queue);
     pack.num_loaded = 0;
     pack.insufficient_capacity = false;
     res = iota_tangle_transaction_load_hashes_of_approvers(cw_calc->tangle,
@@ -150,8 +144,8 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
         if (!hash_to_indexed_hash_set_map_contains(
                 tx_to_approvers,
                 ((trit_array_p)pack.models[curr_approver_index])->trits)) {
-          utarray_push_back(
-              stack, ((trit_array_p)pack.models[curr_approver_index])->trits);
+          hash_queue_push(
+              &queue, ((trit_array_p)pack.models[curr_approver_index])->trits);
         }
 
         if ((res = hash_set_add(
@@ -161,10 +155,11 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
         }
       }
     }
+    hash_queue_pop(&queue);
   }
 
   hash_pack_free(&pack);
-  utarray_free(stack);
+  hash_queue_free(&queue);
 
   return res;
 }
@@ -177,21 +172,20 @@ static retcode_t cw_rating_dfs_do_dfs_light(
   hash_to_indexed_hash_set_entry_t *curr_tx_entry = NULL;
   hash_set_entry_t *curr_direct_approver = NULL;
   hash_set_entry_t *tmp_direct_approver = NULL;
+  retcode_t ret;
 
-  UT_array *stack = NULL;
-  utarray_new(stack, &trits_hash_icd);
-  if (stack == NULL) {
-    log_error(CW_RATING_CALCULATOR_LOGGER_ID, "Failed in memory allocation\n");
-    return RC_CONSENSUS_OOM;
+  hash_queue_t queue = NULL;
+  if ((ret = hash_queue_push(&queue, ep))) {
+    return ret;
   }
-  utarray_push_back(stack, ep);
 
-  while (utarray_len(stack)) {
-    curr_hash = (flex_trit_t *)utarray_back(stack);
-    utarray_pop_back(stack);
+  while (!hash_queue_empty(queue)) {
+    curr_hash = hash_queue_peek(queue);
 
     HASH_FIND(hh, tx_to_approvers, curr_hash, FLEX_TRIT_SIZE_243,
               curr_tx_entry);
+
+    hash_queue_pop(&queue);
 
     if (!curr_tx_entry) {
       continue;
@@ -206,10 +200,12 @@ static retcode_t cw_rating_dfs_do_dfs_light(
 
     HASH_ITER(hh, curr_tx_entry->approvers, curr_direct_approver,
               tmp_direct_approver) {
-      utarray_push_back(stack, curr_direct_approver->hash);
+      if (ret = hash_queue_push(&queue, curr_direct_approver->hash)) {
+        return ret;
+      }
     }
   }
 
-  utarray_free(stack);
+  hash_queue_free(&queue);
   return RC_OK;
 }

@@ -113,7 +113,9 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
   flex_trit_t curr_hash_trits[FLEX_TRIT_SIZE_243];
 
   hash_queue_t non_analyzed_hashes = NULL;
-  hash_queue_push(&non_analyzed_hashes, tail_hash->trits);
+  if (res = hash_queue_push(&non_analyzed_hashes, tail_hash->trits)) {
+    return res;
+  }
 
   // Load the transaction
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
@@ -154,15 +156,21 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
       break;
     }
     if (curr_tx->snapshot_index == 0) {
-      hash_queue_push(&non_analyzed_hashes, curr_tx->trunk);
-      hash_queue_push(&non_analyzed_hashes, curr_tx->branch);
+      if (res = hash_queue_push(&non_analyzed_hashes, curr_tx->trunk)) {
+        return res;
+      }
+      if (res = hash_queue_push(&non_analyzed_hashes, curr_tx->branch)) {
+        return res;
+      }
     }
     hash_queue_pop(&non_analyzed_hashes);
   }
 
   hash_queue_free(&non_analyzed_hashes);
   hash_set_free(&visited_hashes);
-  hash_set_add(&epv->max_depth_ok_memoization, tail_hash->trits);
+  if (res = hash_set_add(&epv->max_depth_ok_memoization, tail_hash->trits)) {
+    return res;
+  }
 
   return res;
 }

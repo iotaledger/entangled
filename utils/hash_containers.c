@@ -7,6 +7,12 @@
 
 #include "utils/hash_containers.h"
 
+bool hash_queue_empty(hash_queue_t queue) {
+  size_t count;
+  hash_queue_entry_t *entry = NULL;
+  CDL_COUNT(queue, entry, count);
+  return (count == 0);
+}
 retcode_t hash_queue_push(hash_queue_t *queue, flex_trit_t *hash) {
   hash_queue_entry_t *entry = NULL;
 

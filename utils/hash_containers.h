@@ -35,6 +35,7 @@ typedef struct hash_queue_entry_s {
 } hash_queue_entry_t;
 typedef hash_queue_entry_t *hash_queue_t;
 
+bool hash_queue_empty(hash_queue_t queue);
 retcode_t hash_queue_push(hash_queue_t *queue, flex_trit_t *hash);
 void hash_queue_pop(hash_queue_t *queue);
 flex_trit_t *hash_queue_peek(hash_queue_t queue);
