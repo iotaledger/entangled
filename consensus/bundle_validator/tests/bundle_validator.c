@@ -250,27 +250,20 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invali
   flex_trits_from_trits(&txs[1]->signature_or_message[FLEX_TRIT_SIZE_243 - 1],
                         NUM_TRITS_FOR_FLEX_TRIT, buffer,
                         NUM_TRITS_FOR_FLEX_TRIT, NUM_TRITS_FOR_FLEX_TRIT);
-  build_tangle(&tangle, txs, 4);
-
-  bool exist = false;
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
-  TEST_ASSERT(exist == true);
-
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(tail_hash, txs[0]->hash, NUM_TRITS_HASH);
+  build_tangle(&tangle, txs, 4);
 
   bool is_valid = false;
 
   TEST_ASSERT(iota_consensus_bundle_validator_validate(
                   &tangle, tail_hash, bundle, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
-
   TEST_ASSERT(iota_consensus_bundle_validator_destroy() == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
+  transactions_free(txs, 4);
   trit_array_free(tail_hash);
   bundle_transactions_free(&bundle);
-  transactions_free(txs, 4);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
 void test_iota_consensus_bundle_validator_validate_size_4_value_valid() {
