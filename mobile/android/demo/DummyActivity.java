@@ -14,17 +14,17 @@ public class DummyActivity extends Activity{
     setContentView(android.R.layout.simple_list_item_1);
 
     Log.e("IOTA", "Starting PoW");
-    String nonce = Interface.doPOW(TX_TRYTES, 14);
+    String nonce = Interface.iota_pow(TX_TRYTES, 14);
     Log.e("IOTA", "Retrieved nonce: " + nonce);
 
     String SEED = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9";
 
     Log.e("IOTA", "Starting Address");
-    String address = Interface.generateAddress(SEED, 2, 2);
+    String address = Interface.iota_sign_address_gen(SEED, 2, 2);
     Log.e("IOTA", "Calculated address: " + address);
-    
+
     Log.e("IOTA", "Starting Signature");
-    String signature = Interface.generateSignature(SEED, 2, 2, SEED);
+    String signature = Interface.iota_sign_signature_gen(SEED, 2, 2, SEED);
     Log.e("IOTA", "Seed: " + SEED);
     Log.e("IOTA", "Calculated signature: " + signature);
   }
