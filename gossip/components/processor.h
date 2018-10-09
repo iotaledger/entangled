@@ -17,12 +17,14 @@
 typedef struct concurrent_queue_iota_packet_t_s processor_queue_t;
 typedef struct iota_packet_s iota_packet_t;
 typedef struct node_s node_t;
+typedef struct tangle_s tangle_t;
 
 typedef struct processor_state_s {
   thread_handle_t thread;
   bool running;
   processor_queue_t *queue;
   node_t *node;
+  tangle_t *tangle;
   size_t req_hash_size;
 } processor_state_t;
 
@@ -35,12 +37,13 @@ extern "C" {
  *
  * @param state The processor state
  * @param node A node
+ * @param tangle A tangle
  * @param testnet Testnet if true, Mainnet otherwise
  *
  * @return a status code
  */
 retcode_t processor_init(processor_state_t *const state, node_t *const node,
-                         bool testnet);
+                         tangle_t *const tangle, bool testnet);
 
 /**
  * Starts a processor

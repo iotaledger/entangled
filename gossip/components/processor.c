@@ -53,17 +53,15 @@ static retcode_t process_transaction_bytes(processor_state_t *const state,
     TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
     trit_array_set_trits(&hash, (*tx)->hash, NUM_TRITS_HASH);
 
-    if ((ret = iota_tangle_transaction_exist(&state->node->core->tangle,
-                                             TRANSACTION_COL_HASH, &hash,
-                                             &exists))) {
+    if ((ret = iota_tangle_transaction_exist(
+             state->tangle, TRANSACTION_COL_HASH, &hash, &exists))) {
       return ret;
     }
     if (exists == false) {
       neighbor->nbr_new_tx++;
       // Store new transaction
       log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Storing new transaction\n");
-      if ((ret = iota_tangle_transaction_store(&state->node->core->tangle,
-                                               *tx))) {
+      if ((ret = iota_tangle_transaction_store(state->tangle, *tx))) {
         log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                     "Storing new transaction failed\n");
         neighbor->nbr_invalid_tx++;
@@ -182,7 +180,7 @@ static void *processor_routine(processor_state_t *const state) {
 }
 
 retcode_t processor_init(processor_state_t *const state, node_t *const node,
-                         bool testnet) {
+                         tangle_t *const tangle, bool testnet) {
   if (state == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_STATE;
   } else if (node == NULL) {
@@ -193,6 +191,7 @@ retcode_t processor_init(processor_state_t *const state, node_t *const node,
   memset(state, 0, sizeof(processor_state_t));
   state->running = false;
   state->node = node;
+  state->tangle = tangle;
   if (testnet) {
     state->req_hash_size = TESTNET_PACKET_REQ_HASH_SIZE;
   } else {
