@@ -31,8 +31,9 @@ retcode_t core_init(core_t* const core) {
                                  .index_milestone_hash = true};
 
   log_info(CORE_LOGGER_ID, "Initializing consensus\n");
-  if (iota_consensus_init(&core->consensus, &db_conf, core->config.testnet) !=
-      RC_OK) {
+  if (iota_consensus_init(&core->consensus, &db_conf,
+                          &core->transaction_requester,
+                          core->config.testnet) != RC_OK) {
     log_critical(CORE_LOGGER_ID, "Initializing consensus failed\n");
     return RC_CORE_FAILED_CONSENSUS_INIT;
   }

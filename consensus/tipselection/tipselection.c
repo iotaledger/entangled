@@ -32,7 +32,6 @@ retcode_t iota_consensus_tipselection_init(
   impl->ep_selector = ep;
   impl->max_txs_below_max_depth = max_txs_below_max_depth;
   impl->max_depth = max_depth;
-  rw_lock_handle_init(&impl->mt->latest_snapshot->rw_lock);
   return RC_OK;
 }
 
@@ -45,11 +44,11 @@ retcode_t iota_consensus_get_transactions_to_approve(
 
   rw_lock_handle_rdlock(&ts->mt->latest_snapshot->rw_lock);
 
-  if ((res = iota_consensus_get_entry_point(ts->ep_selector, depth, ep))) {
-    log_error(TIPSELECTION_LOGGER_ID,
-              "Getting entry point failed with error %" PRIu64 "\n", res);
-    goto ret;
-  }
+  // if ((res = iota_consensus_get_entry_point(ts->ep_selector, depth, ep))) {
+  //   log_error(TIPSELECTION_LOGGER_ID,
+  //             "Getting entry point failed with error %" PRIu64 "\n", res);
+  //   goto ret;
+  // }
 
   if ((res = iota_consensus_cw_rating_calculate(ts->cw_calc, ep,
                                                 &ratings_result))) {
@@ -74,18 +73,18 @@ retcode_t iota_consensus_get_transactions_to_approve(
   iota_consensus_exit_probability_randomize(ts->ep_randomizer, &eptv,
                                             &ratings_result, ep, tips->branch);
 
-  res = iota_consensus_ledeger_validator_validate(ts->lv, tips);
-  if (res != RC_OK) {
-    log_error(TIPSELECTION_LOGGER_ID,
-              "Second walking failed with error %" PRIu64 "\n", res);
-    goto ret;
-  }
-
-  if ((res = iota_consensus_ledeger_validator_validate(ts->lv, tips))) {
-    log_error(TIPSELECTION_LOGGER_ID,
-              "Validating tips failed with error %" PRIu64 "\n", res);
-    goto ret;
-  }
+  // res = iota_consensus_ledeger_validator_validate(ts->lv, tips);
+  // if (res != RC_OK) {
+  //   log_error(TIPSELECTION_LOGGER_ID,
+  //             "Second walking failed with error %" PRIu64 "\n", res);
+  //   goto ret;
+  // }
+  //
+  // if ((res = iota_consensus_ledeger_validator_validate(ts->lv, tips))) {
+  //   log_error(TIPSELECTION_LOGGER_ID,
+  //             "Validating tips failed with error %" PRIu64 "\n", res);
+  //   goto ret;
+  // }
 
 ret:
   rw_lock_handle_unlock(&ts->mt->latest_snapshot->rw_lock);
@@ -100,6 +99,5 @@ retcode_t iota_consensus_tipselection_destroy(tipselection_t *const ts) {
   ts->mt = NULL;
   ts->tangle = NULL;
   ts->ep_randomizer = NULL;
-  rw_lock_handle_destroy(&ts->mt->latest_snapshot->rw_lock);
   return RC_OK;
 }

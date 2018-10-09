@@ -223,7 +223,6 @@ retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv,
   logger_helper_init(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   lv->tangle = tangle;
   lv->milestone_tracker = mt;
-  mt->ledger_validator = lv;
   lv->transaction_requester = tr;
 
   if ((ret = build_snapshot(lv, &mt->latest_solid_subtangle_milestone_index,
