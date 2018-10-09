@@ -26,13 +26,8 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
   retcode_t ret = RC_OK;
   hash_queue_t non_analyzed_hashes = NULL;
   hash_set_t analyzed_hashes = NULL;
+  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
 
-  struct _iota_transaction tx;
-  iota_transaction_t tx_ptr = &tx;
-  iota_stor_pack_t pack = {.models = (void **)&tx_ptr,
-                           .capacity = 1,
-                           .num_loaded = 0,
-                           .insufficient_capacity = false};
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 
   if ((ret = hash_queue_push(&non_analyzed_hashes, milestone_hash)) != RC_OK) {
@@ -77,12 +72,7 @@ static retcode_t build_snapshot(ledger_validator_t *const lv,
                                 uint64_t *const consistent_index,
                                 flex_trit_t *const consistent_hash) {
   retcode_t ret = RC_OK;
-  iota_milestone_t milestone;
-  iota_milestone_t *milestone_ptr = &milestone;
-  iota_stor_pack_t pack = {.models = (void **)&milestone_ptr,
-                           .capacity = 1,
-                           .num_loaded = 0,
-                           .insufficient_capacity = false};
+  DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
   if ((ret = iota_tangle_milestone_load_first(lv->tangle, &pack)) != RC_OK) {
     goto done;
@@ -131,13 +121,8 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
   int number_of_analyzed_transactions = 0;
   hash_queue_t non_analyzed_hashes = NULL;
   state_entry_t *entry, *diff_elem;
-
-  struct _iota_transaction tx;
-  iota_transaction_t tx_ptr = &tx, tx_bundle = NULL;
-  iota_stor_pack_t pack = {.models = (void **)&tx_ptr,
-                           .capacity = 1,
-                           .num_loaded = 0,
-                           .insufficient_capacity = false};
+  iota_transaction_t tx_bundle = NULL;
+  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 
   bool valid_bundle = false;
@@ -269,12 +254,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   bool valid_diff = true;
   hash_set_t analyzed_hashes = NULL;
   state_map_t diff = NULL, patch = NULL;
-  struct _iota_transaction tx;
-  iota_transaction_t tx_ptr = &tx;
-  iota_stor_pack_t pack = {.models = (void **)&tx_ptr,
-                           .capacity = 1,
-                           .num_loaded = 0,
-                           .insufficient_capacity = false};
+  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   struct _trit_array milestone_hash = {milestone->hash, NUM_TRITS_HASH,
                                        FLEX_TRIT_SIZE_243, 0};
 
