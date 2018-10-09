@@ -116,15 +116,11 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
   hash_queue_push(&non_analyzed_hashes, tail_hash->trits);
 
   // Load the transaction
-  struct _iota_transaction curr_tx_s;
-  iota_transaction_t curr_tx = &curr_tx_s;
-
-  iota_stor_pack_t pack = {.models = (void **)(&curr_tx),
-                           .capacity = 1,
-                           .num_loaded = 0,
-                           .insufficient_capacity = false};
+  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
 
   hash_set_t visited_hashes = NULL;
+  TRIT_ARRAY_DECLARE(hash_trits_array, NUM_TRITS_HASH);
+
   while (non_analyzed_hashes != NULL) {
     if (hash_set_size(&visited_hashes) == epv->max_analyzed_txs) {
       log_error(WALKER_VALIDATOR_LOGGER_ID,
@@ -143,8 +139,8 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
       break;
     }
 
-    TRIT_ARRAY_DECLARE(hash_trits_array, NUM_TRITS_HASH);
-    memcpy(hash_trits_array.trits, curr_hash_trits, FLEX_TRIT_SIZE_243);
+    hash_trits_array.trits = curr_hash_trits;
+
     res = iota_tangle_transaction_load(epv->tangle, TRANSACTION_COL_HASH,
                                        &hash_trits_array, &pack);
     bool tail_is_not_genesis =

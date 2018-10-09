@@ -36,7 +36,6 @@ typedef struct exit_prob_transaction_validator_s {
   uint32_t max_analyzed_txs;
   uint32_t max_depth;
   hash_set_t max_depth_ok_memoization;
-  // private final TransactionValidator transactionValidator;
 } exit_prob_transaction_validator_t;
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_init(
