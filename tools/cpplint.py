@@ -355,7 +355,7 @@ _CPP_HEADERS = frozenset([
     'algorithm',
     'array',
     'atomic',
-    'bitset',
+    'raw_bits',
     'chrono',
     'codecvt',
     'complex',

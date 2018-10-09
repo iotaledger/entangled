@@ -18,6 +18,10 @@
 extern "C" {
 #endif
 
+/*
+ * Queue types and operations
+ */
+
 typedef struct hash_list_entry_s {
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   struct hash_list_entry_s *next;
@@ -31,21 +35,63 @@ typedef struct hash_queue_entry_s {
 } hash_queue_entry_t;
 typedef hash_queue_entry_t *hash_queue_t;
 
+retcode_t hash_queue_push(hash_queue_t *queue, flex_trit_t *hash);
+retcode_t hash_queue_pop(hash_queue_t *queue);
+flex_trit_t *hash_queue_peek(hash_queue_t queue);
+retcode_t hash_queue_free(hash_queue_t *queue);
+
+/*
+ * Set types and operations
+ */
+
 typedef struct hash_set_entry_s {
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   UT_hash_handle hh;
 } hash_set_entry_t;
 typedef hash_set_entry_t *hash_set_t;
 
-retcode_t hash_queue_push(hash_queue_t *queue, flex_trit_t *hash);
-retcode_t hash_queue_pop(hash_queue_t *queue);
-flex_trit_t *hash_queue_peek(hash_queue_t queue);
-retcode_t hash_queue_free(hash_queue_t *queue);
-
 retcode_t hash_set_add(hash_set_t *set, flex_trit_t *hash);
 retcode_t hash_set_append(hash_set_t *set, hash_set_t *clone);
 bool hash_set_contains(hash_set_t *set, flex_trit_t *hash);
-retcode_t hash_set_free(hash_set_t *set);
+void hash_set_free(hash_set_t *set);
+
+/*
+ * Int Map operations
+ */
+
+typedef struct hash_to_int_value_map_entry {
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  int64_t value;
+  UT_hash_handle hh;
+} hash_to_int_value_map_entry;
+typedef hash_to_int_value_map_entry *hash_int_map_t;
+
+retcode_t hash_int_map_add(hash_int_map_t *map, flex_trit_t *hash,
+                           int64_t value);
+void hash_int_map_free(hash_int_map_t *map);
+
+/*
+ *  Map of hash to hash_set
+ *
+ */
+
+typedef struct hash_to_indexed_hash_set_entry_s {
+  flex_trit_t hash[FLEX_TRIT_SIZE_243]; /*key*/
+  size_t idx;
+  hash_set_t approvers; /*value*/
+  UT_hash_handle hh;
+} hash_to_indexed_hash_set_entry_t;
+
+typedef hash_to_indexed_hash_set_entry_t *hash_to_indexed_hash_set_map_t;
+
+bool hash_to_hash_set_map_contains(hash_to_indexed_hash_set_map_t *map,
+                                   flex_trit_t *hash);
+
+retcode_t hash_to_hash_set_create_map_new_set(
+    hash_to_indexed_hash_set_map_t *map, flex_trit_t *hash,
+    hash_to_indexed_hash_set_entry_t **new_set_entry, size_t index);
+
+void hash_to_hash_set_map_free(hash_to_indexed_hash_set_map_t *map);
 
 #ifdef __cplusplus
 }
