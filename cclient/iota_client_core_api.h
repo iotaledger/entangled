@@ -71,7 +71,7 @@ retcode_t iota_client_add_neighbors(const iota_client_service_t* const service,
  * if you have your neighbors added via the command line, they will be retained
  * after you restart your node.
  *
- * https://iota.readme.io/reference#removeneighors
+ * https://iota.readme.io/reference#removeneighbors
 
  * @param service IRI node end point.
  * @param req Request containing list of neighbors to remove.
