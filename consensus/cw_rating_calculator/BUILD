@@ -9,6 +9,7 @@ cc_library(
         "//consensus/tangle",
         "//utils:hash_containers",
         "//utils:logger_helper",
+        "//utils/containers:bitset",
         "@com_github_uthash//:uthash",
     ],
 )

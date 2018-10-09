@@ -33,25 +33,9 @@ enum cw_calculation_implementation {
   BACKWARD_WEIGHT_PROPAGATION,
 };
 
-typedef struct cw_entry_t {
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  int64_t cw;
-  UT_hash_handle hh;
-} cw_entry_t;
-typedef cw_entry_t *cw_map_t;
-
-typedef struct hash_to_direct_approvers_entry_t {
-  flex_trit_t hash[FLEX_TRIT_SIZE_243]; /*key*/
-  uint64_t idx;
-  hash_set_t approvers; /*value*/
-  UT_hash_handle hh;
-} hash_to_direct_approvers_entry_t;
-
-typedef hash_to_direct_approvers_entry_t *hash_to_direct_approvers_map_t;
-
 typedef struct cw_calc_result {
-  cw_map_t cw_ratings;
-  hash_to_direct_approvers_map_t tx_to_approvers;
+  hash_int_map_t cw_ratings;
+  hash_to_indexed_hash_set_map_t tx_to_approvers;
 } cw_calc_result;
 
 typedef struct cw_rating_calculator_base cw_rating_calculator_base_t;

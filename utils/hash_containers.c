@@ -73,12 +73,80 @@ bool hash_set_contains(hash_set_t *set, flex_trit_t *hash) {
   return entry != NULL;
 }
 
-retcode_t hash_set_free(hash_set_t *set) {
+void hash_set_free(hash_set_t *set) {
   hash_set_entry_t *iter = NULL, *tmp = NULL;
 
   HASH_ITER(hh, *set, iter, tmp) {
     HASH_DEL(*set, iter);
     free(iter);
   }
+}
+
+/*
+ * Hash Map
+ */
+
+retcode_t hash_int_map_add(hash_int_map_t *map, flex_trit_t *hash,
+                           int64_t value) {
+  hash_to_int_value_map_entry *map_entry = NULL;
+  map_entry = (hash_to_int_value_map_entry *)malloc(
+      sizeof(hash_to_int_value_map_entry));
+  if (map_entry == NULL) {
+    return RC_UTILS_OOM;
+  }
+  memcpy(map_entry->hash, hash, FLEX_TRIT_SIZE_243);
+  map_entry->value = value;
+  HASH_ADD(hh, *map, hash, FLEX_TRIT_SIZE_243, map_entry);
   return RC_OK;
+}
+
+void hash_int_map_free(hash_int_map_t *map) {
+  hash_to_int_value_map_entry *curr_entry = NULL;
+  hash_to_int_value_map_entry *tmp_entry = NULL;
+
+  HASH_ITER(hh, *map, curr_entry, tmp_entry) {
+    HASH_DEL(*map, curr_entry);
+    free(curr_entry);
+  }
+}
+
+/*
+ *  hash_to_indexed_hash_set_map_t
+ */
+bool hash_to_indexed_hash_set_map_contains(hash_to_indexed_hash_set_map_t *map,
+                                           flex_trit_t *hash) {
+  hash_to_indexed_hash_set_entry_t *entry = NULL;
+  if (!(*map)) {
+    return false;
+  }
+  HASH_FIND(hh, *map, hash, FLEX_TRIT_SIZE_243, entry);
+  return entry != NULL;
+}
+
+retcode_t hash_to_indexed_hash_set_map_add_new_set(
+    hash_to_indexed_hash_set_map_t *map, flex_trit_t *hash,
+    hash_to_indexed_hash_set_entry_t **new_set_entry, size_t index) {
+  *new_set_entry = (hash_to_indexed_hash_set_entry_t *)malloc(
+      sizeof(hash_to_indexed_hash_set_entry_t));
+  if (*new_set_entry == NULL) {
+    return RC_UTILS_OOM;
+  }
+
+  (*new_set_entry)->approvers = NULL;
+  (*new_set_entry)->idx = index;
+  memcpy((*new_set_entry)->hash, hash, FLEX_TRIT_SIZE_243);
+
+  HASH_ADD(hh, *map, hash, FLEX_TRIT_SIZE_243, *new_set_entry);
+
+  return RC_OK;
+}
+
+void hash_to_indexed_hash_set_map_free(hash_to_indexed_hash_set_map_t *map) {
+  hash_to_indexed_hash_set_entry_t *curr_entry = NULL;
+  hash_to_indexed_hash_set_entry_t *tmp_entry = NULL;
+  HASH_ITER(hh, *map, curr_entry, tmp_entry) {
+    hash_set_free(&((*map)->approvers));
+    HASH_DEL(*map, curr_entry);
+    free(curr_entry);
+  }
 }

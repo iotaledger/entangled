@@ -25,8 +25,9 @@ static retcode_t random_walker_select_approver_tail(
     trit_array_t *approver_tail_hash, bool *found_approver);
 
 static retcode_t select_approver(
-    const ep_randomizer_t *exit_probability_randomizer, cw_map_t cw_ratings,
-    hash_set_t *approvers, trit_array_t *approver, bool *has_next_approver);
+    const ep_randomizer_t *exit_probability_randomizer,
+    hash_int_map_t cw_ratings, hash_set_t *approvers, trit_array_t *approver,
+    bool *has_next_approver);
 
 static retcode_t find_tail_if_valid(
     const ep_randomizer_t *exit_probability_randomizer,
@@ -91,7 +92,7 @@ retcode_t random_walker_select_approver_tail(
     trit_array_t *approver_tail_hash, bool *found_approver_tail) {
   retcode_t ret = RC_OK;
   bool has_next_approver;
-  hash_to_direct_approvers_entry_t *curr_approver_entry = NULL;
+  hash_to_indexed_hash_set_entry_t *curr_approver_entry = NULL;
   hash_set_entry_t *curr_approver = NULL;
   trit_array_t approver;
   flex_trit_t approver_trits[FLEX_TRIT_SIZE_243];
@@ -137,11 +138,11 @@ retcode_t random_walker_select_approver_tail(
 }
 
 retcode_t select_approver(const ep_randomizer_t *exit_probability_randomizer,
-                          cw_map_t cw_ratings, hash_set_t *approvers,
+                          hash_int_map_t cw_ratings, hash_set_t *approvers,
                           trit_array_t *approver, bool *has_next_approver) {
   hash_set_entry_t *curr_approver = NULL;
   hash_set_entry_t *tmp_approver = NULL;
-  cw_entry_t *curr_rating = NULL;
+  hash_to_int_value_map_entry *curr_rating = NULL;
   size_t num_approvers = HASH_COUNT(*approvers);
   int64_t weights[num_approvers];
   double sum_weights = 0;
@@ -152,7 +153,7 @@ retcode_t select_approver(const ep_randomizer_t *exit_probability_randomizer,
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
     HASH_FIND(hh, cw_ratings, curr_approver->hash, FLEX_TRIT_SIZE_243,
               curr_rating);
-    weights[idx++] = curr_rating->cw;
+    weights[idx++] = curr_rating->value;
   }
 
   int64_t max_weight = 0;

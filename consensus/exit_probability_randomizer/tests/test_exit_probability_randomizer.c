@@ -44,8 +44,8 @@ typedef enum test_tangle_topology {
 } test_tangle_topology;
 
 void test_cw_gen_topology(test_tangle_topology topology) {
-  cw_entry_t *curr_cw_entry = NULL;
-  cw_entry_t *tmp_cw_entry = NULL;
+  hash_to_int_value_map_entry *curr_cw_entry = NULL;
+  hash_to_int_value_map_entry *tmp_cw_entry = NULL;
   size_t num_approvers = 50;
   size_t num_txs = num_approvers + 1;
 
@@ -99,11 +99,11 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   size_t total_weight = 0;
 
   HASH_ITER(hh, out.cw_ratings, curr_cw_entry, tmp_cw_entry) {
-    total_weight += curr_cw_entry->cw;
+    total_weight += curr_cw_entry->value;
   }
   // First Entry, for both topologies, has to equal the number of total
   // approvers + own weight
-  TEST_ASSERT_EQUAL_INT(out.cw_ratings->cw, num_approvers + 1);
+  TEST_ASSERT_EQUAL_INT(out.cw_ratings->value, num_approvers + 1);
   if (topology == ONLY_DIRECT_APPROVERS) {
     TEST_ASSERT_EQUAL_INT(total_weight, num_approvers + 1 + num_approvers);
   } else if (topology == BLOCKCHAIN) {
@@ -237,8 +237,8 @@ void test_cw_topology_only_direct_approvers(void) {
 void test_cw_topology_blockchain(void) { test_cw_gen_topology(BLOCKCHAIN); }
 
 void test_cw_topology_four_transactions_diamond(void) {
-  cw_entry_t *curr_cw_entry = NULL;
-  cw_entry_t *tmp_cw_entry = NULL;
+  hash_to_int_value_map_entry *curr_cw_entry = NULL;
+  hash_to_int_value_map_entry *tmp_cw_entry = NULL;
 
   size_t num_txs = 4;
 
@@ -295,7 +295,7 @@ void test_cw_topology_four_transactions_diamond(void) {
   size_t total_weight = 0;
 
   HASH_ITER(hh, out.cw_ratings, curr_cw_entry, tmp_cw_entry) {
-    total_weight += curr_cw_entry->cw;
+    total_weight += curr_cw_entry->value;
   }
 
   TEST_ASSERT_EQUAL_INT(total_weight, 4 + 2 + 2 + 1);
@@ -329,8 +329,8 @@ void test_cw_topology_four_transactions_diamond(void) {
 }
 
 void test_cw_topology_two_inequal_tips(void) {
-  cw_entry_t *curr_cw_entry = NULL;
-  cw_entry_t *tmp_cw_entry = NULL;
+  hash_to_int_value_map_entry *curr_cw_entry = NULL;
+  hash_to_int_value_map_entry *tmp_cw_entry = NULL;
 
   size_t num_txs = 4;
 
@@ -388,7 +388,7 @@ void test_cw_topology_two_inequal_tips(void) {
   size_t total_weight = 0;
 
   HASH_ITER(hh, out.cw_ratings, curr_cw_entry, tmp_cw_entry) {
-    total_weight += curr_cw_entry->cw;
+    total_weight += curr_cw_entry->value;
   }
 
   TEST_ASSERT_EQUAL_INT(total_weight, 4 + 2 + 1 + 1);
@@ -455,8 +455,8 @@ void test_cw_topology_two_inequal_tips(void) {
 }
 
 void test_1_bundle(void) {
-  cw_entry_t *curr_cw_entry = NULL;
-  cw_entry_t *tmp_cw_entry = NULL;
+  hash_to_int_value_map_entry *curr_cw_entry = NULL;
+  hash_to_int_value_map_entry *tmp_cw_entry = NULL;
 
   size_t bundle_size = 4;
 
@@ -540,7 +540,7 @@ void test_1_bundle(void) {
   size_t total_weight = 0;
 
   HASH_ITER(hh, out.cw_ratings, curr_cw_entry, tmp_cw_entry) {
-    total_weight += curr_cw_entry->cw;
+    total_weight += curr_cw_entry->value;
   }
 
   TEST_ASSERT_EQUAL_INT(total_weight, 5 + 4 + 3 + 2 + 1);
@@ -591,8 +591,8 @@ void test_1_bundle(void) {
 }
 
 void test_2_chained_bundles(void) {
-  cw_entry_t *curr_cw_entry = NULL;
-  cw_entry_t *tmp_cw_entry = NULL;
+  hash_to_int_value_map_entry *curr_cw_entry = NULL;
+  hash_to_int_value_map_entry *tmp_cw_entry = NULL;
 
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
@@ -676,7 +676,7 @@ void test_2_chained_bundles(void) {
   size_t total_weight = 0;
 
   HASH_ITER(hh, out.cw_ratings, curr_cw_entry, tmp_cw_entry) {
-    total_weight += curr_cw_entry->cw;
+    total_weight += curr_cw_entry->value;
   }
 
   TEST_ASSERT_EQUAL_INT(total_weight, 7 + 6 + 5 + 4 + 3 + 2 + 1);
