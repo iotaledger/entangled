@@ -27,7 +27,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   logger_helper_init(CONSENSUS_LOGGER_ID, LOGGER_DEBUG, true);
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing bundle validator\n");
-  if ((ret = bundle_validate_init()) != RC_OK) {
+  if ((ret = iota_consensus_bundle_validator_init()) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Initializing bundle validator failed\n");
     return ret;
   }
@@ -157,7 +157,7 @@ retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
   retcode_t ret = RC_OK;
 
   log_info(CONSENSUS_LOGGER_ID, "Destroying bundle validator\n");
-  if ((ret = bundle_validate_destroy()) != RC_OK) {
+  if ((ret = iota_consensus_bundle_validator_destroy()) != RC_OK) {
     log_error(CONSENSUS_LOGGER_ID, "Destroying bundle validator failed\n");
   }
 
