@@ -36,7 +36,7 @@ typedef struct hash_queue_entry_s {
 typedef hash_queue_entry_t *hash_queue_t;
 
 retcode_t hash_queue_push(hash_queue_t *queue, flex_trit_t *hash);
-retcode_t hash_queue_pop(hash_queue_t *queue);
+void hash_queue_pop(hash_queue_t *queue);
 flex_trit_t *hash_queue_peek(hash_queue_t queue);
 retcode_t hash_queue_free(hash_queue_t *queue);
 
@@ -50,6 +50,7 @@ typedef struct hash_set_entry_s {
 } hash_set_entry_t;
 typedef hash_set_entry_t *hash_set_t;
 
+uint32_t hash_set_size(hash_set_t *set);
 retcode_t hash_set_add(hash_set_t *set, flex_trit_t *hash);
 retcode_t hash_set_append(hash_set_t *set, hash_set_t *clone);
 bool hash_set_contains(hash_set_t *set, flex_trit_t *hash);

@@ -5,7 +5,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "common/errors.h"
 #include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
 #include "utils/logger_helper.h"

@@ -5,6 +5,7 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/trinary:trit_array",
+        "@com_github_uthash//:uthash",
     ],
 )
 

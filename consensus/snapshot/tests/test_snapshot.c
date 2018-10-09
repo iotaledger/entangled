@@ -64,9 +64,8 @@ void test_snapshot_get_balance() {
   flex_trit_t address[FLEX_TRIT_SIZE_243];
   int64_t balance;
 
-  TEST_ASSERT(iota_snapshot_init(
-                  &snapshot, "consensus/snapshot/tests/snapshot.txt",
-                  "consensus/snapshot/tests/snapshot.sig", true) == RC_OK);
+  TEST_ASSERT(iota_snapshot_init(&snapshot, SNAPSHOT_FILE, SNAPSHOT_SIG_FILE,
+                                 true) == RC_OK);
   flex_trits_from_trytes(address, NUM_TRITS_HASH,
                          (tryte_t*)"J9999999999999999999999999999999999999999999999999999"
                          "9999999999999999999999999999",
