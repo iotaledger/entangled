@@ -252,9 +252,6 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invali
                         NUM_TRITS_FOR_FLEX_TRIT, NUM_TRITS_FOR_FLEX_TRIT);
   build_tangle(&tangle, txs, 4);
 
-  trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(ep, txs[0]->trunk, NUM_TRITS_HASH);
-
   bool exist = false;
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
               RC_OK);
@@ -271,7 +268,6 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invali
 
   TEST_ASSERT(iota_consensus_bundle_validator_destroy() == RC_OK);
   trit_array_free(tail_hash);
-  trit_array_free(ep);
   bundle_transactions_free(&bundle);
   transactions_free(txs, 4);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
