@@ -41,12 +41,16 @@ extern "C" {
 /**
  * Initializes all consensus components
  *
+ * @param consensus The consensus
+ *
  * @return a status code
  */
-retcode_t iota_consensus_init(iota_consensus_t* const consensus);
+retcode_t iota_consensus_init(iota_consensus_t* const consensus, bool testnet);
 
 /**
  * Starts all consensus components
+ *
+ * @param consensus The consensus
  *
  * @return a status code
  */
@@ -55,12 +59,16 @@ retcode_t iota_consensus_start(iota_consensus_t* const consensus);
 /**
  * Stops all consensus components
  *
+ * @param consensus The consensus
+ *
  * @return a status code
  */
 retcode_t iota_consensus_stop(iota_consensus_t* const consensus);
 
 /**
  * Destroys all consensus components
+ *
+ * @param consensus The consensus
  *
  * @return a status code
  */
