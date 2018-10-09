@@ -6,6 +6,7 @@
  */
 
 #include "common/sign/normalize.h"
+#include "common/trinary/trit_long.h"
 
 void normalize_hash(flex_trit_t const *const hash,
                     byte_t *const normalized_hash) {
@@ -43,5 +44,15 @@ void normalize_hash(flex_trit_t const *const hash,
         }
       }
     }
+  }
+}
+
+void normalize_hash_trits(flex_trit_t const *const hash,
+                          trit_t *const normalized_hash) {
+  byte_t normalized_bundle_bytes[NUM_TRYTES_HASH];
+
+  normalize_hash(hash, normalized_bundle_bytes);
+  for (int c = 0; c < NUM_TRYTES_HASH; ++c) {
+    long_to_trits(normalized_bundle_bytes[c], &normalized_hash[c * RADIX]);
   }
 }
