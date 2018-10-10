@@ -28,17 +28,25 @@ typedef struct hash_list_entry_s {
 } hash_list_entry_t;
 typedef hash_list_entry_t *hash_list_t;
 
-typedef struct hash_queue_entry_s {
+typedef struct hash_dll_entry_s {
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  struct hash_queue_entry_s *next;
-  struct hash_queue_entry_s *prev;
-} hash_queue_entry_t;
-typedef hash_queue_entry_t *hash_queue_t;
+  struct hash_dll_entry_s *next;
+  struct hash_dll_entry_s *prev;
+} hash_dll_entry_t;
+typedef hash_dll_entry_t *hash_queue_t;
+typedef hash_dll_entry_t *hash_stack_t;
 
+bool hash_queue_empty(hash_queue_t queue);
 retcode_t hash_queue_push(hash_queue_t *queue, flex_trit_t *hash);
 void hash_queue_pop(hash_queue_t *queue);
 flex_trit_t *hash_queue_peek(hash_queue_t queue);
 retcode_t hash_queue_free(hash_queue_t *queue);
+
+bool hash_stack_empty(hash_stack_t queue);
+retcode_t hash_stack_push(hash_stack_t *queue, flex_trit_t *hash);
+void hash_stack_pop(hash_stack_t *queue);
+flex_trit_t *hash_stack_peek(hash_stack_t queue);
+retcode_t hash_stack_free(hash_stack_t *queue);
 
 /*
  * Set types and operations
