@@ -48,8 +48,8 @@ size_t min_trits(int64_t const value) {
   // Edge case where value == INT64_MIN. In this case,
   // llabs cannot return a value greater than INT64_MAX
   // so we "force" the (unsigned) value explicitly
-  if (value == 0x8000000000000000LL) {
-    v_abs = 0x8000000000000000ULL;
+  if (value == INT64_MIN) {
+    v_abs = INT64_MAX+1ULL;
   } else {
     v_abs = llabs(value);
   }
@@ -71,8 +71,8 @@ size_t long_to_trits(int64_t const value, trit_t *const trits) {
   // Edge case where value == INT64_MIN. In this case,
   // llabs cannot return a value greater than INT64_MAX
   // so we "force" the (unsigned) value explicitly
-  if (value == 0x8000000000000000LL) {
-    v_abs = 0x8000000000000000ULL;
+  if (value == INT64_MIN) {
+    v_abs = INT64_MAX+1ULL;
   } else {
     v_abs = llabs(value);
   }
