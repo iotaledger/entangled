@@ -28,10 +28,20 @@
 extern "C" {
 #endif
 
+typedef struct snapshot_conf_s {
+  uint64_t timestamp;
+  uint64_t signature_index;
+  uint64_t signature_depth;
+  flex_trit_t signature_pubkey[FLEX_TRIT_SIZE_243];
+  flex_trit_t coordinator[FLEX_TRIT_SIZE_243];
+  uint64_t last_milestone;
+} snapshot_conf_t;
+
 typedef struct snapshot_s {
   rw_lock_handle_t rw_lock;
   size_t index;
   state_delta_t state;
+  snapshot_conf_t conf;
 } snapshot_t;
 
 /**
