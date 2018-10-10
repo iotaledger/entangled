@@ -74,8 +74,12 @@ done:
   return ret;
 }
 
-static retcode_t get_snapshot_conf(char const *const snapshot_conf_file,
-                                   snapshot_conf_t *const conf) {
+/*
+ * Public functions
+ */
+
+retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
+                                  snapshot_conf_t *const conf) {
   retcode_t ret = RC_OK;
   FILE *file = NULL;
   size_t len = 0;
@@ -181,10 +185,6 @@ done:
   return ret;
 }
 
-/*
- * Public functions
- */
-
 retcode_t iota_snapshot_init(snapshot_t *const snapshot,
                              char const *const snapshot_file,
                              char const *const snapshot_sig_file,
@@ -201,7 +201,8 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot,
   snapshot->index = 0;
   snapshot->state = NULL;
 
-  if ((ret = get_snapshot_conf(snapshot_conf_file, &snapshot->conf)) != RC_OK) {
+  if ((ret = iota_snapshot_init_conf(snapshot_conf_file, &snapshot->conf)) !=
+      RC_OK) {
     log_critical(SNAPSHOT_LOGGER_ID,
                  "Parsing snapshot configuration file failed\n");
     return ret;

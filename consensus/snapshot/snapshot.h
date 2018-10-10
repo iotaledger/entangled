@@ -38,6 +38,17 @@ typedef struct snapshot_s {
 } snapshot_t;
 
 /**
+ * Initializes a snapshot configuration
+ *
+ * @param snapshot_conf_file The snapshot configuration file path
+ * @param conf The snapshot configuration
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
+                                  snapshot_conf_t *const conf);
+
+/**
  * Initializes a snapshot
  *
  * @param snapshot The snapshot
