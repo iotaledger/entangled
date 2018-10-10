@@ -159,40 +159,66 @@ retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
     log_error(CONSENSUS_LOGGER_ID, "Destroying bundle validator failed\n");
   }
 
+  log_info(CONSENSUS_LOGGER_ID,
+           "Destroying cumulative weight rating calculator\n");
+  if ((ret = iota_consensus_cw_rating_destroy(
+           &consensus->cw_rating_calculator)) != RC_OK) {
+    log_error(CONSENSUS_LOGGER_ID,
+              "Destroying cumulative weight rating calculator failed\n");
+  }
+
+  log_info(CONSENSUS_LOGGER_ID, "Destroying entry point selector\n");
+  if ((ret = iota_consensus_entry_point_selector_destroy(
+           &consensus->entry_point_selector)) != RC_OK) {
+    log_error(CONSENSUS_LOGGER_ID, "Destroying entry point selector failed\n");
+  }
+
+  log_info(CONSENSUS_LOGGER_ID, "Destroying exit probability randomizer\n");
+  if ((ret = iota_consensus_ep_randomizer_destroy(&consensus->ep_randomizer)) !=
+      RC_OK) {
+    log_error(CONSENSUS_LOGGER_ID,
+              "Destroying exit probability randomizer failed\n");
+  }
+
+  log_info(CONSENSUS_LOGGER_ID,
+           "Destroying exit probability transaction validator\n");
+  if ((ret = iota_consensus_exit_prob_transaction_validator_destroy(
+           &consensus->exit_prob_transaction_validator))) {
+    log_error(CONSENSUS_LOGGER_ID,
+              "Destroying exit probability transaction validator failed\n");
+  }
+
+  log_info(CONSENSUS_LOGGER_ID, "Destroying ledger validator\n");
+  if ((ret = iota_consensus_ledger_validator_destroy(
+           &consensus->ledger_validator)) != RC_OK) {
+    log_error(CONSENSUS_LOGGER_ID, "Destroying ledger validator failed\n");
+  }
+
+  log_info(CONSENSUS_LOGGER_ID, "Destroying milestone tracker\n");
+  if ((ret = iota_milestone_tracker_destroy(&consensus->milestone_tracker)) !=
+      RC_OK) {
+    log_error(CONSENSUS_LOGGER_ID, "Destroying milestone tracker failed\n");
+  }
+
   log_info(CONSENSUS_LOGGER_ID, "Destroying snapshot\n");
   if ((ret = iota_snapshot_destroy(&consensus->snapshot)) != RC_OK) {
     log_error(CONSENSUS_LOGGER_ID, "Destroying snapshot failed\n");
+  }
+
+  log_info(CONSENSUS_LOGGER_ID, "Destroying tangle\n");
+  if ((ret = iota_tangle_destroy(&consensus->tangle)) != RC_OK) {
+    log_error(CONSENSUS_LOGGER_ID, "Destroying tangle failed\n");
+  }
+
+  log_info(CONSENSUS_LOGGER_ID, "Destroying tip selection\n");
+  if ((ret = iota_consensus_tipselection_destroy(&consensus->tipselection))) {
+    log_error(CONSENSUS_LOGGER_ID, "Destroying tip selection failed\n");
   }
 
   log_info(CONSENSUS_LOGGER_ID, "Destroying transaction validator\n");
   if ((ret = iota_consensus_transaction_validator_destroy(
            &consensus->transaction_validator)) != RC_OK) {
     log_error(CONSENSUS_LOGGER_ID, "Destroying transaction validator failed\n");
-  }
-
-  // iota_consensus_cw_rating_destroy(cw_rating_calculator_t * cw_calc);
-
-  // iota_consensus_entry_point_selector_destroy(
-  //     entry_point_selector_t *const eps);
-
-  //  retcode_t iota_consensus_ep_randomizer_destroy(
-  //     ep_randomizer_t *ep_randomizer);
-
-  // extern retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
-  //     exit_prob_transaction_validator_t *epv);
-
-  // retcode_t iota_consensus_ledger_validator_destroy(ledger_validator_t
-  // *const lv);
-
-  // extern retcode_t iota_milestone_tracker_destroy(milestone_tracker_t*
-  // const mt);
-
-  // extern retcode_t iota_consensus_tipselection_destroy(tipselection_t
-  // *const ts);
-
-  log_info(CONSENSUS_LOGGER_ID, "Destroying tangle\n");
-  if ((ret = iota_tangle_destroy(&consensus->tangle)) != RC_OK) {
-    log_error(CONSENSUS_LOGGER_ID, "Destroying tangle failed\n");
   }
 
   logger_helper_destroy(CONSENSUS_LOGGER_ID);
