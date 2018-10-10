@@ -286,7 +286,7 @@ void test_milestone_state_diff(void) {
   flex_trit_t *hashed_hash;
 
   flex_trits_from_trits(hash, HASH_LENGTH, trits, HASH_LENGTH, HASH_LENGTH);
-  for (int i = -10; i <= 10; i++) {
+  for (int i = -1000; i <= 1000; i++) {
     hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
     memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
     free(hashed_hash);
@@ -300,7 +300,7 @@ void test_milestone_state_diff(void) {
 
   TEST_ASSERT(iota_stor_state_diff_load(&conn, 42, &state_diff2) == RC_OK);
 
-  int i = -10;
+  int i = -1000;
   flex_trits_from_trits(hash, HASH_LENGTH, trits, HASH_LENGTH, HASH_LENGTH);
   iter = NULL;
   HASH_ITER(hh, state_diff2, iter, tmp) {
