@@ -88,14 +88,14 @@ retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
         *coordinator = NULL;
 
   if ((file = fopen(snapshot_conf_file, "r")) == NULL) {
-    log_error(SNAPSHOT_LOGGER_ID, "Snapshot configuration file not found");
+    log_error(SNAPSHOT_LOGGER_ID, "Snapshot configuration file not found\n");
     ret = RC_SNAPSHOT_FILE_NOT_FOUND;
     goto done;
   }
 
   if (fseek(file, 0, SEEK_END) < 0 || (len = ftell(file)) < 0 ||
       fseek(file, 0, SEEK_SET) < 0) {
-    log_error(SNAPSHOT_LOGGER_ID, "Invalid snapshot configuration file");
+    log_error(SNAPSHOT_LOGGER_ID, "Invalid snapshot configuration file\n");
     ret = RC_SNAPSHOT_INVALID_FILE;
     goto done;
   }
@@ -106,7 +106,7 @@ retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
   }
 
   if (fread(content, 1, len, file) < 0) {
-    log_error(SNAPSHOT_LOGGER_ID, "Invalid snapshot configuration file");
+    log_error(SNAPSHOT_LOGGER_ID, "Invalid snapshot configuration file\n");
     ret = RC_SNAPSHOT_INVALID_FILE;
     goto done;
   }
@@ -167,7 +167,7 @@ retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
 json_error : {
   const char *error_ptr = cJSON_GetErrorPtr();
   if (error_ptr != NULL) {
-    log_error(SNAPSHOT_LOGGER_ID, "%s", error_ptr);
+    log_error(SNAPSHOT_LOGGER_ID, "%s\n", error_ptr);
   }
   ret = RC_SNAPSHOT_FAILED_JSON_PARSING;
 }

@@ -84,11 +84,13 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   char *snapshot_file = NULL;
   char *snapshot_sig_file = NULL;
   if (core->config.testnet) {
-    snapshot_file = TESTNET_SNAPSHOT_FILE;
-    snapshot_sig_file = TESTNET_SNAPSHOT_SIG_FILE;
+    snapshot_file = SNAPSHOT_TESTNET;
+    snapshot_sig_file = SNAPSHOT_SIG_TESTNET;
+    snapshot_conf_file = SNAPSHOT_CONF_TESTNET;
   } else {
-    snapshot_file = MAINNET_SNAPSHOT_FILE;
-    snapshot_sig_file = MAINNET_SNAPSHOT_SIG_FILE;
+    snapshot_file = SNAPSHOT_MAINNET;
+    snapshot_sig_file = SNAPSHOT_SIG_MAINNET;
+    snapshot_conf_file = SNAPSHOT_CONF_MAINNET;
   }
   if ((ret = iota_snapshot_init(&consensus->snapshot, CIRI_SNAPSHOT_FILE,
                                 CIRI_SNAPSHOT_SIG_FILE, testnet)) != RC_OK) {

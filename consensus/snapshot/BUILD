@@ -17,6 +17,9 @@ cc_library(
         "SNAPSHOT_CONF_MAINNET='\"external/snapshot_conf_mainnet/file/snapshot.json\"'",
         "SNAPSHOT_SIG_MAINNET='\"external/snapshot_sig_mainnet/file/snapshot.sig\"'",
         "SNAPSHOT_MAINNET='\"external/snapshot_mainnet/file/snapshot.txt\"'",
+        "SNAPSHOT_CONF_TESTNET='\"external/snapshot_conf_testnet/file/snapshot.json\"'",
+        "SNAPSHOT_SIG_TESTNET='\"external/snapshot_sig_testnet/file/snapshot.sig\"'",
+        "SNAPSHOT_TESTNET='\"external/snapshot_testnet/file/snapshot.txt\"'",
     ],
     visibility = ["//visibility:public"],
     deps = [
