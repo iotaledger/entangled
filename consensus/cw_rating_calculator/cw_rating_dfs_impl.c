@@ -121,38 +121,29 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
 
   while (!hash_stack_empty(stack)) {
     curr_tx_hash = hash_stack_peek(stack);
-    pack.num_loaded = 0;
-    pack.insufficient_capacity = false;
-    res = iota_tangle_transaction_load_hashes_of_approvers(cw_calc->tangle,
-                                                           curr_tx_hash, &pack);
-
-    if (res != RC_OK) {
-      log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-                "Failed in loading approvers, error code is: %" PRIu64 "\n",
-                res);
-      return res;
-    }
 
     if (!hash_to_indexed_hash_set_map_contains(tx_to_approvers, curr_tx_hash)) {
-      hash_to_indexed_hash_set_map_add_new_set(tx_to_approvers, curr_tx_hash,
-                                               &curr_tx, (*subtangle_size)++);
-
+      hash_pack_reset(&pack);
+      if ((res = iota_tangle_transaction_load_hashes_of_approvers(
+               cw_calc->tangle, curr_tx_hash, &pack))) {
+        log_error(CW_RATING_CALCULATOR_LOGGER_ID,
+                  "Failed in loading approvers, error code is: %" PRIu64 "\n",
+                  res);
+        return res;
+      }
+      if ((res = hash_to_indexed_hash_set_map_add_new_set(
+               tx_to_approvers, curr_tx_hash, &curr_tx, (*subtangle_size)++))) {
+        return res;
+      }
       hash_stack_pop(&stack);
-
       while (pack.num_loaded > 0) {
         curr_approver_index = --pack.num_loaded;
         // Add each found approver to the currently traversed tx
-
-        if (!hash_to_indexed_hash_set_map_contains(
-                tx_to_approvers,
-                ((trit_array_p)pack.models[curr_approver_index])->trits)) {
-          if ((res = hash_stack_push(
-                   &stack,
-                   ((trit_array_p)pack.models[curr_approver_index])->trits))) {
-            return res;
-          }
+        if ((res = hash_stack_push(
+                 &stack,
+                 ((trit_array_p)pack.models[curr_approver_index])->trits))) {
+          return res;
         }
-
         if ((res = hash_set_add(
                  &curr_tx->approvers,
                  ((trit_array_p)pack.models[pack.num_loaded])->trits))) {
