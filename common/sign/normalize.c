@@ -50,10 +50,10 @@ void normalize_hash(flex_trit_t const *const hash,
 
 void normalize_hash_trits(flex_trit_t const *const hash,
                           trit_t *const normalized_hash) {
-  byte_t normalized_bundle_bytes[NUM_TRYTES_HASH];
+  byte_t normalized_bundle_bytes[HASH_LENGTH_TRYTE];
 
   normalize_hash(hash, normalized_bundle_bytes);
-  for (int c = 0; c < NUM_TRYTES_HASH; ++c) {
+  for (int c = 0; c < HASH_LENGTH_TRYTE; ++c) {
     long_to_trits(normalized_bundle_bytes[c], &normalized_hash[c * RADIX]);
   }
 }

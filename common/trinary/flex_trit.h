@@ -22,6 +22,7 @@ extern "C" {
 #include <stdbool.h>
 #include <string.h>
 
+#include "common/defs.h"
 #include "common/trinary/trit_byte.h"
 #include "common/trinary/trit_tryte.h"
 

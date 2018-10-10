@@ -52,8 +52,8 @@ cc_library(
     deps = [
         ":bytes",
         ":trits",
-        "//utils:macros",
         "//common:defs",
+        "//utils:macros",
     ],
 )
 
