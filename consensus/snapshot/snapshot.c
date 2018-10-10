@@ -5,8 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "consensus/snapshot/snapshot.h"
+#include <stdio.h>
+
+#include "cJSON.h"
+
 #include "common/model/transaction.h"
+#include "consensus/snapshot/snapshot.h"
 #include "utils/logger_helper.h"
 #include "utils/signed_files.h"
 
@@ -70,6 +74,114 @@ done:
   return ret;
 }
 
+static retcode_t get_snapshot_conf(char const *const snapshot_conf_file,
+                                   snapshot_conf_t *const conf) {
+  retcode_t ret = RC_OK;
+  FILE *file = NULL;
+  size_t len = 0;
+  char *content = NULL;
+  cJSON *json = NULL, *tmp = NULL, *timestamp = NULL, *signature = NULL,
+        *coordinator = NULL;
+
+  if ((file = fopen(snapshot_conf_file, "r")) == NULL) {
+    log_error(SNAPSHOT_LOGGER_ID, "Snapshot configuration file not found");
+    ret = RC_SNAPSHOT_FILE_NOT_FOUND;
+    goto done;
+  }
+
+  if (fseek(file, 0, SEEK_END) < 0 || (len = ftell(file)) < 0 ||
+      fseek(file, 0, SEEK_SET) < 0) {
+    log_error(SNAPSHOT_LOGGER_ID, "Invalid snapshot configuration file");
+    ret = RC_SNAPSHOT_INVALID_FILE;
+    goto done;
+  }
+
+  if ((content = (char *)malloc(len + 1)) == NULL) {
+    ret = RC_SNAPSHOT_OOM;
+    goto done;
+  }
+
+  if (fread(content, 1, len, file) < 0) {
+    log_error(SNAPSHOT_LOGGER_ID, "Invalid snapshot configuration file");
+    ret = RC_SNAPSHOT_INVALID_FILE;
+    goto done;
+  }
+
+  content[len] = '\0';
+
+  if ((json = cJSON_Parse(content)) == NULL) {
+    goto json_error;
+  }
+
+  if ((timestamp = cJSON_GetObjectItemCaseSensitive(json, "timestamp")) ==
+          NULL ||
+      (signature = cJSON_GetObjectItemCaseSensitive(json, "signature")) ==
+          NULL ||
+      (coordinator = cJSON_GetObjectItemCaseSensitive(json, "coordinator")) ==
+          NULL) {
+    goto json_error;
+  }
+
+  if (!cJSON_IsNumber(timestamp)) {
+    goto json_error;
+  }
+  conf->timestamp = timestamp->valueint;
+
+  tmp = cJSON_GetObjectItemCaseSensitive(signature, "index");
+  if (tmp == NULL || !cJSON_IsNumber(tmp)) {
+    goto json_error;
+  }
+  conf->signature_index = tmp->valueint;
+
+  tmp = cJSON_GetObjectItemCaseSensitive(signature, "depth");
+  if (tmp == NULL || !cJSON_IsNumber(tmp)) {
+    goto json_error;
+  }
+  conf->signature_depth = tmp->valueint;
+
+  tmp = cJSON_GetObjectItemCaseSensitive(signature, "pubkey");
+  if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL) {
+    goto json_error;
+  }
+  flex_trits_from_trytes(conf->signature_pubkey, NUM_TRITS_ADDRESS,
+                         (tryte_t *)tmp->valuestring, NUM_TRYTES_ADDRESS,
+                         NUM_TRYTES_ADDRESS);
+
+  tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "pubkey");
+  if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL) {
+    goto json_error;
+  }
+  flex_trits_from_trytes(conf->coordinator, NUM_TRITS_ADDRESS,
+                         (tryte_t *)tmp->valuestring, NUM_TRYTES_ADDRESS,
+                         NUM_TRYTES_ADDRESS);
+
+  tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "lastMilestone");
+  if (tmp == NULL || !cJSON_IsNumber(tmp)) {
+    goto json_error;
+  }
+  conf->last_milestone = tmp->valueint;
+
+json_error : {
+  const char *error_ptr = cJSON_GetErrorPtr();
+  if (error_ptr != NULL) {
+    log_error(SNAPSHOT_LOGGER_ID, "%s", error_ptr);
+  }
+  ret = RC_SNAPSHOT_FAILED_JSON_PARSING;
+}
+
+done:
+  if (file) {
+    fclose(file);
+  }
+  if (content) {
+    free(content);
+  }
+  if (json) {
+    cJSON_Delete(json);
+  }
+  return ret;
+}
+
 /*
  * Public functions
  */
@@ -88,6 +200,13 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot,
   rw_lock_handle_init(&snapshot->rw_lock);
   snapshot->index = 0;
   snapshot->state = NULL;
+
+  if ((ret = get_snapshot_conf(SNAPSHOT_CONF_MAINNET, &snapshot->conf)) !=
+      RC_OK) {
+    log_critical(SNAPSHOT_LOGGER_ID,
+                 "Parsing snapshot configuration file failed\n");
+    return ret;
+  }
 
   if (!testnet) {
     bool valid = false;
