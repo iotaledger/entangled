@@ -13,6 +13,7 @@
 #include "common/sign/normalize.h"
 #include "common/sign/v1/iss_curl.h"
 #include "common/storage/sql/defs.h"
+#include "common/trinary/trit_array.h"
 #include "common/trinary/trit_long.h"
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
@@ -306,23 +307,18 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
       NULL) {
     goto oom;
   }
+  if ((mt->coordinator =
+           trit_array_new_from_trytes(snapshot->conf.coordinator)) == NULL) {
+    goto oom;
+  }
+  mt->milestone_start_index = snapshot->conf.last_milestone;
+  mt->latest_milestone_index = snapshot->conf.last_milestone;
+  mt->latest_solid_subtangle_milestone_index = snapshot->conf.last_milestone;
   if (mt->testnet) {
-    if ((mt->coordinator = trit_array_new_from_trytes(
-             (tryte_t*)TESTNET_COORDINATOR_ADDRESS)) == NULL) {
-      goto oom;
-    }
-    mt->milestone_start_index = TESTNET_MILESTONE_START_INDEX;
     mt->num_keys_in_milestone = TESTNET_NUM_KEYS_IN_MILESTONE;
   } else {
-    if ((mt->coordinator = trit_array_new_from_trytes(
-             (tryte_t*)MAINNET_COORDINATOR_ADDRESS)) == NULL) {
-      goto oom;
-    }
-    mt->milestone_start_index = MAINNET_MILESTONE_START_INDEX;
     mt->num_keys_in_milestone = MAINNET_NUM_KEYS_IN_MILESTONE;
   }
-  mt->latest_milestone_index = mt->milestone_start_index;
-  mt->latest_solid_subtangle_milestone_index = mt->milestone_start_index;
 
   return RC_OK;
 
