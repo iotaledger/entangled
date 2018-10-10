@@ -1,5 +1,24 @@
 workspace(name = "org_iota_entangled")
 
+SNAPSHOT_REPOSITORY = "https://raw.githubusercontent.com/thibault-martinez/snapshots/master"
+
+SNAPSHOT_TIMESTAMP_MAINNET = "20180917"
+
+http_file(
+    name = "snapshot_conf_mainnet",
+    url = SNAPSHOT_REPOSITORY + "/mainnet/" + SNAPSHOT_TIMESTAMP_MAINNET + "/snapshot.json",
+)
+
+http_file(
+    name = "snapshot_sig_mainnet",
+    url = SNAPSHOT_REPOSITORY + "/mainnet/" + SNAPSHOT_TIMESTAMP_MAINNET + "/snapshot.sig",
+)
+
+http_file(
+    name = "snapshot_mainnet",
+    url = SNAPSHOT_REPOSITORY + "/mainnet/" + SNAPSHOT_TIMESTAMP_MAINNET + "/snapshot.txt",
+)
+
 git_repository(
     name = "rules_iota",
     commit = "8571197145287c75a2b9cd93531db27d765fafc4",
