@@ -9,7 +9,6 @@
 #include <assert.h>
 #include "utils/macros.h"
 
-#define NUMBER_OF_TRITS_IN_A_BYTE 5
 #define RADIX 3
 static const byte_t byte_radix[] = {1, 3, 9, 27, 81};
 

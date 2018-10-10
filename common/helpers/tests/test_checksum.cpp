@@ -116,7 +116,7 @@ TEST(ChecksumTest, testFlexChecksumEquality) {
   };
 #endif
   const size_t NUM_TRITS = 243;
-  size_t flex_len = num_flex_trits_for_trits(NUM_TRITS);
+  size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS);
   flex_trit_t *partial = (flex_trit_t *)calloc(flex_len, sizeof(flex_trit_t));
 
   auto checksum = iota_flex_checksum(ADDRESS, NUM_TRITS, 0);
@@ -130,13 +130,13 @@ TEST(ChecksumTest, testFlexChecksumEquality) {
   checksum = iota_flex_checksum(ADDRESS, NUM_TRITS, 9);
   memset(partial, FLEX_TRIT_NULL_VALUE, flex_len);
   flex_trits_slice(partial, NUM_TRITS, CHECKSUM, NUM_TRITS, NUM_TRITS - 9, 9);
-  EXPECT_TRUE(memcmp(checksum, partial, num_flex_trits_for_trits(9)) == 0);
+  EXPECT_TRUE(memcmp(checksum, partial, NUM_FLEX_TRITS_FOR_TRITS(9)) == 0);
   free(checksum);
 
   checksum = iota_flex_checksum(ADDRESS, NUM_TRITS, 27);
   memset(partial, FLEX_TRIT_NULL_VALUE, flex_len);
   flex_trits_slice(partial, NUM_TRITS, CHECKSUM, NUM_TRITS, NUM_TRITS - 27, 27);
-  EXPECT_TRUE(memcmp(checksum, partial, num_flex_trits_for_trits(27)) == 0);
+  EXPECT_TRUE(memcmp(checksum, partial, NUM_FLEX_TRITS_FOR_TRITS(27)) == 0);
   free(checksum);
 
   free(partial);

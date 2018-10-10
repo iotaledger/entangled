@@ -115,7 +115,7 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_address_gen(
     return NULL;
   }
   address =
-      calloc(num_flex_trits_for_trits(HASH_LENGTH) + 1, sizeof(flex_trit_t));
+      calloc(NUM_FLEX_TRITS_FOR_TRITS(HASH_LENGTH) + 1, sizeof(flex_trit_t));
   if (!address) {
     goto cleanup;
   }
@@ -158,7 +158,7 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_signature_gen(
     return NULL;
   }
   signature =
-      calloc(num_flex_trits_for_trits(key_length) + 1, sizeof(flex_trit_t));
+      calloc(NUM_FLEX_TRITS_FOR_TRITS(key_length) + 1, sizeof(flex_trit_t));
   if (!signature) {
     goto cleanup;
   }

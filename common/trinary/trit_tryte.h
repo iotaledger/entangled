@@ -17,6 +17,7 @@ extern "C" {
 #include "common/trinary/tryte.h"
 
 #define RADIX 3
+#define NUMBER_OF_TRITS_IN_A_TRYTE 3
 
 size_t num_trytes_for_trits(size_t num_trits);
 trit_t get_trit_at(tryte_t *const trytes, size_t const length, size_t index);
