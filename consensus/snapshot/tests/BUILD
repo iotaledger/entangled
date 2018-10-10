@@ -4,6 +4,7 @@ cc_test(
     data = [
         "snapshot.txt",
         "snapshot_badly_formatted.txt",
+        "snapshot_conf.txt",
         "snapshot_inconsistent.txt",
         "snapshot_invalid_supply.txt",
     ],
