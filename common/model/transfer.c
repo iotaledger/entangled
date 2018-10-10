@@ -492,7 +492,7 @@ void transfer_iterator_next_data_transaction(
   // Length of the message data for the current transaction
   size_t len = data_len - offset;
   len = len > NUM_TRITS_SIGNATURE ? NUM_TRITS_SIGNATURE : len;
-  size_t flex_size = num_flex_trits_for_trits(len);
+  size_t flex_size = NUM_FLEX_TRITS_FOR_TRITS(len);
   flex_trit_t *trits = transaction_message(transfer_iterator->transaction);
   memset(trits, FLEX_TRIT_NULL_VALUE, flex_size);
   flex_trits_slice(trits, flex_size, data, data_len, offset, len);

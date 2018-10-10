@@ -9,7 +9,6 @@
 
 #include "trit_tryte.h"
 
-#define NUMBER_OF_TRITS_IN_A_TRYTE 3
 #define TRYTE_SPACE 27
 #define TRYTE_STRING "9ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 #define TRITS_TO_TRYTES_MAP                                                 \
