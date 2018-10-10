@@ -64,7 +64,7 @@ IOTA_EXPORT flex_trit_t* iota_flex_checksum(const flex_trit_t* flex_trits,
   kerl_hash(trits, num_trits, trits_hash, &kerl);
   free(trits);
 
-  size_t flex_len = num_flex_trits_for_trits(num_trits);
+  size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(num_trits);
   flex_trit_t* checksum_flex_trits =
       (flex_trit_t*)calloc(flex_len, sizeof(flex_trit_t));
   if (!checksum_flex_trits) {

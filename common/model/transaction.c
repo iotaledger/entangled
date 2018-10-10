@@ -141,7 +141,7 @@ size_t transaction_serialize_to_flex_trits(const iota_transaction_t transaction,
                                            flex_trit_t *trits) {
   flex_trit_t partial[FLEX_TRIT_SIZE_81];
   size_t offset = 0, long_size;
-  size_t num_bytes = num_flex_trits_for_trits(NUM_TRITS_SERIALIZED_TRANSACTION);
+  size_t num_bytes = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_SERIALIZED_TRANSACTION);
   memset(trits, FLEX_TRIT_NULL_VALUE, num_bytes);
 
   flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,

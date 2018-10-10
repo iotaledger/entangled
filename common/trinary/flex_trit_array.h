@@ -41,7 +41,7 @@ class FlexTritArray {
   /// @param[in] num_trits - number of trits to store
   /// @return size_t - the number of bytes need
   static size_t numBytesForTrits(size_t num_trits) {
-    return num_flex_trits_for_trits(num_trits);
+    return NUM_FLEX_TRITS_FOR_TRITS(num_trits);
   };
 
   /// Returns a new FlexTritArray from a vector of trits.
