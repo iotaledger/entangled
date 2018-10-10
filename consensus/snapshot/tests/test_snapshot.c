@@ -16,8 +16,6 @@
 snapshot_t snapshot;
 
 void test_snapshot_conf() {
-  tryte_t hash[NUM_TRYTES_ADDRESS];
-
   TEST_ASSERT(iota_snapshot_init(
                   &snapshot, "consensus/snapshot/tests/snapshot.txt",
                   "consensus/snapshot/tests/snapshot.sig",
@@ -26,12 +24,8 @@ void test_snapshot_conf() {
   TEST_ASSERT_EQUAL_INT(snapshot.conf.signature_index, 9);
   TEST_ASSERT_EQUAL_INT(snapshot.conf.signature_depth, 6);
   TEST_ASSERT_EQUAL_INT(snapshot.conf.last_milestone, 774804);
-  flex_trits_to_trytes(hash, NUM_TRYTES_ADDRESS, snapshot.conf.signature_pubkey,
-                       NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
-  TEST_ASSERT_EQUAL_MEMORY(hash, (tryte_t*)"TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD9CZUYAC", NUM_TRYTES_ADDRESS);
-  flex_trits_to_trytes(hash, NUM_TRYTES_ADDRESS, snapshot.conf.coordinator,
-                       NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
-  TEST_ASSERT_EQUAL_MEMORY(hash, (tryte_t*)"KPWCHICGJZXKE9GSUDXZYUAPLHAKAHYHDXNPHENTERYMMBQOPSQIDENXKLKCEYCPVTZQLEEJVYJZV9BWU", NUM_TRYTES_ADDRESS);
+  TEST_ASSERT_EQUAL_MEMORY(snapshot.conf.signature_pubkey, (tryte_t*)"TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD9CZUYAC", NUM_TRYTES_ADDRESS);
+  TEST_ASSERT_EQUAL_MEMORY(snapshot.conf.coordinator, (tryte_t*)"KPWCHICGJZXKE9GSUDXZYUAPLHAKAHYHDXNPHENTERYMMBQOPSQIDENXKLKCEYCPVTZQLEEJVYJZV9BWU", NUM_TRYTES_ADDRESS);
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 

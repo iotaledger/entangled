@@ -140,20 +140,18 @@ static retcode_t get_snapshot_conf(char const *const snapshot_conf_file,
   conf->signature_depth = tmp->valueint;
 
   tmp = cJSON_GetObjectItemCaseSensitive(signature, "pubkey");
-  if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL) {
+  if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL ||
+      strlen(tmp->valuestring) != HASH_LENGTH_TRYTE) {
     goto json_error;
   }
-  flex_trits_from_trytes(conf->signature_pubkey, NUM_TRITS_ADDRESS,
-                         (tryte_t *)tmp->valuestring, NUM_TRYTES_ADDRESS,
-                         NUM_TRYTES_ADDRESS);
+  memcpy(conf->signature_pubkey, tmp->valuestring, HASH_LENGTH_TRYTE);
 
   tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "pubkey");
-  if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL) {
+  if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL ||
+      strlen(tmp->valuestring) != HASH_LENGTH_TRYTE) {
     goto json_error;
   }
-  flex_trits_from_trytes(conf->coordinator, NUM_TRITS_ADDRESS,
-                         (tryte_t *)tmp->valuestring, NUM_TRYTES_ADDRESS,
-                         NUM_TRYTES_ADDRESS);
+  memcpy(conf->coordinator, tmp->valuestring, HASH_LENGTH_TRYTE);
 
   tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "lastMilestone");
   if (tmp == NULL || !cJSON_IsNumber(tmp)) {
@@ -212,8 +210,9 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot,
   if (!testnet) {
     bool valid = false;
     if ((ret = iota_file_signature_validate(
-             snapshot_file, snapshot_sig_file, (tryte_t *)SNAPSHOT_PUBKEY,
-             SNAPSHOT_PUBKEY_DEPTH, SNAPSHOT_INDEX, &valid)) != RC_OK) {
+             snapshot_file, snapshot_sig_file, snapshot->conf.signature_pubkey,
+             snapshot->conf.signature_depth, snapshot->conf.signature_index,
+             &valid)) != RC_OK) {
       log_critical(SNAPSHOT_LOGGER_ID,
                    "Validating snapshot signature failed\n");
       return ret;

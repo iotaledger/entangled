@@ -17,13 +17,6 @@
 #include "consensus/snapshot/state_delta.h"
 #include "utils/handles/rw_lock.h"
 
-#define SNAPSHOT_PUBKEY                                                        \
-  "TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD" \
-  "9CZUYAC"
-#define SNAPSHOT_PUBKEY_DEPTH 6UL
-#define SNAPSHOT_INDEX 4UL
-#define SNAPSHOT_TIMESTAMP 1537203600UL
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,8 +25,8 @@ typedef struct snapshot_conf_s {
   uint64_t timestamp;
   uint64_t signature_index;
   uint64_t signature_depth;
-  flex_trit_t signature_pubkey[FLEX_TRIT_SIZE_243];
-  flex_trit_t coordinator[FLEX_TRIT_SIZE_243];
+  tryte_t signature_pubkey[HASH_LENGTH_TRYTE];
+  tryte_t coordinator[HASH_LENGTH_TRYTE];
   uint64_t last_milestone;
 } snapshot_conf_t;
 
