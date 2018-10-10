@@ -6,6 +6,7 @@
  */
 
 #include "consensus/consensus.h"
+#include "ciri/conf/conf_values.h"
 #include "utils/logger_helper.h"
 
 #define CONSENSUS_LOGGER_ID "consensus"
@@ -13,10 +14,6 @@
 // FIXME: waiting for a stable location of these files
 #define CIRI_SNAPSHOT_FILE "ciri/snapshotTestnet.txt"
 #define CIRI_SNAPSHOT_SIG_FILE "ciri/snapshotTestnet.sig"
-
-static enum cw_calculation_implementation cw_calc_impl = DFS_FROM_ENTRY_POINT;
-static enum ep_randomizer_implementation ep_rand_impl = EP_RANDOM_WALK;
-static double alpha = 0.001;
 
 retcode_t iota_consensus_init(iota_consensus_t *const consensus,
                               connection_config_t const *const db_conf,
@@ -35,10 +32,10 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   log_info(CONSENSUS_LOGGER_ID,
            "Initializing cumulative weight rating calculator\n");
   if ((ret = iota_consensus_cw_rating_init(&consensus->cw_rating_calculator,
-                                           &consensus->tangle, cw_calc_impl)) !=
+                                           &consensus->tangle, CW_CALC_IMPL)) !=
       RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
-                 "Initializing cumulative weight rating calculator\n");
+                 "Initializing cumulative weight rating calculator failed\n");
     return ret;
   }
 
@@ -53,20 +50,20 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing exit probability randomizer\n");
   if ((ret = iota_consensus_ep_randomizer_init(&consensus->tangle,
-                                               &consensus->ep_randomizer, alpha,
-                                               ep_rand_impl)) != RC_OK) {
+                                               &consensus->ep_randomizer, ALPHA,
+                                               EP_RAND_IMPL)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing exit probability randomizer failed\n");
     return ret;
   }
 
-  // TODO fill params
   log_info(CONSENSUS_LOGGER_ID,
            "Initializing exit probability transaction validator\n");
   if ((ret = iota_consensus_exit_prob_transaction_validator_init(
            &consensus->tangle, &consensus->milestone_tracker,
            &consensus->ledger_validator,
-           &consensus->exit_prob_transaction_validator, 0, 0)) != RC_OK) {
+           &consensus->exit_prob_transaction_validator, MAX_ANALYZED_TXS,
+           MAX_DEPTH)) != RC_OK) {
     log_critical(
         CONSENSUS_LOGGER_ID,
         "Initializing exit probability transaction validator failed\n");
@@ -96,23 +93,22 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
     return ret;
   }
 
-  // TODO fill params
   log_info(CONSENSUS_LOGGER_ID, "Initializing tip selection\n");
   if ((ret = iota_consensus_tipselection_init(
            &consensus->tipselection, &consensus->tangle,
            &consensus->ledger_validator,
            &consensus->exit_prob_transaction_validator,
            &consensus->cw_rating_calculator, &consensus->milestone_tracker,
-           &consensus->entry_point_selector, &consensus->ep_randomizer, alpha,
-           0, 0)) != RC_OK) {
+           &consensus->entry_point_selector, &consensus->ep_randomizer, ALPHA,
+           MAX_ANALYZED_TXS, MAX_DEPTH)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Initializing tip selection failed\n");
     return ret;
   }
 
-  // TODO fill params
   log_info(CONSENSUS_LOGGER_ID, "Initializing transaction validator\n");
   if ((ret = iota_consensus_transaction_validator_init(
-           &consensus->transaction_validator, 0, 0)) != RC_OK) {
+           &consensus->transaction_validator, SNAPSHOT_TIMESTAMP * 1000,
+           (testnet ? TESTNET_MWM : MAINNET_MWM))) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing transaction validator failed\n");
     return ret;
