@@ -520,7 +520,7 @@ void test_1_bundle(void) {
 
   cw_calc_result out;
 
-  for (uint i = 0; i < bundle_size; ++i) {
+  for (unsigned int i = 0; i < bundle_size; ++i) {
     TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(
                     &tangle, txs[i]->hash, &pack) == RC_OK);
   }
