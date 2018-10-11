@@ -70,82 +70,28 @@ static retcode_t select_approver(
 
 static retcode_t find_tail_if_valid(
     const ep_randomizer_t *exit_probability_randomizer,
-    const trit_array_t *tx_hash, trit_array_t *tail_hash, bool *found_tail) {
-  retcode_t res;
+    const exit_prob_transaction_validator_t *epv, trit_array_t *tx_hash,
+    bool *found_tail) {
+  retcode_t ret = RC_OK;
 
-  struct _iota_transaction next_tx_s;
-  iota_transaction_t next_tx = &next_tx_s;
-  flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
-  bool found_approver = false;
-  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, tx_pack);
   *found_tail = false;
-
-  res = iota_tangle_transaction_load(exit_probability_randomizer->tangle,
-                                     TRANSACTION_COL_HASH, tx_hash, &tx_pack);
-  if (res != RC_OK || tx_pack.num_loaded == 0) {
-    return res;
+  ret = iota_tangle_find_tail(exit_probability_randomizer->tangle, tx_hash,
+                              tx_hash, found_tail);
+  if (ret != RC_OK) {
+    log_error(RANDOM_WALKER_LOGGER_ID, "Finding tail failed: %" PRIu64 "\n",
+              ret);
+    return ret;
   }
-
-  curr_tx = (iota_transaction_t)(tx_pack.models[0]);
-
-  uint32_t index = curr_tx->current_index;
-  memcpy(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243);
-
-  iota_stor_pack_t hash_pack;
-  if ((res = hash_pack_init(&hash_pack, 10)) != RC_OK) {
-    return res;
+  if (*found_tail) {
+    // ret = iota_consensus_exit_prob_transaction_validator_is_valid(epv,
+    // tx_hash, found_tail);
+    // if (ret != RC_OK) {
+    //   log_error(RANDOM_WALKER_LOGGER_ID,
+    //             "Tail tranaction validation failed: %" PRIu64 "\n", ret);
+    //   return ret;
+    // }
   }
-
-  while (res == RC_OK && index > 0 &&
-         memcmp(curr_tx->bundle, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
-    hash_pack.num_loaded = 0;
-    hash_pack.insufficient_capacity = false;
-    res = iota_tangle_transaction_load_hashes_of_approvers(
-        exit_probability_randomizer->tangle, curr_tx->hash, &hash_pack);
-
-    if (res != RC_OK) {
-      log_error(RANDOM_WALKER_LOGGER_ID,
-                "Failed in loading approvers, error code is: %" PRIu64 "\n",
-                res);
-      break;
-    }
-
-    --index;
-    uint32_t approver_idx = 0;
-    found_approver = false;
-    while (approver_idx < hash_pack.num_loaded) {
-      trit_array_p approver_hash =
-          (trit_array_t *)hash_pack.models[approver_idx];
-      tx_pack.models = (void **)(&next_tx);
-      hash_pack_reset(&tx_pack);
-      res = iota_tangle_transaction_load(exit_probability_randomizer->tangle,
-                                         TRANSACTION_COL_HASH, approver_hash,
-                                         &tx_pack);
-      if (res != RC_OK || tx_pack.num_loaded == 0) {
-        break;
-      }
-      if (next_tx->current_index == index &&
-          memcmp(next_tx->bundle, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
-        curr_tx = next_tx;
-        found_approver = true;
-        break;
-      }
-    }
-
-    if (!found_approver) {
-      break;
-    }
-  }
-
-  if (curr_tx->current_index == 0) {
-    memcpy(tail_hash->trits, curr_tx->hash, FLEX_TRIT_SIZE_243);
-    tail_hash->num_bytes = FLEX_TRIT_SIZE_243;
-    *found_tail = true;
-  }
-
-  hash_pack_free(&hash_pack);
-
-  return res;
+  return ret;
 }
 
 static retcode_t random_walker_select_approver_tail(
@@ -176,7 +122,7 @@ static retcode_t random_walker_select_approver_tail(
       return ret;
     }
     if (has_next_approver) {
-      ret = find_tail_if_valid(exit_probability_randomizer, approver, approver,
+      ret = find_tail_if_valid(exit_probability_randomizer, epv, approver,
                                found_approver_tail);
       if (ret != RC_OK) {
         *found_approver_tail = false;
