@@ -86,6 +86,14 @@ extern retcode_t iota_tangle_milestone_exist(const tangle_t *const tangle,
                                              const trit_array_p key,
                                              bool *exist);
 
+/*
+ * Utilities
+ */
+
+retcode_t iota_tangle_find_tail(const tangle_t *const tangle,
+                                trit_array_t *tx_hash, trit_array_t *tail,
+                                bool *found_tail);
+
 #ifdef __cplusplus
 }
 #endif
