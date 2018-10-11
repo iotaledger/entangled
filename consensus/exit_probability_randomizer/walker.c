@@ -12,6 +12,7 @@
 
 #include "consensus/exit_probability_randomizer/walker.h"
 #include "utils/logger_helper.h"
+#include "utils/macros.h"
 
 #define RANDOM_WALKER_LOGGER_ID "consensus_random_walker"
 
@@ -33,6 +34,8 @@ static retcode_t select_approver(
   size_t num_approvers = HASH_COUNT(*approvers);
   int64_t weights[num_approvers];
   double sum_weights = 0;
+  double target = 0;
+  int64_t max_weight = 0;
   size_t idx = 0;
 
   *has_next_approver = false;
@@ -40,14 +43,12 @@ static retcode_t select_approver(
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
     HASH_FIND(hh, cw_ratings, curr_approver->hash, FLEX_TRIT_SIZE_243,
               curr_rating);
-    weights[idx++] = curr_rating->value;
-  }
-
-  int64_t max_weight = 0;
-  for (idx = 0; idx < num_approvers; ++idx) {
-    if (weights[idx] > max_weight) {
-      max_weight = weights[idx];
+    if (curr_rating == NULL) {
+      log_error(RANDOM_WALKER_LOGGER_ID, "No rating found for approver\n");
+      return RC_CONSENSUS_EXIT_PROBABILITIES_MISSING_RATING;
     }
+    weights[idx++] = curr_rating->value;
+    max_weight = MAX(max_weight, curr_rating->value);
   }
 
   for (idx = 0; idx < num_approvers; ++idx) {
@@ -56,19 +57,12 @@ static retcode_t select_approver(
     sum_weights += weights[idx];
   }
 
-  double target = ((double)rand() / (double)RAND_MAX) * sum_weights;
   idx = 0;
-  while (target > 0 && idx < num_approvers) {
-    target -= weights[idx++];
-  }
-  --idx;
-
-  size_t iter_idx = 0;
+  target = ((double)rand() / (double)RAND_MAX) * sum_weights;
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
-    if (iter_idx++ == idx) {
+    if ((target = (target - weights[idx++])) <= 0) {
       *has_next_approver = true;
       memcpy(approver->trits, curr_approver->hash, FLEX_TRIT_SIZE_243);
-      approver->num_bytes = FLEX_TRIT_SIZE_243;
       break;
     }
   }
@@ -113,7 +107,7 @@ static retcode_t find_tail_if_valid(
         exit_probability_randomizer->tangle, curr_tx->hash, &hash_pack);
 
     if (res != RC_OK) {
-      log_error(CW_RATING_CALCULATOR_LOGGER_ID,
+      log_error(RANDOM_WALKER_LOGGER_ID,
                 "Failed in loading approvers, error code is: %" PRIu64 "\n",
                 res);
       break;
@@ -201,8 +195,8 @@ static retcode_t random_walker_select_approver_tail(
         HASH_FIND(hh, curr_approver_entry->approvers, approver.trits,
                   FLEX_TRIT_SIZE_243, curr_approver);
         HASH_DEL(curr_approver_entry->approvers, curr_approver);
-        // if next tail is not valid, re-select while removing it from approvers
-        // set
+        // if next tail is not valid, re-select while removing it from
+        // approvers set
       }
     }
   }
