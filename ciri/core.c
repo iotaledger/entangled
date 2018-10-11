@@ -22,13 +22,7 @@ retcode_t core_init(core_t* const core) {
   logger_helper_init(CORE_LOGGER_ID, LOGGER_DEBUG, true);
   core->running = false;
 
-  connection_config_t db_conf = {.db_path = CIRI_DB_PATH,
-                                 .index_transaction_address = true,
-                                 .index_transaction_approvee = true,
-                                 .index_transaction_bundle = true,
-                                 .index_transaction_tag = true,
-                                 .index_transaction_hash = true,
-                                 .index_milestone_hash = true};
+  connection_config_t db_conf = {.db_path = CIRI_DB_PATH};
 
   log_info(CORE_LOGGER_ID, "Initializing consensus\n");
   if (iota_consensus_init(&core->consensus, &db_conf,
