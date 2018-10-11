@@ -39,11 +39,13 @@ typedef struct node_s {
  *
  * @param node The node
  * @param core A core
+ * @param tangle A tangle
  * @param transaction_requester A transaction requester
  *
  * @return a status code
  */
 retcode_t node_init(node_t* const node, core_t* const core,
+                    tangle_t* const tangle,
                     requester_state_t* const transaction_requester);
 
 /**

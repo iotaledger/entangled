@@ -34,9 +34,8 @@ static retcode_t regular_transaction_request(
                            .capacity = 1,
                            .num_loaded = 0,
                            .insufficient_capacity = false};
-  if ((ret = iota_tangle_transaction_load(&state->node->core->tangle,
-                                          TRANSACTION_COL_HASH, request->hash,
-                                          &pack))) {
+  if ((ret = iota_tangle_transaction_load(state->tangle, TRANSACTION_COL_HASH,
+                                          request->hash, &pack))) {
     return ret;
   }
   if (pack.num_loaded == 0) {
@@ -128,7 +127,8 @@ static void *responder_routine(responder_state_t *const state) {
   return NULL;
 }
 
-retcode_t responder_init(responder_state_t *const state, node_t *const node) {
+retcode_t responder_init(responder_state_t *const state, node_t *const node,
+                         tangle_t *const tangle) {
   if (state == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_STATE;
   } else if (node == NULL) {
@@ -139,6 +139,7 @@ retcode_t responder_init(responder_state_t *const state, node_t *const node) {
   memset(state, 0, sizeof(responder_state_t));
   state->running = false;
   state->node = node;
+  state->tangle = tangle;
 
   log_debug(RESPONDER_COMPONENT_LOGGER_ID, "Initializing responder queue\n");
   if (CQ_INIT(transaction_request_t, state->queue) != CQ_SUCCESS) {

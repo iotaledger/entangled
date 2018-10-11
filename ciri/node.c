@@ -50,6 +50,7 @@ static retcode_t node_neighbors_init(node_t* const node) {
 // Public functions
 
 retcode_t node_init(node_t* const node, core_t* const core,
+                    tangle_t* const tangle,
                     requester_state_t* const transaction_requester) {
   if (node == NULL) {
     return RC_NODE_NULL_NODE;
@@ -76,7 +77,7 @@ retcode_t node_init(node_t* const node, core_t* const core,
   }
 
   log_info(NODE_LOGGER_ID, "Initializing processor component\n");
-  if (processor_init(&node->processor, node, core->config.testnet)) {
+  if (processor_init(&node->processor, node, tangle, core->config.testnet)) {
     log_critical(NODE_LOGGER_ID, "Initializing processor component failed\n");
     return RC_NODE_FAILED_PROCESSOR_INIT;
   }
@@ -90,7 +91,7 @@ retcode_t node_init(node_t* const node, core_t* const core,
   }
 
   log_info(NODE_LOGGER_ID, "Initializing responder component\n");
-  if (responder_init(&node->responder, node)) {
+  if (responder_init(&node->responder, node, tangle)) {
     log_critical(NODE_LOGGER_ID, "Initializing responder component failed\n");
     return RC_NODE_FAILED_RESPONDER_INIT;
   }
