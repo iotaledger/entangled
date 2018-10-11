@@ -306,12 +306,6 @@ int main(int argc, char *argv[]) {
   }
 
   config.db_path = test_db_path;
-  config.index_transaction_address = true;
-  config.index_transaction_approvee = true;
-  config.index_transaction_bundle = true;
-  config.index_transaction_tag = true;
-  config.index_transaction_hash = true;
-  config.index_milestone_hash = true;
 
   RUN_TEST(test_transaction_does_not_exist);
   RUN_TEST(test_transaction_not_a_tail);
