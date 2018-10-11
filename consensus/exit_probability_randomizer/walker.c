@@ -13,7 +13,7 @@
 #include "consensus/exit_probability_randomizer/walker.h"
 #include "utils/logger_helper.h"
 
-#define RANDOM_WALKER_ID "consensus_random_walker"
+#define RANDOM_WALKER_LOGGER_ID "consensus_random_walker"
 
 void init_ep_randomizer_walker(ep_randomizer_t *randomizer) {
   randomizer->base.vtable = random_walk_vtable;
@@ -158,9 +158,10 @@ static retcode_t find_tail_if_valid(
 }
 
 static retcode_t random_walker_select_approver_tail(
-    const ep_randomizer_t *exit_probability_randomizer, flex_trit_t *curr_tail,
-    cw_calc_result *cw_result, const exit_prob_transaction_validator_t *epv,
-    trit_array_t *approver_tail_hash, bool *found_approver_tail) {
+    const ep_randomizer_t *exit_probability_randomizer,
+    const exit_prob_transaction_validator_t *epv, flex_trit_t *curr_tail,
+    cw_calc_result *cw_result, trit_array_t *approver_tail_hash,
+    bool *found_approver_tail) {
   retcode_t ret = RC_OK;
   bool has_next_approver;
   hash_to_indexed_hash_set_entry_t *curr_approver_entry = NULL;
@@ -217,48 +218,43 @@ retcode_t iota_consensus_random_walker_randomize(
     const exit_prob_transaction_validator_t *ep_validator,
     cw_calc_result *cw_result, const trit_array_p ep, trit_array_p tip) {
   retcode_t ret = RC_OK;
-  bool is_valid = false;
-  flex_trit_t curr_tail_hash[FLEX_TRIT_SIZE_243];
-  bool has_next_approver_tail = false;
-  size_t num_traversed_tails = 0;
-  trit_array_t next_approver_tail;
+  bool ep_is_valid = false;
+  bool has_approver_tail = false;
+  size_t num_traversed_tails = 1;
+  flex_trit_t *curr_tail = ep->trits;
   flex_trit_t approver_tail_trits[FLEX_TRIT_SIZE_243];
-  next_approver_tail.trits = approver_tail_trits;
-  next_approver_tail.num_bytes = FLEX_TRIT_SIZE_243;
+  trit_array_t approver_tail = {.trits = approver_tail_trits,
+                                .num_trits = HASH_LENGTH_TRIT,
+                                .num_bytes = FLEX_TRIT_SIZE_243,
+                                .dynamic = 0};
 
-  ret = iota_consensus_exit_prob_transaction_validator_is_valid(ep_validator,
-                                                                ep, &is_valid);
-  if (ret) {
-    log_error(RANDOM_WALKER_ID,
-              "Failed in entrypoint validation: %" PRIu64 "\n", ret);
+  ret = iota_consensus_exit_prob_transaction_validator_is_valid(
+      ep_validator, ep, &ep_is_valid);
+  if (ret != RC_OK) {
+    log_error(RANDOM_WALKER_LOGGER_ID,
+              "Entry point validation failed: %" PRIu64 "\n", ret);
     return ret;
-  }
-
-  if (!is_valid) {
-    log_error(RANDOM_WALKER_ID,
-              "Failed in entrypoint validation, entry point is not valid");
+  } else if (!ep_is_valid) {
+    log_error(RANDOM_WALKER_LOGGER_ID, "Invalid entry point\n");
     return RC_CONSENSUS_EXIT_PROBABILITIES_INVALID_ENTRYPOINT;
   }
 
-  memcpy(curr_tail_hash, ep->trits, ep->num_bytes);
-  num_traversed_tails++;
-
   do {
     ret = random_walker_select_approver_tail(
-        exit_probability_randomizer, curr_tail_hash, cw_result, ep_validator,
-        &next_approver_tail, &has_next_approver_tail);
-    if (ret) {
+        exit_probability_randomizer, ep_validator, curr_tail, cw_result,
+        &approver_tail, &has_approver_tail);
+    if (ret != RC_OK) {
+      log_error(RANDOM_WALKER_LOGGER_ID,
+                "Selecting approver tail failed: %" PRIu64 "\n", ret);
       return ret;
-    } else if (has_next_approver_tail) {
-      memcpy(curr_tail_hash, next_approver_tail.trits,
-             next_approver_tail.num_bytes);
+    } else if (has_approver_tail) {
+      curr_tail = approver_tail_trits;
       num_traversed_tails++;
     }
-  } while (has_next_approver_tail);
+  } while (has_approver_tail);
 
-  memcpy(tip->trits, curr_tail_hash, FLEX_TRIT_SIZE_243);
-  //(traversed_tails, tmp_element, num_traversed_tails);
-  log_debug(RANDOM_WALKER_ID,
+  memcpy(tip->trits, curr_tail, FLEX_TRIT_SIZE_243);
+  log_debug(RANDOM_WALKER_LOGGER_ID,
             "Number of tails traversed to find tip: %" PRIu64 "\n",
             num_traversed_tails);
 
