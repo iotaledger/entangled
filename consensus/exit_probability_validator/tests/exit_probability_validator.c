@@ -30,9 +30,9 @@ static char *test_db_path =
     "consensus/exit_probability_validator/tests/test.db";
 static char *ciri_db_path =
     "consensus/exit_probability_validator/tests/ciri.db";
-
 static char *snapshot_path =
     "consensus/exit_probability_validator/tests/snapshot.txt";
+static char *snapshot_conf_path = "consensus/snapshot/tests/snapshot_conf.txt";
 
 static uint32_t max_depth = 15;
 static uint32_t max_txs_below_max_depth = 10;
@@ -43,8 +43,8 @@ static milestone_tracker_t mt;
 static ledger_validator_t lv;
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
-  TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL, true) ==
-              RC_OK);
+  TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL,
+                                 snapshot_conf_path, true) == RC_OK);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, true) ==
               RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &mt, NULL) ==

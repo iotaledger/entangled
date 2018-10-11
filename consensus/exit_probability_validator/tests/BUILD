@@ -4,8 +4,9 @@ cc_test(
         "exit_probability_validator.c",
     ],
     data = [
-        "snapshot.txt",
         ":db_file",
+        ":snapshot.txt",
+        "//consensus/snapshot/tests:snapshot_test_files",
     ],
     visibility = ["//visibility:public"],
     deps = [
