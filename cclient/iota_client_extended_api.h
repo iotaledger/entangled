@@ -14,7 +14,6 @@
 extern "C" {
 #endif
 
-//----TODO objects----------
 typedef flex_hash_array_t hashes_t;
 typedef flex_hash_array_t address_list_t;
 typedef flex_hash_array_t inputs_list_t;
@@ -50,7 +49,6 @@ typedef struct {
   int32_t start;
   int32_t end;
 } address_opt_t;
-//---------END of TODO objects-------------
 
 /**
  * Re-broadcasts all transactions in a bundle given the tail transaction hash.
