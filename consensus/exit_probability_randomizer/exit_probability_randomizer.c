@@ -9,14 +9,14 @@
 #include "consensus/exit_probability_randomizer/walker.h"
 #include "utils/logger_helper.h"
 
-#define EXIT_PROBABILITY_RANDOMIZER_ID "consensus_exit_probability_randomizer"
+#define EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID \
+  "consensus_exit_probability_randomizer"
 
 retcode_t iota_consensus_ep_randomizer_init(
     tangle_t *const tangle, ep_randomizer_t *ep_randomizer, double alpha,
     enum ep_randomizer_implementation impl) {
-  logger_helper_init(EXIT_PROBABILITY_RANDOMIZER_ID, LOGGER_DEBUG, true);
-  int seed = time(NULL);
-  srand(seed);
+  logger_helper_init(EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID, LOGGER_DEBUG, true);
+  srand(time(NULL));
   ep_randomizer->tangle = tangle;
   ep_randomizer->alpha = alpha;
   if (impl == EP_RANDOM_WALK) {
@@ -28,7 +28,7 @@ retcode_t iota_consensus_ep_randomizer_init(
 }
 
 retcode_t iota_consensus_ep_randomizer_destroy(ep_randomizer_t *ep_randomizer) {
-  logger_helper_destroy(EXIT_PROBABILITY_RANDOMIZER_ID);
+  logger_helper_destroy(EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID);
   ep_randomizer->tangle = NULL;
   return RC_OK;
 }
