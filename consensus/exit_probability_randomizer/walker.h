@@ -9,14 +9,11 @@
 #define __CONCENSUS_EXIT_PROBABILITY_RANDOMIZER_WALKER_H__
 
 #include <stdbool.h>
-#include <stdint.h>
-#include "common/errors.h"
 
-#include "common/storage/connection.h"
+#include "common/errors.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
-#include "consensus/tangle/tangle.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -8,8 +8,6 @@
 #include <inttypes.h>
 #include <math.h>
 
-#include "utlist.h"
-
 #include "consensus/exit_probability_randomizer/walker.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
@@ -84,7 +82,6 @@ static retcode_t find_tail_if_valid(
 
   res = iota_tangle_transaction_load(exit_probability_randomizer->tangle,
                                      TRANSACTION_COL_HASH, tx_hash, &tx_pack);
-
   if (res != RC_OK || tx_pack.num_loaded == 0) {
     return res;
   }
@@ -153,48 +150,42 @@ static retcode_t find_tail_if_valid(
 
 static retcode_t random_walker_select_approver_tail(
     const ep_randomizer_t *exit_probability_randomizer,
-    const exit_prob_transaction_validator_t *epv, flex_trit_t *curr_tail,
-    cw_calc_result *cw_result, trit_array_t *approver_tail_hash,
+    const exit_prob_transaction_validator_t *epv, cw_calc_result *cw_result,
+    flex_trit_t *curr_tail_hash, trit_array_t *approver,
     bool *found_approver_tail) {
   retcode_t ret = RC_OK;
-  bool has_next_approver;
-  hash_to_indexed_hash_set_entry_t *curr_approver_entry = NULL;
-  hash_set_entry_t *curr_approver = NULL;
-  trit_array_t approver;
-  flex_trit_t approver_trits[FLEX_TRIT_SIZE_243];
-  approver.trits = (flex_trit_t *)&approver_trits;
-
-  memcpy(approver.trits, curr_tail, FLEX_TRIT_SIZE_243);
-  approver.num_bytes = FLEX_TRIT_SIZE_243;
+  bool has_next_approver = false;
+  hash_to_indexed_hash_set_entry_t *approvers_entry = NULL;
+  hash_set_entry_t *approver_entry = NULL;
 
   *found_approver_tail = false;
-  HASH_FIND(hh, cw_result->tx_to_approvers, curr_tail, FLEX_TRIT_SIZE_243,
-            curr_approver_entry);
 
-  if (!curr_approver_entry) {
-    *found_approver_tail = false;
+  HASH_FIND(hh, cw_result->tx_to_approvers, curr_tail_hash, FLEX_TRIT_SIZE_243,
+            approvers_entry);
+  if (!approvers_entry) {
     return RC_OK;
   }
 
   while (!(*found_approver_tail) &&
-         HASH_COUNT(curr_approver_entry->approvers) > 0) {
+         HASH_COUNT(approvers_entry->approvers) > 0) {
     ret = select_approver(exit_probability_randomizer, cw_result->cw_ratings,
-                          &curr_approver_entry->approvers, &approver,
+                          &approvers_entry->approvers, approver,
                           &has_next_approver);
     if (ret != RC_OK) {
       *found_approver_tail = false;
       return ret;
     }
     if (has_next_approver) {
-      ret = find_tail_if_valid(exit_probability_randomizer, &approver,
-                               approver_tail_hash, found_approver_tail);
+      ret = find_tail_if_valid(exit_probability_randomizer, approver, approver,
+                               found_approver_tail);
       if (ret != RC_OK) {
+        *found_approver_tail = false;
         return ret;
       }
       if (!(*found_approver_tail)) {
-        HASH_FIND(hh, curr_approver_entry->approvers, approver.trits,
-                  FLEX_TRIT_SIZE_243, curr_approver);
-        HASH_DEL(curr_approver_entry->approvers, curr_approver);
+        HASH_FIND(hh, approvers_entry->approvers, approver->trits,
+                  FLEX_TRIT_SIZE_243, approver_entry);
+        HASH_DEL(approvers_entry->approvers, approver_entry);
         // if next tail is not valid, re-select while removing it from
         // approvers set
       }
@@ -215,9 +206,9 @@ retcode_t iota_consensus_random_walker_randomize(
   bool ep_is_valid = false;
   bool has_approver_tail = false;
   size_t num_traversed_tails = 1;
-  flex_trit_t *curr_tail = ep->trits;
-  flex_trit_t approver_tail_trits[FLEX_TRIT_SIZE_243];
-  trit_array_t approver_tail = {.trits = approver_tail_trits,
+  flex_trit_t *curr_tail_hash = ep->trits;
+  flex_trit_t approver_tail_hash[FLEX_TRIT_SIZE_243];
+  trit_array_t approver_tail = {.trits = approver_tail_hash,
                                 .num_trits = HASH_LENGTH_TRIT,
                                 .num_bytes = FLEX_TRIT_SIZE_243,
                                 .dynamic = 0};
@@ -235,19 +226,19 @@ retcode_t iota_consensus_random_walker_randomize(
 
   do {
     ret = random_walker_select_approver_tail(
-        exit_probability_randomizer, ep_validator, curr_tail, cw_result,
+        exit_probability_randomizer, ep_validator, cw_result, curr_tail_hash,
         &approver_tail, &has_approver_tail);
     if (ret != RC_OK) {
       log_error(RANDOM_WALKER_LOGGER_ID,
                 "Selecting approver tail failed: %" PRIu64 "\n", ret);
       return ret;
     } else if (has_approver_tail) {
-      curr_tail = approver_tail_trits;
+      curr_tail_hash = approver_tail_hash;
       num_traversed_tails++;
     }
   } while (has_approver_tail);
 
-  memcpy(tip->trits, curr_tail, FLEX_TRIT_SIZE_243);
+  memcpy(tip->trits, curr_tail_hash, FLEX_TRIT_SIZE_243);
   log_debug(RANDOM_WALKER_LOGGER_ID,
             "Number of tails traversed to find tip: %" PRIu64 "\n",
             num_traversed_tails);
