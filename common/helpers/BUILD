@@ -22,6 +22,7 @@ cc_library(
     hdrs = ["sign.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//common:defs",
         "//common/kerl",
         "//common/sign/v1:iss_kerl",
         "//common/trinary:flex_trit",
@@ -49,6 +50,7 @@ cc_library(
     hdrs = ["digest.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//common:defs",
         "//common/curl-p:digest",
         "//common/trinary:flex_trit",
         "//utils:export",
@@ -62,6 +64,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":digest",
+        "//common:defs",
         "//common/kerl:hash",
         "//common/sign/v1:iss_kerl",
         "//common/trinary:flex_trit",

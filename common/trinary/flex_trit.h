@@ -22,13 +22,11 @@ extern "C" {
 #include <stdbool.h>
 #include <string.h>
 
+#include "common/defs.h"
 #include "common/trinary/trit_byte.h"
 #include "common/trinary/trit_tryte.h"
 
 typedef int8_t flex_trit_t;
-
-#define NUM_TRITS_HASH 243
-#define NUM_TRYTES_HASH 81
 
 #if defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
 #define FLEX_TRIT_NULL_VALUE '9'

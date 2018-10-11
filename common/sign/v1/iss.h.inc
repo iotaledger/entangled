@@ -6,10 +6,8 @@
  */
 
 #include <string.h>
-#include "common/trinary/add.h"
 
-#define ISS_FRAGMENTS 27
-#define ISS_KEY_LENGTH (HASH_LENGTH * ISS_FRAGMENTS)
+#include "common/trinary/add.h"
 
 #define CAT(A, ...) _CAT(A, __VA_ARGS__)
 #define _CAT(A, ...) A##__VA_ARGS__

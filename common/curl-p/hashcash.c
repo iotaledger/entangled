@@ -7,9 +7,9 @@
 
 #include <stdio.h>
 
-#include "hashcash.h"
-#include "ptrit.h"
-#include "search.h"
+#include "common/curl-p/hashcash.h"
+#include "common/curl-p/ptrit.h"
+#include "common/curl-p/search.h"
 
 #ifdef _WIN32
 #define CTZLL(x) _tzcnt_u64(x)
@@ -20,7 +20,7 @@
 short test(PCurl *const curl, unsigned short const mwm) {
   unsigned short i;
   ptrit_s probe = HIGH_BITS;
-  for (i = HASH_LENGTH; i-- > HASH_LENGTH - mwm && probe != 0;) {
+  for (i = HASH_LENGTH_TRIT; i-- > HASH_LENGTH_TRIT - mwm && probe != 0;) {
     probe &= ~(curl->state[i].low ^ curl->state[i].high);
   }
   if (probe == 0) {

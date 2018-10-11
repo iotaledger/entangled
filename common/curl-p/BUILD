@@ -6,6 +6,7 @@ cc_library(
         "const.h",
         "indices.h",
     ],
+    deps = ["//common:defs"],
 )
 
 cc_library(

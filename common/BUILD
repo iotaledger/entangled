@@ -1,8 +1,8 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "stdint",
-    hdrs = ["stdint.h"],
+    name = "defs",
+    hdrs = ["defs.h"],
 )
 
 cc_library(
@@ -13,4 +13,9 @@ cc_library(
         "errors.h",
     ],
     hdrs = ["errors.h"],
+)
+
+cc_library(
+    name = "stdint",
+    hdrs = ["stdint.h"],
 )

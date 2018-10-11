@@ -9,9 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "trit_long.h"
-
-#define RADIX 3
+#include "common/defs.h"
+#include "common/trinary/trit_long.h"
 
 static trit_t const encoded_zero[] = {1, 0, 0, -1};
 static double const pow27LUT[] = {1,

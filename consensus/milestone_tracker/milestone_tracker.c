@@ -30,9 +30,9 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt,
                                       iota_transaction_t tx2, bool* valid) {
   trit_t signature_trits[NUM_TRITS_SIGNATURE];
   trit_t siblings_trits[NUM_TRITS_SIGNATURE];
-  trit_t normalized_trunk_trits[HASH_LENGTH];
-  trit_t sig_digest[HASH_LENGTH];
-  trit_t root[HASH_LENGTH];
+  trit_t normalized_trunk_trits[HASH_LENGTH_TRIT];
+  trit_t sig_digest[HASH_LENGTH_TRIT];
+  trit_t root[HASH_LENGTH_TRIT];
   flex_trit_t coo[FLEX_TRIT_SIZE_243];
   Curl curl;
 
@@ -50,10 +50,11 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt,
   iss_curl_sig_digest(sig_digest, normalized_trunk_trits, signature_trits,
                       NUM_TRITS_SIGNATURE, &curl);
   curl_reset(&curl);
-  iss_curl_address(sig_digest, root, HASH_LENGTH, &curl);
+  iss_curl_address(sig_digest, root, HASH_LENGTH_TRIT, &curl);
   merkle_root(root, siblings_trits, mt->num_keys_in_milestone, candidate->index,
               &curl);
-  flex_trits_from_trits(coo, HASH_LENGTH, root, HASH_LENGTH, HASH_LENGTH);
+  flex_trits_from_trits(coo, HASH_LENGTH_TRIT, root, HASH_LENGTH_TRIT,
+                        HASH_LENGTH_TRIT);
 
   if (memcmp(coo, mt->coordinator->trits, FLEX_TRIT_SIZE_243) == 0) {
     *valid = true;

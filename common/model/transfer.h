@@ -17,9 +17,6 @@ extern "C" {
 #include "common/model/transaction.h"
 
 #define NUM_TRITS_ESSENCE 486
-#define TRITS_PER_BUNDLE_HASH 243
-#define NUM_TRYTES_ESSENCE 162
-#define TRYTES_PER_BUNDLE_HASH 81
 
 /***********************************************************************************************************
  * Transfer Input data structure
