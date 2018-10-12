@@ -5,14 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __CONCENSUS_EXIT_PROBABILITY_RANDOMIZER_EXIT_PROBABILITY_RANDOMIZER_H__
-#define __CONCENSUS_EXIT_PROBABILITY_RANDOMIZER_EXIT_PROBABILITY_RANDOMIZER_H__
+#ifndef __CONSENSUS_EXIT_PROBABILITY_RANDOMIZER_EXIT_PROBABILITY_RANDOMIZER_H__
+#define __CONSENSUS_EXIT_PROBABILITY_RANDOMIZER_EXIT_PROBABILITY_RANDOMIZER_H__
 
-#include <stdbool.h>
 #include <stdint.h>
-#include "common/errors.h"
 
-#include "common/storage/connection.h"
+#include "common/errors.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
 #include "consensus/tangle/tangle.h"
@@ -62,4 +60,4 @@ extern retcode_t iota_consensus_exit_probability_randomize(
 }
 #endif
 
-#endif  // __CONCENSUS_EXIT_PROBABILITY_RANDOMIZER_EXIT_PROBABILITY_RANDOMIZER_H__
+#endif  // __CONSENSUS_EXIT_PROBABILITY_RANDOMIZER_EXIT_PROBABILITY_RANDOMIZER_H__

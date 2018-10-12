@@ -14,10 +14,6 @@
 
 #define RANDOM_WALKER_LOGGER_ID "consensus_random_walker"
 
-void init_ep_randomizer_walker(ep_randomizer_t *randomizer) {
-  randomizer->base.vtable = random_walk_vtable;
-}
-
 /*
  * Private functions
  */
@@ -134,6 +130,10 @@ static retcode_t random_walker_select_approver_tail(
 /*
  * Public functions
  */
+
+void iota_consensus_random_walker_init(ep_randomizer_t *randomizer) {
+  randomizer->base.vtable = random_walk_vtable;
+}
 
 retcode_t iota_consensus_random_walker_randomize(
     const ep_randomizer_t *exit_probability_randomizer,

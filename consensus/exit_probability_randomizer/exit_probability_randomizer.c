@@ -20,7 +20,7 @@ retcode_t iota_consensus_ep_randomizer_init(
   ep_randomizer->tangle = tangle;
   ep_randomizer->alpha = alpha;
   if (impl == EP_RANDOM_WALK) {
-    init_ep_randomizer_walker(ep_randomizer);
+    iota_consensus_random_walker_init(ep_randomizer);
   } else if (impl == EP_NO_IMPLEMENTATION) {
     return RC_CONSENSUS_NOT_IMPLEMENTED;
   }
