@@ -42,11 +42,11 @@ void hash_queue_pop(hash_queue_t *queue);
 flex_trit_t *hash_queue_peek(hash_queue_t queue);
 retcode_t hash_queue_free(hash_queue_t *queue);
 
-bool hash_stack_empty(hash_stack_t queue);
-retcode_t hash_stack_push(hash_stack_t *queue, flex_trit_t *hash);
-void hash_stack_pop(hash_stack_t *queue);
-flex_trit_t *hash_stack_peek(hash_stack_t queue);
-retcode_t hash_stack_free(hash_stack_t *queue);
+bool hash_stack_empty(hash_stack_t stack);
+retcode_t hash_stack_push(hash_stack_t *stack, flex_trit_t *hash);
+void hash_stack_pop(hash_stack_t *stack);
+flex_trit_t *hash_stack_peek(hash_stack_t stack);
+retcode_t hash_stack_free(hash_stack_t *stack);
 
 /*
  * Set types and operations
