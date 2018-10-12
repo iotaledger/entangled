@@ -67,27 +67,26 @@ extern retcode_t iota_stor_transaction_load_hashes_of_approvers(
  * Milestone operations
  */
 
-extern retcode_t iota_stor_milestone_store(const connection_t* const conn,
-                                           const iota_milestone_t* data_in);
+extern retcode_t iota_stor_milestone_store(
+    connection_t const* const conn, iota_milestone_t const* const data_in);
 
-extern retcode_t iota_stor_milestone_load(const connection_t* const conn,
-                                          const char* col_name,
-                                          const trit_array_p key,
-                                          iota_stor_pack_t* pack);
+extern retcode_t iota_stor_milestone_load(connection_t const* const conn,
+                                          trit_array_t const* const hash,
+                                          iota_stor_pack_t* const pack);
 
-extern retcode_t iota_stor_milestone_load_first(const connection_t* const conn,
-                                                iota_stor_pack_t* pack);
+extern retcode_t iota_stor_milestone_load_first(connection_t const* const conn,
+                                                iota_stor_pack_t* const pack);
 
-extern retcode_t iota_stor_milestone_load_last(const connection_t* const conn,
-                                               iota_stor_pack_t* pack);
+extern retcode_t iota_stor_milestone_load_last(connection_t const* const conn,
+                                               iota_stor_pack_t* const pack);
 
-extern retcode_t iota_stor_milestone_load_next(const connection_t* const conn,
-                                               uint64_t index,
-                                               iota_stor_pack_t* pack);
+extern retcode_t iota_stor_milestone_load_next(connection_t const* const conn,
+                                               uint64_t const index,
+                                               iota_stor_pack_t* const pack);
 
-extern retcode_t iota_stor_milestone_exist(const connection_t* const conn,
-                                           const char* index_name,
-                                           const trit_array_p key, bool* exist);
+extern retcode_t iota_stor_milestone_exist(connection_t const* const conn,
+                                           trit_array_t const* const key,
+                                           bool* const exist);
 
 #ifdef __cplusplus
 }

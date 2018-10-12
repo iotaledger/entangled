@@ -50,25 +50,13 @@ extern retcode_t iota_statement_transaction_select_hashes_approvers(
  * Milestone statements
  */
 
-extern retcode_t iota_statement_milestone_insert(
-    const iota_milestone_t* milestone, char statement[], size_t statement_cap);
-
-extern retcode_t iota_statement_milestone_select(const char* index_col,
-                                                 char statement[],
-                                                 size_t statement_cap);
-
-extern retcode_t iota_statement_milestone_select_first(char statement[],
-                                                       size_t statement_cap);
-
-extern retcode_t iota_statement_milestone_select_last(char statement[],
-                                                      size_t statement_cap);
-
-extern retcode_t iota_statement_milestone_select_next(char statement[],
-                                                      size_t statement_cap);
-
-extern retcode_t iota_statement_milestone_exist(const char* index_col,
-                                                char statement[],
-                                                size_t statement_cap);
+extern char* iota_statement_milestone_insert;
+extern char* iota_statement_milestone_select_by_hash;
+extern char* iota_statement_milestone_select_first;
+extern char* iota_statement_milestone_select_last;
+extern char* iota_statement_milestone_select_next;
+extern char* iota_statement_milestone_exist;
+extern char* iota_statement_milestone_exist_by_hash;
 
 #ifdef __cplusplus
 }

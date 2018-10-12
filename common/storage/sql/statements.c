@@ -187,54 +187,28 @@ retcode_t iota_statement_transaction_select_hashes_approvers(
  * Milestone statements
  */
 
-retcode_t iota_statement_milestone_insert(const iota_milestone_t *milestone,
-                                          char statement[],
-                                          size_t statement_cap) {
-  int res = snprintf(statement, statement_cap,
-                     "INSERT INTO %s (%s,%s) VALUES (%" PRIu64 ", ?)",
-                     MILESTONE_TABLE_NAME, MILESTONE_COL_INDEX,
-                     MILESTONE_COL_HASH, milestone->index);
+char *iota_statement_milestone_insert =
+    "INSERT INTO " MILESTONE_TABLE_NAME " (" MILESTONE_COL_INDEX
+    "," MILESTONE_COL_HASH ") VALUES (?, ?)";
 
-  if (res < 0 || res == statement_cap) {
-    log_error(SQL_STATEMENTS_ID,
-              "Failed in creating statement, statement: %s\n", statement);
-    return RC_SQL_FAILED_WRITE_STATEMENT;
-  }
-  return RC_OK;
-}
+char *iota_statement_milestone_select_by_hash =
+    "SELECT * FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH " = ?";
 
-retcode_t iota_statement_milestone_select(const char *index_col,
-                                          char statement[],
-                                          size_t statement_cap) {
-  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", index_col,
-                                       "=", "", "", 0, statement,
-                                       statement_cap);
-}
+char *iota_statement_milestone_select_first =
+    "SELECT * FROM " MILESTONE_TABLE_NAME " ORDER BY " MILESTONE_COL_INDEX
+    " ASC LIMIT 1";
 
-retcode_t iota_statement_milestone_select_first(char statement[],
-                                                size_t statement_cap) {
-  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", "", "",
-                                       MILESTONE_COL_INDEX, "ASC", 1, statement,
-                                       statement_cap);
-}
+char *iota_statement_milestone_select_last =
+    "SELECT * FROM " MILESTONE_TABLE_NAME " ORDER BY " MILESTONE_COL_INDEX
+    " DESC LIMIT 1";
 
-retcode_t iota_statement_milestone_select_last(char statement[],
-                                               size_t statement_cap) {
-  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", "", "",
-                                       MILESTONE_COL_INDEX, "DESC", 1,
-                                       statement, statement_cap);
-}
+char *iota_statement_milestone_select_next =
+    "SELECT * FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX
+    " > ? ORDER BY " MILESTONE_COL_INDEX " ASC LIMIT 1";
 
-retcode_t iota_statement_milestone_select_next(char statement[],
-                                               size_t statement_cap) {
-  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*",
-                                       MILESTONE_COL_INDEX, ">", "", "", 1,
-                                       statement, statement_cap);
-}
+char *iota_statement_milestone_exist =
+    "SELECT '1' WHERE EXISTS(SELECT 1 FROM " MILESTONE_TABLE_NAME ")";
 
-retcode_t iota_statement_milestone_exist(const char *index_col,
-                                         char statement[],
-                                         size_t statement_cap) {
-  return iota_statement_generic_exist(MILESTONE_TABLE_NAME, index_col,
-                                      statement, statement_cap);
-}
+char *iota_statement_milestone_exist_by_hash =
+    "SELECT '1' WHERE EXISTS(SELECT 1 FROM " MILESTONE_TABLE_NAME
+    " WHERE " MILESTONE_COL_HASH " = ?)";
