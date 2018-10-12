@@ -7,9 +7,8 @@
 
 #include "utils/hash_containers.h"
 
-bool hash_queue_empty(hash_queue_t queue) {
-  return (queue == NULL);
-}
+bool hash_queue_empty(hash_queue_t queue) { return (queue == NULL); }
+
 retcode_t hash_queue_push(hash_queue_t *queue, flex_trit_t *hash) {
   hash_dll_entry_t *entry = NULL;
 
@@ -48,6 +47,7 @@ retcode_t hash_queue_free(hash_queue_t *queue) {
  */
 
 bool hash_stack_empty(hash_stack_t stack) { return (stack == NULL); }
+
 retcode_t hash_stack_push(hash_stack_t *stack, flex_trit_t *hash) {
   hash_dll_entry_t *entry = NULL;
 
