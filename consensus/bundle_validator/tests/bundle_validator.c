@@ -259,12 +259,13 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invali
 
   TEST_ASSERT(iota_consensus_bundle_validator_validate(
                   &tangle, tail_hash, bundle, &is_valid) == RC_OK);
-  TEST_ASSERT(!is_valid);
-  TEST_ASSERT(iota_consensus_bundle_validator_destroy() == RC_OK);
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(iota_consensus_bundle_validator_destroy() == RC_OK);
+
   transactions_free(txs, 4);
   trit_array_free(tail_hash);
   bundle_transactions_free(&bundle);
+  TEST_ASSERT(!is_valid);
 }
 
 void test_iota_consensus_bundle_validator_validate_size_4_value_valid() {
@@ -323,10 +324,8 @@ int main(int argc, char *argv[]) {
   RUN_TEST(test_bundle_size_1_value_with_wrong_address_invalid);
   RUN_TEST(test_bundle_exceed_supply_pos_invalid);
   RUN_TEST(test_bundle_exceed_supply_neg_invalid);
-
-  // FIXME (@tsvisabo) - ASAN yelling
-  // RUN_TEST(test_bundle_validate_size_4_value_wrong_sig_invalid);
-
+  RUN_TEST(
+      test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invalid);
   RUN_TEST(test_iota_consensus_bundle_validator_validate_size_4_value_valid);
 
   return UNITY_END();
