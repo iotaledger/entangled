@@ -284,6 +284,7 @@ static void* solid_milestone_tracker(void* arg) {
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
                                       tangle_t* const tangle,
                                       snapshot_t* const snapshot,
+                                      ledger_validator_t* const lv,
                                       bool testnet) {
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
@@ -297,6 +298,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   mt->testnet = testnet;
   mt->tangle = tangle;
   mt->latest_snapshot = snapshot;
+  mt->ledger_validator = lv;
   if ((mt->latest_milestone = trit_array_new(NUM_TRITS_HASH)) == NULL) {
     goto oom;
   }
@@ -321,7 +323,6 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   }
   mt->latest_milestone_index = mt->milestone_start_index;
   mt->latest_solid_subtangle_milestone_index = mt->milestone_start_index;
-  mt->ledger_validator = NULL;
 
   return RC_OK;
 

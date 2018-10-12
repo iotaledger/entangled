@@ -22,6 +22,12 @@
 #include "consensus/model.h"
 #include "consensus/tangle/tangle.h"
 
+#define ALPHA .001
+#define MAX_DEPTH 15
+#define MAX_ANALYZED_TXS 20000
+#define CW_CALC_IMPL DFS_FROM_ENTRY_POINT
+#define EP_RAND_IMPL EP_RANDOM_WALK
+
 #ifdef __cplusplus
 extern "C" {
 #endif
