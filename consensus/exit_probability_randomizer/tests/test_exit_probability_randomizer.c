@@ -71,7 +71,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
 }
 
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
-  iota_consensus_ledger_validator_destroy(&epv->lv);
+  iota_consensus_ledger_validator_destroy(epv->lv);
   iota_snapshot_destroy(&snapshot);
   iota_milestone_tracker_destroy(&mt);
   iota_consensus_exit_prob_transaction_validator_destroy(epv);
@@ -503,17 +503,16 @@ void test_1_bundle(void) {
 
   iota_transaction_t txs[bundle_size + 1];
 
-  tryte_t *trytes[5] = {
-      TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
-      TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES,
-      BUNDLE_OF_4_TRUNK_TRANSACTION};
+  tryte_t *trytes[5] = {(tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                        (tryte_t *)TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+                        (tryte_t *)TX_3_OF_4_VALUE_BUNDLE_TRYTES,
+                        (tryte_t *)TX_4_OF_4_VALUE_BUNDLE_TRYTES,
+                        (tryte_t *)BUNDLE_OF_4_TRUNK_TRANSACTION};
   transactions_deserialize(trytes, txs, 5);
   for (size_t i = 0; i < 5; ++i) {
     txs[i]->snapshot_index = 9999999;
   }
   build_tangle(&tangle, txs, bundle_size + 1);
-
-  iota_transaction_t curr_tx = NULL;
 
   iota_stor_pack_t pack;
   hash_pack_init(&pack, bundle_size + 1);
@@ -602,12 +601,12 @@ void test_2_chained_bundles(void) {
 
   iota_transaction_t txs[6];
 
-  tryte_t *trytes[6] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                        TX_2_OF_4_VALUE_BUNDLE_TRYTES,
-                        TX_3_OF_4_VALUE_BUNDLE_TRYTES,
-                        TX_4_OF_4_VALUE_BUNDLE_TRYTES,
-                        TX_1_OF_2,
-                        TX_2_OF_2};
+  tryte_t *trytes[6] = {(tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                        (tryte_t *)TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+                        (tryte_t *)TX_3_OF_4_VALUE_BUNDLE_TRYTES,
+                        (tryte_t *)TX_4_OF_4_VALUE_BUNDLE_TRYTES,
+                        (tryte_t *)TX_1_OF_2,
+                        (tryte_t *)TX_2_OF_2};
   transactions_deserialize(trytes, txs, 6);
   for (size_t i = 0; i < 6; ++i) {
     txs[i]->snapshot_index = max_depth + 1;
@@ -618,14 +617,13 @@ void test_2_chained_bundles(void) {
 
   flex_trit_t ep_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trits_from_trytes(
-      ep_trits, NUM_TRITS_SERIALIZED_TRANSACTION, BUNDLE_OF_2_TRUNK_TX,
-      NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
+  flex_trits_from_trytes(ep_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         (tryte_t *)BUNDLE_OF_2_TRUNK_TX,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t txEp = transaction_deserialize(ep_trits);
   txEp->snapshot_index = 9999999;
-
-  iota_transaction_t curr_tx = NULL;
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, txEp) == RC_OK);
 

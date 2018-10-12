@@ -59,7 +59,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
 }
 
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
-  iota_consensus_ledger_validator_destroy(&epv->lv);
+  iota_consensus_ledger_validator_destroy(epv->lv);
   iota_snapshot_destroy(&snapshot);
   iota_milestone_tracker_destroy(&mt);
   iota_consensus_exit_prob_transaction_validator_destroy(epv);
@@ -92,10 +92,8 @@ void test_transaction_not_a_tail() {
 
   flex_trit_t transaction_3_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trit_t ep_trits[FLEX_TRIT_SIZE_8019];
-
   flex_trits_from_trytes(transaction_3_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_3_OF_4_VALUE_BUNDLE_TRYTES,
+                         (tryte_t *)TX_3_OF_4_VALUE_BUNDLE_TRYTES,
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
@@ -130,10 +128,9 @@ void test_transaction_invalid_diff() {
 
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
-  flex_trit_t ep_trits[FLEX_TRIT_SIZE_8019];
-
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         TX_1_OF_2, NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         (tryte_t *)TX_1_OF_2,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
@@ -168,12 +165,10 @@ void test_transaction_below_max_depth() {
 
   iota_transaction_t txs[2];
 
-  tryte_t *trytes[2] = {TX_1_OF_2, TX_2_OF_2};
+  tryte_t *trytes[2] = {(tryte_t *)TX_1_OF_2, (tryte_t *)TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = max_depth - 1;
   build_tangle(&tangle, txs, 2);
-
-  flex_trit_t ep_trits[FLEX_TRIT_SIZE_8019];
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
               RC_OK);
@@ -203,7 +198,7 @@ void test_transaction_exceed_max_transactions() {
 
   iota_transaction_t txs[2];
 
-  tryte_t *trytes[2] = {TX_1_OF_2, TX_2_OF_2};
+  tryte_t *trytes[2] = {(tryte_t *)TX_1_OF_2, (tryte_t *)TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = max_depth + 1;
   txs[1]->snapshot_index = max_depth + 1;
@@ -237,7 +232,7 @@ void test_transaction_is_genesis() {
 
   iota_transaction_t txs[2];
 
-  tryte_t *trytes[2] = {TX_1_OF_2, TX_2_OF_2};
+  tryte_t *trytes[2] = {(tryte_t *)TX_1_OF_2, (tryte_t *)TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = 0;
   build_tangle(&tangle, txs, 2);
@@ -269,11 +264,9 @@ void test_transaction_valid() {
 
   iota_transaction_t txs[2];
 
-  tryte_t *trytes[2] = {TX_1_OF_2, TX_2_OF_2};
+  tryte_t *trytes[2] = {(tryte_t *)TX_1_OF_2, (tryte_t *)TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   build_tangle(&tangle, txs, 2);
-
-  flex_trit_t ep_trits[FLEX_TRIT_SIZE_8019];
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
               RC_OK);

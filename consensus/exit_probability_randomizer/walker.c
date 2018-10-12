@@ -31,12 +31,12 @@ static retcode_t select_approver(
 
 static retcode_t find_tail_if_valid(
     const ep_randomizer_t *exit_probability_randomizer,
-    const trit_array_t *tx_hash, trit_array_t *tail_hash, bool *found_tail);
+    trit_array_t *const tx_hash, trit_array_t *tail_hash, bool *found_tail);
 
 retcode_t iota_consensus_random_walker_randomize(
     const ep_randomizer_t *exit_probability_randomizer,
-    const exit_prob_transaction_validator_t *ep_validator,
-    cw_calc_result *cw_result, const trit_array_p ep, trit_array_p tip) {
+    exit_prob_transaction_validator_t *ep_validator, cw_calc_result *cw_result,
+    const trit_array_p ep, trit_array_p tip) {
   retcode_t ret = RC_OK;
   bool is_valid = false;
   flex_trit_t curr_tail_hash[FLEX_TRIT_SIZE_243];
@@ -190,7 +190,7 @@ retcode_t select_approver(const ep_randomizer_t *exit_probability_randomizer,
 }
 
 retcode_t find_tail_if_valid(const ep_randomizer_t *exit_probability_randomizer,
-                             const trit_array_t *tx_hash,
+                             trit_array_t *const tx_hash,
                              trit_array_t *tail_hash, bool *found_tail) {
   retcode_t res;
 

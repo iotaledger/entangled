@@ -35,7 +35,7 @@ retcode_t iota_consensus_ep_randomizer_destroy(ep_randomizer_t *ep_randomizer) {
 
 retcode_t iota_consensus_exit_probability_randomize(
     const ep_randomizer_t *ep_randomizer,
-    const exit_prob_transaction_validator_t *epv, cw_calc_result *cw_result,
+    exit_prob_transaction_validator_t *epv, cw_calc_result *cw_result,
     const trit_array_p ep, trit_array_p tip) {
   return ep_randomizer->base.vtable.exit_probability_randomize(
       ep_randomizer, epv, cw_result, ep, tip);

@@ -32,8 +32,7 @@ extern retcode_t iota_consensus_transaction_validator_destroy(
     transaction_validator_t *const tv);
 
 extern bool iota_consensus_transaction_validate(
-    transaction_validator_t *const tv,
-    const iota_transaction_t const transaction);
+    transaction_validator_t *const tv, iota_transaction_t const transaction);
 
 // TODO - complete
 
