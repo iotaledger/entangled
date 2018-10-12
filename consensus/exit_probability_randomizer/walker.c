@@ -24,8 +24,7 @@ void init_ep_randomizer_walker(ep_randomizer_t *randomizer) {
 
 static retcode_t select_approver(
     const ep_randomizer_t *exit_probability_randomizer,
-    hash_int_map_t cw_ratings, hash_set_t *approvers, trit_array_t *approver,
-    bool *has_next_approver) {
+    hash_int_map_t cw_ratings, hash_set_t *approvers, trit_array_t *approver) {
   hash_set_entry_t *curr_approver = NULL;
   hash_set_entry_t *tmp_approver = NULL;
   hash_to_int_value_map_entry *curr_rating = NULL;
@@ -35,8 +34,6 @@ static retcode_t select_approver(
   double target = 0;
   int64_t max_weight = 0;
   size_t idx = 0;
-
-  *has_next_approver = false;
 
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
     HASH_FIND(hh, cw_ratings, curr_approver->hash, FLEX_TRIT_SIZE_243,
@@ -59,7 +56,6 @@ static retcode_t select_approver(
   target = ((double)rand() / (double)RAND_MAX) * sum_weights;
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
     if ((target = (target - weights[idx++])) <= 0) {
-      *has_next_approver = true;
       memcpy(approver->trits, curr_approver->hash, FLEX_TRIT_SIZE_243);
       break;
     }
@@ -98,13 +94,12 @@ static retcode_t random_walker_select_approver_tail(
     const ep_randomizer_t *exit_probability_randomizer,
     const exit_prob_transaction_validator_t *epv, cw_calc_result *cw_result,
     flex_trit_t *curr_tail_hash, trit_array_t *approver,
-    bool *found_approver_tail) {
+    bool *has_approver_tail) {
   retcode_t ret = RC_OK;
-  bool has_next_approver = false;
   hash_to_indexed_hash_set_entry_t *approvers_entry = NULL;
   hash_set_entry_t *approver_entry = NULL;
 
-  *found_approver_tail = false;
+  *has_approver_tail = false;
 
   HASH_FIND(hh, cw_result->tx_to_approvers, curr_tail_hash, FLEX_TRIT_SIZE_243,
             approvers_entry);
@@ -112,32 +107,28 @@ static retcode_t random_walker_select_approver_tail(
     return RC_OK;
   }
 
-  while (!(*found_approver_tail) &&
-         HASH_COUNT(approvers_entry->approvers) > 0) {
+  while (!(*has_approver_tail) && HASH_COUNT(approvers_entry->approvers) > 0) {
     ret = select_approver(exit_probability_randomizer, cw_result->cw_ratings,
-                          &approvers_entry->approvers, approver,
-                          &has_next_approver);
+                          &approvers_entry->approvers, approver);
     if (ret != RC_OK) {
-      *found_approver_tail = false;
+      *has_approver_tail = false;
       return ret;
     }
-    if (has_next_approver) {
-      ret = find_tail_if_valid(exit_probability_randomizer, epv, approver,
-                               found_approver_tail);
-      if (ret != RC_OK) {
-        *found_approver_tail = false;
-        return ret;
-      }
-      if (!(*found_approver_tail)) {
-        HASH_FIND(hh, approvers_entry->approvers, approver->trits,
-                  FLEX_TRIT_SIZE_243, approver_entry);
-        HASH_DEL(approvers_entry->approvers, approver_entry);
-        // if next tail is not valid, re-select while removing it from
-        // approvers set
-      }
+    ret = find_tail_if_valid(exit_probability_randomizer, epv, approver,
+                             has_approver_tail);
+    if (ret != RC_OK) {
+      *has_approver_tail = false;
+      return ret;
+    }
+    if (!(*has_approver_tail)) {
+      // if next tail is not valid, re-select while removing it from
+      // approvers set
+      HASH_FIND(hh, approvers_entry->approvers, approver->trits,
+                FLEX_TRIT_SIZE_243, approver_entry);
+      HASH_DEL(approvers_entry->approvers, approver_entry);
     }
   }
-  return RC_OK;
+  return ret;
 }
 
 /*
