@@ -148,7 +148,7 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   /// Exit Probabilities - start
 
   ep_randomizer_t ep_randomizer;
-  TEST_ASSERT(iota_consensus_ep_randomizer_init(&tangle, &ep_randomizer, 0,
+  TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &tangle, 0,
                                                 EP_RANDOM_WALK) == RC_OK);
 
   trit_array_t tip;
@@ -238,7 +238,7 @@ void test_single_tx_tangle(void) {
   TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), 1);
 
   ep_randomizer_t ep_randomizer;
-  TEST_ASSERT(iota_consensus_ep_randomizer_init(&tangle, &ep_randomizer, 0.01,
+  TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &tangle, 0.01,
                                                 EP_RANDOM_WALK) == RC_OK);
 
   trit_array_t tip;
@@ -333,7 +333,7 @@ void test_cw_topology_four_transactions_diamond(void) {
   TEST_ASSERT_EQUAL_INT(total_weight, 4 + 2 + 2 + 1);
 
   ep_randomizer_t ep_randomizer;
-  TEST_ASSERT(iota_consensus_ep_randomizer_init(&tangle, &ep_randomizer, 0.01,
+  TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &tangle, 0.01,
                                                 EP_RANDOM_WALK) == RC_OK);
 
   trit_array_t tip;
@@ -428,7 +428,7 @@ void test_cw_topology_two_inequal_tips(void) {
 
   ep_randomizer_t ep_randomizer;
   TEST_ASSERT(iota_consensus_ep_randomizer_init(
-                  &tangle, &ep_randomizer, low_alpha, EP_RANDOM_WALK) == RC_OK);
+                  &ep_randomizer, &tangle, low_alpha, EP_RANDOM_WALK) == RC_OK);
 
   trit_array_t tip;
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
@@ -547,7 +547,7 @@ void test_1_bundle(void) {
 
   ep_randomizer_t ep_randomizer;
   TEST_ASSERT(iota_consensus_ep_randomizer_init(
-                  &tangle, &ep_randomizer, low_alpha, EP_RANDOM_WALK) == RC_OK);
+                  &ep_randomizer, &tangle, low_alpha, EP_RANDOM_WALK) == RC_OK);
 
   trit_array_t tip;
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
@@ -648,7 +648,7 @@ void test_2_chained_bundles(void) {
 
   ep_randomizer_t ep_randomizer;
   TEST_ASSERT(iota_consensus_ep_randomizer_init(
-                  &tangle, &ep_randomizer, low_alpha, EP_RANDOM_WALK) == RC_OK);
+                  &ep_randomizer, &tangle, low_alpha, EP_RANDOM_WALK) == RC_OK);
 
   trit_array_t tip;
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];

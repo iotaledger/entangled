@@ -49,8 +49,8 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   }
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing exit probability randomizer\n");
-  if ((ret = iota_consensus_ep_randomizer_init(&consensus->tangle,
-                                               &consensus->ep_randomizer, ALPHA,
+  if ((ret = iota_consensus_ep_randomizer_init(&consensus->ep_randomizer,
+                                               &consensus->tangle, ALPHA,
                                                EP_RAND_IMPL)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing exit probability randomizer failed\n");

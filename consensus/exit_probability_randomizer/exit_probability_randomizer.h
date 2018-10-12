@@ -30,9 +30,10 @@ typedef struct ep_randomizer_s ep_randomizer_t;
 typedef struct {
   // find_transactions_request
   retcode_t (*exit_probability_randomize)(
-      const ep_randomizer_t *ep_randomizer,
-      exit_prob_transaction_validator_t *epv, cw_calc_result *cw_result,
-      const trit_array_p ep, trit_array_p tip);
+      ep_randomizer_t const *const ep_randomizer,
+      exit_prob_transaction_validator_t const *const epv,
+      cw_calc_result *const cw_result, trit_array_t const *const ep,
+      trit_array_t *const tip);
 } ep_randomizer_vtable;
 
 struct ep_randomizer_base_s {
@@ -46,15 +47,16 @@ struct ep_randomizer_s {
 };
 
 extern retcode_t iota_consensus_ep_randomizer_init(
-    tangle_t *const tangle, ep_randomizer_t *ep_randomizer, double alpha,
+    ep_randomizer_t *const ep_randomizer, tangle_t *const tangle, double alpha,
     enum ep_randomizer_implementation);
 extern retcode_t iota_consensus_ep_randomizer_destroy(
-    ep_randomizer_t *ep_randomizer);
+    ep_randomizer_t *const ep_randomizer);
 
 extern retcode_t iota_consensus_exit_probability_randomize(
-    const ep_randomizer_t *exit_probability_randomizer,
-    exit_prob_transaction_validator_t *ep_validator, cw_calc_result *cw_result,
-    const trit_array_p ep, trit_array_p tip);
+    ep_randomizer_t const *const exit_probability_randomizer,
+    exit_prob_transaction_validator_t const *const ep_validator,
+    cw_calc_result *const cw_result, trit_array_t const *const ep,
+    trit_array_t *const tip);
 
 #ifdef __cplusplus
 }

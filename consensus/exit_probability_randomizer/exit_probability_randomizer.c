@@ -13,7 +13,7 @@
   "consensus_exit_probability_randomizer"
 
 retcode_t iota_consensus_ep_randomizer_init(
-    tangle_t *const tangle, ep_randomizer_t *ep_randomizer, double alpha,
+    ep_randomizer_t *const ep_randomizer, tangle_t *const tangle, double alpha,
     enum ep_randomizer_implementation impl) {
   logger_helper_init(EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID, LOGGER_DEBUG, true);
   srand(time(NULL));
@@ -27,16 +27,18 @@ retcode_t iota_consensus_ep_randomizer_init(
   return RC_OK;
 }
 
-retcode_t iota_consensus_ep_randomizer_destroy(ep_randomizer_t *ep_randomizer) {
+retcode_t iota_consensus_ep_randomizer_destroy(
+    ep_randomizer_t *const ep_randomizer) {
   logger_helper_destroy(EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID);
   ep_randomizer->tangle = NULL;
   return RC_OK;
 }
 
 retcode_t iota_consensus_exit_probability_randomize(
-    const ep_randomizer_t *ep_randomizer,
-    exit_prob_transaction_validator_t *epv, cw_calc_result *cw_result,
-    const trit_array_p ep, trit_array_p tip) {
+    ep_randomizer_t const *const ep_randomizer,
+    exit_prob_transaction_validator_t const *const epv,
+    cw_calc_result *const cw_result, trit_array_t const *const ep,
+    trit_array_t *const tip) {
   return ep_randomizer->base.vtable.exit_probability_randomize(
       ep_randomizer, epv, cw_result, ep, tip);
 }

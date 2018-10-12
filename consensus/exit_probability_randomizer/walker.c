@@ -19,8 +19,9 @@
  */
 
 static retcode_t select_approver(
-    const ep_randomizer_t *exit_probability_randomizer,
-    hash_int_map_t cw_ratings, hash_set_t *approvers, trit_array_t *approver) {
+    ep_randomizer_t const *const exit_probability_randomizer,
+    hash_int_map_t const cw_ratings, hash_set_t const *const approvers,
+    trit_array_t *const approver) {
   hash_set_entry_t *curr_approver = NULL;
   hash_set_entry_t *tmp_approver = NULL;
   hash_to_int_value_map_entry *curr_rating = NULL;
@@ -61,9 +62,9 @@ static retcode_t select_approver(
 }
 
 static retcode_t find_tail_if_valid(
-    const ep_randomizer_t *exit_probability_randomizer,
-    const exit_prob_transaction_validator_t *epv, trit_array_t *tx_hash,
-    bool *found_tail) {
+    ep_randomizer_t const *const exit_probability_randomizer,
+    exit_prob_transaction_validator_t const *const epv,
+    trit_array_t *const tx_hash, bool *const found_tail) {
   retcode_t ret = RC_OK;
 
   *found_tail = false;
@@ -87,10 +88,10 @@ static retcode_t find_tail_if_valid(
 }
 
 static retcode_t random_walker_select_approver_tail(
-    const ep_randomizer_t *exit_probability_randomizer,
-    const exit_prob_transaction_validator_t *epv, cw_calc_result *cw_result,
-    flex_trit_t *curr_tail_hash, trit_array_t *approver,
-    bool *has_approver_tail) {
+    ep_randomizer_t const *const exit_probability_randomizer,
+    exit_prob_transaction_validator_t const *const epv,
+    cw_calc_result *const cw_result, flex_trit_t const *const curr_tail_hash,
+    trit_array_t *const approver, bool *const has_approver_tail) {
   retcode_t ret = RC_OK;
   hash_to_indexed_hash_set_entry_t *approvers_entry = NULL;
   hash_set_entry_t *approver_entry = NULL;
@@ -131,14 +132,15 @@ static retcode_t random_walker_select_approver_tail(
  * Public functions
  */
 
-void iota_consensus_random_walker_init(ep_randomizer_t *randomizer) {
+void iota_consensus_random_walker_init(ep_randomizer_t *const randomizer) {
   randomizer->base.vtable = random_walk_vtable;
 }
 
 retcode_t iota_consensus_random_walker_randomize(
-    const ep_randomizer_t *exit_probability_randomizer,
-    const exit_prob_transaction_validator_t *ep_validator,
-    cw_calc_result *cw_result, const trit_array_p ep, trit_array_p tip) {
+    ep_randomizer_t const *const exit_probability_randomizer,
+    exit_prob_transaction_validator_t const *const ep_validator,
+    cw_calc_result *const cw_result, trit_array_t const *const ep,
+    trit_array_t *const tip) {
   retcode_t ret = RC_OK;
   bool ep_is_valid = false;
   bool has_approver_tail = false;
