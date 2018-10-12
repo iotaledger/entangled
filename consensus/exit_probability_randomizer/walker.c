@@ -64,25 +64,25 @@ static retcode_t select_approver(
 static retcode_t find_tail_if_valid(
     ep_randomizer_t const *const exit_probability_randomizer,
     exit_prob_transaction_validator_t const *const epv,
-    trit_array_t *const tx_hash, bool *const found_tail) {
+    trit_array_t *const tx_hash, bool *const has_valid_tail) {
   retcode_t ret = RC_OK;
 
-  *found_tail = false;
+  *has_valid_tail = false;
   ret = iota_tangle_find_tail(exit_probability_randomizer->tangle, tx_hash,
-                              tx_hash, found_tail);
+                              tx_hash, has_valid_tail);
   if (ret != RC_OK) {
     log_error(RANDOM_WALKER_LOGGER_ID, "Finding tail failed: %" PRIu64 "\n",
               ret);
     return ret;
   }
-  if (*found_tail) {
-    // ret = iota_consensus_exit_prob_transaction_validator_is_valid(epv,
-    // tx_hash, found_tail);
-    // if (ret != RC_OK) {
-    //   log_error(RANDOM_WALKER_LOGGER_ID,
-    //             "Tail tranaction validation failed: %" PRIu64 "\n", ret);
-    //   return ret;
-    // }
+  if (*has_valid_tail) {
+    ret = iota_consensus_exit_prob_transaction_validator_is_valid(
+        epv, tx_hash, has_valid_tail);
+    if (ret != RC_OK) {
+      log_error(RANDOM_WALKER_LOGGER_ID,
+                "Tail transaction validation failed: %" PRIu64 "\n", ret);
+      return ret;
+    }
   }
   return ret;
 }
@@ -111,6 +111,8 @@ static retcode_t random_walker_select_approver_tail(
       *has_approver_tail = false;
       return ret;
     }
+    HASH_FIND(hh, approvers_entry->approvers, approver->trits,
+              FLEX_TRIT_SIZE_243, approver_entry);
     ret = find_tail_if_valid(exit_probability_randomizer, epv, approver,
                              has_approver_tail);
     if (ret != RC_OK) {
@@ -120,8 +122,6 @@ static retcode_t random_walker_select_approver_tail(
     if (!(*has_approver_tail)) {
       // if next tail is not valid, re-select while removing it from
       // approvers set
-      HASH_FIND(hh, approvers_entry->approvers, approver->trits,
-                FLEX_TRIT_SIZE_243, approver_entry);
       HASH_DEL(approvers_entry->approvers, approver_entry);
     }
   }
