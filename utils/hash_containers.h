@@ -33,8 +33,9 @@ typedef struct hash_dll_entry_s {
   struct hash_dll_entry_s *next;
   struct hash_dll_entry_s *prev;
 } hash_dll_entry_t;
+
 typedef hash_dll_entry_t *hash_queue_t;
-typedef hash_dll_entry_t *hash_stack_t;
+typedef hash_list_entry_t *hash_stack_t;
 
 bool hash_queue_empty(hash_queue_t queue);
 retcode_t hash_queue_push(hash_queue_t *queue, flex_trit_t *hash);
