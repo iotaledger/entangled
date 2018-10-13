@@ -49,21 +49,21 @@ retcode_t hash_queue_free(hash_queue_t *queue) {
 bool hash_stack_empty(hash_stack_t stack) { return (stack == NULL); }
 
 retcode_t hash_stack_push(hash_stack_t *stack, flex_trit_t *hash) {
-  hash_dll_entry_t *entry = NULL;
+  hash_list_entry_t *entry = NULL;
 
-  if ((entry = malloc(sizeof(hash_dll_entry_t))) == NULL) {
+  if ((entry = malloc(sizeof(hash_list_entry_t))) == NULL) {
     return RC_UTILS_OOM;
   }
   memcpy(entry->hash, hash, FLEX_TRIT_SIZE_243);
-  CDL_PREPEND(*stack, entry);
+  LL_PREPEND(*stack, entry);
   return RC_OK;
 }
 
 void hash_stack_pop(hash_stack_t *stack) {
-  hash_dll_entry_t *tmp = NULL;
+  hash_list_entry_t *tmp = NULL;
 
   tmp = *stack;
-  CDL_DELETE(*stack, *stack);
+  LL_DELETE(*stack, *stack);
   free(tmp);
 }
 
@@ -72,10 +72,10 @@ flex_trit_t *hash_stack_peek(hash_stack_t stack) {
 }
 
 retcode_t hash_stack_free(hash_stack_t *stack) {
-  hash_dll_entry_t *iter = NULL, *tmp1 = NULL, *tmp2 = NULL;
+  hash_list_entry_t *iter = NULL, *tmp = NULL;
 
-  CDL_FOREACH_SAFE(*stack, iter, tmp1, tmp2) {
-    CDL_DELETE(*stack, iter);
+  LL_FOREACH_SAFE(*stack, iter, tmp) {
+    LL_DELETE(*stack, iter);
     free(iter);
   }
   return RC_OK;
