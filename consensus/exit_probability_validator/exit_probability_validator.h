@@ -47,8 +47,8 @@ extern retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
     exit_prob_transaction_validator_t *epv);
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
-    exit_prob_transaction_validator_t *epv, trit_array_p tail_hash,
-    bool *is_valid);
+    exit_prob_transaction_validator_t const *epv,
+    trit_array_t const *const tail_hash, bool *is_valid);
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
     exit_prob_transaction_validator_t *ep_validator, trit_array_p tail_hash,
