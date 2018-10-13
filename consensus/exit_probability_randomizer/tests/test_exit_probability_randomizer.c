@@ -62,7 +62,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &mt, NULL) ==
               RC_OK);
 
-  // We want to avoid un necessary validation
+  // We want to avoid unnecessary validation
   mt.latest_snapshot->index = 99999999999;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(
@@ -609,7 +609,7 @@ void test_2_chained_bundles(void) {
                         (tryte_t *)TX_2_OF_2};
   transactions_deserialize(trytes, txs, 6);
   for (size_t i = 0; i < 6; ++i) {
-    txs[i]->snapshot_index = max_depth + 1;
+    txs[i]->snapshot_index = 9999999;
   }
   build_tangle(&tangle, txs, 6);
 
