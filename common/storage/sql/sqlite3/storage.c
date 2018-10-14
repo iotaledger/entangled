@@ -36,28 +36,32 @@ retcode_t iota_stor_destroy(connection_t const* const conn) {
  * Binding functions
  */
 
-static retcode_t column_compress_bind(sqlite3_stmt* statement, size_t index,
+static retcode_t column_compress_bind(sqlite3_stmt* const statement,
+                                      size_t const index,
                                       flex_trit_t const* const flex_trits,
-                                      size_t num_bytes) {
-  ssize_t i;
-  for (i = num_bytes - 1; i >= 0 && flex_trits[i] == FLEX_TRIT_NULL_VALUE; --i)
+                                      size_t const num_bytes) {
+  ssize_t i = num_bytes - 1;
+  int rc = 0;
+
+  for (; i >= 0 && flex_trits[i] == FLEX_TRIT_NULL_VALUE; --i)
     ;
-  int rc = sqlite3_bind_blob(statement, index, flex_trits, i + 1, NULL);
-  if (rc != SQLITE_OK) {
+  if ((rc = sqlite3_bind_blob(statement, index, flex_trits, i + 1, NULL)) !=
+      SQLITE_OK) {
     log_error(SQLITE3_LOGGER_ID,
-              "Failed in binding, sqlite3 code is: %" PRIu64 "\n", rc);
+              "Binding failed with sqlite3 code: %" PRIu64 "\n", rc);
     return RC_SQLITE3_FAILED_BINDING;
   }
   return RC_OK;
 }
 
-static void column_decompress_load(sqlite3_stmt* statement, size_t index,
-                                   flex_trit_t* flex_trits, size_t num_bytes) {
-  char const* buffer;
-  size_t column_size;
+static void column_decompress_load(sqlite3_stmt* const statement,
+                                   size_t const index,
+                                   flex_trit_t* const flex_trits,
+                                   size_t const num_bytes) {
+  char const* buffer = NULL;
+  size_t column_size = 0;
 
-  buffer = sqlite3_column_blob(statement, index);
-  if (buffer) {
+  if ((buffer = sqlite3_column_blob(statement, index))) {
     column_size = sqlite3_column_bytes(statement, index);
     memcpy(flex_trits, buffer, column_size);
     memset(flex_trits + column_size, FLEX_TRIT_NULL_VALUE,
@@ -71,21 +75,40 @@ static void column_decompress_load(sqlite3_stmt* statement, size_t index,
  * Generic function
  */
 
-static void select_milestones_populate_from_row(sqlite3_stmt* statement,
-                                                iota_milestone_t* milestone);
+static void select_milestones_populate_from_row(
+    sqlite3_stmt* const statement, iota_milestone_t* const milestone);
 
-static void select_transactions_populate_from_row(sqlite3_stmt* statement,
-                                                  iota_transaction_t tx);
+static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
+                                                  iota_transaction_t const tx);
 
-static retcode_t prepare_statement(sqlite3* db, sqlite3_stmt** sqlite_statement,
-                                   char* const statement) {
+static retcode_t prepare_statement(sqlite3* const db,
+                                   sqlite3_stmt** const sqlite_statement,
+                                   char const* const statement) {
   char const* err_msg = NULL;
+  int rc = 0;
 
-  int rc = sqlite3_prepare_v2(db, statement, -1, sqlite_statement, &err_msg);
-  if (rc != SQLITE_OK) {
+  if ((rc = sqlite3_prepare_v2(db, statement, -1, sqlite_statement,
+                               &err_msg)) != SQLITE_OK) {
     log_error(SQLITE3_LOGGER_ID,
-              "Failed preparing statement, sqlite3 code is: %" PRIu64 "\n", rc);
+              "Preparing statement failed with sqlite3 code: %" PRIu64 "\n",
+              rc);
     return RC_SQLITE3_FAILED_PREPARED_STATEMENT;
+  }
+
+  return RC_OK;
+}
+
+static retcode_t finalize_statement(sqlite3_stmt* const sqlite_statement) {
+  int rc = 0;
+
+  if (sqlite_statement == NULL) {
+    return RC_OK;
+  }
+
+  if ((rc = sqlite3_finalize(sqlite_statement)) != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed in finalizing, sqlite3 code is: %" PRIu64 "\n", rc);
+    return RC_SQLITE3_FAILED_FINALIZE;
   }
 
   return RC_OK;
@@ -97,10 +120,9 @@ enum load_model {
   MODEL_MILESTONE,
 };
 
-static retcode_t execute_statement_load_gen(sqlite3_stmt* sqlite_statement,
-                                            iota_stor_pack_t* pack,
-                                            uint32_t max_records,
-                                            enum load_model model) {
+static retcode_t execute_statement_load_gen(
+    sqlite3_stmt* const sqlite_statement, iota_stor_pack_t* const pack,
+    uint32_t const max_records, enum load_model const model) {
   pack->insufficient_capacity = false;
   while (sqlite3_step(sqlite_statement) ==
          SQLITE_ROW) {  // While query has result-rows.
@@ -123,60 +145,40 @@ static retcode_t execute_statement_load_gen(sqlite3_stmt* sqlite_statement,
       return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
     }
   }
-  int rc =
-      sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
-  if (rc != SQLITE_OK) {
-    log_error(SQLITE3_LOGGER_ID,
-              "Failed in finalizing, sqlite3 code is: %" PRIu64 "\n", rc);
-    return RC_SQLITE3_FAILED_FINALIZE;
-  }
 
   return RC_OK;
 }
 
-static retcode_t execute_statement_load_hashes(sqlite3_stmt* sqlite_statement,
-                                               iota_stor_pack_t* pack) {
+static retcode_t execute_statement_load_hashes(
+    sqlite3_stmt* const sqlite_statement, iota_stor_pack_t* const pack) {
   return execute_statement_load_gen(sqlite_statement, pack, pack->capacity,
                                     MODEL_HASH);
 }
 
 static retcode_t execute_statement_store_update(
-    sqlite3_stmt* sqlite_statement) {
+    sqlite3_stmt* const sqlite_statement) {
   int rc = sqlite3_step(sqlite_statement);
-  if (rc != SQLITE_OK && rc != SQLITE_DONE) {
-    rc = sqlite3_finalize(
-        sqlite_statement);  //  Finalize the prepared statement.
-    log_error(SQLITE3_LOGGER_ID,
-              "Failed in step, sqlite3 code is: %" PRIu64 "\n", rc);
-    return RC_SQLITE3_FAILED_STEP;
-  }
 
-  rc = sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
-  if (rc != SQLITE_OK) {
-    log_error(SQLITE3_LOGGER_ID,
-              "Failed finalizing statement, sqlite3 code is: %" PRIu64 "\n",
+  if (rc != SQLITE_OK && rc != SQLITE_DONE) {
+    log_error(SQLITE3_LOGGER_ID, "Step failed with sqlite3 code: %" PRIu64 "\n",
               rc);
-    return RC_SQLITE3_FAILED_FINALIZE;
+    return RC_SQLITE3_FAILED_STEP;
   }
 
   return RC_OK;
 }
 
-static retcode_t execute_statement_exist(sqlite3_stmt* sqlite_statement,
-                                         bool* exist) {
+static retcode_t execute_statement_exist(sqlite3_stmt* const sqlite_statement,
+                                         bool* const exist) {
+  int rc = sqlite3_step(sqlite_statement);
   *exist = false;
-  if (sqlite3_step(sqlite_statement) == SQLITE_ROW) {
-    *exist = true;
-  }
 
-  int rc =
-      sqlite3_finalize(sqlite_statement);  //  Finalize the prepared statement.
-  if (rc != SQLITE_OK) {
-    log_error(SQLITE3_LOGGER_ID,
-              "Failed in finalizing the statement, sqlite3 code is: %" PRIu64
-              "\n",
+  if (rc == SQLITE_ROW) {
+    *exist = true;
+  } else if (rc != SQLITE_OK && rc != SQLITE_DONE) {
+    log_error(SQLITE3_LOGGER_ID, "Step failed with sqlite3 code: %" PRIu64 "\n",
               rc);
-    return RC_SQLITE3_FAILED_FINALIZE;
+    return RC_SQLITE3_FAILED_STEP;
   }
 
   return RC_OK;
@@ -220,8 +222,8 @@ retcode_t iota_stor_transaction_store(connection_t const* const conn,
   sqlite3_stmt* sqlite_statement = NULL;
 
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
-                               iota_statement_transaction_insert))) {
-    return ret;
+                               iota_statement_transaction_insert)) != RC_OK) {
+    goto done;
   }
 
   ret = column_compress_bind(sqlite_statement, 1, tx->signature_or_message,
@@ -249,14 +251,16 @@ retcode_t iota_stor_transaction_store(connection_t const* const conn,
   ret |=
       column_compress_bind(sqlite_statement, 16, tx->hash, FLEX_TRIT_SIZE_243);
   sqlite3_bind_int64(sqlite_statement, 17, tx->snapshot_index);
-  if (ret) {
+  if (ret != RC_OK) {
     return RC_SQLITE3_FAILED_BINDING;
   }
 
   if ((ret = execute_statement_store_update(sqlite_statement))) {
-    return ret;
+    goto done;
   }
 
+done:
+  finalize_statement(sqlite_statement);
   return ret;
 }
 
@@ -273,23 +277,27 @@ retcode_t iota_stor_transaction_load(connection_t const* const conn,
       statement = iota_statement_transaction_select_by_hash;
       break;
     default:
+      return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
       break;
   }
 
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
-                               statement))) {
-    return ret;
+                               statement)) != RC_OK) {
+    goto done;
   }
 
   if ((ret = column_compress_bind(sqlite_statement, 1, key->trits,
-                                  key->num_bytes))) {
-    return ret;
+                                  key->num_bytes)) != RC_OK) {
+    goto done;
   }
 
-  if ((ret = execute_statement_load_transactions(sqlite_statement, pack))) {
-    return ret;
+  if ((ret = execute_statement_load_transactions(sqlite_statement, pack)) !=
+      RC_OK) {
+    goto done;
   }
 
+done:
+  finalize_statement(sqlite_statement);
   return ret;
 }
 
@@ -306,23 +314,26 @@ retcode_t iota_stor_transaction_load_hashes(connection_t const* const conn,
       statement = iota_statement_transaction_select_hashes_by_address;
       break;
     default:
+      return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
       break;
   }
 
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
-                               statement))) {
-    return ret;
+                               statement)) != RC_OK) {
+    goto done;
   }
 
   if ((ret = column_compress_bind(sqlite_statement, 1, key->trits,
-                                  key->num_bytes))) {
-    return ret;
+                                  key->num_bytes)) != RC_OK) {
+    goto done;
   }
 
-  if ((ret = execute_statement_load_hashes(sqlite_statement, pack))) {
-    return ret;
+  if ((ret = execute_statement_load_hashes(sqlite_statement, pack)) != RC_OK) {
+    goto done;
   }
 
+done:
+  finalize_statement(sqlite_statement);
   return ret;
 }
 
@@ -334,23 +345,25 @@ retcode_t iota_stor_transaction_load_hashes_of_approvers(
 
   if ((ret = prepare_statement(
            (sqlite3*)conn->db, &sqlite_statement,
-           iota_statement_transaction_select_hashes_of_approvers))) {
-    return ret;
+           iota_statement_transaction_select_hashes_of_approvers)) != RC_OK) {
+    goto done;
   }
 
   if ((ret = column_compress_bind(sqlite_statement, 1, approvee_hash,
-                                  FLEX_TRIT_SIZE_243))) {
-    return ret;
+                                  FLEX_TRIT_SIZE_243)) != RC_OK) {
+    goto done;
   }
   if ((ret = column_compress_bind(sqlite_statement, 2, approvee_hash,
-                                  FLEX_TRIT_SIZE_243))) {
-    return ret;
+                                  FLEX_TRIT_SIZE_243)) != RC_OK) {
+    goto done;
   }
 
-  if ((ret = execute_statement_load_hashes(sqlite_statement, pack))) {
-    return ret;
+  if ((ret = execute_statement_load_hashes(sqlite_statement, pack)) != RC_OK) {
+    goto done;
   }
 
+done:
+  finalize_statement(sqlite_statement);
   return ret;
 }
 
@@ -362,17 +375,19 @@ retcode_t iota_stor_transaction_update_snapshot_index(
 
   if ((ret = prepare_statement(
            (sqlite3*)conn->db, &sqlite_statement,
-           iota_statement_transaction_update_snapshot_index))) {
-    return ret;
+           iota_statement_transaction_update_snapshot_index)) != RC_OK) {
+    goto done;
   }
 
   sqlite3_bind_int64(sqlite_statement, 1, snapshot_index);
   column_compress_bind(sqlite_statement, 2, hash, FLEX_TRIT_SIZE_243);
 
-  if ((ret = execute_statement_store_update(sqlite_statement))) {
-    return ret;
+  if ((ret = execute_statement_store_update(sqlite_statement)) != RC_OK) {
+    goto done;
   }
 
+done:
+  finalize_statement(sqlite_statement);
   return ret;
 }
 
@@ -392,25 +407,28 @@ retcode_t iota_stor_transaction_exist(connection_t const* const conn,
       statement = iota_statement_transaction_exist_by_hash;
       break;
     default:
+      return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
       break;
   }
 
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
-                               statement))) {
-    return ret;
+                               statement)) != RC_OK) {
+    goto done;
   }
 
   if (field != TRANSACTION_FIELD_NONE && key) {
     if ((ret = column_compress_bind(sqlite_statement, 1, (void*)key->trits,
-                                    key->num_bytes))) {
-      return ret;
+                                    key->num_bytes)) != RC_OK) {
+      goto done;
     }
   }
 
-  if ((ret = execute_statement_exist(sqlite_statement, exist))) {
-    return ret;
+  if ((ret = execute_statement_exist(sqlite_statement, exist)) != RC_OK) {
+    goto done;
   }
 
+done:
+  finalize_statement(sqlite_statement);
   return ret;
 }
 
@@ -438,22 +456,24 @@ retcode_t iota_stor_milestone_store(connection_t const* const conn,
   sqlite3_stmt* sqlite_statement = NULL;
 
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
-                               iota_statement_milestone_insert))) {
-    return ret;
+                               iota_statement_milestone_insert)) != RC_OK) {
+    goto done;
   }
 
   sqlite3_bind_int64(sqlite_statement, 1, milestone->index);
   if ((ret = column_compress_bind(sqlite_statement, 2,
                                   (flex_trit_t*)milestone->hash,
-                                  FLEX_TRIT_SIZE_243))) {
-    return ret;
+                                  FLEX_TRIT_SIZE_243)) != RC_OK) {
+    goto done;
   }
 
-  if ((ret = execute_statement_store_update(sqlite_statement))) {
-    return ret;
+  if ((ret = execute_statement_store_update(sqlite_statement)) != RC_OK) {
+    goto done;
   }
 
-  return RC_OK;
+done:
+  finalize_statement(sqlite_statement);
+  return ret;
 }
 
 retcode_t iota_stor_milestone_load(connection_t const* const conn,
@@ -465,19 +485,21 @@ retcode_t iota_stor_milestone_load(connection_t const* const conn,
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
                                iota_statement_milestone_select_by_hash)) !=
       RC_OK) {
-    return ret;
+    goto done;
   }
 
   if ((ret = column_compress_bind(sqlite_statement, 1, hash,
                                   FLEX_TRIT_SIZE_243)) != RC_OK) {
-    return ret;
+    goto done;
   }
 
   if ((ret = execute_statement_load_milestones(sqlite_statement, pack,
                                                pack->capacity)) != RC_OK) {
-    return ret;
+    goto done;
   }
 
+done:
+  finalize_statement(sqlite_statement);
   return ret;
 }
 
@@ -489,14 +511,16 @@ retcode_t iota_stor_milestone_load_first(connection_t const* const conn,
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
                                iota_statement_milestone_select_first)) !=
       RC_OK) {
-    return ret;
+    goto done;
   }
 
   if ((ret = execute_statement_load_milestones(sqlite_statement, pack, 1)) !=
       RC_OK) {
-    return ret;
+    goto done;
   }
 
+done:
+  finalize_statement(sqlite_statement);
   return ret;
 }
 
@@ -508,14 +532,16 @@ retcode_t iota_stor_milestone_load_last(connection_t const* const conn,
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
                                iota_statement_milestone_select_last)) !=
       RC_OK) {
-    return ret;
+    goto done;
   }
 
   if ((ret = execute_statement_load_milestones(sqlite_statement, pack, 1)) !=
       RC_OK) {
-    return ret;
+    goto done;
   }
 
+done:
+  finalize_statement(sqlite_statement);
   return ret;
 }
 
@@ -529,21 +555,23 @@ retcode_t iota_stor_milestone_load_next(connection_t const* const conn,
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
                                iota_statement_milestone_select_next)) !=
       RC_OK) {
-    return ret;
+    goto done;
   }
 
   if ((rc = sqlite3_bind_int(sqlite_statement, 1, index)) != SQLITE_OK) {
     sqlite3_finalize(sqlite_statement);
     log_error(SQLITE3_LOGGER_ID,
               "Failed in binding, sqlite3 code is: %" PRIu64 "\n", rc);
-    return RC_SQLITE3_FAILED_BINDING;
+    goto done;
   }
 
   if ((ret = execute_statement_load_milestones(sqlite_statement, pack, 1)) !=
       RC_OK) {
-    return ret;
+    goto done;
   }
 
+done:
+  finalize_statement(sqlite_statement);
   return ret;
 }
 
@@ -561,20 +589,22 @@ retcode_t iota_stor_milestone_exist(connection_t const* const conn,
   }
 
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
-                               statement))) {
-    return ret;
+                               statement)) != RC_OK) {
+    goto done;
   }
 
   if (hash) {
     if ((ret = column_compress_bind(sqlite_statement, 1, hash,
-                                    FLEX_TRIT_SIZE_243))) {
-      return ret;
+                                    FLEX_TRIT_SIZE_243)) != RC_OK) {
+      goto done;
     }
   }
 
-  if ((ret = execute_statement_exist(sqlite_statement, exist))) {
-    return ret;
+  if ((ret = execute_statement_exist(sqlite_statement, exist)) != RC_OK) {
+    goto done;
   }
 
+done:
+  finalize_statement(sqlite_statement);
   return ret;
 }
