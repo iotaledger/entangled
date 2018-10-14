@@ -146,6 +146,8 @@ void test_stored_transaction(void) {
   TEST_ASSERT_EQUAL_INT(txs[0]->snapshot_index,
                         TEST_TRANSACTION.snapshot_index);
 
+  TEST_ASSERT_EQUAL_INT(txs[0]->solid, TEST_TRANSACTION.solid);
+
   for (int i = 0; i < 5; ++i) {
     transaction_free(pack.models[i]);
   }
@@ -258,7 +260,7 @@ void test_stored_load_hashes_of_approvers(void) {
   }
 }
 
-void test_update_snapshot_index(void) {
+void test_transaction_update_snapshot_index(void) {
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   struct _trit_array hash = {(flex_trit_t *)TEST_TRANSACTION.hash,
                              NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
@@ -303,7 +305,8 @@ void test_milestone_state_delta(void) {
   int i = -1000;
   flex_trits_from_trits(hash, HASH_LENGTH, trits, HASH_LENGTH, HASH_LENGTH);
   iter = NULL;
-  HASH_ITER(hh, state_delta2, iter, tmp) {
+  HASH_ITER(hh, state_delta2, iter, tmp)
+  {
     hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
     memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
     free(hashed_hash);
@@ -314,6 +317,27 @@ void test_milestone_state_delta(void) {
 
   state_delta_destroy(&state_delta1);
   state_delta_destroy(&state_delta2);
+}
+
+void test_transaction_update_solid_state(void) {
+  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
+  struct _trit_array hash = {(flex_trit_t *)TEST_TRANSACTION.hash,
+                             NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
+
+  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
+                                         &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
+  TEST_ASSERT_EQUAL_INT(tx.solid, TEST_TRANSACTION.solid);
+  bool old_solid_tate = tx.solid;
+  bool new_solid_state = !old_solid_tate;
+  TEST_ASSERT(iota_stor_transaction_update_solid_state(
+                  &conn, (flex_trit_t *)TEST_TRANSACTION.hash,
+                  new_solid_state) == RC_OK);
+  hash_pack_reset(&pack);
+  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
+                                         &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
+  TEST_ASSERT_EQUAL_INT(tx.solid, new_solid_state);
 }
 
 int main(void) {
@@ -329,8 +353,9 @@ int main(void) {
   RUN_TEST(test_stored_milestone);
   RUN_TEST(test_stored_load_hashes_by_address);
   RUN_TEST(test_stored_load_hashes_of_approvers);
-  RUN_TEST(test_update_snapshot_index);
   RUN_TEST(test_milestone_state_delta);
+  RUN_TEST(test_transaction_update_snapshot_index);
+  RUN_TEST(test_transaction_update_solid_state);
 
   return UNITY_END();
 }

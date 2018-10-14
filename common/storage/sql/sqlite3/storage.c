@@ -160,8 +160,7 @@ static retcode_t execute_statement_load_hashes(
 
 static retcode_t execute_statement_store_update(
     sqlite3_stmt* const sqlite_statement) {
-  int rc = sqlite3_step(sqlite_statement);
-
+  retcode_t rc = sqlite3_step(sqlite_statement);
   if (rc != SQLITE_OK && rc != SQLITE_DONE) {
     log_error(SQLITE3_LOGGER_ID, "Step failed with sqlite3 code: %" PRIu64 "\n",
               rc);
@@ -171,8 +170,12 @@ static retcode_t execute_statement_store_update(
   return RC_OK;
 }
 
-static retcode_t execute_statement_exist(sqlite3_stmt* const sqlite_statement,
-                                         bool* const exist) {
+static retcode_t execute_statement_store(sqlite3_stmt* sqlite_statement) {
+  return execute_statement_store_update(sqlite_statement);
+}
+
+static retcode_t execute_statement_exist(sqlite3_stmt* sqlite_statement,
+                                         bool* exist) {
   int rc = sqlite3_step(sqlite_statement);
   *exist = false;
 
@@ -374,6 +377,31 @@ retcode_t iota_stor_transaction_load_hashes_of_approvers(
 done:
   finalize_statement(sqlite_statement);
   return ret;
+}
+
+retcode_t iota_stor_transaction_update_solid_state(
+    const connection_t* const conn, flex_trit_t* const hash, bool is_solid) {
+  retcode_t ret = RC_OK;
+  char const* err_msg = 0;
+  sqlite3_stmt* sqlite_statement = 0;
+
+  int rc = sqlite3_prepare_v2((sqlite3*)conn->db,
+                              iota_statement_transaction_update_solid_state, -1,
+                              &sqlite_statement, &err_msg);
+  if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed preparing statement, sqlite3 code is: %\" PRIu64 \"\n",
+              rc);
+    return RC_SQLITE3_FAILED_PREPARED_STATEMENT;
+  }
+  rc = column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243);
+  if (rc != SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID,
+              "Failed in binding, sqlite3 code is: %\" PRIu64 \"\n", rc);
+    return RC_SQLITE3_FAILED_BINDING;
+  }
+
+  return execute_statement_store_update(sqlite_statement);
 }
 
 retcode_t iota_stor_transaction_update_snapshot_index(

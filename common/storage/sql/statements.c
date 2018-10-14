@@ -39,6 +39,10 @@ char *iota_statement_transaction_update_snapshot_index =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SNAPSHOT_INDEX
     "=? WHERE " TRANSACTION_COL_HASH "=?";
 
+char *iota_statement_transaction_update_solid_state =
+    "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SOLID
+    "=? WHERE " TRANSACTION_COL_HASH "=?";
+
 char *iota_statement_transaction_exist =
     "SELECT 1 WHERE EXISTS(SELECT 1 "
     "FROM " TRANSACTION_TABLE_NAME ")";
