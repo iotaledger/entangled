@@ -26,45 +26,32 @@ retcode_t iota_tangle_destroy(tangle_t *tangle) {
  */
 
 retcode_t iota_tangle_transaction_store(const tangle_t *const tangle,
-                                        const iota_transaction_t data_in) {
-  return iota_stor_transaction_store(&tangle->conn, data_in);
+                                        const iota_transaction_t tx) {
+  return iota_stor_transaction_store(&tangle->conn, tx);
 }
 
 retcode_t iota_tangle_transaction_load(const tangle_t *const tangle,
-                                       const char *col_name,
+                                       transaction_field_t const field,
                                        const trit_array_p key,
-                                       iota_stor_pack_t *data_out) {
+                                       iota_stor_pack_t *tx) {
   // TODO - when more "persistance provider are implemented - should loop
-  return iota_stor_transaction_load(&tangle->conn, col_name, key, data_out);
-}
-
-retcode_t iota_tangle_transaction_exist(const tangle_t *const tangle,
-                                        const char *index_name,
-                                        const trit_array_p key, bool *exist) {
-  // TODO - when more "persistance provider are implemented - should loop
-  return iota_stor_transaction_exist(&tangle->conn, index_name, key, exist);
-}
-
-retcode_t iota_tangle_transaction_update_snapshot_index(
-    const tangle_t *const tangle, flex_trit_t *const hash,
-    uint64_t snapshot_index) {
-  return iota_stor_transaction_update_snapshot_index(&tangle->conn, hash,
-                                                     snapshot_index);
+  return iota_stor_transaction_load(&tangle->conn, field, key, tx);
 }
 
 retcode_t iota_tangle_transaction_load_hashes(const tangle_t *const tangle,
-                                              const char *index_name,
+                                              transaction_field_t const field,
                                               const trit_array_p key,
                                               iota_stor_pack_t *pack) {
   retcode_t res = RC_OK;
+  fprintf(stderr, "ENTER\n");
 
-  res = iota_stor_transaction_load_hashes(&tangle->conn, index_name, key, pack);
+  res = iota_stor_transaction_load_hashes(&tangle->conn, field, key, pack);
+  fprintf(stderr, "%d\n", res);
   while (res == RC_OK && pack->insufficient_capacity) {
     res = hash_pack_resize(pack, 2);
     if (res == RC_OK) {
       pack->num_loaded = 0;
-      res = iota_stor_transaction_load_hashes(&tangle->conn, index_name, key,
-                                              pack);
+      res = iota_stor_transaction_load_hashes(&tangle->conn, field, key, pack);
     }
   }
 
@@ -72,7 +59,7 @@ retcode_t iota_tangle_transaction_load_hashes(const tangle_t *const tangle,
     log_error(TANGLE_LOGGER_ID,
               "Failed in loading hashes, error code is: %" PRIu64 "\n", res);
   }
-
+  fprintf(stderr, "LEAVE\n");
   return res;
 }
 
@@ -101,6 +88,20 @@ retcode_t iota_tangle_transaction_load_hashes_of_approvers(
   return res;
 }
 
+retcode_t iota_tangle_transaction_update_snapshot_index(
+    const tangle_t *const tangle, flex_trit_t *const hash,
+    uint64_t snapshot_index) {
+  return iota_stor_transaction_update_snapshot_index(&tangle->conn, hash,
+                                                     snapshot_index);
+}
+
+retcode_t iota_tangle_transaction_exist(const tangle_t *const tangle,
+                                        transaction_field_t const field,
+                                        const trit_array_p key, bool *exist) {
+  // TODO - when more "persistance provider are implemented - should loop
+  return iota_stor_transaction_exist(&tangle->conn, field, key, exist);
+}
+
 /*
  * Milestone operations
  */
@@ -111,10 +112,9 @@ retcode_t iota_tangle_milestone_store(const tangle_t *const tangle,
 }
 
 retcode_t iota_tangle_milestone_load(const tangle_t *const tangle,
-                                     const char *col_name,
                                      const trit_array_p key,
                                      iota_stor_pack_t *pack) {
-  return iota_stor_milestone_load(&tangle->conn, col_name, key, pack);
+  return iota_stor_milestone_load(&tangle->conn, key, pack);
 }
 
 retcode_t iota_tangle_milestone_load_first(const tangle_t *const tangle,
@@ -134,9 +134,8 @@ retcode_t iota_tangle_milestone_load_next(const tangle_t *const tangle,
 }
 
 retcode_t iota_tangle_milestone_exist(const tangle_t *const tangle,
-                                      const char *index_name,
                                       const trit_array_p key, bool *exist) {
-  return iota_stor_milestone_exist(&tangle->conn, index_name, key, exist);
+  return iota_stor_milestone_exist(&tangle->conn, key, exist);
 }
 
 /*

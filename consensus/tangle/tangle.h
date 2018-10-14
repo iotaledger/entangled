@@ -34,30 +34,30 @@ extern retcode_t iota_tangle_destroy(tangle_t *tangle);
  * Transaction operations
  */
 
-extern retcode_t iota_tangle_transaction_store(
-    const tangle_t *const tangle, const iota_transaction_t data_in);
+extern retcode_t iota_tangle_transaction_store(const tangle_t *const tangle,
+                                               const iota_transaction_t tx);
 
 extern retcode_t iota_tangle_transaction_load(const tangle_t *const tangle,
-                                              const char *col_name,
+                                              transaction_field_t const field,
                                               const trit_array_p key,
-                                              iota_stor_pack_t *data_out);
-
-extern retcode_t iota_tangle_transaction_exist(const tangle_t *const tangle,
-                                               const char *index_name,
-                                               const trit_array_p key,
-                                               bool *exist);
-
-extern retcode_t iota_tangle_transaction_update_snapshot_index(
-    const tangle_t *const tangle, flex_trit_t *const hash,
-    uint64_t snapshot_index);
+                                              iota_stor_pack_t *tx);
 
 extern retcode_t iota_tangle_transaction_load_hashes(
-    const tangle_t *const tangle, const char *index_name,
+    const tangle_t *const tangle, transaction_field_t const field,
     const trit_array_p key, iota_stor_pack_t *pack);
 
 extern retcode_t iota_tangle_transaction_load_hashes_of_approvers(
     const tangle_t *const tangle, const flex_trit_t *approvee_hash,
     iota_stor_pack_t *pack);
+
+extern retcode_t iota_tangle_transaction_update_snapshot_index(
+    const tangle_t *const tangle, flex_trit_t *const hash,
+    uint64_t snapshot_index);
+
+extern retcode_t iota_tangle_transaction_exist(const tangle_t *const tangle,
+                                               transaction_field_t const field,
+                                               const trit_array_p key,
+                                               bool *exist);
 
 /*
  * Milestone operations
@@ -67,7 +67,6 @@ extern retcode_t iota_tangle_milestone_store(const tangle_t *const tangle,
                                              const iota_milestone_t *data_in);
 
 extern retcode_t iota_tangle_milestone_load(const tangle_t *const tangle,
-                                            const char *col_name,
                                             const trit_array_p key,
                                             iota_stor_pack_t *pack);
 
@@ -82,7 +81,6 @@ extern retcode_t iota_tangle_milestone_load_next(const tangle_t *const tangle,
                                                  iota_stor_pack_t *pack);
 
 extern retcode_t iota_tangle_milestone_exist(const tangle_t *const tangle,
-                                             const char *index_name,
                                              const trit_array_p key,
                                              bool *exist);
 

@@ -80,8 +80,8 @@ retcode_t request_transaction(requester_state_t *const state,
   }
 
   // TODO(thibault) check null hash
-  if ((ret = iota_tangle_transaction_exist(state->tangle, TRANSACTION_COL_HASH,
-                                           hash, &exists))) {
+  if ((ret = iota_tangle_transaction_exist(
+           state->tangle, TRANSACTION_FIELD_HASH, hash, &exists))) {
     return ret;
   }
   if (exists) {
@@ -119,7 +119,7 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
     *hash = iter->data;
     iter = iter->next;
     if ((ret = iota_tangle_transaction_exist(
-             state->tangle, TRANSACTION_COL_HASH, *hash, &exists))) {
+             state->tangle, TRANSACTION_FIELD_HASH, *hash, &exists))) {
       return ret;
     }
     if (exists) {

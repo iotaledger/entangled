@@ -101,8 +101,8 @@ void test_transaction_not_a_tail() {
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx3) == RC_OK);
 
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
@@ -138,8 +138,8 @@ void test_transaction_invalid_diff() {
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
 
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
@@ -170,8 +170,8 @@ void test_transaction_below_max_depth() {
   txs[0]->snapshot_index = max_depth - 1;
   build_tangle(&tangle, txs, 2);
 
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
@@ -204,8 +204,8 @@ void test_transaction_exceed_max_transactions() {
   txs[1]->snapshot_index = max_depth + 1;
   build_tangle(&tangle, txs, 2);
 
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
@@ -237,8 +237,8 @@ void test_transaction_is_genesis() {
   txs[0]->snapshot_index = 0;
   build_tangle(&tangle, txs, 2);
 
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
@@ -268,8 +268,8 @@ void test_transaction_valid() {
   transactions_deserialize(trytes, txs, 2);
   build_tangle(&tangle, txs, 2);
 
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
