@@ -43,10 +43,8 @@ retcode_t iota_tangle_transaction_load_hashes(const tangle_t *const tangle,
                                               const trit_array_p key,
                                               iota_stor_pack_t *pack) {
   retcode_t res = RC_OK;
-  fprintf(stderr, "ENTER\n");
 
   res = iota_stor_transaction_load_hashes(&tangle->conn, field, key, pack);
-  fprintf(stderr, "%d\n", res);
   while (res == RC_OK && pack->insufficient_capacity) {
     res = hash_pack_resize(pack, 2);
     if (res == RC_OK) {
@@ -59,7 +57,6 @@ retcode_t iota_tangle_transaction_load_hashes(const tangle_t *const tangle,
     log_error(TANGLE_LOGGER_ID,
               "Failed in loading hashes, error code is: %" PRIu64 "\n", res);
   }
-  fprintf(stderr, "LEAVE\n");
   return res;
 }
 
@@ -155,7 +152,7 @@ retcode_t iota_tangle_find_tail(const tangle_t *const tangle,
 
   *found_tail = false;
 
-  res = iota_tangle_transaction_load(tangle, TRANSACTION_COL_HASH, tx_hash,
+  res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, tx_hash,
                                      &tx_pack);
   if (res != RC_OK || tx_pack.num_loaded == 0) {
     return res;
@@ -190,7 +187,7 @@ retcode_t iota_tangle_find_tail(const tangle_t *const tangle,
           (trit_array_t *)hash_pack.models[approver_idx];
       tx_pack.models = (void **)(&next_tx);
       hash_pack_reset(&tx_pack);
-      res = iota_tangle_transaction_load(tangle, TRANSACTION_COL_HASH,
+      res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
                                          approver_hash, &tx_pack);
       if (res != RC_OK || tx_pack.num_loaded == 0) {
         break;
