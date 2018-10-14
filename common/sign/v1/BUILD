@@ -11,6 +11,7 @@ cc_library(
         "iss_curl.h",
     ],
     deps = [
+        "//common:defs",
         "//common/curl-p:trit",
         "//common/trinary:add",
     ],
@@ -27,6 +28,7 @@ cc_library(
         "iss_kerl.h",
     ],
     deps = [
+        "//common:defs",
         "//common/kerl",
         "//common/trinary:add",
     ],

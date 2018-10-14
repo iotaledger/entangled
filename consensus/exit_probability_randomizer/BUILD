@@ -21,10 +21,8 @@ cc_library(
         "//common:errors",
         "//common/trinary:trit_array",
         "//consensus/cw_rating_calculator",
-        "//consensus/entry_point_selector",
         "//consensus/exit_probability_validator",
         "//consensus/tangle",
         "//utils:logger_helper",
-        "@com_github_uthash//:uthash",
     ],
 )

@@ -5,13 +5,13 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/helpers/checksum.h"
-
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "common/defs.h"
+#include "common/helpers/checksum.h"
 #include "common/kerl/hash.h"
 #include "common/sign/v1/iss_kerl.h"
 #include "common/trinary/trit_tryte.h"
@@ -26,7 +26,7 @@ IOTA_EXPORT char* iota_checksum(const char* input, const size_t input_length,
     return NULL;
   }
 
-  trit_t trits_hash[HASH_LENGTH];
+  trit_t trits_hash[HASH_LENGTH_TRIT];
   trit_t* trits = calloc(input_length * RADIX, sizeof(trit_t));
   if (!trits) {
     return NULL;
@@ -39,8 +39,9 @@ IOTA_EXPORT char* iota_checksum(const char* input, const size_t input_length,
   if (!checksum_trytes) {
     return NULL;
   }
-  trits_to_trytes((trit_t*)(&trits_hash[HASH_LENGTH - checksum_length * RADIX]),
-                  (tryte_t*)checksum_trytes, checksum_length * RADIX);
+  trits_to_trytes(
+      (trit_t*)(&trits_hash[HASH_LENGTH_TRIT - checksum_length * RADIX]),
+      (tryte_t*)checksum_trytes, checksum_length * RADIX);
 
   return checksum_trytes;
 }
@@ -55,7 +56,7 @@ IOTA_EXPORT flex_trit_t* iota_flex_checksum(const flex_trit_t* flex_trits,
     return NULL;
   }
 
-  trit_t trits_hash[HASH_LENGTH];
+  trit_t trits_hash[HASH_LENGTH_TRIT];
   trit_t* trits = (trit_t*)calloc(num_trits, sizeof(trit_t));
   if (!trits) {
     return NULL;
@@ -64,15 +65,15 @@ IOTA_EXPORT flex_trit_t* iota_flex_checksum(const flex_trit_t* flex_trits,
   kerl_hash(trits, num_trits, trits_hash, &kerl);
   free(trits);
 
-  size_t flex_len = num_flex_trits_for_trits(num_trits);
+  size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(num_trits);
   flex_trit_t* checksum_flex_trits =
       (flex_trit_t*)calloc(flex_len, sizeof(flex_trit_t));
   if (!checksum_flex_trits) {
     return NULL;
   }
-  flex_trits_from_trits(checksum_flex_trits, HASH_LENGTH,
-                        &trits_hash[HASH_LENGTH - checksum_length], HASH_LENGTH,
-                        checksum_length);
+  flex_trits_from_trits(checksum_flex_trits, HASH_LENGTH_TRIT,
+                        &trits_hash[HASH_LENGTH_TRIT - checksum_length],
+                        HASH_LENGTH_TRIT, checksum_length);
 
   return checksum_flex_trits;
 }

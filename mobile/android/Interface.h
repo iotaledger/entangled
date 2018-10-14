@@ -9,27 +9,32 @@ extern "C" {
 #endif
 /*
  * Class:     org_iota_mobile_Interface
- * Method:    doPOW
+ * Method:    iota_pow
  * Signature: (Ljava/lang/String;I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_doPOW(JNIEnv *, jclass,
-                                                               jstring, jint);
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1pow(JNIEnv *,
+                                                                   jclass,
+                                                                   jstring,
+                                                                   jint);
 
 /*
  * Class:     org_iota_mobile_Interface
- * Method:    generateAddress
+ * Method:    iota_sign_address_gen
  * Signature: (Ljava/lang/String;II)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_generateAddress(
-    JNIEnv *, jclass, jstring, jint, jint);
+JNIEXPORT jstring JNICALL
+Java_org_iota_mobile_Interface_iota_1sign_1address_1gen(JNIEnv *, jclass,
+                                                        jstring, jint, jint);
 
 /*
  * Class:     org_iota_mobile_Interface
- * Method:    generateSignature
+ * Method:    iota_sign_signature_gen
  * Signature: (Ljava/lang/String;IILjava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_generateSignature(
-    JNIEnv *, jclass, jstring, jint, jint, jstring);
+JNIEXPORT jstring JNICALL
+Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen(JNIEnv *, jclass,
+                                                          jstring, jint, jint,
+                                                          jstring);
 
 #ifdef __cplusplus
 }

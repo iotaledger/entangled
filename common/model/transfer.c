@@ -439,12 +439,11 @@ int transfer_ctx_hash(transfer_ctx_t transfer_ctx, Kerl *kerl,
       current_index++;
     }
   }
-  trit_t bundle_trit[TRITS_PER_BUNDLE_HASH];
+  trit_t bundle_trit[HASH_LENGTH_TRIT];
   // Squeeze kerl to get the bundle hash
-  kerl_squeeze(kerl, bundle_trit, TRITS_PER_BUNDLE_HASH);
-  flex_trits_from_trits(transfer_ctx->bundle, TRITS_PER_BUNDLE_HASH,
-                        bundle_trit, TRITS_PER_BUNDLE_HASH,
-                        TRITS_PER_BUNDLE_HASH);
+  kerl_squeeze(kerl, bundle_trit, HASH_LENGTH_TRIT);
+  flex_trits_from_trits(transfer_ctx->bundle, HASH_LENGTH_TRIT, bundle_trit,
+                        HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   return 0;
 }
 
@@ -492,7 +491,7 @@ void transfer_iterator_next_data_transaction(
   // Length of the message data for the current transaction
   size_t len = data_len - offset;
   len = len > NUM_TRITS_SIGNATURE ? NUM_TRITS_SIGNATURE : len;
-  size_t flex_size = num_flex_trits_for_trits(len);
+  size_t flex_size = NUM_FLEX_TRITS_FOR_TRITS(len);
   flex_trit_t *trits = transaction_message(transfer_iterator->transaction);
   memset(trits, FLEX_TRIT_NULL_VALUE, flex_size);
   flex_trits_slice(trits, flex_size, data, data_len, offset, len);

@@ -18,16 +18,16 @@ void test_merkle(void) {
   char *const seed =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQR"
       "STUVWXYZ9";
-  trit_t seed_trits[HASH_LENGTH];
-  trytes_to_trits((tryte_t *)seed, seed_trits, HASH_LENGTH / 3);
+  trit_t seed_trits[HASH_LENGTH_TRIT];
+  trytes_to_trits((tryte_t *)seed, seed_trits, HASH_LENGTH_TRYTE);
   size_t start = 7;
   size_t leaf_count = 32;
   size_t security = 1;
   size_t size = merkle_size(leaf_count);
-  trit_t merkle_tree[size * HASH_LENGTH];
+  trit_t merkle_tree[size * HASH_LENGTH_TRIT];
   trit_t depth = merkle_depth(size);
-  trit_t siblings[(depth - 1) * HASH_LENGTH];
-  trit_t hash[HASH_LENGTH];
+  trit_t siblings[(depth - 1) * HASH_LENGTH_TRIT];
+  trit_t hash[HASH_LENGTH_TRIT];
   Curl c;
   c.type = CURL_P_27;
   init_curl(&c);
@@ -38,17 +38,17 @@ void test_merkle(void) {
                                          start, security, &c));
   for (size_t i = 0; i < leaf_count; i++) {
     TEST_ASSERT_EQUAL_INT(
-        0, merkle_branch(merkle_tree, siblings, size * HASH_LENGTH, depth, i,
-                         leaf_count));
+        0, merkle_branch(merkle_tree, siblings, size * HASH_LENGTH_TRIT, depth,
+                         i, leaf_count));
     memcpy(hash,
            &merkle_tree[merkle_node_index(depth - 1,
                                           merkle_leaf_index(i, leaf_count),
                                           depth - 1) *
-                        HASH_LENGTH],
-           HASH_LENGTH);
+                        HASH_LENGTH_TRIT],
+           HASH_LENGTH_TRIT);
     curl_reset(&c);
     merkle_root(hash, siblings, depth - 1, i, &c);
-    TEST_ASSERT_EQUAL_MEMORY(merkle_tree, hash, HASH_LENGTH);
+    TEST_ASSERT_EQUAL_MEMORY(merkle_tree, hash, HASH_LENGTH_TRIT);
   }
 }
 

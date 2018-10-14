@@ -7,11 +7,10 @@
 
 #include <string.h>
 
-#include "trit_tryte.h"
+#include "common/defs.h"
+#include "common/trinary/trit_tryte.h"
 
-#define NUMBER_OF_TRITS_IN_A_TRYTE 3
 #define TRYTE_SPACE 27
-#define TRYTE_STRING "9ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 #define TRITS_TO_TRYTES_MAP                                                 \
   {0, 0, 0}, {1, 0, 0}, {-1, 1, 0}, {0, 1, 0}, {1, 1, 0}, {-1, -1, 1},      \
       {0, -1, 1}, {1, -1, 1}, {-1, 0, 1}, {0, 0, 1}, {1, 0, 1}, {-1, 1, 1}, \
@@ -57,7 +56,7 @@ uint8_t set_trit_at(tryte_t *const trytes, size_t const length, size_t index,
   if (tryte < 0) {
     tryte += TRYTE_SPACE;
   }
-  trytes[tindex] = TRYTE_STRING[(size_t)tryte];
+  trytes[tindex] = TRYTE_ALPHABET[(size_t)tryte];
   return 1;
 }
 
@@ -75,7 +74,7 @@ void trits_to_trytes(trit_t const *const trits, tryte_t *const trytes,
   if (j < 0) {
     j += TRYTE_SPACE;
   }
-  trytes[0] = TRYTE_STRING[(size_t)j];
+  trytes[0] = TRYTE_ALPHABET[(size_t)j];
   if (length <= NUMBER_OF_TRITS_IN_A_TRYTE) {
     return;
   }
@@ -89,7 +88,8 @@ void trytes_to_trits(tryte_t const *const tryte, trit_t *const trits,
     return;
   }
   memcpy(trits,
-         TRYTE_TO_TRITS_MAPPINGS[strchr(TRYTE_STRING, tryte[0]) - TRYTE_STRING],
+         TRYTE_TO_TRITS_MAPPINGS[strchr(TRYTE_ALPHABET, tryte[0]) -
+                                 TRYTE_ALPHABET],
          NUMBER_OF_TRITS_IN_A_TRYTE * sizeof(trit_t));
   trytes_to_trits(&tryte[1], &trits[NUMBER_OF_TRITS_IN_A_TRYTE], length - 1);
 }

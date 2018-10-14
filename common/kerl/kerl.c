@@ -7,8 +7,8 @@
 
 #include <assert.h>
 
-#include "converter.h"
-#include "kerl.h"
+#include "common/kerl/converter.h"
+#include "common/kerl/kerl.h"
 
 #define RATE 832
 #define CAPACITY (1600 - RATE)
@@ -27,12 +27,12 @@ void kerl_absorb(Kerl* const ctx, trit_t const* trits, size_t const length) {
   uint8_t bytes[HASH_BYTE_LEN];
   trit_t const* const end = &trits[length];
 
-  assert(length % HASH_LENGTH == 0);
+  assert(length % HASH_LENGTH_TRIT == 0);
 
   for (; trits < end;) {
     convert_trits_to_bytes(trits, bytes);
     Keccak_HashUpdate(&ctx->keccak, bytes, HASH_BIT_LEN);
-    trits = &trits[HASH_LENGTH];
+    trits = &trits[HASH_LENGTH_TRIT];
   }
 }
 
@@ -42,7 +42,7 @@ void kerl_squeeze(Kerl* const ctx, trit_t* trits, size_t const length) {
   uint32_t* ptr = (uint32_t*)bytes;
   trit_t const* const end = &trits[length];
 
-  assert(length % HASH_LENGTH == 0);
+  assert(length % HASH_LENGTH_TRIT == 0);
 
   for (; trits < end;) {
     Keccak_HashSqueeze(&ctx->keccak, bytes, HASH_BIT_LEN);
@@ -56,7 +56,7 @@ void kerl_squeeze(Kerl* const ctx, trit_t* trits, size_t const length) {
 
     init_kerl(ctx);
     Keccak_HashUpdate(&ctx->keccak, bytes, HASH_BIT_LEN);
-    trits = &trits[HASH_LENGTH];
+    trits = &trits[HASH_LENGTH_TRIT];
   }
 }
 

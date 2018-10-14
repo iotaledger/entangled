@@ -138,3 +138,82 @@ retcode_t iota_tangle_milestone_exist(const tangle_t *const tangle,
                                       const trit_array_p key, bool *exist) {
   return iota_stor_milestone_exist(&tangle->conn, index_name, key, exist);
 }
+
+/*
+ * Utilities
+ */
+
+retcode_t iota_tangle_find_tail(const tangle_t *const tangle,
+                                trit_array_t *tx_hash, trit_array_t *tail,
+                                bool *found_tail) {
+  retcode_t res = RC_OK;
+  struct _iota_transaction next_tx_s;
+  iota_transaction_t next_tx = &next_tx_s;
+  flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
+  bool found_approver = false;
+  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, tx_pack);
+
+  *found_tail = false;
+
+  res = iota_tangle_transaction_load(tangle, TRANSACTION_COL_HASH, tx_hash,
+                                     &tx_pack);
+  if (res != RC_OK || tx_pack.num_loaded == 0) {
+    return res;
+  }
+
+  uint32_t index = curr_tx->current_index;
+  memcpy(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243);
+
+  iota_stor_pack_t hash_pack;
+  if ((res = hash_pack_init(&hash_pack, 10)) != RC_OK) {
+    return res;
+  }
+
+  while (res == RC_OK && index > 0 &&
+         memcmp(curr_tx->bundle, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
+    hash_pack_reset(&hash_pack);
+    res = iota_tangle_transaction_load_hashes_of_approvers(
+        tangle, curr_tx->hash, &hash_pack);
+
+    if (res != RC_OK) {
+      log_error(TANGLE_LOGGER_ID,
+                "Failed in loading approvers, error code is: %" PRIu64 "\n",
+                res);
+      break;
+    }
+
+    --index;
+    uint32_t approver_idx = 0;
+    found_approver = false;
+    while (approver_idx < hash_pack.num_loaded) {
+      trit_array_p approver_hash =
+          (trit_array_t *)hash_pack.models[approver_idx];
+      tx_pack.models = (void **)(&next_tx);
+      hash_pack_reset(&tx_pack);
+      res = iota_tangle_transaction_load(tangle, TRANSACTION_COL_HASH,
+                                         approver_hash, &tx_pack);
+      if (res != RC_OK || tx_pack.num_loaded == 0) {
+        break;
+      }
+      if (next_tx->current_index == index &&
+          memcmp(next_tx->bundle, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
+        curr_tx = next_tx;
+        found_approver = true;
+        break;
+      }
+    }
+
+    if (!found_approver) {
+      break;
+    }
+  }
+
+  if (curr_tx->current_index == 0) {
+    memcpy(tail->trits, curr_tx->hash, FLEX_TRIT_SIZE_243);
+    *found_tail = true;
+  }
+
+  hash_pack_free(&hash_pack);
+
+  return res;
+}

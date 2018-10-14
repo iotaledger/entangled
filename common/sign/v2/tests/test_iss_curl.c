@@ -25,7 +25,7 @@ void test_subseed(trit_t *seed, trit_t *subseed, int64_t i, Curl *curl) {
 
   iss_curl_subseed(seed, subseed, i, curl);
 
-  trits_to_trytes(subseed, tryte_seed, HASH_LENGTH);
+  trits_to_trytes(subseed, tryte_seed, HASH_LENGTH_TRIT);
 
   TEST_ASSERT_EQUAL_MEMORY(EXPECT_SUBSEED, tryte_seed, strlen(EXPECT_SUBSEED));
 }
@@ -79,8 +79,8 @@ void test_key(trit_t *s, trit_t *k, size_t l, Curl *c) {
   "KZFP9ZR"
 
 void test_addy(trit_t *k, size_t l, Curl *c) {
-  tryte_t addy_trytes[HASH_LENGTH / 3 + 1];
-  addy_trytes[HASH_LENGTH / 3] = 0;
+  tryte_t addy_trytes[HASH_LENGTH_TRYTE + 1];
+  addy_trytes[HASH_LENGTH_TRYTE] = 0;
 
   iss_curl_key_digest(k, k, l, c);
   iss_curl_address(k, k, l * 243 / 6561, c);
@@ -88,7 +88,7 @@ void test_addy(trit_t *k, size_t l, Curl *c) {
   trits_to_trytes(k, addy_trytes, l * 243 / 6561);
 
   TEST_ASSERT_EQUAL_MEMORY(EXP_ADDY, addy_trytes,
-                           HASH_LENGTH / 3 * sizeof(tryte_t));
+                           HASH_LENGTH_TRYTE * sizeof(tryte_t));
 }
 
 #define EX_SIG                                                                 \
@@ -96,7 +96,7 @@ void test_addy(trit_t *k, size_t l, Curl *c) {
   "YB9YB9E"
 void test_sig(trit_t *k, size_t l, Curl *c) {
   tryte_t addy_trytes[l];
-  trit_t hash[HASH_LENGTH];
+  trit_t hash[HASH_LENGTH_TRIT];
 
   memset(hash, 0, sizeof(hash));
   memset(addy_trytes, 0, sizeof(hash));
@@ -105,21 +105,21 @@ void test_sig(trit_t *k, size_t l, Curl *c) {
 
   TEST_ASSERT_EQUAL_INT(0, iss_curl_signature(k, hash, 0, k, l, c));
   TEST_ASSERT_EQUAL_INT(0, iss_curl_sig_digest(k, hash, 0, k, l, c));
-  TEST_ASSERT_EQUAL_INT(0, iss_curl_address(k, k, HASH_LENGTH, c));
+  TEST_ASSERT_EQUAL_INT(0, iss_curl_address(k, k, HASH_LENGTH_TRIT, c));
 
-  trits_to_trytes(k, addy_trytes, HASH_LENGTH);
+  trits_to_trytes(k, addy_trytes, HASH_LENGTH_TRIT);
 
-  addy_trytes[HASH_LENGTH / 3] = 0;
+  addy_trytes[HASH_LENGTH_TRYTE] = 0;
 
   TEST_ASSERT_EQUAL_MEMORY(EXP_ADDY, addy_trytes,
-                           HASH_LENGTH / 3 * sizeof(tryte_t));
+                           HASH_LENGTH_TRYTE * sizeof(tryte_t));
 }
 #undef EX_SIG
 #undef EXP_ADDY
 
 void test_iss() {
-  trit_t seed[HASH_LENGTH];
-  trit_t subseed[HASH_LENGTH];
+  trit_t seed[HASH_LENGTH_TRIT];
+  trit_t subseed[HASH_LENGTH_TRIT];
   trit_t key[ISS_KEY_LENGTH];
   int64_t index = 3;
   size_t key_length = ISS_KEY_LENGTH;

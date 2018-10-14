@@ -77,57 +77,46 @@ retcode_t init_connection(const connection_t* const conn,
              config->db_path);
   }
 
-  if (config->index_transaction_approvee) {
-    if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                              TRANSACTION_TRUNK_INDEX,
-                                              TRANSACTION_COL_TRUNK))) {
-      return retcode;
-    }
-    if (create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                   TRANSACTION_BRANCH_INDEX,
-                                   TRANSACTION_COL_BRANCH)) {
-      return retcode;
-    }
+  if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                            TRANSACTION_TRUNK_INDEX,
+                                            TRANSACTION_COL_TRUNK))) {
+    return retcode;
   }
 
-  if (config->index_transaction_address) {
-    if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                              TRANSACTION_ADDRESS_INDEX,
-                                              TRANSACTION_COL_ADDRESS))) {
-      return retcode;
-    }
+  if (create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                 TRANSACTION_BRANCH_INDEX,
+                                 TRANSACTION_COL_BRANCH)) {
+    return retcode;
   }
 
-  if (config->index_transaction_bundle) {
-    if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                              TRANSACTION_BUNDLE_INDEX,
-                                              TRANSACTION_COL_BUNDLE))) {
-      return retcode;
-    }
+  if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                            TRANSACTION_ADDRESS_INDEX,
+                                            TRANSACTION_COL_ADDRESS))) {
+    return retcode;
   }
 
-  if (config->index_transaction_tag) {
-    if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                              TRANSACTION_TAG_INDEX,
-                                              TRANSACTION_COL_TAG))) {
-      return retcode;
-    }
+  if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                            TRANSACTION_BUNDLE_INDEX,
+                                            TRANSACTION_COL_BUNDLE))) {
+    return retcode;
   }
 
-  if (config->index_transaction_hash) {
-    if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                              TRANSACTION_HASH_INDEX,
-                                              TRANSACTION_COL_HASH))) {
-      return retcode;
-    }
+  if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                            TRANSACTION_TAG_INDEX,
+                                            TRANSACTION_COL_TAG))) {
+    return retcode;
   }
 
-  if (config->index_milestone_hash) {
-    if ((retcode = create_index_if_not_exists(conn, MILESTONE_TABLE_NAME,
-                                              MILESTONE_HASH_INDEX,
-                                              MILESTONE_COL_HASH))) {
-      return retcode;
-    }
+  if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
+                                            TRANSACTION_HASH_INDEX,
+                                            TRANSACTION_COL_HASH))) {
+    return retcode;
+  }
+
+  if ((retcode = create_index_if_not_exists(conn, MILESTONE_TABLE_NAME,
+                                            MILESTONE_HASH_INDEX,
+                                            MILESTONE_COL_HASH))) {
+    return retcode;
   }
 
   // TODO - implement connections pool so no two threads

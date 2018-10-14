@@ -6,11 +6,9 @@
  */
 
 #include <string.h>
-#include "common/trinary/add.h"
 
-#define MAX_TRYTE_VALUE 13
-#define MIN_TRYTE_VALUE -13
-#define TRYTE_WIDTH 3
+#include "common/defs.h"
+#include "common/trinary/add.h"
 
 #define CAT(A, ...) _CAT(A, __VA_ARGS__)
 #define _CAT(A, ...) A##__VA_ARGS__
@@ -20,23 +18,23 @@
 
 int _ISS_PREFIX(subseed)(trit_t const *const seed, trit_t *const out,
                          int64_t const index, HASH_STATE *const state) {
-  memcpy(out, seed, HASH_LENGTH * sizeof(trit_t));
-  add_assign(out, HASH_LENGTH, index);
-  _HASH_PREFIX(absorb)(state, out, HASH_LENGTH);
-  _HASH_PREFIX(squeeze)(state, out, HASH_LENGTH);
+  memcpy(out, seed, HASH_LENGTH_TRIT * sizeof(trit_t));
+  add_assign(out, HASH_LENGTH_TRIT, index);
+  _HASH_PREFIX(absorb)(state, out, HASH_LENGTH_TRIT);
+  _HASH_PREFIX(squeeze)(state, out, HASH_LENGTH_TRIT);
   _HASH_PREFIX(reset)(state);
   return 0;
 }
 
 int _ISS_PREFIX(key)(trit_t const *const subseed, trit_t *key,
                      size_t const key_length, HASH_STATE *const state) {
-  if (key_length % HASH_LENGTH) return -1;
+  if (key_length % HASH_LENGTH_TRIT) return -1;
   trit_t *const end = &key[key_length];
 
-  _HASH_PREFIX(absorb)(state, subseed, HASH_LENGTH);
+  _HASH_PREFIX(absorb)(state, subseed, HASH_LENGTH_TRIT);
 
-  for (; key < end; key = &key[HASH_LENGTH]) {
-    _HASH_PREFIX(squeeze)(state, key, HASH_LENGTH);
+  for (; key < end; key = &key[HASH_LENGTH_TRIT]) {
+    _HASH_PREFIX(squeeze)(state, key, HASH_LENGTH_TRIT);
   }
 
   _HASH_PREFIX(reset)(state);
@@ -51,21 +49,22 @@ int _ISS_PREFIX(key_digest)(trit_t *key, trit_t *digest,
   size_t i;
   trit_t *const k_start = key;
   trit_t *const k_end = &key[key_length];
-  trit_t *const d_end = &digest[HASH_LENGTH * (key_length / ISS_KEY_LENGTH)];
+  trit_t *const d_end =
+      &digest[HASH_LENGTH_TRIT * (key_length / ISS_KEY_LENGTH)];
 
-  for (; key < k_end; key = &key[HASH_LENGTH]) {
+  for (; key < k_end; key = &key[HASH_LENGTH_TRIT]) {
     for (i = 0; i < 26; i++) {
-      _HASH_PREFIX(absorb)(state, key, HASH_LENGTH);
-      _HASH_PREFIX(squeeze)(state, key, HASH_LENGTH);
+      _HASH_PREFIX(absorb)(state, key, HASH_LENGTH_TRIT);
+      _HASH_PREFIX(squeeze)(state, key, HASH_LENGTH_TRIT);
       _HASH_PREFIX(reset)(state);
     }
   }
 
   key = k_start;
 
-  for (; digest < d_end; digest = &digest[HASH_LENGTH]) {
+  for (; digest < d_end; digest = &digest[HASH_LENGTH_TRIT]) {
     _HASH_PREFIX(absorb)(state, key, ISS_KEY_LENGTH);
-    _HASH_PREFIX(squeeze)(state, digest, HASH_LENGTH);
+    _HASH_PREFIX(squeeze)(state, digest, HASH_LENGTH_TRIT);
     _HASH_PREFIX(reset)(state);
 
     key = &key[ISS_KEY_LENGTH];
@@ -76,7 +75,7 @@ int _ISS_PREFIX(key_digest)(trit_t *key, trit_t *digest,
 int _ISS_PREFIX(address)(trit_t const *const digest, trit_t *const address,
                          size_t const digest_length, HASH_STATE *const state) {
   _HASH_PREFIX(absorb)(state, digest, digest_length);
-  _HASH_PREFIX(squeeze)(state, address, HASH_LENGTH);
+  _HASH_PREFIX(squeeze)(state, address, HASH_LENGTH_TRIT);
   _HASH_PREFIX(reset)(state);
   return 0;
 }
@@ -91,10 +90,10 @@ int _ISS_PREFIX(signature)(trit_t *sig, trit_t const *const hash,
   size_t i, j;
   trit_t *se = &sig[key_len];
   if (sig != key) memcpy(sig, key, key_len * sizeof(trit_t));
-  for (i = 0; sig < se; i++, sig = &sig[HASH_LENGTH]) {
-    for (j = 0; j < (MAX_TRYTE_VALUE - HASH_TRYTE_VAL(hash, i)); j++) {
-      _HASH_PREFIX(absorb)(state, sig, HASH_LENGTH);
-      _HASH_PREFIX(squeeze)(state, sig, HASH_LENGTH);
+  for (i = 0; sig < se; i++, sig = &sig[HASH_LENGTH_TRIT]) {
+    for (j = 0; j < (TRYTE_VALUE_MAX - HASH_TRYTE_VAL(hash, i)); j++) {
+      _HASH_PREFIX(absorb)(state, sig, HASH_LENGTH_TRIT);
+      _HASH_PREFIX(squeeze)(state, sig, HASH_LENGTH_TRIT);
       _HASH_PREFIX(reset)(state);
     }
   }
@@ -107,15 +106,15 @@ int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t const *const hash,
                             HASH_STATE *const state) {
   size_t i, j;
   trit_t *sig_start = sig, *sig_end = &sig[sig_len];
-  for (i = 0; sig < sig_end; i++, sig = &sig[HASH_LENGTH]) {
-    for (j = 0; j < (HASH_TRYTE_VAL(hash, i) - MIN_TRYTE_VALUE); j++) {
-      _HASH_PREFIX(absorb)(state, sig, HASH_LENGTH);
-      _HASH_PREFIX(squeeze)(state, sig, HASH_LENGTH);
+  for (i = 0; sig < sig_end; i++, sig = &sig[HASH_LENGTH_TRIT]) {
+    for (j = 0; j < (HASH_TRYTE_VAL(hash, i) - TRYTE_VALUE_MIN); j++) {
+      _HASH_PREFIX(absorb)(state, sig, HASH_LENGTH_TRIT);
+      _HASH_PREFIX(squeeze)(state, sig, HASH_LENGTH_TRIT);
       _HASH_PREFIX(reset)(state);
     }
   }
   _HASH_PREFIX(absorb)(state, sig_start, sig_len);
-  _HASH_PREFIX(squeeze)(state, dig, HASH_LENGTH);
+  _HASH_PREFIX(squeeze)(state, dig, HASH_LENGTH_TRIT);
   return 0;
 }
 

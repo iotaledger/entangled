@@ -3,7 +3,10 @@ cc_test(
     srcs = [
         "test_exit_probability_randomizer.c",
     ],
-    data = [":db_file"],
+    data = [
+        "snapshot.txt",
+        ":db_file",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         "//common/storage/sql/sqlite3:sqlite3_storage",
@@ -20,5 +23,6 @@ genrule(
     name = "db_file",
     srcs = ["//common/storage/sql:schema"],
     outs = ["ciri.db"],
-    cmd = "sqlite3 $@ < $<",
+    cmd = "$(location @sqlite3//:shell) $@ < $<",
+    tools = ["@sqlite3//:shell"],
 )

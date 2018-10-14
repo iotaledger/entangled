@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "bct.h"
-#include "indices.h"
+#include "common/curl-p/bct.h"
+#include "common/curl-p/indices.h"
 
 #define __TRUTH_TABLE 1, 0, -1, 2, 1, -1, 0, 2, -1, 1, 0
 
@@ -25,23 +25,25 @@ void init_s_curl(BCurl *const ctx) {
 void s_curl_absorb(BCurl *const ctx, bct_t const *const trits,
                    size_t const offset, size_t const length) {
   copy_bct(ctx->state, 0, trits, offset,
-           (length < HASH_LENGTH ? length : HASH_LENGTH));
+           (length < HASH_LENGTH_TRIT ? length : HASH_LENGTH_TRIT));
   s_transform(ctx);
-  if (length <= HASH_LENGTH) {
+  if (length <= HASH_LENGTH_TRIT) {
     return;
   }
-  s_curl_absorb(ctx, trits, offset + HASH_LENGTH, length - HASH_LENGTH);
+  s_curl_absorb(ctx, trits, offset + HASH_LENGTH_TRIT,
+                length - HASH_LENGTH_TRIT);
 }
 
 void s_curl_squeeze(BCurl *const ctx, bct_t *const trits, size_t const offset,
                     size_t const length) {
   copy_bct(trits, offset, ctx->state, 0,
-           (length < HASH_LENGTH ? length : HASH_LENGTH));
+           (length < HASH_LENGTH_TRIT ? length : HASH_LENGTH_TRIT));
   s_transform(ctx);
-  if (length <= HASH_LENGTH) {
+  if (length <= HASH_LENGTH_TRIT) {
     return;
   }
-  s_curl_squeeze(ctx, trits, offset + HASH_LENGTH, length - HASH_LENGTH);
+  s_curl_squeeze(ctx, trits, offset + HASH_LENGTH_TRIT,
+                 length - HASH_LENGTH_TRIT);
 }
 
 void s_transform(BCurl *const ctx) {

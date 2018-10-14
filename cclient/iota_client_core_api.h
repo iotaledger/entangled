@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef CCLIENT_IOTA_API_H_
-#define CCLIENT_IOTA_API_H_
+#ifndef CCLIENT_IOTA_CORE_API_H_
+#define CCLIENT_IOTA_CORE_API_H_
 
 #include "cclient/service.h"
 #include "request/requests.h"
@@ -17,8 +17,8 @@
 extern "C" {
 #endif
 
-retcode_t iota_client_core_init(iota_client_service_t* serv);
-void iota_client_core_destroy(iota_client_service_t* serv);
+retcode_t iota_client_core_init(iota_client_service_t* const serv);
+void iota_client_core_destroy(iota_client_service_t* const serv);
 
 /**
  * Returns information about your node.
@@ -28,8 +28,8 @@ void iota_client_core_destroy(iota_client_service_t* serv);
  * @return The response.
  */
 
-retcode_t iota_api_get_node_info(const iota_client_service_t* const service,
-                                 get_node_info_res_t** res);
+retcode_t iota_client_get_node_info(const iota_client_service_t* const service,
+                                    get_node_info_res_t** res);
 
 /**
  * Returns the set of neighbors service node is connected with, as well as their
@@ -43,8 +43,8 @@ retcode_t iota_api_get_node_info(const iota_client_service_t* const service,
  *
  * @return error value.
  */
-retcode_t iota_api_get_neighbors(const iota_client_service_t* const service,
-                                 get_neighbors_res_t* const res);
+retcode_t iota_client_get_neighbors(const iota_client_service_t* const service,
+                                    get_neighbors_res_t* const res);
 
 /**
  * Add a list of neighbors to iri node. It should be noted that this is only
@@ -58,9 +58,9 @@ retcode_t iota_api_get_neighbors(const iota_client_service_t* const service,
  *
  * @return error value.
  */
-retcode_t iota_api_add_neighbors(const iota_client_service_t* const service,
-                                 add_neighbors_req_t* req,
-                                 add_neighbors_res_t* res);
+retcode_t iota_client_add_neighbors(const iota_client_service_t* const service,
+                                    const add_neighbors_req_t* const req,
+                                    add_neighbors_res_t* res);
 
 /**
  * Removes a list of neighbors from your iri node. This is only temporary, and
@@ -76,9 +76,9 @@ retcode_t iota_api_add_neighbors(const iota_client_service_t* const service,
  *
  * @return error value.
  */
-retcode_t iota_api_remove_neighbors(const iota_client_service_t* const service,
-                                    remove_neighbors_req_t* req,
-                                    remove_neighbors_res_t* res);
+retcode_t iota_client_remove_neighbors(
+    const iota_client_service_t* const service,
+    const remove_neighbors_req_t* const req, remove_neighbors_res_t* res);
 
 /**
  * Returns the list of tips.
@@ -90,8 +90,8 @@ retcode_t iota_api_remove_neighbors(const iota_client_service_t* const service,
  *
  * @return error value.
  */
-retcode_t iota_api_get_tips(const iota_client_service_t* const service,
-                            get_tips_res_t** res);
+retcode_t iota_client_get_tips(const iota_client_service_t* const service,
+                               get_tips_res_t** res);
 /**
  * Find the transactions which attach the specified input and return. All input
  * values are lists (in req), for which a list of return values (transaction
@@ -108,9 +108,10 @@ retcode_t iota_api_get_tips(const iota_client_service_t* const service,
  *
  * @return error value.
  */
-retcode_t iota_api_find_transactions(const iota_client_service_t* const service,
-                                     const find_transactions_req_t* const req,
-                                     find_transactions_res_t** const res);
+retcode_t iota_client_find_transactions(
+    const iota_client_service_t* const service,
+    const find_transactions_req_t* const req,
+    find_transactions_res_t** const res);
 
 /**
  * Returns the raw transaction data (trytes) of a specific transaction. These
@@ -125,8 +126,9 @@ retcode_t iota_api_find_transactions(const iota_client_service_t* const service,
  *
  * @return error value.
  */
-retcode_t iota_api_get_trytes(const iota_client_service_t* const service,
-                              get_trytes_req_t* req, get_trytes_res_t** res);
+retcode_t iota_client_get_trytes(const iota_client_service_t* const service,
+                                 get_trytes_req_t* const req,
+                                 get_trytes_res_t** res);
 
 /**
  * Get the inclusion states of a set of transactions. This is for determining if
@@ -145,12 +147,12 @@ retcode_t iota_api_get_trytes(const iota_client_service_t* const service,
  *
  * @return error value.
  */
-retcode_t iota_api_get_inclusion_states(
-    const iota_client_service_t* const service, get_inclusion_state_req_t* req,
-    get_inclusion_state_res_t* res);
+retcode_t iota_client_get_inclusion_states(
+    const iota_client_service_t* const service,
+    get_inclusion_state_req_t* const req, get_inclusion_state_res_t* res);
 
 /**
- * Similar to iota_api_get_inclusion_states. It returns the confirmed balance
+ * Similar to iota_client_get_inclusion_states. It returns the confirmed balance
  * which a list of addresses have at the latest confirmed milestone. In addition
  * to the balances, it also returns the milestone as well as the index with
  * which the confirmed balance was determined. The balances is returned as a
@@ -165,9 +167,9 @@ retcode_t iota_api_get_inclusion_states(
  *
  * @return error value.
  */
-retcode_t iota_api_get_balances(const iota_client_service_t* const service,
-                                const get_balances_req_t* const req,
-                                get_balances_res_t** res);
+retcode_t iota_client_get_balances(const iota_client_service_t* const service,
+                                   const get_balances_req_t* const req,
+                                   get_balances_res_t** res);
 
 /**
  * Tip selection which returns trunkTransaction and branchTransaction. The input
@@ -185,9 +187,9 @@ retcode_t iota_api_get_balances(const iota_client_service_t* const service,
  *
  * @return error value.
  */
-retcode_t iota_api_get_transactions_to_approve(
+retcode_t iota_client_get_transactions_to_approve(
     const iota_client_service_t* const service,
-    get_transactions_to_approve_req_t* req,
+    const get_transactions_to_approve_req_t* const req,
     get_transactions_to_approve_res_t** res);
 
 /**
@@ -195,12 +197,12 @@ retcode_t iota_api_get_transactions_to_approve(
  * Work. You need to supply branchTransaction as well as trunkTransaction
  * (basically the tips which you're going to validate and reference with this
  * transaction) - both of which you'll get through the
- * iota_api_get_transactions_to_approve API call. The returned value is a
+ * iota_client_get_transactions_to_approve API call. The returned value is a
  * different set of tryte values which you can input into
- * iota_api_broadcast_transactions and iota_api_store_transactions. The returned
- * tryte value, the last 243 trytes basically consist of the: trunkTransaction +
- * branchTransaction + nonce. These are valid trytes which are then accepted by
- * the network.
+ * iota_client_broadcast_transactions and iota_client_store_transactions. The
+ * returned tryte value, the last 243 trytes basically consist of the:
+ * trunkTransaction + branchTransaction + nonce. These are valid trytes which
+ * are then accepted by the network.
  *
  * https://iota.readme.io/reference#attachtotangle
  *
@@ -210,12 +212,12 @@ retcode_t iota_api_get_transactions_to_approve(
  *
  * @return error value.
  */
-retcode_t iota_api_attach_to_tangle(const iota_client_service_t* const service,
-                                    attach_to_tangle_req_t* req,
-                                    attach_to_tangle_res_t** res);
+retcode_t iota_client_attach_to_tangle(
+    const iota_client_service_t* const service,
+    const attach_to_tangle_req_t* const req, attach_to_tangle_res_t** res);
 
 /**
- * Interrupts and completely aborts the iota_api_attach_to_tangle process.
+ * Interrupts and completely aborts the iota_client_attach_to_tangle process.
  *
  * https://iota.readme.io/reference#interruptattachingtotangle
  *
@@ -223,12 +225,12 @@ retcode_t iota_api_attach_to_tangle(const iota_client_service_t* const service,
  * @return error value.
  */
 
-retcode_t iota_api_interrupt_attaching_to_tangle(
+retcode_t iota_client_interrupt_attaching_to_tangle(
     const iota_client_service_t* const service);
 
 /**
  * Broadcast a list of transactions to all neighbors. The input trytes for this
- * call are provided by iota_api_attach_to_tangle.
+ * call are provided by iota_client_attach_to_tangle.
  *
  * https://iota.readme.io/reference#broadcasttransactions
  *
@@ -237,13 +239,13 @@ retcode_t iota_api_interrupt_attaching_to_tangle(
  *
  * @return error value.
  */
-retcode_t iota_api_broadcast_transactions(
+retcode_t iota_client_broadcast_transactions(
     const iota_client_service_t* const service,
     broadcast_transactions_req_t* req);
 
 /**
  * Store transactions into the local storage. The trytes to be used for this
- * call are returned by iota_api_attach_to_tangle.
+ * call are returned by iota_client_attach_to_tangle.
  *
  * https://iota.readme.io/reference#storetransactions
  *
@@ -252,15 +254,16 @@ retcode_t iota_api_broadcast_transactions(
  *
  * @return The error value.
  */
-retcode_t iota_api_store_transactions(
-    const iota_client_service_t* const service, store_transactions_req_t* req);
+retcode_t iota_client_store_transactions(
+    const iota_client_service_t* const service,
+    store_transactions_req_t* const req);
 
 /**
  * Checks if a transaction is _consistent_ or a set of transactions are
  * _co-consistent_.
  * As long as a transaction is consistent it might be accepted
  * by the network. In case transaction is inconsistent, it will not be accepted,
- * and a reattachment is required by calling iota_api_replay_bundle().
+ * and a reattachment is required by calling iota_client_replay_bundle().
  *
  * https://iota.readme.io/reference#checkconsistency
  *
@@ -272,12 +275,12 @@ retcode_t iota_api_store_transactions(
  *
  * @return The error value.
  */
-retcode_t iota_api_check_consistency(const iota_client_service_t* const service,
-                                     check_consistency_req_t* req,
-                                     check_consistency_res_t* res);
+retcode_t iota_client_check_consistency(
+    const iota_client_service_t* const service,
+    check_consistency_req_t* const req, check_consistency_res_t* res);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // CCLIENT_IOTA_API_H_
+#endif  // CCLIENT_IOTA_CORE_API_H_

@@ -58,12 +58,6 @@ static connection_t conn;
 void test_init_connection(void) {
   connection_config_t config;
   config.db_path = "common/storage/sql/sqlite3/tests/test.db";
-  config.index_transaction_address = true;
-  config.index_transaction_approvee = true;
-  config.index_transaction_bundle = true;
-  config.index_transaction_tag = true;
-  config.index_transaction_hash = true;
-  config.index_milestone_hash = true;
   TEST_ASSERT(init_connection(&conn, &config) == RC_OK);
 }
 
@@ -174,16 +168,12 @@ void test_stored_milestone(void) {
   milestone.hash[0]++;
   TEST_ASSERT(iota_stor_milestone_store(&conn, &milestone) == RC_OK);
 
-  iota_milestone_t *ms = malloc(sizeof(iota_milestone_t));
-  iota_stor_pack_t ms_pack = {.models = (void **)&ms,
-                              .capacity = 1,
-                              .num_loaded = 0,
-                              .insufficient_capacity = false};
+  DECLARE_PACK_SINGLE_MILESTONE(ms, ms_ptr, ms_pack);
 
   iota_stor_milestone_load_last(&conn, &ms_pack);
   TEST_ASSERT_EQUAL_INT(1, ms_pack.num_loaded);
-  TEST_ASSERT_EQUAL_INT(ms->index, milestone.index);
-  TEST_ASSERT_EQUAL_MEMORY(ms->hash, milestone.hash, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_INT(ms.index, milestone.index);
+  TEST_ASSERT_EQUAL_MEMORY(ms.hash, milestone.hash, FLEX_TRIT_SIZE_243);
   milestone.hash[0]--;
   milestone.index--;
 
@@ -191,10 +181,8 @@ void test_stored_milestone(void) {
   ms_pack.num_loaded = 0;
   iota_stor_milestone_load_first(&conn, &ms_pack);
   TEST_ASSERT_EQUAL_INT(1, ms_pack.num_loaded);
-  TEST_ASSERT_EQUAL_INT(ms->index, milestone.index);
-  TEST_ASSERT_EQUAL_MEMORY(ms->hash, milestone.hash, FLEX_TRIT_SIZE_243);
-
-  free(ms);
+  TEST_ASSERT_EQUAL_INT(ms.index, milestone.index);
+  TEST_ASSERT_EQUAL_MEMORY(ms.hash, milestone.hash, FLEX_TRIT_SIZE_243);
 
   bool exist = false;
   TEST_ASSERT(iota_stor_milestone_exist(&conn, NULL, NULL, &exist) == RC_OK);
@@ -272,9 +260,7 @@ void test_stored_load_hashes_of_approvers(void) {
 }
 
 void test_update_snapshot_index(void) {
-  struct _iota_transaction tx;
-  iota_transaction_t tx_ptr = &tx;
-  iota_stor_pack_t pack = {(void **)&tx_ptr, 1, 0, false};
+  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   struct _trit_array hash = {(flex_trit_t *)TEST_TRANSACTION.hash,
                              NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 

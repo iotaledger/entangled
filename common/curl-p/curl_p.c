@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "indices.h"
-#include "trit.h"
+#include "common/curl-p/indices.h"
+#include "common/curl-p/trit.h"
 
 #define __TRUTH_TABLE 1, 0, -1, 2, 1, -1, 0, 2, -1, 1, 0
 
@@ -20,24 +20,28 @@ void sbox(Curl *const, Curl *const);
 void init_curl(Curl *const ctx) { memset(ctx->state, 0, sizeof(ctx->state)); }
 
 void curl_absorb(Curl *const ctx, trit_t const *const trits, size_t length) {
-  size_t numChunks = length / HASH_LENGTH + ((length % HASH_LENGTH) ? 1 : 0);
+  size_t numChunks =
+      length / HASH_LENGTH_TRIT + ((length % HASH_LENGTH_TRIT) ? 1 : 0);
   size_t i = 0;
   for (; i < numChunks; ++i) {
-    memcpy(ctx->state, trits + i * HASH_LENGTH * sizeof(trit_t),
-           (length < HASH_LENGTH ? length : HASH_LENGTH) * sizeof(trit_t));
+    memcpy(ctx->state, trits + i * HASH_LENGTH_TRIT * sizeof(trit_t),
+           (length < HASH_LENGTH_TRIT ? length : HASH_LENGTH_TRIT) *
+               sizeof(trit_t));
     transform(ctx);
-    length = length < HASH_LENGTH ? 0 : length - HASH_LENGTH;
+    length = length < HASH_LENGTH_TRIT ? 0 : length - HASH_LENGTH_TRIT;
   }
 }
 
 void curl_squeeze(Curl *const ctx, trit_t *const trits, size_t length) {
-  size_t numChunks = length / HASH_LENGTH + ((length % HASH_LENGTH) ? 1 : 0);
+  size_t numChunks =
+      length / HASH_LENGTH_TRIT + ((length % HASH_LENGTH_TRIT) ? 1 : 0);
   size_t i = 0;
   for (; i < numChunks; ++i) {
-    memcpy(trits + i * HASH_LENGTH * sizeof(trit_t), ctx->state,
-           (length < HASH_LENGTH ? length : HASH_LENGTH) * sizeof(trit_t));
+    memcpy(trits + i * HASH_LENGTH_TRIT * sizeof(trit_t), ctx->state,
+           (length < HASH_LENGTH_TRIT ? length : HASH_LENGTH_TRIT) *
+               sizeof(trit_t));
     transform(ctx);
-    length = length < HASH_LENGTH ? 0 : length - HASH_LENGTH;
+    length = length < HASH_LENGTH_TRIT ? 0 : length - HASH_LENGTH_TRIT;
   }
 }
 

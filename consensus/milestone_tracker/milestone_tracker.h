@@ -54,6 +54,7 @@ typedef struct milestone_tracker_s {
  * @param mt The milestone tracker
  * @param tangle A tangle
  * @param snapshot An initial snapshot
+ * @param lv A ledger validator
  * @param testnet Whether the node runs on testnet or not
  *
  * @return a status code
@@ -61,6 +62,7 @@ typedef struct milestone_tracker_s {
 extern retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
                                              tangle_t* const tangle,
                                              snapshot_t* const snapshot,
+                                             ledger_validator_t* const lv,
                                              bool testnet);
 
 /**

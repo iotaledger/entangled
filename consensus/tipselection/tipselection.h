@@ -22,6 +22,12 @@
 #include "consensus/model.h"
 #include "consensus/tangle/tangle.h"
 
+#define ALPHA .001
+#define MAX_DEPTH 15
+#define MAX_ANALYZED_TXS 20000
+#define CW_CALC_IMPL DFS_FROM_ENTRY_POINT
+#define EP_RAND_IMPL EP_RANDOM_WALK
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,6 +40,8 @@ typedef struct tipselection_t {
   tangle_t *tangle;
   exit_prob_transaction_validator_t *wv;
   ep_randomizer_t *ep_randomizer;
+  uint32_t max_txs_below_max_depth;
+  uint32_t max_depth;
 } tipselection_t;
 
 extern retcode_t iota_consensus_tipselection_init(
@@ -41,7 +49,7 @@ extern retcode_t iota_consensus_tipselection_init(
     exit_prob_transaction_validator_t *const wv,
     cw_rating_calculator_t *const cw_calc, milestone_tracker_t *const mt,
     entry_point_selector_t *const ep, ep_randomizer_t *const ep_randomizer,
-    double alpha);
+    double alpha, uint32_t max_txs_below_max_depth, uint32_t max_depth);
 
 extern retcode_t iota_consensus_get_transactions_to_approve(
     tipselection_t *const ts, size_t const depth, trit_array_p const reference,

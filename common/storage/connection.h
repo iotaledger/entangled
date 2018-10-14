@@ -22,12 +22,6 @@ typedef struct connection_t {
 
 typedef struct connection_config_t {
   const char* db_path;
-  bool index_transaction_address;
-  bool index_transaction_approvee;
-  bool index_transaction_bundle;
-  bool index_transaction_tag;
-  bool index_transaction_hash;
-  bool index_milestone_hash;
 } connection_config_t;
 
 extern retcode_t init_connection(const connection_t* const,

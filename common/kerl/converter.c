@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "common/defs.h"
 #include "common/kerl/bigint.h"
 #include "common/kerl/converter.h"
 
@@ -15,7 +16,6 @@
 #define BYTE_LEN 48
 #define BYTE_LEN_2 24
 #define TRIT_LEN 243
-#define RADIX 3
 
 static const uint32_t HALF_3[] = {
     0xa5ce8964, 0x9f007669, 0x1484504f, 0x3ade00d9, 0x0c24486e, 0x50979d57,
