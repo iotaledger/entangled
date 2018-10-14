@@ -128,6 +128,19 @@ void hash_set_free(hash_set_t *set) {
   *set = NULL;
 }
 
+retcode_t hash_set_for_each(hash_set_t *set, hash_on_container_func func,
+                            void *container) {
+  retcode_t ret = RC_OK;
+  hash_set_entry_t *curr_entry = NULL;
+  hash_set_entry_t *tmp_entry = NULL;
+  HASH_ITER(hh, *set, curr_entry, tmp_entry) {
+    if ((ret = func(container, curr_entry->hash))) {
+      return ret;
+    }
+  }
+  return ret;
+}
+
 /*
  * Hash Map
  */

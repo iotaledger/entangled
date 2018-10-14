@@ -37,6 +37,8 @@ typedef struct hash_dll_entry_s {
 typedef hash_dll_entry_t *hash_queue_t;
 typedef hash_list_entry_t *hash_stack_t;
 
+typedef retcode_t (*hash_on_container_func)(void *container, flex_trit_t *hash);
+
 bool hash_queue_empty(hash_queue_t queue);
 retcode_t hash_queue_push(hash_queue_t *queue, flex_trit_t *hash);
 void hash_queue_pop(hash_queue_t *queue);
@@ -64,6 +66,9 @@ retcode_t hash_set_add(hash_set_t *set, flex_trit_t *hash);
 retcode_t hash_set_append(hash_set_t *set, hash_set_t *clone);
 bool hash_set_contains(hash_set_t *set, flex_trit_t *hash);
 void hash_set_free(hash_set_t *set);
+
+retcode_t hash_set_for_each(hash_set_t *set, hash_on_container_func func,
+                            void *container);
 
 /*
  * Int Map operations
