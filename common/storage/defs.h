@@ -31,6 +31,7 @@
 #define TRANSACTION_COL_NONCE "nonce"
 #define TRANSACTION_COL_HASH "hash"
 #define TRANSACTION_COL_SNAPSHOT_INDEX "snapshot_index"
+#define TRANSACTION_COL_SOLID "solid"
 
 #define TRANSACTION_NUM_COLS 17
 
