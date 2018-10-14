@@ -13,6 +13,7 @@ cc_library(
     hdrs = ["converter.h"],
     deps = [
         ":bigint",
+        "//common:defs",
         "//common:stdint",
         "//common/trinary:trits",
     ],

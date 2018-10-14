@@ -1,5 +1,6 @@
 build --cxxopt='-std=c++1z'
 build --fat_apk_cpu='armeabi-v7a,arm64-v8a,x86,x86_64'
+build --output_filter='^//((?!external:).)*$'
 
 test --copt='-ggdb3'
 
@@ -32,4 +33,3 @@ build:ubsan --copt -fsanitize=undefined
 build:ubsan --copt -fno-omit-frame-pointer
 build:ubsan --linkopt -fsanitize=undefined
 build:ubsan --linkopt -lubsan
-

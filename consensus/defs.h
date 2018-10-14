@@ -8,7 +8,7 @@
 #ifndef __CONSENSUS_DEFS_H__
 #define __CONSENSUS_DEFS_H__
 
-#define IOTA_SUPPLY 2779530283277761L
+#define IOTA_SUPPLY 2779530283277761LL
 
 #ifdef __cplusplus
 extern "C" {

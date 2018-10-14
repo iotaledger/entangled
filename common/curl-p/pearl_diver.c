@@ -141,7 +141,7 @@ void *run_search_thread(void *const data) {
   SearchInstance *inst = ((SearchInstance *)data);
 
   for (i = 0; i < inst->index; i++) {
-    ptrit_increment(inst->curl.state, inst->offset, HASH_LENGTH);
+    ptrit_increment(inst->curl.state, inst->offset, HASH_LENGTH_TRIT);
   }
 
   intptr_t ret = do_pd_search(inst->test, inst, &copy);
@@ -164,7 +164,7 @@ short do_pd_search(short (*test)(PCurl *const, unsigned short const),
 
       return index;
     }
-    ptrit_increment(inst->curl.state, inst->offset + 1, HASH_LENGTH);
+    ptrit_increment(inst->curl.state, inst->offset + 1, HASH_LENGTH_TRIT);
 
     rw_lock_handle_rdlock(inst->statusLock);
     status = *inst->status;

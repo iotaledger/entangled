@@ -52,14 +52,14 @@
 
 void run_curl_p_test(Curl *curl, trit_t *exp) {
   trit_t trits[] = {TRITS_IN};
-  trit_t hash[HASH_LENGTH];
+  trit_t hash[HASH_LENGTH_TRIT];
 
   init_curl(curl);
-  curl_absorb(curl, trits, HASH_LENGTH);
-  curl_squeeze(curl, hash, HASH_LENGTH);
+  curl_absorb(curl, trits, HASH_LENGTH_TRIT);
+  curl_squeeze(curl, hash, HASH_LENGTH_TRIT);
   curl_reset(curl);
 
-  TEST_ASSERT_EQUAL_INT8_ARRAY(exp, hash, HASH_LENGTH);
+  TEST_ASSERT_EQUAL_INT8_ARRAY(exp, hash, HASH_LENGTH_TRIT);
 }
 
 void test_curl_p_27_works(void) {
@@ -85,22 +85,22 @@ void test_other(void)
 {
         Curl curl;
         curl.type = CURL_P_27;
-        trit_t hash[HASH_LENGTH];
+        trit_t hash[HASH_LENGTH_TRIT];
 
         trit_t trits[] = {OTHER_TRITS_IN};
         init_curl(&curl);
-        curl_absorb(&curl, trits, HASH_LENGTH);
-        curl_squeeze(&curl, hash, HASH_LENGTH);
+        curl_absorb(&curl, trits, HASH_LENGTH_TRIT);
+        curl_squeeze(&curl, hash, HASH_LENGTH_TRIT);
         curl_reset(&curl);
-        for(int i = 0; i < HASH_LENGTH; i++) {
+        for(int i = 0; i < HASH_LENGTH_TRIT; i++) {
                 fprintf(stderr, "%hhd, ", hash[i]);
         }
         fprintf(stderr, "\n");
         curl.type = CURL_P_81;
-        curl_absorb(&curl, trits, HASH_LENGTH);
-        curl_squeeze(&curl, hash, HASH_LENGTH);
+        curl_absorb(&curl, trits, HASH_LENGTH_TRIT);
+        curl_squeeze(&curl, hash, HASH_LENGTH_TRIT);
         curl_reset(&curl);
-        for(int i = 0; i < HASH_LENGTH; i++) {
+        for(int i = 0; i < HASH_LENGTH_TRIT; i++) {
                 fprintf(stderr, "%hhd, ", hash[i]);
         }
 }

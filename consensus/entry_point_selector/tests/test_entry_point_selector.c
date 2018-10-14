@@ -34,12 +34,7 @@ static char* ciri_db_path = "consensus/entry_point_selector/tests/ciri.db";
 void test_entry_point() {
   iota_milestone_t milestone = {START_MILESTONE, {0}};
   TRIT_ARRAY_DECLARE(ep, NUM_TRITS_HASH);
-  iota_milestone_t ep_milestone;
-  iota_milestone_t* ep_milestone_ptr = &ep_milestone;
-  iota_stor_pack_t pack = {.models = (void**)&ep_milestone_ptr,
-                           .capacity = 1,
-                           .num_loaded = 0,
-                           .insufficient_capacity = false};
+  DECLARE_PACK_SINGLE_MILESTONE(ep_milestone, ep_milestone_ptr, pack);
 
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
@@ -79,12 +74,6 @@ int main(int argc, char* argv[]) {
   }
 
   config.db_path = test_db_path;
-  config.index_transaction_address = true;
-  config.index_transaction_approvee = true;
-  config.index_transaction_bundle = true;
-  config.index_transaction_tag = true;
-  config.index_transaction_hash = true;
-  config.index_milestone_hash = true;
 
   if (TEST_PROTECT()) {
     RUN_TEST(test_entry_point);

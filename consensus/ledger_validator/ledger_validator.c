@@ -24,23 +24,18 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
                                            flex_trit_t *const milestone_hash,
                                            uint64_t index) {
   retcode_t ret = RC_OK;
-  hash_queue_t non_analyzed_hashes = NULL;
+  hash_stack_t non_analyzed_hashes = NULL;
   hash_set_t analyzed_hashes = NULL;
+  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
 
-  struct _iota_transaction tx;
-  iota_transaction_t tx_ptr = &tx;
-  iota_stor_pack_t pack = {.models = (void **)&tx_ptr,
-                           .capacity = 1,
-                           .num_loaded = 0,
-                           .insufficient_capacity = false};
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 
-  if ((ret = hash_queue_push(&non_analyzed_hashes, milestone_hash)) != RC_OK) {
+  if ((ret = hash_stack_push(&non_analyzed_hashes, milestone_hash)) != RC_OK) {
     goto done;
   }
 
   while (non_analyzed_hashes != NULL) {
-    tx_hash.trits = hash_queue_peek(non_analyzed_hashes);
+    tx_hash.trits = hash_stack_peek(non_analyzed_hashes);
     if (!hash_set_contains(&analyzed_hashes, tx_hash.trits)) {
       hash_pack_reset(&pack);
       if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_COL_HASH,
@@ -53,10 +48,10 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
           goto done;
         }
         // TODO messageQ publish
-        if ((ret = hash_queue_push(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
+        if ((ret = hash_stack_push(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
           goto done;
         }
-        if ((ret = hash_queue_push(&non_analyzed_hashes, tx.branch)) != RC_OK) {
+        if ((ret = hash_stack_push(&non_analyzed_hashes, tx.branch)) != RC_OK) {
           goto done;
         }
       }
@@ -64,11 +59,11 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
         goto done;
       }
     }
-    hash_queue_pop(&non_analyzed_hashes);
+    hash_stack_pop(&non_analyzed_hashes);
   }
 
 done:
-  hash_queue_free(&non_analyzed_hashes);
+  hash_stack_free(&non_analyzed_hashes);
   hash_set_free(&analyzed_hashes);
   return ret;
 }
@@ -77,12 +72,7 @@ static retcode_t build_snapshot(ledger_validator_t *const lv,
                                 uint64_t *const consistent_index,
                                 flex_trit_t *const consistent_hash) {
   retcode_t ret = RC_OK;
-  iota_milestone_t milestone;
-  iota_milestone_t *milestone_ptr = &milestone;
-  iota_stor_pack_t pack = {.models = (void **)&milestone_ptr,
-                           .capacity = 1,
-                           .num_loaded = 0,
-                           .insufficient_capacity = false};
+  DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
   if ((ret = iota_tangle_milestone_load_first(lv->tangle, &pack)) != RC_OK) {
     goto done;
@@ -129,22 +119,17 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
                                  bool is_milestone, bool *valid_diff) {
   retcode_t ret = RC_OK;
   int number_of_analyzed_transactions = 0;
-  hash_queue_t non_analyzed_hashes = NULL;
+  hash_stack_t non_analyzed_hashes = NULL;
   state_entry_t *entry, *diff_elem;
-
-  struct _iota_transaction tx;
-  iota_transaction_t tx_ptr = &tx, tx_bundle = NULL;
-  iota_stor_pack_t pack = {.models = (void **)&tx_ptr,
-                           .capacity = 1,
-                           .num_loaded = 0,
-                           .insufficient_capacity = false};
+  iota_transaction_t tx_bundle = NULL;
+  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 
   bool valid_bundle = false;
   bundle_transactions_t *bundle = NULL;
   bundle_transactions_new(&bundle);
 
-  if ((ret = hash_queue_push(&non_analyzed_hashes, tip)) != RC_OK) {
+  if ((ret = hash_stack_push(&non_analyzed_hashes, tip)) != RC_OK) {
     goto done;
   }
 
@@ -157,7 +142,7 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
   }
 
   while (non_analyzed_hashes != NULL) {
-    tx_hash.trits = hash_queue_peek(non_analyzed_hashes);
+    tx_hash.trits = hash_stack_peek(non_analyzed_hashes);
     if (!hash_set_contains(analyzed_hashes, tx_hash.trits)) {
       hash_pack_reset(&pack);
       if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_COL_HASH,
@@ -173,8 +158,8 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
         number_of_analyzed_transactions++;
         if (tx.current_index == 0) {
           valid_bundle = false;
-          if ((ret = bundle_validate(lv->tangle, &tx_hash, bundle,
-                                     &valid_bundle)) != RC_OK) {
+          if ((ret = iota_consensus_bundle_validator_validate(
+                   lv->tangle, &tx_hash, bundle, &valid_bundle)) != RC_OK) {
             goto done;
           }
           if (valid_bundle && (tx_bundle = (iota_transaction_t)utarray_eltptr(
@@ -205,10 +190,10 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
             goto done;
           }
         }
-        if ((ret = hash_queue_push(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
+        if ((ret = hash_stack_push(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
           goto done;
         }
-        if ((ret = hash_queue_push(&non_analyzed_hashes, tx.branch)) != RC_OK) {
+        if ((ret = hash_stack_push(&non_analyzed_hashes, tx.branch)) != RC_OK) {
           goto done;
         }
       }
@@ -216,10 +201,11 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
         goto done;
       }
     }
-    hash_queue_pop(&non_analyzed_hashes);
+    hash_stack_pop(&non_analyzed_hashes);
   }
 done:
-  hash_queue_free(&non_analyzed_hashes);
+  bundle_transactions_free(&bundle);
+  hash_stack_free(&non_analyzed_hashes);
   hash_set_free(analyzed_hashes);
   return ret;
 }
@@ -237,7 +223,6 @@ retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv,
   logger_helper_init(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   lv->tangle = tangle;
   lv->milestone_tracker = mt;
-  mt->ledger_validator = lv;
   lv->transaction_requester = tr;
 
   if ((ret = build_snapshot(lv, &mt->latest_solid_subtangle_milestone_index,
@@ -269,12 +254,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   bool valid_diff = true;
   hash_set_t analyzed_hashes = NULL;
   state_map_t diff = NULL, patch = NULL;
-  struct _iota_transaction tx;
-  iota_transaction_t tx_ptr = &tx;
-  iota_stor_pack_t pack = {.models = (void **)&tx_ptr,
-                           .capacity = 1,
-                           .num_loaded = 0,
-                           .insufficient_capacity = false};
+  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   struct _trit_array milestone_hash = {milestone->hash, NUM_TRITS_HASH,
                                        FLEX_TRIT_SIZE_243, 0};
 

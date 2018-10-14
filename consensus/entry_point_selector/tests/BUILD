@@ -17,5 +17,6 @@ genrule(
     name = "db_file",
     srcs = ["//common/storage/sql:schema"],
     outs = ["ciri.db"],
-    cmd = "sqlite3 $@ < $<",
+    cmd = "$(location @sqlite3//:shell) $@ < $<",
+    tools = ["@sqlite3//:shell"],
 )

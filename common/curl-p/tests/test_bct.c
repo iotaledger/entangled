@@ -70,14 +70,14 @@
 void run_curl_p_s_test(BCurl *curl, trit_t *exp) {
   bct_t trits[] = {TRITS_IN};
   bct_t hash[61];
-  trit_t trit_hash[HASH_LENGTH];
+  trit_t trit_hash[HASH_LENGTH_TRIT];
 
   s_curl_absorb(curl, trits, 0, 6);
-  s_curl_squeeze(curl, hash, 0, HASH_LENGTH);
+  s_curl_squeeze(curl, hash, 0, HASH_LENGTH_TRIT);
   s_curl_reset(curl);
 
-  copy_bct_to_trits(trit_hash, hash, 0, HASH_LENGTH);
-  TEST_ASSERT_EQUAL_INT8_ARRAY(exp, trit_hash, HASH_LENGTH);
+  copy_bct_to_trits(trit_hash, hash, 0, HASH_LENGTH_TRIT);
+  TEST_ASSERT_EQUAL_INT8_ARRAY(exp, trit_hash, HASH_LENGTH_TRIT);
 }
 
 void test_curl_p_27_works(void) {
