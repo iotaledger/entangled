@@ -8,6 +8,8 @@
 #define __STDC_WANT_LIB_EXT1__ 1
 #include "memset_secure.h"
 #include <string.h>
+#include <errno.h>
+#include <stdint.h>
 
 int memset_secure(void *dest, size_t destsz, int ch, size_t count) {
 #if (__STDC_VERSION__ >= 201112L || __cplusplus >= 201103L) && defined (__STDC_LIB_EXT1__)
