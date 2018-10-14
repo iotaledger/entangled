@@ -75,8 +75,8 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
   // Check if milestone is already present in database i.e. validated
   TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
   memcpy(hash.trits, candidate->hash, FLEX_TRIT_SIZE_243);
-  if ((ret = iota_tangle_milestone_exist(mt->tangle, &hash, &exists)) !=
-      RC_OK) {
+  if ((ret = iota_tangle_milestone_exist(mt->tangle, candidate->hash,
+                                         &exists)) != RC_OK) {
     goto done;
   } else if (exists) {
     goto valid;

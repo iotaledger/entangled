@@ -52,7 +52,7 @@ void test_entry_point() {
   TEST_ASSERT(iota_consensus_entry_point_selector_get_entry_point(
                   &eps, DEPTH, &ep) == RC_OK);
 
-  TEST_ASSERT(iota_tangle_milestone_load(&tangle, &ep, &pack) == RC_OK);
+  TEST_ASSERT(iota_tangle_milestone_load(&tangle, ep.trits, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
 
   TEST_ASSERT_EQUAL_INT(ep_milestone.index, LATEST_SOLID_MILESTONE - DEPTH);

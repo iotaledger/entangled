@@ -67,7 +67,7 @@ extern retcode_t iota_tangle_milestone_store(const tangle_t *const tangle,
                                              const iota_milestone_t *data_in);
 
 extern retcode_t iota_tangle_milestone_load(const tangle_t *const tangle,
-                                            const trit_array_p key,
+                                            flex_trit_t const *const hash,
                                             iota_stor_pack_t *pack);
 
 extern retcode_t iota_tangle_milestone_load_first(const tangle_t *const tangle,
@@ -81,7 +81,7 @@ extern retcode_t iota_tangle_milestone_load_next(const tangle_t *const tangle,
                                                  iota_stor_pack_t *pack);
 
 extern retcode_t iota_tangle_milestone_exist(const tangle_t *const tangle,
-                                             const trit_array_p key,
+                                             flex_trit_t const *const hash,
                                              bool *exist);
 
 /*

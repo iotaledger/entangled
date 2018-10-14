@@ -64,9 +64,7 @@ void test_init_connection(void) {
 void test_initialized_db_empty_transaction(void) {
   bool exist = false;
 
-  TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
-  memcpy(hash.trits, HASH, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_stor_milestone_exist(&conn, &hash, &exist) == RC_OK);
+  TEST_ASSERT(iota_stor_milestone_exist(&conn, HASH, &exist) == RC_OK);
   TEST_ASSERT(exist == false);
 }
 
@@ -150,8 +148,6 @@ void test_stored_transaction(void) {
 }
 
 void test_stored_milestone(void) {
-  TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
-  memcpy(hash.trits, HASH, FLEX_TRIT_SIZE_243);
   iota_milestone_t milestone;
   milestone.index = 42;
   memcpy(milestone.hash, HASH, FLEX_TRIT_SIZE_243);
@@ -188,7 +184,7 @@ void test_stored_milestone(void) {
   bool exist = false;
   TEST_ASSERT(iota_stor_milestone_exist(&conn, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
-  TEST_ASSERT(iota_stor_milestone_exist(&conn, &hash, &exist) == RC_OK);
+  TEST_ASSERT(iota_stor_milestone_exist(&conn, HASH, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
   TEST_ASSERT(iota_stor_milestone_exist(&conn, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
@@ -202,10 +198,10 @@ void test_stored_milestone(void) {
   for (int i = 0; i < 5; ++i) {
     pack.models[i] = malloc(sizeof(iota_milestone_t));
   }
-  TEST_ASSERT(iota_stor_milestone_load(&conn, &hash, &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_milestone_load(&conn, HASH, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_INT(milestones[0]->index, 42);
-  TEST_ASSERT_EQUAL_MEMORY(milestones[0]->hash, hash.trits, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(milestones[0]->hash, HASH, FLEX_TRIT_SIZE_243);
   for (int i = 0; i < 5; ++i) {
     free(pack.models[i]);
   }

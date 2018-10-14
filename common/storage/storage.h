@@ -72,7 +72,7 @@ extern retcode_t iota_stor_milestone_store(
     connection_t const* const conn, iota_milestone_t const* const data_in);
 
 extern retcode_t iota_stor_milestone_load(connection_t const* const conn,
-                                          trit_array_t const* const hash,
+                                          flex_trit_t const* const hash,
                                           iota_stor_pack_t* const pack);
 
 extern retcode_t iota_stor_milestone_load_first(connection_t const* const conn,
@@ -86,7 +86,7 @@ extern retcode_t iota_stor_milestone_load_next(connection_t const* const conn,
                                                iota_stor_pack_t* const pack);
 
 extern retcode_t iota_stor_milestone_exist(connection_t const* const conn,
-                                           trit_array_t const* const key,
+                                           flex_trit_t const* const hash,
                                            bool* const exist);
 
 #ifdef __cplusplus

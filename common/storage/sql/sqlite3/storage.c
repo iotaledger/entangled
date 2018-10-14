@@ -457,7 +457,7 @@ retcode_t iota_stor_milestone_store(connection_t const* const conn,
 }
 
 retcode_t iota_stor_milestone_load(connection_t const* const conn,
-                                   trit_array_t const* const hash,
+                                   flex_trit_t const* const hash,
                                    iota_stor_pack_t* const pack) {
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
@@ -468,8 +468,8 @@ retcode_t iota_stor_milestone_load(connection_t const* const conn,
     return ret;
   }
 
-  if ((ret = column_compress_bind(sqlite_statement, 1, hash->trits,
-                                  hash->num_bytes)) != RC_OK) {
+  if ((ret = column_compress_bind(sqlite_statement, 1, hash,
+                                  FLEX_TRIT_SIZE_243)) != RC_OK) {
     return ret;
   }
 
@@ -548,13 +548,13 @@ retcode_t iota_stor_milestone_load_next(connection_t const* const conn,
 }
 
 retcode_t iota_stor_milestone_exist(connection_t const* const conn,
-                                    trit_array_t const* const key,
+                                    flex_trit_t const* const hash,
                                     bool* const exist) {
   retcode_t ret = RC_OK;
   char* statement = NULL;
   sqlite3_stmt* sqlite_statement = NULL;
 
-  if (key) {
+  if (hash) {
     statement = iota_statement_milestone_exist_by_hash;
   } else {
     statement = iota_statement_milestone_exist;
@@ -565,9 +565,9 @@ retcode_t iota_stor_milestone_exist(connection_t const* const conn,
     return ret;
   }
 
-  if (key) {
-    if ((ret = column_compress_bind(sqlite_statement, 1, key->trits,
-                                    key->num_bytes))) {
+  if (hash) {
+    if ((ret = column_compress_bind(sqlite_statement, 1, hash,
+                                    FLEX_TRIT_SIZE_243))) {
       return ret;
     }
   }
