@@ -7,12 +7,13 @@
 
 #define __STDC_WANT_LIB_EXT1__ 1
 #include "memset_secure.h"
-#include <string.h>
 #include <errno.h>
 #include <stdint.h>
+#include <string.h>
 
 int memset_secure(void *dest, size_t destsz, int ch, size_t count) {
-#if (__STDC_VERSION__ >= 201112L || __cplusplus >= 201103L) && defined (__STDC_LIB_EXT1__)
+#if (__STDC_VERSION__ >= 201112L || __cplusplus >= 201103L) && \
+    defined(__STDC_LIB_EXT1__)
   // If this is C11, we can simply use memset_s
   return memset_s(dest, destsz, ch, count);
 #elif defined(_WIN32)
