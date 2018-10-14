@@ -3,13 +3,7 @@ cc_library(
     srcs = ["statements.c"],
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
-    deps = [
-        "//common:errors",
-        "//common/model:milestone",
-        "//common/model:transaction",
-        "//common/storage",
-        "//utils:logger_helper",
-    ],
+    deps = ["//common/storage"],
 )
 
 filegroup(

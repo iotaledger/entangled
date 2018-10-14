@@ -24,44 +24,45 @@ typedef struct _iota_transaction* iota_transaction_t;
 extern "C" {
 #endif
 
-extern retcode_t iota_stor_init(const connection_t* const conn,
-                                const connection_config_t* const config);
+extern retcode_t iota_stor_init(connection_t const* const conn,
+                                connection_config_t const* const config);
 
-extern retcode_t iota_stor_destroy(const connection_t* const conn);
+extern retcode_t iota_stor_destroy(connection_t const* const conn);
 
 /*
  * Transaction operations
  */
 
-extern retcode_t iota_stor_transaction_store(const connection_t* const conn,
-                                             const iota_transaction_t data_in);
+typedef enum transaction_field_e {
+  TRANSACTION_FIELD_NONE,
+  TRANSACTION_FIELD_HASH,
+  TRANSACTION_FIELD_ADDRESS
+} transaction_field_t;
 
-extern retcode_t iota_stor_transaction_load(const connection_t* const conn,
-                                            const char* col_name,
-                                            const trit_array_p key,
-                                            iota_stor_pack_t* pack);
+extern retcode_t iota_stor_transaction_store(connection_t const* const conn,
+                                             iota_transaction_t const data_in);
 
-extern retcode_t iota_stor_transaction_exist(const connection_t* const conn,
-                                             const char* index_name,
-                                             const trit_array_p key,
-                                             bool* exist);
-
-extern retcode_t iota_stor_transaction_update_snapshot_index(
-    const connection_t* const conn, flex_trit_t* const hash,
-    uint64_t snapshot_index);
-
-extern retcode_t iota_stor_transaction_update(const connection_t* const conn,
-                                              const char* index_name,
-                                              const trit_array_p key,
-                                              const iota_transaction_t data_in);
+extern retcode_t iota_stor_transaction_load(connection_t const* const conn,
+                                            transaction_field_t const field,
+                                            trit_array_t const* const key,
+                                            iota_stor_pack_t* const pack);
 
 extern retcode_t iota_stor_transaction_load_hashes(
-    const connection_t* const conn, const char* col_name,
-    const trit_array_p key, iota_stor_pack_t* pack);
+    connection_t const* const conn, transaction_field_t const field,
+    trit_array_t const* const key, iota_stor_pack_t* const pack);
 
 extern retcode_t iota_stor_transaction_load_hashes_of_approvers(
-    const connection_t* const conn, const flex_trit_t* approvee_hash,
-    iota_stor_pack_t* pack);
+    connection_t const* const conn, flex_trit_t const* const approvee_hash,
+    iota_stor_pack_t* const pack);
+
+extern retcode_t iota_stor_transaction_update_snapshot_index(
+    connection_t const* const conn, flex_trit_t const* const hash,
+    uint64_t const snapshot_index);
+
+extern retcode_t iota_stor_transaction_exist(connection_t const* const conn,
+                                             transaction_field_t const field,
+                                             trit_array_t const* const key,
+                                             bool* const exist);
 
 /*
  * Milestone operations
