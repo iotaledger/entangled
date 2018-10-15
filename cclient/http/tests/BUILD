@@ -8,4 +8,5 @@ cc_test(
         "@unity",
         "@cJSON",
     ],
+    flaky = True,
 )

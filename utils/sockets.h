@@ -16,17 +16,20 @@ extern "C" {
 #ifdef __WIN32__
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#define RECEIVE_BUFFER_SIZE 4096
 // ESP headers
 #elif __XTENSA__
 #include "lwip/netdb.h"
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
+#define RECEIVE_BUFFER_SIZE 2048
 // Should cover all POSIX complient platforms
 // Linux, macOS...
 #else
 #include <netdb.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#define RECEIVE_BUFFER_SIZE 4096
 #endif
 
 #ifdef __cplusplus

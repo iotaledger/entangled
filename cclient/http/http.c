@@ -12,8 +12,6 @@
 #include "utils/macros.h"
 #include "utils/sockets.h"
 
-#define RECEIVE_BUFFER_SIZE 1024
-
 typedef enum {
   IOTA_REQUEST_STATUS_OK,
   IOTA_REQUEST_STATUS_DONE,
@@ -166,28 +164,17 @@ static retcode_t send_headers_to_iota_service(int sockfd,
                                               http_info_t const* http_settings,
                                               size_t data_length,
                                               char const* const path) {
-  char header[100];
-  sprintf(header, "POST %s HTTP/1.1\r\n", path);
+  static char* header_template =
+      "POST %s HTTP/1.1\r\n"
+      "Host: %s\r\n"
+      "X-IOTA-API-Version: %d\r\n"
+      "Content-Type: application/x-www-form-urlencoded\r\n"
+      "Content-Length: %lu\r\n"
+      "\r\n";
+  char header[256];
+  sprintf(header, header_template, path, http_settings->host,
+          http_settings->api_version, data_length);
   if (send_data_to_iota_service(sockfd, header, strlen(header)) < 0) {
-    return -1;
-  }
-  sprintf(header, "Host: %s\r\n", http_settings->host);
-  if (send_data_to_iota_service(sockfd, header, strlen(header)) < 0) {
-    return -1;
-  }
-  sprintf(header, "X-IOTA-API-Version: %d\r\n", http_settings->api_version);
-  if (send_data_to_iota_service(sockfd, header, strlen(header)) < 0) {
-    return -1;
-  }
-  sprintf(header, "Content-Type: application/x-www-form-urlencoded\r\n");
-  if (send_data_to_iota_service(sockfd, header, strlen(header)) < 0) {
-    return -1;
-  }
-  sprintf(header, "Content-Length: %lu\r\n", data_length);
-  if (send_data_to_iota_service(sockfd, header, strlen(header)) < 0) {
-    return -1;
-  }
-  if (send_data_to_iota_service(sockfd, "\r\n", 2) < 0) {
     return -1;
   }
   return RC_OK;
