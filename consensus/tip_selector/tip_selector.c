@@ -15,7 +15,7 @@
 #include "consensus/tip_selector/tip_selector.h"
 #include "utils/logger_helper.h"
 
-#define TIP_SELECTOR_LOGGER_ID "consensus_tipselection"
+#define TIP_SELECTOR_LOGGER_ID "consensus_tip_selector"
 
 retcode_t iota_consensus_tip_selector_init(
     tip_selector_t *const tip_selector,
