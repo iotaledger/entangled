@@ -75,7 +75,7 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
   // Check if milestone is already present in database i.e. validated
   TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
   memcpy(hash.trits, candidate->hash, FLEX_TRIT_SIZE_243);
-  if ((ret = iota_tangle_milestone_exist(mt->tangle, MILESTONE_COL_HASH, &hash,
+  if ((ret = iota_tangle_milestone_exist(mt->tangle, candidate->hash,
                                          &exists)) != RC_OK) {
     goto done;
   } else if (exists) {
@@ -158,13 +158,13 @@ static void* latest_milestone_tracker(void* arg) {
 
     hash_pack.num_loaded = 0;
     hash_pack.insufficient_capacity = false;
-    if (iota_tangle_transaction_load_hashes(mt->tangle, TRANSACTION_COL_ADDRESS,
-                                            mt->coordinator,
-                                            &hash_pack) == RC_OK) {
+    if (iota_tangle_transaction_load_hashes(
+            mt->tangle, TRANSACTION_FIELD_ADDRESS, mt->coordinator,
+            &hash_pack) == RC_OK) {
       for (size_t i = 0; i < hash_pack.num_loaded; ++i) {
         tx_pack.num_loaded = 0;
         tx_pack.insufficient_capacity = false;
-        if (iota_tangle_transaction_load(mt->tangle, TRANSACTION_COL_HASH,
+        if (iota_tangle_transaction_load(mt->tangle, TRANSACTION_FIELD_HASH,
                                          hash_pack.models[i],
                                          &tx_pack) == RC_OK) {
           if (tx_pack.num_loaded > 0 && tx.current_index == 0) {

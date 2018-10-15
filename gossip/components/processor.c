@@ -54,7 +54,7 @@ static retcode_t process_transaction_bytes(processor_state_t *const state,
     trit_array_set_trits(&hash, (*tx)->hash, NUM_TRITS_HASH);
 
     if ((ret = iota_tangle_transaction_exist(
-             state->tangle, TRANSACTION_COL_HASH, &hash, &exists))) {
+             state->tangle, TRANSACTION_FIELD_HASH, &hash, &exists))) {
       return ret;
     }
     if (exists == false) {

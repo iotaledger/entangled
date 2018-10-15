@@ -38,8 +38,8 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
     tx_hash.trits = hash_stack_peek(non_analyzed_hashes);
     if (!hash_set_contains(&analyzed_hashes, tx_hash.trits)) {
       hash_pack_reset(&pack);
-      if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_COL_HASH,
-                                              &tx_hash, &pack)) != RC_OK) {
+      if ((ret = iota_tangle_transaction_load(
+               lv->tangle, TRANSACTION_FIELD_HASH, &tx_hash, &pack)) != RC_OK) {
         goto done;
       }
       if (tx.snapshot_index == 0) {
@@ -145,8 +145,8 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
     tx_hash.trits = hash_stack_peek(non_analyzed_hashes);
     if (!hash_set_contains(analyzed_hashes, tx_hash.trits)) {
       hash_pack_reset(&pack);
-      if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_COL_HASH,
-                                              &tx_hash, &pack)) != RC_OK) {
+      if ((ret = iota_tangle_transaction_load(
+               lv->tangle, TRANSACTION_FIELD_HASH, &tx_hash, &pack)) != RC_OK) {
         goto done;
       }
       if (pack.num_loaded == 0) {
@@ -260,7 +260,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
 
   rw_lock_handle_wrlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
 
-  if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_COL_HASH,
+  if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_FIELD_HASH,
                                           &milestone_hash, &pack)) != RC_OK) {
     goto done;
   } else if (pack.num_loaded != 1) {

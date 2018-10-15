@@ -119,11 +119,12 @@ void test_cw_gen_topology(test_tangle_topology topology) {
 
   cw_calc_result out;
   trit_array_p curr_hash = trit_array_new(NUM_TRITS_HASH);
+  bool exist;
   for (int i = 0; i < num_approvers; i++) {
     trit_array_set_trits(curr_hash, txs[i].hash, NUM_TRITS_HASH);
-    TEST_ASSERT(iota_tangle_transaction_load_hashes(
-                    &tangle, TRANSACTION_COL_HASH, curr_hash, &pack) == RC_OK);
-    TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
+    TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_HASH,
+                                              curr_hash, &exist) == RC_OK);
+    TEST_ASSERT(exist);
   }
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
@@ -224,15 +225,13 @@ void test_single_tx_tangle(void) {
   TEST_ASSERT(iota_tangle_transaction_store(
                   &tangle, (iota_transaction_t)&TEST_TRANSACTION) == RC_OK);
 
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
-  TEST_ASSERT(iota_tangle_transaction_load_hashes(&tangle, TRANSACTION_COL_HASH,
-                                                  ep, &pack) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-  TEST_ASSERT_EQUAL_MEMORY(((trit_array_p)pack.models[0])->trits, ep->trits,
-                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_HASH, ep,
+                                            &exist) == RC_OK);
+  TEST_ASSERT(exist);
 
   TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
   TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), 1);
@@ -280,8 +279,8 @@ void test_cw_topology_four_transactions_diamond(void) {
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
 
   bool exist;
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(!exist);
 
@@ -315,9 +314,9 @@ void test_cw_topology_four_transactions_diamond(void) {
   trit_array_p curr_hash = trit_array_new(NUM_TRITS_HASH);
   for (int i = 0; i < num_txs; i++) {
     trit_array_set_trits(curr_hash, txs[i].hash, NUM_TRITS_HASH);
-    TEST_ASSERT(iota_tangle_transaction_load_hashes(
-                    &tangle, TRANSACTION_COL_HASH, curr_hash, &pack) == RC_OK);
-    TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
+    TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_HASH,
+                                              curr_hash, &exist) == RC_OK);
+    TEST_ASSERT(exist);
   }
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
@@ -371,8 +370,8 @@ void test_cw_topology_two_inequal_tips(void) {
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
 
   bool exist;
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(!exist);
 
@@ -407,9 +406,9 @@ void test_cw_topology_two_inequal_tips(void) {
   trit_array_p curr_hash = trit_array_new(NUM_TRITS_HASH);
   for (int i = 0; i < num_txs; i++) {
     trit_array_set_trits(curr_hash, txs[i].hash, NUM_TRITS_HASH);
-    TEST_ASSERT(iota_tangle_transaction_load_hashes(
-                    &tangle, TRANSACTION_COL_HASH, curr_hash, &pack) == RC_OK);
-    TEST_ASSERT_EQUAL_INT(i + 1, pack.num_loaded);
+    TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_HASH,
+                                              curr_hash, &exist) == RC_OK);
+    TEST_ASSERT(exist);
   }
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
@@ -496,8 +495,8 @@ void test_1_bundle(void) {
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
 
   bool exist;
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(!exist);
 
@@ -558,7 +557,7 @@ void test_1_bundle(void) {
 
   DECLARE_PACK_SINGLE_TX(tx, tx_models, tx_pack);
 
-  TEST_ASSERT(iota_tangle_transaction_load(&tangle, TRANSACTION_COL_HASH, ep,
+  TEST_ASSERT(iota_tangle_transaction_load(&tangle, TRANSACTION_FIELD_HASH, ep,
                                            &tx_pack) == RC_OK);
 
   TEST_ASSERT_EQUAL_INT(1, tx_pack.num_loaded);
@@ -594,8 +593,8 @@ void test_2_chained_bundles(void) {
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
 
   bool exist;
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(!exist);
 
@@ -659,7 +658,7 @@ void test_2_chained_bundles(void) {
 
   DECLARE_PACK_SINGLE_TX(tx, tx_models, tx_pack);
 
-  TEST_ASSERT(iota_tangle_transaction_load(&tangle, TRANSACTION_COL_HASH, ep,
+  TEST_ASSERT(iota_tangle_transaction_load(&tangle, TRANSACTION_FIELD_HASH, ep,
                                            &tx_pack) == RC_OK);
 
   TEST_ASSERT_EQUAL_INT(1, tx_pack.num_loaded);
