@@ -40,11 +40,11 @@ char *iota_statement_transaction_update_snapshot_index =
     "=? WHERE " TRANSACTION_COL_HASH "=?";
 
 char *iota_statement_transaction_exist =
-    "SELECT '1' WHERE EXISTS(SELECT 1 "
+    "SELECT 1 WHERE EXISTS(SELECT 1 "
     "FROM " TRANSACTION_TABLE_NAME ")";
 
 char *iota_statement_transaction_exist_by_hash =
-    "SELECT '1' WHERE EXISTS(SELECT 1 "
+    "SELECT 1 WHERE EXISTS(SELECT 1 "
     "FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?)";
 
 /*
@@ -71,9 +71,9 @@ char *iota_statement_milestone_select_next =
     ">? ORDER BY " MILESTONE_COL_INDEX " ASC LIMIT 1";
 
 char *iota_statement_milestone_exist =
-    "SELECT '1' WHERE EXISTS(SELECT 1 "
+    "SELECT 1 WHERE EXISTS(SELECT 1 "
     "FROM " MILESTONE_TABLE_NAME ")";
 
 char *iota_statement_milestone_exist_by_hash =
-    "SELECT '1' WHERE EXISTS(SELECT 1 "
+    "SELECT 1 WHERE EXISTS(SELECT 1 "
     "FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?)";
