@@ -33,29 +33,34 @@ extern "C" {
 #endif
 
 typedef struct tip_selector_s {
-  cw_rating_calculator_t *cw_calc;
-  entry_point_selector_t *ep_selector;
-  ledger_validator_t *lv;
-  milestone_tracker_t *mt;
-  tangle_t *tangle;
-  exit_prob_transaction_validator_t *wv;
+  cw_rating_calculator_t *cw_rating_calculator;
+  entry_point_selector_t *entry_point_selector;
   ep_randomizer_t *ep_randomizer;
+  exit_prob_transaction_validator_t *walker_validator;
+  ledger_validator_t *ledger_validator;
+  milestone_tracker_t *milestone_tracker;
+  tangle_t *tangle;
   uint32_t max_txs_below_max_depth;
   uint32_t max_depth;
 } tip_selector_t;
 
 extern retcode_t iota_consensus_tip_selector_init(
-    tip_selector_t *impl, tangle_t *const tangle, ledger_validator_t *const lv,
-    exit_prob_transaction_validator_t *const wv,
-    cw_rating_calculator_t *const cw_calc, milestone_tracker_t *const mt,
-    entry_point_selector_t *const ep, ep_randomizer_t *const ep_randomizer,
-    double alpha, uint32_t max_txs_below_max_depth, uint32_t max_depth);
+    tip_selector_t *const tip_selector,
+    cw_rating_calculator_t *const cw_rating_calculator,
+    entry_point_selector_t *const entry_point_selector,
+    ep_randomizer_t *const ep_randomizer,
+    exit_prob_transaction_validator_t *const walker_validator,
+    ledger_validator_t *const ledger_validator,
+    milestone_tracker_t *const milestone_tracker, tangle_t *const tangle,
+    double const alpha, uint32_t const max_txs_below_max_depth,
+    uint32_t const max_depth);
 
 extern retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
-    tip_selector_t *const ts, size_t const depth, trit_array_p const reference,
-    tips_pair *const tips);
+    tip_selector_t *const tip_selector, size_t const depth,
+    trit_array_t const *const reference, tips_pair *const tips);
 
-extern retcode_t iota_consensus_tip_selector_destroy(tip_selector_t *const ts);
+extern retcode_t iota_consensus_tip_selector_destroy(
+    tip_selector_t *const tip_selector);
 
 #ifdef __cplusplus
 }

@@ -83,6 +83,7 @@ typedef hash_to_int_value_map_entry *hash_int_map_t;
 
 retcode_t hash_int_map_add(hash_int_map_t *map, flex_trit_t *hash,
                            int64_t value);
+bool hash_int_map_contains(hash_int_map_t *map, flex_trit_t *hash);
 void hash_int_map_free(hash_int_map_t *map);
 
 /*
