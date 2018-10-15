@@ -621,3 +621,83 @@ done:
   finalize_statement(sqlite_statement);
   return ret;
 }
+
+/*
+ * State diff operations
+ */
+
+retcode_t iota_stor_state_diff_store(const connection_t* const conn,
+                                     uint64_t index, state_map_t* diff) {
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = NULL;
+  size_t size = 0;
+  byte_t* bytes = NULL;
+
+  if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
+                               iota_statement_state_diff_store))) {
+    goto done;
+  }
+
+  size = iota_state_diff_serialized_size(diff);
+  if ((bytes = calloc(size, sizeof(byte_t))) == NULL) {
+    ret = RC_STORAGE_OOM;
+    goto done;
+  }
+
+  if ((ret = iota_state_diff_serialize(diff, bytes)) != RC_OK) {
+    goto done;
+  }
+
+  if (sqlite3_bind_blob(sqlite_statement, 1, bytes, size, NULL) != SQLITE_OK ||
+      sqlite3_bind_int(sqlite_statement, 2, index) != SQLITE_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
+  if ((ret = execute_statement_store_update(sqlite_statement))) {
+    goto done;
+  }
+
+done:
+  if (bytes) {
+    free(bytes);
+  }
+  finalize_statement(sqlite_statement);
+  return ret;
+}
+
+extern retcode_t iota_stor_state_diff_load(const connection_t* const conn,
+                                           uint64_t index, state_map_t* diff) {
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = NULL;
+  byte_t* bytes = NULL;
+  size_t size = 0;
+  int rc = 0;
+
+  *diff = NULL;
+
+  if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
+                               iota_statement_state_diff_load))) {
+    goto done;
+  }
+
+  if (sqlite3_bind_int(sqlite_statement, 1, index) != SQLITE_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
+  rc = sqlite3_step(sqlite_statement);
+  if (rc == SQLITE_ROW) {
+    bytes = (byte_t*)sqlite3_column_blob(sqlite_statement, 0);
+    size = sqlite3_column_bytes(sqlite_statement, 0);
+    if ((ret = iota_state_diff_deserialize(bytes, size, diff)) != RC_OK) {
+      goto done;
+    }
+  } else if (rc != SQLITE_OK && rc != SQLITE_DONE) {
+    ret = RC_SQLITE3_FAILED_STEP;
+  }
+
+done:
+  finalize_statement(sqlite_statement);
+  return ret;
+}

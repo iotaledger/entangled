@@ -10,13 +10,18 @@
 
 #include <unity/unity.h>
 
+#include "common/helpers/digest.h"
 #include "common/model/milestone.h"
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
+#include "consensus/snapshot/snapshot.h"
 #include "utils/files.h"
+
+// TODO Remove after "Common definitions #329" is merged
+#define HASH_LENGTH 243
 
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
 const flex_trit_t HASH[] = {
@@ -273,6 +278,48 @@ void test_update_snapshot_index(void) {
   TEST_ASSERT_EQUAL_INT(tx.snapshot_index, 123456);
 }
 
+void test_milestone_state_diff(void) {
+  state_map_t state_diff1 = NULL, state_diff2 = NULL;
+  state_entry_t *new = NULL, *iter = NULL, *tmp = NULL;
+  trit_t trits[HASH_LENGTH] = {1};
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t *hashed_hash;
+
+  flex_trits_from_trits(hash, HASH_LENGTH, trits, HASH_LENGTH, HASH_LENGTH);
+  for (int i = -1000; i <= 1000; i++) {
+    hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
+    memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
+    free(hashed_hash);
+    new = malloc(sizeof(state_entry_t));
+    memcpy(new->hash, hash, FLEX_TRIT_SIZE_243);
+    new->value = i;
+    HASH_ADD(hh, state_diff1, hash, FLEX_TRIT_SIZE_243, new);
+  }
+
+  TEST_ASSERT(iota_stor_state_diff_store(&conn, 42, &state_diff1) == RC_OK);
+
+  TEST_ASSERT(iota_stor_state_diff_load(&conn, 43, &state_diff2) == RC_OK);
+  TEST_ASSERT(state_diff2 == NULL);
+
+  TEST_ASSERT(iota_stor_state_diff_load(&conn, 42, &state_diff2) == RC_OK);
+  TEST_ASSERT(state_diff2 != NULL);
+
+  int i = -1000;
+  flex_trits_from_trits(hash, HASH_LENGTH, trits, HASH_LENGTH, HASH_LENGTH);
+  iter = NULL;
+  HASH_ITER(hh, state_diff2, iter, tmp) {
+    hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
+    memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
+    free(hashed_hash);
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hash, FLEX_TRIT_SIZE_243);
+    TEST_ASSERT_EQUAL_INT(iter->value, i);
+    i++;
+  }
+
+  TEST_ASSERT(iota_snapshot_state_destroy(&state_diff1) == RC_OK);
+  TEST_ASSERT(iota_snapshot_state_destroy(&state_diff2) == RC_OK);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -287,6 +334,7 @@ int main(void) {
   RUN_TEST(test_stored_load_hashes_by_address);
   RUN_TEST(test_stored_load_hashes_of_approvers);
   RUN_TEST(test_update_snapshot_index);
+  RUN_TEST(test_milestone_state_diff);
 
   return UNITY_END();
 }

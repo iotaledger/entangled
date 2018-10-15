@@ -6,6 +6,7 @@ cc_test(
     data = [":db_file"],
     visibility = ["//visibility:public"],
     deps = [
+        "//common/helpers:digest",
         "//common/storage/sql/sqlite3:sqlite3_storage",
         "//common/storage/tests/helpers",
         "//common/trinary:trit_ptrit",

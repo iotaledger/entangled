@@ -10,6 +10,7 @@ cc_library(
         "//common/model:milestone",
         "//common/model:transaction",
         "//common/storage/sql:statements",
+        "//consensus/snapshot",
         "//utils:logger_helper",
         "@sqlite3",
     ],

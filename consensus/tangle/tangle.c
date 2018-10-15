@@ -212,3 +212,17 @@ retcode_t iota_tangle_find_tail(const tangle_t *const tangle,
 
   return res;
 }
+
+/*
+ * State diff operations
+ */
+
+retcode_t iota_tangle_state_diff_store(const tangle_t *const tangle,
+                                       uint64_t index, state_map_t *diff) {
+  return iota_stor_state_diff_store(&tangle->conn, index, diff);
+}
+
+retcode_t iota_tangle_state_diff_load(const tangle_t *const tangle,
+                                      uint64_t index, state_map_t *diff) {
+  return iota_stor_state_diff_load(&tangle->conn, index, diff);
+}
