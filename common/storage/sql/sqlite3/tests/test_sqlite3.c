@@ -298,7 +298,11 @@ void test_milestone_state_diff(void) {
 
   TEST_ASSERT(iota_stor_state_diff_store(&conn, 42, &state_diff1) == RC_OK);
 
+  TEST_ASSERT(iota_stor_state_diff_load(&conn, 43, &state_diff2) == RC_OK);
+  TEST_ASSERT(state_diff2 == NULL);
+
   TEST_ASSERT(iota_stor_state_diff_load(&conn, 42, &state_diff2) == RC_OK);
+  TEST_ASSERT(state_diff2 != NULL);
 
   int i = -1000;
   flex_trits_from_trits(hash, HASH_LENGTH, trits, HASH_LENGTH, HASH_LENGTH);
