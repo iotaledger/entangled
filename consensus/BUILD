@@ -14,7 +14,7 @@ cc_library(
         "//consensus/milestone_tracker",
         "//consensus/snapshot",
         "//consensus/tangle",
-        "//consensus/tipselection",
+        "//consensus/tip_selector",
         "//consensus/transaction_validator",
     ],
 )

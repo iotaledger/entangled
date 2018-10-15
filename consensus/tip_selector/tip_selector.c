@@ -12,13 +12,13 @@
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
 #include "consensus/snapshot/snapshot.h"
-#include "consensus/tipselection/tipselection.h"
+#include "consensus/tip_selector/tip_selector.h"
 #include "utils/logger_helper.h"
 
 #define TIPSELECTION_LOGGER_ID "consensus_tipselection"
 
 retcode_t iota_consensus_tipselection_init(
-    tipselection_t *impl, tangle_t *const tangle, ledger_validator_t *const lv,
+    tip_selector_t *impl, tangle_t *const tangle, ledger_validator_t *const lv,
     exit_prob_transaction_validator_t *const wv,
     cw_rating_calculator_t *const cw_calc, milestone_tracker_t *const mt,
     entry_point_selector_t *const ep, ep_randomizer_t *const ep_randomizer,
@@ -36,7 +36,7 @@ retcode_t iota_consensus_tipselection_init(
 }
 
 retcode_t iota_consensus_get_transactions_to_approve(
-    tipselection_t *const ts, size_t const depth, trit_array_p const reference,
+    tip_selector_t *const ts, size_t const depth, trit_array_p const reference,
     tips_pair *tips) {
   retcode_t res = RC_OK;
   trit_array_p ep = NULL;
@@ -91,7 +91,7 @@ ret:
   return res;
 }
 
-retcode_t iota_consensus_tipselection_destroy(tipselection_t *const ts) {
+retcode_t iota_consensus_tipselection_destroy(tip_selector_t *const ts) {
   logger_helper_destroy(TIPSELECTION_LOGGER_ID);
   ts->cw_calc = NULL;
   ts->ep_selector = NULL;
