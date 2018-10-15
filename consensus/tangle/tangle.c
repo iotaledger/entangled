@@ -34,7 +34,6 @@ retcode_t iota_tangle_transaction_load(const tangle_t *const tangle,
                                        transaction_field_t const field,
                                        const trit_array_p key,
                                        iota_stor_pack_t *tx) {
-  // TODO - when more "persistance provider are implemented - should loop
   return iota_stor_transaction_load(&tangle->conn, field, key, tx);
 }
 
@@ -95,7 +94,6 @@ retcode_t iota_tangle_transaction_update_snapshot_index(
 retcode_t iota_tangle_transaction_exist(const tangle_t *const tangle,
                                         transaction_field_t const field,
                                         const trit_array_p key, bool *exist) {
-  // TODO - when more "persistance provider are implemented - should loop
   return iota_stor_transaction_exist(&tangle->conn, field, key, exist);
 }
 
