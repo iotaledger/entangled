@@ -42,11 +42,12 @@ typedef struct snapshot_s {
  *
  * @param snapshot_conf_file The snapshot configuration file path
  * @param conf The snapshot configuration
+ * @param testnet Whether the node runs on testnet or not
  *
  * @return a status code
  */
 retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
-                                  snapshot_conf_t *const conf);
+                                  snapshot_conf_t *const conf, bool testnet);
 
 /**
  * Initializes a snapshot

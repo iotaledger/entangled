@@ -79,7 +79,7 @@ done:
  */
 
 retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
-                                  snapshot_conf_t *const conf) {
+                                  snapshot_conf_t *const conf, bool testnet) {
   retcode_t ret = RC_OK;
   FILE *file = NULL;
   size_t len = 0;
@@ -119,8 +119,6 @@ retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
 
   if ((timestamp = cJSON_GetObjectItemCaseSensitive(json, "timestamp")) ==
           NULL ||
-      (signature = cJSON_GetObjectItemCaseSensitive(json, "signature")) ==
-          NULL ||
       (coordinator = cJSON_GetObjectItemCaseSensitive(json, "coordinator")) ==
           NULL) {
     goto json_error;
@@ -130,25 +128,6 @@ retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
     goto json_error;
   }
   conf->timestamp = timestamp->valueint;
-
-  tmp = cJSON_GetObjectItemCaseSensitive(signature, "index");
-  if (tmp == NULL || !cJSON_IsNumber(tmp)) {
-    goto json_error;
-  }
-  conf->signature_index = tmp->valueint;
-
-  tmp = cJSON_GetObjectItemCaseSensitive(signature, "depth");
-  if (tmp == NULL || !cJSON_IsNumber(tmp)) {
-    goto json_error;
-  }
-  conf->signature_depth = tmp->valueint;
-
-  tmp = cJSON_GetObjectItemCaseSensitive(signature, "pubkey");
-  if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL ||
-      strlen(tmp->valuestring) != HASH_LENGTH_TRYTE) {
-    goto json_error;
-  }
-  memcpy(conf->signature_pubkey, tmp->valuestring, HASH_LENGTH_TRYTE);
 
   tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "pubkey");
   if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL ||
@@ -162,6 +141,33 @@ retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
     goto json_error;
   }
   conf->last_milestone = tmp->valueint;
+
+  if (!testnet) {
+    if ((signature = cJSON_GetObjectItemCaseSensitive(json, "signature")) ==
+        NULL) {
+      goto json_error;
+    }
+
+    tmp = cJSON_GetObjectItemCaseSensitive(signature, "index");
+    if (tmp == NULL || !cJSON_IsNumber(tmp)) {
+      goto json_error;
+    }
+    conf->signature_index = tmp->valueint;
+
+    tmp = cJSON_GetObjectItemCaseSensitive(signature, "depth");
+    if (tmp == NULL || !cJSON_IsNumber(tmp)) {
+      goto json_error;
+    }
+    conf->signature_depth = tmp->valueint;
+
+    tmp = cJSON_GetObjectItemCaseSensitive(signature, "pubkey");
+    if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL ||
+        strlen(tmp->valuestring) != HASH_LENGTH_TRYTE) {
+      goto json_error;
+    }
+    memcpy(conf->signature_pubkey, tmp->valuestring, HASH_LENGTH_TRYTE);
+  }
+
   goto done;
 
 json_error : {
@@ -201,8 +207,8 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot,
   snapshot->index = 0;
   snapshot->state = NULL;
 
-  if ((ret = iota_snapshot_init_conf(snapshot_conf_file, &snapshot->conf)) !=
-      RC_OK) {
+  if ((ret = iota_snapshot_init_conf(snapshot_conf_file, &snapshot->conf,
+                                     testnet)) != RC_OK) {
     log_critical(SNAPSHOT_LOGGER_ID,
                  "Parsing snapshot configuration file failed\n");
     return ret;

@@ -4,6 +4,8 @@ SNAPSHOT_REPOSITORY = "https://raw.githubusercontent.com/thibault-martinez/snaps
 
 SNAPSHOT_TIMESTAMP_MAINNET = "20180917"
 
+SNAPSHOT_TIMESTAMP_TESTNET = "20180329"
+
 http_file(
     name = "snapshot_conf_mainnet",
     url = SNAPSHOT_REPOSITORY + "/mainnet/" + SNAPSHOT_TIMESTAMP_MAINNET + "/snapshot.json",
@@ -17,6 +19,16 @@ http_file(
 http_file(
     name = "snapshot_mainnet",
     url = SNAPSHOT_REPOSITORY + "/mainnet/" + SNAPSHOT_TIMESTAMP_MAINNET + "/snapshot.txt",
+)
+
+http_file(
+    name = "snapshot_conf_testnet",
+    url = SNAPSHOT_REPOSITORY + "/testnet/" + SNAPSHOT_TIMESTAMP_TESTNET + "/snapshot.json",
+)
+
+http_file(
+    name = "snapshot_testnet",
+    url = SNAPSHOT_REPOSITORY + "/testnet/" + SNAPSHOT_TIMESTAMP_TESTNET + "/snapshot.txt",
 )
 
 git_repository(
