@@ -167,8 +167,6 @@ static retcode_t cw_rating_dfs_do_dfs_light(
   *subtangle_size = 0;
   flex_trit_t *curr_hash = NULL;
   hash_to_indexed_hash_set_entry_t *curr_tx_entry = NULL;
-  hash_set_entry_t *curr_direct_approver = NULL;
-  hash_set_entry_t *tmp_direct_approver = NULL;
   retcode_t ret;
 
   hash_stack_t stack = NULL;
@@ -195,11 +193,9 @@ static retcode_t cw_rating_dfs_do_dfs_light(
 
     bitset_set_true(visited_bitset, curr_tx_entry->idx);
 
-    HASH_ITER(hh, curr_tx_entry->approvers, curr_direct_approver,
-              tmp_direct_approver) {
-      if ((ret = hash_stack_push(&stack, curr_direct_approver->hash))) {
-        return ret;
-      }
+    if ((ret = hash_set_for_each(&curr_tx_entry->approvers, hash_stack_push,
+                                 &stack))) {
+      return ret;
     }
   }
 
