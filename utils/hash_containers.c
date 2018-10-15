@@ -159,6 +159,16 @@ retcode_t hash_int_map_add(hash_int_map_t *map, flex_trit_t *hash,
   return RC_OK;
 }
 
+bool hash_int_map_contains(hash_int_map_t *map, flex_trit_t *hash) {
+  if (*map == NULL) {
+    return false;
+  }
+  hash_to_int_value_map_entry *entry = NULL;
+
+  HASH_FIND(hh, *map, hash, FLEX_TRIT_SIZE_243, entry);
+  return entry != NULL;
+}
+
 void hash_int_map_free(hash_int_map_t *map) {
   hash_to_int_value_map_entry *curr_entry = NULL;
   hash_to_int_value_map_entry *tmp_entry = NULL;
