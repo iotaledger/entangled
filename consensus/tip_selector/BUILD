@@ -1,7 +1,7 @@
 cc_library(
-    name = "tipselection",
-    srcs = ["tipselection.c"],
-    hdrs = ["tipselection.h"],
+    name = "tip_selector",
+    srcs = ["tip_selector.c"],
+    hdrs = ["tip_selector.h"],
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
@@ -12,6 +12,8 @@ cc_library(
         "//consensus/exit_probability_randomizer",
         "//consensus/exit_probability_validator",
         "//consensus/ledger_validator",
+        "//consensus/milestone_tracker",
+        "//consensus/tangle",
         "//utils:logger_helper",
     ],
 )

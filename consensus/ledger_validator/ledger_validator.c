@@ -316,7 +316,7 @@ done:
 }
 
 retcode_t iota_consensus_ledger_validator_check_consistency(
-    ledger_validator_t *const lv, hash_list_t hashes, bool *consistent) {
+    ledger_validator_t *const lv, hash_stack_t hashes, bool *consistent) {
   retcode_t ret = RC_OK;
   hash_list_entry_t *iter = NULL;
   hash_set_t analyzed_hashes = NULL;
