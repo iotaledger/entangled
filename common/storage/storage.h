@@ -16,6 +16,7 @@
 #include "common/storage/pack.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/snapshot/state_delta.h"
+#include "utils/hash_containers.h"
 
 // Forward declaration
 typedef struct iota_milestone_s iota_milestone_t;
@@ -59,11 +60,6 @@ extern retcode_t iota_stor_transaction_update_snapshot_index(
 
 extern retcode_t iota_stor_transaction_update_solid_state(
     const connection_t* const conn, flex_trit_t* const hash, bool is_solid);
-
-extern retcode_t iota_stor_transaction_update(const connection_t* const conn,
-                                              const char* index_name,
-                                              const trit_array_p key,
-                                              const iota_transaction_t data_in);
 
 extern retcode_t iota_stor_transaction_load_hashes(
     connection_t const* const conn, transaction_field_t const field,

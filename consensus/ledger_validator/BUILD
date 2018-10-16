@@ -19,6 +19,7 @@ cc_library(
         "//consensus/milestone_tracker:milestone_tracker_shared",
         "//consensus/snapshot",
         "//consensus/tangle",
+        "//consensus/utils:tangle_traversals",
         "//gossip/components:requester",
         "//utils:hash_containers",
         "//utils/containers/hash:hash243_stack",

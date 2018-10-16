@@ -7,6 +7,7 @@ cc_library(
         "//common:errors",
         "//common/trinary:trit_array",
         "//consensus/snapshot:state_delta",
+        "//utils:hash_containers",
         "//utils:logger_helper",
     ],
 )

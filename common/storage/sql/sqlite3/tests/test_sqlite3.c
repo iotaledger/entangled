@@ -305,8 +305,7 @@ void test_milestone_state_delta(void) {
   int i = -1000;
   flex_trits_from_trits(hash, HASH_LENGTH, trits, HASH_LENGTH, HASH_LENGTH);
   iter = NULL;
-  HASH_ITER(hh, state_delta2, iter, tmp)
-  {
+  HASH_ITER(hh, state_delta2, iter, tmp) {
     hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
     memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
     free(hashed_hash);

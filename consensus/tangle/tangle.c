@@ -37,6 +37,11 @@ retcode_t iota_tangle_transaction_load(const tangle_t *const tangle,
   return iota_stor_transaction_load(&tangle->conn, field, key, tx);
 }
 
+retcode_t iota_tangle_transaction_update_solid_state(
+    const tangle_t *const tangle, flex_trit_t *const hash, bool state) {
+  return iota_stor_transaction_update_solid_state(&tangle->conn, hash, state);
+}
+
 retcode_t iota_tangle_transaction_load_hashes(const tangle_t *const tangle,
                                               transaction_field_t const field,
                                               const trit_array_p key,
