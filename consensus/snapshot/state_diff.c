@@ -7,31 +7,102 @@
 
 #include "consensus/snapshot/state_diff.h"
 
-retcode_t state_diff_destroy(state_diff_t *const state) {
-  state_diff_entry_t *entry, *tmp;
+int64_t state_diff_sum(state_diff_t const *const state) {
+  int64_t sum = 0;
+  state_diff_entry_t *iter = NULL, *tmp = NULL;
 
-  if (state == NULL) {
-    return RC_SNAPSHOT_NULL_STATE;
-  } else if (*state == NULL) {
-    return RC_OK;
-  }
+  HASH_ITER(hh, *state, iter, tmp) { sum += iter->value; }
+  return sum;
+}
 
-  HASH_ITER(hh, *state, entry, tmp) {
-    HASH_DEL(*state, entry);
-    free(entry);
+retcode_t state_diff_add_or_sum(state_diff_t *const state,
+                                flex_trit_t const *const hash,
+                                int64_t const value) {
+  retcode_t ret = RC_OK;
+  state_diff_entry_t *entry = NULL;
+
+  state_diff_find(*state, hash, entry);
+  if (entry) {
+    entry->value += value;
+  } else {
+    if ((ret = state_diff_add(state, hash, value)) != RC_OK) {
+      return ret;
+    }
   }
   return RC_OK;
 }
 
-bool state_diff_is_consistent(state_diff_t *const state) {
+retcode_t state_diff_add_or_replace(state_diff_t *const state,
+                                    flex_trit_t const *const hash,
+                                    int64_t const value) {
+  retcode_t ret = RC_OK;
+  state_diff_entry_t *entry = NULL;
+
+  state_diff_find(*state, hash, entry);
+  if (entry) {
+    entry->value = value;
+  } else {
+    if ((ret = state_diff_add(state, hash, value)) != RC_OK) {
+      return ret;
+    }
+  }
+  return RC_OK;
+}
+
+retcode_t state_diff_create_patch(state_diff_t const *const state,
+                                  state_diff_t const *const diff,
+                                  state_diff_t *const patch) {
+  retcode_t ret = RC_OK;
+  state_diff_entry_t *iter = NULL, *entry = NULL, *tmp = NULL;
+
+  HASH_ITER(hh, *diff, iter, tmp) {
+    state_diff_find(*state, iter->hash, entry);
+    if ((ret = state_diff_add(patch, iter->hash,
+                              (entry ? entry->value : 0) + iter->value)) !=
+        RC_OK) {
+      return ret;
+    }
+  }
+  return ret;
+}
+
+retcode_t state_diff_apply_patch(state_diff_t *const state,
+                                 state_diff_t const *const patch) {
+  retcode_t ret = RC_OK;
+  state_diff_entry_t *iter = NULL, *tmp = NULL;
+
+  HASH_ITER(hh, *patch, iter, tmp) {
+    if ((ret = state_diff_add_or_sum(state, iter->hash, iter->value)) !=
+        RC_OK) {
+      return ret;
+    }
+  }
+  return ret;
+}
+
+retcode_t state_diff_merge_patch(state_diff_t *const state,
+                                 state_diff_t const *const patch) {
+  retcode_t ret = RC_OK;
+  state_diff_entry_t *iter = NULL, *tmp = NULL;
+
+  HASH_ITER(hh, *patch, iter, tmp) {
+    if ((ret = state_diff_add_or_replace(state, iter->hash, iter->value)) !=
+        RC_OK) {
+      return ret;
+    }
+  }
+  return ret;
+}
+
+bool state_diff_is_consistent(state_diff_t *const diff) {
   state_diff_entry_t *entry, *tmp;
 
-  HASH_ITER(hh, *state, entry, tmp) {
+  HASH_ITER(hh, *diff, entry, tmp) {
     if (entry->value <= 0) {
       if (entry->value < 0) {
         return false;
       }
-      HASH_DEL(*state, entry);
+      HASH_DEL(*diff, entry);
       free(entry);
     }
   }
@@ -59,7 +130,7 @@ retcode_t state_diff_serialize(state_diff_t const *const diff,
   return RC_OK;
 }
 
-retcode_t state_diff_deserialize(byte_t const *const bytes, size_t size,
+retcode_t state_diff_deserialize(byte_t const *const bytes, size_t const size,
                                  state_diff_t *const diff) {
   uint64_t offset = 0;
   state_diff_entry_t *new = NULL;

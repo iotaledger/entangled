@@ -120,7 +120,6 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
   retcode_t ret = RC_OK;
   int number_of_analyzed_transactions = 0;
   hash_stack_t non_analyzed_hashes = NULL;
-  state_diff_entry_t *entry, *diff_elem;
   iota_transaction_t tx_bundle = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
@@ -167,20 +166,9 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
             while (tx_bundle != NULL) {
               if (tx_bundle->value != 0) {
                 // TODO countedTx.add(bundleTransactionViewModel.getHash()))
-                HASH_FIND(hh, *state, tx_bundle->address, FLEX_TRIT_SIZE_243,
-                          entry);
-                if (entry) {
-                  entry->value += tx_bundle->value;
-                } else {
-                  if ((diff_elem = malloc(sizeof(state_diff_entry_t))) ==
-                      NULL) {
-                    ret = RC_LEDGER_VALIDATOR_OOM;
-                    goto done;
-                  }
-                  memcpy(diff_elem->hash, tx_bundle->address,
-                         FLEX_TRIT_SIZE_243);
-                  diff_elem->value = tx_bundle->value;
-                  HASH_ADD(hh, *state, hash, FLEX_TRIT_SIZE_243, diff_elem);
+                if ((ret = state_diff_add_or_sum(state, tx_bundle->address,
+                                                 tx_bundle->value)) != RC_OK) {
+                  goto done;
                 }
               }
               tx_bundle = (iota_transaction_t)utarray_next(bundle, tx_bundle);
@@ -339,7 +327,6 @@ retcode_t iota_consensus_ledger_validator_update_diff(
     state_diff_t *diff, flex_trit_t *tip, bool *is_consistent) {
   retcode_t ret = RC_OK;
   state_diff_t current_state = NULL, patch = NULL;
-  state_diff_entry_t *iter, *entry, *diff_elem, *tmp;
   hash_set_t visited_hashes = NULL;
   bool valid_diff = true;
 
@@ -370,20 +357,8 @@ retcode_t iota_consensus_ledger_validator_update_diff(
     goto done;
   }
 
-  // TODO Extract state_diff_t from snapshot #345
-  HASH_ITER(hh, *diff, iter, tmp) {
-    HASH_FIND(hh, current_state, iter->hash, FLEX_TRIT_SIZE_243, entry);
-    if (entry) {
-      entry->value += iter->value;
-    } else {
-      if ((diff_elem = malloc(sizeof(state_diff_entry_t))) == NULL) {
-        ret = RC_LEDGER_VALIDATOR_OOM;
-        goto done;
-      }
-      memcpy(diff_elem->hash, iter->hash, FLEX_TRIT_SIZE_243);
-      diff_elem->value = iter->value;
-      HASH_ADD(hh, current_state, hash, FLEX_TRIT_SIZE_243, diff_elem);
-    }
+  if ((ret = state_diff_apply_patch(&current_state, diff)) != RC_OK) {
+    goto done;
   }
 
   if ((ret = iota_snapshot_create_patch(lv->milestone_tracker->latest_snapshot,
@@ -394,22 +369,7 @@ retcode_t iota_consensus_ledger_validator_update_diff(
   *is_consistent = state_diff_is_consistent(&patch);
 
   if (is_consistent) {
-    // TODO Extract state_diff_t from snapshot #345
-    HASH_ITER(hh, current_state, iter, tmp) {
-      HASH_FIND(hh, *diff, iter->hash, FLEX_TRIT_SIZE_243, entry);
-      if (entry) {
-        entry->value = iter->value;
-      } else {
-        if ((diff_elem = malloc(sizeof(state_diff_entry_t))) == NULL) {
-          ret = RC_LEDGER_VALIDATOR_OOM;
-          goto done;
-        }
-        memcpy(diff_elem->hash, iter->hash, FLEX_TRIT_SIZE_243);
-        diff_elem->value = iter->value;
-        HASH_ADD(hh, *diff, hash, FLEX_TRIT_SIZE_243, diff_elem);
-      }
-    }
-    if ((ret = hash_set_append(&visited_hashes, analyzed_hashes))) {
+    if ((ret = state_diff_merge_patch(diff, &current_state)) != RC_OK) {
       goto done;
     }
   }

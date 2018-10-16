@@ -20,10 +20,10 @@ static retcode_t iota_snapshot_initial_state(snapshot_t *const snapshot,
   retcode_t ret = RC_OK;
   char *line = NULL, *delim = NULL;
   int64_t value = 0, supply = 0;
-  state_diff_entry_t *entry = NULL;
   size_t len = 0;
   ssize_t rd = 0;
   FILE *fp = NULL;
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
 
   if ((fp = fopen(snapshot_file, "r")) == NULL) {
     log_critical(SNAPSHOT_LOGGER_ID, "Opening snapshot file failed\n");
@@ -41,14 +41,11 @@ static retcode_t iota_snapshot_initial_state(snapshot_t *const snapshot,
     *delim = '\0';
     value = atoll(delim + 1);
     if (value > 0) {
-      if ((entry = malloc(sizeof(state_diff_entry_t))) == NULL) {
-        ret = RC_SNAPSHOT_OOM;
+      flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t *)line,
+                             NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+      if ((ret = state_diff_add(&snapshot->state, hash, value)) != RC_OK) {
         goto done;
       }
-      flex_trits_from_trytes(entry->hash, NUM_TRITS_HASH, (tryte_t *)line,
-                             NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-      entry->value = value;
-      HASH_ADD(hh, snapshot->state, hash, FLEX_TRIT_SIZE_243, entry);
       supply += value;
     } else if (value < 0) {
       ret = RC_SNAPSHOT_INCONSISTENT_SNAPSHOT;
@@ -117,7 +114,7 @@ retcode_t iota_snapshot_destroy(snapshot_t *const snapshot) {
     return RC_SNAPSHOT_NULL_SELF;
   }
 
-  ret = state_diff_destroy(&snapshot->state);
+  state_diff_destroy(&snapshot->state);
   rw_lock_handle_destroy(&snapshot->rw_lock);
   logger_helper_destroy(SNAPSHOT_LOGGER_ID);
   return ret;
@@ -135,7 +132,7 @@ size_t iota_snapshot_get_index(snapshot_t *const snapshot) {
 retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
                                     flex_trit_t *const hash, int64_t *balance) {
   retcode_t ret = RC_OK;
-  state_diff_entry_t *entry;
+  state_diff_entry_t *entry = NULL;
 
   if (snapshot == NULL) {
     return RC_SNAPSHOT_NULL_SELF;
@@ -146,7 +143,7 @@ retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
   }
 
   rw_lock_handle_rdlock(&snapshot->rw_lock);
-  HASH_FIND(hh, snapshot->state, hash, FLEX_TRIT_SIZE_243, entry);
+  state_diff_find(snapshot->state, hash, entry);
   if (entry == NULL) {
     ret = RC_SNAPSHOT_BALANCE_NOT_FOUND;
   } else {
@@ -160,7 +157,6 @@ retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
                                      state_diff_t *const diff,
                                      state_diff_t *const patch) {
   retcode_t ret = RC_OK;
-  state_diff_entry_t *iter, *entry, *new, *tmp;
 
   if (snapshot == NULL) {
     return RC_SNAPSHOT_NULL_SELF;
@@ -168,16 +164,11 @@ retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
 
   HASH_CLEAR(hh, *patch);
   rw_lock_handle_rdlock(&snapshot->rw_lock);
-  HASH_ITER(hh, *diff, iter, tmp) {
-    HASH_FIND(hh, snapshot->state, iter->hash, FLEX_TRIT_SIZE_243, entry);
-    if ((new = malloc(sizeof(state_diff_entry_t))) == NULL) {
-      ret = RC_SNAPSHOT_OOM;
-      goto done;
-    }
-    memcpy(new->hash, iter->hash, FLEX_TRIT_SIZE_243);
-    new->value = (entry ? entry->value : 0) + iter->value;
-    HASH_ADD(hh, *patch, hash, FLEX_TRIT_SIZE_243, new);
+
+  if ((ret = state_diff_create_patch(&snapshot->state, diff, patch)) != RC_OK) {
+    goto done;
   }
+
 done:
   rw_lock_handle_unlock(&snapshot->rw_lock);
   return ret;
@@ -186,35 +177,25 @@ done:
 retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
                                     state_diff_t *const patch, size_t index) {
   retcode_t ret = RC_OK;
-  state_diff_entry_t *iter, *entry, *new, *tmp;
-  ssize_t sum = 0;
+  int64_t sum = 0;
 
   if (snapshot == NULL) {
     return RC_SNAPSHOT_NULL_SELF;
   }
 
-  HASH_ITER(hh, *patch, iter, tmp) { sum += iter->value; }
-  if (sum != 0) {
+  if ((sum = state_diff_sum(patch)) != 0) {
     log_warning(SNAPSHOT_LOGGER_ID, "Inconsistent snapshot patch\n");
     return RC_SNAPSHOT_INCONSISTENT_PATCH;
   }
 
   rw_lock_handle_wrlock(&snapshot->rw_lock);
-  HASH_ITER(hh, *patch, iter, tmp) {
-    HASH_FIND(hh, snapshot->state, iter->hash, FLEX_TRIT_SIZE_243, entry);
-    if (entry) {
-      entry->value += iter->value;
-    } else {
-      if ((new = malloc(sizeof(state_diff_entry_t))) == NULL) {
-        ret = RC_SNAPSHOT_OOM;
-        goto done;
-      }
-      memcpy(new->hash, iter->hash, FLEX_TRIT_SIZE_243);
-      new->value = iter->value;
-      HASH_ADD(hh, snapshot->state, hash, FLEX_TRIT_SIZE_243, new);
-    }
+
+  if ((ret = state_diff_apply_patch(&snapshot->state, patch)) != RC_OK) {
+    goto done;
   }
+
   snapshot->index = index;
+
 done:
   rw_lock_handle_unlock(&snapshot->rw_lock);
   return ret;
