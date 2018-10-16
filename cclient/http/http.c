@@ -77,7 +77,6 @@ static int request_parse_message_complete(struct _response_ctx* response) {
 static retcode_t connect_to_iota_service(char const* const hostname,
                                          const size_t port, int* sockfd) {
   struct addrinfo hints, *serverinfo, *info;
-  int res;
   char port_string[6];
 
   memset(&hints, 0, sizeof hints);
@@ -164,8 +163,7 @@ static retcode_t send_data_to_iota_service(int sockfd, char const* const data,
 
 static retcode_t send_headers_to_iota_service(int sockfd,
                                               http_info_t const* http_settings,
-                                              size_t data_length,
-                                              char const* const path) {
+                                              size_t data_length) {
   static char* header_template =
       "POST %s HTTP/1.1\r\n"
       "Host: %s\r\n"
@@ -174,14 +172,13 @@ static retcode_t send_headers_to_iota_service(int sockfd,
       "Content-Length: %lu\r\n"
       "\r\n";
   char header[256];
-  sprintf(header, header_template, path, http_settings->host,
+  sprintf(header, header_template, http_settings->path, http_settings->host,
           http_settings->api_version, data_length);
   return send_data_to_iota_service(sockfd, header, strlen(header));
 }
 
-retcode_t _iota_service_query(const void* const service_opaque,
-                              char_buffer_t* obj, char_buffer_t* response,
-                              char const* const path) {
+retcode_t iota_service_query(const void* const service_opaque,
+                             char_buffer_t* obj, char_buffer_t* response) {
   int sockfd = -1;
   retcode_t result = RC_OK;
   const iota_client_service_t* const service =
@@ -193,8 +190,8 @@ retcode_t _iota_service_query(const void* const service_opaque,
     goto cleanup;
   }
 
-  if ((result = send_headers_to_iota_service(sockfd, http_settings, obj->length,
-                                             path)) != RC_OK) {
+  if ((result = send_headers_to_iota_service(sockfd, http_settings,
+                                             obj->length)) != RC_OK) {
     goto cleanup;
   }
   if ((result = send_data_to_iota_service(sockfd, obj->data, obj->length)) !=
@@ -209,9 +206,4 @@ cleanup:
     close(sockfd);
   }
   return result;
-}
-
-retcode_t iota_service_query(const void* const service_opaque,
-                             char_buffer_t* obj, char_buffer_t* response) {
-  return _iota_service_query(service_opaque, obj, response, "/");
 }

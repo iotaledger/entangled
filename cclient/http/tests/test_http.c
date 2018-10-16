@@ -107,19 +107,16 @@ const char* data =
     "vitae ante. Vivamus ultrices luctus nunc. Suspendisse et dolor. Etiam "
     "dignissim. Proin malesuada adipiscing lacus.";
 
-retcode_t _iota_service_query(const void* const service_opaque,
-                              char_buffer_t* obj, char_buffer_t* response,
-                              char const* const path);
-
 void test_http(void) {
   iota_client_service_t service = {0};
   service.http.host = "httpbin.org";
   service.http.port = 80;
+  service.http.path = "/post";
   char_buffer_t* req = char_buffer_new();
   char_buffer_t* res = char_buffer_new();
   char_buffer_allocate(req, strlen(data));
   memcpy(req->data, data, req->length);
-  _iota_service_query(&service, req, res, "/post");
+  iota_service_query(&service, req, res);
   cJSON* json_obj = cJSON_Parse(res->data);
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "form");
   // For some reason the server echoes the data into the key of the json object
