@@ -111,7 +111,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   log_info(CONSENSUS_LOGGER_ID, "Initializing transaction validator\n");
   if ((ret = iota_consensus_transaction_validator_init(
            &consensus->transaction_validator,
-           consensus->snapshot.conf.timestamp * 1000,
+           consensus->snapshot.conf.timestamp_sec * 1000UL,
            (testnet ? TESTNET_MWM : MAINNET_MWM))) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing transaction validator failed\n");

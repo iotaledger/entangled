@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 typedef struct snapshot_conf_s {
-  uint64_t timestamp;
+  uint64_t timestamp_sec;
   uint64_t signature_index;
   uint64_t signature_depth;
   tryte_t signature_pubkey[HASH_LENGTH_TRYTE];

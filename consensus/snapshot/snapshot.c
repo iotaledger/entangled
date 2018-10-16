@@ -127,7 +127,7 @@ retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
   if (!cJSON_IsNumber(timestamp)) {
     goto json_error;
   }
-  conf->timestamp = timestamp->valueint;
+  conf->timestamp_sec = timestamp->valueint;
 
   tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "pubkey");
   if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL ||
