@@ -31,7 +31,7 @@ extern "C" {
 typedef struct snapshot_s {
   rw_lock_handle_t rw_lock;
   size_t index;
-  state_map_t state;
+  state_diff_t state;
 } snapshot_t;
 
 /**
@@ -65,7 +65,7 @@ extern retcode_t iota_snapshot_destroy(snapshot_t *const snapshot);
  *
  * @return a status code
  */
-extern retcode_t iota_snapshot_state_destroy(state_map_t *const state);
+extern retcode_t iota_snapshot_state_destroy(state_diff_t *const state);
 
 /**
  * Checks if a given state is consistent
@@ -74,7 +74,7 @@ extern retcode_t iota_snapshot_state_destroy(state_map_t *const state);
  *
  * @return true if consistent, false otherwise
  */
-extern bool iota_snapshot_is_state_consistent(state_map_t *const state);
+extern bool iota_snapshot_is_state_consistent(state_diff_t *const state);
 
 /**
  * Gets the index of a snapshot
@@ -107,8 +107,8 @@ extern retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
  * @return a status code
  */
 extern retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
-                                            state_map_t *const diff,
-                                            state_map_t *const patch);
+                                            state_diff_t *const diff,
+                                            state_diff_t *const patch);
 
 /**
  * Applies a patch to a snapshot state
@@ -120,7 +120,7 @@ extern retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
  * @return a status code
  */
 extern retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
-                                           state_map_t *const patch,
+                                           state_diff_t *const patch,
                                            size_t index);
 
 #ifdef __cplusplus

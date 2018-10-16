@@ -626,8 +626,9 @@ done:
  * State diff operations
  */
 
-retcode_t iota_stor_state_diff_store(const connection_t* const conn,
-                                     uint64_t index, state_map_t* diff) {
+retcode_t iota_stor_state_diff_store(connection_t const* const conn,
+                                     uint64_t const index,
+                                     state_diff_t const* const diff) {
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
   size_t size = 0;
@@ -666,8 +667,9 @@ done:
   return ret;
 }
 
-extern retcode_t iota_stor_state_diff_load(const connection_t* const conn,
-                                           uint64_t index, state_map_t* diff) {
+extern retcode_t iota_stor_state_diff_load(connection_t const* const conn,
+                                           uint64_t const index,
+                                           state_diff_t* const diff) {
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
   byte_t* bytes = NULL;

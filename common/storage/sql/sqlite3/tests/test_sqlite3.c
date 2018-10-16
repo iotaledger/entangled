@@ -279,8 +279,8 @@ void test_update_snapshot_index(void) {
 }
 
 void test_milestone_state_diff(void) {
-  state_map_t state_diff1 = NULL, state_diff2 = NULL;
-  state_entry_t *new = NULL, *iter = NULL, *tmp = NULL;
+  state_diff_t state_diff1 = NULL, state_diff2 = NULL;
+  state_diff_entry_t *new = NULL, *iter = NULL, *tmp = NULL;
   trit_t trits[HASH_LENGTH] = {1};
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trit_t *hashed_hash;
@@ -290,7 +290,7 @@ void test_milestone_state_diff(void) {
     hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
     memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
     free(hashed_hash);
-    new = malloc(sizeof(state_entry_t));
+    new = malloc(sizeof(state_diff_entry_t));
     memcpy(new->hash, hash, FLEX_TRIT_SIZE_243);
     new->value = i;
     HASH_ADD(hh, state_diff1, hash, FLEX_TRIT_SIZE_243, new);

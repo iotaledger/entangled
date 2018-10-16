@@ -82,14 +82,14 @@ void test_snapshot_get_balance() {
 }
 
 void test_snapshot_create_and_apply_patch() {
-  state_map_t diff = NULL;
-  state_map_t patch = NULL;
+  state_diff_t diff = NULL;
+  state_diff_t patch = NULL;
   int64_t balance;
 
   TEST_ASSERT(iota_snapshot_init(
                   &snapshot, "consensus/snapshot/tests/snapshot.txt",
                   "consensus/snapshot/tests/snapshot.sig", true) == RC_OK);
-  state_entry_t *new1 = malloc(sizeof(state_entry_t));
+  state_diff_entry_t *new1 = malloc(sizeof(state_diff_entry_t));
   flex_trits_from_trytes(new1->hash, NUM_TRITS_HASH,
                          (tryte_t*)"O99999999999999999999999999999999999999999999999999999999999999999999999999999999",
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
@@ -99,7 +99,7 @@ void test_snapshot_create_and_apply_patch() {
   TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &diff, 1) ==
               RC_SNAPSHOT_INCONSISTENT_PATCH);
   TEST_ASSERT(iota_snapshot_state_destroy(&patch) == RC_OK);
-  state_entry_t *new2 = malloc(sizeof(state_entry_t));
+  state_diff_entry_t *new2 = malloc(sizeof(state_diff_entry_t));
   flex_trits_from_trytes(new2->hash, NUM_TRITS_HASH,
                                      (tryte_t*)"Q99999999999999999999999999999999999999999999999999999999999999999999999999999999",
                                      NUM_TRYTES_HASH, NUM_TRYTES_HASH);

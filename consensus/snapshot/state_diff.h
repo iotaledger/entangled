@@ -8,28 +8,22 @@
 #ifndef __CONSENSUS_SNAPSHOT_STATE_DIFF_H__
 #define __CONSENSUS_SNAPSHOT_STATE_DIFF_H__
 
-#include "uthash.h"
-
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
+#include "utils/hash_containers.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct state_entry_t {
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  int64_t value;
-  UT_hash_handle hh;
-} state_entry_t;
+typedef hash_to_int_map_entry_t state_diff_entry_t;
+typedef state_diff_entry_t *state_diff_t;
 
-typedef state_entry_t *state_map_t;
-
-size_t iota_state_diff_serialized_size(state_map_t const *const state_diff);
-retcode_t iota_state_diff_serialize(state_map_t const *const state_diff,
+size_t iota_state_diff_serialized_size(state_diff_t const *const diff);
+retcode_t iota_state_diff_serialize(state_diff_t const *const diff,
                                     byte_t *const bytes);
 retcode_t iota_state_diff_deserialize(byte_t const *const bytes, size_t size,
-                                      state_map_t *const state_diff);
+                                      state_diff_t *const diff);
 
 #ifdef __cplusplus
 }

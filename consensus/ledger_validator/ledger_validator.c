@@ -114,13 +114,13 @@ done:
 
 static retcode_t get_latest_diff(ledger_validator_t *const lv,
                                  hash_set_t *const analyzed_hashes,
-                                 state_map_t *state, flex_trit_t *const tip,
+                                 state_diff_t *state, flex_trit_t *const tip,
                                  uint64_t latest_snapshot_index,
                                  bool is_milestone, bool *valid_diff) {
   retcode_t ret = RC_OK;
   int number_of_analyzed_transactions = 0;
   hash_stack_t non_analyzed_hashes = NULL;
-  state_entry_t *entry, *diff_elem;
+  state_diff_entry_t *entry, *diff_elem;
   iota_transaction_t tx_bundle = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
@@ -172,7 +172,8 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
                 if (entry) {
                   entry->value += tx_bundle->value;
                 } else {
-                  if ((diff_elem = malloc(sizeof(state_entry_t))) == NULL) {
+                  if ((diff_elem = malloc(sizeof(state_diff_entry_t))) ==
+                      NULL) {
                     ret = RC_LEDGER_VALIDATOR_OOM;
                     goto done;
                   }
@@ -253,7 +254,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   retcode_t ret = RC_OK;
   bool valid_diff = true;
   hash_set_t analyzed_hashes = NULL;
-  state_map_t diff = NULL, patch = NULL;
+  state_diff_t diff = NULL, patch = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   struct _trit_array milestone_hash = {milestone->hash, NUM_TRITS_HASH,
                                        FLEX_TRIT_SIZE_243, 0};
@@ -320,7 +321,7 @@ retcode_t iota_consensus_ledger_validator_check_consistency(
   retcode_t ret = RC_OK;
   hash_list_entry_t *iter = NULL;
   hash_set_t analyzed_hashes = NULL;
-  state_map_t diff = NULL;
+  state_diff_t diff = NULL;
 
   LL_FOREACH(hashes, iter) {
     if ((ret = iota_consensus_ledger_validator_update_diff(
@@ -335,10 +336,10 @@ retcode_t iota_consensus_ledger_validator_check_consistency(
 
 retcode_t iota_consensus_ledger_validator_update_diff(
     ledger_validator_t *const lv, hash_set_t *analyzed_hashes,
-    state_map_t *diff, flex_trit_t *tip, bool *is_consistent) {
+    state_diff_t *diff, flex_trit_t *tip, bool *is_consistent) {
   retcode_t ret = RC_OK;
-  state_map_t current_state = NULL, patch = NULL;
-  state_entry_t *iter, *entry, *diff_elem, *tmp;
+  state_diff_t current_state = NULL, patch = NULL;
+  state_diff_entry_t *iter, *entry, *diff_elem, *tmp;
   hash_set_t visited_hashes = NULL;
   bool valid_diff = true;
 
@@ -369,13 +370,13 @@ retcode_t iota_consensus_ledger_validator_update_diff(
     goto done;
   }
 
-  // TODO Extract state_map_t from snapshot #345
+  // TODO Extract state_diff_t from snapshot #345
   HASH_ITER(hh, *diff, iter, tmp) {
     HASH_FIND(hh, current_state, iter->hash, FLEX_TRIT_SIZE_243, entry);
     if (entry) {
       entry->value += iter->value;
     } else {
-      if ((diff_elem = malloc(sizeof(state_entry_t))) == NULL) {
+      if ((diff_elem = malloc(sizeof(state_diff_entry_t))) == NULL) {
         ret = RC_LEDGER_VALIDATOR_OOM;
         goto done;
       }
@@ -393,13 +394,13 @@ retcode_t iota_consensus_ledger_validator_update_diff(
   *is_consistent = iota_snapshot_is_state_consistent(&patch);
 
   if (is_consistent) {
-    // TODO Extract state_map_t from snapshot #345
+    // TODO Extract state_diff_t from snapshot #345
     HASH_ITER(hh, current_state, iter, tmp) {
       HASH_FIND(hh, *diff, iter->hash, FLEX_TRIT_SIZE_243, entry);
       if (entry) {
         entry->value = iter->value;
       } else {
-        if ((diff_elem = malloc(sizeof(state_entry_t))) == NULL) {
+        if ((diff_elem = malloc(sizeof(state_diff_entry_t))) == NULL) {
           ret = RC_LEDGER_VALIDATOR_OOM;
           goto done;
         }
