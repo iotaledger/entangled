@@ -7,6 +7,10 @@
 
 #include "utils/hash_containers.h"
 
+/*
+ * Queue operations
+ */
+
 bool hash_queue_empty(hash_queue_t queue) { return (queue == NULL); }
 
 retcode_t hash_queue_push(hash_queue_t *queue, flex_trit_t *hash) {
@@ -43,7 +47,7 @@ retcode_t hash_queue_free(hash_queue_t *queue) {
 }
 
 /*
- *  Stack
+ * Stack operations
  */
 
 bool hash_stack_empty(hash_stack_t stack) { return (stack == NULL); }
@@ -81,6 +85,12 @@ retcode_t hash_stack_free(hash_stack_t *stack) {
   return RC_OK;
 }
 
+/*
+ * Set operations
+ */
+
+uint32_t hash_set_size(hash_set_t *set) { return HASH_COUNT(*set); }
+
 retcode_t hash_set_add(hash_set_t *set, flex_trit_t *hash) {
   hash_set_entry_t *entry = NULL;
 
@@ -116,8 +126,6 @@ bool hash_set_contains(hash_set_t *set, flex_trit_t *hash) {
   return entry != NULL;
 }
 
-uint32_t hash_set_size(hash_set_t *set) { return HASH_COUNT(*set); }
-
 void hash_set_free(hash_set_t *set) {
   hash_set_entry_t *iter = NULL, *tmp = NULL;
 
@@ -142,14 +150,14 @@ retcode_t hash_set_for_each(hash_set_t *set, hash_on_container_func func,
 }
 
 /*
- * Hash Map
+ * Hash-int map operations
  */
 
 retcode_t hash_int_map_add(hash_int_map_t *map, flex_trit_t *hash,
                            int64_t value) {
-  hash_to_int_value_map_entry *map_entry = NULL;
-  map_entry = (hash_to_int_value_map_entry *)malloc(
-      sizeof(hash_to_int_value_map_entry));
+  hash_to_int_map_entry_t *map_entry = NULL;
+  map_entry =
+      (hash_to_int_map_entry_t *)malloc(sizeof(hash_to_int_map_entry_t));
   if (map_entry == NULL) {
     return RC_UTILS_OOM;
   }
@@ -163,15 +171,15 @@ bool hash_int_map_contains(hash_int_map_t *map, flex_trit_t *hash) {
   if (*map == NULL) {
     return false;
   }
-  hash_to_int_value_map_entry *entry = NULL;
+  hash_to_int_map_entry_t *entry = NULL;
 
   HASH_FIND(hh, *map, hash, FLEX_TRIT_SIZE_243, entry);
   return entry != NULL;
 }
 
 void hash_int_map_free(hash_int_map_t *map) {
-  hash_to_int_value_map_entry *curr_entry = NULL;
-  hash_to_int_value_map_entry *tmp_entry = NULL;
+  hash_to_int_map_entry_t *curr_entry = NULL;
+  hash_to_int_map_entry_t *tmp_entry = NULL;
 
   HASH_ITER(hh, *map, curr_entry, tmp_entry) {
     HASH_DEL(*map, curr_entry);
@@ -180,8 +188,9 @@ void hash_int_map_free(hash_int_map_t *map) {
 }
 
 /*
- *  hash_to_indexed_hash_set_map_t
+ * Hash-indexed_hash_set map
  */
+
 bool hash_to_indexed_hash_set_map_contains(hash_to_indexed_hash_set_map_t *map,
                                            flex_trit_t *hash) {
   hash_to_indexed_hash_set_entry_t *entry = NULL;

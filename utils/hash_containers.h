@@ -19,14 +19,13 @@ extern "C" {
 #endif
 
 /*
- * Queue types and operations
+ * List types
  */
 
 typedef struct hash_list_entry_s {
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   struct hash_list_entry_s *next;
 } hash_list_entry_t;
-typedef hash_list_entry_t *hash_list_t;
 
 typedef struct hash_dll_entry_s {
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
@@ -34,16 +33,25 @@ typedef struct hash_dll_entry_s {
   struct hash_dll_entry_s *prev;
 } hash_dll_entry_t;
 
-typedef hash_dll_entry_t *hash_queue_t;
-typedef hash_list_entry_t *hash_stack_t;
-
 typedef retcode_t (*hash_on_container_func)(void *container, flex_trit_t *hash);
+
+/*
+ * Queue type and operations
+ */
+
+typedef hash_dll_entry_t *hash_queue_t;
 
 bool hash_queue_empty(hash_queue_t queue);
 retcode_t hash_queue_push(hash_queue_t *queue, flex_trit_t *hash);
 void hash_queue_pop(hash_queue_t *queue);
 flex_trit_t *hash_queue_peek(hash_queue_t queue);
 retcode_t hash_queue_free(hash_queue_t *queue);
+
+/*
+ * Stack type and operations
+ */
+
+typedef hash_list_entry_t *hash_stack_t;
 
 bool hash_stack_empty(hash_stack_t stack);
 retcode_t hash_stack_push(hash_stack_t *stack, flex_trit_t *hash);
@@ -52,13 +60,14 @@ flex_trit_t *hash_stack_peek(hash_stack_t stack);
 retcode_t hash_stack_free(hash_stack_t *stack);
 
 /*
- * Set types and operations
+ * Set type and operations
  */
 
 typedef struct hash_set_entry_s {
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   UT_hash_handle hh;
 } hash_set_entry_t;
+
 typedef hash_set_entry_t *hash_set_t;
 
 uint32_t hash_set_size(hash_set_t *set);
@@ -66,20 +75,20 @@ retcode_t hash_set_add(hash_set_t *set, flex_trit_t *hash);
 retcode_t hash_set_append(hash_set_t *set, hash_set_t *clone);
 bool hash_set_contains(hash_set_t *set, flex_trit_t *hash);
 void hash_set_free(hash_set_t *set);
-
 retcode_t hash_set_for_each(hash_set_t *set, hash_on_container_func func,
                             void *container);
 
 /*
- * Int Map operations
+ * Hash-int map type and operations
  */
 
-typedef struct hash_to_int_value_map_entry {
+typedef struct hash_to_int_map_entry_s {
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   int64_t value;
   UT_hash_handle hh;
-} hash_to_int_value_map_entry;
-typedef hash_to_int_value_map_entry *hash_int_map_t;
+} hash_to_int_map_entry_t;
+
+typedef hash_to_int_map_entry_t *hash_int_map_t;
 
 retcode_t hash_int_map_add(hash_int_map_t *map, flex_trit_t *hash,
                            int64_t value);
@@ -87,8 +96,7 @@ bool hash_int_map_contains(hash_int_map_t *map, flex_trit_t *hash);
 void hash_int_map_free(hash_int_map_t *map);
 
 /*
- *  Map of hash to hash_set
- *
+ * Hash-indexed_hash_set map type and operations
  */
 
 typedef struct hash_to_indexed_hash_set_entry_s {
@@ -102,11 +110,9 @@ typedef hash_to_indexed_hash_set_entry_t *hash_to_indexed_hash_set_map_t;
 
 bool hash_to_indexed_hash_set_map_contains(hash_to_indexed_hash_set_map_t *map,
                                            flex_trit_t *hash);
-
 retcode_t hash_to_indexed_hash_set_map_add_new_set(
     hash_to_indexed_hash_set_map_t *map, flex_trit_t *hash,
     hash_to_indexed_hash_set_entry_t **new_set_entry, size_t index);
-
 void hash_to_indexed_hash_set_map_free(hash_to_indexed_hash_set_map_t *map);
 
 #ifdef __cplusplus
