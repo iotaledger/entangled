@@ -112,11 +112,11 @@ done:
   return ret;
 }
 
-static retcode_t get_latest_diff(ledger_validator_t *const lv,
-                                 hash_set_t *const analyzed_hashes,
-                                 state_diff_t *state, flex_trit_t *const tip,
-                                 uint64_t latest_snapshot_index,
-                                 bool is_milestone, bool *valid_diff) {
+static retcode_t get_latest_delta(ledger_validator_t *const lv,
+                                  hash_set_t *const analyzed_hashes,
+                                  state_delta_t *state, flex_trit_t *const tip,
+                                  uint64_t latest_snapshot_index,
+                                  bool is_milestone, bool *valid_delta) {
   retcode_t ret = RC_OK;
   int number_of_analyzed_transactions = 0;
   hash_stack_t non_analyzed_hashes = NULL;
@@ -150,7 +150,7 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
       }
       if (pack.num_loaded == 0) {
         // TODO request transaction
-        *valid_diff = false;
+        *valid_delta = false;
         goto done;
       }
       if (tx.snapshot_index == 0 || tx.snapshot_index > latest_snapshot_index) {
@@ -166,8 +166,8 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
             while (tx_bundle != NULL) {
               if (tx_bundle->value != 0) {
                 // TODO countedTx.add(bundleTransactionViewModel.getHash()))
-                if ((ret = state_diff_add_or_sum(state, tx_bundle->address,
-                                                 tx_bundle->value)) != RC_OK) {
+                if ((ret = state_delta_add_or_sum(state, tx_bundle->address,
+                                                  tx_bundle->value)) != RC_OK) {
                   goto done;
                 }
               }
@@ -175,7 +175,7 @@ static retcode_t get_latest_diff(ledger_validator_t *const lv,
             }
           }
           if (!valid_bundle) {
-            *valid_diff = false;
+            *valid_delta = false;
             goto done;
           }
         }
@@ -240,9 +240,9 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
     ledger_validator_t *const lv, iota_milestone_t *const milestone,
     bool *const has_snapshot) {
   retcode_t ret = RC_OK;
-  bool valid_diff = true;
+  bool valid_delta = true;
   hash_set_t analyzed_hashes = NULL;
-  state_diff_t diff = NULL, patch = NULL;
+  state_delta_t delta = NULL, patch = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   struct _trit_array milestone_hash = {milestone->hash, NUM_TRITS_HASH,
                                        FLEX_TRIT_SIZE_243, 0};
@@ -258,23 +258,24 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   }
   *has_snapshot = tx.snapshot_index != 0;
   if (!(*has_snapshot)) {
-    if ((ret = get_latest_diff(
-             lv, &analyzed_hashes, &diff, tx.hash,
+    if ((ret = get_latest_delta(
+             lv, &analyzed_hashes, &delta, tx.hash,
              iota_snapshot_get_index(lv->milestone_tracker->latest_snapshot),
-             true, &valid_diff)) != RC_OK) {
-      log_error(LEDGER_VALIDATOR_LOGGER_ID, "Getting latest diff failed\n");
+             true, &valid_delta)) != RC_OK) {
+      log_error(LEDGER_VALIDATOR_LOGGER_ID, "Getting latest delta failed\n");
       goto done;
     }
-    if (!valid_diff) {
+    if (!valid_delta) {
       *has_snapshot = false;
       goto done;
     }
     if ((ret = iota_snapshot_create_patch(
-             lv->milestone_tracker->latest_snapshot, &diff, &patch)) != RC_OK) {
+             lv->milestone_tracker->latest_snapshot, &delta, &patch)) !=
+        RC_OK) {
       log_error(LEDGER_VALIDATOR_LOGGER_ID, "Creating patch failed\n");
       goto done;
     }
-    *has_snapshot = state_diff_is_consistent(&patch);
+    *has_snapshot = state_delta_is_consistent(&patch);
     if (*has_snapshot) {
       if ((ret = update_snapshot_milestone(lv, milestone->hash,
                                            milestone->index)) != RC_OK) {
@@ -282,12 +283,12 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
                   "Updating snapshot milestone failed\n");
         goto done;
       }
-      if (HASH_COUNT(diff) != 0) {
+      if (HASH_COUNT(delta) != 0) {
         //         stateDiffViewModel.store(tangle); // TODO
       }
       if ((ret =
                iota_snapshot_apply_patch(lv->milestone_tracker->latest_snapshot,
-                                         &diff, milestone->index)) != RC_OK) {
+                                         &delta, milestone->index)) != RC_OK) {
         log_error(LEDGER_VALIDATOR_LOGGER_ID, "Applying patch failed\n");
         goto done;
       }
@@ -295,11 +296,11 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   }
 done:
   rw_lock_handle_unlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
-  if (diff) {
-    state_diff_destroy(&diff);
+  if (delta) {
+    state_delta_destroy(&delta);
   }
   if (patch) {
-    state_diff_destroy(&patch);
+    state_delta_destroy(&patch);
   }
   return ret;
 }
@@ -309,11 +310,11 @@ retcode_t iota_consensus_ledger_validator_check_consistency(
   retcode_t ret = RC_OK;
   hash_list_entry_t *iter = NULL;
   hash_set_t analyzed_hashes = NULL;
-  state_diff_t diff = NULL;
+  state_delta_t delta = NULL;
 
   LL_FOREACH(hashes, iter) {
-    if ((ret = iota_consensus_ledger_validator_update_diff(
-             lv, &analyzed_hashes, &diff, iter->hash, consistent)) != RC_OK) {
+    if ((ret = iota_consensus_ledger_validator_update_delta(
+             lv, &analyzed_hashes, &delta, iter->hash, consistent)) != RC_OK) {
       return ret;
     } else if (*consistent == false) {
       return ret;
@@ -322,13 +323,13 @@ retcode_t iota_consensus_ledger_validator_check_consistency(
   return ret;
 }
 
-retcode_t iota_consensus_ledger_validator_update_diff(
+retcode_t iota_consensus_ledger_validator_update_delta(
     ledger_validator_t *const lv, hash_set_t *analyzed_hashes,
-    state_diff_t *diff, flex_trit_t *tip, bool *is_consistent) {
+    state_delta_t *delta, flex_trit_t *tip, bool *is_consistent) {
   retcode_t ret = RC_OK;
-  state_diff_t current_state = NULL, patch = NULL;
+  state_delta_t current_state = NULL, patch = NULL;
   hash_set_t visited_hashes = NULL;
-  bool valid_diff = true;
+  bool valid_delta = true;
 
   // TODO
   // if (!TransactionViewModel.fromHash(tangle, tip).isSolid()) {
@@ -344,20 +345,20 @@ retcode_t iota_consensus_ledger_validator_update_diff(
     goto done;
   }
 
-  if ((ret = get_latest_diff(
+  if ((ret = get_latest_delta(
            lv, &visited_hashes, &current_state, tip,
            iota_snapshot_get_index(lv->milestone_tracker->latest_snapshot),
-           false, &valid_diff)) != RC_OK) {
-    log_error(LEDGER_VALIDATOR_LOGGER_ID, "Getting latest diff failed\n");
+           false, &valid_delta)) != RC_OK) {
+    log_error(LEDGER_VALIDATOR_LOGGER_ID, "Getting latest delta failed\n");
     goto done;
   }
 
-  if (!valid_diff) {
+  if (!valid_delta) {
     *is_consistent = false;
     goto done;
   }
 
-  if ((ret = state_diff_apply_patch(&current_state, diff)) != RC_OK) {
+  if ((ret = state_delta_apply_patch(&current_state, delta)) != RC_OK) {
     goto done;
   }
 
@@ -366,10 +367,10 @@ retcode_t iota_consensus_ledger_validator_update_diff(
     log_error(LEDGER_VALIDATOR_LOGGER_ID, "Creating patch failed\n");
     goto done;
   }
-  *is_consistent = state_diff_is_consistent(&patch);
+  *is_consistent = state_delta_is_consistent(&patch);
 
   if (is_consistent) {
-    if ((ret = state_diff_merge_patch(diff, &current_state)) != RC_OK) {
+    if ((ret = state_delta_merge_patch(delta, &current_state)) != RC_OK) {
       goto done;
     }
   }

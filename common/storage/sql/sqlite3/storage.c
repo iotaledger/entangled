@@ -623,29 +623,29 @@ done:
 }
 
 /*
- * State diff operations
+ * State delta operations
  */
 
-retcode_t iota_stor_state_diff_store(connection_t const* const conn,
-                                     uint64_t const index,
-                                     state_diff_t const* const diff) {
+retcode_t iota_stor_state_delta_store(connection_t const* const conn,
+                                      uint64_t const index,
+                                      state_delta_t const* const delta) {
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
   size_t size = 0;
   byte_t* bytes = NULL;
 
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
-                               iota_statement_state_diff_store))) {
+                               iota_statement_state_delta_store))) {
     goto done;
   }
 
-  size = state_diff_serialized_size(diff);
+  size = state_delta_serialized_size(delta);
   if ((bytes = calloc(size, sizeof(byte_t))) == NULL) {
     ret = RC_STORAGE_OOM;
     goto done;
   }
 
-  if ((ret = state_diff_serialize(diff, bytes)) != RC_OK) {
+  if ((ret = state_delta_serialize(delta, bytes)) != RC_OK) {
     goto done;
   }
 
@@ -667,19 +667,19 @@ done:
   return ret;
 }
 
-extern retcode_t iota_stor_state_diff_load(connection_t const* const conn,
-                                           uint64_t const index,
-                                           state_diff_t* const diff) {
+extern retcode_t iota_stor_state_delta_load(connection_t const* const conn,
+                                            uint64_t const index,
+                                            state_delta_t* const delta) {
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
   byte_t* bytes = NULL;
   size_t size = 0;
   int rc = 0;
 
-  *diff = NULL;
+  *delta = NULL;
 
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
-                               iota_statement_state_diff_load))) {
+                               iota_statement_state_delta_load))) {
     goto done;
   }
 
@@ -692,7 +692,7 @@ extern retcode_t iota_stor_state_diff_load(connection_t const* const conn,
   if (rc == SQLITE_ROW) {
     bytes = (byte_t*)sqlite3_column_blob(sqlite_statement, 0);
     size = sqlite3_column_bytes(sqlite_statement, 0);
-    if ((ret = state_diff_deserialize(bytes, size, diff)) != RC_OK) {
+    if ((ret = state_delta_deserialize(bytes, size, delta)) != RC_OK) {
       goto done;
     }
   } else if (rc != SQLITE_OK && rc != SQLITE_DONE) {

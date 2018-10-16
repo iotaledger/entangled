@@ -14,7 +14,7 @@
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/defs.h"
-#include "consensus/snapshot/state_diff.h"
+#include "consensus/snapshot/state_delta.h"
 #include "utils/handles/rw_lock.h"
 
 #define SNAPSHOT_PUBKEY                                                        \
@@ -31,7 +31,7 @@ extern "C" {
 typedef struct snapshot_s {
   rw_lock_handle_t rw_lock;
   size_t index;
-  state_diff_t state;
+  state_delta_t state;
 } snapshot_t;
 
 /**
@@ -78,17 +78,17 @@ retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
                                     flex_trit_t *const hash, int64_t *balance);
 
 /**
- * Creates a patch of a snapshot state and a diff
+ * Creates a patch of a snapshot state and a delta
  *
  * @param snapshot The snapshot
- * @param diff The diff
+ * @param delta The delta
  * @param patch The patch
  *
  * @return a status code
  */
 retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
-                                     state_diff_t *const diff,
-                                     state_diff_t *const patch);
+                                     state_delta_t *const delta,
+                                     state_delta_t *const patch);
 
 /**
  * Applies a patch to a snapshot state
@@ -100,7 +100,7 @@ retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
  * @return a status code
  */
 retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
-                                    state_diff_t *const patch, size_t index);
+                                    state_delta_t *const patch, size_t index);
 
 #ifdef __cplusplus
 }

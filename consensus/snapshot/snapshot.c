@@ -43,7 +43,7 @@ static retcode_t iota_snapshot_initial_state(snapshot_t *const snapshot,
     if (value > 0) {
       flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t *)line,
                              NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-      if ((ret = state_diff_add(&snapshot->state, hash, value)) != RC_OK) {
+      if ((ret = state_delta_add(&snapshot->state, hash, value)) != RC_OK) {
         goto done;
       }
       supply += value;
@@ -114,7 +114,7 @@ retcode_t iota_snapshot_destroy(snapshot_t *const snapshot) {
     return RC_SNAPSHOT_NULL_SELF;
   }
 
-  state_diff_destroy(&snapshot->state);
+  state_delta_destroy(&snapshot->state);
   rw_lock_handle_destroy(&snapshot->rw_lock);
   logger_helper_destroy(SNAPSHOT_LOGGER_ID);
   return ret;
@@ -132,7 +132,7 @@ size_t iota_snapshot_get_index(snapshot_t *const snapshot) {
 retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
                                     flex_trit_t *const hash, int64_t *balance) {
   retcode_t ret = RC_OK;
-  state_diff_entry_t *entry = NULL;
+  state_delta_entry_t *entry = NULL;
 
   if (snapshot == NULL) {
     return RC_SNAPSHOT_NULL_SELF;
@@ -143,7 +143,7 @@ retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
   }
 
   rw_lock_handle_rdlock(&snapshot->rw_lock);
-  state_diff_find(snapshot->state, hash, entry);
+  state_delta_find(snapshot->state, hash, entry);
   if (entry == NULL) {
     ret = RC_SNAPSHOT_BALANCE_NOT_FOUND;
   } else {
@@ -154,8 +154,8 @@ retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
 }
 
 retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
-                                     state_diff_t *const diff,
-                                     state_diff_t *const patch) {
+                                     state_delta_t *const delta,
+                                     state_delta_t *const patch) {
   retcode_t ret = RC_OK;
 
   if (snapshot == NULL) {
@@ -165,7 +165,8 @@ retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
   HASH_CLEAR(hh, *patch);
   rw_lock_handle_rdlock(&snapshot->rw_lock);
 
-  if ((ret = state_diff_create_patch(&snapshot->state, diff, patch)) != RC_OK) {
+  if ((ret = state_delta_create_patch(&snapshot->state, delta, patch)) !=
+      RC_OK) {
     goto done;
   }
 
@@ -175,7 +176,7 @@ done:
 }
 
 retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
-                                    state_diff_t *const patch, size_t index) {
+                                    state_delta_t *const patch, size_t index) {
   retcode_t ret = RC_OK;
   int64_t sum = 0;
 
@@ -183,14 +184,14 @@ retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
     return RC_SNAPSHOT_NULL_SELF;
   }
 
-  if ((sum = state_diff_sum(patch)) != 0) {
+  if ((sum = state_delta_sum(patch)) != 0) {
     log_warning(SNAPSHOT_LOGGER_ID, "Inconsistent snapshot patch\n");
     return RC_SNAPSHOT_INCONSISTENT_PATCH;
   }
 
   rw_lock_handle_wrlock(&snapshot->rw_lock);
 
-  if ((ret = state_diff_apply_patch(&snapshot->state, patch)) != RC_OK) {
+  if ((ret = state_delta_apply_patch(&snapshot->state, patch)) != RC_OK) {
     goto done;
   }
 

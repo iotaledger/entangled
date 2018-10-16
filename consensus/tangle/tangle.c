@@ -214,15 +214,15 @@ retcode_t iota_tangle_find_tail(const tangle_t *const tangle,
 }
 
 /*
- * State diff operations
+ * State delta operations
  */
 
-retcode_t iota_tangle_state_diff_store(const tangle_t *const tangle,
-                                       uint64_t index, state_diff_t *diff) {
-  return iota_stor_state_diff_store(&tangle->conn, index, diff);
+retcode_t iota_tangle_state_delta_store(const tangle_t *const tangle,
+                                        uint64_t index, state_delta_t *delta) {
+  return iota_stor_state_delta_store(&tangle->conn, index, delta);
 }
 
-retcode_t iota_tangle_state_diff_load(const tangle_t *const tangle,
-                                      uint64_t index, state_diff_t *diff) {
-  return iota_stor_state_diff_load(&tangle->conn, index, diff);
+retcode_t iota_tangle_state_delta_load(const tangle_t *const tangle,
+                                       uint64_t index, state_delta_t *delta) {
+  return iota_stor_state_delta_load(&tangle->conn, index, delta);
 }

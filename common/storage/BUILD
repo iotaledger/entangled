@@ -6,7 +6,7 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/trinary:trit_array",
-        "//consensus/snapshot:state_diff",
+        "//consensus/snapshot:state_delta",
         "//utils:logger_helper",
     ],
 )

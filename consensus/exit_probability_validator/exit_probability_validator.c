@@ -34,8 +34,8 @@ retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
 
   hash_set_free(&epv->max_depth_ok_memoization);
   hash_set_free(&epv->analyzed_hashes);
-  state_diff_destroy(&epv->diff);
-  epv->diff = NULL;
+  state_delta_destroy(&epv->delta);
+  epv->delta = NULL;
   epv->tangle = NULL;
   epv->mt = NULL;
   epv->lv = NULL;
@@ -70,8 +70,8 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
     return RC_OK;
   }
 
-  ret = iota_consensus_ledger_validator_update_diff(
-      epv->lv, &epv->analyzed_hashes, &epv->diff, tail_hash->trits, is_valid);
+  ret = iota_consensus_ledger_validator_update_delta(
+      epv->lv, &epv->analyzed_hashes, &epv->delta, tail_hash->trits, is_valid);
   if (ret != RC_OK) {
     *is_valid = false;
     return ret;

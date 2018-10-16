@@ -54,9 +54,9 @@ void test_snapshot_check_consistency() {
   TEST_ASSERT(iota_snapshot_init(
                   &snapshot, "consensus/snapshot/tests/snapshot.txt",
                   "consensus/snapshot/tests/snapshot.sig", true) == RC_OK);
-  TEST_ASSERT(state_diff_is_consistent(&snapshot.state) == true);
+  TEST_ASSERT(state_delta_is_consistent(&snapshot.state) == true);
   snapshot.state->value *= -1;
-  TEST_ASSERT(state_diff_is_consistent(&snapshot.state) == false);
+  TEST_ASSERT(state_delta_is_consistent(&snapshot.state) == false);
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 
@@ -82,8 +82,8 @@ void test_snapshot_get_balance() {
 }
 
 void test_snapshot_create_and_apply_patch() {
-  state_diff_t diff = NULL;
-  state_diff_t patch = NULL;
+  state_delta_t delta = NULL;
+  state_delta_t patch = NULL;
   int64_t balance = 0;
   flex_trit_t hash1[FLEX_TRIT_SIZE_243];
   flex_trit_t hash2[FLEX_TRIT_SIZE_243];
@@ -94,25 +94,25 @@ void test_snapshot_create_and_apply_patch() {
   flex_trits_from_trytes(hash1, NUM_TRITS_HASH,
                          (tryte_t*)"O99999999999999999999999999999999999999999999999999999999999999999999999999999999",
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT(state_diff_add(&diff, hash1, -50) == RC_OK);
-  TEST_ASSERT(iota_snapshot_create_patch(&snapshot, &diff, &patch) == RC_OK);
-  TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &diff, 1) ==
+  TEST_ASSERT(state_delta_add(&delta, hash1, -50) == RC_OK);
+  TEST_ASSERT(iota_snapshot_create_patch(&snapshot, &delta, &patch) == RC_OK);
+  TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &delta, 1) ==
               RC_SNAPSHOT_INCONSISTENT_PATCH);
-  state_diff_destroy(&patch);
+  state_delta_destroy(&patch);
   flex_trits_from_trytes(hash2, NUM_TRITS_HASH,
                                      (tryte_t*)"Q99999999999999999999999999999999999999999999999999999999999999999999999999999999",
                                      NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT(state_diff_add(&diff, hash2, 50) == RC_OK);
-  TEST_ASSERT(iota_snapshot_create_patch(&snapshot, &diff, &patch) == RC_OK);
-  TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &diff, 2) == RC_OK);
-  state_diff_destroy(&patch);
+  TEST_ASSERT(state_delta_add(&delta, hash2, 50) == RC_OK);
+  TEST_ASSERT(iota_snapshot_create_patch(&snapshot, &delta, &patch) == RC_OK);
+  TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &delta, 2) == RC_OK);
+  state_delta_destroy(&patch);
   TEST_ASSERT_EQUAL_INT(iota_snapshot_get_index(&snapshot), 2);
   TEST_ASSERT(iota_snapshot_get_balance(&snapshot, hash1, &balance) == RC_OK);
   TEST_ASSERT_EQUAL_INT(balance, 10);
   TEST_ASSERT(iota_snapshot_get_balance(&snapshot, hash2, &balance) == RC_OK);
   TEST_ASSERT_EQUAL_INT(balance, 50);
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
-  state_diff_destroy(&diff);
+  state_delta_destroy(&delta);
 }
 
 int main(int argc, char *argv[]) {

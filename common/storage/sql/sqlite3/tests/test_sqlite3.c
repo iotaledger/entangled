@@ -277,9 +277,9 @@ void test_update_snapshot_index(void) {
   TEST_ASSERT_EQUAL_INT(tx.snapshot_index, 123456);
 }
 
-void test_milestone_state_diff(void) {
-  state_diff_t state_diff1 = NULL, state_diff2 = NULL;
-  state_diff_entry_t *iter = NULL, *tmp = NULL;
+void test_milestone_state_delta(void) {
+  state_delta_t state_delta1 = NULL, state_delta2 = NULL;
+  state_delta_entry_t *iter = NULL, *tmp = NULL;
   trit_t trits[HASH_LENGTH] = {1};
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trit_t *hashed_hash;
@@ -289,21 +289,21 @@ void test_milestone_state_diff(void) {
     hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
     memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
     free(hashed_hash);
-    TEST_ASSERT(state_diff_add(&state_diff1, hash, i) == RC_OK);
+    TEST_ASSERT(state_delta_add(&state_delta1, hash, i) == RC_OK);
   }
 
-  TEST_ASSERT(iota_stor_state_diff_store(&conn, 42, &state_diff1) == RC_OK);
+  TEST_ASSERT(iota_stor_state_delta_store(&conn, 42, &state_delta1) == RC_OK);
 
-  TEST_ASSERT(iota_stor_state_diff_load(&conn, 43, &state_diff2) == RC_OK);
-  TEST_ASSERT(state_diff2 == NULL);
+  TEST_ASSERT(iota_stor_state_delta_load(&conn, 43, &state_delta2) == RC_OK);
+  TEST_ASSERT(state_delta2 == NULL);
 
-  TEST_ASSERT(iota_stor_state_diff_load(&conn, 42, &state_diff2) == RC_OK);
-  TEST_ASSERT(state_diff2 != NULL);
+  TEST_ASSERT(iota_stor_state_delta_load(&conn, 42, &state_delta2) == RC_OK);
+  TEST_ASSERT(state_delta2 != NULL);
 
   int i = -1000;
   flex_trits_from_trits(hash, HASH_LENGTH, trits, HASH_LENGTH, HASH_LENGTH);
   iter = NULL;
-  HASH_ITER(hh, state_diff2, iter, tmp) {
+  HASH_ITER(hh, state_delta2, iter, tmp) {
     hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
     memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
     free(hashed_hash);
@@ -312,8 +312,8 @@ void test_milestone_state_diff(void) {
     i++;
   }
 
-  state_diff_destroy(&state_diff1);
-  state_diff_destroy(&state_diff2);
+  state_delta_destroy(&state_delta1);
+  state_delta_destroy(&state_delta2);
 }
 
 int main(void) {
@@ -330,7 +330,7 @@ int main(void) {
   RUN_TEST(test_stored_load_hashes_by_address);
   RUN_TEST(test_stored_load_hashes_of_approvers);
   RUN_TEST(test_update_snapshot_index);
-  RUN_TEST(test_milestone_state_diff);
+  RUN_TEST(test_milestone_state_delta);
 
   return UNITY_END();
 }
