@@ -25,11 +25,13 @@ struct _response_ctx {
   IOTA_REQUEST_STATUS status;
 };
 
+// Callback declarations for parser
 static int request_parse_header_complete(struct _response_ctx* response);
 static int request_parse_data(struct _response_ctx* response,
                               const unsigned char* at, size_t length);
 static int request_parse_message_complete(struct _response_ctx* response);
 
+// Callback implementation for parser
 static int request_parse_header_complete_cb(http_parser* parser) {
   return request_parse_header_complete((struct _response_ctx*)parser->data);
 }
@@ -44,43 +46,7 @@ static int request_parse_message_complete_cb(http_parser* parser) {
   return request_parse_message_complete((struct _response_ctx*)parser->data);
 }
 
-static int connect_to_iota_service(char const* const hostname,
-                                   const size_t port) {
-  int sockfd;
-  struct addrinfo hints, *serverinfo, *info;
-  int res;
-  char port_string[6];
-
-  memset(&hints, 0, sizeof hints);
-  hints.ai_family = AF_UNSPEC;  // use AF_INET6 to force IPv6
-  hints.ai_socktype = SOCK_STREAM;
-  sprintf(port_string, "%lu", port);
-  if ((res = getaddrinfo(hostname, port_string, &hints, &serverinfo)) != 0) {
-    return -1;
-  }
-  // loop through all the results and connect to the first we can
-  for (info = serverinfo; info; info = info->ai_next) {
-    if ((sockfd = socket(info->ai_family, info->ai_socktype,
-                         info->ai_protocol)) == -1) {
-      continue;
-    }
-    if (connect(sockfd, info->ai_addr, info->ai_addrlen) == -1) {
-      close(sockfd);
-      continue;
-    }
-    // Successfully connection
-    break;
-  }
-  // If no info was found return error
-  if (!info) {
-    return -1;
-  }
-  // Free resources allocated by getaddrinfo
-  freeaddrinfo(serverinfo);
-  // Return socket fd - 0 or greater
-  return sockfd;
-}
-
+// Callback implementation for context
 static int request_parse_header_complete(struct _response_ctx* response) {
   size_t data_len = response->parser->content_length;
   if (!data_len) {
@@ -104,6 +70,43 @@ static int request_parse_data(struct _response_ctx* response,
 
 static int request_parse_message_complete(struct _response_ctx* response) {
   response->status = IOTA_REQUEST_STATUS_DONE;
+  return RC_OK;
+}
+
+// Socket creation
+static retcode_t connect_to_iota_service(char const* const hostname,
+                                         const size_t port, int* sockfd) {
+  struct addrinfo hints, *serverinfo, *info;
+  int res;
+  char port_string[6];
+
+  memset(&hints, 0, sizeof hints);
+  hints.ai_family = AF_UNSPEC;  // use AF_INET6 to force IPv6
+  hints.ai_socktype = SOCK_STREAM;
+  sprintf(port_string, "%lu", port);
+  if (getaddrinfo(hostname, port_string, &hints, &serverinfo) != 0) {
+    return RC_CCLIENT_HOST_NOT_FOUND;
+  }
+  // loop through all the results and connect to the first we can
+  for (info = serverinfo; info; info = info->ai_next) {
+    if ((*sockfd = socket(info->ai_family, info->ai_socktype,
+                          info->ai_protocol)) == -1) {
+      continue;
+    }
+    if (connect(*sockfd, info->ai_addr, info->ai_addrlen) == -1) {
+      close(*sockfd);
+      continue;
+    }
+    // Successfully connection
+    break;
+  }
+  // If no info was found return error
+  if (!info) {
+    return RC_CCLIENT_HTTP;
+  }
+  // Free resources allocated by getaddrinfo
+  freeaddrinfo(serverinfo);
+  // Return socket fd - 0 or greater
   return RC_OK;
 }
 
@@ -131,17 +134,16 @@ static retcode_t read_data_from_iota_service(int sockfd,
   while ((num_received = recv(sockfd, buffer, RECEIVE_BUFFER_SIZE, 0)) > 0) {
     int parsed = http_parser_execute(&parser, &settings, buffer, num_received);
     // A parsing error occured, or an error in a callback
-    if (parsed < num_received) {
-      return -1;
-    } else if (response_context.status == IOTA_REQUEST_STATUS_ERROR) {
-      return -1;
+    if (parsed < num_received ||
+        response_context.status == IOTA_REQUEST_STATUS_ERROR) {
+      return RC_CCLIENT_HTTP_RES;
     } else if (response_context.status == IOTA_REQUEST_STATUS_DONE) {
       return RC_OK;
     }
     memset(buffer, 0, sizeof(buffer));
   }
   if (num_received <= 0) {
-    return -1;
+    return RC_CCLIENT_HTTP;
   }
   return RC_OK;
 }
@@ -152,7 +154,7 @@ static retcode_t send_data_to_iota_service(int sockfd, char const* const data,
   while (data_length > 0) {
     ssize_t num_sent = send(sockfd, ptr, data_length, 0);
     if (num_sent < 0) {
-      return -1;
+      return RC_CCLIENT_HTTP;
     }
     ptr += num_sent;
     data_length -= num_sent;
@@ -174,10 +176,7 @@ static retcode_t send_headers_to_iota_service(int sockfd,
   char header[256];
   sprintf(header, header_template, path, http_settings->host,
           http_settings->api_version, data_length);
-  if (send_data_to_iota_service(sockfd, header, strlen(header)) < 0) {
-    return -1;
-  }
-  return RC_OK;
+  return send_data_to_iota_service(sockfd, header, strlen(header));
 }
 
 retcode_t _iota_service_query(const void* const service_opaque,
@@ -189,26 +188,26 @@ retcode_t _iota_service_query(const void* const service_opaque,
       (const iota_client_service_t* const)service_opaque;
   const http_info_t* http_settings = &service->http;
 
-  if ((sockfd = connect_to_iota_service(http_settings->host,
-                                        http_settings->port)) < 0) {
-    return -1;
+  if ((result = connect_to_iota_service(
+           http_settings->host, http_settings->port, &sockfd)) != RC_OK) {
+    goto cleanup;
   }
 
-  if (send_headers_to_iota_service(sockfd, http_settings, obj->length, path) !=
+  if ((result = send_headers_to_iota_service(sockfd, http_settings, obj->length,
+                                             path)) != RC_OK) {
+    goto cleanup;
+  }
+  if ((result = send_data_to_iota_service(sockfd, obj->data, obj->length)) !=
       RC_OK) {
-    result = -1;
     goto cleanup;
   }
-  if (send_data_to_iota_service(sockfd, obj->data, obj->length) != RC_OK) {
-    result = -1;
-    goto cleanup;
-  }
-  if (read_data_from_iota_service(sockfd, response) != RC_OK) {
-    result = -1;
+  if ((result = read_data_from_iota_service(sockfd, response)) != RC_OK) {
     goto cleanup;
   }
 cleanup:
-  close(sockfd);
+  if (sockfd != -1) {
+    close(sockfd);
+  }
   return result;
 }
 
