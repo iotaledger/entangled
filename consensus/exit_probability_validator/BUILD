@@ -10,6 +10,7 @@ cc_library(
         "//consensus/entry_point_selector",
         "//consensus/ledger_validator",
         "//consensus/tangle",
+        "//consensus/transaction_solidifier",
         "//utils:hash_containers",
         "//utils:logger_helper",
         "@com_github_uthash//:uthash",

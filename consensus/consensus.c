@@ -78,14 +78,21 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
            (testnet ? SNAPSHOT_CONF_TESTNET : SNAPSHOT_CONF_MAINNET),
            testnet)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Initializing snapshot failed\n");
+  }
+  log_info(CONSENSUS_LOGGER_ID, "Initializing transaction solidifier\n");
+  if ((ret = iota_consensus_transaction_validator_init(
+           &consensus->transaction_solidifier, &consensus->tangle,
+           transaction_requester)) != RC_OK) {
+    log_critical(CONSENSUS_LOGGER_ID,
+                 "Initializing transaction solidifier failed\n");
     return ret;
   }
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing milestone tracker\n");
   if ((ret = iota_milestone_tracker_init(
            &consensus->milestone_tracker, &consensus->tangle,
-           &consensus->snapshot, &consensus->ledger_validator, testnet)) !=
-      RC_OK) {
+           &consensus->snapshot, &consensus->ledger_validator,
+           &consensus->transaction_solidifier, testnet)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing milestone tracker failed\n");
     return ret;

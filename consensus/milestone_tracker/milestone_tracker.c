@@ -18,6 +18,11 @@
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
+<<<<<<< HEAD
+=======
+#include "consensus/transaction_solidifier/transaction_solidifier.h"
+#include "mam/v1/merkle.h"
+>>>>>>> consensus/transaction_solidifier: add usage and consensus_t
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
 #include "utils/merkle.h"
@@ -25,10 +30,7 @@
 
 #define MILESTONE_TRACKER_LOGGER_ID "consensus_milestone_tracker"
 
-static retcode_t validate_coordinator(milestone_tracker_t* const mt,
-                                      iota_milestone_t* const candidate,
-                                      iota_transaction_t tx1,
-                                      iota_transaction_t tx2, bool* valid) {
+    static retcode_t validate_coordinator(milestone_tracker_t* const mt, iota_milestone_t* const candidate, iota_transaction_t tx1, iota_transaction_t tx2, bool* valid) {
   trit_t signature_trits[NUM_TRITS_SIGNATURE];
   trit_t siblings_trits[NUM_TRITS_SIGNATURE];
   trit_t normalized_trunk_trits[HASH_LENGTH_TRIT];
@@ -218,11 +220,16 @@ static retcode_t update_latest_solid_subtangle_milestone(
     while (pack.num_loaded != 0 && milestone.index <= latest_milestone.index &&
            mt->running) {
       has_snapshot = false;
-      if (milestone.index >= mt->latest_solid_subtangle_milestone_index
-          // TODO &&
-          // transactionValidator.checkSolidity(milestoneViewModel.getHash(),
-          // true))
-      ) {
+      bool is_solid;
+      if (milestone.index >= mt->latest_solid_subtangle_milestone_index) {
+        if ((ret = iota_consensus_transaction_solidifier_check_solidity(
+                 mt->transaction_solidifier, milestone.hash, true,
+                 &is_solid))) {
+          return ret;
+        }
+        if (!is_solid) {
+          break;
+        }
         if ((ret = iota_consensus_ledger_validator_update_snapshot(
                  mt->ledger_validator, &milestone, &has_snapshot)) != RC_OK) {
           log_error(MILESTONE_TRACKER_LOGGER_ID, "Updating snapshot failed\n");
@@ -286,6 +293,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
                                       tangle_t* const tangle,
                                       snapshot_t* const snapshot,
                                       ledger_validator_t* const lv,
+                                      transaction_solidifier_t* const ts,
                                       bool testnet) {
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
@@ -300,7 +308,8 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   mt->tangle = tangle;
   mt->latest_snapshot = snapshot;
   mt->ledger_validator = lv;
-  if ((mt->latest_milestone = trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
+  mt->transaction_solidifier = ts;
+  if ((mt->latest_milestone = trit_array_new(NUM_TRITS_HASH)) == NULL) {
     goto oom;
   }
   if ((mt->latest_solid_subtangle_milestone =

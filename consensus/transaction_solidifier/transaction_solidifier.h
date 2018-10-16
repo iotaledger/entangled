@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-typedef struct transaction_solidifier_t {
+typedef struct transaction_solidifier_s {
   tangle_t *tangle;
   requester_state_t *requester;
   thread_handle_t thread;

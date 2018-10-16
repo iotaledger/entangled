@@ -19,6 +19,8 @@ cc_library(
         "//consensus/bundle_validator",
         "//consensus/ledger_validator",
         "//consensus/snapshot",
+        "//consensus/transaction_solidifier",
+        "//mam/v1:mam",
         "//utils:macros",
         "//utils:merkle",
         "//utils:time",

@@ -26,6 +26,7 @@ typedef struct tangle_s tangle_t;
 typedef struct snapshot_s snapshot_t;
 typedef struct _trit_array* trit_array_p;
 typedef struct ledger_validator_s ledger_validator_t;
+typedef struct transaction_solidifier_s transaction_solidifier_t;
 
 typedef struct milestone_tracker_s {
   bool running;
@@ -42,8 +43,8 @@ typedef struct milestone_tracker_s {
   trit_array_p coordinator;
   size_t num_keys_in_milestone;
   ledger_validator_t* ledger_validator;
+  transaction_solidifier_t* transaction_solidifier;
   // TODO
-  // private final TransactionValidator transactionValidator;
   // private final MessageQ messageQ;
   // bool accept_any_testnet_coo;
 } milestone_tracker_t;
@@ -63,6 +64,7 @@ extern retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
                                              tangle_t* const tangle,
                                              snapshot_t* const snapshot,
                                              ledger_validator_t* const lv,
+                                             transaction_solidifier_t* ts,
                                              bool testnet);
 
 /**

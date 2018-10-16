@@ -346,6 +346,11 @@ retcode_t iota_consensus_transaction_solidifier_check_and_update_solid_state(
     transaction_solidifier_t *const ts, flex_trit_t *const hash) {
   retcode_t ret;
   bool solid;
+
+  if (ts->requester == NULL) {
+    return RC_OK;
+  }
+
   if ((ret = check_transaction_and_update_solid_state(ts, hash, &solid))) {
     return ret;
   }
