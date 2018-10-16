@@ -21,5 +21,5 @@ CREATE TABLE IF NOT EXISTS iota_transaction (
 CREATE TABLE IF NOT EXISTS iota_milestone (
   id INTEGER NOT NULL PRIMARY KEY,
   hash BLOB NOT NULL UNIQUE,
-  diff BLOB
+  delta BLOB
 );

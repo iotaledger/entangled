@@ -119,7 +119,7 @@ void test_transaction_not_a_tail() {
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
-void test_transaction_invalid_diff() {
+void test_transaction_invalid_delta() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
   init_epv(&epv);
@@ -302,7 +302,7 @@ int main(int argc, char *argv[]) {
 
   RUN_TEST(test_transaction_does_not_exist);
   RUN_TEST(test_transaction_not_a_tail);
-  RUN_TEST(test_transaction_invalid_diff);
+  RUN_TEST(test_transaction_invalid_delta);
   RUN_TEST(test_transaction_below_max_depth);
   RUN_TEST(test_transaction_exceed_max_transactions);
   RUN_TEST(test_transaction_is_genesis);

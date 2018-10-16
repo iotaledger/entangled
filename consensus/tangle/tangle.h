@@ -17,7 +17,7 @@
 #include "common/storage/defs.h"
 #include "common/storage/storage.h"
 #include "common/trinary/trit_array.h"
-#include "consensus/snapshot/state_diff.h"
+#include "consensus/snapshot/state_delta.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -86,14 +86,14 @@ retcode_t iota_tangle_milestone_exist(const tangle_t *const tangle,
                                       bool *exist);
 
 /*
- * State diff operations
+ * State delta operations
  */
 
-retcode_t iota_tangle_state_diff_store(const tangle_t *const tangle,
-                                       uint64_t index, state_map_t *diff);
+retcode_t iota_tangle_state_delta_store(const tangle_t *const tangle,
+                                        uint64_t index, state_delta_t *delta);
 
-retcode_t iota_tangle_state_diff_load(const tangle_t *const tangle,
-                                      uint64_t index, state_map_t *diff);
+retcode_t iota_tangle_state_delta_load(const tangle_t *const tangle,
+                                       uint64_t index, state_delta_t *delta);
 
 /*
  * Utilities

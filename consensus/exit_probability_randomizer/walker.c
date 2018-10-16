@@ -24,7 +24,7 @@ static retcode_t select_approver(
     trit_array_t *const approver) {
   hash_set_entry_t *curr_approver = NULL;
   hash_set_entry_t *tmp_approver = NULL;
-  hash_to_int_value_map_entry *curr_rating = NULL;
+  hash_to_int_map_entry_t *curr_rating = NULL;
   size_t num_approvers = HASH_COUNT(*approvers);
   int64_t weights[num_approvers];
   double sum_weights = 0;

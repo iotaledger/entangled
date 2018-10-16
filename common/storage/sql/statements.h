@@ -37,11 +37,11 @@ extern char* iota_statement_milestone_exist;
 extern char* iota_statement_milestone_exist_by_hash;
 
 /*
- * State diff statements
+ * State delta statements
  */
 
-extern char* iota_statement_state_diff_store;
-extern char* iota_statement_state_diff_load;
+extern char* iota_statement_state_delta_store;
+extern char* iota_statement_state_delta_load;
 
 #ifdef __cplusplus
 }

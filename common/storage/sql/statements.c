@@ -79,13 +79,13 @@ char *iota_statement_milestone_exist_by_hash =
     "FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?)";
 
 /*
- * State diff statements
+ * State delta statements
  */
 
-char *iota_statement_state_diff_store =
-    "UPDATE " MILESTONE_TABLE_NAME " SET " MILESTONE_COL_DIFF
+char *iota_statement_state_delta_store =
+    "UPDATE " MILESTONE_TABLE_NAME " SET " MILESTONE_COL_DELTA
     "=? WHERE " MILESTONE_COL_INDEX "=?";
 
-char *iota_statement_state_diff_load =
-    "SELECT " MILESTONE_COL_DIFF " FROM " MILESTONE_TABLE_NAME
+char *iota_statement_state_delta_load =
+    "SELECT " MILESTONE_COL_DELTA " FROM " MILESTONE_TABLE_NAME
     " WHERE " MILESTONE_COL_INDEX "=?";
