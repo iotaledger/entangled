@@ -7,6 +7,37 @@
 
 #include "consensus/snapshot/state_diff.h"
 
+retcode_t iota_state_diff_destroy(state_diff_t *const state) {
+  state_diff_entry_t *entry, *tmp;
+
+  if (state == NULL) {
+    return RC_SNAPSHOT_NULL_STATE;
+  } else if (*state == NULL) {
+    return RC_OK;
+  }
+
+  HASH_ITER(hh, *state, entry, tmp) {
+    HASH_DEL(*state, entry);
+    free(entry);
+  }
+  return RC_OK;
+}
+
+bool iota_state_diff_is_consistent(state_diff_t *const state) {
+  state_diff_entry_t *entry, *tmp;
+
+  HASH_ITER(hh, *state, entry, tmp) {
+    if (entry->value <= 0) {
+      if (entry->value < 0) {
+        return false;
+      }
+      HASH_DEL(*state, entry);
+      free(entry);
+    }
+  }
+  return true;
+}
+
 size_t iota_state_diff_serialized_size(state_diff_t const *const diff) {
   if (diff == NULL) {
     return 0;

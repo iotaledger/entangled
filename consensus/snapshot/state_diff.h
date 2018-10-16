@@ -19,6 +19,8 @@ extern "C" {
 typedef hash_to_int_map_entry_t state_diff_entry_t;
 typedef state_diff_entry_t *state_diff_t;
 
+retcode_t iota_state_diff_destroy(state_diff_t *const state);
+bool iota_state_diff_is_consistent(state_diff_t *const state);
 size_t iota_state_diff_serialized_size(state_diff_t const *const diff);
 retcode_t iota_state_diff_serialize(state_diff_t const *const diff,
                                     byte_t *const bytes);

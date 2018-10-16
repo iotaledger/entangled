@@ -316,8 +316,8 @@ void test_milestone_state_diff(void) {
     i++;
   }
 
-  TEST_ASSERT(iota_snapshot_state_destroy(&state_diff1) == RC_OK);
-  TEST_ASSERT(iota_snapshot_state_destroy(&state_diff2) == RC_OK);
+  TEST_ASSERT(iota_state_diff_destroy(&state_diff1) == RC_OK);
+  TEST_ASSERT(iota_state_diff_destroy(&state_diff2) == RC_OK);
 }
 
 int main(void) {

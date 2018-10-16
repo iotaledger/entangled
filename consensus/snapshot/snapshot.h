@@ -44,10 +44,9 @@ typedef struct snapshot_s {
  *
  * @return a status code
  */
-extern retcode_t iota_snapshot_init(snapshot_t *const snapshot,
-                                    char const *const snapshot_file,
-                                    char const *const snapshot_sig_file,
-                                    bool testnet);
+retcode_t iota_snapshot_init(snapshot_t *const snapshot,
+                             char const *const snapshot_file,
+                             char const *const snapshot_sig_file, bool testnet);
 
 /**
  * Destroys a snapshot
@@ -56,25 +55,7 @@ extern retcode_t iota_snapshot_init(snapshot_t *const snapshot,
  *
  * @return a status code
  */
-extern retcode_t iota_snapshot_destroy(snapshot_t *const snapshot);
-
-/**
- * Destroys a snapshot state
- *
- * @param state The state
- *
- * @return a status code
- */
-extern retcode_t iota_snapshot_state_destroy(state_diff_t *const state);
-
-/**
- * Checks if a given state is consistent
- *
- * @param state The state
- *
- * @return true if consistent, false otherwise
- */
-extern bool iota_snapshot_is_state_consistent(state_diff_t *const state);
+retcode_t iota_snapshot_destroy(snapshot_t *const snapshot);
 
 /**
  * Gets the index of a snapshot
@@ -83,7 +64,7 @@ extern bool iota_snapshot_is_state_consistent(state_diff_t *const state);
  *
  * @return the snapshot index
  */
-extern size_t iota_snapshot_get_index(snapshot_t *const snapshot);
+size_t iota_snapshot_get_index(snapshot_t *const snapshot);
 
 /**
  * Gets the balance of a given address hash
@@ -93,9 +74,8 @@ extern size_t iota_snapshot_get_index(snapshot_t *const snapshot);
  *
  * @return a status code
  */
-extern retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
-                                           flex_trit_t *const hash,
-                                           int64_t *balance);
+retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
+                                    flex_trit_t *const hash, int64_t *balance);
 
 /**
  * Creates a patch of a snapshot state and a diff
@@ -106,9 +86,9 @@ extern retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
  *
  * @return a status code
  */
-extern retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
-                                            state_diff_t *const diff,
-                                            state_diff_t *const patch);
+retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
+                                     state_diff_t *const diff,
+                                     state_diff_t *const patch);
 
 /**
  * Applies a patch to a snapshot state
@@ -119,9 +99,8 @@ extern retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
  *
  * @return a status code
  */
-extern retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
-                                           state_diff_t *const patch,
-                                           size_t index);
+retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
+                                    state_diff_t *const patch, size_t index);
 
 #ifdef __cplusplus
 }

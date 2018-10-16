@@ -117,41 +117,10 @@ retcode_t iota_snapshot_destroy(snapshot_t *const snapshot) {
     return RC_SNAPSHOT_NULL_SELF;
   }
 
-  ret = iota_snapshot_state_destroy(&snapshot->state);
+  ret = iota_state_diff_destroy(&snapshot->state);
   rw_lock_handle_destroy(&snapshot->rw_lock);
   logger_helper_destroy(SNAPSHOT_LOGGER_ID);
   return ret;
-}
-
-retcode_t iota_snapshot_state_destroy(state_diff_t *const state) {
-  state_diff_entry_t *entry, *tmp;
-
-  if (state == NULL) {
-    return RC_SNAPSHOT_NULL_STATE;
-  } else if (*state == NULL) {
-    return RC_OK;
-  }
-
-  HASH_ITER(hh, *state, entry, tmp) {
-    HASH_DEL(*state, entry);
-    free(entry);
-  }
-  return RC_OK;
-}
-
-bool iota_snapshot_is_state_consistent(state_diff_t *const state) {
-  state_diff_entry_t *entry, *tmp;
-
-  HASH_ITER(hh, *state, entry, tmp) {
-    if (entry->value <= 0) {
-      if (entry->value < 0) {
-        return false;
-      }
-      HASH_DEL(*state, entry);
-      free(entry);
-    }
-  }
-  return true;
 }
 
 size_t iota_snapshot_get_index(snapshot_t *const snapshot) {
