@@ -93,7 +93,7 @@ retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
     goto done;
   }
 
-  if (fseek(file, 0, SEEK_END) < 0 || (len = ftell(file)) < 0 ||
+  if (fseek(file, 0, SEEK_END) < 0 || (len = ftell(file)) <= 0 ||
       fseek(file, 0, SEEK_SET) < 0) {
     log_error(SNAPSHOT_LOGGER_ID, "Invalid snapshot configuration file\n");
     ret = RC_SNAPSHOT_INVALID_FILE;
