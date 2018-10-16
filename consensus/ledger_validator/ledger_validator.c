@@ -286,7 +286,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
       log_error(LEDGER_VALIDATOR_LOGGER_ID, "Creating patch failed\n");
       goto done;
     }
-    *has_snapshot = iota_state_diff_is_consistent(&patch);
+    *has_snapshot = state_diff_is_consistent(&patch);
     if (*has_snapshot) {
       if ((ret = update_snapshot_milestone(lv, milestone->hash,
                                            milestone->index)) != RC_OK) {
@@ -308,10 +308,10 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
 done:
   rw_lock_handle_unlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
   if (diff) {
-    iota_state_diff_destroy(&diff);
+    state_diff_destroy(&diff);
   }
   if (patch) {
-    iota_state_diff_destroy(&patch);
+    state_diff_destroy(&patch);
   }
   return ret;
 }
@@ -391,7 +391,7 @@ retcode_t iota_consensus_ledger_validator_update_diff(
     log_error(LEDGER_VALIDATOR_LOGGER_ID, "Creating patch failed\n");
     goto done;
   }
-  *is_consistent = iota_state_diff_is_consistent(&patch);
+  *is_consistent = state_diff_is_consistent(&patch);
 
   if (is_consistent) {
     // TODO Extract state_diff_t from snapshot #345

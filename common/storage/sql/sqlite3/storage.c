@@ -639,13 +639,13 @@ retcode_t iota_stor_state_diff_store(connection_t const* const conn,
     goto done;
   }
 
-  size = iota_state_diff_serialized_size(diff);
+  size = state_diff_serialized_size(diff);
   if ((bytes = calloc(size, sizeof(byte_t))) == NULL) {
     ret = RC_STORAGE_OOM;
     goto done;
   }
 
-  if ((ret = iota_state_diff_serialize(diff, bytes)) != RC_OK) {
+  if ((ret = state_diff_serialize(diff, bytes)) != RC_OK) {
     goto done;
   }
 
@@ -692,7 +692,7 @@ extern retcode_t iota_stor_state_diff_load(connection_t const* const conn,
   if (rc == SQLITE_ROW) {
     bytes = (byte_t*)sqlite3_column_blob(sqlite_statement, 0);
     size = sqlite3_column_bytes(sqlite_statement, 0);
-    if ((ret = iota_state_diff_deserialize(bytes, size, diff)) != RC_OK) {
+    if ((ret = state_diff_deserialize(bytes, size, diff)) != RC_OK) {
       goto done;
     }
   } else if (rc != SQLITE_OK && rc != SQLITE_DONE) {

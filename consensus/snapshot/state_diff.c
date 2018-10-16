@@ -7,7 +7,7 @@
 
 #include "consensus/snapshot/state_diff.h"
 
-retcode_t iota_state_diff_destroy(state_diff_t *const state) {
+retcode_t state_diff_destroy(state_diff_t *const state) {
   state_diff_entry_t *entry, *tmp;
 
   if (state == NULL) {
@@ -23,7 +23,7 @@ retcode_t iota_state_diff_destroy(state_diff_t *const state) {
   return RC_OK;
 }
 
-bool iota_state_diff_is_consistent(state_diff_t *const state) {
+bool state_diff_is_consistent(state_diff_t *const state) {
   state_diff_entry_t *entry, *tmp;
 
   HASH_ITER(hh, *state, entry, tmp) {
@@ -38,15 +38,15 @@ bool iota_state_diff_is_consistent(state_diff_t *const state) {
   return true;
 }
 
-size_t iota_state_diff_serialized_size(state_diff_t const *const diff) {
+size_t state_diff_serialized_size(state_diff_t const *const diff) {
   if (diff == NULL) {
     return 0;
   }
   return HASH_COUNT(*diff) * (FLEX_TRIT_SIZE_243 + sizeof(int64_t));
 }
 
-retcode_t iota_state_diff_serialize(state_diff_t const *const diff,
-                                    byte_t *const bytes) {
+retcode_t state_diff_serialize(state_diff_t const *const diff,
+                               byte_t *const bytes) {
   uint64_t offset = 0;
   state_diff_entry_t *iter = NULL, *tmp = NULL;
 
@@ -59,8 +59,8 @@ retcode_t iota_state_diff_serialize(state_diff_t const *const diff,
   return RC_OK;
 }
 
-retcode_t iota_state_diff_deserialize(byte_t const *const bytes, size_t size,
-                                      state_diff_t *const diff) {
+retcode_t state_diff_deserialize(byte_t const *const bytes, size_t size,
+                                 state_diff_t *const diff) {
   uint64_t offset = 0;
   state_diff_entry_t *new = NULL;
 

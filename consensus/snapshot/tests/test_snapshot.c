@@ -54,9 +54,9 @@ void test_snapshot_check_consistency() {
   TEST_ASSERT(iota_snapshot_init(
                   &snapshot, "consensus/snapshot/tests/snapshot.txt",
                   "consensus/snapshot/tests/snapshot.sig", true) == RC_OK);
-  TEST_ASSERT(iota_state_diff_is_consistent(&snapshot.state) == true);
+  TEST_ASSERT(state_diff_is_consistent(&snapshot.state) == true);
   snapshot.state->value *= -1;
-  TEST_ASSERT(iota_state_diff_is_consistent(&snapshot.state) == false);
+  TEST_ASSERT(state_diff_is_consistent(&snapshot.state) == false);
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
 }
 
@@ -98,7 +98,7 @@ void test_snapshot_create_and_apply_patch() {
   TEST_ASSERT(iota_snapshot_create_patch(&snapshot, &diff, &patch) == RC_OK);
   TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &diff, 1) ==
               RC_SNAPSHOT_INCONSISTENT_PATCH);
-  TEST_ASSERT(iota_state_diff_destroy(&patch) == RC_OK);
+  TEST_ASSERT(state_diff_destroy(&patch) == RC_OK);
   state_diff_entry_t *new2 = malloc(sizeof(state_diff_entry_t));
   flex_trits_from_trytes(new2->hash, NUM_TRITS_HASH,
                                      (tryte_t*)"Q99999999999999999999999999999999999999999999999999999999999999999999999999999999",
@@ -107,7 +107,7 @@ void test_snapshot_create_and_apply_patch() {
   HASH_ADD(hh, diff, hash, FLEX_TRIT_SIZE_243, new2);
   TEST_ASSERT(iota_snapshot_create_patch(&snapshot, &diff, &patch) == RC_OK);
   TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &diff, 2) == RC_OK);
-  TEST_ASSERT(iota_state_diff_destroy(&patch) == RC_OK);
+  TEST_ASSERT(state_diff_destroy(&patch) == RC_OK);
   TEST_ASSERT_EQUAL_INT(iota_snapshot_get_index(&snapshot), 2);
   TEST_ASSERT(iota_snapshot_get_balance(&snapshot, new1->hash, &balance) ==
               RC_OK);
@@ -116,7 +116,7 @@ void test_snapshot_create_and_apply_patch() {
               RC_OK);
   TEST_ASSERT_EQUAL_INT(balance, 50);
   TEST_ASSERT(iota_snapshot_destroy(&snapshot) == RC_OK);
-  TEST_ASSERT(iota_state_diff_destroy(&diff) == RC_OK);
+  TEST_ASSERT(state_diff_destroy(&diff) == RC_OK);
 }
 
 int main(int argc, char *argv[]) {

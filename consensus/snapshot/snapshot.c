@@ -117,7 +117,7 @@ retcode_t iota_snapshot_destroy(snapshot_t *const snapshot) {
     return RC_SNAPSHOT_NULL_SELF;
   }
 
-  ret = iota_state_diff_destroy(&snapshot->state);
+  ret = state_diff_destroy(&snapshot->state);
   rw_lock_handle_destroy(&snapshot->rw_lock);
   logger_helper_destroy(SNAPSHOT_LOGGER_ID);
   return ret;
