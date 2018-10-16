@@ -32,6 +32,7 @@ cc_library(
         "//utils:logger_helper",
         "//utils:signed_files",
         "//utils/handles:rw_lock",
+        "@cJSON",
     ],
 )
 

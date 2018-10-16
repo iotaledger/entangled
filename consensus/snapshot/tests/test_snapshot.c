@@ -72,7 +72,7 @@ void test_snapshot_check_consistency() {
   TEST_ASSERT(iota_snapshot_init(
                   &snapshot, "consensus/snapshot/tests/snapshot.txt",
                   "consensus/snapshot/tests/snapshot.sig",
-                  "consensus/snapshot/tests/snapshot_conf.txt" true) == RC_OK);
+                  "consensus/snapshot/tests/snapshot_conf.txt", true) == RC_OK);
   TEST_ASSERT(state_delta_is_consistent(&snapshot.state) == true);
   snapshot.state->value *= -1;
   TEST_ASSERT(state_delta_is_consistent(&snapshot.state) == false);
