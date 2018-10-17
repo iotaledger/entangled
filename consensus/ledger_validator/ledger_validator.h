@@ -28,7 +28,6 @@ typedef struct ledger_validator_s {
   tangle_t *tangle;
   milestone_tracker_t *milestone_tracker;
   requester_state_t *transaction_requester;
-  // TODO volatile int numberOfConfirmedTransactions;
 } ledger_validator_t;
 
 retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv,
@@ -36,16 +35,20 @@ retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv,
                                                milestone_tracker_t *const mt,
                                                requester_state_t *const tr);
 
+retcode_t iota_consensus_ledger_validator_destroy(ledger_validator_t *const lv);
+
 retcode_t iota_consensus_ledger_validator_update_snapshot(
-    ledger_validator_t *const lv, iota_milestone_t *const milestone,
+    ledger_validator_t const *const lv, iota_milestone_t *const milestone,
     bool *const has_snapshot);
 
 retcode_t iota_consensus_ledger_validator_check_consistency(
-    ledger_validator_t *const lv, hash243_stack_t hashes, bool *consistent);
+    ledger_validator_t *const const lv, hash243_stack_t const hashes,
+    bool *const is_consistent);
 
 retcode_t iota_consensus_ledger_validator_update_delta(
-    ledger_validator_t *const lv, hash243_set_t *analyzed_hashes,
-    state_delta_t *delta, flex_trit_t *tip, bool *is_consistent);
+    ledger_validator_t const *const lv, hash243_set_t *const analyzed_hashes,
+    state_delta_t *const delta, flex_trit_t const *const tip,
+    bool *const is_consistent);
 
 retcode_t iota_consensus_ledger_validator_destroy(ledger_validator_t *const lv);
 
