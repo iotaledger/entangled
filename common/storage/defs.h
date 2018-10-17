@@ -33,7 +33,7 @@
 #define TRANSACTION_COL_SNAPSHOT_INDEX "snapshot_index"
 #define TRANSACTION_COL_SOLID "solid"
 
-#define TRANSACTION_NUM_COLS 17
+#define TRANSACTION_NUM_COLS 18
 
 /*
  * Milestone definitions

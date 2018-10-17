@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS iota_transaction (
   nonce BLOB NOT NULL,
   hash BLOB NOT NULL PRIMARY KEY,
   snapshot_index INTEGER NOT NULL,
-  solid SMALLINT
+  solid SMALLINT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS iota_milestone (

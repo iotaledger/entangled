@@ -13,7 +13,7 @@
 
 #define TRANSACTION_SOLIDIFIER_LOGGER_ID "consensus_transaction_solidifier"
 
-#define SOLID_PROPAGATION_INTERVAL 0.5
+#define SOLID_PROPAGATION_INTERVAL 500000
 
 /*
  * Forward declarations
@@ -29,12 +29,12 @@ static retcode_t check_transaction_and_update_solid_state(
     transaction_solidifier_t *const ts, flex_trit_t *const transaction,
     bool *const solid);
 
-static void *spawn_solid_transactions_propogation(void *arg);
+static void *spawn_solid_transactions_propagation(void *arg);
 
 static retcode_t add_new_solid_transaction(transaction_solidifier_t *const ts,
                                            flex_trit_t *const hash);
 
-static retcode_t propogate_solid_transactions(
+static retcode_t propagate_solid_transactions(
     transaction_solidifier_t *const ts);
 
 static retcode_t check_solidity_do_func(tangle_t *const tangle,
@@ -51,26 +51,27 @@ typedef struct check_solidity_do_func_params_s {
   bool is_milestone;
 } check_solidity_do_func_params_t;
 
-static void *spawn_solid_transactions_propogation(void *arg) {
+static void *spawn_solid_transactions_propagation(void *arg) {
   transaction_solidifier_t *ts = (transaction_solidifier_t *)arg;
   while (ts->running) {
-    if (propogate_solid_transactions(ts) != RC_OK) {
+    if (propagate_solid_transactions(ts) != RC_OK) {
       log_critical(TRANSACTION_SOLIDIFIER_LOGGER_ID,
                    "Failed in solid transaction propagation %s\n");
     }
-    sleep(SOLID_PROPAGATION_INTERVAL);
+    usleep(SOLID_PROPAGATION_INTERVAL);
   }
   return NULL;
 }
 
-static retcode_t propogate_solid_transactions(
+static retcode_t propagate_solid_transactions(
     transaction_solidifier_t *const ts) {
   retcode_t ret;
-  hash_set_t transactions_to_propagate;
+  hash243_set_t transactions_to_propagate;
 
   lock_handle_lock(&ts->lock);
-  if ((ret = hash_set_for_each(&ts->newly_set_solid_transactions, hash_set_add,
-                               (void *)&transactions_to_propagate))) {
+  if ((ret = hash243_set_for_each(&ts->newly_set_solid_transactions,
+                                  hash243_set_add,
+                                  (void *)&transactions_to_propagate))) {
     return ret;
   }
 
@@ -81,8 +82,8 @@ static retcode_t propogate_solid_transactions(
     return ret;
   }
 
-  hash_set_entry_t *curr_entry = NULL;
-  hash_set_entry_t *tmp_entry = NULL;
+  hash243_set_entry_t *curr_entry = NULL;
+  hash243_set_entry_t *tmp_entry = NULL;
   flex_trit_t *curr_approver_hash;
   uint16_t approver_index;
   bool is_approver_solid;
@@ -119,7 +120,7 @@ static retcode_t propogate_solid_transactions(
   return RC_OK;
 }
 
-void iota_consensus_transaction_solidifier_init(
+retcode_t iota_consensus_transaction_solidifier_init(
     transaction_solidifier_t *const ts, tangle_t *const tangle,
     requester_state_t *const requester) {
   ts->tangle = tangle;
@@ -129,6 +130,7 @@ void iota_consensus_transaction_solidifier_init(
   ts->solid_transactions_candidates = NULL;
   lock_handle_init(&ts->lock);
   memset(genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+  return RC_OK;
 }
 
 retcode_t iota_consensus_transaction_solidifier_start(
@@ -141,11 +143,11 @@ retcode_t iota_consensus_transaction_solidifier_start(
   log_info(TRANSACTION_SOLIDIFIER_LOGGER_ID,
            "Spawning transaction_solidifier thread\n");
   if (thread_handle_create(
-          &ts->thread, (thread_routine_t)spawn_solid_transactions_propogation,
+          &ts->thread, (thread_routine_t)spawn_solid_transactions_propagation,
           ts) != 0) {
     log_critical(TRANSACTION_SOLIDIFIER_LOGGER_ID,
-                 "Spawning cIRI API thread failed\n");
-    return RC_CIRI_API_FAILED_THREAD_SPAWN;
+                 "Spawning transaction_solidifier thread failed\n");
+    return RC_API_FAILED_THREAD_SPAWN;
   }
   return RC_OK;
 }
@@ -167,7 +169,7 @@ retcode_t iota_consensus_transaction_solidifier_stop(
   if (thread_handle_join(ts->thread, NULL) != 0) {
     log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
               "Shutting down transaction_solidifier thread failed\n");
-    ret = RC_CIRI_API_FAILED_THREAD_JOIN;
+    ret = RC_API_FAILED_THREAD_JOIN;
   }
   return ret;
 }
@@ -177,7 +179,7 @@ retcode_t iota_consensus_transaction_solidifier_destroy(
   if (ts == NULL) {
     return RC_CONSENSUS_NULL_PTR;
   } else if (ts->running) {
-    return RC_CIRI_API_STILL_RUNNING;
+    return RC_API_STILL_RUNNING;
   }
 
   ts->tangle = NULL;
@@ -204,7 +206,7 @@ static retcode_t check_solidity_do_func(tangle_t *const tangle,
   // Transaction is not marked solid, but it is a candidate
   if (pack->num_loaded == 1 && !((iota_transaction_t)pack->models[0])->solid) {
     *should_branch = true;
-    return hash_set_add(&ts->solid_transactions_candidates, hash);
+    return hash243_set_add(&ts->solid_transactions_candidates, hash);
   } else if (pack->num_loaded == 0) {
     if (memcmp(hash, genesis_hash, FLEX_TRIT_SIZE_243) != 0) {
       ts->solid = false;
@@ -251,8 +253,8 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
                                         hash, &params);
   if (ts->solid) {
     // TODO - one db statement
-    hash_set_entry_t *curr_entry = NULL;
-    hash_set_entry_t *tmp_entry = NULL;
+    hash243_set_entry_t *curr_entry = NULL;
+    hash243_set_entry_t *tmp_entry = NULL;
     HASH_ITER(hh, ts->solid_transactions_candidates, curr_entry, tmp_entry) {
       if ((ret = iota_tangle_transaction_update_solid_state(
                ts->tangle, curr_entry->hash, true)) != RC_OK) {
@@ -260,7 +262,7 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
       }
     }
   }
-  hash_set_free(&ts->solid_transactions_candidates);
+  hash243_set_free(&ts->solid_transactions_candidates);
   return ret;
 }
 
@@ -307,7 +309,6 @@ static retcode_t check_transaction_and_update_solid_state(
                ts->tangle, transaction->hash, true)) != RC_OK) {
         return ret;
       }
-      // TODO - update height
     }
   }
 
@@ -365,7 +366,8 @@ static retcode_t add_new_solid_transaction(transaction_solidifier_t *const ts,
                                            flex_trit_t *const hash) {
   retcode_t ret;
   lock_handle_lock(&ts->lock);
-  if ((ret = hash_set_add(&ts->newly_set_solid_transactions, hash)) != RC_OK) {
+  if ((ret = hash243_set_add(&ts->newly_set_solid_transactions, hash)) !=
+      RC_OK) {
     return ret;
   }
   lock_handle_unlock(&ts->lock);

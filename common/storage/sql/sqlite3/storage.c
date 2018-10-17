@@ -160,7 +160,7 @@ static retcode_t execute_statement_load_hashes(
 
 static retcode_t execute_statement_store_update(
     sqlite3_stmt* const sqlite_statement) {
-  retcode_t rc = sqlite3_step(sqlite_statement);
+  int rc = sqlite3_step(sqlite_statement);
   if (rc != SQLITE_OK && rc != SQLITE_DONE) {
     log_error(SQLITE3_LOGGER_ID, "Step failed with sqlite3 code: %" PRIu64 "\n",
               rc);
@@ -258,7 +258,8 @@ retcode_t iota_stor_transaction_store(connection_t const* const conn,
       column_compress_bind(sqlite_statement, 16, tx->hash,
                            FLEX_TRIT_SIZE_243) != RC_OK ||
       sqlite3_bind_int64(sqlite_statement, 17, tx->snapshot_index) !=
-          SQLITE_OK) {
+          SQLITE_OK ||
+      sqlite3_bind_int(sqlite_statement, 18, tx->solid) != SQLITE_OK) {
     ret = binding_error();
     goto done;
   }

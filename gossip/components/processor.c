@@ -110,6 +110,11 @@ static retcode_t process_request_bytes(processor_state_t *const state,
     // If requested hash is equal to transaction hash: request a random tip
     trit_array_set_null(request_hash);
   }
+
+  if ((ret = iota_consensus_transaction_solidifier_check_and_update_solid_state(
+           &state->node->core->consensus.transaction_solidifier, (*tx).hash))) {
+    return ret;
+  }
   log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Propagating packet to responder\n");
   if ((ret = responder_on_next(&state->node->responder, neighbor,
                                request_hash))) {

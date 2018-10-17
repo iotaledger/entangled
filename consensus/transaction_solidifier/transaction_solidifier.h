@@ -16,9 +16,10 @@
 #include "common/storage/connection.h"
 #include "consensus/tangle/tangle.h"
 #include "gossip/components/requester.h"
+#include "utils/containers/hash/hash243_set.h"
+#include "utils/containers/hash/hash243_stack.h"
 #include "utils/handles/lock.h"
 #include "utils/handles/thread.h"
-#include "utils/hash_containers.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,12 +32,11 @@ typedef struct transaction_solidifier_s {
   bool running;
   bool solid;
   lock_handle_t lock;
-  hash_set_t newly_set_solid_transactions;
-  hash_set_t solid_transactions_candidates;
-
+  hash243_set_t newly_set_solid_transactions;
+  hash243_set_t solid_transactions_candidates;
 } transaction_solidifier_t;
 
-extern void iota_consensus_transaction_solidifier_init(
+extern retcode_t iota_consensus_transaction_solidifier_init(
     transaction_solidifier_t *const ts, tangle_t *const tangle,
     requester_state_t *const requester);
 

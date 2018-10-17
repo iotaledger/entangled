@@ -21,6 +21,7 @@ retcode_t tangle_traversal_dfs_to_genesis(tangle_t *const tangle,
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 
   if ((ret = hash243_stack_push(&non_analyzed_hashes, entry_point)) != RC_OK) {
+    return ret;
   }
   bool should_branch;
   bool should_stop;

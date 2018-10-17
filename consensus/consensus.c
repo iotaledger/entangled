@@ -80,7 +80,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
     log_critical(CONSENSUS_LOGGER_ID, "Initializing snapshot failed\n");
   }
   log_info(CONSENSUS_LOGGER_ID, "Initializing transaction solidifier\n");
-  if ((ret = iota_consensus_transaction_validator_init(
+  if ((ret = iota_consensus_transaction_solidifier_init(
            &consensus->transaction_solidifier, &consensus->tangle,
            transaction_requester)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
@@ -146,6 +146,14 @@ retcode_t iota_consensus_start(iota_consensus_t *const consensus) {
     return ret;
   }
 
+  log_info(CONSENSUS_LOGGER_ID, "Starting transaction_solidifier\n");
+  if ((ret = iota_consensus_transaction_solidifier_start(
+           &consensus->transaction_solidifier)) != RC_OK) {
+    log_critical(CONSENSUS_LOGGER_ID,
+                 "Starting transaction_solidifier failed\n");
+    return ret;
+  }
+
   return ret;
 }
 
@@ -156,6 +164,14 @@ retcode_t iota_consensus_stop(iota_consensus_t *const consensus) {
   if ((ret = iota_milestone_tracker_start(&consensus->milestone_tracker)) !=
       RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Stopping milestone tracker failed\n");
+    return ret;
+  }
+
+  log_info(CONSENSUS_LOGGER_ID, "Stopping transaction_solidifier\n");
+  if ((ret = iota_consensus_transaction_solidifier_stop(
+           &consensus->transaction_solidifier)) != RC_OK) {
+    log_critical(CONSENSUS_LOGGER_ID,
+                 "Stopping transaction_solidifier failed\n");
     return ret;
   }
 
@@ -209,6 +225,13 @@ retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
   if ((ret = iota_milestone_tracker_destroy(&consensus->milestone_tracker)) !=
       RC_OK) {
     log_error(CONSENSUS_LOGGER_ID, "Destroying milestone tracker failed\n");
+  }
+
+  log_info(CONSENSUS_LOGGER_ID, "Destroying transaction solidifier\n");
+  if ((ret = iota_consensus_transaction_solidifier_destroy(
+           &consensus->transaction_solidifier)) != RC_OK) {
+    log_error(CONSENSUS_LOGGER_ID,
+              "Destroying transaction solidifier failed\n");
   }
 
   log_info(CONSENSUS_LOGGER_ID, "Destroying snapshot\n");

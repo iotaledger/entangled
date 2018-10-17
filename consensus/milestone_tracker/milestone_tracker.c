@@ -18,11 +18,7 @@
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
-<<<<<<< HEAD
-=======
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
-#include "mam/v1/merkle.h"
->>>>>>> consensus/transaction_solidifier: add usage and consensus_t
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
 #include "utils/merkle.h"
@@ -30,7 +26,10 @@
 
 #define MILESTONE_TRACKER_LOGGER_ID "consensus_milestone_tracker"
 
-    static retcode_t validate_coordinator(milestone_tracker_t* const mt, iota_milestone_t* const candidate, iota_transaction_t tx1, iota_transaction_t tx2, bool* valid) {
+static retcode_t validate_coordinator(milestone_tracker_t* const mt,
+                                      iota_milestone_t* const candidate,
+                                      iota_transaction_t tx1,
+                                      iota_transaction_t tx2, bool* valid) {
   trit_t signature_trits[NUM_TRITS_SIGNATURE];
   trit_t siblings_trits[NUM_TRITS_SIGNATURE];
   trit_t normalized_trunk_trits[HASH_LENGTH_TRIT];
@@ -202,6 +201,7 @@ static retcode_t update_latest_solid_subtangle_milestone(
   iota_milestone_t* milestone_ptr = &milestone;
   DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr, pack);
   bool has_snapshot = false;
+  bool is_solid = false;
 
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
@@ -220,7 +220,6 @@ static retcode_t update_latest_solid_subtangle_milestone(
     while (pack.num_loaded != 0 && milestone.index <= latest_milestone.index &&
            mt->running) {
       has_snapshot = false;
-      bool is_solid;
       if (milestone.index >= mt->latest_solid_subtangle_milestone_index) {
         if ((ret = iota_consensus_transaction_solidifier_check_solidity(
                  mt->transaction_solidifier, milestone.hash, true,
