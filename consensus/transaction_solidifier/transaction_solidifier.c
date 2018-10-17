@@ -49,6 +49,7 @@ static retcode_t check_solidity_do_func(tangle_t *const tangle,
 typedef struct check_solidity_do_func_params_s {
   transaction_solidifier_t *ts;
   bool is_milestone;
+  bool is_solid;
 } check_solidity_do_func_params_t;
 
 static void *spawn_solid_transactions_propagation(void *arg) {
@@ -67,14 +68,12 @@ static retcode_t propagate_solid_transactions(
     transaction_solidifier_t *const ts) {
   retcode_t ret;
   hash243_set_t transactions_to_propagate;
-
   lock_handle_lock(&ts->lock);
   if ((ret = hash243_set_for_each(&ts->newly_set_solid_transactions,
                                   hash243_set_add,
                                   (void *)&transactions_to_propagate))) {
     return ret;
   }
-
   lock_handle_unlock(&ts->lock);
 
   iota_stor_pack_t hash_pack;
@@ -102,6 +101,9 @@ static retcode_t propagate_solid_transactions(
       curr_approver_hash = (flex_trit_t *)hash_pack.models[approver_index];
       if ((ret = check_transaction_and_update_solid_state(
                ts, curr_approver_hash, &is_approver_solid)) != RC_OK) {
+        log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
+                  "In %s, failed check_transaction_and_update_solid_state\n",
+                  __FUNCTION__);
         return ret;
       }
       if (is_approver_solid) {
@@ -130,6 +132,7 @@ retcode_t iota_consensus_transaction_solidifier_init(
   ts->solid_transactions_candidates = NULL;
   lock_handle_init(&ts->lock);
   memset(genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+  logger_helper_init(TRANSACTION_SOLIDIFIER_LOGGER_ID, LOGGER_DEBUG, true);
   return RC_OK;
 }
 
@@ -209,7 +212,7 @@ static retcode_t check_solidity_do_func(tangle_t *const tangle,
     return hash243_set_add(&ts->solid_transactions_candidates, hash);
   } else if (pack->num_loaded == 0) {
     if (memcmp(hash, genesis_hash, FLEX_TRIT_SIZE_243) != 0) {
-      ts->solid = false;
+      params->is_solid = false;
       trit_array_t hash_trits = {.trits = hash,
                                  .num_trits = NUM_TRITS_HASH,
                                  .num_bytes = FLEX_TRIT_SIZE_243,
@@ -218,6 +221,8 @@ static retcode_t check_solidity_do_func(tangle_t *const tangle,
       return request_transaction(ts->requester, &hash_trits);
     }
   }
+
+  log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID, "In %s, SHOULD BE SOLID\n");
   return RC_OK;
 }
 
@@ -242,16 +247,17 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
   }
 
   if (curr_tx->solid) {
-    *is_solid = false;
+    *is_solid = true;
     return RC_OK;
   }
 
-  ts->solid = true;
-  check_solidity_do_func_params_t params = {.ts = ts,
-                                            .is_milestone = is_milestone};
+  check_solidity_do_func_params_t params = {
+      .ts = ts, .is_milestone = is_milestone, .is_solid = true};
   ret = tangle_traversal_dfs_to_genesis(ts->tangle, check_solidity_do_func,
                                         hash, &params);
-  if (ts->solid) {
+  if (params.is_solid) {
+    log_debug(TRANSACTION_SOLIDIFIER_LOGGER_ID, "In %s, updating solid state\n",
+              __FUNCTION__);
     // TODO - one db statement
     hash243_set_entry_t *curr_entry = NULL;
     hash243_set_entry_t *tmp_entry = NULL;
@@ -353,6 +359,9 @@ retcode_t iota_consensus_transaction_solidifier_check_and_update_solid_state(
   }
 
   if ((ret = check_transaction_and_update_solid_state(ts, hash, &solid))) {
+    log_debug(TRANSACTION_SOLIDIFIER_LOGGER_ID,
+              "In %s, failed check_transaction_and_update_solid_state\n",
+              __FUNCTION__);
     return ret;
   }
 
