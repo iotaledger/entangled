@@ -134,7 +134,9 @@ retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
       strlen(tmp->valuestring) != HASH_LENGTH_TRYTE) {
     goto json_error;
   }
-  memcpy(conf->coordinator, tmp->valuestring, HASH_LENGTH_TRYTE);
+  flex_trits_from_trytes(conf->coordinator, HASH_LENGTH_TRIT,
+                         (tryte_t *)tmp->valuestring, HASH_LENGTH_TRYTE,
+                         HASH_LENGTH_TRYTE);
 
   tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "lastMilestone");
   if (tmp == NULL || !cJSON_IsNumber(tmp)) {
@@ -165,7 +167,9 @@ retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
         strlen(tmp->valuestring) != HASH_LENGTH_TRYTE) {
       goto json_error;
     }
-    memcpy(conf->signature_pubkey, tmp->valuestring, HASH_LENGTH_TRYTE);
+    flex_trits_from_trytes(conf->signature_pubkey, HASH_LENGTH_TRIT,
+                           (tryte_t *)tmp->valuestring, HASH_LENGTH_TRYTE,
+                           HASH_LENGTH_TRYTE);
   }
 
   goto done;

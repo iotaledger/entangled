@@ -25,8 +25,8 @@ typedef struct snapshot_conf_s {
   uint64_t timestamp_sec;
   uint64_t signature_index;
   uint64_t signature_depth;
-  tryte_t signature_pubkey[HASH_LENGTH_TRYTE];
-  tryte_t coordinator[HASH_LENGTH_TRYTE];
+  flex_trit_t signature_pubkey[FLEX_TRIT_SIZE_243];
+  flex_trit_t coordinator[FLEX_TRIT_SIZE_243];
   uint64_t last_milestone;
 } snapshot_conf_t;
 

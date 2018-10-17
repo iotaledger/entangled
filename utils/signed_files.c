@@ -22,7 +22,7 @@
  */
 
 static retcode_t validate_signature(char const *const signature_filename,
-                                    tryte_t const *const public_key,
+                                    flex_trit_t const *const public_key,
                                     size_t depth, size_t index,
                                     flex_trit_t *const digest,
                                     bool *const valid) {
@@ -81,7 +81,8 @@ static retcode_t validate_signature(char const *const signature_filename,
     trytes_to_trits((tryte_t *)line, siblings, read);
     merkle_root(root, siblings, depth, index, &curl);
   }
-  trytes_to_trits(public_key, public_key_trits, HASH_LENGTH_TRYTE);
+  flex_trits_to_trits(public_key_trits, HASH_LENGTH_TRIT, public_key,
+                      HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   *valid = (memcmp(public_key_trits, root, HASH_LENGTH_TRIT) == 0);
 
 done:
@@ -159,7 +160,7 @@ done:
 
 retcode_t iota_file_signature_validate(char const *const filename,
                                        char const *const signature_filename,
-                                       tryte_t const *const public_key,
+                                       flex_trit_t const *const public_key,
                                        size_t depth, size_t index,
                                        bool *const valid) {
   retcode_t ret = RC_OK;

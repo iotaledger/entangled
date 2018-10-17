@@ -17,6 +17,8 @@ snapshot_t snapshot;
 
 void test_snapshot_conf() {
   snapshot_conf_t conf;
+  tryte_t sig_pubkey[HASH_LENGTH_TRYTE];
+  tryte_t coo[HASH_LENGTH_TRYTE];
 
   TEST_ASSERT(iota_snapshot_init_conf(
                   "consensus/snapshot/tests/snapshot_conf.txt", &conf, false) ==
@@ -25,8 +27,12 @@ void test_snapshot_conf() {
   TEST_ASSERT_EQUAL_INT(conf.signature_index, 9UL);
   TEST_ASSERT_EQUAL_INT(conf.signature_depth, 6UL);
   TEST_ASSERT_EQUAL_INT(conf.last_milestone, 774804UL);
-  TEST_ASSERT_EQUAL_MEMORY(conf.signature_pubkey, (tryte_t*)"TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD9CZUYAC", NUM_TRYTES_ADDRESS);
-  TEST_ASSERT_EQUAL_MEMORY(conf.coordinator, (tryte_t*)"KPWCHICGJZXKE9GSUDXZYUAPLHAKAHYHDXNPHENTERYMMBQOPSQIDENXKLKCEYCPVTZQLEEJVYJZV9BWU", NUM_TRYTES_ADDRESS);
+  flex_trits_to_trytes(sig_pubkey, HASH_LENGTH_TRYTE, conf.signature_pubkey,
+                       HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  flex_trits_to_trytes(coo, HASH_LENGTH_TRYTE, conf.coordinator,
+                       HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  TEST_ASSERT_EQUAL_MEMORY(sig_pubkey, (tryte_t*)"TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD9CZUYAC", NUM_TRYTES_ADDRESS);
+  TEST_ASSERT_EQUAL_MEMORY(coo, (tryte_t*)"KPWCHICGJZXKE9GSUDXZYUAPLHAKAHYHDXNPHENTERYMMBQOPSQIDENXKLKCEYCPVTZQLEEJVYJZV9BWU", NUM_TRYTES_ADDRESS);
 }
 
 void test_snapshot_init_file_not_found() {

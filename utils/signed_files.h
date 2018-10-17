@@ -12,8 +12,6 @@
 
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
-#include "common/trinary/trits.h"
-#include "common/trinary/tryte.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,7 +19,7 @@ extern "C" {
 
 retcode_t iota_file_signature_validate(char const *const filename,
                                        char const *const signature_filename,
-                                       tryte_t const *const public_key,
+                                       flex_trit_t const *const public_key,
                                        size_t depth, size_t index,
                                        bool *const valid);
 

@@ -74,7 +74,7 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
   }
 
   // Check if milestone is already present in database i.e. validated
-  TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
+  TRIT_ARRAY_DECLARE(hash, HASH_LENGTH_TRIT);
   memcpy(hash.trits, candidate->hash, FLEX_TRIT_SIZE_243);
   if ((ret = iota_tangle_milestone_exist(mt->tangle, candidate->hash,
                                          &exists)) != RC_OK) {
@@ -300,17 +300,18 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   mt->tangle = tangle;
   mt->latest_snapshot = snapshot;
   mt->ledger_validator = lv;
-  if ((mt->latest_milestone = trit_array_new(NUM_TRITS_HASH)) == NULL) {
+  if ((mt->latest_milestone = trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
     goto oom;
   }
-  if ((mt->latest_solid_subtangle_milestone = trit_array_new(NUM_TRITS_HASH)) ==
-      NULL) {
+  if ((mt->latest_solid_subtangle_milestone =
+           trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
     goto oom;
   }
-  if ((mt->coordinator =
-           trit_array_new_from_trytes(snapshot->conf.coordinator)) == NULL) {
+  if ((mt->coordinator = trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
     goto oom;
   }
+  memcpy(mt->coordinator->trits, snapshot->conf.coordinator,
+         FLEX_TRIT_SIZE_243);
   mt->milestone_start_index = snapshot->conf.last_milestone;
   mt->latest_milestone_index = snapshot->conf.last_milestone;
   mt->latest_solid_subtangle_milestone_index = snapshot->conf.last_milestone;
