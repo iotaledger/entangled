@@ -28,8 +28,9 @@ static retcode_t update_snapshot_milestone_do_func(
 
   if (pack->num_loaded == 0) {
     *should_stop = true;
-    // TODO
-    return 1;
+    log_error(LEDGER_VALIDATOR_LOGGER_ID, "In %s, could not load milestone\n",
+              __FUNCTION__);
+    return RC_LEDGER_VALIDATOR_COULD_NOT_LOAD_MILESTONE;
   }
   iota_transaction_t transaction = pack->models[0];
   *should_branch = transaction->snapshot_index == 0;
