@@ -36,7 +36,7 @@ static char *ciri_db_path =
     "consensus/exit_probability_randomizer/tests/ciri.db";
 static char *snapshot_path =
     "consensus/exit_probability_randomizer/tests/snapshot.txt";
-static char *snapshot_conf_path = "consensus/snapshot/tests/snapshot_conf.txt";
+static char *snapshot_conf_path = "consensus/snapshot/tests/snapshot_conf.json";
 
 static double low_alpha = 0;
 static double high_alpha = 1;

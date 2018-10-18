@@ -3,7 +3,7 @@ filegroup(
     srcs = [
         "snapshot.txt",
         "snapshot_badly_formatted.txt",
-        "snapshot_conf.txt",
+        "snapshot_conf.json",
         "snapshot_inconsistent.txt",
         "snapshot_invalid_supply.txt",
     ],

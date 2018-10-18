@@ -32,7 +32,7 @@ static char *ciri_db_path =
     "consensus/exit_probability_validator/tests/ciri.db";
 static char *snapshot_path =
     "consensus/exit_probability_validator/tests/snapshot.txt";
-static char *snapshot_conf_path = "consensus/snapshot/tests/snapshot_conf.txt";
+static char *snapshot_conf_path = "consensus/snapshot/tests/snapshot_conf.json";
 
 static uint32_t max_depth = 15;
 static uint32_t max_txs_below_max_depth = 10;
