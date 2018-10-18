@@ -3,11 +3,11 @@ cc_test(
     srcs = [
         "test_exit_probability_randomizer.c",
     ],
-    flaky = True,
     data = [
         "snapshot.txt",
         ":db_file",
     ],
+    flaky = True,
     visibility = ["//visibility:public"],
     deps = [
         "//common/storage/sql/sqlite3:sqlite3_storage",
