@@ -10,18 +10,12 @@
 
 #include <stdlib.h>
 
+#include "cclient/serialization/serializer.h"
 #include "common/errors.h"
-#include "serialization/serializer.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-enum serializer_type_t {
-  SR_JSON = 0,
-  SR_UNIMPLEMENTED,
-};
-typedef enum serializer_type_t serializer_type_t;
 
 typedef struct {
   const char* host;

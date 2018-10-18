@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "cclient/serialization/serializer.h"
 #include "common/errors.h"
 #include "utils/handles/thread.h"
 
@@ -22,6 +23,8 @@ typedef struct iota_api_s {
   thread_handle_t thread;
   bool running;
   uint16_t port;
+  serializer_t serializer;
+  serializer_type_t serializer_type;
 } iota_api_t;
 
 /**
@@ -29,10 +32,12 @@ typedef struct iota_api_s {
  *
  * @param api The API
  * @param port The API port
+ * @param serializer_type A serializer type
  *
  * @return a status code
  */
-retcode_t iota_api_init(iota_api_t *const api, uint16_t port);
+retcode_t iota_api_init(iota_api_t *const api, uint16_t port,
+                        serializer_type_t serializer_type);
 
 /**
  * Starts an API
