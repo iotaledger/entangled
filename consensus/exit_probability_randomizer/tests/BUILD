@@ -3,6 +3,7 @@ cc_test(
     srcs = [
         "test_exit_probability_randomizer.c",
     ],
+    flaky = True,
     data = [
         ":db_file",
         ":snapshot.txt",
