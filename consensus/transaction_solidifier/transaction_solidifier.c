@@ -339,7 +339,7 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts,
     log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
               "No transactions were loaded for the provided tail hash\n");
     *solid = false;
-    return ret;
+    return request_transaction(ts->requester, &approvee_trits);
   }
   if (memcmp(curr_tx_s.hash, genesis_hash, FLEX_TRIT_SIZE_243) == 0) {
     *solid = true;
