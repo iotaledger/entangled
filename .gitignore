@@ -39,6 +39,7 @@ hs_err_pid*
 *.iws
 
 ## Plugin-specific files:
+.clwb/
 
 # IntelliJ
 /out/
