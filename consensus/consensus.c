@@ -70,6 +70,17 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
     return ret;
   }
 
+  log_info(CONSENSUS_LOGGER_ID, "Initializing snapshot\n");
+  if ((ret = iota_snapshot_init(
+           &consensus->snapshot,
+           (testnet ? SNAPSHOT_TESTNET : SNAPSHOT_MAINNET),
+           (testnet ? NULL : SNAPSHOT_SIG_MAINNET),
+           (testnet ? SNAPSHOT_CONF_TESTNET : SNAPSHOT_CONF_MAINNET),
+           testnet)) != RC_OK) {
+    log_critical(CONSENSUS_LOGGER_ID, "Initializing snapshot failed\n");
+    return ret;
+  }
+
   log_info(CONSENSUS_LOGGER_ID, "Initializing milestone tracker\n");
   if ((ret = iota_milestone_tracker_init(
            &consensus->milestone_tracker, &consensus->tangle,
@@ -77,13 +88,6 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
       RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing milestone tracker failed\n");
-    return ret;
-  }
-
-  log_info(CONSENSUS_LOGGER_ID, "Initializing snapshot\n");
-  if ((ret = iota_snapshot_init(&consensus->snapshot, CIRI_SNAPSHOT_FILE,
-                                CIRI_SNAPSHOT_SIG_FILE, testnet)) != RC_OK) {
-    log_critical(CONSENSUS_LOGGER_ID, "Initializing snapshot failed\n");
     return ret;
   }
 
@@ -106,7 +110,8 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing transaction validator\n");
   if ((ret = iota_consensus_transaction_validator_init(
-           &consensus->transaction_validator, SNAPSHOT_TIMESTAMP * 1000,
+           &consensus->transaction_validator,
+           consensus->snapshot.conf.timestamp_sec * 1000UL,
            (testnet ? TESTNET_MWM : MAINNET_MWM))) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing transaction validator failed\n");

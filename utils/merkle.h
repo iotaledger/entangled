@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_MERKLE_H__
-#define __MAM_MERKLE_H__
+#ifndef __UTILS_MERKLE_H__
+#define __UTILS_MERKLE_H__
 
 #include "common/curl-p/trit.h"
 
@@ -100,4 +100,4 @@ void merkle_root(trit_t *const hash, trit_t const *const siblings,
                  size_t const siblings_number, size_t const leaf_index,
                  Curl *const c);
 
-#endif  //__MAM_MERKLE_H__
+#endif  //__UTILS_MERKLE_H__
