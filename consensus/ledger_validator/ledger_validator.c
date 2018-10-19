@@ -104,7 +104,10 @@ static retcode_t build_snapshot(ledger_validator_t const *const lv,
         *consistent_index = milestone.index;
         memcpy(consistent_hash, milestone.hash, FLEX_TRIT_SIZE_243);
       } else {
-        break;
+        log_critical(LEDGER_VALIDATOR_LOGGER_ID,
+                     "Inconsistent state delta loaded\n");
+        ret = RC_LEDGER_VALIDATOR_INCONSISTENT_DELTA;
+        goto done;
       }
     }
     hash_pack_reset(&pack);
