@@ -11,8 +11,6 @@
 
 #define WALKER_VALIDATOR_LOGGER_ID "consensus_walker_validator"
 
-static flex_trit_t null_hash[FLEX_TRIT_SIZE_243];
-
 retcode_t iota_consensus_exit_prob_transaction_validator_init(
     tangle_t *const tangle, milestone_tracker_t *const mt,
     ledger_validator_t *const lv, exit_prob_transaction_validator_t *epv,
@@ -24,7 +22,6 @@ retcode_t iota_consensus_exit_prob_transaction_validator_init(
   epv->max_analyzed_txs = max_analyzed_txs;
   epv->max_depth = max_depth;
   epv->max_depth_ok_memoization = NULL;
-  memset(null_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   return RC_OK;
 }
 
@@ -145,7 +142,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
                                        &hash_trits_array, &pack);
     bool tail_is_not_genesis =
         (curr_tx_s.snapshot_index != 0 ||
-         memcmp(null_hash, curr_tx_s.hash, FLEX_TRIT_SIZE_243) == 0);
+         memcmp(genesis_hash, curr_tx_s.hash, FLEX_TRIT_SIZE_243) == 0);
     if (tail_is_not_genesis &&
         (curr_tx_s.snapshot_index < lowest_allowed_depth)) {
       log_error(WALKER_VALIDATOR_LOGGER_ID,

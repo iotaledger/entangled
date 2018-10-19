@@ -139,7 +139,6 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
   iota_transaction_t tx_bundle = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   struct _trit_array curr_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
-  flex_trit_t null_hash[FLEX_TRIT_SIZE_243];
 
   bool valid_bundle = false;
   bundle_transactions_t *bundle = NULL;
@@ -149,16 +148,11 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
     goto done;
   }
 
-  memset(null_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
-  if (!hash_set_contains(analyzed_hashes, null_hash)) {
-    if ((ret = hash_set_add(analyzed_hashes, null_hash)) != RC_OK) {
-      goto done;
-    }
+  if ((ret = hash_set_add(analyzed_hashes, genesis_hash)) != RC_OK) {
+    goto done;
   }
-  if (!hash_set_contains(&counted_hashes, null_hash)) {
-    if ((ret = hash_set_add(&counted_hashes, null_hash)) != RC_OK) {
-      goto done;
-    }
+  if ((ret = hash_set_add(&counted_hashes, genesis_hash)) != RC_OK) {
+    goto done;
   }
 
   while (non_analyzed_hashes != NULL) {

@@ -22,6 +22,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   retcode_t ret = RC_OK;
 
   logger_helper_init(CONSENSUS_LOGGER_ID, LOGGER_DEBUG, true);
+  memset(genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing bundle validator\n");
   if ((ret = iota_consensus_bundle_validator_init()) != RC_OK) {

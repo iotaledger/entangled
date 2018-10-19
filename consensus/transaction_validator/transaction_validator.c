@@ -17,8 +17,6 @@
 
 static size_t MAX_TIMESTAMP_FUTURE_MS = 2 * 60 * 60 * 1000;
 
-static flex_trit_t genesis_hash[FLEX_TRIT_SIZE_243];
-
 static bool has_invalid_timestamp(transaction_validator_t* const tv,
                                   iota_transaction_t const transaction) {
   uint64_t max_future_timestamp_ms =
@@ -39,7 +37,6 @@ retcode_t iota_consensus_transaction_validator_init(
   logger_helper_init(TRANSACTION_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   tv->snapshot_timestamp_ms = snapshot_timestamp_ms;
   tv->mwm = mwm;
-  memset(genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   return RC_OK;
 }
 

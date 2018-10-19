@@ -5,6 +5,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
+        "//consensus:defs",
         "//consensus/bundle_validator",
         "//consensus/cw_rating_calculator",
         "//consensus/entry_point_selector",
@@ -22,8 +23,12 @@ cc_library(
 
 cc_library(
     name = "defs",
+    srcs = ["defs.c"],
     hdrs = ["defs.h"],
     visibility = ["//visibility:public"],
+    deps = [
+        "//common/trinary:flex_trit",
+    ],
 )
 
 cc_library(
