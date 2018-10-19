@@ -94,7 +94,7 @@ size_t flex_trits_insert(flex_trit_t *const to_flex_trits, size_t const to_len,
                          size_t const start, size_t const num_trits) {
   // Bounds checking
   if (num_trits == 0 || num_trits > len || num_trits > to_len ||
-      start >= to_len || (start + num_trits) >= to_len) {
+      start >= to_len || (start + num_trits) > to_len) {
     return 0;
   }
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
