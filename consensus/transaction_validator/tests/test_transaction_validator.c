@@ -22,7 +22,7 @@ void transaction_invalid_value() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
@@ -41,7 +41,7 @@ void transaction_invalid_hash() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
@@ -60,7 +60,7 @@ void transaction_invalid_attachment_timestamp_too_futuristic() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
@@ -78,7 +78,7 @@ void transaction_invalid_attachment_timestamp_too_old() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
@@ -97,7 +97,7 @@ void transaction_invalid_value_tx_wrong_address() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
@@ -116,7 +116,7 @@ void transaction_invalid_timestamp_too_futuristic() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
@@ -135,7 +135,7 @@ void transaction_invalid_timestamp_too_old() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
@@ -156,7 +156,7 @@ void transaction_is_valid() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
