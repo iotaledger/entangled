@@ -16,6 +16,11 @@
 extern "C" {
 #endif
 
+typedef enum serializer_type_e {
+  SR_JSON = 0,
+  SR_UNIMPLEMENTED,
+} serializer_type_t;
+
 typedef struct serializer_base serializer_t;
 
 typedef struct {
@@ -125,7 +130,6 @@ typedef struct {
 
 typedef struct serializer_base {
   serializer_vtable vtable;
-
 } serializer_base;
 
 #ifdef __cplusplus

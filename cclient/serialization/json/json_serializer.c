@@ -9,7 +9,8 @@
 #include <string.h>
 
 #include "cJSON.h"
-#include "serializer/json/json_serializer.h"
+
+#include "cclient/serialization/json/json_serializer.h"
 
 #define JSON_LOGGER_ID "json_serializer"
 

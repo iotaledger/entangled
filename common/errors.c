@@ -176,10 +176,10 @@ const char* error_2_string(retcode_t err) {
     case RC_CIRI_CONF_NULL_CONF:
     case RC_CIRI_CONF_INVALID_ARGUMENTS:
     // Conf Module
-    case RC_CIRI_API_NULL_SELF:
-    case RC_CIRI_API_FAILED_THREAD_SPAWN:
-    case RC_CIRI_API_FAILED_THREAD_JOIN:
-    case RC_CIRI_API_STILL_RUNNING:
+    case RC_API_NULL_SELF:
+    case RC_API_FAILED_THREAD_SPAWN:
+    case RC_API_FAILED_THREAD_JOIN:
+    case RC_API_STILL_RUNNING:
     // Snapshot Module
     case RC_SNAPSHOT_NULL_SELF:
     case RC_SNAPSHOT_NULL_STATE:
