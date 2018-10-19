@@ -11,7 +11,6 @@
 // FIXME: Get cIRI database path from configuration variables
 // https://github.com/iotaledger/entangled/issues/132
 #define CIRI_DB_PATH "ciri/ciri.db"
-
 #define CORE_LOGGER_ID "core"
 
 retcode_t core_init(core_t* const core) {

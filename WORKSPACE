@@ -36,3 +36,7 @@ iota_deps()
 load("@iota_toolchains//:toolchains.bzl", "setup_toolchains")
 
 setup_toolchains()
+
+load("//tools:snapshot.bzl", "fetch_snapshot_files")
+
+fetch_snapshot_files()
