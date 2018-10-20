@@ -98,11 +98,11 @@ retcode_t json_remove_neighbors_deserialize_response(
     remove_neighbors_res_t* out);
 
 retcode_t json_get_trytes_serialize_request(const serializer_t* const s,
-                                            get_trytes_req_t* const obj,
+                                            get_trytes_req_t const* const req,
                                             char_buffer_t* out);
 retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
                                                const char* const obj,
-                                               get_trytes_res_t** out);
+                                               get_trytes_res_t* const res);
 
 retcode_t json_attach_to_tangle_serialize_request(
     const serializer_t* const s, const attach_to_tangle_req_t* const obj,

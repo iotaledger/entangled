@@ -939,7 +939,7 @@ retcode_t json_remove_neighbors_deserialize_response(
 }
 
 retcode_t json_get_trytes_serialize_request(const serializer_t* const s,
-                                            get_trytes_req_t* const obj,
+                                            get_trytes_req_t const* const req,
                                             char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
@@ -954,7 +954,7 @@ retcode_t json_get_trytes_serialize_request(const serializer_t* const s,
 
   cJSON_AddItemToObject(json_root, "command", cJSON_CreateString("getTrytes"));
 
-  ret = flex_hash_array_to_json_array(obj, json_root, "hashes");
+  ret = flex_hash_array_to_json_array(req->hashes, json_root, "hashes");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;
@@ -976,7 +976,7 @@ retcode_t json_get_trytes_serialize_request(const serializer_t* const s,
 
 retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
                                                const char* const obj,
-                                               get_trytes_res_t** out) {
+                                               get_trytes_res_t* const res) {
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
@@ -997,7 +997,7 @@ retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  *out = json_array_to_flex_hash_array(json_obj, "trytes", *out);
+  res->trytes = json_array_to_flex_hash_array(json_obj, "trytes", res->trytes);
 
   cJSON_Delete(json_obj);
   return ret;

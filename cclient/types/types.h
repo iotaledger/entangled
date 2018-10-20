@@ -59,7 +59,7 @@ retcode_t flex_hash_to_char_buffer(trit_array_p hash, char_buffer_t* out);
 
 flex_hash_array_t* flex_hash_array_new();
 flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
-                                          const char* trytes);
+                                          char const* const trytes);
 trit_array_p flex_hash_array_at(flex_hash_array_t* head, size_t index);
 int flex_hash_array_count(flex_hash_array_t* head);
 void flex_hash_array_free(flex_hash_array_t* head);

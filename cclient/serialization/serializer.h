@@ -98,11 +98,11 @@ typedef struct {
       const serializer_t* const s, const char* const obj,
       remove_neighbors_res_t* out);
   retcode_t (*get_trytes_serialize_request)(const serializer_t* const s,
-                                            get_trytes_req_t* const obj,
+                                            get_trytes_req_t const* const req,
                                             char_buffer_t* out);
   retcode_t (*get_trytes_deserialize_response)(const serializer_t* const s,
                                                const char* const obj,
-                                               get_trytes_res_t** out);
+                                               get_trytes_res_t* const res);
 
   retcode_t (*attach_to_tangle_serialize_request)(
       const serializer_t* const s, const attach_to_tangle_req_t* const obj,
