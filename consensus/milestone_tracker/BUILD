@@ -18,8 +18,9 @@ cc_library(
         "//common/sign/v1:iss_curl",
         "//consensus/bundle_validator",
         "//consensus/ledger_validator",
-        "//mam/v1:merkle",
+        "//consensus/snapshot",
         "//utils:macros",
+        "//utils:merkle",
         "//utils:time",
     ],
 )

@@ -30,9 +30,9 @@ static char *test_db_path =
     "consensus/exit_probability_validator/tests/test.db";
 static char *ciri_db_path =
     "consensus/exit_probability_validator/tests/ciri.db";
-
 static char *snapshot_path =
     "consensus/exit_probability_validator/tests/snapshot.txt";
+static char *snapshot_conf_path = "consensus/snapshot/tests/snapshot_conf.json";
 
 static uint32_t max_depth = 15;
 static uint32_t max_txs_below_max_depth = 10;
@@ -43,8 +43,8 @@ static milestone_tracker_t mt;
 static ledger_validator_t lv;
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
-  TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL, true) ==
-              RC_OK);
+  TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL,
+                                 snapshot_conf_path, true) == RC_OK);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, true) ==
               RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &mt, NULL) ==
@@ -101,8 +101,8 @@ void test_transaction_not_a_tail() {
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx3) == RC_OK);
 
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
@@ -119,7 +119,7 @@ void test_transaction_not_a_tail() {
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
-void test_transaction_invalid_diff() {
+void test_transaction_invalid_delta() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
   init_epv(&epv);
@@ -138,8 +138,8 @@ void test_transaction_invalid_diff() {
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
 
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
@@ -170,8 +170,8 @@ void test_transaction_below_max_depth() {
   txs[0]->snapshot_index = max_depth - 1;
   build_tangle(&tangle, txs, 2);
 
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
@@ -204,8 +204,8 @@ void test_transaction_exceed_max_transactions() {
   txs[1]->snapshot_index = max_depth + 1;
   build_tangle(&tangle, txs, 2);
 
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
@@ -237,8 +237,8 @@ void test_transaction_is_genesis() {
   txs[0]->snapshot_index = 0;
   build_tangle(&tangle, txs, 2);
 
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
@@ -268,8 +268,8 @@ void test_transaction_valid() {
   transactions_deserialize(trytes, txs, 2);
   build_tangle(&tangle, txs, 2);
 
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
@@ -302,7 +302,7 @@ int main(int argc, char *argv[]) {
 
   RUN_TEST(test_transaction_does_not_exist);
   RUN_TEST(test_transaction_not_a_tail);
-  RUN_TEST(test_transaction_invalid_diff);
+  RUN_TEST(test_transaction_invalid_delta);
   RUN_TEST(test_transaction_below_max_depth);
   RUN_TEST(test_transaction_exceed_max_transactions);
   RUN_TEST(test_transaction_is_genesis);

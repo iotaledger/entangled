@@ -70,6 +70,17 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
     return ret;
   }
 
+  log_info(CONSENSUS_LOGGER_ID, "Initializing snapshot\n");
+  if ((ret = iota_snapshot_init(
+           &consensus->snapshot,
+           (testnet ? SNAPSHOT_TESTNET : SNAPSHOT_MAINNET),
+           (testnet ? NULL : SNAPSHOT_SIG_MAINNET),
+           (testnet ? SNAPSHOT_CONF_TESTNET : SNAPSHOT_CONF_MAINNET),
+           testnet)) != RC_OK) {
+    log_critical(CONSENSUS_LOGGER_ID, "Initializing snapshot failed\n");
+    return ret;
+  }
+
   log_info(CONSENSUS_LOGGER_ID, "Initializing milestone tracker\n");
   if ((ret = iota_milestone_tracker_init(
            &consensus->milestone_tracker, &consensus->tangle,
@@ -80,34 +91,27 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
     return ret;
   }
 
-  log_info(CONSENSUS_LOGGER_ID, "Initializing snapshot\n");
-  if ((ret = iota_snapshot_init(&consensus->snapshot, CIRI_SNAPSHOT_FILE,
-                                CIRI_SNAPSHOT_SIG_FILE, testnet)) != RC_OK) {
-    log_critical(CONSENSUS_LOGGER_ID, "Initializing snapshot failed\n");
-    return ret;
-  }
-
   log_info(CONSENSUS_LOGGER_ID, "Initializing tangle\n");
   if ((ret = iota_tangle_init(&consensus->tangle, db_conf)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Initializing tangle failed\n");
     return ret;
   }
 
-  log_info(CONSENSUS_LOGGER_ID, "Initializing tip selection\n");
-  if ((ret = iota_consensus_tipselection_init(
-           &consensus->tipselection, &consensus->tangle,
-           &consensus->ledger_validator,
+  log_info(CONSENSUS_LOGGER_ID, "Initializing tip selector\n");
+  if ((ret = iota_consensus_tip_selector_init(
+           &consensus->tip_selector, &consensus->cw_rating_calculator,
+           &consensus->entry_point_selector, &consensus->ep_randomizer,
            &consensus->exit_prob_transaction_validator,
-           &consensus->cw_rating_calculator, &consensus->milestone_tracker,
-           &consensus->entry_point_selector, &consensus->ep_randomizer, ALPHA,
-           MAX_ANALYZED_TXS, MAX_DEPTH)) != RC_OK) {
-    log_critical(CONSENSUS_LOGGER_ID, "Initializing tip selection failed\n");
+           &consensus->ledger_validator, &consensus->milestone_tracker,
+           &consensus->tangle, ALPHA, MAX_ANALYZED_TXS, MAX_DEPTH)) != RC_OK) {
+    log_critical(CONSENSUS_LOGGER_ID, "Initializing tip selector failed\n");
     return ret;
   }
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing transaction validator\n");
   if ((ret = iota_consensus_transaction_validator_init(
-           &consensus->transaction_validator, SNAPSHOT_TIMESTAMP * 1000,
+           &consensus->transaction_validator,
+           consensus->snapshot.conf.timestamp_sec * 1000UL,
            (testnet ? TESTNET_MWM : MAINNET_MWM))) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing transaction validator failed\n");
@@ -210,9 +214,9 @@ retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
     log_error(CONSENSUS_LOGGER_ID, "Destroying tangle failed\n");
   }
 
-  log_info(CONSENSUS_LOGGER_ID, "Destroying tip selection\n");
-  if ((ret = iota_consensus_tipselection_destroy(&consensus->tipselection))) {
-    log_error(CONSENSUS_LOGGER_ID, "Destroying tip selection failed\n");
+  log_info(CONSENSUS_LOGGER_ID, "Destroying tip selector\n");
+  if ((ret = iota_consensus_tip_selector_destroy(&consensus->tip_selector))) {
+    log_error(CONSENSUS_LOGGER_ID, "Destroying tip selector failed\n");
   }
 
   log_info(CONSENSUS_LOGGER_ID, "Destroying transaction validator\n");

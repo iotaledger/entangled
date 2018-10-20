@@ -18,7 +18,7 @@
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/snapshot/snapshot.h"
 #include "consensus/tangle/tangle.h"
-#include "consensus/tipselection/tipselection.h"
+#include "consensus/tip_selector/tip_selector.h"
 #include "consensus/transaction_validator/transaction_validator.h"
 
 typedef struct iota_consensus_s {
@@ -30,7 +30,7 @@ typedef struct iota_consensus_s {
   milestone_tracker_t milestone_tracker;
   snapshot_t snapshot;
   tangle_t tangle;
-  tipselection_t tipselection;
+  tip_selector_t tip_selector;
   transaction_validator_t transaction_validator;
 } iota_consensus_t;
 

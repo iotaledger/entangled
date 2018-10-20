@@ -5,8 +5,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
-        "//common/model:transaction",
         "//common/trinary:trit_array",
+        "//consensus/snapshot:state_delta",
         "//utils:logger_helper",
     ],
 )
@@ -18,7 +18,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
-        "//common/model:transaction",
         "//common/trinary:trit_array",
         "//utils:logger_helper",
     ],

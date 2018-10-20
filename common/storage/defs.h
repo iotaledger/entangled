@@ -42,7 +42,8 @@
 
 #define MILESTONE_COL_INDEX "id"
 #define MILESTONE_COL_HASH "hash"
+#define MILESTONE_COL_DELTA "delta"
 
-#define MILESTONE_NUM_COLS 2
+#define MILESTONE_NUM_COLS 3
 
 #endif  // __COMMON_STORAGE_DEFS_H__

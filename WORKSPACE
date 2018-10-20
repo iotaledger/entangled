@@ -8,7 +8,7 @@ git_repository(
 
 git_repository(
     name = "iota_toolchains",
-    commit = "6b501df8e7f3bc3b143c894737fbb1d82e914762",
+    commit = "9eeb9c757eabfd1b2ff3235b1ce1f667e29ee07d",
     remote = "https://github.com/iotaledger/toolchains.git",
 )
 
@@ -36,3 +36,7 @@ iota_deps()
 load("@iota_toolchains//:toolchains.bzl", "setup_toolchains")
 
 setup_toolchains()
+
+load("//tools:snapshot.bzl", "fetch_snapshot_files")
+
+fetch_snapshot_files()

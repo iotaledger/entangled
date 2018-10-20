@@ -10,9 +10,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+
 #include <unity/unity.h>
 
-#include "serializer/json/json_serializer.h"
+#include "cclient/serialization/json/json_serializer.h"
 
 #ifdef __cplusplus
 extern "C" {

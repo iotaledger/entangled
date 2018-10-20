@@ -30,7 +30,7 @@ static retcode_t load_bundle_transactions(tangle_t const* const tangle,
                                 .dynamic = 0};
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
 
-  res = iota_tangle_transaction_load(tangle, TRANSACTION_COL_HASH, tail_hash,
+  res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, tail_hash,
                                      &pack);
   if (res != RC_OK || pack.num_loaded == 0) {
     log_error(BUNDLE_VALIDATOR_LOGGER_ID,
@@ -47,7 +47,7 @@ static retcode_t load_bundle_transactions(tangle_t const* const tangle,
     curr_tx_trunk.trits = curr_tx->trunk;
 
     hash_pack_reset(&pack);
-    res = iota_tangle_transaction_load(tangle, TRANSACTION_COL_HASH,
+    res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
                                        &curr_tx_trunk, &pack);
     if (res != RC_OK || pack.num_loaded == 0) {
       log_error(BUNDLE_VALIDATOR_LOGGER_ID,

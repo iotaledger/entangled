@@ -10,6 +10,7 @@
 
 #include <unity/unity.h>
 
+#include "common/helpers/digest.h"
 #include "common/model/milestone.h"
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
@@ -17,6 +18,9 @@
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
 #include "utils/files.h"
+
+// TODO Remove after "Common definitions #329" is merged
+#define HASH_LENGTH 243
 
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
 const flex_trit_t HASH[] = {
@@ -64,10 +68,7 @@ void test_init_connection(void) {
 void test_initialized_db_empty_transaction(void) {
   bool exist = false;
 
-  TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
-  memcpy(hash.trits, HASH, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_stor_milestone_exist(&conn, MILESTONE_COL_HASH, &hash,
-                                        &exist) == RC_OK);
+  TEST_ASSERT(iota_stor_milestone_exist(&conn, HASH, &exist) == RC_OK);
   TEST_ASSERT(exist == false);
 }
 
@@ -76,7 +77,7 @@ void test_initialized_db_empty_milestone(void) {
 
   TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
   memcpy(hash.trits, HASH, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_COL_HASH, &hash,
+  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_FIELD_HASH, &hash,
                                           &exist) == RC_OK);
   TEST_ASSERT(exist == false);
 }
@@ -92,13 +93,15 @@ void test_stored_transaction(void) {
 
   TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
   memcpy(hash.trits, TEST_TRANSACTION.hash, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_stor_transaction_exist(&conn, NULL, NULL, &exist) == RC_OK);
+  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_FIELD_NONE, NULL,
+                                          &exist) == RC_OK);
   TEST_ASSERT(exist == true);
-  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_COL_HASH, &hash,
+  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_FIELD_HASH, &hash,
                                           &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
-  TEST_ASSERT(iota_stor_transaction_exist(&conn, NULL, NULL, &exist) == RC_OK);
+  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_FIELD_NONE, NULL,
+                                          &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
   iota_transaction_t txs[5];
@@ -111,7 +114,7 @@ void test_stored_transaction(void) {
     pack.models[i] = transaction_new();
   }
 
-  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_COL_HASH, &hash,
+  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
                                          &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
 
@@ -149,8 +152,6 @@ void test_stored_transaction(void) {
 }
 
 void test_stored_milestone(void) {
-  TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
-  memcpy(hash.trits, HASH, FLEX_TRIT_SIZE_243);
   iota_milestone_t milestone;
   milestone.index = 42;
   memcpy(milestone.hash, HASH, FLEX_TRIT_SIZE_243);
@@ -185,12 +186,11 @@ void test_stored_milestone(void) {
   TEST_ASSERT_EQUAL_MEMORY(ms.hash, milestone.hash, FLEX_TRIT_SIZE_243);
 
   bool exist = false;
-  TEST_ASSERT(iota_stor_milestone_exist(&conn, NULL, NULL, &exist) == RC_OK);
+  TEST_ASSERT(iota_stor_milestone_exist(&conn, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
-  TEST_ASSERT(iota_stor_milestone_exist(&conn, MILESTONE_COL_HASH, &hash,
-                                        &exist) == RC_OK);
+  TEST_ASSERT(iota_stor_milestone_exist(&conn, HASH, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
-  TEST_ASSERT(iota_stor_milestone_exist(&conn, NULL, NULL, &exist) == RC_OK);
+  TEST_ASSERT(iota_stor_milestone_exist(&conn, NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
   iota_milestone_t *milestones[5];
@@ -202,11 +202,10 @@ void test_stored_milestone(void) {
   for (int i = 0; i < 5; ++i) {
     pack.models[i] = malloc(sizeof(iota_milestone_t));
   }
-  TEST_ASSERT(iota_stor_milestone_load(&conn, MILESTONE_COL_HASH, &hash,
-                                       &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_milestone_load(&conn, HASH, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_INT(milestones[0]->index, 42);
-  TEST_ASSERT_EQUAL_MEMORY(milestones[0]->hash, hash.trits, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(milestones[0]->hash, HASH, FLEX_TRIT_SIZE_243);
   for (int i = 0; i < 5; ++i) {
     free(pack.models[i]);
   }
@@ -225,8 +224,8 @@ void test_stored_load_hashes_by_address(void) {
   pack.capacity = 5;
   TRIT_ARRAY_DECLARE(key, NUM_TRITS_HASH);
   memcpy(key.trits, TEST_TRANSACTION.address, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_stor_transaction_load_hashes(&conn, TRANSACTION_COL_ADDRESS,
-                                                &key, &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_transaction_load_hashes(
+                  &conn, TRANSACTION_FIELD_ADDRESS, &key, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_MEMORY(TEST_TRANSACTION.hash,
                            ((trit_array_p)pack.models[0])->trits,
@@ -264,7 +263,7 @@ void test_update_snapshot_index(void) {
   struct _trit_array hash = {(flex_trit_t *)TEST_TRANSACTION.hash,
                              NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 
-  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_COL_HASH, &hash,
+  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
                                          &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_INT(tx.snapshot_index, TEST_TRANSACTION.snapshot_index);
@@ -272,10 +271,49 @@ void test_update_snapshot_index(void) {
                   &conn, (flex_trit_t *)TEST_TRANSACTION.hash, 123456) ==
               RC_OK);
   hash_pack_reset(&pack);
-  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_COL_HASH, &hash,
+  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
                                          &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_INT(tx.snapshot_index, 123456);
+}
+
+void test_milestone_state_delta(void) {
+  state_delta_t state_delta1 = NULL, state_delta2 = NULL;
+  state_delta_entry_t *iter = NULL, *tmp = NULL;
+  trit_t trits[HASH_LENGTH] = {1};
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t *hashed_hash;
+
+  flex_trits_from_trits(hash, HASH_LENGTH, trits, HASH_LENGTH, HASH_LENGTH);
+  for (int i = -1000; i <= 1000; i++) {
+    hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
+    memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
+    free(hashed_hash);
+    TEST_ASSERT(state_delta_add(&state_delta1, hash, i) == RC_OK);
+  }
+
+  TEST_ASSERT(iota_stor_state_delta_store(&conn, 42, &state_delta1) == RC_OK);
+
+  TEST_ASSERT(iota_stor_state_delta_load(&conn, 43, &state_delta2) == RC_OK);
+  TEST_ASSERT(state_delta2 == NULL);
+
+  TEST_ASSERT(iota_stor_state_delta_load(&conn, 42, &state_delta2) == RC_OK);
+  TEST_ASSERT(state_delta2 != NULL);
+
+  int i = -1000;
+  flex_trits_from_trits(hash, HASH_LENGTH, trits, HASH_LENGTH, HASH_LENGTH);
+  iter = NULL;
+  HASH_ITER(hh, state_delta2, iter, tmp) {
+    hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
+    memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
+    free(hashed_hash);
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hash, FLEX_TRIT_SIZE_243);
+    TEST_ASSERT_EQUAL_INT(iter->value, i);
+    i++;
+  }
+
+  state_delta_destroy(&state_delta1);
+  state_delta_destroy(&state_delta2);
 }
 
 int main(void) {
@@ -292,6 +330,7 @@ int main(void) {
   RUN_TEST(test_stored_load_hashes_by_address);
   RUN_TEST(test_stored_load_hashes_of_approvers);
   RUN_TEST(test_update_snapshot_index);
+  RUN_TEST(test_milestone_state_delta);
 
   return UNITY_END();
 }

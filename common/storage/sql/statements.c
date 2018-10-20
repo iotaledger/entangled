@@ -5,236 +5,87 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <inttypes.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "common/model/milestone.h"
-#include "common/model/transaction.h"
 #include "common/storage/defs.h"
-#include "common/storage/sql/defs.h"
-#include "common/storage/sql/statements.h"
-#include "utils/logger_helper.h"
-
-#define SQL_STATEMENTS_ID "sql_statements"
-
-/*
- * Generic statements
- */
-
-static retcode_t iota_statement_generic_select(
-    const char *table_name, const char *select_col, const char *where_col,
-    const char *where_cmp, const char *order_col, const char *order, int limit,
-    char statement[], size_t statement_cap) {
-  size_t offset = 0;
-  int res;
-
-  res = snprintf(statement + offset, statement_cap - offset,
-                 "SELECT %s FROM %s", select_col, table_name);
-  offset += res;
-  if (res < 0 || res == statement_cap - offset) {
-    goto error;
-  }
-
-  if (where_col != NULL && strcmp(where_col, "") != 0 && where_cmp != NULL &&
-      strcmp(where_cmp, "") != 0) {
-    res = snprintf(statement + offset, statement_cap - offset, " WHERE %s %s ?",
-                   where_col, where_cmp);
-    offset += res;
-    if (res < 0 || res == statement_cap - offset) {
-      goto error;
-    }
-  }
-
-  if (order_col != NULL && strcmp(order_col, "") != 0 && order != NULL &&
-      (strcmp(order, "ASC") == 0 || strcmp(order, "DESC") == 0)) {
-    res = snprintf(statement + offset, statement_cap - offset,
-                   " ORDER BY %s %s", order_col, order);
-    offset += res;
-    if (res < 0 || res == statement_cap - offset) {
-      goto error;
-    }
-  }
-
-  if (limit != 0) {
-    res = snprintf(statement + offset, statement_cap - offset, " LIMIT %d",
-                   limit);
-    offset += res;
-    if (res < 0 || res == statement_cap - offset) {
-      goto error;
-    }
-  }
-
-  return RC_OK;
-
-error:
-  log_error(SQL_STATEMENTS_ID, "Failed in creating statement, statement: %s\n",
-            statement);
-  return RC_SQL_FAILED_WRITE_STATEMENT;
-}
-
-static retcode_t iota_statement_generic_exist(const char *table_name,
-                                              const char *index_col,
-                                              char statement[],
-                                              size_t statement_cap) {
-  int res;
-
-  if (index_col == NULL || strcmp(index_col, "") == 0) {
-    res = snprintf(statement, statement_cap,
-                   "SELECT '1' WHERE EXISTS(SELECT 1 FROM %s)", table_name);
-  } else {
-    res = snprintf(statement, statement_cap,
-                   "SELECT '1' WHERE EXISTS(SELECT 1 FROM %s WHERE %s = ?)",
-                   table_name, index_col);
-  }
-
-  if (res < 0 || res == statement_cap) {
-    log_error(SQL_STATEMENTS_ID,
-              "Failed in creating statement, statement: %s\n", statement);
-    return RC_SQL_FAILED_WRITE_STATEMENT;
-  }
-  return RC_OK;
-}
 
 /*
  * Transaction statements
  */
 
-retcode_t iota_statement_transaction_insert(const iota_transaction_t tx,
-                                            char statement[],
-                                            size_t statement_cap) {
-  int res = snprintf(
-      statement, statement_cap,
-      "INSERT INTO %s (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) "
-      "VALUES (?,?,%" PRIi64 ",?,%" PRIu64 ",%" PRIu64 ",%" PRIu64
-      ",?,?,?,?,%" PRIu64 ",%" PRIu64 ",%" PRIu64 ",?,?,%" PRIu64 ")",
-      TRANSACTION_TABLE_NAME, TRANSACTION_COL_SIG_OR_MSG,
-      TRANSACTION_COL_ADDRESS, TRANSACTION_COL_VALUE,
-      TRANSACTION_COL_OBSOLETE_TAG, TRANSACTION_COL_TIMESTAMP,
-      TRANSACTION_COL_CURRENT_INDEX, TRANSACTION_COL_LAST_INDEX,
-      TRANSACTION_COL_BUNDLE, TRANSACTION_COL_TRUNK, TRANSACTION_COL_BRANCH,
-      TRANSACTION_COL_TAG, TRANSACTION_COL_ATTACHMENT_TIMESTAMP,
-      TRANSACTION_COL_ATTACHMENT_TIMESTAMP_UPPER,
-      TRANSACTION_COL_ATTACHMENT_TIMESTAMP_LOWER, TRANSACTION_COL_NONCE,
-      TRANSACTION_COL_HASH, TRANSACTION_COL_SNAPSHOT_INDEX, tx->value,
-      tx->timestamp, tx->current_index, tx->last_index,
-      tx->attachment_timestamp, tx->attachment_timestamp_upper,
-      tx->attachment_timestamp_lower, tx->snapshot_index);
+char *iota_statement_transaction_insert =
+    "INSERT INTO " TRANSACTION_TABLE_NAME "(" TRANSACTION_COL_SIG_OR_MSG
+    "," TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE
+    "," TRANSACTION_COL_OBSOLETE_TAG "," TRANSACTION_COL_TIMESTAMP
+    "," TRANSACTION_COL_CURRENT_INDEX "," TRANSACTION_COL_LAST_INDEX
+    "," TRANSACTION_COL_BUNDLE "," TRANSACTION_COL_TRUNK
+    "," TRANSACTION_COL_BRANCH "," TRANSACTION_COL_TAG
+    "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP
+    "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_UPPER
+    "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_LOWER "," TRANSACTION_COL_NONCE
+    "," TRANSACTION_COL_HASH "," TRANSACTION_COL_SNAPSHOT_INDEX
+    ")VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-  if (res < 0 || res == statement_cap) {
-    log_error(SQL_STATEMENTS_ID,
-              "Failed in creating statement, statement: %s\n", statement);
-    return RC_SQL_FAILED_WRITE_STATEMENT;
-  }
-  return RC_OK;
-}
+char *iota_statement_transaction_select_by_hash =
+    "SELECT * FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
 
-retcode_t iota_statement_transaction_select(const char *index_col,
-                                            char statement[],
-                                            size_t statement_cap) {
-  return iota_statement_generic_select(TRANSACTION_TABLE_NAME, "*", index_col,
-                                       "=", "", "", 0, statement,
-                                       statement_cap);
-}
+char *iota_statement_transaction_select_hashes_by_address =
+    "SELECT " TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME
+    " WHERE " TRANSACTION_COL_ADDRESS "=?";
 
-retcode_t iota_statement_transaction_exist(const char *index_col,
-                                           char statement[],
-                                           size_t statement_cap) {
-  return iota_statement_generic_exist(TRANSACTION_TABLE_NAME, index_col,
-                                      statement, statement_cap);
-}
+char *iota_statement_transaction_select_hashes_of_approvers =
+    "SELECT " TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME
+    " WHERE " TRANSACTION_COL_BRANCH "=? OR " TRANSACTION_COL_TRUNK "=?";
 
-retcode_t iota_statement_transaction_update_snapshot_index(
-    uint64_t snapshot_index, char statement[], size_t statement_cap) {
-  int res = snprintf(statement, statement_cap,
-                     "UPDATE %s SET %s=%" PRIu64 " WHERE %s=?",
-                     TRANSACTION_TABLE_NAME, TRANSACTION_COL_SNAPSHOT_INDEX,
-                     snapshot_index, TRANSACTION_COL_HASH);
+char *iota_statement_transaction_update_snapshot_index =
+    "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SNAPSHOT_INDEX
+    "=? WHERE " TRANSACTION_COL_HASH "=?";
 
-  if (res < 0 || res == statement_cap) {
-    log_error(SQL_STATEMENTS_ID,
-              "Failed in creating statement, statement: %s\n", statement);
-    return RC_SQL_FAILED_WRITE_STATEMENT;
-  }
-  return RC_OK;
-}
+char *iota_statement_transaction_exist =
+    "SELECT 1 WHERE EXISTS(SELECT 1 "
+    "FROM " TRANSACTION_TABLE_NAME ")";
 
-retcode_t iota_statement_transaction_select_hashes(const char *index_col,
-                                                   char statement[],
-                                                   size_t statement_cap) {
-  return iota_statement_generic_select(TRANSACTION_TABLE_NAME,
-                                       TRANSACTION_COL_HASH, index_col, "=", "",
-                                       "", 0, statement, statement_cap);
-}
-
-retcode_t iota_statement_transaction_select_hashes_approvers(
-    const flex_trit_t *approvee_hash, char statement[], size_t statement_cap) {
-  int res =
-      snprintf(statement, statement_cap, "SELECT %s FROM %s WHERE %s=? OR %s=?",
-               TRANSACTION_COL_HASH, TRANSACTION_TABLE_NAME,
-               TRANSACTION_COL_BRANCH, TRANSACTION_COL_TRUNK);
-
-  if (res < 0 || res == statement_cap) {
-    log_error(SQL_STATEMENTS_ID,
-              "Failed in creating statement, statement: %s\n", statement);
-    return RC_SQL_FAILED_WRITE_STATEMENT;
-  }
-
-  return RC_OK;
-}
+char *iota_statement_transaction_exist_by_hash =
+    "SELECT 1 WHERE EXISTS(SELECT 1 "
+    "FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?)";
 
 /*
  * Milestone statements
  */
 
-retcode_t iota_statement_milestone_insert(const iota_milestone_t *milestone,
-                                          char statement[],
-                                          size_t statement_cap) {
-  int res = snprintf(statement, statement_cap,
-                     "INSERT INTO %s (%s,%s) VALUES (%" PRIu64 ", ?)",
-                     MILESTONE_TABLE_NAME, MILESTONE_COL_INDEX,
-                     MILESTONE_COL_HASH, milestone->index);
+char *iota_statement_milestone_insert =
+    "INSERT INTO " MILESTONE_TABLE_NAME "(" MILESTONE_COL_INDEX
+    "," MILESTONE_COL_HASH ")VALUES(?,?)";
 
-  if (res < 0 || res == statement_cap) {
-    log_error(SQL_STATEMENTS_ID,
-              "Failed in creating statement, statement: %s\n", statement);
-    return RC_SQL_FAILED_WRITE_STATEMENT;
-  }
-  return RC_OK;
-}
+char *iota_statement_milestone_select_by_hash =
+    "SELECT * FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?";
 
-retcode_t iota_statement_milestone_select(const char *index_col,
-                                          char statement[],
-                                          size_t statement_cap) {
-  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", index_col,
-                                       "=", "", "", 0, statement,
-                                       statement_cap);
-}
+char *iota_statement_milestone_select_first =
+    "SELECT * FROM " MILESTONE_TABLE_NAME " ORDER BY " MILESTONE_COL_INDEX
+    " ASC LIMIT 1";
 
-retcode_t iota_statement_milestone_select_first(char statement[],
-                                                size_t statement_cap) {
-  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", "", "",
-                                       MILESTONE_COL_INDEX, "ASC", 1, statement,
-                                       statement_cap);
-}
+char *iota_statement_milestone_select_last =
+    "SELECT * FROM " MILESTONE_TABLE_NAME " ORDER BY " MILESTONE_COL_INDEX
+    " DESC LIMIT 1";
 
-retcode_t iota_statement_milestone_select_last(char statement[],
-                                               size_t statement_cap) {
-  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*", "", "",
-                                       MILESTONE_COL_INDEX, "DESC", 1,
-                                       statement, statement_cap);
-}
+char *iota_statement_milestone_select_next =
+    "SELECT * FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX
+    ">? ORDER BY " MILESTONE_COL_INDEX " ASC LIMIT 1";
 
-retcode_t iota_statement_milestone_select_next(char statement[],
-                                               size_t statement_cap) {
-  return iota_statement_generic_select(MILESTONE_TABLE_NAME, "*",
-                                       MILESTONE_COL_INDEX, ">", "", "", 1,
-                                       statement, statement_cap);
-}
+char *iota_statement_milestone_exist =
+    "SELECT 1 WHERE EXISTS(SELECT 1 "
+    "FROM " MILESTONE_TABLE_NAME ")";
 
-retcode_t iota_statement_milestone_exist(const char *index_col,
-                                         char statement[],
-                                         size_t statement_cap) {
-  return iota_statement_generic_exist(MILESTONE_TABLE_NAME, index_col,
-                                      statement, statement_cap);
-}
+char *iota_statement_milestone_exist_by_hash =
+    "SELECT 1 WHERE EXISTS(SELECT 1 "
+    "FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?)";
+
+/*
+ * State delta statements
+ */
+
+char *iota_statement_state_delta_store =
+    "UPDATE " MILESTONE_TABLE_NAME " SET " MILESTONE_COL_DELTA
+    "=? WHERE " MILESTONE_COL_INDEX "=?";
+
+char *iota_statement_state_delta_load =
+    "SELECT " MILESTONE_COL_DELTA " FROM " MILESTONE_TABLE_NAME
+    " WHERE " MILESTONE_COL_INDEX "=?";

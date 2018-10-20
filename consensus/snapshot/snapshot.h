@@ -11,37 +11,43 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "uthash.h"
-
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/defs.h"
+#include "consensus/snapshot/state_delta.h"
 #include "utils/handles/rw_lock.h"
-
-#define SNAPSHOT_PUBKEY                                                        \
-  "TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD" \
-  "9CZUYAC"
-#define SNAPSHOT_PUBKEY_DEPTH 6UL
-#define SNAPSHOT_INDEX 4UL
-#define SNAPSHOT_TIMESTAMP 1537203600UL
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct state_entry_t {
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  int64_t value;
-  UT_hash_handle hh;
-} state_entry_t;
-
-typedef state_entry_t *state_map_t;
+typedef struct snapshot_conf_s {
+  uint64_t timestamp_sec;
+  uint64_t signature_index;
+  uint64_t signature_depth;
+  flex_trit_t signature_pubkey[FLEX_TRIT_SIZE_243];
+  flex_trit_t coordinator[FLEX_TRIT_SIZE_243];
+  uint64_t last_milestone;
+} snapshot_conf_t;
 
 typedef struct snapshot_s {
   rw_lock_handle_t rw_lock;
   size_t index;
-  state_map_t state;
+  state_delta_t state;
+  snapshot_conf_t conf;
 } snapshot_t;
+
+/**
+ * Initializes a snapshot configuration
+ *
+ * @param snapshot_conf_file The snapshot configuration file path
+ * @param conf The snapshot configuration
+ * @param testnet Whether the node runs on testnet or not
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
+                                  snapshot_conf_t *const conf, bool testnet);
 
 /**
  * Initializes a snapshot
@@ -49,14 +55,16 @@ typedef struct snapshot_s {
  * @param snapshot The snapshot
  * @param snapshot_file The snapshot file path
  * @param snapshot_sig_file The snapshot signature file path
+ * @param snapshot_conf_file The snapshot configuration file path
  * @param testnet Whether the node runs on testnet or not
  *
  * @return a status code
  */
-extern retcode_t iota_snapshot_init(snapshot_t *const snapshot,
-                                    char const *const snapshot_file,
-                                    char const *const snapshot_sig_file,
-                                    bool testnet);
+retcode_t iota_snapshot_init(snapshot_t *const snapshot,
+                             char const *const snapshot_file,
+                             char const *const snapshot_sig_file,
+                             char const *const snapshot_conf_file,
+                             bool testnet);
 
 /**
  * Destroys a snapshot
@@ -65,25 +73,7 @@ extern retcode_t iota_snapshot_init(snapshot_t *const snapshot,
  *
  * @return a status code
  */
-extern retcode_t iota_snapshot_destroy(snapshot_t *const snapshot);
-
-/**
- * Destroys a snapshot state
- *
- * @param state The state
- *
- * @return a status code
- */
-extern retcode_t iota_snapshot_state_destroy(state_map_t *const state);
-
-/**
- * Checks if a given state is consistent
- *
- * @param state The state
- *
- * @return true if consistent, false otherwise
- */
-extern bool iota_snapshot_is_state_consistent(state_map_t *const state);
+retcode_t iota_snapshot_destroy(snapshot_t *const snapshot);
 
 /**
  * Gets the index of a snapshot
@@ -92,7 +82,7 @@ extern bool iota_snapshot_is_state_consistent(state_map_t *const state);
  *
  * @return the snapshot index
  */
-extern size_t iota_snapshot_get_index(snapshot_t *const snapshot);
+size_t iota_snapshot_get_index(snapshot_t *const snapshot);
 
 /**
  * Gets the balance of a given address hash
@@ -102,22 +92,21 @@ extern size_t iota_snapshot_get_index(snapshot_t *const snapshot);
  *
  * @return a status code
  */
-extern retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
-                                           flex_trit_t *const hash,
-                                           int64_t *balance);
+retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
+                                    flex_trit_t *const hash, int64_t *balance);
 
 /**
- * Creates a patch of a snapshot state and a diff
+ * Creates a patch of a snapshot state and a delta
  *
  * @param snapshot The snapshot
- * @param diff The diff
+ * @param delta The delta
  * @param patch The patch
  *
  * @return a status code
  */
-extern retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
-                                            state_map_t *const diff,
-                                            state_map_t *const patch);
+retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
+                                     state_delta_t *const delta,
+                                     state_delta_t *const patch);
 
 /**
  * Applies a patch to a snapshot state
@@ -128,9 +117,8 @@ extern retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
  *
  * @return a status code
  */
-extern retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
-                                           state_map_t *const patch,
-                                           size_t index);
+retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
+                                    state_delta_t *const patch, size_t index);
 
 #ifdef __cplusplus
 }
