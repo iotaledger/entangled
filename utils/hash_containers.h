@@ -47,6 +47,8 @@ retcode_t hash_queue_push(hash_queue_t *const queue,
 void hash_queue_pop(hash_queue_t *const queue);
 flex_trit_t *hash_queue_peek(hash_queue_t const queue);
 void hash_queue_free(hash_queue_t *const queue);
+int hash_queue_count(hash_queue_t *const queue);
+flex_trit_t *hash_queue_at(hash_queue_t *const queue, size_t index);
 
 /*
  * Stack type and operations
@@ -60,6 +62,7 @@ retcode_t hash_stack_push(hash_stack_t *const stack,
 void hash_stack_pop(hash_stack_t *const stack);
 flex_trit_t *hash_stack_peek(hash_stack_t const stack);
 void hash_stack_free(hash_stack_t *const stack);
+int hash_stack_count(hash_stack_t const stack);
 
 /*
  * Set type and operations
