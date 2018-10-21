@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __UTILS_HANDLES_SIG_H__
-#define __UTILS_HANDLES_SIG_H__
+#ifndef __UTILS_HANDLES_SIGNAL_H__
+#define __UTILS_HANDLES_SIGNAL_H__
 
 /**
  * We declare a function register_signal() to handle signals while the program
@@ -68,4 +68,4 @@ static inline __sighandler_t register_signal(
 static inline __sighandler_t register_signal(
     int SIG, void (*handler_core_end)(universal_singal_num_t));
 
-#endif  // __UTILS_HANDLES_SIG_H__
+#endif  // __UTILS_HANDLES_SIGNAL_H__
