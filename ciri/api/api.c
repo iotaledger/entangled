@@ -103,8 +103,10 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
   tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
-  size_t nbr = 0;
 
+  if (flex_hash_array_count(req->hashes) > api->max_get_trytes) {
+    return RC_API_MAX_GET_TRYTES;
+  }
   LL_FOREACH(req->hashes, iter) {
     hash_pack_reset(&pack);
     if ((ret = iota_tangle_transaction_load(api->tangle, TRANSACTION_FIELD_HASH,
@@ -122,10 +124,6 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
     // TODO Remove when cclient uses hash containers
     tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION] = '\0';
     get_trytes_res_add_trytes(res, tx_trytes);
-    nbr++;
-  }
-  if (nbr > api->max_get_trytes) {
-    return RC_API_MAX_GET_TRYTES;
   }
   return ret;
 }

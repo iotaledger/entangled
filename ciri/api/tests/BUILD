@@ -14,7 +14,6 @@ genrule(
     tools = ["@sqlite3//:shell"],
 )
 
-
 cc_test(
     name = "test_get_trytes",
     srcs = ["test_get_trytes.c"],
@@ -26,4 +25,3 @@ cc_test(
         "@unity",
     ],
 )
-
