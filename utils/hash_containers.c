@@ -46,16 +46,16 @@ void hash_queue_free(hash_queue_t *const queue) {
   }
 }
 
-int hash_queue_count(hash_queue_t *const queue) {
+size_t hash_queue_count(hash_queue_t *const queue) {
   hash_dll_entry_t *iter = NULL;
-  int count = 0;
+  size_t count = 0;
   CDL_COUNT(*queue, iter, count);
   return count;
 }
 
 flex_trit_t *hash_queue_at(hash_queue_t *const queue, size_t index) {
   hash_dll_entry_t *iter = NULL;
-  int count = 0;
+  size_t count = 0;
   CDL_FOREACH(*queue, iter) {
     if (count == index) {
       return (flex_trit_t *)(iter->hash);
@@ -104,9 +104,9 @@ void hash_stack_free(hash_stack_t *const stack) {
   }
 }
 
-int hash_stack_count(hash_stack_t const stack) {
+size_t hash_stack_count(hash_stack_t const stack) {
   hash_stack_t curr = stack;
-  int count = 0;
+  size_t count = 0;
   while (curr != NULL) {
     ++count;
     curr = curr->next;
