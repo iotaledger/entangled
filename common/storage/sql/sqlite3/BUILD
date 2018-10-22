@@ -7,7 +7,8 @@ cc_library(
     linkopts = ["-pthread"],
     visibility = ["//visibility:public"],
     deps = [
-        "//common/storage",
+        "//common/model:milestone",
+        "//common/model:transaction",
         "//common/storage/sql:statements",
         "//utils:logger_helper",
         "@sqlite3",

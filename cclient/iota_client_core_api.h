@@ -25,7 +25,10 @@ void iota_client_core_destroy(iota_client_service_t* const serv);
  *
  * https://iota.readme.io/reference#getnodeinfo
  *
- * @return The response.
+ * @param service IRI node end point.
+ * @param res Response containing the node's info
+ *
+ * @return error value.
  */
 
 retcode_t iota_client_get_node_info(const iota_client_service_t* const service,
@@ -39,7 +42,7 @@ retcode_t iota_client_get_node_info(const iota_client_service_t* const service,
  * https://iota.readme.io/reference#getneighborsactivity
  *
  * @param service IRI node end point.
- * @param res get_node_info_res_t struct containing the node's info
+ * @param res Response containing the neighbors' info
  *
  * @return error value.
  */
@@ -55,6 +58,7 @@ retcode_t iota_client_get_neighbors(const iota_client_service_t* const service,
  *
  * @param service IRI node end point.
  * @param req Request containing list of neighbors to add
+ * @param res Response containing a number of neighbor
  *
  * @return error value.
  */
@@ -64,15 +68,14 @@ retcode_t iota_client_add_neighbors(const iota_client_service_t* const service,
 
 /**
  * Removes a list of neighbors from your iri node. This is only temporary, and
- if you
- * have your neighbors added via the command line, they will be retained after
- * you restart your node.
+ * if you have your neighbors added via the command line, they will be retained
+ * after you restart your node.
  *
- * https://iota.readme.io/reference#reoveneighors
+ * https://iota.readme.io/reference#removeneighbors
 
  * @param service IRI node end point.
- * @param uris List of URI elements.
- * @param nuUris Number of elements in uris
+ * @param req Request containing list of neighbors to remove.
+ * @param res Response containing a number of neighbor
  *
  * @return error value.
  */
@@ -102,8 +105,8 @@ retcode_t iota_client_get_tips(const iota_client_service_t* const service,
  * https://iota.readme.io/reference#findtransactions
  *
  * @param service IRI node end point.
- * @param req - find_transactions_req_t struct containing all elements by which
- * transactions should be sought.
+ * @param req - Request containing all elements by which transactions should be
+ * sought.
  * @param res Response containing found transactions
  *
  * @return error value.
@@ -121,8 +124,9 @@ retcode_t iota_client_find_transactions(
  * https://iota.readme.io/reference#gettrytes
  *
  * @param service IRI node end point.
- * @param req The request containing Hashes of transactions to which trytes are
+ * @param req Request containing hashes of transactions to which trytes are
  * to be retrieved
+ * @param res Response containing trytes of specific transactions
  *
  * @return error value.
  */
@@ -141,9 +145,9 @@ retcode_t iota_client_get_trytes(const iota_client_service_t* const service,
  * https://iota.readme.io/reference#getinclusionstates
  *
  * @param service IRI node end point.
- * @param req The request with transactions to which we are searching for
+ * @param req Request containing transactions to which we are searching for
  * inclusion state for.
- * @param res The response with the corresponding inclusion states
+ * @param res Response containing the corresponding inclusion states
  *
  * @return error value.
  */
@@ -161,7 +165,7 @@ retcode_t iota_client_get_inclusion_states(
  * https://iota.readme.io/reference#getbalances
  *
  * @param service IRI node end point.
- * @param req The request containing the addresses for which balances are
+ * @param req Request containing the addresses for which balances are
  * requested
  * @param res Response containing the requested balances
  *
@@ -178,12 +182,12 @@ retcode_t iota_client_get_balances(const iota_client_service_t* const service,
  * "babysitting" you do for the network (as you have to confirm more
  * transactions).
  *
- * https://iota.readme.io/reference#getbalances
+ * https://iota.readme.io/reference#gettransactionstoapprove
  *
  * @param service IRI node end point.
- * @param depth Nuber of bundles to go back to determine the transactions for
- * approval.
- * @param res Transactions to approve (branch + trunk)
+ * @param req Request containing number of bundles to go back to determine
+ * the transactions for approval.
+ * @param res Response containing transactions to approve (branch + trunk)
  *
  * @return error value.
  */
@@ -208,7 +212,8 @@ retcode_t iota_client_get_transactions_to_approve(
  *
  *
  * @param service IRI node end point.
- * @param req The request with the attachment params
+ * @param req Request containing the attachment params
+ * @param res Response containing trytes
  *
  * @return error value.
  */
@@ -222,6 +227,7 @@ retcode_t iota_client_attach_to_tangle(
  * https://iota.readme.io/reference#interruptattachingtotangle
  *
  * @param service IRI node end point.
+ *
  * @return error value.
  */
 
@@ -235,7 +241,7 @@ retcode_t iota_client_interrupt_attaching_to_tangle(
  * https://iota.readme.io/reference#broadcasttransactions
  *
  * @param service IRI node end point.
- * @param req - the request containing the transactions to broadcast
+ * @param req - Request containing the transactions to broadcast
  *
  * @return error value.
  */
@@ -250,7 +256,7 @@ retcode_t iota_client_broadcast_transactions(
  * https://iota.readme.io/reference#storetransactions
  *
  * @param service IRI node end point.
- * @param req - the request containing the transactions to store
+ * @param req - Request containing the transactions to store
  *
  * @return The error value.
  */
@@ -268,9 +274,9 @@ retcode_t iota_client_store_transactions(
  * https://iota.readme.io/reference#checkconsistency
  *
  * @param service IRI node end point.
- * @param req - the request containing tail transaction hash (hash of
+ * @param req - Request containing tail transaction hash (hash of
  * transaction with `currentIndex=0`), or array of tail transaction hashes.
- * @param res - the response containing consistency state of given transaction
+ * @param res - Response containing consistency state of given transaction
  * or co-consistency of given transactions.
  *
  * @return The error value.

@@ -114,8 +114,8 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
   trit_array_set_trits(ep, tx1->trunk, NUM_TRITS_HASH);
 
   bool exist = false;
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
@@ -160,8 +160,8 @@ void test_bundle_exceed_supply_pos_invalid() {
   trit_array_set_trits(ep, tx1->trunk, NUM_TRITS_HASH);
 
   bool exist = false;
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
@@ -206,8 +206,8 @@ void test_bundle_exceed_supply_neg_invalid() {
   trit_array_set_trits(ep, tx1->trunk, NUM_TRITS_HASH);
 
   bool exist = false;
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
@@ -286,8 +286,8 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_valid() {
   build_tangle(&tangle, txs, 4);
 
   bool exist = false;
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, NULL, NULL, &exist) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
+                                            NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);

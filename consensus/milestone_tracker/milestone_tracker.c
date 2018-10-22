@@ -13,13 +13,14 @@
 #include "common/sign/normalize.h"
 #include "common/sign/v1/iss_curl.h"
 #include "common/storage/sql/defs.h"
+#include "common/trinary/trit_array.h"
 #include "common/trinary/trit_long.h"
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
-#include "mam/v1/merkle.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
+#include "utils/merkle.h"
 #include "utils/time.h"
 
 #define MILESTONE_TRACKER_LOGGER_ID "consensus_milestone_tracker"
@@ -73,9 +74,9 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
   }
 
   // Check if milestone is already present in database i.e. validated
-  TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
+  TRIT_ARRAY_DECLARE(hash, HASH_LENGTH_TRIT);
   memcpy(hash.trits, candidate->hash, FLEX_TRIT_SIZE_243);
-  if ((ret = iota_tangle_milestone_exist(mt->tangle, MILESTONE_COL_HASH, &hash,
+  if ((ret = iota_tangle_milestone_exist(mt->tangle, candidate->hash,
                                          &exists)) != RC_OK) {
     goto done;
   } else if (exists) {
@@ -158,13 +159,13 @@ static void* latest_milestone_tracker(void* arg) {
 
     hash_pack.num_loaded = 0;
     hash_pack.insufficient_capacity = false;
-    if (iota_tangle_transaction_load_hashes(mt->tangle, TRANSACTION_COL_ADDRESS,
-                                            mt->coordinator,
-                                            &hash_pack) == RC_OK) {
+    if (iota_tangle_transaction_load_hashes(
+            mt->tangle, TRANSACTION_FIELD_ADDRESS, mt->coordinator,
+            &hash_pack) == RC_OK) {
       for (size_t i = 0; i < hash_pack.num_loaded; ++i) {
         tx_pack.num_loaded = 0;
         tx_pack.insufficient_capacity = false;
-        if (iota_tangle_transaction_load(mt->tangle, TRANSACTION_COL_HASH,
+        if (iota_tangle_transaction_load(mt->tangle, TRANSACTION_FIELD_HASH,
                                          hash_pack.models[i],
                                          &tx_pack) == RC_OK) {
           if (tx_pack.num_loaded > 0 && tx.current_index == 0) {
@@ -299,30 +300,26 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   mt->tangle = tangle;
   mt->latest_snapshot = snapshot;
   mt->ledger_validator = lv;
-  if ((mt->latest_milestone = trit_array_new(NUM_TRITS_HASH)) == NULL) {
+  if ((mt->latest_milestone = trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
     goto oom;
   }
-  if ((mt->latest_solid_subtangle_milestone = trit_array_new(NUM_TRITS_HASH)) ==
-      NULL) {
+  if ((mt->latest_solid_subtangle_milestone =
+           trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
     goto oom;
   }
+  if ((mt->coordinator = trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
+    goto oom;
+  }
+  memcpy(mt->coordinator->trits, snapshot->conf.coordinator,
+         FLEX_TRIT_SIZE_243);
+  mt->milestone_start_index = snapshot->conf.last_milestone;
+  mt->latest_milestone_index = snapshot->conf.last_milestone;
+  mt->latest_solid_subtangle_milestone_index = snapshot->conf.last_milestone;
   if (mt->testnet) {
-    if ((mt->coordinator = trit_array_new_from_trytes(
-             (tryte_t*)TESTNET_COORDINATOR_ADDRESS)) == NULL) {
-      goto oom;
-    }
-    mt->milestone_start_index = TESTNET_MILESTONE_START_INDEX;
     mt->num_keys_in_milestone = TESTNET_NUM_KEYS_IN_MILESTONE;
   } else {
-    if ((mt->coordinator = trit_array_new_from_trytes(
-             (tryte_t*)MAINNET_COORDINATOR_ADDRESS)) == NULL) {
-      goto oom;
-    }
-    mt->milestone_start_index = MAINNET_MILESTONE_START_INDEX;
     mt->num_keys_in_milestone = MAINNET_NUM_KEYS_IN_MILESTONE;
   }
-  mt->latest_milestone_index = mt->milestone_start_index;
-  mt->latest_solid_subtangle_milestone_index = mt->milestone_start_index;
 
   return RC_OK;
 

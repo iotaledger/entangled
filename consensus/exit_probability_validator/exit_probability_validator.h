@@ -31,7 +31,7 @@ typedef struct exit_prob_transaction_validator_s {
   tangle_t *tangle;
   milestone_tracker_t *mt;
   ledger_validator_t *lv;
-  state_map_t diff;
+  state_delta_t delta;
   hash_set_t analyzed_hashes;
   uint32_t max_analyzed_txs;
   uint32_t max_depth;

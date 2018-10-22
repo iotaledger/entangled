@@ -7,9 +7,9 @@ cc_library(
     deps =
         [
             ":mask",
-            ":merkle",
             "//common/curl-p:hamming",
             "//common/trinary:trit_long",
+            "//utils:merkle",
         ],
 )
 
@@ -22,11 +22,4 @@ cc_library(
             "//common/curl-p:trit",
             "//common/trinary:add",
         ],
-)
-
-cc_library(
-    name = "merkle",
-    srcs = ["merkle.c"],
-    hdrs = ["merkle.h"],
-    deps = ["//common/sign/v2:iss_curl"],
 )

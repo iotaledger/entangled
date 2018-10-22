@@ -7,7 +7,6 @@
 
 #include <stdlib.h>
 
-#include "common/model/transaction.h"
 #include "common/storage/pack.h"
 #include "common/trinary/trit_array.h"
 #include "utils/logger_helper.h"
@@ -32,7 +31,7 @@ retcode_t hash_pack_resize(iota_stor_pack_t *pack, size_t resize_factor) {
   }
 
   for (int i = 0; i < pack->capacity; ++i) {
-    pack->models[i] = trit_array_new(NUM_TRITS_ADDRESS);
+    pack->models[i] = trit_array_new(HASH_LENGTH_TRIT);
     if (pack->models[i] == NULL) {
       return RC_STORAGE_OOM;
     }
@@ -52,7 +51,7 @@ retcode_t hash_pack_init(iota_stor_pack_t *pack, size_t size) {
   }
 
   for (int i = 0; i < pack->capacity; ++i) {
-    pack->models[i] = trit_array_new(NUM_TRITS_ADDRESS);
+    pack->models[i] = trit_array_new(HASH_LENGTH_TRIT);
     if (pack->models[i] == NULL) {
       return RC_STORAGE_OOM;
     }

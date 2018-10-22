@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "iota_client_core_api.h"
+#include "cclient/iota_client_core_api.h"
 #include "cclient/http/http.h"
 #include "cclient/service.h"
 

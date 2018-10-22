@@ -9,7 +9,8 @@
 #define CCLIENT_SERIALIZATION_JSON_SERIALIZER_H
 
 #include <stdlib.h>
-#include "serializer/serializer.h"
+
+#include "cclient/serialization/serializer.h"
 #include "utils/logger_helper.h"
 
 #ifdef __cplusplus
