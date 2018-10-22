@@ -20,6 +20,10 @@
 extern "C" {
 #endif
 
+typedef struct iota_api_limits_s {
+  size_t max_get_trytes;
+} iota_api_limits_t;
+
 typedef struct iota_api_s {
   thread_handle_t thread;
   bool running;
@@ -27,7 +31,7 @@ typedef struct iota_api_s {
   tangle_t *tangle;
   serializer_t serializer;
   serializer_type_t serializer_type;
-  size_t max_get_trytes;
+  iota_api_limits_t limits;
 } iota_api_t;
 
 /**

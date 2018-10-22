@@ -104,7 +104,7 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
   tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
 
-  if (flex_hash_array_count(req->hashes) > api->max_get_trytes) {
+  if (flex_hash_array_count(req->hashes) > api->limits.max_get_trytes) {
     return RC_API_MAX_GET_TRYTES;
   }
   LL_FOREACH(req->hashes, iter) {

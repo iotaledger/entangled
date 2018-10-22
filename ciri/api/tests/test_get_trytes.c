@@ -31,7 +31,7 @@ void test_get_trytes_empty(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
 
-  api.max_get_trytes = 100;
+  api.limits.max_get_trytes = 100;
 
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
   TEST_ASSERT_EQUAL_INT(get_trytes_res_trytes_num(res), 0);
@@ -44,7 +44,7 @@ void test_get_trytes_not_found(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
 
-  api.max_get_trytes = 100;
+  api.limits.max_get_trytes = 100;
 
   get_trytes_req_add_hash(req, NULL_HASH);
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
@@ -60,7 +60,7 @@ void test_get_trytes_max(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
 
-  api.max_get_trytes = 1;
+  api.limits.max_get_trytes = 1;
 
   // Storing 2 transactions to get trytes from
 
@@ -85,7 +85,7 @@ void test_get_trytes(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
 
-  api.max_get_trytes = 100;
+  api.limits.max_get_trytes = 100;
 
   // Storing 4 transactions to get trytes from
 
