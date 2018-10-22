@@ -14,6 +14,7 @@
 #include "cclient/serialization/serializer.h"
 #include "common/errors.h"
 #include "consensus/tangle/tangle.h"
+#include "consensus/transaction_validator/transaction_validator.h"
 #include "utils/handles/thread.h"
 
 #ifdef __cplusplus
@@ -29,6 +30,7 @@ typedef struct iota_api_s {
   bool running;
   uint16_t port;
   tangle_t *tangle;
+  transaction_validator_t *transaction_validator;
   serializer_t serializer;
   serializer_type_t serializer_type;
   iota_api_limits_t limits;
@@ -39,12 +41,15 @@ typedef struct iota_api_s {
  *
  * @param api The API
  * @param port The API port
+ * @param tangle A tangle
+ * @param transaction_validator A transaction validator
  * @param serializer_type A serializer type
  *
  * @return a status code
  */
 retcode_t iota_api_init(iota_api_t *const api, uint16_t const port,
                         tangle_t *const tangle,
+                        transaction_validator_t *const transaction_validator,
                         serializer_type_t const serializer_type);
 
 /**
@@ -100,7 +105,7 @@ retcode_t iota_api_interrupt_attaching_to_tangle();
 retcode_t iota_api_broadcast_transactions(
     broadcast_transactions_req_t const *const req);
 retcode_t iota_api_store_transactions(
-    store_transactions_req_t const *const req);
+    iota_api_t const *const api, store_transactions_req_t const *const req);
 retcode_t iota_api_check_consistency(check_consistency_req_t const *const req,
                                      check_consistency_res_t *const res);
 

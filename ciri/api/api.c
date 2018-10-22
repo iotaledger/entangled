@@ -159,8 +159,33 @@ retcode_t iota_api_broadcast_transactions(
 }
 
 retcode_t iota_api_store_transactions(
-    store_transactions_req_t const *const req) {
-  return RC_OK;
+    iota_api_t const *const api, store_transactions_req_t const *const req) {
+  retcode_t ret = RC_OK;
+  flex_hash_array_t *iter = NULL;
+  struct _iota_transaction tx;
+  struct _trit_array hash = {.trits = NULL,
+                             .num_trits = HASH_LENGTH_TRIT,
+                             .num_bytes = FLEX_TRIT_SIZE_243,
+                             .dynamic = 0};
+  bool exists;
+
+  LL_FOREACH(req->trytes, iter) {
+    transaction_deserialize_from_trits(&tx, iter->hash->trits);
+    if (iota_consensus_transaction_validate(api->transaction_validator, &tx)) {
+      hash.trits = tx.hash;
+      if ((ret = iota_tangle_transaction_exist(
+               api->tangle, TRANSACTION_FIELD_HASH, &hash, &exists)) != RC_OK) {
+        return ret;
+      }
+      if (!exists) {
+        if ((ret = iota_tangle_transaction_store(api->tangle, &tx)) != RC_OK) {
+          return ret;
+        }
+        // TODO store metadata: arrival_time, status, sender (#407)
+      }
+    }
+  }
+  return ret;
 }
 
 retcode_t iota_api_check_consistency(check_consistency_req_t const *const req,
@@ -170,6 +195,7 @@ retcode_t iota_api_check_consistency(check_consistency_req_t const *const req,
 
 retcode_t iota_api_init(iota_api_t *const api, uint16_t const port,
                         tangle_t *const tangle,
+                        transaction_validator_t *const transaction_validator,
                         serializer_type_t const serializer_type) {
   if (api == NULL) {
     return RC_API_NULL_SELF;
@@ -180,6 +206,8 @@ retcode_t iota_api_init(iota_api_t *const api, uint16_t const port,
   api->running = false;
   api->port = port;
   api->tangle = tangle;
+  api->transaction_validator = transaction_validator;
+
   api->serializer_type = serializer_type;
   if (api->serializer_type == SR_JSON) {
     init_json_serializer(&api->serializer);
