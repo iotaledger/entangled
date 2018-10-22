@@ -27,10 +27,6 @@ void tearDown(void) {
   TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
-/*
- * get_trytes tests
- */
-
 void test_get_trytes_empty(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
@@ -140,7 +136,6 @@ int main(void) {
   UNITY_BEGIN();
 
   config.db_path = test_db_path;
-
   api.tangle = &tangle;
 
   RUN_TEST(test_get_trytes_empty);
