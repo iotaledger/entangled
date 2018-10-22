@@ -43,14 +43,21 @@ void test_get_trytes_empty(void) {
 void test_get_trytes_not_found(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
+  tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION];
 
   api.limits.max_get_trytes = 100;
 
   get_trytes_req_add_hash(req, NULL_HASH);
+
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
   TEST_ASSERT_EQUAL_INT(get_trytes_res_trytes_num(res), 1);
-  TEST_ASSERT_EQUAL_MEMORY(get_trytes_res_trytes_at(res, 0)->trits,
-                           NULL_TX_TRYTES, NUM_TRYTES_SERIALIZED_TRANSACTION);
+
+  flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION,
+                       get_trytes_res_trytes_at(res, 0)->trits,
+                       NUM_TRITS_SERIALIZED_TRANSACTION,
+                       NUM_TRITS_SERIALIZED_TRANSACTION);
+  TEST_ASSERT_EQUAL_MEMORY(tx_trytes, NULL_TX_TRYTES,
+                           NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
@@ -84,48 +91,38 @@ void test_get_trytes_max(void) {
 void test_get_trytes(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
+  iota_transaction_t txs[4];
+  tryte_t const *const txs_trytes[4] = {
+      TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+      TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
+  tryte_t const *const hashes_trytes[4] = {TX_1_OF_4_HASH, TX_2_OF_4_HASH,
+                                           TX_3_OF_4_HASH, TX_4_OF_4_HASH};
+  tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION];
 
   api.limits.max_get_trytes = 100;
 
-  // Storing 4 transactions to get trytes from
+  // Storing transactions to get trytes from
 
-  iota_transaction_t txs[4];
-  tryte_t const *const trytes[4] = {
-      TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
-      TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
-  transactions_deserialize(trytes, txs, 4);
+  transactions_deserialize(txs_trytes, txs, 4);
   build_tangle(&tangle, txs, 4);
 
-  // Getting trytes 1 & 3 from hashes
+  // Loading trytes from hashes
 
-  get_trytes_req_add_hash(req, TX_1_OF_4_HASH);
-  get_trytes_req_add_hash(req, TX_3_OF_4_HASH);
+  for (size_t i = 0; i < 4; i++) {
+    get_trytes_req_add_hash(req, hashes_trytes[i]);
+  }
+
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(get_trytes_res_trytes_num(res), 2);
-  TEST_ASSERT_EQUAL_MEMORY(get_trytes_res_trytes_at(res, 0)->trits,
-                           TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                           NUM_TRYTES_SERIALIZED_TRANSACTION);
-  TEST_ASSERT_EQUAL_MEMORY(get_trytes_res_trytes_at(res, 1)->trits,
-                           TX_3_OF_4_VALUE_BUNDLE_TRYTES,
-                           NUM_TRYTES_SERIALIZED_TRANSACTION);
+  TEST_ASSERT_EQUAL_INT(get_trytes_res_trytes_num(res), 4);
 
-  get_trytes_req_free(&req);
-  req = get_trytes_req_new();
-  get_trytes_res_free(&res);
-  res = get_trytes_res_new();
-
-  // Getting trytes 2 & 4 from hashes
-
-  get_trytes_req_add_hash(req, TX_2_OF_4_HASH);
-  get_trytes_req_add_hash(req, TX_4_OF_4_HASH);
-  TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(get_trytes_res_trytes_num(res), 2);
-  TEST_ASSERT_EQUAL_MEMORY(get_trytes_res_trytes_at(res, 0)->trits,
-                           TX_2_OF_4_VALUE_BUNDLE_TRYTES,
-                           NUM_TRYTES_SERIALIZED_TRANSACTION);
-  TEST_ASSERT_EQUAL_MEMORY(get_trytes_res_trytes_at(res, 1)->trits,
-                           TX_4_OF_4_VALUE_BUNDLE_TRYTES,
-                           NUM_TRYTES_SERIALIZED_TRANSACTION);
+  for (size_t i = 0; i < 4; i++) {
+    flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION,
+                         get_trytes_res_trytes_at(res, i)->trits,
+                         NUM_TRITS_SERIALIZED_TRANSACTION,
+                         NUM_TRITS_SERIALIZED_TRANSACTION);
+    TEST_ASSERT_EQUAL_MEMORY(tx_trytes, txs_trytes[i],
+                             NUM_TRYTES_SERIALIZED_TRANSACTION);
+  }
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
