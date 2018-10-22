@@ -8,7 +8,9 @@
 #ifndef CCLIENT_IOTA_EXTENDED_API_H_
 #define CCLIENT_IOTA_EXTENDED_API_H_
 
+#include "common/helpers/sign.h"
 #include "iota_client_core_api.h"
+#include "utils/hash_containers.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,9 +47,9 @@ typedef struct {
 } account_data_t;
 
 typedef struct {
-  int security;
-  int32_t start;
-  int32_t end;
+  size_t security;
+  size_t start;
+  size_t total;
 } address_opt_t;
 
 /**
@@ -169,7 +171,7 @@ retcode_t iota_client_get_bundle(iota_client_service_t const* const serv,
  */
 retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
                                  trit_array_p const seed,
-                                 address_opt_t const addr_opt;
+                                 address_opt_t const addr_opt,
                                  int32_t threshold, inputs_t out_input);
 
 /**
@@ -200,21 +202,19 @@ retcode_t iota_client_get_latest_inclusion(
  * @param {trit_array_p} seed - At least 81 trytes long seed
  * @param {address_opt_t} addr_opt - address options: Starting key index,
  * Security level, Ending Key index.
- * @param {hashes_t} out_addresses - New (unused) address or list of addresses
- * up to (and including) first unused address.
+ * @param {hash_queue_t} out_addresses - New (unused) address or list of
+ * addresses up to (and including) first unused address.
  *
  * @returns {retcode_t}
  * - `INVALID_SEED`
- * - `INVALID_START_OPTION`
  * - `INVALID_SECURITY`
- * - Fetch error
- *
+ *,
  *   https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetNewAddress.ts#L131
  */
 retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
-                                      trit_array_p const seed,
+                                      flex_trit_t const* const seed,
                                       address_opt_t const addr_opt,
-                                      hashes_t* out_addresses);
+                                      hash_queue_t* out_addresses);
 
 /**
  * Fetches the transaction objects, given an array of transaction hashes.
