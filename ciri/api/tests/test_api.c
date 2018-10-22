@@ -82,6 +82,7 @@ void test_get_trytes_max(void) {
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
+  transactions_free(txs, 2);
 }
 
 void test_get_trytes(void) {
@@ -132,6 +133,7 @@ void test_get_trytes(void) {
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
+  transactions_free(txs, 4);
 }
 
 int main(void) {
