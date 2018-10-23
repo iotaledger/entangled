@@ -13,7 +13,7 @@
 
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
-#include "utils/containers/sets/hash243_set.h"
+#include "utils/containers/hash/hash243_set.h"
 
 #ifdef __cplusplus
 extern "C" {

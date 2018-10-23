@@ -1,29 +1,23 @@
-def _hash_set_generator_impl(ctx):
+def _hash_container_generator_impl(ctx):
     ctx.actions.expand_template(
-        template = ctx.file._source_template,
+        template = ctx.file.source_template,
         output = ctx.outputs.source,
         substitutions = {"{SIZE}": str(ctx.attr.size)},
     )
     ctx.actions.expand_template(
-        template = ctx.file._header_template,
+        template = ctx.file.header_template,
         output = ctx.outputs.header,
         substitutions = {"{SIZE}": str(ctx.attr.size)},
     )
 
-_hash_set_generator = rule(
-    implementation = _hash_set_generator_impl,
+_hash_container_generator = rule(
+    implementation = _hash_container_generator_impl,
     attrs = {
-        "size": attr.int(mandatory = True),
         "source": attr.string(mandatory = True),
+        "source_template": attr.label(mandatory = True, allow_single_file = True),
         "header": attr.string(mandatory = True),
-        "_source_template": attr.label(
-            default = Label("//utils/containers/sets:hash_set.c.tpl"),
-            allow_single_file = True,
-        ),
-        "_header_template": attr.label(
-            default = Label("//utils/containers/sets:hash_set.h.tpl"),
-            allow_single_file = True,
-        ),
+        "header_template": attr.label(mandatory = True, allow_single_file = True),
+        "size": attr.int(mandatory = True),
     },
     outputs = {
         "source": "%{source}",
@@ -31,15 +25,17 @@ _hash_set_generator = rule(
     },
 )
 
-def hash_set_generate(size):
-    base = "hash" + str(size) + "_set"
+def hash_container_generate(type, size):
+    base = "hash" + str(size) + "_" + type
     source = base + ".c"
     header = base + ".h"
 
-    _hash_set_generator(
+    _hash_container_generator(
         name = base + "_generator",
         source = source,
+        source_template = "//utils/containers/hash:hash_" + type + ".c.tpl",
         header = header,
+        header_template = "//utils/containers/hash:hash_" + type + ".h.tpl",
         size = size,
     )
 

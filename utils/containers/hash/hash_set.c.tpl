@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "utils/containers/sets/hash{SIZE}_set.h"
+#include "utils/containers/hash/hash{SIZE}_set.h"
 
 uint32_t hash{SIZE}_set_size(hash{SIZE}_set_t const *const set) {
   return HASH_COUNT(*set);
