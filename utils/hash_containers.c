@@ -66,54 +66,6 @@ flex_trit_t *hash_queue_at(hash_queue_t *const queue, size_t index) {
 }
 
 /*
- * Stack operations
- */
-
-bool hash_stack_empty(hash_stack_t const stack) { return (stack == NULL); }
-
-retcode_t hash_stack_push(hash_stack_t *const stack,
-                          flex_trit_t const *const hash) {
-  hash_list_entry_t *entry = NULL;
-
-  if ((entry = malloc(sizeof(hash_list_entry_t))) == NULL) {
-    return RC_UTILS_OOM;
-  }
-  memcpy(entry->hash, hash, FLEX_TRIT_SIZE_243);
-  LL_PREPEND(*stack, entry);
-  return RC_OK;
-}
-
-void hash_stack_pop(hash_stack_t *const stack) {
-  hash_list_entry_t *tmp = NULL;
-
-  tmp = *stack;
-  LL_DELETE(*stack, *stack);
-  free(tmp);
-}
-
-flex_trit_t *hash_stack_peek(hash_stack_t const stack) {
-  return (flex_trit_t *)(stack->hash);
-}
-
-void hash_stack_free(hash_stack_t *const stack) {
-  hash_list_entry_t *iter = NULL, *tmp = NULL;
-
-  LL_FOREACH_SAFE(*stack, iter, tmp) {
-    LL_DELETE(*stack, iter);
-    free(iter);
-  }
-}
-
-size_t hash_stack_count(hash_stack_t const stack) {
-  hash_stack_t curr = stack;
-  size_t count = 0;
-  while (curr != NULL) {
-    ++count;
-    curr = curr->next;
-  }
-  return count;
-}
-/*
  * Hash-int map operations
  */
 

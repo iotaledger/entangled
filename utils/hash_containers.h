@@ -19,15 +19,6 @@
 extern "C" {
 #endif
 
-/*
- * List types
- */
-
-typedef struct hash_list_entry_s {
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  struct hash_list_entry_s *next;
-} hash_list_entry_t;
-
 typedef struct hash_dll_entry_s {
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   struct hash_dll_entry_s *next;
@@ -50,20 +41,6 @@ flex_trit_t *hash_queue_peek(hash_queue_t const queue);
 void hash_queue_free(hash_queue_t *const queue);
 size_t hash_queue_count(hash_queue_t *const queue);
 flex_trit_t *hash_queue_at(hash_queue_t *const queue, size_t index);
-
-/*
- * Stack type and operations
- */
-
-typedef hash_list_entry_t *hash_stack_t;
-
-bool hash_stack_empty(hash_stack_t const stack);
-retcode_t hash_stack_push(hash_stack_t *const stack,
-                          flex_trit_t const *const hash);
-void hash_stack_pop(hash_stack_t *const stack);
-flex_trit_t *hash_stack_peek(hash_stack_t const stack);
-void hash_stack_free(hash_stack_t *const stack);
-size_t hash_stack_count(hash_stack_t const stack);
 
 /*
  * Hash-int map type and operations

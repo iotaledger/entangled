@@ -26,3 +26,30 @@ hash_container_generate(
     size = 8019,
     type = "set",
 )
+
+# Stacks
+
+hash_container_generate(
+    size = 27,
+    type = "stack",
+)
+
+hash_container_generate(
+    size = 81,
+    type = "stack",
+)
+
+hash_container_generate(
+    size = 243,
+    type = "stack",
+)
+
+hash_container_generate(
+    size = 6561,
+    type = "stack",
+)
+
+hash_container_generate(
+    size = 8019,
+    type = "stack",
+)

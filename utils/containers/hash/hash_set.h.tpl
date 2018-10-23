@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __UTILS_CONTAINERS_SETS_HASH{SIZE}_SET_H__
-#define __UTILS_CONTAINERS_SETS_HASH{SIZE}_SET_H__
+#ifndef __UTILS_CONTAINERS_HASH_HASH{SIZE}_SET_H__
+#define __UTILS_CONTAINERS_HASH_HASH{SIZE}_SET_H__
 
 #include "uthash.h"
 
@@ -43,4 +43,4 @@ retcode_t hash{SIZE}_set_for_each(hash{SIZE}_set_t const *const set,
 }
 #endif
 
-#endif  // __UTILS_CONTAINERS_SETS_HASH{SIZE}_SET_H__
+#endif  // __UTILS_CONTAINERS_HASH_HASH{SIZE}_SET_H__
