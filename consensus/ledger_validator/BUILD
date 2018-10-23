@@ -21,5 +21,6 @@ cc_library(
         "//consensus/tangle",
         "//gossip/components:requester",
         "//utils:hash_containers",
+        "//utils/containers/hash:hash243_stack",
     ],
 )

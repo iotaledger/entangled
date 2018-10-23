@@ -50,7 +50,7 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
                      .dynamic = 0};
   cw_calc_result rating_results = {.cw_ratings = NULL, .tx_to_approvers = NULL};
   bool consistent = false;
-  hash_stack_t tips_stack = NULL;
+  hash243_stack_t tips_stack = NULL;
 
   rw_lock_handle_rdlock(
       &tip_selector->milestone_tracker->latest_snapshot->rw_lock);
@@ -77,7 +77,7 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
               "Getting trunk tip failed with error %" PRIu64 "\n", ret);
     goto done;
   }
-  if ((ret = hash_stack_push(&tips_stack, tips->trunk->trits)) != RC_OK) {
+  if ((ret = hash243_stack_push(&tips_stack, tips->trunk->trits)) != RC_OK) {
     goto done;
   }
 
@@ -97,7 +97,7 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
               "Getting branch tip failed with error %" PRIu64 "\n", ret);
     goto done;
   }
-  if ((ret = hash_stack_push(&tips_stack, tips->branch->trits)) != RC_OK) {
+  if ((ret = hash243_stack_push(&tips_stack, tips->branch->trits)) != RC_OK) {
     goto done;
   }
 
@@ -118,7 +118,7 @@ done:
   rw_lock_handle_unlock(
       &tip_selector->milestone_tracker->latest_snapshot->rw_lock);
   cw_calc_result_destroy(&rating_results);
-  hash_stack_free(&tips_stack);
+  hash243_stack_free(&tips_stack);
   return ret;
 }
 

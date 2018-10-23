@@ -24,18 +24,19 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
                                            flex_trit_t *const milestone_hash,
                                            uint64_t index) {
   retcode_t ret = RC_OK;
-  hash_stack_t non_analyzed_hashes = NULL;
+  hash243_stack_t non_analyzed_hashes = NULL;
   hash243_set_t analyzed_hashes = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
 
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 
-  if ((ret = hash_stack_push(&non_analyzed_hashes, milestone_hash)) != RC_OK) {
+  if ((ret = hash243_stack_push(&non_analyzed_hashes, milestone_hash)) !=
+      RC_OK) {
     goto done;
   }
 
   while (non_analyzed_hashes != NULL) {
-    tx_hash.trits = hash_stack_peek(non_analyzed_hashes);
+    tx_hash.trits = hash243_stack_peek(non_analyzed_hashes);
     if (!hash243_set_contains(&analyzed_hashes, tx_hash.trits)) {
       hash_pack_reset(&pack);
       if ((ret = iota_tangle_transaction_load(
@@ -48,10 +49,12 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
           goto done;
         }
         // TODO messageQ publish
-        if ((ret = hash_stack_push(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
+        if ((ret = hash243_stack_push(&non_analyzed_hashes, tx.trunk)) !=
+            RC_OK) {
           goto done;
         }
-        if ((ret = hash_stack_push(&non_analyzed_hashes, tx.branch)) != RC_OK) {
+        if ((ret = hash243_stack_push(&non_analyzed_hashes, tx.branch)) !=
+            RC_OK) {
           goto done;
         }
       }
@@ -59,11 +62,11 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
         goto done;
       }
     }
-    hash_stack_pop(&non_analyzed_hashes);
+    hash243_stack_pop(&non_analyzed_hashes);
   }
 
 done:
-  hash_stack_free(&non_analyzed_hashes);
+  hash243_stack_free(&non_analyzed_hashes);
   hash243_set_free(&analyzed_hashes);
   return ret;
 }
@@ -119,7 +122,7 @@ static retcode_t get_latest_delta(ledger_validator_t *const lv,
                                   bool is_milestone, bool *valid_delta) {
   retcode_t ret = RC_OK;
   int number_of_analyzed_transactions = 0;
-  hash_stack_t non_analyzed_hashes = NULL;
+  hash243_stack_t non_analyzed_hashes = NULL;
   iota_transaction_t tx_bundle = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
@@ -128,7 +131,7 @@ static retcode_t get_latest_delta(ledger_validator_t *const lv,
   bundle_transactions_t *bundle = NULL;
   bundle_transactions_new(&bundle);
 
-  if ((ret = hash_stack_push(&non_analyzed_hashes, tip)) != RC_OK) {
+  if ((ret = hash243_stack_push(&non_analyzed_hashes, tip)) != RC_OK) {
     goto done;
   }
 
@@ -141,7 +144,7 @@ static retcode_t get_latest_delta(ledger_validator_t *const lv,
   }
 
   while (non_analyzed_hashes != NULL) {
-    tx_hash.trits = hash_stack_peek(non_analyzed_hashes);
+    tx_hash.trits = hash243_stack_peek(non_analyzed_hashes);
     if (!hash243_set_contains(analyzed_hashes, tx_hash.trits)) {
       hash_pack_reset(&pack);
       if ((ret = iota_tangle_transaction_load(
@@ -179,10 +182,12 @@ static retcode_t get_latest_delta(ledger_validator_t *const lv,
             goto done;
           }
         }
-        if ((ret = hash_stack_push(&non_analyzed_hashes, tx.trunk)) != RC_OK) {
+        if ((ret = hash243_stack_push(&non_analyzed_hashes, tx.trunk)) !=
+            RC_OK) {
           goto done;
         }
-        if ((ret = hash_stack_push(&non_analyzed_hashes, tx.branch)) != RC_OK) {
+        if ((ret = hash243_stack_push(&non_analyzed_hashes, tx.branch)) !=
+            RC_OK) {
           goto done;
         }
       }
@@ -190,11 +195,11 @@ static retcode_t get_latest_delta(ledger_validator_t *const lv,
         goto done;
       }
     }
-    hash_stack_pop(&non_analyzed_hashes);
+    hash243_stack_pop(&non_analyzed_hashes);
   }
 done:
   bundle_transactions_free(&bundle);
-  hash_stack_free(&non_analyzed_hashes);
+  hash243_stack_free(&non_analyzed_hashes);
   hash243_set_free(analyzed_hashes);
   return ret;
 }
@@ -306,9 +311,9 @@ done:
 }
 
 retcode_t iota_consensus_ledger_validator_check_consistency(
-    ledger_validator_t *const lv, hash_stack_t hashes, bool *consistent) {
+    ledger_validator_t *const lv, hash243_stack_t hashes, bool *consistent) {
   retcode_t ret = RC_OK;
-  hash_list_entry_t *iter = NULL;
+  hash243_stack_entry_t *iter = NULL;
   hash243_set_t analyzed_hashes = NULL;
   state_delta_t delta = NULL;
 
