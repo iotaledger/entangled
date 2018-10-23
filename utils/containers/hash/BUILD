@@ -53,3 +53,30 @@ hash_container_generate(
     size = 8019,
     type = "stack",
 )
+
+# Queues
+
+hash_container_generate(
+    size = 27,
+    type = "queue",
+)
+
+hash_container_generate(
+    size = 81,
+    type = "queue",
+)
+
+hash_container_generate(
+    size = 243,
+    type = "queue",
+)
+
+hash_container_generate(
+    size = 6561,
+    type = "queue",
+)
+
+hash_container_generate(
+    size = 8019,
+    type = "queue",
+)

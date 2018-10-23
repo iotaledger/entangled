@@ -19,29 +19,6 @@
 extern "C" {
 #endif
 
-typedef struct hash_dll_entry_s {
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  struct hash_dll_entry_s *next;
-  struct hash_dll_entry_s *prev;
-} hash_dll_entry_t;
-
-typedef retcode_t (*hash_on_container_func)(void *container, flex_trit_t *hash);
-
-/*
- * Queue type and operations
- */
-
-typedef hash_dll_entry_t *hash_queue_t;
-
-bool hash_queue_empty(hash_queue_t const queue);
-retcode_t hash_queue_push(hash_queue_t *const queue,
-                          flex_trit_t const *const hash);
-void hash_queue_pop(hash_queue_t *const queue);
-flex_trit_t *hash_queue_peek(hash_queue_t const queue);
-void hash_queue_free(hash_queue_t *const queue);
-size_t hash_queue_count(hash_queue_t *const queue);
-flex_trit_t *hash_queue_at(hash_queue_t *const queue, size_t index);
-
 /*
  * Hash-int map type and operations
  */
