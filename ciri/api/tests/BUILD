@@ -25,3 +25,16 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_store_transactions",
+    srcs = ["test_store_transactions.c"],
+    data = [":db_file"],
+    deps = [
+        ":defs",
+        "//ciri/api",
+        "//consensus:defs",
+        "//consensus/test_utils",
+        "@unity",
+    ],
+)
