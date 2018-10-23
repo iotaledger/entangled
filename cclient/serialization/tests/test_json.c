@@ -56,7 +56,7 @@ void test_deserialize_find_transactions(void) {
   find_transactions_res_t* deserialize_find_tran = find_transactions_res_new();
 
   serializer.vtable.find_transactions_deserialize_response(
-      &serializer, json_text, &deserialize_find_tran);
+      &serializer, json_text, deserialize_find_tran);
 
   tmp_hash = find_transactions_res_hash_at(deserialize_find_tran, 0);
   TEST_ASSERT_EQUAL_MEMORY(hash1->trits, tmp_hash->trits, tmp_hash->num_bytes);
@@ -70,7 +70,7 @@ void test_deserialize_find_transactions(void) {
   tmp_hash = find_transactions_res_hash_at(deserialize_find_tran, 3);
   TEST_ASSERT_NULL(tmp_hash);
 
-  find_transactions_res_free(deserialize_find_tran);
+  find_transactions_res_free(&deserialize_find_tran);
   trit_array_free(hash1);
   trit_array_free(hash2);
   trit_array_free(hash3);

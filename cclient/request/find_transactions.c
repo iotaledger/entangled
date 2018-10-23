@@ -10,10 +10,12 @@
 find_transactions_req_t* find_transactions_req_new() {
   find_transactions_req_t* req =
       (find_transactions_req_t*)malloc(sizeof(find_transactions_req_t));
-  req->addresses = flex_hash_array_new();
-  req->tags = flex_hash_array_new();
-  req->approvees = flex_hash_array_new();
-  req->bundles = flex_hash_array_new();
+  if (req) {
+    req->addresses = flex_hash_array_new();
+    req->tags = flex_hash_array_new();
+    req->approvees = flex_hash_array_new();
+    req->bundles = flex_hash_array_new();
+  }
   return req;
 }
 

@@ -7,23 +7,31 @@
 
 #include "iota_client_extended_api.h"
 
-static bool is_unused_address(iota_client_service_t const* const serv,
-                              flex_trit_t const* const addr) {
-  // retcode_t ret = RC_OK;
-  int ret_num = 0;
+static retcode_t is_unused_address(iota_client_service_t const* const serv,
+                                   flex_trit_t const* const addr,
+                                   bool* const isUnused) {
+  retcode_t ret_code = RC_OK;
+  size_t ret_num = 0;
   tryte_t trytes_addr[NUM_TRYTES_ADDRESS];
-  find_transactions_req_t* find_tran = find_transactions_req_new();
-  find_transactions_res_t* res = find_transactions_res_new();
+  find_transactions_req_t* find_tran = NULL;
+  find_transactions_res_t* res = NULL;
 
+  find_tran = find_transactions_req_new();
+  res = find_transactions_res_new();
+  if (!find_tran || !res) {
+    return RC_CCLIENT_NULL_PTR;
+  }
   // TODO remove flex_trits-trytes convertion.
-  flex_trits_to_trytes(trytes_addr, NUM_TRYTES_ADDRESS, addr, NUM_TRITS_ADDRESS,
-                       NUM_TRITS_ADDRESS);
-  find_tran = find_transactions_req_add_address(find_tran, (char*)trytes_addr);
-
-  iota_client_find_transactions(serv, find_tran, &res);
-
-  ret_num = find_transactions_res_hash_num(res);
-  return ret_num ? true : false;
+  size_t trits_num = flex_trits_to_trytes(trytes_addr, NUM_TRYTES_ADDRESS, addr,
+                                          NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
+  if (trits_num) {
+    find_tran =
+        find_transactions_req_add_address(find_tran, (char*)trytes_addr);
+    ret_code = iota_client_find_transactions(serv, find_tran, res);
+    ret_num = find_transactions_res_hash_num(res);
+    *isUnused = ret_num ? false : true;
+  }
+  return ret_code;
 }
 
 retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
@@ -33,6 +41,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
   retcode_t ret = RC_OK;
   flex_trit_t* tmp = NULL;
   size_t addr_index = 0;
+  bool isUnused = true;
 
   // security validation
   if (addr_opt.security <= 0 || addr_opt.security > 3) {
@@ -58,7 +67,11 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
       tmp = iota_flex_sign_address_gen(seed, addr_index, addr_opt.security);
       if (tmp) {
         ret = hash_queue_push(out_addresses, tmp);
-        if (!is_unused_address(serv, tmp) || ret != RC_OK) {
+        if (ret) {
+          return ret;
+        }
+        ret = is_unused_address(serv, tmp, &isUnused);
+        if (ret || isUnused) {
           return ret;
         }
       } else {
@@ -67,6 +80,5 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
       }
     }
   }
-
   return ret;
 }

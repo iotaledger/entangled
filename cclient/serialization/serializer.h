@@ -30,8 +30,8 @@ typedef struct {
       char_buffer_t* out);
 
   retcode_t (*find_transactions_deserialize_response)(
-      const serializer_t* const s, const char* const obj,
-      find_transactions_res_t** out);
+      serializer_t const* const s, char const* const obj,
+      find_transactions_res_t* out);
 
   // get_balances_response
   retcode_t (*get_balances_serialize_request)(

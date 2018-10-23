@@ -224,9 +224,9 @@ done:
 }
 
 retcode_t iota_client_find_transactions(
-    const iota_client_service_t* const service,
-    const find_transactions_req_t* const req,
-    find_transactions_res_t** const res) {
+    iota_client_service_t const* const service,
+    find_transactions_req_t const* const req,
+    find_transactions_res_t* const res) {
   retcode_t result = RC_OK;
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();

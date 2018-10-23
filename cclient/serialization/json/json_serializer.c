@@ -304,8 +304,8 @@ err:
 }
 
 retcode_t json_find_transactions_deserialize_response(
-    const serializer_t* const s, const char* const obj,
-    find_transactions_res_t** out) {
+    serializer_t const* const s, char const* const obj,
+    find_transactions_res_t* out) {
   log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
@@ -326,7 +326,7 @@ retcode_t json_find_transactions_deserialize_response(
     return RC_CCLIENT_RES_ERROR;
   }
 
-  *out = json_array_to_flex_hash_array(json_obj, "hashes", *out);
+  out->hashes = json_array_to_flex_hash_array(json_obj, "hashes", out->hashes);
 
   cJSON_Delete(json_obj);
   return ret;

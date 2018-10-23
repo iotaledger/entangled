@@ -27,8 +27,8 @@ retcode_t json_find_transactions_serialize_request(
     char_buffer_t* out);
 
 retcode_t json_find_transactions_deserialize_response(
-    const serializer_t* const, const char* const obj,
-    find_transactions_res_t** out);
+    serializer_t const* const, char const* const obj,
+    find_transactions_res_t* out);
 
 // get_balances_response
 retcode_t json_get_balances_serialize_request(
