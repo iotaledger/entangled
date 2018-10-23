@@ -16,11 +16,17 @@ get_trytes_req_t* get_trytes_req_new() {
 }
 
 void get_trytes_req_free(get_trytes_req_t** const req) {
-  if (req) {
-    flex_hash_array_free((*req)->hashes);
-    free(*req);
-    *req = NULL;
+  if (!req || !(*req)) {
+    return;
   }
+
+  get_trytes_req_t* tmp = *req;
+
+  if (tmp->hashes) {
+    flex_hash_array_free(tmp->hashes);
+  }
+  free(tmp);
+  *req = NULL;
 }
 
 get_trytes_req_t* get_trytes_req_add_hash(get_trytes_req_t* const req,

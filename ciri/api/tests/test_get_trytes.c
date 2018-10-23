@@ -61,6 +61,8 @@ void test_get_trytes_not_found(void) {
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
+  TEST_ASSERT(req == NULL);
+  TEST_ASSERT(res == NULL);
 }
 
 void test_get_trytes_max(void) {
@@ -85,6 +87,8 @@ void test_get_trytes_max(void) {
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
+  TEST_ASSERT(req == NULL);
+  TEST_ASSERT(res == NULL);
   transactions_free(txs, 2);
 }
 
@@ -126,6 +130,8 @@ void test_get_trytes(void) {
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
+  TEST_ASSERT(req == NULL);
+  TEST_ASSERT(res == NULL);
   transactions_free(txs, 4);
 }
 

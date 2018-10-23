@@ -109,6 +109,7 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
   }
   LL_FOREACH(req->hashes, iter) {
     hash_pack_reset(&pack);
+    // NOTE Concurrency needs to be taken care of
     if ((ret = iota_tangle_transaction_load(api->tangle, TRANSACTION_FIELD_HASH,
                                             iter->hash, &pack)) != RC_OK) {
       return ret;

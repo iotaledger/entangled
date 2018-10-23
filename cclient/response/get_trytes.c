@@ -16,11 +16,17 @@ get_trytes_res_t* get_trytes_res_new() {
 }
 
 void get_trytes_res_free(get_trytes_res_t** const res) {
-  if (res) {
-    flex_hash_array_free((*res)->trytes);
-    free(*res);
-    *res = NULL;
+  if (!res || !(*res)) {
+    return;
   }
+
+  get_trytes_res_t* tmp = *res;
+
+  if (tmp->trytes) {
+    flex_hash_array_free(tmp->trytes);
+  }
+  free(tmp);
+  *res = NULL;
 }
 
 trit_array_p get_trytes_res_trytes_at(get_trytes_res_t const* const res,
