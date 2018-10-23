@@ -2,14 +2,14 @@ def hash_set_generate(size):
     native.genrule(
         name = "hash" + str(size) + "_set_generate_header",
         outs = ["hash" + str(size) + "_set.h"],
-        srcs = ["hash_set_template.h"],
+        srcs = ["hash_set.h.tpl"],
         cmd = "sed 's/$$SIZE/" + str(size) + "/g' $(<) > $(@)",
     )
 
     native.genrule(
         name = "hash" + str(size) + "_set_generate_source",
         outs = ["hash" + str(size) + "_set.c"],
-        srcs = ["hash_set_template.c"],
+        srcs = ["hash_set.c.tpl"],
         cmd = "sed 's/$$SIZE/" + str(size) + "/g' $(<) > $(@)",
     )
 
