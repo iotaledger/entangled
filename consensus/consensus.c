@@ -11,10 +11,6 @@
 
 #define CONSENSUS_LOGGER_ID "consensus"
 
-// FIXME: waiting for a stable location of these files
-#define CIRI_SNAPSHOT_FILE "ciri/snapshotTestnet.txt"
-#define CIRI_SNAPSHOT_SIG_FILE "ciri/snapshotTestnet.sig"
-
 retcode_t iota_consensus_init(iota_consensus_t *const consensus,
                               connection_config_t const *const db_conf,
                               requester_state_t *const transaction_requester,
