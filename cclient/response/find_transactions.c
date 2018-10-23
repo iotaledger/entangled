@@ -26,9 +26,13 @@ size_t find_transactions_res_hash_num(find_transactions_res_t* in) {
 }
 
 void find_transactions_res_free(find_transactions_res_t** res) {
-  if (res) {
-    flex_hash_array_free((*res)->hashes);
-    free(*res);
-    *res = NULL;
+  if (!res || !(*res)) {
+    return;
   }
+
+  if ((*res)->hashes) {
+    flex_hash_array_free((*res)->hashes);
+  }
+  free(*res);
+  *res = NULL;
 }
