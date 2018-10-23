@@ -53,12 +53,12 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
         return RC_CCLIENT_NULL_PTR;
       }
     }
-  } else {  // return an unused address
+  } else {  // return addresses include the latest unused address.
     for (addr_index = 0;; addr_index++) {
       tmp = iota_flex_sign_address_gen(seed, addr_index, addr_opt.security);
       if (tmp) {
-        if (!is_unused_address(serv, tmp)) {
-          ret = hash_queue_push(out_addresses, tmp);
+        ret = hash_queue_push(out_addresses, tmp);
+        if (!is_unused_address(serv, tmp) || ret != RC_OK) {
           return ret;
         }
       } else {
