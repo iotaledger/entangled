@@ -74,6 +74,7 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/trinary:flex_trit",
+        "//utils/containers/hash:hash243_set",
         "@com_github_uthash//:uthash",
     ],
 )

@@ -10,6 +10,7 @@
 
 #include "common/errors.h"
 #include "consensus/snapshot/snapshot.h"
+#include "utils/containers/hash/hash243_stack.h"
 #include "utils/hash_containers.h"
 
 // Forward declarations
@@ -40,10 +41,10 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
     bool *const has_snapshot);
 
 retcode_t iota_consensus_ledger_validator_check_consistency(
-    ledger_validator_t *const lv, hash_stack_t hashes, bool *consistent);
+    ledger_validator_t *const lv, hash243_stack_t hashes, bool *consistent);
 
 retcode_t iota_consensus_ledger_validator_update_delta(
-    ledger_validator_t *const lv, hash_set_t *analyzed_hashes,
+    ledger_validator_t *const lv, hash243_set_t *analyzed_hashes,
     state_delta_t *delta, flex_trit_t *tip, bool *is_consistent);
 
 retcode_t iota_consensus_ledger_validator_destroy(ledger_validator_t *const lv);

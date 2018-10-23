@@ -5,13 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __TEST_HASH_CONTAINERS_H__
-#define __TEST_HASH_CONTAINERS_H__
+#ifndef __UTILS_CONTAINERS_HASH_TESTS_DEFS_H__
+#define __UTILS_CONTAINERS_HASH_TESTS_DEFS_H__
 
 #include <unity/unity.h>
 
 #include "common/trinary/flex_trit.h"
-#include "utils/hash_containers.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,4 +91,4 @@ static const flex_trit_t hash243_2[FLEX_TRIT_SIZE_243] = {
 }
 #endif
 
-#endif  // __TEST_HASH_CONTAINERS_H__
+#endif  // __UTILS_CONTAINERS_HASH_TESTS_DEFS_H__

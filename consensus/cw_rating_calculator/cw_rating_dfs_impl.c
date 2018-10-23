@@ -10,6 +10,7 @@
 #include "common/storage/pack.h"
 #include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
 #include "utils/containers/bitset.h"
+#include "utils/containers/hash/hash243_stack.h"
 #include "utils/logger_helper.h"
 
 static retcode_t cw_rating_dfs_do_dfs_from_db(
@@ -112,15 +113,15 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
     return res;
   }
 
-  hash_stack_t stack = NULL;
-  if ((res = hash_stack_push(&stack, entry_point->trits))) {
+  hash243_stack_t stack = NULL;
+  if ((res = hash243_stack_push(&stack, entry_point->trits))) {
     return res;
   }
 
   flex_trit_t *curr_tx_hash = NULL;
 
-  while (!hash_stack_empty(stack)) {
-    curr_tx_hash = hash_stack_peek(stack);
+  while (!hash243_stack_empty(stack)) {
+    curr_tx_hash = hash243_stack_peek(stack);
 
     if (!hash_to_indexed_hash_set_map_contains(tx_to_approvers, curr_tx_hash)) {
       hash_pack_reset(&pack);
@@ -135,16 +136,16 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
                tx_to_approvers, curr_tx_hash, &curr_tx, (*subtangle_size)++))) {
         return res;
       }
-      hash_stack_pop(&stack);
+      hash243_stack_pop(&stack);
       while (pack.num_loaded > 0) {
         curr_approver_index = --pack.num_loaded;
         // Add each found approver to the currently traversed tx
-        if ((res = hash_stack_push(
+        if ((res = hash243_stack_push(
                  &stack,
                  ((trit_array_p)pack.models[curr_approver_index])->trits))) {
           return res;
         }
-        if ((res = hash_set_add(
+        if ((res = hash243_set_add(
                  &curr_tx->approvers,
                  ((trit_array_p)pack.models[pack.num_loaded])->trits))) {
           return res;
@@ -152,11 +153,11 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
       }
       continue;
     }
-    hash_stack_pop(&stack);
+    hash243_stack_pop(&stack);
   }
 
   hash_pack_free(&pack);
-  hash_stack_free(&stack);
+  hash243_stack_free(&stack);
 
   return res;
 }
@@ -169,18 +170,18 @@ static retcode_t cw_rating_dfs_do_dfs_light(
   hash_to_indexed_hash_set_entry_t *curr_tx_entry = NULL;
   retcode_t ret;
 
-  hash_stack_t stack = NULL;
-  if ((ret = hash_stack_push(&stack, ep))) {
+  hash243_stack_t stack = NULL;
+  if ((ret = hash243_stack_push(&stack, ep))) {
     return ret;
   }
 
-  while (!hash_stack_empty(stack)) {
-    curr_hash = hash_stack_peek(stack);
+  while (!hash243_stack_empty(stack)) {
+    curr_hash = hash243_stack_peek(stack);
 
     HASH_FIND(hh, tx_to_approvers, curr_hash, FLEX_TRIT_SIZE_243,
               curr_tx_entry);
 
-    hash_stack_pop(&stack);
+    hash243_stack_pop(&stack);
 
     if (!curr_tx_entry) {
       continue;
@@ -193,12 +194,12 @@ static retcode_t cw_rating_dfs_do_dfs_light(
 
     bitset_set_true(visited_bitset, curr_tx_entry->idx);
 
-    if ((ret = hash_set_for_each(&curr_tx_entry->approvers, hash_stack_push,
-                                 &stack))) {
+    if ((ret = hash243_set_for_each(&curr_tx_entry->approvers,
+                                    hash243_stack_push, &stack))) {
       return ret;
     }
   }
 
-  hash_stack_free(&stack);
+  hash243_stack_free(&stack);
   return RC_OK;
 }
