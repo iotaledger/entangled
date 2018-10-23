@@ -22,3 +22,17 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_hash_containers",
+    srcs = [
+        "test_hash_containers.c",
+        "test_hash_containers.h",
+    ],
+    deps = [
+        "//common/model:transaction",
+        "//common/trinary:flex_trit",
+        "//utils:hash_containers",
+        "@unity",
+    ],
+)
