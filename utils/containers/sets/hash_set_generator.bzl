@@ -22,4 +22,5 @@ def hash_set_generate(size):
             "//common/trinary:flex_trit",
             "@com_github_uthash//:uthash",
         ],
+        visibility = ["//visibility:public"],
     )

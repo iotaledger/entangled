@@ -32,10 +32,10 @@ typedef struct exit_prob_transaction_validator_s {
   milestone_tracker_t *mt;
   ledger_validator_t *lv;
   state_delta_t delta;
-  hash_set_t analyzed_hashes;
+  hash243_set_t analyzed_hashes;
   uint32_t max_analyzed_txs;
   uint32_t max_depth;
-  hash_set_t max_depth_ok_memoization;
+  hash243_set_t max_depth_ok_memoization;
 } exit_prob_transaction_validator_t;
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_init(

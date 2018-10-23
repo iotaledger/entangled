@@ -32,8 +32,8 @@ retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
     exit_prob_transaction_validator_t *epv) {
   logger_helper_destroy(WALKER_VALIDATOR_LOGGER_ID);
 
-  hash_set_free(&epv->max_depth_ok_memoization);
-  hash_set_free(&epv->analyzed_hashes);
+  hash243_set_free(&epv->max_depth_ok_memoization);
+  hash243_set_free(&epv->analyzed_hashes);
   state_delta_destroy(&epv->delta);
   epv->delta = NULL;
   epv->tangle = NULL;
@@ -118,11 +118,11 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
   // Load the transaction
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
 
-  hash_set_t visited_hashes = NULL;
+  hash243_set_t visited_hashes = NULL;
   TRIT_ARRAY_DECLARE(hash_trits_array, NUM_TRITS_HASH);
 
   while (non_analyzed_hashes != NULL) {
-    if (hash_set_size(&visited_hashes) == epv->max_analyzed_txs) {
+    if (hash243_set_size(&visited_hashes) == epv->max_analyzed_txs) {
       log_error(WALKER_VALIDATOR_LOGGER_ID,
                 "Validation failed, exceeded num of transactions\n");
       *below_max_depth = false;
@@ -130,12 +130,12 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
     }
 
     flex_trit_t *curr_hash_trits = hash_stack_peek(non_analyzed_hashes);
-    if (hash_set_contains(&visited_hashes, curr_hash_trits)) {
+    if (hash243_set_contains(&visited_hashes, curr_hash_trits)) {
       continue;
     }
 
     // Mark the transaction as visited
-    if ((res = hash_set_add(&visited_hashes, curr_hash_trits))) {
+    if ((res = hash243_set_add(&visited_hashes, curr_hash_trits))) {
       break;
     }
 
@@ -167,9 +167,9 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
   }
 
   hash_stack_free(&non_analyzed_hashes);
-  hash_set_free(&visited_hashes);
-  if ((res = hash_set_add(&epv->max_depth_ok_memoization, tail_hash->trits)) !=
-      RC_OK) {
+  hash243_set_free(&visited_hashes);
+  if ((res = hash243_set_add(&epv->max_depth_ok_memoization,
+                             tail_hash->trits)) != RC_OK) {
     return res;
   }
 

@@ -13,6 +13,7 @@
 
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
+#include "utils/containers/sets/hash243_set.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,26 +66,6 @@ void hash_stack_free(hash_stack_t *const stack);
 size_t hash_stack_count(hash_stack_t const stack);
 
 /*
- * Set type and operations
- */
-
-typedef struct hash_set_entry_s {
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  UT_hash_handle hh;
-} hash_set_entry_t;
-
-typedef hash_set_entry_t *hash_set_t;
-
-uint32_t hash_set_size(hash_set_t const *const set);
-retcode_t hash_set_add(hash_set_t *const set, flex_trit_t const *const hash);
-retcode_t hash_set_append(hash_set_t const *const set, hash_set_t *const clone);
-bool hash_set_contains(hash_set_t const *const set,
-                       flex_trit_t const *const hash);
-void hash_set_free(hash_set_t *const set);
-retcode_t hash_set_for_each(hash_set_t const *const set,
-                            hash_on_container_func func, void *const container);
-
-/*
  * Hash-int map type and operations
  */
 
@@ -109,7 +90,7 @@ void hash_int_map_free(hash_int_map_t *const map);
 typedef struct hash_to_indexed_hash_set_entry_s {
   flex_trit_t hash[FLEX_TRIT_SIZE_243]; /*key*/
   size_t idx;
-  hash_set_t approvers; /*value*/
+  hash243_set_t approvers; /*value*/
   UT_hash_handle hh;
 } hash_to_indexed_hash_set_entry_t;
 

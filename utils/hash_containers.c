@@ -114,75 +114,6 @@ size_t hash_stack_count(hash_stack_t const stack) {
   return count;
 }
 /*
- * Set operations
- */
-
-uint32_t hash_set_size(hash_set_t const *const set) { return HASH_COUNT(*set); }
-
-retcode_t hash_set_add(hash_set_t *const set, flex_trit_t const *const hash) {
-  hash_set_entry_t *entry = NULL;
-
-  if ((entry = malloc(sizeof(hash_set_entry_t))) == NULL) {
-    return RC_UTILS_OOM;
-  }
-  memcpy(entry->hash, hash, FLEX_TRIT_SIZE_243);
-  HASH_ADD(hh, *set, hash, FLEX_TRIT_SIZE_243, entry);
-  return RC_OK;
-}
-
-retcode_t hash_set_append(hash_set_t const *const set1,
-                          hash_set_t *const set2) {
-  retcode_t ret = RC_OK;
-  hash_set_entry_t *iter = NULL, *tmp = NULL;
-
-  HASH_ITER(hh, *set1, iter, tmp) {
-    if (!hash_set_contains(set2, iter->hash)) {
-      if ((ret = hash_set_add(set2, iter->hash)) != RC_OK) {
-        return ret;
-      }
-    }
-  }
-  return ret;
-}
-
-bool hash_set_contains(hash_set_t const *const set,
-                       flex_trit_t const *const hash) {
-  hash_set_entry_t *entry = NULL;
-
-  if (*set == NULL) {
-    return false;
-  }
-
-  HASH_FIND(hh, *set, hash, FLEX_TRIT_SIZE_243, entry);
-  return entry != NULL;
-}
-
-void hash_set_free(hash_set_t *const set) {
-  hash_set_entry_t *iter = NULL, *tmp = NULL;
-
-  HASH_ITER(hh, *set, iter, tmp) {
-    HASH_DEL(*set, iter);
-    free(iter);
-  }
-  *set = NULL;
-}
-
-retcode_t hash_set_for_each(hash_set_t const *const set,
-                            hash_on_container_func func,
-                            void *const container) {
-  retcode_t ret = RC_OK;
-  hash_set_entry_t *curr_entry = NULL;
-  hash_set_entry_t *tmp_entry = NULL;
-
-  HASH_ITER(hh, *set, curr_entry, tmp_entry) {
-    if ((ret = func(container, curr_entry->hash)) != RC_OK) {
-      return ret;
-    }
-  }
-  return ret;
-}
-
-/*
  * Hash-int map operations
  */
 
@@ -265,7 +196,7 @@ void hash_to_indexed_hash_set_map_free(
   hash_to_indexed_hash_set_entry_t *tmp_entry = NULL;
 
   HASH_ITER(hh, *map, curr_entry, tmp_entry) {
-    hash_set_free(&((*map)->approvers));
+    hash243_set_free(&((*map)->approvers));
     HASH_DEL(*map, curr_entry);
     free(curr_entry);
   }

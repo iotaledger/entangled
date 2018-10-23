@@ -144,7 +144,7 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
                  ((trit_array_p)pack.models[curr_approver_index])->trits))) {
           return res;
         }
-        if ((res = hash_set_add(
+        if ((res = hash243_set_add(
                  &curr_tx->approvers,
                  ((trit_array_p)pack.models[pack.num_loaded])->trits))) {
           return res;
@@ -193,8 +193,8 @@ static retcode_t cw_rating_dfs_do_dfs_light(
 
     bitset_set_true(visited_bitset, curr_tx_entry->idx);
 
-    if ((ret = hash_set_for_each(&curr_tx_entry->approvers, hash_stack_push,
-                                 &stack))) {
+    if ((ret = hash243_set_for_each(&curr_tx_entry->approvers, hash_stack_push,
+                                    &stack))) {
       return ret;
     }
   }
