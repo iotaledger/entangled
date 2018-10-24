@@ -23,7 +23,6 @@ cc_library(
 
 cc_library(
     name = "defs",
-    srcs = ["defs.c"],
     hdrs = ["defs.h"],
     visibility = ["//visibility:public"],
     deps = [

@@ -27,6 +27,7 @@
 static cw_rating_calculator_t calc;
 static tangle_t tangle;
 static connection_config_t config;
+static iota_consensus_defs_t defs;
 
 // gdb --args ./test_cw_ratings_dfs 1
 static bool debug_mode = false;
@@ -62,15 +63,15 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   iota_consensus_transaction_solidifier_init(&ts, &tangle, NULL);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, &ts,
                                           true) == RC_OK);
-  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &mt, NULL) ==
-              RC_OK);
+  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &defs, &tangle, &mt,
+                                                   NULL) == RC_OK);
 
   // We want to avoid unnecessary validation
   mt.latest_snapshot->index = 99999999999;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(
-                  &tangle, &mt, &lv, epv, max_txs_below_max_depth, max_depth) ==
-              RC_OK);
+                  &defs, &tangle, &mt, &lv, epv, max_txs_below_max_depth,
+                  max_depth) == RC_OK);
 }
 
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
@@ -699,6 +700,8 @@ int main(int argc, char *argv[]) {
   }
 
   config.db_path = test_db_path;
+
+  memset(defs.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
 
   RUN_TEST(test_single_tx_tangle);
   RUN_TEST(test_cw_topology_blockchain);

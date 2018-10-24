@@ -25,15 +25,16 @@ extern "C" {
 #endif
 
 typedef struct ledger_validator_s {
+  iota_consensus_defs_t *defs;
   tangle_t *tangle;
   milestone_tracker_t *milestone_tracker;
   requester_state_t *transaction_requester;
 } ledger_validator_t;
 
-retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv,
-                                               tangle_t *const tangle,
-                                               milestone_tracker_t *const mt,
-                                               requester_state_t *const tr);
+retcode_t iota_consensus_ledger_validator_init(
+    ledger_validator_t *const lv, iota_consensus_defs_t *const defs,
+    tangle_t *const tangle, milestone_tracker_t *const mt,
+    requester_state_t *const tr);
 
 retcode_t iota_consensus_ledger_validator_destroy(ledger_validator_t *const lv);
 

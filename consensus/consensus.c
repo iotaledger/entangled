@@ -18,7 +18,8 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   retcode_t ret = RC_OK;
 
   logger_helper_init(CONSENSUS_LOGGER_ID, LOGGER_DEBUG, true);
-  memset(genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+  memset(consensus->defs.genesis_hash, FLEX_TRIT_NULL_VALUE,
+         FLEX_TRIT_SIZE_243);
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing bundle validator\n");
   if ((ret = iota_consensus_bundle_validator_init()) != RC_OK) {
@@ -57,7 +58,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   log_info(CONSENSUS_LOGGER_ID,
            "Initializing exit probability transaction validator\n");
   if ((ret = iota_consensus_exit_prob_transaction_validator_init(
-           &consensus->tangle, &consensus->milestone_tracker,
+           &consensus->defs, &consensus->tangle, &consensus->milestone_tracker,
            &consensus->ledger_validator,
            &consensus->exit_prob_transaction_validator, MAX_ANALYZED_TXS,
            MAX_DEPTH)) != RC_OK) {
@@ -115,7 +116,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing transaction validator\n");
   if ((ret = iota_consensus_transaction_validator_init(
-           &consensus->transaction_validator,
+           &consensus->transaction_validator, &consensus->defs,
            consensus->snapshot.conf.timestamp_sec * 1000UL,
            (testnet ? TESTNET_MWM : MAINNET_MWM))) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
@@ -125,7 +126,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing ledger validator\n");
   if ((ret = iota_consensus_ledger_validator_init(
-           &consensus->ledger_validator, &consensus->tangle,
+           &consensus->ledger_validator, &consensus->defs, &consensus->tangle,
            &consensus->milestone_tracker, transaction_requester)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Initializing ledger validator failed\n");
     return ret;

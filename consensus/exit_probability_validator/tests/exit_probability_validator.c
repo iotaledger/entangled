@@ -44,6 +44,7 @@ static milestone_tracker_t mt;
 static ledger_validator_t lv;
 static transaction_solidifier_t ts;
 static requester_state_t tr;
+static iota_consensus_defs_t defs;
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
   TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL,
@@ -52,15 +53,14 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, &ts,
                                           true) == RC_OK);
   TEST_ASSERT(requester_init(&tr, &tangle) == RC_OK);
-  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &mt, &tr) ==
-              RC_OK);
-
+  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &defs, &tangle, &mt,
+                                                   &tr) == RC_OK);
   // We want to avoid unnecessary validation
   mt.latest_snapshot->index = 99999999999;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(
-                  &tangle, &mt, &lv, epv, max_txs_below_max_depth, max_depth) ==
-              RC_OK);
+                  &defs, &tangle, &mt, &lv, epv, max_txs_below_max_depth,
+                  max_depth) == RC_OK);
 }
 
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
@@ -306,6 +306,8 @@ int main(int argc, char *argv[]) {
   }
 
   config.db_path = test_db_path;
+
+  memset(defs.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
 
   RUN_TEST(test_transaction_does_not_exist);
   RUN_TEST(test_transaction_not_a_tail);

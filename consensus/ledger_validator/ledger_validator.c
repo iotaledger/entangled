@@ -148,10 +148,12 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
     goto done;
   }
 
-  if ((ret = hash243_set_add(analyzed_hashes, genesis_hash)) != RC_OK) {
+  if ((ret = hash243_set_add(analyzed_hashes, lv->defs->genesis_hash)) !=
+      RC_OK) {
     goto done;
   }
-  if ((ret = hash243_set_add(&counted_hashes, genesis_hash)) != RC_OK) {
+  if ((ret = hash243_set_add(&counted_hashes, lv->defs->genesis_hash)) !=
+      RC_OK) {
     goto done;
   }
 
@@ -225,13 +227,14 @@ done:
  * Public functions
  */
 
-retcode_t iota_consensus_ledger_validator_init(ledger_validator_t *const lv,
-                                               tangle_t *const tangle,
-                                               milestone_tracker_t *const mt,
-                                               requester_state_t *const tr) {
+retcode_t iota_consensus_ledger_validator_init(
+    ledger_validator_t *const lv, iota_consensus_defs_t *const defs,
+    tangle_t *const tangle, milestone_tracker_t *const mt,
+    requester_state_t *const tr) {
   retcode_t ret = RC_OK;
 
   logger_helper_init(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
+  lv->defs = defs;
   lv->tangle = tangle;
   lv->milestone_tracker = mt;
   lv->transaction_requester = tr;

@@ -23,7 +23,8 @@ static bool has_invalid_timestamp(transaction_validator_t* const tv,
       current_timestamp_ms() + MAX_TIMESTAMP_FUTURE_MS;
   if (transaction->attachment_timestamp == 0) {
     return (transaction->timestamp * 1000 < tv->snapshot_timestamp_ms &&
-            memcmp(genesis_hash, transaction->hash, FLEX_TRIT_SIZE_243)) ||
+            memcmp(tv->defs->genesis_hash, transaction->hash,
+                   FLEX_TRIT_SIZE_243)) ||
            transaction->timestamp * 1000 > max_future_timestamp_ms;
   }
 
@@ -32,9 +33,10 @@ static bool has_invalid_timestamp(transaction_validator_t* const tv,
 }
 
 retcode_t iota_consensus_transaction_validator_init(
-    transaction_validator_t* const tv, uint64_t snapshot_timestamp_ms,
-    uint8_t mwm) {
+    transaction_validator_t* const tv, iota_consensus_defs_t* const defs,
+    uint64_t snapshot_timestamp_ms, uint8_t mwm) {
   logger_helper_init(TRANSACTION_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
+  tv->defs = defs;
   tv->snapshot_timestamp_ms = snapshot_timestamp_ms;
   tv->mwm = mwm;
   return RC_OK;
