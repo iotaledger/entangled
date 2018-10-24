@@ -9,7 +9,6 @@
 #define __GOSSIP_COMPONENTS_REQUESTER_H__
 
 #include <stdbool.h>
-#include <stdlib.h>
 
 #include "common/errors.h"
 #include "utils/containers/hash/hash243_set.h"
