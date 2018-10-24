@@ -594,14 +594,14 @@ void test_serialize_store_transactions(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   store_transactions_req_t* req = store_transactions_req_new();
-  req = store_transactions_req_add(req, TEST_2673_TRYRES_1);
+  store_transactions_req_add_trytes(req, TEST_2673_TRYRES_1);
 
   serializer.vtable.store_transactions_serialize_request(&serializer, req,
                                                          serializer_out);
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
   char_buffer_free(serializer_out);
-  store_transactions_req_free(req);
+  store_transactions_req_free(&req);
 }
 
 void test_serialize_check_consistency(void) {
