@@ -27,7 +27,7 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts,
 
 static retcode_t check_transaction_and_update_solid_state(
     transaction_solidifier_t *const ts, flex_trit_t *const transaction,
-    bool *const solid);
+    bool *const is_new_solid);
 
 static void *spawn_solid_transactions_propagation(void *arg);
 
@@ -109,11 +109,6 @@ static retcode_t propagate_solid_transactions(
       if (is_approver_solid) {
         if ((ret = iota_tangle_transaction_update_solid_state(
                  ts->tangle, curr_approver_hash, true)) != RC_OK) {
-          return ret;
-        }
-
-        if ((ret = add_new_solid_transaction(ts, curr_approver_hash)) !=
-            RC_OK) {
           return ret;
         }
       }
@@ -222,7 +217,6 @@ static retcode_t check_solidity_do_func(tangle_t *const tangle,
     }
   }
 
-  log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID, "In %s, SHOULD BE SOLID\n");
   return RC_OK;
 }
 
@@ -274,10 +268,10 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
 
 static retcode_t check_transaction_and_update_solid_state(
     transaction_solidifier_t *const ts, flex_trit_t *const hash,
-    bool *const solid) {
+    bool *const is_new_solid) {
   retcode_t ret;
 
-  *solid = false;
+  *is_new_solid = false;
 
   DECLARE_PACK_SINGLE_TX(transaction_s, transaction, pack);
   trit_array_t hash_trits = {.trits = hash,
@@ -294,23 +288,25 @@ static retcode_t check_transaction_and_update_solid_state(
   }
 
   if (!transaction->solid) {
-    *solid = true;
+    *is_new_solid = true;
 
-    if ((ret = check_approvee_solid_state(ts, transaction->trunk, solid))) {
-      *solid = false;
+    if ((ret = check_approvee_solid_state(ts, transaction->trunk,
+                                          is_new_solid))) {
+      *is_new_solid = false;
       return ret;
     }
 
-    if (!*solid) {
+    if (!*is_new_solid) {
       return RC_OK;
     }
 
-    if ((ret = check_approvee_solid_state(ts, transaction->branch, solid))) {
-      *solid = false;
+    if ((ret = check_approvee_solid_state(ts, transaction->branch,
+                                          is_new_solid))) {
+      *is_new_solid = false;
       return ret;
     }
 
-    if (*solid) {
+    if (*is_new_solid) {
       if ((ret = iota_tangle_transaction_update_solid_state(
                ts->tangle, transaction->hash, true)) != RC_OK) {
         return ret;
@@ -339,7 +335,9 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts,
     log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
               "No transactions were loaded for the provided tail hash\n");
     *solid = false;
-    return request_transaction(ts->requester, &approvee_trits);
+    return RC_OK;
+    // FIXME (@tsvisabo) CLL assigns pointers rather than copy, hence seg fault
+    // return request_transaction(ts->requester, &approvee_trits);
   }
   if (memcmp(curr_tx_s.hash, genesis_hash, FLEX_TRIT_SIZE_243) == 0) {
     *solid = true;
@@ -352,20 +350,21 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts,
 retcode_t iota_consensus_transaction_solidifier_check_and_update_solid_state(
     transaction_solidifier_t *const ts, flex_trit_t *const hash) {
   retcode_t ret;
-  bool solid;
+  bool is_new_solid;
 
   if (ts->requester == NULL) {
     return RC_OK;
   }
 
-  if ((ret = check_transaction_and_update_solid_state(ts, hash, &solid))) {
+  if ((ret =
+           check_transaction_and_update_solid_state(ts, hash, &is_new_solid))) {
     log_debug(TRANSACTION_SOLIDIFIER_LOGGER_ID,
               "In %s, failed check_transaction_and_update_solid_state\n",
               __FUNCTION__);
     return ret;
   }
 
-  if (solid) {
+  if (is_new_solid) {
     return add_new_solid_transaction(ts, hash);
   }
   return RC_OK;
