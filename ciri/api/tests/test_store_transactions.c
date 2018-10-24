@@ -47,7 +47,7 @@ void test_store_transactions_invalid_tx(void) {
                              .num_bytes = FLEX_TRIT_SIZE_243,
                              .dynamic = 0};
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
-  tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION];
+  tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
 
   // Trying to store an invalid transaction (invalid supply)
 
@@ -61,6 +61,7 @@ void test_store_transactions_invalid_tx(void) {
                        NUM_TRITS_SERIALIZED_TRANSACTION,
                        NUM_TRITS_SERIALIZED_TRANSACTION);
 
+  tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION] = '\0';
   store_transactions_req_add_trytes(req, tx_trytes);
 
   TEST_ASSERT(iota_api_store_transactions(&api, req) == RC_OK);
