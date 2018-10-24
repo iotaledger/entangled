@@ -58,7 +58,11 @@ cc_library(
 cc_library(
     name = "requester_shared",
     hdrs = ["requester.h"],
-    deps = ["//common:errors"],
+    deps = [
+        "//common:errors",
+        "//utils/containers/hash:hash243_set",
+        "//utils/handles:rw_lock",
+    ],
 )
 
 cc_library(
@@ -68,7 +72,6 @@ cc_library(
         ":requester_shared",
         "//consensus/tangle",
         "//utils:logger_helper",
-        "//utils/containers/lists:concurrent_list_trit_array",
     ],
 )
 
