@@ -148,10 +148,10 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
     goto done;
   }
 
-  if ((ret = hash_set_add(analyzed_hashes, genesis_hash)) != RC_OK) {
+  if ((ret = hash243_set_add(analyzed_hashes, genesis_hash)) != RC_OK) {
     goto done;
   }
-  if ((ret = hash_set_add(&counted_hashes, genesis_hash)) != RC_OK) {
+  if ((ret = hash243_set_add(&counted_hashes, genesis_hash)) != RC_OK) {
     goto done;
   }
 
@@ -184,12 +184,12 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
           }
           while (tx_bundle != NULL) {
             if (tx_bundle->value != 0) {
-              if (!hash_set_contains(&counted_hashes, tx_bundle->hash)) {
+              if (!hash243_set_contains(&counted_hashes, tx_bundle->hash)) {
                 if ((ret = state_delta_add_or_sum(state, tx_bundle->address,
                                                   tx_bundle->value)) != RC_OK) {
                   goto done;
                 }
-                if ((ret = hash_set_add(&counted_hashes, tx_bundle->hash)) !=
+                if ((ret = hash243_set_add(&counted_hashes, tx_bundle->hash)) !=
                     RC_OK) {
                   goto done;
                 }
@@ -349,7 +349,7 @@ retcode_t iota_consensus_ledger_validator_check_consistency(
   }
 
 done:
-  hash_set_free(&analyzed_hashes);
+  hash243_set_free(&analyzed_hashes);
   state_delta_destroy(&delta);
   return ret;
 }
@@ -405,7 +405,7 @@ retcode_t iota_consensus_ledger_validator_update_delta(
       log_error(LEDGER_VALIDATOR_LOGGER_ID, "Merging patch failed\n");
       goto done;
     }
-    if ((ret = hash_set_append(&visited_hashes, analyzed_hashes)) != RC_OK) {
+    if ((ret = hash243_set_append(&visited_hashes, analyzed_hashes)) != RC_OK) {
       goto done;
     }
     *is_consistent = true;
@@ -414,6 +414,6 @@ retcode_t iota_consensus_ledger_validator_update_delta(
 done:
   state_delta_destroy(&tip_state);
   state_delta_destroy(&patch);
-  hash_set_free(&visited_hashes);
+  hash243_set_free(&visited_hashes);
   return ret;
 }

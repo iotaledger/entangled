@@ -42,7 +42,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
     bool *const has_snapshot);
 
 retcode_t iota_consensus_ledger_validator_check_consistency(
-    ledger_validator_t *const const lv, hash243_stack_t const hashes,
+    ledger_validator_t const *const lv, hash243_stack_t const hashes,
     bool *const is_consistent);
 
 retcode_t iota_consensus_ledger_validator_update_delta(
