@@ -30,6 +30,8 @@ typedef retcode_t (*hash{SIZE}_on_container_func)(void *container,
 uint32_t hash{SIZE}_set_size(hash{SIZE}_set_t const *const set);
 retcode_t hash{SIZE}_set_add(hash{SIZE}_set_t *const set,
                             flex_trit_t const *const hash);
+retcode_t hash{SIZE}_set_remove(hash{SIZE}_set_t *const set,
+                                flex_trit_t const *const hash);
 retcode_t hash{SIZE}_set_append(hash{SIZE}_set_t const *const set1,
                                hash{SIZE}_set_t *const set2);
 bool hash{SIZE}_set_contains(hash{SIZE}_set_t const *const set,

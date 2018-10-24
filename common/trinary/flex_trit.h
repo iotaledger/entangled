@@ -158,6 +158,8 @@ static inline uint8_t flex_trits_set_at(flex_trit_t *const flex_trits,
   return 1;
 }
 
+bool flex_trits_is_null(flex_trit_t const *const flex_trits, size_t const len);
+
 /// Returns a portion of length num_trits of an array into a new array from
 /// start. The original array will not be modified.
 /// @param[in] to_flex_trits - the array that will contain the slice

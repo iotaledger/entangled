@@ -102,7 +102,8 @@ retcode_t requester_clear_request(requester_state_t *const state,
   }
 
   rw_lock_handle_wrlock(&state->lock);
-  // TODO REMOVE
+  hash243_set_remove(&state->milestones, hash);
+  hash243_set_remove(&state->transactions, hash);
   rw_lock_handle_unlock(&state->lock);
 
   return RC_OK;
@@ -122,7 +123,10 @@ retcode_t request_transaction(requester_state_t *const state,
     return RC_REQUESTER_COMPONENT_NULL_STATE;
   }
 
-  //  TODO CHECK NULL HASH
+  if (!flex_trits_is_null(hash, FLEX_TRIT_SIZE_243)) {
+    return RC_OK;
+  }
+
   if ((ret = iota_tangle_transaction_exist(
            state->tangle, TRANSACTION_FIELD_HASH, &key, &exists)) != RC_OK) {
     return ret;
@@ -134,7 +138,7 @@ retcode_t request_transaction(requester_state_t *const state,
   rw_lock_handle_wrlock(&state->lock);
 
   if (is_milestone) {
-    // TODO remove hash from transactions set
+    hash243_set_remove(&state->transactions, hash);
     if ((ret = hash243_set_add(&state->milestones, hash)) != RC_OK) {
       goto done;
     }
@@ -182,16 +186,20 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
       goto done;
     }
     if (exists) {
-      // TODO REMOVE
+      hash243_set_remove(&request_set, hash);
     } else {
       break;
     }
   }
+
   if (hash243_set_size(&request_set) == 0) {
     memset(hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   } else {
     memcpy(hash, iter->hash, FLEX_TRIT_SIZE_243);
   }
+
+  // TODO randomly drop "non-milestone" transactions so we don't keep on asking
+  // for non-existent transactions forever
 
 done:
   rw_lock_handle_unlock(&state->lock);
