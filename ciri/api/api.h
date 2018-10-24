@@ -13,18 +13,25 @@
 
 #include "cclient/serialization/serializer.h"
 #include "common/errors.h"
+#include "consensus/tangle/tangle.h"
 #include "utils/handles/thread.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+typedef struct iota_api_limits_s {
+  size_t max_get_trytes;
+} iota_api_limits_t;
+
 typedef struct iota_api_s {
   thread_handle_t thread;
   bool running;
   uint16_t port;
+  tangle_t *tangle;
   serializer_t serializer;
   serializer_type_t serializer_type;
+  iota_api_limits_t limits;
 } iota_api_t;
 
 /**
@@ -36,8 +43,9 @@ typedef struct iota_api_s {
  *
  * @return a status code
  */
-retcode_t iota_api_init(iota_api_t *const api, uint16_t port,
-                        serializer_type_t serializer_type);
+retcode_t iota_api_init(iota_api_t *const api, uint16_t const port,
+                        tangle_t *const tangle,
+                        serializer_type_t const serializer_type);
 
 /**
  * Starts an API
@@ -75,7 +83,8 @@ retcode_t iota_api_remove_neighbors(remove_neighbors_req_t const *const req,
 retcode_t iota_api_get_tips(get_tips_res_t *const res);
 retcode_t iota_api_find_transactions(find_transactions_req_t const *const req,
                                      find_transactions_res_t *const res);
-retcode_t iota_api_get_trytes(get_trytes_req_t const *const req,
+retcode_t iota_api_get_trytes(iota_api_t const *const api,
+                              get_trytes_req_t const *const req,
                               get_trytes_res_t *const res);
 retcode_t iota_api_get_inclusion_states(
     get_inclusion_state_req_t const *const req,

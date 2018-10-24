@@ -9,6 +9,7 @@ cc_library(
         "//cclient/response:responses",
         "//cclient/serialization:serializer_json",
         "//common:errors",
+        "//consensus/tangle",
         "//utils:logger_helper",
         "//utils/handles:thread",
     ],

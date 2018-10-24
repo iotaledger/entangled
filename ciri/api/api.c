@@ -66,55 +66,6 @@ static iota_api_command_t get_command(char const *const command) {
   return p->value;
 }
 
-static void *iota_api_routine(void *arg) {
-  iota_api_t *api = (iota_api_t *)arg;
-  retcode_t ret = RC_OK;
-
-  while (api->running) {
-    // TODO Get request from client
-    // TODO Parse request
-    switch (get_command("getNeighbors")) {
-      case CMD_GET_NODE_INFO: {
-      } break;
-      case CMD_GET_NEIGHBORS: {
-        get_neighbors_res_t *res = get_neighbors_res_new();
-        iota_api_get_neighbors(res);
-        // TODO serialize response
-        get_neighbors_res_free(res);
-      } break;
-      case CMD_ADD_NEIGHBORS: {
-      } break;
-      case CMD_REMOVE_NEIGHBORS: {
-      } break;
-      case CMD_GET_TIPS: {
-      } break;
-      case CMD_FIND_TRANSACTIONS: {
-      } break;
-      case CMD_GET_TRYTES: {
-      } break;
-      case CMD_GET_INCLUSION_STATES: {
-      } break;
-      case CMD_GET_BALANCES: {
-      } break;
-      case CMD_GET_TRANSACTIONS_TO_APPROVE: {
-      } break;
-      case CMD_ATTACH_TO_TANGLE: {
-      } break;
-      case CMD_INTERRUPT_ATTACHING_TO_TANGLE: {
-      } break;
-      case CMD_BROADCAST_TRANSACTIONS: {
-      } break;
-      case CMD_STORE_TRANSACTIONS: {
-      } break;
-      case CMD_CHECK_CONSISTENCY: {
-      } break;
-      default: { } break; }
-    // TODO Send response back to client
-    sleep(1);
-  }
-  return NULL;
-}
-
 /*
  * Public functions
  */
@@ -144,9 +95,38 @@ retcode_t iota_api_find_transactions(find_transactions_req_t const *const req,
   return RC_OK;
 }
 
-retcode_t iota_api_get_trytes(get_trytes_req_t const *const req,
+retcode_t iota_api_get_trytes(iota_api_t const *const api,
+                              get_trytes_req_t const *const req,
                               get_trytes_res_t *const res) {
-  return RC_OK;
+  retcode_t ret = RC_OK;
+  flex_hash_array_t *iter = NULL;
+  flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
+  tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
+  DECLARE_PACK_SINGLE_TX(tx, txp, pack);
+
+  if (flex_hash_array_count(req->hashes) > api->limits.max_get_trytes) {
+    return RC_API_MAX_GET_TRYTES;
+  }
+  LL_FOREACH(req->hashes, iter) {
+    hash_pack_reset(&pack);
+    // NOTE Concurrency needs to be taken care of
+    if ((ret = iota_tangle_transaction_load(api->tangle, TRANSACTION_FIELD_HASH,
+                                            iter->hash, &pack)) != RC_OK) {
+      return ret;
+    }
+    if (pack.num_loaded != 0) {
+      transaction_serialize_on_flex_trits(txp, tx_trits);
+      flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION,
+                           tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                           NUM_TRITS_SERIALIZED_TRANSACTION);
+    } else {
+      memset(tx_trytes, '9', NUM_TRYTES_SERIALIZED_TRANSACTION);
+    }
+    // TODO Remove when cclient uses hash containers
+    tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION] = '\0';
+    get_trytes_res_add_trytes(res, tx_trytes);
+  }
+  return ret;
 }
 
 retcode_t iota_api_get_inclusion_states(
@@ -188,8 +168,9 @@ retcode_t iota_api_check_consistency(check_consistency_req_t const *const req,
   return RC_OK;
 }
 
-retcode_t iota_api_init(iota_api_t *const api, uint16_t port,
-                        serializer_type_t serializer_type) {
+retcode_t iota_api_init(iota_api_t *const api, uint16_t const port,
+                        tangle_t *const tangle,
+                        serializer_type_t const serializer_type) {
   if (api == NULL) {
     return RC_API_NULL_SELF;
   }
@@ -198,6 +179,7 @@ retcode_t iota_api_init(iota_api_t *const api, uint16_t port,
   memset(api, 0, sizeof(iota_api_t));
   api->running = false;
   api->port = port;
+  api->tangle = tangle;
   api->serializer_type = serializer_type;
   if (api->serializer_type == SR_JSON) {
     init_json_serializer(&api->serializer);
@@ -213,12 +195,6 @@ retcode_t iota_api_start(iota_api_t *const api) {
   }
 
   api->running = true;
-  log_info(API_LOGGER_ID, "Spawning cIRI API thread\n");
-  if (thread_handle_create(&api->thread, (thread_routine_t)iota_api_routine,
-                           api) != 0) {
-    log_critical(API_LOGGER_ID, "Spawning cIRI API thread failed\n");
-    return RC_API_FAILED_THREAD_SPAWN;
-  }
   return RC_OK;
 }
 
@@ -232,12 +208,6 @@ retcode_t iota_api_stop(iota_api_t *const api) {
   }
 
   api->running = false;
-
-  log_info(API_LOGGER_ID, "Shutting down cIRI API thread\n");
-  if (thread_handle_join(api->thread, NULL) != 0) {
-    log_error(API_LOGGER_ID, "Shutting down cIRI API thread failed\n");
-    ret = RC_API_FAILED_THREAD_JOIN;
-  }
   return ret;
 }
 

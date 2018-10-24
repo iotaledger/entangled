@@ -68,11 +68,11 @@ bool iota_consensus_transaction_validate(transaction_validator_t* const tv,
     return false;
   }
 
-  trit_t buffer[NUM_TRITS_FOR_FLEX_TRIT];
-  flex_trits_to_trits(buffer, NUM_TRITS_FOR_FLEX_TRIT,
+  trit_t buffer[NUM_TRITS_PER_FLEX_TRIT];
+  flex_trits_to_trits(buffer, NUM_TRITS_PER_FLEX_TRIT,
                       &transaction->address[FLEX_TRIT_SIZE_243 - 1],
-                      NUM_TRITS_FOR_FLEX_TRIT, NUM_TRITS_FOR_FLEX_TRIT);
-  if (transaction->value != 0 && buffer[NUM_TRITS_FOR_FLEX_TRIT - 1] != 0) {
+                      NUM_TRITS_PER_FLEX_TRIT, NUM_TRITS_PER_FLEX_TRIT);
+  if (transaction->value != 0 && buffer[NUM_TRITS_PER_FLEX_TRIT - 1] != 0) {
     log_error(TRANSACTION_VALIDATOR_LOGGER_ID,
               "Validation failed, Invalid address for value transaction\n");
     return false;

@@ -100,7 +100,7 @@ retcode_t trytes_to_flex_hash(trit_array_p hash, const char* trytes) {
 flex_hash_array_t* flex_hash_array_new() { return NULL; }
 
 flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
-                                          const char* trytes) {
+                                          char const* const trytes) {
   flex_hash_array_t* elt =
       (flex_hash_array_t*)malloc(sizeof(flex_hash_array_t));
 

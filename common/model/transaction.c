@@ -141,8 +141,7 @@ size_t transaction_serialize_to_flex_trits(const iota_transaction_t transaction,
                                            flex_trit_t *trits) {
   flex_trit_t partial[FLEX_TRIT_SIZE_81];
   size_t offset = 0, long_size;
-  size_t num_bytes = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_SERIALIZED_TRANSACTION);
-  memset(trits, FLEX_TRIT_NULL_VALUE, num_bytes);
+  memset(trits, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
 
   flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                     transaction->signature_or_message, NUM_TRITS_SIGNATURE,
@@ -427,16 +426,16 @@ uint8_t transaction_weight_magnitude(const iota_transaction_t transaction) {
   uint8_t pos = FLEX_TRIT_SIZE_243;
 
   while (pos-- > 0 && transaction->hash[pos] == FLEX_TRIT_NULL_VALUE) {
-    num_trailing_null_values += NUM_TRITS_FOR_FLEX_TRIT;
+    num_trailing_null_values += NUM_TRITS_PER_FLEX_TRIT;
   }
 
   if (pos > 0) {
-    trit_t one_trit_buffer[NUM_TRITS_FOR_FLEX_TRIT];
-    flex_trits_to_trits(one_trit_buffer, NUM_TRITS_FOR_FLEX_TRIT,
-                        &transaction->hash[pos], NUM_TRITS_FOR_FLEX_TRIT,
-                        NUM_TRITS_FOR_FLEX_TRIT);
+    trit_t one_trit_buffer[NUM_TRITS_PER_FLEX_TRIT];
+    flex_trits_to_trits(one_trit_buffer, NUM_TRITS_PER_FLEX_TRIT,
+                        &transaction->hash[pos], NUM_TRITS_PER_FLEX_TRIT,
+                        NUM_TRITS_PER_FLEX_TRIT);
 
-    pos = NUM_TRITS_FOR_FLEX_TRIT;
+    pos = NUM_TRITS_PER_FLEX_TRIT;
     while (pos-- > 0 && one_trit_buffer[pos] == 0) {
       ++num_trailing_null_values;
     }

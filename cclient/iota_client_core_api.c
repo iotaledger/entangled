@@ -265,7 +265,7 @@ done:
 
 retcode_t iota_client_get_trytes(const iota_client_service_t* const service,
                                  get_trytes_req_t* const req,
-                                 get_trytes_res_t** res) {
+                                 get_trytes_res_t* res) {
   retcode_t result = RC_OK;
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();

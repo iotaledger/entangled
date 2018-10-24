@@ -93,7 +93,7 @@ void test_transaction_not_a_tail() {
   flex_trit_t transaction_3_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_3_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (tryte_t *)TX_3_OF_4_VALUE_BUNDLE_TRYTES,
+                         TX_3_OF_4_VALUE_BUNDLE_TRYTES,
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
@@ -165,7 +165,7 @@ void test_transaction_below_max_depth() {
 
   iota_transaction_t txs[2];
 
-  tryte_t *trytes[2] = {(tryte_t *)TX_1_OF_2, (tryte_t *)TX_2_OF_2};
+  tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = max_depth - 1;
   build_tangle(&tangle, txs, 2);
@@ -198,7 +198,7 @@ void test_transaction_exceed_max_transactions() {
 
   iota_transaction_t txs[2];
 
-  tryte_t *trytes[2] = {(tryte_t *)TX_1_OF_2, (tryte_t *)TX_2_OF_2};
+  tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = max_depth + 1;
   txs[1]->snapshot_index = max_depth + 1;
@@ -232,7 +232,7 @@ void test_transaction_is_genesis() {
 
   iota_transaction_t txs[2];
 
-  tryte_t *trytes[2] = {(tryte_t *)TX_1_OF_2, (tryte_t *)TX_2_OF_2};
+  tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = 0;
   build_tangle(&tangle, txs, 2);
@@ -264,7 +264,7 @@ void test_transaction_valid() {
 
   iota_transaction_t txs[2];
 
-  tryte_t *trytes[2] = {(tryte_t *)TX_1_OF_2, (tryte_t *)TX_2_OF_2};
+  tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   build_tangle(&tangle, txs, 2);
 

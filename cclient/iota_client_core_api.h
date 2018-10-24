@@ -132,7 +132,7 @@ retcode_t iota_client_find_transactions(
  */
 retcode_t iota_client_get_trytes(const iota_client_service_t* const service,
                                  get_trytes_req_t* const req,
-                                 get_trytes_res_t** res);
+                                 get_trytes_res_t* res);
 
 /**
  * Get the inclusion states of a set of transactions. This is for determining if

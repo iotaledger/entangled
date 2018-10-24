@@ -147,7 +147,7 @@ void test_bundle_exceed_supply_pos_invalid() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
@@ -193,7 +193,7 @@ void test_bundle_exceed_supply_neg_invalid() {
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_1_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
@@ -238,19 +238,18 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invali
 
   iota_transaction_t txs[4];
 
-  tryte_t *trytes[4] = {(tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)TX_2_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)TX_3_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)TX_4_OF_4_VALUE_BUNDLE_TRYTES};
+  tryte_t const *const trytes[4] = {
+      TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+      TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
   transactions_deserialize(trytes, txs, 4);
-  trit_t buffer[NUM_TRITS_FOR_FLEX_TRIT];
-  flex_trits_to_trits(buffer, NUM_TRITS_FOR_FLEX_TRIT,
-                      txs[1]->signature_or_message, NUM_TRITS_FOR_FLEX_TRIT,
-                      NUM_TRITS_FOR_FLEX_TRIT);
-  buffer[NUM_TRITS_FOR_FLEX_TRIT - 1] = 1;
+  trit_t buffer[NUM_TRITS_PER_FLEX_TRIT];
+  flex_trits_to_trits(buffer, NUM_TRITS_PER_FLEX_TRIT,
+                      txs[1]->signature_or_message, NUM_TRITS_PER_FLEX_TRIT,
+                      NUM_TRITS_PER_FLEX_TRIT);
+  buffer[NUM_TRITS_PER_FLEX_TRIT - 1] = 1;
   flex_trits_from_trits(&txs[1]->signature_or_message[FLEX_TRIT_SIZE_243 - 1],
-                        NUM_TRITS_FOR_FLEX_TRIT, buffer,
-                        NUM_TRITS_FOR_FLEX_TRIT, NUM_TRITS_FOR_FLEX_TRIT);
+                        NUM_TRITS_PER_FLEX_TRIT, buffer,
+                        NUM_TRITS_PER_FLEX_TRIT, NUM_TRITS_PER_FLEX_TRIT);
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(tail_hash, txs[0]->hash, NUM_TRITS_HASH);
   build_tangle(&tangle, txs, 4);
@@ -278,10 +277,9 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_valid() {
 
   iota_transaction_t txs[4];
 
-  tryte_t *trytes[4] = {(tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)TX_2_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)TX_3_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)TX_4_OF_4_VALUE_BUNDLE_TRYTES};
+  tryte_t const *const trytes[4] = {
+      TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+      TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
   transactions_deserialize(trytes, txs, 4);
   build_tangle(&tangle, txs, 4);
 

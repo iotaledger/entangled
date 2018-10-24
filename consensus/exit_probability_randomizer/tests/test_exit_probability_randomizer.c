@@ -502,11 +502,10 @@ void test_1_bundle(void) {
 
   iota_transaction_t txs[bundle_size + 1];
 
-  tryte_t *trytes[5] = {(tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)TX_2_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)TX_3_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)TX_4_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)BUNDLE_OF_4_TRUNK_TRANSACTION};
+  tryte_t const *const trytes[5] = {
+      TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+      TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES,
+      BUNDLE_OF_4_TRUNK_TRANSACTION};
   transactions_deserialize(trytes, txs, 5);
   for (size_t i = 0; i < 5; ++i) {
     txs[i]->snapshot_index = 9999999;
@@ -600,12 +599,12 @@ void test_2_chained_bundles(void) {
 
   iota_transaction_t txs[6];
 
-  tryte_t *trytes[6] = {(tryte_t *)TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)TX_2_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)TX_3_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)TX_4_OF_4_VALUE_BUNDLE_TRYTES,
-                        (tryte_t *)TX_1_OF_2,
-                        (tryte_t *)TX_2_OF_2};
+  tryte_t const *const trytes[6] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                                    TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+                                    TX_3_OF_4_VALUE_BUNDLE_TRYTES,
+                                    TX_4_OF_4_VALUE_BUNDLE_TRYTES,
+                                    TX_1_OF_2,
+                                    TX_2_OF_2};
   transactions_deserialize(trytes, txs, 6);
   for (size_t i = 0; i < 6; ++i) {
     txs[i]->snapshot_index = 9999999;
