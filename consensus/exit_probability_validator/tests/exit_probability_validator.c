@@ -48,8 +48,8 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL,
                                  snapshot_conf_path, true) == RC_OK);
   iota_consensus_transaction_solidifier_init(&ts, &tangle, NULL);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, true) ==
-              RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, &ts,
+                                          true) == RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &mt, NULL) ==
               RC_OK);
 
