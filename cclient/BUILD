@@ -13,7 +13,7 @@ cc_library(
         ":service",
         "//cclient/http:beast",
         "//common/helpers:sign",
-        "//utils:hash_containers",
+        "//utils/containers/hash:hash243_queue",
     ],
 )
 

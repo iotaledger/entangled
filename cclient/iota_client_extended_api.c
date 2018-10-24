@@ -37,7 +37,7 @@ static retcode_t is_unused_address(iota_client_service_t const* const serv,
 retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
                                       flex_trit_t const* const seed,
                                       address_opt_t const addr_opt,
-                                      hash_queue_t* out_addresses) {
+                                      hash243_queue_t* out_addresses) {
   retcode_t ret = RC_OK;
   flex_trit_t* tmp = NULL;
   size_t addr_index = 0;
@@ -53,7 +53,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
          addr_index++) {
       tmp = iota_flex_sign_address_gen(seed, addr_index, addr_opt.security);
       if (tmp) {
-        ret = hash_queue_push(out_addresses, tmp);
+        ret = hash243_queue_push(out_addresses, tmp);
         if (ret) {
           return ret;
         }
@@ -66,7 +66,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
     for (addr_index = 0;; addr_index++) {
       tmp = iota_flex_sign_address_gen(seed, addr_index, addr_opt.security);
       if (tmp) {
-        ret = hash_queue_push(out_addresses, tmp);
+        ret = hash243_queue_push(out_addresses, tmp);
         if (ret) {
           return ret;
         }

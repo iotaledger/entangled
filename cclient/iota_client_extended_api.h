@@ -10,7 +10,7 @@
 
 #include "common/helpers/sign.h"
 #include "iota_client_core_api.h"
-#include "utils/hash_containers.h"
+#include "utils/containers/hash/hash243_queue.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -202,7 +202,7 @@ retcode_t iota_client_get_latest_inclusion(
  * @param {trit_array_p} seed - At least 81 trytes long seed
  * @param {address_opt_t} addr_opt - address options: Starting key index,
  * Security level, Ending Key index.
- * @param {hash_queue_t} out_addresses - New (unused) address or list of
+ * @param {hash243_queue_t} out_addresses - New (unused) address or list of
  * addresses up to (and including) first unused address.
  *
  * @returns {retcode_t}
@@ -214,7 +214,7 @@ retcode_t iota_client_get_latest_inclusion(
 retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
                                       flex_trit_t const* const seed,
                                       address_opt_t const addr_opt,
-                                      hash_queue_t* out_addresses);
+                                      hash243_queue_t* out_addresses);
 
 /**
  * Fetches the transaction objects, given an array of transaction hashes.
