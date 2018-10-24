@@ -9,7 +9,7 @@
 
 static retcode_t is_unused_address(iota_client_service_t const* const serv,
                                    flex_trit_t const* const addr,
-                                   bool* const isUnused) {
+                                   bool* const is_unused) {
   retcode_t ret_code = RC_OK;
   size_t ret_num = 0;
   tryte_t trytes_addr[NUM_TRYTES_ADDRESS];
@@ -29,7 +29,7 @@ static retcode_t is_unused_address(iota_client_service_t const* const serv,
         find_transactions_req_add_address(find_tran, (char*)trytes_addr);
     ret_code = iota_client_find_transactions(serv, find_tran, res);
     ret_num = find_transactions_res_hash_num(res);
-    *isUnused = ret_num ? false : true;
+    *is_unused = ret_num ? false : true;
   }
   return ret_code;
 }
@@ -41,7 +41,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
   retcode_t ret = RC_OK;
   flex_trit_t* tmp = NULL;
   size_t addr_index = 0;
-  bool isUnused = true;
+  bool is_unused = true;
 
   // security validation
   if (addr_opt.security <= 0 || addr_opt.security > 3) {
@@ -70,8 +70,8 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
         if (ret) {
           return ret;
         }
-        ret = is_unused_address(serv, tmp, &isUnused);
-        if (ret || isUnused) {
+        ret = is_unused_address(serv, tmp, &is_unused);
+        if (ret || is_unused) {
           return ret;
         }
       } else {
