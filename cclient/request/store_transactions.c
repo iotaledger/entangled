@@ -17,11 +17,17 @@ store_transactions_req_t* store_transactions_req_new() {
 }
 
 void store_transactions_req_free(store_transactions_req_t** const req) {
-  if (req) {
-    flex_hash_array_free((*req)->trytes);
-    free(*req);
-    *req = NULL;
+  if (!req || !(*req)) {
+    return;
   }
+
+  store_transactions_req_t* tmp = *req;
+
+  if (tmp->trytes) {
+    flex_hash_array_free(tmp->trytes);
+  }
+  free(tmp);
+  *req = NULL;
 }
 
 store_transactions_req_t* store_transactions_req_add_trytes(

@@ -35,6 +35,7 @@ void test_store_transactions_empty(void) {
   TEST_ASSERT(iota_api_store_transactions(&api, req) == RC_OK);
 
   store_transactions_req_free(&req);
+  TEST_ASSERT(req == NULL);
 }
 
 void test_store_transactions_invalid_tx(void) {
@@ -73,6 +74,7 @@ void test_store_transactions_invalid_tx(void) {
   TEST_ASSERT(pack.num_loaded == 0);
 
   store_transactions_req_free(&req);
+  TEST_ASSERT(req == NULL);
 }
 
 void test_store_transactions(void) {
@@ -116,6 +118,7 @@ void test_store_transactions(void) {
   }
 
   store_transactions_req_free(&req);
+  TEST_ASSERT(req == NULL);
 }
 
 int main(void) {

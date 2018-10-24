@@ -178,6 +178,7 @@ retcode_t iota_api_store_transactions(
         return ret;
       }
       if (!exists) {
+        // NOTE Concurrency needs to be taken care of
         if ((ret = iota_tangle_transaction_store(api->tangle, &tx)) != RC_OK) {
           return ret;
         }
