@@ -67,7 +67,7 @@ static void *spawn_solid_transactions_propagation(void *arg) {
 static retcode_t propagate_solid_transactions(
     transaction_solidifier_t *const ts) {
   retcode_t ret;
-  hash243_set_t transactions_to_propagate;
+  hash243_set_t transactions_to_propagate = NULL;
   lock_handle_lock(&ts->lock);
   if ((ret = hash243_set_for_each(&ts->newly_set_solid_transactions,
                                   hash243_set_add,
