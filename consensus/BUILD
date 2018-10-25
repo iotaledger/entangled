@@ -15,6 +15,7 @@ cc_library(
         "//consensus/snapshot",
         "//consensus/tangle",
         "//consensus/tip_selector",
+        "//consensus/transaction_solidifier",
         "//consensus/transaction_validator",
     ],
 )

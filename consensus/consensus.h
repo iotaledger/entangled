@@ -19,6 +19,7 @@
 #include "consensus/snapshot/snapshot.h"
 #include "consensus/tangle/tangle.h"
 #include "consensus/tip_selector/tip_selector.h"
+#include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "consensus/transaction_validator/transaction_validator.h"
 
 typedef struct iota_consensus_s {
@@ -32,6 +33,7 @@ typedef struct iota_consensus_s {
   tangle_t tangle;
   tip_selector_t tip_selector;
   transaction_validator_t transaction_validator;
+  transaction_solidifier_t transaction_solidifier;
 } iota_consensus_t;
 
 #ifdef __cplusplus

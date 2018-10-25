@@ -22,7 +22,7 @@ char *iota_statement_transaction_insert =
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_UPPER
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_LOWER "," TRANSACTION_COL_NONCE
     "," TRANSACTION_COL_HASH "," TRANSACTION_COL_SNAPSHOT_INDEX
-    ")VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    "," TRANSACTION_COL_SOLID ")VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 char *iota_statement_transaction_select_by_hash =
     "SELECT * FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
@@ -37,6 +37,10 @@ char *iota_statement_transaction_select_hashes_of_approvers =
 
 char *iota_statement_transaction_update_snapshot_index =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SNAPSHOT_INDEX
+    "=? WHERE " TRANSACTION_COL_HASH "=?";
+
+char *iota_statement_transaction_update_solid_state =
+    "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SOLID
     "=? WHERE " TRANSACTION_COL_HASH "=?";
 
 char *iota_statement_transaction_exist =

@@ -8,7 +8,7 @@ cc_library(
         "//common/trinary:trit_array",
         "//consensus:model",
         "//consensus/tangle",
-        "//utils:hash_containers",
+        "//utils:hash_maps",
         "//utils:logger_helper",
         "//utils/containers:bitset",
         "//utils/containers/hash:hash243_stack",

@@ -5,7 +5,7 @@ cc_library(
     deps = [
         "//common:errors",
         "//consensus/snapshot",
-        "//utils:hash_containers",
+        "//utils:hash_maps",
     ],
 )
 
@@ -19,8 +19,9 @@ cc_library(
         "//consensus/milestone_tracker:milestone_tracker_shared",
         "//consensus/snapshot",
         "//consensus/tangle",
+        "//consensus/utils:tangle_traversals",
         "//gossip/components:requester",
-        "//utils:hash_containers",
+        "//utils:hash_maps",
         "//utils/containers/hash:hash243_stack",
     ],
 )

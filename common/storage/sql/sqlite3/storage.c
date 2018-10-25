@@ -161,7 +161,6 @@ static retcode_t execute_statement_load_hashes(
 static retcode_t execute_statement_store_update(
     sqlite3_stmt* const sqlite_statement) {
   int rc = sqlite3_step(sqlite_statement);
-
   if (rc != SQLITE_OK && rc != SQLITE_DONE) {
     log_error(SQLITE3_LOGGER_ID, "Step failed with sqlite3 code: %" PRIu64 "\n",
               rc);
@@ -171,8 +170,8 @@ static retcode_t execute_statement_store_update(
   return RC_OK;
 }
 
-static retcode_t execute_statement_exist(sqlite3_stmt* const sqlite_statement,
-                                         bool* const exist) {
+static retcode_t execute_statement_exist(sqlite3_stmt* sqlite_statement,
+                                         bool* exist) {
   int rc = sqlite3_step(sqlite_statement);
   *exist = false;
 
@@ -217,6 +216,7 @@ static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
   column_decompress_load(statement, 14, tx->nonce, FLEX_TRIT_SIZE_81);
   column_decompress_load(statement, 15, tx->hash, FLEX_TRIT_SIZE_243);
   tx->snapshot_index = sqlite3_column_int64(statement, 16);
+  tx->solid = sqlite3_column_int(statement, 17);
 }
 
 retcode_t iota_stor_transaction_store(connection_t const* const conn,
@@ -258,7 +258,8 @@ retcode_t iota_stor_transaction_store(connection_t const* const conn,
       column_compress_bind(sqlite_statement, 16, tx->hash,
                            FLEX_TRIT_SIZE_243) != RC_OK ||
       sqlite3_bind_int64(sqlite_statement, 17, tx->snapshot_index) !=
-          SQLITE_OK) {
+          SQLITE_OK ||
+      sqlite3_bind_int(sqlite_statement, 18, tx->solid) != SQLITE_OK) {
     ret = binding_error();
     goto done;
   }
@@ -368,6 +369,33 @@ retcode_t iota_stor_transaction_load_hashes_of_approvers(
   }
 
   if ((ret = execute_statement_load_hashes(sqlite_statement, pack)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  finalize_statement(sqlite_statement);
+  return ret;
+}
+
+retcode_t iota_stor_transaction_update_solid_state(
+    const connection_t* const conn, flex_trit_t* const hash, bool is_solid) {
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = NULL;
+
+  if ((ret = prepare_statement(
+           (sqlite3*)conn->db, &sqlite_statement,
+           iota_statement_transaction_update_solid_state)) != RC_OK) {
+    goto done;
+  }
+
+  if (sqlite3_bind_int(sqlite_statement, 1, (int)is_solid) != SQLITE_OK ||
+      column_compress_bind(sqlite_statement, 2, hash, FLEX_TRIT_SIZE_243) !=
+          RC_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
+  if ((ret = execute_statement_store_update(sqlite_statement)) != RC_OK) {
     goto done;
   }
 

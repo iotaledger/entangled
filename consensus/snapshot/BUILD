@@ -44,6 +44,6 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/trinary:flex_trit",
-        "//utils:hash_containers",
+        "//utils:hash_maps",
     ],
 )

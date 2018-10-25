@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS iota_transaction (
   attachment_timestamp_upper TIMESTAMP NOT NULL,
   nonce BLOB NOT NULL,
   hash BLOB NOT NULL PRIMARY KEY,
-  snapshot_index INTEGER NOT NULL
+  snapshot_index INTEGER NOT NULL,
+  solid SMALLINT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS iota_milestone (

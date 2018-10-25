@@ -12,12 +12,12 @@
 #include <stdint.h>
 #include "common/errors.h"
 
+#include "../../utils/hash_maps.h"
 #include "common/storage/connection.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
-#include "utils/hash_containers.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -20,6 +20,7 @@
 #include "consensus/tangle/tangle.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
+#include "consensus/transaction_solidifier/transaction_solidifier.h"
 
 static tangle_t tangle;
 static connection_config_t config;
@@ -41,12 +42,14 @@ static exit_prob_transaction_validator_t epv;
 static snapshot_t snapshot;
 static milestone_tracker_t mt;
 static ledger_validator_t lv;
+static transaction_solidifier_t ts;
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
   TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL,
                                  snapshot_conf_path, true) == RC_OK);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, true) ==
-              RC_OK);
+  iota_consensus_transaction_solidifier_init(&ts, &tangle, NULL);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, &ts,
+                                          true) == RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &mt, NULL) ==
               RC_OK);
 
@@ -62,6 +65,7 @@ static void destroy_epv(exit_prob_transaction_validator_t *epv) {
   iota_consensus_ledger_validator_destroy(epv->lv);
   iota_snapshot_destroy(&snapshot);
   iota_milestone_tracker_destroy(&mt);
+  iota_consensus_transaction_solidifier_destroy(&ts);
   iota_consensus_exit_prob_transaction_validator_destroy(epv);
 }
 

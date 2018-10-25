@@ -51,7 +51,8 @@ static retcode_t load_bundle_transactions(tangle_t const* const tangle,
                                        &curr_tx_trunk, &pack);
     if (res != RC_OK || pack.num_loaded == 0) {
       log_error(BUNDLE_VALIDATOR_LOGGER_ID,
-                "No transactions were loaded for the provided tail hash\n");
+                "Failed in %s, could not load next transaction\n",
+                __FUNCTION__);
       return res;
     }
   }
