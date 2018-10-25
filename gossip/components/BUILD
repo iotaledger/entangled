@@ -56,9 +56,9 @@ cc_library(
 )
 
 cc_library(
-    name = "requester",
-    srcs = ["requester.c"],
-    hdrs = ["requester.h"],
+    name = "transaction_requester",
+    srcs = ["transaction_requester.c"],
+    hdrs = ["transaction_requester.h"],
     deps = [
         "//common:errors",
         "//consensus/tangle",

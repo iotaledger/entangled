@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __GOSSIP_COMPONENTS_REQUESTER_H__
-#define __GOSSIP_COMPONENTS_REQUESTER_H__
+#ifndef __GOSSIP_COMPONENTS_TRANSACTION_REQUESTER_H__
+#define __GOSSIP_COMPONENTS_TRANSACTION_REQUESTER_H__
 
 #include <stdbool.h>
 
@@ -117,4 +117,4 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
 }
 #endif
 
-#endif  //__GOSSIP_COMPONENTS_REQUESTER_H__
+#endif  //__GOSSIP_COMPONENTS_TRANSACTION_REQUESTER_H__

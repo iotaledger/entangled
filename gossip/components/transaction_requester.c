@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "gossip/components/requester.h"
+#include "gossip/components/transaction_requester.h"
 #include "common/storage/sql/defs.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/logger_helper.h"

@@ -38,8 +38,8 @@ cc_library(
         "//gossip/components:broadcaster_shared",
         "//gossip/components:processor_shared",
         "//gossip/components:receiver_shared",
-        "//gossip/components:requester",
         "//gossip/components:responder_shared",
+        "//gossip/components:transaction_requester",
     ],
 )
 
