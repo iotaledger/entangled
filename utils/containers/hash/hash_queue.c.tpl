@@ -34,6 +34,9 @@ void hash{SIZE}_queue_pop(hash{SIZE}_queue_t *const queue) {
 }
 
 flex_trit_t *hash{SIZE}_queue_peek(hash{SIZE}_queue_t const queue) {
+  if (queue == NULL) {
+    return NULL;
+  }
   return (flex_trit_t *)(queue->hash);
 }
 
