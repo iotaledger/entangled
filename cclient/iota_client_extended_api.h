@@ -33,14 +33,14 @@ typedef struct {
 } input_t;
 
 typedef struct {
-  int64_t total_balance;
-  flex_hash_array_t input;
+  size_t total_balance;
+  hash243_queue_t addresses;
 } inputs_t;
 
 typedef struct {
   int64_t balance;
   trit_array_p latest_address;
-  address_list_t addresses;
+  hash243_queue_t addresses;
   inputs_list_t inputs;
   transfer_list_t transfers;
   transaction_list_t transactions;
@@ -170,9 +170,10 @@ retcode_t iota_client_get_bundle(iota_client_service_t const* const serv,
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetInputs.ts#L70
  */
 retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
-                                 trit_array_p const seed,
+                                 flex_trit_t const* const seed,
                                  address_opt_t const addr_opt,
-                                 int32_t threshold, inputs_t out_input);
+                                 size_t const threshold,
+                                 inputs_t* const out_input);
 
 /**
  * Fetches inclusion states of given transactions and a list of tips,

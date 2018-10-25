@@ -11,29 +11,24 @@ get_balances_req_t* get_balances_req_new() {
   get_balances_req_t* req =
       (get_balances_req_t*)malloc(sizeof(get_balances_req_t));
   if (req) {
-    req->addresses = flex_hash_array_new();
-    req->tips = flex_hash_array_new();
+    req->addresses = NULL;
+    req->tips = NULL;
   }
   return req;
 }
 
 void get_balances_req_free(get_balances_req_t** req) {
-  if (req) {
-    flex_hash_array_free((*req)->addresses);
-    flex_hash_array_free((*req)->tips);
-    free(*req);
-    *req = NULL;
+  if (!req || !(*req)) {
+    return;
   }
-}
 
-get_balances_req_t* get_balances_req_add_address(get_balances_req_t* req,
-                                                 char* addr) {
-  req->addresses = flex_hash_array_append(req->addresses, addr);
-  return req;
-}
+  if ((*req)->addresses) {
+    hash243_queue_free(&(*req)->addresses);
+  }
+  if ((*req)->tips) {
+    hash243_queue_free(&(*req)->tips);
+  }
 
-get_balances_req_t* get_balances_req_add_tips(get_balances_req_t* req,
-                                              char* tip) {
-  req->tips = flex_hash_array_append(req->tips, tip);
-  return req;
+  free(*req);
+  *req = NULL;
 }

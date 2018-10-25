@@ -30,8 +30,9 @@ void init_json_serializer(serializer_t* serializer) {
   serializer->vtable = json_vtable;
 }
 
-retcode_t json_array_to_utarray(const cJSON* obj, const char* obj_name,
-                                UT_array* ut) {
+static retcode_t json_array_to_utarray(cJSON const* const obj,
+                                       char const* const obj_name,
+                                       UT_array* ut) {
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
     cJSON* current_obj = NULL;
@@ -48,8 +49,9 @@ retcode_t json_array_to_utarray(const cJSON* obj, const char* obj_name,
   return RC_OK;
 }
 
-retcode_t utarray_to_json_array(const UT_array* ut, cJSON* json_root,
-                                const char* obj_name) {
+static retcode_t utarray_to_json_array(UT_array const* const ut,
+                                       cJSON* const json_root,
+                                       char const* const obj_name) {
   if (utarray_len(ut) > 0) {
     cJSON* array_obj = cJSON_CreateArray();
     if (array_obj == NULL) {
@@ -67,9 +69,9 @@ retcode_t utarray_to_json_array(const UT_array* ut, cJSON* json_root,
   return RC_OK;
 }
 
-flex_hash_array_t* json_array_to_flex_hash_array(const cJSON* obj,
-                                                 const char* obj_name,
-                                                 flex_hash_array_t* head) {
+static flex_hash_array_t* json_array_to_flex_hash_array(
+    cJSON const* const obj, char const* const obj_name,
+    flex_hash_array_t* head) {
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
     cJSON* current_obj = NULL;
@@ -87,9 +89,9 @@ flex_hash_array_t* json_array_to_flex_hash_array(const cJSON* obj,
   return head;
 }
 
-retcode_t flex_hash_array_to_json_array(flex_hash_array_t* head,
-                                        cJSON* json_root,
-                                        const char* obj_name) {
+static retcode_t flex_hash_array_to_json_array(flex_hash_array_t* const head,
+                                               cJSON* const json_root,
+                                               char const* const obj_name) {
   flex_hash_array_t* elt;
   int array_count;
   cJSON* array_obj = NULL;
@@ -120,8 +122,9 @@ retcode_t flex_hash_array_to_json_array(flex_hash_array_t* head,
   return RC_OK;
 }
 
-retcode_t flex_hash_to_json_string(cJSON* json_obj, const char* key,
-                                   const trit_array_p hash) {
+static retcode_t flex_hash_to_json_string(cJSON* const json_obj,
+                                          char const* const key,
+                                          trit_array_p const hash) {
   // flex to trytes;
   size_t len_trytes = hash->num_trits / 3;
   trit_t trytes_out[len_trytes + 1];
@@ -138,8 +141,9 @@ retcode_t flex_hash_to_json_string(cJSON* json_obj, const char* key,
   return RC_OK;
 }
 
-retcode_t json_string_to_flex_hash(const cJSON* json_obj, const char* key,
-                                   trit_array_p hash) {
+static retcode_t json_string_to_flex_hash(cJSON const* const json_obj,
+                                          char const* const key,
+                                          trit_array_p const hash) {
   retcode_t ret = RC_OK;
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, key);
   if (json_value == NULL) {
@@ -160,8 +164,9 @@ retcode_t json_string_to_flex_hash(const cJSON* json_obj, const char* key,
   return ret;
 }
 
-retcode_t json_boolean_array_to_utarray(const cJSON* obj, const char* obj_name,
-                                        UT_array* ut) {
+static retcode_t json_boolean_array_to_utarray(cJSON const* const obj,
+                                               char const* const obj_name,
+                                               UT_array* const ut) {
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
     cJSON* current_obj = NULL;
@@ -178,8 +183,8 @@ retcode_t json_boolean_array_to_utarray(const cJSON* obj, const char* obj_name,
   return RC_OK;
 }
 
-retcode_t json_get_size(const cJSON* json_obj, const char* obj_name,
-                        size_t* num) {
+static retcode_t json_get_size(cJSON const* const json_obj,
+                               char const* const obj_name, size_t* const num) {
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
   if (json_value == NULL) {
     log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
@@ -198,7 +203,8 @@ retcode_t json_get_size(const cJSON* json_obj, const char* obj_name,
   return RC_OK;
 }
 
-retcode_t json_get_int(const cJSON* json_obj, const char* obj_name, int* num) {
+static retcode_t json_get_int(cJSON const* const json_obj,
+                              char const* const obj_name, int* const num) {
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
   if (json_value == NULL) {
     log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
@@ -217,8 +223,9 @@ retcode_t json_get_int(const cJSON* json_obj, const char* obj_name, int* num) {
   return RC_OK;
 }
 
-retcode_t json_get_string(cJSON* json_obj, char* obj_name,
-                          char_buffer_t* text) {
+static retcode_t json_get_string(cJSON const* const json_obj,
+                                 char const* const obj_name,
+                                 char_buffer_t* const text) {
   retcode_t ret = RC_OK;
   size_t str_len = 0;
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
@@ -245,6 +252,64 @@ retcode_t json_get_string(cJSON* json_obj, char* obj_name,
   }
 
   return ret;
+}
+
+static retcode_t hash243_queue_to_json_array(hash243_queue_t queue,
+                                             cJSON* const json_root,
+                                             char const* const obj_name) {
+  size_t array_count;
+  cJSON* array_obj = NULL;
+
+  array_count = hash243_queue_count(&queue);
+  if (array_count > 0) {
+    array_obj = cJSON_CreateArray();
+    if (array_obj == NULL) {
+      return RC_CCLIENT_JSON_CREATE;
+    }
+    cJSON_AddItemToObject(json_root, obj_name, array_obj);
+
+    for (int i = 0; i < array_count; i++) {
+      size_t len_trytes = NUM_TRITS_HASH / 3;
+      trit_t trytes_out[len_trytes + 1];
+      flex_trit_t* elm = hash243_queue_at(&queue, i);
+      size_t trits_count = flex_trits_to_trytes(trytes_out, len_trytes, elm,
+                                                NUM_TRITS_HASH, NUM_TRITS_HASH);
+      trytes_out[len_trytes] = '\0';
+      if (trits_count != 0) {
+        cJSON_AddItemToArray(array_obj,
+                             cJSON_CreateString((const char*)trytes_out));
+      } else {
+        return RC_CCLIENT_FLEX_TRITS;
+      }
+    }
+  }
+  return RC_OK;
+}
+
+static retcode_t json_array_to_hash243_queue(cJSON const* const obj,
+                                             char const* const obj_name,
+                                             hash243_queue_t* queue) {
+  retcode_t ret_code = RC_OK;
+  cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
+  if (cJSON_IsArray(json_item)) {
+    cJSON* current_obj = NULL;
+    cJSON_ArrayForEach(current_obj, json_item) {
+      if (current_obj->valuestring != NULL) {
+        trit_array_p tmp_ref =
+            trit_array_new_from_trytes((tryte_t*)current_obj->valuestring);
+        ret_code = hash243_queue_push(queue, tmp_ref->trits);
+        trit_array_free(tmp_ref);
+        if (ret_code) {
+          return ret_code;
+        }
+      }
+    }
+  } else {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_PARSE);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+  return ret_code;
 }
 
 retcode_t json_find_transactions_serialize_request(
@@ -350,7 +415,7 @@ retcode_t json_get_balances_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("getBalances"));
 
-  ret = flex_hash_array_to_json_array(obj->addresses, json_root, "addresses");
+  ret = hash243_queue_to_json_array(obj->addresses, json_root, "addresses");
   if (ret != RC_OK) {
     goto err;
   }
@@ -358,7 +423,7 @@ retcode_t json_get_balances_serialize_request(
   cJSON_AddItemToObject(json_root, "threshold",
                         cJSON_CreateNumber(obj->threshold));
 
-  ret = flex_hash_array_to_json_array(obj->tips, json_root, "tips");
+  ret = hash243_queue_to_json_array(obj->tips, json_root, "tips");
   if (ret != RC_OK) {
     goto err;
   }
@@ -380,9 +445,9 @@ err:
   return ret;
 }
 
-retcode_t json_get_balances_deserialize_response(const serializer_t* const s,
-                                                 const char* const obj,
-                                                 get_balances_res_t** out) {
+retcode_t json_get_balances_deserialize_response(serializer_t const* const s,
+                                                 char const* const obj,
+                                                 get_balances_res_t* out) {
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
@@ -403,18 +468,17 @@ retcode_t json_get_balances_deserialize_response(const serializer_t* const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_array_to_utarray(json_obj, "balances", (*out)->balances);
-  if (ret != RC_OK) {
+  ret = json_array_to_utarray(json_obj, "balances", out->balances);
+  if (ret) {
     goto end;
   }
 
-  (*out)->milestone =
-      json_array_to_flex_hash_array(json_obj, "references", (*out)->milestone);
-  if (ret != RC_OK) {
+  ret = json_array_to_hash243_queue(json_obj, "references", &out->milestone);
+  if (ret) {
     goto end;
   }
 
-  ret = json_get_int(json_obj, "milestoneIndex", &(*out)->milestoneIndex);
+  ret = json_get_int(json_obj, "milestoneIndex", &out->milestoneIndex);
   if (ret != RC_OK) {
     goto end;
   }

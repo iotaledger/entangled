@@ -35,9 +35,9 @@ retcode_t json_get_balances_serialize_request(
     const serializer_t* const, const get_balances_req_t* const obj,
     char_buffer_t* out);
 
-retcode_t json_get_balances_deserialize_response(const serializer_t* const,
-                                                 const char* const obj,
-                                                 get_balances_res_t** out);
+retcode_t json_get_balances_deserialize_response(serializer_t const* const,
+                                                 char const* const obj,
+                                                 get_balances_res_t* out);
 
 // get_inclusion_state_response
 retcode_t json_get_inclusion_state_serialize_request(

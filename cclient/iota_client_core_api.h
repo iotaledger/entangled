@@ -171,9 +171,9 @@ retcode_t iota_client_get_inclusion_states(
  *
  * @return error value.
  */
-retcode_t iota_client_get_balances(const iota_client_service_t* const service,
-                                   const get_balances_req_t* const req,
-                                   get_balances_res_t** res);
+retcode_t iota_client_get_balances(iota_client_service_t const* const service,
+                                   get_balances_req_t const* const req,
+                                   get_balances_res_t* res);
 
 /**
  * Tip selection which returns trunkTransaction and branchTransaction. The input

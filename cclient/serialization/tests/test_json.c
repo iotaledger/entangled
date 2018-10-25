@@ -409,6 +409,7 @@ void test_deserialize_get_inclusion_states(void) {
 
 void test_serialize_get_balances(void) {
   serializer_t serializer;
+  retcode_t ret = RC_OK;
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"command\":\"getBalances\",\"addresses\":["
@@ -418,7 +419,15 @@ void test_serialize_get_balances(void) {
 
   char_buffer_t* serializer_out = char_buffer_new();
   get_balances_req_t* get_bal = get_balances_req_new();
-  get_bal = get_balances_req_add_address(get_bal, TEST_81_TRYRES_1);
+
+  TEST_ASSERT_NOT_NULL(serializer_out);
+  TEST_ASSERT_NOT_NULL(get_bal);
+  // trytes to flex_trits
+  trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_1);
+  ret = hash243_queue_push(&get_bal->addresses, hash1->trits);
+  trit_array_free(hash1);
+  TEST_ASSERT(ret == RC_OK);
+
   get_bal->threshold = TEST_BALANCES_SERIALIZE_THRESHOLD;
   serializer.vtable.get_balances_serialize_request(&serializer, get_bal,
                                                    serializer_out);
@@ -441,21 +450,23 @@ void test_deserialize_get_balances(void) {
       "\"], "
       "\"milestoneIndex\":" STR(TEST_BALANCES_MILESTONEINDEX) "}";
 
-  trit_array_p tmp_ref = NULL;
   trit_array_p ref = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_1);
 
   get_balances_res_t* deserialize_get_bal = get_balances_res_new();
   serializer.vtable.get_balances_deserialize_response(&serializer, json_text,
-                                                      &deserialize_get_bal);
+                                                      deserialize_get_bal);
 
   TEST_ASSERT_EQUAL_STRING(TEST_BALANCES_BALANCE, get_balances_res_balances_at(
                                                       deserialize_get_bal, 0));
-  tmp_ref = get_balances_res_milestone_at(deserialize_get_bal, 0);
-  TEST_ASSERT_EQUAL_MEMORY(ref->trits, tmp_ref->trits, tmp_ref->num_bytes);
+
+  TEST_ASSERT_EQUAL_MEMORY(ref->trits,
+                           hash243_queue_at(&deserialize_get_bal->milestone, 0),
+                           ref->num_bytes);
+
   TEST_ASSERT_EQUAL_INT(TEST_BALANCES_MILESTONEINDEX,
                         deserialize_get_bal->milestoneIndex);
 
-  get_balances_res_free(deserialize_get_bal);
+  get_balances_res_free(&deserialize_get_bal);
   trit_array_free(ref);
 }
 
