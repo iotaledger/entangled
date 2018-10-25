@@ -112,7 +112,7 @@ static retcode_t process_request_bytes(processor_state_t *const state,
   }
 
   if ((ret = iota_consensus_transaction_solidifier_check_and_update_solid_state(
-           &state->node->core->consensus.transaction_solidifier, (*tx).hash))) {
+           &state->node->core->consensus.transaction_solidifier, tx->hash))) {
     return ret;
   }
   log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Propagating packet to responder\n");
