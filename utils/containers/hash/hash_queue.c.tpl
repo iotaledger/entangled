@@ -27,8 +27,10 @@ void hash{SIZE}_queue_pop(hash{SIZE}_queue_t *const queue) {
   hash{SIZE}_queue_entry_t *tmp = NULL;
 
   tmp = *queue;
-  CDL_DELETE(*queue, *queue);
-  free(tmp);
+  if (tmp != NULL) {
+    CDL_DELETE(*queue, *queue);
+    free(tmp);
+  }
 }
 
 flex_trit_t *hash{SIZE}_queue_peek(hash{SIZE}_queue_t const queue) {
