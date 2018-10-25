@@ -209,6 +209,7 @@ retcode_t iota_api_check_consistency(check_consistency_req_t const *const req,
 retcode_t iota_api_init(iota_api_t *const api, uint16_t const port,
                         tangle_t *const tangle,
                         transaction_validator_t *const transaction_validator,
+                        broadcaster_state_t *const broadcaster,
                         serializer_type_t const serializer_type) {
   if (api == NULL) {
     return RC_API_NULL_SELF;
@@ -220,6 +221,7 @@ retcode_t iota_api_init(iota_api_t *const api, uint16_t const port,
   api->port = port;
   api->tangle = tangle;
   api->transaction_validator = transaction_validator;
+  api->broadcaster = broadcaster;
   api->serializer_type = serializer_type;
   if (api->serializer_type == SR_JSON) {
     init_json_serializer(&api->serializer);
