@@ -38,6 +38,8 @@ void test_get_trytes_empty(void) {
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
+  TEST_ASSERT(req == NULL);
+  TEST_ASSERT(res == NULL);
 }
 
 void test_get_trytes_not_found(void) {

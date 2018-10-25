@@ -1123,7 +1123,7 @@ retcode_t json_broadcast_transactions_serialize_request(
 }
 
 retcode_t json_store_transactions_serialize_request(
-    const serializer_t* const s, store_transactions_req_t* const obj,
+    const serializer_t* const s, store_transactions_req_t* const req,
     char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
@@ -1139,7 +1139,7 @@ retcode_t json_store_transactions_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("storeTransactions"));
 
-  ret = flex_hash_array_to_json_array(obj, json_root, "trytes");
+  ret = flex_hash_array_to_json_array(req->trytes, json_root, "trytes");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;

@@ -10,6 +10,7 @@ cc_library(
         "//cclient/serialization:serializer_json",
         "//common:errors",
         "//consensus/tangle",
+        "//consensus/transaction_validator",
         "//utils:logger_helper",
         "//utils/handles:thread",
     ],
