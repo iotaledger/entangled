@@ -223,7 +223,7 @@ static retcode_t update_latest_solid_subtangle_milestone(
       if (milestone.index >= mt->latest_solid_subtangle_milestone_index) {
         if ((ret = iota_consensus_transaction_solidifier_check_solidity(
                  mt->transaction_solidifier, milestone.hash, true,
-                 &is_solid))) {
+                 &is_solid)) != RC_OK) {
           return ret;
         }
         if (!is_solid) {
