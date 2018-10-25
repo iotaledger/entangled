@@ -11,7 +11,7 @@ cc_test(
 
 cc_test(
     name = "test_signed_files",
-    timeout = "moderate",
+    timeout = "long",
     srcs = ["test_signed_files.c"],
     data = [
         "fake.sig",
