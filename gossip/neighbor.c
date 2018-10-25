@@ -63,37 +63,38 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
 }
 
 retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
-                        iota_packet_t *const packet) {
+                        flex_trit_t const *const flex_trits) {
   retcode_t ret = RC_OK;
-  trit_t hash_trits[NUM_TRITS_HASH];
+  trit_t hash_trits[HASH_LENGTH_TRIT];
   trit_array_p hash = NULL;
+  iota_packet_t packet;
 
-  if (node == NULL) {
-    return RC_NEIGHBOR_NULL_NODE;
+  if (node == NULL || neighbor == NULL || flex_trits == NULL) {
+    return RC_NULL_PARAM;
   }
-  if (neighbor == NULL) {
-    return RC_NEIGHBOR_NULL_NEIGHBOR;
-  }
-  if (packet == NULL) {
-    return RC_NEIGHBOR_NULL_PACKET;
-  }
+
   if ((ret = get_transaction_to_request(node->requester, &hash))) {
     return ret;
   }
+
   if (hash != NULL) {
     // TODO(thibault): iota_packet_set_request
     flex_trits_to_trits(hash_trits, NUM_TRITS_HASH, hash->trits,
                         hash->num_trits, hash->num_trits);
-    trits_to_bytes(hash_trits, packet->content + PACKET_TX_SIZE,
-                   NUM_TRITS_HASH);
+    trits_to_bytes(hash_trits, packet.content + PACKET_TX_SIZE, NUM_TRITS_HASH);
   }
+
+  if ((ret = iota_packet_set_transaction(&packet, flex_trits)) != RC_OK) {
+    return ret;
+  }
+
   if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
-    if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, packet) ==
+    if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, &packet) ==
         false) {
       return RC_NEIGHBOR_FAILED_SEND;
     }
   } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
-    if (udp_send(&node->receiver.udp_service, &neighbor->endpoint, packet) ==
+    if (udp_send(&node->receiver.udp_service, &neighbor->endpoint, &packet) ==
         false) {
       return RC_NEIGHBOR_FAILED_SEND;
     }

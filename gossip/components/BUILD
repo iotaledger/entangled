@@ -3,7 +3,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "broadcaster_shared",
     hdrs = ["broadcaster.h"],
-    deps = ["//utils/handles:thread"],
+    deps = [
+        "//utils/containers/hash:hash8019_queue",
+        "//utils/handles:cond",
+        "//utils/handles:lock",
+        "//utils/handles:thread",
+    ],
 )
 
 cc_library(
@@ -14,7 +19,6 @@ cc_library(
         "//ciri:node_shared",
         "//utils:logger_helper",
         "//utils/containers/lists:concurrent_list_neighbor",
-        "//utils/containers/queues:concurrent_queue_packet",
     ],
 )
 

@@ -47,8 +47,8 @@ int main(int argc, char* argv[]) {
   // TODO remove
   // Dummy broadcasted packet to begin receiving from UDP neighbors
   sleep(2);
-  iota_packet_t p = {{0}};
-  broadcaster_on_next(&core_g.node.broadcaster, p);
+  flex_trit_t dummy[FLEX_TRIT_SIZE_8019] = {0};
+  broadcaster_on_next(&core_g.node.broadcaster, dummy);
   sleep(1000);
 
   log_info(MAIN_LOGGER_ID, "Stopping cIRI core\n");

@@ -46,7 +46,8 @@ retcode_t core_init(core_t* const core) {
 
   log_info(CORE_LOGGER_ID, "Initializing cIRI API\n");
   if (iota_api_init(&core->api, core->config.api_port, &core->consensus.tangle,
-                    &core->consensus.transaction_validator, SR_JSON)) {
+                    &core->consensus.transaction_validator,
+                    &core->node.broadcaster, SR_JSON)) {
     log_critical(CORE_LOGGER_ID, "Initializing cIRI API failed\n");
     return RC_CORE_FAILED_API_INIT;
   }

@@ -11,19 +11,22 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
+#include "utils/containers/hash/hash8019_queue.h"
+#include "utils/handles/cond.h"
+#include "utils/handles/lock.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
-typedef struct concurrent_queue_iota_packet_t_s broadcaster_queue_t;
-typedef struct iota_packet_s iota_packet_t;
 typedef struct node_s node_t;
 
-typedef struct broadcaster_state_s {
+typedef struct broadcaster_s {
   thread_handle_t thread;
   bool running;
-  broadcaster_queue_t *queue;
   node_t *node;
-} broadcaster_state_t;
+  hash8019_queue_t queue;
+  lock_handle_t lock;
+  cond_handle_t cond;
+} broadcaster_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,51 +35,51 @@ extern "C" {
 /**
  * Initializes a broadcaster
  *
- * @param state The broadcaster state
+ * @param broadcaster The broadcaster
  * @param node A node
  *
  * @return a status code
  */
-retcode_t broadcaster_init(broadcaster_state_t *const state,
+retcode_t broadcaster_init(broadcaster_t *const broadcaster,
                            node_t *const node);
-
-/**
- * Starts a broadcaster
- *
- * @param state The broadcaster state
- *
- * @return a status code
- */
-retcode_t broadcaster_start(broadcaster_state_t *const state);
-
-/**
- * Adds a packet to a broadcaster queue
- *
- * @param state The broadcaster state
- * @param packet The packet
- *
- * @return a status code
- */
-retcode_t broadcaster_on_next(broadcaster_state_t *const state,
-                              iota_packet_t const packet);
-
-/**
- * Stops a broadcaster
- *
- * @param state The broadcaster state
- *
- * @return a status code
- */
-retcode_t broadcaster_stop(broadcaster_state_t *const state);
 
 /**
  * Destroys a broadcaster
  *
- * @param state The broadcaster state
+ * @param broadcaster The broadcaster
  *
  * @return a status code
  */
-retcode_t broadcaster_destroy(broadcaster_state_t *const state);
+retcode_t broadcaster_destroy(broadcaster_t *const broadcaster);
+
+/**
+ * Starts a broadcaster
+ *
+ * @param broadcaster The broadcaster
+ *
+ * @return a status code
+ */
+retcode_t broadcaster_start(broadcaster_t *const broadcaster);
+
+/**
+ * Adds transaction flex trits to the broadcaster queue
+ *
+ * @param broadcaster The broadcaster
+ * @param flex_trits Transaction flex trits
+ *
+ * @return a status code
+ */
+retcode_t broadcaster_on_next(broadcaster_t *const broadcaster,
+                              flex_trit_t const *const flex_trits);
+
+/**
+ * Stops a broadcaster
+ *
+ * @param broadcaster The broadcaster
+ *
+ * @return a status code
+ */
+retcode_t broadcaster_stop(broadcaster_t *const broadcaster);
 
 #ifdef __cplusplus
 }

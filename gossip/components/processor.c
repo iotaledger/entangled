@@ -34,13 +34,11 @@ static retcode_t process_transaction_bytes(processor_state_t *const state,
   }
 
   if (true /* TODO(thibault): if !cached */) {
-    trit_t tx_trits[PACKET_TX_TRITS_SIZE];
     flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
 
-    bytes_to_trits(packet->content, PACKET_TX_SIZE, tx_trits,
-                   PACKET_TX_TRITS_SIZE);
-    flex_trits_from_trits(tx_flex_trits, PACKET_TX_TRITS_SIZE, tx_trits,
-                          PACKET_TX_TRITS_SIZE, PACKET_TX_TRITS_SIZE);
+    flex_trits_from_bytes(tx_flex_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                          packet->content, NUM_TRITS_SERIALIZED_TRANSACTION,
+                          NUM_TRITS_SERIALIZED_TRANSACTION);
     if ((*tx = transaction_deserialize(tx_flex_trits)) == NULL) {
       neighbor->nbr_invalid_tx++;
       log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
@@ -71,7 +69,8 @@ static retcode_t process_transaction_bytes(processor_state_t *const state,
       // Broadcast new transaction
       log_debug(PROCESSOR_COMPONENT_LOGGER_ID,
                 "Propagating packet to broadcaster\n");
-      if ((ret = broadcaster_on_next(&state->node->broadcaster, *packet))) {
+      if ((ret =
+               broadcaster_on_next(&state->node->broadcaster, tx_flex_trits))) {
         log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                     "Propagating packet to broadcaster failed\n");
         return ret;
