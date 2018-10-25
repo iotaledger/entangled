@@ -79,6 +79,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
            testnet)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Initializing snapshot failed\n");
   }
+
   log_info(CONSENSUS_LOGGER_ID, "Initializing transaction solidifier\n");
   if ((ret = iota_consensus_transaction_solidifier_init(
            &consensus->transaction_solidifier, &consensus->tangle,

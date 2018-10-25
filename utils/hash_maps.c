@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "utils/hash_containers.h"
+#include "utils/hash_maps.h"
 
 /*
  * Hash-int map operations

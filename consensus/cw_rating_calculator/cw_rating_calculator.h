@@ -13,10 +13,10 @@
 
 #include "uthash.h"
 
+#include "../../utils/hash_maps.h"
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/tangle/tangle.h"
-#include "utils/hash_containers.h"
 
 #define CW_RATING_CALCULATOR_LOGGER_ID "consensus_cw_rating_calculator"
 

@@ -8,10 +8,10 @@
 #ifndef __CONSENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
 #define __CONSENSUS_LEDGER_VALIDATOR_LEDGER_VALIDATOR_H__
 
+#include "../../utils/hash_maps.h"
 #include "common/errors.h"
 #include "consensus/snapshot/snapshot.h"
 #include "utils/containers/hash/hash243_stack.h"
-#include "utils/hash_containers.h"
 
 // Forward declarations
 typedef struct tangle_s tangle_t;

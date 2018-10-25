@@ -16,7 +16,6 @@
 #include "common/storage/pack.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/snapshot/state_delta.h"
-#include "utils/hash_containers.h"
 
 // Forward declaration
 typedef struct iota_milestone_s iota_milestone_t;

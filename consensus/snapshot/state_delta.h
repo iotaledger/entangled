@@ -8,9 +8,9 @@
 #ifndef __CONSENSUS_SNAPSHOT_STATE_DELTA_H__
 #define __CONSENSUS_SNAPSHOT_STATE_DELTA_H__
 
+#include "../../utils/hash_maps.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
-#include "utils/hash_containers.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -18,7 +18,10 @@ retcode_t tangle_traversal_dfs_to_genesis(tangle_t *const tangle,
   hash243_set_t analyzed_hashes = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
 
-  struct _trit_array tx_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
+  struct _trit_array tx_hash = {.trits = NULL,
+                                .num_trits = NUM_TRITS_HASH,
+                                .num_bytes = FLEX_TRIT_SIZE_243,
+                                .dynamic = 0};
 
   if ((ret = hash243_stack_push(&non_analyzed_hashes, entry_point)) != RC_OK) {
     return ret;
@@ -45,7 +48,6 @@ retcode_t tangle_traversal_dfs_to_genesis(tangle_t *const tangle,
       }
 
       if (should_branch) {
-        // TODO messageQ publish
         if ((ret = hash243_stack_push(&non_analyzed_hashes, tx.trunk)) !=
             RC_OK) {
           break;

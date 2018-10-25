@@ -11,7 +11,7 @@ cc_library(
         "//consensus/ledger_validator",
         "//consensus/tangle",
         "//consensus/transaction_solidifier",
-        "//utils:hash_containers",
+        "//utils:hash_maps",
         "//utils:logger_helper",
         "@com_github_uthash//:uthash",
     ],

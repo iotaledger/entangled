@@ -56,8 +56,6 @@ extern retcode_t
 iota_consensus_transaction_solidifier_check_and_update_solid_state(
     transaction_solidifier_t *const ts, flex_trit_t *const hash);
 
-// TODO - complete
-
 #ifdef __cplusplus
 }
 #endif
