@@ -103,7 +103,7 @@ retcode_t iota_api_attach_to_tangle(attach_to_tangle_req_t const *const req,
                                     attach_to_tangle_res_t *const res);
 retcode_t iota_api_interrupt_attaching_to_tangle();
 retcode_t iota_api_broadcast_transactions(
-    broadcast_transactions_req_t const *const req);
+    iota_api_t const *const api, broadcast_transactions_req_t const *const req);
 retcode_t iota_api_store_transactions(
     iota_api_t const *const api, store_transactions_req_t const *const req);
 retcode_t iota_api_check_consistency(check_consistency_req_t const *const req,

@@ -154,8 +154,20 @@ retcode_t iota_api_attach_to_tangle(attach_to_tangle_req_t const *const req,
 retcode_t iota_api_interrupt_attaching_to_tangle() { return RC_OK; }
 
 retcode_t iota_api_broadcast_transactions(
+    iota_api_t const *const api,
     broadcast_transactions_req_t const *const req) {
-  return RC_OK;
+  retcode_t ret = RC_OK;
+  flex_hash_array_t *iter = NULL;
+  struct _iota_transaction tx;
+
+  LL_FOREACH(req->trytes, iter) {
+    transaction_deserialize_from_trits(&tx, iter->hash->trits);
+    if (iota_consensus_transaction_validate(api->transaction_validator, &tx)) {
+      //       transactionViewModel.weightMagnitude = Curl.HASH_LENGTH;
+      //       instance.node.broadcast(transactionViewModel);
+    }
+  }
+  return ret;
 }
 
 retcode_t iota_api_store_transactions(
@@ -208,7 +220,6 @@ retcode_t iota_api_init(iota_api_t *const api, uint16_t const port,
   api->port = port;
   api->tangle = tangle;
   api->transaction_validator = transaction_validator;
-
   api->serializer_type = serializer_type;
   if (api->serializer_type == SR_JSON) {
     init_json_serializer(&api->serializer);
