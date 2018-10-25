@@ -38,3 +38,15 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_broadcast_transactions",
+    srcs = ["test_broadcast_transactions.c"],
+    data = [":db_file"],
+    deps = [
+        ":defs",
+        "//ciri/api",
+        "//consensus/test_utils",
+        "@unity",
+    ],
+)
