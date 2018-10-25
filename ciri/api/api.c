@@ -163,8 +163,11 @@ retcode_t iota_api_broadcast_transactions(
   LL_FOREACH(req->trytes, iter) {
     transaction_deserialize_from_trits(&tx, iter->hash->trits);
     if (iota_consensus_transaction_validate(api->transaction_validator, &tx)) {
-      //       transactionViewModel.weightMagnitude = Curl.HASH_LENGTH;
-      //       instance.node.broadcast(transactionViewModel);
+      // TODO priority queue on weight_magnitude
+      if ((ret = broadcaster_on_next(api->broadcaster, iter->hash->trits)) !=
+          RC_OK) {
+        return ret;
+      }
     }
   }
   return ret;
