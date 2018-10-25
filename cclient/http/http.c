@@ -9,8 +9,8 @@
 #include <string.h>
 #include "cclient/service.h"
 #include "http_parser.h"
+#include "network/sockets.h"
 #include "utils/macros.h"
-#include "utils/sockets.h"
 
 typedef enum {
   IOTA_REQUEST_STATUS_OK,
@@ -76,36 +76,9 @@ static int request_parse_message_complete(struct _response_ctx* response) {
 // Socket creation
 static retcode_t connect_to_iota_service(char const* const hostname,
                                          const size_t port, int* sockfd) {
-  struct addrinfo hints, *serverinfo, *info;
-  char port_string[6];
-
-  memset(&hints, 0, sizeof hints);
-  hints.ai_family = AF_UNSPEC;  // use AF_INET6 to force IPv6
-  hints.ai_socktype = SOCK_STREAM;
-  sprintf(port_string, "%lu", port);
-  if (getaddrinfo(hostname, port_string, &hints, &serverinfo) != 0) {
-    return RC_CCLIENT_HOST_NOT_FOUND;
-  }
-  // loop through all the results and connect to the first we can
-  for (info = serverinfo; info; info = info->ai_next) {
-    if ((*sockfd = socket(info->ai_family, info->ai_socktype,
-                          info->ai_protocol)) == -1) {
-      continue;
-    }
-    if (connect(*sockfd, info->ai_addr, info->ai_addrlen) == -1) {
-      close(*sockfd);
-      continue;
-    }
-    // Successfully connection
-    break;
-  }
-  // If no info was found return error
-  if (!info) {
+  if ((*sockfd = open_client_socket(hostname, port)) == -1) {
     return RC_CCLIENT_HTTP;
   }
-  // Free resources allocated by getaddrinfo
-  freeaddrinfo(serverinfo);
-  // Return socket fd - 0 or greater
   return RC_OK;
 }
 
@@ -130,7 +103,8 @@ static retcode_t read_data_from_iota_service(int sockfd,
   http_parser_init(&parser, HTTP_RESPONSE);
   parser.data = &response_context;
   // Loop over received data
-  while ((num_received = recv(sockfd, buffer, RECEIVE_BUFFER_SIZE, 0)) > 0) {
+  while ((num_received = receive_on_socket_wait(sockfd, buffer,
+                                                RECEIVE_BUFFER_SIZE)) > 0) {
     int parsed = http_parser_execute(&parser, &settings, buffer, num_received);
     // A parsing error occured, or an error in a callback
     if (parsed < num_received ||
@@ -151,7 +125,7 @@ static retcode_t send_data_to_iota_service(int sockfd, char const* const data,
                                            size_t data_length) {
   char* ptr = (char*)data;
   while (data_length > 0) {
-    ssize_t num_sent = send(sockfd, ptr, data_length, 0);
+    ssize_t num_sent = send_on_socket_wait(sockfd, ptr, data_length);
     if (num_sent < 0) {
       return RC_CCLIENT_HTTP;
     }
@@ -203,7 +177,7 @@ retcode_t iota_service_query(const void* const service_opaque,
   }
 cleanup:
   if (sockfd != -1) {
-    close(sockfd);
+    close_socket(sockfd);
   }
   return result;
 }

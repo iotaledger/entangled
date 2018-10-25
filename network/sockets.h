@@ -32,6 +32,11 @@ extern "C" {
 #define RECEIVE_BUFFER_SIZE 4096
 #endif
 
+int open_client_socket(char const *const hostname, const size_t port);
+void close_socket(int sockfd);
+int receive_on_socket_wait(int sockfd, void *buffer, size_t len);
+int send_on_socket_wait(int sockfd, const void *buffer, size_t len);
+
 #ifdef __cplusplus
 }
 #endif

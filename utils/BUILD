@@ -78,8 +78,3 @@ cc_library(
         "@com_github_uthash//:uthash",
     ],
 )
-
-cc_library(
-    name = "sockets",
-    hdrs = ["sockets.h"],
-)
