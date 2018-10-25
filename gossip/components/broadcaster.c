@@ -133,6 +133,20 @@ retcode_t broadcaster_on_next(broadcaster_t *const broadcaster,
   return RC_OK;
 }
 
+size_t broadcaster_size(broadcaster_t *const broadcaster) {
+  size_t size = 0;
+
+  if (broadcaster == NULL) {
+    return 0;
+  }
+
+  lock_handle_lock(&broadcaster->lock);
+  size = hash8019_queue_count(&broadcaster->queue);
+  lock_handle_unlock(&broadcaster->lock);
+
+  return size;
+}
+
 retcode_t broadcaster_stop(broadcaster_t *const broadcaster) {
   if (broadcaster == NULL) {
     return RC_NULL_PARAM;

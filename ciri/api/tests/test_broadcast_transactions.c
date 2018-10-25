@@ -9,6 +9,7 @@
 
 #include "ciri/api/api.h"
 #include "ciri/api/tests/defs.h"
+#include "ciri/node.h"
 #include "consensus/defs.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
@@ -19,6 +20,8 @@ static connection_config_t config;
 static iota_api_t api;
 static tangle_t tangle;
 static transaction_validator_t transaction_validator;
+static node_t node;
+static broadcaster_t broadcaster;
 
 void setUp(void) {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
@@ -33,6 +36,8 @@ void test_broadcast_transactions_empty(void) {
   broadcast_transactions_req_t *req = broadcast_transactions_req_new();
 
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req) == RC_OK);
+
+  TEST_ASSERT_EQUAL_INT(broadcaster_size(&broadcaster), 0);
 
   broadcast_transactions_req_free(&req);
   TEST_ASSERT(req == NULL);
@@ -59,6 +64,8 @@ void test_broadcast_transactions_invalid_tx(void) {
   broadcast_transactions_req_add_trytes(req, tx_trytes);
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req) == RC_OK);
 
+  TEST_ASSERT_EQUAL_INT(broadcaster_size(&broadcaster), 0);
+
   broadcast_transactions_req_free(&req);
   TEST_ASSERT(req == NULL);
 }
@@ -76,6 +83,8 @@ void test_broadcast_transactions(void) {
   }
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req) == RC_OK);
 
+  TEST_ASSERT_EQUAL_INT(broadcaster_size(&broadcaster), 4);
+
   broadcast_transactions_req_free(&req);
   TEST_ASSERT(req == NULL);
 }
@@ -86,6 +95,8 @@ int main(void) {
   config.db_path = test_db_path;
   api.tangle = &tangle;
   api.transaction_validator = &transaction_validator;
+  broadcaster_init(&broadcaster, &node);
+  api.broadcaster = &broadcaster;
 
   iota_consensus_transaction_validator_init(&transaction_validator, 1536845195,
                                             10);

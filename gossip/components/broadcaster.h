@@ -73,6 +73,15 @@ retcode_t broadcaster_on_next(broadcaster_t *const broadcaster,
                               flex_trit_t const *const flex_trits);
 
 /**
+ * Gets the size of the broadcaster queue
+ *
+ * @param broadcaster The broadcaster
+ *
+ * @return a status code
+ */
+size_t broadcaster_size(broadcaster_t *const broadcaster);
+
+/**
  * Stops a broadcaster
  *
  * @param broadcaster The broadcaster
