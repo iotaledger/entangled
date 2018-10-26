@@ -13,6 +13,7 @@
 
 #include "common/errors.h"
 #include "common/storage/connection.h"
+#include "consensus/defs.h"
 #include "consensus/tangle/tangle.h"
 
 #ifdef __cplusplus
