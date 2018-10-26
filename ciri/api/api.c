@@ -21,6 +21,12 @@
  * Private functions
  */
 
+bool invalid_subtangle_status(iota_api_t const *const api) {
+  return (api->consensus->milestone_tracker
+              .latest_solid_subtangle_milestone_index ==
+          api->consensus->milestone_tracker.milestone_start_index);
+}
+
 typedef enum iota_api_command_e {
   CMD_GET_NODE_INFO,
   CMD_GET_NEIGHBORS,
@@ -316,11 +322,40 @@ retcode_t iota_api_get_transactions_to_approve(
     iota_api_t const *const api,
     get_transactions_to_approve_req_t const *const req,
     get_transactions_to_approve_res_t *const res) {
+  retcode_t ret = RC_OK;
+  tips_pair_t tips;
+  flex_trit_t reference_trits[FLEX_TRIT_SIZE_243];
+  flex_trit_t *reference = NULL;
+
   if (api == NULL || req == NULL || res == NULL) {
     return RC_NULL_PARAM;
   }
 
-  return RC_OK;
+  if (req->depth > MAX_DEPTH) {
+    return RC_API_INVALID_DEPTH_INPUT;
+  }
+
+  if (invalid_subtangle_status(api)) {
+    return RC_API_INVALID_SUBTANGLE_STATUS;
+  }
+
+  if (req->reference != NULL && req->reference->data != NULL) {
+    flex_trits_from_trytes(reference_trits, HASH_LENGTH_TRIT,
+                           (tryte_t *)req->reference->data, HASH_LENGTH_TRYTE,
+                           HASH_LENGTH_TRYTE);
+    reference = reference_trits;
+  }
+
+  if ((ret = iota_consensus_tip_selector_get_transactions_to_approve(
+           &api->consensus->tip_selector, req->depth, reference, &tips)) !=
+      RC_OK) {
+    return ret;
+  }
+
+  get_transactions_to_approve_res_set_branch(res, tips.branch);
+  get_transactions_to_approve_res_set_trunk(res, tips.trunk);
+
+  return ret;
 }
 
 retcode_t iota_api_attach_to_tangle(iota_api_t const *const api,
