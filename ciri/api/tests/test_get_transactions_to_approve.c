@@ -85,5 +85,7 @@ int main(void) {
   RUN_TEST(test_get_transactions_to_approve_invalid_depth);
   RUN_TEST(test_get_transactions_to_approve_invalid_subtangle_status);
 
+  TEST_ASSERT(iota_consensus_destroy(&consensus) == RC_OK);
+
   return UNITY_END();
 }
