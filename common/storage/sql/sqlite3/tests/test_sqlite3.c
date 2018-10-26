@@ -358,6 +358,7 @@ void test_transactions_update_solid_states_one_transaction(void) {
                                          &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT(tx.solid);
+  hash243_set_free(&hashes);
 }
 
 void test_transactions_update_solid_states_two_transaction(void) {
@@ -403,6 +404,7 @@ void test_transactions_update_solid_states_two_transaction(void) {
                                          &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT(tx.solid);
+  hash243_set_free(&hashes);
 }
 
 int main(void) {
