@@ -206,8 +206,8 @@ static retcode_t check_solidity_do_func(tangle_t *const tangle,
                                  .num_trits = NUM_TRITS_HASH,
                                  .num_bytes = FLEX_TRIT_SIZE_243,
                                  .dynamic = 0};
-      // TODO send params->is_milestone
-      return request_transaction(ts->requester, &hash_trits);
+      return request_transaction(ts->requester, &hash_trits,
+                                 params->is_milestone);
     }
   }
 

@@ -21,7 +21,6 @@ cc_library(
         "//consensus/tangle",
         "//consensus/utils:tangle_traversals",
         "//gossip/components:transaction_requester",
-        "//utils:hash_containers",
         "//utils:hash_maps",
         "//utils/containers/hash:hash243_stack",
     ],
