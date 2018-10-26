@@ -19,9 +19,17 @@ get_transactions_to_approve_req_t* get_transactions_to_approve_req_new() {
 }
 
 void get_transactions_to_approve_req_free(
-    get_transactions_to_approve_req_t** req) {
-  if (req || (*req)) {
-    free(*req);
-    *req = NULL;
+    get_transactions_to_approve_req_t** const req) {
+  if (!req || !(*req)) {
+    return;
   }
+
+  free(*req);
+  *req = NULL;
+}
+
+void get_transactions_to_approve_req_set_reference(
+    get_transactions_to_approve_req_t* const req,
+    tryte_t const* const reference) {
+  memcpy(req->reference, reference, FLEX_TRIT_SIZE_243);
 }

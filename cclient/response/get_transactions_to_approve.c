@@ -19,9 +19,11 @@ get_transactions_to_approve_res_t* get_transactions_to_approve_res_new() {
 }
 
 void get_transactions_to_approve_res_free(
-    get_transactions_to_approve_res_t** res) {
-  if (res || (*res)) {
-    free(*res);
-    *res = NULL;
+    get_transactions_to_approve_res_t** const res) {
+  if (!res || !(*res)) {
+    return;
   }
+
+  free(*res);
+  *res = NULL;
 }
