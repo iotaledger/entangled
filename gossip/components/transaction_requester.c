@@ -162,7 +162,7 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
   hash243_set_t backup_set = NULL;
   hash243_set_entry_t *iter = NULL;
   hash243_set_entry_t *tmp = NULL;
-  trit_array_t key = {.trits = hash,
+  trit_array_t key = {.trits = NULL,
                       .num_trits = HASH_LENGTH_TRIT,
                       .num_bytes = FLEX_TRIT_SIZE_243,
                       .dynamic = 0};
