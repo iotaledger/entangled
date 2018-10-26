@@ -11,6 +11,7 @@ cc_test(
         "//common/storage/tests/helpers",
         "//common/trinary:trit_ptrit",
         "//utils:files",
+        "//utils/containers/hash:hash243_set",
         "@unity",
     ],
 )

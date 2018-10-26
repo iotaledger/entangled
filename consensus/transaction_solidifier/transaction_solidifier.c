@@ -250,15 +250,8 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
   if (params.is_solid) {
     log_debug(TRANSACTION_SOLIDIFIER_LOGGER_ID, "In %s, updating solid state\n",
               __FUNCTION__);
-    // TODO - one db statement
-    hash243_set_entry_t *curr_entry = NULL;
-    hash243_set_entry_t *tmp_entry = NULL;
-    HASH_ITER(hh, ts->solid_transactions_candidates, curr_entry, tmp_entry) {
-      if ((ret = iota_tangle_transaction_update_solid_state(
-               ts->tangle, curr_entry->hash, true)) != RC_OK) {
-        goto done;
-      }
-    }
+    ret = iota_tangle_transactions_update_solid_state_true(
+        ts->tangle, ts->solid_transactions_candidates);
     hash243_set_append(&ts->solid_transactions_candidates,
                        &ts->newly_set_solid_transactions);
   }

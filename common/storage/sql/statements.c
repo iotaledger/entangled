@@ -5,6 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <inttypes.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include "common/storage/defs.h"
 
 /*
@@ -51,6 +55,10 @@ char *iota_statement_transaction_exist_by_hash =
     "SELECT 1 WHERE EXISTS(SELECT 1 "
     "FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?)";
 
+char *iota_statement_transactions_update_solid_state_prefix =
+    "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SOLID
+    "=1 WHERE " TRANSACTION_COL_HASH " in (";
+
 /*
  * Milestone statements
  */
@@ -93,3 +101,37 @@ char *iota_statement_state_delta_store =
 char *iota_statement_state_delta_load =
     "SELECT " MILESTONE_COL_DELTA " FROM " MILESTONE_TABLE_NAME
     " WHERE " MILESTONE_COL_INDEX "=?";
+
+/*
+ * Functions
+ */
+
+void iota_statement_in_clause_combine(char *const statement,
+                                      const char *const prefix_statement,
+                                      uint32_t num_elements) {
+  uint16_t prefix_size = strlen(prefix_statement);
+  // Every '?' is followed either by ',' or ')'
+  char *statement_curr_offset = &statement[prefix_size];
+
+  memcpy(statement, prefix_statement, prefix_size);
+
+  uint32_t curr_hash = 0;
+  while (curr_hash < num_elements) {
+    statement_curr_offset[2 * curr_hash] = '?';
+    ++curr_hash;
+
+    if (curr_hash == num_elements) {
+      statement_curr_offset[2 * curr_hash - 1] = ')';
+    } else {
+      statement_curr_offset[2 * curr_hash - 1] = ',';
+    }
+  }
+  statement_curr_offset[2 * curr_hash] = '\0';
+}
+
+uint16_t iota_statement_in_clause_size_to_alloc(
+    const char *const prefix_statement, uint32_t num_elements) {
+  uint16_t prefix_size = strlen(prefix_statement);
+
+  return prefix_size + num_elements * 2;
+}
