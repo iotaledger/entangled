@@ -18,6 +18,7 @@
 #include "common/storage/storage.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/snapshot/state_delta.h"
+#include "utils/containers/hash/hash243_set.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,6 +63,9 @@ retcode_t iota_tangle_transaction_exist(const tangle_t *const tangle,
 
 retcode_t iota_tangle_transaction_update_solid_state(
     const tangle_t *const tangle, flex_trit_t *const hash, bool state);
+
+retcode_t iota_tangle_transactions_update_solid_state_true(
+    const tangle_t *const tangle, const hash243_set_t hashes);
 
 /*
  * Milestone operations

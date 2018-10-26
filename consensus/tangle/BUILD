@@ -10,6 +10,7 @@ cc_library(
         "//common/trinary:trit_array",
         "//consensus/snapshot:state_delta",
         "//utils:logger_helper",
+        "//utils/containers/hash:hash243_set",
         "@com_github_uthash//:uthash",
     ],
 )

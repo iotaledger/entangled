@@ -57,6 +57,21 @@ static retcode_t column_compress_bind(sqlite3_stmt* const statement,
   return RC_OK;
 }
 
+typedef struct bind_hashes_params_s {
+  uint32_t binding_index;
+  sqlite3_stmt* sqlite_statement;
+} bind_hashes_params_t;
+
+static retcode_t bind_hashes_do_func(bind_hashes_params_t* params,
+                                     flex_trit_t* hash) {
+  retcode_t ret = RC_OK;
+  if (column_compress_bind(params->sqlite_statement, params->binding_index++,
+                           hash, FLEX_TRIT_SIZE_243) != RC_OK) {
+    ret = binding_error();
+  }
+  return ret;
+}
+
 static void column_decompress_load(sqlite3_stmt* const statement,
                                    size_t const index,
                                    flex_trit_t* const flex_trits,
@@ -392,6 +407,41 @@ retcode_t iota_stor_transaction_update_solid_state(
       column_compress_bind(sqlite_statement, 2, hash, FLEX_TRIT_SIZE_243) !=
           RC_OK) {
     ret = binding_error();
+    goto done;
+  }
+
+  if ((ret = execute_statement_store_update(sqlite_statement)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  finalize_statement(sqlite_statement);
+  return ret;
+}
+
+retcode_t iota_stor_transactions_update_solid_state_true(
+    const connection_t* const conn, const hash243_set_t hashes) {
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = NULL;
+  uint32_t num_hashes = hash243_set_size(&hashes);
+  uint16_t statement_size = iota_statement_in_clause_size_to_alloc(
+      iota_statement_transactions_update_solid_state_prefix, num_hashes);
+
+  char statement[statement_size];
+  iota_statement_in_clause_combine(
+      statement, iota_statement_transactions_update_solid_state_prefix,
+      num_hashes);
+
+  if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
+                               statement)) != RC_OK) {
+    goto done;
+  }
+
+  bind_hashes_params_t params = {.num_hashes = num_hashes,
+                                 .binding_index = 1,
+                                 .sqlite_statement = sqlite_statement};
+  if ((ret = hash243_set_for_each(&hashes, bind_hashes_do_func, &params)) !=
+      RC_OK) {
     goto done;
   }
 

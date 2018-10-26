@@ -60,6 +60,9 @@ extern retcode_t iota_stor_transaction_update_snapshot_index(
 extern retcode_t iota_stor_transaction_update_solid_state(
     const connection_t* const conn, flex_trit_t* const hash, bool is_solid);
 
+extern retcode_t iota_stor_transactions_update_solid_state_true(
+    const connection_t* const conn, const hash243_set_t hashes);
+
 extern retcode_t iota_stor_transaction_load_hashes(
     connection_t const* const conn, transaction_field_t const field,
     trit_array_t const* const key, iota_stor_pack_t* const pack);
