@@ -15,11 +15,13 @@ retcode_t hash{SIZE}_set_add(hash{SIZE}_set_t *const set,
                             flex_trit_t const *const hash) {
   hash{SIZE}_set_entry_t *entry = NULL;
 
-  if ((entry = malloc(sizeof(hash{SIZE}_set_entry_t))) == NULL) {
-    return RC_UTILS_OOM;
+  if (!hash{SIZE}_set_contains(set, hash)) {
+    if ((entry = malloc(sizeof(hash{SIZE}_set_entry_t))) == NULL) {
+      return RC_UTILS_OOM;
+    }
+    memcpy(entry->hash, hash, FLEX_TRIT_SIZE_{SIZE});
+    HASH_ADD(hh, *set, hash, FLEX_TRIT_SIZE_{SIZE}, entry);
   }
-  memcpy(entry->hash, hash, FLEX_TRIT_SIZE_{SIZE});
-  HASH_ADD(hh, *set, hash, FLEX_TRIT_SIZE_{SIZE}, entry);
   return RC_OK;
 }
 
@@ -49,10 +51,8 @@ retcode_t hash{SIZE}_set_append(hash{SIZE}_set_t const *const set1,
   hash{SIZE}_set_entry_t *iter = NULL, *tmp = NULL;
 
   HASH_ITER(hh, *set1, iter, tmp) {
-    if (!hash{SIZE}_set_contains(set2, iter->hash)) {
-      if ((ret = hash{SIZE}_set_add(set2, iter->hash)) != RC_OK) {
-        return ret;
-      }
+    if ((ret = hash{SIZE}_set_add(set2, iter->hash)) != RC_OK) {
+      return ret;
     }
   }
   return ret;
