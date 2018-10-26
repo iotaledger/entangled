@@ -38,7 +38,7 @@ retcode_t iota_consensus_tip_selector_init(
 
 retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
     tip_selector_t *const tip_selector, size_t const depth,
-    flex_trit_t const *const reference, tips_pair *const tips) {
+    flex_trit_t const *const reference, tips_pair_t *const tips) {
   retcode_t ret = RC_OK;
   flex_trit_t ep_trits[FLEX_TRIT_SIZE_243];
   trit_array_t ep = {.trits = ep_trits,
@@ -74,7 +74,7 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
               "Getting trunk tip failed with error %" PRIu64 "\n", ret);
     goto done;
   }
-  if ((ret = hash243_stack_push(&tips_stack, tips->trunk->trits)) != RC_OK) {
+  if ((ret = hash243_stack_push(&tips_stack, tips->trunk)) != RC_OK) {
     goto done;
   }
 
@@ -94,7 +94,7 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
               "Getting branch tip failed with error %" PRIu64 "\n", ret);
     goto done;
   }
-  if ((ret = hash243_stack_push(&tips_stack, tips->branch->trits)) != RC_OK) {
+  if ((ret = hash243_stack_push(&tips_stack, tips->branch)) != RC_OK) {
     goto done;
   }
 

@@ -181,9 +181,7 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &conf, &tangle,
                                                 EP_RANDOM_WALK) == RC_OK);
 
-  trit_array_t tip;
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
-  tip.trits = tip_trits;
 
   /// Select the tip
   uint16_t selected_tip_counts[num_approvers];
@@ -192,10 +190,10 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   int selections = 200;
   for (size_t i = 0; i < selections; ++i) {
     TEST_ASSERT(iota_consensus_exit_probability_randomize(
-                    &ep_randomizer, &epv, &out, ep, &tip) == RC_OK);
+                    &ep_randomizer, &epv, &out, ep, tip_trits) == RC_OK);
 
     for (size_t a = 0; a < num_approvers; ++a) {
-      if (memcmp(tip.trits, transaction_hash(&txs[a]), FLEX_TRIT_SIZE_243) ==
+      if (memcmp(tip_trits, transaction_hash(&txs[a]), FLEX_TRIT_SIZE_243) ==
           0) {
         selected_tip_counts[a] += 1;
       }
@@ -278,16 +276,14 @@ void test_single_tx_tangle(void) {
   TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &conf, &tangle,
                                                 EP_RANDOM_WALK) == RC_OK);
 
-  trit_array_t tip;
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
-  tip.trits = tip_trits;
 
   /// Select the tip
   TEST_ASSERT(iota_consensus_exit_probability_randomize(
-                  &ep_randomizer, &epv, &out, ep, &tip) == RC_OK);
+                  &ep_randomizer, &epv, &out, ep, tip_trits) == RC_OK);
 
   /// Check that tip was selected
-  TEST_ASSERT_EQUAL_MEMORY(tip.trits, ep->trits, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(tip_trits, ep->trits, FLEX_TRIT_SIZE_243);
 
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
 
@@ -384,16 +380,14 @@ void test_cw_topology_four_transactions_diamond(void) {
   TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &conf, &tangle,
                                                 EP_RANDOM_WALK) == RC_OK);
 
-  trit_array_t tip;
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
-  tip.trits = tip_trits;
 
   /// Select the tip
   TEST_ASSERT(iota_consensus_exit_probability_randomize(
-                  &ep_randomizer, &epv, &out, ep, &tip) == RC_OK);
+                  &ep_randomizer, &epv, &out, ep, tip_trits) == RC_OK);
 
   /// Check that tip was selected
-  TEST_ASSERT_EQUAL_MEMORY(tip.trits, transaction_hash(&txs[3]),
+  TEST_ASSERT_EQUAL_MEMORY(tip_trits, transaction_hash(&txs[3]),
                            FLEX_TRIT_SIZE_243);
 
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
@@ -488,9 +482,7 @@ void test_cw_topology_two_inequal_tips(void) {
   TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &conf, &tangle,
                                                 EP_RANDOM_WALK) == RC_OK);
 
-  trit_array_t tip;
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
-  tip.trits = tip_trits;
 
   /// Select the tip
 
@@ -498,8 +490,8 @@ void test_cw_topology_two_inequal_tips(void) {
   int selections = 200;
   for (size_t i = 0; i < selections; ++i) {
     TEST_ASSERT(iota_consensus_exit_probability_randomize(
-                    &ep_randomizer, &epv, &out, ep, &tip) == RC_OK);
-    if (memcmp(tip.trits, transaction_hash(&txs[num_txs - 1]),
+                    &ep_randomizer, &epv, &out, ep, tip_trits) == RC_OK);
+    if (memcmp(tip_trits, transaction_hash(&txs[num_txs - 1]),
                FLEX_TRIT_SIZE_243) == 0) {
       selected_tip_count++;
     }
@@ -519,8 +511,8 @@ void test_cw_topology_two_inequal_tips(void) {
 
   for (size_t i = 0; i < selections; ++i) {
     TEST_ASSERT(iota_consensus_exit_probability_randomize(
-                    &ep_randomizer, &epv, &out, ep, &tip) == RC_OK);
-    if (memcmp(tip.trits, transaction_hash(&txs[num_txs - 1]),
+                    &ep_randomizer, &epv, &out, ep, tip_trits) == RC_OK);
+    if (memcmp(tip_trits, transaction_hash(&txs[num_txs - 1]),
                FLEX_TRIT_SIZE_243) == 0) {
       selected_tip_count++;
     }
@@ -614,9 +606,9 @@ void test_1_bundle(void) {
   TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &conf, &tangle,
                                                 EP_RANDOM_WALK) == RC_OK);
 
-  trit_array_t tip;
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
-  tip.trits = tip_trits;
+
+  init_epv(&epv);
   /// Select the tip
 
   DECLARE_PACK_SINGLE_TX(tx, tx_models, tx_pack);
@@ -629,8 +621,8 @@ void test_1_bundle(void) {
   int selections = 100;
   for (size_t i = 0; i < selections; ++i) {
     TEST_ASSERT(iota_consensus_exit_probability_randomize(
-                    &ep_randomizer, &epv, &out, ep, &tip) == RC_OK);
-    if (memcmp(tip.trits, transaction_hash(txs[0]), FLEX_TRIT_SIZE_243) == 0) {
+                    &ep_randomizer, &epv, &out, ep, tip_trits) == RC_OK);
+    if (memcmp(tip_trits, transaction_hash(txs[0]), FLEX_TRIT_SIZE_243) == 0) {
       selected_tip_count++;
     }
   }
@@ -721,9 +713,7 @@ void test_2_chained_bundles(void) {
   TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &conf, &tangle,
                                                 EP_RANDOM_WALK) == RC_OK);
 
-  trit_array_t tip;
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
-  tip.trits = tip_trits;
 
   init_epv(&epv);
   /// Select the tip
@@ -738,8 +728,8 @@ void test_2_chained_bundles(void) {
   int selections = 10;
   for (size_t i = 0; i < selections; ++i) {
     TEST_ASSERT(iota_consensus_exit_probability_randomize(
-                    &ep_randomizer, &epv, &out, ep, &tip) == RC_OK);
-    if (memcmp(tip.trits, transaction_hash(txs[0]), FLEX_TRIT_SIZE_243) == 0) {
+                    &ep_randomizer, &epv, &out, ep, tip_trits) == RC_OK);
+    if (memcmp(tip_trits, transaction_hash(txs[0]), FLEX_TRIT_SIZE_243) == 0) {
       selected_tip_count++;
     }
   }

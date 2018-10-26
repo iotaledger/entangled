@@ -141,7 +141,7 @@ retcode_t iota_consensus_random_walker_randomize(
     ep_randomizer_t const *const exit_probability_randomizer,
     exit_prob_transaction_validator_t *const ep_validator,
     cw_calc_result *const cw_result, trit_array_t const *const ep,
-    trit_array_t *const tip) {
+    flex_trit_t *const tip) {
   retcode_t ret = RC_OK;
   bool ep_is_valid = false;
   bool has_approver_tail = false;
@@ -178,7 +178,7 @@ retcode_t iota_consensus_random_walker_randomize(
     }
   } while (has_approver_tail);
 
-  memcpy(tip->trits, curr_tail_hash, FLEX_TRIT_SIZE_243);
+  memcpy(tip, curr_tail_hash, FLEX_TRIT_SIZE_243);
   log_debug(RANDOM_WALKER_LOGGER_ID,
             "Number of tails traversed to find tip: %" PRIu64 "\n",
             num_traversed_tails);

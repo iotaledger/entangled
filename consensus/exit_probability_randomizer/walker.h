@@ -23,7 +23,7 @@ retcode_t iota_consensus_random_walker_randomize(
     ep_randomizer_t const *const exit_probability_randomizer,
     exit_prob_transaction_validator_t *const ep_validator,
     cw_calc_result *const cw_result, trit_array_t const *const ep,
-    trit_array_p tip);
+    flex_trit_t *const tip);
 
 static ep_randomizer_vtable random_walk_vtable = {
     .exit_probability_randomize = iota_consensus_random_walker_randomize,
