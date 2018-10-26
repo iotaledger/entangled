@@ -12,8 +12,8 @@ get_transactions_to_approve_res_t* get_transactions_to_approve_res_new() {
       (get_transactions_to_approve_res_t*)malloc(
           sizeof(get_transactions_to_approve_res_t));
   if (res) {
-    memset(res->trunk, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
     memset(res->branch, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+    memset(res->trunk, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243)
   }
   return res;
 }
@@ -26,4 +26,16 @@ void get_transactions_to_approve_res_free(
 
   free(*res);
   *res = NULL;
+}
+
+void get_transactions_to_approve_res_set_branch(
+    get_transactions_to_approve_res_t* const res,
+    flex_trit_t const* const branch) {
+  memcpy(res->branch->trits, branch, FLEX_TRIT_SIZE_243);
+}
+
+void get_transactions_to_approve_res_set_trunk(
+    get_transactions_to_approve_res_t* const res,
+    flex_trit_t const* const trunk) {
+  memcpy(res->trunk->trits, trunk, FLEX_TRIT_SIZE_243);
 }
