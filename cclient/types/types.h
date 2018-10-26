@@ -18,6 +18,7 @@
 #include "common/trinary/tryte.h"
 
 #include "utils/containers/hash/hash243_queue.h"
+#include "utils/containers/hash/hash81_queue.h"
 #include "utils/logger_helper.h"
 
 #include "utarray.h"

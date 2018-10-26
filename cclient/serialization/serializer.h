@@ -26,7 +26,7 @@ typedef struct serializer_base serializer_t;
 typedef struct {
   // find_transactions_request
   retcode_t (*find_transactions_serialize_request)(
-      const serializer_t* const s, const find_transactions_req_t* const obj,
+      serializer_t const* const s, find_transactions_req_t const* const obj,
       char_buffer_t* out);
 
   retcode_t (*find_transactions_deserialize_response)(

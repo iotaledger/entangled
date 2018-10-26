@@ -8,6 +8,7 @@
 #include "test_json.h"
 
 void test_serialize_find_transactions(void) {
+  retcode_t ret = RC_OK;
   serializer_t serializer;
   init_json_serializer(&serializer);
   const char* json_text =
@@ -23,10 +24,26 @@ void test_serialize_find_transactions(void) {
   find_transactions_req_t* find_tran = find_transactions_req_new();
   char_buffer_t* serializer_out = char_buffer_new();
 
-  find_tran = find_transactions_req_add_tag(find_tran, TEST_27_TRYRES_1);
-  find_tran = find_transactions_req_add_approvee(find_tran, TEST_81_TRYRES_2);
-  find_tran = find_transactions_req_add_address(find_tran, TEST_81_TRYRES_1);
-  find_tran = find_transactions_req_add_bundle(find_tran, TEST_81_TRYRES_3);
+  trit_array_p tmp_hash =
+      trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_1);
+  ret = hash243_queue_push(&find_tran->addresses, tmp_hash->trits);
+  TEST_ASSERT(ret == RC_OK);
+  trit_array_free(tmp_hash);
+
+  tmp_hash = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_2);
+  ret = hash243_queue_push(&find_tran->approvees, tmp_hash->trits);
+  TEST_ASSERT(ret == RC_OK);
+  trit_array_free(tmp_hash);
+
+  tmp_hash = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_3);
+  ret = hash243_queue_push(&find_tran->bundles, tmp_hash->trits);
+  TEST_ASSERT(ret == RC_OK);
+  trit_array_free(tmp_hash);
+
+  tmp_hash = trit_array_new_from_trytes((tryte_t*)TEST_27_TRYRES_1);
+  ret = hash81_queue_push(&find_tran->tags, tmp_hash->trits);
+  TEST_ASSERT(ret == RC_OK);
+  trit_array_free(tmp_hash);
 
   serializer.vtable.find_transactions_serialize_request(&serializer, find_tran,
                                                         serializer_out);

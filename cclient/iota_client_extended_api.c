@@ -12,7 +12,6 @@ static retcode_t is_unused_address(iota_client_service_t const* const serv,
                                    bool* const is_unused) {
   retcode_t ret_code = RC_OK;
   size_t ret_num = 0;
-  tryte_t trytes_addr[NUM_TRYTES_ADDRESS];
   find_transactions_req_t* find_tran = NULL;
   find_transactions_res_t* res = NULL;
 
@@ -21,13 +20,13 @@ static retcode_t is_unused_address(iota_client_service_t const* const serv,
   if (!find_tran || !res) {
     return RC_CCLIENT_NULL_PTR;
   }
-  // TODO remove flex_trits-trytes convertion.
-  size_t trits_num = flex_trits_to_trytes(trytes_addr, NUM_TRYTES_ADDRESS, addr,
-                                          NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
-  if (trits_num) {
-    find_tran =
-        find_transactions_req_add_address(find_tran, (char*)trytes_addr);
-    ret_code = iota_client_find_transactions(serv, find_tran, res);
+
+  ret_code = hash243_queue_push(&find_tran->addresses, addr);
+  if (ret_code) {
+    return ret_code;
+  }
+  ret_code = iota_client_find_transactions(serv, find_tran, res);
+  if (!ret_code) {
     ret_num = find_transactions_res_hash_num(res);
     *is_unused = ret_num ? false : true;
   }
