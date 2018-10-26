@@ -419,8 +419,8 @@ done:
   return ret;
 }
 
-retcode_t iota_stor_transactions_update_solid_state_true(
-    const connection_t* const conn, const hash243_set_t hashes) {
+retcode_t iota_stor_transactions_update_solid_state(
+    const connection_t* const conn, const hash243_set_t hashes, bool is_solid) {
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
   uint32_t num_hashes = hash243_set_size(&hashes);
@@ -437,7 +437,12 @@ retcode_t iota_stor_transactions_update_solid_state_true(
     goto done;
   }
 
-  bind_hashes_params_t params = {.binding_index = 1,
+  if (sqlite3_bind_int(sqlite_statement, 1, (int)is_solid) != SQLITE_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
+  bind_hashes_params_t params = {.binding_index = 2,
                                  .sqlite_statement = sqlite_statement};
   if ((ret = hash243_set_for_each(&hashes, bind_hashes_do_func, &params)) !=
       RC_OK) {

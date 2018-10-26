@@ -57,7 +57,7 @@ char *iota_statement_transaction_exist_by_hash =
 
 char *iota_statement_transactions_update_solid_state_prefix =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SOLID
-    "=1 WHERE " TRANSACTION_COL_HASH " in (";
+    "=? WHERE " TRANSACTION_COL_HASH " in (";
 
 /*
  * Milestone statements

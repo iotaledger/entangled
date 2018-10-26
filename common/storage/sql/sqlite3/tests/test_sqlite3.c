@@ -343,15 +343,9 @@ void test_transactions_update_solid_states_one_transaction(void) {
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   struct _trit_array hash = {(flex_trit_t *)TEST_TRANSACTION.hash,
                              NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
-
-  hash243_set_t hashes1 = NULL;
-  hash243_set_add(&hashes1, TEST_TRANSACTION.hash);
-  TEST_ASSERT(iota_stor_transactions_update_solid_state_true(&conn, hashes1) ==
-              RC_OK);
-
   hash243_set_t hashes = NULL;
   hash243_set_add(&hashes, TEST_TRANSACTION.hash);
-  TEST_ASSERT(iota_stor_transactions_update_solid_state_true(&conn, hashes) ==
+  TEST_ASSERT(iota_stor_transactions_update_solid_state(&conn, hashes, true) ==
               RC_OK);
   hash_pack_reset(&pack);
   TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
@@ -390,7 +384,7 @@ void test_transactions_update_solid_states_two_transaction(void) {
   hash243_set_t hashes = NULL;
   hash243_set_add(&hashes, TEST_TRANSACTION.hash);
   hash243_set_add(&hashes, second_test_transaction.hash);
-  TEST_ASSERT(iota_stor_transactions_update_solid_state_true(&conn, hashes) ==
+  TEST_ASSERT(iota_stor_transactions_update_solid_state(&conn, hashes, true) ==
               RC_OK);
   hash_pack_reset(&pack);
   TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,

@@ -64,8 +64,8 @@ retcode_t iota_tangle_transaction_exist(const tangle_t *const tangle,
 retcode_t iota_tangle_transaction_update_solid_state(
     const tangle_t *const tangle, flex_trit_t *const hash, bool state);
 
-retcode_t iota_tangle_transactions_update_solid_state_true(
-    const tangle_t *const tangle, const hash243_set_t hashes);
+retcode_t iota_tangle_transactions_update_solid_state(
+    const tangle_t *const tangle, const hash243_set_t hashes, bool is_solid);
 
 /*
  * Milestone operations
