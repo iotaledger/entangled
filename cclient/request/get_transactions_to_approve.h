@@ -22,6 +22,8 @@ typedef struct get_transactions_to_approve_req_s {
 get_transactions_to_approve_req_t* get_transactions_to_approve_req_new();
 void get_transactions_to_approve_req_free(
     get_transactions_to_approve_req_t** const req);
+void get_transactions_to_approve_req_set_depth(
+    get_transactions_to_approve_req_t* const req, uint32_t const depth);
 void get_transactions_to_approve_req_set_reference(
     get_transactions_to_approve_req_t* const req,
     tryte_t const* const reference);

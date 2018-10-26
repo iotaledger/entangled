@@ -28,6 +28,11 @@ void get_transactions_to_approve_req_free(
   *req = NULL;
 }
 
+void get_transactions_to_approve_req_set_depth(
+    get_transactions_to_approve_req_t* const req, uint32_t const depth) {
+  req->depth = depth;
+}
+
 void get_transactions_to_approve_req_set_reference(
     get_transactions_to_approve_req_t* const req,
     tryte_t const* const reference) {
