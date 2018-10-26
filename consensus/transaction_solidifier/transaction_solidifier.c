@@ -107,8 +107,8 @@ static retcode_t propagate_solid_transactions(
         return ret;
       }
       if (is_approver_solid) {
-        if ((ret = iota_tangle_transaction_update_solid_state(
-                 ts->tangle, curr_approver_hash, true)) != RC_OK) {
+        if ((ret = add_new_solid_transaction(ts, curr_approver_hash)) !=
+            RC_OK) {
           return ret;
         }
       }
