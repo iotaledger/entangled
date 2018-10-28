@@ -11,6 +11,7 @@ cc_library(
         "//common:errors",
         "//consensus/tangle",
         "//consensus/transaction_validator",
+        "//gossip/components:broadcaster",
         "//utils:logger_helper",
         "//utils/handles:thread",
     ],

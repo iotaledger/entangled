@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["iota_packet.h"],
     deps = [
         "//ciri/conf:conf_values",
+        "//common:errors",
         "//common/model:transaction",
         "//common/network:endpoint",
         "//common/trinary:bytes",
@@ -30,6 +31,7 @@ cc_library(
         "//common/model:transaction",
         "//common/network:uri_parser",
         "//common/trinary:trit_array",
+        "//gossip/components:requester",
         "//gossip/services:tcp_sender",
         "//gossip/services:udp_sender",
     ],

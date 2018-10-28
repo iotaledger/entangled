@@ -575,14 +575,14 @@ void test_serialize_broadcast_transactions(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   broadcast_transactions_req_t* req = broadcast_transactions_req_new();
-  req = broadcast_transactions_req_add(req, TEST_2673_TRYRES_3);
+  broadcast_transactions_req_add_trytes(req, TEST_2673_TRYRES_3);
 
   serializer.vtable.broadcast_transactions_serialize_request(&serializer, req,
                                                              serializer_out);
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
   char_buffer_free(serializer_out);
-  broadcast_transactions_req_free(req);
+  broadcast_transactions_req_free(&req);
 }
 
 void test_serialize_store_transactions(void) {

@@ -9,8 +9,10 @@
 #define __GOSSIP_IOTA_PACKET_H__
 
 #include "ciri/conf/conf_values.h"
+#include "common/errors.h"
 #include "common/network/endpoint.h"
 #include "common/trinary/bytes.h"
+#include "common/trinary/flex_trit.h"
 
 // Forward declarations
 typedef struct _iota_transaction* iota_transaction_t;
@@ -40,10 +42,10 @@ void iota_packet_build(iota_packet_t* const packet, char const* const ip,
  * Fills the transaction part of a packet content
  *
  * @param packet The packet
- * @param tx The transaction
+ * @param flex_trits The transaction flex trits
  */
-void iota_packet_set_transaction(iota_packet_t* const packet,
-                                 iota_transaction_t const tx);
+retcode_t iota_packet_set_transaction(iota_packet_t* const packet,
+                                      flex_trit_t const* const flex_trits);
 
 /**
  * Fills the request part of a packet content
