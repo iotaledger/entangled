@@ -44,3 +44,8 @@ cc_library(
         "//conditions:default": [],
     }),
 )
+
+cc_library(
+    name = "cas",
+    hdrs = ["cas.h"],
+)
