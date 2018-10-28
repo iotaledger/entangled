@@ -12,6 +12,7 @@
 
 #include "common/errors.h"
 #include "common/network/endpoint.h"
+#include "common/trinary/flex_trit.h"
 
 // Forward declarations
 typedef struct node_s node_t;
@@ -61,12 +62,12 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
  *
  * @param node A node
  * @param neighbor The neighbor
- * @param packet The packet
+ * @param flex_trits Transaction flex trits
  *
  * @return a status code
  */
 retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
-                        iota_packet_t *const packet);
+                        flex_trit_t const *const flex_trits);
 
 #ifdef __cplusplus
 }

@@ -20,18 +20,15 @@ void iota_packet_build(iota_packet_t* const packet, char const* const ip,
   packet->source.protocol = protocol;
 }
 
-void iota_packet_set_transaction(iota_packet_t* const packet,
-                                 iota_transaction_t const tx) {
-  flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
-  trit_t tx_trits[NUM_TRITS_SERIALIZED_TRANSACTION];
-
-  if (packet == NULL || tx == NULL) {
-    return;
+retcode_t iota_packet_set_transaction(iota_packet_t* const packet,
+                                      flex_trit_t const* const flex_trits) {
+  if (packet == NULL || flex_trits == NULL) {
+    return RC_NULL_PARAM;
   }
 
-  transaction_serialize_on_flex_trits(tx, tx_flex_trits);
-
   flex_trits_to_bytes(packet->content, NUM_TRITS_SERIALIZED_TRANSACTION,
-                      tx_flex_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                      flex_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                       NUM_TRITS_SERIALIZED_TRANSACTION);
+
+  return RC_OK;
 }
