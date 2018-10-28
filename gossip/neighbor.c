@@ -66,7 +66,6 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
                         flex_trit_t const *const flex_trits) {
   retcode_t ret = RC_OK;
   trit_t hash_trits[HASH_LENGTH_TRIT];
-  trit_array_p hash = NULL;
   iota_packet_t packet;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
 

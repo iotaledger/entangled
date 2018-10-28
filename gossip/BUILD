@@ -31,7 +31,7 @@ cc_library(
         "//common/model:transaction",
         "//common/network:uri_parser",
         "//common/trinary:trit_array",
-        "//gossip/components:requester",
+        "//gossip/components:transaction_requester",
         "//gossip/services:tcp_sender",
         "//gossip/services:udp_sender",
     ],
