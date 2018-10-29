@@ -22,6 +22,7 @@ static tangle_t tangle;
 static transaction_validator_t transaction_validator;
 static node_t node;
 static broadcaster_t broadcaster;
+static iota_consensus_defs_t defs;
 
 void setUp(void) {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
@@ -97,9 +98,10 @@ int main(void) {
   api.transaction_validator = &transaction_validator;
   broadcaster_init(&broadcaster, &node);
   api.broadcaster = &broadcaster;
+  memset(defs.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
 
-  iota_consensus_transaction_validator_init(&transaction_validator, 1536845195,
-                                            10);
+  iota_consensus_transaction_validator_init(&transaction_validator, &defs,
+                                            1536845195, 10);
 
   RUN_TEST(test_broadcast_transactions_empty);
   RUN_TEST(test_broadcast_transactions_invalid_tx);

@@ -46,6 +46,7 @@ void hash_int_map_free(hash_int_map_t *const map) {
     HASH_DEL(*map, curr_entry);
     free(curr_entry);
   }
+  *map = NULL;
 }
 
 /*
@@ -94,4 +95,5 @@ void hash_to_indexed_hash_set_map_free(
     HASH_DEL(*map, curr_entry);
     free(curr_entry);
   }
+  *map = NULL;
 }

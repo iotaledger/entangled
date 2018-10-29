@@ -28,6 +28,7 @@ extern "C" {
 /// exit probabilities
 
 typedef struct exit_prob_transaction_validator_s {
+  iota_consensus_defs_t *defs;
   tangle_t *tangle;
   milestone_tracker_t *mt;
   ledger_validator_t *lv;
@@ -39,9 +40,10 @@ typedef struct exit_prob_transaction_validator_s {
 } exit_prob_transaction_validator_t;
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_init(
-    tangle_t *const tangle, milestone_tracker_t *const mt,
-    ledger_validator_t *const lv, exit_prob_transaction_validator_t *epv,
-    uint32_t max_analyzed_txs, uint32_t max_depth);
+    iota_consensus_defs_t *const defs, tangle_t *const tangle,
+    milestone_tracker_t *const mt, ledger_validator_t *const lv,
+    exit_prob_transaction_validator_t *epv, uint32_t max_analyzed_txs,
+    uint32_t max_depth);
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
     exit_prob_transaction_validator_t *epv);

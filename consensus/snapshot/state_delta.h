@@ -21,7 +21,9 @@ typedef state_delta_entry_t *state_delta_t;
 
 #define state_delta_add(delta, hash, value) hash_int_map_add(delta, hash, value)
 #define state_delta_find(delta, hash, entry) \
-  HASH_FIND(hh, delta, hash, FLEX_TRIT_SIZE_243, entry);
+  HASH_FIND(hh, delta, hash, FLEX_TRIT_SIZE_243, entry)
+#define state_delta_size(delta) HASH_COUNT(delta)
+#define state_delta_empty(delta) (state_delta_size(delta) == 0)
 #define state_delta_destroy(delta) hash_int_map_free(delta)
 
 int64_t state_delta_sum(state_delta_t const *const state);
