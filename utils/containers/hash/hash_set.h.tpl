@@ -32,6 +32,8 @@ retcode_t hash{SIZE}_set_add(hash{SIZE}_set_t *const set,
                             flex_trit_t const *const hash);
 retcode_t hash{SIZE}_set_remove(hash{SIZE}_set_t *const set,
                                 flex_trit_t const *const hash);
+retcode_t hash{SIZE}_set_remove_entry(hash{SIZE}_set_t *const set,
+                                      hash{SIZE}_set_entry_t *const entry);
 retcode_t hash{SIZE}_set_append(hash{SIZE}_set_t const *const set1,
                                hash{SIZE}_set_t *const set2);
 bool hash{SIZE}_set_contains(hash{SIZE}_set_t const *const set,

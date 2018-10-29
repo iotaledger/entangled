@@ -63,28 +63,28 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
 }
 
 retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
-                        flex_trit_t const *const flex_trits) {
+                        flex_trit_t const *const transaction) {
   retcode_t ret = RC_OK;
-  trit_t hash_trits[HASH_LENGTH_TRIT];
   iota_packet_t packet;
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t request[FLEX_TRIT_SIZE_243];
 
-  if (node == NULL || neighbor == NULL || flex_trits == NULL) {
+  if (node == NULL || neighbor == NULL || transaction == NULL) {
     return RC_NULL_PARAM;
   }
-  // TODO randomly select milestone or regular tx
-  if ((ret = get_transaction_to_request(node->requester, hash, false))) {
+
+  if ((ret = iota_packet_set_transaction(&packet, transaction)) != RC_OK) {
     return ret;
   }
 
-  if ((ret = iota_packet_set_transaction(&packet, flex_trits)) != RC_OK) {
+  bool is_milestone =
+      ((double)rand() / (double)RAND_MAX) < PROBABILITY_SELECT_MILESTONE_CHILD;
+  if ((ret = get_transaction_to_request(node->requester, request,
+                                        is_milestone)) != RC_OK) {
     return ret;
   }
-
-  // TODO(thibault): iota_packet_set_request
-  flex_trits_to_trits(hash_trits, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT,
-                      HASH_LENGTH_TRIT);
-  trits_to_bytes(hash_trits, packet.content + PACKET_TX_SIZE, NUM_TRITS_HASH);
+  if ((ret = iota_packet_set_request(&packet, request)) != RC_OK) {
+    return ret;
+  }
 
   if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
     if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, &packet) ==

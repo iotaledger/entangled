@@ -6,6 +6,7 @@
  */
 
 #include "gossip/components/transaction_requester.h"
+#include "ciri/conf/conf_values.h"
 #include "common/storage/sql/defs.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/logger_helper.h"
@@ -123,7 +124,7 @@ retcode_t request_transaction(requester_state_t *const state,
     return RC_REQUESTER_COMPONENT_NULL_STATE;
   }
 
-  if (!flex_trits_is_null(hash, FLEX_TRIT_SIZE_243)) {
+  if (flex_trits_is_null(hash, FLEX_TRIT_SIZE_243)) {
     return RC_OK;
   }
 
@@ -158,8 +159,8 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
                                      flex_trit_t *const hash,
                                      bool const milestone) {
   retcode_t ret = RC_OK;
-  hash243_set_t request_set = NULL;
-  hash243_set_t backup_set = NULL;
+  hash243_set_t *request_set = NULL;
+  hash243_set_t *backup_set = NULL;
   hash243_set_entry_t *iter = NULL;
   hash243_set_entry_t *tmp = NULL;
   trit_array_t key = {.trits = NULL,
@@ -172,34 +173,34 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
     return RC_REQUESTER_COMPONENT_NULL_STATE;
   }
 
-  request_set = milestone ? state->milestones : state->transactions;
-  backup_set = milestone ? state->transactions : state->milestones;
+  request_set = milestone ? &state->milestones : &state->transactions;
+  backup_set = milestone ? &state->transactions : &state->milestones;
 
   rw_lock_handle_wrlock(&state->lock);
 
-  request_set = hash243_set_size(&request_set) != 0 ? request_set : backup_set;
+  request_set = hash243_set_size(request_set) != 0 ? request_set : backup_set;
 
-  HASH_ITER(hh, request_set, iter, tmp) {
+  HASH_ITER(hh, *request_set, iter, tmp) {
     key.trits = iter->hash;
     if ((ret = iota_tangle_transaction_exist(
-             state->tangle, TRANSACTION_FIELD_HASH, &key, &exists))) {
+             state->tangle, TRANSACTION_FIELD_HASH, &key, &exists)) != RC_OK) {
       goto done;
     }
     if (exists) {
-      hash243_set_remove(&request_set, hash);
+      hash243_set_remove_entry(request_set, iter);
     } else {
+      memcpy(hash, iter->hash, FLEX_TRIT_SIZE_243);
       break;
     }
   }
 
-  if (hash243_set_size(&request_set) == 0) {
+  if (hash243_set_size(request_set) == 0) {
     memset(hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
-  } else {
-    memcpy(hash, iter->hash, FLEX_TRIT_SIZE_243);
   }
 
-  // TODO randomly drop "non-milestone" transactions so we don't keep on asking
-  // for non-existent transactions forever
+  if (((double)rand() / (double)RAND_MAX) < PROBABILITY_REMOVE_REQUEST) {
+    hash243_set_remove(request_set, iter->hash);
+  }
 
 done:
   rw_lock_handle_unlock(&state->lock);
