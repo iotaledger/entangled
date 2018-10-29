@@ -8,6 +8,8 @@
 #ifndef __COMMON_STORAGE_SQL_STATEMENTS_H__
 #define __COMMON_STORAGE_SQL_STATEMENTS_H__
 
+#include <inttypes.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -43,6 +45,17 @@ extern char* iota_statement_milestone_exist_by_hash;
 
 extern char* iota_statement_state_delta_store;
 extern char* iota_statement_state_delta_load;
+
+/*
+ * Functions
+ */
+
+extern void iota_statement_in_clause_combine(char* const statement,
+                                             const char* const prefix_statement,
+                                             uint32_t num_elements);
+
+extern uint16_t iota_statement_in_clause_size_to_alloc(
+    const char* const prefix_statement, uint32_t num_elements);
 
 #ifdef __cplusplus
 }

@@ -5,6 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <inttypes.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include "common/storage/defs.h"
 
 /*
