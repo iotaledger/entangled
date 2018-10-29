@@ -43,6 +43,7 @@ static snapshot_t snapshot;
 static milestone_tracker_t mt;
 static ledger_validator_t lv;
 static transaction_solidifier_t ts;
+static requester_state_t tr;
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
   TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL,
@@ -50,7 +51,8 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   iota_consensus_transaction_solidifier_init(&ts, &tangle, NULL);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, &ts,
                                           true) == RC_OK);
-  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &mt, NULL) ==
+  TEST_ASSERT(requester_init(&tr, &tangle) == RC_OK);
+  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &mt, &tr) ==
               RC_OK);
 
   // We want to avoid unnecessary validation
@@ -67,6 +69,7 @@ static void destroy_epv(exit_prob_transaction_validator_t *epv) {
   iota_milestone_tracker_destroy(&mt);
   iota_consensus_transaction_solidifier_destroy(&ts);
   iota_consensus_exit_prob_transaction_validator_destroy(epv);
+  requester_destroy(&tr);
 }
 
 void test_transaction_does_not_exist() {

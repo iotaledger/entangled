@@ -20,6 +20,8 @@ static core_t core_g;
 int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
 
+  srand(time(NULL));
+
   if (ciri_conf_parse(&core_g.config, argc, argv)) {
     return EXIT_FAILURE;
   }
@@ -47,7 +49,8 @@ int main(int argc, char* argv[]) {
   // TODO remove
   // Dummy broadcasted packet to begin receiving from UDP neighbors
   sleep(2);
-  flex_trit_t dummy[FLEX_TRIT_SIZE_8019] = {0};
+  flex_trit_t dummy[FLEX_TRIT_SIZE_8019];
+  memset(dummy, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
   broadcaster_on_next(&core_g.node.broadcaster, dummy);
   sleep(1000);
 

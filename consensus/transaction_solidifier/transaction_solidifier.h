@@ -15,7 +15,7 @@
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
 #include "consensus/tangle/tangle.h"
-#include "gossip/components/requester.h"
+#include "gossip/components/transaction_requester.h"
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/containers/hash/hash243_stack.h"
 #include "utils/handles/lock.h"

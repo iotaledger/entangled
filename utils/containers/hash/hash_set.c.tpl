@@ -23,6 +23,26 @@ retcode_t hash{SIZE}_set_add(hash{SIZE}_set_t *const set,
   return RC_OK;
 }
 
+retcode_t hash{SIZE}_set_remove(hash{SIZE}_set_t *const set,
+                                flex_trit_t const *const hash) {
+  hash{SIZE}_set_entry_t *entry = NULL;
+
+  if (set != NULL && * set != NULL && hash != NULL) {
+    HASH_FIND(hh, *set, hash, FLEX_TRIT_SIZE_{SIZE}, entry);
+    return hash{SIZE}_set_remove_entry(set, entry);
+  }
+  return RC_OK;
+}
+
+retcode_t hash{SIZE}_set_remove_entry(hash{SIZE}_set_t *const set,
+                                      hash{SIZE}_set_entry_t * const entry) {
+  if (set != NULL && * set != NULL && entry != NULL) {
+    HASH_DEL(*set, entry);
+    free(entry);
+  }
+  return RC_OK;
+}
+
 retcode_t hash{SIZE}_set_append(hash{SIZE}_set_t const *const set1,
                                hash{SIZE}_set_t *const set2) {
   retcode_t ret = RC_OK;

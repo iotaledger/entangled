@@ -86,7 +86,8 @@ static retcode_t reply_to_request(responder_state_t *const state,
     flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
 
     transaction_serialize_on_flex_trits(tx, tx_trits);
-    if ((ret = neighbor_send(state->node, request->neighbor, tx_trits))) {
+    if ((ret = neighbor_send(state->node, request->neighbor, tx_trits)) !=
+        RC_OK) {
       return ret;
     }
   } else {
@@ -94,7 +95,8 @@ static retcode_t reply_to_request(responder_state_t *const state,
     // TODO(thibault): Randomly doesn't propagate request
     if (trit_array_is_null(request->hash) == false) {
       // Request is an actual missing transaction
-      if ((ret = request_transaction(state->node->requester, request->hash))) {
+      if ((ret = request_transaction(state->node->requester,
+                                     request->hash->trits, false)) != RC_OK) {
         return ret;
       }
     }

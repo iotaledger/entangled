@@ -12,7 +12,7 @@
 #include "ciri/conf/conf.h"
 #include "ciri/node.h"
 #include "consensus/consensus.h"
-#include "gossip/components/requester.h"
+#include "gossip/components/transaction_requester.h"
 
 #ifdef __cplusplus
 extern "C" {

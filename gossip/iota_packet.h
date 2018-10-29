@@ -42,18 +42,19 @@ void iota_packet_build(iota_packet_t* const packet, char const* const ip,
  * Fills the transaction part of a packet content
  *
  * @param packet The packet
- * @param flex_trits The transaction flex trits
+ * @param transaction The transaction flex trits
  */
 retcode_t iota_packet_set_transaction(iota_packet_t* const packet,
-                                      flex_trit_t const* const flex_trits);
+                                      flex_trit_t const* const transaction);
 
 /**
  * Fills the request part of a packet content
  *
  * @param packet The packet
- * @param hash The requested hash
+ * @param request The request flex trits
  */
-void iota_packet_set_request(iota_packet_t* const packet, trit_array_p hash);
+retcode_t iota_packet_set_request(iota_packet_t* const packet,
+                                  flex_trit_t const* const request);
 
 #ifdef __cplusplus
 }

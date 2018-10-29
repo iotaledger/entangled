@@ -10,7 +10,7 @@ cc_library(
         "//consensus:defs",
         "//consensus/tangle",
         "//consensus/utils:tangle_traversals",
-        "//gossip/components:requester",
+        "//gossip/components:transaction_requester",
         "//utils:logger_helper",
         "//utils/containers/hash:hash243_set",
         "//utils/containers/hash:hash243_stack",

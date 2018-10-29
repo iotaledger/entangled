@@ -21,14 +21,27 @@ void iota_packet_build(iota_packet_t* const packet, char const* const ip,
 }
 
 retcode_t iota_packet_set_transaction(iota_packet_t* const packet,
-                                      flex_trit_t const* const flex_trits) {
-  if (packet == NULL || flex_trits == NULL) {
+                                      flex_trit_t const* const transaction) {
+  if (packet == NULL || transaction == NULL) {
     return RC_NULL_PARAM;
   }
 
   flex_trits_to_bytes(packet->content, NUM_TRITS_SERIALIZED_TRANSACTION,
-                      flex_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                      transaction, NUM_TRITS_SERIALIZED_TRANSACTION,
                       NUM_TRITS_SERIALIZED_TRANSACTION);
+
+  return RC_OK;
+}
+
+retcode_t iota_packet_set_request(iota_packet_t* const packet,
+                                  flex_trit_t const* const request) {
+  if (packet == NULL || request == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  flex_trits_to_bytes(packet->content + PACKET_TX_SIZE,
+                      HASH_LENGTH_TRIT - TESTNET_MWM, request, HASH_LENGTH_TRIT,
+                      HASH_LENGTH_TRIT - TESTNET_MWM);
 
   return RC_OK;
 }

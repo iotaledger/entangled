@@ -11,6 +11,16 @@
 #include "common/trinary/flex_trit.h"
 #include "common/trinary/trit_byte.h"
 #include "utils/macros.h"
+
+bool flex_trits_is_null(flex_trit_t const *const flex_trits, size_t const len) {
+  for (size_t i = 0; i < len; i++) {
+    if (flex_trits[i] != FLEX_TRIT_NULL_VALUE) {
+      return false;
+    }
+  }
+  return true;
+}
+
 size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
                         flex_trit_t const *const flex_trits, size_t const len,
                         size_t const start, size_t const num_trits) {

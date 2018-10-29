@@ -56,19 +56,16 @@ cc_library(
 )
 
 cc_library(
-    name = "requester_shared",
-    hdrs = ["requester.h"],
-    deps = ["//common:errors"],
-)
-
-cc_library(
-    name = "requester",
-    srcs = ["requester.c"],
+    name = "transaction_requester",
+    srcs = ["transaction_requester.c"],
+    hdrs = ["transaction_requester.h"],
     deps = [
-        ":requester_shared",
+        "//ciri/conf:conf_values",
+        "//common:errors",
         "//consensus/tangle",
         "//utils:logger_helper",
-        "//utils/containers/lists:concurrent_list_trit_array",
+        "//utils/containers/hash:hash243_set",
+        "//utils/handles:rw_lock",
     ],
 )
 

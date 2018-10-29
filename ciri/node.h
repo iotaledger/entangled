@@ -12,8 +12,8 @@
 #include "gossip/components/broadcaster.h"
 #include "gossip/components/processor.h"
 #include "gossip/components/receiver.h"
-#include "gossip/components/requester.h"
 #include "gossip/components/responder.h"
+#include "gossip/components/transaction_requester.h"
 
 #ifdef __cplusplus
 extern "C" {

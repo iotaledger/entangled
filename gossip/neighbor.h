@@ -62,12 +62,12 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
  *
  * @param node A node
  * @param neighbor The neighbor
- * @param flex_trits Transaction flex trits
+ * @param transaction Transaction flex trits
  *
  * @return a status code
  */
 retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
-                        flex_trit_t const *const flex_trits);
+                        flex_trit_t const *const transaction);
 
 #ifdef __cplusplus
 }
