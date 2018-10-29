@@ -13,6 +13,7 @@
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/snapshot/snapshot.h"
 #include "consensus/utils/tangle_traversals.h"
+#include "gossip/components/transaction_requester.h"
 #include "utils/logger_helper.h"
 
 #define LEDGER_VALIDATOR_LOGGER_ID "consensus_ledger_validator"
@@ -133,7 +134,8 @@ static retcode_t get_latest_delta(ledger_validator_t *const lv,
         goto done;
       }
       if (pack.num_loaded == 0) {
-        // TODO request transaction
+        ret = request_transaction(lv->transaction_requester, tx_hash.trits,
+                                  is_milestone);
         *valid_delta = false;
         goto done;
       }

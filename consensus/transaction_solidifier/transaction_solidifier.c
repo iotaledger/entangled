@@ -202,12 +202,7 @@ static retcode_t check_solidity_do_func(tangle_t *const tangle,
   } else if (pack->num_loaded == 0) {
     if (memcmp(hash, genesis_hash, FLEX_TRIT_SIZE_243) != 0) {
       params->is_solid = false;
-      trit_array_t hash_trits = {.trits = hash,
-                                 .num_trits = NUM_TRITS_HASH,
-                                 .num_bytes = FLEX_TRIT_SIZE_243,
-                                 .dynamic = 0};
-      return request_transaction(ts->requester, &hash_trits,
-                                 params->is_milestone);
+      return request_transaction(ts->requester, hash, params->is_milestone);
     }
   }
 
@@ -327,7 +322,7 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts,
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
 
   trit_array_t approvee_trits = {.trits = approvee,
-                                 .num_trits = NUM_TRITS_HASH,
+                                 .num_trits = HASH_LENGTH_TRIT,
                                  .num_bytes = FLEX_TRIT_SIZE_243,
                                  .dynamic = 0};
 
@@ -337,9 +332,7 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts,
     log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
               "No transactions were loaded for the provided tail hash\n");
     *solid = false;
-    return RC_OK;
-    // FIXME (@tsvisabo) CLL assigns pointers rather than copy, hence seg fault
-    // return request_transaction(ts->requester, &approvee_trits);
+    return request_transaction(ts->requester, approvee, false);
   }
   if (memcmp(curr_tx_s.hash, genesis_hash, FLEX_TRIT_SIZE_243) == 0) {
     *solid = true;
