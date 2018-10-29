@@ -248,7 +248,8 @@ retcode_t update_transactions(const connection_t* const conn,
 
   should_rollback_if_failed = true;
   if (type == BOOLEAN) {
-    if (sqlite3_bind_int(sqlite_statement, 1, *((int*)value)) != SQLITE_OK) {
+    int value_int = *((bool*)value);
+    if (sqlite3_bind_int(sqlite_statement, 1, value_int) != SQLITE_OK) {
       ret = binding_error();
       goto done;
     }
