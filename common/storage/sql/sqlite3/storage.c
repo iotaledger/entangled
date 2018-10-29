@@ -33,6 +33,17 @@ retcode_t iota_stor_destroy(connection_t const* const conn) {
 }
 
 /*
+ * Declarations/Definitions
+ */
+
+typedef struct bind_execute_hash_params_s {
+  sqlite3_stmt* sqlite_statement;
+} bind_execute_hash_params_t;
+
+static retcode_t bind_execute_hash_do_func(bind_execute_hash_params_t* params,
+                                           flex_trit_t* hash);
+
+/*
  * BEGIN / END transaction
  */
 
@@ -212,16 +223,72 @@ static retcode_t execute_statement_exist(sqlite3_stmt* sqlite_statement,
   return RC_OK;
 }
 
+enum value_type {
+  BOOLEAN,
+  INT64,
+};
+
+retcode_t update_transactions(const connection_t* const conn,
+                              const hash243_set_t hashes, void* value,
+                              const char* const statement,
+                              enum value_type type) {
+  retcode_t ret = RC_OK;
+  retcode_t ret_rollback;
+  sqlite3_stmt* sqlite_statement = NULL;
+  bool should_rollback_if_failed = false;
+
+  if ((ret = begin_transaction((sqlite3*)conn->db)) != RC_OK) {
+    return ret;
+  }
+
+  if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
+                               statement)) != RC_OK) {
+    goto done;
+  }
+
+  should_rollback_if_failed = true;
+  if (type == BOOLEAN) {
+    int value_int = *((bool*)value);
+    if (sqlite3_bind_int(sqlite_statement, 1, value_int) != SQLITE_OK) {
+      ret = binding_error();
+      goto done;
+    }
+  } else if (type == INT64) {
+    if (sqlite3_bind_int64(sqlite_statement, 1, *((int64_t*)value)) !=
+        SQLITE_OK) {
+      ret = binding_error();
+      goto done;
+    }
+  }
+
+  bind_execute_hash_params_t params = {.sqlite_statement = sqlite_statement};
+  if ((ret = hash243_set_for_each(&hashes, bind_execute_hash_do_func,
+                                  &params)) != RC_OK) {
+    goto done;
+  }
+
+done:
+
+  finalize_statement(sqlite_statement);
+  if (ret != RC_OK && should_rollback_if_failed) {
+    if ((ret_rollback = rollback_transaction((sqlite3*)conn->db)) != RC_OK) {
+      return ret_rollback;
+    }
+    return ret;
+  }
+  if (ret = end_transaction((sqlite3*)conn->db) != RC_OK) {
+    return ret;
+  }
+
+  return ret;
+}
+
 /*
  * Functors
  */
 
-typedef struct bind_execute_hash_params_s {
-  sqlite3_stmt* sqlite_statement;
-} bind_execute_hash_params_t;
-
-static retcode_t bind__execute_hash_do_func(bind_execute_hash_params_t* params,
-                                            flex_trit_t* hash) {
+static retcode_t bind_execute_hash_do_func(bind_execute_hash_params_t* params,
+                                           flex_trit_t* hash) {
   retcode_t ret = RC_OK;
   if (column_compress_bind(params->sqlite_statement, 2, hash,
                            FLEX_TRIT_SIZE_243) != RC_OK) {
@@ -455,47 +522,17 @@ done:
 
 retcode_t iota_stor_transactions_update_solid_state(
     const connection_t* const conn, const hash243_set_t hashes, bool is_solid) {
-  retcode_t ret = RC_OK;
-  retcode_t ret_rollback;
-  sqlite3_stmt* sqlite_statement = NULL;
-  bool should_rollback_if_failed = false;
+  return update_transactions(conn, hashes, &is_solid,
+                             iota_statement_transaction_update_solid_state,
+                             BOOLEAN);
+}
 
-  if ((ret = begin_transaction((sqlite3*)conn->db)) != RC_OK) {
-    return ret;
-  }
-
-  if ((ret = prepare_statement(
-           (sqlite3*)conn->db, &sqlite_statement,
-           iota_statement_transaction_update_solid_state)) != RC_OK) {
-    goto done;
-  }
-
-  should_rollback_if_failed = true;
-  if (sqlite3_bind_int(sqlite_statement, 1, (int)is_solid) != SQLITE_OK) {
-    ret = binding_error();
-    goto done;
-  }
-
-  bind_execute_hash_params_t params = {.sqlite_statement = sqlite_statement};
-  if ((ret = hash243_set_for_each(&hashes, bind__execute_hash_do_func,
-                                  &params)) != RC_OK) {
-    goto done;
-  }
-
-done:
-
-  finalize_statement(sqlite_statement);
-  if (ret != RC_OK && should_rollback_if_failed) {
-    if ((ret_rollback = rollback_transaction((sqlite3*)conn->db)) != RC_OK) {
-      return ret_rollback;
-    }
-    return ret;
-  }
-  if (ret = end_transaction((sqlite3*)conn->db) != RC_OK) {
-    return ret;
-  }
-
-  return ret;
+retcode_t iota_stor_transactions_update_snapshot_index(
+    connection_t const* const conn, const hash243_set_t hashes,
+    uint64_t const snapshot_index) {
+  return update_transactions(conn, hashes, &snapshot_index,
+                             iota_statement_transaction_update_snapshot_index,
+                             INT64);
 }
 
 retcode_t iota_stor_transaction_update_snapshot_index(
