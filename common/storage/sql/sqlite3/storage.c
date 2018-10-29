@@ -33,6 +33,31 @@ retcode_t iota_stor_destroy(connection_t const* const conn) {
 }
 
 /*
+ * BEGIN / END transaction
+ */
+
+static retcode_t begin_transaction(sqlite3* const db) {
+  if ((sqlite3_exec(db, "BEGIN TRANSACTION;", NULL, NULL, NULL)) != SQLITE_OK) {
+    return RC_SQLITE3_FAILED_BEGIN;
+  }
+  return RC_OK;
+}
+
+static retcode_t end_transaction(sqlite3* const db) {
+  if (sqlite3_exec(db, "END TRANSACTION;", NULL, NULL, NULL) != SQLITE_OK) {
+    return RC_SQLITE3_FAILED_END;
+  }
+  return RC_OK;
+}
+
+static retcode_t rollback_transaction(sqlite3* const db) {
+  if (sqlite3_exec(db, "ROLLBACK TRANSACTION;", NULL, NULL, NULL) !=
+      SQLITE_OK) {
+    return RC_SQLITE3_FAILED_ROLLBACK;
+  }
+  return RC_OK;
+}
+/*
  * Binding functions
  */
 
@@ -55,21 +80,6 @@ static retcode_t column_compress_bind(sqlite3_stmt* const statement,
     return RC_SQLITE3_FAILED_BINDING;
   }
   return RC_OK;
-}
-
-typedef struct bind_hashes_params_s {
-  uint32_t binding_index;
-  sqlite3_stmt* sqlite_statement;
-} bind_hashes_params_t;
-
-static retcode_t bind_hashes_do_func(bind_hashes_params_t* params,
-                                     flex_trit_t* hash) {
-  retcode_t ret = RC_OK;
-  if (column_compress_bind(params->sqlite_statement, params->binding_index++,
-                           hash, FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = binding_error();
-  }
-  return ret;
 }
 
 static void column_decompress_load(sqlite3_stmt* const statement,
@@ -199,6 +209,29 @@ static retcode_t execute_statement_exist(sqlite3_stmt* sqlite_statement,
   }
 
   return RC_OK;
+}
+
+/*
+ * Functors
+ */
+
+typedef struct bind_hashes_params_s {
+  sqlite3_stmt* sqlite_statement;
+} bind_execute_hash_params_t;
+
+static retcode_t bind__execute_hash_do_func(bind_execute_hash_params_t* params,
+                                            flex_trit_t* hash) {
+  retcode_t ret = RC_OK;
+  if (column_compress_bind(params->sqlite_statement, 2, hash,
+                           FLEX_TRIT_SIZE_243) != RC_OK) {
+    ret = binding_error();
+  }
+
+  if ((ret = execute_statement_store_update(params->sqlite_statement)) !=
+      RC_OK) {
+    return ret;
+  }
+  return ret;
 }
 
 /*
@@ -422,18 +455,16 @@ done:
 retcode_t iota_stor_transactions_update_solid_state(
     const connection_t* const conn, const hash243_set_t hashes, bool is_solid) {
   retcode_t ret = RC_OK;
+  retcode_t ret_rollback;
   sqlite3_stmt* sqlite_statement = NULL;
-  uint32_t num_hashes = hash243_set_size(&hashes);
-  uint16_t statement_size = iota_statement_in_clause_size_to_alloc(
-      iota_statement_transactions_update_solid_state_prefix, num_hashes);
 
-  char statement[statement_size];
-  iota_statement_in_clause_combine(
-      statement, iota_statement_transactions_update_solid_state_prefix,
-      num_hashes);
+  if ((ret = begin_transaction((sqlite3*)conn->db)) != RC_OK) {
+    return ret;
+  }
 
-  if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
-                               statement)) != RC_OK) {
+  if ((ret = prepare_statement(
+           (sqlite3*)conn->db, &sqlite_statement,
+           iota_statement_transaction_update_solid_state)) != RC_OK) {
     goto done;
   }
 
@@ -442,19 +473,25 @@ retcode_t iota_stor_transactions_update_solid_state(
     goto done;
   }
 
-  bind_hashes_params_t params = {.binding_index = 2,
-                                 .sqlite_statement = sqlite_statement};
-  if ((ret = hash243_set_for_each(&hashes, bind_hashes_do_func, &params)) !=
-      RC_OK) {
-    goto done;
-  }
-
-  if ((ret = execute_statement_store_update(sqlite_statement)) != RC_OK) {
+  bind_execute_hash_params_t params = {.sqlite_statement = sqlite_statement};
+  if ((ret = hash243_set_for_each(&hashes, bind__execute_hash_do_func,
+                                  &params)) != RC_OK) {
     goto done;
   }
 
 done:
+
   finalize_statement(sqlite_statement);
+  if (ret != RC_OK) {
+    if ((ret_rollback = rollback_transaction((sqlite3*)conn->db)) != RC_OK) {
+      return ret_rollback;
+    }
+    return ret;
+  }
+  if (ret = end_transaction((sqlite3*)conn->db) != RC_OK) {
+    return ret;
+  }
+
   return ret;
 }
 
