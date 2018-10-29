@@ -167,7 +167,7 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
         goto done;
       }
       if (pack.num_loaded == 0) {
-        ret = request_transaction(lv->transaction_requester, tx_hash.trits,
+        ret = request_transaction(lv->transaction_requester, curr_hash.trits,
                                   is_milestone);
         *valid_delta = false;
         goto done;
