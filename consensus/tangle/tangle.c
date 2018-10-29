@@ -102,6 +102,13 @@ retcode_t iota_tangle_transaction_update_snapshot_index(
                                                      snapshot_index);
 }
 
+retcode_t iota_tangle_transactions_update_snapshot_index(
+    const tangle_t *const tangle, const hash243_set_t hashes,
+    uint64_t snapshot_index) {
+  return iota_stor_transactions_update_snapshot_index(&tangle->conn, hashes,
+                                                      snapshot_index);
+}
+
 retcode_t iota_tangle_transaction_exist(const tangle_t *const tangle,
                                         transaction_field_t const field,
                                         const trit_array_p key, bool *exist) {
