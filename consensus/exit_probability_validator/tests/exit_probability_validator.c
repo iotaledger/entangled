@@ -69,6 +69,7 @@ static void destroy_epv(exit_prob_transaction_validator_t *epv) {
   iota_milestone_tracker_destroy(&mt);
   iota_consensus_transaction_solidifier_destroy(&ts);
   iota_consensus_exit_prob_transaction_validator_destroy(epv);
+  requester_destroy(&tr);
 }
 
 void test_transaction_does_not_exist() {
