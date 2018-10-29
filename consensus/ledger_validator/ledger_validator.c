@@ -26,6 +26,7 @@ static retcode_t update_snapshot_milestone_do_func(
     tangle_t *tangle, flex_trit_t *const hash, iota_stor_pack_t *pack,
     void *data, bool *should_branch, bool *should_stop) {
   retcode_t ret;
+  hash243_set_t *hashes = data;
 
   if (pack->num_loaded == 0) {
     *should_stop = true;
@@ -37,8 +38,7 @@ static retcode_t update_snapshot_milestone_do_func(
   *should_branch = transaction->snapshot_index == 0;
 
   if (*should_branch) {
-    if ((ret = iota_tangle_transaction_update_snapshot_index(
-             tangle, transaction->hash, *((uint64_t *)data))) != RC_OK) {
+    if ((ret = hash243_set_add(hashes, transaction->hash)) != RC_OK) {
       *should_stop = true;
       return ret;
     }
@@ -50,8 +50,18 @@ static retcode_t update_snapshot_milestone_do_func(
 static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
                                            flex_trit_t *const hash,
                                            uint64_t index) {
-  return tangle_traversal_dfs_to_genesis(
-      lv->tangle, update_snapshot_milestone_do_func, hash, &index);
+  retcode_t ret;
+  hash243_set_t hashes_to_update = NULL;
+
+  if ((ret = tangle_traversal_dfs_to_genesis(
+           lv->tangle, update_snapshot_milestone_do_func, hash,
+           &hashes_to_update)) != RC_OK) {
+    return ret;
+  }
+  ret = iota_tangle_transactions_update_snapshot_index(lv->tangle,
+                                                       hashes_to_update, index);
+  hash243_set_free(&hashes_to_update);
+  return ret;
 }
 
 static retcode_t build_snapshot(ledger_validator_t *const lv,

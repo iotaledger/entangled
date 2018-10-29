@@ -8,6 +8,8 @@
 #ifndef __COMMON_STORAGE_SQL_STATEMENTS_H__
 #define __COMMON_STORAGE_SQL_STATEMENTS_H__
 
+#include <inttypes.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
