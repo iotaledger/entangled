@@ -38,12 +38,10 @@ typedef struct {
 } inputs_t;
 
 typedef struct {
-  int64_t balance;
-  trit_array_p latest_address;
+  size_t balance;
+  flex_trit_t latest_address[FLEX_TRIT_SIZE_243];
   hash243_queue_t addresses;
-  inputs_list_t inputs;
-  transfer_list_t transfers;
-  transaction_list_t transactions;
+  hash243_queue_t transactions;
 } account_data_t;
 
 typedef struct {
@@ -51,6 +49,9 @@ typedef struct {
   size_t start;
   size_t total;
 } address_opt_t;
+
+void iota_client_extended_init();
+void iota_client_extended_destroy();
 
 /**
  * Re-broadcasts all transactions in a bundle given the tail transaction hash.
@@ -103,12 +104,11 @@ retcode_t iota_client_find_transaction_objects(
 
 /**
  * Returns an `account_data_t` object, containing account information about
- * `addresses`, `transactions`, `inputs` and total account balance.
+ * `addresses`, `transactions` and the total balance.
  *
  * @param {iota_client_service_t} serv - client service
- * @param {trit_array_p} seed
- * @param {address_opt_t} addr_opt - address options: Starting key index,
- * Security level, Ending Key index.
+ * @param {flex_trit_t} seed
+ * @param {size_t} security - Security
  * @param {account_data_t} out_account - acount data object
  *
  * @returns {retcode_t}
@@ -119,9 +119,9 @@ retcode_t iota_client_find_transaction_objects(
  * Refer:
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetAccountData.ts#L84
  */
-retcode_t iota_client_get_account_data(iota_client_service_t const* const serve,
-                                       trit_array_p const seed,
-                                       address_opt_t const addr_opt,
+retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
+                                       flex_trit_t const* const seed,
+                                       size_t const security,
                                        account_data_t* out_account);
 
 /**

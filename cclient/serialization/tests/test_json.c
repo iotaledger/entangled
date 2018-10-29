@@ -67,25 +67,27 @@ void test_deserialize_find_transactions(void) {
 
   trit_array_p tmp_hash = NULL;
   trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_1);
+  TEST_ASSERT_NOT_NULL(hash1);
   trit_array_p hash2 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_2);
+  TEST_ASSERT_NOT_NULL(hash2);
   trit_array_p hash3 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_3);
+  TEST_ASSERT_NOT_NULL(hash3);
 
   find_transactions_res_t* deserialize_find_tran = find_transactions_res_new();
 
   serializer.vtable.find_transactions_deserialize_response(
       &serializer, json_text, deserialize_find_tran);
 
-  tmp_hash = find_transactions_res_hash_at(deserialize_find_tran, 0);
-  TEST_ASSERT_EQUAL_MEMORY(hash1->trits, tmp_hash->trits, tmp_hash->num_bytes);
-
-  tmp_hash = find_transactions_res_hash_at(deserialize_find_tran, 1);
-  TEST_ASSERT_EQUAL_MEMORY(hash2->trits, tmp_hash->trits, tmp_hash->num_bytes);
-
-  tmp_hash = find_transactions_res_hash_at(deserialize_find_tran, 2);
-  TEST_ASSERT_EQUAL_MEMORY(hash3->trits, tmp_hash->trits, tmp_hash->num_bytes);
-
-  tmp_hash = find_transactions_res_hash_at(deserialize_find_tran, 3);
-  TEST_ASSERT_NULL(tmp_hash);
+  TEST_ASSERT_EQUAL_MEMORY(hash1->trits,
+                           hash243_queue_at(&deserialize_find_tran->hashes, 0),
+                           hash1->num_bytes);
+  TEST_ASSERT_EQUAL_MEMORY(hash2->trits,
+                           hash243_queue_at(&deserialize_find_tran->hashes, 1),
+                           hash2->num_bytes);
+  TEST_ASSERT_EQUAL_MEMORY(hash3->trits,
+                           hash243_queue_at(&deserialize_find_tran->hashes, 2),
+                           hash3->num_bytes);
+  TEST_ASSERT_EQUAL_INT(3, hash243_queue_count(&deserialize_find_tran->hashes));
 
   find_transactions_res_free(&deserialize_find_tran);
   trit_array_free(hash1);

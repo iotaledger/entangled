@@ -15,14 +15,11 @@ extern "C" {
 #endif
 
 typedef struct find_transactions_res {
-  flex_hash_array_t* hashes;
+  hash243_queue_t hashes;
 } find_transactions_res_t;
 
 find_transactions_res_t* find_transactions_res_new();
 void find_transactions_res_free(find_transactions_res_t** res);
-trit_array_p find_transactions_res_hash_at(find_transactions_res_t* in,
-                                           int index);
-size_t find_transactions_res_hash_num(find_transactions_res_t* in);
 
 #ifdef __cplusplus
 }

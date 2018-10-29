@@ -423,7 +423,7 @@ retcode_t json_find_transactions_deserialize_response(
     return RC_CCLIENT_RES_ERROR;
   }
 
-  out->hashes = json_array_to_flex_hash_array(json_obj, "hashes", out->hashes);
+  ret = json_array_to_hash243_queue(json_obj, "hashes", &out->hashes);
 
   cJSON_Delete(json_obj);
   return ret;

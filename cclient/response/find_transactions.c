@@ -11,18 +11,9 @@ find_transactions_res_t* find_transactions_res_new() {
   find_transactions_res_t* res =
       (find_transactions_res_t*)malloc(sizeof(find_transactions_res_t));
   if (res) {
-    res->hashes = flex_hash_array_new();
+    res->hashes = NULL;
   }
   return res;
-}
-
-trit_array_p find_transactions_res_hash_at(find_transactions_res_t* in,
-                                           int index) {
-  return flex_hash_array_at(in->hashes, index);
-}
-
-size_t find_transactions_res_hash_num(find_transactions_res_t* in) {
-  return flex_hash_array_count(in->hashes);
 }
 
 void find_transactions_res_free(find_transactions_res_t** res) {
@@ -31,7 +22,7 @@ void find_transactions_res_free(find_transactions_res_t** res) {
   }
 
   if ((*res)->hashes) {
-    flex_hash_array_free((*res)->hashes);
+    hash243_queue_free(&(*res)->hashes);
   }
   free(*res);
   *res = NULL;
