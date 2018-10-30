@@ -45,7 +45,7 @@ static retcode_t select_approver(
 
   for (idx = 0; idx < num_approvers; ++idx) {
     weights[idx] -= max_weight;
-    weights[idx] = exp(weights[idx] * exit_probability_randomizer->alpha);
+    weights[idx] = exp(weights[idx] * exit_probability_randomizer->conf->alpha);
     sum_weights += weights[idx];
   }
 

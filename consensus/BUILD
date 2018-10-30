@@ -5,7 +5,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
-        "//consensus:defs",
         "//consensus/bundle_validator",
         "//consensus/cw_rating_calculator",
         "//consensus/entry_point_selector",
@@ -18,15 +17,6 @@ cc_library(
         "//consensus/tip_selector",
         "//consensus/transaction_solidifier",
         "//consensus/transaction_validator",
-    ],
-)
-
-cc_library(
-    name = "defs",
-    hdrs = ["defs.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//common/trinary:flex_trit",
     ],
 )
 
@@ -44,5 +34,9 @@ cc_library(
     name = "conf",
     srcs = ["conf.c"],
     hdrs = ["conf.h"],
-    deps = ["//common:errors"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common:errors",
+        "//common/trinary:flex_trit",
+    ],
 )

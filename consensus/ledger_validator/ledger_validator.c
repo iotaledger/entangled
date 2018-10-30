@@ -232,13 +232,13 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
  */
 
 retcode_t iota_consensus_ledger_validator_init(
-    ledger_validator_t *const lv, iota_consensus_defs_t *const defs,
+    ledger_validator_t *const lv, iota_consensus_conf_t *const conf,
     tangle_t *const tangle, milestone_tracker_t *const mt,
     requester_state_t *const tr) {
   retcode_t ret = RC_OK;
 
   logger_helper_init(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
-  lv->defs = defs;
+  lv->conf = conf;
   lv->tangle = tangle;
   lv->milestone_tracker = mt;
   lv->transaction_requester = tr;

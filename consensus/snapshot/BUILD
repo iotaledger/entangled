@@ -27,7 +27,7 @@ cc_library(
         "//common:errors",
         "//common/model:transaction",
         "//common/trinary:trit_array",
-        "//consensus:defs",
+        "//consensus:conf",
         "//consensus/snapshot:state_delta",
         "//utils:logger_helper",
         "//utils:signed_files",

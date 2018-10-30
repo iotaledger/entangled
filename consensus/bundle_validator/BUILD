@@ -6,7 +6,7 @@ cc_library(
     deps = [
         "//common/model:bundle",
         "//common/sign:normalize",
-        "//consensus:defs",
+        "//consensus:conf",
         "//consensus/tangle",
     ],
 )

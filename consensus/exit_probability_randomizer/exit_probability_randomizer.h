@@ -19,14 +19,16 @@
 extern "C" {
 #endif
 
-enum ep_randomizer_implementation {
+// Forward declarations
+typedef struct ep_randomizer_base_s ep_randomizer_base_t;
+typedef struct ep_randomizer_s ep_randomizer_t;
+
+typedef enum ep_randomizer_implementation_e {
   EP_NO_IMPLEMENTATION,
   EP_RANDOM_WALK,
   EP_RANDOMIZE_SAMPLE,
-};
+} ep_randomizer_implementation_t;
 
-typedef struct ep_randomizer_base_s ep_randomizer_base_t;
-typedef struct ep_randomizer_s ep_randomizer_t;
 typedef struct {
   // find_transactions_request
   retcode_t (*exit_probability_randomize)(
@@ -42,13 +44,13 @@ struct ep_randomizer_base_s {
 
 struct ep_randomizer_s {
   ep_randomizer_base_t base;
+  iota_consensus_conf_t *conf;
   tangle_t *tangle;
-  double alpha;
 };
 
 extern retcode_t iota_consensus_ep_randomizer_init(
-    ep_randomizer_t *const ep_randomizer, tangle_t *const tangle, double alpha,
-    enum ep_randomizer_implementation);
+    ep_randomizer_t *const ep_randomizer, iota_consensus_conf_t *const conf,
+    tangle_t *const tangle, ep_randomizer_implementation_t);
 extern retcode_t iota_consensus_ep_randomizer_destroy(
     ep_randomizer_t *const ep_randomizer);
 

@@ -13,7 +13,7 @@
 
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
-#include "consensus/defs.h"
+#include "consensus/conf.h"
 #include "consensus/snapshot/state_delta.h"
 #include "utils/handles/rw_lock.h"
 

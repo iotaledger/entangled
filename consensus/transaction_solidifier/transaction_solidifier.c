@@ -109,8 +109,9 @@ static retcode_t propagate_solid_transactions(
 }
 
 retcode_t iota_consensus_transaction_solidifier_init(
-    transaction_solidifier_t *const ts, iota_consensus_defs_t *const defs,
+    transaction_solidifier_t *const ts, iota_consensus_conf_t *const conf,
     tangle_t *const tangle, requester_state_t *const requester) {
+  ts->conf = conf;
   ts->tangle = tangle;
   ts->requester = requester;
   ts->running = false;
@@ -197,7 +198,7 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash,
     *should_branch = true;
     return hash243_set_add(&ts->solid_transactions_candidates, hash);
   } else if (pack->num_loaded == 0) {
-    if (memcmp(hash, ts->defs->genesis_hash, FLEX_TRIT_SIZE_243) != 0) {
+    if (memcmp(hash, ts->conf->genesis_hash, FLEX_TRIT_SIZE_243) != 0) {
       params->is_solid = false;
       return request_transaction(ts->requester, hash, params->is_milestone);
     }
@@ -325,7 +326,7 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts,
     *solid = false;
     return request_transaction(ts->requester, approvee, false);
   }
-  if (memcmp(curr_tx_s.hash, ts->defs->genesis_hash, FLEX_TRIT_SIZE_243) == 0) {
+  if (memcmp(curr_tx_s.hash, ts->conf->genesis_hash, FLEX_TRIT_SIZE_243) == 0) {
     *solid = true;
     return ret;
   }

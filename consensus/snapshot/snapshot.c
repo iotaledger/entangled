@@ -10,6 +10,7 @@
 #include "cJSON.h"
 
 #include "common/model/transaction.h"
+#include "consensus/conf.h"
 #include "consensus/snapshot/snapshot.h"
 #include "utils/logger_helper.h"
 #include "utils/signed_files.h"

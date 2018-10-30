@@ -44,8 +44,6 @@ typedef struct milestone_tracker_s {
   size_t num_keys_in_milestone;
   ledger_validator_t* ledger_validator;
   transaction_solidifier_t* transaction_solidifier;
-  // TODO
-  // private final MessageQ messageQ;
   // bool accept_any_testnet_coo;
 } milestone_tracker_t;
 

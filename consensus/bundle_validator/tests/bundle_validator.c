@@ -14,7 +14,7 @@
 #include "common/model/transaction.h"
 #include "common/storage/tests/helpers/defs.h"
 #include "consensus/bundle_validator/bundle_validator.h"
-#include "consensus/defs.h"
+#include "consensus/conf.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
 

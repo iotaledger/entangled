@@ -9,7 +9,7 @@
 #include "common/sign/normalize.h"
 #include "common/sign/v1/iss_kerl.h"
 #include "common/trinary/trit_long.h"
-#include "consensus/defs.h"
+#include "consensus/conf.h"
 #include "utils/logger_helper.h"
 
 #define BUNDLE_VALIDATOR_LOGGER_ID "consensus_bundle_validator"
