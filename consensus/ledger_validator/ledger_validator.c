@@ -22,9 +22,11 @@
  * Private functions
  */
 
-static retcode_t update_snapshot_milestone_do_func(
-    tangle_t *tangle, flex_trit_t *const hash, iota_stor_pack_t *pack,
-    void *data, bool *should_branch, bool *should_stop) {
+static retcode_t update_snapshot_milestone_do_func(flex_trit_t *const hash,
+                                                   iota_stor_pack_t *pack,
+                                                   void *data,
+                                                   bool *should_branch,
+                                                   bool *should_stop) {
   retcode_t ret;
   hash243_set_t *hashes = data;
 
@@ -54,7 +56,7 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
   hash243_set_t hashes_to_update = NULL;
 
   if ((ret = tangle_traversal_dfs_to_genesis(
-           lv->tangle, update_snapshot_milestone_do_func, hash,
+           lv->tangle, update_snapshot_milestone_do_func, hash, NULL,
            &hashes_to_update)) != RC_OK) {
     return ret;
   }

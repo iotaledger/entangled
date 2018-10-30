@@ -37,8 +37,7 @@ static retcode_t add_new_solid_transaction(transaction_solidifier_t *const ts,
 static retcode_t propagate_solid_transactions(
     transaction_solidifier_t *const ts);
 
-static retcode_t check_solidity_do_func(tangle_t *const tangle,
-                                        flex_trit_t *hash,
+static retcode_t check_solidity_do_func(flex_trit_t *hash,
                                         iota_stor_pack_t *pack, void *data,
                                         bool *should_branch, bool *should_stop);
 
@@ -185,8 +184,7 @@ retcode_t iota_consensus_transaction_solidifier_destroy(
   return RC_OK;
 }
 
-static retcode_t check_solidity_do_func(tangle_t *const tangle,
-                                        flex_trit_t *hash,
+static retcode_t check_solidity_do_func(flex_trit_t *hash,
                                         iota_stor_pack_t *pack, void *data,
                                         bool *should_branch,
                                         bool *should_stop) {
@@ -239,7 +237,7 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
       .ts = ts, .is_milestone = is_milestone, .is_solid = true};
 
   if ((ret = tangle_traversal_dfs_to_genesis(ts->tangle, check_solidity_do_func,
-                                             hash, &params)) != RC_OK) {
+                                             hash, NULL, &params)) != RC_OK) {
     goto done;
   }
   if (params.is_solid) {
