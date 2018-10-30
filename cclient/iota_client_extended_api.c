@@ -33,7 +33,8 @@ static retcode_t is_unused_address(iota_client_service_t const* const serv,
   find_tran_req = find_transactions_req_new();
   find_tran_res = find_transactions_res_new();
   if (!find_tran_req || !find_tran_res) {
-    return RC_CCLIENT_NULL_PTR;
+    ret_code = RC_CCLIENT_NULL_PTR;
+    goto done;
   }
 
   ret_code = hash243_queue_push(&find_tran_req->addresses, addr);
@@ -62,7 +63,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
 
   log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   // security validation
-  if (addr_opt.security <= 0 || addr_opt.security > 3) {
+  if (addr_opt.security == 0 || addr_opt.security > 3) {
     return RC_CCLIENT_INVALID_SECURITY;
   }
 
@@ -148,14 +149,16 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
   address_opt_t const addr_opt = {.security = security, .start = 0, .total = 0};
   flex_trit_t* tmp_addr = NULL;
   size_t addr_index = 0;
+  hash243_queue_entry_t* tx_iter = NULL;
   find_transactions_req_t* find_tx_req = NULL;
   find_transactions_res_t* find_tx_res = NULL;
   get_balances_req_t* blances_req = get_balances_req_new();
   get_balances_res_t* blances_res = get_balances_res_new();
 
   // security validation
-  if (addr_opt.security <= 0 || addr_opt.security > 3) {
-    return RC_CCLIENT_INVALID_SECURITY;
+  if (addr_opt.security == 0 || addr_opt.security > 3) {
+    ret_code = RC_CCLIENT_INVALID_SECURITY;
+    goto done;
   }
 
   // get addresses
@@ -186,10 +189,10 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
           }
 
           // appending tx
-          for (int i = 0; i < tx_num; i++) {
+          tx_iter = NULL;
+          CDL_FOREACH(find_tx_res->hashes, tx_iter) {
             ret_code =
-                hash243_queue_push(&out_account->transactions,
-                                   hash243_queue_at(&find_tx_res->hashes, i));
+                hash243_queue_push(&out_account->transactions, tx_iter->hash);
             if (ret_code) {
               goto done;
             }
@@ -211,12 +214,14 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
     }
   }
 
-  // get balances
-  blances_req->threshold = 100;
-  blances_req->addresses = out_account->addresses;
-  ret_code = iota_client_get_balances(serv, blances_req, blances_res);
-  if (!ret_code) {
-    out_account->balance = get_balances_res_total_balance(blances_res);
+  if (out_account->addresses) {
+    // get balances
+    blances_req->threshold = 100;
+    blances_req->addresses = out_account->addresses;
+    ret_code = iota_client_get_balances(serv, blances_req, blances_res);
+    if (!ret_code) {
+      out_account->balance = get_balances_res_total_balance(blances_res);
+    }
   }
 
 done:
