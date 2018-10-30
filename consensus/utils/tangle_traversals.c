@@ -12,12 +12,12 @@
 retcode_t tangle_traversal_dfs_to_genesis(
     tangle_t *const tangle, tangle_traversal_functor func,
     flex_trit_t *const entry_point, flex_trit_t *const genesis_hash,
-    hash243_set_t *const analyzed_hashe_param, void *data) {
+    hash243_set_t *const analyzed_hashes_param, void *data) {
   retcode_t ret = RC_OK;
   hash243_stack_t non_analyzed_hashes = NULL;
   hash243_set_t analyzed_hashes_local = NULL;
   hash243_set_t *analyzed_hashes =
-      analyzed_hashe_param ? analyzed_hashe_param : &analyzed_hashes_local;
+      analyzed_hashes_param ? analyzed_hashes_param : &analyzed_hashes_local;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
 
   struct _trit_array tx_hash = {.trits = NULL,
@@ -71,7 +71,7 @@ retcode_t tangle_traversal_dfs_to_genesis(
   }
 
   hash243_stack_free(&non_analyzed_hashes);
-  if (!analyzed_hashe_param) {
+  if (!analyzed_hashes_param) {
     hash243_set_free(analyzed_hashes);
   }
   return ret;
