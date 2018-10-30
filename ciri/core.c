@@ -25,29 +25,22 @@ retcode_t core_init(core_t* const core) {
 
   log_info(CORE_LOGGER_ID, "Initializing consensus\n");
   if (iota_consensus_init(&core->consensus, &db_conf,
-                          &core->transaction_requester) != RC_OK) {
+                          &core->node.transaction_requester) != RC_OK) {
     log_critical(CORE_LOGGER_ID, "Initializing consensus failed\n");
     return RC_CORE_FAILED_CONSENSUS_INIT;
   }
 
-  log_info(CORE_LOGGER_ID, "Initializing transaction requester\n");
-  if (requester_init(&core->transaction_requester, &core->consensus.tangle)) {
-    log_critical(CORE_LOGGER_ID, "Initializing transaction requester failed\n");
-    return RC_CORE_FAILED_REQUESTER_INIT;
-  }
-
-  log_info(CORE_LOGGER_ID, "Initializing cIRI node\n");
-  if (node_init(&core->node, core, &core->consensus.tangle,
-                &core->transaction_requester)) {
-    log_critical(CORE_LOGGER_ID, "Initializing cIRI node failed\n");
+  log_info(CORE_LOGGER_ID, "Initializing gossiping node\n");
+  if (node_init(&core->node, core, &core->consensus.tangle)) {
+    log_critical(CORE_LOGGER_ID, "Initializing gossiping node failed\n");
     return RC_CORE_FAILED_NODE_INIT;
   }
 
-  log_info(CORE_LOGGER_ID, "Initializing cIRI API\n");
+  log_info(CORE_LOGGER_ID, "Initializing API\n");
   if (iota_api_init(&core->api, core->config.api_port, &core->consensus.tangle,
                     &core->consensus.transaction_validator,
                     &core->node.broadcaster, SR_JSON)) {
-    log_critical(CORE_LOGGER_ID, "Initializing cIRI API failed\n");
+    log_critical(CORE_LOGGER_ID, "Initializing API failed\n");
     return RC_CORE_FAILED_API_INIT;
   }
 
@@ -139,12 +132,6 @@ retcode_t core_destroy(core_t* const core) {
   if (iota_consensus_stop(&core->consensus) != RC_OK) {
     log_critical(CORE_LOGGER_ID, "Destroying consensus failed\n");
     return RC_CORE_FAILED_CONSENSUS_DESTROY;
-  }
-
-  log_info(CORE_LOGGER_ID, "Destroying transaction requester\n");
-  if (requester_destroy(&core->transaction_requester)) {
-    log_error(CORE_LOGGER_ID, "Destroying transaction requester failed\n");
-    ret = RC_CORE_FAILED_REQUESTER_DESTROY;
   }
 
   logger_helper_destroy(CORE_LOGGER_ID);

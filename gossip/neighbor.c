@@ -78,7 +78,7 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
 
   bool is_milestone =
       ((double)rand() / (double)RAND_MAX) < PROBABILITY_SELECT_MILESTONE_CHILD;
-  if ((ret = get_transaction_to_request(node->requester, request,
+  if ((ret = get_transaction_to_request(&node->transaction_requester, request,
                                         is_milestone)) != RC_OK) {
     return ret;
   }

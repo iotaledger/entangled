@@ -43,8 +43,6 @@ const char* error_2_string(retcode_t err) {
     case RC_CORE_FAILED_API_DESTROY:
     case RC_CORE_FAILED_SNAPSHOT_INIT:
     case RC_CORE_FAILED_SNAPSHOT_DESTROY:
-    case RC_CORE_FAILED_REQUESTER_INIT:
-    case RC_CORE_FAILED_REQUESTER_DESTROY:
     case RC_CORE_STILL_RUNNING:
     // Node Module
     case RC_NODE_NULL_NODE:

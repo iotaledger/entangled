@@ -30,9 +30,9 @@ typedef struct node_s {
   processor_state_t processor;
   receiver_state_t receiver;
   responder_state_t responder;
-  requester_state_t* requester;
+  requester_state_t transaction_requester;
   neighbors_list_t* neighbors;
-} node_t;
+} iota_node_t;
 
 /**
  * Initializes a node
@@ -40,13 +40,11 @@ typedef struct node_s {
  * @param node The node
  * @param core A core
  * @param tangle A tangle
- * @param transaction_requester A transaction requester
  *
  * @return a status code
  */
-retcode_t node_init(node_t* const node, core_t* const core,
-                    tangle_t* const tangle,
-                    requester_state_t* const transaction_requester);
+retcode_t node_init(iota_node_t* const node, core_t* const core,
+                    tangle_t* const tangle);
 
 /**
  * Starts a node
@@ -55,7 +53,7 @@ retcode_t node_init(node_t* const node, core_t* const core,
  *
  * @return a status code
  */
-retcode_t node_start(node_t* const node);
+retcode_t node_start(iota_node_t* const node);
 
 /**
  * Stops a node
@@ -64,7 +62,7 @@ retcode_t node_start(node_t* const node);
  *
  * @return a status code
  */
-retcode_t node_stop(node_t* const node);
+retcode_t node_stop(iota_node_t* const node);
 
 /**
  * Destroys a node
@@ -73,7 +71,7 @@ retcode_t node_stop(node_t* const node);
  *
  * @return a status code
  */
-retcode_t node_destroy(node_t* const node);
+retcode_t node_destroy(iota_node_t* const node);
 
 #ifdef __cplusplus
 }
