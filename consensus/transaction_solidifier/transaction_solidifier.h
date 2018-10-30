@@ -14,6 +14,7 @@
 #include "common/errors.h"
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
+#include "consensus/defs.h"
 #include "consensus/tangle/tangle.h"
 #include "gossip/components/transaction_requester.h"
 #include "utils/containers/hash/hash243_set.h"
@@ -26,6 +27,7 @@ extern "C" {
 #endif
 
 typedef struct transaction_solidifier_s {
+  iota_consensus_defs_t *defs;
   tangle_t *tangle;
   requester_state_t *requester;
   thread_handle_t thread;
@@ -36,8 +38,8 @@ typedef struct transaction_solidifier_s {
 } transaction_solidifier_t;
 
 extern retcode_t iota_consensus_transaction_solidifier_init(
-    transaction_solidifier_t *const ts, tangle_t *const tangle,
-    requester_state_t *const requester);
+    transaction_solidifier_t *const ts, iota_consensus_defs_t *const defs,
+    tangle_t *const tangle, requester_state_t *const requester);
 
 extern retcode_t iota_consensus_transaction_solidifier_start(
     transaction_solidifier_t *const ts);

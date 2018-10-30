@@ -56,8 +56,8 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
   hash243_set_t hashes_to_update = NULL;
 
   if ((ret = tangle_traversal_dfs_to_genesis(
-           lv->tangle, update_snapshot_milestone_do_func, hash, NULL,
-           &hashes_to_update)) != RC_OK) {
+           lv->tangle, update_snapshot_milestone_do_func, hash,
+           lv->defs->genesis_hash, NULL, &hashes_to_update)) != RC_OK) {
     return ret;
   }
   ret = iota_tangle_transactions_update_snapshot_index(lv->tangle,

@@ -80,8 +80,8 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing transaction solidifier\n");
   if ((ret = iota_consensus_transaction_solidifier_init(
-           &consensus->transaction_solidifier, &consensus->tangle,
-           transaction_requester)) != RC_OK) {
+           &consensus->transaction_solidifier, &consensus->defs,
+           &consensus->tangle, transaction_requester)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing transaction solidifier failed\n");
     return ret;

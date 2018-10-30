@@ -56,11 +56,12 @@ static snapshot_t snapshot;
 static milestone_tracker_t mt;
 static ledger_validator_t lv;
 static transaction_solidifier_t ts;
+static iota_consensus_defs_t defs;
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
   TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL,
                                  snapshot_conf_path, true) == RC_OK);
-  iota_consensus_transaction_solidifier_init(&ts, &tangle, NULL);
+  iota_consensus_transaction_solidifier_init(&ts, &defs, &tangle, NULL);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, &ts,
                                           true) == RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &defs, &tangle, &mt,
