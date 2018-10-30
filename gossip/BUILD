@@ -27,7 +27,7 @@ cc_library(
     srcs = ["neighbor.c"],
     deps = [
         ":neighbor_shared",
-        "//ciri:node_shared",
+        ":node_shared",
         "//common/model:transaction",
         "//common/network:uri_parser",
         "//common/trinary:trit_array",
@@ -47,4 +47,28 @@ cc_library(
     srcs = ["conf.c"],
     hdrs = ["conf.h"],
     deps = ["//common:errors"],
+)
+
+cc_library(
+    name = "node_shared",
+    hdrs = ["node.h"],
+    deps = [
+        "//gossip/components:broadcaster_shared",
+        "//gossip/components:processor_shared",
+        "//gossip/components:receiver_shared",
+        "//gossip/components:responder_shared",
+        "//gossip/components:transaction_requester",
+    ],
+)
+
+cc_library(
+    name = "node",
+    srcs = ["node.c"],
+    deps = [
+        ":node_shared",
+        "//gossip/components:broadcaster",
+        "//gossip/components:processor",
+        "//gossip/components:receiver",
+        "//gossip/components:responder",
+    ],
 )

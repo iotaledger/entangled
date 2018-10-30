@@ -16,7 +16,7 @@ cc_library(
     srcs = ["broadcaster.c"],
     deps = [
         ":broadcaster_shared",
-        "//ciri:node_shared",
+        "//gossip:node_shared",
         "//utils:logger_helper",
         "//utils/containers/lists:concurrent_list_neighbor",
     ],
@@ -50,7 +50,7 @@ cc_library(
     srcs = ["receiver.c"],
     deps = [
         ":receiver_shared",
-        "//ciri:node_shared",
+        "//gossip:node_shared",
         "//gossip/services:receiver",
     ],
 )

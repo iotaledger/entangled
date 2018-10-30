@@ -6,7 +6,7 @@
  */
 
 #include "gossip/services/tcp_receiver.hpp"
-#include "ciri/node.h"
+#include "gossip/node.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/logger_helper.h"

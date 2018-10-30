@@ -8,8 +8,8 @@
 #include <string.h>
 
 #include "ciri/conf/conf_values.h"
-#include "ciri/node.h"
 #include "gossip/components/receiver.h"
+#include "gossip/node.h"
 #include "utils/logger_helper.h"
 
 #define RECEIVER_COMPONENT_LOGGER_ID "receiver_component"
