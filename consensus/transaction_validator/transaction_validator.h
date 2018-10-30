@@ -22,13 +22,10 @@ extern "C" {
 
 typedef struct transaction_validator_t {
   iota_consensus_conf_t *conf;
-  uint64_t snapshot_timestamp_ms;
-  uint8_t mwm;
 } transaction_validator_t;
 
 extern retcode_t iota_consensus_transaction_validator_init(
-    transaction_validator_t *const tv, iota_consensus_conf_t *const conf,
-    uint64_t snapshot_timestamp_ms, uint8_t mwm);
+    transaction_validator_t *const tv, iota_consensus_conf_t *const conf);
 
 extern retcode_t iota_consensus_transaction_validator_destroy(
     transaction_validator_t *const tv);

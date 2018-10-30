@@ -47,15 +47,13 @@ extern "C" {
  *
  * @param consensus The consensus
  * @param db_conf Database configuration
- * @param testnet Testnet if true, Mainnet otherwise
  * @param transaction_requester A transaction requester
  *
  * @return a status code
  */
 retcode_t iota_consensus_init(iota_consensus_t* const consensus,
                               connection_config_t const* const db_conf,
-                              requester_state_t* const transaction_requester,
-                              bool testnet);
+                              requester_state_t* const transaction_requester);
 
 /**
  * Starts all consensus components

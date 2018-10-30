@@ -61,11 +61,13 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   conf.max_depth = max_depth;
   conf.below_max_depth = max_txs_below_max_depth;
 
-  TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL,
-                                 snapshot_conf_path, true) == RC_OK);
+  strcpy(conf.snapshot_file, snapshot_path);
+  strcpy(conf.snapshot_conf_file, snapshot_conf_path);
+  strcpy(conf.snapshot_sig_file, "");
+  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_OK);
   iota_consensus_transaction_solidifier_init(&ts, &conf, &tangle, NULL);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, &ts,
-                                          true) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &tangle, &snapshot, &lv,
+                                          &ts) == RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &conf, &tangle, &mt,
                                                    NULL) == RC_OK);
 
