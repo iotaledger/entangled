@@ -128,6 +128,79 @@ done:
   return ret;
 }
 
+typedef struct get_latest_delta_do_func_params_s {
+  ledger_validator_t *lv;
+  bool valid_delta;
+  bool is_milestone;
+  uint64_t latest_snapshot_index;
+  state_delta_t *state;
+} get_latest_delta_do_func_params_t;
+
+static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
+                                          iota_stor_pack_t *pack, void *data,
+                                          bool *should_branch,
+                                          bool *should_stop) {
+  retcode_t ret = RC_OK;
+  bool valid_bundle = false;
+  struct _trit_array curr_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
+  bundle_transactions_t *bundle = NULL;
+  iota_transaction_t tx_bundle = NULL;
+
+  *should_stop = false;
+  *should_branch = false;
+  get_latest_delta_do_func_params_t *params =
+      (get_latest_delta_do_func_params_t *)data;
+  ledger_validator_t *lv = params->lv;
+
+  // Transaction is not marked solid, but it is a candidate
+  if (pack->num_loaded == 0) {
+    if (lv->transaction_requester) {
+      ret = request_transaction(lv->transaction_requester, hash,
+                                params->is_milestone);
+    }
+    params->valid_delta = false;
+    *should_stop = true;
+    return ret;
+  }
+
+  iota_transaction_t tx = pack->models[0];
+  *should_branch = true;
+  if (tx->snapshot_index == 0 ||
+      tx->snapshot_index > params->latest_snapshot_index) {
+    if (tx->current_index == 0) {
+      bundle_transactions_new(&bundle);
+      curr_hash.trits = hash;
+      if ((ret = iota_consensus_bundle_validator_validate(
+               lv->tangle, &curr_hash, bundle, &valid_bundle)) != RC_OK) {
+        goto done;
+      }
+      if (!valid_bundle ||
+          (tx_bundle = (iota_transaction_t)utarray_eltptr(bundle, 0)) != NULL) {
+        params->valid_delta = false;
+        *should_stop = true;
+        goto done;
+      }
+      while (tx_bundle != NULL) {
+        if (tx_bundle->value != 0) {
+          if ((ret = state_delta_add_or_sum(params->state, tx_bundle->address,
+                                            tx_bundle->value)) != RC_OK) {
+            goto done;
+          }
+        }
+        tx_bundle = (iota_transaction_t)utarray_next(bundle, tx_bundle);
+      }
+    }
+  }
+
+done:
+  bundle_transactions_free(&bundle);
+  if (ret != RC_OK) {
+    *should_stop = true;
+    params->valid_delta = false;
+  }
+  return ret;
+}
+
 static retcode_t get_latest_delta(ledger_validator_t const *const lv,
                                   hash243_set_t *const analyzed_hashes,
                                   state_delta_t *const state,
@@ -136,92 +209,18 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
                                   bool const is_milestone,
                                   bool *const valid_delta) {
   retcode_t ret = RC_OK;
-  hash243_stack_t non_analyzed_hashes = NULL;
-  hash243_set_t counted_hashes = NULL;
-  iota_transaction_t tx_bundle = NULL;
-  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  struct _trit_array curr_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
 
-  bool valid_bundle = false;
-  bundle_transactions_t *bundle = NULL;
-  bundle_transactions_new(&bundle);
+  get_latest_delta_do_func_params_t params = {
+      .state = state,
+      .valid_delta = true,
+      .latest_snapshot_index = latest_snapshot_index,
+      .is_milestone = is_milestone,
+      .lv = lv};
 
-  if ((ret = hash243_stack_push(&non_analyzed_hashes, tip)) != RC_OK) {
-    goto done;
-  }
-
-  if ((ret = hash243_set_add(analyzed_hashes, lv->defs->genesis_hash)) !=
-      RC_OK) {
-    goto done;
-  }
-  if ((ret = hash243_set_add(&counted_hashes, lv->defs->genesis_hash)) !=
-      RC_OK) {
-    goto done;
-  }
-
-  while (non_analyzed_hashes != NULL) {
-    curr_hash.trits = hash243_stack_peek(non_analyzed_hashes);
-    if (!hash243_set_contains(analyzed_hashes, curr_hash.trits)) {
-      hash_pack_reset(&pack);
-      if ((ret = iota_tangle_transaction_load(
-               lv->tangle, TRANSACTION_FIELD_HASH, &curr_hash, &pack)) !=
-          RC_OK) {
-        goto done;
-      }
-      if (pack.num_loaded == 0) {
-        ret = request_transaction(lv->transaction_requester, curr_hash.trits,
-                                  is_milestone);
-        *valid_delta = false;
-        goto done;
-      }
-      if (tx.snapshot_index == 0 || tx.snapshot_index > latest_snapshot_index) {
-        if (tx.current_index == 0) {
-          valid_bundle = false;
-          if ((ret = iota_consensus_bundle_validator_validate(
-                   lv->tangle, &curr_hash, bundle, &valid_bundle)) != RC_OK) {
-            goto done;
-          }
-          if (!valid_bundle || (tx_bundle = (iota_transaction_t)utarray_eltptr(
-                                    bundle, 0)) != NULL) {
-            *valid_delta = false;
-            goto done;
-          }
-          while (tx_bundle != NULL) {
-            if (tx_bundle->value != 0) {
-              if (!hash243_set_contains(&counted_hashes, tx_bundle->hash)) {
-                if ((ret = state_delta_add_or_sum(state, tx_bundle->address,
-                                                  tx_bundle->value)) != RC_OK) {
-                  goto done;
-                }
-                if ((ret = hash243_set_add(&counted_hashes, tx_bundle->hash)) !=
-                    RC_OK) {
-                  goto done;
-                }
-              }
-            }
-            tx_bundle = (iota_transaction_t)utarray_next(bundle, tx_bundle);
-          }
-        }
-        if ((ret = hash243_stack_push(&non_analyzed_hashes, tx.trunk)) !=
-            RC_OK) {
-          goto done;
-        }
-        if ((ret = hash243_stack_push(&non_analyzed_hashes, tx.branch)) !=
-            RC_OK) {
-          goto done;
-        }
-      }
-      if ((ret = hash243_set_add(analyzed_hashes, curr_hash.trits)) != RC_OK) {
-        goto done;
-      }
-    }
-    hash243_stack_pop(&non_analyzed_hashes);
-  }
-
-done:
-  bundle_transactions_free(&bundle);
-  hash243_stack_free(&non_analyzed_hashes);
-  hash243_set_free(&counted_hashes);
+  ret = tangle_traversal_dfs_to_genesis(lv->tangle, get_latest_delta_do_func,
+                                        tip, lv->defs->genesis_hash,
+                                        analyzed_hashes, (void *)&params);
+  *valid_delta = params.valid_delta;
   return ret;
 }
 

@@ -16,7 +16,7 @@ retcode_t tangle_traversal_dfs_to_genesis(
   retcode_t ret = RC_OK;
   hash243_stack_t non_analyzed_hashes = NULL;
   hash243_set_t analyzed_hashes_local = NULL;
-  hash243_set_t analyzed_hashes =
+  hash243_set_t *analyzed_hashes =
       analyzed_hashe_param ? analyzed_hashe_param : &analyzed_hashes_local;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
 
@@ -28,7 +28,7 @@ retcode_t tangle_traversal_dfs_to_genesis(
   if ((ret = hash243_stack_push(&non_analyzed_hashes, entry_point)) != RC_OK) {
     return ret;
   }
-  if ((ret = hash243_stack_push(&non_analyzed_hashes, genesis_hash)) != RC_OK) {
+  if ((ret = hash243_set_add(analyzed_hashes, genesis_hash)) != RC_OK) {
     return ret;
   }
 

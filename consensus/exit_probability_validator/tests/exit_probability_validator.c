@@ -47,6 +47,7 @@ static requester_state_t tr;
 static iota_consensus_defs_t defs;
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
+  memset(defs.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL,
                                  snapshot_conf_path, true) == RC_OK);
   iota_consensus_transaction_solidifier_init(&ts, &defs, &tangle, NULL);
@@ -209,6 +210,8 @@ void test_transaction_exceed_max_transactions() {
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = max_depth + 1;
   txs[1]->snapshot_index = max_depth + 1;
+  memcpy(txs[1]->trunk, defs.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[1]->branch, defs.genesis_hash, FLEX_TRIT_SIZE_243);
   build_tangle(&tangle, txs, 2);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
@@ -303,6 +306,7 @@ int main(int argc, char *argv[]) {
     test_db_path = "test.db";
     ciri_db_path = "ciri.db";
     snapshot_path = "snapshot.txt";
+    snapshot_conf_path = "snapshot_conf.json";
   }
 
   config.db_path = test_db_path;
