@@ -41,3 +41,10 @@ cc_library(
     name = "transaction_request",
     hdrs = ["transaction_request.h"],
 )
+
+cc_library(
+    name = "conf",
+    srcs = ["conf.c"],
+    hdrs = ["conf.h"],
+    deps = ["//common:errors"],
+)

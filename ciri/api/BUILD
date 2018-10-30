@@ -16,3 +16,10 @@ cc_library(
         "//utils/handles:thread",
     ],
 )
+
+cc_library(
+    name = "conf",
+    srcs = ["conf.c"],
+    hdrs = ["conf.h"],
+    deps = ["//common:errors"],
+)

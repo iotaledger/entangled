@@ -39,3 +39,10 @@ cc_library(
         "//common/trinary:trit_array",
     ],
 )
+
+cc_library(
+    name = "conf",
+    srcs = ["conf.c"],
+    hdrs = ["conf.h"],
+    deps = ["//common:errors"],
+)
