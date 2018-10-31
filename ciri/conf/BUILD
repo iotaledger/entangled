@@ -8,10 +8,7 @@ cc_library(
 
 cc_library(
     name = "conf",
-    srcs = [
-        "conf.c",
-        "conf_provider_getopt.c",
-    ],
+    srcs = ["conf.c"],
     hdrs = ["conf.h"],
     deps = [
         ":usage",
