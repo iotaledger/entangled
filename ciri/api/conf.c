@@ -13,9 +13,6 @@ retcode_t iota_api_conf_init(iota_api_conf_t* const conf) {
   }
 
   conf->port = DEFAULT_API_PORT;
-
-  // Limits conf
-
   conf->max_get_trytes = DEFAULT_MAX_GET_TRYTES;
 
   return RC_OK;
