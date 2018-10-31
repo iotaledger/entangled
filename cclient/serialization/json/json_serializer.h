@@ -23,21 +23,21 @@ void logger_destroy_json_serializer();
 void init_json_serializer(serializer_t* serializer);
 
 retcode_t json_find_transactions_serialize_request(
-    const serializer_t* const s, const find_transactions_req_t* const obj,
+    serializer_t const* const s, find_transactions_req_t const* const obj,
     char_buffer_t* out);
 
 retcode_t json_find_transactions_deserialize_response(
-    const serializer_t* const, const char* const obj,
-    find_transactions_res_t** out);
+    serializer_t const* const, char const* const obj,
+    find_transactions_res_t* out);
 
 // get_balances_response
 retcode_t json_get_balances_serialize_request(
-    const serializer_t* const, const get_balances_req_t* const obj,
+    serializer_t const* const, get_balances_req_t const* const obj,
     char_buffer_t* out);
 
-retcode_t json_get_balances_deserialize_response(const serializer_t* const,
-                                                 const char* const obj,
-                                                 get_balances_res_t** out);
+retcode_t json_get_balances_deserialize_response(serializer_t const* const,
+                                                 char const* const obj,
+                                                 get_balances_res_t* out);
 
 // get_inclusion_state_response
 retcode_t json_get_inclusion_state_serialize_request(
