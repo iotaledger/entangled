@@ -33,7 +33,7 @@ cIRI is built and run through [bazel](https://www.bazel.build/).
 ```
 $ git clone https://github.com/iotaledger/entangled.git
 $ cd entangled
-$ bazel run -- ciri <optional flags>
+$ bazel run --define network=mainnet|testnet -- ciri <optional flags>
 ```
 
 *First build can take some time due to dependencies downloading.*
