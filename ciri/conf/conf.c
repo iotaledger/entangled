@@ -10,25 +10,34 @@
 #include "ciri/conf/conf.h"
 #include "ciri/conf/conf_values.h"
 
-retcode_t ciri_conf_init(ciri_conf_t* conf) {
-  if (conf == NULL) {
-    return RC_CIRI_CONF_NULL_CONF;
+retcode_t iota_ciri_conf_default(iota_ciri_conf_t *const ciri_conf,
+                                 iota_gossip_conf_t *const gossip_conf,
+                                 iota_consensus_conf_t *const consensus_conf) {
+  retcode_t ret = RC_OK;
+
+  if (ciri_conf == NULL || gossip_conf == NULL || consensus_conf == NULL) {
+    return RC_NULL_PARAM;
   }
 
-  memset(conf, 0, sizeof(ciri_conf_t));
-  conf->log_level = CONF_DEFAULT_LOG_LEVEL;
-  conf->api_port = CONF_DEFAULT_API_PORT;
-  conf->neighbors = CONF_DEFAULT_NEIGHBORS;
-  conf->conf_file = CONF_DEFAULT_CONF_FILE;
-  conf->tcp_receiver_port = CONF_DEFAULT_TCP_RECEIVER_PORT;
-  conf->udp_receiver_port = CONF_DEFAULT_UDP_RECEIVER_PORT;
-  conf->testnet = CONF_DEFAULT_TESTNET;
-  conf->remote = CONF_DEFAULT_REMOTE;
-  conf->remote_auth_token = CONF_DEFAULT_REMOTE_AUTH_TOKEN;
-  conf->remote_limit_api = CONF_DEFAULT_REMOTE_LIMIT_API;
-  conf->send_limit = CONF_DEFAULT_SEND_LIMIT;
-  conf->max_peers = CONF_DEFAULT_MAX_PEERS;
-  conf->dns_resolution = CONF_DEFAULT_DNS_RESOLUTION;
+  memset(ciri_conf, 0, sizeof(iota_ciri_conf_t));
 
-  return RC_OK;
+  ciri_conf->log_level = CONF_DEFAULT_LOG_LEVEL;
+  ciri_conf->api_port = CONF_DEFAULT_API_PORT;
+  ciri_conf->conf_file = CONF_DEFAULT_CONF_FILE;
+  ciri_conf->remote = CONF_DEFAULT_REMOTE;
+  ciri_conf->remote_auth_token = CONF_DEFAULT_REMOTE_AUTH_TOKEN;
+  ciri_conf->remote_limit_api = CONF_DEFAULT_REMOTE_LIMIT_API;
+  ciri_conf->send_limit = CONF_DEFAULT_SEND_LIMIT;
+  ciri_conf->max_peers = CONF_DEFAULT_MAX_PEERS;
+  ciri_conf->dns_resolution = CONF_DEFAULT_DNS_RESOLUTION;
+
+  if ((ret = iota_gossip_conf_init(gossip_conf)) != RC_OK) {
+    return ret;
+  }
+
+  if ((ret = iota_consensus_conf_init(consensus_conf)) != RC_OK) {
+    return ret;
+  }
+
+  return ret;
 }

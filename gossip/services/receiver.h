@@ -23,7 +23,6 @@ typedef struct receiver_service_s {
   protocol_type_t protocol;
   receiver_state_t* state;
   receive_queue_t* queue;
-  size_t packet_size;
   void* context;
   void* opaque_socket;
 } receiver_service_t;

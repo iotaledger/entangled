@@ -77,12 +77,13 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
   }
 
   bool is_milestone =
-      ((double)rand() / (double)RAND_MAX) < PROBABILITY_SELECT_MILESTONE_CHILD;
+      ((double)rand() / (double)RAND_MAX) < node->conf.p_select_milestone_child;
   if ((ret = get_transaction_to_request(&node->transaction_requester, request,
                                         is_milestone)) != RC_OK) {
     return ret;
   }
-  if ((ret = iota_packet_set_request(&packet, request)) != RC_OK) {
+  if ((ret = iota_packet_set_request(&packet, request, node->conf.mwm)) !=
+      RC_OK) {
     return ret;
   }
 

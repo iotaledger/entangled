@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
+#include "gossip/conf.h"
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/handles/rw_lock.h"
 
@@ -18,6 +19,7 @@
 typedef struct tangle_s tangle_t;
 
 typedef struct requester_state_s {
+  iota_gossip_conf_t *conf;
   hash243_set_t milestones;
   hash243_set_t transactions;
   tangle_t *tangle;
@@ -33,10 +35,12 @@ extern "C" {
  *
  * @param state The requester state
  * @param tangle A tangle
+ * @param conf Gossip configuration
  *
  * @return a status code
  */
 retcode_t requester_init(requester_state_t *const state,
+                         iota_gossip_conf_t *const conf,
                          tangle_t *const tangle);
 
 /**

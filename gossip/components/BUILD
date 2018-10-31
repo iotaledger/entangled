@@ -63,6 +63,7 @@ cc_library(
         "//ciri/conf:conf_values",
         "//common:errors",
         "//consensus/tangle",
+        "//gossip:conf",
         "//utils:logger_helper",
         "//utils/containers/hash:hash243_set",
         "//utils/handles:rw_lock",

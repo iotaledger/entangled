@@ -12,30 +12,33 @@
 #include <stdint.h>
 
 #include "common/errors.h"
+#include "consensus/conf.h"
+#include "gossip/conf.h"
 #include "utils/logger_helper.h"
 
-typedef struct ciri_conf_s {
+typedef struct iota_ciri_conf_s {
   logger_level_t log_level;
   uint16_t api_port;
-  char *neighbors;
   char *conf_file;
-  uint16_t tcp_receiver_port;
-  uint16_t udp_receiver_port;
-  bool testnet;
   bool remote;
   char *remote_auth_token;
   char *remote_limit_api;
   float send_limit;
   size_t max_peers;
   bool dns_resolution;
-} ciri_conf_t;
+} iota_ciri_conf_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-retcode_t ciri_conf_init(ciri_conf_t *conf);
-retcode_t ciri_conf_parse(ciri_conf_t *conf, int argc, char **argv);
+retcode_t iota_ciri_conf_default(iota_ciri_conf_t *const ciri_conf,
+                                 iota_gossip_conf_t *const gossip_conf,
+                                 iota_consensus_conf_t *const consensus_conf);
+retcode_t iota_ciri_conf_cli(iota_ciri_conf_t *const ciri_conf,
+                             iota_gossip_conf_t *const gossip_conf,
+                             iota_consensus_conf_t *const consensus_conf,
+                             int argc, char **argv);
 
 #ifdef __cplusplus
 }

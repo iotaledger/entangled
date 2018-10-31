@@ -20,7 +20,7 @@ extern "C" {
 
 typedef struct core_s {
   bool running;
-  ciri_conf_t config;
+  iota_ciri_conf_t conf;
   iota_consensus_t consensus;
   iota_node_t node;
   iota_api_t api;

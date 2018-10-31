@@ -53,14 +53,14 @@ static logger_level_t get_log_level(char const* const log_level) {
   return map[i].level;
 }
 
-retcode_t ciri_conf_parse(ciri_conf_t* conf, int argc, char** argv) {
+retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
+                             iota_gossip_conf_t* const gossip_conf,
+                             iota_consensus_conf_t* const consensus_conf,
+                             int argc, char** argv) {
   retcode_t ret = RC_OK;
   int arg;
   struct option* long_options = build_options();
 
-  if ((ret = ciri_conf_init(conf))) {
-    return ret;
-  }
   while ((arg = getopt_long(argc, argv, short_options, long_options, NULL)) !=
          -1) {
     switch (arg) {
@@ -70,43 +70,40 @@ retcode_t ciri_conf_parse(ciri_conf_t* conf, int argc, char** argv) {
         exit(EXIT_SUCCESS);
         break;
       case 'l':  // --log-level
-        conf->log_level = get_log_level(optarg);
+        ciri_conf->log_level = get_log_level(optarg);
         break;
       case 'p':  // --port
-        conf->api_port = atoi(optarg);
+        ciri_conf->api_port = atoi(optarg);
         break;
       case 'n':  // --neighbors
-        conf->neighbors = optarg;
+        gossip_conf->neighbors = optarg;
         break;
       case 'c':  // --config
-        conf->conf_file = optarg;
+        ciri_conf->conf_file = optarg;
         break;
       case 'u':  // --udp-receiver-port
-        conf->udp_receiver_port = atoi(optarg);
+        gossip_conf->udp_receiver_port = atoi(optarg);
         break;
       case 't':  // --tcp-receiver-port
-        conf->tcp_receiver_port = atoi(optarg);
-        break;
-      case 'e':  // --testnet
-        conf->testnet = true;
+        gossip_conf->tcp_receiver_port = atoi(optarg);
         break;
       case 'r':  // --remote
-        conf->remote = true;
+        ciri_conf->remote = true;
         break;
       case 'a':  // --remote-auth
-        conf->remote_auth_token = optarg;
+        ciri_conf->remote_auth_token = optarg;
         break;
       case 'i':  // --remote-limit-api
-        conf->remote_limit_api = optarg;
+        ciri_conf->remote_limit_api = optarg;
         break;
       case 's':  // --send-limit
-        conf->send_limit = atof(optarg);
+        ciri_conf->send_limit = atof(optarg);
         break;
       case 'm':  // --max-peers
-        conf->max_peers = atoi(optarg);
+        ciri_conf->max_peers = atoi(optarg);
         break;
       case 'd':  // --dns-resolution-false
-        conf->dns_resolution = false;
+        ciri_conf->dns_resolution = false;
         break;
       default:
         iota_usage();

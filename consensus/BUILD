@@ -14,6 +14,32 @@ CONSENSUS_TESTNET_VARIABLES = [
     "MWM=9",
 ]
 
+config_setting(
+    name = "mainnet",
+    values = {"define": "network=mainnet"},
+)
+
+config_setting(
+    name = "testnet",
+    values = {"define": "network=testnet"},
+)
+
+cc_library(
+    name = "conf",
+    srcs = ["conf.c"],
+    hdrs = ["conf.h"],
+    defines = select({
+        ":mainnet": CONSENSUS_MAINNET_VARIABLES,
+        ":testnet": CONSENSUS_TESTNET_VARIABLES,
+        "//conditions:default": CONSENSUS_MAINNET_VARIABLES,
+    }),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common:errors",
+        "//common/trinary:flex_trit",
+    ],
+)
+
 cc_library(
     name = "consensus",
     srcs = ["consensus.c"],
@@ -43,31 +69,5 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/trinary:trit_array",
-    ],
-)
-
-config_setting(
-    name = "mainnet",
-    values = {"define": "network=mainnet"},
-)
-
-config_setting(
-    name = "testnet",
-    values = {"define": "network=testnet"},
-)
-
-cc_library(
-    name = "conf",
-    srcs = ["conf.c"],
-    hdrs = ["conf.h"],
-    defines = select({
-        ":mainnet": CONSENSUS_MAINNET_VARIABLES,
-        ":testnet": CONSENSUS_TESTNET_VARIABLES,
-        "//conditions:default": CONSENSUS_MAINNET_VARIABLES,
-    }),
-    visibility = ["//visibility:public"],
-    deps = [
-        "//common:errors",
-        "//common/trinary:flex_trit",
     ],
 )

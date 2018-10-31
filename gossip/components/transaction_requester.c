@@ -16,13 +16,15 @@
 #define REQUESTER_COMPONENT_LOGGER_ID "requester_component"
 
 retcode_t requester_init(requester_state_t *const state,
+                         iota_gossip_conf_t *const conf,
                          tangle_t *const tangle) {
-  if (state == NULL || tangle == NULL) {
+  if (state == NULL || tangle == NULL || conf == NULL) {
     return RC_REQUESTER_COMPONENT_NULL_STATE;
   }
 
   logger_helper_init(REQUESTER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
   memset(state, 0, sizeof(requester_state_t));
+  state->conf = conf;
   state->milestones = NULL;
   state->transactions = NULL;
   state->tangle = tangle;
@@ -198,7 +200,7 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
     memset(hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
 
-  if (((double)rand() / (double)RAND_MAX) < PROBABILITY_REMOVE_REQUEST) {
+  if (((double)rand() / (double)RAND_MAX) < state->conf->p_remove_request) {
     hash243_set_remove(request_set, iter->hash);
   }
 

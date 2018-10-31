@@ -56,7 +56,7 @@ bool udp_send(receiver_service_t *const service, endpoint_t *const endpoint,
     auto socket = reinterpret_cast<boost::asio::ip::udp::socket *>(
         service->opaque_socket);
     socket->async_send_to(
-        boost::asio::buffer(packet->content, service->packet_size),
+        boost::asio::buffer(packet->content, PACKET_SIZE),
         *reinterpret_cast<boost::asio::ip::udp::endpoint *>(
             endpoint->opaque_inetaddr),
         [](const boost::system::error_code &, std::size_t) {});

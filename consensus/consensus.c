@@ -18,13 +18,6 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
 
   logger_helper_init(CONSENSUS_LOGGER_ID, LOGGER_DEBUG, true);
 
-  log_info(CONSENSUS_LOGGER_ID, "Initializing consensus configuration\n");
-  if ((ret = iota_consensus_conf_init(&consensus->conf)) != RC_OK) {
-    log_critical(CONSENSUS_LOGGER_ID,
-                 "Initializing consensus configuration failed\n");
-    return ret;
-  }
-
   log_info(CONSENSUS_LOGGER_ID, "Initializing bundle validator\n");
   if ((ret = iota_consensus_bundle_validator_init()) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Initializing bundle validator failed\n");
@@ -75,6 +68,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   if ((ret = iota_snapshot_init(&consensus->snapshot, &consensus->conf)) !=
       RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Initializing snapshot failed\n");
+    return ret;
   }
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing transaction solidifier\n");

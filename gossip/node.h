@@ -24,6 +24,7 @@ typedef struct core_s core_t;
 typedef struct concurrent_list_neighbor_t_s neighbors_list_t;
 
 typedef struct node_s {
+  iota_gossip_conf_t conf;
   bool running;
   core_t* core;
   broadcaster_t broadcaster;

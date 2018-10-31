@@ -8,18 +8,18 @@
 #ifndef __GOSSIP_IOTA_PACKET_H__
 #define __GOSSIP_IOTA_PACKET_H__
 
-#include "ciri/conf/conf_values.h"
 #include "common/errors.h"
 #include "common/network/endpoint.h"
 #include "common/trinary/bytes.h"
 #include "common/trinary/flex_trit.h"
+#include "gossip/conf.h"
 
 // Forward declarations
 typedef struct _iota_transaction* iota_transaction_t;
 typedef struct _trit_array* trit_array_p;
 
 typedef struct iota_packet_s {
-  byte_t content[TESTNET_PACKET_SIZE];
+  byte_t content[PACKET_SIZE];
   endpoint_t source;
 } iota_packet_t;
 
@@ -52,9 +52,11 @@ retcode_t iota_packet_set_transaction(iota_packet_t* const packet,
  *
  * @param packet The packet
  * @param request The request flex trits
+ * @param mwm The minimum weigth magnitude
  */
 retcode_t iota_packet_set_request(iota_packet_t* const packet,
-                                  flex_trit_t const* const request);
+                                  flex_trit_t const* const request,
+                                  uint8_t mwm);
 
 #ifdef __cplusplus
 }
