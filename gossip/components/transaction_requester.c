@@ -6,7 +6,6 @@
  */
 
 #include "gossip/components/transaction_requester.h"
-#include "ciri/conf/conf_values.h"
 #include "common/storage/sql/defs.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/logger_helper.h"

@@ -9,7 +9,6 @@
 #define __CIRI_CONF_CONF_H__
 
 #include <stdbool.h>
-#include <stdint.h>
 
 #include "ciri/api/conf.h"
 #include "common/errors.h"
@@ -17,21 +16,15 @@
 #include "gossip/conf.h"
 #include "utils/logger_helper.h"
 
-typedef struct iota_ciri_conf_s {
-  logger_level_t log_level;
-  uint16_t api_port;
-  char *conf_file;
-  bool remote;
-  char *remote_auth_token;
-  char *remote_limit_api;
-  float send_limit;
-  size_t max_peers;
-  bool dns_resolution;
-} iota_ciri_conf_t;
+#define DEFAULT_LOG_LEVEL LOGGER_INFO
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct iota_ciri_conf_s {
+  logger_level_t log_level;
+} iota_ciri_conf_t;
 
 retcode_t iota_ciri_conf_default(iota_ciri_conf_t *const ciri_conf,
                                  iota_consensus_conf_t *const consensus_conf,

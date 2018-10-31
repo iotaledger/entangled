@@ -60,7 +60,6 @@ cc_library(
     srcs = ["transaction_requester.c"],
     hdrs = ["transaction_requester.h"],
     deps = [
-        "//ciri/conf:conf_values",
         "//common:errors",
         "//consensus/tangle",
         "//gossip:conf",

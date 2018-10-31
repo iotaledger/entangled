@@ -8,7 +8,6 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#include "ciri/conf/conf_values.h"
 #include "common/model/milestone.h"
 #include "common/sign/normalize.h"
 #include "common/sign/v1/iss_curl.h"

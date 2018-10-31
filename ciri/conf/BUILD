@@ -7,11 +7,6 @@ cc_library(
 )
 
 cc_library(
-    name = "conf_values",
-    hdrs = ["conf_values.h"],
-)
-
-cc_library(
     name = "conf",
     srcs = [
         "conf.c",
@@ -19,7 +14,6 @@ cc_library(
     ],
     hdrs = ["conf.h"],
     deps = [
-        ":conf_values",
         ":usage",
         "//ciri/api:conf",
         "//common:errors",

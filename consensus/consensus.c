@@ -6,7 +6,6 @@
  */
 
 #include "consensus/consensus.h"
-#include "ciri/conf/conf_values.h"
 #include "utils/logger_helper.h"
 
 #define CONSENSUS_LOGGER_ID "consensus"

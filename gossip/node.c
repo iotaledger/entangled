@@ -51,8 +51,6 @@ static retcode_t node_neighbors_init(node_t* const node) {
 
 retcode_t node_init(node_t* const node, core_t* const core,
                     tangle_t* const tangle) {
-  retcode_t ret = RC_OK;
-
   if (node == NULL) {
     return RC_NODE_NULL_NODE;
   } else if (core == NULL) {

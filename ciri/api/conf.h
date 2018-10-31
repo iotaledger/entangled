@@ -8,7 +8,11 @@
 #ifndef __CIRI_API_CONF_H__
 #define __CIRI_API_CONF_H__
 
+#include <stdint.h>
+
 #include "common/errors.h"
+
+#define DEFAULT_API_PORT 14265
 
 // Limits conf
 
@@ -19,6 +23,7 @@ extern "C" {
 #endif
 
 typedef struct iota_api_conf_s {
+  uint16_t port;
   // Limits conf
   size_t max_get_trytes;
 } iota_api_conf_t;

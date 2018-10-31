@@ -209,8 +209,7 @@ retcode_t iota_api_check_consistency(check_consistency_req_t const *const req,
   return RC_OK;
 }
 
-retcode_t iota_api_init(iota_api_t *const api, uint16_t const port,
-                        tangle_t *const tangle,
+retcode_t iota_api_init(iota_api_t *const api, tangle_t *const tangle,
                         transaction_validator_t *const transaction_validator,
                         broadcaster_t *const broadcaster,
                         serializer_type_t const serializer_type) {
@@ -220,7 +219,6 @@ retcode_t iota_api_init(iota_api_t *const api, uint16_t const port,
 
   logger_helper_init(API_LOGGER_ID, LOGGER_DEBUG, true);
   api->running = false;
-  api->port = port;
   api->tangle = tangle;
   api->transaction_validator = transaction_validator;
   api->broadcaster = broadcaster;
