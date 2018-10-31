@@ -1,14 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
-GOSSIP_MAINNET_VARIABLES = [
-    "REQUEST_HASH_SIZE=46",
-    "MWM=14",
-]
-
-GOSSIP_TESTNET_VARIABLES = [
-    "REQUEST_HASH_SIZE=49",
-    "MWM=9",
-]
+load(":conf.bzl", "GOSSIP_MAINNET_VARIABLES")
+load(":conf.bzl", "GOSSIP_TESTNET_VARIABLES")
 
 config_setting(
     name = "mainnet",
