@@ -142,7 +142,10 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
                                           bool *should_stop) {
   retcode_t ret = RC_OK;
   bool valid_bundle = false;
-  struct _trit_array curr_hash = {NULL, NUM_TRITS_HASH, FLEX_TRIT_SIZE_243, 0};
+  struct _trit_array curr_hash = {.trits = NULL,
+                                  .num_trits = NUM_TRITS_HASH,
+                                  .num_bytes = FLEX_TRIT_SIZE_243,
+                                  .dynamic = 0};
   bundle_transactions_t *bundle = NULL;
   iota_transaction_t tx_bundle = NULL;
 
