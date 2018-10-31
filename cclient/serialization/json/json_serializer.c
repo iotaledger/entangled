@@ -100,6 +100,7 @@ static retcode_t flex_hash_array_to_json_array(flex_hash_array_t* const head,
                                                char const* const obj_name) {
   flex_hash_array_t* elt;
   int array_count;
+  retcode_t ret = RC_OK;
   cJSON* array_obj = NULL;
 
   LL_COUNT(head, elt, array_count);
@@ -112,12 +113,10 @@ static retcode_t flex_hash_array_to_json_array(flex_hash_array_t* const head,
     LL_FOREACH(head, elt) {
       // flex to trytes;
       size_t len_trytes = elt->hash->num_trits / 3;
-      trit_t trytes_out[len_trytes + 1];
-      size_t trits_count =
-          flex_trits_to_trytes(trytes_out, len_trytes, elt->hash->trits,
-                               elt->hash->num_trits, elt->hash->num_trits);
+      char trytes_out[len_trytes + 1];
+      ret = flex_hash_to_trytes(elt->hash, trytes_out);
       trytes_out[len_trytes] = '\0';
-      if (trits_count != 0) {
+      if (ret == RC_OK) {
         cJSON_AddItemToArray(array_obj,
                              cJSON_CreateString((const char*)trytes_out));
       } else {
