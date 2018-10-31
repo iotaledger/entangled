@@ -117,7 +117,7 @@ retcode_t iota_consensus_transaction_solidifier_init(
   ts->running = false;
   ts->newly_set_solid_transactions = NULL;
   ts->solid_transactions_candidates = NULL;
-  ts->defs = defs;
+  ts->conf = conf;
   lock_handle_init(&ts->lock);
   logger_helper_init(TRANSACTION_SOLIDIFIER_LOGGER_ID, LOGGER_DEBUG, true);
   return RC_OK;
@@ -176,7 +176,7 @@ retcode_t iota_consensus_transaction_solidifier_destroy(
   ts->requester = NULL;
   ts->newly_set_solid_transactions = NULL;
   ts->solid_transactions_candidates = NULL;
-  ts->defs = NULL;
+  ts->conf = NULL;
 
   lock_handle_destroy(&ts->lock);
 
@@ -237,7 +237,7 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
       .ts = ts, .is_milestone = is_milestone, .is_solid = true};
 
   if ((ret = tangle_traversal_dfs_to_genesis(ts->tangle, check_solidity_do_func,
-                                             hash, ts->defs->genesis_hash, NULL,
+                                             hash, ts->conf->genesis_hash, NULL,
                                              &params)) != RC_OK) {
     goto done;
   }

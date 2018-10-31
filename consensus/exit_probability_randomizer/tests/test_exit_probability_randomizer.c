@@ -523,8 +523,8 @@ void test_1_bundle(void) {
   for (size_t i = 0; i < 5; ++i) {
     txs[i]->snapshot_index = 9999999;
   }
-  memcpy(txs[4]->trunk, defs.genesis_hash, FLEX_TRIT_SIZE_243);
-  memcpy(txs[4]->branch, defs.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[4]->trunk, conf.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[4]->branch, conf.genesis_hash, FLEX_TRIT_SIZE_243);
   build_tangle(&tangle, txs, bundle_size + 1);
 
   iota_stor_pack_t pack;
@@ -638,8 +638,8 @@ void test_2_chained_bundles(void) {
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t txEp = transaction_deserialize(ep_trits);
-  memcpy(txEp->trunk, defs.genesis_hash, FLEX_TRIT_SIZE_243);
-  memcpy(txEp->branch, defs.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txEp->trunk, conf.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txEp->branch, conf.genesis_hash, FLEX_TRIT_SIZE_243);
   txEp->snapshot_index = 9999999;
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, txEp) == RC_OK);

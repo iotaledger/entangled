@@ -44,28 +44,31 @@ static milestone_tracker_t mt;
 static ledger_validator_t lv;
 static transaction_solidifier_t ts;
 static requester_state_t tr;
-static iota_consensus_conf_t conf;
+static iota_consensus_conf_t consensus_conf;
+static iota_gossip_conf_t gossip_conf;
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
-  iota_consensus_conf_init(&conf);
-  conf.max_depth = max_depth;
-  conf.below_max_depth = max_txs_below_max_depth;
+  iota_gossip_conf_init(&gossip_conf);
+  iota_consensus_conf_init(&consensus_conf);
+  consensus_conf.max_depth = max_depth;
+  consensus_conf.below_max_depth = max_txs_below_max_depth;
 
-  strcpy(conf.snapshot_file, snapshot_path);
-  strcpy(conf.snapshot_conf_file, snapshot_conf_path);
-  strcpy(conf.snapshot_sig_file, "");
-  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_OK);
-  iota_consensus_transaction_solidifier_init(&ts, &conf, &tangle, NULL);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &tangle, &snapshot, &lv,
-                                          &ts) == RC_OK);
-  TEST_ASSERT(requester_init(&tr, &tangle) == RC_OK);
-  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &conf, &tangle, &mt,
-                                                   &tr) == RC_OK);
+  strcpy(consensus_conf.snapshot_file, snapshot_path);
+  strcpy(consensus_conf.snapshot_conf_file, snapshot_conf_path);
+  strcpy(consensus_conf.snapshot_sig_file, "");
+  TEST_ASSERT(iota_snapshot_init(&snapshot, &consensus_conf) == RC_OK);
+  iota_consensus_transaction_solidifier_init(&ts, &consensus_conf, &tangle,
+                                             NULL);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &consensus_conf, &tangle,
+                                          &snapshot, &lv, &ts) == RC_OK);
+  TEST_ASSERT(requester_init(&tr, &gossip_conf, &tangle) == RC_OK);
+  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &consensus_conf,
+                                                   &tangle, &mt, &tr) == RC_OK);
   // We want to avoid unnecessary validation
   mt.latest_snapshot->index = 99999999999;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(
-                  &conf, &tangle, &mt, &lv, epv) == RC_OK);
+                  &consensus_conf, &tangle, &mt, &lv, epv) == RC_OK);
 }
 
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
@@ -214,8 +217,8 @@ void test_transaction_exceed_max_transactions() {
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = max_depth + 1;
   txs[1]->snapshot_index = max_depth + 1;
-  memcpy(txs[1]->trunk, defs.genesis_hash, FLEX_TRIT_SIZE_243);
-  memcpy(txs[1]->branch, defs.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[1]->trunk, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[1]->branch, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
   build_tangle(&tangle, txs, 2);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
@@ -315,7 +318,7 @@ int main(int argc, char *argv[]) {
 
   config.db_path = test_db_path;
 
-  memset(conf.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+  memset(consensus_conf.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
 
   RUN_TEST(test_transaction_does_not_exist);
   RUN_TEST(test_transaction_not_a_tail);
