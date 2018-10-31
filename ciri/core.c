@@ -30,9 +30,10 @@ retcode_t core_init(core_t* const core) {
     return RC_CORE_FAILED_CONSENSUS_INIT;
   }
 
-  log_info(CORE_LOGGER_ID, "Initializing gossiping node\n");
+  log_info(CORE_LOGGER_ID, "Initializing node gossip components\n");
   if (node_init(&core->node, core, &core->consensus.tangle)) {
-    log_critical(CORE_LOGGER_ID, "Initializing gossiping node failed\n");
+    log_critical(CORE_LOGGER_ID,
+                 "Initializing node gossip components failed\n");
     return RC_CORE_FAILED_NODE_INIT;
   }
 
