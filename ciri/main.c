@@ -24,8 +24,8 @@ int main(int argc, char* argv[]) {
 
   // Default configuration
 
-  if (iota_ciri_conf_default(&core_g.conf, &core_g.node.conf,
-                             &core_g.consensus.conf) != RC_OK) {
+  if (iota_ciri_conf_default(&core_g.conf, &core_g.consensus.conf,
+                             &core_g.node.conf, &core_g.api.conf) != RC_OK) {
     return EXIT_FAILURE;
   }
 
@@ -33,8 +33,9 @@ int main(int argc, char* argv[]) {
 
   // CLI Configuration
 
-  if (iota_ciri_conf_cli(&core_g.conf, &core_g.node.conf,
-                         &core_g.consensus.conf, argc, argv) != RC_OK) {
+  if (iota_ciri_conf_cli(&core_g.conf, &core_g.consensus.conf,
+                         &core_g.node.conf, &core_g.api.conf, argc,
+                         argv) != RC_OK) {
     return EXIT_FAILURE;
   }
 

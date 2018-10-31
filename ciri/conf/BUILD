@@ -21,6 +21,7 @@ cc_library(
     deps = [
         ":conf_values",
         ":usage",
+        "//ciri/api:conf",
         "//common:errors",
         "//consensus:conf",
         "//gossip:conf",

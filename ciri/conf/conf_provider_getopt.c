@@ -54,9 +54,10 @@ static logger_level_t get_log_level(char const* const log_level) {
 }
 
 retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
-                             iota_gossip_conf_t* const gossip_conf,
                              iota_consensus_conf_t* const consensus_conf,
-                             int argc, char** argv) {
+                             iota_gossip_conf_t* const gossip_conf,
+                             iota_api_conf_t* const api_conf, int argc,
+                             char** argv) {
   retcode_t ret = RC_OK;
   int arg;
   struct option* long_options = build_options();

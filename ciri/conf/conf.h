@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "ciri/api/conf.h"
 #include "common/errors.h"
 #include "consensus/conf.h"
 #include "gossip/conf.h"
@@ -33,12 +34,14 @@ extern "C" {
 #endif
 
 retcode_t iota_ciri_conf_default(iota_ciri_conf_t *const ciri_conf,
+                                 iota_consensus_conf_t *const consensus_conf,
                                  iota_gossip_conf_t *const gossip_conf,
-                                 iota_consensus_conf_t *const consensus_conf);
+                                 iota_api_conf_t *const api_conf);
 retcode_t iota_ciri_conf_cli(iota_ciri_conf_t *const ciri_conf,
-                             iota_gossip_conf_t *const gossip_conf,
                              iota_consensus_conf_t *const consensus_conf,
-                             int argc, char **argv);
+                             iota_gossip_conf_t *const gossip_conf,
+                             iota_api_conf_t *const api_conf, int argc,
+                             char **argv);
 
 #ifdef __cplusplus
 }

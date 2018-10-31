@@ -5,6 +5,7 @@ cc_library(
     srcs = ["api.c"],
     hdrs = ["api.h"],
     deps = [
+        ":conf",
         "//cclient/request:requests",
         "//cclient/response:responses",
         "//cclient/serialization:serializer_json",

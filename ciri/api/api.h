@@ -12,6 +12,7 @@
 #include <stdint.h>
 
 #include "cclient/serialization/serializer.h"
+#include "ciri/api/conf.h"
 #include "common/errors.h"
 #include "consensus/tangle/tangle.h"
 #include "consensus/transaction_validator/transaction_validator.h"
@@ -22,11 +23,8 @@
 extern "C" {
 #endif
 
-typedef struct iota_api_limits_s {
-  size_t max_get_trytes;
-} iota_api_limits_t;
-
 typedef struct iota_api_s {
+  iota_api_conf_t conf;
   thread_handle_t thread;
   bool running;
   uint16_t port;
@@ -35,7 +33,6 @@ typedef struct iota_api_s {
   broadcaster_t *broadcaster;
   serializer_t serializer;
   serializer_type_t serializer_type;
-  iota_api_limits_t limits;
 } iota_api_t;
 
 /**

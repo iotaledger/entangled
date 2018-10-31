@@ -11,8 +11,9 @@
 #include "ciri/conf/conf_values.h"
 
 retcode_t iota_ciri_conf_default(iota_ciri_conf_t *const ciri_conf,
+                                 iota_consensus_conf_t *const consensus_conf,
                                  iota_gossip_conf_t *const gossip_conf,
-                                 iota_consensus_conf_t *const consensus_conf) {
+                                 iota_api_conf_t *const api_conf) {
   retcode_t ret = RC_OK;
 
   if (ciri_conf == NULL || gossip_conf == NULL || consensus_conf == NULL) {
@@ -31,11 +32,15 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t *const ciri_conf,
   ciri_conf->max_peers = CONF_DEFAULT_MAX_PEERS;
   ciri_conf->dns_resolution = CONF_DEFAULT_DNS_RESOLUTION;
 
+  if ((ret = iota_consensus_conf_init(consensus_conf)) != RC_OK) {
+    return ret;
+  }
+
   if ((ret = iota_gossip_conf_init(gossip_conf)) != RC_OK) {
     return ret;
   }
 
-  if ((ret = iota_consensus_conf_init(consensus_conf)) != RC_OK) {
+  if ((ret = iota_api_conf_init(api_conf)) != RC_OK) {
     return ret;
   }
 
