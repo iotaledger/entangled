@@ -9,7 +9,7 @@
 #define __CIRI_CORE_H__
 
 #include "ciri/api/api.h"
-#include "ciri/conf/conf.h"
+#include "ciri/conf.h"
 #include "consensus/consensus.h"
 #include "gossip/components/transaction_requester.h"
 #include "gossip/node.h"

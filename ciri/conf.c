@@ -9,8 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ciri/conf/conf.h"
-#include "ciri/conf/usage.h"
+#include "ciri/conf.h"
+#include "ciri/usage.h"
 
 /*
  * Private functions

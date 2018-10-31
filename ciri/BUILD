@@ -15,8 +15,8 @@ cc_library(
     name = "core_shared",
     hdrs = ["core.h"],
     deps = [
+        ":conf",
         "//ciri/api",
-        "//ciri/conf",
         "//consensus",
         "//gossip:node_shared",
     ],
@@ -28,5 +28,25 @@ cc_library(
     deps = [
         ":core_shared",
         "//gossip:node",
+    ],
+)
+
+cc_library(
+    name = "usage",
+    srcs = ["usage.c"],
+    hdrs = ["usage.h"],
+)
+
+cc_library(
+    name = "conf",
+    srcs = ["conf.c"],
+    hdrs = ["conf.h"],
+    deps = [
+        ":usage",
+        "//ciri/api:conf",
+        "//common:errors",
+        "//consensus:conf",
+        "//gossip:conf",
+        "//utils:logger_helper",
     ],
 )
