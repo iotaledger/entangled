@@ -56,11 +56,13 @@ static snapshot_t snapshot;
 static milestone_tracker_t mt;
 static ledger_validator_t lv;
 static transaction_solidifier_t ts;
+static iota_consensus_defs_t defs;
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
+  memset(defs.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL,
                                  snapshot_conf_path, true) == RC_OK);
-  iota_consensus_transaction_solidifier_init(&ts, &tangle, NULL);
+  iota_consensus_transaction_solidifier_init(&ts, &defs, &tangle, NULL);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, &ts,
                                           true) == RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &defs, &tangle, &mt,
@@ -515,6 +517,8 @@ void test_1_bundle(void) {
   for (size_t i = 0; i < 5; ++i) {
     txs[i]->snapshot_index = 9999999;
   }
+  memcpy(txs[4]->trunk, defs.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[4]->branch, defs.genesis_hash, FLEX_TRIT_SIZE_243);
   build_tangle(&tangle, txs, bundle_size + 1);
 
   iota_stor_pack_t pack;
@@ -614,6 +618,7 @@ void test_2_chained_bundles(void) {
   for (size_t i = 0; i < 6; ++i) {
     txs[i]->snapshot_index = 9999999;
   }
+
   build_tangle(&tangle, txs, 6);
 
   // First bundle
@@ -626,6 +631,8 @@ void test_2_chained_bundles(void) {
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t txEp = transaction_deserialize(ep_trits);
+  memcpy(txEp->trunk, defs.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txEp->branch, defs.genesis_hash, FLEX_TRIT_SIZE_243);
   txEp->snapshot_index = 9999999;
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, txEp) == RC_OK);
@@ -697,6 +704,7 @@ int main(int argc, char *argv[]) {
     test_db_path = "test.db";
     ciri_db_path = "ciri.db";
     snapshot_path = "snapshot.txt";
+    snapshot_conf_path = "snapshot_conf.json";
   }
 
   config.db_path = test_db_path;
