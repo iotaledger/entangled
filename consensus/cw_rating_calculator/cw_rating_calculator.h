@@ -13,10 +13,10 @@
 
 #include "uthash.h"
 
-#include "../../utils/hash_maps.h"
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/tangle/tangle.h"
+#include "utils/hash_maps.h"
 
 #define CW_RATING_CALCULATOR_LOGGER_ID "consensus_cw_rating_calculator"
 
@@ -24,22 +24,23 @@
 extern "C" {
 #endif
 
-enum cw_calculation_implementation {
+// Forward declarations
+typedef struct cw_rating_calculator_base cw_rating_calculator_base_t;
+typedef struct cw_rating_calculator_t cw_rating_calculator_t;
+
+typedef enum cw_calculation_implementation_e {
   CW_NO_IMPLEMENTATION,
   /// time - O(n^2), place - O(n^2)
   DFS_FROM_ENTRY_POINT,
   /// time - O(n), place - O(n^2) implementation with the cost of
   /// Performing propogation on each incoming transaction
   BACKWARD_WEIGHT_PROPAGATION,
-};
+} cw_calculation_implementation_t;
 
 typedef struct cw_calc_result {
   hash_int_map_t cw_ratings;
   hash_to_indexed_hash_set_map_t tx_to_approvers;
 } cw_calc_result;
-
-typedef struct cw_rating_calculator_base cw_rating_calculator_base_t;
-typedef struct cw_rating_calculator_t cw_rating_calculator_t;
 
 typedef struct {
   // find_transactions_request
@@ -60,7 +61,7 @@ struct cw_rating_calculator_t {
 
 extern retcode_t iota_consensus_cw_rating_init(
     cw_rating_calculator_t *const cw_calc, tangle_t *const tangle,
-    enum cw_calculation_implementation impl);
+    cw_calculation_implementation_t impl);
 
 extern retcode_t iota_consensus_cw_rating_destroy(
     cw_rating_calculator_t *cw_calc);

@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-#include "ciri/conf/usage.h"
+#include "ciri/usage.h"
 
 void iota_usage() {
   int i = 0;

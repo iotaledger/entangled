@@ -15,10 +15,10 @@ cc_library(
     name = "core_shared",
     hdrs = ["core.h"],
     deps = [
-        ":node_shared",
+        ":conf",
         "//ciri/api",
-        "//ciri/conf",
         "//consensus",
+        "//gossip:node_shared",
     ],
 )
 
@@ -27,30 +27,26 @@ cc_library(
     srcs = ["core.c"],
     deps = [
         ":core_shared",
-        ":node",
+        "//gossip:node",
     ],
 )
 
 cc_library(
-    name = "node_shared",
-    hdrs = ["node.h"],
-    deps = [
-        "//gossip/components:broadcaster_shared",
-        "//gossip/components:processor_shared",
-        "//gossip/components:receiver_shared",
-        "//gossip/components:responder_shared",
-        "//gossip/components:transaction_requester",
-    ],
+    name = "usage",
+    srcs = ["usage.c"],
+    hdrs = ["usage.h"],
 )
 
 cc_library(
-    name = "node",
-    srcs = ["node.c"],
+    name = "conf",
+    srcs = ["conf.c"],
+    hdrs = ["conf.h"],
     deps = [
-        ":node_shared",
-        "//gossip/components:broadcaster",
-        "//gossip/components:processor",
-        "//gossip/components:receiver",
-        "//gossip/components:responder",
+        ":usage",
+        "//ciri/api:conf",
+        "//common:errors",
+        "//consensus:conf",
+        "//gossip:conf",
+        "//utils:logger_helper",
     ],
 )

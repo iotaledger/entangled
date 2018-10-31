@@ -10,8 +10,8 @@
 
 #include "common/errors.h"
 #include "consensus/bundle_validator/bundle_validator.h"
+#include "consensus/conf.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
-#include "consensus/defs.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
@@ -24,7 +24,7 @@
 #include "consensus/transaction_validator/transaction_validator.h"
 
 typedef struct iota_consensus_s {
-  iota_consensus_defs_t defs;
+  iota_consensus_conf_t conf;
   cw_rating_calculator_t cw_rating_calculator;
   entry_point_selector_t entry_point_selector;
   ep_randomizer_t ep_randomizer;
@@ -47,15 +47,13 @@ extern "C" {
  *
  * @param consensus The consensus
  * @param db_conf Database configuration
- * @param testnet Testnet if true, Mainnet otherwise
  * @param transaction_requester A transaction requester
  *
  * @return a status code
  */
 retcode_t iota_consensus_init(iota_consensus_t* const consensus,
                               connection_config_t const* const db_conf,
-                              requester_state_t* const transaction_requester,
-                              bool testnet);
+                              requester_state_t* const transaction_requester);
 
 /**
  * Starts all consensus components

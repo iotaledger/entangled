@@ -9,8 +9,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ciri/conf/conf.h"
-#include "ciri/conf/usage.h"
+#include "ciri/conf.h"
+#include "ciri/usage.h"
+
+/*
+ * Private functions
+ */
 
 static struct option* build_options() {
   size_t nbr = 0;
@@ -53,14 +57,47 @@ static logger_level_t get_log_level(char const* const log_level) {
   return map[i].level;
 }
 
-retcode_t ciri_conf_parse(ciri_conf_t* conf, int argc, char** argv) {
+/*
+ * Public functions
+ */
+
+retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf,
+                                 iota_consensus_conf_t* const consensus_conf,
+                                 iota_gossip_conf_t* const gossip_conf,
+                                 iota_api_conf_t* const api_conf) {
   retcode_t ret = RC_OK;
+
+  if (ciri_conf == NULL || gossip_conf == NULL || consensus_conf == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  memset(ciri_conf, 0, sizeof(iota_ciri_conf_t));
+
+  ciri_conf->log_level = DEFAULT_LOG_LEVEL;
+
+  if ((ret = iota_consensus_conf_init(consensus_conf)) != RC_OK) {
+    return ret;
+  }
+
+  if ((ret = iota_gossip_conf_init(gossip_conf)) != RC_OK) {
+    return ret;
+  }
+
+  if ((ret = iota_api_conf_init(api_conf)) != RC_OK) {
+    return ret;
+  }
+
+  return ret;
+}
+
+retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
+                             iota_consensus_conf_t* const consensus_conf,
+                             iota_gossip_conf_t* const gossip_conf,
+                             iota_api_conf_t* const api_conf, int argc,
+                             char** argv) {
   int arg;
   struct option* long_options = build_options();
 
-  if ((ret = ciri_conf_init(conf))) {
-    return ret;
-  }
   while ((arg = getopt_long(argc, argv, short_options, long_options, NULL)) !=
          -1) {
     switch (arg) {
@@ -70,43 +107,19 @@ retcode_t ciri_conf_parse(ciri_conf_t* conf, int argc, char** argv) {
         exit(EXIT_SUCCESS);
         break;
       case 'l':  // --log-level
-        conf->log_level = get_log_level(optarg);
+        ciri_conf->log_level = get_log_level(optarg);
         break;
       case 'p':  // --port
-        conf->api_port = atoi(optarg);
+        api_conf->port = atoi(optarg);
         break;
       case 'n':  // --neighbors
-        conf->neighbors = optarg;
-        break;
-      case 'c':  // --config
-        conf->conf_file = optarg;
+        gossip_conf->neighbors = optarg;
         break;
       case 'u':  // --udp-receiver-port
-        conf->udp_receiver_port = atoi(optarg);
+        gossip_conf->udp_receiver_port = atoi(optarg);
         break;
       case 't':  // --tcp-receiver-port
-        conf->tcp_receiver_port = atoi(optarg);
-        break;
-      case 'e':  // --testnet
-        conf->testnet = true;
-        break;
-      case 'r':  // --remote
-        conf->remote = true;
-        break;
-      case 'a':  // --remote-auth
-        conf->remote_auth_token = optarg;
-        break;
-      case 'i':  // --remote-limit-api
-        conf->remote_limit_api = optarg;
-        break;
-      case 's':  // --send-limit
-        conf->send_limit = atof(optarg);
-        break;
-      case 'm':  // --max-peers
-        conf->max_peers = atoi(optarg);
-        break;
-      case 'd':  // --dns-resolution-false
-        conf->dns_resolution = false;
+        gossip_conf->tcp_receiver_port = atoi(optarg);
         break;
       default:
         iota_usage();

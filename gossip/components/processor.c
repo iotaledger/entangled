@@ -98,7 +98,7 @@ static retcode_t process_request_bytes(processor_state_t *const state,
     return RC_PROCESSOR_COMPONENT_NULL_TX;
   }
 
-  bytes_to_trits(packet->content + PACKET_TX_SIZE, state->req_hash_size,
+  bytes_to_trits(packet->content + PACKET_TX_SIZE, REQUEST_HASH_SIZE,
                  request_hash_trits, NUM_TRITS_HASH);
   if ((request_hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
     return RC_PROCESSOR_COMPONENT_OOM;
@@ -184,7 +184,7 @@ static void *processor_routine(processor_state_t *const state) {
 }
 
 retcode_t processor_init(processor_state_t *const state, node_t *const node,
-                         tangle_t *const tangle, bool testnet) {
+                         tangle_t *const tangle) {
   if (state == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_STATE;
   } else if (node == NULL) {
@@ -196,11 +196,6 @@ retcode_t processor_init(processor_state_t *const state, node_t *const node,
   state->running = false;
   state->node = node;
   state->tangle = tangle;
-  if (testnet) {
-    state->req_hash_size = TESTNET_PACKET_REQ_HASH_SIZE;
-  } else {
-    state->req_hash_size = MAINNET_PACKET_REQ_HASH_SIZE;
-  }
 
   log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Initializing processor queue\n");
   if (CQ_INIT(iota_packet_t, state->queue) != CQ_SUCCESS) {

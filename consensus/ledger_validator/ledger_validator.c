@@ -57,7 +57,7 @@ static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
 
   if ((ret = tangle_traversal_dfs_to_genesis(
            lv->tangle, update_snapshot_milestone_do_func, hash,
-           lv->defs->genesis_hash, NULL, &hashes_to_update)) != RC_OK) {
+           lv->conf->genesis_hash, NULL, &hashes_to_update)) != RC_OK) {
     return ret;
   }
   ret = iota_tangle_transactions_update_snapshot_index(lv->tangle,
@@ -221,7 +221,7 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
       .lv = lv};
 
   ret = tangle_traversal_dfs_to_genesis(lv->tangle, get_latest_delta_do_func,
-                                        tip, lv->defs->genesis_hash,
+                                        tip, lv->conf->genesis_hash,
                                         analyzed_hashes, (void *)&params);
   *valid_delta = params.valid_delta;
   return ret;
@@ -232,13 +232,13 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
  */
 
 retcode_t iota_consensus_ledger_validator_init(
-    ledger_validator_t *const lv, iota_consensus_defs_t *const defs,
+    ledger_validator_t *const lv, iota_consensus_conf_t *const conf,
     tangle_t *const tangle, milestone_tracker_t *const mt,
     requester_state_t *const tr) {
   retcode_t ret = RC_OK;
 
   logger_helper_init(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
-  lv->defs = defs;
+  lv->conf = conf;
   lv->tangle = tangle;
   lv->milestone_tracker = mt;
   lv->transaction_requester = tr;

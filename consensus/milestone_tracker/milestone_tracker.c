@@ -8,7 +8,6 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#include "ciri/conf/conf_values.h"
 #include "common/model/milestone.h"
 #include "common/sign/normalize.h"
 #include "common/sign/v1/iss_curl.h"
@@ -53,8 +52,8 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt,
                       NUM_TRITS_SIGNATURE, &curl);
   curl_reset(&curl);
   iss_curl_address(sig_digest, root, HASH_LENGTH_TRIT, &curl);
-  merkle_root(root, siblings_trits, mt->num_keys_in_milestone, candidate->index,
-              &curl);
+  merkle_root(root, siblings_trits, mt->conf->num_keys_in_milestone,
+              candidate->index, &curl);
   flex_trits_from_trits(coo, HASH_LENGTH_TRIT, root, HASH_LENGTH_TRIT,
                         HASH_LENGTH_TRIT);
 
@@ -289,11 +288,11 @@ static void* solid_milestone_tracker(void* arg) {
 }
 
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
+                                      iota_consensus_conf_t* const conf,
                                       tangle_t* const tangle,
                                       snapshot_t* const snapshot,
                                       ledger_validator_t* const lv,
-                                      transaction_solidifier_t* const ts,
-                                      bool testnet) {
+                                      transaction_solidifier_t* const ts) {
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
   } else if (tangle == NULL) {
@@ -303,7 +302,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   logger_helper_init(MILESTONE_TRACKER_LOGGER_ID, LOGGER_DEBUG, true);
   memset(mt, 0, sizeof(milestone_tracker_t));
   mt->running = false;
-  mt->testnet = testnet;
+  mt->conf = conf;
   mt->tangle = tangle;
   mt->latest_snapshot = snapshot;
   mt->ledger_validator = lv;
@@ -318,16 +317,10 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   if ((mt->coordinator = trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
     goto oom;
   }
-  memcpy(mt->coordinator->trits, snapshot->conf.coordinator,
-         FLEX_TRIT_SIZE_243);
-  mt->milestone_start_index = snapshot->conf.last_milestone;
-  mt->latest_milestone_index = snapshot->conf.last_milestone;
-  mt->latest_solid_subtangle_milestone_index = snapshot->conf.last_milestone;
-  if (mt->testnet) {
-    mt->num_keys_in_milestone = TESTNET_NUM_KEYS_IN_MILESTONE;
-  } else {
-    mt->num_keys_in_milestone = MAINNET_NUM_KEYS_IN_MILESTONE;
-  }
+  memcpy(mt->coordinator->trits, conf->coordinator, FLEX_TRIT_SIZE_243);
+  mt->milestone_start_index = conf->last_milestone;
+  mt->latest_milestone_index = conf->last_milestone;
+  mt->latest_solid_subtangle_milestone_index = conf->last_milestone;
 
   return RC_OK;
 

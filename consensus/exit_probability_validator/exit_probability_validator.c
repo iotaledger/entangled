@@ -12,17 +12,14 @@
 #define WALKER_VALIDATOR_LOGGER_ID "consensus_walker_validator"
 
 retcode_t iota_consensus_exit_prob_transaction_validator_init(
-    iota_consensus_defs_t *const defs, tangle_t *const tangle,
+    iota_consensus_conf_t *const conf, tangle_t *const tangle,
     milestone_tracker_t *const mt, ledger_validator_t *const lv,
-    exit_prob_transaction_validator_t *epv, uint32_t max_analyzed_txs,
-    uint32_t max_depth) {
+    exit_prob_transaction_validator_t *epv) {
   logger_helper_init(WALKER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
-  epv->defs = defs;
+  epv->conf = conf;
   epv->tangle = tangle;
   epv->mt = mt;
   epv->lv = lv;
-  epv->max_analyzed_txs = max_analyzed_txs;
-  epv->max_depth = max_depth;
   epv->max_depth_ok_memoization = NULL;
   return RC_OK;
 }
@@ -85,7 +82,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
 
   ret = iota_consensus_exit_prob_transaction_validator_below_max_depth(
       epv, tail_hash,
-      epv->mt->latest_solid_subtangle_milestone_index - epv->max_depth,
+      epv->mt->latest_solid_subtangle_milestone_index - epv->conf->max_depth,
       &below_max_depth);
   if (ret != RC_OK) {
     return ret;
@@ -121,7 +118,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
   TRIT_ARRAY_DECLARE(hash_trits_array, NUM_TRITS_HASH);
 
   while (non_analyzed_hashes != NULL) {
-    if (hash243_set_size(&visited_hashes) == epv->max_analyzed_txs) {
+    if (hash243_set_size(&visited_hashes) == epv->conf->below_max_depth) {
       log_error(WALKER_VALIDATOR_LOGGER_ID,
                 "Validation failed, exceeded num of transactions\n");
       *below_max_depth = false;
@@ -143,7 +140,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
     res = iota_tangle_transaction_load(epv->tangle, TRANSACTION_FIELD_HASH,
                                        &hash_trits_array, &pack);
     bool tail_is_not_genesis = (curr_tx_s.snapshot_index != 0 ||
-                                memcmp(epv->defs->genesis_hash, curr_tx_s.hash,
+                                memcmp(epv->conf->genesis_hash, curr_tx_s.hash,
                                        FLEX_TRIT_SIZE_243) == 0);
     if (tail_is_not_genesis &&
         (curr_tx_s.snapshot_index < lowest_allowed_depth)) {

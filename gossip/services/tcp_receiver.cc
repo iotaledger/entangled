@@ -6,7 +6,7 @@
  */
 
 #include "gossip/services/tcp_receiver.hpp"
-#include "ciri/node.h"
+#include "gossip/node.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/logger_helper.h"
@@ -55,7 +55,7 @@ void TcpConnection::start() {
 void TcpConnection::receive() {
   auto self(shared_from_this());
   boost::asio::async_read(
-      socket_, boost::asio::buffer(packet_.content, service_->packet_size),
+      socket_, boost::asio::buffer(packet_.content, PACKET_SIZE),
       [this, self](boost::system::error_code ec, std::size_t length) {
         if (!ec && length > 0) {
           handlePacket(length);
@@ -65,7 +65,7 @@ void TcpConnection::receive() {
 }
 
 bool TcpConnection::handlePacket(std::size_t const length) {
-  if (length != service_->packet_size) {
+  if (length != PACKET_SIZE) {
     return false;
   }
   iota_packet_build(&packet_, neighbor_->endpoint.ip, neighbor_->endpoint.port,

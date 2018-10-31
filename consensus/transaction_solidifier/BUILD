@@ -7,7 +7,7 @@ cc_library(
         "//common:errors",
         "//common/model:transaction",
         "//common/trinary:trit_array",
-        "//consensus:defs",
+        "//consensus:conf",
         "//consensus/tangle",
         "//consensus/utils:tangle_traversals",
         "//gossip/components:transaction_requester",

@@ -31,7 +31,7 @@ void test_get_trytes_empty(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
 
-  api.limits.max_get_trytes = 100;
+  api.conf.max_get_trytes = 100;
 
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
   TEST_ASSERT_EQUAL_INT(get_trytes_res_trytes_num(res), 0);
@@ -47,7 +47,7 @@ void test_get_trytes_not_found(void) {
   get_trytes_res_t *res = get_trytes_res_new();
   tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION];
 
-  api.limits.max_get_trytes = 100;
+  api.conf.max_get_trytes = 100;
 
   get_trytes_req_add_hash(req, NULL_HASH);
 
@@ -71,7 +71,7 @@ void test_get_trytes_max(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
 
-  api.limits.max_get_trytes = 1;
+  api.conf.max_get_trytes = 1;
 
   // Storing 2 transactions to get trytes from
 
@@ -105,7 +105,7 @@ void test_get_trytes(void) {
                                            TX_3_OF_4_HASH, TX_4_OF_4_HASH};
   tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION];
 
-  api.limits.max_get_trytes = 100;
+  api.conf.max_get_trytes = 100;
 
   // Storing transactions to get trytes from
 
@@ -142,6 +142,8 @@ int main(void) {
 
   config.db_path = test_db_path;
   api.tangle = &tangle;
+
+  TEST_ASSERT(iota_api_conf_init(&api.conf) == RC_OK);
 
   RUN_TEST(test_get_trytes_empty);
   RUN_TEST(test_get_trytes_not_found);

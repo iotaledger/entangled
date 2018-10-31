@@ -7,8 +7,8 @@
 
 #include <string.h>
 
-#include "ciri/node.h"
 #include "gossip/components/broadcaster.h"
+#include "gossip/node.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 

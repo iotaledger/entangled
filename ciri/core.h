@@ -9,10 +9,10 @@
 #define __CIRI_CORE_H__
 
 #include "ciri/api/api.h"
-#include "ciri/conf/conf.h"
-#include "ciri/node.h"
+#include "ciri/conf.h"
 #include "consensus/consensus.h"
 #include "gossip/components/transaction_requester.h"
+#include "gossip/node.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,10 +20,9 @@ extern "C" {
 
 typedef struct core_s {
   bool running;
-  ciri_conf_t config;
+  iota_ciri_conf_t conf;
   iota_consensus_t consensus;
-  requester_state_t transaction_requester;
-  node_t node;
+  iota_node_t node;
   iota_api_t api;
 } core_t;
 

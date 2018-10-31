@@ -10,33 +10,37 @@
 #include "consensus/snapshot/snapshot.h"
 #include "utils/signed_files.h"
 
+iota_consensus_conf_t conf;
+
 void test_good_signature(void) {
   bool valid = false;
-  snapshot_conf_t conf;
 
-  TEST_ASSERT(iota_snapshot_init_conf(SNAPSHOT_CONF_MAINNET, &conf, false) ==
-              RC_OK);
+  TEST_ASSERT(iota_snapshot_init_conf(&conf) == RC_OK);
   TEST_ASSERT(iota_file_signature_validate(
-                  SNAPSHOT_MAINNET, SNAPSHOT_SIG_MAINNET, conf.signature_pubkey,
-                  conf.signature_depth, conf.signature_index, &valid) == RC_OK);
+                  conf.snapshot_file, conf.snapshot_sig_file,
+                  conf.snapshot_signature_pubkey, conf.snapshot_signature_depth,
+                  conf.snapshot_signature_index, &valid) == RC_OK);
   TEST_ASSERT_TRUE(valid);
 }
 
 void test_bad_signature(void) {
   bool valid = false;
-  snapshot_conf_t conf;
 
-  TEST_ASSERT(iota_snapshot_init_conf(SNAPSHOT_CONF_MAINNET, &conf, false) ==
-              RC_OK);
-  TEST_ASSERT(
-      iota_file_signature_validate(SNAPSHOT_MAINNET, "utils/tests/fake.sig",
-                                   conf.signature_pubkey, conf.signature_depth,
-                                   conf.signature_index, &valid) == RC_OK);
+  TEST_ASSERT(iota_snapshot_init_conf(&conf) == RC_OK);
+  TEST_ASSERT(iota_file_signature_validate(
+                  conf.snapshot_file, "utils/tests/fake.sig",
+                  conf.snapshot_signature_pubkey, conf.snapshot_signature_depth,
+                  conf.snapshot_signature_index, &valid) == RC_OK);
   TEST_ASSERT_FALSE(valid);
 }
 
 int main(void) {
   UNITY_BEGIN();
+
+  TEST_ASSERT(iota_consensus_conf_init(&conf) == RC_OK);
+  strcpy(conf.snapshot_file, SNAPSHOT_FILE);
+  strcpy(conf.snapshot_conf_file, SNAPSHOT_CONF_FILE);
+  strcpy(conf.snapshot_sig_file, SNAPSHOT_SIG_FILE);
 
   RUN_TEST(test_good_signature);
   RUN_TEST(test_bad_signature);

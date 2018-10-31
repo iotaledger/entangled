@@ -21,7 +21,7 @@ bool tcp_send(receiver_service_t *const service, endpoint_t *const endpoint,
     auto socket = reinterpret_cast<boost::asio::ip::tcp::socket *>(
         endpoint->opaque_inetaddr);
     boost::asio::async_write(
-        *socket, boost::asio::buffer(packet->content, service->packet_size),
+        *socket, boost::asio::buffer(packet->content, PACKET_SIZE),
         [](const boost::system::error_code &, std::size_t) {});
   } catch (std::exception const &e) {
     log_error("Sending packet to tcp://%s:%d failed: %s", endpoint->host,

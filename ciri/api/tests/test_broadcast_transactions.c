@@ -9,10 +9,10 @@
 
 #include "ciri/api/api.h"
 #include "ciri/api/tests/defs.h"
-#include "ciri/node.h"
-#include "consensus/defs.h"
+#include "consensus/conf.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
+#include "gossip/node.h"
 
 static char *test_db_path = "ciri/api/tests/test.db";
 static char *ciri_db_path = "ciri/api/tests/ciri.db";
@@ -22,7 +22,7 @@ static tangle_t tangle;
 static transaction_validator_t transaction_validator;
 static node_t node;
 static broadcaster_t broadcaster;
-static iota_consensus_defs_t defs;
+static iota_consensus_conf_t conf;
 
 void setUp(void) {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
@@ -98,10 +98,11 @@ int main(void) {
   api.transaction_validator = &transaction_validator;
   broadcaster_init(&broadcaster, &node);
   api.broadcaster = &broadcaster;
-  memset(defs.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT(iota_consensus_conf_init(&conf) == RC_OK);
+  conf.snapshot_timestamp_sec = 1536845195;
+  conf.mwm = 1;
 
-  iota_consensus_transaction_validator_init(&transaction_validator, &defs,
-                                            1536845195, 10);
+  iota_consensus_transaction_validator_init(&transaction_validator, &conf);
 
   RUN_TEST(test_broadcast_transactions_empty);
   RUN_TEST(test_broadcast_transactions_invalid_tx);

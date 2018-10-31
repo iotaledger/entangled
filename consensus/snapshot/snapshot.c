@@ -10,6 +10,7 @@
 #include "cJSON.h"
 
 #include "common/model/transaction.h"
+#include "consensus/conf.h"
 #include "consensus/snapshot/snapshot.h"
 #include "utils/logger_helper.h"
 #include "utils/signed_files.h"
@@ -78,8 +79,7 @@ done:
  * Public functions
  */
 
-retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
-                                  snapshot_conf_t *const conf, bool testnet) {
+retcode_t iota_snapshot_init_conf(iota_consensus_conf_t *const conf) {
   retcode_t ret = RC_OK;
   FILE *file = NULL;
   size_t len = 0;
@@ -87,7 +87,7 @@ retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
   cJSON *json = NULL, *tmp = NULL, *timestamp = NULL, *signature = NULL,
         *coordinator = NULL;
 
-  if ((file = fopen(snapshot_conf_file, "r")) == NULL) {
+  if ((file = fopen(conf->snapshot_conf_file, "r")) == NULL) {
     log_error(SNAPSHOT_LOGGER_ID, "Snapshot configuration file not found\n");
     ret = RC_SNAPSHOT_FILE_NOT_FOUND;
     goto done;
@@ -127,7 +127,7 @@ retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
   if (!cJSON_IsNumber(timestamp)) {
     goto json_error;
   }
-  conf->timestamp_sec = timestamp->valueint;
+  conf->snapshot_timestamp_sec = timestamp->valueint;
 
   tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "pubkey");
   if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL ||
@@ -144,30 +144,26 @@ retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
   }
   conf->last_milestone = tmp->valueint;
 
-  if (!testnet) {
-    if ((signature = cJSON_GetObjectItemCaseSensitive(json, "signature")) ==
-        NULL) {
-      goto json_error;
-    }
-
+  if ((signature = cJSON_GetObjectItemCaseSensitive(json, "signature")) !=
+      NULL) {
     tmp = cJSON_GetObjectItemCaseSensitive(signature, "index");
     if (tmp == NULL || !cJSON_IsNumber(tmp)) {
       goto json_error;
     }
-    conf->signature_index = tmp->valueint;
+    conf->snapshot_signature_index = tmp->valueint;
 
     tmp = cJSON_GetObjectItemCaseSensitive(signature, "depth");
     if (tmp == NULL || !cJSON_IsNumber(tmp)) {
       goto json_error;
     }
-    conf->signature_depth = tmp->valueint;
+    conf->snapshot_signature_depth = tmp->valueint;
 
     tmp = cJSON_GetObjectItemCaseSensitive(signature, "pubkey");
     if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL ||
         strlen(tmp->valuestring) != HASH_LENGTH_TRYTE) {
       goto json_error;
     }
-    flex_trits_from_trytes(conf->signature_pubkey, HASH_LENGTH_TRIT,
+    flex_trits_from_trytes(conf->snapshot_signature_pubkey, HASH_LENGTH_TRIT,
                            (tryte_t *)tmp->valuestring, HASH_LENGTH_TRYTE,
                            HASH_LENGTH_TRYTE);
   }
@@ -196,10 +192,7 @@ done:
 }
 
 retcode_t iota_snapshot_init(snapshot_t *const snapshot,
-                             char const *const snapshot_file,
-                             char const *const snapshot_sig_file,
-                             char const *const snapshot_conf_file,
-                             bool testnet) {
+                             iota_consensus_conf_t *const conf) {
   retcode_t ret = RC_OK;
 
   if (snapshot == NULL) {
@@ -208,22 +201,23 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot,
 
   logger_helper_init(SNAPSHOT_LOGGER_ID, LOGGER_DEBUG, true);
   rw_lock_handle_init(&snapshot->rw_lock);
+  snapshot->conf = conf;
   snapshot->index = 0;
   snapshot->state = NULL;
 
-  if ((ret = iota_snapshot_init_conf(snapshot_conf_file, &snapshot->conf,
-                                     testnet)) != RC_OK) {
+  if ((ret = iota_snapshot_init_conf(snapshot->conf)) != RC_OK) {
     log_critical(SNAPSHOT_LOGGER_ID,
                  "Parsing snapshot configuration file failed\n");
     return ret;
   }
 
-  if (!testnet) {
+  if (strlen(snapshot->conf->snapshot_sig_file)) {
     bool valid = false;
     if ((ret = iota_file_signature_validate(
-             snapshot_file, snapshot_sig_file, snapshot->conf.signature_pubkey,
-             snapshot->conf.signature_depth, snapshot->conf.signature_index,
-             &valid)) != RC_OK) {
+             conf->snapshot_file, conf->snapshot_sig_file,
+             snapshot->conf->snapshot_signature_pubkey,
+             snapshot->conf->snapshot_signature_depth,
+             snapshot->conf->snapshot_signature_index, &valid)) != RC_OK) {
       log_critical(SNAPSHOT_LOGGER_ID,
                    "Validating snapshot signature failed\n");
       return ret;
@@ -232,7 +226,7 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot,
       return RC_SNAPSHOT_INVALID_SIGNATURE;
     }
   }
-  if ((ret = iota_snapshot_initial_state(snapshot, snapshot_file))) {
+  if ((ret = iota_snapshot_initial_state(snapshot, conf->snapshot_file))) {
     log_critical(SNAPSHOT_LOGGER_ID,
                  "Initializing snapshot initial state failed\n");
     return ret;

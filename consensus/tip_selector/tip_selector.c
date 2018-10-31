@@ -18,15 +18,14 @@
 #define TIP_SELECTOR_LOGGER_ID "consensus_tip_selector"
 
 retcode_t iota_consensus_tip_selector_init(
-    tip_selector_t *const tip_selector,
+    tip_selector_t *const tip_selector, iota_consensus_conf_t *const conf,
     cw_rating_calculator_t *const cw_rating_calculator,
     entry_point_selector_t *const entry_point_selector,
     ep_randomizer_t *const ep_randomizer,
     exit_prob_transaction_validator_t *const walker_validator,
     ledger_validator_t *const ledger_validator,
-    milestone_tracker_t *const milestone_tracker, tangle_t *const tangle,
-    double const alpha, uint32_t const max_txs_below_max_depth,
-    uint32_t const max_depth) {
+    milestone_tracker_t *const milestone_tracker, tangle_t *const tangle) {
+  tip_selector->conf = conf;
   tip_selector->cw_rating_calculator = cw_rating_calculator;
   tip_selector->entry_point_selector = entry_point_selector;
   tip_selector->ep_randomizer = ep_randomizer;
@@ -34,8 +33,6 @@ retcode_t iota_consensus_tip_selector_init(
   tip_selector->ledger_validator = ledger_validator;
   tip_selector->milestone_tracker = milestone_tracker;
   tip_selector->tangle = tangle;
-  tip_selector->max_txs_below_max_depth = max_txs_below_max_depth;
-  tip_selector->max_depth = max_depth;
   return RC_OK;
 }
 

@@ -22,7 +22,20 @@ int main(int argc, char* argv[]) {
 
   srand(time(NULL));
 
-  if (ciri_conf_parse(&core_g.config, argc, argv)) {
+  // Default configuration
+
+  if (iota_ciri_conf_default(&core_g.conf, &core_g.consensus.conf,
+                             &core_g.node.conf, &core_g.api.conf) != RC_OK) {
+    return EXIT_FAILURE;
+  }
+
+  // File configuration
+
+  // CLI Configuration
+
+  if (iota_ciri_conf_cli(&core_g.conf, &core_g.consensus.conf,
+                         &core_g.node.conf, &core_g.api.conf, argc,
+                         argv) != RC_OK) {
     return EXIT_FAILURE;
   }
 
@@ -31,7 +44,7 @@ int main(int argc, char* argv[]) {
   }
   logger_init();
   logger_output_register(stdout);
-  logger_output_level_set(stdout, core_g.config.log_level);
+  logger_output_level_set(stdout, core_g.conf.log_level);
   logger_helper_init(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
 
   log_info(MAIN_LOGGER_ID, "Initializing cIRI core\n");

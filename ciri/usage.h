@@ -41,8 +41,6 @@ static struct ciri_argument_s {
      REQUIRED_ARG},
     {"udp-receiver-port", 'u', "UDP receiver port", REQUIRED_ARG},
     {"tcp-receiver-port", 't', "TCP receiver port", REQUIRED_ARG},
-    {"testnet", 'e', "Makes it possible to run IRI with the IOTA testnet",
-     NO_ARG},
     {"remote", 'r', "Remotely access your node and send API commands", NO_ARG},
     {"remote-auth", 'a',
      "Requires authentication password for accessing remotely. Requires a "

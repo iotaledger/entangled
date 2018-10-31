@@ -25,7 +25,7 @@ cc_library(
     srcs = ["tcp_receiver.cc"],
     hdrs = ["tcp_receiver.hpp"],
     deps = [
-        "//ciri:node_shared",
+        "//gossip:node_shared",
         "//utils:logger_helper",
         "//utils/containers/lists:concurrent_list_neighbor",
         "//utils/containers/queues:concurrent_queue_packet",

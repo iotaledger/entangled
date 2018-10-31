@@ -16,7 +16,7 @@ cc_library(
     srcs = ["broadcaster.c"],
     deps = [
         ":broadcaster_shared",
-        "//ciri:node_shared",
+        "//gossip:node_shared",
         "//utils:logger_helper",
         "//utils/containers/lists:concurrent_list_neighbor",
     ],
@@ -50,7 +50,7 @@ cc_library(
     srcs = ["receiver.c"],
     deps = [
         ":receiver_shared",
-        "//ciri:node_shared",
+        "//gossip:node_shared",
         "//gossip/services:receiver",
     ],
 )
@@ -60,9 +60,9 @@ cc_library(
     srcs = ["transaction_requester.c"],
     hdrs = ["transaction_requester.h"],
     deps = [
-        "//ciri/conf:conf_values",
         "//common:errors",
         "//consensus/tangle",
+        "//gossip:conf",
         "//utils:logger_helper",
         "//utils/containers/hash:hash243_set",
         "//utils/handles:rw_lock",

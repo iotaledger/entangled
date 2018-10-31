@@ -33,7 +33,7 @@ cc_test(
     deps = [
         ":defs",
         "//ciri/api",
-        "//consensus:defs",
+        "//consensus:conf",
         "//consensus/test_utils",
         "@unity",
     ],

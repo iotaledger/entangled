@@ -27,7 +27,7 @@
 static cw_rating_calculator_t calc;
 static tangle_t tangle;
 static connection_config_t config;
-static iota_consensus_defs_t defs;
+static iota_consensus_conf_t conf;
 
 // gdb --args ./test_cw_ratings_dfs 1
 static bool debug_mode = false;
@@ -56,24 +56,26 @@ static snapshot_t snapshot;
 static milestone_tracker_t mt;
 static ledger_validator_t lv;
 static transaction_solidifier_t ts;
-static iota_consensus_defs_t defs;
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
-  memset(defs.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL,
-                                 snapshot_conf_path, true) == RC_OK);
-  iota_consensus_transaction_solidifier_init(&ts, &defs, &tangle, NULL);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, &ts,
-                                          true) == RC_OK);
-  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &defs, &tangle, &mt,
+  conf.max_depth = max_depth;
+  conf.below_max_depth = max_txs_below_max_depth;
+
+  strcpy(conf.snapshot_file, snapshot_path);
+  strcpy(conf.snapshot_conf_file, snapshot_conf_path);
+  strcpy(conf.snapshot_sig_file, "");
+  TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_OK);
+  iota_consensus_transaction_solidifier_init(&ts, &conf, &tangle, NULL);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &tangle, &snapshot, &lv,
+                                          &ts) == RC_OK);
+  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &conf, &tangle, &mt,
                                                    NULL) == RC_OK);
 
   // We want to avoid unnecessary validation
   mt.latest_snapshot->index = 99999999999;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(
-                  &defs, &tangle, &mt, &lv, epv, max_txs_below_max_depth,
-                  max_depth) == RC_OK);
+                  &conf, &tangle, &mt, &lv, epv) == RC_OK);
 }
 
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
@@ -156,7 +158,8 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   /// Exit Probabilities - start
 
   ep_randomizer_t ep_randomizer;
-  TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &tangle, 0,
+  conf.alpha = 0;
+  TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &conf, &tangle,
                                                 EP_RANDOM_WALK) == RC_OK);
 
   trit_array_t tip;
@@ -244,7 +247,8 @@ void test_single_tx_tangle(void) {
   TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), 1);
 
   ep_randomizer_t ep_randomizer;
-  TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &tangle, 0.01,
+  conf.alpha = 0.01;
+  TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &conf, &tangle,
                                                 EP_RANDOM_WALK) == RC_OK);
 
   trit_array_t tip;
@@ -339,7 +343,8 @@ void test_cw_topology_four_transactions_diamond(void) {
   TEST_ASSERT_EQUAL_INT(total_weight, 4 + 2 + 2 + 1);
 
   ep_randomizer_t ep_randomizer;
-  TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &tangle, 0.01,
+  conf.alpha = 0.01;
+  TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &conf, &tangle,
                                                 EP_RANDOM_WALK) == RC_OK);
 
   trit_array_t tip;
@@ -433,8 +438,9 @@ void test_cw_topology_two_inequal_tips(void) {
   /// Exit Probabilities - start
 
   ep_randomizer_t ep_randomizer;
-  TEST_ASSERT(iota_consensus_ep_randomizer_init(
-                  &ep_randomizer, &tangle, low_alpha, EP_RANDOM_WALK) == RC_OK);
+  conf.alpha = low_alpha;
+  TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &conf, &tangle,
+                                                EP_RANDOM_WALK) == RC_OK);
 
   trit_array_t tip;
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
@@ -462,7 +468,7 @@ void test_cw_topology_two_inequal_tips(void) {
   TEST_ASSERT(selected_tip_count > expected_mean - 3 * expected_stdev);
 
   /// High alpha
-  ep_randomizer.alpha = high_alpha;
+  conf.alpha = high_alpha;
   selected_tip_count = 0;
 
   for (size_t i = 0; i < selections; ++i) {
@@ -517,8 +523,8 @@ void test_1_bundle(void) {
   for (size_t i = 0; i < 5; ++i) {
     txs[i]->snapshot_index = 9999999;
   }
-  memcpy(txs[4]->trunk, defs.genesis_hash, FLEX_TRIT_SIZE_243);
-  memcpy(txs[4]->branch, defs.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[4]->trunk, conf.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[4]->branch, conf.genesis_hash, FLEX_TRIT_SIZE_243);
   build_tangle(&tangle, txs, bundle_size + 1);
 
   iota_stor_pack_t pack;
@@ -553,8 +559,9 @@ void test_1_bundle(void) {
   /// Exit Probabilities - start
 
   ep_randomizer_t ep_randomizer;
-  TEST_ASSERT(iota_consensus_ep_randomizer_init(
-                  &ep_randomizer, &tangle, low_alpha, EP_RANDOM_WALK) == RC_OK);
+  conf.alpha = low_alpha;
+  TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &conf, &tangle,
+                                                EP_RANDOM_WALK) == RC_OK);
 
   trit_array_t tip;
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
@@ -631,8 +638,8 @@ void test_2_chained_bundles(void) {
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t txEp = transaction_deserialize(ep_trits);
-  memcpy(txEp->trunk, defs.genesis_hash, FLEX_TRIT_SIZE_243);
-  memcpy(txEp->branch, defs.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txEp->trunk, conf.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txEp->branch, conf.genesis_hash, FLEX_TRIT_SIZE_243);
   txEp->snapshot_index = 9999999;
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, txEp) == RC_OK);
@@ -657,8 +664,9 @@ void test_2_chained_bundles(void) {
   /// Exit Probabilities - start
 
   ep_randomizer_t ep_randomizer;
-  TEST_ASSERT(iota_consensus_ep_randomizer_init(
-                  &ep_randomizer, &tangle, low_alpha, EP_RANDOM_WALK) == RC_OK);
+  conf.alpha = low_alpha;
+  TEST_ASSERT(iota_consensus_ep_randomizer_init(&ep_randomizer, &conf, &tangle,
+                                                EP_RANDOM_WALK) == RC_OK);
 
   trit_array_t tip;
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
@@ -709,7 +717,7 @@ int main(int argc, char *argv[]) {
 
   config.db_path = test_db_path;
 
-  memset(defs.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+  iota_consensus_conf_init(&conf);
 
   RUN_TEST(test_single_tx_tangle);
   RUN_TEST(test_cw_topology_blockchain);
