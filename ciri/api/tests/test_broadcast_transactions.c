@@ -100,7 +100,7 @@ int main(void) {
   api.broadcaster = &broadcaster;
   TEST_ASSERT(iota_consensus_conf_init(&conf) == RC_OK);
   conf.snapshot_timestamp_sec = 1536845195;
-  conf.mwm = 10;
+  conf.mwm = 1;
 
   iota_consensus_transaction_validator_init(&transaction_validator, &conf);
 
