@@ -14,8 +14,12 @@ void iota_usage() {
 
   fprintf(stderr, "cIRI usage:\n");
   while (ciri_arguments_g[i].desc) {
-    fprintf(stderr, "--%-20s (-%c) ", ciri_arguments_g[i].name,
-            ciri_arguments_g[i].val);
+    fprintf(stderr, "--%-20s ", ciri_arguments_g[i].name);
+    if (ciri_arguments_g[i].val < CLI_ARG) {
+      fprintf(stderr, "(-%c) ", ciri_arguments_g[i].val);
+    } else {
+      fprintf(stderr, "     ");
+    }
     if (ciri_arguments_g[i].has_arg == REQUIRED_ARG) {
       fprintf(stderr, " arg ");
     } else if (ciri_arguments_g[i].has_arg == OPTIONAL_ARG) {
