@@ -33,16 +33,14 @@ extern "C" {
 typedef struct iota_consensus_conf_s {
   // The hash of the genesis transaction
   flex_trit_t genesis_hash[FLEX_TRIT_SIZE_243];
-  // The maximal number of previous milestones from where you can perform the
-  // random walk
+  // Limits how many milestones behind the current one the random walk can start
   size_t max_depth;
-  // Parameter that defines the randomness of the tip selection. Should be a
-  // number between 0 to infinity, where 0 is most random and infinity is most
-  // deterministic
+  // Randomness of the tip selection. Value must be in [0, inf] where 0 is most
+  // random and inf is most deterministic
   double alpha;
-  // The maximal number of unconfirmed transactions that may be analyzed in
-  // order to find the latest milestone the transaction that we are stepping on
-  // during the walk approves
+  // Maximum number of unconfirmed transactions that may be analysed to find the
+  // latest referenced milestone by the currently visited transaction during the
+  // random walk
   size_t below_max_depth;
   // Path of the snapshot configuration file
   char snapshot_conf_file[128];
@@ -66,9 +64,8 @@ typedef struct iota_consensus_conf_s {
   // The depth of the Merkle tree which in turn determines the number of leaves
   // (private keys) that the coordinator can use to sign a message
   size_t num_keys_in_milestone;
-  // The minimum weight magnitude is the number of trailing 0s that must appear
-  // in the end of a transaction hash. Increasing this number by 1 will result
-  // in proof of work that is 3 times as hard
+  // Number of trailing ternary 0s that must appear at the end of a transaction
+  // hash. Difficulty can be described as 3^mwm
   uint8_t mwm;
 } iota_consensus_conf_t;
 

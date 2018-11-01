@@ -5,61 +5,100 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __CIRI_CONF_CONF_ARGS_H__
-#define __CIRI_CONF_CONF_ARGS_H__
+#ifndef __CIRI_USAGE_H__
+#define __CIRI_USAGE_H__
 
 #include <stdlib.h>
 
-typedef enum ciri_arg_requirement_e {
+typedef enum cli_arg_value_e {
+  CLI_ARG = 1000,
+
+  // Gossip configuration
+
+  CLI_ARG_MWM,
+  CLI_ARG_P_REMOVE_REQUEST,
+  CLI_ARG_P_SELECT_MILESTONE,
+
+  // API configuration
+
+  CLI_ARG_MAX_GET_TRYTES,
+
+  // Consensus configuration
+
+  CLI_ARG_ALPHA,
+  CLI_ARG_BELOW_MAX_DEPTH,
+  CLI_ARG_MAX_DEPTH,
+
+} cli_arg_value_t;
+
+typedef enum cli_arg_requirement_e {
   NO_ARG,
   REQUIRED_ARG,
   OPTIONAL_ARG
-} ciri_arg_requirement_t;
+} cli_arg_requirement_t;
 
-static struct ciri_argument_s {
+static struct cli_argument_s {
   char* name;
-  char val;
+  int val;
   char* desc;
-  ciri_arg_requirement_t has_arg;
-} ciri_arguments_g[] = {
-    {"help", 'h', "Displays this usage", NO_ARG},
+  cli_arg_requirement_t has_arg;
+} cli_arguments_g[] = {
+
+    // cIRI configuration
+
+    {"help", 'h', "Displays this usage.", NO_ARG},
     {"log-level", 'l',
-     "Log level amongst: \"debug\", \"info\", \"notice\", \"warning\", "
+     "Valid log levels: \"debug\", \"info\", \"notice\", \"warning\", "
      "\"error\", \"critical\", \"alert\" "
-     "and \"emergency\"",
+     "and \"emergency\".",
      REQUIRED_ARG},
-    {"port", 'p',
-     "This is a mandatory option that defines the port to be used to send API "
-     "commands to your node",
+
+    // Gossip configuration
+
+    {"mwm", CLI_ARG_MWM,
+     "Number of trailing ternary 0s that must appear at the end of a "
+     "transaction hash. Difficulty can be described as 3^mwm.",
      REQUIRED_ARG},
-    {"neighbors", 'n',
-     "Neighbors that you are connected with will be added via this option",
+    {"neighbors", 'n', "URIs of neighbouring nodes, separated by a space.",
      REQUIRED_ARG},
-    {"config", 'c',
-     "Config INI file that can be used instead of CLI options. See more "
-     "below",
+    {"p-remove-request", CLI_ARG_P_REMOVE_REQUEST,
+     "Probability of removing a transaction from the request queue without "
+     "requesting it. Value must be in [0,1].",
      REQUIRED_ARG},
-    {"udp-receiver-port", 'u', "UDP receiver port", REQUIRED_ARG},
-    {"tcp-receiver-port", 't', "TCP receiver port", REQUIRED_ARG},
-    {"remote", 'r', "Remotely access your node and send API commands", NO_ARG},
-    {"remote-auth", 'a',
-     "Requires authentication password for accessing remotely. Requires a "
-     "correct username:hashedpassword combination",
+    {"p-select-milestone", CLI_ARG_P_SELECT_MILESTONE,
+     "Probability of sending a current milestone request to a neighbour. Value "
+     "must be in [0,1].",
      REQUIRED_ARG},
-    {"remote-limit-api", 'i',
-     "Excludes certain API calls from being able to be accessed remotely",
+    {"tcp-receiver-port", 't', "TCP listen port.", REQUIRED_ARG},
+    {"udp-receiver-port", 'u', "UDP listen port.", REQUIRED_ARG},
+
+    // API configuration
+
+    {"max-get-trytes", CLI_ARG_MAX_GET_TRYTES,
+     "Maximum number of transactions that will be returned by the 'getTrytes' "
+     "API call.",
      REQUIRED_ARG},
-    {"send-limit", 's',
-     "Limits the outbound bandwidth consumption. Limit is set to mbit/s",
+    {"port", 'p', "HTTP API listen port.", REQUIRED_ARG},
+
+    // Consensus configuration
+
+    {"alpha", CLI_ARG_ALPHA,
+     "Randomness of the tip selection. Value must be in [0, inf] where 0 is "
+     "most random and inf is most deterministic.",
      REQUIRED_ARG},
-    {"max-peers", 'm',
-     "Limits the number of max accepted peers. Default is set to 0 (mutual "
-     "tethering)",
+    {"below-max-depth", CLI_ARG_BELOW_MAX_DEPTH,
+     "Maximum number of unconfirmed transactions that may be analysed to find "
+     "the latest referenced milestone by the currently visited transaction "
+     "during the random walk.",
      REQUIRED_ARG},
-    {"dns-resolution-false", 'd', "Ignores DNS resolution refreshing", NO_ARG},
+    {"max-depth", CLI_ARG_MAX_DEPTH,
+     "Limits how many milestones behind the current one the random walk can "
+     "start.",
+     REQUIRED_ARG},
+
     {NULL, 0, NULL, NO_ARG}};
 
-static char* short_options = "hp:n:c:u:t:era:l:s:m:d";
+static char* short_options = "hl:n:t:u:p:";
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,4 +110,4 @@ void iota_usage();
 }
 #endif
 
-#endif  // __CIRI_CONF_CONF_ARGS_H__
+#endif  // __CIRI_USAGE_H__
