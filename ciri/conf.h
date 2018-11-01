@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __CIRI_CONF_CONF_H__
-#define __CIRI_CONF_CONF_H__
+#ifndef __CIRI_CONF_H__
+#define __CIRI_CONF_H__
 
 #include <stdbool.h>
 
@@ -84,4 +84,4 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t *const ciri_conf,
 }
 #endif
 
-#endif  // __CIRI_CONF_CONF_H__
+#endif  // __CIRI_CONF_H__
