@@ -45,9 +45,16 @@ Command line options
 
 Long option | Short option | Description | Example input
 --- | --- | --- | ---
-`--help` | `-h` | Displays the usage |
-`--log-level` | `-l` | Log level amongst: "debug", "info", "notice", "warning", "error", "critical", "alert" and "emergency" | `-l debug`
-`--neighbors` | `-n` | Neighbors that you are connected with will be added via this option | `-n "udp://148.148.148.148:14265 udp://[2001:db8:a0b:12f0::1]:14265"`
-`--udp-receiver-port` | `-u` | UDP receiver port | `-u 14600`
-`--tcp-receiver-port` | `-t` | TCP receiver port | `-t 15600`
-`--testnet` | | Makes it possible to run IRI with the IOTA testnet | `--testnet`
+`--help` | `-h` | Displays the usage. |
+`--log-level` | `-l` | Log level amongst: "debug", "info", "notice", "warning", "error", "critical", "alert" and "emergency". | `-l debug`
+`--mwm`||The minimum weight magnitude is the number of trailing 0s that must appear in the end of a transaction hash. Increasing this number by 1 will result in proof of work that is 3 times as hard.| `--mwm 14`
+`--neighbors` | `-n` | URIs of peer iota nodes. | `-n "udp://148.148.148.148:14265 udp://[2001:db8:a0b:12f0::1]:14265"`
+`--p-remove-request`| | A number between 0 and 1 that represents the probability of stopping to request a transaction.This number should be closer to 0 so non-existing transaction hashes will eventually be removed. | `--p-remove-request 0.01`
+`--p-select-milestone` | | A number between 0 and 1 that represents the probability of requesting a milestone transaction from a neighbor. This should be large since it is imperative that we find milestones to get transactions confirmed. | `--p-select-milestone 0.7`
+`--tcp-receiver-port` | `-t` | TCP receiver port. | `-t 15600`
+`--udp-receiver-port` | `-u` | UDP receiver port. | `-u 14600`
+`--max-get-trytes` | | The maximal number of trytes that may be returned by the "getTrytes" API call. If the number of transactions found exceeds this number an error will be returned. | `--max-get-trytes 10000`
+`--port` | `p` | The port that will be used by the API. | `--port 14265`
+`--alpha` | | Parameter that defines the randomness of the tip selection. Should be a number between 0 to infinity, where 0 is most random and infinity is most deterministic. | `--alpha 0.001`
+`--below-max-depth` | | The maximal number of unconfirmed transactions that may be analyzed in order to find the latest milestone the transaction that we are stepping on during the walk approves. | `--below-max-depth 20000`
+`--max-depth` | | The maximal number of previous milestones from where you can perform the random walk. | `--max-depth 15`
