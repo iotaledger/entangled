@@ -102,7 +102,7 @@ static struct cli_argument_s {
 
     {NULL, 0, NULL, NO_ARG}};
 
-static char* short_options = "";
+static char* short_options = "hl:n:t:u:p:";
 
 #ifdef __cplusplus
 extern "C" {
