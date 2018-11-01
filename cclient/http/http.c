@@ -143,6 +143,7 @@ static retcode_t send_headers_to_iota_service(int sockfd,
       "Host: %s\r\n"
       "X-IOTA-API-Version: %d\r\n"
       "Content-Type: application/x-www-form-urlencoded\r\n"
+      "Accept: application/json\r\n"
       "Content-Length: %lu\r\n"
       "\r\n";
   char header[256];
