@@ -29,23 +29,20 @@ extern "C" {
 // This structure contains all configuration variables needed to operate the
 // IOTA gossip protocol
 typedef struct iota_gossip_conf_s {
-  // The UDP receiver port
+  // UDP listen port
   uint16_t udp_receiver_port;
-  // The TCP receiver port
+  // TCP listen port
   uint16_t tcp_receiver_port;
-  // The minimum weight magnitude is the number of trailing 0s that must appear
-  // in the end of a transaction hash. Increasing this number by 1 will result
-  // in proof of work that is 3 times as hard
+  // Number of trailing ternary 0s that must appear at the end of a transaction
+  // hash. Difficulty can be described as 3^mwm
   uint8_t mwm;
-  // Node neighbors
+  // URIs of neighbouring nodes, separated by a space
   char* neighbors;
-  // A number between 0 and 1 that represents the probability of requesting a
-  // milestone transaction from a neighbor. This should be large since it is
-  // imperative that we find milestones to get transactions confirmed
+  // Probability of sending a current milestone request to a neighbour. Value
+  // must be in [0,1]
   double p_select_milestone;
-  // A number between 0 and 1 that represents the probability of stopping to
-  // request a transaction. This number should be closer to 0 so non-existing
-  // transaction hashes will eventually be removed
+  // Probability of removing a transaction from the request queue without
+  // requesting it. Value must be in [0,1]
   double p_remove_request;
 } iota_gossip_conf_t;
 

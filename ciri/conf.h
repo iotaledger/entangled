@@ -25,7 +25,7 @@ extern "C" {
 // This structure contains all configuration variables needed to operate
 // cIRI
 typedef struct iota_ciri_conf_s {
-  // Log level amongst: LOGGER_DEBUG, LOGGER_INFO, LOGGER_NOTICE,
+  // Valid log levels: LOGGER_DEBUG, LOGGER_INFO, LOGGER_NOTICE,
   // LOGGER_WARNING, LOGGER_ERR, LOGGER_CRIT, LOGGER_ALERT and LOGGER_EMERG
   logger_level_t log_level;
 } iota_ciri_conf_t;
