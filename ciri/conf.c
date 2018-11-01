@@ -161,5 +161,5 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
 
 done:
   free(long_options);
-  return RC_OK;
+  return ret;
 };
