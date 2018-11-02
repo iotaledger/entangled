@@ -15,11 +15,12 @@
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
 #include "common/trinary/flex_trit.h"
-#include "consensus/defs.h"
+#include "consensus/conf.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
 #include "consensus/tangle/tangle.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
+#include "consensus/transaction_solidifier/transaction_solidifier.h"
 
 static tangle_t tangle;
 static connection_config_t config;
@@ -41,28 +42,42 @@ static exit_prob_transaction_validator_t epv;
 static snapshot_t snapshot;
 static milestone_tracker_t mt;
 static ledger_validator_t lv;
+static transaction_solidifier_t ts;
+static requester_state_t tr;
+static iota_consensus_conf_t consensus_conf;
+static iota_gossip_conf_t gossip_conf;
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
-  TEST_ASSERT(iota_snapshot_init(&snapshot, snapshot_path, NULL,
-                                 snapshot_conf_path, true) == RC_OK);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &tangle, &snapshot, &lv, true) ==
-              RC_OK);
-  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &mt, NULL) ==
-              RC_OK);
+  iota_gossip_conf_init(&gossip_conf);
+  iota_consensus_conf_init(&consensus_conf);
+  consensus_conf.max_depth = max_depth;
+  consensus_conf.below_max_depth = max_txs_below_max_depth;
 
+  strcpy(consensus_conf.snapshot_file, snapshot_path);
+  strcpy(consensus_conf.snapshot_conf_file, snapshot_conf_path);
+  strcpy(consensus_conf.snapshot_sig_file, "");
+  TEST_ASSERT(iota_snapshot_init(&snapshot, &consensus_conf) == RC_OK);
+  iota_consensus_transaction_solidifier_init(&ts, &consensus_conf, &tangle,
+                                             NULL);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &consensus_conf, &tangle,
+                                          &snapshot, &lv, &ts) == RC_OK);
+  TEST_ASSERT(requester_init(&tr, &gossip_conf, &tangle) == RC_OK);
+  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &consensus_conf,
+                                                   &tangle, &mt, &tr) == RC_OK);
   // We want to avoid unnecessary validation
   mt.latest_snapshot->index = 99999999999;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(
-                  &tangle, &mt, &lv, epv, max_txs_below_max_depth, max_depth) ==
-              RC_OK);
+                  &consensus_conf, &tangle, &mt, &lv, epv) == RC_OK);
 }
 
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
   iota_consensus_ledger_validator_destroy(epv->lv);
   iota_snapshot_destroy(&snapshot);
   iota_milestone_tracker_destroy(&mt);
+  iota_consensus_transaction_solidifier_destroy(&ts);
   iota_consensus_exit_prob_transaction_validator_destroy(epv);
+  requester_destroy(&tr);
 }
 
 void test_transaction_does_not_exist() {
@@ -93,7 +108,7 @@ void test_transaction_not_a_tail() {
   flex_trit_t transaction_3_trits[FLEX_TRIT_SIZE_8019];
 
   flex_trits_from_trytes(transaction_3_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (tryte_t *)TX_3_OF_4_VALUE_BUNDLE_TRYTES,
+                         TX_3_OF_4_VALUE_BUNDLE_TRYTES,
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
@@ -165,7 +180,7 @@ void test_transaction_below_max_depth() {
 
   iota_transaction_t txs[2];
 
-  tryte_t *trytes[2] = {(tryte_t *)TX_1_OF_2, (tryte_t *)TX_2_OF_2};
+  tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = max_depth - 1;
   build_tangle(&tangle, txs, 2);
@@ -198,10 +213,12 @@ void test_transaction_exceed_max_transactions() {
 
   iota_transaction_t txs[2];
 
-  tryte_t *trytes[2] = {(tryte_t *)TX_1_OF_2, (tryte_t *)TX_2_OF_2};
+  tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = max_depth + 1;
   txs[1]->snapshot_index = max_depth + 1;
+  memcpy(txs[1]->trunk, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[1]->branch, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
   build_tangle(&tangle, txs, 2);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
@@ -232,7 +249,7 @@ void test_transaction_is_genesis() {
 
   iota_transaction_t txs[2];
 
-  tryte_t *trytes[2] = {(tryte_t *)TX_1_OF_2, (tryte_t *)TX_2_OF_2};
+  tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = 0;
   build_tangle(&tangle, txs, 2);
@@ -264,7 +281,7 @@ void test_transaction_valid() {
 
   iota_transaction_t txs[2];
 
-  tryte_t *trytes[2] = {(tryte_t *)TX_1_OF_2, (tryte_t *)TX_2_OF_2};
+  tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   build_tangle(&tangle, txs, 2);
 
@@ -296,9 +313,12 @@ int main(int argc, char *argv[]) {
     test_db_path = "test.db";
     ciri_db_path = "ciri.db";
     snapshot_path = "snapshot.txt";
+    snapshot_conf_path = "snapshot_conf.json";
   }
 
   config.db_path = test_db_path;
+
+  memset(consensus_conf.genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
 
   RUN_TEST(test_transaction_does_not_exist);
   RUN_TEST(test_transaction_not_a_tail);

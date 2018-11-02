@@ -14,6 +14,8 @@ cc_library(
         "//common/trinary:trit_array",
         "//common/trinary:tryte",
         "//utils:logger_helper",
+        "//utils/containers/hash:hash243_queue",
+        "//utils/containers/hash:hash81_queue",
         "@com_github_uthash//:uthash",
     ],
 )

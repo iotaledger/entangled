@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "ciri/node.h"
+#include "gossip/node.h"
 #include "ciri/core.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
@@ -20,7 +20,7 @@ static retcode_t node_neighbors_init(node_t* const node) {
 
   if (node == NULL) {
     return RC_NODE_NULL_NODE;
-  } else if (node->core->config.neighbors == NULL) {
+  } else if (node->conf.neighbors == NULL) {
     return RC_OK;
   }
 
@@ -30,7 +30,7 @@ static retcode_t node_neighbors_init(node_t* const node) {
     return RC_NODE_FAILED_NEIGHBORS_INIT;
   }
 
-  ptr = cpy = strdup(node->core->config.neighbors);
+  ptr = cpy = strdup(node->conf.neighbors);
   while ((neighbor_uri = strsep(&cpy, " ")) != NULL) {
     if (neighbor_init_with_uri(&neighbor, neighbor_uri)) {
       log_warning(NODE_LOGGER_ID, "Initializing neighbor with URI %s failed\n",
@@ -50,8 +50,7 @@ static retcode_t node_neighbors_init(node_t* const node) {
 // Public functions
 
 retcode_t node_init(node_t* const node, core_t* const core,
-                    tangle_t* const tangle,
-                    requester_state_t* const transaction_requester) {
+                    tangle_t* const tangle) {
   if (node == NULL) {
     return RC_NODE_NULL_NODE;
   } else if (core == NULL) {
@@ -59,10 +58,8 @@ retcode_t node_init(node_t* const node, core_t* const core,
   }
 
   logger_helper_init(NODE_LOGGER_ID, LOGGER_DEBUG, true);
-  memset(node, 0, sizeof(node_t));
   node->running = false;
   node->core = core;
-  node->requester = transaction_requester;
 
   log_info(NODE_LOGGER_ID, "Initializing neighbors\n");
   if (node_neighbors_init(node)) {
@@ -77,15 +74,14 @@ retcode_t node_init(node_t* const node, core_t* const core,
   }
 
   log_info(NODE_LOGGER_ID, "Initializing processor component\n");
-  if (processor_init(&node->processor, node, tangle, core->config.testnet)) {
+  if (processor_init(&node->processor, node, tangle)) {
     log_critical(NODE_LOGGER_ID, "Initializing processor component failed\n");
     return RC_NODE_FAILED_PROCESSOR_INIT;
   }
 
   log_info(NODE_LOGGER_ID, "Initializing receiver component\n");
-  if (receiver_init(&node->receiver, node, core->config.testnet,
-                    core->config.tcp_receiver_port,
-                    core->config.udp_receiver_port)) {
+  if (receiver_init(&node->receiver, node, node->conf.tcp_receiver_port,
+                    node->conf.udp_receiver_port)) {
     log_critical(NODE_LOGGER_ID, "Initializing receiver component failed\n");
     return RC_NODE_FAILED_RECEIVER_INIT;
   }
@@ -94,6 +90,13 @@ retcode_t node_init(node_t* const node, core_t* const core,
   if (responder_init(&node->responder, node, tangle)) {
     log_critical(NODE_LOGGER_ID, "Initializing responder component failed\n");
     return RC_NODE_FAILED_RESPONDER_INIT;
+  }
+
+  log_info(NODE_LOGGER_ID, "Initializing transaction requester component\n");
+  if (requester_init(&node->transaction_requester, &node->conf, tangle)) {
+    log_critical(NODE_LOGGER_ID,
+                 "Initializing transaction requester component failed\n");
+    return RC_NODE_FAILED_REQUESTER_INIT;
   }
 
   return RC_OK;
@@ -178,6 +181,13 @@ retcode_t node_destroy(node_t* const node) {
     return RC_NODE_NULL_NODE;
   } else if (node->running) {
     return RC_NODE_STILL_RUNNING;
+  }
+
+  log_info(NODE_LOGGER_ID, "Destroying transaction requester component\n");
+  if (requester_destroy(&node->transaction_requester)) {
+    log_error(NODE_LOGGER_ID,
+              "Destroying transaction requester component failed\n");
+    ret = RC_NODE_FAILED_REQUESTER_DESTROY;
   }
 
   log_info(NODE_LOGGER_ID, "Destroying broadcaster component\n");

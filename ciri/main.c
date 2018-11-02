@@ -20,7 +20,22 @@ static core_t core_g;
 int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
 
-  if (ciri_conf_parse(&core_g.config, argc, argv)) {
+  srand(time(NULL));
+
+  // Default configuration
+
+  if (iota_ciri_conf_default(&core_g.conf, &core_g.consensus.conf,
+                             &core_g.node.conf, &core_g.api.conf) != RC_OK) {
+    return EXIT_FAILURE;
+  }
+
+  // File configuration
+
+  // CLI Configuration
+
+  if (iota_ciri_conf_cli(&core_g.conf, &core_g.consensus.conf,
+                         &core_g.node.conf, &core_g.api.conf, argc,
+                         argv) != RC_OK) {
     return EXIT_FAILURE;
   }
 
@@ -29,7 +44,7 @@ int main(int argc, char* argv[]) {
   }
   logger_init();
   logger_output_register(stdout);
-  logger_output_level_set(stdout, core_g.config.log_level);
+  logger_output_level_set(stdout, core_g.conf.log_level);
   logger_helper_init(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
 
   log_info(MAIN_LOGGER_ID, "Initializing cIRI core\n");
@@ -47,8 +62,9 @@ int main(int argc, char* argv[]) {
   // TODO remove
   // Dummy broadcasted packet to begin receiving from UDP neighbors
   sleep(2);
-  iota_packet_t p = {{0}};
-  broadcaster_on_next(&core_g.node.broadcaster, p);
+  flex_trit_t dummy[FLEX_TRIT_SIZE_8019];
+  memset(dummy, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
+  broadcaster_on_next(&core_g.node.broadcaster, dummy);
   sleep(1000);
 
   log_info(MAIN_LOGGER_ID, "Stopping cIRI core\n");

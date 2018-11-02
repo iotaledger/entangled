@@ -8,7 +8,6 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#include "ciri/conf/conf_values.h"
 #include "common/model/milestone.h"
 #include "common/sign/normalize.h"
 #include "common/sign/v1/iss_curl.h"
@@ -18,6 +17,7 @@
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
 #include "utils/merkle.h"
@@ -52,8 +52,8 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt,
                       NUM_TRITS_SIGNATURE, &curl);
   curl_reset(&curl);
   iss_curl_address(sig_digest, root, HASH_LENGTH_TRIT, &curl);
-  merkle_root(root, siblings_trits, mt->num_keys_in_milestone, candidate->index,
-              &curl);
+  merkle_root(root, siblings_trits, mt->conf->num_keys_in_milestone,
+              candidate->index, &curl);
   flex_trits_from_trits(coo, HASH_LENGTH_TRIT, root, HASH_LENGTH_TRIT,
                         HASH_LENGTH_TRIT);
 
@@ -200,6 +200,7 @@ static retcode_t update_latest_solid_subtangle_milestone(
   iota_milestone_t* milestone_ptr = &milestone;
   DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr, pack);
   bool has_snapshot = false;
+  bool is_solid = false;
 
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
@@ -218,11 +219,15 @@ static retcode_t update_latest_solid_subtangle_milestone(
     while (pack.num_loaded != 0 && milestone.index <= latest_milestone.index &&
            mt->running) {
       has_snapshot = false;
-      if (milestone.index >= mt->latest_solid_subtangle_milestone_index
-          // TODO &&
-          // transactionValidator.checkSolidity(milestoneViewModel.getHash(),
-          // true))
-      ) {
+      if (milestone.index >= mt->latest_solid_subtangle_milestone_index) {
+        if ((ret = iota_consensus_transaction_solidifier_check_solidity(
+                 mt->transaction_solidifier, milestone.hash, true,
+                 &is_solid)) != RC_OK) {
+          return ret;
+        }
+        if (!is_solid) {
+          break;
+        }
         if ((ret = iota_consensus_ledger_validator_update_snapshot(
                  mt->ledger_validator, &milestone, &has_snapshot)) != RC_OK) {
           log_error(MILESTONE_TRACKER_LOGGER_ID, "Updating snapshot failed\n");
@@ -283,10 +288,11 @@ static void* solid_milestone_tracker(void* arg) {
 }
 
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
+                                      iota_consensus_conf_t* const conf,
                                       tangle_t* const tangle,
                                       snapshot_t* const snapshot,
                                       ledger_validator_t* const lv,
-                                      bool testnet) {
+                                      transaction_solidifier_t* const ts) {
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
   } else if (tangle == NULL) {
@@ -296,11 +302,12 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   logger_helper_init(MILESTONE_TRACKER_LOGGER_ID, LOGGER_DEBUG, true);
   memset(mt, 0, sizeof(milestone_tracker_t));
   mt->running = false;
-  mt->testnet = testnet;
+  mt->conf = conf;
   mt->tangle = tangle;
   mt->latest_snapshot = snapshot;
   mt->ledger_validator = lv;
-  if ((mt->latest_milestone = trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
+  mt->transaction_solidifier = ts;
+  if ((mt->latest_milestone = trit_array_new(NUM_TRITS_HASH)) == NULL) {
     goto oom;
   }
   if ((mt->latest_solid_subtangle_milestone =
@@ -310,16 +317,10 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   if ((mt->coordinator = trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
     goto oom;
   }
-  memcpy(mt->coordinator->trits, snapshot->conf.coordinator,
-         FLEX_TRIT_SIZE_243);
-  mt->milestone_start_index = snapshot->conf.last_milestone;
-  mt->latest_milestone_index = snapshot->conf.last_milestone;
-  mt->latest_solid_subtangle_milestone_index = snapshot->conf.last_milestone;
-  if (mt->testnet) {
-    mt->num_keys_in_milestone = TESTNET_NUM_KEYS_IN_MILESTONE;
-  } else {
-    mt->num_keys_in_milestone = MAINNET_NUM_KEYS_IN_MILESTONE;
-  }
+  memcpy(mt->coordinator->trits, conf->coordinator, FLEX_TRIT_SIZE_243);
+  mt->milestone_start_index = conf->last_milestone;
+  mt->latest_milestone_index = conf->last_milestone;
+  mt->latest_solid_subtangle_milestone_index = conf->last_milestone;
 
   return RC_OK;
 

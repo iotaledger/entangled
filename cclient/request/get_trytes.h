@@ -14,13 +14,15 @@
 extern "C" {
 #endif
 
-/* List of tx hashes for which request should get trytes */
-typedef flex_hash_array_t get_trytes_req_t;
+typedef struct get_trytes_req_s {
+  /* List of tx hashes for which request should get trytes */
+  flex_hash_array_t* hashes;
+} get_trytes_req_t;
 
 get_trytes_req_t* get_trytes_req_new();
-get_trytes_req_t* get_trytes_req_add(get_trytes_req_t* hashes,
-                                     const char* hash);
-void get_trytes_req_free(get_trytes_req_t* ut);
+void get_trytes_req_free(get_trytes_req_t** const req);
+get_trytes_req_t* get_trytes_req_add_hash(get_trytes_req_t* const req,
+                                          tryte_t const* const hash);
 
 #ifdef __cplusplus
 }

@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
+#include "consensus/conf.h"
 #include "utils/handles/thread.h"
 
 #define MILESTONE_TRACKER_INITIAL_HASH_PACK_SIZE 10
@@ -26,10 +27,11 @@ typedef struct tangle_s tangle_t;
 typedef struct snapshot_s snapshot_t;
 typedef struct _trit_array* trit_array_p;
 typedef struct ledger_validator_s ledger_validator_t;
+typedef struct transaction_solidifier_s transaction_solidifier_t;
 
 typedef struct milestone_tracker_s {
   bool running;
-  bool testnet;
+  iota_consensus_conf_t* conf;
   tangle_t* tangle;
   snapshot_t* latest_snapshot;
   uint64_t milestone_start_index;
@@ -40,11 +42,8 @@ typedef struct milestone_tracker_s {
   uint64_t latest_solid_subtangle_milestone_index;
   trit_array_p latest_solid_subtangle_milestone;
   trit_array_p coordinator;
-  size_t num_keys_in_milestone;
   ledger_validator_t* ledger_validator;
-  // TODO
-  // private final TransactionValidator transactionValidator;
-  // private final MessageQ messageQ;
+  transaction_solidifier_t* transaction_solidifier;
   // bool accept_any_testnet_coo;
 } milestone_tracker_t;
 
@@ -52,18 +51,19 @@ typedef struct milestone_tracker_s {
  * Initializes a milestone tracker
  *
  * @param mt The milestone tracker
+ * @param conf Consensus configuration
  * @param tangle A tangle
  * @param snapshot An initial snapshot
  * @param lv A ledger validator
- * @param testnet Whether the node runs on testnet or not
  *
  * @return a status code
  */
 extern retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
+                                             iota_consensus_conf_t* const conf,
                                              tangle_t* const tangle,
                                              snapshot_t* const snapshot,
                                              ledger_validator_t* const lv,
-                                             bool testnet);
+                                             transaction_solidifier_t* ts);
 
 /**
  * Starts a milestone tracker

@@ -34,13 +34,11 @@ static retcode_t process_transaction_bytes(processor_state_t *const state,
   }
 
   if (true /* TODO(thibault): if !cached */) {
-    trit_t tx_trits[PACKET_TX_TRITS_SIZE];
     flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
 
-    bytes_to_trits(packet->content, PACKET_TX_SIZE, tx_trits,
-                   PACKET_TX_TRITS_SIZE);
-    flex_trits_from_trits(tx_flex_trits, PACKET_TX_TRITS_SIZE, tx_trits,
-                          PACKET_TX_TRITS_SIZE, PACKET_TX_TRITS_SIZE);
+    flex_trits_from_bytes(tx_flex_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                          packet->content, NUM_TRITS_SERIALIZED_TRANSACTION,
+                          NUM_TRITS_SERIALIZED_TRANSACTION);
     if ((*tx = transaction_deserialize(tx_flex_trits)) == NULL) {
       neighbor->nbr_invalid_tx++;
       log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
@@ -71,7 +69,8 @@ static retcode_t process_transaction_bytes(processor_state_t *const state,
       // Broadcast new transaction
       log_debug(PROCESSOR_COMPONENT_LOGGER_ID,
                 "Propagating packet to broadcaster\n");
-      if ((ret = broadcaster_on_next(&state->node->broadcaster, *packet))) {
+      if ((ret =
+               broadcaster_on_next(&state->node->broadcaster, tx_flex_trits))) {
         log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                     "Propagating packet to broadcaster failed\n");
         return ret;
@@ -99,8 +98,8 @@ static retcode_t process_request_bytes(processor_state_t *const state,
     return RC_PROCESSOR_COMPONENT_NULL_TX;
   }
 
-  bytes_to_trits(packet->content + PACKET_TX_SIZE, state->req_hash_size,
-                 request_hash_trits, NUM_TRITS_HASH);
+  bytes_to_trits(packet->content + PACKET_TX_SIZE, REQUEST_HASH_SIZE,
+                 request_hash_trits, REQUEST_HASH_SIZE_TRITS);
   if ((request_hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
     return RC_PROCESSOR_COMPONENT_OOM;
   }
@@ -109,6 +108,11 @@ static retcode_t process_request_bytes(processor_state_t *const state,
   if (memcmp(request_hash->trits, tx->hash, request_hash->num_bytes) == 0) {
     // If requested hash is equal to transaction hash: request a random tip
     trit_array_set_null(request_hash);
+  }
+
+  if ((ret = iota_consensus_transaction_solidifier_check_and_update_solid_state(
+           &state->node->core->consensus.transaction_solidifier, tx->hash))) {
+    return ret;
   }
   log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Propagating packet to responder\n");
   if ((ret = responder_on_next(&state->node->responder, neighbor,
@@ -180,7 +184,7 @@ static void *processor_routine(processor_state_t *const state) {
 }
 
 retcode_t processor_init(processor_state_t *const state, node_t *const node,
-                         tangle_t *const tangle, bool testnet) {
+                         tangle_t *const tangle) {
   if (state == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_STATE;
   } else if (node == NULL) {
@@ -192,11 +196,6 @@ retcode_t processor_init(processor_state_t *const state, node_t *const node,
   state->running = false;
   state->node = node;
   state->tangle = tangle;
-  if (testnet) {
-    state->req_hash_size = TESTNET_PACKET_REQ_HASH_SIZE;
-  } else {
-    state->req_hash_size = MAINNET_PACKET_REQ_HASH_SIZE;
-  }
 
   log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Initializing processor queue\n");
   if (CQ_INIT(iota_packet_t, state->queue) != CQ_SUCCESS) {

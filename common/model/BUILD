@@ -40,8 +40,6 @@ cc_library(
         "//common/helpers:sign",
         "//common/kerl",
         "//common/model:transaction",
-        "//common/trinary:trit_tryte",
-        "//common/trinary:tryte_long",
     ],
 )
 

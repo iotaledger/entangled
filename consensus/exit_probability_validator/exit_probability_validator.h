@@ -10,14 +10,15 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "common/errors.h"
 
+#include "common/errors.h"
 #include "common/storage/connection.h"
+#include "consensus/conf.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
-#include "utils/hash_containers.h"
+#include "utils/hash_maps.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,20 +29,19 @@ extern "C" {
 /// exit probabilities
 
 typedef struct exit_prob_transaction_validator_s {
+  iota_consensus_conf_t *conf;
   tangle_t *tangle;
   milestone_tracker_t *mt;
   ledger_validator_t *lv;
   state_delta_t delta;
-  hash_set_t analyzed_hashes;
-  uint32_t max_analyzed_txs;
-  uint32_t max_depth;
-  hash_set_t max_depth_ok_memoization;
+  hash243_set_t analyzed_hashes;
+  hash243_set_t max_depth_ok_memoization;
 } exit_prob_transaction_validator_t;
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_init(
-    tangle_t *const tangle, milestone_tracker_t *const mt,
-    ledger_validator_t *const lv, exit_prob_transaction_validator_t *epv,
-    uint32_t max_analyzed_txs, uint32_t max_depth);
+    iota_consensus_conf_t *const conf, tangle_t *const tangle,
+    milestone_tracker_t *const mt, ledger_validator_t *const lv,
+    exit_prob_transaction_validator_t *epv);
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
     exit_prob_transaction_validator_t *epv);

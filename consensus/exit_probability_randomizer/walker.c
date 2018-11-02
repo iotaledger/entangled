@@ -20,10 +20,10 @@
 
 static retcode_t select_approver(
     ep_randomizer_t const *const exit_probability_randomizer,
-    hash_int_map_t const cw_ratings, hash_set_t const *const approvers,
+    hash_int_map_t const cw_ratings, hash243_set_t const *const approvers,
     trit_array_t *const approver) {
-  hash_set_entry_t *curr_approver = NULL;
-  hash_set_entry_t *tmp_approver = NULL;
+  hash243_set_entry_t *curr_approver = NULL;
+  hash243_set_entry_t *tmp_approver = NULL;
   hash_to_int_map_entry_t *curr_rating = NULL;
   size_t num_approvers = HASH_COUNT(*approvers);
   int64_t weights[num_approvers];
@@ -45,7 +45,7 @@ static retcode_t select_approver(
 
   for (idx = 0; idx < num_approvers; ++idx) {
     weights[idx] -= max_weight;
-    weights[idx] = exp(weights[idx] * exit_probability_randomizer->alpha);
+    weights[idx] = exp(weights[idx] * exit_probability_randomizer->conf->alpha);
     sum_weights += weights[idx];
   }
 
@@ -94,7 +94,7 @@ static retcode_t random_walker_select_approver_tail(
     trit_array_t *const approver, bool *const has_approver_tail) {
   retcode_t ret = RC_OK;
   hash_to_indexed_hash_set_entry_t *approvers_entry = NULL;
-  hash_set_entry_t *approver_entry = NULL;
+  hash243_set_entry_t *approver_entry = NULL;
 
   *has_approver_tail = false;
 

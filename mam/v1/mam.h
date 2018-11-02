@@ -12,6 +12,10 @@
 #include "common/trinary/trit_long.h"
 #include "mam/v1/mask.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Initializes the encryption/decryption state for a MAM session
  *
@@ -91,5 +95,9 @@ int mam_parse(trit_t *const payload, size_t const payload_length,
               trit_t const *const root, size_t *const index,
               trit_t *const next_root, size_t *const security,
               Curl *const enc_curl);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  //__MAM_H__

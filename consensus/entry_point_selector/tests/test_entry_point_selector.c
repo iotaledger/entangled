@@ -38,8 +38,8 @@ void test_entry_point() {
 
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
-  TEST_ASSERT(iota_consensus_entry_point_selector_init(&eps, &mt, &tangle,
-                                                       true) == RC_OK);
+  TEST_ASSERT(iota_consensus_entry_point_selector_init(&eps, &mt, &tangle) ==
+              RC_OK);
 
   mt.latest_solid_subtangle_milestone_index = LATEST_SOLID_MILESTONE;
 

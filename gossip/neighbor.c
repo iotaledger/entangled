@@ -7,12 +7,12 @@
 
 #include <string.h>
 
-#include "ciri/node.h"
 #include "common/model/transaction.h"
 #include "common/network/uri_parser.h"
 #include "common/trinary/trit_array.h"
 #include "gossip/iota_packet.h"
 #include "gossip/neighbor.h"
+#include "gossip/node.h"
 #include "gossip/services/tcp_sender.hpp"
 #include "gossip/services/udp_sender.hpp"
 
@@ -33,6 +33,7 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
   }
   if (strcmp(scheme, "tcp") == 0) {
     neighbor->endpoint.protocol = PROTOCOL_TCP;
+    strcpy(neighbor->endpoint.ip, neighbor->endpoint.host);
   } else if (strcmp(scheme, "udp") == 0) {
     neighbor->endpoint.protocol = PROTOCOL_UDP;
     if (udp_endpoint_init(&neighbor->endpoint) == false) {
@@ -63,37 +64,37 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
 }
 
 retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
-                        iota_packet_t *const packet) {
+                        flex_trit_t const *const transaction) {
   retcode_t ret = RC_OK;
-  trit_t hash_trits[NUM_TRITS_HASH];
-  trit_array_p hash = NULL;
+  iota_packet_t packet;
+  flex_trit_t request[FLEX_TRIT_SIZE_243];
 
-  if (node == NULL) {
-    return RC_NEIGHBOR_NULL_NODE;
+  if (node == NULL || neighbor == NULL || transaction == NULL) {
+    return RC_NULL_PARAM;
   }
-  if (neighbor == NULL) {
-    return RC_NEIGHBOR_NULL_NEIGHBOR;
-  }
-  if (packet == NULL) {
-    return RC_NEIGHBOR_NULL_PACKET;
-  }
-  if ((ret = get_transaction_to_request(node->requester, &hash))) {
+
+  if ((ret = iota_packet_set_transaction(&packet, transaction)) != RC_OK) {
     return ret;
   }
-  if (hash != NULL) {
-    // TODO(thibault): iota_packet_set_request
-    flex_trits_to_trits(hash_trits, NUM_TRITS_HASH, hash->trits,
-                        hash->num_trits, hash->num_trits);
-    trits_to_bytes(hash_trits, packet->content + PACKET_TX_SIZE,
-                   NUM_TRITS_HASH);
+
+  bool is_milestone =
+      ((double)rand() / (double)RAND_MAX) < node->conf.p_select_milestone;
+  if ((ret = get_transaction_to_request(&node->transaction_requester, request,
+                                        is_milestone)) != RC_OK) {
+    return ret;
   }
+  if ((ret = iota_packet_set_request(&packet, request, node->conf.mwm)) !=
+      RC_OK) {
+    return ret;
+  }
+
   if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
-    if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, packet) ==
+    if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, &packet) ==
         false) {
       return RC_NEIGHBOR_FAILED_SEND;
     }
   } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
-    if (udp_send(&node->receiver.udp_service, &neighbor->endpoint, packet) ==
+    if (udp_send(&node->receiver.udp_service, &neighbor->endpoint, &packet) ==
         false) {
       return RC_NEIGHBOR_FAILED_SEND;
     }

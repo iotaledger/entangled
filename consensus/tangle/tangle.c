@@ -37,6 +37,17 @@ retcode_t iota_tangle_transaction_load(const tangle_t *const tangle,
   return iota_stor_transaction_load(&tangle->conn, field, key, tx);
 }
 
+retcode_t iota_tangle_transaction_update_solid_state(
+    const tangle_t *const tangle, flex_trit_t *const hash, bool state) {
+  return iota_stor_transaction_update_solid_state(&tangle->conn, hash, state);
+}
+
+retcode_t iota_tangle_transactions_update_solid_state(
+    const tangle_t *const tangle, const hash243_set_t hashes, bool is_solid) {
+  return iota_stor_transactions_update_solid_state(&tangle->conn, hashes,
+                                                   is_solid);
+}
+
 retcode_t iota_tangle_transaction_load_hashes(const tangle_t *const tangle,
                                               transaction_field_t const field,
                                               const trit_array_p key,
@@ -89,6 +100,13 @@ retcode_t iota_tangle_transaction_update_snapshot_index(
     uint64_t snapshot_index) {
   return iota_stor_transaction_update_snapshot_index(&tangle->conn, hash,
                                                      snapshot_index);
+}
+
+retcode_t iota_tangle_transactions_update_snapshot_index(
+    const tangle_t *const tangle, const hash243_set_t hashes,
+    uint64_t snapshot_index) {
+  return iota_stor_transactions_update_snapshot_index(&tangle->conn, hashes,
+                                                      snapshot_index);
 }
 
 retcode_t iota_tangle_transaction_exist(const tangle_t *const tangle,

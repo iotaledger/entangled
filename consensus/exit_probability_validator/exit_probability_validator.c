@@ -11,20 +11,16 @@
 
 #define WALKER_VALIDATOR_LOGGER_ID "consensus_walker_validator"
 
-static flex_trit_t null_hash[FLEX_TRIT_SIZE_243];
-
 retcode_t iota_consensus_exit_prob_transaction_validator_init(
-    tangle_t *const tangle, milestone_tracker_t *const mt,
-    ledger_validator_t *const lv, exit_prob_transaction_validator_t *epv,
-    uint32_t max_analyzed_txs, uint32_t max_depth) {
+    iota_consensus_conf_t *const conf, tangle_t *const tangle,
+    milestone_tracker_t *const mt, ledger_validator_t *const lv,
+    exit_prob_transaction_validator_t *epv) {
   logger_helper_init(WALKER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
+  epv->conf = conf;
   epv->tangle = tangle;
   epv->mt = mt;
   epv->lv = lv;
-  epv->max_analyzed_txs = max_analyzed_txs;
-  epv->max_depth = max_depth;
   epv->max_depth_ok_memoization = NULL;
-  memset(null_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   return RC_OK;
 }
 
@@ -32,8 +28,8 @@ retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
     exit_prob_transaction_validator_t *epv) {
   logger_helper_destroy(WALKER_VALIDATOR_LOGGER_ID);
 
-  hash_set_free(&epv->max_depth_ok_memoization);
-  hash_set_free(&epv->analyzed_hashes);
+  hash243_set_free(&epv->max_depth_ok_memoization);
+  hash243_set_free(&epv->analyzed_hashes);
   state_delta_destroy(&epv->delta);
   epv->delta = NULL;
   epv->tangle = NULL;
@@ -86,7 +82,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
 
   ret = iota_consensus_exit_prob_transaction_validator_below_max_depth(
       epv, tail_hash,
-      epv->mt->latest_solid_subtangle_milestone_index - epv->max_depth,
+      epv->mt->latest_solid_subtangle_milestone_index - epv->conf->max_depth,
       &below_max_depth);
   if (ret != RC_OK) {
     return ret;
@@ -109,8 +105,8 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
     uint32_t lowest_allowed_depth, bool *below_max_depth) {
   retcode_t res = RC_OK;
 
-  hash_stack_t non_analyzed_hashes = NULL;
-  if ((res = hash_stack_push(&non_analyzed_hashes, tail_hash->trits)) !=
+  hash243_stack_t non_analyzed_hashes = NULL;
+  if ((res = hash243_stack_push(&non_analyzed_hashes, tail_hash->trits)) !=
       RC_OK) {
     return res;
   }
@@ -118,24 +114,24 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
   // Load the transaction
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
 
-  hash_set_t visited_hashes = NULL;
+  hash243_set_t visited_hashes = NULL;
   TRIT_ARRAY_DECLARE(hash_trits_array, NUM_TRITS_HASH);
 
   while (non_analyzed_hashes != NULL) {
-    if (hash_set_size(&visited_hashes) == epv->max_analyzed_txs) {
+    if (hash243_set_size(&visited_hashes) == epv->conf->below_max_depth) {
       log_error(WALKER_VALIDATOR_LOGGER_ID,
                 "Validation failed, exceeded num of transactions\n");
       *below_max_depth = false;
       break;
     }
 
-    flex_trit_t *curr_hash_trits = hash_stack_peek(non_analyzed_hashes);
-    if (hash_set_contains(&visited_hashes, curr_hash_trits)) {
+    flex_trit_t *curr_hash_trits = hash243_stack_peek(non_analyzed_hashes);
+    if (hash243_set_contains(&visited_hashes, curr_hash_trits)) {
       continue;
     }
 
     // Mark the transaction as visited
-    if ((res = hash_set_add(&visited_hashes, curr_hash_trits))) {
+    if ((res = hash243_set_add(&visited_hashes, curr_hash_trits))) {
       break;
     }
 
@@ -143,9 +139,9 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
 
     res = iota_tangle_transaction_load(epv->tangle, TRANSACTION_FIELD_HASH,
                                        &hash_trits_array, &pack);
-    bool tail_is_not_genesis =
-        (curr_tx_s.snapshot_index != 0 ||
-         memcmp(null_hash, curr_tx_s.hash, FLEX_TRIT_SIZE_243) == 0);
+    bool tail_is_not_genesis = (curr_tx_s.snapshot_index != 0 ||
+                                memcmp(epv->conf->genesis_hash, curr_tx_s.hash,
+                                       FLEX_TRIT_SIZE_243) == 0);
     if (tail_is_not_genesis &&
         (curr_tx_s.snapshot_index < lowest_allowed_depth)) {
       log_error(WALKER_VALIDATOR_LOGGER_ID,
@@ -154,22 +150,22 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
       break;
     }
     if (curr_tx->snapshot_index == 0) {
-      if ((res = hash_stack_push(&non_analyzed_hashes, curr_tx->trunk)) !=
+      if ((res = hash243_stack_push(&non_analyzed_hashes, curr_tx->trunk)) !=
           RC_OK) {
         return res;
       }
-      if ((res = hash_stack_push(&non_analyzed_hashes, curr_tx->branch)) !=
+      if ((res = hash243_stack_push(&non_analyzed_hashes, curr_tx->branch)) !=
           RC_OK) {
         return res;
       }
     }
-    hash_stack_pop(&non_analyzed_hashes);
+    hash243_stack_pop(&non_analyzed_hashes);
   }
 
-  hash_stack_free(&non_analyzed_hashes);
-  hash_set_free(&visited_hashes);
-  if ((res = hash_set_add(&epv->max_depth_ok_memoization, tail_hash->trits)) !=
-      RC_OK) {
+  hash243_stack_free(&non_analyzed_hashes);
+  hash243_set_free(&visited_hashes);
+  if ((res = hash243_set_add(&epv->max_depth_ok_memoization,
+                             tail_hash->trits)) != RC_OK) {
     return res;
   }
 

@@ -33,7 +33,7 @@ cIRI is built and run through [bazel](https://www.bazel.build/).
 ```
 $ git clone https://github.com/iotaledger/entangled.git
 $ cd entangled
-$ bazel run -- ciri <optional flags>
+$ bazel run --define network=mainnet|testnet -- ciri <optional flags>
 ```
 
 *First build can take some time due to dependencies downloading.*
@@ -45,9 +45,16 @@ Command line options
 
 Long option | Short option | Description | Example input
 --- | --- | --- | ---
-`--help` | `-h` | Displays the usage |
-`--log-level` | `-l` | Log level amongst: "debug", "info", "notice", "warning", "error", "critical", "alert" and "emergency" | `-l debug`
-`--neighbors` | `-n` | Neighbors that you are connected with will be added via this option | `-n "udp://148.148.148.148:14265 udp://[2001:db8:a0b:12f0::1]:14265"`
-`--udp-receiver-port` | `-u` | UDP receiver port | `-u 14600`
-`--tcp-receiver-port` | `-t` | TCP receiver port | `-t 15600`
-`--testnet` | | Makes it possible to run IRI with the IOTA testnet | `--testnet`
+`--help` | `-h` | Displays the usage. |
+`--log-level` | `-l` | Valid log levels: "debug", "info", "notice", "warning", "error", "critical", "alert" and "emergency". | `-l debug`
+`--mwm` | | Number of trailing ternary 0s that must appear at the end of a transaction hash. Difficulty can be described as 3^mwm. | `--mwm 14`
+`--neighbors` | `-n` | URIs of neighbouring nodes, separated by a space. | `-n "udp://148.148.148.148:14265 udp://[2001:db8:a0b:12f0::1]:14265"`
+`--p-remove-request` | | Probability of removing a transaction from the request queue without requesting it. Value must be in [0,1]. | `--p-remove-request 0.01`
+`--p-select-milestone` | | Probability of sending a current milestone request to a neighbour. Value must be in [0,1]. | `--p-select-milestone 0.7`
+`--tcp-receiver-port` | `-t` | TCP listen port. | `-t 15600`
+`--udp-receiver-port` | `-u` | UDP listen port. | `-u 14600`
+`--max-get-trytes` | | Maximum number of transactions that will be returned by the 'getTrytes' API call. | `--max-get-trytes 10000`
+`--port` | `p` | HTTP API listen port. | `--port 14265`
+`--alpha` | | Randomness of the tip selection. Value must be in [0, inf] where 0 is most random and inf is most deterministic. | `--alpha 0.001`
+`--below-max-depth` | | Maximum number of unconfirmed transactions that may be analysed to find the latest referenced milestone by the currently visited transaction during the random walk. | `--below-max-depth 20000`
+`--max-depth` | | Limits how many milestones behind the current one the random walk can start. | `--max-depth 15`

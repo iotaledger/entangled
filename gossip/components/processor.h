@@ -25,7 +25,6 @@ typedef struct processor_state_s {
   processor_queue_t *queue;
   node_t *node;
   tangle_t *tangle;
-  size_t req_hash_size;
 } processor_state_t;
 
 #ifdef __cplusplus
@@ -38,12 +37,11 @@ extern "C" {
  * @param state The processor state
  * @param node A node
  * @param tangle A tangle
- * @param testnet Testnet if true, Mainnet otherwise
  *
  * @return a status code
  */
 retcode_t processor_init(processor_state_t *const state, node_t *const node,
-                         tangle_t *const tangle, bool testnet);
+                         tangle_t *const tangle);
 
 /**
  * Starts a processor
