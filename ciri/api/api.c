@@ -182,8 +182,10 @@ retcode_t iota_api_store_transactions(
                              .num_trits = HASH_LENGTH_TRIT,
                              .num_bytes = FLEX_TRIT_SIZE_243,
                              .dynamic = 0};
-  bool exists;
+  tx.solid = 0;
+  tx.snapshot_index = 0;
 
+  bool exists;
   LL_FOREACH(req->trytes, iter) {
     transaction_deserialize_from_trits(&tx, iter->hash->trits);
     if (iota_consensus_transaction_validate(api->transaction_validator, &tx)) {

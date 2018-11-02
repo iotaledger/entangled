@@ -68,6 +68,7 @@ static retcode_t propagate_solid_transactions(
   lock_handle_lock(&ts->lock);
   ret = hash243_set_append(&ts->newly_set_solid_transactions,
                            &transactions_to_propagate);
+  hash243_set_free(&ts->newly_set_solid_transactions);
   lock_handle_unlock(&ts->lock);
   if (ret) {
     return ret;
