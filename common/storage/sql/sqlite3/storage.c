@@ -290,16 +290,18 @@ done:
 static retcode_t bind_execute_hash_do_func(bind_execute_hash_params_t* params,
                                            flex_trit_t* hash) {
   retcode_t ret = RC_OK;
-  if (column_compress_bind(params->sqlite_statement, 2, hash,
-                           FLEX_TRIT_SIZE_243) != RC_OK) {
-    ret = binding_error();
+  int reset_ret = sqlite3_reset(params->sqlite_statement);
+
+  if (reset_ret != SQLITE_DONE && reset_ret != SQLITE_OK) {
+    return binding_error();
   }
 
-  if ((ret = execute_statement_store_update(params->sqlite_statement)) !=
-      RC_OK) {
-    return ret;
+  if (column_compress_bind(params->sqlite_statement, 2, hash,
+                           FLEX_TRIT_SIZE_243) != RC_OK) {
+    return binding_error();
   }
-  return ret;
+
+  return execute_statement_store_update(params->sqlite_statement);
 }
 
 /*
