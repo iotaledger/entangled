@@ -99,7 +99,7 @@ static retcode_t process_request_bytes(processor_state_t *const state,
   }
 
   bytes_to_trits(packet->content + PACKET_TX_SIZE, REQUEST_HASH_SIZE,
-                 request_hash_trits, NUM_TRITS_HASH);
+                 request_hash_trits, REQUEST_HASH_SIZE_TRITS);
   if ((request_hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
     return RC_PROCESSOR_COMPONENT_OOM;
   }
