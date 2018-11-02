@@ -11,7 +11,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":service",
-        "//cclient/http:http",
+        "//cclient/http",
         "//common/helpers:sign",
         "//utils/containers/hash:hash243_queue",
     ],

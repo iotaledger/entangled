@@ -68,6 +68,7 @@ static retcode_t propagate_solid_transactions(
   lock_handle_lock(&ts->lock);
   ret = hash243_set_append(&ts->newly_set_solid_transactions,
                            &transactions_to_propagate);
+  hash243_set_free(&ts->newly_set_solid_transactions);
   lock_handle_unlock(&ts->lock);
   if (ret) {
     return ret;
@@ -239,6 +240,7 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
   if ((ret = tangle_traversal_dfs_to_genesis(ts->tangle, check_solidity_do_func,
                                              hash, ts->conf->genesis_hash, NULL,
                                              &params)) != RC_OK) {
+    *is_solid = false;
     goto done;
   }
   if (params.is_solid) {
