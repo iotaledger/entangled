@@ -3,10 +3,10 @@ cc_test(
     srcs = [
         "test_http.c",
     ],
-    deps = [
-        "//cclient/http:http",
-        "@unity",
-        "@cJSON",
-    ],
     flaky = True,
+    deps = [
+        "//cclient/http",
+        "@cJSON",
+        "@unity",
+    ],
 )

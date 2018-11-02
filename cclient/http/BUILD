@@ -14,6 +14,6 @@ cc_library(
     deps = [
         ":shared",
         "//network:sockets",
-        "@http_parser//:http_parser",
+        "@http_parser",
     ],
 )
