@@ -33,6 +33,7 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
   }
   if (strcmp(scheme, "tcp") == 0) {
     neighbor->endpoint.protocol = PROTOCOL_TCP;
+    strcpy(neighbor->endpoint.ip, neighbor->endpoint.host);
   } else if (strcmp(scheme, "udp") == 0) {
     neighbor->endpoint.protocol = PROTOCOL_UDP;
     if (udp_endpoint_init(&neighbor->endpoint) == false) {
