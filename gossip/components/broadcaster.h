@@ -14,6 +14,7 @@
 #include "utils/containers/hash/hash8019_queue.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/lock.h"
+#include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
@@ -24,7 +25,7 @@ typedef struct broadcaster_s {
   bool running;
   node_t *node;
   hash8019_queue_t queue;
-  lock_handle_t lock;
+  rw_lock_handle_t lock;
   cond_handle_t cond;
 } broadcaster_t;
 

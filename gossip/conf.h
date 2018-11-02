@@ -11,9 +11,11 @@
 #include <stdint.h>
 
 #include "common/errors.h"
+#include "common/trinary/trit_byte.h"
 
 #define PACKET_TX_SIZE 1604
-#define PACKET_SIZE PACKET_TX_SIZE + REQUEST_HASH_SIZE
+#define PACKET_SIZE (PACKET_TX_SIZE + REQUEST_HASH_SIZE)
+#define REQUEST_HASH_SIZE_TRITS (REQUEST_HASH_SIZE * NUMBER_OF_TRITS_IN_A_BYTE)
 
 #define DEFAULT_UDP_RECEIVER_PORT 14600
 #define DEFAULT_TCP_RECEIVER_PORT 15600

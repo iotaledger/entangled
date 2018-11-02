@@ -23,7 +23,10 @@ cc_library(
         "//conditions:default": GOSSIP_MAINNET_VARIABLES,
     }),
     visibility = ["//visibility:public"],
-    deps = ["//common:errors"],
+    deps = [
+        "//common:errors",
+        "//common/trinary:trit_byte",
+    ],
 )
 
 cc_library(
