@@ -14,32 +14,38 @@
 #include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/logger_helper.h"
 
-#define PROCESSOR_COMPONENT_LOGGER_ID "processor_component"
+#define PROCESSOR_COMPONENT_LOGGER_ID "processor"
+
+/*
+ * Private functions
+ */
 
 static retcode_t process_transaction_bytes(processor_state_t *const processor,
                                            neighbor_t *const neighbor,
                                            iota_packet_t *const packet,
                                            iota_transaction_t transaction) {
   retcode_t ret = RC_OK;
-  bool exists = false;
 
-  if (processor == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_STATE;
-  } else if (neighbor == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_NEIGHBOR;
-  } else if (packet == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_PACKET;
-  } else if (transaction == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_TX;
+  if (processor == NULL || neighbor == NULL || packet == NULL ||
+      transaction == NULL) {
+    return RC_NULL_PARAM;
   }
 
-  if (true /* TODO(thibault): if !cached */) {
-    flex_trit_t tx_flex_trits[FLEX_TRIT_SIZE_8019];
+  // TODO(thibault): if !cached
+  if (true) {
+    bool exists = false;
+    flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
+    trit_array_t hash = {.trits = NULL,
+                         .num_trits = HASH_LENGTH_TRIT,
+                         .num_bytes = FLEX_TRIT_SIZE_243,
+                         .dynamic = 0};
 
-    flex_trits_from_bytes(tx_flex_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                          packet->content, NUM_TRITS_SERIALIZED_TRANSACTION,
+    flex_trits_from_bytes(transaction_flex_trits,
+                          NUM_TRITS_SERIALIZED_TRANSACTION, packet->content,
+                          NUM_TRITS_SERIALIZED_TRANSACTION,
                           NUM_TRITS_SERIALIZED_TRANSACTION);
-    if ((transaction = transaction_deserialize(tx_flex_trits)) == NULL) {
+    if ((transaction = transaction_deserialize(transaction_flex_trits)) ==
+        NULL) {
       neighbor->nbr_invalid_tx++;
       log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                   "Deserializing transaction failed\n");
@@ -48,9 +54,7 @@ static retcode_t process_transaction_bytes(processor_state_t *const processor,
     // TODO(thibault): Transaction validation
     // TODO(thibault): Add to cache
 
-    TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
-    trit_array_set_trits(&hash, transaction->hash, NUM_TRITS_HASH);
-
+    hash.trits = transaction->hash;
     if ((ret = iota_tangle_transaction_exist(
              processor->tangle, TRANSACTION_FIELD_HASH, &hash, &exists))) {
       return ret;
@@ -71,7 +75,7 @@ static retcode_t process_transaction_bytes(processor_state_t *const processor,
       log_debug(PROCESSOR_COMPONENT_LOGGER_ID,
                 "Propagating packet to broadcaster\n");
       if ((ret = broadcaster_on_next(&processor->node->broadcaster,
-                                     tx_flex_trits))) {
+                                     transaction_flex_trits))) {
         log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                     "Propagating packet to broadcaster failed\n");
         return ret;
@@ -84,19 +88,14 @@ static retcode_t process_transaction_bytes(processor_state_t *const processor,
 static retcode_t process_request_bytes(processor_state_t *const processor,
                                        neighbor_t *const neighbor,
                                        iota_packet_t *const packet,
-                                       iota_transaction_t const tx) {
+                                       iota_transaction_t const transaction) {
   retcode_t ret = RC_OK;
   trit_t request_hash_trits[NUM_TRITS_HASH] = {0};
   trit_array_p request_hash = NULL;
 
-  if (processor == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_STATE;
-  } else if (neighbor == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_NEIGHBOR;
-  } else if (packet == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_PACKET;
-  } else if (tx == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_TX;
+  if (processor == NULL || neighbor == NULL || packet == NULL ||
+      transaction == NULL) {
+    return RC_NULL_PARAM;
   }
 
   bytes_to_trits(packet->content + PACKET_TX_SIZE, REQUEST_HASH_SIZE,
@@ -106,14 +105,15 @@ static retcode_t process_request_bytes(processor_state_t *const processor,
   }
   flex_trits_from_trits(request_hash->trits, NUM_TRITS_HASH, request_hash_trits,
                         NUM_TRITS_HASH, NUM_TRITS_HASH);
-  if (memcmp(request_hash->trits, tx->hash, request_hash->num_bytes) == 0) {
+  if (memcmp(request_hash->trits, transaction->hash, request_hash->num_bytes) ==
+      0) {
     // If requested hash is equal to transaction hash: request a random tip
     trit_array_set_null(request_hash);
   }
 
   if ((ret = iota_consensus_transaction_solidifier_check_and_update_solid_state(
            &processor->node->core->consensus.transaction_solidifier,
-           tx->hash))) {
+           transaction->hash))) {
     return ret;
   }
   log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Propagating packet to responder\n");
@@ -128,17 +128,16 @@ static retcode_t process_request_bytes(processor_state_t *const processor,
 
 static retcode_t process_packet(processor_state_t *const processor,
                                 iota_packet_t *const packet) {
+  retcode_t ret = RC_OK;
   neighbor_t *neighbor = NULL;
-  struct _iota_transaction tx;
+  struct _iota_transaction transaction;
 
-  if (processor == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_STATE;
-  } else if (packet == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_PACKET;
+  if (processor == NULL || packet == NULL) {
+    return RC_NULL_PARAM;
   }
 
-  tx.snapshot_index = 0;
-  tx.solid = 0;
+  transaction.snapshot_index = 0;
+  transaction.solid = 0;
 
   neighbor =
       neighbor_find_by_endpoint(processor->node->neighbors, &packet->source);
@@ -149,17 +148,19 @@ static retcode_t process_packet(processor_state_t *const processor,
     // TODO(thibault): Random drop transaction
 
     log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing transaction bytes\n");
-    if (process_transaction_bytes(processor, neighbor, packet, &tx)) {
+    if ((ret = process_transaction_bytes(processor, neighbor, packet,
+                                         &transaction)) != RC_OK) {
       log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                   "Processing transaction bytes failed\n");
-      return RC_PROCESSOR_COMPONENT_FAILED_TX_PROCESSING;
+      return ret;
     }
 
     log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing request bytes\n");
-    if (process_request_bytes(processor, neighbor, packet, &tx)) {
+    if ((ret = process_request_bytes(processor, neighbor, packet,
+                                     &transaction)) != RC_OK) {
       log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                   "Processing request bytes failed\n");
-      return RC_PROCESSOR_COMPONENT_FAILED_REQ_PROCESSING;
+      return ret;
     }
 
     // TODO(thibault): Recent seen bytes statistics
@@ -167,7 +168,7 @@ static retcode_t process_packet(processor_state_t *const processor,
     // TODO(thibault): Testnet add non-tethered neighbor
   }
 
-  return RC_OK;
+  return ret;
 }
 
 static void *processor_routine(processor_state_t *const processor) {
@@ -189,12 +190,14 @@ static void *processor_routine(processor_state_t *const processor) {
   return NULL;
 }
 
+/*
+ * Public functions
+ */
+
 retcode_t processor_init(processor_state_t *const processor, node_t *const node,
                          tangle_t *const tangle) {
-  if (processor == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_STATE;
-  } else if (node == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_NODE;
+  if (processor == NULL || node == NULL || tangle == NULL) {
+    return RC_NULL_PARAM;
   }
 
   logger_helper_init(PROCESSOR_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
@@ -215,7 +218,7 @@ retcode_t processor_init(processor_state_t *const processor, node_t *const node,
 
 retcode_t processor_start(processor_state_t *const processor) {
   if (processor == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   }
 
   log_info(PROCESSOR_COMPONENT_LOGGER_ID, "Spawning processor thread\n");
@@ -233,7 +236,7 @@ retcode_t processor_start(processor_state_t *const processor) {
 retcode_t processor_on_next(processor_state_t *const processor,
                             iota_packet_t const packet) {
   if (processor == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   }
 
   if (CQ_PUSH(processor->queue, packet) != CQ_SUCCESS) {
@@ -248,7 +251,7 @@ retcode_t processor_stop(processor_state_t *const processor) {
   bool ret = RC_OK;
 
   if (processor == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   } else if (processor->running == false) {
     return RC_OK;
   }
@@ -267,7 +270,7 @@ retcode_t processor_destroy(processor_state_t *const processor) {
   bool ret = RC_OK;
 
   if (processor == NULL) {
-    return RC_PROCESSOR_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   } else if (processor->running) {
     return RC_PROCESSOR_COMPONENT_STILL_RUNNING;
   }
