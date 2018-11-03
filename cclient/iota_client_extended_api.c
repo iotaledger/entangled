@@ -141,9 +141,10 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
   return ret_code;
 }
 
-retcode_t iota_client_get_account_data(
-    iota_client_seitrvice_t const* const serv, flex_trit_t const* const seed,
-    size_t const security, account_data_t* out_account) {
+retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
+                                       flex_trit_t const* const seed,
+                                       size_t const security,
+                                       account_data_t* out_account) {
   retcode_t ret_code = RC_OK;
   address_opt_t const addr_opt = {.security = security, .start = 0, .total = 0};
   flex_trit_t* tmp_addr = NULL;
