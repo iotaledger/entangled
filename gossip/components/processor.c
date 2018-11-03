@@ -121,8 +121,8 @@ failure:
 }
 
 /**
- * Converts request bytes to a hash, check its solidity and adds it to the
- * responder queue.
+ * Converts request bytes from a packet to a hash, checks its solidity and adds
+ * it to the responder queue.
  *
  * @param processor The processor state
  * @param neighbor The neighbor that sent the packet
@@ -131,46 +131,54 @@ failure:
  *
  * @return a status code
  */
-static retcode_t process_request_bytes(processor_state_t *const processor,
+static retcode_t process_request_bytes(processor_state_t const *const processor,
                                        neighbor_t *const neighbor,
-                                       iota_packet_t *const packet,
+                                       iota_packet_t const *const packet,
                                        flex_trit_t *const hash) {
   retcode_t ret = RC_OK;
-  trit_t request_hash_trits[NUM_TRITS_HASH] = {0};
   trit_array_p request_hash = NULL;
 
   if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
     return RC_NULL_PARAM;
   }
 
-  bytes_to_trits(packet->content + PACKET_TX_SIZE, REQUEST_HASH_SIZE,
-                 request_hash_trits, REQUEST_HASH_SIZE_TRITS);
-  if ((request_hash = trit_array_new(NUM_TRITS_HASH)) == NULL) {
-    return RC_PROCESSOR_OOM;
+  if ((request_hash = trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
+    return RC_OOM;
   }
-  flex_trits_from_trits(request_hash->trits, NUM_TRITS_HASH, request_hash_trits,
-                        NUM_TRITS_HASH, NUM_TRITS_HASH);
+
+  if (flex_trits_from_bytes(request_hash->trits, HASH_LENGTH_TRIT,
+                            packet->content + PACKET_TX_SIZE,
+                            REQUEST_HASH_SIZE_TRITS, REQUEST_HASH_SIZE_TRITS) !=
+      REQUEST_HASH_SIZE_TRITS) {
+    log_warning(PROCESSOR_LOGGER_ID, "Invalid request bytes\n");
+    return RC_PROCESSOR_INVALID_REQUEST;
+  }
+
+  // If requested hash is equal to transaction hash: request a random tip
   if (memcmp(request_hash->trits, hash, request_hash->num_bytes) == 0) {
-    // If requested hash is equal to transaction hash: request a random tip
     trit_array_set_null(request_hash);
   }
 
   if ((ret = iota_consensus_transaction_solidifier_check_and_update_solid_state(
-           &processor->node->core->consensus.transaction_solidifier, hash))) {
+           &processor->node->core->consensus.transaction_solidifier, hash)) !=
+      RC_OK) {
+    log_warning(PROCESSOR_LOGGER_ID, "Checking transaction solidity failed\n");
     return ret;
   }
+
   log_debug(PROCESSOR_LOGGER_ID, "Propagating packet to responder\n");
   if ((ret = responder_on_next(&processor->node->responder, neighbor,
-                               request_hash))) {
+                               request_hash)) != RC_OK) {
     log_warning(PROCESSOR_LOGGER_ID,
                 "Propagating packet to responder failed\n");
     return ret;
   }
-  return RC_OK;
+
+  return ret;
 }
 
-static retcode_t process_packet(processor_state_t *const processor,
-                                iota_packet_t *const packet) {
+static retcode_t process_packet(processor_state_t const *const processor,
+                                iota_packet_t const *const packet) {
   retcode_t ret = RC_OK;
   neighbor_t *neighbor = NULL;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
@@ -198,10 +206,8 @@ static retcode_t process_packet(processor_state_t *const processor,
       log_warning(PROCESSOR_LOGGER_ID, "Processing request bytes failed\n");
       return ret;
     }
-
-    // TODO(thibault): Recent seen bytes statistics
   } else {
-    // TODO(thibault): Testnet add non-tethered neighbor
+    // TODO Testnet add non-tethered neighbor
   }
 
   return ret;
