@@ -170,3 +170,44 @@ retcode_t flex_hash_to_char_buffer(trit_array_p hash, char_buffer_t* out) {
   }
   return RC_OK;
 }
+
+flex_hash_array_t* hash243_queue_to_flex_hash_array(hash243_queue_t* in_queue) {
+  if (!hash243_queue_count(in_queue)) {
+    return NULL;
+  }
+
+  flex_hash_array_t *out_array, next_array;
+
+  for (int i = 0; i < hash243_queue_count(in_queue); i++) {
+    next_array = (flex_hash_array_t*)malloc(sizeof(flex_hash_array_t));
+    if (i == 0) {
+      out_array = next_array;
+    }
+    next_array->next = NULL;
+
+    memcpy(next_array->hash->trits, hash243_queue_at(in_queue, i),
+           sizeof(hash243_queue_at(in_queue, i)));
+    // TODO need to assign value of num_trits, num_bytes, dynamic
+
+    next_array = next_array->next;
+  }
+  return out_array;
+}
+
+hash243_queue_t* flex_hash_array_to_hash243_queue(flex_hash_array_t* in_array) {
+  // TODO do the transform !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  if (!in_array) {
+    return NULL;
+  }
+
+  hash243_queue_t* out_queue = NULL;
+  do {
+    retcode_t ret_code = hash243_queue_push(out_queue, next_array->hash->trits);
+    if (!ret_code) {
+      return NULL;
+    }
+    in_array = in_array->next;
+  } while (in_array->next);
+
+  return out_queue;
+}

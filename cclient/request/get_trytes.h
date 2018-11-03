@@ -16,7 +16,7 @@ extern "C" {
 
 typedef struct get_trytes_req_s {
   /* List of tx hashes for which request should get trytes */
-  flex_hash_array_t* hashes;
+  hash243_queue_t hashes;
 } get_trytes_req_t;
 
 get_trytes_req_t* get_trytes_req_new();

@@ -10,7 +10,7 @@
 get_trytes_req_t* get_trytes_req_new() {
   get_trytes_req_t* req = (get_trytes_req_t*)malloc(sizeof(get_trytes_req_t));
   if (req) {
-    req->hashes = flex_hash_array_new();
+    req->hashes = NULL;
   }
   return req;
 }
@@ -20,17 +20,15 @@ void get_trytes_req_free(get_trytes_req_t** const req) {
     return;
   }
 
-  get_trytes_req_t* tmp = *req;
-
-  if (tmp->hashes) {
-    flex_hash_array_free(tmp->hashes);
+  if ((*req)->hashes) {
+    hash243_queue_free(&(*req)->hashes);
   }
-  free(tmp);
+  free(*req);
   *req = NULL;
 }
 
 get_trytes_req_t* get_trytes_req_add_hash(get_trytes_req_t* const req,
                                           tryte_t const* const hash) {
-  req->hashes = flex_hash_array_append(req->hashes, hash);
+  hash243_queue_push(req->hashes, hash);
   return req;
 }

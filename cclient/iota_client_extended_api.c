@@ -141,10 +141,9 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
   return ret_code;
 }
 
-retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
-                                       flex_trit_t const* const seed,
-                                       size_t const security,
-                                       account_data_t* out_account) {
+retcode_t iota_client_get_account_data(
+    iota_client_seitrvice_t const* const serv, flex_trit_t const* const seed,
+    size_t const security, account_data_t* out_account) {
   retcode_t ret_code = RC_OK;
   address_opt_t const addr_opt = {.security = security, .start = 0, .total = 0};
   flex_trit_t* tmp_addr = NULL;
@@ -234,4 +233,64 @@ done:
   get_balances_req_free(&blances_req);
   get_balances_res_free(&blances_res);
   return ret_code;
+}
+
+retcode_t iota_client_find_transaction_objects(
+    iota_client_service_t const* const serv, hashes_t* addresses,
+    hashes_t const* const bundles, hashes_t const* const tags,
+    hashes_t const* const approvees, transaction_list_t* out_tx_objs) {
+  retcode_t ret_code = RC_OK;
+
+  log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+
+  find_transactions_req_t* find_tx_req = NULL;
+  find_transactions_res_t* find_tx_res = NULL;
+  get_trytes_req_t* get_trytes_req = get_trytes_req_new();
+  get_trytes_res_t* get_trytes_res = get_trytes_res_new();
+
+  if (!find_tx_req || !find_tx_res || !get_trytes_req || !get_trytes_res) {
+    ret_code = RC_CCLIENT_NULL_PTR;
+    goto done;
+  }
+
+  &find_tx_req->addresses = flex_hash_array_to_hash243_queue(
+      addresses) if (!(&find_tx_req->addresses)) {
+    goto done;
+  }
+  &find_tx_req->bundles =
+      flex_hash_array_to_hash243_queue(bundles) if (!(&find_tx_req->bundles)) {
+    goto done;
+  }
+  &find_tx_req->tags =
+      flex_hash_array_to_hash243_queue(tags) if (!(&find_tx_req->tags)) {
+    goto done;
+  }
+  &find_tx_req->approvees = flex_hash_array_to_hash243_queue(
+      approvees) if (!(&find_tx_req->approvees)) {
+    goto done;
+  }
+  ret_code = iota_client_find_transactions(serv, find_tx_req, find_tx_res);
+  if (ret_code) {
+    goto done;
+  }
+
+  get_trytes_req->hashes = find_tx_res->hashes;
+  if (!get_trytes_req->hashes) {
+    goto done;
+  }
+
+  ret_code = iota_client_get_trytes(sev, get_trytes_req, get_trytes_res);
+  if (ret_code) {
+    goto done;
+  }
+
+  out_tx_obj = hash243_queue_to_flex_hash_array(get_trytes_res->trytes);
+
+done:
+  find_transactions_req_free(&find_tx_req);
+  find_transactions_res_free(&find_tx_res);
+  get_trytes_req_free(get_trytes_req);
+  get_trytes_res_free(get_trytes_res);
+
+  return RC_OK;
 }

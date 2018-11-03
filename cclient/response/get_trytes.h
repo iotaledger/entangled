@@ -19,7 +19,7 @@ typedef struct get_trytes_res_s {
   The raw transaction data (trytes) of a specific transaction. These trytes can
   then be easily converted into the actual transaction object.
   */
-  flex_hash_array_t* trytes;
+  hash243_queue_t trytes;
 } get_trytes_res_t;
 
 get_trytes_res_t* get_trytes_res_new();
