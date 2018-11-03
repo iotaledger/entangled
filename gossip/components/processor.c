@@ -44,8 +44,8 @@ static retcode_t process_transaction_bytes(processor_state_t *const processor,
                           NUM_TRITS_SERIALIZED_TRANSACTION, packet->content,
                           NUM_TRITS_SERIALIZED_TRANSACTION,
                           NUM_TRITS_SERIALIZED_TRANSACTION);
-    if ((transaction = transaction_deserialize(transaction_flex_trits)) ==
-        NULL) {
+    if (transaction_deserialize_from_trits(transaction,
+                                           transaction_flex_trits) == 0) {
       neighbor->nbr_invalid_tx++;
       log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                   "Deserializing transaction failed\n");
