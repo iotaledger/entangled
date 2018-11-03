@@ -8,20 +8,27 @@
 #ifndef __GOSSIP_IOTA_PACKET_H__
 #define __GOSSIP_IOTA_PACKET_H__
 
+#include "utlist.h"
+
 #include "common/errors.h"
+#include "common/model/transaction.h"
 #include "common/network/endpoint.h"
 #include "common/trinary/bytes.h"
 #include "common/trinary/flex_trit.h"
 #include "gossip/conf.h"
 
-// Forward declarations
-typedef struct _iota_transaction* iota_transaction_t;
-typedef struct _trit_array* trit_array_p;
-
 typedef struct iota_packet_s {
   byte_t content[PACKET_SIZE];
   endpoint_t source;
 } iota_packet_t;
+
+typedef struct iota_packet_queue_entry_s {
+  iota_packet_t packet;
+  struct iota_packet_queue_entry_s* next;
+  struct iota_packet_queue_entry_s* prev;
+} iota_packet_queue_entry_t;
+
+typedef iota_packet_queue_entry_t* iota_packet_queue_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,6 +64,14 @@ retcode_t iota_packet_set_transaction(iota_packet_t* const packet,
 retcode_t iota_packet_set_request(iota_packet_t* const packet,
                                   flex_trit_t const* const request,
                                   uint8_t mwm);
+
+bool iota_packet_queue_empty(iota_packet_queue_t const queue);
+size_t iota_packet_queue_count(iota_packet_queue_t const* const queue);
+retcode_t iota_packet_queue_push(iota_packet_queue_t* const queue,
+                                 iota_packet_t const* const packet);
+void iota_packet_queue_pop(iota_packet_queue_t* const queue);
+iota_packet_t* iota_packet_queue_peek(iota_packet_queue_t const queue);
+void iota_packet_queue_free(iota_packet_queue_t* const queue);
 
 #ifdef __cplusplus
 }
