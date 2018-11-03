@@ -19,7 +19,7 @@
 static retcode_t process_transaction_bytes(processor_state_t *const state,
                                            neighbor_t *const neighbor,
                                            iota_packet_t *const packet,
-                                           iota_transaction_t *const tx) {
+                                           iota_transaction_t transaction) {
   retcode_t ret = RC_OK;
   bool exists = false;
 
@@ -29,7 +29,7 @@ static retcode_t process_transaction_bytes(processor_state_t *const state,
     return RC_PROCESSOR_COMPONENT_NULL_NEIGHBOR;
   } else if (packet == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_PACKET;
-  } else if (tx == NULL) {
+  } else if (transaction == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_TX;
   }
 
@@ -39,7 +39,7 @@ static retcode_t process_transaction_bytes(processor_state_t *const state,
     flex_trits_from_bytes(tx_flex_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                           packet->content, NUM_TRITS_SERIALIZED_TRANSACTION,
                           NUM_TRITS_SERIALIZED_TRANSACTION);
-    if ((*tx = transaction_deserialize(tx_flex_trits)) == NULL) {
+    if ((transaction = transaction_deserialize(tx_flex_trits)) == NULL) {
       neighbor->nbr_invalid_tx++;
       log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                   "Deserializing transaction failed\n");
@@ -49,7 +49,7 @@ static retcode_t process_transaction_bytes(processor_state_t *const state,
     // TODO(thibault): Add to cache
 
     TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
-    trit_array_set_trits(&hash, (*tx)->hash, NUM_TRITS_HASH);
+    trit_array_set_trits(&hash, transaction->hash, NUM_TRITS_HASH);
 
     if ((ret = iota_tangle_transaction_exist(
              state->tangle, TRANSACTION_FIELD_HASH, &hash, &exists))) {
@@ -59,7 +59,7 @@ static retcode_t process_transaction_bytes(processor_state_t *const state,
       neighbor->nbr_new_tx++;
       // Store new transaction
       log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Storing new transaction\n");
-      if ((ret = iota_tangle_transaction_store(state->tangle, *tx))) {
+      if ((ret = iota_tangle_transaction_store(state->tangle, transaction))) {
         log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                     "Storing new transaction failed\n");
         neighbor->nbr_invalid_tx++;
@@ -127,13 +127,16 @@ static retcode_t process_request_bytes(processor_state_t *const state,
 static retcode_t process_packet(processor_state_t *const state,
                                 iota_packet_t *const packet) {
   neighbor_t *neighbor = NULL;
-  iota_transaction_t tx = NULL;
+  struct _iota_transaction tx;
 
   if (state == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_STATE;
   } else if (packet == NULL) {
     return RC_PROCESSOR_COMPONENT_NULL_PACKET;
   }
+
+  tx.snapshot_index = 0;
+  tx.solid = 0;
 
   neighbor = neighbor_find_by_endpoint(state->node->neighbors, &packet->source);
 
@@ -150,7 +153,7 @@ static retcode_t process_packet(processor_state_t *const state,
     }
 
     log_debug(PROCESSOR_COMPONENT_LOGGER_ID, "Processing request bytes\n");
-    if (process_request_bytes(state, neighbor, packet, tx)) {
+    if (process_request_bytes(state, neighbor, packet, &tx)) {
       log_warning(PROCESSOR_COMPONENT_LOGGER_ID,
                   "Processing request bytes failed\n");
       return RC_PROCESSOR_COMPONENT_FAILED_REQ_PROCESSING;
