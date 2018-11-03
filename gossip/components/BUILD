@@ -25,7 +25,10 @@ cc_library(
 cc_library(
     name = "processor_shared",
     hdrs = ["processor.h"],
-    deps = ["//utils/handles:thread"],
+    deps = [
+        "//consensus/transaction_validator",
+        "//utils/handles:thread",
+    ],
 )
 
 cc_library(

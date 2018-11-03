@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
+#include "consensus/transaction_validator/transaction_validator.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
@@ -25,6 +26,7 @@ typedef struct processor_state_s {
   processor_queue_t *queue;
   node_t *node;
   tangle_t *tangle;
+  transaction_validator_t *transaction_validator;
 } processor_state_t;
 
 #ifdef __cplusplus
@@ -41,7 +43,8 @@ extern "C" {
  * @return a status code
  */
 retcode_t processor_init(processor_state_t *const state, node_t *const node,
-                         tangle_t *const tangle);
+                         tangle_t *const tangle,
+                         transaction_validator_t *const transaction_validator);
 
 /**
  * Starts a processor
