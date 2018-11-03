@@ -262,7 +262,7 @@ retcode_t iota_client_find_transaction_objects(
     goto done;
   }
   &find_tx_req->tags =
-      flex_hash_array_to_hash243_queue(tags) if (!(&find_tx_req->tags)) {
+      flex_hash_array_to_hash81_queue(tags) if (!(&find_tx_req->tags)) {
     goto done;
   }
   &find_tx_req->approvees = flex_hash_array_to_hash243_queue(

@@ -68,6 +68,7 @@ void flex_hash_array_free(flex_hash_array_t* head);
 
 flex_hash_array_t* hash243_queue_to_flex_hash_array(hash243_queue_t* in_queue);
 hash243_queue_t* flex_hash_array_to_hash243_queue(flex_hash_array_t* in_array);
+hash81_queue_t* flex_hash_array_to_hash81_queue(flex_hash_array_t* in_array);
 #ifdef __cplusplus
 }
 #endif

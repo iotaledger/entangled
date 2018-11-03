@@ -195,7 +195,6 @@ flex_hash_array_t* hash243_queue_to_flex_hash_array(hash243_queue_t* in_queue) {
 }
 
 hash243_queue_t* flex_hash_array_to_hash243_queue(flex_hash_array_t* in_array) {
-  // TODO do the transform !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   if (!in_array) {
     return NULL;
   }
@@ -203,6 +202,23 @@ hash243_queue_t* flex_hash_array_to_hash243_queue(flex_hash_array_t* in_array) {
   hash243_queue_t* out_queue = NULL;
   do {
     retcode_t ret_code = hash243_queue_push(out_queue, next_array->hash->trits);
+    if (!ret_code) {
+      return NULL;
+    }
+    in_array = in_array->next;
+  } while (in_array->next);
+
+  return out_queue;
+}
+
+hash81_queue_t* flex_hash_array_to_hash81_queue(flex_hash_array_t* in_array) {
+  if (!in_array) {
+    return NULL;
+  }
+
+  hash243_queue_t* out_queue = NULL;
+  do {
+    retcode_t ret_code = hash81_queue_push(out_queue, next_array->hash->trits);
     if (!ret_code) {
       return NULL;
     }
