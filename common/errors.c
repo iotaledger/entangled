@@ -119,10 +119,6 @@ const char* error_2_string(retcode_t err) {
     case RC_BROADCASTER_FAILED_PUSH_QUEUE:
     case RC_BROADCASTER_STILL_RUNNING:
     // Processor component module
-    case RC_PROCESSOR_FAILED_INIT_QUEUE:
-    case RC_PROCESSOR_FAILED_DESTROY_QUEUE:
-    case RC_PROCESSOR_FAILED_ADD_QUEUE:
-    case RC_PROCESSOR_STILL_RUNNING:
     case RC_PROCESSOR_INVALID_TRANSACTION:
     // Receiver component module
     case RC_RECEIVER_COMPONENT_NULL_STATE:

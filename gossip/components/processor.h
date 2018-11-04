@@ -22,6 +22,9 @@
 typedef struct node_s node_t;
 typedef struct tangle_s tangle_t;
 
+/**
+ * A processor is responsible for analyzing packets sent by neighbors.
+ */
 typedef struct processor_s {
   thread_handle_t thread;
   bool running;
@@ -43,6 +46,7 @@ extern "C" {
  * @param processor The processor state
  * @param node A node
  * @param tangle A tangle
+ * @param transaction_validator A transaction validator
  *
  * @return a status code
  */
