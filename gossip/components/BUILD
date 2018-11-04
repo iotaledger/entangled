@@ -26,6 +26,7 @@ cc_library(
     name = "processor_shared",
     hdrs = ["processor.h"],
     deps = [
+        "//consensus/transaction_solidifier",
         "//consensus/transaction_validator",
         "//utils/handles:cond",
         "//utils/handles:lock",
@@ -39,7 +40,7 @@ cc_library(
     srcs = ["processor.c"],
     deps = [
         ":processor_shared",
-        "//ciri:core_shared",
+        "//gossip:node_shared",
         "//utils/containers/lists:concurrent_list_neighbor",
     ],
 )

@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
+#include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "consensus/transaction_validator/transaction_validator.h"
 #include "gossip/iota_packet.h"
 #include "utils/handles/cond.h"
@@ -34,6 +35,7 @@ typedef struct processor_s {
   node_t *node;
   tangle_t *tangle;
   transaction_validator_t *transaction_validator;
+  transaction_solidifier_t *transaction_solidifier;
 } processor_t;
 
 #ifdef __cplusplus
@@ -47,12 +49,14 @@ extern "C" {
  * @param node A node
  * @param tangle A tangle
  * @param transaction_validator A transaction validator
+ * @param transaction_solidifier A transaction solidifier
  *
  * @return a status code
  */
-retcode_t processor_init(processor_t *const processor, node_t *const node,
-                         tangle_t *const tangle,
-                         transaction_validator_t *const transaction_validator);
+retcode_t processor_init(
+    processor_t *const processor, node_t *const node, tangle_t *const tangle,
+    transaction_validator_t *const transaction_validator,
+    transaction_solidifier_t *const transaction_solidifier);
 
 /**
  * Starts a processor

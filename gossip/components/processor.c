@@ -7,8 +7,8 @@
 
 #include <string.h>
 
-#include "ciri/core.h"
 #include "gossip/components/processor.h"
+#include "gossip/node.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
@@ -20,7 +20,8 @@
  */
 
 /**
- * Converts transaction bytes from a packet to a transaction and validates it.
+ * Converts transaction bytes from a packet to a transaction, validates it and
+ * checks its solidity.
  * If valid and new: stores and broadcasts it.
  *
  * @param processor The processor state
@@ -102,6 +103,15 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
         goto failure;
       }
 
+      // Checks solidity of the transaction
+      if ((ret =
+               iota_consensus_transaction_solidifier_check_and_update_solid_state(
+                   processor->transaction_solidifier, hash)) != RC_OK) {
+        log_warning(PROCESSOR_LOGGER_ID,
+                    "Checking transaction solidity failed\n");
+        return ret;
+      }
+
       // TODO Store transaction metadata
 
       // Broadcast the new transaction
@@ -125,8 +135,8 @@ failure:
 }
 
 /**
- * Converts request bytes from a packet to a hash, checks its solidity and adds
- * it to the responder queue.
+ * Converts request bytes from a packet to a hash and adds it to the responder
+ * queue.
  *
  * @param processor The processor state
  * @param neighbor The neighbor that sent the packet
@@ -163,14 +173,6 @@ static retcode_t process_request_bytes(processor_t const *const processor,
   // null to request a random tip
   if (memcmp(request_hash->trits, hash, request_hash->num_bytes) == 0) {
     trit_array_set_null(request_hash);
-  }
-
-  // Checks solidity of the transaction
-  if ((ret = iota_consensus_transaction_solidifier_check_and_update_solid_state(
-           &processor->node->core->consensus.transaction_solidifier, hash)) !=
-      RC_OK) {
-    log_warning(PROCESSOR_LOGGER_ID, "Checking transaction solidity failed\n");
-    return ret;
   }
 
   // Adds request to the responder queue
@@ -273,11 +275,12 @@ static void *processor_routine(processor_t *const processor) {
  * Public functions
  */
 
-retcode_t processor_init(processor_t *const processor, node_t *const node,
-                         tangle_t *const tangle,
-                         transaction_validator_t *const transaction_validator) {
+retcode_t processor_init(
+    processor_t *const processor, node_t *const node, tangle_t *const tangle,
+    transaction_validator_t *const transaction_validator,
+    transaction_solidifier_t *const transaction_solidifier) {
   if (processor == NULL || node == NULL || tangle == NULL ||
-      transaction_validator == NULL) {
+      transaction_validator == NULL || transaction_solidifier == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -290,6 +293,7 @@ retcode_t processor_init(processor_t *const processor, node_t *const node,
   processor->node = node;
   processor->tangle = tangle;
   processor->transaction_validator = transaction_validator;
+  processor->transaction_solidifier = transaction_solidifier;
 
   return RC_OK;
 }
@@ -341,6 +345,7 @@ retcode_t processor_destroy(processor_t *const processor) {
   processor->node = NULL;
   processor->tangle = NULL;
   processor->transaction_validator = NULL;
+  processor->transaction_solidifier = NULL;
 
   logger_helper_destroy(PROCESSOR_LOGGER_ID);
 

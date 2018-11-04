@@ -323,8 +323,6 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts,
   ret = iota_tangle_transaction_load(ts->tangle, TRANSACTION_FIELD_HASH,
                                      &approvee_trits, &pack);
   if (ret != RC_OK || pack.num_loaded == 0) {
-    log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
-              "No transactions were loaded for the provided tail hash\n");
     *solid = false;
     return request_transaction(ts->requester, approvee, false);
   }
