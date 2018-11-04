@@ -1,16 +1,9 @@
-/*
- * Copyright (c) 2018 IOTA Stiftung
- * https://github.com/iotaledger/entangled
- *
- * Refer to the LICENSE file for licensing information
- */
-
 #include <stdio.h>
 
 #include "common/sign/v2/iss_curl.h"
-#include "utils/merkle.h"
+#include "mam/v1/merkle.h"
 
-static trit_t const merkle_null_hash[HASH_LENGTH_TRIT] = {0};
+static trit_t const merkle_null_hash[HASH_LENGTH] = {0};
 
 static size_t binary_tree_size(size_t const acc, size_t const depth) {
   return (1 << (depth + 1)) - 1 + acc;
@@ -39,28 +32,33 @@ size_t merkle_depth(size_t const node_count) {
   return depth + 1;
 }
 
+/* return the node index of assign location in tree. The order of nodes indexes
+ * follow depth-first rule.
+ * @param acc The number of nodes in the previous counting binary tree
+ * @param depth The depth of the node, counting from root
+ * @param width The width of the node, counting from left
+ * @param tree_depth The depth of whole tree
+ */
 static size_t merkle_node_index_traverse(size_t const acc, size_t const depth,
                                          size_t const width,
                                          size_t const tree_depth) {
-  if (!tree_depth)
+  if (!tree_depth) {
     return 0;
-
-  int depth_cursor = 1;
-  int width_of_leaves_divide_scale = 1;
-  int index = 0;
-  int width_cursor = width;
-  int width_of_leaves = 1 << depth;
+  }
+  size_t depth_cursor = 1;
+  size_t index = depth + acc;
+  size_t width_cursor = width;
+  size_t width_of_leaves = 1 << depth;
 
   while (depth_cursor <= depth) {
-    if (width_cursor >= (width_of_leaves >> width_of_leaves_divide_scale)) {
-      index += ((1 << (depth + 1)) - 1);
-      width_cursor =
-          width_cursor - (width_of_leaves >> width_of_leaves_divide_scale);
+    if (width_cursor >= (width_of_leaves >> depth_cursor)) {
+      /* add whole bianry tree size of the lest side binary tree */
+      index += ((1 << (tree_depth - depth_cursor + 1)) - 1);
+      /* counting node index in the subtree which the cursor currently stays */
+      width_cursor = width_cursor - (width_of_leaves >> depth_cursor);
     }
-    width_of_leaves_divide_scale++;
     depth_cursor++;
   }
-  index += depth;
   return index;
 }
 
@@ -94,9 +92,8 @@ int merkle_create(trit_t *const tree, size_t const base_size,
                      offset + merkle_leaf_index(leaf_index, base_size), c);
     iss_curl_key(key, key, key_size, c);
     iss_curl_key_digest(key, key, key_size, c);
-    iss_curl_address(
-        &tree[HASH_LENGTH_TRIT * merkle_node_index(td, leaf_index, td)], key,
-        HASH_LENGTH_TRIT, c);
+    iss_curl_address(&tree[HASH_LENGTH * merkle_node_index(td, leaf_index, td)],
+                     key, HASH_LENGTH, c);
   }
 
   // hash tree
@@ -105,25 +102,21 @@ int merkle_create(trit_t *const tree, size_t const base_size,
       // if right hash exists, absorb right hash then left hash
       if (width < cur_size - 1) {
         curl_absorb(
-            c,
-            &tree[HASH_LENGTH_TRIT * merkle_node_index(depth, width + 1, td)],
-            HASH_LENGTH_TRIT);
-        curl_absorb(
-            c, &tree[HASH_LENGTH_TRIT * merkle_node_index(depth, width, td)],
-            HASH_LENGTH_TRIT);
+            c, &tree[HASH_LENGTH * merkle_node_index(depth, width + 1, td)],
+            HASH_LENGTH);
+        curl_absorb(c, &tree[HASH_LENGTH * merkle_node_index(depth, width, td)],
+                    HASH_LENGTH);
       }
       // else, absorb the remaining hash then a null hash
       else {
-        curl_absorb(
-            c, &tree[HASH_LENGTH_TRIT * merkle_node_index(depth, width, td)],
-            HASH_LENGTH_TRIT);
-        curl_absorb(c, (trit_t *)merkle_null_hash, HASH_LENGTH_TRIT);
+        curl_absorb(c, &tree[HASH_LENGTH * merkle_node_index(depth, width, td)],
+                    HASH_LENGTH);
+        curl_absorb(c, (trit_t *)merkle_null_hash, HASH_LENGTH);
       }
       // squeeze the result in the parent node
       curl_squeeze(
-          c,
-          &tree[HASH_LENGTH_TRIT * merkle_node_index(depth - 1, width / 2, td)],
-          HASH_LENGTH_TRIT);
+          c, &tree[HASH_LENGTH * merkle_node_index(depth - 1, width / 2, td)],
+          HASH_LENGTH);
       curl_reset(c);
     }
     cur_size = (cur_size + 1) >> 1;
@@ -140,12 +133,12 @@ int merkle_branch(trit_t const *const tree, trit_t *const siblings,
   if (tree == NULL) {
     return NULL_TREE;
   }
-  if (HASH_LENGTH_TRIT *
+  if (HASH_LENGTH *
           merkle_node_index(tree_depth - 1, leaf_index, tree_depth - 1) >=
       tree_length) {
     return LEAF_INDEX_OUT_OF_BOUNDS;
   }
-  if (tree_depth > merkle_depth(tree_length / HASH_LENGTH_TRIT))
+  if (tree_depth > merkle_depth(tree_length / HASH_LENGTH))
     return DEPTH_OUT_OF_BOUNDS;
 
   size_t sibling_index, site_index;
@@ -159,16 +152,16 @@ int merkle_branch(trit_t const *const tree, trit_t *const siblings,
     } else {
       sibling_index++;
     }
-    site_index = HASH_LENGTH_TRIT *
+    site_index = HASH_LENGTH *
                  merkle_node_index(depth_index, sibling_index, tree_depth - 1);
     if (site_index >= tree_length) {
       // if depth width is not even, copy a null hash
-      memcpy(&siblings[i * HASH_LENGTH_TRIT], merkle_null_hash,
-             HASH_LENGTH_TRIT * sizeof(trit_t));
+      memcpy(&siblings[i * HASH_LENGTH], merkle_null_hash,
+             HASH_LENGTH * sizeof(trit_t));
     } else {
       // else copy a sibling
-      memcpy(&siblings[i * HASH_LENGTH_TRIT], &tree[site_index],
-             HASH_LENGTH_TRIT * sizeof(trit_t));
+      memcpy(&siblings[i * HASH_LENGTH], &tree[site_index],
+             HASH_LENGTH * sizeof(trit_t));
     }
 
     sibling_index >>= 1;
@@ -182,15 +175,15 @@ void merkle_root(trit_t *const hash, trit_t const *const siblings,
   for (size_t i = 0, j = 1; i < siblings_number; i++, j <<= 1) {
     // if index is a right node, absorb a sibling (left) then the hash
     if (leaf_index & j) {
-      curl_absorb(c, &siblings[i * HASH_LENGTH_TRIT], HASH_LENGTH_TRIT);
-      curl_absorb(c, hash, HASH_LENGTH_TRIT);
+      curl_absorb(c, &siblings[i * HASH_LENGTH], HASH_LENGTH);
+      curl_absorb(c, hash, HASH_LENGTH);
     }
     // if index is a left node, absorb the hash then a sibling (right)
     else {
-      curl_absorb(c, hash, HASH_LENGTH_TRIT);
-      curl_absorb(c, &siblings[i * HASH_LENGTH_TRIT], HASH_LENGTH_TRIT);
+      curl_absorb(c, hash, HASH_LENGTH);
+      curl_absorb(c, &siblings[i * HASH_LENGTH], HASH_LENGTH);
     }
-    curl_squeeze(c, hash, HASH_LENGTH_TRIT);
+    curl_squeeze(c, hash, HASH_LENGTH);
     curl_reset(c);
   }
 }
