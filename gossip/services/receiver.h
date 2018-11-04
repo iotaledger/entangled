@@ -23,7 +23,7 @@ typedef struct receiver_service_s {
   uint16_t port;
   protocol_type_t protocol;
   receiver_state_t* state;
-  processor_state_t* processor;
+  processor_t* processor;
   void* context;
   void* opaque_socket;
 } receiver_service_t;

@@ -19,11 +19,10 @@
 #include "utils/handles/thread.h"
 
 // Forward declarations
-typedef struct concurrent_queue_iota_packet_t_s processor_queue_t;
 typedef struct node_s node_t;
 typedef struct tangle_s tangle_t;
 
-typedef struct processor_state_s {
+typedef struct processor_s {
   thread_handle_t thread;
   bool running;
   iota_packet_queue_t queue;
@@ -32,7 +31,7 @@ typedef struct processor_state_s {
   node_t *node;
   tangle_t *tangle;
   transaction_validator_t *transaction_validator;
-} processor_state_t;
+} processor_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,52 +40,52 @@ extern "C" {
 /**
  * Initializes a processor
  *
- * @param state The processor state
+ * @param processor The processor state
  * @param node A node
  * @param tangle A tangle
  *
  * @return a status code
  */
-retcode_t processor_init(processor_state_t *const state, node_t *const node,
+retcode_t processor_init(processor_t *const processor, node_t *const node,
                          tangle_t *const tangle,
                          transaction_validator_t *const transaction_validator);
 
 /**
  * Starts a processor
  *
- * @param state The processor state
+ * @param processor The processor state
  *
  * @return a status code
  */
-retcode_t processor_start(processor_state_t *const state);
+retcode_t processor_start(processor_t *const processor);
 
 /**
  * Stops a processor
  *
- * @param state The processor state
+ * @param processor The processor state
  *
  * @return a status code
  */
-retcode_t processor_stop(processor_state_t *const state);
+retcode_t processor_stop(processor_t *const processor);
 
 /**
  * Destroys a processor
  *
- * @param state The processor state
+ * @param processor The processor state
  *
  * @return a status code
  */
-retcode_t processor_destroy(processor_state_t *const state);
+retcode_t processor_destroy(processor_t *const processor);
 
 /**
  * Adds a packet to a processor queue
  *
- * @param state The processor state
+ * @param processor The processor state
  * @param packet The packet
  *
  * @return a status code
  */
-retcode_t processor_on_next(processor_state_t *const state,
+retcode_t processor_on_next(processor_t *const processor,
                             iota_packet_t const packet);
 
 /**
@@ -96,7 +95,7 @@ retcode_t processor_on_next(processor_state_t *const state,
  *
  * @return a status code
  */
-size_t processor_size(processor_state_t *const processor);
+size_t processor_size(processor_t *const processor);
 
 #ifdef __cplusplus
 }

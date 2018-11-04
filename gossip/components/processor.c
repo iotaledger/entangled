@@ -31,9 +31,10 @@
  *
  * @return a status code
  */
-static retcode_t process_transaction_bytes(
-    processor_state_t const *const processor, neighbor_t *const neighbor,
-    iota_packet_t const *const packet, flex_trit_t *const hash) {
+static retcode_t process_transaction_bytes(processor_t const *const processor,
+                                           neighbor_t *const neighbor,
+                                           iota_packet_t const *const packet,
+                                           flex_trit_t *const hash) {
   retcode_t ret = RC_OK;
 
   if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
@@ -131,7 +132,7 @@ failure:
  *
  * @return a status code
  */
-static retcode_t process_request_bytes(processor_state_t const *const processor,
+static retcode_t process_request_bytes(processor_t const *const processor,
                                        neighbor_t *const neighbor,
                                        iota_packet_t const *const packet,
                                        flex_trit_t *const hash) {
@@ -177,7 +178,7 @@ static retcode_t process_request_bytes(processor_state_t const *const processor,
   return ret;
 }
 
-static retcode_t process_packet(processor_state_t const *const processor,
+static retcode_t process_packet(processor_t const *const processor,
                                 iota_packet_t const *const packet) {
   retcode_t ret = RC_OK;
   neighbor_t *neighbor = NULL;
@@ -213,7 +214,7 @@ static retcode_t process_packet(processor_state_t const *const processor,
   return ret;
 }
 
-static void *processor_routine(processor_state_t *const processor) {
+static void *processor_routine(processor_t *const processor) {
   iota_packet_t *packet = NULL;
 
   if (processor == NULL) {
@@ -254,7 +255,7 @@ static void *processor_routine(processor_state_t *const processor) {
  * Public functions
  */
 
-retcode_t processor_init(processor_state_t *const processor, node_t *const node,
+retcode_t processor_init(processor_t *const processor, node_t *const node,
                          tangle_t *const tangle,
                          transaction_validator_t *const transaction_validator) {
   if (processor == NULL || node == NULL || tangle == NULL ||
@@ -263,7 +264,7 @@ retcode_t processor_init(processor_state_t *const processor, node_t *const node,
   }
 
   logger_helper_init(PROCESSOR_LOGGER_ID, LOGGER_DEBUG, true);
-  memset(processor, 0, sizeof(processor_state_t));
+  memset(processor, 0, sizeof(processor_t));
   processor->running = false;
   processor->queue = NULL;
   processor->node = node;
@@ -275,7 +276,7 @@ retcode_t processor_init(processor_state_t *const processor, node_t *const node,
   return RC_OK;
 }
 
-retcode_t processor_start(processor_state_t *const processor) {
+retcode_t processor_start(processor_t *const processor) {
   if (processor == NULL) {
     return RC_NULL_PARAM;
   }
@@ -291,7 +292,7 @@ retcode_t processor_start(processor_state_t *const processor) {
   return RC_OK;
 }
 
-retcode_t processor_stop(processor_state_t *const processor) {
+retcode_t processor_stop(processor_t *const processor) {
   bool ret = RC_OK;
 
   if (processor == NULL) {
@@ -309,7 +310,7 @@ retcode_t processor_stop(processor_state_t *const processor) {
   return ret;
 }
 
-retcode_t processor_destroy(processor_state_t *const processor) {
+retcode_t processor_destroy(processor_t *const processor) {
   bool ret = RC_OK;
 
   if (processor == NULL) {
@@ -325,7 +326,7 @@ retcode_t processor_destroy(processor_state_t *const processor) {
   return ret;
 }
 
-retcode_t processor_on_next(processor_state_t *const processor,
+retcode_t processor_on_next(processor_t *const processor,
                             iota_packet_t const packet) {
   retcode_t ret = RC_OK;
 
@@ -351,7 +352,7 @@ retcode_t processor_on_next(processor_state_t *const processor,
   return ret;
 }
 
-size_t processor_size(processor_state_t *const processor) {
+size_t processor_size(processor_t *const processor) {
   size_t size = 0;
 
   if (processor == NULL) {
