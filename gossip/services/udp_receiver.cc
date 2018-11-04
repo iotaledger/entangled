@@ -53,7 +53,8 @@ bool UdpReceiverService::handlePacket(endpoint_t* const endpoint,
   if (length != PACKET_SIZE) {
     return false;
   }
-  iota_packet_build(&packet_, endpoint->ip, endpoint->port, PROTOCOL_UDP);
+  iota_packet_set_endpoint(&packet_, endpoint->ip, endpoint->port,
+                           PROTOCOL_UDP);
   log_debug(UDP_RECEIVER_SERVICE_LOGGER_ID,
             "Packet received from tethered neighbor udp://%s:%d\n",
             endpoint->host, endpoint->port);

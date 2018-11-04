@@ -11,17 +11,26 @@
 #include "utlist.h"
 
 #include "common/errors.h"
-#include "common/model/transaction.h"
 #include "common/network/endpoint.h"
 #include "common/trinary/bytes.h"
 #include "common/trinary/flex_trit.h"
 #include "gossip/conf.h"
 
+/**
+ * The IOTA gossip protocol exchange packet that contains:
+ * - A transaction encoded in bytes
+ * - A request hash encoded in bytes
+ * - An endpoint containing information related to the packet sender
+ */
 typedef struct iota_packet_s {
   byte_t content[PACKET_SIZE];
   endpoint_t source;
 } iota_packet_t;
 
+/**
+ * A queue of packet used to dispatch packets in different threads.
+ * Not concurrent by default.
+ */
 typedef struct iota_packet_queue_entry_s {
   iota_packet_t packet;
   struct iota_packet_queue_entry_s* next;
@@ -35,42 +44,97 @@ extern "C" {
 #endif
 
 /**
- * Fills a packet except the content part
- *
- * @param packet The packet
- * @param ip The endpoint ip
- * @param port The endpoint port
- * @param protocol The endpoint protocol
- */
-void iota_packet_build(iota_packet_t* const packet, char const* const ip,
-                       uint16_t const port, protocol_type_t const protocol);
-
-/**
- * Fills the transaction part of a packet content
+ * Sets the transaction of a packet
  *
  * @param packet The packet
  * @param transaction The transaction flex trits
+ *
+ * @return a status code
  */
 retcode_t iota_packet_set_transaction(iota_packet_t* const packet,
                                       flex_trit_t const* const transaction);
 
 /**
- * Fills the request part of a packet content
+ * Sets the request of a packet
  *
  * @param packet The packet
  * @param request The request flex trits
  * @param mwm The minimum weigth magnitude
+ *
+ * @return a status code
  */
 retcode_t iota_packet_set_request(iota_packet_t* const packet,
                                   flex_trit_t const* const request,
                                   uint8_t mwm);
 
+/**
+ * Sets the endpoint of a packet
+ *
+ * @param packet The packet
+ * @param ip The endpoint ip
+ * @param port The endpoint port
+ * @param protocol The endpoint protocol
+ *
+ * @return a status code
+ */
+retcode_t iota_packet_set_endpoint(iota_packet_t* const packet,
+                                   char const* const ip, uint16_t const port,
+                                   protocol_type_t const protocol);
+
+/**
+ * Tells whether a packet queue is empty or not
+ *
+ * @param queue The packet queue
+ *
+ * @return true if empty, false otherwise
+ */
 bool iota_packet_queue_empty(iota_packet_queue_t const queue);
-size_t iota_packet_queue_count(iota_packet_queue_t const* const queue);
+
+/**
+ * Gets the size of a packet queue
+ *
+ * @param queue The packet queue
+ *
+ * @return the size of the packet queue
+ */
+size_t iota_packet_queue_count(iota_packet_queue_t const queue);
+
+/**
+ * Pushes a packet to a packet queue
+ *
+ * @param queue The packet queue
+ * @param packet The packet
+ *
+ * @return a status code
+ */
 retcode_t iota_packet_queue_push(iota_packet_queue_t* const queue,
                                  iota_packet_t const* const packet);
+
+/**
+ * Pops a packet from a packet queue
+ *
+ * @param queue The packet queue
+ *
+ * @return a status code
+ */
 void iota_packet_queue_pop(iota_packet_queue_t* const queue);
+
+/**
+ * Peeks a packet from a packet queue
+ *
+ * @param queue The packet queue
+ *
+ * @return the packet
+ */
 iota_packet_t* iota_packet_queue_peek(iota_packet_queue_t const queue);
+
+/**
+ * Frees a packet queue
+ *
+ * @param queue The packet queue
+ *
+ * @return a status code
+ */
 void iota_packet_queue_free(iota_packet_queue_t* const queue);
 
 #ifdef __cplusplus

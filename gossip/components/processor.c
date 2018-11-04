@@ -359,7 +359,7 @@ size_t processor_size(processor_state_t *const processor) {
   }
 
   rw_lock_handle_rdlock(&processor->lock);
-  size = iota_packet_queue_count(&processor->queue);
+  size = iota_packet_queue_count(processor->queue);
   rw_lock_handle_unlock(&processor->lock);
 
   return size;
