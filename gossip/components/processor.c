@@ -11,10 +11,10 @@
 #include "common/storage/sql/defs.h"
 #include "gossip/components/processor.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
-#include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_LOGGER_ID "processor"
+#define PROCESSOR_TIMEOUT_SEC 5
 
 /*
  * Private functions
@@ -214,20 +214,39 @@ static retcode_t process_packet(processor_state_t const *const processor,
 }
 
 static void *processor_routine(processor_state_t *const processor) {
-  iota_packet_t packet;
+  iota_packet_t *packet = NULL;
 
   if (processor == NULL) {
     return NULL;
   }
 
+  lock_handle_t lock_cond;
+  lock_handle_init(&lock_cond);
+  lock_handle_lock(&lock_cond);
+
   while (processor->running) {
-    if (CQ_POP(processor->queue, &packet) == CQ_SUCCESS) {
-      log_debug(PROCESSOR_LOGGER_ID, "Processing packet\n");
-      if (process_packet(processor, &packet)) {
-        log_warning(PROCESSOR_LOGGER_ID, "Processing packet failed\n");
-      }
+    fprintf(stderr, "%d\n", processor_size(processor));
+    if (processor_size(processor) == 0) {
+      cond_handle_timedwait(&processor->cond, &lock_cond,
+                            PROCESSOR_TIMEOUT_SEC);
     }
+
+    rw_lock_handle_wrlock(&processor->lock);
+    packet = iota_packet_queue_peek(processor->queue);
+    if (packet == NULL) {
+      rw_lock_handle_unlock(&processor->lock);
+      continue;
+    }
+    log_debug(PROCESSOR_LOGGER_ID, "Processing packet\n");
+    if (process_packet(processor, packet)) {
+      log_warning(PROCESSOR_LOGGER_ID, "Processing packet failed\n");
+    }
+    iota_packet_queue_pop(&processor->queue);
+    rw_lock_handle_unlock(&processor->lock);
   }
+
+  lock_handle_unlock(&lock_cond);
+  lock_handle_destroy(&lock_cond);
   return NULL;
 }
 
@@ -246,15 +265,12 @@ retcode_t processor_init(processor_state_t *const processor, node_t *const node,
   logger_helper_init(PROCESSOR_LOGGER_ID, LOGGER_DEBUG, true);
   memset(processor, 0, sizeof(processor_state_t));
   processor->running = false;
+  processor->queue = NULL;
   processor->node = node;
   processor->tangle = tangle;
   processor->transaction_validator = transaction_validator;
-
-  log_debug(PROCESSOR_LOGGER_ID, "Initializing processor queue\n");
-  if (CQ_INIT(iota_packet_t, processor->queue) != CQ_SUCCESS) {
-    log_critical(PROCESSOR_LOGGER_ID, "Initializing processor queue failed\n");
-    return RC_PROCESSOR_FAILED_INIT_QUEUE;
-  }
+  rw_lock_handle_init(&processor->lock);
+  cond_handle_init(&processor->cond);
 
   return RC_OK;
 }
@@ -271,20 +287,6 @@ retcode_t processor_start(processor_state_t *const processor) {
                            processor) != 0) {
     log_critical(PROCESSOR_LOGGER_ID, "Spawning processor thread failed\n");
     return RC_FAILED_THREAD_SPAWN;
-  }
-  return RC_OK;
-}
-
-retcode_t processor_on_next(processor_state_t *const processor,
-                            iota_packet_t const packet) {
-  if (processor == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  if (CQ_PUSH(processor->queue, packet) != CQ_SUCCESS) {
-    log_warning(PROCESSOR_LOGGER_ID,
-                "Adding packet to processor queue failed\n");
-    return RC_PROCESSOR_FAILED_ADD_QUEUE;
   }
   return RC_OK;
 }
@@ -316,10 +318,49 @@ retcode_t processor_destroy(processor_state_t *const processor) {
     return RC_PROCESSOR_STILL_RUNNING;
   }
 
-  log_debug(PROCESSOR_LOGGER_ID, "Destroying processor queue\n");
-  if (CQ_DESTROY(iota_packet_t, processor->queue) != CQ_SUCCESS) {
-    log_error(PROCESSOR_LOGGER_ID, "Destroying processor queue failed\n");
-    ret = RC_PROCESSOR_FAILED_DESTROY_QUEUE;
-  }
+  rw_lock_handle_destroy(&processor->lock);
+  cond_handle_destroy(&processor->cond);
+  logger_helper_destroy(PROCESSOR_LOGGER_ID);
+
   return ret;
+}
+
+retcode_t processor_on_next(processor_state_t *const processor,
+                            iota_packet_t const packet) {
+  retcode_t ret = RC_OK;
+
+  if (processor == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  rw_lock_handle_wrlock(&processor->lock);
+  ret = iota_packet_queue_push(&processor->queue, &packet);
+  rw_lock_handle_unlock(&processor->lock);
+
+  fprintf(stderr, "%d\n", ret);
+
+  if (ret != RC_OK) {
+    log_warning(PROCESSOR_LOGGER_ID,
+                "Pushing packet to processor queue failed\n");
+    return RC_PROCESSOR_FAILED_ADD_QUEUE;
+  } else {
+    fprintf(stderr, "SIGNAL\n");
+    cond_handle_signal(&processor->cond);
+  }
+
+  return ret;
+}
+
+size_t processor_size(processor_state_t *const processor) {
+  size_t size = 0;
+
+  if (processor == NULL) {
+    return 0;
+  }
+
+  rw_lock_handle_rdlock(&processor->lock);
+  size = iota_packet_queue_count(&processor->queue);
+  rw_lock_handle_unlock(&processor->lock);
+
+  return size;
 }

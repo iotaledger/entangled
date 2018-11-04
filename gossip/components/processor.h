@@ -12,18 +12,23 @@
 
 #include "common/errors.h"
 #include "consensus/transaction_validator/transaction_validator.h"
+#include "gossip/iota_packet.h"
+#include "utils/handles/cond.h"
+#include "utils/handles/lock.h"
+#include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
 typedef struct concurrent_queue_iota_packet_t_s processor_queue_t;
-typedef struct iota_packet_s iota_packet_t;
 typedef struct node_s node_t;
 typedef struct tangle_s tangle_t;
 
 typedef struct processor_state_s {
   thread_handle_t thread;
   bool running;
-  processor_queue_t *queue;
+  iota_packet_queue_t queue;
+  rw_lock_handle_t lock;
+  cond_handle_t cond;
   node_t *node;
   tangle_t *tangle;
   transaction_validator_t *transaction_validator;
@@ -56,17 +61,6 @@ retcode_t processor_init(processor_state_t *const state, node_t *const node,
 retcode_t processor_start(processor_state_t *const state);
 
 /**
- * Adds a packet to a processor queue
- *
- * @param state The processor state
- * @param packet The packet
- *
- * @return a status code
- */
-retcode_t processor_on_next(processor_state_t *const state,
-                            iota_packet_t const packet);
-
-/**
  * Stops a processor
  *
  * @param state The processor state
@@ -83,6 +77,26 @@ retcode_t processor_stop(processor_state_t *const state);
  * @return a status code
  */
 retcode_t processor_destroy(processor_state_t *const state);
+
+/**
+ * Adds a packet to a processor queue
+ *
+ * @param state The processor state
+ * @param packet The packet
+ *
+ * @return a status code
+ */
+retcode_t processor_on_next(processor_state_t *const state,
+                            iota_packet_t const packet);
+
+/**
+ * Gets the size of the processor queue
+ *
+ * @param processor The processor
+ *
+ * @return a status code
+ */
+size_t processor_size(processor_state_t *const processor);
 
 #ifdef __cplusplus
 }

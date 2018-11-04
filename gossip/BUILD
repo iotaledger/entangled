@@ -39,6 +39,7 @@ cc_library(
         "//common/model:transaction",
         "//common/network:endpoint",
         "//common/trinary:bytes",
+        "@com_github_uthash//:uthash",
     ],
 )
 

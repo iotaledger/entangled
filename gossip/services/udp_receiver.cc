@@ -8,7 +8,6 @@
 #include "gossip/services/udp_receiver.hpp"
 #include "gossip/node.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
-#include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/logger_helper.h"
 
 #define UDP_RECEIVER_SERVICE_LOGGER_ID "udp_receiver_service"
@@ -58,7 +57,7 @@ bool UdpReceiverService::handlePacket(endpoint_t* const endpoint,
   log_debug(UDP_RECEIVER_SERVICE_LOGGER_ID,
             "Packet received from tethered neighbor udp://%s:%d\n",
             endpoint->host, endpoint->port);
-  if (CQ_PUSH(service_->queue, packet_) != CQ_SUCCESS) {
+  if (processor_on_next(service_->processor, packet_) != RC_OK) {
     return false;
   }
   return true;
