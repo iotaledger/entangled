@@ -59,13 +59,13 @@ retcode_t iota_packet_set_transaction(iota_packet_t* const packet,
  *
  * @param packet The packet
  * @param request The request flex trits
- * @param mwm The minimum weigth magnitude
+ * @param request_size The size of the request hash in trits
  *
  * @return a status code
  */
 retcode_t iota_packet_set_request(iota_packet_t* const packet,
                                   flex_trit_t const* const request,
-                                  uint8_t mwm);
+                                  uint8_t request_size);
 
 /**
  * Sets the endpoint of a packet

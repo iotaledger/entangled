@@ -28,14 +28,14 @@ retcode_t iota_packet_set_transaction(iota_packet_t *const packet,
 
 retcode_t iota_packet_set_request(iota_packet_t *const packet,
                                   flex_trit_t const *const request,
-                                  uint8_t mwm) {
+                                  uint8_t request_size) {
   if (packet == NULL || request == NULL) {
     return RC_NULL_PARAM;
   }
 
-  if (flex_trits_to_bytes(packet->content + PACKET_TX_SIZE,
-                          HASH_LENGTH_TRIT - mwm, request, HASH_LENGTH_TRIT,
-                          HASH_LENGTH_TRIT - mwm) != (HASH_LENGTH_TRIT - mwm)) {
+  if (flex_trits_to_bytes(packet->content + PACKET_TX_SIZE, request_size,
+                          request, HASH_LENGTH_TRIT,
+                          request_size) != request_size) {
     return RC_GOSSIP_SET_PACKET_REQUEST_FAILED;
   }
 
