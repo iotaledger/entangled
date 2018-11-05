@@ -156,10 +156,11 @@ static retcode_t process_request_bytes(processor_t const *const processor,
   }
 
   // Retreives the request hash from the packet
+  uint8_t mwm = processor->node->conf.mwm;
   if (flex_trits_from_bytes(request_hash->trits, HASH_LENGTH_TRIT,
                             packet->content + PACKET_TX_SIZE,
-                            REQUEST_HASH_SIZE_TRITS, REQUEST_HASH_SIZE_TRITS) !=
-      REQUEST_HASH_SIZE_TRITS) {
+                            HASH_LENGTH_TRIT - mwm, HASH_LENGTH_TRIT - mwm) !=
+      (HASH_LENGTH_TRIT - mwm)) {
     log_warning(PROCESSOR_LOGGER_ID, "Invalid request bytes\n");
     return RC_PROCESSOR_INVALID_REQUEST;
   }
