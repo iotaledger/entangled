@@ -25,7 +25,14 @@ cc_library(
 cc_library(
     name = "processor_shared",
     hdrs = ["processor.h"],
-    deps = ["//utils/handles:thread"],
+    deps = [
+        "//consensus/transaction_solidifier",
+        "//consensus/transaction_validator",
+        "//utils/handles:cond",
+        "//utils/handles:lock",
+        "//utils/handles:rw_lock",
+        "//utils/handles:thread",
+    ],
 )
 
 cc_library(
@@ -33,9 +40,8 @@ cc_library(
     srcs = ["processor.c"],
     deps = [
         ":processor_shared",
-        "//ciri:core_shared",
+        "//gossip:node_shared",
         "//utils/containers/lists:concurrent_list_neighbor",
-        "//utils/containers/queues:concurrent_queue_packet",
     ],
 )
 
@@ -83,7 +89,6 @@ cc_library(
         ":responder_shared",
         "//ciri:core_shared",
         "//gossip:neighbor_shared",
-        "//utils/containers/queues:concurrent_queue_packet",
         "//utils/containers/queues:concurrent_queue_transaction_request",
     ],
 )

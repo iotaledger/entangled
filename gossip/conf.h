@@ -15,7 +15,6 @@
 
 #define PACKET_TX_SIZE 1604
 #define PACKET_SIZE (PACKET_TX_SIZE + REQUEST_HASH_SIZE)
-#define REQUEST_HASH_SIZE_TRITS (REQUEST_HASH_SIZE * NUMBER_OF_TRITS_IN_A_BYTE)
 
 #define DEFAULT_UDP_RECEIVER_PORT 14600
 #define DEFAULT_TCP_RECEIVER_PORT 15600
@@ -38,6 +37,8 @@ typedef struct iota_gossip_conf_s {
   // Number of trailing ternary 0s that must appear at the end of a transaction
   // hash. Difficulty can be described as 3^mwm
   uint8_t mwm;
+  // Size of the request hash in trits, equivalent to HASH_LENGTH_TRIT - mwm.
+  uint8_t request_hash_size_trit;
   // URIs of neighbouring nodes, separated by a space
   char* neighbors;
   // Probability of sending a current milestone request to a neighbour. Value

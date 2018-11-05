@@ -115,6 +115,8 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
       // Gossip configuration
       case CLI_ARG_MWM:  // --mwm
         gossip_conf->mwm = atoi(optarg);
+        gossip_conf->request_hash_size_trit =
+            HASH_LENGTH_TRIT - gossip_conf->mwm;
         consensus_conf->mwm = atoi(optarg);
         break;
       case 'n':  // --neighbors

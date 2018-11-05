@@ -23,21 +23,17 @@ retcode_t receiver_init(receiver_state_t *const state, node_t *const node,
 
   logger_helper_init(RECEIVER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
   memset(state, 0, sizeof(receiver_state_t));
-  if (node->processor.queue == NULL) {
-    log_critical(RECEIVER_COMPONENT_LOGGER_ID, "Processor not initialized\n");
-    return RC_RECEIVER_COMPONENT_INVALID_PROCESSOR;
-  }
   state->running = false;
   state->tcp_service.port = tcp_port;
   state->tcp_service.protocol = PROTOCOL_TCP;
   state->tcp_service.state = state;
-  state->tcp_service.queue = node->processor.queue;
+  state->tcp_service.processor = &node->processor;
   state->tcp_service.context = NULL;
   state->tcp_service.opaque_socket = NULL;
   state->udp_service.port = udp_port;
   state->udp_service.protocol = PROTOCOL_UDP;
   state->udp_service.state = state;
-  state->udp_service.queue = node->processor.queue;
+  state->udp_service.processor = &node->processor;
   state->udp_service.context = NULL;
   state->udp_service.opaque_socket = NULL;
   state->node = node;

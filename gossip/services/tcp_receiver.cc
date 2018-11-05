@@ -8,7 +8,6 @@
 #include "gossip/services/tcp_receiver.hpp"
 #include "gossip/node.h"
 #include "utils/containers/lists/concurrent_list_neighbor.h"
-#include "utils/containers/queues/concurrent_queue_packet.h"
 #include "utils/logger_helper.h"
 
 #define TCP_RECEIVER_SERVICE_LOGGER_ID "tcp_receiver_service"
@@ -68,12 +67,12 @@ bool TcpConnection::handlePacket(std::size_t const length) {
   if (length != PACKET_SIZE) {
     return false;
   }
-  iota_packet_build(&packet_, neighbor_->endpoint.ip, neighbor_->endpoint.port,
-                    PROTOCOL_TCP);
+  iota_packet_set_endpoint(&packet_, neighbor_->endpoint.ip,
+                           neighbor_->endpoint.port, PROTOCOL_TCP);
   log_debug(TCP_RECEIVER_SERVICE_LOGGER_ID,
             "Packet received from tethered neighbor tcp://%s:%d\n",
             neighbor_->endpoint.host, neighbor_->endpoint.port);
-  if (CQ_PUSH(service_->queue, packet_) != CQ_SUCCESS) {
+  if (processor_on_next(service_->processor, packet_) != RC_OK) {
     return false;
   }
   return true;

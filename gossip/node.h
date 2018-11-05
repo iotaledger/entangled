@@ -28,7 +28,7 @@ typedef struct node_s {
   bool running;
   core_t* core;
   broadcaster_t broadcaster;
-  processor_state_t processor;
+  processor_t processor;
   receiver_state_t receiver;
   responder_state_t responder;
   requester_state_t transaction_requester;
