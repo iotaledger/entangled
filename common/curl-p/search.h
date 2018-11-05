@@ -12,9 +12,17 @@
 #include "common/curl-p/ptrit.h"
 #include "common/curl-p/trit.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 PearlDiverStatus pd_search(Curl *const ctx, unsigned short const offset,
                            unsigned short const end,
                            short (*test)(PCurl *const, unsigned short const),
                            unsigned short const param);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

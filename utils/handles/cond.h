@@ -8,6 +8,10 @@
 #ifndef __UTILS_HANDLES_COND_H__
 #define __UTILS_HANDLES_COND_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * We define a type cond_handle_t mapping to a system available condition
  * variable primitive and its associated functions, some of them might have no
@@ -157,5 +161,9 @@ static inline int cond_handle_timedwait(cond_handle_t* const cond,
  * @return exit status
  */
 static inline int cond_handle_destroy(cond_handle_t* const cond);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __UTILS_HANDLES_COND_H__

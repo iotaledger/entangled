@@ -8,6 +8,10 @@
 #ifndef __UTILS_HANDLES_RW_LOCK_H__
 #define __UTILS_HANDLES_RW_LOCK_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * We define a type rw_lock_handle_t mapping to a system available read/write
  * lock primitive and its associated functions, some of them might have no
@@ -130,5 +134,9 @@ static inline int rw_lock_handle_unlock(rw_lock_handle_t* const lock);
  * @return exit status
  */
 static inline int rw_lock_handle_destroy(rw_lock_handle_t* const lock);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __UTILS_HANDLES_RW_LOCK_H__

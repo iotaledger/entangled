@@ -17,7 +17,16 @@ typedef enum {
   HEAD,
 } SearchType;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 PearlDiverStatus hashcash(Curl *const ctx, SearchType const type,
                           unsigned short const offset, unsigned short const end,
                           unsigned short const min_weight);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

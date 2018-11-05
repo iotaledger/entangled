@@ -13,7 +13,15 @@
 #define HASH_PREFIX kerl
 #define HASH_STATE Kerl
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "iss.h.inc"
+
+#ifdef __cplusplus
+}
+#endif
 
 #undef HASH_PREFIX
 #undef HASH_STATE
