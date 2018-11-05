@@ -20,7 +20,7 @@
  * The IOTA gossip protocol exchange packet that contains:
  * - A transaction encoded in bytes
  * - A request hash encoded in bytes
- * - An endpoint containing information related to the packet sender
+ * - A metadata endpoint containing information related to the packet sender
  */
 typedef struct iota_packet_s {
   byte_t content[PACKET_SIZE];

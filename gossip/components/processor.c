@@ -36,6 +36,13 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
                                            iota_packet_t const *const packet,
                                            flex_trit_t *const hash) {
   retcode_t ret = RC_OK;
+  bool exists = false;
+  struct _iota_transaction transaction = {.snapshot_index = 0, .solid = 0};
+  flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
+  trit_array_t key = {.trits = hash,
+                      .num_trits = HASH_LENGTH_TRIT,
+                      .num_bytes = FLEX_TRIT_SIZE_243,
+                      .dynamic = 0};
 
   if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
     return RC_NULL_PARAM;
@@ -43,88 +50,76 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
 
   // TODO Check if transaction hash is cached
 
-  if (false) {
-  } else {
-    bool exists = false;
-    struct _iota_transaction transaction = {.snapshot_index = 0, .solid = 0};
-    flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
-    trit_array_t key = {.trits = hash,
-                        .num_trits = HASH_LENGTH_TRIT,
-                        .num_bytes = FLEX_TRIT_SIZE_243,
-                        .dynamic = 0};
+  // Retreives the transaction from the packet
+  if (flex_trits_from_bytes(transaction_flex_trits,
+                            NUM_TRITS_SERIALIZED_TRANSACTION, packet->content,
+                            NUM_TRITS_SERIALIZED_TRANSACTION,
+                            NUM_TRITS_SERIALIZED_TRANSACTION) !=
+      NUM_TRITS_SERIALIZED_TRANSACTION) {
+    log_warning(PROCESSOR_LOGGER_ID, "Invalid transaction bytes\n");
+    ret = RC_PROCESSOR_INVALID_TRANSACTION;
+    goto failure;
+  }
 
-    // Retreives the transaction from the packet
-    if (flex_trits_from_bytes(transaction_flex_trits,
-                              NUM_TRITS_SERIALIZED_TRANSACTION, packet->content,
-                              NUM_TRITS_SERIALIZED_TRANSACTION,
-                              NUM_TRITS_SERIALIZED_TRANSACTION) !=
-        NUM_TRITS_SERIALIZED_TRANSACTION) {
-      log_warning(PROCESSOR_LOGGER_ID, "Invalid transaction bytes\n");
-      ret = RC_PROCESSOR_INVALID_TRANSACTION;
+  // Deserializes the transaction
+  if (transaction_deserialize_from_trits(&transaction,
+                                         transaction_flex_trits) !=
+      NUM_TRITS_SERIALIZED_TRANSACTION) {
+    log_warning(PROCESSOR_LOGGER_ID, "Deserializing transaction failed\n");
+    ret = RC_PROCESSOR_INVALID_TRANSACTION;
+    goto failure;
+  }
+
+  // Validates the transaction
+  if (!iota_consensus_transaction_validate(processor->transaction_validator,
+                                           &transaction)) {
+    log_warning(PROCESSOR_LOGGER_ID, "Invalid transaction\n");
+    ret = RC_PROCESSOR_INVALID_TRANSACTION;
+    goto failure;
+  }
+
+  // TODO Add transaction hash to cache
+
+  memcpy(hash, transaction.hash, FLEX_TRIT_SIZE_243);
+
+  // Checks if the transaction is already persisted
+  if ((ret = iota_tangle_transaction_exist(
+           processor->tangle, TRANSACTION_FIELD_HASH, &key, &exists)) !=
+      RC_OK) {
+    log_warning(PROCESSOR_LOGGER_ID, "Checking if transaction exists failed\n");
+    goto failure;
+  }
+
+  if (!exists) {
+    // Stores the new transaction
+    log_debug(PROCESSOR_LOGGER_ID, "Storing new transaction\n");
+    if ((ret = iota_tangle_transaction_store(processor->tangle,
+                                             &transaction)) != RC_OK) {
+      log_warning(PROCESSOR_LOGGER_ID, "Storing new transaction failed\n");
       goto failure;
     }
 
-    // Deserializes th transaction
-    if (transaction_deserialize_from_trits(&transaction,
-                                           transaction_flex_trits) !=
-        NUM_TRITS_SERIALIZED_TRANSACTION) {
-      log_warning(PROCESSOR_LOGGER_ID, "Deserializing transaction failed\n");
-      ret = RC_PROCESSOR_INVALID_TRANSACTION;
-      goto failure;
-    }
-
-    // Validates the transaction
-    if (!iota_consensus_transaction_validate(processor->transaction_validator,
-                                             &transaction)) {
-      log_warning(PROCESSOR_LOGGER_ID, "Invalid transaction\n");
-      ret = RC_PROCESSOR_INVALID_TRANSACTION;
-      goto failure;
-    }
-
-    // TODO Add transaction hash to cache
-
-    memcpy(hash, transaction.hash, FLEX_TRIT_SIZE_243);
-
-    // Checks if the transaction is already persisted
-    if ((ret = iota_tangle_transaction_exist(
-             processor->tangle, TRANSACTION_FIELD_HASH, &key, &exists)) !=
-        RC_OK) {
+    // Checks solidity of the transaction
+    if ((ret =
+             iota_consensus_transaction_solidifier_check_and_update_solid_state(
+                 processor->transaction_solidifier, hash)) != RC_OK) {
       log_warning(PROCESSOR_LOGGER_ID,
-                  "Checking if transaction exists failed\n");
+                  "Checking transaction solidity failed\n");
+      return ret;
+    }
+
+    // TODO Store transaction metadata
+
+    // Broadcast the new transaction
+    log_debug(PROCESSOR_LOGGER_ID, "Propagating packet to broadcaster\n");
+    if ((ret = broadcaster_on_next(&processor->node->broadcaster,
+                                   transaction_flex_trits)) != RC_OK) {
+      log_warning(PROCESSOR_LOGGER_ID,
+                  "Propagating packet to broadcaster failed\n");
       goto failure;
     }
 
-    if (!exists) {
-      // Stores the new transaction
-      log_debug(PROCESSOR_LOGGER_ID, "Storing new transaction\n");
-      if ((ret = iota_tangle_transaction_store(processor->tangle,
-                                               &transaction)) != RC_OK) {
-        log_warning(PROCESSOR_LOGGER_ID, "Storing new transaction failed\n");
-        goto failure;
-      }
-
-      // Checks solidity of the transaction
-      if ((ret =
-               iota_consensus_transaction_solidifier_check_and_update_solid_state(
-                   processor->transaction_solidifier, hash)) != RC_OK) {
-        log_warning(PROCESSOR_LOGGER_ID,
-                    "Checking transaction solidity failed\n");
-        return ret;
-      }
-
-      // TODO Store transaction metadata
-
-      // Broadcast the new transaction
-      log_debug(PROCESSOR_LOGGER_ID, "Propagating packet to broadcaster\n");
-      if ((ret = broadcaster_on_next(&processor->node->broadcaster,
-                                     transaction_flex_trits)) != RC_OK) {
-        log_warning(PROCESSOR_LOGGER_ID,
-                    "Propagating packet to broadcaster failed\n");
-        goto failure;
-      }
-
-      neighbor->nbr_new_tx++;
-    }
+    neighbor->nbr_new_tx++;
   }
 
   return ret;
