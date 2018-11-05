@@ -344,6 +344,32 @@ static retcode_t hash81_queue_to_json_array(hash81_queue_t queue,
   return RC_OK;
 }
 
+static retcode_t json_array_to_hash8019_queue(cJSON const* const obj,
+                                              char const* const obj_name,
+                                              hash8019_queue_t* queue) {
+  retcode_t ret_code = RC_OK;
+  cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
+  if (cJSON_IsArray(json_item)) {
+    cJSON* current_obj = NULL;
+    cJSON_ArrayForEach(current_obj, json_item) {
+      if (current_obj->valuestring != NULL) {
+        trit_array_p tmp_ref =
+            trit_array_new_from_trytes((tryte_t*)current_obj->valuestring);
+        ret_code = hash8019_queue_push(queue, tmp_ref->trits);
+        trit_array_free(tmp_ref);
+        if (ret_code) {
+          return ret_code;
+        }
+      }
+    }
+  } else {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_PARSE);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+  return ret_code;
+}
+
 retcode_t json_find_transactions_serialize_request(
     serializer_t const* const s, find_transactions_req_t const* const obj,
     char_buffer_t* out) {
@@ -1050,7 +1076,7 @@ retcode_t json_get_trytes_serialize_request(const serializer_t* const s,
 
   cJSON_AddItemToObject(json_root, "command", cJSON_CreateString("getTrytes"));
 
-  ret = flex_hash_array_to_json_array(req->hashes, json_root, "hashes");
+  ret = hash243_queue_to_json_array(req->hashes, json_root, "hashes");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;
@@ -1092,9 +1118,7 @@ retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
   }
-
-  res->trytes = json_array_to_flex_hash_array(json_obj, "trytes", res->trytes);
-
+  ret = json_array_to_hash8019_queue(json_obj, "trytes", &res->trytes);
   cJSON_Delete(json_obj);
   return ret;
 }

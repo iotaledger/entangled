@@ -16,13 +16,13 @@ extern "C" {
 
 typedef struct get_trytes_req_s {
   /* List of tx hashes for which request should get trytes */
-  flex_hash_array_t* hashes;
+  hash243_queue_t hashes;
 } get_trytes_req_t;
 
 get_trytes_req_t* get_trytes_req_new();
 void get_trytes_req_free(get_trytes_req_t** const req);
-get_trytes_req_t* get_trytes_req_add_hash(get_trytes_req_t* const req,
-                                          tryte_t const* const hash);
+retcode_t get_trytes_req_add_hash(get_trytes_req_t* const req,
+                                  flex_trit_t const* const hash);
 
 #ifdef __cplusplus
 }

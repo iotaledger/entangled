@@ -49,18 +49,20 @@ void test_get_trytes_not_found(void) {
 
   api.conf.max_get_trytes = 100;
 
-  get_trytes_req_add_hash(req, NULL_HASH);
+  trit_array_p null_hash = trit_array_new_from_trytes(NULL_HASH);
+  TEST_ASSERT(get_trytes_req_add_hash(req, null_hash->trits) == RC_OK);
 
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
   TEST_ASSERT_EQUAL_INT(get_trytes_res_trytes_num(res), 1);
 
   flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION,
-                       get_trytes_res_trytes_at(res, 0)->trits,
+                       get_trytes_res_trytes_at(res, 0),
                        NUM_TRITS_SERIALIZED_TRANSACTION,
                        NUM_TRITS_SERIALIZED_TRANSACTION);
   TEST_ASSERT_EQUAL_MEMORY(tx_trytes, NULL_TX_TRYTES,
                            NUM_TRYTES_SERIALIZED_TRANSACTION);
 
+  trit_array_free(null_hash);
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
   TEST_ASSERT(req == NULL);
@@ -83,10 +85,14 @@ void test_get_trytes_max(void) {
 
   // Getting trytes 1 & 2 from hashes
 
-  get_trytes_req_add_hash(req, TX_1_OF_4_HASH);
-  get_trytes_req_add_hash(req, TX_2_OF_4_HASH);
+  trit_array_p tx1_hash = trit_array_new_from_trytes(TX_1_OF_4_HASH);
+  trit_array_p tx2_hash = trit_array_new_from_trytes(TX_2_OF_4_HASH);
+  TEST_ASSERT(get_trytes_req_add_hash(req, tx1_hash->trits) == RC_OK);
+  TEST_ASSERT(get_trytes_req_add_hash(req, tx2_hash->trits) == RC_OK);
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_API_MAX_GET_TRYTES);
 
+  trit_array_free(tx1_hash);
+  trit_array_free(tx2_hash);
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
   TEST_ASSERT(req == NULL);
@@ -104,30 +110,34 @@ void test_get_trytes(void) {
   tryte_t const *const hashes_trytes[4] = {TX_1_OF_4_HASH, TX_2_OF_4_HASH,
                                            TX_3_OF_4_HASH, TX_4_OF_4_HASH};
   tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION];
+  hash8019_queue_entry_t *iter = NULL;
+  size_t tx_index = 0;
 
   api.conf.max_get_trytes = 100;
 
   // Storing transactions to get trytes from
 
   transactions_deserialize(txs_trytes, txs, 4);
-  build_tangle(&api.consensus->tangle, txs, 4);
+  TEST_ASSERT(build_tangle(&api.consensus->tangle, txs, 4) == RC_OK);
 
   // Loading trytes from hashes
 
   for (size_t i = 0; i < 4; i++) {
-    get_trytes_req_add_hash(req, hashes_trytes[i]);
+    trit_array_p tmp_hash = trit_array_new_from_trytes(hashes_trytes[i]);
+    TEST_ASSERT(get_trytes_req_add_hash(req, tmp_hash->trits) == RC_OK);
+    trit_array_free(tmp_hash);
   }
 
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
   TEST_ASSERT_EQUAL_INT(get_trytes_res_trytes_num(res), 4);
 
-  for (size_t i = 0; i < 4; i++) {
+  CDL_FOREACH(res->trytes, iter) {
     flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION,
-                         get_trytes_res_trytes_at(res, i)->trits,
-                         NUM_TRITS_SERIALIZED_TRANSACTION,
+                         iter->hash, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRITS_SERIALIZED_TRANSACTION);
-    TEST_ASSERT_EQUAL_MEMORY(tx_trytes, txs_trytes[i],
+    TEST_ASSERT_EQUAL_MEMORY(tx_trytes, txs_trytes[tx_index],
                              NUM_TRYTES_SERIALIZED_TRANSACTION);
+    tx_index++;
   }
 
   get_trytes_req_free(&req);

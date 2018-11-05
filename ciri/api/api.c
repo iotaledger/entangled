@@ -130,33 +130,40 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
                               get_trytes_req_t const *const req,
                               get_trytes_res_t *const res) {
   retcode_t ret = RC_OK;
-  flex_hash_array_t *iter = NULL;
+  hash243_queue_entry_t *iter = NULL;
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
-  tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
+  trit_array_p tmp_trits = NULL;
+
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
 
-  if (flex_hash_array_count(req->hashes) > api->conf.max_get_trytes) {
+  if (hash243_queue_count(&req->hashes) > api->conf.max_get_trytes) {
     return RC_API_MAX_GET_TRYTES;
   }
-  LL_FOREACH(req->hashes, iter) {
+  CDL_FOREACH(req->hashes, iter) {
     hash_pack_reset(&pack);
+    // flex_trit to trit_array_p for iota_tangle_transaction_load
+    tmp_trits = trit_array_new_from_flex(iter->hash, NUM_TRITS_HASH,
+                                         FLEX_TRIT_SIZE_243);
+    if (!tmp_trits) {
+      return RC_API_NULL_POINTER;
+    }
     // NOTE Concurrency needs to be taken care of
     if ((ret = iota_tangle_transaction_load(&api->consensus->tangle,
-                                            TRANSACTION_FIELD_HASH, iter->hash,
+                                            TRANSACTION_FIELD_HASH, tmp_trits,
                                             &pack)) != RC_OK) {
+      trit_array_free(tmp_trits);
       return ret;
     }
+
     if (pack.num_loaded != 0) {
       transaction_serialize_on_flex_trits(txp, tx_trits);
-      flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION,
-                           tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                           NUM_TRITS_SERIALIZED_TRANSACTION);
     } else {
-      memset(tx_trytes, '9', NUM_TRYTES_SERIALIZED_TRANSACTION);
+      memset(tx_trits, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
     }
-    // TODO Remove when cclient uses hash containers
-    tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION] = '\0';
-    get_trytes_res_add_trytes(res, tx_trytes);
+
+    get_trytes_res_add_trytes(res, tx_trits);
+    trit_array_free(tmp_trits);
+    tmp_trits = NULL;
   }
   return ret;
 }

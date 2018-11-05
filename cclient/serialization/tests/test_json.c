@@ -350,13 +350,16 @@ void test_serialize_get_trytes(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   get_trytes_req_t* req = get_trytes_req_new();
-  get_trytes_req_add_hash(req, (tryte_t*)TEST_81_TRYRES_1);
+  trit_array_p tmp_hash =
+      trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_1);
+  TEST_ASSERT(get_trytes_req_add_hash(req, tmp_hash->trits) == RC_OK);
 
   serializer.vtable.get_trytes_serialize_request(&serializer, req,
                                                  serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
+  trit_array_free(tmp_hash);
   char_buffer_free(serializer_out);
   get_trytes_req_free(&req);
 }
@@ -368,14 +371,14 @@ void test_deserialize_get_trytes(void) {
       "{\"trytes\":["
       "\"" TEST_2673_TRYRES_1 "\"]}";
 
-  trit_array_p tmp_trytes = NULL;
+  flex_trit_t* tmp_trytes = NULL;
   trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_2673_TRYRES_1);
   get_trytes_res_t* res = get_trytes_res_new();
 
   serializer.vtable.get_trytes_deserialize_response(&serializer, json_text,
                                                     res);
   tmp_trytes = get_trytes_res_trytes_at(res, 0);
-  TEST_ASSERT_EQUAL_MEMORY(tmp_trytes->trits, hash1->trits, hash1->num_bytes);
+  TEST_ASSERT_EQUAL_MEMORY(tmp_trytes, hash1->trits, hash1->num_bytes);
   tmp_trytes = get_trytes_res_trytes_at(res, 1);
   TEST_ASSERT_NULL(tmp_trytes);
 

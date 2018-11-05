@@ -101,7 +101,8 @@ trit_t *trit_array_to_int8(trit_array_p const trit_array, trit_t *const trits,
 /// @return trit_array_p - the new trit_array
 trit_array_p trit_array_new(size_t const num_trits);
 trit_array_p trit_array_new_from_trytes(tryte_t const *const trytes);
-
+trit_array_p trit_array_new_from_flex(flex_trit_t const *const trits,
+                                      size_t num_trits, size_t num_bytes);
 /***********************************************************************************************************
  * Destructor
  ***********************************************************************************************************/
