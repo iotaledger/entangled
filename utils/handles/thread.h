@@ -8,6 +8,10 @@
 #ifndef __UTILS_HANDLES_THREAD_H__
 #define __UTILS_HANDLES_THREAD_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * We define a type thread_handle_t mapping to a system available thread
  * primitive and its associated functions, some of them might have no effect if
@@ -84,5 +88,9 @@ static inline int thread_handle_create(thread_handle_t *const thread,
  * @return exit status
  */
 static inline int thread_handle_join(thread_handle_t thread, void **status);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __UTILS_HANDLES_THREAD_H__

@@ -18,11 +18,19 @@ typedef struct {
   CurlType type;
 } BCurl;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void init_s_curl(BCurl *ctx);
 
 void s_transform(BCurl *);
 void s_curl_absorb(BCurl *, bct_t *const, size_t, size_t);
 void s_curl_squeeze(BCurl *, bct_t *const, size_t, size_t);
 void s_curl_reset(BCurl *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
