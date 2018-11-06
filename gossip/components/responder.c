@@ -15,6 +15,9 @@
 #define RESPONDER_LOGGER_ID "responder"
 
 static retcode_t random_tip_request(transaction_request_t *const request) {
+  if (request == NULL) {
+    return RC_NULL_PARAM;
+  }
   // TODO(thibault): Random tip request
   request->neighbor->nbr_random_tx_req++;
   return RC_OK;
@@ -25,8 +28,12 @@ static retcode_t regular_transaction_request(
     iota_transaction_t *const tx) {
   retcode_t ret = RC_OK;
 
+  if (processor == NULL || request == NULL || tx == NULL) {
+    return RC_NULL_PARAM;
+  }
+
   if ((*tx = transaction_new()) == NULL) {
-    return RC_RESPONDER_COMPONENT_OOM;
+    return RC_OOM;
   }
 
   iota_stor_pack_t pack = {.models = (void **)tx,
@@ -47,14 +54,9 @@ static retcode_t regular_transaction_request(
 static retcode_t get_transaction_for_request(
     responder_t *const processor, transaction_request_t *const request,
     iota_transaction_t *const tx) {
-  if (processor == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_STATE;
-  } else if (request == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_REQ;
-  } else if (request->neighbor == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_NEIGHBOR;
-  } else if (tx == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_TX;
+  if (processor == NULL || request == NULL || request->neighbor == NULL ||
+      tx == NULL) {
+    return RC_NULL_PARAM;
   }
 
   if (trit_array_is_null(request->hash)) {
@@ -70,12 +72,9 @@ static retcode_t reply_to_request(responder_t *const processor,
                                   iota_transaction_t const tx) {
   retcode_t ret = RC_OK;
 
-  if (processor == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_STATE;
-  } else if (request == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_REQ;
-  } else if (request->neighbor == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_NEIGHBOR;
+  if (processor == NULL || request == NULL || request->neighbor == NULL ||
+      tx == NULL) {
+    return RC_NULL_PARAM;
   }
 
   if (tx != NULL) {
@@ -128,10 +127,8 @@ static void *responder_routine(responder_t *const processor) {
 
 retcode_t responder_init(responder_t *const processor, node_t *const node,
                          tangle_t *const tangle) {
-  if (processor == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_STATE;
-  } else if (node == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_NODE;
+  if (processor == NULL || node == NULL || tangle == NULL) {
+    return RC_NULL_PARAM;
   }
 
   logger_helper_init(RESPONDER_LOGGER_ID, LOGGER_DEBUG, true);
@@ -151,7 +148,7 @@ retcode_t responder_init(responder_t *const processor, node_t *const node,
 
 retcode_t responder_start(responder_t *const processor) {
   if (processor == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   }
 
   log_info(RESPONDER_LOGGER_ID, "Spawning responder thread\n");
@@ -160,7 +157,7 @@ retcode_t responder_start(responder_t *const processor) {
                            (thread_routine_t)responder_routine,
                            processor) != 0) {
     log_critical(RESPONDER_LOGGER_ID, "Spawning responder thread failed\n");
-    return RC_RESPONDER_COMPONENT_FAILED_THREAD_SPAWN;
+    return RC_FAILED_THREAD_SPAWN;
   }
   return RC_OK;
 }
@@ -169,7 +166,7 @@ retcode_t responder_stop(responder_t *const processor) {
   retcode_t ret = RC_OK;
 
   if (processor == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   } else if (processor->running == false) {
     return RC_OK;
   }
@@ -178,7 +175,7 @@ retcode_t responder_stop(responder_t *const processor) {
   processor->running = false;
   if (thread_handle_join(processor->thread, NULL) != 0) {
     log_error(RESPONDER_LOGGER_ID, "Shutting down responder thread failed\n");
-    ret = RC_RESPONDER_COMPONENT_FAILED_THREAD_JOIN;
+    ret = RC_FAILED_THREAD_JOIN;
   }
   return ret;
 }
@@ -187,9 +184,9 @@ retcode_t responder_destroy(responder_t *const processor) {
   retcode_t ret = RC_OK;
 
   if (processor == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   } else if (processor->running) {
-    return RC_RESPONDER_COMPONENT_STILL_RUNNING;
+    return RC_STILL_RUNNING;
   }
 
   log_debug(RESPONDER_LOGGER_ID, "Destroying responder queue\n");
@@ -204,8 +201,8 @@ retcode_t responder_destroy(responder_t *const processor) {
 retcode_t responder_on_next(responder_t *const processor,
                             neighbor_t *const neighbor,
                             trit_array_p const hash) {
-  if (processor == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_STATE;
+  if (processor == NULL || neighbor == NULL || hash == NULL) {
+    return RC_NULL_PARAM;
   }
 
   if (CQ_PUSH(processor->queue, ((transaction_request_t){neighbor, hash})) !=
