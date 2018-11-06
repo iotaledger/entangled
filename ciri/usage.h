@@ -16,6 +16,7 @@ typedef enum cli_arg_value_e {
   // Gossip configuration
 
   CLI_ARG_MWM,
+  CLI_ARG_P_PROPAGATE_REQUEST,
   CLI_ARG_P_REMOVE_REQUEST,
   CLI_ARG_P_SELECT_MILESTONE,
 
@@ -60,6 +61,12 @@ static struct cli_argument_s {
      "transaction hash. Difficulty can be described as 3^mwm.",
      REQUIRED_ARG},
     {"neighbors", 'n', "URIs of neighbouring nodes, separated by a space.",
+     REQUIRED_ARG},
+    {"p-propagate-request", CLI_ARG_P_PROPAGATE_REQUEST,
+     "Probability of propagating the request of a transaction to a neighbor "
+     "node if it can't be found. This should be low since we don't want to "
+     "propagate non-existing transactions that spam the network. Value must be "
+     "in [0,1].",
      REQUIRED_ARG},
     {"p-remove-request", CLI_ARG_P_REMOVE_REQUEST,
      "Probability of removing a transaction from the request queue without "

@@ -37,27 +37,31 @@ static retcode_t get_transaction_for_request(
                       .num_trits = HASH_LENGTH_TRIT,
                       .num_bytes = FLEX_TRIT_SIZE_243,
                       .dynamic = 0};
+
   if (flex_trits_is_null(request->hash, FLEX_TRIT_SIZE_243)) {
     log_debug(RESPONDER_LOGGER_ID, "Responding to random tip request\n");
     return random_tip_request(request);
-  }
-  log_debug(RESPONDER_LOGGER_ID, "Responding to regular transaction request\n");
-  if ((ret = iota_tangle_transaction_load(
-           processor->tangle, TRANSACTION_FIELD_HASH, &key, pack))) {
-    return ret;
+  } else {
+    log_debug(RESPONDER_LOGGER_ID,
+              "Responding to regular transaction request\n");
+    if ((ret = iota_tangle_transaction_load(
+             processor->tangle, TRANSACTION_FIELD_HASH, &key, pack))) {
+      return ret;
+    }
   }
   return ret;
 }
 
-static retcode_t reply_to_request(responder_t *const processor,
-                                  transaction_request_t *const request,
-                                  iota_stor_pack_t *const pack) {
+static retcode_t respond_to_request(responder_t *const processor,
+                                    transaction_request_t *const request,
+                                    iota_stor_pack_t *const pack) {
   retcode_t ret = RC_OK;
 
   if (processor == NULL || request == NULL || request->neighbor == NULL ||
       pack == NULL) {
     return RC_NULL_PARAM;
   }
+
   if (pack->num_loaded != 0) {
     // Send transaction back to neighbor
     flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
@@ -69,11 +73,13 @@ static retcode_t reply_to_request(responder_t *const processor,
     }
   } else {
     // Transaction not found
-    // TODO(thibault): Randomly doesn't propagate request
-    if (!flex_trits_is_null(request->hash, FLEX_TRIT_SIZE_243)) {
+    if (!flex_trits_is_null(request->hash, FLEX_TRIT_SIZE_243) &&
+        ((double)rand() / (double)RAND_MAX) <
+            processor->node->conf.p_propagate_request) {
       // Request is an actual missing transaction
       if ((ret = request_transaction(&processor->node->transaction_requester,
                                      request->hash, false)) != RC_OK) {
+        log_error(RESPONDER_LOGGER_ID, "Requesting transaction failed\n");
         return ret;
       }
     }
@@ -98,7 +104,7 @@ static void *responder_routine(responder_t *const processor) {
                     "Getting transaction for request failed\n");
         continue;
       }
-      if (reply_to_request(processor, &request, &pack)) {
+      if (respond_to_request(processor, &request, &pack)) {
         log_warning(RESPONDER_LOGGER_ID, "Replying to request failed\n");
         continue;
       }

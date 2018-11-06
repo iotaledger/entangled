@@ -260,6 +260,7 @@ static void *processor_routine(processor_t *const processor) {
 
   lock_handle_unlock(&lock_cond);
   lock_handle_destroy(&lock_cond);
+
   return NULL;
 }
 

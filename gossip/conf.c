@@ -20,6 +20,7 @@ retcode_t iota_gossip_conf_init(iota_gossip_conf_t* const conf) {
   conf->mwm = DEFAULT_MWN;
   conf->request_hash_size_trit = HASH_LENGTH_TRIT - DEFAULT_MWN;
   conf->neighbors = DEFAULT_NEIGHBORS;
+  conf->p_propagate_request = DEFAULT_PROBABILITY_PROPAGATE_REQUEST;
   conf->p_select_milestone = DEFAULT_PROBABILITY_SELECT_MILESTONE;
   conf->p_remove_request = DEFAULT_PROBABILITY_REMOVE_REQUEST;
 
