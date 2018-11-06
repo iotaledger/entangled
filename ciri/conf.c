@@ -134,6 +134,9 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
       case CLI_ARG_P_SELECT_MILESTONE:  // --p-select-milestone
         gossip_conf->p_select_milestone = atof(optarg);
         break;
+      case CLI_ARG_P_SEND_MILESTONE:  // --p-send-milestone
+        gossip_conf->p_send_milestone = atof(optarg);
+        break;
       case 't':  // --tcp-receiver-port
         gossip_conf->tcp_receiver_port = atoi(optarg);
         break;
