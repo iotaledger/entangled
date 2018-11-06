@@ -87,8 +87,8 @@ cc_library(
     hdrs = ["responder.h"],
     deps = [
         ":responder_shared",
-        "//ciri:core_shared",
         "//gossip:neighbor_shared",
+        "//gossip:node_shared",
         "//utils/containers/queues:concurrent_queue_transaction_request",
     ],
 )

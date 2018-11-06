@@ -6,9 +6,9 @@
  */
 
 #include "gossip/components/responder.h"
-#include "ciri/core.h"
 #include "common/storage/sql/defs.h"
 #include "gossip/neighbor.h"
+#include "gossip/node.h"
 #include "utils/containers/queues/concurrent_queue_transaction_request.h"
 #include "utils/logger_helper.h"
 

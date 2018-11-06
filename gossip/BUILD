@@ -91,6 +91,7 @@ cc_library(
     srcs = ["node.c"],
     deps = [
         ":node_shared",
+        "//ciri:core_shared",
         "//gossip/components:broadcaster",
         "//gossip/components:processor",
         "//gossip/components:receiver",
