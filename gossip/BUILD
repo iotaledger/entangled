@@ -70,8 +70,13 @@ cc_library(
 
 cc_library(
     name = "transaction_request",
+    srcs = ["transaction_request.c"],
     hdrs = ["transaction_request.h"],
-    deps = ["//common/trinary:flex_trit"],
+    deps = [
+        "//common:errors",
+        "//common/trinary:flex_trit",
+        "@com_github_uthash//:uthash",
+    ],
 )
 
 cc_library(

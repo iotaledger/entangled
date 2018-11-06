@@ -8,14 +8,83 @@
 #ifndef __GOSSIP_TRANSACTION_REQUEST_H__
 #define __GOSSIP_TRANSACTION_REQUEST_H__
 
+#include "utlist.h"
+
+#include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 
 // Forward declarations
 typedef struct neighbor_s neighbor_t;
 
 typedef struct transaction_request_s {
-  neighbor_t *neighbor;
+  neighbor_t* neighbor;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
 } transaction_request_t;
+
+typedef struct transaction_request_queue_entry_s {
+  transaction_request_t request;
+  struct transaction_request_queue_entry_s* next;
+  struct transaction_request_queue_entry_s* prev;
+} transaction_request_queue_entry_t;
+
+typedef transaction_request_queue_entry_t* transaction_request_queue_t;
+
+/**
+ * Tells whether a transaction request queue is empty or not
+ *
+ * @param queue The transaction request queue
+ *
+ * @return true if empty, false otherwise
+ */
+bool transaction_request_queue_empty(transaction_request_queue_t const queue);
+
+/**
+ * Gets the size of a transaction request queue
+ *
+ * @param queue The transaction request queue
+ *
+ * @return the size of the transaction request queue
+ */
+size_t transaction_request_queue_count(transaction_request_queue_t const queue);
+
+/**
+ * Pushes a transaction request to a transaction request queue
+ *
+ * @param queue The transaction request queue
+ * @param request The transaction request
+ *
+ * @return a status code
+ */
+retcode_t transaction_request_queue_push(
+    transaction_request_queue_t* const queue, neighbor_t* const neighbor,
+    flex_trit_t const* const hash);
+
+/**
+ * Pops a transaction request from a transaction request queue
+ *
+ * @param queue The transaction request queue
+ *
+ * @return a status code
+ */
+void transaction_request_queue_pop(transaction_request_queue_t* const queue);
+
+/**
+ * Peeks a transaction request from a transaction request queue
+ *
+ * @param queue The transaction request queue
+ *
+ * @return the transaction request
+ */
+transaction_request_t* transaction_request_queue_peek(
+    transaction_request_queue_t const queue);
+
+/**
+ * Frees a transaction request queue
+ *
+ * @param queue The transaction request queue
+ *
+ * @return a status code
+ */
+void transaction_request_queue_free(transaction_request_queue_t* const queue);
 
 #endif  // __GOSSIP_TRANSACTION_REQUEST_H__

@@ -78,7 +78,10 @@ cc_library(
 cc_library(
     name = "responder_shared",
     hdrs = ["responder.h"],
-    deps = ["//utils/handles:thread"],
+    deps = [
+        "//gossip:transaction_request",
+        "//utils/handles:thread",
+    ],
 )
 
 cc_library(
@@ -89,6 +92,5 @@ cc_library(
         ":responder_shared",
         "//gossip:neighbor_shared",
         "//gossip:node_shared",
-        "//utils/containers/queues:concurrent_queue_transaction_request",
     ],
 )

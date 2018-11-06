@@ -12,10 +12,13 @@
 
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
+#include "gossip/transaction_request.h"
+#include "utils/handles/cond.h"
+#include "utils/handles/lock.h"
+#include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
-typedef struct concurrent_queue_transaction_request_t_s responder_queue_t;
 typedef struct neighbor_s neighbor_t;
 typedef struct node_s node_t;
 typedef struct tangle_s tangle_t;
@@ -23,7 +26,9 @@ typedef struct tangle_s tangle_t;
 typedef struct responder_s {
   thread_handle_t thread;
   bool running;
-  responder_queue_t *queue;
+  transaction_request_queue_t queue;
+  rw_lock_handle_t lock;
+  cond_handle_t cond;
   node_t *node;
   tangle_t *tangle;
 } responder_t;
@@ -83,6 +88,15 @@ retcode_t responder_destroy(responder_t *const responder);
 retcode_t responder_on_next(responder_t *const responder,
                             neighbor_t *const neighbor,
                             flex_trit_t const *const hash);
+
+/**
+ * Gets the size of the responder queue
+ *
+ * @param responder The responder
+ *
+ * @return a status code
+ */
+size_t responder_size(responder_t *const responder);
 
 #ifdef __cplusplus
 }
