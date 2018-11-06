@@ -46,11 +46,11 @@ void test_get_trytes_not_found(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
   tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION];
+  flex_trit_t null_hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
 
   api.conf.max_get_trytes = 100;
 
-  trit_array_p null_hash = trit_array_new_from_trytes(NULL_HASH);
-  TEST_ASSERT(get_trytes_req_add_hash(req, null_hash->trits) == RC_OK);
+  TEST_ASSERT(get_trytes_req_add_hash(req, null_hash) == RC_OK);
 
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
   TEST_ASSERT_EQUAL_INT(get_trytes_res_trytes_num(res), 1);
@@ -62,7 +62,6 @@ void test_get_trytes_not_found(void) {
   TEST_ASSERT_EQUAL_MEMORY(tx_trytes, NULL_TX_TRYTES,
                            NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  trit_array_free(null_hash);
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
   TEST_ASSERT(req == NULL);
@@ -72,6 +71,7 @@ void test_get_trytes_not_found(void) {
 void test_get_trytes_max(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
 
   api.conf.max_get_trytes = 1;
 
@@ -84,15 +84,16 @@ void test_get_trytes_max(void) {
   build_tangle(&api.consensus->tangle, txs, 2);
 
   // Getting trytes 1 & 2 from hashes
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, TX_1_OF_4_HASH, NUM_TRYTES_HASH,
+                         NUM_TRYTES_HASH);
+  TEST_ASSERT(get_trytes_req_add_hash(req, hash) == RC_OK);
 
-  trit_array_p tx1_hash = trit_array_new_from_trytes(TX_1_OF_4_HASH);
-  trit_array_p tx2_hash = trit_array_new_from_trytes(TX_2_OF_4_HASH);
-  TEST_ASSERT(get_trytes_req_add_hash(req, tx1_hash->trits) == RC_OK);
-  TEST_ASSERT(get_trytes_req_add_hash(req, tx2_hash->trits) == RC_OK);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, TX_2_OF_4_HASH, NUM_TRYTES_HASH,
+                         NUM_TRYTES_HASH);
+  TEST_ASSERT(get_trytes_req_add_hash(req, hash) == RC_OK);
+
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_API_MAX_GET_TRYTES);
 
-  trit_array_free(tx1_hash);
-  trit_array_free(tx2_hash);
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
   TEST_ASSERT(req == NULL);

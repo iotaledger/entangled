@@ -290,15 +290,16 @@ static retcode_t json_array_to_hash243_queue(cJSON const* const obj,
                                              char const* const obj_name,
                                              hash243_queue_t* queue) {
   retcode_t ret_code = RC_OK;
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
     cJSON* current_obj = NULL;
     cJSON_ArrayForEach(current_obj, json_item) {
       if (current_obj->valuestring != NULL) {
-        trit_array_p tmp_ref =
-            trit_array_new_from_trytes((tryte_t*)current_obj->valuestring);
-        ret_code = hash243_queue_push(queue, tmp_ref->trits);
-        trit_array_free(tmp_ref);
+        flex_trits_from_trytes(hash, NUM_TRITS_HASH,
+                               (const tryte_t*)current_obj->valuestring,
+                               NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+        ret_code = hash243_queue_push(queue, hash);
         if (ret_code) {
           return ret_code;
         }
@@ -348,15 +349,17 @@ static retcode_t json_array_to_hash8019_queue(cJSON const* const obj,
                                               char const* const obj_name,
                                               hash8019_queue_t* queue) {
   retcode_t ret_code = RC_OK;
+  flex_trit_t hash[FLEX_TRIT_SIZE_8019] = {FLEX_TRIT_NULL_VALUE};
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
     cJSON* current_obj = NULL;
     cJSON_ArrayForEach(current_obj, json_item) {
       if (current_obj->valuestring != NULL) {
-        trit_array_p tmp_ref =
-            trit_array_new_from_trytes((tryte_t*)current_obj->valuestring);
-        ret_code = hash8019_queue_push(queue, tmp_ref->trits);
-        trit_array_free(tmp_ref);
+        flex_trits_from_trytes(hash, NUM_TRITS_SERIALIZED_TRANSACTION,
+                               (const tryte_t*)current_obj->valuestring,
+                               NUM_TRYTES_SERIALIZED_TRANSACTION,
+                               NUM_TRYTES_SERIALIZED_TRANSACTION);
+        ret_code = hash8019_queue_push(queue, hash);
         if (ret_code) {
           return ret_code;
         }

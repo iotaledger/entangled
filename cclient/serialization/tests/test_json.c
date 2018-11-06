@@ -23,8 +23,8 @@ void test_serialize_find_transactions(void) {
 
   find_transactions_req_t* find_tran = find_transactions_req_new();
   char_buffer_t* serializer_out = char_buffer_new();
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  flex_trit_t tag[FLEX_TRIT_SIZE_81];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
+  flex_trit_t tag[FLEX_TRIT_SIZE_81] = {FLEX_TRIT_NULL_VALUE};
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYRES_1,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
@@ -62,7 +62,7 @@ void test_deserialize_find_transactions(void) {
       "\", "
       "\"" TEST_81_TRYRES_3 "\"]}";
 
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
 
   find_transactions_res_t* deserialize_find_tran = find_transactions_res_new();
 
@@ -139,7 +139,7 @@ void test_deserialize_get_node_info(void) {
       ","
       "\"transactionsToRequest\""
       ":" STR(TEST_INFO_TRANSACTIONS_TO_REQUEST) "}";
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
   get_node_info_res_t* node_info = get_node_info_res_new();
 
   serializer.vtable.get_node_info_deserialize_response(&serializer, json_text,
@@ -325,7 +325,7 @@ void test_deserialize_get_tips(void) {
       "\","
       "\"" TEST_81_TRYRES_3 "\"],\"duration\":4}";
 
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
 
   trit_array_p tmp_tip = NULL;
   get_tips_res_t* tips = get_tips_res_new();
@@ -355,7 +355,7 @@ void test_serialize_get_trytes(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   get_trytes_req_t* req = get_trytes_req_new();
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYRES_1,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
@@ -376,7 +376,7 @@ void test_deserialize_get_trytes(void) {
   const char* json_text =
       "{\"trytes\":["
       "\"" TEST_2673_TRYRES_1 "\"]}";
-  flex_trit_t hash[FLEX_TRIT_SIZE_8019];
+  flex_trit_t hash[FLEX_TRIT_SIZE_8019] = {FLEX_TRIT_NULL_VALUE};
 
   flex_trit_t* tmp_trytes = NULL;
   get_trytes_res_t* res = get_trytes_res_new();
@@ -445,7 +445,7 @@ void test_serialize_get_balances(void) {
       "\"" TEST_81_TRYRES_1
       "\"]"
       ",\"threshold\":" STR(TEST_BALANCES_SERIALIZE_THRESHOLD) "}";
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
 
   char_buffer_t* serializer_out = char_buffer_new();
   get_balances_req_t* get_bal = get_balances_req_new();
@@ -477,7 +477,7 @@ void test_deserialize_get_balances(void) {
       "[\"" TEST_81_TRYRES_1
       "\"], "
       "\"milestoneIndex\":" STR(TEST_BALANCES_MILESTONEINDEX) "}";
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYRES_1,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
 
@@ -528,7 +528,7 @@ void test_deserialize_get_transactions_to_approve(void) {
       "\"" TEST_81_TRYRES_1
       "\",\"branchTransaction\":"
       "\"" TEST_81_TRYRES_2 "\"}";
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
 
   get_transactions_to_approve_res_t* deserialize_get_txn_approve =
       get_transactions_to_approve_res_new();
@@ -583,7 +583,7 @@ void test_deserialize_attach_to_tangle(void) {
   const char* json_text = "{\"trytes\":[\"" TEST_81_TRYRES_1
                           "\",\"" TEST_81_TRYRES_2 "\"],\"duration\":4}";
   trit_array_p tmp_hash = NULL;
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
 
   attach_to_tangle_res_t* trytes = attach_to_tangle_res_new();
 
