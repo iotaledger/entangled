@@ -8,13 +8,14 @@
 #ifndef __GOSSIP_TRANSACTION_REQUEST_H__
 #define __GOSSIP_TRANSACTION_REQUEST_H__
 
+#include "common/trinary/flex_trit.h"
+
 // Forward declarations
 typedef struct neighbor_s neighbor_t;
-typedef struct _trit_array *trit_array_p;
 
 typedef struct transaction_request_s {
   neighbor_t *neighbor;
-  trit_array_p hash;
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
 } transaction_request_t;
 
 #endif  // __GOSSIP_TRANSACTION_REQUEST_H__

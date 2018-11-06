@@ -11,12 +11,12 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
+#include "common/trinary/flex_trit.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
 typedef struct concurrent_queue_transaction_request_t_s responder_queue_t;
 typedef struct neighbor_s neighbor_t;
-typedef struct _trit_array *trit_array_p;
 typedef struct node_s node_t;
 typedef struct tangle_s tangle_t;
 
@@ -82,7 +82,7 @@ retcode_t responder_destroy(responder_t *const responder);
  */
 retcode_t responder_on_next(responder_t *const responder,
                             neighbor_t *const neighbor,
-                            trit_array_p const hash);
+                            flex_trit_t const *const hash);
 
 #ifdef __cplusplus
 }

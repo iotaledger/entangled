@@ -33,13 +33,17 @@ static retcode_t get_transaction_for_request(
     return RC_NULL_PARAM;
   }
 
-  if (trit_array_is_null(request->hash)) {
+  trit_array_t key = {.trits = request->hash,
+                      .num_trits = HASH_LENGTH_TRIT,
+                      .num_bytes = FLEX_TRIT_SIZE_243,
+                      .dynamic = 0};
+  if (flex_trits_is_null(request->hash, FLEX_TRIT_SIZE_243)) {
     log_debug(RESPONDER_LOGGER_ID, "Responding to random tip request\n");
     return random_tip_request(request);
   }
   log_debug(RESPONDER_LOGGER_ID, "Responding to regular transaction request\n");
   if ((ret = iota_tangle_transaction_load(
-           processor->tangle, TRANSACTION_FIELD_HASH, request->hash, pack))) {
+           processor->tangle, TRANSACTION_FIELD_HASH, &key, pack))) {
     return ret;
   }
   return ret;
@@ -54,12 +58,10 @@ static retcode_t reply_to_request(responder_t *const processor,
       pack == NULL) {
     return RC_NULL_PARAM;
   }
-
   if (pack->num_loaded != 0) {
     // Send transaction back to neighbor
     flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
     iota_transaction_t tx = ((iota_transaction_t *)(pack->models))[0];
-
     transaction_serialize_on_flex_trits(tx, tx_trits);
     if ((ret = neighbor_send(processor->node, request->neighbor, tx_trits)) !=
         RC_OK) {
@@ -68,10 +70,10 @@ static retcode_t reply_to_request(responder_t *const processor,
   } else {
     // Transaction not found
     // TODO(thibault): Randomly doesn't propagate request
-    if (trit_array_is_null(request->hash) == false) {
+    if (!flex_trits_is_null(request->hash, FLEX_TRIT_SIZE_243)) {
       // Request is an actual missing transaction
       if ((ret = request_transaction(&processor->node->transaction_requester,
-                                     request->hash->trits, false)) != RC_OK) {
+                                     request->hash, false)) != RC_OK) {
         return ret;
       }
     }
@@ -180,13 +182,16 @@ retcode_t responder_destroy(responder_t *const processor) {
 
 retcode_t responder_on_next(responder_t *const processor,
                             neighbor_t *const neighbor,
-                            trit_array_p const hash) {
+                            flex_trit_t const *const hash) {
   if (processor == NULL || neighbor == NULL || hash == NULL) {
     return RC_NULL_PARAM;
   }
 
-  if (CQ_PUSH(processor->queue, ((transaction_request_t){neighbor, hash})) !=
-      CQ_SUCCESS) {
+  transaction_request_t req;
+  req.neighbor = neighbor;
+  memcpy(req.hash, hash, FLEX_TRIT_SIZE_243);
+
+  if (CQ_PUSH(processor->queue, req) != CQ_SUCCESS) {
     log_warning(RESPONDER_LOGGER_ID,
                 "Adding request to responder queue failed\n");
     return RC_RESPONDER_COMPONENT_FAILED_ADD_QUEUE;

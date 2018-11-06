@@ -145,18 +145,14 @@ static retcode_t process_request_bytes(processor_t const *const processor,
                                        iota_packet_t const *const packet,
                                        flex_trit_t *const hash) {
   retcode_t ret = RC_OK;
-  trit_array_p request_hash = NULL;
+  flex_trit_t request_hash[FLEX_TRIT_SIZE_243];
 
   if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
     return RC_NULL_PARAM;
   }
 
-  if ((request_hash = trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
-    return RC_OOM;
-  }
-
   // Retreives the request hash from the packet
-  if (flex_trits_from_bytes(request_hash->trits, HASH_LENGTH_TRIT,
+  if (flex_trits_from_bytes(request_hash, HASH_LENGTH_TRIT,
                             packet->content + PACKET_TX_SIZE,
                             processor->node->conf.request_hash_size_trit,
                             processor->node->conf.request_hash_size_trit) !=
@@ -167,8 +163,8 @@ static retcode_t process_request_bytes(processor_t const *const processor,
 
   // If requested hash is equal to transaction hash, sets the request hash to
   // null to request a random tip
-  if (memcmp(request_hash->trits, hash, request_hash->num_bytes) == 0) {
-    trit_array_set_null(request_hash);
+  if (memcmp(request_hash, hash, FLEX_TRIT_SIZE_243) == 0) {
+    memset(request_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
 
   // Adds request to the responder queue

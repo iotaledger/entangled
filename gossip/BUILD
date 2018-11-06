@@ -71,6 +71,7 @@ cc_library(
 cc_library(
     name = "transaction_request",
     hdrs = ["transaction_request.h"],
+    deps = ["//common/trinary:flex_trit"],
 )
 
 cc_library(
