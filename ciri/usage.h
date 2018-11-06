@@ -18,6 +18,7 @@ typedef enum cli_arg_value_e {
   CLI_ARG_MWM,
   CLI_ARG_P_PROPAGATE_REQUEST,
   CLI_ARG_P_REMOVE_REQUEST,
+  CLI_ARG_P_REPLY_RANDOM_TIP,
   CLI_ARG_P_SELECT_MILESTONE,
 
   // API configuration
@@ -72,38 +73,44 @@ static struct cli_argument_s {
      "Probability of removing a transaction from the request queue without "
      "requesting it. Value must be in [0,1].",
      REQUIRED_ARG},
-    {"p-select-milestone", CLI_ARG_P_SELECT_MILESTONE,
-     "Probability of sending a current milestone request to a neighbour. Value "
-     "must be in [0,1].",
-     REQUIRED_ARG},
-    {"tcp-receiver-port", 't', "TCP listen port.", REQUIRED_ARG},
-    {"udp-receiver-port", 'u', "UDP listen port.", REQUIRED_ARG},
+    {"p-reply-random-tip",
+     CLI_ARG_P_REPLY_RANDOM_TIP,
+     "Probability of replying to a random transaction request, even though "
+     "your node doesn't have anything to request. Value must be in [0,1].",
+     // REQUIRED_ARG},
+     {"p-select-milestone", CLI_ARG_P_SELECT_MILESTONE,
+      "Probability of sending a current milestone request to a neighbour. "
+      "Value "
+      "must be in [0,1].",
+      REQUIRED_ARG},
+     {"tcp-receiver-port", 't', "TCP listen port.", REQUIRED_ARG},
+     {"udp-receiver-port", 'u', "UDP listen port.", REQUIRED_ARG},
 
-    // API configuration
+     // API configuration
 
-    {"max-get-trytes", CLI_ARG_MAX_GET_TRYTES,
-     "Maximum number of transactions that will be returned by the 'getTrytes' "
-     "API call.",
-     REQUIRED_ARG},
-    {"port", 'p', "HTTP API listen port.", REQUIRED_ARG},
+     {"max-get-trytes", CLI_ARG_MAX_GET_TRYTES,
+      "Maximum number of transactions that will be returned by the 'getTrytes' "
+      "API call.",
+      REQUIRED_ARG},
+     {"port", 'p', "HTTP API listen port.", REQUIRED_ARG},
 
-    // Consensus configuration
+     // Consensus configuration
 
-    {"alpha", CLI_ARG_ALPHA,
-     "Randomness of the tip selection. Value must be in [0, inf] where 0 is "
-     "most random and inf is most deterministic.",
-     REQUIRED_ARG},
-    {"below-max-depth", CLI_ARG_BELOW_MAX_DEPTH,
-     "Maximum number of unconfirmed transactions that may be analysed to find "
-     "the latest referenced milestone by the currently visited transaction "
-     "during the random walk.",
-     REQUIRED_ARG},
-    {"max-depth", CLI_ARG_MAX_DEPTH,
-     "Limits how many milestones behind the current one the random walk can "
-     "start.",
-     REQUIRED_ARG},
+     {"alpha", CLI_ARG_ALPHA,
+      "Randomness of the tip selection. Value must be in [0, inf] where 0 is "
+      "most random and inf is most deterministic.",
+      REQUIRED_ARG},
+     {"below-max-depth", CLI_ARG_BELOW_MAX_DEPTH,
+      "Maximum number of unconfirmed transactions that may be analysed to find "
+      "the latest referenced milestone by the currently visited transaction "
+      "during the random walk.",
+      REQUIRED_ARG},
+     {"max-depth", CLI_ARG_MAX_DEPTH,
+      "Limits how many milestones behind the current one the random walk can "
+      "start.",
+      REQUIRED_ARG},
 
-    {NULL, 0, NULL, NO_ARG}};
+     {NULL, 0, NULL, NO_ARG}};
 
 static char* short_options = "hl:n:t:u:p:";
 

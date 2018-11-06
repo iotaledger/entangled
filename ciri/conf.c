@@ -125,6 +125,9 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
       case CLI_ARG_P_PROPAGATE_REQUEST:  // --p-propagate-request
         gossip_conf->p_propagate_request = atof(optarg);
         break;
+      case CLI_ARG_P_REPLY_RANDOM_TIP:  // --p-reply-random-tip
+        gossip_conf->p_reply_random_tip = atof(optarg);
+        break;
       case CLI_ARG_P_REMOVE_REQUEST:  // --p-remove-request
         gossip_conf->p_remove_request = atof(optarg);
         break;

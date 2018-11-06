@@ -51,6 +51,7 @@ Long option | Short option | Description | Example input
 `--neighbors` | `-n` | URIs of neighbouring nodes, separated by a space. | `-n "udp://148.148.148.148:14265 udp://[2001:db8:a0b:12f0::1]:14265"`
 `--p-propagate-request` |  | Probability of propagating the request of a transaction to a neighbor node if it can't be found. This should be low since we don't want to propagate non-existing transactions that spam the network. Value must be in [0,1]. | `--p-propagate-request 0.01`
 `--p-remove-request` | | Probability of removing a transaction from the request queue without requesting it. Value must be in [0,1]. | `--p-remove-request 0.01`
+`--p-reply-random-tip` | | Probability of replying to a random transaction request, even though your node doesn't have anything to request. Value must be in [0,1]. | `--p-reply-random-tip 0.66`
 `--p-select-milestone` | | Probability of sending a current milestone request to a neighbour. Value must be in [0,1]. | `--p-select-milestone 0.7`
 `--tcp-receiver-port` | `-t` | TCP listen port. | `-t 15600`
 `--udp-receiver-port` | `-u` | UDP listen port. | `-u 14600`

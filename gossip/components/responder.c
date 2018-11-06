@@ -14,15 +14,6 @@
 
 #define RESPONDER_LOGGER_ID "responder"
 
-static retcode_t random_tip_request(transaction_request_t *const request) {
-  if (request == NULL) {
-    return RC_NULL_PARAM;
-  }
-  // TODO(thibault): Random tip request
-  request->neighbor->nbr_random_tx_req++;
-  return RC_OK;
-}
-
 static retcode_t get_transaction_for_request(
     responder_t *const processor, transaction_request_t *const request,
     iota_stor_pack_t *const pack) {
@@ -40,12 +31,16 @@ static retcode_t get_transaction_for_request(
 
   if (flex_trits_is_null(request->hash, FLEX_TRIT_SIZE_243)) {
     log_debug(RESPONDER_LOGGER_ID, "Responding to random tip request\n");
-    return random_tip_request(request);
+    if (true) {
+      request->neighbor->nbr_random_tx_req++;
+    }
+    // Else no tx to request, so no random tip will be sent as a reply.
   } else {
     log_debug(RESPONDER_LOGGER_ID,
               "Responding to regular transaction request\n");
     if ((ret = iota_tangle_transaction_load(
-             processor->tangle, TRANSACTION_FIELD_HASH, &key, pack))) {
+             processor->tangle, TRANSACTION_FIELD_HASH, &key, pack)) != RC_OK) {
+      log_warning(RESPONDER_LOGGER_ID, "Loading transaction failed\n");
       return ret;
     }
   }
@@ -69,8 +64,10 @@ static retcode_t respond_to_request(responder_t *const processor,
     transaction_serialize_on_flex_trits(tx, tx_trits);
     if ((ret = neighbor_send(processor->node, request->neighbor, tx_trits)) !=
         RC_OK) {
+      log_warning(RESPONDER_LOGGER_ID, "Sending transaction failed\n");
       return ret;
     }
+    // TODO Add transaction to cache
   } else {
     // Transaction not found
     if (!flex_trits_is_null(request->hash, FLEX_TRIT_SIZE_243) &&
@@ -79,7 +76,7 @@ static retcode_t respond_to_request(responder_t *const processor,
       // Request is an actual missing transaction
       if ((ret = request_transaction(&processor->node->transaction_requester,
                                      request->hash, false)) != RC_OK) {
-        log_error(RESPONDER_LOGGER_ID, "Requesting transaction failed\n");
+        log_warning(RESPONDER_LOGGER_ID, "Requesting transaction failed\n");
         return ret;
       }
     }
