@@ -12,7 +12,7 @@
 #include "utils/containers/queues/concurrent_queue_transaction_request.h"
 #include "utils/logger_helper.h"
 
-#define RESPONDER_COMPONENT_LOGGER_ID "responder_component"
+#define RESPONDER_LOGGER_ID "responder"
 
 static retcode_t random_tip_request(transaction_request_t *const request) {
   // TODO(thibault): Random tip request
@@ -21,7 +21,7 @@ static retcode_t random_tip_request(transaction_request_t *const request) {
 }
 
 static retcode_t regular_transaction_request(
-    responder_state_t *const state, transaction_request_t *const request,
+    responder_t *const processor, transaction_request_t *const request,
     iota_transaction_t *const tx) {
   retcode_t ret = RC_OK;
 
@@ -33,8 +33,8 @@ static retcode_t regular_transaction_request(
                            .capacity = 1,
                            .num_loaded = 0,
                            .insufficient_capacity = false};
-  if ((ret = iota_tangle_transaction_load(state->tangle, TRANSACTION_FIELD_HASH,
-                                          request->hash, &pack))) {
+  if ((ret = iota_tangle_transaction_load(
+           processor->tangle, TRANSACTION_FIELD_HASH, request->hash, &pack))) {
     return ret;
   }
   if (pack.num_loaded == 0) {
@@ -45,9 +45,9 @@ static retcode_t regular_transaction_request(
 }
 
 static retcode_t get_transaction_for_request(
-    responder_state_t *const state, transaction_request_t *const request,
+    responder_t *const processor, transaction_request_t *const request,
     iota_transaction_t *const tx) {
-  if (state == NULL) {
+  if (processor == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_STATE;
   } else if (request == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_REQ;
@@ -58,21 +58,19 @@ static retcode_t get_transaction_for_request(
   }
 
   if (trit_array_is_null(request->hash)) {
-    log_debug(RESPONDER_COMPONENT_LOGGER_ID,
-              "Responding to random tip request\n");
+    log_debug(RESPONDER_LOGGER_ID, "Responding to random tip request\n");
     return random_tip_request(request);
   }  // else
-  log_debug(RESPONDER_COMPONENT_LOGGER_ID,
-            "Responding to regular transaction request\n");
-  return regular_transaction_request(state, request, tx);
+  log_debug(RESPONDER_LOGGER_ID, "Responding to regular transaction request\n");
+  return regular_transaction_request(processor, request, tx);
 }
 
-static retcode_t reply_to_request(responder_state_t *const state,
+static retcode_t reply_to_request(responder_t *const processor,
                                   transaction_request_t *const request,
                                   iota_transaction_t const tx) {
   retcode_t ret = RC_OK;
 
-  if (state == NULL) {
+  if (processor == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_STATE;
   } else if (request == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_REQ;
@@ -85,7 +83,7 @@ static retcode_t reply_to_request(responder_state_t *const state,
     flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
 
     transaction_serialize_on_flex_trits(tx, tx_trits);
-    if ((ret = neighbor_send(state->node, request->neighbor, tx_trits)) !=
+    if ((ret = neighbor_send(processor->node, request->neighbor, tx_trits)) !=
         RC_OK) {
       return ret;
     }
@@ -94,7 +92,7 @@ static retcode_t reply_to_request(responder_state_t *const state,
     // TODO(thibault): Randomly doesn't propagate request
     if (trit_array_is_null(request->hash) == false) {
       // Request is an actual missing transaction
-      if ((ret = request_transaction(&state->node->transaction_requester,
+      if ((ret = request_transaction(&processor->node->transaction_requester,
                                      request->hash->trits, false)) != RC_OK) {
         return ret;
       }
@@ -103,25 +101,24 @@ static retcode_t reply_to_request(responder_state_t *const state,
   return RC_OK;
 }
 
-static void *responder_routine(responder_state_t *const state) {
+static void *responder_routine(responder_t *const processor) {
   transaction_request_t request;
   iota_transaction_t tx = NULL;
 
-  if (state == NULL) {
+  if (processor == NULL) {
     return NULL;
   }
 
-  while (state->running) {
-    if (CQ_POP(state->queue, &request) == CQ_SUCCESS) {
-      log_debug(RESPONDER_COMPONENT_LOGGER_ID, "Responding to request\n");
-      if (get_transaction_for_request(state, &request, &tx)) {
-        log_warning(RESPONDER_COMPONENT_LOGGER_ID,
+  while (processor->running) {
+    if (CQ_POP(processor->queue, &request) == CQ_SUCCESS) {
+      log_debug(RESPONDER_LOGGER_ID, "Responding to request\n");
+      if (get_transaction_for_request(processor, &request, &tx)) {
+        log_warning(RESPONDER_LOGGER_ID,
                     "Getting transaction for request failed\n");
         continue;
       }
-      if (reply_to_request(state, &request, tx)) {
-        log_warning(RESPONDER_COMPONENT_LOGGER_ID,
-                    "Replying to request failed\n");
+      if (reply_to_request(processor, &request, tx)) {
+        log_warning(RESPONDER_LOGGER_ID, "Replying to request failed\n");
         continue;
       }
     }
@@ -129,96 +126,93 @@ static void *responder_routine(responder_state_t *const state) {
   return NULL;
 }
 
-retcode_t responder_init(responder_state_t *const state, node_t *const node,
+retcode_t responder_init(responder_t *const processor, node_t *const node,
                          tangle_t *const tangle) {
-  if (state == NULL) {
+  if (processor == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_STATE;
   } else if (node == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_NODE;
   }
 
-  logger_helper_init(RESPONDER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
-  memset(state, 0, sizeof(responder_state_t));
-  state->running = false;
-  state->node = node;
-  state->tangle = tangle;
+  logger_helper_init(RESPONDER_LOGGER_ID, LOGGER_DEBUG, true);
+  memset(processor, 0, sizeof(responder_t));
+  processor->running = false;
+  processor->node = node;
+  processor->tangle = tangle;
 
-  log_debug(RESPONDER_COMPONENT_LOGGER_ID, "Initializing responder queue\n");
-  if (CQ_INIT(transaction_request_t, state->queue) != CQ_SUCCESS) {
-    log_critical(RESPONDER_COMPONENT_LOGGER_ID,
-                 "Initializing responder queue failed\n");
+  log_debug(RESPONDER_LOGGER_ID, "Initializing responder queue\n");
+  if (CQ_INIT(transaction_request_t, processor->queue) != CQ_SUCCESS) {
+    log_critical(RESPONDER_LOGGER_ID, "Initializing responder queue failed\n");
     return RC_RESPONDER_COMPONENT_FAILED_INIT_QUEUE;
   }
 
   return RC_OK;
 }
 
-retcode_t responder_start(responder_state_t *const state) {
-  if (state == NULL) {
+retcode_t responder_start(responder_t *const processor) {
+  if (processor == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_STATE;
   }
 
-  log_info(RESPONDER_COMPONENT_LOGGER_ID, "Spawning responder thread\n");
-  state->running = true;
-  if (thread_handle_create(&state->thread, (thread_routine_t)responder_routine,
-                           state) != 0) {
-    log_critical(RESPONDER_COMPONENT_LOGGER_ID,
-                 "Spawning responder thread failed\n");
+  log_info(RESPONDER_LOGGER_ID, "Spawning responder thread\n");
+  processor->running = true;
+  if (thread_handle_create(&processor->thread,
+                           (thread_routine_t)responder_routine,
+                           processor) != 0) {
+    log_critical(RESPONDER_LOGGER_ID, "Spawning responder thread failed\n");
     return RC_RESPONDER_COMPONENT_FAILED_THREAD_SPAWN;
   }
   return RC_OK;
 }
 
-retcode_t responder_on_next(responder_state_t *const state,
-                            neighbor_t *const neighbor,
-                            trit_array_p const hash) {
-  if (state == NULL) {
-    return RC_RESPONDER_COMPONENT_NULL_STATE;
-  }
-
-  if (CQ_PUSH(state->queue, ((transaction_request_t){neighbor, hash})) !=
-      CQ_SUCCESS) {
-    log_warning(RESPONDER_COMPONENT_LOGGER_ID,
-                "Adding request to responder queue failed\n");
-    return RC_RESPONDER_COMPONENT_FAILED_ADD_QUEUE;
-  }
-  return RC_OK;
-}
-
-retcode_t responder_stop(responder_state_t *const state) {
+retcode_t responder_stop(responder_t *const processor) {
   retcode_t ret = RC_OK;
 
-  if (state == NULL) {
+  if (processor == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_STATE;
-  } else if (state->running == false) {
+  } else if (processor->running == false) {
     return RC_OK;
   }
 
-  log_info(RESPONDER_COMPONENT_LOGGER_ID, "Shutting down responder thread\n");
-  state->running = false;
-  if (thread_handle_join(state->thread, NULL) != 0) {
-    log_error(RESPONDER_COMPONENT_LOGGER_ID,
-              "Shutting down responder thread failed\n");
+  log_info(RESPONDER_LOGGER_ID, "Shutting down responder thread\n");
+  processor->running = false;
+  if (thread_handle_join(processor->thread, NULL) != 0) {
+    log_error(RESPONDER_LOGGER_ID, "Shutting down responder thread failed\n");
     ret = RC_RESPONDER_COMPONENT_FAILED_THREAD_JOIN;
   }
   return ret;
 }
 
-retcode_t responder_destroy(responder_state_t *const state) {
+retcode_t responder_destroy(responder_t *const processor) {
   retcode_t ret = RC_OK;
 
-  if (state == NULL) {
+  if (processor == NULL) {
     return RC_RESPONDER_COMPONENT_NULL_STATE;
-  } else if (state->running) {
+  } else if (processor->running) {
     return RC_RESPONDER_COMPONENT_STILL_RUNNING;
   }
 
-  log_debug(RESPONDER_COMPONENT_LOGGER_ID, "Destroying responder queue\n");
-  if (CQ_DESTROY(transaction_request_t, state->queue) != CQ_SUCCESS) {
-    log_error(RESPONDER_COMPONENT_LOGGER_ID,
-              "Destroying responder queue failed\n");
+  log_debug(RESPONDER_LOGGER_ID, "Destroying responder queue\n");
+  if (CQ_DESTROY(transaction_request_t, processor->queue) != CQ_SUCCESS) {
+    log_error(RESPONDER_LOGGER_ID, "Destroying responder queue failed\n");
     ret = RC_RESPONDER_COMPONENT_FAILED_DESTROY_QUEUE;
   }
-  logger_helper_destroy(RESPONDER_COMPONENT_LOGGER_ID);
+  logger_helper_destroy(RESPONDER_LOGGER_ID);
   return ret;
+}
+
+retcode_t responder_on_next(responder_t *const processor,
+                            neighbor_t *const neighbor,
+                            trit_array_p const hash) {
+  if (processor == NULL) {
+    return RC_RESPONDER_COMPONENT_NULL_STATE;
+  }
+
+  if (CQ_PUSH(processor->queue, ((transaction_request_t){neighbor, hash})) !=
+      CQ_SUCCESS) {
+    log_warning(RESPONDER_LOGGER_ID,
+                "Adding request to responder queue failed\n");
+    return RC_RESPONDER_COMPONENT_FAILED_ADD_QUEUE;
+  }
+  return RC_OK;
 }
