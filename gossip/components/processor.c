@@ -13,7 +13,7 @@
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_LOGGER_ID "processor"
-#define PROCESSOR_TIMEOUT_SEC 5
+#define PROCESSOR_TIMEOUT_SEC 1
 
 /*
  * Private functions

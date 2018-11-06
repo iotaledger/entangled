@@ -23,63 +23,42 @@ static retcode_t random_tip_request(transaction_request_t *const request) {
   return RC_OK;
 }
 
-static retcode_t regular_transaction_request(
-    responder_t *const processor, transaction_request_t *const request,
-    iota_transaction_t *const tx) {
-  retcode_t ret = RC_OK;
-
-  if (processor == NULL || request == NULL || tx == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  if ((*tx = transaction_new()) == NULL) {
-    return RC_OOM;
-  }
-
-  iota_stor_pack_t pack = {.models = (void **)tx,
-                           .capacity = 1,
-                           .num_loaded = 0,
-                           .insufficient_capacity = false};
-  if ((ret = iota_tangle_transaction_load(
-           processor->tangle, TRANSACTION_FIELD_HASH, request->hash, &pack))) {
-    return ret;
-  }
-  if (pack.num_loaded == 0) {
-    transaction_free(*tx);
-    *tx = NULL;
-  }
-  return RC_OK;
-}
-
 static retcode_t get_transaction_for_request(
     responder_t *const processor, transaction_request_t *const request,
-    iota_transaction_t *const tx) {
+    iota_stor_pack_t *const pack) {
+  retcode_t ret = RC_OK;
+
   if (processor == NULL || request == NULL || request->neighbor == NULL ||
-      tx == NULL) {
+      pack == NULL) {
     return RC_NULL_PARAM;
   }
 
   if (trit_array_is_null(request->hash)) {
     log_debug(RESPONDER_LOGGER_ID, "Responding to random tip request\n");
     return random_tip_request(request);
-  }  // else
+  }
   log_debug(RESPONDER_LOGGER_ID, "Responding to regular transaction request\n");
-  return regular_transaction_request(processor, request, tx);
+  if ((ret = iota_tangle_transaction_load(
+           processor->tangle, TRANSACTION_FIELD_HASH, request->hash, pack))) {
+    return ret;
+  }
+  return ret;
 }
 
 static retcode_t reply_to_request(responder_t *const processor,
                                   transaction_request_t *const request,
-                                  iota_transaction_t const tx) {
+                                  iota_stor_pack_t *const pack) {
   retcode_t ret = RC_OK;
 
   if (processor == NULL || request == NULL || request->neighbor == NULL ||
-      tx == NULL) {
+      pack == NULL) {
     return RC_NULL_PARAM;
   }
 
-  if (tx != NULL) {
+  if (pack->num_loaded != 0) {
     // Send transaction back to neighbor
     flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
+    iota_transaction_t tx = ((iota_transaction_t *)(pack->models))[0];
 
     transaction_serialize_on_flex_trits(tx, tx_trits);
     if ((ret = neighbor_send(processor->node, request->neighbor, tx_trits)) !=
@@ -102,7 +81,7 @@ static retcode_t reply_to_request(responder_t *const processor,
 
 static void *responder_routine(responder_t *const processor) {
   transaction_request_t request;
-  iota_transaction_t tx = NULL;
+  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
 
   if (processor == NULL) {
     return NULL;
@@ -111,12 +90,13 @@ static void *responder_routine(responder_t *const processor) {
   while (processor->running) {
     if (CQ_POP(processor->queue, &request) == CQ_SUCCESS) {
       log_debug(RESPONDER_LOGGER_ID, "Responding to request\n");
-      if (get_transaction_for_request(processor, &request, &tx)) {
+      hash_pack_reset(&pack);
+      if (get_transaction_for_request(processor, &request, &pack)) {
         log_warning(RESPONDER_LOGGER_ID,
                     "Getting transaction for request failed\n");
         continue;
       }
-      if (reply_to_request(processor, &request, tx)) {
+      if (reply_to_request(processor, &request, &pack)) {
         log_warning(RESPONDER_LOGGER_ID, "Replying to request failed\n");
         continue;
       }
