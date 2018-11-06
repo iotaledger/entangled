@@ -73,6 +73,7 @@ cc_test(
 
 cc_test(
     name = "test_mss",
+    timeout = "moderate",
     srcs = [
         "test_mss.c",
     ],
@@ -86,6 +87,17 @@ cc_test(
     name = "test_mam",
     srcs = [
         "test_mam.c",
+    ],
+    deps =
+        [
+            ":shared",
+        ],
+)
+
+cc_test(
+    name = "test",
+    srcs = [
+        "test.c",
     ],
     deps =
         [
