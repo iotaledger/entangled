@@ -113,29 +113,6 @@ trit_array_p trit_array_new_from_trytes(tryte_t const *const trytes) {
   return trit_array;
 }
 
-trit_array_p trit_array_new_from_flex(flex_trit_t const *const trits,
-                                      size_t num_trits, size_t num_bytes) {
-  trit_array_p trit_array;
-  trit_array = (trit_array_p)malloc(sizeof(struct _trit_array));
-  if (!trit_array) {
-    // errno = IOTA_OUT_OF_MEMORY
-    return NULL;
-  }
-  memset(trit_array, 0, sizeof(struct _trit_array));
-  trit_array->num_trits = num_trits;
-  trit_array->num_bytes = num_bytes;
-  trit_array->trits = malloc(trit_array->num_bytes);
-  if (!trit_array->trits) {
-    trit_array_free(trit_array);
-    // errno = IOTA_OUT_OF_MEMORY
-    return NULL;
-  }
-
-  memcpy(trit_array->trits, trits, trit_array->num_bytes);
-  trit_array->dynamic = 1;
-  return trit_array;
-}
-
 /***********************************************************************************************************
  * Destructor
  ***********************************************************************************************************/

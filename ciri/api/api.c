@@ -132,26 +132,24 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
   retcode_t ret = RC_OK;
   hash243_queue_entry_t *iter = NULL;
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
-  trit_array_p tmp_trits = NULL;
+  trit_array_t tmp_trits = {.trits = NULL,
+                            .num_trits = HASH_LENGTH_TRIT,
+                            .num_bytes = FLEX_TRIT_SIZE_243,
+                            .dynamic = 0};
 
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
 
   if (hash243_queue_count(&req->hashes) > api->conf.max_get_trytes) {
     return RC_API_MAX_GET_TRYTES;
   }
+
   CDL_FOREACH(req->hashes, iter) {
     hash_pack_reset(&pack);
-    // flex_trit to trit_array_p for iota_tangle_transaction_load
-    tmp_trits = trit_array_new_from_flex(iter->hash, NUM_TRITS_HASH,
-                                         FLEX_TRIT_SIZE_243);
-    if (!tmp_trits) {
-      return RC_API_NULL_POINTER;
-    }
+    tmp_trits.trits = iter->hash;
     // NOTE Concurrency needs to be taken care of
     if ((ret = iota_tangle_transaction_load(&api->consensus->tangle,
-                                            TRANSACTION_FIELD_HASH, tmp_trits,
+                                            TRANSACTION_FIELD_HASH, &tmp_trits,
                                             &pack)) != RC_OK) {
-      trit_array_free(tmp_trits);
       return ret;
     }
 
@@ -162,8 +160,6 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
     }
 
     get_trytes_res_add_trytes(res, tx_trits);
-    trit_array_free(tmp_trits);
-    tmp_trits = NULL;
   }
   return ret;
 }
