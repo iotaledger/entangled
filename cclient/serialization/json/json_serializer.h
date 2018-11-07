@@ -109,7 +109,7 @@ retcode_t json_attach_to_tangle_serialize_request(
     char_buffer_t* out);
 retcode_t json_attach_to_tangle_deserialize_response(
     const serializer_t* const s, const char* const obj,
-    attach_to_tangle_res_t** out);
+    attach_to_tangle_res_t* const out);
 
 // broadcast_transactions_request
 retcode_t json_broadcast_transactions_serialize_request(

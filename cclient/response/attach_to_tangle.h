@@ -14,15 +14,20 @@
 extern "C" {
 #endif
 
-// response is a different set of tryte values which you can input into
-// broadcastTransactions and storeTransactions.
-typedef flex_hash_array_t attach_to_tangle_res_t;
+typedef struct {
+  /**
+   * The returned value is a different set of tryte values which you can input
+   * into broadcastTransactions and storeTransactions
+   */
+  hash8019_queue_t trytes;
+
+} attach_to_tangle_res_t;
 
 attach_to_tangle_res_t* attach_to_tangle_res_new();
-trit_array_p attach_to_tangle_res_trytes_at(attach_to_tangle_res_t* res,
+flex_trit_t* attach_to_tangle_res_trytes_at(attach_to_tangle_res_t* res,
                                             int index);
-int attach_to_tangle_res_trytes_cnt(attach_to_tangle_res_t* res);
-void attach_to_tangle_res_free(attach_to_tangle_res_t* hashes);
+size_t attach_to_tangle_res_trytes_cnt(attach_to_tangle_res_t* res);
+void attach_to_tangle_res_free(attach_to_tangle_res_t** hashes);
 
 #ifdef __cplusplus
 }

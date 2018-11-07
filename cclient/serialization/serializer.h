@@ -109,7 +109,7 @@ typedef struct {
       char_buffer_t* out);
   retcode_t (*attach_to_tangle_deserialize_response)(
       const serializer_t* const s, const char* const obj,
-      attach_to_tangle_res_t** out);
+      attach_to_tangle_res_t* out);
 
   // broadcastTransactions
   retcode_t (*broadcast_transactions_serialize_request)(
