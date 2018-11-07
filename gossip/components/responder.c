@@ -40,7 +40,7 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
   }
 
   // If the hash is null, a random tip was requested
-  if (flex_trits_is_null(hash->trits, FLEX_TRIT_SIZE_243)) {
+  if (flex_trits_are_null(hash->trits, FLEX_TRIT_SIZE_243)) {
     log_debug(RESPONDER_LOGGER_ID, "Responding to random tip request\n");
     if (true) {
       neighbor->nbr_random_tx_req++;
@@ -97,7 +97,7 @@ static retcode_t respond_to_request(responder_t const *const responder,
     // TODO Add transaction to cache
   } else {
     // If a transaction was requested but not found, requests it
-    if (!flex_trits_is_null(hash, FLEX_TRIT_SIZE_243) &&
+    if (!flex_trits_are_null(hash, FLEX_TRIT_SIZE_243) &&
         ((double)rand() / (double)RAND_MAX) <
             responder->node->conf.p_propagate_request) {
       if ((ret = request_transaction(&responder->node->transaction_requester,

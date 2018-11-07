@@ -125,7 +125,7 @@ retcode_t request_transaction(requester_state_t *const state,
     return RC_REQUESTER_COMPONENT_NULL_STATE;
   }
 
-  if (flex_trits_is_null(hash, FLEX_TRIT_SIZE_243)) {
+  if (flex_trits_are_null(hash, FLEX_TRIT_SIZE_243)) {
     return RC_OK;
   }
 
