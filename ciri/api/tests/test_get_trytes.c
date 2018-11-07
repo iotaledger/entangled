@@ -46,7 +46,8 @@ void test_get_trytes_not_found(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
   tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION];
-  flex_trit_t null_hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
+  const flex_trit_t null_hash[FLEX_TRIT_SIZE_243] = {
+      [0 ... FLEX_TRIT_SIZE_243 - 1] = FLEX_TRIT_NULL_VALUE};
 
   api.conf.max_get_trytes = 100;
 
@@ -71,7 +72,7 @@ void test_get_trytes_not_found(void) {
 void test_get_trytes_max(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
-  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
 
   api.conf.max_get_trytes = 1;
 

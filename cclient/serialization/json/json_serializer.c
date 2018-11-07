@@ -290,7 +290,7 @@ static retcode_t json_array_to_hash243_queue(cJSON const* const obj,
                                              char const* const obj_name,
                                              hash243_queue_t* queue) {
   retcode_t ret_code = RC_OK;
-  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {FLEX_TRIT_NULL_VALUE};
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
     cJSON* current_obj = NULL;
@@ -349,7 +349,7 @@ static retcode_t json_array_to_hash8019_queue(cJSON const* const obj,
                                               char const* const obj_name,
                                               hash8019_queue_t* queue) {
   retcode_t ret_code = RC_OK;
-  flex_trit_t hash[FLEX_TRIT_SIZE_8019] = {FLEX_TRIT_NULL_VALUE};
+  flex_trit_t hash[FLEX_TRIT_SIZE_8019] = {};
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
     cJSON* current_obj = NULL;
