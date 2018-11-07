@@ -199,7 +199,8 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
     memset(hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
 
-  if (((double)rand() / (double)RAND_MAX) < state->conf->p_remove_request) {
+  if (((double)rand() / (double)RAND_MAX) < state->conf->p_remove_request &&
+      request_set != &state->milestones) {
     hash243_set_remove(request_set, iter->hash);
   }
 
