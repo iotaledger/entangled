@@ -71,6 +71,7 @@ cc_library(
         "//gossip:conf",
         "//utils:logger_helper",
         "//utils/containers/hash:hash243_set",
+        "//utils/handles:rand",
         "//utils/handles:rw_lock",
     ],
 )
@@ -95,5 +96,6 @@ cc_library(
         ":responder_shared",
         "//gossip:neighbor_shared",
         "//gossip:node_shared",
+        "//utils/handles:rand",
     ],
 )

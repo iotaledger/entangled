@@ -65,6 +65,7 @@ cc_library(
         "//gossip/components:transaction_requester",
         "//gossip/services:tcp_sender",
         "//gossip/services:udp_sender",
+        "//utils/handles:rand",
     ],
 )
 

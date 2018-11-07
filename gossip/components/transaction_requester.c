@@ -8,6 +8,7 @@
 #include "gossip/components/transaction_requester.h"
 #include "common/storage/sql/defs.h"
 #include "consensus/tangle/tangle.h"
+#include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 
 // TODO(thibault) configuration variable
@@ -199,7 +200,7 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
     memset(hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
 
-  if (((double)rand() / (double)RAND_MAX) < state->conf->p_remove_request) {
+  if (rand_handle_probability() < state->conf->p_remove_request) {
     hash243_set_remove(request_set, iter->hash);
   }
 

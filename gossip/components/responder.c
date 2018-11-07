@@ -8,6 +8,7 @@
 #include "gossip/components/responder.h"
 #include "gossip/neighbor.h"
 #include "gossip/node.h"
+#include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 
 #define RESPONDER_LOGGER_ID "responder"
@@ -98,8 +99,7 @@ static retcode_t respond_to_request(responder_t const *const responder,
   } else {
     // If a transaction was requested but not found, requests it
     if (!flex_trits_are_null(hash, FLEX_TRIT_SIZE_243) &&
-        ((double)rand() / (double)RAND_MAX) <
-            responder->node->conf.p_propagate_request) {
+        rand_handle_probability() < responder->node->conf.p_propagate_request) {
       if ((ret = request_transaction(&responder->node->transaction_requester,
                                      hash, false)) != RC_OK) {
         log_warning(RESPONDER_LOGGER_ID, "Requesting transaction failed\n");
