@@ -106,6 +106,28 @@ size_t tips_cache_solid_size(tips_cache_t* const cache);
  */
 size_t tips_cache_size(tips_cache_t* const cache);
 
+/**
+ * Gets a random tip from a tip cache
+ *
+ * @param cache The cache
+ * @param tip A tip to be filled
+ *
+ * @return a status code
+ */
+retcode_t tips_cache_random_tip(tips_cache_t* const cache,
+                                flex_trit_t* const tip);
+
+/**
+ * Gets a random solid tip from a tip cache
+ *
+ * @param cache The cache
+ * @param tip A tip to be filled
+ *
+ * @return a status code
+ */
+retcode_t tips_cache_random_solid_tip(tips_cache_t* const cache,
+                                      flex_trit_t* const tip);
+
 #ifdef __cplusplus
 }
 #endif

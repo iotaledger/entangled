@@ -153,3 +153,25 @@ size_t tips_cache_size(tips_cache_t* const cache) {
 
   return size;
 }
+
+retcode_t tips_cache_random_tip(tips_cache_t* const cache,
+                                flex_trit_t* const tip) {
+  if (cache == NULL || tip == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  // TODO waiting on #484 for rand handle
+
+  return RC_OK;
+}
+
+retcode_t tips_cache_random_solid_tip(tips_cache_t* const cache,
+                                      flex_trit_t* const tip) {
+  if (cache == NULL || tip == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  // TODO waiting on #484 for rand handle
+
+  return RC_OK;
+}
