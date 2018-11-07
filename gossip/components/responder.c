@@ -44,6 +44,7 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
   if (flex_trits_are_null(hash->trits, FLEX_TRIT_SIZE_243)) {
     log_debug(RESPONDER_LOGGER_ID, "Responding to random tip request\n");
     if (true) {
+      // TODO random tip request
       neighbor->nbr_random_tx_req++;
     }
     // Else no tx to request, so no random tip will be sent as a reply.
@@ -151,12 +152,9 @@ static void *responder_routine(responder_t *const responder) {
                                     &pack) != RC_OK) {
       log_warning(RESPONDER_LOGGER_ID,
                   "Getting transaction for request failed\n");
-      continue;
-    }
-    if (respond_to_request(responder, request->neighbor, request->hash,
-                           &pack) != RC_OK) {
+    } else if (respond_to_request(responder, request->neighbor, request->hash,
+                                  &pack) != RC_OK) {
       log_warning(RESPONDER_LOGGER_ID, "Replying to request failed\n");
-      continue;
     }
     transaction_request_queue_pop(&responder->queue);
     rw_lock_handle_unlock(&responder->lock);
