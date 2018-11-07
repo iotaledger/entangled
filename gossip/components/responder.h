@@ -23,6 +23,10 @@ typedef struct neighbor_s neighbor_t;
 typedef struct node_s node_t;
 typedef struct tangle_s tangle_t;
 
+/**
+ * A responder is responsible for responding to transaction requests sent by
+ * neighbors.
+ */
 typedef struct responder_s {
   thread_handle_t thread;
   bool running;

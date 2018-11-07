@@ -17,6 +17,18 @@
  * Private functions
  */
 
+/**
+ * Gets a transaction according to a request hash
+ * - if null hash: gets a random tip
+ * - if non-null hash: gets the corresponding transaction
+ *
+ * @param responder The responder
+ * @param neighbor The requesting neighbor
+ * @param hash The request hash
+ * @param pack A stor pack to be filled with a transaction
+ *
+ * @return a status code
+ */
 static retcode_t get_transaction_for_request(responder_t const *const responder,
                                              neighbor_t *const neighbor,
                                              trit_array_t const *const hash,
@@ -27,13 +39,16 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
     return RC_NULL_PARAM;
   }
 
+  // If the hash is null, a random tip was requested
   if (flex_trits_is_null(hash->trits, FLEX_TRIT_SIZE_243)) {
     log_debug(RESPONDER_LOGGER_ID, "Responding to random tip request\n");
     if (true) {
       neighbor->nbr_random_tx_req++;
     }
     // Else no tx to request, so no random tip will be sent as a reply.
-  } else {
+  }
+  // If the hash is non-null, a transaction was requested
+  else {
     log_debug(RESPONDER_LOGGER_ID,
               "Responding to regular transaction request\n");
     if ((ret = iota_tangle_transaction_load(
@@ -46,6 +61,18 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
   return ret;
 }
 
+/**
+ * Responds to a request by:
+ * - sending a transaction to the requesting neighbor or
+ * - requesting a missing transaction
+ *
+ * @param responder The responder
+ * @param neighbor The requesting neighbor
+ * @param hash The request hash
+ * @param pack A stor pack containing a transaction
+ *
+ * @return a status code
+ */
 static retcode_t respond_to_request(responder_t const *const responder,
                                     neighbor_t *const neighbor,
                                     flex_trit_t const *const hash,
@@ -57,7 +84,7 @@ static retcode_t respond_to_request(responder_t const *const responder,
   }
 
   if (pack->num_loaded != 0) {
-    // Send transaction back to neighbor
+    // If a transaction or a random tip was found, sends it back to the neighbor
     iota_transaction_t transaction = ((iota_transaction_t *)(pack->models))[0];
     flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
@@ -69,11 +96,10 @@ static retcode_t respond_to_request(responder_t const *const responder,
     }
     // TODO Add transaction to cache
   } else {
-    // Transaction not found
+    // If a transaction was requested but not found, requests it
     if (!flex_trits_is_null(hash, FLEX_TRIT_SIZE_243) &&
         ((double)rand() / (double)RAND_MAX) <
             responder->node->conf.p_propagate_request) {
-      // Request is an actual missing transaction
       if ((ret = request_transaction(&responder->node->transaction_requester,
                                      hash, false)) != RC_OK) {
         log_warning(RESPONDER_LOGGER_ID, "Requesting transaction failed\n");
@@ -85,6 +111,12 @@ static retcode_t respond_to_request(responder_t const *const responder,
   return RC_OK;
 }
 
+/**
+ * Continuously looks for a transaction request from a responder queue and
+ * process it
+ *
+ * @param responder The responder state
+ */
 static void *responder_routine(responder_t *const responder) {
   transaction_request_t *request = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);

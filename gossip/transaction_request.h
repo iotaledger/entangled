@@ -16,11 +16,18 @@
 // Forward declarations
 typedef struct neighbor_s neighbor_t;
 
+// A transaction request coming from a neighbor
 typedef struct transaction_request_s {
+  // The requesting neighbor
   neighbor_t* neighbor;
+  // The requested hash
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
 } transaction_request_t;
 
+/**
+ * A queue of transaction requests used to dispatch them in different threads.
+ * Not concurrent by default.
+ */
 typedef struct transaction_request_queue_entry_s {
   transaction_request_t request;
   struct transaction_request_queue_entry_s* next;
@@ -51,7 +58,8 @@ size_t transaction_request_queue_count(transaction_request_queue_t const queue);
  * Pushes a transaction request to a transaction request queue
  *
  * @param queue The transaction request queue
- * @param request The transaction request
+ * @param neighbor The requesting neighbor
+ * @param hash The requested hash
  *
  * @return a status code
  */

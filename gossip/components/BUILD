@@ -80,6 +80,9 @@ cc_library(
     hdrs = ["responder.h"],
     deps = [
         "//gossip:transaction_request",
+        "//utils/handles:cond",
+        "//utils/handles:lock",
+        "//utils/handles:rw_lock",
         "//utils/handles:thread",
     ],
 )
