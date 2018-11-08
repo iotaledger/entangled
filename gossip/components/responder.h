@@ -11,22 +11,31 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
+#include "common/trinary/flex_trit.h"
+#include "gossip/transaction_request.h"
+#include "utils/handles/cond.h"
+#include "utils/handles/lock.h"
+#include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
-typedef struct concurrent_queue_transaction_request_t_s responder_queue_t;
 typedef struct neighbor_s neighbor_t;
-typedef struct _trit_array *trit_array_p;
 typedef struct node_s node_t;
 typedef struct tangle_s tangle_t;
 
-typedef struct responder_state_s {
+/**
+ * A responder is responsible for responding to transaction requests sent by
+ * neighbors.
+ */
+typedef struct responder_s {
   thread_handle_t thread;
   bool running;
-  responder_queue_t *queue;
+  transaction_request_queue_t queue;
+  rw_lock_handle_t lock;
+  cond_handle_t cond;
   node_t *node;
   tangle_t *tangle;
-} responder_state_t;
+} responder_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,54 +44,63 @@ extern "C" {
 /**
  * Initializes a responder
  *
- * @param state The responder state
+ * @param responder The responder state
  * @param node A node
  * @param tangle A tangle
  *
  * @return a status code
  */
-retcode_t responder_init(responder_state_t *const state, node_t *const node,
+retcode_t responder_init(responder_t *const responder, node_t *const node,
                          tangle_t *const tangle);
 
 /**
  * Starts a responder
  *
- * @param state The responder state
+ * @param responder The responder state
  *
  * @return a status code
  */
-retcode_t responder_start(responder_state_t *const state);
+retcode_t responder_start(responder_t *const responder);
+
+/**
+ * Stops a responder
+ *
+ * @param responder The responder state
+ *
+ * @return a status code
+ */
+retcode_t responder_stop(responder_t *const responder);
+
+/**
+ * Destroys a responder
+ *
+ * @param responder The responder state
+ *
+ * @return a status code
+ */
+retcode_t responder_destroy(responder_t *const responder);
 
 /**
  * Adds a request to a responder
  *
- * @param state The responder state
+ * @param responder The responder state
  * @param neighbor Requesting neighbor
  * @param hash Requested hash
  *
  * @return a status code
  */
-retcode_t responder_on_next(responder_state_t *const state,
+retcode_t responder_on_next(responder_t *const responder,
                             neighbor_t *const neighbor,
-                            trit_array_p const hash);
+                            flex_trit_t const *const hash);
 
 /**
- * Stops a responder
+ * Gets the size of the responder queue
  *
- * @param state The responder state
+ * @param responder The responder
  *
  * @return a status code
  */
-retcode_t responder_stop(responder_state_t *const state);
-
-/**
- * Destroys a responder
- *
- * @param state The responder state
- *
- * @return a status code
- */
-retcode_t responder_destroy(responder_state_t *const state);
+size_t responder_size(responder_t *const responder);
 
 #ifdef __cplusplus
 }

@@ -9,8 +9,8 @@
 #include <string.h>
 
 #include "ciri/core.h"
-#include "gossip/iota_packet.h"  // TODO remove
 #include "utils/containers/lists/concurrent_list_neighbor.h"
+#include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 
 #define MAIN_LOGGER_ID "main"
@@ -20,7 +20,7 @@ static core_t core_g;
 int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
 
-  srand(time(NULL));
+  rand_handle_seed(time(NULL));
 
   // Default configuration
 

@@ -24,5 +24,6 @@ cc_library(
         "//consensus/exit_probability_validator",
         "//consensus/tangle",
         "//utils:logger_helper",
+        "//utils/handles:rand",
     ],
 )

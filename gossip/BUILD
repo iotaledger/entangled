@@ -65,12 +65,19 @@ cc_library(
         "//gossip/components:transaction_requester",
         "//gossip/services:tcp_sender",
         "//gossip/services:udp_sender",
+        "//utils/handles:rand",
     ],
 )
 
 cc_library(
     name = "transaction_request",
+    srcs = ["transaction_request.c"],
     hdrs = ["transaction_request.h"],
+    deps = [
+        "//common:errors",
+        "//common/trinary:flex_trit",
+        "@com_github_uthash//:uthash",
+    ],
 )
 
 cc_library(
@@ -90,6 +97,7 @@ cc_library(
     srcs = ["node.c"],
     deps = [
         ":node_shared",
+        "//ciri:core_shared",
         "//gossip/components:broadcaster",
         "//gossip/components:processor",
         "//gossip/components:receiver",

@@ -30,7 +30,7 @@ typedef struct node_s {
   broadcaster_t broadcaster;
   processor_t processor;
   receiver_state_t receiver;
-  responder_state_t responder;
+  responder_t responder;
   requester_state_t transaction_requester;
   neighbors_list_t* neighbors;
 } iota_node_t;

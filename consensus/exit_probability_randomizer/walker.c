@@ -9,6 +9,7 @@
 #include <math.h>
 
 #include "consensus/exit_probability_randomizer/walker.h"
+#include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
 
@@ -50,7 +51,7 @@ static retcode_t select_approver(
   }
 
   idx = 0;
-  target = ((double)rand() / (double)RAND_MAX) * sum_weights;
+  target = rand_handle_probability() * sum_weights;
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
     if ((target = (target - weights[idx++])) <= 0) {
       memcpy(approver->trits, curr_approver->hash, FLEX_TRIT_SIZE_243);

@@ -7,6 +7,7 @@
 
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/exit_probability_randomizer/walker.h"
+#include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 
 #define EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID \
@@ -16,7 +17,7 @@ retcode_t iota_consensus_ep_randomizer_init(
     ep_randomizer_t *const ep_randomizer, iota_consensus_conf_t *const conf,
     tangle_t *const tangle, ep_randomizer_implementation_t impl) {
   logger_helper_init(EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID, LOGGER_DEBUG, true);
-  srand(time(NULL));
+  rand_handle_seed(time(NULL));
   ep_randomizer->conf = conf;
   ep_randomizer->tangle = tangle;
   if (impl == EP_RANDOM_WALK) {
