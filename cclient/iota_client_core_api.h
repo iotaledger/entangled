@@ -94,7 +94,7 @@ retcode_t iota_client_remove_neighbors(
  * @return error value.
  */
 retcode_t iota_client_get_tips(const iota_client_service_t* const service,
-                               get_tips_res_t** res);
+                               get_tips_res_t* res);
 /**
  * Find the transactions which attach the specified input and return. All input
  * values are lists (in req), for which a list of return values (transaction

@@ -72,7 +72,7 @@ typedef struct {
                                           char_buffer_t* out);
   retcode_t (*get_tips_deserialize_response)(const serializer_t* const,
                                              const char* const obj,
-                                             get_tips_res_t** out);
+                                             get_tips_res_t* res);
 
   // get_transactions_to_approve_response
   retcode_t (*get_transactions_to_approve_serialize_request)(

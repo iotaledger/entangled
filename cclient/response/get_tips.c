@@ -7,14 +7,33 @@
 
 #include "response/get_tips.h"
 
-get_tips_res_t* get_tips_res_new() { return flex_hash_array_new(); }
-
-trit_array_p get_tips_res_hash_at(get_tips_res_t* hashes, size_t index) {
-  return flex_hash_array_at(hashes, index);
+get_tips_res_t* get_tips_res_new() {
+  get_tips_res_t* res = (get_tips_res_t*)malloc(sizeof(get_tips_res_t));
+  if (res) {
+    res->tips = flex_hash_array_new();
+  }
+  return res;
 }
 
-int get_tips_res_hash_num(get_tips_res_t* hashes) {
-  return flex_hash_array_count(hashes);
+void get_tips_res_free(get_tips_res_t** const res) {
+  if (!res || !(*res)) {
+    return;
+  }
+
+  get_tips_res_t* tmp = *res;
+
+  if (tmp->tips) {
+    flex_hash_array_free(tmp->tips);
+  }
+  free(tmp);
+  *res = NULL;
 }
 
-void get_tips_res_free(get_tips_res_t* hashes) { flex_hash_array_free(hashes); }
+trit_array_p get_tips_res_tip_at(get_tips_res_t* const res,
+                                 size_t const index) {
+  return flex_hash_array_at(res->tips, index);
+}
+
+size_t get_tips_res_tip_num(get_tips_res_t* const res) {
+  return flex_hash_array_count(res->tips);
+}

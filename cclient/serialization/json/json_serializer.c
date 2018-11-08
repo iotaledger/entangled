@@ -800,7 +800,7 @@ retcode_t json_get_tips_serialize_request(const serializer_t* const s,
 
 retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
                                              const char* const obj,
-                                             get_tips_res_t** out) {
+                                             get_tips_res_t* res) {
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
@@ -821,7 +821,7 @@ retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  *out = json_array_to_flex_hash_array(json_obj, "hashes", *out);
+  res->tips = json_array_to_flex_hash_array(json_obj, "hashes", res->tips);
 
   cJSON_Delete(json_obj);
   return ret;

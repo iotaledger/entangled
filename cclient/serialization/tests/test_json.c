@@ -327,17 +327,16 @@ void test_deserialize_get_tips(void) {
   trit_array_p tmp_tip = NULL;
   trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_1);
   trit_array_p hash2 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_2);
-  get_tips_res_t* tips = get_tips_res_new();
+  get_tips_res_t* res = get_tips_res_new();
 
-  serializer.vtable.get_tips_deserialize_response(&serializer, json_text,
-                                                  &tips);
-  tmp_tip = get_tips_res_hash_at(tips, 0);
+  serializer.vtable.get_tips_deserialize_response(&serializer, json_text, res);
+  tmp_tip = get_tips_res_tip_at(res, 0);
   TEST_ASSERT_EQUAL_MEMORY(tmp_tip->trits, hash1->trits, hash1->num_bytes);
-  tmp_tip = get_tips_res_hash_at(tips, 1);
+  tmp_tip = get_tips_res_tip_at(res, 1);
   TEST_ASSERT_EQUAL_MEMORY(tmp_tip->trits, hash2->trits, hash2->num_bytes);
-  tmp_tip = get_tips_res_hash_at(tips, 3);
+  tmp_tip = get_tips_res_tip_at(res, 3);
   TEST_ASSERT_NULL(tmp_tip);
-  get_tips_res_free(tips);
+  get_tips_res_free(&res);
   trit_array_free(hash1);
   trit_array_free(hash2);
 }
