@@ -6,6 +6,7 @@
  */
 
 #include "gossip/tips_cache.h"
+#include "utils/handles/rand.h"
 
 /*
  * Private functions
@@ -27,6 +28,26 @@ static retcode_t tips_cache_fifo_add(hash243_set_t* const set,
   }
 
   return hash243_set_add(set, tip);
+}
+
+static retcode_t tips_cache_random_tip_from_set(hash243_set_t* const set,
+                                                flex_trit_t* const tip) {
+  hash243_set_entry_t* iter = NULL;
+  hash243_set_entry_t* tmp = NULL;
+
+  if (set == NULL || tip == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  int index = rand_handle_rand_interval(0, hash243_set_size(set));
+  HASH_ITER(hh, *set, iter, tmp) {
+    if (index-- == 0) {
+      memcpy(tip, iter->hash, FLEX_TRIT_SIZE_243);
+      break;
+    }
+  }
+
+  return RC_OK;
 }
 
 /*
@@ -156,22 +177,42 @@ size_t tips_cache_size(tips_cache_t* const cache) {
 
 retcode_t tips_cache_random_tip(tips_cache_t* const cache,
                                 flex_trit_t* const tip) {
+  retcode_t ret = RC_OK;
+
   if (cache == NULL || tip == NULL) {
     return RC_NULL_PARAM;
   }
 
-  // TODO waiting on #484 for rand handle
+  rw_lock_handle_rdlock(&cache->lock);
 
-  return RC_OK;
+  if (hash243_set_size(&cache->tips) == 0) {
+    memset(tip, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+    goto done;
+  }
+  ret = tips_cache_random_tip_from_set(&cache->tips, tip);
+
+done:
+  rw_lock_handle_unlock(&cache->lock);
+  return ret;
 }
 
 retcode_t tips_cache_random_solid_tip(tips_cache_t* const cache,
                                       flex_trit_t* const tip) {
+  retcode_t ret = RC_OK;
+
   if (cache == NULL || tip == NULL) {
     return RC_NULL_PARAM;
   }
 
-  // TODO waiting on #484 for rand handle
+  rw_lock_handle_rdlock(&cache->lock);
 
-  return RC_OK;
+  if (hash243_set_size(&cache->solid_tips) == 0) {
+    rw_lock_handle_unlock(&cache->lock);
+    return tips_cache_random_tip(cache, tip);
+  }
+  ret = tips_cache_random_tip_from_set(&cache->solid_tips, tip);
+
+  rw_lock_handle_unlock(&cache->lock);
+
+  return ret;
 }
