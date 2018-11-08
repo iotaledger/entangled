@@ -197,16 +197,16 @@ retcode_t iota_api_broadcast_transactions(
     iota_api_t const *const api,
     broadcast_transactions_req_t const *const req) {
   retcode_t ret = RC_OK;
-  flex_hash_array_t *iter = NULL;
+  hash8019_queue_entry_t *iter = NULL;
   struct _iota_transaction tx;
 
-  LL_FOREACH(req->trytes, iter) {
-    transaction_deserialize_from_trits(&tx, iter->hash->trits);
+  CDL_FOREACH(req->trytes, iter) {
+    transaction_deserialize_from_trits(&tx, iter->hash);
     if (iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
       // TODO priority queue on weight_magnitude
-      if ((ret = broadcaster_on_next(&api->node->broadcaster,
-                                     iter->hash->trits)) != RC_OK) {
+      if ((ret = broadcaster_on_next(&api->node->broadcaster, iter->hash)) !=
+          RC_OK) {
         return ret;
       }
     }
