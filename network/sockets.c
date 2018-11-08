@@ -5,8 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "sockets.h"
+#include <stdio.h>
 #include <string.h>
+
+#include "sockets.h"
 
 int open_client_socket(char const *const hostname, const size_t port) {
   struct addrinfo hints, *serverinfo, *info;
