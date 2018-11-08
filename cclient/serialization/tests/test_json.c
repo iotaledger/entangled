@@ -623,8 +623,8 @@ void test_serialize_broadcast_transactions(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   broadcast_transactions_req_t* req = broadcast_transactions_req_new();
-  broadcast_transactions_req_add_trytes(req,
-                                        (const tryte_t*)TEST_2673_TRYRES_3);
+  TEST_ASSERT(broadcast_transactions_req_add_trytes(
+                  req, (const tryte_t*)TEST_2673_TRYRES_3) == RC_OK);
 
   serializer.vtable.broadcast_transactions_serialize_request(&serializer, req,
                                                              serializer_out);
@@ -664,8 +664,10 @@ void test_serialize_check_consistency(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   check_consistency_req_t* req = check_consistency_req_new();
-  req = check_consistency_req_add(req, TEST_81_TRYRES_1);
-  req = check_consistency_req_add(req, TEST_81_TRYRES_2);
+  TEST_ASSERT(check_consistency_req_add(
+                  req, (const tryte_t*)TEST_81_TRYRES_1) == RC_OK);
+  TEST_ASSERT(check_consistency_req_add(
+                  req, (const tryte_t*)TEST_81_TRYRES_2) == RC_OK);
 
   serializer.vtable.check_consistency_serialize_request(&serializer, req,
                                                         serializer_out);
@@ -673,7 +675,7 @@ void test_serialize_check_consistency(void) {
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
   char_buffer_free(serializer_out);
-  check_consistency_req_free(req);
+  check_consistency_req_free(&req);
 }
 
 void test_deserialize_check_consistency(void) {

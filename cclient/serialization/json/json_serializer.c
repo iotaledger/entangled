@@ -1351,7 +1351,7 @@ retcode_t json_check_consistency_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("checkConsistency"));
 
-  ret = flex_hash_array_to_json_array(obj, json_root, "tails");
+  ret = hash243_queue_to_json_array(obj->hashes, json_root, "tails");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;
