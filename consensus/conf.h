@@ -18,6 +18,7 @@
 #define DEFAULT_TIP_SELECTION_BELOW_MAX_DEPTH 20000
 #define DEFAULT_TIP_SELECTION_CW_CALC_IMPL DFS_FROM_ENTRY_POINT
 #define DEFAULT_TIP_SELECTION_EP_RAND_IMPL EP_RANDOM_WALK
+#define DEFAULT_DB_PATH DB_PATH
 #define DEFAULT_SNAPSHOT_CONF_FILE SNAPSHOT_CONF_FILE
 #define DEFAULT_SNAPSHOT_SIG_FILE SNAPSHOT_SIG_FILE
 #define DEFAULT_SNAPSHOT_FILE SNAPSHOT_FILE
@@ -42,6 +43,8 @@ typedef struct iota_consensus_conf_s {
   // latest referenced milestone by the currently visited transaction during the
   // random walk
   size_t below_max_depth;
+  // Path of the DB file
+  char db_path[128];
   // Path of the snapshot configuration file
   char snapshot_conf_file[128];
   // Path to the file that contains a signature for the snapshot file

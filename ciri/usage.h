@@ -28,6 +28,7 @@ typedef enum cli_arg_value_e {
   CLI_ARG_ALPHA,
   CLI_ARG_BELOW_MAX_DEPTH,
   CLI_ARG_MAX_DEPTH,
+  CLI_ARG_DB_PATH,
 
 } cli_arg_value_t;
 
@@ -95,6 +96,7 @@ static struct cli_argument_s {
      "Limits how many milestones behind the current one the random walk can "
      "start.",
      REQUIRED_ARG},
+    {"db-path", CLI_ARG_DB_PATH, "Path to the database file.", REQUIRED_ARG},
 
     {NULL, 0, NULL, NO_ARG}};
 

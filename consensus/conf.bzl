@@ -1,4 +1,5 @@
 CONSENSUS_MAINNET_VARIABLES = [
+    "DB_PATH='\"ciri/ciri.db\"'",
     "SNAPSHOT_CONF_FILE='\"external/snapshot_conf_mainnet/file/snapshot.json\"'",
     "SNAPSHOT_SIG_FILE='\"external/snapshot_sig_mainnet/file/snapshot.sig\"'",
     "SNAPSHOT_FILE='\"external/snapshot_mainnet/file/snapshot.txt\"'",
@@ -7,6 +8,7 @@ CONSENSUS_MAINNET_VARIABLES = [
 ]
 
 CONSENSUS_TESTNET_VARIABLES = [
+    "DB_PATH='\"ciri/ciri.db\"'",
     "SNAPSHOT_CONF_FILE='\"external/snapshot_conf_testnet/file/snapshot.json\"'",
     "SNAPSHOT_SIG_FILE='\"\"'",
     "SNAPSHOT_FILE='\"external/snapshot_testnet/file/snapshot.txt\"'",
