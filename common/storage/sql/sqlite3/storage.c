@@ -229,7 +229,8 @@ enum value_type {
 };
 
 retcode_t update_transactions(const connection_t* const conn,
-                              const hash243_set_t hashes, void* value,
+                              const hash243_set_t hashes,
+                              void const* const value,
                               const char* const statement,
                               enum value_type type) {
   retcode_t ret = RC_OK;
@@ -262,8 +263,9 @@ retcode_t update_transactions(const connection_t* const conn,
   }
 
   bind_execute_hash_params_t params = {.sqlite_statement = sqlite_statement};
-  if ((ret = hash243_set_for_each(&hashes, bind_execute_hash_do_func,
-                                  &params)) != RC_OK) {
+  if ((ret = hash243_set_for_each(
+           &hashes, (hash243_on_container_func)bind_execute_hash_do_func,
+           &params)) != RC_OK) {
     goto done;
   }
 
@@ -276,7 +278,7 @@ done:
     }
     return ret;
   }
-  if (ret = end_transaction((sqlite3*)conn->db) != RC_OK) {
+  if ((ret = end_transaction((sqlite3*)conn->db)) != RC_OK) {
     return ret;
   }
 
@@ -289,7 +291,6 @@ done:
 
 static retcode_t bind_execute_hash_do_func(bind_execute_hash_params_t* params,
                                            flex_trit_t* hash) {
-  retcode_t ret = RC_OK;
   int reset_ret = sqlite3_reset(params->sqlite_statement);
 
   if (reset_ret != SQLITE_DONE && reset_ret != SQLITE_OK) {

@@ -71,8 +71,6 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf,
     return RC_NULL_PARAM;
   }
 
-  memset(ciri_conf, 0, sizeof(iota_ciri_conf_t));
-
   ciri_conf->log_level = DEFAULT_LOG_LEVEL;
 
   if ((ret = iota_consensus_conf_init(consensus_conf)) != RC_OK) {
