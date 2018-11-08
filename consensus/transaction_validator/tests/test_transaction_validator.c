@@ -16,7 +16,6 @@
 #include "utarray.h"
 #include "utils/time.h"
 
-static const uint16_t mwm = 14;
 static iota_consensus_conf_t conf;
 
 void transaction_invalid_value() {

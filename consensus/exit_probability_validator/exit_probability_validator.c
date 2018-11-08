@@ -101,7 +101,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
 }
 
 retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
-    exit_prob_transaction_validator_t *epv, trit_array_p tail_hash,
+    exit_prob_transaction_validator_t *epv, trit_array_t const *const tail_hash,
     uint32_t lowest_allowed_depth, bool *below_max_depth) {
   retcode_t res = RC_OK;
 

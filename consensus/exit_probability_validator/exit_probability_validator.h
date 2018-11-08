@@ -51,8 +51,9 @@ extern retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
     trit_array_t const *const tail_hash, bool *const is_valid);
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
-    exit_prob_transaction_validator_t *ep_validator, trit_array_p tail_hash,
-    uint32_t lowest_allowed_depth, bool *below_max_depth);
+    exit_prob_transaction_validator_t *ep_validator,
+    trit_array_t const *const tail_hash, uint32_t lowest_allowed_depth,
+    bool *below_max_depth);
 
 #ifdef __cplusplus
 }
