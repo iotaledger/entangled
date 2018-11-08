@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __CIRI_NODE_H__
-#define __CIRI_NODE_H__
+#ifndef __GOSSIP_NODE_H__
+#define __GOSSIP_NODE_H__
 
 #include "common/errors.h"
 #include "gossip/components/broadcaster.h"
@@ -80,4 +80,4 @@ retcode_t node_destroy(iota_node_t* const node);
 }
 #endif
 
-#endif  // __CIRI_NODE_H__
+#endif  // __GOSSIP_NODE_H__
