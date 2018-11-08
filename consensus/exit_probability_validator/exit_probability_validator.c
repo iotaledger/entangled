@@ -40,8 +40,8 @@ retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
 }
 
 retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
-    exit_prob_transaction_validator_t const *epv,
-    trit_array_t const *const tail_hash, bool *is_valid) {
+    exit_prob_transaction_validator_t *const epv,
+    trit_array_t const *const tail_hash, bool *const is_valid) {
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(tx, tx_models, tx_pack);
 

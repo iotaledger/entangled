@@ -36,7 +36,7 @@ trit_array_p get_trytes_res_trytes_at(get_trytes_res_t const* const res,
 
 get_trytes_res_t* get_trytes_res_add_trytes(get_trytes_res_t* const res,
                                             tryte_t const* const trytes) {
-  res->trytes = flex_hash_array_append(res->trytes, trytes);
+  res->trytes = flex_hash_array_append(res->trytes, (char*)trytes);
   return res;
 }
 

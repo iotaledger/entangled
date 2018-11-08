@@ -64,8 +64,8 @@ static retcode_t select_approver(
 
 static retcode_t find_tail_if_valid(
     ep_randomizer_t const *const exit_probability_randomizer,
-    exit_prob_transaction_validator_t const *const epv,
-    trit_array_t *const tx_hash, bool *const has_valid_tail) {
+    exit_prob_transaction_validator_t *const epv, trit_array_t *const tx_hash,
+    bool *const has_valid_tail) {
   retcode_t ret = RC_OK;
 
   *has_valid_tail = false;

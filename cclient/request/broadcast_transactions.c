@@ -30,6 +30,6 @@ void broadcast_transactions_req_free(broadcast_transactions_req_t** const req) {
 
 broadcast_transactions_req_t* broadcast_transactions_req_add_trytes(
     broadcast_transactions_req_t* const req, tryte_t const* const trytes) {
-  req->trytes = flex_hash_array_append(req->trytes, trytes);
+  req->trytes = flex_hash_array_append(req->trytes, (char*)trytes);
   return req;
 }
