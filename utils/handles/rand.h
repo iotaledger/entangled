@@ -22,7 +22,11 @@ static inline void rand_handle_seed(unsigned int seed) { srand(seed); }
 static inline int rand_handle_rand() { return rand(); }
 
 static inline double rand_handle_probability() {
-  return ((double)rand_handle_rand() / (double)RAND_MAX);
+  return ((double)rand_handle_rand() / (double)((unsigned)RAND_MAX + 1));
+}
+
+static inline int rand_handle_rand_interval(size_t lower, size_t upper) {
+  return lower + rand_handle_probability() * upper;
 }
 
 #else
@@ -51,6 +55,16 @@ static inline int rand_handle_rand();
  * @return a random probability
  */
 static inline double rand_handle_probability();
+
+/**
+ * Generates a random number in the interval [lower;upper[
+ *
+ * @param lower The lower bound
+ * @param upper The upper bound
+ *
+ * @return a random number in the interval
+ */
+static inline int rand_handle_rand_interval(size_t lower, size_t upper);
 
 #ifdef __cplusplus
 }
