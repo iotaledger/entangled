@@ -80,10 +80,11 @@ int main(int argc, char* argv[]) {
     }
     log_info(MAIN_LOGGER_ID,
              "Transactions: to process %d, to broadcast %d, to request %d, "
-             "count %d\n",
+             "to reply %d, count %d\n",
              processor_size(&core_g.node.processor),
              broadcaster_size(&core_g.node.broadcaster),
-             requester_size(&core_g.node.transaction_requester), count);
+             requester_size(&core_g.node.transaction_requester),
+             responder_size(&core_g.node.responder), count);
     sleep(STATS_LOG_INTERVAL);
   }
 
