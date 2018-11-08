@@ -18,7 +18,7 @@ retcode_t core_init(core_t* const core) {
   logger_helper_init(CORE_LOGGER_ID, LOGGER_DEBUG, true);
   core->running = false;
 
-  connection_config_t db_conf = {.db_path = core->consensus.conf.db_path};
+  connection_config_t db_conf = {.db_path = core->conf.db_path};
 
   log_info(CORE_LOGGER_ID, "Initializing consensus\n");
   if (iota_consensus_init(&core->consensus, &db_conf,

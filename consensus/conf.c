@@ -17,7 +17,6 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t* const conf) {
   conf->max_depth = DEFAULT_TIP_SELECTION_MAX_DEPTH;
   conf->alpha = DEFAULT_TIP_SELECTION_ALPHA;
   conf->below_max_depth = DEFAULT_TIP_SELECTION_BELOW_MAX_DEPTH;
-  strcpy(conf->db_path, DEFAULT_DB_PATH);
   strcpy(conf->snapshot_conf_file, DEFAULT_SNAPSHOT_CONF_FILE);
   strcpy(conf->snapshot_sig_file, DEFAULT_SNAPSHOT_SIG_FILE);
   strcpy(conf->snapshot_file, DEFAULT_SNAPSHOT_FILE);
