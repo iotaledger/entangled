@@ -31,10 +31,9 @@ typedef struct iota_api_s {
   iota_api_conf_t conf;
   thread_handle_t thread;
   bool running;
-  uint16_t port;
+  node_t *node;
   tangle_t *tangle;
   transaction_validator_t *transaction_validator;
-  broadcaster_t *broadcaster;
   serializer_t serializer;
   serializer_type_t serializer_type;
 } iota_api_t;
@@ -43,16 +42,16 @@ typedef struct iota_api_s {
  * Initializes an API
  *
  * @param api The API
+ * @param node A node
  * @param tangle A tangle
  * @param transaction_validator A transaction validator
- * @param broadcaster A broadcaster
  * @param serializer_type A serializer type
  *
  * @return a status code
  */
-retcode_t iota_api_init(iota_api_t *const api, tangle_t *const tangle,
+retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
+                        tangle_t *const tangle,
                         transaction_validator_t *const transaction_validator,
-                        broadcaster_t *const broadcaster,
                         serializer_type_t const serializer_type);
 
 /**

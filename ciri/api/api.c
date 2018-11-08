@@ -9,6 +9,7 @@
 
 #include "cclient/serialization/json/json_serializer.h"
 #include "ciri/api/api.h"
+#include "gossip/node.h"
 #include "request/requests.h"
 #include "response/responses.h"
 #include "utils/logger_helper.h"
@@ -179,8 +180,8 @@ retcode_t iota_api_broadcast_transactions(
     transaction_deserialize_from_trits(&tx, iter->hash->trits);
     if (iota_consensus_transaction_validate(api->transaction_validator, &tx)) {
       // TODO priority queue on weight_magnitude
-      if ((ret = broadcaster_on_next(api->broadcaster, iter->hash->trits)) !=
-          RC_OK) {
+      if ((ret = broadcaster_on_next(&api->node->broadcaster,
+                                     iter->hash->trits)) != RC_OK) {
         return ret;
       }
     }
@@ -233,9 +234,9 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api,
   return RC_OK;
 }
 
-retcode_t iota_api_init(iota_api_t *const api, tangle_t *const tangle,
+retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
+                        tangle_t *const tangle,
                         transaction_validator_t *const transaction_validator,
-                        broadcaster_t *const broadcaster,
                         serializer_type_t const serializer_type) {
   if (api == NULL) {
     return RC_API_NULL_SELF;
@@ -243,9 +244,9 @@ retcode_t iota_api_init(iota_api_t *const api, tangle_t *const tangle,
 
   logger_helper_init(API_LOGGER_ID, LOGGER_DEBUG, true);
   api->running = false;
+  api->node = node;
   api->tangle = tangle;
   api->transaction_validator = transaction_validator;
-  api->broadcaster = broadcaster;
   api->serializer_type = serializer_type;
   if (api->serializer_type == SR_JSON) {
     init_json_serializer(&api->serializer);
