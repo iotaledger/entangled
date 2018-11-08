@@ -47,6 +47,7 @@ Long option | Short option | Description | Example input
 --- | --- | --- | ---
 `--help` | `-h` | Displays the usage. |
 `--log-level` | `-l` | Valid log levels: "debug", "info", "notice", "warning", "error", "critical", "alert" and "emergency". | `-l debug`
+`--db-path` | `-d` | Path to the database file. | `--db-path ciri/ciri.db`
 `--mwm` | | Number of trailing ternary 0s that must appear at the end of a transaction hash. Difficulty can be described as 3^mwm. | `--mwm 14`
 `--neighbors` | `-n` | URIs of neighbouring nodes, separated by a space. | `-n "udp://148.148.148.148:14265 udp://[2001:db8:a0b:12f0::1]:14265"`
 `--p-remove-request` | | Probability of removing a transaction from the request queue without requesting it. Value must be in [0,1]. | `--p-remove-request 0.01`
@@ -58,4 +59,3 @@ Long option | Short option | Description | Example input
 `--alpha` | | Randomness of the tip selection. Value must be in [0, inf] where 0 is most random and inf is most deterministic. | `--alpha 0.001`
 `--below-max-depth` | | Maximum number of unconfirmed transactions that may be analysed to find the latest referenced milestone by the currently visited transaction during the random walk. | `--below-max-depth 20000`
 `--max-depth` | | Limits how many milestones behind the current one the random walk can start. | `--max-depth 15`
-`--db-path` | | Path to the database file. | `--db-path ciri/ciri.db`

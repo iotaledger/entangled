@@ -28,7 +28,6 @@ typedef enum cli_arg_value_e {
   CLI_ARG_ALPHA,
   CLI_ARG_BELOW_MAX_DEPTH,
   CLI_ARG_MAX_DEPTH,
-  CLI_ARG_DB_PATH,
 
 } cli_arg_value_t;
 
@@ -53,6 +52,7 @@ static struct cli_argument_s {
      "\"error\", \"critical\", \"alert\" "
      "and \"emergency\".",
      REQUIRED_ARG},
+    {"db-path", 'd', "Path to the database file.", REQUIRED_ARG},
 
     // Gossip configuration
 
@@ -96,11 +96,10 @@ static struct cli_argument_s {
      "Limits how many milestones behind the current one the random walk can "
      "start.",
      REQUIRED_ARG},
-    {"db-path", CLI_ARG_DB_PATH, "Path to the database file.", REQUIRED_ARG},
 
     {NULL, 0, NULL, NO_ARG}};
 
-static char* short_options = "hl:n:t:u:p:";
+static char* short_options = "hld:n:t:u:p:";
 
 #ifdef __cplusplus
 extern "C" {

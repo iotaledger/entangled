@@ -111,6 +111,9 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
       case 'l':  // --log-level
         ciri_conf->log_level = get_log_level(optarg);
         break;
+      case 'd':  // --db-path
+        strcpy(consensus_conf->db_path, optarg);
+        break;
 
       // Gossip configuration
       case CLI_ARG_MWM:  // --mwm
@@ -152,9 +155,6 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
         break;
       case CLI_ARG_BELOW_MAX_DEPTH:  // --below-max-depth
         consensus_conf->below_max_depth = atoi(optarg);
-        break;
-      case CLI_ARG_DB_PATH:  // --db-path
-        strcpy(consensus_conf->db_path, optarg);
         break;
 
       default:
