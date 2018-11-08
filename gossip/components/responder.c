@@ -119,7 +119,8 @@ static retcode_t respond_to_request(responder_t const *const responder,
  * @param responder The responder state
  */
 static void *responder_routine(responder_t *const responder) {
-  transaction_request_t *request = NULL;
+  transaction_request_t *request_ptr = NULL;
+  transaction_request_t request;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   trit_array_t hash = {.trits = NULL,
                        .num_trits = HASH_LENGTH_TRIT,
@@ -139,25 +140,28 @@ static void *responder_routine(responder_t *const responder) {
       cond_handle_timedwait(&responder->cond, &lock_cond,
                             RESPONDER_TIMEOUT_SEC);
     }
+
     rw_lock_handle_wrlock(&responder->lock);
-    request = transaction_request_queue_peek(responder->queue);
-    if (request == NULL) {
+    request_ptr = transaction_request_queue_peek(responder->queue);
+    if (request_ptr == NULL) {
       rw_lock_handle_unlock(&responder->lock);
       continue;
     }
+    request = *request_ptr;
+    transaction_request_queue_pop(&responder->queue);
+    rw_lock_handle_unlock(&responder->lock);
+
     log_debug(RESPONDER_LOGGER_ID, "Responding to request\n");
     hash_pack_reset(&pack);
-    hash.trits = request->hash;
-    if (get_transaction_for_request(responder, request->neighbor, &hash,
+    hash.trits = request.hash;
+    if (get_transaction_for_request(responder, request.neighbor, &hash,
                                     &pack) != RC_OK) {
       log_warning(RESPONDER_LOGGER_ID,
                   "Getting transaction for request failed\n");
-    } else if (respond_to_request(responder, request->neighbor, request->hash,
+    } else if (respond_to_request(responder, request.neighbor, request.hash,
                                   &pack) != RC_OK) {
       log_warning(RESPONDER_LOGGER_ID, "Replying to request failed\n");
     }
-    transaction_request_queue_pop(&responder->queue);
-    rw_lock_handle_unlock(&responder->lock);
   }
 
   lock_handle_unlock(&lock_cond);

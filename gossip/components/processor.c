@@ -229,7 +229,8 @@ static retcode_t process_packet(processor_t const *const processor,
  * @param processor The processor state
  */
 static void *processor_routine(processor_t *const processor) {
-  iota_packet_t *packet = NULL;
+  iota_packet_t *packet_ptr = NULL;
+  iota_packet_t packet;
 
   if (processor == NULL) {
     return NULL;
@@ -244,18 +245,21 @@ static void *processor_routine(processor_t *const processor) {
       cond_handle_timedwait(&processor->cond, &lock_cond,
                             PROCESSOR_TIMEOUT_SEC);
     }
+
     rw_lock_handle_wrlock(&processor->lock);
-    packet = iota_packet_queue_peek(processor->queue);
-    if (packet == NULL) {
+    packet_ptr = iota_packet_queue_peek(processor->queue);
+    if (packet_ptr == NULL) {
       rw_lock_handle_unlock(&processor->lock);
       continue;
     }
-    log_debug(PROCESSOR_LOGGER_ID, "Processing packet\n");
-    if (process_packet(processor, packet) != RC_OK) {
-      log_warning(PROCESSOR_LOGGER_ID, "Processing packet failed\n");
-    }
+    packet = *packet_ptr;
     iota_packet_queue_pop(&processor->queue);
     rw_lock_handle_unlock(&processor->lock);
+
+    log_debug(PROCESSOR_LOGGER_ID, "Processing packet\n");
+    if (process_packet(processor, &packet) != RC_OK) {
+      log_warning(PROCESSOR_LOGGER_ID, "Processing packet failed\n");
+    }
   }
 
   lock_handle_unlock(&lock_cond);
