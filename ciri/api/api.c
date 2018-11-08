@@ -97,7 +97,27 @@ retcode_t iota_api_remove_neighbors(iota_api_t const *const api,
 
 retcode_t iota_api_get_tips(iota_api_t const *const api,
                             get_tips_res_t *const res) {
-  return RC_OK;
+  retcode_t ret = RC_OK;
+  hash243_set_t tips = NULL;
+  hash243_set_entry_t *iter = NULL;
+  hash243_set_entry_t *tmp = NULL;
+  tryte_t tip_trytes[HASH_LENGTH_TRYTE + 1];
+
+  if ((ret = tips_cache_get_tips(&api->node->tips, &tips))) {
+    goto done;
+  }
+
+  HASH_ITER(hh, tips, iter, tmp) {
+    // TODO Not necessary when get_tips_res_t will have a hash container
+    flex_trits_to_trytes(tip_trytes, HASH_LENGTH_TRYTE, iter->hash,
+                         HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    tip_trytes[HASH_LENGTH_TRYTE] = '\0';
+    get_tips_res_add_tip(res, tip_trytes);
+  }
+
+done:
+  hash243_set_free(&tips);
+  return ret;
 }
 
 retcode_t iota_api_find_transactions(iota_api_t const *const api,
