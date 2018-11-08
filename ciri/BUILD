@@ -17,7 +17,10 @@ cc_binary(
     name = "ciri",
     srcs = ["main.c"],
     copts = ["-DLOGGER_ENABLE"],
-    data = ["ciri.db"],
+    data = [
+        "db/ciri-mainnet.db",
+        "db/ciri-testnet.db",
+    ],
     deps = [
         ":core",
         "//utils/containers/lists:concurrent_list_neighbor",
