@@ -623,7 +623,8 @@ void test_serialize_broadcast_transactions(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   broadcast_transactions_req_t* req = broadcast_transactions_req_new();
-  broadcast_transactions_req_add_trytes(req, (tryte_t*)TEST_2673_TRYRES_3);
+  broadcast_transactions_req_add_trytes(req,
+                                        (const tryte_t*)TEST_2673_TRYRES_3);
 
   serializer.vtable.broadcast_transactions_serialize_request(&serializer, req,
                                                              serializer_out);
