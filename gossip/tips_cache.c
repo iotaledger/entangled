@@ -74,6 +74,26 @@ retcode_t tips_cache_destroy(tips_cache_t* const cache) {
   return RC_OK;
 }
 
+retcode_t tips_cache_get_tips(tips_cache_t* const cache,
+                              hash243_set_t* const tips) {
+  retcode_t ret = RC_OK;
+
+  if (cache == NULL || tips == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  rw_lock_handle_rdlock(&cache->lock);
+
+  if ((ret = hash243_set_append(&cache->tips, tips)) != RC_OK ||
+      (ret = hash243_set_append(&cache->solid_tips, tips)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  rw_lock_handle_unlock(&cache->lock);
+  return ret;
+}
+
 retcode_t tips_cache_add(tips_cache_t* const cache,
                          flex_trit_t const* const tip) {
   retcode_t ret = RC_OK;

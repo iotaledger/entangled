@@ -110,6 +110,23 @@ void test_tips_cache() {
   TEST_ASSERT_EQUAL_INT(tips_cache_solid_size(&cache), 3);
   TEST_ASSERT_EQUAL_INT(tips_cache_size(&cache), 5);
 
+  hash243_set_t tips = NULL;
+
+  TEST_ASSERT(tips_cache_get_tips(&cache, &tips) == RC_OK);
+  iter = tips;
+
+  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[1], FLEX_TRIT_SIZE_243), 0);
+  iter = iter->hh.next;
+  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[8], FLEX_TRIT_SIZE_243), 0);
+  iter = iter->hh.next;
+  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[7], FLEX_TRIT_SIZE_243), 0);
+  iter = iter->hh.next;
+  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[2], FLEX_TRIT_SIZE_243), 0);
+  iter = iter->hh.next;
+  TEST_ASSERT_EQUAL_INT(memcmp(iter->hash, hashes[4], FLEX_TRIT_SIZE_243), 0);
+
+  hash243_set_free(&tips);
+
   TEST_ASSERT(tips_cache_set_solid(&cache, hashes[1]) == RC_OK);
   TEST_ASSERT_EQUAL_INT(tips_cache_non_solid_size(&cache), 1);
   TEST_ASSERT_EQUAL_INT(tips_cache_solid_size(&cache), 4);
