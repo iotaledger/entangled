@@ -47,7 +47,7 @@ Long option | Short option | Description | Example input
 --- | --- | --- | ---
 `--help` | `-h` | Displays the usage. |
 `--log-level` | `-l` | Valid log levels: "debug", "info", "notice", "warning", "error", "critical", "alert" and "emergency". | `-l debug`
-`--db-path` | `-d` | Path to the database file. | `--db-path ciri/ciri-mainnet.db`
+`--db-path` | `-d` | Path to the database file. | `--db-path ciri/db/ciri-mainnet.db`
 `--mwm` | | Number of trailing ternary 0s that must appear at the end of a transaction hash. Difficulty can be described as 3^mwm. | `--mwm 14`
 `--neighbors` | `-n` | URIs of neighbouring nodes, separated by a space. | `-n "udp://148.148.148.148:14265 udp://[2001:db8:a0b:12f0::1]:14265"`
 `--p-remove-request` | | Probability of removing a transaction from the request queue without requesting it. Value must be in [0,1]. | `--p-remove-request 0.01`
