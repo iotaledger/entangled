@@ -20,6 +20,8 @@ typedef struct get_tips_res_s {
 
 get_tips_res_t* get_tips_res_new();
 void get_tips_res_free(get_tips_res_t** const res);
+get_tips_res_t* get_tips_res_add_tip(get_tips_res_t* const res,
+                                     tryte_t const* const tip);
 trit_array_p get_tips_res_tip_at(get_tips_res_t* const res, size_t const index);
 size_t get_tips_res_tip_num(get_tips_res_t* const res);
 
