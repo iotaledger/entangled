@@ -13,8 +13,6 @@
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/handles/rw_lock.h"
 
-#define TIPS_CACHE_SIZE 5000
-
 // A fixed capacity FIFO-behaving tips cache
 typedef struct tips_cache_s {
   hash243_set_t tips;

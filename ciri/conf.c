@@ -142,6 +142,9 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
       case 't':  // --tcp-receiver-port
         gossip_conf->tcp_receiver_port = atoi(optarg);
         break;
+      case CLI_ARG_TIPS_CACHE_SIZE:  // --tips-cache-size
+        gossip_conf->tips_cache_size = atoi(optarg);
+        break;
       case 'u':  // --udp-receiver-port
         gossip_conf->udp_receiver_port = atoi(optarg);
         break;

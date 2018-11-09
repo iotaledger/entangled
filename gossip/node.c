@@ -60,7 +60,7 @@ retcode_t node_init(node_t* const node, core_t* const core,
   logger_helper_init(NODE_LOGGER_ID, LOGGER_DEBUG, true);
   node->running = false;
   node->core = core;
-  tips_cache_init(&node->tips, TIPS_CACHE_SIZE);
+  tips_cache_init(&node->tips, node->conf.tips_cache_size);
 
   log_info(NODE_LOGGER_ID, "Initializing neighbors\n");
   if (node_neighbors_init(node) != RC_OK) {
