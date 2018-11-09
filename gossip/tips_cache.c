@@ -82,15 +82,18 @@ retcode_t tips_cache_get_tips(tips_cache_t* const cache,
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_rdlock(&cache->lock);
+  rw_lock_handle_rdlock(&cache->tips_lock);
+  ret = hash243_set_append(&cache->tips, tips);
+  rw_lock_handle_unlock(&cache->tips_lock);
 
-  if ((ret = hash243_set_append(&cache->tips, tips)) != RC_OK ||
-      (ret = hash243_set_append(&cache->solid_tips, tips)) != RC_OK) {
-    goto done;
+  if (ret != RC_OK) {
+    return ret;
   }
 
-done:
-  rw_lock_handle_unlock(&cache->lock);
+  rw_lock_handle_rdlock(&cache->solid_tips_lock);
+  ret = hash243_set_append(&cache->solid_tips, tips);
+  rw_lock_handle_unlock(&cache->solid_tips_lock);
+
   return ret;
 }
 
