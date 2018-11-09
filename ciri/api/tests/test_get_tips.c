@@ -58,8 +58,7 @@ void test_get_tips(void) {
 
   TEST_ASSERT(tips_cache_destroy(&node.tips) == RC_OK);
 
-  get_tips_res_free(&res);
-  TEST_ASSERT(res == NULL);
+  get_tips_res_free(res);
 }
 
 int main(void) {

@@ -336,7 +336,7 @@ void test_deserialize_get_tips(void) {
   TEST_ASSERT_EQUAL_MEMORY(tmp_tip->trits, hash2->trits, hash2->num_bytes);
   tmp_tip = get_tips_res_tip_at(res, 3);
   TEST_ASSERT_NULL(tmp_tip);
-  get_tips_res_free(&res);
+  get_tips_res_free(res);
   trit_array_free(hash1);
   trit_array_free(hash2);
 }

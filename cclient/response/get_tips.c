@@ -15,18 +15,15 @@ get_tips_res_t* get_tips_res_new() {
   return res;
 }
 
-void get_tips_res_free(get_tips_res_t** const res) {
-  if (!res || !(*res)) {
+void get_tips_res_free(get_tips_res_t* const res) {
+  if (!res) {
     return;
   }
 
-  get_tips_res_t* tmp = *res;
-
-  if (tmp->tips) {
-    flex_hash_array_free(tmp->tips);
+  if (res->tips) {
+    flex_hash_array_free(res->tips);
   }
-  free(tmp);
-  *res = NULL;
+  free(res);
 }
 
 get_tips_res_t* get_tips_res_add_tip(get_tips_res_t* const res,
