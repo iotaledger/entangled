@@ -11,7 +11,7 @@
 #include "utils/hash_maps.h"
 #include "utils/logger_helper.h"
 
-#define TRANSACTION_SOLIDIFIER_LOGGER_ID "consensus_transaction_solidifier"
+#define TRANSACTION_SOLIDIFIER_LOGGER_ID "transaction_solidifier"
 
 #define SOLID_PROPAGATION_INTERVAL 500000
 
@@ -111,14 +111,15 @@ static retcode_t propagate_solid_transactions(
 
 retcode_t iota_consensus_transaction_solidifier_init(
     transaction_solidifier_t *const ts, iota_consensus_conf_t *const conf,
-    tangle_t *const tangle, requester_state_t *const requester) {
+    tangle_t *const tangle, requester_state_t *const requester,
+    tips_cache_t *const tips) {
   ts->conf = conf;
   ts->tangle = tangle;
   ts->requester = requester;
   ts->running = false;
   ts->newly_set_solid_transactions = NULL;
   ts->solid_transactions_candidates = NULL;
-  ts->conf = conf;
+  ts->tips = tips;
   lock_handle_init(&ts->lock);
   logger_helper_init(TRANSACTION_SOLIDIFIER_LOGGER_ID, LOGGER_DEBUG, true);
   return RC_OK;
@@ -132,12 +133,12 @@ retcode_t iota_consensus_transaction_solidifier_start(
 
   ts->running = true;
   log_info(TRANSACTION_SOLIDIFIER_LOGGER_ID,
-           "Spawning transaction_solidifier thread\n");
+           "Spawning transaction solidifier thread\n");
   if (thread_handle_create(
           &ts->thread, (thread_routine_t)spawn_solid_transactions_propagation,
           ts) != 0) {
     log_critical(TRANSACTION_SOLIDIFIER_LOGGER_ID,
-                 "Spawning transaction_solidifier thread failed\n");
+                 "Spawning transaction solidifier thread failed\n");
     return RC_API_FAILED_THREAD_SPAWN;
   }
   return RC_OK;
@@ -156,10 +157,10 @@ retcode_t iota_consensus_transaction_solidifier_stop(
   ts->running = false;
 
   log_info(TRANSACTION_SOLIDIFIER_LOGGER_ID,
-           "Shutting down transaction_solidifier thread\n");
+           "Shutting down transaction solidifier thread\n");
   if (thread_handle_join(ts->thread, NULL) != 0) {
     log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
-              "Shutting down transaction_solidifier thread failed\n");
+              "Shutting down transaction solidifier thread failed\n");
     ret = RC_API_FAILED_THREAD_JOIN;
   }
   return ret;

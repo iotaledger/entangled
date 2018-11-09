@@ -12,7 +12,8 @@
 
 retcode_t iota_consensus_init(iota_consensus_t *const consensus,
                               connection_config_t const *const db_conf,
-                              requester_state_t *const transaction_requester) {
+                              requester_state_t *const transaction_requester,
+                              tips_cache_t *const tips) {
   retcode_t ret = RC_OK;
 
   logger_helper_init(CONSENSUS_LOGGER_ID, LOGGER_DEBUG, true);
@@ -73,7 +74,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   log_info(CONSENSUS_LOGGER_ID, "Initializing transaction solidifier\n");
   if ((ret = iota_consensus_transaction_solidifier_init(
            &consensus->transaction_solidifier, &consensus->conf,
-           &consensus->tangle, transaction_requester)) != RC_OK) {
+           &consensus->tangle, transaction_requester, tips)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing transaction solidifier failed\n");
     return ret;
