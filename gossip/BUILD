@@ -88,7 +88,6 @@ cc_library(
         "//common:errors",
         "//common/trinary:flex_trit",
         "//utils/containers/hash:hash243_set",
-        "//utils/handles:rand",
         "//utils/handles:rw_lock",
     ],
 )
