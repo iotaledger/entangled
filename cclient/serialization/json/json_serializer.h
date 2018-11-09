@@ -62,7 +62,7 @@ retcode_t json_get_node_info_serialize_request(const serializer_t* const s,
 
 retcode_t json_get_node_info_deserialize_response(const serializer_t* const,
                                                   const char* const obj,
-                                                  get_node_info_res_t** out);
+                                                  get_node_info_res_t* out);
 
 // get_tips_response
 retcode_t json_get_tips_serialize_request(const serializer_t* const s,
@@ -78,7 +78,7 @@ retcode_t json_get_transactions_to_approve_serialize_request(
 
 retcode_t json_get_transactions_to_approve_deserialize_response(
     const serializer_t* const, const char* const obj,
-    get_transactions_to_approve_res_t** out);
+    get_transactions_to_approve_res_t* out);
 
 // addNeighbors
 retcode_t json_add_neighbors_serialize_request(

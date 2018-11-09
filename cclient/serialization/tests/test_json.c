@@ -143,7 +143,7 @@ void test_deserialize_get_node_info(void) {
   get_node_info_res_t* node_info = get_node_info_res_new();
 
   serializer.vtable.get_node_info_deserialize_response(&serializer, json_text,
-                                                       &node_info);
+                                                       node_info);
 
   TEST_ASSERT_EQUAL_STRING(TEST_INFO_APP_NAME, node_info->app_name->data);
   TEST_ASSERT_EQUAL_STRING(TEST_INFO_APP_VERSION, node_info->app_version->data);
@@ -156,7 +156,7 @@ void test_deserialize_get_node_info(void) {
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYRES_1,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash, node_info->latest_milestone->trits,
+  TEST_ASSERT_EQUAL_MEMORY(hash, node_info->latest_milestone,
                            FLEX_TRIT_SIZE_243);
 
   TEST_ASSERT_EQUAL_INT8(TEST_INFO_LATEST_MILESTONE_INDEX,
@@ -164,8 +164,7 @@ void test_deserialize_get_node_info(void) {
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYRES_2,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash,
-                           node_info->latest_solid_subtangle_milestone->trits,
+  TEST_ASSERT_EQUAL_MEMORY(hash, node_info->latest_solid_subtangle_milestone,
                            FLEX_TRIT_SIZE_243);
 
   TEST_ASSERT_EQUAL_INT8(TEST_INFO_LATEST_SS_MILESTONE_INDEX,
@@ -327,24 +326,22 @@ void test_deserialize_get_tips(void) {
 
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
 
-  trit_array_p tmp_tip = NULL;
-  get_tips_res_t* tips = get_tips_res_new();
+  get_tips_res_t* tips_res = get_tips_res_new();
 
   serializer.vtable.get_tips_deserialize_response(&serializer, json_text,
-                                                  &tips);
-  tmp_tip = get_tips_res_hash_at(tips, 0);
+                                                  tips_res);
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYRES_1,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash, tmp_tip->trits, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, get_tips_res_hash_at(tips_res, 0),
+                           FLEX_TRIT_SIZE_243);
 
-  tmp_tip = get_tips_res_hash_at(tips, 1);
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYRES_2,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash, tmp_tip->trits, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, get_tips_res_hash_at(tips_res, 1),
+                           FLEX_TRIT_SIZE_243);
 
-  tmp_tip = get_tips_res_hash_at(tips, 3);
-  TEST_ASSERT_NULL(tmp_tip);
-  get_tips_res_free(tips);
+  TEST_ASSERT_NULL(get_tips_res_hash_at(tips_res, 3));
+  get_tips_res_free(&tips_res);
 }
 
 void test_serialize_get_trytes(void) {
@@ -405,8 +402,10 @@ void test_serialize_get_inclusion_states(void) {
   get_inclusion_state_req_t* get_is = get_inclusion_state_req_new();
   char_buffer_t* serializer_out = char_buffer_new();
 
-  get_is = get_inclusion_state_req_add_hash(get_is, TEST_81_TRYRES_1);
-  get_is = get_inclusion_state_req_add_tip(get_is, TEST_81_TRYRES_2);
+  TEST_ASSERT(get_inclusion_state_req_add_hash(
+                  get_is, (const tryte_t*)TEST_81_TRYRES_1) == RC_OK);
+  TEST_ASSERT(get_inclusion_state_req_add_tip(
+                  get_is, (const tryte_t*)TEST_81_TRYRES_2) == RC_OK);
 
   serializer.vtable.get_inclusion_state_serialize_request(&serializer, get_is,
                                                           serializer_out);
@@ -530,22 +529,22 @@ void test_deserialize_get_transactions_to_approve(void) {
       "\"" TEST_81_TRYRES_2 "\"}";
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
 
-  get_transactions_to_approve_res_t* deserialize_get_txn_approve =
+  get_transactions_to_approve_res_t* deserialize_get_tx_approve =
       get_transactions_to_approve_res_new();
   serializer.vtable.get_transactions_to_approve_deserialize_response(
-      &serializer, json_text, &deserialize_get_txn_approve);
+      &serializer, json_text, deserialize_get_tx_approve);
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYRES_1,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash, deserialize_get_txn_approve->trunk->trits,
+  TEST_ASSERT_EQUAL_MEMORY(hash, deserialize_get_tx_approve->trunk,
                            FLEX_TRIT_SIZE_243);
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYRES_2,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash, deserialize_get_txn_approve->branch->trits,
+  TEST_ASSERT_EQUAL_MEMORY(hash, deserialize_get_tx_approve->branch,
                            FLEX_TRIT_SIZE_243);
 
-  get_transactions_to_approve_res_free(&deserialize_get_txn_approve);
+  get_transactions_to_approve_res_free(&deserialize_get_tx_approve);
 }
 
 void test_serialize_attach_to_tangle(void) {
@@ -643,7 +642,8 @@ void test_serialize_store_transactions(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   store_transactions_req_t* req = store_transactions_req_new();
-  store_transactions_req_add_trytes(req, (tryte_t*)TEST_2673_TRYRES_1);
+  TEST_ASSERT(store_transactions_req_add_trytes(
+                  req, (const tryte_t*)TEST_2673_TRYRES_1) == RC_OK);
 
   serializer.vtable.store_transactions_serialize_request(&serializer, req,
                                                          serializer_out);

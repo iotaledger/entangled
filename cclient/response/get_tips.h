@@ -15,15 +15,13 @@ extern "C" {
 #endif
 
 typedef struct get_tips_res_s {
-  flex_hash_array_t* tips;
+  hash243_queue_t hashes;
 } get_tips_res_t;
 
 get_tips_res_t* get_tips_res_new();
-void get_tips_res_free(get_tips_res_t* const res);
-get_tips_res_t* get_tips_res_add_tip(get_tips_res_t* const res,
-                                     tryte_t const* const tip);
-trit_array_p get_tips_res_tip_at(get_tips_res_t* const res, size_t const index);
-size_t get_tips_res_tip_num(get_tips_res_t* const res);
+flex_trit_t* get_tips_res_hash_at(get_tips_res_t* res, size_t index);
+size_t get_tips_res_hash_num(get_tips_res_t* res);
+void get_tips_res_free(get_tips_res_t** res);
 
 #ifdef __cplusplus
 }
