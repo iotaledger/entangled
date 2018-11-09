@@ -47,7 +47,7 @@ bool neighbor_remove(neighbors_list_t *const neighbors,
 }
 
 neighbor_t *neighbor_find_by_endpoint(neighbors_list_t *const neighbors,
-                                      endpoint_t *endpoint) {
+                                      endpoint_t const *const endpoint) {
   if (neighbors == NULL || endpoint == NULL) {
     return NULL;
   }

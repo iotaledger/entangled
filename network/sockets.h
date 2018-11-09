@@ -29,6 +29,7 @@ extern "C" {
 #include <netdb.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <unistd.h>
 #define RECEIVE_BUFFER_SIZE 4096
 #endif
 

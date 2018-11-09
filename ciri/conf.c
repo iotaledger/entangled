@@ -71,8 +71,6 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf,
     return RC_NULL_PARAM;
   }
 
-  memset(ciri_conf, 0, sizeof(iota_ciri_conf_t));
-
   ciri_conf->log_level = DEFAULT_LOG_LEVEL;
   strcpy(ciri_conf->db_path, DEFAULT_DB_PATH);
 
@@ -126,11 +124,20 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
       case 'n':  // --neighbors
         gossip_conf->neighbors = optarg;
         break;
+      case CLI_ARG_P_PROPAGATE_REQUEST:  // --p-propagate-request
+        gossip_conf->p_propagate_request = atof(optarg);
+        break;
+      case CLI_ARG_P_REPLY_RANDOM_TIP:  // --p-reply-random-tip
+        gossip_conf->p_reply_random_tip = atof(optarg);
+        break;
       case CLI_ARG_P_REMOVE_REQUEST:  // --p-remove-request
         gossip_conf->p_remove_request = atof(optarg);
         break;
       case CLI_ARG_P_SELECT_MILESTONE:  // --p-select-milestone
         gossip_conf->p_select_milestone = atof(optarg);
+        break;
+      case CLI_ARG_P_SEND_MILESTONE:  // --p-send-milestone
+        gossip_conf->p_send_milestone = atof(optarg);
         break;
       case 't':  // --tcp-receiver-port
         gossip_conf->tcp_receiver_port = atoi(optarg);

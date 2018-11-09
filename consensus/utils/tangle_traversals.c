@@ -11,7 +11,7 @@
 
 retcode_t tangle_traversal_dfs_to_genesis(
     tangle_t *const tangle, tangle_traversal_functor func,
-    flex_trit_t *const entry_point, flex_trit_t *const genesis_hash,
+    flex_trit_t const *const entry_point, flex_trit_t const *const genesis_hash,
     hash243_set_t *const analyzed_hashes_param, void *data) {
   retcode_t ret = RC_OK;
   hash243_stack_t non_analyzed_hashes = NULL;

@@ -30,7 +30,6 @@ extern "C" {
  *
  * @return error value.
  */
-
 typedef retcode_t (*tangle_traversal_functor)(flex_trit_t* const hash,
                                               iota_stor_pack_t* pack,
                                               void* data, bool* should_branch,
@@ -46,11 +45,10 @@ typedef retcode_t (*tangle_traversal_functor)(flex_trit_t* const hash,
  *
  * @return error value.
  */
-
 retcode_t tangle_traversal_dfs_to_genesis(tangle_t* const tangle,
                                           tangle_traversal_functor func,
-                                          flex_trit_t* const entry_point,
-                                          flex_trit_t* const genesis_hash,
+                                          flex_trit_t const* const entry_point,
+                                          flex_trit_t const* const genesis_hash,
                                           hash243_set_t* analyzed_hashes_param,
                                           void* data);
 

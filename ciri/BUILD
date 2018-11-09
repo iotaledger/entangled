@@ -15,6 +15,7 @@ cc_binary(
     deps = [
         ":core",
         "//utils/containers/lists:concurrent_list_neighbor",
+        "//utils/handles:rand",
     ],
 )
 

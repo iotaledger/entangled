@@ -1,16 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "concurrent_queue_transaction_request",
-    srcs = ["concurrent_queue_transaction_request.c"],
-    hdrs = ["concurrent_queue_transaction_request.h"],
-    deps = [
-        ":concurrent_queue",
-        "//gossip:transaction_request",
-    ],
-)
-
-cc_library(
     name = "concurrent_queue_trit_array",
     srcs = ["concurrent_queue_trit_array.c"],
     hdrs = ["concurrent_queue_trit_array.h"],

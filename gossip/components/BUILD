@@ -71,6 +71,7 @@ cc_library(
         "//gossip:conf",
         "//utils:logger_helper",
         "//utils/containers/hash:hash243_set",
+        "//utils/handles:rand",
         "//utils/handles:rw_lock",
     ],
 )
@@ -78,7 +79,13 @@ cc_library(
 cc_library(
     name = "responder_shared",
     hdrs = ["responder.h"],
-    deps = ["//utils/handles:thread"],
+    deps = [
+        "//gossip:transaction_request",
+        "//utils/handles:cond",
+        "//utils/handles:lock",
+        "//utils/handles:rw_lock",
+        "//utils/handles:thread",
+    ],
 )
 
 cc_library(
@@ -87,8 +94,8 @@ cc_library(
     hdrs = ["responder.h"],
     deps = [
         ":responder_shared",
-        "//ciri:core_shared",
         "//gossip:neighbor_shared",
-        "//utils/containers/queues:concurrent_queue_transaction_request",
+        "//gossip:node_shared",
+        "//utils/handles:rand",
     ],
 )
