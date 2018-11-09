@@ -454,6 +454,39 @@ static retcode_t hash8019_queue_to_json_array(hash8019_queue_t queue,
   return RC_OK;
 }
 
+static retcode_t hash8019_stack_to_json_array(hash8019_stack_t stack,
+                                              cJSON* const json_root,
+                                              char const* const obj_name) {
+  size_t array_count = 0;
+  cJSON* array_obj = NULL;
+  hash8019_stack_entry_t* s_iter = NULL;
+  trit_t trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
+  size_t trits_count = 0;
+
+  array_count = hash8019_stack_count(stack);
+  if (array_count > 0) {
+    array_obj = cJSON_CreateArray();
+    if (array_obj == NULL) {
+      return RC_CCLIENT_JSON_CREATE;
+    }
+    cJSON_AddItemToObject(json_root, obj_name, array_obj);
+
+    LL_FOREACH(stack, s_iter) {
+      trits_count = flex_trits_to_trytes(
+          trytes_out, NUM_TRYTES_SERIALIZED_TRANSACTION, s_iter->hash,
+          NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
+      trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION] = '\0';
+      if (trits_count != 0) {
+        cJSON_AddItemToArray(array_obj,
+                             cJSON_CreateString((const char*)trytes_out));
+      } else {
+        return RC_CCLIENT_FLEX_TRITS;
+      }
+    }
+  }
+  return RC_OK;
+}
+
 retcode_t json_find_transactions_serialize_request(
     serializer_t const* const s, find_transactions_req_t const* const obj,
     char_buffer_t* out) {
@@ -1307,7 +1340,7 @@ retcode_t json_broadcast_transactions_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("broadcastTransactions"));
 
-  ret = hash8019_queue_to_json_array(req->trytes, json_root, "trytes");
+  ret = hash8019_stack_to_json_array(req->trytes, json_root, "trytes");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;
@@ -1344,7 +1377,7 @@ retcode_t json_store_transactions_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("storeTransactions"));
 
-  ret = hash8019_queue_to_json_array(req->trytes, json_root, "trytes");
+  ret = hash8019_stack_to_json_array(req->trytes, json_root, "trytes");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;

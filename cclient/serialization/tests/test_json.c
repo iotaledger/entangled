@@ -622,8 +622,14 @@ void test_serialize_broadcast_transactions(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   broadcast_transactions_req_t* req = broadcast_transactions_req_new();
-  TEST_ASSERT(broadcast_transactions_req_add_trytes(
-                  req, (const tryte_t*)TEST_2673_TRYRES_3) == RC_OK);
+  flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
+  size_t len = flex_trits_from_trytes(
+      tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+      (const tryte_t*)TEST_2673_TRYRES_3, NUM_TRYTES_SERIALIZED_TRANSACTION,
+      NUM_TRYTES_SERIALIZED_TRANSACTION);
+  TEST_ASSERT(len);
+
+  TEST_ASSERT(hash8019_stack_push(&req->trytes, tx_trits) == RC_OK);
 
   serializer.vtable.broadcast_transactions_serialize_request(&serializer, req,
                                                              serializer_out);
@@ -642,8 +648,14 @@ void test_serialize_store_transactions(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   store_transactions_req_t* req = store_transactions_req_new();
-  TEST_ASSERT(store_transactions_req_add_trytes(
-                  req, (const tryte_t*)TEST_2673_TRYRES_1) == RC_OK);
+  flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
+  size_t len = flex_trits_from_trytes(
+      tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+      (const tryte_t*)TEST_2673_TRYRES_1, NUM_TRYTES_SERIALIZED_TRANSACTION,
+      NUM_TRYTES_SERIALIZED_TRANSACTION);
+  TEST_ASSERT(len);
+
+  TEST_ASSERT(hash8019_stack_push(&req->trytes, tx_trits) == RC_OK);
 
   serializer.vtable.store_transactions_serialize_request(&serializer, req,
                                                          serializer_out);

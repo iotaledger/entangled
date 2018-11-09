@@ -58,7 +58,7 @@ void test_store_transactions_invalid_tx(void) {
   tx.value = -IOTA_SUPPLY - 1;
   transaction_serialize_on_flex_trits(&tx, tx_trits);
 
-  hash8019_queue_push(&req->trytes, tx_trits);
+  hash8019_stack_push(&req->trytes, tx_trits);
 
   TEST_ASSERT(iota_api_store_transactions(&api, req) == RC_OK);
 
@@ -94,7 +94,10 @@ void test_store_transactions(void) {
   // Storing 4 transactions
 
   for (size_t i = 0; i < 4; i++) {
-    store_transactions_req_add_trytes(req, txs_trytes[i]);
+    flex_trits_from_trytes(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                           txs_trytes[i], NUM_TRYTES_SERIALIZED_TRANSACTION,
+                           NUM_TRYTES_SERIALIZED_TRANSACTION);
+    hash8019_stack_push(&req->trytes, tx_trits);
   }
   TEST_ASSERT(iota_api_store_transactions(&api, req) == RC_OK);
   // Checking that they have been stored
