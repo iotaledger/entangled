@@ -65,7 +65,6 @@ void test_deserialize_find_transactions(void) {
       "\", "
       "\"" TEST_81_TRYRES_3 "\"]}";
 
-  trit_array_p tmp_hash = NULL;
   trit_array_p hash1 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_1);
   TEST_ASSERT_NOT_NULL(hash1);
   trit_array_p hash2 = trit_array_new_from_trytes((tryte_t*)TEST_81_TRYRES_2);
@@ -352,7 +351,7 @@ void test_serialize_get_trytes(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   get_trytes_req_t* req = get_trytes_req_new();
-  get_trytes_req_add_hash(req, TEST_81_TRYRES_1);
+  get_trytes_req_add_hash(req, (tryte_t*)TEST_81_TRYRES_1);
 
   serializer.vtable.get_trytes_serialize_request(&serializer, req,
                                                  serializer_out);
@@ -605,7 +604,7 @@ void test_serialize_broadcast_transactions(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   broadcast_transactions_req_t* req = broadcast_transactions_req_new();
-  broadcast_transactions_req_add_trytes(req, TEST_2673_TRYRES_3);
+  broadcast_transactions_req_add_trytes(req, (tryte_t*)TEST_2673_TRYRES_3);
 
   serializer.vtable.broadcast_transactions_serialize_request(&serializer, req,
                                                              serializer_out);
@@ -624,7 +623,7 @@ void test_serialize_store_transactions(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   store_transactions_req_t* req = store_transactions_req_new();
-  store_transactions_req_add_trytes(req, TEST_2673_TRYRES_1);
+  store_transactions_req_add_trytes(req, (tryte_t*)TEST_2673_TRYRES_1);
 
   serializer.vtable.store_transactions_serialize_request(&serializer, req,
                                                          serializer_out);
