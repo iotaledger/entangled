@@ -3,23 +3,13 @@ package(default_visibility = ["//visibility:public"])
 load(":conf.bzl", "GOSSIP_MAINNET_VARIABLES")
 load(":conf.bzl", "GOSSIP_TESTNET_VARIABLES")
 
-config_setting(
-    name = "mainnet",
-    values = {"define": "network=mainnet"},
-)
-
-config_setting(
-    name = "testnet",
-    values = {"define": "network=testnet"},
-)
-
 cc_library(
     name = "conf",
     srcs = ["conf.c"],
     hdrs = ["conf.h"],
     defines = select({
-        ":mainnet": GOSSIP_MAINNET_VARIABLES,
-        ":testnet": GOSSIP_TESTNET_VARIABLES,
+        "//config:mainnet": GOSSIP_MAINNET_VARIABLES,
+        "//config:testnet": GOSSIP_TESTNET_VARIABLES,
         "//conditions:default": GOSSIP_MAINNET_VARIABLES,
     }),
     visibility = ["//visibility:public"],

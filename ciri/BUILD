@@ -3,24 +3,15 @@ package(default_visibility = ["//visibility:public"])
 load(":conf.bzl", "CIRI_MAINNET_VARIABLES")
 load(":conf.bzl", "CIRI_TESTNET_VARIABLES")
 
-config_setting(
-    name = "mainnet",
-    values = {"define": "network=mainnet"},
-)
-
-config_setting(
-    name = "testnet",
-    values = {"define": "network=testnet"},
-)
-
 cc_binary(
     name = "ciri",
     srcs = ["main.c"],
     copts = ["-DLOGGER_ENABLE"],
-    data = [
-        "db/ciri-mainnet.db",
-        "db/ciri-testnet.db",
-    ],
+    data = select({
+        "//config:mainnet": ["db/ciri-mainnet.db"],
+        "//config:testnet": ["db/ciri-testnet.db"],
+        "//conditions:default": ["db/ciri-mainnet.db"],
+    }),
     deps = [
         ":core",
         "//utils/containers/lists:concurrent_list_neighbor",
@@ -58,8 +49,8 @@ cc_library(
     srcs = ["conf.c"],
     hdrs = ["conf.h"],
     defines = select({
-        ":mainnet": CIRI_MAINNET_VARIABLES,
-        ":testnet": CIRI_TESTNET_VARIABLES,
+        "//config:mainnet": CIRI_MAINNET_VARIABLES,
+        "//config:testnet": CIRI_TESTNET_VARIABLES,
         "//conditions:default": CIRI_MAINNET_VARIABLES,
     }),
     deps = [
