@@ -55,6 +55,7 @@ static struct cli_argument_s {
      "\"error\", \"critical\", \"alert\" "
      "and \"emergency\".",
      REQUIRED_ARG},
+    {"db-path", 'd', "Path to the database file.", REQUIRED_ARG},
 
     // Gossip configuration
 
@@ -115,7 +116,7 @@ static struct cli_argument_s {
 
     {NULL, 0, NULL, NO_ARG}};
 
-static char* short_options = "hl:n:t:u:p:";
+static char* short_options = "hl:d:n:t:u:p:";
 
 #ifdef __cplusplus
 extern "C" {

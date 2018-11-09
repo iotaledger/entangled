@@ -8,9 +8,6 @@
 #include "ciri/core.h"
 #include "utils/logger_helper.h"
 
-// FIXME: Get cIRI database path from configuration variables
-// https://github.com/iotaledger/entangled/issues/132
-#define CIRI_DB_PATH "ciri/ciri.db"
 #define CORE_LOGGER_ID "core"
 
 retcode_t core_init(core_t* const core) {
@@ -21,7 +18,7 @@ retcode_t core_init(core_t* const core) {
   logger_helper_init(CORE_LOGGER_ID, LOGGER_DEBUG, true);
   core->running = false;
 
-  connection_config_t db_conf = {.db_path = CIRI_DB_PATH};
+  connection_config_t db_conf = {.db_path = core->conf.db_path};
 
   log_info(CORE_LOGGER_ID, "Initializing consensus\n");
   if (iota_consensus_init(&core->consensus, &db_conf,
