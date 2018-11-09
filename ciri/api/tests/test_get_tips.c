@@ -48,17 +48,16 @@ void test_get_tips(void) {
   TEST_ASSERT(tips_cache_add(&node.tips, hashes[4]) == RC_OK);
 
   TEST_ASSERT(iota_api_get_tips(&api, res) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(get_tips_res_tip_num(res), 10);
+  TEST_ASSERT_EQUAL_INT(get_tips_res_hash_num(res), 10);
 
   for (size_t i = 0; i < 10; i++) {
-    trit_array_p trit_array = get_tips_res_tip_at(res, i);
-    TEST_ASSERT_EQUAL_INT(
-        memcmp(trit_array->trits, hashes[i], FLEX_TRIT_SIZE_243), 0);
+    TEST_ASSERT_EQUAL_MEMORY(get_tips_res_hash_at(res, i), hashes[i],
+                             FLEX_TRIT_SIZE_243);
   }
 
   TEST_ASSERT(tips_cache_destroy(&node.tips) == RC_OK);
 
-  get_tips_res_free(res);
+  get_tips_res_free(&res);
 }
 
 int main(void) {

@@ -108,11 +108,7 @@ retcode_t iota_api_get_tips(iota_api_t const *const api,
   }
 
   HASH_ITER(hh, tips, iter, tmp) {
-    // TODO Not necessary when get_tips_res_t will have a hash container
-    flex_trits_to_trytes(tip_trytes, HASH_LENGTH_TRYTE, iter->hash,
-                         HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-    tip_trytes[HASH_LENGTH_TRYTE] = '\0';
-    get_tips_res_add_tip(res, tip_trytes);
+    hash243_queue_push(&res->hashes, iter->hash);
   }
 
 done:
