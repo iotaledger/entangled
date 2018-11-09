@@ -360,12 +360,18 @@ retcode_t iota_consensus_transaction_solidifier_check_and_update_solid_state(
 
 static retcode_t add_new_solid_transaction(transaction_solidifier_t *const ts,
                                            flex_trit_t *const hash) {
-  retcode_t ret;
+  retcode_t ret = RC_OK;
+
   lock_handle_lock(&ts->lock);
+
   if ((ret = hash243_set_add(&ts->newly_set_solid_transactions, hash)) !=
       RC_OK) {
-    return ret;
+    goto done;
   }
+
+  ret = tips_cache_set_solid(ts->tips, hash);
+
+done:
   lock_handle_unlock(&ts->lock);
   return ret;
 }
