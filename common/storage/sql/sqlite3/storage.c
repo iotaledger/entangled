@@ -610,6 +610,42 @@ done:
   return ret;
 }
 
+retcode_t iota_stor_transaction_approvers_count(connection_t const* const conn,
+                                                flex_trit_t const* const hash,
+                                                size_t* const count) {
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = NULL;
+  int rc = 0;
+
+  if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
+                               iota_statement_transaction_approvers_count)) !=
+      RC_OK) {
+    goto done;
+  }
+
+  if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) !=
+          RC_OK ||
+      column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) !=
+          RC_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
+  rc = sqlite3_step(sqlite_statement);
+  if (rc == SQLITE_ROW) {
+    *count = sqlite3_column_int64(sqlite_statement, 0);
+  } else if (rc != SQLITE_OK && rc != SQLITE_DONE) {
+    log_error(SQLITE3_LOGGER_ID, "Step failed with sqlite3 code: %" PRIu64 "\n",
+              rc);
+    ret = RC_SQLITE3_FAILED_STEP;
+    goto done;
+  }
+
+done:
+  finalize_statement(sqlite_statement);
+  return ret;
+}
+
 /*
  * Milestone operations
  */
