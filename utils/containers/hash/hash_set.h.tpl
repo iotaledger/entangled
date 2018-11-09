@@ -42,6 +42,8 @@ void hash{SIZE}_set_free(hash{SIZE}_set_t *const set);
 retcode_t hash{SIZE}_set_for_each(hash{SIZE}_set_t const *const set,
                                  hash{SIZE}_on_container_func func,
                                  void *const container);
+retcode_t hash{SIZE}_set_random_hash(hash{SIZE}_set_t const *const set,
+                                     flex_trit_t *const hash);
 
 #ifdef __cplusplus
 }

@@ -71,6 +71,18 @@ cc_library(
 )
 
 cc_library(
+    name = "tips_cache",
+    srcs = ["tips_cache.c"],
+    hdrs = ["tips_cache.h"],
+    deps = [
+        "//common:errors",
+        "//common/trinary:flex_trit",
+        "//utils/containers/hash:hash243_set",
+        "//utils/handles:rw_lock",
+    ],
+)
+
+cc_library(
     name = "node_shared",
     hdrs = ["node.h"],
     deps = [

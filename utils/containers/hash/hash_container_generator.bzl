@@ -46,6 +46,7 @@ def hash_container_generate(type, size):
         deps = [
             "//common:errors",
             "//common/trinary:flex_trit",
+            "//utils/handles:rand",
             "@com_github_uthash//:uthash",
         ],
         visibility = ["//visibility:public"],
