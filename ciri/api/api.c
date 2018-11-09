@@ -240,6 +240,11 @@ retcode_t iota_api_store_transactions(
                                                  &tx)) != RC_OK) {
           return ret;
         }
+        if ((ret = iota_consensus_transaction_solidifier_update_status(
+                 &api->consensus->transaction_solidifier, &tx)) != RC_OK) {
+          log_warning(API_LOGGER_ID, "Updating transaction status failed\n");
+          return ret;
+        }
         // TODO store metadata: arrival_time, status, sender (#407)
       }
     }

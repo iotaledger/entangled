@@ -375,3 +375,24 @@ done:
   lock_handle_unlock(&ts->lock);
   return ret;
 }
+
+retcode_t iota_consensus_transaction_solidifier_update_status(
+    transaction_solidifier_t *const ts, iota_transaction_t const tx) {
+  retcode_t ret = RC_OK;
+
+  if ((ret = requester_clear_request(ts->requester, tx->hash)) != RC_OK) {
+    return ret;
+  }
+
+  // if (transactionViewModel.getApprovers(tangle).size() == 0) {
+  //   tipsViewModel.addTipHash(transactionViewModel.getHash());
+  // }
+
+  if ((ret = tips_cache_remove(ts->tips, tx->trunk)) != RC_OK ||
+      (ret = tips_cache_remove(ts->tips, tx->branch)) != RC_OK) {
+    return ret;
+  }
+
+  return iota_consensus_transaction_solidifier_check_and_update_solid_state(
+      ts, tx->hash);
+}
