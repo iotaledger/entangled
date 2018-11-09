@@ -8,6 +8,7 @@
 
 #include "common/helpers/sign.h"
 #include "common/model/transfer.h"
+#include "common/trinary/trit_long.h"
 
 /***********************************************************************************************************
  * Transfer Input data structure

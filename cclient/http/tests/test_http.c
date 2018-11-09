@@ -108,7 +108,7 @@ const char* data =
     "dignissim. Proin malesuada adipiscing lacus.";
 
 void test_http(void) {
-  iota_client_service_t service = {0};
+  iota_client_service_t service = {{0}};
   service.http.host = "httpbin.org";
   service.http.port = 80;
   service.http.path = "/post";

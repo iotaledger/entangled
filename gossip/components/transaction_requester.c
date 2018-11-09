@@ -117,10 +117,10 @@ retcode_t request_transaction(requester_state_t *const state,
                               bool const is_milestone) {
   retcode_t ret = RC_OK;
   bool exists = false;
-  trit_array_t key = {.trits = hash,
-                      .num_trits = HASH_LENGTH_TRIT,
-                      .num_bytes = FLEX_TRIT_SIZE_243,
-                      .dynamic = 0};
+  trit_array_t const key = {.trits = hash,
+                            .num_trits = HASH_LENGTH_TRIT,
+                            .num_bytes = FLEX_TRIT_SIZE_243,
+                            .dynamic = 0};
 
   if (state == NULL || hash == NULL) {
     return RC_REQUESTER_COMPONENT_NULL_STATE;

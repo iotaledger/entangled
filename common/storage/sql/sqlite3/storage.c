@@ -40,8 +40,8 @@ typedef struct bind_execute_hash_params_s {
   sqlite3_stmt* sqlite_statement;
 } bind_execute_hash_params_t;
 
-static retcode_t bind_execute_hash_do_func(bind_execute_hash_params_t* params,
-                                           flex_trit_t* hash);
+static retcode_t bind_execute_hash_do_func(
+    bind_execute_hash_params_t* const params, flex_trit_t const* const hash);
 
 /*
  * BEGIN / END transaction
@@ -207,8 +207,8 @@ static retcode_t execute_statement_store_update(
   return RC_OK;
 }
 
-static retcode_t execute_statement_exist(sqlite3_stmt* sqlite_statement,
-                                         bool* exist) {
+static retcode_t execute_statement_exist(sqlite3_stmt* const sqlite_statement,
+                                         bool* const exist) {
   int rc = sqlite3_step(sqlite_statement);
   *exist = false;
 
@@ -228,10 +228,11 @@ enum value_type {
   INT64,
 };
 
-retcode_t update_transactions(const connection_t* const conn,
-                              const hash243_set_t hashes, void* value,
-                              const char* const statement,
-                              enum value_type type) {
+retcode_t update_transactions(connection_t const* const conn,
+                              hash243_set_t const hashes,
+                              void const* const value,
+                              char const* const statement,
+                              enum value_type const type) {
   retcode_t ret = RC_OK;
   retcode_t ret_rollback;
   sqlite3_stmt* sqlite_statement = NULL;
@@ -262,8 +263,9 @@ retcode_t update_transactions(const connection_t* const conn,
   }
 
   bind_execute_hash_params_t params = {.sqlite_statement = sqlite_statement};
-  if ((ret = hash243_set_for_each(&hashes, bind_execute_hash_do_func,
-                                  &params)) != RC_OK) {
+  if ((ret = hash243_set_for_each(
+           &hashes, (hash243_on_container_func)bind_execute_hash_do_func,
+           &params)) != RC_OK) {
     goto done;
   }
 
@@ -276,7 +278,7 @@ done:
     }
     return ret;
   }
-  if (ret = end_transaction((sqlite3*)conn->db) != RC_OK) {
+  if ((ret = end_transaction((sqlite3*)conn->db)) != RC_OK) {
     return ret;
   }
 
@@ -287,9 +289,8 @@ done:
  * Functors
  */
 
-static retcode_t bind_execute_hash_do_func(bind_execute_hash_params_t* params,
-                                           flex_trit_t* hash) {
-  retcode_t ret = RC_OK;
+static retcode_t bind_execute_hash_do_func(
+    bind_execute_hash_params_t* const params, flex_trit_t const* const hash) {
   int reset_ret = sqlite3_reset(params->sqlite_statement);
 
   if (reset_ret != SQLITE_DONE && reset_ret != SQLITE_OK) {
@@ -496,7 +497,8 @@ done:
 }
 
 retcode_t iota_stor_transaction_update_solid_state(
-    const connection_t* const conn, flex_trit_t* const hash, bool is_solid) {
+    connection_t const* const conn, flex_trit_t const* const hash,
+    bool const is_solid) {
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
 
@@ -523,14 +525,15 @@ done:
 }
 
 retcode_t iota_stor_transactions_update_solid_state(
-    const connection_t* const conn, const hash243_set_t hashes, bool is_solid) {
+    connection_t const* const conn, hash243_set_t const hashes,
+    bool const is_solid) {
   return update_transactions(conn, hashes, &is_solid,
                              iota_statement_transaction_update_solid_state,
                              BOOLEAN);
 }
 
 retcode_t iota_stor_transactions_update_snapshot_index(
-    connection_t const* const conn, const hash243_set_t hashes,
+    connection_t const* const conn, hash243_set_t const hashes,
     uint64_t const snapshot_index) {
   return update_transactions(conn, hashes, &snapshot_index,
                              iota_statement_transaction_update_snapshot_index,

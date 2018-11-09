@@ -32,6 +32,6 @@ void store_transactions_req_free(store_transactions_req_t** const req) {
 
 store_transactions_req_t* store_transactions_req_add_trytes(
     store_transactions_req_t* const req, tryte_t const* const trytes) {
-  req->trytes = flex_hash_array_append(req->trytes, trytes);
+  req->trytes = flex_hash_array_append(req->trytes, (char*)trytes);
   return req;
 }

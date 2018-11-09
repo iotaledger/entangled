@@ -13,8 +13,6 @@ retcode_t iota_gossip_conf_init(iota_gossip_conf_t* const conf) {
     return RC_NULL_PARAM;
   }
 
-  memset(conf, 0, sizeof(iota_gossip_conf_t));
-
   conf->udp_receiver_port = DEFAULT_UDP_RECEIVER_PORT;
   conf->tcp_receiver_port = DEFAULT_TCP_RECEIVER_PORT;
   conf->mwm = DEFAULT_MWN;
