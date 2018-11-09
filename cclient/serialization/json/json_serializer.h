@@ -69,7 +69,7 @@ retcode_t json_get_tips_serialize_request(const serializer_t* const s,
                                           char_buffer_t* out);
 retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
                                              const char* const obj,
-                                             get_tips_res_t** out);
+                                             get_tips_res_t* res);
 
 // get_transactions_to_approve_response
 retcode_t json_get_transactions_to_approve_serialize_request(

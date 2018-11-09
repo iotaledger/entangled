@@ -60,6 +60,7 @@ retcode_t node_init(node_t* const node, core_t* const core,
   logger_helper_init(NODE_LOGGER_ID, LOGGER_DEBUG, true);
   node->running = false;
   node->core = core;
+  tips_cache_init(&node->tips, node->conf.tips_cache_size);
 
   log_info(NODE_LOGGER_ID, "Initializing neighbors\n");
   if (node_neighbors_init(node) != RC_OK) {
@@ -222,6 +223,8 @@ retcode_t node_destroy(node_t* const node) {
     log_error(NODE_LOGGER_ID, "Destroying neighbors list failed\n");
     ret = RC_NODE_FAILED_NEIGHBORS_DESTROY;
   }
+
+  tips_cache_destroy(&node->tips);
 
   logger_helper_destroy(NODE_LOGGER_ID);
 

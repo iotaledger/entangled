@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __CIRI_NODE_H__
-#define __CIRI_NODE_H__
+#ifndef __GOSSIP_NODE_H__
+#define __GOSSIP_NODE_H__
 
 #include "common/errors.h"
 #include "gossip/components/broadcaster.h"
@@ -14,6 +14,7 @@
 #include "gossip/components/receiver.h"
 #include "gossip/components/responder.h"
 #include "gossip/components/transaction_requester.h"
+#include "gossip/tips_cache.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,6 +34,7 @@ typedef struct node_s {
   responder_t responder;
   requester_state_t transaction_requester;
   neighbors_list_t* neighbors;
+  tips_cache_t tips;
 } iota_node_t;
 
 /**
@@ -78,4 +80,4 @@ retcode_t node_destroy(iota_node_t* const node);
 }
 #endif
 
-#endif  // __CIRI_NODE_H__
+#endif  // __GOSSIP_NODE_H__

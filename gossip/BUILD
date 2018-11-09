@@ -86,6 +86,7 @@ cc_library(
     name = "node_shared",
     hdrs = ["node.h"],
     deps = [
+        ":tips_cache",
         "//gossip/components:broadcaster_shared",
         "//gossip/components:processor_shared",
         "//gossip/components:receiver_shared",

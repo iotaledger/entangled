@@ -25,6 +25,7 @@
 #define DEFAULT_PROBABILITY_REPLY_RANDOM_TIP 0.66
 #define DEFAULT_PROBABILITY_SELECT_MILESTONE 0.7
 #define DEFAULT_PROBABILITY_SEND_MILESTONE 0.02
+#define DEFAULT_TIPS_CACHE_SIZE 5000
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,6 +61,8 @@ typedef struct iota_gossip_conf_s {
   // Probability of sending a milestone transaction when the node looks for a
   // random transaction to send to a neighbor. Value must be in [0,1]
   double p_send_milestone;
+  // Size of the tips cache
+  size_t tips_cache_size;
 } iota_gossip_conf_t;
 
 /**
