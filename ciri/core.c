@@ -36,9 +36,8 @@ retcode_t core_init(core_t* const core) {
   }
 
   log_info(CORE_LOGGER_ID, "Initializing API\n");
-  if (iota_api_init(&core->api, &core->consensus.tangle,
-                    &core->consensus.transaction_validator,
-                    &core->node.broadcaster, SR_JSON) != RC_OK) {
+  if (iota_api_init(&core->api, &core->node, &core->consensus, SR_JSON) !=
+      RC_OK) {
     log_critical(CORE_LOGGER_ID, "Initializing API failed\n");
     return RC_CORE_FAILED_API_INIT;
   }
