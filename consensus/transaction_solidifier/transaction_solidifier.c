@@ -379,14 +379,22 @@ done:
 retcode_t iota_consensus_transaction_solidifier_update_status(
     transaction_solidifier_t *const ts, iota_transaction_t const tx) {
   retcode_t ret = RC_OK;
+  size_t approvers_count = 0;
 
   if ((ret = requester_clear_request(ts->requester, tx->hash)) != RC_OK) {
     return ret;
   }
 
-  // if (transactionViewModel.getApprovers(tangle).size() == 0) {
-  //   tipsViewModel.addTipHash(transactionViewModel.getHash());
-  // }
+  if ((ret = iota_tangle_transaction_approvers_count(
+           ts->tangle, tx->hash, &approvers_count)) != RC_OK) {
+    return ret;
+  }
+
+  if (approvers_count == 0) {
+    if ((ret = tips_cache_add(ts->tips, tx->hash)) != RC_OK) {
+      return ret;
+    }
+  }
 
   if ((ret = tips_cache_remove(ts->tips, tx->trunk)) != RC_OK ||
       (ret = tips_cache_remove(ts->tips, tx->branch)) != RC_OK) {
