@@ -27,8 +27,3 @@ void get_trytes_req_free(get_trytes_req_t** const req) {
   free(*req);
   *req = NULL;
 }
-
-retcode_t get_trytes_req_add_hash(get_trytes_req_t* const req,
-                                  flex_trit_t const* const hash) {
-  return hash243_queue_push(&req->hashes, hash);
-}

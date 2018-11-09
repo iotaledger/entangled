@@ -31,25 +31,3 @@ void get_inclusion_state_req_free(get_inclusion_state_req_t** req) {
   free(*req);
   *req = NULL;
 }
-
-retcode_t get_inclusion_state_req_add_hash(get_inclusion_state_req_t* req,
-                                           tryte_t const* const hash) {
-  flex_trit_t trits[FLEX_TRIT_SIZE_243];
-  size_t len = flex_trits_from_trytes(trits, NUM_TRITS_HASH, hash,
-                                      NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  if (len) {
-    hash243_queue_push(&req->hashes, trits);
-  }
-  return len ? RC_OK : RC_CCLIENT_FLEX_TRITS;
-}
-
-retcode_t get_inclusion_state_req_add_tip(get_inclusion_state_req_t* req,
-                                          tryte_t const* const tip) {
-  flex_trit_t trits[FLEX_TRIT_SIZE_243];
-  size_t len = flex_trits_from_trytes(trits, NUM_TRITS_HASH, tip,
-                                      NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  if (len) {
-    hash243_queue_push(&req->tips, trits);
-  }
-  return len ? RC_OK : RC_CCLIENT_FLEX_TRITS;
-}

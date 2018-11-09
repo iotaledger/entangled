@@ -40,15 +40,6 @@ typedef struct {
 attach_to_tangle_req_t* attach_to_tangle_req_new();
 void attach_to_tangle_req_free(attach_to_tangle_req_t** req);
 
-retcode_t attach_to_tangle_req_set_trunk(attach_to_tangle_req_t* req,
-                                         tryte_t const* const trunk);
-retcode_t attach_to_tangle_req_set_branch(attach_to_tangle_req_t* req,
-                                          tryte_t const* const branch);
-void attach_to_tangle_req_set_mwm(attach_to_tangle_req_t* req,
-                                  const int32_t mwm);
-retcode_t attach_to_tangle_req_add_trytes(attach_to_tangle_req_t* req,
-                                          tryte_t const* const trytes);
-
 #ifdef __cplusplus
 }
 #endif

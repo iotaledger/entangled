@@ -15,16 +15,7 @@ check_consistency_req_t* check_consistency_req_new() {
   }
   return req;
 }
-retcode_t check_consistency_req_add(check_consistency_req_t* req,
-                                    tryte_t const* const tail) {
-  flex_trit_t trits[FLEX_TRIT_SIZE_243];
-  size_t len = flex_trits_from_trytes(trits, NUM_TRITS_HASH, tail,
-                                      NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  if (len) {
-    hash243_queue_push(&req->hashes, trits);
-  }
-  return len ? RC_OK : RC_CCLIENT_FLEX_TRITS;
-}
+
 void check_consistency_req_free(check_consistency_req_t** req) {
   if (!req || !(*req)) {
     return;

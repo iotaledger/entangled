@@ -31,34 +31,3 @@ void attach_to_tangle_req_free(attach_to_tangle_req_t** req) {
   free(*req);
   *req = NULL;
 }
-
-retcode_t attach_to_tangle_req_set_trunk(attach_to_tangle_req_t* req,
-                                         tryte_t const* const trunk) {
-  size_t len = flex_trits_from_trytes(req->trunk, NUM_TRITS_HASH, trunk,
-                                      NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  return len ? RC_OK : RC_CCLIENT_FLEX_TRITS;
-}
-
-retcode_t attach_to_tangle_req_set_branch(attach_to_tangle_req_t* req,
-                                          tryte_t const* const branch) {
-  size_t len = flex_trits_from_trytes(req->branch, NUM_TRITS_HASH, branch,
-                                      NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  return len ? RC_OK : RC_CCLIENT_FLEX_TRITS;
-}
-
-void attach_to_tangle_req_set_mwm(attach_to_tangle_req_t* req,
-                                  const int32_t mwm) {
-  req->mwm = mwm;
-}
-
-retcode_t attach_to_tangle_req_add_trytes(attach_to_tangle_req_t* req,
-                                          tryte_t const* const trytes) {
-  flex_trit_t trits[FLEX_TRIT_SIZE_8019];
-  size_t len = flex_trits_from_trytes(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                                      trytes, NUM_TRYTES_SERIALIZED_TRANSACTION,
-                                      NUM_TRYTES_SERIALIZED_TRANSACTION);
-  if (len) {
-    hash8019_queue_push(&req->trytes, trits);
-  }
-  return len ? RC_OK : RC_CCLIENT_FLEX_TRITS;
-}

@@ -159,7 +159,7 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
       memset(tx_trits, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
     }
 
-    get_trytes_res_add_trytes(res, tx_trits);
+    hash8019_queue_push(&res->trytes, tx_trits);
   }
   return ret;
 }

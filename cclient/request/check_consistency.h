@@ -23,8 +23,6 @@ typedef struct check_consistency_req_s {
 } check_consistency_req_t;
 
 check_consistency_req_t* check_consistency_req_new();
-retcode_t check_consistency_req_add(check_consistency_req_t* req,
-                                    tryte_t const* const tail);
 void check_consistency_req_free(check_consistency_req_t** req);
 
 #ifdef __cplusplus

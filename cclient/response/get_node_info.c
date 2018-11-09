@@ -14,9 +14,9 @@ get_node_info_res_t* get_node_info_res_new() {
   if (res) {
     res->app_name = char_buffer_new();
     res->app_version = char_buffer_new();
-    memset(res->latest_milestone, FLEX_TRIT_NULL_VALUE, NUM_TRITS_HASH);
+    memset(res->latest_milestone, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
     memset(res->latest_solid_subtangle_milestone, FLEX_TRIT_NULL_VALUE,
-           NUM_TRITS_HASH);
+           FLEX_TRIT_SIZE_243);
   }
   return res;
 }

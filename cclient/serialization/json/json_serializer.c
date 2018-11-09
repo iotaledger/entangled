@@ -990,8 +990,11 @@ retcode_t json_get_transactions_to_approve_serialize_request(
 
   cJSON_AddItemToObject(json_root, "depth", cJSON_CreateNumber(obj->depth));
 
-  cJSON_AddItemToObject(json_root, "reference",
-                        cJSON_CreateString(obj->reference->data));
+  ret = flex_trits_to_json_string(json_root, "reference", obj->reference,
+                                  NUM_TRITS_HASH);
+  if (ret != RC_OK) {
+    goto done;
+  }
 
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
@@ -1003,6 +1006,7 @@ retcode_t json_get_transactions_to_approve_serialize_request(
     cJSON_free((void*)json_text);
   }
 
+done:
   cJSON_Delete(json_root);
   return ret;
 }
