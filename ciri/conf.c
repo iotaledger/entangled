@@ -72,6 +72,7 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf,
   }
 
   ciri_conf->log_level = DEFAULT_LOG_LEVEL;
+  strcpy(ciri_conf->db_path, DEFAULT_DB_PATH);
 
   if ((ret = iota_consensus_conf_init(consensus_conf)) != RC_OK) {
     return ret;
@@ -108,6 +109,9 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
         break;
       case 'l':  // --log-level
         ciri_conf->log_level = get_log_level(optarg);
+        break;
+      case 'd':  // --db-path
+        strcpy(ciri_conf->db_path, optarg);
         break;
 
       // Gossip configuration
