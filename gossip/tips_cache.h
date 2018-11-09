@@ -18,9 +18,10 @@
 // A fixed capacity FIFO-behaving tips cache
 typedef struct tips_cache_s {
   hash243_set_t tips;
+  rw_lock_handle_t tips_lock;
   hash243_set_t solid_tips;
+  rw_lock_handle_t solid_tips_lock;
   size_t capacity;
-  rw_lock_handle_t lock;
 } tips_cache_t;
 
 #ifdef __cplusplus
