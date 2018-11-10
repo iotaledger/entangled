@@ -237,9 +237,9 @@ done:
 }
 
 retcode_t iota_client_find_transaction_objects(
-    iota_client_service_t const* const serv, hashes_t* addresses,
-    hashes_t const* const bundles, hashes_t const* const tags,
-    hashes_t const* const approvees, transaction_list_t* out_tx_objs) {
+    iota_client_service_t const* const serv, hash243_queue_t* addresses,
+    hash243_queue_t const* const bundles, hash81_queue_t const* const tags,
+    hash243_queue_t const* const approvees, transaction_list_t* out_tx_objs) {
   retcode_t ret_code = RC_OK;
 
   log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
@@ -254,19 +254,19 @@ retcode_t iota_client_find_transaction_objects(
     goto done;
   }
 
-  &find_tx_req->addresses = flex_hash_array_to_hash243_queue(addresses);
+  &find_tx_req->addresses = addresses;
   if (!(&find_tx_req->addresses)) {
     goto done;
   }
-  &find_tx_req->bundles = flex_hash_array_to_hash243_queue(bundles);
+  &find_tx_req->bundles = bundles;
   if (!(&find_tx_req->bundles)) {
     goto done;
   }
-  &find_tx_req->tags = flex_hash_array_to_hash81_queue(tags);
+  &find_tx_req->tags = tags;
   if (!(&find_tx_req->tags)) {
     goto done;
   }
-  &find_tx_req->approvees = flex_hash_array_to_hash243_queue(approvees);
+  &find_tx_req->approvees = approvees;
   if (!(&find_tx_req->approvees)) {
     goto done;
   }

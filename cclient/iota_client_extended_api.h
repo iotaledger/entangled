@@ -98,9 +98,9 @@ retcode_t iota_client_broadcast_bundle(iota_client_service_t const* const serv,
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createFindTransactionObjects.ts#L38
  */
 retcode_t iota_client_find_transaction_objects(
-    iota_client_service_t const* const serv, hashes_t* addresses,
-    hashes_t const* const bundles, hashes_t const* const tags,
-    hashes_t const* const approvees, transaction_list_t* out_tx_objs);
+    iota_client_service_t const* const serv, hash243_queue_t* addresses,
+    hash243_queue_t const* const bundles, hash81_queue_t const* const tags,
+    hash243_queue_t const* const approvees, transaction_list_t* out_tx_objs);
 
 /**
  * Returns an `account_data_t` object, containing account information about
