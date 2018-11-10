@@ -26,6 +26,7 @@ extern char* iota_statement_transaction_update_snapshot_index;
 extern char* iota_statement_transaction_update_solid_state;
 extern char* iota_statement_transaction_exist;
 extern char* iota_statement_transaction_exist_by_hash;
+extern char* iota_statement_transaction_approvers_count;
 
 /*
  * Milestone statements

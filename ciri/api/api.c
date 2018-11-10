@@ -141,8 +141,9 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
   LL_FOREACH(req->hashes, iter) {
     hash_pack_reset(&pack);
     // NOTE Concurrency needs to be taken care of
-    if ((ret = iota_tangle_transaction_load(api->tangle, TRANSACTION_FIELD_HASH,
-                                            iter->hash, &pack)) != RC_OK) {
+    if ((ret = iota_tangle_transaction_load(&api->consensus->tangle,
+                                            TRANSACTION_FIELD_HASH, iter->hash,
+                                            &pack)) != RC_OK) {
       return ret;
     }
     if (pack.num_loaded != 0) {
@@ -198,7 +199,8 @@ retcode_t iota_api_broadcast_transactions(
 
   LL_FOREACH(req->trytes, iter) {
     transaction_deserialize_from_trits(&tx, iter->hash->trits);
-    if (iota_consensus_transaction_validate(api->transaction_validator, &tx)) {
+    if (iota_consensus_transaction_validate(
+            &api->consensus->transaction_validator, &tx)) {
       // TODO priority queue on weight_magnitude
       if ((ret = broadcaster_on_next(&api->node->broadcaster,
                                      iter->hash->trits)) != RC_OK) {
@@ -224,15 +226,23 @@ retcode_t iota_api_store_transactions(
   bool exists;
   LL_FOREACH(req->trytes, iter) {
     transaction_deserialize_from_trits(&tx, iter->hash->trits);
-    if (iota_consensus_transaction_validate(api->transaction_validator, &tx)) {
+    if (iota_consensus_transaction_validate(
+            &api->consensus->transaction_validator, &tx)) {
       hash.trits = tx.hash;
-      if ((ret = iota_tangle_transaction_exist(
-               api->tangle, TRANSACTION_FIELD_HASH, &hash, &exists)) != RC_OK) {
+      if ((ret = iota_tangle_transaction_exist(&api->consensus->tangle,
+                                               TRANSACTION_FIELD_HASH, &hash,
+                                               &exists)) != RC_OK) {
         return ret;
       }
       if (!exists) {
         // NOTE Concurrency needs to be taken care of
-        if ((ret = iota_tangle_transaction_store(api->tangle, &tx)) != RC_OK) {
+        if ((ret = iota_tangle_transaction_store(&api->consensus->tangle,
+                                                 &tx)) != RC_OK) {
+          return ret;
+        }
+        if ((ret = iota_consensus_transaction_solidifier_update_status(
+                 &api->consensus->transaction_solidifier, &tx)) != RC_OK) {
+          log_warning(API_LOGGER_ID, "Updating transaction status failed\n");
           return ret;
         }
         // TODO store metadata: arrival_time, status, sender (#407)
@@ -255,8 +265,7 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api,
 }
 
 retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
-                        tangle_t *const tangle,
-                        transaction_validator_t *const transaction_validator,
+                        iota_consensus_t *const consensus,
                         serializer_type_t const serializer_type) {
   if (api == NULL) {
     return RC_API_NULL_SELF;
@@ -265,8 +274,7 @@ retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
   logger_helper_init(API_LOGGER_ID, LOGGER_DEBUG, true);
   api->running = false;
   api->node = node;
-  api->tangle = tangle;
-  api->transaction_validator = transaction_validator;
+  api->consensus = consensus;
   api->serializer_type = serializer_type;
   if (api->serializer_type == SR_JSON) {
     init_json_serializer(&api->serializer);

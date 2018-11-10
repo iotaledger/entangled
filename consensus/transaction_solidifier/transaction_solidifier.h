@@ -17,6 +17,7 @@
 #include "consensus/conf.h"
 #include "consensus/tangle/tangle.h"
 #include "gossip/components/transaction_requester.h"
+#include "gossip/tips_cache.h"
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/containers/hash/hash243_stack.h"
 #include "utils/handles/lock.h"
@@ -35,28 +36,32 @@ typedef struct transaction_solidifier_s {
   lock_handle_t lock;
   hash243_set_t newly_set_solid_transactions;
   hash243_set_t solid_transactions_candidates;
+  tips_cache_t *tips;
 } transaction_solidifier_t;
 
-extern retcode_t iota_consensus_transaction_solidifier_init(
+retcode_t iota_consensus_transaction_solidifier_init(
     transaction_solidifier_t *const ts, iota_consensus_conf_t *const conf,
-    tangle_t *const tangle, requester_state_t *const requester);
+    tangle_t *const tangle, requester_state_t *const requester,
+    tips_cache_t *const tips);
 
-extern retcode_t iota_consensus_transaction_solidifier_start(
+retcode_t iota_consensus_transaction_solidifier_start(
     transaction_solidifier_t *const ts);
 
-extern retcode_t iota_consensus_transaction_solidifier_stop(
+retcode_t iota_consensus_transaction_solidifier_stop(
     transaction_solidifier_t *const ts);
 
-extern retcode_t iota_consensus_transaction_solidifier_destroy(
+retcode_t iota_consensus_transaction_solidifier_destroy(
     transaction_solidifier_t *const ts);
 
-extern retcode_t iota_consensus_transaction_solidifier_check_solidity(
+retcode_t iota_consensus_transaction_solidifier_check_solidity(
     transaction_solidifier_t *const ts, flex_trit_t *const hash,
     bool is_milestone, bool *const is_solid);
 
-extern retcode_t
-iota_consensus_transaction_solidifier_check_and_update_solid_state(
+retcode_t iota_consensus_transaction_solidifier_check_and_update_solid_state(
     transaction_solidifier_t *const ts, flex_trit_t *const hash);
+
+retcode_t iota_consensus_transaction_solidifier_update_status(
+    transaction_solidifier_t *const ts, iota_transaction_t const tx);
 
 #ifdef __cplusplus
 }

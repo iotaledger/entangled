@@ -14,8 +14,7 @@
 #include "cclient/serialization/serializer.h"
 #include "ciri/api/conf.h"
 #include "common/errors.h"
-#include "consensus/tangle/tangle.h"
-#include "consensus/transaction_validator/transaction_validator.h"
+#include "consensus/consensus.h"
 #include "gossip/components/broadcaster.h"
 #include "utils/handles/thread.h"
 
@@ -32,8 +31,7 @@ typedef struct iota_api_s {
   thread_handle_t thread;
   bool running;
   node_t *node;
-  tangle_t *tangle;
-  transaction_validator_t *transaction_validator;
+  iota_consensus_t *consensus;
   serializer_t serializer;
   serializer_type_t serializer_type;
 } iota_api_t;
@@ -43,15 +41,13 @@ typedef struct iota_api_s {
  *
  * @param api The API
  * @param node A node
- * @param tangle A tangle
- * @param transaction_validator A transaction validator
+ * @param consensus A consensus
  * @param serializer_type A serializer type
  *
  * @return a status code
  */
 retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
-                        tangle_t *const tangle,
-                        transaction_validator_t *const transaction_validator,
+                        iota_consensus_t *const consensus,
                         serializer_type_t const serializer_type);
 
 /**

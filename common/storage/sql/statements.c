@@ -55,6 +55,9 @@ char *iota_statement_transaction_exist_by_hash =
     "SELECT 1 WHERE EXISTS(SELECT 1 "
     "FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?)";
 
+char *iota_statement_transaction_approvers_count =
+    "SELECT COUNT(*) FROM " TRANSACTION_TABLE_NAME " WHERE branch=? OR trunk=?";
+
 /*
  * Milestone statements
  */
