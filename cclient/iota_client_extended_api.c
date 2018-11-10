@@ -254,19 +254,19 @@ retcode_t iota_client_find_transaction_objects(
     goto done;
   }
 
-  &find_tx_req->addresses = addresses;
+  memcpy(&find_tx_req->addresses, addresses, sizeof(addresses));
   if (!(&find_tx_req->addresses)) {
     goto done;
   }
-  &find_tx_req->bundles = bundles;
+  memcpy(&find_tx_req->bundles, bundles, sizeof(bundles));
   if (!(&find_tx_req->bundles)) {
     goto done;
   }
-  &find_tx_req->tags = tags;
+  memcpy(&find_tx_req->tags, tags, sizeof(tags));
   if (!(&find_tx_req->tags)) {
     goto done;
   }
-  &find_tx_req->approvees = approvees;
+  memcpy(&find_tx_req->approvees, approvees, sizeof(approvees));
   if (!(&find_tx_req->approvees)) {
     goto done;
   }
@@ -275,7 +275,7 @@ retcode_t iota_client_find_transaction_objects(
     goto done;
   }
 
-  get_trytes_req->hashes = find_tx_res->hashes;
+  memcpy(get_trytes_req->hashes, find_tx_res->hashes, sizeof(find_tx_res->hashes));
   if (!get_trytes_req->hashes) {
     goto done;
   }

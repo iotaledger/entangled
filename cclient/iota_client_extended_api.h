@@ -8,6 +8,8 @@
 #ifndef CCLIENT_IOTA_EXTENDED_API_H_
 #define CCLIENT_IOTA_EXTENDED_API_H_
 
+#include <stdio.h>
+
 #include "common/helpers/sign.h"
 #include "iota_client_core_api.h"
 #include "utils/containers/hash/hash243_queue.h"
