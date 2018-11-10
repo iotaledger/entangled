@@ -21,7 +21,6 @@ static iota_api_t api;
 static tangle_t tangle;
 static transaction_validator_t transaction_validator;
 static node_t node;
-static broadcaster_t broadcaster;
 static iota_consensus_conf_t conf;
 
 void setUp(void) {
@@ -38,7 +37,7 @@ void test_broadcast_transactions_empty(void) {
 
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req) == RC_OK);
 
-  TEST_ASSERT_EQUAL_INT(broadcaster_size(&broadcaster), 0);
+  TEST_ASSERT_EQUAL_INT(broadcaster_size(&node.broadcaster), 0);
 
   broadcast_transactions_req_free(&req);
   TEST_ASSERT(req == NULL);
@@ -65,7 +64,7 @@ void test_broadcast_transactions_invalid_tx(void) {
   broadcast_transactions_req_add_trytes(req, tx_trytes);
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req) == RC_OK);
 
-  TEST_ASSERT_EQUAL_INT(broadcaster_size(&broadcaster), 0);
+  TEST_ASSERT_EQUAL_INT(broadcaster_size(&node.broadcaster), 0);
 
   broadcast_transactions_req_free(&req);
   TEST_ASSERT(req == NULL);
@@ -84,7 +83,7 @@ void test_broadcast_transactions(void) {
   }
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req) == RC_OK);
 
-  TEST_ASSERT_EQUAL_INT(broadcaster_size(&broadcaster), 4);
+  TEST_ASSERT_EQUAL_INT(broadcaster_size(&node.broadcaster), 4);
 
   broadcast_transactions_req_free(&req);
   TEST_ASSERT(req == NULL);
@@ -96,8 +95,8 @@ int main(void) {
   config.db_path = test_db_path;
   api.tangle = &tangle;
   api.transaction_validator = &transaction_validator;
-  broadcaster_init(&broadcaster, &node);
-  api.broadcaster = &broadcaster;
+  broadcaster_init(&node.broadcaster, &node);
+  api.node = &node;
   TEST_ASSERT(iota_consensus_conf_init(&conf) == RC_OK);
   conf.snapshot_timestamp_sec = 1536845195;
   conf.mwm = 1;

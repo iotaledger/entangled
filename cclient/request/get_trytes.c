@@ -31,6 +31,6 @@ void get_trytes_req_free(get_trytes_req_t** const req) {
 
 get_trytes_req_t* get_trytes_req_add_hash(get_trytes_req_t* const req,
                                           tryte_t const* const hash) {
-  req->hashes = flex_hash_array_append(req->hashes, hash);
+  req->hashes = flex_hash_array_append(req->hashes, (char*)hash);
   return req;
 }

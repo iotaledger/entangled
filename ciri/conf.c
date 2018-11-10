@@ -71,9 +71,8 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf,
     return RC_NULL_PARAM;
   }
 
-  memset(ciri_conf, 0, sizeof(iota_ciri_conf_t));
-
   ciri_conf->log_level = DEFAULT_LOG_LEVEL;
+  strcpy(ciri_conf->db_path, DEFAULT_DB_PATH);
 
   if ((ret = iota_consensus_conf_init(consensus_conf)) != RC_OK) {
     return ret;
@@ -111,14 +110,25 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
       case 'l':  // --log-level
         ciri_conf->log_level = get_log_level(optarg);
         break;
+      case 'd':  // --db-path
+        strcpy(ciri_conf->db_path, optarg);
+        break;
 
       // Gossip configuration
       case CLI_ARG_MWM:  // --mwm
         gossip_conf->mwm = atoi(optarg);
+        gossip_conf->request_hash_size_trit =
+            HASH_LENGTH_TRIT - gossip_conf->mwm;
         consensus_conf->mwm = atoi(optarg);
         break;
       case 'n':  // --neighbors
         gossip_conf->neighbors = optarg;
+        break;
+      case CLI_ARG_P_PROPAGATE_REQUEST:  // --p-propagate-request
+        gossip_conf->p_propagate_request = atof(optarg);
+        break;
+      case CLI_ARG_P_REPLY_RANDOM_TIP:  // --p-reply-random-tip
+        gossip_conf->p_reply_random_tip = atof(optarg);
         break;
       case CLI_ARG_P_REMOVE_REQUEST:  // --p-remove-request
         gossip_conf->p_remove_request = atof(optarg);
@@ -126,8 +136,14 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
       case CLI_ARG_P_SELECT_MILESTONE:  // --p-select-milestone
         gossip_conf->p_select_milestone = atof(optarg);
         break;
+      case CLI_ARG_P_SEND_MILESTONE:  // --p-send-milestone
+        gossip_conf->p_send_milestone = atof(optarg);
+        break;
       case 't':  // --tcp-receiver-port
         gossip_conf->tcp_receiver_port = atoi(optarg);
+        break;
+      case CLI_ARG_TIPS_CACHE_SIZE:  // --tips-cache-size
+        gossip_conf->tips_cache_size = atoi(optarg);
         break;
       case 'u':  // --udp-receiver-port
         gossip_conf->udp_receiver_port = atoi(optarg);

@@ -12,9 +12,18 @@ cc_library(
     deps = [
         ":service",
         "//cclient/http",
+        "//common/helpers:checksum",
+        "//common/helpers:digest",
+        "//common/helpers:pow",
         "//common/helpers:sign",
         "//utils/containers/hash:hash243_queue",
     ],
+)
+
+cc_binary(
+    name = "libcclient.so",
+    linkshared = True,
+    deps = [":api"],
 )
 
 cc_library(

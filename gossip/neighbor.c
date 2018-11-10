@@ -15,6 +15,7 @@
 #include "gossip/node.h"
 #include "gossip/services/tcp_sender.hpp"
 #include "gossip/services/udp_sender.hpp"
+#include "utils/handles/rand.h"
 
 retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
                                  char const *const uri) {
@@ -77,14 +78,13 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
     return ret;
   }
 
-  bool is_milestone =
-      ((double)rand() / (double)RAND_MAX) < node->conf.p_select_milestone;
+  bool is_milestone = rand_handle_probability() < node->conf.p_select_milestone;
   if ((ret = get_transaction_to_request(&node->transaction_requester, request,
                                         is_milestone)) != RC_OK) {
     return ret;
   }
-  if ((ret = iota_packet_set_request(&packet, request, node->conf.mwm)) !=
-      RC_OK) {
+  if ((ret = iota_packet_set_request(
+           &packet, request, node->conf.request_hash_size_trit)) != RC_OK) {
     return ret;
   }
 

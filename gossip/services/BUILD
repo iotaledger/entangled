@@ -5,6 +5,7 @@ cc_library(
     hdrs = ["receiver.h"],
     deps = [
         "//common/network",
+        "//gossip/components:processor_shared",
         "//utils/handles:thread",
     ],
 )
@@ -16,7 +17,6 @@ cc_library(
         ":receiver_shared",
         "//gossip/services:tcp_receiver",
         "//gossip/services:udp_receiver",
-        "//utils/containers/queues:concurrent_queue_packet",
     ],
 )
 
@@ -28,7 +28,6 @@ cc_library(
         "//gossip:node_shared",
         "//utils:logger_helper",
         "//utils/containers/lists:concurrent_list_neighbor",
-        "//utils/containers/queues:concurrent_queue_packet",
         "@boost//:asio",
     ],
 )
@@ -53,7 +52,6 @@ cc_library(
         "//gossip:neighbor",
         "//utils:logger_helper",
         "//utils/containers/lists:concurrent_list_neighbor",
-        "//utils/containers/queues:concurrent_queue_packet",
         "@boost//:asio",
     ],
 )

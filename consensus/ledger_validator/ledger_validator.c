@@ -49,7 +49,7 @@ static retcode_t update_snapshot_milestone_do_func(flex_trit_t *const hash,
   return RC_OK;
 }
 
-static retcode_t update_snapshot_milestone(ledger_validator_t *const lv,
+static retcode_t update_snapshot_milestone(ledger_validator_t const *const lv,
                                            flex_trit_t *const hash,
                                            uint64_t index) {
   retcode_t ret;

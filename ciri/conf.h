@@ -17,6 +17,7 @@
 #include "utils/logger_helper.h"
 
 #define DEFAULT_LOG_LEVEL LOGGER_INFO
+#define DEFAULT_DB_PATH DB_PATH
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,6 +29,8 @@ typedef struct iota_ciri_conf_s {
   // Valid log levels: LOGGER_DEBUG, LOGGER_INFO, LOGGER_NOTICE,
   // LOGGER_WARNING, LOGGER_ERR, LOGGER_CRIT, LOGGER_ALERT and LOGGER_EMERG
   logger_level_t log_level;
+  // Path of the DB file
+  char db_path[128];
 } iota_ciri_conf_t;
 
 /**

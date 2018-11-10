@@ -194,8 +194,9 @@ static retcode_t cw_rating_dfs_do_dfs_light(
 
     bitset_set_true(visited_bitset, curr_tx_entry->idx);
 
-    if ((ret = hash243_set_for_each(&curr_tx_entry->approvers,
-                                    hash243_stack_push, &stack))) {
+    if ((ret = hash243_set_for_each(
+             &curr_tx_entry->approvers,
+             (hash243_on_container_func)hash243_stack_push, &stack))) {
       return ret;
     }
   }

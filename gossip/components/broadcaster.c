@@ -21,7 +21,8 @@
 
 static void *broadcaster_routine(broadcaster_t *const broadcaster) {
   concurrent_list_node_neighbor_t *iter = NULL;
-  flex_trit_t *transaction_flex_trits = NULL;
+  flex_trit_t *transaction_flex_trits_ptr = NULL;
+  flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
   if (broadcaster == NULL) {
     return NULL;
@@ -37,11 +38,16 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
     }
 
     rw_lock_handle_wrlock(&broadcaster->lock);
-    transaction_flex_trits = hash8019_queue_peek(broadcaster->queue);
-    if (transaction_flex_trits == NULL) {
+    transaction_flex_trits_ptr = hash8019_queue_peek(broadcaster->queue);
+    if (transaction_flex_trits_ptr == NULL) {
       rw_lock_handle_unlock(&broadcaster->lock);
       continue;
     }
+    memcpy(transaction_flex_trits, transaction_flex_trits_ptr,
+           FLEX_TRIT_SIZE_8019);
+    hash8019_queue_pop(&broadcaster->queue);
+    rw_lock_handle_unlock(&broadcaster->lock);
+
     log_debug(BROADCASTER_LOGGER_ID, "Broadcasting transaction\n");
     if (broadcaster->node->neighbors) {
       iter = broadcaster->node->neighbors->front;
@@ -54,8 +60,6 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
         iter = iter->next;
       }
     }
-    hash8019_queue_pop(&broadcaster->queue);
-    rw_lock_handle_unlock(&broadcaster->lock);
   }
 
   lock_handle_unlock(&lock_cond);

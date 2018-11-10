@@ -9,6 +9,7 @@
 
 #include "cclient/serialization/json/json_serializer.h"
 #include "ciri/api/api.h"
+#include "gossip/node.h"
 #include "request/requests.h"
 #include "response/responses.h"
 #include "utils/logger_helper.h"
@@ -34,6 +35,7 @@ typedef enum iota_api_command_e {
   CMD_INTERRUPT_ATTACHING_TO_TANGLE,
   CMD_BROADCAST_TRANSACTIONS,
   CMD_STORE_TRANSACTIONS,
+  CMD_WERE_ADDRESSES_SPENT_FROM,
   CMD_CHECK_CONSISTENCY,
   CMD_UNKNOWN
 } iota_api_command_t;
@@ -57,6 +59,7 @@ static iota_api_command_t get_command(char const *const command) {
       {"interruptAttachingToTangle", CMD_INTERRUPT_ATTACHING_TO_TANGLE},
       {"broadcastTransactions", CMD_BROADCAST_TRANSACTIONS},
       {"storeTransactions", CMD_STORE_TRANSACTIONS},
+      {"wereAddressesSpentFrom", CMD_WERE_ADDRESSES_SPENT_FROM},
       {"checkConsistency", CMD_CHECK_CONSISTENCY},
       {NULL, CMD_UNKNOWN},
   };
@@ -70,27 +73,55 @@ static iota_api_command_t get_command(char const *const command) {
  * Public functions
  */
 
-retcode_t iota_api_get_node_info(get_node_info_res_t *const res) {
+retcode_t iota_api_get_node_info(iota_api_t const *const api,
+                                 get_node_info_res_t *const res) {
   return RC_OK;
 }
 
-retcode_t iota_api_get_neighbors(get_neighbors_res_t *const res) {
+retcode_t iota_api_get_neighbors(iota_api_t const *const api,
+                                 get_neighbors_res_t *const res) {
   return RC_OK;
 }
 
-retcode_t iota_api_add_neighbors(add_neighbors_req_t const *const req,
+retcode_t iota_api_add_neighbors(iota_api_t const *const api,
+                                 add_neighbors_req_t const *const req,
                                  add_neighbors_res_t *const res) {
   return RC_OK;
 }
 
-retcode_t iota_api_remove_neighbors(remove_neighbors_req_t const *const req,
+retcode_t iota_api_remove_neighbors(iota_api_t const *const api,
+                                    remove_neighbors_req_t const *const req,
                                     remove_neighbors_res_t *const res) {
   return RC_OK;
 }
 
-retcode_t iota_api_get_tips(get_tips_res_t *const res) { return RC_OK; }
+retcode_t iota_api_get_tips(iota_api_t const *const api,
+                            get_tips_res_t *const res) {
+  retcode_t ret = RC_OK;
+  hash243_set_t tips = NULL;
+  hash243_set_entry_t *iter = NULL;
+  hash243_set_entry_t *tmp = NULL;
+  tryte_t tip_trytes[HASH_LENGTH_TRYTE + 1];
 
-retcode_t iota_api_find_transactions(find_transactions_req_t const *const req,
+  if ((ret = tips_cache_get_tips(&api->node->tips, &tips))) {
+    goto done;
+  }
+
+  HASH_ITER(hh, tips, iter, tmp) {
+    // TODO Not necessary when get_tips_res_t will have a hash container
+    flex_trits_to_trytes(tip_trytes, HASH_LENGTH_TRYTE, iter->hash,
+                         HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+    tip_trytes[HASH_LENGTH_TRYTE] = '\0';
+    get_tips_res_add_tip(res, tip_trytes);
+  }
+
+done:
+  hash243_set_free(&tips);
+  return ret;
+}
+
+retcode_t iota_api_find_transactions(iota_api_t const *const api,
+                                     find_transactions_req_t const *const req,
                                      find_transactions_res_t *const res) {
   return RC_OK;
 }
@@ -130,28 +161,33 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
 }
 
 retcode_t iota_api_get_inclusion_states(
-    get_inclusion_state_req_t const *const req,
+    iota_api_t const *const api, get_inclusion_state_req_t const *const req,
     get_inclusion_state_res_t *const res) {
   return RC_OK;
 }
 
-retcode_t iota_api_get_balances(get_balances_req_t const *const req,
+retcode_t iota_api_get_balances(iota_api_t const *const api,
+                                get_balances_req_t const *const req,
                                 get_balances_res_t *const res) {
   return RC_OK;
 }
 
 retcode_t iota_api_get_transactions_to_approve(
+    iota_api_t const *const api,
     get_transactions_to_approve_req_t const *const req,
     get_transactions_to_approve_res_t *const res) {
   return RC_OK;
 }
 
-retcode_t iota_api_attach_to_tangle(attach_to_tangle_req_t const *const req,
+retcode_t iota_api_attach_to_tangle(iota_api_t const *const api,
+                                    attach_to_tangle_req_t const *const req,
                                     attach_to_tangle_res_t *const res) {
   return RC_OK;
 }
 
-retcode_t iota_api_interrupt_attaching_to_tangle() { return RC_OK; }
+retcode_t iota_api_interrupt_attaching_to_tangle(iota_api_t const *const api) {
+  return RC_OK;
+}
 
 retcode_t iota_api_broadcast_transactions(
     iota_api_t const *const api,
@@ -164,8 +200,8 @@ retcode_t iota_api_broadcast_transactions(
     transaction_deserialize_from_trits(&tx, iter->hash->trits);
     if (iota_consensus_transaction_validate(api->transaction_validator, &tx)) {
       // TODO priority queue on weight_magnitude
-      if ((ret = broadcaster_on_next(api->broadcaster, iter->hash->trits)) !=
-          RC_OK) {
+      if ((ret = broadcaster_on_next(&api->node->broadcaster,
+                                     iter->hash->trits)) != RC_OK) {
         return ret;
       }
     }
@@ -206,14 +242,21 @@ retcode_t iota_api_store_transactions(
   return ret;
 }
 
-retcode_t iota_api_check_consistency(check_consistency_req_t const *const req,
+retcode_t iota_api_were_addresses_spent_from(
+    iota_api_t const *const api, check_consistency_req_t const *const req,
+    check_consistency_res_t *const res) {
+  return RC_OK;
+}
+
+retcode_t iota_api_check_consistency(iota_api_t const *const api,
+                                     check_consistency_req_t const *const req,
                                      check_consistency_res_t *const res) {
   return RC_OK;
 }
 
-retcode_t iota_api_init(iota_api_t *const api, tangle_t *const tangle,
+retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
+                        tangle_t *const tangle,
                         transaction_validator_t *const transaction_validator,
-                        broadcaster_t *const broadcaster,
                         serializer_type_t const serializer_type) {
   if (api == NULL) {
     return RC_API_NULL_SELF;
@@ -221,9 +264,9 @@ retcode_t iota_api_init(iota_api_t *const api, tangle_t *const tangle,
 
   logger_helper_init(API_LOGGER_ID, LOGGER_DEBUG, true);
   api->running = false;
+  api->node = node;
   api->tangle = tangle;
   api->transaction_validator = transaction_validator;
-  api->broadcaster = broadcaster;
   api->serializer_type = serializer_type;
   if (api->serializer_type == SR_JSON) {
     init_json_serializer(&api->serializer);

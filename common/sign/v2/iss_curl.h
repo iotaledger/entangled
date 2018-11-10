@@ -13,7 +13,15 @@
 #define HASH_PREFIX curl
 #define HASH_STATE Curl
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "iss.h.inc"
+
+#ifdef __cplusplus
+}
+#endif
 
 #undef HASH_PREFIX
 #undef HASH_STATE

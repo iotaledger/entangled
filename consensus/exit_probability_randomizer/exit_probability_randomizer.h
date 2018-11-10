@@ -33,7 +33,7 @@ typedef struct {
   // find_transactions_request
   retcode_t (*exit_probability_randomize)(
       ep_randomizer_t const *const ep_randomizer,
-      exit_prob_transaction_validator_t const *const epv,
+      exit_prob_transaction_validator_t *const epv,
       cw_calc_result *const cw_result, trit_array_t const *const ep,
       trit_array_t *const tip);
 } ep_randomizer_vtable;
@@ -56,7 +56,7 @@ extern retcode_t iota_consensus_ep_randomizer_destroy(
 
 extern retcode_t iota_consensus_exit_probability_randomize(
     ep_randomizer_t const *const exit_probability_randomizer,
-    exit_prob_transaction_validator_t const *const ep_validator,
+    exit_prob_transaction_validator_t *const ep_validator,
     cw_calc_result *const cw_result, trit_array_t const *const ep,
     trit_array_t *const tip);
 

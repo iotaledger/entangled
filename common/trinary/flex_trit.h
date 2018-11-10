@@ -158,7 +158,15 @@ static inline uint8_t flex_trits_set_at(flex_trit_t *const flex_trits,
   return 1;
 }
 
-bool flex_trits_is_null(flex_trit_t const *const flex_trits, size_t const len);
+static inline bool flex_trits_are_null(flex_trit_t const *const flex_trits,
+                                       size_t const len) {
+  for (size_t i = 0; i < len; i++) {
+    if (flex_trits[i] != FLEX_TRIT_NULL_VALUE) {
+      return false;
+    }
+  }
+  return true;
+}
 
 /// Returns a portion of length num_trits of an array into a new array from
 /// start. The original array will not be modified.
