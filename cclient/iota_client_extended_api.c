@@ -254,20 +254,20 @@ retcode_t iota_client_find_transaction_objects(
     goto done;
   }
 
-  &find_tx_req->addresses = flex_hash_array_to_hash243_queue(
-      addresses) if (!(&find_tx_req->addresses)) {
+  &find_tx_req->addresses = flex_hash_array_to_hash243_queue(addresses);
+  if (!(&find_tx_req->addresses)) {
     goto done;
   }
-  &find_tx_req->bundles =
-      flex_hash_array_to_hash243_queue(bundles) if (!(&find_tx_req->bundles)) {
+  &find_tx_req->bundles = flex_hash_array_to_hash243_queue(bundles);
+  if (!(&find_tx_req->bundles)) {
     goto done;
   }
-  &find_tx_req->tags =
-      flex_hash_array_to_hash81_queue(tags) if (!(&find_tx_req->tags)) {
+  &find_tx_req->tags = flex_hash_array_to_hash81_queue(tags);
+  if (!(&find_tx_req->tags)) {
     goto done;
   }
-  &find_tx_req->approvees = flex_hash_array_to_hash243_queue(
-      approvees) if (!(&find_tx_req->approvees)) {
+  &find_tx_req->approvees = flex_hash_array_to_hash243_queue(approvees);
+  if (!(&find_tx_req->approvees)) {
     goto done;
   }
   ret_code = iota_client_find_transactions(serv, find_tx_req, find_tx_res);
