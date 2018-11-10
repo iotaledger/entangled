@@ -21,7 +21,7 @@
 
 /**
  * Converts transaction bytes from a packet to a transaction, validates it and
- * checks its solidity.
+ * updates its status.
  * If valid and new: stores and broadcasts it.
  *
  * @param processor The processor state
@@ -99,12 +99,10 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
       goto failure;
     }
 
-    // Checks solidity of the transaction
-    if ((ret =
-             iota_consensus_transaction_solidifier_check_and_update_solid_state(
-                 processor->transaction_solidifier, hash)) != RC_OK) {
-      log_warning(PROCESSOR_LOGGER_ID,
-                  "Checking transaction solidity failed\n");
+    // Updates transaction status
+    if ((ret = iota_consensus_transaction_solidifier_update_status(
+             processor->transaction_solidifier, &transaction)) != RC_OK) {
+      log_warning(PROCESSOR_LOGGER_ID, "Updating transaction status failed\n");
       return ret;
     }
 

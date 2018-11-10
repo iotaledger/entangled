@@ -16,15 +16,15 @@ static char *test_db_path = "ciri/api/tests/test.db";
 static char *ciri_db_path = "ciri/api/tests/ciri.db";
 static connection_config_t config;
 static iota_api_t api;
-static tangle_t tangle;
+static iota_consensus_t consensus;
 
 void setUp(void) {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
+  TEST_ASSERT(tangle_setup(&api.consensus->tangle, &config, test_db_path,
+                           ciri_db_path) == RC_OK);
 }
 
 void tearDown(void) {
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&api.consensus->tangle, test_db_path) == RC_OK);
 }
 
 void test_get_trytes_empty(void) {
@@ -79,7 +79,7 @@ void test_get_trytes_max(void) {
   tryte_t const *const trytes[2] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                                     TX_2_OF_4_VALUE_BUNDLE_TRYTES};
   transactions_deserialize(trytes, txs, 2);
-  build_tangle(&tangle, txs, 2);
+  build_tangle(&api.consensus->tangle, txs, 2);
 
   // Getting trytes 1 & 2 from hashes
 
@@ -110,7 +110,7 @@ void test_get_trytes(void) {
   // Storing transactions to get trytes from
 
   transactions_deserialize(txs_trytes, txs, 4);
-  build_tangle(&tangle, txs, 4);
+  build_tangle(&api.consensus->tangle, txs, 4);
 
   // Loading trytes from hashes
 
@@ -141,7 +141,7 @@ int main(void) {
   UNITY_BEGIN();
 
   config.db_path = test_db_path;
-  api.tangle = &tangle;
+  api.consensus = &consensus;
 
   TEST_ASSERT(iota_api_conf_init(&api.conf) == RC_OK);
 

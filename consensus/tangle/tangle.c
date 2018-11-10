@@ -119,6 +119,12 @@ retcode_t iota_tangle_transaction_exist(tangle_t const *const tangle,
   return iota_stor_transaction_exist(&tangle->conn, field, key, exist);
 }
 
+retcode_t iota_tangle_transaction_approvers_count(tangle_t const *const tangle,
+                                                  flex_trit_t const *const hash,
+                                                  size_t *const count) {
+  return iota_stor_transaction_approvers_count(&tangle->conn, hash, count);
+}
+
 /*
  * Milestone operations
  */

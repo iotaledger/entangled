@@ -75,6 +75,10 @@ retcode_t iota_tangle_transactions_update_solid_state(
     tangle_t const *const tangle, hash243_set_t const hashes,
     bool const is_solid);
 
+retcode_t iota_tangle_transaction_approvers_count(tangle_t const *const tangle,
+                                                  flex_trit_t const *const hash,
+                                                  size_t *const count);
+
 /*
  * Milestone operations
  */
