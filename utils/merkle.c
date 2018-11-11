@@ -13,10 +13,7 @@
 static trit_t const merkle_null_hash[HASH_LENGTH_TRIT] = {0};
 
 static size_t binary_tree_size(size_t const acc, size_t const depth) {
-  if (depth == 0) {
-    return acc + 1;
-  }
-  return binary_tree_size(acc + (1 << depth), depth - 1);
+  return (1 << (depth + 1)) - 1 + acc;
 }
 
 size_t merkle_size(size_t const leaf_count) {
@@ -42,18 +39,34 @@ size_t merkle_depth(size_t const node_count) {
   return depth + 1;
 }
 
+/* return the node index of assign location in tree. The order of nodes indexes
+ * follow depth-first rule.
+ * @param acc The number of nodes in the previous counting binary tree
+ * @param depth The depth of the node, counting from root
+ * @param width The width of the node, counting from left
+ * @param tree_depth The depth of whole tree
+ */
 static size_t merkle_node_index_traverse(size_t const acc, size_t const depth,
                                          size_t const width,
                                          size_t const tree_depth) {
-  if (depth == 0) return acc;
-  if (width < (1 << (depth - 1))) {
-    return merkle_node_index_traverse(acc + 1, depth - 1, width,
-                                      tree_depth - 1);
-  } else {
-    return merkle_node_index_traverse(
-        1 + acc + binary_tree_size(0, tree_depth - 1), depth - 1,
-        width - (1 << (depth - 1)), tree_depth - 1);
+  if (!tree_depth) {
+    return 0;
   }
+  size_t depth_cursor = 1;
+  size_t index = depth + acc;
+  size_t width_cursor = width;
+  size_t width_of_leaves = 1 << depth;
+
+  while (depth_cursor <= depth) {
+    if (width_cursor >= (width_of_leaves >> depth_cursor)) {
+      /* add whole bianry tree size of the lest side binary tree */
+      index += ((1 << (tree_depth - depth_cursor + 1)) - 1);
+      /* counting node index in the subtree which the cursor currently stays */
+      width_cursor = width_cursor - (width_of_leaves >> depth_cursor);
+    }
+    depth_cursor++;
+  }
+  return index;
 }
 
 size_t merkle_node_index(size_t const depth, size_t const width,
