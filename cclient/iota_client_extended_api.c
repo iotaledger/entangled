@@ -239,7 +239,7 @@ done:
 retcode_t iota_client_find_transaction_objects(
     iota_client_service_t const* const serv, hash243_queue_t* addresses,
     hash243_queue_t const* const bundles, hash81_queue_t const* const tags,
-    hash243_queue_t const* const approvees, transaction_list_t* out_tx_objs) {
+    hash243_queue_t const* const approvees, iota_transaction_t* out_tx_objs) {
   retcode_t ret_code = RC_OK;
 
   log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);

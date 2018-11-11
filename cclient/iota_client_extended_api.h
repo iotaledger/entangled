@@ -11,6 +11,7 @@
 #include <stdio.h>
 
 #include "common/helpers/sign.h"
+#include "common/model/transaction.h"
 #include "iota_client_core_api.h"
 #include "utils/containers/hash/hash243_queue.h"
 
@@ -102,7 +103,7 @@ retcode_t iota_client_broadcast_bundle(iota_client_service_t const* const serv,
 retcode_t iota_client_find_transaction_objects(
     iota_client_service_t const* const serv, hash243_queue_t* addresses,
     hash243_queue_t const* const bundles, hash81_queue_t const* const tags,
-    hash243_queue_t const* const approvees, transaction_list_t* out_tx_objs);
+    hash243_queue_t const* const approvees, iota_transaction_t* out_tx_objs);
 
 /**
  * Returns an `account_data_t` object, containing account information about
