@@ -91,6 +91,7 @@ cc_library(
         "//gossip/components:processor_shared",
         "//gossip/components:receiver_shared",
         "//gossip/components:responder_shared",
+        "//gossip/components:tips_requester_shared",
         "//gossip/components:transaction_requester",
     ],
 )
@@ -105,5 +106,6 @@ cc_library(
         "//gossip/components:processor",
         "//gossip/components:receiver",
         "//gossip/components:responder",
+        "//gossip/components:tips_requester",
     ],
 )
