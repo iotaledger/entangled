@@ -49,8 +49,8 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
                               .dynamic = 0};
 
     log_debug(RESPONDER_LOGGER_ID, "Responding to random tip request\n");
-    if (requester_size(&responder->node->transaction_requester) > 0 &&
-        rand_handle_probability() < responder->node->conf.p_reply_random_tip) {
+    if (rand_handle_probability() < responder->node->conf.p_reply_random_tip &&
+        requester_size(&responder->node->transaction_requester) > 0) {
       neighbor->nbr_random_tx_req++;
       if ((ret = tips_cache_random_tip(&responder->node->tips, tip)) != RC_OK) {
         return ret;
