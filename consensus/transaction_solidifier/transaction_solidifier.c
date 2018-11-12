@@ -283,17 +283,13 @@ static retcode_t check_transaction_and_update_solid_state(
     *is_new_solid = true;
 
     if ((ret = check_approvee_solid_state(ts, transaction->trunk,
-                                          is_new_solid))) {
+                                          is_new_solid)) != RC_OK) {
       *is_new_solid = false;
       return ret;
     }
 
-    if (!*is_new_solid) {
-      return RC_OK;
-    }
-
     if ((ret = check_approvee_solid_state(ts, transaction->branch,
-                                          is_new_solid))) {
+                                          is_new_solid)) != RC_OK) {
       *is_new_solid = false;
       return ret;
     }
