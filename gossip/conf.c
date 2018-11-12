@@ -24,6 +24,7 @@ retcode_t iota_gossip_conf_init(iota_gossip_conf_t* const conf) {
   conf->p_select_milestone = DEFAULT_PROBABILITY_SELECT_MILESTONE;
   conf->p_send_milestone = DEFAULT_PROBABILITY_SEND_MILESTONE;
   conf->tips_cache_size = DEFAULT_TIPS_CACHE_SIZE;
+  conf->requester_queue_size = DEFAULT_REQUESTER_QUEUE_SIZE;
 
   return RC_OK;
 }

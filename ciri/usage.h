@@ -21,6 +21,7 @@ typedef enum cli_arg_value_e {
   CLI_ARG_P_REPLY_RANDOM_TIP,
   CLI_ARG_P_SELECT_MILESTONE,
   CLI_ARG_P_SEND_MILESTONE,
+  CLI_ARG_REQUESTER_QUEUE_SIZE,
   CLI_ARG_TIPS_CACHE_SIZE,
 
   // API configuration
@@ -88,6 +89,8 @@ static struct cli_argument_s {
      "Probability of sending a milestone transaction when the node looks for a "
      "random transaction to send to a neighbor. Value must be in [0,1].",
      REQUIRED_ARG},
+    {"requester-queue-size", CLI_ARG_REQUESTER_QUEUE_SIZE,
+     "Size of the transaction requester queue.", REQUIRED_ARG},
     {"tcp-receiver-port", 't', "TCP listen port.", REQUIRED_ARG},
     {"tips-cache-size", CLI_ARG_TIPS_CACHE_SIZE,
      "Size of the tips cache. Also bounds the number of tips returned by "

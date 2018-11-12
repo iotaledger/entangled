@@ -22,6 +22,8 @@ extern char* iota_statement_transaction_insert;
 extern char* iota_statement_transaction_select_by_hash;
 extern char* iota_statement_transaction_select_hashes_by_address;
 extern char* iota_statement_transaction_select_hashes_of_approvers;
+extern char*
+    iota_statement_transaction_select_hashes_of_transactions_to_request;
 extern char* iota_statement_transaction_update_snapshot_index;
 extern char* iota_statement_transaction_update_solid_state;
 extern char* iota_statement_transaction_exist;
