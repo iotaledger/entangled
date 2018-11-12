@@ -18,40 +18,6 @@
 
 #define CONNECTION_LOGGER_ID "stor_sqlite3_conn"
 
-retcode_t create_index_if_not_exists(const connection_t* const conn,
-                                     const char* const table_name,
-                                     const char* const index_name,
-                                     const char* const col_name) {
-  char* err_msg = 0;
-
-  char statement[MAX_CREATE_INDEX_STATEMENT_SIZE];
-
-  int res = snprintf(statement, MAX_CREATE_INDEX_STATEMENT_SIZE,
-                     "CREATE INDEX IF NOT EXISTS %s ON %s(%s)", index_name,
-                     table_name, col_name);
-
-  if (res < 0 || res == MAX_CREATE_INDEX_STATEMENT_SIZE) {
-    log_error(CONNECTION_LOGGER_ID,
-              "Failed to write statement, statement: %s\n", statement);
-    return RC_SQLITE3_FAILED_WRITE_STATEMENT;
-  }
-
-  int rc = sqlite3_exec((sqlite3*)conn->db, statement, 0, 0, &err_msg);
-  if (rc != SQLITE_OK) {
-    log_error(CONNECTION_LOGGER_ID,
-              "Failed in creating index, statement: %s, err_msg: %s\n",
-              statement, err_msg);
-    sqlite3_free(err_msg);
-    return RC_SQLITE3_FAILED_CREATE_INDEX_DB;
-  }
-
-  log_debug(CONNECTION_LOGGER_ID,
-            "Created index: %s on column: %s of table: %s\n", index_name,
-            col_name, table_name);
-
-  return RC_OK;
-}
-
 retcode_t init_connection(const connection_t* const conn,
                           const connection_config_t* const config) {
   retcode_t retcode = RC_OK;
@@ -75,48 +41,6 @@ retcode_t init_connection(const connection_t* const conn,
   } else {
     log_info(CONNECTION_LOGGER_ID, "Connection to database %s created\n",
              config->db_path);
-  }
-
-  if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                            TRANSACTION_TRUNK_INDEX,
-                                            TRANSACTION_COL_TRUNK))) {
-    return retcode;
-  }
-
-  if (create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                 TRANSACTION_BRANCH_INDEX,
-                                 TRANSACTION_COL_BRANCH)) {
-    return retcode;
-  }
-
-  if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                            TRANSACTION_ADDRESS_INDEX,
-                                            TRANSACTION_COL_ADDRESS))) {
-    return retcode;
-  }
-
-  if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                            TRANSACTION_BUNDLE_INDEX,
-                                            TRANSACTION_COL_BUNDLE))) {
-    return retcode;
-  }
-
-  if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                            TRANSACTION_TAG_INDEX,
-                                            TRANSACTION_COL_TAG))) {
-    return retcode;
-  }
-
-  if ((retcode = create_index_if_not_exists(conn, TRANSACTION_TABLE_NAME,
-                                            TRANSACTION_HASH_INDEX,
-                                            TRANSACTION_COL_HASH))) {
-    return retcode;
-  }
-
-  if ((retcode = create_index_if_not_exists(conn, MILESTONE_TABLE_NAME,
-                                            MILESTONE_HASH_INDEX,
-                                            MILESTONE_COL_HASH))) {
-    return retcode;
   }
 
   // TODO - implement connections pool so no two threads

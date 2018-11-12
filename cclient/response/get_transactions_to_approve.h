@@ -15,8 +15,8 @@ extern "C" {
 #endif
 
 typedef struct {
-  trit_array_p branch;
-  trit_array_p trunk;
+  flex_trit_t branch[FLEX_TRIT_SIZE_243];
+  flex_trit_t trunk[FLEX_TRIT_SIZE_243];
 } get_transactions_to_approve_res_t;
 
 get_transactions_to_approve_res_t* get_transactions_to_approve_res_new();

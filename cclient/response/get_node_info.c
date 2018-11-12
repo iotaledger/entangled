@@ -14,19 +14,24 @@ get_node_info_res_t* get_node_info_res_new() {
   if (res) {
     res->app_name = char_buffer_new();
     res->app_version = char_buffer_new();
-    res->latest_milestone = trit_array_new(NUM_TRITS_ADDRESS);
-    res->latest_solid_subtangle_milestone = trit_array_new(NUM_TRITS_ADDRESS);
+    memset(res->latest_milestone, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+    memset(res->latest_solid_subtangle_milestone, FLEX_TRIT_NULL_VALUE,
+           FLEX_TRIT_SIZE_243);
   }
   return res;
 }
 
 void get_node_info_res_free(get_node_info_res_t** res) {
-  if (*res) {
-    char_buffer_free((*res)->app_name);
-    char_buffer_free((*res)->app_version);
-    trit_array_free((*res)->latest_milestone);
-    trit_array_free((*res)->latest_solid_subtangle_milestone);
-    free(*res);
-    *res = NULL;
+  if (!res || !(*res)) {
+    return;
   }
+
+  if ((*res)->app_name) {
+    char_buffer_free((*res)->app_name);
+  }
+  if ((*res)->app_version) {
+    char_buffer_free((*res)->app_version);
+  }
+  free(*res);
+  *res = NULL;
 }

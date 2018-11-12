@@ -48,7 +48,6 @@ void test_store_transactions_invalid_tx(void) {
                              .num_bytes = FLEX_TRIT_SIZE_243,
                              .dynamic = 0};
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
-  tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
 
   // Trying to store an invalid transaction (invalid supply)
 
@@ -58,12 +57,8 @@ void test_store_transactions_invalid_tx(void) {
   transaction_deserialize_from_trits(&tx, tx_trits);
   tx.value = -IOTA_SUPPLY - 1;
   transaction_serialize_on_flex_trits(&tx, tx_trits);
-  flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION, tx_trits,
-                       NUM_TRITS_SERIALIZED_TRANSACTION,
-                       NUM_TRITS_SERIALIZED_TRANSACTION);
 
-  tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION] = '\0';
-  store_transactions_req_add_trytes(req, tx_trytes);
+  hash8019_stack_push(&req->trytes, tx_trits);
 
   TEST_ASSERT(iota_api_store_transactions(&api, req) == RC_OK);
 
@@ -99,7 +94,10 @@ void test_store_transactions(void) {
   // Storing 4 transactions
 
   for (size_t i = 0; i < 4; i++) {
-    store_transactions_req_add_trytes(req, txs_trytes[i]);
+    flex_trits_from_trytes(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                           txs_trytes[i], NUM_TRYTES_SERIALIZED_TRANSACTION,
+                           NUM_TRYTES_SERIALIZED_TRANSACTION);
+    hash8019_stack_push(&req->trytes, tx_trits);
   }
   TEST_ASSERT(iota_api_store_transactions(&api, req) == RC_OK);
   // Checking that they have been stored
