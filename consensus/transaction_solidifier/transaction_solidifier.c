@@ -13,7 +13,7 @@
 
 #define TRANSACTION_SOLIDIFIER_LOGGER_ID "transaction_solidifier"
 
-#define SOLID_PROPAGATION_INTERVAL 500000
+#define SOLID_PROPAGATION_INTERVAL 500000uLL
 
 /*
  * Forward declarations
