@@ -111,7 +111,8 @@ retcode_t node_init(node_t* const node, core_t* const core,
   }
 
   if ((ret = iota_tangle_transaction_load_hashes_of_requests(
-           &node->core->consensus.tangle, &pack, 1000)) != RC_OK) {
+           &node->core->consensus.tangle, &pack,
+           node->conf.requester_queue_size)) != RC_OK) {
     log_error(NODE_LOGGER_ID,
               "Loading hashes of transactions to request failed\n");
     goto done;
