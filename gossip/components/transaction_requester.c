@@ -11,9 +11,7 @@
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 
-// TODO(thibault) configuration variable
-#define MAX_TX_REQ_NBR 10000
-#define REQUESTER_COMPONENT_LOGGER_ID "requester_component"
+#define REQUESTER_LOGGER_ID "requester"
 
 retcode_t requester_init(requester_state_t *const state,
                          iota_gossip_conf_t *const conf,
@@ -22,7 +20,7 @@ retcode_t requester_init(requester_state_t *const state,
     return RC_REQUESTER_COMPONENT_NULL_STATE;
   }
 
-  logger_helper_init(REQUESTER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_init(REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
   memset(state, 0, sizeof(requester_state_t));
   state->conf = conf;
   state->milestones = NULL;
@@ -42,7 +40,7 @@ retcode_t requester_destroy(requester_state_t *const state) {
   hash243_set_free(&state->transactions);
   state->tangle = NULL;
   rw_lock_handle_destroy(&state->lock);
-  logger_helper_destroy(REQUESTER_COMPONENT_LOGGER_ID);
+  logger_helper_destroy(REQUESTER_LOGGER_ID);
 
   return RC_OK;
 }
@@ -95,7 +93,7 @@ bool requester_is_full(requester_state_t *const state) {
   size = hash243_set_size(&state->transactions);
   rw_lock_handle_unlock(&state->lock);
 
-  return size >= MAX_TX_REQ_NBR;
+  return size >= state->conf->requester_queue_size;
 }
 
 retcode_t requester_clear_request(requester_state_t *const state,
@@ -146,7 +144,8 @@ retcode_t request_transaction(requester_state_t *const state,
       goto done;
     }
   } else if (!hash243_set_contains(&state->milestones, hash) &&
-             hash243_set_size(&state->transactions) < MAX_TX_REQ_NBR) {
+             hash243_set_size(&state->transactions) <
+                 state->conf->requester_queue_size) {
     if ((ret = hash243_set_add(&state->transactions, hash)) != RC_OK) {
       goto done;
     }

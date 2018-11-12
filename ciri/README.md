@@ -55,6 +55,7 @@ Long option | Short option | Description | Example input
 `--p-reply-random-tip` | | Probability of replying to a random transaction request, even though your node doesn't have anything to request. Value must be in [0,1]. | `--p-reply-random-tip 0.66`
 `--p-select-milestone` | | Probability of sending a current milestone request to a neighbour. Value must be in [0,1]. | `--p-select-milestone 0.7`
 `--p-send-milestone` | | Probability of sending a milestone transaction when the node looks for a random transaction to send to a neighbor. Value must be in [0,1]. | `--p-send-milestone 0.02`
+`--requester-queue-size` | | Size of the transaction requester queue. | `--requester-queue-size 10000`
 `--tcp-receiver-port` | `-t` | TCP listen port. | `-t 15600`
 `--tips-cache-size` | | Size of the tips cache. Also bounds the number of tips returned by getTips API call. | `--tips-cache-size 5000`
 `--udp-receiver-port` | `-u` | UDP listen port. | `-u 14600`
