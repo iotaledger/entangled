@@ -65,7 +65,7 @@ typedef struct {
 
   retcode_t (*get_node_info_deserialize_response)(const serializer_t* const,
                                                   const char* const obj,
-                                                  get_node_info_res_t** out);
+                                                  get_node_info_res_t* out);
 
   // get_tips_request
   retcode_t (*get_tips_serialize_request)(const serializer_t* const,
@@ -81,7 +81,7 @@ typedef struct {
 
   retcode_t (*get_transactions_to_approve_deserialize_response)(
       const serializer_t* const, const char* const obj,
-      get_transactions_to_approve_res_t** out);
+      get_transactions_to_approve_res_t* out);
 
   // addNeighbors
   retcode_t (*add_neighbors_serialize_request)(
@@ -109,7 +109,7 @@ typedef struct {
       char_buffer_t* out);
   retcode_t (*attach_to_tangle_deserialize_response)(
       const serializer_t* const s, const char* const obj,
-      attach_to_tangle_res_t** out);
+      attach_to_tangle_res_t* out);
 
   // broadcastTransactions
   retcode_t (*broadcast_transactions_serialize_request)(

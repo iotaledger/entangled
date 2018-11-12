@@ -45,7 +45,6 @@ void test_broadcast_transactions_invalid_tx(void) {
   broadcast_transactions_req_t *req = broadcast_transactions_req_new();
   struct _iota_transaction tx;
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
-  tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
 
   // Trying to broadcast an invalid transaction (invalid supply)
 
@@ -55,11 +54,7 @@ void test_broadcast_transactions_invalid_tx(void) {
   transaction_deserialize_from_trits(&tx, tx_trits);
   tx.value = -IOTA_SUPPLY - 1;
   transaction_serialize_on_flex_trits(&tx, tx_trits);
-  flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION, tx_trits,
-                       NUM_TRITS_SERIALIZED_TRANSACTION,
-                       NUM_TRITS_SERIALIZED_TRANSACTION);
-  tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION] = '\0';
-  broadcast_transactions_req_add_trytes(req, tx_trytes);
+  hash8019_stack_push(&req->trytes, tx_trits);
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req) == RC_OK);
 
   TEST_ASSERT_EQUAL_INT(broadcaster_size(&api.node->broadcaster), 0);
@@ -73,11 +68,15 @@ void test_broadcast_transactions(void) {
   tryte_t const *const txs_trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
+  flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
 
   // Broadcasting 4 transactions
 
   for (size_t i = 0; i < 4; i++) {
-    broadcast_transactions_req_add_trytes(req, txs_trytes[i]);
+    flex_trits_from_trytes(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                           txs_trytes[i], NUM_TRYTES_SERIALIZED_TRANSACTION,
+                           NUM_TRYTES_SERIALIZED_TRANSACTION);
+    hash8019_stack_push(&req->trytes, tx_trits);
   }
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req) == RC_OK);
 

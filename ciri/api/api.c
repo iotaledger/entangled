@@ -108,11 +108,7 @@ retcode_t iota_api_get_tips(iota_api_t const *const api,
   }
 
   HASH_ITER(hh, tips, iter, tmp) {
-    // TODO Not necessary when get_tips_res_t will have a hash container
-    flex_trits_to_trytes(tip_trytes, HASH_LENGTH_TRYTE, iter->hash,
-                         HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-    tip_trytes[HASH_LENGTH_TRYTE] = '\0';
-    get_tips_res_add_tip(res, tip_trytes);
+    hash243_queue_push(&res->hashes, iter->hash);
   }
 
 done:
@@ -130,33 +126,36 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
                               get_trytes_req_t const *const req,
                               get_trytes_res_t *const res) {
   retcode_t ret = RC_OK;
-  flex_hash_array_t *iter = NULL;
+  hash243_queue_entry_t *iter = NULL;
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
-  tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
+  trit_array_t tmp_trits = {.trits = NULL,
+                            .num_trits = HASH_LENGTH_TRIT,
+                            .num_bytes = FLEX_TRIT_SIZE_243,
+                            .dynamic = 0};
+
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
 
-  if (flex_hash_array_count(req->hashes) > api->conf.max_get_trytes) {
+  if (hash243_queue_count(&req->hashes) > api->conf.max_get_trytes) {
     return RC_API_MAX_GET_TRYTES;
   }
-  LL_FOREACH(req->hashes, iter) {
+
+  CDL_FOREACH(req->hashes, iter) {
     hash_pack_reset(&pack);
+    tmp_trits.trits = iter->hash;
     // NOTE Concurrency needs to be taken care of
     if ((ret = iota_tangle_transaction_load(&api->consensus->tangle,
-                                            TRANSACTION_FIELD_HASH, iter->hash,
+                                            TRANSACTION_FIELD_HASH, &tmp_trits,
                                             &pack)) != RC_OK) {
       return ret;
     }
+
     if (pack.num_loaded != 0) {
       transaction_serialize_on_flex_trits(txp, tx_trits);
-      flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION,
-                           tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                           NUM_TRITS_SERIALIZED_TRANSACTION);
     } else {
-      memset(tx_trytes, '9', NUM_TRYTES_SERIALIZED_TRANSACTION);
+      memset(tx_trits, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
     }
-    // TODO Remove when cclient uses hash containers
-    tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION] = '\0';
-    get_trytes_res_add_trytes(res, tx_trytes);
+
+    hash8019_queue_push(&res->trytes, tx_trits);
   }
   return ret;
 }
@@ -194,16 +193,16 @@ retcode_t iota_api_broadcast_transactions(
     iota_api_t const *const api,
     broadcast_transactions_req_t const *const req) {
   retcode_t ret = RC_OK;
-  flex_hash_array_t *iter = NULL;
+  hash8019_stack_entry_t *iter = NULL;
   struct _iota_transaction tx;
 
   LL_FOREACH(req->trytes, iter) {
-    transaction_deserialize_from_trits(&tx, iter->hash->trits);
+    transaction_deserialize_from_trits(&tx, iter->hash);
     if (iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
       // TODO priority queue on weight_magnitude
-      if ((ret = broadcaster_on_next(&api->node->broadcaster,
-                                     iter->hash->trits)) != RC_OK) {
+      if ((ret = broadcaster_on_next(&api->node->broadcaster, iter->hash)) !=
+          RC_OK) {
         return ret;
       }
     }
@@ -214,7 +213,7 @@ retcode_t iota_api_broadcast_transactions(
 retcode_t iota_api_store_transactions(
     iota_api_t const *const api, store_transactions_req_t const *const req) {
   retcode_t ret = RC_OK;
-  flex_hash_array_t *iter = NULL;
+  hash8019_stack_entry_t *iter = NULL;
   struct _iota_transaction tx;
   struct _trit_array hash = {.trits = NULL,
                              .num_trits = HASH_LENGTH_TRIT,
@@ -225,7 +224,7 @@ retcode_t iota_api_store_transactions(
 
   bool exists;
   LL_FOREACH(req->trytes, iter) {
-    transaction_deserialize_from_trits(&tx, iter->hash->trits);
+    transaction_deserialize_from_trits(&tx, iter->hash);
     if (iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
       hash.trits = tx.hash;

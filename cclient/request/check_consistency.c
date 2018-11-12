@@ -8,12 +8,22 @@
 #include "request/check_consistency.h"
 
 check_consistency_req_t* check_consistency_req_new() {
-  return flex_hash_array_new();
+  check_consistency_req_t* req =
+      (check_consistency_req_t*)malloc(sizeof(check_consistency_req_t));
+  if (req) {
+    req->hashes = NULL;
+  }
+  return req;
 }
-flex_hash_array_t* check_consistency_req_add(check_consistency_req_t* tails,
-                                             const char* tail) {
-  return flex_hash_array_append(tails, tail);
-}
-void check_consistency_req_free(check_consistency_req_t* tails) {
-  flex_hash_array_free(tails);
+
+void check_consistency_req_free(check_consistency_req_t** req) {
+  if (!req || !(*req)) {
+    return;
+  }
+
+  if ((*req)->hashes) {
+    hash243_queue_free(&(*req)->hashes);
+  }
+  free(*req);
+  *req = NULL;
 }
