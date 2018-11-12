@@ -24,7 +24,8 @@ get_balances_res_t* get_balances_res_new();
 void get_balances_res_free(get_balances_res_t** res);
 char* get_balances_res_balances_at(get_balances_res_t const* const in,
                                    int const index);
-size_t get_balances_res_total_balance(get_balances_res_t const* const res);
+size_t get_balances_res_total_balance(get_balances_res_t const* const res,
+                                      size_t const threshold);
 
 #ifdef __cplusplus
 }

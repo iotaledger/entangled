@@ -37,13 +37,18 @@ char* get_balances_res_balances_at(get_balances_res_t const* const in,
   return *p;
 }
 
-size_t get_balances_res_total_balance(get_balances_res_t const* const res) {
+size_t get_balances_res_total_balance(get_balances_res_t const* const res,
+                                      size_t const threshold) {
   size_t sum = 0;
-  size_t elm_count = utarray_len(res->balances);
-  for (int i = 0; i < elm_count; i++) {
-    char** p = (char**)utarray_eltptr(res->balances, i);
-    char* endptr;
-    sum += strtol(*p, &endptr, 10);
+  size_t balance = 0;
+  char** p = NULL;
+  char* endptr;
+
+  while ((p = (char**)utarray_next(res->balances, p))) {
+    balance = strtol(*p, &endptr, 10);
+    if (balance > threshold) {
+      sum += balance;
+    }
   }
   return sum;
 }

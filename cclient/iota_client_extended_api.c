@@ -128,12 +128,15 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
   // get balances from all addresses
   get_balances_req_t* blances_req = get_balances_req_new();
   get_balances_res_t* blances_res = get_balances_res_new();
-  blances_req->threshold = threshold;
+  blances_req->threshold = 100;  // currently `100` should be used
   // assign the list directly, not making a copy.
   blances_req->addresses = out_input->addresses;
 
   ret_code = iota_client_get_balances(serv, blances_req, blances_res);
-  out_input->total_balance = get_balances_res_total_balance(blances_res);
+
+  // filter balances via threshold
+  out_input->total_balance =
+      get_balances_res_total_balance(blances_res, threshold);
 
   blances_req->addresses = NULL;  // no need to be freed
   get_balances_req_free(&blances_req);
@@ -216,11 +219,12 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
 
   if (out_account->addresses) {
     // get balances
-    blances_req->threshold = 100;
+    blances_req->threshold = 100;  // currently `100` should be used
     blances_req->addresses = out_account->addresses;
     ret_code = iota_client_get_balances(serv, blances_req, blances_res);
     if (!ret_code) {
-      out_account->balance = get_balances_res_total_balance(blances_res);
+      // count all balances
+      out_account->balance = get_balances_res_total_balance(blances_res, 1);
     }
   }
 
