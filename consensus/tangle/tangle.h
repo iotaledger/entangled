@@ -54,6 +54,15 @@ retcode_t iota_tangle_transaction_load_hashes_of_approvers(
     tangle_t const *const tangle, flex_trit_t const *const approvee_hash,
     iota_stor_pack_t *const pack);
 
+/**
+ * Loads hashes of missing transactions (i.e. only referred as trunk or branch)
+ *
+ * @param tangle The tangle
+ * @param pack A pack to be filled with hashes
+ * @param limit The maximum number of hashes to load
+ *
+ * @return a status code
+ */
 retcode_t iota_tangle_transaction_load_hashes_of_requests(
     tangle_t const *const tangle, iota_stor_pack_t *const pack,
     size_t const limit);
