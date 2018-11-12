@@ -145,7 +145,8 @@ static void* latest_milestone_tracker(void* arg) {
   iota_stor_pack_t hash_pack;
   iota_milestone_t candidate;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, tx_pack);
-  uint64_t scan_time, previous_latest_milestone_index;
+  uint64_t scan_time = 0;
+  uint64_t previous_latest_milestone_index = 0;
 
   if (mt == NULL) {
     return NULL;
@@ -255,7 +256,8 @@ static retcode_t update_latest_solid_subtangle_milestone(
 
 static void* solid_milestone_tracker(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
-  uint64_t scan_time, previous_solid_subtangle_latest_milestone_index;
+  uint64_t scan_time = 0;
+  uint64_t previous_solid_subtangle_latest_milestone_index = 0;
 
   if (mt != NULL) {
     while (mt->running) {
