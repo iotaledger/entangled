@@ -54,6 +54,10 @@ retcode_t iota_tangle_transaction_load_hashes_of_approvers(
     tangle_t const *const tangle, flex_trit_t const *const approvee_hash,
     iota_stor_pack_t *const pack);
 
+retcode_t iota_tangle_transaction_load_hashes_of_requests(
+    tangle_t const *const tangle, iota_stor_pack_t *const pack,
+    size_t const limit);
+
 retcode_t iota_tangle_transaction_update_snapshot_index(
     tangle_t const *const tangle, flex_trit_t const *const hash,
     uint64_t const snapshot_index);

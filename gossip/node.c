@@ -51,6 +51,9 @@ static retcode_t node_neighbors_init(node_t* const node) {
 
 retcode_t node_init(node_t* const node, core_t* const core,
                     tangle_t* const tangle) {
+  retcode_t ret = RC_OK;
+  iota_stor_pack_t pack;
+
   if (node == NULL) {
     return RC_NODE_NULL_NODE;
   } else if (core == NULL) {
@@ -103,7 +106,29 @@ retcode_t node_init(node_t* const node, core_t* const core,
     return RC_NODE_FAILED_REQUESTER_INIT;
   }
 
-  return RC_OK;
+  if ((ret = hash_pack_init(&pack, 10)) != RC_OK) {
+    goto done;
+  }
+
+  if ((ret = iota_tangle_transaction_load_hashes_of_requests(
+           &node->core->consensus.tangle, &pack, 1000)) != RC_OK) {
+    log_error(NODE_LOGGER_ID,
+              "Loading hashes of transactions to request failed\n");
+    goto done;
+  }
+
+  for (size_t i = 0; i < pack.num_loaded; i++) {
+    if ((ret = request_transaction(&node->transaction_requester,
+                                   ((trit_array_t*)(pack.models[i]))->trits,
+                                   false)) != RC_OK) {
+      log_error(NODE_LOGGER_ID, "Requesting transaction failed\n");
+      goto done;
+    }
+  }
+
+done:
+  hash_pack_free(&pack);
+  return ret;
 }
 
 retcode_t node_start(node_t* const node) {
