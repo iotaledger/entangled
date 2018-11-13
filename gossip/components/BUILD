@@ -99,3 +99,23 @@ cc_library(
         "//utils/handles:rand",
     ],
 )
+
+cc_library(
+    name = "tips_requester_shared",
+    hdrs = ["tips_requester.h"],
+    deps = [
+        "//common:errors",
+        "//utils/handles:thread",
+    ],
+)
+
+cc_library(
+    name = "tips_requester",
+    srcs = ["tips_requester.c"],
+    deps = [
+        ":tips_requester_shared",
+        "//gossip:iota_packet",
+        "//utils:logger_helper",
+        "//utils/containers/lists:concurrent_list_neighbor",
+    ],
+)

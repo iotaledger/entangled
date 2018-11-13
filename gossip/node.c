@@ -180,6 +180,14 @@ retcode_t node_init(node_t* const node, core_t* const core,
     return RC_NODE_FAILED_RESPONDER_INIT;
   }
 
+  log_info(NODE_LOGGER_ID, "Initializing tips requester component\n");
+  if ((ret = tips_requester_init(&node->tips_requester, node,
+                                 &core->consensus.tangle)) != RC_OK) {
+    log_critical(NODE_LOGGER_ID,
+                 "Initializing  tips requester component failed\n");
+    return ret;
+  }
+
   log_info(NODE_LOGGER_ID, "Initializing transaction requester component\n");
   if (node_transaction_requester_init(node, tangle) != RC_OK) {
     log_critical(NODE_LOGGER_ID,
@@ -197,6 +205,8 @@ retcode_t node_init(node_t* const node, core_t* const core,
 }
 
 retcode_t node_start(node_t* const node) {
+  retcode_t ret = RC_OK;
+
   if (node == NULL) {
     return RC_NODE_NULL_NODE;
   }
@@ -225,9 +235,15 @@ retcode_t node_start(node_t* const node) {
     return RC_NODE_FAILED_RESPONDER_START;
   }
 
+  log_info(NODE_LOGGER_ID, "Starting tips requester component\n");
+  if ((ret = tips_requester_start(&node->tips_requester)) != RC_OK) {
+    log_critical(NODE_LOGGER_ID, "Starting tips requester component failed\n");
+    return ret;
+  }
+
   node->running = true;
 
-  return RC_OK;
+  return ret;
 }
 
 retcode_t node_stop(node_t* const node) {
@@ -265,6 +281,11 @@ retcode_t node_stop(node_t* const node) {
     ret = RC_NODE_FAILED_RESPONDER_STOP;
   }
 
+  log_info(NODE_LOGGER_ID, "Stopping tips requester component\n");
+  if ((ret = tips_requester_stop(&node->tips_requester)) != RC_OK) {
+    log_error(NODE_LOGGER_ID, "Stopping tips requester component failed\n");
+  }
+
   return ret;
 }
 
@@ -282,6 +303,11 @@ retcode_t node_destroy(node_t* const node) {
     log_error(NODE_LOGGER_ID,
               "Destroying transaction requester component failed\n");
     ret = RC_NODE_FAILED_REQUESTER_DESTROY;
+  }
+
+  log_info(NODE_LOGGER_ID, "Destroying tips requester component\n");
+  if ((ret = tips_requester_destroy(&node->tips_requester)) != RC_OK) {
+    log_error(NODE_LOGGER_ID, "Destroying tips requester component failed\n");
   }
 
   log_info(NODE_LOGGER_ID, "Destroying broadcaster component\n");

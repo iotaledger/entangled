@@ -13,6 +13,7 @@
 #include "gossip/components/processor.h"
 #include "gossip/components/receiver.h"
 #include "gossip/components/responder.h"
+#include "gossip/components/tips_requester.h"
 #include "gossip/components/transaction_requester.h"
 #include "gossip/tips_cache.h"
 
@@ -33,6 +34,7 @@ typedef struct node_s {
   receiver_state_t receiver;
   responder_t responder;
   requester_state_t transaction_requester;
+  tips_requester_t tips_requester;
   neighbors_list_t* neighbors;
   tips_cache_t tips;
 } iota_node_t;

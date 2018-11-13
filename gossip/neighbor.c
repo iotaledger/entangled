@@ -64,6 +64,31 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
   return RC_OK;
 }
 
+retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor,
+                               iota_packet_t const *const packet) {
+  if (node == NULL || neighbor == NULL || packet == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
+    if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, packet) ==
+        false) {
+      return RC_NEIGHBOR_FAILED_SEND;
+    }
+  } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
+    if (udp_send(&node->receiver.udp_service, &neighbor->endpoint, packet) ==
+        false) {
+      return RC_NEIGHBOR_FAILED_SEND;
+    }
+  } else {
+    return RC_NEIGHBOR_INVALID_PROTOCOL;
+  }
+
+  neighbor->nbr_sent_tx++;
+
+  return RC_OK;
+}
+
 retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
                         flex_trit_t const *const transaction) {
   retcode_t ret = RC_OK;
@@ -88,19 +113,5 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
     return ret;
   }
 
-  if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
-    if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, &packet) ==
-        false) {
-      return RC_NEIGHBOR_FAILED_SEND;
-    }
-  } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
-    if (udp_send(&node->receiver.udp_service, &neighbor->endpoint, &packet) ==
-        false) {
-      return RC_NEIGHBOR_FAILED_SEND;
-    }
-  } else {
-    return RC_NEIGHBOR_INVALID_PROTOCOL;
-  }
-  neighbor->nbr_sent_tx++;
-  return RC_OK;
+  return neighbor_send_packet(node, neighbor, &packet);
 }

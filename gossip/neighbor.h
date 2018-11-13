@@ -62,7 +62,19 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
  *
  * @param node A node
  * @param neighbor The neighbor
- * @param transaction Transaction flex trits
+ * @param packet The packet
+ *
+ * @return a status code
+ */
+retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor,
+                               iota_packet_t const *const packet);
+
+/**
+ * Sends transaction flex trits to a neighbor
+ *
+ * @param node A node
+ * @param neighbor The neighbor
+ * @param transaction The transaction flex trits
  *
  * @return a status code
  */
