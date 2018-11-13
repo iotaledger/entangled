@@ -48,6 +48,12 @@ char *iota_statement_transaction_select_hashes_of_transactions_to_request =
     " b WHERE b." TRANSACTION_COL_HASH " = a." TRANSACTION_COL_BRANCH
     ")) LIMIT ?";
 
+char *iota_statement_transaction_select_hashes_of_tips =
+    "SELECT " TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME
+    " a WHERE NOT(EXISTS(SELECT 1 FROM " TRANSACTION_TABLE_NAME
+    " b WHERE b." TRANSACTION_COL_TRUNK " = a." TRANSACTION_COL_HASH
+    " OR b." TRANSACTION_COL_BRANCH " = a." TRANSACTION_COL_HASH ")) LIMIT ?";
+
 char *iota_statement_transaction_update_snapshot_index =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SNAPSHOT_INDEX
     "=? WHERE " TRANSACTION_COL_HASH "=?";

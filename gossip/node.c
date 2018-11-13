@@ -12,7 +12,9 @@
 
 #define NODE_LOGGER_ID "node"
 
-// Private functions
+/*
+ * Private functions
+ */
 
 static retcode_t node_neighbors_init(node_t* const node) {
   neighbor_t neighbor;
@@ -47,7 +49,49 @@ static retcode_t node_neighbors_init(node_t* const node) {
   return RC_OK;
 }
 
-// Public functions
+static retcode_t node_tips_cache_init(node_t* const node) {
+  retcode_t ret = RC_OK;
+  iota_stor_pack_t pack;
+
+  if (node == NULL) {
+    return RC_NODE_NULL_NODE;
+  }
+
+  if ((ret = tips_cache_init(&node->tips, node->conf.tips_cache_size)) !=
+      RC_OK) {
+    return ret;
+  }
+
+  if ((ret = hash_pack_init(&pack, node->conf.tips_cache_size)) != RC_OK) {
+    log_error(NODE_LOGGER_ID, "Initializing tips pack failed\n");
+    goto done;
+  }
+
+  if ((ret = iota_tangle_transaction_load_hashes_of_tips(
+           &node->core->consensus.tangle, &pack, node->conf.tips_cache_size)) !=
+      RC_OK) {
+    log_error(NODE_LOGGER_ID, "Loading hashes of tips failed\n");
+    goto done;
+  }
+
+  for (size_t i = 0; i < pack.num_loaded; i++) {
+    if ((ret = tips_cache_add(
+             &node->tips, ((trit_array_t*)(pack.models[i]))->trits)) != RC_OK) {
+      log_error(NODE_LOGGER_ID, "Adding tip to cache failed\n");
+      goto done;
+    }
+  }
+
+  log_debug(NODE_LOGGER_ID, "Added %d tips to cache\n", pack.num_loaded);
+
+done:
+  hash_pack_free(&pack);
+  return ret;
+}
+
+/*
+ * Public functions
+ */
 
 retcode_t node_init(node_t* const node, core_t* const core,
                     tangle_t* const tangle) {
@@ -63,7 +107,6 @@ retcode_t node_init(node_t* const node, core_t* const core,
   logger_helper_init(NODE_LOGGER_ID, LOGGER_DEBUG, true);
   node->running = false;
   node->core = core;
-  tips_cache_init(&node->tips, node->conf.tips_cache_size);
 
   log_info(NODE_LOGGER_ID, "Initializing neighbors\n");
   if (node_neighbors_init(node) != RC_OK) {
@@ -125,6 +168,12 @@ retcode_t node_init(node_t* const node, core_t* const core,
       log_error(NODE_LOGGER_ID, "Requesting transaction failed\n");
       goto done;
     }
+  }
+
+  log_info(NODE_LOGGER_ID, "Initializing tips cache\n");
+  if ((ret = node_tips_cache_init(node)) != RC_OK) {
+    log_error(NODE_LOGGER_ID, "Initializing tips cache failed\n");
+    return ret;
   }
 
 done:

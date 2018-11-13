@@ -67,6 +67,19 @@ retcode_t iota_tangle_transaction_load_hashes_of_requests(
     tangle_t const *const tangle, iota_stor_pack_t *const pack,
     size_t const limit);
 
+/**
+ * Loads hashes of tips (i.e. not referenced by any transaction)
+ *
+ * @param tangle The tangle
+ * @param pack A pack to be filled with hashes
+ * @param limit The maximum number of hashes to load
+ *
+ * @return a status code
+ */
+retcode_t iota_tangle_transaction_load_hashes_of_tips(
+    tangle_t const *const tangle, iota_stor_pack_t *const pack,
+    size_t const limit);
+
 retcode_t iota_tangle_transaction_update_snapshot_index(
     tangle_t const *const tangle, flex_trit_t const *const hash,
     uint64_t const snapshot_index);

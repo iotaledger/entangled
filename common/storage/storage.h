@@ -81,6 +81,10 @@ extern retcode_t iota_stor_transaction_load_hashes_of_requests(
     connection_t const* const conn, iota_stor_pack_t* const pack,
     size_t const limit);
 
+extern retcode_t iota_stor_transaction_load_hashes_of_tips(
+    connection_t const* const conn, iota_stor_pack_t* const pack,
+    size_t const limit);
+
 extern retcode_t iota_stor_transaction_approvers_count(
     connection_t const* const conn, flex_trit_t const* const hash,
     size_t* const count);
