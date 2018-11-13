@@ -51,20 +51,9 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
     }
     transaction_serialize_on_flex_trits(transaction_ptr,
                                         transaction_flex_trits);
-    fprintf(stderr, "Transaction:\n");
-    for (size_t i = 0; i < FLEX_TRIT_SIZE_8019; i++) {
-      fprintf(stderr, "%c", transaction_flex_trits[i]);
-    }
-    fprintf(stderr, "\n");
     if (iota_packet_set_transaction(&packet, transaction_flex_trits) != RC_OK) {
       continue;
     }
-    fprintf(stderr, "Request:\n");
-    for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
-      fprintf(stderr, "%c", latest_milestone.hash[i]);
-    }
-    fprintf(stderr, "\n");
-    fprintf(stderr, "%d\n", tips_requester->node->conf.request_hash_size_trit);
     if (iota_packet_set_request(
             &packet, latest_milestone.hash,
             tips_requester->node->conf.request_hash_size_trit) != RC_OK) {
