@@ -24,6 +24,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "common/trinary/trits.h"
+
 #if defined(NDEBUG)  //&& defined(MAM2_DEBUG)
 // enable `assert` in RELEASE
 #undef NDEBUG
@@ -41,7 +43,7 @@
 
 /*! \brief
 
-word_t should be thought of as ternary processor register.
+trit_t should be thought of as ternary processor register.
 Although it can consist of several trytes
 here it is considered as an atomic vector of trits.
 In binary computer and in C language this type is tunable
@@ -60,10 +62,9 @@ Otherwise it would require inefficient shifts or unpacking.
 #error MAM2_TRITS_PER_WORD is not defined or is not positive.
 #endif
 
-#if defined(MAM2_TRINARY_WORD_REP_INT)
 /*! \brief Single-trit word representation
 
-`word_t` consists of one trit.
+`trit_t` consists of one trit.
 
 #define MAM2_TRINARY_WORD_REP_INT_T int8_t
 #define MAM2_TRITS_PER_WORD 1
@@ -80,71 +81,8 @@ or
 #elif (MAM2_TRITS_PER_WORD <= 40)
 #define MAM2_TRINARY_WORD_REP_INT_T int64_t
 #else
-#error "Can't represent word_t for specified MAM2_TRITS_PER_WORD."
+#error "Can't represent trit_t for specified MAM2_TRITS_PER_WORD."
 #endif
-#endif
-
-typedef MAM2_TRINARY_WORD_REP_INT_T rep_t;
-typedef rep_t word_t;
-
-#elif defined(MAM2_TRINARY_WORD_REP_INTERLEAVED)
-/*! \brief Interleaved word representation
-
-`word_t` is represented using two bit arrays (unsigned ints).
-(lo,hi): (0,0)=(1,1)=0 (0,1)=1 (1,0)=-1
-
-#define MAM2_TRINARY_WORD_REP_INTERLEAVED_T uint8_t
-#define MAM2_TRITS_PER_WORD 8
-or
-#define MAM2_TRINARY_WORD_REP_INTERLEAVED_T uint32_t
-#define MAM2_TRITS_PER_WORD 27
-*/
-#ifndef MAM2_TRINARY_WORD_REP_INTERLEAVED_T
-#if (MAM2_TRITS_PER_WORD <= 8)
-#define MAM2_TRINARY_WORD_REP_INTERLEAVED_T int8_t
-#elif (MAM2_TRITS_PER_WORD <= 16)
-#define MAM2_TRINARY_WORD_REP_INTERLEAVED_T int16_t
-#elif (MAM2_TRITS_PER_WORD <= 32)
-#define MAM2_TRINARY_WORD_REP_INTERLEAVED_T int32_t
-#elif (MAM2_TRITS_PER_WORD <= 64)
-#define MAM2_TRINARY_WORD_REP_INTERLEAVED_T int64_t
-#else
-#error "Can't represent word_t for specified MAM2_TRITS_PER_WORD."
-#endif
-#endif
-
-typedef MAM2_TRINARY_WORD_REP_INTERLEAVED_T rep_t;
-typedef struct {
-  rep_t lo, hi;
-} word_t;
-#define MAM2_WORD_TRIT_IS_ZERO(w, t) \
-  ((((w).lo ^ (w).hi) & ((word_t)1) << (t)) == 0)
-
-#elif defined(MAM2_TRINARY_WORD_REP_PACKED)
-//#define MAM2_TRINARY_WORD_REP_PACKED_T uint8_t
-//#define MAM2_TRITS_PER_WORD 3
-#ifndef MAM2_TRINARY_WORD_REP_PACKED_T
-#if (MAM2_TRITS_PER_WORD <= 4)
-#define MAM2_TRINARY_WORD_REP_PACKED_T int8_t
-#elif (MAM2_TRITS_PER_WORD <= 8)
-#define MAM2_TRINARY_WORD_REP_PACKED_T int16_t
-#elif (MAM2_TRITS_PER_WORD <= 16)
-#define MAM2_TRINARY_WORD_REP_PACKED_T int32_t
-#elif (MAM2_TRITS_PER_WORD <= 32)
-#define MAM2_TRINARY_WORD_REP_PACKED_T int64_t
-#else
-#error "Can't represent word_t for specified MAM2_TRITS_PER_WORD."
-#endif
-#endif
-
-typedef MAM2_TRINARY_WORD_REP_PACKED_T rep_t;
-typedef rep_t word_t;
-
-#else
-#error MAM2_TRINARY_WORD representation is not selected.	\
-  Please, define one of MAM2_TRINARY_WORD_REP_INT, \
-  MAM2_TRINARY_WORD_REP_INTERLEAVED, \
-  or MAM2_TRINARY_WORD_REP_PACKED.
 #endif
 
 /*! \brief Minimum number of words needed to represent `t` trits */
@@ -189,7 +127,7 @@ with values in range [-(3^18-1)/2,..,-1,0,1,..,(3^18-1)/2]. */
 typedef int32_t trint18_t;
 
 /*! \note `trintX_t` types represent integer values whereas
-`word_t` type represents fixed-size set of trits. */
+`trit_t` type represents fixed-size set of trits. */
 
 /*! Unsigned 8-bit type. */
 typedef uint8_t byte;

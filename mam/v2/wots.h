@@ -38,12 +38,12 @@
 /*! \brief WOTS signature size. */
 #define MAM2_WOTS_SIG_SIZE MAM2_WOTS_SK_SIZE
 
-typedef word_t wots_sk_t[MAM2_WORDS(MAM2_WOTS_SK_SIZE)];
+typedef trit_t wots_sk_t[MAM2_WORDS(MAM2_WOTS_SK_SIZE)];
 
 /*! \brief WOTS interface. */
 typedef struct _iwots {
   isponge *s; /*!< sponge interface */
-  word_t *sk; /*!< private key */
+  trit_t *sk; /*!< private key */
 } iwots;
 
 /*! \brief Init WOTS interface with Sponge. */

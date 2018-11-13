@@ -74,6 +74,18 @@ trit_array_p trit_array_slice(trit_array_p const trit_array,
                               trit_array_p const to_trit_array,
                               size_t const start, size_t const num_trits);
 
+/// Returns a new trit_array containing a portion of length num_trits of the
+/// trits of another trit_array, from index start.
+/// Takes less than num_trits if trit_array contains less
+/// @param[in] trit_array - the original trit_array
+/// @param[in] to_trit_array - the new trit_array
+/// @param[in] start - the start index in the original array
+/// @param[in] num_trits - the number of trits to copy over
+/// @return trit_array_p - the new trit_array
+trit_array_p trit_array_slice_at_most(trit_array_p const trit_array,
+                                      trit_array_p const to_trit_array,
+                                      size_t const start, size_t num_trits);
+
 /// Inserts the contents of an array into the receiver starting at a given
 /// index.
 /// @param[in] trit_array - the array to insert into
@@ -92,6 +104,20 @@ trit_array_p trit_array_insert(trit_array_p const trit_array,
 trit_t *trit_array_to_int8(trit_array_p const trit_array, trit_t *const trits,
                            size_t const len);
 
+/// Set a range with value
+/// @param[in] trits - the array
+/// @param[in] start - start index
+/// @param[in] end - end index
+/// @param[in] value - the value to set
+/// @return trit_array_p - the receiver
+trit_array_p trit_array_set_range(trit_array_p const trits, size_t start,
+                                  size_t end, trit_t value);
+
+/// Compare the content of two arrays
+/// @param[in] lhs - left operand
+/// @param[in] rhs - right operand
+/// @return bool - true if their content is the same
+bool trit_array_equal(trit_array_p const lhs, trit_array_p const rhs);
 #if !defined(NO_DYNAMIC_ALLOCATION)
 /***********************************************************************************************************
  * Constructor
@@ -119,15 +145,28 @@ void trit_array_free(trit_array_p const trit_array);
   struct _trit_array NAME = {(flex_trit_t *)&NAME##_trits, NUM_TRITS, \
                              NAME##_num_bytes, 0};
 
+/// Macro to declare a new trit_array and initialize it with an array of flex
+/// trits stored according to the current memory model.
+/// @param[in] NAME - the name of the varialbe to declare
+/// @param[in] NUM_TRITS - the number of trits the trit_array can store
+/// @param[in] FLEX_TRITS - the initial trits packed in to the current memory
+/// model
+#define TRIT_ARRAY_MAKE(NAME, NUM_TRITS, FLEX_TRITS)                 \
+  size_t NAME##_num_bytes = trit_array_bytes_for_trits(NUM_TRITS);   \
+  flex_trit_t NAME##_trits[] = {FLEX_TRITS};                         \
+  struct _trit_array NAME = {(flex_trit_t *)NAME##_trits, NUM_TRITS, \
+                             NAME##_num_bytes, 0};
+
 /// Macro to declare a new trit_array and initialize it with an array of trits
 /// stored according to the current memory model.
 /// @param[in] NAME - the name of the varialbe to declare
 /// @param[in] NUM_TRITS - the number of trits the trit_array can store
 /// @param[in] TRITS - the initial trits packed in to the current memory model
-#define TRIT_ARRAY_MAKE(NAME, NUM_TRITS, TRITS)                      \
-  size_t NAME##_num_bytes = trit_array_bytes_for_trits(NUM_TRITS);   \
-  flex_trit_t NAME##_trits[] = {TRITS};                              \
-  struct _trit_array NAME = {(flex_trit_t *)NAME##_trits, NUM_TRITS, \
+#define TRIT_ARRAY_MAKE_FROM_RAW(NAME, NUM_TRITS, TRITS)                       \
+  size_t NAME##_num_bytes = trit_array_bytes_for_trits(NUM_TRITS);             \
+  flex_trit_t NAME##_trits[NAME##_num_bytes];                                  \
+  flex_trits_from_trits(NAME##_trits, NUM_TRITS, TRITS, NUM_TRITS, NUM_TRITS); \
+  struct _trit_array NAME = {(flex_trit_t *)NAME##_trits, NUM_TRITS,           \
                              NAME##_num_bytes, 0};
 
 #endif

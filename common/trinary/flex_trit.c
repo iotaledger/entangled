@@ -137,7 +137,7 @@ size_t flex_trits_from_trits(flex_trit_t *const to_flex_trits,
                              size_t const to_len, trit_t const *const trits,
                              size_t const len, size_t const num_trits) {
   // Bounds checking
-  if (num_trits > len || num_trits > to_len) {
+  if (num_trits > len || num_trits > to_len || num_trits == 0) {
     return 0;
   }
   memset(to_flex_trits, FLEX_TRIT_NULL_VALUE, NUM_FLEX_TRITS_FOR_TRITS(to_len));

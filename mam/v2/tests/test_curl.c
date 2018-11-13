@@ -141,8 +141,8 @@ MAM2_SAPI void curl_test() {
   curl_sponge c[1];
   curl_sponge_init(c);
 
-  trits_from_str(data, data_str);
-  trits_from_str(hash, hash_str);
+  trytes_to_trits(data_str, data.p, strlen(data_str));
+  trytes_to_trits(hash_str, hash.p, strlen(hash_str));
   curl_init(c);
   curl_absorb(c, data);
   curl_squeeze(c, h);

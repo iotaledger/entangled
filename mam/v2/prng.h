@@ -27,7 +27,7 @@
 /*! \brief PRNG key size. */
 #define MAM2_PRNG_KEY_SIZE 243
 
-typedef word_t prng_key_t[MAM2_WORDS(MAM2_PRNG_KEY_SIZE)];
+typedef trit_t prng_key_t[MAM2_WORDS(MAM2_PRNG_KEY_SIZE)];
 
 /*! \brief PRNG AE destination tryte. */
 #define MAM2_PRNG_DST_SECKEY 0
@@ -39,7 +39,7 @@ typedef word_t prng_key_t[MAM2_WORDS(MAM2_PRNG_KEY_SIZE)];
 /*! \brief PRNG interface. */
 typedef struct _iprng {
   isponge *s; /*!< sponge interface */
-  word_t *k;  /*!< key */
+  trit_t *k;  /*!< key */
 } iprng;
 
 /*! \brief PRNG initialization. */

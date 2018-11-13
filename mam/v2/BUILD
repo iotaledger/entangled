@@ -22,9 +22,13 @@ cc_library(
     name = "defs",
     hdrs = ["defs.h"],
     defines = select({
-        ":1_trits_per_word": TRINARY_INT_1_TRITS_PER_WORD_DEFS,
         "//conditions:default": TRINARY_INT_1_TRITS_PER_WORD_DEFS,
     }),
+    deps = [
+        "//common/trinary:trit_array",
+        "//common/trinary:trit_long",
+        "//common/trinary:trits",
+    ],
 )
 
 cc_library(
@@ -53,6 +57,7 @@ cc_library(
     deps = [
         "trits",
         ":defs",
+        "//common/trinary:trit_array",
     ],
 )
 
@@ -63,6 +68,7 @@ cc_library(
     deps = [
         ":alloc",
         ":defs",
+        "//common/trinary:trit_tryte",
     ],
 )
 
@@ -86,6 +92,7 @@ cc_library(
         ":buffers",
         ":defs",
         ":trits",
+        "//common/trinary:add",
     ],
 )
 
@@ -136,9 +143,4 @@ cc_library(
         ":sponge",
         ":trits",
     ],
-)
-
-config_setting(
-    name = "1_trits_per_word",
-    values = {"define": "trits_per_word=1"},
 )

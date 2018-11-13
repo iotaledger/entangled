@@ -21,6 +21,7 @@
 #include "mam/v2/tests/common.h"
 #include "mam/v2/trits.h"
 #include "mam/v2/wots.h"
+#include "utils/macros.h"
 
 #include <string.h>
 #include <unity/unity.h>
@@ -37,10 +38,12 @@ MAM2_SAPI void prng_test_do(iprng *p) {
 
   // init K
   trits_set_zero(K);
-  trits_from_str(K,
-                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-                 "NOPQRSTUVWXYZ9ABCDEFGHIJKLM");
+  const char *k_str =
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM";
+  trytes_to_trits(k_str, K.p, MIN(strlen(k_str), K.n / RADIX));
+
   sponge_init(p->s);
   sponge_absorb(p->s, MAM2_SPONGE_CTL_KEY, K);
   sponge_squeeze(p->s, MAM2_SPONGE_CTL_KEY, K);
@@ -51,7 +54,8 @@ MAM2_SAPI void prng_test_do(iprng *p) {
   prng_gen(p, 0, N, Y1);
   prng_gen(p, 1, N, Y2);
 
-  TEST_ASSERT(0 != trits_cmp_grlex(Y1, Y2));
+  int d = trits_cmp_grlex(Y1, Y2);
+  TEST_ASSERT(d != 0);
 }
 
 MAM2_SAPI void prng_test() {

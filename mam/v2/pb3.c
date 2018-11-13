@@ -246,11 +246,15 @@ MAM2_SAPI void pb3_unwrap_secret(isponge *s, trits_t t) {
 }
 
 MAM2_SAPI void pb3_wrap_encrypted(isponge *s, trits_t t) {
-  sponge_encr(s, t, t);
+  TRIT_ARRAY_MAKE_FROM_RAW(X, t.n, t.p);
+  sponge_encr(s, &X, &X);
+  flex_trits_to_trits(t.p, t.n, X.trits, t.n, t.n);
 }
 
 MAM2_SAPI void pb3_unwrap_encrypted(isponge *s, trits_t t) {
-  sponge_decr(s, t, t);
+  TRIT_ARRAY_MAKE_FROM_RAW(T_arr, t.n, t.p);
+  sponge_decr(s, &T_arr, &T_arr);
+  flex_trits_to_trits(t.p, t.n, T_arr.trits, t.n, t.n);
 }
 
 MAM2_SAPI void pb3_wrap_data(isponge *s, trits_t t) {

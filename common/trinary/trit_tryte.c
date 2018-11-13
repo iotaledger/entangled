@@ -5,6 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <assert.h>
 #include <string.h>
 
 #include "common/defs.h"

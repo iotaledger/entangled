@@ -55,6 +55,7 @@ MAM2_SAPI void prng_gen2(iprng *p, trint3_t d, trits_t N1, trits_t N2,
 
 MAM2_SAPI void prng_gen3(iprng *p, trint3_t d, trits_t N1, trits_t N2,
                          trits_t N3, trits_t Y) {
+  memset(Y.p, 0, Y.n);
   MAM2_TRITS_DEF(dt, 3);
   trits_t KdN[5] = {prng_key_trits(p), dt, N1, N2, N3};
   trits_put3(dt, d);

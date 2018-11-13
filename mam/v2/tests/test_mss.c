@@ -22,6 +22,8 @@
 #include "mam/v2/trits.h"
 #include "mam/v2/wots.h"
 
+#include "utils/macros.h"
+
 #include <string.h>
 #include <unity/unity.h>
 
@@ -40,17 +42,20 @@ MAM2_SAPI void mss_test_do(imss *m, iprng *p, isponge *s, iwots *w,
   ialloc *a = 0;
   trits_t sig_ = trits_alloc(a, MAM2_MSS_SIG_SIZE(D));
 
-  trits_from_str(K,
-                 "ABCNOABCNKOZWYKOZWYSDF9SDF9"
-                 "YSDF9QABCNKOZWYSDF9ABCNKOZW"
-                 "SDF9CABCABCNKOZWYNKOZWYSDF9");
+  const char *k_str =
+      "ABCNOABCNKOZWYKOZWYSDF9SDF9"
+      "YSDF9QABCNKOZWYSDF9ABCNKOZW"
+      "SDF9CABCABCNKOZWYNKOZWYSDF9";
+
+  trytes_to_trits(k_str, K.p, MIN(strlen(k_str), K.n / RADIX));
   prng_init(p, p->s, K);
   trits_set_zero(N);
   trits_set_zero(H);
-  trits_from_str(H,
-                 "ABCNKOZWYSDF9OABCNKOZWYSDF9"
-                 "ABCNKOZWYSDF9QABCNKOZWYSDF9"
-                 "ABCNKOZWYSDF9CABCNKOZWYSDF9");
+  const char *h_str =
+      "ABCNKOZWYSDF9OABCNKOZWYSDF9"
+      "ABCNKOZWYSDF9QABCNKOZWYSDF9"
+      "ABCNKOZWYSDF9CABCNKOZWYSDF9";
+  trytes_to_trits(h_str, H.p, MIN(strlen(h_str), H.n / RADIX));
 
   for (d = 1; r && d <= D; ++d) {
     trits_t sig = trits_take(sig_, MAM2_MSS_SIG_SIZE(d));

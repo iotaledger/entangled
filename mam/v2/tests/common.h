@@ -28,6 +28,8 @@
 #include "mam/v2/trits.h"
 #include "mam/v2/wots.h"
 
+#include "common/trinary/add.h"
+
 #if !defined(MAM2_MSS_TEST_MAX_D)
 #define MAM2_MSS_TEST_MAX_D 3
 #endif
@@ -52,9 +54,9 @@ typedef struct _test_wots_s {
 #define def_test_mss(DEPTH, sfx)                  \
   typedef struct _test_mss##sfx {                 \
     imss m;                                       \
-    word_t ap[MAM2_MSS_MT_AUTH_WORDS(DEPTH)];     \
+    trit_t ap[MAM2_MSS_MT_AUTH_WORDS(DEPTH)];     \
     uint32_t ap_check;                            \
-    word_t hs[MAM2_MSS_MT_HASH_WORDS(DEPTH, 1)];  \
+    trit_t hs[MAM2_MSS_MT_HASH_WORDS(DEPTH, 1)];  \
     uint32_t hs_check;                            \
     mss_mt_node ns[MAM2_MSS_MT_NODES(DEPTH) + 1]; \
     uint32_t ns_check;                            \
@@ -65,7 +67,7 @@ typedef struct _test_wots_s {
 #define def_test_mss(D, sfx)         \
   typedef struct _test_mss##sfx {    \
     imss m;                          \
-    word_t mt[MAM2_MSS_MT_WORDS(D)]; \
+    trit_t mt[MAM2_MSS_MT_WORDS(D)]; \
     uint32_t mt_check;               \
   } test_mss##sfx
 #endif
@@ -125,21 +127,38 @@ def_test_mss_check(3, 3);
 def_test_mss_check(4, 4);
 def_test_mss_check(MAM2_MSS_TEST_MAX_D, );
 
-MAM2_SAPI void test_f(void *buf, word_t *s) {
-  trits_t x = trits_from_rep(MAM2_SPONGE_RATE, s);
-  trits_t y = trits_from_rep(MAM2_SPONGE_RATE, (word_t *)buf);
-  trits_t x0 = trits_take(x, MAM2_SPONGE_RATE / 2);
-  trits_t x1 = trits_drop(x, MAM2_SPONGE_RATE / 2);
-  trits_t x2 =
-      trits_drop(trits_from_rep(MAM2_SPONGE_WIDTH, s), MAM2_SPONGE_RATE);
+// FIXME (@tsvisabo)
+#define FLEX_SPONGE_RATE MAM2_SPONGE_RATE
 
-  trits_add(x0, x1, x0);
-  trits_add(x0, x2, x0);
-  trits_add(x0, x2, x2);
+static void xor_trits(trit_t *lhs, trit_t *rhs, trit_t *res, size_t len) {
+  for (size_t i = 0; i < len; ++i) {
+    res[i] = trit_sum(lhs[i], rhs[i]);
+  }
+}
 
-  trits_copy(trits_take(x, MAM2_SPONGE_RATE - 6), trits_drop(y, 6));
-  trits_copy(trits_drop(x, MAM2_SPONGE_RATE - 6), trits_take(y, 6));
-  trits_copy(y, x);
+MAM2_SAPI void test_f(void *buf, trit_t *s) {
+  trit_t x0_trits[MAM2_SPONGE_RATE / 2];
+  memcpy(x0_trits, s, MAM2_SPONGE_RATE / 2);
+  trit_t x1_trits[MAM2_SPONGE_RATE / 2];
+  memcpy(x1_trits, &s[MAM2_SPONGE_RATE / 2], MAM2_SPONGE_RATE / 2);
+  trit_t y_trits[MAM2_SPONGE_RATE];
+  memcpy(y_trits, buf, MAM2_SPONGE_RATE);
+
+  trit_t x2_trits[MAM2_SPONGE_WIDTH - MAM2_SPONGE_RATE];
+  memcpy(x2_trits, &s[MAM2_SPONGE_RATE], MAM2_SPONGE_WIDTH - MAM2_SPONGE_RATE);
+
+  xor_trits(x1_trits, x0_trits, x0_trits, MAM2_SPONGE_RATE / 2);
+
+  xor_trits(x2_trits, x0_trits, x0_trits, MAM2_SPONGE_RATE / 2);
+
+  xor_trits(x0_trits, x2_trits, x2_trits, MAM2_SPONGE_RATE / 2);
+
+  memcpy(s, x0_trits, MAM2_SPONGE_RATE / 2);
+  memcpy(&s[MAM2_SPONGE_RATE / 2], x1_trits, MAM2_SPONGE_RATE / 2);
+  memcpy(&s[MAM2_SPONGE_RATE], x2_trits, MAM2_SPONGE_WIDTH - MAM2_SPONGE_RATE);
+  memcpy(&y_trits[6], s, MAM2_SPONGE_RATE - 6);
+  memcpy(y_trits, &s[MAM2_SPONGE_RATE - 6], 6);
+  memcpy(s, y_trits, MAM2_SPONGE_RATE);
 }
 
 static isponge *test_sponge_init(test_sponge_t *s) {
