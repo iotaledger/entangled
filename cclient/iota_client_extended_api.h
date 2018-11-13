@@ -33,7 +33,7 @@ typedef struct {
 } input_t;
 
 typedef struct {
-  size_t total_balance;
+  uint64_t total_balance;
   hash243_queue_t addresses;
 } inputs_t;
 
@@ -172,7 +172,7 @@ retcode_t iota_client_get_bundle(iota_client_service_t const* const serv,
 retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
                                  flex_trit_t const* const seed,
                                  address_opt_t const addr_opt,
-                                 size_t const threshold,
+                                 uint64_t const threshold,
                                  inputs_t* const out_input);
 
 /**

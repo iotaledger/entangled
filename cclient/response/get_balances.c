@@ -39,16 +39,3 @@ uint64_t get_balances_res_balances_at(get_balances_res_t const* const res,
                                       int const index) {
   return *(uint64_t*)utarray_eltptr(res->balances, index);
 }
-
-uint64_t get_balances_res_total_balance(get_balances_res_t const* const res,
-                                        uint64_t const threshold) {
-  uint64_t sum = 0;
-  uint64_t* p = NULL;
-  for (p = (uint64_t*)utarray_front(res->balances); p != NULL;
-       p = (uint64_t*)utarray_next(res->balances, p)) {
-    if (*p > threshold) {
-      sum += *p;
-    }
-  }
-  return sum;
-}
