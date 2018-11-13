@@ -49,6 +49,46 @@ static retcode_t node_neighbors_init(node_t* const node) {
   return RC_OK;
 }
 
+static retcode_t node_transaction_requester_init(node_t* const node,
+                                                 tangle_t* const tangle) {
+  retcode_t ret = RC_OK;
+  iota_stor_pack_t pack;
+
+  if ((ret = requester_init(&node->transaction_requester, &node->conf,
+                            tangle)) != RC_OK) {
+    return ret;
+  }
+
+  if ((ret = hash_pack_init(&pack, node->conf.requester_queue_size)) != RC_OK) {
+    log_error(NODE_LOGGER_ID, "Initializing request hash pack failed\n");
+    goto done;
+  }
+
+  if ((ret = iota_tangle_transaction_load_hashes_of_requests(
+           &node->core->consensus.tangle, &pack,
+           node->conf.requester_queue_size)) != RC_OK) {
+    log_error(NODE_LOGGER_ID,
+              "Loading hashes of transactions to request failed\n");
+    goto done;
+  }
+
+  for (size_t i = 0; i < pack.num_loaded; i++) {
+    if ((ret = request_transaction(&node->transaction_requester,
+                                   ((trit_array_t*)(pack.models[i]))->trits,
+                                   false)) != RC_OK) {
+      log_error(NODE_LOGGER_ID, "Requesting transaction failed\n");
+      goto done;
+    }
+  }
+
+  log_debug(NODE_LOGGER_ID, "Added %d transactions to request\n",
+            pack.num_loaded);
+
+done:
+  hash_pack_free(&pack);
+  return ret;
+}
+
 static retcode_t node_tips_cache_init(node_t* const node) {
   retcode_t ret = RC_OK;
   iota_stor_pack_t pack;
@@ -96,7 +136,6 @@ done:
 retcode_t node_init(node_t* const node, core_t* const core,
                     tangle_t* const tangle) {
   retcode_t ret = RC_OK;
-  iota_stor_pack_t pack;
 
   if (node == NULL) {
     return RC_NODE_NULL_NODE;
@@ -142,32 +181,10 @@ retcode_t node_init(node_t* const node, core_t* const core,
   }
 
   log_info(NODE_LOGGER_ID, "Initializing transaction requester component\n");
-  if (requester_init(&node->transaction_requester, &node->conf, tangle) !=
-      RC_OK) {
+  if (node_transaction_requester_init(node, tangle) != RC_OK) {
     log_critical(NODE_LOGGER_ID,
                  "Initializing transaction requester component failed\n");
     return RC_NODE_FAILED_REQUESTER_INIT;
-  }
-
-  if ((ret = hash_pack_init(&pack, 10)) != RC_OK) {
-    goto done;
-  }
-
-  if ((ret = iota_tangle_transaction_load_hashes_of_requests(
-           &node->core->consensus.tangle, &pack,
-           node->conf.requester_queue_size)) != RC_OK) {
-    log_error(NODE_LOGGER_ID,
-              "Loading hashes of transactions to request failed\n");
-    goto done;
-  }
-
-  for (size_t i = 0; i < pack.num_loaded; i++) {
-    if ((ret = request_transaction(&node->transaction_requester,
-                                   ((trit_array_t*)(pack.models[i]))->trits,
-                                   false)) != RC_OK) {
-      log_error(NODE_LOGGER_ID, "Requesting transaction failed\n");
-      goto done;
-    }
   }
 
   log_info(NODE_LOGGER_ID, "Initializing tips cache\n");
@@ -176,8 +193,6 @@ retcode_t node_init(node_t* const node, core_t* const core,
     return ret;
   }
 
-done:
-  hash_pack_free(&pack);
   return ret;
 }
 
