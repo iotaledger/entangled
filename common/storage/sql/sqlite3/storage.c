@@ -523,6 +523,32 @@ done:
   return ret;
 }
 
+extern retcode_t iota_stor_transaction_load_hashes_of_tips(
+    connection_t const* const conn, iota_stor_pack_t* const pack,
+    size_t const limit) {
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = NULL;
+
+  if ((ret = prepare_statement(
+           (sqlite3*)conn->db, &sqlite_statement,
+           iota_statement_transaction_select_hashes_of_tips)) != RC_OK) {
+    goto done;
+  }
+
+  if (sqlite3_bind_int(sqlite_statement, 1, limit) != SQLITE_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
+  if ((ret = execute_statement_load_hashes(sqlite_statement, pack)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  finalize_statement(sqlite_statement);
+  return ret;
+}
+
 retcode_t iota_stor_transaction_update_solid_state(
     connection_t const* const conn, flex_trit_t const* const hash,
     bool const is_solid) {
