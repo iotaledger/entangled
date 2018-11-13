@@ -178,7 +178,7 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
         goto done;
       }
       if (!valid_bundle ||
-          (tx_bundle = (iota_transaction_t)utarray_eltptr(bundle, 0)) != NULL) {
+          (tx_bundle = (iota_transaction_t)utarray_eltptr(bundle, 0)) == NULL) {
         params->valid_delta = false;
         *should_stop = true;
         goto done;
