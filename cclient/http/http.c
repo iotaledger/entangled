@@ -25,6 +25,10 @@ struct _response_ctx {
   IOTA_REQUEST_STATUS status;
 };
 
+const char* khttp_ApplicationJson = "application/json";
+const char* khttp_ApplicationFormUrlencoded =
+    "application/x-www-form-urlencoded";
+
 // Callback declarations for parser
 static int request_parse_header_complete(struct _response_ctx* response);
 static int request_parse_data(struct _response_ctx* response,
