@@ -95,13 +95,13 @@ typedef struct _imss {
   isponge *s;    /*!< Sponge interface used to hash Merkle tree nodes. */
   iwots *w;      /*!< WOTS interface used to generate keys and sign. */
 #if defined(MAM2_MSS_TRAVERSAL)
-  word_t *ap;       /*!< Current authentication path; `d` hash values. */
-  word_t *hs;       /*!< Buffer storing hash-values of auxiliary nodes;
+  trit_t *ap;       /*!< Current authentication path; `d` hash values. */
+  trit_t *hs;       /*!< Buffer storing hash-values of auxiliary nodes;
                     MAM2_MSS_MT_NODES(d) hash-values in total. */
   mss_mt_node *ns;  /*<! Auxiliary node infos. */
   mss_mt_stack *ss; /*<! Stacks used by traversal algorithm. */
 #else
-  word_t *mt; /*!< Buffer storing complete Merkle-tree. */
+  trit_t *mt; /*!< Buffer storing complete Merkle-tree. */
 #endif
   trits_t N1, N2; /*!< Nonce = `N1`||`N2`, stored pointers only, NOT copies. */
 } imss;
@@ -115,7 +115,7 @@ for the purpose of key gen stack `D-1` must have capacity `D+1`.
 It is achieved by allocating one extra node:
 
 ```
-  word_t *alloc_words(size_t word_count);
+  trit_t *alloc_words(size_t word_count);
   mss_mt_node *alloc_nodes(size_t node_count);
   mss_mt_stack *alloc_stacks(size_t stack_count);
   mss_mt_height_t D;

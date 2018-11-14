@@ -44,22 +44,21 @@ MAM2_SAPI bool_t wots_test_do(iwots *w, iprng *p) {
   wots_gen_sk(w, p, N);
   wots_calc_pk(w, pk);
   wots_sign(w, H, sig);
-  // wots_recover(w->s, H, sig, pkr);
-  r = r && wots_verify(w->s, H, sig, pk);
+  TEST_ASSERT(wots_verify(w->s, H, sig, pk));
 
   trits_put1(H, trit_add(trits_get1(H), 1));
   r = r && !wots_verify(w->s, H, sig, pk);
   trits_put1(H, trit_sub(trits_get1(H), 1));
 
   trits_put1(sig, trit_add(trits_get1(sig), 1));
-  r = r && !wots_verify(w->s, H, sig, pk);
+  TEST_ASSERT(!wots_verify(w->s, H, sig, pk));
   trits_put1(sig, trit_sub(trits_get1(sig), 1));
 
   trits_put1(pk, trit_add(trits_get1(pk), 1));
   r = r && !wots_verify(w->s, H, sig, pk);
   trits_put1(pk, trit_sub(trits_get1(pk), 1));
 
-  return r;
+  TEST_ASSERT(r);
 }
 
 MAM2_SAPI void wots_test() {

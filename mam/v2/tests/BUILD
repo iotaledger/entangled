@@ -9,21 +9,12 @@ cc_library(
     deps =
         [
             ":structs",
+            "//common/trinary:add",
             "//mam/v2:curl",
             "//mam/v2:mam",
             "//mam/v2:trits",
+            "//utils:macros",
             "@unity",
-        ],
-)
-
-cc_test(
-    name = "test_trits",
-    srcs = [
-        "test_trits.c",
-    ],
-    deps =
-        [
-            ":shared",
         ],
 )
 

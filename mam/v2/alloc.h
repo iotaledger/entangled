@@ -27,8 +27,8 @@ void *mam2_alloc(ialloc *a, size_t s);
 
 void mam2_free(ialloc *a, void *p);
 
-word_t *mam2_words_alloc(ialloc *a, size_t wc);
+trit_t *mam2_words_alloc(ialloc *a, size_t wc);
 
-void mam2_words_free(ialloc *a, word_t *ws);
+void mam2_words_free(ialloc *a, trit_t *ws);
 
 #endif  // __MAM_V2_ALLOC_H_

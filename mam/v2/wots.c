@@ -120,8 +120,11 @@ MAM2_SAPI void wots_gen_sk3(iwots *w, iprng *p, trits_t N1, trits_t N2,
 }
 
 MAM2_SAPI void wots_calc_pk(iwots *w, trits_t pk) {
+  TRIT_ARRAY_MAKE_FROM_RAW(pk_trits, pk.n - pk.d, &pk.p[pk.d]);
   MAM2_TRITS_DEF(sk_pks, MAM2_WOTS_SK_SIZE);
   trits_copy(wots_sk_trits(w), sk_pks);
+  size_t num_sk_pks = wots_sk_trits(w).n - wots_sk_trits(w).d;
+  TRIT_ARRAY_MAKE_FROM_RAW(sk_pks_arr, num_sk_pks, wots_sk_trits(w).p);
   wots_calc_pks(w->s, sk_pks, pk);
   trits_set_zero(sk_pks);
 }
@@ -153,6 +156,7 @@ MAM2_SAPI err_t wots_create(ialloc *a, iwots *w) {
   do {
     memset(w, 0, sizeof(iwots));
     w->sk = mam2_words_alloc(a, MAM2_WORDS(MAM2_WOTS_SK_SIZE));
+    memset(w->sk, 0, MAM2_WORDS(MAM2_WOTS_SK_SIZE));
     err_guard(w->sk, err_bad_alloc);
     e = err_ok;
   } while (0);

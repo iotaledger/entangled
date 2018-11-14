@@ -41,7 +41,7 @@ MAM2_API err_t mam2_mss_create(mam2_ialloc *ma, imss *m, iprng *p,
 MAM2_API void mam2_mss_destroy(mam2_ialloc *ma, imss *m);
 
 #define MAM2_CHANNEL_ID_SIZE MAM2_MSS_MT_HASH_SIZE
-typedef word_t chid_t[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
+typedef trit_t chid_t[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
 typedef struct _mam2_channel {
   imss m[1]; /*!< MSS instance. */
   chid_t id; /*!< MSS public key. */
@@ -80,7 +80,7 @@ mam2_channel_save, mam2_channel_load
 */
 
 #define MAM2_ENDPOINT_ID_SIZE MAM2_MSS_MT_HASH_SIZE
-typedef word_t epid_t[MAM2_WORDS(MAM2_MSS_MT_HASH_SIZE)];
+typedef trit_t epid_t[MAM2_WORDS(MAM2_MSS_MT_HASH_SIZE)];
 typedef struct _mam2_endpoint {
   imss m[1]; /*!< MSS instance. */
   epid_t id; /*!< MSS public key. */
@@ -120,8 +120,8 @@ mam2_endpoint_save, mam2_endpoint_load
 #define MAM2_PSK_SIZE 243
 /*! \brief Preshared key. */
 typedef struct _mam2_psk {
-  word_t id[MAM2_WORDS(MAM2_PSK_ID_SIZE)];
-  word_t psk[MAM2_WORDS(MAM2_PSK_SIZE)];
+  trit_t id[MAM2_WORDS(MAM2_PSK_ID_SIZE)];
+  trit_t psk[MAM2_WORDS(MAM2_PSK_SIZE)];
 } mam2_psk;
 MAM2_API trits_t mam2_psk_id(mam2_psk *p);
 MAM2_API trits_t mam2_psk_trits(mam2_psk *p);
@@ -131,7 +131,7 @@ def_mam2_list(mam2_psk_node, mam2_psk_list);
 
 /*! \brief Recipient's NTRU public key. */
 typedef struct _mam2_ntru_pk {
-  word_t pk[MAM2_WORDS(MAM2_NTRU_PK_SIZE)];
+  trit_t pk[MAM2_WORDS(MAM2_NTRU_PK_SIZE)];
 } mam2_ntru_pk;
 MAM2_API trits_t mam2_ntru_pk_id(mam2_ntru_pk *p);
 MAM2_API trits_t mam2_ntru_pk_trits(mam2_ntru_pk *p);
@@ -154,7 +154,7 @@ typedef struct _mam2_send_msg_context {
   bool_t ep_sig;     /*!< Need to sign Endpoint.sig? */
 
   trits_t nonce; /*!< Message nonce, must be unique for each key. */
-  word_t key[MAM2_WORDS(
+  trit_t key[MAM2_WORDS(
       MAM2_SPONGE_KEY_SIZE)]; /*!< Trits (memory) for session key. */
   bool_t key_plain;           /*!< Include session key in plain? */
   mam2_psk_list psks;         /*!< Encrypt message for these psks. */
@@ -185,20 +185,20 @@ typedef struct _mam2_recv_msg_context {
   isponge *fork;   /*!< Sponge interface used for PB3 forks. */
 
   tryte_t pubkey;
-  word_t chid[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
-  word_t chid1[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
-  word_t epid[MAM2_WORDS(MAM2_ENDPOINT_ID_SIZE)];
+  trit_t chid[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
+  trit_t chid1[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
+  trit_t epid[MAM2_WORDS(MAM2_ENDPOINT_ID_SIZE)];
   isponge *ms;   /*!< Sponge interface used by MSS layer */
   isponge *ws;   /*!< Sponge interface used by WOTS layer */
   bool_t ep_sig; /*!< Signed? */
   // TODO: check for trusted chid/epid
   // TODO: handle (add to trusted list) new chid1
 
-  word_t nonce[MAM2_WORDS(MAM2_HEADER_NONCE_SIZE)];
-  word_t key[MAM2_WORDS(
+  trit_t nonce[MAM2_WORDS(MAM2_HEADER_NONCE_SIZE)];
+  trit_t key[MAM2_WORDS(
       MAM2_SPONGE_KEY_SIZE)]; /*!< Trits (memory) for session key. */
-  word_t psk_id[MAM2_WORDS(MAM2_PSK_ID_SIZE)]; /*!< Buffer to read PSK id to. */
-  word_t
+  trit_t psk_id[MAM2_WORDS(MAM2_PSK_ID_SIZE)]; /*!< Buffer to read PSK id to. */
+  trit_t
       ntru_id[MAM2_WORDS(MAM2_NTRU_ID_SIZE)]; /*!< Buffer to read NTRU id to. */
   mam2_psk *psk;                              /*!< PSK to decrypt message. */
   intru *ntru; /*!< NTRU sk to decrypt message. */

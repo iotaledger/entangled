@@ -34,9 +34,9 @@
 #define MAM2_NTRU_ID_SIZE 81
 
 typedef struct _intru {
-  word_t
+  trit_t
       *id; /*!< Key id - the first 27 trytes of the corresponding public key.*/
-  word_t *sk; /*!< Private key words. */
+  trit_t *sk; /*!< Private key words. */
 } intru;
 
 MAM2_INLINE MAM2_API trits_t ntru_id_trits(intru *n);

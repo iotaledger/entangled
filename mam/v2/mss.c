@@ -82,7 +82,7 @@ static void mss_mt_gen_leaf(
 }
 
 #if defined(MAM2_MSS_TRAVERSAL)
-MAM2_INLINE static trits_t mss_hash_idx(word_t *p, size_t i) {
+MAM2_INLINE static trits_t mss_hash_idx(trit_t *p, size_t i) {
   return trits_from_rep(MAM2_MSS_MT_HASH_SIZE, p + MAM2_MSS_HASH_IDX(i));
 }
 
@@ -109,7 +109,7 @@ MAM2_INLINE static void mss_mt_init(imss *m) {
 MAM2_INLINE static void mss_mt_update(imss *m, mss_mt_height_t d) {
   mss_mt_stack *s;
   mss_mt_node *ns;
-  word_t *hs;
+  trit_t *hs;
   trits_t h[2], wpk;
 
   // current level must be lower than MT height
@@ -192,7 +192,7 @@ MAM2_INLINE static trits_t mss_mt_node_trits(imss *m, trint6_t d, trint18_t i) {
   MAM2_ASSERT(i < ((trint18_t)1 << d));
 
   size_t idx = ((size_t)1 << d) + i - 1;
-  word_t *w = m->mt + MAM2_WORDS(MAM2_MSS_MT_HASH_SIZE) * idx;
+  trit_t *w = m->mt + MAM2_WORDS(MAM2_MSS_MT_HASH_SIZE) * idx;
   return trits_from_rep(MAM2_MSS_MT_HASH_SIZE, w);
 }
 #endif
@@ -240,7 +240,7 @@ MAM2_SAPI void mss_gen(imss *m, trits_t pk) {
   mss_mt_height_t d = m->d - 1;
   mss_mt_stack *s = m->ss + MAM2_MSS_MT_STACKS(d);
   mss_mt_node *ns = m->ns + MAM2_MSS_MT_NODES(d), *n;
-  word_t *hs = m->hs + MAM2_MSS_MT_HASH_WORDS(d, 0);
+  trit_t *hs = m->hs + MAM2_MSS_MT_HASH_WORDS(d, 0);
 
   // init stack
   // max node height is `D`

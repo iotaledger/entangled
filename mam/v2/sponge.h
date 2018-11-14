@@ -18,6 +18,7 @@
 #ifndef __MAM_V2_SPONGE_H__
 #define __MAM_V2_SPONGE_H__
 
+#include "common/trinary/trit_array.h"
 #include "mam/v2/defs.h"
 #include "mam/v2/trits.h"
 
@@ -39,7 +40,7 @@
 #define MAM2_SPONGE_MAC_SIZE 243
 
 /*! \brief Sponge state. */
-typedef word_t sponge_state_t[MAM2_WORDS(MAM2_SPONGE_WIDTH)];
+typedef trit_t sponge_state_t[MAM2_WORDS(MAM2_SPONGE_WIDTH)];
 
 /*! \brief c2 control trit DATA */
 #define MAM2_SPONGE_CTL_DATA 0
@@ -49,16 +50,16 @@ typedef word_t sponge_state_t[MAM2_WORDS(MAM2_SPONGE_WIDTH)];
 #define MAM2_SPONGE_CTL_KEY 1
 /*! \brief c2 control trit PRN */
 #define MAM2_SPONGE_CTL_PRN 1
-/*! \brief c2 control trit TEXT */
-#define MAM2_SPONGE_CTL_TEXT -1
-/*! \brief c2 control trit MAC */
-#define MAM2_SPONGE_CTL_MAC -1
 
 /*! \brief Sponge interface. */
 typedef struct _isponge {
-  void (*f)(void *, word_t *); /*!< sponge transformation */
+  void (*f)(void *, trit_t *); /*!< sponge transformation */
   void *stack;                 /*!< additional memory used by `f` */
-  word_t *s;                   /*!< sponge state */
+  trit_t *s;                   /*!< sponge state */
+
+  // TODO - replace s field and also get correct size
+  flex_trit_t flex_trit_state[MAM2_SPONGE_WIDTH];
+
 } isponge;
 
 /*! \brief Fork (copy) sponge state. `fork` must be initialized. */
@@ -80,6 +81,8 @@ MAM2_API void sponge_absorb(
     trits_t X   /*!< [in] input data */
 );
 
+MAM2_SAPI void sponge_absorb_arr(isponge *s, trit_t c2, trit_array_p X_arr);
+
 /*! \brief Absorb concatenation of `Xs[0]`..`Xs[n-1]` */
 MAM2_SAPI void sponge_absorbn(
     isponge *s, /*!< [in] sponge interface */
@@ -96,15 +99,15 @@ MAM2_API void sponge_squeeze(
 );
 
 /*! \brief Sponge AE encryption. */
-MAM2_API void sponge_encr(isponge *s, /*!< [in] sponge interface */
-                          trits_t X,  /*!< [in] plaintext */
-                          trits_t Y   /*!< [out] ciphertext */
+MAM2_API void sponge_encr(isponge *s,     /*!< [in] sponge interface */
+                          trit_array_p X, /*!< [in] plaintext */
+                          trit_array_p Y  /*!< [out] ciphertext */
 );
 
 /*! \brief Sponge AE decryption. */
-MAM2_API void sponge_decr(isponge *s, /*!< [in] sponge interface */
-                          trits_t X,  /*!< [in] ciphertext */
-                          trits_t Y   /*!< [out] plaintext */
+MAM2_API void sponge_decr(isponge *s,     /*!< [in] sponge interface */
+                          trit_array_p X, /*!< [in] ciphertext */
+                          trit_array_p Y  /*!< [out] plaintext */
 );
 
 /*! \brief Sponge hashing. */

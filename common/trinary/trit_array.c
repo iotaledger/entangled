@@ -6,6 +6,7 @@
  */
 
 #include "common/trinary/trit_array.h"
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -60,6 +61,15 @@ trit_array_p trit_array_slice(trit_array_p trit_array,
   return to_trit_array;
 }
 
+trit_array_p trit_array_slice_at_most(trit_array_p const trit_array,
+                                      trit_array_p const to_trit_array,
+                                      const size_t start, size_t num_trits) {
+  if (trit_array->num_trits - start < num_trits) {
+    num_trits = trit_array->num_trits - start;
+  }
+  trit_array_slice(trit_array, to_trit_array, start, num_trits);
+}
+
 trit_array_p trit_array_insert(trit_array_p const trit_array,
                                trit_array_p const from_trit_array,
                                size_t const start, size_t const num_trits) {
@@ -74,6 +84,22 @@ trit_t *trit_array_to_int8(trit_array_p const trit_array, trit_t *const trits,
   flex_trits_to_trits(trits, len, trit_array->trits, trit_array->num_trits,
                       trit_array->num_trits);
   return trits;
+}
+
+trit_array_p trit_array_set_range(trit_array_p const trits, size_t start,
+                                  size_t end, trit_t value) {
+  assert(start < trits->num_trits && end < trits->num_trits);
+  for (size_t idx = start; idx < end; ++idx) {
+    trit_array_set_at(trits, idx, value);
+  }
+  return trits;
+}
+
+bool trit_array_equal(trit_array_p const lhs, trit_array_p const rhs) {
+  if (lhs->num_trits != rhs->num_trits) {
+    return false;
+  }
+  return memcmp(lhs->trits, rhs->trits, lhs->num_bytes) == 0;
 }
 
 #if !defined(NO_DYNAMIC_ALLOCATION)
