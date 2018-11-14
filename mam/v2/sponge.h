@@ -20,7 +20,7 @@
 
 #include "common/trinary/trit_array.h"
 #include "mam/v2/defs.h"
-#include "mam/v2/trits.h"
+#include "trits.h"
 
 /*! \brief Sponge state rate. */
 #define MAM2_SPONGE_RATE 486
@@ -99,15 +99,15 @@ MAM2_API void sponge_squeeze(
 );
 
 /*! \brief Sponge AE encryption. */
-MAM2_API void sponge_encr(isponge *s,     /*!< [in] sponge interface */
-                          trit_array_p X, /*!< [in] plaintext */
-                          trit_array_p Y  /*!< [out] ciphertext */
+MAM2_API void sponge_encr(isponge *s, /*!< [in] sponge interface */
+                          trits_t X,  /*!< [in] plaintext */
+                          trits_t Y   /*!< [out] ciphertext */
 );
 
 /*! \brief Sponge AE decryption. */
-MAM2_API void sponge_decr(isponge *s,     /*!< [in] sponge interface */
-                          trit_array_p X, /*!< [in] ciphertext */
-                          trit_array_p Y  /*!< [out] plaintext */
+MAM2_API void sponge_decr(isponge *s, /*!< [in] sponge interface */
+                          trits_t X,  /*!< [in] ciphertext */
+                          trits_t Y   /*!< [out] plaintext */
 );
 
 /*! \brief Sponge hashing. */

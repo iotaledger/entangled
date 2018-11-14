@@ -18,7 +18,7 @@
 
 #include "mam/v2/defs.h"
 #include "mam/v2/sponge.h"
-#include "mam/v2/trits.h"
+#include "trits.h"
 
 /*! \brief Curl state. */
 typedef struct _curl_sponge {

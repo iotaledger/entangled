@@ -92,36 +92,21 @@ static bool_t sponge_test_ae(isponge *s) {
     X = MAM2_TRITS_INIT(X, k);
     Y = MAM2_TRITS_INIT(Y, k);
     Z = MAM2_TRITS_INIT(Z, k);
-
     sponge_init(s);
     sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-    TRIT_ARRAY_MAKE_FROM_RAW(X_arr, X.n, X.p);
-    TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, Y.n, Y.p);
-    sponge_encr(s, &X_arr, &Y_arr);
-    flex_trits_to_trits(Y.p, Y.n, Y_arr.trits, Y.n, Y.n);
-
+    sponge_encr(s, X, Y);  // Y=E(X)
     sponge_init(s);
     sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-
-    TRIT_ARRAY_MAKE_FROM_RAW(Z_arr, Z.n, Z.p);
-    sponge_decr(s, &Y_arr, &Z_arr);  // Z=D(E(X))
-    flex_trits_to_trits(Z.p, Z.n, Z_arr.trits, Z.n, Z.n);
-
-    if (!trit_array_equal(&X_arr, &Z_arr)) return 0;
-
+    sponge_decr(s, Y, Z);  // Z=D(E(X))
+    if (0 != trits_cmp_grlex(X, Z)) return 0;
     sponge_init(s);
     sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-
-    sponge_encr(s, &Z_arr, &Z_arr);  // Z=E(Z=X)
-    flex_trits_to_trits(Z.p, Z.n, Z_arr.trits, Z.n, Z.n);
-
-    TEST_ASSERT(trit_array_equal(&Y_arr, &Z_arr));
-
+    sponge_encr(s, Z, Z);  // Z=E(Z=X)
+    if (0 != trits_cmp_grlex(Y, Z)) return 0;
     sponge_init(s);
     sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-    sponge_decr(s, &Z_arr, &Z_arr);  // Z=D(Z=E(X))
-    flex_trits_to_trits(Z.p, Z.n, Z_arr.trits, Z.n, Z.n);
-    TEST_ASSERT(trit_array_equal(&X_arr, &Z_arr));
+    sponge_decr(s, Z, Z);  // Z=D(Z=E(X))
+    if (0 != trits_cmp_grlex(X, Z)) return 0;
   }
 
 #undef MAM2_SPONGE_TEST_MAX_K
@@ -203,33 +188,26 @@ static void sponge_test_pointwise(isponge *s) {
   t = trits_take(T, MAM2_SPONGE_HASH_SIZE);
   trytes_to_trits(hash_y, t.p, strlen(hash_y));
 
-  TRIT_ARRAY_MAKE_FROM_RAW(t_arr, t.n, t.p);
-
   r = trits_cmp_eq(y, t);
-  // FIXME (@tsvisab0)
-  // TEST_ASSERT(r);
+  TEST_ASSERT(r);
 
   sponge_init(s);
   sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
   x = X;
   y = Y;
-  TRIT_ARRAY_MAKE_FROM_RAW(x_arr, x.n, x.p);
-  TRIT_ARRAY_MAKE_FROM_RAW(y_arr, y.n, y.p);
-  sponge_encr(s, &x_arr, &y_arr);  // Z=E(Z=X)
-  flex_trits_to_trits(y.p, y.n, y_arr.trits, y.n, y.n);
+  sponge_encr(s, x, y);
+
   t = T;
   trytes_to_trits(encr_y, t.p, strlen(encr_y));
+
   r = trits_cmp_eq(y, t);
   TEST_ASSERT(r);
-
   sponge_init(s);
   sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
   x = X;
   y = Y;
   trits_copy(x, y);
-  TRIT_ARRAY_MAKE_FROM_RAW(y2_arr, y.n, y.p);
-  sponge_encr(s, &y2_arr, &y2_arr);  // Z=E(Z=X)
-  flex_trits_to_trits(y.p, y.n, y2_arr.trits, y.n, y.n);
+  sponge_encr(s, y, y);
   t = T;
   trytes_to_trits(encr_y, t.p, strlen(encr_y));
   r = trits_cmp_eq(y, t);
@@ -239,24 +217,18 @@ static void sponge_test_pointwise(isponge *s) {
   sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
   x = X;
   y = Y;
-
-  sponge_decr(s, &x_arr, &y_arr);
-  flex_trits_to_trits(y.p, y.n, y_arr.trits, y.n, y.n);
-
+  sponge_decr(s, x, y);
   t = T;
+
   trytes_to_trits(decr_y, t.p, strlen(decr_y));
   r = trits_cmp_eq(y, t);
   TEST_ASSERT(r);
-
   sponge_init(s);
   sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
   x = X;
   y = Y;
   trits_copy(x, y);
-
-  flex_trits_from_trits(y_arr.trits, y_arr.num_trits, y.p, y.n, y.n);
-  sponge_decr(s, &y_arr, &y_arr);
-  flex_trits_to_trits(y.p, y.n, y_arr.trits, y.n, y.n);
+  sponge_decr(s, y, y);
   t = T;
   trytes_to_trits(decr_y, t.p, strlen(decr_y));
   r = trits_cmp_eq(y, t);

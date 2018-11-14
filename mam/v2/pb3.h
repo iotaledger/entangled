@@ -21,7 +21,7 @@
 #include "mam/v2//err.h"
 #include "mam/v2/defs.h"
 #include "mam/v2/sponge.h"
-#include "mam/v2/trits.h"
+#include "trits.h"
 
 /*
 Protobuf3 primitive types

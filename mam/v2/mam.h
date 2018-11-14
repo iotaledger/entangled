@@ -24,8 +24,8 @@
 #include "mam/v2/ntru.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
-#include "mam/v2/trits.h"
 #include "mam/v2/wots.h"
+#include "trits.h"
 
 typedef struct _mam2_ialloc {
   ialloc *a; /*!< Context passed to `create_sponge` and `destroy_sponge`. */

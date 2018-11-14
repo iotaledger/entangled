@@ -22,7 +22,7 @@
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
 #include "mam/v2/sponge.h"
-#include "mam/v2/trits.h"
+#include "trits.h"
 
 /*! \brief PRNG key size. */
 #define MAM2_PRNG_KEY_SIZE 243
