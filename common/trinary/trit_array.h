@@ -141,7 +141,7 @@ void trit_array_free(trit_array_p const trit_array);
 #define TRIT_ARRAY_DECLARE(NAME, NUM_TRITS)                           \
   size_t NAME##_num_bytes = trit_array_bytes_for_trits(NUM_TRITS);    \
   flex_trit_t NAME##_trits[NAME##_num_bytes];                         \
-  memset(&NAME##_trits, 0, NAME##_num_bytes);                         \
+  memset(&NAME##_trits, FLEX_TRIT_NULL_VALUE, NAME##_num_bytes);      \
   struct _trit_array NAME = {(flex_trit_t *)&NAME##_trits, NUM_TRITS, \
                              NAME##_num_bytes, 0};
 
