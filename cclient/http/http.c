@@ -142,13 +142,14 @@ static retcode_t send_headers_to_iota_service(int sockfd,
       "POST %s HTTP/1.1\r\n"
       "Host: %s\r\n"
       "X-IOTA-API-Version: %d\r\n"
-      "Content-Type: application/x-www-form-urlencoded\r\n"
-      "Accept: application/json\r\n"
+      "Content-Type: %s\r\n"
+      "Accept: %s\r\n"
       "Content-Length: %lu\r\n"
       "\r\n";
   char header[256];
   sprintf(header, header_template, http_settings->path, http_settings->host,
-          http_settings->api_version, data_length);
+          http_settings->api_version, http_settings->content_type,
+          http_settings->accept, data_length);
   return send_data_to_iota_service(sockfd, header, strlen(header));
 }
 
