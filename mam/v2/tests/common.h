@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -51,48 +50,48 @@ typedef struct _test_wots_s {
 } test_wots_t;
 
 #if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss(DEPTH, sfx)                  \
-  typedef struct _test_mss##sfx {                 \
-    imss m;                                       \
-    trit_t ap[MAM2_MSS_MT_AUTH_WORDS(DEPTH)];     \
-    uint32_t ap_check;                            \
-    trit_t hs[MAM2_MSS_MT_HASH_WORDS(DEPTH, 1)];  \
-    uint32_t hs_check;                            \
-    mss_mt_node ns[MAM2_MSS_MT_NODES(DEPTH) + 1]; \
-    uint32_t ns_check;                            \
-    mss_mt_stack ss[MAM2_MSS_MT_STACKS(DEPTH)];   \
-    uint32_t ss_check;                            \
+#define def_test_mss(DEPTH, sfx)                    \
+  typedef struct _test_mss##sfx {                   \
+    mss_t m;                                        \
+    trit_t ap[MAM2_MSS_MT_AUTH_WORDS(DEPTH)];       \
+    uint32_t ap_check;                              \
+    trit_t hs[MAM2_MSS_MT_HASH_WORDS(DEPTH, 1)];    \
+    uint32_t hs_check;                              \
+    mss_mt_node_t ns[MAM2_MSS_MT_NODES(DEPTH) + 1]; \
+    uint32_t ns_check;                              \
+    mss_mt_stack_t ss[MAM2_MSS_MT_STACKS(DEPTH)];   \
+    uint32_t ss_check;                              \
   } test_mss##sfx
 #else
 #define def_test_mss(D, sfx)         \
   typedef struct _test_mss##sfx {    \
-    imss m;                          \
+    mss_t m;                         \
     trit_t mt[MAM2_MSS_MT_WORDS(D)]; \
     uint32_t mt_check;               \
   } test_mss##sfx
 #endif
 
 #if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss_init(DEPTH, sfx)                 \
-  static imss *test_mss_init##sfx(test_mss##sfx *m) { \
-    m->m.ap = m->ap;                                  \
-    m->ap_check = 0xdeadbeef;                         \
-    m->m.hs = m->hs;                                  \
-    m->hs_check = 0xdeadbeef;                         \
-    m->m.ns = m->ns;                                  \
-    m->ns_check = 0xdeadbeef;                         \
-    m->m.ss = m->ss;                                  \
-    m->ss_check = 0xdeadbeef;                         \
-    return &m->m;                                     \
+#define def_test_mss_init(DEPTH, sfx)                  \
+  static mss_t *test_mss_init##sfx(test_mss##sfx *m) { \
+    m->m.auth_path = m->ap;                            \
+    m->ap_check = 0xdeadbeef;                          \
+    m->m.hashes = m->hs;                               \
+    m->hs_check = 0xdeadbeef;                          \
+    m->m.nodes = m->ns;                                \
+    m->ns_check = 0xdeadbeef;                          \
+    m->m.stacks = m->ss;                               \
+    m->ss_check = 0xdeadbeef;                          \
+    return &m->m;                                      \
   }
 #else
-#define def_test_mss_init(D, sfx)                               \
-  static imss *test_mss_init##sfx(test_mss##sfx *m, iwots *w) { \
-    m->m.d = D;                                                 \
-    m->m.ws = w;                                                \
-    m->m.mt = m->mt;                                            \
-    m->mt_check = 0xdeadbeef;                                   \
-    return &m->m;                                               \
+#define def_test_mss_init(D, sfx)                                \
+  static mss_t *test_mss_init##sfx(test_mss##sfx *m, iwots *w) { \
+    m->m.d = D;                                                  \
+    m->m.ws = w;                                                 \
+    m->m.mt = m->mt;                                             \
+    m->mt_check = 0xdeadbeef;                                    \
+    return &m->m;                                                \
   }
 #endif
 
