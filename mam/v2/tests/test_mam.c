@@ -133,11 +133,11 @@ MAM2_SAPI void mam_test() {
   iprng *pa = test_prng_init(_pa, s);
   iprng *pb = test_prng_init(_pb, s);
   iwots *w = test_wots_init(_w, s);
-  imss *m1 = test_mss_init1(_m1);
-  imss *m2 = test_mss_init2(_m2);
-  imss *m3 = test_mss_init3(_m3);
-  imss *m4 = test_mss_init4(_m4);
-  imss *m = test_mss_init(_m);
+  mss_t *m1 = test_mss_init1(_m1);
+  mss_t *m2 = test_mss_init2(_m2);
+  mss_t *m3 = test_mss_init3(_m3);
+  mss_t *m4 = test_mss_init4(_m4);
+  mss_t *m = test_mss_init(_m);
   mam_test_do(s, 0, test_create_sponge, test_delete_sponge, pa, pb);
 }
 

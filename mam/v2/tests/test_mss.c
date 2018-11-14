@@ -30,8 +30,7 @@
 #include <memory.h>
 #include <stdio.h>
 
-MAM2_SAPI void mss_test_do(imss *m, iprng *p, isponge *s, iwots *w,
-                           mss_mt_height_t D) {
+void mss_test_do(mss_t *m, iprng *p, isponge *s, iwots *w, mss_mt_height_t D) {
   bool_t r = 1;
   MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
   mss_mt_height_t d;
@@ -116,7 +115,7 @@ MAM2_SAPI void mss_test_do(imss *m, iprng *p, isponge *s, iwots *w,
   trits_free(a, sig_);
 }
 
-MAM2_SAPI void mss_test() {
+void mss_test() {
   test_sponge_t _s[1];
   test_prng_t _p[1];
   test_wots_t _w[1];
@@ -129,11 +128,11 @@ MAM2_SAPI void mss_test() {
   isponge *s = test_sponge_init(_s);
   iprng *p = test_prng_init(_p, s);
   iwots *w = test_wots_init(_w, s);
-  imss *m1 = test_mss_init1(_m1);
-  imss *m2 = test_mss_init2(_m2);
-  imss *m3 = test_mss_init3(_m3);
-  imss *m4 = test_mss_init4(_m4);
-  imss *m = test_mss_init(_m);
+  mss_t *m1 = test_mss_init1(_m1);
+  mss_t *m2 = test_mss_init2(_m2);
+  mss_t *m3 = test_mss_init3(_m3);
+  mss_t *m4 = test_mss_init4(_m4);
+  mss_t *m = test_mss_init(_m);
   mss_test_do(m1, p, s, w, 1);
   mss_test_do(m2, p, s, w, 2);
   mss_test_do(m3, p, s, w, 3);
