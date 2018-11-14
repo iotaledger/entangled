@@ -18,7 +18,7 @@
 #include "mam/v2/mam.h"
 #include "mam/v2/pb3.h"
 
-MAM2_SAPI err_t mam2_mss_create(mam2_ialloc *ma, imss *m, iprng *p,
+MAM2_SAPI err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, iprng *p,
                                 mss_mt_height_t d, trits_t N1, trits_t N2) {
   err_t e = err_internal_error;
   ialloc *a;
@@ -29,30 +29,30 @@ MAM2_SAPI err_t mam2_mss_create(mam2_ialloc *ma, imss *m, iprng *p,
   do {
     err_bind(mss_create(a, m, d));
 
-    m->N1 = trits_null();
+    m->nonce1 = trits_null();
     if (!trits_is_empty(N1)) {
-      m->N1 = trits_alloc(a, trits_size(N1));
-      err_guard(!trits_is_null(m->N1), err_bad_alloc);
+      m->nonce1 = trits_alloc(a, trits_size(N1));
+      err_guard(!trits_is_null(m->nonce1), err_bad_alloc);
     }
 
-    m->N2 = trits_null();
+    m->nonce2 = trits_null();
     if (!trits_is_empty(N2)) {
-      m->N2 = trits_alloc(a, trits_size(N2));
-      err_guard(!trits_is_null(m->N2), err_bad_alloc);
+      m->nonce2 = trits_alloc(a, trits_size(N2));
+      err_guard(!trits_is_null(m->nonce2), err_bad_alloc);
     }
 
-    m->s = ma->create_sponge(a);
-    err_guard(m->s, err_bad_alloc);
+    m->sponge = ma->create_sponge(a);
+    err_guard(m->sponge, err_bad_alloc);
 
-    m->w = mam2_alloc(a, sizeof(iwots));
-    err_guard(m->w, err_bad_alloc);
-    err_bind(wots_create(a, m->w));
+    m->wots = mam2_alloc(a, sizeof(iwots));
+    err_guard(m->wots, err_bad_alloc);
+    err_bind(wots_create(a, m->wots));
 
-    m->w->s = ma->create_sponge(a);
-    err_guard(m->w->s, err_bad_alloc);
-    wots_init(m->w, m->w->s);
+    m->wots->s = ma->create_sponge(a);
+    err_guard(m->wots->s, err_bad_alloc);
+    wots_init(m->wots, m->wots->s);
 
-    mss_init(m, p, m->s, m->w, d, m->N1, m->N2);
+    mss_init(m, p, m->sponge, m->wots, d, m->nonce1, m->nonce2);
 
     e = err_ok;
   } while (0);
@@ -60,26 +60,26 @@ MAM2_SAPI err_t mam2_mss_create(mam2_ialloc *ma, imss *m, iprng *p,
   return e;
 }
 
-MAM2_SAPI void mam2_mss_destroy(mam2_ialloc *ma, imss *m) {
+MAM2_SAPI void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m) {
   ialloc *a;
   MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
   a = ma->a;
 
-  m->p = 0;
+  m->prng = NULL;
 
-  trits_free(a, m->N1);
-  trits_free(a, m->N2);
+  trits_free(a, m->nonce1);
+  trits_free(a, m->nonce2);
 
-  if (m->w) {
-    ma->destroy_sponge(a, m->w->s);
-    m->w->s = 0;
+  if (m->wots) {
+    ma->destroy_sponge(a, m->wots->s);
+    m->wots->s = 0;
   }
-  wots_destroy(a, m->w);
-  m->w = 0;
+  wots_destroy(a, m->wots);
+  m->wots = NULL;
 
-  ma->destroy_sponge(a, m->s);
-  m->s = 0;
+  ma->destroy_sponge(a, m->sponge);
+  m->sponge = NULL;
 
   mss_destroy(a, m);
 }
@@ -87,9 +87,9 @@ MAM2_SAPI void mam2_mss_destroy(mam2_ialloc *ma, imss *m) {
 MAM2_SAPI trits_t mam2_channel_id(mam2_channel *ch) {
   return trits_from_rep(MAM2_CHANNEL_ID_SIZE, ch->id);
 }
-MAM2_SAPI trits_t mam2_channel_name(mam2_channel *ch) { return ch->m->N1; }
+MAM2_SAPI trits_t mam2_channel_name(mam2_channel *ch) { return ch->m->nonce1; }
 static size_t mam2_channel_sig_size(mam2_channel *ch) {
-  return MAM2_MSS_SIG_SIZE(ch->m->d);
+  return MAM2_MSS_SIG_SIZE(ch->m->height);
 }
 
 MAM2_SAPI err_t mam2_channel_create(
@@ -127,10 +127,12 @@ MAM2_SAPI void mam2_channel_destroy(mam2_ialloc *ma, /*!< [in] Allocator. */
 MAM2_API trits_t mam2_endpoint_id(mam2_endpoint *ep) {
   return trits_from_rep(MAM2_ENDPOINT_ID_SIZE, ep->id);
 }
-MAM2_API trits_t mam2_endpoint_chname(mam2_endpoint *ep) { return ep->m->N1; }
-MAM2_API trits_t mam2_endpoint_name(mam2_endpoint *ep) { return ep->m->N2; }
+MAM2_API trits_t mam2_endpoint_chname(mam2_endpoint *ep) {
+  return ep->m->nonce1;
+}
+MAM2_API trits_t mam2_endpoint_name(mam2_endpoint *ep) { return ep->m->nonce2; }
 static size_t mam2_endpoint_sig_size(mam2_endpoint *ep) {
-  return MAM2_MSS_SIG_SIZE(ep->m->d);
+  return MAM2_MSS_SIG_SIZE(ep->m->height);
 }
 
 MAM2_SAPI err_t mam2_endpoint_create(
@@ -549,7 +551,7 @@ MAM2_SAPI size_t mam2_send_packet_size(mam2_send_packet_context *cfg,
   else if (2 == cfg->checksum) {
     MAM2_ASSERT(cfg->m);
     //    trytes sig = 2;
-    sz += pb3_sizeof_trytes(MAM2_MSS_SIG_SIZE(cfg->m->d) / 3);
+    sz += pb3_sizeof_trytes(MAM2_MSS_SIG_SIZE(cfg->m->height) / 3);
   } else
     MAM2_ASSERT(0);
 }
@@ -604,7 +606,7 @@ MAM2_SAPI err_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
 
       sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, H);
 
-      n = MAM2_MSS_SIG_SIZE(cfg->m->d);
+      n = MAM2_MSS_SIG_SIZE(cfg->m->height);
       // manually `pb3_encode_trytes`
       pb3_encode_sizet(n / 3, b);
       sig = trits_take(*b, n);

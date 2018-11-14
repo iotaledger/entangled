@@ -35,16 +35,16 @@ typedef struct _mam2_ialloc {
   void (*destroy_sponge)(ialloc *a, isponge *); /*!< Deallocator. */
 } mam2_ialloc;
 
-MAM2_API err_t mam2_mss_create(mam2_ialloc *ma, imss *m, iprng *p,
+MAM2_API err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, iprng *p,
                                mss_mt_height_t d, trits_t N1, trits_t N2);
 
-MAM2_API void mam2_mss_destroy(mam2_ialloc *ma, imss *m);
+MAM2_API void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m);
 
 #define MAM2_CHANNEL_ID_SIZE MAM2_MSS_MT_HASH_SIZE
 typedef trit_t chid_t[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
 typedef struct _mam2_channel {
-  imss m[1]; /*!< MSS instance. */
-  chid_t id; /*!< MSS public key. */
+  mss_t m[1]; /*!< MSS instance. */
+  chid_t id;  /*!< MSS public key. */
 } mam2_channel;
 MAM2_API trits_t mam2_channel_id(mam2_channel *ch);
 MAM2_API trits_t mam2_channel_name(mam2_channel *ch);
@@ -82,8 +82,8 @@ mam2_channel_save, mam2_channel_load
 #define MAM2_ENDPOINT_ID_SIZE MAM2_MSS_MT_HASH_SIZE
 typedef trit_t epid_t[MAM2_WORDS(MAM2_MSS_MT_HASH_SIZE)];
 typedef struct _mam2_endpoint {
-  imss m[1]; /*!< MSS instance. */
-  epid_t id; /*!< MSS public key. */
+  mss_t m[1]; /*!< MSS instance. */
+  epid_t id;  /*!< MSS public key. */
 } mam2_endpoint;
 MAM2_API trits_t mam2_endpoint_id(mam2_endpoint *ep);
 MAM2_API trits_t mam2_endpoint_chname(mam2_endpoint *ep);
@@ -170,7 +170,7 @@ typedef struct _mam2_send_packet_context {
   isponge *s; /*!< Main Sponge interface */
   trint18_t ord;
   tryte_t checksum;
-  imss *m;
+  mss_t *m;
 } mam2_send_packet_context;
 
 MAM2_API size_t mam2_send_packet_size(mam2_send_packet_context *cfg,
