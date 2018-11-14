@@ -164,7 +164,7 @@ MAM2_SAPI void sponge_squeeze_arr(isponge *s, trit_t c2, trit_array_p Y) {
 
 MAM2_SAPI void sponge_squeeze(isponge *s, trit_t c2, trits_t Y) {
   size_t num_trits = Y.n - Y.d;
-  TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, num_trits, &Y.p[Y.d]);
+  TRIT_ARRAY_DECLARE(Y_arr, num_trits);
   sponge_squeeze_arr(s, c2, &Y_arr);
   flex_trits_to_trits(&Y.p[Y.d], num_trits, Y_arr.trits, num_trits, num_trits);
 }

@@ -120,7 +120,6 @@ MAM2_SAPI void wots_gen_sk3(iwots *w, iprng *p, trits_t N1, trits_t N2,
 }
 
 MAM2_SAPI void wots_calc_pk(iwots *w, trits_t pk) {
-  TRIT_ARRAY_MAKE_FROM_RAW(pk_trits, pk.n - pk.d, &pk.p[pk.d]);
   MAM2_TRITS_DEF(sk_pks, MAM2_WOTS_SK_SIZE);
   trits_copy(wots_sk_trits(w), sk_pks);
   size_t num_sk_pks = wots_sk_trits(w).n - wots_sk_trits(w).d;
