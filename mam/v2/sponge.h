@@ -55,20 +55,13 @@ typedef trit_t sponge_state_t[MAM2_WORDS(MAM2_SPONGE_WIDTH)];
 typedef struct _isponge {
   void (*f)(void *, trit_t *); /*!< sponge transformation */
   void *stack;                 /*!< additional memory used by `f` */
-  trit_t *s;                   /*!< sponge state */
-
   // TODO - replace s field and also get correct size
-  flex_trit_t flex_trit_state[MAM2_SPONGE_WIDTH];
+  flex_trit_t state[FLEX_TRIT_SIZE_SPONGE_WIDTH]; /*!< sponge state */
 
 } isponge;
 
 /*! \brief Fork (copy) sponge state. `fork` must be initialized. */
 MAM2_API void sponge_fork(isponge *s, isponge *fork);
-
-/*! \brief Get part (the first `n` trits) of the sponge outer state.
-\note It is usually used with `sponge_absorb1`.
-*/
-MAM2_INLINE MAM2_SAPI trits_t sponge_outer_trits(isponge *s, size_t n);
 
 /*! \brief Sponge state initialization. */
 MAM2_API void sponge_init(isponge *s /*!< [in] sponge interface */

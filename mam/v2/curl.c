@@ -65,7 +65,14 @@ MAM2_INLINE static trits_t curl_outer_trits(curl_sponge *s, size_t n) {
   return trits_take(curl_state_trits(s), n);
 }
 
-static void curl_transform(curl_sponge *s) { s->i.f(s->i.stack, s->i.s); }
+static void curl_transform(curl_sponge *s) {
+  trit_t state_trits[MAM2_SPONGE_WIDTH];
+  flex_trits_to_trits(state_trits, MAM2_SPONGE_WIDTH, s->i.state,
+                      MAM2_SPONGE_WIDTH, MAM2_SPONGE_WIDTH);
+  s->i.f(s->i.stack, state_trits);
+  flex_trits_from_trits(s->i.state, MAM2_SPONGE_WIDTH, state_trits,
+                        MAM2_SPONGE_WIDTH, MAM2_SPONGE_WIDTH);
+}
 
 MAM2_SAPI void curl_init(curl_sponge *s) {
   trits_set_zero(curl_state_trits(s));
@@ -100,7 +107,6 @@ MAM2_SAPI void curl_squeeze(curl_sponge *s, trits_t Y) {
 }
 
 MAM2_SAPI isponge *curl_sponge_init(curl_sponge *c) {
-  c->i.s = c->s;
   c->i.stack = c->s2;
   c->i.f = curl_f81;
   return &c->i;

@@ -135,6 +135,15 @@ typedef uint8_t byte;
 /*! \brief Assert expression. */
 #define MAM2_ASSERT(expr) assert(expr)
 
+#if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
+#define FLEX_TRIT_SIZE_SPONGE_WIDTH 729
+#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_SPONGE_WIDTH 243
+#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_SPONGE_WIDTH 183
+#elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_SPONGE_WIDTH 146
+#endif
 // TODO - Figure out what to do with those (@tsvisabo)
 
 #define MAM2_API

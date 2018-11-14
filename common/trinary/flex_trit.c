@@ -361,3 +361,10 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
 #endif
   return num_trits;
 }
+
+void flex_trit_set_range(flex_trit_t *trits, size_t start, size_t end,
+                         trit_t value) {
+  for (size_t idx = start; idx < end; ++idx) {
+    flex_trits_set_at(trits, end, idx, value);
+  }
+}

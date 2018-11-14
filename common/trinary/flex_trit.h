@@ -260,6 +260,14 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
 size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
                              const byte_t *bytes, size_t len, size_t num_trits);
 
+/// Set a range with value
+/// @param[in] flex_trits - the trits to set
+/// @param[in] start - start index
+/// @param[in] end - end index
+/// @param[in] value - the value to set
+void flex_trit_set_range(flex_trit_t *trits, size_t start, size_t end,
+                         trit_t value);
+
 #endif
 #ifdef __cplusplus
 }

@@ -89,9 +89,7 @@ trit_t *trit_array_to_int8(trit_array_p const trit_array, trit_t *const trits,
 trit_array_p trit_array_set_range(trit_array_p const trits, size_t start,
                                   size_t end, trit_t value) {
   assert(start < trits->num_trits && end < trits->num_trits);
-  for (size_t idx = start; idx < end; ++idx) {
-    trit_array_set_at(trits, idx, value);
-  }
+  flex_trit_set_range(trits->trits, start, end, value);
   return trits;
 }
 

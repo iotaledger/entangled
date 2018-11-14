@@ -29,6 +29,7 @@
 #include "mam/v2/wots.h"
 
 #include "common/trinary/add.h"
+#include "mam/v2/defs.h"
 
 #if !defined(MAM2_MSS_TEST_MAX_D)
 #define MAM2_MSS_TEST_MAX_D 3
@@ -37,7 +38,6 @@
 typedef struct _test_sponge_s {
   isponge s;
   sponge_state_t stack;
-  sponge_state_t state;
 } test_sponge_t;
 
 typedef struct _test_prng_s {
@@ -164,7 +164,6 @@ MAM2_SAPI void test_f(void *buf, trit_t *s) {
 static isponge *test_sponge_init(test_sponge_t *s) {
   s->s.f = test_f;
   s->s.stack = s->stack;
-  s->s.s = s->state;
   return &s->s;
 }
 
