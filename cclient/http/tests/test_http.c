@@ -112,7 +112,6 @@ void test_http(void) {
   service.http.host = "httpbin.org";
   service.http.content_type = "application/x-www-form-urlencoded";
   service.http.accept = "application/json";
-  service.http.host = "httpbin.org";
   service.http.port = 80;
   service.http.path = "/post";
   char_buffer_t* req = char_buffer_new();
