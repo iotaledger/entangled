@@ -30,15 +30,18 @@ void init_json_serializer(serializer_t* serializer) {
   serializer->vtable = json_vtable;
 }
 
-static retcode_t json_array_to_utarray(cJSON const* const obj,
-                                       char const* const obj_name,
-                                       UT_array* ut) {
+static retcode_t json_array_to_uint64(cJSON const* const obj,
+                                      char const* const obj_name,
+                                      UT_array* ut) {
+  char* endptr;
+  uint64_t value = 0;
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
   if (cJSON_IsArray(json_item)) {
     cJSON* current_obj = NULL;
     cJSON_ArrayForEach(current_obj, json_item) {
       if (current_obj->valuestring != NULL) {
-        utarray_push_back(ut, &current_obj->valuestring);
+        value = strtol(current_obj->valuestring, &endptr, 10);
+        utarray_push_back(ut, &value);
       }
     }
   } else {
@@ -643,7 +646,7 @@ retcode_t json_get_balances_deserialize_response(serializer_t const* const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_array_to_utarray(json_obj, "balances", out->balances);
+  ret = json_array_to_uint64(json_obj, "balances", out->balances);
   if (ret) {
     goto end;
   }

@@ -477,7 +477,7 @@ void test_deserialize_get_balances(void) {
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"balances\": "
-      "[\"" TEST_BALANCES_BALANCE
+      "[\"" STR(TEST_BALANCES_BALANCE)
       "\"], "
       "\"references\": "
       "[\"" TEST_81_TRYRES_1
@@ -491,7 +491,7 @@ void test_deserialize_get_balances(void) {
   serializer.vtable.get_balances_deserialize_response(&serializer, json_text,
                                                       deserialize_get_bal);
 
-  TEST_ASSERT_EQUAL_STRING(TEST_BALANCES_BALANCE, get_balances_res_balances_at(
+  TEST_ASSERT_EQUAL_UINT64(TEST_BALANCES_BALANCE, get_balances_res_balances_at(
                                                       deserialize_get_bal, 0));
 
   TEST_ASSERT_EQUAL_MEMORY(hash,

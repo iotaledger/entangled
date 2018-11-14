@@ -26,7 +26,7 @@ void iota_client_core_destroy(iota_client_service_t* const serv) {
 }
 
 retcode_t iota_client_get_node_info(const iota_client_service_t* const service,
-                                    get_node_info_res_t** res) {
+                                    get_node_info_res_t* res) {
   retcode_t result = RC_OK;
 
   char_buffer_t* req_buff = char_buffer_new();
@@ -386,7 +386,7 @@ done:
 retcode_t iota_client_get_transactions_to_approve(
     const iota_client_service_t* const service,
     const get_transactions_to_approve_req_t* const req,
-    get_transactions_to_approve_res_t** res) {
+    get_transactions_to_approve_res_t* res) {
   retcode_t result = RC_OK;
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();
