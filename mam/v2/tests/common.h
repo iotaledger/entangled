@@ -16,7 +16,6 @@
 #ifndef __MAM_V2_TEST_STRUCTS_H__
 #define __MAM_V2_TEST_STRUCTS_H__
 
-#include "../trits.h"
 #include "mam/v2/alloc.h"
 #include "mam/v2/buffers.h"
 #include "mam/v2/curl.h"
@@ -26,6 +25,7 @@
 #include "mam/v2/pb3.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
+#include "mam/v2/trits.h"
 #include "mam/v2/wots.h"
 
 #include "common/trinary/add.h"

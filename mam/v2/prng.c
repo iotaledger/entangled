@@ -36,11 +36,6 @@ MAM2_SAPI void prng_init(iprng *p, isponge *s, trits_t K) {
   trits_copy(K, prng_key_trits(p));
 }
 
-static void flex_from_trits(trits_t t, flex_trit_t *flex_trits) {
-  size_t n = t.n - t.d;
-  flex_trits_from_trits(flex_trits, n, &t.p[t.d], n, n);
-}
-
 MAM2_SAPI void prng_gen(iprng *p, trint3_t d, trits_t N, trits_t Y) {
   MAM2_TRITS_DEF(dt, 3);
   trits_t KdN[3] = {prng_key_trits(p), dt, N};

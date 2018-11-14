@@ -25,16 +25,17 @@ static trit_t curl_table[] = {1, 0, -1, 2, 1, -1, 0, 2, -1, 1, 0};
 static void curl_f(int rounds, void *buf, trit_t *s) {
   trits_t x, state = trits_from_rep(MAM2_SPONGE_WIDTH, s);
   trits_t stack = trits_from_rep(MAM2_SPONGE_WIDTH, (trit_t *)buf);
-  trit_t t, prev_t = trits_get1(state);
+  trit_t t, prev = trits_get1(state);
   size_t i, j = 0;
   for (; rounds--;) {
-    trits_copy(x = state, stack);
+    x = state;
+    trits_copy(x, stack);
     for (i = 0; i++ < MAM2_SPONGE_WIDTH;) {
       j = (j < 365) ? (j + 364) : (j - 365);
       t = trits_get1(trits_drop(stack, j));
-      trits_put1(x, curl_table[prev_t + (t << 2) + 5]);
+      trits_put1(x, curl_table[prev + (t << 2) + 5]);
       x = trits_drop(x, 1);
-      prev_t = t;
+      prev = t;
     }
   }
 }
