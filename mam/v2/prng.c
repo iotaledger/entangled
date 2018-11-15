@@ -40,14 +40,6 @@ MAM2_SAPI void prng_gen(iprng *p, trint3_t d, trits_t N, trits_t Y) {
   MAM2_TRITS_DEF(dt, 3);
   trits_t KdN[3] = {prng_key_trits(p), dt, N};
   trits_put3(dt, d);
-
-  flex_trit_t p_flex[NUM_FLEX_TRITS_FOR_TRITS(MAM2_PRNG_KEY_SIZE)];
-  flex_trit_t dt_flex[dt.n - dt.d];
-  flex_trit_t N_flex[N.n - N.d];
-  flex_from_trits(dt, dt_flex);
-  flex_from_trits(N, N_flex);
-  flex_from_trits(prng_key_trits(p), p_flex);
-  flex_trit_t *kdn_trits[3] = {p_flex, dt_flex, N_flex};
   prng_absorbn(p->s, 3, KdN);
   prng_squeeze(p->s, Y);
 }
@@ -57,17 +49,6 @@ MAM2_SAPI void prng_gen2(iprng *p, trint3_t d, trits_t N1, trits_t N2,
   MAM2_TRITS_DEF(dt, 3);
   trits_t KdN[4] = {prng_key_trits(p), dt, N1, N2};
   trits_put3(dt, d);
-
-  flex_trit_t p_flex[NUM_FLEX_TRITS_FOR_TRITS(MAM2_PRNG_KEY_SIZE)];
-  flex_trit_t dt_flex[dt.n - dt.d];
-  flex_trit_t N1_flex[N1.n - N1.d];
-  flex_trit_t N2_flex[N2.n - N2.d];
-  flex_from_trits(dt, dt_flex);
-  flex_from_trits(N1, N1_flex);
-  flex_from_trits(N2, N2_flex);
-  flex_from_trits(prng_key_trits(p), p_flex);
-  flex_trit_t *kdn_trits[4] = {p_flex, dt_flex, N1_flex, N2_flex};
-
   prng_absorbn(p->s, 4, KdN);
   prng_squeeze(p->s, Y);
 }
@@ -78,17 +59,6 @@ MAM2_SAPI void prng_gen3(iprng *p, trint3_t d, trits_t N1, trits_t N2,
   MAM2_TRITS_DEF(dt, 3);
   trits_t KdN[5] = {prng_key_trits(p), dt, N1, N2, N3};
   trits_put3(dt, d);
-
-  flex_trit_t p_flex[NUM_FLEX_TRITS_FOR_TRITS(MAM2_PRNG_KEY_SIZE)];
-  flex_trit_t dt_flex[dt.n - dt.d];
-  flex_trit_t N1_flex[N1.n - N1.d];
-  flex_trit_t N2_flex[N2.n - N2.d];
-  flex_trit_t N3_flex[N3.n - N3.d];
-  flex_from_trits(dt, dt_flex);
-  flex_from_trits(N1, N1_flex);
-  flex_from_trits(N2, N2_flex);
-  flex_from_trits(prng_key_trits(p), p_flex);
-  flex_trit_t *kdn_trits[5] = {p_flex, dt_flex, N1_flex, N2_flex, N3_flex};
   prng_absorbn(p->s, 5, KdN);
   prng_squeeze(p->s, Y);
 }
