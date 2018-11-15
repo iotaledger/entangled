@@ -285,19 +285,20 @@ retcode_t iota_client_get_transaction_objects(
   retcode_t ret_code = RC_OK;
   get_trytes_res_t* out_trytes = get_trytes_res_new();
   hash8019_queue_entry_t* q_iter = NULL;
-  iota_transaction_t tx = NULL;
+  struct _iota_transaction tx = {};
+  size_t tx_deserialize_offset = 0;
 
   ret_code = iota_client_get_trytes(serv, tx_hashes, out_trytes);
   if (ret_code == RC_OK) {
     CDL_FOREACH(out_trytes->trytes, q_iter) {
-      tx = transaction_deserialize(q_iter->hash);
-      if (tx) {
-        transaction_array_push_back(out_tx_objs, tx);
-        transaction_free(tx);
+      tx_deserialize_offset =
+          transaction_deserialize_from_trits(&tx, q_iter->hash);
+      if (tx_deserialize_offset) {
+        transaction_array_push_back(out_tx_objs, &tx);
       } else {
-        ret_code = RC_CCLIENT_NULL_PTR;
-        log_error(CCLIENT_EXTENDED_LOGGER_ID,
-                  "%s: transaction deserialize failed.\n", __func__);
+        ret_code = RC_CCLIENT_TX_DESERIALIZE_FAILED;
+        log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s: %s.\n", __func__,
+                  error_2_string(ret_code));
         goto done;
       }
     }
