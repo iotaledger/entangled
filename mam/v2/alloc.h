@@ -20,15 +20,8 @@
 
 #include "mam/v2/defs.h"
 
-/*! \brief MAM2 allocator type; nothing for now. */
-typedef void ialloc;
+trit_t *mam2_words_alloc(size_t wc);
 
-void *mam2_alloc(ialloc *a, size_t s);
-
-void mam2_free(ialloc *a, void *p);
-
-trit_t *mam2_words_alloc(ialloc *a, size_t wc);
-
-void mam2_words_free(ialloc *a, trit_t *ws);
+void mam2_words_free(trit_t *ws);
 
 #endif  // __MAM_V2_ALLOC_H_

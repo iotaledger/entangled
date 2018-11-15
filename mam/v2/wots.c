@@ -149,12 +149,12 @@ MAM2_SAPI bool_t wots_verify(isponge *s, trits_t H, trits_t sig, trits_t pk) {
   return (0 == trits_cmp_grlex(pk, sig_pk)) ? 1 : 0;
 }
 
-MAM2_SAPI err_t wots_create(ialloc *a, iwots *w) {
+MAM2_SAPI err_t wots_create(iwots *w) {
   err_t e = err_internal_error;
   MAM2_ASSERT(w);
   do {
     memset(w, 0, sizeof(iwots));
-    w->sk = mam2_words_alloc(a, MAM2_WORDS(MAM2_WOTS_SK_SIZE));
+    w->sk = mam2_words_alloc(MAM2_WORDS(MAM2_WOTS_SK_SIZE));
     memset(w->sk, 0, MAM2_WORDS(MAM2_WOTS_SK_SIZE));
     err_guard(w->sk, err_bad_alloc);
     e = err_ok;
@@ -162,8 +162,8 @@ MAM2_SAPI err_t wots_create(ialloc *a, iwots *w) {
   return e;
 }
 
-MAM2_SAPI void wots_destroy(ialloc *a, iwots *w) {
+MAM2_SAPI void wots_destroy(iwots *w) {
   MAM2_ASSERT(w);
-  mam2_words_free(a, w->sk);
+  mam2_words_free(w->sk);
   w->sk = 0;
 }

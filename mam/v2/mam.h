@@ -28,11 +28,9 @@
 #include "trits.h"
 
 typedef struct _mam2_ialloc {
-  ialloc *a; /*!< Context passed to `create_sponge` and `destroy_sponge`. */
-  isponge *(*create_sponge)(
-      ialloc *a); /*!< Allocator for sponge interfaces used by
+  isponge *(*create_sponge)(); /*!< Allocator for sponge interfaces used by
                      channels/endpoints (WOTS, PB3 sponge, PB3 fork sponge). */
-  void (*destroy_sponge)(ialloc *a, isponge *); /*!< Deallocator. */
+  void (*destroy_sponge)(isponge *); /*!< Deallocator. */
 } mam2_ialloc;
 
 MAM2_API err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, iprng *p,

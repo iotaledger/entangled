@@ -20,14 +20,8 @@
 
 #include <stdlib.h>
 
-void *mam2_alloc(ialloc *a, size_t s) { return malloc(s); }
-
-void mam2_free(ialloc *a, void *p) {
-  if (p) free(p);
+trit_t *mam2_words_alloc(size_t wc) {
+  return (trit_t *)malloc(sizeof(trit_t) * wc);
 }
 
-trit_t *mam2_words_alloc(ialloc *a, size_t wc) {
-  return (trit_t *)mam2_alloc(a, sizeof(trit_t) * wc);
-}
-
-void mam2_words_free(ialloc *a, trit_t *ws) { mam2_free(a, (void *)ws); }
+void mam2_words_free(trit_t *ws) { free(ws); }
