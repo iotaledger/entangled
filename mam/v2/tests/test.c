@@ -91,7 +91,7 @@ void test_prng_gen(size_t Kn, char *K, size_t Nn, char *N, size_t Yn, char *Y) {
   test_sponge_t _s[1];
   test_prng_t _p[1];
   isponge *s = test_sponge_init(_s);
-  iprng *p = test_prng_init(_p, s);
+  prng_t *p = test_prng_init(_p, s);
 
   trits_t tK = trits_alloc(3 * Kn);
   trits_t tN = trits_alloc(3 * Nn);
@@ -115,7 +115,7 @@ void test_wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   test_prng_t _p[1];
   test_wots_t _w[1];
   isponge *s = test_sponge_init(_s);
-  iprng *p = test_prng_init(_p, s);
+  prng_t *p = test_prng_init(_p, s);
   iwots *w = test_wots_init(_w, s);
 
   trits_t tK = trits_alloc(3 * Kn);

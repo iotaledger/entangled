@@ -216,7 +216,7 @@ static void mss_fold_apath(
  * Public functions
  */
 
-void mss_init(mss_t *const mss, iprng *const prng, isponge *const sponge,
+void mss_init(mss_t *const mss, prng_t *const prng, isponge *const sponge,
               iwots *const wots, mss_mt_height_t const height,
               trits_t const nonce1, trits_t const nonce2) {
   MAM2_ASSERT(mss);

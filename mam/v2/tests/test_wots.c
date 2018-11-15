@@ -28,7 +28,7 @@
 #include <memory.h>
 #include <stdio.h>
 
-MAM2_SAPI bool_t wots_test_do(iwots *w, iprng *p) {
+MAM2_SAPI bool_t wots_test_do(iwots *w, prng_t *p) {
   bool_t r = 1;
   MAM2_TRITS_DEF(N, 18);
   MAM2_TRITS_DEF(pk, MAM2_WOTS_PK_SIZE);
@@ -67,7 +67,7 @@ MAM2_SAPI void wots_test() {
   test_wots_t _w[1];
 
   isponge *s = test_sponge_init(_s);
-  iprng *p = test_prng_init(_p, s);
+  prng_t *p = test_prng_init(_p, s);
   iwots *w = test_wots_init(_w, s);
 
   MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
@@ -78,7 +78,7 @@ MAM2_SAPI void wots_test() {
       "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
       "NOPQRSTUVWXYZ9ABCDEFGHIJKLM";
   trytes_to_trits(k_str, K.p, MIN(strlen(k_str), K.n / RADIX));
-  prng_init(p, p->s, K);
+  prng_init(p, p->sponge, K);
 
   wots_test_do(w, p);
 }

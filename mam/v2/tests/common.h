@@ -39,7 +39,7 @@ typedef struct _test_sponge_s {
 } test_sponge_t;
 
 typedef struct _test_prng_s {
-  iprng p;
+  prng_t p;
   prng_key_t key;
 } test_prng_t;
 
@@ -166,10 +166,10 @@ static isponge *test_sponge_init(test_sponge_t *s) {
   return &s->s;
 }
 
-static iprng *test_prng_init(test_prng_t *p, isponge *s) {
-  p->p.s = s;
-  p->p.k = p->key;
-  return &p->p;
+static prng_t *test_prng_init(test_prng_t *prng, isponge *sponge) {
+  prng->p.sponge = sponge;
+  prng->p.key = prng->key;
+  return &prng->p;
 }
 
 static iwots *test_wots_init(test_wots_t *w, isponge *s) {

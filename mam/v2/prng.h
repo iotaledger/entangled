@@ -1,82 +1,95 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file prng.h
-\brief MAM2 PRNG layer.
-*/
 #ifndef __MAM_V2_PRNG_H__
 #define __MAM_V2_PRNG_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
 #include "mam/v2/sponge.h"
-#include "trits.h"
+#include "mam/v2/trits.h"
 
-/*! \brief PRNG key size. */
+// PRNG key size
 #define MAM2_PRNG_KEY_SIZE 243
 
 typedef trit_t prng_key_t[MAM2_WORDS(MAM2_PRNG_KEY_SIZE)];
 
-/*! \brief PRNG AE destination tryte. */
+// PRNG AE destination tryte
 #define MAM2_PRNG_DST_SECKEY 0
-/*! \brief PRNG WOTS destination tryte. */
+// PRNG WOTS destination tryte
 #define MAM2_PRNG_DST_WOTSKEY 1
-/*! \brief PRNG NTRU destination tryte. */
+// PRNG NTRU destination tryte
 #define MAM2_PRNG_DST_NTRUKEY 2
 
-/*! \brief PRNG interface. */
-typedef struct _iprng {
-  isponge *s; /*!< sponge interface */
-  trit_t *k;  /*!< key */
-} iprng;
+// PRNG interface
+typedef struct prng_s {
+  isponge *sponge;
+  trit_t *key;
+} prng_t;
 
-/*! \brief PRNG initialization. */
-MAM2_API void prng_init(iprng *p,   /*!< [in] PRNG interface */
-                        isponge *s, /*!< [in] Sponge interface */
-                        trits_t K   /*!< [in] key of size MAM2_PRNG_KEY_SIZE */
-);
+/**
+ * Allocates memory for PRNG secret key
+ *
+ * @param prng PRNG interface
+ */
+err_t prng_create(prng_t *prng);
 
-/*! \brief PRNG output generation. */
-MAM2_API void prng_gen(iprng *p,   /*!< [in] PRNG interface */
-                       trint3_t d, /*!< [in] destination tryte */
-                       trits_t N,  /*!< [in] nonce */
-                       trits_t Y   /*!< [out] pseudorandom trits */
-);
+/**
+ * PRNG initialization
+ *
+ * @param prng PRNG interface
+ * @param sponge Sponge interface
+ * @param key Key of size MAM2_PRNG_KEY_SIZE
+ */
+void prng_init(prng_t *prng, isponge *sponge, trits_t key);
 
-/*! \brief PRNG output generation with
-nonce `N1` || `N2`. */
-MAM2_SAPI void prng_gen2(iprng *p,   /*!< [in] PRNG interface */
-                         trint3_t d, /*!< [in] destination tryte */
-                         trits_t N1, /*!< [in] first nonce */
-                         trits_t N2, /*!< [in] second nonce */
-                         trits_t Y   /*!< [out] pseudorandom trits */
-);
+/**
+ * PRNG output generation with nonce
+ *
+ * @param prng PRNG interface
+ * @param dest Destination tryte
+ * @param nonce Nonce
+ * @param trits Pseudorandom trits
+ */
+void prng_gen(prng_t *prng, trint3_t dest, trits_t nonce, trits_t trits);
 
-/*! \brief PRNG output generation with
-nonce `N1` || `N2` || `N3`. */
-MAM2_SAPI void prng_gen3(iprng *p,   /*!< [in] PRNG interface */
-                         trint3_t d, /*!< [in] destination tryte */
-                         trits_t N1, /*!< [in] first nonce */
-                         trits_t N2, /*!< [in] second nonce */
-                         trits_t N3, /*!< [in] third nonce */
-                         trits_t Y   /*!< [out] pseudorandom trits */
-);
+/**
+ * PRNG output generation with nonce1 || nonce2
+ *
+ * @param prng PRNG interface
+ * @param dest Destination tryte
+ * @param nonce1 First nonce
+ * @param nonce2 Second nonce
+ * @param trits Pseudorandom trits
+ */
+void prng_gen2(prng_t *prng, trint3_t dest, trits_t nonce1, trits_t nonce2,
+               trits_t trits);
 
-/*! \brief Allocate memory for PRNG secret key. */
-MAM2_API err_t prng_create(iprng *p);
+/**
+ * PRNG output generation with nonce1 || nonce2 || nonce3
+ *
+ * @param prng PRNG interface
+ * @param dest Destination tryte
+ * @param nonce1 First nonce
+ * @param nonce2 Second nonce
+ * @param nonce3 Third nonce
+ * @param trits Pseudorandom trits
+ */
+void prng_gen3(prng_t *prng, trint3_t dest, trits_t nonce1, trits_t nonce2,
+               trits_t nonce3, trits_t trits);
 
-/*! \brief Deallocate memory for PRNG secret key. */
-MAM2_API void prng_destroy(iprng *p);
+/**
+ * Deallocates memory for PRNG secret key
+ *
+ * @param prng PRNG interface
+ */
+void prng_destroy(prng_t *prng);
 
 #endif  // __MAM_V2_PRNG_H__

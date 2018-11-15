@@ -25,9 +25,9 @@ MAM2_INLINE MAM2_SAPI trits_t ntru_sk_trits(intru *n) {
   return trits_from_rep(MAM2_NTRU_SK_SIZE, n->sk);
 }
 
-MAM2_SAPI void ntru_gen(intru *n, iprng *p, trits_t N, trits_t pk) {}
+MAM2_SAPI void ntru_gen(intru *n, prng_t *p, trits_t N, trits_t pk) {}
 
-MAM2_SAPI void ntru_encr(trits_t pk, iprng *p, trits_t K, trits_t N,
+MAM2_SAPI void ntru_encr(trits_t pk, prng_t *p, trits_t K, trits_t N,
                          trits_t Y) {}
 
 MAM2_SAPI bool_t ntru_decr(intru *n, trits_t Y, trits_t K) { return 0; }

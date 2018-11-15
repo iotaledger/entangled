@@ -28,7 +28,7 @@
 #include <memory.h>
 #include <stdio.h>
 
-MAM2_SAPI void prng_test_do(iprng *p) {
+void prng_test_do(prng_t *p) {
   bool_t r = 1;
   MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
   MAM2_TRITS_DEF(N, 18);
@@ -43,13 +43,13 @@ MAM2_SAPI void prng_test_do(iprng *p) {
       "NOPQRSTUVWXYZ9ABCDEFGHIJKLM";
   trytes_to_trits(k_str, K.p, MIN(strlen(k_str), K.n / RADIX));
 
-  sponge_init(p->s);
-  sponge_absorb(p->s, MAM2_SPONGE_CTL_KEY, K);
-  sponge_squeeze(p->s, MAM2_SPONGE_CTL_KEY, K);
+  sponge_init(p->sponge);
+  sponge_absorb(p->sponge, MAM2_SPONGE_CTL_KEY, K);
+  sponge_squeeze(p->sponge, MAM2_SPONGE_CTL_KEY, K);
   // init N
   trits_set_zero(N);
 
-  prng_init(p, p->s, K);
+  prng_init(p, p->sponge, K);
   prng_gen(p, 0, N, Y1);
   prng_gen(p, 1, N, Y2);
 
@@ -57,12 +57,12 @@ MAM2_SAPI void prng_test_do(iprng *p) {
   TEST_ASSERT(d != 0);
 }
 
-MAM2_SAPI void prng_test() {
+void prng_test() {
   test_sponge_t _s[1];
   test_prng_t _p[1];
 
   isponge *s = test_sponge_init(_s);
-  iprng *p = test_prng_init(_p, s);
+  prng_t *p = test_prng_init(_p, s);
   prng_test_do(p);
 }
 

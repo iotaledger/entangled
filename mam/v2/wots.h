@@ -51,21 +51,21 @@ MAM2_API void wots_init(iwots *w,  /*!< [in,out] WOTS interface */
 );
 
 /*! \brief Generate WOTS private key. */
-MAM2_API void wots_gen_sk(iwots *w, /*!< [in] WOTS interface */
-                          iprng *p, /*!< [in] PRNG interface */
-                          trits_t N /*!< [in] nonce */
+MAM2_API void wots_gen_sk(iwots *w,  /*!< [in] WOTS interface */
+                          prng_t *p, /*!< [in] PRNG interface */
+                          trits_t N  /*!< [in] nonce */
 );
 
 /*! \brief Generate WOTS private key. */
 MAM2_API void wots_gen_sk2(iwots *w,   /*!< [in] WOTS interface */
-                           iprng *p,   /*!< [in] PRNG interface */
+                           prng_t *p,  /*!< [in] PRNG interface */
                            trits_t N1, /*!< [in] first nonce */
                            trits_t N2  /*!< [in] second nonce */
 );
 
 /*! \brief Generate WOTS private key. */
 MAM2_API void wots_gen_sk3(iwots *w,   /*!< [in] WOTS interface */
-                           iprng *p,   /*!< [in] PRNG interface */
+                           prng_t *p,  /*!< [in] PRNG interface */
                            trits_t N1, /*!< [in] first nonce */
                            trits_t N2, /*!< [in] second nonce */
                            trits_t N3  /*!< [in] third nonce */

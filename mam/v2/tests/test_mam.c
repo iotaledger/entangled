@@ -36,7 +36,7 @@ static void test_delete_sponge(isponge *s) { free((test_sponge_t *)s); }
 MAM2_SAPI void mam_test_do(isponge *s, void *sponge_alloc_ctx,
                            isponge *(create_sponge)(void *ctx),
                            void (*destroy_sponge)(void *ctx, isponge *),
-                           iprng *pa, iprng *pb) {
+                           prng_t *pa, prng_t *pb) {
   err_t e = err_internal_error;
 
 #if 0
@@ -126,9 +126,9 @@ MAM2_SAPI void mam_test() {
   test_mss _m[1];
 
   isponge *s = test_sponge_init(_s);
-  iprng *p = test_prng_init(_p, s);
-  iprng *pa = test_prng_init(_pa, s);
-  iprng *pb = test_prng_init(_pb, s);
+  prng_t *p = test_prng_init(_p, s);
+  prng_t *pa = test_prng_init(_pa, s);
+  prng_t *pb = test_prng_init(_pb, s);
   iwots *w = test_wots_init(_w, s);
   mss_t *m1 = test_mss_init1(_m1);
   mss_t *m2 = test_mss_init2(_m2);

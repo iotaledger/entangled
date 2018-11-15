@@ -29,7 +29,7 @@
 #include <memory.h>
 #include <stdio.h>
 
-void mss_test_do(mss_t *m, iprng *p, isponge *s, iwots *w, mss_mt_height_t D) {
+void mss_test_do(mss_t *m, prng_t *p, isponge *s, iwots *w, mss_mt_height_t D) {
   bool_t r = 1;
   MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
   mss_mt_height_t d;
@@ -45,7 +45,7 @@ void mss_test_do(mss_t *m, iprng *p, isponge *s, iwots *w, mss_mt_height_t D) {
       "SDF9CABCABCNKOZWYNKOZWYSDF9";
 
   trytes_to_trits(k_str, K.p, MIN(strlen(k_str), K.n / RADIX));
-  prng_init(p, p->s, K);
+  prng_init(p, p->sponge, K);
   trits_set_zero(N);
   trits_set_zero(H);
   const char *h_str =
@@ -124,7 +124,7 @@ void mss_test() {
   test_mss _m[1];
 
   isponge *s = test_sponge_init(_s);
-  iprng *p = test_prng_init(_p, s);
+  prng_t *p = test_prng_init(_p, s);
   iwots *w = test_wots_init(_w, s);
   mss_t *m1 = test_mss_init1(_m1);
   mss_t *m2 = test_mss_init2(_m2);

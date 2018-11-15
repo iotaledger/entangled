@@ -44,14 +44,14 @@ MAM2_INLINE MAM2_API trits_t ntru_id_trits(intru *n);
 MAM2_INLINE MAM2_API trits_t ntru_sk_trits(intru *n);
 
 MAM2_API void ntru_gen(intru *n,  /*!< [in] NTRU interface */
-                       iprng *p,  /*!< [in] PRNG interface */
+                       prng_t *p, /*!< [in] PRNG interface */
                        trits_t N, /*!< [in] nonce */
                        trits_t pk /*!< [out] NTRU public key */
 );
 
 MAM2_API void ntru_encr(
     trits_t pk, /*!< [in] NTRU public key */
-    iprng *p,   /*!< [in] PRNG interface */
+    prng_t *p,  /*!< [in] PRNG interface */
     trits_t K,  /*!< [in] session symmetric key to be encrypted */
     trits_t N,  /*!< [in] nonce */
     trits_t Y   /*!< [out] encrypted K */

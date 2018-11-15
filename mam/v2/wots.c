@@ -106,15 +106,15 @@ MAM2_SAPI void wots_init(iwots *w, isponge *s) {
   w->s = s;
 }
 
-MAM2_SAPI void wots_gen_sk(iwots *w, iprng *p, trits_t N) {
+MAM2_SAPI void wots_gen_sk(iwots *w, prng_t *p, trits_t N) {
   wots_gen_sk3(w, p, N, trits_null(), trits_null());
 }
 
-MAM2_SAPI void wots_gen_sk2(iwots *w, iprng *p, trits_t N1, trits_t N2) {
+MAM2_SAPI void wots_gen_sk2(iwots *w, prng_t *p, trits_t N1, trits_t N2) {
   wots_gen_sk3(w, p, N1, N2, trits_null());
 }
 
-MAM2_SAPI void wots_gen_sk3(iwots *w, iprng *p, trits_t N1, trits_t N2,
+MAM2_SAPI void wots_gen_sk3(iwots *w, prng_t *p, trits_t N1, trits_t N2,
                             trits_t N3) {
   prng_gen3(p, MAM2_PRNG_DST_WOTSKEY, N1, N2, N3, wots_sk_trits(w));
 }
