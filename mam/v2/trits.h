@@ -19,8 +19,7 @@
 #ifndef __MAM_V2_TRITS_H__
 #define __MAM_V2_TRITS_H__
 
-#include "alloc.h"
-#include "defs.h"
+#include "mam/v2/defs.h"
 
 #include "common/trinary/flex_trit.h"
 #include "common/trinary/trit_tryte.h"

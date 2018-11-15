@@ -68,7 +68,7 @@ MAM2_SAPI err_t prng_create(iprng *p) {
   MAM2_ASSERT(p);
   do {
     memset(p, 0, sizeof(iprng));
-    p->k = mam2_words_alloc(MAM2_WORDS(MAM2_PRNG_KEY_SIZE));
+    p->k = (trit_t *)malloc(sizeof(trit_t) * MAM2_WORDS(MAM2_PRNG_KEY_SIZE));
     err_guard(p->k, err_bad_alloc);
     e = err_ok;
   } while (0);
@@ -77,6 +77,6 @@ MAM2_SAPI err_t prng_create(iprng *p) {
 
 MAM2_SAPI void prng_destroy(iprng *p) {
   MAM2_ASSERT(p);
-  mam2_words_free(p->k);
+  free(p->k);
   p->k = 0;
 }

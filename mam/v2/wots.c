@@ -154,7 +154,7 @@ MAM2_SAPI err_t wots_create(iwots *w) {
   MAM2_ASSERT(w);
   do {
     memset(w, 0, sizeof(iwots));
-    w->sk = mam2_words_alloc(MAM2_WORDS(MAM2_WOTS_SK_SIZE));
+    w->sk = (trit_t *)malloc(sizeof(trit_t) * MAM2_WORDS(MAM2_WOTS_SK_SIZE));
     memset(w->sk, 0, MAM2_WORDS(MAM2_WOTS_SK_SIZE));
     err_guard(w->sk, err_bad_alloc);
     e = err_ok;
@@ -164,6 +164,6 @@ MAM2_SAPI err_t wots_create(iwots *w) {
 
 MAM2_SAPI void wots_destroy(iwots *w) {
   MAM2_ASSERT(w);
-  mam2_words_free(w->sk);
+  free(w->sk);
   w->sk = 0;
 }

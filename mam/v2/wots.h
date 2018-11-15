@@ -17,7 +17,6 @@
 #ifndef __MAM_V2_WOTS_H__
 #define __MAM_V2_WOTS_H__
 
-#include "mam/v2/alloc.h"
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
 #include "mam/v2/prng.h"

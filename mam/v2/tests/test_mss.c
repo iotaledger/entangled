@@ -9,7 +9,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/alloc.h"
 #include "mam/v2/buffers.h"
 #include "mam/v2/curl.h"
 #include "mam/v2/mam.h"

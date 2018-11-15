@@ -182,12 +182,12 @@ MAM2_SAPI trits_t trits_null() { return trits_from_rep(0, 0); }
 MAM2_SAPI bool_t trits_is_null(trits_t x) { return (0 == x.p); }
 
 MAM2_SAPI trits_t trits_alloc(size_t n) {
-  trit_t *p = mam2_words_alloc(MAM2_WORDS(n));
+  trit_t *p = (trit_t *)malloc(sizeof(trit_t) * MAM2_WORDS(n));
   memset(p, 0, MAM2_WORDS(n));
   return trits_from_rep(n, p);
 }
 
-MAM2_SAPI void trits_free(trits_t x) { mam2_words_free(x.p); }
+MAM2_SAPI void trits_free(trits_t x) { free(x.p); }
 
 #define MAM2_TRIT_NORM(t) (((t) == 2) ? -1 : ((t) == -2) ? 1 : (t))
 trit_t trit_add(trit_t x, trit_t s) {
