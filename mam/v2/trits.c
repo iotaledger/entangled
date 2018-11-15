@@ -148,8 +148,11 @@ MAM2_SAPI void trits_set_zero(trits_t x) {
 MAM2_SAPI void trits_copy(trits_t x, trits_t y) {
   MAM2_ASSERT(trits_size(x) == trits_size(y));
 
-  for (; !trits_is_empty(x); x = trits_drop(x, 1), y = trits_drop(y, 1))
+  while (!trits_is_empty(x)) {
     trits_put1(y, trits_get1(x));
+    x = trits_drop(x, 1);
+    y = trits_drop(y, 1);
+  }
 }
 
 MAM2_SAPI int trits_cmp_grlex(trits_t x, trits_t y) {
