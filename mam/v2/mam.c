@@ -47,7 +47,7 @@ MAM2_SAPI err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, iprng *p,
     err_guard(m->wots, err_bad_alloc);
     err_bind(wots_create(m->wots));
 
-    m->wots->s = ma->create_sponge(a);
+    m->wots->s = ma->create_sponge();
     err_guard(m->wots->s, err_bad_alloc);
     wots_init(m->wots, m->wots->s);
 
