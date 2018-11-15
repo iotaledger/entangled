@@ -249,3 +249,51 @@ done:
   get_balances_res_free(&balances_res);
   return ret_code;
 }
+
+retcode_t iota_client_find_transaction_objects(
+    iota_client_service_t const* const serv,
+    find_transactions_req_t const* const tx_queries,
+    transaction_array_t out_tx_objs) {
+  retcode_t ret_code = RC_OK;
+  find_transactions_res_t* find_tx_res = find_transactions_res_new();
+  get_trytes_res_t* out_trytes = get_trytes_res_new();
+  hash8019_queue_entry_t* q_iter = NULL;
+  iota_transaction_t tx = NULL;
+
+  log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  if (!find_tx_res || !out_trytes) {
+    ret_code = RC_CCLIENT_NULL_PTR;
+    log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s create object failed: %s\n",
+              __func__, error_2_string(ret_code));
+    goto done;
+  }
+
+  ret_code = iota_client_find_transactions(serv, tx_queries, find_tx_res);
+  if (!ret_code && find_tx_res) {
+    ret_code = iota_client_get_trytes(serv, (get_trytes_req_t*)find_tx_res,
+                                      out_trytes);
+    if (!ret_code) {
+      CDL_FOREACH(out_trytes->trytes, q_iter) {
+        tx = transaction_deserialize(q_iter->hash);
+        if (tx) {
+          transaction_array_push_back(out_tx_objs, tx);
+          transaction_free(tx);
+        } else {
+          ret_code = RC_CCLIENT_NULL_PTR;
+          log_error(CCLIENT_EXTENDED_LOGGER_ID,
+                    "transaction deserialize failed.\n");
+          goto done;
+        }
+      }
+    }
+  }
+
+done:
+  if (find_tx_res) {
+    find_transactions_res_free(&find_tx_res);
+  }
+  if (out_trytes) {
+    get_trytes_res_free(&out_trytes);
+  }
+  return ret_code;
+}
