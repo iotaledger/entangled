@@ -20,6 +20,7 @@
 #include "mam/v2/tests/common.h"
 #include "mam/v2/trits.h"
 #include "mam/v2/wots.h"
+#include "utils/macros.h"
 
 #include <string.h>
 #include <unity/unity.h>
@@ -62,24 +63,23 @@ MAM2_SAPI bool_t wots_test_do(iwots *w, iprng *p) {
 
 MAM2_SAPI void wots_test() {
   test_sponge_t _s[1];
-  test_prng_t _p[1], _pa[1], _pb[1];
+  test_prng_t _p[1];
   test_wots_t _w[1];
-  test_mss1 _m1[1];
-  test_mss2 _m2[1];
-  test_mss3 _m3[1];
-  test_mss4 _m4[1];
-  test_mss _m[1];
 
   isponge *s = test_sponge_init(_s);
   iprng *p = test_prng_init(_p, s);
-  iprng *pa = test_prng_init(_pa, s);
-  iprng *pb = test_prng_init(_pb, s);
   iwots *w = test_wots_init(_w, s);
-  mss_t *m1 = test_mss_init1(_m1);
-  mss_t *m2 = test_mss_init2(_m2);
-  mss_t *m3 = test_mss_init3(_m3);
-  mss_t *m4 = test_mss_init4(_m4);
-  mss_t *m = test_mss_init(_m);
+
+  MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
+  // init K
+  trits_set_zero(K);
+  const char *k_str =
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM";
+  trytes_to_trits(k_str, K.p, MIN(strlen(k_str), K.n / RADIX));
+  prng_init(p, p->s, K);
+
   wots_test_do(w, p);
 }
 
