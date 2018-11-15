@@ -17,7 +17,7 @@
 #define __MAM_V2_BUFFERS_H__
 
 #include "mam/v2/defs.h"
-#include "mam/v2/trits.h"
+#include "trits.h"
 
 typedef struct {
   trits_t X;   /*!< the head */

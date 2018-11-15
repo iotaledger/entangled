@@ -22,7 +22,7 @@
 #include "mam/v2/err.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
-#include "mam/v2/trits.h"
+#include "trits.h"
 
 /*! \brief WOTS public key size. */
 #define MAM2_WOTS_PK_SIZE 243

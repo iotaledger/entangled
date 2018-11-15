@@ -68,6 +68,7 @@ cc_library(
     deps = [
         ":alloc",
         ":defs",
+        "//common/trinary:flex_trit",
         "//common/trinary:trit_tryte",
     ],
 )

@@ -60,10 +60,7 @@ void test_sponge_encr(size_t Kn, char *K, size_t Xn, char *X, size_t Yn,
   trytes_to_trits(K, tK.p, MIN(strlen(K), tK.n / RADIX));
   sponge_absorb(s, MAM2_SPONGE_CTL_KEY, tK);
   trytes_to_trits(X, tX.p, MIN(strlen(X), tX.n / RADIX));
-  TRIT_ARRAY_MAKE_FROM_RAW(X_arr, tX.n, tX.p);
-  TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, tY.n, tY.p);
-  sponge_encr(s, &X_arr, &Y_arr);
-  flex_trits_to_trits(tY.p, tY.n, Y_arr.trits, tY.n, tY.n);
+  sponge_encr(s, tX, tY);
   trits_to_trytes(tY.p, Y, tY.n);
 
   trits_free(a, tK);
@@ -87,10 +84,7 @@ void test_sponge_decr(size_t Kn, char *K, size_t Yn, char *Y, size_t Xn,
   sponge_absorb(s, MAM2_SPONGE_CTL_KEY, tK);
   trytes_to_trits(Y, tY.p, MIN(strlen(Y), tY.n / RADIX));
 
-  TRIT_ARRAY_MAKE_FROM_RAW(tY_arr, tY.n, tY.p);
-  TRIT_ARRAY_MAKE_FROM_RAW(tX_arr, tX.n, tX.p);
-  sponge_decr(s, &tY_arr, &tX_arr);
-  flex_trits_to_trits(tX.p, tX.n, tX_arr.trits, tX.n, tX.n);
+  sponge_decr(s, tY, tX);
   trits_to_trytes(tX.p, X, tX.n);
   trits_free(a, tK);
   trits_free(a, tY);

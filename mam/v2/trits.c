@@ -201,3 +201,91 @@ trit_t trit_sub(trit_t y, trit_t s) {
   x = MAM2_TRIT_NORM(x);
   return x;
 }
+
+MAM2_SAPI void trits_copy_pad10(trits_t x, trits_t y) {
+  size_t n = trits_size(x);
+  MAM2_ASSERT(n < trits_size(y));
+  trits_copy(x, trits_take(y, n));
+  y = trits_drop(y, n);
+  trits_pad10(y);
+}
+
+MAM2_SAPI void trits_pad10(trits_t y) {
+  MAM2_ASSERT(!trits_is_empty(y));
+  // 1
+  trits_put1(y, 1);
+  // 0*
+  trits_set_zero(trits_drop(y, 1));
+}
+
+MAM2_INLINE MAM2_SAPI bool_t trits_is_same(trits_t x, trits_t y) {
+  return (x.p == y.p) && (x.d == y.d);  // && (x.n == y.n)
+}
+
+MAM2_SAPI void trits_copy_add(trits_t x, trits_t s, trits_t y) {
+  trit_t tx, ts, ty;
+  MAM2_ASSERT(trits_size(x) == trits_size(s));
+  MAM2_ASSERT(trits_size(x) == trits_size(y));
+  for (; !trits_is_empty(x);
+       x = trits_drop(x, 1), s = trits_drop(s, 1), y = trits_drop(y, 1)) {
+    tx = trits_get1(x);
+    ts = trits_get1(s);
+    ty = trit_add(tx, ts);
+    trits_put1(s, tx);
+    trits_put1(y, ty);
+  }
+}
+MAM2_SAPI void trits_copy_sub(trits_t y, trits_t s, trits_t x) {
+  trit_t tx, ts, ty;
+  MAM2_ASSERT(trits_size(x) == trits_size(s));
+  MAM2_ASSERT(trits_size(x) == trits_size(y));
+  for (; !trits_is_empty(x);
+       x = trits_drop(x, 1), s = trits_drop(s, 1), y = trits_drop(y, 1)) {
+    ty = trits_get1(y);
+    ts = trits_get1(s);
+    tx = trit_sub(ty, ts);
+    trits_put1(s, tx);
+    trits_put1(x, tx);
+  }
+}
+
+void trit_swap_add(trit_t *x, trit_t *s) {
+  trit_t y = *x + *s;
+  y = MAM2_TRIT_NORM(y);
+  *s = *x;
+  *x = y;
+}
+void trit_swap_sub(trit_t *y, trit_t *s) {
+  trit_t x = *y - *s;
+  x = MAM2_TRIT_NORM(x);
+  *s = x;
+  *y = x;
+}
+
+MAM2_SAPI void trits_swap_add(trits_t x, trits_t s) {
+  trit_t tx, ts;
+  MAM2_ASSERT(trits_size(x) == trits_size(s));
+  for (; !trits_is_empty(x); x = trits_drop(x, 1), s = trits_drop(s, 1)) {
+    tx = trits_get1(x);
+    ts = trits_get1(s);
+    trit_swap_add(&tx, &ts);
+    trits_put1(x, tx);
+    trits_put1(s, ts);
+  }
+}
+MAM2_SAPI void trits_swap_sub(trits_t y, trits_t s) {
+  trit_t ty, ts;
+  MAM2_ASSERT(trits_size(y) == trits_size(s));
+  for (; !trits_is_empty(y); y = trits_drop(y, 1), s = trits_drop(s, 1)) {
+    ty = trits_get1(y);
+    ts = trits_get1(s);
+    trit_swap_sub(&ty, &ts);
+    trits_put1(y, ty);
+    trits_put1(s, ts);
+  }
+}
+
+void flex_from_trits(trits_t t, flex_trit_t *flex_trits) {
+  size_t n = t.n - t.d;
+  flex_trits_from_trits(flex_trits, n, &t.p[t.d], n, n);
+}

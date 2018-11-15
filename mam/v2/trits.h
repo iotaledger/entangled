@@ -19,9 +19,10 @@
 #ifndef __MAM_V2_TRITS_H__
 #define __MAM_V2_TRITS_H__
 
-#include "mam/v2/alloc.h"
-#include "mam/v2/defs.h"
+#include "alloc.h"
+#include "defs.h"
 
+#include "common/trinary/flex_trit.h"
 #include "common/trinary/trit_tryte.h"
 
 /*! \brief Array of trits.
@@ -130,6 +131,26 @@ MAM2_API trit_t trit_add(trit_t x, trit_t s);
 
 /*! \brief Return `y - s (mods 3)`. */
 MAM2_API trit_t trit_sub(trit_t y, trit_t s);
+
+/*! \brief Copy and pad trits: `y` := pad10(`x`). */
+MAM2_API void trits_copy_pad10(trits_t x, trits_t y);
+
+/*! \brief Pad trits: `y` := pad10(`y`). */
+MAM2_API void trits_pad10(trits_t y);
+
+/*! \brief Check whether `x` and `y` point to the same memory location.
+\note `trits_is_same(x, y)` implies `0 == trits_cmp_grlex(x, y)` but not vice
+versa. */
+MAM2_INLINE MAM2_API bool_t trits_is_same(trits_t x, trits_t y);
+
+/*! \brief Copy and add trits: `y` := `x` + `s`, `s` := `x`. */
+MAM2_API void trits_copy_add(trits_t x, trits_t s, trits_t y);
+/*! \brief Copy and sub trits: `x` := `y` - `s`, `s` := `x`. */
+MAM2_API void trits_copy_sub(trits_t y, trits_t s, trits_t x);
+MAM2_API void trits_swap_add(trits_t x, trits_t s);
+MAM2_API void trits_swap_sub(trits_t y, trits_t s);
+
+void flex_from_trits(trits_t t, flex_trit_t *flex_trits);
 
 /*! \brief Print string rep of `x` into stdout if MAM2_DEBUG defined. */
 #ifdef MAM2_DEBUG

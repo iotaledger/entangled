@@ -23,29 +23,19 @@ static trit_t curl_table[] = {1, 0, -1, 2, 1, -1, 0, 2, -1, 1, 0};
 
 /*! \brief Curl transform */
 static void curl_f(int rounds, void *buf, trit_t *s) {
-  flex_trit_t flex_trits_state[FLEX_SPONGE_WIDTH];
-  flex_trits_from_trits(flex_trits_state, FLEX_SPONGE_WIDTH, s,
-                        FLEX_SPONGE_WIDTH, FLEX_SPONGE_WIDTH);
-  flex_trit_t flex_trits_stack[FLEX_SPONGE_WIDTH];
-  flex_trits_from_trits(flex_trits_stack, FLEX_SPONGE_WIDTH, (trit_t *)buf,
-                        FLEX_SPONGE_WIDTH, FLEX_SPONGE_WIDTH);
-  trit_t t, prev_t = flex_trits_at(flex_trits_state, FLEX_SPONGE_WIDTH, 0);
+  trits_t x, state = trits_from_rep(MAM2_SPONGE_WIDTH, s);
+  trits_t stack = trits_from_rep(MAM2_SPONGE_WIDTH, (trit_t *)buf);
+  trit_t t, prev = trits_get1(state);
   size_t i, j = 0;
-
-  flex_trit_t *stack_p = flex_trits_stack;
-  size_t stack_pos = 0;
-  size_t state_pos = 0;
   for (; rounds--;) {
-    flex_trits_slice(flex_trits_state, FLEX_SPONGE_WIDTH, flex_trits_stack,
-                     FLEX_SPONGE_WIDTH, state_pos, FLEX_SPONGE_WIDTH);
+    x = state;
+    trits_copy(x, stack);
     for (i = 0; i++ < MAM2_SPONGE_WIDTH;) {
       j = (j < 365) ? (j + 364) : (j - 365);
-      stack_pos = j;
-      t = flex_trits_at(stack_p, FLEX_SPONGE_WIDTH, stack_pos);
-      flex_trits_set_at(flex_trits_state, FLEX_SPONGE_WIDTH, 0,
-                        curl_table[prev_t + (t << 2) + 5]);
-      state_pos++;
-      prev_t = t;
+      t = trits_get1(trits_drop(stack, j));
+      trits_put1(x, curl_table[prev + (t << 2) + 5]);
+      x = trits_drop(x, 1);
+      prev = t;
     }
   }
 }
