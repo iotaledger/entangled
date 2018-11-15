@@ -15,7 +15,6 @@
 #ifndef __MAM_V2_TEST_STRUCTS_H__
 #define __MAM_V2_TEST_STRUCTS_H__
 
-#include "mam/v2/alloc.h"
 #include "mam/v2/buffers.h"
 #include "mam/v2/curl.h"
 #include "mam/v2/mam.h"

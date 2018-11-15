@@ -201,7 +201,7 @@ MAM2_SAPI err_t pb3_decode_trytes(trits_t *trytes, trits_t *b) {
   return e;
 }
 
-MAM2_SAPI err_t pb3_decode_trytes2(ialloc *a, trits_t *trytes, trits_t *b) {
+MAM2_SAPI err_t pb3_decode_trytes2(trits_t *trytes, trits_t *b) {
   err_t e = err_internal_error;
   trits_t t = trits_null();
 
@@ -213,7 +213,7 @@ MAM2_SAPI err_t pb3_decode_trytes2(ialloc *a, trits_t *trytes, trits_t *b) {
     err_guard(trits_size(*b) >= pb3_sizeof_ntrytes(n), err_pb3_eof);
 
     if (trits_is_null(*trytes)) {
-      t = trits_alloc(a, 3 * n);
+      t = trits_alloc(3 * n);
       err_guard(!trits_is_null(t), err_bad_alloc);
       err_bind(pb3_decode_ntrytes(t, b));
       *trytes = t;
@@ -227,7 +227,7 @@ MAM2_SAPI err_t pb3_decode_trytes2(ialloc *a, trits_t *trytes, trits_t *b) {
     e = err_ok;
   } while (0);
 
-  if (!trits_is_null(t)) trits_free(a, t);
+  if (!trits_is_null(t)) trits_free(t);
 
   return e;
 }

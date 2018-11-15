@@ -19,36 +19,35 @@
 #include "mam/v2/pb3.h"
 
 MAM2_SAPI err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, iprng *p,
-                                mss_mt_height_t d, trits_t N1, trits_t N2) {
+                                mss_mt_height_t d, trits_t nonce1,
+                                trits_t nonce2) {
   err_t e = err_internal_error;
-  ialloc *a;
   MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
-  a = ma->a;
 
   do {
-    err_bind(mss_create(a, m, d));
+    err_bind(mss_create(m, d));
 
     m->nonce1 = trits_null();
-    if (!trits_is_empty(N1)) {
-      m->nonce1 = trits_alloc(a, trits_size(N1));
+    if (!trits_is_empty(nonce1)) {
+      m->nonce1 = trits_alloc(trits_size(nonce1));
       err_guard(!trits_is_null(m->nonce1), err_bad_alloc);
     }
 
     m->nonce2 = trits_null();
-    if (!trits_is_empty(N2)) {
-      m->nonce2 = trits_alloc(a, trits_size(N2));
+    if (!trits_is_empty(nonce2)) {
+      m->nonce2 = trits_alloc(trits_size(nonce2));
       err_guard(!trits_is_null(m->nonce2), err_bad_alloc);
     }
 
-    m->sponge = ma->create_sponge(a);
+    m->sponge = ma->create_sponge();
     err_guard(m->sponge, err_bad_alloc);
 
-    m->wots = mam2_alloc(a, sizeof(iwots));
+    m->wots = malloc(sizeof(iwots));
     err_guard(m->wots, err_bad_alloc);
-    err_bind(wots_create(a, m->wots));
+    err_bind(wots_create(m->wots));
 
-    m->wots->s = ma->create_sponge(a);
+    m->wots->s = ma->create_sponge();
     err_guard(m->wots->s, err_bad_alloc);
     wots_init(m->wots, m->wots->s);
 
@@ -61,27 +60,25 @@ MAM2_SAPI err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, iprng *p,
 }
 
 MAM2_SAPI void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m) {
-  ialloc *a;
   MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
-  a = ma->a;
 
   m->prng = NULL;
 
-  trits_free(a, m->nonce1);
-  trits_free(a, m->nonce2);
+  trits_free(m->nonce1);
+  trits_free(m->nonce2);
 
   if (m->wots) {
-    ma->destroy_sponge(a, m->wots->s);
+    ma->destroy_sponge(m->wots->s);
     m->wots->s = 0;
   }
-  wots_destroy(a, m->wots);
+  wots_destroy(m->wots);
   m->wots = NULL;
 
-  ma->destroy_sponge(a, m->sponge);
+  ma->destroy_sponge(m->sponge);
   m->sponge = NULL;
 
-  mss_destroy(a, m);
+  mss_destroy(m);
 }
 
 MAM2_SAPI trits_t mam2_channel_id(mam2_channel *ch) {
@@ -285,7 +282,6 @@ static trits_t mam2_send_msg_cfg_key(mam2_send_msg_context *cfg) {
 MAM2_SAPI err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
   err_t e = err_internal_error;
 
-  ialloc *a;
   isponge *s;
   isponge *fork;
   trits_t b0, *b;
@@ -298,7 +294,6 @@ MAM2_SAPI err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
   MAM2_ASSERT(cfg->ch);
   MAM2_ASSERT(cfg->ma);
   MAM2_ASSERT(cfg->s);
-  a = cfg->ma->a;
   s = cfg->s;
   fork = cfg->fork;
 
@@ -306,7 +301,7 @@ MAM2_SAPI err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
     err_guard(msg, err_invalid_argument);
     msg_size = mam2_send_msg_size(cfg);
     if (trits_is_null(*msg)) {
-      _msg = trits_alloc(a, msg_size);
+      _msg = trits_alloc(msg_size);
       err_guard(!trits_is_null(_msg), err_bad_alloc);
       *msg = _msg;
     } else
@@ -523,7 +518,7 @@ MAM2_SAPI err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
     e = err_ok;
   } while (0);
 
-  trits_free(a, _msg);
+  trits_free(_msg);
   trits_set_zero(mam2_send_msg_cfg_key(cfg));
 
   return e;
@@ -659,7 +654,6 @@ static trits_t mam2_recv_msg_cfg_ntru_id(mam2_recv_msg_context *cfg) {
 MAM2_SAPI err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
   err_t e = err_internal_error;
 
-  ialloc *a;
   isponge *s;
   isponge *fork;
   trits_t b0, *b;
@@ -670,7 +664,6 @@ MAM2_SAPI err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
   MAM2_ASSERT(cfg->epid);
   MAM2_ASSERT(cfg->ma);
   MAM2_ASSERT(cfg->s);
-  a = cfg->ma->a;
   s = cfg->s;
   fork = cfg->fork;
   b = msg;
@@ -842,7 +835,6 @@ MAM2_SAPI err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
 MAM2_SAPI err_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
                                  trits_t *payload) {
   err_t e = err_internal_error;
-  ialloc *a;
   isponge *s;
   trits_t b0, *b = packet;
 
@@ -852,7 +844,6 @@ MAM2_SAPI err_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
   MAM2_ASSERT(packet);
   MAM2_ASSERT(payload);
   s = cfg->s;
-  a = cfg->ma->a;
 
   do {
     tryte_t checksum = -1;
@@ -863,7 +854,7 @@ MAM2_SAPI err_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
 
     //  encrypted trytes payload;
     b0 = *b;
-    err_bind(pb3_decode_trytes2(a, payload, b));
+    err_bind(pb3_decode_trytes2(payload, b));
     pb3_unwrap_encrypted(s, trits_diff(b0, *b));
 
     //  donthash oneof checksum

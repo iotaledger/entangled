@@ -201,19 +201,17 @@ bool_t mss_verify(isponge *ms, isponge *ws, trits_t hash, trits_t sig,
  * Non Merkle tree related objects (WOTS, PRNG, Sponge interfaces)
  * must be allocated separately
  *
- * @param a
  * @param mss MSS interface
  * @param height Merkle-tree height
  */
-err_t mss_create(ialloc *a, mss_t *mss, mss_mt_height_t height);
+err_t mss_create(mss_t *mss, mss_mt_height_t height);
 
 /**
  * Deallocate memory for internal Merkle tree structure
  * Pointer `mss` must be freed afterwards
  *
- * @param a
  * @param mss MSS interface
  */
-void mss_destroy(ialloc *a, mss_t *mss);
+void mss_destroy(mss_t *mss);
 
 #endif  // __MAM_V2_MSS_H__

@@ -19,8 +19,7 @@
 #ifndef __MAM_V2_TRITS_H__
 #define __MAM_V2_TRITS_H__
 
-#include "alloc.h"
-#include "defs.h"
+#include "mam/v2/defs.h"
 
 #include "common/trinary/flex_trit.h"
 #include "common/trinary/trit_tryte.h"
@@ -121,10 +120,10 @@ In such case trits should be passed by pointer: `trits_t *x`.
 MAM2_INLINE MAM2_API bool_t trits_is_null(trits_t x);
 
 /*! \brief Alloc `n` trits. */
-MAM2_API trits_t trits_alloc(ialloc *a, size_t n);
+MAM2_API trits_t trits_alloc(size_t n);
 
 /*! \brief Free trits `x`. */
-MAM2_API void trits_free(ialloc *a, trits_t x);
+MAM2_API void trits_free(trits_t x);
 
 /*! \brief Return `x + s (mods 3)`. */
 MAM2_API trit_t trit_add(trit_t x, trit_t s);

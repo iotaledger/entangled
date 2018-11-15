@@ -17,7 +17,6 @@
 #ifndef __MAM_V2_PB3_H__
 #define __MAM_V2_PB3_H__
 
-#include "mam/v2//alloc.h"
 #include "mam/v2//err.h"
 #include "mam/v2/defs.h"
 #include "mam/v2/sponge.h"
@@ -76,7 +75,7 @@ MAM2_API void pb3_encode_trytes(trits_t trytes, trits_t *b);
 
 MAM2_API err_t pb3_decode_trytes(trits_t *trytes, trits_t *b);
 
-MAM2_API err_t pb3_decode_trytes2(ialloc *a, trits_t *trytes, trits_t *b);
+MAM2_API err_t pb3_decode_trytes2(trits_t *trytes, trits_t *b);
 
 /*
 Protobuf3 cryptographic modifier handling:

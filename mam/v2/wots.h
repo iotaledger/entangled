@@ -17,7 +17,6 @@
 #ifndef __MAM_V2_WOTS_H__
 #define __MAM_V2_WOTS_H__
 
-#include "mam/v2/alloc.h"
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
 #include "mam/v2/prng.h"
@@ -99,10 +98,10 @@ MAM2_API bool_t wots_verify(isponge *s,  /*!< [in] Sponge interface */
 );
 
 /*! \brief Allocate memory for WOTS private key. */
-MAM2_API err_t wots_create(ialloc *a, iwots *w);
+MAM2_API err_t wots_create(iwots *w);
 
 /*! \brief Deallocate memory for WOTS private key. */
-MAM2_API void wots_destroy(ialloc *a, iwots *w);
+MAM2_API void wots_destroy(iwots *w);
 
 MAM2_API trits_t wots_sk_trits(iwots *w);
 

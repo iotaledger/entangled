@@ -9,7 +9,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/alloc.h"
 #include "mam/v2/buffers.h"
 #include "mam/v2/curl.h"
 #include "mam/v2/mam.h"
@@ -38,8 +37,7 @@ void mss_test_do(mss_t *m, iprng *p, isponge *s, iwots *w, mss_mt_height_t D) {
   MAM2_TRITS_DEF(H, MAM2_MSS_HASH_SIZE);
   MAM2_TRITS_DEF(pk, MAM2_MSS_PK_SIZE);
   // MAM2_TRITS_DEF(sig_, MAM2_MSS_SIG_SIZE(MAM2_MSS_TEST_MAX_D));
-  ialloc *a = 0;
-  trits_t sig_ = trits_alloc(a, MAM2_MSS_SIG_SIZE(D));
+  trits_t sig_ = trits_alloc(MAM2_MSS_SIG_SIZE(D));
 
   const char *k_str =
       "ABCNOABCNKOZWYKOZWYSDF9SDF9"
@@ -112,7 +110,7 @@ void mss_test_do(mss_t *m, iprng *p, isponge *s, iwots *w, mss_mt_height_t D) {
     } while (mss_next(m));
   }
 
-  trits_free(a, sig_);
+  trits_free(sig_);
 }
 
 void mss_test() {

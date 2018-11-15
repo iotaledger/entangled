@@ -44,13 +44,6 @@ cc_library(
 )
 
 cc_library(
-    name = "alloc",
-    srcs = ["alloc.c"],
-    hdrs = ["alloc.h"],
-    deps = [":defs"],
-)
-
-cc_library(
     name = "buffers",
     srcs = ["buffers.c"],
     hdrs = ["buffers.h"],
@@ -66,7 +59,6 @@ cc_library(
     srcs = ["trits.c"],
     hdrs = ["trits.h"],
     deps = [
-        ":alloc",
         ":defs",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_tryte",

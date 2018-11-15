@@ -5,7 +5,6 @@
 #include <time.h>
 #include <unity/unity.h>
 
-#include "mam/v2/alloc.h"
 #include "mam/v2/buffers.h"
 #include "mam/v2/curl.h"
 #include "mam/v2/mam.h"
@@ -31,9 +30,8 @@ void test_sponge_hash(size_t Xn, char *X, size_t Yn, char *Y) {
   test_sponge_t _s[1];
   isponge *s = test_sponge_init(_s);
 
-  ialloc *a = 0;
-  trits_t tX = trits_alloc(a, 3 * Xn);
-  trits_t tY = trits_alloc(a, 3 * Yn);
+  trits_t tX = trits_alloc(3 * Xn);
+  trits_t tY = trits_alloc(3 * Yn);
 
   sponge_init(s);
   trytes_to_trits(X, tX.p, MIN(strlen(X), tX.n / RADIX));
@@ -42,8 +40,8 @@ void test_sponge_hash(size_t Xn, char *X, size_t Yn, char *Y) {
   sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, tY);
   trits_to_trytes(tY.p, Y, tY.n);
 
-  trits_free(a, tX);
-  trits_free(a, tY);
+  trits_free(tX);
+  trits_free(tY);
 }
 
 void test_sponge_encr(size_t Kn, char *K, size_t Xn, char *X, size_t Yn,
@@ -51,10 +49,9 @@ void test_sponge_encr(size_t Kn, char *K, size_t Xn, char *X, size_t Yn,
   test_sponge_t _s[1];
   isponge *s = test_sponge_init(_s);
 
-  ialloc *a = 0;
-  trits_t tK = trits_alloc(a, 3 * Kn);
-  trits_t tX = trits_alloc(a, 3 * Xn);
-  trits_t tY = trits_alloc(a, 3 * Yn);
+  trits_t tK = trits_alloc(3 * Kn);
+  trits_t tX = trits_alloc(3 * Xn);
+  trits_t tY = trits_alloc(3 * Yn);
 
   sponge_init(s);
   trytes_to_trits(K, tK.p, MIN(strlen(K), tK.n / RADIX));
@@ -63,9 +60,9 @@ void test_sponge_encr(size_t Kn, char *K, size_t Xn, char *X, size_t Yn,
   sponge_encr(s, tX, tY);
   trits_to_trytes(tY.p, Y, tY.n);
 
-  trits_free(a, tK);
-  trits_free(a, tX);
-  trits_free(a, tY);
+  trits_free(tK);
+  trits_free(tX);
+  trits_free(tY);
 }
 
 void test_sponge_decr(size_t Kn, char *K, size_t Yn, char *Y, size_t Xn,
@@ -73,10 +70,9 @@ void test_sponge_decr(size_t Kn, char *K, size_t Yn, char *Y, size_t Xn,
   test_sponge_t _s[1];
   isponge *s = test_sponge_init(_s);
 
-  ialloc *a = 0;
-  trits_t tK = trits_alloc(a, 3 * Kn);
-  trits_t tY = trits_alloc(a, 3 * Yn);
-  trits_t tX = trits_alloc(a, 3 * Xn);
+  trits_t tK = trits_alloc(3 * Kn);
+  trits_t tY = trits_alloc(3 * Yn);
+  trits_t tX = trits_alloc(3 * Xn);
 
   sponge_init(s);
   trytes_to_trits(K, tK.p, MIN(strlen(K), tK.n / RADIX));
@@ -86,9 +82,9 @@ void test_sponge_decr(size_t Kn, char *K, size_t Yn, char *Y, size_t Xn,
 
   sponge_decr(s, tY, tX);
   trits_to_trytes(tX.p, X, tX.n);
-  trits_free(a, tK);
-  trits_free(a, tY);
-  trits_free(a, tX);
+  trits_free(tK);
+  trits_free(tY);
+  trits_free(tX);
 }
 
 void test_prng_gen(size_t Kn, char *K, size_t Nn, char *N, size_t Yn, char *Y) {
@@ -97,10 +93,9 @@ void test_prng_gen(size_t Kn, char *K, size_t Nn, char *N, size_t Yn, char *Y) {
   isponge *s = test_sponge_init(_s);
   iprng *p = test_prng_init(_p, s);
 
-  ialloc *a = 0;
-  trits_t tK = trits_alloc(a, 3 * Kn);
-  trits_t tN = trits_alloc(a, 3 * Nn);
-  trits_t tY = trits_alloc(a, 3 * Yn);
+  trits_t tK = trits_alloc(3 * Kn);
+  trits_t tN = trits_alloc(3 * Nn);
+  trits_t tY = trits_alloc(3 * Yn);
 
   trytes_to_trits(K, tK.p, MIN(tK.n / RADIX, strlen(K)));
   prng_init(p, s, tK);
@@ -109,9 +104,9 @@ void test_prng_gen(size_t Kn, char *K, size_t Nn, char *N, size_t Yn, char *Y) {
   prng_gen(p, 0, tN, tY);
   trits_to_trytes(&tY.p[tY.d], Y, tY.n - tY.d);
 
-  trits_free(a, tK);
-  trits_free(a, tN);
-  trits_free(a, tY);
+  trits_free(tK);
+  trits_free(tN);
+  trits_free(tY);
 }
 
 void test_wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
@@ -123,12 +118,11 @@ void test_wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   iprng *p = test_prng_init(_p, s);
   iwots *w = test_wots_init(_w, s);
 
-  ialloc *a = 0;
-  trits_t tK = trits_alloc(a, 3 * Kn);
-  trits_t tN = trits_alloc(a, 3 * Nn);
-  trits_t tpk = trits_alloc(a, 3 * pkn);
-  trits_t tH = trits_alloc(a, 3 * Hn);
-  trits_t tsig = trits_alloc(a, 3 * sign);
+  trits_t tK = trits_alloc(3 * Kn);
+  trits_t tN = trits_alloc(3 * Nn);
+  trits_t tpk = trits_alloc(3 * pkn);
+  trits_t tH = trits_alloc(3 * Hn);
+  trits_t tsig = trits_alloc(3 * sign);
 
   trytes_to_trits(K, tK.p, MIN(strlen(K), tK.n / RADIX));
   prng_init(p, s, tK);
@@ -141,11 +135,11 @@ void test_wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   wots_sign(w, tH, tsig);
   trits_to_trytes(tsig.p, sig, MIN(tsig.n / RADIX, strlen(sig)));
 
-  trits_free(a, tK);
-  trits_free(a, tN);
-  trits_free(a, tpk);
-  trits_free(a, tH);
-  trits_free(a, tsig);
+  trits_free(tK);
+  trits_free(tN);
+  trits_free(tpk);
+  trits_free(tH);
+  trits_free(tsig);
 }
 
 void test() {

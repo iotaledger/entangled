@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -9,7 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/alloc.h"
 #include "mam/v2/buffers.h"
 #include "mam/v2/curl.h"
 #include "mam/v2/mam.h"
@@ -28,13 +26,12 @@
 #include <memory.h>
 #include <stdio.h>
 
-static isponge *test_create_sponge(ialloc *a) {
-  test_sponge_t *t = mam2_alloc(a, sizeof(test_sponge_t));
+static isponge *test_create_sponge() {
+  test_sponge_t *t = malloc(sizeof(test_sponge_t));
   return test_sponge_init(t);
 }
-static void test_delete_sponge(ialloc *a, isponge *s) {
-  mam2_free(a, (test_sponge_t *)s);
-}
+
+static void test_delete_sponge(isponge *s) { free((test_sponge_t *)s); }
 
 MAM2_SAPI void mam_test_do(isponge *s, void *sponge_alloc_ctx,
                            isponge *(create_sponge)(void *ctx),

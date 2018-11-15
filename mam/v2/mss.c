@@ -460,7 +460,7 @@ bool_t mss_verify(isponge *ms, isponge *ws, trits_t H, trits_t sig,
   return (0 == trits_cmp_grlex(apk, pk)) ? 1 : 0;
 }
 
-err_t mss_create(ialloc *a, mss_t *mss, mss_mt_height_t d) {
+err_t mss_create(mss_t *mss, mss_mt_height_t d) {
   err_t e = err_internal_error;
   MAM2_ASSERT(mss);
 
@@ -469,22 +469,23 @@ err_t mss_create(ialloc *a, mss_t *mss, mss_mt_height_t d) {
     err_guard(0 <= d && d <= MAM2_MSS_MAX_HEIGHT, err_invalid_argument);
 
 #if defined(MAM2_MSS_TRAVERSAL)
-    mss->auth_path = mam2_words_alloc(a, MAM2_MSS_MT_AUTH_WORDS(d));
+    mss->auth_path =
+        (trit_t *)malloc(sizeof(trit_t) * MAM2_MSS_MT_AUTH_WORDS(d));
     err_guard(mss->auth_path, err_bad_alloc);
 
     // add 1 extra hash for dirty hack (see mss.c)
-    mss->hashes = mam2_words_alloc(a, MAM2_MSS_MT_HASH_WORDS(d, 1));
+    mss->hashes =
+        (trit_t *)malloc(sizeof(trit_t) * MAM2_MSS_MT_HASH_WORDS(d, 1));
     err_guard(mss->hashes, err_bad_alloc);
 
     // add 1 extra node for dirty hack (see mss.c)
-    mss->nodes =
-        mam2_alloc(a, sizeof(mss_mt_node_t) * (MAM2_MSS_MT_NODES(d) + 1));
+    mss->nodes = malloc(sizeof(mss_mt_node_t) * (MAM2_MSS_MT_NODES(d) + 1));
     err_guard(mss->nodes, err_bad_alloc);
 
-    mss->stacks = mam2_alloc(a, sizeof(mss_mt_stack_t) * MAM2_MSS_MT_STACKS(d));
+    mss->stacks = malloc(sizeof(mss_mt_stack_t) * MAM2_MSS_MT_STACKS(d));
     err_guard(mss->nodes, err_bad_alloc);
 #else
-    mss->merkle_tree = mam2_words_alloc(a, MAM2_MSS_MT_WORDS(d));
+    mss->merkle_tree = (trit_t *)malloc(sizeof(trit_t) * MAM2_MSS_MT_WORDS(d));
     err_guard(mss->merkle_tree, err_bad_alloc);
 #endif
 
@@ -495,26 +496,30 @@ err_t mss_create(ialloc *a, mss_t *mss, mss_mt_height_t d) {
   return e;
 }
 
-void mss_destroy(ialloc *a, mss_t *mss) {
+void mss_destroy(mss_t *mss) {
   MAM2_ASSERT(mss);
 
 #if defined(MAM2_MSS_TRAVERSAL)
   if (mss->auth_path) {
-    mam2_words_free(a, mss->auth_path), mss->auth_path = 0;
+    free(mss->auth_path);
+    mss->auth_path = NULL;
   }
   if (mss->hashes) {
-    mam2_words_free(a, mss->hashes), mss->hashes = 0;
+    free(mss->hashes);
+    mss->hashes = NULL;
   }
   if (mss->nodes) {
-    mam2_free(a, mss->nodes), mss->nodes = 0;
+    free(mss->nodes);
+    mss->nodes = NULL;
   }
   if (mss->stacks) {
-    mam2_free(a, mss->stacks), mss->stacks = 0;
+    free(mss->stacks);
+    mss->stacks = NULL;
   }
 #else
   if (mss->merkle_tree) {
-    mam2_words_free(a, mss->merkle_tree);
-    mss->merkle_tree = 0;
+    free(mss->merkle_tree);
+    mss->merkle_tree = NULL;
   }
 #endif
 }

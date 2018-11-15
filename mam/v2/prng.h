@@ -18,7 +18,6 @@
 #ifndef __MAM_V2_PRNG_H__
 #define __MAM_V2_PRNG_H__
 
-#include "mam/v2/alloc.h"
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
 #include "mam/v2/sponge.h"
@@ -75,9 +74,9 @@ MAM2_SAPI void prng_gen3(iprng *p,   /*!< [in] PRNG interface */
 );
 
 /*! \brief Allocate memory for PRNG secret key. */
-MAM2_API err_t prng_create(ialloc *a, iprng *p);
+MAM2_API err_t prng_create(iprng *p);
 
 /*! \brief Deallocate memory for PRNG secret key. */
-MAM2_API void prng_destroy(ialloc *a, iprng *p);
+MAM2_API void prng_destroy(iprng *p);
 
 #endif  // __MAM_V2_PRNG_H__
