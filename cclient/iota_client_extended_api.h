@@ -231,8 +231,8 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetTransactionObjects.ts#L35
  */
 retcode_t iota_client_get_transaction_objects(
-    iota_client_service_t const* const serv, hashes_t const* const transactions,
-    transaction_objs_t* out_tx_objs);
+    iota_client_service_t const* const serv, get_trytes_req_t* const tx_hashes,
+    transaction_array_t out_tx_objs);
 
 /**
  * Checks if a transaction is _promotable_, by calling
