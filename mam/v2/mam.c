@@ -312,7 +312,7 @@ MAM2_SAPI err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
       mss_skn(cfg->ep->m, skn);
     else
       mss_skn(cfg->ch->m, skn);
-    prng_gen3(cfg->rng, MAM2_PRNG_DST_SECKEY, mam2_channel_name(cfg->ch),
+    prng_gen3(cfg->rng, MAM2_PRNG_DST_SEC_KEY, mam2_channel_name(cfg->ch),
               cfg->ep ? mam2_endpoint_name(cfg->ep) : trits_null(), skn,
               mam2_send_msg_cfg_key(cfg));
 
