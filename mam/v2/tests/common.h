@@ -39,8 +39,8 @@ typedef struct _test_sponge_s {
 } test_sponge_t;
 
 typedef struct _test_prng_s {
-  iprng p;
-  prng_key_t key;
+  prng_t p;
+  flex_trit_t key[FLEX_TRIT_SIZE_243];
 } test_prng_t;
 
 typedef struct _test_wots_s {
@@ -166,10 +166,10 @@ static isponge *test_sponge_init(test_sponge_t *s) {
   return &s->s;
 }
 
-static iprng *test_prng_init(test_prng_t *p, isponge *s) {
-  p->p.s = s;
-  p->p.k = p->key;
-  return &p->p;
+static prng_t *test_prng_init(test_prng_t *prng, isponge *sponge) {
+  prng->p.sponge = sponge;
+  memcpy(prng->p.key, prng->key, FLEX_TRIT_SIZE_243);
+  return &prng->p;
 }
 
 static iwots *test_wots_init(test_wots_t *w, isponge *s) {

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -9,27 +8,17 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/buffers.h"
-#include "mam/v2/curl.h"
-#include "mam/v2/mam.h"
-#include "mam/v2/mss.h"
-#include "mam/v2/ntru.h"
-#include "mam/v2/pb3.h"
+#include <unity/unity.h>
+
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
 #include "mam/v2/tests/common.h"
 #include "mam/v2/trits.h"
-#include "mam/v2/wots.h"
 #include "utils/macros.h"
 
-#include <string.h>
-#include <unity/unity.h>
-
-#include <memory.h>
-#include <stdio.h>
-
-MAM2_SAPI void prng_test_do(iprng *p) {
-  bool_t r = 1;
+void prng_test_do(prng_t *const prng) {
+  flex_trit_t key[FLEX_TRIT_SIZE_243];
+  // TODO Remove when sponge handles flex_trit_t
   MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
   MAM2_TRITS_DEF(N, 18);
   MAM2_TRITS_DEF(Y1, 243 * 2 + 18);
@@ -37,33 +26,34 @@ MAM2_SAPI void prng_test_do(iprng *p) {
 
   // init K
   trits_set_zero(K);
-  const char *k_str =
-      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM";
-  trytes_to_trits(k_str, K.p, MIN(strlen(k_str), K.n / RADIX));
+  tryte_t const *const key_trytes =
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCD"
+      "EFGHIJKLM";
+  trytes_to_trits(key_trytes, K.p, MIN(strlen(key_trytes), K.n / RADIX));
+  flex_trits_from_trytes(key, MAM2_PRNG_KEY_SIZE, key_trytes, HASH_LENGTH_TRYTE,
+                         HASH_LENGTH_TRYTE);
 
-  sponge_init(p->s);
-  sponge_absorb(p->s, MAM2_SPONGE_CTL_KEY, K);
-  sponge_squeeze(p->s, MAM2_SPONGE_CTL_KEY, K);
+  sponge_init(prng->sponge);
+  sponge_absorb(prng->sponge, MAM2_SPONGE_CTL_KEY, K);
+  sponge_squeeze(prng->sponge, MAM2_SPONGE_CTL_KEY, K);
   // init N
   trits_set_zero(N);
 
-  prng_init(p, p->s, K);
-  prng_gen(p, 0, N, Y1);
-  prng_gen(p, 1, N, Y2);
+  prng_init(prng, prng->sponge, key);
+  prng_gen(prng, 0, N, Y1);
+  prng_gen(prng, 1, N, Y2);
 
   int d = trits_cmp_grlex(Y1, Y2);
   TEST_ASSERT(d != 0);
 }
 
-MAM2_SAPI void prng_test() {
-  test_sponge_t _s[1];
-  test_prng_t _p[1];
+void prng_test() {
+  test_sponge_t _sponge;
+  test_prng_t _prng;
 
-  isponge *s = test_sponge_init(_s);
-  iprng *p = test_prng_init(_p, s);
-  prng_test_do(p);
+  isponge *sponge = test_sponge_init(&_sponge);
+  prng_t *prng = test_prng_init(&_prng, sponge);
+  prng_test_do(prng);
 }
 
 int main(void) {

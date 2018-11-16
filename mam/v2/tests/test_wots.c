@@ -28,7 +28,7 @@
 #include <memory.h>
 #include <stdio.h>
 
-MAM2_SAPI bool_t wots_test_do(iwots *w, iprng *p) {
+MAM2_SAPI bool_t wots_test_do(iwots *w, prng_t *p) {
   bool_t r = 1;
   MAM2_TRITS_DEF(N, 18);
   MAM2_TRITS_DEF(pk, MAM2_WOTS_PK_SIZE);
@@ -67,18 +67,21 @@ MAM2_SAPI void wots_test() {
   test_wots_t _w[1];
 
   isponge *s = test_sponge_init(_s);
-  iprng *p = test_prng_init(_p, s);
+  prng_t *p = test_prng_init(_p, s);
   iwots *w = test_wots_init(_w, s);
 
+  flex_trit_t key[FLEX_TRIT_SIZE_243];
+  // TODO Remove when sponge handles flex_trit_t
   MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
   // init K
   trits_set_zero(K);
-  const char *k_str =
-      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM";
-  trytes_to_trits(k_str, K.p, MIN(strlen(k_str), K.n / RADIX));
-  prng_init(p, p->s, K);
+  tryte_t const *const key_trytes =
+      "NOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCD"
+      "EFGHIJKLM";
+  flex_trits_from_trytes(key, MAM2_PRNG_KEY_SIZE, key_trytes, HASH_LENGTH_TRYTE,
+                         HASH_LENGTH_TRYTE);
+  trytes_to_trits(key_trytes, K.p, MIN(strlen(key_trytes), K.n / RADIX));
+  prng_init(p, p->sponge, key);
 
   wots_test_do(w, p);
 }

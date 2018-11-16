@@ -91,14 +91,18 @@ void test_prng_gen(size_t Kn, char *K, size_t Nn, char *N, size_t Yn, char *Y) {
   test_sponge_t _s[1];
   test_prng_t _p[1];
   isponge *s = test_sponge_init(_s);
-  iprng *p = test_prng_init(_p, s);
+  prng_t *p = test_prng_init(_p, s);
 
   trits_t tK = trits_alloc(3 * Kn);
   trits_t tN = trits_alloc(3 * Nn);
   trits_t tY = trits_alloc(3 * Yn);
 
+  flex_trit_t key[FLEX_TRIT_SIZE_243];
+  flex_trits_from_trytes(key, MAM2_PRNG_KEY_SIZE, K, HASH_LENGTH_TRYTE,
+                         HASH_LENGTH_TRYTE);
+
   trytes_to_trits(K, tK.p, MIN(tK.n / RADIX, strlen(K)));
-  prng_init(p, s, tK);
+  prng_init(p, s, key);
   trytes_to_trits(N, tN.p, MIN(tN.n / RADIX, strlen(N)));
   trytes_to_trits(N, tN.p, MIN(tN.n / RADIX, strlen(N)));
   prng_gen(p, 0, tN, tY);
@@ -115,7 +119,7 @@ void test_wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   test_prng_t _p[1];
   test_wots_t _w[1];
   isponge *s = test_sponge_init(_s);
-  iprng *p = test_prng_init(_p, s);
+  prng_t *p = test_prng_init(_p, s);
   iwots *w = test_wots_init(_w, s);
 
   trits_t tK = trits_alloc(3 * Kn);
@@ -124,8 +128,12 @@ void test_wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   trits_t tH = trits_alloc(3 * Hn);
   trits_t tsig = trits_alloc(3 * sign);
 
+  flex_trit_t key[FLEX_TRIT_SIZE_243];
+
   trytes_to_trits(K, tK.p, MIN(strlen(K), tK.n / RADIX));
-  prng_init(p, s, tK);
+  flex_trits_from_trytes(key, MAM2_PRNG_KEY_SIZE, K, HASH_LENGTH_TRYTE,
+                         HASH_LENGTH_TRYTE);
+  prng_init(p, s, key);
   trytes_to_trits(N, tN.p, MIN(strlen(N), tN.n / RADIX));
   wots_gen_sk(w, p, tN);
   wots_calc_pk(w, tpk);

@@ -29,8 +29,10 @@
 #include <memory.h>
 #include <stdio.h>
 
-void mss_test_do(mss_t *m, iprng *p, isponge *s, iwots *w, mss_mt_height_t D) {
+void mss_test_do(mss_t *m, prng_t *p, isponge *s, iwots *w, mss_mt_height_t D) {
   bool_t r = 1;
+  flex_trit_t key[FLEX_TRIT_SIZE_243];
+  // TODO Remove when sponge handles flex_trit_t
   MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
   mss_mt_height_t d;
   MAM2_TRITS_DEF(N, 24);
@@ -39,13 +41,14 @@ void mss_test_do(mss_t *m, iprng *p, isponge *s, iwots *w, mss_mt_height_t D) {
   // MAM2_TRITS_DEF(sig_, MAM2_MSS_SIG_SIZE(MAM2_MSS_TEST_MAX_D));
   trits_t sig_ = trits_alloc(MAM2_MSS_SIG_SIZE(D));
 
-  const char *k_str =
-      "ABCNOABCNKOZWYKOZWYSDF9SDF9"
-      "YSDF9QABCNKOZWYSDF9ABCNKOZW"
-      "SDF9CABCABCNKOZWYNKOZWYSDF9";
+  tryte_t const *const key_trytes =
+      "ABCNOABCNKOZWYKOZWYSDF9SDF9YSDF9QABCNKOZWYSDF9ABCNKOZWSDF9CABCABCNKOZWYN"
+      "KOZWYSDF9";
 
-  trytes_to_trits(k_str, K.p, MIN(strlen(k_str), K.n / RADIX));
-  prng_init(p, p->s, K);
+  trytes_to_trits(key_trytes, K.p, MIN(strlen(key_trytes), K.n / RADIX));
+  flex_trits_from_trytes(key, MAM2_PRNG_KEY_SIZE, key_trytes, HASH_LENGTH_TRYTE,
+                         HASH_LENGTH_TRYTE);
+  prng_init(p, p->sponge, key);
   trits_set_zero(N);
   trits_set_zero(H);
   const char *h_str =
@@ -124,7 +127,7 @@ void mss_test() {
   test_mss _m[1];
 
   isponge *s = test_sponge_init(_s);
-  iprng *p = test_prng_init(_p, s);
+  prng_t *p = test_prng_init(_p, s);
   iwots *w = test_wots_init(_w, s);
   mss_t *m1 = test_mss_init1(_m1);
   mss_t *m2 = test_mss_init2(_m2);

@@ -3,80 +3,95 @@
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file prng.c
-\brief MAM2 PRNG layer.
-*/
+#include <stdlib.h>
+
+#include "common/trinary/trit_long.h"
 #include "mam/v2/prng.h"
 
-static void prng_absorbn(isponge *s, size_t n, trits_t *KdN) {
+/*
+ * Private functions
+ */
+
+static void prng_absorbn(isponge *const s, size_t const n,
+                         trits_t const *const trits_to_absorb) {
   sponge_init(s);
-  sponge_absorbn(s, MAM2_SPONGE_CTL_KEY, n, KdN);
+  sponge_absorbn(s, MAM2_SPONGE_CTL_KEY, n, trits_to_absorb);
 }
 
-static void prng_squeeze(isponge *s, trits_t Y) {
-  sponge_squeeze(s, MAM2_SPONGE_CTL_PRN, Y);
+static void prng_squeeze(isponge *const s, trits_t output) {
+  sponge_squeeze(s, MAM2_SPONGE_CTL_PRN, output);
 }
 
-MAM2_INLINE static trits_t prng_key_trits(iprng *p) {
-  return trits_from_rep(MAM2_PRNG_KEY_SIZE, p->k);
+/*
+ * Public functions
+ */
+
+void prng_create(prng_t *const prng) {
+  prng->sponge = NULL;
+  memset(prng->key, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
 }
 
-MAM2_SAPI void prng_init(iprng *p, isponge *s, trits_t K) {
-  MAM2_ASSERT(trits_size(K) == MAM2_PRNG_KEY_SIZE);
-
-  p->s = s;
-  trits_copy(K, prng_key_trits(p));
+void prng_init(prng_t *const prng, isponge *const sponge,
+               flex_trit_t const *const key) {
+  prng->sponge = sponge;
+  memcpy(prng->key, key, FLEX_TRIT_SIZE_243);
 }
 
-MAM2_SAPI void prng_gen(iprng *p, trint3_t d, trits_t N, trits_t Y) {
-  MAM2_TRITS_DEF(dt, 3);
-  trits_t KdN[3] = {prng_key_trits(p), dt, N};
-  trits_put3(dt, d);
-  prng_absorbn(p->s, 3, KdN);
-  prng_squeeze(p->s, Y);
+// TODO Switch input/output to flex_trit_t when sponge handle them
+void prng_gen(prng_t *const prng, uint8_t const dest, trits_t const nonce,
+              trits_t output) {
+  trit_t key_trits[MAM2_PRNG_KEY_SIZE];
+  trit_t dest_trits[3];
+  trits_t trits_to_absorb[3] = {trits_from_rep(MAM2_PRNG_KEY_SIZE, key_trits),
+                                trits_from_rep(3, dest_trits), nonce};
+
+  flex_trits_to_trits(key_trits, MAM2_PRNG_KEY_SIZE, prng->key,
+                      MAM2_PRNG_KEY_SIZE, MAM2_PRNG_KEY_SIZE);
+  long_to_trits(dest, dest_trits);
+
+  prng_absorbn(prng->sponge, 3, trits_to_absorb);
+  prng_squeeze(prng->sponge, output);
 }
 
-MAM2_SAPI void prng_gen2(iprng *p, trint3_t d, trits_t N1, trits_t N2,
-                         trits_t Y) {
-  MAM2_TRITS_DEF(dt, 3);
-  trits_t KdN[4] = {prng_key_trits(p), dt, N1, N2};
-  trits_put3(dt, d);
-  prng_absorbn(p->s, 4, KdN);
-  prng_squeeze(p->s, Y);
+// TODO Switch input/output to flex_trit_t when sponge handle them
+void prng_gen2(prng_t *const prng, uint8_t const dest, trits_t const nonce1,
+               trits_t const nonce2, trits_t output) {
+  trit_t key_trits[MAM2_PRNG_KEY_SIZE];
+  trit_t dest_trits[3];
+  trits_t trits_to_absorb[4] = {trits_from_rep(MAM2_PRNG_KEY_SIZE, key_trits),
+                                trits_from_rep(3, dest_trits), nonce1, nonce2};
+
+  flex_trits_to_trits(key_trits, MAM2_PRNG_KEY_SIZE, prng->key,
+                      MAM2_PRNG_KEY_SIZE, MAM2_PRNG_KEY_SIZE);
+  long_to_trits(dest, dest_trits);
+
+  prng_absorbn(prng->sponge, 4, trits_to_absorb);
+  prng_squeeze(prng->sponge, output);
 }
 
-MAM2_SAPI void prng_gen3(iprng *p, trint3_t d, trits_t N1, trits_t N2,
-                         trits_t N3, trits_t Y) {
-  memset(Y.p, 0, Y.n);
-  MAM2_TRITS_DEF(dt, 3);
-  trits_t KdN[5] = {prng_key_trits(p), dt, N1, N2, N3};
-  trits_put3(dt, d);
-  prng_absorbn(p->s, 5, KdN);
-  prng_squeeze(p->s, Y);
+// TODO Switch input/output to flex_trit_t when sponge handle them
+void prng_gen3(prng_t *const prng, uint8_t const dest, trits_t const nonce1,
+               trits_t const nonce2, trits_t const nonce3, trits_t output) {
+  trit_t key_trits[MAM2_PRNG_KEY_SIZE];
+  trit_t dest_trits[3];
+  trits_t trits_to_absorb[5] = {trits_from_rep(MAM2_PRNG_KEY_SIZE, key_trits),
+                                trits_from_rep(3, dest_trits), nonce1, nonce2,
+                                nonce3};
+
+  flex_trits_to_trits(key_trits, MAM2_PRNG_KEY_SIZE, prng->key,
+                      MAM2_PRNG_KEY_SIZE, MAM2_PRNG_KEY_SIZE);
+  long_to_trits(dest, dest_trits);
+
+  prng_absorbn(prng->sponge, 5, trits_to_absorb);
+  prng_squeeze(prng->sponge, output);
 }
 
-MAM2_SAPI err_t prng_create(iprng *p) {
-  err_t e = err_internal_error;
-  MAM2_ASSERT(p);
-  do {
-    memset(p, 0, sizeof(iprng));
-    p->k = (trit_t *)malloc(sizeof(trit_t) * MAM2_WORDS(MAM2_PRNG_KEY_SIZE));
-    err_guard(p->k, err_bad_alloc);
-    e = err_ok;
-  } while (0);
-  return e;
-}
-
-MAM2_SAPI void prng_destroy(iprng *p) {
-  MAM2_ASSERT(p);
-  free(p->k);
-  p->k = 0;
+void prng_destroy(prng_t *const prng) {
+  prng->sponge = NULL;
+  memset(prng->key, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
 }

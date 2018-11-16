@@ -33,7 +33,7 @@ typedef struct _mam2_ialloc {
   void (*destroy_sponge)(isponge *); /*!< Deallocator. */
 } mam2_ialloc;
 
-MAM2_API err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, iprng *p,
+MAM2_API err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
                                mss_mt_height_t d, trits_t N1, trits_t N2);
 
 MAM2_API void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m);
@@ -56,7 +56,7 @@ def_mam2_list(mam2_channel_node, mam2_channel_list);
 */
 MAM2_API err_t mam2_channel_create(
     mam2_ialloc *ma, /*!< [in] Allocator. */
-    iprng *
+    prng_t *
         p, /*! [in] Shared PRNG interface used to generate WOTS private keys. */
     mss_mt_height_t d, /*!< [in] MSS MT height. */
     trits_t ch_name,   /*!< [in] Channel name. */
@@ -96,7 +96,7 @@ def_mam2_list(mam2_endpoint_node, mam2_endpoint_list);
 */
 MAM2_API err_t mam2_endpoint_create(
     mam2_ialloc *ma, /*!< [in] Allocator. */
-    iprng *
+    prng_t *
         p, /*! [in] Shared PRNG interface used to generate WOTS private keys. */
     mss_mt_height_t d, /*!< [in] MSS MT height. */
     trits_t ch_name,   /*!< [in] Channel name. */
@@ -143,8 +143,8 @@ typedef struct _mam2_send_msg_context {
   mam2_ialloc *ma; /*!< Allocator. */
   isponge *s;      /*!< Main Sponge interface used to wrap PB3 messages. */
   isponge *fork;   /*!< Sponge interface used for PB3 forks. */
-  iprng *prng; /*!< Shared deterministic PRNG instance used to gen MSS keys. */
-  iprng *rng;  /*!< Volatile PRNG instance used to generate ephemeral keys. */
+  prng_t *prng; /*!< Shared deterministic PRNG instance used to gen MSS keys. */
+  prng_t *rng;  /*!< Volatile PRNG instance used to generate ephemeral keys. */
 
   mam2_channel *ch;  /*!< Current channel. */
   mam2_channel *ch1; /*!< New channel (may be null). */

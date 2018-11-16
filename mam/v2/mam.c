@@ -18,7 +18,7 @@
 #include "mam/v2/mam.h"
 #include "mam/v2/pb3.h"
 
-MAM2_SAPI err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, iprng *p,
+MAM2_SAPI err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
                                 mss_mt_height_t d, trits_t nonce1,
                                 trits_t nonce2) {
   err_t e = err_internal_error;
@@ -91,7 +91,7 @@ static size_t mam2_channel_sig_size(mam2_channel *ch) {
 
 MAM2_SAPI err_t mam2_channel_create(
     mam2_ialloc *ma, /*!< [in] Allocator. */
-    iprng *
+    prng_t *
         p, /*! [in] Shared PRNG interface used to generate WOTS private keys. */
     mss_mt_height_t d, /*!< [in] MSS MT height. */
     trits_t ch_name,   /*!< [in] Channel name. */
@@ -134,7 +134,7 @@ static size_t mam2_endpoint_sig_size(mam2_endpoint *ep) {
 
 MAM2_SAPI err_t mam2_endpoint_create(
     mam2_ialloc *ma, /*!< [in] Allocator. */
-    iprng *
+    prng_t *
         p, /*! [in] Shared PRNG interface used to generate WOTS private keys. */
     mss_mt_height_t d, /*!< [in] MSS MT height. */
     trits_t ch_name,   /*!< [in] Channel name. */
@@ -312,7 +312,7 @@ MAM2_SAPI err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
       mss_skn(cfg->ep->m, skn);
     else
       mss_skn(cfg->ch->m, skn);
-    prng_gen3(cfg->rng, MAM2_PRNG_DST_SECKEY, mam2_channel_name(cfg->ch),
+    prng_gen3(cfg->rng, MAM2_PRNG_DST_SEC_KEY, mam2_channel_name(cfg->ch),
               cfg->ep ? mam2_endpoint_name(cfg->ep) : trits_null(), skn,
               mam2_send_msg_cfg_key(cfg));
 
