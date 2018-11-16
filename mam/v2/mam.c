@@ -21,9 +21,9 @@
 #include "mam/v2/mam.h"
 #include "mam/v2/pb3.h"
 
-err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p, mss_mt_height_t d,
-                      trits_t nonce1, trits_t nonce2) {
-  err_t e = err_internal_error;
+retcode_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
+                          mss_mt_height_t d, trits_t nonce1, trits_t nonce2) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
   MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
 
@@ -33,29 +33,29 @@ err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p, mss_mt_height_t d,
     m->nonce1 = trits_null();
     if (!trits_is_empty(nonce1)) {
       m->nonce1 = trits_alloc(trits_size(nonce1));
-      err_guard(!trits_is_null(m->nonce1), err_bad_alloc);
+      err_guard(!trits_is_null(m->nonce1), RC_OOM);
     }
 
     m->nonce2 = trits_null();
     if (!trits_is_empty(nonce2)) {
       m->nonce2 = trits_alloc(trits_size(nonce2));
-      err_guard(!trits_is_null(m->nonce2), err_bad_alloc);
+      err_guard(!trits_is_null(m->nonce2), RC_OOM);
     }
 
     m->sponge = ma->create_sponge();
-    err_guard(m->sponge, err_bad_alloc);
+    err_guard(m->sponge, RC_OOM);
 
     m->wots = malloc(sizeof(wots_t));
-    err_guard(m->wots, err_bad_alloc);
+    err_guard(m->wots, RC_OOM);
     wots_reset(m->wots);
 
     m->wots->sponge = ma->create_sponge();
-    err_guard(m->wots->sponge, err_bad_alloc);
+    err_guard(m->wots->sponge, RC_OOM);
     wots_init(m->wots, m->wots->sponge);
 
     mss_init(m, p, m->sponge, m->wots, d, m->nonce1, m->nonce2);
 
-    e = err_ok;
+    e = RC_OK;
   } while (0);
 
   return e;
@@ -91,14 +91,14 @@ static size_t mam2_channel_sig_size(mam2_channel *ch) {
   return MAM2_MSS_SIG_SIZE(ch->m->height);
 }
 
-err_t mam2_channel_create(mam2_ialloc *ma, /*!< [in] Allocator. */
-                          prng_t *p, /*! [in] Shared PRNG interface used to
-                                        generate WOTS private keys. */
-                          mss_mt_height_t d, /*!< [in] MSS MT height. */
-                          trits_t ch_name,   /*!< [in] Channel name. */
-                          mam2_channel *ch   /*!< [out] Channel. */
+retcode_t mam2_channel_create(mam2_ialloc *ma, /*!< [in] Allocator. */
+                              prng_t *p, /*! [in] Shared PRNG interface used to
+                                            generate WOTS private keys. */
+                              mss_mt_height_t d, /*!< [in] MSS MT height. */
+                              trits_t ch_name,   /*!< [in] Channel name. */
+                              mam2_channel *ch   /*!< [out] Channel. */
 ) {
-  err_t e = err_internal_error;
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   MAM2_ASSERT(ma);
   MAM2_ASSERT(ch);
@@ -107,7 +107,7 @@ err_t mam2_channel_create(mam2_ialloc *ma, /*!< [in] Allocator. */
     err_bind(mam2_mss_create(ma, ch->m, p, d, ch_name, trits_null()));
     mss_gen(ch->m, mam2_channel_id(ch));
 
-    e = err_ok;
+    e = RC_OK;
   } while (0);
 
   return e;
@@ -131,15 +131,15 @@ static size_t mam2_endpoint_sig_size(mam2_endpoint *ep) {
   return MAM2_MSS_SIG_SIZE(ep->m->height);
 }
 
-err_t mam2_endpoint_create(mam2_ialloc *ma, /*!< [in] Allocator. */
-                           prng_t *p, /*! [in] Shared PRNG interface used to
-                                         generate WOTS private keys. */
-                           mss_mt_height_t d, /*!< [in] MSS MT height. */
-                           trits_t ch_name,   /*!< [in] Channel name. */
-                           trits_t ep_name,   /*!< [in] Endpoint name. */
-                           mam2_endpoint *ep  /*!< [out] Endpoint. */
+retcode_t mam2_endpoint_create(mam2_ialloc *ma, /*!< [in] Allocator. */
+                               prng_t *p, /*! [in] Shared PRNG interface used to
+                                             generate WOTS private keys. */
+                               mss_mt_height_t d, /*!< [in] MSS MT height. */
+                               trits_t ch_name,   /*!< [in] Channel name. */
+                               trits_t ep_name,   /*!< [in] Endpoint name. */
+                               mam2_endpoint *ep  /*!< [out] Endpoint. */
 ) {
-  err_t e = err_internal_error;
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   MAM2_ASSERT(ma);
   MAM2_ASSERT(ep);
@@ -148,7 +148,7 @@ err_t mam2_endpoint_create(mam2_ialloc *ma, /*!< [in] Allocator. */
     err_bind(mam2_mss_create(ma, ep->m, p, d, ch_name, ep_name));
     mss_gen(ep->m, mam2_endpoint_id(ep));
 
-    e = err_ok;
+    e = RC_OK;
   } while (0);
 
   return e;
@@ -277,8 +277,8 @@ static trits_t mam2_send_msg_cfg_key(mam2_send_msg_context *cfg) {
   return trits_from_rep(MAM2_SPONGE_KEY_SIZE, cfg->key);
 }
 
-err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
-  err_t e = err_internal_error;
+retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   isponge *s;
   isponge *fork;
@@ -296,14 +296,14 @@ err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
   fork = cfg->fork;
 
   do {
-    err_guard(msg, err_invalid_argument);
+    err_guard(msg, RC_MAM2_INVALID_ARGUMENT);
     msg_size = mam2_send_msg_size(cfg);
     if (trits_is_null(*msg)) {
       _msg = trits_alloc(msg_size);
-      err_guard(!trits_is_null(_msg), err_bad_alloc);
+      err_guard(!trits_is_null(_msg), RC_OOM);
       *msg = _msg;
     } else
-      err_guard(!(trits_size(*msg) < msg_size), err_buffer_too_small);
+      err_guard(!(trits_size(*msg) < msg_size), RC_MAM2_BUFFER_TOO_SMALL);
     b = msg;
 
     if (cfg->ep)
@@ -513,7 +513,7 @@ err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
     }
 
     _msg = trits_null();
-    e = err_ok;
+    e = RC_OK;
   } while (0);
 
   trits_free(_msg);
@@ -549,9 +549,9 @@ size_t mam2_send_packet_size(mam2_send_packet_context *cfg,
     MAM2_ASSERT(0);
 }
 
-err_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
-                       trits_t *packet) {
-  err_t e = err_internal_error;
+retcode_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
+                           trits_t *packet) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
   isponge *s;
   trits_t b0, *b = packet;
 
@@ -611,7 +611,7 @@ err_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
       //    null none = 0;
       ;
 
-    e = err_ok;
+    e = RC_OK;
   } while (0);
 
   return e;
@@ -649,8 +649,8 @@ static trits_t mam2_recv_msg_cfg_ntru_id(mam2_recv_msg_context *cfg) {
   return trits_from_rep(MAM2_NTRU_ID_SIZE, cfg->ntru_id);
 }
 
-err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
-  err_t e = err_internal_error;
+retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   isponge *s;
   isponge *fork;
@@ -670,12 +670,12 @@ err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
     // unwrap Channel
     {
       tryte_t ver = 0;
-      err_guard(trits_size(*b) >= pb3_sizeof_tryte(), err_pb3_eof);
+      err_guard(trits_size(*b) >= pb3_sizeof_tryte(), RC_MAM2_PB3_EOF);
 
       // tryte ver;
       b0 = *b;
       err_bind(pb3_decode_tryte(&ver, b));
-      err_guard(0 == ver, err_mam2_version_not_supported);
+      err_guard(0 == ver, RC_MAM2_VERSION_NOT_SUPPORTED);
       pb3_unwrap_data(s, trits_diff(b0, *b));
 
       // external required tryte chid[81];
@@ -688,7 +688,7 @@ err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
 
       b0 = *b;
       err_bind(pb3_decode_oneof(&pubkey, b));
-      err_guard(0 <= pubkey && pubkey <= 2, err_pb3_bad_oneof);
+      err_guard(0 <= pubkey && pubkey <= 2, RC_MAM2_PB3_BAD_ONEOF);
       pb3_unwrap_data(s, trits_diff(b0, *b));
       cfg->pubkey = pubkey;
 
@@ -708,7 +708,7 @@ err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
       {
         size_t n = 0;
         err_bind(pb3_decode_sizet(&n, b));
-        err_guard(trits_size(*b) >= pb3_sizeof_ntrytes(n), err_pb3_eof);
+        err_guard(trits_size(*b) >= pb3_sizeof_ntrytes(n), RC_MAM2_PB3_EOF);
 
         if (0 < n) {
           trits_t sig;
@@ -716,7 +716,7 @@ err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
 
           sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, H);
 
-          err_guard(trits_size(*b) >= n, err_pb3_eof);
+          err_guard(trits_size(*b) >= n, RC_MAM2_PB3_EOF);
           sig = trits_take(*b, n);
           *b = trits_drop(*b, n);
 
@@ -749,7 +749,7 @@ err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
         err_bind(pb3_decode_repeated(&keyload_count, b));
         pb3_unwrap_data(s, trits_diff(b0, *b));
 
-        for (e = err_ok; e == err_ok && keyload_count--;) {
+        for (e = RC_OK; e == RC_OK && keyload_count--;) {
           tryte_t keyload = -1;
 
           // forkhash
@@ -767,7 +767,7 @@ err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
             pb3_decode_ntrytes(mam2_recv_msg_cfg_key(cfg), b);
             pb3_unwrap_data(fork, trits_diff(b0, *b));
 
-            err_guard(!key_found, err_mam2_keyload_overloaded);
+            err_guard(!key_found, RC_MAM2_KEYLOAD_OVERLOADED);
             key_found = 1;
           } else if (1 == keyload) {  //  KeyloadPSK psk = 1;
 
@@ -778,7 +778,7 @@ err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
 
             if (cfg->psk && trits_cmp_eq(mam2_psk_id(cfg->psk),
                                          mam2_recv_msg_cfg_psk_id(cfg))) {
-              err_guard(!key_found, err_mam2_keyload_overloaded);
+              err_guard(!key_found, RC_MAM2_KEYLOAD_OVERLOADED);
               key_found = 1;
 
               //  external secret tryte psk[81];
@@ -803,14 +803,14 @@ err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
 
             if (cfg->ntru && trits_cmp_eq(ntru_id_trits(cfg->ntru),
                                           mam2_recv_msg_cfg_ntru_id(cfg))) {
-              err_guard(!key_found, err_mam2_keyload_overloaded);
+              err_guard(!key_found, RC_MAM2_KEYLOAD_OVERLOADED);
               key_found = 1;
 
               //  tryte ekey[3072];
-              err_guard(trits_size(*b) >= MAM2_NTRU_EKEY_SIZE, err_pb3_eof);
+              err_guard(trits_size(*b) >= MAM2_NTRU_EKEY_SIZE, RC_MAM2_PB3_EOF);
               b0 = trits_take(*b, MAM2_NTRU_EKEY_SIZE);
               err_guard(ntru_decr(cfg->ntru, b0, mam2_recv_msg_cfg_key(cfg)),
-                        err_pb3_bad_ekey);
+                        RC_MAM2_PB3_BAD_EKEY);
               *b = trits_drop(*b, MAM2_NTRU_EKEY_SIZE);
               pb3_unwrap_data(fork, b0);
             } else {
@@ -819,20 +819,20 @@ err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
               *b = trits_drop(*b, pb3_sizeof_ntrytes(MAM2_NTRU_EKEY_SIZE / 3));
             }
           } else
-            err_guard(0, err_pb3_bad_oneof);
+            err_guard(0, RC_MAM2_PB3_BAD_ONEOF);
         }
       }
     }
 
-    e = err_ok;
+    e = RC_OK;
   } while (0);
 
   return e;
 }
 
-err_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
-                       trits_t *payload) {
-  err_t e = err_internal_error;
+retcode_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
+                           trits_t *payload) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
   isponge *s;
   trits_t b0, *b = packet;
 
@@ -858,19 +858,19 @@ err_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
     //  donthash oneof checksum
     b0 = *b;
     err_bind(pb3_decode_oneof(&checksum, b));
-    err_guard(0 <= checksum && checksum <= 2, err_pb3_bad_oneof);
+    err_guard(0 <= checksum && checksum <= 2, RC_MAM2_PB3_BAD_ONEOF);
     pb3_wrap_data(s, trits_diff(b0, *b));
 
     if (1 == checksum) {
       //    tryte mac [81] = 1;
       MAM2_TRITS_DEF(mac, MAM2_SPONGE_MAC_SIZE);
       // pb3_encode_ntrytes(mac, b);
-      err_guard(trits_size(*b) >= MAM2_SPONGE_MAC_SIZE, err_pb3_eof);
+      err_guard(trits_size(*b) >= MAM2_SPONGE_MAC_SIZE, RC_MAM2_PB3_EOF);
       b0 = trits_take(*b, MAM2_SPONGE_MAC_SIZE);
       sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, mac);
       *b = trits_drop(*b, MAM2_SPONGE_MAC_SIZE);
 
-      err_guard(trits_cmp_eq(mac, b0), err_pb3_bad_mac);
+      err_guard(trits_cmp_eq(mac, b0), RC_MAM2_PB3_BAD_MAC);
     } else if (2 == checksum) {
       //    trytes sig = 2;
       size_t n;
@@ -879,19 +879,20 @@ err_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
 
       // manually `pb3_decode_trytes`
       err_bind(pb3_decode_sizet(&n, b));
-      err_guard(trits_size(*b) >= n, err_pb3_eof);
+      err_guard(trits_size(*b) >= n, RC_MAM2_PB3_EOF);
       sig = trits_take(*b, n);
       *b = trits_drop(*b, n);
 
       sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, H);
 
       // verify
-      err_guard(mss_verify(cfg->ms, cfg->ws, H, sig, cfg->pk), err_pb3_bad_sig);
+      err_guard(mss_verify(cfg->ms, cfg->ws, H, sig, cfg->pk),
+                RC_MAM2_PB3_BAD_SIG);
     } else
       //    null none = 0;
       ;
 
-    e = err_ok;
+    e = RC_OK;
   } while (0);
 
   return e;

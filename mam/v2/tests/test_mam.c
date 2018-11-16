@@ -37,7 +37,7 @@ void mam_test_do(isponge *s, void *sponge_alloc_ctx,
                  isponge *(create_sponge)(void *ctx),
                  void (*destroy_sponge)(void *ctx, isponge *), prng_t *pa,
                  prng_t *pb) {
-  err_t e = err_internal_error;
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
 #if 0
     struct

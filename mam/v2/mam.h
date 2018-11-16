@@ -18,7 +18,6 @@
 #define __MAM_V2_MAM2_H__
 
 #include "mam/v2/defs.h"
-#include "mam/v2/err.h"
 #include "mam/v2/list.h"
 #include "mam/v2/mss.h"
 #include "mam/v2/ntru.h"
@@ -33,8 +32,8 @@ typedef struct _mam2_ialloc {
   void (*destroy_sponge)(isponge *); /*!< Deallocator. */
 } mam2_ialloc;
 
-err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p, mss_mt_height_t d,
-                      trits_t N1, trits_t N2);
+retcode_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
+                          mss_mt_height_t d, trits_t N1, trits_t N2);
 
 void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m);
 
@@ -54,12 +53,12 @@ def_mam2_list(mam2_channel_node, mam2_channel_list);
 \brief Allocate memory for internal objects,
   and generate MSS public key.
 */
-err_t mam2_channel_create(mam2_ialloc *ma, /*!< [in] Allocator. */
-                          prng_t *p, /*! [in] Shared PRNG interface used to
-                                        generate WOTS private keys. */
-                          mss_mt_height_t d, /*!< [in] MSS MT height. */
-                          trits_t ch_name,   /*!< [in] Channel name. */
-                          mam2_channel *ch   /*!< [out] Channel. */
+retcode_t mam2_channel_create(mam2_ialloc *ma, /*!< [in] Allocator. */
+                              prng_t *p, /*! [in] Shared PRNG interface used to
+                                            generate WOTS private keys. */
+                              mss_mt_height_t d, /*!< [in] MSS MT height. */
+                              trits_t ch_name,   /*!< [in] Channel name. */
+                              mam2_channel *ch   /*!< [out] Channel. */
 );
 
 /*
@@ -93,13 +92,13 @@ def_mam2_list(mam2_endpoint_node, mam2_endpoint_list);
 \brief Allocate memory for internal objects,
   and generate MSS public key.
 */
-err_t mam2_endpoint_create(mam2_ialloc *ma, /*!< [in] Allocator. */
-                           prng_t *p, /*! [in] Shared PRNG interface used to
-                                         generate WOTS private keys. */
-                           mss_mt_height_t d, /*!< [in] MSS MT height. */
-                           trits_t ch_name,   /*!< [in] Channel name. */
-                           trits_t ep_name,   /*!< [in] Endpoint name. */
-                           mam2_endpoint *ep  /*!< [out] Endpoint. */
+retcode_t mam2_endpoint_create(mam2_ialloc *ma, /*!< [in] Allocator. */
+                               prng_t *p, /*! [in] Shared PRNG interface used to
+                                             generate WOTS private keys. */
+                               mss_mt_height_t d, /*!< [in] MSS MT height. */
+                               trits_t ch_name,   /*!< [in] Channel name. */
+                               trits_t ep_name,   /*!< [in] Endpoint name. */
+                               mam2_endpoint *ep  /*!< [out] Endpoint. */
 );
 
 /* \brief Deallocate memory for internal objects. */
@@ -160,7 +159,7 @@ typedef struct _mam2_send_msg_context {
 
 size_t mam2_send_msg_size(mam2_send_msg_context *cfg);
 
-err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg);
+retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg);
 
 typedef struct _mam2_send_packet_context {
   isponge *s; /*!< Main Sponge interface */
@@ -172,8 +171,8 @@ typedef struct _mam2_send_packet_context {
 size_t mam2_send_packet_size(mam2_send_packet_context *cfg,
                              size_t payload_size);
 
-err_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
-                       trits_t *packet);
+retcode_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
+                           trits_t *packet);
 
 typedef struct _mam2_recv_msg_context {
   mam2_ialloc *ma; /*!< Allocator. */
@@ -200,7 +199,7 @@ typedef struct _mam2_recv_msg_context {
   intru *ntru; /*!< NTRU sk to decrypt message. */
 } mam2_recv_msg_context;
 
-err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg);
+retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg);
 
 typedef struct _mam2_recv_packet_context {
   mam2_ialloc *ma; /*!< Allocator. */
@@ -211,7 +210,7 @@ typedef struct _mam2_recv_packet_context {
   isponge *ws;     /*!< Sponge interface used by WOTS. */
 } mam2_recv_packet_context;
 
-err_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
-                       trits_t *payload);
+retcode_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
+                           trits_t *payload);
 
 #endif  // __MAM_V2_MAM2_H__

@@ -460,36 +460,36 @@ bool_t mss_verify(isponge *ms, isponge *ws, trits_t H, trits_t sig,
   return (0 == trits_cmp_grlex(apk, pk)) ? 1 : 0;
 }
 
-err_t mss_create(mss_t *mss, mss_mt_height_t d) {
-  err_t e = err_internal_error;
+retcode_t mss_create(mss_t *mss, mss_mt_height_t d) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
   MAM2_ASSERT(mss);
 
   do {
     memset(mss, 0, sizeof(mss_t));
-    err_guard(0 <= d && d <= MAM2_MSS_MAX_HEIGHT, err_invalid_argument);
+    err_guard(0 <= d && d <= MAM2_MSS_MAX_HEIGHT, RC_MAM2_INVALID_ARGUMENT);
 
 #if defined(MAM2_MSS_TRAVERSAL)
     mss->auth_path =
         (trit_t *)malloc(sizeof(trit_t) * MAM2_MSS_MT_AUTH_WORDS(d));
-    err_guard(mss->auth_path, err_bad_alloc);
+    err_guard(mss->auth_path, RC_OOM);
 
     // add 1 extra hash for dirty hack (see mss.c)
     mss->hashes =
         (trit_t *)malloc(sizeof(trit_t) * MAM2_MSS_MT_HASH_WORDS(d, 1));
-    err_guard(mss->hashes, err_bad_alloc);
+    err_guard(mss->hashes, RC_OOM);
 
     // add 1 extra node for dirty hack (see mss.c)
     mss->nodes = malloc(sizeof(mss_mt_node_t) * (MAM2_MSS_MT_NODES(d) + 1));
-    err_guard(mss->nodes, err_bad_alloc);
+    err_guard(mss->nodes, RC_OOM);
 
     mss->stacks = malloc(sizeof(mss_mt_stack_t) * MAM2_MSS_MT_STACKS(d));
-    err_guard(mss->nodes, err_bad_alloc);
+    err_guard(mss->nodes, RC_OOM);
 #else
     mss->merkle_tree = (trit_t *)malloc(sizeof(trit_t) * MAM2_MSS_MT_WORDS(d));
-    err_guard(mss->merkle_tree, err_bad_alloc);
+    err_guard(mss->merkle_tree, RC_OOM);
 #endif
 
-    e = err_ok;
+    e = RC_OK;
   } while (0);
 
   // do not free here in case of error
