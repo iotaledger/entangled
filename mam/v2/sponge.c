@@ -21,11 +21,11 @@
 #include "common/trinary/trit_array.h"
 #include "mam/v2/buffers.h"
 
-MAM2_INLINE static trits_t sponge_state_trits(isponge *s) {
+static trits_t sponge_state_trits(isponge *s) {
   return trits_from_rep(MAM2_SPONGE_WIDTH, s->s);
 }
 
-MAM2_INLINE static trits_t sponge_outer1_trits(isponge *s) {
+static trits_t sponge_outer1_trits(isponge *s) {
   // one extra trit for padding
   return trits_take(sponge_state_trits(s), MAM2_SPONGE_RATE + 1);
 }
@@ -38,12 +38,12 @@ static inline void set_control_tryte(isponge *s, size_t i, trit_t c0, trit_t c1,
   t.p[t.d + 2] = c2;
 }
 
-MAM2_INLINE static trits_t sponge_control_trits(isponge *s) {
+static trits_t sponge_control_trits(isponge *s) {
   return trits_take(trits_drop(sponge_state_trits(s), MAM2_SPONGE_RATE),
                     MAM2_SPONGE_CONTROL);
 }
 
-MAM2_INLINE MAM2_SAPI trits_t sponge_outer_trits(isponge *s, size_t n) {
+trits_t sponge_outer_trits(isponge *s, size_t n) {
   MAM2_ASSERT(n <= MAM2_SPONGE_RATE);
   return trits_take(sponge_state_trits(s), n);
 }
@@ -53,15 +53,13 @@ MAM2_INLINE MAM2_SAPI trits_t sponge_outer_trits(isponge *s, size_t n) {
 
 static void sponge_transform(isponge *s) { s->f(s->stack, s->s); }
 
-MAM2_SAPI void sponge_fork(isponge *s, isponge *fork) {
+void sponge_fork(isponge *s, isponge *fork) {
   trits_copy(sponge_state_trits(s), sponge_state_trits(fork));
 }
 
-MAM2_SAPI void sponge_init(isponge *s) {
-  trits_set_zero(sponge_state_trits(s));
-}
+void sponge_init(isponge *s) { trits_set_zero(sponge_state_trits(s)); }
 
-MAM2_SAPI void sponge_absorb(isponge *s, trit_t c2, trits_t X) {
+void sponge_absorb(isponge *s, trit_t c2, trits_t X) {
   trits_t Xi;
   size_t ni;
   trit_t c0, c1;
@@ -80,7 +78,7 @@ MAM2_SAPI void sponge_absorb(isponge *s, trit_t c2, trits_t X) {
   } while (!trits_is_empty(X));
 }
 
-MAM2_SAPI void sponge_squeeze(isponge *s, trit_t c2, trits_t Y) {
+void sponge_squeeze(isponge *s, trit_t c2, trits_t Y) {
   trits_t Yi;
   size_t ni;
   trit_t c0 = -1, c1;
@@ -96,7 +94,7 @@ MAM2_SAPI void sponge_squeeze(isponge *s, trit_t c2, trits_t Y) {
   } while (!trits_is_empty(Y));
 }
 
-MAM2_SAPI void sponge_absorbn(isponge *s, trit_t c2, size_t n, trits_t *Xs) {
+void sponge_absorbn(isponge *s, trit_t c2, size_t n, trits_t *Xs) {
   buffers_t tb = buffers_init(n, Xs);
   size_t m = buffers_size(tb);
   trits_t s1 = sponge_outer1_trits(s);
@@ -117,7 +115,7 @@ MAM2_SAPI void sponge_absorbn(isponge *s, trit_t c2, size_t n, trits_t *Xs) {
   } while (0 < m);
 }
 
-MAM2_SAPI void sponge_encr(isponge *s, trits_t X, trits_t Y) {
+void sponge_encr(isponge *s, trits_t X, trits_t Y) {
   trits_t Xi, Yi;
   size_t ni;
   trit_t c0, c1, c2 = -1;
@@ -142,7 +140,7 @@ MAM2_SAPI void sponge_encr(isponge *s, trits_t X, trits_t Y) {
   } while (!trits_is_empty(X));
 }
 
-MAM2_SAPI void sponge_decr(isponge *s, trits_t Y, trits_t X) {
+void sponge_decr(isponge *s, trits_t Y, trits_t X) {
   trits_t Xi, Yi;
   size_t ni;
   trit_t c0, c1, c2 = -1;
@@ -167,13 +165,13 @@ MAM2_SAPI void sponge_decr(isponge *s, trits_t Y, trits_t X) {
   } while (!trits_is_empty(Y));
 }
 
-MAM2_SAPI void sponge_hash(isponge *s, trits_t X, trits_t Y) {
+void sponge_hash(isponge *s, trits_t X, trits_t Y) {
   sponge_init(s);
   sponge_absorb(s, MAM2_SPONGE_CTL_HASH, X);
   sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, Y);
 }
 
-MAM2_SAPI void sponge_hashn(isponge *s, size_t n, trits_t *Xs, trits_t Y) {
+void sponge_hashn(isponge *s, size_t n, trits_t *Xs, trits_t Y) {
   sponge_init(s);
   sponge_absorbn(s, MAM2_SPONGE_CTL_HASH, n, Xs);
   sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, Y);

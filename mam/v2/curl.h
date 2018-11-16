@@ -30,8 +30,8 @@ typedef struct _curl_sponge {
 #define MAM2_CURL_RATE 243
 
 /*! \brief Curl sponge interface initialization. */
-MAM2_API isponge *curl_sponge_init(curl_sponge *c);
+isponge *curl_sponge_init(curl_sponge *c);
 
-MAM2_API void curl_init(curl_sponge *s);
-MAM2_API void curl_absorb(curl_sponge *s, trits_t X);
-MAM2_API void curl_squeeze(curl_sponge *s, trits_t Y);
+void curl_init(curl_sponge *s);
+void curl_absorb(curl_sponge *s, trits_t X);
+void curl_squeeze(curl_sponge *s, trits_t Y);

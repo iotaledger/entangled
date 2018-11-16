@@ -33,10 +33,10 @@ typedef struct _mam2_ialloc {
   void (*destroy_sponge)(isponge *); /*!< Deallocator. */
 } mam2_ialloc;
 
-MAM2_API err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
-                               mss_mt_height_t d, trits_t N1, trits_t N2);
+err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p, mss_mt_height_t d,
+                      trits_t N1, trits_t N2);
 
-MAM2_API void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m);
+void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m);
 
 #define MAM2_CHANNEL_ID_SIZE MAM2_MSS_MT_HASH_SIZE
 typedef trit_t chid_t[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
@@ -44,8 +44,8 @@ typedef struct _mam2_channel {
   mss_t m[1]; /*!< MSS instance. */
   chid_t id;  /*!< MSS public key. */
 } mam2_channel;
-MAM2_API trits_t mam2_channel_id(mam2_channel *ch);
-MAM2_API trits_t mam2_channel_name(mam2_channel *ch);
+trits_t mam2_channel_id(mam2_channel *ch);
+trits_t mam2_channel_name(mam2_channel *ch);
 
 def_mam2_list_node(mam2_channel, mam2_channel_node);
 def_mam2_list(mam2_channel_node, mam2_channel_list);
@@ -54,13 +54,12 @@ def_mam2_list(mam2_channel_node, mam2_channel_list);
 \brief Allocate memory for internal objects,
   and generate MSS public key.
 */
-MAM2_API err_t mam2_channel_create(
-    mam2_ialloc *ma, /*!< [in] Allocator. */
-    prng_t *
-        p, /*! [in] Shared PRNG interface used to generate WOTS private keys. */
-    mss_mt_height_t d, /*!< [in] MSS MT height. */
-    trits_t ch_name,   /*!< [in] Channel name. */
-    mam2_channel *ch   /*!< [out] Channel. */
+err_t mam2_channel_create(mam2_ialloc *ma, /*!< [in] Allocator. */
+                          prng_t *p, /*! [in] Shared PRNG interface used to
+                                        generate WOTS private keys. */
+                          mss_mt_height_t d, /*!< [in] MSS MT height. */
+                          trits_t ch_name,   /*!< [in] Channel name. */
+                          mam2_channel *ch   /*!< [out] Channel. */
 );
 
 /*
@@ -68,8 +67,8 @@ MAM2_API err_t mam2_channel_create(
 \note Before destroying channel make sure to destroy
   all associated endpoints.
 */
-MAM2_API void mam2_channel_destroy(mam2_ialloc *ma, /*!< [in] Allocator. */
-                                   mam2_channel *ch /*!< [out] Channel. */
+void mam2_channel_destroy(mam2_ialloc *ma, /*!< [in] Allocator. */
+                          mam2_channel *ch /*!< [out] Channel. */
 );
 
 /*
@@ -83,9 +82,9 @@ typedef struct _mam2_endpoint {
   mss_t m[1]; /*!< MSS instance. */
   epid_t id;  /*!< MSS public key. */
 } mam2_endpoint;
-MAM2_API trits_t mam2_endpoint_id(mam2_endpoint *ep);
-MAM2_API trits_t mam2_endpoint_chname(mam2_endpoint *ep);
-MAM2_API trits_t mam2_endpoint_name(mam2_endpoint *ep);
+trits_t mam2_endpoint_id(mam2_endpoint *ep);
+trits_t mam2_endpoint_chname(mam2_endpoint *ep);
+trits_t mam2_endpoint_name(mam2_endpoint *ep);
 
 def_mam2_list_node(mam2_endpoint, mam2_endpoint_node);
 def_mam2_list(mam2_endpoint_node, mam2_endpoint_list);
@@ -94,19 +93,18 @@ def_mam2_list(mam2_endpoint_node, mam2_endpoint_list);
 \brief Allocate memory for internal objects,
   and generate MSS public key.
 */
-MAM2_API err_t mam2_endpoint_create(
-    mam2_ialloc *ma, /*!< [in] Allocator. */
-    prng_t *
-        p, /*! [in] Shared PRNG interface used to generate WOTS private keys. */
-    mss_mt_height_t d, /*!< [in] MSS MT height. */
-    trits_t ch_name,   /*!< [in] Channel name. */
-    trits_t ep_name,   /*!< [in] Endpoint name. */
-    mam2_endpoint *ep  /*!< [out] Endpoint. */
+err_t mam2_endpoint_create(mam2_ialloc *ma, /*!< [in] Allocator. */
+                           prng_t *p, /*! [in] Shared PRNG interface used to
+                                         generate WOTS private keys. */
+                           mss_mt_height_t d, /*!< [in] MSS MT height. */
+                           trits_t ch_name,   /*!< [in] Channel name. */
+                           trits_t ep_name,   /*!< [in] Endpoint name. */
+                           mam2_endpoint *ep  /*!< [out] Endpoint. */
 );
 
 /* \brief Deallocate memory for internal objects. */
-MAM2_API void mam2_endpoint_destroy(mam2_ialloc *ma,  /*!< [in] Allocator. */
-                                    mam2_endpoint *ep /*!< [out] Endpoint. */
+void mam2_endpoint_destroy(mam2_ialloc *ma,  /*!< [in] Allocator. */
+                           mam2_endpoint *ep /*!< [out] Endpoint. */
 );
 
 /*
@@ -121,8 +119,8 @@ typedef struct _mam2_psk {
   trit_t id[MAM2_WORDS(MAM2_PSK_ID_SIZE)];
   trit_t psk[MAM2_WORDS(MAM2_PSK_SIZE)];
 } mam2_psk;
-MAM2_API trits_t mam2_psk_id(mam2_psk *p);
-MAM2_API trits_t mam2_psk_trits(mam2_psk *p);
+trits_t mam2_psk_id(mam2_psk *p);
+trits_t mam2_psk_trits(mam2_psk *p);
 
 def_mam2_list_node(mam2_psk, mam2_psk_node);
 def_mam2_list(mam2_psk_node, mam2_psk_list);
@@ -131,8 +129,8 @@ def_mam2_list(mam2_psk_node, mam2_psk_list);
 typedef struct _mam2_ntru_pk {
   trit_t pk[MAM2_WORDS(MAM2_NTRU_PK_SIZE)];
 } mam2_ntru_pk;
-MAM2_API trits_t mam2_ntru_pk_id(mam2_ntru_pk *p);
-MAM2_API trits_t mam2_ntru_pk_trits(mam2_ntru_pk *p);
+trits_t mam2_ntru_pk_id(mam2_ntru_pk *p);
+trits_t mam2_ntru_pk_trits(mam2_ntru_pk *p);
 
 def_mam2_list_node(mam2_ntru_pk, mam2_ntru_pk_node);
 def_mam2_list(mam2_ntru_pk_node, mam2_ntru_pk_list);
@@ -160,9 +158,9 @@ typedef struct _mam2_send_msg_context {
       ntru_pks; /*!< Encrypt message for these NTRU public keys. */
 } mam2_send_msg_context;
 
-MAM2_API size_t mam2_send_msg_size(mam2_send_msg_context *cfg);
+size_t mam2_send_msg_size(mam2_send_msg_context *cfg);
 
-MAM2_API err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg);
+err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg);
 
 typedef struct _mam2_send_packet_context {
   isponge *s; /*!< Main Sponge interface */
@@ -171,11 +169,11 @@ typedef struct _mam2_send_packet_context {
   mss_t *m;
 } mam2_send_packet_context;
 
-MAM2_API size_t mam2_send_packet_size(mam2_send_packet_context *cfg,
-                                      size_t payload_size);
+size_t mam2_send_packet_size(mam2_send_packet_context *cfg,
+                             size_t payload_size);
 
-MAM2_API err_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
-                                trits_t *packet);
+err_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
+                       trits_t *packet);
 
 typedef struct _mam2_recv_msg_context {
   mam2_ialloc *ma; /*!< Allocator. */
@@ -202,7 +200,7 @@ typedef struct _mam2_recv_msg_context {
   intru *ntru; /*!< NTRU sk to decrypt message. */
 } mam2_recv_msg_context;
 
-MAM2_API err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg);
+err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg);
 
 typedef struct _mam2_recv_packet_context {
   mam2_ialloc *ma; /*!< Allocator. */
@@ -213,7 +211,7 @@ typedef struct _mam2_recv_packet_context {
   isponge *ws;     /*!< Sponge interface used by WOTS. */
 } mam2_recv_packet_context;
 
-MAM2_API err_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
-                                trits_t *payload);
+err_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
+                       trits_t *payload);
 
 #endif  // __MAM_V2_MAM2_H__

@@ -39,28 +39,26 @@ typedef struct _intru {
   trit_t *sk; /*!< Private key words. */
 } intru;
 
-MAM2_INLINE MAM2_API trits_t ntru_id_trits(intru *n);
+trits_t ntru_id_trits(intru *n);
 
-MAM2_INLINE MAM2_API trits_t ntru_sk_trits(intru *n);
+trits_t ntru_sk_trits(intru *n);
 
-MAM2_API void ntru_gen(intru *n,  /*!< [in] NTRU interface */
-                       prng_t *p, /*!< [in] PRNG interface */
-                       trits_t N, /*!< [in] nonce */
-                       trits_t pk /*!< [out] NTRU public key */
+void ntru_gen(intru *n,  /*!< [in] NTRU interface */
+              prng_t *p, /*!< [in] PRNG interface */
+              trits_t N, /*!< [in] nonce */
+              trits_t pk /*!< [out] NTRU public key */
 );
 
-MAM2_API void ntru_encr(
-    trits_t pk, /*!< [in] NTRU public key */
-    prng_t *p,  /*!< [in] PRNG interface */
-    trits_t K,  /*!< [in] session symmetric key to be encrypted */
-    trits_t N,  /*!< [in] nonce */
-    trits_t Y   /*!< [out] encrypted K */
+void ntru_encr(trits_t pk, /*!< [in] NTRU public key */
+               prng_t *p,  /*!< [in] PRNG interface */
+               trits_t K,  /*!< [in] session symmetric key to be encrypted */
+               trits_t N,  /*!< [in] nonce */
+               trits_t Y   /*!< [out] encrypted K */
 );
 
-MAM2_API bool_t ntru_decr(
-    intru *n,  /*!< [in] NTRU interface */
-    trits_t Y, /*!< [in] encrypted K */
-    trits_t K  /*!< [out] decrypted session symmetric key */
+bool_t ntru_decr(intru *n,  /*!< [in] NTRU interface */
+                 trits_t Y, /*!< [in] encrypted K */
+                 trits_t K  /*!< [out] decrypted session symmetric key */
 );
 
 #endif  // __MAM_V2_NTRU_H__

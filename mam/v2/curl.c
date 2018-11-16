@@ -46,22 +46,20 @@ static void curl_f81(void *buf, trit_t *s) { curl_f(81, buf, s); }
 /*! \brief Curl-27 transform */
 static void curl_f27(void *buf, trit_t *s) { curl_f(27, buf, s); }
 
-MAM2_INLINE static trits_t curl_state_trits(curl_sponge *s) {
+static trits_t curl_state_trits(curl_sponge *s) {
   return trits_from_rep(MAM2_SPONGE_WIDTH, s->s);
 }
 
-MAM2_INLINE static trits_t curl_outer_trits(curl_sponge *s, size_t n) {
+static trits_t curl_outer_trits(curl_sponge *s, size_t n) {
   MAM2_ASSERT(n <= MAM2_CURL_RATE);
   return trits_take(curl_state_trits(s), n);
 }
 
 static void curl_transform(curl_sponge *s) { s->i.f(s->i.stack, s->i.s); }
 
-MAM2_SAPI void curl_init(curl_sponge *s) {
-  trits_set_zero(curl_state_trits(s));
-}
+void curl_init(curl_sponge *s) { trits_set_zero(curl_state_trits(s)); }
 
-MAM2_SAPI void curl_absorb(curl_sponge *s, trits_t X) {
+void curl_absorb(curl_sponge *s, trits_t X) {
   trits_t Xi;
   size_t ni;
 
@@ -75,7 +73,7 @@ MAM2_SAPI void curl_absorb(curl_sponge *s, trits_t X) {
   } while (!trits_is_empty(X));
 }
 
-MAM2_SAPI void curl_squeeze(curl_sponge *s, trits_t Y) {
+void curl_squeeze(curl_sponge *s, trits_t Y) {
   trits_t Yi;
   size_t ni;
 
@@ -89,7 +87,7 @@ MAM2_SAPI void curl_squeeze(curl_sponge *s, trits_t Y) {
   } while (!trits_is_empty(Y));
 }
 
-MAM2_SAPI isponge *curl_sponge_init(curl_sponge *c) {
+isponge *curl_sponge_init(curl_sponge *c) {
   c->i.s = c->s;
   c->i.stack = c->s2;
   c->i.f = curl_f81;

@@ -15,16 +15,16 @@
 */
 #include "mam/v2/buffers.h"
 
-MAM2_SAPI MAM2_INLINE buffers_t buffers_init(size_t n, trits_t *Xs) {
+buffers_t buffers_init(size_t n, trits_t *Xs) {
   buffers_t bs = {trits_null(), n, Xs};
   return bs;
 }
 
-MAM2_SAPI MAM2_INLINE bool_t buffers_is_empty(buffers_t bs) {
+bool_t buffers_is_empty(buffers_t bs) {
   return trits_is_empty(bs.X) && (0 == bs.n);
 }
 
-MAM2_SAPI size_t buffers_size(buffers_t bs) {
+size_t buffers_size(buffers_t bs) {
   size_t m = 0;
 
   for (; !buffers_is_empty(bs);) {
@@ -40,7 +40,7 @@ MAM2_SAPI size_t buffers_size(buffers_t bs) {
   return m;
 }
 
-MAM2_SAPI size_t buffers_copy_to(buffers_t *bs, trits_t buf) {
+size_t buffers_copy_to(buffers_t *bs, trits_t buf) {
   size_t k, m = 0;
 
   for (; !trits_is_empty(buf) && !buffers_is_empty(*bs);) {
@@ -59,7 +59,7 @@ MAM2_SAPI size_t buffers_copy_to(buffers_t *bs, trits_t buf) {
   return m;
 }
 
-/*MAM2_SAPI size_t buffers_copy_from(buffers_t *bs, trits_t buf) {
+/* size_t buffers_copy_from(buffers_t *bs, trits_t buf) {
     size_t k, m = 0;
 
     for (; !trits_is_empty(buf) && !buffers_is_empty(*bs);) {

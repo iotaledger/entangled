@@ -17,17 +17,16 @@
 */
 #include "mam/v2/ntru.h"
 
-MAM2_INLINE MAM2_SAPI trits_t ntru_id_trits(intru *n) {
+trits_t ntru_id_trits(intru *n) {
   return trits_from_rep(MAM2_NTRU_ID_SIZE, n->id);
 }
 
-MAM2_INLINE MAM2_SAPI trits_t ntru_sk_trits(intru *n) {
+trits_t ntru_sk_trits(intru *n) {
   return trits_from_rep(MAM2_NTRU_SK_SIZE, n->sk);
 }
 
-MAM2_SAPI void ntru_gen(intru *n, prng_t *p, trits_t N, trits_t pk) {}
+void ntru_gen(intru *n, prng_t *p, trits_t N, trits_t pk) {}
 
-MAM2_SAPI void ntru_encr(trits_t pk, prng_t *p, trits_t K, trits_t N,
-                         trits_t Y) {}
+void ntru_encr(trits_t pk, prng_t *p, trits_t K, trits_t N, trits_t Y) {}
 
-MAM2_SAPI bool_t ntru_decr(intru *n, trits_t Y, trits_t K) { return 0; }
+bool_t ntru_decr(intru *n, trits_t Y, trits_t K) { return 0; }

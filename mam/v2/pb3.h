@@ -27,11 +27,11 @@ Protobuf3 primitive types
 null, tryte, size_t, trytes, tryte [n]
 */
 
-MAM2_INLINE MAM2_API size_t pb3_sizeof_tryte();
+size_t pb3_sizeof_tryte();
 
-MAM2_API void pb3_encode_tryte(tryte_t t, trits_t *b);
+void pb3_encode_tryte(tryte_t t, trits_t *b);
 
-MAM2_API err_t pb3_decode_tryte(tryte_t *t, trits_t *b);
+err_t pb3_decode_tryte(tryte_t *t, trits_t *b);
 
 #define pb3_sizeof_oneof pb3_sizeof_tryte
 #define pb3_encode_oneof pb3_encode_tryte
@@ -41,59 +41,59 @@ MAM2_API err_t pb3_decode_tryte(tryte_t *t, trits_t *b);
 #define pb3_encode_optional pb3_encode_tryte
 #define pb3_decode_optional pb3_decode_tryte
 
-MAM2_INLINE MAM2_API size_t pb3_sizeof_trint();
+size_t pb3_sizeof_trint();
 
-MAM2_API void pb3_encode_trint(trint9_t t, trits_t *b);
+void pb3_encode_trint(trint9_t t, trits_t *b);
 
-MAM2_API err_t pb3_decode_trint(trint9_t *t, trits_t *b);
+err_t pb3_decode_trint(trint9_t *t, trits_t *b);
 
-MAM2_INLINE MAM2_API size_t pb3_sizeof_longtrint();
+size_t pb3_sizeof_longtrint();
 
-MAM2_API void pb3_encode_longtrint(trint18_t t, trits_t *b);
+void pb3_encode_longtrint(trint18_t t, trits_t *b);
 
-MAM2_API err_t pb3_decode_longtrint(trint18_t *t, trits_t *b);
+err_t pb3_decode_longtrint(trint18_t *t, trits_t *b);
 
-MAM2_API size_t pb3_sizeof_sizet(size_t n);
+size_t pb3_sizeof_sizet(size_t n);
 
-MAM2_API void pb3_encode_sizet(size_t n, trits_t *b);
+void pb3_encode_sizet(size_t n, trits_t *b);
 
-MAM2_API err_t pb3_decode_sizet(size_t *n, trits_t *b);
+err_t pb3_decode_sizet(size_t *n, trits_t *b);
 
 #define pb3_sizeof_repeated pb3_sizeof_sizet
 #define pb3_encode_repeated pb3_encode_sizet
 #define pb3_decode_repeated pb3_decode_sizet
 
-MAM2_API size_t pb3_sizeof_ntrytes(size_t n);
+size_t pb3_sizeof_ntrytes(size_t n);
 
-MAM2_API void pb3_encode_ntrytes(trits_t ntrytes, trits_t *b);
+void pb3_encode_ntrytes(trits_t ntrytes, trits_t *b);
 
-MAM2_API err_t pb3_decode_ntrytes(trits_t ntrytes, trits_t *b);
+err_t pb3_decode_ntrytes(trits_t ntrytes, trits_t *b);
 
-MAM2_API size_t pb3_sizeof_trytes(size_t n);
+size_t pb3_sizeof_trytes(size_t n);
 
-MAM2_API void pb3_encode_trytes(trits_t trytes, trits_t *b);
+void pb3_encode_trytes(trits_t trytes, trits_t *b);
 
-MAM2_API err_t pb3_decode_trytes(trits_t *trytes, trits_t *b);
+err_t pb3_decode_trytes(trits_t *trytes, trits_t *b);
 
-MAM2_API err_t pb3_decode_trytes2(trits_t *trytes, trits_t *b);
+err_t pb3_decode_trytes2(trits_t *trytes, trits_t *b);
 
 /*
 Protobuf3 cryptographic modifier handling:
 secret, encrypted, data(other)
 */
 
-MAM2_API void pb3_wrap_secret(isponge *s, trits_t t);
+void pb3_wrap_secret(isponge *s, trits_t t);
 
-MAM2_API void pb3_unwrap_secret(isponge *s, trits_t t);
+void pb3_unwrap_secret(isponge *s, trits_t t);
 
-MAM2_API void pb3_wrap_encrypted(isponge *s, trits_t t);
+void pb3_wrap_encrypted(isponge *s, trits_t t);
 
-MAM2_API void pb3_unwrap_encrypted(isponge *s, trits_t t);
+void pb3_unwrap_encrypted(isponge *s, trits_t t);
 
-MAM2_API void pb3_wrap_data(isponge *s, trits_t t);
+void pb3_wrap_data(isponge *s, trits_t t);
 
-MAM2_API void pb3_unwrap_data(isponge *s, trits_t t);
+void pb3_unwrap_data(isponge *s, trits_t t);
 
-MAM2_API bool_t pb3_test();
+bool_t pb3_test();
 
 #endif  // __MAM_V2_PB3_H__

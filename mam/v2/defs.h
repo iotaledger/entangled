@@ -135,10 +135,4 @@ typedef uint8_t byte;
 /*! \brief Assert expression. */
 #define MAM2_ASSERT(expr) assert(expr)
 
-// TODO - Figure out what to do with those (@tsvisabo)
-
-#define MAM2_API
-#define MAM2_SAPI
-#define MAM2_INLINE
-
 #endif  // __MAM_V2_DEFS_H__

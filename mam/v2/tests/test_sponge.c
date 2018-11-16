@@ -234,7 +234,7 @@ static void sponge_test_pointwise(isponge *s) {
   TEST_ASSERT(r);
 }
 
-MAM2_SAPI void sponge_test(isponge *s) {
+void sponge_test(isponge *s) {
   sponge_test_ae(s);
   sponge_test_hash(s);
   sponge_test_pointwise(s);

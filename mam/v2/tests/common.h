@@ -134,7 +134,7 @@ static void xor_trits(trit_t *lhs, trit_t *rhs, trit_t *res, size_t len) {
   }
 }
 
-MAM2_SAPI void test_f(void *buf, trit_t *s) {
+void test_f(void *buf, trit_t *s) {
   trit_t x0_trits[MAM2_SPONGE_RATE / 2];
   memcpy(x0_trits, s, MAM2_SPONGE_RATE / 2);
   trit_t x1_trits[MAM2_SPONGE_RATE / 2];
