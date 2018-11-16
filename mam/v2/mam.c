@@ -18,9 +18,8 @@
 #include "mam/v2/mam.h"
 #include "mam/v2/pb3.h"
 
-MAM2_SAPI err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
-                                mss_mt_height_t d, trits_t nonce1,
-                                trits_t nonce2) {
+err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p, mss_mt_height_t d,
+                      trits_t nonce1, trits_t nonce2) {
   err_t e = err_internal_error;
   MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
@@ -59,7 +58,7 @@ MAM2_SAPI err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
   return e;
 }
 
-MAM2_SAPI void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m) {
+void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m) {
   MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
 
@@ -81,21 +80,20 @@ MAM2_SAPI void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m) {
   mss_destroy(m);
 }
 
-MAM2_SAPI trits_t mam2_channel_id(mam2_channel *ch) {
+trits_t mam2_channel_id(mam2_channel *ch) {
   return trits_from_rep(MAM2_CHANNEL_ID_SIZE, ch->id);
 }
-MAM2_SAPI trits_t mam2_channel_name(mam2_channel *ch) { return ch->m->nonce1; }
+trits_t mam2_channel_name(mam2_channel *ch) { return ch->m->nonce1; }
 static size_t mam2_channel_sig_size(mam2_channel *ch) {
   return MAM2_MSS_SIG_SIZE(ch->m->height);
 }
 
-MAM2_SAPI err_t mam2_channel_create(
-    mam2_ialloc *ma, /*!< [in] Allocator. */
-    prng_t *
-        p, /*! [in] Shared PRNG interface used to generate WOTS private keys. */
-    mss_mt_height_t d, /*!< [in] MSS MT height. */
-    trits_t ch_name,   /*!< [in] Channel name. */
-    mam2_channel *ch   /*!< [out] Channel. */
+err_t mam2_channel_create(mam2_ialloc *ma, /*!< [in] Allocator. */
+                          prng_t *p, /*! [in] Shared PRNG interface used to
+                                        generate WOTS private keys. */
+                          mss_mt_height_t d, /*!< [in] MSS MT height. */
+                          trits_t ch_name,   /*!< [in] Channel name. */
+                          mam2_channel *ch   /*!< [out] Channel. */
 ) {
   err_t e = err_internal_error;
 
@@ -112,8 +110,8 @@ MAM2_SAPI err_t mam2_channel_create(
   return e;
 }
 
-MAM2_SAPI void mam2_channel_destroy(mam2_ialloc *ma, /*!< [in] Allocator. */
-                                    mam2_channel *ch /*!< [out] Channel. */
+void mam2_channel_destroy(mam2_ialloc *ma, /*!< [in] Allocator. */
+                          mam2_channel *ch /*!< [out] Channel. */
 ) {
   MAM2_ASSERT(ma);
   MAM2_ASSERT(ch);
@@ -121,25 +119,22 @@ MAM2_SAPI void mam2_channel_destroy(mam2_ialloc *ma, /*!< [in] Allocator. */
   mam2_mss_destroy(ma, ch->m);
 }
 
-MAM2_API trits_t mam2_endpoint_id(mam2_endpoint *ep) {
+trits_t mam2_endpoint_id(mam2_endpoint *ep) {
   return trits_from_rep(MAM2_ENDPOINT_ID_SIZE, ep->id);
 }
-MAM2_API trits_t mam2_endpoint_chname(mam2_endpoint *ep) {
-  return ep->m->nonce1;
-}
-MAM2_API trits_t mam2_endpoint_name(mam2_endpoint *ep) { return ep->m->nonce2; }
+trits_t mam2_endpoint_chname(mam2_endpoint *ep) { return ep->m->nonce1; }
+trits_t mam2_endpoint_name(mam2_endpoint *ep) { return ep->m->nonce2; }
 static size_t mam2_endpoint_sig_size(mam2_endpoint *ep) {
   return MAM2_MSS_SIG_SIZE(ep->m->height);
 }
 
-MAM2_SAPI err_t mam2_endpoint_create(
-    mam2_ialloc *ma, /*!< [in] Allocator. */
-    prng_t *
-        p, /*! [in] Shared PRNG interface used to generate WOTS private keys. */
-    mss_mt_height_t d, /*!< [in] MSS MT height. */
-    trits_t ch_name,   /*!< [in] Channel name. */
-    trits_t ep_name,   /*!< [in] Endpoint name. */
-    mam2_endpoint *ep  /*!< [out] Endpoint. */
+err_t mam2_endpoint_create(mam2_ialloc *ma, /*!< [in] Allocator. */
+                           prng_t *p, /*! [in] Shared PRNG interface used to
+                                         generate WOTS private keys. */
+                           mss_mt_height_t d, /*!< [in] MSS MT height. */
+                           trits_t ch_name,   /*!< [in] Channel name. */
+                           trits_t ep_name,   /*!< [in] Endpoint name. */
+                           mam2_endpoint *ep  /*!< [out] Endpoint. */
 ) {
   err_t e = err_internal_error;
 
@@ -156,8 +151,8 @@ MAM2_SAPI err_t mam2_endpoint_create(
   return e;
 }
 
-MAM2_SAPI void mam2_endpoint_destroy(mam2_ialloc *ma,  /*!< [in] Allocator. */
-                                     mam2_endpoint *ep /*!< [out] Endpoint. */
+void mam2_endpoint_destroy(mam2_ialloc *ma,  /*!< [in] Allocator. */
+                           mam2_endpoint *ep /*!< [out] Endpoint. */
 ) {
   MAM2_ASSERT(ma);
   MAM2_ASSERT(ep);
@@ -165,21 +160,21 @@ MAM2_SAPI void mam2_endpoint_destroy(mam2_ialloc *ma,  /*!< [in] Allocator. */
   mam2_mss_destroy(ma, ep->m);
 }
 
-MAM2_SAPI trits_t mam2_psk_id(mam2_psk *p) {
+trits_t mam2_psk_id(mam2_psk *p) {
   return trits_from_rep(MAM2_PSK_ID_SIZE, p->id);
 }
-MAM2_SAPI trits_t mam2_psk_trits(mam2_psk *p) {
+trits_t mam2_psk_trits(mam2_psk *p) {
   return trits_from_rep(MAM2_PSK_SIZE, p->psk);
 }
 
-MAM2_SAPI trits_t mam2_ntru_pk_trits(mam2_ntru_pk *p) {
+trits_t mam2_ntru_pk_trits(mam2_ntru_pk *p) {
   return trits_from_rep(MAM2_NTRU_PK_SIZE, p->pk);
 }
-MAM2_SAPI trits_t mam2_ntru_pk_id(mam2_ntru_pk *p) {
+trits_t mam2_ntru_pk_id(mam2_ntru_pk *p) {
   return trits_from_rep(MAM2_NTRU_ID_SIZE, p->pk);
 }
 
-MAM2_SAPI size_t mam2_send_msg_size(mam2_send_msg_context *cfg) {
+size_t mam2_send_msg_size(mam2_send_msg_context *cfg) {
   size_t sz = 0;
 
   // channel
@@ -279,7 +274,7 @@ static trits_t mam2_send_msg_cfg_key(mam2_send_msg_context *cfg) {
   return trits_from_rep(MAM2_SPONGE_KEY_SIZE, cfg->key);
 }
 
-MAM2_SAPI err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
+err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
   err_t e = err_internal_error;
 
   isponge *s;
@@ -524,8 +519,8 @@ MAM2_SAPI err_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
   return e;
 }
 
-MAM2_SAPI size_t mam2_send_packet_size(mam2_send_packet_context *cfg,
-                                       size_t payload_size) {
+size_t mam2_send_packet_size(mam2_send_packet_context *cfg,
+                             size_t payload_size) {
   size_t sz = 0;
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(0 == payload_size % 3);
@@ -551,8 +546,8 @@ MAM2_SAPI size_t mam2_send_packet_size(mam2_send_packet_context *cfg,
     MAM2_ASSERT(0);
 }
 
-MAM2_SAPI err_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
-                                 trits_t *packet) {
+err_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
+                       trits_t *packet) {
   err_t e = err_internal_error;
   isponge *s;
   trits_t b0, *b = packet;
@@ -651,7 +646,7 @@ static trits_t mam2_recv_msg_cfg_ntru_id(mam2_recv_msg_context *cfg) {
   return trits_from_rep(MAM2_NTRU_ID_SIZE, cfg->ntru_id);
 }
 
-MAM2_SAPI err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
+err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
   err_t e = err_internal_error;
 
   isponge *s;
@@ -832,8 +827,8 @@ MAM2_SAPI err_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
   return e;
 }
 
-MAM2_SAPI err_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
-                                 trits_t *payload) {
+err_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
+                       trits_t *payload) {
   err_t e = err_internal_error;
   isponge *s;
   trits_t b0, *b = packet;

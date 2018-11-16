@@ -46,63 +46,63 @@ typedef struct _iwots {
 } iwots;
 
 /*! \brief Init WOTS interface with Sponge. */
-MAM2_API void wots_init(iwots *w,  /*!< [in,out] WOTS interface */
-                        isponge *s /*!< [in] Sponge interface */
+void wots_init(iwots *w,  /*!< [in,out] WOTS interface */
+               isponge *s /*!< [in] Sponge interface */
 );
 
 /*! \brief Generate WOTS private key. */
-MAM2_API void wots_gen_sk(iwots *w,  /*!< [in] WOTS interface */
-                          prng_t *p, /*!< [in] PRNG interface */
-                          trits_t N  /*!< [in] nonce */
+void wots_gen_sk(iwots *w,  /*!< [in] WOTS interface */
+                 prng_t *p, /*!< [in] PRNG interface */
+                 trits_t N  /*!< [in] nonce */
 );
 
 /*! \brief Generate WOTS private key. */
-MAM2_API void wots_gen_sk2(iwots *w,   /*!< [in] WOTS interface */
-                           prng_t *p,  /*!< [in] PRNG interface */
-                           trits_t N1, /*!< [in] first nonce */
-                           trits_t N2  /*!< [in] second nonce */
+void wots_gen_sk2(iwots *w,   /*!< [in] WOTS interface */
+                  prng_t *p,  /*!< [in] PRNG interface */
+                  trits_t N1, /*!< [in] first nonce */
+                  trits_t N2  /*!< [in] second nonce */
 );
 
 /*! \brief Generate WOTS private key. */
-MAM2_API void wots_gen_sk3(iwots *w,   /*!< [in] WOTS interface */
-                           prng_t *p,  /*!< [in] PRNG interface */
-                           trits_t N1, /*!< [in] first nonce */
-                           trits_t N2, /*!< [in] second nonce */
-                           trits_t N3  /*!< [in] third nonce */
+void wots_gen_sk3(iwots *w,   /*!< [in] WOTS interface */
+                  prng_t *p,  /*!< [in] PRNG interface */
+                  trits_t N1, /*!< [in] first nonce */
+                  trits_t N2, /*!< [in] second nonce */
+                  trits_t N3  /*!< [in] third nonce */
 );
 
 /*! \brief Calculate WOTS public key.
 \note Private key must have already been generated. */
-MAM2_API void wots_calc_pk(iwots *w,  /*!< [in] WOTS interface */
-                           trits_t pk /*!< [out] public key */
+void wots_calc_pk(iwots *w,  /*!< [in] WOTS interface */
+                  trits_t pk /*!< [out] public key */
 );
 
 /*! \brief Generate WOTS signature. */
-MAM2_API void wots_sign(iwots *w,   /*!< [in] WOTS interface */
-                        trits_t H,  /*!< [in] hash value tbs */
-                        trits_t sig /*!< [out] signature */
+void wots_sign(iwots *w,   /*!< [in] WOTS interface */
+               trits_t H,  /*!< [in] hash value tbs */
+               trits_t sig /*!< [out] signature */
 );
 
 /*! \brief Recover WOTS public key from signature. */
-MAM2_API void wots_recover(isponge *s,  /*!< [in] Sponge interface */
-                           trits_t H,   /*!< [in] signed hash value */
-                           trits_t sig, /*!< [in] signature */
-                           trits_t pk   /*!< [out] presumed public key */
+void wots_recover(isponge *s,  /*!< [in] Sponge interface */
+                  trits_t H,   /*!< [in] signed hash value */
+                  trits_t sig, /*!< [in] signature */
+                  trits_t pk   /*!< [out] presumed public key */
 );
 
 /*! \brief Verify WOTS signature. */
-MAM2_API bool_t wots_verify(isponge *s,  /*!< [in] Sponge interface */
-                            trits_t H,   /*!< [in] signed hash value */
-                            trits_t sig, /*!< [in] signature */
-                            trits_t pk   /*!< [in] public key */
+bool_t wots_verify(isponge *s,  /*!< [in] Sponge interface */
+                   trits_t H,   /*!< [in] signed hash value */
+                   trits_t sig, /*!< [in] signature */
+                   trits_t pk   /*!< [in] public key */
 );
 
 /*! \brief Allocate memory for WOTS private key. */
-MAM2_API err_t wots_create(iwots *w);
+err_t wots_create(iwots *w);
 
 /*! \brief Deallocate memory for WOTS private key. */
-MAM2_API void wots_destroy(iwots *w);
+void wots_destroy(iwots *w);
 
-MAM2_API trits_t wots_sk_trits(iwots *w);
+trits_t wots_sk_trits(iwots *w);
 
 #endif  // __MAM_V2_WOTS_H__

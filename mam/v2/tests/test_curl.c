@@ -26,7 +26,7 @@
 #include <memory.h>
 #include <stdio.h>
 
-MAM2_SAPI void curl_test() {
+void curl_test() {
   // test value from com.iota.iri.hash.CurlTest
   char data_str[2673 + 1] =
       "RSWWSFXPQJUBJROQBRQZWZXZJWM"

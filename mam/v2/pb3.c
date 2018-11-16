@@ -25,15 +25,15 @@ Protobuf3 primitive types
 null, tryte, size_t, trytes, tryte [n]
 */
 
-MAM2_INLINE MAM2_SAPI size_t pb3_sizeof_tryte() { return 3; }
+size_t pb3_sizeof_tryte() { return 3; }
 
-MAM2_SAPI void pb3_encode_tryte(tryte_t t, trits_t *b) {
+void pb3_encode_tryte(tryte_t t, trits_t *b) {
   MAM2_ASSERT(b && !(trits_size(*b) < pb3_sizeof_tryte()));
   trits_put3(trits_take(*b, 3), t);
   *b = trits_drop(*b, 3);
 }
 
-MAM2_SAPI err_t pb3_decode_tryte(tryte_t *t, trits_t *b) {
+err_t pb3_decode_tryte(tryte_t *t, trits_t *b) {
   MAM2_ASSERT(0 != t);
 
   if (trits_size(*b) < pb3_sizeof_tryte()) return err_pb3_eof;
@@ -43,15 +43,15 @@ MAM2_SAPI err_t pb3_decode_tryte(tryte_t *t, trits_t *b) {
   return err_ok;
 }
 
-MAM2_INLINE MAM2_SAPI size_t pb3_sizeof_trint() { return 9; }
+size_t pb3_sizeof_trint() { return 9; }
 
-MAM2_SAPI void pb3_encode_trint(trint9_t t, trits_t *b) {
+void pb3_encode_trint(trint9_t t, trits_t *b) {
   MAM2_ASSERT(b && !(trits_size(*b) < pb3_sizeof_trint()));
   trits_put9(trits_take(*b, 9), t);
   *b = trits_drop(*b, 9);
 }
 
-MAM2_SAPI err_t pb3_decode_trint(trint9_t *t, trits_t *b) {
+err_t pb3_decode_trint(trint9_t *t, trits_t *b) {
   MAM2_ASSERT(0 != t);
 
   if (trits_size(*b) < pb3_sizeof_trint()) return err_pb3_eof;
@@ -61,15 +61,15 @@ MAM2_SAPI err_t pb3_decode_trint(trint9_t *t, trits_t *b) {
   return err_ok;
 }
 
-MAM2_INLINE MAM2_SAPI size_t pb3_sizeof_longtrint() { return 18; }
+size_t pb3_sizeof_longtrint() { return 18; }
 
-MAM2_SAPI void pb3_encode_longtrint(trint18_t t, trits_t *b) {
+void pb3_encode_longtrint(trint18_t t, trits_t *b) {
   MAM2_ASSERT(b && !(trits_size(*b) < pb3_sizeof_longtrint()));
   trits_put18(trits_take(*b, 18), t);
   *b = trits_drop(*b, 18);
 }
 
-MAM2_SAPI err_t pb3_decode_longtrint(trint18_t *t, trits_t *b) {
+err_t pb3_decode_longtrint(trint18_t *t, trits_t *b) {
   MAM2_ASSERT(0 != t);
 
   if (trits_size(*b) < pb3_sizeof_longtrint()) return err_pb3_eof;
@@ -88,7 +88,7 @@ static size_t pb3_sizet_trytes(size_t n) {
   return d;
 }
 
-MAM2_SAPI size_t pb3_sizeof_sizet(size_t n) {
+size_t pb3_sizeof_sizet(size_t n) {
   size_t d = pb3_sizet_trytes(n);
   MAM2_ASSERT(d < 14);
 
@@ -96,7 +96,7 @@ MAM2_SAPI size_t pb3_sizeof_sizet(size_t n) {
   return 3 * (d + 1);
 }
 
-MAM2_SAPI void pb3_encode_sizet(size_t n, trits_t *b) {
+void pb3_encode_sizet(size_t n, trits_t *b) {
   MAM2_ASSERT(b && !(trits_size(*b) < pb3_sizeof_sizet(n)));
 
   size_t d = pb3_sizet_trytes(n);
@@ -109,7 +109,7 @@ MAM2_SAPI void pb3_encode_sizet(size_t n, trits_t *b) {
   MAM2_ASSERT(0 == n);
 }
 
-MAM2_SAPI err_t pb3_decode_sizet(size_t *n, trits_t *b) {
+err_t pb3_decode_sizet(size_t *n, trits_t *b) {
   err_t e = err_internal_error;
 
   MAM2_ASSERT(0 != n);
@@ -141,9 +141,9 @@ MAM2_SAPI err_t pb3_decode_sizet(size_t *n, trits_t *b) {
   return e;
 }
 
-MAM2_SAPI size_t pb3_sizeof_ntrytes(size_t n) { return 3 * n; }
+size_t pb3_sizeof_ntrytes(size_t n) { return 3 * n; }
 
-MAM2_SAPI void pb3_encode_ntrytes(trits_t ntrytes, trits_t *b) {
+void pb3_encode_ntrytes(trits_t ntrytes, trits_t *b) {
   size_t n = trits_size(ntrytes);
   MAM2_ASSERT(0 == (n % 3));
   MAM2_ASSERT(n <= trits_size(*b));
@@ -152,7 +152,7 @@ MAM2_SAPI void pb3_encode_ntrytes(trits_t ntrytes, trits_t *b) {
   *b = trits_drop(*b, n);
 }
 
-MAM2_SAPI err_t pb3_decode_ntrytes(trits_t ntrytes, trits_t *b) {
+err_t pb3_decode_ntrytes(trits_t ntrytes, trits_t *b) {
   err_t e = err_internal_error;
 
   MAM2_ASSERT(0 == (trits_size(ntrytes) % 3));
@@ -169,11 +169,11 @@ MAM2_SAPI err_t pb3_decode_ntrytes(trits_t ntrytes, trits_t *b) {
   return e;
 }
 
-MAM2_SAPI size_t pb3_sizeof_trytes(size_t n) {
+size_t pb3_sizeof_trytes(size_t n) {
   return 0 + pb3_sizeof_sizet(n) + pb3_sizeof_ntrytes(n);
 }
 
-MAM2_SAPI void pb3_encode_trytes(trits_t trytes, trits_t *b) {
+void pb3_encode_trytes(trits_t trytes, trits_t *b) {
   size_t n = trits_size(trytes);
   MAM2_ASSERT(0 == (n % 3));
 
@@ -181,7 +181,7 @@ MAM2_SAPI void pb3_encode_trytes(trits_t trytes, trits_t *b) {
   pb3_encode_ntrytes(trytes, b);
 }
 
-MAM2_SAPI err_t pb3_decode_trytes(trits_t *trytes, trits_t *b) {
+err_t pb3_decode_trytes(trits_t *trytes, trits_t *b) {
   err_t e = err_internal_error;
 
   MAM2_ASSERT(0 != trytes);
@@ -201,7 +201,7 @@ MAM2_SAPI err_t pb3_decode_trytes(trits_t *trytes, trits_t *b) {
   return e;
 }
 
-MAM2_SAPI err_t pb3_decode_trytes2(trits_t *trytes, trits_t *b) {
+err_t pb3_decode_trytes2(trits_t *trytes, trits_t *b) {
   err_t e = err_internal_error;
   trits_t t = trits_null();
 
@@ -237,27 +237,23 @@ Protobuf3 cryptographic modifier handling:
 secret, encrypted, data(other), donthash
 */
 
-MAM2_SAPI void pb3_wrap_secret(isponge *s, trits_t t) {
+void pb3_wrap_secret(isponge *s, trits_t t) {
   sponge_absorb(s, MAM2_SPONGE_CTL_KEY, t);
 }
 
-MAM2_SAPI void pb3_unwrap_secret(isponge *s, trits_t t) {
+void pb3_unwrap_secret(isponge *s, trits_t t) {
   sponge_absorb(s, MAM2_SPONGE_CTL_KEY, t);
 }
 
-MAM2_SAPI void pb3_wrap_encrypted(isponge *s, trits_t t) {
-  sponge_encr(s, t, t);
-}
+void pb3_wrap_encrypted(isponge *s, trits_t t) { sponge_encr(s, t, t); }
 
-MAM2_SAPI void pb3_unwrap_encrypted(isponge *s, trits_t t) {
-  sponge_decr(s, t, t);
-}
+void pb3_unwrap_encrypted(isponge *s, trits_t t) { sponge_decr(s, t, t); }
 
-MAM2_SAPI void pb3_wrap_data(isponge *s, trits_t t) {
+void pb3_wrap_data(isponge *s, trits_t t) {
   sponge_absorb(s, MAM2_SPONGE_CTL_DATA, t);
 }
 
-MAM2_SAPI void pb3_unwrap_data(isponge *s, trits_t t) {
+void pb3_unwrap_data(isponge *s, trits_t t) {
   sponge_absorb(s, MAM2_SPONGE_CTL_DATA, t);
 }
 
@@ -318,7 +314,7 @@ static bool_t pb3_test_sizets() {
   return r;
 }
 
-MAM2_SAPI bool_t pb3_test() {
+bool_t pb3_test() {
   bool_t r = 1;
   r = r && pb3_test_sizets();
   /*TODO*/

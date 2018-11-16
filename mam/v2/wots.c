@@ -100,26 +100,25 @@ trits_t wots_sk_trits(iwots *w) {
   return trits_from_rep(MAM2_WOTS_SK_SIZE, w->sk);
 }
 
-MAM2_SAPI void wots_init(iwots *w, isponge *s) {
+void wots_init(iwots *w, isponge *s) {
   MAM2_ASSERT(w);
   MAM2_ASSERT(s);
   w->s = s;
 }
 
-MAM2_SAPI void wots_gen_sk(iwots *w, prng_t *p, trits_t N) {
+void wots_gen_sk(iwots *w, prng_t *p, trits_t N) {
   wots_gen_sk3(w, p, N, trits_null(), trits_null());
 }
 
-MAM2_SAPI void wots_gen_sk2(iwots *w, prng_t *p, trits_t N1, trits_t N2) {
+void wots_gen_sk2(iwots *w, prng_t *p, trits_t N1, trits_t N2) {
   wots_gen_sk3(w, p, N1, N2, trits_null());
 }
 
-MAM2_SAPI void wots_gen_sk3(iwots *w, prng_t *p, trits_t N1, trits_t N2,
-                            trits_t N3) {
+void wots_gen_sk3(iwots *w, prng_t *p, trits_t N1, trits_t N2, trits_t N3) {
   prng_gen3(p, MAM2_PRNG_DST_WOTS_KEY, N1, N2, N3, wots_sk_trits(w));
 }
 
-MAM2_SAPI void wots_calc_pk(iwots *w, trits_t pk) {
+void wots_calc_pk(iwots *w, trits_t pk) {
   MAM2_TRITS_DEF(sk_pks, MAM2_WOTS_SK_SIZE);
   trits_copy(wots_sk_trits(w), sk_pks);
   size_t num_sk_pks = wots_sk_trits(w).n - wots_sk_trits(w).d;
@@ -128,12 +127,12 @@ MAM2_SAPI void wots_calc_pk(iwots *w, trits_t pk) {
   trits_set_zero(sk_pks);
 }
 
-MAM2_SAPI void wots_sign(iwots *w, trits_t H, trits_t sig) {
+void wots_sign(iwots *w, trits_t H, trits_t sig) {
   trits_copy(wots_sk_trits(w), sig);
   wots_hash_sign(w->s, sig, H);
 }
 
-MAM2_SAPI void wots_recover(isponge *s, trits_t H, trits_t sig, trits_t pk) {
+void wots_recover(isponge *s, trits_t H, trits_t sig, trits_t pk) {
   MAM2_TRITS_DEF(sig_pks, MAM2_WOTS_SK_SIZE);
 
   MAM2_ASSERT(trits_size(pk) == MAM2_WOTS_PK_SIZE);
@@ -143,13 +142,13 @@ MAM2_SAPI void wots_recover(isponge *s, trits_t H, trits_t sig, trits_t pk) {
   sponge_hash(s, sig_pks, pk);
 }
 
-MAM2_SAPI bool_t wots_verify(isponge *s, trits_t H, trits_t sig, trits_t pk) {
+bool_t wots_verify(isponge *s, trits_t H, trits_t sig, trits_t pk) {
   MAM2_TRITS_DEF(sig_pk, MAM2_WOTS_PK_SIZE);
   wots_recover(s, H, sig, sig_pk);
   return (0 == trits_cmp_grlex(pk, sig_pk)) ? 1 : 0;
 }
 
-MAM2_SAPI err_t wots_create(iwots *w) {
+err_t wots_create(iwots *w) {
   err_t e = err_internal_error;
   MAM2_ASSERT(w);
   do {
@@ -162,7 +161,7 @@ MAM2_SAPI err_t wots_create(iwots *w) {
   return e;
 }
 
-MAM2_SAPI void wots_destroy(iwots *w) {
+void wots_destroy(iwots *w) {
   MAM2_ASSERT(w);
   free(w->sk);
   w->sk = 0;

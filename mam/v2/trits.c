@@ -20,44 +20,44 @@
 #include <memory.h>
 #include <stdio.h>
 
-MAM2_SAPI bool_t trits_is_empty(trits_t x) { return (x.n == x.d); }
+bool_t trits_is_empty(trits_t x) { return (x.n == x.d); }
 
-MAM2_SAPI size_t trits_size(trits_t x) { return (x.n - x.d); }
+size_t trits_size(trits_t x) { return (x.n - x.d); }
 
-MAM2_SAPI trits_t trits_from_rep(size_t n, trit_t *w) {
+trits_t trits_from_rep(size_t n, trit_t *w) {
   trits_t x = {n, 0, w};
   return x;
 }
 
-MAM2_SAPI trits_t trits_take(trits_t x, size_t n) {
+trits_t trits_take(trits_t x, size_t n) {
   MAM2_ASSERT(x.n >= x.d + n);
   x.n = x.d + n;
   return x;
 }
 
-MAM2_SAPI trits_t trits_take_min(trits_t x, size_t n) {
+trits_t trits_take_min(trits_t x, size_t n) {
   x.n = min(x.n, x.d + n);
   return x;
 }
 
-MAM2_SAPI trits_t trits_drop(trits_t x, size_t n) {
+trits_t trits_drop(trits_t x, size_t n) {
   MAM2_ASSERT(x.n >= x.d + n);
   x.d += n;
   return x;
 }
 
-MAM2_SAPI int64_t trits_get1(trits_t x) {
+int64_t trits_get1(trits_t x) {
   MAM2_ASSERT(x.n > x.d);
   return x.p[x.d];
 }
 
-MAM2_SAPI void trits_put1(trits_t x, trint1_t t) {
+void trits_put1(trits_t x, trint1_t t) {
   MAM2_ASSERT(x.n > x.d);
   MAM2_ASSERT_TRINT1(t);
   x.p[x.d] = t;
 }
 
-MAM2_SAPI trint3_t trits_get3(trits_t x) {
+trint3_t trits_get3(trits_t x) {
   MAM2_ASSERT(x.n >= x.d + 3);
 
   trint3_t t0 = (trint3_t)trits_get1(x);
@@ -66,7 +66,7 @@ MAM2_SAPI trint3_t trits_get3(trits_t x) {
   return t0 + (trint3_t)3 * t1 + (trint3_t)9 * t2;
 }
 
-MAM2_SAPI void trits_put3(trits_t x, trint3_t t) {
+void trits_put3(trits_t x, trint3_t t) {
   MAM2_ASSERT(x.n >= x.d + 3);
 
   trint1_t t0 = MAM2_MODS(t, 3 * 3 * 3, 3);
@@ -80,7 +80,7 @@ MAM2_SAPI void trits_put3(trits_t x, trint3_t t) {
   trits_put1(trits_drop(x, 2), t2);
 }
 
-MAM2_SAPI trint6_t trits_get6(trits_t x) {
+trint6_t trits_get6(trits_t x) {
   MAM2_ASSERT(x.n >= x.d + 6);
 
   trint6_t t0 = (trint6_t)trits_get3(x);
@@ -88,7 +88,7 @@ MAM2_SAPI trint6_t trits_get6(trits_t x) {
   return t0 + (trint6_t)27 * t1;
 }
 
-MAM2_SAPI void trits_put6(trits_t x, trint6_t t) {
+void trits_put6(trits_t x, trint6_t t) {
   MAM2_ASSERT(x.n >= x.d + 6);
 
   trint3_t t0 = MAM2_MODS(t, 27 * 27, 27);
@@ -99,7 +99,7 @@ MAM2_SAPI void trits_put6(trits_t x, trint6_t t) {
   trits_put3(trits_drop(x, 3), t1);
 }
 
-MAM2_SAPI trint9_t trits_get9(trits_t x) {
+trint9_t trits_get9(trits_t x) {
   MAM2_ASSERT(x.n >= x.d + 9);
 
   trint9_t t0 = (trint9_t)trits_get3(x);
@@ -108,7 +108,7 @@ MAM2_SAPI trint9_t trits_get9(trits_t x) {
   return t0 + (trint9_t)27 * t1 + (trint9_t)729 * t2;
 }
 
-MAM2_SAPI void trits_put9(trits_t x, trint9_t t) {
+void trits_put9(trits_t x, trint9_t t) {
   MAM2_ASSERT(x.n >= x.d + 9);
 
   trint3_t t0 = MAM2_MODS(t, 27 * 27 * 27, 27);
@@ -122,7 +122,7 @@ MAM2_SAPI void trits_put9(trits_t x, trint9_t t) {
   trits_put3(trits_drop(x, 6), t2);
 }
 
-MAM2_SAPI trint18_t trits_get18(trits_t x) {
+trint18_t trits_get18(trits_t x) {
   MAM2_ASSERT(x.n >= x.d + 18);
 
   trint18_t t0 = (trint18_t)trits_get9(x);
@@ -130,7 +130,7 @@ MAM2_SAPI trint18_t trits_get18(trits_t x) {
   return t0 + (trint18_t)19683 * t1;
 }
 
-MAM2_SAPI void trits_put18(trits_t x, trint18_t t) {
+void trits_put18(trits_t x, trint18_t t) {
   MAM2_ASSERT(x.n >= x.d + 18);
 
   trint9_t t0 = MAM2_MODS(t, 19683 * 19683, 19683);
@@ -141,11 +141,11 @@ MAM2_SAPI void trits_put18(trits_t x, trint18_t t) {
   trits_put9(trits_drop(x, 9), t1);
 }
 
-MAM2_SAPI void trits_set_zero(trits_t x) {
+void trits_set_zero(trits_t x) {
   for (; !trits_is_empty(x); x = trits_drop(x, 1)) trits_put1(x, 0);
 }
 
-MAM2_SAPI void trits_copy(trits_t x, trits_t y) {
+void trits_copy(trits_t x, trits_t y) {
   MAM2_ASSERT(trits_size(x) == trits_size(y));
 
   while (!trits_is_empty(x)) {
@@ -155,7 +155,7 @@ MAM2_SAPI void trits_copy(trits_t x, trits_t y) {
   }
 }
 
-MAM2_SAPI int trits_cmp_grlex(trits_t x, trits_t y) {
+int trits_cmp_grlex(trits_t x, trits_t y) {
   int d = 0;
 
   if (trits_size(x) < trits_size(y)) return -3;
@@ -168,11 +168,11 @@ MAM2_SAPI int trits_cmp_grlex(trits_t x, trits_t y) {
   return d;
 }
 
-MAM2_SAPI bool_t trits_cmp_eq(trits_t x, trits_t y) {
+bool_t trits_cmp_eq(trits_t x, trits_t y) {
   return (0 == trits_cmp_grlex(x, y)) ? 1 : 0;
 }
 
-MAM2_INLINE MAM2_SAPI trits_t trits_diff(trits_t begin, trits_t end) {
+trits_t trits_diff(trits_t begin, trits_t end) {
   MAM2_ASSERT(begin.p == end.p);
   MAM2_ASSERT(begin.n == end.n);
   MAM2_ASSERT(begin.d <= end.d);
@@ -180,17 +180,17 @@ MAM2_INLINE MAM2_SAPI trits_t trits_diff(trits_t begin, trits_t end) {
   return trits_from_rep(end.d - begin.d, begin.p);
 }
 
-MAM2_SAPI trits_t trits_null() { return trits_from_rep(0, 0); }
+trits_t trits_null() { return trits_from_rep(0, 0); }
 
-MAM2_SAPI bool_t trits_is_null(trits_t x) { return (0 == x.p); }
+bool_t trits_is_null(trits_t x) { return (0 == x.p); }
 
-MAM2_SAPI trits_t trits_alloc(size_t n) {
+trits_t trits_alloc(size_t n) {
   trit_t *p = (trit_t *)malloc(sizeof(trit_t) * MAM2_WORDS(n));
   memset(p, 0, MAM2_WORDS(n));
   return trits_from_rep(n, p);
 }
 
-MAM2_SAPI void trits_free(trits_t x) { free(x.p); }
+void trits_free(trits_t x) { free(x.p); }
 
 #define MAM2_TRIT_NORM(t) (((t) == 2) ? -1 : ((t) == -2) ? 1 : (t))
 trit_t trit_add(trit_t x, trit_t s) {
@@ -205,7 +205,7 @@ trit_t trit_sub(trit_t y, trit_t s) {
   return x;
 }
 
-MAM2_SAPI void trits_copy_pad10(trits_t x, trits_t y) {
+void trits_copy_pad10(trits_t x, trits_t y) {
   size_t n = trits_size(x);
   MAM2_ASSERT(n < trits_size(y));
   trits_copy(x, trits_take(y, n));
@@ -213,7 +213,7 @@ MAM2_SAPI void trits_copy_pad10(trits_t x, trits_t y) {
   trits_pad10(y);
 }
 
-MAM2_SAPI void trits_pad10(trits_t y) {
+void trits_pad10(trits_t y) {
   MAM2_ASSERT(!trits_is_empty(y));
   // 1
   trits_put1(y, 1);
@@ -221,11 +221,11 @@ MAM2_SAPI void trits_pad10(trits_t y) {
   trits_set_zero(trits_drop(y, 1));
 }
 
-MAM2_INLINE MAM2_SAPI bool_t trits_is_same(trits_t x, trits_t y) {
+bool_t trits_is_same(trits_t x, trits_t y) {
   return (x.p == y.p) && (x.d == y.d);  // && (x.n == y.n)
 }
 
-MAM2_SAPI void trits_copy_add(trits_t x, trits_t s, trits_t y) {
+void trits_copy_add(trits_t x, trits_t s, trits_t y) {
   trit_t tx, ts, ty;
   MAM2_ASSERT(trits_size(x) == trits_size(s));
   MAM2_ASSERT(trits_size(x) == trits_size(y));
@@ -238,7 +238,7 @@ MAM2_SAPI void trits_copy_add(trits_t x, trits_t s, trits_t y) {
     trits_put1(y, ty);
   }
 }
-MAM2_SAPI void trits_copy_sub(trits_t y, trits_t s, trits_t x) {
+void trits_copy_sub(trits_t y, trits_t s, trits_t x) {
   trit_t tx, ts, ty;
   MAM2_ASSERT(trits_size(x) == trits_size(s));
   MAM2_ASSERT(trits_size(x) == trits_size(y));
@@ -265,7 +265,7 @@ void trit_swap_sub(trit_t *y, trit_t *s) {
   *y = x;
 }
 
-MAM2_SAPI void trits_swap_add(trits_t x, trits_t s) {
+void trits_swap_add(trits_t x, trits_t s) {
   trit_t tx, ts;
   MAM2_ASSERT(trits_size(x) == trits_size(s));
   for (; !trits_is_empty(x); x = trits_drop(x, 1), s = trits_drop(s, 1)) {
@@ -276,7 +276,7 @@ MAM2_SAPI void trits_swap_add(trits_t x, trits_t s) {
     trits_put1(s, ts);
   }
 }
-MAM2_SAPI void trits_swap_sub(trits_t y, trits_t s) {
+void trits_swap_sub(trits_t y, trits_t s) {
   trit_t ty, ts;
   MAM2_ASSERT(trits_size(y) == trits_size(s));
   for (; !trits_is_empty(y); y = trits_drop(y, 1), s = trits_drop(s, 1)) {
