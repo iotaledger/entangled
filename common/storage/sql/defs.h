@@ -19,12 +19,12 @@
 #define TRANSACTION_TRUNK_INDEX "trunk_index"
 #define TRANSACTION_BRANCH_INDEX "branch_index"
 #define TRANSACTION_TAG_INDEX "tag_index"
-#define TRANSACTION_HASH_INDEX "hash_index"
+#define TRANSACTION_HASH_INDEX "transaction_hash_index"
 
 /*
  * Milestone definitions
  */
 
-#define MILESTONE_HASH_INDEX "hash_index"
+#define MILESTONE_HASH_INDEX "milestone_hash_index"
 
 #endif  // __COMMON_STORAGE_SQL_DEFS_H__
