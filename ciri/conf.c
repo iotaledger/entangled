@@ -102,6 +102,9 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
          -1) {
     switch (arg) {
       // cIRI configuration
+      case 'd':  // --db-path
+        strcpy(ciri_conf->db_path, optarg);
+        break;
       case 'h':  // --help
         iota_usage();
         free(long_options);
@@ -109,9 +112,6 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
         break;
       case 'l':  // --log-level
         ciri_conf->log_level = get_log_level(optarg);
-        break;
-      case 'd':  // --db-path
-        strcpy(ciri_conf->db_path, optarg);
         break;
 
       // Gossip configuration
@@ -127,11 +127,11 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
       case CLI_ARG_P_PROPAGATE_REQUEST:  // --p-propagate-request
         gossip_conf->p_propagate_request = atof(optarg);
         break;
-      case CLI_ARG_P_REPLY_RANDOM_TIP:  // --p-reply-random-tip
-        gossip_conf->p_reply_random_tip = atof(optarg);
-        break;
       case CLI_ARG_P_REMOVE_REQUEST:  // --p-remove-request
         gossip_conf->p_remove_request = atof(optarg);
+        break;
+      case CLI_ARG_P_REPLY_RANDOM_TIP:  // --p-reply-random-tip
+        gossip_conf->p_reply_random_tip = atof(optarg);
         break;
       case CLI_ARG_P_SELECT_MILESTONE:  // --p-select-milestone
         gossip_conf->p_select_milestone = atof(optarg);
@@ -161,14 +161,28 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
         break;
 
       // Consensus configuration
-      case CLI_ARG_MAX_DEPTH:  // --max-depth
-        consensus_conf->max_depth = atoi(optarg);
-        break;
       case CLI_ARG_ALPHA:  // --alpha
         consensus_conf->alpha = atof(optarg);
         break;
       case CLI_ARG_BELOW_MAX_DEPTH:  // --below-max-depth
         consensus_conf->below_max_depth = atoi(optarg);
+        break;
+      case CLI_ARG_MAX_DEPTH:  // --max-depth
+        consensus_conf->max_depth = atoi(optarg);
+        break;
+      case CLI_ARG_SNAPSHOT_SIGNATURE_DEPTH:  // --snapshot-signature-depth
+        consensus_conf->snapshot_signature_depth = atoi(optarg);
+        break;
+      case CLI_ARG_SNAPSHOT_SIGNATURE_INDEX:  // --snapshot-signature-index
+        consensus_conf->snapshot_signature_index = atoi(optarg);
+        break;
+      case CLI_ARG_SNAPSHOT_SIGNATURE_PUBKEY:  // --snapshot-signature-pubkey
+        flex_trits_from_trytes(consensus_conf->snapshot_signature_pubkey,
+                               HASH_LENGTH_TRIT, (tryte_t*)optarg,
+                               HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+        break;
+      case CLI_ARG_SNAPSHOT_TIMESTAMP:  // --snapshot-timestamp
+        consensus_conf->snapshot_timestamp_sec = atoi(optarg);
         break;
 
       default:

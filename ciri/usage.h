@@ -33,6 +33,10 @@ typedef enum cli_arg_value_e {
   CLI_ARG_ALPHA,
   CLI_ARG_BELOW_MAX_DEPTH,
   CLI_ARG_MAX_DEPTH,
+  CLI_ARG_SNAPSHOT_SIGNATURE_DEPTH,
+  CLI_ARG_SNAPSHOT_SIGNATURE_INDEX,
+  CLI_ARG_SNAPSHOT_SIGNATURE_PUBKEY,
+  CLI_ARG_SNAPSHOT_TIMESTAMP,
 
 } cli_arg_value_t;
 
@@ -51,13 +55,13 @@ static struct cli_argument_s {
 
     // cIRI configuration
 
+    {"db-path", 'd', "Path to the database file.", REQUIRED_ARG},
     {"help", 'h', "Displays this usage.", NO_ARG},
     {"log-level", 'l',
      "Valid log levels: \"debug\", \"info\", \"notice\", \"warning\", "
      "\"error\", \"critical\", \"alert\" "
      "and \"emergency\".",
      REQUIRED_ARG},
-    {"db-path", 'd', "Path to the database file.", REQUIRED_ARG},
 
     // Gossip configuration
 
@@ -121,7 +125,14 @@ static struct cli_argument_s {
      "Limits how many milestones behind the current one the random walk can "
      "start.",
      REQUIRED_ARG},
-
+    {"snapshot-signature-depth", CLI_ARG_SNAPSHOT_SIGNATURE_DEPTH,
+     "Depth of the snapshot signature.", REQUIRED_ARG},
+    {"snapshot-signature-index", CLI_ARG_SNAPSHOT_SIGNATURE_INDEX,
+     "Index of the snapshot signature.", REQUIRED_ARG},
+    {"snapshot-signature-pubkey", CLI_ARG_SNAPSHOT_SIGNATURE_PUBKEY,
+     "Public key of the snapshot signature.", REQUIRED_ARG},
+    {"snapshot-timestamp", CLI_ARG_SNAPSHOT_TIMESTAMP,
+     "Epoch time of the last snapshot.", REQUIRED_ARG},
     {NULL, 0, NULL, NO_ARG}};
 
 static char* short_options = "hl:d:n:t:u:p:";

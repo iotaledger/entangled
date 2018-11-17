@@ -78,6 +78,16 @@ typedef struct iota_consensus_conf_s {
  */
 retcode_t iota_consensus_conf_init(iota_consensus_conf_t* const conf);
 
+/**
+ * Initializes snapshot configuration with the snapshot repository
+ * https://github.com/iotaledger/snapshots
+ *
+ * @param conf The consensus configuration
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshot_conf_init(iota_consensus_conf_t* const conf);
+
 #ifdef __cplusplus
 }
 #endif
