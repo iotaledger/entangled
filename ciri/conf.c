@@ -170,8 +170,14 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
       case CLI_ARG_MAX_DEPTH:  // --max-depth
         consensus_conf->max_depth = atoi(optarg);
         break;
+      case CLI_ARG_SNAPSHOT_FILE:  // --snapshot-file
+        strcpy(consensus_conf->snapshot_file, optarg);
+        break;
       case CLI_ARG_SNAPSHOT_SIGNATURE_DEPTH:  // --snapshot-signature-depth
         consensus_conf->snapshot_signature_depth = atoi(optarg);
+        break;
+      case CLI_ARG_SNAPSHOT_SIGNATURE_FILE:  // --snapshot-signature-file
+        strcpy(consensus_conf->snapshot_signature_file, optarg);
         break;
       case CLI_ARG_SNAPSHOT_SIGNATURE_INDEX:  // --snapshot-signature-index
         consensus_conf->snapshot_signature_index = atoi(optarg);

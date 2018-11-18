@@ -89,10 +89,10 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot,
   snapshot->index = 0;
   snapshot->state = NULL;
 
-  if (strlen(snapshot->conf->snapshot_sig_file)) {
+  if (strlen(snapshot->conf->snapshot_signature_file)) {
     bool valid = false;
     if ((ret = iota_file_signature_validate(
-             conf->snapshot_file, conf->snapshot_sig_file,
+             conf->snapshot_file, conf->snapshot_signature_file,
              snapshot->conf->snapshot_signature_pubkey,
              snapshot->conf->snapshot_signature_depth,
              snapshot->conf->snapshot_signature_index, &valid)) != RC_OK) {

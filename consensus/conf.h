@@ -45,7 +45,7 @@ typedef struct iota_consensus_conf_s {
   // Path of the snapshot configuration file
   char snapshot_conf_file[128];
   // Path to the file that contains a signature for the snapshot file
-  char snapshot_sig_file[128];
+  char snapshot_signature_file[128];
   // Path to the file that contains the state of the ledger at the last snapshot
   char snapshot_file[128];
   // Epoch time of the last snapshot
