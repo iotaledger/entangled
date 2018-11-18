@@ -32,7 +32,9 @@ typedef enum cli_arg_value_e {
 
   CLI_ARG_ALPHA,
   CLI_ARG_BELOW_MAX_DEPTH,
+  CLI_ARG_LAST_MILESTONE,
   CLI_ARG_MAX_DEPTH,
+  CLI_ARG_NUM_KEYS_IN_MILESTONE,
   CLI_ARG_SNAPSHOT_FILE,
   CLI_ARG_SNAPSHOT_SIGNATURE_DEPTH,
   CLI_ARG_SNAPSHOT_SIGNATURE_FILE,
@@ -123,9 +125,17 @@ static struct cli_argument_s {
      "the latest referenced milestone by the currently visited transaction "
      "during the random walk.",
      REQUIRED_ARG},
+    {"last-milestone", CLI_ARG_LAST_MILESTONE,
+     "The index of the last milestone issued by the corrdinator before the "
+     "last snapshot.",
+     REQUIRED_ARG},
     {"max-depth", CLI_ARG_MAX_DEPTH,
      "Limits how many milestones behind the current one the random walk can "
      "start.",
+     REQUIRED_ARG},
+    {"num-keys-in-milestone", CLI_ARG_NUM_KEYS_IN_MILESTONE,
+     "The depth of the Merkle tree which in turn determines the number of "
+     "leaves (private keys) that the coordinator can use to sign a message.",
      REQUIRED_ARG},
     {"snapshot-file", CLI_ARG_SNAPSHOT_FILE,
      "Path to the file that contains the state of the ledger at the last "

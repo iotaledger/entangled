@@ -167,8 +167,14 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
       case CLI_ARG_BELOW_MAX_DEPTH:  // --below-max-depth
         consensus_conf->below_max_depth = atoi(optarg);
         break;
+      case CLI_ARG_LAST_MILESTONE:  // --last-milestone
+        consensus_conf->last_milestone = atoi(optarg);
+        break;
       case CLI_ARG_MAX_DEPTH:  // --max-depth
         consensus_conf->max_depth = atoi(optarg);
+        break;
+      case CLI_ARG_NUM_KEYS_IN_MILESTONE:  // --num-keys-in-milestone
+        consensus_conf->num_keys_in_milestone = atoi(optarg);
         break;
       case CLI_ARG_SNAPSHOT_FILE:  // --snapshot-file
         strcpy(consensus_conf->snapshot_file, optarg);

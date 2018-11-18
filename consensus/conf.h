@@ -58,8 +58,8 @@ typedef struct iota_consensus_conf_s {
   flex_trit_t snapshot_signature_pubkey[FLEX_TRIT_SIZE_243];
   // The address of the coordinator
   flex_trit_t coordinator[FLEX_TRIT_SIZE_243];
-  // The index of the last milestone issues by the corrdinator before the
-  // snapshot last
+  // The index of the last milestone issued by the corrdinator before the
+  // last snapshot
   uint64_t last_milestone;
   // The depth of the Merkle tree which in turn determines the number of leaves
   // (private keys) that the coordinator can use to sign a message
