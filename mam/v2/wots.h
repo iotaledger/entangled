@@ -59,14 +59,14 @@ typedef struct wots_s {
  * @param wots WOTS interface
  * @param sponge Sponge interface
  */
-void wots_init(wots_t *wots, isponge *sponge);
+void wots_init(wots_t *const wots, isponge *const sponge);
 
 /**
  * Resets WOTS sponge and SK
  *
  * @param wots WOTS interface
  */
-void wots_create(wots_t *wots);
+void wots_reset(wots_t *const wots);
 
 /**
  * Generates a WOTS private key
@@ -75,7 +75,7 @@ void wots_create(wots_t *wots);
  * @param prng PRNG interface
  * @param nonce Nonce
  */
-void wots_gen_sk(wots_t *wots, prng_t *prng, trits_t nonce);
+void wots_gen_sk(wots_t *const wots, prng_t *const prng, trits_t const nonce);
 
 /**
  * Generates a WOTS private key
@@ -85,7 +85,8 @@ void wots_gen_sk(wots_t *wots, prng_t *prng, trits_t nonce);
  * @param nonce1 First nonce
  * @param nonce2 Second nonce
  */
-void wots_gen_sk2(wots_t *wots, prng_t *prng, trits_t nonce1, trits_t nonce2);
+void wots_gen_sk2(wots_t *const wots, prng_t *const prng, trits_t const nonce1,
+                  trits_t const nonce2);
 
 /**
  * Generates a WOTS private key
@@ -96,8 +97,8 @@ void wots_gen_sk2(wots_t *wots, prng_t *prng, trits_t nonce1, trits_t nonce2);
  * @param nonce2 Second nonce
  * @param nonce3 Third nonce
  */
-void wots_gen_sk3(wots_t *wots, prng_t *prng, trits_t nonce, trits_t nonce2,
-                  trits_t nonce3);
+void wots_gen_sk3(wots_t *const wots, prng_t *const prng, trits_t const nonce,
+                  trits_t const nonce2, trits_t const nonce3);
 
 /**
  * Computes a WOTS public key
@@ -106,7 +107,7 @@ void wots_gen_sk3(wots_t *wots, prng_t *prng, trits_t nonce, trits_t nonce2,
  * @param wots WOTS interface
  * @param pk Public key
  */
-void wots_calc_pk(wots_t *wots, trits_t pk);
+void wots_calc_pk(wots_t *const wots, trits_t pk);
 
 /**
  * Generates a WOTS signature
@@ -115,7 +116,7 @@ void wots_calc_pk(wots_t *wots, trits_t pk);
  * @param hash Hash value to be signed
  * @param sig Signature
  */
-void wots_sign(wots_t *wots, trits_t hash, trits_t sig);
+void wots_sign(wots_t *const wots, trits_t const hash, trits_t sig);
 
 /**
  * Recovers a WOTS public key from a signature
@@ -125,7 +126,8 @@ void wots_sign(wots_t *wots, trits_t hash, trits_t sig);
  * @param sig Signature
  * @param pk Presumed public key
  */
-void wots_recover(isponge *sponge, trits_t hash, trits_t sig, trits_t pk);
+void wots_recover(isponge *const sponge, trits_t const hash, trits_t const sig,
+                  trits_t pk);
 
 /**
  * Verifies a WOTS signature
@@ -137,7 +139,8 @@ void wots_recover(isponge *sponge, trits_t hash, trits_t sig, trits_t pk);
  *
  * @return true if signature is valid, false otherwise
  */
-bool_t wots_verify(isponge *sponge, trits_t hash, trits_t sig, trits_t pk);
+bool wots_verify(isponge *const sponge, trits_t const hash, trits_t const sig,
+                 trits_t const pk);
 
 /**
  * Gets the WOTS private key
@@ -146,6 +149,6 @@ bool_t wots_verify(isponge *sponge, trits_t hash, trits_t sig, trits_t pk);
  *
  * @return the WOTS private key
  */
-trits_t wots_sk_trits(wots_t *wots);
+trits_t wots_sk_trits(wots_t *const wots);
 
 #endif  // __MAM_V2_WOTS_H__
