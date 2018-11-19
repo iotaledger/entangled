@@ -19,16 +19,31 @@
 
 // WOTS public key size
 #define MAM2_WOTS_PK_SIZE 243
+// WOTS public key flex size
+#define MAM2_WOTS_PK_FLEX_SIZE FLEX_TRIT_SIZE_243
+
 // WOTS private key part size
 #define MAM2_WOTS_SK_PART_SIZE 162
+// WOTS private key part flex size
+#define MAM2_WOTS_SK_PART_FLEX_SIZE FLEX_TRIT_SIZE_162
+
 // WOTS private key parts count
 #define MAM2_WOTS_SK_PART_COUNT 81
+
 // WOTS private key size
 #define MAM2_WOTS_SK_SIZE (MAM2_WOTS_SK_PART_SIZE * MAM2_WOTS_SK_PART_COUNT)
+// WOTS private key flex size
+#define MAM2_WOTS_SK_FLEX_SIZE FLEX_TRIT_SIZE_13122
+
 // WOTS signed hash value size
 #define MAM2_WOTS_HASH_SIZE 234
+// WOTS signed hash value flex size
+#define MAM2_WOTS_HASH_FLEX_SIZE FLEX_TRIT_SIZE_234
+
 // WOTS signature size
 #define MAM2_WOTS_SIG_SIZE MAM2_WOTS_SK_SIZE
+// WOTS signature size
+#define MAM2_WOTS_SIG_FLEX_SIZE MAM2_WOTS_SK_FLEX_SIZE
 
 typedef trit_t wots_sk_t[MAM2_WORDS(MAM2_WOTS_SK_SIZE)];
 
