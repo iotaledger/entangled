@@ -44,18 +44,18 @@ bool_t wots_test_do(wots_t *w, prng_t *p) {
   wots_gen_sk(w, p, N);
   wots_calc_pk(w, pk);
   wots_sign(w, H, sig);
-  TEST_ASSERT(wots_verify(w->s, H, sig, pk));
+  TEST_ASSERT(wots_verify(w->sponge, H, sig, pk));
 
   trits_put1(H, trit_add(trits_get1(H), 1));
-  r = r && !wots_verify(w->s, H, sig, pk);
+  r = r && !wots_verify(w->sponge, H, sig, pk);
   trits_put1(H, trit_sub(trits_get1(H), 1));
 
   trits_put1(sig, trit_add(trits_get1(sig), 1));
-  TEST_ASSERT(!wots_verify(w->s, H, sig, pk));
+  TEST_ASSERT(!wots_verify(w->sponge, H, sig, pk));
   trits_put1(sig, trit_sub(trits_get1(sig), 1));
 
   trits_put1(pk, trit_add(trits_get1(pk), 1));
-  r = r && !wots_verify(w->s, H, sig, pk);
+  r = r && !wots_verify(w->sponge, H, sig, pk);
   trits_put1(pk, trit_sub(trits_get1(pk), 1));
 
   TEST_ASSERT(r);

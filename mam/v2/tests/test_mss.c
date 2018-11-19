@@ -79,36 +79,36 @@ void mss_test_do(mss_t *m, prng_t *p, isponge *s, wots_t *w,
     do {
       dbg_printf("------------------------\nskn = %d\n", m->skn);
       mss_sign(m, H, sig);
-      r = r && mss_verify(s, w->s, H, sig, pk);
+      r = r && mss_verify(s, w->sponge, H, sig, pk);
 
 #if !defined(MAM2_MSS_DEBUG)
       // H is ignored, makes no sense to modify and check
       trits_put1(H, trit_add(trits_get1(H), 1));
-      r = r && !mss_verify(s, w->s, H, sig, pk);
+      r = r && !mss_verify(s, w->sponge, H, sig, pk);
       trits_put1(H, trit_sub(trits_get1(H), 1));
 #endif
 
       trits_put1(sig_skn, trit_add(trits_get1(sig_skn), 1));
-      r = r && !mss_verify(s, w->s, H, sig, pk);
+      r = r && !mss_verify(s, w->sponge, H, sig, pk);
       trits_put1(sig_skn, trit_sub(trits_get1(sig_skn), 1));
 
 #if !defined(MAM2_MSS_DEBUG)
       // WOTS sig is ignored, makes no sense to modify and check
       trits_put1(sig_wots, trit_add(trits_get1(sig_wots), 1));
-      r = r && !mss_verify(s, w->s, H, sig, pk);
+      r = r && !mss_verify(s, w->sponge, H, sig, pk);
       trits_put1(sig_wots, trit_sub(trits_get1(sig_wots), 1));
 
       if (!trits_is_empty(sig_apath)) {
         trits_put1(sig_apath, trit_add(trits_get1(sig_apath), 1));
-        r = r && !mss_verify(s, w->s, H, sig, pk);
+        r = r && !mss_verify(s, w->sponge, H, sig, pk);
         trits_put1(sig_apath, trit_sub(trits_get1(sig_apath), 1));
       }
 #endif
 
-      TEST_ASSERT(
-          !mss_verify(s, w->s, H, trits_take(sig, trits_size(sig) - 1), pk));
+      TEST_ASSERT(!mss_verify(s, w->sponge, H,
+                              trits_take(sig, trits_size(sig) - 1), pk));
       trits_put1(pk, trit_add(trits_get1(pk), 1));
-      TEST_ASSERT(!mss_verify(s, w->s, H, sig, pk));
+      TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, pk));
       trits_put1(pk, trit_sub(trits_get1(pk), 1));
 
     } while (mss_next(m));

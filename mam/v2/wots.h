@@ -3,17 +3,11 @@
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file wots.h
-\brief MAM2 WOTS layer.
-*/
 #ifndef __MAM_V2_WOTS_H__
 #define __MAM_V2_WOTS_H__
 
@@ -39,10 +33,10 @@
 
 typedef trit_t wots_sk_t[MAM2_WORDS(MAM2_WOTS_SK_SIZE)];
 
-/*! \brief WOTS interface. */
+// WOTS interface
 typedef struct wots_s {
-  isponge *s; /*!< sponge interface */
-  trit_t *sk; /*!< private key */
+  isponge *sponge; /*!< sponge interface */
+  trit_t *sk;      /*!< private key */
 } wots_t;
 
 /*! \brief Init WOTS interface with Sponge. */

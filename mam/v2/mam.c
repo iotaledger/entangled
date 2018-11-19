@@ -46,9 +46,9 @@ err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p, mss_mt_height_t d,
     err_guard(m->wots, err_bad_alloc);
     err_bind(wots_create(m->wots));
 
-    m->wots->s = ma->create_sponge();
-    err_guard(m->wots->s, err_bad_alloc);
-    wots_init(m->wots, m->wots->s);
+    m->wots->sponge = ma->create_sponge();
+    err_guard(m->wots->sponge, err_bad_alloc);
+    wots_init(m->wots, m->wots->sponge);
 
     mss_init(m, p, m->sponge, m->wots, d, m->nonce1, m->nonce2);
 
@@ -68,8 +68,8 @@ void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m) {
   trits_free(m->nonce2);
 
   if (m->wots) {
-    ma->destroy_sponge(m->wots->s);
-    m->wots->s = 0;
+    ma->destroy_sponge(m->wots->sponge);
+    m->wots->sponge = NULL;
   }
   wots_destroy(m->wots);
   m->wots = NULL;

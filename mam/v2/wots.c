@@ -1,21 +1,18 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file wots.c
-\brief MAM2 WOTS layer.
-*/
 #include "mam/v2/wots.h"
+
+/*
+ * Private functions
+ */
 
 static void wots_calc_pks(isponge *s, trits_t sk_pks, trits_t pk) {
   size_t i, j;
@@ -96,14 +93,14 @@ static void wots_hash_verify(isponge *s, trits_t sig_pks, trits_t H) {
   }
 }
 
-trits_t wots_sk_trits(wots_t *w) {
-  return trits_from_rep(MAM2_WOTS_SK_SIZE, w->sk);
-}
+/*
+ * Public functions
+ */
 
 void wots_init(wots_t *w, isponge *s) {
   MAM2_ASSERT(w);
   MAM2_ASSERT(s);
-  w->s = s;
+  w->sponge = s;
 }
 
 void wots_gen_sk(wots_t *w, prng_t *p, trits_t N) {
@@ -123,13 +120,13 @@ void wots_calc_pk(wots_t *w, trits_t pk) {
   trits_copy(wots_sk_trits(w), sk_pks);
   size_t num_sk_pks = wots_sk_trits(w).n - wots_sk_trits(w).d;
   TRIT_ARRAY_MAKE_FROM_RAW(sk_pks_arr, num_sk_pks, wots_sk_trits(w).p);
-  wots_calc_pks(w->s, sk_pks, pk);
+  wots_calc_pks(w->sponge, sk_pks, pk);
   trits_set_zero(sk_pks);
 }
 
 void wots_sign(wots_t *w, trits_t H, trits_t sig) {
   trits_copy(wots_sk_trits(w), sig);
-  wots_hash_sign(w->s, sig, H);
+  wots_hash_sign(w->sponge, sig, H);
 }
 
 void wots_recover(isponge *s, trits_t H, trits_t sig, trits_t pk) {
@@ -165,4 +162,8 @@ void wots_destroy(wots_t *w) {
   MAM2_ASSERT(w);
   free(w->sk);
   w->sk = 0;
+}
+
+trits_t wots_sk_trits(wots_t *w) {
+  return trits_from_rep(MAM2_WOTS_SK_SIZE, w->sk);
 }

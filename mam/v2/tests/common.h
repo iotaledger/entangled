@@ -173,7 +173,7 @@ static prng_t *test_prng_init(test_prng_t *prng, isponge *sponge) {
 }
 
 static wots_t *test_wots_init(test_wots_t *w, isponge *s) {
-  w->w.s = s;
+  w->w.sponge = s;
   w->w.sk = w->sk;
   return &w->w;
 }
