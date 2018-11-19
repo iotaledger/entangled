@@ -15,88 +15,131 @@
 #include "mam/v2/err.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
-#include "trits.h"
+#include "mam/v2/trits.h"
 
-/*! \brief WOTS public key size. */
+// WOTS public key size
 #define MAM2_WOTS_PK_SIZE 243
-/*! \brief WOTS private key part size. */
+// WOTS private key part size
 #define MAM2_WOTS_SK_PART_SIZE 162
-/*! \brief WOTS private key parts count. */
+// WOTS private key parts count
 #define MAM2_WOTS_SK_PART_COUNT 81
-/*! \brief WOTS private key size. */
+// WOTS private key size
 #define MAM2_WOTS_SK_SIZE (MAM2_WOTS_SK_PART_SIZE * MAM2_WOTS_SK_PART_COUNT)
-
-/*! \brief WOTS signed hash value size. */
+// WOTS signed hash value size
 #define MAM2_WOTS_HASH_SIZE 234
-/*! \brief WOTS signature size. */
+// WOTS signature size
 #define MAM2_WOTS_SIG_SIZE MAM2_WOTS_SK_SIZE
 
 typedef trit_t wots_sk_t[MAM2_WORDS(MAM2_WOTS_SK_SIZE)];
 
 // WOTS interface
 typedef struct wots_s {
-  isponge *sponge; /*!< sponge interface */
-  trit_t *sk;      /*!< private key */
+  isponge *sponge;
+  trit_t *sk;
 } wots_t;
 
-/*! \brief Init WOTS interface with Sponge. */
-void wots_init(wots_t *w, /*!< [in,out] WOTS interface */
-               isponge *s /*!< [in] Sponge interface */
-);
+/**
+ * Initializes a WOTS interface with a Sponge
+ *
+ * @param wots WOTS interface
+ * @param sponge Sponge interface
+ */
+void wots_init(wots_t *wots, isponge *sponge);
 
-/*! \brief Generate WOTS private key. */
-void wots_gen_sk(wots_t *w, /*!< [in] WOTS interface */
-                 prng_t *p, /*!< [in] PRNG interface */
-                 trits_t N  /*!< [in] nonce */
-);
+/**
+ * Generates a WOTS private key
+ *
+ * @param wots WOTS interface
+ * @param prng PRNG interface
+ * @param nonce Nonce
+ */
+void wots_gen_sk(wots_t *wots, prng_t *prng, trits_t nonce);
 
-/*! \brief Generate WOTS private key. */
-void wots_gen_sk2(wots_t *w,  /*!< [in] WOTS interface */
-                  prng_t *p,  /*!< [in] PRNG interface */
-                  trits_t N1, /*!< [in] first nonce */
-                  trits_t N2  /*!< [in] second nonce */
-);
+/**
+ * Generates a WOTS private key
+ *
+ * @param wots WOTS interface
+ * @param prng PRNG interface
+ * @param nonce1 First nonce
+ * @param nonce2 Second nonce
+ */
+void wots_gen_sk2(wots_t *wots, prng_t *prng, trits_t nonce1, trits_t nonce2);
 
-/*! \brief Generate WOTS private key. */
-void wots_gen_sk3(wots_t *w,  /*!< [in] WOTS interface */
-                  prng_t *p,  /*!< [in] PRNG interface */
-                  trits_t N1, /*!< [in] first nonce */
-                  trits_t N2, /*!< [in] second nonce */
-                  trits_t N3  /*!< [in] third nonce */
-);
+/**
+ * Generates a WOTS private key
+ *
+ * @param wots WOTS interface
+ * @param prng PRNG interface
+ * @param nonce1 First nonce
+ * @param nonce2 Second nonce
+ * @param nonce3 Third nonce
+ */
+void wots_gen_sk3(wots_t *wots, prng_t *prng, trits_t nonce, trits_t nonce2,
+                  trits_t nonce3);
 
-/*! \brief Calculate WOTS public key.
-\note Private key must have already been generated. */
-void wots_calc_pk(wots_t *w, /*!< [in] WOTS interface */
-                  trits_t pk /*!< [out] public key */
-);
+/**
+ * Computes a WOTS public key
+ * Private key must have already been generated
+ *
+ * @param wots WOTS interface
+ * @param pk Public key
+ */
+void wots_calc_pk(wots_t *wots, trits_t pk);
 
-/*! \brief Generate WOTS signature. */
-void wots_sign(wots_t *w,  /*!< [in] WOTS interface */
-               trits_t H,  /*!< [in] hash value tbs */
-               trits_t sig /*!< [out] signature */
-);
+/**
+ * Generates a WOTS signature
+ *
+ * @param wots WOTS interface
+ * @param hash Hash value to be signed
+ * @param sig Signature
+ */
+void wots_sign(wots_t *wots, trits_t hash, trits_t sig);
 
-/*! \brief Recover WOTS public key from signature. */
-void wots_recover(isponge *s,  /*!< [in] Sponge interface */
-                  trits_t H,   /*!< [in] signed hash value */
-                  trits_t sig, /*!< [in] signature */
-                  trits_t pk   /*!< [out] presumed public key */
-);
+/**
+ * Recovers a WOTS public key from a signature
+ *
+ * @param sponge Sponge interface
+ * @param hash Signed hash value
+ * @param sig Signature
+ * @param pk Presumed public key
+ */
+void wots_recover(isponge *sponge, trits_t hash, trits_t sig, trits_t pk);
 
-/*! \brief Verify WOTS signature. */
-bool_t wots_verify(isponge *s,  /*!< [in] Sponge interface */
-                   trits_t H,   /*!< [in] signed hash value */
-                   trits_t sig, /*!< [in] signature */
-                   trits_t pk   /*!< [in] public key */
-);
+/**
+ * Verifies a WOTS signature
+ *
+ * @param sponge Sponge interface
+ * @param hash Signed hash value
+ * @param sig Signature
+ * @param pk Public key
+ *
+ * @return true if signature is valid, false otherwise
+ */
+bool_t wots_verify(isponge *sponge, trits_t hash, trits_t sig, trits_t pk);
 
-/*! \brief Allocate memory for WOTS private key. */
-err_t wots_create(wots_t *w);
+/**
+ * Allocates memory for WOTS private key
+ *
+ * @param wots WOTS interface
+ *
+ * @return a status code
+ */
+err_t wots_create(wots_t *wots);
 
-/*! \brief Deallocate memory for WOTS private key. */
-void wots_destroy(wots_t *w);
+/**
+ * Deallocates memory for WOTS private key
+ *
+ * @param wots WOTS interface
+ */
+void wots_destroy(wots_t *wots);
 
-trits_t wots_sk_trits(wots_t *w);
+/**
+ * Gets the WOTS private key
+ *
+ * @param wots WOTS interface
+ *
+ * @return the WOTS private key
+ */
+trits_t wots_sk_trits(wots_t *wots);
 
 #endif  // __MAM_V2_WOTS_H__
