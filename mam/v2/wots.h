@@ -40,31 +40,31 @@
 typedef trit_t wots_sk_t[MAM2_WORDS(MAM2_WOTS_SK_SIZE)];
 
 /*! \brief WOTS interface. */
-typedef struct _iwots {
+typedef struct wots_s {
   isponge *s; /*!< sponge interface */
   trit_t *sk; /*!< private key */
-} iwots;
+} wots_t;
 
 /*! \brief Init WOTS interface with Sponge. */
-void wots_init(iwots *w,  /*!< [in,out] WOTS interface */
+void wots_init(wots_t *w, /*!< [in,out] WOTS interface */
                isponge *s /*!< [in] Sponge interface */
 );
 
 /*! \brief Generate WOTS private key. */
-void wots_gen_sk(iwots *w,  /*!< [in] WOTS interface */
+void wots_gen_sk(wots_t *w, /*!< [in] WOTS interface */
                  prng_t *p, /*!< [in] PRNG interface */
                  trits_t N  /*!< [in] nonce */
 );
 
 /*! \brief Generate WOTS private key. */
-void wots_gen_sk2(iwots *w,   /*!< [in] WOTS interface */
+void wots_gen_sk2(wots_t *w,  /*!< [in] WOTS interface */
                   prng_t *p,  /*!< [in] PRNG interface */
                   trits_t N1, /*!< [in] first nonce */
                   trits_t N2  /*!< [in] second nonce */
 );
 
 /*! \brief Generate WOTS private key. */
-void wots_gen_sk3(iwots *w,   /*!< [in] WOTS interface */
+void wots_gen_sk3(wots_t *w,  /*!< [in] WOTS interface */
                   prng_t *p,  /*!< [in] PRNG interface */
                   trits_t N1, /*!< [in] first nonce */
                   trits_t N2, /*!< [in] second nonce */
@@ -73,12 +73,12 @@ void wots_gen_sk3(iwots *w,   /*!< [in] WOTS interface */
 
 /*! \brief Calculate WOTS public key.
 \note Private key must have already been generated. */
-void wots_calc_pk(iwots *w,  /*!< [in] WOTS interface */
+void wots_calc_pk(wots_t *w, /*!< [in] WOTS interface */
                   trits_t pk /*!< [out] public key */
 );
 
 /*! \brief Generate WOTS signature. */
-void wots_sign(iwots *w,   /*!< [in] WOTS interface */
+void wots_sign(wots_t *w,  /*!< [in] WOTS interface */
                trits_t H,  /*!< [in] hash value tbs */
                trits_t sig /*!< [out] signature */
 );
@@ -98,11 +98,11 @@ bool_t wots_verify(isponge *s,  /*!< [in] Sponge interface */
 );
 
 /*! \brief Allocate memory for WOTS private key. */
-err_t wots_create(iwots *w);
+err_t wots_create(wots_t *w);
 
 /*! \brief Deallocate memory for WOTS private key. */
-void wots_destroy(iwots *w);
+void wots_destroy(wots_t *w);
 
-trits_t wots_sk_trits(iwots *w);
+trits_t wots_sk_trits(wots_t *w);
 
 #endif  // __MAM_V2_WOTS_H__

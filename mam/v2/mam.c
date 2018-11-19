@@ -42,7 +42,7 @@ err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p, mss_mt_height_t d,
     m->sponge = ma->create_sponge();
     err_guard(m->sponge, err_bad_alloc);
 
-    m->wots = malloc(sizeof(iwots));
+    m->wots = malloc(sizeof(wots_t));
     err_guard(m->wots, err_bad_alloc);
     err_bind(wots_create(m->wots));
 

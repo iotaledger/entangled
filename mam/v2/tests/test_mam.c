@@ -129,7 +129,7 @@ void mam_test() {
   prng_t *p = test_prng_init(_p, s);
   prng_t *pa = test_prng_init(_pa, s);
   prng_t *pb = test_prng_init(_pb, s);
-  iwots *w = test_wots_init(_w, s);
+  wots_t *w = test_wots_init(_w, s);
   mss_t *m1 = test_mss_init1(_m1);
   mss_t *m2 = test_mss_init2(_m2);
   mss_t *m3 = test_mss_init3(_m3);

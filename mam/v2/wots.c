@@ -96,29 +96,29 @@ static void wots_hash_verify(isponge *s, trits_t sig_pks, trits_t H) {
   }
 }
 
-trits_t wots_sk_trits(iwots *w) {
+trits_t wots_sk_trits(wots_t *w) {
   return trits_from_rep(MAM2_WOTS_SK_SIZE, w->sk);
 }
 
-void wots_init(iwots *w, isponge *s) {
+void wots_init(wots_t *w, isponge *s) {
   MAM2_ASSERT(w);
   MAM2_ASSERT(s);
   w->s = s;
 }
 
-void wots_gen_sk(iwots *w, prng_t *p, trits_t N) {
+void wots_gen_sk(wots_t *w, prng_t *p, trits_t N) {
   wots_gen_sk3(w, p, N, trits_null(), trits_null());
 }
 
-void wots_gen_sk2(iwots *w, prng_t *p, trits_t N1, trits_t N2) {
+void wots_gen_sk2(wots_t *w, prng_t *p, trits_t N1, trits_t N2) {
   wots_gen_sk3(w, p, N1, N2, trits_null());
 }
 
-void wots_gen_sk3(iwots *w, prng_t *p, trits_t N1, trits_t N2, trits_t N3) {
+void wots_gen_sk3(wots_t *w, prng_t *p, trits_t N1, trits_t N2, trits_t N3) {
   prng_gen3(p, MAM2_PRNG_DST_WOTS_KEY, N1, N2, N3, wots_sk_trits(w));
 }
 
-void wots_calc_pk(iwots *w, trits_t pk) {
+void wots_calc_pk(wots_t *w, trits_t pk) {
   MAM2_TRITS_DEF(sk_pks, MAM2_WOTS_SK_SIZE);
   trits_copy(wots_sk_trits(w), sk_pks);
   size_t num_sk_pks = wots_sk_trits(w).n - wots_sk_trits(w).d;
@@ -127,7 +127,7 @@ void wots_calc_pk(iwots *w, trits_t pk) {
   trits_set_zero(sk_pks);
 }
 
-void wots_sign(iwots *w, trits_t H, trits_t sig) {
+void wots_sign(wots_t *w, trits_t H, trits_t sig) {
   trits_copy(wots_sk_trits(w), sig);
   wots_hash_sign(w->s, sig, H);
 }
@@ -148,11 +148,11 @@ bool_t wots_verify(isponge *s, trits_t H, trits_t sig, trits_t pk) {
   return (0 == trits_cmp_grlex(pk, sig_pk)) ? 1 : 0;
 }
 
-err_t wots_create(iwots *w) {
+err_t wots_create(wots_t *w) {
   err_t e = err_internal_error;
   MAM2_ASSERT(w);
   do {
-    memset(w, 0, sizeof(iwots));
+    memset(w, 0, sizeof(wots_t));
     w->sk = (trit_t *)malloc(sizeof(trit_t) * MAM2_WORDS(MAM2_WOTS_SK_SIZE));
     memset(w->sk, 0, MAM2_WORDS(MAM2_WOTS_SK_SIZE));
     err_guard(w->sk, err_bad_alloc);
@@ -161,7 +161,7 @@ err_t wots_create(iwots *w) {
   return e;
 }
 
-void wots_destroy(iwots *w) {
+void wots_destroy(wots_t *w) {
   MAM2_ASSERT(w);
   free(w->sk);
   w->sk = 0;

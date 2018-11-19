@@ -29,7 +29,8 @@
 #include <memory.h>
 #include <stdio.h>
 
-void mss_test_do(mss_t *m, prng_t *p, isponge *s, iwots *w, mss_mt_height_t D) {
+void mss_test_do(mss_t *m, prng_t *p, isponge *s, wots_t *w,
+                 mss_mt_height_t D) {
   bool_t r = 1;
   flex_trit_t key[FLEX_TRIT_SIZE_243];
   // TODO Remove when sponge handles flex_trit_t
@@ -128,7 +129,7 @@ void mss_test() {
 
   isponge *s = test_sponge_init(_s);
   prng_t *p = test_prng_init(_p, s);
-  iwots *w = test_wots_init(_w, s);
+  wots_t *w = test_wots_init(_w, s);
   mss_t *m1 = test_mss_init1(_m1);
   mss_t *m2 = test_mss_init2(_m2);
   mss_t *m3 = test_mss_init3(_m3);

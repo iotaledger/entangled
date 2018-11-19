@@ -28,7 +28,7 @@
 #include <memory.h>
 #include <stdio.h>
 
-bool_t wots_test_do(iwots *w, prng_t *p) {
+bool_t wots_test_do(wots_t *w, prng_t *p) {
   bool_t r = 1;
   MAM2_TRITS_DEF(N, 18);
   MAM2_TRITS_DEF(pk, MAM2_WOTS_PK_SIZE);
@@ -68,7 +68,7 @@ void wots_test() {
 
   isponge *s = test_sponge_init(_s);
   prng_t *p = test_prng_init(_p, s);
-  iwots *w = test_wots_init(_w, s);
+  wots_t *w = test_wots_init(_w, s);
 
   flex_trit_t key[FLEX_TRIT_SIZE_243];
   // TODO Remove when sponge handles flex_trit_t
