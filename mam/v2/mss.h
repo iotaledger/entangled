@@ -90,7 +90,7 @@ typedef struct mss_s {
   mss_mt_index_t skn;      // Current WOTS private key number
   prng_t *prng;            // PRNG interface used to generate WOTS private keys
   isponge *sponge;         // Sponge interface used to hash Merkle tree nodes
-  iwots *wots;             // WOTS interface used to generate keys and sign
+  wots_t *wots;            // WOTS interface used to generate keys and sign
 #if defined(MAM2_MSS_TRAVERSAL)
   trit_t *auth_path;       // Current authentication path; `d` hash values
   trit_t *hashes;          // Buffer storing hash-values of auxiliary nodes;
@@ -145,7 +145,7 @@ typedef struct mss_s {
  * @param nonce2 Second nonce
  */
 void mss_init(mss_t *const mss, prng_t *const prng, isponge *const sponge,
-              iwots *const wots, mss_mt_height_t const height,
+              wots_t *const wots, mss_mt_height_t const height,
               trits_t const nonce1, trits_t const nonce2);
 
 /**
