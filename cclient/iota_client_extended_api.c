@@ -546,3 +546,77 @@ retcode_t iota_client_send_transfer(
   hash_array_free(raw_tx);
   return ret_code;
 }
+
+retcode_t iota_client_get_bundle(iota_client_service_t const* const serv,
+                                 flex_trit_t const* const tail_hash,
+                                 transaction_objs_t* out_tx_objs) {
+  log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
+  return iota_client_traverse_bundle(serv, tail_hash, out_tx_objs);
+}
+
+retcode_t iota_client_traverse_bundle(iota_client_service_t const* const serv,
+                                      flex_trit_t const* const trunk_tx,
+                                      transaction_objs_t* const tx_objs) {
+  retcode_t ret_code = RC_OK;
+  get_trytes_req_t* get_trytes_req = NULL;
+  get_trytes_res_t* get_trytes_res = NULL;
+  iota_transaction_t* tx;
+  flex_trit_t* tmp_trytes;
+  flex_trit_t* trunk_hash = (flex_trit_t*)trunk_tx;
+
+  log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
+
+  do {
+    // Create request and response to get_trytes API
+    get_trytes_req = get_trytes_req_new();
+    get_trytes_res = get_trytes_res_new();
+    if (!get_trytes_req || !get_trytes_res) {
+      ret_code = RC_CCLIENT_NULL_PTR;
+      goto cleanup;
+    }
+    // Add the trunk hash to the request parameters
+    ret_code = hash243_queue_push(&get_trytes_req->hashes, trunk_hash);
+    if (ret_code != RC_OK) {
+      goto cleanup;
+    }
+    // Call the get_trytes API
+    ret_code = iota_client_get_trytes(serv, get_trytes_req, get_trytes_res);
+    if (ret_code != RC_OK) {
+      goto cleanup;
+    }
+    get_trytes_req_free(&get_trytes_req);
+    // Get the transaction trytes
+    tmp_trytes = hash8019_queue_at(&get_trytes_res->trytes, 0);
+    if (!tmp_trytes) {
+      ret_code = RC_CCLIENT_RES_ERROR;
+      goto cleanup;
+    }
+    // Create a new transaction with the received trytes
+    tx = transaction_deserialize(tmp_trytes, true);
+    if (!tx) {
+      ret_code = RC_CCLIENT_OOM;
+      goto cleanup;
+    }
+    get_trytes_res_free(&get_trytes_res);
+    // Check that the first transaction we get is really a tail transaction
+    // Its index must be 0 and the list of transactions empty.
+    // It is an error if the first transaction has index > 0
+    if (!utarray_len(tx_objs) && transaction_current_index(tx)) {
+      ret_code = RC_CCLIENT_INVALID_TAIL_HASH;
+      goto cleanup;
+    }
+    // If the transaction is valid, add it to the transactino list
+    utarray_push_back(tx_objs, tx);
+    trunk_hash = transaction_trunk(tx);
+  } while (transaction_current_index(tx) != transaction_last_index(tx));
+
+  return ret_code;
+
+cleanup:
+  get_trytes_req_free(&get_trytes_req);
+  get_trytes_res_free(&get_trytes_res);
+  if (tx_objs) {
+    utarray_clear(tx_objs);
+  }
+  return ret_code;
+}
