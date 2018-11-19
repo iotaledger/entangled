@@ -103,6 +103,12 @@ void wots_init(wots_t *wots, isponge *sponge) {
   wots->sponge = sponge;
 }
 
+void wots_reset(wots_t *wots) {
+  MAM2_ASSERT(wots);
+  wots->sponge = NULL;
+  memset(wots->sk, FLEX_TRIT_NULL_VALUE, MAM2_WOTS_SK_FLEX_SIZE);
+}
+
 void wots_gen_sk(wots_t *wots, prng_t *prng, trits_t nonce) {
   wots_gen_sk3(wots, prng, nonce, trits_null(), trits_null());
 }
@@ -145,25 +151,6 @@ bool_t wots_verify(isponge *sponge, trits_t hash, trits_t sig, trits_t pk) {
   MAM2_TRITS_DEF(sig_pk, MAM2_WOTS_PK_SIZE);
   wots_recover(sponge, hash, sig, sig_pk);
   return (0 == trits_cmp_grlex(pk, sig_pk)) ? 1 : 0;
-}
-
-err_t wots_create(wots_t *wots) {
-  err_t e = err_internal_error;
-  MAM2_ASSERT(wots);
-  do {
-    memset(wots, 0, sizeof(wots_t));
-    wots->sk = (trit_t *)malloc(sizeof(trit_t) * MAM2_WORDS(MAM2_WOTS_SK_SIZE));
-    memset(wots->sk, 0, MAM2_WORDS(MAM2_WOTS_SK_SIZE));
-    err_guard(wots->sk, err_bad_alloc);
-    e = err_ok;
-  } while (0);
-  return e;
-}
-
-void wots_destroy(wots_t *wots) {
-  MAM2_ASSERT(wots);
-  free(wots->sk);
-  wots->sk = NULL;
 }
 
 trits_t wots_sk_trits(wots_t *wots) {

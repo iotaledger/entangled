@@ -50,7 +50,7 @@ typedef trit_t wots_sk_t[MAM2_WORDS(MAM2_WOTS_SK_SIZE)];
 // WOTS interface
 typedef struct wots_s {
   isponge *sponge;
-  trit_t *sk;
+  flex_trit_t sk[MAM2_WOTS_SK_FLEX_SIZE];
 } wots_t;
 
 /**
@@ -60,6 +60,13 @@ typedef struct wots_s {
  * @param sponge Sponge interface
  */
 void wots_init(wots_t *wots, isponge *sponge);
+
+/**
+ * Resets WOTS sponge and SK
+ *
+ * @param wots WOTS interface
+ */
+void wots_create(wots_t *wots);
 
 /**
  * Generates a WOTS private key
@@ -131,22 +138,6 @@ void wots_recover(isponge *sponge, trits_t hash, trits_t sig, trits_t pk);
  * @return true if signature is valid, false otherwise
  */
 bool_t wots_verify(isponge *sponge, trits_t hash, trits_t sig, trits_t pk);
-
-/**
- * Allocates memory for WOTS private key
- *
- * @param wots WOTS interface
- *
- * @return a status code
- */
-err_t wots_create(wots_t *wots);
-
-/**
- * Deallocates memory for WOTS private key
- *
- * @param wots WOTS interface
- */
-void wots_destroy(wots_t *wots);
 
 /**
  * Gets the WOTS private key

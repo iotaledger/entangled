@@ -15,6 +15,9 @@
 \file mam2.c
 \brief MAM2 layer.
 */
+
+#include <stdlib.h>
+
 #include "mam/v2/mam.h"
 #include "mam/v2/pb3.h"
 
@@ -44,7 +47,7 @@ err_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p, mss_mt_height_t d,
 
     m->wots = malloc(sizeof(wots_t));
     err_guard(m->wots, err_bad_alloc);
-    err_bind(wots_create(m->wots));
+    wots_reset(m->wots);
 
     m->wots->sponge = ma->create_sponge();
     err_guard(m->wots->sponge, err_bad_alloc);
@@ -71,7 +74,7 @@ void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m) {
     ma->destroy_sponge(m->wots->sponge);
     m->wots->sponge = NULL;
   }
-  wots_destroy(m->wots);
+  wots_reset(m->wots);
   m->wots = NULL;
 
   ma->destroy_sponge(m->sponge);
