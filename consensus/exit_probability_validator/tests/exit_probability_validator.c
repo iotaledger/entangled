@@ -55,7 +55,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
 
   strcpy(consensus_conf.snapshot_file, snapshot_path);
   strcpy(consensus_conf.snapshot_conf_file, snapshot_conf_path);
-  strcpy(consensus_conf.snapshot_sig_file, "");
+  strcpy(consensus_conf.snapshot_signature_file, "");
   TEST_ASSERT(iota_snapshot_init(&snapshot, &consensus_conf) == RC_OK);
   iota_consensus_transaction_solidifier_init(&ts, &consensus_conf, &tangle,
                                              NULL, NULL);
