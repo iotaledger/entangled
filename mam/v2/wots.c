@@ -25,7 +25,9 @@ static void wots_calc_pks(isponge *const sponge, trits_t sk_pks, trits_t pk) {
     sk_part = trits_take(sk_pks, MAM2_WOTS_SK_PART_SIZE);
     sk_pks = trits_drop(sk_pks, MAM2_WOTS_SK_PART_SIZE);
 
-    for (j = 0; j < 26; ++j) sponge_hash(sponge, sk_part, sk_part);
+    for (j = 0; j < 26; ++j) {
+      sponge_hash(sponge, sk_part, sk_part);
+    }
   }
 
   sponge_hash(sponge, pks, pk);
@@ -48,7 +50,9 @@ static void wots_hash_sign(isponge *const sponge, trits_t sk_sig,
     h = trits_get3(trits_drop(hash, i * 3));
     t += h;
 
-    for (j = 0; j < 13 + h; ++j) sponge_hash(sponge, sig_part, sig_part);
+    for (j = 0; j < 13 + h; ++j) {
+      sponge_hash(sponge, sig_part, sig_part);
+    }
   }
 
   t = -t;
@@ -59,7 +63,9 @@ static void wots_hash_sign(isponge *const sponge, trits_t sk_sig,
     h = MAM2_MODS(t, 19683, 27);
     t = MAM2_DIVS(t, 19683, 27);
 
-    for (j = 0; j < 13 + h; ++j) sponge_hash(sponge, sig_part, sig_part);
+    for (j = 0; j < 13 + h; ++j) {
+      sponge_hash(sponge, sig_part, sig_part);
+    }
   }
 }
 
@@ -122,20 +128,27 @@ void wots_gen_sk2(wots_t *const wots, prng_t *const prng, trits_t const nonce1,
 
 void wots_gen_sk3(wots_t *const wots, prng_t *const prng, trits_t const nonce1,
                   trits_t const nonce2, trits_t const nonce3) {
-  prng_gen3(prng, MAM2_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3,
-            wots_sk_trits(wots));
+  // TODO Remove when prng_gen3 takes flex_trit_t *
+  MAM2_TRITS_DEF(tmp, MAM2_WOTS_SK_SIZE);
+  prng_gen3(prng, MAM2_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3, tmp);
+  // TODO Remove when prng_gen3 takes flex_trit_t *
+  flex_trits_from_trits(wots->sk, MAM2_WOTS_SK_SIZE, tmp.p, MAM2_WOTS_SK_SIZE,
+                        MAM2_WOTS_SK_SIZE);
 }
 
 void wots_calc_pk(wots_t *const wots, trits_t pk) {
   MAM2_TRITS_DEF(sk_pks, MAM2_WOTS_SK_SIZE);
-  trits_copy(wots_sk_trits(wots), sk_pks);
-  size_t num_sk_pks = wots_sk_trits(wots).n - wots_sk_trits(wots).d;
+  // TODO Remove when wots_calc_pks takes flex_trit_t *
+  flex_trits_to_trits(sk_pks.p, MAM2_WOTS_SK_SIZE, wots->sk, MAM2_WOTS_SK_SIZE,
+                      MAM2_WOTS_SK_SIZE);
   wots_calc_pks(wots->sponge, sk_pks, pk);
   trits_set_zero(sk_pks);
 }
 
 void wots_sign(wots_t *const wots, trits_t const hash, trits_t sig) {
-  trits_copy(wots_sk_trits(wots), sig);
+  // TODO Remove when wots_hash_sign takes flex_trit_t *
+  flex_trits_to_trits(sig.p, MAM2_WOTS_SK_SIZE, wots->sk, MAM2_WOTS_SK_SIZE,
+                      MAM2_WOTS_SK_SIZE);
   wots_hash_sign(wots->sponge, sig, hash);
 }
 
@@ -155,8 +168,4 @@ bool wots_verify(isponge *const sponge, trits_t const hash, trits_t const sig,
   MAM2_TRITS_DEF(sig_pk, MAM2_WOTS_PK_SIZE);
   wots_recover(sponge, hash, sig, sig_pk);
   return (0 == trits_cmp_grlex(pk, sig_pk));
-}
-
-trits_t wots_sk_trits(wots_t *const wots) {
-  return trits_from_rep(MAM2_WOTS_SK_SIZE, wots->sk);
 }

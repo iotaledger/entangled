@@ -142,13 +142,4 @@ void wots_recover(isponge *const sponge, trits_t const hash, trits_t const sig,
 bool wots_verify(isponge *const sponge, trits_t const hash, trits_t const sig,
                  trits_t const pk);
 
-/**
- * Gets the WOTS private key
- *
- * @param wots WOTS interface
- *
- * @return the WOTS private key
- */
-trits_t wots_sk_trits(wots_t *const wots);
-
 #endif  // __MAM_V2_WOTS_H__
