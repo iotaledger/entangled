@@ -61,7 +61,7 @@ void sponge_init(isponge *s) { trits_set_zero(sponge_state_trits(s)); }
 
 void sponge_absorb(isponge *s, trit_t c2, trits_t X) {
   size_t num_trits = X.n - X.d;
-  TRIT_ARRAY_MAKE_FROM_RAW(X_arr, num_trits, X.p);
+  TRIT_ARRAY_MAKE_FROM_RAW(X_arr, num_trits, X.p + X.d);
   sponge_absorb_flex(s, c2, &X_arr);
   flex_trits_to_trits(&X.p[X.d], num_trits, X_arr.trits, num_trits, num_trits);
 }
@@ -98,7 +98,7 @@ void sponge_absorb_flex(isponge *s, trit_t c2, trit_array_p X_arr) {
 
 void sponge_squeeze(isponge *s, trit_t c2, trits_t Y) {
   size_t num_trits = Y.n - Y.d;
-  TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, num_trits, Y.p);
+  TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, num_trits, Y.p + Y.d);
   sponge_squeeze_flex(s, c2, &Y_arr);
   flex_trits_to_trits(&Y.p[Y.d], num_trits, Y_arr.trits, num_trits, num_trits);
 }
@@ -242,8 +242,8 @@ void sponge_decr_flex(isponge *s, trit_array_p X_arr, trit_array_p Y_arr) {
 
 void sponge_hash(isponge *s, trits_t X, trits_t Y) {
   size_t y_size = Y.n - Y.d;
-  TRIT_ARRAY_MAKE_FROM_RAW(X_arr, X.n - X.d, &X.p[X.d]);
-  TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, y_size, &Y.p[Y.d]);
+  TRIT_ARRAY_MAKE_FROM_RAW(X_arr, X.n - X.d, X.p + X.d);
+  TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, y_size, Y.p + Y.d);
   sponge_hash_flex(s, &X_arr, &Y_arr);
   flex_trits_to_trits(&Y.p[Y.d], y_size, Y_arr.trits, y_size, y_size);
 }
