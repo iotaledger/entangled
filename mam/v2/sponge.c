@@ -148,6 +148,41 @@ void sponge_absorbn(isponge *s, trit_t c2, size_t n, trits_t *Xs) {
   } while (0 < m);
 }
 
+void sponge_absorbn_flex(isponge *s, trit_t c2, size_t n, trit_array_t Xs[]) {
+  size_t total_trits = 0;
+  for (size_t i = 0; i < n; ++i) {
+    total_trits += Xs[i].num_trits;
+  }
+  trit_t buffer[total_trits + n];
+  trits_t Xs_trits[n];
+  size_t trits_pos = 0;
+  for (size_t i = 0; i < n; ++i) {
+    flex_trits_to_trits(&buffer[trits_pos], Xs[i].num_trits, Xs[i].trits,
+                        Xs[i].num_trits, Xs[i].num_trits);
+    Xs_trits[i] = trits_from_rep(Xs[i].num_trits, &buffer[trits_pos]);
+    trits_pos += Xs[i].num_trits;
+  }
+
+  buffers_t tb = buffers_init(n, Xs_trits);
+  size_t m = buffers_size(tb);
+  trits_t s1 = sponge_outer1_trits(s);
+  size_t ni;
+  trit_t c0, c1;
+  do {
+    ni = (m < MAM2_SPONGE_RATE) ? m : MAM2_SPONGE_RATE;
+    m -= ni;
+    c0 = (ni < MAM2_SPONGE_RATE) ? 0 : 1;
+    c1 = (0 == m) ? 1 : -1;
+    if (!MAM2_SPONGE_IS_CONTROL_TRIT_ZERO(s, 1)) {
+      set_control_tryte(s, 1, c0, c1, c2);
+      sponge_transform(s);
+    }
+    buffers_copy_to(&tb, trits_take(s1, ni));
+    trits_pad10(trits_drop(s1, ni));
+    set_control_tryte(s, 0, c0, c1, c2);
+  } while (0 < m);
+}
+
 void sponge_encr(isponge *s, trits_t X, trits_t Y) {
   size_t y_size = Y.n - Y.d;
   TRIT_ARRAY_MAKE_FROM_RAW(X_arr, X.n, X.p + X.d);
@@ -255,7 +290,34 @@ void sponge_hash_flex(isponge *s, trit_array_p X, trit_array_p Y) {
 }
 
 void sponge_hashn(isponge *s, size_t n, trits_t *Xs, trits_t Y) {
+  // Convert trits_t* to trit_array_t[]
+  trit_array_t Xs_arrays[n];
+  size_t num_bytes = 0;
+  for (size_t i = 0; i < n; ++i) {
+    num_bytes += trit_array_bytes_for_trits(Xs[i].n - Xs[i].d);
+  }
+  flex_trit_t buffer[num_bytes];
+  size_t pos = 0;
+  size_t curr_num_trits;
+  for (size_t i = 0; i < n; ++i) {
+    curr_num_trits = Xs[i].n - Xs[i].d;
+    num_bytes = trit_array_bytes_for_trits(curr_num_trits);
+    flex_trits_from_trits(&buffer[pos], curr_num_trits, Xs[i].p + Xs[i].d,
+                          curr_num_trits, curr_num_trits);
+    Xs_arrays[i].dynamic = 0;
+    trit_array_set_trits(&Xs_arrays[i], &buffer[pos], curr_num_trits);
+    pos += num_bytes;
+  }
+
+  size_t y_size = Y.n - Y.d;
+  TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, y_size, Y.p + Y.d);
+  sponge_hashn_flex(s, n, Xs_arrays, &Y_arr);
+  flex_trits_to_trits(&Y.p[Y.d], y_size, Y_arr.trits, y_size, y_size);
+}
+
+void sponge_hashn_flex(isponge *s, size_t n, trit_array_t Xs[],
+                       trit_array_p Y) {
   sponge_init(s);
-  sponge_absorbn(s, MAM2_SPONGE_CTL_HASH, n, Xs);
-  sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, Y);
+  sponge_absorbn_flex(s, MAM2_SPONGE_CTL_HASH, n, Xs);
+  sponge_squeeze_flex(s, MAM2_SPONGE_CTL_HASH, Y);
 }

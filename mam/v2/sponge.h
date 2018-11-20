@@ -90,6 +90,14 @@ void sponge_absorbn(
     trits_t *Xs /*!< [in] input data blocks */
 );
 
+/*! \brief Absorb concatenation of `Xs[0]`..`Xs[n-1]` */
+void sponge_absorbn_flex(
+    isponge *s,       /*!< [in] sponge interface */
+    trit_t c2,        /*!< [in] control trit encoding input data type */
+    size_t n,         /*!< [in] input data blocks count */
+    trit_array_t Xs[] /*!< [in] input data blocks */
+);
+
 /*! \brief Sponge squeezing. */
 void sponge_squeeze(
     isponge *s, /*!< [in] sponge interface */
@@ -145,6 +153,15 @@ void sponge_hashn(isponge *s,  /*!< [in] sponge interface */
                   size_t n,    /*!< [in] input data blocks count */
                   trits_t *Xs, /*!< [in] input data blocks */
                   trits_t Y    /*!< [out] hash value */
+
+);
+
+/*! \brief Sponge hashing. */
+void sponge_hashn_flex(isponge *s,        /*!< [in] sponge interface */
+                       size_t n,          /*!< [in] input data blocks count */
+                       trit_array_t Xs[], /*!< [in] input data blocks */
+                       trit_array_p Y     /*!< [out] hash value */
+
 );
 
 #endif  // __MAM_V2_SPONGE_H__
