@@ -153,7 +153,7 @@ void sponge_absorbn_flex(isponge *s, trit_t c2, size_t n, trit_array_t Xs[]) {
   for (size_t i = 0; i < n; ++i) {
     total_trits += Xs[i].num_trits;
   }
-  trit_t buffer[total_trits + n];
+  trit_t buffer[total_trits];
   trits_t Xs_trits[n];
   size_t trits_pos = 0;
   for (size_t i = 0; i < n; ++i) {
