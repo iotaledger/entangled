@@ -80,7 +80,7 @@ void sponge_absorb(isponge *s, /*!< [in] sponge interface */
                    trits_t X  /*!< [in] input data */
 );
 
-void sponge_absorb_arr(isponge *s, trit_t c2, trit_array_p X_arr);
+void sponge_absorb_flex(isponge *s, trit_t c2, trit_array_p X_arr);
 
 /*! \brief Absorb concatenation of `Xs[0]`..`Xs[n-1]` */
 void sponge_absorbn(
