@@ -241,9 +241,17 @@ void sponge_decr_flex(isponge *s, trit_array_p X_arr, trit_array_p Y_arr) {
 }
 
 void sponge_hash(isponge *s, trits_t X, trits_t Y) {
+  size_t y_size = Y.n - Y.d;
+  TRIT_ARRAY_MAKE_FROM_RAW(X_arr, X.n - X.d, &X.p[X.d]);
+  TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, y_size, &Y.p[Y.d]);
+  sponge_hash_flex(s, &X_arr, &Y_arr);
+  flex_trits_to_trits(&Y.p[Y.d], y_size, Y_arr.trits, y_size, y_size);
+}
+
+void sponge_hash_flex(isponge *s, trit_array_p X, trit_array_p Y) {
   sponge_init(s);
-  sponge_absorb(s, MAM2_SPONGE_CTL_HASH, X);
-  sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, Y);
+  sponge_absorb_flex(s, MAM2_SPONGE_CTL_HASH, X);
+  sponge_squeeze_flex(s, MAM2_SPONGE_CTL_HASH, Y);
 }
 
 void sponge_hashn(isponge *s, size_t n, trits_t *Xs, trits_t Y) {

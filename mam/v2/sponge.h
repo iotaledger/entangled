@@ -135,6 +135,12 @@ void sponge_hash(isponge *s, /*!< [in] sponge interface */
 );
 
 /*! \brief Sponge hashing. */
+void sponge_hash_flex(isponge *s,     /*!< [in] sponge interface */
+                      trit_array_p X, /*!< [in] input data */
+                      trit_array_p Y  /*!< [out] hash value */
+);
+
+/*! \brief Sponge hashing. */
 void sponge_hashn(isponge *s,  /*!< [in] sponge interface */
                   size_t n,    /*!< [in] input data blocks count */
                   trits_t *Xs, /*!< [in] input data blocks */
