@@ -115,6 +115,12 @@ void sponge_decr(isponge *s, /*!< [in] sponge interface */
                  trits_t Y   /*!< [out] plaintext */
 );
 
+/*! \brief Sponge AE decryption. */
+void sponge_decr_flex(isponge *s,     /*!< [in] sponge interface */
+                      trit_array_p X, /*!< [in] ciphertext */
+                      trit_array_p Y  /*!< [out] plaintext */
+);
+
 /*! \brief Sponge hashing. */
 void sponge_hash(isponge *s, /*!< [in] sponge interface */
                  trits_t X,  /*!< [in] input data */
