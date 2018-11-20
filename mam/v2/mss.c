@@ -437,8 +437,9 @@ bool_t mss_verify(isponge *ms, isponge *ws, trits_t H, trits_t sig,
 
   dbg_printf("d=%d skn=%d", d, skn);
   if (d < 0 || skn < 0 || skn >= (1 << d) ||
-      trits_size(sig) != (MAM2_MSS_SIG_SIZE(d) - MAM2_MSS_SKN_SIZE))
+      trits_size(sig) != (MAM2_MSS_SIG_SIZE(d) - MAM2_MSS_SKN_SIZE)) {
     return 0;
+  }
 
 #if defined(MAM2_MSS_DEBUG)
   trits_copy(trits_take(sig, MAM2_MSS_MT_HASH_SIZE), apk);
