@@ -255,7 +255,7 @@ retcode_t iota_client_get_transaction_objects(
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createIsPromotable.ts#L71
  */
 retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
-                                    trit_array_p const tail_transaction,
+                                    flex_trit_t const* const tail_tx,
                                     bool* out_promotable);
 
 /**
