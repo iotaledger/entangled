@@ -153,7 +153,7 @@ void sponge_absorbn_flex(isponge *s, trit_t c2, size_t n, trit_array_t Xs[]) {
   for (size_t i = 0; i < n; ++i) {
     total_trits += Xs[i].num_trits;
   }
-  trit_t buffer[total_trits];
+  trit_t buffer[total_trits + NUM_TRITS_PER_FLEX_TRIT];
   trits_t Xs_trits[n];
   size_t trits_pos = 0;
   for (size_t i = 0; i < n; ++i) {
@@ -196,8 +196,8 @@ void sponge_encr_flex(isponge *s, trit_array_p X_arr, trit_array_p Y_arr) {
   size_t ni;
   trit_t c0, c1, c2 = -1;
   MAM2_ASSERT(X_arr->num_trits == Y_arr->num_trits);
-  trit_t x_rep[X_arr->num_trits];
-  trit_t y_rep[Y_arr->num_trits];
+  trit_t x_rep[X_arr->num_trits + NUM_TRITS_PER_FLEX_TRIT];
+  trit_t y_rep[Y_arr->num_trits + NUM_TRITS_PER_FLEX_TRIT];
   flex_trits_to_trits(x_rep, X_arr->num_trits, X_arr->trits, X_arr->num_trits,
                       X_arr->num_trits);
   flex_trits_to_trits(y_rep, Y_arr->num_trits, Y_arr->trits, Y_arr->num_trits,
@@ -241,8 +241,8 @@ void sponge_decr_flex(isponge *s, trit_array_p X_arr, trit_array_p Y_arr) {
   trits_t Xi, Yi;
   size_t ni;
   trit_t c0, c1, c2 = -1;
-  trit_t x_rep[X_arr->num_trits];
-  trit_t y_rep[Y_arr->num_trits];
+  trit_t x_rep[X_arr->num_trits + NUM_TRITS_PER_FLEX_TRIT];
+  trit_t y_rep[Y_arr->num_trits + NUM_TRITS_PER_FLEX_TRIT];
   flex_trits_to_trits(x_rep, X_arr->num_trits, X_arr->trits, X_arr->num_trits,
                       X_arr->num_trits);
   flex_trits_to_trits(y_rep, Y_arr->num_trits, Y_arr->trits, Y_arr->num_trits,
