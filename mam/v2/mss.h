@@ -11,6 +11,7 @@
 #ifndef __MAM_V2_MSS_H__
 #define __MAM_V2_MSS_H__
 
+#include "common/errors.h"
 #include "mam/v2/defs.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
@@ -204,7 +205,7 @@ bool_t mss_verify(isponge *ms, isponge *ws, trits_t hash, trits_t sig,
  * @param mss MSS interface
  * @param height Merkle-tree height
  */
-err_t mss_create(mss_t *mss, mss_mt_height_t height);
+retcode_t mss_create(mss_t *mss, mss_mt_height_t height);
 
 /**
  * Deallocate memory for internal Merkle tree structure

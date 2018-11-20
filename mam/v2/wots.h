@@ -12,7 +12,6 @@
 #define __MAM_V2_WOTS_H__
 
 #include "mam/v2/defs.h"
-#include "mam/v2/err.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
 #include "mam/v2/trits.h"

@@ -10,7 +10,6 @@ cc_library(
     hdrs = ["mam.h"],
     deps = [
         ":defs",
-        ":errs",
         ":list",
         ":ntru",
         ":pb3",
@@ -35,12 +34,6 @@ cc_library(
     name = "list",
     srcs = ["list.h"],
     hdrs = ["list.h"],
-)
-
-cc_library(
-    name = "errs",
-    srcs = ["err.c"],
-    hdrs = ["err.h"],
 )
 
 cc_library(
@@ -71,7 +64,6 @@ cc_library(
     hdrs = ["prng.h"],
     deps = [
         ":defs",
-        ":errs",
         ":sponge",
         ":trits",
     ],
@@ -105,6 +97,7 @@ cc_library(
     hdrs = ["mss.h"],
     deps = [
         ":wots",
+        "//common:errors",
     ],
 )
 
@@ -124,6 +117,7 @@ cc_library(
     hdrs = ["pb3.h"],
     deps = [
         ":mss",
+        "//common:errors",
     ],
 )
 
