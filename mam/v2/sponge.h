@@ -103,6 +103,12 @@ void sponge_encr(isponge *s, /*!< [in] sponge interface */
                  trits_t Y   /*!< [out] ciphertext */
 );
 
+/*! \brief Sponge AE encryption. */
+void sponge_encr_flex(isponge *s,     /*!< [in] sponge interface */
+                      trit_array_p X, /*!< [in] plaintext */
+                      trit_array_p Y  /*!< [out] ciphertext */
+);
+
 /*! \brief Sponge AE decryption. */
 void sponge_decr(isponge *s, /*!< [in] sponge interface */
                  trits_t X,  /*!< [in] ciphertext */

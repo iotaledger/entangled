@@ -116,10 +116,28 @@ void sponge_absorbn(isponge *s, trit_t c2, size_t n, trits_t *Xs) {
 }
 
 void sponge_encr(isponge *s, trits_t X, trits_t Y) {
+  TRIT_ARRAY_MAKE_FROM_RAW(X_arr, X.n, X.p);
+  TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, Y.n, Y.p);
+  sponge_encr_flex(s, &X_arr, &Y_arr);
+  flex_trits_to_trits(Y.p, Y_arr.num_trits, Y_arr.trits, Y_arr.num_trits,
+                      Y_arr.num_trits);
+}
+
+void sponge_encr_flex(isponge *s, trit_array_p X_arr, trit_array_p Y_arr) {
   trits_t Xi, Yi;
   size_t ni;
   trit_t c0, c1, c2 = -1;
-  MAM2_ASSERT(trits_size(X) == trits_size(Y));
+  MAM2_ASSERT(X_arr->num_trits == Y_arr->num_trits);
+  trit_t x_rep[X_arr->num_trits];
+  trit_t y_rep[Y_arr->num_trits];
+  flex_trits_to_trits(x_rep, X_arr->num_trits, X_arr->trits, X_arr->num_trits,
+                      X_arr->num_trits);
+  flex_trits_to_trits(y_rep, Y_arr->num_trits, Y_arr->trits, Y_arr->num_trits,
+                      Y_arr->num_trits);
+
+  trits_t X = trits_from_rep(X_arr->num_trits, x_rep);
+  trits_t Y = trits_from_rep(Y_arr->num_trits, y_rep);
+  trit_t *y_p = Y.p;
 
   do {
     Xi = trits_take_min(X, MAM2_SPONGE_RATE);
@@ -135,9 +153,12 @@ void sponge_encr(isponge *s, trits_t X, trits_t Y) {
       trits_swap_add(Xi, sponge_outer_trits(s, ni));
     else
       trits_copy_add(Xi, sponge_outer_trits(s, ni), Yi);
+
     trits_pad10(trits_drop(sponge_outer1_trits(s), ni));
     set_control_tryte(s, 0, c0, c1, c2);
   } while (!trits_is_empty(X));
+  flex_trits_from_trits(Y_arr->trits, Y_arr->num_trits, y_p, Y_arr->num_trits,
+                        Y_arr->num_trits);
 }
 
 void sponge_decr(isponge *s, trits_t Y, trits_t X) {

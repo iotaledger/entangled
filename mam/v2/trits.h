@@ -149,7 +149,7 @@ void trits_copy_sub(trits_t y, trits_t s, trits_t x);
 void trits_swap_add(trits_t x, trits_t s);
 void trits_swap_sub(trits_t y, trits_t s);
 
-void flex_from_trits(trits_t t, flex_trit_t *flex_trits);
+void flex_trit_t_from_trits_t(trits_t t, flex_trit_t *flex_trits);
 
 /*! \brief Print string rep of `x` into stdout if MAM2_DEBUG defined. */
 #ifdef MAM2_DEBUG
