@@ -80,7 +80,7 @@ void sponge_absorb(isponge *s, /*!< [in] sponge interface */
                    trits_t X  /*!< [in] input data */
 );
 
-void sponge_absorb_arr(isponge *s, trit_t c2, trit_array_p X_arr);
+void sponge_absorb_flex(isponge *s, trit_t c2, trit_array_p X_arr);
 
 /*! \brief Absorb concatenation of `Xs[0]`..`Xs[n-1]` */
 void sponge_absorbn(
@@ -97,10 +97,23 @@ void sponge_squeeze(
     trits_t Y   /*!< [out] output data */
 );
 
+/*! \brief Sponge squeezing. */
+void sponge_squeeze_flex(
+    isponge *s,    /*!< [in] sponge interface */
+    trit_t c2,     /*!< [in] control trit encoding output data type */
+    trit_array_p Y /*!< [out] output data */
+);
+
 /*! \brief Sponge AE encryption. */
 void sponge_encr(isponge *s, /*!< [in] sponge interface */
                  trits_t X,  /*!< [in] plaintext */
                  trits_t Y   /*!< [out] ciphertext */
+);
+
+/*! \brief Sponge AE encryption. */
+void sponge_encr_flex(isponge *s,     /*!< [in] sponge interface */
+                      trit_array_p X, /*!< [in] plaintext */
+                      trit_array_p Y  /*!< [out] ciphertext */
 );
 
 /*! \brief Sponge AE decryption. */
@@ -109,10 +122,22 @@ void sponge_decr(isponge *s, /*!< [in] sponge interface */
                  trits_t Y   /*!< [out] plaintext */
 );
 
+/*! \brief Sponge AE decryption. */
+void sponge_decr_flex(isponge *s,     /*!< [in] sponge interface */
+                      trit_array_p X, /*!< [in] ciphertext */
+                      trit_array_p Y  /*!< [out] plaintext */
+);
+
 /*! \brief Sponge hashing. */
 void sponge_hash(isponge *s, /*!< [in] sponge interface */
                  trits_t X,  /*!< [in] input data */
                  trits_t Y   /*!< [out] hash value */
+);
+
+/*! \brief Sponge hashing. */
+void sponge_hash_flex(isponge *s,     /*!< [in] sponge interface */
+                      trit_array_p X, /*!< [in] input data */
+                      trit_array_p Y  /*!< [out] hash value */
 );
 
 /*! \brief Sponge hashing. */
