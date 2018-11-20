@@ -44,7 +44,7 @@ typedef struct _test_prng_s {
 } test_prng_t;
 
 typedef struct _test_wots_s {
-  iwots w;
+  wots_t w;
   wots_sk_t sk;
 } test_wots_t;
 
@@ -84,13 +84,13 @@ typedef struct _test_wots_s {
     return &m->m;                                      \
   }
 #else
-#define def_test_mss_init(D, sfx)                                \
-  static mss_t *test_mss_init##sfx(test_mss##sfx *m, iwots *w) { \
-    m->m.d = D;                                                  \
-    m->m.ws = w;                                                 \
-    m->m.mt = m->mt;                                             \
-    m->mt_check = 0xdeadbeef;                                    \
-    return &m->m;                                                \
+#define def_test_mss_init(D, sfx)                                 \
+  static mss_t *test_mss_init##sfx(test_mss##sfx *m, wots_t *w) { \
+    m->m.d = D;                                                   \
+    m->m.ws = w;                                                  \
+    m->m.mt = m->mt;                                              \
+    m->mt_check = 0xdeadbeef;                                     \
+    return &m->m;                                                 \
   }
 #endif
 
@@ -172,9 +172,9 @@ static prng_t *test_prng_init(test_prng_t *prng, isponge *sponge) {
   return &prng->p;
 }
 
-static iwots *test_wots_init(test_wots_t *w, isponge *s) {
-  w->w.s = s;
-  w->w.sk = w->sk;
+static wots_t *test_wots_init(test_wots_t *w, isponge *s) {
+  w->w.sponge = s;
+  memcpy(w->w.sk, w->sk, MAM2_WOTS_SK_FLEX_SIZE);
   return &w->w;
 }
 

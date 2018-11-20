@@ -135,4 +135,22 @@ typedef uint8_t byte;
 /*! \brief Assert expression. */
 #define MAM2_ASSERT(expr) assert(expr)
 
+#if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
+#define FLEX_TRIT_SIZE_162 162
+#define FLEX_TRIT_SIZE_234 234
+#define FLEX_TRIT_SIZE_13122 13122
+#elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_162 54
+#define FLEX_TRIT_SIZE_234 78
+#define FLEX_TRIT_SIZE_13122 4374
+#elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_162 41
+#define FLEX_TRIT_SIZE_234 59
+#define FLEX_TRIT_SIZE_13122 3281
+#elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_162 33
+#define FLEX_TRIT_SIZE_234 47
+#define FLEX_TRIT_SIZE_13122 2625
+#endif
+
 #endif  // __MAM_V2_DEFS_H__

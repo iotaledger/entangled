@@ -120,7 +120,7 @@ void test_wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   test_wots_t _w[1];
   isponge *s = test_sponge_init(_s);
   prng_t *p = test_prng_init(_p, s);
-  iwots *w = test_wots_init(_w, s);
+  wots_t *w = test_wots_init(_w, s);
 
   trits_t tK = trits_alloc(3 * Kn);
   trits_t tN = trits_alloc(3 * Nn);
