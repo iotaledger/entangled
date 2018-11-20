@@ -252,9 +252,9 @@ void mss_gen(mss_t *mss, trits_t pk) {
   // empty stack
   s->stack_size = 0;
 
-  if (0 == mss->height)
+  if (0 == mss->height) {
     mss_mt_gen_leaf(mss, 0, pk);
-  else
+  } else
     for (;;) {
       // update current stack
       mss_mt_update(mss, d);
