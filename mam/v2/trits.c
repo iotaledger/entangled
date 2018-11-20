@@ -288,7 +288,7 @@ void trits_swap_sub(trits_t y, trits_t s) {
   }
 }
 
-void flex_from_trits(trits_t t, flex_trit_t *flex_trits) {
+void flex_trit_t_from_trits_t(trits_t t, flex_trit_t *flex_trits) {
   size_t n = t.n - t.d;
   flex_trits_from_trits(flex_trits, n, &t.p[t.d], n, n);
 }
