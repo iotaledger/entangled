@@ -44,8 +44,6 @@
 // WOTS signature size
 #define MAM2_WOTS_SIG_FLEX_SIZE MAM2_WOTS_SK_FLEX_SIZE
 
-typedef trit_t wots_sk_t[MAM2_WORDS(MAM2_WOTS_SK_SIZE)];
-
 // WOTS interface
 typedef struct wots_s {
   isponge *sponge;

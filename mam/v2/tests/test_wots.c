@@ -62,25 +62,20 @@ bool_t wots_test_do(wots_t *w, prng_t *p) {
 }
 
 void wots_test() {
-  test_sponge_t _s[1];
-  test_prng_t _p[1];
-  test_wots_t _w[1];
+  test_sponge_t _s;
+  test_prng_t _p;
+  test_wots_t _w;
 
-  isponge *s = test_sponge_init(_s);
-  prng_t *p = test_prng_init(_p, s);
-  wots_t *w = test_wots_init(_w, s);
+  isponge *s = test_sponge_init(&_s);
+  prng_t *p = test_prng_init(&_p, s);
+  wots_t *w = test_wots_init(&_w, s);
 
   flex_trit_t key[FLEX_TRIT_SIZE_243];
-  // TODO Remove when sponge handles flex_trit_t
-  MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
-  // init K
-  trits_set_zero(K);
   tryte_t const *const key_trytes =
       "NOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCD"
       "EFGHIJKLM";
   flex_trits_from_trytes(key, MAM2_PRNG_KEY_SIZE, key_trytes, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
-  trytes_to_trits(key_trytes, K.p, MIN(strlen(key_trytes), K.n / RADIX));
   prng_init(p, p->sponge, key);
 
   wots_test_do(w, p);

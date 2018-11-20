@@ -45,7 +45,7 @@ typedef struct _test_prng_s {
 
 typedef struct _test_wots_s {
   wots_t w;
-  wots_sk_t sk;
+  flex_trit_t sk[MAM2_WOTS_SK_FLEX_SIZE];
 } test_wots_t;
 
 #if defined(MAM2_MSS_TRAVERSAL)
