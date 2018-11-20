@@ -97,6 +97,13 @@ void sponge_squeeze(
     trits_t Y   /*!< [out] output data */
 );
 
+/*! \brief Sponge squeezing. */
+void sponge_squeeze_flex(
+    isponge *s,    /*!< [in] sponge interface */
+    trit_t c2,     /*!< [in] control trit encoding output data type */
+    trit_array_p Y /*!< [out] output data */
+);
+
 /*! \brief Sponge AE encryption. */
 void sponge_encr(isponge *s, /*!< [in] sponge interface */
                  trits_t X,  /*!< [in] plaintext */
