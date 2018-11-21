@@ -59,7 +59,7 @@ void prng_reset(prng_t *const prng);
  * @param output Pseudorandom trits
  */
 void prng_gen(prng_t *const prng, uint8_t const dest,
-              trit_array_t const *const nonce, trits_t output);
+              trit_array_t const *const nonce, trit_array_t *const output);
 
 /**
  * PRNG output generation with nonce1 || nonce2
@@ -72,7 +72,7 @@ void prng_gen(prng_t *const prng, uint8_t const dest,
  */
 void prng_gen2(prng_t *const prng, uint8_t const dest,
                trit_array_t const *const nonce1,
-               trit_array_t const *const nonce2, trits_t output);
+               trit_array_t const *const nonce2, trit_array_t *const output);
 
 /**
  * PRNG output generation with nonce1 || nonce2 || nonce3
@@ -87,6 +87,6 @@ void prng_gen2(prng_t *const prng, uint8_t const dest,
 void prng_gen3(prng_t *const prng, uint8_t const dest,
                trit_array_t const *const nonce1,
                trit_array_t const *const nonce2,
-               trit_array_t const *const nonce3, trits_t output);
+               trit_array_t const *const nonce3, trit_array_t *const output);
 
 #endif  // __MAM_V2_PRNG_H__

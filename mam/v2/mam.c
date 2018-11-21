@@ -310,8 +310,13 @@ retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
     trits_t cfg_ep = cfg->ep ? mam2_endpoint_name(cfg->ep) : trits_null();
     TRIT_ARRAY_MAKE_FROM_RAW(ep, cfg_ep.n - cfg_ep.d, cfg_ep.p + cfg_ep.d);
     TRIT_ARRAY_MAKE_FROM_RAW(skn_trits, skn.n - skn.d, skn.p + skn.d);
+    TRIT_ARRAY_DECLARE(cfg_key_array, MAM2_SPONGE_KEY_SIZE);
+    trits_t cfg_key_trits = mam2_send_msg_cfg_key(cfg);
     prng_gen3(cfg->rng, MAM2_PRNG_DST_SEC_KEY, &ch, &ep, &skn_trits,
-              mam2_send_msg_cfg_key(cfg));
+              &cfg_key_array);
+    flex_trits_to_trits(cfg_key_trits.p + cfg_key_trits.d, MAM2_SPONGE_KEY_SIZE,
+                        cfg_key_array.trits, MAM2_SPONGE_KEY_SIZE,
+                        MAM2_SPONGE_KEY_SIZE);
 
     // choose recipient
 

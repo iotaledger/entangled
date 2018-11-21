@@ -11,6 +11,7 @@
 #ifndef __MAM_V2_TEST_STRUCTS_H__
 #define __MAM_V2_TEST_STRUCTS_H__
 
+#include "common/trinary/add.h"
 #include "mam/v2/mss.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"

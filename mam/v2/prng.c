@@ -16,30 +16,21 @@
  */
 
 static inline void prng_absorbn(isponge *const s, size_t const n,
-                                trit_array_t const *const trits) {
+                                trit_array_t const *const input) {
   sponge_init(s);
-  sponge_absorbn_flex(s, MAM2_SPONGE_CTL_KEY, n, trits);
+  sponge_absorbn_flex(s, MAM2_SPONGE_CTL_KEY, n, input);
 }
 
-// TODO switch output to trit_array_t
-static inline void prng_squeeze(isponge *const s, trits_t output) {
-  sponge_squeeze(s, MAM2_SPONGE_CTL_PRN, output);
+static inline void prng_squeeze(isponge *const s, trit_array_t *const output) {
+  sponge_squeeze_flex(s, MAM2_SPONGE_CTL_PRN, output);
 }
 
-static inline trit_array_t trit_array_from_key(prng_t *const prng) {
+static inline trit_array_t prng_key_trit_array(prng_t *const prng) {
   trit_array_t key = {.trits = prng->key,
                       .num_trits = MAM2_PRNG_KEY_SIZE,
                       .num_bytes = MAM2_PRNG_KEY_FLEX_SIZE,
                       .dynamic = 0};
   return key;
-}
-
-static void trit_array_set_dest_tryte(trit_array_t *const trit_array,
-                                      uint8_t const dest) {
-  trit_t trits[3];
-
-  long_to_trits(dest, trits);
-  flex_trits_from_trits(trit_array->trits, 3, trits, 3, 3);
 }
 
 /*
@@ -57,32 +48,32 @@ void prng_reset(prng_t *const prng) {
   memset(prng->key, FLEX_TRIT_NULL_VALUE, MAM2_PRNG_KEY_FLEX_SIZE);
 }
 
-// TODO switch output to trit_array_t
 void prng_gen(prng_t *const prng, uint8_t const dest,
-              trit_array_t const *const nonce, trits_t output) {
+              trit_array_t const *const nonce, trit_array_t *const output) {
   trit_array_t null = trit_array_null();
   prng_gen3(prng, dest, nonce, &null, &null, output);
 }
 
-// TODO switch output to trit_array_t
 void prng_gen2(prng_t *const prng, uint8_t const dest,
                trit_array_t const *const nonce1,
-               trit_array_t const *const nonce2, trits_t output) {
+               trit_array_t const *const nonce2, trit_array_t *const output) {
   trit_array_t null = trit_array_null();
   prng_gen3(prng, dest, nonce1, nonce2, &null, output);
 }
 
-// TODO switch output to trit_array_t
 void prng_gen3(prng_t *const prng, uint8_t const dest,
                trit_array_t const *const nonce1,
                trit_array_t const *const nonce2,
-               trit_array_t const *const nonce3, trits_t output) {
-  TRIT_ARRAY_DECLARE(dest_trits, 3);
-  trit_array_set_dest_tryte(&dest_trits, dest);
+               trit_array_t const *const nonce3, trit_array_t *const output) {
+  TRIT_ARRAY_DECLARE(dest_array, 3);
+  trit_t dest_trits[3];
 
-  trit_array_t trits_to_absorb[5] = {trit_array_from_key(prng), dest_trits,
-                                     *nonce1, *nonce2, *nonce3};
+  long_to_trits(dest, dest_trits);
+  flex_trits_from_trits(dest_array.trits, 3, dest_trits, 3, 3);
 
-  prng_absorbn(prng->sponge, 5, (trit_array_t *)trits_to_absorb);
+  trit_array_t input[5] = {prng_key_trit_array(prng), dest_array, *nonce1,
+                           *nonce2, *nonce3};
+
+  prng_absorbn(prng->sponge, 5, (trit_array_t *)input);
   prng_squeeze(prng->sponge, output);
 }

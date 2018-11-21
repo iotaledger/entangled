@@ -29,29 +29,34 @@ bool_t wots_test_do(wots_t *w, prng_t *p) {
   TRIT_ARRAY_DECLARE(N, 18);
   trit_array_set_null(&N);
   MAM2_TRITS_DEF(pk, MAM2_WOTS_PK_SIZE);
-  MAM2_TRITS_DEF(H, MAM2_WOTS_HASH_SIZE);
+  MAM2_TRITS_DEF(H_to_remove, MAM2_WOTS_HASH_SIZE);
+  TRIT_ARRAY_DECLARE(H, MAM2_WOTS_HASH_SIZE);
   MAM2_TRITS_DEF(sig, MAM2_WOTS_SIG_SIZE);
   // MAM2_TRITS_DEF(pkr, MAM2_WOTS_PK_SIZE);
 
-  trits_set_zero(H);
+  trits_set_zero(H_to_remove);
+  trit_array_set_null(&H);
   memset(w->sk, FLEX_TRIT_NULL_VALUE, MAM2_WOTS_SK_FLEX_SIZE);
 
-  prng_gen(p, 7, &N, H);
+  prng_gen(p, 7, &N, &H);
+  // TODO REMOVE
+  flex_trits_to_trits(H_to_remove.p + H_to_remove.d, MAM2_WOTS_HASH_SIZE,
+                      H.trits, MAM2_WOTS_HASH_SIZE, MAM2_WOTS_HASH_SIZE);
   wots_gen_sk(w, p, &N);
   wots_calc_pk(w, pk);
-  wots_sign(w, H, sig);
-  TEST_ASSERT(wots_verify(w->sponge, H, sig, pk));
+  wots_sign(w, H_to_remove, sig);
+  TEST_ASSERT(wots_verify(w->sponge, H_to_remove, sig, pk));
 
-  trits_put1(H, trit_add(trits_get1(H), 1));
-  r = r && !wots_verify(w->sponge, H, sig, pk);
-  trits_put1(H, trit_sub(trits_get1(H), 1));
+  trits_put1(H_to_remove, trit_add(trits_get1(H_to_remove), 1));
+  r = r && !wots_verify(w->sponge, H_to_remove, sig, pk);
+  trits_put1(H_to_remove, trit_sub(trits_get1(H_to_remove), 1));
 
   trits_put1(sig, trit_add(trits_get1(sig), 1));
-  TEST_ASSERT(!wots_verify(w->sponge, H, sig, pk));
+  TEST_ASSERT(!wots_verify(w->sponge, H_to_remove, sig, pk));
   trits_put1(sig, trit_sub(trits_get1(sig), 1));
 
   trits_put1(pk, trit_add(trits_get1(pk), 1));
-  r = r && !wots_verify(w->sponge, H, sig, pk);
+  r = r && !wots_verify(w->sponge, H_to_remove, sig, pk);
   trits_put1(pk, trit_sub(trits_get1(pk), 1));
 
   TEST_ASSERT(r);

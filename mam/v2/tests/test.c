@@ -84,7 +84,7 @@ void test_prng_gen(size_t Kn, char *K, trit_array_t const *const nonce,
   prng_t *p = test_prng_init(_p, s);
 
   trits_t tK = trits_alloc(3 * Kn);
-  trits_t tY = trits_alloc(3 * Yn);
+  TRIT_ARRAY_DECLARE(tY, 3 * Yn);
 
   flex_trit_t key[FLEX_TRIT_SIZE_243];
   flex_trits_from_trytes(key, MAM2_PRNG_KEY_SIZE, K, HASH_LENGTH_TRYTE,
@@ -92,11 +92,10 @@ void test_prng_gen(size_t Kn, char *K, trit_array_t const *const nonce,
 
   trytes_to_trits(K, tK.p, MIN(tK.n / RADIX, strlen(K)));
   prng_init(p, s, key);
-  prng_gen(p, 0, nonce, tY);
-  trits_to_trytes(&tY.p[tY.d], Y, tY.n - tY.d);
+  prng_gen(p, 0, nonce, &tY);
+  flex_trits_to_trytes(Y, Yn, tY.trits, 3 * Yn, 3 * Yn);
 
   trits_free(tK);
-  trits_free(tY);
 }
 
 void test_wots_gen_sign(size_t Kn, char *K, trit_array_t const *const nonce,
@@ -114,7 +113,7 @@ void test_wots_gen_sign(size_t Kn, char *K, trit_array_t const *const nonce,
   trits_t tH = trits_alloc(3 * Hn);
   trits_t tsig = trits_alloc(3 * sign);
 
-  flex_trit_t key[FLEX_TRIT_SIZE_243];
+  flex_trit_t key[MAM2_PRNG_KEY_SIZE];
 
   trytes_to_trits(K, tK.p, MIN(strlen(K), tK.n / RADIX));
   flex_trits_from_trytes(key, MAM2_PRNG_KEY_SIZE, K, HASH_LENGTH_TRYTE,
@@ -189,16 +188,20 @@ void test() {
   char wots_gen_sign_sig[MAM2_WOTS_SIG_SIZE / 3];
 
   test_sponge_hash(162, X, sponge_hash_Yn, sponge_hash_Y);
+  TEST_ASSERT_EQUAL_MEMORY(sponge_hash_Y, sponge_hash_expected, 81);
+
   test_sponge_encr(81, K, 162, X, sponge_encr_Yn, sponge_encr_Y);
+  TEST_ASSERT_EQUAL_MEMORY(sponge_encr_Y, sponge_encr_expected, 162);
+
   test_sponge_decr(81, K, 162, X, sponge_decr_Xn, sponge_decr_X);
+  TEST_ASSERT_EQUAL_MEMORY(sponge_decr_X, sponge_decr_expected, 162);
+
   test_prng_gen(81, K, &nonce, prng_gen_Yn, prng_gen_Y);
+  TEST_ASSERT_EQUAL_MEMORY(prng_gen_Y, prng_gen_expected, 162);
+
   test_wots_gen_sign(81, K, &nonce, MAM2_WOTS_PK_SIZE / 3, wots_gen_sign_pk, 78,
                      H, MAM2_WOTS_SIG_SIZE / 3, wots_gen_sign_sig);
 
-  TEST_ASSERT_EQUAL_MEMORY(sponge_hash_Y, sponge_hash_expected, 81);
-  TEST_ASSERT_EQUAL_MEMORY(sponge_encr_Y, sponge_encr_expected, 162);
-  TEST_ASSERT_EQUAL_MEMORY(sponge_decr_X, sponge_decr_expected, 162);
-  TEST_ASSERT_EQUAL_MEMORY(prng_gen_Y, prng_gen_expected, 162);
   // FIXME (@tsvisabo) test dec(enc(X)) = X
   // TODO - test/fix wots_gen_sign_sig
 }

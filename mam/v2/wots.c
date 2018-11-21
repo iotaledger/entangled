@@ -138,12 +138,11 @@ void wots_gen_sk3(wots_t *const wots, prng_t *const prng,
                   trit_array_t const *const nonce1,
                   trit_array_t const *const nonce2,
                   trit_array_t const *const nonce3) {
-  // TODO Remove when prng_gen3 takes flex_trit_t *
-  MAM2_TRITS_DEF(tmp, MAM2_WOTS_SK_SIZE);
-  prng_gen3(prng, MAM2_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3, tmp);
-  // TODO Remove when prng_gen3 takes flex_trit_t *
-  flex_trits_from_trits(wots->sk, MAM2_WOTS_SK_SIZE, tmp.p + tmp.d,
-                        MAM2_WOTS_SK_SIZE, MAM2_WOTS_SK_SIZE);
+  trit_array_t sk = {.trits = wots->sk,
+                     .num_trits = MAM2_WOTS_SK_SIZE,
+                     .num_bytes = MAM2_WOTS_SK_FLEX_SIZE,
+                     .dynamic = 0};
+  prng_gen3(prng, MAM2_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3, &sk);
 }
 
 void wots_calc_pk(wots_t *const wots, trits_t pk) {

@@ -22,7 +22,9 @@ void prng_test_do(prng_t *const prng) {
   MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
   TRIT_ARRAY_DECLARE(N, 18);
   MAM2_TRITS_DEF(Y1, 243 * 2 + 18);
+  TRIT_ARRAY_DECLARE(Y1_arr, 243 * 2 + 18);
   MAM2_TRITS_DEF(Y2, 243 * 2 + 18);
+  TRIT_ARRAY_DECLARE(Y2_arr, 243 * 2 + 18);
 
   // init K
   trits_set_zero(K);
@@ -40,8 +42,13 @@ void prng_test_do(prng_t *const prng) {
   trit_array_set_null(&N);
 
   prng_init(prng, prng->sponge, key);
-  prng_gen(prng, 0, &N, Y1);
-  prng_gen(prng, 1, &N, Y2);
+  prng_gen(prng, 0, &N, &Y1_arr);
+  prng_gen(prng, 1, &N, &Y2_arr);
+
+  flex_trits_to_trits(Y1.p + Y1.d, 243 * 2 + 18, Y1_arr.trits, 243 * 2 + 18,
+                      243 * 2 + 18);
+  flex_trits_to_trits(Y2.p + Y2.d, 243 * 2 + 18, Y2_arr.trits, 243 * 2 + 18,
+                      243 * 2 + 18);
 
   int d = trits_cmp_grlex(Y1, Y2);
   TEST_ASSERT(d != 0);
