@@ -29,15 +29,6 @@ typedef struct snapshot_s {
 } snapshot_t;
 
 /**
- * Initializes a snapshot configuration
- *
- * @param conf The consensus configuration
- *
- * @return a status code
- */
-retcode_t iota_snapshot_init_conf(iota_consensus_conf_t *const conf);
-
-/**
  * Initializes a snapshot
  *
  * @param snapshot The snapshot

@@ -20,7 +20,7 @@ void test_snapshot_conf() {
   tryte_t coo[HASH_LENGTH_TRYTE];
 
   strcpy(conf.snapshot_conf_file, snapshot_conf_path);
-  TEST_ASSERT(iota_snapshot_init_conf(&conf) == RC_OK);
+  TEST_ASSERT(iota_snapshot_conf_init(&conf) == RC_OK);
   TEST_ASSERT_EQUAL_INT(conf.snapshot_timestamp_sec, 1537203600UL);
   TEST_ASSERT_EQUAL_INT(conf.snapshot_signature_index, 9UL);
   TEST_ASSERT_EQUAL_INT(conf.snapshot_signature_depth, 6UL);
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
 
   iota_consensus_conf_init(&conf);
   strcpy(conf.snapshot_conf_file, snapshot_conf_path);
-  strcpy(conf.snapshot_sig_file, "");
+  strcpy(conf.snapshot_signature_file, "");
 
   RUN_TEST(test_snapshot_conf);
   RUN_TEST(test_snapshot_init_file_not_found);

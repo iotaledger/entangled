@@ -32,7 +32,15 @@ typedef enum cli_arg_value_e {
 
   CLI_ARG_ALPHA,
   CLI_ARG_BELOW_MAX_DEPTH,
+  CLI_ARG_LAST_MILESTONE,
   CLI_ARG_MAX_DEPTH,
+  CLI_ARG_NUM_KEYS_IN_MILESTONE,
+  CLI_ARG_SNAPSHOT_FILE,
+  CLI_ARG_SNAPSHOT_SIGNATURE_DEPTH,
+  CLI_ARG_SNAPSHOT_SIGNATURE_FILE,
+  CLI_ARG_SNAPSHOT_SIGNATURE_INDEX,
+  CLI_ARG_SNAPSHOT_SIGNATURE_PUBKEY,
+  CLI_ARG_SNAPSHOT_TIMESTAMP,
 
 } cli_arg_value_t;
 
@@ -51,13 +59,13 @@ static struct cli_argument_s {
 
     // cIRI configuration
 
+    {"db-path", 'd', "Path to the database file.", REQUIRED_ARG},
     {"help", 'h', "Displays this usage.", NO_ARG},
     {"log-level", 'l',
      "Valid log levels: \"debug\", \"info\", \"notice\", \"warning\", "
      "\"error\", \"critical\", \"alert\" "
      "and \"emergency\".",
      REQUIRED_ARG},
-    {"db-path", 'd', "Path to the database file.", REQUIRED_ARG},
 
     // Gossip configuration
 
@@ -117,11 +125,33 @@ static struct cli_argument_s {
      "the latest referenced milestone by the currently visited transaction "
      "during the random walk.",
      REQUIRED_ARG},
+    {"last-milestone", CLI_ARG_LAST_MILESTONE,
+     "The index of the last milestone issued by the corrdinator before the "
+     "last snapshot.",
+     REQUIRED_ARG},
     {"max-depth", CLI_ARG_MAX_DEPTH,
      "Limits how many milestones behind the current one the random walk can "
      "start.",
      REQUIRED_ARG},
-
+    {"num-keys-in-milestone", CLI_ARG_NUM_KEYS_IN_MILESTONE,
+     "The depth of the Merkle tree which in turn determines the number of "
+     "leaves (private keys) that the coordinator can use to sign a message.",
+     REQUIRED_ARG},
+    {"snapshot-file", CLI_ARG_SNAPSHOT_FILE,
+     "Path to the file that contains the state of the ledger at the last "
+     "snapshot.",
+     REQUIRED_ARG},
+    {"snapshot-signature-depth", CLI_ARG_SNAPSHOT_SIGNATURE_DEPTH,
+     "Depth of the snapshot signature.", REQUIRED_ARG},
+    {"snapshot-signature-file", CLI_ARG_SNAPSHOT_SIGNATURE_FILE,
+     "Path to the file that contains a signature for the snapshot file.",
+     REQUIRED_ARG},
+    {"snapshot-signature-index", CLI_ARG_SNAPSHOT_SIGNATURE_INDEX,
+     "Index of the snapshot signature.", REQUIRED_ARG},
+    {"snapshot-signature-pubkey", CLI_ARG_SNAPSHOT_SIGNATURE_PUBKEY,
+     "Public key of the snapshot signature.", REQUIRED_ARG},
+    {"snapshot-timestamp", CLI_ARG_SNAPSHOT_TIMESTAMP,
+     "Epoch time of the last snapshot.", REQUIRED_ARG},
     {NULL, 0, NULL, NO_ARG}};
 
 static char* short_options = "hl:d:n:t:u:p:";
