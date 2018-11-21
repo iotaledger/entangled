@@ -14,6 +14,8 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/trinary:flex_trit",
+        "//utils:logger_helper",
+        "@cJSON",
     ],
 )
 
