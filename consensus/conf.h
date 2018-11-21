@@ -45,7 +45,7 @@ typedef struct iota_consensus_conf_s {
   // Path of the snapshot configuration file
   char snapshot_conf_file[128];
   // Path to the file that contains a signature for the snapshot file
-  char snapshot_sig_file[128];
+  char snapshot_signature_file[128];
   // Path to the file that contains the state of the ledger at the last snapshot
   char snapshot_file[128];
   // Epoch time of the last snapshot
@@ -58,8 +58,8 @@ typedef struct iota_consensus_conf_s {
   flex_trit_t snapshot_signature_pubkey[FLEX_TRIT_SIZE_243];
   // The address of the coordinator
   flex_trit_t coordinator[FLEX_TRIT_SIZE_243];
-  // The index of the last milestone issues by the corrdinator before the
-  // snapshot last
+  // The index of the last milestone issued by the corrdinator before the
+  // last snapshot
   uint64_t last_milestone;
   // The depth of the Merkle tree which in turn determines the number of leaves
   // (private keys) that the coordinator can use to sign a message
@@ -77,6 +77,16 @@ typedef struct iota_consensus_conf_s {
  * @return a status code
  */
 retcode_t iota_consensus_conf_init(iota_consensus_conf_t* const conf);
+
+/**
+ * Initializes snapshot configuration with the snapshot repository
+ * https://github.com/iotaledger/snapshots
+ *
+ * @param conf The consensus configuration
+ *
+ * @return a status code
+ */
+retcode_t iota_snapshot_conf_init(iota_consensus_conf_t* const conf);
 
 #ifdef __cplusplus
 }

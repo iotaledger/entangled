@@ -5,13 +5,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdio.h>
-
-#include "cJSON.h"
-
+#include "consensus/snapshot/snapshot.h"
 #include "common/model/transaction.h"
 #include "consensus/conf.h"
-#include "consensus/snapshot/snapshot.h"
 #include "utils/logger_helper.h"
 #include "utils/signed_files.h"
 
@@ -79,118 +75,6 @@ done:
  * Public functions
  */
 
-retcode_t iota_snapshot_init_conf(iota_consensus_conf_t *const conf) {
-  retcode_t ret = RC_OK;
-  FILE *file = NULL;
-  size_t len = 0;
-  char *content = NULL;
-  cJSON *json = NULL, *tmp = NULL, *timestamp = NULL, *signature = NULL,
-        *coordinator = NULL;
-
-  if ((file = fopen(conf->snapshot_conf_file, "r")) == NULL) {
-    log_error(SNAPSHOT_LOGGER_ID, "Snapshot configuration file not found\n");
-    ret = RC_SNAPSHOT_FILE_NOT_FOUND;
-    goto done;
-  }
-
-  if (fseek(file, 0, SEEK_END) < 0 || (len = ftell(file)) <= 0 ||
-      fseek(file, 0, SEEK_SET) < 0) {
-    log_error(SNAPSHOT_LOGGER_ID, "Invalid snapshot configuration file\n");
-    ret = RC_SNAPSHOT_INVALID_FILE;
-    goto done;
-  }
-
-  if ((content = (char *)malloc(len + 1)) == NULL) {
-    ret = RC_SNAPSHOT_OOM;
-    goto done;
-  }
-
-  if (fread(content, 1, len, file) < 0) {
-    log_error(SNAPSHOT_LOGGER_ID, "Invalid snapshot configuration file\n");
-    ret = RC_SNAPSHOT_INVALID_FILE;
-    goto done;
-  }
-
-  content[len] = '\0';
-
-  if ((json = cJSON_Parse(content)) == NULL) {
-    goto json_error;
-  }
-
-  if ((timestamp = cJSON_GetObjectItemCaseSensitive(json, "timestamp")) ==
-          NULL ||
-      (coordinator = cJSON_GetObjectItemCaseSensitive(json, "coordinator")) ==
-          NULL) {
-    goto json_error;
-  }
-
-  if (!cJSON_IsNumber(timestamp)) {
-    goto json_error;
-  }
-  conf->snapshot_timestamp_sec = timestamp->valueint;
-
-  tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "pubkey");
-  if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL ||
-      strlen(tmp->valuestring) != HASH_LENGTH_TRYTE) {
-    goto json_error;
-  }
-  flex_trits_from_trytes(conf->coordinator, HASH_LENGTH_TRIT,
-                         (tryte_t *)tmp->valuestring, HASH_LENGTH_TRYTE,
-                         HASH_LENGTH_TRYTE);
-
-  tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "lastMilestone");
-  if (tmp == NULL || !cJSON_IsNumber(tmp)) {
-    goto json_error;
-  }
-  conf->last_milestone = tmp->valueint;
-
-  if ((signature = cJSON_GetObjectItemCaseSensitive(json, "signature")) !=
-      NULL) {
-    tmp = cJSON_GetObjectItemCaseSensitive(signature, "index");
-    if (tmp == NULL || !cJSON_IsNumber(tmp)) {
-      goto json_error;
-    }
-    conf->snapshot_signature_index = tmp->valueint;
-
-    tmp = cJSON_GetObjectItemCaseSensitive(signature, "depth");
-    if (tmp == NULL || !cJSON_IsNumber(tmp)) {
-      goto json_error;
-    }
-    conf->snapshot_signature_depth = tmp->valueint;
-
-    tmp = cJSON_GetObjectItemCaseSensitive(signature, "pubkey");
-    if (tmp == NULL || !cJSON_IsString(tmp) || tmp->valuestring == NULL ||
-        strlen(tmp->valuestring) != HASH_LENGTH_TRYTE) {
-      goto json_error;
-    }
-    flex_trits_from_trytes(conf->snapshot_signature_pubkey, HASH_LENGTH_TRIT,
-                           (tryte_t *)tmp->valuestring, HASH_LENGTH_TRYTE,
-                           HASH_LENGTH_TRYTE);
-  }
-
-  goto done;
-
-json_error : {
-  const char *error_ptr = cJSON_GetErrorPtr();
-  if (error_ptr != NULL) {
-    log_error(SNAPSHOT_LOGGER_ID, "%s\n", error_ptr);
-  }
-  ret = RC_SNAPSHOT_FAILED_JSON_PARSING;
-}
-
-done:
-  if (file) {
-    fclose(file);
-  }
-  if (content) {
-    free(content);
-  }
-  if (json) {
-    cJSON_Delete(json);
-  }
-  return ret;
-}
-
 retcode_t iota_snapshot_init(snapshot_t *const snapshot,
                              iota_consensus_conf_t *const conf) {
   retcode_t ret = RC_OK;
@@ -205,16 +89,10 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot,
   snapshot->index = 0;
   snapshot->state = NULL;
 
-  if ((ret = iota_snapshot_init_conf(snapshot->conf)) != RC_OK) {
-    log_critical(SNAPSHOT_LOGGER_ID,
-                 "Parsing snapshot configuration file failed\n");
-    return ret;
-  }
-
-  if (strlen(snapshot->conf->snapshot_sig_file)) {
+  if (strlen(snapshot->conf->snapshot_signature_file)) {
     bool valid = false;
     if ((ret = iota_file_signature_validate(
-             conf->snapshot_file, conf->snapshot_sig_file,
+             conf->snapshot_file, conf->snapshot_signature_file,
              snapshot->conf->snapshot_signature_pubkey,
              snapshot->conf->snapshot_signature_depth,
              snapshot->conf->snapshot_signature_index, &valid)) != RC_OK) {
