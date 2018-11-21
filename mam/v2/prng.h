@@ -58,8 +58,8 @@ void prng_reset(prng_t *const prng);
  * @param nonce Nonce
  * @param output Pseudorandom trits
  */
-void prng_gen(prng_t *const prng, uint8_t const dest, trits_t const nonce,
-              trits_t output);
+void prng_gen(prng_t *const prng, uint8_t const dest,
+              trit_array_t const *const nonce, trits_t output);
 
 /**
  * PRNG output generation with nonce1 || nonce2
@@ -70,8 +70,9 @@ void prng_gen(prng_t *const prng, uint8_t const dest, trits_t const nonce,
  * @param nonce2 Second nonce
  * @param output Pseudorandom trits
  */
-void prng_gen2(prng_t *const prng, uint8_t const dest, trits_t const nonce1,
-               trits_t const nonce2, trits_t output);
+void prng_gen2(prng_t *const prng, uint8_t const dest,
+               trit_array_t const *const nonce1,
+               trit_array_t const *const nonce2, trits_t output);
 
 /**
  * PRNG output generation with nonce1 || nonce2 || nonce3
@@ -83,7 +84,9 @@ void prng_gen2(prng_t *const prng, uint8_t const dest, trits_t const nonce1,
  * @param nonce3 Third nonce
  * @param output Pseudorandom trits
  */
-void prng_gen3(prng_t *const prng, uint8_t const dest, trits_t const nonce1,
-               trits_t const nonce2, trits_t const nonce3, trits_t output);
+void prng_gen3(prng_t *const prng, uint8_t const dest,
+               trit_array_t const *const nonce1,
+               trit_array_t const *const nonce2,
+               trit_array_t const *const nonce3, trits_t output);
 
 #endif  // __MAM_V2_PRNG_H__

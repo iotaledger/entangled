@@ -121,17 +121,23 @@ void wots_reset(wots_t *const wots) {
   memset(wots->sk, FLEX_TRIT_NULL_VALUE, MAM2_WOTS_SK_FLEX_SIZE);
 }
 
-void wots_gen_sk(wots_t *const wots, prng_t *const prng, trits_t const nonce) {
-  wots_gen_sk3(wots, prng, nonce, trits_null(), trits_null());
+void wots_gen_sk(wots_t *const wots, prng_t *const prng,
+                 trit_array_t const *const nonce) {
+  trit_array_t null = trit_array_null();
+  wots_gen_sk3(wots, prng, nonce, &null, &null);
 }
 
-void wots_gen_sk2(wots_t *const wots, prng_t *const prng, trits_t const nonce1,
-                  trits_t const nonce2) {
-  wots_gen_sk3(wots, prng, nonce1, nonce2, trits_null());
+void wots_gen_sk2(wots_t *const wots, prng_t *const prng,
+                  trit_array_t const *const nonce1,
+                  trit_array_t const *const nonce2) {
+  trit_array_t null = trit_array_null();
+  wots_gen_sk3(wots, prng, nonce1, nonce2, &null);
 }
 
-void wots_gen_sk3(wots_t *const wots, prng_t *const prng, trits_t const nonce1,
-                  trits_t const nonce2, trits_t const nonce3) {
+void wots_gen_sk3(wots_t *const wots, prng_t *const prng,
+                  trit_array_t const *const nonce1,
+                  trit_array_t const *const nonce2,
+                  trit_array_t const *const nonce3) {
   // TODO Remove when prng_gen3 takes flex_trit_t *
   MAM2_TRITS_DEF(tmp, MAM2_WOTS_SK_SIZE);
   prng_gen3(prng, MAM2_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3, tmp);

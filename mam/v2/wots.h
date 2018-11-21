@@ -72,7 +72,8 @@ void wots_reset(wots_t *const wots);
  * @param prng PRNG interface
  * @param nonce Nonce
  */
-void wots_gen_sk(wots_t *const wots, prng_t *const prng, trits_t const nonce);
+void wots_gen_sk(wots_t *const wots, prng_t *const prng,
+                 trit_array_t const *const nonce);
 
 /**
  * Generates a WOTS private key
@@ -82,8 +83,9 @@ void wots_gen_sk(wots_t *const wots, prng_t *const prng, trits_t const nonce);
  * @param nonce1 First nonce
  * @param nonce2 Second nonce
  */
-void wots_gen_sk2(wots_t *const wots, prng_t *const prng, trits_t const nonce1,
-                  trits_t const nonce2);
+void wots_gen_sk2(wots_t *const wots, prng_t *const prng,
+                  trit_array_t const *const nonce1,
+                  trit_array_t const *const nonce2);
 
 /**
  * Generates a WOTS private key
@@ -94,8 +96,10 @@ void wots_gen_sk2(wots_t *const wots, prng_t *const prng, trits_t const nonce1,
  * @param nonce2 Second nonce
  * @param nonce3 Third nonce
  */
-void wots_gen_sk3(wots_t *const wots, prng_t *const prng, trits_t const nonce,
-                  trits_t const nonce2, trits_t const nonce3);
+void wots_gen_sk3(wots_t *const wots, prng_t *const prng,
+                  trit_array_t const *const nonce1,
+                  trit_array_t const *const nonce2,
+                  trit_array_t const *const nonce3);
 
 /**
  * Computes a WOTS public key

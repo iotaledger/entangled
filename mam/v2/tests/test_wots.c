@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -9,12 +8,14 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/buffers.h"
-#include "mam/v2/curl.h"
+#include <memory.h>
+#include <stdio.h>
+#include <string.h>
+
+#include <unity/unity.h>
+
 #include "mam/v2/mam.h"
 #include "mam/v2/mss.h"
-#include "mam/v2/ntru.h"
-#include "mam/v2/pb3.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
 #include "mam/v2/tests/common.h"
@@ -22,26 +23,21 @@
 #include "mam/v2/wots.h"
 #include "utils/macros.h"
 
-#include <string.h>
-#include <unity/unity.h>
-
-#include <memory.h>
-#include <stdio.h>
-
 bool_t wots_test_do(wots_t *w, prng_t *p) {
   bool_t r = 1;
-  MAM2_TRITS_DEF(N, 18);
+
+  TRIT_ARRAY_DECLARE(N, 18);
+  trit_array_set_null(&N);
   MAM2_TRITS_DEF(pk, MAM2_WOTS_PK_SIZE);
   MAM2_TRITS_DEF(H, MAM2_WOTS_HASH_SIZE);
   MAM2_TRITS_DEF(sig, MAM2_WOTS_SIG_SIZE);
   // MAM2_TRITS_DEF(pkr, MAM2_WOTS_PK_SIZE);
 
-  trits_set_zero(N);
   trits_set_zero(H);
   memset(w->sk, FLEX_TRIT_NULL_VALUE, MAM2_WOTS_SK_FLEX_SIZE);
 
-  prng_gen(p, 7, N, H);
-  wots_gen_sk(w, p, N);
+  prng_gen(p, 7, &N, H);
+  wots_gen_sk(w, p, &N);
   wots_calc_pk(w, pk);
   wots_sign(w, H, sig);
   TEST_ASSERT(wots_verify(w->sponge, H, sig, pk));

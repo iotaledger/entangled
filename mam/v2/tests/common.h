@@ -11,18 +11,11 @@
 #ifndef __MAM_V2_TEST_STRUCTS_H__
 #define __MAM_V2_TEST_STRUCTS_H__
 
-#include "mam/v2/buffers.h"
-#include "mam/v2/curl.h"
-#include "mam/v2/mam.h"
 #include "mam/v2/mss.h"
-#include "mam/v2/ntru.h"
-#include "mam/v2/pb3.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
 #include "mam/v2/trits.h"
 #include "mam/v2/wots.h"
-
-#include "common/trinary/add.h"
 
 #if !defined(MAM2_MSS_TEST_MAX_D)
 #define MAM2_MSS_TEST_MAX_D 3

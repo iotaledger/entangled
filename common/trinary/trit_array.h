@@ -26,6 +26,12 @@ typedef struct _trit_array {
   uint8_t dynamic;
 } trit_array_t;
 
+static inline trit_array_t trit_array_null() {
+  trit_array_t trit_array = {
+      .trits = NULL, .num_trits = 0, .num_bytes = 0, .dynamic = 0};
+  return trit_array;
+}
+
 /// Returns the number of bytes needed to pack a given number of trits in the
 /// current memory model.
 /// @param[in] num_trits - the number of trits to pack
