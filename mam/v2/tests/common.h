@@ -8,10 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file buffers.h
-\brief Trits collection to simplify buffered operations.
-*/
 #ifndef __MAM_V2_TEST_STRUCTS_H__
 #define __MAM_V2_TEST_STRUCTS_H__
 
@@ -40,7 +36,7 @@ typedef struct _test_sponge_s {
 
 typedef struct _test_prng_s {
   prng_t p;
-  flex_trit_t key[FLEX_TRIT_SIZE_243];
+  flex_trit_t key[MAM2_PRNG_KEY_FLEX_SIZE];
 } test_prng_t;
 
 typedef struct _test_wots_s {
@@ -168,7 +164,7 @@ static isponge *test_sponge_init(test_sponge_t *s) {
 
 static prng_t *test_prng_init(test_prng_t *prng, isponge *sponge) {
   prng->p.sponge = sponge;
-  memcpy(prng->p.key, prng->key, FLEX_TRIT_SIZE_243);
+  memcpy(prng->p.key, prng->key, MAM2_PRNG_KEY_FLEX_SIZE);
   return &prng->p;
 }
 

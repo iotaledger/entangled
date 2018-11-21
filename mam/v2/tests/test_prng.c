@@ -17,7 +17,7 @@
 #include "utils/macros.h"
 
 void prng_test_do(prng_t *const prng) {
-  flex_trit_t key[FLEX_TRIT_SIZE_243];
+  flex_trit_t key[MAM2_PRNG_KEY_FLEX_SIZE];
   // TODO Remove when sponge handles flex_trit_t
   MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
   MAM2_TRITS_DEF(N, 18);

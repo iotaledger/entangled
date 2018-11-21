@@ -17,6 +17,8 @@
 
 // PRNG key size
 #define MAM2_PRNG_KEY_SIZE 243
+// PRNG key flex size
+#define MAM2_PRNG_KEY_FLEX_SIZE FLEX_TRIT_SIZE_243
 
 // PRNG AE destination tryte
 #define MAM2_PRNG_DST_SEC_KEY 0
@@ -28,7 +30,7 @@
 // PRNG interface
 typedef struct prng_s {
   isponge *sponge;
-  flex_trit_t key[FLEX_TRIT_SIZE_243];
+  flex_trit_t key[MAM2_PRNG_KEY_FLEX_SIZE];
 } prng_t;
 
 /**
