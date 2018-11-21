@@ -1,25 +1,19 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file sponge.c
-\brief MAM2 Sponge layer.
-*/
-#include "mam/v2/sponge.h"
 #include <stdlib.h>
+
 #include "common/trinary/add.h"
 #include "common/trinary/trit_array.h"
 #include "mam/v2/buffers.h"
+#include "mam/v2/sponge.h"
 
 static trits_t sponge_state_trits(isponge *s) {
   return trits_from_rep(MAM2_SPONGE_WIDTH, s->s);
@@ -98,7 +92,7 @@ void sponge_absorb_flex(isponge *s, trit_t c2, trit_array_p X_arr) {
 
 void sponge_squeeze(isponge *s, trit_t c2, trits_t Y) {
   size_t num_trits = Y.n - Y.d;
-  TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, num_trits, Y.p + Y.d);
+  TRIT_ARRAY_DECLARE(Y_arr, num_trits);
   sponge_squeeze_flex(s, c2, &Y_arr);
   flex_trits_to_trits(&Y.p[Y.d], num_trits, Y_arr.trits, num_trits, num_trits);
 }
@@ -186,7 +180,7 @@ void sponge_absorbn_flex(isponge *s, trit_t c2, size_t n, trit_array_t Xs[]) {
 void sponge_encr(isponge *s, trits_t X, trits_t Y) {
   size_t y_size = Y.n - Y.d;
   TRIT_ARRAY_MAKE_FROM_RAW(X_arr, X.n, X.p + X.d);
-  TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, Y.n, Y.p + Y.d);
+  TRIT_ARRAY_DECLARE(Y_arr, y_size);
   sponge_encr_flex(s, &X_arr, &Y_arr);
   flex_trits_to_trits(Y.p + Y.d, y_size, Y_arr.trits, y_size, y_size);
 }
@@ -231,7 +225,7 @@ void sponge_encr_flex(isponge *s, trit_array_p X_arr, trit_array_p Y_arr) {
 
 void sponge_decr(isponge *s, trits_t Y, trits_t X) {
   size_t x_size = X.n - X.d;
-  TRIT_ARRAY_MAKE_FROM_RAW(X_arr, X.n, X.p + X.d);
+  TRIT_ARRAY_DECLARE(X_arr, x_size);
   TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, Y.n, Y.p + Y.d);
   sponge_decr_flex(s, &X_arr, &Y_arr);
   flex_trits_to_trits(X.p + X.d, x_size, X_arr.trits, x_size, x_size);
@@ -278,7 +272,7 @@ void sponge_decr_flex(isponge *s, trit_array_p X_arr, trit_array_p Y_arr) {
 void sponge_hash(isponge *s, trits_t X, trits_t Y) {
   size_t y_size = Y.n - Y.d;
   TRIT_ARRAY_MAKE_FROM_RAW(X_arr, X.n - X.d, X.p + X.d);
-  TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, y_size, Y.p + Y.d);
+  TRIT_ARRAY_DECLARE(Y_arr, y_size);
   sponge_hash_flex(s, &X_arr, &Y_arr);
   flex_trits_to_trits(&Y.p[Y.d], y_size, Y_arr.trits, y_size, y_size);
 }
@@ -310,7 +304,7 @@ void sponge_hashn(isponge *s, size_t n, trits_t *Xs, trits_t Y) {
   }
 
   size_t y_size = Y.n - Y.d;
-  TRIT_ARRAY_MAKE_FROM_RAW(Y_arr, y_size, Y.p + Y.d);
+  TRIT_ARRAY_DECLARE(Y_arr, y_size);
   sponge_hashn_flex(s, n, Xs_arrays, &Y_arr);
   flex_trits_to_trits(&Y.p[Y.d], y_size, Y_arr.trits, y_size, y_size);
 }
