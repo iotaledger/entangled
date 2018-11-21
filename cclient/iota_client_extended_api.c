@@ -365,3 +365,38 @@ done:
   check_consistency_res_free(consistency_res);
   return ret_code;
 }
+
+retcode_t iota_client_get_latest_inclusion(
+    iota_client_service_t const* const serv, hash243_queue_t const transactions,
+    get_inclusion_state_res_t* out_states) {
+  retcode_t ret_code = RC_OK;
+  get_node_info_res_t* node_info = get_node_info_res_new();
+  get_inclusion_state_req_t* inclusion_req = get_inclusion_state_req_new();
+
+  ret_code = iota_client_get_node_info(serv, node_info);
+  if (ret_code) {
+    goto done;
+  }
+
+  inclusion_req->hashes = transactions;
+  if (hash243_queue_push(&inclusion_req->tips,
+                         node_info->latest_solid_subtangle_milestone)) {
+    goto done;
+  }
+
+  // check txs with latest solid subtangle milestone
+  if (iota_client_get_inclusion_states(serv, inclusion_req, out_states)) {
+    goto done;
+  }
+
+done:
+  if (node_info) {
+    get_node_info_res_free(&node_info);
+  }
+
+  if (inclusion_req) {
+    inclusion_req->hashes = NULL;
+    get_inclusion_state_req_free(&inclusion_req);
+  }
+  return ret_code;
+}

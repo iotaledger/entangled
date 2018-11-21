@@ -181,8 +181,8 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
  * `latest_solid_subtangle_milestione`.
  *
  * @param {iota_client_service_t} serv - client service
- * @param {hashes_t} transactions - List of transactions hashes
- * @param {booleans_t} out_states - List of inclusion states
+ * @param {hash243_queue_t} transactions - List of transactions hashes
+ * @param {get_inclusion_state_res_t} out_states - List of inclusion states
  *
  * @returns {retcode_t}
  * - `INVALID_HASH`: Invalid transaction hash
@@ -191,8 +191,8 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetLatestInclusion.ts#L34
  */
 retcode_t iota_client_get_latest_inclusion(
-    iota_client_service_t const* const serv, hashes_t const* const transactions,
-    booleans_t out_states);
+    iota_client_service_t const* const serv, hash243_queue_t const transactions,
+    get_inclusion_state_res_t* out_states);
 
 /**
  * Generates and returns a new address by calling
