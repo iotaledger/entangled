@@ -18,12 +18,7 @@ static void wots_calc_pks(isponge *const sponge, trit_array_p sk_pks,
                           trit_array_p pk) {
   size_t i, j;
 
-  TRIT_ARRAY_DECLARE(sk_part_trits_array, 0);
-  flex_trit_t
-      sk_part_flex_trits[trit_array_bytes_for_trits(MAM2_WOTS_SK_PART_SIZE)];
-  trit_array_set_trits(&sk_part_trits_array, sk_part_flex_trits,
-                       MAM2_WOTS_SK_PART_SIZE);
-
+  TRIT_ARRAY_DECLARE(sk_part_trits_array, MAM2_WOTS_SK_PART_SIZE);
   MAM2_ASSERT(sk_pks->num_trits == MAM2_WOTS_SK_SIZE);
   MAM2_ASSERT(pk->num_trits == MAM2_WOTS_PK_SIZE);
 
@@ -149,20 +144,11 @@ void wots_gen_sk3(wots_t *const wots, prng_t *const prng, trits_t const nonce1,
 }
 
 void wots_calc_pk(wots_t *const wots, trits_t pk) {
-  TRIT_ARRAY_DECLARE(sk_trits_array, 0);
-  flex_trit_t sk_flex_trits[trit_array_bytes_for_trits(MAM2_WOTS_SK_SIZE)];
-  memcpy(sk_flex_trits, wots->sk, MAM2_WOTS_SK_FLEX_SIZE);
-  trit_array_set_trits(&sk_trits_array, sk_flex_trits, MAM2_WOTS_SK_SIZE);
-
-  TRIT_ARRAY_DECLARE(pk_trits_array, 0);
-  flex_trit_t pk_flex_trits[trit_array_bytes_for_trits(MAM2_WOTS_PK_SIZE)];
-  flex_trits_from_trits(pk_flex_trits, MAM2_WOTS_PK_SIZE, pk.p + pk.d,
-                        MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
-  trit_array_set_trits(&pk_trits_array, pk_flex_trits, MAM2_WOTS_PK_SIZE);
-
+  TRIT_ARRAY_DECLARE(sk_trits_array, MAM2_WOTS_SK_SIZE);
+  memcpy(sk_trits_array.trits, wots->sk, MAM2_WOTS_SK_FLEX_SIZE);
+  TRIT_ARRAY_MAKE_FROM_RAW(pk_trits_array, MAM2_WOTS_PK_SIZE, pk.p + pk.d);
   wots_calc_pks(wots->sponge, &sk_trits_array, &pk_trits_array);
-
-  flex_trits_to_trits(pk.p + pk.d, MAM2_WOTS_PK_SIZE, pk_flex_trits,
+  flex_trits_to_trits(pk.p + pk.d, MAM2_WOTS_PK_SIZE, pk_trits_array.trits,
                       MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
 }
 
