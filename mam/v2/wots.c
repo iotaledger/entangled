@@ -123,15 +123,15 @@ void wots_reset(wots_t *const wots) {
 
 void wots_gen_sk(wots_t *const wots, prng_t *const prng,
                  trit_array_t const *const nonce) {
-  trit_array_t null = trit_array_null();
-  wots_gen_sk3(wots, prng, nonce, &null, &null);
+  trit_array_t null_trits = trit_array_null();
+  wots_gen_sk3(wots, prng, nonce, &null_trits, &null_trits);
 }
 
 void wots_gen_sk2(wots_t *const wots, prng_t *const prng,
                   trit_array_t const *const nonce1,
                   trit_array_t const *const nonce2) {
-  trit_array_t null = trit_array_null();
-  wots_gen_sk3(wots, prng, nonce1, nonce2, &null);
+  trit_array_t null_trits = trit_array_null();
+  wots_gen_sk3(wots, prng, nonce1, nonce2, &null_trits);
 }
 
 void wots_gen_sk3(wots_t *const wots, prng_t *const prng,

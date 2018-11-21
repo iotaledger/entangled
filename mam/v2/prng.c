@@ -50,15 +50,15 @@ void prng_reset(prng_t *const prng) {
 
 void prng_gen(prng_t *const prng, uint8_t const dest,
               trit_array_t const *const nonce, trit_array_t *const output) {
-  trit_array_t null = trit_array_null();
-  prng_gen3(prng, dest, nonce, &null, &null, output);
+  trit_array_t null_trits = trit_array_null();
+  prng_gen3(prng, dest, nonce, &null_trits, &null_trits, output);
 }
 
 void prng_gen2(prng_t *const prng, uint8_t const dest,
                trit_array_t const *const nonce1,
                trit_array_t const *const nonce2, trit_array_t *const output) {
-  trit_array_t null = trit_array_null();
-  prng_gen3(prng, dest, nonce1, nonce2, &null, output);
+  trit_array_t null_trits = trit_array_null();
+  prng_gen3(prng, dest, nonce1, nonce2, &null_trits, output);
 }
 
 void prng_gen3(prng_t *const prng, uint8_t const dest,
