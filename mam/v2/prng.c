@@ -30,15 +30,15 @@ static void prng_squeeze(isponge *const s, trits_t output) {
  * Public functions
  */
 
-void prng_create(prng_t *const prng) {
-  prng->sponge = NULL;
-  memset(prng->key, FLEX_TRIT_NULL_VALUE, MAM2_PRNG_KEY_FLEX_SIZE);
-}
-
 void prng_init(prng_t *const prng, isponge *const sponge,
                flex_trit_t const *const key) {
   prng->sponge = sponge;
   memcpy(prng->key, key, MAM2_PRNG_KEY_FLEX_SIZE);
+}
+
+void prng_reset(prng_t *const prng) {
+  prng->sponge = NULL;
+  memset(prng->key, FLEX_TRIT_NULL_VALUE, MAM2_PRNG_KEY_FLEX_SIZE);
 }
 
 // TODO Switch input/output to flex_trit_t when sponge handle them
@@ -88,9 +88,4 @@ void prng_gen3(prng_t *const prng, uint8_t const dest, trits_t const nonce1,
 
   prng_absorbn(prng->sponge, 5, trits_to_absorb);
   prng_squeeze(prng->sponge, output);
-}
-
-void prng_destroy(prng_t *const prng) {
-  prng->sponge = NULL;
-  memset(prng->key, FLEX_TRIT_NULL_VALUE, MAM2_PRNG_KEY_FLEX_SIZE);
 }

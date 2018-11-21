@@ -34,14 +34,7 @@ typedef struct prng_s {
 } prng_t;
 
 /**
- * PRNG default initialization
- *
- * @param prng PRNG interface
- */
-void prng_create(prng_t *const prng);
-
-/**
- * PRNG value initialization
+ * PRNG initialization
  *
  * @param prng PRNG interface
  * @param sponge Sponge interface
@@ -49,6 +42,13 @@ void prng_create(prng_t *const prng);
  */
 void prng_init(prng_t *const prng, isponge *const sponge,
                flex_trit_t const *const key);
+
+/**
+ * Resets PRNG sponge and key
+ *
+ * @param prng PRNG interface
+ */
+void prng_reset(prng_t *const prng);
 
 /**
  * PRNG output generation with nonce
@@ -85,12 +85,5 @@ void prng_gen2(prng_t *const prng, uint8_t const dest, trits_t const nonce1,
  */
 void prng_gen3(prng_t *const prng, uint8_t const dest, trits_t const nonce1,
                trits_t const nonce2, trits_t const nonce3, trits_t output);
-
-/**
- * Cleans PRNG state
- *
- * @param prng PRNG interface
- */
-void prng_destroy(prng_t *const prng);
 
 #endif  // __MAM_V2_PRNG_H__
