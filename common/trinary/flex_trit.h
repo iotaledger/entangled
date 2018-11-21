@@ -187,12 +187,30 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
 /// @param[in] to_len - the number of trits encoded in the to_flex_trits array
 /// @param[in] flex_trits - the array containing the trits to copy over
 /// @param[in] len - the number of trits the flex_trits array stores
-/// @param[in] start - the start index in the target array
+/// @param[in] start - the start index in the destination array
 /// @param[in] num_trits - the number of trits to copy over
 /// @return size_t - the number of trits copied over
 size_t flex_trits_insert(flex_trit_t *const to_flex_trits, size_t const to_len,
                          flex_trit_t const *const flex_trits, size_t const len,
                          size_t const start, size_t const num_trits);
+
+/// Inserts the contents of an array into another array starting at a given
+/// index.
+/// @param[in] dst_trits - the array to insert into
+/// @param[in] dst_len - the number of trits encoded in the to_flex_trits array
+/// @param[in] src_trits - the array containing the trits to copy over
+/// @param[in] src_len - the number of trits the flex_trits array stores
+/// @param[in] src_start_pos - the start index on the source array
+/// @param[in] dst_start_pos - the start index on the destination array
+/// @param[in] num_trits - the number of trits to copy over
+/// @return size_t - the number of trits copied over
+size_t flex_trits_insert_from_pos(flex_trit_t *const dst_trits,
+                                  size_t const dst_len,
+                                  flex_trit_t const *const src_trits,
+                                  size_t const src_len,
+                                  size_t const src_start_pos,
+                                  size_t const dst_start_pos,
+                                  size_t const num_trits);
 
 /// Returns an array of trits regardless of the current memory storage
 /// scheme

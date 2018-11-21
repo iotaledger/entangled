@@ -90,12 +90,26 @@ trit_array_p trit_array_slice_at_most(trit_array_p const trit_array,
 /// index.
 /// @param[in] trit_array - the array to insert into
 /// @param[in] from_trit_array - the array containing the trits to copy over
-/// @param[in] start - the start index in the target array
+/// @param[in] start - the start index in the destination array
 /// @param[in] num_trits - the number of trits to copy over
 /// @return trit_array_p - the receiver
 trit_array_p trit_array_insert(trit_array_p const trit_array,
                                trit_array_p const from_trit_array,
                                size_t const start, size_t const num_trits);
+
+/// Inserts the contents of an array into the receiver starting at a given
+/// index.
+/// @param[in] dst_trits - the array to insert into
+/// @param[in] src_trits - the array containing the trits to copy over
+/// @param[in] src_start_pos - the start index on the source array
+/// @param[in] dst_start_pos - the start index on the destination array
+/// @param[in] num_trits - the number of trits to copy over
+/// @return trit_array_p - the receiver
+trit_array_p trit_array_insert_from_pos(trit_array_p const dst_trits,
+                                        trit_array_p const src_trits,
+                                        size_t const src_start_pos,
+                                        size_t const dst_start_pos,
+                                        size_t const num_trits);
 
 /// Returns an array of trits regardless of the current memory storage scheme
 /// @param[in] trit_array - the array of packed trits
