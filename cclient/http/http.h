@@ -15,6 +15,9 @@ extern "C" {
 #include <stdlib.h>
 #include "cclient/service.h"
 
+extern const char* khttp_ApplicationJson;
+extern const char* khttp_ApplicationFormUrlencoded;
+
 retcode_t iota_service_query(const void* const service_opaque,
                              char_buffer_t* obj, char_buffer_t* response);
 
