@@ -153,6 +153,18 @@ typedef struct mss_s {
 #endif
 
 /**
+ * Allocate memory for internal Merkle tree structure
+ * `mss_init` must still be called afterwards
+ * In case of error `mss_destroy` must be called
+ * Non Merkle tree related objects (WOTS, PRNG, Sponge interfaces)
+ * must be allocated separately
+ *
+ * @param mss MSS interface
+ * @param height Merkle-tree height
+ */
+retcode_t mss_create(mss_t *mss, mss_mt_height_t height);
+
+/**
  * MSS interface initialization
  * MSS Merkle tree should already be allocated and initialized for the current
  * height
@@ -214,18 +226,6 @@ void mss_sign(mss_t *mss, trits_t hash, trits_t sig);
  */
 bool_t mss_verify(isponge *ms, isponge *ws, trits_t hash, trits_t sig,
                   trits_t pk);
-
-/**
- * Allocate memory for internal Merkle tree structure
- * `mss_init` must still be called afterwards
- * In case of error `mss_destroy` must be called
- * Non Merkle tree related objects (WOTS, PRNG, Sponge interfaces)
- * must be allocated separately
- *
- * @param mss MSS interface
- * @param height Merkle-tree height
- */
-retcode_t mss_create(mss_t *mss, mss_mt_height_t height);
 
 /**
  * Deallocate memory for internal Merkle tree structure
