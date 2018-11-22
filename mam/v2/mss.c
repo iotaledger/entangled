@@ -458,7 +458,13 @@ bool_t mss_verify(isponge *ms, isponge *ws, trits_t H, trits_t sig,
 #if defined(MAM2_MSS_DEBUG)
   trits_copy(trits_take(sig, MAM2_MSS_MT_HASH_SIZE), apk);
 #else
-  wots_recover(ws, H, trits_take(sig, MAM2_WOTS_SIG_SIZE), apk);
+  MAM2_ASSERT(trits_size(pk) == MAM2_WOTS_PK_SIZE);
+  TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, H.p + H.d);
+  TRIT_ARRAY_MAKE_FROM_RAW(sk_sig_array, MAM2_WOTS_SIG_SIZE, sig.p + sig.d);
+  TRIT_ARRAY_DECLARE(pk_array, MAM2_WOTS_PK_SIZE);
+  wots_recover(ws, &hash_array, &sk_sig_array, &pk_array);
+  flex_trits_to_trits(apk.p + apk.d, MAM2_WOTS_PK_SIZE, pk_array.trits,
+                      MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
 #endif
   dbg_printf("\nwpR\t");
   trits_dbg_print(apk);
