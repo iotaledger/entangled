@@ -125,17 +125,17 @@ void test_wots_gen_sign(size_t Kn, char *K, trit_array_t const *const nonce,
   wots_calc_pk(w, &pk_trits_array);
   flex_trits_to_trits(tpk.p + tpk.d, MAM2_WOTS_PK_SIZE, pk_trits_array.trits,
                       MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
+
   trits_to_trytes(tpk.p, pk, MIN(strlen(pk), tpk.n / RADIX));
 
   trytes_to_trits(H, tH.p, MIN(strlen(H), tH.n));
-
-  TRIT_ARRAY_DECLARE(sk_sig_array, MAM2_WOTS_SK_SIZE);
-  memcpy(sk_sig_array.trits, w->sk, MAM2_WOTS_SK_FLEX_SIZE);
-  TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, tH.p + tH.d);
-  wots_sign(w, &hash_array, &sk_sig_array);
-
-  flex_trits_to_trits(tsig.p + tsig.d, MAM2_WOTS_SK_SIZE, sk_sig_array.trits,
+  flex_trits_to_trits(tsig.p + tsig.d, MAM2_WOTS_SK_SIZE, w->sk,
                       MAM2_WOTS_SK_SIZE, MAM2_WOTS_SK_SIZE);
+  TRIT_ARRAY_DECLARE(hash_array, MAM2_WOTS_HASH_SIZE);
+  TRIT_ARRAY_DECLARE(sk_sig_array, MAM2_WOTS_SIG_SIZE);
+  wots_sign(w, &hash_array, &sk_sig_array);
+  flex_trits_to_trits(tsig.p + tsig.d, MAM2_WOTS_SIG_SIZE, sk_sig_array.trits,
+                      MAM2_WOTS_SIG_SIZE, MAM2_WOTS_SIG_SIZE);
 
   trits_to_trytes(tsig.p, sig, MIN(tsig.n / RADIX, strlen(sig)));
 

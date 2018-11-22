@@ -9,6 +9,8 @@
  */
 
 #include "mam/v2/wots.h"
+#include <stdlib.h>
+#include "common/trinary/trit_long.h"
 
 /*
  * Private functions
@@ -70,7 +72,6 @@ static void wots_hash_sign(isponge *const sponge, trit_array_p sk_sig,
   for (; i < MAM2_WOTS_SK_PART_COUNT; ++i) {
     trit_array_insert_from_pos(&sk_sig_part, sk_sig, sig_pos, 0,
                                MAM2_WOTS_SK_PART_SIZE);
-
     h = MAM2_MODS(t, 19683, 27);
     t = MAM2_DIVS(t, 19683, 27);
 

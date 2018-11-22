@@ -35,7 +35,6 @@ bool_t wots_test_do(wots_t *w, prng_t *p) {
   memset(w->sk, FLEX_TRIT_NULL_VALUE, MAM2_WOTS_SK_FLEX_SIZE);
 
   prng_gen(p, 7, &N, &H);
-
   wots_gen_sk(w, p, &N);
   TRIT_ARRAY_MAKE_FROM_RAW(pk_trits_array, MAM2_WOTS_PK_SIZE, pk.p + pk.d);
   wots_calc_pk(w, &pk_trits_array);
