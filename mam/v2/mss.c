@@ -413,6 +413,7 @@ void mss_skn(mss_t *mss, trits_t skn) {
 
 void mss_auth_path(mss_t *mss, trint18_t i, trit_array_t *const auth_path) {
   mss_mt_height_t d;
+  size_t offset = 0;
 
   MAM2_ASSERT(auth_path->num_trits == MAM2_MSS_AUTH_PATH_SIZE(mss->height));
 
@@ -429,19 +430,19 @@ void mss_auth_path(mss_t *mss, trint18_t i, trit_array_t *const auth_path) {
   {
 #if defined(MAM2_MSS_TRAVERSAL)
     trit_array_t ni = mss_mt_auth_path_trits(mss, d);
-    memcpy(auth_path->trits, ni.trits, MAM2_MSS_MT_HASH_FLEX_SIZE);
+    memcpy(auth_path->trits + offset, ni.trits, MAM2_MSS_MT_HASH_FLEX_SIZE);
 #else
     trits_t ni = mss_mt_node_t_trits(m, d, (0 == i % 2) ? i + 1 : i - 1);
-    flex_trits_from_trits(auth_path->trits, MAM2_MSS_MT_HASH_SIZE, ni.p + ni.d,
-                          MAM2_MSS_MT_HASH_SIZE, MAM2_MSS_MT_HASH_SIZE);
+    flex_trits_from_trits(auth_path->trits + offset, MAM2_MSS_MT_HASH_SIZE,
+                          ni.p + ni.d, MAM2_MSS_MT_HASH_SIZE,
+                          MAM2_MSS_MT_HASH_SIZE);
 #endif
-    // trits_copy(ni, pi);
 
     dbg_printf("ap\t");
     trits_dbg_print(ni);
     dbg_printf("\n");
 
-    auth_path->trits += MAM2_MSS_MT_HASH_SIZE;
+    offset += MAM2_MSS_MT_HASH_SIZE;
   }
 }
 
