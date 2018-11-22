@@ -32,11 +32,6 @@ static inline void set_control_tryte(isponge *s, size_t i, trit_t c0, trit_t c1,
   t.p[t.d + 2] = c2;
 }
 
-static trits_t sponge_control_trits(isponge *s) {
-  return trits_take(trits_drop(sponge_state_trits(s), MAM2_SPONGE_RATE),
-                    MAM2_SPONGE_CONTROL);
-}
-
 trits_t sponge_outer_trits(isponge *s, size_t n) {
   MAM2_ASSERT(n <= MAM2_SPONGE_RATE);
   return trits_take(sponge_state_trits(s), n);
@@ -117,27 +112,6 @@ void sponge_squeeze_flex(isponge *s, trit_t c2, trit_array_p Y_arr) {
 
   flex_trits_from_trits(Y_arr->trits, Y_arr->num_trits, y_p, Y_arr->num_trits,
                         Y_arr->num_trits);
-}
-
-void sponge_absorbn(isponge *s, trit_t c2, size_t n, trits_t *Xs) {
-  buffers_t tb = buffers_init(n, Xs);
-  size_t m = buffers_size(tb);
-  trits_t s1 = sponge_outer1_trits(s);
-  size_t ni;
-  trit_t c0, c1;
-  do {
-    ni = (m < MAM2_SPONGE_RATE) ? m : MAM2_SPONGE_RATE;
-    m -= ni;
-    c0 = (ni < MAM2_SPONGE_RATE) ? 0 : 1;
-    c1 = (0 == m) ? 1 : -1;
-    if (!MAM2_SPONGE_IS_CONTROL_TRIT_ZERO(s, 1)) {
-      set_control_tryte(s, 1, c0, c1, c2);
-      sponge_transform(s);
-    }
-    buffers_copy_to(&tb, trits_take(s1, ni));
-    trits_pad10(trits_drop(s1, ni));
-    set_control_tryte(s, 0, c0, c1, c2);
-  } while (0 < m);
 }
 
 void sponge_absorbn_flex(isponge *s, trit_t c2, size_t n, trit_array_t Xs[]) {

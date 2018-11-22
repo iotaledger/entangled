@@ -50,10 +50,6 @@ typedef struct _isponge {
   void (*f)(void *, trit_t *); /*!< sponge transformation */
   void *stack;                 /*!< additional memory used by `f` */
   trit_t *s;                   /*!< sponge state */
-
-  // TODO - replace s field and also get correct size
-  flex_trit_t flex_trit_state[MAM2_SPONGE_WIDTH];
-
 } isponge;
 
 /*! \brief Fork (copy) sponge state. `fork` must be initialized. */
@@ -75,14 +71,6 @@ void sponge_absorb(isponge *s, /*!< [in] sponge interface */
 );
 
 void sponge_absorb_flex(isponge *s, trit_t c2, trit_array_p X_arr);
-
-/*! \brief Absorb concatenation of `Xs[0]`..`Xs[n-1]` */
-void sponge_absorbn(
-    isponge *s, /*!< [in] sponge interface */
-    trit_t c2,  /*!< [in] control trit encoding input data type */
-    size_t n,   /*!< [in] input data blocks count */
-    trits_t *Xs /*!< [in] input data blocks */
-);
 
 /*! \brief Absorb concatenation of `Xs[0]`..`Xs[n-1]` */
 void sponge_absorbn_flex(
