@@ -127,8 +127,8 @@ void wots_sign(wots_t *const wots, trit_array_p const hash, trit_array_p sig);
  * @param sig Signature
  * @param pk Presumed public key
  */
-void wots_recover(isponge *const sponge, trits_t const hash, trits_t const sig,
-                  trits_t pk);
+void wots_recover(isponge *const sponge, trit_array_p const hash,
+                  trit_array_p const sig, trit_array_p pk);
 
 /**
  * Verifies a WOTS signature
