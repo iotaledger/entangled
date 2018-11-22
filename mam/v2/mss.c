@@ -8,6 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #include "mam/v2/mss.h"
 
 /*
@@ -63,7 +65,13 @@ static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trits_t h) {
   MAM2_TRITS_DEF(Ni, 18);
   // gen sk from current leaf index
   trits_put18(Ni, index);
-  wots_gen_sk3(mss->wots, mss->prng, mss->nonce1, mss->nonce2, Ni);
+  // TODO Remove when mss handles flex_trits
+  TRIT_ARRAY_MAKE_FROM_RAW(nonce1, mss->nonce1.n - mss->nonce1.d,
+                           mss->nonce1.p + mss->nonce1.d);
+  TRIT_ARRAY_MAKE_FROM_RAW(nonce2, mss->nonce2.n - mss->nonce2.d,
+                           mss->nonce2.p + mss->nonce2.d);
+  TRIT_ARRAY_MAKE_FROM_RAW(noncei, Ni.n - Ni.d, Ni.p + Ni.d);
+  wots_gen_sk3(mss->wots, mss->prng, &nonce1, &nonce2, &noncei);
   // calc pk & push hash
   wots_calc_pk(mss->wots, h);
 #endif
@@ -390,7 +398,13 @@ void mss_sign(mss_t *mss, trits_t H, trits_t sig) {
   {
     MAM2_TRITS_DEF(Ni, 18);
     trits_put18(Ni, mss->skn);
-    wots_gen_sk3(mss->wots, mss->prng, mss->nonce1, mss->nonce2, Ni);
+    // TODO Remove when mss handles flex_trits
+    TRIT_ARRAY_MAKE_FROM_RAW(nonce1, mss->nonce1.n - mss->nonce1.d,
+                             mss->nonce1.p + mss->nonce1.d);
+    TRIT_ARRAY_MAKE_FROM_RAW(nonce2, mss->nonce2.n - mss->nonce2.d,
+                             mss->nonce2.p + mss->nonce2.d);
+    TRIT_ARRAY_MAKE_FROM_RAW(noncei, Ni.n - Ni.d, Ni.p + Ni.d);
+    wots_gen_sk3(mss->wots, mss->prng, &nonce1, &nonce2, &noncei);
   }
 
   wots_sign(mss->wots, H, trits_take(sig, MAM2_WOTS_SIG_SIZE));
