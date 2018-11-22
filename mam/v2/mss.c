@@ -413,7 +413,7 @@ void mss_sign(mss_t *mss, trits_t hash, trits_t sig) {
 
   TRIT_ARRAY_DECLARE(sk_sig_array, MAM2_WOTS_SK_SIZE);
   memcpy(sk_sig_array.trits, mss->wots->sk, MAM2_WOTS_SK_FLEX_SIZE);
-  TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, H.p + H.d);
+  TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, hash.p + hash.d);
   wots_sign(mss->wots, &hash_array, &sk_sig_array);
 
   flex_trits_to_trits(sig.p + sig.d, MAM2_WOTS_SK_SIZE, sk_sig_array.trits,
