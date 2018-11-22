@@ -136,6 +136,7 @@ void test_wots_gen_sign(size_t Kn, char *K, trit_array_t const *const nonce,
   wots_sign(w, &hash_array, &sk_sig_array);
   flex_trits_to_trits(tsig.p + tsig.d, MAM2_WOTS_SIG_SIZE, sk_sig_array.trits,
                       MAM2_WOTS_SIG_SIZE, MAM2_WOTS_SIG_SIZE);
+
   trits_to_trytes(tsig.p, sig, MIN(tsig.n / RADIX, strlen(sig)));
 
   trits_free(tK);
