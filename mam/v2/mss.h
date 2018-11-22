@@ -113,7 +113,7 @@ typedef struct mss_s {
   isponge *sponge;         // Sponge interface used to hash Merkle tree nodes
   wots_t *wots;            // WOTS interface used to generate keys and sign
 #if defined(MAM2_MSS_TRAVERSAL)
-  trit_t *auth_path;       // Current authentication path; `d` hash values
+  flex_trit_t *auth_path;  // Current authentication path; `d` hash values
   trit_t *hashes;          // Buffer storing hash-values of auxiliary nodes;
                            // MAM2_MSS_MT_NODES(d) hash-values in total
   mss_mt_node_t *nodes;    // Auxiliary node infos
@@ -204,7 +204,7 @@ void mss_skn(mss_t *mss, trits_t skn);
  * @param i Number of WOTS instance
  * @param auth_path Authentication path
  */
-void mss_auth_path(mss_t *mss, trint18_t i, trits_t auth_path);
+void mss_auth_path(mss_t *mss, trint18_t i, trit_array_t *const auth_path);
 
 /**
  * Generates MSS signature
