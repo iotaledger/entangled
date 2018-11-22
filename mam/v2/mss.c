@@ -53,14 +53,14 @@ static void mss_mt_hash2(isponge *sponge, trits_t h[2], trits_t h01) {
 
 /*!< [in] leaf index: `0 <= i < 2^D` */
 /*!< [out] WOTS pk / leaf hash */
-static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trits_t h) {
+static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trits_t pk) {
   MAM2_ASSERT(0 <= index && index <= MAM2_MSS_MAX_SKN(mss->height));
 
 #if defined(MAM2_MSS_DEBUG)
   // this is a special debug MT hash function;
   // hash of the node is it's index in the level
-  trits_set_zero(h);
-  trits_put18(h, index);
+  trits_set_zero(pk);
+  trits_put18(pk, index);
 #else
   MAM2_TRITS_DEF(Ni, 18);
   // gen sk from current leaf index
@@ -73,11 +73,15 @@ static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trits_t h) {
   TRIT_ARRAY_MAKE_FROM_RAW(noncei, Ni.n - Ni.d, Ni.p + Ni.d);
   wots_gen_sk3(mss->wots, mss->prng, &nonce1, &nonce2, &noncei);
   // calc pk & push hash
-  wots_calc_pk(mss->wots, h);
+  TRIT_ARRAY_MAKE_FROM_RAW(pk_trits_array, MAM2_WOTS_PK_SIZE, pk.p + pk.d);
+  wots_calc_pk(mss->wots, &pk_trits_array);
+  flex_trits_to_trits(pk.p + pk.d, MAM2_WOTS_PK_SIZE, pk_trits_array.trits,
+                      MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
+
 #endif
 
   dbg_printf("wpk %d   \t", index);
-  trits_dbg_print(h);
+  trits_dbg_print(pk);
   dbg_printf("\n");
 }
 
@@ -407,7 +411,14 @@ void mss_sign(mss_t *mss, trits_t H, trits_t sig) {
     wots_gen_sk3(mss->wots, mss->prng, &nonce1, &nonce2, &noncei);
   }
 
-  wots_sign(mss->wots, H, trits_take(sig, MAM2_WOTS_SIG_SIZE));
+  TRIT_ARRAY_DECLARE(sk_sig_array, MAM2_WOTS_SK_SIZE);
+  memcpy(sk_sig_array.trits, mss->wots->sk, MAM2_WOTS_SK_FLEX_SIZE);
+  TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, H.p + H.d);
+  wots_sign(mss->wots, &hash_array, &sk_sig_array);
+
+  flex_trits_to_trits(sig.p + sig.d, MAM2_WOTS_SK_SIZE, sk_sig_array.trits,
+                      MAM2_WOTS_SK_SIZE, MAM2_WOTS_SK_SIZE);
+
 #endif
   sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
 
@@ -458,7 +469,13 @@ bool_t mss_verify(isponge *ms, isponge *ws, trits_t H, trits_t sig,
 #if defined(MAM2_MSS_DEBUG)
   trits_copy(trits_take(sig, MAM2_MSS_MT_HASH_SIZE), apk);
 #else
-  wots_recover(ws, H, trits_take(sig, MAM2_WOTS_SIG_SIZE), apk);
+  MAM2_ASSERT(trits_size(pk) == MAM2_WOTS_PK_SIZE);
+  TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, H.p + H.d);
+  TRIT_ARRAY_MAKE_FROM_RAW(sk_sig_array, MAM2_WOTS_SIG_SIZE, sig.p + sig.d);
+  TRIT_ARRAY_DECLARE(pk_array, MAM2_WOTS_PK_SIZE);
+  wots_recover(ws, &hash_array, &sk_sig_array, &pk_array);
+  flex_trits_to_trits(apk.p + apk.d, MAM2_WOTS_PK_SIZE, pk_array.trits,
+                      MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
 #endif
   dbg_printf("\nwpR\t");
   trits_dbg_print(apk);
