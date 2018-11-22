@@ -53,7 +53,7 @@ static void mss_mt_hash2(isponge *sponge, trits_t h[2], trits_t h01) {
 
 /*!< [in] leaf index: `0 <= i < 2^D` */
 /*!< [out] WOTS pk / leaf hash */
-static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trits_t h) {
+static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trits_t pk) {
   MAM2_ASSERT(0 <= index && index <= MAM2_MSS_MAX_SKN(mss->height));
 
 #if defined(MAM2_MSS_DEBUG)
@@ -73,7 +73,11 @@ static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trits_t h) {
   TRIT_ARRAY_MAKE_FROM_RAW(noncei, Ni.n - Ni.d, Ni.p + Ni.d);
   wots_gen_sk3(mss->wots, mss->prng, &nonce1, &nonce2, &noncei);
   // calc pk & push hash
-  wots_calc_pk(mss->wots, h);
+  TRIT_ARRAY_DECLARE(pk_trits_array, MAM2_WOTS_PK_SIZE);
+  wots_calc_pk(mss->wots, &pk_trits_array);
+  flex_trits_to_trits(pk.p + pk.d, MAM2_WOTS_PK_SIZE, pk_trits_array.trits,
+                      MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
+
 #endif
 
   dbg_printf("wpk %d   \t", index);
@@ -384,7 +388,7 @@ void mss_apath(mss_t *mss, trint18_t i, trits_t p) {
   }
 }
 
-void mss_sign(mss_t *mss, trits_t H, trits_t sig) {
+void mss_sign(mss_t *mss, trits_t hash, trits_t sig) {
   MAM2_ASSERT(trits_size(sig) == MAM2_MSS_SIG_SIZE(mss->height));
 
   dbg_printf("mss sign skn=%d\n", mss->skn);
@@ -407,7 +411,13 @@ void mss_sign(mss_t *mss, trits_t H, trits_t sig) {
     wots_gen_sk3(mss->wots, mss->prng, &nonce1, &nonce2, &noncei);
   }
 
-  wots_sign(mss->wots, H, trits_take(sig, MAM2_WOTS_SIG_SIZE));
+  flex_trits_to_trits(sig.p + sig.d, MAM2_WOTS_SK_SIZE, mss->wots->sk,
+                      MAM2_WOTS_SK_SIZE, MAM2_WOTS_SK_SIZE);
+  TRIT_ARRAY_DECLARE(hash_array, MAM2_WOTS_HASH_SIZE);
+  TRIT_ARRAY_MAKE_FROM_RAW(sk_sig_array, MAM2_WOTS_SIG_SIZE, sig.p + sig.d);
+  wots_sign(mss->wots, &hash_array, &sk_sig_array);
+  flex_trits_to_trits(sig.p + sig.d, MAM2_WOTS_SIG_SIZE, sk_sig_array.trits,
+                      MAM2_WOTS_SIG_SIZE, MAM2_WOTS_SIG_SIZE);
 #endif
   sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
 
