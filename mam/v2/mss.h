@@ -26,21 +26,41 @@
 
 // MSS public key size
 #define MAM2_MSS_PK_SIZE 243
+// MSS public key flex size
+#define MAM2_MSS_PK_FLEX_SIZE FLEX_TRIT_SIZE_243
+
 // Trits needed to encode SKN (tree depth and key number)
 #define MAM2_MSS_SKN_SIZE 18
+// Flex trits needed to encode SKN (tree depth and key number)
+#define MAM2_MSS_SKN_FLEX_SIZE FLEX_TRIT_SIZE_18
+
 // Maximum value of SKN for a given height d
 #define MAM2_MSS_MAX_SKN(d) (((uint32_t)1 << d) - 1)
+
 // MSS authentication path size of height d
 #define MAM2_MSS_AUTH_PATH_SIZE(d) (MAM2_WOTS_PK_SIZE * d)
+// MSS authentication path flex size of height d
+#define MAM2_MSS_AUTH_PATH_FLEX_SIZE(d) \
+  NUM_FLEX_TRITS_FOR_TRITS(MAM2_MSS_AUTH_PATH_SIZE(d))
+
 // MSS signature size with a tree of height d
 #define MAM2_MSS_SIG_SIZE(d) \
   (MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE + MAM2_MSS_AUTH_PATH_SIZE(d))
+// MSS signature flex size with a tree of height d
+#define MAM2_MSS_SIG_FLEX_SIZE(d) NUM_FLEX_TRITS_FOR_TRITS(MAM2_MSS_SIG_SIZE(d))
+
 // MSS signed hash value size
 #define MAM2_MSS_HASH_SIZE MAM2_WOTS_HASH_SIZE
+// MSS signed hash value flex size
+#define MAM2_MSS_HASH_FLEX_SIZE MAM2_WOTS_HASH_FLEX_SIZE
+
 // Max Merkle tree height
 #define MAM2_MSS_MAX_HEIGHT 20
+
 // Size of hash values stored in Merkle tree
 #define MAM2_MSS_MT_HASH_SIZE MAM2_WOTS_PK_SIZE
+// FLex size of hash values stored in Merkle tree
+#define MAM2_MSS_MT_HASH_FLEX_SIZE MAM2_WOTS_PK_FLEX_SIZE
 
 // Leaves have height `0`, root has height `D`; `0 <= d < D`; `D <= 20`
 typedef uint8_t mss_mt_height_t;
