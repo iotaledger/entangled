@@ -14,23 +14,26 @@
  * Private functions
  */
 
-static void wots_calc_pks(isponge *const sponge, trits_t sk_pks, trits_t pk) {
+static void wots_calc_pks(isponge *const sponge, trit_array_p sk_pks,
+                          trit_array_p pk) {
   size_t i, j;
-  trits_t sk_part, pks = sk_pks;
 
-  MAM2_ASSERT(trits_size(sk_pks) == MAM2_WOTS_SK_SIZE);
-  MAM2_ASSERT(trits_size(pk) == MAM2_WOTS_PK_SIZE);
+  TRIT_ARRAY_DECLARE(sk_part_trits_array, MAM2_WOTS_SK_PART_SIZE);
+  MAM2_ASSERT(sk_pks->num_trits == MAM2_WOTS_SK_SIZE);
+  MAM2_ASSERT(pk->num_trits == MAM2_WOTS_PK_SIZE);
 
+  size_t sk_pos = 0;
   for (i = 0; i < MAM2_WOTS_SK_PART_COUNT; ++i) {
-    sk_part = trits_take(sk_pks, MAM2_WOTS_SK_PART_SIZE);
-    sk_pks = trits_drop(sk_pks, MAM2_WOTS_SK_PART_SIZE);
-
+    trit_array_insert_from_pos(&sk_part_trits_array, sk_pks, sk_pos, 0,
+                               MAM2_WOTS_SK_PART_SIZE);
     for (j = 0; j < 26; ++j) {
-      sponge_hash(sponge, sk_part, sk_part);
+      sponge_hash_flex(sponge, &sk_part_trits_array, &sk_part_trits_array);
     }
+    trit_array_insert_from_pos(sk_pks, &sk_part_trits_array, 0, sk_pos,
+                               MAM2_WOTS_SK_PART_SIZE);
+    sk_pos += MAM2_WOTS_SK_PART_SIZE;
   }
-
-  sponge_hash(sponge, pks, pk);
+  sponge_hash_flex(sponge, sk_pks, pk);
 }
 
 static void wots_hash_sign(isponge *const sponge, trits_t sk_sig,
@@ -146,12 +149,12 @@ void wots_gen_sk3(wots_t *const wots, prng_t *const prng,
 }
 
 void wots_calc_pk(wots_t *const wots, trits_t pk) {
-  MAM2_TRITS_DEF(sk_pks, MAM2_WOTS_SK_SIZE);
-  // TODO Remove when wots_calc_pks takes flex_trit_t *
-  flex_trits_to_trits(sk_pks.p + sk_pks.d, MAM2_WOTS_SK_SIZE, wots->sk,
-                      MAM2_WOTS_SK_SIZE, MAM2_WOTS_SK_SIZE);
-  wots_calc_pks(wots->sponge, sk_pks, pk);
-  trits_set_zero(sk_pks);
+  TRIT_ARRAY_DECLARE(sk_trits_array, MAM2_WOTS_SK_SIZE);
+  memcpy(sk_trits_array.trits, wots->sk, MAM2_WOTS_SK_FLEX_SIZE);
+  TRIT_ARRAY_MAKE_FROM_RAW(pk_trits_array, MAM2_WOTS_PK_SIZE, pk.p + pk.d);
+  wots_calc_pks(wots->sponge, &sk_trits_array, &pk_trits_array);
+  flex_trits_to_trits(pk.p + pk.d, MAM2_WOTS_PK_SIZE, pk_trits_array.trits,
+                      MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
 }
 
 void wots_sign(wots_t *const wots, trits_t const hash, trits_t sig) {

@@ -109,6 +109,30 @@ size_t flex_trits_insert(flex_trit_t *const to_flex_trits, size_t const to_len,
   return num_trits;
 }
 
+size_t flex_trits_insert_from_pos(flex_trit_t *const dst_trits,
+                                  size_t const dst_len,
+                                  flex_trit_t const *const src_trits,
+                                  size_t const src_len,
+                                  size_t const src_start_pos,
+                                  size_t const dst_start_pos,
+                                  size_t const num_trits) {
+  // Bounds checking
+  if (num_trits == 0 || num_trits > src_len || num_trits > dst_len ||
+      src_start_pos >= src_len || (src_start_pos + num_trits) > src_len ||
+      dst_start_pos >= dst_len || (dst_start_pos + num_trits) > dst_len) {
+    return 0;
+  }
+#if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
+  memcpy(dst_trits + dst_start_pos, src_trits + src_start_pos, num_trits);
+#else
+  for (size_t i = 0; i < num_trits; i++) {
+    trit_t t = flex_trits_at(src_trits, src_len, src_start_pos + i);
+    flex_trits_set_at(dst_trits, dst_len, dst_start_pos + i, t);
+  }
+#endif
+  return num_trits;
+}
+
 size_t flex_trits_to_trits(trit_t *const trits, size_t const to_len,
                            flex_trit_t const *const flex_trits,
                            size_t const len, size_t const num_trits) {
