@@ -224,19 +224,19 @@ static void mss_fold_auth_path(
                                [out] recovered MT root */
 ) {
   trits_t t[2];
+  size_t offset = 0;
 
-  while (auth_path->num_trits) {
+  while (offset < auth_path->num_bytes) {
     t[skn % 2] = h;
     // TODO remove when mss_mt_hash2 takes flex_trits
     MAM2_TRITS_DEF(auth_trits, MAM2_MSS_MT_HASH_SIZE);
-    flex_trits_to_trits(auth_trits.p, MAM2_MSS_MT_HASH_SIZE, auth_path->trits,
-                        MAM2_MSS_MT_HASH_SIZE, MAM2_MSS_MT_HASH_SIZE);
+    flex_trits_to_trits(auth_trits.p, MAM2_MSS_MT_HASH_SIZE,
+                        auth_path->trits + offset, MAM2_MSS_MT_HASH_SIZE,
+                        MAM2_MSS_MT_HASH_SIZE);
     t[1 - (skn % 2)] = auth_trits;
     dbg_printf("mt  i=%d \t", skn);
     mss_mt_hash2(s, t, h);
-    auth_path->trits += MAM2_MSS_MT_HASH_SIZE;
-    auth_path->num_trits -= MAM2_MSS_MT_HASH_SIZE;
-    auth_path->num_bytes -= MAM2_MSS_MT_HASH_FLEX_SIZE;
+    offset += MAM2_MSS_MT_HASH_FLEX_SIZE;
     skn /= 2;
   }
 }
@@ -442,7 +442,7 @@ void mss_auth_path(mss_t *mss, trint18_t i, trit_array_t *const auth_path) {
     trits_dbg_print(ni);
     dbg_printf("\n");
 
-    offset += MAM2_MSS_MT_HASH_SIZE;
+    offset += MAM2_MSS_MT_HASH_FLEX_SIZE;
   }
 }
 
@@ -541,7 +541,7 @@ bool_t mss_verify(isponge *ms, isponge *ws, trits_t H, trits_t sig,
   dbg_printf("\nwpR\t");
   trits_dbg_print(apk);
   sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
-  TRIT_ARRAY_MAKE_FROM_RAW(auth_path, sig.n - sig.d, sig.p);
+  TRIT_ARRAY_MAKE_FROM_RAW(auth_path, sig.n - sig.d, sig.p + sig.d);
 
   mss_fold_auth_path(ms, skn, &auth_path, apk);
 
