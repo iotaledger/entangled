@@ -173,11 +173,12 @@ int mam_parse(trit_t *const payload, size_t const payload_length,
 
   // decrypt signature from payload
   curl_reset(enc_curl);
-  iss_curl_sig_digest(hash, hash, 0, payload + offset,
+  trit_t digest[*security * HASH_LENGTH_TRIT];
+  iss_curl_sig_digest(digest, hash, 0, payload + offset,
                       *security * ISS_KEY_LENGTH, enc_curl);
 
   // complete the address
-  iss_curl_address(hash, hash, HASH_LENGTH_TRIT, enc_curl);
+  iss_curl_address(hash, digest, *security * HASH_LENGTH_TRIT, enc_curl);
   offset += *security * ISS_KEY_LENGTH;
 
   // decrypt siblings number from payload
