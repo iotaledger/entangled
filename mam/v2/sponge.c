@@ -102,8 +102,6 @@ void sponge_squeeze_flex(isponge *s, trit_t c2, trit_array_p Y_arr) {
   size_t ni;
   trit_t c0 = -1, c1;
   trit_t y_rep[Y_arr->num_trits];
-  flex_trits_to_trits(y_rep, Y_arr->num_trits, Y_arr->trits, Y_arr->num_trits,
-                      Y_arr->num_trits);
   trits_t Y = trits_from_rep(Y_arr->num_trits, y_rep);
   trit_t *y_p = Y.p;
   do {

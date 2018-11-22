@@ -17,6 +17,8 @@
 
 // PRNG key size
 #define MAM2_PRNG_KEY_SIZE 243
+// PRNG key flex size
+#define MAM2_PRNG_KEY_FLEX_SIZE FLEX_TRIT_SIZE_243
 
 // PRNG AE destination tryte
 #define MAM2_PRNG_DST_SEC_KEY 0
@@ -28,18 +30,11 @@
 // PRNG interface
 typedef struct prng_s {
   isponge *sponge;
-  flex_trit_t key[FLEX_TRIT_SIZE_243];
+  flex_trit_t key[MAM2_PRNG_KEY_FLEX_SIZE];
 } prng_t;
 
 /**
- * PRNG default initialization
- *
- * @param prng PRNG interface
- */
-void prng_create(prng_t *const prng);
-
-/**
- * PRNG value initialization
+ * PRNG initialization
  *
  * @param prng PRNG interface
  * @param sponge Sponge interface
@@ -49,6 +44,13 @@ void prng_init(prng_t *const prng, isponge *const sponge,
                flex_trit_t const *const key);
 
 /**
+ * Resets PRNG sponge and key
+ *
+ * @param prng PRNG interface
+ */
+void prng_reset(prng_t *const prng);
+
+/**
  * PRNG output generation with nonce
  *
  * @param prng PRNG interface
@@ -56,8 +58,8 @@ void prng_init(prng_t *const prng, isponge *const sponge,
  * @param nonce Nonce
  * @param output Pseudorandom trits
  */
-void prng_gen(prng_t *const prng, uint8_t const dest, trits_t const nonce,
-              trits_t output);
+void prng_gen(prng_t *const prng, uint8_t const dest,
+              trit_array_t const *const nonce, trit_array_t *const output);
 
 /**
  * PRNG output generation with nonce1 || nonce2
@@ -68,8 +70,9 @@ void prng_gen(prng_t *const prng, uint8_t const dest, trits_t const nonce,
  * @param nonce2 Second nonce
  * @param output Pseudorandom trits
  */
-void prng_gen2(prng_t *const prng, uint8_t const dest, trits_t const nonce1,
-               trits_t const nonce2, trits_t output);
+void prng_gen2(prng_t *const prng, uint8_t const dest,
+               trit_array_t const *const nonce1,
+               trit_array_t const *const nonce2, trit_array_t *const output);
 
 /**
  * PRNG output generation with nonce1 || nonce2 || nonce3
@@ -81,14 +84,9 @@ void prng_gen2(prng_t *const prng, uint8_t const dest, trits_t const nonce1,
  * @param nonce3 Third nonce
  * @param output Pseudorandom trits
  */
-void prng_gen3(prng_t *const prng, uint8_t const dest, trits_t const nonce1,
-               trits_t const nonce2, trits_t const nonce3, trits_t output);
-
-/**
- * Cleans PRNG state
- *
- * @param prng PRNG interface
- */
-void prng_destroy(prng_t *const prng);
+void prng_gen3(prng_t *const prng, uint8_t const dest,
+               trit_array_t const *const nonce1,
+               trit_array_t const *const nonce2,
+               trit_array_t const *const nonce3, trit_array_t *const output);
 
 #endif  // __MAM_V2_PRNG_H__

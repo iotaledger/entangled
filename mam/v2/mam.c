@@ -1,20 +1,13 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
+ * [ITSec Lab]
  *
  *
  * Refer to the LICENSE file for licensing information
  */
-
-/*!
-\file mam2.c
-\brief MAM2 layer.
-*/
 
 #include <stdlib.h>
 
@@ -310,9 +303,20 @@ retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
       mss_skn(cfg->ep->m, skn);
     else
       mss_skn(cfg->ch->m, skn);
-    prng_gen3(cfg->rng, MAM2_PRNG_DST_SEC_KEY, mam2_channel_name(cfg->ch),
-              cfg->ep ? mam2_endpoint_name(cfg->ep) : trits_null(), skn,
-              mam2_send_msg_cfg_key(cfg));
+
+    // TODO Remove when mam handles flex_trits
+    trits_t cfg_ch = mam2_channel_name(cfg->ch);
+    TRIT_ARRAY_MAKE_FROM_RAW(ch, cfg_ch.n - cfg_ch.d, cfg_ch.p + cfg_ch.d);
+    trits_t cfg_ep = cfg->ep ? mam2_endpoint_name(cfg->ep) : trits_null();
+    TRIT_ARRAY_MAKE_FROM_RAW(ep, cfg_ep.n - cfg_ep.d, cfg_ep.p + cfg_ep.d);
+    TRIT_ARRAY_MAKE_FROM_RAW(skn_trits, skn.n - skn.d, skn.p + skn.d);
+    TRIT_ARRAY_DECLARE(cfg_key_array, MAM2_SPONGE_KEY_SIZE);
+    trits_t cfg_key_trits = mam2_send_msg_cfg_key(cfg);
+    prng_gen3(cfg->rng, MAM2_PRNG_DST_SEC_KEY, &ch, &ep, &skn_trits,
+              &cfg_key_array);
+    flex_trits_to_trits(cfg_key_trits.p + cfg_key_trits.d, MAM2_SPONGE_KEY_SIZE,
+                        cfg_key_array.trits, MAM2_SPONGE_KEY_SIZE,
+                        MAM2_SPONGE_KEY_SIZE);
 
     // choose recipient
 
