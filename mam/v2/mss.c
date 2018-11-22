@@ -73,7 +73,7 @@ static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trits_t pk) {
   TRIT_ARRAY_MAKE_FROM_RAW(noncei, Ni.n - Ni.d, Ni.p + Ni.d);
   wots_gen_sk3(mss->wots, mss->prng, &nonce1, &nonce2, &noncei);
   // calc pk & push hash
-  TRIT_ARRAY_MAKE_FROM_RAW(pk_trits_array, MAM2_WOTS_PK_SIZE, pk.p + pk.d);
+  TRIT_ARRAY_DECLARE(pk_trits_array, MAM2_WOTS_PK_SIZE);
   wots_calc_pk(mss->wots, &pk_trits_array);
   flex_trits_to_trits(pk.p + pk.d, MAM2_WOTS_PK_SIZE, pk_trits_array.trits,
                       MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
@@ -413,7 +413,7 @@ void mss_sign(mss_t *mss, trits_t hash, trits_t sig) {
 
   flex_trits_to_trits(sig.p + sig.d, MAM2_WOTS_SK_SIZE, mss->wots->sk,
                       MAM2_WOTS_SK_SIZE, MAM2_WOTS_SK_SIZE);
-  TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, hash.p + hash.d);
+  TRIT_ARRAY_DECLARE(hash_array, MAM2_WOTS_HASH_SIZE);
   TRIT_ARRAY_MAKE_FROM_RAW(sk_sig_array, MAM2_WOTS_SIG_SIZE, sig.p + sig.d);
   wots_sign(mss->wots, &hash_array, &sk_sig_array);
   flex_trits_to_trits(sig.p + sig.d, MAM2_WOTS_SIG_SIZE, sk_sig_array.trits,

@@ -49,10 +49,7 @@ static void wots_hash_sign(isponge *const sponge, trit_array_p sk_sig,
 
   MAM2_ASSERT(sk_sig->num_trits == MAM2_WOTS_SK_SIZE);
   MAM2_ASSERT(hash->num_trits == MAM2_WOTS_HASH_SIZE);
-
   TRIT_ARRAY_DECLARE(sk_sig_part, MAM2_WOTS_SK_PART_SIZE);
-  sk_sig_part.dynamic = 0;
-
   size_t sig_pos = 0;
   for (i = 0; i < MAM2_WOTS_SK_PART_COUNT - 3; ++i) {
     trit_array_insert_from_pos(&sk_sig_part, sk_sig, sig_pos, 0,
