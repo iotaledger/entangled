@@ -14,7 +14,6 @@
 #include "mam/v2/defs.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
-#include "mam/v2/trits.h"
 
 // WOTS public key size
 #define MAM2_WOTS_PK_SIZE 243
