@@ -79,6 +79,17 @@ trit_array_p trit_array_insert(trit_array_p const trit_array,
   return trit_array;
 }
 
+trit_array_p trit_array_insert_from_pos(trit_array_p const dst_trits,
+                                        trit_array_p const src_trits,
+                                        size_t const src_start_pos,
+                                        size_t const dst_start_pos,
+                                        size_t const num_trits) {
+  flex_trits_insert_from_pos(dst_trits->trits, dst_trits->num_trits,
+                             src_trits->trits, src_trits->num_trits,
+                             src_start_pos, dst_start_pos, num_trits);
+  return dst_trits;
+}
+
 trit_t *trit_array_to_int8(trit_array_p const trit_array, trit_t *const trits,
                            size_t const len) {
   flex_trits_to_trits(trits, len, trit_array->trits, trit_array->num_trits,
