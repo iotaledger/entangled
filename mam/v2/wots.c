@@ -162,13 +162,10 @@ void wots_gen_sk3(wots_t *const wots, prng_t *const prng,
   prng_gen3(prng, MAM2_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3, &sk);
 }
 
-void wots_calc_pk(wots_t *const wots, trits_t pk) {
+void wots_calc_pk(wots_t *const wots, trit_array_p pk) {
   TRIT_ARRAY_DECLARE(sk_trits_array, MAM2_WOTS_SK_SIZE);
   memcpy(sk_trits_array.trits, wots->sk, MAM2_WOTS_SK_FLEX_SIZE);
-  TRIT_ARRAY_MAKE_FROM_RAW(pk_trits_array, MAM2_WOTS_PK_SIZE, pk.p + pk.d);
-  wots_calc_pks(wots->sponge, &sk_trits_array, &pk_trits_array);
-  flex_trits_to_trits(pk.p + pk.d, MAM2_WOTS_PK_SIZE, pk_trits_array.trits,
-                      MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
+  wots_calc_pks(wots->sponge, &sk_trits_array, pk);
 }
 
 void wots_sign(wots_t *const wots, trit_array_p const hash, trit_array_p sig) {

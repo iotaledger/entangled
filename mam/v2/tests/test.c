@@ -121,7 +121,11 @@ void test_wots_gen_sign(size_t Kn, char *K, trit_array_t const *const nonce,
   prng_init(p, s, key);
 
   wots_gen_sk(w, p, nonce);
-  wots_calc_pk(w, tpk);
+  TRIT_ARRAY_MAKE_FROM_RAW(pk_trits_array, MAM2_WOTS_PK_SIZE, tpk.p + tpk.d);
+  wots_calc_pk(w, &pk_trits_array);
+  flex_trits_to_trits(tpk.p + tpk.d, MAM2_WOTS_PK_SIZE, pk_trits_array.trits,
+                      MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
+
   trits_to_trytes(tpk.p, pk, MIN(strlen(pk), tpk.n / RADIX));
 
   trytes_to_trits(H, tH.p, MIN(strlen(H), tH.n));

@@ -108,7 +108,7 @@ void wots_gen_sk3(wots_t *const wots, prng_t *const prng,
  * @param wots WOTS interface
  * @param pk Public key
  */
-void wots_calc_pk(wots_t *const wots, trits_t pk);
+void wots_calc_pk(wots_t *const wots, trit_array_p pk);
 
 /**
  * Generates a WOTS signature
