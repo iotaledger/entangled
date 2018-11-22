@@ -117,7 +117,7 @@ void wots_calc_pk(wots_t *const wots, trits_t pk);
  * @param hash Hash value to be signed
  * @param sig Signature
  */
-void wots_sign(wots_t *const wots, trits_t const hash, trits_t sig);
+void wots_sign(wots_t *const wots, trit_array_p const hash, trit_array_p sig);
 
 /**
  * Recovers a WOTS public key from a signature

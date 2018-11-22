@@ -42,9 +42,16 @@ bool_t wots_test_do(wots_t *w, prng_t *p) {
   // TODO REMOVE
   flex_trits_to_trits(H_to_remove.p + H_to_remove.d, MAM2_WOTS_HASH_SIZE,
                       H.trits, MAM2_WOTS_HASH_SIZE, MAM2_WOTS_HASH_SIZE);
+  TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, H_to_remove.p + H_to_remove.d);
   wots_gen_sk(w, p, &N);
   wots_calc_pk(w, pk);
-  wots_sign(w, H_to_remove, sig);
+  flex_trits_to_trits(sig.p + sig.d, MAM2_WOTS_SK_SIZE, w->sk,
+                      MAM2_WOTS_SK_SIZE, MAM2_WOTS_SK_SIZE);
+  TRIT_ARRAY_MAKE_FROM_RAW(sk_sig_array, MAM2_WOTS_SIG_SIZE, sig.p + sig.d);
+  wots_sign(w, &hash_array, &sk_sig_array);
+  flex_trits_to_trits(sig.p + sig.d, MAM2_WOTS_SIG_SIZE, sk_sig_array.trits,
+                      MAM2_WOTS_SIG_SIZE, MAM2_WOTS_SIG_SIZE);
+
   TEST_ASSERT(wots_verify(w->sponge, H_to_remove, sig, pk));
 
   trits_put1(H_to_remove, trit_add(trits_get1(H_to_remove), 1));

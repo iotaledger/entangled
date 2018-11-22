@@ -384,7 +384,7 @@ void mss_apath(mss_t *mss, trint18_t i, trits_t p) {
   }
 }
 
-void mss_sign(mss_t *mss, trits_t H, trits_t sig) {
+void mss_sign(mss_t *mss, trits_t hash, trits_t sig) {
   MAM2_ASSERT(trits_size(sig) == MAM2_MSS_SIG_SIZE(mss->height));
 
   dbg_printf("mss sign skn=%d\n", mss->skn);
@@ -407,7 +407,13 @@ void mss_sign(mss_t *mss, trits_t H, trits_t sig) {
     wots_gen_sk3(mss->wots, mss->prng, &nonce1, &nonce2, &noncei);
   }
 
-  wots_sign(mss->wots, H, trits_take(sig, MAM2_WOTS_SIG_SIZE));
+  flex_trits_to_trits(sig.p + sig.d, MAM2_WOTS_SK_SIZE, mss->wots->sk,
+                      MAM2_WOTS_SK_SIZE, MAM2_WOTS_SK_SIZE);
+  TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, hash.p + hash.d);
+  TRIT_ARRAY_MAKE_FROM_RAW(sk_sig_array, MAM2_WOTS_SIG_SIZE, sig.p + sig.d);
+  wots_sign(mss->wots, &hash_array, &sk_sig_array);
+  flex_trits_to_trits(sig.p + sig.d, MAM2_WOTS_SIG_SIZE, sk_sig_array.trits,
+                      MAM2_WOTS_SIG_SIZE, MAM2_WOTS_SIG_SIZE);
 #endif
   sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
 

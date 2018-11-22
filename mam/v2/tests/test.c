@@ -125,7 +125,13 @@ void test_wots_gen_sign(size_t Kn, char *K, trit_array_t const *const nonce,
   trits_to_trytes(tpk.p, pk, MIN(strlen(pk), tpk.n / RADIX));
 
   trytes_to_trits(H, tH.p, MIN(strlen(H), tH.n));
-  wots_sign(w, tH, tsig);
+  flex_trits_to_trits(tsig.p + tsig.d, MAM2_WOTS_SK_SIZE, w->sk,
+                      MAM2_WOTS_SK_SIZE, MAM2_WOTS_SK_SIZE);
+  TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, tH.p + tH.d);
+  TRIT_ARRAY_MAKE_FROM_RAW(sk_sig_array, MAM2_WOTS_SIG_SIZE, tsig.p + tsig.d);
+  wots_sign(w, &hash_array, &sk_sig_array);
+  flex_trits_to_trits(tsig.p + tsig.d, MAM2_WOTS_SIG_SIZE, sk_sig_array.trits,
+                      MAM2_WOTS_SIG_SIZE, MAM2_WOTS_SIG_SIZE);
   trits_to_trytes(tsig.p, sig, MIN(tsig.n / RADIX, strlen(sig)));
 
   trits_free(tK);
