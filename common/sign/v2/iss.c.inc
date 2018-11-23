@@ -104,7 +104,7 @@ int _ISS_PREFIX(signature)(trit_t *sig, trit_t const *const hash,
     return 1;
   }
 
-  for (i = start_offset % window; sig < se; i++) {
+  for (i = start_offset % window; sig < se;) {
     for (j = i * ISS_CHUNK_LENGTH; j < (i + 1) * ISS_CHUNK_LENGTH && sig < se;
          j += TRYTE_WIDTH) {
       s = hash[j] + hash[j + 1] * 3 + hash[j + 2] * 9;
@@ -123,25 +123,24 @@ int _ISS_PREFIX(sig_digest)(trit_t *dig, trit_t const *const hash,
   int s;
   trit_t *sig_start, *end;
 
+  sig_start = sig;
   end = &sig[sig_len];
   if (!(window = signed_window(hash))) {
     return 1;
   }
 
   for (i = offset % window; sig < end;) {
-    sig_start = sig;
     for (j = i * ISS_CHUNK_LENGTH; j < (i + 1) * ISS_CHUNK_LENGTH && sig < end;
          j += TRYTE_WIDTH) {
       s = hash[j] + hash[j + 1] * 3 + hash[j + 2] * 9;
       _ISS_PREFIX(digest)(sig, s - TRYTE_VALUE_MIN, c);
       sig = &sig[HASH_LENGTH_TRIT];
     }
-    _HASH_PREFIX(absorb)(c, sig_start, ISS_KEY_LENGTH);
-    _HASH_PREFIX(squeeze)(c, dig, HASH_LENGTH_TRIT);
-    _HASH_PREFIX(reset)(c);
-    dig = &dig[HASH_LENGTH_TRIT];
     i = (i + 1) % window;
   }
+  _HASH_PREFIX(absorb)(c, sig_start, window * ISS_KEY_LENGTH);
+  _HASH_PREFIX(squeeze)(c, dig, HASH_LENGTH_TRIT);
+  _HASH_PREFIX(reset)(c);
   return 0;
 }
 
