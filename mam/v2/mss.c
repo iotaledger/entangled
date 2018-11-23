@@ -90,13 +90,12 @@ static trits_t mss_hash_idx(trit_t *p, size_t i) {
   return trits_from_rep(MAM2_MSS_MT_HASH_SIZE, p + MAM2_MSS_HASH_IDX(i));
 }
 
-static trit_array_t mss_mt_auth_path_trits(mss_t *mss, mss_mt_height_t d) {
-  trit_array_t auth_path_trits = {
-      .trits = mss->auth_path + d * MAM2_MSS_MT_HASH_FLEX_SIZE,
-      .num_trits = MAM2_MSS_MT_HASH_SIZE,
-      .num_bytes = MAM2_MSS_MT_HASH_FLEX_SIZE,
-      .dynamic = 0};
-  return auth_path_trits;
+static void mss_mt_set_auth_node(mss_t *mss, mss_mt_height_t d,
+                                 trit_array_t *const auth_node) {
+  flex_trits_insert_from_pos(mss->auth_path,
+                             MAM2_MSS_AUTH_PATH_SIZE(mss->height),
+                             auth_node->trits, MAM2_MSS_MT_HASH_SIZE, 0,
+                             d * MAM2_MSS_MT_HASH_SIZE, MAM2_MSS_MT_HASH_SIZE);
 }
 
 static trits_t mss_mt_hs_trits(mss_t *mss, mss_mt_height_t d, size_t i) {
@@ -186,11 +185,11 @@ static void mss_mt_refresh(mss_t *mss) {
     s = mss->stacks + d;
     MAM2_ASSERT(s->stack_size == 1);
     trits_t hs_node = mss_mt_hs_trits(mss, d, s->stack_size - 1);
-    trit_array_t auth_node = mss_mt_auth_path_trits(mss, d);
+    TRIT_ARRAY_DECLARE(auth_node, MAM2_MSS_MT_HASH_SIZE);
     // TODO remove when hs are flex_trits
-    flex_trits_from_trits(auth_node.trits, auth_node.num_trits,
-                          hs_node.p + hs_node.d, hs_node.n - hs_node.d,
-                          hs_node.n - hs_node.d);
+    flex_trits_from_trits(auth_node.trits, MAM2_MSS_MT_HASH_SIZE, hs_node.p,
+                          MAM2_MSS_MT_HASH_SIZE, MAM2_MSS_MT_HASH_SIZE);
+    mss_mt_set_auth_node(mss, d, &auth_node);
 
     s->index = (mss->skn + 1 + dd) ^ dd;
     s->height = d;
@@ -226,17 +225,21 @@ static void mss_fold_auth_path(
   trits_t t[2];
   size_t offset = 0;
 
-  while (offset < auth_path->num_bytes) {
+  while (offset < auth_path->num_trits) {
     t[skn % 2] = h;
     // TODO remove when mss_mt_hash2 takes flex_trits
     MAM2_TRITS_DEF(auth_trits, MAM2_MSS_MT_HASH_SIZE);
+    TRIT_ARRAY_DECLARE(auth_trits_array, MAM2_MSS_MT_HASH_SIZE);
+    flex_trits_insert_from_pos(auth_trits_array.trits, MAM2_MSS_MT_HASH_SIZE,
+                               auth_path->trits, auth_path->num_trits, offset,
+                               0, MAM2_MSS_MT_HASH_SIZE);
     flex_trits_to_trits(auth_trits.p, MAM2_MSS_MT_HASH_SIZE,
-                        auth_path->trits + offset, MAM2_MSS_MT_HASH_SIZE,
+                        auth_trits_array.trits, MAM2_MSS_MT_HASH_SIZE,
                         MAM2_MSS_MT_HASH_SIZE);
     t[1 - (skn % 2)] = auth_trits;
     dbg_printf("mt  i=%d \t", skn);
     mss_mt_hash2(s, t, h);
-    offset += MAM2_MSS_MT_HASH_FLEX_SIZE;
+    offset += MAM2_MSS_MT_HASH_SIZE;
     skn /= 2;
   }
 }
@@ -341,10 +344,11 @@ void mss_gen(mss_t *mss, trits_t pk) {
       // is it current apath node?
       if (n->index == 1) {  // add to `ap`
         trits_t h = mss_hash_idx(hs, s->stack_size - 1);
-        trit_array_t a = mss_mt_auth_path_trits(mss, n->height);
+        TRIT_ARRAY_DECLARE(auth_node, MAM2_MSS_MT_HASH_SIZE);
         // TODO remove when hs are flex_trits
-        flex_trits_from_trits(a.trits, a.num_trits, h.p + h.d, h.n - h.d,
-                              h.n - h.d);
+        flex_trits_from_trits(auth_node.trits, MAM2_MSS_MT_HASH_SIZE, h.p,
+                              MAM2_MSS_MT_HASH_SIZE, MAM2_MSS_MT_HASH_SIZE);
+        mss_mt_set_auth_node(mss, n->height, &auth_node);
       } else
 
           // is it next apath node?
@@ -429,8 +433,10 @@ void mss_auth_path(mss_t *mss, trint18_t i, trit_array_t *const auth_path) {
 #endif
   {
 #if defined(MAM2_MSS_TRAVERSAL)
-    trit_array_t ni = mss_mt_auth_path_trits(mss, d);
-    memcpy(auth_path->trits + offset, ni.trits, MAM2_MSS_MT_HASH_FLEX_SIZE);
+    flex_trits_insert_from_pos(
+        auth_path->trits, MAM2_MSS_AUTH_PATH_SIZE(mss->height), mss->auth_path,
+        MAM2_MSS_AUTH_PATH_SIZE(mss->height), offset, offset,
+        MAM2_MSS_MT_HASH_SIZE);
 #else
     trits_t ni = mss_mt_node_t_trits(m, d, (0 == i % 2) ? i + 1 : i - 1);
     flex_trits_from_trits(auth_path->trits + offset, MAM2_MSS_MT_HASH_SIZE,
@@ -442,7 +448,7 @@ void mss_auth_path(mss_t *mss, trint18_t i, trit_array_t *const auth_path) {
     trits_dbg_print(ni);
     dbg_printf("\n");
 
-    offset += MAM2_MSS_MT_HASH_FLEX_SIZE;
+    offset += MAM2_MSS_MT_HASH_SIZE;
   }
 }
 
