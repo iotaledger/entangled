@@ -245,16 +245,15 @@ retcode_t iota_api_broadcast_transactions(
     iota_api_t const *const api,
     broadcast_transactions_req_t const *const req) {
   retcode_t ret = RC_OK;
-  hash8019_stack_entry_t *iter = NULL;
+  flex_trit_t *elt = NULL;
   struct _iota_transaction tx;
 
-  LL_FOREACH(req->trytes, iter) {
-    transaction_deserialize_from_trits(&tx, iter->hash);
+  HASH_ARRAY_FOREACH(req->trytes, elt) {
+    transaction_deserialize_from_trits(&tx, elt);
     if (iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
       // TODO priority queue on weight_magnitude
-      if ((ret = broadcaster_on_next(&api->node->broadcaster, iter->hash)) !=
-          RC_OK) {
+      if ((ret = broadcaster_on_next(&api->node->broadcaster, elt)) != RC_OK) {
         return ret;
       }
     }
@@ -266,7 +265,7 @@ retcode_t iota_api_broadcast_transactions(
 retcode_t iota_api_store_transactions(
     iota_api_t const *const api, store_transactions_req_t const *const req) {
   retcode_t ret = RC_OK;
-  hash8019_stack_entry_t *iter = NULL;
+  flex_trit_t *elt = NULL;
   struct _iota_transaction tx;
   struct _trit_array hash = {.trits = NULL,
                              .num_trits = HASH_LENGTH_TRIT,
@@ -276,8 +275,8 @@ retcode_t iota_api_store_transactions(
   transaction_set_snapshot_index(&tx, 0);
 
   bool exists;
-  LL_FOREACH(req->trytes, iter) {
-    transaction_deserialize_from_trits(&tx, iter->hash);
+  HASH_ARRAY_FOREACH(req->trytes, elt) {
+    transaction_deserialize_from_trits(&tx, elt);
     if (iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
       hash.trits = transaction_hash(&tx);

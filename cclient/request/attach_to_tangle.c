@@ -12,7 +12,7 @@ attach_to_tangle_req_t* attach_to_tangle_req_new() {
       (attach_to_tangle_req_t*)malloc(sizeof(attach_to_tangle_req_t));
   if (req) {
     req->mwm = ATTACH_TO_TANGLE_MAIN_MWM;
-    req->trytes = NULL;
+    req->trytes = hash8019_array_new();
     memset(req->trunk, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
     memset(req->branch, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
@@ -25,7 +25,7 @@ void attach_to_tangle_req_free(attach_to_tangle_req_t** req) {
   }
 
   if ((*req)->trytes) {
-    hash8019_queue_free(&(*req)->trytes);
+    hash_array_free((*req)->trytes);
   }
 
   free(*req);

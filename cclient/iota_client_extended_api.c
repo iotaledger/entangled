@@ -400,3 +400,85 @@ done:
   }
   return ret_code;
 }
+
+retcode_t iota_client_store_and_broadcast(
+    iota_client_service_t const* const serv,
+    store_transactions_req_t const* const trytes) {
+  retcode_t ret_code = RC_OK;
+  ret_code = iota_client_store_transactions(serv, trytes);
+  if (ret_code == RC_OK) {
+    ret_code = iota_client_broadcast_transactions(
+        serv, (broadcast_transactions_req_t*)trytes);
+  }
+  return ret_code;
+}
+
+retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
+                                  hash8019_array_p const trytes,
+                                  uint32_t const depth, uint32_t const mwm,
+                                  flex_trit_t const* const reference,
+                                  transaction_array_t out_transactions) {
+  retcode_t ret_code = RC_OK;
+  get_transactions_to_approve_req_t* tx_approve_req =
+      get_transactions_to_approve_req_new();
+  get_transactions_to_approve_res_t* tx_approve_res =
+      get_transactions_to_approve_res_new();
+  attach_to_tangle_req_t* attach_req = attach_to_tangle_req_new();
+  attach_to_tangle_res_t* attach_res = attach_to_tangle_res_new();
+  flex_trit_t* elt = NULL;
+  size_t tx_deserialize_offset = 0;
+  struct _iota_transaction tx = {};
+
+  if (!tx_approve_req || !tx_approve_res || !attach_req || !attach_res) {
+    ret_code = RC_CCLIENT_NULL_PTR;
+    goto done;
+  }
+
+  if (reference) {
+    memcpy(tx_approve_req->reference, reference, FLEX_TRIT_SIZE_243);
+  }
+  tx_approve_req->depth = depth;
+  // get tx to approve
+  ret_code = iota_client_get_transactions_to_approve(serv, tx_approve_req,
+                                                     tx_approve_res);
+  if (ret_code) {
+    goto done;
+  }
+
+  memcpy(attach_req->branch, tx_approve_res->branch, FLEX_TRIT_SIZE_243);
+  memcpy(attach_req->trunk, tx_approve_res->trunk, FLEX_TRIT_SIZE_243);
+  attach_req->mwm = mwm;
+  attach_req->trytes = trytes;
+  // attach to tangle
+  ret_code = iota_client_attach_to_tangle(serv, attach_req, attach_res);
+  if (ret_code) {
+    goto done;
+  }
+
+  // store and broadcast
+  ret_code = iota_client_store_and_broadcast(
+      serv, (store_transactions_req_t*)attach_res);
+
+  // trytes to transaction objects
+  HASH_ARRAY_FOREACH(trytes, elt) {
+    tx_deserialize_offset = transaction_deserialize_from_trits(&tx, elt);
+    if (tx_deserialize_offset) {
+      transaction_array_push_back(out_transactions, &tx);
+    } else {
+      ret_code = RC_CCLIENT_TX_DESERIALIZE_FAILED;
+      log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s: %s.\n", __func__,
+                error_2_string(ret_code));
+      goto done;
+    }
+  }
+
+done:
+  get_transactions_to_approve_req_free(&tx_approve_req);
+  get_transactions_to_approve_res_free(&tx_approve_res);
+  attach_to_tangle_res_free(&attach_res);
+  if (attach_req) {
+    attach_req->trytes = NULL;
+    attach_to_tangle_req_free(&attach_req);
+  }
+  return ret_code;
+}

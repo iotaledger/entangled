@@ -19,7 +19,7 @@ typedef struct {
    * The returned value is a different set of tryte values which you can input
    * into broadcastTransactions and storeTransactions
    */
-  hash8019_queue_t trytes;
+  hash8019_array_p trytes;
 
 } attach_to_tangle_res_t;
 

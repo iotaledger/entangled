@@ -371,9 +371,10 @@ retcode_t iota_client_send_transfer(iota_client_service_t const* const serv,
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createSendTrytes.ts#L38
  */
 retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
-                                  hashes_t const* const trytes, int const depth,
-                                  int const mwm, trit_array_p const reference,
-                                  transaction_list_t* out_transactions);
+                                  hash8019_array_p const trytes,
+                                  uint32_t const depth, uint32_t const mwm,
+                                  flex_trit_t const* const reference,
+                                  transaction_array_t out_transactions);
 
 /**
  * Stores and broadcasts a list of _attached_ transaction trytes by calling
@@ -386,7 +387,7 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
  * Any transactions stored with this command will eventaully be erased, as a
  * result of a snapshot.
  *
- * @param {hashes_t} trytes - Attached transaction trytes
+ * @param {store_transactions_req_t} trytes - Attached transaction trytes
  * @param {hashes_t} out_trytes - Attached transaction trytes
  *
  * @return {retcode_t}
@@ -397,8 +398,8 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createStoreAndBroadcast.ts#L28
  */
 retcode_t iota_client_store_and_broadcast(
-    iota_client_service_t const* const serv, hashes_t const* const trytes,
-    hashes_t* out_trytes);
+    iota_client_service_t const* const serv,
+    store_transactions_req_t const* const trytes);
 
 /**
  * Fetches the bundle of a given the _tail_ transaction hash, by traversing

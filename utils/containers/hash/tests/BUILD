@@ -22,3 +22,13 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_hash_array",
+    srcs = ["test_hash_array.c"],
+    deps = [
+        ":defs",
+        "//utils/containers/hash:hash_array",
+        "@unity",
+    ],
+)
