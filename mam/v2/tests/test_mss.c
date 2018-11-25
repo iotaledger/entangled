@@ -70,7 +70,10 @@ void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
     dbg_printf("========================\nD = %d\n", d);
 
     mss_init(m, p, s, w, d, N, trits_null());
-    mss_gen(m, pk);
+    TRIT_ARRAY_DECLARE(pk_array, MAM2_WOTS_PK_SIZE);
+    mss_gen(m, &pk_array);
+    flex_trits_to_trits(pk.p + pk.d, MAM2_WOTS_PK_SIZE, pk_array.trits,
+                        MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
 
     dbg_printf("mss pk \t");
     trits_dbg_print(pk);

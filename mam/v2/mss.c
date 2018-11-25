@@ -53,7 +53,7 @@ static void mss_mt_hash2(sponge_t *sponge, trits_t h[2], trits_t h01) {
 
 /*!< [in] leaf index: `0 <= i < 2^D` */
 /*!< [out] WOTS pk / leaf hash */
-static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trits_t pk) {
+static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trit_array_p pk) {
   MAM2_ASSERT(0 <= index && index <= MAM2_MSS_MAX_SKN(mss->height));
 
 #if defined(MAM2_MSS_DEBUG)
@@ -73,10 +73,7 @@ static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trits_t pk) {
   TRIT_ARRAY_MAKE_FROM_RAW(noncei, Ni.n - Ni.d, Ni.p + Ni.d);
   wots_gen_sk3(mss->wots, mss->prng, &nonce1, &nonce2, &noncei);
   // calc pk & push hash
-  TRIT_ARRAY_DECLARE(pk_trits_array, MAM2_WOTS_PK_SIZE);
-  wots_calc_pk(mss->wots, &pk_trits_array);
-  flex_trits_to_trits(pk.p + pk.d, MAM2_WOTS_PK_SIZE, pk_trits_array.trits,
-                      MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
+  wots_calc_pk(mss->wots, pk);
 
 #endif
 
@@ -159,7 +156,10 @@ static void mss_mt_update(mss_t *mss, mss_mt_height_t d) {
   } else if (s->index <= MAM2_MSS_MAX_SKN(mss->height)) {
     // pk will be put on top of the stack
     wpk = mss_hash_idx(hs, s->stack_size);
-    mss_mt_gen_leaf(mss, s->index, wpk);
+    TRIT_ARRAY_MAKE_FROM_RAW(wpk_array, MAM2_WOTS_PK_SIZE, wpk.p + wpk.d);
+    mss_mt_gen_leaf(mss, s->index, &wpk_array);
+    flex_trits_to_trits(wpk.p + wpk.d, MAM2_WOTS_PK_SIZE, wpk_array.trits,
+                        MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
 
     // push leaf into stack
     // leaf has level `0`
@@ -303,7 +303,7 @@ void mss_init(mss_t *const mss, prng_t *const prng, sponge_t *const sponge,
 #endif
 }
 
-void mss_gen(mss_t *mss, trits_t pk) {
+void mss_gen(mss_t *mss, trit_array_p pk) {
 #if defined(MAM2_MSS_TRAVERSAL)
   // reuse stack `D-1`, by construction (see note in mss.h)
   // it has capacity `D+1`
@@ -333,7 +333,8 @@ void mss_gen(mss_t *mss, trits_t pk) {
       if (n->height == mss->height) {  // done
         // copy pk, it is stored outside of stack due to dirty hack
         trits_t h = mss_hash_idx(hs, s->stack_size);
-        trits_copy(h, pk);
+        flex_trits_from_trits(pk->trits, MAM2_WOTS_PK_SIZE, h.p + h.d,
+                              MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
         // init stack
         s->height = mss->height - 1;
         s->index = 0;

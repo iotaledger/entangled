@@ -98,7 +98,7 @@ retcode_t mam2_channel_create(mam2_ialloc *ma, /*!< [in] Allocator. */
 
   do {
     err_bind(mam2_mss_create(ma, ch->m, p, d, ch_name, trits_null()));
-    mss_gen(ch->m, mam2_channel_id(ch));
+    // mss_gen(ch->m, mam2_channel_id(ch));
 
     e = RC_OK;
   } while (0);
@@ -139,7 +139,7 @@ retcode_t mam2_endpoint_create(mam2_ialloc *ma, /*!< [in] Allocator. */
 
   do {
     err_bind(mam2_mss_create(ma, ep->m, p, d, ch_name, ep_name));
-    mss_gen(ep->m, mam2_endpoint_id(ep));
+    // mss_gen(ep->m, mam2_endpoint_id(ep));
 
     e = RC_OK;
   } while (0);

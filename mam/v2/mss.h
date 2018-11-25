@@ -187,7 +187,7 @@ void mss_init(mss_t *const mss, prng_t *const prng, sponge_t *const sponge,
  * @param mss MSS interface
  * @param pk public key, Merkle-tree root
  */
-void mss_gen(mss_t *mss, trits_t pk);
+void mss_gen(mss_t *mss, trit_array_p pk);
 
 /**
  * Encode MSS SKN
