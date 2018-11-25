@@ -14,7 +14,7 @@
 #include "mam/v1/mam.h"
 #include "utils/merkle.h"
 
-void test_create(void) {
+void test_mam_sec(int security) {
   char *const seed =
       "TX9XRR9SRCOBMTYDTMKNEIJCSZIMEUPWCNLC9DPDZKKAEMEFVSTEVUFTRUZXEHLULEIYJIEO"
       "WIC9STAHW";
@@ -39,9 +39,8 @@ void test_create(void) {
   size_t index = 7;
   size_t message_length = strlen(message) * 3;
 
-  size_t security = 1;
   size_t start = 0;
-  size_t count = 16;
+  size_t count = 8;
   size_t next_start = start + count;
   size_t next_count = 1;
   size_t tree_size = merkle_size(count);
@@ -88,10 +87,16 @@ void test_create(void) {
   free(payload);
 }
 
+void test_mam() {
+  test_mam_sec(1);
+  test_mam_sec(2);
+  test_mam_sec(3);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
-  RUN_TEST(test_create);
+  RUN_TEST(test_mam);
 
   return UNITY_END();
 }
