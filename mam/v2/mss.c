@@ -18,6 +18,7 @@
 
 /*!< [in] hash values of left and right child nodes */
 /*!< [out] hash value of their parent */
+<<<<<<< HEAD
 static void mss_mt_hash2(sponge_t *sponge, trits_t h[2], trits_t h01) {
   dbg_printf("\nleft  \t");
   trits_dbg_print(h[0]);
@@ -49,6 +50,11 @@ static void mss_mt_hash2(sponge_t *sponge, trits_t h[2], trits_t h01) {
   dbg_printf("\nparent\t");
   trits_dbg_print(h01);
   dbg_printf("\n");
+=======
+static void mss_mt_hash2(isponge *sponge, trit_array_t hashes_pack[2],
+                         trit_array_p hash) {
+  sponge_hashn_flex(sponge, 2, hashes_pack, hash);
+>>>>>>> mam/v2: mss_fold_path - flex trits
 }
 
 /*!< [in] leaf index: `0 <= i < 2^D` */
@@ -129,6 +135,8 @@ static void mss_mt_update(mss_t *mss, mss_mt_height_t d) {
   if ((0 != s->stack_size) && (ns[s->stack_size - 1].height >= s->height))
     return;
 
+  trit_array_t hashes_pack[2];
+  TRIT_ARRAY_DECLARE(hash, MAM2_MSS_MT_HASH_SIZE);
   // can merge (top 2 nodes have the same height)?
   if (s->stack_size > 1 && (ns[s->stack_size - 2].height ==
                             ns[s->stack_size - 1].height)) {  // merge
@@ -137,14 +145,21 @@ static void mss_mt_update(mss_t *mss, mss_mt_height_t d) {
     // pop the left node
     h[0] = mss_hash_idx(hs, --s->stack_size);
 
+    TRIT_ARRAY_MAKE_FROM_RAW(h_el1, MAM2_MSS_MT_HASH_SIZE, h[0].p + h[0].d);
+    TRIT_ARRAY_MAKE_FROM_RAW(h_el2, MAM2_MSS_MT_HASH_SIZE, h[1].p + h[1].d);
+    hashes_pack[0] = h_el1;
+    hashes_pack[1] = h_el2;
     // hash them
     // dirty hack: at the last level do not overwrite
     // left hash value, but instead right;
     // left hash value is needed for MTT algorithm
     dbg_printf("mt  d=%d i=%d\t", ns[s->stack_size].height,
                ns[s->stack_size].index);
-    mss_mt_hash2(mss->sponge, h,
-                 h[ns[s->stack_size].height + 1 != mss->height ? 0 : 1]);
+    trits_t h_res = h[ns[s->stack_size].height + 1 != mss->height ? 0 : 1];
+
+    mss_mt_hash2(mss->sponge, hashes_pack, &hash);
+    flex_trits_to_trits(h_res.p + h_res.d, MAM2_MSS_MT_HASH_SIZE, hash.trits,
+                        MAM2_MSS_MT_HASH_SIZE, MAM2_MSS_MT_HASH_SIZE);
 
     // push parent into stack
     // parent is one level up
@@ -217,30 +232,29 @@ static trits_t mss_mt_node_t_trits(mss_t *m, trint6_t d, trint18_t i) {
 static void mss_fold_auth_path(
     sponge_t *s,
     mss_mt_index_t skn, /*!< [in] corresponding WOTS sk number / leaf index */
-    trit_array_t
-        *const auth_path, /*!< [in] authentication path - leaf to root */
-    trits_t h             /*!< [in] recovered WOTS pk / start hash value;
-                               [out] recovered MT root */
+    trit_array_p ap,    /*!< [in] authentication path - leaf to root */
+    trit_array_p pk_recovered /*!< [in] recovered WOTS pk / start hash value;
+                   [out] recovered MT root */
 ) {
-  trits_t t[2];
-  size_t offset = 0;
+  TRIT_ARRAY_DECLARE(h_el1, MAM2_MSS_MT_HASH_SIZE);
+  TRIT_ARRAY_DECLARE(h_el2, MAM2_MSS_MT_HASH_SIZE);
+  trit_array_t hashes_pack[2] = {h_el1, h_el2};
 
-  while (offset < auth_path->num_trits) {
-    t[skn % 2] = h;
-    // TODO remove when mss_mt_hash2 takes flex_trits
-    MAM2_TRITS_DEF(auth_trits, MAM2_MSS_MT_HASH_SIZE);
-    TRIT_ARRAY_DECLARE(auth_trits_array, MAM2_MSS_MT_HASH_SIZE);
-    flex_trits_insert_from_pos(auth_trits_array.trits, MAM2_MSS_MT_HASH_SIZE,
-                               auth_path->trits, auth_path->num_trits, offset,
-                               0, MAM2_MSS_MT_HASH_SIZE);
-    flex_trits_to_trits(auth_trits.p, MAM2_MSS_MT_HASH_SIZE,
-                        auth_trits_array.trits, MAM2_MSS_MT_HASH_SIZE,
-                        MAM2_MSS_MT_HASH_SIZE);
-    t[1 - (skn % 2)] = auth_trits;
+  size_t ap_length = ap->num_trits / MAM2_MSS_MT_HASH_SIZE;
+  size_t pos = 0;
+  for (size_t i = 0; i < ap_length; skn /= 2, ++i) {
+    flex_trits_slice(hashes_pack[skn % 2].trits, MAM2_MSS_MT_HASH_SIZE,
+                     pk_recovered->trits, MAM2_MSS_MT_HASH_SIZE, 0,
+                     MAM2_MSS_MT_HASH_SIZE);
+
+    flex_trits_slice(hashes_pack[1 - (skn % 2)].trits, MAM2_MSS_MT_HASH_SIZE,
+                     ap->trits, ap_length * MAM2_MSS_MT_HASH_SIZE, pos,
+                     MAM2_MSS_MT_HASH_SIZE);
+
     dbg_printf("mt  i=%d \t", skn);
-    mss_mt_hash2(s, t, h);
-    offset += MAM2_MSS_MT_HASH_SIZE;
-    skn /= 2;
+
+    mss_mt_hash2(s, hashes_pack, pk_recovered);
+    pos += MAM2_MSS_MT_HASH_SIZE;
   }
 }
 
@@ -512,7 +526,6 @@ bool_t mss_verify(sponge_t *ms, sponge_t *ws, trits_t H, trits_t sig,
   trint6_t d;
   trint18_t skn;
   MAM2_TRITS_DEF(ts, 18);
-  MAM2_TRITS_DEF(apk_to_remove, MAM2_MSS_MT_HASH_SIZE);
 
   dbg_printf("mss verify\n");
 
@@ -540,17 +553,17 @@ bool_t mss_verify(sponge_t *ms, sponge_t *ws, trits_t H, trits_t sig,
   MAM2_ASSERT(pk->num_trits == MAM2_WOTS_PK_SIZE);
   TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, H.p + H.d);
   TRIT_ARRAY_MAKE_FROM_RAW(sk_sig_array, MAM2_WOTS_SIG_SIZE, sig.p + sig.d);
-  TRIT_ARRAY_DECLARE(apk, MAM2_WOTS_PK_SIZE);
+  TRIT_ARRAY_DECLARE(apk, MAM2_MSS_MT_HASH_SIZE);
   wots_recover(ws, &hash_array, &sk_sig_array, &apk);
-  flex_trits_to_trits(apk_to_remove.p, MAM2_MSS_MT_HASH_SIZE, apk.trits,
-                      MAM2_MSS_MT_HASH_SIZE, MAM2_MSS_MT_HASH_SIZE);
+
 #endif
   dbg_printf("\nwpR\t");
   // trits_dbg_print(apk);
   sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
   TRIT_ARRAY_MAKE_FROM_RAW(auth_path, sig.n - sig.d, sig.p + sig.d);
+  TRIT_ARRAY_MAKE_FROM_RAW(ap_array, sig.n - sig.d, sig.p + sig.d);
 
-  mss_fold_auth_path(ms, skn, &auth_path, apk);
+  mss_fold_apath(ms, skn, &ap_array, &apk);
 
   dbg_printf("apk\t");
   trits_dbg_print(apk);
