@@ -508,11 +508,11 @@ bool_t mss_next(mss_t *mss) {
 }
 
 bool_t mss_verify(sponge_t *ms, sponge_t *ws, trits_t H, trits_t sig,
-                  trits_t pk) {
+                  trit_array_p pk) {
   trint6_t d;
   trint18_t skn;
   MAM2_TRITS_DEF(ts, 18);
-  MAM2_TRITS_DEF(apk, MAM2_MSS_MT_HASH_SIZE);
+  MAM2_TRITS_DEF(apk_to_remove, MAM2_MSS_MT_HASH_SIZE);
 
   dbg_printf("mss verify\n");
 
@@ -537,16 +537,16 @@ bool_t mss_verify(sponge_t *ms, sponge_t *ws, trits_t H, trits_t sig,
 #if defined(MAM2_MSS_DEBUG)
   trits_copy(trits_take(sig, MAM2_MSS_MT_HASH_SIZE), apk);
 #else
-  MAM2_ASSERT(trits_size(pk) == MAM2_WOTS_PK_SIZE);
+  MAM2_ASSERT(pk->num_trits == MAM2_WOTS_PK_SIZE);
   TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, H.p + H.d);
   TRIT_ARRAY_MAKE_FROM_RAW(sk_sig_array, MAM2_WOTS_SIG_SIZE, sig.p + sig.d);
-  TRIT_ARRAY_DECLARE(pk_array, MAM2_WOTS_PK_SIZE);
-  wots_recover(ws, &hash_array, &sk_sig_array, &pk_array);
-  flex_trits_to_trits(apk.p + apk.d, MAM2_WOTS_PK_SIZE, pk_array.trits,
-                      MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
+  TRIT_ARRAY_DECLARE(apk, MAM2_WOTS_PK_SIZE);
+  wots_recover(ws, &hash_array, &sk_sig_array, &apk);
+  flex_trits_to_trits(apk_to_remove.p, MAM2_MSS_MT_HASH_SIZE, apk.trits,
+                      MAM2_MSS_MT_HASH_SIZE, MAM2_MSS_MT_HASH_SIZE);
 #endif
   dbg_printf("\nwpR\t");
-  trits_dbg_print(apk);
+  // trits_dbg_print(apk);
   sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
   TRIT_ARRAY_MAKE_FROM_RAW(auth_path, sig.n - sig.d, sig.p + sig.d);
 
@@ -558,7 +558,10 @@ bool_t mss_verify(sponge_t *ms, sponge_t *ws, trits_t H, trits_t sig,
   trits_dbg_print(pk);
   dbg_printf("\n*************\n");
 
-  return (0 == trits_cmp_grlex(apk, pk)) ? 1 : 0;
+  return (0 == memcmp(pk->trits, apk.trits,
+                      trit_array_bytes_for_trits(MAM2_WOTS_PK_SIZE)))
+             ? 1
+             : 0;
 }
 
 void mss_destroy(mss_t *mss) {

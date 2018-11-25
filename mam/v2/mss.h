@@ -224,8 +224,9 @@ void mss_sign(mss_t *mss, trits_t hash, trits_t sig);
  * @param sig Signature
  * @param pk public key (Merkle-tree root)
  */
+
 bool_t mss_verify(sponge_t *ms, sponge_t *ws, trits_t hash, trits_t sig,
-                  trits_t pk);
+                  trit_array_p pk);
 
 /**
  * Deallocate memory for internal Merkle tree structure

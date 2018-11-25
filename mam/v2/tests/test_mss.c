@@ -70,49 +70,48 @@ void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
     dbg_printf("========================\nD = %d\n", d);
 
     mss_init(m, p, s, w, d, N, trits_null());
-    TRIT_ARRAY_DECLARE(pk_array, MAM2_WOTS_PK_SIZE);
-    mss_gen(m, &pk_array);
-    flex_trits_to_trits(pk.p + pk.d, MAM2_WOTS_PK_SIZE, pk_array.trits,
-                        MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
+    TRIT_ARRAY_DECLARE(pk, MAM2_WOTS_PK_SIZE);
+    mss_gen(m, &pk);
 
     dbg_printf("mss pk \t");
-    trits_dbg_print(pk);
+    // trits_dbg_print(pk);
     dbg_printf("\n");
 
     do {
       dbg_printf("------------------------\nskn = %d\n", m->skn);
       mss_sign(m, H, sig);
-      TEST_ASSERT(mss_verify(s, w->sponge, H, sig, pk));
+      TEST_ASSERT(mss_verify(s, w->sponge, H, sig, &pk));
 
 #if !defined(MAM2_MSS_DEBUG)
       // H is ignored, makes no sense to modify and check
       trits_put1(H, trit_add(trits_get1(H), 1));
-      TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, pk));
+      TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, &pk));
       trits_put1(H, trit_sub(trits_get1(H), 1));
 #endif
 
       trits_put1(sig_skn, trit_add(trits_get1(sig_skn), 1));
-      TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, pk));
+      TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, &pk));
       trits_put1(sig_skn, trit_sub(trits_get1(sig_skn), 1));
 
 #if !defined(MAM2_MSS_DEBUG)
       // WOTS sig is ignored, makes no sense to modify and check
       trits_put1(sig_wots, trit_add(trits_get1(sig_wots), 1));
-      TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, pk));
+      TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, &pk));
       trits_put1(sig_wots, trit_sub(trits_get1(sig_wots), 1));
 
       if (!trits_is_empty(sig_apath)) {
         trits_put1(sig_apath, trit_add(trits_get1(sig_apath), 1));
-        TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, pk));
+        TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, &pk));
         trits_put1(sig_apath, trit_sub(trits_get1(sig_apath), 1));
       }
 #endif
 
       TEST_ASSERT(!mss_verify(s, w->sponge, H,
-                              trits_take(sig, trits_size(sig) - 1), pk));
-      trits_put1(pk, trit_add(trits_get1(pk), 1));
-      TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, pk));
-      trits_put1(pk, trit_sub(trits_get1(pk), 1));
+                              trits_take(sig, trits_size(sig) - 1), &pk));
+      trit_t orig = trit_array_at(&pk, 0);
+      trit_array_set_at(&pk, 0, trit_sum(orig, 1));
+      TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, &pk));
+      trit_array_set_at(&pk, 0, orig);
 
     } while (mss_next(m));
   }

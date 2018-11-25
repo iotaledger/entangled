@@ -725,13 +725,15 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
           *b = trits_drop(*b, n);
 
           // TODO: verify that signer is trusted
+          TRIT_ARRAY_MAKE_FROM_RAW(pk, mam2_recv_msg_cfg_epid(cfg).p,
+                                   MAM2_WOTS_PK_SIZE);
           if (2 == pubkey)
             // signed with ep
-            mss_verify(cfg->ms, cfg->ws, H, sig, mam2_recv_msg_cfg_epid(cfg));
-          else
+            mss_verify(cfg->ms, cfg->ws, H, sig, &pk);
+          else {
             // signed with ch
-            mss_verify(cfg->ms, cfg->ws, H, sig, mam2_recv_msg_cfg_chid(cfg));
-
+            mss_verify(cfg->ms, cfg->ws, H, sig, &pk);
+          }
           // TODO: record new channel/endpoint
         }
       }
@@ -889,9 +891,9 @@ retcode_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
 
       sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, H);
 
+      TRIT_ARRAY_MAKE_FROM_RAW(pk, cfg->pk.p, MAM2_WOTS_PK_SIZE);
       // verify
-      err_guard(mss_verify(cfg->ms, cfg->ws, H, sig, cfg->pk),
-                RC_MAM2_PB3_BAD_SIG);
+      err_guard(mss_verify(cfg->ms, cfg->ws, H, sig, &pk), RC_MAM2_PB3_BAD_SIG);
     } else
       //    null none = 0;
       ;
