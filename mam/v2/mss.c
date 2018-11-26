@@ -36,8 +36,7 @@ static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trit_array_p pk) {
   trits_put18(pk, index);
 #else
   // gen sk from current leaf index
-  trit_t nonce_i[MAM2_MSS_SKN_SIZE];
-  memset(nonce_i, 0, MAM2_MSS_SKN_SIZE);
+  trit_t nonce_i[MAM2_MSS_SKN_SIZE] = {0};
   long_to_trits(index, nonce_i);
   TRIT_ARRAY_MAKE_FROM_RAW(noncei, MAM2_MSS_SKN_SIZE, nonce_i);
   wots_gen_sk3(mss->wots, mss->prng, &mss->nonce1, &mss->nonce2, &noncei);
@@ -273,6 +272,8 @@ void mss_init(mss_t *const mss, prng_t *const prng, sponge_t *const sponge,
   mss->prng = prng;
   mss->sponge = sponge;
   mss->wots = wots;
+  mss->nonce1.dynamic = 0;
+  mss->nonce2.dynamic = 0;
   trit_array_set_trits(&mss->nonce1, nonce1->trits, nonce1->num_trits);
   trit_array_set_trits(&mss->nonce2, nonce2->trits, nonce2->num_trits);
 #if defined(MAM2_MSS_TRAVERSAL)
@@ -378,8 +379,7 @@ void mss_gen(mss_t *mss, trit_array_p pk) {
 }
 
 void mss_skn(mss_t *mss, trit_array_p skn) {
-  trit_t ts[MAM2_MSS_SKN_SIZE];
-  memset(ts, 0, MAM2_MSS_SKN_SIZE);
+  trit_t ts[MAM2_MSS_SKN_SIZE] = {0};
   long_to_trits(mss->height, ts);
   long_to_trits(mss->skn, &ts[4]);
   flex_trits_from_trits(skn->trits, MAM2_MSS_SKN_SIZE, ts, MAM2_MSS_SKN_SIZE,
@@ -436,8 +436,7 @@ void mss_sign(mss_t *mss, trit_array_p hash, trit_array_p sig) {
   mss_mt_gen_leaf(mss, mss->skn, trits_take(sig, MAM2_MSS_MT_HASH_SIZE));
 #else
   {
-    trit_t nonce_i[MAM2_MSS_SKN_SIZE];
-    memset(nonce_i, 0, MAM2_MSS_SKN_SIZE);
+    trit_t nonce_i[MAM2_MSS_SKN_SIZE] = {0};
     long_to_trits(mss->skn, nonce_i);
     TRIT_ARRAY_MAKE_FROM_RAW(noncei, MAM2_MSS_SKN_SIZE, nonce_i);
     wots_gen_sk3(mss->wots, mss->prng, &mss->nonce1, &mss->nonce2, &noncei);

@@ -24,15 +24,14 @@ retcode_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
   do {
     err_bind(mss_create(m, d));
 
-    TRIT_ARRAY_DECLARE(nonce_null_1, 0);
-    m->nonce1 = nonce_null_1;
+    TRIT_ARRAY_DECLARE(nonce_null, 0);
+    m->nonce1 = nonce_null;
     if (nonce1) {
       m->nonce1 = *nonce1;
       err_guard(m->nonce1.num_trits > 0, RC_OOM);
     }
 
-    TRIT_ARRAY_DECLARE(nonce_null_2, 0);
-    m->nonce2 = nonce_null_2;
+    m->nonce2 = nonce_null;
     if (nonce2) {
       m->nonce2 = *nonce2;
       err_guard(m->nonce2.num_trits > 0, RC_OOM);
@@ -321,7 +320,8 @@ retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
       ep = mam2_endpoint_name(cfg->ep);
     } else {
       ep.num_trits = 0;
-      ep.trits = 0;
+      ep.num_bytes = 0;
+      ep.trits = NULL;
     }
     TRIT_ARRAY_MAKE_FROM_RAW(skn_trits, skn.n - skn.d, skn.p + skn.d);
     TRIT_ARRAY_DECLARE(cfg_key_array, MAM2_SPONGE_KEY_SIZE);
