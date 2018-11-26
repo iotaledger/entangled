@@ -20,6 +20,8 @@
 #include <memory.h>
 #include <stdio.h>
 
+#include "utils/macros.h"
+
 bool trits_is_empty(trits_t x) { return (x.n == x.d); }
 
 size_t trits_size(trits_t x) { return (x.n - x.d); }
@@ -36,7 +38,7 @@ trits_t trits_take(trits_t x, size_t n) {
 }
 
 trits_t trits_take_min(trits_t x, size_t n) {
-  x.n = min(x.n, x.d + n);
+  x.n = MIN(x.n, x.d + n);
   return x;
 }
 

@@ -33,9 +33,6 @@ typedef struct _trits_t {
   trit_t *p; /*!< pointer to the words holding trits */
 } trits_t;
 
-/*! \brief Minimum of two values. */
-static size_t min(size_t k, size_t n) { return k < n ? k : n; }
-
 #define MAM2_TRITS_INIT(X, k) trits_from_rep(k, X##_p)
 
 #define MAM2_TRITS_DECL(X, k)  \
