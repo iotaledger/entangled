@@ -1,20 +1,13 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file defs.h
-\brief MAM2 common definitions.
-*/
 #ifndef __MAM_V2_DEFS_H__
 #define __MAM_V2_DEFS_H__
 

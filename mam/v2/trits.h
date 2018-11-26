@@ -1,20 +1,12 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
-
-/*!
-\file trits.h
-\brief Basic trinary array operations.
-*/
 
 #ifndef __MAM_V2_TRITS_H__
 #define __MAM_V2_TRITS_H__

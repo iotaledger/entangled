@@ -5,7 +5,6 @@
  * MAM is based on an original implementation & specification by apmi.bsu.by
  * [ITSec Lab]
  *
- *
  * Refer to the LICENSE file for licensing information
  */
 

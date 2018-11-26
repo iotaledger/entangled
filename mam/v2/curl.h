@@ -3,17 +3,11 @@
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file curl.h
-\brief Curl implementation.
-*/
 #pragma once
 
 #include "mam/v2/defs.h"

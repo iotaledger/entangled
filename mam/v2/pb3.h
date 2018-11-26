@@ -3,17 +3,11 @@
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file pb3.h
-\brief MAM2 Protobuf3 layer.
-*/
 #ifndef __MAM_V2_PB3_H__
 #define __MAM_V2_PB3_H__
 

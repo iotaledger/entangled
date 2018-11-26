@@ -3,16 +3,11 @@
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file buffers.h
-\brief Trits collection to simplify buffered operations.
-*/
 #ifndef __MAM_V2_BUFFERS_H__
 #define __MAM_V2_BUFFERS_H__
 
