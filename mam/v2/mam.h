@@ -33,7 +33,8 @@ typedef struct _mam2_ialloc {
 } mam2_ialloc;
 
 retcode_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
-                          mss_mt_height_t d, trits_t N1, trits_t N2);
+                          mss_mt_height_t d, trit_array_p nonce1,
+                          trit_array_p nonce2);
 
 void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m);
 

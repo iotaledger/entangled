@@ -15,7 +15,8 @@
 #include "mam/v2/pb3.h"
 
 retcode_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
-                          mss_mt_height_t d, trits_t nonce1, trits_t nonce2) {
+                          mss_mt_height_t d, trit_array_p nonce1,
+                          trit_array_p nonce2) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
@@ -25,17 +26,15 @@ retcode_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
 
     TRIT_ARRAY_DECLARE(nonce_null_1, 0);
     m->nonce1 = nonce_null_1;
-    if (!trits_is_empty(nonce1)) {
-      TRIT_ARRAY_MAKE_FROM_RAW(n1, nonce1.n - nonce1.d, nonce1.p + nonce1.d);
-      m->nonce1 = n1;
+    if (nonce1) {
+      m->nonce1 = *nonce1;
       err_guard(m->nonce1.num_trits > 0, RC_OOM);
     }
 
     TRIT_ARRAY_DECLARE(nonce_null_2, 0);
     m->nonce2 = nonce_null_2;
-    if (!trits_is_empty(nonce2)) {
-      TRIT_ARRAY_MAKE_FROM_RAW(n2, nonce2.n - nonce2.d, nonce2.p + nonce2.d);
-      m->nonce2 = n2;
+    if (nonce2) {
+      m->nonce2 = *nonce2;
       err_guard(m->nonce2.num_trits > 0, RC_OOM);
     }
 
@@ -50,8 +49,7 @@ retcode_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
     err_guard(m->wots->sponge, RC_OOM);
     wots_init(m->wots, m->wots->sponge);
 
-    // FIXME (tsvisabo) - uncomment
-    // mss_init(m, p, m->sponge, m->wots, d, m->nonce1, m->nonce2);
+    mss_init(m, p, m->sponge, m->wots, d, &m->nonce1, &m->nonce2);
 
     e = RC_OK;
   } while (0);
@@ -99,7 +97,9 @@ retcode_t mam2_channel_create(mam2_ialloc *ma, /*!< [in] Allocator. */
   MAM2_ASSERT(ch);
 
   do {
-    err_bind(mam2_mss_create(ma, ch->m, p, d, ch_name, trits_null()));
+    TRIT_ARRAY_MAKE_FROM_RAW(ch_name_array, ch_name.n - ch_name.d,
+                             ch_name.p + ch_name.d)
+    err_bind(mam2_mss_create(ma, ch->m, p, d, &ch_name_array, NULL));
     // FIXME (@tsvisabo) - uncomment
     // mss_gen(ch->m, mam2_channel_id(ch));
 
@@ -141,7 +141,11 @@ retcode_t mam2_endpoint_create(mam2_ialloc *ma, /*!< [in] Allocator. */
   MAM2_ASSERT(ep);
 
   do {
-    err_bind(mam2_mss_create(ma, ep->m, p, d, ch_name, ep_name));
+    TRIT_ARRAY_MAKE_FROM_RAW(ch_name_array, ch_name.n - ch_name.d,
+                             ch_name.p + ch_name.d);
+    TRIT_ARRAY_MAKE_FROM_RAW(ep_name_array, ep_name.n - ep_name.d,
+                             ep_name.p + ep_name.d);
+    err_bind(mam2_mss_create(ma, ep->m, p, d, &ch_name_array, &ep_name_array));
     // FIXME (@tsvisabo) - uncomment
     // mss_gen(ep->m, mam2_endpoint_id(ep));
 
