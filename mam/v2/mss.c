@@ -90,8 +90,12 @@ static trits_t mss_hash_idx(trit_t *p, size_t i) {
   return trits_from_rep(MAM2_MSS_MT_HASH_SIZE, p + MAM2_MSS_HASH_IDX(i));
 }
 
-static trits_t mss_mt_ap_trits(mss_t *mss, mss_mt_height_t d) {
-  return mss_hash_idx(mss->auth_path, d);
+static void mss_mt_set_auth_node(mss_t *mss, mss_mt_height_t d,
+                                 trit_array_t *const auth_node) {
+  flex_trits_insert_from_pos(mss->auth_path,
+                             MAM2_MSS_AUTH_PATH_SIZE(mss->height),
+                             auth_node->trits, MAM2_MSS_MT_HASH_SIZE, 0,
+                             d * MAM2_MSS_MT_HASH_SIZE, MAM2_MSS_MT_HASH_SIZE);
 }
 
 static trits_t mss_mt_hs_trits(mss_t *mss, mss_mt_height_t d, size_t i) {
@@ -180,8 +184,12 @@ static void mss_mt_refresh(mss_t *mss) {
 
     s = mss->stacks + d;
     MAM2_ASSERT(s->stack_size == 1);
-    trits_copy(mss_mt_hs_trits(mss, d, s->stack_size - 1),
-               mss_mt_ap_trits(mss, d));
+    trits_t hs_node = mss_mt_hs_trits(mss, d, s->stack_size - 1);
+    TRIT_ARRAY_DECLARE(auth_node, MAM2_MSS_MT_HASH_SIZE);
+    // TODO remove when hs are flex_trits
+    flex_trits_from_trits(auth_node.trits, MAM2_MSS_MT_HASH_SIZE, hs_node.p,
+                          MAM2_MSS_MT_HASH_SIZE, MAM2_MSS_MT_HASH_SIZE);
+    mss_mt_set_auth_node(mss, d, &auth_node);
 
     s->index = (mss->skn + 1 + dd) ^ dd;
     s->height = d;
@@ -206,27 +214,75 @@ static trits_t mss_mt_node_t_trits(mss_t *m, trint6_t d, trint18_t i) {
 }
 #endif
 
-static void mss_fold_apath(
+static void mss_fold_auth_path(
     isponge *s,
     mss_mt_index_t skn, /*!< [in] corresponding WOTS sk number / leaf index */
-    trits_t ap,         /*!< [in] authentication path - leaf to root */
-    trits_t h           /*!< [in] recovered WOTS pk / start hash value;
-                             [out] recovered MT root */
+    trit_array_t
+        *const auth_path, /*!< [in] authentication path - leaf to root */
+    trits_t h             /*!< [in] recovered WOTS pk / start hash value;
+                               [out] recovered MT root */
 ) {
   trits_t t[2];
+  size_t offset = 0;
 
-  for (; !trits_is_empty(ap);
-       skn /= 2, ap = trits_drop(ap, MAM2_MSS_MT_HASH_SIZE)) {
+  while (offset < auth_path->num_trits) {
     t[skn % 2] = h;
-    t[1 - (skn % 2)] = trits_take(ap, MAM2_MSS_MT_HASH_SIZE);
+    // TODO remove when mss_mt_hash2 takes flex_trits
+    MAM2_TRITS_DEF(auth_trits, MAM2_MSS_MT_HASH_SIZE);
+    TRIT_ARRAY_DECLARE(auth_trits_array, MAM2_MSS_MT_HASH_SIZE);
+    flex_trits_insert_from_pos(auth_trits_array.trits, MAM2_MSS_MT_HASH_SIZE,
+                               auth_path->trits, auth_path->num_trits, offset,
+                               0, MAM2_MSS_MT_HASH_SIZE);
+    flex_trits_to_trits(auth_trits.p, MAM2_MSS_MT_HASH_SIZE,
+                        auth_trits_array.trits, MAM2_MSS_MT_HASH_SIZE,
+                        MAM2_MSS_MT_HASH_SIZE);
+    t[1 - (skn % 2)] = auth_trits;
     dbg_printf("mt  i=%d \t", skn);
     mss_mt_hash2(s, t, h);
+    offset += MAM2_MSS_MT_HASH_SIZE;
+    skn /= 2;
   }
 }
 
 /*
  * Public functions
  */
+
+retcode_t mss_create(mss_t *mss, mss_mt_height_t d) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
+  MAM2_ASSERT(mss);
+
+  do {
+    memset(mss, 0, sizeof(mss_t));
+    err_guard(0 <= d && d <= MAM2_MSS_MAX_HEIGHT, RC_MAM2_INVALID_ARGUMENT);
+
+#if defined(MAM2_MSS_TRAVERSAL)
+    mss->auth_path = (flex_trit_t *)malloc(sizeof(flex_trit_t) *
+                                           MAM2_MSS_AUTH_PATH_FLEX_SIZE(d));
+    err_guard(mss->auth_path, RC_OOM);
+
+    // add 1 extra hash for dirty hack (see mss.c)
+    mss->hashes =
+        (trit_t *)malloc(sizeof(trit_t) * MAM2_MSS_MT_HASH_WORDS(d, 1));
+    err_guard(mss->hashes, RC_OOM);
+
+    // add 1 extra node for dirty hack (see mss.c)
+    mss->nodes = malloc(sizeof(mss_mt_node_t) * (MAM2_MSS_MT_NODES(d) + 1));
+    err_guard(mss->nodes, RC_OOM);
+
+    mss->stacks = malloc(sizeof(mss_mt_stack_t) * MAM2_MSS_MT_STACKS(d));
+    err_guard(mss->nodes, RC_OOM);
+#else
+    mss->merkle_tree = (trit_t *)malloc(sizeof(trit_t) * MAM2_MSS_MT_WORDS(d));
+    err_guard(mss->merkle_tree, RC_OOM);
+#endif
+
+    e = RC_OK;
+  } while (0);
+
+  // do not free here in case of error
+  return e;
+}
 
 void mss_init(mss_t *const mss, prng_t *const prng, isponge *const sponge,
               wots_t *const wots, mss_mt_height_t const height,
@@ -288,8 +344,11 @@ void mss_gen(mss_t *mss, trits_t pk) {
       // is it current apath node?
       if (n->index == 1) {  // add to `ap`
         trits_t h = mss_hash_idx(hs, s->stack_size - 1);
-        trits_t a = mss_mt_ap_trits(mss, n->height);
-        trits_copy(h, a);
+        TRIT_ARRAY_DECLARE(auth_node, MAM2_MSS_MT_HASH_SIZE);
+        // TODO remove when hs are flex_trits
+        flex_trits_from_trits(auth_node.trits, MAM2_MSS_MT_HASH_SIZE, h.p,
+                              MAM2_MSS_MT_HASH_SIZE, MAM2_MSS_MT_HASH_SIZE);
+        mss_mt_set_auth_node(mss, n->height, &auth_node);
       } else
 
           // is it next apath node?
@@ -356,10 +415,11 @@ void mss_skn(mss_t *mss, trits_t skn) {
   dbg_printf("\n");
 }
 
-void mss_apath(mss_t *mss, trint18_t i, trits_t p) {
+void mss_auth_path(mss_t *mss, trint18_t i, trit_array_t *const auth_path) {
   mss_mt_height_t d;
+  size_t offset = 0;
 
-  MAM2_ASSERT(trits_size(p) == MAM2_MSS_AUTH_PATH_SIZE(mss->height));
+  MAM2_ASSERT(auth_path->num_trits == MAM2_MSS_AUTH_PATH_SIZE(mss->height));
 
   dbg_printf("apath i=%d\n", i);
 
@@ -372,19 +432,23 @@ void mss_apath(mss_t *mss, trint18_t i, trits_t p) {
   for (d = mss->height; d; --d, i = i / 2)
 #endif
   {
-    trits_t pi = trits_take(p, MAM2_MSS_MT_HASH_SIZE);
 #if defined(MAM2_MSS_TRAVERSAL)
-    trits_t ni = mss_hash_idx(mss->auth_path, d);
+    flex_trits_insert_from_pos(
+        auth_path->trits, MAM2_MSS_AUTH_PATH_SIZE(mss->height), mss->auth_path,
+        MAM2_MSS_AUTH_PATH_SIZE(mss->height), offset, offset,
+        MAM2_MSS_MT_HASH_SIZE);
 #else
     trits_t ni = mss_mt_node_t_trits(m, d, (0 == i % 2) ? i + 1 : i - 1);
+    flex_trits_from_trits(auth_path->trits + offset, MAM2_MSS_MT_HASH_SIZE,
+                          ni.p + ni.d, MAM2_MSS_MT_HASH_SIZE,
+                          MAM2_MSS_MT_HASH_SIZE);
 #endif
-    trits_copy(ni, pi);
 
     dbg_printf("ap\t");
     trits_dbg_print(ni);
     dbg_printf("\n");
 
-    p = trits_drop(p, MAM2_MSS_MT_HASH_SIZE);
+    offset += MAM2_MSS_MT_HASH_SIZE;
   }
 }
 
@@ -421,7 +485,11 @@ void mss_sign(mss_t *mss, trits_t hash, trits_t sig) {
 #endif
   sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
 
-  mss_apath(mss, mss->skn, sig);
+  // TODO Remove when sig is a trit_array_t
+  TRIT_ARRAY_DECLARE(auth_path, sig.n - sig.d);
+  mss_auth_path(mss, mss->skn, &auth_path);
+  flex_trits_to_trits(sig.p + sig.d, sig.n - sig.d, auth_path.trits,
+                      sig.n - sig.d, sig.n - sig.d);
 }
 
 bool_t mss_next(mss_t *mss) {
@@ -479,8 +547,9 @@ bool_t mss_verify(isponge *ms, isponge *ws, trits_t H, trits_t sig,
   dbg_printf("\nwpR\t");
   trits_dbg_print(apk);
   sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
+  TRIT_ARRAY_MAKE_FROM_RAW(auth_path, sig.n - sig.d, sig.p + sig.d);
 
-  mss_fold_apath(ms, skn, sig, apk);
+  mss_fold_auth_path(ms, skn, &auth_path, apk);
 
   dbg_printf("apk\t");
   trits_dbg_print(apk);
@@ -489,42 +558,6 @@ bool_t mss_verify(isponge *ms, isponge *ws, trits_t H, trits_t sig,
   dbg_printf("\n*************\n");
 
   return (0 == trits_cmp_grlex(apk, pk)) ? 1 : 0;
-}
-
-retcode_t mss_create(mss_t *mss, mss_mt_height_t d) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  MAM2_ASSERT(mss);
-
-  do {
-    memset(mss, 0, sizeof(mss_t));
-    err_guard(0 <= d && d <= MAM2_MSS_MAX_HEIGHT, RC_MAM2_INVALID_ARGUMENT);
-
-#if defined(MAM2_MSS_TRAVERSAL)
-    mss->auth_path =
-        (trit_t *)malloc(sizeof(trit_t) * MAM2_MSS_MT_AUTH_WORDS(d));
-    err_guard(mss->auth_path, RC_OOM);
-
-    // add 1 extra hash for dirty hack (see mss.c)
-    mss->hashes =
-        (trit_t *)malloc(sizeof(trit_t) * MAM2_MSS_MT_HASH_WORDS(d, 1));
-    err_guard(mss->hashes, RC_OOM);
-
-    // add 1 extra node for dirty hack (see mss.c)
-    mss->nodes = malloc(sizeof(mss_mt_node_t) * (MAM2_MSS_MT_NODES(d) + 1));
-    err_guard(mss->nodes, RC_OOM);
-
-    mss->stacks = malloc(sizeof(mss_mt_stack_t) * MAM2_MSS_MT_STACKS(d));
-    err_guard(mss->nodes, RC_OOM);
-#else
-    mss->merkle_tree = (trit_t *)malloc(sizeof(trit_t) * MAM2_MSS_MT_WORDS(d));
-    err_guard(mss->merkle_tree, RC_OOM);
-#endif
-
-    e = RC_OK;
-  } while (0);
-
-  // do not free here in case of error
-  return e;
 }
 
 void mss_destroy(mss_t *mss) {

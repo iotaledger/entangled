@@ -26,21 +26,41 @@
 
 // MSS public key size
 #define MAM2_MSS_PK_SIZE 243
+// MSS public key flex size
+#define MAM2_MSS_PK_FLEX_SIZE FLEX_TRIT_SIZE_243
+
 // Trits needed to encode SKN (tree depth and key number)
 #define MAM2_MSS_SKN_SIZE 18
+// Flex trits needed to encode SKN (tree depth and key number)
+#define MAM2_MSS_SKN_FLEX_SIZE FLEX_TRIT_SIZE_18
+
 // Maximum value of SKN for a given height d
 #define MAM2_MSS_MAX_SKN(d) (((uint32_t)1 << d) - 1)
+
 // MSS authentication path size of height d
 #define MAM2_MSS_AUTH_PATH_SIZE(d) (MAM2_WOTS_PK_SIZE * d)
+// MSS authentication path flex size of height d
+#define MAM2_MSS_AUTH_PATH_FLEX_SIZE(d) \
+  NUM_FLEX_TRITS_FOR_TRITS(MAM2_MSS_AUTH_PATH_SIZE(d))
+
 // MSS signature size with a tree of height d
 #define MAM2_MSS_SIG_SIZE(d) \
   (MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE + MAM2_MSS_AUTH_PATH_SIZE(d))
+// MSS signature flex size with a tree of height d
+#define MAM2_MSS_SIG_FLEX_SIZE(d) NUM_FLEX_TRITS_FOR_TRITS(MAM2_MSS_SIG_SIZE(d))
+
 // MSS signed hash value size
 #define MAM2_MSS_HASH_SIZE MAM2_WOTS_HASH_SIZE
+// MSS signed hash value flex size
+#define MAM2_MSS_HASH_FLEX_SIZE MAM2_WOTS_HASH_FLEX_SIZE
+
 // Max Merkle tree height
 #define MAM2_MSS_MAX_HEIGHT 20
+
 // Size of hash values stored in Merkle tree
 #define MAM2_MSS_MT_HASH_SIZE MAM2_WOTS_PK_SIZE
+// FLex size of hash values stored in Merkle tree
+#define MAM2_MSS_MT_HASH_FLEX_SIZE MAM2_WOTS_PK_FLEX_SIZE
 
 // Leaves have height `0`, root has height `D`; `0 <= d < D`; `D <= 20`
 typedef uint8_t mss_mt_height_t;
@@ -93,7 +113,7 @@ typedef struct mss_s {
   isponge *sponge;         // Sponge interface used to hash Merkle tree nodes
   wots_t *wots;            // WOTS interface used to generate keys and sign
 #if defined(MAM2_MSS_TRAVERSAL)
-  trit_t *auth_path;       // Current authentication path; `d` hash values
+  flex_trit_t *auth_path;  // Current authentication path; `d` hash values
   trit_t *hashes;          // Buffer storing hash-values of auxiliary nodes;
                            // MAM2_MSS_MT_NODES(d) hash-values in total
   mss_mt_node_t *nodes;    // Auxiliary node infos
@@ -131,6 +151,18 @@ typedef struct mss_s {
  */
 
 #endif
+
+/**
+ * Allocate memory for internal Merkle tree structure
+ * `mss_init` must still be called afterwards
+ * In case of error `mss_destroy` must be called
+ * Non Merkle tree related objects (WOTS, PRNG, Sponge interfaces)
+ * must be allocated separately
+ *
+ * @param mss MSS interface
+ * @param height Merkle-tree height
+ */
+retcode_t mss_create(mss_t *mss, mss_mt_height_t height);
 
 /**
  * MSS interface initialization
@@ -172,7 +204,7 @@ void mss_skn(mss_t *mss, trits_t skn);
  * @param i Number of WOTS instance
  * @param auth_path Authentication path
  */
-void mss_auth_path(mss_t *mss, trint18_t i, trits_t auth_path);
+void mss_auth_path(mss_t *mss, trint18_t i, trit_array_t *const auth_path);
 
 /**
  * Generates MSS signature
@@ -194,18 +226,6 @@ void mss_sign(mss_t *mss, trits_t hash, trits_t sig);
  */
 bool_t mss_verify(isponge *ms, isponge *ws, trits_t hash, trits_t sig,
                   trits_t pk);
-
-/**
- * Allocate memory for internal Merkle tree structure
- * `mss_init` must still be called afterwards
- * In case of error `mss_destroy` must be called
- * Non Merkle tree related objects (WOTS, PRNG, Sponge interfaces)
- * must be allocated separately
- *
- * @param mss MSS interface
- * @param height Merkle-tree height
- */
-retcode_t mss_create(mss_t *mss, mss_mt_height_t height);
 
 /**
  * Deallocate memory for internal Merkle tree structure
