@@ -21,7 +21,6 @@
 /*! \brief Enable debug output macros. */
 //#define MAM2_DEBUG
 
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -106,10 +105,6 @@ typedef trint1_t trit_t;
 with values in range [-13,..,-1,0,1,..,13]. */
 typedef int8_t trint3_t;
 typedef trint3_t tryte_t;
-
-static char tryte_to_char(tryte_t t);
-
-static bool tryte_from_char(tryte_t *t, char c);
 
 /*! \brief Signed integer type capable of storing 6 trits
 with values in range [-(3^6-1)/2=-364,..,-1,0,1,..,364=(3^6-1)/2]. */
