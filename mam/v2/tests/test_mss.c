@@ -18,7 +18,6 @@
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
 #include "mam/v2/tests/common.h"
-#include "mam/v2/trits.h"
 #include "mam/v2/wots.h"
 
 #include "utils/macros.h"
@@ -34,17 +33,13 @@ void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
                  mss_mt_height_t mt_height) {
   bool_t r = 1;
   flex_trit_t key[FLEX_TRIT_SIZE_243];
-  // TODO Remove when sponge handles flex_trit_t
-  MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
   mss_mt_height_t d;
 
-  TRIT_ARRAY_DECLARE(sig_array, MAM2_MSS_SIG_SIZE(mt_height));
-
+  TRIT_ARRAY_DECLARE(sig, MAM2_MSS_SIG_SIZE(mt_height));
   tryte_t const *const key_trytes =
       "ABCNOABCNKOZWYKOZWYSDF9SDF9YSDF9QABCNKOZWYSDF9ABCNKOZWSDF9CABCABCNKOZWYN"
       "KOZWYSDF9";
 
-  trytes_to_trits(key_trytes, K.p, MIN(strlen(key_trytes), K.n / RADIX));
   flex_trits_from_trytes(key, MAM2_PRNG_KEY_SIZE, key_trytes, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
   prng_init(p, p->sponge, key);
@@ -62,15 +57,13 @@ void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
 
   for (d = 1; r && d <= mt_height; ++d) {
     TRIT_ARRAY_DECLARE(curr_sig, MAM2_MSS_SIG_SIZE(d));
-    trit_array_insert_from_pos(&curr_sig, &sig_array, 0, 0,
-                               MAM2_MSS_SIG_SIZE(d));
+    trit_array_insert_from_pos(&curr_sig, &sig, 0, 0, MAM2_MSS_SIG_SIZE(d));
     trit_t tmp[MAM2_MSS_SIG_SIZE(d)];
     flex_trits_to_trits(tmp, MAM2_MSS_SIG_SIZE(d), curr_sig.trits,
                         MAM2_MSS_SIG_SIZE(d), MAM2_MSS_SIG_SIZE(d));
 
     TRIT_ARRAY_DECLARE(curr_sig_skn, MAM2_MSS_SKN_SIZE);
-    trit_array_insert_from_pos(&curr_sig_skn, &sig_array, 0, 0,
-                               MAM2_MSS_SKN_SIZE);
+    trit_array_insert_from_pos(&curr_sig_skn, &sig, 0, 0, MAM2_MSS_SKN_SIZE);
 #if !defined(MAM2_MSS_DEBUG)
     TRIT_ARRAY_DECLARE(sig_wots, MAM2_WOTS_SIG_SIZE);
     trit_array_insert_from_pos(&sig_wots, &curr_sig, MAM2_MSS_SKN_SIZE, 0,
