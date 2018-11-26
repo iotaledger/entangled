@@ -30,7 +30,7 @@
 #include <stdio.h>
 
 void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
-                 mss_mt_height_t D) {
+                 mss_mt_height_t mt_height) {
   bool_t r = 1;
   flex_trit_t key[FLEX_TRIT_SIZE_243];
   // TODO Remove when sponge handles flex_trit_t

@@ -18,43 +18,9 @@
 
 /*!< [in] hash values of left and right child nodes */
 /*!< [out] hash value of their parent */
-<<<<<<< HEAD
-static void mss_mt_hash2(sponge_t *sponge, trits_t h[2], trits_t h01) {
-  dbg_printf("\nleft  \t");
-  trits_dbg_print(h[0]);
-  dbg_printf("\nright \t");
-  trits_dbg_print(h[1]);
-
-#if defined(MAM2_MSS_DEBUG)
-  {
-    // this is a special debug MT hash function
-    mss_mt_index_t i0, i1, i01;
-    // hash of the node is it's index in level
-    i0 = trits_get18(h[0]);
-    // MAM2_ASSERT(i0 == ns[s->stack_size].index);
-    i1 = trits_get18(h[1]);
-    // MAM2_ASSERT(i1 == ns[s->s+1].index);
-    // left node is even
-    MAM2_ASSERT(i0 % 2 == 0);
-    // right node is left node + 1
-    MAM2_ASSERT(i0 + 1 == i1);
-    // parent's index
-    i01 = i0 / 2;
-    trits_set_zero(h01);
-    trits_put18(h01, i01);
-  }
-#else
-  sponge_hashn(sponge, 2, h, h01);
-#endif
-
-  dbg_printf("\nparent\t");
-  trits_dbg_print(h01);
-  dbg_printf("\n");
-=======
-static void mss_mt_hash2(isponge *sponge, trit_array_t hashes_pack[2],
+static void mss_mt_hash2(sponge_t *sponge, trit_array_t hashes_pack[2],
                          trit_array_p hash) {
   sponge_hashn_flex(sponge, 2, hashes_pack, hash);
->>>>>>> mam/v2: mss_fold_path - flex trits
 }
 
 /*!< [in] leaf index: `0 <= i < 2^D` */
@@ -229,9 +195,8 @@ static trits_t mss_mt_node_t_trits(mss_t *m, trint6_t d, trint18_t i) {
 }
 #endif
 
-
 static void mss_fold_apath(
-        sponge_t *s,
+    sponge_t *s,
     mss_mt_index_t skn, /*!< [in] corresponding WOTS sk number / leaf index */
     trit_array_p ap,    /*!< [in] authentication path - leaf to root */
     trit_array_p pk_recovered /*!< [in] recovered WOTS pk / start hash value;
