@@ -56,9 +56,9 @@ void ntru_encr(trits_t pk, /*!< [in] NTRU public key */
                trits_t Y   /*!< [out] encrypted K */
 );
 
-bool_t ntru_decr(intru *n,  /*!< [in] NTRU interface */
-                 trits_t Y, /*!< [in] encrypted K */
-                 trits_t K  /*!< [out] decrypted session symmetric key */
+bool ntru_decr(intru *n,  /*!< [in] NTRU interface */
+               trits_t Y, /*!< [in] encrypted K */
+               trits_t K  /*!< [out] decrypted session symmetric key */
 );
 
 #endif  // __MAM_V2_NTRU_H__

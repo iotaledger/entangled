@@ -20,7 +20,7 @@ buffers_t buffers_init(size_t n, trits_t *Xs) {
   return bs;
 }
 
-bool_t buffers_is_empty(buffers_t bs) {
+bool buffers_is_empty(buffers_t bs) {
   return trits_is_empty(bs.X) && (0 == bs.n);
 }
 

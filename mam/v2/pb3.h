@@ -94,6 +94,6 @@ void pb3_wrap_data(sponge_t *s, trits_t t);
 
 void pb3_unwrap_data(sponge_t *s, trits_t t);
 
-bool_t pb3_test();
+bool pb3_test();
 
 #endif  // __MAM_V2_PB3_H__

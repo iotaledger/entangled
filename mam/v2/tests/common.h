@@ -85,16 +85,15 @@ typedef struct _test_wots_s {
 #endif
 
 #if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss_check(D, sfx)                                   \
-  static bool_t test_mss_check##sfx(test_mss##sfx *m) {              \
-    return 1 && m->auth_path_check == 0xdeadbeef &&                  \
-           m->hs_check == 0xdeadbeef && m->ns_check == 0xdeadbeef && \
-           m->ss_check == 0xdeadbeef;                                \
+#define def_test_mss_check(D, sfx)                                          \
+  static bool test_mss_check##sfx(test_mss##sfx *m) {                       \
+    return m->auth_path_check == 0xdeadbeef && m->hs_check == 0xdeadbeef && \
+           m->ns_check == 0xdeadbeef && m->ss_check == 0xdeadbeef;          \
   }
 #else
-#define def_test_mss_check(D, sfx)                      \
-  static bool_t test_mss_check##sfx(test_mss##sfx *m) { \
-    return 1 && m->mt_check == 0xdeadbeef;              \
+#define def_test_mss_check(D, sfx)                    \
+  static bool test_mss_check##sfx(test_mss##sfx *m) { \
+    return m->mt_check == 0xdeadbeef;                 \
   }
 #endif
 

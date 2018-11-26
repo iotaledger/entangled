@@ -29,4 +29,4 @@ void ntru_gen(intru *n, prng_t *p, trits_t N, trits_t pk) {}
 
 void ntru_encr(trits_t pk, prng_t *p, trits_t K, trits_t N, trits_t Y) {}
 
-bool_t ntru_decr(intru *n, trits_t Y, trits_t K) { return 0; }
+bool ntru_decr(intru *n, trits_t Y, trits_t K) { return false; }

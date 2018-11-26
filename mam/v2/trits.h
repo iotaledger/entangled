@@ -47,7 +47,7 @@ static size_t min(size_t k, size_t n) { return k < n ? k : n; }
   trits_t X = MAM2_TRITS_INIT(X, k);
 
 /*! \brief Check `x.n` against zero. */
-bool_t trits_is_empty(trits_t x);
+bool trits_is_empty(trits_t x);
 
 /*! \brief Size of `x`. */
 size_t trits_size(trits_t x);
@@ -83,7 +83,7 @@ void trits_put9(trits_t x, trint9_t t);
 \note `trits_size(x)` must be multiple of 3.
 Size of `s` must be equal `trits_size(x)/3`.
 */
-bool_t trits_from_str(trits_t x, char *s);
+bool trits_from_str(trits_t x, char *s);
 
 /*! \brief Set zero trits: `x` := 0^n. */
 void trits_set_zero(trits_t x);
@@ -95,7 +95,7 @@ void trits_copy(trits_t x, trits_t y);
 int trits_cmp_grlex(trits_t x, trits_t y);
 
 /*! \brief Compare trits: `x` =? `y`. */
-bool_t trits_cmp_eq(trits_t x, trits_t y);
+bool trits_cmp_eq(trits_t x, trits_t y);
 
 /*! \brief Return `x` such that:
 `trits_is_same(trits_drop(begin, trits_size(x)), end)` and
@@ -113,7 +113,7 @@ to allocate memory for trits. But in certain cases where the size of memory
 is difficult to trac memory can be allocated within a callee.
 In such case trits should be passed by pointer: `trits_t *x`.
 */
-bool_t trits_is_null(trits_t x);
+bool trits_is_null(trits_t x);
 
 /*! \brief Alloc `n` trits. */
 trits_t trits_alloc(size_t n);
@@ -136,7 +136,7 @@ void trits_pad10(trits_t y);
 /*! \brief Check whether `x` and `y` point to the same memory location.
 \note `trits_is_same(x, y)` implies `0 == trits_cmp_grlex(x, y)` but not vice
 versa. */
-bool_t trits_is_same(trits_t x, trits_t y);
+bool trits_is_same(trits_t x, trits_t y);
 
 /*! \brief Copy and add trits: `y` := `x` + `s`, `s` := `x`. */
 void trits_copy_add(trits_t x, trits_t s, trits_t y);

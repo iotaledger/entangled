@@ -21,6 +21,7 @@
 /*! \brief Enable debug output macros. */
 //#define MAM2_DEBUG
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -101,10 +102,6 @@ typedef trint1_t trit_t;
   MAM2_ASSERT(((t1) == (trint1_t)-1) || ((t1) == (trint1_t)0) || \
               ((t1) == (trint1_t)1))
 
-/*! \brief Boolean type with zero as `false`(`no`) and non-zero as
- * `true`(`yes`). */
-typedef trint1_t bool_t;
-
 /*! \brief Signed integer type capable of storing 3 trits
 with values in range [-13,..,-1,0,1,..,13]. */
 typedef int8_t trint3_t;
@@ -112,7 +109,7 @@ typedef trint3_t tryte_t;
 
 static char tryte_to_char(tryte_t t);
 
-static bool_t tryte_from_char(tryte_t *t, char c);
+static bool tryte_from_char(tryte_t *t, char c);
 
 /*! \brief Signed integer type capable of storing 6 trits
 with values in range [-(3^6-1)/2=-364,..,-1,0,1,..,364=(3^6-1)/2]. */

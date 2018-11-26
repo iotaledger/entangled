@@ -184,7 +184,7 @@ void test() {
       "OXYZ99AZNOD99ABCKNLMOXYZA99999999999999999999999999999999999999999999999"
       "999999999999999999";
 
-  bool_t r = 1;
+  bool r = true;
   size_t sponge_hash_Yn = 81;
   size_t sponge_encr_Yn = 162;
   size_t sponge_decr_Xn = 162;

@@ -459,8 +459,10 @@ void mss_sign(mss_t *mss, trit_array_p hash, trit_array_p sig) {
                              auth_path.num_trits);
 }
 
-bool_t mss_next(mss_t *mss) {
-  if (mss->skn == MAM2_MSS_MAX_SKN(mss->height)) return 0;
+bool mss_next(mss_t *mss) {
+  if (mss->skn == MAM2_MSS_MAX_SKN(mss->height)) {
+    return false;
+  };
 
 #if defined(MAM2_MSS_TRAVERSAL)
   if (mss->skn < MAM2_MSS_MAX_SKN(mss->height)) {
@@ -470,11 +472,11 @@ bool_t mss_next(mss_t *mss) {
 #endif
 
   mss->skn++;
-  return 1;
+  return true;
 }
 
-bool_t mss_verify(sponge_t *ms, sponge_t *ws, trit_array_p hash,
-                  trit_array_p sig, trit_array_p pk) {
+bool mss_verify(sponge_t *ms, sponge_t *ws, trit_array_p hash, trit_array_p sig,
+                trit_array_p pk) {
   uint16_t d;
   uint32_t skn;
   trit_t tmp[MAM2_MSS_SKN_SIZE];
@@ -499,13 +501,15 @@ bool_t mss_verify(sponge_t *ms, sponge_t *ws, trit_array_p hash,
 
   dbg_printf("mss verify\n");
 
-  if (sig->num_trits < MAM2_MSS_SIG_SIZE(0)) return 0;
+  if (sig->num_trits < MAM2_MSS_SIG_SIZE(0)) {
+    return false;
+  };
 
   dbg_printf("d=%d skn=%d", d, skn);
   if (d < 0 || skn < 0 || skn >= (1 << d) ||
       (sk_sig_array.num_trits + ap_array.num_trits) !=
           (MAM2_MSS_SIG_SIZE(d) - MAM2_MSS_SKN_SIZE)) {
-    return 0;
+    return false;
   }
 
   MAM2_ASSERT(pk->num_trits == MAM2_WOTS_PK_SIZE);
@@ -523,7 +527,7 @@ bool_t mss_verify(sponge_t *ms, sponge_t *ws, trit_array_p hash,
   trits_dbg_print(pk);
   dbg_printf("\n*************\n");
 
-  return (0 == memcmp(pk->trits, apk.trits, MAM2_WOTS_PK_FLEX_SIZE)) ? 1 : 0;
+  return (0 == memcmp(pk->trits, apk.trits, MAM2_WOTS_PK_FLEX_SIZE));
 }
 
 void mss_destroy(mss_t *mss) {

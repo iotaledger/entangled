@@ -31,7 +31,7 @@
 
 void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
                  mss_mt_height_t mt_height) {
-  bool_t r = 1;
+  bool r = true;
   flex_trit_t key[FLEX_TRIT_SIZE_243];
   mss_mt_height_t d;
 

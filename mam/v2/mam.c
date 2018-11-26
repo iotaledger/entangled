@@ -768,7 +768,7 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
       //  forkhash repeated oneof keyload
       {
         size_t keyload_count = 0;
-        bool_t key_found = 0;
+        bool key_found = false;
 
         b0 = *b;
         err_bind(pb3_decode_repeated(&keyload_count, b));
@@ -793,7 +793,7 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
             pb3_unwrap_data(fork, trits_diff(b0, *b));
 
             err_guard(!key_found, RC_MAM2_KEYLOAD_OVERLOADED);
-            key_found = 1;
+            key_found = true;
           } else if (1 == keyload) {  //  KeyloadPSK psk = 1;
 
             //  tryte id[27];
@@ -804,7 +804,7 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
             if (cfg->psk && trits_cmp_eq(mam2_psk_id(cfg->psk),
                                          mam2_recv_msg_cfg_psk_id(cfg))) {
               err_guard(!key_found, RC_MAM2_KEYLOAD_OVERLOADED);
-              key_found = 1;
+              key_found = true;
 
               //  external secret tryte psk[81];
               pb3_unwrap_secret(s, mam2_psk_trits(cfg->psk));
@@ -829,7 +829,7 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
             if (cfg->ntru && trits_cmp_eq(ntru_id_trits(cfg->ntru),
                                           mam2_recv_msg_cfg_ntru_id(cfg))) {
               err_guard(!key_found, RC_MAM2_KEYLOAD_OVERLOADED);
-              key_found = 1;
+              key_found = true;
 
               //  tryte ekey[3072];
               err_guard(trits_size(*b) >= MAM2_NTRU_EKEY_SIZE, RC_MAM2_PB3_EOF);

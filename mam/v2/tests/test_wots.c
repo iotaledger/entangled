@@ -23,7 +23,7 @@
 #include "mam/v2/wots.h"
 #include "utils/macros.h"
 
-bool_t wots_test_do(wots_t *w, prng_t *p) {
+void wots_test_do(wots_t *w, prng_t *p) {
   TRIT_ARRAY_DECLARE(N, 18);
   trit_array_set_null(&N);
   MAM2_TRITS_DEF(pk, MAM2_WOTS_PK_SIZE);
