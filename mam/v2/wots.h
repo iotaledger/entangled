@@ -45,7 +45,7 @@
 
 // WOTS interface
 typedef struct wots_s {
-  isponge *sponge;
+  sponge_t *sponge;
   flex_trit_t sk[MAM2_WOTS_SK_FLEX_SIZE];
 } wots_t;
 
@@ -55,7 +55,7 @@ typedef struct wots_s {
  * @param wots WOTS interface
  * @param sponge Sponge interface
  */
-void wots_init(wots_t *const wots, isponge *const sponge);
+void wots_init(wots_t *const wots, sponge_t *const sponge);
 
 /**
  * Resets WOTS sponge and SK
@@ -126,7 +126,7 @@ void wots_sign(wots_t *const wots, trit_array_p const hash, trit_array_p sig);
  * @param sig Signature
  * @param pk Presumed public key
  */
-void wots_recover(isponge *const sponge, trit_array_p const hash,
+void wots_recover(sponge_t *const sponge, trit_array_p const hash,
                   trit_array_p const sig, trit_array_p pk);
 
 /**
@@ -139,7 +139,7 @@ void wots_recover(isponge *const sponge, trit_array_p const hash,
  *
  * @return true if signature is valid, false otherwise
  */
-bool wots_verify(isponge *const sponge, trit_array_p const hash,
+bool wots_verify(sponge_t *const sponge, trit_array_p const hash,
                  trit_array_p const sig, trit_array_p const pk);
 
 #endif  // __MAM_V2_WOTS_H__

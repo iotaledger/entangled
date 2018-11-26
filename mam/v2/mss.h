@@ -110,7 +110,7 @@ typedef struct mss_s {
   mss_mt_height_t height;  // Merkle tree height
   mss_mt_index_t skn;      // Current WOTS private key number
   prng_t *prng;            // PRNG interface used to generate WOTS private keys
-  isponge *sponge;         // Sponge interface used to hash Merkle tree nodes
+  sponge_t *sponge;        // Sponge interface used to hash Merkle tree nodes
   wots_t *wots;            // WOTS interface used to generate keys and sign
 #if defined(MAM2_MSS_TRAVERSAL)
   flex_trit_t *auth_path;  // Current authentication path; `d` hash values
@@ -177,7 +177,7 @@ retcode_t mss_create(mss_t *mss, mss_mt_height_t height);
  * @param nonce1 First nonce
  * @param nonce2 Second nonce
  */
-void mss_init(mss_t *const mss, prng_t *const prng, isponge *const sponge,
+void mss_init(mss_t *const mss, prng_t *const prng, sponge_t *const sponge,
               wots_t *const wots, mss_mt_height_t const height,
               trits_t const nonce1, trits_t const nonce2);
 
@@ -224,7 +224,7 @@ void mss_sign(mss_t *mss, trits_t hash, trits_t sig);
  * @param sig Signature
  * @param pk public key (Merkle-tree root)
  */
-bool_t mss_verify(isponge *ms, isponge *ws, trits_t hash, trits_t sig,
+bool_t mss_verify(sponge_t *ms, sponge_t *ws, trits_t hash, trits_t sig,
                   trits_t pk);
 
 /**

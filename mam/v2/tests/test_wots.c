@@ -96,7 +96,7 @@ void wots_test() {
   test_prng_t _p;
   test_wots_t _w;
 
-  isponge *s = test_sponge_init(&_s);
+  sponge_t *s = test_sponge_init(&_s);
   prng_t *p = test_prng_init(&_p, s);
   wots_t *w = test_wots_init(&_w, s);
 

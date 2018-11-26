@@ -87,7 +87,7 @@ void curl_squeeze(curl_sponge *s, trits_t Y) {
   } while (!trits_is_empty(Y));
 }
 
-isponge *curl_sponge_init(curl_sponge *c) {
+sponge_t *curl_sponge_init(curl_sponge *c) {
   c->i.s = c->s;
   c->i.stack = c->s2;
   c->i.f = curl_f81;

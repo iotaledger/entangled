@@ -58,7 +58,7 @@ void prng_test() {
   test_sponge_t _sponge;
   test_prng_t _prng;
 
-  isponge *sponge = test_sponge_init(&_sponge);
+  sponge_t *sponge = test_sponge_init(&_sponge);
   prng_t *prng = test_prng_init(&_prng, sponge);
   prng_test_do(prng);
 }

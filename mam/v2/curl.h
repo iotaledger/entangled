@@ -22,7 +22,7 @@
 
 /*! \brief Curl state. */
 typedef struct _curl_sponge {
-  isponge i;         /*!< sponge interface */
+  sponge_t i;        /*!< sponge interface */
   sponge_state_t s;  /*!< state */
   sponge_state_t s2; /*!< additional memory */
 } curl_sponge;
@@ -30,7 +30,7 @@ typedef struct _curl_sponge {
 #define MAM2_CURL_RATE 243
 
 /*! \brief Curl sponge interface initialization. */
-isponge *curl_sponge_init(curl_sponge *c);
+sponge_t *curl_sponge_init(curl_sponge *c);
 
 void curl_init(curl_sponge *s);
 void curl_absorb(curl_sponge *s, trits_t X);

@@ -82,17 +82,17 @@ Protobuf3 cryptographic modifier handling:
 secret, encrypted, data(other)
 */
 
-void pb3_wrap_secret(isponge *s, trits_t t);
+void pb3_wrap_secret(sponge_t *s, trits_t t);
 
-void pb3_unwrap_secret(isponge *s, trits_t t);
+void pb3_unwrap_secret(sponge_t *s, trits_t t);
 
-void pb3_wrap_encrypted(isponge *s, trits_t t);
+void pb3_wrap_encrypted(sponge_t *s, trits_t t);
 
-void pb3_unwrap_encrypted(isponge *s, trits_t t);
+void pb3_unwrap_encrypted(sponge_t *s, trits_t t);
 
-void pb3_wrap_data(isponge *s, trits_t t);
+void pb3_wrap_data(sponge_t *s, trits_t t);
 
-void pb3_unwrap_data(isponge *s, trits_t t);
+void pb3_unwrap_data(sponge_t *s, trits_t t);
 
 bool_t pb3_test();
 

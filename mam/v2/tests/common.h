@@ -23,7 +23,7 @@
 #endif
 
 typedef struct _test_sponge_s {
-  isponge s;
+  sponge_t s;
   sponge_state_t stack;
   sponge_state_t state;
 } test_sponge_t;
@@ -150,20 +150,20 @@ void test_f(void *buf, trit_t *s) {
   memcpy(s, y_trits, MAM2_SPONGE_RATE);
 }
 
-static isponge *test_sponge_init(test_sponge_t *s) {
+static sponge_t *test_sponge_init(test_sponge_t *s) {
   s->s.f = test_f;
   s->s.stack = s->stack;
   s->s.s = s->state;
   return &s->s;
 }
 
-static prng_t *test_prng_init(test_prng_t *prng, isponge *sponge) {
+static prng_t *test_prng_init(test_prng_t *prng, sponge_t *sponge) {
   prng->p.sponge = sponge;
   memcpy(prng->p.key, prng->key, MAM2_PRNG_KEY_FLEX_SIZE);
   return &prng->p;
 }
 
-static wots_t *test_wots_init(test_wots_t *w, isponge *s) {
+static wots_t *test_wots_init(test_wots_t *w, sponge_t *s) {
   w->w.sponge = s;
   memcpy(w->w.sk, w->sk, MAM2_WOTS_SK_FLEX_SIZE);
   return &w->w;

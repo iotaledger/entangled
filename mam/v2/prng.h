@@ -11,9 +11,7 @@
 #ifndef __MAM_V2_PRNG_H__
 #define __MAM_V2_PRNG_H__
 
-#include "mam/v2/defs.h"
 #include "mam/v2/sponge.h"
-#include "mam/v2/trits.h"
 
 // PRNG key size
 #define MAM2_PRNG_KEY_SIZE 243
@@ -29,29 +27,29 @@
 
 // PRNG interface
 typedef struct prng_s {
-  isponge *sponge;
+  sponge_t *sponge;
   flex_trit_t key[MAM2_PRNG_KEY_FLEX_SIZE];
 } prng_t;
 
 /**
- * PRNG initialization
+ * Initializes PRNG
  *
  * @param prng PRNG interface
  * @param sponge Sponge interface
  * @param key Key of size MAM2_PRNG_KEY_SIZE
  */
-void prng_init(prng_t *const prng, isponge *const sponge,
+void prng_init(prng_t *const prng, sponge_t *const sponge,
                flex_trit_t const *const key);
 
 /**
- * Resets PRNG sponge and key
+ * Resets PRNG
  *
  * @param prng PRNG interface
  */
 void prng_reset(prng_t *const prng);
 
 /**
- * PRNG output generation with nonce
+ * Outputs pseudorandom trits with one input nonce
  *
  * @param prng PRNG interface
  * @param dest Destination tryte
@@ -62,7 +60,7 @@ void prng_gen(prng_t *const prng, uint8_t const dest,
               trit_array_t const *const nonce, trit_array_t *const output);
 
 /**
- * PRNG output generation with nonce1 || nonce2
+ * Outputs pseudorandom trits with two input nonces
  *
  * @param prng PRNG interface
  * @param dest Destination tryte
@@ -75,7 +73,7 @@ void prng_gen2(prng_t *const prng, uint8_t const dest,
                trit_array_t const *const nonce2, trit_array_t *const output);
 
 /**
- * PRNG output generation with nonce1 || nonce2 || nonce3
+ * Outputs pseudorandom trits with three input nonces
  *
  * @param prng PRNG interface
  * @param dest Destination tryte

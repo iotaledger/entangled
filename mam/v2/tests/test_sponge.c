@@ -28,7 +28,7 @@
 #include <memory.h>
 #include <stdio.h>
 
-static void sponge_test_hash(isponge *s) {
+static void sponge_test_hash(sponge_t *s) {
   bool_t r = 1;
   MAM2_TRITS_DEF(X0, MAM2_SPONGE_RATE * 3);
   trits_t Xs[3], X;
@@ -49,7 +49,7 @@ static void sponge_test_hash(isponge *s) {
   }
 }
 
-static bool_t sponge_test_ae(isponge *s) {
+static bool_t sponge_test_ae(sponge_t *s) {
 #define MAM2_SPONGE_TEST_MAX_K 1110
   size_t k, i;
   MAM2_TRITS_DEF(K, MAM2_SPONGE_KEY_SIZE);
@@ -112,7 +112,7 @@ static bool_t sponge_test_ae(isponge *s) {
   return 1;
 }
 
-static void sponge_test_pointwise(isponge *s) {
+static void sponge_test_pointwise(sponge_t *s) {
   bool_t r, ok;
 
   MAM2_TRITS_DEF(K, MAM2_SPONGE_KEY_SIZE);
@@ -234,7 +234,7 @@ static void sponge_test_pointwise(isponge *s) {
   TEST_ASSERT(r);
 }
 
-void sponge_test(isponge *s) {
+void sponge_test(sponge_t *s) {
   sponge_test_ae(s);
   sponge_test_hash(s);
   sponge_test_pointwise(s);
@@ -244,7 +244,7 @@ int main(void) {
   UNITY_BEGIN();
 
   test_sponge_t _s[1];
-  isponge *s = test_sponge_init(_s);
+  sponge_t *s = test_sponge_init(_s);
 
   sponge_test(s);
 
