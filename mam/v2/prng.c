@@ -12,28 +12,6 @@
 #include "common/trinary/trit_long.h"
 
 /*
- * Private functions
- */
-
-static inline void prng_absorbn(sponge_t *const s, size_t const n,
-                                trit_array_t const *const input) {
-  sponge_init(s);
-  sponge_absorbn_flex(s, MAM2_SPONGE_CTL_KEY, n, input);
-}
-
-static inline void prng_squeeze(sponge_t *const s, trit_array_t *const output) {
-  sponge_squeeze_flex(s, MAM2_SPONGE_CTL_PRN, output);
-}
-
-static inline trit_array_t prng_key_trit_array(prng_t *const prng) {
-  trit_array_t key = {.trits = prng->key,
-                      .num_trits = MAM2_PRNG_KEY_SIZE,
-                      .num_bytes = MAM2_PRNG_KEY_FLEX_SIZE,
-                      .dynamic = 0};
-  return key;
-}
-
-/*
  * Public functions
  */
 
@@ -71,9 +49,16 @@ void prng_gen3(prng_t *const prng, uint8_t const dest,
   long_to_trits(dest, dest_trits);
   flex_trits_from_trits(dest_array.trits, 3, dest_trits, 3, 3);
 
-  trit_array_t input[5] = {prng_key_trit_array(prng), dest_array, *nonce1,
-                           *nonce2, *nonce3};
+  trit_array_t input[5] = {{.trits = prng->key,
+                            .num_trits = MAM2_PRNG_KEY_SIZE,
+                            .num_bytes = MAM2_PRNG_KEY_FLEX_SIZE,
+                            .dynamic = 0},
+                           dest_array,
+                           *nonce1,
+                           *nonce2,
+                           *nonce3};
 
-  prng_absorbn(prng->sponge, 5, (trit_array_t *)input);
-  prng_squeeze(prng->sponge, output);
+  sponge_init(prng->sponge);
+  sponge_absorbn_flex(prng->sponge, MAM2_SPONGE_CTL_KEY, 5, input);
+  sponge_squeeze_flex(prng->sponge, MAM2_SPONGE_CTL_PRN, output);
 }
