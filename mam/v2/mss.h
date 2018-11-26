@@ -195,7 +195,7 @@ void mss_gen(mss_t *mss, trit_array_p pk);
  * @param mss MSS interface
  * @param skn Encoded height and current private key number
  */
-void mss_skn(mss_t *mss, trits_t skn);
+void mss_skn(mss_t *mss, trit_array_p skn);
 
 /**
  * Encodes MSS authentication path

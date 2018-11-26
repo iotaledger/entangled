@@ -300,10 +300,11 @@ retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
       err_guard(!(trits_size(*msg) < msg_size), RC_MAM2_BUFFER_TOO_SMALL);
     b = msg;
 
-    if (cfg->ep)
-      mss_skn(cfg->ep->m, skn);
-    else
-      mss_skn(cfg->ch->m, skn);
+    if (cfg->ep) {
+      // mss_skn(cfg->ep->m, skn);
+    } else {
+      // mss_skn(cfg->ch->m, skn);
+    }
 
     // TODO Remove when mam handles flex_trits
     trits_t cfg_ch = mam2_channel_name(cfg->ch);
