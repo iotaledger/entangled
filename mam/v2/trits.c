@@ -103,14 +103,6 @@ void trits_put9(trits_t x, trint9_t t) {
   trits_put3(trits_drop(x, 6), t2);
 }
 
-trint18_t trits_get18(trits_t x) {
-  MAM2_ASSERT(x.n >= x.d + 18);
-
-  trint18_t t0 = (trint18_t)trits_get9(x);
-  trint18_t t1 = (trint18_t)trits_get9(trits_drop(x, 9));
-  return t0 + (trint18_t)19683 * t1;
-}
-
 void trits_set_zero(trits_t x) {
   for (; !trits_is_empty(x); x = trits_drop(x, 1)) trits_put1(x, 0);
 }

@@ -75,7 +75,7 @@ retcode_t pb3_decode_longtrint(trint18_t *t, trits_t *b) {
 
   if (trits_size(*b) < pb3_sizeof_longtrint()) return RC_MAM2_PB3_EOF;
 
-  *t = trits_get18(trits_take(*b, 18));
+  *t = trits_to_long(b->p + b->d, MAM2_MSS_SKN_SIZE);
   *b = trits_drop(*b, 18);
   return RC_OK;
 }
