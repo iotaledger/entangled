@@ -12,11 +12,10 @@
 #define __MAM_V2_MSS_H__
 
 #include "common/errors.h"
-#include "mam/v2/defs.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
+#include "mam/v2/trits.h"
 #include "mam/v2/wots.h"
-#include "trits.h"
 
 // Use Merkle tree traversal algorithm on MSS layer
 #define MAM2_MSS_TRAVERSAL

@@ -11,14 +11,12 @@
 #ifndef __MAM_V2_MAM2_H__
 #define __MAM_V2_MAM2_H__
 
-#include "mam/v2/defs.h"
 #include "mam/v2/list.h"
 #include "mam/v2/mss.h"
 #include "mam/v2/ntru.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
-#include "mam/v2/wots.h"
-#include "trits.h"
+#include "mam/v2/trits.h"
 
 typedef struct _mam2_ialloc {
   sponge_t *(*create_sponge)(); /*!< Allocator for sponge interfaces used by

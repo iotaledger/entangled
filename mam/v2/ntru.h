@@ -11,10 +11,8 @@
 #ifndef __MAM_V2_NTRU_H__
 #define __MAM_V2_NTRU_H__
 
-#include "mam/v2/defs.h"
 #include "mam/v2/prng.h"
-#include "mam/v2/sponge.h"
-#include "trits.h"
+#include "mam/v2/trits.h"
 
 /*! \brief NTRU public key - 3g(x)/(1+3f(x)) - size. */
 #define MAM2_NTRU_PK_SIZE 9216

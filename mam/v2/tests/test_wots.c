@@ -8,14 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <memory.h>
-#include <stdio.h>
-#include <string.h>
-
 #include <unity/unity.h>
 
-#include "mam/v2/mam.h"
-#include "mam/v2/mss.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
 #include "mam/v2/tests/common.h"

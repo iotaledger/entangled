@@ -8,9 +8,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/wots.h"
 #include <stdlib.h>
+
 #include "common/trinary/trit_long.h"
+#include "mam/v2/wots.h"
 
 /*
  * Private functions

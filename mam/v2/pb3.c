@@ -9,10 +9,8 @@
  */
 
 #include "mam/v2/pb3.h"
-
 #include "common/trinary/trit_long.h"
 #include "mam/v2/mss.h"
-#include "mam/v2/prng.h"
 
 /*
 Protobuf3 primitive types

@@ -12,8 +12,7 @@
 #define __MAM_V2_SPONGE_H__
 
 #include "common/trinary/trit_array.h"
-#include "mam/v2/defs.h"
-#include "trits.h"
+#include "mam/v2/trits.h"
 
 /*! \brief Sponge state rate. */
 #define MAM2_SPONGE_RATE 486

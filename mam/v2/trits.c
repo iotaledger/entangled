@@ -8,11 +8,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdlib.h>
+
 #include "mam/v2/trits.h"
-
-#include <memory.h>
-#include <stdio.h>
-
 #include "utils/macros.h"
 
 bool trits_is_empty(trits_t x) { return (x.n == x.d); }

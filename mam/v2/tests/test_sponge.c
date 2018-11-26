@@ -8,24 +8,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/buffers.h"
-#include "mam/v2/curl.h"
-#include "mam/v2/mam.h"
-#include "mam/v2/mss.h"
-#include "mam/v2/ntru.h"
-#include "mam/v2/pb3.h"
-#include "mam/v2/prng.h"
+#include <unity/unity.h>
+
 #include "mam/v2/sponge.h"
 #include "mam/v2/tests/common.h"
 #include "mam/v2/trits.h"
-#include "mam/v2/wots.h"
 #include "utils/macros.h"
-
-#include <string.h>
-#include <unity/unity.h>
-
-#include <memory.h>
-#include <stdio.h>
 
 static void sponge_test_hash(sponge_t *s) {
   MAM2_TRITS_DEF(X0, MAM2_SPONGE_RATE * 3);

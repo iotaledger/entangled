@@ -12,9 +12,8 @@
 #define __MAM_V2_PB3_H__
 
 #include "common/errors.h"
-#include "mam/v2/defs.h"
 #include "mam/v2/sponge.h"
-#include "trits.h"
+#include "mam/v2/trits.h"
 
 /*
 Protobuf3 primitive types
