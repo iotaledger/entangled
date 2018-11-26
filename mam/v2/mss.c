@@ -171,7 +171,7 @@ static void mss_mt_update(mss_t *mss, mss_mt_height_t d) {
   } else if (s->index <= MAM2_MSS_MAX_SKN(mss->height)) {
     // pk will be put on top of the stack
     wpk = mss_hash_idx(hs, s->stack_size);
-    TRIT_ARRAY_MAKE_FROM_RAW(wpk_array, MAM2_WOTS_PK_SIZE, wpk.p + wpk.d);
+    TRIT_ARRAY_DECLARE(wpk_array, MAM2_WOTS_PK_SIZE);
     mss_mt_gen_leaf(mss, s->index, &wpk_array);
     flex_trits_to_trits(wpk.p + wpk.d, MAM2_WOTS_PK_SIZE, wpk_array.trits,
                         MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
@@ -229,8 +229,9 @@ static trits_t mss_mt_node_t_trits(mss_t *m, trint6_t d, trint18_t i) {
 }
 #endif
 
-static void mss_fold_auth_path(
-    sponge_t *s,
+
+static void mss_fold_apath(
+        sponge_t *s,
     mss_mt_index_t skn, /*!< [in] corresponding WOTS sk number / leaf index */
     trit_array_p ap,    /*!< [in] authentication path - leaf to root */
     trit_array_p pk_recovered /*!< [in] recovered WOTS pk / start hash value;
@@ -571,10 +572,7 @@ bool_t mss_verify(sponge_t *ms, sponge_t *ws, trits_t H, trits_t sig,
   trits_dbg_print(pk);
   dbg_printf("\n*************\n");
 
-  return (0 == memcmp(pk->trits, apk.trits,
-                      trit_array_bytes_for_trits(MAM2_WOTS_PK_SIZE)))
-             ? 1
-             : 0;
+  return (0 == memcmp(pk->trits, apk.trits, MAM2_WOTS_PK_FLEX_SIZE)) ? 1 : 0;
 }
 
 void mss_destroy(mss_t *mss) {

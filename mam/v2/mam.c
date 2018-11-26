@@ -98,6 +98,7 @@ retcode_t mam2_channel_create(mam2_ialloc *ma, /*!< [in] Allocator. */
 
   do {
     err_bind(mam2_mss_create(ma, ch->m, p, d, ch_name, trits_null()));
+    // TODO - when this function is using trit_array_t - uncomment
     // mss_gen(ch->m, mam2_channel_id(ch));
 
     e = RC_OK;
@@ -725,8 +726,8 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
           *b = trits_drop(*b, n);
 
           // TODO: verify that signer is trusted
-          TRIT_ARRAY_MAKE_FROM_RAW(pk, mam2_recv_msg_cfg_epid(cfg).p,
-                                   MAM2_WOTS_PK_SIZE);
+          TRIT_ARRAY_MAKE_FROM_RAW(pk, MAM2_WOTS_PK_SIZE,
+                                   mam2_recv_msg_cfg_epid(cfg).p);
           if (2 == pubkey)
             // signed with ep
             mss_verify(cfg->ms, cfg->ws, H, sig, &pk);
@@ -891,7 +892,7 @@ retcode_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
 
       sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, H);
 
-      TRIT_ARRAY_MAKE_FROM_RAW(pk, cfg->pk.p, MAM2_WOTS_PK_SIZE);
+      TRIT_ARRAY_MAKE_FROM_RAW(pk, MAM2_WOTS_PK_SIZE, cfg->pk.p);
       // verify
       err_guard(mss_verify(cfg->ms, cfg->ws, H, sig, &pk), RC_MAM2_PB3_BAD_SIG);
     } else
