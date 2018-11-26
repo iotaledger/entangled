@@ -100,7 +100,7 @@ retcode_t mam2_channel_create(mam2_ialloc *ma, /*!< [in] Allocator. */
 
   do {
     err_bind(mam2_mss_create(ma, ch->m, p, d, ch_name, trits_null()));
-    // TODO - when this function is using trit_array_t - uncomment
+    // FIXME (@tsvisabo) - uncomment
     // mss_gen(ch->m, mam2_channel_id(ch));
 
     e = RC_OK;
@@ -142,6 +142,7 @@ retcode_t mam2_endpoint_create(mam2_ialloc *ma, /*!< [in] Allocator. */
 
   do {
     err_bind(mam2_mss_create(ma, ep->m, p, d, ch_name, ep_name));
+    // FIXME (@tsvisabo) - uncomment
     // mss_gen(ep->m, mam2_endpoint_id(ep));
 
     e = RC_OK;
@@ -302,6 +303,7 @@ retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
       err_guard(!(trits_size(*msg) < msg_size), RC_MAM2_BUFFER_TOO_SMALL);
     b = msg;
 
+    // FIXME (@tsvisabo) - uncomment
     if (cfg->ep) {
       // mss_skn(cfg->ep->m, skn);
     } else {
@@ -620,7 +622,7 @@ retcode_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
       *b = trits_drop(*b, n);
 
       // sign
-      // TODO - uncomment
+      // FIXME (@tsvisabo) - uncomment
       // mss_sign(cfg->m, H, sig);
     } else
       //    null none = 0;
@@ -738,6 +740,8 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
           // TODO: verify that signer is trusted
           TRIT_ARRAY_MAKE_FROM_RAW(pk, MAM2_WOTS_PK_SIZE,
                                    mam2_recv_msg_cfg_epid(cfg).p);
+
+          // FIXME (@tsvisabo) - uncomment
           if (2 == pubkey) {
             // signed with ep
             // mss_verify(cfg->ms, cfg->ws, H, sig, &pk);
@@ -904,7 +908,7 @@ retcode_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
 
       TRIT_ARRAY_MAKE_FROM_RAW(pk, MAM2_WOTS_PK_SIZE, cfg->pk.p);
       // verify
-      // TODO - uncomment
+      // FIXME (@tsvisabo) - uncomment
       // err_guard(mss_verify(cfg->ms, cfg->ws, H, sig, &pk),
       // RC_MAM2_PB3_BAD_SIG);
     } else
