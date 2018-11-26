@@ -17,6 +17,7 @@
 */
 #include "mam/v2/pb3.h"
 
+#include "common/trinary/trit_long.h"
 #include "mam/v2/mss.h"
 #include "mam/v2/prng.h"
 
@@ -65,7 +66,7 @@ size_t pb3_sizeof_longtrint() { return 18; }
 
 void pb3_encode_longtrint(trint18_t t, trits_t *b) {
   MAM2_ASSERT(b && !(trits_size(*b) < pb3_sizeof_longtrint()));
-  trits_put18(trits_take(*b, 18), t);
+  long_to_trits(t, b->p + b->d);
   *b = trits_drop(*b, 18);
 }
 

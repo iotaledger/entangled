@@ -213,7 +213,7 @@ void mss_auth_path(mss_t *mss, trint18_t i, trit_array_t *const auth_path);
  * @param hash Hash value to be signed
  * @param sig Signature
  */
-void mss_sign(mss_t *mss, trits_t hash, trits_t sig);
+void mss_sign(mss_t *mss, trit_array_p hash, trit_array_p sig);
 
 /**
  * Verifies MSS signature
@@ -225,8 +225,8 @@ void mss_sign(mss_t *mss, trits_t hash, trits_t sig);
  * @param pk public key (Merkle-tree root)
  */
 
-bool_t mss_verify(sponge_t *ms, sponge_t *ws, trits_t hash, trits_t sig,
-                  trit_array_p pk);
+bool_t mss_verify(sponge_t *ms, sponge_t *ws, trit_array_p hash,
+                  trit_array_p sig, trit_array_p pk);
 
 /**
  * Deallocate memory for internal Merkle tree structure

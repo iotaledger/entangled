@@ -402,10 +402,12 @@ retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
         *b = trits_drop(*b, n);
 
         // sign with ep
-        if (cfg->ep)
-          mss_sign(cfg->ep->m, H, sig);
-        else
-          mss_sign(cfg->ch->m, H, sig);
+        if (cfg->ep) {
+          // TODO - uncomment
+          // mss_sign(cfg->ep->m, H, sig);
+        } else {
+          // mss_sign(cfg->ch->m, H, sig);
+        }
       } else
         // empty sig = no sig
         pb3_encode_trytes(trits_null(), b);
@@ -612,7 +614,8 @@ retcode_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
       *b = trits_drop(*b, n);
 
       // sign
-      mss_sign(cfg->m, H, sig);
+      // TODO - uncomment
+      // mss_sign(cfg->m, H, sig);
     } else
       //    null none = 0;
       ;
@@ -729,12 +732,12 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
           // TODO: verify that signer is trusted
           TRIT_ARRAY_MAKE_FROM_RAW(pk, MAM2_WOTS_PK_SIZE,
                                    mam2_recv_msg_cfg_epid(cfg).p);
-          if (2 == pubkey)
+          if (2 == pubkey) {
             // signed with ep
-            mss_verify(cfg->ms, cfg->ws, H, sig, &pk);
-          else {
+            // mss_verify(cfg->ms, cfg->ws, H, sig, &pk);
+          } else {
             // signed with ch
-            mss_verify(cfg->ms, cfg->ws, H, sig, &pk);
+            // mss_verify(cfg->ms, cfg->ws, H, sig, &pk);
           }
           // TODO: record new channel/endpoint
         }
@@ -895,7 +898,9 @@ retcode_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
 
       TRIT_ARRAY_MAKE_FROM_RAW(pk, MAM2_WOTS_PK_SIZE, cfg->pk.p);
       // verify
-      err_guard(mss_verify(cfg->ms, cfg->ws, H, sig, &pk), RC_MAM2_PB3_BAD_SIG);
+      // TODO - uncomment
+      // err_guard(mss_verify(cfg->ms, cfg->ws, H, sig, &pk),
+      // RC_MAM2_PB3_BAD_SIG);
     } else
       //    null none = 0;
       ;
