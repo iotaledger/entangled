@@ -318,7 +318,7 @@ static retcode_t hash243_queue_to_json_array(hash243_queue_t queue,
     cJSON_AddItemToObject(json_root, obj_name, array_obj);
 
     CDL_FOREACH(queue, q_iter) {
-      trit_t trytes_out[NUM_TRYTES_HASH + 1];
+      tryte_t trytes_out[NUM_TRYTES_HASH + 1];
       size_t trits_count =
           flex_trits_to_trytes(trytes_out, NUM_TRYTES_HASH, q_iter->hash,
                                NUM_TRITS_HASH, NUM_TRITS_HASH);
@@ -404,7 +404,7 @@ static retcode_t hash81_queue_to_json_array(hash81_queue_t queue,
     cJSON_AddItemToObject(json_root, obj_name, array_obj);
 
     CDL_FOREACH(queue, q_iter) {
-      trit_t trytes_out[NUM_TRYTES_TAG + 1];
+      tryte_t trytes_out[NUM_TRYTES_TAG + 1];
       size_t trits_count =
           flex_trits_to_trytes(trytes_out, NUM_TRYTES_TAG, q_iter->hash,
                                NUM_TRITS_TAG, NUM_TRITS_TAG);
@@ -454,7 +454,7 @@ static retcode_t flex_trits_to_json_string(cJSON* const json_obj,
                                            size_t num_trits) {
   // flex to trytes;
   size_t len_trytes = num_trits / 3;
-  trit_t trytes_out[len_trytes + 1];
+  tryte_t trytes_out[len_trytes + 1];
   size_t trits_count =
       flex_trits_to_trytes(trytes_out, len_trytes, hash, num_trits, num_trits);
   trytes_out[len_trytes] = '\0';
@@ -500,7 +500,7 @@ static retcode_t hash8019_queue_to_json_array(hash8019_queue_t queue,
   size_t array_count = 0;
   cJSON* array_obj = NULL;
   hash8019_queue_entry_t* q_iter = NULL;
-  trit_t trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
+  tryte_t trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
   size_t trits_count = 0;
 
   array_count = hash8019_queue_count(&queue);
@@ -533,7 +533,7 @@ static retcode_t hash8019_stack_to_json_array(hash8019_stack_t stack,
   size_t array_count = 0;
   cJSON* array_obj = NULL;
   hash8019_stack_entry_t* s_iter = NULL;
-  trit_t trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
+  tryte_t trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
   size_t trits_count = 0;
 
   array_count = hash8019_stack_count(stack);
@@ -565,7 +565,7 @@ static retcode_t hash8019_array_to_json_array(hash8019_array_p array,
                                               char const* const obj_name) {
   size_t array_count = 0;
   cJSON* array_obj = NULL;
-  trit_t trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
+  tryte_t trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION + 1] = {};
   size_t trits_count = 0;
   flex_trit_t* elt = NULL;
 

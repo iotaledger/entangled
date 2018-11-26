@@ -325,7 +325,7 @@ retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
   // Milestones are being issued every ~2mins, and 1 minute delay for
   // propagating the network of nodes.
   uint64_t max_depth = (6 * 2 - 1) * (60 * 1000);
-  log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+
   hash243_queue_push(&consistency_req->hashes, tail_tx);
   *out_promotable = false;
   ret_code =
@@ -363,6 +363,7 @@ retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
 done:
   check_consistency_req_free(&consistency_req);
   check_consistency_res_free(consistency_res);
+  get_trytes_res_free(&out_trytes);
   return ret_code;
 }
 
