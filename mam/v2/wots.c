@@ -16,7 +16,7 @@
  * Private functions
  */
 
-static void wots_calc_pks(isponge *const sponge, trit_array_p sk_pks,
+static void wots_calc_pks(sponge_t *const sponge, trit_array_p sk_pks,
                           trit_array_p pk) {
   size_t i, j;
 
@@ -38,7 +38,7 @@ static void wots_calc_pks(isponge *const sponge, trit_array_p sk_pks,
   sponge_hash_flex(sponge, sk_pks, pk);
 }
 
-static void wots_hash_sign(isponge *const sponge, trit_array_p sk_sig,
+static void wots_hash_sign(sponge_t *const sponge, trit_array_p sk_sig,
                            trit_array_p const hash) {
   size_t i, j;
   trint9_t t = 0;
@@ -84,7 +84,7 @@ static void wots_hash_sign(isponge *const sponge, trit_array_p sk_sig,
   }
 }
 
-static void wots_hash_verify(isponge *const sponge, trit_array_p sig_pks,
+static void wots_hash_verify(sponge_t *const sponge, trit_array_p sig_pks,
                              trit_array_p const hash) {
   size_t i, j;
   trint9_t t = 0;
@@ -135,7 +135,7 @@ static void wots_hash_verify(isponge *const sponge, trit_array_p sig_pks,
  * Public functions
  */
 
-void wots_init(wots_t *const wots, isponge *const sponge) {
+void wots_init(wots_t *const wots, sponge_t *const sponge) {
   MAM2_ASSERT(wots);
   MAM2_ASSERT(sponge);
   wots->sponge = sponge;
@@ -181,14 +181,14 @@ void wots_sign(wots_t *const wots, trit_array_p const hash, trit_array_p sig) {
   wots_hash_sign(wots->sponge, sig, hash);
 }
 
-void wots_recover(isponge *const sponge, trit_array_p const hash,
+void wots_recover(sponge_t *const sponge, trit_array_p const hash,
                   trit_array_p const sig, trit_array_p pk) {
   MAM2_ASSERT(pk->num_trits == MAM2_WOTS_PK_SIZE);
   wots_hash_verify(sponge, sig, hash);
   sponge_hash_flex(sponge, sig, pk);
 }
 
-bool wots_verify(isponge *const sponge, trit_array_p const hash,
+bool wots_verify(sponge_t *const sponge, trit_array_p const hash,
                  trit_array_p const sig, trit_array_p const pk) {
   TRIT_ARRAY_DECLARE(pk_array, MAM2_WOTS_PK_SIZE);
   wots_recover(sponge, hash, sig, &pk_array);

@@ -18,7 +18,7 @@
 
 /*!< [in] hash values of left and right child nodes */
 /*!< [out] hash value of their parent */
-static void mss_mt_hash2(isponge *sponge, trits_t h[2], trits_t h01) {
+static void mss_mt_hash2(sponge_t *sponge, trits_t h[2], trits_t h01) {
   dbg_printf("\nleft  \t");
   trits_dbg_print(h[0]);
   dbg_printf("\nright \t");
@@ -215,7 +215,7 @@ static trits_t mss_mt_node_t_trits(mss_t *m, trint6_t d, trint18_t i) {
 #endif
 
 static void mss_fold_auth_path(
-    isponge *s,
+    sponge_t *s,
     mss_mt_index_t skn, /*!< [in] corresponding WOTS sk number / leaf index */
     trit_array_t
         *const auth_path, /*!< [in] authentication path - leaf to root */
@@ -284,7 +284,7 @@ retcode_t mss_create(mss_t *mss, mss_mt_height_t d) {
   return e;
 }
 
-void mss_init(mss_t *const mss, prng_t *const prng, isponge *const sponge,
+void mss_init(mss_t *const mss, prng_t *const prng, sponge_t *const sponge,
               wots_t *const wots, mss_mt_height_t const height,
               trits_t const nonce1, trits_t const nonce2) {
   MAM2_ASSERT(mss);
@@ -506,7 +506,7 @@ bool_t mss_next(mss_t *mss) {
   return 1;
 }
 
-bool_t mss_verify(isponge *ms, isponge *ws, trits_t H, trits_t sig,
+bool_t mss_verify(sponge_t *ms, sponge_t *ws, trits_t H, trits_t sig,
                   trits_t pk) {
   trint6_t d;
   trint18_t skn;

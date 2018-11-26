@@ -26,16 +26,16 @@
 #include <memory.h>
 #include <stdio.h>
 
-static isponge *test_create_sponge() {
+static sponge_t *test_create_sponge() {
   test_sponge_t *t = malloc(sizeof(test_sponge_t));
   return test_sponge_init(t);
 }
 
-static void test_delete_sponge(isponge *s) { free((test_sponge_t *)s); }
+static void test_delete_sponge(sponge_t *s) { free((test_sponge_t *)s); }
 
-void mam_test_do(isponge *s, void *sponge_alloc_ctx,
-                 isponge *(create_sponge)(void *ctx),
-                 void (*destroy_sponge)(void *ctx, isponge *), prng_t *pa,
+void mam_test_do(sponge_t *s, void *sponge_alloc_ctx,
+                 sponge_t *(create_sponge)(void *ctx),
+                 void (*destroy_sponge)(void *ctx, sponge_t *), prng_t *pa,
                  prng_t *pb) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
@@ -125,7 +125,7 @@ void mam_test() {
   test_mss4 _m4[1];
   test_mss _m[1];
 
-  isponge *s = test_sponge_init(_s);
+  sponge_t *s = test_sponge_init(_s);
   prng_t *p = test_prng_init(_p, s);
   prng_t *pa = test_prng_init(_pa, s);
   prng_t *pb = test_prng_init(_pb, s);

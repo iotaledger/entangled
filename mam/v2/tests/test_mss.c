@@ -29,7 +29,7 @@
 #include <memory.h>
 #include <stdio.h>
 
-void mss_test_do(mss_t *m, prng_t *p, isponge *s, wots_t *w,
+void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
                  mss_mt_height_t D) {
   bool_t r = 1;
   flex_trit_t key[FLEX_TRIT_SIZE_243];
@@ -127,7 +127,7 @@ void mss_test() {
   test_mss4 _m4[1];
   test_mss _m[1];
 
-  isponge *s = test_sponge_init(_s);
+  sponge_t *s = test_sponge_init(_s);
   prng_t *p = test_prng_init(_p, s);
   wots_t *w = test_wots_init(_w, s);
   mss_t *m1 = test_mss_init1(_m1);

@@ -273,8 +273,8 @@ static trits_t mam2_send_msg_cfg_key(mam2_send_msg_context *cfg) {
 retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
-  isponge *s;
-  isponge *fork;
+  sponge_t *s;
+  sponge_t *fork;
   trits_t b0, *b;
 
   MAM2_TRITS_DEF(skn, MAM2_MSS_SKN_SIZE);
@@ -556,7 +556,7 @@ size_t mam2_send_packet_size(mam2_send_packet_context *cfg,
 retcode_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
                            trits_t *packet) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  isponge *s;
+  sponge_t *s;
   trits_t b0, *b = packet;
 
   MAM2_ASSERT(cfg);
@@ -656,8 +656,8 @@ static trits_t mam2_recv_msg_cfg_ntru_id(mam2_recv_msg_context *cfg) {
 retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
-  isponge *s;
-  isponge *fork;
+  sponge_t *s;
+  sponge_t *fork;
   trits_t b0, *b;
 
   MAM2_ASSERT(cfg);
@@ -837,7 +837,7 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
 retcode_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
                            trits_t *payload) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  isponge *s;
+  sponge_t *s;
   trits_t b0, *b = packet;
 
   MAM2_ASSERT(cfg);

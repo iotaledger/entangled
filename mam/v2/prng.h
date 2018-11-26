@@ -27,7 +27,7 @@
 
 // PRNG interface
 typedef struct prng_s {
-  isponge *sponge;
+  sponge_t *sponge;
   flex_trit_t key[MAM2_PRNG_KEY_FLEX_SIZE];
 } prng_t;
 
@@ -38,7 +38,7 @@ typedef struct prng_s {
  * @param sponge Sponge interface
  * @param key Key of size MAM2_PRNG_KEY_SIZE
  */
-void prng_init(prng_t *const prng, isponge *const sponge,
+void prng_init(prng_t *const prng, sponge_t *const sponge,
                flex_trit_t const *const key);
 
 /**

@@ -15,13 +15,13 @@
  * Private functions
  */
 
-static inline void prng_absorbn(isponge *const s, size_t const n,
+static inline void prng_absorbn(sponge_t *const s, size_t const n,
                                 trit_array_t const *const input) {
   sponge_init(s);
   sponge_absorbn_flex(s, MAM2_SPONGE_CTL_KEY, n, input);
 }
 
-static inline void prng_squeeze(isponge *const s, trit_array_t *const output) {
+static inline void prng_squeeze(sponge_t *const s, trit_array_t *const output) {
   sponge_squeeze_flex(s, MAM2_SPONGE_CTL_PRN, output);
 }
 
@@ -37,7 +37,7 @@ static inline trit_array_t prng_key_trit_array(prng_t *const prng) {
  * Public functions
  */
 
-void prng_init(prng_t *const prng, isponge *const sponge,
+void prng_init(prng_t *const prng, sponge_t *const sponge,
                flex_trit_t const *const key) {
   prng->sponge = sponge;
   memcpy(prng->key, key, MAM2_PRNG_KEY_FLEX_SIZE);
