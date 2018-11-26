@@ -44,7 +44,7 @@ typedef struct _mam2_channel {
   chid_t id;  /*!< MSS public key. */
 } mam2_channel;
 trits_t mam2_channel_id(mam2_channel *ch);
-trits_t mam2_channel_name(mam2_channel *ch);
+trit_array_t mam2_channel_name(mam2_channel *ch);
 
 def_mam2_list_node(mam2_channel, mam2_channel_node);
 def_mam2_list(mam2_channel_node, mam2_channel_list);
@@ -82,8 +82,8 @@ typedef struct _mam2_endpoint {
   epid_t id;  /*!< MSS public key. */
 } mam2_endpoint;
 trits_t mam2_endpoint_id(mam2_endpoint *ep);
-trits_t mam2_endpoint_chname(mam2_endpoint *ep);
-trits_t mam2_endpoint_name(mam2_endpoint *ep);
+trit_array_t mam2_endpoint_chname(mam2_endpoint *ep);
+trit_array_t mam2_endpoint_name(mam2_endpoint *ep);
 
 def_mam2_list_node(mam2_endpoint, mam2_endpoint_node);
 def_mam2_list(mam2_endpoint_node, mam2_endpoint_list);

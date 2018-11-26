@@ -122,8 +122,8 @@ typedef struct mss_s {
   trit_t *merkle_tree;  // Buffer storing complete Merkle-tree
 #endif
   // Nonce = `nonce1`||`nonce2`, stored pointers only, NOT copies
-  trits_t nonce1;
-  trits_t nonce2;
+  trit_array_t nonce1;
+  trit_array_t nonce2;
 } mss_t;
 
 #if defined(MAM2_MSS_TRAVERSAL)
@@ -179,7 +179,7 @@ retcode_t mss_create(mss_t *mss, mss_mt_height_t height);
  */
 void mss_init(mss_t *const mss, prng_t *const prng, sponge_t *const sponge,
               wots_t *const wots, mss_mt_height_t const height,
-              trits_t const nonce1, trits_t const nonce2);
+              trit_array_p const nonce1, trit_array_p const nonce2);
 
 /**
  * Generates MSS keys

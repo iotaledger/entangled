@@ -37,7 +37,6 @@ void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
   // TODO Remove when sponge handles flex_trit_t
   MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
   mss_mt_height_t d;
-  MAM2_TRITS_DEF(nonce, 24);
 
   TRIT_ARRAY_DECLARE(sig_array, MAM2_MSS_SIG_SIZE(mt_height));
 
@@ -49,7 +48,9 @@ void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
   flex_trits_from_trytes(key, MAM2_PRNG_KEY_SIZE, key_trytes, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
   prng_init(p, p->sponge, key);
-  trits_set_zero(nonce);
+  TRIT_ARRAY_DECLARE(nonce, 24);
+  TRIT_ARRAY_DECLARE(nonce_null, 0);
+
   const char *h_str =
       "ABCNKOZWYSDF9OABCNKOZWYSDF9"
       "ABCNKOZWYSDF9QABCNKOZWYSDF9"
@@ -83,7 +84,7 @@ void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
 
     dbg_printf("========================\nmt_height = %d\n", d);
 
-    mss_init(m, p, s, w, d, nonce, trits_null());
+    mss_init(m, p, s, w, d, &nonce, &nonce_null);
     TRIT_ARRAY_DECLARE(pk, MAM2_WOTS_PK_SIZE);
     mss_gen(m, &pk);
 

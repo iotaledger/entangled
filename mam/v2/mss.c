@@ -39,13 +39,8 @@ static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trit_array_p pk) {
   trit_t nonce_i[MAM2_MSS_SKN_SIZE];
   memset(nonce_i, 0, MAM2_MSS_SKN_SIZE);
   long_to_trits(index, nonce_i);
-  // TODO Remove when mss handles flex_trits
-  TRIT_ARRAY_MAKE_FROM_RAW(nonce1, mss->nonce1.n - mss->nonce1.d,
-                           mss->nonce1.p + mss->nonce1.d);
-  TRIT_ARRAY_MAKE_FROM_RAW(nonce2, mss->nonce2.n - mss->nonce2.d,
-                           mss->nonce2.p + mss->nonce2.d);
   TRIT_ARRAY_MAKE_FROM_RAW(noncei, MAM2_MSS_SKN_SIZE, nonce_i);
-  wots_gen_sk3(mss->wots, mss->prng, &nonce1, &nonce2, &noncei);
+  wots_gen_sk3(mss->wots, mss->prng, &mss->nonce1, &mss->nonce2, &noncei);
   // calc pk & push hash
   wots_calc_pk(mss->wots, pk);
 
@@ -268,7 +263,7 @@ retcode_t mss_create(mss_t *mss, mss_mt_height_t d) {
 
 void mss_init(mss_t *const mss, prng_t *const prng, sponge_t *const sponge,
               wots_t *const wots, mss_mt_height_t const height,
-              trits_t const nonce1, trits_t const nonce2) {
+              trit_array_p const nonce1, trit_array_p const nonce2) {
   MAM2_ASSERT(mss);
   MAM2_ASSERT(prng);
   MAM2_ASSERT(0 <= height && height <= MAM2_MSS_MAX_HEIGHT);
@@ -278,8 +273,8 @@ void mss_init(mss_t *const mss, prng_t *const prng, sponge_t *const sponge,
   mss->prng = prng;
   mss->sponge = sponge;
   mss->wots = wots;
-  mss->nonce1 = nonce1;
-  mss->nonce2 = nonce2;
+  trit_array_set_trits(&mss->nonce1, nonce1->trits, nonce1->num_trits);
+  trit_array_set_trits(&mss->nonce2, nonce2->trits, nonce2->num_trits);
 #if defined(MAM2_MSS_TRAVERSAL)
   mss_mt_init(mss);
 #endif
@@ -444,13 +439,8 @@ void mss_sign(mss_t *mss, trit_array_p hash, trit_array_p sig) {
     trit_t nonce_i[MAM2_MSS_SKN_SIZE];
     memset(nonce_i, 0, MAM2_MSS_SKN_SIZE);
     long_to_trits(mss->skn, nonce_i);
-    // TODO Remove when mss handles flex_trits
-    TRIT_ARRAY_MAKE_FROM_RAW(nonce1, mss->nonce1.n - mss->nonce1.d,
-                             mss->nonce1.p + mss->nonce1.d);
-    TRIT_ARRAY_MAKE_FROM_RAW(nonce2, mss->nonce2.n - mss->nonce2.d,
-                             mss->nonce2.p + mss->nonce2.d);
     TRIT_ARRAY_MAKE_FROM_RAW(noncei, MAM2_MSS_SKN_SIZE, nonce_i);
-    wots_gen_sk3(mss->wots, mss->prng, &nonce1, &nonce2, &noncei);
+    wots_gen_sk3(mss->wots, mss->prng, &mss->nonce1, &mss->nonce2, &noncei);
   }
 
   TRIT_ARRAY_DECLARE(sk_sig_array, MAM2_WOTS_SK_SIZE);

@@ -23,16 +23,20 @@ retcode_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
   do {
     err_bind(mss_create(m, d));
 
-    m->nonce1 = trits_null();
+    TRIT_ARRAY_DECLARE(nonce_null_1, 0);
+    m->nonce1 = nonce_null_1;
     if (!trits_is_empty(nonce1)) {
-      m->nonce1 = trits_alloc(trits_size(nonce1));
-      err_guard(!trits_is_null(m->nonce1), RC_OOM);
+      TRIT_ARRAY_MAKE_FROM_RAW(n1, nonce1.n - nonce1.d, nonce1.p + nonce1.d);
+      m->nonce1 = n1;
+      err_guard(m->nonce1.num_trits > 0, RC_OOM);
     }
 
-    m->nonce2 = trits_null();
+    TRIT_ARRAY_DECLARE(nonce_null_2, 0);
+    m->nonce2 = nonce_null_2;
     if (!trits_is_empty(nonce2)) {
-      m->nonce2 = trits_alloc(trits_size(nonce2));
-      err_guard(!trits_is_null(m->nonce2), RC_OOM);
+      TRIT_ARRAY_MAKE_FROM_RAW(n2, nonce2.n - nonce2.d, nonce2.p + nonce2.d);
+      m->nonce2 = n2;
+      err_guard(m->nonce2.num_trits > 0, RC_OOM);
     }
 
     m->sponge = ma->create_sponge();
@@ -46,7 +50,8 @@ retcode_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
     err_guard(m->wots->sponge, RC_OOM);
     wots_init(m->wots, m->wots->sponge);
 
-    mss_init(m, p, m->sponge, m->wots, d, m->nonce1, m->nonce2);
+    // FIXME (tsvisabo) - uncomment
+    // mss_init(m, p, m->sponge, m->wots, d, m->nonce1, m->nonce2);
 
     e = RC_OK;
   } while (0);
@@ -59,9 +64,6 @@ void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m) {
   MAM2_ASSERT(m);
 
   m->prng = NULL;
-
-  trits_free(m->nonce1);
-  trits_free(m->nonce2);
 
   if (m->wots) {
     ma->destroy_sponge(m->wots->sponge);
@@ -79,7 +81,7 @@ void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m) {
 trits_t mam2_channel_id(mam2_channel *ch) {
   return trits_from_rep(MAM2_CHANNEL_ID_SIZE, ch->id);
 }
-trits_t mam2_channel_name(mam2_channel *ch) { return ch->m->nonce1; }
+trit_array_t mam2_channel_name(mam2_channel *ch) { return ch->m->nonce1; }
 static size_t mam2_channel_sig_size(mam2_channel *ch) {
   return MAM2_MSS_SIG_SIZE(ch->m->height);
 }
@@ -119,8 +121,8 @@ void mam2_channel_destroy(mam2_ialloc *ma, /*!< [in] Allocator. */
 trits_t mam2_endpoint_id(mam2_endpoint *ep) {
   return trits_from_rep(MAM2_ENDPOINT_ID_SIZE, ep->id);
 }
-trits_t mam2_endpoint_chname(mam2_endpoint *ep) { return ep->m->nonce1; }
-trits_t mam2_endpoint_name(mam2_endpoint *ep) { return ep->m->nonce2; }
+trit_array_t mam2_endpoint_chname(mam2_endpoint *ep) { return ep->m->nonce1; }
+trit_array_t mam2_endpoint_name(mam2_endpoint *ep) { return ep->m->nonce2; }
 static size_t mam2_endpoint_sig_size(mam2_endpoint *ep) {
   return MAM2_MSS_SIG_SIZE(ep->m->height);
 }
@@ -307,10 +309,14 @@ retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
     }
 
     // TODO Remove when mam handles flex_trits
-    trits_t cfg_ch = mam2_channel_name(cfg->ch);
-    TRIT_ARRAY_MAKE_FROM_RAW(ch, cfg_ch.n - cfg_ch.d, cfg_ch.p + cfg_ch.d);
-    trits_t cfg_ep = cfg->ep ? mam2_endpoint_name(cfg->ep) : trits_null();
-    TRIT_ARRAY_MAKE_FROM_RAW(ep, cfg_ep.n - cfg_ep.d, cfg_ep.p + cfg_ep.d);
+    trit_array_t ch = mam2_channel_name(cfg->ch);
+    trit_array_t ep;
+    if (cfg->ep) {
+      ep = mam2_endpoint_name(cfg->ep);
+    } else {
+      ep.num_trits = 0;
+      ep.trits = 0;
+    }
     TRIT_ARRAY_MAKE_FROM_RAW(skn_trits, skn.n - skn.d, skn.p + skn.d);
     TRIT_ARRAY_DECLARE(cfg_key_array, MAM2_SPONGE_KEY_SIZE);
     trits_t cfg_key_trits = mam2_send_msg_cfg_key(cfg);
