@@ -74,7 +74,7 @@ static void mss_mt_init(mss_t *mss) {
   for (d = 0; d < mss->height; d++, s++) {
     s->height = d;
     s->index = 0;
-    s->stack_size = 0;
+    s->size = 0;
   }
 }
 
@@ -90,18 +90,17 @@ static void mss_mt_update(mss_t *mss, mss_mt_height_t d) {
   trit_t *hs = mss->hashes + MAM2_MSS_MT_HASH_WORDS(d, 0);
 
   // finished?
-  if ((0 != s->stack_size) && (ns[s->stack_size - 1].height >= s->height))
-    return;
+  if ((0 != s->size) && (ns[s->size - 1].height >= s->height)) return;
 
   trit_array_t hashes_pack[2];
   TRIT_ARRAY_DECLARE(hash, MAM2_MSS_MT_HASH_SIZE);
   // can merge (top 2 nodes have the same height)?
-  if (s->stack_size > 1 && (ns[s->stack_size - 2].height ==
-                            ns[s->stack_size - 1].height)) {  // merge
+  if (s->size > 1 &&
+      (ns[s->size - 2].height == ns[s->size - 1].height)) {  // merge
     // pop the right node
-    h[1] = mss_hash_idx(hs, --s->stack_size);
+    h[1] = mss_hash_idx(hs, --s->size);
     // pop the left node
-    h[0] = mss_hash_idx(hs, --s->stack_size);
+    h[0] = mss_hash_idx(hs, --s->size);
 
     TRIT_ARRAY_MAKE_FROM_RAW(h_el1, MAM2_MSS_MT_HASH_SIZE, h[0].p + h[0].d);
     TRIT_ARRAY_MAKE_FROM_RAW(h_el2, MAM2_MSS_MT_HASH_SIZE, h[1].p + h[1].d);
@@ -111,9 +110,8 @@ static void mss_mt_update(mss_t *mss, mss_mt_height_t d) {
     // dirty hack: at the last level do not overwrite
     // left hash value, but instead right;
     // left hash value is needed for MTT algorithm
-    dbg_printf("mt  d=%d i=%d\t", ns[s->stack_size].height,
-               ns[s->stack_size].index);
-    trits_t h_res = h[ns[s->stack_size].height + 1 != mss->height ? 0 : 1];
+    dbg_printf("mt  d=%d i=%d\t", ns[s->size].height, ns[s->size].index);
+    trits_t h_res = h[ns[s->size].height + 1 != mss->height ? 0 : 1];
 
     mss_mt_hash2(mss->sponge, hashes_pack, &hash);
     flex_trits_to_trits(h_res.p + h_res.d, MAM2_MSS_MT_HASH_SIZE, hash.trits,
@@ -121,14 +119,14 @@ static void mss_mt_update(mss_t *mss, mss_mt_height_t d) {
 
     // push parent into stack
     // parent is one level up
-    ns[s->stack_size].height += 1;
+    ns[s->size].height += 1;
     // parent's index
-    ns[s->stack_size].index /= 2;
+    ns[s->size].index /= 2;
     // adjust stack size
-    s->stack_size++;
+    s->size++;
   } else if (s->index <= MAM2_MSS_MAX_SKN(mss->height)) {
     // pk will be put on top of the stack
-    wpk = mss_hash_idx(hs, s->stack_size);
+    wpk = mss_hash_idx(hs, s->size);
     TRIT_ARRAY_DECLARE(wpk_array, MAM2_WOTS_PK_SIZE);
     mss_mt_gen_leaf(mss, s->index, &wpk_array);
     flex_trits_to_trits(wpk.p + wpk.d, MAM2_WOTS_PK_SIZE, wpk_array.trits,
@@ -136,11 +134,11 @@ static void mss_mt_update(mss_t *mss, mss_mt_height_t d) {
 
     // push leaf into stack
     // leaf has level `0`
-    ns[s->stack_size].height = 0;
+    ns[s->size].height = 0;
     // leaf's index
-    ns[s->stack_size].index = s->index;
+    ns[s->size].index = s->index;
     // increase stack size
-    s->stack_size++;
+    s->size++;
     // increment leaf index (skn)
     s->index++;
   }
@@ -156,8 +154,8 @@ static void mss_mt_refresh(mss_t *mss) {
     if ((mss->skn + 1) % dd != 0) break;
 
     s = mss->stacks + d;
-    MAM2_ASSERT(s->stack_size == 1);
-    trits_t hs_node = mss_mt_hs_trits(mss, d, s->stack_size - 1);
+    MAM2_ASSERT(s->size == 1);
+    trits_t hs_node = mss_mt_hs_trits(mss, d, s->size - 1);
     TRIT_ARRAY_DECLARE(auth_node, MAM2_MSS_MT_HASH_SIZE);
     // TODO remove when hs are flex_trits
     flex_trits_from_trits(auth_node.trits, MAM2_MSS_MT_HASH_SIZE, hs_node.p,
@@ -166,7 +164,7 @@ static void mss_mt_refresh(mss_t *mss) {
 
     s->index = (mss->skn + 1 + dd) ^ dd;
     s->height = d;
-    s->stack_size = 0;
+    s->size = 0;
   }
 }
 
@@ -294,7 +292,7 @@ void mss_gen(mss_t *mss, trit_array_p pk) {
   // start leaf index (skn) is `0`
   s->index = 0;
   // empty stack
-  s->stack_size = 0;
+  s->size = 0;
 
   if (0 == mss->height) {
     mss_mt_gen_leaf(mss, 0, pk);
@@ -304,23 +302,23 @@ void mss_gen(mss_t *mss, trit_array_p pk) {
       mss_mt_update(mss, d);
 
       // top node
-      n = &ns[s->stack_size - 1];
+      n = &ns[s->size - 1];
       // is it root?
       if (n->height == mss->height) {  // done
         // copy pk, it is stored outside of stack due to dirty hack
-        trits_t h = mss_hash_idx(hs, s->stack_size);
+        trits_t h = mss_hash_idx(hs, s->size);
         flex_trits_from_trits(pk->trits, MAM2_WOTS_PK_SIZE, h.p + h.d,
                               MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
         // init stack
         s->height = mss->height - 1;
         s->index = 0;
-        s->stack_size = 1;
+        s->size = 1;
         break;
       }
 
       // is it current apath node?
       if (n->index == 1) {  // add to `ap`
-        trits_t h = mss_hash_idx(hs, s->stack_size - 1);
+        trits_t h = mss_hash_idx(hs, s->size - 1);
         TRIT_ARRAY_DECLARE(auth_node, MAM2_MSS_MT_HASH_SIZE);
         // TODO remove when hs are flex_trits
         flex_trits_from_trits(auth_node.trits, MAM2_MSS_MT_HASH_SIZE, h.p,
@@ -336,17 +334,17 @@ void mss_gen(mss_t *mss, trit_array_p pk) {
         // stack `n->height` nodes
         mss_mt_node_t *nsd = mss->nodes + MAM2_MSS_MT_NODES(n->height);
         // node `n` hash
-        trits_t h = mss_hash_idx(hs, s->stack_size - 1);
+        trits_t h = mss_hash_idx(hs, s->size - 1);
         // stack `n->height` first node hash
         trits_t hd = mss_mt_hs_trits(mss, n->height, 0);
 
-        MAM2_ASSERT(0 == sd->stack_size);
+        MAM2_ASSERT(0 == sd->size);
         // copy hash
         trits_copy(h, hd);
         // copy node
         nsd[0] = *n;
         // increase size
-        sd->stack_size++;
+        sd->size++;
       }
     }
 

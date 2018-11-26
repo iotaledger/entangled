@@ -87,7 +87,7 @@ typedef struct mss_mt_node_s {
 typedef struct mss_mt_stack_s {
   mss_mt_height_t height;
   mss_mt_index_t index;
-  size_t stack_size;
+  size_t size;
 } mss_mt_stack_t;
 
 // Number of auxiliary stacks used by tree-traversal algorithm
