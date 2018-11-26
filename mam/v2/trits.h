@@ -76,12 +76,8 @@ trint3_t trits_get3(trits_t x);
 /*! \brief Put the first tryte. */
 void trits_put3(trits_t x, trint3_t t);
 
-trint6_t trits_get6(trits_t x);
-void trits_put6(trits_t x, trint6_t t);
 trint9_t trits_get9(trits_t x);
 void trits_put9(trits_t x, trint9_t t);
-trint18_t trits_get18(trits_t x);
-void trits_put18(trits_t x, trint18_t t);
 
 /*! \brief Convert trytes from string.
 \note `trits_size(x)` must be multiple of 3.

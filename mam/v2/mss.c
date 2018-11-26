@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 
+#include "common/trinary/trit_long.h"
 #include "mam/v2/mss.h"
 
 /*
@@ -34,16 +35,11 @@ static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trit_array_p pk) {
   trits_set_zero(pk);
   trits_put18(pk, index);
 #else
-  MAM2_TRITS_DEF(Ni, 18);
   // gen sk from current leaf index
-  trits_put18(Ni, index);
-  // TODO Remove when mss handles flex_trits
-  TRIT_ARRAY_MAKE_FROM_RAW(nonce1, mss->nonce1.n - mss->nonce1.d,
-                           mss->nonce1.p + mss->nonce1.d);
-  TRIT_ARRAY_MAKE_FROM_RAW(nonce2, mss->nonce2.n - mss->nonce2.d,
-                           mss->nonce2.p + mss->nonce2.d);
-  TRIT_ARRAY_MAKE_FROM_RAW(noncei, Ni.n - Ni.d, Ni.p + Ni.d);
-  wots_gen_sk3(mss->wots, mss->prng, &nonce1, &nonce2, &noncei);
+  trit_t nonce_i[MAM2_MSS_SKN_SIZE] = {0};
+  long_to_trits(index, nonce_i);
+  TRIT_ARRAY_MAKE_FROM_RAW(noncei, MAM2_MSS_SKN_SIZE, nonce_i);
+  wots_gen_sk3(mss->wots, mss->prng, &mss->nonce1, &mss->nonce2, &noncei);
   // calc pk & push hash
   wots_calc_pk(mss->wots, pk);
 
@@ -266,7 +262,7 @@ retcode_t mss_create(mss_t *mss, mss_mt_height_t d) {
 
 void mss_init(mss_t *const mss, prng_t *const prng, sponge_t *const sponge,
               wots_t *const wots, mss_mt_height_t const height,
-              trits_t const nonce1, trits_t const nonce2) {
+              trit_array_p const nonce1, trit_array_p const nonce2) {
   MAM2_ASSERT(mss);
   MAM2_ASSERT(prng);
   MAM2_ASSERT(0 <= height && height <= MAM2_MSS_MAX_HEIGHT);
@@ -276,8 +272,10 @@ void mss_init(mss_t *const mss, prng_t *const prng, sponge_t *const sponge,
   mss->prng = prng;
   mss->sponge = sponge;
   mss->wots = wots;
-  mss->nonce1 = nonce1;
-  mss->nonce2 = nonce2;
+  mss->nonce1.dynamic = 0;
+  mss->nonce2.dynamic = 0;
+  trit_array_set_trits(&mss->nonce1, nonce1->trits, nonce1->num_trits);
+  trit_array_set_trits(&mss->nonce2, nonce2->trits, nonce2->num_trits);
 #if defined(MAM2_MSS_TRAVERSAL)
   mss_mt_init(mss);
 #endif
@@ -380,17 +378,12 @@ void mss_gen(mss_t *mss, trit_array_p pk) {
 #endif
 }
 
-void mss_skn(mss_t *mss, trits_t skn) {
-  MAM2_TRITS_DEF(ts, 18);
-
-  MAM2_ASSERT(trits_size(skn) == MAM2_MSS_SKN_SIZE);
-
-  trits_put6(ts, mss->height);
-  trits_copy(trits_take(ts, 4), trits_take(skn, 4));
-
-  trits_put18(ts, mss->skn);
-  trits_copy(trits_take(ts, 14), trits_drop(skn, 4));
-
+void mss_skn(mss_t *mss, trit_array_p skn) {
+  trit_t ts[MAM2_MSS_SKN_SIZE] = {0};
+  long_to_trits(mss->height, ts);
+  long_to_trits(mss->skn, &ts[4]);
+  flex_trits_from_trits(skn->trits, MAM2_MSS_SKN_SIZE, ts, MAM2_MSS_SKN_SIZE,
+                        MAM2_MSS_SKN_SIZE);
   dbg_printf("skn\n");
   trits_dbg_print(skn);
   dbg_printf("\n");
@@ -433,44 +426,37 @@ void mss_auth_path(mss_t *mss, trint18_t i, trit_array_t *const auth_path) {
   }
 }
 
-void mss_sign(mss_t *mss, trits_t hash, trits_t sig) {
-  MAM2_ASSERT(trits_size(sig) == MAM2_MSS_SIG_SIZE(mss->height));
+void mss_sign(mss_t *mss, trit_array_p hash, trit_array_p sig) {
+  MAM2_ASSERT(sig->num_trits == MAM2_MSS_SIG_SIZE(mss->height));
 
   dbg_printf("mss sign skn=%d\n", mss->skn);
-  mss_skn(mss, trits_take(sig, MAM2_MSS_SKN_SIZE));
-  sig = trits_drop(sig, MAM2_MSS_SKN_SIZE);
-
+  mss_skn(mss, sig);
 #if defined(MAM2_MSS_DEBUG)
   // instead of WOTS sig gen WOTS pk directly
   mss_mt_gen_leaf(mss, mss->skn, trits_take(sig, MAM2_MSS_MT_HASH_SIZE));
 #else
   {
-    MAM2_TRITS_DEF(Ni, 18);
-    trits_put18(Ni, mss->skn);
-    // TODO Remove when mss handles flex_trits
-    TRIT_ARRAY_MAKE_FROM_RAW(nonce1, mss->nonce1.n - mss->nonce1.d,
-                             mss->nonce1.p + mss->nonce1.d);
-    TRIT_ARRAY_MAKE_FROM_RAW(nonce2, mss->nonce2.n - mss->nonce2.d,
-                             mss->nonce2.p + mss->nonce2.d);
-    TRIT_ARRAY_MAKE_FROM_RAW(noncei, Ni.n - Ni.d, Ni.p + Ni.d);
-    wots_gen_sk3(mss->wots, mss->prng, &nonce1, &nonce2, &noncei);
+    trit_t nonce_i[MAM2_MSS_SKN_SIZE] = {0};
+    long_to_trits(mss->skn, nonce_i);
+    TRIT_ARRAY_MAKE_FROM_RAW(noncei, MAM2_MSS_SKN_SIZE, nonce_i);
+    wots_gen_sk3(mss->wots, mss->prng, &mss->nonce1, &mss->nonce2, &noncei);
   }
 
   TRIT_ARRAY_DECLARE(sk_sig_array, MAM2_WOTS_SK_SIZE);
   memcpy(sk_sig_array.trits, mss->wots->sk, MAM2_WOTS_SK_FLEX_SIZE);
-  TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, hash.p + hash.d);
-  wots_sign(mss->wots, &hash_array, &sk_sig_array);
 
-  flex_trits_to_trits(sig.p + sig.d, MAM2_WOTS_SK_SIZE, sk_sig_array.trits,
-                      MAM2_WOTS_SK_SIZE, MAM2_WOTS_SK_SIZE);
+  wots_sign(mss->wots, hash, &sk_sig_array);
+
+  trit_array_insert_from_pos(sig, &sk_sig_array, 0, MAM2_MSS_SKN_SIZE,
+                             sk_sig_array.num_trits);
 #endif
-  sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
-
   // TODO Remove when sig is a trit_array_t
-  TRIT_ARRAY_DECLARE(auth_path, sig.n - sig.d);
+  TRIT_ARRAY_DECLARE(auth_path,
+                     sig->num_trits - MAM2_MSS_SKN_SIZE - MAM2_WOTS_SIG_SIZE);
   mss_auth_path(mss, mss->skn, &auth_path);
-  flex_trits_to_trits(sig.p + sig.d, sig.n - sig.d, auth_path.trits,
-                      sig.n - sig.d, sig.n - sig.d);
+  trit_array_insert_from_pos(sig, &auth_path, 0,
+                             MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE,
+                             auth_path.num_trits);
 }
 
 bool_t mss_next(mss_t *mss) {
@@ -487,47 +473,47 @@ bool_t mss_next(mss_t *mss) {
   return 1;
 }
 
-bool_t mss_verify(sponge_t *ms, sponge_t *ws, trits_t H, trits_t sig,
-                  trit_array_p pk) {
-  trint6_t d;
-  trint18_t skn;
-  MAM2_TRITS_DEF(ts, 18);
+bool_t mss_verify(sponge_t *ms, sponge_t *ws, trit_array_p hash,
+                  trit_array_p sig, trit_array_p pk) {
+  uint16_t d;
+  uint32_t skn;
+  trit_t tmp[MAM2_MSS_SKN_SIZE];
+
+  TRIT_ARRAY_DECLARE(sk_sig_prefix_d, 4);
+  TRIT_ARRAY_DECLARE(sk_sig_prefix_skn, 14);
+
+  trit_array_insert_from_pos(&sk_sig_prefix_d, sig, 0, 0, 4);
+  trit_array_insert_from_pos(&sk_sig_prefix_skn, sig, 4, 0, 14);
+  flex_trits_to_trits(tmp, MAM2_MSS_SKN_SIZE, sk_sig_prefix_d.trits, 4, 4);
+  d = trits_to_long(tmp, 4);
+  flex_trits_to_trits(tmp, MAM2_MSS_SKN_SIZE, sk_sig_prefix_skn.trits, 14, 14);
+  skn = trits_to_long(tmp, 14);
+
+  size_t ap_size = sig->num_trits - MAM2_WOTS_SIG_SIZE - MAM2_MSS_SKN_SIZE;
+  TRIT_ARRAY_DECLARE(sk_sig_array, MAM2_WOTS_SIG_SIZE);
+  trit_array_insert_from_pos(&sk_sig_array, sig, MAM2_MSS_SKN_SIZE, 0,
+                             MAM2_WOTS_SIG_SIZE);
+  TRIT_ARRAY_DECLARE(ap_array, ap_size);
+  trit_array_insert_from_pos(
+      &ap_array, sig, MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE, 0, ap_size);
 
   dbg_printf("mss verify\n");
 
-  if (trits_size(sig) < MAM2_MSS_SIG_SIZE(0)) return 0;
-
-  trits_set_zero(ts);
-
-  trits_copy(trits_take(sig, 4), trits_take(ts, 4));
-  sig = trits_drop(sig, 4);
-  d = trits_get6(ts);
-
-  trits_copy(trits_take(sig, 14), trits_take(ts, 14));
-  sig = trits_drop(sig, 14);
-  skn = trits_get18(ts);
+  if (sig->num_trits < MAM2_MSS_SIG_SIZE(0)) return 0;
 
   dbg_printf("d=%d skn=%d", d, skn);
   if (d < 0 || skn < 0 || skn >= (1 << d) ||
-      trits_size(sig) != (MAM2_MSS_SIG_SIZE(d) - MAM2_MSS_SKN_SIZE)) {
+      (sk_sig_array.num_trits + ap_array.num_trits) !=
+          (MAM2_MSS_SIG_SIZE(d) - MAM2_MSS_SKN_SIZE)) {
     return 0;
   }
 
-#if defined(MAM2_MSS_DEBUG)
-  trits_copy(trits_take(sig, MAM2_MSS_MT_HASH_SIZE), apk);
-#else
   MAM2_ASSERT(pk->num_trits == MAM2_WOTS_PK_SIZE);
-  TRIT_ARRAY_MAKE_FROM_RAW(hash_array, MAM2_WOTS_HASH_SIZE, H.p + H.d);
-  TRIT_ARRAY_MAKE_FROM_RAW(sk_sig_array, MAM2_WOTS_SIG_SIZE, sig.p + sig.d);
-  TRIT_ARRAY_DECLARE(apk, MAM2_MSS_MT_HASH_SIZE);
-  wots_recover(ws, &hash_array, &sk_sig_array, &apk);
 
-#endif
+  TRIT_ARRAY_DECLARE(apk, MAM2_MSS_MT_HASH_SIZE);
+  wots_recover(ws, hash, &sk_sig_array, &apk);
+
   dbg_printf("\nwpR\t");
-  // trits_dbg_print(apk);
-  sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
-  TRIT_ARRAY_MAKE_FROM_RAW(auth_path, sig.n - sig.d, sig.p + sig.d);
-  TRIT_ARRAY_MAKE_FROM_RAW(ap_array, sig.n - sig.d, sig.p + sig.d);
 
   mss_fold_apath(ms, skn, &ap_array, &apk);
 

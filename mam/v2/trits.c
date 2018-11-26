@@ -80,25 +80,6 @@ void trits_put3(trits_t x, trint3_t t) {
   trits_put1(trits_drop(x, 2), t2);
 }
 
-trint6_t trits_get6(trits_t x) {
-  MAM2_ASSERT(x.n >= x.d + 6);
-
-  trint6_t t0 = (trint6_t)trits_get3(x);
-  trint6_t t1 = (trint6_t)trits_get3(trits_drop(x, 3));
-  return t0 + (trint6_t)27 * t1;
-}
-
-void trits_put6(trits_t x, trint6_t t) {
-  MAM2_ASSERT(x.n >= x.d + 6);
-
-  trint3_t t0 = MAM2_MODS(t, 27 * 27, 27);
-  t = MAM2_DIVS(t, 27 * 27, 27);
-  trint3_t t1 = (trint3_t)t;
-
-  trits_put3(x, t0);
-  trits_put3(trits_drop(x, 3), t1);
-}
-
 trint9_t trits_get9(trits_t x) {
   MAM2_ASSERT(x.n >= x.d + 9);
 
@@ -120,25 +101,6 @@ void trits_put9(trits_t x, trint9_t t) {
   trits_put3(x, t0);
   trits_put3(trits_drop(x, 3), t1);
   trits_put3(trits_drop(x, 6), t2);
-}
-
-trint18_t trits_get18(trits_t x) {
-  MAM2_ASSERT(x.n >= x.d + 18);
-
-  trint18_t t0 = (trint18_t)trits_get9(x);
-  trint18_t t1 = (trint18_t)trits_get9(trits_drop(x, 9));
-  return t0 + (trint18_t)19683 * t1;
-}
-
-void trits_put18(trits_t x, trint18_t t) {
-  MAM2_ASSERT(x.n >= x.d + 18);
-
-  trint9_t t0 = MAM2_MODS(t, 19683 * 19683, 19683);
-  t = MAM2_DIVS(t, 19683 * 19683, 19683);
-  trint9_t t1 = (trint9_t)t;
-
-  trits_put9(x, t0);
-  trits_put9(trits_drop(x, 9), t1);
 }
 
 void trits_set_zero(trits_t x) {

@@ -122,8 +122,8 @@ typedef struct mss_s {
   trit_t *merkle_tree;  // Buffer storing complete Merkle-tree
 #endif
   // Nonce = `nonce1`||`nonce2`, stored pointers only, NOT copies
-  trits_t nonce1;
-  trits_t nonce2;
+  trit_array_t nonce1;
+  trit_array_t nonce2;
 } mss_t;
 
 #if defined(MAM2_MSS_TRAVERSAL)
@@ -179,7 +179,7 @@ retcode_t mss_create(mss_t *mss, mss_mt_height_t height);
  */
 void mss_init(mss_t *const mss, prng_t *const prng, sponge_t *const sponge,
               wots_t *const wots, mss_mt_height_t const height,
-              trits_t const nonce1, trits_t const nonce2);
+              trit_array_p const nonce1, trit_array_p const nonce2);
 
 /**
  * Generates MSS keys
@@ -195,7 +195,7 @@ void mss_gen(mss_t *mss, trit_array_p pk);
  * @param mss MSS interface
  * @param skn Encoded height and current private key number
  */
-void mss_skn(mss_t *mss, trits_t skn);
+void mss_skn(mss_t *mss, trit_array_p skn);
 
 /**
  * Encodes MSS authentication path
@@ -213,7 +213,7 @@ void mss_auth_path(mss_t *mss, trint18_t i, trit_array_t *const auth_path);
  * @param hash Hash value to be signed
  * @param sig Signature
  */
-void mss_sign(mss_t *mss, trits_t hash, trits_t sig);
+void mss_sign(mss_t *mss, trit_array_p hash, trit_array_p sig);
 
 /**
  * Verifies MSS signature
@@ -225,8 +225,8 @@ void mss_sign(mss_t *mss, trits_t hash, trits_t sig);
  * @param pk public key (Merkle-tree root)
  */
 
-bool_t mss_verify(sponge_t *ms, sponge_t *ws, trits_t hash, trits_t sig,
-                  trit_array_p pk);
+bool_t mss_verify(sponge_t *ms, sponge_t *ws, trit_array_p hash,
+                  trit_array_p sig, trit_array_p pk);
 
 /**
  * Deallocate memory for internal Merkle tree structure

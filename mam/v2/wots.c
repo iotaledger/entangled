@@ -47,7 +47,6 @@ static void wots_hash_sign(sponge_t *const sponge, trit_array_p sk_sig,
   trit_t h_trits[3];
   size_t sig_pos = 0;
 
-  MAM2_ASSERT(sk_sig->num_trits == MAM2_WOTS_SK_SIZE);
   MAM2_ASSERT(hash->num_trits == MAM2_WOTS_HASH_SIZE);
 
   TRIT_ARRAY_DECLARE(sk_sig_part, MAM2_WOTS_SK_PART_SIZE);
