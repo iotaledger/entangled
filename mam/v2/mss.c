@@ -326,11 +326,10 @@ void mss_gen(mss_t *mss, trit_array_p pk) {
         flex_trits_from_trits(auth_node.trits, MAM2_MSS_MT_HASH_SIZE, h.p,
                               MAM2_MSS_MT_HASH_SIZE, MAM2_MSS_MT_HASH_SIZE);
         mss_mt_set_auth_node(mss, node->height, &auth_node);
-      } else
-
-          // is it next apath node?
-          if (node->index == 0 &&
-              (node->height + 1 != mss->height)) {  // push to stack `n->height`
+      }
+      // is it next apath node?
+      else if (node->index == 0 && (node->height + 1 != mss->height)) {
+        // push to stack `n->height`
         // stack `n->height`
         mss_mt_stack_t *sd = mss->stacks + MAM2_MSS_MT_STACKS(node->height);
         // stack `n->height` nodes
