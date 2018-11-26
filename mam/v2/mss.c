@@ -79,19 +79,15 @@ static void mss_mt_init(mss_t *mss) {
 }
 
 static void mss_mt_update(mss_t *mss, mss_mt_height_t d) {
-  mss_mt_stack_t *s;
-  mss_mt_node_t *ns;
-  trit_t *hs;
   trits_t h[2], wpk;
-
   // current level must be lower than MT height
   MAM2_ASSERT(0 <= d && d < mss->height);
   // stack at level `d`
-  s = mss->stacks + MAM2_MSS_MT_STACKS(d);
+  mss_mt_stack_t *s = &mss->stacks[MAM2_MSS_MT_STACKS(d)];
   // stack's nodes
-  ns = mss->nodes + MAM2_MSS_MT_NODES(d);
+  mss_mt_node_t *ns = &mss->nodes[MAM2_MSS_MT_NODES(d)];
   // stack's hashes stored separately from nodes
-  hs = mss->hashes + MAM2_MSS_MT_HASH_WORDS(d, 0);
+  trit_t *hs = mss->hashes + MAM2_MSS_MT_HASH_WORDS(d, 0);
 
   // finished?
   if ((0 != s->stack_size) && (ns[s->stack_size - 1].height >= s->height))
@@ -286,8 +282,10 @@ void mss_gen(mss_t *mss, trit_array_p pk) {
   // reuse stack `D-1`, by construction (see note in mss.h)
   // it has capacity `D+1`
   mss_mt_height_t d = mss->height - 1;
-  mss_mt_stack_t *s = mss->stacks + MAM2_MSS_MT_STACKS(d);
-  mss_mt_node_t *ns = mss->nodes + MAM2_MSS_MT_NODES(d), *n;
+  fprintf(stderr, "VALUE %d\n", MAM2_MSS_MT_STACKS(d));
+  mss_mt_stack_t *s = &mss->stacks[MAM2_MSS_MT_STACKS(d)];
+  mss_mt_node_t *ns = &mss->nodes[MAM2_MSS_MT_NODES(d)];
+  mss_mt_node_t *n = NULL;
   trit_t *hs = mss->hashes + MAM2_MSS_MT_HASH_WORDS(d, 0);
 
   // init stack
@@ -306,7 +304,7 @@ void mss_gen(mss_t *mss, trit_array_p pk) {
       mss_mt_update(mss, d);
 
       // top node
-      n = ns + (s->stack_size - 1);
+      n = &ns[s->stack_size - 1];
       // is it root?
       if (n->height == mss->height) {  // done
         // copy pk, it is stored outside of stack due to dirty hack
