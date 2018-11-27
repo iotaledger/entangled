@@ -69,6 +69,12 @@ static inline void trit_array_set_null(trit_array_p const trit_array) {
   memset(trit_array->trits, FLEX_TRIT_NULL_VALUE, trit_array->num_bytes);
 }
 
+static inline bool trit_array_is_equal(trit_array_p const lhs,
+                                       trit_array_p const rhs) {
+  return (lhs->num_trits == rhs->num_trits &&
+          memcmp(lhs->trits, rhs->trits, lhs->num_bytes) == 0);
+}
+
 /// Returns a new trit_array containing a portion of length num_trits of the
 /// trits of another trit_array, from index start.
 /// @param[in] trit_array - the original trit_array

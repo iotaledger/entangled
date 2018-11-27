@@ -10,6 +10,7 @@
 
 #include <unity/unity.h>
 
+#include "common/trinary/trit_long.h"
 #include "mam/v2/sponge.h"
 #include "mam/v2/tests/common.h"
 #include "mam/v2/trits.h"
@@ -51,10 +52,10 @@ static void sponge_test_hash(sponge_t *s) {
 static bool sponge_test_ae(sponge_t *s) {
 #define MAM2_SPONGE_TEST_MAX_K 1110
   size_t k, i;
-  MAM2_TRITS_DEF(K, MAM2_SPONGE_KEY_SIZE);
-  MAM2_TRITS_DEF(X, MAM2_SPONGE_TEST_MAX_K);
-  MAM2_TRITS_DEF(Y, MAM2_SPONGE_TEST_MAX_K);
-  MAM2_TRITS_DEF(Z, MAM2_SPONGE_TEST_MAX_K);
+  TRIT_ARRAY_DECLARE(K, MAM2_SPONGE_KEY_SIZE);
+  TRIT_ARRAY_DECLARE(X, MAM2_SPONGE_TEST_MAX_K);
+  TRIT_ARRAY_DECLARE(Y, MAM2_SPONGE_TEST_MAX_K);
+  TRIT_ARRAY_DECLARE(Z, MAM2_SPONGE_TEST_MAX_K);
   size_t ks[] = {0,
                  1,
                  2,
@@ -72,43 +73,52 @@ static bool sponge_test_ae(sponge_t *s) {
                  MAM2_SPONGE_TEST_MAX_K + 1};
 
   // init X
-  for (i = 0; i < MAM2_SPONGE_TEST_MAX_K / 3; ++i)
-    trits_put3(trits_drop(X, 3 * i), (tryte_t)((i % 27) - 13));
+  trit_t tmp[3];
+  for (i = 0; i < MAM2_SPONGE_TEST_MAX_K / 3; ++i) {
+    trit_t val = (tryte_t)((i % 27) - 13);
+    long_to_trits(val, tmp);
+    trit_array_set_at(&X, 3 * i, tmp[0]);
+    trit_array_set_at(&X, 3 * i + 1, tmp[1]);
+    trit_array_set_at(&X, 3 * i + 2, tmp[2]);
+  }
   // init K
-  trits_set_zero(K);
-  trytes_to_trits(
-      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
-      "NOPQRSTUVWXYZ9ABCDEFGHIJKLM",
-      K.p, 81);
+  trit_array_set_null(&K);
+  flex_trits_from_trytes(K.trits, 81,
+                         "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+                         "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
+                         "NOPQRSTUVWXYZ9ABCDEFGHIJKLM",
+                         81, 81);
 
   sponge_init(s);
-  sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-  sponge_squeeze(s, MAM2_SPONGE_CTL_KEY, K);
+  sponge_absorb_flex(s, MAM2_SPONGE_CTL_KEY, &K);
+  sponge_squeeze_flex(s, MAM2_SPONGE_CTL_KEY, &K);
 
   for (i = 0; (k = ks[i++]) <= MAM2_SPONGE_TEST_MAX_K;) {
-    X = MAM2_TRITS_INIT(X, k);
-    Y = MAM2_TRITS_INIT(Y, k);
-    Z = MAM2_TRITS_INIT(Z, k);
+    TRIT_ARRAY_DECLARE(curr_X, k);
+    TRIT_ARRAY_DECLARE(curr_Y, k);
+    TRIT_ARRAY_DECLARE(curr_Z, k);
+    trit_array_set_trits(&curr_X, X.trits, k);
+    trit_array_set_trits(&curr_Y, Y.trits, k);
+    trit_array_set_trits(&curr_Z, Z.trits, k);
     sponge_init(s);
-    sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-    sponge_encr(s, X, Y);  // Y=E(X)
+    sponge_absorb_flex(s, MAM2_SPONGE_CTL_KEY, &K);
+    sponge_encr_flex(s, &curr_X, &curr_Y);  // Y=E(X)
     sponge_init(s);
-    sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-    sponge_decr(s, Y, Z);  // Z=D(E(X))
-    if (0 != trits_cmp_grlex(X, Z)) {
+    sponge_absorb_flex(s, MAM2_SPONGE_CTL_KEY, &K);
+    sponge_decr_flex(s, &curr_Y, &curr_Z);  // Z=D(E(X))
+    if (!trit_array_is_equal(&curr_X, &curr_Z)) {
       return false;
     }
     sponge_init(s);
-    sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-    sponge_encr(s, Z, Z);  // Z=E(Z=X)
-    if (0 != trits_cmp_grlex(Y, Z)) {
+    sponge_absorb_flex(s, MAM2_SPONGE_CTL_KEY, &K);
+    sponge_encr_flex(s, &curr_Z, &curr_Z);  // Z=E(Z=X)
+    if (!trit_array_is_equal(&curr_Y, &curr_Z)) {
       return false;
     }
     sponge_init(s);
-    sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-    sponge_decr(s, Z, Z);  // Z=D(Z=E(X))
-    if (0 != trits_cmp_grlex(X, Z)) {
+    sponge_absorb_flex(s, MAM2_SPONGE_CTL_KEY, &K);
+    sponge_decr_flex(s, &curr_Z, &curr_Z);  // Z=D(Z=E(X))
+    if (!trit_array_is_equal(&curr_X, &curr_Z)) {
       return false;
     }
   }

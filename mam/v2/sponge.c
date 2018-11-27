@@ -241,8 +241,7 @@ void sponge_hash(sponge_t *s, trit_array_p X, trit_array_p Y) {
   sponge_squeeze_flex(s, MAM2_SPONGE_CTL_HASH, Y);
 }
 
-void sponge_hashn(sponge_t *s, size_t n, trit_array_t *Xs,
-                  trit_array_p Y) {
+void sponge_hashn(sponge_t *s, size_t n, trit_array_t *Xs, trit_array_p Y) {
   sponge_init(s);
   sponge_absorbn_flex(s, MAM2_SPONGE_CTL_HASH, n, Xs);
   sponge_squeeze_flex(s, MAM2_SPONGE_CTL_HASH, Y);
