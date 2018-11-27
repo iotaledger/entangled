@@ -116,31 +116,15 @@ void sponge_decr_flex(sponge_t *s,    /*!< [in] sponge interface */
                       trit_array_p Y  /*!< [out] plaintext */
 );
 
-/*! \brief Sponge hashing. */
-void sponge_hash(sponge_t *s, /*!< [in] sponge interface */
-                 trits_t X,   /*!< [in] input data */
-                 trits_t Y    /*!< [out] hash value */
+void sponge_hash(sponge_t *s,    /*!< [in] sponge interface */
+                 trit_array_p X, /*!< [in] input data */
+                 trit_array_p Y  /*!< [out] hash value */
 );
 
-/*! \brief Sponge hashing. */
-void sponge_hash_flex(sponge_t *s,    /*!< [in] sponge interface */
-                      trit_array_p X, /*!< [in] input data */
-                      trit_array_p Y  /*!< [out] hash value */
-);
-
-/*! \brief Sponge hashing. */
-void sponge_hashn(sponge_t *s, /*!< [in] sponge interface */
-                  size_t n,    /*!< [in] input data blocks count */
-                  trits_t *Xs, /*!< [in] input data blocks */
-                  trits_t Y    /*!< [out] hash value */
-
-);
-
-/*! \brief Sponge hashing. */
-void sponge_hashn_flex(sponge_t *s,       /*!< [in] sponge interface */
-                       size_t n,          /*!< [in] input data blocks count */
-                       trit_array_t Xs[], /*!< [in] input data blocks */
-                       trit_array_p Y     /*!< [out] hash value */
+void sponge_hashn(sponge_t *s,      /*!< [in] sponge interface */
+                  size_t n,         /*!< [in] input data blocks count */
+                  trit_array_t *Xs, /*!< [in] input data blocks */
+                  trit_array_p Y    /*!< [out] hash value */
 
 );
 
