@@ -28,7 +28,7 @@
 #define MAM2_WOTS_SK_PART_COUNT 81
 
 // WOTS private key size
-#define MAM2_WOTS_SK_SIZE (MAM2_WOTS_SK_PART_SIZE * MAM2_WOTS_SK_PART_COUNT)
+#define MAM2_WOTS_SK_SIZE 13122
 // WOTS private key flex size
 #define MAM2_WOTS_SK_FLEX_SIZE FLEX_TRIT_SIZE_13122
 
@@ -49,7 +49,7 @@ typedef struct wots_s {
 } wots_t;
 
 /**
- * Initializes a WOTS interface with a Sponge
+ * Initializes a WOTS interface
  *
  * @param wots WOTS interface
  * @param sponge Sponge interface
@@ -57,14 +57,14 @@ typedef struct wots_s {
 void wots_init(wots_t *const wots, sponge_t *const sponge);
 
 /**
- * Resets WOTS sponge and SK
+ * Resets a WOTS interface
  *
  * @param wots WOTS interface
  */
 void wots_reset(wots_t *const wots);
 
 /**
- * Generates a WOTS private key
+ * Generates a WOTS private key with one input nonce
  *
  * @param wots WOTS interface
  * @param prng PRNG interface
@@ -74,7 +74,7 @@ void wots_gen_sk(wots_t *const wots, prng_t *const prng,
                  trit_array_t const *const nonce);
 
 /**
- * Generates a WOTS private key
+ * Generates a WOTS private key with two input nonces
  *
  * @param wots WOTS interface
  * @param prng PRNG interface
@@ -86,7 +86,7 @@ void wots_gen_sk2(wots_t *const wots, prng_t *const prng,
                   trit_array_t const *const nonce2);
 
 /**
- * Generates a WOTS private key
+ * Generates a WOTS private key with three input nonces
  *
  * @param wots WOTS interface
  * @param prng PRNG interface
@@ -123,7 +123,7 @@ void wots_sign(wots_t *const wots, trit_array_t *const hash, trit_array_t *sig);
  * @param sponge Sponge interface
  * @param hash Signed hash value
  * @param sig Signature
- * @param pk Presumed public key
+ * @param pk Recovered public key
  */
 void wots_recover(sponge_t *const sponge, trit_array_t *const hash,
                   trit_array_t *const sig, trit_array_t *pk);
