@@ -3,24 +3,16 @@
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file ntru.h
-\brief MAM2 NTRU layer.
-*/
 #ifndef __MAM_V2_NTRU_H__
 #define __MAM_V2_NTRU_H__
 
-#include "mam/v2/defs.h"
 #include "mam/v2/prng.h"
-#include "mam/v2/sponge.h"
-#include "trits.h"
+#include "mam/v2/trits.h"
 
 /*! \brief NTRU public key - 3g(x)/(1+3f(x)) - size. */
 #define MAM2_NTRU_PK_SIZE 9216
@@ -56,9 +48,9 @@ void ntru_encr(trits_t pk, /*!< [in] NTRU public key */
                trits_t Y   /*!< [out] encrypted K */
 );
 
-bool_t ntru_decr(intru *n,  /*!< [in] NTRU interface */
-                 trits_t Y, /*!< [in] encrypted K */
-                 trits_t K  /*!< [out] decrypted session symmetric key */
+bool ntru_decr(intru *n,  /*!< [in] NTRU interface */
+               trits_t Y, /*!< [in] encrypted K */
+               trits_t K  /*!< [out] decrypted session symmetric key */
 );
 
 #endif  // __MAM_V2_NTRU_H__

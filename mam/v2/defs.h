@@ -1,20 +1,13 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file defs.h
-\brief MAM2 common definitions.
-*/
 #ifndef __MAM_V2_DEFS_H__
 #define __MAM_V2_DEFS_H__
 
@@ -101,18 +94,10 @@ typedef trint1_t trit_t;
   MAM2_ASSERT(((t1) == (trint1_t)-1) || ((t1) == (trint1_t)0) || \
               ((t1) == (trint1_t)1))
 
-/*! \brief Boolean type with zero as `false`(`no`) and non-zero as
- * `true`(`yes`). */
-typedef trint1_t bool_t;
-
 /*! \brief Signed integer type capable of storing 3 trits
 with values in range [-13,..,-1,0,1,..,13]. */
 typedef int8_t trint3_t;
 typedef trint3_t tryte_t;
-
-static char tryte_to_char(tryte_t t);
-
-static bool_t tryte_from_char(tryte_t *t, char c);
 
 /*! \brief Signed integer type capable of storing 6 trits
 with values in range [-(3^6-1)/2=-364,..,-1,0,1,..,364=(3^6-1)/2]. */
@@ -136,18 +121,22 @@ typedef uint8_t byte;
 #define MAM2_ASSERT(expr) assert(expr)
 
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
+#define FLEX_TRIT_SIZE_18 18
 #define FLEX_TRIT_SIZE_162 162
 #define FLEX_TRIT_SIZE_234 234
 #define FLEX_TRIT_SIZE_13122 13122
 #elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_18 6
 #define FLEX_TRIT_SIZE_162 54
 #define FLEX_TRIT_SIZE_234 78
 #define FLEX_TRIT_SIZE_13122 4374
 #elif defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_18 5
 #define FLEX_TRIT_SIZE_162 41
 #define FLEX_TRIT_SIZE_234 59
 #define FLEX_TRIT_SIZE_13122 3281
 #elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
+#define FLEX_TRIT_SIZE_18 4
 #define FLEX_TRIT_SIZE_162 33
 #define FLEX_TRIT_SIZE_234 47
 #define FLEX_TRIT_SIZE_13122 2625

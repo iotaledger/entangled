@@ -1,24 +1,16 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file pb3.c
-\brief MAM2 Protobuf3 layer.
-*/
 #include "mam/v2/pb3.h"
-
+#include "common/trinary/trit_long.h"
 #include "mam/v2/mss.h"
-#include "mam/v2/prng.h"
 
 /*
 Protobuf3 primitive types
@@ -65,7 +57,7 @@ size_t pb3_sizeof_longtrint() { return 18; }
 
 void pb3_encode_longtrint(trint18_t t, trits_t *b) {
   MAM2_ASSERT(b && !(trits_size(*b) < pb3_sizeof_longtrint()));
-  trits_put18(trits_take(*b, 18), t);
+  long_to_trits(t, b->p + b->d);
   *b = trits_drop(*b, 18);
 }
 
@@ -74,7 +66,7 @@ retcode_t pb3_decode_longtrint(trint18_t *t, trits_t *b) {
 
   if (trits_size(*b) < pb3_sizeof_longtrint()) return RC_MAM2_PB3_EOF;
 
-  *t = trits_get18(trits_take(*b, 18));
+  *t = trits_to_long(b->p + b->d, MAM2_MSS_SKN_SIZE);
   *b = trits_drop(*b, 18);
   return RC_OK;
 }
@@ -237,23 +229,23 @@ Protobuf3 cryptographic modifier handling:
 secret, encrypted, data(other), donthash
 */
 
-void pb3_wrap_secret(isponge *s, trits_t t) {
+void pb3_wrap_secret(sponge_t *s, trits_t t) {
   sponge_absorb(s, MAM2_SPONGE_CTL_KEY, t);
 }
 
-void pb3_unwrap_secret(isponge *s, trits_t t) {
+void pb3_unwrap_secret(sponge_t *s, trits_t t) {
   sponge_absorb(s, MAM2_SPONGE_CTL_KEY, t);
 }
 
-void pb3_wrap_encrypted(isponge *s, trits_t t) { sponge_encr(s, t, t); }
+void pb3_wrap_encrypted(sponge_t *s, trits_t t) { sponge_encr(s, t, t); }
 
-void pb3_unwrap_encrypted(isponge *s, trits_t t) { sponge_decr(s, t, t); }
+void pb3_unwrap_encrypted(sponge_t *s, trits_t t) { sponge_decr(s, t, t); }
 
-void pb3_wrap_data(isponge *s, trits_t t) {
+void pb3_wrap_data(sponge_t *s, trits_t t) {
   sponge_absorb(s, MAM2_SPONGE_CTL_DATA, t);
 }
 
-void pb3_unwrap_data(isponge *s, trits_t t) {
+void pb3_unwrap_data(sponge_t *s, trits_t t) {
   sponge_absorb(s, MAM2_SPONGE_CTL_DATA, t);
 }
 
@@ -271,9 +263,9 @@ void pb3_unwrap_data(isponge *s, trits_t t) {
     pb3_unwrap_##mod(s, trits_diff(b##_begin, *b)); \
   } while (0)
 
-static bool_t pb3_test_sizet(size_t n) {
+static bool pb3_test_sizet(size_t n) {
   retcode_t e;
-  bool_t ok = 1;
+  bool ok = true;
   size_t k = pb3_sizeof_sizet(n);
   size_t m = 0;
   MAM2_TRITS_DEF(b0, 3 * 14);  // 14 trytes max
@@ -290,8 +282,8 @@ static bool_t pb3_test_sizet(size_t n) {
   return (e == RC_OK && ok && m == n);
 }
 
-static bool_t pb3_test_sizets() {
-  bool_t r = 1;
+static bool pb3_test_sizets() {
+  bool r = true;
 
   size_t n, k;
 
@@ -314,8 +306,8 @@ static bool_t pb3_test_sizets() {
   return r;
 }
 
-bool_t pb3_test() {
-  bool_t r = 1;
+bool pb3_test() {
+  bool r = true;
   r = r && pb3_test_sizets();
   /*TODO*/
   return r;

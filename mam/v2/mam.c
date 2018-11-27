@@ -5,7 +5,6 @@
  * MAM is based on an original implementation & specification by apmi.bsu.by
  * [ITSec Lab]
  *
- *
  * Refer to the LICENSE file for licensing information
  */
 
@@ -15,7 +14,8 @@
 #include "mam/v2/pb3.h"
 
 retcode_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
-                          mss_mt_height_t d, trits_t nonce1, trits_t nonce2) {
+                          mss_mt_height_t d, trit_array_p nonce1,
+                          trit_array_p nonce2) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
@@ -23,16 +23,17 @@ retcode_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
   do {
     err_bind(mss_create(m, d));
 
-    m->nonce1 = trits_null();
-    if (!trits_is_empty(nonce1)) {
-      m->nonce1 = trits_alloc(trits_size(nonce1));
-      err_guard(!trits_is_null(m->nonce1), RC_OOM);
+    TRIT_ARRAY_DECLARE(nonce_null, 0);
+    m->nonce1 = nonce_null;
+    if (nonce1) {
+      m->nonce1 = *nonce1;
+      err_guard(m->nonce1.num_trits > 0, RC_OOM);
     }
 
-    m->nonce2 = trits_null();
-    if (!trits_is_empty(nonce2)) {
-      m->nonce2 = trits_alloc(trits_size(nonce2));
-      err_guard(!trits_is_null(m->nonce2), RC_OOM);
+    m->nonce2 = nonce_null;
+    if (nonce2) {
+      m->nonce2 = *nonce2;
+      err_guard(m->nonce2.num_trits > 0, RC_OOM);
     }
 
     m->sponge = ma->create_sponge();
@@ -46,7 +47,7 @@ retcode_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
     err_guard(m->wots->sponge, RC_OOM);
     wots_init(m->wots, m->wots->sponge);
 
-    mss_init(m, p, m->sponge, m->wots, d, m->nonce1, m->nonce2);
+    mss_init(m, p, m->sponge, m->wots, d, &m->nonce1, &m->nonce2);
 
     e = RC_OK;
   } while (0);
@@ -59,9 +60,6 @@ void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m) {
   MAM2_ASSERT(m);
 
   m->prng = NULL;
-
-  trits_free(m->nonce1);
-  trits_free(m->nonce2);
 
   if (m->wots) {
     ma->destroy_sponge(m->wots->sponge);
@@ -79,7 +77,7 @@ void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m) {
 trits_t mam2_channel_id(mam2_channel *ch) {
   return trits_from_rep(MAM2_CHANNEL_ID_SIZE, ch->id);
 }
-trits_t mam2_channel_name(mam2_channel *ch) { return ch->m->nonce1; }
+trit_array_t mam2_channel_name(mam2_channel *ch) { return ch->m->nonce1; }
 static size_t mam2_channel_sig_size(mam2_channel *ch) {
   return MAM2_MSS_SIG_SIZE(ch->m->height);
 }
@@ -97,8 +95,11 @@ retcode_t mam2_channel_create(mam2_ialloc *ma, /*!< [in] Allocator. */
   MAM2_ASSERT(ch);
 
   do {
-    err_bind(mam2_mss_create(ma, ch->m, p, d, ch_name, trits_null()));
-    mss_gen(ch->m, mam2_channel_id(ch));
+    TRIT_ARRAY_MAKE_FROM_RAW(ch_name_array, ch_name.n - ch_name.d,
+                             ch_name.p + ch_name.d)
+    err_bind(mam2_mss_create(ma, ch->m, p, d, &ch_name_array, NULL));
+    // FIXME (@tsvisabo) - uncomment
+    // mss_gen(ch->m, mam2_channel_id(ch));
 
     e = RC_OK;
   } while (0);
@@ -118,8 +119,8 @@ void mam2_channel_destroy(mam2_ialloc *ma, /*!< [in] Allocator. */
 trits_t mam2_endpoint_id(mam2_endpoint *ep) {
   return trits_from_rep(MAM2_ENDPOINT_ID_SIZE, ep->id);
 }
-trits_t mam2_endpoint_chname(mam2_endpoint *ep) { return ep->m->nonce1; }
-trits_t mam2_endpoint_name(mam2_endpoint *ep) { return ep->m->nonce2; }
+trit_array_t mam2_endpoint_chname(mam2_endpoint *ep) { return ep->m->nonce1; }
+trit_array_t mam2_endpoint_name(mam2_endpoint *ep) { return ep->m->nonce2; }
 static size_t mam2_endpoint_sig_size(mam2_endpoint *ep) {
   return MAM2_MSS_SIG_SIZE(ep->m->height);
 }
@@ -138,8 +139,13 @@ retcode_t mam2_endpoint_create(mam2_ialloc *ma, /*!< [in] Allocator. */
   MAM2_ASSERT(ep);
 
   do {
-    err_bind(mam2_mss_create(ma, ep->m, p, d, ch_name, ep_name));
-    mss_gen(ep->m, mam2_endpoint_id(ep));
+    TRIT_ARRAY_MAKE_FROM_RAW(ch_name_array, ch_name.n - ch_name.d,
+                             ch_name.p + ch_name.d);
+    TRIT_ARRAY_MAKE_FROM_RAW(ep_name_array, ep_name.n - ep_name.d,
+                             ep_name.p + ep_name.d);
+    err_bind(mam2_mss_create(ma, ep->m, p, d, &ch_name_array, &ep_name_array));
+    // FIXME (@tsvisabo) - uncomment
+    // mss_gen(ep->m, mam2_endpoint_id(ep));
 
     e = RC_OK;
   } while (0);
@@ -273,8 +279,8 @@ static trits_t mam2_send_msg_cfg_key(mam2_send_msg_context *cfg) {
 retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
-  isponge *s;
-  isponge *fork;
+  sponge_t *s;
+  sponge_t *fork;
   trits_t b0, *b;
 
   MAM2_TRITS_DEF(skn, MAM2_MSS_SKN_SIZE);
@@ -299,16 +305,23 @@ retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
       err_guard(!(trits_size(*msg) < msg_size), RC_MAM2_BUFFER_TOO_SMALL);
     b = msg;
 
-    if (cfg->ep)
-      mss_skn(cfg->ep->m, skn);
-    else
-      mss_skn(cfg->ch->m, skn);
+    // FIXME (@tsvisabo) - uncomment
+    if (cfg->ep) {
+      // mss_skn(cfg->ep->m, skn);
+    } else {
+      // mss_skn(cfg->ch->m, skn);
+    }
 
     // TODO Remove when mam handles flex_trits
-    trits_t cfg_ch = mam2_channel_name(cfg->ch);
-    TRIT_ARRAY_MAKE_FROM_RAW(ch, cfg_ch.n - cfg_ch.d, cfg_ch.p + cfg_ch.d);
-    trits_t cfg_ep = cfg->ep ? mam2_endpoint_name(cfg->ep) : trits_null();
-    TRIT_ARRAY_MAKE_FROM_RAW(ep, cfg_ep.n - cfg_ep.d, cfg_ep.p + cfg_ep.d);
+    trit_array_t ch = mam2_channel_name(cfg->ch);
+    trit_array_t ep;
+    if (cfg->ep) {
+      ep = mam2_endpoint_name(cfg->ep);
+    } else {
+      ep.num_trits = 0;
+      ep.num_bytes = 0;
+      ep.trits = NULL;
+    }
     TRIT_ARRAY_MAKE_FROM_RAW(skn_trits, skn.n - skn.d, skn.p + skn.d);
     TRIT_ARRAY_DECLARE(cfg_key_array, MAM2_SPONGE_KEY_SIZE);
     trits_t cfg_key_trits = mam2_send_msg_cfg_key(cfg);
@@ -400,10 +413,12 @@ retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg) {
         *b = trits_drop(*b, n);
 
         // sign with ep
-        if (cfg->ep)
-          mss_sign(cfg->ep->m, H, sig);
-        else
-          mss_sign(cfg->ch->m, H, sig);
+        if (cfg->ep) {
+          // TODO - uncomment
+          // mss_sign(cfg->ep->m, H, sig);
+        } else {
+          // mss_sign(cfg->ch->m, H, sig);
+        }
       } else
         // empty sig = no sig
         pb3_encode_trytes(trits_null(), b);
@@ -556,7 +571,7 @@ size_t mam2_send_packet_size(mam2_send_packet_context *cfg,
 retcode_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
                            trits_t *packet) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  isponge *s;
+  sponge_t *s;
   trits_t b0, *b = packet;
 
   MAM2_ASSERT(cfg);
@@ -610,7 +625,8 @@ retcode_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
       *b = trits_drop(*b, n);
 
       // sign
-      mss_sign(cfg->m, H, sig);
+      // FIXME (@tsvisabo) - uncomment
+      // mss_sign(cfg->m, H, sig);
     } else
       //    null none = 0;
       ;
@@ -656,8 +672,8 @@ static trits_t mam2_recv_msg_cfg_ntru_id(mam2_recv_msg_context *cfg) {
 retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
-  isponge *s;
-  isponge *fork;
+  sponge_t *s;
+  sponge_t *fork;
   trits_t b0, *b;
 
   MAM2_ASSERT(cfg);
@@ -725,13 +741,17 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
           *b = trits_drop(*b, n);
 
           // TODO: verify that signer is trusted
-          if (2 == pubkey)
-            // signed with ep
-            mss_verify(cfg->ms, cfg->ws, H, sig, mam2_recv_msg_cfg_epid(cfg));
-          else
-            // signed with ch
-            mss_verify(cfg->ms, cfg->ws, H, sig, mam2_recv_msg_cfg_chid(cfg));
+          TRIT_ARRAY_MAKE_FROM_RAW(pk, MAM2_WOTS_PK_SIZE,
+                                   mam2_recv_msg_cfg_epid(cfg).p);
 
+          // FIXME (@tsvisabo) - uncomment
+          if (2 == pubkey) {
+            // signed with ep
+            // mss_verify(cfg->ms, cfg->ws, H, sig, &pk);
+          } else {
+            // signed with ch
+            // mss_verify(cfg->ms, cfg->ws, H, sig, &pk);
+          }
           // TODO: record new channel/endpoint
         }
       }
@@ -747,7 +767,7 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
       //  forkhash repeated oneof keyload
       {
         size_t keyload_count = 0;
-        bool_t key_found = 0;
+        bool key_found = false;
 
         b0 = *b;
         err_bind(pb3_decode_repeated(&keyload_count, b));
@@ -772,7 +792,7 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
             pb3_unwrap_data(fork, trits_diff(b0, *b));
 
             err_guard(!key_found, RC_MAM2_KEYLOAD_OVERLOADED);
-            key_found = 1;
+            key_found = true;
           } else if (1 == keyload) {  //  KeyloadPSK psk = 1;
 
             //  tryte id[27];
@@ -783,7 +803,7 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
             if (cfg->psk && trits_cmp_eq(mam2_psk_id(cfg->psk),
                                          mam2_recv_msg_cfg_psk_id(cfg))) {
               err_guard(!key_found, RC_MAM2_KEYLOAD_OVERLOADED);
-              key_found = 1;
+              key_found = true;
 
               //  external secret tryte psk[81];
               pb3_unwrap_secret(s, mam2_psk_trits(cfg->psk));
@@ -808,7 +828,7 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
             if (cfg->ntru && trits_cmp_eq(ntru_id_trits(cfg->ntru),
                                           mam2_recv_msg_cfg_ntru_id(cfg))) {
               err_guard(!key_found, RC_MAM2_KEYLOAD_OVERLOADED);
-              key_found = 1;
+              key_found = true;
 
               //  tryte ekey[3072];
               err_guard(trits_size(*b) >= MAM2_NTRU_EKEY_SIZE, RC_MAM2_PB3_EOF);
@@ -837,7 +857,7 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg) {
 retcode_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
                            trits_t *payload) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  isponge *s;
+  sponge_t *s;
   trits_t b0, *b = packet;
 
   MAM2_ASSERT(cfg);
@@ -889,9 +909,11 @@ retcode_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,
 
       sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, H);
 
+      TRIT_ARRAY_MAKE_FROM_RAW(pk, MAM2_WOTS_PK_SIZE, cfg->pk.p);
       // verify
-      err_guard(mss_verify(cfg->ms, cfg->ws, H, sig, cfg->pk),
-                RC_MAM2_PB3_BAD_SIG);
+      // FIXME (@tsvisabo) - uncomment
+      // err_guard(mss_verify(cfg->ms, cfg->ws, H, sig, &pk),
+      // RC_MAM2_PB3_BAD_SIG);
     } else
       //    null none = 0;
       ;

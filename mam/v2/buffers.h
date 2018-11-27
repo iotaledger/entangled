@@ -3,21 +3,15 @@
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file buffers.h
-\brief Trits collection to simplify buffered operations.
-*/
 #ifndef __MAM_V2_BUFFERS_H__
 #define __MAM_V2_BUFFERS_H__
 
-#include "mam/v2/defs.h"
-#include "trits.h"
+#include "mam/v2/trits.h"
 
 typedef struct {
   trits_t X;   /*!< the head */
@@ -32,7 +26,7 @@ buffers_t buffers_init(size_t n, trits_t *Xs);
 \note However if the tail buffers consist of empty buffers only
 it will _not_ be considered empty!
 */
-bool_t buffers_is_empty(buffers_t tb);
+bool buffers_is_empty(buffers_t tb);
 
 /*! \brief Sum of head and tail buffers sizes. */
 size_t buffers_size(buffers_t tb);

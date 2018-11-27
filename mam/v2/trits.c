@@ -1,26 +1,19 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file trits.c
-\brief Basic trinary array operations.
-*/
+#include <stdlib.h>
+
 #include "mam/v2/trits.h"
+#include "utils/macros.h"
 
-#include <memory.h>
-#include <stdio.h>
-
-bool_t trits_is_empty(trits_t x) { return (x.n == x.d); }
+bool trits_is_empty(trits_t x) { return (x.n == x.d); }
 
 size_t trits_size(trits_t x) { return (x.n - x.d); }
 
@@ -36,7 +29,7 @@ trits_t trits_take(trits_t x, size_t n) {
 }
 
 trits_t trits_take_min(trits_t x, size_t n) {
-  x.n = min(x.n, x.d + n);
+  x.n = MIN(x.n, x.d + n);
   return x;
 }
 
@@ -80,25 +73,6 @@ void trits_put3(trits_t x, trint3_t t) {
   trits_put1(trits_drop(x, 2), t2);
 }
 
-trint6_t trits_get6(trits_t x) {
-  MAM2_ASSERT(x.n >= x.d + 6);
-
-  trint6_t t0 = (trint6_t)trits_get3(x);
-  trint6_t t1 = (trint6_t)trits_get3(trits_drop(x, 3));
-  return t0 + (trint6_t)27 * t1;
-}
-
-void trits_put6(trits_t x, trint6_t t) {
-  MAM2_ASSERT(x.n >= x.d + 6);
-
-  trint3_t t0 = MAM2_MODS(t, 27 * 27, 27);
-  t = MAM2_DIVS(t, 27 * 27, 27);
-  trint3_t t1 = (trint3_t)t;
-
-  trits_put3(x, t0);
-  trits_put3(trits_drop(x, 3), t1);
-}
-
 trint9_t trits_get9(trits_t x) {
   MAM2_ASSERT(x.n >= x.d + 9);
 
@@ -120,25 +94,6 @@ void trits_put9(trits_t x, trint9_t t) {
   trits_put3(x, t0);
   trits_put3(trits_drop(x, 3), t1);
   trits_put3(trits_drop(x, 6), t2);
-}
-
-trint18_t trits_get18(trits_t x) {
-  MAM2_ASSERT(x.n >= x.d + 18);
-
-  trint18_t t0 = (trint18_t)trits_get9(x);
-  trint18_t t1 = (trint18_t)trits_get9(trits_drop(x, 9));
-  return t0 + (trint18_t)19683 * t1;
-}
-
-void trits_put18(trits_t x, trint18_t t) {
-  MAM2_ASSERT(x.n >= x.d + 18);
-
-  trint9_t t0 = MAM2_MODS(t, 19683 * 19683, 19683);
-  t = MAM2_DIVS(t, 19683 * 19683, 19683);
-  trint9_t t1 = (trint9_t)t;
-
-  trits_put9(x, t0);
-  trits_put9(trits_drop(x, 9), t1);
 }
 
 void trits_set_zero(trits_t x) {
@@ -168,9 +123,7 @@ int trits_cmp_grlex(trits_t x, trits_t y) {
   return d;
 }
 
-bool_t trits_cmp_eq(trits_t x, trits_t y) {
-  return (0 == trits_cmp_grlex(x, y)) ? 1 : 0;
-}
+bool trits_cmp_eq(trits_t x, trits_t y) { return (0 == trits_cmp_grlex(x, y)); }
 
 trits_t trits_diff(trits_t begin, trits_t end) {
   MAM2_ASSERT(begin.p == end.p);
@@ -182,7 +135,7 @@ trits_t trits_diff(trits_t begin, trits_t end) {
 
 trits_t trits_null() { return trits_from_rep(0, 0); }
 
-bool_t trits_is_null(trits_t x) { return (0 == x.p); }
+bool trits_is_null(trits_t x) { return (0 == x.p); }
 
 trits_t trits_alloc(size_t n) {
   trit_t *p = (trit_t *)malloc(sizeof(trit_t) * MAM2_WORDS(n));
@@ -221,7 +174,7 @@ void trits_pad10(trits_t y) {
   trits_set_zero(trits_drop(y, 1));
 }
 
-bool_t trits_is_same(trits_t x, trits_t y) {
+bool trits_is_same(trits_t x, trits_t y) {
   return (x.p == y.p) && (x.d == y.d);  // && (x.n == y.n)
 }
 

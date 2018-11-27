@@ -23,7 +23,7 @@
 #endif
 
 typedef struct _test_sponge_s {
-  isponge s;
+  sponge_t s;
   sponge_state_t stack;
   sponge_state_t state;
 } test_sponge_t;
@@ -39,17 +39,18 @@ typedef struct _test_wots_s {
 } test_wots_t;
 
 #if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss(DEPTH, sfx)                    \
-  typedef struct _test_mss##sfx {                   \
-    mss_t m;                                        \
-    trit_t ap[MAM2_MSS_MT_AUTH_WORDS(DEPTH)];       \
-    uint32_t ap_check;                              \
-    trit_t hs[MAM2_MSS_MT_HASH_WORDS(DEPTH, 1)];    \
-    uint32_t hs_check;                              \
-    mss_mt_node_t ns[MAM2_MSS_MT_NODES(DEPTH) + 1]; \
-    uint32_t ns_check;                              \
-    mss_mt_stack_t ss[MAM2_MSS_MT_STACKS(DEPTH)];   \
-    uint32_t ss_check;                              \
+#define def_test_mss(DEPTH, sfx)                                            \
+  typedef struct _test_mss##sfx {                                           \
+    mss_t m;                                                                \
+    flex_trit_t auth_path[MAM2_MSS_AUTH_PATH_FLEX_SIZE(DEPTH)];             \
+    uint32_t auth_path_check;                                               \
+    flex_trit_t                                                             \
+        hashes[NUM_FLEX_TRITS_FOR_TRITS(MAM2_MSS_MT_HASH_WORDS(DEPTH, 1))]; \
+    uint32_t hashes_check;                                                  \
+    mss_mt_node_t nodes[MAM2_MSS_MT_NODES(DEPTH) + 1];                      \
+    uint32_t nodes_check;                                                   \
+    mss_mt_stack_t stacks[MAM2_MSS_MT_STACKS(DEPTH)];                       \
+    uint32_t stacks_check;                                                  \
   } test_mss##sfx
 #else
 #define def_test_mss(D, sfx)         \
@@ -63,14 +64,14 @@ typedef struct _test_wots_s {
 #if defined(MAM2_MSS_TRAVERSAL)
 #define def_test_mss_init(DEPTH, sfx)                  \
   static mss_t *test_mss_init##sfx(test_mss##sfx *m) { \
-    m->m.auth_path = m->ap;                            \
-    m->ap_check = 0xdeadbeef;                          \
-    m->m.hashes = m->hs;                               \
-    m->hs_check = 0xdeadbeef;                          \
-    m->m.nodes = m->ns;                                \
-    m->ns_check = 0xdeadbeef;                          \
-    m->m.stacks = m->ss;                               \
-    m->ss_check = 0xdeadbeef;                          \
+    m->m.auth_path = m->auth_path;                     \
+    m->auth_path_check = 0xdeadbeef;                   \
+    m->m.hashes = m->hashes;                           \
+    m->hashes_check = 0xdeadbeef;                      \
+    m->m.nodes = m->nodes;                             \
+    m->nodes_check = 0xdeadbeef;                       \
+    m->m.stacks = m->stacks;                           \
+    m->stacks_check = 0xdeadbeef;                      \
     return &m->m;                                      \
   }
 #else
@@ -85,15 +86,16 @@ typedef struct _test_wots_s {
 #endif
 
 #if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss_check(D, sfx)                                        \
-  static bool_t test_mss_check##sfx(test_mss##sfx *m) {                   \
-    return 1 && m->ap_check == 0xdeadbeef && m->hs_check == 0xdeadbeef && \
-           m->ns_check == 0xdeadbeef && m->ss_check == 0xdeadbeef;        \
+#define def_test_mss_check(D, sfx)                                          \
+  static bool test_mss_check##sfx(test_mss##sfx *m) {                       \
+    return m->auth_path_check == 0xdeadbeef &&                              \
+           m->hashes_check == 0xdeadbeef && m->nodes_check == 0xdeadbeef && \
+           m->stacks_check == 0xdeadbeef;                                   \
   }
 #else
-#define def_test_mss_check(D, sfx)                      \
-  static bool_t test_mss_check##sfx(test_mss##sfx *m) { \
-    return 1 && m->mt_check == 0xdeadbeef;              \
+#define def_test_mss_check(D, sfx)                    \
+  static bool test_mss_check##sfx(test_mss##sfx *m) { \
+    return m->mt_check == 0xdeadbeef;                 \
   }
 #endif
 
@@ -149,20 +151,20 @@ void test_f(void *buf, trit_t *s) {
   memcpy(s, y_trits, MAM2_SPONGE_RATE);
 }
 
-static isponge *test_sponge_init(test_sponge_t *s) {
+static sponge_t *test_sponge_init(test_sponge_t *s) {
   s->s.f = test_f;
   s->s.stack = s->stack;
   s->s.s = s->state;
   return &s->s;
 }
 
-static prng_t *test_prng_init(test_prng_t *prng, isponge *sponge) {
+static prng_t *test_prng_init(test_prng_t *prng, sponge_t *sponge) {
   prng->p.sponge = sponge;
   memcpy(prng->p.key, prng->key, MAM2_PRNG_KEY_FLEX_SIZE);
   return &prng->p;
 }
 
-static wots_t *test_wots_init(test_wots_t *w, isponge *s) {
+static wots_t *test_wots_init(test_wots_t *w, sponge_t *s) {
   w->w.sponge = s;
   memcpy(w->w.sk, w->sk, MAM2_WOTS_SK_FLEX_SIZE);
   return &w->w;

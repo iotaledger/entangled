@@ -3,37 +3,30 @@
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file mam2.h
-\brief MAM2 layer.
-*/
 #ifndef __MAM_V2_MAM2_H__
 #define __MAM_V2_MAM2_H__
 
-#include "mam/v2/defs.h"
 #include "mam/v2/list.h"
 #include "mam/v2/mss.h"
 #include "mam/v2/ntru.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
-#include "mam/v2/wots.h"
-#include "trits.h"
+#include "mam/v2/trits.h"
 
 typedef struct _mam2_ialloc {
-  isponge *(*create_sponge)(); /*!< Allocator for sponge interfaces used by
+  sponge_t *(*create_sponge)(); /*!< Allocator for sponge interfaces used by
                      channels/endpoints (WOTS, PB3 sponge, PB3 fork sponge). */
-  void (*destroy_sponge)(isponge *); /*!< Deallocator. */
+  void (*destroy_sponge)(sponge_t *); /*!< Deallocator. */
 } mam2_ialloc;
 
 retcode_t mam2_mss_create(mam2_ialloc *ma, mss_t *m, prng_t *p,
-                          mss_mt_height_t d, trits_t N1, trits_t N2);
+                          mss_mt_height_t d, trit_array_p nonce1,
+                          trit_array_p nonce2);
 
 void mam2_mss_destroy(mam2_ialloc *ma, mss_t *m);
 
@@ -44,7 +37,7 @@ typedef struct _mam2_channel {
   chid_t id;  /*!< MSS public key. */
 } mam2_channel;
 trits_t mam2_channel_id(mam2_channel *ch);
-trits_t mam2_channel_name(mam2_channel *ch);
+trit_array_t mam2_channel_name(mam2_channel *ch);
 
 def_mam2_list_node(mam2_channel, mam2_channel_node);
 def_mam2_list(mam2_channel_node, mam2_channel_list);
@@ -82,8 +75,8 @@ typedef struct _mam2_endpoint {
   epid_t id;  /*!< MSS public key. */
 } mam2_endpoint;
 trits_t mam2_endpoint_id(mam2_endpoint *ep);
-trits_t mam2_endpoint_chname(mam2_endpoint *ep);
-trits_t mam2_endpoint_name(mam2_endpoint *ep);
+trit_array_t mam2_endpoint_chname(mam2_endpoint *ep);
+trit_array_t mam2_endpoint_name(mam2_endpoint *ep);
 
 def_mam2_list_node(mam2_endpoint, mam2_endpoint_node);
 def_mam2_list(mam2_endpoint_node, mam2_endpoint_list);
@@ -138,20 +131,20 @@ def_mam2_list(mam2_ntru_pk_node, mam2_ntru_pk_list);
 
 typedef struct _mam2_send_msg_context {
   mam2_ialloc *ma; /*!< Allocator. */
-  isponge *s;      /*!< Main Sponge interface used to wrap PB3 messages. */
-  isponge *fork;   /*!< Sponge interface used for PB3 forks. */
+  sponge_t *s;     /*!< Main Sponge interface used to wrap PB3 messages. */
+  sponge_t *fork;  /*!< Sponge interface used for PB3 forks. */
   prng_t *prng; /*!< Shared deterministic PRNG instance used to gen MSS keys. */
   prng_t *rng;  /*!< Volatile PRNG instance used to generate ephemeral keys. */
 
   mam2_channel *ch;  /*!< Current channel. */
   mam2_channel *ch1; /*!< New channel (may be null). */
   mam2_endpoint *ep; /*!< Current endpoint (may be null). */
-  bool_t ep_sig;     /*!< Need to sign Endpoint.sig? */
+  bool ep_sig;       /*!< Need to sign Endpoint.sig? */
 
   trits_t nonce; /*!< Message nonce, must be unique for each key. */
   trit_t key[MAM2_WORDS(
       MAM2_SPONGE_KEY_SIZE)]; /*!< Trits (memory) for session key. */
-  bool_t key_plain;           /*!< Include session key in plain? */
+  bool key_plain;             /*!< Include session key in plain? */
   mam2_psk_list psks;         /*!< Encrypt message for these psks. */
   mam2_ntru_pk_list
       ntru_pks; /*!< Encrypt message for these NTRU public keys. */
@@ -162,7 +155,7 @@ size_t mam2_send_msg_size(mam2_send_msg_context *cfg);
 retcode_t mam2_send_msg(mam2_send_msg_context *cfg, trits_t *msg);
 
 typedef struct _mam2_send_packet_context {
-  isponge *s; /*!< Main Sponge interface */
+  sponge_t *s; /*!< Main Sponge interface */
   trint18_t ord;
   tryte_t checksum;
   mss_t *m;
@@ -176,16 +169,16 @@ retcode_t mam2_send_packet(mam2_send_packet_context *cfg, trits_t payload,
 
 typedef struct _mam2_recv_msg_context {
   mam2_ialloc *ma; /*!< Allocator. */
-  isponge *s;      /*!< Main Sponge interface */
-  isponge *fork;   /*!< Sponge interface used for PB3 forks. */
+  sponge_t *s;     /*!< Main Sponge interface */
+  sponge_t *fork;  /*!< Sponge interface used for PB3 forks. */
 
   tryte_t pubkey;
   trit_t chid[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
   trit_t chid1[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
   trit_t epid[MAM2_WORDS(MAM2_ENDPOINT_ID_SIZE)];
-  isponge *ms;   /*!< Sponge interface used by MSS layer */
-  isponge *ws;   /*!< Sponge interface used by WOTS layer */
-  bool_t ep_sig; /*!< Signed? */
+  sponge_t *ms; /*!< Sponge interface used by MSS layer */
+  sponge_t *ws; /*!< Sponge interface used by WOTS layer */
+  bool ep_sig;  /*!< Signed? */
   // TODO: check for trusted chid/epid
   // TODO: handle (add to trusted list) new chid1
 
@@ -203,11 +196,11 @@ retcode_t mam2_recv_msg(mam2_recv_msg_context *cfg, trits_t *msg);
 
 typedef struct _mam2_recv_packet_context {
   mam2_ialloc *ma; /*!< Allocator. */
-  isponge *s;      /*!< Main Sponge interface */
+  sponge_t *s;     /*!< Main Sponge interface */
   trint18_t ord;   /*!< Packet ordinal number. */
   trits_t pk;      /*!< Channel/Endpoint id - MSS public key. */
-  isponge *ms;     /*!< Sponge interface used by MSS. */
-  isponge *ws;     /*!< Sponge interface used by WOTS. */
+  sponge_t *ms;    /*!< Sponge interface used by MSS. */
+  sponge_t *ws;    /*!< Sponge interface used by WOTS. */
 } mam2_recv_packet_context;
 
 retcode_t mam2_recv_packet(mam2_recv_packet_context *cfg, trits_t *packet,

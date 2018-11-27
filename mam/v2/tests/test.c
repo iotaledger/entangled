@@ -17,7 +17,7 @@
 
 void test_sponge_hash(size_t Xn, char *X, size_t Yn, char *Y) {
   test_sponge_t _s[1];
-  isponge *s = test_sponge_init(_s);
+  sponge_t *s = test_sponge_init(_s);
 
   trits_t tX = trits_alloc(3 * Xn);
   trits_t tY = trits_alloc(3 * Yn);
@@ -36,7 +36,7 @@ void test_sponge_hash(size_t Xn, char *X, size_t Yn, char *Y) {
 void test_sponge_encr(size_t Kn, char *K, size_t Xn, char *X, size_t Yn,
                       char *Y) {
   test_sponge_t _s[1];
-  isponge *s = test_sponge_init(_s);
+  sponge_t *s = test_sponge_init(_s);
 
   trits_t tK = trits_alloc(3 * Kn);
   trits_t tX = trits_alloc(3 * Xn);
@@ -57,7 +57,7 @@ void test_sponge_encr(size_t Kn, char *K, size_t Xn, char *X, size_t Yn,
 void test_sponge_decr(size_t Kn, char *K, size_t Yn, char *Y, size_t Xn,
                       char *X) {
   test_sponge_t _s[1];
-  isponge *s = test_sponge_init(_s);
+  sponge_t *s = test_sponge_init(_s);
 
   trits_t tK = trits_alloc(3 * Kn);
   trits_t tY = trits_alloc(3 * Yn);
@@ -80,7 +80,7 @@ void test_prng_gen(size_t Kn, char *K, trit_array_t const *const nonce,
                    size_t Yn, char *Y) {
   test_sponge_t _s[1];
   test_prng_t _p[1];
-  isponge *s = test_sponge_init(_s);
+  sponge_t *s = test_sponge_init(_s);
   prng_t *p = test_prng_init(_p, s);
 
   trits_t tK = trits_alloc(3 * Kn);
@@ -104,7 +104,7 @@ void test_wots_gen_sign(size_t Kn, char *K, trit_array_t const *const nonce,
   test_sponge_t _s[1];
   test_prng_t _p[1];
   test_wots_t _w[1];
-  isponge *s = test_sponge_init(_s);
+  sponge_t *s = test_sponge_init(_s);
   prng_t *p = test_prng_init(_p, s);
   wots_t *w = test_wots_init(_w, s);
 
@@ -184,7 +184,7 @@ void test() {
       "OXYZ99AZNOD99ABCKNLMOXYZA99999999999999999999999999999999999999999999999"
       "999999999999999999";
 
-  bool_t r = 1;
+  bool r = true;
   size_t sponge_hash_Yn = 81;
   size_t sponge_encr_Yn = 162;
   size_t sponge_decr_Xn = 162;

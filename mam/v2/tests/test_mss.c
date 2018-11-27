@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -9,112 +8,114 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/buffers.h"
-#include "mam/v2/curl.h"
-#include "mam/v2/mam.h"
+#include <unity/unity.h>
+
 #include "mam/v2/mss.h"
-#include "mam/v2/ntru.h"
-#include "mam/v2/pb3.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
 #include "mam/v2/tests/common.h"
-#include "mam/v2/trits.h"
-#include "mam/v2/wots.h"
-
 #include "utils/macros.h"
 
-#include <string.h>
-#include <unity/unity.h>
-
-#include <memory.h>
-#include <stdio.h>
-
-void mss_test_do(mss_t *m, prng_t *p, isponge *s, wots_t *w,
-                 mss_mt_height_t D) {
-  bool_t r = 1;
+void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
+                 mss_mt_height_t mt_height) {
+  bool r = true;
   flex_trit_t key[FLEX_TRIT_SIZE_243];
-  // TODO Remove when sponge handles flex_trit_t
-  MAM2_TRITS_DEF(K, MAM2_PRNG_KEY_SIZE);
   mss_mt_height_t d;
-  MAM2_TRITS_DEF(N, 24);
-  MAM2_TRITS_DEF(H, MAM2_MSS_HASH_SIZE);
-  MAM2_TRITS_DEF(pk, MAM2_MSS_PK_SIZE);
-  // MAM2_TRITS_DEF(sig_, MAM2_MSS_SIG_SIZE(MAM2_MSS_TEST_MAX_D));
-  trits_t sig_ = trits_alloc(MAM2_MSS_SIG_SIZE(D));
 
+  TRIT_ARRAY_DECLARE(sig, MAM2_MSS_SIG_SIZE(mt_height));
   tryte_t const *const key_trytes =
       "ABCNOABCNKOZWYKOZWYSDF9SDF9YSDF9QABCNKOZWYSDF9ABCNKOZWSDF9CABCABCNKOZWYN"
       "KOZWYSDF9";
 
-  trytes_to_trits(key_trytes, K.p, MIN(strlen(key_trytes), K.n / RADIX));
   flex_trits_from_trytes(key, MAM2_PRNG_KEY_SIZE, key_trytes, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
   prng_init(p, p->sponge, key);
-  trits_set_zero(N);
-  trits_set_zero(H);
+  TRIT_ARRAY_DECLARE(nonce, 24);
+  TRIT_ARRAY_DECLARE(nonce_null, 0);
+
   const char *h_str =
       "ABCNKOZWYSDF9OABCNKOZWYSDF9"
       "ABCNKOZWYSDF9QABCNKOZWYSDF9"
       "ABCNKOZWYSDF9CABCNKOZWYSDF9";
-  trytes_to_trits(h_str, H.p, MIN(strlen(h_str), H.n / RADIX));
 
-  for (d = 1; r && d <= D; ++d) {
-    trits_t sig = trits_take(sig_, MAM2_MSS_SIG_SIZE(d));
-    trits_t sig_skn = trits_take(sig, MAM2_MSS_SKN_SIZE);
+  TRIT_ARRAY_DECLARE(hash_array, MAM2_WOTS_HASH_SIZE);
+  flex_trits_from_trytes(hash_array.trits, MAM2_WOTS_HASH_SIZE, h_str,
+                         MAM2_WOTS_HASH_SIZE, strlen(h_str));
+
+  for (d = 1; r && d <= mt_height; ++d) {
+    TRIT_ARRAY_DECLARE(curr_sig, MAM2_MSS_SIG_SIZE(d));
+    trit_array_insert_from_pos(&curr_sig, &sig, 0, 0, MAM2_MSS_SIG_SIZE(d));
+    trit_t tmp[MAM2_MSS_SIG_SIZE(d)];
+    flex_trits_to_trits(tmp, MAM2_MSS_SIG_SIZE(d), curr_sig.trits,
+                        MAM2_MSS_SIG_SIZE(d), MAM2_MSS_SIG_SIZE(d));
+
+    TRIT_ARRAY_DECLARE(curr_sig_skn, MAM2_MSS_SKN_SIZE);
+    trit_array_insert_from_pos(&curr_sig_skn, &sig, 0, 0, MAM2_MSS_SKN_SIZE);
 #if !defined(MAM2_MSS_DEBUG)
-    trits_t sig_wots =
-        trits_take(trits_drop(sig, MAM2_MSS_SKN_SIZE), MAM2_WOTS_SIG_SIZE);
-    trits_t sig_apath = trits_drop(sig, MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE);
+    TRIT_ARRAY_DECLARE(sig_wots, MAM2_WOTS_SIG_SIZE);
+    trit_array_insert_from_pos(&sig_wots, &curr_sig, MAM2_MSS_SKN_SIZE, 0,
+                               MAM2_WOTS_SIG_SIZE);
+    TRIT_ARRAY_DECLARE(
+        sig_apath, curr_sig.num_trits - MAM2_WOTS_SIG_SIZE - MAM2_MSS_SKN_SIZE);
+    trit_array_insert_from_pos(
+        &sig_apath, &curr_sig, MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE, 0,
+        curr_sig.num_trits - MAM2_WOTS_SIG_SIZE - MAM2_MSS_SKN_SIZE);
 #endif
 
-    dbg_printf("========================\nD = %d\n", d);
+    dbg_printf("========================\nmt_height = %d\n", d);
 
-    mss_init(m, p, s, w, d, N, trits_null());
-    mss_gen(m, pk);
+    mss_init(m, p, s, w, d, &nonce, &nonce_null);
+    TRIT_ARRAY_DECLARE(pk, MAM2_WOTS_PK_SIZE);
+    mss_gen(m, &pk);
 
     dbg_printf("mss pk \t");
-    trits_dbg_print(pk);
+    // trits_dbg_print(pk);
     dbg_printf("\n");
 
     do {
       dbg_printf("------------------------\nskn = %d\n", m->skn);
-      mss_sign(m, H, sig);
-      TEST_ASSERT(mss_verify(s, w->sponge, H, sig, pk));
+      mss_sign(m, &hash_array, &curr_sig);
+      TEST_ASSERT(mss_verify(s, w->sponge, &hash_array, &curr_sig, &pk));
 
 #if !defined(MAM2_MSS_DEBUG)
       // H is ignored, makes no sense to modify and check
-      trits_put1(H, trit_add(trits_get1(H), 1));
-      TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, pk));
-      trits_put1(H, trit_sub(trits_get1(H), 1));
+      trit_t modified_trit = trit_array_at(&hash_array, 0);
+      trit_array_set_at(&hash_array, 0, trit_sum(modified_trit, 1));
+      TEST_ASSERT(!mss_verify(s, w->sponge, &hash_array, &curr_sig, &pk));
+      trit_array_set_at(&hash_array, 0, modified_trit);
 #endif
 
-      trits_put1(sig_skn, trit_add(trits_get1(sig_skn), 1));
-      TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, pk));
-      trits_put1(sig_skn, trit_sub(trits_get1(sig_skn), 1));
+      modified_trit = trit_array_at(&curr_sig, 0);
+      trit_array_set_at(&curr_sig, 0, trit_sum(modified_trit, 1));
+      TEST_ASSERT(!mss_verify(s, w->sponge, &hash_array, &curr_sig, &pk));
+      trit_array_set_at(&curr_sig, 0, modified_trit);
 
 #if !defined(MAM2_MSS_DEBUG)
       // WOTS sig is ignored, makes no sense to modify and check
-      trits_put1(sig_wots, trit_add(trits_get1(sig_wots), 1));
-      TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, pk));
-      trits_put1(sig_wots, trit_sub(trits_get1(sig_wots), 1));
+      modified_trit = trit_array_at(&curr_sig, MAM2_MSS_SKN_SIZE);
+      trit_array_set_at(&curr_sig, MAM2_MSS_SKN_SIZE,
+                        trit_sum(modified_trit, 1));
+      TEST_ASSERT(!mss_verify(s, w->sponge, &hash_array, &curr_sig, &pk));
+      trit_array_set_at(&curr_sig, MAM2_MSS_SKN_SIZE, modified_trit);
 
-      if (!trits_is_empty(sig_apath)) {
-        trits_put1(sig_apath, trit_add(trits_get1(sig_apath), 1));
-        TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, pk));
-        trits_put1(sig_apath, trit_sub(trits_get1(sig_apath), 1));
+      if (sig_apath.num_trits > 0) {
+        modified_trit =
+            trit_array_at(&curr_sig, MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE);
+        trit_array_set_at(&curr_sig, MAM2_MSS_SKN_SIZE,
+                          trit_sum(modified_trit, 1));
+        TEST_ASSERT(!mss_verify(s, w->sponge, &hash_array, &curr_sig, &pk));
+        trit_array_set_at(&curr_sig, MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE,
+                          modified_trit);
       }
 #endif
 
-      TEST_ASSERT(!mss_verify(s, w->sponge, H,
-                              trits_take(sig, trits_size(sig) - 1), pk));
-      trits_put1(pk, trit_add(trits_get1(pk), 1));
-      TEST_ASSERT(!mss_verify(s, w->sponge, H, sig, pk));
-      trits_put1(pk, trit_sub(trits_get1(pk), 1));
+      modified_trit = trit_array_at(&pk, 0);
+      trit_array_set_at(&pk, 0, trit_sum(modified_trit, 1));
+      TEST_ASSERT(!mss_verify(s, w->sponge, &hash_array, &curr_sig, &pk));
+      trit_array_set_at(&pk, 0, modified_trit);
 
     } while (mss_next(m));
   }
-
-  trits_free(sig_);
 }
 
 void mss_test() {
@@ -127,7 +128,7 @@ void mss_test() {
   test_mss4 _m4[1];
   test_mss _m[1];
 
-  isponge *s = test_sponge_init(_s);
+  sponge_t *s = test_sponge_init(_s);
   prng_t *p = test_prng_init(_p, s);
   wots_t *w = test_wots_init(_w, s);
   mss_t *m1 = test_mss_init1(_m1);
