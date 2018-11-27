@@ -63,6 +63,7 @@ Long option | Short option | Description | Example input
 `--port` | `-p` | HTTP API listen port. | `--port 14265`
 `--alpha` | | Randomness of the tip selection. Value must be in [0, inf] where 0 is most random and inf is most deterministic. | `--alpha 0.001`
 `--below-max-depth` | | Maximum number of unconfirmed transactions that may be analysed to find the latest referenced milestone by the currently visited transaction during the random walk. | `--below-max-depth 20000`
+`--coordinator` | | The address of the coordinator. | `--coordinator "KPW...BWU"`
 `--last-milestone` | | The index of the last milestone issued by the corrdinator before the last snapshot. | `--last-milestone 774804`
 `--max-depth` | | Limits how many milestones behind the current one the random walk can start. | `--max-depth 15`
 `--num-keys-in-milestone` | | The depth of the Merkle tree which in turn determines the number of leaves (private keys) that the coordinator can use to sign a message. | `--num-keys-in-milestone 20`
