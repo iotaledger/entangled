@@ -117,11 +117,11 @@ trit_array_p trit_array_insert(trit_array_p const trit_array,
 /// @param[in] dst_start_pos - the start index on the destination array
 /// @param[in] num_trits - the number of trits to copy over
 /// @return trit_array_p - the receiver
-trit_array_p trit_array_insert_from_pos(trit_array_p const dst_trits,
-                                        trit_array_p const src_trits,
-                                        size_t const src_start_pos,
-                                        size_t const dst_start_pos,
-                                        size_t const num_trits);
+trit_array_t *trit_array_insert_from_pos(trit_array_t *const dst_trits,
+                                         trit_array_t const *const src_trits,
+                                         size_t const src_start_pos,
+                                         size_t const dst_start_pos,
+                                         size_t const num_trits);
 
 /// Returns an array of trits regardless of the current memory storage scheme
 /// @param[in] trit_array - the array of packed trits

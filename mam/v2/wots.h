@@ -106,7 +106,7 @@ void wots_gen_sk3(wots_t *const wots, prng_t *const prng,
  * @param wots WOTS interface
  * @param pk Public key
  */
-void wots_calc_pk(wots_t *const wots, trit_array_t *pk);
+void wots_calc_pk(wots_t *const wots, trit_array_t *const pk);
 
 /**
  * Generates a WOTS signature
@@ -115,7 +115,8 @@ void wots_calc_pk(wots_t *const wots, trit_array_t *pk);
  * @param hash Hash value to be signed
  * @param sig Signature
  */
-void wots_sign(wots_t *const wots, trit_array_t *const hash, trit_array_t *sig);
+void wots_sign(wots_t *const wots, trit_array_t const *const hash,
+               trit_array_t *const sig);
 
 /**
  * Recovers a WOTS public key from a signature
@@ -125,8 +126,8 @@ void wots_sign(wots_t *const wots, trit_array_t *const hash, trit_array_t *sig);
  * @param sig Signature
  * @param pk Recovered public key
  */
-void wots_recover(sponge_t *const sponge, trit_array_t *const hash,
-                  trit_array_t *const sig, trit_array_t *pk);
+void wots_recover(sponge_t *const sponge, trit_array_t const *const hash,
+                  trit_array_t *const sig, trit_array_t *const pk);
 
 /**
  * Verifies a WOTS signature
@@ -138,7 +139,7 @@ void wots_recover(sponge_t *const sponge, trit_array_t *const hash,
  *
  * @return true if signature is valid, false otherwise
  */
-bool wots_verify(sponge_t *const sponge, trit_array_t *const hash,
-                 trit_array_t *const sig, trit_array_t *const pk);
+bool wots_verify(sponge_t *const sponge, trit_array_t const *const hash,
+                 trit_array_t *const sig, trit_array_t const *const pk);
 
 #endif  // __MAM_V2_WOTS_H__

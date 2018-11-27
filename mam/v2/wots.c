@@ -17,8 +17,8 @@
  * Private functions
  */
 
-static void wots_calc_pks(sponge_t *const sponge, trit_array_t *sk_pks,
-                          trit_array_t *pk) {
+static void wots_calc_pks(sponge_t *const sponge, trit_array_t *const sk_pks,
+                          trit_array_t *const pk) {
   size_t i, j;
 
   TRIT_ARRAY_DECLARE(sk_part_trits_array, MAM2_WOTS_SK_PART_SIZE);
@@ -39,8 +39,9 @@ static void wots_calc_pks(sponge_t *const sponge, trit_array_t *sk_pks,
   sponge_hash(sponge, sk_pks, pk);
 }
 
-static void wots_hash_sign(sponge_t *const sponge, trit_array_t *sk_sig,
-                           trit_array_t *const hash) {
+static void wots_hash_sign(sponge_t *const sponge,
+                           trit_array_t const *const hash,
+                           trit_array_t *const sk_sig) {
   size_t i, j;
   trint9_t t = 0;
   trint3_t h;
@@ -84,8 +85,9 @@ static void wots_hash_sign(sponge_t *const sponge, trit_array_t *sk_sig,
   }
 }
 
-static void wots_hash_verify(sponge_t *const sponge, trit_array_t *sig_pks,
-                             trit_array_t *const hash) {
+static void wots_hash_verify(sponge_t *const sponge,
+                             trit_array_t const *const hash,
+                             trit_array_t *const sig_pks) {
   size_t i, j;
   trint9_t t = 0;
   trint3_t h;
@@ -171,26 +173,26 @@ void wots_gen_sk3(wots_t *const wots, prng_t *const prng,
   prng_gen3(prng, MAM2_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3, &sk);
 }
 
-void wots_calc_pk(wots_t *const wots, trit_array_t *pk) {
+void wots_calc_pk(wots_t *const wots, trit_array_t *const pk) {
   TRIT_ARRAY_DECLARE(sk_trits_array, MAM2_WOTS_SK_SIZE);
   memcpy(sk_trits_array.trits, wots->sk, MAM2_WOTS_SK_FLEX_SIZE);
   wots_calc_pks(wots->sponge, &sk_trits_array, pk);
 }
 
-void wots_sign(wots_t *const wots, trit_array_t *const hash,
-               trit_array_t *sig) {
-  wots_hash_sign(wots->sponge, sig, hash);
+void wots_sign(wots_t *const wots, trit_array_t const *const hash,
+               trit_array_t *const sig) {
+  wots_hash_sign(wots->sponge, hash, sig);
 }
 
-void wots_recover(sponge_t *const sponge, trit_array_t *const hash,
-                  trit_array_t *const sig, trit_array_t *pk) {
+void wots_recover(sponge_t *const sponge, trit_array_t const *const hash,
+                  trit_array_t *const sig, trit_array_t *const pk) {
   MAM2_ASSERT(pk->num_trits == MAM2_WOTS_PK_SIZE);
-  wots_hash_verify(sponge, sig, hash);
+  wots_hash_verify(sponge, hash, sig);
   sponge_hash(sponge, sig, pk);
 }
 
-bool wots_verify(sponge_t *const sponge, trit_array_t *const hash,
-                 trit_array_t *const sig, trit_array_t *const pk) {
+bool wots_verify(sponge_t *const sponge, trit_array_t const *const hash,
+                 trit_array_t *const sig, trit_array_t const *const pk) {
   TRIT_ARRAY_DECLARE(pk_array, MAM2_WOTS_PK_SIZE);
   wots_recover(sponge, hash, sig, &pk_array);
   return (0 == memcmp(pk->trits, pk_array.trits,
