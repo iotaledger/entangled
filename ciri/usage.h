@@ -32,6 +32,7 @@ typedef enum cli_arg_value_e {
 
   CLI_ARG_ALPHA,
   CLI_ARG_BELOW_MAX_DEPTH,
+  CLI_ARG_COORDINATOR,
   CLI_ARG_LAST_MILESTONE,
   CLI_ARG_MAX_DEPTH,
   CLI_ARG_NUM_KEYS_IN_MILESTONE,
@@ -124,6 +125,8 @@ static struct cli_argument_s {
      "Maximum number of unconfirmed transactions that may be analysed to find "
      "the latest referenced milestone by the currently visited transaction "
      "during the random walk.",
+     REQUIRED_ARG},
+    {"coordinator", CLI_ARG_COORDINATOR, "The address of the coordinator.",
      REQUIRED_ARG},
     {"last-milestone", CLI_ARG_LAST_MILESTONE,
      "The index of the last milestone issued by the corrdinator before the "

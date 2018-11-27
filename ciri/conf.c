@@ -167,6 +167,15 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
       case CLI_ARG_BELOW_MAX_DEPTH:  // --below-max-depth
         consensus_conf->below_max_depth = atoi(optarg);
         break;
+      case CLI_ARG_COORDINATOR:  // --coordinator
+        if (strlen(optarg) != HASH_LENGTH_TRYTE) {
+          ret = RC_CIRI_CONF_INVALID_ARGUMENTS;
+          goto done;
+        }
+        flex_trits_from_trytes(consensus_conf->coordinator, HASH_LENGTH_TRIT,
+                               (tryte_t*)optarg, HASH_LENGTH_TRYTE,
+                               HASH_LENGTH_TRYTE);
+        break;
       case CLI_ARG_LAST_MILESTONE:  // --last-milestone
         consensus_conf->last_milestone = atoi(optarg);
         break;
@@ -189,6 +198,10 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
         consensus_conf->snapshot_signature_index = atoi(optarg);
         break;
       case CLI_ARG_SNAPSHOT_SIGNATURE_PUBKEY:  // --snapshot-signature-pubkey
+        if (strlen(optarg) != HASH_LENGTH_TRYTE) {
+          ret = RC_CIRI_CONF_INVALID_ARGUMENTS;
+          goto done;
+        }
         flex_trits_from_trytes(consensus_conf->snapshot_signature_pubkey,
                                HASH_LENGTH_TRIT, (tryte_t*)optarg,
                                HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
