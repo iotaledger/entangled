@@ -39,17 +39,18 @@ typedef struct _test_wots_s {
 } test_wots_t;
 
 #if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss(DEPTH, sfx)                                \
-  typedef struct _test_mss##sfx {                               \
-    mss_t m;                                                    \
-    flex_trit_t auth_path[MAM2_MSS_AUTH_PATH_FLEX_SIZE(DEPTH)]; \
-    uint32_t auth_path_check;                                   \
-    trit_t hs[MAM2_MSS_MT_HASH_WORDS(DEPTH, 1)];                \
-    uint32_t hs_check;                                          \
-    mss_mt_node_t ns[MAM2_MSS_MT_NODES(DEPTH) + 1];             \
-    uint32_t ns_check;                                          \
-    mss_mt_stack_t ss[MAM2_MSS_MT_STACKS(DEPTH)];               \
-    uint32_t ss_check;                                          \
+#define def_test_mss(DEPTH, sfx)                                            \
+  typedef struct _test_mss##sfx {                                           \
+    mss_t m;                                                                \
+    flex_trit_t auth_path[MAM2_MSS_AUTH_PATH_FLEX_SIZE(DEPTH)];             \
+    uint32_t auth_path_check;                                               \
+    flex_trit_t                                                             \
+        hashes[NUM_FLEX_TRITS_FOR_TRITS(MAM2_MSS_MT_HASH_WORDS(DEPTH, 1))]; \
+    uint32_t hashes_check;                                                  \
+    mss_mt_node_t nodes[MAM2_MSS_MT_NODES(DEPTH) + 1];                      \
+    uint32_t nodes_check;                                                   \
+    mss_mt_stack_t stacks[MAM2_MSS_MT_STACKS(DEPTH)];                       \
+    uint32_t stacks_check;                                                  \
   } test_mss##sfx
 #else
 #define def_test_mss(D, sfx)         \
@@ -65,12 +66,12 @@ typedef struct _test_wots_s {
   static mss_t *test_mss_init##sfx(test_mss##sfx *m) { \
     m->m.auth_path = m->auth_path;                     \
     m->auth_path_check = 0xdeadbeef;                   \
-    m->m.hashes = m->hs;                               \
-    m->hs_check = 0xdeadbeef;                          \
-    m->m.nodes = m->ns;                                \
-    m->ns_check = 0xdeadbeef;                          \
-    m->m.stacks = m->ss;                               \
-    m->ss_check = 0xdeadbeef;                          \
+    m->m.hashes = m->hashes;                           \
+    m->hashes_check = 0xdeadbeef;                      \
+    m->m.nodes = m->nodes;                             \
+    m->nodes_check = 0xdeadbeef;                       \
+    m->m.stacks = m->stacks;                           \
+    m->stacks_check = 0xdeadbeef;                      \
     return &m->m;                                      \
   }
 #else
@@ -87,8 +88,9 @@ typedef struct _test_wots_s {
 #if defined(MAM2_MSS_TRAVERSAL)
 #define def_test_mss_check(D, sfx)                                          \
   static bool test_mss_check##sfx(test_mss##sfx *m) {                       \
-    return m->auth_path_check == 0xdeadbeef && m->hs_check == 0xdeadbeef && \
-           m->ns_check == 0xdeadbeef && m->ss_check == 0xdeadbeef;          \
+    return m->auth_path_check == 0xdeadbeef &&                              \
+           m->hashes_check == 0xdeadbeef && m->nodes_check == 0xdeadbeef && \
+           m->stacks_check == 0xdeadbeef;                                   \
   }
 #else
 #define def_test_mss_check(D, sfx)                    \
