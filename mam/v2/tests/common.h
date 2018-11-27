@@ -5,7 +5,7 @@
  * MAM is based on an original implementation & specification by apmi.bsu.by
  * [ITSec Lab]
  *
- * Refer to the LICENSE file for licenodesing information
+ * Refer to the LICENSE file for licensing information
  */
 
 #ifndef __MAM_V2_TEST_STRUCTS_H__
@@ -39,17 +39,18 @@ typedef struct _test_wots_s {
 } test_wots_t;
 
 #if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss(DEPTH, sfx)                                \
-  typedef struct _test_mss##sfx {                               \
-    mss_t m;                                                    \
-    flex_trit_t auth_path[MAM2_MSS_AUTH_PATH_FLEX_SIZE(DEPTH)]; \
-    uint32_t auth_path_check;                                   \
-    trit_t hashes[MAM2_MSS_MT_HASH_WORDS(DEPTH, 1)];            \
-    uint32_t hashes_check;                                      \
-    mss_mt_node_t nodes[MAM2_MSS_MT_NODES(DEPTH) + 1];          \
-    uint32_t nodes_check;                                       \
-    mss_mt_stack_t stacks[MAM2_MSS_MT_STACKS(DEPTH)];           \
-    uint32_t stacks_check;                                      \
+#define def_test_mss(DEPTH, sfx)                                            \
+  typedef struct _test_mss##sfx {                                           \
+    mss_t m;                                                                \
+    flex_trit_t auth_path[MAM2_MSS_AUTH_PATH_FLEX_SIZE(DEPTH)];             \
+    uint32_t auth_path_check;                                               \
+    flex_trit_t                                                             \
+        hashes[NUM_FLEX_TRITS_FOR_TRITS(MAM2_MSS_MT_HASH_WORDS(DEPTH, 1))]; \
+    uint32_t hashes_check;                                                  \
+    mss_mt_node_t nodes[MAM2_MSS_MT_NODES(DEPTH) + 1];                      \
+    uint32_t nodes_check;                                                   \
+    mss_mt_stack_t stacks[MAM2_MSS_MT_STACKS(DEPTH)];                       \
+    uint32_t stacks_check;                                                  \
   } test_mss##sfx
 #else
 #define def_test_mss(D, sfx)         \

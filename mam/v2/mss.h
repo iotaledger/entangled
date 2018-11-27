@@ -113,7 +113,7 @@ typedef struct mss_s {
   wots_t *wots;            // WOTS interface used to generate keys and sign
 #if defined(MAM2_MSS_TRAVERSAL)
   flex_trit_t *auth_path;  // Current authentication path; `d` hash values
-  trit_t *hashes;          // Buffer storing hash-values of auxiliary nodes;
+  flex_trit_t *hashes;     // Buffer storing hash-values of auxiliary nodes;
                            // MAM2_MSS_MT_NODES(d) hash-values in total
   mss_mt_node_t *nodes;    // Auxiliary node infos
   mss_mt_stack_t *stacks;  // Stacks used by traversal algorithm
