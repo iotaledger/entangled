@@ -77,9 +77,6 @@ void sponge_absorb_flex(sponge_t *s, trit_t c2, trit_array_p X_arr) {
     trits_copy_pad10(Xi, sponge_outer1_trits(s));
     set_control_tryte(s, 0, c0, c1, c2);
   } while (!trits_is_empty(X));
-
-  flex_trits_from_trits(X_arr->trits, X_arr->num_trits, x_p, X_arr->num_trits,
-                        X_arr->num_trits);
 }
 
 void sponge_squeeze(sponge_t *s, trit_t c2, trits_t Y) {
