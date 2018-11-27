@@ -19,8 +19,6 @@
 
 static void wots_calc_pks(sponge_t *const sponge, trit_array_t *const sk,
                           trit_array_t *const pk) {
-  MAM2_ASSERT(sk->num_trits == MAM2_WOTS_SK_SIZE);
-  MAM2_ASSERT(pk->num_trits == MAM2_WOTS_PK_SIZE);
   TRIT_ARRAY_DECLARE(sk_part, MAM2_WOTS_SK_PART_SIZE);
 
   size_t sk_pos = 0;
@@ -50,9 +48,6 @@ static void wots_hash_sign_or_recover(sponge_t *const sponge,
   flex_trit_t hash_value_flex[NUM_FLEX_TRITS_FOR_TRITS(3)];
   trit_t hash_value_trits[3];
   size_t sig_pos = 0;
-
-  MAM2_ASSERT(sig->num_trits == MAM2_WOTS_SK_SIZE);
-  MAM2_ASSERT(hash->num_trits == MAM2_WOTS_HASH_SIZE);
   TRIT_ARRAY_DECLARE(sig_part, MAM2_WOTS_SK_PART_SIZE);
 
   for (i = 0; i < MAM2_WOTS_SK_PART_COUNT - 3; ++i) {
@@ -132,6 +127,7 @@ void wots_gen_sk3(wots_t *const wots, prng_t *const prng,
 }
 
 void wots_calc_pk(wots_t *const wots, trit_array_t *const pk) {
+  MAM2_ASSERT(pk->num_trits == MAM2_WOTS_PK_SIZE);
   TRIT_ARRAY_DECLARE(sk, MAM2_WOTS_SK_SIZE);
   memcpy(sk.trits, wots->sk, MAM2_WOTS_SK_FLEX_SIZE);
   wots_calc_pks(wots->sponge, &sk, pk);
@@ -139,11 +135,15 @@ void wots_calc_pk(wots_t *const wots, trit_array_t *const pk) {
 
 void wots_sign(wots_t *const wots, trit_array_t const *const hash,
                trit_array_t *const sig) {
+  MAM2_ASSERT(hash->num_trits == MAM2_WOTS_HASH_SIZE);
+  MAM2_ASSERT(sig->num_trits == MAM2_WOTS_SIG_SIZE);
   wots_hash_sign_or_recover(wots->sponge, hash, sig, WOTS_HASH_SIGN);
 }
 
 void wots_recover(sponge_t *const sponge, trit_array_t const *const hash,
                   trit_array_t const *const sig, trit_array_t *const pk) {
+  MAM2_ASSERT(hash->num_trits == MAM2_WOTS_HASH_SIZE);
+  MAM2_ASSERT(sig->num_trits == MAM2_WOTS_SIG_SIZE);
   MAM2_ASSERT(pk->num_trits == MAM2_WOTS_PK_SIZE);
   TRIT_ARRAY_DECLARE(sig_cpy, MAM2_WOTS_SIG_SIZE);
   memcpy(sig_cpy.trits, sig->trits, MAM2_WOTS_SIG_FLEX_SIZE);
@@ -153,6 +153,9 @@ void wots_recover(sponge_t *const sponge, trit_array_t const *const hash,
 
 bool wots_verify(sponge_t *const sponge, trit_array_t const *const hash,
                  trit_array_t const *const sig, trit_array_t const *const pk) {
+  MAM2_ASSERT(hash->num_trits == MAM2_WOTS_HASH_SIZE);
+  MAM2_ASSERT(sig->num_trits == MAM2_WOTS_SIG_SIZE);
+  MAM2_ASSERT(pk->num_trits == MAM2_WOTS_PK_SIZE);
   TRIT_ARRAY_DECLARE(pk_recovered, MAM2_WOTS_PK_SIZE);
   wots_recover(sponge, hash, sig, &pk_recovered);
   return (0 == memcmp(pk->trits, pk_recovered.trits, MAM2_WOTS_PK_FLEX_SIZE));
