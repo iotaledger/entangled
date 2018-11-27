@@ -120,14 +120,3 @@ cc_library(
         "//common:errors",
     ],
 )
-
-cc_library(
-    name = "curl",
-    srcs = ["curl.c"],
-    hdrs = ["curl.h"],
-    deps = [
-        ":defs",
-        ":sponge",
-        ":trits",
-    ],
-)
