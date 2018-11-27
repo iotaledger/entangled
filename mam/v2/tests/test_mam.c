@@ -8,23 +8,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/buffers.h"
-#include "mam/v2/curl.h"
-#include "mam/v2/mam.h"
-#include "mam/v2/mss.h"
-#include "mam/v2/ntru.h"
-#include "mam/v2/pb3.h"
-#include "mam/v2/prng.h"
-#include "mam/v2/sponge.h"
-#include "mam/v2/tests/common.h"
-#include "mam/v2/trits.h"
-#include "mam/v2/wots.h"
+#include <stdlib.h>
 
-#include <string.h>
 #include <unity/unity.h>
 
-#include <memory.h>
-#include <stdio.h>
+#include "mam/v2/mam.h"
+#include "mam/v2/tests/common.h"
 
 static sponge_t *test_create_sponge() {
   test_sponge_t *t = malloc(sizeof(test_sponge_t));

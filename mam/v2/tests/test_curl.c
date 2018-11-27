@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -9,22 +8,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/buffers.h"
-#include "mam/v2/curl.h"
-#include "mam/v2/mam.h"
-#include "mam/v2/mss.h"
-#include "mam/v2/ntru.h"
-#include "mam/v2/pb3.h"
-#include "mam/v2/prng.h"
-#include "mam/v2/sponge.h"
-#include "mam/v2/trits.h"
-#include "mam/v2/wots.h"
-
-#include <string.h>
 #include <unity/unity.h>
 
-#include <memory.h>
-#include <stdio.h>
+#include "mam/v2/curl.h"
 
 void curl_test() {
   // test value from com.iota.iri.hash.CurlTest
@@ -133,7 +119,7 @@ void curl_test() {
       "VQFASMFAEQWUZCLIWLCDIGYVXOE"
       "JBBEMZOIHAYSUQMEFOGZBXUMHQW";
 
-  bool_t r = 1;
+  bool r = true;
   MAM2_TRITS_DEF(data, 3 * 2673);
   MAM2_TRITS_DEF(hash, MAM2_SPONGE_HASH_SIZE);
   MAM2_TRITS_DEF(h, MAM2_SPONGE_HASH_SIZE);

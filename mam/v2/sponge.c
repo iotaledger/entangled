@@ -8,12 +8,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdlib.h>
-
-#include "common/trinary/add.h"
-#include "common/trinary/trit_array.h"
-#include "mam/v2/buffers.h"
 #include "mam/v2/sponge.h"
+#include "common/trinary/add.h"
+#include "mam/v2/buffers.h"
 
 static trits_t sponge_state_trits(sponge_t *s) {
   return trits_from_rep(MAM2_SPONGE_WIDTH, s->s);

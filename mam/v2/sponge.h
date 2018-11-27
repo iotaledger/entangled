@@ -5,7 +5,6 @@
  * MAM is based on an original implementation & specification by apmi.bsu.by
  * [ITSec Lab]
  *
- *
  * Refer to the LICENSE file for licensing information
  */
 
@@ -13,8 +12,7 @@
 #define __MAM_V2_SPONGE_H__
 
 #include "common/trinary/trit_array.h"
-#include "mam/v2/defs.h"
-#include "trits.h"
+#include "mam/v2/trits.h"
 
 /*! \brief Sponge state rate. */
 #define MAM2_SPONGE_RATE 486

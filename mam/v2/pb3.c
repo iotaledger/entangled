@@ -1,25 +1,16 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file pb3.c
-\brief MAM2 Protobuf3 layer.
-*/
 #include "mam/v2/pb3.h"
-
 #include "common/trinary/trit_long.h"
 #include "mam/v2/mss.h"
-#include "mam/v2/prng.h"
 
 /*
 Protobuf3 primitive types
@@ -272,9 +263,9 @@ void pb3_unwrap_data(sponge_t *s, trits_t t) {
     pb3_unwrap_##mod(s, trits_diff(b##_begin, *b)); \
   } while (0)
 
-static bool_t pb3_test_sizet(size_t n) {
+static bool pb3_test_sizet(size_t n) {
   retcode_t e;
-  bool_t ok = 1;
+  bool ok = true;
   size_t k = pb3_sizeof_sizet(n);
   size_t m = 0;
   MAM2_TRITS_DEF(b0, 3 * 14);  // 14 trytes max
@@ -291,8 +282,8 @@ static bool_t pb3_test_sizet(size_t n) {
   return (e == RC_OK && ok && m == n);
 }
 
-static bool_t pb3_test_sizets() {
-  bool_t r = 1;
+static bool pb3_test_sizets() {
+  bool r = true;
 
   size_t n, k;
 
@@ -315,8 +306,8 @@ static bool_t pb3_test_sizets() {
   return r;
 }
 
-bool_t pb3_test() {
-  bool_t r = 1;
+bool pb3_test() {
+  bool r = true;
   r = r && pb3_test_sizets();
   /*TODO*/
   return r;

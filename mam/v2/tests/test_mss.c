@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -9,29 +8,17 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/buffers.h"
-#include "mam/v2/curl.h"
-#include "mam/v2/mam.h"
+#include <unity/unity.h>
+
 #include "mam/v2/mss.h"
-#include "mam/v2/ntru.h"
-#include "mam/v2/pb3.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
 #include "mam/v2/tests/common.h"
-#include "mam/v2/wots.h"
-
 #include "utils/macros.h"
-
-#include <string.h>
-#include <unity/unity.h>
-
-#include <memory.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
                  mss_mt_height_t mt_height) {
-  bool_t r = 1;
+  bool r = true;
   flex_trit_t key[FLEX_TRIT_SIZE_243];
   mss_mt_height_t d;
 

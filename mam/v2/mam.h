@@ -3,28 +3,20 @@
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file mam2.h
-\brief MAM2 layer.
-*/
 #ifndef __MAM_V2_MAM2_H__
 #define __MAM_V2_MAM2_H__
 
-#include "mam/v2/defs.h"
 #include "mam/v2/list.h"
 #include "mam/v2/mss.h"
 #include "mam/v2/ntru.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
-#include "mam/v2/wots.h"
-#include "trits.h"
+#include "mam/v2/trits.h"
 
 typedef struct _mam2_ialloc {
   sponge_t *(*create_sponge)(); /*!< Allocator for sponge interfaces used by
@@ -147,12 +139,12 @@ typedef struct _mam2_send_msg_context {
   mam2_channel *ch;  /*!< Current channel. */
   mam2_channel *ch1; /*!< New channel (may be null). */
   mam2_endpoint *ep; /*!< Current endpoint (may be null). */
-  bool_t ep_sig;     /*!< Need to sign Endpoint.sig? */
+  bool ep_sig;       /*!< Need to sign Endpoint.sig? */
 
   trits_t nonce; /*!< Message nonce, must be unique for each key. */
   trit_t key[MAM2_WORDS(
       MAM2_SPONGE_KEY_SIZE)]; /*!< Trits (memory) for session key. */
-  bool_t key_plain;           /*!< Include session key in plain? */
+  bool key_plain;             /*!< Include session key in plain? */
   mam2_psk_list psks;         /*!< Encrypt message for these psks. */
   mam2_ntru_pk_list
       ntru_pks; /*!< Encrypt message for these NTRU public keys. */
@@ -184,9 +176,9 @@ typedef struct _mam2_recv_msg_context {
   trit_t chid[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
   trit_t chid1[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
   trit_t epid[MAM2_WORDS(MAM2_ENDPOINT_ID_SIZE)];
-  sponge_t *ms;  /*!< Sponge interface used by MSS layer */
-  sponge_t *ws;  /*!< Sponge interface used by WOTS layer */
-  bool_t ep_sig; /*!< Signed? */
+  sponge_t *ms; /*!< Sponge interface used by MSS layer */
+  sponge_t *ws; /*!< Sponge interface used by WOTS layer */
+  bool ep_sig;  /*!< Signed? */
   // TODO: check for trusted chid/epid
   // TODO: handle (add to trusted list) new chid1
 

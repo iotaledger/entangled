@@ -3,24 +3,17 @@
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file pb3.h
-\brief MAM2 Protobuf3 layer.
-*/
 #ifndef __MAM_V2_PB3_H__
 #define __MAM_V2_PB3_H__
 
 #include "common/errors.h"
-#include "mam/v2/defs.h"
 #include "mam/v2/sponge.h"
-#include "trits.h"
+#include "mam/v2/trits.h"
 
 /*
 Protobuf3 primitive types
@@ -94,6 +87,6 @@ void pb3_wrap_data(sponge_t *s, trits_t t);
 
 void pb3_unwrap_data(sponge_t *s, trits_t t);
 
-bool_t pb3_test();
+bool pb3_test();
 
 #endif  // __MAM_V2_PB3_H__

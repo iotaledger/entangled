@@ -1,26 +1,19 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
  *
  * MAM is based on an original implementation & specification by apmi.bsu.by
- [ITSec Lab]
-
- *
+ * [ITSec Lab]
  *
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file trits.c
-\brief Basic trinary array operations.
-*/
+#include <stdlib.h>
+
 #include "mam/v2/trits.h"
+#include "utils/macros.h"
 
-#include <memory.h>
-#include <stdio.h>
-
-bool_t trits_is_empty(trits_t x) { return (x.n == x.d); }
+bool trits_is_empty(trits_t x) { return (x.n == x.d); }
 
 size_t trits_size(trits_t x) { return (x.n - x.d); }
 
@@ -36,7 +29,7 @@ trits_t trits_take(trits_t x, size_t n) {
 }
 
 trits_t trits_take_min(trits_t x, size_t n) {
-  x.n = min(x.n, x.d + n);
+  x.n = MIN(x.n, x.d + n);
   return x;
 }
 
@@ -130,9 +123,7 @@ int trits_cmp_grlex(trits_t x, trits_t y) {
   return d;
 }
 
-bool_t trits_cmp_eq(trits_t x, trits_t y) {
-  return (0 == trits_cmp_grlex(x, y)) ? 1 : 0;
-}
+bool trits_cmp_eq(trits_t x, trits_t y) { return (0 == trits_cmp_grlex(x, y)); }
 
 trits_t trits_diff(trits_t begin, trits_t end) {
   MAM2_ASSERT(begin.p == end.p);
@@ -144,7 +135,7 @@ trits_t trits_diff(trits_t begin, trits_t end) {
 
 trits_t trits_null() { return trits_from_rep(0, 0); }
 
-bool_t trits_is_null(trits_t x) { return (0 == x.p); }
+bool trits_is_null(trits_t x) { return (0 == x.p); }
 
 trits_t trits_alloc(size_t n) {
   trit_t *p = (trit_t *)malloc(sizeof(trit_t) * MAM2_WORDS(n));
@@ -183,7 +174,7 @@ void trits_pad10(trits_t y) {
   trits_set_zero(trits_drop(y, 1));
 }
 
-bool_t trits_is_same(trits_t x, trits_t y) {
+bool trits_is_same(trits_t x, trits_t y) {
   return (x.p == y.p) && (x.d == y.d);  // && (x.n == y.n)
 }
 

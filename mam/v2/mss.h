@@ -12,11 +12,10 @@
 #define __MAM_V2_MSS_H__
 
 #include "common/errors.h"
-#include "mam/v2/defs.h"
 #include "mam/v2/prng.h"
 #include "mam/v2/sponge.h"
+#include "mam/v2/trits.h"
 #include "mam/v2/wots.h"
-#include "trits.h"
 
 // Use Merkle tree traversal algorithm on MSS layer
 #define MAM2_MSS_TRAVERSAL
@@ -225,8 +224,8 @@ void mss_sign(mss_t *mss, trit_array_p hash, trit_array_p sig);
  * @param pk public key (Merkle-tree root)
  */
 
-bool_t mss_verify(sponge_t *ms, sponge_t *ws, trit_array_p hash,
-                  trit_array_p sig, trit_array_p pk);
+bool mss_verify(sponge_t *ms, sponge_t *ws, trit_array_p hash, trit_array_p sig,
+                trit_array_p pk);
 
 /**
  * Deallocate memory for internal Merkle tree structure

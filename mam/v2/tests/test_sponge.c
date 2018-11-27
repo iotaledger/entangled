@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -9,27 +8,14 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/buffers.h"
-#include "mam/v2/curl.h"
-#include "mam/v2/mam.h"
-#include "mam/v2/mss.h"
-#include "mam/v2/ntru.h"
-#include "mam/v2/pb3.h"
-#include "mam/v2/prng.h"
+#include <unity/unity.h>
+
 #include "mam/v2/sponge.h"
 #include "mam/v2/tests/common.h"
 #include "mam/v2/trits.h"
-#include "mam/v2/wots.h"
 #include "utils/macros.h"
 
-#include <string.h>
-#include <unity/unity.h>
-
-#include <memory.h>
-#include <stdio.h>
-
 static void sponge_test_hash(sponge_t *s) {
-  bool_t r = 1;
   MAM2_TRITS_DEF(X0, MAM2_SPONGE_RATE * 3);
   trits_t Xs[3], X;
   MAM2_TRITS_DEF(Y1, 243);
@@ -49,7 +35,7 @@ static void sponge_test_hash(sponge_t *s) {
   }
 }
 
-static bool_t sponge_test_ae(sponge_t *s) {
+static bool sponge_test_ae(sponge_t *s) {
 #define MAM2_SPONGE_TEST_MAX_K 1110
   size_t k, i;
   MAM2_TRITS_DEF(K, MAM2_SPONGE_KEY_SIZE);
@@ -97,23 +83,29 @@ static bool_t sponge_test_ae(sponge_t *s) {
     sponge_init(s);
     sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
     sponge_decr(s, Y, Z);  // Z=D(E(X))
-    if (0 != trits_cmp_grlex(X, Z)) return 0;
+    if (0 != trits_cmp_grlex(X, Z)) {
+      return false;
+    }
     sponge_init(s);
     sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
     sponge_encr(s, Z, Z);  // Z=E(Z=X)
-    if (0 != trits_cmp_grlex(Y, Z)) return 0;
+    if (0 != trits_cmp_grlex(Y, Z)) {
+      return false;
+    }
     sponge_init(s);
     sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
     sponge_decr(s, Z, Z);  // Z=D(Z=E(X))
-    if (0 != trits_cmp_grlex(X, Z)) return 0;
+    if (0 != trits_cmp_grlex(X, Z)) {
+      return false;
+    }
   }
 
 #undef MAM2_SPONGE_TEST_MAX_K
-  return 1;
+  return true;
 }
 
 static void sponge_test_pointwise(sponge_t *s) {
-  bool_t r, ok;
+  bool r, ok;
 
   MAM2_TRITS_DEF(K, MAM2_SPONGE_KEY_SIZE);
   MAM2_TRITS_DEF(X, 2 * MAM2_SPONGE_RATE + 3);
