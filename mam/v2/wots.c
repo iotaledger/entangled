@@ -30,13 +30,13 @@ static void wots_calc_pks(sponge_t *const sponge, trit_array_p sk_pks,
     trit_array_insert_from_pos(&sk_part_trits_array, sk_pks, sk_pos, 0,
                                MAM2_WOTS_SK_PART_SIZE);
     for (j = 0; j < 26; ++j) {
-      sponge_hash_flex(sponge, &sk_part_trits_array, &sk_part_trits_array);
+      sponge_hash(sponge, &sk_part_trits_array, &sk_part_trits_array);
     }
     trit_array_insert_from_pos(sk_pks, &sk_part_trits_array, 0, sk_pos,
                                MAM2_WOTS_SK_PART_SIZE);
     sk_pos += MAM2_WOTS_SK_PART_SIZE;
   }
-  sponge_hash_flex(sponge, sk_pks, pk);
+  sponge_hash(sponge, sk_pks, pk);
 }
 
 static void wots_hash_sign(sponge_t *const sponge, trit_array_p sk_sig,
@@ -61,7 +61,7 @@ static void wots_hash_sign(sponge_t *const sponge, trit_array_p sk_sig,
     t += h;
 
     for (j = 0; j < 13 + h; ++j) {
-      sponge_hash_flex(sponge, &sk_sig_part, &sk_sig_part);
+      sponge_hash(sponge, &sk_sig_part, &sk_sig_part);
     }
     trit_array_insert_from_pos(sk_sig, &sk_sig_part, 0, sig_pos,
                                MAM2_WOTS_SK_PART_SIZE);
@@ -76,7 +76,7 @@ static void wots_hash_sign(sponge_t *const sponge, trit_array_p sk_sig,
     t = MAM2_DIVS(t, 19683, 27);
 
     for (j = 0; j < 13 + h; ++j) {
-      sponge_hash_flex(sponge, &sk_sig_part, &sk_sig_part);
+      sponge_hash(sponge, &sk_sig_part, &sk_sig_part);
     }
     trit_array_insert_from_pos(sk_sig, &sk_sig_part, 0, sig_pos,
                                MAM2_WOTS_SK_PART_SIZE);
@@ -106,7 +106,7 @@ static void wots_hash_verify(sponge_t *const sponge, trit_array_p sig_pks,
     t += h;
 
     for (j = 0; j < 13 - h; ++j) {
-      sponge_hash_flex(sponge, &sk_sig_part, &sk_sig_part);
+      sponge_hash(sponge, &sk_sig_part, &sk_sig_part);
     }
     trit_array_insert_from_pos(sig_pks, &sk_sig_part, 0, sig_pos,
                                MAM2_WOTS_SK_PART_SIZE);
@@ -122,7 +122,7 @@ static void wots_hash_verify(sponge_t *const sponge, trit_array_p sig_pks,
     t = MAM2_DIVS(t, 19683, 27);
 
     for (j = 0; j < 13 - h; ++j) {
-      sponge_hash_flex(sponge, &sk_sig_part, &sk_sig_part);
+      sponge_hash(sponge, &sk_sig_part, &sk_sig_part);
     };
 
     trit_array_insert_from_pos(sig_pks, &sk_sig_part, 0, sig_pos,
@@ -185,7 +185,7 @@ void wots_recover(sponge_t *const sponge, trit_array_p const hash,
                   trit_array_p const sig, trit_array_p pk) {
   MAM2_ASSERT(pk->num_trits == MAM2_WOTS_PK_SIZE);
   wots_hash_verify(sponge, sig, hash);
-  sponge_hash_flex(sponge, sig, pk);
+  sponge_hash(sponge, sig, pk);
 }
 
 bool wots_verify(sponge_t *const sponge, trit_array_p const hash,

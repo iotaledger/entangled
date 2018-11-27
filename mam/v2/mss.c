@@ -21,7 +21,7 @@
 /*!< [out] hash value of their parent */
 static void mss_mt_hash2(sponge_t *sponge, trit_array_t hashes_pack[2],
                          trit_array_p hash) {
-  sponge_hashn_flex(sponge, 2, hashes_pack, hash);
+  sponge_hashn(sponge, 2, hashes_pack, hash);
 }
 
 /*!< [in] leaf index: `0 <= i < 2^D` */
