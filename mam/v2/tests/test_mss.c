@@ -51,7 +51,6 @@ void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
 
     TRIT_ARRAY_DECLARE(curr_sig_skn, MAM2_MSS_SKN_SIZE);
     trit_array_insert_from_pos(&curr_sig_skn, &sig, 0, 0, MAM2_MSS_SKN_SIZE);
-#if !defined(MAM2_MSS_DEBUG)
     TRIT_ARRAY_DECLARE(sig_wots, MAM2_WOTS_SIG_SIZE);
     trit_array_insert_from_pos(&sig_wots, &curr_sig, MAM2_MSS_SKN_SIZE, 0,
                                MAM2_WOTS_SIG_SIZE);
@@ -60,7 +59,6 @@ void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
     trit_array_insert_from_pos(
         &sig_apath, &curr_sig, MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE, 0,
         curr_sig.num_trits - MAM2_WOTS_SIG_SIZE - MAM2_MSS_SKN_SIZE);
-#endif
 
     dbg_printf("========================\nmt_height = %d\n", d);
 
@@ -77,20 +75,17 @@ void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
       mss_sign(m, &hash_array, &curr_sig);
       TEST_ASSERT(mss_verify(s, w->sponge, &hash_array, &curr_sig, &pk));
 
-#if !defined(MAM2_MSS_DEBUG)
       // H is ignored, makes no sense to modify and check
       trit_t modified_trit = trit_array_at(&hash_array, 0);
       trit_array_set_at(&hash_array, 0, trit_sum(modified_trit, 1));
       TEST_ASSERT(!mss_verify(s, w->sponge, &hash_array, &curr_sig, &pk));
       trit_array_set_at(&hash_array, 0, modified_trit);
-#endif
 
       modified_trit = trit_array_at(&curr_sig, 0);
       trit_array_set_at(&curr_sig, 0, trit_sum(modified_trit, 1));
       TEST_ASSERT(!mss_verify(s, w->sponge, &hash_array, &curr_sig, &pk));
       trit_array_set_at(&curr_sig, 0, modified_trit);
 
-#if !defined(MAM2_MSS_DEBUG)
       // WOTS sig is ignored, makes no sense to modify and check
       modified_trit = trit_array_at(&curr_sig, MAM2_MSS_SKN_SIZE);
       trit_array_set_at(&curr_sig, MAM2_MSS_SKN_SIZE,
@@ -107,7 +102,6 @@ void mss_test_do(mss_t *m, prng_t *p, sponge_t *s, wots_t *w,
         trit_array_set_at(&curr_sig, MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE,
                           modified_trit);
       }
-#endif
 
       modified_trit = trit_array_at(&pk, 0);
       trit_array_set_at(&pk, 0, trit_sum(modified_trit, 1));

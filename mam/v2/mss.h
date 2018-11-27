@@ -20,9 +20,6 @@
 // Use Merkle tree traversal algorithm on MSS layer
 #define MAM2_MSS_TRAVERSAL
 
-// Enable debug MT hash function to ease MT traversal debug
-//#define MAM2_MSS_DEBUG
-
 // MSS public key size
 #define MAM2_MSS_PK_SIZE 243
 // MSS public key flex size

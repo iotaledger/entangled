@@ -28,13 +28,6 @@ static void mss_mt_hash2(sponge_t *sponge, trit_array_t hashes_pack[2],
 /*!< [out] WOTS pk / leaf hash */
 static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trit_array_p pk) {
   MAM2_ASSERT(0 <= index && index <= MAM2_MSS_MAX_SKN(mss->height));
-
-#if defined(MAM2_MSS_DEBUG)
-  // this is a special debug MT hash function;
-  // hash of the node is it's index in the level
-  trits_set_zero(pk);
-  trits_put18(pk, index);
-#else
   // gen sk from current leaf index
   trit_t nonce_i[MAM2_MSS_SKN_SIZE] = {0};
   long_to_trits(index, nonce_i);
@@ -42,8 +35,6 @@ static void mss_mt_gen_leaf(mss_t *mss, mss_mt_index_t index, trit_array_p pk) {
   wots_gen_sk3(mss->wots, mss->prng, &mss->nonce1, &mss->nonce2, &noncei);
   // calc pk & push hash
   wots_calc_pk(mss->wots, pk);
-
-#endif
 
   dbg_printf("wpk %d   \t", index);
   trits_dbg_print(pk);
@@ -430,10 +421,6 @@ void mss_sign(mss_t *mss, trit_array_p hash, trit_array_p sig) {
 
   dbg_printf("mss sign skn=%d\n", mss->skn);
   mss_skn(mss, sig);
-#if defined(MAM2_MSS_DEBUG)
-  // instead of WOTS sig gen WOTS pk directly
-  mss_mt_gen_leaf(mss, mss->skn, trits_take(sig, MAM2_MSS_MT_HASH_SIZE));
-#else
   {
     trit_t nonce_i[MAM2_MSS_SKN_SIZE] = {0};
     long_to_trits(mss->skn, nonce_i);
@@ -448,7 +435,6 @@ void mss_sign(mss_t *mss, trit_array_p hash, trit_array_p sig) {
 
   trit_array_insert_from_pos(sig, &sk_sig_array, 0, MAM2_MSS_SKN_SIZE,
                              sk_sig_array.num_trits);
-#endif
   // TODO Remove when sig is a trit_array_t
   TRIT_ARRAY_DECLARE(auth_path,
                      sig->num_trits - MAM2_MSS_SKN_SIZE - MAM2_WOTS_SIG_SIZE);
