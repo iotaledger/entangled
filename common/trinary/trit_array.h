@@ -72,6 +72,7 @@ static inline void trit_array_set_null(trit_array_p const trit_array) {
 static inline bool trit_array_is_equal(trit_array_p const lhs,
                                        trit_array_p const rhs) {
   return (lhs->num_trits == rhs->num_trits &&
+          lhs->num_bytes == rhs->num_bytes &&
           memcmp(lhs->trits, rhs->trits, lhs->num_bytes) == 0);
 }
 
@@ -193,6 +194,18 @@ void trit_array_free(trit_array_p const trit_array);
   flex_trit_t NAME##_trits[NAME##_num_bytes];                                  \
   flex_trits_from_trits(NAME##_trits, NUM_TRITS, TRITS, NUM_TRITS, NUM_TRITS); \
   struct _trit_array NAME = {(flex_trit_t *)NAME##_trits, NUM_TRITS,           \
+                             NAME##_num_bytes, 0};
+
+/// Macro to declare a new trit_array and initialize it with an array of trytes.
+/// @param[in] NAME - the name of the varialbe to declare
+/// @param[in] NUM_TRYTES - the number of trytes the trit_array can store
+/// @param[in] TRYTES - the initial trytes
+#define TRIT_ARRAY_MAKE_FROM_TRYTES(NAME, NUM_TRYTES, TRYTES)              \
+  size_t NAME##_num_bytes = trit_array_bytes_for_trits(NUM_TRYTES * 3);    \
+  flex_trit_t NAME##_trits[NAME##_num_bytes];                              \
+  flex_trits_from_trytes(NAME##_trits, NUM_TRYTES * 3, TRYTES, NUM_TRYTES, \
+                         NUM_TRYTES);                                      \
+  struct _trit_array NAME = {(flex_trit_t *)NAME##_trits, NUM_TRYTES * 3,  \
                              NAME##_num_bytes, 0};
 
 #endif
