@@ -195,6 +195,18 @@ void trit_array_free(trit_array_p const trit_array);
   struct _trit_array NAME = {(flex_trit_t *)NAME##_trits, NUM_TRITS,           \
                              NAME##_num_bytes, 0};
 
+/// Macro to declare a new trit_array and initialize it with an array of trytes.
+/// @param[in] NAME - the name of the varialbe to declare
+/// @param[in] NUM_TRYTES - the number of trytes the trit_array can store
+/// @param[in] TRYTES - the initial trytes
+#define TRIT_ARRAY_MAKE_FROM_TRYTES(NAME, NUM_TRYTES, TRYTES)              \
+  size_t NAME##_num_bytes = trit_array_bytes_for_trits(NUM_TRYTES * 3);    \
+  flex_trit_t NAME##_trits[NAME##_num_bytes];                              \
+  flex_trits_from_trytes(NAME##_trits, NUM_TRYTES * 3, TRYTES, NUM_TRYTES, \
+                         NUM_TRYTES);                                      \
+  struct _trit_array NAME = {(flex_trit_t *)NAME##_trits, NUM_TRYTES * 3,  \
+                             NAME##_num_bytes, 0};
+
 #endif
 #ifdef __cplusplus
 }
