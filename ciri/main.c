@@ -31,6 +31,11 @@ int main(int argc, char* argv[]) {
 
   // File configuration
 
+  if (iota_ciri_conf_file(&core_g.conf, &core_g.consensus.conf,
+                          &core_g.node.conf, &core_g.api.conf) != RC_OK) {
+    return EXIT_FAILURE;
+  }
+
   // CLI Configuration
 
   if (iota_ciri_conf_cli(&core_g.conf, &core_g.consensus.conf,

@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "yaml.h"
+
 #include "ciri/conf.h"
 #include "ciri/usage.h"
 
@@ -85,6 +87,62 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf,
   if ((ret = iota_api_conf_init(api_conf)) != RC_OK) {
     return ret;
   }
+
+  return ret;
+}
+
+retcode_t iota_ciri_conf_file(iota_ciri_conf_t* const ciri_conf,
+                              iota_consensus_conf_t* const consensus_conf,
+                              iota_gossip_conf_t* const gossip_conf,
+                              iota_api_conf_t* const api_conf) {
+  retcode_t ret = RC_OK;
+  yaml_parser_t parser;
+  yaml_token_t token;
+  FILE* file = NULL;
+  char* arg = NULL;
+  int state = 0;
+
+  if (ciri_conf == NULL || gossip_conf == NULL || consensus_conf == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if ((file = fopen("ciri/conf.yml", "r")) != NULL) {
+    return RC_CIRI_CONF_FILE_NOT_FOUND;
+  }
+
+  if (!yaml_parser_initialize(&parser)) {
+    return RC_CIRI_CONF_PARSER_ERROR;
+  }
+  yaml_parser_set_input_file(&parser, file);
+
+  do {
+    if (!yaml_parser_scan(&parser, &token)) {
+      return RC_CIRI_CONF_PARSER_ERROR;
+    }
+    switch (token.type) {
+      case YAML_KEY_TOKEN:
+        state = 0;
+        break;
+      case YAML_VALUE_TOKEN:
+        state = 1;
+        break;
+      case YAML_SCALAR_TOKEN:
+        arg = (char*)token.data.scalar.value;
+        if (state == 0) {  // Key
+        } else {           // Value
+        }
+        break;
+      default:
+        break;
+    }
+    if (token.type != YAML_STREAM_END_TOKEN) {
+      yaml_token_delete(&token);
+    }
+  } while (token.type != YAML_STREAM_END_TOKEN);
+
+  yaml_token_delete(&token);
+  yaml_parser_delete(&parser);
+  fclose(file);
 
   return ret;
 }
