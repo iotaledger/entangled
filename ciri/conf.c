@@ -59,6 +59,127 @@ static logger_level_t get_log_level(char const* const log_level) {
   return map[i].level;
 }
 
+static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf,
+                                iota_consensus_conf_t* const consensus_conf,
+                                iota_gossip_conf_t* const gossip_conf,
+                                iota_api_conf_t* const api_conf, int const key,
+                                char const* const value) {
+  retcode_t ret = RC_OK;
+
+  switch (key) {
+    // cIRI configuration
+    case 'd':  // --db-path
+      strcpy(ciri_conf->db_path, value);
+      break;
+    case 'h':  // --help
+      iota_usage();
+      exit(EXIT_SUCCESS);
+      break;
+    case 'l':  // --log-level
+      ciri_conf->log_level = get_log_level(value);
+      break;
+
+    // Gossip configuration
+    case CONF_MWM:  // --mwm
+      gossip_conf->mwm = atoi(value);
+      gossip_conf->request_hash_size_trit = HASH_LENGTH_TRIT - gossip_conf->mwm;
+      consensus_conf->mwm = atoi(value);
+      break;
+    case 'n':  // --neighbors
+      gossip_conf->neighbors = value;
+      break;
+    case CONF_P_PROPAGATE_REQUEST:  // --p-propagate-request
+      gossip_conf->p_propagate_request = atof(value);
+      break;
+    case CONF_P_REMOVE_REQUEST:  // --p-remove-request
+      gossip_conf->p_remove_request = atof(value);
+      break;
+    case CONF_P_REPLY_RANDOM_TIP:  // --p-reply-random-tip
+      gossip_conf->p_reply_random_tip = atof(value);
+      break;
+    case CONF_P_SELECT_MILESTONE:  // --p-select-milestone
+      gossip_conf->p_select_milestone = atof(value);
+      break;
+    case CONF_P_SEND_MILESTONE:  // --p-send-milestone
+      gossip_conf->p_send_milestone = atof(value);
+      break;
+    case CONF_REQUESTER_QUEUE_SIZE:  // --requester-queue-size
+      gossip_conf->requester_queue_size = atoi(value);
+      break;
+    case 't':  // --tcp-receiver-port
+      gossip_conf->tcp_receiver_port = atoi(value);
+      break;
+    case CONF_TIPS_CACHE_SIZE:  // --tips-cache-size
+      gossip_conf->tips_cache_size = atoi(value);
+      break;
+    case 'u':  // --udp-receiver-port
+      gossip_conf->udp_receiver_port = atoi(value);
+      break;
+
+    // API configuration
+    case CONF_MAX_GET_TRYTES:  // --max-get-trytes
+      api_conf->max_get_trytes = atoi(value);
+      break;
+    case 'p':  // --port
+      api_conf->port = atoi(value);
+      break;
+
+    // Consensus configuration
+    case CONF_ALPHA:  // --alpha
+      consensus_conf->alpha = atof(value);
+      break;
+    case CONF_BELOW_MAX_DEPTH:  // --below-max-depth
+      consensus_conf->below_max_depth = atoi(value);
+      break;
+    case CONF_COORDINATOR:  // --coordinator
+      if (strlen(value) != HASH_LENGTH_TRYTE) {
+        return RC_CIRI_CONF_INVALID_ARGUMENTS;
+      }
+      flex_trits_from_trytes(consensus_conf->coordinator, HASH_LENGTH_TRIT,
+                             (tryte_t*)value, HASH_LENGTH_TRYTE,
+                             HASH_LENGTH_TRYTE);
+      break;
+    case CONF_LAST_MILESTONE:  // --last-milestone
+      consensus_conf->last_milestone = atoi(value);
+      break;
+    case CONF_MAX_DEPTH:  // --max-depth
+      consensus_conf->max_depth = atoi(value);
+      break;
+    case CONF_NUM_KEYS_IN_MILESTONE:  // --num-keys-in-milestone
+      consensus_conf->num_keys_in_milestone = atoi(value);
+      break;
+    case CONF_SNAPSHOT_FILE:  // --snapshot-file
+      strcpy(consensus_conf->snapshot_file, value);
+      break;
+    case CONF_SNAPSHOT_SIGNATURE_DEPTH:  // --snapshot-signature-depth
+      consensus_conf->snapshot_signature_depth = atoi(value);
+      break;
+    case CONF_SNAPSHOT_SIGNATURE_FILE:  // --snapshot-signature-file
+      strcpy(consensus_conf->snapshot_signature_file, value);
+      break;
+    case CONF_SNAPSHOT_SIGNATURE_INDEX:  // --snapshot-signature-index
+      consensus_conf->snapshot_signature_index = atoi(value);
+      break;
+    case CONF_SNAPSHOT_SIGNATURE_PUBKEY:  // --snapshot-signature-pubkey
+      if (strlen(value) != HASH_LENGTH_TRYTE) {
+        return RC_CIRI_CONF_INVALID_ARGUMENTS;
+      }
+      flex_trits_from_trytes(consensus_conf->snapshot_signature_pubkey,
+                             HASH_LENGTH_TRIT, (tryte_t*)value,
+                             HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+      break;
+    case CONF_SNAPSHOT_TIMESTAMP:  // --snapshot-timestamp
+      consensus_conf->snapshot_timestamp_sec = atoi(value);
+      break;
+
+    default:
+      iota_usage();
+      return RC_CIRI_CONF_INVALID_ARGUMENTS;
+  }
+
+  return ret;
+}
+
 /*
  * Public functions
  */
@@ -106,7 +227,7 @@ retcode_t iota_ciri_conf_file(iota_ciri_conf_t* const ciri_conf,
     return RC_NULL_PARAM;
   }
 
-  if ((file = fopen("ciri/conf.yml", "r")) != NULL) {
+  if ((file = fopen("ciri/conf.yml", "r")) == NULL) {
     return RC_CIRI_CONF_FILE_NOT_FOUND;
   }
 
@@ -152,130 +273,18 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
                              iota_gossip_conf_t* const gossip_conf,
                              iota_api_conf_t* const api_conf, int argc,
                              char** argv) {
-  int arg;
+  int key;
   retcode_t ret = RC_OK;
   struct option* long_options = build_options();
 
-  while ((arg = getopt_long(argc, argv, short_options, long_options, NULL)) !=
+  while ((key = getopt_long(argc, argv, short_options, long_options, NULL)) !=
          -1) {
-    switch (arg) {
-      // cIRI configuration
-      case 'd':  // --db-path
-        strcpy(ciri_conf->db_path, optarg);
-        break;
-      case 'h':  // --help
-        iota_usage();
-        free(long_options);
-        exit(EXIT_SUCCESS);
-        break;
-      case 'l':  // --log-level
-        ciri_conf->log_level = get_log_level(optarg);
-        break;
-
-      // Gossip configuration
-      case CONF_MWM:  // --mwm
-        gossip_conf->mwm = atoi(optarg);
-        gossip_conf->request_hash_size_trit =
-            HASH_LENGTH_TRIT - gossip_conf->mwm;
-        consensus_conf->mwm = atoi(optarg);
-        break;
-      case 'n':  // --neighbors
-        gossip_conf->neighbors = optarg;
-        break;
-      case CONF_P_PROPAGATE_REQUEST:  // --p-propagate-request
-        gossip_conf->p_propagate_request = atof(optarg);
-        break;
-      case CONF_P_REMOVE_REQUEST:  // --p-remove-request
-        gossip_conf->p_remove_request = atof(optarg);
-        break;
-      case CONF_P_REPLY_RANDOM_TIP:  // --p-reply-random-tip
-        gossip_conf->p_reply_random_tip = atof(optarg);
-        break;
-      case CONF_P_SELECT_MILESTONE:  // --p-select-milestone
-        gossip_conf->p_select_milestone = atof(optarg);
-        break;
-      case CONF_P_SEND_MILESTONE:  // --p-send-milestone
-        gossip_conf->p_send_milestone = atof(optarg);
-        break;
-      case CONF_REQUESTER_QUEUE_SIZE:  // --requester-queue-size
-        gossip_conf->requester_queue_size = atoi(optarg);
-        break;
-      case 't':  // --tcp-receiver-port
-        gossip_conf->tcp_receiver_port = atoi(optarg);
-        break;
-      case CONF_TIPS_CACHE_SIZE:  // --tips-cache-size
-        gossip_conf->tips_cache_size = atoi(optarg);
-        break;
-      case 'u':  // --udp-receiver-port
-        gossip_conf->udp_receiver_port = atoi(optarg);
-        break;
-
-      // API configuration
-      case CONF_MAX_GET_TRYTES:  // --max-get-trytes
-        api_conf->max_get_trytes = atoi(optarg);
-        break;
-      case 'p':  // --port
-        api_conf->port = atoi(optarg);
-        break;
-
-      // Consensus configuration
-      case CONF_ALPHA:  // --alpha
-        consensus_conf->alpha = atof(optarg);
-        break;
-      case CONF_BELOW_MAX_DEPTH:  // --below-max-depth
-        consensus_conf->below_max_depth = atoi(optarg);
-        break;
-      case CONF_COORDINATOR:  // --coordinator
-        if (strlen(optarg) != HASH_LENGTH_TRYTE) {
-          ret = RC_CIRI_CONF_INVALID_ARGUMENTS;
-          goto done;
-        }
-        flex_trits_from_trytes(consensus_conf->coordinator, HASH_LENGTH_TRIT,
-                               (tryte_t*)optarg, HASH_LENGTH_TRYTE,
-                               HASH_LENGTH_TRYTE);
-        break;
-      case CONF_LAST_MILESTONE:  // --last-milestone
-        consensus_conf->last_milestone = atoi(optarg);
-        break;
-      case CONF_MAX_DEPTH:  // --max-depth
-        consensus_conf->max_depth = atoi(optarg);
-        break;
-      case CONF_NUM_KEYS_IN_MILESTONE:  // --num-keys-in-milestone
-        consensus_conf->num_keys_in_milestone = atoi(optarg);
-        break;
-      case CONF_SNAPSHOT_FILE:  // --snapshot-file
-        strcpy(consensus_conf->snapshot_file, optarg);
-        break;
-      case CONF_SNAPSHOT_SIGNATURE_DEPTH:  // --snapshot-signature-depth
-        consensus_conf->snapshot_signature_depth = atoi(optarg);
-        break;
-      case CONF_SNAPSHOT_SIGNATURE_FILE:  // --snapshot-signature-file
-        strcpy(consensus_conf->snapshot_signature_file, optarg);
-        break;
-      case CONF_SNAPSHOT_SIGNATURE_INDEX:  // --snapshot-signature-index
-        consensus_conf->snapshot_signature_index = atoi(optarg);
-        break;
-      case CONF_SNAPSHOT_SIGNATURE_PUBKEY:  // --snapshot-signature-pubkey
-        if (strlen(optarg) != HASH_LENGTH_TRYTE) {
-          ret = RC_CIRI_CONF_INVALID_ARGUMENTS;
-          goto done;
-        }
-        flex_trits_from_trytes(consensus_conf->snapshot_signature_pubkey,
-                               HASH_LENGTH_TRIT, (tryte_t*)optarg,
-                               HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
-        break;
-      case CONF_SNAPSHOT_TIMESTAMP:  // --snapshot-timestamp
-        consensus_conf->snapshot_timestamp_sec = atoi(optarg);
-        break;
-
-      default:
-        iota_usage();
-        ret = RC_CIRI_CONF_INVALID_ARGUMENTS;
-        goto done;
+    if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf,
+                              key, optarg) != RC_OK)) {
+      break;
     }
   }
 
-done:
   free(long_options);
   return ret;
 };
