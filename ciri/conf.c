@@ -173,7 +173,7 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
         break;
 
       // Gossip configuration
-      case CLI_ARG_MWM:  // --mwm
+      case CONF_MWM:  // --mwm
         gossip_conf->mwm = atoi(optarg);
         gossip_conf->request_hash_size_trit =
             HASH_LENGTH_TRIT - gossip_conf->mwm;
@@ -182,28 +182,28 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
       case 'n':  // --neighbors
         gossip_conf->neighbors = optarg;
         break;
-      case CLI_ARG_P_PROPAGATE_REQUEST:  // --p-propagate-request
+      case CONF_P_PROPAGATE_REQUEST:  // --p-propagate-request
         gossip_conf->p_propagate_request = atof(optarg);
         break;
-      case CLI_ARG_P_REMOVE_REQUEST:  // --p-remove-request
+      case CONF_P_REMOVE_REQUEST:  // --p-remove-request
         gossip_conf->p_remove_request = atof(optarg);
         break;
-      case CLI_ARG_P_REPLY_RANDOM_TIP:  // --p-reply-random-tip
+      case CONF_P_REPLY_RANDOM_TIP:  // --p-reply-random-tip
         gossip_conf->p_reply_random_tip = atof(optarg);
         break;
-      case CLI_ARG_P_SELECT_MILESTONE:  // --p-select-milestone
+      case CONF_P_SELECT_MILESTONE:  // --p-select-milestone
         gossip_conf->p_select_milestone = atof(optarg);
         break;
-      case CLI_ARG_P_SEND_MILESTONE:  // --p-send-milestone
+      case CONF_P_SEND_MILESTONE:  // --p-send-milestone
         gossip_conf->p_send_milestone = atof(optarg);
         break;
-      case CLI_ARG_REQUESTER_QUEUE_SIZE:  // --requester-queue-size
+      case CONF_REQUESTER_QUEUE_SIZE:  // --requester-queue-size
         gossip_conf->requester_queue_size = atoi(optarg);
         break;
       case 't':  // --tcp-receiver-port
         gossip_conf->tcp_receiver_port = atoi(optarg);
         break;
-      case CLI_ARG_TIPS_CACHE_SIZE:  // --tips-cache-size
+      case CONF_TIPS_CACHE_SIZE:  // --tips-cache-size
         gossip_conf->tips_cache_size = atoi(optarg);
         break;
       case 'u':  // --udp-receiver-port
@@ -211,7 +211,7 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
         break;
 
       // API configuration
-      case CLI_ARG_MAX_GET_TRYTES:  // --max-get-trytes
+      case CONF_MAX_GET_TRYTES:  // --max-get-trytes
         api_conf->max_get_trytes = atoi(optarg);
         break;
       case 'p':  // --port
@@ -219,13 +219,13 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
         break;
 
       // Consensus configuration
-      case CLI_ARG_ALPHA:  // --alpha
+      case CONF_ALPHA:  // --alpha
         consensus_conf->alpha = atof(optarg);
         break;
-      case CLI_ARG_BELOW_MAX_DEPTH:  // --below-max-depth
+      case CONF_BELOW_MAX_DEPTH:  // --below-max-depth
         consensus_conf->below_max_depth = atoi(optarg);
         break;
-      case CLI_ARG_COORDINATOR:  // --coordinator
+      case CONF_COORDINATOR:  // --coordinator
         if (strlen(optarg) != HASH_LENGTH_TRYTE) {
           ret = RC_CIRI_CONF_INVALID_ARGUMENTS;
           goto done;
@@ -234,28 +234,28 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
                                (tryte_t*)optarg, HASH_LENGTH_TRYTE,
                                HASH_LENGTH_TRYTE);
         break;
-      case CLI_ARG_LAST_MILESTONE:  // --last-milestone
+      case CONF_LAST_MILESTONE:  // --last-milestone
         consensus_conf->last_milestone = atoi(optarg);
         break;
-      case CLI_ARG_MAX_DEPTH:  // --max-depth
+      case CONF_MAX_DEPTH:  // --max-depth
         consensus_conf->max_depth = atoi(optarg);
         break;
-      case CLI_ARG_NUM_KEYS_IN_MILESTONE:  // --num-keys-in-milestone
+      case CONF_NUM_KEYS_IN_MILESTONE:  // --num-keys-in-milestone
         consensus_conf->num_keys_in_milestone = atoi(optarg);
         break;
-      case CLI_ARG_SNAPSHOT_FILE:  // --snapshot-file
+      case CONF_SNAPSHOT_FILE:  // --snapshot-file
         strcpy(consensus_conf->snapshot_file, optarg);
         break;
-      case CLI_ARG_SNAPSHOT_SIGNATURE_DEPTH:  // --snapshot-signature-depth
+      case CONF_SNAPSHOT_SIGNATURE_DEPTH:  // --snapshot-signature-depth
         consensus_conf->snapshot_signature_depth = atoi(optarg);
         break;
-      case CLI_ARG_SNAPSHOT_SIGNATURE_FILE:  // --snapshot-signature-file
+      case CONF_SNAPSHOT_SIGNATURE_FILE:  // --snapshot-signature-file
         strcpy(consensus_conf->snapshot_signature_file, optarg);
         break;
-      case CLI_ARG_SNAPSHOT_SIGNATURE_INDEX:  // --snapshot-signature-index
+      case CONF_SNAPSHOT_SIGNATURE_INDEX:  // --snapshot-signature-index
         consensus_conf->snapshot_signature_index = atoi(optarg);
         break;
-      case CLI_ARG_SNAPSHOT_SIGNATURE_PUBKEY:  // --snapshot-signature-pubkey
+      case CONF_SNAPSHOT_SIGNATURE_PUBKEY:  // --snapshot-signature-pubkey
         if (strlen(optarg) != HASH_LENGTH_TRYTE) {
           ret = RC_CIRI_CONF_INVALID_ARGUMENTS;
           goto done;
@@ -264,7 +264,7 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
                                HASH_LENGTH_TRIT, (tryte_t*)optarg,
                                HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
         break;
-      case CLI_ARG_SNAPSHOT_TIMESTAMP:  // --snapshot-timestamp
+      case CONF_SNAPSHOT_TIMESTAMP:  // --snapshot-timestamp
         consensus_conf->snapshot_timestamp_sec = atoi(optarg);
         break;
 
