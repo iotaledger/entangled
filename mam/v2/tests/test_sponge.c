@@ -16,13 +16,7 @@
 #include "mam/v2/trits.h"
 #include "utils/macros.h"
 
-#include <string.h>
-#include <unity/unity.h>
-
-#include <memory.h>
-#include <stdio.h>
-
-static void sponge_test_hash(sponge_t *s) {
+static void sponge_test_hash(sponge_t *const s) {
   trit_array_t xs_flex_trits[3];
   size_t n;
   TRIT_ARRAY_DECLARE(y1_flex_trits, MAM2_SPONGE_HASH_SIZE);
@@ -127,141 +121,88 @@ static bool sponge_test_ae(sponge_t *s) {
   return true;
 }
 
-static void sponge_test_pointwise(sponge_t *s) {
-  bool r, ok;
+static void sponge_test_pointwise(sponge_t *const s) {
+  TRIT_ARRAY_DECLARE(K, MAM2_SPONGE_KEY_SIZE);
+  TRIT_ARRAY_DECLARE(X, 2 * MAM2_SPONGE_RATE + 3);
+  TRIT_ARRAY_DECLARE(Y, 2 * MAM2_SPONGE_RATE + 3);
+  TRIT_ARRAY_DECLARE(y, MAM2_SPONGE_HASH_SIZE);
 
-  MAM2_TRITS_DEF(K, MAM2_SPONGE_KEY_SIZE);
-  MAM2_TRITS_DEF(X, 2 * MAM2_SPONGE_RATE + 3);
-  MAM2_TRITS_DEF(Y, 2 * MAM2_SPONGE_RATE + 3);
-  MAM2_TRITS_DEF(T, 2 * MAM2_SPONGE_RATE + 3);
-  trits_t x, y, t;
+  tryte_t *rnd_trytes = (tryte_t*)
+      "SERQWES9QWEFYSDKVJKPOKWFJKLJD9QW9EAWZMAJLQKJWEO9SDFPWALKDIXNKISDFJ9ENKML"
+      "PQIOMLZQESDFLJKWERQWESDIFYSDKVJKPOKLJZMAJLQKJWEO9SDFQPPQIOWEAMZXNKISDF9Q"
+      "WELKJ99QW9EAWENKMLQWPEOIERTYIASDLKJZXCMNSDF9NK9ASDPLZXCMSDFWEROIUCXVJKSF"
+      "9REWRVXCVMAEKRUOIHEWLZXCPVSFLJSDKWEDIFYKVJKLKNWELKJ99QJZMAJLQKRQWESSDFQP"
+      "PQIOWEAMZJZXCMNSXISDF9QW9EAWUOIHEEPONKQWPETYIASDLKDFSSJWE9NKMLRRVXCVMAK9"
+      "ASRLZXC9DDFWEOIUCX9REWEKRWLZXDPOIEMOCPVSVJKSFZ";
 
-  char const rnd[(MAM2_SPONGE_KEY_SIZE + 2 * MAM2_SPONGE_RATE + 3) / 3 + 1] =
-      "SERQWES9QWEFYSDKVJKPOKWFJKL"
-      "JD9QW9EAWZMAJLQKJWEO9SDFPWA"
-      "LKDIXNKISDFJ9ENKMLPQIOMLZQE"
+  tryte_t *hash_y_trytes = (tryte_t*)
+      "99B9WYVWFGZVQTFAQ9NLWNNFYDJAIGVWKROPLKSXS9TAPIGVUBHBZJKRMLVUHKYZIIVQ9GTQ"
+      "SIUXXCSYS";
+  size_t hash_y_length = strlen((char *)hash_y_trytes);
+  TRIT_ARRAY_MAKE_FROM_TRYTES(hash_y, hash_y_length, hash_y_trytes);
 
-      "SDFLJKWERQWESDIFYSDKVJKPOKL"
-      "JZMAJLQKJWEO9SDFQPPQIOWEAMZ"
-      "XNKISDF9QWELKJ99QW9EAWENKML"
-      "QWPEOIERTYIASDLKJZXCMNSDF9N"
-      "K9ASDPLZXCMSDFWEROIUCXVJKSF"
-      "9REWRVXCVMAEKRUOIHEWLZXCPVS"
+  tryte_t *encr_y_trytes =
+      "SDHFADDVJQPMXJGYZCNUXWZ9TQVUKTBJBPKOXMNMQKRJ9WPNLWXBSOBONTTMLNDEXGQQ9EGJ"
+      "MQNPNKOPKJMNEOIERTYIASDLKJZXCMNSDF9NK9ASDPLZXCMSDFWEROIUCXVJKSF9REWRVXCV"
+      "MAEKRUOIHEWLZXCPVSADEENUZFXEJRXGPZAFNXQFYRZWCWMEDUV9LADHFTXFPJTGZUNHRTG9"
+      "HEFVXMWJWDWSUQUFP9HMRLC9BRNLTJDKVHGNSLZULTJDCQYKC9ABGXRIHCTBB9L9PUPRAIWI"
+      "VCEZRFGMHSXENVJIRIBSENBTWYLLX9OYIHVDR";
+  size_t encr_y_length = strlen((char *)encr_y_trytes);
+  TRIT_ARRAY_MAKE_FROM_TRYTES(encr_y, encr_y_length, encr_y_trytes);
 
-      "FLJSDKWEDIFYKVJKLKNWELKJ99Q"
-      "JZMAJLQKRQWESSDFQPPQIOWEAMZ"
-      "JZXCMNSXISDF9QW9EAWUOIHEEPO"
-      "NKQWPETYIASDLKDFSSJWE9NKMLR"
-      "RVXCVMAK9ASRLZXC9DDFWEOIUCX"
-      "9REWEKRWLZXDPOIEMOCPVSVJKSF"
+  tryte_t *decr_y_trytes =
+      "SDMISU99ZQFIKPKNCEIDHUNKSWBWNCXJVUKBYIPNRUC9KFUD9WPXYMAPZYOVIMFNPHW99VCU"
+      "NBLFWZAAM9ROEOIERTYIASDLKJZXCMNSDF9NK9ASDPLZXCMSDFWEROIUCXVJKSF9REWRVXCV"
+      "MAEKRUOIHEWLZXCPVSTTBHLYTXYRCKIXIBUZRIOSBOPFL9YTJFXJCGFAETMCXJCOVGUASFZB"
+      "OITLBKGBSCKKYUPDXGJGYRKLZHZMDQEA9WPDJWXCMLKGE9XHXMOUHLRWVCUUXPOZVOZJBODN"
+      "MRNTULZTVHLEE9F9MFWKROJYNS9UEETJHEPQM";
+  size_t decr_y_length = strlen((char *)decr_y_trytes);
+  TRIT_ARRAY_MAKE_FROM_TRYTES(decr_y, decr_y_length, decr_y_trytes);
 
-      "Z";
-  char const hash_y[MAM2_SPONGE_HASH_SIZE / 3 + 1] =
-      "99B9WYVWFGZVQTFAQ9NLWNNFYDJ"
-      "AIGVWKROPLKSXS9TAPIGVUBHBZJ"
-      "KRMLVUHKYZIIVQ9GTQSIUXXCSYS";
-  char const encr_y[(2 * MAM2_SPONGE_RATE + 3) / 3 + 1] =
-      "SDHFADDVJQPMXJGYZCNUXWZ9TQV"
-      "UKTBJBPKOXMNMQKRJ9WPNLWXBSO"
-      "BONTTMLNDEXGQQ9EGJMQNPNKOPK"
-      "JMNEOIERTYIASDLKJZXCMNSDF9N"
-      "K9ASDPLZXCMSDFWEROIUCXVJKSF"
-      "9REWRVXCVMAEKRUOIHEWLZXCPVS"
-      "ADEENUZFXEJRXGPZAFNXQFYRZWC"
-      "WMEDUV9LADHFTXFPJTGZUNHRTG9"
-      "HEFVXMWJWDWSUQUFP9HMRLC9BRN"
-      "LTJDKVHGNSLZULTJDCQYKC9ABGX"
-      "RIHCTBB9L9PUPRAIWIVCEZRFGMH"
-      "SXENVJIRIBSENBTWYLLX9OYIHVD"
-      "R";
-  char const decr_y[(2 * MAM2_SPONGE_RATE + 3) / 3 + 1] =
-      "SDMISU99ZQFIKPKNCEIDHUNKSWB"
-      "WNCXJVUKBYIPNRUC9KFUD9WPXYM"
-      "APZYOVIMFNPHW99VCUNBLFWZAAM"
-      "9ROEOIERTYIASDLKJZXCMNSDF9N"
-      "K9ASDPLZXCMSDFWEROIUCXVJKSF"
-      "9REWRVXCVMAEKRUOIHEWLZXCPVS"
-      "TTBHLYTXYRCKIXIBUZRIOSBOPFL"
-      "9YTJFXJCGFAETMCXJCOVGUASFZB"
-      "OITLBKGBSCKKYUPDXGJGYRKLZHZ"
-      "MDQEA9WPDJWXCMLKGE9XHXMOUHL"
-      "RWVCUUXPOZVOZJBODNMRNTULZTV"
-      "HLEE9F9MFWKROJYNS9UEETJHEPQ"
-      "M";
-
-  trytes_to_trits(rnd, K.p, MIN(strlen(rnd), K.n / RADIX));
-  trytes_to_trits(rnd + MAM2_SPONGE_KEY_SIZE / 3, X.p,
-                  strlen(rnd + MAM2_SPONGE_KEY_SIZE / 3));
-  trits_set_zero(Y);
+  flex_trits_from_trytes(K.trits, MAM2_SPONGE_KEY_SIZE, rnd_trytes,
+                         MAM2_SPONGE_KEY_SIZE / 3, MAM2_SPONGE_KEY_SIZE / 3);
+  flex_trits_from_trytes(
+      X.trits, 2 * MAM2_SPONGE_RATE + 3, rnd_trytes + MAM2_SPONGE_KEY_SIZE / 3,
+      strlen((char *)(rnd_trytes + MAM2_SPONGE_KEY_SIZE / 3)),
+      strlen((char *)(rnd_trytes + MAM2_SPONGE_KEY_SIZE / 3)));
 
   sponge_init(s);
-  x = X;
-  sponge_absorb(s, MAM2_SPONGE_CTL_DATA, x);
-  y = trits_take(Y, MAM2_SPONGE_HASH_SIZE);
-  sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, y);
-  t = trits_take(T, MAM2_SPONGE_HASH_SIZE);
-  trytes_to_trits(hash_y, t.p, strlen(hash_y));
-
-  r = trits_cmp_eq(y, t);
-  TEST_ASSERT(r);
+  sponge_absorb_flex(s, MAM2_SPONGE_CTL_DATA, &X);
+  sponge_squeeze_flex(s, MAM2_SPONGE_CTL_HASH, &y);
+  TEST_ASSERT(trit_array_is_equal(&hash_y, &y));
 
   sponge_init(s);
-  sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-  x = X;
-  y = Y;
-  sponge_encr(s, x, y);
-
-  t = T;
-  trytes_to_trits(encr_y, t.p, strlen(encr_y));
-
-  r = trits_cmp_eq(y, t);
-  TEST_ASSERT(r);
-  sponge_init(s);
-  sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-  x = X;
-  y = Y;
-  trits_copy(x, y);
-  sponge_encr(s, y, y);
-  t = T;
-  trytes_to_trits(encr_y, t.p, strlen(encr_y));
-  r = trits_cmp_eq(y, t);
-  TEST_ASSERT(r);
+  sponge_absorb_flex(s, MAM2_SPONGE_CTL_KEY, &K);
+  sponge_encr_flex(s, &X, &Y);
+  TEST_ASSERT(trit_array_is_equal(&encr_y, &Y));
 
   sponge_init(s);
-  sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-  x = X;
-  y = Y;
-  sponge_decr(s, x, y);
-  t = T;
+  sponge_absorb_flex(s, MAM2_SPONGE_CTL_KEY, &K);
+  memcpy(Y.trits, X.trits, X.num_bytes);
+  sponge_encr_flex(s, &Y, &Y);
+  TEST_ASSERT(trit_array_is_equal(&encr_y, &Y));
 
-  trytes_to_trits(decr_y, t.p, strlen(decr_y));
-  r = trits_cmp_eq(y, t);
-  TEST_ASSERT(r);
   sponge_init(s);
-  sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-  x = X;
-  y = Y;
-  trits_copy(x, y);
-  sponge_decr(s, y, y);
-  t = T;
-  trytes_to_trits(decr_y, t.p, strlen(decr_y));
-  r = trits_cmp_eq(y, t);
-  TEST_ASSERT(r);
-}
+  sponge_absorb_flex(s, MAM2_SPONGE_CTL_KEY, &K);
+  sponge_decr_flex(s, &Y, &X);
+  TEST_ASSERT(trit_array_is_equal(&decr_y, &Y));
 
-void sponge_test(sponge_t *s) {
-  sponge_test_ae(s);
-  sponge_test_hash(s);
-  sponge_test_pointwise(s);
+  sponge_init(s);
+  sponge_absorb_flex(s, MAM2_SPONGE_CTL_KEY, &K);
+  memcpy(Y.trits, X.trits, X.num_bytes);
+  sponge_decr_flex(s, &Y, &Y);
+  TEST_ASSERT(trit_array_equal(&decr_y, &Y));
 }
 
 int main(void) {
   UNITY_BEGIN();
 
-  test_sponge_t _s[1];
-  sponge_t *s = test_sponge_init(_s);
+  test_sponge_t _s;
+  sponge_t *s = test_sponge_init(&_s);
 
-  sponge_test(s);
+  sponge_test_ae(s);
+  sponge_test_hash(s);
+  sponge_test_pointwise(s);
 
   return UNITY_END();
 }
