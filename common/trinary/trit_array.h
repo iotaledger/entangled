@@ -72,6 +72,7 @@ static inline void trit_array_set_null(trit_array_p const trit_array) {
 static inline bool trit_array_is_equal(trit_array_p const lhs,
                                        trit_array_p const rhs) {
   return (lhs->num_trits == rhs->num_trits &&
+          lhs->num_bytes == rhs->num_bytes &&
           memcmp(lhs->trits, rhs->trits, lhs->num_bytes) == 0);
 }
 
