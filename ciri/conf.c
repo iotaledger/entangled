@@ -59,6 +59,15 @@ static logger_level_t get_log_level(char const* const log_level) {
   return map[i].level;
 }
 
+static int get_conf_key(char const* const key) {
+  int i = 0;
+  while (cli_arguments_g[i].name != NULL &&
+         strcmp(cli_arguments_g[i].name, key) != 0) {
+    i++;
+  }
+  return cli_arguments_g[i].val;
+}
+
 static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf,
                                 iota_consensus_conf_t* const consensus_conf,
                                 iota_gossip_conf_t* const gossip_conf,
@@ -220,6 +229,7 @@ retcode_t iota_ciri_conf_file(iota_ciri_conf_t* const ciri_conf,
   yaml_parser_t parser;
   yaml_token_t token;
   FILE* file = NULL;
+  int key = 0;
   char* arg = NULL;
   int state = 0;
 
@@ -250,7 +260,12 @@ retcode_t iota_ciri_conf_file(iota_ciri_conf_t* const ciri_conf,
       case YAML_SCALAR_TOKEN:
         arg = (char*)token.data.scalar.value;
         if (state == 0) {  // Key
-        } else {           // Value
+          key = get_conf_key(arg);
+        } else {  // Value
+          if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf,
+                                    api_conf, key, arg) != RC_OK)) {
+            goto done;
+          }
         }
         break;
       default:
@@ -261,10 +276,10 @@ retcode_t iota_ciri_conf_file(iota_ciri_conf_t* const ciri_conf,
     }
   } while (token.type != YAML_STREAM_END_TOKEN);
 
+done:
   yaml_token_delete(&token);
   yaml_parser_delete(&parser);
   fclose(file);
-
   return ret;
 }
 
