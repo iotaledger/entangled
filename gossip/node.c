@@ -82,7 +82,7 @@ static retcode_t node_transaction_requester_init(node_t* const node,
   }
 
   log_debug(NODE_LOGGER_ID, "Added %d transactions to request\n",
-            pack.num_loaded);
+            requester_size(&node->transaction_requester));
 
 done:
   hash_pack_free(&pack);
@@ -122,7 +122,8 @@ static retcode_t node_tips_cache_init(node_t* const node) {
     }
   }
 
-  log_debug(NODE_LOGGER_ID, "Added %d tips to cache\n", pack.num_loaded);
+  log_debug(NODE_LOGGER_ID, "Added %d tips to cache\n",
+            tips_cache_size(&node->tips));
 
 done:
   hash_pack_free(&pack);
