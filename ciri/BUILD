@@ -11,7 +11,7 @@ cc_binary(
         "//config:mainnet": ["db/ciri-mainnet.db"],
         "//config:testnet": ["db/ciri-testnet.db"],
         "//conditions:default": ["db/ciri-mainnet.db"],
-    }),
+    }) + [":conf.yml"],
     deps = [
         ":core",
         "//utils/containers/lists:concurrent_list_neighbor",
@@ -61,5 +61,6 @@ cc_library(
         "//consensus:conf",
         "//gossip:conf",
         "//utils:logger_helper",
+        "@yaml",
     ],
 )

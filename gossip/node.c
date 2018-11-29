@@ -342,6 +342,7 @@ retcode_t node_destroy(node_t* const node) {
   }
 
   tips_cache_destroy(&node->tips);
+  free(node->conf.neighbors);
 
   logger_helper_destroy(NODE_LOGGER_ID);
 
