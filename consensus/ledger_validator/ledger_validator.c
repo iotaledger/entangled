@@ -267,7 +267,6 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
     bool *const has_snapshot) {
   retcode_t ret = RC_OK;
   bool valid_delta = true;
-  hash243_set_t analyzed_hashes = NULL;
   state_delta_t delta = NULL;
   state_delta_t patch = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
@@ -288,7 +287,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   *has_snapshot = tx.snapshot_index != 0;
   if (!(*has_snapshot)) {
     if ((ret = get_latest_delta(
-             lv, &analyzed_hashes, &delta, tx.hash,
+             lv, NULL, &delta, tx.hash,
              iota_snapshot_get_index(lv->milestone_tracker->latest_snapshot),
              true, &valid_delta)) != RC_OK) {
       log_error(LEDGER_VALIDATOR_LOGGER_ID, "Getting latest delta failed\n");
