@@ -172,14 +172,9 @@ retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
 
   HASH_CLEAR(hh, *patch);
   rw_lock_handle_rdlock(&snapshot->rw_lock);
-
-  if ((ret = state_delta_create_patch(&snapshot->state, delta, patch)) !=
-      RC_OK) {
-    goto done;
-  }
-
-done:
+  ret = state_delta_create_patch(&snapshot->state, delta, patch);
   rw_lock_handle_unlock(&snapshot->rw_lock);
+
   return ret;
 }
 
@@ -198,14 +193,9 @@ retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
   }
 
   rw_lock_handle_wrlock(&snapshot->rw_lock);
-
-  if ((ret = state_delta_apply_patch(&snapshot->state, patch)) != RC_OK) {
-    goto done;
-  }
-
+  ret = state_delta_apply_patch(&snapshot->state, patch);
   snapshot->index = index;
-
-done:
   rw_lock_handle_unlock(&snapshot->rw_lock);
+
   return ret;
 }
