@@ -219,6 +219,7 @@ void test_transaction_exceed_max_transactions() {
   txs[1]->snapshot_index = max_depth + 1;
   memcpy(txs[1]->trunk, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
   memcpy(txs[1]->branch, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[0]->branch, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
   build_tangle(&tangle, txs, 2);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
