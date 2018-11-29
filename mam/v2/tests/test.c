@@ -8,213 +8,140 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <time.h>
-
 #include <unity/unity.h>
 
 #include "mam/v2/tests/common.h"
 #include "utils/macros.h"
 
-void test_sponge_hash(size_t Xn, char *X, size_t Yn, char *Y) {
-  test_sponge_t _s[1];
-  sponge_t *s = test_sponge_init(_s);
-
-  trits_t tX = trits_alloc(3 * Xn);
-  trits_t tY = trits_alloc(3 * Yn);
-
-  sponge_init(s);
-  trytes_to_trits(X, tX.p, MIN(strlen(X), tX.n / RADIX));
-
-  sponge_absorb(s, MAM2_SPONGE_CTL_DATA, tX);
-  sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, tY);
-  trits_to_trytes(tY.p, Y, tY.n);
-
-  trits_free(tX);
-  trits_free(tY);
-}
-
-void test_sponge_encr(size_t Kn, char *K, size_t Xn, char *X, size_t Yn,
-                      char *Y) {
-  test_sponge_t _s[1];
-  sponge_t *s = test_sponge_init(_s);
-
-  trits_t tK = trits_alloc(3 * Kn);
-  trits_t tX = trits_alloc(3 * Xn);
-  trits_t tY = trits_alloc(3 * Yn);
+void test_sponge_hash(trit_array_t const *const input) {
+  test_sponge_t _s;
+  sponge_t *s = test_sponge_init(&_s);
+  tryte_t *expected_hash_trytes = (tryte_t *)
+      "Z9DDCLPZASLK9BCLPZASLKDVICXESYBIWBHJHQYOKIHNXHZDQVCFGDVIUTDVISKTMDG9EMON"
+      "OYXPODPWU";
+  size_t expected_hash_length = strlen((char *)expected_hash_trytes);
+  TRIT_ARRAY_MAKE_FROM_TRYTES(expected_hash, expected_hash_length,
+                              expected_hash_trytes);
+  TRIT_ARRAY_DECLARE(output, 243);
 
   sponge_init(s);
-  trytes_to_trits(K, tK.p, MIN(strlen(K), tK.n / RADIX));
-  sponge_absorb(s, MAM2_SPONGE_CTL_KEY, tK);
-  trytes_to_trits(X, tX.p, MIN(strlen(X), tX.n / RADIX));
-  sponge_encr(s, tX, tY);
-  trits_to_trytes(tY.p, Y, tY.n);
+  sponge_absorb_flex(s, MAM2_SPONGE_CTL_DATA, input);
+  sponge_squeeze_flex(s, MAM2_SPONGE_CTL_HASH, &output);
 
-  trits_free(tK);
-  trits_free(tX);
-  trits_free(tY);
+  TEST_ASSERT(trit_array_is_equal(&expected_hash, &output));
 }
 
-void test_sponge_decr(size_t Kn, char *K, size_t Yn, char *Y, size_t Xn,
-                      char *X) {
-  test_sponge_t _s[1];
-  sponge_t *s = test_sponge_init(_s);
-
-  trits_t tK = trits_alloc(3 * Kn);
-  trits_t tY = trits_alloc(3 * Yn);
-  trits_t tX = trits_alloc(3 * Xn);
+void test_sponge_encr(trit_array_t const *const key,
+                      trit_array_t const *const input) {
+  test_sponge_t _s;
+  sponge_t *s = test_sponge_init(&_s);
+  tryte_t *expected_encr_trytes = (tryte_t *)
+    "ABEZQN99JVWYZAZONRCHKUNKUSKSKSKTMDGQN99JVWYZAZONRCHKUNTYKUNKUSKTMDGQN99J"
+    "VWYZAZONRNDAAZNODFGABCKNLMOXYWERXCVHAZNODFGXCVKNLMOXHABCYZ99WERFGWERVHAB"
+    "CKXCNLM9AZNODOXYZ9";
+  size_t expected_encr_length = strlen((char *)expected_encr_trytes);
+  TRIT_ARRAY_MAKE_FROM_TRYTES(expected_encr, expected_encr_length,
+                              expected_encr_trytes);
+  TRIT_ARRAY_DECLARE(output, 486);
 
   sponge_init(s);
-  trytes_to_trits(K, tK.p, MIN(strlen(K), tK.n / RADIX));
+  sponge_absorb_flex(s, MAM2_SPONGE_CTL_KEY, key);
+  sponge_encr_flex(s, input, &output);
 
-  sponge_absorb(s, MAM2_SPONGE_CTL_KEY, tK);
-  trytes_to_trits(Y, tY.p, MIN(strlen(Y), tY.n / RADIX));
-
-  sponge_decr(s, tY, tX);
-  trits_to_trytes(tX.p, X, tX.n);
-  trits_free(tK);
-  trits_free(tY);
-  trits_free(tX);
+  TEST_ASSERT(trit_array_is_equal(&expected_encr, &output));
 }
 
-void test_prng_gen(size_t Kn, char *K, trit_array_t const *const nonce,
-                   size_t Yn, char *Y) {
-  test_sponge_t _s[1];
-  test_prng_t _p[1];
-  sponge_t *s = test_sponge_init(_s);
-  prng_t *p = test_prng_init(_p, s);
+void test_sponge_decr(trit_array_t const *const key,
+                      trit_array_t const *const input) {
+  test_sponge_t _s;
+  sponge_t *s = test_sponge_init(&_s);
+  tryte_t *expected_decr_trytes = (tryte_t *)
+      "ABSNTANLTJBBAAZPPERLQAVSLPEKVPEFUBITANLTJBBAAZPPERLQAVAPQAVSLPEFUBITANLT"
+      "JBBAAZPPEKWZAZNODFGABCKNLMOXYWERXCVHAZNODFGXCVKNLMOXHABCYZ99WERFGWERVHAB"
+      "CKXCNLM9AZNODOXYZ9";
+  size_t expected_decr_length = strlen((char *)expected_decr_trytes);
+  TRIT_ARRAY_MAKE_FROM_TRYTES(expected_decr, expected_decr_length,
+                              expected_decr_trytes);
+  TRIT_ARRAY_DECLARE(output, 486);
 
-  trits_t tK = trits_alloc(3 * Kn);
-  TRIT_ARRAY_DECLARE(tY, 3 * Yn);
+  sponge_init(s);
+  sponge_absorb_flex(s, MAM2_SPONGE_CTL_KEY, key);
+  sponge_decr_flex(s, &output, input);
 
-  flex_trit_t key[FLEX_TRIT_SIZE_243];
-  flex_trits_from_trytes(key, MAM2_PRNG_KEY_SIZE, K, HASH_LENGTH_TRYTE,
-                         HASH_LENGTH_TRYTE);
-
-  trytes_to_trits(K, tK.p, MIN(tK.n / RADIX, strlen(K)));
-  prng_init(p, s, key);
-  prng_gen(p, 0, nonce, &tY);
-  flex_trits_to_trytes(Y, Yn, tY.trits, 3 * Yn, 3 * Yn);
-
-  trits_free(tK);
+  TEST_ASSERT(trit_array_is_equal(&expected_decr, &output));
 }
 
-void test_wots_gen_sign(size_t Kn, char *K, trit_array_t const *const nonce,
-                        size_t pkn, char *pk, size_t Hn, char *H, size_t sign,
-                        char *sig) {
-  test_sponge_t _s[1];
-  test_prng_t _p[1];
-  test_wots_t _w[1];
-  sponge_t *s = test_sponge_init(_s);
-  prng_t *p = test_prng_init(_p, s);
-  wots_t *w = test_wots_init(_w, s);
+void test_prng_gen(trit_array_t const *const key,
+                   trit_array_t const *const nonce) {
+  test_sponge_t _s;
+  test_prng_t _p;
+  sponge_t *s = test_sponge_init(&_s);
+  prng_t *p = test_prng_init(&_p, s);
+  tryte_t *expected_gen_trytes = (tryte_t *)
+      "99MGDGQN99JVWYZZZNODFGWERXCVHXCVHABCKNLMOXYZ99AZNODFGWERFGWERXCVHABCKNLM"
+      "OXYZ99AZNOD99ABCKNLMOXYZA99999999999999999999999999999999999999999999999"
+      "999999999999999999";
+  size_t expected_gen_length = strlen((char *)expected_gen_trytes);
+  TRIT_ARRAY_MAKE_FROM_TRYTES(expected_gen, expected_gen_length,
+                              expected_gen_trytes);
+  TRIT_ARRAY_DECLARE(output, 486);
 
-  trits_t tK = trits_alloc(3 * Kn);
-  trits_t tpk = trits_alloc(3 * pkn);
-  trits_t tH = trits_alloc(3 * Hn);
-  trits_t tsig = trits_alloc(3 * sign);
+  prng_init(p, s, key->trits);
+  prng_gen(p, 0, nonce, &output);
 
-  flex_trit_t key[MAM2_PRNG_KEY_SIZE];
+  TEST_ASSERT(trit_array_is_equal(&expected_gen, &output));
+}
 
-  trytes_to_trits(K, tK.p, MIN(strlen(K), tK.n / RADIX));
-  flex_trits_from_trytes(key, MAM2_PRNG_KEY_SIZE, K, HASH_LENGTH_TRYTE,
-                         HASH_LENGTH_TRYTE);
-  prng_init(p, s, key);
+void test_wots_gen_sign(trit_array_t const *const key,
+                        trit_array_t const *const nonce,
+                        trit_array_t const *const hash) {
+  test_sponge_t _s;
+  test_prng_t _p;
+  test_wots_t _w;
+  sponge_t *s = test_sponge_init(&_s);
+  prng_t *p = test_prng_init(&_p, s);
+  wots_t *w = test_wots_init(&_w, s);
 
+  TRIT_ARRAY_DECLARE(pk, MAM2_WOTS_PK_SIZE);
+  TRIT_ARRAY_DECLARE(sig, MAM2_WOTS_SIG_SIZE);
+
+  prng_init(p, s, key->trits);
   wots_gen_sk(w, p, nonce);
-  TRIT_ARRAY_MAKE_FROM_RAW(pk_trits_array, MAM2_WOTS_PK_SIZE, tpk.p + tpk.d);
-  wots_calc_pk(w, &pk_trits_array);
-  flex_trits_to_trits(tpk.p + tpk.d, MAM2_WOTS_PK_SIZE, pk_trits_array.trits,
-                      MAM2_WOTS_PK_SIZE, MAM2_WOTS_PK_SIZE);
-
-  trits_to_trytes(tpk.p, pk, MIN(strlen(pk), tpk.n / RADIX));
-
-  trytes_to_trits(H, tH.p, MIN(strlen(H), tH.n));
-  flex_trits_to_trits(tsig.p + tsig.d, MAM2_WOTS_SK_SIZE, w->sk,
-                      MAM2_WOTS_SK_SIZE, MAM2_WOTS_SK_SIZE);
-  TRIT_ARRAY_DECLARE(hash_array, MAM2_WOTS_HASH_SIZE);
-  TRIT_ARRAY_DECLARE(sk_sig_array, MAM2_WOTS_SIG_SIZE);
-  wots_sign(w, &hash_array, &sk_sig_array);
-  flex_trits_to_trits(tsig.p + tsig.d, MAM2_WOTS_SIG_SIZE, sk_sig_array.trits,
-                      MAM2_WOTS_SIG_SIZE, MAM2_WOTS_SIG_SIZE);
-
-  trits_to_trytes(tsig.p, sig, MIN(tsig.n / RADIX, strlen(sig)));
-
-  trits_free(tK);
-  trits_free(tpk);
-  trits_free(tH);
-  trits_free(tsig);
+  wots_calc_pk(w, &pk);
+  wots_sign(w, hash, &sig);
+  // TODO - test/fix wots_gen_sign_sig
 }
 
 void test() {
   tryte_t *nonce_trytes = (tryte_t *)"9ABCKNLMOXYZ";
-  TRIT_ARRAY_DECLARE(nonce, 3 * 12);
-  flex_trits_from_trytes(nonce.trits, 3 * 12, nonce_trytes, 12, 12);
+  size_t nonce_length = strlen((char *)nonce_trytes);
+  TRIT_ARRAY_MAKE_FROM_TRYTES(nonce, nonce_length, nonce_trytes);
 
-  char K[81 + 1] =
-      "ABCKNLMOXYZ99AZNODFGWERXCVH"
-      "XCVHABCKNLMOXYZ99AZNODFGWER"
-      "FGWERXCVHABCKNLMOXYZ99AZNOD";
+  tryte_t *key_trytes = (tryte_t *)
+      "ABCKNLMOXYZ99AZNODFGWERXCVHXCVHABCKNLMOXYZ99AZNODFGWERFGWERXCVHABCKNLMOX"
+      "YZ99AZNOD";
+  size_t key_length = strlen((char *)key_trytes);
+  TRIT_ARRAY_MAKE_FROM_TRYTES(key, key_length, key_trytes);
 
-  char H[78 + 1] =
-      "BACKNLMOXYZ99AZNODFGWERXCVH"
-      "XCVHABCKNLMOXYZ99AZNODFGWER"
-      "FGWERXCVHABCKNLMOXYZ99AZ";
+  tryte_t *hash_trytes = (tryte_t*)
+      "BACKNLMOXYZ99AZNODFGWERXCVHXCVHABCKNLMOXYZ99AZNODFGWERFGWERXCVHABCKNLMOX"
+      "YZ99AZ";
+  size_t hash_length = strlen((char *)hash_trytes);
+  TRIT_ARRAY_MAKE_FROM_TRYTES(hash, hash_length, hash_trytes);
 
-  char X[162 + 1] =
-      "ABCKNLMOXYZ99AZNODFGWERXCVH"
-      "XCVHABCKNLMOXYZ99AZNODFGWER"
-      "FGWERXCVHABCKNLMOXYZ99AZNOD"
-      "Z99AZNODFGABCKNLMOXYWERXCVH"
-      "AZNODFGXCVKNLMOXHABCYZ99WER"
-      "FGWERVHABCKXCNLM9AZNODOXYZ9";
-
-  char *sponge_hash_expected =
-      "Z9DDCLPZASLK9BCLPZASLKDVICXESYBIWBHJHQYOKIHNXHZDQVCFGDVIUTDVISKTMDG9EMON"
-      "OYXPODPWU";
-  char *sponge_encr_expected =
-      "ABEZQN99JVWYZAZONRCHKUNKUSKSKSKTMDGQN99JVWYZAZONRCHKUNTYKUNKUSKTMDGQN99J"
-      "VWYZAZONRNDAAZNODFGABCKNLMOXYWERXCVHAZNODFGXCVKNLMOXHABCYZ99WERFGWERVHAB"
+  tryte_t *input_trytes = (tryte_t*)
+      "ABCKNLMOXYZ99AZNODFGWERXCVHXCVHABCKNLMOXYZ99AZNODFGWERFGWERXCVHABCKNLMOX"
+      "YZ99AZNODZ99AZNODFGABCKNLMOXYWERXCVHAZNODFGXCVKNLMOXHABCYZ99WERFGWERVHAB"
       "CKXCNLM9AZNODOXYZ9";
-  char *sponge_decr_expected =
-      "ABSNTANLTJBBAAZPPERLQAVSLPEKVPEFUBITANLTJBBAAZPPERLQAVAPQAVSLPEFUBITANLT"
-      "JBBAAZPPEKWZAZNODFGABCKNLMOXYWERXCVHAZNODFGXCVKNLMOXHABCYZ99WERFGWERVHAB"
-      "CKXCNLM9AZNODOXYZ9";
-  char *prng_gen_expected =
-      "99MGDGQN99JVWYZZZNODFGWERXCVHXCVHABCKNLMOXYZ99AZNODFGWERFGWERXCVHABCKNLM"
-      "OXYZ99AZNOD99ABCKNLMOXYZA99999999999999999999999999999999999999999999999"
-      "999999999999999999";
+  size_t input_length = strlen((char *)input_trytes);
+  TRIT_ARRAY_MAKE_FROM_TRYTES(input, input_length, input_trytes);
 
-  bool r = true;
-  size_t sponge_hash_Yn = 81;
-  size_t sponge_encr_Yn = 162;
-  size_t sponge_decr_Xn = 162;
-  size_t prng_gen_Yn = 162;
-  clock_t clk;
-
-  char sponge_hash_Y[81];
-  char sponge_encr_Y[162];
-  char sponge_decr_X[162];
-  char prng_gen_Y[162];
-  char wots_gen_sign_pk[MAM2_WOTS_PK_SIZE / 3];
-  char wots_gen_sign_sig[MAM2_WOTS_SIG_SIZE / 3];
-
-  test_sponge_hash(162, X, sponge_hash_Yn, sponge_hash_Y);
-  TEST_ASSERT_EQUAL_MEMORY(sponge_hash_Y, sponge_hash_expected, 81);
-
-  test_sponge_encr(81, K, 162, X, sponge_encr_Yn, sponge_encr_Y);
-  TEST_ASSERT_EQUAL_MEMORY(sponge_encr_Y, sponge_encr_expected, 162);
-
-  test_sponge_decr(81, K, 162, X, sponge_decr_Xn, sponge_decr_X);
-  TEST_ASSERT_EQUAL_MEMORY(sponge_decr_X, sponge_decr_expected, 162);
-
-  test_prng_gen(81, K, &nonce, prng_gen_Yn, prng_gen_Y);
-  TEST_ASSERT_EQUAL_MEMORY(prng_gen_Y, prng_gen_expected, 162);
-
-  test_wots_gen_sign(81, K, &nonce, MAM2_WOTS_PK_SIZE / 3, wots_gen_sign_pk, 78,
-                     H, MAM2_WOTS_SIG_SIZE / 3, wots_gen_sign_sig);
-
+  test_sponge_hash(&input);
   // FIXME (@tsvisabo) test dec(enc(X)) = X
-  // TODO - test/fix wots_gen_sign_sig
+  test_sponge_encr(&key, &input);
+  test_sponge_decr(&key, &input);
+  test_prng_gen(&key, &nonce);
+  test_wots_gen_sign(&key, &nonce, &hash);
 }
 
 int main(void) {
