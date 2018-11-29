@@ -218,16 +218,17 @@ static retcode_t update_latest_solid_subtangle_milestone(
     return RC_CONSENSUS_MT_NULL_SELF;
   }
 
-
   if ((ret = iota_tangle_milestone_load_next(
            mt->tangle, mt->latest_solid_subtangle_milestone_index, &pack)) !=
       RC_OK) {
     return ret;
   }
+
   while (pack.num_loaded != 0 &&
          milestone.index <= mt->latest_milestone_index && mt->running) {
     has_snapshot = false;
-    if (milestone.index >= mt->latest_solid_subtangle_milestone_index) {
+    is_solid = false;
+    if (milestone.index > mt->latest_solid_subtangle_milestone_index) {
       if ((ret = iota_consensus_transaction_solidifier_check_solidity(
                mt->transaction_solidifier, milestone.hash, true, &is_solid)) !=
           RC_OK) {

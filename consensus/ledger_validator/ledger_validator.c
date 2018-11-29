@@ -142,10 +142,10 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
                                           bool *should_stop) {
   retcode_t ret = RC_OK;
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
-  struct _trit_array curr_hash = {.trits = NULL,
-                                  .num_trits = NUM_TRITS_HASH,
-                                  .num_bytes = FLEX_TRIT_SIZE_243,
-                                  .dynamic = 0};
+  trit_array_t curr_hash = {.trits = NULL,
+                            .num_trits = NUM_TRITS_HASH,
+                            .num_bytes = FLEX_TRIT_SIZE_243,
+                            .dynamic = 0};
   bundle_transactions_t *bundle = NULL;
   iota_transaction_t tx_bundle = NULL;
 
@@ -193,6 +193,7 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
         tx_bundle = (iota_transaction_t)utarray_next(bundle, tx_bundle);
       }
     }
+    bundle_transactions_free(&bundle);
   }
 
 done:
@@ -222,7 +223,7 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
 
   ret = tangle_traversal_dfs_to_genesis(lv->tangle, get_latest_delta_do_func,
                                         tip, lv->conf->genesis_hash,
-                                        analyzed_hashes, (void *)&params);
+                                        analyzed_hashes, &params);
   *valid_delta = params.valid_delta;
   return ret;
 }
@@ -270,8 +271,10 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   state_delta_t delta = NULL;
   state_delta_t patch = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  struct _trit_array milestone_hash = {milestone->hash, NUM_TRITS_HASH,
-                                       FLEX_TRIT_SIZE_243, 0};
+  trit_array_t milestone_hash = {.trits = milestone->hash,
+                                 .num_trits = HASH_LENGTH_TRIT,
+                                 .num_bytes = FLEX_TRIT_SIZE_243,
+                                 .dynamic = 0};
 
   *has_snapshot = false;
   rw_lock_handle_wrlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
