@@ -2,18 +2,15 @@ Tracking issues
 ---------------
 
 - [API](https://github.com/iotaledger/entangled/issues/325)
-- [Consensus](https://github.com/iotaledger/entangled/issues/182)
 - [Generic event-routing system](https://github.com/iotaledger/entangled/issues/306)
 
-cIRI
-====
+# cIRI
 
 A low level implementation of an IOTA node in C.
 
 This is a WIP [IOTA](https://iota.org/) node. It allows users to become part of the [IOTA](https://iota.org/) network as both a transaction relay and network information provider through the easy-to-use [API](https://iota.readme.io/reference).
 
-How to get started
-------------------
+## How to get started
 
 The IOTA network is an independent peer-to-peer network with a first-user, friend-to-friend, network structure:
 
@@ -25,8 +22,7 @@ You can find neighbors quickly at both our [Discord Community](https://discord.g
 
 Everyone will be welcoming and very happy to help you get connected. If you want to get tokens for your testcase, please just ask in one of the communication channels.
 
-Build and run cIRI
-------------------
+## Build and run cIRI
 
 cIRI is built and run through [bazel](https://www.bazel.build/).
 
@@ -38,10 +34,21 @@ $ bazel run --define network=mainnet|testnet -- ciri <optional flags>
 
 *First build can take some time due to dependencies downloading.*
 
-Command line options
---------------------
+## Configuration
 
-*Currently supported, more to come.*
+### Configuration file
+
+cIRI configuration file is a [YAML](http://yaml.org/) file with path `ciri/conf.yml`.
+
+Example file:
+
+```yaml
+log-level: debug
+neighbors: "udp://148.148.148.148:14265"
+port: 14265
+```
+
+### Command Line Interface
 
 Long option | Short option | Description | Example input
 --- | --- | --- | ---

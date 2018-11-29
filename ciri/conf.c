@@ -95,7 +95,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf,
       consensus_conf->mwm = atoi(value);
       break;
     case 'n':  // --neighbors
-      gossip_conf->neighbors = value;
+      gossip_conf->neighbors = strdup(value);
       break;
     case CONF_P_PROPAGATE_REQUEST:  // --p-propagate-request
       gossip_conf->p_propagate_request = atof(value);
