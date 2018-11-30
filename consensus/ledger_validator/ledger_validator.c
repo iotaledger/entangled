@@ -74,8 +74,6 @@ static retcode_t build_snapshot(ledger_validator_t const *const lv,
   state_delta_t patch = NULL;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
-  rw_lock_handle_wrlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
-
   if ((ret = iota_tangle_milestone_load_first(lv->tangle, &pack)) != RC_OK) {
     goto done;
   }
@@ -122,7 +120,6 @@ static retcode_t build_snapshot(ledger_validator_t const *const lv,
   }
 
 done:
-  rw_lock_handle_unlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
   state_delta_destroy(&delta);
   state_delta_destroy(&patch);
   return ret;
