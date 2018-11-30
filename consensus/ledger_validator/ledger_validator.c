@@ -167,9 +167,10 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
   }
 
   iota_transaction_t tx = pack->models[0];
-  *should_branch = true;
+
   if (tx->snapshot_index == 0 ||
       tx->snapshot_index > params->latest_snapshot_index) {
+    *should_branch = true;
     if (tx->current_index == 0) {
       bundle_transactions_new(&bundle);
       curr_hash.trits = hash;
@@ -192,8 +193,8 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
         }
         tx_bundle = (iota_transaction_t)utarray_next(bundle, tx_bundle);
       }
+      bundle_transactions_free(&bundle);
     }
-    bundle_transactions_free(&bundle);
   }
 
 done:
