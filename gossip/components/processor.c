@@ -117,6 +117,14 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
       goto failure;
     }
 
+    if (transaction.current_index == 0 &&
+        memcmp(transaction.address,
+               processor->milestone_tracker->coordinator->trits,
+               FLEX_TRIT_SIZE_243) == 0) {
+      ret = iota_milestone_tracker_add_candidate(processor->milestone_tracker,
+                                                 transaction.hash);
+    }
+
     neighbor->nbr_new_tx++;
   }
 
@@ -270,12 +278,14 @@ static void *processor_routine(processor_t *const processor) {
  * Public functions
  */
 
-retcode_t processor_init(
-    processor_t *const processor, node_t *const node, tangle_t *const tangle,
-    transaction_validator_t *const transaction_validator,
-    transaction_solidifier_t *const transaction_solidifier) {
+retcode_t processor_init(processor_t *const processor, node_t *const node,
+                         tangle_t *const tangle,
+                         transaction_validator_t *const transaction_validator,
+                         transaction_solidifier_t *const transaction_solidifier,
+                         milestone_tracker_t *const milestone_tracker) {
   if (processor == NULL || node == NULL || tangle == NULL ||
-      transaction_validator == NULL || transaction_solidifier == NULL) {
+      transaction_validator == NULL || transaction_solidifier == NULL ||
+      milestone_tracker == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -289,6 +299,7 @@ retcode_t processor_init(
   processor->tangle = tangle;
   processor->transaction_validator = transaction_validator;
   processor->transaction_solidifier = transaction_solidifier;
+  processor->milestone_tracker = milestone_tracker;
 
   return RC_OK;
 }
@@ -341,6 +352,7 @@ retcode_t processor_destroy(processor_t *const processor) {
   processor->tangle = NULL;
   processor->transaction_validator = NULL;
   processor->transaction_solidifier = NULL;
+  processor->milestone_tracker = NULL;
 
   logger_helper_destroy(PROCESSOR_LOGGER_ID);
 

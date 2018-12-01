@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
+#include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "consensus/transaction_validator/transaction_validator.h"
 #include "gossip/iota_packet.h"
@@ -36,6 +37,7 @@ typedef struct processor_s {
   tangle_t *tangle;
   transaction_validator_t *transaction_validator;
   transaction_solidifier_t *transaction_solidifier;
+  milestone_tracker_t *milestone_tracker;
 } processor_t;
 
 #ifdef __cplusplus
@@ -50,13 +52,15 @@ extern "C" {
  * @param tangle A tangle
  * @param transaction_validator A transaction validator
  * @param transaction_solidifier A transaction solidifier
+ * @param milestone_tracker A milestone tracker
  *
  * @return a status code
  */
-retcode_t processor_init(
-    processor_t *const processor, node_t *const node, tangle_t *const tangle,
-    transaction_validator_t *const transaction_validator,
-    transaction_solidifier_t *const transaction_solidifier);
+retcode_t processor_init(processor_t *const processor, node_t *const node,
+                         tangle_t *const tangle,
+                         transaction_validator_t *const transaction_validator,
+                         transaction_solidifier_t *const transaction_solidifier,
+                         milestone_tracker_t *const milestone_tracker);
 
 /**
  * Starts a processor

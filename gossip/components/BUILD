@@ -6,7 +6,7 @@ cc_library(
     deps = [
         "//utils/containers/hash:hash8019_queue",
         "//utils/handles:cond",
-        "//utils/handles:lock",
+        "//utils/handles:rw_lock",
         "//utils/handles:thread",
     ],
 )
@@ -26,6 +26,7 @@ cc_library(
     name = "processor_shared",
     hdrs = ["processor.h"],
     deps = [
+        "//consensus/milestone_tracker",
         "//consensus/transaction_solidifier",
         "//consensus/transaction_validator",
         "//utils/handles:cond",
