@@ -68,6 +68,7 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
   retcode_t ret = RC_OK;
   bundle_transactions_t* bundle = NULL;
   bool exists = false, valid = false;
+  bundle_validation_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
 
   if (candidate->index >= 0x200000) {
     return RC_OK;
@@ -88,11 +89,11 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
     ret = RC_CONSENSUS_MT_OOM;
     goto done;
   }
-  if ((ret = iota_consensus_bundle_validator_validate(mt->tangle, &hash, bundle,
-                                                      &valid)) != RC_OK) {
+  if ((ret = iota_consensus_bundle_validator_validate(
+           mt->tangle, &hash, bundle, &bundle_status)) != RC_OK) {
     log_warning(MILESTONE_TRACKER_LOGGER_ID, "Validating bundle failed\n");
     goto done;
-  } else if (!valid) {
+  } else if (bundle_status != BUNDLE_VALID) {
     goto done;
   } else {
     iota_transaction_t tx1 = NULL;
