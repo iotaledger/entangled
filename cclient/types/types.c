@@ -78,7 +78,7 @@ void char_buffer_free(char_buffer_t* in) {
 retcode_t flex_hash_to_trytes(const trit_array_p hash, char* trytes) {
   size_t trits_len = 0;
   if (trytes == NULL) {
-    return RC_CCLIENT_FLEX_TRITS;
+    return RC_CCLIENT_NULL_PTR;
   }
 
   trits_len = flex_trits_to_trytes(
@@ -86,7 +86,7 @@ retcode_t flex_hash_to_trytes(const trit_array_p hash, char* trytes) {
       hash->trits, hash->num_trits, hash->num_trits);
 
   if (trits_len == 0) {
-    return RC_CCLIENT_FLEX_TRITS;
+    return RC_CCLIENT_INVALID_TRITS_LEN;
   }
   return RC_OK;
 }
@@ -97,14 +97,14 @@ retcode_t trytes_to_flex_hash(trit_array_p hash, const char* trytes) {
   size_t ret_trytes = 0;
   if (trits_len > hash->num_trits) {
     trit_array_set_null(hash);
-    return RC_CCLIENT_FLEX_TRITS;
+    return RC_CCLIENT_INVALID_TRITS_LEN;
   }
   ret_trytes = flex_trits_from_trytes(hash->trits, trits_len,
                                       (const tryte_t*)trytes, str_len, str_len);
 
   if (ret_trytes == 0) {
     trit_array_set_null(hash);
-    return RC_CCLIENT_FLEX_TRITS;
+    return RC_CCLIENT_INVALID_TRITS_LEN;
   }
 
   return RC_OK;
@@ -180,7 +180,7 @@ retcode_t flex_hash_to_char_buffer(trit_array_p hash, char_buffer_t* out) {
       hash->trits, hash->num_trits, hash->num_trits);
 
   if (trits_len == 0) {
-    return RC_CCLIENT_FLEX_TRITS;
+    return RC_CCLIENT_INVALID_TRITS_LEN;
   }
   return RC_OK;
 }

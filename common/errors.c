@@ -96,8 +96,8 @@ const char* error_2_string(retcode_t err) {
       return STR_CCLIENT_RES_ERROR;
     case RC_CCLIENT_JSON_KEY:
       return STR_CCLIENT_JSON_KEY;
-    case RC_CCLIENT_FLEX_TRITS:
-      return STR_CCLIENT_FLEX_TRITS;
+    case RC_CCLIENT_INVALID_TRITS_LEN:
+      return STR_CCLIENT_INVALID_TRITS_LEN;
     case RC_CCLIENT_NULL_PTR:
       return STR_CCLIENT_NULL_PTR;
     case RC_CCLIENT_UNIMPLEMENTED:
