@@ -63,15 +63,29 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt,
   return RC_OK;
 }
 
-static retcode_t validate_milestone(milestone_tracker_t* const mt,
-                                    iota_milestone_t* const candidate) {
+typedef enum milestone_status_e {
+  MILESTONE_VALID,
+  MILESTONE_INVALID,
+  MILESTONE_EXISTS,
+  MILESTONE_INCOMPLETE,
+} milestone_status_t;
+
+static retcode_t validate_milestone(
+    milestone_tracker_t* const mt, iota_milestone_t* const candidate,
+    milestone_status_t* const milestone_status) {
   retcode_t ret = RC_OK;
   bundle_transactions_t* bundle = NULL;
   bool exists = false, valid = false;
   bundle_validation_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
+  *milestone_status = MILESTONE_INVALID;
 
   if (candidate->index >= 0x200000) {
-    return RC_OK;
+    *milestone_status = MILESTONE_INVALID;
+    return ret;
+  } else if (candidate->index <= mt->latest_solid_subtangle_milestone_index ||
+             candidate->index == mt->latest_milestone_index) {
+    *milestone_status = MILESTONE_EXISTS;
+    return ret;
   }
 
   // Check if milestone is already present in database i.e. validated
@@ -79,23 +93,25 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
   memcpy(hash.trits, candidate->hash, FLEX_TRIT_SIZE_243);
   if ((ret = iota_tangle_milestone_exist(mt->tangle, candidate->hash,
                                          &exists)) != RC_OK) {
-    goto done;
+    return ret;
   } else if (exists) {
-    goto valid;
+    *milestone_status = MILESTONE_EXISTS;
+    return ret;
   }
 
   bundle_transactions_new(&bundle);
   if (bundle == NULL) {
-    ret = RC_CONSENSUS_MT_OOM;
-    goto done;
+    return RC_CONSENSUS_MT_OOM;
   }
   if ((ret = iota_consensus_bundle_validator_validate(
            mt->tangle, &hash, bundle, &bundle_status)) != RC_OK) {
     log_warning(MILESTONE_TRACKER_LOGGER_ID, "Validating bundle failed\n");
     goto done;
-  } else if (bundle_status != BUNDLE_VALID) {
+  } else if (bundle_status == BUNDLE_INCOMPLETE) {
+    fprintf(stderr, "BUNDLE_INCOMPLETE\n");
+    *milestone_status = MILESTONE_INCOMPLETE;
     goto done;
-  } else {
+  } else if (bundle_status == BUNDLE_VALID) {
     iota_transaction_t tx1 = NULL;
     iota_transaction_t tx2 = NULL;
 
@@ -113,19 +129,12 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt,
       log_warning(MILESTONE_TRACKER_LOGGER_ID,
                   "Validating coordinator failed\n");
       goto done;
-    } else if (!valid) {
-      goto done;
-    } else {
-      iota_tangle_milestone_store(mt->tangle, candidate);
-      goto valid;
+    }
+    if (valid) {
+      *milestone_status = MILESTONE_VALID;
     }
   }
 
-valid:
-  if (candidate->index > mt->latest_milestone_index) {
-    mt->latest_milestone_index = candidate->index;
-    memcpy(mt->latest_milestone->trits, candidate->hash, FLEX_TRIT_SIZE_243);
-  }
 done:
   if (bundle) {
     bundle_transactions_free(&bundle);
@@ -145,17 +154,15 @@ static void* milestone_validator(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
   iota_milestone_t candidate;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  uint64_t previous_latest_milestone_index = 0;
   flex_trit_t* peek = NULL;
   TRIT_ARRAY_DECLARE(hash, HASH_LENGTH_TRIT);
+  milestone_status_t milestone_status;
 
   if (mt == NULL) {
     return NULL;
   }
 
   while (mt->running) {
-    previous_latest_milestone_index = mt->latest_milestone_index;
-
     rw_lock_handle_wrlock(&mt->candidates_lock);
     peek = hash243_queue_peek(mt->candidates);
 
@@ -169,16 +176,24 @@ static void* milestone_validator(void* arg) {
           pack.num_loaded != 0) {
         candidate.index = get_milestone_index(&tx);
         memcpy(candidate.hash, tx.hash, FLEX_TRIT_SIZE_243);
-        if (validate_milestone(mt, &candidate) != RC_OK) {
+        if (validate_milestone(mt, &candidate, &milestone_status) != RC_OK) {
           log_warning(MILESTONE_TRACKER_LOGGER_ID,
                       "Validating milestone failed\n");
+          continue;
         }
-        if (previous_latest_milestone_index != mt->latest_milestone_index) {
-          // TODO messageQ publish lmi
-          log_info(MILESTONE_TRACKER_LOGGER_ID,
-                   "Latest milestone has changed from #%" PRIu64 " to #%" PRIu64
-                   "\n",
-                   previous_latest_milestone_index, mt->latest_milestone_index);
+        if (milestone_status == MILESTONE_VALID) {
+          iota_tangle_milestone_store(mt->tangle, &candidate);
+          if (candidate.index > mt->latest_milestone_index) {
+            log_info(MILESTONE_TRACKER_LOGGER_ID,
+                     "Latest milestone has changed from #%" PRIu64
+                     " to #%" PRIu64 "\n",
+                     mt->latest_milestone_index, candidate.index);
+            mt->latest_milestone_index = candidate.index;
+            memcpy(mt->latest_milestone->trits, candidate.hash,
+                   FLEX_TRIT_SIZE_243);
+            log_debug(MILESTONE_TRACKER_LOGGER_ID, "%d milestone candidates\n",
+                      hash243_queue_count(&mt->candidates));
+          }
         }
       }
     } else {
