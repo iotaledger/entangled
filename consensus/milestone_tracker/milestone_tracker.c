@@ -108,7 +108,6 @@ static retcode_t validate_milestone(
     log_warning(MILESTONE_TRACKER_LOGGER_ID, "Validating bundle failed\n");
     goto done;
   } else if (bundle_status == BUNDLE_INCOMPLETE) {
-    fprintf(stderr, "BUNDLE_INCOMPLETE\n");
     *milestone_status = MILESTONE_INCOMPLETE;
     goto done;
   } else if (bundle_status == BUNDLE_VALID) {
@@ -194,6 +193,8 @@ static void* milestone_validator(void* arg) {
             log_debug(MILESTONE_TRACKER_LOGGER_ID, "%d milestone candidates\n",
                       hash243_queue_count(&mt->candidates));
           }
+        } else if (milestone_status == MILESTONE_INCOMPLETE) {
+          iota_milestone_tracker_add_candidate(mt, peek);
         }
       }
     } else {
