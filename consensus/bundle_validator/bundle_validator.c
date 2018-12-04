@@ -41,23 +41,19 @@ static retcode_t load_bundle_transactions(tangle_t const* const tangle,
   last_index = curr_tx->last_index;
   memcpy(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243);
 
-  while (curr_index <= last_index &&
+  while (pack.num_loaded != 0 && curr_index <= last_index &&
          memcmp(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243) == 0) {
     bundle_transactions_add(bundle, curr_tx);
     curr_tx_trunk.trits = curr_tx->trunk;
 
     hash_pack_reset(&pack);
-    res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
-                                       &curr_tx_trunk, &pack);
-    if (res != RC_OK || pack.num_loaded == 0) {
-      log_error(BUNDLE_VALIDATOR_LOGGER_ID,
-                "Failed in %s, could not load next transaction\n",
-                __FUNCTION__);
+    if ((res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
+                                            &curr_tx_trunk, &pack)) != RC_OK) {
       return res;
     }
   }
 
-  return RC_OK;
+  return res;
 }
 
 static retcode_t validate_signature(bundle_transactions_t const* const bundle,
