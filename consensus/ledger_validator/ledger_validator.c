@@ -250,9 +250,6 @@ retcode_t iota_consensus_ledger_validator_init(
     return ret;
   }
 
-  log_info(LEDGER_VALIDATOR_LOGGER_ID,
-           "Loaded consistent milestone: #%" PRIu64 "\n",
-           mt->latest_solid_subtangle_milestone_index);
   return ret;
 }
 

@@ -16,7 +16,7 @@
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
-#define MILESTONE_VALIDATION_INTERVAL 1000uLL
+#define MILESTONE_VALIDATION_INTERVAL 10uLL
 #define SOLID_MILESTONE_RESCAN_INTERVAL 5000uLL
 
 #ifdef __cplusplus

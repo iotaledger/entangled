@@ -154,8 +154,11 @@ static void* milestone_validator(void* arg) {
   iota_milestone_t candidate;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   flex_trit_t* peek = NULL;
-  TRIT_ARRAY_DECLARE(hash, HASH_LENGTH_TRIT);
   milestone_status_t milestone_status;
+  trit_array_t hash = {.trits = candidate.hash,
+                       .num_trits = HASH_LENGTH_TRIT,
+                       .num_bytes = FLEX_TRIT_SIZE_243,
+                       .dynamic = 0};
 
   if (mt == NULL) {
     return NULL;
@@ -166,7 +169,7 @@ static void* milestone_validator(void* arg) {
     peek = hash243_queue_peek(mt->candidates);
 
     if (peek != NULL) {
-      memcpy(hash.trits, peek, FLEX_TRIT_SIZE_243);
+      memcpy(candidate.hash, peek, FLEX_TRIT_SIZE_243);
       hash243_queue_pop(&mt->candidates);
       rw_lock_handle_unlock(&mt->candidates_lock);
       hash_pack_reset(&pack);
@@ -174,7 +177,6 @@ static void* milestone_validator(void* arg) {
                                        &hash, &pack) == RC_OK &&
           pack.num_loaded != 0) {
         candidate.index = get_milestone_index(&tx);
-        memcpy(candidate.hash, tx.hash, FLEX_TRIT_SIZE_243);
         if (validate_milestone(mt, &candidate, &milestone_status) != RC_OK) {
           log_warning(MILESTONE_TRACKER_LOGGER_ID,
                       "Validating milestone failed\n");
@@ -190,17 +192,15 @@ static void* milestone_validator(void* arg) {
             mt->latest_milestone_index = candidate.index;
             memcpy(mt->latest_milestone->trits, candidate.hash,
                    FLEX_TRIT_SIZE_243);
-            log_debug(MILESTONE_TRACKER_LOGGER_ID, "%d milestone candidates\n",
-                      hash243_queue_count(&mt->candidates));
           }
         } else if (milestone_status == MILESTONE_INCOMPLETE) {
-          iota_milestone_tracker_add_candidate(mt, peek);
+          iota_milestone_tracker_add_candidate(mt, candidate.hash);
         }
       }
     } else {
       rw_lock_handle_unlock(&mt->candidates_lock);
-      sleep_ms(MILESTONE_VALIDATION_INTERVAL);
     }
+    sleep_ms(MILESTONE_VALIDATION_INTERVAL);
   }
 
   return NULL;
@@ -354,11 +354,25 @@ oom:
 }
 
 retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt) {
+  retcode_t ret = RC_OK;
+  DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr, pack);
+
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
   }
 
   mt->running = true;
+
+  if ((ret = iota_tangle_milestone_load_last(mt->tangle, &pack)) != RC_OK) {
+    return ret;
+  }
+  if (pack.num_loaded != 0) {
+    mt->latest_milestone_index = latest_milestone.index;
+    memcpy(mt->latest_milestone->trits, latest_milestone.hash,
+           FLEX_TRIT_SIZE_243);
+  }
+  log_info(MILESTONE_TRACKER_LOGGER_ID, "Latest milestone: #%d\n",
+           mt->latest_milestone_index);
 
   log_info(MILESTONE_TRACKER_LOGGER_ID,
            "Spawning milestone validator thread\n");
@@ -368,6 +382,9 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt) {
                  "Spawning milestone validator thread failed\n");
     return RC_CONSENSUS_MT_FAILED_THREAD_SPAWN;
   }
+
+  log_info(MILESTONE_TRACKER_LOGGER_ID, "Latest solid milestone: #%d\n",
+           mt->latest_solid_subtangle_milestone_index);
 
   log_info(MILESTONE_TRACKER_LOGGER_ID,
            "Spawning milestone solidifier thread\n");
