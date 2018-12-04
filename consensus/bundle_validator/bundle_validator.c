@@ -133,8 +133,7 @@ retcode_t iota_consensus_bundle_validator_destroy() {
 
 retcode_t iota_consensus_bundle_validator_validate(
     tangle_t const* const tangle, trit_array_p const tail_hash,
-    bundle_transactions_t* const bundle,
-    bundle_validation_status_t* const status) {
+    bundle_transactions_t* const bundle, bundle_status_t* const status) {
   retcode_t res = RC_OK;
   iota_transaction_t curr_tx = NULL;
   size_t index = 0, last_index = 0;

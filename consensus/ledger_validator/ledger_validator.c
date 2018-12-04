@@ -141,7 +141,7 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
                                           bool *should_branch,
                                           bool *should_stop) {
   retcode_t ret = RC_OK;
-  bundle_validation_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
+  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
   struct _trit_array curr_hash = {.trits = NULL,
                                   .num_trits = NUM_TRITS_HASH,
                                   .num_bytes = FLEX_TRIT_SIZE_243,

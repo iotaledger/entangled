@@ -76,7 +76,7 @@ static retcode_t validate_milestone(
   retcode_t ret = RC_OK;
   bundle_transactions_t* bundle = NULL;
   bool exists = false, valid = false;
-  bundle_validation_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
+  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
   *milestone_status = MILESTONE_INVALID;
 
   if (candidate->index >= 0x200000) {
