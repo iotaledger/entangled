@@ -35,11 +35,11 @@ static retcode_t update_snapshot_milestone_do_func(flex_trit_t *const hash,
               __FUNCTION__);
     return RC_LEDGER_VALIDATOR_COULD_NOT_LOAD_MILESTONE;
   }
-  iota_transaction_t transaction = pack->models[0];
+  iota_transaction_meta_view_model_t transaction = pack->models[0];
   *should_branch = transaction->snapshot_index == 0;
 
   if (*should_branch) {
-    if ((ret = hash243_set_add(hashes, transaction->hash)) != RC_OK) {
+    if ((ret = hash243_set_add(hashes, hash)) != RC_OK) {
       *should_stop = true;
       return ret;
     }
@@ -56,7 +56,8 @@ static retcode_t update_snapshot_milestone(ledger_validator_t const *const lv,
 
   if ((ret = tangle_traversal_dfs_to_genesis(
            lv->tangle, update_snapshot_milestone_do_func, hash,
-           lv->conf->genesis_hash, NULL, &hashes_to_update)) != RC_OK) {
+           lv->conf->genesis_hash, NULL, &hashes_to_update,
+           MODEL_TRANSACTION_META_ALL)) != RC_OK) {
     return ret;
   }
   ret = iota_tangle_transactions_update_snapshot_index(lv->tangle,
@@ -143,15 +144,27 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
                             .num_bytes = FLEX_TRIT_SIZE_243,
                             .dynamic = 0};
   bundle_transactions_t *bundle = NULL;
-  iota_transaction_t tx_bundle = NULL;
+  iota_transaction_meta_view_model_t tx_bundle = NULL;
 
   *should_stop = false;
   *should_branch = false;
   get_latest_delta_do_func_params_t *params =
       (get_latest_delta_do_func_params_t *)data;
   ledger_validator_t *lv = params->lv;
-  iota_transaction_t tx = pack->models[0];
 
+  // Transaction is not marked solid, but it is a candidate
+  if (pack->num_loaded == 0) {
+    if (lv->transaction_requester) {
+      ret = request_transaction(lv->transaction_requester, hash,
+                                params->is_milestone);
+    }
+    params->valid_delta = false;
+    *should_stop = true;
+    return ret;
+  }
+
+  iota_transaction_meta_view_model_t tx = pack->models[0];
+  *should_branch = true;
   if (tx->snapshot_index == 0 ||
       tx->snapshot_index > params->latest_snapshot_index) {
     *should_branch = true;
@@ -162,8 +175,10 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
                lv->tangle, &curr_hash, bundle, &bundle_status)) != RC_OK) {
         goto done;
       }
+
       if (bundle_status != BUNDLE_VALID ||
-          (tx_bundle = (iota_transaction_t)utarray_eltptr(bundle, 0)) == NULL) {
+          (tx_bundle = (iota_transaction_meta_view_model_t)utarray_eltptr(
+               bundle, 0)) == NULL) {
         params->valid_delta = false;
         *should_stop = true;
         goto done;
@@ -175,7 +190,8 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
             goto done;
           }
         }
-        tx_bundle = (iota_transaction_t)utarray_next(bundle, tx_bundle);
+        tx_bundle =
+            (iota_transaction_meta_view_model_t)utarray_next(bundle, tx_bundle);
       }
       bundle_transactions_free(&bundle);
     }
@@ -206,10 +222,9 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
       .latest_snapshot_index = latest_snapshot_index,
       .is_milestone = is_milestone,
       .lv = lv};
-
-  ret = tangle_traversal_dfs_to_genesis(lv->tangle, get_latest_delta_do_func,
-                                        tip, lv->conf->genesis_hash,
-                                        analyzed_hashes, &params);
+  ret = tangle_traversal_dfs_to_genesis(
+      lv->tangle, get_latest_delta_do_func, tip, lv->conf->genesis_hash,
+      analyzed_hashes, &params, MODEL_TRANSACTION_META_ALL);
   *valid_delta = params.valid_delta;
   return ret;
 }
@@ -253,7 +268,8 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   bool valid_delta = true;
   state_delta_t delta = NULL;
   state_delta_t patch = NULL;
-  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
+
+  DECLARE_PACK_SINGLE_SNAPSHOT_INDEX(tx, tx_ptr, pack);
   trit_array_t milestone_hash = {.trits = milestone->hash,
                                  .num_trits = HASH_LENGTH_TRIT,
                                  .num_bytes = FLEX_TRIT_SIZE_243,
@@ -262,8 +278,9 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   *has_snapshot = false;
   rw_lock_handle_wrlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
 
-  if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_FIELD_HASH,
-                                          &milestone_hash, &pack)) != RC_OK) {
+  if ((ret = iota_tangle_transaction_selective_load(
+           lv->tangle, TRANSACTION_FIELD_HASH, &milestone_hash, &pack,
+           MODEL_SNAPSHOT_INDEX)) != RC_OK) {
     goto done;
   } else if (pack.num_loaded == 0) {
     ret = RC_LEDGER_VALIDATOR_INVALID_TRANSACTION;
@@ -276,7 +293,8 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   *has_snapshot = tx.snapshot_index != 0;
   if (!(*has_snapshot)) {
     if ((ret = get_latest_delta(
-             lv, NULL, &delta, tx.hash,
+
+             lv, NULL, &delta, milestone_hash.trits,
              iota_snapshot_get_index(lv->milestone_tracker->latest_snapshot),
              true, &valid_delta)) != RC_OK) {
       log_error(LEDGER_VALIDATOR_LOGGER_ID, "Getting latest delta failed\n");

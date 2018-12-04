@@ -141,7 +141,8 @@ done:
   return ret;
 }
 
-static uint64_t get_milestone_index(iota_transaction_t const tx) {
+static uint64_t get_milestone_index(
+    iota_transaction_meta_view_model_t const tx) {
   trit_t buffer[NUM_TRITS_OBSOLETE_TAG];
 
   flex_trits_to_trits(buffer, NUM_TRITS_OBSOLETE_TAG, tx->obsolete_tag,
@@ -152,7 +153,7 @@ static uint64_t get_milestone_index(iota_transaction_t const tx) {
 static void* milestone_validator(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
   iota_milestone_t candidate;
-  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
+  DECLARE_PACK_SINGLE_META_TX(tx, tx_ptr, pack);
   flex_trit_t* peek = NULL;
   milestone_status_t milestone_status;
   trit_array_t hash = {.trits = candidate.hash,
@@ -173,8 +174,9 @@ static void* milestone_validator(void* arg) {
       hash243_queue_pop(&mt->candidates);
       rw_lock_handle_unlock(&mt->candidates_lock);
       hash_pack_reset(&pack);
-      if (iota_tangle_transaction_load(mt->tangle, TRANSACTION_FIELD_HASH,
-                                       &hash, &pack) == RC_OK &&
+      if (iota_tangle_transaction_selective_load(
+              mt->tangle, TRANSACTION_FIELD_HASH, &hash, &pack,
+              MODEL_TRANSACTION_META_ALL) == RC_OK &&
           pack.num_loaded != 0) {
         candidate.index = get_milestone_index(&tx);
         if (validate_milestone(mt, &candidate, &milestone_status) != RC_OK) {

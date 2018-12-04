@@ -40,6 +40,15 @@ typedef enum transaction_field_e {
   TRANSACTION_FIELD_ADDRESS
 } transaction_field_t;
 
+typedef enum load_model_e {
+  MODEL_TRANSACTION,
+  MODEL_HASH,
+  MODEL_MILESTONE,
+  MODEL_TRANSACTION_META_ALL,
+  MODEL_SNAPSHOT_INDEX,
+  MODEL_SOLID,
+} load_model_t;
+
 extern retcode_t iota_stor_transaction_store(connection_t const* const conn,
                                              iota_transaction_t const data_in);
 
@@ -47,6 +56,11 @@ extern retcode_t iota_stor_transaction_load(connection_t const* const conn,
                                             transaction_field_t const field,
                                             trit_array_t const* const key,
                                             iota_stor_pack_t* const pack);
+
+extern retcode_t iota_stor_transaction_selective_load(
+    connection_t const* const conn, transaction_field_t const field,
+    trit_array_t const* const key, iota_stor_pack_t* const pack,
+    load_model_t const load_model);
 
 extern retcode_t iota_stor_transaction_exist(connection_t const* const conn,
                                              transaction_field_t const field,

@@ -43,10 +43,11 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
     exit_prob_transaction_validator_t *const epv,
     trit_array_t const *const tail_hash, bool *const is_valid) {
   retcode_t ret = RC_OK;
-  DECLARE_PACK_SINGLE_TX(tx, tx_models, tx_pack);
+  DECLARE_PACK_SINGLE_META_TX(tx, tx_models, tx_pack);
 
-  ret = iota_tangle_transaction_load(epv->tangle, TRANSACTION_FIELD_HASH,
-                                     tail_hash, &tx_pack);
+  ret = iota_tangle_transaction_selective_load(
+      epv->tangle, TRANSACTION_FIELD_HASH, tail_hash, &tx_pack,
+      MODEL_TRANSACTION_META_ALL);
   if (ret != RC_OK) {
     *is_valid = false;
     return ret;
@@ -112,7 +113,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
   }
 
   // Load the transaction
-  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
+  DECLARE_PACK_SINGLE_SNAPSHOT_INDEX(curr_tx_s, curr_tx, pack);
 
   hash243_set_t visited_hashes = NULL;
   TRIT_ARRAY_DECLARE(hash_trits_array, NUM_TRITS_HASH);
@@ -137,11 +138,13 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
 
     hash_trits_array.trits = curr_hash_trits;
 
-    res = iota_tangle_transaction_load(epv->tangle, TRANSACTION_FIELD_HASH,
-                                       &hash_trits_array, &pack);
-    bool tail_is_not_genesis = (curr_tx_s.snapshot_index != 0 ||
-                                memcmp(epv->conf->genesis_hash, curr_tx_s.hash,
-                                       FLEX_TRIT_SIZE_243) == 0);
+    res = iota_tangle_transaction_selective_load(
+        epv->tangle, TRANSACTION_FIELD_HASH, &hash_trits_array, &pack,
+        MODEL_TRANSACTION_META_ALL);
+    bool tail_is_not_genesis =
+        (curr_tx_s.snapshot_index != 0 ||
+         memcmp(epv->conf->genesis_hash, hash_trits_array.trits,
+                FLEX_TRIT_SIZE_243) == 0);
     if (tail_is_not_genesis &&
         (curr_tx_s.snapshot_index < lowest_allowed_depth)) {
       log_error(WALKER_VALIDATOR_LOGGER_ID,

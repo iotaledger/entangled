@@ -32,6 +32,10 @@ extern char* iota_statement_transaction_exist;
 extern char* iota_statement_transaction_exist_by_hash;
 extern char* iota_statement_transaction_approvers_count;
 
+extern char* iota_statement_transaction_select_meta_fields_by_hash;
+extern char* iota_statement_select_snapshot_by_hash;
+extern char* iota_statement_select_solid_by_hash;
+
 /*
  * Milestone statements
  */

@@ -45,6 +45,11 @@ retcode_t iota_tangle_transaction_load(tangle_t const *const tangle,
                                        trit_array_t const *const key,
                                        iota_stor_pack_t *const tx);
 
+retcode_t iota_tangle_transaction_selective_load(
+    tangle_t const *const tangle, transaction_field_t const field,
+    trit_array_t const *const key, iota_stor_pack_t *const tx,
+    load_model_t const load_model);
+
 retcode_t iota_tangle_transaction_load_hashes(tangle_t const *const tangle,
                                               transaction_field_t const field,
                                               trit_array_t const *const key,
