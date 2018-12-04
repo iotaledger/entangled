@@ -7,7 +7,7 @@
 
 #include "common/model/transfer.h"
 
-#define TRANSFER_LOGGER_ID "cclient_core_api"
+#define TRANSFER_LOGGER_ID "transfer"
 
 /***********************************************************************************************************
  * Private interface
@@ -37,7 +37,7 @@ static void transfer_iterator_next_data_transaction(
                   __func__, __LINE__);
     }
   } else {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] transfer type not match.\n",
+    log_error(TRANSFER_LOGGER_ID, "[%s:%d] the transfer type doesn't match.\n",
               __func__, __LINE__);
   }
 }
@@ -75,7 +75,7 @@ static void transfer_iterator_next_output_transaction(
                   __func__, __LINE__);
     }
   } else {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] transfer type not match.\n",
+    log_error(TRANSFER_LOGGER_ID, "[%s:%d] the transfer type doesn't match.\n",
               __func__, __LINE__);
   }
 }
@@ -87,10 +87,10 @@ static void transfer_iterator_next_input_transaction(
 
   if (transfer->type == VALUE_IN) {
     value_in = (transfer_value_in_t*)transfer->meta;
-    memcpy(tx->signature_or_message, value_in->data, sizeof(value_in->len));
+    memcpy(tx->signature_or_message, value_in->data, value_in->len);
     tx->value = transfer->value;
   } else {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] transfer type not match.\n",
+    log_error(TRANSFER_LOGGER_ID, "[%s:%d] the transfer type doesn't match.\n",
               __func__, __LINE__);
   }
 }
@@ -272,7 +272,7 @@ transfer_t* transfer_value_in_new(flex_trit_t const* const address,
 }
 
 void transfer_free(transfer_t** transfer) {
-  if (transfer || *transfer) {
+  if (transfer && *transfer) {
     free((*transfer)->meta);
     free(*transfer);
     *transfer = NULL;
@@ -383,7 +383,7 @@ transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[], size_t len,
 
 void transfer_iterator_free(transfer_iterator_t** iter) {
   transfer_iterator_t* iter_p = *iter;
-  if (*iter || iter) {
+  if (iter && *iter) {
     if (iter_p->dynamic_transaction && iter_p->transaction) {
       free(iter_p->transaction);
     }
