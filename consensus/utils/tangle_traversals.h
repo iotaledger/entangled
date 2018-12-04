@@ -11,7 +11,6 @@
 #include "common/model/transaction.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/containers/hash/hash243_set.h"
-#include "utils/containers/hash/hash243_stack.h"
 
 #ifdef __cplusplus
 extern "C" {

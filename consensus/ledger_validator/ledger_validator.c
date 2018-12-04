@@ -13,7 +13,6 @@
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/snapshot/snapshot.h"
 #include "consensus/utils/tangle_traversals.h"
-#include "gossip/components/transaction_requester.h"
 #include "utils/logger_helper.h"
 
 #define LEDGER_VALIDATOR_LOGGER_ID "consensus_ledger_validator"
@@ -74,8 +73,6 @@ static retcode_t build_snapshot(ledger_validator_t const *const lv,
   state_delta_t patch = NULL;
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
-  rw_lock_handle_wrlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
-
   if ((ret = iota_tangle_milestone_load_first(lv->tangle, &pack)) != RC_OK) {
     goto done;
   }
@@ -122,7 +119,6 @@ static retcode_t build_snapshot(ledger_validator_t const *const lv,
   }
 
 done:
-  rw_lock_handle_unlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
   state_delta_destroy(&delta);
   state_delta_destroy(&patch);
   return ret;
@@ -142,10 +138,10 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
                                           bool *should_stop) {
   retcode_t ret = RC_OK;
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
-  struct _trit_array curr_hash = {.trits = NULL,
-                                  .num_trits = NUM_TRITS_HASH,
-                                  .num_bytes = FLEX_TRIT_SIZE_243,
-                                  .dynamic = 0};
+  trit_array_t curr_hash = {.trits = NULL,
+                            .num_trits = NUM_TRITS_HASH,
+                            .num_bytes = FLEX_TRIT_SIZE_243,
+                            .dynamic = 0};
   bundle_transactions_t *bundle = NULL;
   iota_transaction_t tx_bundle = NULL;
 
@@ -154,22 +150,11 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
   get_latest_delta_do_func_params_t *params =
       (get_latest_delta_do_func_params_t *)data;
   ledger_validator_t *lv = params->lv;
-
-  // Transaction is not marked solid, but it is a candidate
-  if (pack->num_loaded == 0) {
-    if (lv->transaction_requester) {
-      ret = request_transaction(lv->transaction_requester, hash,
-                                params->is_milestone);
-    }
-    params->valid_delta = false;
-    *should_stop = true;
-    return ret;
-  }
-
   iota_transaction_t tx = pack->models[0];
-  *should_branch = true;
+
   if (tx->snapshot_index == 0 ||
       tx->snapshot_index > params->latest_snapshot_index) {
+    *should_branch = true;
     if (tx->current_index == 0) {
       bundle_transactions_new(&bundle);
       curr_hash.trits = hash;
@@ -192,6 +177,7 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
         }
         tx_bundle = (iota_transaction_t)utarray_next(bundle, tx_bundle);
       }
+      bundle_transactions_free(&bundle);
     }
   }
 
@@ -204,6 +190,7 @@ done:
   return ret;
 }
 
+// This function should always be called with a solid entry point
 static retcode_t get_latest_delta(ledger_validator_t const *const lv,
                                   hash243_set_t *const analyzed_hashes,
                                   state_delta_t *const state,
@@ -222,7 +209,7 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
 
   ret = tangle_traversal_dfs_to_genesis(lv->tangle, get_latest_delta_do_func,
                                         tip, lv->conf->genesis_hash,
-                                        analyzed_hashes, (void *)&params);
+                                        analyzed_hashes, &params);
   *valid_delta = params.valid_delta;
   return ret;
 }
@@ -233,15 +220,13 @@ static retcode_t get_latest_delta(ledger_validator_t const *const lv,
 
 retcode_t iota_consensus_ledger_validator_init(
     ledger_validator_t *const lv, iota_consensus_conf_t *const conf,
-    tangle_t *const tangle, milestone_tracker_t *const mt,
-    requester_state_t *const tr) {
+    tangle_t *const tangle, milestone_tracker_t *const mt) {
   retcode_t ret = RC_OK;
 
   logger_helper_init(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   lv->conf = conf;
   lv->tangle = tangle;
   lv->milestone_tracker = mt;
-  lv->transaction_requester = tr;
 
   if ((ret = build_snapshot(lv, &mt->latest_solid_subtangle_milestone_index,
                             mt->latest_solid_subtangle_milestone->trits)) !=
@@ -257,7 +242,6 @@ retcode_t iota_consensus_ledger_validator_destroy(
     ledger_validator_t *const lv) {
   lv->tangle = NULL;
   lv->milestone_tracker = NULL;
-  lv->transaction_requester = NULL;
   logger_helper_destroy(LEDGER_VALIDATOR_LOGGER_ID);
   return RC_OK;
 }
@@ -267,12 +251,13 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
     bool *const has_snapshot) {
   retcode_t ret = RC_OK;
   bool valid_delta = true;
-  hash243_set_t analyzed_hashes = NULL;
   state_delta_t delta = NULL;
   state_delta_t patch = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  struct _trit_array milestone_hash = {milestone->hash, NUM_TRITS_HASH,
-                                       FLEX_TRIT_SIZE_243, 0};
+  trit_array_t milestone_hash = {.trits = milestone->hash,
+                                 .num_trits = HASH_LENGTH_TRIT,
+                                 .num_bytes = FLEX_TRIT_SIZE_243,
+                                 .dynamic = 0};
 
   *has_snapshot = false;
   rw_lock_handle_wrlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
@@ -281,14 +266,17 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
                                           &milestone_hash, &pack)) != RC_OK) {
     goto done;
   } else if (pack.num_loaded == 0) {
-    ret = RC_LEDGER_VALIDATOR_INVALID_MILESTONE;
+    ret = RC_LEDGER_VALIDATOR_INVALID_TRANSACTION;
+    goto done;
+  } else if (tx.solid == 0) {
+    ret = RC_LEDGER_VALIDATOR_TRANSACTION_NOT_SOLID;
     goto done;
   }
 
   *has_snapshot = tx.snapshot_index != 0;
   if (!(*has_snapshot)) {
     if ((ret = get_latest_delta(
-             lv, &analyzed_hashes, &delta, tx.hash,
+             lv, NULL, &delta, tx.hash,
              iota_snapshot_get_index(lv->milestone_tracker->latest_snapshot),
              true, &valid_delta)) != RC_OK) {
       log_error(LEDGER_VALIDATOR_LOGGER_ID, "Getting latest delta failed\n");
@@ -367,10 +355,23 @@ retcode_t iota_consensus_ledger_validator_update_delta(
   state_delta_t patch = NULL;
   hash243_set_t visited_hashes = NULL;
   bool valid_delta = true;
-
+  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
+  trit_array_t hash = {.trits = tip,
+                       .num_trits = HASH_LENGTH_TRIT,
+                       .num_bytes = FLEX_TRIT_SIZE_243,
+                       .dynamic = 0};
   *is_consistent = false;
 
-  // TODO Waiting for Transaction solidifier - WIP #405
+  if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_FIELD_HASH,
+                                          &hash, &pack)) != RC_OK) {
+    goto done;
+  } else if (pack.num_loaded == 0) {
+    ret = RC_LEDGER_VALIDATOR_INVALID_TRANSACTION;
+    goto done;
+  } else if (tx.solid == 0) {
+    ret = RC_LEDGER_VALIDATOR_TRANSACTION_NOT_SOLID;
+    goto done;
+  }
 
   if (hash243_set_contains(analyzed_hashes, tip)) {
     *is_consistent = true;

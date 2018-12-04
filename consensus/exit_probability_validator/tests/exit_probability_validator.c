@@ -43,9 +43,15 @@ static snapshot_t snapshot;
 static milestone_tracker_t mt;
 static ledger_validator_t lv;
 static transaction_solidifier_t ts;
-static requester_state_t tr;
 static iota_consensus_conf_t consensus_conf;
 static iota_gossip_conf_t gossip_conf;
+
+void setUp() {
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
+}
+
+void tearDown() { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK); }
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
   iota_gossip_conf_init(&gossip_conf);
@@ -61,9 +67,8 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
                                              NULL, NULL);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &consensus_conf, &tangle,
                                           &snapshot, &lv, &ts) == RC_OK);
-  TEST_ASSERT(requester_init(&tr, &gossip_conf, &tangle) == RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &consensus_conf,
-                                                   &tangle, &mt, &tr) == RC_OK);
+                                                   &tangle, &mt) == RC_OK);
   // We want to avoid unnecessary validation
   mt.latest_snapshot->index = 99999999999;
 
@@ -77,12 +82,9 @@ static void destroy_epv(exit_prob_transaction_validator_t *epv) {
   iota_milestone_tracker_destroy(&mt);
   iota_consensus_transaction_solidifier_destroy(&ts);
   iota_consensus_exit_prob_transaction_validator_destroy(epv);
-  requester_destroy(&tr);
 }
 
 void test_transaction_does_not_exist() {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
   init_epv(&epv);
 
   bool is_valid = false;
@@ -95,12 +97,9 @@ void test_transaction_does_not_exist() {
 
   trit_array_free(tail);
   destroy_epv(&epv);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
 void test_transaction_not_a_tail() {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
   init_epv(&epv);
 
   bool exist = false;
@@ -131,12 +130,9 @@ void test_transaction_not_a_tail() {
   trit_array_free(tail);
   transaction_free(tx3);
   destroy_epv(&epv);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
 void test_transaction_invalid_delta() {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
   init_epv(&epv);
 
   bool exist = false;
@@ -150,6 +146,7 @@ void test_transaction_invalid_delta() {
 
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
   tx1->snapshot_index = 0;
+  tx1->solid = 1;
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
 
@@ -168,12 +165,9 @@ void test_transaction_invalid_delta() {
   trit_array_free(tail);
   transaction_free(tx1);
   destroy_epv(&epv);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
 void test_transaction_below_max_depth() {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
   init_epv(&epv);
 
   bool exist = false;
@@ -183,6 +177,8 @@ void test_transaction_below_max_depth() {
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = max_depth - 1;
+  txs[0]->solid = 1;
+  txs[1]->solid = 1;
   build_tangle(&tangle, txs, 2);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
@@ -200,12 +196,9 @@ void test_transaction_below_max_depth() {
   trit_array_free(tail);
   transactions_free(txs, 2);
   destroy_epv(&epv);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
 void test_transaction_exceed_max_transactions() {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
   max_txs_below_max_depth = 0;
   init_epv(&epv);
 
@@ -216,9 +209,12 @@ void test_transaction_exceed_max_transactions() {
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = max_depth + 1;
+  txs[0]->solid = 1;
   txs[1]->snapshot_index = max_depth + 1;
+  txs[1]->solid = 1;
   memcpy(txs[1]->trunk, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
   memcpy(txs[1]->branch, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
+  memcpy(txs[0]->branch, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
   build_tangle(&tangle, txs, 2);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
@@ -236,13 +232,10 @@ void test_transaction_exceed_max_transactions() {
   trit_array_free(tail);
   transactions_free(txs, 2);
   destroy_epv(&epv);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   max_txs_below_max_depth = 15;
 }
 
 void test_transaction_is_genesis() {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
   init_epv(&epv);
 
   bool exist = false;
@@ -252,6 +245,8 @@ void test_transaction_is_genesis() {
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
   txs[0]->snapshot_index = 0;
+  txs[0]->solid = 1;
+  txs[1]->solid = 1;
   build_tangle(&tangle, txs, 2);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
@@ -269,12 +264,9 @@ void test_transaction_is_genesis() {
   trit_array_free(tail);
   transactions_free(txs, 2);
   destroy_epv(&epv);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
 void test_transaction_valid() {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
   init_epv(&epv);
 
   bool exist = false;
@@ -283,6 +275,8 @@ void test_transaction_valid() {
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
+  txs[0]->solid = 1;
+  txs[1]->solid = 1;
   build_tangle(&tangle, txs, 2);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
@@ -300,7 +294,6 @@ void test_transaction_valid() {
   trit_array_free(tail);
   transactions_free(txs, 2);
   destroy_epv(&epv);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
 int main(int argc, char *argv[]) {

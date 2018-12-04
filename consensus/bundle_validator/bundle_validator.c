@@ -51,6 +51,7 @@ static retcode_t load_bundle_transactions(tangle_t const* const tangle,
                                             &curr_tx_trunk, &pack)) != RC_OK) {
       return res;
     }
+    curr_index++;
   }
 
   return res;

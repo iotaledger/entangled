@@ -216,7 +216,7 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
   retcode_t ret;
 
   trit_array_t hash_trits = {.trits = hash,
-                             .num_trits = NUM_TRITS_HASH,
+                             .num_trits = HASH_LENGTH_TRIT,
                              .num_bytes = FLEX_TRIT_SIZE_243,
                              .dynamic = 0};
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
@@ -246,6 +246,7 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
     goto done;
   }
   if (params.is_solid) {
+    *is_solid = true;
     log_debug(TRANSACTION_SOLIDIFIER_LOGGER_ID, "In %s, updating solid state\n",
               __FUNCTION__);
     ret = iota_tangle_transactions_update_solid_state(
