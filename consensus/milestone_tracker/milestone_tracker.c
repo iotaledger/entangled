@@ -357,6 +357,7 @@ oom:
 retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt) {
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr, pack);
+  iota_stor_pack_t hash_pack;
 
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
@@ -374,6 +375,22 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt) {
   }
   log_info(MILESTONE_TRACKER_LOGGER_ID, "Latest milestone: #%d\n",
            mt->latest_milestone_index);
+
+  hash_pack_init(&hash_pack, 512);
+
+  if ((ret = iota_tangle_transaction_load_hashes_of_milestone_candidates(
+           mt->tangle, &hash_pack, mt->coordinator->trits)) != RC_OK) {
+    log_critical(MILESTONE_TRACKER_LOGGER_ID,
+                 "Loading milestone candidates failed\n");
+  }
+  log_info(MILESTONE_TRACKER_LOGGER_ID, "Loaded %d milestone candidates\n",
+           hash_pack.num_loaded);
+
+  for (size_t i = 0; i < hash_pack.num_loaded; i++) {
+    iota_milestone_tracker_add_candidate(
+        mt, ((trit_array_p*)hash_pack.models)[i]->trits);
+  }
+  hash_pack_free(&hash_pack);
 
   log_info(MILESTONE_TRACKER_LOGGER_ID,
            "Spawning milestone validator thread\n");

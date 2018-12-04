@@ -80,6 +80,18 @@ retcode_t iota_tangle_transaction_load_hashes_of_tips(
     tangle_t const *const tangle, iota_stor_pack_t *const pack,
     size_t const limit);
 
+/**
+ * Loads hashes of milestone candidates
+ *
+ * @param tangle The tangle
+ * @param pack A pack to be filled with hashes
+ *
+ * @return a status code
+ */
+retcode_t iota_tangle_transaction_load_hashes_of_milestone_candidates(
+    tangle_t const *const tangle, iota_stor_pack_t *const pack,
+    flex_trit_t const *const coordinator);
+
 retcode_t iota_tangle_transaction_update_snapshot_index(
     tangle_t const *const tangle, flex_trit_t const *const hash,
     uint64_t const snapshot_index);
