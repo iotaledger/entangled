@@ -5,6 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <inttypes.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include "common/storage/defs.h"
 
 /*
@@ -22,7 +26,7 @@ char *iota_statement_transaction_insert =
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_UPPER
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_LOWER "," TRANSACTION_COL_NONCE
     "," TRANSACTION_COL_HASH "," TRANSACTION_COL_SNAPSHOT_INDEX
-    ")VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    "," TRANSACTION_COL_SOLID ")VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 char *iota_statement_transaction_select_by_hash =
     "SELECT * FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
@@ -35,8 +39,27 @@ char *iota_statement_transaction_select_hashes_of_approvers =
     "SELECT " TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME
     " WHERE " TRANSACTION_COL_BRANCH "=? OR " TRANSACTION_COL_TRUNK "=?";
 
+char *iota_statement_transaction_select_hashes_of_transactions_to_request =
+    "SELECT " TRANSACTION_COL_TRUNK " FROM " TRANSACTION_TABLE_NAME
+    " a WHERE NOT(EXISTS(SELECT 1 FROM " TRANSACTION_TABLE_NAME
+    " b WHERE b." TRANSACTION_COL_HASH " = a." TRANSACTION_COL_TRUNK
+    ")) UNION SELECT " TRANSACTION_COL_BRANCH " FROM " TRANSACTION_TABLE_NAME
+    " a WHERE NOT(EXISTS(SELECT 1 FROM " TRANSACTION_TABLE_NAME
+    " b WHERE b." TRANSACTION_COL_HASH " = a." TRANSACTION_COL_BRANCH
+    ")) LIMIT ?";
+
+char *iota_statement_transaction_select_hashes_of_tips =
+    "SELECT " TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME
+    " a WHERE NOT(EXISTS(SELECT 1 FROM " TRANSACTION_TABLE_NAME
+    " b WHERE b." TRANSACTION_COL_TRUNK " = a." TRANSACTION_COL_HASH
+    " OR b." TRANSACTION_COL_BRANCH " = a." TRANSACTION_COL_HASH ")) LIMIT ?";
+
 char *iota_statement_transaction_update_snapshot_index =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SNAPSHOT_INDEX
+    "=? WHERE " TRANSACTION_COL_HASH "=?";
+
+char *iota_statement_transaction_update_solid_state =
+    "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SOLID
     "=? WHERE " TRANSACTION_COL_HASH "=?";
 
 char *iota_statement_transaction_exist =
@@ -46,6 +69,9 @@ char *iota_statement_transaction_exist =
 char *iota_statement_transaction_exist_by_hash =
     "SELECT 1 WHERE EXISTS(SELECT 1 "
     "FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?)";
+
+char *iota_statement_transaction_approvers_count =
+    "SELECT COUNT(*) FROM " TRANSACTION_TABLE_NAME " WHERE branch=? OR trunk=?";
 
 /*
  * Milestone statements

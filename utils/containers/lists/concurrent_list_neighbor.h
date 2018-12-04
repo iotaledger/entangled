@@ -59,7 +59,7 @@ bool neighbor_remove(neighbors_list_t *const neighbors,
  * @return a pointer to the neigbor if found, NULL otherwise
  */
 neighbor_t *neighbor_find_by_endpoint(neighbors_list_t *const neighbors,
-                                      endpoint_t *endpoint);
+                                      endpoint_t const *const endpoint);
 
 /**
  * Find a neigbor matching given endpoint values

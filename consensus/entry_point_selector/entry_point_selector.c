@@ -18,11 +18,10 @@
 
 retcode_t iota_consensus_entry_point_selector_init(
     entry_point_selector_t *const eps, milestone_tracker_t *const mt,
-    tangle_t *const tangle, bool const testnet) {
+    tangle_t *const tangle) {
   logger_helper_init(ENTRY_POINT_SELECTOR_LOGGER_ID, LOGGER_DEBUG, true);
   eps->mt = mt;
   eps->tangle = tangle;
-  eps->testnet = testnet;
   return RC_OK;
 }
 

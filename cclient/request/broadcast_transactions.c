@@ -8,15 +8,22 @@
 #include "request/broadcast_transactions.h"
 
 broadcast_transactions_req_t* broadcast_transactions_req_new() {
-  return (broadcast_transactions_req_t*)flex_hash_array_new();
+  broadcast_transactions_req_t* req = (broadcast_transactions_req_t*)malloc(
+      sizeof(broadcast_transactions_req_t));
+  if (req) {
+    req->trytes = NULL;
+  }
+  return req;
 }
 
-broadcast_transactions_req_t* broadcast_transactions_req_add(
-    broadcast_transactions_req_t* transactions, const char* trytes) {
-  return flex_hash_array_append(transactions, trytes);
-}
-
-void broadcast_transactions_req_free(
-    broadcast_transactions_req_t* transactions) {
-  flex_hash_array_free(transactions);
+void broadcast_transactions_req_free(broadcast_transactions_req_t** const req) {
+  if (!req || !(*req)) {
+    return;
+  }
+  broadcast_transactions_req_t* tmp = *req;
+  if (tmp->trytes) {
+    hash8019_stack_free(&tmp->trytes);
+  }
+  free(tmp);
+  *req = NULL;
 }

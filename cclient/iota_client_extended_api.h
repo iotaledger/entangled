@@ -8,7 +8,9 @@
 #ifndef CCLIENT_IOTA_EXTENDED_API_H_
 #define CCLIENT_IOTA_EXTENDED_API_H_
 
+#include "common/helpers/sign.h"
 #include "iota_client_core_api.h"
+#include "utils/containers/hash/hash243_queue.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,24 +33,25 @@ typedef struct {
 } input_t;
 
 typedef struct {
-  int64_t total_balance;
-  flex_hash_array_t input;
+  uint64_t total_balance;
+  hash243_queue_t addresses;
 } inputs_t;
 
 typedef struct {
-  int64_t balance;
-  trit_array_p latest_address;
-  address_list_t addresses;
-  inputs_list_t inputs;
-  transfer_list_t transfers;
-  transaction_list_t transactions;
+  size_t balance;
+  flex_trit_t latest_address[FLEX_TRIT_SIZE_243];
+  hash243_queue_t addresses;
+  hash243_queue_t transactions;
 } account_data_t;
 
 typedef struct {
-  int security;
-  int32_t start;
-  int32_t end;
+  size_t security;
+  size_t start;
+  size_t total;
 } address_opt_t;
+
+void iota_client_extended_init();
+void iota_client_extended_destroy();
 
 /**
  * Re-broadcasts all transactions in a bundle given the tail transaction hash.
@@ -101,12 +104,11 @@ retcode_t iota_client_find_transaction_objects(
 
 /**
  * Returns an `account_data_t` object, containing account information about
- * `addresses`, `transactions`, `inputs` and total account balance.
+ * `addresses`, `transactions` and the total balance.
  *
  * @param {iota_client_service_t} serv - client service
- * @param {trit_array_p} seed
- * @param {address_opt_t} addr_opt - address options: Starting key index,
- * Security level, Ending Key index.
+ * @param {flex_trit_t} seed
+ * @param {size_t} security - Security
  * @param {account_data_t} out_account - acount data object
  *
  * @returns {retcode_t}
@@ -117,9 +119,9 @@ retcode_t iota_client_find_transaction_objects(
  * Refer:
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetAccountData.ts#L84
  */
-retcode_t iota_client_get_account_data(iota_client_service_t const* const serve,
-                                       trit_array_p const seed,
-                                       address_opt_t const addr_opt,
+retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
+                                       flex_trit_t const* const seed,
+                                       size_t const security,
                                        account_data_t* out_account);
 
 /**
@@ -168,9 +170,10 @@ retcode_t iota_client_get_bundle(iota_client_service_t const* const serv,
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetInputs.ts#L70
  */
 retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
-                                 trit_array_p const seed,
-                                 address_opt_t const addr_opt;
-                                 int32_t threshold, inputs_t out_input);
+                                 flex_trit_t const* const seed,
+                                 address_opt_t const addr_opt,
+                                 uint64_t const threshold,
+                                 inputs_t* const out_input);
 
 /**
  * Fetches inclusion states of given transactions and a list of tips,
@@ -200,21 +203,19 @@ retcode_t iota_client_get_latest_inclusion(
  * @param {trit_array_p} seed - At least 81 trytes long seed
  * @param {address_opt_t} addr_opt - address options: Starting key index,
  * Security level, Ending Key index.
- * @param {hashes_t} out_addresses - New (unused) address or list of addresses
- * up to (and including) first unused address.
+ * @param {hash243_queue_t} out_addresses - New (unused) address or list of
+ * addresses up to (and including) first unused address.
  *
  * @returns {retcode_t}
  * - `INVALID_SEED`
- * - `INVALID_START_OPTION`
  * - `INVALID_SECURITY`
- * - Fetch error
- *
+ *,
  *   https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetNewAddress.ts#L131
  */
 retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
-                                      trit_array_p const seed,
+                                      flex_trit_t const* const seed,
                                       address_opt_t const addr_opt,
-                                      hashes_t* out_addresses);
+                                      hash243_queue_t* out_addresses);
 
 /**
  * Fetches the transaction objects, given an array of transaction hashes.

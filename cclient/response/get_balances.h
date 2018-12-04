@@ -14,16 +14,19 @@
 extern "C" {
 #endif
 
+static const UT_icd ut_uint64_icd UTARRAY_UNUSED = {sizeof(uint64_t), NULL,
+                                                    NULL, NULL};
 typedef struct {
   UT_array* balances;
   int milestoneIndex;
-  flex_hash_array_t* milestone;
+  hash243_queue_t milestone;
 } get_balances_res_t;
 
 get_balances_res_t* get_balances_res_new();
-void get_balances_res_free(get_balances_res_t* res);
-char* get_balances_res_balances_at(get_balances_res_t* in, int index);
-trit_array_p get_balances_res_milestone_at(get_balances_res_t* in, int index);
+void get_balances_res_free(get_balances_res_t** res);
+size_t get_balances_res_balances_num(get_balances_res_t const* const res);
+uint64_t get_balances_res_balances_at(get_balances_res_t const* const res,
+                                      int const index);
 
 #ifdef __cplusplus
 }

@@ -13,6 +13,7 @@
 
 #include "common/errors.h"
 #include "common/storage/connection.h"
+#include "consensus/conf.h"
 #include "consensus/tangle/tangle.h"
 
 #ifdef __cplusplus
@@ -20,21 +21,17 @@ extern "C" {
 #endif
 
 typedef struct transaction_validator_t {
-  uint64_t snapshot_timestamp_ms;
-  uint8_t mwm;
+  iota_consensus_conf_t *conf;
 } transaction_validator_t;
 
 extern retcode_t iota_consensus_transaction_validator_init(
-    transaction_validator_t *const tv, uint64_t snapshot_timestamp_ms,
-    uint8_t mwm);
+    transaction_validator_t *const tv, iota_consensus_conf_t *const conf);
 
 extern retcode_t iota_consensus_transaction_validator_destroy(
     transaction_validator_t *const tv);
 
 extern bool iota_consensus_transaction_validate(
     transaction_validator_t *const tv, iota_transaction_t const transaction);
-
-// TODO - complete
 
 #ifdef __cplusplus
 }

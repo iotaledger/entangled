@@ -3,7 +3,12 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "broadcaster_shared",
     hdrs = ["broadcaster.h"],
-    deps = ["//utils/handles:thread"],
+    deps = [
+        "//utils/containers/hash:hash8019_queue",
+        "//utils/handles:cond",
+        "//utils/handles:lock",
+        "//utils/handles:thread",
+    ],
 )
 
 cc_library(
@@ -11,17 +16,23 @@ cc_library(
     srcs = ["broadcaster.c"],
     deps = [
         ":broadcaster_shared",
-        "//ciri:node_shared",
+        "//gossip:node_shared",
         "//utils:logger_helper",
         "//utils/containers/lists:concurrent_list_neighbor",
-        "//utils/containers/queues:concurrent_queue_packet",
     ],
 )
 
 cc_library(
     name = "processor_shared",
     hdrs = ["processor.h"],
-    deps = ["//utils/handles:thread"],
+    deps = [
+        "//consensus/transaction_solidifier",
+        "//consensus/transaction_validator",
+        "//utils/handles:cond",
+        "//utils/handles:lock",
+        "//utils/handles:rw_lock",
+        "//utils/handles:thread",
+    ],
 )
 
 cc_library(
@@ -29,9 +40,8 @@ cc_library(
     srcs = ["processor.c"],
     deps = [
         ":processor_shared",
-        "//ciri:core_shared",
+        "//gossip:node_shared",
         "//utils/containers/lists:concurrent_list_neighbor",
-        "//utils/containers/queues:concurrent_queue_packet",
     ],
 )
 
@@ -46,32 +56,36 @@ cc_library(
     srcs = ["receiver.c"],
     deps = [
         ":receiver_shared",
-        "//ciri:node_shared",
+        "//gossip:node_shared",
         "//gossip/services:receiver",
     ],
 )
 
 cc_library(
-    name = "requester_shared",
-    hdrs = ["requester.h"],
-    deps = ["//common:errors"],
-)
-
-cc_library(
-    name = "requester",
-    srcs = ["requester.c"],
+    name = "transaction_requester",
+    srcs = ["transaction_requester.c"],
+    hdrs = ["transaction_requester.h"],
     deps = [
-        ":requester_shared",
+        "//common:errors",
         "//consensus/tangle",
+        "//gossip:conf",
         "//utils:logger_helper",
-        "//utils/containers/lists:concurrent_list_trit_array",
+        "//utils/containers/hash:hash243_set",
+        "//utils/handles:rand",
+        "//utils/handles:rw_lock",
     ],
 )
 
 cc_library(
     name = "responder_shared",
     hdrs = ["responder.h"],
-    deps = ["//utils/handles:thread"],
+    deps = [
+        "//gossip:transaction_request",
+        "//utils/handles:cond",
+        "//utils/handles:lock",
+        "//utils/handles:rw_lock",
+        "//utils/handles:thread",
+    ],
 )
 
 cc_library(
@@ -80,9 +94,28 @@ cc_library(
     hdrs = ["responder.h"],
     deps = [
         ":responder_shared",
-        "//ciri:core_shared",
         "//gossip:neighbor_shared",
-        "//utils/containers/queues:concurrent_queue_packet",
-        "//utils/containers/queues:concurrent_queue_transaction_request",
+        "//gossip:node_shared",
+        "//utils/handles:rand",
+    ],
+)
+
+cc_library(
+    name = "tips_requester_shared",
+    hdrs = ["tips_requester.h"],
+    deps = [
+        "//common:errors",
+        "//utils/handles:thread",
+    ],
+)
+
+cc_library(
+    name = "tips_requester",
+    srcs = ["tips_requester.c"],
+    deps = [
+        ":tips_requester_shared",
+        "//gossip:iota_packet",
+        "//utils:logger_helper",
+        "//utils/containers/lists:concurrent_list_neighbor",
     ],
 )

@@ -14,14 +14,13 @@
 extern "C" {
 #endif
 
-// List of raw data of transactions to be rebroadcast.
-typedef flex_hash_array_t broadcast_transactions_req_t;
+typedef struct broadcast_transactions_req_s {
+  // List of raw transactions data to be broadcasted
+  hash8019_stack_t trytes;
+} broadcast_transactions_req_t;
 
 broadcast_transactions_req_t* broadcast_transactions_req_new();
-broadcast_transactions_req_t* broadcast_transactions_req_add(
-    broadcast_transactions_req_t* transactions, const char* trytes);
-void broadcast_transactions_req_free(
-    broadcast_transactions_req_t* transactions);
+void broadcast_transactions_req_free(broadcast_transactions_req_t** const req);
 
 #ifdef __cplusplus
 }

@@ -7,14 +7,15 @@
 
 #include <string.h>
 
-#include "ciri/node.h"
 #include "common/model/transaction.h"
 #include "common/network/uri_parser.h"
 #include "common/trinary/trit_array.h"
 #include "gossip/iota_packet.h"
 #include "gossip/neighbor.h"
+#include "gossip/node.h"
 #include "gossip/services/tcp_sender.hpp"
 #include "gossip/services/udp_sender.hpp"
+#include "utils/handles/rand.h"
 
 retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
                                  char const *const uri) {
@@ -33,6 +34,7 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
   }
   if (strcmp(scheme, "tcp") == 0) {
     neighbor->endpoint.protocol = PROTOCOL_TCP;
+    strcpy(neighbor->endpoint.ip, neighbor->endpoint.host);
   } else if (strcmp(scheme, "udp") == 0) {
     neighbor->endpoint.protocol = PROTOCOL_UDP;
     if (udp_endpoint_init(&neighbor->endpoint) == false) {
@@ -62,31 +64,12 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
   return RC_OK;
 }
 
-retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
-                        iota_packet_t *const packet) {
-  retcode_t ret = RC_OK;
-  trit_t hash_trits[NUM_TRITS_HASH];
-  trit_array_p hash = NULL;
+retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor,
+                               iota_packet_t const *const packet) {
+  if (node == NULL || neighbor == NULL || packet == NULL) {
+    return RC_NULL_PARAM;
+  }
 
-  if (node == NULL) {
-    return RC_NEIGHBOR_NULL_NODE;
-  }
-  if (neighbor == NULL) {
-    return RC_NEIGHBOR_NULL_NEIGHBOR;
-  }
-  if (packet == NULL) {
-    return RC_NEIGHBOR_NULL_PACKET;
-  }
-  if ((ret = get_transaction_to_request(node->requester, &hash))) {
-    return ret;
-  }
-  if (hash != NULL) {
-    // TODO(thibault): iota_packet_set_request
-    flex_trits_to_trits(hash_trits, NUM_TRITS_HASH, hash->trits,
-                        hash->num_trits, hash->num_trits);
-    trits_to_bytes(hash_trits, packet->content + PACKET_TX_SIZE,
-                   NUM_TRITS_HASH);
-  }
   if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
     if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, packet) ==
         false) {
@@ -100,6 +83,35 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
   } else {
     return RC_NEIGHBOR_INVALID_PROTOCOL;
   }
+
   neighbor->nbr_sent_tx++;
+
   return RC_OK;
+}
+
+retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
+                        flex_trit_t const *const transaction) {
+  retcode_t ret = RC_OK;
+  iota_packet_t packet;
+  flex_trit_t request[FLEX_TRIT_SIZE_243];
+
+  if (node == NULL || neighbor == NULL || transaction == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if ((ret = iota_packet_set_transaction(&packet, transaction)) != RC_OK) {
+    return ret;
+  }
+
+  bool is_milestone = rand_handle_probability() < node->conf.p_select_milestone;
+  if ((ret = get_transaction_to_request(&node->transaction_requester, request,
+                                        is_milestone)) != RC_OK) {
+    return ret;
+  }
+  if ((ret = iota_packet_set_request(
+           &packet, request, node->conf.request_hash_size_trit)) != RC_OK) {
+    return ret;
+  }
+
+  return neighbor_send_packet(node, neighbor, &packet);
 }

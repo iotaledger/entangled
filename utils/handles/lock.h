@@ -8,6 +8,10 @@
 #ifndef __UTILS_HANDLES_LOCK_H__
 #define __UTILS_HANDLES_LOCK_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * We define a type lock_handle_t mapping to a system available lock primitive
  * and its associated functions, some of them might have no effect if not needed
@@ -105,5 +109,9 @@ static inline int lock_handle_unlock(lock_handle_t* const lock);
  * @return exit status
  */
 static inline int lock_handle_destroy(lock_handle_t* const lock);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __UTILS_HANDLES_LOCK_H__

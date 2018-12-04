@@ -8,14 +8,24 @@
 #include "request/store_transactions.h"
 
 store_transactions_req_t* store_transactions_req_new() {
-  return flex_hash_array_new();
+  store_transactions_req_t* req =
+      (store_transactions_req_t*)malloc(sizeof(store_transactions_req_t));
+  if (req) {
+    req->trytes = NULL;
+  }
+  return req;
 }
 
-store_transactions_req_t* store_transactions_req_add(
-    store_transactions_req_t* transactions, const char* trytes) {
-  return flex_hash_array_append(transactions, trytes);
-}
+void store_transactions_req_free(store_transactions_req_t** const req) {
+  if (!req || !(*req)) {
+    return;
+  }
 
-void store_transactions_req_free(store_transactions_req_t* transactions) {
-  flex_hash_array_free(transactions);
+  store_transactions_req_t* tmp = *req;
+
+  if (tmp->trytes) {
+    hash8019_stack_free(&tmp->trytes);
+  }
+  free(tmp);
+  *req = NULL;
 }

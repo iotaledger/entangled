@@ -32,7 +32,7 @@ void iota_client_core_destroy(iota_client_service_t* const serv);
  */
 
 retcode_t iota_client_get_node_info(const iota_client_service_t* const service,
-                                    get_node_info_res_t** res);
+                                    get_node_info_res_t* res);
 
 /**
  * Returns the set of neighbors service node is connected with, as well as their
@@ -94,7 +94,7 @@ retcode_t iota_client_remove_neighbors(
  * @return error value.
  */
 retcode_t iota_client_get_tips(const iota_client_service_t* const service,
-                               get_tips_res_t** res);
+                               get_tips_res_t* res);
 /**
  * Find the transactions which attach the specified input and return. All input
  * values are lists (in req), for which a list of return values (transaction
@@ -112,9 +112,9 @@ retcode_t iota_client_get_tips(const iota_client_service_t* const service,
  * @return error value.
  */
 retcode_t iota_client_find_transactions(
-    const iota_client_service_t* const service,
-    const find_transactions_req_t* const req,
-    find_transactions_res_t** const res);
+    iota_client_service_t const* const service,
+    find_transactions_req_t const* const req,
+    find_transactions_res_t* const res);
 
 /**
  * Returns the raw transaction data (trytes) of a specific transaction. These
@@ -132,7 +132,7 @@ retcode_t iota_client_find_transactions(
  */
 retcode_t iota_client_get_trytes(const iota_client_service_t* const service,
                                  get_trytes_req_t* const req,
-                                 get_trytes_res_t** res);
+                                 get_trytes_res_t* res);
 
 /**
  * Get the inclusion states of a set of transactions. This is for determining if
@@ -171,9 +171,9 @@ retcode_t iota_client_get_inclusion_states(
  *
  * @return error value.
  */
-retcode_t iota_client_get_balances(const iota_client_service_t* const service,
-                                   const get_balances_req_t* const req,
-                                   get_balances_res_t** res);
+retcode_t iota_client_get_balances(iota_client_service_t const* const service,
+                                   get_balances_req_t const* const req,
+                                   get_balances_res_t* res);
 
 /**
  * Tip selection which returns trunkTransaction and branchTransaction. The input
@@ -194,7 +194,7 @@ retcode_t iota_client_get_balances(const iota_client_service_t* const service,
 retcode_t iota_client_get_transactions_to_approve(
     const iota_client_service_t* const service,
     const get_transactions_to_approve_req_t* const req,
-    get_transactions_to_approve_res_t** res);
+    get_transactions_to_approve_res_t* res);
 
 /**
  * Attaches the specified transactions (trytes) to the Tangle by doing Proof of
@@ -219,7 +219,7 @@ retcode_t iota_client_get_transactions_to_approve(
  */
 retcode_t iota_client_attach_to_tangle(
     const iota_client_service_t* const service,
-    const attach_to_tangle_req_t* const req, attach_to_tangle_res_t** res);
+    const attach_to_tangle_req_t* const req, attach_to_tangle_res_t* res);
 
 /**
  * Interrupts and completely aborts the iota_client_attach_to_tangle process.

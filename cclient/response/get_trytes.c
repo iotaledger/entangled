@@ -7,16 +7,24 @@
 
 #include "response/get_trytes.h"
 
-get_trytes_res_t* get_trytes_res_new() { return flex_hash_array_new(); }
-
-trit_array_p get_trytes_res_at(get_trytes_res_t* trytes_array, int index) {
-  return flex_hash_array_at(trytes_array, index);
+get_trytes_res_t* get_trytes_res_new() {
+  get_trytes_res_t* res = (get_trytes_res_t*)malloc(sizeof(get_trytes_res_t));
+  if (res) {
+    res->trytes = NULL;
+  }
+  return res;
 }
 
-int get_trytes_res_num(get_trytes_res_t* trytes_array) {
-  return flex_hash_array_count(trytes_array);
-}
+void get_trytes_res_free(get_trytes_res_t** const res) {
+  if (!res || !(*res)) {
+    return;
+  }
 
-void get_trytes_res_free(get_trytes_res_t* trytes_array) {
-  flex_hash_array_free(trytes_array);
+  get_trytes_res_t* tmp = *res;
+
+  if (tmp->trytes) {
+    hash8019_queue_free(&tmp->trytes);
+  }
+  free(tmp);
+  *res = NULL;
 }

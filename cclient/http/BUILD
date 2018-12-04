@@ -6,15 +6,14 @@ cc_library(
 )
 
 cc_library(
-    name = "beast",
+    name = "http",
     srcs = [
-        "beast.cc",
+        "http.c",
     ],
     visibility = ["//visibility:public"],
     deps = [
         ":shared",
-        "//common/model:transaction",
-        "@boost//:beast",
-        "@com_github_google_glog//:glog",
+        "//network:sockets",
+        "@http_parser",
     ],
 )

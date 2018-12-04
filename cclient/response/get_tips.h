@@ -14,12 +14,14 @@
 extern "C" {
 #endif
 
-typedef flex_hash_array_t get_tips_res_t;
+typedef struct get_tips_res_s {
+  hash243_queue_t hashes;
+} get_tips_res_t;
 
 get_tips_res_t* get_tips_res_new();
-trit_array_p get_tips_res_hash_at(get_tips_res_t* hashes, size_t index);
-int get_tips_res_hash_num(get_tips_res_t* hashes);
-void get_tips_res_free(get_tips_res_t* hashes);
+flex_trit_t* get_tips_res_hash_at(get_tips_res_t* res, size_t index);
+size_t get_tips_res_hash_num(get_tips_res_t* res);
+void get_tips_res_free(get_tips_res_t** res);
 
 #ifdef __cplusplus
 }

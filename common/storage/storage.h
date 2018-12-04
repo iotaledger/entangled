@@ -48,6 +48,27 @@ extern retcode_t iota_stor_transaction_load(connection_t const* const conn,
                                             trit_array_t const* const key,
                                             iota_stor_pack_t* const pack);
 
+extern retcode_t iota_stor_transaction_exist(connection_t const* const conn,
+                                             transaction_field_t const field,
+                                             trit_array_t const* const key,
+                                             bool* const exist);
+
+extern retcode_t iota_stor_transaction_update_snapshot_index(
+    connection_t const* const conn, flex_trit_t const* const hash,
+    uint64_t const snapshot_index);
+
+extern retcode_t iota_stor_transactions_update_snapshot_index(
+    connection_t const* const conn, hash243_set_t const hashes,
+    uint64_t const snapshot_index);
+
+extern retcode_t iota_stor_transaction_update_solid_state(
+    connection_t const* const conn, flex_trit_t const* const hash,
+    bool const is_solid);
+
+extern retcode_t iota_stor_transactions_update_solid_state(
+    connection_t const* const conn, hash243_set_t const hashes,
+    bool const is_solid);
+
 extern retcode_t iota_stor_transaction_load_hashes(
     connection_t const* const conn, transaction_field_t const field,
     trit_array_t const* const key, iota_stor_pack_t* const pack);
@@ -56,14 +77,17 @@ extern retcode_t iota_stor_transaction_load_hashes_of_approvers(
     connection_t const* const conn, flex_trit_t const* const approvee_hash,
     iota_stor_pack_t* const pack);
 
-extern retcode_t iota_stor_transaction_update_snapshot_index(
-    connection_t const* const conn, flex_trit_t const* const hash,
-    uint64_t const snapshot_index);
+extern retcode_t iota_stor_transaction_load_hashes_of_requests(
+    connection_t const* const conn, iota_stor_pack_t* const pack,
+    size_t const limit);
 
-extern retcode_t iota_stor_transaction_exist(connection_t const* const conn,
-                                             transaction_field_t const field,
-                                             trit_array_t const* const key,
-                                             bool* const exist);
+extern retcode_t iota_stor_transaction_load_hashes_of_tips(
+    connection_t const* const conn, iota_stor_pack_t* const pack,
+    size_t const limit);
+
+extern retcode_t iota_stor_transaction_approvers_count(
+    connection_t const* const conn, flex_trit_t const* const hash,
+    size_t* const count);
 
 /*
  * Milestone operations

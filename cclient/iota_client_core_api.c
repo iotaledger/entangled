@@ -26,7 +26,7 @@ void iota_client_core_destroy(iota_client_service_t* const serv) {
 }
 
 retcode_t iota_client_get_node_info(const iota_client_service_t* const service,
-                                    get_node_info_res_t** res) {
+                                    get_node_info_res_t* res) {
   retcode_t result = RC_OK;
 
   char_buffer_t* req_buff = char_buffer_new();
@@ -185,7 +185,7 @@ done:
 }
 
 retcode_t iota_client_get_tips(const iota_client_service_t* const service,
-                               get_tips_res_t** res) {
+                               get_tips_res_t* res) {
   retcode_t result = RC_OK;
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();
@@ -224,9 +224,9 @@ done:
 }
 
 retcode_t iota_client_find_transactions(
-    const iota_client_service_t* const service,
-    const find_transactions_req_t* const req,
-    find_transactions_res_t** const res) {
+    iota_client_service_t const* const service,
+    find_transactions_req_t const* const req,
+    find_transactions_res_t* const res) {
   retcode_t result = RC_OK;
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
@@ -265,7 +265,7 @@ done:
 
 retcode_t iota_client_get_trytes(const iota_client_service_t* const service,
                                  get_trytes_req_t* const req,
-                                 get_trytes_res_t** res) {
+                                 get_trytes_res_t* res) {
   retcode_t result = RC_OK;
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
@@ -341,9 +341,9 @@ done:
   return result;
 }
 
-retcode_t iota_client_get_balances(const iota_client_service_t* const service,
-                                   const get_balances_req_t* const req,
-                                   get_balances_res_t** res) {
+retcode_t iota_client_get_balances(iota_client_service_t const* const service,
+                                   get_balances_req_t const* const req,
+                                   get_balances_res_t* res) {
   retcode_t result = RC_OK;
 
   char_buffer_t* res_buff = char_buffer_new();
@@ -386,7 +386,7 @@ done:
 retcode_t iota_client_get_transactions_to_approve(
     const iota_client_service_t* const service,
     const get_transactions_to_approve_req_t* const req,
-    get_transactions_to_approve_res_t** res) {
+    get_transactions_to_approve_res_t* res) {
   retcode_t result = RC_OK;
   char_buffer_t* req_buff = char_buffer_new();
   char_buffer_t* res_buff = char_buffer_new();
@@ -428,7 +428,7 @@ done:
 
 retcode_t iota_client_attach_to_tangle(
     const iota_client_service_t* const service,
-    const attach_to_tangle_req_t* const req, attach_to_tangle_res_t** res) {
+    const attach_to_tangle_req_t* const req, attach_to_tangle_res_t* res) {
   retcode_t result = RC_OK;
 
   char_buffer_t* res_buff = char_buffer_new();

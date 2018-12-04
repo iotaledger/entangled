@@ -14,11 +14,11 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":milestone_tracker_shared",
-        "//ciri/conf:conf_values",
         "//common/sign/v1:iss_curl",
         "//consensus/bundle_validator",
         "//consensus/ledger_validator",
         "//consensus/snapshot",
+        "//consensus/transaction_solidifier",
         "//utils:macros",
         "//utils:merkle",
         "//utils:time",

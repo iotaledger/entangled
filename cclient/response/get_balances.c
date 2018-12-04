@@ -11,25 +11,31 @@ get_balances_res_t* get_balances_res_new() {
   get_balances_res_t* res =
       (get_balances_res_t*)malloc(sizeof(get_balances_res_t));
   if (res) {
-    utarray_new(res->balances, &ut_str_icd);
-    res->milestone = flex_hash_array_new();
+    utarray_new(res->balances, &ut_uint64_icd);
+    res->milestone = NULL;
   }
   return res;
 }
 
-void get_balances_res_free(get_balances_res_t* res) {
-  if (res) {
-    utarray_free(res->balances);
-    flex_hash_array_free(res->milestone);
-    free(res);
+void get_balances_res_free(get_balances_res_t** res) {
+  if (!res || !(*res)) {
+    return;
   }
+  if ((*res)->balances) {
+    utarray_free((*res)->balances);
+  }
+  if ((*res)->milestone) {
+    hash243_queue_free(&(*res)->milestone);
+  }
+  free(*res);
+  *res = NULL;
 }
 
-char* get_balances_res_balances_at(get_balances_res_t* in, int index) {
-  char** p = (char**)utarray_eltptr(in->balances, index);
-  return *p;
+size_t get_balances_res_balances_num(get_balances_res_t const* const res) {
+  return utarray_len(res->balances);
 }
 
-trit_array_p get_balances_res_milestone_at(get_balances_res_t* in, int index) {
-  return flex_hash_array_at(in->milestone, index);
+uint64_t get_balances_res_balances_at(get_balances_res_t const* const res,
+                                      int const index) {
+  return *(uint64_t*)utarray_eltptr(res->balances, index);
 }

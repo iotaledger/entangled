@@ -6,7 +6,7 @@ cc_library(
     hdrs = ["concurrent_list_neighbor.h"],
     deps = [
         ":concurrent_list",
-        "//gossip:neighbor_shared",
+        "//gossip:neighbor",
     ],
 )
 

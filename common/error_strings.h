@@ -25,6 +25,7 @@ extern "C" {
 #define STR_CCLIENT_FLEX_TRITS "trits converting failed"
 #define STR_CCLIENT_NULL_PTR "NULL pointer"
 #define STR_CCLIENT_UNIMPLEMENTED "Function unimplemented"
+#define STR_CCLIENT_INVALID_SECURITY "Invalid security level"
 
 #ifdef __cplusplus
 }

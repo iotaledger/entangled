@@ -18,8 +18,10 @@ void bundle_transactions_new(bundle_transactions_t **const bundle) {
 }
 
 void bundle_transactions_free(bundle_transactions_t **const bundle) {
-  utarray_clear(*bundle);
-  utarray_free(*bundle);
+  if (bundle && *bundle) {
+    utarray_clear(*bundle);
+    utarray_free(*bundle);
+  }
 }
 
 void bundle_transactions_add(bundle_transactions_t *const bundle,

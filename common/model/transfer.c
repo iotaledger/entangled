@@ -4,13 +4,11 @@
  *
  * Refer to the LICENSE file for licensing information
  */
-
-#include "common/model/transfer.h"
 #include <string.h>
+
 #include "common/helpers/sign.h"
+#include "common/model/transfer.h"
 #include "common/trinary/trit_long.h"
-#include "common/trinary/trit_tryte.h"
-#include "common/trinary/tryte_long.h"
 
 /***********************************************************************************************************
  * Transfer Input data structure

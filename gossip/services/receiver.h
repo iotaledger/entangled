@@ -11,10 +11,11 @@
 #include <stdint.h>
 
 #include "common/network/network.h"
+#include "gossip/components/processor.h"
+#include "gossip/iota_packet.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
-typedef struct concurrent_queue_iota_packet_t_s receive_queue_t;
 typedef struct receiver_state_s receiver_state_t;
 
 typedef struct receiver_service_s {
@@ -22,8 +23,7 @@ typedef struct receiver_service_s {
   uint16_t port;
   protocol_type_t protocol;
   receiver_state_t* state;
-  receive_queue_t* queue;
-  size_t packet_size;
+  processor_t* processor;
   void* context;
   void* opaque_socket;
 } receiver_service_t;

@@ -14,13 +14,13 @@
 extern "C" {
 #endif
 
-// List of raw data of transactions to be store.
-typedef flex_hash_array_t store_transactions_req_t;
+typedef struct store_transactions_req_s {
+  // List of raw transactions data to be stored
+  hash8019_stack_t trytes;
+} store_transactions_req_t;
 
 store_transactions_req_t* store_transactions_req_new();
-store_transactions_req_t* store_transactions_req_add(
-    store_transactions_req_t* transactions, const char* trytes);
-void store_transactions_req_free(store_transactions_req_t* transactions);
+void store_transactions_req_free(store_transactions_req_t** const req);
 
 #ifdef __cplusplus
 }

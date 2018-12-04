@@ -15,6 +15,10 @@
 #define LEAF_INDEX_OUT_OF_BOUNDS 3
 #define DEPTH_OUT_OF_BOUNDS 4
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Computes the size of a merkle tree, e.g. its node number
  *
@@ -99,5 +103,9 @@ int merkle_branch(trit_t const *const tree, trit_t *const siblings,
 void merkle_root(trit_t *const hash, trit_t const *const siblings,
                  size_t const siblings_number, size_t const leaf_index,
                  Curl *const c);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  //__UTILS_MERKLE_H__

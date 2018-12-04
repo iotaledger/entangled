@@ -14,16 +14,16 @@
 extern "C" {
 #endif
 
-/*
-The raw transaction data (trytes) of a specific transaction. These trytes can
-then be easily converted into the actual transaction object.
-*/
-typedef flex_hash_array_t get_trytes_res_t;
+typedef struct get_trytes_res_s {
+  /*
+  The raw transaction data (trytes) of a specific transaction. These trytes can
+  then be easily converted into the actual transaction object.
+  */
+  hash8019_queue_t trytes;
+} get_trytes_res_t;
 
 get_trytes_res_t* get_trytes_res_new();
-trit_array_p get_trytes_res_at(get_trytes_res_t* trytes_array, int index);
-int get_trytes_res_num(get_trytes_res_t* trytes_array);
-void get_trytes_res_free(get_trytes_res_t* trytes_array);
+void get_trytes_res_free(get_trytes_res_t** const res);
 
 #ifdef __cplusplus
 }

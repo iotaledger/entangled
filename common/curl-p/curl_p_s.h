@@ -21,6 +21,10 @@ typedef struct s_curl_s {
   CurlSType type;
 } s_curl_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void s_init_curl(s_curl_t* const ctx);
 
 void s_curl_absorb(s_curl_t* const ctx, trit_t const* const trits,
@@ -28,5 +32,9 @@ void s_curl_absorb(s_curl_t* const ctx, trit_t const* const trits,
 void s_curl_squeeze(s_curl_t* const ctx, trit_t* const trits,
                     size_t const length);
 void s_curl_reset(s_curl_t* const ctx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

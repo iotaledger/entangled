@@ -11,30 +11,17 @@ get_transactions_to_approve_req_t* get_transactions_to_approve_req_new() {
   get_transactions_to_approve_req_t* req =
       (get_transactions_to_approve_req_t*)malloc(
           sizeof(get_transactions_to_approve_req_t));
-  if (req == NULL) {
-    return NULL;
+  if (req) {
+    memset(req->reference, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
 
-  req->reference = char_buffer_new();
   return req;
 }
 
 void get_transactions_to_approve_req_free(
     get_transactions_to_approve_req_t** req) {
   if (*req) {
-    char_buffer_free((*req)->reference);
     free(*req);
     *req = NULL;
-  }
-}
-
-void get_transactions_to_approve_req_set_reference(
-    get_transactions_to_approve_req_t* req, char* reference) {
-  retcode_t ret = RC_OK;
-  size_t len = strlen(reference);
-
-  ret = char_buffer_allocate(req->reference, len);
-  if (ret == RC_OK) {
-    strncpy(req->reference->data, reference, len);
   }
 }

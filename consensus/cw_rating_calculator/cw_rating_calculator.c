@@ -9,9 +9,9 @@
 #include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
 #include "utils/logger_helper.h"
 
-retcode_t iota_consensus_cw_rating_init(
-    cw_rating_calculator_t *const cw_calc, tangle_t *const tangle,
-    enum cw_calculation_implementation impl) {
+retcode_t iota_consensus_cw_rating_init(cw_rating_calculator_t *const cw_calc,
+                                        tangle_t *const tangle,
+                                        cw_calculation_implementation_t impl) {
   logger_helper_init(CW_RATING_CALCULATOR_LOGGER_ID, LOGGER_DEBUG, true);
   cw_calc->tangle = tangle;
   if (impl == DFS_FROM_ENTRY_POINT) {

@@ -37,7 +37,7 @@ retcode_t tangle_cleanup(tangle_t *const tangle, char *test_db_path) {
   return ret;
 }
 
-void transactions_deserialize(tryte_t **transactions_trytes,
+void transactions_deserialize(tryte_t const *const *const transactions_trytes,
                               iota_transaction_t *txs,
                               size_t num_transactions) {
   for (size_t i = 0; i < num_transactions; ++i) {

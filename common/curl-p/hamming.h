@@ -11,8 +11,16 @@
 #include "common/curl-p/pearl_diver.h"
 #include "common/curl-p/trit.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 PearlDiverStatus hamming(Curl *const, unsigned short const offset,
                          unsigned short const end,
                          unsigned short const security);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -68,12 +68,13 @@ cc_library(
 )
 
 cc_library(
-    name = "hash_containers",
-    srcs = ["hash_containers.c"],
-    hdrs = ["hash_containers.h"],
+    name = "hash_maps",
+    srcs = ["hash_maps.c"],
+    hdrs = ["hash_maps.h"],
     deps = [
         "//common:errors",
         "//common/trinary:flex_trit",
+        "//utils/containers/hash:hash243_set",
         "@com_github_uthash//:uthash",
     ],
 )

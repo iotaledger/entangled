@@ -13,7 +13,7 @@
 
 #include "common/errors.h"
 #include "common/trinary/trit_array.h"
-#include "consensus/defs.h"
+#include "consensus/conf.h"
 #include "consensus/snapshot/state_delta.h"
 #include "utils/handles/rw_lock.h"
 
@@ -21,50 +21,23 @@
 extern "C" {
 #endif
 
-typedef struct snapshot_conf_s {
-  uint64_t timestamp_sec;
-  uint64_t signature_index;
-  uint64_t signature_depth;
-  flex_trit_t signature_pubkey[FLEX_TRIT_SIZE_243];
-  flex_trit_t coordinator[FLEX_TRIT_SIZE_243];
-  uint64_t last_milestone;
-} snapshot_conf_t;
-
 typedef struct snapshot_s {
+  iota_consensus_conf_t *conf;
   rw_lock_handle_t rw_lock;
   size_t index;
   state_delta_t state;
-  snapshot_conf_t conf;
 } snapshot_t;
-
-/**
- * Initializes a snapshot configuration
- *
- * @param snapshot_conf_file The snapshot configuration file path
- * @param conf The snapshot configuration
- * @param testnet Whether the node runs on testnet or not
- *
- * @return a status code
- */
-retcode_t iota_snapshot_init_conf(char const *const snapshot_conf_file,
-                                  snapshot_conf_t *const conf, bool testnet);
 
 /**
  * Initializes a snapshot
  *
  * @param snapshot The snapshot
- * @param snapshot_file The snapshot file path
- * @param snapshot_sig_file The snapshot signature file path
- * @param snapshot_conf_file The snapshot configuration file path
- * @param testnet Whether the node runs on testnet or not
+ * @param conf Consensus configuration
  *
  * @return a status code
  */
 retcode_t iota_snapshot_init(snapshot_t *const snapshot,
-                             char const *const snapshot_file,
-                             char const *const snapshot_sig_file,
-                             char const *const snapshot_conf_file,
-                             bool testnet);
+                             iota_consensus_conf_t *const conf);
 
 /**
  * Destroys a snapshot

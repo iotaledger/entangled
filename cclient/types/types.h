@@ -17,6 +17,10 @@
 #include "common/trinary/trit_array.h"
 #include "common/trinary/tryte.h"
 
+#include "utils/containers/hash/hash243_queue.h"
+#include "utils/containers/hash/hash8019_queue.h"
+#include "utils/containers/hash/hash8019_stack.h"
+#include "utils/containers/hash/hash81_queue.h"
 #include "utils/logger_helper.h"
 
 #include "utarray.h"
@@ -59,7 +63,7 @@ retcode_t flex_hash_to_char_buffer(trit_array_p hash, char_buffer_t* out);
 
 flex_hash_array_t* flex_hash_array_new();
 flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
-                                          const char* trytes);
+                                          char const* const trytes);
 trit_array_p flex_hash_array_at(flex_hash_array_t* head, size_t index);
 int flex_hash_array_count(flex_hash_array_t* head);
 void flex_hash_array_free(flex_hash_array_t* head);
