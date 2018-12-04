@@ -147,6 +147,32 @@ retcode_t iota_tangle_transaction_load_hashes_of_tips(
   return res;
 }
 
+retcode_t iota_tangle_transaction_load_hashes_of_milestone_candidates(
+    tangle_t const *const tangle, iota_stor_pack_t *const pack,
+    flex_trit_t const *const coordinator) {
+  retcode_t res = RC_OK;
+
+  res = iota_stor_transaction_load_hashes_of_milestone_candidates(
+      &tangle->conn, pack, coordinator);
+
+  while (res == RC_OK && pack->insufficient_capacity) {
+    if ((res = hash_pack_resize(pack, 2)) == RC_OK) {
+      pack->num_loaded = 0;
+      res = iota_stor_transaction_load_hashes_of_milestone_candidates(
+          &tangle->conn, pack, coordinator);
+    }
+  }
+
+  if (res != RC_OK) {
+    log_error(TANGLE_LOGGER_ID,
+              "Failed in loading hashes of milestone candidates, error code "
+              "is: %" PRIu64 "\n",
+              res);
+  }
+
+  return res;
+}
+
 retcode_t iota_tangle_transaction_update_snapshot_index(
     tangle_t const *const tangle, flex_trit_t const *const hash,
     uint64_t const snapshot_index) {

@@ -41,23 +41,19 @@ static retcode_t load_bundle_transactions(tangle_t const* const tangle,
   last_index = curr_tx->last_index;
   memcpy(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243);
 
-  while (curr_index <= last_index &&
+  while (pack.num_loaded != 0 && curr_index <= last_index &&
          memcmp(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243) == 0) {
     bundle_transactions_add(bundle, curr_tx);
     curr_tx_trunk.trits = curr_tx->trunk;
 
     hash_pack_reset(&pack);
-    res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
-                                       &curr_tx_trunk, &pack);
-    if (res != RC_OK || pack.num_loaded == 0) {
-      log_error(BUNDLE_VALIDATOR_LOGGER_ID,
-                "Failed in %s, could not load next transaction\n",
-                __FUNCTION__);
+    if ((res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
+                                            &curr_tx_trunk, &pack)) != RC_OK) {
       return res;
     }
   }
 
-  return RC_OK;
+  return res;
 }
 
 static retcode_t validate_signature(bundle_transactions_t const* const bundle,
@@ -133,18 +129,19 @@ retcode_t iota_consensus_bundle_validator_destroy() {
 
 retcode_t iota_consensus_bundle_validator_validate(
     tangle_t const* const tangle, trit_array_p const tail_hash,
-    bundle_transactions_t* const bundle, bool* const is_valid) {
+    bundle_transactions_t* const bundle, bundle_status_t* const status) {
   retcode_t res = RC_OK;
   iota_transaction_t curr_tx = NULL;
   size_t index = 0, last_index = 0;
   int64_t bundle_value = 0;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
+  bool valid_sig = true;
 
-  *is_valid = true;
+  *status = BUNDLE_VALID;
 
   if (bundle == NULL) {
     log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Bundle is not initialized\n");
-    *is_valid = false;
+    *status = BUNDLE_NOT_INITIALIZED;
     return RC_CONSENSUS_NULL_BUNDLE_PTR;
   }
 
@@ -152,23 +149,34 @@ retcode_t iota_consensus_bundle_validator_validate(
   if (res != RC_OK || utarray_len(bundle) == 0) {
     log_error(BUNDLE_VALIDATOR_LOGGER_ID,
               "Loading transactions for tail failed\n");
-    *is_valid = false;
+    *status = BUNDLE_TAIL_NOT_FOUND;
     return res;
   }
 
   curr_tx = (iota_transaction_t)utarray_eltptr(bundle, 0);
   last_index = curr_tx->last_index;
+
+  if (utarray_len(bundle) != last_index + 1) {
+    *status = BUNDLE_INCOMPLETE;
+    return res;
+  }
+
   memcpy(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243);
 
   for (; curr_tx != NULL;
        curr_tx = (iota_transaction_t)utarray_next(bundle, curr_tx)) {
     bundle_value += curr_tx->value;
 
+    if (llabs(bundle_value) > IOTA_SUPPLY) {
+      log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Invalid bundle supply\n");
+      *status = BUNDLE_INVALID_VALUE;
+      break;
+    }
+
     if (curr_tx->current_index != index++ ||
-        curr_tx->last_index != last_index ||
-        llabs(bundle_value) > IOTA_SUPPLY) {
+        curr_tx->last_index != last_index) {
       log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Invalid transaction in bundle\n");
-      *is_valid = false;
+      *status = BUNDLE_INVALID_TX;
       break;
     }
 
@@ -176,7 +184,7 @@ retcode_t iota_consensus_bundle_validator_validate(
         flex_trits_at(curr_tx->address, NUM_TRITS_ADDRESS,
                       NUM_TRITS_ADDRESS - 1) != 0) {
       log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Invalid input address\n");
-      *is_valid = false;
+      *status = BUNDLE_INVALID_INPUT_ADDRESS;
       break;
     }
 
@@ -187,7 +195,7 @@ retcode_t iota_consensus_bundle_validator_validate(
 
       if (bundle_value != 0) {
         log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Bundle value is not zero\n");
-        *is_valid = false;
+        *status = BUNDLE_INVALID_VALUE;
         break;
       }
 
@@ -196,7 +204,7 @@ retcode_t iota_consensus_bundle_validator_validate(
           0) {
         log_error(BUNDLE_VALIDATOR_LOGGER_ID,
                   "Bundle hash provided differs from calculated\n");
-        *is_valid = false;
+        *status = BUNDLE_INVALID_HASH;
         break;
       }
 
@@ -206,10 +214,10 @@ retcode_t iota_consensus_bundle_validator_validate(
                       &normalized_bundle_trits[c * RADIX]);
       }
 
-      res = validate_signature(bundle, normalized_bundle_trits, is_valid);
-      if (res != RC_OK || !(*is_valid)) {
+      res = validate_signature(bundle, normalized_bundle_trits, &valid_sig);
+      if (res != RC_OK || !valid_sig) {
         log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Invalid signature\n");
-        *is_valid = false;
+        *status = BUNDLE_INVALID_SIGNATURE;
         break;
       }
     }
