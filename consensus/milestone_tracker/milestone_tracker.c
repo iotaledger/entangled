@@ -187,8 +187,9 @@ static void* milestone_validator(void* arg) {
           if (candidate.index > mt->latest_milestone_index) {
             log_info(MILESTONE_TRACKER_LOGGER_ID,
                      "Latest milestone has changed from #%" PRIu64
-                     " to #%" PRIu64 "\n",
-                     mt->latest_milestone_index, candidate.index);
+                     " to #%" PRIu64 " (%d remaining candidates)\n",
+                     mt->latest_milestone_index, candidate.index,
+                     hash243_queue_count(&mt->candidates));
             mt->latest_milestone_index = candidate.index;
             memcpy(mt->latest_milestone->trits, candidate.hash,
                    FLEX_TRIT_SIZE_243);
