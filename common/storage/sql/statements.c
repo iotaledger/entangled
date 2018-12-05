@@ -99,7 +99,7 @@ char *iota_statement_milestone_select_last =
 
 char *iota_statement_milestone_select_next =
     "SELECT * FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX
-    ">? ORDER BY " MILESTONE_COL_INDEX " ASC LIMIT 1";
+    "=(?+1)";
 
 char *iota_statement_milestone_exist =
     "SELECT 1 WHERE EXISTS(SELECT 1 "
