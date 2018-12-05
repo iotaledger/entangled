@@ -145,11 +145,10 @@ void test_transaction_invalid_delta() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
-  tx1->snapshot_index = 0;
-  tx1->solid = 1;
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
-
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, tx1->hash,
+                                                         true) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
 
@@ -176,10 +175,14 @@ void test_transaction_below_max_depth() {
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
-  txs[0]->snapshot_index = max_depth - 1;
-  txs[0]->solid = 1;
-  txs[1]->solid = 1;
+
   build_tangle(&tangle, txs, 2);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[0]->hash,
+                                                         true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(
+                  &tangle, txs[0]->hash, max_depth - 1) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[1]->hash,
+                                                         true) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
@@ -208,14 +211,18 @@ void test_transaction_exceed_max_transactions() {
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
-  txs[0]->snapshot_index = max_depth + 1;
-  txs[0]->solid = 1;
-  txs[1]->snapshot_index = max_depth + 1;
-  txs[1]->solid = 1;
   memcpy(txs[1]->trunk, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
   memcpy(txs[1]->branch, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
   memcpy(txs[0]->branch, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
   build_tangle(&tangle, txs, 2);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[0]->hash,
+                                                         true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(
+                  &tangle, txs[0]->hash, max_depth + 1) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[1]->hash,
+                                                         true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(
+                  &tangle, txs[1]->hash, max_depth + 1) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
@@ -244,11 +251,11 @@ void test_transaction_is_genesis() {
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
-  txs[0]->snapshot_index = 0;
-  txs[0]->solid = 1;
-  txs[1]->solid = 1;
   build_tangle(&tangle, txs, 2);
-
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[0]->hash,
+                                                         true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[1]->hash,
+                                                         true) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
 
@@ -275,9 +282,20 @@ void test_transaction_valid() {
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
-  txs[0]->solid = 1;
-  txs[1]->solid = 1;
   build_tangle(&tangle, txs, 2);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[0]->hash,
+                                                         1) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, txs[1]->hash,
+                                                         1) == RC_OK);
+
+  DECLARE_PACK_SINGLE_SOLID_STATE(tx, tx_ptr, pack);
+  struct _trit_array hash = {(flex_trit_t *)txs[0]->hash, NUM_TRITS_HASH,
+                             FLEX_TRIT_SIZE_243, 0};
+
+  TEST_ASSERT(iota_stor_transaction_selective_load(
+                  &tangle, TRANSACTION_FIELD_HASH, &hash, &pack,
+                  MODEL_TRANSACTION_SOLID) == RC_OK);
+  TEST_ASSERT(tx.solid);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);

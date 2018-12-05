@@ -73,9 +73,10 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
   address[HASH_LENGTH_TRIT - 1] = -1;
   flex_trits_from_trits(txs[0]->address, HASH_LENGTH_TRIT, address,
                         HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-  build_tangle(&tangle, txs, 4);
+  TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
 
   bool exist = false;
+
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
