@@ -55,13 +55,11 @@ extern "C" {
  ***********************************************************************************************************/
 typedef struct _iota_transaction *iota_transaction_t;
 typedef struct _iota_transaction_meta_view_model
-    *iota_transaction_meta_view_model_t;
+    iota_transaction_meta_view_model_t;
 typedef struct _iota_transaction_snapshot_index_view_model
-    *iota_transaction_snapshot_index_view_model_t;
+    iota_transaction_snapshot_index_view_model_t;
 typedef struct _iota_transaction_solid_view_model
-    *iota_transaction_solid_view_model_t;
-typedef struct _iota_transaction_value_view_model
-    *iota_transaction_value_view_model_t;
+    iota_transaction_solid_view_model_t;
 
 struct _iota_transaction {
   // 2187 trytes = 6561 trits
@@ -139,12 +137,6 @@ struct _iota_transaction_snapshot_index_view_model {
 
 struct _iota_transaction_solid_view_model {
   bool solid;
-  flex_trit_t trunk[FLEX_TRIT_SIZE_243];
-  flex_trit_t branch[FLEX_TRIT_SIZE_243];
-};
-
-struct _iota_transaction_value_view_model {
-  int64_t value;
   flex_trit_t trunk[FLEX_TRIT_SIZE_243];
   flex_trit_t branch[FLEX_TRIT_SIZE_243];
 };

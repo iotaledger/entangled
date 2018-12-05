@@ -122,7 +122,8 @@ static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
                                                   iota_transaction_t const tx);
 
 static void select_transactions_meta_fields_populate_from_row(
-    sqlite3_stmt* const statement, iota_transaction_meta_view_model_t const tx);
+    sqlite3_stmt* const statement,
+    iota_transaction_meta_view_model_t* const tx);
 
 static retcode_t prepare_statement(sqlite3* const db,
                                    sqlite3_stmt** const sqlite_statement,
@@ -159,7 +160,7 @@ static retcode_t finalize_statement(sqlite3_stmt* const sqlite_statement) {
 
 static void select_transactions_solid_state_populate_from_row(
     sqlite3_stmt* const statement,
-    iota_transaction_solid_view_model_t const vm) {
+    iota_transaction_solid_view_model_t* const vm) {
   vm->solid = sqlite3_column_int(statement, 0);
   column_decompress_load(statement, 1, vm->trunk, FLEX_TRIT_SIZE_243);
   column_decompress_load(statement, 2, vm->branch, FLEX_TRIT_SIZE_243);
@@ -167,16 +168,8 @@ static void select_transactions_solid_state_populate_from_row(
 
 static void select_transactions_snapshot_index_populate_from_row(
     sqlite3_stmt* const statement,
-    iota_transaction_snapshot_index_view_model_t const vm) {
+    iota_transaction_snapshot_index_view_model_t* const vm) {
   vm->snapshot_index = sqlite3_column_int64(statement, 0);
-  column_decompress_load(statement, 1, vm->trunk, FLEX_TRIT_SIZE_243);
-  column_decompress_load(statement, 2, vm->branch, FLEX_TRIT_SIZE_243);
-}
-
-static void select_transactions_value_populate_from_row(
-    sqlite3_stmt* const statement,
-    iota_transaction_value_view_model_t const vm) {
-  vm->value = sqlite3_column_int64(statement, 0);
   column_decompress_load(statement, 1, vm->trunk, FLEX_TRIT_SIZE_243);
   column_decompress_load(statement, 2, vm->branch, FLEX_TRIT_SIZE_243);
 }
@@ -370,7 +363,7 @@ static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
 
 static void select_transactions_meta_fields_populate_from_row(
     sqlite3_stmt* const statement,
-    iota_transaction_meta_view_model_t const tx) {
+    iota_transaction_meta_view_model_t* const tx) {
   column_decompress_load(statement, 0, tx->address, FLEX_TRIT_SIZE_243);
   tx->value = sqlite3_column_int64(statement, 1);
   column_decompress_load(statement, 2, tx->obsolete_tag, FLEX_TRIT_SIZE_81);
@@ -492,9 +485,9 @@ retcode_t iota_stor_transaction_selective_load(connection_t const* const conn,
       if (load_model == MODEL_TRANSACTION_META_ALL) {
         statement = iota_statement_transaction_select_meta_fields_by_hash;
       } else if (load_model == MODEL_SNAPSHOT_INDEX) {
-        statement = iota_statement_select_snapshot_by_hash;
+        statement = iota_statement_transaction_select_snapshot_by_hash;
       } else if (load_model == MODEL_SOLID) {
-        statement = iota_statement_select_solid_by_hash;
+        statement = iota_statement_transaction_select_solid_by_hash;
       } else {
         return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
       }

@@ -198,7 +198,7 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash,
 
   // Transaction is not marked solid, but it is a candidate
   if (pack->num_loaded == 1 &&
-      !((iota_transaction_meta_view_model_t)pack->models[0])->solid) {
+      !((iota_transaction_meta_view_model_t *)pack->models[0])->solid) {
     *should_branch = true;
     return hash243_set_add(&ts->solid_transactions_candidates, hash);
   } else if (pack->num_loaded == 0) {

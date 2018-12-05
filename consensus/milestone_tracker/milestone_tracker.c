@@ -142,7 +142,7 @@ done:
 }
 
 static uint64_t get_milestone_index(
-    iota_transaction_meta_view_model_t const tx) {
+    iota_transaction_meta_view_model_t* const tx) {
   trit_t buffer[NUM_TRITS_OBSOLETE_TAG];
 
   flex_trits_to_trits(buffer, NUM_TRITS_OBSOLETE_TAG, tx->obsolete_tag,

@@ -40,11 +40,11 @@ char *iota_statement_transaction_select_meta_fields_by_hash =
     "," TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID
     " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
 
-char *iota_statement_select_snapshot_by_hash =
+char *iota_statement_transaction_select_snapshot_by_hash =
     "SELECT " TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_TRUNK
     "," TRANSACTION_COL_BRANCH " FROM " TRANSACTION_TABLE_NAME
     " WHERE " TRANSACTION_COL_HASH "=?";
-extern char *iota_statement_select_solid_by_hash =
+extern char *iota_statement_transaction_select_solid_by_hash =
     "SELECT " TRANSACTION_COL_SOLID "," TRANSACTION_COL_TRUNK
     "," TRANSACTION_COL_BRANCH " FROM " TRANSACTION_TABLE_NAME
     " WHERE " TRANSACTION_COL_HASH "=?";

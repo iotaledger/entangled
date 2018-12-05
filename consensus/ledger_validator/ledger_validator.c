@@ -35,7 +35,7 @@ static retcode_t update_snapshot_milestone_do_func(flex_trit_t *const hash,
               __FUNCTION__);
     return RC_LEDGER_VALIDATOR_COULD_NOT_LOAD_MILESTONE;
   }
-  iota_transaction_meta_view_model_t transaction = pack->models[0];
+  iota_transaction_meta_view_model_t *transaction = pack->models[0];
   *should_branch = transaction->snapshot_index == 0;
 
   if (*should_branch) {
@@ -144,7 +144,7 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
                             .num_bytes = FLEX_TRIT_SIZE_243,
                             .dynamic = 0};
   bundle_transactions_t *bundle = NULL;
-  iota_transaction_meta_view_model_t tx_bundle = NULL;
+  iota_transaction_meta_view_model_t *tx_bundle = NULL;
 
   *should_stop = false;
   *should_branch = false;
@@ -163,7 +163,7 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
     return ret;
   }
 
-  iota_transaction_meta_view_model_t tx = pack->models[0];
+  iota_transaction_meta_view_model_t *tx = pack->models[0];
   *should_branch = true;
   if (tx->snapshot_index == 0 ||
       tx->snapshot_index > params->latest_snapshot_index) {
@@ -177,7 +177,7 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
       }
 
       if (bundle_status != BUNDLE_VALID ||
-          (tx_bundle = (iota_transaction_meta_view_model_t)utarray_eltptr(
+          (tx_bundle = (iota_transaction_meta_view_model_t *)utarray_eltptr(
                bundle, 0)) == NULL) {
         params->valid_delta = false;
         *should_stop = true;
@@ -190,8 +190,8 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
             goto done;
           }
         }
-        tx_bundle =
-            (iota_transaction_meta_view_model_t)utarray_next(bundle, tx_bundle);
+        tx_bundle = (iota_transaction_meta_view_model_t *)utarray_next(
+            bundle, tx_bundle);
       }
       bundle_transactions_free(&bundle);
     }
