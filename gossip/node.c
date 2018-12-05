@@ -241,6 +241,13 @@ retcode_t node_start(node_t* const node) {
     return ret;
   }
 
+  log_info(NODE_LOGGER_ID, "Starting transaction requester component\n");
+  if ((ret = requester_start(&node->transaction_requester)) != RC_OK) {
+    log_critical(NODE_LOGGER_ID,
+                 "Starting transaction requester component failed\n");
+    return ret;
+  }
+
   node->running = true;
 
   return ret;
@@ -284,6 +291,12 @@ retcode_t node_stop(node_t* const node) {
   log_info(NODE_LOGGER_ID, "Stopping tips requester component\n");
   if ((ret = tips_requester_stop(&node->tips_requester)) != RC_OK) {
     log_error(NODE_LOGGER_ID, "Stopping tips requester component failed\n");
+  }
+
+  log_info(NODE_LOGGER_ID, "Stopping transaction requester component\n");
+  if ((ret = requester_stop(&node->transaction_requester)) != RC_OK) {
+    log_error(NODE_LOGGER_ID,
+              "Stopping transaction requester component failed\n");
   }
 
   return ret;

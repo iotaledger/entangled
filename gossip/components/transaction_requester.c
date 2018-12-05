@@ -10,19 +10,44 @@
 #include "consensus/tangle/tangle.h"
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
+#include "utils/time.h"
 
 #define REQUESTER_LOGGER_ID "requester"
+#define REQUESTER_INTERVAL 100
+
+/*
+ * Private functions
+ */
+
+static void *transaction_requester_routine(
+    transaction_requester_t *const transaction_requester) {
+  if (transaction_requester == NULL) {
+    return NULL;
+  }
+
+  while (transaction_requester->running) {
+    fprintf(stderr, "Requester\n");
+    sleep_ms(REQUESTER_INTERVAL);
+  }
+
+  return NULL;
+}
+
+/*
+ * Public functions
+ */
 
 retcode_t requester_init(transaction_requester_t *const transaction_requester,
                          iota_gossip_conf_t *const conf,
                          tangle_t *const tangle) {
   if (transaction_requester == NULL || tangle == NULL || conf == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   }
 
   logger_helper_init(REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
   memset(transaction_requester, 0, sizeof(transaction_requester_t));
   transaction_requester->conf = conf;
+  transaction_requester->running = false;
   transaction_requester->milestones = NULL;
   transaction_requester->transactions = NULL;
   transaction_requester->tangle = tangle;
@@ -31,10 +56,47 @@ retcode_t requester_init(transaction_requester_t *const transaction_requester,
   return RC_OK;
 }
 
+retcode_t requester_start(
+    transaction_requester_t *const transaction_requester) {
+  if (transaction_requester == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  log_info(REQUESTER_LOGGER_ID, "Spawning transaction requester thread\n");
+  transaction_requester->running = true;
+  if (thread_handle_create(&transaction_requester->thread,
+                           (thread_routine_t)transaction_requester_routine,
+                           transaction_requester) != 0) {
+    return RC_FAILED_THREAD_SPAWN;
+  }
+
+  return RC_OK;
+}
+
+retcode_t requester_stop(transaction_requester_t *const transaction_requester) {
+  if (transaction_requester == NULL) {
+    return RC_NULL_PARAM;
+  } else if (transaction_requester->running == false) {
+    return RC_OK;
+  }
+
+  log_info(REQUESTER_LOGGER_ID, "Shutting down transaction requester thread\n");
+  transaction_requester->running = false;
+  if (thread_handle_join(transaction_requester->thread, NULL) != 0) {
+    log_error(REQUESTER_LOGGER_ID,
+              "Shutting down transaction requester thread failed\n");
+    return RC_FAILED_THREAD_JOIN;
+  }
+
+  return RC_OK;
+}
+
 retcode_t requester_destroy(
     transaction_requester_t *const transaction_requester) {
   if (transaction_requester == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
+  } else if (transaction_requester->running) {
+    return RC_STILL_RUNNING;
   }
 
   hash243_set_free(&transaction_requester->milestones);
@@ -52,7 +114,7 @@ retcode_t requester_get_requested_transactions(
   retcode_t ret = RC_OK;
 
   if (transaction_requester == NULL || transactions == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   }
 
   rw_lock_handle_rdlock(&transaction_requester->lock);
@@ -75,7 +137,7 @@ size_t requester_size(transaction_requester_t *const transaction_requester) {
   size_t size = 0;
 
   if (transaction_requester == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   }
 
   rw_lock_handle_rdlock(&transaction_requester->lock);
@@ -90,7 +152,7 @@ bool requester_is_full(transaction_requester_t *const transaction_requester) {
   size_t size = 0;
 
   if (transaction_requester == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   }
 
   rw_lock_handle_rdlock(&transaction_requester->lock);
@@ -104,7 +166,7 @@ retcode_t requester_clear_request(
     transaction_requester_t *const transaction_requester,
     flex_trit_t const *const hash) {
   if (transaction_requester == NULL || hash == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   }
 
   rw_lock_handle_wrlock(&transaction_requester->lock);
@@ -126,7 +188,7 @@ retcode_t request_transaction(
                             .dynamic = 0};
 
   if (transaction_requester == NULL || hash == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   }
 
   if (flex_trits_are_null(hash, FLEX_TRIT_SIZE_243)) {
@@ -181,7 +243,7 @@ retcode_t get_transaction_to_request(
   bool exists = false;
 
   if (transaction_requester == NULL || hash == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+    return RC_NULL_PARAM;
   }
 
   request_set = milestone ? &transaction_requester->milestones

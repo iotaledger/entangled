@@ -14,12 +14,15 @@
 #include "gossip/conf.h"
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/handles/rw_lock.h"
+#include "utils/handles/thread.h"
 
 // Forward declarations
 typedef struct tangle_s tangle_t;
 
 typedef struct transaction_requester_s {
   iota_gossip_conf_t *conf;
+  thread_handle_t thread;
+  bool running;
   hash243_set_t milestones;
   hash243_set_t transactions;
   tangle_t *tangle;
@@ -42,6 +45,24 @@ extern "C" {
 retcode_t requester_init(transaction_requester_t *const transaction_requester,
                          iota_gossip_conf_t *const conf,
                          tangle_t *const tangle);
+
+/**
+ * Starts a transaction requester
+ *
+ * @param transaction_requester The transaction requester
+ *
+ * @return a status code
+ */
+retcode_t requester_start(transaction_requester_t *const transaction_requester);
+
+/**
+ * Stops a transaction requester
+ *
+ * @param transaction_requester The transaction requester
+ *
+ * @return a status code
+ */
+retcode_t requester_stop(transaction_requester_t *const transaction_requester);
 
 /**
  * Destroys a transaction requester

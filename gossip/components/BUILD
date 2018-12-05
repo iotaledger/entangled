@@ -72,9 +72,11 @@ cc_library(
         "//consensus/tangle",
         "//gossip:conf",
         "//utils:logger_helper",
+        "//utils:time",
         "//utils/containers/hash:hash243_set",
         "//utils/handles:rand",
         "//utils/handles:rw_lock",
+        "//utils/handles:thread",
     ],
 )
 
