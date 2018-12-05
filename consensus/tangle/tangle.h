@@ -117,6 +117,11 @@ retcode_t iota_tangle_transaction_approvers_count(tangle_t const *const tangle,
                                                   flex_trit_t const *const hash,
                                                   size_t *const count);
 
+retcode_t iota_tangle_transaction_selective_load(
+    tangle_t const *const tangle, transaction_field_t const field,
+    trit_array_t const *const key, iota_stor_pack_t *const tx,
+    load_model_e const load_model);
+
 /*
  * Milestone operations
  */

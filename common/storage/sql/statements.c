@@ -78,6 +78,23 @@ char *iota_statement_transaction_exist_by_hash =
 char *iota_statement_transaction_approvers_count =
     "SELECT COUNT(*) FROM " TRANSACTION_TABLE_NAME " WHERE branch=? OR trunk=?";
 
+char *iota_statement_transaction_select_meta_fields_by_hash =
+    "SELECT " TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE
+    "," TRANSACTION_COL_OBSOLETE_TAG "," TRANSACTION_COL_TIMESTAMP
+    "," TRANSACTION_COL_CURRENT_INDEX "," TRANSACTION_COL_LAST_INDEX
+    "," TRANSACTION_COL_BUNDLE "," TRANSACTION_COL_TRUNK
+    "," TRANSACTION_COL_BRANCH "," TRANSACTION_COL_TAG
+    "," TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID
+    " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
+char *iota_statement_transaction_select_snapshot_by_hash =
+    "SELECT " TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_TRUNK
+    "," TRANSACTION_COL_BRANCH " FROM " TRANSACTION_TABLE_NAME
+    " WHERE " TRANSACTION_COL_HASH "=?";
+extern char *iota_statement_transaction_select_solid_by_hash =
+    "SELECT " TRANSACTION_COL_SOLID "," TRANSACTION_COL_TRUNK
+    "," TRANSACTION_COL_BRANCH " FROM " TRANSACTION_TABLE_NAME
+    " WHERE " TRANSACTION_COL_HASH "=?";
+
 /*
  * Milestone statements
  */

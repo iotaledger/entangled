@@ -200,6 +200,14 @@ retcode_t iota_tangle_transaction_approvers_count(tangle_t const *const tangle,
   return iota_stor_transaction_approvers_count(&tangle->conn, hash, count);
 }
 
+retcode_t iota_tangle_transaction_selective_load(
+    tangle_t const *const tangle, transaction_field_t const field,
+    trit_array_t const *const key, iota_stor_pack_t *const tx,
+    load_model_e const load_model) {
+  return iota_stor_transaction_selective_load(&tangle->conn, field, key, tx,
+                                              load_model);
+}
+
 /*
  * Milestone operations
  */

@@ -54,6 +54,11 @@ extern "C" {
  * Transaction data structure
  ***********************************************************************************************************/
 typedef struct _iota_transaction *iota_transaction_t;
+typedef struct _iota_transaction_meta_model iota_transaction_meta_model_t;
+typedef struct _iota_transaction_snapshot_index_model
+    iota_transaction_snapshot_index_model_t;
+typedef struct _iota_transaction_solid_model iota_transaction_solid_model_t;
+
 struct _iota_transaction {
   // 2187 trytes = 6561 trits
   flex_trit_t signature_or_message[FLEX_TRIT_SIZE_6561];
@@ -92,6 +97,45 @@ struct _iota_transaction {
   // Metadata
   uint64_t snapshot_index;
   bool solid;
+};
+
+struct _iota_transaction_meta_model {
+  // 81 trytes = 243 trits
+  flex_trit_t address[FLEX_TRIT_SIZE_243];
+  // 27 trytes = 81 trits
+  int64_t value;
+  // 27 trytes = 81 trits
+  flex_trit_t obsolete_tag[FLEX_TRIT_SIZE_81];
+  // 9 trytes = 27 trits
+  uint64_t timestamp;
+  // 9 trytes = 27 trits
+  int64_t current_index;
+  // 9 trytes = 27 trits
+  int64_t last_index;
+  // 81 trytes = 243 trits
+  flex_trit_t bundle[FLEX_TRIT_SIZE_243];
+  // 81 trytes = 243 trits
+  flex_trit_t trunk[FLEX_TRIT_SIZE_243];
+  // 81 trytes = 243 trits
+  flex_trit_t branch[FLEX_TRIT_SIZE_243];
+  // 27 trytes = 81 trits
+  flex_trit_t tag[FLEX_TRIT_SIZE_81];
+  // 81 trytes = 243 trits
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  // Metadata
+  uint64_t snapshot_index;
+  bool solid;
+};
+
+struct _iota_transaction_snapshot_index_model {
+  uint64_t snapshot_index;
+  flex_trit_t trunk[FLEX_TRIT_SIZE_243];
+  flex_trit_t branch[FLEX_TRIT_SIZE_243];
+};
+struct _iota_transaction_solid_model {
+  bool solid;
+  flex_trit_t trunk[FLEX_TRIT_SIZE_243];
+  flex_trit_t branch[FLEX_TRIT_SIZE_243];
 };
 
 /***********************************************************************************************************

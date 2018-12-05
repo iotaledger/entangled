@@ -40,6 +40,15 @@ typedef enum transaction_field_e {
   TRANSACTION_FIELD_ADDRESS
 } transaction_field_t;
 
+typedef enum load_model_e {
+  MODEL_MILESTONE,
+  MODEL_TRANSACTION_ALL,
+  MODEL_TRANSACTION_HASH,
+  MODEL_TRANSACTION_META_ALL,
+  MODEL_TRANSACTION_SNAPSHOT_INDEX,
+  MODEL_TRANSACTION_SOLID,
+} load_model_e;
+
 extern retcode_t iota_stor_transaction_store(connection_t const* const conn,
                                              iota_transaction_t const data_in);
 
@@ -92,6 +101,11 @@ extern retcode_t iota_stor_transaction_load_hashes_of_milestone_candidates(
 extern retcode_t iota_stor_transaction_approvers_count(
     connection_t const* const conn, flex_trit_t const* const hash,
     size_t* const count);
+
+extern retcode_t iota_stor_transaction_selective_load(
+    connection_t const* const conn, transaction_field_t const field,
+    trit_array_t const* const key, iota_stor_pack_t* const pack,
+    load_model_e const load_model);
 
 /*
  * Milestone operations
