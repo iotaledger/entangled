@@ -220,10 +220,11 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
                              .num_trits = HASH_LENGTH_TRIT,
                              .num_bytes = FLEX_TRIT_SIZE_243,
                              .dynamic = 0};
-  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
+  DECLARE_PACK_SINGLE_SOLID_STATE(curr_tx_s, curr_tx, pack);
 
-  ret = iota_tangle_transaction_load(ts->tangle, TRANSACTION_FIELD_HASH,
-                                     &hash_trits, &pack);
+  ret = iota_tangle_transaction_selective_load(
+      ts->tangle, TRANSACTION_FIELD_HASH, &hash_trits, &pack,
+      MODEL_TRANSACTION_SOLID);
   if (ret != RC_OK || pack.num_loaded == 0) {
     log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
               "No transactions were loaded for the provided hash\n");
@@ -268,14 +269,15 @@ static retcode_t check_transaction_and_update_solid_state(
 
   *is_new_solid = false;
 
-  DECLARE_PACK_SINGLE_TX(transaction_s, transaction, pack);
+  DECLARE_PACK_SINGLE_SOLID_STATE(transaction_s, transaction, pack);
   trit_array_t hash_trits = {.trits = hash,
                              .num_trits = NUM_TRITS_HASH,
                              .num_bytes = FLEX_TRIT_SIZE_243,
                              .dynamic = 0};
 
-  ret = iota_tangle_transaction_load(ts->tangle, TRANSACTION_FIELD_HASH,
-                                     &hash_trits, &pack);
+  ret = iota_tangle_transaction_selective_load(
+      ts->tangle, TRANSACTION_FIELD_HASH, &hash_trits, &pack,
+      MODEL_TRANSACTION_SOLID);
   if (ret != RC_OK || pack.num_loaded == 0) {
     log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
               "No transactions were loaded for the provided hash\n");
@@ -298,8 +300,8 @@ static retcode_t check_transaction_and_update_solid_state(
     }
 
     if (*is_new_solid) {
-      if ((ret = iota_tangle_transaction_update_solid_state(
-               ts->tangle, transaction->hash, true)) != RC_OK) {
+      if ((ret = iota_tangle_transaction_update_solid_state(ts->tangle, hash,
+                                                            true)) != RC_OK) {
         return ret;
       }
     }
@@ -313,20 +315,21 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts,
                                             bool *solid) {
   retcode_t ret = RC_OK;
 
-  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
+  DECLARE_PACK_SINGLE_SOLID_STATE(curr_tx_s, curr_tx, pack);
 
   trit_array_t approvee_trits = {.trits = approvee,
                                  .num_trits = HASH_LENGTH_TRIT,
                                  .num_bytes = FLEX_TRIT_SIZE_243,
                                  .dynamic = 0};
 
-  ret = iota_tangle_transaction_load(ts->tangle, TRANSACTION_FIELD_HASH,
-                                     &approvee_trits, &pack);
+  ret = iota_tangle_transaction_selective_load(
+      ts->tangle, TRANSACTION_FIELD_HASH, &approvee_trits, &pack,
+      MODEL_TRANSACTION_SOLID);
   if (ret != RC_OK || pack.num_loaded == 0) {
     *solid = false;
     return request_transaction(ts->requester, approvee, false);
   }
-  if (memcmp(curr_tx_s.hash, ts->conf->genesis_hash, FLEX_TRIT_SIZE_243) == 0) {
+  if (memcmp(approvee, ts->conf->genesis_hash, FLEX_TRIT_SIZE_243) == 0) {
     *solid = true;
     return ret;
   }
