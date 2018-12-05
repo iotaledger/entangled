@@ -8,12 +8,15 @@
 #include "gossip/components/transaction_requester.h"
 #include "common/storage/sql/defs.h"
 #include "consensus/tangle/tangle.h"
+#include "gossip/node.h"
+#include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 #include "utils/time.h"
 
 #define REQUESTER_LOGGER_ID "requester"
-#define REQUESTER_INTERVAL 100
+#define REQUESTER_INTERVAL 10
+#define REQUESTER_THRESHOLD 100
 
 /*
  * Private functions
@@ -21,12 +24,46 @@
 
 static void *transaction_requester_routine(
     transaction_requester_t *const transaction_requester) {
+  concurrent_list_node_neighbor_t *iter = NULL;
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t transaction[FLEX_TRIT_SIZE_8019];
+  retcode_t ret = RC_OK;
+  trit_array_t key = {.trits = hash,
+                      .num_trits = HASH_LENGTH_TRIT,
+                      .num_bytes = FLEX_TRIT_SIZE_243,
+                      .dynamic = 0};
+  DECLARE_PACK_SINGLE_TX(tx, txp, pack);
+
   if (transaction_requester == NULL) {
     return NULL;
   }
 
   while (transaction_requester->running) {
-    fprintf(stderr, "Requester\n");
+    if (requester_size(transaction_requester) > REQUESTER_THRESHOLD) {
+      tips_cache_random_tip(&transaction_requester->node->tips, hash);
+      if (flex_trits_are_null(hash, FLEX_TRIT_SIZE_243)) {
+        memset(transaction, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
+      } else {
+        hash_pack_reset(&pack);
+        ret = iota_tangle_transaction_load(transaction_requester->tangle,
+                                           TRANSACTION_FIELD_HASH, &key, &pack);
+        if (ret == RC_OK && pack.num_loaded != 0) {
+          transaction_serialize_on_flex_trits(txp, transaction);
+        } else {
+          memset(transaction, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
+        }
+      }
+      if (transaction_requester->node->neighbors) {
+        iter = transaction_requester->node->neighbors->front;
+        while (iter) {
+          if (neighbor_send(transaction_requester->node, &iter->data,
+                            transaction) != RC_OK) {
+            log_warning(REQUESTER_LOGGER_ID, "Sending request failed\n");
+          }
+          iter = iter->next;
+        }
+      }
+    }
     sleep_ms(REQUESTER_INTERVAL);
   }
 
@@ -38,15 +75,14 @@ static void *transaction_requester_routine(
  */
 
 retcode_t requester_init(transaction_requester_t *const transaction_requester,
-                         iota_gossip_conf_t *const conf,
-                         tangle_t *const tangle) {
-  if (transaction_requester == NULL || tangle == NULL || conf == NULL) {
+                         node_t *const node, tangle_t *const tangle) {
+  if (transaction_requester == NULL || node == NULL || tangle == NULL) {
     return RC_NULL_PARAM;
   }
 
   logger_helper_init(REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
   memset(transaction_requester, 0, sizeof(transaction_requester_t));
-  transaction_requester->conf = conf;
+  transaction_requester->node = node;
   transaction_requester->running = false;
   transaction_requester->milestones = NULL;
   transaction_requester->transactions = NULL;
@@ -101,6 +137,7 @@ retcode_t requester_destroy(
 
   hash243_set_free(&transaction_requester->milestones);
   hash243_set_free(&transaction_requester->transactions);
+  transaction_requester->node = NULL;
   transaction_requester->tangle = NULL;
   rw_lock_handle_destroy(&transaction_requester->lock);
   logger_helper_destroy(REQUESTER_LOGGER_ID);
@@ -159,7 +196,7 @@ bool requester_is_full(transaction_requester_t *const transaction_requester) {
   size = hash243_set_size(&transaction_requester->transactions);
   rw_lock_handle_unlock(&transaction_requester->lock);
 
-  return size >= transaction_requester->conf->requester_queue_size;
+  return size >= transaction_requester->node->conf.requester_queue_size;
 }
 
 retcode_t requester_clear_request(
@@ -204,8 +241,6 @@ retcode_t request_transaction(
     return RC_OK;
   }
 
-  fprintf(stderr, "Size %d\n", requester_size(transaction_requester));
-
   rw_lock_handle_wrlock(&transaction_requester->lock);
 
   if (is_milestone) {
@@ -216,7 +251,7 @@ retcode_t request_transaction(
     }
   } else if (!hash243_set_contains(&transaction_requester->milestones, hash) &&
              hash243_set_size(&transaction_requester->transactions) <
-                 transaction_requester->conf->requester_queue_size) {
+                 transaction_requester->node->conf.requester_queue_size) {
     if ((ret = hash243_set_add(&transaction_requester->transactions, hash)) !=
         RC_OK) {
       goto done;
@@ -236,7 +271,7 @@ retcode_t get_transaction_to_request(
   hash243_set_t *backup_set = NULL;
   hash243_set_entry_t *iter = NULL;
   hash243_set_entry_t *tmp = NULL;
-  trit_array_t key = {.trits = NULL,
+  trit_array_t key = {.trits = hash,
                       .num_trits = HASH_LENGTH_TRIT,
                       .num_bytes = FLEX_TRIT_SIZE_243,
                       .dynamic = 0};
@@ -256,16 +291,15 @@ retcode_t get_transaction_to_request(
   request_set = hash243_set_size(request_set) != 0 ? request_set : backup_set;
 
   HASH_ITER(hh, *request_set, iter, tmp) {
-    key.trits = iter->hash;
+    memcpy(hash, iter->hash, FLEX_TRIT_SIZE_243);
     if ((ret = iota_tangle_transaction_exist(transaction_requester->tangle,
                                              TRANSACTION_FIELD_HASH, &key,
                                              &exists)) != RC_OK) {
       goto done;
     }
-    if (exists) {
-      hash243_set_remove_entry(request_set, iter);
-    } else {
-      memcpy(hash, iter->hash, FLEX_TRIT_SIZE_243);
+    hash243_set_remove_entry(request_set, iter);
+    if (!exists) {
+      hash243_set_add(request_set, hash);
       break;
     }
   }
@@ -275,9 +309,9 @@ retcode_t get_transaction_to_request(
   }
 
   if (rand_handle_probability() <
-          transaction_requester->conf->p_remove_request &&
+          transaction_requester->node->conf.p_remove_request &&
       request_set != &transaction_requester->milestones) {
-    hash243_set_remove(request_set, iter->hash);
+    hash243_set_remove(request_set, hash);
   }
 
 done:

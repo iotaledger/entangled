@@ -7,6 +7,8 @@
 
 #include <string.h>
 
+#include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "gossip/components/processor.h"
 #include "gossip/neighbor.h"
 #include "gossip/node.h"

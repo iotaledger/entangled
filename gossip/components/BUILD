@@ -26,8 +26,6 @@ cc_library(
     name = "processor_shared",
     hdrs = ["processor.h"],
     deps = [
-        "//consensus/milestone_tracker",
-        "//consensus/transaction_solidifier",
         "//consensus/transaction_validator",
         "//gossip:iota_packet",
         "//utils/handles:cond",
@@ -43,6 +41,8 @@ cc_library(
     deps = [
         ":processor_shared",
         "//gossip:neighbor",
+        "//consensus/milestone_tracker",
+        "//consensus/transaction_solidifier",
         "//gossip:node_shared",
     ],
 )
@@ -64,19 +64,27 @@ cc_library(
 )
 
 cc_library(
-    name = "transaction_requester",
-    srcs = ["transaction_requester.c"],
+    name = "transaction_requester_shared",
     hdrs = ["transaction_requester.h"],
     deps = [
         "//common:errors",
-        "//consensus/tangle",
-        "//gossip:conf",
-        "//utils:logger_helper",
-        "//utils:time",
         "//utils/containers/hash:hash243_set",
-        "//utils/handles:rand",
         "//utils/handles:rw_lock",
         "//utils/handles:thread",
+    ],
+)
+
+cc_library(
+    name = "transaction_requester",
+    srcs = ["transaction_requester.c"],
+    deps = [
+        ":transaction_requester_shared",
+        "//consensus/tangle",
+        "//gossip:node_shared",
+        "//utils:logger_helper",
+        "//utils:time",
+        "//utils/containers/lists:concurrent_list_neighbor",
+        "//utils/handles:rand",
     ],
 )
 
