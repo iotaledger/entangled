@@ -454,8 +454,6 @@ iota_transaction_t transaction_new(void) {
     // errno = IOTA_OUT_OF_MEMORY
   }
   transaction_reset(transaction);
-  transaction->snapshot_index = 0;
-  transaction->solid = 0;
   return transaction;
 }
 

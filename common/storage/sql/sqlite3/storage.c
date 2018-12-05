@@ -357,8 +357,6 @@ static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
   tx->attachment_timestamp_lower = sqlite3_column_int64(statement, 13);
   column_decompress_load(statement, 14, tx->nonce, FLEX_TRIT_SIZE_81);
   column_decompress_load(statement, 15, tx->hash, FLEX_TRIT_SIZE_243);
-  tx->snapshot_index = sqlite3_column_int64(statement, 16);
-  tx->solid = sqlite3_column_int(statement, 17);
 }
 
 static void select_transactions_meta_fields_populate_from_row(
@@ -415,10 +413,7 @@ retcode_t iota_stor_transaction_store(connection_t const* const conn,
       column_compress_bind(sqlite_statement, 15, tx->nonce,
                            FLEX_TRIT_SIZE_81) != RC_OK ||
       column_compress_bind(sqlite_statement, 16, tx->hash,
-                           FLEX_TRIT_SIZE_243) != RC_OK ||
-      sqlite3_bind_int64(sqlite_statement, 17, tx->snapshot_index) !=
-          SQLITE_OK ||
-      sqlite3_bind_int(sqlite_statement, 18, tx->solid) != SQLITE_OK) {
+                           FLEX_TRIT_SIZE_243) != RC_OK) {
     ret = binding_error();
     goto done;
   }

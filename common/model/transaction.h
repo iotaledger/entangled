@@ -95,10 +95,6 @@ struct _iota_transaction {
   // 81 trytes = 243 trits
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   // Total 2754 trytes
-
-  // Metadata
-  uint64_t snapshot_index;
-  bool solid;
 };
 
 struct _iota_transaction_meta_view_model {

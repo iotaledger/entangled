@@ -25,8 +25,7 @@ char *iota_statement_transaction_insert =
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_UPPER
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_LOWER "," TRANSACTION_COL_NONCE
-    "," TRANSACTION_COL_HASH "," TRANSACTION_COL_SNAPSHOT_INDEX
-    "," TRANSACTION_COL_SOLID ")VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    "," TRANSACTION_COL_HASH ")VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 char *iota_statement_transaction_select_by_hash =
     "SELECT * FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
