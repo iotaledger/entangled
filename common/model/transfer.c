@@ -349,7 +349,8 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
 }
 
 transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[], size_t len,
-                                           Kerl* kerl) {
+                                           Kerl* kerl,
+                                           iota_transaction_t transaction) {
   transfer_ctx_t* transfer_ctx = NULL;
   transfer_iterator_t* transfer_iterator =
       (transfer_iterator_t*)calloc(1, sizeof(transfer_iterator_t));
@@ -358,6 +359,16 @@ transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[], size_t len,
               __LINE__);
     return NULL;
   }
+
+  if (transaction) {
+    transfer_iterator->transaction = transaction;
+    transfer_iterator->dynamic_transaction = 0;
+  } else {
+    // Dynamically allocate a transaction structure
+    transfer_iterator->transaction = transaction_new();
+    transfer_iterator->dynamic_transaction = 1;
+  }
+
   transfer_iterator->transfers = transfers;
   transfer_iterator->transfers_count = len;
   transfer_ctx = transfer_ctx_new();
@@ -401,12 +412,6 @@ iota_transaction_t transfer_iterator_next(
 
   if (transfer_iterator->current_transfer <
       transfer_iterator->transfers_count) {
-    // Dynamically allocate a transaction structure if none was
-    // previously provided with transfer_iterator_set_transaction
-    if (!transfer_iterator->transaction) {
-      transfer_iterator->transaction = transaction_new();
-      transfer_iterator->dynamic_transaction = 1;
-    }
     transfer_t* transfer =
         transfer_iterator->transfers[transfer_iterator->current_transfer];
     size_t count = transfer_transactions_count(transfer);

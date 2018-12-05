@@ -144,12 +144,10 @@ iota_transaction_t transfer_iterator_next(
     transfer_iterator_t *transfer_iterator);
 
 // Creates and returns a new transfer iterator
+// if `transaction` is NULL will be dynamically allocated a transaction object.
 transfer_iterator_t *transfer_iterator_new(transfer_t *transfers[], size_t len,
-                                           Kerl *kerl);
-// Set statically allocated transaction - If not used, will be dynamically
-// allocated
-void transfer_iterator_set_transaction(transfer_iterator_t *transfer_iterator,
-                                       iota_transaction_t transaction);
+                                           Kerl *kerl,
+                                           iota_transaction_t transaction);
 
 // Free an existing transfer iterator
 void transfer_iterator_free(transfer_iterator_t **iter);

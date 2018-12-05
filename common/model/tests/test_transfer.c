@@ -40,7 +40,7 @@ void test_value_out(void) {
   transfer_t* transfers[1] = {transfer};
   Kerl kerl = {};
   init_kerl(&kerl);
-  tf_iter = transfer_iterator_new(transfers, 1, &kerl);
+  tf_iter = transfer_iterator_new(transfers, 1, &kerl, &TX);
   TEST_ASSERT_NOT_NULL(tf_iter);
   tf_iter->transaction = &TX;
 
@@ -80,7 +80,7 @@ void test_transfer_data(void) {
   transfer_t* transfers[1] = {transfer};
   Kerl kerl = {};
   init_kerl(&kerl);
-  tf_iter = transfer_iterator_new(transfers, 1, &kerl);
+  tf_iter = transfer_iterator_new(transfers, 1, &kerl, NULL);
   TEST_ASSERT_NOT_NULL(tf_iter);
 
   tx = transfer_iterator_next(tf_iter);
