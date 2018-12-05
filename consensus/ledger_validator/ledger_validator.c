@@ -151,18 +151,6 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
   get_latest_delta_do_func_params_t *params =
       (get_latest_delta_do_func_params_t *)data;
   ledger_validator_t *lv = params->lv;
-
-  // Transaction is not marked solid, but it is a candidate
-  if (pack->num_loaded == 0) {
-    if (lv->transaction_requester) {
-      ret = request_transaction(lv->transaction_requester, hash,
-                                params->is_milestone);
-    }
-    params->valid_delta = false;
-    *should_stop = true;
-    return ret;
-  }
-
   iota_transaction_meta_view_model_t *tx = pack->models[0];
   *should_branch = true;
   if (tx->snapshot_index == 0 ||
@@ -269,7 +257,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   state_delta_t delta = NULL;
   state_delta_t patch = NULL;
 
-  DECLARE_PACK_SINGLE_SNAPSHOT_INDEX(tx, tx_ptr, pack);
+  DECLARE_PACK_SINGLE_META_TX(tx, tx_ptr, pack);
   trit_array_t milestone_hash = {.trits = milestone->hash,
                                  .num_trits = HASH_LENGTH_TRIT,
                                  .num_bytes = FLEX_TRIT_SIZE_243,
@@ -373,7 +361,7 @@ retcode_t iota_consensus_ledger_validator_update_delta(
   state_delta_t patch = NULL;
   hash243_set_t visited_hashes = NULL;
   bool valid_delta = true;
-  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
+  DECLARE_PACK_SINGLE_SOLID_STATE(tx, tx_ptr, pack);
   trit_array_t hash = {.trits = tip,
                        .num_trits = HASH_LENGTH_TRIT,
                        .num_bytes = FLEX_TRIT_SIZE_243,
