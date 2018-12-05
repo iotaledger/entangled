@@ -35,7 +35,7 @@ static retcode_t update_snapshot_milestone_do_func(flex_trit_t *const hash,
               __FUNCTION__);
     return RC_LEDGER_VALIDATOR_COULD_NOT_LOAD_MILESTONE;
   }
-  iota_transaction_t transaction = pack->models[0];
+  iota_transaction_meta_model_t *transaction = pack->models[0];
   *should_branch = transaction->snapshot_index == 0;
 
   if (*should_branch) {
@@ -150,7 +150,7 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
   get_latest_delta_do_func_params_t *params =
       (get_latest_delta_do_func_params_t *)data;
   ledger_validator_t *lv = params->lv;
-  iota_transaction_t tx = pack->models[0];
+  iota_transaction_meta_model_t *tx = pack->models[0];
 
   if (tx->snapshot_index == 0 ||
       tx->snapshot_index > params->latest_snapshot_index) {

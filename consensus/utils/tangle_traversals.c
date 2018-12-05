@@ -19,7 +19,7 @@ retcode_t tangle_traversal_dfs_to_genesis(
   hash243_set_t analyzed_hashes_local = NULL;
   hash243_set_t *analyzed_hashes =
       analyzed_hashes_param ? analyzed_hashes_param : &analyzed_hashes_local;
-  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
+  DECLARE_PACK_SINGLE_META_TX(tx, tx_ptr, pack);
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   trit_array_t tx_hash = {.trits = hash,
                           .num_trits = HASH_LENGTH_TRIT,
@@ -42,8 +42,9 @@ retcode_t tangle_traversal_dfs_to_genesis(
     hash243_stack_pop(&non_analyzed_hashes);
     if (!hash243_set_contains(analyzed_hashes, tx_hash.trits)) {
       hash_pack_reset(&pack);
-      if ((ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
-                                              &tx_hash, &pack)) != RC_OK) {
+      if ((ret = iota_tangle_transaction_selective_load(
+               tangle, TRANSACTION_FIELD_HASH, &tx_hash, &pack,
+               MODEL_TRANSACTION_META_ALL)) != RC_OK) {
         break;
       }
 
