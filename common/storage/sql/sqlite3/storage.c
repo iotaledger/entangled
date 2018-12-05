@@ -100,8 +100,9 @@ static void select_transactions_meta_fields_populate_from_row(
   column_decompress_load(statement, 7, tx->trunk, FLEX_TRIT_SIZE_243);
   column_decompress_load(statement, 8, tx->branch, FLEX_TRIT_SIZE_243);
   column_decompress_load(statement, 9, tx->tag, FLEX_TRIT_SIZE_81);
-  tx->snapshot_index = sqlite3_column_int64(statement, 10);
-  tx->solid = sqlite3_column_int(statement, 11);
+  column_decompress_load(statement, 10, tx->hash, FLEX_TRIT_SIZE_243);
+  tx->snapshot_index = sqlite3_column_int64(statement, 11);
+  tx->solid = sqlite3_column_int(statement, 12);
 }
 
 /*

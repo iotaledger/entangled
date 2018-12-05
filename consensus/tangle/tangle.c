@@ -254,16 +254,18 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
                                 trit_array_t *const tail,
                                 bool *const found_tail) {
   retcode_t res = RC_OK;
-  struct _iota_transaction next_tx_s;
-  iota_transaction_t next_tx = &next_tx_s;
+  struct _iota_transaction_meta_model next_tx_s;
+  iota_transaction_meta_model_t *next_tx = &next_tx_s;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   bool found_approver = false;
-  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, tx_pack);
+  DECLARE_PACK_SINGLE_META_TX(curr_tx_s, curr_tx, tx_pack);
+  flex_trit_t *curr_hash = tx_hash->trits;
 
   *found_tail = false;
 
-  res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, tx_hash,
-                                     &tx_pack);
+  res = iota_tangle_transaction_selective_load(tangle, TRANSACTION_FIELD_HASH,
+                                               tx_hash, &tx_pack,
+                                               MODEL_TRANSACTION_META_ALL);
   if (res != RC_OK || tx_pack.num_loaded == 0) {
     return res;
   }
@@ -297,8 +299,9 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
           (trit_array_t *)hash_pack.models[approver_idx];
       tx_pack.models = (void **)(&next_tx);
       hash_pack_reset(&tx_pack);
-      res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
-                                         approver_hash, &tx_pack);
+      res = iota_tangle_transaction_selective_load(
+          tangle, TRANSACTION_FIELD_HASH, approver_hash, &tx_pack,
+          MODEL_TRANSACTION_META_ALL);
       if (res != RC_OK || tx_pack.num_loaded == 0) {
         break;
       }
