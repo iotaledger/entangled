@@ -30,7 +30,7 @@ extern "C" {
 typedef struct transaction_solidifier_s {
   iota_consensus_conf_t *conf;
   tangle_t *tangle;
-  requester_state_t *requester;
+  transaction_requester_t *transaction_requester;
   thread_handle_t thread;
   bool running;
   lock_handle_t lock;
@@ -41,7 +41,8 @@ typedef struct transaction_solidifier_s {
 
 retcode_t iota_consensus_transaction_solidifier_init(
     transaction_solidifier_t *const ts, iota_consensus_conf_t *const conf,
-    tangle_t *const tangle, requester_state_t *const requester,
+    tangle_t *const tangle,
+    transaction_requester_t *const transaction_requester,
     tips_cache_t *const tips);
 
 retcode_t iota_consensus_transaction_solidifier_start(

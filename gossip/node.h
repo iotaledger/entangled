@@ -34,7 +34,7 @@ typedef struct node_s {
   processor_t processor;
   receiver_state_t receiver;
   responder_t responder;
-  requester_state_t transaction_requester;
+  transaction_requester_t transaction_requester;
   tips_requester_t tips_requester;
   neighbor_t* neighbors;
   rw_lock_handle_t neighbors_lock;

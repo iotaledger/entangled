@@ -112,11 +112,12 @@ static retcode_t propagate_solid_transactions(
 
 retcode_t iota_consensus_transaction_solidifier_init(
     transaction_solidifier_t *const ts, iota_consensus_conf_t *const conf,
-    tangle_t *const tangle, requester_state_t *const requester,
+    tangle_t *const tangle,
+    transaction_requester_t *const transaction_requester,
     tips_cache_t *const tips) {
   ts->conf = conf;
   ts->tangle = tangle;
-  ts->requester = requester;
+  ts->transaction_requester = transaction_requester;
   ts->running = false;
   ts->newly_set_solid_transactions = NULL;
   ts->solid_transactions_candidates = NULL;
@@ -176,7 +177,7 @@ retcode_t iota_consensus_transaction_solidifier_destroy(
   }
 
   ts->tangle = NULL;
-  ts->requester = NULL;
+  ts->transaction_requester = NULL;
   ts->newly_set_solid_transactions = NULL;
   ts->solid_transactions_candidates = NULL;
   ts->conf = NULL;
@@ -203,7 +204,8 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash,
   } else if (pack->num_loaded == 0) {
     if (memcmp(hash, ts->conf->genesis_hash, FLEX_TRIT_SIZE_243) != 0) {
       params->is_solid = false;
-      return request_transaction(ts->requester, hash, params->is_milestone);
+      return request_transaction(ts->transaction_requester, hash,
+                                 params->is_milestone);
     }
   }
 
@@ -323,7 +325,7 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts,
                                      &approvee_trits, &pack);
   if (ret != RC_OK || pack.num_loaded == 0) {
     *solid = false;
-    return request_transaction(ts->requester, approvee, false);
+    return request_transaction(ts->transaction_requester, approvee, false);
   }
   if (memcmp(curr_tx_s.hash, ts->conf->genesis_hash, FLEX_TRIT_SIZE_243) == 0) {
     *solid = true;
@@ -338,7 +340,7 @@ retcode_t iota_consensus_transaction_solidifier_check_and_update_solid_state(
   retcode_t ret;
   bool is_new_solid;
 
-  if (ts->requester == NULL) {
+  if (ts->transaction_requester == NULL) {
     return RC_OK;
   }
 
@@ -379,7 +381,8 @@ retcode_t iota_consensus_transaction_solidifier_update_status(
   retcode_t ret = RC_OK;
   size_t approvers_count = 0;
 
-  if ((ret = requester_clear_request(ts->requester, tx->hash)) != RC_OK) {
+  if ((ret = requester_clear_request(ts->transaction_requester, tx->hash)) !=
+      RC_OK) {
     return ret;
   }
 
