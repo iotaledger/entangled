@@ -43,6 +43,11 @@ typedef struct bind_execute_hash_params_s {
 static retcode_t bind_execute_hash_do_func(
     bind_execute_hash_params_t* const params, flex_trit_t const* const hash);
 
+static void column_decompress_load(sqlite3_stmt* const statement,
+                                   size_t const index,
+                                   flex_trit_t* const flex_trits,
+                                   size_t const num_bytes);
+
 /*
  * BEGIN / END transaction
  */
@@ -67,6 +72,36 @@ static retcode_t rollback_transaction(sqlite3* const db) {
     return RC_SQLITE3_FAILED_ROLLBACK;
   }
   return RC_OK;
+}
+
+static void select_transactions_solid_state_populate_from_row(
+    sqlite3_stmt* const statement, iota_transaction_solid_model_t* const vm) {
+  vm->solid = sqlite3_column_int(statement, 0);
+  column_decompress_load(statement, 1, vm->trunk, FLEX_TRIT_SIZE_243);
+  column_decompress_load(statement, 2, vm->branch, FLEX_TRIT_SIZE_243);
+}
+static void select_transactions_snapshot_index_populate_from_row(
+    sqlite3_stmt* const statement,
+    iota_transaction_snapshot_index_model_t* const vm) {
+  vm->snapshot_index = sqlite3_column_int64(statement, 0);
+  column_decompress_load(statement, 1, vm->trunk, FLEX_TRIT_SIZE_243);
+  column_decompress_load(statement, 2, vm->branch, FLEX_TRIT_SIZE_243);
+}
+
+static void select_transactions_meta_fields_populate_from_row(
+    sqlite3_stmt* const statement, iota_transaction_meta_model_t* const tx) {
+  column_decompress_load(statement, 0, tx->address, FLEX_TRIT_SIZE_243);
+  tx->value = sqlite3_column_int64(statement, 1);
+  column_decompress_load(statement, 2, tx->obsolete_tag, FLEX_TRIT_SIZE_81);
+  tx->timestamp = sqlite3_column_int64(statement, 3);
+  tx->current_index = sqlite3_column_int64(statement, 4);
+  tx->last_index = sqlite3_column_int64(statement, 5);
+  column_decompress_load(statement, 6, tx->bundle, FLEX_TRIT_SIZE_243);
+  column_decompress_load(statement, 7, tx->trunk, FLEX_TRIT_SIZE_243);
+  column_decompress_load(statement, 8, tx->branch, FLEX_TRIT_SIZE_243);
+  column_decompress_load(statement, 9, tx->tag, FLEX_TRIT_SIZE_81);
+  tx->snapshot_index = sqlite3_column_int64(statement, 10);
+  tx->solid = sqlite3_column_int(statement, 11);
 }
 
 /*
@@ -164,14 +199,23 @@ static retcode_t execute_statement_load_gen(
       pack->insufficient_capacity = (pack->num_loaded == pack->capacity);
       break;
     }
-    if (model == MODEL_TRANSACTION_HASH) {
+    if (model == MODEL_TRANSACTION_ALL) {
+      select_transactions_populate_from_row(sqlite_statement,
+                                            pack->models[pack->num_loaded++]);
+    } else if (model == MODEL_TRANSACTION_HASH) {
       column_decompress_load(
           sqlite_statement, 0,
           ((trit_array_p)pack->models[pack->num_loaded++])->trits,
           FLEX_TRIT_SIZE_243);
-    } else if (model == MODEL_TRANSACTION_ALL) {
-      select_transactions_populate_from_row(sqlite_statement,
-                                            pack->models[pack->num_loaded++]);
+    } else if (model == MODEL_TRANSACTION_META_ALL) {
+      select_transactions_meta_fields_populate_from_row(
+          sqlite_statement, pack->models[pack->num_loaded++]);
+    } else if (model == MODEL_TRANSACTION_SNAPSHOT_INDEX) {
+      select_transactions_snapshot_index_populate_from_row(
+          sqlite_statement, pack->models[pack->num_loaded++]);
+    } else if (model == MODEL_TRANSACTION_SOLID) {
+      select_transactions_solid_state_populate_from_row(
+          sqlite_statement, pack->models[pack->num_loaded++]);
     } else if (model == MODEL_MILESTONE) {
       select_milestones_populate_from_row(sqlite_statement,
                                           pack->models[pack->num_loaded++]);
