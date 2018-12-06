@@ -270,8 +270,9 @@ void test_transaction_update_snapshot_index(void) {
                   &conn, (flex_trit_t *)TEST_TRANSACTION.hash, 123456) ==
               RC_OK);
   hash_pack_reset(&pack);
-  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
-                                         &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_transaction_selective_load(
+                  &conn, TRANSACTION_FIELD_HASH, &hash, &pack,
+                  MODEL_TRANSACTION_SNAPSHOT_INDEX) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_INT(tx.snapshot_index, 123456);
 }
