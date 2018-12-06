@@ -9,7 +9,6 @@
 #include <string.h>
 
 #include "ciri/core.h"
-#include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 

@@ -18,7 +18,6 @@ cc_library(
         ":broadcaster_shared",
         "//gossip:node_shared",
         "//utils:logger_helper",
-        "//utils/containers/lists:concurrent_list_neighbor",
     ],
 )
 
@@ -29,6 +28,7 @@ cc_library(
         "//consensus/milestone_tracker",
         "//consensus/transaction_solidifier",
         "//consensus/transaction_validator",
+        "//gossip:iota_packet",
         "//utils/handles:cond",
         "//utils/handles:lock",
         "//utils/handles:rw_lock",
@@ -41,8 +41,8 @@ cc_library(
     srcs = ["processor.c"],
     deps = [
         ":processor_shared",
+        "//gossip:neighbor",
         "//gossip:node_shared",
-        "//utils/containers/lists:concurrent_list_neighbor",
     ],
 )
 
@@ -115,8 +115,9 @@ cc_library(
     srcs = ["tips_requester.c"],
     deps = [
         ":tips_requester_shared",
+        "//common/model:milestone",
         "//gossip:iota_packet",
+        "//gossip:node_shared",
         "//utils:logger_helper",
-        "//utils/containers/lists:concurrent_list_neighbor",
     ],
 )

@@ -1,16 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "concurrent_list_neighbor",
-    srcs = ["concurrent_list_neighbor.c"],
-    hdrs = ["concurrent_list_neighbor.h"],
-    deps = [
-        ":concurrent_list",
-        "//gossip:neighbor",
-    ],
-)
-
-cc_library(
     name = "concurrent_list_trit_array",
     srcs = ["concurrent_list_trit_array.c"],
     hdrs = ["concurrent_list_trit_array.h"],

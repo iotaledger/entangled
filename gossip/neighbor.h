@@ -10,13 +10,15 @@
 
 #include <stdbool.h>
 
+#include "utlist.h"
+
 #include "common/errors.h"
-#include "common/network/endpoint.h"
 #include "common/trinary/flex_trit.h"
+#include "gossip/iota_packet.h"
+#include "utarray.h"
 
 // Forward declarations
 typedef struct node_s node_t;
-typedef struct iota_packet_s iota_packet_t;
 
 typedef struct neighbor_s {
   endpoint_t endpoint;
@@ -25,7 +27,7 @@ typedef struct neighbor_s {
   unsigned int nbr_invalid_tx;
   unsigned int nbr_sent_tx;
   unsigned int nbr_random_tx_req;
-  bool flagged;
+  struct neighbor_s *next;
 } neighbor_t;
 
 #ifdef __cplusplus
@@ -80,6 +82,72 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor,
  */
 retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
                         flex_trit_t const *const transaction);
+
+/**
+ * Adds a neighbor to a neighbors list
+ *
+ * @param neighbors The neighbors list
+ * @param neighbor The neighbor
+ *
+ * @return a status code
+ */
+retcode_t neighbors_add(neighbor_t **const neighbors,
+                        neighbor_t const *const neighbor);
+
+/**
+ * Removes a neighbor from a neighbors list
+ *
+ * @param neighbors The neighbors list
+ * @pram neighbor The neighbor
+ *
+ * @return a status code
+ */
+retcode_t neighbors_remove(neighbor_t **const neighbors,
+                           neighbor_t const *const neighbor);
+
+/**
+ * Frees a neighbors list
+ *
+ * @param neighbors The neighbors list
+ *
+ * @return a status code
+ */
+retcode_t neighbors_free(neighbor_t **const neighbors);
+
+/**
+ * Gives the size of the neighbors list
+ *
+ * @param neighbors The neighbors list
+ *
+ * @return the size of the neighbors list
+ */
+size_t neighbors_count(neighbor_t *const neighbors);
+
+/**
+ * Finds a neigbor matching given endpoint
+ *
+ * @param neighbors The neighbors list
+ * @param endpoint The endpoint
+ *
+ * @return a pointer to the neigbor if found, NULL otherwise
+ */
+neighbor_t *neighbors_find_by_endpoint(neighbor_t *const neighbors,
+                                       endpoint_t const *const endpoint);
+
+/**
+ * Finds a neigbor matching given endpoint values
+ *
+ * @param neighbors The neighbors list
+ * @param ip The endpoint ip
+ * @param port The endpoint port
+ * @param protocol The endpoint protocol
+ *
+ * @return a pointer to the neigbor if found, NULL otherwise
+ */
+neighbor_t *neighbors_find_by_endpoint_values(neighbor_t *const neighbors,
+                                              char const *const ip,
+                                              uint16_t const port,
+                                              protocol_type_t const protocol);
 
 #ifdef __cplusplus
 }
