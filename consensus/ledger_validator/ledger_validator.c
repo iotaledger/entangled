@@ -258,9 +258,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
                                  .num_trits = HASH_LENGTH_TRIT,
                                  .num_bytes = FLEX_TRIT_SIZE_243,
                                  .dynamic = 0};
-
   *has_snapshot = false;
-  rw_lock_handle_wrlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
 
   if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_FIELD_HASH,
                                           &milestone_hash, &pack)) != RC_OK) {
@@ -314,7 +312,6 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   }
 
 done:
-  rw_lock_handle_unlock(&lv->milestone_tracker->latest_snapshot->rw_lock);
   state_delta_destroy(&delta);
   state_delta_destroy(&patch);
   return ret;
