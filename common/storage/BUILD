@@ -1,6 +1,11 @@
 cc_library(
     name = "storage",
-    srcs = glob(["*.c"]),
+    srcs = glob(
+        [
+            "*.c",
+            "enums.h",
+        ],
+    ),
     hdrs = glob(["*.h"]),
     visibility = ["//visibility:public"],
     deps = [
@@ -14,7 +19,10 @@ cc_library(
 
 cc_library(
     name = "pack",
-    srcs = ["pack.c"],
+    srcs = [
+        "enums.h",
+        "pack.c",
+    ],
     hdrs = ["pack.h"],
     visibility = ["//visibility:public"],
     deps = [

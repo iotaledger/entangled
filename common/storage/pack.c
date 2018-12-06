@@ -45,6 +45,7 @@ retcode_t hash_pack_init(iota_stor_pack_t *pack, size_t size) {
   pack->num_loaded = 0;
   pack->insufficient_capacity = false;
   pack->models = malloc(sizeof(trit_array_p) * pack->capacity);
+  pack->load_model = MODEL_TRANSACTION_HASH;
   if (pack->models == NULL) {
     log_error(STORAGE_PACKS_LOGGER_ID, "Failed in malloc\n");
     return RC_STORAGE_OOM;

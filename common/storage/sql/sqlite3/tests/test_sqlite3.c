@@ -109,7 +109,8 @@ void test_stored_transaction(void) {
   iota_stor_pack_t pack = {.models = (void **)txs,
                            .capacity = 5,
                            .num_loaded = 0,
-                           .insufficient_capacity = false};
+                           .insufficient_capacity = false,
+                           .load_model = MODEL_TRANSACTION_ALL};
 
   for (int i = 0; i < 5; ++i) {
     pack.models[i] = transaction_new();
@@ -196,7 +197,8 @@ void test_stored_milestone(void) {
   iota_stor_pack_t pack = {.models = (void **)milestones,
                            .num_loaded = 0,
                            .capacity = 5,
-                           .insufficient_capacity = false};
+                           .insufficient_capacity = false,
+                           .load_model = MODEL_TRANSACTION_ALL};
 
   for (int i = 0; i < 5; ++i) {
     pack.models[i] = malloc(sizeof(iota_milestone_t));
@@ -215,7 +217,8 @@ void test_stored_load_hashes_by_address(void) {
   iota_stor_pack_t pack = {.models = (void **)hashes,
                            .capacity = 5,
                            .num_loaded = 0,
-                           .insufficient_capacity = false};
+                           .insufficient_capacity = false,
+                           .load_model = MODEL_TRANSACTION_HASH};
 
   for (int i = 0; i < pack.capacity; ++i) {
     pack.models[i] = trit_array_new(NUM_TRITS_ADDRESS);
@@ -240,7 +243,8 @@ void test_stored_load_hashes_of_approvers(void) {
   iota_stor_pack_t pack = {.models = (void **)hashes,
                            .capacity = 5,
                            .num_loaded = 0,
-                           .insufficient_capacity = false};
+                           .insufficient_capacity = false,
+                           .load_model = MODEL_TRANSACTION_HASH};
 
   for (int i = 0; i < pack.capacity; ++i) {
     pack.models[i] = trit_array_new(NUM_TRITS_HASH);

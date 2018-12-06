@@ -348,12 +348,6 @@ static retcode_t bind_execute_hash_do_func(
  * Transaction operations
  */
 
-static retcode_t execute_statement_load_transactions(
-    sqlite3_stmt* const sqlite_statement, iota_stor_pack_t* const pack) {
-  return execute_statement_load_gen(sqlite_statement, pack, pack->capacity,
-                                    MODEL_TRANSACTION_ALL);
-}
-
 static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
                                                   iota_transaction_t const tx) {
   column_decompress_load(statement, 0, tx->signature_or_message,
@@ -430,38 +424,8 @@ retcode_t iota_stor_transaction_load(connection_t const* const conn,
                                      transaction_field_t const field,
                                      trit_array_t const* const key,
                                      iota_stor_pack_t* const pack) {
-  retcode_t ret = RC_OK;
-  char* statement = NULL;
-  sqlite3_stmt* sqlite_statement = NULL;
-
-  switch (field) {
-    case TRANSACTION_FIELD_HASH:
-      statement = iota_statement_transaction_select_by_hash;
-      break;
-    default:
-      return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
-      break;
-  }
-
-  if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
-                               statement)) != RC_OK) {
-    goto done;
-  }
-
-  if (column_compress_bind(sqlite_statement, 1, key->trits, key->num_bytes) !=
-      RC_OK) {
-    ret = binding_error();
-    goto done;
-  }
-
-  if ((ret = execute_statement_load_transactions(sqlite_statement, pack)) !=
-      RC_OK) {
-    goto done;
-  }
-
-done:
-  finalize_statement(sqlite_statement);
-  return ret;
+  return iota_stor_transaction_selective_load(conn, field, key, pack,
+                                              MODEL_TRANSACTION_ALL);
 }
 
 retcode_t iota_stor_transaction_selective_load(connection_t const* const conn,
@@ -472,6 +436,8 @@ retcode_t iota_stor_transaction_selective_load(connection_t const* const conn,
   retcode_t ret = RC_OK;
   char* statement;
   sqlite3_stmt* sqlite_statement = NULL;
+  assert(pack->load_model == load_model);
+
   switch (field) {
     case TRANSACTION_FIELD_HASH:
       if (load_model == MODEL_TRANSACTION_META_ALL) {
@@ -480,6 +446,8 @@ retcode_t iota_stor_transaction_selective_load(connection_t const* const conn,
         statement = iota_statement_transaction_select_snapshot_by_hash;
       } else if (load_model == MODEL_TRANSACTION_SOLID) {
         statement = iota_statement_transaction_select_solid_by_hash;
+      } else if (load_model == MODEL_TRANSACTION_ALL) {
+        statement = iota_statement_transaction_select_by_hash;
       } else {
         return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
       }
@@ -512,6 +480,7 @@ retcode_t iota_stor_transaction_load_hashes(connection_t const* const conn,
   retcode_t ret = RC_OK;
   char* statement = NULL;
   sqlite3_stmt* sqlite_statement = NULL;
+  assert(pack->load_model == MODEL_TRANSACTION_HASH);
 
   switch (field) {
     case TRANSACTION_FIELD_ADDRESS:
@@ -519,7 +488,6 @@ retcode_t iota_stor_transaction_load_hashes(connection_t const* const conn,
       break;
     default:
       return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
-      break;
   }
 
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
@@ -547,6 +515,7 @@ retcode_t iota_stor_transaction_load_hashes_of_approvers(
     iota_stor_pack_t* const pack) {
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
+  assert(pack->load_model == MODEL_TRANSACTION_HASH);
 
   if ((ret = prepare_statement(
            (sqlite3*)conn->db, &sqlite_statement,
@@ -576,6 +545,7 @@ retcode_t iota_stor_transaction_load_hashes_of_requests(
     size_t const limit) {
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
+  assert(pack->load_model == MODEL_TRANSACTION_HASH);
 
   if ((ret = prepare_statement(
            (sqlite3*)conn->db, &sqlite_statement,
@@ -603,6 +573,7 @@ retcode_t iota_stor_transaction_load_hashes_of_tips(
     size_t const limit) {
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
+  assert(pack->load_model == MODEL_TRANSACTION_HASH);
 
   if ((ret = prepare_statement(
            (sqlite3*)conn->db, &sqlite_statement,
@@ -629,6 +600,7 @@ retcode_t iota_stor_transaction_load_hashes_of_milestone_candidates(
     flex_trit_t const* const coordinator) {
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
+  assert(pack->load_model == MODEL_TRANSACTION_HASH);
 
   if ((ret = prepare_statement(
            (sqlite3*)conn->db, &sqlite_statement,

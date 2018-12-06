@@ -13,6 +13,7 @@
 #include "common/errors.h"
 #include "common/storage/connection.h"
 #include "common/storage/defs.h"
+#include "common/storage/enums.h"
 #include "common/storage/pack.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/snapshot/state_delta.h"
@@ -39,15 +40,6 @@ typedef enum transaction_field_e {
   TRANSACTION_FIELD_HASH,
   TRANSACTION_FIELD_ADDRESS
 } transaction_field_t;
-
-typedef enum load_model_e {
-  MODEL_MILESTONE,
-  MODEL_TRANSACTION_ALL,
-  MODEL_TRANSACTION_HASH,
-  MODEL_TRANSACTION_META_ALL,
-  MODEL_TRANSACTION_SNAPSHOT_INDEX,
-  MODEL_TRANSACTION_SOLID,
-} load_model_e;
 
 extern retcode_t iota_stor_transaction_store(connection_t const* const conn,
                                              iota_transaction_t const data_in);

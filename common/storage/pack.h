@@ -12,37 +12,42 @@
 #include <stdint.h>
 
 #include "common/errors.h"
+#include "common/storage/enums.h"
 
 typedef struct iota_stor_pack_s {
   void **models;
   size_t capacity;
   size_t num_loaded;
   bool insufficient_capacity;
+  load_model_e load_model
 } iota_stor_pack_t;
 
-#define DECLARE_PACK_SINGLE(TYPE, NAME, PTR_NAME, PACK_NAME)    \
-  TYPE NAME;                                                    \
-  TYPE *PTR_NAME = &NAME;                                       \
-  iota_stor_pack_t PACK_NAME = {.models = (void **)(&PTR_NAME), \
-                                .capacity = 1,                  \
-                                .num_loaded = 0,                \
-                                .insufficient_capacity = false};
+#define DECLARE_PACK_SINGLE(TYPE, NAME, PTR_NAME, PACK_NAME, LOAD_MODEL) \
+  TYPE NAME;                                                             \
+  TYPE *PTR_NAME = &NAME;                                                \
+  iota_stor_pack_t PACK_NAME = {.models = (void **)(&PTR_NAME),          \
+                                .capacity = 1,                           \
+                                .num_loaded = 0,                         \
+                                .insufficient_capacity = false,          \
+                                .load_model = LOAD_MODEL};
 
-#define DECLARE_PACK_SINGLE_TX(NAME, PTR_NAME, PACK_NAME) \
-  DECLARE_PACK_SINGLE(struct _iota_transaction, NAME, PTR_NAME, PACK_NAME)
+#define DECLARE_PACK_SINGLE_TX(NAME, PTR_NAME, PACK_NAME)                  \
+  DECLARE_PACK_SINGLE(struct _iota_transaction, NAME, PTR_NAME, PACK_NAME, \
+                      MODEL_TRANSACTION_ALL)
 
-#define DECLARE_PACK_SINGLE_MILESTONE(NAME, PTR_NAME, PACK_NAME) \
-  DECLARE_PACK_SINGLE(iota_milestone_t, NAME, PTR_NAME, PACK_NAME)
+#define DECLARE_PACK_SINGLE_MILESTONE(NAME, PTR_NAME, PACK_NAME)   \
+  DECLARE_PACK_SINGLE(iota_milestone_t, NAME, PTR_NAME, PACK_NAME, \
+                      MODEL_MILESTONE)
 
 #define DECLARE_PACK_SINGLE_META_TX(NAME, PTR_NAME, PACK_NAME)             \
   DECLARE_PACK_SINGLE(struct _iota_transaction_meta_model, NAME, PTR_NAME, \
-                      PACK_NAME)
+                      PACK_NAME, MODEL_TRANSACTION_META_ALL)
 #define DECLARE_PACK_SINGLE_SOLID_STATE(NAME, PTR_NAME, PACK_NAME)          \
   DECLARE_PACK_SINGLE(struct _iota_transaction_solid_model, NAME, PTR_NAME, \
-                      PACK_NAME)
+                      PACK_NAME, MODEL_TRANSACTION_SOLID)
 #define DECLARE_PACK_SINGLE_SNAPSHOT_INDEX(NAME, PTR_NAME, PACK_NAME)      \
   DECLARE_PACK_SINGLE(struct _iota_transaction_snapshot_index_model, NAME, \
-                      PTR_NAME, PACK_NAME)
+                      PTR_NAME, PACK_NAME, MODEL_TRANSACTION_SNAPSHOT_INDEX)
 
 #ifdef __cplusplus
 extern "C" {
