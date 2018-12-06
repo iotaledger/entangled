@@ -83,7 +83,7 @@ cc_library(
         "//gossip:node_shared",
         "//utils:logger_helper",
         "//utils:time",
-        "//utils/containers/lists:concurrent_list_neighbor",
+        "//utils/containers/lists:concurrent_list_neighbor_shared",
         "//utils/handles:rand",
     ],
 )

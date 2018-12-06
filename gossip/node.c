@@ -52,8 +52,8 @@ static retcode_t node_transaction_requester_init(node_t* const node,
   retcode_t ret = RC_OK;
   iota_stor_pack_t pack;
 
-  if ((ret = requester_init(&node->transaction_requester, &node->conf,
-                            tangle)) != RC_OK) {
+  if ((ret = requester_init(&node->transaction_requester, node, tangle)) !=
+      RC_OK) {
     return ret;
   }
 
