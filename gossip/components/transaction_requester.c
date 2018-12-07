@@ -39,31 +39,33 @@ static void *transaction_requester_routine(
   }
 
   while (transaction_requester->running) {
-    if (requester_size(transaction_requester) > REQUESTER_THRESHOLD) {
-      tips_cache_random_tip(&transaction_requester->node->tips, hash);
-      if (flex_trits_are_null(hash, FLEX_TRIT_SIZE_243)) {
-        memset(transaction, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
+    if (requester_size(transaction_requester) <= REQUESTER_THRESHOLD) {
+      goto sleep;
+    }
+    tips_cache_random_tip(&transaction_requester->node->tips, hash);
+    if (flex_trits_are_null(hash, FLEX_TRIT_SIZE_243)) {
+      memset(transaction, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
+    } else {
+      hash_pack_reset(&pack);
+      ret = iota_tangle_transaction_load(transaction_requester->tangle,
+                                         TRANSACTION_FIELD_HASH, &key, &pack);
+      if (ret == RC_OK && pack.num_loaded != 0) {
+        transaction_serialize_on_flex_trits(txp, transaction);
       } else {
-        hash_pack_reset(&pack);
-        ret = iota_tangle_transaction_load(transaction_requester->tangle,
-                                           TRANSACTION_FIELD_HASH, &key, &pack);
-        if (ret == RC_OK && pack.num_loaded != 0) {
-          transaction_serialize_on_flex_trits(txp, transaction);
-        } else {
-          memset(transaction, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
-        }
-      }
-      if (transaction_requester->node->neighbors) {
-        iter = transaction_requester->node->neighbors->front;
-        while (iter) {
-          if (neighbor_send(transaction_requester->node, &iter->data,
-                            transaction) != RC_OK) {
-            log_warning(REQUESTER_LOGGER_ID, "Sending request failed\n");
-          }
-          iter = iter->next;
-        }
+        memset(transaction, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
       }
     }
+    if (transaction_requester->node->neighbors) {
+      iter = transaction_requester->node->neighbors->front;
+      while (iter) {
+        if (neighbor_send(transaction_requester->node, &iter->data,
+                          transaction) != RC_OK) {
+          log_warning(REQUESTER_LOGGER_ID, "Sending request failed\n");
+        }
+        iter = iter->next;
+      }
+    }
+  sleep:
     sleep_ms(REQUESTER_INTERVAL);
   }
 
