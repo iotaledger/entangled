@@ -16,6 +16,7 @@ cc_library(
     srcs = ["broadcaster.c"],
     deps = [
         ":broadcaster_shared",
+        "//gossip:neighbor",
         "//gossip:node_shared",
         "//utils:logger_helper",
     ],
