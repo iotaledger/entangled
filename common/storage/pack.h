@@ -19,7 +19,7 @@ typedef struct iota_stor_pack_s {
   size_t capacity;
   size_t num_loaded;
   bool insufficient_capacity;
-  load_model_e load_model
+  load_model_e load_model;
 } iota_stor_pack_t;
 
 #define DECLARE_PACK_SINGLE(TYPE, NAME, PTR_NAME, PACK_NAME, LOAD_MODEL) \
