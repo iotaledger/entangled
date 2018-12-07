@@ -85,6 +85,7 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
 
 /**
  * Adds a neighbor to a neighbors list
+ * The caller must hold the neighbors lock in write access
  *
  * @param neighbors The neighbors list
  * @param neighbor The neighbor
@@ -96,6 +97,7 @@ retcode_t neighbors_add(neighbor_t **const neighbors,
 
 /**
  * Removes a neighbor from a neighbors list
+ * The caller must hold the neighbors lock in write access
  *
  * @param neighbors The neighbors list
  * @pram neighbor The neighbor
@@ -107,6 +109,7 @@ retcode_t neighbors_remove(neighbor_t **const neighbors,
 
 /**
  * Frees a neighbors list
+ * The caller must hold the neighbors lock in write access
  *
  * @param neighbors The neighbors list
  *
@@ -116,6 +119,7 @@ retcode_t neighbors_free(neighbor_t **const neighbors);
 
 /**
  * Gives the size of the neighbors list
+ * The caller must hold the neighbors lock in read access
  *
  * @param neighbors The neighbors list
  *
@@ -125,6 +129,7 @@ size_t neighbors_count(neighbor_t *const neighbors);
 
 /**
  * Finds a neigbor matching given endpoint
+ * The caller must hold the neighbors lock in read access
  *
  * @param neighbors The neighbors list
  * @param endpoint The endpoint
@@ -136,6 +141,7 @@ neighbor_t *neighbors_find_by_endpoint(neighbor_t *const neighbors,
 
 /**
  * Finds a neigbor matching given endpoint values
+ * The caller must hold the neighbors lock in read access
  *
  * @param neighbors The neighbors list
  * @param ip The endpoint ip
