@@ -330,17 +330,26 @@ void test_deserialize_get_tips(void) {
 
   serializer.vtable.get_tips_deserialize_response(&serializer, json_text,
                                                   tips_res);
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYRES_1,
+
+  hash243_stack_entry_t* hashes = tips_res->hashes;
+
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYRES_3,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash, get_tips_res_hash_at(tips_res, 0),
-                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hashes->hash, hash, FLEX_TRIT_SIZE_243);
+  hashes = hashes->next;
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYRES_2,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash, get_tips_res_hash_at(tips_res, 1),
-                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hashes->hash, hash, FLEX_TRIT_SIZE_243);
+  hashes = hashes->next;
 
-  TEST_ASSERT_NULL(get_tips_res_hash_at(tips_res, 3));
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYRES_1,
+                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  TEST_ASSERT_EQUAL_MEMORY(hashes->hash, hash, FLEX_TRIT_SIZE_243);
+  hashes = hashes->next;
+
+  TEST_ASSERT_NULL(hashes);
+
   get_tips_res_free(&tips_res);
 }
 

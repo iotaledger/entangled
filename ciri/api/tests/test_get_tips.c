@@ -16,7 +16,7 @@ static node_t node;
 
 void test_get_tips(void) {
   get_tips_res_t *res = get_tips_res_new();
-  flex_trit_t hashes[10][243];
+  flex_trit_t hashes[10][FLEX_TRIT_SIZE_243];
   tryte_t trytes[81] =
       "A99999999999999999999999999999999999999999999999999999999999999999999999"
       "999999999";
@@ -50,9 +50,11 @@ void test_get_tips(void) {
   TEST_ASSERT(iota_api_get_tips(&api, res) == RC_OK);
   TEST_ASSERT_EQUAL_INT(get_tips_res_hash_num(res), 10);
 
-  for (size_t i = 0; i < 10; i++) {
-    TEST_ASSERT_EQUAL_MEMORY(get_tips_res_hash_at(res, i), hashes[i],
-                             FLEX_TRIT_SIZE_243);
+  size_t i = 9;
+  hash243_stack_entry_t *iter = NULL;
+  LL_FOREACH(res->hashes, iter) {
+    TEST_ASSERT_EQUAL_MEMORY(iter->hash, hashes[i], FLEX_TRIT_SIZE_243);
+    i--;
   }
 
   TEST_ASSERT(tips_cache_destroy(&node.tips) == RC_OK);
