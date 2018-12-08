@@ -11,16 +11,16 @@
     (defined(__APPLE__) && defined(__MACH__))
 
 void signal_handler_posix(int signo) {
-  if (signo == ctrl_c_signal) {
-    end_core(ctrl_c);
+  if (signo == CTRL_C_SIGNAL) {
+    handler(ctrl_c);
   }
 }
 
 #elif defined(_WIN32)
 
 BOOL signal_handler_WIN(DWORD dwCtrlType) {
-  if (dwCtrlType == ctrl_c_signal) {
-    end_core(ctrl_c);
+  if (dwCtrlType == CTRL_C_SIGNAL) {
+    handler(ctrl_c);
     return TRUE;
   }
   return signal_error;

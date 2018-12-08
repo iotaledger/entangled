@@ -15,11 +15,8 @@ cc_binary(
     deps = [
         ":core",
         "//utils/containers/lists:concurrent_list_neighbor",
-<<<<<<< 101064f2b3761033b0cf314afacc103f6ea7f668
         "//utils/handles:rand",
-=======
         "//utils/handles:signal",
->>>>>>> implement abstract signal handler
     ],
 )
 
