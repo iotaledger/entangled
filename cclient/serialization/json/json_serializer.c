@@ -1114,7 +1114,7 @@ retcode_t json_add_neighbors_deserialize_response(const serializer_t* const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_get_int(json_obj, "addedNeighbors", out);
+  ret = json_get_int(json_obj, "addedNeighbors", &out->added_neighbors);
 
   cJSON_Delete(json_obj);
   return ret;

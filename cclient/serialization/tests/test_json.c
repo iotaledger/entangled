@@ -256,12 +256,14 @@ void test_deserialize_add_neighbors(void) {
   const char* json_text =
       "{\"addedNeighbors\":" STR(ADD_NEIGHBORS_RES) ",\"duration\":2}";
 
-  add_neighbors_res_t res = 0;
+  add_neighbors_res_t* res = add_neighbors_res_new();
 
   serializer.vtable.add_neighbors_deserialize_response(&serializer, json_text,
-                                                       &res);
+                                                       res);
 
-  TEST_ASSERT_EQUAL_INT(ADD_NEIGHBORS_RES, res);
+  TEST_ASSERT_EQUAL_INT(ADD_NEIGHBORS_RES, res->added_neighbors);
+
+  add_neighbors_res_free(&res);
 }
 
 void test_serialize_remove_neighbors(void) {
