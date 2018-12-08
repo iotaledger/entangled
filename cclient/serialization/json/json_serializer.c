@@ -1055,7 +1055,7 @@ end:
 }
 
 retcode_t json_add_neighbors_serialize_request(
-    const serializer_t* const s, const add_neighbors_req_t* const obj,
+    const serializer_t* const s, const add_neighbors_req_t* const req,
     char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
@@ -1071,7 +1071,7 @@ retcode_t json_add_neighbors_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("addNeighbors"));
 
-  ret = utarray_to_json_array(obj, json_root, "uris");
+  ret = utarray_to_json_array(req->uris, json_root, "uris");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;

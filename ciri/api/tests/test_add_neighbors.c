@@ -19,9 +19,12 @@ void test_add_neighbors(void) {
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(node.neighbors), 0);
 
+  add_neighbors_req_add(req, "udp://8.8.8.1:15001");
+
   TEST_ASSERT(iota_api_add_neighbors(&api, req, res) == RC_OK);
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(node.neighbors), 0);
+  TEST_ASSERT_EQUAL_INT(res->added_neighbors, 0);
 
   add_neighbors_req_free(req);
   add_neighbors_res_free(&res);

@@ -15,11 +15,13 @@ extern "C" {
 #endif
 
 /* List of neighbors URIs */
-typedef UT_array add_neighbors_req_t;
+typedef struct add_neighbors_req_s {
+  UT_array* uris;
+} add_neighbors_req_t;
 
 add_neighbors_req_t* add_neighbors_req_new();
-void add_neighbors_req_add(add_neighbors_req_t* uris, const char* uri);
-void add_neighbors_req_free(add_neighbors_req_t* ut);
+void add_neighbors_req_add(add_neighbors_req_t* req, const char* uri);
+void add_neighbors_req_free(add_neighbors_req_t** req);
 
 #ifdef __cplusplus
 }

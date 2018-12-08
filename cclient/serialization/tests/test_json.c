@@ -8,7 +8,6 @@
 #include "test_json.h"
 
 void test_serialize_find_transactions(void) {
-  retcode_t ret = RC_OK;
   serializer_t serializer;
   init_json_serializer(&serializer);
   const char* json_text =
@@ -247,7 +246,7 @@ void test_serialize_add_neighbors(void) {
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
   char_buffer_free(serializer_out);
-  add_neighbors_req_free(req);
+  add_neighbors_req_free(&req);
 }
 
 void test_deserialize_add_neighbors(void) {
@@ -446,7 +445,6 @@ void test_deserialize_get_inclusion_states(void) {
 
 void test_serialize_get_balances(void) {
   serializer_t serializer;
-  retcode_t ret = RC_OK;
   init_json_serializer(&serializer);
   const char* json_text =
       "{\"command\":\"getBalances\",\"addresses\":["
