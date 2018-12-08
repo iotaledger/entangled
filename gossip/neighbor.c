@@ -176,9 +176,11 @@ retcode_t neighbors_free(neighbor_t **const neighbors) {
     LL_DELETE(*neighbors, elt);
     free(elt);
   }
+
+  return RC_OK;
 }
 
-size_t neighbor_count(neighbor_t *const neighbors) {
+size_t neighbors_count(neighbor_t *const neighbors) {
   size_t count = 0;
   neighbor_t *elt = NULL;
 
