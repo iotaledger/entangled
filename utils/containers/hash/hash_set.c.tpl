@@ -6,6 +6,7 @@
  */
 
 #include "utils/containers/hash/hash{SIZE}_set.h"
+#include "utils/handles/rand.h"
 
 uint32_t hash{SIZE}_set_size(hash{SIZE}_set_t const *const set) {
   return HASH_COUNT(*set);
@@ -93,4 +94,24 @@ retcode_t hash{SIZE}_set_for_each(hash{SIZE}_set_t const *const set,
     }
   }
   return ret;
+}
+
+retcode_t hash{SIZE}_set_random_hash(hash{SIZE}_set_t const *const set,
+                                     flex_trit_t *const hash) {
+  hash{SIZE}_set_entry_t* iter = NULL;
+  hash{SIZE}_set_entry_t* tmp = NULL;
+
+  if (set == NULL || hash == NULL) {
+   return RC_NULL_PARAM;
+  }
+
+  int index = rand_handle_rand_interval(0, hash{SIZE}_set_size(set));
+  HASH_ITER(hh, *set, iter, tmp) {
+    if (index-- == 0) {
+      memcpy(hash, iter->hash, FLEX_TRIT_SIZE_{SIZE});
+      break;
+    }
+  }
+
+  return RC_OK;
 }

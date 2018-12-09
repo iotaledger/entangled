@@ -20,7 +20,7 @@
 #include "utils/time.h"
 
 uint64_t current_timestamp_ms() {
-  struct timeval tv;
+  struct timeval tv = {0};
 
   gettimeofday(&tv, NULL);
   uint64_t ms = tv.tv_sec * 1000ULL + tv.tv_usec / 1000ULL;

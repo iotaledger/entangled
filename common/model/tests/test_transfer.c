@@ -12,67 +12,96 @@
 #include "common/model/tests/defs.h"
 #include "common/model/transfer.h"
 
-struct _transfer_output OUTPUT = {SEED, 3ULL, 5ULL};
-
-struct _iota_transaction TX;
-
 void test_bundle_hash(void) {
-  transfer_t transfer = transfer_new(VALUE_IN);
-  transfer_value_in_t value_in = transfer_value_in(transfer);
-  transfer_value_in_set_address(value_in, (const tryte_t *)ADDRESS);
-  transfer_set_tag(transfer, (tryte_t *)TAG);
-  transfer_set_timestamp(transfer, 1509136296);
+  transfer_t* transfer =
+      transfer_value_in_new(ADDRESS, TAG, 0, NULL, 0, 1509136296);
+  TEST_ASSERT_NOT_NULL(transfer);
 
-  transfer_t transfers[1] = {transfer};
+  transfer_t* transfers[1] = {transfer};
   Kerl kerl = {};
   init_kerl(&kerl);
-  transfer_ctx_t transfer_ctx = transfer_ctx_new();
+  transfer_ctx_t* transfer_ctx = transfer_ctx_new();
   transfer_ctx_init(transfer_ctx, transfers, 1);
   transfer_ctx_hash(transfer_ctx, &kerl, transfers, 1);
-  tryte_t *bundle_hash = transfer_ctx_finalize(transfer_ctx);
-  TEST_ASSERT_EQUAL_MEMORY(HASH, bundle_hash, sizeof(HASH));
+  TEST_ASSERT_EQUAL_MEMORY(HASH, transfer_ctx->bundle, sizeof(HASH));
   transfer_ctx_free(transfer_ctx);
-  transfer_free(transfer);
+  transfer_free(&transfer);
+  TEST_ASSERT_NULL(transfer);
 }
 
-void test_iterator(void) {
-  transfer_t transfer = transfer_new(VALUE_OUT);
-  transfer_value_out_t value_out = transfer_value_out(transfer);
-  transfer_value_out_set_output(value_out, &OUTPUT);
-  transfer_value_out_set_address(value_out, (const tryte_t *)ADDRESS);
-  transfer_set_tag(transfer, (tryte_t *)TAG);
-  transfer_set_timestamp(transfer, 1509136296);
+void test_value_out(void) {
+  iota_transaction_t tx;
+  transfer_iterator_t* tf_iter = NULL;
+  transfer_value_out_t OUTPUT = {SEED, 3, 5};
+  struct _iota_transaction TX;
+  transfer_t* transfer =
+      transfer_value_out_new(&OUTPUT, TAG, ADDRESS, 0, 1509136296);
 
-  transfer_t transfers[1] = {transfer};
+  transfer_t* transfers[1] = {transfer};
   Kerl kerl = {};
   init_kerl(&kerl);
-  transfer_iterator_t transfer_iterator =
-      transfer_iterator_new(transfers, 1, &kerl);
-  transfer_iterator_set_transaction(transfer_iterator, &TX);
-  iota_transaction_t transaction;
-  transaction = transfer_iterator_next(transfer_iterator);
-  TEST_ASSERT_NOT_NULL(transaction);
-  TEST_ASSERT_EQUAL_MEMORY(SIG1, transaction_signature(transaction),
-                           sizeof(SIG1));
-  transaction = transfer_iterator_next(transfer_iterator);
-  TEST_ASSERT_NOT_NULL(transaction);
-  TEST_ASSERT_EQUAL_MEMORY(SIG2, transaction_signature(transaction),
-                           sizeof(SIG2));
-  transaction = transfer_iterator_next(transfer_iterator);
-  TEST_ASSERT_NOT_NULL(transaction);
-  TEST_ASSERT_EQUAL_MEMORY(SIG3, transaction_signature(transaction),
-                           sizeof(SIG3));
-  transaction = transfer_iterator_next(transfer_iterator);
-  TEST_ASSERT_NULL(transaction);
-  transfer_iterator_free(transfer_iterator);
-  transfer_free(transfer);
+  tf_iter = transfer_iterator_new(transfers, 1, &kerl, &TX);
+  TEST_ASSERT_NOT_NULL(tf_iter);
+  tf_iter->transaction = &TX;
+
+  tx = transfer_iterator_next(tf_iter);
+  TEST_ASSERT_NOT_NULL(tx);
+  TEST_ASSERT_EQUAL_MEMORY(SIG1, tx->signature_or_message, sizeof(SIG1));
+
+  tx = transfer_iterator_next(tf_iter);
+  TEST_ASSERT_NOT_NULL(tx);
+  TEST_ASSERT_EQUAL_MEMORY(SIG2, tx->signature_or_message, sizeof(SIG2));
+
+  tx = transfer_iterator_next(tf_iter);
+  TEST_ASSERT_NOT_NULL(tx);
+  TEST_ASSERT_EQUAL_MEMORY(SIG3, tx->signature_or_message, sizeof(SIG3));
+
+  tx = transfer_iterator_next(tf_iter);
+  TEST_ASSERT_NULL(tx);
+
+  transfer_iterator_free(&tf_iter);
+  transfer_free(&transfer);
+  TEST_ASSERT_NULL(transfer);
+}
+
+void test_transfer_data(void) {
+  iota_transaction_t tx;
+  transfer_iterator_t* tf_iter = NULL;
+  transfer_t* transfer = NULL;
+
+  flex_trit_t data[FLEX_TRIT_SIZE_243] = {};
+
+  flex_trits_from_trytes(data, NUM_TRITS_ADDRESS, TEST_DATA, NUM_TRYTES_ADDRESS,
+                         NUM_TRYTES_ADDRESS);
+
+  transfer =
+      transfer_data_new(ADDRESS, TAG, data, NUM_TRITS_ADDRESS, 1509136296);
+
+  transfer_t* transfers[1] = {transfer};
+  Kerl kerl = {};
+  init_kerl(&kerl);
+  tf_iter = transfer_iterator_new(transfers, 1, &kerl, NULL);
+  TEST_ASSERT_NOT_NULL(tf_iter);
+
+  tx = transfer_iterator_next(tf_iter);
+  TEST_ASSERT_NOT_NULL(tx);
+  TEST_ASSERT_EQUAL_MEMORY(data, tx->signature_or_message, FLEX_TRIT_SIZE_243);
+
+  tx = transfer_iterator_next(tf_iter);
+  TEST_ASSERT_NULL(tx);
+
+  transfer_iterator_free(&tf_iter);
+  TEST_ASSERT_NULL(tf_iter);
+  transfer_free(&transfer);
+  TEST_ASSERT_NULL(transfer);
 }
 
 int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_bundle_hash);
-  RUN_TEST(test_iterator);
+  RUN_TEST(test_value_out);
+  RUN_TEST(test_transfer_data);
 
   return UNITY_END();
 }

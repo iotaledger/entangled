@@ -24,7 +24,7 @@
 
 // Hash length definitions
 
-#define HASH_LENGTH_BYTE 48
+#define HASH_LENGTH_BYTE 49
 #define HASH_LENGTH_TRYTE 81
 #define HASH_LENGTH_TRIT 243
 

@@ -22,20 +22,17 @@ extern "C" {
 typedef struct tangle_s tangle_t;
 typedef struct milestone_tracker_s milestone_tracker_t;
 typedef struct iota_milestone_s iota_milestone_t;
-typedef struct requester_state_s requester_state_t;
 typedef int8_t flex_trit_t;
 
 typedef struct ledger_validator_s {
   iota_consensus_conf_t *conf;
   tangle_t *tangle;
   milestone_tracker_t *milestone_tracker;
-  requester_state_t *transaction_requester;
 } ledger_validator_t;
 
 retcode_t iota_consensus_ledger_validator_init(
     ledger_validator_t *const lv, iota_consensus_conf_t *const conf,
-    tangle_t *const tangle, milestone_tracker_t *const mt,
-    requester_state_t *const tr);
+    tangle_t *const tangle, milestone_tracker_t *const mt);
 
 retcode_t iota_consensus_ledger_validator_destroy(ledger_validator_t *const lv);
 

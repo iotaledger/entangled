@@ -16,15 +16,15 @@ static char *test_db_path = "ciri/api/tests/test.db";
 static char *ciri_db_path = "ciri/api/tests/ciri.db";
 static connection_config_t config;
 static iota_api_t api;
-static tangle_t tangle;
+static iota_consensus_t consensus;
 
 void setUp(void) {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
+  TEST_ASSERT(tangle_setup(&api.consensus->tangle, &config, test_db_path,
+                           ciri_db_path) == RC_OK);
 }
 
 void tearDown(void) {
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&api.consensus->tangle, test_db_path) == RC_OK);
 }
 
 void test_get_trytes_empty(void) {
@@ -34,7 +34,7 @@ void test_get_trytes_empty(void) {
   api.conf.max_get_trytes = 100;
 
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(get_trytes_res_trytes_num(res), 0);
+  TEST_ASSERT_EQUAL_INT(hash8019_queue_count(&res->trytes), 0);
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
@@ -46,16 +46,18 @@ void test_get_trytes_not_found(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
   tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION];
+  const flex_trit_t null_hash[FLEX_TRIT_SIZE_243] = {
+      [0 ... FLEX_TRIT_SIZE_243 - 1] = FLEX_TRIT_NULL_VALUE};
 
   api.conf.max_get_trytes = 100;
 
-  get_trytes_req_add_hash(req, NULL_HASH);
+  TEST_ASSERT(hash243_queue_push(&req->hashes, null_hash) == RC_OK);
 
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(get_trytes_res_trytes_num(res), 1);
+  TEST_ASSERT_EQUAL_INT(hash243_queue_count(&req->hashes), 1);
 
   flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION,
-                       get_trytes_res_trytes_at(res, 0)->trits,
+                       hash8019_queue_at(&res->trytes, 0),
                        NUM_TRITS_SERIALIZED_TRANSACTION,
                        NUM_TRITS_SERIALIZED_TRANSACTION);
   TEST_ASSERT_EQUAL_MEMORY(tx_trytes, NULL_TX_TRYTES,
@@ -70,6 +72,7 @@ void test_get_trytes_not_found(void) {
 void test_get_trytes_max(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
 
   api.conf.max_get_trytes = 1;
 
@@ -79,12 +82,17 @@ void test_get_trytes_max(void) {
   tryte_t const *const trytes[2] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                                     TX_2_OF_4_VALUE_BUNDLE_TRYTES};
   transactions_deserialize(trytes, txs, 2);
-  build_tangle(&tangle, txs, 2);
+  build_tangle(&api.consensus->tangle, txs, 2);
 
   // Getting trytes 1 & 2 from hashes
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, TX_1_OF_4_HASH, NUM_TRYTES_HASH,
+                         NUM_TRYTES_HASH);
+  TEST_ASSERT(hash243_queue_push(&req->hashes, hash) == RC_OK);
 
-  get_trytes_req_add_hash(req, TX_1_OF_4_HASH);
-  get_trytes_req_add_hash(req, TX_2_OF_4_HASH);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, TX_2_OF_4_HASH, NUM_TRYTES_HASH,
+                         NUM_TRYTES_HASH);
+  TEST_ASSERT(hash243_queue_push(&req->hashes, hash) == RC_OK);
+
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_API_MAX_GET_TRYTES);
 
   get_trytes_req_free(&req);
@@ -104,30 +112,36 @@ void test_get_trytes(void) {
   tryte_t const *const hashes_trytes[4] = {TX_1_OF_4_HASH, TX_2_OF_4_HASH,
                                            TX_3_OF_4_HASH, TX_4_OF_4_HASH};
   tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION];
+  hash8019_queue_entry_t *iter = NULL;
+  size_t tx_index = 0;
+  flex_trit_t tmp_hash[FLEX_TRIT_SIZE_243];
 
   api.conf.max_get_trytes = 100;
 
   // Storing transactions to get trytes from
 
   transactions_deserialize(txs_trytes, txs, 4);
-  build_tangle(&tangle, txs, 4);
+  TEST_ASSERT(build_tangle(&api.consensus->tangle, txs, 4) == RC_OK);
 
   // Loading trytes from hashes
 
   for (size_t i = 0; i < 4; i++) {
-    get_trytes_req_add_hash(req, hashes_trytes[i]);
+    TEST_ASSERT(flex_trits_from_trytes(tmp_hash, NUM_TRITS_HASH,
+                                       hashes_trytes[i], NUM_TRYTES_HASH,
+                                       NUM_TRYTES_HASH));
+    TEST_ASSERT(hash243_queue_push(&req->hashes, tmp_hash) == RC_OK);
   }
 
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(get_trytes_res_trytes_num(res), 4);
+  TEST_ASSERT_EQUAL_INT(hash243_queue_count(&req->hashes), 4);
 
-  for (size_t i = 0; i < 4; i++) {
+  CDL_FOREACH(res->trytes, iter) {
     flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION,
-                         get_trytes_res_trytes_at(res, i)->trits,
-                         NUM_TRITS_SERIALIZED_TRANSACTION,
+                         iter->hash, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRITS_SERIALIZED_TRANSACTION);
-    TEST_ASSERT_EQUAL_MEMORY(tx_trytes, txs_trytes[i],
+    TEST_ASSERT_EQUAL_MEMORY(tx_trytes, txs_trytes[tx_index],
                              NUM_TRYTES_SERIALIZED_TRANSACTION);
+    tx_index++;
   }
 
   get_trytes_req_free(&req);
@@ -141,7 +155,7 @@ int main(void) {
   UNITY_BEGIN();
 
   config.db_path = test_db_path;
-  api.tangle = &tangle;
+  api.consensus = &consensus;
 
   TEST_ASSERT(iota_api_conf_init(&api.conf) == RC_OK);
 

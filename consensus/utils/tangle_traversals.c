@@ -5,13 +5,14 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "tangle_traversals.h"
+#include "consensus/utils/tangle_traversals.h"
 #include "common/storage/defs.h"
 #include "common/storage/pack.h"
+#include "utils/containers/hash/hash243_stack.h"
 
 retcode_t tangle_traversal_dfs_to_genesis(
     tangle_t *const tangle, tangle_traversal_functor func,
-    flex_trit_t *const entry_point, flex_trit_t *const genesis_hash,
+    flex_trit_t const *const entry_point, flex_trit_t const *const genesis_hash,
     hash243_set_t *const analyzed_hashes_param, void *data) {
   retcode_t ret = RC_OK;
   hash243_stack_t non_analyzed_hashes = NULL;
@@ -19,11 +20,11 @@ retcode_t tangle_traversal_dfs_to_genesis(
   hash243_set_t *analyzed_hashes =
       analyzed_hashes_param ? analyzed_hashes_param : &analyzed_hashes_local;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-
-  struct _trit_array tx_hash = {.trits = NULL,
-                                .num_trits = NUM_TRITS_HASH,
-                                .num_bytes = FLEX_TRIT_SIZE_243,
-                                .dynamic = 0};
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  trit_array_t tx_hash = {.trits = hash,
+                          .num_trits = HASH_LENGTH_TRIT,
+                          .num_bytes = FLEX_TRIT_SIZE_243,
+                          .dynamic = 0};
 
   if ((ret = hash243_stack_push(&non_analyzed_hashes, entry_point)) != RC_OK) {
     return ret;
@@ -36,7 +37,9 @@ retcode_t tangle_traversal_dfs_to_genesis(
   bool should_stop;
 
   while (non_analyzed_hashes != NULL) {
-    tx_hash.trits = hash243_stack_peek(non_analyzed_hashes);
+    memcpy(tx_hash.trits, hash243_stack_peek(non_analyzed_hashes),
+           FLEX_TRIT_SIZE_243);
+    hash243_stack_pop(&non_analyzed_hashes);
     if (!hash243_set_contains(analyzed_hashes, tx_hash.trits)) {
       hash_pack_reset(&pack);
       if ((ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
@@ -67,7 +70,6 @@ retcode_t tangle_traversal_dfs_to_genesis(
         break;
       }
     }
-    hash243_stack_pop(&non_analyzed_hashes);
   }
 
   hash243_stack_free(&non_analyzed_hashes);

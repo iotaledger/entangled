@@ -12,15 +12,6 @@
 #include "common/trinary/trit_byte.h"
 #include "utils/macros.h"
 
-bool flex_trits_is_null(flex_trit_t const *const flex_trits, size_t const len) {
-  for (size_t i = 0; i < len; i++) {
-    if (flex_trits[i] != FLEX_TRIT_NULL_VALUE) {
-      return false;
-    }
-  }
-  return true;
-}
-
 size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
                         flex_trit_t const *const flex_trits, size_t const len,
                         size_t const start, size_t const num_trits) {
@@ -34,7 +25,7 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
   // num_bytes == num_trits in a 1:1 scheme
   memcpy(to_flex_trits, flex_trits + start, num_bytes);
 #elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE)
-  trit_t trits[6];
+  trit_t trits[6] = {0};
   size_t index = start / 3U;
   size_t offset = start % 3U;
   size_t i, j;
@@ -118,6 +109,30 @@ size_t flex_trits_insert(flex_trit_t *const to_flex_trits, size_t const to_len,
   return num_trits;
 }
 
+size_t flex_trits_insert_from_pos(flex_trit_t *const dst_trits,
+                                  size_t const dst_len,
+                                  flex_trit_t const *const src_trits,
+                                  size_t const src_len,
+                                  size_t const src_start_pos,
+                                  size_t const dst_start_pos,
+                                  size_t const num_trits) {
+  // Bounds checking
+  if (num_trits == 0 || num_trits > src_len || num_trits > dst_len ||
+      src_start_pos >= src_len || (src_start_pos + num_trits) > src_len ||
+      dst_start_pos >= dst_len || (dst_start_pos + num_trits) > dst_len) {
+    return 0;
+  }
+#if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
+  memcpy(dst_trits + dst_start_pos, src_trits + src_start_pos, num_trits);
+#else
+  for (size_t i = 0; i < num_trits; i++) {
+    trit_t t = flex_trits_at(src_trits, src_len, src_start_pos + i);
+    flex_trits_set_at(dst_trits, dst_len, dst_start_pos + i, t);
+  }
+#endif
+  return num_trits;
+}
+
 size_t flex_trits_to_trits(trit_t *const trits, size_t const to_len,
                            flex_trit_t const *const flex_trits,
                            size_t const len, size_t const num_trits) {
@@ -146,7 +161,7 @@ size_t flex_trits_from_trits(flex_trit_t *const to_flex_trits,
                              size_t const to_len, trit_t const *const trits,
                              size_t const len, size_t const num_trits) {
   // Bounds checking
-  if (num_trits > len || num_trits > to_len) {
+  if (num_trits > len || num_trits > to_len || num_trits == 0) {
     return 0;
   }
   memset(to_flex_trits, FLEX_TRIT_NULL_VALUE, NUM_FLEX_TRITS_FOR_TRITS(to_len));

@@ -15,6 +15,7 @@
 #include "gossip/node.h"
 #include "gossip/services/tcp_sender.hpp"
 #include "gossip/services/udp_sender.hpp"
+#include "utils/handles/rand.h"
 
 retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
                                  char const *const uri) {
@@ -63,6 +64,31 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
   return RC_OK;
 }
 
+retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor,
+                               iota_packet_t const *const packet) {
+  if (node == NULL || neighbor == NULL || packet == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
+    if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, packet) ==
+        false) {
+      return RC_NEIGHBOR_FAILED_SEND;
+    }
+  } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
+    if (udp_send(&node->receiver.udp_service, &neighbor->endpoint, packet) ==
+        false) {
+      return RC_NEIGHBOR_FAILED_SEND;
+    }
+  } else {
+    return RC_NEIGHBOR_INVALID_PROTOCOL;
+  }
+
+  neighbor->nbr_sent_tx++;
+
+  return RC_OK;
+}
+
 retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
                         flex_trit_t const *const transaction) {
   retcode_t ret = RC_OK;
@@ -77,30 +103,15 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
     return ret;
   }
 
-  bool is_milestone =
-      ((double)rand() / (double)RAND_MAX) < node->conf.p_select_milestone;
+  bool is_milestone = rand_handle_probability() < node->conf.p_select_milestone;
   if ((ret = get_transaction_to_request(&node->transaction_requester, request,
                                         is_milestone)) != RC_OK) {
     return ret;
   }
-  if ((ret = iota_packet_set_request(&packet, request, node->conf.mwm)) !=
-      RC_OK) {
+  if ((ret = iota_packet_set_request(
+           &packet, request, node->conf.request_hash_size_trit)) != RC_OK) {
     return ret;
   }
 
-  if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
-    if (tcp_send(&node->receiver.tcp_service, &neighbor->endpoint, &packet) ==
-        false) {
-      return RC_NEIGHBOR_FAILED_SEND;
-    }
-  } else if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
-    if (udp_send(&node->receiver.udp_service, &neighbor->endpoint, &packet) ==
-        false) {
-      return RC_NEIGHBOR_FAILED_SEND;
-    }
-  } else {
-    return RC_NEIGHBOR_INVALID_PROTOCOL;
-  }
-  neighbor->nbr_sent_tx++;
-  return RC_OK;
+  return neighbor_send_packet(node, neighbor, &packet);
 }

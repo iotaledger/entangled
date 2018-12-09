@@ -32,12 +32,7 @@ typedef struct {
 
 get_balances_req_t* get_balances_req_new();
 void get_balances_req_free(get_balances_req_t** req);
-/*
-retcode_t get_balances_req_add_address(get_balances_req_t* req,
-                                       flex_trit_t const* const addr);
-retcode_t get_balances_req_add_tips(get_balances_req_t* req,
-                                    flex_trit_t const* const tip);
-*/
+
 #ifdef __cplusplus
 }
 #endif

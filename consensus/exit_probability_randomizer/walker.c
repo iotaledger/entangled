@@ -9,6 +9,7 @@
 #include <math.h>
 
 #include "consensus/exit_probability_randomizer/walker.h"
+#include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
 
@@ -50,7 +51,7 @@ static retcode_t select_approver(
   }
 
   idx = 0;
-  target = ((double)rand() / (double)RAND_MAX) * sum_weights;
+  target = rand_handle_probability() * sum_weights;
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
     if ((target = (target - weights[idx++])) <= 0) {
       memcpy(approver->trits, curr_approver->hash, FLEX_TRIT_SIZE_243);
@@ -63,8 +64,8 @@ static retcode_t select_approver(
 
 static retcode_t find_tail_if_valid(
     ep_randomizer_t const *const exit_probability_randomizer,
-    exit_prob_transaction_validator_t const *const epv,
-    trit_array_t *const tx_hash, bool *const has_valid_tail) {
+    exit_prob_transaction_validator_t *const epv, trit_array_t *const tx_hash,
+    bool *const has_valid_tail) {
   retcode_t ret = RC_OK;
 
   *has_valid_tail = false;
@@ -89,7 +90,7 @@ static retcode_t find_tail_if_valid(
 
 static retcode_t random_walker_select_approver_tail(
     ep_randomizer_t const *const exit_probability_randomizer,
-    exit_prob_transaction_validator_t const *const epv,
+    exit_prob_transaction_validator_t *const epv,
     cw_calc_result *const cw_result, flex_trit_t const *const curr_tail_hash,
     trit_array_t *const approver, bool *const has_approver_tail) {
   retcode_t ret = RC_OK;
@@ -138,7 +139,7 @@ void iota_consensus_random_walker_init(ep_randomizer_t *const randomizer) {
 
 retcode_t iota_consensus_random_walker_randomize(
     ep_randomizer_t const *const exit_probability_randomizer,
-    exit_prob_transaction_validator_t const *const ep_validator,
+    exit_prob_transaction_validator_t *const ep_validator,
     cw_calc_result *const cw_result, trit_array_t const *const ep,
     trit_array_t *const tip) {
   retcode_t ret = RC_OK;

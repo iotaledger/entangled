@@ -37,6 +37,11 @@ cc_library(
 )
 
 cc_library(
+    name = "rand",
+    hdrs = ["rand.h"],
+)
+
+cc_library(
     name = "thread",
     hdrs = ["thread.h"],
     linkopts = select({

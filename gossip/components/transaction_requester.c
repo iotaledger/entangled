@@ -8,11 +8,10 @@
 #include "gossip/components/transaction_requester.h"
 #include "common/storage/sql/defs.h"
 #include "consensus/tangle/tangle.h"
+#include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 
-// TODO(thibault) configuration variable
-#define MAX_TX_REQ_NBR 10000
-#define REQUESTER_COMPONENT_LOGGER_ID "requester_component"
+#define REQUESTER_LOGGER_ID "requester"
 
 retcode_t requester_init(requester_state_t *const state,
                          iota_gossip_conf_t *const conf,
@@ -21,7 +20,7 @@ retcode_t requester_init(requester_state_t *const state,
     return RC_REQUESTER_COMPONENT_NULL_STATE;
   }
 
-  logger_helper_init(REQUESTER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_init(REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
   memset(state, 0, sizeof(requester_state_t));
   state->conf = conf;
   state->milestones = NULL;
@@ -41,7 +40,7 @@ retcode_t requester_destroy(requester_state_t *const state) {
   hash243_set_free(&state->transactions);
   state->tangle = NULL;
   rw_lock_handle_destroy(&state->lock);
-  logger_helper_destroy(REQUESTER_COMPONENT_LOGGER_ID);
+  logger_helper_destroy(REQUESTER_LOGGER_ID);
 
   return RC_OK;
 }
@@ -94,7 +93,7 @@ bool requester_is_full(requester_state_t *const state) {
   size = hash243_set_size(&state->transactions);
   rw_lock_handle_unlock(&state->lock);
 
-  return size >= MAX_TX_REQ_NBR;
+  return size >= state->conf->requester_queue_size;
 }
 
 retcode_t requester_clear_request(requester_state_t *const state,
@@ -116,16 +115,16 @@ retcode_t request_transaction(requester_state_t *const state,
                               bool const is_milestone) {
   retcode_t ret = RC_OK;
   bool exists = false;
-  trit_array_t key = {.trits = hash,
-                      .num_trits = HASH_LENGTH_TRIT,
-                      .num_bytes = FLEX_TRIT_SIZE_243,
-                      .dynamic = 0};
+  trit_array_t const key = {.trits = hash,
+                            .num_trits = HASH_LENGTH_TRIT,
+                            .num_bytes = FLEX_TRIT_SIZE_243,
+                            .dynamic = 0};
 
   if (state == NULL || hash == NULL) {
     return RC_REQUESTER_COMPONENT_NULL_STATE;
   }
 
-  if (flex_trits_is_null(hash, FLEX_TRIT_SIZE_243)) {
+  if (flex_trits_are_null(hash, FLEX_TRIT_SIZE_243)) {
     return RC_OK;
   }
 
@@ -145,7 +144,8 @@ retcode_t request_transaction(requester_state_t *const state,
       goto done;
     }
   } else if (!hash243_set_contains(&state->milestones, hash) &&
-             hash243_set_size(&state->transactions) < MAX_TX_REQ_NBR) {
+             hash243_set_size(&state->transactions) <
+                 state->conf->requester_queue_size) {
     if ((ret = hash243_set_add(&state->transactions, hash)) != RC_OK) {
       goto done;
     }
@@ -199,7 +199,8 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
     memset(hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
 
-  if (((double)rand() / (double)RAND_MAX) < state->conf->p_remove_request) {
+  if (rand_handle_probability() < state->conf->p_remove_request &&
+      request_set != &state->milestones) {
     hash243_set_remove(request_set, iter->hash);
   }
 

@@ -48,12 +48,14 @@ extern "C" {
  * @param consensus The consensus
  * @param db_conf Database configuration
  * @param transaction_requester A transaction requester
+ * @param tips A tips cache
  *
  * @return a status code
  */
 retcode_t iota_consensus_init(iota_consensus_t* const consensus,
                               connection_config_t const* const db_conf,
-                              requester_state_t* const transaction_requester);
+                              requester_state_t* const transaction_requester,
+                              tips_cache_t* const tips);
 
 /**
  * Starts all consensus components

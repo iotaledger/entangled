@@ -10,6 +10,10 @@
 
 #include "common/curl-p/trit.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Masks a given message with a curl instance state
  *
@@ -31,5 +35,9 @@ void mask(trit_t *const dest, trit_t const *const message, size_t const length,
  */
 void unmask(trit_t *const dest, trit_t const *const cipher, size_t const length,
             Curl *const c);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  //__MAM_MASK_H__

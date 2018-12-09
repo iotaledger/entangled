@@ -5,6 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <assert.h>
 #include <string.h>
 
 #include "common/defs.h"
@@ -49,7 +50,12 @@ uint8_t set_trit_at(tryte_t *const trytes, size_t const length, size_t index,
   tryte_t tryte = trytes[tindex];
   size_t cindex = tryte == '9' ? 0 : tryte - '@';
   trit_t trits[3];
-  memcpy(trits, TRYTE_TO_TRITS_MAPPINGS[cindex], NUMBER_OF_TRITS_IN_A_TRYTE);
+  if (cindex > 26) {
+    // uninitialized
+    memcpy(trits, TRYTE_TO_TRITS_MAPPINGS[0], NUMBER_OF_TRITS_IN_A_TRYTE);
+  } else {
+    memcpy(trits, TRYTE_TO_TRITS_MAPPINGS[cindex], NUMBER_OF_TRITS_IN_A_TRYTE);
+  }
   size_t uindex = index % 3U;
   trits[uindex] = trit;
   tryte = trits[0] + trits[1] * 3 + trits[2] * 9;

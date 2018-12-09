@@ -57,19 +57,26 @@ static milestone_tracker_t mt;
 static ledger_validator_t lv;
 static transaction_solidifier_t ts;
 
+void setUp() {
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
+}
+
+void tearDown() { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK); }
+
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
   conf.max_depth = max_depth;
   conf.below_max_depth = max_txs_below_max_depth;
 
   strcpy(conf.snapshot_file, snapshot_path);
   strcpy(conf.snapshot_conf_file, snapshot_conf_path);
-  strcpy(conf.snapshot_sig_file, "");
+  strcpy(conf.snapshot_signature_file, "");
   TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_OK);
-  iota_consensus_transaction_solidifier_init(&ts, &conf, &tangle, NULL);
+  iota_consensus_transaction_solidifier_init(&ts, &conf, &tangle, NULL, NULL);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &tangle, &snapshot, &lv,
                                           &ts) == RC_OK);
-  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &conf, &tangle, &mt,
-                                                   NULL) == RC_OK);
+  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &conf, &tangle, &mt) ==
+              RC_OK);
 
   // We want to avoid unnecessary validation
   mt.latest_snapshot->index = 99999999999;
@@ -92,20 +99,21 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   size_t num_approvers = 50;
   size_t num_txs = num_approvers + 1;
 
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
 
-  TEST_ASSERT(iota_tangle_transaction_store(
-                  &tangle, (iota_transaction_t)&TEST_TRANSACTION) == RC_OK);
+  struct _iota_transaction tx = TEST_TRANSACTION;
+  tx.solid = 1;
+  TEST_ASSERT(iota_tangle_transaction_store(&tangle, &tx) == RC_OK);
 
   struct _iota_transaction txs[num_approvers];
   txs[0] = TEST_TRANSACTION;
+  txs[0].solid = 1;
   txs[0].hash[0] += 1;
   memcpy(txs[0].branch, TEST_TRANSACTION.hash, FLEX_TRIT_SIZE_243);
   for (int i = 1; i < num_approvers; i++) {
     txs[i] = TEST_TRANSACTION;
+    txs[i].solid = 1;
     // Different hash for each tx,
     // we don't worry about it not being valid encoding
     txs[i].hash[i / 256] += (i + 1);
@@ -212,14 +220,11 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
   trit_array_free(curr_hash);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
   destroy_epv(&epv);
 }
 
 void test_single_tx_tangle(void) {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
 
@@ -232,8 +237,9 @@ void test_single_tx_tangle(void) {
   cw_calc_result out;
   bool exist = false;
 
-  TEST_ASSERT(iota_tangle_transaction_store(
-                  &tangle, (iota_transaction_t)&TEST_TRANSACTION) == RC_OK);
+  struct _iota_transaction tx = TEST_TRANSACTION;
+  tx.solid = 1;
+  TEST_ASSERT(iota_tangle_transaction_store(&tangle, &tx) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
@@ -268,7 +274,6 @@ void test_single_tx_tangle(void) {
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
   destroy_epv(&epv);
 }
@@ -284,8 +289,6 @@ void test_cw_topology_four_transactions_diamond(void) {
 
   size_t num_txs = 4;
 
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
 
@@ -297,8 +300,10 @@ void test_cw_topology_four_transactions_diamond(void) {
 
   struct _iota_transaction txs[num_txs];
   txs[0] = TEST_TRANSACTION;
+  txs[0].solid = 1;
   for (int i = 1; i < num_txs; i++) {
     txs[i] = TEST_TRANSACTION;
+    txs[i].solid = 1;
     // Different hash for each tx,
     // we don't worry about it not being valid encoding
     txs[i].hash[0] += (i + 1);
@@ -365,7 +370,6 @@ void test_cw_topology_four_transactions_diamond(void) {
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
   trit_array_free(curr_hash);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
   destroy_epv(&epv);
 }
@@ -376,8 +380,6 @@ void test_cw_topology_two_inequal_tips(void) {
 
   size_t num_txs = 4;
 
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
 
@@ -389,8 +391,10 @@ void test_cw_topology_two_inequal_tips(void) {
 
   struct _iota_transaction txs[num_txs];
   txs[0] = TEST_TRANSACTION;
+  txs[0].solid = 1;
   for (int i = 1; i < num_txs; i++) {
     txs[i] = TEST_TRANSACTION;
+    txs[i].solid = 1;
     // Different hash for each tx,
     // we don't worry about it not being valid encoding
     txs[i].hash[0] += (i + 1);
@@ -491,7 +495,6 @@ void test_cw_topology_two_inequal_tips(void) {
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
   trit_array_free(curr_hash);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
   destroy_epv(&epv);
 }
@@ -502,8 +505,6 @@ void test_1_bundle(void) {
 
   size_t bundle_size = 4;
 
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
 
@@ -522,6 +523,7 @@ void test_1_bundle(void) {
   transactions_deserialize(trytes, txs, 5);
   for (size_t i = 0; i < 5; ++i) {
     txs[i]->snapshot_index = 9999999;
+    txs[i]->solid = 1;
   }
   memcpy(txs[4]->trunk, conf.genesis_hash, FLEX_TRIT_SIZE_243);
   memcpy(txs[4]->branch, conf.genesis_hash, FLEX_TRIT_SIZE_243);
@@ -593,7 +595,6 @@ void test_1_bundle(void) {
   trit_array_free(ep);
 
   transactions_free(txs, 5);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
   destroy_epv(&epv);
 }
@@ -602,8 +603,6 @@ void test_2_chained_bundles(void) {
   hash_to_int_map_entry_t *curr_cw_entry = NULL;
   hash_to_int_map_entry_t *tmp_cw_entry = NULL;
 
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);
 
@@ -624,6 +623,7 @@ void test_2_chained_bundles(void) {
   transactions_deserialize(trytes, txs, 6);
   for (size_t i = 0; i < 6; ++i) {
     txs[i]->snapshot_index = 9999999;
+    txs[i]->solid = 1;
   }
 
   build_tangle(&tangle, txs, 6);
@@ -641,6 +641,7 @@ void test_2_chained_bundles(void) {
   memcpy(txEp->trunk, conf.genesis_hash, FLEX_TRIT_SIZE_243);
   memcpy(txEp->branch, conf.genesis_hash, FLEX_TRIT_SIZE_243);
   txEp->snapshot_index = 9999999;
+  txEp->solid = 1;
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, txEp) == RC_OK);
 
@@ -697,7 +698,6 @@ void test_2_chained_bundles(void) {
   trit_array_free(ep);
   transactions_free(txs, 6);
   transaction_free(txEp);
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
   destroy_epv(&epv);
 }

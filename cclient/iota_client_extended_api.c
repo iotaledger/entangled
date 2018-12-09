@@ -113,31 +113,41 @@ done:
 retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
                                  flex_trit_t const* const seed,
                                  address_opt_t const addr_opt,
-                                 size_t const threshold,
+                                 uint64_t const threshold,
                                  inputs_t* const out_input) {
   retcode_t ret_code = RC_OK;
+  get_balances_req_t* balances_req = get_balances_req_new();
+  get_balances_res_t* balances_res = get_balances_res_new();
+
+  hash243_queue_entry_t* q_iter = NULL;
+  size_t counter = 0;
+  uint64_t tmp_balance = 0;
+  out_input->total_balance = 0;
 
   log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
   // get address list
-  ret_code =
-      iota_client_get_new_address(serv, seed, addr_opt, &out_input->addresses);
+  ret_code = iota_client_get_new_address(serv, seed, addr_opt,
+                                         &balances_req->addresses);
   if (ret_code) {
     return ret_code;
   }
 
-  // get balances from all addresses
-  get_balances_req_t* blances_req = get_balances_req_new();
-  get_balances_res_t* blances_res = get_balances_res_new();
-  blances_req->threshold = threshold;
-  // assign the list directly, not making a copy.
-  blances_req->addresses = out_input->addresses;
+  balances_req->threshold = 100;  // currently `100` should be used
+  ret_code = iota_client_get_balances(serv, balances_req, balances_res);
+  if (ret_code == RC_OK && balances_req->addresses) {
+    // expect balance value is in order.
+    CDL_FOREACH(balances_req->addresses, q_iter) {
+      tmp_balance = get_balances_res_balances_at(balances_res, counter);
+      if (tmp_balance >= threshold) {
+        out_input->total_balance += tmp_balance;
+        hash243_queue_push(&out_input->addresses, q_iter->hash);
+      }
+      counter++;
+    }
+  }
 
-  ret_code = iota_client_get_balances(serv, blances_req, blances_res);
-  out_input->total_balance = get_balances_res_total_balance(blances_res);
-
-  blances_req->addresses = NULL;  // no need to be freed
-  get_balances_req_free(&blances_req);
-  get_balances_res_free(&blances_res);
+  get_balances_req_free(&balances_req);
+  get_balances_res_free(&balances_res);
   return ret_code;
 }
 
@@ -152,8 +162,8 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
   hash243_queue_entry_t* tx_iter = NULL;
   find_transactions_req_t* find_tx_req = NULL;
   find_transactions_res_t* find_tx_res = NULL;
-  get_balances_req_t* blances_req = get_balances_req_new();
-  get_balances_res_t* blances_res = get_balances_res_new();
+  get_balances_req_t* balances_req = get_balances_req_new();
+  get_balances_res_t* balances_res = get_balances_res_new();
 
   // security validation
   if (addr_opt.security == 0 || addr_opt.security > 3) {
@@ -216,11 +226,15 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
 
   if (out_account->addresses) {
     // get balances
-    blances_req->threshold = 100;
-    blances_req->addresses = out_account->addresses;
-    ret_code = iota_client_get_balances(serv, blances_req, blances_res);
+    out_account->balance = 0;
+    balances_req->threshold = 100;  // currently `100` should be used
+    balances_req->addresses = out_account->addresses;
+    ret_code = iota_client_get_balances(serv, balances_req, balances_res);
     if (!ret_code) {
-      out_account->balance = get_balances_res_total_balance(blances_res);
+      // count all balances
+      for (int i = 0; i < get_balances_res_balances_num(balances_res); i++) {
+        out_account->balance += get_balances_res_balances_at(balances_res, i);
+      }
     }
   }
 
@@ -230,8 +244,8 @@ done:
   }
   find_transactions_req_free(&find_tx_req);
   find_transactions_res_free(&find_tx_res);
-  blances_req->addresses = NULL;  // no need to be freed
-  get_balances_req_free(&blances_req);
-  get_balances_res_free(&blances_res);
+  balances_req->addresses = NULL;  // no need to be freed
+  get_balances_req_free(&balances_req);
+  get_balances_res_free(&balances_res);
   return ret_code;
 }

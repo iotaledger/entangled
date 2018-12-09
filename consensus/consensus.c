@@ -12,7 +12,8 @@
 
 retcode_t iota_consensus_init(iota_consensus_t *const consensus,
                               connection_config_t const *const db_conf,
-                              requester_state_t *const transaction_requester) {
+                              requester_state_t *const transaction_requester,
+                              tips_cache_t *const tips) {
   retcode_t ret = RC_OK;
 
   logger_helper_init(CONSENSUS_LOGGER_ID, LOGGER_DEBUG, true);
@@ -73,7 +74,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   log_info(CONSENSUS_LOGGER_ID, "Initializing transaction solidifier\n");
   if ((ret = iota_consensus_transaction_solidifier_init(
            &consensus->transaction_solidifier, &consensus->conf,
-           &consensus->tangle, transaction_requester)) != RC_OK) {
+           &consensus->tangle, transaction_requester, tips)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing transaction solidifier failed\n");
     return ret;
@@ -118,7 +119,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus,
   log_info(CONSENSUS_LOGGER_ID, "Initializing ledger validator\n");
   if ((ret = iota_consensus_ledger_validator_init(
            &consensus->ledger_validator, &consensus->conf, &consensus->tangle,
-           &consensus->milestone_tracker, transaction_requester)) != RC_OK) {
+           &consensus->milestone_tracker)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Initializing ledger validator failed\n");
     return ret;
   }
@@ -136,11 +137,11 @@ retcode_t iota_consensus_start(iota_consensus_t *const consensus) {
     return ret;
   }
 
-  log_info(CONSENSUS_LOGGER_ID, "Starting transaction_solidifier\n");
+  log_info(CONSENSUS_LOGGER_ID, "Starting transaction solidifier\n");
   if ((ret = iota_consensus_transaction_solidifier_start(
            &consensus->transaction_solidifier)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
-                 "Starting transaction_solidifier failed\n");
+                 "Starting transaction solidifier failed\n");
     return ret;
   }
 
@@ -151,18 +152,16 @@ retcode_t iota_consensus_stop(iota_consensus_t *const consensus) {
   retcode_t ret = RC_OK;
 
   log_info(CONSENSUS_LOGGER_ID, "Stopping milestone tracker\n");
-  if ((ret = iota_milestone_tracker_start(&consensus->milestone_tracker)) !=
+  if ((ret = iota_milestone_tracker_stop(&consensus->milestone_tracker)) !=
       RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Stopping milestone tracker failed\n");
-    return ret;
   }
 
-  log_info(CONSENSUS_LOGGER_ID, "Stopping transaction_solidifier\n");
+  log_info(CONSENSUS_LOGGER_ID, "Stopping transaction solidifier\n");
   if ((ret = iota_consensus_transaction_solidifier_stop(
            &consensus->transaction_solidifier)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
-                 "Stopping transaction_solidifier failed\n");
-    return ret;
+                 "Stopping transaction solidifier failed\n");
   }
 
   return ret;
@@ -200,7 +199,7 @@ retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
   log_info(CONSENSUS_LOGGER_ID,
            "Destroying exit probability transaction validator\n");
   if ((ret = iota_consensus_exit_prob_transaction_validator_destroy(
-           &consensus->exit_prob_transaction_validator))) {
+           &consensus->exit_prob_transaction_validator)) != RC_OK) {
     log_error(CONSENSUS_LOGGER_ID,
               "Destroying exit probability transaction validator failed\n");
   }
