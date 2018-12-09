@@ -105,7 +105,7 @@ retcode_t neighbors_add(neighbor_t **const neighbors,
  * @return a status code
  */
 retcode_t neighbors_remove(neighbor_t **const neighbors,
-                           neighbor_t const *const neighbor);
+                           neighbor_t *const neighbor);
 
 /**
  * Frees a neighbors list
