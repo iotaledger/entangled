@@ -8,8 +8,8 @@
 #include <string.h>
 
 #include "gossip/components/processor.h"
+#include "gossip/neighbor.h"
 #include "gossip/node.h"
-#include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_LOGGER_ID "processor"
@@ -109,7 +109,6 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
     // TODO Store transaction metadata
 
     // Broadcast the new transaction
-    log_debug(PROCESSOR_LOGGER_ID, "Propagating packet to broadcaster\n");
     if ((ret = broadcaster_on_next(&processor->node->broadcaster,
                                    transaction_flex_trits)) != RC_OK) {
       log_warning(PROCESSOR_LOGGER_ID,
@@ -174,7 +173,6 @@ static retcode_t process_request_bytes(processor_t const *const processor,
   }
 
   // Adds request to the responder queue
-  log_debug(PROCESSOR_LOGGER_ID, "Propagating request to responder\n");
   if ((ret = responder_on_next(&processor->node->responder, neighbor,
                                request_hash)) != RC_OK) {
     log_warning(PROCESSOR_LOGGER_ID,
@@ -198,35 +196,47 @@ static retcode_t process_packet(processor_t const *const processor,
   retcode_t ret = RC_OK;
   neighbor_t *neighbor = NULL;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  char *protocol = NULL;
 
   if (processor == NULL || packet == NULL) {
     return RC_NULL_PARAM;
   }
 
+  rw_lock_handle_rdlock(&processor->node->neighbors_lock);
+
   neighbor =
-      neighbor_find_by_endpoint(processor->node->neighbors, &packet->source);
+      neighbors_find_by_endpoint(processor->node->neighbors, &packet->source);
+  protocol = packet->source.protocol == PROTOCOL_TCP ? "tcp" : "udp";
 
   if (neighbor) {
+    log_debug(PROCESSOR_LOGGER_ID,
+              "Processing packet from tethered node %s://%s:%d\n", protocol,
+              neighbor->endpoint.host, neighbor->endpoint.port);
     neighbor->nbr_all_tx++;
 
     log_debug(PROCESSOR_LOGGER_ID, "Processing transaction bytes\n");
     if ((ret = process_transaction_bytes(processor, neighbor, packet, hash)) !=
         RC_OK) {
       log_warning(PROCESSOR_LOGGER_ID, "Processing transaction bytes failed\n");
-      return ret;
+      goto done;
     }
 
     log_debug(PROCESSOR_LOGGER_ID, "Processing request bytes\n");
     if ((ret = process_request_bytes(processor, neighbor, packet, hash)) !=
         RC_OK) {
       log_warning(PROCESSOR_LOGGER_ID, "Processing request bytes failed\n");
-      return ret;
+      goto done;
     }
   } else {
+    log_debug(PROCESSOR_LOGGER_ID,
+              "Discarding packet from non-tethered node %s://%s:%d\n", protocol,
+              packet->source.ip, packet->source.port);
     // TODO Testnet add non-tethered neighbor
   }
 
-  return RC_OK;
+done:
+  rw_lock_handle_unlock(&processor->node->neighbors_lock);
+  return ret;
 }
 
 /**
@@ -262,7 +272,6 @@ static void *processor_routine(processor_t *const processor) {
     iota_packet_queue_pop(&processor->queue);
     rw_lock_handle_unlock(&processor->lock);
 
-    log_debug(PROCESSOR_LOGGER_ID, "Processing packet\n");
     if (process_packet(processor, &packet) != RC_OK) {
       log_warning(PROCESSOR_LOGGER_ID, "Processing packet failed\n");
     }

@@ -25,9 +25,8 @@ cc_library(
     srcs = ["tcp_receiver.cc"],
     hdrs = ["tcp_receiver.hpp"],
     deps = [
-        "//gossip:node_shared",
+        "//gossip:neighbor",
         "//utils:logger_helper",
-        "//utils/containers/lists:concurrent_list_neighbor",
         "@boost//:asio",
     ],
 )
@@ -49,9 +48,7 @@ cc_library(
     srcs = ["udp_receiver.cc"],
     hdrs = ["udp_receiver.hpp"],
     deps = [
-        "//gossip:neighbor",
-        "//utils:logger_helper",
-        "//utils/containers/lists:concurrent_list_neighbor",
+        ":receiver_shared",
         "@boost//:asio",
     ],
 )

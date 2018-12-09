@@ -13,7 +13,7 @@
 #include "utils/logger_helper.h"
 
 bool tcp_send(receiver_service_t *const service, endpoint_t *const endpoint,
-              iota_packet_t *const packet) {
+              iota_packet_t const *const packet) {
   if (endpoint == NULL || endpoint->opaque_inetaddr == NULL) {
     return false;
   }

@@ -5,11 +5,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <string.h>
+#include <stdlib.h>
 
-#include "common/model/transaction.h"
 #include "common/network/uri_parser.h"
-#include "common/trinary/trit_array.h"
 #include "gossip/iota_packet.h"
 #include "gossip/neighbor.h"
 #include "gossip/node.h"
@@ -114,4 +112,110 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
   }
 
   return neighbor_send_packet(node, neighbor, &packet);
+}
+
+static int neighbor_cmp(neighbor_t const *const lhs,
+                        neighbor_t const *const rhs) {
+  if (lhs == NULL || rhs == NULL) {
+    return false;
+  }
+
+  return !(strcmp(lhs->endpoint.ip, rhs->endpoint.ip) == 0 &&
+           lhs->endpoint.port == rhs->endpoint.port &&
+           lhs->endpoint.protocol == rhs->endpoint.protocol);
+}
+
+retcode_t neighbors_add(neighbor_t **const neighbors,
+                        neighbor_t const *const neighbor) {
+  neighbor_t *entry = NULL;
+  neighbor_t *elt = NULL;
+
+  if (neighbors == NULL || neighbor == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  LL_SEARCH(*neighbors, elt, neighbor, neighbor_cmp);
+
+  if (elt != NULL) {
+    return RC_NEIGHBOR_ALREADY_PAIRED;
+  }
+
+  if ((entry = malloc(sizeof(neighbor_t))) == NULL) {
+    return RC_OOM;
+  }
+
+  memcpy(entry, neighbor, sizeof(neighbor_t));
+  LL_PREPEND(*neighbors, entry);
+
+  return RC_OK;
+}
+
+retcode_t neighbors_remove(neighbor_t **const neighbors,
+                           neighbor_t const *const neighbor) {
+  neighbor_t *elt = NULL;
+
+  if (neighbors == NULL || neighbor == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  LL_SEARCH(*neighbors, elt, neighbor, neighbor_cmp);
+
+  if (elt != NULL) {
+    LL_DELETE(*neighbors, elt);
+    free(elt);
+  }
+
+  return RC_OK;
+}
+
+retcode_t neighbors_free(neighbor_t **const neighbors) {
+  neighbor_t *elt = NULL;
+  neighbor_t *tmp = NULL;
+
+  LL_FOREACH_SAFE(*neighbors, elt, tmp) {
+    LL_DELETE(*neighbors, elt);
+    free(elt);
+  }
+}
+
+size_t neighbor_count(neighbor_t *const neighbors) {
+  size_t count = 0;
+  neighbor_t *elt = NULL;
+
+  if (neighbors == NULL) {
+    return 0;
+  }
+
+  LL_COUNT(neighbors, elt, count);
+  return count;
+}
+
+neighbor_t *neighbors_find_by_endpoint(neighbor_t *const neighbors,
+                                       endpoint_t const *const endpoint) {
+  if (neighbors == NULL || endpoint == NULL) {
+    return NULL;
+  }
+
+  return neighbors_find_by_endpoint_values(neighbors, endpoint->ip,
+                                           endpoint->port, endpoint->protocol);
+}
+
+neighbor_t *neighbors_find_by_endpoint_values(neighbor_t *const neighbors,
+                                              char const *const ip,
+                                              uint16_t const port,
+                                              protocol_type_t const protocol) {
+  neighbor_t cmp;
+  neighbor_t *elt;
+
+  if (neighbors == NULL) {
+    return NULL;
+  }
+
+  if (neighbor_init_with_values(&cmp, ip, port, protocol)) {
+    return NULL;
+  }
+
+  LL_SEARCH(neighbors, elt, &cmp, neighbor_cmp);
+
+  return elt;
 }
