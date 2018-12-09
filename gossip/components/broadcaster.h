@@ -13,7 +13,6 @@
 #include "common/errors.h"
 #include "utils/containers/hash/hash8019_queue.h"
 #include "utils/handles/cond.h"
-#include "utils/handles/lock.h"
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 

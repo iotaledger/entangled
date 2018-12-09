@@ -12,10 +12,11 @@
 
 #include "common/errors.h"
 #include "consensus/conf.h"
+#include "utils/containers/hash/hash243_queue.h"
+#include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
-#define MILESTONE_TRACKER_INITIAL_HASH_PACK_SIZE 10
-#define LATEST_MILESTONE_RESCAN_INTERVAL 5000uLL
+#define MILESTONE_VALIDATION_INTERVAL 10uLL
 #define SOLID_MILESTONE_RESCAN_INTERVAL 5000uLL
 
 #ifdef __cplusplus
@@ -35,15 +36,17 @@ typedef struct milestone_tracker_s {
   tangle_t* tangle;
   snapshot_t* latest_snapshot;
   uint64_t milestone_start_index;
-  thread_handle_t latest_milestone_tracker;
+  thread_handle_t milestone_validator;
   uint64_t latest_milestone_index;
   trit_array_p latest_milestone;
-  thread_handle_t solid_milestone_tracker;
+  thread_handle_t milestone_solidifier;
   uint64_t latest_solid_subtangle_milestone_index;
   trit_array_p latest_solid_subtangle_milestone;
   trit_array_p coordinator;
   ledger_validator_t* ledger_validator;
   transaction_solidifier_t* transaction_solidifier;
+  hash243_queue_t candidates;
+  rw_lock_handle_t candidates_lock;
   // bool accept_any_testnet_coo;
 } milestone_tracker_t;
 
@@ -58,12 +61,12 @@ typedef struct milestone_tracker_s {
  *
  * @return a status code
  */
-extern retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
-                                             iota_consensus_conf_t* const conf,
-                                             tangle_t* const tangle,
-                                             snapshot_t* const snapshot,
-                                             ledger_validator_t* const lv,
-                                             transaction_solidifier_t* ts);
+retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
+                                      iota_consensus_conf_t* const conf,
+                                      tangle_t* const tangle,
+                                      snapshot_t* const snapshot,
+                                      ledger_validator_t* const lv,
+                                      transaction_solidifier_t* ts);
 
 /**
  * Starts a milestone tracker
@@ -72,7 +75,7 @@ extern retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
  *
  * @return a status code
  */
-extern retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt);
+retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt);
 
 /**
  * Stops a milestone tracker
@@ -81,7 +84,7 @@ extern retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt);
  *
  * @return a status code
  */
-extern retcode_t iota_milestone_tracker_stop(milestone_tracker_t* const mt);
+retcode_t iota_milestone_tracker_stop(milestone_tracker_t* const mt);
 
 /**
  * Destroys a milestone tracker
@@ -90,7 +93,18 @@ extern retcode_t iota_milestone_tracker_stop(milestone_tracker_t* const mt);
  *
  * @return a status code
  */
-extern retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt);
+retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt);
+
+/**
+ * Pushes a milestone candidate to the milestone tracker candidates queue
+ *
+ * @param mt The milestone tracker
+ * @param hash The candidate hash
+ *
+ * @return a status code
+ */
+retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt,
+                                               flex_trit_t const* const hash);
 
 #ifdef __cplusplus
 }

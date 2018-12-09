@@ -67,7 +67,7 @@ trit_array_p trit_array_slice_at_most(trit_array_p const trit_array,
   if (trit_array->num_trits - start < num_trits) {
     num_trits = trit_array->num_trits - start;
   }
-  trit_array_slice(trit_array, to_trit_array, start, num_trits);
+  return trit_array_slice(trit_array, to_trit_array, start, num_trits);
 }
 
 trit_array_p trit_array_insert(trit_array_p const trit_array,

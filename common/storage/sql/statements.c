@@ -54,6 +54,11 @@ char *iota_statement_transaction_select_hashes_of_tips =
     " b WHERE b." TRANSACTION_COL_TRUNK " = a." TRANSACTION_COL_HASH
     " OR b." TRANSACTION_COL_BRANCH " = a." TRANSACTION_COL_HASH ")) LIMIT ?";
 
+char *iota_statement_transaction_select_hashes_of_milestone_candidates =
+    "SELECT " TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME
+    " WHERE " TRANSACTION_COL_ADDRESS
+    " LIKE ? EXCEPT SELECT " MILESTONE_COL_HASH " FROM " MILESTONE_TABLE_NAME;
+
 char *iota_statement_transaction_update_snapshot_index =
     "UPDATE " TRANSACTION_TABLE_NAME " SET " TRANSACTION_COL_SNAPSHOT_INDEX
     "=? WHERE " TRANSACTION_COL_HASH "=?";
@@ -94,7 +99,7 @@ char *iota_statement_milestone_select_last =
 
 char *iota_statement_milestone_select_next =
     "SELECT * FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX
-    ">? ORDER BY " MILESTONE_COL_INDEX " ASC LIMIT 1";
+    "=(?+1)";
 
 char *iota_statement_milestone_exist =
     "SELECT 1 WHERE EXISTS(SELECT 1 "

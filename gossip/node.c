@@ -163,7 +163,8 @@ retcode_t node_init(node_t* const node, core_t* const core,
   log_info(NODE_LOGGER_ID, "Initializing processor component\n");
   if (processor_init(&node->processor, node, tangle,
                      &core->consensus.transaction_validator,
-                     &core->consensus.transaction_solidifier) != RC_OK) {
+                     &core->consensus.transaction_solidifier,
+                     &core->consensus.milestone_tracker) != RC_OK) {
     log_critical(NODE_LOGGER_ID, "Initializing processor component failed\n");
     return RC_NODE_FAILED_PROCESSOR_INIT;
   }

@@ -4,6 +4,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
+        "//utils/containers/hash:hash243_queue",
         "//utils/handles:thread",
     ],
 )

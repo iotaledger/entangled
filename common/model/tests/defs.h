@@ -10,6 +10,9 @@
 
 #include "common/model/transaction.h"
 
+static tryte_t const * const TEST_DATA =
+    (tryte_t*)"LQZYGHAQLJLENO9IBSFOFIYHIBKOHEWVAEHKYOED9WBERCCLGGLOJVIZSIUUXGJ9WONIGBXKTVAWUXNHW";
+
 static const char TRYTES[] = {
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
     '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9', '9',
