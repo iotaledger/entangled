@@ -13,6 +13,7 @@
 #include "utils/logger_helper.h"
 
 #define MAIN_LOGGER_ID "main"
+#define STATS_LOG_INTERVAL 10
 
 static core_t core_g;
 
@@ -69,7 +70,23 @@ int main(int argc, char* argv[]) {
   flex_trit_t dummy[FLEX_TRIT_SIZE_8019];
   memset(dummy, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
   broadcaster_on_next(&core_g.node.broadcaster, dummy);
-  sleep(1000);
+
+  size_t count = 0;
+  while (true) {
+    if (iota_tangle_transaction_count(&core_g.consensus.tangle, &count) !=
+        RC_OK) {
+      ret = EXIT_FAILURE;
+      break;
+    }
+    log_info(MAIN_LOGGER_ID,
+             "Transactions: to process %d, to broadcast %d, to request %d, "
+             "to reply %d, count %d\n",
+             processor_size(&core_g.node.processor),
+             broadcaster_size(&core_g.node.broadcaster),
+             requester_size(&core_g.node.transaction_requester),
+             responder_size(&core_g.node.responder), count);
+    sleep(STATS_LOG_INTERVAL);
+  }
 
   log_info(MAIN_LOGGER_ID, "Stopping cIRI core\n");
   if (core_stop(&core_g) != RC_OK) {

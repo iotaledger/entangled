@@ -40,6 +40,9 @@ typedef enum transaction_field_e {
   TRANSACTION_FIELD_ADDRESS
 } transaction_field_t;
 
+extern retcode_t iota_stor_transaction_count(connection_t const* const conn,
+                                             size_t* const count);
+
 extern retcode_t iota_stor_transaction_store(connection_t const* const conn,
                                              iota_transaction_t const data_in);
 
