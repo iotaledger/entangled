@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-typedef struct {
+typedef struct get_node_info_res_s {
   /**
    * Name of the IOTA software you're currently using (IRI stands for Initial
    * Reference Implementation).
@@ -24,23 +24,6 @@ typedef struct {
    * The version of the IOTA software you're currently running.
    */
   char_buffer_t* app_version;
-  /**
-   * Available cores on your machine for JRE.
-   */
-  int jre_available_processors;
-  /**
-   * Returns the amount of free memory in the Java Virtual Machine.
-   */
-  uint32_t jre_free_memory;
-  /**
-   * Returns the maximum amount of memory that the Java virtual machine will
-   * attempt to use.
-   */
-  uint32_t jre_max_memory;
-  /**
-   * Returns the total amount of memory in the Java virtual machine.
-   */
-  uint32_t jre_total_memory;
   /**
    * Latest milestone that was signed off by the coordinator.
    */
@@ -79,7 +62,7 @@ typedef struct {
   /**
    * Transactions to request during syncing process.
    */
-  uint32_t trans_to_request;
+  uint32_t transactions_to_request;
 } get_node_info_res_t;
 
 get_node_info_res_t* get_node_info_res_new();
