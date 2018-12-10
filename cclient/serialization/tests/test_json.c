@@ -283,7 +283,7 @@ void test_serialize_remove_neighbors(void) {
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
   char_buffer_free(serializer_out);
-  remove_neighbors_req_free(req);
+  remove_neighbors_req_free(&req);
 }
 
 void test_deserialize_remove_neighbors(void) {
