@@ -112,7 +112,27 @@ retcode_t iota_api_add_neighbors(iota_api_t const *const api,
 retcode_t iota_api_remove_neighbors(iota_api_t const *const api,
                                     remove_neighbors_req_t const *const req,
                                     remove_neighbors_res_t *const res) {
-  return RC_OK;
+  char **uri;
+  neighbor_t neighbor;
+  retcode_t ret = RC_OK;
+
+  res->removed_neighbors = 0;
+  for (uri = (char **)utarray_front(req->uris); uri != NULL;
+       uri = (char **)utarray_next(req->uris, uri)) {
+    if ((ret = neighbor_init_with_uri(&neighbor, *uri)) != RC_OK) {
+      return ret;
+    }
+    log_info(API_LOGGER_ID, "Removing neighbor %s\n", *uri);
+    rw_lock_handle_wrlock(&api->node->neighbors_lock);
+    if (neighbors_remove(&api->node->neighbors, &neighbor) == RC_OK) {
+      res->removed_neighbors++;
+    } else {
+      log_warning(API_LOGGER_ID, "Removing neighbor %s failed\n", *uri);
+    }
+    rw_lock_handle_unlock(&api->node->neighbors_lock);
+  }
+
+  return ret;
 }
 
 retcode_t iota_api_get_tips(iota_api_t const *const api,
