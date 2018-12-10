@@ -7,7 +7,6 @@
 
 #include "gossip/node.h"
 #include "ciri/core.h"
-#include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
 #define NODE_LOGGER_ID "node"
@@ -26,23 +25,22 @@ static retcode_t node_neighbors_init(node_t* const node) {
     return RC_OK;
   }
 
-  log_debug(NODE_LOGGER_ID, "Initializing neighbors list\n");
-  if (CL_INIT(neighbor_t, node->neighbors, neighbor_cmp) != CL_SUCCESS) {
-    log_critical(NODE_LOGGER_ID, "Initializing neighbors list failed\n");
-    return RC_NODE_FAILED_NEIGHBORS_INIT;
-  }
+  node->neighbors = NULL;
+  rw_lock_handle_init(&node->neighbors_lock);
 
   ptr = cpy = strdup(node->conf.neighbors);
   while ((neighbor_uri = strsep(&cpy, " ")) != NULL) {
-    if (neighbor_init_with_uri(&neighbor, neighbor_uri)) {
+    if (neighbor_init_with_uri(&neighbor, neighbor_uri) != RC_OK) {
       log_warning(NODE_LOGGER_ID, "Initializing neighbor with URI %s failed\n",
                   neighbor_uri);
       continue;
     }
     log_info(NODE_LOGGER_ID, "Adding neighbor %s\n", neighbor_uri);
-    if (neighbor_add(node->neighbors, neighbor) == false) {
+    rw_lock_handle_wrlock(&node->neighbors_lock);
+    if (neighbors_add(&node->neighbors, &neighbor) != RC_OK) {
       log_warning(NODE_LOGGER_ID, "Adding neighbor %s failed\n", neighbor_uri);
     }
+    rw_lock_handle_unlock(&node->neighbors_lock);
   }
 
   free(ptr);
@@ -336,11 +334,11 @@ retcode_t node_destroy(node_t* const node) {
     ret = RC_NODE_FAILED_RESPONDER_DESTROY;
   }
 
-  log_debug(NODE_LOGGER_ID, "Destroying neighbors list\n");
-  if (CL_DESTROY(neighbor_t, node->neighbors) != CL_SUCCESS) {
-    log_error(NODE_LOGGER_ID, "Destroying neighbors list failed\n");
-    ret = RC_NODE_FAILED_NEIGHBORS_DESTROY;
-  }
+  log_debug(NODE_LOGGER_ID, "Destroying neighbors\n");
+  rw_lock_handle_wrlock(&node->neighbors_lock);
+  neighbors_free(&node->neighbors);
+  rw_lock_handle_unlock(&node->neighbors_lock);
+  rw_lock_handle_destroy(&node->neighbors_lock);
 
   tips_cache_destroy(&node->tips);
   free(node->conf.neighbors);

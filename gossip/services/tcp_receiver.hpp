@@ -26,11 +26,9 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
  private:
   void receive();
-  bool handlePacket(std::size_t const length);
 
  private:
   receiver_service_t* service_;
-  neighbor_t* neighbor_;
   boost::asio::ip::tcp::socket socket_;
   iota_packet_t packet_;
 };

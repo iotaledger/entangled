@@ -78,6 +78,9 @@ char *iota_statement_transaction_exist_by_hash =
 char *iota_statement_transaction_approvers_count =
     "SELECT COUNT(*) FROM " TRANSACTION_TABLE_NAME " WHERE branch=? OR trunk=?";
 
+char *iota_statement_transaction_count =
+    "SELECT COUNT(*) FROM " TRANSACTION_TABLE_NAME;
+
 /*
  * Milestone statements
  */
