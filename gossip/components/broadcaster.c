@@ -9,7 +9,6 @@
 
 #include "gossip/components/broadcaster.h"
 #include "gossip/node.h"
-#include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
 #define BROADCASTER_LOGGER_ID "broadcaster"
@@ -20,7 +19,7 @@
  */
 
 static void *broadcaster_routine(broadcaster_t *const broadcaster) {
-  concurrent_list_node_neighbor_t *iter = NULL;
+  neighbor_t *iter = NULL;
   flex_trit_t *transaction_flex_trits_ptr = NULL;
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
@@ -49,17 +48,14 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
     rw_lock_handle_unlock(&broadcaster->lock);
 
     log_debug(BROADCASTER_LOGGER_ID, "Broadcasting transaction\n");
-    if (broadcaster->node->neighbors) {
-      iter = broadcaster->node->neighbors->front;
-      while (iter) {
-        if (neighbor_send(broadcaster->node, &iter->data,
-                          transaction_flex_trits)) {
-          log_warning(BROADCASTER_LOGGER_ID,
-                      "Broadcasting transaction failed\n");
-        }
-        iter = iter->next;
+    rw_lock_handle_rdlock(&broadcaster->node->neighbors_lock);
+    LL_FOREACH(broadcaster->node->neighbors, iter) {
+      if (neighbor_send(broadcaster->node, iter, transaction_flex_trits) !=
+          RC_OK) {
+        log_warning(BROADCASTER_LOGGER_ID, "Broadcasting transaction failed\n");
       }
     }
+    rw_lock_handle_unlock(&broadcaster->node->neighbors_lock);
   }
 
   lock_handle_unlock(&lock_cond);

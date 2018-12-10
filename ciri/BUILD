@@ -14,7 +14,6 @@ cc_binary(
     }) + [":conf.yml"],
     deps = [
         ":core",
-        "//utils/containers/lists:concurrent_list_neighbor",
         "//utils/handles:rand",
     ],
 )

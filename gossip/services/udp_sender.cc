@@ -46,7 +46,7 @@ bool udp_endpoint_destroy(endpoint_t *const endpoint) {
 }
 
 bool udp_send(receiver_service_t *const service, endpoint_t *const endpoint,
-              iota_packet_t *const packet) {
+              iota_packet_t const *const packet) {
   if (service == NULL || service->opaque_socket == NULL || endpoint == NULL ||
       endpoint->opaque_inetaddr == NULL) {
     return false;

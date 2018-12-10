@@ -9,7 +9,6 @@
 #include "common/model/milestone.h"
 #include "gossip/iota_packet.h"
 #include "gossip/node.h"
-#include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
 #define TIPS_REQUESTER_LOGGER_ID "tips_requester"
@@ -21,7 +20,7 @@
 
 static void *tips_requester_routine(tips_requester_t *const tips_requester) {
   iota_packet_t packet;
-  concurrent_list_node_neighbor_t *iter = NULL;
+  neighbor_t *iter = NULL;
   DECLARE_PACK_SINGLE_TX(transaction, transaction_ptr, transaction_pack);
   DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr,
                                 milestone_pack);
@@ -60,17 +59,14 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
       continue;
     }
 
-    if (tips_requester->node->neighbors) {
-      iter = tips_requester->node->neighbors->front;
-      while (iter) {
-        if (neighbor_send_packet(tips_requester->node, &iter->data, &packet) !=
-            RC_OK) {
-          log_warning(TIPS_REQUESTER_LOGGER_ID,
-                      "Sending packet to neighbor failed\n");
-        }
-        iter = iter->next;
+    rw_lock_handle_rdlock(&tips_requester->node->neighbors_lock);
+    LL_FOREACH(tips_requester->node->neighbors, iter) {
+      if (neighbor_send_packet(tips_requester->node, iter, &packet) != RC_OK) {
+        log_warning(TIPS_REQUESTER_LOGGER_ID,
+                    "Sending tip request to neighbor failed\n");
       }
     }
+    rw_lock_handle_unlock(&tips_requester->node->neighbors_lock);
     sleep(TIPS_REQUESTER_INTERVAL);
   }
 
