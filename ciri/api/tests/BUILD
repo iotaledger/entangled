@@ -58,6 +58,15 @@ cc_test(
 )
 
 cc_test(
+    name = "test_remove_neighbors",
+    srcs = ["test_remove_neighbors.c"],
+    deps = [
+        "//ciri/api",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_store_transactions",
     srcs = ["test_store_transactions.c"],
     data = [":db_file"],
