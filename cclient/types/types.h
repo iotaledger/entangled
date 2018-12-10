@@ -18,6 +18,7 @@
 #include "common/trinary/tryte.h"
 
 #include "utils/containers/hash/hash243_queue.h"
+#include "utils/containers/hash/hash243_stack.h"
 #include "utils/containers/hash/hash8019_queue.h"
 #include "utils/containers/hash/hash8019_stack.h"
 #include "utils/containers/hash/hash81_queue.h"

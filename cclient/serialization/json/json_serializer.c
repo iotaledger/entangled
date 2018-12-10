@@ -318,6 +318,33 @@ static retcode_t json_array_to_hash243_queue(cJSON const* const obj,
   return ret_code;
 }
 
+static retcode_t json_array_to_hash243_stack(cJSON const* const obj,
+                                             char const* const obj_name,
+                                             hash243_stack_t* queue) {
+  retcode_t ret_code = RC_OK;
+  flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
+  cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
+  if (cJSON_IsArray(json_item)) {
+    cJSON* current_obj = NULL;
+    cJSON_ArrayForEach(current_obj, json_item) {
+      if (current_obj->valuestring != NULL) {
+        flex_trits_from_trytes(hash, NUM_TRITS_HASH,
+                               (const tryte_t*)current_obj->valuestring,
+                               NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+        ret_code = hash243_stack_push(queue, hash);
+        if (ret_code) {
+          return ret_code;
+        }
+      }
+    }
+  } else {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_PARSE);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+  return ret_code;
+}
+
 static retcode_t hash81_queue_to_json_array(hash81_queue_t queue,
                                             cJSON* const json_root,
                                             char const* const obj_name) {
@@ -967,7 +994,7 @@ retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_array_to_hash243_queue(json_obj, "hashes", &res->hashes);
+  ret = json_array_to_hash243_stack(json_obj, "hashes", &res->hashes);
 
   cJSON_Delete(json_obj);
   return ret;

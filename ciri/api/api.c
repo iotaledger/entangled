@@ -101,14 +101,15 @@ retcode_t iota_api_get_tips(iota_api_t const *const api,
   hash243_set_t tips = NULL;
   hash243_set_entry_t *iter = NULL;
   hash243_set_entry_t *tmp = NULL;
-  tryte_t tip_trytes[HASH_LENGTH_TRYTE + 1];
 
-  if ((ret = tips_cache_get_tips(&api->node->tips, &tips))) {
+  if ((ret = tips_cache_get_tips(&api->node->tips, &tips)) != RC_OK) {
     goto done;
   }
 
   HASH_ITER(hh, tips, iter, tmp) {
-    hash243_queue_push(&res->hashes, iter->hash);
+    if ((ret = hash243_stack_push(&res->hashes, iter->hash)) != RC_OK) {
+      goto done;
+    }
   }
 
 done:
