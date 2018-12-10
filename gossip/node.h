@@ -15,6 +15,7 @@
 #include "gossip/components/responder.h"
 #include "gossip/components/tips_requester.h"
 #include "gossip/components/transaction_requester.h"
+#include "gossip/components/transaction_requester_worker.h"
 #include "gossip/neighbor.h"
 #include "gossip/tips_cache.h"
 #include "utils/handles/rw_lock.h"

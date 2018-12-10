@@ -46,24 +46,6 @@ retcode_t requester_init(transaction_requester_t *const transaction_requester,
                          node_t *const node, tangle_t *const tangle);
 
 /**
- * Starts a transaction requester
- *
- * @param transaction_requester The transaction requester
- *
- * @return a status code
- */
-retcode_t requester_start(transaction_requester_t *const transaction_requester);
-
-/**
- * Stops a transaction requester
- *
- * @param transaction_requester The transaction requester
- *
- * @return a status code
- */
-retcode_t requester_stop(transaction_requester_t *const transaction_requester);
-
-/**
  * Destroys a transaction requester
  *
  * @param transaction_requester The transaction requester
