@@ -9,7 +9,6 @@
 #include "common/storage/sql/defs.h"
 #include "consensus/tangle/tangle.h"
 #include "gossip/node.h"
-#include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 #include "utils/time.h"
@@ -24,7 +23,7 @@
 
 static void *transaction_requester_routine(
     transaction_requester_t *const transaction_requester) {
-  concurrent_list_node_neighbor_t *iter = NULL;
+  neighbor_t *iter = NULL;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trit_t transaction[FLEX_TRIT_SIZE_8019];
   retcode_t ret = RC_OK;
@@ -55,16 +54,14 @@ static void *transaction_requester_routine(
         memset(transaction, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
       }
     }
-    if (transaction_requester->node->neighbors) {
-      iter = transaction_requester->node->neighbors->front;
-      while (iter) {
-        if (neighbor_send(transaction_requester->node, &iter->data,
-                          transaction) != RC_OK) {
-          log_warning(REQUESTER_LOGGER_ID, "Sending request failed\n");
-        }
-        iter = iter->next;
+    rw_lock_handle_rdlock(&transaction_requester->node->neighbors_lock);
+    LL_FOREACH(transaction_requester->node->neighbors, iter) {
+      if (neighbor_send(transaction_requester->node, iter, transaction) !=
+          RC_OK) {
+        log_warning(REQUESTER_LOGGER_ID, "Sending request failed\n");
       }
     }
+    rw_lock_handle_unlock(&transaction_requester->node->neighbors_lock);
   sleep:
     sleep_ms(REQUESTER_INTERVAL);
   }

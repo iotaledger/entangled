@@ -40,9 +40,9 @@ cc_library(
     srcs = ["processor.c"],
     deps = [
         ":processor_shared",
-        "//gossip:neighbor",
         "//consensus/milestone_tracker",
         "//consensus/transaction_solidifier",
+        "//gossip:neighbor",
         "//gossip:node_shared",
     ],
 )
@@ -83,7 +83,6 @@ cc_library(
         "//gossip:node_shared",
         "//utils:logger_helper",
         "//utils:time",
-        "//utils/containers/lists:concurrent_list_neighbor_shared",
         "//utils/handles:rand",
     ],
 )
