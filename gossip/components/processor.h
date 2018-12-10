@@ -11,8 +11,6 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
-#include "consensus/milestone_tracker/milestone_tracker.h"
-#include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "consensus/transaction_validator/transaction_validator.h"
 #include "gossip/iota_packet.h"
 #include "utils/handles/cond.h"
@@ -23,6 +21,8 @@
 // Forward declarations
 typedef struct node_s node_t;
 typedef struct tangle_s tangle_t;
+typedef struct transaction_solidifier_s transaction_solidifier_t;
+typedef struct milestone_tracker_s milestone_tracker_t;
 
 /**
  * A processor is responsible for analyzing packets sent by neighbors.

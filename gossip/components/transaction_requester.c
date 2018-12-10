@@ -8,111 +8,124 @@
 #include "gossip/components/transaction_requester.h"
 #include "common/storage/sql/defs.h"
 #include "consensus/tangle/tangle.h"
+#include "gossip/node.h"
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 
 #define REQUESTER_LOGGER_ID "requester"
 
-retcode_t requester_init(requester_state_t *const state,
-                         iota_gossip_conf_t *const conf,
-                         tangle_t *const tangle) {
-  if (state == NULL || tangle == NULL || conf == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+/*
+ * Public functions
+ */
+
+retcode_t requester_init(transaction_requester_t *const transaction_requester,
+                         node_t *const node, tangle_t *const tangle) {
+  if (transaction_requester == NULL || node == NULL || tangle == NULL) {
+    return RC_NULL_PARAM;
   }
 
   logger_helper_init(REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
-  memset(state, 0, sizeof(requester_state_t));
-  state->conf = conf;
-  state->milestones = NULL;
-  state->transactions = NULL;
-  state->tangle = tangle;
-  rw_lock_handle_init(&state->lock);
+  memset(transaction_requester, 0, sizeof(transaction_requester_t));
+  transaction_requester->node = node;
+  transaction_requester->running = false;
+  transaction_requester->milestones = NULL;
+  transaction_requester->transactions = NULL;
+  transaction_requester->tangle = tangle;
+  rw_lock_handle_init(&transaction_requester->lock);
 
   return RC_OK;
 }
 
-retcode_t requester_destroy(requester_state_t *const state) {
-  if (state == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+retcode_t requester_destroy(
+    transaction_requester_t *const transaction_requester) {
+  if (transaction_requester == NULL) {
+    return RC_NULL_PARAM;
+  } else if (transaction_requester->running) {
+    return RC_STILL_RUNNING;
   }
 
-  hash243_set_free(&state->milestones);
-  hash243_set_free(&state->transactions);
-  state->tangle = NULL;
-  rw_lock_handle_destroy(&state->lock);
+  hash243_set_free(&transaction_requester->milestones);
+  hash243_set_free(&transaction_requester->transactions);
+  transaction_requester->node = NULL;
+  transaction_requester->tangle = NULL;
+  rw_lock_handle_destroy(&transaction_requester->lock);
   logger_helper_destroy(REQUESTER_LOGGER_ID);
 
   return RC_OK;
 }
 
 retcode_t requester_get_requested_transactions(
-    requester_state_t *const state, hash243_set_t *const transactions) {
+    transaction_requester_t *const transaction_requester,
+    hash243_set_t *const transactions) {
   retcode_t ret = RC_OK;
 
-  if (state == NULL || transactions == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+  if (transaction_requester == NULL || transactions == NULL) {
+    return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_rdlock(&state->lock);
+  rw_lock_handle_rdlock(&transaction_requester->lock);
 
-  if ((ret = hash243_set_append(&state->transactions, transactions)) != RC_OK) {
+  if ((ret = hash243_set_append(&transaction_requester->transactions,
+                                transactions)) != RC_OK) {
     goto done;
   }
-  if ((ret = hash243_set_append(&state->milestones, transactions)) != RC_OK) {
+  if ((ret = hash243_set_append(&transaction_requester->milestones,
+                                transactions)) != RC_OK) {
     goto done;
   }
 
 done:
-  rw_lock_handle_unlock(&state->lock);
+  rw_lock_handle_unlock(&transaction_requester->lock);
   return ret;
 }
 
-size_t requester_size(requester_state_t *const state) {
+size_t requester_size(transaction_requester_t *const transaction_requester) {
   size_t size = 0;
 
-  if (state == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+  if (transaction_requester == NULL) {
+    return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_rdlock(&state->lock);
-  size = hash243_set_size(&state->transactions) +
-         hash243_set_size(&state->milestones);
-  rw_lock_handle_unlock(&state->lock);
+  rw_lock_handle_rdlock(&transaction_requester->lock);
+  size = hash243_set_size(&transaction_requester->transactions) +
+         hash243_set_size(&transaction_requester->milestones);
+  rw_lock_handle_unlock(&transaction_requester->lock);
 
   return size;
 }
 
-bool requester_is_full(requester_state_t *const state) {
+bool requester_is_full(transaction_requester_t *const transaction_requester) {
   size_t size = 0;
 
-  if (state == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+  if (transaction_requester == NULL) {
+    return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_rdlock(&state->lock);
-  size = hash243_set_size(&state->transactions);
-  rw_lock_handle_unlock(&state->lock);
+  rw_lock_handle_rdlock(&transaction_requester->lock);
+  size = hash243_set_size(&transaction_requester->transactions);
+  rw_lock_handle_unlock(&transaction_requester->lock);
 
-  return size >= state->conf->requester_queue_size;
+  return size >= transaction_requester->node->conf.requester_queue_size;
 }
 
-retcode_t requester_clear_request(requester_state_t *const state,
-                                  flex_trit_t const *const hash) {
-  if (state == NULL || hash == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+retcode_t requester_clear_request(
+    transaction_requester_t *const transaction_requester,
+    flex_trit_t const *const hash) {
+  if (transaction_requester == NULL || hash == NULL) {
+    return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_wrlock(&state->lock);
-  hash243_set_remove(&state->milestones, hash);
-  hash243_set_remove(&state->transactions, hash);
-  rw_lock_handle_unlock(&state->lock);
+  rw_lock_handle_wrlock(&transaction_requester->lock);
+  hash243_set_remove(&transaction_requester->milestones, hash);
+  hash243_set_remove(&transaction_requester->transactions, hash);
+  rw_lock_handle_unlock(&transaction_requester->lock);
 
   return RC_OK;
 }
 
-retcode_t request_transaction(requester_state_t *const state,
-                              flex_trit_t *const hash,
-                              bool const is_milestone) {
+retcode_t request_transaction(
+    transaction_requester_t *const transaction_requester,
+    flex_trit_t *const hash, bool const is_milestone) {
   retcode_t ret = RC_OK;
   bool exists = false;
   trit_array_t const key = {.trits = hash,
@@ -120,77 +133,82 @@ retcode_t request_transaction(requester_state_t *const state,
                             .num_bytes = FLEX_TRIT_SIZE_243,
                             .dynamic = 0};
 
-  if (state == NULL || hash == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+  if (transaction_requester == NULL || hash == NULL) {
+    return RC_NULL_PARAM;
   }
 
   if (flex_trits_are_null(hash, FLEX_TRIT_SIZE_243)) {
     return RC_OK;
   }
 
-  if ((ret = iota_tangle_transaction_exist(
-           state->tangle, TRANSACTION_FIELD_HASH, &key, &exists)) != RC_OK) {
+  if ((ret = iota_tangle_transaction_exist(transaction_requester->tangle,
+                                           TRANSACTION_FIELD_HASH, &key,
+                                           &exists)) != RC_OK) {
     return ret;
   }
   if (exists) {
     return RC_OK;
   }
 
-  rw_lock_handle_wrlock(&state->lock);
+  rw_lock_handle_wrlock(&transaction_requester->lock);
 
   if (is_milestone) {
-    hash243_set_remove(&state->transactions, hash);
-    if ((ret = hash243_set_add(&state->milestones, hash)) != RC_OK) {
+    hash243_set_remove(&transaction_requester->transactions, hash);
+    if ((ret = hash243_set_add(&transaction_requester->milestones, hash)) !=
+        RC_OK) {
       goto done;
     }
-  } else if (!hash243_set_contains(&state->milestones, hash) &&
-             hash243_set_size(&state->transactions) <
-                 state->conf->requester_queue_size) {
-    if ((ret = hash243_set_add(&state->transactions, hash)) != RC_OK) {
+  } else if (!hash243_set_contains(&transaction_requester->milestones, hash) &&
+             hash243_set_size(&transaction_requester->transactions) <
+                 transaction_requester->node->conf.requester_queue_size) {
+    if ((ret = hash243_set_add(&transaction_requester->transactions, hash)) !=
+        RC_OK) {
       goto done;
     }
   }
 
 done:
-  rw_lock_handle_unlock(&state->lock);
+  rw_lock_handle_unlock(&transaction_requester->lock);
   return ret;
 }
 
-retcode_t get_transaction_to_request(requester_state_t *const state,
-                                     flex_trit_t *const hash,
-                                     bool const milestone) {
+retcode_t get_transaction_to_request(
+    transaction_requester_t *const transaction_requester,
+    flex_trit_t *const hash, bool const milestone) {
   retcode_t ret = RC_OK;
   hash243_set_t *request_set = NULL;
   hash243_set_t *backup_set = NULL;
   hash243_set_entry_t *iter = NULL;
   hash243_set_entry_t *tmp = NULL;
-  trit_array_t key = {.trits = NULL,
+  trit_array_t key = {.trits = hash,
                       .num_trits = HASH_LENGTH_TRIT,
                       .num_bytes = FLEX_TRIT_SIZE_243,
                       .dynamic = 0};
   bool exists = false;
 
-  if (state == NULL || hash == NULL) {
-    return RC_REQUESTER_COMPONENT_NULL_STATE;
+  if (transaction_requester == NULL || hash == NULL) {
+    return RC_NULL_PARAM;
   }
 
-  request_set = milestone ? &state->milestones : &state->transactions;
-  backup_set = milestone ? &state->transactions : &state->milestones;
+  request_set = milestone ? &transaction_requester->milestones
+                          : &transaction_requester->transactions;
+  backup_set = milestone ? &transaction_requester->transactions
+                         : &transaction_requester->milestones;
 
-  rw_lock_handle_wrlock(&state->lock);
+  rw_lock_handle_wrlock(&transaction_requester->lock);
 
   request_set = hash243_set_size(request_set) != 0 ? request_set : backup_set;
 
   HASH_ITER(hh, *request_set, iter, tmp) {
-    key.trits = iter->hash;
-    if ((ret = iota_tangle_transaction_exist(
-             state->tangle, TRANSACTION_FIELD_HASH, &key, &exists)) != RC_OK) {
+    memcpy(hash, iter->hash, FLEX_TRIT_SIZE_243);
+    if ((ret = iota_tangle_transaction_exist(transaction_requester->tangle,
+                                             TRANSACTION_FIELD_HASH, &key,
+                                             &exists)) != RC_OK) {
       goto done;
     }
-    if (exists) {
-      hash243_set_remove_entry(request_set, iter);
-    } else {
-      memcpy(hash, iter->hash, FLEX_TRIT_SIZE_243);
+    hash243_set_remove_entry(request_set, iter);
+    if (!exists) {
+      hash243_set_add(request_set, hash);
       break;
     }
   }
@@ -199,12 +217,13 @@ retcode_t get_transaction_to_request(requester_state_t *const state,
     memset(hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
 
-  if (rand_handle_probability() < state->conf->p_remove_request &&
-      request_set != &state->milestones) {
-    hash243_set_remove(request_set, iter->hash);
+  if (rand_handle_probability() <
+          transaction_requester->node->conf.p_remove_request &&
+      request_set != &transaction_requester->milestones) {
+    hash243_set_remove(request_set, hash);
   }
 
 done:
-  rw_lock_handle_unlock(&state->lock);
+  rw_lock_handle_unlock(&transaction_requester->lock);
   return ret;
 }
