@@ -1186,7 +1186,7 @@ retcode_t json_remove_neighbors_serialize_request(
 
 retcode_t json_remove_neighbors_deserialize_response(
     const serializer_t* const s, const char* const obj,
-    remove_neighbors_res_t* out) {
+    remove_neighbors_res_t* res) {
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
@@ -1207,7 +1207,7 @@ retcode_t json_remove_neighbors_deserialize_response(
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_get_int(json_obj, "removedNeighbors", out);
+  ret = json_get_int(json_obj, "removedNeighbors", &res->removed_neighbors);
 
   cJSON_Delete(json_obj);
   return ret;

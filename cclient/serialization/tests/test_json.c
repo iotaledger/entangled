@@ -292,12 +292,14 @@ void test_deserialize_remove_neighbors(void) {
   const char* json_text =
       "{\"removedNeighbors\":" STR(REMOVE_NEIGHBORS_RES) ",\"duration\":2}";
 
-  remove_neighbors_res_t res = 0;
+  remove_neighbors_res_t* res = remove_neighbors_res_new();
 
   serializer.vtable.remove_neighbors_deserialize_response(&serializer,
-                                                          json_text, &res);
+                                                          json_text, res);
 
-  TEST_ASSERT_EQUAL_INT(REMOVE_NEIGHBORS_RES, res);
+  TEST_ASSERT_EQUAL_INT(REMOVE_NEIGHBORS_RES, res->removed_neighbors);
+
+  remove_neighbors_res_free(&res);
 }
 
 void test_serialize_get_tips(void) {
