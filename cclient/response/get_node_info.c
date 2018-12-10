@@ -17,6 +17,7 @@ get_node_info_res_t* get_node_info_res_new() {
     memset(res->latest_milestone, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
     memset(res->latest_solid_subtangle_milestone, FLEX_TRIT_NULL_VALUE,
            FLEX_TRIT_SIZE_243);
+    memset(res->coordinator_address, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
   return res;
 }

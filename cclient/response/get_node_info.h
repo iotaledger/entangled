@@ -16,8 +16,7 @@ extern "C" {
 
 typedef struct get_node_info_res_s {
   /**
-   * Name of the IOTA software you're currently using (IRI stands for Initial
-   * Reference Implementation).
+   * Name of the IOTA software you're currently using.
    */
   char_buffer_t* app_name;
   /**
@@ -44,6 +43,11 @@ typedef struct get_node_info_res_s {
    */
   uint32_t latest_solid_subtangle_milestone_index;
   /**
+   * The start index of the milestones.
+   * This index is encoded in each milestone transaction by the coordinator
+   */
+  uint32_t milestone_start_index;
+  /**
    * Number of neighbors you are directly connected with.
    */
   uint16_t neighbors;
@@ -63,6 +67,10 @@ typedef struct get_node_info_res_s {
    * Transactions to request during syncing process.
    */
   uint32_t transactions_to_request;
+  /**
+   * The address of the coordinator being followed by this node.
+   */
+  flex_trit_t coordinator_address[FLEX_TRIT_SIZE_243];
 } get_node_info_res_t;
 
 get_node_info_res_t* get_node_info_res_new();
