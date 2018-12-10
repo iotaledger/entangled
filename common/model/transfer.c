@@ -30,7 +30,7 @@ static void transfer_iterator_next_data_transaction(
     len = data_len - offset;
     len = len > NUM_TRITS_SIGNATURE ? NUM_TRITS_SIGNATURE : len;
     flex_ret =
-        flex_trits_slice(transfer_iterator->transaction->signature_or_message,
+        flex_trits_slice(transaction_signature(transfer_iterator->transaction),
                          len, trans_data->data, data_len, offset, len);
     if (flex_ret == 0) {
       log_warning(TRANSFER_LOGGER_ID, "[%s:%d] flex_trits slicing failed.\n",
@@ -61,10 +61,10 @@ static void transfer_iterator_next_output_transaction(
           (flex_trit_t*)iota_signature_gen(
               output_info->seed, output_info->seed_index, output_info->security,
               transfer_iterator->bundle_hash);
-      tx->value = transfer->value;
+      transaction_set_value(tx, transfer->value);
     }
     flex_ret = flex_trits_slice(
-        tx->signature_or_message, NUM_TRITS_SIGNATURE,
+        transaction_signature(tx), NUM_TRITS_SIGNATURE,
         transfer_iterator->transaction_signature,
         NUM_TRITS_SIGNATURE * output_info->security,
         NUM_TRITS_SIGNATURE *
@@ -87,8 +87,8 @@ static void transfer_iterator_next_input_transaction(
 
   if (transfer->type == VALUE_IN) {
     value_in = (transfer_value_in_t*)transfer->meta;
-    memcpy(tx->signature_or_message, value_in->data, value_in->len);
-    tx->value = transfer->value;
+    memcpy(transaction_signature(tx), value_in->data, value_in->len);
+    transaction_set_value(tx, transfer->value);
   } else {
     log_error(TRANSFER_LOGGER_ID, "[%s:%d] the transfer type doesn't match.\n",
               __func__, __LINE__);
@@ -424,16 +424,19 @@ iota_transaction_t transfer_iterator_next(
     // Reset all transaction fields
     transaction_reset(transaction);
     // Set common transaction fields
-    memcpy(transaction->bundle, transfer_iterator->bundle_hash,
-           sizeof(transaction->bundle));
-    memcpy(transaction->address, transfer->address,
-           sizeof(transaction->address));
-    memcpy(transaction->obsolete_tag, transfer->tag,
-           sizeof(transaction->obsolete_tag));
-    memcpy(transaction->tag, transfer->tag, sizeof(transaction->tag));
-    transaction->timestamp = transfer->timestamp;
-    transaction->current_index = transfer_iterator->current_transaction_index;
-    transaction->last_index = transfer_iterator->transactions_count - 1;
+    memcpy(transaction_bundle(transaction), transfer_iterator->bundle_hash,
+           sizeof(transaction_bundle(transaction)));
+    memcpy(transaction_address(transaction), transfer->address,
+           sizeof(transaction_address(transaction)));
+    memcpy(transaction_obsolete_tag(transaction), transfer->tag,
+           sizeof(transaction_obsolete_tag(transaction)));
+    memcpy(transaction_tag(transaction), transfer->tag,
+           sizeof(transaction_tag(transaction)));
+    transaction_set_timestamp(transaction, transfer->timestamp);
+    transaction_set_current_index(transaction,
+                                  transfer_iterator->current_transaction_index);
+    transaction_set_last_index(transaction,
+                               transfer_iterator->transactions_count - 1);
 
     // Set transaction type specific fields
     switch (transfer->type) {

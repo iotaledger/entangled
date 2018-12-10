@@ -39,7 +39,8 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
                                            flex_trit_t *const hash) {
   retcode_t ret = RC_OK;
   bool exists = false;
-  struct _iota_transaction transaction = {.snapshot_index = 0, .solid = 0};
+  struct _iota_transaction transaction = {.metadata.snapshot_index = 0,
+                                          .metadata.solid = 0};
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
   trit_array_t key = {.trits = hash,
                       .num_trits = HASH_LENGTH_TRIT,
@@ -82,7 +83,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
 
   // TODO Add transaction hash to cache
 
-  memcpy(hash, transaction.hash, FLEX_TRIT_SIZE_243);
+  memcpy(hash, transaction_hash(&transaction), FLEX_TRIT_SIZE_243);
 
   // Checks if the transaction is already persisted
   if ((ret = iota_tangle_transaction_exist(
@@ -118,12 +119,12 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
       goto failure;
     }
 
-    if (transaction.current_index == 0 &&
-        memcmp(transaction.address,
+    if (transaction_current_index(&transaction) == 0 &&
+        memcmp(transaction_address(&transaction),
                processor->milestone_tracker->coordinator->trits,
                FLEX_TRIT_SIZE_243) == 0) {
-      ret = iota_milestone_tracker_add_candidate(processor->milestone_tracker,
-                                                 transaction.hash);
+      ret = iota_milestone_tracker_add_candidate(
+          processor->milestone_tracker, transaction_hash(&transaction));
     }
 
     neighbor->nbr_new_tx++;

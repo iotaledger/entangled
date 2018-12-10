@@ -59,7 +59,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
     return RC_OK;
   }
 
-  if (tx.current_index != 0) {
+  if (transaction_current_index(&tx) != 0) {
     log_error(WALKER_VALIDATOR_LOGGER_ID,
               "Validation failed, transaction is not a tail\n");
     *is_valid = false;
@@ -139,23 +139,24 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
 
     res = iota_tangle_transaction_load(epv->tangle, TRANSACTION_FIELD_HASH,
                                        &hash_trits_array, &pack);
-    bool tail_is_not_genesis = (curr_tx_s.snapshot_index != 0 ||
-                                memcmp(epv->conf->genesis_hash, curr_tx_s.hash,
-                                       FLEX_TRIT_SIZE_243) == 0);
+    bool tail_is_not_genesis =
+        (transaction_snapshot_index(&curr_tx_s) != 0 ||
+         memcmp(epv->conf->genesis_hash, transaction_hash(&curr_tx_s),
+                FLEX_TRIT_SIZE_243) == 0);
     if (tail_is_not_genesis &&
-        (curr_tx_s.snapshot_index < lowest_allowed_depth)) {
+        (transaction_snapshot_index(&curr_tx_s) < lowest_allowed_depth)) {
       log_error(WALKER_VALIDATOR_LOGGER_ID,
                 "Validation failed, transaction is below max depth\n");
       *below_max_depth = true;
       break;
     }
-    if (curr_tx->snapshot_index == 0) {
-      if ((res = hash243_stack_push(&non_analyzed_hashes, curr_tx->trunk)) !=
-          RC_OK) {
+    if (transaction_snapshot_index(curr_tx) == 0) {
+      if ((res = hash243_stack_push(&non_analyzed_hashes,
+                                    transaction_trunk(curr_tx))) != RC_OK) {
         return res;
       }
-      if ((res = hash243_stack_push(&non_analyzed_hashes, curr_tx->branch)) !=
-          RC_OK) {
+      if ((res = hash243_stack_push(&non_analyzed_hashes,
+                                    transaction_branch(curr_tx))) != RC_OK) {
         return res;
       }
     }

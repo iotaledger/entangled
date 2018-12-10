@@ -54,9 +54,17 @@ extern "C" {
  * Transaction data structure
  ***********************************************************************************************************/
 typedef struct _iota_transaction *iota_transaction_t;
-struct _iota_transaction {
-  // 2187 trytes = 6561 trits
-  flex_trit_t signature_or_message[FLEX_TRIT_SIZE_6561];
+typedef struct _iota_transaction_fields_essence
+    iota_transaction_fields_essence_t;
+typedef struct _iota_transaction_fields_attachement
+    iota_transaction_fields_attachement_t;
+typedef struct _iota_transaction_fields_consensus
+    iota_transaction_fields_consensus_t;
+typedef struct _iota_transaction_fields_metadata
+    iota_transaction_fields_metadata_t;
+typedef struct _iota_transaction_fields_data iota_transaction_fields_data_t;
+
+struct _iota_transaction_fields_essence {
   // 81 trytes = 243 trits
   flex_trit_t address[FLEX_TRIT_SIZE_243];
   // 27 trytes = 81 trits
@@ -69,14 +77,13 @@ struct _iota_transaction {
   int64_t current_index;
   // 9 trytes = 27 trits
   int64_t last_index;
-  // 81 trytes = 243 trits
-  flex_trit_t bundle[FLEX_TRIT_SIZE_243];
+};
+
+struct _iota_transaction_fields_attachement {
   // 81 trytes = 243 trits
   flex_trit_t trunk[FLEX_TRIT_SIZE_243];
   // 81 trytes = 243 trits
   flex_trit_t branch[FLEX_TRIT_SIZE_243];
-  // 27 trytes = 81 trits
-  flex_trit_t tag[FLEX_TRIT_SIZE_81];
   // 9 trytes = 27 trits
   int64_t attachment_timestamp;
   // 9 trytes = 27 trits
@@ -85,13 +92,33 @@ struct _iota_transaction {
   int64_t attachment_timestamp_upper;
   // 27 trytes = 81 trits
   flex_trit_t nonce[FLEX_TRIT_SIZE_81];
+  // 27 trytes = 81 trits
+  flex_trit_t tag[FLEX_TRIT_SIZE_81];
+};
+
+struct _iota_transaction_fields_consensus {
   // 81 trytes = 243 trits
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  // Total 2754 trytes
+  // 81 trytes = 243 trits
+  flex_trit_t bundle[FLEX_TRIT_SIZE_243];
+};
 
-  // Metadata
+struct _iota_transaction_fields_data {
+  // 2187 trytes = 6561 trits
+  flex_trit_t signature_or_message[FLEX_TRIT_SIZE_6561];
+};
+
+struct _iota_transaction_fields_metadata {
   uint64_t snapshot_index;
   bool solid;
+};
+
+struct _iota_transaction {
+  iota_transaction_fields_essence_t essence;
+  iota_transaction_fields_attachement_t attachement;
+  iota_transaction_fields_consensus_t consensus;
+  iota_transaction_fields_data_t data;
+  iota_transaction_fields_metadata_t metadata;
 };
 
 /***********************************************************************************************************
@@ -181,6 +208,16 @@ flex_trit_t *transaction_hash(iota_transaction_t transaction);
 // Set the transaction hash (copy argument)
 void transaction_set_hash(iota_transaction_t transaction,
                           const flex_trit_t *hash);
+
+// Get the transaction snapshot index
+uint64_t transaction_snapshot_index(iota_transaction_t transaction);
+// Set the transaction snapshot index
+void transaction_set_snapshot_index(iota_transaction_t transaction,
+                                    uint64_t snapshot_index);
+// Get the transaction solid state
+bool transaction_solid(iota_transaction_t transaction);
+// Set the transaction solid state
+void transaction_set_solid(iota_transaction_t transaction, bool state);
 
 void transaction_reset(iota_transaction_t transaction);
 
