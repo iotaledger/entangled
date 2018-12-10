@@ -22,6 +22,14 @@ int main(int argc, char* argv[]) {
 
   rand_handle_seed(time(NULL));
 
+  if (LOGGER_VERSION != logger_version()) {
+    return EXIT_FAILURE;
+  }
+  logger_init();
+  logger_output_register(stdout);
+  logger_output_level_set(stdout, LOGGER_WARNING);
+  logger_helper_init(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
+
   // Default configuration
 
   if (iota_ciri_conf_default(&core_g.conf, &core_g.consensus.conf,
@@ -36,7 +44,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  // CLI Configuration
+  // CLI configuration
 
   if (iota_ciri_conf_cli(&core_g.conf, &core_g.consensus.conf,
                          &core_g.node.conf, &core_g.api.conf, argc,
@@ -44,13 +52,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  if (LOGGER_VERSION != logger_version()) {
-    return EXIT_FAILURE;
-  }
-  logger_init();
-  logger_output_register(stdout);
   logger_output_level_set(stdout, core_g.conf.log_level);
-  logger_helper_init(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
 
   log_info(MAIN_LOGGER_ID, "Initializing cIRI core\n");
   if (core_init(&core_g) != RC_OK) {
