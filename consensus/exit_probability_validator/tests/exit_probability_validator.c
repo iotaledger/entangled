@@ -87,14 +87,20 @@ void test_transaction_does_not_exist() {
 
   bool is_valid = false;
   trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, transaction_hash(&TEST_TRANSACTION),
-                       NUM_TRITS_HASH);
+  flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
+  flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+
+  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
+  trit_array_set_trits(tail, transaction_hash(test_tx), NUM_TRITS_HASH);
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
                   &epv, tail, &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
   trit_array_free(tail);
   destroy_epv(&epv);
+  transaction_free(test_tx);
 }
 
 void test_transaction_not_a_tail() {

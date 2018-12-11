@@ -43,8 +43,13 @@ void test_iota_consensus_bundle_validator_validate_tail_not_found() {
   bundle_transactions_new(&bundle);
 
   trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, transaction_hash(&TEST_TRANSACTION),
-                       NUM_TRITS_HASH);
+  flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
+  flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+
+  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
+  trit_array_set_trits(tail, transaction_hash(test_tx), NUM_TRITS_HASH);
 
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
 
@@ -54,6 +59,7 @@ void test_iota_consensus_bundle_validator_validate_tail_not_found() {
 
   trit_array_free(tail);
   bundle_transactions_free(&bundle);
+  transaction_free(test_tx);
 }
 
 void test_bundle_size_1_value_with_wrong_address_invalid() {
