@@ -124,104 +124,230 @@ struct _iota_transaction {
 /***********************************************************************************************************
  * Accessors
  ***********************************************************************************************************/
+/***********************************************************************************************************
+ * Accessors
+ ***********************************************************************************************************/
 // Get the transaction signature
-flex_trit_t *transaction_signature(iota_transaction_t transaction);
+static inline flex_trit_t *transaction_signature(
+    iota_transaction_t transaction) {
+  return transaction->data.signature_or_message;
+}
+
 // Set the transaction signature (copy argument)
-void transaction_set_signature(iota_transaction_t transaction,
-                               const flex_trit_t *signature);
+static inline void transaction_set_signature(iota_transaction_t transaction,
+                                             const flex_trit_t *signature) {
+  memcpy(transaction->data.signature_or_message, signature,
+         sizeof(transaction->data.signature_or_message));
+}
+
 // Get the transaction message
-flex_trit_t *transaction_message(iota_transaction_t transaction);
+static inline flex_trit_t *transaction_message(iota_transaction_t transaction) {
+  return transaction->data.signature_or_message;
+}
+
 // Set the transaction message (copy argument)
-void transaction_set_message(iota_transaction_t transaction,
-                             const flex_trit_t *message);
+static inline void transaction_set_message(iota_transaction_t transaction,
+                                           const flex_trit_t *message) {
+  memcpy(transaction->data.signature_or_message, message,
+         sizeof(transaction->data.signature_or_message));
+}
+
 // Get the transaction address
-flex_trit_t *transaction_address(iota_transaction_t transaction);
+static inline flex_trit_t *transaction_address(iota_transaction_t transaction) {
+  return transaction->essence.address;
+}
+
 // Set the transaction address (copy argument)
-void transaction_set_address(iota_transaction_t transaction,
-                             const flex_trit_t *address);
+static inline void transaction_set_address(iota_transaction_t transaction,
+                                           const flex_trit_t *address) {
+  memcpy(transaction->essence.address, address,
+         sizeof(transaction->essence.address));
+}
+
 // Get the transaction value
-int64_t transaction_value(iota_transaction_t transaction);
+static inline int64_t transaction_value(iota_transaction_t transaction) {
+  return transaction->essence.value;
+}
+
 // Set the transaction value
-void transaction_set_value(iota_transaction_t transaction, int64_t value);
+static inline void transaction_set_value(iota_transaction_t transaction,
+                                         int64_t value) {
+  transaction->essence.value = value;
+}
+
 // Get the transaction obsolete tag
-flex_trit_t *transaction_obsolete_tag(iota_transaction_t transaction);
+static inline flex_trit_t *transaction_obsolete_tag(
+    iota_transaction_t transaction) {
+  return transaction->essence.obsolete_tag;
+}
+
 // Set the transaction obsolete tag
-void transaction_set_obsolete_tag(iota_transaction_t transaction,
-                                  const flex_trit_t *obsolete_tag);
+static inline void transaction_set_obsolete_tag(
+    iota_transaction_t transaction, const flex_trit_t *obsolete_tag) {
+  memcpy(transaction->essence.obsolete_tag, obsolete_tag,
+         sizeof(transaction->essence.obsolete_tag));
+}
+
 // Get the transaction timestamp
-uint64_t transaction_timestamp(iota_transaction_t transaction);
+static inline uint64_t transaction_timestamp(iota_transaction_t transaction) {
+  return transaction->essence.timestamp;
+}
+
 // Set the transaction timestamp
-void transaction_set_timestamp(iota_transaction_t transaction,
-                               uint64_t timestamp);
+static inline void transaction_set_timestamp(iota_transaction_t transaction,
+                                             uint64_t timestamp) {
+  transaction->essence.timestamp = timestamp;
+}
+
 // Get the transaction current index
-int64_t transaction_current_index(iota_transaction_t transaction);
+static inline int64_t transaction_current_index(
+    iota_transaction_t transaction) {
+  return transaction->essence.current_index;
+}
+
 // Set the transaction current index
-void transaction_set_current_index(iota_transaction_t transaction,
-                                   int64_t index);
+static inline void transaction_set_current_index(iota_transaction_t transaction,
+                                                 int64_t index) {
+  transaction->essence.current_index = index;
+}
+
 // Get the transaction last index
-int64_t transaction_last_index(iota_transaction_t transaction);
+static inline int64_t transaction_last_index(iota_transaction_t transaction) {
+  return transaction->essence.last_index;
+}
+
 // Set the transaction last index
-void transaction_set_last_index(iota_transaction_t transaction,
-                                int64_t last_index);
+static inline void transaction_set_last_index(iota_transaction_t transaction,
+                                              int64_t index) {
+  transaction->essence.last_index = index;
+}
+
 // Get the transaction bundle
-flex_trit_t *transaction_bundle(iota_transaction_t transaction);
+static inline flex_trit_t *transaction_bundle(iota_transaction_t transaction) {
+  return transaction->consensus.bundle;
+}
+
 // Set the transaction bundle (copy argument)
-void transaction_set_bundle(iota_transaction_t transaction,
-                            const flex_trit_t *bundle);
+static inline void transaction_set_bundle(iota_transaction_t transaction,
+                                          const flex_trit_t *bundle) {
+  memcpy(transaction->consensus.bundle, bundle,
+         sizeof(transaction->consensus.bundle));
+}
+
 // Get the transaction trunk
-flex_trit_t *transaction_trunk(iota_transaction_t transaction);
+static inline flex_trit_t *transaction_trunk(iota_transaction_t transaction) {
+  return transaction->attachement.trunk;
+}
+
 // Set the transaction trunk (copy argument)
-void transaction_set_trunk(iota_transaction_t transaction,
-                           const flex_trit_t *trunk);
+static inline void transaction_set_trunk(iota_transaction_t transaction,
+                                         const flex_trit_t *trunk) {
+  memcpy(transaction->attachement.trunk, trunk,
+         sizeof(transaction->attachement.trunk));
+}
+
 // Get the transaction branch
-flex_trit_t *transaction_branch(iota_transaction_t transaction);
+static inline flex_trit_t *transaction_branch(iota_transaction_t transaction) {
+  return transaction->attachement.branch;
+}
+
 // Set the transaction branch (copy argument)
-void transaction_set_branch(iota_transaction_t transaction,
-                            const flex_trit_t *branch);
+static inline void transaction_set_branch(iota_transaction_t transaction,
+                                          const flex_trit_t *branch) {
+  memcpy(transaction->attachement.branch, branch,
+         sizeof(transaction->attachement.branch));
+}
+
 // Get the transaction tag
-flex_trit_t *transaction_tag(iota_transaction_t transaction);
+static inline flex_trit_t *transaction_tag(iota_transaction_t transaction) {
+  return transaction->attachement.tag;
+}
+
 // Set the transaction tag (copy argument)
-void transaction_set_tag(iota_transaction_t transaction,
-                         const flex_trit_t *tag);
+static inline void transaction_set_tag(iota_transaction_t transaction,
+                                       const flex_trit_t *tag) {
+  memcpy(transaction->attachement.tag, tag,
+         sizeof(transaction->attachement.tag));
+}
+
 // Get the transaction attachment timestamp
-int64_t transaction_attachment_timestamp(iota_transaction_t transaction);
+static inline int64_t transaction_attachment_timestamp(
+    iota_transaction_t transaction) {
+  return transaction->attachement.attachment_timestamp;
+}
+
 // Set the transaction attachment timestamp
-void transaction_set_attachment_timestamp(iota_transaction_t transaction,
-                                          int64_t timestamp);
+static inline void transaction_set_attachment_timestamp(
+    iota_transaction_t transaction, int64_t timestamp) {
+  transaction->attachement.attachment_timestamp = timestamp;
+}
+
 // Get the transaction attachment timestamp lower
-int64_t transaction_attachment_timestamp_lower(iota_transaction_t transaction);
+static inline int64_t transaction_attachment_timestamp_lower(
+    iota_transaction_t transaction) {
+  return transaction->attachement.attachment_timestamp_lower;
+}
+
 // Set the transaction attachment timestamp lower
-void transaction_set_attachment_timestamp_lower(iota_transaction_t transaction,
-                                                int64_t timestamp);
+static inline void transaction_set_attachment_timestamp_lower(
+    iota_transaction_t transaction, int64_t timestamp) {
+  transaction->attachement.attachment_timestamp_lower = timestamp;
+}
+
 // Get the transaction attachment timestamp upper
-int64_t transaction_attachment_timestamp_upper(iota_transaction_t transaction);
+static inline int64_t transaction_attachment_timestamp_upper(
+    iota_transaction_t transaction) {
+  return transaction->attachement.attachment_timestamp_upper;
+}
+
 // Set the transaction attachment timestamp upper
-void transaction_set_attachment_timestamp_upper(iota_transaction_t transaction,
-                                                int64_t timestamp);
+static inline void transaction_set_attachment_timestamp_upper(
+    iota_transaction_t transaction, int64_t timestamp) {
+  transaction->attachement.attachment_timestamp_upper = timestamp;
+}
+
 // Get the transaction nonce
-flex_trit_t *transaction_nonce(iota_transaction_t transaction);
+static inline flex_trit_t *transaction_nonce(iota_transaction_t transaction) {
+  return transaction->attachement.nonce;
+}
+
 // Set the transaction nonce (copy argument)
-void transaction_set_nonce(iota_transaction_t transaction,
-                           const flex_trit_t *nonce);
+static inline void transaction_set_nonce(iota_transaction_t transaction,
+                                         const flex_trit_t *nonce) {
+  memcpy(transaction->attachement.nonce, nonce,
+         sizeof(transaction->attachement.nonce));
+}
+
 // Get the transaction hash
-flex_trit_t *transaction_hash(iota_transaction_t transaction);
+static inline flex_trit_t *transaction_hash(iota_transaction_t transaction) {
+  return transaction->consensus.hash;
+}
+
 // Set the transaction hash (copy argument)
-void transaction_set_hash(iota_transaction_t transaction,
-                          const flex_trit_t *hash);
+static inline void transaction_set_hash(iota_transaction_t transaction,
+                                        const flex_trit_t *hash) {
+  memcpy(transaction->consensus.hash, hash,
+         sizeof(transaction->consensus.hash));
+}
 
-// Get the transaction snapshot index
-uint64_t transaction_snapshot_index(iota_transaction_t transaction);
+static inline uint64_t transaction_snapshot_index(
+    iota_transaction_t transaction) {
+  return transaction->metadata.snapshot_index;
+}
 // Set the transaction snapshot index
-void transaction_set_snapshot_index(iota_transaction_t transaction,
-                                    uint64_t snapshot_index);
-// Get the transaction solid state
-bool transaction_solid(iota_transaction_t transaction);
+static inline void transaction_set_snapshot_index(
+    iota_transaction_t transaction, uint64_t snapshot_index) {
+  transaction->metadata.snapshot_index = snapshot_index;
+}
+
+static inline bool transaction_solid(iota_transaction_t transaction) {
+  return transaction->metadata.solid;
+}
 // Set the transaction solid state
-void transaction_set_solid(iota_transaction_t transaction, bool state);
-
-void transaction_reset(iota_transaction_t transaction);
-
-uint8_t transaction_weight_magnitude(const iota_transaction_t transaction);
+static inline void transaction_set_solid(iota_transaction_t transaction,
+                                         bool state) {
+  transaction->metadata.solid = state;
+}
 
 /***********************************************************************************************************
  * Constructors

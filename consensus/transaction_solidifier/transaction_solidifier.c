@@ -383,8 +383,8 @@ retcode_t iota_consensus_transaction_solidifier_update_status(
   retcode_t ret = RC_OK;
   size_t approvers_count = 0;
 
-  if ((ret = requester_clear_request(ts->transaction_requester, transaction_hash(tx))) !=
-      RC_OK) {
+  if ((ret = requester_clear_request(ts->transaction_requester,
+                                     transaction_hash(tx))) != RC_OK) {
     return ret;
   }
 
