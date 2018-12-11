@@ -31,16 +31,16 @@ typedef struct {
   /**
    * Returns the amount of free memory in the Java Virtual Machine.
    */
-  size_t jre_free_memory;
+  uint32_t jre_free_memory;
   /**
    * Returns the maximum amount of memory that the Java virtual machine will
    * attempt to use.
    */
-  size_t jre_max_memory;
+  uint32_t jre_max_memory;
   /**
    * Returns the total amount of memory in the Java virtual machine.
    */
-  size_t jre_total_memory;
+  uint32_t jre_total_memory;
   /**
    * Latest milestone that was signed off by the coordinator.
    */
@@ -48,7 +48,7 @@ typedef struct {
   /**
    * Index of the latest milestone.
    */
-  size_t latest_milestone_index;
+  uint32_t latest_milestone_index;
   /**
    * The latest milestone which is solid and is used for sending transactions.
    * For a milestone to become solid your local node must basically approve the
@@ -59,27 +59,27 @@ typedef struct {
   /**
    * Index of the latest solid subtangle.
    */
-  size_t latest_solid_subtangle_milestone_index;
+  uint32_t latest_solid_subtangle_milestone_index;
   /**
    * Number of neighbors you are directly connected with.
    */
-  int neighbors;
+  uint16_t neighbors;
   /**
    * Packets which are currently queued up.
    */
-  int packets_queue_size;
+  uint16_t packets_queue_size;
   /**
    * Current UNIX timestamp.
    */
-  size_t time;
+  uint64_t time;
   /**
    * Number of tips in the network.
    */
-  int tips;
+  uint32_t tips;
   /**
    * Transactions to request during syncing process.
    */
-  int trans_to_request;
+  uint32_t trans_to_request;
 } get_node_info_res_t;
 
 get_node_info_res_t* get_node_info_res_new();

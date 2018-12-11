@@ -188,26 +188,6 @@ static retcode_t json_boolean_array_to_utarray(cJSON const* const obj,
   return RC_OK;
 }
 
-static retcode_t json_get_size(cJSON const* const json_obj,
-                               char const* const obj_name, size_t* const num) {
-  cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
-  if (json_value == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
-              STR_CCLIENT_JSON_KEY, obj_name);
-    return RC_CCLIENT_JSON_KEY;
-  }
-
-  if (cJSON_IsNumber(json_value)) {
-    *num = (size_t)json_value->valuedouble;
-  } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not number\n", __func__, __LINE__,
-              STR_CCLIENT_JSON_PARSE);
-    return RC_CCLIENT_JSON_PARSE;
-  }
-
-  return RC_OK;
-}
-
 static retcode_t json_get_int(cJSON const* const json_obj,
                               char const* const obj_name, int* const num) {
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
@@ -219,6 +199,69 @@ static retcode_t json_get_int(cJSON const* const json_obj,
 
   if (cJSON_IsNumber(json_value)) {
     *num = json_value->valueint;
+  } else {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s not number\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_PARSE);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  return RC_OK;
+}
+
+static retcode_t json_get_uint16(cJSON const* const json_obj,
+                                 char const* const obj_name,
+                                 uint16_t* const num) {
+  cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
+  if (json_value == NULL) {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_KEY, obj_name);
+    return RC_CCLIENT_JSON_KEY;
+  }
+
+  if (cJSON_IsNumber(json_value)) {
+    *num = (uint16_t)json_value->valueint;
+  } else {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s not number\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_PARSE);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  return RC_OK;
+}
+
+static retcode_t json_get_uint32(cJSON const* const json_obj,
+                                 char const* const obj_name,
+                                 uint32_t* const num) {
+  cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
+  if (json_value == NULL) {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_KEY, obj_name);
+    return RC_CCLIENT_JSON_KEY;
+  }
+
+  if (cJSON_IsNumber(json_value)) {
+    *num = (uint32_t)json_value->valuedouble;
+  } else {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s not number\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_PARSE);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  return RC_OK;
+}
+
+static retcode_t json_get_uint64(cJSON const* const json_obj,
+                                 char const* const obj_name,
+                                 uint64_t* const num) {
+  cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
+  if (json_value == NULL) {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_KEY, obj_name);
+    return RC_CCLIENT_JSON_KEY;
+  }
+
+  if (cJSON_IsNumber(json_value)) {
+    *num = (uint64_t)json_value->valuedouble;
   } else {
     log_error(JSON_LOGGER_ID, "[%s:%d] %s not number\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
@@ -888,17 +931,17 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
     goto end;
   }
 
-  ret = json_get_size(json_obj, "jreFreeMemory", &out->jre_free_memory);
+  ret = json_get_uint32(json_obj, "jreFreeMemory", &out->jre_free_memory);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_size(json_obj, "jreMaxMemory", &out->jre_max_memory);
+  ret = json_get_uint32(json_obj, "jreMaxMemory", &out->jre_max_memory);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_size(json_obj, "jreTotalMemory", &out->jre_total_memory);
+  ret = json_get_uint32(json_obj, "jreTotalMemory", &out->jre_total_memory);
   if (ret != RC_OK) {
     goto end;
   }
@@ -909,8 +952,8 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
     goto end;
   }
 
-  ret = json_get_size(json_obj, "latestMilestoneIndex",
-                      &out->latest_milestone_index);
+  ret = json_get_uint32(json_obj, "latestMilestoneIndex",
+                        &out->latest_milestone_index);
   if (ret != RC_OK) {
     goto end;
   }
@@ -922,33 +965,34 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
     goto end;
   }
 
-  ret = json_get_size(json_obj, "latestSolidSubtangleMilestoneIndex",
-                      &out->latest_solid_subtangle_milestone_index);
+  ret = json_get_uint32(json_obj, "latestSolidSubtangleMilestoneIndex",
+                        &out->latest_solid_subtangle_milestone_index);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_int(json_obj, "neighbors", &out->neighbors);
+  ret = json_get_uint16(json_obj, "neighbors", &out->neighbors);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_int(json_obj, "packetsQueueSize", &out->packets_queue_size);
+  ret = json_get_uint16(json_obj, "packetsQueueSize", &out->packets_queue_size);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_size(json_obj, "time", &out->time);
+  ret = json_get_uint64(json_obj, "time", &out->time);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_int(json_obj, "tips", &out->tips);
+  ret = json_get_uint32(json_obj, "tips", &out->tips);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_int(json_obj, "transactionsToRequest", &out->trans_to_request);
+  ret = json_get_uint32(json_obj, "transactionsToRequest",
+                        &out->trans_to_request);
   if (ret != RC_OK) {
     goto end;
   }

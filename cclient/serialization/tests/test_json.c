@@ -146,35 +146,36 @@ void test_deserialize_get_node_info(void) {
 
   TEST_ASSERT_EQUAL_STRING(TEST_INFO_APP_NAME, node_info->app_name->data);
   TEST_ASSERT_EQUAL_STRING(TEST_INFO_APP_VERSION, node_info->app_version->data);
-  TEST_ASSERT_EQUAL_INT(TEST_INFO_JRE_AVAILABLE_PROCESSORS,
-                        node_info->jre_available_processors);
-  TEST_ASSERT_EQUAL_INT8(TEST_INFO_JRE_FREE_MEMORY, node_info->jre_free_memory);
-  TEST_ASSERT_EQUAL_INT8(TEST_INFO_JRE_MAX_MEMORY, node_info->jre_max_memory);
-  TEST_ASSERT_EQUAL_INT8(TEST_INFO_JRE_TOTAL_MEMORY,
-                         node_info->jre_total_memory);
+  TEST_ASSERT_EQUAL_UINT8(TEST_INFO_JRE_AVAILABLE_PROCESSORS,
+                          node_info->jre_available_processors);
+  TEST_ASSERT_EQUAL_UINT32(TEST_INFO_JRE_FREE_MEMORY,
+                           node_info->jre_free_memory);
+  TEST_ASSERT_EQUAL_UINT32(TEST_INFO_JRE_MAX_MEMORY, node_info->jre_max_memory);
+  TEST_ASSERT_EQUAL_UINT32(TEST_INFO_JRE_TOTAL_MEMORY,
+                           node_info->jre_total_memory);
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, node_info->latest_milestone,
                            FLEX_TRIT_SIZE_243);
 
-  TEST_ASSERT_EQUAL_INT8(TEST_INFO_LATEST_MILESTONE_INDEX,
-                         node_info->latest_milestone_index);
+  TEST_ASSERT_EQUAL_UINT32(TEST_INFO_LATEST_MILESTONE_INDEX,
+                           node_info->latest_milestone_index);
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_2,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, node_info->latest_solid_subtangle_milestone,
                            FLEX_TRIT_SIZE_243);
 
-  TEST_ASSERT_EQUAL_INT8(TEST_INFO_LATEST_SS_MILESTONE_INDEX,
-                         node_info->latest_solid_subtangle_milestone_index);
-  TEST_ASSERT_EQUAL_INT(TEST_INFO_NEIGHBORS, node_info->neighbors);
-  TEST_ASSERT_EQUAL_INT(TEST_INFO_PACKETS_QUEUE_SIZE,
-                        node_info->packets_queue_size);
-  TEST_ASSERT_EQUAL_INT8(TEST_INFO_TIME, node_info->time);
-  TEST_ASSERT_EQUAL_INT(TEST_INFO_TIPS, node_info->tips);
-  TEST_ASSERT_EQUAL_INT(TEST_INFO_TRANSACTIONS_TO_REQUEST,
-                        node_info->trans_to_request);
+  TEST_ASSERT_EQUAL_UINT32(TEST_INFO_LATEST_SS_MILESTONE_INDEX,
+                           node_info->latest_solid_subtangle_milestone_index);
+  TEST_ASSERT_EQUAL_UINT16(TEST_INFO_NEIGHBORS, node_info->neighbors);
+  TEST_ASSERT_EQUAL_UINT16(TEST_INFO_PACKETS_QUEUE_SIZE,
+                           node_info->packets_queue_size);
+  TEST_ASSERT_EQUAL_UINT64(TEST_INFO_TIME, node_info->time);
+  TEST_ASSERT_EQUAL_UINT32(TEST_INFO_TIPS, node_info->tips);
+  TEST_ASSERT_EQUAL_UINT32(TEST_INFO_TRANSACTIONS_TO_REQUEST,
+                           node_info->trans_to_request);
 
   get_node_info_res_free(&node_info);
 }
