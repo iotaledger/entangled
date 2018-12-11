@@ -36,10 +36,10 @@ static retcode_t update_snapshot_milestone_do_func(flex_trit_t *const hash,
     return RC_LEDGER_VALIDATOR_COULD_NOT_LOAD_MILESTONE;
   }
   iota_transaction_t transaction = pack->models[0];
-  *should_branch = transaction->snapshot_index == 0;
+  *should_branch = transaction_snapshot_index(transaction) == 0;
 
   if (*should_branch) {
-    if ((ret = hash243_set_add(hashes, transaction->hash)) != RC_OK) {
+    if ((ret = hash243_set_add(hashes, hash)) != RC_OK) {
       *should_stop = true;
       return ret;
     }
@@ -152,10 +152,10 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
   ledger_validator_t *lv = params->lv;
   iota_transaction_t tx = pack->models[0];
 
-  if (tx->snapshot_index == 0 ||
-      tx->snapshot_index > params->latest_snapshot_index) {
+  if (transaction_snapshot_index(tx) == 0 ||
+      transaction_snapshot_index(tx) > params->latest_snapshot_index) {
     *should_branch = true;
-    if (tx->current_index == 0) {
+    if (transaction_current_index(tx) == 0) {
       bundle_transactions_new(&bundle);
       curr_hash.trits = hash;
       if ((ret = iota_consensus_bundle_validator_validate(
@@ -169,9 +169,10 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
         goto done;
       }
       while (tx_bundle != NULL) {
-        if (tx_bundle->value != 0) {
-          if ((ret = state_delta_add_or_sum(params->state, tx_bundle->address,
-                                            tx_bundle->value)) != RC_OK) {
+        if (transaction_value(tx_bundle) != 0) {
+          if ((ret = state_delta_add_or_sum(
+                   params->state, transaction_address(tx_bundle),
+                   transaction_value(tx_bundle))) != RC_OK) {
             goto done;
           }
         }
@@ -266,15 +267,15 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   } else if (pack.num_loaded == 0) {
     ret = RC_LEDGER_VALIDATOR_INVALID_TRANSACTION;
     goto done;
-  } else if (tx.solid == 0) {
+  } else if (transaction_solid(&tx) == 0) {
     ret = RC_LEDGER_VALIDATOR_TRANSACTION_NOT_SOLID;
     goto done;
   }
 
-  *has_snapshot = tx.snapshot_index != 0;
+  *has_snapshot = transaction_snapshot_index(&tx) != 0;
   if (!(*has_snapshot)) {
     if ((ret = get_latest_delta(
-             lv, NULL, &delta, tx.hash,
+             lv, NULL, &delta, transaction_hash(&tx),
              iota_snapshot_get_index(lv->milestone_tracker->latest_snapshot),
              true, &valid_delta)) != RC_OK) {
       log_error(LEDGER_VALIDATOR_LOGGER_ID, "Getting latest delta failed\n");
@@ -365,7 +366,7 @@ retcode_t iota_consensus_ledger_validator_update_delta(
   } else if (pack.num_loaded == 0) {
     ret = RC_LEDGER_VALIDATOR_INVALID_TRANSACTION;
     goto done;
-  } else if (tx.solid == 0) {
+  } else if (!transaction_solid(&tx)) {
     ret = RC_LEDGER_VALIDATOR_TRANSACTION_NOT_SOLID;
     goto done;
   }

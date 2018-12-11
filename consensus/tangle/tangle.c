@@ -265,8 +265,8 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
     return res;
   }
 
-  uint32_t index = curr_tx->current_index;
-  memcpy(bundle_hash, curr_tx->bundle, FLEX_TRIT_SIZE_243);
+  uint32_t index = transaction_current_index(curr_tx);
+  memcpy(bundle_hash, transaction_bundle(curr_tx), FLEX_TRIT_SIZE_243);
 
   iota_stor_pack_t hash_pack;
   if ((res = hash_pack_init(&hash_pack, 10)) != RC_OK) {
@@ -274,10 +274,11 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
   }
 
   while (res == RC_OK && index > 0 &&
-         memcmp(curr_tx->bundle, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
+         memcmp(transaction_bundle(curr_tx), bundle_hash, FLEX_TRIT_SIZE_243) ==
+             0) {
     hash_pack_reset(&hash_pack);
     res = iota_tangle_transaction_load_hashes_of_approvers(
-        tangle, curr_tx->hash, &hash_pack);
+        tangle, transaction_hash(curr_tx), &hash_pack);
 
     if (res != RC_OK) {
       log_error(TANGLE_LOGGER_ID,
@@ -299,8 +300,9 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
       if (res != RC_OK || tx_pack.num_loaded == 0) {
         break;
       }
-      if (next_tx->current_index == index &&
-          memcmp(next_tx->bundle, bundle_hash, FLEX_TRIT_SIZE_243) == 0) {
+      if (transaction_current_index(next_tx) == index &&
+          memcmp(transaction_bundle(next_tx), bundle_hash,
+                 FLEX_TRIT_SIZE_243) == 0) {
         curr_tx = next_tx;
         found_approver = true;
         break;
@@ -312,8 +314,8 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
     }
   }
 
-  if (curr_tx->current_index == 0) {
-    memcpy(tail->trits, curr_tx->hash, FLEX_TRIT_SIZE_243);
+  if (transaction_current_index(curr_tx) == 0) {
+    memcpy(tail->trits, transaction_hash(curr_tx), FLEX_TRIT_SIZE_243);
     *found_tail = true;
   }
 

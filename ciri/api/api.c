@@ -242,15 +242,15 @@ retcode_t iota_api_store_transactions(
                              .num_trits = HASH_LENGTH_TRIT,
                              .num_bytes = FLEX_TRIT_SIZE_243,
                              .dynamic = 0};
-  tx.solid = 0;
-  tx.snapshot_index = 0;
+  transaction_set_solid(&tx, false);
+  transaction_set_snapshot_index(&tx, 0);
 
   bool exists;
   LL_FOREACH(req->trytes, iter) {
     transaction_deserialize_from_trits(&tx, iter->hash);
     if (iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
-      hash.trits = tx.hash;
+      hash.trits = transaction_hash(&tx);
       if ((ret = iota_tangle_transaction_exist(&api->consensus->tangle,
                                                TRANSACTION_FIELD_HASH, &hash,
                                                &exists)) != RC_OK) {

@@ -40,9 +40,11 @@ void calculate_bundle_hash(bundle_transactions_t *bundle, flex_trit_t *out) {
 
   for (curr_tx = (iota_transaction_t)utarray_front(bundle); curr_tx != NULL;
        curr_tx = (iota_transaction_t)utarray_next(bundle, curr_tx)) {
-    absorb_essence(&kerl, curr_tx->address, curr_tx->value,
-                   curr_tx->obsolete_tag, curr_tx->timestamp,
-                   curr_tx->current_index, curr_tx->last_index, essence_trits);
+    absorb_essence(
+        &kerl, transaction_address(curr_tx), transaction_value(curr_tx),
+        transaction_obsolete_tag(curr_tx), transaction_timestamp(curr_tx),
+        transaction_current_index(curr_tx), transaction_last_index(curr_tx),
+        essence_trits);
   }
 
   // Squeeze kerl to get the bundle hash

@@ -43,8 +43,13 @@ void test_iota_consensus_bundle_validator_validate_tail_not_found() {
   bundle_transactions_new(&bundle);
 
   trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, (flex_trit_t *)TEST_TRANSACTION.hash,
-                       NUM_TRITS_HASH);
+  flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
+  flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+
+  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
+  trit_array_set_trits(tail, transaction_hash(test_tx), NUM_TRITS_HASH);
 
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
 
@@ -54,6 +59,7 @@ void test_iota_consensus_bundle_validator_validate_tail_not_found() {
 
   trit_array_free(tail);
   bundle_transactions_free(&bundle);
+  transaction_free(test_tx);
 }
 
 void test_bundle_size_1_value_with_wrong_address_invalid() {
@@ -68,10 +74,10 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
 
   transactions_deserialize(trytes, txs, 4);
-  flex_trits_to_trits(address, HASH_LENGTH_TRIT, txs[1]->address,
+  flex_trits_to_trits(address, HASH_LENGTH_TRIT, transaction_address(txs[1]),
                       HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   address[HASH_LENGTH_TRIT - 1] = -1;
-  flex_trits_from_trits(txs[0]->address, HASH_LENGTH_TRIT, address,
+  flex_trits_from_trits(transaction_address(txs[0]), HASH_LENGTH_TRIT, address,
                         HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   build_tangle(&tangle, txs, 4);
 
@@ -81,7 +87,7 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
   TEST_ASSERT(exist == true);
 
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail_hash, txs[0]->hash, NUM_TRITS_HASH);
+  trit_array_set_trits(tail_hash, transaction_hash(txs[0]), NUM_TRITS_HASH);
 
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
 
@@ -105,7 +111,7 @@ void test_bundle_exceed_supply_pos_invalid() {
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
 
   transactions_deserialize(trytes, txs, 4);
-  txs[0]->value = IOTA_SUPPLY + 1;
+  transaction_set_value(txs[0], IOTA_SUPPLY + 1);
   build_tangle(&tangle, txs, 4);
 
   bool exist = false;
@@ -114,7 +120,7 @@ void test_bundle_exceed_supply_pos_invalid() {
   TEST_ASSERT(exist == true);
 
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail_hash, txs[0]->hash, NUM_TRITS_HASH);
+  trit_array_set_trits(tail_hash, transaction_hash(txs[0]), NUM_TRITS_HASH);
 
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
 
@@ -138,7 +144,7 @@ void test_bundle_exceed_supply_neg_invalid() {
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
 
   transactions_deserialize(trytes, txs, 4);
-  txs[0]->value = -IOTA_SUPPLY - 1;
+  transaction_set_value(txs[0], -IOTA_SUPPLY - 1);
   build_tangle(&tangle, txs, 4);
 
   bool exist = false;
@@ -147,7 +153,7 @@ void test_bundle_exceed_supply_neg_invalid() {
   TEST_ASSERT(exist == true);
 
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail_hash, txs[0]->hash, NUM_TRITS_HASH);
+  trit_array_set_trits(tail_hash, transaction_hash(txs[0]), NUM_TRITS_HASH);
 
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
 
@@ -172,14 +178,14 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invali
   transactions_deserialize(trytes, txs, 4);
   trit_t buffer[NUM_TRITS_PER_FLEX_TRIT];
   flex_trits_to_trits(buffer, NUM_TRITS_PER_FLEX_TRIT,
-                      (flex_trit_t *)&txs[1]->signature_or_message,
-                      NUM_TRITS_PER_FLEX_TRIT, NUM_TRITS_PER_FLEX_TRIT);
+                      transaction_signature(txs[1]), NUM_TRITS_PER_FLEX_TRIT,
+                      NUM_TRITS_PER_FLEX_TRIT);
   buffer[NUM_TRITS_PER_FLEX_TRIT - 1] = !buffer[NUM_TRITS_PER_FLEX_TRIT - 1];
-  flex_trits_from_trits((flex_trit_t *)&txs[1]->signature_or_message,
-                        NUM_TRITS_PER_FLEX_TRIT, buffer,
-                        NUM_TRITS_PER_FLEX_TRIT, NUM_TRITS_PER_FLEX_TRIT);
+  flex_trits_from_trits(transaction_signature(txs[1]), NUM_TRITS_PER_FLEX_TRIT,
+                        buffer, NUM_TRITS_PER_FLEX_TRIT,
+                        NUM_TRITS_PER_FLEX_TRIT);
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail_hash, txs[0]->hash, NUM_TRITS_HASH);
+  trit_array_set_trits(tail_hash, transaction_hash(txs[0]), NUM_TRITS_HASH);
   build_tangle(&tangle, txs, 4);
 
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
@@ -210,7 +216,7 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_valid() {
   TEST_ASSERT(exist == true);
 
   trit_array_p tail_hash = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail_hash, txs[0]->hash, NUM_TRITS_HASH);
+  trit_array_set_trits(tail_hash, transaction_hash(txs[0]), NUM_TRITS_HASH);
 
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
 
