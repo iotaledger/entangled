@@ -150,8 +150,8 @@ void test_deserialize_get_node_info(void) {
 
   TEST_ASSERT_EQUAL_UINT32(TEST_INFO_LATEST_SS_MILESTONE_INDEX,
                            node_info->latest_solid_subtangle_milestone_index);
-  TEST_ASSERT_EQUAL_UIN32(TEST_INFO_MILESTONE_START_INDEX,
-                          node_info->milestone_start_index);
+  TEST_ASSERT_EQUAL_UINT32(TEST_INFO_MILESTONE_START_INDEX,
+                           node_info->milestone_start_index);
   TEST_ASSERT_EQUAL_UINT16(TEST_INFO_NEIGHBORS, node_info->neighbors);
   TEST_ASSERT_EQUAL_UINT16(TEST_INFO_PACKETS_QUEUE_SIZE,
                            node_info->packets_queue_size);
