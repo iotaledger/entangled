@@ -209,9 +209,9 @@ void test_cw_gen_topology(test_tangle_topology topology) {
     double expected_stdev =
         sqrt(expected_mean * (1.0 - 1.0 / ((double)num_approvers)));
     for (size_t a = 0; a < num_approvers; ++a) {
-      uint16_t comp_up = expected_mean + 5 * expected_stdev;
-      uint16_t comp_low = MAX((expected_mean - 5 * expected_stdev), 0);
-      TEST_ASSERT(selected_tip_counts[a] < comp_up);
+      uint16_t comp_up = expected_mean + 4 * expected_stdev;
+      uint16_t comp_low = MAX((expected_mean - 4 * expected_stdev), 0);
+      TEST_ASSERT(selected_tip_counts[a] <= comp_up);
       TEST_ASSERT(selected_tip_counts[a] >= comp_low);
     }
   }
@@ -760,9 +760,9 @@ int main(int argc, char *argv[]) {
 
   RUN_TEST(test_single_tx_tangle);
   RUN_TEST(test_cw_topology_blockchain);
-  // RUN_TEST(test_cw_topology_only_direct_approvers);
-  // RUN_TEST(test_cw_topology_four_transactions_diamond);
-  // RUN_TEST(test_cw_topology_two_inequal_tips);
+  RUN_TEST(test_cw_topology_only_direct_approvers);
+  RUN_TEST(test_cw_topology_four_transactions_diamond);
+  RUN_TEST(test_cw_topology_two_inequal_tips);
 
   // Bundles
   RUN_TEST(test_1_bundle);
