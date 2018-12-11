@@ -20,7 +20,7 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
   char scheme[MAX_SCHEME_LENGTH];
 
   if (neighbor == NULL) {
-    return RC_NEIGHBOR_NULL_NEIGHBOR;
+    return RC_NULL_PARAM;
   }
   if (uri == NULL) {
     return RC_NEIGHBOR_NULL_URI;
@@ -32,12 +32,8 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
   }
   if (strcmp(scheme, "tcp") == 0) {
     neighbor->endpoint.protocol = PROTOCOL_TCP;
-    strcpy(neighbor->endpoint.ip, neighbor->endpoint.host);
   } else if (strcmp(scheme, "udp") == 0) {
     neighbor->endpoint.protocol = PROTOCOL_UDP;
-    if (udp_endpoint_init(&neighbor->endpoint) == false) {
-      return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
-    }
   } else {
     return RC_NEIGHBOR_INVALID_PROTOCOL;
   }
@@ -48,8 +44,9 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
                                     char const *const ip, uint16_t const port,
                                     protocol_type_t const protocol) {
   if (neighbor == NULL) {
-    return RC_NEIGHBOR_NULL_NEIGHBOR;
+    return RC_NULL_PARAM;
   }
+
   memset(neighbor, 0, sizeof(neighbor_t));
   neighbor->endpoint.protocol = protocol;
   if (ip) {
@@ -120,7 +117,8 @@ static int neighbor_cmp(neighbor_t const *const lhs,
     return false;
   }
 
-  return !(strcmp(lhs->endpoint.ip, rhs->endpoint.ip) == 0 &&
+  return !((strcmp(lhs->endpoint.ip, rhs->endpoint.ip) == 0 ||
+            strcmp(lhs->endpoint.host, rhs->endpoint.host) == 0) &&
            lhs->endpoint.port == rhs->endpoint.port &&
            lhs->endpoint.protocol == rhs->endpoint.protocol);
 }
@@ -147,11 +145,37 @@ retcode_t neighbors_add(neighbor_t **const neighbors,
   memcpy(entry, neighbor, sizeof(neighbor_t));
   LL_PREPEND(*neighbors, entry);
 
+  if (entry->endpoint.protocol == PROTOCOL_UDP) {
+    if (udp_endpoint_init(&entry->endpoint) == false) {
+      return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
+    }
+  }
+
   return RC_OK;
 }
 
+retcode_t neighbors_remove_entry(neighbor_t **const neighbors,
+                                 neighbor_t *const neighbor) {
+  retcode_t ret = RC_OK;
+
+  if (neighbors == NULL || neighbor == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
+    if (udp_endpoint_destroy(&neighbor->endpoint) == false) {
+      ret = RC_NEIGHBOR_FAILED_ENDPOINT_DESTROY;
+    }
+  }
+
+  LL_DELETE(*neighbors, neighbor);
+  free(neighbor);
+
+  return ret;
+}
+
 retcode_t neighbors_remove(neighbor_t **const neighbors,
-                           neighbor_t const *const neighbor) {
+                           neighbor_t *const neighbor) {
   neighbor_t *elt = NULL;
 
   if (neighbors == NULL || neighbor == NULL) {
@@ -160,25 +184,22 @@ retcode_t neighbors_remove(neighbor_t **const neighbors,
 
   LL_SEARCH(*neighbors, elt, neighbor, neighbor_cmp);
 
-  if (elt != NULL) {
-    LL_DELETE(*neighbors, elt);
-    free(elt);
-  }
-
-  return RC_OK;
+  return neighbors_remove_entry(neighbors, elt);
 }
 
 retcode_t neighbors_free(neighbor_t **const neighbors) {
   neighbor_t *elt = NULL;
   neighbor_t *tmp = NULL;
+  retcode_t ret = RC_OK;
 
   LL_FOREACH_SAFE(*neighbors, elt, tmp) {
-    LL_DELETE(*neighbors, elt);
-    free(elt);
+    ret = neighbors_remove_entry(neighbors, elt);
   }
+
+  return ret;
 }
 
-size_t neighbor_count(neighbor_t *const neighbors) {
+size_t neighbors_count(neighbor_t *const neighbors) {
   size_t count = 0;
   neighbor_t *elt = NULL;
 
