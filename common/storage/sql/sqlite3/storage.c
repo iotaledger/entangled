@@ -328,17 +328,17 @@ static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
   tx->essence.last_index = sqlite3_column_int64(statement, 6);
   column_decompress_load(statement, 7, tx->consensus.bundle,
                          FLEX_TRIT_SIZE_243);
-  column_decompress_load(statement, 8, tx->attachement.trunk,
+  column_decompress_load(statement, 8, tx->attachment.trunk,
                          FLEX_TRIT_SIZE_243);
-  column_decompress_load(statement, 9, tx->attachement.branch,
+  column_decompress_load(statement, 9, tx->attachment.branch,
                          FLEX_TRIT_SIZE_243);
-  column_decompress_load(statement, 10, tx->attachement.tag, FLEX_TRIT_SIZE_81);
-  tx->attachement.attachment_timestamp = sqlite3_column_int64(statement, 11);
-  tx->attachement.attachment_timestamp_upper =
+  column_decompress_load(statement, 10, tx->attachment.tag, FLEX_TRIT_SIZE_81);
+  tx->attachment.attachment_timestamp = sqlite3_column_int64(statement, 11);
+  tx->attachment.attachment_timestamp_upper =
       sqlite3_column_int64(statement, 12);
-  tx->attachement.attachment_timestamp_lower =
+  tx->attachment.attachment_timestamp_lower =
       sqlite3_column_int64(statement, 13);
-  column_decompress_load(statement, 14, tx->attachement.nonce,
+  column_decompress_load(statement, 14, tx->attachment.nonce,
                          FLEX_TRIT_SIZE_81);
   column_decompress_load(statement, 15, tx->consensus.hash, FLEX_TRIT_SIZE_243);
   tx->metadata.snapshot_index = sqlite3_column_int64(statement, 16);
@@ -397,21 +397,21 @@ retcode_t iota_stor_transaction_store(connection_t const* const conn,
           SQLITE_OK ||
       column_compress_bind(sqlite_statement, 8, tx->consensus.bundle,
                            FLEX_TRIT_SIZE_243) != RC_OK ||
-      column_compress_bind(sqlite_statement, 9, tx->attachement.trunk,
+      column_compress_bind(sqlite_statement, 9, tx->attachment.trunk,
                            FLEX_TRIT_SIZE_243) != RC_OK ||
-      column_compress_bind(sqlite_statement, 10, tx->attachement.branch,
+      column_compress_bind(sqlite_statement, 10, tx->attachment.branch,
                            FLEX_TRIT_SIZE_243) != RC_OK ||
-      column_compress_bind(sqlite_statement, 11, tx->attachement.tag,
+      column_compress_bind(sqlite_statement, 11, tx->attachment.tag,
                            FLEX_TRIT_SIZE_81) != RC_OK ||
       sqlite3_bind_int64(sqlite_statement, 12,
-                         tx->attachement.attachment_timestamp) != SQLITE_OK ||
+                         tx->attachment.attachment_timestamp) != SQLITE_OK ||
       sqlite3_bind_int64(sqlite_statement, 13,
-                         tx->attachement.attachment_timestamp_lower) !=
+                         tx->attachment.attachment_timestamp_lower) !=
           SQLITE_OK ||
       sqlite3_bind_int64(sqlite_statement, 14,
-                         tx->attachement.attachment_timestamp_upper) !=
+                         tx->attachment.attachment_timestamp_upper) !=
           SQLITE_OK ||
-      column_compress_bind(sqlite_statement, 15, tx->attachement.nonce,
+      column_compress_bind(sqlite_statement, 15, tx->attachment.nonce,
                            FLEX_TRIT_SIZE_81) != RC_OK ||
       column_compress_bind(sqlite_statement, 16, tx->consensus.hash,
                            FLEX_TRIT_SIZE_243) != RC_OK ||

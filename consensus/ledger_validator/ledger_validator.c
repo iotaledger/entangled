@@ -39,8 +39,7 @@ static retcode_t update_snapshot_milestone_do_func(flex_trit_t *const hash,
   *should_branch = transaction_snapshot_index(transaction) == 0;
 
   if (*should_branch) {
-    if ((ret = hash243_set_add(hashes, transaction_hash(transaction))) !=
-        RC_OK) {
+    if ((ret = hash243_set_add(hashes, hash)) != RC_OK) {
       *should_stop = true;
       return ret;
     }

@@ -115,7 +115,7 @@ struct _iota_transaction_fields_metadata {
 
 struct _iota_transaction {
   iota_transaction_fields_essence_t essence;
-  iota_transaction_fields_attachement_t attachement;
+  iota_transaction_fields_attachement_t attachment;
   iota_transaction_fields_consensus_t consensus;
   iota_transaction_fields_data_t data;
   iota_transaction_fields_metadata_t metadata;
@@ -236,86 +236,85 @@ static inline void transaction_set_bundle(iota_transaction_t transaction,
 
 // Get the transaction trunk
 static inline flex_trit_t *transaction_trunk(iota_transaction_t transaction) {
-  return transaction->attachement.trunk;
+  return transaction->attachment.trunk;
 }
 
 // Set the transaction trunk (copy argument)
 static inline void transaction_set_trunk(iota_transaction_t transaction,
                                          const flex_trit_t *trunk) {
-  memcpy(transaction->attachement.trunk, trunk,
-         sizeof(transaction->attachement.trunk));
+  memcpy(transaction->attachment.trunk, trunk,
+         sizeof(transaction->attachment.trunk));
 }
 
 // Get the transaction branch
 static inline flex_trit_t *transaction_branch(iota_transaction_t transaction) {
-  return transaction->attachement.branch;
+  return transaction->attachment.branch;
 }
 
 // Set the transaction branch (copy argument)
 static inline void transaction_set_branch(iota_transaction_t transaction,
                                           const flex_trit_t *branch) {
-  memcpy(transaction->attachement.branch, branch,
-         sizeof(transaction->attachement.branch));
+  memcpy(transaction->attachment.branch, branch,
+         sizeof(transaction->attachment.branch));
 }
 
 // Get the transaction tag
 static inline flex_trit_t *transaction_tag(iota_transaction_t transaction) {
-  return transaction->attachement.tag;
+  return transaction->attachment.tag;
 }
 
 // Set the transaction tag (copy argument)
 static inline void transaction_set_tag(iota_transaction_t transaction,
                                        const flex_trit_t *tag) {
-  memcpy(transaction->attachement.tag, tag,
-         sizeof(transaction->attachement.tag));
+  memcpy(transaction->attachment.tag, tag, sizeof(transaction->attachment.tag));
 }
 
 // Get the transaction attachment timestamp
 static inline int64_t transaction_attachment_timestamp(
     iota_transaction_t transaction) {
-  return transaction->attachement.attachment_timestamp;
+  return transaction->attachment.attachment_timestamp;
 }
 
 // Set the transaction attachment timestamp
 static inline void transaction_set_attachment_timestamp(
     iota_transaction_t transaction, int64_t timestamp) {
-  transaction->attachement.attachment_timestamp = timestamp;
+  transaction->attachment.attachment_timestamp = timestamp;
 }
 
 // Get the transaction attachment timestamp lower
 static inline int64_t transaction_attachment_timestamp_lower(
     iota_transaction_t transaction) {
-  return transaction->attachement.attachment_timestamp_lower;
+  return transaction->attachment.attachment_timestamp_lower;
 }
 
 // Set the transaction attachment timestamp lower
 static inline void transaction_set_attachment_timestamp_lower(
     iota_transaction_t transaction, int64_t timestamp) {
-  transaction->attachement.attachment_timestamp_lower = timestamp;
+  transaction->attachment.attachment_timestamp_lower = timestamp;
 }
 
 // Get the transaction attachment timestamp upper
 static inline int64_t transaction_attachment_timestamp_upper(
     iota_transaction_t transaction) {
-  return transaction->attachement.attachment_timestamp_upper;
+  return transaction->attachment.attachment_timestamp_upper;
 }
 
 // Set the transaction attachment timestamp upper
 static inline void transaction_set_attachment_timestamp_upper(
     iota_transaction_t transaction, int64_t timestamp) {
-  transaction->attachement.attachment_timestamp_upper = timestamp;
+  transaction->attachment.attachment_timestamp_upper = timestamp;
 }
 
 // Get the transaction nonce
 static inline flex_trit_t *transaction_nonce(iota_transaction_t transaction) {
-  return transaction->attachement.nonce;
+  return transaction->attachment.nonce;
 }
 
 // Set the transaction nonce (copy argument)
 static inline void transaction_set_nonce(iota_transaction_t transaction,
                                          const flex_trit_t *nonce) {
-  memcpy(transaction->attachement.nonce, nonce,
-         sizeof(transaction->attachement.nonce));
+  memcpy(transaction->attachment.nonce, nonce,
+         sizeof(transaction->attachment.nonce));
 }
 
 // Get the transaction hash
