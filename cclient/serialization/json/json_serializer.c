@@ -925,27 +925,6 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
     goto end;
   }
 
-  ret = json_get_int(json_obj, "jreAvailableProcessors",
-                     &out->jre_available_processors);
-  if (ret != RC_OK) {
-    goto end;
-  }
-
-  ret = json_get_uint32(json_obj, "jreFreeMemory", &out->jre_free_memory);
-  if (ret != RC_OK) {
-    goto end;
-  }
-
-  ret = json_get_uint32(json_obj, "jreMaxMemory", &out->jre_max_memory);
-  if (ret != RC_OK) {
-    goto end;
-  }
-
-  ret = json_get_uint32(json_obj, "jreTotalMemory", &out->jre_total_memory);
-  if (ret != RC_OK) {
-    goto end;
-  }
-
   ret = json_string_to_flex_trits(json_obj, "latestMilestone",
                                   out->latest_milestone, NUM_TRITS_HASH);
   if (ret != RC_OK) {
@@ -971,6 +950,12 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
     goto end;
   }
 
+  ret = json_get_uint32(json_obj, "milestoneStartIndex",
+                        &out->milestone_start_index);
+  if (ret != RC_OK) {
+    goto end;
+  }
+
   ret = json_get_uint16(json_obj, "neighbors", &out->neighbors);
   if (ret != RC_OK) {
     goto end;
@@ -992,7 +977,13 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
   }
 
   ret = json_get_uint32(json_obj, "transactionsToRequest",
-                        &out->trans_to_request);
+                        &out->transactions_to_request);
+  if (ret != RC_OK) {
+    goto end;
+  }
+
+  ret = json_string_to_flex_trits(json_obj, "coordinatorAddress",
+                                  out->coordinator_address, NUM_TRITS_HASH);
   if (ret != RC_OK) {
     goto end;
   }

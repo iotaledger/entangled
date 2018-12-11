@@ -13,6 +13,7 @@
 #include "request/requests.h"
 #include "response/responses.h"
 #include "utils/logger_helper.h"
+#include "utils/time.h"
 
 #define API_LOGGER_ID "api"
 
@@ -75,6 +76,35 @@ static iota_api_command_t get_command(char const *const command) {
 
 retcode_t iota_api_get_node_info(iota_api_t const *const api,
                                  get_node_info_res_t *const res) {
+  char_buffer_allocate(res->app_name, strlen(CIRI_NAME));
+  strcpy(res->app_name->data, CIRI_NAME);
+  char_buffer_allocate(res->app_version, strlen(CIRI_VERSION));
+  strcpy(res->app_version->data, CIRI_VERSION);
+  memcpy(res->latest_milestone,
+         api->consensus->milestone_tracker.latest_milestone->trits,
+         FLEX_TRIT_SIZE_243);
+  res->latest_milestone_index =
+      api->consensus->milestone_tracker.latest_milestone_index;
+  memcpy(
+      res->latest_solid_subtangle_milestone,
+      api->consensus->milestone_tracker.latest_solid_subtangle_milestone->trits,
+      FLEX_TRIT_SIZE_243);
+  res->latest_solid_subtangle_milestone_index =
+      api->consensus->milestone_tracker.latest_solid_subtangle_milestone_index;
+  res->milestone_start_index =
+      api->consensus->milestone_tracker.milestone_start_index;
+  rw_lock_handle_rdlock(&api->node->neighbors_lock);
+  res->neighbors = neighbors_count(api->node->neighbors);
+  rw_lock_handle_unlock(&api->node->neighbors_lock);
+  res->packets_queue_size = broadcaster_size(&api->node->broadcaster);
+  res->time = current_timestamp_ms();
+  res->tips = tips_cache_size(&api->node->tips);
+  res->transactions_to_request =
+      requester_size(&api->node->transaction_requester);
+  memcpy(res->coordinator_address,
+         api->consensus->milestone_tracker.coordinator->trits,
+         FLEX_TRIT_SIZE_243);
+
   return RC_OK;
 }
 
