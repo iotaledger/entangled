@@ -278,6 +278,9 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
 size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
                              const byte_t *bytes, size_t len, size_t num_trits);
 
+// return true if all flex_trit are NULL, else false.
+bool is_empty_flex_trits(flex_trit_t const *const hash, uint32_t len);
+
 #endif
 #ifdef __cplusplus
 }

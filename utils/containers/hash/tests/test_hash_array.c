@@ -12,8 +12,8 @@ void test_empty_hash() {
   flex_trit_t null_hash[FLEX_TRIT_SIZE_243];
   memset(null_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
 
-  TEST_ASSERT(empty_hash(null_hash, FLEX_TRIT_SIZE_243));
-  TEST_ASSERT(empty_hash(hash243_1, FLEX_TRIT_SIZE_243) == false);
+  TEST_ASSERT(is_empty_flex_trits(null_hash, FLEX_TRIT_SIZE_243));
+  TEST_ASSERT(is_empty_flex_trits(hash243_1, FLEX_TRIT_SIZE_243) == false);
 }
 
 void test_empty_hash243_array() {

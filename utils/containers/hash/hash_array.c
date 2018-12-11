@@ -47,20 +47,14 @@ void hash_array_push(hash_array_p array, flex_trit_t const* const trits) {
   utarray_push_back(array, trits);
 }
 
-flex_trit_t* hash_array_at(hash_array_p array, size_t index) {
+flex_trit_t* hash_array_at(hash_array_p array, uint32_t index) {
   return (flex_trit_t*)utarray_eltptr(array, index);
 }
 
-size_t hash_array_len(hash_array_p array) { return utarray_len(array); }
+void hash_array_reserve(hash_array_p array, uint32_t len) {
+  utarray_reserve(array, len);
+}
+
+uint32_t hash_array_len(hash_array_p array) { return utarray_len(array); }
 
 void hash_array_free(hash_array_p array) { utarray_free(array); }
-
-bool empty_hash(flex_trit_t const* const hash, size_t len) {
-  size_t index = 0;
-  for (index = 0; index < len; index++) {
-    if (hash[index] != FLEX_TRIT_NULL_VALUE) {
-      return false;
-    }
-  }
-  return true;
-}
