@@ -310,7 +310,7 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createPromoteTransaction.ts#L51
  */
 retcode_t iota_client_promote_transaction(
-    iota_client_service_t const* const serv, trit_array_p const tail_hash,
+    iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
     int const depth, int const mwm, transfer_list_t const* const transfers,
     transaction_list_t* out_transactions);
 

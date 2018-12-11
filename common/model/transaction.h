@@ -510,6 +510,11 @@ size_t transaction_deserialize_from_trits(iota_transaction_t *const transaction,
                                           flex_trit_t const *const trits,
                                           bool compute_hash);
 /***********************************************************************************************************
+ * Spam transaction
+ ***********************************************************************************************************/
+// Creates a new spam transaction
+iota_transaction_t transaction_new_spam(void);
+/***********************************************************************************************************
  * Destructor
  ***********************************************************************************************************/
 // Free an existing transaction - compatible with free()

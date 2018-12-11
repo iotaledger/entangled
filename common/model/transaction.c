@@ -353,6 +353,23 @@ size_t transaction_deserialize_from_trits(iota_transaction_t *const transaction,
 }
 
 /***********************************************************************************************************
+ * Spam transaction
+ ***********************************************************************************************************/
+// Creates a new spam transaction
+iota_transaction_t transaction_new_spam(void) {
+  tryte_t message[NUM_TRYTES_SIGNATURE];
+  iota_transaction_t spam_transaction = transaction_new();
+  if (!spam_transaction) {
+    return NULL;
+  }
+  memset(message, '9', sizeof(message));
+  flex_trits_from_trytes(transaction_message(spam_transaction), NUM_TRITS_SIGNATURE, message, NUM_TRITS_SIGNATURE, NUM_TRYTES_SIGNATURE);
+  flex_trits_from_trytes(transaction_address(spam_transaction), NUM_TRITS_ADDRESS, message, NUM_TRITS_ADDRESS, NUM_TRYTES_ADDRESS);
+  flex_trits_from_trytes(transaction_tag(spam_transaction), NUM_TRITS_TAG, message, NUM_TRITS_TAG, NUM_TRYTES_TAG);
+  return spam_transaction;
+}
+
+/***********************************************************************************************************
  * Destructor
  ***********************************************************************************************************/
 // Free an existing transaction - compatible with free()
