@@ -74,7 +74,7 @@ void iota_client_extended_destroy();
  */
 retcode_t iota_client_broadcast_bundle(iota_client_service_t const* const serv,
                                        flex_trit_t const* const tail_hash,
-                                       transaction_objs_t* tx_objs);
+                                       transaction_objs_t* const tx_objs);
 
 /**
  * Wrapper function for iota_client_find_transactions() and
@@ -312,7 +312,7 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
 retcode_t iota_client_promote_transaction(
     iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
     int const depth, int const mwm, transfer_list_t const* const transfers,
-    transaction_list_t* out_transactions);
+    transaction_objs_t* const tx_objs);
 
 /**
  * Reattaches a transfer to tangle by selecting tips & performing the
@@ -341,8 +341,9 @@ retcode_t iota_client_promote_transaction(
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createReplayBundle.ts#L38
  */
 retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv,
-                                    trit_array_p const tail, int const depth,
-                                    int const mwm, transaction_objs_t tx_objs);
+                                    flex_trit_t const* const tail_hash,
+                                    int const depth, int const mwm,
+                                    transaction_objs_t* const tx_objs);
 
 // https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createSendTransfer.ts#L22
 retcode_t iota_client_send_transfer(

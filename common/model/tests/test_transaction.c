@@ -55,8 +55,7 @@ void test_spam_transaction(void) {
                            sizeof(transaction->signature_or_message));
   TEST_ASSERT_EQUAL_MEMORY(TRITS, transaction->address,
                            sizeof(transaction->address));
-  TEST_ASSERT_EQUAL_MEMORY(TRITS, transaction->tag,
-                           sizeof(transaction->tag));
+  TEST_ASSERT_EQUAL_MEMORY(TRITS, transaction->tag, sizeof(transaction->tag));
   transaction_free(transaction);
 }
 

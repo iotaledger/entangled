@@ -58,9 +58,9 @@ done:
 
 static retcode_t check_consistency(iota_client_service_t const* const serv,
                                    flex_trit_t const* const tail_tx) {
-   retcode_t ret_code = RC_OK;
-   check_consistency_req_t* consistency_req = NULL;
-   check_consistency_res_t* consistency_res = NULL;
+  retcode_t ret_code = RC_OK;
+  check_consistency_req_t* consistency_req = NULL;
+  check_consistency_res_t* consistency_res = NULL;
 
   log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
 
@@ -68,29 +68,29 @@ static retcode_t check_consistency(iota_client_service_t const* const serv,
   if (!consistency_req) {
     ret_code = RC_CCLIENT_NULL_PTR;
     log_error(CCLIENT_EXTENDED_LOGGER_ID,
-               "%s check_consistency_req_new failed: %s\n", __func__,
-               error_2_string(ret_code));
+              "%s check_consistency_req_new failed: %s\n", __func__,
+              error_2_string(ret_code));
     goto cleanup;
   }
   consistency_res = check_consistency_res_new();
   if (!consistency_res) {
     ret_code = RC_CCLIENT_NULL_PTR;
     log_error(CCLIENT_EXTENDED_LOGGER_ID,
-               "%s check_consistency_res_new failed: %s\n", __func__,
-               error_2_string(ret_code));
+              "%s check_consistency_res_new failed: %s\n", __func__,
+              error_2_string(ret_code));
     goto cleanup;
   }
 
-   hash243_queue_push(&consistency_req->hashes, tail_tx);
-   ret_code =
-       iota_client_check_consistency(serv, consistency_req, consistency_res);
+  hash243_queue_push(&consistency_req->hashes, tail_tx);
+  ret_code =
+      iota_client_check_consistency(serv, consistency_req, consistency_res);
   if (ret_code) {
-     log_warning(CCLIENT_EXTENDED_LOGGER_ID, "check consistency failed\n");
-     goto cleanup;
-   }
-   if (!consistency_res->state) {
-     ret_code = RC_CCLIENT_CONSISTENCY;
-   }
+    log_warning(CCLIENT_EXTENDED_LOGGER_ID, "check consistency failed\n");
+    goto cleanup;
+  }
+  if (!consistency_res->state) {
+    ret_code = RC_CCLIENT_CONSISTENCY;
+  }
 
 cleanup:
   check_consistency_req_free(&consistency_req);
@@ -100,7 +100,7 @@ cleanup:
 
 static retcode_t traverse_bundle(iota_client_service_t const* const serv,
                                  flex_trit_t const* const tail_hash,
-                                 UT_array* const tx_objs,
+                                 transaction_objs_t* const tx_objs,
                                  hash8019_stack_t* trytes) {
   retcode_t ret_code = RC_OK;
   get_trytes_req_t* get_trytes_req = NULL;
@@ -108,23 +108,22 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
   iota_transaction_t* tx;
   flex_trit_t* tmp_trytes;
   flex_trit_t* trunk_hash = (flex_trit_t*)tail_hash;
+  int64_t current_index, last_index;
 
   log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
 
   get_trytes_req = get_trytes_req_new();
   if (!get_trytes_req) {
     ret_code = RC_CCLIENT_NULL_PTR;
-    log_error(CCLIENT_EXTENDED_LOGGER_ID,
-               "%s get_trytes_req_new failed: %s\n", __func__,
-               error_2_string(ret_code));
+    log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s get_trytes_req_new failed: %s\n",
+              __func__, error_2_string(ret_code));
     goto cleanup;
   }
   get_trytes_res = get_trytes_res_new();
   if (!get_trytes_res) {
     ret_code = RC_CCLIENT_NULL_PTR;
-    log_error(CCLIENT_EXTENDED_LOGGER_ID,
-               "%s get_trytes_res_new failed: %s\n", __func__,
-               error_2_string(ret_code));
+    log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s get_trytes_res_new failed: %s\n",
+              __func__, error_2_string(ret_code));
     goto cleanup;
   }
   do {
@@ -150,19 +149,8 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
     tmp_trytes = hash8019_queue_at(&get_trytes_res->trytes, 0);
     if (!tmp_trytes) {
       ret_code = RC_CCLIENT_RES_ERROR;
-      log_error(CCLIENT_EXTENDED_LOGGER_ID,
-                "%s hash8019_queue_at failed: %s\n", __func__,
-                error_2_string(ret_code));
-      goto cleanup;
-    }
-    // Check that the first transaction we get is really a tail transaction
-    // Its index must be 0 and the list of transactions empty.
-    // It is an error if the first transaction has index > 0
-    if (!utarray_len(tx_objs) && transaction_current_index(tx)) {
-      ret_code = RC_CCLIENT_INVALID_TAIL_HASH;
-      log_error(CCLIENT_EXTENDED_LOGGER_ID,
-                "%s not a tail transaction: %s\n", __func__,
-                error_2_string(ret_code));
+      log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s hash8019_queue_at failed: %s\n",
+                __func__, error_2_string(ret_code));
       goto cleanup;
     }
     // Create a new transaction with the received trytes
@@ -174,16 +162,32 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
                 error_2_string(ret_code));
       goto cleanup;
     }
+    current_index = transaction_current_index(tx);
+    last_index = transaction_last_index(tx);
+    // Get the next tail_hash from the transaction
+    trunk_hash = transaction_trunk(tx);
     // If we want the raw trytes, add them to the stack
     if (trytes) {
       hash8019_stack_push(trytes, tmp_trytes);
     }
+    if (tx_objs) {
+      // Check that the first transaction we get is really a tail transaction
+      // Its index must be 0 and the list of transactions empty.
+      // It is an error if the first transaction has index > 0
+      if (!utarray_len(tx_objs) && transaction_current_index(tx)) {
+        ret_code = RC_CCLIENT_INVALID_TAIL_HASH;
+        log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s not a tail transaction: %s\n",
+                  __func__, error_2_string(ret_code));
+        goto cleanup;
+      }
+      // The transaction is valid, add it to the transaction list
+      utarray_push_back(tx_objs, tx);
+    } else {
+      transaction_free(tx);
+    }
     // The response is not needed anymore
     hash8019_queue_free(&get_trytes_res->trytes);
-    // If the transaction is valid, add it to the transaction list
-    utarray_push_back(tx_objs, tx);
-    trunk_hash = transaction_trunk(tx);
-  } while (transaction_current_index(tx) != transaction_last_index(tx));
+  } while (current_index != last_index);
   // The next three lines are repeated in cleanup. They could be written:
   // goto done;
   get_trytes_req_free(&get_trytes_req);
@@ -696,7 +700,7 @@ retcode_t iota_client_send_transfer(
 
 retcode_t iota_client_broadcast_bundle(iota_client_service_t const* const serv,
                                        flex_trit_t const* const tail_hash,
-                                       transaction_objs_t* tx_objs) {
+                                       transaction_objs_t* const tx_objs) {
   retcode_t ret_code = RC_OK;
   broadcast_transactions_req_t* broadcast_transactions_req = NULL;
 
@@ -715,9 +719,8 @@ retcode_t iota_client_broadcast_bundle(iota_client_service_t const* const serv,
   ret_code = traverse_bundle(serv, tail_hash, tx_objs,
                              &broadcast_transactions_req->trytes);
   if (ret_code != RC_OK) {
-    log_error(CCLIENT_EXTENDED_LOGGER_ID,
-              "%s traverse_bundle failed: %s\n", __func__,
-              error_2_string(ret_code));
+    log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s traverse_bundle failed: %s\n",
+              __func__, error_2_string(ret_code));
     goto cleanup;
   }
   // Call the broadcast_transactions API
@@ -758,7 +761,7 @@ retcode_t iota_client_traverse_bundle(iota_client_service_t const* const serv,
 retcode_t iota_client_promote_transaction(
     iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
     int const depth, int const mwm, transfer_list_t const* const transfers,
-    transaction_list_t* out_transactions) {
+    transaction_objs_t* const tx_objs) {
   retcode_t ret_code = RC_OK;
   iota_transaction_t spam_transaction = NULL;
 
@@ -766,9 +769,8 @@ retcode_t iota_client_promote_transaction(
 
   ret_code = check_consistency(serv, tail_hash);
   if (ret_code != RC_OK) {
-    log_error(CCLIENT_EXTENDED_LOGGER_ID,
-              "%s check_consistency failed: %s\n", __func__,
-              error_2_string(ret_code));
+    log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s check_consistency failed: %s\n",
+              __func__, error_2_string(ret_code));
     return ret_code;
   }
 
@@ -781,9 +783,40 @@ retcode_t iota_client_promote_transaction(
     return ret_code;
   }
 
-  // Witing for iota_client_send_transfer implementation
-  //return iota_client_send_transfer(serv, tail_hash, depth, mwm, transfers, out_transactions);
+  // Waiting for iota_client_send_transfer implementation
+  // return iota_client_send_transfer(serv, tail_hash, depth, mwm, transfers,
+  // tx_objs);
 
   return ret_code;
 }
 
+retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv,
+                                    flex_trit_t const* const tail_hash,
+                                    int const depth, int const mwm,
+                                    transaction_objs_t* const tx_objs) {
+  retcode_t ret_code = RC_OK;
+  hash8019_stack_t trytes;
+
+  log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+
+  ret_code = traverse_bundle(serv, tail_hash, NULL, &trytes);
+  if (ret_code != RC_OK) {
+    log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s traverse_bundle failed: %s\n",
+              __func__, error_2_string(ret_code));
+    goto cleanup;
+  }
+
+  // Waiting for iota_client_send_trytes implementation
+  // ret_code = iota_client_send_trytes(serv, trytes, depth, mwm, NULL,
+  // tx_objs);
+  if (ret_code != RC_OK) {
+    log_error(CCLIENT_EXTENDED_LOGGER_ID,
+              "%s iota_client_send_trytes failed: %s\n", __func__,
+              error_2_string(ret_code));
+    goto cleanup;
+  }
+
+cleanup:
+  hash8019_stack_free(&trytes);
+  return ret_code;
+}
