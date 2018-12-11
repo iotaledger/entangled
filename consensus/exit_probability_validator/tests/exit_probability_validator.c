@@ -44,7 +44,6 @@ static milestone_tracker_t mt;
 static ledger_validator_t lv;
 static transaction_solidifier_t ts;
 static iota_consensus_conf_t consensus_conf;
-static iota_gossip_conf_t gossip_conf;
 
 void setUp() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
@@ -54,7 +53,6 @@ void setUp() {
 void tearDown() { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK); }
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
-  iota_gossip_conf_init(&gossip_conf);
   iota_consensus_conf_init(&consensus_conf);
   consensus_conf.max_depth = max_depth;
   consensus_conf.below_max_depth = max_txs_below_max_depth;
