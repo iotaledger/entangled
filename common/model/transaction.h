@@ -56,8 +56,8 @@ extern "C" {
 typedef struct _iota_transaction *iota_transaction_t;
 typedef struct _iota_transaction_fields_essence
     iota_transaction_fields_essence_t;
-typedef struct _iota_transaction_fields_attachement
-    iota_transaction_fields_attachement_t;
+typedef struct _iota_transaction_fields_attachment
+    iota_transaction_fields_attachment_t;
 typedef struct _iota_transaction_fields_consensus
     iota_transaction_fields_consensus_t;
 typedef struct _iota_transaction_fields_metadata
@@ -81,7 +81,7 @@ struct _iota_transaction_fields_essence {
   flex_trit_t bundle[FLEX_TRIT_SIZE_243];
 };
 
-struct _iota_transaction_fields_attachement {
+struct _iota_transaction_fields_attachment {
   // 81 trytes = 243 trits
   flex_trit_t trunk[FLEX_TRIT_SIZE_243];
   // 81 trytes = 243 trits
@@ -115,7 +115,7 @@ struct _iota_transaction_fields_metadata {
 
 struct _iota_transaction {
   iota_transaction_fields_essence_t essence;
-  iota_transaction_fields_attachement_t attachment;
+  iota_transaction_fields_attachment_t attachment;
   iota_transaction_fields_consensus_t consensus;
   iota_transaction_fields_data_t data;
   iota_transaction_fields_metadata_t metadata;
