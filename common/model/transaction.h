@@ -77,6 +77,8 @@ struct _iota_transaction_fields_essence {
   int64_t current_index;
   // 9 trytes = 27 trits
   int64_t last_index;
+  // 81 trytes = 243 trits
+  flex_trit_t bundle[FLEX_TRIT_SIZE_243];
 };
 
 struct _iota_transaction_fields_attachement {
@@ -99,8 +101,6 @@ struct _iota_transaction_fields_attachement {
 struct _iota_transaction_fields_consensus {
   // 81 trytes = 243 trits
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  // 81 trytes = 243 trits
-  flex_trit_t bundle[FLEX_TRIT_SIZE_243];
 };
 
 struct _iota_transaction_fields_data {
@@ -224,14 +224,14 @@ static inline void transaction_set_last_index(iota_transaction_t transaction,
 
 // Get the transaction bundle
 static inline flex_trit_t *transaction_bundle(iota_transaction_t transaction) {
-  return transaction->consensus.bundle;
+  return transaction->essence.bundle;
 }
 
 // Set the transaction bundle (copy argument)
 static inline void transaction_set_bundle(iota_transaction_t transaction,
                                           const flex_trit_t *bundle) {
-  memcpy(transaction->consensus.bundle, bundle,
-         sizeof(transaction->consensus.bundle));
+  memcpy(transaction->essence.bundle, bundle,
+         sizeof(transaction->essence.bundle));
 }
 
 // Get the transaction trunk

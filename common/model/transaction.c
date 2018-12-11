@@ -68,7 +68,7 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
   transaction_set_last_index(transaction,
                              trits_to_long(buffer, NUM_TRITS_LAST_INDEX));
   offset += NUM_TRITS_LAST_INDEX;
-  flex_trits_slice(transaction->consensus.bundle, NUM_TRITS_BUNDLE, trits,
+  flex_trits_slice(transaction->essence.bundle, NUM_TRITS_BUNDLE, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_BUNDLE);
   offset += NUM_TRITS_BUNDLE;
   flex_trits_slice(transaction->attachment.trunk, NUM_TRITS_TRUNK, trits,
@@ -171,7 +171,7 @@ size_t transaction_serialize_to_flex_trits(const iota_transaction_t transaction,
                     NUM_TRITS_LAST_INDEX, offset, NUM_TRITS_LAST_INDEX);
   offset += NUM_TRITS_LAST_INDEX;
   flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                    transaction->consensus.bundle, NUM_TRITS_BUNDLE, offset,
+                    transaction->essence.bundle, NUM_TRITS_BUNDLE, offset,
                     NUM_TRITS_BUNDLE);
   offset += NUM_TRITS_BUNDLE;
   flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
@@ -224,8 +224,8 @@ void transaction_reset(iota_transaction_t transaction) {
          sizeof(transaction->essence.address));
   memset(transaction->essence.obsolete_tag, FLEX_TRIT_NULL_VALUE,
          sizeof(transaction->essence.obsolete_tag));
-  memset(transaction->consensus.bundle, FLEX_TRIT_NULL_VALUE,
-         sizeof(transaction->consensus.bundle));
+  memset(transaction->essence.bundle, FLEX_TRIT_NULL_VALUE,
+         sizeof(transaction->essence.bundle));
   memset(transaction->attachment.trunk, FLEX_TRIT_NULL_VALUE,
          sizeof(transaction->attachment.trunk));
   memset(transaction->attachment.branch, FLEX_TRIT_NULL_VALUE,
