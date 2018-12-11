@@ -82,6 +82,21 @@ char *iota_statement_transaction_count =
     "SELECT COUNT(*) FROM " TRANSACTION_TABLE_NAME;
 
 /*
+ * Partial Transaction statements
+ */
+
+char *iota_statement_transaction_select_for_traversal =
+    "SELECT " TRANSACTION_COL_TRUNK "," TRANSACTION_COL_BRANCH
+    "," TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE
+    "," TRANSACTION_COL_CURRENT_INDEX "," TRANSACTION_COL_BUNDLE
+    "," TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID
+    " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
+
+char *iota_statement_transaction_select_solid_state =
+    "SELECT " TRANSACTION_COL_SOLID " FROM " TRANSACTION_TABLE_NAME
+    " WHERE " TRANSACTION_COL_HASH "=?";
+
+/*
  * Milestone statements
  */
 

@@ -12,6 +12,7 @@ extern "C" {
 #ifndef __COMMON_MODEL_TRANSACTION_H_
 #define __COMMON_MODEL_TRANSACTION_H_
 
+#include <assert.h>
 #include "common/trinary/flex_trit.h"
 
 #define NUM_TRITS_SERIALIZED_TRANSACTION 8019
@@ -119,7 +120,33 @@ struct _iota_transaction {
   iota_transaction_fields_consensus_t consensus;
   iota_transaction_fields_data_t data;
   iota_transaction_fields_metadata_t metadata;
+  int64_t loaded_columns_mask;
 };
+
+typedef enum _field_mask {
+  MASK_ADDRESS = (1u << 0),
+  MASK_VALUE = (1u << 1),
+  MASK_OBSOLETE_TAG = (1u << 2),
+  MASK_TIMESTAMP = (1u << 3),
+  MASK_CURRENT_INDEX = (1u << 4),
+  MASK_LAST_INDEX = (1u << 5),
+  MASK_BUNDLE = (1u << 6),
+  MASK_TRUNK = (1u << 7),
+  MASK_BRANCH = (1u << 8),
+  MASK_ATTACHMENT_TIMESTAMP = (1u << 9),
+  MASK_ATTACHMENT_TIMESTAMP_UPPER = (1u << 10),
+  MASK_ATTACHMENT_TIMESTAMP_LOWER = (1u << 11),
+  MASK_NONCE = (1u << 12),
+  MASK_TAG = (1u << 13),
+  MASK_HASH = (1u << 14),
+  MASK_SIGNATURE = (1u << 15),
+  MASK_SNAPSHOT_INDEX = (1u << 16),
+  MASK_SOLID = (1u << 17),
+  MASK_TRAVERSAL_COLUMNS = MASK_TRUNK | MASK_BRANCH | MASK_ADDRESS |
+                           MASK_VALUE | MASK_CURRENT_INDEX | MASK_LAST_INDEX |
+                           MASK_BUNDLE | MASK_SNAPSHOT_INDEX | MASK_SOLID,
+  MASK_ALL_COLUMNS = ~0,
+} field_mask_e;
 
 /***********************************************************************************************************
  * Accessors
@@ -130,221 +157,259 @@ struct _iota_transaction {
 // Get the transaction signature
 static inline flex_trit_t *transaction_signature(
     iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_SIGNATURE);
   return transaction->data.signature_or_message;
 }
 
 // Set the transaction signature (copy argument)
 static inline void transaction_set_signature(iota_transaction_t transaction,
                                              const flex_trit_t *signature) {
+  transaction->loaded_columns_mask |= MASK_SIGNATURE;
   memcpy(transaction->data.signature_or_message, signature,
          sizeof(transaction->data.signature_or_message));
 }
 
 // Get the transaction message
 static inline flex_trit_t *transaction_message(iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_SIGNATURE);
   return transaction->data.signature_or_message;
 }
 
 // Set the transaction message (copy argument)
 static inline void transaction_set_message(iota_transaction_t transaction,
                                            const flex_trit_t *message) {
+  transaction->loaded_columns_mask |= MASK_SIGNATURE;
   memcpy(transaction->data.signature_or_message, message,
          sizeof(transaction->data.signature_or_message));
 }
 
 // Get the transaction address
 static inline flex_trit_t *transaction_address(iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_ADDRESS);
   return transaction->essence.address;
 }
 
 // Set the transaction address (copy argument)
 static inline void transaction_set_address(iota_transaction_t transaction,
                                            const flex_trit_t *address) {
+  transaction->loaded_columns_mask |= MASK_ADDRESS;
   memcpy(transaction->essence.address, address,
          sizeof(transaction->essence.address));
 }
 
 // Get the transaction value
 static inline int64_t transaction_value(iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_VALUE);
   return transaction->essence.value;
 }
 
 // Set the transaction value
 static inline void transaction_set_value(iota_transaction_t transaction,
                                          int64_t value) {
+  transaction->loaded_columns_mask |= MASK_VALUE;
   transaction->essence.value = value;
 }
 
 // Get the transaction obsolete tag
 static inline flex_trit_t *transaction_obsolete_tag(
     iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_OBSOLETE_TAG);
   return transaction->essence.obsolete_tag;
 }
 
 // Set the transaction obsolete tag
 static inline void transaction_set_obsolete_tag(
     iota_transaction_t transaction, const flex_trit_t *obsolete_tag) {
+  transaction->loaded_columns_mask |= MASK_OBSOLETE_TAG;
   memcpy(transaction->essence.obsolete_tag, obsolete_tag,
          sizeof(transaction->essence.obsolete_tag));
 }
 
 // Get the transaction timestamp
 static inline uint64_t transaction_timestamp(iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_TIMESTAMP);
   return transaction->essence.timestamp;
 }
 
 // Set the transaction timestamp
 static inline void transaction_set_timestamp(iota_transaction_t transaction,
                                              uint64_t timestamp) {
+  transaction->loaded_columns_mask |= MASK_TIMESTAMP;
   transaction->essence.timestamp = timestamp;
 }
 
 // Get the transaction current index
 static inline int64_t transaction_current_index(
     iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_CURRENT_INDEX);
   return transaction->essence.current_index;
 }
 
 // Set the transaction current index
 static inline void transaction_set_current_index(iota_transaction_t transaction,
                                                  int64_t index) {
+  transaction->loaded_columns_mask |= MASK_CURRENT_INDEX;
   transaction->essence.current_index = index;
 }
 
 // Get the transaction last index
 static inline int64_t transaction_last_index(iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_LAST_INDEX);
   return transaction->essence.last_index;
 }
 
 // Set the transaction last index
 static inline void transaction_set_last_index(iota_transaction_t transaction,
                                               int64_t index) {
+  transaction->loaded_columns_mask |= MASK_LAST_INDEX;
   transaction->essence.last_index = index;
 }
 
 // Get the transaction bundle
 static inline flex_trit_t *transaction_bundle(iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_BUNDLE);
   return transaction->essence.bundle;
 }
 
 // Set the transaction bundle (copy argument)
 static inline void transaction_set_bundle(iota_transaction_t transaction,
                                           const flex_trit_t *bundle) {
+  transaction->loaded_columns_mask |= MASK_BUNDLE;
   memcpy(transaction->essence.bundle, bundle,
          sizeof(transaction->essence.bundle));
 }
 
 // Get the transaction trunk
 static inline flex_trit_t *transaction_trunk(iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_TRUNK);
   return transaction->attachment.trunk;
 }
 
 // Set the transaction trunk (copy argument)
 static inline void transaction_set_trunk(iota_transaction_t transaction,
                                          const flex_trit_t *trunk) {
+  transaction->loaded_columns_mask |= MASK_TRUNK;
   memcpy(transaction->attachment.trunk, trunk,
          sizeof(transaction->attachment.trunk));
 }
 
 // Get the transaction branch
 static inline flex_trit_t *transaction_branch(iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_BRANCH);
   return transaction->attachment.branch;
 }
 
 // Set the transaction branch (copy argument)
 static inline void transaction_set_branch(iota_transaction_t transaction,
                                           const flex_trit_t *branch) {
+  transaction->loaded_columns_mask |= MASK_BRANCH;
   memcpy(transaction->attachment.branch, branch,
          sizeof(transaction->attachment.branch));
 }
 
 // Get the transaction tag
 static inline flex_trit_t *transaction_tag(iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_TAG);
   return transaction->attachment.tag;
 }
 
 // Set the transaction tag (copy argument)
 static inline void transaction_set_tag(iota_transaction_t transaction,
                                        const flex_trit_t *tag) {
+  transaction->loaded_columns_mask |= MASK_TAG;
   memcpy(transaction->attachment.tag, tag, sizeof(transaction->attachment.tag));
 }
 
 // Get the transaction attachment timestamp
 static inline int64_t transaction_attachment_timestamp(
     iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_ATTACHMENT_TIMESTAMP);
   return transaction->attachment.attachment_timestamp;
 }
 
 // Set the transaction attachment timestamp
 static inline void transaction_set_attachment_timestamp(
     iota_transaction_t transaction, int64_t timestamp) {
+  transaction->loaded_columns_mask |= MASK_ATTACHMENT_TIMESTAMP;
   transaction->attachment.attachment_timestamp = timestamp;
 }
 
 // Get the transaction attachment timestamp lower
 static inline int64_t transaction_attachment_timestamp_lower(
     iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_ATTACHMENT_TIMESTAMP_LOWER);
   return transaction->attachment.attachment_timestamp_lower;
 }
 
 // Set the transaction attachment timestamp lower
 static inline void transaction_set_attachment_timestamp_lower(
     iota_transaction_t transaction, int64_t timestamp) {
+  transaction->loaded_columns_mask |= MASK_ATTACHMENT_TIMESTAMP_LOWER;
   transaction->attachment.attachment_timestamp_lower = timestamp;
 }
 
 // Get the transaction attachment timestamp upper
 static inline int64_t transaction_attachment_timestamp_upper(
     iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_ATTACHMENT_TIMESTAMP_UPPER);
   return transaction->attachment.attachment_timestamp_upper;
 }
 
 // Set the transaction attachment timestamp upper
 static inline void transaction_set_attachment_timestamp_upper(
     iota_transaction_t transaction, int64_t timestamp) {
+  transaction->loaded_columns_mask |= MASK_ATTACHMENT_TIMESTAMP_UPPER;
   transaction->attachment.attachment_timestamp_upper = timestamp;
 }
 
 // Get the transaction nonce
 static inline flex_trit_t *transaction_nonce(iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_NONCE);
   return transaction->attachment.nonce;
 }
 
 // Set the transaction nonce (copy argument)
 static inline void transaction_set_nonce(iota_transaction_t transaction,
                                          const flex_trit_t *nonce) {
+  transaction->loaded_columns_mask |= MASK_NONCE;
   memcpy(transaction->attachment.nonce, nonce,
          sizeof(transaction->attachment.nonce));
 }
 
 // Get the transaction hash
 static inline flex_trit_t *transaction_hash(iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_HASH);
   return transaction->consensus.hash;
 }
 
 // Set the transaction hash (copy argument)
 static inline void transaction_set_hash(iota_transaction_t transaction,
                                         const flex_trit_t *hash) {
+  transaction->loaded_columns_mask |= MASK_HASH;
   memcpy(transaction->consensus.hash, hash,
          sizeof(transaction->consensus.hash));
 }
 
 static inline uint64_t transaction_snapshot_index(
     iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_SNAPSHOT_INDEX);
   return transaction->metadata.snapshot_index;
 }
 // Set the transaction snapshot index
 static inline void transaction_set_snapshot_index(
     iota_transaction_t transaction, uint64_t snapshot_index) {
+  transaction->loaded_columns_mask |= MASK_SNAPSHOT_INDEX;
   transaction->metadata.snapshot_index = snapshot_index;
 }
 
 static inline bool transaction_solid(iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask && MASK_SOLID);
   return transaction->metadata.solid;
 }
 // Set the transaction solid state
 static inline void transaction_set_solid(iota_transaction_t transaction,
                                          bool state) {
+  transaction->loaded_columns_mask |= MASK_SOLID;
   transaction->metadata.solid = state;
 }
 

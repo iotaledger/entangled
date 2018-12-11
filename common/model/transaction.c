@@ -123,6 +123,7 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
   curl_digest(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, hash, &curl);
   flex_trits_from_trits(transaction->consensus.hash, NUM_TRITS_HASH, hash,
                         NUM_TRITS_HASH, NUM_TRITS_HASH);
+  transaction->loaded_columns_mask |= MASK_ALL_COLUMNS;
   return offset;
 }
 
@@ -273,8 +274,6 @@ iota_transaction_t transaction_new(void) {
     // errno = IOTA_OUT_OF_MEMORY
   }
   transaction_reset(transaction);
-  transaction->metadata.snapshot_index = 0;
-  transaction->metadata.solid = 0;
   return transaction;
 }
 

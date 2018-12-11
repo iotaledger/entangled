@@ -34,6 +34,13 @@ extern char* iota_statement_transaction_approvers_count;
 extern char* iota_statement_transaction_count;
 
 /*
+ * Partial Transaction statements
+ */
+
+extern char* iota_statement_transaction_select_for_traversal;
+extern char* iota_statement_transaction_select_solid_state;
+
+/*
  * Milestone statements
  */
 

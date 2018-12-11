@@ -261,8 +261,8 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
                                  .dynamic = 0};
   *has_snapshot = false;
 
-  if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_FIELD_HASH,
-                                          &milestone_hash, &pack)) != RC_OK) {
+  if ((ret = iota_tangle_transaction_load_for_traversal(
+           lv->tangle, milestone->hash, &pack)) != RC_OK) {
     goto done;
   } else if (pack.num_loaded == 0) {
     ret = RC_LEDGER_VALIDATOR_INVALID_TRANSACTION;
@@ -353,20 +353,14 @@ retcode_t iota_consensus_ledger_validator_update_delta(
   state_delta_t patch = NULL;
   hash243_set_t visited_hashes = NULL;
   bool valid_delta = true;
-  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  trit_array_t hash = {.trits = tip,
-                       .num_trits = HASH_LENGTH_TRIT,
-                       .num_bytes = FLEX_TRIT_SIZE_243,
-                       .dynamic = 0};
-  *is_consistent = false;
 
-  if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_FIELD_HASH,
-                                          &hash, &pack)) != RC_OK) {
+  *is_consistent = false;
+  bool is_solid;
+
+  if ((ret = iota_tangle_transaction_load_solid_state(lv->tangle, tip,
+                                                      &is_solid)) != RC_OK) {
     goto done;
-  } else if (pack.num_loaded == 0) {
-    ret = RC_LEDGER_VALIDATOR_INVALID_TRANSACTION;
-    goto done;
-  } else if (!transaction_solid(&tx)) {
+  } else if (!is_solid) {
     ret = RC_LEDGER_VALIDATOR_TRANSACTION_NOT_SOLID;
     goto done;
   }

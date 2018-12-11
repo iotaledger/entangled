@@ -103,6 +103,18 @@ retcode_t iota_tangle_transaction_load_hashes_of_approvers(
   return res;
 }
 
+retcode_t iota_tangle_transaction_load_for_traversal(
+    tangle_t const *const tangle, flex_trit_t const *const hash,
+    iota_stor_pack_t *const pack) {
+  return iota_stor_transaction_load_for_traversal(&tangle->conn, hash, pack);
+}
+
+retcode_t iota_tangle_transaction_load_solid_state(
+    tangle_t const *const tangle, flex_trit_t const *const hash,
+    bool *const is_solid) {
+  return iota_stor_transaction_load_solid_state(&tangle->conn, hash, is_solid);
+}
+
 retcode_t iota_tangle_transaction_load_hashes_of_requests(
     tangle_t const *const tangle, iota_stor_pack_t *const pack,
     size_t const limit) {

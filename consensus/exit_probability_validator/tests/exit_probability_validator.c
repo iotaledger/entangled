@@ -324,6 +324,5 @@ int main(int argc, char *argv[]) {
   RUN_TEST(test_transaction_exceed_max_transactions);
   RUN_TEST(test_transaction_is_genesis);
   RUN_TEST(test_transaction_valid);
-
   return UNITY_END();
 }
