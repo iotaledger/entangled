@@ -243,14 +243,14 @@ uint8_t transaction_weight_magnitude(const iota_transaction_t transaction) {
   uint8_t pos = FLEX_TRIT_SIZE_243;
 
   while (pos-- > 0 &&
-         transaction->consensus.hash[pos] == FLEX_TRIT_NULL_VALUE) {
+         transaction_hash(transaction)[pos] == FLEX_TRIT_NULL_VALUE) {
     num_trailing_null_values += NUM_TRITS_PER_FLEX_TRIT;
   }
 
   if (pos > 0) {
     trit_t one_trit_buffer[NUM_TRITS_PER_FLEX_TRIT];
     flex_trits_to_trits(one_trit_buffer, NUM_TRITS_PER_FLEX_TRIT,
-                        &transaction->consensus.hash[pos],
+                        &transaction_hash(transaction)[pos],
                         NUM_TRITS_PER_FLEX_TRIT, NUM_TRITS_PER_FLEX_TRIT);
 
     pos = NUM_TRITS_PER_FLEX_TRIT;
