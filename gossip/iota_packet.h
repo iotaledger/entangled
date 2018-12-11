@@ -8,7 +8,7 @@
 #ifndef __GOSSIP_IOTA_PACKET_H__
 #define __GOSSIP_IOTA_PACKET_H__
 
-#include "utlist.h"
+#include <liblfds711.h>
 
 #include "common/errors.h"
 #include "common/network/endpoint.h"
@@ -25,19 +25,15 @@
 typedef struct iota_packet_s {
   byte_t content[PACKET_SIZE];
   endpoint_t source;
+
+  struct lfds711_queue_umm_element qe;
 } iota_packet_t;
 
 /**
  * A queue of packet used to dispatch packets in different threads.
  * Not concurrent by default.
  */
-typedef struct iota_packet_queue_entry_s {
-  iota_packet_t packet;
-  struct iota_packet_queue_entry_s* next;
-  struct iota_packet_queue_entry_s* prev;
-} iota_packet_queue_entry_t;
-
-typedef iota_packet_queue_entry_t* iota_packet_queue_t;
+typedef struct lfds711_queue_umm_state iota_packet_queue_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -88,7 +84,7 @@ retcode_t iota_packet_set_endpoint(iota_packet_t* const packet,
  *
  * @return true if empty, false otherwise
  */
-bool iota_packet_queue_empty(iota_packet_queue_t const queue);
+bool iota_packet_queue_empty(const iota_packet_queue_t* const queue);
 
 /**
  * Gets the size of a packet queue
@@ -97,36 +93,27 @@ bool iota_packet_queue_empty(iota_packet_queue_t const queue);
  *
  * @return the size of the packet queue
  */
-size_t iota_packet_queue_count(iota_packet_queue_t const queue);
+size_t iota_packet_queue_count(const iota_packet_queue_t* const queue);
 
 /**
- * Pushes a packet to a packet queue
+ * Enqueues a packet in a packet queue
  *
  * @param queue The packet queue
  * @param packet The packet
  *
  * @return a status code
  */
-retcode_t iota_packet_queue_push(iota_packet_queue_t* const queue,
-                                 iota_packet_t const* const packet);
+retcode_t iota_packet_queue_enqueue(iota_packet_queue_t* queue,
+                                    iota_packet_t const* const packet);
 
 /**
- * Pops a packet from a packet queue
+ * Dequeues a packet from a packet queue
  *
  * @param queue The packet queue
  *
  * @return a status code
  */
-void iota_packet_queue_pop(iota_packet_queue_t* const queue);
-
-/**
- * Peeks a packet from a packet queue
- *
- * @param queue The packet queue
- *
- * @return the packet
- */
-iota_packet_t* iota_packet_queue_peek(iota_packet_queue_t const queue);
+iota_packet_t* iota_packet_queue_dequeue(iota_packet_queue_t* queue);
 
 /**
  * Frees a packet queue
@@ -135,7 +122,10 @@ iota_packet_t* iota_packet_queue_peek(iota_packet_queue_t const queue);
  *
  * @return a status code
  */
-void iota_packet_queue_free(iota_packet_queue_t* const queue);
+void iota_packet_queue_free(iota_packet_queue_t* queue);
+
+void iota_packet_queue_init_owner(iota_packet_queue_t* queue);
+void iota_packet_queue_init_user(iota_packet_queue_t* queue);
 
 #ifdef __cplusplus
 }

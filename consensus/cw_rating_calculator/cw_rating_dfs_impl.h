@@ -8,9 +8,6 @@
 #ifndef __CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_DFS_IMPL_H__
 #define __CONSENSUS_CW_RATING_CALCULATOR_CW_RATING_DFS_IMPL_H__
 
-#include "utarray.h"
-#include "uthash.h"
-
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 
 #ifdef __cplusplus

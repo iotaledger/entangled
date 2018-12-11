@@ -30,7 +30,7 @@ cc_library(
         "//common/network:endpoint",
         "//common/trinary:bytes",
         "//common/trinary:flex_trit",
-        "@com_github_uthash//:uthash",
+        "@liblfds//:liblfds",
     ],
 )
 

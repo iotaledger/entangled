@@ -15,6 +15,9 @@ UdpReceiverService::UdpReceiverService(receiver_service_t* const service,
       socket_(context, boost::asio::ip::udp::endpoint(
                            boost::asio::ip::udp::v4(), port)) {
   service->opaque_socket = &socket_;
+
+  iota_packet_queue_init_user(&service->processor->queue);
+
   receive();
 }
 

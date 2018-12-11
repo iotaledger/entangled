@@ -31,7 +31,6 @@ typedef struct processor_s {
   thread_handle_t thread;
   bool running;
   iota_packet_queue_t queue;
-  rw_lock_handle_t lock;
   cond_handle_t cond;
   node_t *node;
   tangle_t *tangle;

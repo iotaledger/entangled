@@ -19,6 +19,8 @@ TcpConnection::TcpConnection(receiver_service_t* const service,
                              boost::asio::ip::tcp::socket socket)
     : service_(service), socket_(std::move(socket)) {
   service->opaque_socket = &socket_;
+
+  iota_packet_queue_init_user(&service->processor->queue);
 }
 
 TcpConnection::~TcpConnection() {

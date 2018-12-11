@@ -260,24 +260,22 @@ static void *processor_routine(processor_t *const processor) {
   lock_handle_lock(&lock_cond);
 
   while (processor->running) {
-    if (processor_size(processor) == 0) {
+    packet_ptr = iota_packet_queue_dequeue(&processor->queue);
+    if (packet_ptr == NULL) {
       cond_handle_timedwait(&processor->cond, &lock_cond,
                             PROCESSOR_TIMEOUT_SEC);
+      packet_ptr = iota_packet_queue_dequeue(&processor->queue);
     }
 
-    rw_lock_handle_wrlock(&processor->lock);
-    packet_ptr = iota_packet_queue_peek(processor->queue);
     if (packet_ptr == NULL) {
-      rw_lock_handle_unlock(&processor->lock);
       continue;
     }
-    packet = *packet_ptr;
-    iota_packet_queue_pop(&processor->queue);
-    rw_lock_handle_unlock(&processor->lock);
 
-    if (process_packet(processor, &packet) != RC_OK) {
+    if (process_packet(processor, packet_ptr) != RC_OK) {
       log_warning(PROCESSOR_LOGGER_ID, "Processing packet failed\n");
     }
+
+    free(packet_ptr);
   }
 
   lock_handle_unlock(&lock_cond);
@@ -304,8 +302,9 @@ retcode_t processor_init(processor_t *const processor, node_t *const node,
   logger_helper_init(PROCESSOR_LOGGER_ID, LOGGER_DEBUG, true);
 
   processor->running = false;
-  processor->queue = NULL;
-  rw_lock_handle_init(&processor->lock);
+
+  iota_packet_queue_init_owner(&processor->queue);
+
   cond_handle_init(&processor->cond);
   processor->node = node;
   processor->tangle = tangle;
@@ -358,7 +357,6 @@ retcode_t processor_destroy(processor_t *const processor) {
   }
 
   iota_packet_queue_free(&processor->queue);
-  rw_lock_handle_destroy(&processor->lock);
   cond_handle_destroy(&processor->cond);
   processor->node = NULL;
   processor->tangle = NULL;
@@ -379,9 +377,7 @@ retcode_t processor_on_next(processor_t *const processor,
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_wrlock(&processor->lock);
-  ret = iota_packet_queue_push(&processor->queue, &packet);
-  rw_lock_handle_unlock(&processor->lock);
+  ret = iota_packet_queue_enqueue(&processor->queue, &packet);
 
   if (ret != RC_OK) {
     log_warning(PROCESSOR_LOGGER_ID,
@@ -401,9 +397,7 @@ size_t processor_size(processor_t *const processor) {
     return 0;
   }
 
-  rw_lock_handle_rdlock(&processor->lock);
-  size = iota_packet_queue_count(processor->queue);
-  rw_lock_handle_unlock(&processor->lock);
+  size = iota_packet_queue_count(&processor->queue);
 
   return size;
 }
