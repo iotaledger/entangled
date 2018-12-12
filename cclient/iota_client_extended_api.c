@@ -346,9 +346,9 @@ retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
         time_now = current_timestamp_ms();
         log_debug(CCLIENT_EXTENDED_LOGGER_ID,
                   "checking depth, attachment_timestamp %ld, time: %ld\n",
-                  tx.attachment_timestamp, time_now);
-        if ((tx.attachment_timestamp < time_now) &&
-            ((time_now - tx.attachment_timestamp) < max_depth)) {
+                  tx.attachment.attachment_timestamp, time_now);
+        if ((tx.attachment.attachment_timestamp < time_now) &&
+            ((time_now - tx.attachment.attachment_timestamp) < max_depth)) {
           *out_promotable = true;
         }
       } else {
