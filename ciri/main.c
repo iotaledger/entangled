@@ -78,13 +78,6 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  // TODO remove
-  // Dummy broadcasted packet to begin receiving from UDP neighbors
-  sleep(2);
-  flex_trit_t dummy[FLEX_TRIT_SIZE_8019];
-  memset(dummy, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
-  broadcaster_on_next(&core_g.node.broadcaster, dummy);
-
   size_t count = 0;
   while (true) {
     if (iota_tangle_transaction_count(&tangle, &count) != RC_OK) {
