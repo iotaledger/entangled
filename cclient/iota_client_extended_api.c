@@ -137,12 +137,16 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
   if (ret_code == RC_OK && balances_req->addresses) {
     // expect balance value is in order.
     CDL_FOREACH(balances_req->addresses, q_iter) {
-      tmp_balance = get_balances_res_balances_at(balances_res, counter);
-      if (tmp_balance >= threshold) {
+      if (out_input->total_balance < threshold) {
+        tmp_balance = get_balances_res_balances_at(balances_res, counter);
         out_input->total_balance += tmp_balance;
         hash243_queue_push(&out_input->addresses, q_iter->hash);
       }
       counter++;
+    }
+    // check if balance is sufficient
+    if (out_input->total_balance < threshold) {
+      ret_code = RC_CCLIENT_INSUFFICIENT_BALANCE;
     }
   }
 
