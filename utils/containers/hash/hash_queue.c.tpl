@@ -49,7 +49,7 @@ void hash{SIZE}_queue_free(hash{SIZE}_queue_t *const queue) {
   }
 }
 
-size_t hash{SIZE}_queue_count(hash{SIZE}_queue_t *const queue) {
+size_t hash{SIZE}_queue_count(hash{SIZE}_queue_t const *const queue) {
   hash{SIZE}_queue_entry_t *iter = NULL;
   size_t count = 0;
   CDL_COUNT(*queue, iter, count);
