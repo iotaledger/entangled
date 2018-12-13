@@ -221,6 +221,16 @@ retcode_t iota_tangle_transaction_approvers_count(tangle_t const *const tangle,
   return iota_stor_transaction_approvers_count(&tangle->conn, hash, count);
 }
 
+retcode_t iota_tangle_transaction_find(tangle_t const *const tangle,
+                                       hash243_queue_t const bundles,
+                                       hash243_queue_t const addresses,
+                                       hash81_queue_t const tags,
+                                       hash243_queue_t const approvees,
+                                       iota_stor_pack_t *const pack) {
+  return iota_stor_transaction_find(&tangle->conn, bundles, addresses, tags,
+                                    approvees, pack);
+}
+
 /*
  * Milestone operations
  */
