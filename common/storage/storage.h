@@ -51,13 +51,13 @@ extern retcode_t iota_stor_transaction_load(connection_t const* const conn,
                                             trit_array_t const* const key,
                                             iota_stor_pack_t* const pack);
 
-extern retcode_t iota_stor_transaction_load_for_traversal(
+extern retcode_t iota_stor_transaction_load_essence_attachment_and_metadata(
     connection_t const* const conn, flex_trit_t const* const hash,
     iota_stor_pack_t* const pack);
 
-extern retcode_t iota_stor_transaction_load_solid_state(
+extern retcode_t iota_stor_transaction_load_essence_and_consensus(
     connection_t const* const conn, flex_trit_t const* const hash,
-    bool* const is_solid);
+    iota_stor_pack_t* const pack);
 
 extern retcode_t iota_stor_transaction_exist(connection_t const* const conn,
                                              transaction_field_t const field,

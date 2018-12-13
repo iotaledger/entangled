@@ -58,22 +58,32 @@ retcode_t iota_tangle_transaction_load_hashes_of_approvers(
     iota_stor_pack_t *const pack);
 
 /**
- * Loads traversal data (specified by MASK_TRAVERSAL_COLUMNS)
+ * Loads partial transaction data - (contains essence + attachment + metadata)
  *
  * @param tangle The tangle
- * @param hash The hash of the transaction in which to load its traversal data
+ * @param hash The hash of the transaction
  * @param pack A pack to be filled with hashes
  *
  * @return a status code
  */
 
-retcode_t iota_tangle_transaction_load_for_traversal(
+retcode_t iota_tangle_transaction_load_essence_attachment_and_metadata(
     tangle_t const *const tangle, flex_trit_t const *const hash,
     iota_stor_pack_t *const pack);
 
-retcode_t iota_tangle_transaction_load_solid_state(
+/**
+ * Loads partial transaction data - (contains essence + consensus)
+ *
+ * @param tangle The tangle
+ * @param hash The hash of the transaction
+ * @param pack A pack to be filled with hashes
+ *
+ * @return a status code
+ */
+
+retcode_t iota_tangle_transaction_load_essence_and_consensus(
     tangle_t const *const tangle, flex_trit_t const *const hash,
-    bool *const is_solid);
+    iota_stor_pack_t *const pack);
 
 /**
  * Loads hashes of missing transactions (i.e. only referred as trunk or branch)

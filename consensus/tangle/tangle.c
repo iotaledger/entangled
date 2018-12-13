@@ -103,16 +103,18 @@ retcode_t iota_tangle_transaction_load_hashes_of_approvers(
   return res;
 }
 
-retcode_t iota_tangle_transaction_load_for_traversal(
+retcode_t iota_tangle_transaction_load_essence_attachment_and_metadata(
     tangle_t const *const tangle, flex_trit_t const *const hash,
     iota_stor_pack_t *const pack) {
-  return iota_stor_transaction_load_for_traversal(&tangle->conn, hash, pack);
+  return iota_stor_transaction_load_essence_attachment_and_metadata(
+      &tangle->conn, hash, pack);
 }
 
-retcode_t iota_tangle_transaction_load_solid_state(
+retcode_t iota_tangle_transaction_load_essence_and_consensus(
     tangle_t const *const tangle, flex_trit_t const *const hash,
-    bool *const is_solid) {
-  return iota_stor_transaction_load_solid_state(&tangle->conn, hash, is_solid);
+    iota_stor_pack_t *const pack) {
+  return iota_stor_transaction_load_essence_and_consensus(&tangle->conn, hash,
+                                                          pack);
 }
 
 retcode_t iota_tangle_transaction_load_hashes_of_requests(
@@ -271,8 +273,8 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
 
   *found_tail = false;
 
-  res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, tx_hash,
-                                     &tx_pack);
+  res = iota_tangle_transaction_load_essence_and_consensus(
+      tangle, tx_hash->trits, &tx_pack);
   if (res != RC_OK || tx_pack.num_loaded == 0) {
     return res;
   }
@@ -307,8 +309,8 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
           (trit_array_t *)hash_pack.models[approver_idx];
       tx_pack.models = (void **)(&next_tx);
       hash_pack_reset(&tx_pack);
-      res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
-                                         approver_hash, &tx_pack);
+      res = iota_tangle_transaction_load_essence_and_consensus(
+          tangle, approver_hash->trits, &tx_pack);
       if (res != RC_OK || tx_pack.num_loaded == 0) {
         break;
       }

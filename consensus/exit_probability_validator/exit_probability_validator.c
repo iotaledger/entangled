@@ -45,8 +45,8 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(tx, tx_models, tx_pack);
 
-  ret = iota_tangle_transaction_load_for_traversal(epv->tangle,
-                                                   tail_hash->trits, &tx_pack);
+  ret = iota_tangle_transaction_load_essence_attachment_and_metadata(
+      epv->tangle, tail_hash->trits, &tx_pack);
   if (ret != RC_OK) {
     *is_valid = false;
     return ret;
@@ -135,8 +135,8 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
       break;
     }
 
-    res = iota_tangle_transaction_load_for_traversal(epv->tangle,
-                                                     curr_hash_trits, &pack);
+    res = iota_tangle_transaction_load_essence_attachment_and_metadata(
+        epv->tangle, curr_hash_trits, &pack);
     bool tail_is_not_genesis = (transaction_snapshot_index(&curr_tx_s) != 0 ||
                                 memcmp(epv->conf->genesis_hash, curr_hash_trits,
                                        FLEX_TRIT_SIZE_243) == 0);

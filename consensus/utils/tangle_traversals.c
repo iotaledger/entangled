@@ -37,8 +37,8 @@ retcode_t tangle_traversal_dfs_to_genesis(
     hash243_stack_pop(&non_analyzed_hashes);
     if (!hash243_set_contains(analyzed_hashes, hash)) {
       hash_pack_reset(&pack);
-      if ((ret = iota_tangle_transaction_load_for_traversal(tangle, hash,
-                                                            &pack)) != RC_OK) {
+      if ((ret = iota_tangle_transaction_load_essence_attachment_and_metadata(
+               tangle, hash, &pack)) != RC_OK) {
         break;
       }
 

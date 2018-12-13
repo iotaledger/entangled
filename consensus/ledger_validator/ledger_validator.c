@@ -261,7 +261,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
                                  .dynamic = 0};
   *has_snapshot = false;
 
-  if ((ret = iota_tangle_transaction_load_for_traversal(
+  if ((ret = iota_tangle_transaction_load_essence_attachment_and_metadata(
            lv->tangle, milestone->hash, &pack)) != RC_OK) {
     goto done;
   } else if (pack.num_loaded == 0) {
@@ -355,12 +355,13 @@ retcode_t iota_consensus_ledger_validator_update_delta(
   bool valid_delta = true;
 
   *is_consistent = false;
-  bool is_solid;
+  // Load the transaction
+  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
 
-  if ((ret = iota_tangle_transaction_load_solid_state(lv->tangle, tip,
-                                                      &is_solid)) != RC_OK) {
+  if ((ret = iota_tangle_transaction_load_essence_attachment_and_metadata(
+           lv->tangle, tip, &pack)) != RC_OK) {
     goto done;
-  } else if (!is_solid) {
+  } else if (!transaction_solid(curr_tx)) {
     ret = RC_LEDGER_VALIDATOR_TRANSACTION_NOT_SOLID;
     goto done;
   }

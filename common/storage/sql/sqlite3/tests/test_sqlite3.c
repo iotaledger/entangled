@@ -369,12 +369,8 @@ void test_transaction_update_solid_state(void) {
   hash_pack_reset(&pack);
   TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
                                          &pack) == RC_OK);
-  bool is_solid = false;
-  TEST_ASSERT(iota_stor_transaction_load_solid_state(&conn, hash.trits,
-                                                     &is_solid) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT(tx.metadata.solid == new_solid_state);
-  TEST_ASSERT(tx.metadata.solid == is_solid);
   transaction_free(test_tx);
 }
 

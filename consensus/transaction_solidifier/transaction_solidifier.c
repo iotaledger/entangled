@@ -224,11 +224,16 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
                              .dynamic = 0};
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
 
-  ret = iota_tangle_transaction_load_solid_state(ts->tangle, hash, is_solid);
+  ret = iota_tangle_transaction_load_essence_attachment_and_metadata(
+      ts->tangle, hash, &pack);
   if (ret != RC_OK) {
     log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
               "No transactions were loaded for the provided hash\n");
     return ret;
+  }
+  if (transaction_solid(curr_tx)) {
+    *is_solid = true;
+    return RC_OK;
   }
 
   lock_handle_lock(&ts->lock);
@@ -264,7 +269,8 @@ static retcode_t check_transaction_and_update_solid_state(
   *is_new_solid = false;
   DECLARE_PACK_SINGLE_TX(transaction_s, transaction, pack);
 
-  ret = iota_tangle_transaction_load_for_traversal(ts->tangle, hash, &pack);
+  ret = iota_tangle_transaction_load_essence_attachment_and_metadata(
+      ts->tangle, hash, &pack);
   if (ret != RC_OK || pack.num_loaded == 0) {
     log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
               "No transactions were loaded for the provided hash\n");
@@ -301,15 +307,19 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts,
                                             flex_trit_t *const approvee,
                                             bool *solid) {
   retcode_t ret;
-  ret = iota_tangle_transaction_load_solid_state(ts->tangle, approvee, solid);
-  if (ret != RC_OK) {
+  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
+  ret = iota_tangle_transaction_load_essence_attachment_and_metadata(
+      ts->tangle, approvee, &pack);
+  if (ret != RC_OK || pack.num_loaded == 0) {
     *solid = false;
     return request_transaction(ts->transaction_requester, approvee, false);
   }
-  if (memcmp(approvee, ts->conf->genesis_hash, FLEX_TRIT_SIZE_243) == 0) {
+  if (memcmp(transaction_hash(&curr_tx_s), ts->conf->genesis_hash,
+             FLEX_TRIT_SIZE_243) == 0) {
     *solid = true;
     return ret;
   }
+  *solid = transaction_solid(&curr_tx_s);
   return RC_OK;
 }
 
