@@ -147,7 +147,7 @@ size_t broadcaster_size(broadcaster_t *const broadcaster) {
   }
 
   rw_lock_handle_rdlock(&broadcaster->lock);
-  size = hash8019_queue_count(&broadcaster->queue);
+  size = hash8019_queue_count(broadcaster->queue);
   rw_lock_handle_unlock(&broadcaster->lock);
 
   return size;

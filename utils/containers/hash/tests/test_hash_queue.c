@@ -14,7 +14,7 @@ void test_hash243_queue() {
   hash243_queue_push(&queue, hash243_1);
   hash243_queue_push(&queue, hash243_2);
 
-  TEST_ASSERT_EQUAL_INT(2, hash243_queue_count(&queue));
+  TEST_ASSERT_EQUAL_INT(2, hash243_queue_count(queue));
   TEST_ASSERT_FALSE(hash243_queue_empty(queue));
 
   TEST_ASSERT_EQUAL_MEMORY(hash243_1, hash243_queue_peek(queue),
@@ -26,9 +26,9 @@ void test_hash243_queue() {
   TEST_ASSERT_NULL(hash243_queue_at(&queue, 2));
 
   hash243_queue_pop(&queue);
-  TEST_ASSERT_EQUAL_INT(1, hash243_queue_count(&queue));
+  TEST_ASSERT_EQUAL_INT(1, hash243_queue_count(queue));
   hash243_queue_pop(&queue);
-  TEST_ASSERT_EQUAL_INT(0, hash243_queue_count(&queue));
+  TEST_ASSERT_EQUAL_INT(0, hash243_queue_count(queue));
 
   TEST_ASSERT_TRUE(hash243_queue_empty(queue));
   TEST_ASSERT_NULL(hash243_queue_peek(queue));
