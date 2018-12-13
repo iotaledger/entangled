@@ -419,8 +419,7 @@ void select_transactions_populate_from_row_essence_attachment_and_metadata(
   column_decompress_load(statement, 13, tx->attachment.tag, FLEX_TRIT_SIZE_81);
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 14));
   transaction_set_solid(tx, sqlite3_column_int(statement, 15));
-  tx->loaded_columns_mask =
-      MASK_ESSENCE | MASK_ATTACHMENT | MASK_CONSENSUS | MASK_METADATA;
+  tx->loaded_columns_mask = MASK_ESSENCE | MASK_ATTACHMENT | MASK_METADATA;
 }
 
 void select_transactions_populate_from_row_essence_and_consensus(

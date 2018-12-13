@@ -224,8 +224,8 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
                              .dynamic = 0};
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
 
-  ret = iota_tangle_transaction_load_essence_attachment_and_metadata(
-      ts->tangle, hash, &pack);
+  ret = iota_tangle_transaction_load_partial(
+      ts->tangle, hash, &pack, PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA);
   if (ret != RC_OK) {
     log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
               "No transactions were loaded for the provided hash\n");
@@ -269,8 +269,8 @@ static retcode_t check_transaction_and_update_solid_state(
   *is_new_solid = false;
   DECLARE_PACK_SINGLE_TX(transaction_s, transaction, pack);
 
-  ret = iota_tangle_transaction_load_essence_attachment_and_metadata(
-      ts->tangle, hash, &pack);
+  ret = iota_tangle_transaction_load_partial(
+      ts->tangle, hash, &pack, PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA);
   if (ret != RC_OK || pack.num_loaded == 0) {
     log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
               "No transactions were loaded for the provided hash\n");
@@ -293,8 +293,8 @@ static retcode_t check_transaction_and_update_solid_state(
     }
 
     if (*is_new_solid) {
-      if ((ret = iota_tangle_transaction_update_solid_state(
-               ts->tangle, transaction_hash(transaction), true)) != RC_OK) {
+      if ((ret = iota_tangle_transaction_update_solid_state(ts->tangle, hash,
+                                                            true)) != RC_OK) {
         return ret;
       }
     }
@@ -308,14 +308,13 @@ static retcode_t check_approvee_solid_state(transaction_solidifier_t *const ts,
                                             bool *solid) {
   retcode_t ret;
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
-  ret = iota_tangle_transaction_load_essence_attachment_and_metadata(
-      ts->tangle, approvee, &pack);
+  ret = iota_tangle_transaction_load_partial(ts->tangle, approvee, &pack,
+                                             PARTIAL_TX_MODEL_METADATA);
   if (ret != RC_OK || pack.num_loaded == 0) {
     *solid = false;
     return request_transaction(ts->transaction_requester, approvee, false);
   }
-  if (memcmp(transaction_hash(&curr_tx_s), ts->conf->genesis_hash,
-             FLEX_TRIT_SIZE_243) == 0) {
+  if (memcmp(approvee, ts->conf->genesis_hash, FLEX_TRIT_SIZE_243) == 0) {
     *solid = true;
     return ret;
   }

@@ -172,8 +172,9 @@ static void* milestone_validator(void* arg) {
       hash243_queue_pop(&mt->candidates);
       rw_lock_handle_unlock(&mt->candidates_lock);
       hash_pack_reset(&pack);
-      if (iota_tangle_transaction_load_essence_and_consensus(
-              mt->tangle, candidate.hash, &pack) == RC_OK &&
+      if (iota_tangle_transaction_load_partial(
+              mt->tangle, candidate.hash, &pack,
+              PARTIAL_TX_MODEL_ESSENCE_CONSENSUS) == RC_OK &&
           pack.num_loaded != 0) {
         candidate.index = get_milestone_index(&tx);
         if (validate_milestone(mt, &candidate, &milestone_status) != RC_OK) {
