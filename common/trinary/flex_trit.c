@@ -385,13 +385,3 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
 #endif
   return num_trits;
 }
-
-bool is_empty_flex_trits(flex_trit_t const *const hash, uint32_t len) {
-  uint32_t index = 0;
-  for (index = 0; index < len; index++) {
-    if (hash[index] != FLEX_TRIT_NULL_VALUE) {
-      return false;
-    }
-  }
-  return true;
-}

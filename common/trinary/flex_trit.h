@@ -158,6 +158,7 @@ static inline uint8_t flex_trits_set_at(flex_trit_t *const flex_trits,
   return 1;
 }
 
+// return true if all flex_trit are NULL, else false.
 static inline bool flex_trits_are_null(flex_trit_t const *const flex_trits,
                                        size_t const len) {
   for (size_t i = 0; i < len; i++) {
@@ -277,9 +278,6 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
 /// @return size_t - the number of trits decoded
 size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
                              const byte_t *bytes, size_t len, size_t num_trits);
-
-// return true if all flex_trit are NULL, else false.
-bool is_empty_flex_trits(flex_trit_t const *const hash, uint32_t len);
 
 #endif
 #ifdef __cplusplus

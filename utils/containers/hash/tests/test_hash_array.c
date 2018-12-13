@@ -8,14 +8,6 @@
 #include "utils/containers/hash/hash_array.h"
 #include "utils/containers/hash/tests/defs.h"
 
-void test_empty_hash() {
-  flex_trit_t null_hash[FLEX_TRIT_SIZE_243];
-  memset(null_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
-
-  TEST_ASSERT(is_empty_flex_trits(null_hash, FLEX_TRIT_SIZE_243));
-  TEST_ASSERT(is_empty_flex_trits(hash243_1, FLEX_TRIT_SIZE_243) == false);
-}
-
 void test_empty_hash243_array() {
   hash243_array_p hashes = hash243_array_new();
   TEST_ASSERT_EQUAL_INT(0, hash_array_len(hashes));
@@ -45,7 +37,6 @@ void test_hash243_array() {
 int main(void) {
   UNITY_BEGIN();
 
-  RUN_TEST(test_empty_hash);
   RUN_TEST(test_empty_hash243_array);
   RUN_TEST(test_hash243_array);
 

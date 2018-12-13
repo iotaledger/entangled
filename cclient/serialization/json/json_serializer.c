@@ -1113,7 +1113,7 @@ retcode_t json_get_transactions_to_approve_serialize_request(
 
   cJSON_AddItemToObject(json_root, "depth", cJSON_CreateNumber(obj->depth));
 
-  if (!is_empty_flex_trits(obj->reference, FLEX_TRIT_SIZE_243)) {
+  if (!flex_trits_are_null(obj->reference, FLEX_TRIT_SIZE_243)) {
     ret = flex_trits_to_json_string(json_root, "reference", obj->reference,
                                     NUM_TRITS_HASH);
     if (ret != RC_OK) {
