@@ -338,7 +338,7 @@ retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
                         iota_consensus_t *const consensus,
                         serializer_type_t const serializer_type) {
   if (api == NULL) {
-    return RC_API_NULL_SELF;
+    return RC_NULL_PARAM;
   }
 
   logger_helper_init(API_LOGGER_ID, LOGGER_DEBUG, true);
@@ -356,7 +356,7 @@ retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
 
 retcode_t iota_api_start(iota_api_t *const api) {
   if (api == NULL) {
-    return RC_API_NULL_SELF;
+    return RC_NULL_PARAM;
   }
 
   api->running = true;
@@ -367,7 +367,7 @@ retcode_t iota_api_stop(iota_api_t *const api) {
   retcode_t ret = RC_OK;
 
   if (api == NULL) {
-    return RC_API_NULL_SELF;
+    return RC_NULL_PARAM;
   } else if (api->running == false) {
     return RC_OK;
   }
@@ -378,9 +378,9 @@ retcode_t iota_api_stop(iota_api_t *const api) {
 
 retcode_t iota_api_destroy(iota_api_t *const api) {
   if (api == NULL) {
-    return RC_API_NULL_SELF;
+    return RC_NULL_PARAM;
   } else if (api->running) {
-    return RC_API_STILL_RUNNING;
+    return RC_STILL_RUNNING;
   }
 
   logger_helper_destroy(API_LOGGER_ID);
