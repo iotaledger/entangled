@@ -190,6 +190,13 @@ done:
 retcode_t iota_api_find_transactions(iota_api_t const *const api,
                                      find_transactions_req_t const *const req,
                                      find_transactions_res_t *const res) {
+  if (hash243_queue_count(&req->bundles) == 0 &&
+      hash243_queue_count(&req->addresses) == 0 &&
+      hash243_queue_count(&req->tags) == 0 &&
+      hash243_queue_count(&req->approvees) == 0) {
+    return RC_API_FIND_TRANSACTIONS_NO_INPUT;
+  }
+
   return RC_OK;
 }
 

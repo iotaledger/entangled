@@ -11,10 +11,10 @@ find_transactions_req_t* find_transactions_req_new() {
   find_transactions_req_t* req =
       (find_transactions_req_t*)malloc(sizeof(find_transactions_req_t));
   if (req) {
+    req->bundles = NULL;
     req->addresses = NULL;
     req->tags = NULL;
     req->approvees = NULL;
-    req->bundles = NULL;
   }
   return req;
 }
@@ -24,6 +24,9 @@ void find_transactions_req_free(find_transactions_req_t** req) {
     return;
   }
 
+  if ((*req)->bundles) {
+    hash243_queue_free(&(*req)->bundles);
+  }
   if ((*req)->addresses) {
     hash243_queue_free(&(*req)->addresses);
   }
@@ -32,9 +35,6 @@ void find_transactions_req_free(find_transactions_req_t** req) {
   }
   if ((*req)->approvees) {
     hash243_queue_free(&(*req)->approvees);
-  }
-  if ((*req)->bundles) {
-    hash243_queue_free(&(*req)->bundles);
   }
   free(*req);
   *req = NULL;
