@@ -424,11 +424,10 @@ iota_transaction_t transfer_iterator_next(
     // Reset all transaction fields
     transaction_reset(transaction);
     // Set common transaction fields
-    memcpy(transaction->essence.bundle, transfer_iterator->bundle_hash,
-           FLEX_TRIT_SIZE_243);
-    memcpy(transaction->essence.address, transfer->address, FLEX_TRIT_SIZE_243);
-    memcpy(transaction->essence.obsolete_tag, transfer->tag, FLEX_TRIT_SIZE_81);
-    memcpy(transaction->attachment.tag, transfer->tag, FLEX_TRIT_SIZE_81);
+    transaction_set_bundle(transaction, transfer_iterator->bundle_hash);
+    transaction_set_address(transaction, transfer->address);
+    transaction_set_tag(transaction, transfer->tag);
+    transaction_set_obsolete_tag(transaction, transfer->tag);
     transaction_set_timestamp(transaction, transfer->timestamp);
     transaction_set_current_index(transaction,
                                   transfer_iterator->current_transaction_index);
