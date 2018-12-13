@@ -126,6 +126,9 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf,
       break;
 
     // API configuration
+    case CONF_MAX_FIND_TRANSACTIONS:  // --max-find-transactions
+      api_conf->max_find_transactions = atoi(value);
+      break;
     case CONF_MAX_GET_TRYTES:  // --max-get-trytes
       api_conf->max_get_trytes = atoi(value);
       break;
