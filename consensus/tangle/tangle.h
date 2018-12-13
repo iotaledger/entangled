@@ -86,6 +86,20 @@ retcode_t iota_tangle_transaction_load_essence_and_consensus(
     iota_stor_pack_t *const pack);
 
 /**
+ * Loads partial transaction data - (contains metadata)
+ *
+ * @param tangle The tangle
+ * @param hash The hash of the transaction
+ * @param pack A pack to be filled with hashes
+ *
+ * @return a status code
+ */
+
+retcode_t iota_tangle_transaction_load_metadata(tangle_t const *const tangle,
+                                                flex_trit_t const *const hash,
+                                                iota_stor_pack_t *const pack);
+
+/**
  * Loads hashes of missing transactions (i.e. only referred as trunk or branch)
  *
  * @param tangle The tangle

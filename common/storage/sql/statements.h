@@ -39,7 +39,7 @@ extern char* iota_statement_transaction_count;
 
 extern char* iota_statement_transaction_select_essence_attachment_and_metadata;
 extern char* iota_statement_transaction_select_essence_and_consensus;
-
+extern char* iota_statement_transaction_select_metadata;
 /*
  * Milestone statements
  */

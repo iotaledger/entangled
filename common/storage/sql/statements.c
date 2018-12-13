@@ -104,6 +104,10 @@ char *iota_statement_transaction_select_essence_and_consensus =
     "," TRANSACTION_COL_BUNDLE "," TRANSACTION_COL_HASH
     " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
 
+char *iota_statement_transaction_select_metadata =
+    "SELECT " TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID
+    " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
+
 /*
  * Milestone statements
  */

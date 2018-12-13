@@ -117,6 +117,12 @@ retcode_t iota_tangle_transaction_load_essence_and_consensus(
                                                           pack);
 }
 
+retcode_t iota_tangle_transaction_load_metadata(tangle_t const *const tangle,
+                                                flex_trit_t const *const hash,
+                                                iota_stor_pack_t *const pack) {
+  return iota_stor_transaction_load_metadata(&tangle->conn, hash, pack);
+}
+
 retcode_t iota_tangle_transaction_load_hashes_of_requests(
     tangle_t const *const tangle, iota_stor_pack_t *const pack,
     size_t const limit) {

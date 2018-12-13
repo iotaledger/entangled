@@ -164,6 +164,7 @@ enum load_model {
   MODEL_MILESTONE,
   MODEL_TRANSACTION_ESSENCE_ATTACHMENT_METADATA,
   MODEL_TRANSACTION_MODEL_ESSENCE_CONSENSUS,
+  MODEL_TRANSACTION_MODEL_METADATA,
 };
 
 static retcode_t execute_statement_load_gen(
@@ -192,6 +193,9 @@ static retcode_t execute_statement_load_gen(
           sqlite_statement, pack->models[pack->num_loaded++]);
     } else if (model == MODEL_TRANSACTION_MODEL_ESSENCE_CONSENSUS) {
       select_transactions_populate_from_row_essence_and_consensus(
+          sqlite_statement, pack->models[pack->num_loaded++]);
+    } else if (model == MODEL_TRANSACTION_MODEL_METADATA) {
+      select_transactions_populate_from_row_metadata(
           sqlite_statement, pack->models[pack->num_loaded++]);
     } else {
       return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
@@ -355,6 +359,12 @@ static retcode_t execute_statement_load_transaction_essence_and_consensus(
                                     MODEL_TRANSACTION_MODEL_ESSENCE_CONSENSUS);
 }
 
+static retcode_t execute_statement_load_transaction_metadata(
+    sqlite3_stmt* const sqlite_statement, iota_stor_pack_t* const pack) {
+  return execute_statement_load_gen(sqlite_statement, pack, pack->capacity,
+                                    MODEL_TRANSACTION_MODEL_METADATA);
+}
+
 static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
                                                   iota_transaction_t const tx) {
   column_decompress_load(statement, 0, tx->data.signature_or_message,
@@ -426,6 +436,13 @@ void select_transactions_populate_from_row_essence_and_consensus(
   column_decompress_load(statement, 7, tx->consensus.hash, FLEX_TRIT_SIZE_243);
 
   tx->loaded_columns_mask = MASK_ESSENCE | MASK_CONSENSUS;
+}
+
+void select_transactions_populate_from_row_metadata(
+    sqlite3_stmt* const statement, iota_transaction_t const tx) {
+  transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 01));
+  transaction_set_solid(tx, sqlite3_column_int(statement, 1));
+  tx->loaded_columns_mask = MASK_METADATA;
 }
 
 retcode_t iota_stor_transaction_count(connection_t const* const conn,
@@ -606,6 +623,36 @@ retcode_t iota_stor_transaction_load_essence_and_consensus(
 
   if ((ret = execute_statement_load_transaction_essence_and_consensus(
            sqlite_statement, pack)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  finalize_statement(sqlite_statement);
+  return ret;
+}
+
+retcode_t iota_stor_transaction_load_metadata(connection_t const* const conn,
+                                              flex_trit_t const* const hash,
+                                              iota_stor_pack_t* const pack) {
+  retcode_t ret = RC_OK;
+  char* statement = NULL;
+  sqlite3_stmt* sqlite_statement = NULL;
+
+  statement = iota_statement_transaction_select_metadata;
+
+  if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
+                               statement)) != RC_OK) {
+    goto done;
+  }
+
+  if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) !=
+      RC_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
+  if ((ret = execute_statement_load_transaction_metadata(sqlite_statement,
+                                                         pack)) != RC_OK) {
     goto done;
   }
 
