@@ -40,6 +40,8 @@ cc_library(
     srcs = ["processor.c"],
     deps = [
         ":processor_shared",
+        "//common/trinary:trit_ptrit",
+        "//common/curl-p:ptrit",
         "//consensus/milestone_tracker",
         "//consensus/transaction_solidifier",
         "//gossip:neighbor",

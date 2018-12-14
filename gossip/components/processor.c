@@ -7,6 +7,7 @@
 
 #include <string.h>
 
+#include "common/curl-p/ptrit.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "gossip/components/processor.h"
@@ -29,14 +30,14 @@
  * @param processor The processor state
  * @param neighbor The neighbor that sent the packet
  * @param packet The packet from which to process transaction bytes
- * @param hash A hash to be filled with transaction bytes hash
+ * @param curl_hash The CurlP81 hash of the transaction
  *
  * @return a status code
  */
 static retcode_t process_transaction_bytes(processor_t const *const processor,
                                            neighbor_t *const neighbor,
                                            iota_packet_t const *const packet,
-                                           flex_trit_t *const hash) {
+                                           flex_trit_t *const curl_hash) {
   retcode_t ret = RC_OK;
   bool exists = false;
   struct _iota_transaction transaction = {.metadata.snapshot_index = 0,
@@ -44,7 +45,8 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
                                           .loaded_columns_mask = 0};
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
-  if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
+  if (processor == NULL || neighbor == NULL || packet == NULL ||
+      curl_hash == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -69,6 +71,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
     ret = RC_PROCESSOR_INVALID_TRANSACTION;
     goto failure;
   }
+  memcpy(transaction_hash(&transaction), curl_hash, FLEX_TRIT_SIZE_243);
 
   // Validates the transaction
   if (!iota_consensus_transaction_validate(processor->transaction_validator,
@@ -79,8 +82,6 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
   }
 
   // TODO Add transaction hash to cache
-
-  memcpy(hash, transaction_hash(&transaction), FLEX_TRIT_SIZE_243);
 
   // Checks if the transaction is already persisted
   if ((ret = iota_tangle_transaction_exist(
@@ -192,10 +193,10 @@ static retcode_t process_request_bytes(processor_t const *const processor,
  * @return a status code
  */
 static retcode_t process_packet(processor_t const *const processor,
-                                iota_packet_t const *const packet) {
+                                iota_packet_t const *const packet,
+                                flex_trit_t const *const hash) {
   retcode_t ret = RC_OK;
   neighbor_t *neighbor = NULL;
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
   char *protocol = NULL;
 
   if (processor == NULL || packet == NULL) {
@@ -245,8 +246,21 @@ done:
  * @param processor The processor state
  */
 static void *processor_routine(processor_t *const processor) {
+  size_t j;
+
+  const size_t PACKET_MAX = 64;
+  size_t packet_cnt = 0;
   iota_packet_t *packet_ptr = NULL;
-  iota_packet_t packet;
+  iota_packet_t packets[PACKET_MAX];
+
+  trit_t tx[NUM_TRITS_SERIALIZED_TRANSACTION];
+  trit_t hash[HASH_LENGTH_TRIT];
+
+  PCurl curl;
+  ptrit_t txs_acc[NUM_TRITS_SERIALIZED_TRANSACTION];
+  ptrit_t hashes_acc[HASH_LENGTH_TRIT];
+
+  flex_trit_t flex_hash[FLEX_TRIT_SIZE_243];
 
   if (processor == NULL) {
     return NULL;
@@ -263,17 +277,39 @@ static void *processor_routine(processor_t *const processor) {
     }
 
     rw_lock_handle_wrlock(&processor->lock);
-    packet_ptr = iota_packet_queue_peek(processor->queue);
-    if (packet_ptr == NULL) {
-      rw_lock_handle_unlock(&processor->lock);
-      continue;
+    for (packet_cnt = 0; packet_cnt < PACKET_MAX; packet_cnt++) {
+      packet_ptr = iota_packet_queue_peek(processor->queue);
+      if (packet_ptr == NULL) {
+        goto process_packets;
+      }
+      packets[packet_cnt] = *packet_ptr;
+      iota_packet_queue_pop(&processor->queue);
     }
-    packet = *packet_ptr;
-    iota_packet_queue_pop(&processor->queue);
+
+  process_packets:
     rw_lock_handle_unlock(&processor->lock);
 
-    if (process_packet(processor, &packet) != RC_OK) {
-      log_warning(PROCESSOR_LOGGER_ID, "Processing packet failed\n");
+    ptrit_curl_init(&curl, CURL_P_81);
+    memset(&txs_acc, 0, sizeof(txs_acc));
+    memset(&hashes_acc, 0, sizeof(hashes_acc));
+
+    for (j = 0; j < packet_cnt; j++) {
+      bytes_to_trits(&packets[j].content, PACKET_SIZE, &tx,
+                     NUM_TRITS_SERIALIZED_TRANSACTION);
+      trits_to_ptrits(&tx, &txs_acc, j, NUM_TRITS_SERIALIZED_TRANSACTION);
+    }
+
+    ptrit_curl_absorb(&curl, &txs_acc, NUM_TRITS_SERIALIZED_TRANSACTION);
+    ptrit_curl_squeeze(&curl, &hashes_acc, HASH_LENGTH_TRIT);
+
+    for (j = 0; j < packet_cnt; j++) {
+      ptrits_to_trits(&hashes_acc, &hash, j, HASH_LENGTH_TRIT);
+      flex_trits_from_trits(&flex_hash, HASH_LENGTH_TRIT, &hash,
+                            HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+
+      if (process_packet(processor, &packets[j], &flex_hash) != RC_OK) {
+        log_warning(PROCESSOR_LOGGER_ID, "Processing packet failed\n");
+      }
     }
   }
 
