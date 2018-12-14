@@ -14,7 +14,7 @@ void run_curl_p_test(PCurl *curl, ptrit_t *exp) {
   ptrit_t trits[] = {TRYTES_IN};
   ptrit_t hash[HASH_LENGTH_TRIT];
 
-  ptrit_curl_init(curl);
+  ptrit_curl_init(curl, CURL_P_81);
   ptrit_curl_absorb(curl, trits, 6);
   ptrit_curl_squeeze(curl, hash, HASH_LENGTH_TRIT);
   ptrit_curl_reset(curl);

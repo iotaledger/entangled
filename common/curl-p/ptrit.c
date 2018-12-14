@@ -10,7 +10,8 @@
 
 static const size_t CURL_INDEX[STATE_LENGTH + 1] = {__INDEX_TABLE};
 
-static void ptrit_sbox(ptrit_t *const c, ptrit_t const *const s, size_t const i) {
+static void ptrit_sbox(ptrit_t *const c, ptrit_t const *const s,
+                       size_t const i) {
   if (i == STATE_LENGTH) {
     return;
   }
@@ -26,8 +27,8 @@ static void ptrit_sbox(ptrit_t *const c, ptrit_t const *const s, size_t const i)
   ptrit_sbox(&c[1], s, i + 1);
 }
 
-
-static void ptrit_transform_round(PCurl *const ctx, PCurl *const s, size_t const i) {
+static void ptrit_transform_round(PCurl *const ctx, PCurl *const s,
+                                  size_t const i) {
   if (i == 0) {
     return;
   }
@@ -35,7 +36,10 @@ static void ptrit_transform_round(PCurl *const ctx, PCurl *const s, size_t const
   ptrit_transform_round(s, ctx, i - 1);
 }
 
-void ptrit_curl_init(PCurl *const ctx) { ptrit_curl_reset(ctx); }
+void ptrit_curl_init(PCurl *const ctx, CurlType type) {
+  ptrit_curl_reset(ctx);
+  ctx->type = type;
+}
 
 void ptrit_curl_absorb(PCurl *const ctx, ptrit_t const *const trits,
                        size_t const length) {
@@ -70,7 +74,6 @@ void ptrit_transform(PCurl *const ctx) {
   memcpy(ctx->state, s.state, sizeof(ptrit_t) * STATE_LENGTH);
   ptrit_curl_reset(&s);
 }
-
 
 void ptrit_curl_reset(PCurl *const ctx) {
   memset(ctx->state, 0, sizeof(ptrit_t) * STATE_LENGTH);

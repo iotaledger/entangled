@@ -60,6 +60,7 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short const offset,
 
   {
     PCurl curl;
+    ptrit_curl_init(&curl, CURL_P_81);
     trits_to_ptrits_fill(ctx->state, curl.state, STATE_LENGTH);
     ptrit_offset(&curl.state[offset], 4);
     curl.type = ctx->type;

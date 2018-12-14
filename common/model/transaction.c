@@ -111,18 +111,6 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_NONCE);
   offset += NUM_TRITS_NONCE;
 
-  // Compute the transaction hash
-  // FIXME(thibault) Waiting for cryptographic functions to handle flex_trits
-  Curl curl;
-  init_curl(&curl);
-  curl.type = CURL_P_81;
-  trit_t tx_trits[NUM_TRITS_SERIALIZED_TRANSACTION];
-  trit_t hash[NUM_TRITS_HASH];
-  flex_trits_to_trits(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, trits, offset,
-                      offset);
-  curl_digest(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, hash, &curl);
-  flex_trits_from_trits(transaction->consensus.hash, NUM_TRITS_HASH, hash,
-                        NUM_TRITS_HASH, NUM_TRITS_HASH);
   transaction->loaded_columns_mask |=
       (MASK_ESSENCE | MASK_ATTACHMENT | MASK_CONSENSUS | MASK_DATA);
   return offset;
@@ -141,7 +129,7 @@ size_t _long_to_flex_trit(int64_t value, flex_trit_t *trits) {
 size_t transaction_serialize_to_flex_trits(const iota_transaction_t transaction,
                                            flex_trit_t *trits) {
   flex_trit_t partial[FLEX_TRIT_SIZE_81];
-  size_t offset = 0, long_size;
+  size_t offset = 0, long_size = 0;
   memset(trits, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
 
   flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
