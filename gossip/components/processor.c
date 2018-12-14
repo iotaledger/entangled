@@ -252,14 +252,19 @@ static void *processor_routine(processor_t *const processor) {
   const size_t PACKET_MAX = 64;
   size_t packet_cnt = 0;
   iota_packet_t *packet_ptr = NULL;
-  iota_packet_t *packets = calloc(sizeof(iota_packet_t), PACKET_MAX);
+  iota_packet_t *packets = calloc(PACKET_MAX, sizeof(iota_packet_t));
 
-  trit_t *tx = calloc(sizeof(trit_t), NUM_TRITS_SERIALIZED_TRANSACTION);
-  trit_t *hash = calloc(sizeof(trit_t), HASH_LENGTH_TRIT);
+  trit_t *tx = calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(trit_t));
+  trit_t *hash = calloc(HASH_LENGTH_TRIT, sizeof(trit_t));
 
+<<<<<<< HEAD
   PCurl *curl = calloc(sizeof(PCurl), 1);
   ptrit_t *txs_acc = calloc(sizeof(ptrit_t), NUM_TRITS_SERIALIZED_TRANSACTION);
   ptrit_t *hashes_acc = calloc(sizeof(ptrit_t), HASH_LENGTH_TRIT);
+=======
+  PCurl *curl = calloc(1, sizeof(PCurl));
+  ptrit_t *txs_acc = calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(ptrit_t));
+>>>>>>> common/trinary: improve ptrit test
 
   flex_trit_t flex_hash[FLEX_TRIT_SIZE_243];
 
@@ -296,22 +301,21 @@ static void *processor_routine(processor_t *const processor) {
 
     ptrit_curl_init(curl, CURL_P_81);
     memset(txs_acc, 0, NUM_TRITS_SERIALIZED_TRANSACTION * sizeof(ptrit_t));
-    memset(hashes_acc, 0, HASH_LENGTH_TRIT * sizeof(ptrit_t));
     memset(&flex_hash, FLEX_TRIT_NULL_VALUE, sizeof(flex_hash));
 
     for (j = 0; j < packet_cnt; j++) {
-      bytes_to_trits(&packets[j].content, PACKET_SIZE, tx,
+      bytes_to_trits(&packets[j].content, PACKET_TX_SIZE, tx,
                      NUM_TRITS_SERIALIZED_TRANSACTION);
       trits_to_ptrits(tx, txs_acc, j, NUM_TRITS_SERIALIZED_TRANSACTION);
     }
 
     ptrit_curl_absorb(curl, txs_acc, NUM_TRITS_SERIALIZED_TRANSACTION);
-    ptrit_curl_squeeze(curl, hashes_acc, HASH_LENGTH_TRIT);
+    ptrit_curl_squeeze(curl, txs_acc, HASH_LENGTH_TRIT);
 
     for (j = 0; j < packet_cnt; j++) {
-      ptrits_to_trits(hashes_acc, hash, j, HASH_LENGTH_TRIT);
-      flex_trits_from_trits(&flex_hash, HASH_LENGTH_TRIT, hash,
-                            HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+      ptrits_to_trits(txs_acc, hash, j, HASH_LENGTH_TRIT);
+      flex_trits_from_trits(flex_hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT,
+                            HASH_LENGTH_TRIT);
 
       if (process_packet(processor, &packets[j], &flex_hash) != RC_OK) {
         log_warning(PROCESSOR_LOGGER_ID, "Processing packet failed\n");
@@ -327,7 +331,6 @@ static void *processor_routine(processor_t *const processor) {
   free(tx);
   free(hash);
   free(txs_acc);
-  free(hashes_acc);
 
   return NULL;
 }
