@@ -160,6 +160,56 @@ void test_find_transactions_addresses_only(void) {
   hash243_queue_free(&res_hashes);
 }
 
+/**
+ * In this test, we store 24 txs with 6 txs for 4 different tags.
+ * Each tx is labeled by the 1st char of its hash: from A to X.
+ * Each tag is labeled by the 2nd char of its hash: from A to D.
+ * We then request all txs with tag A or C.
+ * We should end up with 12 txs: A, C, E, G, I, K, M, O, Q, S, U, W.
+ */
+void test_find_transactions_tags_only(void) {
+  find_transactions_req_t *req = find_transactions_req_new();
+  find_transactions_res_t *res = find_transactions_res_new();
+  hash243_queue_t res_hashes = NULL;
+
+  struct _iota_transaction txs[24];
+
+  tryte_t hash_trytes[NUM_TRYTES_HASH];
+  memcpy(hash_trytes, NULL_HASH, NUM_TRYTES_HASH);
+  hash_trytes[0] = 'A';
+
+  tryte_t tags_trytes[NUM_TRYTES_TAG];
+  memcpy(tags_trytes, NULL_HASH, NUM_TRYTES_TAG);
+  tags_trytes[1] = 'A';
+
+  for (size_t i = 0; i < 24; i++) {
+    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes,
+                           NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+    flex_trits_from_trytes(txs[i].attachment.tag, NUM_TRITS_TAG, tags_trytes,
+                           NUM_TRYTES_TAG, NUM_TRYTES_TAG);
+    TEST_ASSERT(iota_tangle_transaction_store(&consensus.tangle, &txs[i]) ==
+                RC_OK);
+    if (tags_trytes[1] == 'A' || tags_trytes[1] == 'C') {
+      hash243_queue_push(&res_hashes, hash_trytes);
+    }
+    hash_trytes[0]++;
+    tags_trytes[1] = 'A' + (i + 1) % 4;
+  }
+
+  tags_trytes[1] = 'A';
+  hash81_queue_push(&req->tags, tags_trytes);
+  tags_trytes[1] = 'C';
+  hash81_queue_push(&req->tags, tags_trytes);
+
+  TEST_ASSERT(iota_api_find_transactions(&api, req, res) == RC_OK);
+
+  TEST_ASSERT(hash243_queue_cmp(res->hashes, res_hashes));
+
+  find_transactions_req_free(&req);
+  find_transactions_res_free(&res);
+  hash243_queue_free(&res_hashes);
+}
+
 void test_find_transactions_no_input(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
@@ -180,6 +230,7 @@ int main(void) {
 
   RUN_TEST(test_find_transactions_bundles_only);
   RUN_TEST(test_find_transactions_addresses_only);
+  RUN_TEST(test_find_transactions_tags_only);
   RUN_TEST(test_find_transactions_no_input);
 
   return UNITY_END();
