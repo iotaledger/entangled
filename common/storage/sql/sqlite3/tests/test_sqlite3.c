@@ -150,10 +150,6 @@ void test_stored_transaction(void) {
                         transaction_last_index(test_tx));
   TEST_ASSERT_EQUAL_MEMORY(transaction_hash(txs[0]), transaction_hash(test_tx),
                            FLEX_TRIT_SIZE_243);
-  TEST_ASSERT_EQUAL_INT(transaction_snapshot_index(txs[0]),
-                        transaction_snapshot_index(test_tx));
-
-  TEST_ASSERT_EQUAL_INT(transaction_solid(txs[0]), transaction_solid(test_tx));
 
   for (int i = 0; i < 5; ++i) {
     transaction_free(pack.models[i]);
@@ -298,13 +294,11 @@ void test_transaction_update_snapshot_index(void) {
   TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
                                          &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-  TEST_ASSERT_EQUAL_INT(tx.metadata.snapshot_index,
-                        transaction_snapshot_index(test_tx));
   TEST_ASSERT(iota_stor_transaction_update_snapshot_index(
                   &conn, transaction_hash(test_tx), 123456) == RC_OK);
   hash_pack_reset(&pack);
-  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
-                                         &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_transaction_load_metadata(
+                  &conn, transaction_hash(test_tx), &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_INT(tx.metadata.snapshot_index, 123456);
   transaction_free(test_tx);
@@ -362,15 +356,13 @@ void test_transaction_update_solid_state(void) {
   TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
                                          &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-  bool old_solid_tate = tx.metadata.solid;
-  bool new_solid_state = !old_solid_tate;
   TEST_ASSERT(iota_stor_transaction_update_solid_state(
-                  &conn, transaction_hash(test_tx), new_solid_state) == RC_OK);
+                  &conn, transaction_hash(test_tx), true) == RC_OK);
   hash_pack_reset(&pack);
-  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
-                                         &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_transaction_load_metadata(
+                  &conn, transaction_hash(test_tx), &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-  TEST_ASSERT(tx.metadata.solid == new_solid_state);
+  TEST_ASSERT(tx.metadata.solid == true);
   transaction_free(test_tx);
 }
 
@@ -419,30 +411,23 @@ void test_transactions_update_solid_states_two_transaction(void) {
                                           &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
-  TEST_ASSERT(iota_stor_transaction_update_solid_state(
-                  &conn, transaction_hash(test_tx), false) == RC_OK);
-
-  TEST_ASSERT(iota_stor_transaction_update_solid_state(
-                  &conn, transaction_hash(&second_test_transaction), false) ==
-              RC_OK);
-
   hash243_set_t hashes = NULL;
   hash243_set_add(&hashes, transaction_hash(test_tx));
   hash243_set_add(&hashes, transaction_hash(&second_test_transaction));
   TEST_ASSERT(iota_stor_transactions_update_solid_state(&conn, hashes, true) ==
               RC_OK);
   hash_pack_reset(&pack);
-  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
-                                         &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_transaction_load_metadata(&conn, hash.trits, &pack) ==
+              RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-  TEST_ASSERT(tx.metadata.solid);
+  TEST_ASSERT(transaction_solid(&tx));
 
   hash_pack_reset(&pack);
   hash.trits = transaction_hash(&second_test_transaction);
-  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
-                                         &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_transaction_load_metadata(&conn, hash.trits, &pack) ==
+              RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-  TEST_ASSERT(tx.metadata.solid);
+  TEST_ASSERT(transaction_solid(&tx));
   hash243_set_free(&hashes);
 }
 

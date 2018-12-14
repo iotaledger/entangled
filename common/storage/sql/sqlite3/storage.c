@@ -390,9 +390,7 @@ static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
   column_decompress_load(statement, 14, tx->attachment.nonce,
                          FLEX_TRIT_SIZE_81);
   column_decompress_load(statement, 15, tx->consensus.hash, FLEX_TRIT_SIZE_243);
-  transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 16));
-  transaction_set_solid(tx, sqlite3_column_int(statement, 17));
-  tx->loaded_columns_mask = MASK_ALL_COLUMNS;
+  tx->loaded_columns_mask = (MASK_ALL_COLUMNS & (~MASK_METADATA));
 }
 
 void select_transactions_populate_from_row_essence_attachment_and_metadata(
@@ -439,7 +437,7 @@ void select_transactions_populate_from_row_essence_and_consensus(
 
 void select_transactions_populate_from_row_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx) {
-  transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 01));
+  transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 0));
   transaction_set_solid(tx, sqlite3_column_int(statement, 1));
   tx->loaded_columns_mask = MASK_METADATA;
 }
@@ -481,44 +479,39 @@ retcode_t iota_stor_transaction_store(connection_t const* const conn,
     goto done;
   }
 
-  if (column_compress_bind(sqlite_statement, 1, transaction_signature(tx),
+  if (column_compress_bind(sqlite_statement, 1, tx->data.signature_or_message,
                            FLEX_TRIT_SIZE_6561) != RC_OK ||
-      column_compress_bind(sqlite_statement, 2, transaction_address(tx),
+      column_compress_bind(sqlite_statement, 2, tx->essence.address,
                            FLEX_TRIT_SIZE_243) != RC_OK ||
-      sqlite3_bind_int64(sqlite_statement, 3, transaction_value(tx)) !=
-          SQLITE_OK ||
-      column_compress_bind(sqlite_statement, 4, transaction_obsolete_tag(tx),
+      sqlite3_bind_int64(sqlite_statement, 3, tx->essence.value) != SQLITE_OK ||
+      column_compress_bind(sqlite_statement, 4, tx->essence.obsolete_tag,
                            FLEX_TRIT_SIZE_81) != RC_OK ||
-      sqlite3_bind_int64(sqlite_statement, 5, transaction_timestamp(tx)) !=
+      sqlite3_bind_int64(sqlite_statement, 5, tx->essence.timestamp) !=
           SQLITE_OK ||
-      sqlite3_bind_int64(sqlite_statement, 6, transaction_current_index(tx)) !=
+      sqlite3_bind_int64(sqlite_statement, 6, tx->essence.current_index) !=
           SQLITE_OK ||
-      sqlite3_bind_int64(sqlite_statement, 7, transaction_last_index(tx)) !=
+      sqlite3_bind_int64(sqlite_statement, 7, tx->essence.last_index) !=
           SQLITE_OK ||
-      column_compress_bind(sqlite_statement, 8, transaction_bundle(tx),
+      column_compress_bind(sqlite_statement, 8, tx->essence.bundle,
                            FLEX_TRIT_SIZE_243) != RC_OK ||
-      column_compress_bind(sqlite_statement, 9, transaction_trunk(tx),
+      column_compress_bind(sqlite_statement, 9, tx->attachment.trunk,
                            FLEX_TRIT_SIZE_243) != RC_OK ||
-      column_compress_bind(sqlite_statement, 10, transaction_branch(tx),
+      column_compress_bind(sqlite_statement, 10, tx->attachment.branch,
                            FLEX_TRIT_SIZE_243) != RC_OK ||
-      column_compress_bind(sqlite_statement, 11, transaction_tag(tx),
+      column_compress_bind(sqlite_statement, 11, tx->attachment.tag,
                            FLEX_TRIT_SIZE_81) != RC_OK ||
       sqlite3_bind_int64(sqlite_statement, 12,
-                         transaction_attachment_timestamp(tx)) != SQLITE_OK ||
+                         tx->attachment.attachment_timestamp) != SQLITE_OK ||
       sqlite3_bind_int64(sqlite_statement, 13,
-                         transaction_attachment_timestamp_lower(tx)) !=
+                         tx->attachment.attachment_timestamp_upper) !=
           SQLITE_OK ||
       sqlite3_bind_int64(sqlite_statement, 14,
-                         transaction_attachment_timestamp_upper(tx)) !=
+                         tx->attachment.attachment_timestamp_lower) !=
           SQLITE_OK ||
-      column_compress_bind(sqlite_statement, 15, transaction_nonce(tx),
+      column_compress_bind(sqlite_statement, 15, tx->attachment.nonce,
                            FLEX_TRIT_SIZE_81) != RC_OK ||
-      column_compress_bind(sqlite_statement, 16, transaction_hash(tx),
-                           FLEX_TRIT_SIZE_243) != RC_OK ||
-      sqlite3_bind_int64(sqlite_statement, 17,
-                         transaction_snapshot_index(tx)) != SQLITE_OK ||
-      sqlite3_bind_int(sqlite_statement, 18, transaction_solid(tx)) !=
-          SQLITE_OK) {
+      column_compress_bind(sqlite_statement, 16, tx->consensus.hash,
+                           FLEX_TRIT_SIZE_243) != RC_OK) {
     ret = binding_error();
     goto done;
   }
