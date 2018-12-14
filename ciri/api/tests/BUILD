@@ -40,7 +40,9 @@ cc_test(
     srcs = ["test_find_transactions.c"],
     data = [":db_file"],
     deps = [
+        ":defs",
         "//ciri/api",
+        "//consensus/test_utils",
         "@unity",
     ],
 )
