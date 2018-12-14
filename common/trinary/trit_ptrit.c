@@ -22,15 +22,15 @@ void trits_to_ptrits(trit_t const *const trits, ptrit_t *const ptrits,
   for (; j < length; j++) {
     switch (trits[j]) {
       case 0:
-        lmask = (1 << index);
-        hmask = (1 << index);
+        lmask = (1uLL << index);
+        hmask = (1uLL << index);
         break;
       case 1:
-        hmask = (1 << index);
+        hmask = (1uLL << index);
         lmask = 0;
         break;
       default:
-        lmask = (1 << index);
+        lmask = (1uLL << index);
         hmask = 0;
     }
 
@@ -63,12 +63,14 @@ void trits_to_ptrits_fill(trit_t const *const trits, ptrit_t *const ptrits,
 
 void ptrits_to_trits(ptrit_t const *const ptrits, trit_t *const trits,
                      size_t const index, size_t length) {
+  size_t j = 0;
   if (length == 0) {
     return;
   }
 
-  trits[0] = (ptrits->low & (1uLL << index))
-                 ? ((ptrits->high & (1uLL << index)) ? 0 : -1)
-                 : 1;
-  ptrits_to_trits(&ptrits[1], &trits[1], index, length - 1);
+  ptrit_s off = (1uLL << index);
+
+  for (; j < length; j++) {
+    trits[j] = (ptrits[j].low & off) ? ((ptrits[j].high & (off)) ? 0 : -1) : 1;
+  }
 }
