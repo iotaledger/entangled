@@ -215,7 +215,7 @@ void test_find_transactions_tags_only(void) {
  * Each tx is labeled by the 1st char of its hash: from A to X.
  * Each approvee is labeled by the 2nd char of its hash: from A to P.
  * We then request all txs with approvees B, H, C or M.
- * We should end up with 12 txs: A, B, D, G, I, J, K, L, O, Q, R, T and W.
+ * We should end up with 12 txs: A, B, D, G, I, J, L, O, Q, R, T and W.
  */
 void test_find_transactions_approvees_only(void) {
   find_transactions_req_t *req = find_transactions_req_new();
@@ -274,6 +274,102 @@ void test_find_transactions_approvees_only(void) {
   hash243_queue_free(&res_hashes);
 }
 
+/*
+ * This test is the intersection of the 4 previous tests.
+ * We should end up with only one tx: G.
+ */
+void test_find_transactions_intersection(void) {
+  find_transactions_req_t *req = find_transactions_req_new();
+  find_transactions_res_t *res = find_transactions_res_new();
+
+  struct _iota_transaction txs[24];
+
+  tryte_t hash_trytes[NUM_TRYTES_HASH];
+  memcpy(hash_trytes, NULL_HASH, NUM_TRYTES_HASH);
+  hash_trytes[0] = 'A';
+
+  tryte_t bundle_trytes[NUM_TRYTES_BUNDLE];
+  memcpy(bundle_trytes, NULL_HASH, NUM_TRYTES_BUNDLE);
+  bundle_trytes[1] = 'A';
+
+  tryte_t address_trytes[NUM_TRYTES_ADDRESS];
+  memcpy(address_trytes, NULL_HASH, NUM_TRYTES_ADDRESS);
+  address_trytes[1] = 'A';
+
+  tryte_t tags_trytes[NUM_TRYTES_TAG];
+  memcpy(tags_trytes, NULL_HASH, NUM_TRYTES_TAG);
+  tags_trytes[1] = 'A';
+
+  tryte_t approvee_trytes[NUM_TRYTES_BRANCH];
+  memcpy(approvee_trytes, NULL_HASH, NUM_TRYTES_BRANCH);
+  approvee_trytes[1] = 'A';
+
+  for (size_t i = 0; i < 24; i++) {
+    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes,
+                           NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+    flex_trits_from_trytes(txs[i].essence.bundle, NUM_TRITS_BUNDLE,
+                           bundle_trytes, NUM_TRYTES_BUNDLE, NUM_TRYTES_BUNDLE);
+    flex_trits_from_trytes(txs[i].essence.address, NUM_TRITS_ADDRESS,
+                           address_trytes, NUM_TRYTES_ADDRESS,
+                           NUM_TRYTES_ADDRESS);
+    flex_trits_from_trytes(txs[i].attachment.tag, NUM_TRITS_TAG, tags_trytes,
+                           NUM_TRYTES_TAG, NUM_TRYTES_TAG);
+    flex_trits_from_trytes(txs[i].attachment.branch, NUM_TRITS_BRANCH,
+                           approvee_trytes, NUM_TRYTES_BRANCH,
+                           NUM_TRYTES_BRANCH);
+
+    TEST_ASSERT(iota_tangle_transaction_store(&consensus.tangle, &txs[i]) ==
+                RC_OK);
+
+    hash_trytes[0]++;
+    bundle_trytes[1] = 'A' + (i + 1) % 8;
+    address_trytes[1] = 'A' + (i + 1) % 6;
+    tags_trytes[1] = 'A' + (i + 1) % 4;
+    approvee_trytes[1] = 'A' + (2 * i + 2) % 16;
+  }
+
+  bundle_trytes[1] = 'B';
+  hash243_queue_push(&req->bundles, bundle_trytes);
+  bundle_trytes[1] = 'E';
+  hash243_queue_push(&req->bundles, bundle_trytes);
+  bundle_trytes[1] = 'G';
+  hash243_queue_push(&req->bundles, bundle_trytes);
+
+  address_trytes[1] = 'A';
+  hash243_queue_push(&req->addresses, address_trytes);
+  address_trytes[1] = 'D';
+  hash243_queue_push(&req->addresses, address_trytes);
+  address_trytes[1] = 'F';
+  hash243_queue_push(&req->addresses, address_trytes);
+
+  tags_trytes[1] = 'A';
+  hash81_queue_push(&req->tags, tags_trytes);
+  tags_trytes[1] = 'C';
+  hash81_queue_push(&req->tags, tags_trytes);
+
+  approvee_trytes[1] = 'B';
+  hash243_queue_push(&req->approvees, approvee_trytes);
+  approvee_trytes[1] = 'C';
+  hash243_queue_push(&req->approvees, approvee_trytes);
+  approvee_trytes[1] = 'H';
+  hash243_queue_push(&req->approvees, approvee_trytes);
+  approvee_trytes[1] = 'M';
+  hash243_queue_push(&req->approvees, approvee_trytes);
+
+  TEST_ASSERT(iota_api_find_transactions(&api, req, res) == RC_OK);
+
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  hash_trytes[0] = 'G';
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, hash_trytes, NUM_TRYTES_HASH,
+                         NUM_TRYTES_HASH);
+  TEST_ASSERT_EQUAL_INT(hash243_queue_count(res->hashes), 1);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_peek(res->hashes),
+                           FLEX_TRIT_SIZE_243);
+
+  find_transactions_req_free(&req);
+  find_transactions_res_free(&res);
+}
+
 void test_find_transactions_no_input(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
@@ -296,6 +392,7 @@ int main(void) {
   RUN_TEST(test_find_transactions_addresses_only);
   RUN_TEST(test_find_transactions_tags_only);
   RUN_TEST(test_find_transactions_approvees_only);
+  RUN_TEST(test_find_transactions_intersection);
   RUN_TEST(test_find_transactions_no_input);
 
   return UNITY_END();
