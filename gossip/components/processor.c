@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "common/curl-p/ptrit.h"
+#include "common/trinary/trit_ptrit.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "gossip/components/processor.h"
@@ -37,7 +38,7 @@
 static retcode_t process_transaction_bytes(processor_t const *const processor,
                                            neighbor_t *const neighbor,
                                            iota_packet_t const *const packet,
-                                           flex_trit_t *const curl_hash) {
+                                           flex_trit_t const *const curl_hash) {
   retcode_t ret = RC_OK;
   bool exists = false;
   struct _iota_transaction transaction = {.metadata.snapshot_index = 0,
@@ -149,7 +150,7 @@ failure:
 static retcode_t process_request_bytes(processor_t const *const processor,
                                        neighbor_t *const neighbor,
                                        iota_packet_t const *const packet,
-                                       flex_trit_t *const hash) {
+                                       flex_trit_t const *const hash) {
   retcode_t ret = RC_OK;
   flex_trit_t request_hash[FLEX_TRIT_SIZE_243];
 
@@ -251,14 +252,14 @@ static void *processor_routine(processor_t *const processor) {
   const size_t PACKET_MAX = 64;
   size_t packet_cnt = 0;
   iota_packet_t *packet_ptr = NULL;
-  iota_packet_t packets[PACKET_MAX];
+  iota_packet_t *packets = calloc(sizeof(iota_packet_t), PACKET_MAX);
 
-  trit_t tx[NUM_TRITS_SERIALIZED_TRANSACTION];
-  trit_t hash[HASH_LENGTH_TRIT];
+  trit_t *tx = calloc(sizeof(trit_t), NUM_TRITS_SERIALIZED_TRANSACTION);
+  trit_t *hash = calloc(sizeof(trit_t), HASH_LENGTH_TRIT);
 
-  PCurl curl;
-  ptrit_t txs_acc[NUM_TRITS_SERIALIZED_TRANSACTION];
-  ptrit_t hashes_acc[HASH_LENGTH_TRIT];
+  PCurl *curl = calloc(sizeof(PCurl), 1);
+  ptrit_t *txs_acc = calloc(sizeof(ptrit_t), NUM_TRITS_SERIALIZED_TRANSACTION);
+  ptrit_t *hashes_acc = calloc(sizeof(ptrit_t), HASH_LENGTH_TRIT);
 
   flex_trit_t flex_hash[FLEX_TRIT_SIZE_243];
 
@@ -289,22 +290,27 @@ static void *processor_routine(processor_t *const processor) {
   process_packets:
     rw_lock_handle_unlock(&processor->lock);
 
-    ptrit_curl_init(&curl, CURL_P_81);
-    memset(&txs_acc, 0, sizeof(txs_acc));
-    memset(&hashes_acc, 0, sizeof(hashes_acc));
-
-    for (j = 0; j < packet_cnt; j++) {
-      bytes_to_trits(&packets[j].content, PACKET_SIZE, &tx,
-                     NUM_TRITS_SERIALIZED_TRANSACTION);
-      trits_to_ptrits(&tx, &txs_acc, j, NUM_TRITS_SERIALIZED_TRANSACTION);
+    if (packet_cnt == 0) {
+      continue;
     }
 
-    ptrit_curl_absorb(&curl, &txs_acc, NUM_TRITS_SERIALIZED_TRANSACTION);
-    ptrit_curl_squeeze(&curl, &hashes_acc, HASH_LENGTH_TRIT);
+    ptrit_curl_init(curl, CURL_P_81);
+    memset(txs_acc, 0, NUM_TRITS_SERIALIZED_TRANSACTION * sizeof(ptrit_t));
+    memset(hashes_acc, 0, HASH_LENGTH_TRIT * sizeof(ptrit_t));
+    memset(&flex_hash, FLEX_TRIT_NULL_VALUE, sizeof(flex_hash));
 
     for (j = 0; j < packet_cnt; j++) {
-      ptrits_to_trits(&hashes_acc, &hash, j, HASH_LENGTH_TRIT);
-      flex_trits_from_trits(&flex_hash, HASH_LENGTH_TRIT, &hash,
+      bytes_to_trits(&packets[j].content, PACKET_SIZE, tx,
+                     NUM_TRITS_SERIALIZED_TRANSACTION);
+      trits_to_ptrits(tx, txs_acc, j, NUM_TRITS_SERIALIZED_TRANSACTION);
+    }
+
+    ptrit_curl_absorb(curl, txs_acc, NUM_TRITS_SERIALIZED_TRANSACTION);
+    ptrit_curl_squeeze(curl, hashes_acc, HASH_LENGTH_TRIT);
+
+    for (j = 0; j < packet_cnt; j++) {
+      ptrits_to_trits(hashes_acc, hash, j, HASH_LENGTH_TRIT);
+      flex_trits_from_trits(&flex_hash, HASH_LENGTH_TRIT, hash,
                             HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
       if (process_packet(processor, &packets[j], &flex_hash) != RC_OK) {
@@ -315,6 +321,13 @@ static void *processor_routine(processor_t *const processor) {
 
   lock_handle_unlock(&lock_cond);
   lock_handle_destroy(&lock_cond);
+
+  free(curl);
+  free(packets);
+  free(tx);
+  free(hash);
+  free(txs_acc);
+  free(hashes_acc);
 
   return NULL;
 }
