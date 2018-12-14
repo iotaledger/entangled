@@ -58,7 +58,7 @@ void tearDown(void) {
  * Each tx is labeled by the 1st char of its hash: from A to X.
  * Each bundle is labeled by the 2nd char of its hash: from A to H.
  * We then request all txs in bundles B, E and G.
- * We should end up with 9 txs: B, E, G, J, M, O, R, U, W.
+ * We should end up with 9 txs: B, E, G, J, M, O, R, U and W.
  */
 void test_find_transactions_bundles_only(void) {
   find_transactions_req_t *req = find_transactions_req_new();
@@ -111,7 +111,7 @@ void test_find_transactions_bundles_only(void) {
  * Each tx is labeled by the 1st char of its hash: from A to X.
  * Each address is labeled by the 2nd char of its hash: from A to F.
  * We then request all txs received/sent by/to addresses A, D and F.
- * We should end up with 12 txs: A, D, F, G, J, L, M, P, R, S, T, X.
+ * We should end up with 12 txs: A, D, F, G, J, L, M, P, R, S, T and X.
  */
 void test_find_transactions_addresses_only(void) {
   find_transactions_req_t *req = find_transactions_req_new();
@@ -164,8 +164,8 @@ void test_find_transactions_addresses_only(void) {
  * In this test, we store 24 txs with 6 txs for 4 different tags.
  * Each tx is labeled by the 1st char of its hash: from A to X.
  * Each tag is labeled by the 2nd char of its hash: from A to D.
- * We then request all txs with tag A or C.
- * We should end up with 12 txs: A, C, E, G, I, K, M, O, Q, S, U, W.
+ * We then request all txs with tags A or C.
+ * We should end up with 12 txs: A, C, E, G, I, K, M, O, Q, S, U and W.
  */
 void test_find_transactions_tags_only(void) {
   find_transactions_req_t *req = find_transactions_req_new();
@@ -210,6 +210,70 @@ void test_find_transactions_tags_only(void) {
   hash243_queue_free(&res_hashes);
 }
 
+/**
+ * In this test, we store 24 txs that approve a set of 16 different txs.
+ * Each tx is labeled by the 1st char of its hash: from A to X.
+ * Each approvee is labeled by the 2nd char of its hash: from A to P.
+ * We then request all txs with approvees B, H, C or M.
+ * We should end up with 12 txs: A, B, D, G, I, J, K, L, O, Q, R, T and W.
+ */
+void test_find_transactions_approvees_only(void) {
+  find_transactions_req_t *req = find_transactions_req_new();
+  find_transactions_res_t *res = find_transactions_res_new();
+  hash243_queue_t res_hashes = NULL;
+
+  struct _iota_transaction txs[24];
+
+  tryte_t hash_trytes[NUM_TRYTES_HASH];
+  memcpy(hash_trytes, NULL_HASH, NUM_TRYTES_HASH);
+  hash_trytes[0] = 'A';
+
+  tryte_t approvee_trytes[NUM_TRYTES_BRANCH];
+  memcpy(approvee_trytes, NULL_HASH, NUM_TRYTES_BRANCH);
+  approvee_trytes[1] = 'A';
+
+  for (size_t i = 0; i < 24; i++) {
+    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes,
+                           NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+    flex_trits_from_trytes(txs[i].attachment.branch, NUM_TRITS_BRANCH,
+                           approvee_trytes, NUM_TRYTES_BRANCH,
+                           NUM_TRYTES_BRANCH);
+    if (approvee_trytes[1] == 'B' || approvee_trytes[1] == 'C' ||
+        approvee_trytes[1] == 'H' || approvee_trytes[1] == 'M') {
+      hash243_queue_push(&res_hashes, hash_trytes);
+    }
+    approvee_trytes[1] = 'A' + (2 * i + 1) % 16;
+    flex_trits_from_trytes(txs[i].attachment.trunk, NUM_TRITS_BRANCH,
+                           approvee_trytes, NUM_TRYTES_BRANCH,
+                           NUM_TRYTES_BRANCH);
+    TEST_ASSERT(iota_tangle_transaction_store(&consensus.tangle, &txs[i]) ==
+                RC_OK);
+    if (approvee_trytes[1] == 'B' || approvee_trytes[1] == 'C' ||
+        approvee_trytes[1] == 'H' || approvee_trytes[1] == 'M') {
+      hash243_queue_push(&res_hashes, hash_trytes);
+    }
+    hash_trytes[0]++;
+    approvee_trytes[1] = 'A' + (2 * i + 2) % 16;
+  }
+
+  approvee_trytes[1] = 'B';
+  hash243_queue_push(&req->approvees, approvee_trytes);
+  approvee_trytes[1] = 'C';
+  hash243_queue_push(&req->approvees, approvee_trytes);
+  approvee_trytes[1] = 'H';
+  hash243_queue_push(&req->approvees, approvee_trytes);
+  approvee_trytes[1] = 'M';
+  hash243_queue_push(&req->approvees, approvee_trytes);
+
+  TEST_ASSERT(iota_api_find_transactions(&api, req, res) == RC_OK);
+
+  TEST_ASSERT(hash243_queue_cmp(res->hashes, res_hashes));
+
+  find_transactions_req_free(&req);
+  find_transactions_res_free(&res);
+  hash243_queue_free(&res_hashes);
+}
+
 void test_find_transactions_no_input(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
@@ -231,6 +295,7 @@ int main(void) {
   RUN_TEST(test_find_transactions_bundles_only);
   RUN_TEST(test_find_transactions_addresses_only);
   RUN_TEST(test_find_transactions_tags_only);
+  RUN_TEST(test_find_transactions_approvees_only);
   RUN_TEST(test_find_transactions_no_input);
 
   return UNITY_END();
