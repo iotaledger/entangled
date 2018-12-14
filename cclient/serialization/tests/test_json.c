@@ -580,13 +580,13 @@ void test_serialize_attach_to_tangle(void) {
       trits_8019, NUM_TRITS_SERIALIZED_TRANSACTION,
       (const tryte_t*)TEST_2673_TRYTES_1, NUM_TRYTES_SERIALIZED_TRANSACTION,
       NUM_TRYTES_SERIALIZED_TRANSACTION));
-  TEST_ASSERT(hash8019_queue_push(&attach_req->trytes, trits_8019) == RC_OK);
+  hash_array_push(attach_req->trytes, trits_8019);
 
   TEST_ASSERT(flex_trits_from_trytes(
       trits_8019, NUM_TRITS_SERIALIZED_TRANSACTION,
       (const tryte_t*)TEST_2673_TRYTES_2, NUM_TRYTES_SERIALIZED_TRANSACTION,
       NUM_TRYTES_SERIALIZED_TRANSACTION));
-  TEST_ASSERT(hash8019_queue_push(&attach_req->trytes, trits_8019) == RC_OK);
+  hash_array_push(attach_req->trytes, trits_8019);
 
   attach_req->mwm = TEST_MWM;
 
@@ -648,7 +648,7 @@ void test_serialize_broadcast_transactions(void) {
       NUM_TRYTES_SERIALIZED_TRANSACTION);
   TEST_ASSERT(len);
 
-  TEST_ASSERT(hash8019_stack_push(&req->trytes, tx_trits) == RC_OK);
+  hash_array_push(req->trytes, tx_trits);
 
   serializer.vtable.broadcast_transactions_serialize_request(&serializer, req,
                                                              serializer_out);
@@ -674,7 +674,7 @@ void test_serialize_store_transactions(void) {
       NUM_TRYTES_SERIALIZED_TRANSACTION);
   TEST_ASSERT(len);
 
-  TEST_ASSERT(hash8019_stack_push(&req->trytes, tx_trits) == RC_OK);
+  hash_array_push(req->trytes, tx_trits);
 
   serializer.vtable.store_transactions_serialize_request(&serializer, req,
                                                          serializer_out);

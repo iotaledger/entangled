@@ -26,6 +26,8 @@ extern "C" {
 #define STR_CCLIENT_NULL_PTR "NULL pointer"
 #define STR_CCLIENT_UNIMPLEMENTED "Function unimplemented"
 #define STR_CCLIENT_INVALID_SECURITY "Invalid security level"
+#define STR_CCLIENT_TX_DESERIALIZE_FAILED \
+  "deserializing transaction object failed"
 
 #ifdef __cplusplus
 }

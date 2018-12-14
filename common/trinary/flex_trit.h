@@ -158,6 +158,7 @@ static inline uint8_t flex_trits_set_at(flex_trit_t *const flex_trits,
   return 1;
 }
 
+// return true if all flex_trit are NULL, else false.
 static inline bool flex_trits_are_null(flex_trit_t const *const flex_trits,
                                        size_t const len) {
   for (size_t i = 0; i < len; i++) {

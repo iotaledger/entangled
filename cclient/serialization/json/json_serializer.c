@@ -318,7 +318,7 @@ static retcode_t hash243_queue_to_json_array(hash243_queue_t queue,
     cJSON_AddItemToObject(json_root, obj_name, array_obj);
 
     CDL_FOREACH(queue, q_iter) {
-      trit_t trytes_out[NUM_TRYTES_HASH + 1];
+      tryte_t trytes_out[NUM_TRYTES_HASH + 1];
       size_t trits_count =
           flex_trits_to_trytes(trytes_out, NUM_TRYTES_HASH, q_iter->hash,
                                NUM_TRITS_HASH, NUM_TRITS_HASH);
@@ -404,7 +404,7 @@ static retcode_t hash81_queue_to_json_array(hash81_queue_t queue,
     cJSON_AddItemToObject(json_root, obj_name, array_obj);
 
     CDL_FOREACH(queue, q_iter) {
-      trit_t trytes_out[NUM_TRYTES_TAG + 1];
+      tryte_t trytes_out[NUM_TRYTES_TAG + 1];
       size_t trits_count =
           flex_trits_to_trytes(trytes_out, NUM_TRYTES_TAG, q_iter->hash,
                                NUM_TRITS_TAG, NUM_TRITS_TAG);
@@ -454,7 +454,7 @@ static retcode_t flex_trits_to_json_string(cJSON* const json_obj,
                                            size_t num_trits) {
   // flex to trytes;
   size_t len_trytes = num_trits / 3;
-  trit_t trytes_out[len_trytes + 1];
+  tryte_t trytes_out[len_trytes + 1];
   size_t trits_count =
       flex_trits_to_trytes(trytes_out, len_trytes, hash, num_trits, num_trits);
   trytes_out[len_trytes] = '\0';
@@ -500,7 +500,7 @@ static retcode_t hash8019_queue_to_json_array(hash8019_queue_t queue,
   size_t array_count = 0;
   cJSON* array_obj = NULL;
   hash8019_queue_entry_t* q_iter = NULL;
-  trit_t trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
+  tryte_t trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
   size_t trits_count = 0;
 
   array_count = hash8019_queue_count(&queue);
@@ -533,7 +533,7 @@ static retcode_t hash8019_stack_to_json_array(hash8019_stack_t stack,
   size_t array_count = 0;
   cJSON* array_obj = NULL;
   hash8019_stack_entry_t* s_iter = NULL;
-  trit_t trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
+  tryte_t trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
   size_t trits_count = 0;
 
   array_count = hash8019_stack_count(stack);
@@ -558,6 +558,64 @@ static retcode_t hash8019_stack_to_json_array(hash8019_stack_t stack,
     }
   }
   return RC_OK;
+}
+
+static retcode_t hash8019_array_to_json_array(hash8019_array_p array,
+                                              cJSON* const json_root,
+                                              char const* const obj_name) {
+  size_t array_count = 0;
+  cJSON* array_obj = NULL;
+  tryte_t trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION + 1] = {};
+  size_t trits_count = 0;
+  flex_trit_t* elt = NULL;
+
+  array_count = hash_array_len(array);
+  if (array_count > 0) {
+    array_obj = cJSON_CreateArray();
+    if (array_obj == NULL) {
+      return RC_CCLIENT_JSON_CREATE;
+    }
+    cJSON_AddItemToObject(json_root, obj_name, array_obj);
+
+    HASH_ARRAY_FOREACH(array, elt) {
+      trits_count = flex_trits_to_trytes(
+          trytes_out, NUM_TRYTES_SERIALIZED_TRANSACTION, elt,
+          NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
+      trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION] = '\0';
+      if (trits_count != 0) {
+        cJSON_AddItemToArray(array_obj,
+                             cJSON_CreateString((const char*)trytes_out));
+      } else {
+        return RC_CCLIENT_FLEX_TRITS;
+      }
+    }
+  }
+  return RC_OK;
+}
+
+static retcode_t json_array_to_hash8019_array(cJSON const* const obj,
+                                              char const* const obj_name,
+                                              hash8019_array_p array) {
+  retcode_t ret_code = RC_OK;
+  flex_trit_t hash[FLEX_TRIT_SIZE_8019] = {};
+  cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
+  if (cJSON_IsArray(json_item)) {
+    cJSON* current_obj = NULL;
+    cJSON_ArrayForEach(current_obj, json_item) {
+      if (current_obj->valuestring != NULL) {
+        flex_trits_from_trytes(hash, NUM_TRITS_SERIALIZED_TRANSACTION,
+                               (const tryte_t*)current_obj->valuestring,
+                               NUM_TRYTES_SERIALIZED_TRANSACTION,
+                               NUM_TRYTES_SERIALIZED_TRANSACTION);
+        hash_array_push(array, hash);
+      }
+    }
+  } else {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_PARSE);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+  return ret_code;
 }
 
 retcode_t json_find_transactions_serialize_request(
@@ -1055,10 +1113,12 @@ retcode_t json_get_transactions_to_approve_serialize_request(
 
   cJSON_AddItemToObject(json_root, "depth", cJSON_CreateNumber(obj->depth));
 
-  ret = flex_trits_to_json_string(json_root, "reference", obj->reference,
-                                  NUM_TRITS_HASH);
-  if (ret != RC_OK) {
-    goto done;
+  if (!flex_trits_are_null(obj->reference, FLEX_TRIT_SIZE_243)) {
+    ret = flex_trits_to_json_string(json_root, "reference", obj->reference,
+                                    NUM_TRITS_HASH);
+    if (ret != RC_OK) {
+      goto done;
+    }
   }
 
   json_text = cJSON_PrintUnformatted(json_root);
@@ -1343,7 +1403,7 @@ retcode_t json_attach_to_tangle_serialize_request(
   cJSON_AddItemToObject(json_root, "minWeightMagnitude",
                         cJSON_CreateNumber(obj->mwm));
 
-  ret = hash8019_queue_to_json_array(obj->trytes, json_root, "trytes");
+  ret = hash8019_array_to_json_array(obj->trytes, json_root, "trytes");
   if (ret != RC_OK) {
     goto done;
   }
@@ -1385,7 +1445,7 @@ retcode_t json_attach_to_tangle_deserialize_response(
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_array_to_hash8019_queue(json_obj, "trytes", &out->trytes);
+  ret = json_array_to_hash8019_array(json_obj, "trytes", out->trytes);
 
   cJSON_Delete(json_obj);
   return ret;
@@ -1409,7 +1469,7 @@ retcode_t json_broadcast_transactions_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("broadcastTransactions"));
 
-  ret = hash8019_stack_to_json_array(req->trytes, json_root, "trytes");
+  ret = hash8019_array_to_json_array(req->trytes, json_root, "trytes");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;
@@ -1446,7 +1506,7 @@ retcode_t json_store_transactions_serialize_request(
   cJSON_AddItemToObject(json_root, "command",
                         cJSON_CreateString("storeTransactions"));
 
-  ret = hash8019_stack_to_json_array(req->trytes, json_root, "trytes");
+  ret = hash8019_array_to_json_array(req->trytes, json_root, "trytes");
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;

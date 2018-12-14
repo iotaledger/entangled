@@ -80,3 +80,14 @@ hash_container_generate(
     size = 8019,
     type = "queue",
 )
+
+cc_library(
+    name = "hash_array",
+    srcs = ["hash_array.c"],
+    hdrs = ["hash_array.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//common/trinary:flex_trit",
+        "@com_github_uthash//:uthash",
+    ],
+)

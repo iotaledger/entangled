@@ -104,6 +104,8 @@ const char* error_2_string(retcode_t err) {
       return STR_CCLIENT_UNIMPLEMENTED;
     case RC_CCLIENT_INVALID_SECURITY:
       return STR_CCLIENT_INVALID_SECURITY;
+    case RC_CCLIENT_TX_DESERIALIZE_FAILED:
+      return STR_CCLIENT_TX_DESERIALIZE_FAILED;
 
     // Consensus module
     case RC_CONSENSUS_NOT_IMPLEMENTED:
