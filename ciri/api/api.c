@@ -190,14 +190,40 @@ done:
 retcode_t iota_api_find_transactions(iota_api_t const *const api,
                                      find_transactions_req_t const *const req,
                                      find_transactions_res_t *const res) {
-  if (hash243_queue_count(&req->bundles) == 0 &&
-      hash243_queue_count(&req->addresses) == 0 &&
-      hash243_queue_count(&req->tags) == 0 &&
-      hash243_queue_count(&req->approvees) == 0) {
+  retcode_t ret = RC_OK;
+  iota_stor_pack_t pack;
+
+  if (hash243_queue_count(req->bundles) == 0 &&
+      hash243_queue_count(req->addresses) == 0 &&
+      hash81_queue_count(req->tags) == 0 &&
+      hash243_queue_count(req->approvees) == 0) {
     return RC_API_FIND_TRANSACTIONS_NO_INPUT;
   }
 
-  return RC_OK;
+  // TODO Refactor stor_pack #618
+  hash_pack_init(&pack, 1024);
+
+  if ((ret = iota_tangle_transaction_find(&api->consensus->tangle, req->bundles,
+                                          req->addresses, req->tags,
+                                          req->approvees, &pack)) != RC_OK) {
+    goto done;
+  }
+
+  if (pack.num_loaded > api->conf.max_find_transactions) {
+    ret = RC_API_MAX_FIND_TRANSACTIONS;
+    goto done;
+  }
+
+  for (size_t i = 0; i < pack.num_loaded; i++) {
+    if ((ret = hash243_queue_push(
+             &res->hashes, ((trit_array_p *)pack.models)[i]->trits)) != RC_OK) {
+      goto done;
+    }
+  }
+
+done:
+  hash_pack_free(&pack);
+  return ret;
 }
 
 retcode_t iota_api_get_trytes(iota_api_t const *const api,
@@ -213,7 +239,7 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
 
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
 
-  if (hash243_queue_count(&req->hashes) > api->conf.max_get_trytes) {
+  if (hash243_queue_count(req->hashes) > api->conf.max_get_trytes) {
     return RC_API_MAX_GET_TRYTES;
   }
 
