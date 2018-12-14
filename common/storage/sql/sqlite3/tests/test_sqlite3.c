@@ -380,10 +380,10 @@ void test_transactions_update_solid_states_one_transaction(void) {
   TEST_ASSERT(iota_stor_transactions_update_solid_state(&conn, hashes, true) ==
               RC_OK);
   hash_pack_reset(&pack);
-  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
-                                         &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_transaction_load_metadata(
+                  &conn, transaction_hash(test_tx), &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
-  TEST_ASSERT(tx.metadata.solid);
+  TEST_ASSERT(transaction_solid(&tx));
   hash243_set_free(&hashes);
   transaction_free(test_tx);
 }
@@ -400,7 +400,7 @@ void test_transactions_update_solid_states_two_transaction(void) {
 
   struct _iota_transaction second_test_transaction = *test_tx;
   // Make them distinguishable
-  second_test_transaction.consensus.hash[FLEX_TRIT_SIZE_243] =
+  second_test_transaction.consensus.hash[FLEX_TRIT_SIZE_243 - 1] =
       second_test_transaction.consensus.hash[0];
 
   TEST_ASSERT(iota_stor_transaction_store(&conn, test_tx) ==
