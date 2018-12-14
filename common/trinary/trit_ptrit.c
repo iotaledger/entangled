@@ -22,15 +22,15 @@ void trits_to_ptrits(trit_t const *const trits, ptrit_t *const ptrits,
   for (; j < length; j++) {
     switch (trits[j]) {
       case 0:
-        lmask = (1 << j);
-        hmask = (1 << j);
+        lmask = (1 << index);
+        hmask = (1 << index);
         break;
       case 1:
-        hmask = (1 << j);
+        hmask = (1 << index);
         lmask = 0;
         break;
       default:
-        lmask = (1 << j);
+        lmask = (1 << index);
         hmask = 0;
     }
 

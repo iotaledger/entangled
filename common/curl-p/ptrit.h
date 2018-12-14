@@ -23,9 +23,9 @@ extern "C" {
 void ptrit_curl_init(PCurl* const ctx, CurlType type);
 void ptrit_transform(PCurl* const ctx);
 void ptrit_curl_absorb(PCurl* const ctx, ptrit_t const* const trits,
-                       size_t const length);
+                       size_t length);
 void ptrit_curl_squeeze(PCurl* const ctx, ptrit_t* const trits,
-                        size_t const length);
+                        size_t length);
 void ptrit_curl_reset(PCurl* const ctx);
 
 #ifdef __cplusplus
