@@ -748,7 +748,7 @@ retcode_t iota_stor_transaction_approvers_count(connection_t const* const conn,
 
   if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) !=
           RC_OK ||
-      column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) !=
+      column_compress_bind(sqlite_statement, 2, hash, FLEX_TRIT_SIZE_243) !=
           RC_OK) {
     ret = binding_error();
     goto done;
