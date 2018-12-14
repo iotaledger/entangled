@@ -36,7 +36,7 @@ void ptrit_curl_absorb(PCurl *const ctx, ptrit_t const *const trits,
       length / HASH_LENGTH_TRIT + ((length % HASH_LENGTH_TRIT) ? 1 : 0);
   size_t i = 0;
   for (; i < numChunks; ++i) {
-    memcpy(ctx->state, trits + i * HASH_LENGTH_TRIT * sizeof(ptrit_t),
+    memcpy(ctx->state, trits + i * HASH_LENGTH_TRIT,
            (length < HASH_LENGTH_TRIT ? length : HASH_LENGTH_TRIT) *
                sizeof(ptrit_t));
     ptrit_transform(ctx);
@@ -49,7 +49,7 @@ void ptrit_curl_squeeze(PCurl *const ctx, ptrit_t *const trits, size_t length) {
       length / HASH_LENGTH_TRIT + ((length % HASH_LENGTH_TRIT) ? 1 : 0);
   size_t i = 0;
   for (; i < numChunks; ++i) {
-    memcpy(trits + i * HASH_LENGTH_TRIT * sizeof(ptrit_t), ctx->state,
+    memcpy(trits + i * HASH_LENGTH_TRIT, ctx->state,
            (length < HASH_LENGTH_TRIT ? length : HASH_LENGTH_TRIT) *
                sizeof(ptrit_t));
     ptrit_transform(ctx);
