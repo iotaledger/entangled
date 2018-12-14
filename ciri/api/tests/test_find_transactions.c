@@ -54,32 +54,32 @@ void tearDown(void) {
 }
 
 /**
- * In this test, we store 24 transactions distributed in 8 bundles.
- * Each transaction is labeled by the 1st char of its hash: from A to X.
+ * In this test, we store 24 txs distributed in 8 bundles of 3 txs.
+ * Each tx is labeled by the 1st char of its hash: from A to X.
  * Each bundle is labeled by the 2nd char of its hash: from A to H.
- * We then request all transactions in bundles B, E and G.
- * We should end up with 9 transactions: B, E, G, J, M, O, R, U, W.
+ * We then request all txs in bundles B, E and G.
+ * We should end up with 9 txs: B, E, G, J, M, O, R, U, W.
  */
-void test_find_transactions_only_bundles(void) {
+void test_find_transactions_bundles_only(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
   hash243_queue_t res_hashes = NULL;
 
   struct _iota_transaction txs[24];
 
-  tryte_t hash_trytes[HASH_LENGTH_TRYTE];
-  memcpy(hash_trytes, NULL_HASH, HASH_LENGTH_TRYTE);
+  tryte_t hash_trytes[NUM_TRYTES_HASH];
+  memcpy(hash_trytes, NULL_HASH, NUM_TRYTES_HASH);
   hash_trytes[0] = 'A';
 
-  tryte_t bundle_trytes[HASH_LENGTH_TRYTE];
-  memcpy(bundle_trytes, NULL_HASH, HASH_LENGTH_TRYTE);
+  tryte_t bundle_trytes[NUM_TRYTES_BUNDLE];
+  memcpy(bundle_trytes, NULL_HASH, NUM_TRYTES_BUNDLE);
   bundle_trytes[1] = 'A';
 
   for (size_t i = 0; i < 24; i++) {
-    flex_trits_from_trytes(txs[i].consensus.hash, HASH_LENGTH_TRIT, hash_trytes,
-                           HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
-    flex_trits_from_trytes(txs[i].essence.bundle, HASH_LENGTH_TRIT,
-                           bundle_trytes, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes,
+                           NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+    flex_trits_from_trytes(txs[i].essence.bundle, NUM_TRITS_BUNDLE,
+                           bundle_trytes, NUM_TRYTES_BUNDLE, NUM_TRYTES_BUNDLE);
     TEST_ASSERT(iota_tangle_transaction_store(&consensus.tangle, &txs[i]) ==
                 RC_OK);
     if (bundle_trytes[1] == 'B' || bundle_trytes[1] == 'E' ||
@@ -96,6 +96,60 @@ void test_find_transactions_only_bundles(void) {
   hash243_queue_push(&req->bundles, bundle_trytes);
   bundle_trytes[1] = 'G';
   hash243_queue_push(&req->bundles, bundle_trytes);
+
+  TEST_ASSERT(iota_api_find_transactions(&api, req, res) == RC_OK);
+
+  TEST_ASSERT(hash243_queue_cmp(res->hashes, res_hashes));
+
+  find_transactions_req_free(&req);
+  find_transactions_res_free(&res);
+  hash243_queue_free(&res_hashes);
+}
+
+/**
+ * In this test, we store 24 txs where 6 addresses receive/send 4 txs each.
+ * Each tx is labeled by the 1st char of its hash: from A to X.
+ * Each address is labeled by the 2nd char of its hash: from A to F.
+ * We then request all txs received/sent by/to addresses A, D and F.
+ * We should end up with 12 txs: A, D, F, G, J, L, M, P, R, S, T, X.
+ */
+void test_find_transactions_addresses_only(void) {
+  find_transactions_req_t *req = find_transactions_req_new();
+  find_transactions_res_t *res = find_transactions_res_new();
+  hash243_queue_t res_hashes = NULL;
+
+  struct _iota_transaction txs[24];
+
+  tryte_t hash_trytes[NUM_TRYTES_HASH];
+  memcpy(hash_trytes, NULL_HASH, NUM_TRYTES_HASH);
+  hash_trytes[0] = 'A';
+
+  tryte_t address_trytes[NUM_TRYTES_ADDRESS];
+  memcpy(address_trytes, NULL_HASH, NUM_TRYTES_ADDRESS);
+  address_trytes[1] = 'A';
+
+  for (size_t i = 0; i < 24; i++) {
+    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes,
+                           NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+    flex_trits_from_trytes(txs[i].essence.address, NUM_TRITS_ADDRESS,
+                           address_trytes, NUM_TRYTES_ADDRESS,
+                           NUM_TRYTES_ADDRESS);
+    TEST_ASSERT(iota_tangle_transaction_store(&consensus.tangle, &txs[i]) ==
+                RC_OK);
+    if (address_trytes[1] == 'A' || address_trytes[1] == 'D' ||
+        address_trytes[1] == 'F') {
+      hash243_queue_push(&res_hashes, hash_trytes);
+    }
+    hash_trytes[0]++;
+    address_trytes[1] = 'A' + (i + 1) % 6;
+  }
+
+  address_trytes[1] = 'A';
+  hash243_queue_push(&req->addresses, address_trytes);
+  address_trytes[1] = 'D';
+  hash243_queue_push(&req->addresses, address_trytes);
+  address_trytes[1] = 'F';
+  hash243_queue_push(&req->addresses, address_trytes);
 
   TEST_ASSERT(iota_api_find_transactions(&api, req, res) == RC_OK);
 
@@ -124,7 +178,8 @@ int main(void) {
   api.consensus = &consensus;
   api.conf.max_find_transactions = 1024;
 
-  RUN_TEST(test_find_transactions_only_bundles);
+  RUN_TEST(test_find_transactions_bundles_only);
+  RUN_TEST(test_find_transactions_addresses_only);
   RUN_TEST(test_find_transactions_no_input);
 
   return UNITY_END();
