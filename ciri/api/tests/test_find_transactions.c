@@ -381,6 +381,39 @@ void test_find_transactions_no_input(void) {
   find_transactions_res_free(&res);
 }
 
+void test_find_transactions_max(void) {
+  find_transactions_req_t *req = find_transactions_req_new();
+  find_transactions_res_t *res = find_transactions_res_new();
+
+  struct _iota_transaction txs[24];
+
+  tryte_t hash_trytes[NUM_TRYTES_HASH];
+  memcpy(hash_trytes, NULL_HASH, NUM_TRYTES_HASH);
+  hash_trytes[0] = 'A';
+
+  tryte_t bundle_trytes[NUM_TRYTES_BUNDLE];
+  memcpy(bundle_trytes, NULL_HASH, NUM_TRYTES_BUNDLE);
+  bundle_trytes[1] = 'A';
+
+  for (size_t i = 0; i < 24; i++) {
+    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes,
+                           NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+    flex_trits_from_trytes(txs[i].essence.bundle, NUM_TRITS_BUNDLE,
+                           bundle_trytes, NUM_TRYTES_BUNDLE, NUM_TRYTES_BUNDLE);
+    TEST_ASSERT(iota_tangle_transaction_store(&consensus.tangle, &txs[i]) ==
+                RC_OK);
+    hash243_queue_push(&req->bundles, bundle_trytes);
+    hash_trytes[0]++;
+    bundle_trytes[1] = 'A' + (i + 1) % 8;
+  }
+
+  TEST_ASSERT(iota_api_find_transactions(&api, req, res) ==
+              RC_API_MAX_FIND_TRANSACTIONS);
+
+  find_transactions_req_free(&req);
+  find_transactions_res_free(&res);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -394,6 +427,10 @@ int main(void) {
   RUN_TEST(test_find_transactions_approvees_only);
   RUN_TEST(test_find_transactions_intersection);
   RUN_TEST(test_find_transactions_no_input);
+
+  api.conf.max_find_transactions = 10;
+
+  RUN_TEST(test_find_transactions_max);
 
   return UNITY_END();
 }
