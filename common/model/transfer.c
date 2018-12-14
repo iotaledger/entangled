@@ -29,9 +29,9 @@ static void transfer_iterator_next_data_transaction(
     // Length of the message data for the current transaction
     len = data_len - offset;
     len = len > NUM_TRITS_SIGNATURE ? NUM_TRITS_SIGNATURE : len;
-    flex_ret =
-        flex_trits_slice(transaction_signature(transfer_iterator->transaction),
-                         len, trans_data->data, data_len, offset, len);
+    flex_ret = flex_trits_slice(
+        transfer_iterator->transaction->data.signature_or_message, len,
+        trans_data->data, data_len, offset, len);
     if (flex_ret == 0) {
       log_warning(TRANSFER_LOGGER_ID, "[%s:%d] flex_trits slicing failed.\n",
                   __func__, __LINE__);
@@ -64,7 +64,7 @@ static void transfer_iterator_next_output_transaction(
       transaction_set_value(tx, transfer->value);
     }
     flex_ret = flex_trits_slice(
-        transaction_signature(tx), NUM_TRITS_SIGNATURE,
+        tx->data.signature_or_message, NUM_TRITS_SIGNATURE,
         transfer_iterator->transaction_signature,
         NUM_TRITS_SIGNATURE * output_info->security,
         NUM_TRITS_SIGNATURE *
@@ -424,14 +424,10 @@ iota_transaction_t transfer_iterator_next(
     // Reset all transaction fields
     transaction_reset(transaction);
     // Set common transaction fields
-    memcpy(transaction_bundle(transaction), transfer_iterator->bundle_hash,
-           sizeof(transaction_bundle(transaction)));
-    memcpy(transaction_address(transaction), transfer->address,
-           sizeof(transaction_address(transaction)));
-    memcpy(transaction_obsolete_tag(transaction), transfer->tag,
-           sizeof(transaction_obsolete_tag(transaction)));
-    memcpy(transaction_tag(transaction), transfer->tag,
-           sizeof(transaction_tag(transaction)));
+    transaction_set_bundle(transaction, transfer_iterator->bundle_hash);
+    transaction_set_address(transaction, transfer->address);
+    transaction_set_tag(transaction, transfer->tag);
+    transaction_set_obsolete_tag(transaction, transfer->tag);
     transaction_set_timestamp(transaction, transfer->timestamp);
     transaction_set_current_index(transaction,
                                   transfer_iterator->current_transaction_index);

@@ -158,10 +158,6 @@ static void* milestone_validator(void* arg) {
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   flex_trit_t* peek = NULL;
   milestone_status_t milestone_status;
-  trit_array_t hash = {.trits = candidate.hash,
-                       .num_trits = HASH_LENGTH_TRIT,
-                       .num_bytes = FLEX_TRIT_SIZE_243,
-                       .dynamic = 0};
 
   if (mt == NULL) {
     return NULL;
@@ -176,8 +172,9 @@ static void* milestone_validator(void* arg) {
       hash243_queue_pop(&mt->candidates);
       rw_lock_handle_unlock(&mt->candidates_lock);
       hash_pack_reset(&pack);
-      if (iota_tangle_transaction_load(mt->tangle, TRANSACTION_FIELD_HASH,
-                                       &hash, &pack) == RC_OK &&
+      if (iota_tangle_transaction_load_partial(
+              mt->tangle, candidate.hash, &pack,
+              PARTIAL_TX_MODEL_ESSENCE_CONSENSUS) == RC_OK &&
           pack.num_loaded != 0) {
         candidate.index = get_milestone_index(&tx);
         if (validate_milestone(mt, &candidate, &milestone_status) != RC_OK) {

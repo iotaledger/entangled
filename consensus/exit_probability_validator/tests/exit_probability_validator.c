@@ -118,6 +118,8 @@ void test_transaction_not_a_tail() {
   iota_transaction_t tx3 = transaction_deserialize(transaction_3_trits);
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx3) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, tx3->consensus.hash, true) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
@@ -149,11 +151,10 @@ void test_transaction_invalid_delta() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
-  transaction_set_snapshot_index(tx1, max_depth + 1);
-  transaction_set_solid(tx1, true);
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
-
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, tx1->consensus.hash, true) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
 
@@ -185,6 +186,11 @@ void test_transaction_below_max_depth() {
   transaction_set_solid(txs[1], true);
   build_tangle(&tangle, txs, 2);
 
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[0]->consensus.hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[1]->consensus.hash, true) == RC_OK);
+
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
 
@@ -212,14 +218,15 @@ void test_transaction_exceed_max_transactions() {
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
-  transaction_set_snapshot_index(txs[0], max_depth + 1);
-  transaction_set_solid(txs[0], true);
-  transaction_set_snapshot_index(txs[1], max_depth + 1);
-  transaction_set_solid(txs[1], true);
   transaction_set_trunk(txs[1], consensus_conf.genesis_hash);
   transaction_set_branch(txs[1], consensus_conf.genesis_hash);
   transaction_set_branch(txs[0], consensus_conf.genesis_hash);
   build_tangle(&tangle, txs, 2);
+
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[0]->consensus.hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[1]->consensus.hash, true) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
@@ -248,10 +255,12 @@ void test_transaction_is_genesis() {
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
-  transaction_set_snapshot_index(txs[0], 0);
-  transaction_set_solid(txs[0], true);
-  transaction_set_solid(txs[1], true);
   build_tangle(&tangle, txs, 2);
+
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[0]->consensus.hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[1]->consensus.hash, true) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
@@ -279,9 +288,12 @@ void test_transaction_valid() {
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2);
-  transaction_set_solid(txs[0], true);
-  transaction_set_solid(txs[1], true);
   build_tangle(&tangle, txs, 2);
+
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[0]->consensus.hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[1]->consensus.hash, true) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
@@ -324,6 +336,5 @@ int main(int argc, char *argv[]) {
   RUN_TEST(test_transaction_exceed_max_transactions);
   RUN_TEST(test_transaction_is_genesis);
   RUN_TEST(test_transaction_valid);
-
   return UNITY_END();
 }

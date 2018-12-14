@@ -255,14 +255,11 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   state_delta_t delta = NULL;
   state_delta_t patch = NULL;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  trit_array_t milestone_hash = {.trits = milestone->hash,
-                                 .num_trits = HASH_LENGTH_TRIT,
-                                 .num_bytes = FLEX_TRIT_SIZE_243,
-                                 .dynamic = 0};
   *has_snapshot = false;
 
-  if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_FIELD_HASH,
-                                          &milestone_hash, &pack)) != RC_OK) {
+  if ((ret = iota_tangle_transaction_load_partial(
+           lv->tangle, milestone->hash, &pack, PARTIAL_TX_MODEL_METADATA)) !=
+      RC_OK) {
     goto done;
   } else if (pack.num_loaded == 0) {
     ret = RC_LEDGER_VALIDATOR_INVALID_TRANSACTION;
@@ -275,7 +272,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
   *has_snapshot = transaction_snapshot_index(&tx) != 0;
   if (!(*has_snapshot)) {
     if ((ret = get_latest_delta(
-             lv, NULL, &delta, transaction_hash(&tx),
+             lv, NULL, &delta, milestone->hash,
              iota_snapshot_get_index(lv->milestone_tracker->latest_snapshot),
              true, &valid_delta)) != RC_OK) {
       log_error(LEDGER_VALIDATOR_LOGGER_ID, "Getting latest delta failed\n");
@@ -353,20 +350,15 @@ retcode_t iota_consensus_ledger_validator_update_delta(
   state_delta_t patch = NULL;
   hash243_set_t visited_hashes = NULL;
   bool valid_delta = true;
-  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  trit_array_t hash = {.trits = tip,
-                       .num_trits = HASH_LENGTH_TRIT,
-                       .num_bytes = FLEX_TRIT_SIZE_243,
-                       .dynamic = 0};
-  *is_consistent = false;
 
-  if ((ret = iota_tangle_transaction_load(lv->tangle, TRANSACTION_FIELD_HASH,
-                                          &hash, &pack)) != RC_OK) {
+  *is_consistent = false;
+  // Load the transaction
+  DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
+
+  if ((ret = iota_tangle_transaction_load_partial(
+           lv->tangle, tip, &pack, PARTIAL_TX_MODEL_METADATA)) != RC_OK) {
     goto done;
-  } else if (pack.num_loaded == 0) {
-    ret = RC_LEDGER_VALIDATOR_INVALID_TRANSACTION;
-    goto done;
-  } else if (!transaction_solid(&tx)) {
+  } else if (!transaction_solid(curr_tx)) {
     ret = RC_LEDGER_VALIDATOR_TRANSACTION_NOT_SOLID;
     goto done;
   }

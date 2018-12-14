@@ -40,7 +40,8 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
   retcode_t ret = RC_OK;
   bool exists = false;
   struct _iota_transaction transaction = {.metadata.snapshot_index = 0,
-                                          .metadata.solid = 0};
+                                          .metadata.solid = 0,
+                                          .loaded_columns_mask = 0};
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
   trit_array_t key = {.trits = hash,
                       .num_trits = HASH_LENGTH_TRIT,

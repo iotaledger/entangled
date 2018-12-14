@@ -271,8 +271,6 @@ retcode_t iota_api_store_transactions(
                              .num_trits = HASH_LENGTH_TRIT,
                              .num_bytes = FLEX_TRIT_SIZE_243,
                              .dynamic = 0};
-  transaction_set_solid(&tx, false);
-  transaction_set_snapshot_index(&tx, 0);
 
   bool exists;
   HASH_ARRAY_FOREACH(req->trytes, elt) {
