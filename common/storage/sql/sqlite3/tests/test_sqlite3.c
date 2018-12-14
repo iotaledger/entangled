@@ -400,16 +400,18 @@ void test_transactions_update_solid_states_two_transaction(void) {
 
   struct _iota_transaction second_test_transaction = *test_tx;
   // Make them distinguishable
-  second_test_transaction.consensus.hash[FLEX_TRIT_SIZE_243 - 1] =
-      second_test_transaction.consensus.hash[0];
+  trit_t modified_trit =
+      flex_trits_at(transaction_hash(test_tx), FLEX_TRIT_SIZE_243, 0);
+  if (abs(modified_trit) > 0) {
+    modified_trit = 0;
+  } else {
+    modified_trit = 1;
+  }
+  flex_trits_set_at(second_test_transaction.consensus.hash, FLEX_TRIT_SIZE_243,
+                    0, modified_trit);
 
-  TEST_ASSERT(iota_stor_transaction_store(&conn, test_tx) ==
-              RC_SQLITE3_FAILED_STEP);
-  bool exist = false;
-
-  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_FIELD_NONE, NULL,
-                                          &exist) == RC_OK);
-  TEST_ASSERT(exist == true);
+  TEST_ASSERT(iota_stor_transaction_store(&conn, &second_test_transaction) ==
+              RC_OK);
 
   hash243_set_t hashes = NULL;
   hash243_set_add(&hashes, transaction_hash(test_tx));
