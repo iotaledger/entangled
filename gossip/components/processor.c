@@ -257,14 +257,10 @@ static void *processor_routine(processor_t *const processor) {
   trit_t *tx = calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(trit_t));
   trit_t *hash = calloc(HASH_LENGTH_TRIT, sizeof(trit_t));
 
-<<<<<<< HEAD
-  PCurl *curl = calloc(sizeof(PCurl), 1);
-  ptrit_t *txs_acc = calloc(sizeof(ptrit_t), NUM_TRITS_SERIALIZED_TRANSACTION);
-  ptrit_t *hashes_acc = calloc(sizeof(ptrit_t), HASH_LENGTH_TRIT);
-=======
   PCurl *curl = calloc(1, sizeof(PCurl));
+  curl->type = 81;
+
   ptrit_t *txs_acc = calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(ptrit_t));
->>>>>>> common/trinary: improve ptrit test
 
   flex_trit_t flex_hash[FLEX_TRIT_SIZE_243];
 
@@ -301,10 +297,10 @@ static void *processor_routine(processor_t *const processor) {
 
     ptrit_curl_init(curl, CURL_P_81);
     memset(txs_acc, 0, NUM_TRITS_SERIALIZED_TRANSACTION * sizeof(ptrit_t));
-    memset(&flex_hash, FLEX_TRIT_NULL_VALUE, sizeof(flex_hash));
+    memset(flex_hash, FLEX_TRIT_NULL_VALUE, sizeof(flex_hash));
 
     for (j = 0; j < packet_cnt; j++) {
-      bytes_to_trits(&packets[j].content, PACKET_TX_SIZE, tx,
+      bytes_to_trits(packets[j].content, PACKET_TX_SIZE, tx,
                      NUM_TRITS_SERIALIZED_TRANSACTION);
       trits_to_ptrits(tx, txs_acc, j, NUM_TRITS_SERIALIZED_TRANSACTION);
     }
@@ -317,7 +313,7 @@ static void *processor_routine(processor_t *const processor) {
       flex_trits_from_trits(flex_hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT,
                             HASH_LENGTH_TRIT);
 
-      if (process_packet(processor, &packets[j], &flex_hash) != RC_OK) {
+      if (process_packet(processor, &packets[j], flex_hash) != RC_OK) {
         log_warning(PROCESSOR_LOGGER_ID, "Processing packet failed\n");
       }
     }

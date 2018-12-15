@@ -71,5 +71,5 @@ void ptrit_transform(PCurl *const ctx) {
 }
 
 void ptrit_curl_reset(PCurl *const ctx) {
-  memset(ctx->state, 0, sizeof(ptrit_t) * STATE_LENGTH);
+  memset(ctx->state, HIGH_BITS, sizeof(ptrit_t) * STATE_LENGTH);
 }
