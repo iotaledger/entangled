@@ -58,7 +58,7 @@ void ptrit_curl_squeeze(PCurl *const ctx, ptrit_t *const trits, size_t length) {
 }
 
 void ptrit_transform(PCurl *const ctx) {
-  PCurl s;
+  PCurl s = {0};
   size_t round = 0;
   for (; round < ctx->type; ++round) {
     if (round & 1)
