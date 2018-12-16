@@ -129,7 +129,7 @@ int main(void) {
   api.node = &node;
   api.consensus = &consensus;
   TEST_ASSERT(iota_gossip_conf_init(&api.node->conf) == RC_OK);
-  TEST_ASSERT(requester_init(&api.node->transaction_requester, &api.node->conf,
+  TEST_ASSERT(requester_init(&api.node->transaction_requester, api.node,
                              &api.consensus->tangle) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.consensus->conf) == RC_OK);
   api.consensus->conf.snapshot_timestamp_sec = 1536845195;
