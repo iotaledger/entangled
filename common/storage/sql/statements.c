@@ -89,6 +89,18 @@ char *iota_statement_transaction_approvers_count =
 char *iota_statement_transaction_count =
     "SELECT COUNT(*) FROM " TRANSACTION_TABLE_NAME;
 
+char *iota_statement_transaction_find =
+    "SELECT a." TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME
+    " a JOIN " TRANSACTION_TABLE_NAME " b ON a." TRANSACTION_COL_HASH
+    "=b." TRANSACTION_COL_HASH " AND (? OR b." TRANSACTION_COL_BUNDLE
+    " IN(%s)) JOIN " TRANSACTION_TABLE_NAME " c ON b." TRANSACTION_COL_HASH
+    "=c." TRANSACTION_COL_HASH " AND (? OR c." TRANSACTION_COL_ADDRESS
+    " IN(%s)) JOIN " TRANSACTION_TABLE_NAME " d ON c." TRANSACTION_COL_HASH
+    "=d." TRANSACTION_COL_HASH " AND (? OR d." TRANSACTION_COL_TAG
+    " IN(%s)) JOIN " TRANSACTION_TABLE_NAME " e ON d." TRANSACTION_COL_HASH
+    "=e." TRANSACTION_COL_HASH " AND (? OR (e." TRANSACTION_COL_BRANCH
+    " IN(%s) OR e." TRANSACTION_COL_TRUNK " IN (%s)))";
+
 /*
  * Partial Transaction statements
  */

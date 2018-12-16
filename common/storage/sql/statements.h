@@ -32,6 +32,7 @@ extern char* iota_statement_transaction_exist;
 extern char* iota_statement_transaction_exist_by_hash;
 extern char* iota_statement_transaction_approvers_count;
 extern char* iota_statement_transaction_count;
+extern char* iota_statement_transaction_find;
 
 /*
  * Partial Transaction statements

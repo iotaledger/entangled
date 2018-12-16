@@ -956,14 +956,44 @@ done:
   return ret;
 }
 
-static void iota_stor_transaction_find_in_clause(char* const statement,
-                                                 size_t* const offset,
-                                                 size_t count) {
-  *offset += sprintf(statement + *offset, "IN(");
-  for (size_t i = 0; i < count; i++) {
-    *offset += sprintf(statement + *offset, "?,");
+static char* iota_stor_transaction_find_in_clause(size_t const count) {
+  char* in_clause = calloc(2 * count, 1);
+  size_t offset = 0;
+
+  if (count != 0) {
+    for (size_t i = 0; i < count; i++) {
+      offset += sprintf(in_clause + offset, "?,");
+    }
+    in_clause[offset - 1] = '\0';
   }
-  statement[*offset - 1] = ')';
+  return in_clause;
+}
+
+static char* iota_stor_transaction_find_build_query(
+    size_t const bundles_count, size_t const addresses_count,
+    size_t const tags_count, size_t const approvees_count) {
+  // Base size of the query + enough space for '?' (bindings)
+  size_t statement_size = 328 + 2 * bundles_count + 2 * addresses_count +
+                          2 * tags_count + 4 * approvees_count;
+  char* statement = malloc(statement_size);
+
+  char* bundles_in_clause = iota_stor_transaction_find_in_clause(bundles_count);
+  char* addresses_in_clause =
+      iota_stor_transaction_find_in_clause(addresses_count);
+  char* tags_in_clause = iota_stor_transaction_find_in_clause(tags_count);
+  char* approvees_in_clause =
+      iota_stor_transaction_find_in_clause(approvees_count);
+
+  snprintf(statement, statement_size, iota_statement_transaction_find,
+           bundles_in_clause, addresses_in_clause, tags_in_clause,
+           approvees_in_clause, approvees_in_clause);
+
+  free(bundles_in_clause);
+  free(addresses_in_clause);
+  free(tags_in_clause);
+  free(approvees_in_clause);
+
+  return statement;
 }
 
 retcode_t iota_stor_transaction_find(connection_t const* const conn,
@@ -980,89 +1010,61 @@ retcode_t iota_stor_transaction_find(connection_t const* const conn,
   size_t approvees_count = hash243_queue_count(approvees);
   hash243_queue_entry_t* iter243 = NULL;
   hash81_queue_entry_t* iter81 = NULL;
-  size_t offset = 0;
   size_t column = 1;
-  bool and = false;
 
-  // Base size of the query is 109 chars
-  // We then add space for the "?,"
-  char* statement = calloc(1, 109 + 2 * bundles_count + 2 * addresses_count +
-                                  2 * tags_count + 4 * approvees_count);
-
-  if (statement == NULL) {
-    return RC_OOM;
-  }
-
-  offset += sprintf(statement, "SELECT " TRANSACTION_COL_HASH
-                               " FROM " TRANSACTION_TABLE_NAME " WHERE ");
-
-  if (bundles_count != 0) {
-    offset += sprintf(statement + offset, TRANSACTION_COL_BUNDLE " ");
-    iota_stor_transaction_find_in_clause(statement, &offset, bundles_count);
-    and = true;
-  }
-
-  if (addresses_count != 0) {
-    if (and) {
-      offset += sprintf(statement + offset, "AND ");
-    }
-    offset += sprintf(statement + offset, TRANSACTION_COL_ADDRESS " ");
-    iota_stor_transaction_find_in_clause(statement, &offset, addresses_count);
-    and = true;
-  }
-
-  if (tags_count != 0) {
-    if (and) {
-      offset += sprintf(statement + offset, "AND ");
-    }
-    offset += sprintf(statement + offset, TRANSACTION_COL_TAG " ");
-    iota_stor_transaction_find_in_clause(statement, &offset, tags_count);
-    and = true;
-  }
-
-  if (approvees_count != 0) {
-    if (and) {
-      offset += sprintf(statement + offset, "AND (");
-    }
-    offset += sprintf(statement + offset, TRANSACTION_COL_BRANCH " ");
-    iota_stor_transaction_find_in_clause(statement, &offset, approvees_count);
-    offset += sprintf(statement + offset, "OR " TRANSACTION_COL_TRUNK " ");
-    iota_stor_transaction_find_in_clause(statement, &offset, approvees_count);
-    if (and) {
-      offset += sprintf(statement + offset, ")");
-    }
-  }
+  char* statement = iota_stor_transaction_find_build_query(
+      bundles_count, addresses_count, tags_count, approvees_count);
 
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
                                statement)) != RC_OK) {
     goto done;
   }
 
+  if (sqlite3_bind_int(sqlite_statement, column++, !bundles_count) !=
+      SQLITE_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
   CDL_FOREACH(bundles, iter243) {
-    if (column_compress_bind(sqlite_statement, column, iter243->hash,
+    if (column_compress_bind(sqlite_statement, column++, iter243->hash,
                              FLEX_TRIT_SIZE_243) != RC_OK) {
       ret = binding_error();
       goto done;
     }
-    column++;
+  }
+
+  if (sqlite3_bind_int(sqlite_statement, column++, !addresses_count) !=
+      SQLITE_OK) {
+    ret = binding_error();
+    goto done;
   }
 
   CDL_FOREACH(addresses, iter243) {
-    if (column_compress_bind(sqlite_statement, column, iter243->hash,
+    if (column_compress_bind(sqlite_statement, column++, iter243->hash,
                              FLEX_TRIT_SIZE_243) != RC_OK) {
       ret = binding_error();
       goto done;
     }
-    column++;
+  }
+
+  if (sqlite3_bind_int(sqlite_statement, column++, !tags_count) != SQLITE_OK) {
+    ret = binding_error();
+    goto done;
   }
 
   CDL_FOREACH(tags, iter81) {
-    if (column_compress_bind(sqlite_statement, column, iter81->hash,
+    if (column_compress_bind(sqlite_statement, column++, iter81->hash,
                              FLEX_TRIT_SIZE_81) != RC_OK) {
       ret = binding_error();
       goto done;
     }
-    column++;
+  }
+
+  if (sqlite3_bind_int(sqlite_statement, column++, !approvees_count) !=
+      SQLITE_OK) {
+    ret = binding_error();
+    goto done;
   }
 
   CDL_FOREACH(approvees, iter243) {
