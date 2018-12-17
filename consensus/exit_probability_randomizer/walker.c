@@ -26,7 +26,7 @@ static retcode_t select_approver(
   hash243_set_entry_t *curr_approver = NULL;
   hash243_set_entry_t *tmp_approver = NULL;
   hash_to_int_map_entry_t *curr_rating = NULL;
-  size_t num_approvers = HASH_COUNT(*approvers);
+  size_t num_approvers = hash243_set_size(approvers);
   int64_t weights[num_approvers];
   double sum_weights = 0;
   double target = 0;
@@ -34,9 +34,7 @@ static retcode_t select_approver(
   size_t idx = 0;
 
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
-    HASH_FIND(hh, cw_ratings, curr_approver->hash, FLEX_TRIT_SIZE_243,
-              curr_rating);
-    if (curr_rating == NULL) {
+    if (!hash_int_map_find(&cw_ratings, curr_approver->hash, &curr_rating)) {
       log_error(RANDOM_WALKER_LOGGER_ID, "No rating found for approver\n");
       return RC_CONSENSUS_EXIT_PROBABILITIES_MISSING_RATING;
     }
@@ -98,10 +96,8 @@ static retcode_t random_walker_select_approver_tail(
   hash243_set_entry_t *approver_entry = NULL;
 
   *has_approver_tail = false;
-
-  HASH_FIND(hh, cw_result->tx_to_approvers, curr_tail_hash, FLEX_TRIT_SIZE_243,
-            approvers_entry);
-  if (!approvers_entry) {
+  if (!hash_to_indexed_hash_set_map_find(&cw_result->tx_to_approvers,
+                                         curr_tail_hash, &approvers_entry)) {
     return RC_OK;
   }
 
