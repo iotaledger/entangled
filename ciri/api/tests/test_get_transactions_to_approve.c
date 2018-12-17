@@ -12,6 +12,7 @@
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
 #include "gossip/node.h"
+#include "utils/files.h"
 
 static char *test_db_path = "ciri/api/tests/test.db";
 static char *ciri_db_path = "ciri/api/tests/ciri.db";
@@ -21,12 +22,12 @@ static node_t node;
 static iota_consensus_t consensus;
 
 void setUp(void) {
-  TEST_ASSERT(tangle_setup(&consensus.tangle, &config, test_db_path,
+  TEST_ASSERT(tangle_setup(&api.consensus->tangle, &config, test_db_path,
                            ciri_db_path) == RC_OK);
 }
 
 void tearDown(void) {
-  TEST_ASSERT(tangle_cleanup(&consensus.tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&api.consensus->tangle, test_db_path) == RC_OK);
 }
 
 void test_get_transactions_to_approve_invalid_depth(void) {
@@ -78,8 +79,8 @@ int main(void) {
   UNITY_BEGIN();
 
   config.db_path = test_db_path;
-  api.consensus = &consensus;
   api.node = &node;
+  api.consensus = &consensus;
 
   TEST_ASSERT(iota_gossip_conf_init(&api.node->conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.consensus->conf) == RC_OK);
@@ -88,10 +89,17 @@ int main(void) {
   TEST_ASSERT(tips_cache_init(&api.node->tips,
                               api.node->conf.tips_cache_size) == RC_OK);
 
-  setUp();
+  // Since iota_consensus_init already initialize tangle, no need to call setUp
+  copy_file(test_db_path, ciri_db_path);
+
+  // Avoid verifying snapshot signature
+  api.consensus->conf.snapshot_signature_file[0] = '\0';
+
   TEST_ASSERT(iota_consensus_init(api.consensus, &config,
                                   &api.node->transaction_requester,
                                   &api.node->tips) == RC_OK);
+
+  // Need to call it since RUN_TEST will call setUp/tearDown automatically
   tearDown();
 
   RUN_TEST(test_get_transactions_to_approve_invalid_depth);

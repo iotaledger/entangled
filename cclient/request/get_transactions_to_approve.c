@@ -12,7 +12,7 @@ get_transactions_to_approve_req_t* get_transactions_to_approve_req_new() {
       (get_transactions_to_approve_req_t*)malloc(
           sizeof(get_transactions_to_approve_req_t));
   if (req) {
-    memset(req->reference, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+    req->reference = NULL;
   }
 
   return req;
@@ -24,7 +24,12 @@ void get_transactions_to_approve_req_free(
     return;
   }
 
-  free(*req);
+  get_transactions_to_approve_req_t* tmp = *req;
+
+  if (tmp->reference) {
+    free(tmp->reference);
+  }
+  free(tmp);
   *req = NULL;
 }
 
@@ -35,6 +40,9 @@ void get_transactions_to_approve_req_set_depth(
 
 void get_transactions_to_approve_req_set_reference(
     get_transactions_to_approve_req_t* const req,
-    tryte_t const* const reference) {
+    flex_trit_t const* const reference) {
+  if (req->reference == NULL) {
+    req->reference = malloc(FLEX_TRIT_SIZE_243);
+  }
   memcpy(req->reference, reference, FLEX_TRIT_SIZE_243);
 }

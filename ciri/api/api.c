@@ -324,8 +324,6 @@ retcode_t iota_api_get_transactions_to_approve(
     get_transactions_to_approve_res_t *const res) {
   retcode_t ret = RC_OK;
   tips_pair_t tips;
-  flex_trit_t reference_trits[FLEX_TRIT_SIZE_243];
-  flex_trit_t *reference = NULL;
 
   if (api == NULL || req == NULL || res == NULL) {
     return RC_NULL_PARAM;
@@ -339,15 +337,8 @@ retcode_t iota_api_get_transactions_to_approve(
     return RC_API_INVALID_SUBTANGLE_STATUS;
   }
 
-  // if (req->reference != NULL && req->reference->data != NULL) {
-  //   flex_trits_from_trytes(reference_trits, HASH_LENGTH_TRIT,
-  //                          (tryte_t *)req->reference->data,
-  //                          HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
-  //   reference = reference_trits;
-  // }
-
   if ((ret = iota_consensus_tip_selector_get_transactions_to_approve(
-           &api->consensus->tip_selector, req->depth, reference, &tips)) !=
+           &api->consensus->tip_selector, req->depth, req->reference, &tips)) !=
       RC_OK) {
     return ret;
   }
