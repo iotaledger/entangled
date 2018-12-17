@@ -303,13 +303,8 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
          memcmp(transaction_bundle(curr_tx), bundle_hash, FLEX_TRIT_SIZE_243) ==
              0) {
     hash_pack_reset(&hash_pack);
-    res = iota_tangle_transaction_load_hashes_of_approvers(
-        tangle, transaction_hash(curr_tx), &hash_pack);
-
-    if (res != RC_OK) {
-      log_error(TANGLE_LOGGER_ID,
-                "Failed in loading approvers, error code is: %" PRIu64 "\n",
-                res);
+    if ((res = iota_tangle_transaction_load_hashes_of_approvers(
+             tangle, transaction_hash(curr_tx), &hash_pack)) != RC_OK) {
       break;
     }
 
