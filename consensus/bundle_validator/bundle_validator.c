@@ -192,8 +192,7 @@ retcode_t iota_consensus_bundle_validator_validate(
 
     if (transaction_current_index(curr_tx) == last_index) {
       flex_trit_t bundle_hash_calculated[FLEX_TRIT_SIZE_243];
-      trit_t normalized_bundle_trits[NUM_TRITS_HASH];
-      byte_t normalized_bundle_bytes[NUM_TRYTES_HASH];
+      trit_t normalized_bundle[HASH_LENGTH_TRIT];
 
       if (bundle_value != 0) {
         log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Bundle value is not zero\n");
@@ -210,13 +209,9 @@ retcode_t iota_consensus_bundle_validator_validate(
         break;
       }
 
-      normalize_hash(bundle_hash_calculated, normalized_bundle_bytes);
-      for (int c = 0; c < NUM_TRYTES_HASH; ++c) {
-        long_to_trits(normalized_bundle_bytes[c],
-                      &normalized_bundle_trits[c * RADIX]);
-      }
+      normalize_hash_trits(bundle_hash_calculated, normalized_bundle);
 
-      res = validate_signature(bundle, normalized_bundle_trits, &valid_sig);
+      res = validate_signature(bundle, normalized_bundle, &valid_sig);
       if (res != RC_OK || !valid_sig) {
         log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Invalid signature\n");
         *status = BUNDLE_INVALID_SIGNATURE;
