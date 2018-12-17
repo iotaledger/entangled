@@ -44,6 +44,22 @@ done:
   return cmp;
 }
 
+static void hash243_queue_push_trytes(hash243_queue_t *const queue,
+                                      tryte_t const *const trytes) {
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, trytes, NUM_TRYTES_HASH,
+                         NUM_TRYTES_HASH);
+  hash243_queue_push(queue, hash);
+}
+
+static void hash81_queue_push_trytes(hash81_queue_t *const queue,
+                                     tryte_t const *const trytes) {
+  flex_trit_t hash[FLEX_TRIT_SIZE_81];
+  flex_trits_from_trytes(hash, NUM_TRITS_TAG, trytes, NUM_TRYTES_TAG,
+                         NUM_TRYTES_TAG);
+  hash81_queue_push(queue, hash);
+}
+
 void setUp(void) {
   TEST_ASSERT(tangle_setup(&consensus.tangle, &config, test_db_path,
                            ciri_db_path) == RC_OK);
@@ -84,18 +100,18 @@ void test_find_transactions_bundles_only(void) {
                 RC_OK);
     if (bundle_trytes[1] == 'B' || bundle_trytes[1] == 'E' ||
         bundle_trytes[1] == 'G') {
-      hash243_queue_push(&res_hashes, hash_trytes);
+      hash243_queue_push(&res_hashes, txs[i].consensus.hash);
     }
     hash_trytes[0]++;
     bundle_trytes[1] = 'A' + (i + 1) % 8;
   }
 
   bundle_trytes[1] = 'B';
-  hash243_queue_push(&req->bundles, bundle_trytes);
+  hash243_queue_push_trytes(&req->bundles, bundle_trytes);
   bundle_trytes[1] = 'E';
-  hash243_queue_push(&req->bundles, bundle_trytes);
+  hash243_queue_push_trytes(&req->bundles, bundle_trytes);
   bundle_trytes[1] = 'G';
-  hash243_queue_push(&req->bundles, bundle_trytes);
+  hash243_queue_push_trytes(&req->bundles, bundle_trytes);
 
   TEST_ASSERT(iota_api_find_transactions(&api, req, res) == RC_OK);
 
@@ -138,18 +154,18 @@ void test_find_transactions_addresses_only(void) {
                 RC_OK);
     if (address_trytes[1] == 'A' || address_trytes[1] == 'D' ||
         address_trytes[1] == 'F') {
-      hash243_queue_push(&res_hashes, hash_trytes);
+      hash243_queue_push(&res_hashes, txs[i].consensus.hash);
     }
     hash_trytes[0]++;
     address_trytes[1] = 'A' + (i + 1) % 6;
   }
 
   address_trytes[1] = 'A';
-  hash243_queue_push(&req->addresses, address_trytes);
+  hash243_queue_push_trytes(&req->addresses, address_trytes);
   address_trytes[1] = 'D';
-  hash243_queue_push(&req->addresses, address_trytes);
+  hash243_queue_push_trytes(&req->addresses, address_trytes);
   address_trytes[1] = 'F';
-  hash243_queue_push(&req->addresses, address_trytes);
+  hash243_queue_push_trytes(&req->addresses, address_trytes);
 
   TEST_ASSERT(iota_api_find_transactions(&api, req, res) == RC_OK);
 
@@ -190,16 +206,16 @@ void test_find_transactions_tags_only(void) {
     TEST_ASSERT(iota_tangle_transaction_store(&consensus.tangle, &txs[i]) ==
                 RC_OK);
     if (tags_trytes[1] == 'A' || tags_trytes[1] == 'C') {
-      hash243_queue_push(&res_hashes, hash_trytes);
+      hash243_queue_push(&res_hashes, txs[i].consensus.hash);
     }
     hash_trytes[0]++;
     tags_trytes[1] = 'A' + (i + 1) % 4;
   }
 
   tags_trytes[1] = 'A';
-  hash81_queue_push(&req->tags, tags_trytes);
+  hash81_queue_push_trytes(&req->tags, tags_trytes);
   tags_trytes[1] = 'C';
-  hash81_queue_push(&req->tags, tags_trytes);
+  hash81_queue_push_trytes(&req->tags, tags_trytes);
 
   TEST_ASSERT(iota_api_find_transactions(&api, req, res) == RC_OK);
 
@@ -240,7 +256,7 @@ void test_find_transactions_approvees_only(void) {
                            NUM_TRYTES_BRANCH);
     if (approvee_trytes[1] == 'B' || approvee_trytes[1] == 'C' ||
         approvee_trytes[1] == 'H' || approvee_trytes[1] == 'M') {
-      hash243_queue_push(&res_hashes, hash_trytes);
+      hash243_queue_push(&res_hashes, txs[i].consensus.hash);
     }
     approvee_trytes[1] = 'A' + (2 * i + 1) % 16;
     flex_trits_from_trytes(txs[i].attachment.trunk, NUM_TRITS_BRANCH,
@@ -250,20 +266,20 @@ void test_find_transactions_approvees_only(void) {
                 RC_OK);
     if (approvee_trytes[1] == 'B' || approvee_trytes[1] == 'C' ||
         approvee_trytes[1] == 'H' || approvee_trytes[1] == 'M') {
-      hash243_queue_push(&res_hashes, hash_trytes);
+      hash243_queue_push(&res_hashes, txs[i].consensus.hash);
     }
     hash_trytes[0]++;
     approvee_trytes[1] = 'A' + (2 * i + 2) % 16;
   }
 
   approvee_trytes[1] = 'B';
-  hash243_queue_push(&req->approvees, approvee_trytes);
+  hash243_queue_push_trytes(&req->approvees, approvee_trytes);
   approvee_trytes[1] = 'C';
-  hash243_queue_push(&req->approvees, approvee_trytes);
+  hash243_queue_push_trytes(&req->approvees, approvee_trytes);
   approvee_trytes[1] = 'H';
-  hash243_queue_push(&req->approvees, approvee_trytes);
+  hash243_queue_push_trytes(&req->approvees, approvee_trytes);
   approvee_trytes[1] = 'M';
-  hash243_queue_push(&req->approvees, approvee_trytes);
+  hash243_queue_push_trytes(&req->approvees, approvee_trytes);
 
   TEST_ASSERT(iota_api_find_transactions(&api, req, res) == RC_OK);
 
@@ -329,32 +345,32 @@ void test_find_transactions_intersection(void) {
   }
 
   bundle_trytes[1] = 'B';
-  hash243_queue_push(&req->bundles, bundle_trytes);
+  hash243_queue_push_trytes(&req->bundles, bundle_trytes);
   bundle_trytes[1] = 'E';
-  hash243_queue_push(&req->bundles, bundle_trytes);
+  hash243_queue_push_trytes(&req->bundles, bundle_trytes);
   bundle_trytes[1] = 'G';
-  hash243_queue_push(&req->bundles, bundle_trytes);
+  hash243_queue_push_trytes(&req->bundles, bundle_trytes);
 
   address_trytes[1] = 'A';
-  hash243_queue_push(&req->addresses, address_trytes);
+  hash243_queue_push_trytes(&req->addresses, address_trytes);
   address_trytes[1] = 'D';
-  hash243_queue_push(&req->addresses, address_trytes);
+  hash243_queue_push_trytes(&req->addresses, address_trytes);
   address_trytes[1] = 'F';
-  hash243_queue_push(&req->addresses, address_trytes);
+  hash243_queue_push_trytes(&req->addresses, address_trytes);
 
   tags_trytes[1] = 'A';
-  hash81_queue_push(&req->tags, tags_trytes);
+  hash81_queue_push_trytes(&req->tags, tags_trytes);
   tags_trytes[1] = 'C';
-  hash81_queue_push(&req->tags, tags_trytes);
+  hash81_queue_push_trytes(&req->tags, tags_trytes);
 
   approvee_trytes[1] = 'B';
-  hash243_queue_push(&req->approvees, approvee_trytes);
+  hash243_queue_push_trytes(&req->approvees, approvee_trytes);
   approvee_trytes[1] = 'C';
-  hash243_queue_push(&req->approvees, approvee_trytes);
+  hash243_queue_push_trytes(&req->approvees, approvee_trytes);
   approvee_trytes[1] = 'H';
-  hash243_queue_push(&req->approvees, approvee_trytes);
+  hash243_queue_push_trytes(&req->approvees, approvee_trytes);
   approvee_trytes[1] = 'M';
-  hash243_queue_push(&req->approvees, approvee_trytes);
+  hash243_queue_push_trytes(&req->approvees, approvee_trytes);
 
   TEST_ASSERT(iota_api_find_transactions(&api, req, res) == RC_OK);
 
@@ -402,7 +418,7 @@ void test_find_transactions_max(void) {
                            bundle_trytes, NUM_TRYTES_BUNDLE, NUM_TRYTES_BUNDLE);
     TEST_ASSERT(iota_tangle_transaction_store(&consensus.tangle, &txs[i]) ==
                 RC_OK);
-    hash243_queue_push(&req->bundles, bundle_trytes);
+    hash243_queue_push(&req->bundles, txs[i].essence.bundle);
     hash_trytes[0]++;
     bundle_trytes[1] = 'A' + (i + 1) % 8;
   }

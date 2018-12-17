@@ -962,7 +962,7 @@ done:
 }
 
 static char* iota_stor_transaction_find_in_clause(size_t const count) {
-  char* in_clause = calloc(2 * count, 1);
+  char* in_clause = calloc(2 * count + 1, 1);
   size_t offset = 0;
 
   if (count != 0) {
