@@ -28,6 +28,14 @@ typedef struct tangle_s {
   connection_t conn;
 } tangle_t;
 
+typedef enum _partial_transaction_model {
+
+  PARTIAL_TX_MODEL_METADATA = MASK_METADATA,
+  PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA =
+      MASK_ESSENCE | MASK_ATTACHMENT | MASK_METADATA,
+  PARTIAL_TX_MODEL_ESSENCE_CONSENSUS,
+} partial_transaction_model_e;
+
 retcode_t iota_tangle_init(tangle_t *const tangle,
                            connection_config_t const *const config);
 
@@ -56,6 +64,21 @@ retcode_t iota_tangle_transaction_load_hashes(tangle_t const *const tangle,
 retcode_t iota_tangle_transaction_load_hashes_of_approvers(
     tangle_t const *const tangle, flex_trit_t const *const approvee_hash,
     iota_stor_pack_t *const pack);
+
+/**
+ * Loads partial transaction data - (contains metadata)
+ *
+ * @param tangle The tangle
+ * @param hash The hash of the transaction
+ * @param pack A pack to be filled with hashes
+ * @param models_mask The bitmask representing the partial data to load
+ *
+ * @return a status code
+ */
+
+retcode_t iota_tangle_transaction_load_partial(
+    tangle_t const *const tangle, flex_trit_t const *const hash,
+    iota_stor_pack_t *const pack, partial_transaction_model_e models_mask);
 
 /**
  * Loads hashes of missing transactions (i.e. only referred as trunk or branch)

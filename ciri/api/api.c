@@ -13,6 +13,7 @@
 #include "request/requests.h"
 #include "response/responses.h"
 #include "utils/logger_helper.h"
+#include "utils/time.h"
 
 #define API_LOGGER_ID "api"
 
@@ -75,6 +76,35 @@ static iota_api_command_t get_command(char const *const command) {
 
 retcode_t iota_api_get_node_info(iota_api_t const *const api,
                                  get_node_info_res_t *const res) {
+  char_buffer_allocate(res->app_name, strlen(CIRI_NAME));
+  strcpy(res->app_name->data, CIRI_NAME);
+  char_buffer_allocate(res->app_version, strlen(CIRI_VERSION));
+  strcpy(res->app_version->data, CIRI_VERSION);
+  memcpy(res->latest_milestone,
+         api->consensus->milestone_tracker.latest_milestone->trits,
+         FLEX_TRIT_SIZE_243);
+  res->latest_milestone_index =
+      api->consensus->milestone_tracker.latest_milestone_index;
+  memcpy(
+      res->latest_solid_subtangle_milestone,
+      api->consensus->milestone_tracker.latest_solid_subtangle_milestone->trits,
+      FLEX_TRIT_SIZE_243);
+  res->latest_solid_subtangle_milestone_index =
+      api->consensus->milestone_tracker.latest_solid_subtangle_milestone_index;
+  res->milestone_start_index =
+      api->consensus->milestone_tracker.milestone_start_index;
+  rw_lock_handle_rdlock(&api->node->neighbors_lock);
+  res->neighbors = neighbors_count(api->node->neighbors);
+  rw_lock_handle_unlock(&api->node->neighbors_lock);
+  res->packets_queue_size = broadcaster_size(&api->node->broadcaster);
+  res->time = current_timestamp_ms();
+  res->tips = tips_cache_size(&api->node->tips);
+  res->transactions_to_request =
+      requester_size(&api->node->transaction_requester);
+  memcpy(res->coordinator_address,
+         api->consensus->milestone_tracker.coordinator->trits,
+         FLEX_TRIT_SIZE_243);
+
   return RC_OK;
 }
 
@@ -235,16 +265,15 @@ retcode_t iota_api_broadcast_transactions(
     iota_api_t const *const api,
     broadcast_transactions_req_t const *const req) {
   retcode_t ret = RC_OK;
-  hash8019_stack_entry_t *iter = NULL;
+  flex_trit_t *elt = NULL;
   struct _iota_transaction tx;
 
-  LL_FOREACH(req->trytes, iter) {
-    transaction_deserialize_from_trits(&tx, iter->hash);
+  HASH_ARRAY_FOREACH(req->trytes, elt) {
+    transaction_deserialize_from_trits(&tx, elt);
     if (iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
       // TODO priority queue on weight_magnitude
-      if ((ret = broadcaster_on_next(&api->node->broadcaster, iter->hash)) !=
-          RC_OK) {
+      if ((ret = broadcaster_on_next(&api->node->broadcaster, elt)) != RC_OK) {
         return ret;
       }
     }
@@ -256,21 +285,19 @@ retcode_t iota_api_broadcast_transactions(
 retcode_t iota_api_store_transactions(
     iota_api_t const *const api, store_transactions_req_t const *const req) {
   retcode_t ret = RC_OK;
-  hash8019_stack_entry_t *iter = NULL;
+  flex_trit_t *elt = NULL;
   struct _iota_transaction tx;
   struct _trit_array hash = {.trits = NULL,
                              .num_trits = HASH_LENGTH_TRIT,
                              .num_bytes = FLEX_TRIT_SIZE_243,
                              .dynamic = 0};
-  tx.solid = 0;
-  tx.snapshot_index = 0;
 
   bool exists;
-  LL_FOREACH(req->trytes, iter) {
-    transaction_deserialize_from_trits(&tx, iter->hash);
+  HASH_ARRAY_FOREACH(req->trytes, elt) {
+    transaction_deserialize_from_trits(&tx, elt);
     if (iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
-      hash.trits = tx.hash;
+      hash.trits = transaction_hash(&tx);
       if ((ret = iota_tangle_transaction_exist(&api->consensus->tangle,
                                                TRANSACTION_FIELD_HASH, &hash,
                                                &exists)) != RC_OK) {

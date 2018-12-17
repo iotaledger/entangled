@@ -249,3 +249,237 @@ done:
   get_balances_res_free(&balances_res);
   return ret_code;
 }
+
+retcode_t iota_client_find_transaction_objects(
+    iota_client_service_t const* const serv,
+    find_transactions_req_t const* const tx_queries,
+    transaction_array_t out_tx_objs) {
+  retcode_t ret_code = RC_OK;
+  find_transactions_res_t* find_tx_res = find_transactions_res_new();
+
+  log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  if (!find_tx_res) {
+    ret_code = RC_CCLIENT_NULL_PTR;
+    log_error(CCLIENT_EXTENDED_LOGGER_ID,
+              "%s create request object failed: %s\n", __func__,
+              error_2_string(ret_code));
+    goto done;
+  }
+
+  ret_code = iota_client_find_transactions(serv, tx_queries, find_tx_res);
+  if ((ret_code == RC_OK) && find_tx_res) {
+    ret_code = iota_client_get_transaction_objects(
+        serv, (get_trytes_req_t*)find_tx_res, out_tx_objs);
+  }
+
+done:
+  if (find_tx_res) {
+    find_transactions_res_free(&find_tx_res);
+  }
+  return ret_code;
+}
+
+retcode_t iota_client_get_transaction_objects(
+    iota_client_service_t const* const serv, get_trytes_req_t* const tx_hashes,
+    transaction_array_t out_tx_objs) {
+  retcode_t ret_code = RC_OK;
+  get_trytes_res_t* out_trytes = get_trytes_res_new();
+  hash8019_queue_entry_t* q_iter = NULL;
+  struct _iota_transaction tx = {};
+  size_t tx_deserialize_offset = 0;
+
+  ret_code = iota_client_get_trytes(serv, tx_hashes, out_trytes);
+  if (ret_code == RC_OK) {
+    CDL_FOREACH(out_trytes->trytes, q_iter) {
+      tx_deserialize_offset =
+          transaction_deserialize_from_trits(&tx, q_iter->hash);
+      if (tx_deserialize_offset) {
+        transaction_array_push_back(out_tx_objs, &tx);
+      } else {
+        ret_code = RC_CCLIENT_TX_DESERIALIZE_FAILED;
+        log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s: %s.\n", __func__,
+                  error_2_string(ret_code));
+        goto done;
+      }
+    }
+  }
+
+done:
+  if (out_trytes) {
+    get_trytes_res_free(&out_trytes);
+  }
+  return ret_code;
+}
+
+retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
+                                    flex_trit_t const* const tail_tx,
+                                    bool* out_promotable) {
+  retcode_t ret_code = RC_OK;
+  check_consistency_req_t* consistency_req = check_consistency_req_new();
+  check_consistency_res_t* consistency_res = check_consistency_res_new();
+  get_trytes_res_t* out_trytes = get_trytes_res_new();
+  struct _iota_transaction tx = {};
+  size_t tx_deserialize_offset = 0;
+  uint64_t time_now = 0;
+  // Check if transaction wasn't issued before last 6 milestones
+  // Milestones are being issued every ~2mins, and 1 minute delay for
+  // propagating the network of nodes.
+  uint64_t max_depth = (6 * 2 - 1) * (60 * 1000);
+
+  hash243_queue_push(&consistency_req->hashes, tail_tx);
+  *out_promotable = false;
+  ret_code =
+      iota_client_check_consistency(serv, consistency_req, consistency_res);
+  if (ret_code) {
+    log_warning(CCLIENT_EXTENDED_LOGGER_ID, "check consistency failed\n");
+    goto done;
+  }
+  if (consistency_res->state) {
+    // get attachmentTimestamp and check if above max depth
+    ret_code = iota_client_get_trytes(serv, (get_trytes_req_t*)consistency_req,
+                                      out_trytes);
+    if (ret_code == RC_OK) {
+      tx_deserialize_offset =
+          transaction_deserialize_from_trits(&tx, out_trytes->trytes->hash);
+      if (tx_deserialize_offset) {
+        // is above max depth
+        time_now = current_timestamp_ms();
+        log_debug(CCLIENT_EXTENDED_LOGGER_ID,
+                  "checking depth, attachment_timestamp %ld, time: %ld\n",
+                  tx.attachment.attachment_timestamp, time_now);
+        if ((tx.attachment.attachment_timestamp < time_now) &&
+            ((time_now - tx.attachment.attachment_timestamp) < max_depth)) {
+          *out_promotable = true;
+        }
+      } else {
+        ret_code = RC_CCLIENT_TX_DESERIALIZE_FAILED;
+        log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s: %s.\n", __func__,
+                  error_2_string(ret_code));
+        goto done;
+      }
+    }
+  }
+
+done:
+  check_consistency_req_free(&consistency_req);
+  check_consistency_res_free(consistency_res);
+  get_trytes_res_free(&out_trytes);
+  return ret_code;
+}
+
+retcode_t iota_client_get_latest_inclusion(
+    iota_client_service_t const* const serv, hash243_queue_t const transactions,
+    get_inclusion_state_res_t* out_states) {
+  retcode_t ret_code = RC_OK;
+  get_node_info_res_t* node_info = get_node_info_res_new();
+  get_inclusion_state_req_t* inclusion_req = get_inclusion_state_req_new();
+
+  ret_code = iota_client_get_node_info(serv, node_info);
+  if (ret_code) {
+    goto done;
+  }
+
+  inclusion_req->hashes = transactions;
+  if (hash243_queue_push(&inclusion_req->tips,
+                         node_info->latest_solid_subtangle_milestone)) {
+    goto done;
+  }
+
+  // check txs with latest solid subtangle milestone
+  if (iota_client_get_inclusion_states(serv, inclusion_req, out_states)) {
+    goto done;
+  }
+
+done:
+  if (node_info) {
+    get_node_info_res_free(&node_info);
+  }
+
+  if (inclusion_req) {
+    inclusion_req->hashes = NULL;
+    get_inclusion_state_req_free(&inclusion_req);
+  }
+  return ret_code;
+}
+
+retcode_t iota_client_store_and_broadcast(
+    iota_client_service_t const* const serv,
+    store_transactions_req_t const* const trytes) {
+  retcode_t ret_code = RC_OK;
+  ret_code = iota_client_store_transactions(serv, trytes);
+  if (ret_code == RC_OK) {
+    ret_code = iota_client_broadcast_transactions(
+        serv, (broadcast_transactions_req_t*)trytes);
+  }
+  return ret_code;
+}
+
+retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
+                                  hash8019_array_p const trytes,
+                                  uint32_t const depth, uint32_t const mwm,
+                                  flex_trit_t const* const reference,
+                                  transaction_array_t out_transactions) {
+  retcode_t ret_code = RC_OK;
+  get_transactions_to_approve_req_t* tx_approve_req =
+      get_transactions_to_approve_req_new();
+  get_transactions_to_approve_res_t* tx_approve_res =
+      get_transactions_to_approve_res_new();
+  attach_to_tangle_req_t* attach_req = attach_to_tangle_req_new();
+  attach_to_tangle_res_t* attach_res = attach_to_tangle_res_new();
+  flex_trit_t* elt = NULL;
+  size_t tx_deserialize_offset = 0;
+  struct _iota_transaction tx = {};
+
+  if (!tx_approve_req || !tx_approve_res || !attach_req || !attach_res) {
+    ret_code = RC_CCLIENT_NULL_PTR;
+    goto done;
+  }
+
+  if (reference) {
+    memcpy(tx_approve_req->reference, reference, FLEX_TRIT_SIZE_243);
+  }
+  tx_approve_req->depth = depth;
+  // get tx to approve
+  ret_code = iota_client_get_transactions_to_approve(serv, tx_approve_req,
+                                                     tx_approve_res);
+  if (ret_code) {
+    goto done;
+  }
+
+  memcpy(attach_req->branch, tx_approve_res->branch, FLEX_TRIT_SIZE_243);
+  memcpy(attach_req->trunk, tx_approve_res->trunk, FLEX_TRIT_SIZE_243);
+  attach_req->mwm = mwm;
+  attach_req->trytes = trytes;
+  // attach to tangle
+  ret_code = iota_client_attach_to_tangle(serv, attach_req, attach_res);
+  if (ret_code) {
+    goto done;
+  }
+
+  // store and broadcast
+  ret_code = iota_client_store_and_broadcast(
+      serv, (store_transactions_req_t*)attach_res);
+
+  // trytes to transaction objects
+  HASH_ARRAY_FOREACH(trytes, elt) {
+    tx_deserialize_offset = transaction_deserialize_from_trits(&tx, elt);
+    if (tx_deserialize_offset) {
+      transaction_array_push_back(out_transactions, &tx);
+    } else {
+      ret_code = RC_CCLIENT_TX_DESERIALIZE_FAILED;
+      log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s: %s.\n", __func__,
+                error_2_string(ret_code));
+      goto done;
+    }
+  }
+
+done:
+  get_transactions_to_approve_req_free(&tx_approve_req);
+  get_transactions_to_approve_res_free(&tx_approve_res);
+  attach_to_tangle_res_free(&attach_res);
+  if (attach_req) {
+    attach_req->trytes = NULL;
+    attach_to_tangle_req_free(&attach_req);
+  }
+  return ret_code;
+}

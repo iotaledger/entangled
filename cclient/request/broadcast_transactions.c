@@ -11,7 +11,7 @@ broadcast_transactions_req_t* broadcast_transactions_req_new() {
   broadcast_transactions_req_t* req = (broadcast_transactions_req_t*)malloc(
       sizeof(broadcast_transactions_req_t));
   if (req) {
-    req->trytes = NULL;
+    req->trytes = hash8019_array_new();
   }
   return req;
 }
@@ -22,7 +22,7 @@ void broadcast_transactions_req_free(broadcast_transactions_req_t** const req) {
   }
   broadcast_transactions_req_t* tmp = *req;
   if (tmp->trytes) {
-    hash8019_stack_free(&tmp->trytes);
+    hash_array_free(tmp->trytes);
   }
   free(tmp);
   *req = NULL;

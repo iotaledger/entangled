@@ -14,10 +14,9 @@
 extern "C" {
 #endif
 
-typedef struct {
+typedef struct get_node_info_res_s {
   /**
-   * Name of the IOTA software you're currently using (IRI stands for Initial
-   * Reference Implementation).
+   * Name of the IOTA software you're currently using.
    */
   char_buffer_t* app_name;
   /**
@@ -25,30 +24,13 @@ typedef struct {
    */
   char_buffer_t* app_version;
   /**
-   * Available cores on your machine for JRE.
-   */
-  int jre_available_processors;
-  /**
-   * Returns the amount of free memory in the Java Virtual Machine.
-   */
-  size_t jre_free_memory;
-  /**
-   * Returns the maximum amount of memory that the Java virtual machine will
-   * attempt to use.
-   */
-  size_t jre_max_memory;
-  /**
-   * Returns the total amount of memory in the Java virtual machine.
-   */
-  size_t jre_total_memory;
-  /**
    * Latest milestone that was signed off by the coordinator.
    */
   flex_trit_t latest_milestone[FLEX_TRIT_SIZE_243];
   /**
    * Index of the latest milestone.
    */
-  size_t latest_milestone_index;
+  uint32_t latest_milestone_index;
   /**
    * The latest milestone which is solid and is used for sending transactions.
    * For a milestone to become solid your local node must basically approve the
@@ -59,27 +41,36 @@ typedef struct {
   /**
    * Index of the latest solid subtangle.
    */
-  size_t latest_solid_subtangle_milestone_index;
+  uint32_t latest_solid_subtangle_milestone_index;
+  /**
+   * The start index of the milestones.
+   * This index is encoded in each milestone transaction by the coordinator
+   */
+  uint32_t milestone_start_index;
   /**
    * Number of neighbors you are directly connected with.
    */
-  int neighbors;
+  uint16_t neighbors;
   /**
    * Packets which are currently queued up.
    */
-  int packets_queue_size;
+  uint16_t packets_queue_size;
   /**
    * Current UNIX timestamp.
    */
-  size_t time;
+  uint64_t time;
   /**
    * Number of tips in the network.
    */
-  int tips;
+  uint32_t tips;
   /**
    * Transactions to request during syncing process.
    */
-  int trans_to_request;
+  uint32_t transactions_to_request;
+  /**
+   * The address of the coordinator being followed by this node.
+   */
+  flex_trit_t coordinator_address[FLEX_TRIT_SIZE_243];
 } get_node_info_res_t;
 
 get_node_info_res_t* get_node_info_res_new();

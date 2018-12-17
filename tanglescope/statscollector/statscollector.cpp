@@ -125,8 +125,9 @@ void ZMQCollectorImpl::collect(uint32_t bundleConfirmationHistogramRange,
   zmqObservable.observe_on(rxcpp::synchronize_new_thread())
       .as_blocking()
       .subscribe(
-          [weakAnalyzer = std::weak_ptr(analyzer), &gauges = _gauges,
-           &counters = _counters, &lmsi](std::shared_ptr<iri::IRIMessage> msg) {
+          [weakAnalyzer = std::weak_ptr<TXAnalyzer>(analyzer),
+           &gauges = _gauges, &counters = _counters,
+           &lmsi](std::shared_ptr<iri::IRIMessage> msg) {
             auto analyzer = weakAnalyzer.lock();
             // FIXME (@th0br0) Proper error handling.
             if (!analyzer) return;

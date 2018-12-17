@@ -33,7 +33,7 @@ void test_value_out(void) {
   iota_transaction_t tx;
   transfer_iterator_t* tf_iter = NULL;
   transfer_value_out_t OUTPUT = {SEED, 3, 5};
-  struct _iota_transaction TX;
+  struct _iota_transaction TX = {.loaded_columns_mask = 0};
   transfer_t* transfer =
       transfer_value_out_new(&OUTPUT, TAG, ADDRESS, 0, 1509136296);
 
@@ -46,15 +46,15 @@ void test_value_out(void) {
 
   tx = transfer_iterator_next(tf_iter);
   TEST_ASSERT_NOT_NULL(tx);
-  TEST_ASSERT_EQUAL_MEMORY(SIG1, tx->signature_or_message, sizeof(SIG1));
+  TEST_ASSERT_EQUAL_MEMORY(SIG1, tx->data.signature_or_message, sizeof(SIG1));
 
   tx = transfer_iterator_next(tf_iter);
   TEST_ASSERT_NOT_NULL(tx);
-  TEST_ASSERT_EQUAL_MEMORY(SIG2, tx->signature_or_message, sizeof(SIG2));
+  TEST_ASSERT_EQUAL_MEMORY(SIG2, tx->data.signature_or_message, sizeof(SIG2));
 
   tx = transfer_iterator_next(tf_iter);
   TEST_ASSERT_NOT_NULL(tx);
-  TEST_ASSERT_EQUAL_MEMORY(SIG3, tx->signature_or_message, sizeof(SIG3));
+  TEST_ASSERT_EQUAL_MEMORY(SIG3, tx->data.signature_or_message, sizeof(SIG3));
 
   tx = transfer_iterator_next(tf_iter);
   TEST_ASSERT_NULL(tx);
@@ -85,7 +85,8 @@ void test_transfer_data(void) {
 
   tx = transfer_iterator_next(tf_iter);
   TEST_ASSERT_NOT_NULL(tx);
-  TEST_ASSERT_EQUAL_MEMORY(data, tx->signature_or_message, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(data, tx->data.signature_or_message,
+                           FLEX_TRIT_SIZE_243);
 
   tx = transfer_iterator_next(tf_iter);
   TEST_ASSERT_NULL(tx);

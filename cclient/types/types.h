@@ -22,6 +22,7 @@
 #include "utils/containers/hash/hash8019_queue.h"
 #include "utils/containers/hash/hash8019_stack.h"
 #include "utils/containers/hash/hash81_queue.h"
+#include "utils/containers/hash/hash_array.h"
 #include "utils/logger_helper.h"
 
 #include "utarray.h"
@@ -68,6 +69,17 @@ flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
 trit_array_p flex_hash_array_at(flex_hash_array_t* head, size_t index);
 int flex_hash_array_count(flex_hash_array_t* head);
 void flex_hash_array_free(flex_hash_array_t* head);
+
+typedef UT_array* transaction_array_t;
+transaction_array_t transaction_array_new();
+void transaction_array_push_back(transaction_array_t txs,
+                                 iota_transaction_t tx);
+size_t transaction_array_len(transaction_array_t txs);
+void transaction_array_free(transaction_array_t txs);
+iota_transaction_t transaction_array_at(transaction_array_t txs, size_t index);
+#define TX_OBJS_FOREACH(txs, tx)                                \
+  for (tx = (iota_transaction_t)utarray_front(txs); tx != NULL; \
+       tx = (iota_transaction_t)utarray_next(txs, tx))
 
 #ifdef __cplusplus
 }

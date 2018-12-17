@@ -87,8 +87,9 @@ void BroadcastReceiveCollector::broadcastOneTransaction() {
     artificialyDelay();
     system_clock::time_point t2 = system_clock::now();
     auto duration = duration_cast<milliseconds>(t2 - t1).count();
-    _hashToBroadcastTime.insert(
-        hashed.hash, BroadcastInfo{std::chrono::system_clock::now(), duration});
+    _hashToBroadcastTime.insert(hashed.hash,
+                                BroadcastInfo{std::chrono::system_clock::now(),
+                                              static_cast<uint64_t>(duration)});
 
     auto storeFuture = boost::async(boost::launch::async, [hashed, this] {
       return _api->storeTransactions({hashed.tx});

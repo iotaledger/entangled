@@ -110,34 +110,22 @@ void test_deserialize_get_node_info(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
   const char* json_text =
-      "{\"appName\":\"" TEST_INFO_APP_NAME
-      "\",\"appVersion\":\"" TEST_INFO_APP_VERSION
-      "\",\"duration\":1,"
-      "\"jreAvailableProcessors\""
-      ":" STR(TEST_INFO_JRE_AVAILABLE_PROCESSORS)
-      ",\"jreFreeMemory\":" STR(TEST_INFO_JRE_FREE_MEMORY)
-      ","
-      "\"jreMaxMemory\":" STR(TEST_INFO_JRE_MAX_MEMORY)
-      ",\"jreTotalMemory\":" STR(TEST_INFO_JRE_TOTAL_MEMORY)
-      ","
-      "\"latestMilestone\":"
-      "\"" TEST_81_TRYTES_1
-      "\","
-      "\"latestMilestoneIndex\""
-      ":" STR(TEST_INFO_LATEST_MILESTONE_INDEX)
-      ","
-      "\"latestSolidSubtangleMilestone\":"
-      "\"" TEST_81_TRYTES_2
-      "\","
-      "\"latestSolidSubtangleMilestoneIndex\""
-      ":" STR(TEST_INFO_LATEST_SS_MILESTONE_INDEX)
-      ",\"neighbors\":" STR(TEST_INFO_NEIGHBORS)
-      ",\"packetsQueueSize\":" STR(TEST_INFO_PACKETS_QUEUE_SIZE)
-      ",\"time\":" STR(TEST_INFO_TIME)
-      ",\"tips\":" STR(TEST_INFO_TIPS)
-      ","
-      "\"transactionsToRequest\""
-      ":" STR(TEST_INFO_TRANSACTIONS_TO_REQUEST) "}";
+      "{"
+        "\"appName\":\"" TEST_INFO_APP_NAME "\","
+        "\"appVersion\":\"" TEST_INFO_APP_VERSION "\","
+        "\"duration\":1,"
+        "\"latestMilestone\":\"" TEST_81_TRYTES_1 "\","
+        "\"latestMilestoneIndex\":" STR(TEST_INFO_LATEST_MILESTONE_INDEX) ","
+        "\"latestSolidSubtangleMilestone\":\"" TEST_81_TRYTES_2 "\","
+        "\"latestSolidSubtangleMilestoneIndex\":" STR(TEST_INFO_LATEST_SS_MILESTONE_INDEX) ","
+        "\"milestoneStartIndex\":" STR(TEST_INFO_MILESTONE_START_INDEX) ","
+        "\"neighbors\":" STR(TEST_INFO_NEIGHBORS) ","
+        "\"packetsQueueSize\":" STR(TEST_INFO_PACKETS_QUEUE_SIZE) ","
+        "\"time\":" STR(TEST_INFO_TIME) ","
+        "\"tips\":" STR(TEST_INFO_TIPS) ","
+        "\"transactionsToRequest\":" STR(TEST_INFO_TRANSACTIONS_TO_REQUEST) ","
+        "\"coordinatorAddress\":\"" TEST_81_TRYTES_3 "\""
+      "}";
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
   get_node_info_res_t* node_info = get_node_info_res_new();
 
@@ -146,35 +134,36 @@ void test_deserialize_get_node_info(void) {
 
   TEST_ASSERT_EQUAL_STRING(TEST_INFO_APP_NAME, node_info->app_name->data);
   TEST_ASSERT_EQUAL_STRING(TEST_INFO_APP_VERSION, node_info->app_version->data);
-  TEST_ASSERT_EQUAL_INT(TEST_INFO_JRE_AVAILABLE_PROCESSORS,
-                        node_info->jre_available_processors);
-  TEST_ASSERT_EQUAL_INT8(TEST_INFO_JRE_FREE_MEMORY, node_info->jre_free_memory);
-  TEST_ASSERT_EQUAL_INT8(TEST_INFO_JRE_MAX_MEMORY, node_info->jre_max_memory);
-  TEST_ASSERT_EQUAL_INT8(TEST_INFO_JRE_TOTAL_MEMORY,
-                         node_info->jre_total_memory);
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, node_info->latest_milestone,
                            FLEX_TRIT_SIZE_243);
 
-  TEST_ASSERT_EQUAL_INT8(TEST_INFO_LATEST_MILESTONE_INDEX,
-                         node_info->latest_milestone_index);
+  TEST_ASSERT_EQUAL_UINT32(TEST_INFO_LATEST_MILESTONE_INDEX,
+                           node_info->latest_milestone_index);
 
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_2,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, node_info->latest_solid_subtangle_milestone,
                            FLEX_TRIT_SIZE_243);
 
-  TEST_ASSERT_EQUAL_INT8(TEST_INFO_LATEST_SS_MILESTONE_INDEX,
-                         node_info->latest_solid_subtangle_milestone_index);
-  TEST_ASSERT_EQUAL_INT(TEST_INFO_NEIGHBORS, node_info->neighbors);
-  TEST_ASSERT_EQUAL_INT(TEST_INFO_PACKETS_QUEUE_SIZE,
-                        node_info->packets_queue_size);
-  TEST_ASSERT_EQUAL_INT8(TEST_INFO_TIME, node_info->time);
-  TEST_ASSERT_EQUAL_INT(TEST_INFO_TIPS, node_info->tips);
-  TEST_ASSERT_EQUAL_INT(TEST_INFO_TRANSACTIONS_TO_REQUEST,
-                        node_info->trans_to_request);
+  TEST_ASSERT_EQUAL_UINT32(TEST_INFO_LATEST_SS_MILESTONE_INDEX,
+                           node_info->latest_solid_subtangle_milestone_index);
+  TEST_ASSERT_EQUAL_UINT32(TEST_INFO_MILESTONE_START_INDEX,
+                           node_info->milestone_start_index);
+  TEST_ASSERT_EQUAL_UINT16(TEST_INFO_NEIGHBORS, node_info->neighbors);
+  TEST_ASSERT_EQUAL_UINT16(TEST_INFO_PACKETS_QUEUE_SIZE,
+                           node_info->packets_queue_size);
+  TEST_ASSERT_EQUAL_UINT64(TEST_INFO_TIME, node_info->time);
+  TEST_ASSERT_EQUAL_UINT32(TEST_INFO_TIPS, node_info->tips);
+  TEST_ASSERT_EQUAL_UINT32(TEST_INFO_TRANSACTIONS_TO_REQUEST,
+                           node_info->transactions_to_request);
+
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_3,
+                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  TEST_ASSERT_EQUAL_MEMORY(hash, node_info->coordinator_address,
+                           FLEX_TRIT_SIZE_243);
 
   get_node_info_res_free(&node_info);
 }
@@ -593,13 +582,13 @@ void test_serialize_attach_to_tangle(void) {
       trits_8019, NUM_TRITS_SERIALIZED_TRANSACTION,
       (const tryte_t*)TEST_2673_TRYTES_1, NUM_TRYTES_SERIALIZED_TRANSACTION,
       NUM_TRYTES_SERIALIZED_TRANSACTION));
-  TEST_ASSERT(hash8019_queue_push(&attach_req->trytes, trits_8019) == RC_OK);
+  hash_array_push(attach_req->trytes, trits_8019);
 
   TEST_ASSERT(flex_trits_from_trytes(
       trits_8019, NUM_TRITS_SERIALIZED_TRANSACTION,
       (const tryte_t*)TEST_2673_TRYTES_2, NUM_TRYTES_SERIALIZED_TRANSACTION,
       NUM_TRYTES_SERIALIZED_TRANSACTION));
-  TEST_ASSERT(hash8019_queue_push(&attach_req->trytes, trits_8019) == RC_OK);
+  hash_array_push(attach_req->trytes, trits_8019);
 
   attach_req->mwm = TEST_MWM;
 
@@ -661,7 +650,7 @@ void test_serialize_broadcast_transactions(void) {
       NUM_TRYTES_SERIALIZED_TRANSACTION);
   TEST_ASSERT(len);
 
-  TEST_ASSERT(hash8019_stack_push(&req->trytes, tx_trits) == RC_OK);
+  hash_array_push(req->trytes, tx_trits);
 
   serializer.vtable.broadcast_transactions_serialize_request(&serializer, req,
                                                              serializer_out);
@@ -687,7 +676,7 @@ void test_serialize_store_transactions(void) {
       NUM_TRYTES_SERIALIZED_TRANSACTION);
   TEST_ASSERT(len);
 
-  TEST_ASSERT(hash8019_stack_push(&req->trytes, tx_trits) == RC_OK);
+  hash_array_push(req->trytes, tx_trits);
 
   serializer.vtable.store_transactions_serialize_request(&serializer, req,
                                                          serializer_out);

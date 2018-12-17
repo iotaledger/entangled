@@ -20,7 +20,7 @@ get_transactions_to_approve_req_t* get_transactions_to_approve_req_new() {
 
 void get_transactions_to_approve_req_free(
     get_transactions_to_approve_req_t** req) {
-  if (*req) {
+  if (req || (*req)) {
     free(*req);
     *req = NULL;
   }
