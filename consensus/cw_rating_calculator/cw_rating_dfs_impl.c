@@ -141,13 +141,12 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
         curr_approver_index = --pack.num_loaded;
         // Add each found approver to the currently traversed tx
         if ((res = hash243_stack_push(
-                 &stack,
-                 ((trit_array_p)pack.models[curr_approver_index])->trits))) {
+                 &stack, ((flex_trit_t *)pack.models[curr_approver_index])))) {
           return res;
         }
         if ((res = hash243_set_add(
                  &curr_tx->approvers,
-                 ((trit_array_p)pack.models[pack.num_loaded])->trits))) {
+                 ((flex_trit_t *)pack.models[pack.num_loaded])))) {
           return res;
         }
       }

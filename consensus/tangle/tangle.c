@@ -312,13 +312,12 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
     uint32_t approver_idx = 0;
     found_approver = false;
     while (approver_idx < hash_pack.num_loaded) {
-      trit_array_p approver_hash =
-          (trit_array_t *)hash_pack.models[approver_idx];
+      flex_trit_t *approver_hash =
+          (flex_trit_t *)hash_pack.models[approver_idx];
       tx_pack.models = (void **)(&next_tx);
       hash_pack_reset(&tx_pack);
       res = iota_tangle_transaction_load_partial(
-          tangle, approver_hash->trits, &tx_pack,
-          PARTIAL_TX_MODEL_ESSENCE_CONSENSUS);
+          tangle, approver_hash, &tx_pack, PARTIAL_TX_MODEL_ESSENCE_CONSENSUS);
       if (res != RC_OK || tx_pack.num_loaded == 0) {
         break;
       }

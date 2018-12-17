@@ -189,10 +189,9 @@ static retcode_t execute_statement_load_gen(
       break;
     }
     if (model == MODEL_HASH) {
-      column_decompress_load(
-          sqlite_statement, 0,
-          ((trit_array_p)pack->models[pack->num_loaded++])->trits,
-          FLEX_TRIT_SIZE_243);
+      column_decompress_load(sqlite_statement, 0,
+                             ((flex_trit_t*)pack->models[pack->num_loaded++]),
+                             FLEX_TRIT_SIZE_243);
     } else if (model == MODEL_TRANSACTION) {
       select_transactions_populate_from_row(sqlite_statement,
                                             pack->models[pack->num_loaded++]);
@@ -679,7 +678,6 @@ retcode_t iota_stor_transaction_load_hashes(connection_t const* const conn,
       break;
     default:
       return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
-      break;
   }
 
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
