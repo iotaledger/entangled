@@ -963,46 +963,6 @@ done:
   return ret;
 }
 
-static char* iota_stor_transaction_find_in_clause(size_t const count) {
-  char* in_clause = calloc(2 * count + 1, 1);
-  size_t offset = 0;
-
-  if (count != 0) {
-    for (size_t i = 0; i < count; i++) {
-      offset += sprintf(in_clause + offset, "?,");
-    }
-    in_clause[offset - 1] = '\0';
-  }
-  return in_clause;
-}
-
-static char* iota_stor_transaction_find_build_query(
-    size_t const bundles_count, size_t const addresses_count,
-    size_t const tags_count, size_t const approvees_count) {
-  // Base size of the query + enough space for '?' (bindings)
-  size_t statement_size = 328 + 2 * bundles_count + 2 * addresses_count +
-                          2 * tags_count + 4 * approvees_count;
-  char* statement = malloc(statement_size);
-
-  char* bundles_in_clause = iota_stor_transaction_find_in_clause(bundles_count);
-  char* addresses_in_clause =
-      iota_stor_transaction_find_in_clause(addresses_count);
-  char* tags_in_clause = iota_stor_transaction_find_in_clause(tags_count);
-  char* approvees_in_clause =
-      iota_stor_transaction_find_in_clause(approvees_count);
-
-  snprintf(statement, statement_size, iota_statement_transaction_find,
-           bundles_in_clause, addresses_in_clause, tags_in_clause,
-           approvees_in_clause, approvees_in_clause);
-
-  free(bundles_in_clause);
-  free(addresses_in_clause);
-  free(tags_in_clause);
-  free(approvees_in_clause);
-
-  return statement;
-}
-
 retcode_t iota_stor_transaction_find(connection_t const* const conn,
                                      hash243_queue_t const bundles,
                                      hash243_queue_t const addresses,
@@ -1019,7 +979,7 @@ retcode_t iota_stor_transaction_find(connection_t const* const conn,
   hash81_queue_entry_t* iter81 = NULL;
   size_t column = 1;
 
-  char* statement = iota_stor_transaction_find_build_query(
+  char* statement = iota_statement_transaction_find_build(
       bundles_count, addresses_count, tags_count, approvees_count);
 
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,

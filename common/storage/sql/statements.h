@@ -15,6 +15,12 @@ extern "C" {
 #endif
 
 /*
+ * Generic statement builders
+ */
+
+extern char* iota_statement_in_clause_build(size_t const count);
+
+/*
  * Transaction statements
  */
 
@@ -41,6 +47,15 @@ extern char* iota_statement_transaction_find;
 extern char* iota_statement_transaction_select_essence_attachment_and_metadata;
 extern char* iota_statement_transaction_select_essence_and_consensus;
 extern char* iota_statement_transaction_select_metadata;
+
+/*
+ * Transaction statement builders
+ */
+
+extern char* iota_statement_transaction_find_build(
+    size_t const bundles_count, size_t const addresses_count,
+    size_t const tags_count, size_t const approvees_count);
+
 /*
  * Milestone statements
  */
