@@ -131,12 +131,6 @@ static void select_transactions_populate_from_row_essence_and_consensus(
 static void select_transactions_populate_from_row_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx);
 
-static void select_transactions_populate_from_row_essence_and_consensus(
-    sqlite3_stmt* const statement, iota_transaction_t const tx);
-
-static void select_transactions_populate_from_row_metadata(
-    sqlite3_stmt* const statement, iota_transaction_t const tx);
-
 static retcode_t prepare_statement(sqlite3* const db,
                                    sqlite3_stmt** const sqlite_statement,
                                    char const* const statement) {

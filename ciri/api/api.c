@@ -21,7 +21,7 @@
  * Private functions
  */
 
-bool invalid_subtangle_status(iota_api_t const *const api) {
+static bool invalid_subtangle_status(iota_api_t const *const api) {
   return (api->consensus->milestone_tracker
               .latest_solid_subtangle_milestone_index ==
           api->consensus->milestone_tracker.milestone_start_index);
@@ -331,20 +331,20 @@ retcode_t iota_api_get_transactions_to_approve(
     return RC_NULL_PARAM;
   }
 
-  if (req->depth > MAX_DEPTH) {
-    return RC_API_INVALID_DEPTH_INPUT;
-  }
+  // if (req->depth > MAX_DEPTH) {
+  //   return RC_API_INVALID_DEPTH_INPUT;
+  // }
 
   if (invalid_subtangle_status(api)) {
     return RC_API_INVALID_SUBTANGLE_STATUS;
   }
 
-  if (req->reference != NULL && req->reference->data != NULL) {
-    flex_trits_from_trytes(reference_trits, HASH_LENGTH_TRIT,
-                           (tryte_t *)req->reference->data, HASH_LENGTH_TRYTE,
-                           HASH_LENGTH_TRYTE);
-    reference = reference_trits;
-  }
+  // if (req->reference != NULL && req->reference->data != NULL) {
+  //   flex_trits_from_trytes(reference_trits, HASH_LENGTH_TRIT,
+  //                          (tryte_t *)req->reference->data,
+  //                          HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+  //   reference = reference_trits;
+  // }
 
   if ((ret = iota_consensus_tip_selector_get_transactions_to_approve(
            &api->consensus->tip_selector, req->depth, reference, &tips)) !=

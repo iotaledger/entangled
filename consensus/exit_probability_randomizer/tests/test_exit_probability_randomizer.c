@@ -608,7 +608,6 @@ void test_1_bundle(void) {
 
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
 
-  init_epv(&epv);
   /// Select the tip
 
   DECLARE_PACK_SINGLE_TX(tx, tx_models, tx_pack);
