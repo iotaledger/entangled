@@ -273,8 +273,8 @@ retcode_t iota_tangle_milestone_exist(tangle_t const *const tangle,
  */
 
 retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
-                                trit_array_t const *const tx_hash,
-                                trit_array_t *const tail,
+                                flex_trit_t const *const tx_hash,
+                                flex_trit_t *const tail,
                                 bool *const found_tail) {
   retcode_t res = RC_OK;
   struct _iota_transaction next_tx_s;
@@ -286,7 +286,7 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
   *found_tail = false;
 
   res = iota_tangle_transaction_load_partial(
-      tangle, tx_hash->trits, &tx_pack, PARTIAL_TX_MODEL_ESSENCE_CONSENSUS);
+      tangle, tx_hash, &tx_pack, PARTIAL_TX_MODEL_ESSENCE_CONSENSUS);
   if (res != RC_OK || tx_pack.num_loaded == 0) {
     return res;
   }
@@ -342,7 +342,7 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
   }
 
   if (transaction_current_index(curr_tx) == 0) {
-    memcpy(tail->trits, transaction_hash(curr_tx), FLEX_TRIT_SIZE_243);
+    memcpy(tail, transaction_hash(curr_tx), FLEX_TRIT_SIZE_243);
     *found_tail = true;
   }
 

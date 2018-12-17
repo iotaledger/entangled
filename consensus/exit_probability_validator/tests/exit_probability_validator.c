@@ -86,19 +86,16 @@ void test_transaction_does_not_exist() {
   init_epv(&epv);
 
   bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
   flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-
   iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
-  trit_array_set_trits(tail, transaction_hash(test_tx), NUM_TRITS_HASH);
+
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
+                  &epv, transaction_hash(test_tx), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
-  trit_array_free(tail);
   destroy_epv(&epv);
   transaction_free(test_tx);
 }
@@ -127,13 +124,9 @@ void test_transaction_not_a_tail() {
   TEST_ASSERT(exist == true);
 
   bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, transaction_hash(tx3), NUM_TRITS_HASH);
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
+                  &epv, transaction_hash(tx3), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
-
-  trit_array_free(tail);
   transaction_free(tx3);
   destroy_epv(&epv);
 }
@@ -161,13 +154,10 @@ void test_transaction_invalid_delta() {
   TEST_ASSERT(exist == true);
 
   bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, transaction_hash(tx1), NUM_TRITS_HASH);
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
+                  &epv, transaction_hash(tx1), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
-  trit_array_free(tail);
   transaction_free(tx1);
   destroy_epv(&epv);
 }
@@ -197,13 +187,10 @@ void test_transaction_below_max_depth() {
   TEST_ASSERT(exist == true);
 
   bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, transaction_hash(txs[0]), NUM_TRITS_HASH);
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
+                  &epv, transaction_hash(txs[0]), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
-  trit_array_free(tail);
   transactions_free(txs, 2);
   destroy_epv(&epv);
 }
@@ -234,13 +221,10 @@ void test_transaction_exceed_max_transactions() {
   TEST_ASSERT(exist == true);
 
   bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, transaction_hash(txs[0]), NUM_TRITS_HASH);
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
+                  &epv, transaction_hash(txs[0]), &is_valid) == RC_OK);
   TEST_ASSERT(is_valid);
 
-  trit_array_free(tail);
   transactions_free(txs, 2);
   destroy_epv(&epv);
   max_txs_below_max_depth = 15;
@@ -268,13 +252,10 @@ void test_transaction_is_genesis() {
   TEST_ASSERT(exist == true);
 
   bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, transaction_hash(txs[0]), NUM_TRITS_HASH);
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
+                  &epv, transaction_hash(txs[0]), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
-  trit_array_free(tail);
   transactions_free(txs, 2);
   destroy_epv(&epv);
 }
@@ -301,13 +282,9 @@ void test_transaction_valid() {
   TEST_ASSERT(exist == true);
 
   bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, transaction_hash(txs[0]), NUM_TRITS_HASH);
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
+                  &epv, transaction_hash(txs[0]), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
-
-  trit_array_free(tail);
   transactions_free(txs, 2);
   destroy_epv(&epv);
 }

@@ -120,7 +120,6 @@ static void select_milestones_populate_from_row(
 
 static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
                                                   iota_transaction_t const tx);
-
 static void
 select_transactions_populate_from_row_essence_attachment_and_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx);
