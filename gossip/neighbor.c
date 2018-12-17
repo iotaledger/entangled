@@ -184,6 +184,10 @@ retcode_t neighbors_remove(neighbor_t **const neighbors,
 
   LL_SEARCH(*neighbors, elt, neighbor, neighbor_cmp);
 
+  if (elt == NULL) {
+    return RC_NEIGHBOR_NOT_PAIRED;
+  }
+
   return neighbors_remove_entry(neighbors, elt);
 }
 

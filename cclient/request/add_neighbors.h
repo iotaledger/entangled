@@ -27,4 +27,4 @@ void add_neighbors_req_free(add_neighbors_req_t** req);
 }
 #endif
 
-#endif  // CCLIENT_REQUEST_FIND_TRANSACTIONS_H
+#endif  // CCLIENT_REQUEST_ADD_NEIGHBORS_H
