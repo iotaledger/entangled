@@ -331,9 +331,9 @@ retcode_t iota_api_get_transactions_to_approve(
     return RC_NULL_PARAM;
   }
 
-  // if (req->depth > MAX_DEPTH) {
-  //   return RC_API_INVALID_DEPTH_INPUT;
-  // }
+  if (req->depth > api->consensus->conf.max_depth) {
+    return RC_API_INVALID_DEPTH_INPUT;
+  }
 
   if (invalid_subtangle_status(api)) {
     return RC_API_INVALID_SUBTANGLE_STATUS;
