@@ -121,13 +121,14 @@ static void select_milestones_populate_from_row(
 static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
                                                   iota_transaction_t const tx);
 
-void select_transactions_populate_from_row_essence_attachment_and_metadata(
+static void
+select_transactions_populate_from_row_essence_attachment_and_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx);
 
-void select_transactions_populate_from_row_essence_and_consensus(
+static void select_transactions_populate_from_row_essence_and_consensus(
     sqlite3_stmt* const statement, iota_transaction_t const tx);
 
-void select_transactions_populate_from_row_metadata(
+static void select_transactions_populate_from_row_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx);
 
 static void select_transactions_populate_from_row_essence_and_consensus(
@@ -269,11 +270,11 @@ enum value_type {
   INT64,
 };
 
-retcode_t update_transactions(connection_t const* const conn,
-                              hash243_set_t const hashes,
-                              void const* const value,
-                              char const* const statement,
-                              enum value_type const type) {
+static retcode_t update_transactions(connection_t const* const conn,
+                                     hash243_set_t const hashes,
+                                     void const* const value,
+                                     char const* const statement,
+                                     enum value_type const type) {
   retcode_t ret = RC_OK;
   retcode_t ret_rollback;
   sqlite3_stmt* sqlite_statement = NULL;
@@ -404,7 +405,8 @@ static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
   tx->loaded_columns_mask = (MASK_ALL_COLUMNS & (~MASK_METADATA));
 }
 
-void select_transactions_populate_from_row_essence_attachment_and_metadata(
+static void
+select_transactions_populate_from_row_essence_attachment_and_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx) {
   column_decompress_load(statement, 0, tx->essence.address, FLEX_TRIT_SIZE_243);
   transaction_set_value(tx, sqlite3_column_int64(statement, 1));
@@ -431,7 +433,7 @@ void select_transactions_populate_from_row_essence_attachment_and_metadata(
   tx->loaded_columns_mask = MASK_ESSENCE | MASK_ATTACHMENT | MASK_METADATA;
 }
 
-void select_transactions_populate_from_row_essence_and_consensus(
+static void select_transactions_populate_from_row_essence_and_consensus(
     sqlite3_stmt* const statement, iota_transaction_t const tx) {
   column_decompress_load(statement, 0, tx->essence.address, FLEX_TRIT_SIZE_243);
   transaction_set_value(tx, sqlite3_column_int64(statement, 1));
@@ -446,7 +448,7 @@ void select_transactions_populate_from_row_essence_and_consensus(
   tx->loaded_columns_mask = MASK_ESSENCE | MASK_CONSENSUS;
 }
 
-void select_transactions_populate_from_row_metadata(
+static void select_transactions_populate_from_row_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx) {
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 0));
   transaction_set_solid(tx, sqlite3_column_int(statement, 1));
