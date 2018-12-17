@@ -86,7 +86,7 @@ void test_deserialize_find_transactions(void) {
                            hash243_queue_at(&deserialize_find_tran->hashes, 2),
                            FLEX_TRIT_SIZE_243);
 
-  TEST_ASSERT_EQUAL_INT(3, hash243_queue_count(&deserialize_find_tran->hashes));
+  TEST_ASSERT_EQUAL_INT(3, hash243_queue_count(deserialize_find_tran->hashes));
 
   find_transactions_res_free(&deserialize_find_tran);
 }

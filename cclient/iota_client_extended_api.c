@@ -43,7 +43,7 @@ static retcode_t is_unused_address(iota_client_service_t const* const serv,
   }
   ret_code = iota_client_find_transactions(serv, find_tran_req, find_tran_res);
   if (!ret_code) {
-    ret_num = hash243_queue_count(&find_tran_res->hashes);
+    ret_num = hash243_queue_count(find_tran_res->hashes);
     *is_unused = ret_num ? false : true;
   }
 done:
@@ -190,7 +190,7 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
 
       ret_code = iota_client_find_transactions(serv, find_tx_req, find_tx_res);
       if (!ret_code) {
-        tx_num = hash243_queue_count(&find_tx_res->hashes);
+        tx_num = hash243_queue_count(find_tx_res->hashes);
         if (tx_num) {
           // appending address
           ret_code = hash243_queue_push(&out_account->addresses, tmp_addr);

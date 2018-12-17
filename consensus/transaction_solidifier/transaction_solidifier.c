@@ -141,7 +141,7 @@ retcode_t iota_consensus_transaction_solidifier_start(
           ts) != 0) {
     log_critical(TRANSACTION_SOLIDIFIER_LOGGER_ID,
                  "Spawning transaction solidifier thread failed\n");
-    return RC_API_FAILED_THREAD_SPAWN;
+    return RC_FAILED_THREAD_SPAWN;
   }
   return RC_OK;
 }
@@ -163,7 +163,7 @@ retcode_t iota_consensus_transaction_solidifier_stop(
   if (thread_handle_join(ts->thread, NULL) != 0) {
     log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
               "Shutting down transaction solidifier thread failed\n");
-    ret = RC_API_FAILED_THREAD_JOIN;
+    ret = RC_FAILED_THREAD_JOIN;
   }
   return ret;
 }
@@ -173,7 +173,7 @@ retcode_t iota_consensus_transaction_solidifier_destroy(
   if (ts == NULL) {
     return RC_CONSENSUS_NULL_PTR;
   } else if (ts->running) {
-    return RC_API_STILL_RUNNING;
+    return RC_STILL_RUNNING;
   }
 
   ts->tangle = NULL;

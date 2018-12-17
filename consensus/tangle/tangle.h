@@ -18,7 +18,9 @@
 #include "common/storage/storage.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/snapshot/state_delta.h"
+#include "utils/containers/hash/hash243_queue.h"
 #include "utils/containers/hash/hash243_set.h"
+#include "utils/containers/hash/hash81_queue.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -142,6 +144,27 @@ retcode_t iota_tangle_transactions_update_solid_state(
 retcode_t iota_tangle_transaction_approvers_count(tangle_t const *const tangle,
                                                   flex_trit_t const *const hash,
                                                   size_t *const count);
+
+/**
+ * Find the transactions which match the specified input. The input fields can
+ * either be bundles, addresses, tags or approvees. Using multiple of these
+ * input fields returns the intersection of the values.
+ *
+ * @param tangle The tangle
+ * @param bundles List of bundle hashes
+ * @param addresses List of addresses
+ * @param tags List of tags
+ * @param approvees List of approvee transaction hashes
+ * @param pack A pack to be filled with hashes
+ *
+ * @return a status code
+ */
+retcode_t iota_tangle_transaction_find(tangle_t const *const tangle,
+                                       hash243_queue_t const bundles,
+                                       hash243_queue_t const addresses,
+                                       hash81_queue_t const tags,
+                                       hash243_queue_t const approvees,
+                                       iota_stor_pack_t *const pack);
 
 /*
  * Milestone operations

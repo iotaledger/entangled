@@ -309,7 +309,7 @@ static retcode_t hash243_queue_to_json_array(hash243_queue_t queue,
   cJSON* array_obj = NULL;
   hash243_queue_entry_t* q_iter = NULL;
 
-  array_count = hash243_queue_count(&queue);
+  array_count = hash243_queue_count(queue);
   if (array_count > 0) {
     array_obj = cJSON_CreateArray();
     if (array_obj == NULL) {
@@ -395,7 +395,7 @@ static retcode_t hash81_queue_to_json_array(hash81_queue_t queue,
   cJSON* array_obj = NULL;
   hash81_queue_entry_t* q_iter = NULL;
 
-  array_count = hash81_queue_count(&queue);
+  array_count = hash81_queue_count(queue);
   if (array_count > 0) {
     array_obj = cJSON_CreateArray();
     if (array_obj == NULL) {
@@ -503,7 +503,7 @@ static retcode_t hash8019_queue_to_json_array(hash8019_queue_t queue,
   tryte_t trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION + 1];
   size_t trits_count = 0;
 
-  array_count = hash8019_queue_count(&queue);
+  array_count = hash8019_queue_count(queue);
   if (array_count > 0) {
     array_obj = cJSON_CreateArray();
     if (array_obj == NULL) {

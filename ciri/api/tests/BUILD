@@ -36,6 +36,18 @@ cc_test(
 )
 
 cc_test(
+    name = "test_find_transactions",
+    srcs = ["test_find_transactions.c"],
+    data = [":db_file"],
+    deps = [
+        ":defs",
+        "//ciri/api",
+        "//consensus/test_utils",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_get_node_info",
     srcs = ["test_get_node_info.c"],
     data = [":db_file"],

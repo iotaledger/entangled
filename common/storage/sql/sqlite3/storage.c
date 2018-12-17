@@ -131,6 +131,12 @@ static void select_transactions_populate_from_row_essence_and_consensus(
 static void select_transactions_populate_from_row_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx);
 
+static void select_transactions_populate_from_row_essence_and_consensus(
+    sqlite3_stmt* const statement, iota_transaction_t const tx);
+
+static void select_transactions_populate_from_row_metadata(
+    sqlite3_stmt* const statement, iota_transaction_t const tx);
+
 static retcode_t prepare_statement(sqlite3* const db,
                                    sqlite3_stmt** const sqlite_statement,
                                    char const* const statement) {
@@ -264,11 +270,11 @@ enum value_type {
   INT64,
 };
 
-retcode_t update_transactions(connection_t const* const conn,
-                              hash243_set_t const hashes,
-                              void const* const value,
-                              char const* const statement,
-                              enum value_type const type) {
+static retcode_t update_transactions(connection_t const* const conn,
+                                     hash243_set_t const hashes,
+                                     void const* const value,
+                                     char const* const statement,
+                                     enum value_type const type) {
   retcode_t ret = RC_OK;
   retcode_t ret_rollback;
   sqlite3_stmt* sqlite_statement = NULL;
@@ -399,7 +405,8 @@ static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
   tx->loaded_columns_mask = (MASK_ALL_COLUMNS & (~MASK_METADATA));
 }
 
-void select_transactions_populate_from_row_essence_attachment_and_metadata(
+static void
+select_transactions_populate_from_row_essence_attachment_and_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx) {
   column_decompress_load(statement, 0, tx->essence.address, FLEX_TRIT_SIZE_243);
   transaction_set_value(tx, sqlite3_column_int64(statement, 1));
@@ -426,7 +433,7 @@ void select_transactions_populate_from_row_essence_attachment_and_metadata(
   tx->loaded_columns_mask = MASK_ESSENCE | MASK_ATTACHMENT | MASK_METADATA;
 }
 
-void select_transactions_populate_from_row_essence_and_consensus(
+static void select_transactions_populate_from_row_essence_and_consensus(
     sqlite3_stmt* const statement, iota_transaction_t const tx) {
   column_decompress_load(statement, 0, tx->essence.address, FLEX_TRIT_SIZE_243);
   transaction_set_value(tx, sqlite3_column_int64(statement, 1));
@@ -441,7 +448,7 @@ void select_transactions_populate_from_row_essence_and_consensus(
   tx->loaded_columns_mask = MASK_ESSENCE | MASK_CONSENSUS;
 }
 
-void select_transactions_populate_from_row_metadata(
+static void select_transactions_populate_from_row_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx) {
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 0));
   transaction_set_solid(tx, sqlite3_column_int(statement, 1));
@@ -953,6 +960,101 @@ retcode_t iota_stor_transaction_approvers_count(connection_t const* const conn,
 
 done:
   finalize_statement(sqlite_statement);
+  return ret;
+}
+
+retcode_t iota_stor_transaction_find(connection_t const* const conn,
+                                     hash243_queue_t const bundles,
+                                     hash243_queue_t const addresses,
+                                     hash81_queue_t const tags,
+                                     hash243_queue_t const approvees,
+                                     iota_stor_pack_t* const pack) {
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement = NULL;
+  size_t bundles_count = hash243_queue_count(bundles);
+  size_t addresses_count = hash243_queue_count(addresses);
+  size_t tags_count = hash81_queue_count(tags);
+  size_t approvees_count = hash243_queue_count(approvees);
+  hash243_queue_entry_t* iter243 = NULL;
+  hash81_queue_entry_t* iter81 = NULL;
+  size_t column = 1;
+
+  char* statement = iota_statement_transaction_find_build(
+      bundles_count, addresses_count, tags_count, approvees_count);
+
+  if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
+                               statement)) != RC_OK) {
+    goto done;
+  }
+
+  if (sqlite3_bind_int(sqlite_statement, column++, !bundles_count) !=
+      SQLITE_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
+  CDL_FOREACH(bundles, iter243) {
+    if (column_compress_bind(sqlite_statement, column++, iter243->hash,
+                             FLEX_TRIT_SIZE_243) != RC_OK) {
+      ret = binding_error();
+      goto done;
+    }
+  }
+
+  if (sqlite3_bind_int(sqlite_statement, column++, !addresses_count) !=
+      SQLITE_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
+  CDL_FOREACH(addresses, iter243) {
+    if (column_compress_bind(sqlite_statement, column++, iter243->hash,
+                             FLEX_TRIT_SIZE_243) != RC_OK) {
+      ret = binding_error();
+      goto done;
+    }
+  }
+
+  if (sqlite3_bind_int(sqlite_statement, column++, !tags_count) != SQLITE_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
+  CDL_FOREACH(tags, iter81) {
+    if (column_compress_bind(sqlite_statement, column++, iter81->hash,
+                             FLEX_TRIT_SIZE_81) != RC_OK) {
+      ret = binding_error();
+      goto done;
+    }
+  }
+
+  if (sqlite3_bind_int(sqlite_statement, column++, !approvees_count) !=
+      SQLITE_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
+  CDL_FOREACH(approvees, iter243) {
+    if (column_compress_bind(sqlite_statement, column, iter243->hash,
+                             FLEX_TRIT_SIZE_243) != RC_OK) {
+      ret = binding_error();
+      goto done;
+    }
+    if (column_compress_bind(sqlite_statement, column + approvees_count,
+                             iter243->hash, FLEX_TRIT_SIZE_243) != RC_OK) {
+      ret = binding_error();
+      goto done;
+    }
+    column++;
+  }
+
+  if ((ret = execute_statement_load_hashes(sqlite_statement, pack)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  finalize_statement(sqlite_statement);
+  free(statement);
   return ret;
 }
 

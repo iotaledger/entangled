@@ -68,7 +68,7 @@ int main(void) {
   node.neighbors = NULL;
   rw_lock_handle_init(&node.neighbors_lock);
   node.conf.requester_queue_size = 100;
-  TEST_ASSERT(requester_init(&node.transaction_requester, &node.conf,
+  TEST_ASSERT(requester_init(&node.transaction_requester, &node,
                              &consensus.tangle) == RC_OK);
   TEST_ASSERT(broadcaster_init(&node.broadcaster, &node) == RC_OK);
   config.db_path = test_db_path;

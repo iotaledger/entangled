@@ -16,6 +16,8 @@
 #include "common/storage/pack.h"
 #include "common/trinary/trit_array.h"
 #include "consensus/snapshot/state_delta.h"
+#include "utils/containers/hash/hash243_queue.h"
+#include "utils/containers/hash/hash81_queue.h"
 
 // Forward declaration
 typedef struct iota_milestone_s iota_milestone_t;
@@ -107,6 +109,13 @@ extern retcode_t iota_stor_transaction_load_hashes_of_milestone_candidates(
 extern retcode_t iota_stor_transaction_approvers_count(
     connection_t const* const conn, flex_trit_t const* const hash,
     size_t* const count);
+
+extern retcode_t iota_stor_transaction_find(connection_t const* const conn,
+                                            hash243_queue_t const bundles,
+                                            hash243_queue_t const addresses,
+                                            hash81_queue_t const tags,
+                                            hash243_queue_t const approvees,
+                                            iota_stor_pack_t* const pack);
 
 /*
  * Milestone operations

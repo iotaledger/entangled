@@ -34,7 +34,7 @@ void test_get_trytes_empty(void) {
   api.conf.max_get_trytes = 100;
 
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(hash8019_queue_count(&res->trytes), 0);
+  TEST_ASSERT_EQUAL_INT(hash8019_queue_count(res->trytes), 0);
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
@@ -54,7 +54,7 @@ void test_get_trytes_not_found(void) {
   TEST_ASSERT(hash243_queue_push(&req->hashes, null_hash) == RC_OK);
 
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(hash243_queue_count(&req->hashes), 1);
+  TEST_ASSERT_EQUAL_INT(hash243_queue_count(req->hashes), 1);
 
   flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION,
                        hash8019_queue_at(&res->trytes, 0),
@@ -133,7 +133,7 @@ void test_get_trytes(void) {
   }
 
   TEST_ASSERT(iota_api_get_trytes(&api, req, res) == RC_OK);
-  TEST_ASSERT_EQUAL_INT(hash243_queue_count(&req->hashes), 4);
+  TEST_ASSERT_EQUAL_INT(hash243_queue_count(req->hashes), 4);
 
   CDL_FOREACH(res->trytes, iter) {
     flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION,
