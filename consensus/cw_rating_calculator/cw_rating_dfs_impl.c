@@ -70,6 +70,7 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
                                  .bitset_relative_index = 0,
                                  .size = bitset_size};
 
+  flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
   HASH_ITER(hh, out->tx_to_approvers, curr_hash_to_approvers_entry,
             tmp_hash_to_approvers_entry) {
     if (curr_hash_to_approvers_entry->idx == 0) {
@@ -77,13 +78,10 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
     }
 
     bitset_reset(&visited_txs_bitset);
-
-    flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
     memcpy(curr_hash, curr_hash_to_approvers_entry->hash, FLEX_TRIT_SIZE_243);
-    res = cw_rating_dfs_do_dfs_light(out->tx_to_approvers, curr_hash,
-                                     &visited_txs_bitset, &sub_tangle_size);
-
-    if (res != RC_OK) {
+    if ((res = cw_rating_dfs_do_dfs_light(out->tx_to_approvers, curr_hash,
+                                          &visited_txs_bitset,
+                                          &sub_tangle_size)) != RC_OK) {
       log_error(CW_RATING_CALCULATOR_LOGGER_ID,
                 "Failed in light DFS, error code is: %" PRIu64 "\n", res);
       return RC_CONSENSUS_CW_FAILED_IN_LIGHT_DFS;
