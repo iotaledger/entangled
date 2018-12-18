@@ -147,6 +147,7 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
     // check if balance is sufficient
     if (out_input->total_balance < threshold) {
       ret_code = RC_CCLIENT_INSUFFICIENT_BALANCE;
+      log_warning(CCLIENT_EXTENDED_LOGGER_ID, "insufficient balance\n");
     }
   }
 
