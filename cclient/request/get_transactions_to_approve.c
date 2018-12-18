@@ -9,12 +9,8 @@
 
 get_transactions_to_approve_req_t* get_transactions_to_approve_req_new() {
   get_transactions_to_approve_req_t* req =
-      (get_transactions_to_approve_req_t*)malloc(
-          sizeof(get_transactions_to_approve_req_t));
-  if (req) {
-    req->reference = NULL;
-  }
-
+      (get_transactions_to_approve_req_t*)calloc(
+          1, sizeof(get_transactions_to_approve_req_t));
   return req;
 }
 
