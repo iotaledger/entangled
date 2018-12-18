@@ -122,7 +122,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
 
     if (transaction_current_index(&transaction) == 0 &&
         memcmp(transaction_address(&transaction),
-               processor->milestone_tracker->coordinator->trits,
+               processor->milestone_tracker->coordinator,
                FLEX_TRIT_SIZE_243) == 0) {
       ret = iota_milestone_tracker_add_candidate(
           processor->milestone_tracker, transaction_hash(&transaction));

@@ -57,7 +57,7 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt,
   flex_trits_from_trits(coo, HASH_LENGTH_TRIT, root, HASH_LENGTH_TRIT,
                         HASH_LENGTH_TRIT);
 
-  if (memcmp(coo, mt->coordinator->trits, FLEX_TRIT_SIZE_243) == 0) {
+  if (memcmp(coo, mt->coordinator, FLEX_TRIT_SIZE_243) == 0) {
     *valid = true;
   }
   return RC_OK;
@@ -191,8 +191,7 @@ static void* milestone_validator(void* arg) {
                      mt->latest_milestone_index, candidate.index,
                      hash243_queue_count(mt->candidates));
             mt->latest_milestone_index = candidate.index;
-            memcpy(mt->latest_milestone->trits, candidate.hash,
-                   FLEX_TRIT_SIZE_243);
+            memcpy(mt->latest_milestone, candidate.hash, FLEX_TRIT_SIZE_243);
           }
         } else if (milestone_status == MILESTONE_INCOMPLETE) {
           iota_milestone_tracker_add_candidate(mt, candidate.hash);
@@ -243,7 +242,7 @@ static retcode_t update_latest_solid_subtangle_milestone(
         return ret;
       } else if (has_snapshot) {
         mt->latest_solid_subtangle_milestone_index = milestone.index;
-        memcpy(mt->latest_solid_subtangle_milestone->trits, milestone.hash,
+        memcpy(mt->latest_solid_subtangle_milestone, milestone.hash,
                FLEX_TRIT_SIZE_243);
       } else {
         break;
@@ -318,34 +317,12 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   mt->transaction_solidifier = ts;
   mt->candidates = NULL;
   rw_lock_handle_init(&mt->candidates_lock);
-  if ((mt->latest_milestone = trit_array_new(NUM_TRITS_HASH)) == NULL) {
-    goto oom;
-  }
-  if ((mt->latest_solid_subtangle_milestone =
-           trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
-    goto oom;
-  }
-  if ((mt->coordinator = trit_array_new(HASH_LENGTH_TRIT)) == NULL) {
-    goto oom;
-  }
-  memcpy(mt->coordinator->trits, conf->coordinator, FLEX_TRIT_SIZE_243);
+  memcpy(mt->coordinator, conf->coordinator, FLEX_TRIT_SIZE_243);
   mt->milestone_start_index = conf->last_milestone;
   mt->latest_milestone_index = conf->last_milestone;
   mt->latest_solid_subtangle_milestone_index = conf->last_milestone;
 
   return RC_OK;
-
-oom:
-  if (mt->latest_milestone) {
-    trit_array_free(mt->latest_milestone);
-  }
-  if (mt->latest_solid_subtangle_milestone) {
-    trit_array_free(mt->latest_solid_subtangle_milestone);
-  }
-  if (mt->coordinator) {
-    trit_array_free(mt->coordinator);
-  }
-  return RC_CONSENSUS_MT_OOM;
 }
 
 retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt) {
@@ -364,8 +341,7 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt) {
   }
   if (pack.num_loaded != 0) {
     mt->latest_milestone_index = latest_milestone.index;
-    memcpy(mt->latest_milestone->trits, latest_milestone.hash,
-           FLEX_TRIT_SIZE_243);
+    memcpy(mt->latest_milestone, latest_milestone.hash, FLEX_TRIT_SIZE_243);
   }
   log_info(MILESTONE_TRACKER_LOGGER_ID, "Latest milestone: #%d\n",
            mt->latest_milestone_index);
@@ -373,7 +349,7 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt) {
   hash_pack_init(&hash_pack, 512);
 
   if ((ret = iota_tangle_transaction_load_hashes_of_milestone_candidates(
-           mt->tangle, &hash_pack, mt->coordinator->trits)) != RC_OK) {
+           mt->tangle, &hash_pack, mt->coordinator)) != RC_OK) {
     log_critical(MILESTONE_TRACKER_LOGGER_ID,
                  "Loading milestone candidates failed\n");
   }
@@ -449,9 +425,6 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt) {
     return RC_CONSENSUS_MT_STILL_RUNNING;
   }
 
-  trit_array_free(mt->latest_milestone);
-  trit_array_free(mt->latest_solid_subtangle_milestone);
-  trit_array_free(mt->coordinator);
   hash243_queue_free(&mt->candidates);
   rw_lock_handle_destroy(&mt->candidates_lock);
   memset(mt, 0, sizeof(milestone_tracker_t));

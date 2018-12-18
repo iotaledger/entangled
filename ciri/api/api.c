@@ -91,14 +91,13 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api,
   char_buffer_allocate(res->app_version, strlen(CIRI_VERSION));
   strcpy(res->app_version->data, CIRI_VERSION);
   memcpy(res->latest_milestone,
-         api->consensus->milestone_tracker.latest_milestone->trits,
+         api->consensus->milestone_tracker.latest_milestone,
          FLEX_TRIT_SIZE_243);
   res->latest_milestone_index =
       api->consensus->milestone_tracker.latest_milestone_index;
-  memcpy(
-      res->latest_solid_subtangle_milestone,
-      api->consensus->milestone_tracker.latest_solid_subtangle_milestone->trits,
-      FLEX_TRIT_SIZE_243);
+  memcpy(res->latest_solid_subtangle_milestone,
+         api->consensus->milestone_tracker.latest_solid_subtangle_milestone,
+         FLEX_TRIT_SIZE_243);
   res->latest_solid_subtangle_milestone_index =
       api->consensus->milestone_tracker.latest_solid_subtangle_milestone_index;
   res->milestone_start_index =
@@ -112,8 +111,7 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api,
   res->transactions_to_request =
       requester_size(&api->node->transaction_requester);
   memcpy(res->coordinator_address,
-         api->consensus->milestone_tracker.coordinator->trits,
-         FLEX_TRIT_SIZE_243);
+         api->consensus->milestone_tracker.coordinator, FLEX_TRIT_SIZE_243);
 
   return RC_OK;
 }

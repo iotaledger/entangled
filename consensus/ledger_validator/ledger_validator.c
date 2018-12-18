@@ -230,8 +230,7 @@ retcode_t iota_consensus_ledger_validator_init(
   lv->milestone_tracker = mt;
 
   if ((ret = build_snapshot(lv, &mt->latest_solid_subtangle_milestone_index,
-                            mt->latest_solid_subtangle_milestone->trits)) !=
-      RC_OK) {
+                            mt->latest_solid_subtangle_milestone)) != RC_OK) {
     log_critical(LEDGER_VALIDATOR_LOGGER_ID, "Building snapshot failed\n");
     return ret;
   }
