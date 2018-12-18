@@ -8,7 +8,6 @@
 #include <unity/unity.h>
 
 #include "ciri/api/api.h"
-#include "ciri/api/tests/defs.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
 #include "gossip/node.h"

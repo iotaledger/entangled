@@ -440,6 +440,10 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api,
     return RC_NULL_PARAM;
   }
 
+  if (invalid_subtangle_status(api)) {
+    return RC_API_INVALID_SUBTANGLE_STATUS;
+  }
+
   return RC_OK;
 }
 
