@@ -40,9 +40,8 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
     tip_selector_t *const tip_selector, size_t const depth,
     flex_trit_t const *const reference, tips_pair_t *const tips) {
   retcode_t ret = RC_OK;
-  flex_trit_t *ep_p;
   flex_trit_t ep_trits[FLEX_TRIT_SIZE_243];
-  ep_p = ep_trits;
+  flex_trit_t *ep_p = ep_trits;
   cw_calc_result rating_results = {.cw_ratings = NULL, .tx_to_approvers = NULL};
   bool consistent = false;
   hash243_stack_t tips_stack = NULL;

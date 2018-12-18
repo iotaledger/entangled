@@ -25,7 +25,7 @@ static retcode_t select_approver(
     flex_trit_t *const approver) {
   hash243_set_entry_t *curr_approver = NULL;
   hash243_set_entry_t *tmp_approver = NULL;
-  hash_to_int_map_entry_t *curr_rating = NULL;
+  hash_to_int_map_entry_t const *curr_rating = NULL;
   size_t num_approvers = hash243_set_size(approvers);
   int64_t weights[num_approvers];
   double sum_weights = 0;
@@ -138,7 +138,7 @@ retcode_t iota_consensus_random_walker_randomize(
   bool ep_is_valid = false;
   bool has_approver_tail = false;
   size_t num_traversed_tails = 1;
-  flex_trit_t *curr_tail_hash = ep;
+  flex_trit_t const *curr_tail_hash = ep;
   flex_trit_t approver_tail_hash[FLEX_TRIT_SIZE_243];
   ret = iota_consensus_exit_prob_transaction_validator_is_valid(
       ep_validator, ep, &ep_is_valid);
