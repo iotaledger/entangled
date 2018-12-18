@@ -382,7 +382,7 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt) {
 
   for (size_t i = 0; i < hash_pack.num_loaded; i++) {
     iota_milestone_tracker_add_candidate(mt,
-                                         ((flex_trit_t*)hash_pack.models)[i]);
+                                         ((flex_trit_t**)hash_pack.models)[i]);
   }
   hash_pack_free(&hash_pack);
 
