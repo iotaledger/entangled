@@ -82,16 +82,24 @@ int main(void) {
       LATEST_SOLID_MILESTONE_INDEX;
   api.consensus->milestone_tracker.milestone_start_index =
       MILESTONE_START_INDEX;
-  TRIT_ARRAY_MAKE_FROM_TRYTES(latest_milestone, HASH_LENGTH_TRYTE,
-                              LATEST_MILESTONE);
-  api.consensus->milestone_tracker.latest_milestone = &latest_milestone;
-  TRIT_ARRAY_MAKE_FROM_TRYTES(latest_solid_milestone, HASH_LENGTH_TRYTE,
-                              LATEST_SOLID_MILESTONE);
-  api.consensus->milestone_tracker.latest_solid_subtangle_milestone =
-      &latest_solid_milestone;
-  TRIT_ARRAY_MAKE_FROM_TRYTES(coordinator, HASH_LENGTH_TRYTE, COORDINATOR);
-  api.consensus->milestone_tracker.coordinator = &coordinator;
+  flex_trit_t latest_milestone_trits[FLEX_TRIT_SIZE_243];
+  flex_trits_from_trytes(latest_milestone_trits, NUM_TRITS_HASH,
+                         LATEST_MILESTONE, HASH_LENGTH_TRYTE,
+                         HASH_LENGTH_TRYTE);
+  memcpy(api.consensus->milestone_tracker.latest_milestone,
+         latest_milestone_trits, FLEX_TRIT_SIZE_243);
+  flex_trit_t latest_solid_milestone_trits[FLEX_TRIT_SIZE_243];
+  flex_trits_from_trytes(latest_solid_milestone_trits, NUM_TRITS_HASH,
+                         LATEST_SOLID_MILESTONE, HASH_LENGTH_TRYTE,
+                         HASH_LENGTH_TRYTE);
+  memcpy(api.consensus->milestone_tracker.latest_solid_subtangle_milestone,
+         latest_solid_milestone_trits, FLEX_TRIT_SIZE_243);
 
+  flex_trit_t coordinator_trits[FLEX_TRIT_SIZE_243];
+  flex_trits_from_trytes(coordinator_trits, NUM_TRITS_HASH, COORDINATOR,
+                         HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+  memcpy(api.consensus->milestone_tracker.coordinator, coordinator_trits,
+         FLEX_TRIT_SIZE_243);
   // Adding neighbors
 
   neighbor_t neighbor;

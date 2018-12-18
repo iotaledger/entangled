@@ -76,9 +76,9 @@ void test_initialized_db_empty_transaction(void) {
 void test_initialized_db_empty_milestone(void) {
   bool exist = false;
 
-  TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
-  memcpy(hash.trits, HASH, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_FIELD_HASH, &hash,
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  memcpy(hash, HASH, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_FIELD_HASH, hash,
                                           &exist) == RC_OK);
   TEST_ASSERT(exist == false);
 }
@@ -96,12 +96,11 @@ void test_stored_transaction(void) {
               RC_SQLITE3_FAILED_STEP);
   bool exist = false;
 
-  TRIT_ARRAY_DECLARE(hash, NUM_TRITS_HASH);
-  memcpy(hash.trits, transaction_hash(test_tx), FLEX_TRIT_SIZE_243);
   TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_FIELD_NONE, NULL,
                                           &exist) == RC_OK);
   TEST_ASSERT(exist == true);
-  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_FIELD_HASH, &hash,
+  TEST_ASSERT(iota_stor_transaction_exist(&conn, TRANSACTION_FIELD_HASH,
+                                          transaction_hash(test_tx),
                                           &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
@@ -119,7 +118,8 @@ void test_stored_transaction(void) {
     pack.models[i] = transaction_new();
   }
 
-  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
+  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH,
+                                         transaction_hash(test_tx),
                                          &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
 
@@ -234,10 +234,9 @@ void test_stored_load_hashes_by_address(void) {
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
   iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
 
-  TRIT_ARRAY_DECLARE(key, NUM_TRITS_HASH);
-  memcpy(key.trits, transaction_address(test_tx), FLEX_TRIT_SIZE_243);
   TEST_ASSERT(iota_stor_transaction_load_hashes(
-                  &conn, TRANSACTION_FIELD_ADDRESS, &key, &pack) == RC_OK);
+                  &conn, TRANSACTION_FIELD_ADDRESS,
+                  transaction_address(test_tx), &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_MEMORY(transaction_hash(test_tx),
                            ((flex_trit_t *)pack.models[0]), FLEX_TRIT_SIZE_243);
@@ -261,10 +260,8 @@ void test_stored_load_hashes_of_approvers(void) {
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
   iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
 
-  TRIT_ARRAY_DECLARE(key, NUM_TRITS_HASH);
-  memcpy(key.trits, transaction_address(test_tx), FLEX_TRIT_SIZE_243);
-  TEST_ASSERT(iota_stor_transaction_load_hashes_of_approvers(&conn, key.trits,
-                                                             &pack) == RC_OK);
+  TEST_ASSERT(iota_stor_transaction_load_hashes_of_approvers(
+                  &conn, transaction_address(test_tx), &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(0, pack.num_loaded);
 
   transaction_free(test_tx);
@@ -277,10 +274,9 @@ void test_transaction_update_snapshot_index(void) {
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
   iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  struct _trit_array hash = {transaction_hash(test_tx), NUM_TRITS_HASH,
-                             FLEX_TRIT_SIZE_243, 0};
 
-  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
+  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH,
+                                         transaction_hash(test_tx),
                                          &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT(iota_stor_transaction_update_snapshot_index(
@@ -339,10 +335,9 @@ void test_transaction_update_solid_state(void) {
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
   iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  struct _trit_array hash = {transaction_hash(test_tx), NUM_TRITS_HASH,
-                             FLEX_TRIT_SIZE_243, 0};
 
-  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH, &hash,
+  TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH,
+                                         transaction_hash(test_tx),
                                          &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT(iota_stor_transaction_update_solid_state(
@@ -362,8 +357,7 @@ void test_transactions_update_solid_states_one_transaction(void) {
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
   iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  struct _trit_array hash = {transaction_hash(test_tx), NUM_TRITS_HASH,
-                             FLEX_TRIT_SIZE_243, 0};
+
   hash243_set_t hashes = NULL;
   hash243_set_add(&hashes, transaction_hash(test_tx));
   TEST_ASSERT(iota_stor_transactions_update_solid_state(&conn, hashes, true) ==
@@ -384,8 +378,6 @@ void test_transactions_update_solid_states_two_transaction(void) {
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
   iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  struct _trit_array hash = {transaction_hash(test_tx), NUM_TRITS_HASH,
-                             FLEX_TRIT_SIZE_243, 0};
 
   struct _iota_transaction second_test_transaction = *test_tx;
   // Make them distinguishable
@@ -408,14 +400,14 @@ void test_transactions_update_solid_states_two_transaction(void) {
   TEST_ASSERT(iota_stor_transactions_update_solid_state(&conn, hashes, true) ==
               RC_OK);
   hash_pack_reset(&pack);
-  TEST_ASSERT(iota_stor_transaction_load_metadata(&conn, hash.trits, &pack) ==
-              RC_OK);
+  TEST_ASSERT(iota_stor_transaction_load_metadata(
+                  &conn, transaction_hash(test_tx), &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT(transaction_solid(&tx));
 
   hash_pack_reset(&pack);
-  hash.trits = transaction_hash(&second_test_transaction);
-  TEST_ASSERT(iota_stor_transaction_load_metadata(&conn, hash.trits, &pack) ==
+  TEST_ASSERT(iota_stor_transaction_load_metadata(
+                  &conn, transaction_hash(&second_test_transaction), &pack) ==
               RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT(transaction_solid(&tx));

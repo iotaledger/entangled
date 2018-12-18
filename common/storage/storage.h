@@ -14,7 +14,7 @@
 #include "common/storage/connection.h"
 #include "common/storage/defs.h"
 #include "common/storage/pack.h"
-#include "common/trinary/trit_array.h"
+#include "common/trinary/flex_trit.h"
 #include "consensus/snapshot/state_delta.h"
 #include "utils/containers/hash/hash243_queue.h"
 #include "utils/containers/hash/hash81_queue.h"
@@ -50,7 +50,7 @@ extern retcode_t iota_stor_transaction_store(connection_t const* const conn,
 
 extern retcode_t iota_stor_transaction_load(connection_t const* const conn,
                                             transaction_field_t const field,
-                                            trit_array_t const* const key,
+                                            flex_trit_t const* const key,
                                             iota_stor_pack_t* const pack);
 
 extern retcode_t iota_stor_transaction_load_essence_attachment_and_metadata(
@@ -67,7 +67,7 @@ extern retcode_t iota_stor_transaction_load_metadata(
 
 extern retcode_t iota_stor_transaction_exist(connection_t const* const conn,
                                              transaction_field_t const field,
-                                             trit_array_t const* const key,
+                                             flex_trit_t const* const key,
                                              bool* const exist);
 
 extern retcode_t iota_stor_transaction_update_snapshot_index(
@@ -88,7 +88,7 @@ extern retcode_t iota_stor_transactions_update_solid_state(
 
 extern retcode_t iota_stor_transaction_load_hashes(
     connection_t const* const conn, transaction_field_t const field,
-    trit_array_t const* const key, iota_stor_pack_t* const pack);
+    flex_trit_t const* const key, iota_stor_pack_t* const pack);
 
 extern retcode_t iota_stor_transaction_load_hashes_of_approvers(
     connection_t const* const conn, flex_trit_t const* const approvee_hash,

@@ -99,10 +99,12 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
   }
 
   bool is_milestone = rand_handle_probability() < node->conf.p_select_milestone;
+
   if ((ret = get_transaction_to_request(&node->transaction_requester, request,
                                         is_milestone)) != RC_OK) {
     return ret;
   }
+
   if ((ret = iota_packet_set_request(
            &packet, request, node->conf.request_hash_size_trit)) != RC_OK) {
     return ret;

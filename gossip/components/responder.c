@@ -32,7 +32,7 @@
  */
 static retcode_t get_transaction_for_request(responder_t const *const responder,
                                              neighbor_t *const neighbor,
-                                             trit_array_t const *const hash,
+                                             flex_trit_t const *const hash,
                                              iota_stor_pack_t *const pack) {
   retcode_t ret = RC_OK;
 
@@ -41,12 +41,8 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
   }
 
   // If the hash is null, a random tip was requested
-  if (flex_trits_are_null(hash->trits, FLEX_TRIT_SIZE_243)) {
+  if (flex_trits_are_null(hash, FLEX_TRIT_SIZE_243)) {
     flex_trit_t tip[FLEX_TRIT_SIZE_243];
-    trit_array_t const key = {.trits = tip,
-                              .num_trits = HASH_LENGTH_TRIT,
-                              .num_bytes = FLEX_TRIT_SIZE_243,
-                              .dynamic = 0};
 
     log_debug(RESPONDER_LOGGER_ID, "Responding to random tip request\n");
     if (rand_handle_probability() < responder->node->conf.p_reply_random_tip &&
@@ -56,7 +52,7 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
         return ret;
       }
       if ((ret = iota_tangle_transaction_load(
-               responder->tangle, TRANSACTION_FIELD_HASH, &key, pack)) !=
+               responder->tangle, TRANSACTION_FIELD_HASH, tip, pack)) !=
               RC_OK ||
           pack->num_loaded == 0) {
         return ret;
@@ -137,10 +133,6 @@ static void *responder_routine(responder_t *const responder) {
   transaction_request_t *request_ptr = NULL;
   transaction_request_t request;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  trit_array_t hash = {.trits = NULL,
-                       .num_trits = HASH_LENGTH_TRIT,
-                       .num_bytes = FLEX_TRIT_SIZE_243,
-                       .dynamic = 0};
 
   if (responder == NULL) {
     return NULL;
@@ -168,8 +160,7 @@ static void *responder_routine(responder_t *const responder) {
 
     log_debug(RESPONDER_LOGGER_ID, "Responding to request\n");
     hash_pack_reset(&pack);
-    hash.trits = request.hash;
-    if (get_transaction_for_request(responder, request.neighbor, &hash,
+    if (get_transaction_for_request(responder, request.neighbor, request.hash,
                                     &pack) != RC_OK) {
       log_warning(RESPONDER_LOGGER_ID,
                   "Getting transaction for request failed\n");

@@ -14,7 +14,7 @@
 #include "utils/logger_helper.h"
 
 static retcode_t cw_rating_dfs_do_dfs_from_db(
-    const cw_rating_calculator_t *const cw_calc, trit_array_p entry_point,
+    const cw_rating_calculator_t *const cw_calc, flex_trit_t *entry_point,
     hash_to_indexed_hash_set_map_t *tx_to_approvers, size_t *subtangle_size);
 
 static retcode_t cw_rating_dfs_do_dfs_light(
@@ -26,7 +26,7 @@ void init_cw_calculator_dfs(cw_rating_calculator_base_t *calculator) {
 }
 
 retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
-                                  trit_array_p entry_point,
+                                  flex_trit_t *entry_point,
                                   cw_calc_result *out) {
   retcode_t res;
 
@@ -52,7 +52,7 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
   }
 
   // Insert first "ratings" entry
-  if ((res = hash_int_map_add(&out->cw_ratings, entry_point->trits,
+  if ((res = hash_int_map_add(&out->cw_ratings, entry_point,
                               max_subtangle_size))) {
     log_error(CW_RATING_CALCULATOR_LOGGER_ID,
               "Failed adding entrypoint into map\n");
@@ -101,7 +101,7 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
 }
 
 static retcode_t cw_rating_dfs_do_dfs_from_db(
-    const cw_rating_calculator_t *const cw_calc, trit_array_p entry_point,
+    const cw_rating_calculator_t *const cw_calc, flex_trit_t *entry_point,
     hash_to_indexed_hash_set_map_t *tx_to_approvers, size_t *subtangle_size) {
   hash_to_indexed_hash_set_entry_t *curr_tx = NULL;
   size_t curr_approver_index;
@@ -114,7 +114,7 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
   }
 
   hash243_stack_t stack = NULL;
-  if ((res = hash243_stack_push(&stack, entry_point->trits))) {
+  if ((res = hash243_stack_push(&stack, entry_point))) {
     return res;
   }
 
