@@ -30,7 +30,7 @@ extern "C" {
 extern retcode_t iota_stor_init(connection_t const* const conn,
                                 connection_config_t const* const config);
 
-extern retcode_t iota_stor_destroy(connection_t const* const conn);
+extern retcode_t iota_stor_destroy(connection_t* const conn);
 
 /*
  * Transaction operations

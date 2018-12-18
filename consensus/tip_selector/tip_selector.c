@@ -38,7 +38,7 @@ retcode_t iota_consensus_tip_selector_init(
 
 retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
     tip_selector_t *const tip_selector, size_t const depth,
-    trit_array_t const *const reference, tips_pair *const tips) {
+    flex_trit_t const *const reference, tips_pair_t *const tips) {
   retcode_t ret = RC_OK;
   flex_trit_t ep_trits[FLEX_TRIT_SIZE_243];
   trit_array_t ep = {.trits = ep_trits,
@@ -74,17 +74,17 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
               "Getting trunk tip failed with error %" PRIu64 "\n", ret);
     goto done;
   }
-  if ((ret = hash243_stack_push(&tips_stack, tips->trunk->trits)) != RC_OK) {
+  if ((ret = hash243_stack_push(&tips_stack, tips->trunk)) != RC_OK) {
     goto done;
   }
 
-  if (reference != NULL && reference->trits != NULL) {
-    if (!hash_int_map_contains(&rating_results.cw_ratings, reference->trits)) {
+  if (reference != NULL) {
+    if (!hash_int_map_contains(&rating_results.cw_ratings, reference)) {
       log_warning(TIP_SELECTOR_LOGGER_ID, "Reference is too old\n");
       ret = RC_TIP_SELECTOR_REFERENCE_TOO_OLD;
       goto done;
     }
-    ep.trits = reference->trits;
+    ep.trits = (flex_trit_t *)reference;
   }
 
   if ((ret = iota_consensus_exit_probability_randomize(
@@ -94,7 +94,7 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
               "Getting branch tip failed with error %" PRIu64 "\n", ret);
     goto done;
   }
-  if ((ret = hash243_stack_push(&tips_stack, tips->branch->trits)) != RC_OK) {
+  if ((ret = hash243_stack_push(&tips_stack, tips->branch)) != RC_OK) {
     goto done;
   }
 

@@ -27,7 +27,7 @@ retcode_t iota_stor_init(connection_t const* const conn,
   return init_connection(conn, config);
 }
 
-retcode_t iota_stor_destroy(connection_t const* const conn) {
+retcode_t iota_stor_destroy(connection_t* const conn) {
   logger_helper_destroy(SQLITE3_LOGGER_ID);
   return destroy_connection(conn);
 }
@@ -122,12 +122,6 @@ static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
                                                   iota_transaction_t const tx);
 static void
 select_transactions_populate_from_row_essence_attachment_and_metadata(
-    sqlite3_stmt* const statement, iota_transaction_t const tx);
-
-static void select_transactions_populate_from_row_essence_and_consensus(
-    sqlite3_stmt* const statement, iota_transaction_t const tx);
-
-static void select_transactions_populate_from_row_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx);
 
 static void select_transactions_populate_from_row_essence_and_consensus(
