@@ -93,7 +93,6 @@ static retcode_t random_walker_select_approver_tail(
     flex_trit_t *const approver, bool *const has_approver_tail) {
   retcode_t ret = RC_OK;
   hash_to_indexed_hash_set_entry_t *approvers_entry = NULL;
-  hash243_set_entry_t *approver_entry = NULL;
 
   *has_approver_tail = false;
   if (!hash_to_indexed_hash_set_map_find(&cw_result->tx_to_approvers,
@@ -108,18 +107,15 @@ static retcode_t random_walker_select_approver_tail(
       *has_approver_tail = false;
       return ret;
     }
-    HASH_FIND(hh, approvers_entry->approvers, approver, FLEX_TRIT_SIZE_243,
-              approver_entry);
-    ret = find_tail_if_valid(exit_probability_randomizer, epv, approver,
-                             has_approver_tail);
-    if (ret != RC_OK) {
-      *has_approver_tail = false;
+
+    if ((ret = find_tail_if_valid(exit_probability_randomizer, epv, approver,
+                                  has_approver_tail)) != RC_OK) {
       return ret;
     }
     if (!(*has_approver_tail)) {
       // if next tail is not valid, re-select while removing it from
       // approvers set
-      HASH_DEL(approvers_entry->approvers, approver_entry);
+      hash243_set_remove(&approvers_entry->approvers, approver);
     }
   }
   return ret;
