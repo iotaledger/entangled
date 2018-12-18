@@ -20,6 +20,8 @@ retcode_t iota_consensus_exit_prob_transaction_validator_init(
   epv->tangle = tangle;
   epv->mt = mt;
   epv->lv = lv;
+  epv->delta = NULL;
+  epv->analyzed_hashes = NULL;
   epv->max_depth_ok_memoization = NULL;
   return RC_OK;
 }
