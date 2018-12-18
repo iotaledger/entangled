@@ -36,6 +36,15 @@ cc_test(
 )
 
 cc_test(
+    name = "test_check_consistency",
+    srcs = ["test_check_consistency.c"],
+    deps = [
+        "//ciri/api",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_find_transactions",
     srcs = ["test_find_transactions.c"],
     data = [":db_file"],
