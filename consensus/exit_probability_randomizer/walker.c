@@ -132,16 +132,17 @@ void iota_consensus_random_walker_init(ep_randomizer_t *const randomizer) {
 retcode_t iota_consensus_random_walker_randomize(
     ep_randomizer_t const *const exit_probability_randomizer,
     exit_prob_transaction_validator_t *const ep_validator,
-    cw_calc_result *const cw_result, trit_array_t const *const ep,
-    flex_trit_t *const tip) {
+    cw_calc_result *const cw_result, flex_trit_t const *const ep,
+    flex_trit_t *tip) {
+
   retcode_t ret = RC_OK;
   bool ep_is_valid = false;
   bool has_approver_tail = false;
   size_t num_traversed_tails = 1;
-  flex_trit_t *curr_tail_hash = ep->trits;
+  flex_trit_t *curr_tail_hash = ep;
   flex_trit_t approver_tail_hash[FLEX_TRIT_SIZE_243];
   ret = iota_consensus_exit_prob_transaction_validator_is_valid(
-      ep_validator, ep->trits, &ep_is_valid);
+      ep_validator, ep, &ep_is_valid);
   if (ret != RC_OK) {
     log_error(RANDOM_WALKER_LOGGER_ID,
               "Entry point validation failed: %" PRIu64 "\n", ret);

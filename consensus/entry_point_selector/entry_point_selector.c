@@ -27,7 +27,7 @@ retcode_t iota_consensus_entry_point_selector_init(
 
 retcode_t iota_consensus_entry_point_selector_get_entry_point(
     entry_point_selector_t *const eps, size_t const depth,
-    trit_array_p const ep) {
+    flex_trit_t *const ep) {
   retcode_t ret = RC_OK;
   uint64_t milestone_index = MAX(
       (int64_t)eps->mt->latest_solid_subtangle_milestone_index - depth - 1, 0);
@@ -42,9 +42,9 @@ retcode_t iota_consensus_entry_point_selector_get_entry_point(
   }
 
   if (pack.num_loaded != 0) {
-    memcpy(ep->trits, milestone.hash, FLEX_TRIT_SIZE_243);
+    memcpy(ep, milestone.hash, FLEX_TRIT_SIZE_243);
   } else {
-    memcpy(ep->trits, eps->mt->latest_solid_subtangle_milestone->trits,
+    memcpy(ep, eps->mt->latest_solid_subtangle_milestone->trits,
            FLEX_TRIT_SIZE_243);
   }
 

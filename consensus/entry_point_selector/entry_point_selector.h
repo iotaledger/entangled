@@ -11,11 +11,11 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
+#include "consensus/ledger_validator/ledger_validator.h"
 
 // Forward declarations
 typedef struct milestone_tracker_s milestone_tracker_t;
 typedef struct tangle_s tangle_t;
-typedef struct _trit_array *trit_array_p;
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,7 +52,7 @@ retcode_t iota_consensus_entry_point_selector_init(
  */
 retcode_t iota_consensus_entry_point_selector_get_entry_point(
     entry_point_selector_t *const eps, size_t const depth,
-    trit_array_p const ep);
+    flex_trit_t *const ep);
 
 /**
  * Destroys an entry point selector

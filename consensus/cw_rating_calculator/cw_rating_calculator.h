@@ -14,7 +14,7 @@
 #include "uthash.h"
 
 #include "common/errors.h"
-#include "common/trinary/trit_array.h"
+#include "common/trinary/flex_trit.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/hash_maps.h"
 
@@ -45,7 +45,7 @@ typedef struct cw_calc_result {
 typedef struct {
   // find_transactions_request
   retcode_t (*cw_rating_calculate)(const cw_rating_calculator_t *const,
-                                   trit_array_p entry_point,
+                                   flex_trit_t *entry_point,
                                    cw_calc_result *result);
 
 } cw_calculator_vtable;
@@ -67,7 +67,7 @@ extern retcode_t iota_consensus_cw_rating_destroy(
     cw_rating_calculator_t *cw_calc);
 
 extern retcode_t iota_consensus_cw_rating_calculate(
-    const cw_rating_calculator_t *cw_calc, trit_array_p entry_point,
+    const cw_rating_calculator_t *cw_calc, flex_trit_t const *entry_point,
     cw_calc_result *out);
 
 extern void cw_calc_result_destroy(cw_calc_result *const calc_result);

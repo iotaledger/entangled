@@ -28,7 +28,7 @@ retcode_t iota_consensus_cw_rating_destroy(cw_rating_calculator_t *cw_calc) {
 }
 
 retcode_t iota_consensus_cw_rating_calculate(
-    const cw_rating_calculator_t *calculator, trit_array_p entry_point,
+    const cw_rating_calculator_t *calculator, flex_trit_t const *entry_point,
     cw_calc_result *out) {
   if (calculator->base.vtable.cw_rating_calculate == NULL) {
     log_error(CW_RATING_CALCULATOR_LOGGER_ID, "Vtable is not initialized\n");
