@@ -389,10 +389,6 @@ retcode_t iota_api_store_transactions(
   retcode_t ret = RC_OK;
   flex_trit_t *elt = NULL;
   struct _iota_transaction tx;
-  trit_array_t hash = {.trits = NULL,
-                       .num_trits = HASH_LENGTH_TRIT,
-                       .num_bytes = FLEX_TRIT_SIZE_243,
-                       .dynamic = 0};
   bool exists;
 
   if (api == NULL || req == NULL) {
