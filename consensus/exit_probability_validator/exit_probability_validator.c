@@ -41,12 +41,12 @@ retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
 
 retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
     exit_prob_transaction_validator_t *const epv,
-    trit_array_t const *const tail_hash, bool *const is_valid) {
+    flex_trit_t const *const tail_hash, bool *const is_valid) {
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(tx, tx_models, tx_pack);
 
   ret = iota_tangle_transaction_load_partial(
-      epv->tangle, tail_hash->trits, &tx_pack,
+      epv->tangle, tail_hash, &tx_pack,
       PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA);
   if (ret != RC_OK) {
     *is_valid = false;
@@ -68,7 +68,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
   }
 
   ret = iota_consensus_ledger_validator_update_delta(
-      epv->lv, &epv->analyzed_hashes, &epv->delta, tail_hash->trits, is_valid);
+      epv->lv, &epv->analyzed_hashes, &epv->delta, tail_hash, is_valid);
   if (ret != RC_OK) {
     *is_valid = false;
     return ret;
@@ -103,13 +103,12 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
 }
 
 retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
-    exit_prob_transaction_validator_t *epv, trit_array_t const *const tail_hash,
+    exit_prob_transaction_validator_t *epv, flex_trit_t const *const tail_hash,
     uint32_t lowest_allowed_depth, bool *below_max_depth) {
   retcode_t res = RC_OK;
 
   hash243_stack_t non_analyzed_hashes = NULL;
-  if ((res = hash243_stack_push(&non_analyzed_hashes, tail_hash->trits)) !=
-      RC_OK) {
+  if ((res = hash243_stack_push(&non_analyzed_hashes, tail_hash)) != RC_OK) {
     return res;
   }
 
@@ -164,8 +163,8 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
 
   hash243_stack_free(&non_analyzed_hashes);
   hash243_set_free(&visited_hashes);
-  if ((res = hash243_set_add(&epv->max_depth_ok_memoization,
-                             tail_hash->trits)) != RC_OK) {
+  if ((res = hash243_set_add(&epv->max_depth_ok_memoization, tail_hash)) !=
+      RC_OK) {
     return res;
   }
 

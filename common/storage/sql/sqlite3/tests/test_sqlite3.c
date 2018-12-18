@@ -219,11 +219,14 @@ void test_stored_milestone(void) {
 }
 
 void test_stored_load_hashes_by_address(void) {
-  trit_array_p hashes[5];
+  flex_trit_t *hashes[5];
   iota_stor_pack_t pack = {.models = (void **)hashes,
                            .capacity = 5,
                            .num_loaded = 0,
                            .insufficient_capacity = false};
+  for (size_t i = 0; i < 5; ++i) {
+    hashes[i] = malloc(FLEX_TRIT_SIZE_243);
+  }
 
   flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
@@ -231,36 +234,26 @@ void test_stored_load_hashes_by_address(void) {
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
   iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
 
-  for (int i = 0; i < pack.capacity; ++i) {
-    pack.models[i] = trit_array_new(NUM_TRITS_ADDRESS);
-  }
-  pack.capacity = 5;
   TRIT_ARRAY_DECLARE(key, NUM_TRITS_HASH);
   memcpy(key.trits, transaction_address(test_tx), FLEX_TRIT_SIZE_243);
   TEST_ASSERT(iota_stor_transaction_load_hashes(
                   &conn, TRANSACTION_FIELD_ADDRESS, &key, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT_EQUAL_MEMORY(transaction_hash(test_tx),
-                           ((trit_array_p)pack.models[0])->trits,
-                           FLEX_TRIT_SIZE_243);
+                           ((flex_trit_t *)pack.models[0]), FLEX_TRIT_SIZE_243);
 
-  for (int i = 0; i < pack.capacity; ++i) {
-    trit_array_free(pack.models[i]);
+  for (size_t i = 0; i < 5; ++i) {
+    free(hashes[i]);
   }
-
   transaction_free(test_tx);
 }
 
 void test_stored_load_hashes_of_approvers(void) {
-  trit_array_p hashes[5];
+  flex_trit_t hashes[5][FLEX_TRIT_SIZE_243];
   iota_stor_pack_t pack = {.models = (void **)hashes,
                            .capacity = 5,
                            .num_loaded = 0,
                            .insufficient_capacity = false};
-
-  for (int i = 0; i < pack.capacity; ++i) {
-    pack.models[i] = trit_array_new(NUM_TRITS_HASH);
-  }
 
   flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
@@ -273,10 +266,6 @@ void test_stored_load_hashes_of_approvers(void) {
   TEST_ASSERT(iota_stor_transaction_load_hashes_of_approvers(&conn, key.trits,
                                                              &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(0, pack.num_loaded);
-
-  for (int i = 0; i < pack.capacity; ++i) {
-    trit_array_free(pack.models[i]);
-  }
 
   transaction_free(test_tx);
 }

@@ -22,11 +22,11 @@
 static retcode_t select_approver(
     ep_randomizer_t const *const exit_probability_randomizer,
     hash_int_map_t const cw_ratings, hash243_set_t const *const approvers,
-    trit_array_t *const approver) {
+    flex_trit_t *const approver) {
   hash243_set_entry_t *curr_approver = NULL;
   hash243_set_entry_t *tmp_approver = NULL;
   hash_to_int_map_entry_t *curr_rating = NULL;
-  size_t num_approvers = HASH_COUNT(*approvers);
+  size_t num_approvers = hash243_set_size(approvers);
   int64_t weights[num_approvers];
   double sum_weights = 0;
   double target = 0;
@@ -34,9 +34,7 @@ static retcode_t select_approver(
   size_t idx = 0;
 
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
-    HASH_FIND(hh, cw_ratings, curr_approver->hash, FLEX_TRIT_SIZE_243,
-              curr_rating);
-    if (curr_rating == NULL) {
+    if (!hash_int_map_find(&cw_ratings, curr_approver->hash, &curr_rating)) {
       log_error(RANDOM_WALKER_LOGGER_ID, "No rating found for approver\n");
       return RC_CONSENSUS_EXIT_PROBABILITIES_MISSING_RATING;
     }
@@ -54,7 +52,7 @@ static retcode_t select_approver(
   target = rand_handle_probability() * sum_weights;
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
     if ((target = (target - weights[idx++])) <= 0) {
-      memcpy(approver->trits, curr_approver->hash, FLEX_TRIT_SIZE_243);
+      memcpy(approver, curr_approver->hash, FLEX_TRIT_SIZE_243);
       break;
     }
   }
@@ -64,7 +62,7 @@ static retcode_t select_approver(
 
 static retcode_t find_tail_if_valid(
     ep_randomizer_t const *const exit_probability_randomizer,
-    exit_prob_transaction_validator_t *const epv, trit_array_t *const tx_hash,
+    exit_prob_transaction_validator_t *const epv, flex_trit_t *const tx_hash,
     bool *const has_valid_tail) {
   retcode_t ret = RC_OK;
 
@@ -92,16 +90,13 @@ static retcode_t random_walker_select_approver_tail(
     ep_randomizer_t const *const exit_probability_randomizer,
     exit_prob_transaction_validator_t *const epv,
     cw_calc_result *const cw_result, flex_trit_t const *const curr_tail_hash,
-    trit_array_t *const approver, bool *const has_approver_tail) {
+    flex_trit_t *const approver, bool *const has_approver_tail) {
   retcode_t ret = RC_OK;
   hash_to_indexed_hash_set_entry_t *approvers_entry = NULL;
-  hash243_set_entry_t *approver_entry = NULL;
 
   *has_approver_tail = false;
-
-  HASH_FIND(hh, cw_result->tx_to_approvers, curr_tail_hash, FLEX_TRIT_SIZE_243,
-            approvers_entry);
-  if (!approvers_entry) {
+  if (!hash_to_indexed_hash_set_map_find(&cw_result->tx_to_approvers,
+                                         curr_tail_hash, &approvers_entry)) {
     return RC_OK;
   }
 
@@ -112,18 +107,15 @@ static retcode_t random_walker_select_approver_tail(
       *has_approver_tail = false;
       return ret;
     }
-    HASH_FIND(hh, approvers_entry->approvers, approver->trits,
-              FLEX_TRIT_SIZE_243, approver_entry);
-    ret = find_tail_if_valid(exit_probability_randomizer, epv, approver,
-                             has_approver_tail);
-    if (ret != RC_OK) {
-      *has_approver_tail = false;
+
+    if ((ret = find_tail_if_valid(exit_probability_randomizer, epv, approver,
+                                  has_approver_tail)) != RC_OK) {
       return ret;
     }
     if (!(*has_approver_tail)) {
       // if next tail is not valid, re-select while removing it from
       // approvers set
-      HASH_DEL(approvers_entry->approvers, approver_entry);
+      hash243_set_remove(&approvers_entry->approvers, approver);
     }
   }
   return ret;
@@ -148,13 +140,8 @@ retcode_t iota_consensus_random_walker_randomize(
   size_t num_traversed_tails = 1;
   flex_trit_t *curr_tail_hash = ep->trits;
   flex_trit_t approver_tail_hash[FLEX_TRIT_SIZE_243];
-  trit_array_t approver_tail = {.trits = approver_tail_hash,
-                                .num_trits = HASH_LENGTH_TRIT,
-                                .num_bytes = FLEX_TRIT_SIZE_243,
-                                .dynamic = 0};
-
   ret = iota_consensus_exit_prob_transaction_validator_is_valid(
-      ep_validator, ep, &ep_is_valid);
+      ep_validator, ep->trits, &ep_is_valid);
   if (ret != RC_OK) {
     log_error(RANDOM_WALKER_LOGGER_ID,
               "Entry point validation failed: %" PRIu64 "\n", ret);
@@ -167,7 +154,7 @@ retcode_t iota_consensus_random_walker_randomize(
   do {
     ret = random_walker_select_approver_tail(
         exit_probability_randomizer, ep_validator, cw_result, curr_tail_hash,
-        &approver_tail, &has_approver_tail);
+        approver_tail_hash, &has_approver_tail);
     if (ret != RC_OK) {
       log_error(RANDOM_WALKER_LOGGER_ID,
                 "Selecting approver tail failed: %" PRIu64 "\n", ret);

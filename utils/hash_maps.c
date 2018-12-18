@@ -49,6 +49,20 @@ void hash_int_map_free(hash_int_map_t *const map) {
   *map = NULL;
 }
 
+bool hash_int_map_find(hash_int_map_t const *const map,
+                       flex_trit_t const *const hash,
+                       hash_to_int_map_entry_t const **res) {
+  if (map == NULL || *map == NULL) {
+    return false;
+  }
+  if (res == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  HASH_FIND(hh, *map, hash, FLEX_TRIT_SIZE_243, *res);
+  return *res != NULL;
+}
+
 /*
  * Hash-indexed_hash_set map
  */
@@ -64,6 +78,20 @@ bool hash_to_indexed_hash_set_map_contains(
 
   HASH_FIND(hh, *map, hash, FLEX_TRIT_SIZE_243, entry);
   return entry != NULL;
+}
+
+bool hash_to_indexed_hash_set_map_find(
+    hash_to_indexed_hash_set_map_t const *const map,
+    flex_trit_t const *const hash,
+    hash_to_indexed_hash_set_entry_t const **res) {
+  if (map == NULL || (*map) == NULL) {
+    return false;
+  }
+  if (res == NULL) {
+    return RC_NULL_PARAM;
+  }
+  HASH_FIND(hh, *map, hash, FLEX_TRIT_SIZE_243, *res);
+  return *res != NULL;
 }
 
 retcode_t hash_to_indexed_hash_set_map_add_new_set(

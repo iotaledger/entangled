@@ -273,8 +273,8 @@ retcode_t iota_tangle_milestone_exist(tangle_t const *const tangle,
  */
 
 retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
-                                trit_array_t const *const tx_hash,
-                                trit_array_t *const tail,
+                                flex_trit_t const *const tx_hash,
+                                flex_trit_t *const tail,
                                 bool *const found_tail) {
   retcode_t res = RC_OK;
   struct _iota_transaction next_tx_s;
@@ -286,7 +286,7 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
   *found_tail = false;
 
   res = iota_tangle_transaction_load_partial(
-      tangle, tx_hash->trits, &tx_pack, PARTIAL_TX_MODEL_ESSENCE_CONSENSUS);
+      tangle, tx_hash, &tx_pack, PARTIAL_TX_MODEL_ESSENCE_CONSENSUS);
   if (res != RC_OK || tx_pack.num_loaded == 0) {
     return res;
   }
@@ -303,13 +303,8 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
          memcmp(transaction_bundle(curr_tx), bundle_hash, FLEX_TRIT_SIZE_243) ==
              0) {
     hash_pack_reset(&hash_pack);
-    res = iota_tangle_transaction_load_hashes_of_approvers(
-        tangle, transaction_hash(curr_tx), &hash_pack);
-
-    if (res != RC_OK) {
-      log_error(TANGLE_LOGGER_ID,
-                "Failed in loading approvers, error code is: %" PRIu64 "\n",
-                res);
+    if ((res = iota_tangle_transaction_load_hashes_of_approvers(
+             tangle, transaction_hash(curr_tx), &hash_pack)) != RC_OK) {
       break;
     }
 
@@ -317,13 +312,12 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
     uint32_t approver_idx = 0;
     found_approver = false;
     while (approver_idx < hash_pack.num_loaded) {
-      trit_array_p approver_hash =
-          (trit_array_t *)hash_pack.models[approver_idx];
+      flex_trit_t *approver_hash =
+          (flex_trit_t *)hash_pack.models[approver_idx];
       tx_pack.models = (void **)(&next_tx);
       hash_pack_reset(&tx_pack);
       res = iota_tangle_transaction_load_partial(
-          tangle, approver_hash->trits, &tx_pack,
-          PARTIAL_TX_MODEL_ESSENCE_CONSENSUS);
+          tangle, approver_hash, &tx_pack, PARTIAL_TX_MODEL_ESSENCE_CONSENSUS);
       if (res != RC_OK || tx_pack.num_loaded == 0) {
         break;
       }
@@ -342,7 +336,7 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
   }
 
   if (transaction_current_index(curr_tx) == 0) {
-    memcpy(tail->trits, transaction_hash(curr_tx), FLEX_TRIT_SIZE_243);
+    memcpy(tail, transaction_hash(curr_tx), FLEX_TRIT_SIZE_243);
     *found_tail = true;
   }
 

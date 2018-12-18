@@ -95,8 +95,7 @@ static retcode_t propagate_solid_transactions(
     }
     for (approver_index = 0; approver_index < hash_pack.num_loaded;
          ++approver_index) {
-      curr_approver_hash =
-          ((trit_array_t *)hash_pack.models[approver_index])->trits;
+      curr_approver_hash = ((flex_trit_t *)hash_pack.models[approver_index]);
       if ((ret =
                iota_consensus_transaction_solidifier_check_and_update_solid_state(
                    ts, curr_approver_hash)) != RC_OK) {

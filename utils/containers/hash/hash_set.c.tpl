@@ -71,6 +71,21 @@ bool hash{SIZE}_set_contains(hash{SIZE}_set_t const *const set,
   return entry != NULL;
 }
 
+bool hash{SIZE}_set_find(hash{SIZE}_set_t const *const set,
+        flex_trit_t const *const hash, hash{SIZE}_set_entry_t const ** entry){
+if (*set == NULL) {
+return false;
+}
+
+if (entry == NULL){
+  return RC_NULL_PARAM;
+}
+
+HASH_FIND(hh, *set, hash, FLEX_TRIT_SIZE_{SIZE}, *entry);
+return *entry != NULL;
+
+}
+
 void hash{SIZE}_set_free(hash{SIZE}_set_t *const set) {
   hash{SIZE}_set_entry_t *iter = NULL, *tmp = NULL;
 

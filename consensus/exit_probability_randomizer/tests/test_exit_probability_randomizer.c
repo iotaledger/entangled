@@ -142,8 +142,6 @@ void test_cw_gen_topology(test_tangle_topology topology) {
 
   trit_array_p ep = trit_array_new(NUM_TRITS_HASH);
   trit_array_set_trits(ep, transaction_hash(tx), NUM_TRITS_HASH);
-  iota_stor_pack_t pack;
-  hash_pack_init(&pack, num_approvers);
 
   cw_calc_result out;
   trit_array_p curr_hash = trit_array_new(NUM_TRITS_HASH);
@@ -226,8 +224,6 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
 
   /// Exit Probabilities - end
-
-  hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
   trit_array_free(ep);
   trit_array_free(curr_hash);
