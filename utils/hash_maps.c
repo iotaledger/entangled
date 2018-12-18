@@ -52,7 +52,7 @@ void hash_int_map_free(hash_int_map_t *const map) {
 bool hash_int_map_find(hash_int_map_t const *const map,
                        flex_trit_t const *const hash,
                        hash_to_int_map_entry_t const **res) {
-  if (*map == NULL) {
+  if (map == NULL || *map == NULL) {
     return false;
   }
   if (res == NULL) {
@@ -84,7 +84,7 @@ bool hash_to_indexed_hash_set_map_find(
     hash_to_indexed_hash_set_map_t const *const map,
     flex_trit_t const *const hash,
     hash_to_indexed_hash_set_entry_t const **res) {
-  if (!(*map)) {
+  if (map == NULL || (*map) == NULL) {
     return false;
   }
   if (res == NULL) {
