@@ -704,12 +704,12 @@ void test_serialize_check_consistency(void) {
   TEST_ASSERT(flex_trits_from_trytes(trits_243, NUM_TRITS_HASH,
                                      (const tryte_t*)TEST_81_TRYTES_1,
                                      NUM_TRYTES_HASH, NUM_TRYTES_HASH));
-  TEST_ASSERT(hash243_queue_push(&req->hashes, trits_243) == RC_OK);
+  TEST_ASSERT(hash243_queue_push(&req->tails, trits_243) == RC_OK);
 
   TEST_ASSERT(flex_trits_from_trytes(trits_243, NUM_TRITS_HASH,
                                      (const tryte_t*)TEST_81_TRYTES_2,
                                      NUM_TRYTES_HASH, NUM_TRYTES_HASH));
-  TEST_ASSERT(hash243_queue_push(&req->hashes, trits_243) == RC_OK);
+  TEST_ASSERT(hash243_queue_push(&req->tails, trits_243) == RC_OK);
 
   serializer.vtable.check_consistency_serialize_request(&serializer, req,
                                                         serializer_out);

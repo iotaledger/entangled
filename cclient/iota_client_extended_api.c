@@ -327,7 +327,7 @@ retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
   // propagating the network of nodes.
   uint64_t max_depth = (6 * 2 - 1) * (60 * 1000);
 
-  hash243_queue_push(&consistency_req->hashes, tail_tx);
+  hash243_queue_push(&consistency_req->tails, tail_tx);
   *out_promotable = false;
   ret_code =
       iota_client_check_consistency(serv, consistency_req, consistency_res);
