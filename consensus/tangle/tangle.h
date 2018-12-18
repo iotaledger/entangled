@@ -16,7 +16,7 @@
 #include "common/storage/connection.h"
 #include "common/storage/defs.h"
 #include "common/storage/storage.h"
-#include "common/trinary/trit_array.h"
+#include "common/trinary/flex_trit.h"
 #include "consensus/snapshot/state_delta.h"
 #include "utils/containers/hash/hash243_queue.h"
 #include "utils/containers/hash/hash243_set.h"
@@ -55,13 +55,8 @@ retcode_t iota_tangle_transaction_store(tangle_t const *const tangle,
 
 retcode_t iota_tangle_transaction_load(tangle_t const *const tangle,
                                        transaction_field_t const field,
-                                       trit_array_t const *const key,
+                                       flex_trit_t const *const key,
                                        iota_stor_pack_t *const tx);
-
-retcode_t iota_tangle_transaction_load_hashes(tangle_t const *const tangle,
-                                              transaction_field_t const field,
-                                              trit_array_t const *const key,
-                                              iota_stor_pack_t *const pack);
 
 retcode_t iota_tangle_transaction_load_hashes_of_approvers(
     tangle_t const *const tangle, flex_trit_t const *const approvee_hash,
@@ -130,7 +125,7 @@ retcode_t iota_tangle_transactions_update_snapshot_index(
 
 retcode_t iota_tangle_transaction_exist(tangle_t const *const tangle,
                                         transaction_field_t const field,
-                                        trit_array_t const *const key,
+                                        flex_trit_t const *const key,
                                         bool *const exist);
 
 retcode_t iota_tangle_transaction_update_solid_state(

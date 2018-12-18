@@ -43,10 +43,6 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
                                           .metadata.solid = 0,
                                           .loaded_columns_mask = 0};
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
-  trit_array_t key = {.trits = hash,
-                      .num_trits = HASH_LENGTH_TRIT,
-                      .num_bytes = FLEX_TRIT_SIZE_243,
-                      .dynamic = 0};
 
   if (processor == NULL || neighbor == NULL || packet == NULL || hash == NULL) {
     return RC_NULL_PARAM;
@@ -88,7 +84,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
 
   // Checks if the transaction is already persisted
   if ((ret = iota_tangle_transaction_exist(
-           processor->tangle, TRANSACTION_FIELD_HASH, &key, &exists)) !=
+           processor->tangle, TRANSACTION_FIELD_HASH, hash, &exists)) !=
       RC_OK) {
     log_warning(PROCESSOR_LOGGER_ID, "Checking if transaction exists failed\n");
     goto failure;

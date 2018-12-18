@@ -89,8 +89,6 @@ static retcode_t validate_milestone(
   }
 
   // Check if milestone is already present in database i.e. validated
-  TRIT_ARRAY_DECLARE(hash, HASH_LENGTH_TRIT);
-  memcpy(hash.trits, candidate->hash, FLEX_TRIT_SIZE_243);
   if ((ret = iota_tangle_milestone_exist(mt->tangle, candidate->hash,
                                          &exists)) != RC_OK) {
     return ret;
@@ -104,7 +102,7 @@ static retcode_t validate_milestone(
     return RC_CONSENSUS_MT_OOM;
   }
   if ((ret = iota_consensus_bundle_validator_validate(
-           mt->tangle, &hash, bundle, &bundle_status)) != RC_OK) {
+           mt->tangle, candidate->hash, bundle, &bundle_status)) != RC_OK) {
     log_warning(MILESTONE_TRACKER_LOGGER_ID, "Validating bundle failed\n");
     goto done;
   } else if (bundle_status == BUNDLE_INCOMPLETE) {

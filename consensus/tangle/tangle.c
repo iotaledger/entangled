@@ -38,7 +38,7 @@ retcode_t iota_tangle_transaction_store(tangle_t const *const tangle,
 
 retcode_t iota_tangle_transaction_load(tangle_t const *const tangle,
                                        transaction_field_t const field,
-                                       trit_array_t const *const key,
+                                       flex_trit_t const *const key,
                                        iota_stor_pack_t *const tx) {
   return iota_stor_transaction_load(&tangle->conn, field, key, tx);
 }
@@ -54,28 +54,6 @@ retcode_t iota_tangle_transactions_update_solid_state(
     bool const is_solid) {
   return iota_stor_transactions_update_solid_state(&tangle->conn, hashes,
                                                    is_solid);
-}
-
-retcode_t iota_tangle_transaction_load_hashes(tangle_t const *const tangle,
-                                              transaction_field_t const field,
-                                              trit_array_t const *const key,
-                                              iota_stor_pack_t *const pack) {
-  retcode_t res = RC_OK;
-
-  res = iota_stor_transaction_load_hashes(&tangle->conn, field, key, pack);
-  while (res == RC_OK && pack->insufficient_capacity) {
-    res = hash_pack_resize(pack, 2);
-    if (res == RC_OK) {
-      pack->num_loaded = 0;
-      res = iota_stor_transaction_load_hashes(&tangle->conn, field, key, pack);
-    }
-  }
-
-  if (res != RC_OK) {
-    log_error(TANGLE_LOGGER_ID,
-              "Failed in loading hashes, error code is: %" PRIu64 "\n", res);
-  }
-  return res;
 }
 
 retcode_t iota_tangle_transaction_load_hashes_of_approvers(
@@ -210,7 +188,7 @@ retcode_t iota_tangle_transactions_update_snapshot_index(
 
 retcode_t iota_tangle_transaction_exist(tangle_t const *const tangle,
                                         transaction_field_t const field,
-                                        trit_array_t const *const key,
+                                        flex_trit_t const *const key,
                                         bool *const exist) {
   return iota_stor_transaction_exist(&tangle->conn, field, key, exist);
 }

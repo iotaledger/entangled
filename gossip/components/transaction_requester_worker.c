@@ -26,10 +26,6 @@ static void *transaction_requester_routine(
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trit_t transaction[FLEX_TRIT_SIZE_8019];
   retcode_t ret = RC_OK;
-  trit_array_t key = {.trits = hash,
-                      .num_trits = HASH_LENGTH_TRIT,
-                      .num_bytes = FLEX_TRIT_SIZE_243,
-                      .dynamic = 0};
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
 
   if (transaction_requester == NULL) {
@@ -46,7 +42,7 @@ static void *transaction_requester_routine(
     } else {
       hash_pack_reset(&pack);
       ret = iota_tangle_transaction_load(transaction_requester->tangle,
-                                         TRANSACTION_FIELD_HASH, &key, &pack);
+                                         TRANSACTION_FIELD_HASH, hash, &pack);
       if (ret == RC_OK && pack.num_loaded != 0) {
         transaction_serialize_on_flex_trits(txp, transaction);
       } else {

@@ -259,10 +259,6 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
   retcode_t ret = RC_OK;
   hash243_queue_entry_t *iter = NULL;
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
-  trit_array_t tmp_trits = {.trits = NULL,
-                            .num_trits = HASH_LENGTH_TRIT,
-                            .num_bytes = FLEX_TRIT_SIZE_243,
-                            .dynamic = 0};
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
 
   if (api == NULL || req == NULL || res == NULL) {
@@ -275,10 +271,9 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
 
   CDL_FOREACH(req->hashes, iter) {
     hash_pack_reset(&pack);
-    tmp_trits.trits = iter->hash;
     // NOTE Concurrency needs to be taken care of
     if ((ret = iota_tangle_transaction_load(&api->consensus->tangle,
-                                            TRANSACTION_FIELD_HASH, &tmp_trits,
+                                            TRANSACTION_FIELD_HASH, iter->hash,
                                             &pack)) != RC_OK) {
       return ret;
     }
@@ -408,10 +403,9 @@ retcode_t iota_api_store_transactions(
     transaction_deserialize_from_trits(&tx, elt);
     if (iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
-      hash.trits = transaction_hash(&tx);
-      if ((ret = iota_tangle_transaction_exist(&api->consensus->tangle,
-                                               TRANSACTION_FIELD_HASH, &hash,
-                                               &exists)) != RC_OK) {
+      if ((ret = iota_tangle_transaction_exist(
+               &api->consensus->tangle, TRANSACTION_FIELD_HASH,
+               transaction_hash(&tx), &exists)) != RC_OK) {
         return ret;
       }
       if (!exists) {

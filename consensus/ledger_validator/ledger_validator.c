@@ -138,10 +138,6 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
                                           bool *should_stop) {
   retcode_t ret = RC_OK;
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
-  trit_array_t curr_hash = {.trits = NULL,
-                            .num_trits = NUM_TRITS_HASH,
-                            .num_bytes = FLEX_TRIT_SIZE_243,
-                            .dynamic = 0};
   bundle_transactions_t *bundle = NULL;
   iota_transaction_t tx_bundle = NULL;
 
@@ -157,9 +153,8 @@ static retcode_t get_latest_delta_do_func(flex_trit_t *hash,
     *should_branch = true;
     if (transaction_current_index(tx) == 0) {
       bundle_transactions_new(&bundle);
-      curr_hash.trits = hash;
       if ((ret = iota_consensus_bundle_validator_validate(
-               lv->tangle, &curr_hash, bundle, &bundle_status)) != RC_OK) {
+               lv->tangle, hash, bundle, &bundle_status)) != RC_OK) {
         goto done;
       }
       if (bundle_status != BUNDLE_VALID ||

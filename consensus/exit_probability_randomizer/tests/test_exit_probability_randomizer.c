@@ -143,12 +143,11 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   flex_trit_t *ep = transaction_hash(tx);
 
   cw_calc_result out;
-  trit_array_p curr_hash = trit_array_new(NUM_TRITS_HASH);
   bool exist;
   for (int i = 0; i < num_approvers; i++) {
-    trit_array_set_trits(curr_hash, transaction_hash(&txs[i]), NUM_TRITS_HASH);
     TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_HASH,
-                                              curr_hash, &exist) == RC_OK);
+                                              transaction_hash(&txs[i]),
+                                              &exist) == RC_OK);
     TEST_ASSERT(exist);
   }
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
@@ -222,7 +221,6 @@ void test_cw_gen_topology(test_tangle_topology topology) {
 
   /// Exit Probabilities - end
   cw_calc_result_destroy(&out);
-  trit_array_free(curr_hash);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
   destroy_epv(&epv);
   transaction_free(tx);
@@ -343,11 +341,10 @@ void test_cw_topology_four_transactions_diamond(void) {
 
   cw_calc_result out;
 
-  trit_array_p curr_hash = trit_array_new(NUM_TRITS_HASH);
   for (int i = 0; i < num_txs; i++) {
-    trit_array_set_trits(curr_hash, transaction_hash(&txs[i]), NUM_TRITS_HASH);
     TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_HASH,
-                                              curr_hash, &exist) == RC_OK);
+                                              transaction_hash(&txs[i]),
+                                              &exist) == RC_OK);
     TEST_ASSERT(exist);
   }
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
@@ -382,7 +379,6 @@ void test_cw_topology_four_transactions_diamond(void) {
 
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
-  trit_array_free(curr_hash);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
   destroy_epv(&epv);
   transaction_free(test_tx);
@@ -441,11 +437,10 @@ void test_cw_topology_two_inequal_tips(void) {
 
   cw_calc_result out;
 
-  trit_array_p curr_hash = trit_array_new(NUM_TRITS_HASH);
   for (int i = 0; i < num_txs; i++) {
-    trit_array_set_trits(curr_hash, transaction_hash(&txs[i]), NUM_TRITS_HASH);
     TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_HASH,
-                                              curr_hash, &exist) == RC_OK);
+                                              transaction_hash(&txs[i]),
+                                              &exist) == RC_OK);
     TEST_ASSERT(exist);
   }
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
@@ -514,7 +509,6 @@ void test_cw_topology_two_inequal_tips(void) {
 
   hash_pack_free(&pack);
   cw_calc_result_destroy(&out);
-  trit_array_free(curr_hash);
   TEST_ASSERT(iota_consensus_cw_rating_destroy(&calc) == RC_OK);
   destroy_epv(&epv);
   transaction_free(test_tx);

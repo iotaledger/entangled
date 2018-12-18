@@ -134,7 +134,6 @@ retcode_t iota_consensus_random_walker_randomize(
     exit_prob_transaction_validator_t *const ep_validator,
     cw_calc_result *const cw_result, flex_trit_t const *const ep,
     flex_trit_t *tip) {
-
   retcode_t ret = RC_OK;
   bool ep_is_valid = false;
   bool has_approver_tail = false;
