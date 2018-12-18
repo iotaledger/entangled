@@ -39,7 +39,7 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
   size_t bitset_size;
 
   if (!entry_point) {
-    return RC_OK;
+    return RC_NULL_PARAM;
   }
 
   res = cw_rating_dfs_do_dfs_from_db(
