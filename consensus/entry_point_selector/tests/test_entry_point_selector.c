@@ -33,7 +33,6 @@ static char* ciri_db_path = "consensus/entry_point_selector/tests/ciri.db";
 
 void test_entry_point() {
   iota_milestone_t milestone = {START_MILESTONE, {0}};
-  TRIT_ARRAY_DECLARE(ep, NUM_TRITS_HASH);
   DECLARE_PACK_SINGLE_MILESTONE(ep_milestone, ep_milestone_ptr, pack);
 
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
@@ -49,10 +48,11 @@ void test_entry_point() {
     milestone.hash[0]++;
   }
 
-  TEST_ASSERT(iota_consensus_entry_point_selector_get_entry_point(
-                  &eps, DEPTH, &ep) == RC_OK);
+  flex_trit_t ep[FLEX_TRIT_SIZE_243];
+  TEST_ASSERT(iota_consensus_entry_point_selector_get_entry_point(&eps, DEPTH,
+                                                                  ep) == RC_OK);
 
-  TEST_ASSERT(iota_tangle_milestone_load(&tangle, ep.trits, &pack) == RC_OK);
+  TEST_ASSERT(iota_tangle_milestone_load(&tangle, ep, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
 
   TEST_ASSERT_EQUAL_INT(ep_milestone.index, LATEST_SOLID_MILESTONE - DEPTH);

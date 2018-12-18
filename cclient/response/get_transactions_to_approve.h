@@ -14,14 +14,20 @@
 extern "C" {
 #endif
 
-typedef struct {
+typedef struct get_transactions_to_approve_res_s {
   flex_trit_t branch[FLEX_TRIT_SIZE_243];
   flex_trit_t trunk[FLEX_TRIT_SIZE_243];
 } get_transactions_to_approve_res_t;
 
 get_transactions_to_approve_res_t* get_transactions_to_approve_res_new();
 void get_transactions_to_approve_res_free(
-    get_transactions_to_approve_res_t** res);
+    get_transactions_to_approve_res_t** const res);
+void get_transactions_to_approve_res_set_branch(
+    get_transactions_to_approve_res_t* const res,
+    flex_trit_t const* const branch);
+void get_transactions_to_approve_res_set_trunk(
+    get_transactions_to_approve_res_t* const res,
+    flex_trit_t const* const trunk);
 
 #ifdef __cplusplus
 }

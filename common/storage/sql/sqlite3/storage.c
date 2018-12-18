@@ -27,7 +27,7 @@ retcode_t iota_stor_init(connection_t const* const conn,
   return init_connection(conn, config);
 }
 
-retcode_t iota_stor_destroy(connection_t const* const conn) {
+retcode_t iota_stor_destroy(connection_t* const conn) {
   logger_helper_destroy(SQLITE3_LOGGER_ID);
   return destroy_connection(conn);
 }
@@ -122,12 +122,6 @@ static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
                                                   iota_transaction_t const tx);
 static void
 select_transactions_populate_from_row_essence_attachment_and_metadata(
-    sqlite3_stmt* const statement, iota_transaction_t const tx);
-
-static void select_transactions_populate_from_row_essence_and_consensus(
-    sqlite3_stmt* const statement, iota_transaction_t const tx);
-
-static void select_transactions_populate_from_row_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx);
 
 static void select_transactions_populate_from_row_essence_and_consensus(
@@ -538,15 +532,17 @@ done:
 
 retcode_t iota_stor_transaction_load(connection_t const* const conn,
                                      transaction_field_t const field,
-                                     trit_array_t const* const key,
+                                     flex_trit_t const* const key,
                                      iota_stor_pack_t* const pack) {
   retcode_t ret = RC_OK;
   char* statement = NULL;
   sqlite3_stmt* sqlite_statement = NULL;
+  size_t num_key_bytes;
 
   switch (field) {
     case TRANSACTION_FIELD_HASH:
       statement = iota_statement_transaction_select_by_hash;
+      num_key_bytes = FLEX_TRIT_SIZE_243;
       break;
     default:
       return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
@@ -557,8 +553,7 @@ retcode_t iota_stor_transaction_load(connection_t const* const conn,
     goto done;
   }
 
-  if (column_compress_bind(sqlite_statement, 1, key->trits, key->num_bytes) !=
-      RC_OK) {
+  if (column_compress_bind(sqlite_statement, 1, key, num_key_bytes) != RC_OK) {
     ret = binding_error();
     goto done;
   }
@@ -666,15 +661,17 @@ done:
 
 retcode_t iota_stor_transaction_load_hashes(connection_t const* const conn,
                                             transaction_field_t const field,
-                                            trit_array_t const* const key,
+                                            flex_trit_t const* const key,
                                             iota_stor_pack_t* const pack) {
   retcode_t ret = RC_OK;
   char* statement = NULL;
   sqlite3_stmt* sqlite_statement = NULL;
+  size_t num_bytes_key;
 
   switch (field) {
     case TRANSACTION_FIELD_ADDRESS:
       statement = iota_statement_transaction_select_hashes_by_address;
+      num_bytes_key = FLEX_TRIT_SIZE_243;
       break;
     default:
       return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
@@ -685,8 +682,7 @@ retcode_t iota_stor_transaction_load_hashes(connection_t const* const conn,
     goto done;
   }
 
-  if (column_compress_bind(sqlite_statement, 1, key->trits, key->num_bytes) !=
-      RC_OK) {
+  if (column_compress_bind(sqlite_statement, 1, key, num_bytes_key) != RC_OK) {
     ret = binding_error();
     goto done;
   }
@@ -884,11 +880,12 @@ done:
 
 retcode_t iota_stor_transaction_exist(connection_t const* const conn,
                                       transaction_field_t const field,
-                                      trit_array_t const* const key,
+                                      flex_trit_t const* const key,
                                       bool* const exist) {
   retcode_t ret = RC_OK;
   char* statement = NULL;
   sqlite3_stmt* sqlite_statement = NULL;
+  size_t num_bytes_key;
 
   switch (field) {
     case TRANSACTION_FIELD_NONE:
@@ -896,10 +893,10 @@ retcode_t iota_stor_transaction_exist(connection_t const* const conn,
       break;
     case TRANSACTION_FIELD_HASH:
       statement = iota_statement_transaction_exist_by_hash;
+      num_bytes_key = FLEX_TRIT_SIZE_243;
       break;
     default:
       return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
-      break;
   }
 
   if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
@@ -908,8 +905,8 @@ retcode_t iota_stor_transaction_exist(connection_t const* const conn,
   }
 
   if (field != TRANSACTION_FIELD_NONE && key) {
-    if (column_compress_bind(sqlite_statement, 1, (void*)key->trits,
-                             key->num_bytes) != RC_OK) {
+    if (column_compress_bind(sqlite_statement, 1, (void*)key, num_bytes_key) !=
+        RC_OK) {
       ret = binding_error();
       goto done;
     }

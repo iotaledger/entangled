@@ -128,10 +128,6 @@ retcode_t request_transaction(
     flex_trit_t *const hash, bool const is_milestone) {
   retcode_t ret = RC_OK;
   bool exists = false;
-  trit_array_t const key = {.trits = hash,
-                            .num_trits = HASH_LENGTH_TRIT,
-                            .num_bytes = FLEX_TRIT_SIZE_243,
-                            .dynamic = 0};
 
   if (transaction_requester == NULL || hash == NULL) {
     return RC_NULL_PARAM;
@@ -142,7 +138,7 @@ retcode_t request_transaction(
   }
 
   if ((ret = iota_tangle_transaction_exist(transaction_requester->tangle,
-                                           TRANSACTION_FIELD_HASH, &key,
+                                           TRANSACTION_FIELD_HASH, hash,
                                            &exists)) != RC_OK) {
     return ret;
   }
@@ -180,10 +176,7 @@ retcode_t get_transaction_to_request(
   hash243_set_t *backup_set = NULL;
   hash243_set_entry_t *iter = NULL;
   hash243_set_entry_t *tmp = NULL;
-  trit_array_t key = {.trits = hash,
-                      .num_trits = HASH_LENGTH_TRIT,
-                      .num_bytes = FLEX_TRIT_SIZE_243,
-                      .dynamic = 0};
+
   bool exists = false;
 
   if (transaction_requester == NULL || hash == NULL) {
@@ -202,7 +195,7 @@ retcode_t get_transaction_to_request(
   HASH_ITER(hh, *request_set, iter, tmp) {
     memcpy(hash, iter->hash, FLEX_TRIT_SIZE_243);
     if ((ret = iota_tangle_transaction_exist(transaction_requester->tangle,
-                                             TRANSACTION_FIELD_HASH, &key,
+                                             TRANSACTION_FIELD_HASH, iter->hash,
                                              &exists)) != RC_OK) {
       goto done;
     }

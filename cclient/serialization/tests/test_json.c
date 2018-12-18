@@ -516,9 +516,11 @@ void test_serialize_get_transactions_to_approve(void) {
   get_transactions_to_approve_req_t* get_tx_approve =
       get_transactions_to_approve_req_new();
 
-  TEST_ASSERT(flex_trits_from_trytes(get_tx_approve->reference, NUM_TRITS_HASH,
+  flex_trit_t reference[FLEX_TRIT_SIZE_243];
+  TEST_ASSERT(flex_trits_from_trytes(reference, NUM_TRITS_HASH,
                                      (const tryte_t*)TEST_81_TRYTES_1,
                                      NUM_TRYTES_HASH, NUM_TRYTES_HASH));
+  get_transactions_to_approve_req_set_reference(get_tx_approve, reference);
 
   get_tx_approve->depth = TEST_TRANSACTION_TO_APPROVE_DEPTH;
   serializer.vtable.get_transactions_to_approve_serialize_request(

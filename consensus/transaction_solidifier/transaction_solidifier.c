@@ -217,10 +217,6 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
     bool is_milestone, bool *const is_solid) {
   retcode_t ret;
 
-  trit_array_t hash_trits = {.trits = hash,
-                             .num_trits = HASH_LENGTH_TRIT,
-                             .num_bytes = FLEX_TRIT_SIZE_243,
-                             .dynamic = 0};
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
 
   ret = iota_tangle_transaction_load_partial(

@@ -6,6 +6,7 @@
  */
 
 #include "iota_client_extended_api.h"
+#include "utils/time.h"
 
 #define CCLIENT_EXTENDED_LOGGER_ID "cclient_extended_api"
 

@@ -24,10 +24,7 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
   DECLARE_PACK_SINGLE_TX(transaction, transaction_ptr, transaction_pack);
   DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr,
                                 milestone_pack);
-  trit_array_t const key = {.trits = latest_milestone.hash,
-                            .num_trits = HASH_LENGTH_TRIT,
-                            .num_bytes = FLEX_TRIT_SIZE_243,
-                            .dynamic = 0};
+
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
   if (tips_requester == NULL) {
@@ -42,9 +39,9 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
       continue;
     }
     hash_pack_reset(&transaction_pack);
-    if (iota_tangle_transaction_load(tips_requester->tangle,
-                                     TRANSACTION_FIELD_HASH, &key,
-                                     &transaction_pack) != RC_OK ||
+    if (iota_tangle_transaction_load(
+            tips_requester->tangle, TRANSACTION_FIELD_HASH,
+            latest_milestone.hash, &transaction_pack) != RC_OK ||
         transaction_pack.num_loaded == 0) {
       continue;
     }

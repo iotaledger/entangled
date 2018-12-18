@@ -101,3 +101,15 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_get_transactions_to_approve",
+    srcs = ["test_get_transactions_to_approve.c"],
+    data = [":db_file"],
+    deps = [
+        ":defs",
+        "//ciri/api",
+        "//consensus/test_utils",
+        "@unity",
+    ],
+)

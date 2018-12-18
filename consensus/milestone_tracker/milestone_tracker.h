@@ -38,11 +38,11 @@ typedef struct milestone_tracker_s {
   uint64_t milestone_start_index;
   thread_handle_t milestone_validator;
   uint64_t latest_milestone_index;
-  trit_array_p latest_milestone;
+  flex_trit_t latest_milestone[FLEX_TRIT_SIZE_243];
   thread_handle_t milestone_solidifier;
   uint64_t latest_solid_subtangle_milestone_index;
-  trit_array_p latest_solid_subtangle_milestone;
-  trit_array_p coordinator;
+  flex_trit_t latest_solid_subtangle_milestone[FLEX_TRIT_SIZE_243];
+  flex_trit_t coordinator[FLEX_TRIT_SIZE_243];
   ledger_validator_t* ledger_validator;
   transaction_solidifier_t* transaction_solidifier;
   hash243_queue_t candidates;

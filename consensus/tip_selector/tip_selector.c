@@ -38,13 +38,10 @@ retcode_t iota_consensus_tip_selector_init(
 
 retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
     tip_selector_t *const tip_selector, size_t const depth,
-    trit_array_t const *const reference, tips_pair *const tips) {
+    flex_trit_t const *const reference, tips_pair_t *const tips) {
   retcode_t ret = RC_OK;
   flex_trit_t ep_trits[FLEX_TRIT_SIZE_243];
-  trit_array_t ep = {.trits = ep_trits,
-                     .num_trits = HASH_LENGTH_TRIT,
-                     .num_bytes = FLEX_TRIT_SIZE_243,
-                     .dynamic = 0};
+  flex_trit_t *ep_p = ep_trits;
   cw_calc_result rating_results = {.cw_ratings = NULL, .tx_to_approvers = NULL};
   bool consistent = false;
   hash243_stack_t tips_stack = NULL;
@@ -53,14 +50,14 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
       &tip_selector->milestone_tracker->latest_snapshot->rw_lock);
 
   if ((ret = iota_consensus_entry_point_selector_get_entry_point(
-           tip_selector->entry_point_selector, depth, &ep)) != RC_OK) {
+           tip_selector->entry_point_selector, depth, ep_p)) != RC_OK) {
     log_error(TIP_SELECTOR_LOGGER_ID,
               "Getting entry point failed with error %" PRIu64 "\n", ret);
     goto done;
   }
 
   if ((ret = iota_consensus_cw_rating_calculate(
-           tip_selector->cw_rating_calculator, &ep, &rating_results)) !=
+           tip_selector->cw_rating_calculator, ep_p, &rating_results)) !=
       RC_OK) {
     log_error(TIP_SELECTOR_LOGGER_ID,
               "Calculating CW ratings failed with error %" PRIu64 "\n", ret);
@@ -69,32 +66,32 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
 
   if ((ret = iota_consensus_exit_probability_randomize(
            tip_selector->ep_randomizer, tip_selector->walker_validator,
-           &rating_results, &ep, tips->trunk)) != RC_OK) {
+           &rating_results, ep_p, tips->trunk)) != RC_OK) {
     log_error(TIP_SELECTOR_LOGGER_ID,
               "Getting trunk tip failed with error %" PRIu64 "\n", ret);
     goto done;
   }
-  if ((ret = hash243_stack_push(&tips_stack, tips->trunk->trits)) != RC_OK) {
+  if ((ret = hash243_stack_push(&tips_stack, tips->trunk)) != RC_OK) {
     goto done;
   }
 
-  if (reference != NULL && reference->trits != NULL) {
-    if (!hash_int_map_contains(&rating_results.cw_ratings, reference->trits)) {
+  if (reference != NULL) {
+    if (!hash_int_map_contains(&rating_results.cw_ratings, reference)) {
       log_warning(TIP_SELECTOR_LOGGER_ID, "Reference is too old\n");
       ret = RC_TIP_SELECTOR_REFERENCE_TOO_OLD;
       goto done;
     }
-    ep.trits = reference->trits;
+    ep_p = reference;
   }
 
   if ((ret = iota_consensus_exit_probability_randomize(
            tip_selector->ep_randomizer, tip_selector->walker_validator,
-           &rating_results, &ep, tips->branch)) != RC_OK) {
+           &rating_results, ep_p, tips->branch)) != RC_OK) {
     log_error(TIP_SELECTOR_LOGGER_ID,
               "Getting branch tip failed with error %" PRIu64 "\n", ret);
     goto done;
   }
-  if ((ret = hash243_stack_push(&tips_stack, tips->branch->trits)) != RC_OK) {
+  if ((ret = hash243_stack_push(&tips_stack, tips->branch)) != RC_OK) {
     goto done;
   }
 

@@ -49,7 +49,7 @@ retcode_t iota_consensus_tip_selector_init(
 
 retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
     tip_selector_t *const tip_selector, size_t const depth,
-    trit_array_t const *const reference, tips_pair *const tips);
+    flex_trit_t const *const reference, tips_pair_t *const tips);
 
 retcode_t iota_consensus_tip_selector_destroy(
     tip_selector_t *const tip_selector);

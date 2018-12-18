@@ -19,15 +19,12 @@
  */
 
 static retcode_t load_bundle_transactions(tangle_t const* const tangle,
-                                          trit_array_p const tail_hash,
+                                          flex_trit_t* const tail_hash,
                                           bundle_transactions_t* const bundle) {
   retcode_t res = RC_OK;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   size_t last_index = 0, curr_index = 0;
-  trit_array_t curr_tx_trunk = {.trits = NULL,
-                                .num_trits = NUM_TRITS_HASH,
-                                .num_bytes = FLEX_TRIT_SIZE_243,
-                                .dynamic = 0};
+  flex_trit_t* curr_tx_trunk = NULL;
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
 
   res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, tail_hash,
@@ -45,11 +42,11 @@ static retcode_t load_bundle_transactions(tangle_t const* const tangle,
          memcmp(bundle_hash, transaction_bundle(curr_tx), FLEX_TRIT_SIZE_243) ==
              0) {
     bundle_transactions_add(bundle, curr_tx);
-    curr_tx_trunk.trits = transaction_trunk(curr_tx);
+    curr_tx_trunk = transaction_trunk(curr_tx);
 
     hash_pack_reset(&pack);
     if ((res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
-                                            &curr_tx_trunk, &pack)) != RC_OK) {
+                                            curr_tx_trunk, &pack)) != RC_OK) {
       return res;
     }
     curr_index++;
@@ -130,7 +127,7 @@ retcode_t iota_consensus_bundle_validator_destroy() {
 }
 
 retcode_t iota_consensus_bundle_validator_validate(
-    tangle_t const* const tangle, trit_array_p const tail_hash,
+    tangle_t const* const tangle, flex_trit_t* const tail_hash,
     bundle_transactions_t* const bundle, bundle_status_t* const status) {
   retcode_t res = RC_OK;
   iota_transaction_t curr_tx = NULL;
