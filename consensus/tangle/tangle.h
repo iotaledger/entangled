@@ -208,8 +208,8 @@ retcode_t iota_tangle_state_delta_load(tangle_t const *const tangle,
  */
 
 retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
-                                trit_array_t const *const tx_hash,
-                                trit_array_t *const tail,
+                                flex_trit_t const *const tx_hash,
+                                flex_trit_t *const tail,
                                 bool *const found_tail);
 
 #ifdef __cplusplus

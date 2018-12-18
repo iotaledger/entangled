@@ -72,8 +72,8 @@ static retcode_t node_transaction_requester_init(node_t* const node,
 
   for (size_t i = 0; i < pack.num_loaded; i++) {
     if ((ret = request_transaction(&node->transaction_requester,
-                                   ((trit_array_t*)(pack.models[i]))->trits,
-                                   false)) != RC_OK) {
+                                   ((flex_trit_t*)(pack.models[i])), false)) !=
+        RC_OK) {
       log_error(NODE_LOGGER_ID, "Requesting transaction failed\n");
       goto done;
     }
@@ -113,8 +113,8 @@ static retcode_t node_tips_cache_init(node_t* const node) {
   }
 
   for (size_t i = 0; i < pack.num_loaded; i++) {
-    if ((ret = tips_cache_add(
-             &node->tips, ((trit_array_t*)(pack.models[i]))->trits)) != RC_OK) {
+    if ((ret = tips_cache_add(&node->tips, ((flex_trit_t*)(pack.models[i])))) !=
+        RC_OK) {
       log_error(NODE_LOGGER_ID, "Adding tip to cache failed\n");
       goto done;
     }

@@ -245,8 +245,7 @@ retcode_t iota_api_find_transactions(iota_api_t const *const api,
   }
 
   for (size_t i = 0; i < pack.num_loaded; i++) {
-    if ((ret = hash243_queue_push(
-             &res->hashes, ((trit_array_p *)pack.models)[i]->trits)) != RC_OK) {
+    if ((ret = hash243_queue_push(&res->hashes, (pack.models)[i])) != RC_OK) {
       goto done;
     }
   }

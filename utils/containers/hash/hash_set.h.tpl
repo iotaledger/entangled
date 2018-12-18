@@ -38,6 +38,8 @@ retcode_t hash{SIZE}_set_append(hash{SIZE}_set_t const *const set1,
                                hash{SIZE}_set_t *const set2);
 bool hash{SIZE}_set_contains(hash{SIZE}_set_t const *const set,
                             flex_trit_t const *const hash);
+bool hash{SIZE}_set_find(hash{SIZE}_set_t const *const set,
+        flex_trit_t const *const hash, hash{SIZE}_set_entry_t const ** entry);
 void hash{SIZE}_set_free(hash{SIZE}_set_t *const set);
 retcode_t hash{SIZE}_set_for_each(hash{SIZE}_set_t const *const set,
                                  hash{SIZE}_on_container_func func,
