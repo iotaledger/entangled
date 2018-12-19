@@ -106,6 +106,8 @@ const char* error_2_string(retcode_t err) {
       return STR_CCLIENT_INVALID_SECURITY;
     case RC_CCLIENT_TX_DESERIALIZE_FAILED:
       return STR_CCLIENT_TX_DESERIALIZE_FAILED;
+    case RC_CCLIENT_INSUFFICIENT_BALANCE:
+      return STR_CCLIENT_INSUFFICIENT_BALANCE;
 
     // Consensus module
     case RC_CONSENSUS_NOT_IMPLEMENTED:
