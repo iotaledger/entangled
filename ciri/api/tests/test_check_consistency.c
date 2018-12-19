@@ -145,7 +145,7 @@ void test_check_consistency_invalid_bundle(void) {
   transactions_free(txs, 4);
 }
 
-void test_check_consistency_inconsistent_ledger(void) {
+void test_check_consistency_consistent_ledger(bool consistency) {
   check_consistency_req_t *req = check_consistency_req_new();
   check_consistency_res_t *res = check_consistency_res_new();
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
@@ -155,9 +155,27 @@ void test_check_consistency_inconsistent_ledger(void) {
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
   tryte_t const *const hashes[4] = {TX_1_OF_4_HASH, TX_2_OF_4_HASH,
                                     TX_3_OF_4_HASH, TX_4_OF_4_HASH};
+
   transactions_deserialize(trytes, txs, 4);
 
+  for (size_t i = 0; i < 4; i++) {
+    memset(txs[i]->attachment.branch, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+    if (i == 3) {
+      memset(txs[i]->attachment.trunk, FLEX_TRIT_NULL_VALUE,
+             FLEX_TRIT_SIZE_243);
+    }
+  }
+
   TEST_ASSERT(build_tangle(&api.consensus->tangle, txs, 4) == RC_OK);
+  for (size_t i = 0; i < 4; i++) {
+    flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, hashes[i], HASH_LENGTH_TRYTE,
+                           HASH_LENGTH_TRYTE);
+    TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(
+                    &api.consensus->tangle, hash,
+                    api.consensus->milestone_tracker
+                            .latest_solid_subtangle_milestone_index -
+                        5) == RC_OK);
+  }
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_1_OF_4_HASH,
                          HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
   hash243_queue_push(&req->tails, hash);
@@ -165,23 +183,25 @@ void test_check_consistency_inconsistent_ledger(void) {
                                                          hash, true) == RC_OK);
 
   TEST_ASSERT(iota_api_check_consistency(&api, req, res) == RC_OK);
-  TEST_ASSERT(res->state == false);
-  TEST_ASSERT_EQUAL_STRING(res->info->data, API_TAILS_NOT_CONSISTENT);
+  if (consistency) {
+    TEST_ASSERT(res->state == true);
+    TEST_ASSERT_NULL(res->info->data);
+  } else {
+    TEST_ASSERT(res->state == false);
+    TEST_ASSERT_EQUAL_STRING(res->info->data, API_TAILS_NOT_CONSISTENT);
+  }
 
   check_consistency_req_free(&req);
   check_consistency_res_free(res);
   transactions_free(txs, 4);
 }
 
-void test_check_consistency_consistent_ledger(void) {
-  check_consistency_req_t *req = check_consistency_req_new();
-  check_consistency_res_t *res = check_consistency_res_new();
+void test_check_consistency_false(void) {
+  test_check_consistency_consistent_ledger(false);
+}
 
-  TEST_ASSERT(iota_api_check_consistency(&api, req, res) == RC_OK);
-  TEST_ASSERT(res->state == true);
-
-  check_consistency_req_free(&req);
-  check_consistency_res_free(res);
+void test_check_consistency_true(void) {
+  test_check_consistency_consistent_ledger(true);
 }
 
 int main(void) {
@@ -214,13 +234,21 @@ int main(void) {
   tearDown();
 
   RUN_TEST(test_check_consistency_invalid_subtangle_status);
+
   consensus.milestone_tracker.latest_solid_subtangle_milestone_index++;
+
   RUN_TEST(test_check_consistency_missing_tail);
   RUN_TEST(test_check_consistency_not_tail);
   RUN_TEST(test_check_consistency_tail_not_solid);
   RUN_TEST(test_check_consistency_invalid_bundle);
-  RUN_TEST(test_check_consistency_inconsistent_ledger);
-  RUN_TEST(test_check_consistency_consistent_ledger);
+  RUN_TEST(test_check_consistency_false);
+
+  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_2_OF_4_ADDRESS,
+                         HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+  state_delta_add(&api.consensus->snapshot.state, hash, 1545071560);
+
+  RUN_TEST(test_check_consistency_true);
 
   TEST_ASSERT(iota_consensus_destroy(&consensus) == RC_OK);
 

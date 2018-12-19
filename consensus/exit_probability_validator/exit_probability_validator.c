@@ -137,6 +137,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
       break;
     }
 
+    hash_pack_reset(&pack);
     res = iota_tangle_transaction_load_partial(
         epv->tangle, curr_hash_trits, &pack,
         PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA);
