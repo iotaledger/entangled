@@ -57,8 +57,8 @@ static void *spawn_solid_transactions_propagation(void *arg) {
         log_critical(TRANSACTION_SOLIDIFIER_LOGGER_ID,
                      "Failed in solid transaction propagation %s\n");
       }
-      usleep(SOLID_PROPAGATION_INTERVAL);
     }
+    usleep(SOLID_PROPAGATION_INTERVAL);
   }
   return NULL;
 }
