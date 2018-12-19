@@ -122,7 +122,6 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
 
   hash243_queue_entry_t* q_iter = NULL;
   size_t counter = 0;
-  uint64_t tmp_balance = 0;
   out_input->total_balance = 0;
 
   log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
@@ -139,8 +138,8 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
     // expect balance value is in order.
     CDL_FOREACH(balances_req->addresses, q_iter) {
       if (out_input->total_balance < threshold) {
-        tmp_balance = get_balances_res_balances_at(balances_res, counter);
-        out_input->total_balance += tmp_balance;
+        out_input->total_balance +=
+            get_balances_res_balances_at(balances_res, counter);
         hash243_queue_push(&out_input->addresses, q_iter->hash);
       }
       counter++;
