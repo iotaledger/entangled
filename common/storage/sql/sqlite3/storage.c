@@ -422,6 +422,7 @@ select_transactions_populate_from_row_essence_attachment_and_metadata(
   column_decompress_load(statement, 13, tx->attachment.tag, FLEX_TRIT_SIZE_81);
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 14));
   transaction_set_solid(tx, sqlite3_column_int(statement, 15));
+  transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 16));
   tx->loaded_columns_mask = MASK_ESSENCE | MASK_ATTACHMENT | MASK_METADATA;
 }
 
@@ -444,6 +445,7 @@ static void select_transactions_populate_from_row_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx) {
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 0));
   transaction_set_solid(tx, sqlite3_column_int(statement, 1));
+  transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 2));
   tx->loaded_columns_mask = MASK_METADATA;
 }
 
