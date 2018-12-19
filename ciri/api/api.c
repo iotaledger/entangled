@@ -86,10 +86,8 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api,
     return RC_NULL_PARAM;
   }
 
-  char_buffer_allocate(res->app_name, strlen(CIRI_NAME));
-  strcpy(res->app_name->data, CIRI_NAME);
-  char_buffer_allocate(res->app_version, strlen(CIRI_VERSION));
-  strcpy(res->app_version->data, CIRI_VERSION);
+  char_buffer_set(res->app_name, CIRI_NAME);
+  char_buffer_set(res->app_version, CIRI_VERSION);
   memcpy(res->latest_milestone,
          api->consensus->milestone_tracker.latest_milestone,
          FLEX_TRIT_SIZE_243);
