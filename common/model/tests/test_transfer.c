@@ -13,17 +13,17 @@
 #include "common/model/transfer.h"
 
 void test_bundle_hash(void) {
+  transfer_ctx_t transfer_ctx = {};
   transfer_t* transfer =
       transfer_value_in_new(ADDRESS, TAG, 0, NULL, 0, 1509136296);
   TEST_ASSERT_NOT_NULL(transfer);
 
   transfer_t* transfers[1] = {transfer};
   Kerl kerl = {};
-  transfer_ctx_t* transfer_ctx = transfer_ctx_new();
-  transfer_ctx_init(transfer_ctx, transfers, 1);
-  transfer_ctx_hash(transfer_ctx, &kerl, transfers, 1);
-  TEST_ASSERT_EQUAL_MEMORY(HASH, transfer_ctx->bundle, sizeof(HASH));
-  transfer_ctx_free(transfer_ctx);
+  TEST_ASSERT_TRUE(transfer_ctx_init(&transfer_ctx, transfers, 1));
+
+  transfer_ctx_hash(&transfer_ctx, &kerl, transfers, 1);
+  TEST_ASSERT_EQUAL_MEMORY(HASH, transfer_ctx.bundle, sizeof(HASH));
   transfer_free(&transfer);
   TEST_ASSERT_NULL(transfer);
 }

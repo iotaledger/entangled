@@ -9,8 +9,11 @@
 #define CCLIENT_IOTA_EXTENDED_API_H_
 
 #include "common/helpers/sign.h"
+#include "common/model/bundle.h"
+#include "common/model/transfer.h"
 #include "iota_client_core_api.h"
 #include "utils/containers/hash/hash243_queue.h"
+#include "utils/time.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -286,13 +289,9 @@ retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createPrepareTransfers.ts#L97
  */
 retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
-                                        trit_array_p const seed,
-                                        int const security,
-                                        transfer_list_t const* const transfers,
-                                        trit_array_p const remainder,
-                                        input_list_t const* const inputs,
-                                        hashes_t* out_bundle_trytes);
-
+                                        transfer_t** const transfers,
+                                        uint32_t const num_transfer,
+                                        bundle_transactions_t* out_bundle);
 /**
  * Attempts to promote a transaction using a provided bundle and, if successful,
  * returns the promoting Transactions.
@@ -348,10 +347,11 @@ retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv,
 
 // https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createSendTransfer.ts#L22
 retcode_t iota_client_send_transfer(iota_client_service_t const* const serv,
-                                    trit_array_p const seed, int const depth,
-                                    int const mwm,
-                                    transfer_list_t const* const transfers,
-                                    transaction_objs_t out_tx_objs);
+                                    int const depth, int const mwm,
+                                    transfer_t** const transfers,
+                                    uint32_t num_transfer,
+                                    flex_trit_t const* const reference,
+                                    bundle_transactions_t* out_tx_objs);
 
 /**
  * [Attaches to tanlge]{@link #module_core.attachToTangle}, [stores]{@link

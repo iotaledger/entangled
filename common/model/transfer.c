@@ -18,7 +18,7 @@ static logger_id_t logger_id;
 static void transfer_iterator_next_data_transaction(
     transfer_iterator_t* transfer_iterator, transfer_t* transfer) {
   transfer_data_t* trans_data = NULL;
-  size_t data_len = 0, offset = 0, len = 0;
+  uint32_t data_len = 0, offset = 0, len = 0;
   size_t flex_ret = 0;
 
   if (transfer->type == DATA) {
@@ -127,7 +127,7 @@ bool validate_output(transfer_value_out_t const* const output) {
 // create data transfer object.
 transfer_t* transfer_data_new(flex_trit_t const* const address,
                               flex_trit_t const* const tag,
-                              flex_trit_t const* const data, size_t data_len,
+                              flex_trit_t const* const data, uint32_t data_len,
                               uint64_t timestamp) {
   transfer_data_t* tf_data = NULL;
   transfer_t* transfer = NULL;
@@ -219,7 +219,7 @@ transfer_t* transfer_value_out_new(transfer_value_out_t const* const output,
 transfer_t* transfer_value_in_new(flex_trit_t const* const address,
                                   flex_trit_t const* const tag, int64_t value,
                                   flex_trit_t const* const data,
-                                  size_t data_len, uint64_t timestamp) {
+                                  uint32_t data_len, uint64_t timestamp) {
   transfer_value_in_t* value_in = NULL;
   transfer_t* tf = NULL;
   if (!address) {
@@ -271,7 +271,7 @@ void transfer_free(transfer_t** transfer) {
   }
 }
 
-size_t transfer_transactions_count(transfer_t* tf) {
+uint32_t transfer_transactions_count(transfer_t* tf) {
   transfer_data_t* data = NULL;
   transfer_value_out_t* value_out = NULL;
   switch (tf->type) {
@@ -302,11 +302,12 @@ transfer_ctx_t* transfer_ctx_new() {
 void transfer_ctx_free(transfer_ctx_t* transfer_ctx) { free(transfer_ctx); }
 
 bool transfer_ctx_init(transfer_ctx_t* transfer_ctx, transfer_t* transfers[],
-                       size_t len) {
-  size_t i;
+                       uint32_t len) {
+  uint32_t i;
   int64_t total = 0;
+  transfer_t* transfer = NULL;
   for (i = 0; i < len; i++) {
-    transfer_t* transfer = transfers[i];
+    transfer = transfers[i];
     transfer_ctx->count += transfer_transactions_count(transfer);
     total += transfer->value;
   }
@@ -315,8 +316,8 @@ bool transfer_ctx_init(transfer_ctx_t* transfer_ctx, transfer_t* transfers[],
 
 // Calculates the bundle hash for a collection of transfers
 void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
-                       transfer_t* transfers[], size_t tx_len) {
-  size_t i, j, count, current_index = 0;
+                       transfer_t* transfers[], uint32_t tx_len) {
+  uint32_t i, j, count, current_index = 0;
   trit_t essence_trits[NUM_TRITS_ESSENCE];
   trit_t bundle_trit[HASH_LENGTH_TRIT];
   transfer_t* tf = NULL;
@@ -340,10 +341,10 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
                         HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 }
 
-transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[], size_t len,
-                                           Kerl* kerl,
+transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[],
+                                           uint32_t len, Kerl* kerl,
                                            iota_transaction_t* transaction) {
-  transfer_ctx_t* transfer_ctx = NULL;
+  transfer_ctx_t transfer_ctx = {};
   transfer_iterator_t* transfer_iterator =
       (transfer_iterator_t*)calloc(1, sizeof(transfer_iterator_t));
   if (!transfer_iterator) {
@@ -362,21 +363,16 @@ transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[], size_t len,
 
   transfer_iterator->transfers = transfers;
   transfer_iterator->transfers_count = len;
-  transfer_ctx = transfer_ctx_new();
-  if (!transfer_ctx) {
-    transfer_iterator_free(&transfer_iterator);
-    log_error(logger_id, "[%s:%d] Out of Memory.\n", __func__, __LINE__);
-    return NULL;
-  }
-  if (transfer_ctx_init(transfer_ctx, transfers, len)) {
-    transfer_iterator->transactions_count = transfer_ctx->count;
-    transfer_ctx_hash(transfer_ctx, kerl, transfers, len);
-    memcpy(transfer_iterator->bundle_hash, transfer_ctx->bundle,
+  if (transfer_ctx_init(&transfer_ctx, transfers, len)) {
+    transfer_iterator->transactions_count = transfer_ctx.count;
+    transfer_ctx_hash(&transfer_ctx, kerl, transfers, len);
+    memcpy(transfer_iterator->bundle_hash, transfer_ctx.bundle,
            FLEX_TRIT_SIZE_243);
   } else {
-    log_error(logger_id, "[%s:%d] Invalid transfers.\n", __func__, __LINE__);
+    log_error(TRANSFER_LOGGER_ID, "[%s:%d] Invalid transfers.\n", __func__,
+              __LINE__);
+    return NULL;
   }
-  transfer_ctx_free(transfer_ctx);
   transfer_iterator->iota_signature_gen = iota_flex_sign_signature_gen;
   return transfer_iterator;
 }
@@ -403,7 +399,7 @@ iota_transaction_t* transfer_iterator_next(
       transfer_iterator->transfers_count) {
     transfer_t* transfer =
         transfer_iterator->transfers[transfer_iterator->current_transfer];
-    size_t count = transfer_transactions_count(transfer);
+    uint32_t count = transfer_transactions_count(transfer);
     if (transfer_iterator->current_transfer_transaction_index >= count) {
       transfer_iterator->current_transfer++;
       transfer_iterator->current_transfer_transaction_index = 0;

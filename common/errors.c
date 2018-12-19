@@ -110,6 +110,8 @@ const char* error_2_string(retcode_t err) {
       return STR_CCLIENT_INSUFFICIENT_BALANCE;
     case RC_CCLIENT_POW_FAILED:
       return STR_CCLIENT_POW_FAILED;
+    case RC_CCLIENT_INVALID_TRANSFER:
+      return SRT_CCLIENT_INVALID_TRANSFER;
 
     // Consensus module
     case RC_CONSENSUS_NOT_IMPLEMENTED:
