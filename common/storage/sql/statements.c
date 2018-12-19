@@ -127,6 +127,14 @@ static size_t iota_statement_transaction_find_size = 328;
  * Partial Transaction statements
  */
 
+char *iota_statement_transaction_select_essence_and_metadata =
+    "SELECT " TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE
+    "," TRANSACTION_COL_OBSOLETE_TAG "," TRANSACTION_COL_TIMESTAMP
+    "," TRANSACTION_COL_CURRENT_INDEX "," TRANSACTION_COL_LAST_INDEX
+    "," TRANSACTION_COL_BUNDLE "," TRANSACTION_COL_SNAPSHOT_INDEX
+    "," TRANSACTION_COL_SOLID " FROM " TRANSACTION_TABLE_NAME
+    " WHERE " TRANSACTION_COL_HASH "=?";
+
 char *iota_statement_transaction_select_essence_attachment_and_metadata =
     "SELECT " TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE
     "," TRANSACTION_COL_OBSOLETE_TAG "," TRANSACTION_COL_TIMESTAMP

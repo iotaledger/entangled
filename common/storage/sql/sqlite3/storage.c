@@ -120,6 +120,9 @@ static void select_milestones_populate_from_row(
 
 static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
                                                   iota_transaction_t const tx);
+static void select_transactions_populate_from_row_essence_and_metadata(
+    sqlite3_stmt* const statement, iota_transaction_t const tx);
+
 static void
 select_transactions_populate_from_row_essence_attachment_and_metadata(
     sqlite3_stmt* const statement, iota_transaction_t const tx);
@@ -167,6 +170,7 @@ enum load_model {
   MODEL_TRANSACTION,
   MODEL_HASH,
   MODEL_MILESTONE,
+  MODEL_TRANSACTION_ESSENCE_METADATA,
   MODEL_TRANSACTION_ESSENCE_ATTACHMENT_METADATA,
   MODEL_TRANSACTION_MODEL_ESSENCE_CONSENSUS,
   MODEL_TRANSACTION_MODEL_METADATA,
@@ -192,6 +196,9 @@ static retcode_t execute_statement_load_gen(
     } else if (model == MODEL_MILESTONE) {
       select_milestones_populate_from_row(sqlite_statement,
                                           pack->models[pack->num_loaded++]);
+    } else if (model == MODEL_TRANSACTION_ESSENCE_METADATA) {
+      select_transactions_populate_from_row_essence_and_metadata(
+          sqlite_statement, pack->models[pack->num_loaded++]);
     } else if (model == MODEL_TRANSACTION_ESSENCE_ATTACHMENT_METADATA) {
       select_transactions_populate_from_row_essence_attachment_and_metadata(
           sqlite_statement, pack->models[pack->num_loaded++]);
@@ -349,6 +356,12 @@ static retcode_t execute_statement_load_transactions(
                                     MODEL_TRANSACTION);
 }
 
+static retcode_t execute_statement_load_transaction_for_essence_and_metadata(
+    sqlite3_stmt* const sqlite_statement, iota_stor_pack_t* const pack) {
+  return execute_statement_load_gen(sqlite_statement, pack, pack->capacity,
+                                    MODEL_TRANSACTION_ESSENCE_METADATA);
+}
+
 static retcode_t
 execute_statement_load_transaction_for_essence_attachment_and_metadata(
     sqlite3_stmt* const sqlite_statement, iota_stor_pack_t* const pack) {
@@ -395,6 +408,21 @@ static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
                          FLEX_TRIT_SIZE_81);
   column_decompress_load(statement, 15, tx->consensus.hash, FLEX_TRIT_SIZE_243);
   tx->loaded_columns_mask = (MASK_ALL_COLUMNS & (~MASK_METADATA));
+}
+
+static void select_transactions_populate_from_row_essence_and_metadata(
+    sqlite3_stmt* const statement, iota_transaction_t const tx) {
+  column_decompress_load(statement, 0, tx->essence.address, FLEX_TRIT_SIZE_243);
+  transaction_set_value(tx, sqlite3_column_int64(statement, 1));
+  column_decompress_load(statement, 2, tx->essence.obsolete_tag,
+                         FLEX_TRIT_SIZE_81);
+  transaction_set_timestamp(tx, sqlite3_column_int64(statement, 3));
+  transaction_set_current_index(tx, sqlite3_column_int64(statement, 4));
+  transaction_set_last_index(tx, sqlite3_column_int64(statement, 5));
+  column_decompress_load(statement, 6, tx->essence.bundle, FLEX_TRIT_SIZE_243);
+  transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 7));
+  transaction_set_solid(tx, sqlite3_column_int(statement, 8));
+  tx->loaded_columns_mask = MASK_ESSENCE | MASK_METADATA;
 }
 
 static void
@@ -560,6 +588,36 @@ retcode_t iota_stor_transaction_load(connection_t const* const conn,
 
   if ((ret = execute_statement_load_transactions(sqlite_statement, pack)) !=
       RC_OK) {
+    goto done;
+  }
+
+done:
+  finalize_statement(sqlite_statement);
+  return ret;
+}
+
+retcode_t iota_stor_transaction_load_essence_and_metadata(
+    connection_t const* const conn, flex_trit_t const* const hash,
+    iota_stor_pack_t* const pack) {
+  retcode_t ret = RC_OK;
+  char* statement = NULL;
+  sqlite3_stmt* sqlite_statement = NULL;
+
+  statement = iota_statement_transaction_select_essence_and_metadata;
+
+  if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
+                               statement)) != RC_OK) {
+    goto done;
+  }
+
+  if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) !=
+      RC_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
+  if ((ret = execute_statement_load_transaction_for_essence_and_metadata(
+           sqlite_statement, pack)) != RC_OK) {
     goto done;
   }
 

@@ -454,9 +454,9 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api,
   CDL_FOREACH(req->tails, iter) {
     bundle_transactions_new(&bundle);
     hash_pack_reset(&pack);
-    if ((ret = iota_tangle_transaction_load(&api->consensus->tangle,
-                                            TRANSACTION_FIELD_HASH, iter->hash,
-                                            &pack)) != RC_OK) {
+    if ((ret = iota_tangle_transaction_load_partial(
+             &api->consensus->tangle, iter->hash, &pack,
+             PARTIAL_TX_MODEL_ESSENCE_METADATA)) != RC_OK) {
     } else if (pack.num_loaded == 0) {
       ret = RC_API_TAIL_MISSING;
     } else if (tx.essence.current_index != 0) {
@@ -464,7 +464,7 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api,
     } else if (!tx.metadata.solid) {
       char_buffer_set(res->info, API_TAILS_NOT_SOLID);
     } else if ((ret = iota_consensus_bundle_validator_validate(
-                    &api->consensus->tangle, transaction_hash(txp), bundle,
+                    &api->consensus->tangle, iter->hash, bundle,
                     &bundle_status)) != RC_OK) {
     } else if (bundle_status != BUNDLE_VALID ||
                bundle_transactions_size(bundle) == 0) {

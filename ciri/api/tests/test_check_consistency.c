@@ -46,8 +46,8 @@ void test_check_consistency_missing_tail(void) {
   check_consistency_res_t *res = check_consistency_res_new();
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
 
-  flex_trits_from_trytes(hash, HASH_LENGTH_TRYTE, TX_1_OF_4_HASH,
-                         HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_1_OF_4_HASH,
+                         HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
   hash243_queue_push(&req->tails, hash);
 
   TEST_ASSERT(iota_api_check_consistency(&api, req, res) ==
@@ -131,7 +131,7 @@ void test_check_consistency_invalid_bundle(void) {
                         NUM_TRITS_PER_FLEX_TRIT);
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_1_OF_4_HASH,
                          HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
-  build_tangle(&api.consensus->tangle, txs, 4);
+  TEST_ASSERT(build_tangle(&api.consensus->tangle, txs, 4) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_update_solid_state(&api.consensus->tangle,
                                                          hash, true) == RC_OK);
   hash243_queue_push(&req->tails, hash);
@@ -157,7 +157,7 @@ void test_check_consistency_inconsistent_ledger(void) {
                                     TX_3_OF_4_HASH, TX_4_OF_4_HASH};
   transactions_deserialize(trytes, txs, 4);
 
-  build_tangle(&api.consensus->tangle, txs, 4);
+  TEST_ASSERT(build_tangle(&api.consensus->tangle, txs, 4) == RC_OK);
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_1_OF_4_HASH,
                          HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
   hash243_queue_push(&req->tails, hash);
