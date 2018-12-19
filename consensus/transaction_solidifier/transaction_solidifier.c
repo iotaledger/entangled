@@ -52,11 +52,13 @@ typedef struct check_solidity_do_func_params_s {
 static void *spawn_solid_transactions_propagation(void *arg) {
   transaction_solidifier_t *ts = (transaction_solidifier_t *)arg;
   while (ts->running) {
-    if (propagate_solid_transactions(ts) != RC_OK) {
-      log_critical(TRANSACTION_SOLIDIFIER_LOGGER_ID,
-                   "Failed in solid transaction propagation %s\n");
+    while (hash243_set_size(&ts->newly_set_solid_transactions) > 0) {
+      if (propagate_solid_transactions(ts) != RC_OK) {
+        log_critical(TRANSACTION_SOLIDIFIER_LOGGER_ID,
+                     "Failed in solid transaction propagation %s\n");
+      }
+      usleep(SOLID_PROPAGATION_INTERVAL);
     }
-    usleep(SOLID_PROPAGATION_INTERVAL);
   }
   return NULL;
 }
@@ -106,6 +108,7 @@ static retcode_t propagate_solid_transactions(
       }
     }
   }
+  hash243_set_free(&transactions_to_propagate);
   return RC_OK;
 }
 
