@@ -92,7 +92,7 @@ static retcode_t propagate_solid_transactions(
 
     hash_pack_reset(&hash_pack);
     if ((ret = iota_tangle_transaction_load_hashes_of_approvers(
-             ts->tangle, curr_entry->hash, &hash_pack))) {
+             ts->tangle, curr_entry->hash, &hash_pack, 0))) {
       return ret;
     }
     for (approver_index = 0; approver_index < hash_pack.num_loaded;

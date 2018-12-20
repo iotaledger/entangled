@@ -20,6 +20,9 @@
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/files.h"
 
+static bool debug_mode = false;
+static char *test_db_path = "common/storage/sql/sqlite3/tests/test.db";
+static char *ciri_db_path = "common/storage/sql/sqlite3/tests/ciri.db";
 // TODO Remove after "Common definitions #329" is merged
 #define HASH_LENGTH 243
 
@@ -62,7 +65,7 @@ static connection_t conn;
 
 void test_init_connection(void) {
   connection_config_t config;
-  config.db_path = "common/storage/sql/sqlite3/tests/test.db";
+  config.db_path = test_db_path;
   TEST_ASSERT(init_connection(&conn, &config) == RC_OK);
 }
 
@@ -261,7 +264,7 @@ void test_stored_load_hashes_of_approvers(void) {
   iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
 
   TEST_ASSERT(iota_stor_transaction_load_hashes_of_approvers(
-                  &conn, transaction_address(test_tx), &pack) == RC_OK);
+                  &conn, transaction_address(test_tx), &pack, 0) == RC_OK);
   TEST_ASSERT_EQUAL_INT(0, pack.num_loaded);
 
   transaction_free(test_tx);
@@ -414,11 +417,53 @@ void test_transactions_update_solid_states_two_transaction(void) {
   hash243_set_free(&hashes);
 }
 
-int main(void) {
+void test_transactions_arrival_time(void) {
+  flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
+  flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
+  DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
+
+  struct _iota_transaction second_test_transaction = *test_tx;
+  // Make them distinguishable
+  trit_t modified_trit =
+      flex_trits_at(transaction_hash(test_tx), FLEX_TRIT_SIZE_243, 2);
+  if (abs(modified_trit) > 0) {
+    modified_trit = 0;
+  } else {
+    modified_trit = 1;
+  }
+  flex_trits_set_at(second_test_transaction.consensus.hash, FLEX_TRIT_SIZE_243,
+                    2, modified_trit);
+  TEST_ASSERT(iota_stor_transaction_store(&conn, &second_test_transaction) ==
+              RC_OK);
+  hash_pack_reset(&pack);
+  TEST_ASSERT(iota_stor_transaction_load_metadata(
+                  &conn, transaction_hash(test_tx), &pack) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
+  int64_t test_tx_timestamp = transaction_arrival_timestamp(&tx);
+  hash_pack_reset(&pack);
+  TEST_ASSERT(iota_stor_transaction_load_metadata(
+                  &conn, transaction_hash(&second_test_transaction), &pack) ==
+              RC_OK);
+  TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
+  TEST_ASSERT(transaction_arrival_timestamp(&tx) > test_tx_timestamp);
+  transaction_free(test_tx);
+}
+
+int main(int argc, char *argv[]) {
   UNITY_BEGIN();
 
-  copy_file("common/storage/sql/sqlite3/tests/test.db",
-            "common/storage/sql/sqlite3/tests/ciri.db");
+  if (argc >= 2) {
+    debug_mode = true;
+  }
+  if (debug_mode) {
+    test_db_path = "test.db";
+    ciri_db_path = "ciri.db";
+  }
+
+  copy_file(test_db_path, ciri_db_path);
 
   RUN_TEST(test_init_connection);
   RUN_TEST(test_initialized_db_empty_transaction);
@@ -432,6 +477,7 @@ int main(void) {
   RUN_TEST(test_transaction_update_solid_state);
   RUN_TEST(test_transactions_update_solid_states_one_transaction);
   RUN_TEST(test_transactions_update_solid_states_two_transaction);
+  RUN_TEST(test_transactions_arrival_time);
 
   return UNITY_END();
 }

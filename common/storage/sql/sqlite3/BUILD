@@ -11,6 +11,7 @@ cc_library(
         "//common/model:transaction",
         "//common/storage/sql:statements",
         "//utils:logger_helper",
+        "//utils:time",
         "@sqlite3",
     ],
 )

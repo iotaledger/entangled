@@ -58,18 +58,18 @@ retcode_t iota_tangle_transactions_update_solid_state(
 
 retcode_t iota_tangle_transaction_load_hashes_of_approvers(
     tangle_t const *const tangle, flex_trit_t const *const approvee_hash,
-    iota_stor_pack_t *const pack) {
+    iota_stor_pack_t *const pack, int64_t before_timestamp) {
   retcode_t res = RC_OK;
 
-  res = iota_stor_transaction_load_hashes_of_approvers(&tangle->conn,
-                                                       approvee_hash, pack);
+  res = iota_stor_transaction_load_hashes_of_approvers(
+      &tangle->conn, approvee_hash, pack, before_timestamp);
 
   while (res == RC_OK && pack->insufficient_capacity) {
     res = hash_pack_resize(pack, 2);
     if (res == RC_OK) {
       pack->num_loaded = 0;
-      res = iota_stor_transaction_load_hashes_of_approvers(&tangle->conn,
-                                                           approvee_hash, pack);
+      res = iota_stor_transaction_load_hashes_of_approvers(
+          &tangle->conn, approvee_hash, pack, before_timestamp);
     }
   }
 
@@ -282,7 +282,7 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
              0) {
     hash_pack_reset(&hash_pack);
     if ((res = iota_tangle_transaction_load_hashes_of_approvers(
-             tangle, transaction_hash(curr_tx), &hash_pack)) != RC_OK) {
+             tangle, transaction_hash(curr_tx), &hash_pack, 0)) != RC_OK) {
       break;
     }
 
