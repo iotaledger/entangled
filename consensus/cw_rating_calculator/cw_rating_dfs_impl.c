@@ -15,7 +15,8 @@
 
 static retcode_t cw_rating_dfs_do_dfs_from_db(
     const cw_rating_calculator_t *const cw_calc, flex_trit_t *entry_point,
-    hash_to_indexed_hash_set_map_t *tx_to_approvers, size_t *subtangle_size);
+    hash_to_indexed_hash_set_map_t *tx_to_approvers, size_t *subtangle_size,
+    int64_t subtangle_before_timestamp);
 
 static retcode_t cw_rating_dfs_do_dfs_light(
     hash_to_indexed_hash_set_map_t tx_to_approvers, flex_trit_t *ep,
@@ -43,7 +44,7 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
   }
 
   res = cw_rating_dfs_do_dfs_from_db(
-      cw_calc, entry_point, &out->tx_to_approvers, &max_subtangle_size);
+      cw_calc, entry_point, &out->tx_to_approvers, &max_subtangle_size, 0);
 
   if (res != RC_OK) {
     log_error(CW_RATING_CALCULATOR_LOGGER_ID,
@@ -100,7 +101,8 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
 
 static retcode_t cw_rating_dfs_do_dfs_from_db(
     const cw_rating_calculator_t *const cw_calc, flex_trit_t *entry_point,
-    hash_to_indexed_hash_set_map_t *tx_to_approvers, size_t *subtangle_size) {
+    hash_to_indexed_hash_set_map_t *tx_to_approvers, size_t *subtangle_size,
+    int64_t subtangle_before_timestamp) {
   hash_to_indexed_hash_set_entry_t *curr_tx = NULL;
   size_t curr_approver_index;
   retcode_t res = RC_OK;
@@ -124,7 +126,8 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
     if (!hash_to_indexed_hash_set_map_contains(tx_to_approvers, curr_tx_hash)) {
       hash_pack_reset(&pack);
       if ((res = iota_tangle_transaction_load_hashes_of_approvers(
-               cw_calc->tangle, curr_tx_hash, &pack))) {
+               cw_calc->tangle, curr_tx_hash, &pack,
+               subtangle_before_timestamp))) {
         log_error(CW_RATING_CALCULATOR_LOGGER_ID,
                   "Failed in loading approvers, error code is: %" PRIu64 "\n",
                   res);

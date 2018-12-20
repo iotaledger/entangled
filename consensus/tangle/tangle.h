@@ -61,7 +61,7 @@ retcode_t iota_tangle_transaction_load(tangle_t const *const tangle,
 
 retcode_t iota_tangle_transaction_load_hashes_of_approvers(
     tangle_t const *const tangle, flex_trit_t const *const approvee_hash,
-    iota_stor_pack_t *const pack);
+    iota_stor_pack_t *const pack, int64_t before_timestamp);
 
 /**
  * Loads partial transaction data - (contains metadata)
