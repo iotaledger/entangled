@@ -25,7 +25,7 @@
 // Return non 0 on success
 size_t transaction_deserialize_trits(iota_transaction_t transaction,
                                      const flex_trit_t *trits,
-                                     bool computeHash) {
+                                     bool compute_hash) {
   flex_trit_t partial[FLEX_TRIT_SIZE_81];
   trit_t buffer[81];
   size_t offset = 0;
@@ -112,7 +112,7 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_NONCE);
   offset += NUM_TRITS_NONCE;
 
-  if (computeHash) {
+  if (compute_hash) {
     Curl curl;
     init_curl(&curl);
     curl.type = CURL_P_81;
@@ -283,14 +283,14 @@ iota_transaction_t transaction_new(void) {
 // Creates and returns a new transaction from serialized data
 // Returns NULL if failed
 iota_transaction_t transaction_deserialize(const flex_trit_t *trits,
-                                           bool computeHash) {
+                                           bool compute_hash) {
   iota_transaction_t transaction;
   transaction = transaction_new();
   if (!transaction) {
     // errno = IOTA_OUT_OF_MEMORY
     return NULL;
   }
-  if (!transaction_deserialize_from_trits(transaction, trits, computeHash)) {
+  if (!transaction_deserialize_from_trits(transaction, trits, compute_hash)) {
     // errno = IOTA_SOME_ERROR
     transaction_free(transaction);
     return NULL;
@@ -332,8 +332,8 @@ size_t transaction_serialize_on_flex_trits(const iota_transaction_t transaction,
 // non 0 on success
 size_t transaction_deserialize_from_trits(iota_transaction_t transaction,
                                           const flex_trit_t *trits,
-                                          bool computeHash) {
-  return transaction_deserialize_trits(transaction, trits, computeHash);
+                                          bool compute_hash) {
+  return transaction_deserialize_trits(transaction, trits, compute_hash);
 }
 
 /***********************************************************************************************************

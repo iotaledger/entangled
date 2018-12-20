@@ -406,7 +406,7 @@ extern uint8_t transaction_weight_magnitude(
 iota_transaction_t transaction_new(void);
 // Creates and returns a new transaction from serialized data - NULL if failed
 iota_transaction_t transaction_deserialize(const flex_trit_t *trits,
-                                           bool computeHash);
+                                           bool compute_hash);
 /***********************************************************************************************************
  * Serialization
  ***********************************************************************************************************/
@@ -423,7 +423,7 @@ size_t transaction_serialize_on_flex_trits(const iota_transaction_t transaction,
 // non 0 on success
 size_t transaction_deserialize_from_trits(iota_transaction_t transaction,
                                           const flex_trit_t *trits,
-                                          bool computeHash);
+                                          bool compute_hash);
 /***********************************************************************************************************
  * Destructor
  ***********************************************************************************************************/

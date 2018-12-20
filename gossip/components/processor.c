@@ -72,7 +72,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
     ret = RC_PROCESSOR_INVALID_TRANSACTION;
     goto failure;
   }
-  memcpy(transaction_hash(&transaction), curl_hash, FLEX_TRIT_SIZE_243);
+  transaction_set_hash(&transaction, curl_hash);
 
   // Validates the transaction
   if (!iota_consensus_transaction_validate(processor->transaction_validator,
