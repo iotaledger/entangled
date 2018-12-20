@@ -24,7 +24,8 @@
 // Fills up an existing transaction with the serialized data in bytes
 // Return non 0 on success
 size_t transaction_deserialize_trits(iota_transaction_t transaction,
-                                     const flex_trit_t *trits) {
+                                     const flex_trit_t *trits,
+                                     bool computeHash) {
   flex_trit_t partial[FLEX_TRIT_SIZE_81];
   trit_t buffer[81];
   size_t offset = 0;
@@ -110,6 +111,19 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
   flex_trits_slice(transaction->attachment.nonce, NUM_TRITS_NONCE, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_NONCE);
   offset += NUM_TRITS_NONCE;
+
+  if (computeHash) {
+    Curl curl;
+    init_curl(&curl);
+    curl.type = CURL_P_81;
+    trit_t tx_trits[NUM_TRITS_SERIALIZED_TRANSACTION];
+    trit_t hash[NUM_TRITS_HASH];
+    flex_trits_to_trits(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, trits,
+                        offset, offset);
+    curl_digest(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, hash, &curl);
+    flex_trits_from_trits(transaction->consensus.hash, NUM_TRITS_HASH, hash,
+                          NUM_TRITS_HASH, NUM_TRITS_HASH);
+  }
 
   transaction->loaded_columns_mask |=
       (MASK_ESSENCE | MASK_ATTACHMENT | MASK_CONSENSUS | MASK_DATA);
@@ -268,14 +282,15 @@ iota_transaction_t transaction_new(void) {
 
 // Creates and returns a new transaction from serialized data
 // Returns NULL if failed
-iota_transaction_t transaction_deserialize(const flex_trit_t *trits) {
+iota_transaction_t transaction_deserialize(const flex_trit_t *trits,
+                                           bool computeHash) {
   iota_transaction_t transaction;
   transaction = transaction_new();
   if (!transaction) {
     // errno = IOTA_OUT_OF_MEMORY
     return NULL;
   }
-  if (!transaction_deserialize_from_trits(transaction, trits)) {
+  if (!transaction_deserialize_from_trits(transaction, trits, computeHash)) {
     // errno = IOTA_SOME_ERROR
     transaction_free(transaction);
     return NULL;
@@ -316,8 +331,9 @@ size_t transaction_serialize_on_flex_trits(const iota_transaction_t transaction,
 // Fills up an existing transaction with the serialized data in trits - returns
 // non 0 on success
 size_t transaction_deserialize_from_trits(iota_transaction_t transaction,
-                                          const flex_trit_t *trits) {
-  return transaction_deserialize_trits(transaction, trits);
+                                          const flex_trit_t *trits,
+                                          bool computeHash) {
+  return transaction_deserialize_trits(transaction, trits, computeHash);
 }
 
 /***********************************************************************************************************

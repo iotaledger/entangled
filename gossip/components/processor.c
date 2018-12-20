@@ -65,8 +65,8 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
   }
 
   // Deserializes the transaction
-  if (transaction_deserialize_from_trits(&transaction,
-                                         transaction_flex_trits) !=
+  if (transaction_deserialize_from_trits(&transaction, transaction_flex_trits,
+                                         false) !=
       NUM_TRITS_SERIALIZED_TRANSACTION) {
     log_warning(PROCESSOR_LOGGER_ID, "Deserializing transaction failed\n");
     ret = RC_PROCESSOR_INVALID_TRANSACTION;
@@ -86,7 +86,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
 
   // Checks if the transaction is already persisted
   if ((ret = iota_tangle_transaction_exist(
-           processor->tangle, TRANSACTION_FIELD_HASH, hash, &exists)) !=
+           processor->tangle, TRANSACTION_FIELD_HASH, curl_hash, &exists)) !=
       RC_OK) {
     log_warning(PROCESSOR_LOGGER_ID, "Checking if transaction exists failed\n");
     goto failure;

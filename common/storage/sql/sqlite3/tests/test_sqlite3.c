@@ -91,7 +91,7 @@ void test_stored_transaction(void) {
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
+  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits, true);
 
   TEST_ASSERT(iota_stor_transaction_store(&conn, test_tx) == RC_OK);
   // Test primary key constraint violation
@@ -235,7 +235,7 @@ void test_stored_load_hashes_by_address(void) {
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
+  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits, true);
 
   TEST_ASSERT(iota_stor_transaction_load_hashes(
                   &conn, TRANSACTION_FIELD_ADDRESS,
@@ -261,7 +261,7 @@ void test_stored_load_hashes_of_approvers(void) {
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
+  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits, true);
 
   TEST_ASSERT(iota_stor_transaction_load_hashes_of_approvers(
                   &conn, transaction_address(test_tx), &pack, 0) == RC_OK);
@@ -275,7 +275,7 @@ void test_transaction_update_snapshot_index(void) {
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
+  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits, true);
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
 
   TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH,
@@ -336,7 +336,7 @@ void test_transaction_update_solid_state(void) {
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
+  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits, true);
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
 
   TEST_ASSERT(iota_stor_transaction_load(&conn, TRANSACTION_FIELD_HASH,
@@ -358,7 +358,7 @@ void test_transactions_update_solid_states_one_transaction(void) {
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
+  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits, true);
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
 
   hash243_set_t hashes = NULL;
@@ -379,7 +379,7 @@ void test_transactions_update_solid_states_two_transaction(void) {
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
+  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits, true);
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
 
   struct _iota_transaction second_test_transaction = *test_tx;
