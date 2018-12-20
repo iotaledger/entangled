@@ -273,7 +273,7 @@ static void *processor_routine(processor_t *const processor) {
   lock_handle_lock(&lock_cond);
 
   while (processor->running) {
-    if (processor_size(processor) == 0) {
+    if (processor_is_empty(processor)) {
       cond_handle_timedwait(&processor->cond, &lock_cond,
                             PROCESSOR_TIMEOUT_SEC);
     }
