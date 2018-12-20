@@ -109,6 +109,17 @@ retcode_t processor_on_next(processor_t *const processor,
  */
 size_t processor_size(processor_t *const processor);
 
+/**
+ * Tells whether the processor queue is empty or not
+ *
+ * @param processor The processor
+ *
+ * @return true if empty, false otherwise
+ */
+static inline bool processor_is_empty(processor_t *const processor) {
+  return processor->queue == NULL;
+}
+
 #ifdef __cplusplus
 }
 #endif

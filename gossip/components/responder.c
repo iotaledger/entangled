@@ -46,7 +46,7 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
 
     log_debug(RESPONDER_LOGGER_ID, "Responding to random tip request\n");
     if (rand_handle_probability() < responder->node->conf.p_reply_random_tip &&
-        requester_size(&responder->node->transaction_requester) > 0) {
+        !requester_is_empty(&responder->node->transaction_requester)) {
       neighbor->nbr_random_tx_req++;
       if ((ret = tips_cache_random_tip(&responder->node->tips, tip)) != RC_OK) {
         return ret;
@@ -143,7 +143,7 @@ static void *responder_routine(responder_t *const responder) {
   lock_handle_lock(&lock_cond);
 
   while (responder->running) {
-    if (responder_size(responder) == 0) {
+    if (responder_is_empty(responder)) {
       cond_handle_timedwait(&responder->cond, &lock_cond,
                             RESPONDER_TIMEOUT_SEC);
     }

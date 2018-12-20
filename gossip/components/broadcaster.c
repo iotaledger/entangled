@@ -31,7 +31,7 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
   lock_handle_lock(&lock_cond);
 
   while (broadcaster->running) {
-    if (broadcaster_size(broadcaster) == 0) {
+    if (broadcaster_is_empty(broadcaster)) {
       cond_handle_timedwait(&broadcaster->cond, &lock_cond,
                             BROADCASTER_TIMEOUT_SEC);
     }

@@ -124,6 +124,18 @@ retcode_t get_transaction_to_request(
     transaction_requester_t *const transaction_requester,
     flex_trit_t *const hash, bool const milestone);
 
+/**
+ * Tells whether the requester queue is empty or not
+ *
+ * @param requester The requester
+ *
+ * @return true if empty, false otherwise
+ */
+static inline bool requester_is_empty(
+    transaction_requester_t *const requester) {
+  return requester->milestones == NULL && requester->transactions == NULL;
+}
+
 #ifdef __cplusplus
 }
 #endif

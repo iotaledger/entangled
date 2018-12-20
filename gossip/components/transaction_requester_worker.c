@@ -14,7 +14,6 @@
 
 #define REQUESTER_LOGGER_ID "requester"
 #define REQUESTER_INTERVAL 10
-#define REQUESTER_THRESHOLD 100
 
 /*
  * Private functions
@@ -33,7 +32,7 @@ static void *transaction_requester_routine(
   }
 
   while (transaction_requester->running) {
-    if (requester_size(transaction_requester) <= REQUESTER_THRESHOLD) {
+    if (requester_is_empty(transaction_requester)) {
       goto sleep;
     }
     tips_cache_random_tip(&transaction_requester->node->tips, hash);
