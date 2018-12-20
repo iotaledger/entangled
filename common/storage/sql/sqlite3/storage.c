@@ -18,6 +18,7 @@
 #include "common/storage/sql/statements.h"
 #include "common/storage/storage.h"
 #include "utils/logger_helper.h"
+#include "utils/time.h"
 
 #define SQLITE3_LOGGER_ID "storage_sqlite3"
 
@@ -518,7 +519,9 @@ retcode_t iota_stor_transaction_store(connection_t const* const conn,
       column_compress_bind(sqlite_statement, 15, tx->attachment.nonce,
                            FLEX_TRIT_SIZE_81) != RC_OK ||
       column_compress_bind(sqlite_statement, 16, tx->consensus.hash,
-                           FLEX_TRIT_SIZE_243) != RC_OK) {
+                           FLEX_TRIT_SIZE_243) != RC_OK ||
+      sqlite3_bind_int64(sqlite_statement, 17, current_timestamp_ms()) !=
+          SQLITE_OK) {
     ret = binding_error();
     goto done;
   }
@@ -700,13 +703,16 @@ done:
 
 retcode_t iota_stor_transaction_load_hashes_of_approvers(
     connection_t const* const conn, flex_trit_t const* const approvee_hash,
-    iota_stor_pack_t* const pack) {
+    iota_stor_pack_t* const pack, int64_t before_timestamp) {
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
 
-  if ((ret = prepare_statement(
-           (sqlite3*)conn->db, &sqlite_statement,
-           iota_statement_transaction_select_hashes_of_approvers)) != RC_OK) {
+  const char* statement =
+      before_timestamp != 0
+          ? iota_statement_transaction_select_hashes_of_approvers_before_date
+          : iota_statement_transaction_select_hashes_of_approvers;
+  if ((ret = prepare_statement((sqlite3*)conn->db, &sqlite_statement,
+                               statement)) != RC_OK) {
     goto done;
   }
 
@@ -714,6 +720,12 @@ retcode_t iota_stor_transaction_load_hashes_of_approvers(
                            FLEX_TRIT_SIZE_243) != RC_OK ||
       column_compress_bind(sqlite_statement, 2, approvee_hash,
                            FLEX_TRIT_SIZE_243) != RC_OK) {
+    ret = binding_error();
+    goto done;
+  }
+
+  if (before_timestamp != 0 &&
+      sqlite3_bind_int64(sqlite_statement, 3, before_timestamp) != SQLITE_OK) {
     ret = binding_error();
     goto done;
   }

@@ -44,7 +44,8 @@ char *iota_statement_transaction_insert =
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_UPPER
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_LOWER "," TRANSACTION_COL_NONCE
-    "," TRANSACTION_COL_HASH ")VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    "," TRANSACTION_COL_HASH "," TRANSACTION_COL_ARRIVAL_TIME
+    ")VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 char *iota_statement_transaction_select_by_hash =
     "SELECT " TRANSACTION_COL_SIG_OR_MSG "," TRANSACTION_COL_ADDRESS
@@ -65,6 +66,11 @@ char *iota_statement_transaction_select_hashes_by_address =
 char *iota_statement_transaction_select_hashes_of_approvers =
     "SELECT " TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME
     " WHERE " TRANSACTION_COL_BRANCH "=? OR " TRANSACTION_COL_TRUNK "=?";
+
+char *iota_statement_transaction_select_hashes_of_approvers_before_date =
+    "SELECT " TRANSACTION_COL_HASH " FROM " TRANSACTION_TABLE_NAME
+    " WHERE (" TRANSACTION_COL_BRANCH "=? OR " TRANSACTION_COL_TRUNK
+    "=?) AND " TRANSACTION_COL_ARRIVAL_TIME "<?";
 
 char *iota_statement_transaction_select_hashes_of_transactions_to_request =
     "SELECT " TRANSACTION_COL_TRUNK " FROM " TRANSACTION_TABLE_NAME

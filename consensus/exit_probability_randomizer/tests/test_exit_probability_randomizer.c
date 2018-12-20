@@ -23,6 +23,7 @@
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "utarray.h"
 #include "utils/macros.h"
+#include "utils/time.h"
 
 static cw_rating_calculator_t calc;
 static tangle_t tangle;
@@ -549,7 +550,7 @@ void test_1_bundle(void) {
 
   for (unsigned int i = 0; i < bundle_size; ++i) {
     TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(
-                    &tangle, transaction_hash(txs[i]), &pack) == RC_OK);
+                    &tangle, transaction_hash(txs[i]), &pack, 0) == RC_OK);
   }
 
   for (size_t i = 0; i < 5; ++i) {
@@ -560,8 +561,14 @@ void test_1_bundle(void) {
   }
 
   TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(
-                  &tangle, transaction_hash(txs[4]), &pack) == RC_OK);
+                  &tangle, transaction_hash(txs[4]), &pack,
+                  current_timestamp_ms()) == RC_OK);
   TEST_ASSERT_EQUAL_INT(pack.num_loaded, bundle_size);
+  hash_pack_reset(&pack);
+  TEST_ASSERT(iota_tangle_transaction_load_hashes_of_approvers(
+                  &tangle, transaction_hash(txs[4]), &pack,
+                  current_timestamp_ms() / 2) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(pack.num_loaded, 0);
 
   flex_trit_t *ep = transaction_hash(txs[4]);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,

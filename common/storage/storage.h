@@ -92,7 +92,7 @@ extern retcode_t iota_stor_transaction_load_hashes(
 
 extern retcode_t iota_stor_transaction_load_hashes_of_approvers(
     connection_t const* const conn, flex_trit_t const* const approvee_hash,
-    iota_stor_pack_t* const pack);
+    iota_stor_pack_t* const pack, int64_t before_timestamp);
 
 extern retcode_t iota_stor_transaction_load_hashes_of_requests(
     connection_t const* const conn, iota_stor_pack_t* const pack,
