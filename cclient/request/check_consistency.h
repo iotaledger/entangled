@@ -19,7 +19,7 @@ typedef struct check_consistency_req_s {
    * Tail transaction hash (hash of transaction with `currentIndex=0`), or array
    * of tail transaction hashes.
    */
-  hash243_queue_t hashes;
+  hash243_queue_t tails;
 } check_consistency_req_t;
 
 check_consistency_req_t* check_consistency_req_new();

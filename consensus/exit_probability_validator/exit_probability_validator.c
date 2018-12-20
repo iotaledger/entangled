@@ -20,6 +20,8 @@ retcode_t iota_consensus_exit_prob_transaction_validator_init(
   epv->tangle = tangle;
   epv->mt = mt;
   epv->lv = lv;
+  epv->delta = NULL;
+  epv->analyzed_hashes = NULL;
   epv->max_depth_ok_memoization = NULL;
   return RC_OK;
 }
@@ -135,6 +137,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
       break;
     }
 
+    hash_pack_reset(&pack);
     res = iota_tangle_transaction_load_partial(
         epv->tangle, curr_hash_trits, &pack,
         PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA);

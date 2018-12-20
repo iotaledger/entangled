@@ -86,6 +86,9 @@ retcode_t iota_tangle_transaction_load_partial(
     iota_stor_pack_t *const pack, partial_transaction_model_e models_mask) {
   if (models_mask == PARTIAL_TX_MODEL_METADATA) {
     return iota_stor_transaction_load_metadata(&tangle->conn, hash, pack);
+  } else if (models_mask == PARTIAL_TX_MODEL_ESSENCE_METADATA) {
+    return iota_stor_transaction_load_essence_and_metadata(&tangle->conn, hash,
+                                                           pack);
   } else if (models_mask == PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA) {
     return iota_stor_transaction_load_essence_attachment_and_metadata(
         &tangle->conn, hash, pack);

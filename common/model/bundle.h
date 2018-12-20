@@ -25,6 +25,15 @@ void bundle_transactions_free(bundle_transactions_t **const bundle);
 void bundle_transactions_add(bundle_transactions_t *const bundle,
                              iota_transaction_t transaction);
 
+static inline size_t bundle_transactions_size(
+    bundle_transactions_t *const bundle) {
+  if (bundle == NULL) {
+    return 0;
+  }
+
+  return utarray_len(bundle);
+}
+
 void calculate_bundle_hash(bundle_transactions_t *bundle, flex_trit_t *out);
 
 #ifdef __cplusplus

@@ -52,6 +52,20 @@ retcode_t char_buffer_allocate(char_buffer_t* in, const size_t n) {
   return RC_OK;
 }
 
+retcode_t char_buffer_set(char_buffer_t* in, char const* const str) {
+  size_t size = strlen(str);
+
+  in->data = (char*)realloc(in->data, sizeof(char) * (size + 1));
+  if (in->data == NULL) {
+    log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
+              STR_CCLIENT_OOM);
+    return RC_CCLIENT_OOM;
+  }
+  in->length = size;
+  strcpy(in->data, str);
+  return RC_OK;
+}
+
 void char_buffer_free(char_buffer_t* in) {
   if (in) {
     if (in->data) {

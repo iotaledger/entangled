@@ -18,6 +18,12 @@
 #include "gossip/components/broadcaster.h"
 #include "utils/handles/thread.h"
 
+#define API_TAILS_NOT_SOLID "tails are not solid (missing a referenced tx)"
+#define API_TAILS_BUNDLE_INVALID "tails are not consistent (bundle is invalid)"
+#define API_TAILS_NOT_CONSISTENT                                          \
+  "tails are not consistent (would lead to inconsistent ledger state or " \
+  "below max depth)"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -297,6 +303,23 @@ retcode_t iota_api_were_addresses_spent_from(
     iota_api_t const *const api, check_consistency_req_t const *const req,
     check_consistency_res_t *const res);
 
+/**
+ * Checks consistency of transactions.
+ * Error is returned if:
+ * - Transaction does not exist
+ * - Transaction is not a tail
+ * False is returned if:
+ * - Tails are not solid
+ * - Tails bundles are not valid
+ * - Tails would lead to inconsistent ledger
+ * True is returned otherwise
+ *
+ * @param api The API
+ * @param req The request
+ * @param res The response
+ *
+ * @return a status code
+ */
 retcode_t iota_api_check_consistency(iota_api_t const *const api,
                                      check_consistency_req_t const *const req,
                                      check_consistency_res_t *const res);

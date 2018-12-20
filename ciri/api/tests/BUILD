@@ -36,6 +36,17 @@ cc_test(
 )
 
 cc_test(
+    name = "test_check_consistency",
+    srcs = ["test_check_consistency.c"],
+    data = [":db_file"],
+    deps = [
+        "//ciri/api",
+        "//consensus/test_utils",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_find_transactions",
     srcs = ["test_find_transactions.c"],
     data = [":db_file"],
@@ -69,6 +80,17 @@ cc_test(
 )
 
 cc_test(
+    name = "test_get_transactions_to_approve",
+    srcs = ["test_get_transactions_to_approve.c"],
+    data = [":db_file"],
+    deps = [
+        "//ciri/api",
+        "//consensus/test_utils",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_get_trytes",
     srcs = ["test_get_trytes.c"],
     data = [":db_file"],
@@ -97,18 +119,6 @@ cc_test(
         ":defs",
         "//ciri/api",
         "//consensus:conf",
-        "//consensus/test_utils",
-        "@unity",
-    ],
-)
-
-cc_test(
-    name = "test_get_transactions_to_approve",
-    srcs = ["test_get_transactions_to_approve.c"],
-    data = [":db_file"],
-    deps = [
-        ":defs",
-        "//ciri/api",
         "//consensus/test_utils",
         "@unity",
     ],
