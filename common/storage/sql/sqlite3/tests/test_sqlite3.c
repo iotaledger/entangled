@@ -422,7 +422,7 @@ void test_transactions_arrival_time(void) {
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits);
+  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits, true);
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
 
   struct _iota_transaction second_test_transaction = *test_tx;

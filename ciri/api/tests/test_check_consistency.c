@@ -72,7 +72,7 @@ void test_check_consistency_not_tail(void) {
       NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
   hash243_queue_push(&req->tails, hash);
 
-  transaction_deserialize_from_trits(&tx, trits);
+  transaction_deserialize_from_trits(&tx, trits, true);
   TEST_ASSERT(iota_tangle_transaction_store(&api.consensus->tangle, &tx) ==
               RC_OK);
 
@@ -97,7 +97,7 @@ void test_check_consistency_tail_not_solid(void) {
       NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
   hash243_queue_push(&req->tails, hash);
 
-  transaction_deserialize_from_trits(&tx, trits);
+  transaction_deserialize_from_trits(&tx, trits, true);
   TEST_ASSERT(iota_tangle_transaction_store(&api.consensus->tangle, &tx) ==
               RC_OK);
   TEST_ASSERT(iota_tangle_transaction_update_solid_state(&api.consensus->tangle,
@@ -121,7 +121,7 @@ void test_check_consistency_invalid_bundle(void) {
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
   trit_t buffer[NUM_TRITS_PER_FLEX_TRIT];
 
-  transactions_deserialize(trytes, txs, 4);
+  transactions_deserialize(trytes, txs, 4, true);
   flex_trits_to_trits(buffer, NUM_TRITS_PER_FLEX_TRIT,
                       transaction_signature(txs[1]), NUM_TRITS_PER_FLEX_TRIT,
                       NUM_TRITS_PER_FLEX_TRIT);
@@ -156,7 +156,7 @@ void test_check_consistency_consistent_ledger(bool consistency) {
   tryte_t const *const hashes[4] = {TX_1_OF_4_HASH, TX_2_OF_4_HASH,
                                     TX_3_OF_4_HASH, TX_4_OF_4_HASH};
 
-  transactions_deserialize(trytes, txs, 4);
+  transactions_deserialize(trytes, txs, 4, true);
 
   for (size_t i = 0; i < 4; i++) {
     memset(txs[i]->attachment.branch, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
