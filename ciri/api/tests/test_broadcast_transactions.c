@@ -51,7 +51,7 @@ void test_broadcast_transactions_invalid_tx(void) {
   flex_trits_from_trytes(
       tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TX_1_OF_4_VALUE_BUNDLE_TRYTES,
       NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
-  transaction_deserialize_from_trits(&tx, tx_trits);
+  transaction_deserialize_from_trits(&tx, tx_trits, false);
   transaction_set_value(&tx, -IOTA_SUPPLY - 1);
   transaction_serialize_on_flex_trits(&tx, tx_trits);
   hash_array_push(req->trytes, tx_trits);

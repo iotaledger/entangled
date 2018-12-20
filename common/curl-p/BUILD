@@ -39,7 +39,7 @@ cc_library(
 
 cc_library(
     name = "ptrit",
-    srcs = ["curl_p_ptrit.c"],
+    srcs = ["ptrit.c"],
     hdrs = [
         "ptrit.h",
     ],

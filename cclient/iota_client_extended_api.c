@@ -297,7 +297,7 @@ retcode_t iota_client_get_transaction_objects(
   if (ret_code == RC_OK) {
     CDL_FOREACH(out_trytes->trytes, q_iter) {
       tx_deserialize_offset =
-          transaction_deserialize_from_trits(&tx, q_iter->hash);
+          transaction_deserialize_from_trits(&tx, q_iter->hash, true);
       if (tx_deserialize_offset) {
         transaction_array_push_back(out_tx_objs, &tx);
       } else {
@@ -344,8 +344,8 @@ retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
     ret_code = iota_client_get_trytes(serv, (get_trytes_req_t*)consistency_req,
                                       out_trytes);
     if (ret_code == RC_OK) {
-      tx_deserialize_offset =
-          transaction_deserialize_from_trits(&tx, out_trytes->trytes->hash);
+      tx_deserialize_offset = transaction_deserialize_from_trits(
+          &tx, out_trytes->trytes->hash, false);
       if (tx_deserialize_offset) {
         // is above max depth
         time_now = current_timestamp_ms();
@@ -467,7 +467,7 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
 
   // trytes to transaction objects
   HASH_ARRAY_FOREACH(trytes, elt) {
-    tx_deserialize_offset = transaction_deserialize_from_trits(&tx, elt);
+    tx_deserialize_offset = transaction_deserialize_from_trits(&tx, elt, false);
     if (tx_deserialize_offset) {
       transaction_array_push_back(out_transactions, &tx);
     } else {

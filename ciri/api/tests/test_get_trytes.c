@@ -81,7 +81,7 @@ void test_get_trytes_max(void) {
   iota_transaction_t txs[2];
   tryte_t const *const trytes[2] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                                     TX_2_OF_4_VALUE_BUNDLE_TRYTES};
-  transactions_deserialize(trytes, txs, 2);
+  transactions_deserialize(trytes, txs, 2, true);
   build_tangle(&api.consensus->tangle, txs, 2);
 
   // Getting trytes 1 & 2 from hashes
@@ -120,7 +120,7 @@ void test_get_trytes(void) {
 
   // Storing transactions to get trytes from
 
-  transactions_deserialize(txs_trytes, txs, 4);
+  transactions_deserialize(txs_trytes, txs, 4, true);
   TEST_ASSERT(build_tangle(&api.consensus->tangle, txs, 4) == RC_OK);
 
   // Loading trytes from hashes

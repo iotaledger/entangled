@@ -110,7 +110,7 @@ void test_cw_gen_topology(test_tangle_topology topology) {
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx = transaction_deserialize(tx_trits);
+  iota_transaction_t tx = transaction_deserialize(tx_trits, true);
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_update_solid_state(
                   &tangle, tx->consensus.hash, true) == RC_OK);
@@ -242,7 +242,7 @@ void test_single_tx_tangle(void) {
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx = transaction_deserialize(tx_trits);
+  iota_transaction_t tx = transaction_deserialize(tx_trits, true);
 
   flex_trit_t *ep = transaction_hash(tx);
 
@@ -310,7 +310,7 @@ void test_cw_topology_four_transactions_diamond(void) {
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t test_tx = transaction_deserialize(test_tx_trits);
+  iota_transaction_t test_tx = transaction_deserialize(test_tx_trits, true);
 
   struct _iota_transaction txs[num_txs];
   txs[0] = *test_tx;
@@ -406,7 +406,7 @@ void test_cw_topology_two_inequal_tips(void) {
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t test_tx = transaction_deserialize(tx_trits);
+  iota_transaction_t test_tx = transaction_deserialize(tx_trits, true);
 
   struct _iota_transaction txs[num_txs];
   txs[0] = *test_tx;
@@ -537,7 +537,7 @@ void test_1_bundle(void) {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES,
       BUNDLE_OF_4_TRUNK_TRANSACTION};
-  transactions_deserialize(trytes, txs, 5);
+  transactions_deserialize(trytes, txs, 5, true);
 
   transaction_set_trunk(txs[4], conf.genesis_hash);
   transaction_set_branch(txs[4], conf.genesis_hash);
@@ -636,7 +636,7 @@ void test_2_chained_bundles(void) {
                                     TX_4_OF_4_VALUE_BUNDLE_TRYTES,
                                     TX_1_OF_2,
                                     TX_2_OF_2};
-  transactions_deserialize(trytes, txs, 6);
+  transactions_deserialize(trytes, txs, 6, true);
   build_tangle(&tangle, txs, 6);
   for (size_t i = 0; i < 6; ++i) {
     TEST_ASSERT(iota_tangle_transaction_update_solid_state(
@@ -654,7 +654,7 @@ void test_2_chained_bundles(void) {
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx_entry_point = transaction_deserialize(ep_trits);
+  iota_transaction_t tx_entry_point = transaction_deserialize(ep_trits, true);
   transaction_set_trunk(tx_entry_point, conf.genesis_hash);
   transaction_set_branch(tx_entry_point, conf.genesis_hash);
   transaction_set_snapshot_index(tx_entry_point, 9999999);

@@ -369,7 +369,7 @@ retcode_t iota_api_broadcast_transactions(
   }
 
   HASH_ARRAY_FOREACH(req->trytes, elt) {
-    transaction_deserialize_from_trits(&tx, elt);
+    transaction_deserialize_from_trits(&tx, elt, true);
     if (iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
       // TODO priority queue on weight_magnitude
@@ -394,7 +394,7 @@ retcode_t iota_api_store_transactions(
   }
 
   HASH_ARRAY_FOREACH(req->trytes, elt) {
-    transaction_deserialize_from_trits(&tx, elt);
+    transaction_deserialize_from_trits(&tx, elt, true);
     if (iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
       if ((ret = iota_tangle_transaction_exist(
