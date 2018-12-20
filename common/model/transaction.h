@@ -112,6 +112,7 @@ struct _iota_transaction_fields_data {
 struct _iota_transaction_fields_metadata {
   uint64_t snapshot_index;
   bool solid;
+  int64_t arrival_timestamp;
 };
 
 struct _iota_transaction {
@@ -376,6 +377,19 @@ static inline bool transaction_solid(iota_transaction_t transaction) {
 static inline void transaction_set_solid(iota_transaction_t transaction,
                                          bool state) {
   transaction->metadata.solid = state;
+}
+
+// Get the transaction arrival timestamp
+static inline int64_t transaction_arrival_timestamp(
+    iota_transaction_t transaction) {
+  assert(transaction->loaded_columns_mask & MASK_METADATA);
+  return transaction->metadata.arrival_timestamp;
+}
+
+// Set the transaction arrival timestamp
+static inline void transaction_set_arrival_timestamp(
+    iota_transaction_t transaction, int64_t timestamp) {
+  transaction->metadata.arrival_timestamp = timestamp;
 }
 
 /***********************************************************************************************************

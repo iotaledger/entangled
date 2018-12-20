@@ -136,8 +136,8 @@ char *iota_statement_transaction_select_essence_attachment_and_metadata =
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_UPPER
     "," TRANSACTION_COL_ATTACHMENT_TIMESTAMP_LOWER "," TRANSACTION_COL_NONCE
     "," TRANSACTION_COL_TAG "," TRANSACTION_COL_SNAPSHOT_INDEX
-    "," TRANSACTION_COL_SOLID " FROM " TRANSACTION_TABLE_NAME
-    " WHERE " TRANSACTION_COL_HASH "=?";
+    "," TRANSACTION_COL_SOLID "," TRANSACTION_COL_ARRIVAL_TIME
+    " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
 
 char *iota_statement_transaction_select_essence_and_consensus =
     "SELECT " TRANSACTION_COL_ADDRESS "," TRANSACTION_COL_VALUE
@@ -148,7 +148,8 @@ char *iota_statement_transaction_select_essence_and_consensus =
 
 char *iota_statement_transaction_select_metadata =
     "SELECT " TRANSACTION_COL_SNAPSHOT_INDEX "," TRANSACTION_COL_SOLID
-    " FROM " TRANSACTION_TABLE_NAME " WHERE " TRANSACTION_COL_HASH "=?";
+    "," TRANSACTION_COL_ARRIVAL_TIME " FROM " TRANSACTION_TABLE_NAME
+    " WHERE " TRANSACTION_COL_HASH "=?";
 
 /*
  * Transaction statement builders
