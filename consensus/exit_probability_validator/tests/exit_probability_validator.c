@@ -11,7 +11,6 @@
 
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
-#include "common/storage/database.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
@@ -292,7 +291,7 @@ void test_transaction_valid() {
 
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
-  TEST_ASSERT(database_init() == RC_OK);
+  TEST_ASSERT(storage_init() == RC_OK);
 
   if (argc >= 2) {
     debug_mode = true;
@@ -316,6 +315,6 @@ int main(int argc, char *argv[]) {
   RUN_TEST(test_transaction_is_genesis);
   RUN_TEST(test_transaction_valid);
 
-  TEST_ASSERT(database_destroy() == RC_OK);
+  TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
 }

@@ -9,7 +9,6 @@
 #include <string.h>
 
 #include "ciri/core.h"
-#include "common/storage/database.h"
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 
@@ -55,9 +54,9 @@ int main(int argc, char* argv[]) {
 
   logger_output_level_set(stdout, core_g.conf.log_level);
 
-  log_info(MAIN_LOGGER_ID, "Initializing database\n");
-  if (database_init() != RC_OK) {
-    log_critical(MAIN_LOGGER_ID, "Initializing database failed\n");
+  log_info(MAIN_LOGGER_ID, "Initializing storage\n");
+  if (storage_init() != RC_OK) {
+    log_critical(MAIN_LOGGER_ID, "Initializing storage failed\n");
     return EXIT_FAILURE;
   }
 
@@ -109,9 +108,9 @@ int main(int argc, char* argv[]) {
     ret = EXIT_FAILURE;
   }
 
-  log_info(MAIN_LOGGER_ID, "Destroying database\n");
-  if (database_destroy() != RC_OK) {
-    log_critical(MAIN_LOGGER_ID, "Destroying database failed\n");
+  log_info(MAIN_LOGGER_ID, "Destroying storage\n");
+  if (storage_destroy() != RC_OK) {
+    log_critical(MAIN_LOGGER_ID, "Destroying storage failed\n");
     ret = EXIT_FAILURE;
   }
 

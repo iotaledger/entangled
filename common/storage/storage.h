@@ -27,10 +27,21 @@ typedef struct _iota_transaction* iota_transaction_t;
 extern "C" {
 #endif
 
-extern retcode_t iota_stor_init(connection_t const* const conn,
-                                connection_config_t const* const config);
+/**
+ * Initializes the storage backend
+ * Should only be called once per process
+ *
+ * @return a status code
+ */
+extern retcode_t storage_init();
 
-extern retcode_t iota_stor_destroy(connection_t* const conn);
+/**
+ * Destroys the storage backend
+ * Should only be called once per process
+ *
+ * @return a status code
+ */
+extern retcode_t storage_destroy();
 
 /*
  * Transaction operations

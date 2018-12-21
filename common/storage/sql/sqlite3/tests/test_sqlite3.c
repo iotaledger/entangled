@@ -14,7 +14,6 @@
 #include "common/model/milestone.h"
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
-#include "common/storage/database.h"
 #include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
@@ -67,7 +66,7 @@ static connection_t conn;
 void test_init_connection(void) {
   connection_config_t config;
   config.db_path = test_db_path;
-  TEST_ASSERT(init_connection(&conn, &config) == RC_OK);
+  TEST_ASSERT(connection_init(&conn, &config) == RC_OK);
 }
 
 void test_initialized_db_empty_transaction(void) {
@@ -455,7 +454,7 @@ void test_transactions_arrival_time(void) {
 
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
-  TEST_ASSERT(database_init() == RC_OK);
+  TEST_ASSERT(storage_init() == RC_OK);
 
   if (argc >= 2) {
     debug_mode = true;
@@ -481,6 +480,6 @@ int main(int argc, char *argv[]) {
   RUN_TEST(test_transactions_update_solid_states_two_transaction);
   RUN_TEST(test_transactions_arrival_time);
 
-  TEST_ASSERT(database_destroy() == RC_OK);
+  TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
 }

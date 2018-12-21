@@ -8,7 +8,6 @@
 #include <unity/unity.h>
 
 #include "ciri/api/api.h"
-#include "common/storage/database.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
 #include "gossip/node.h"
@@ -207,7 +206,7 @@ void test_check_consistency_true(void) {
 
 int main(void) {
   UNITY_BEGIN();
-  TEST_ASSERT(database_init() == RC_OK);
+  TEST_ASSERT(storage_init() == RC_OK);
 
   config.db_path = test_db_path;
   api.node = &node;
@@ -254,6 +253,6 @@ int main(void) {
 
   TEST_ASSERT(iota_consensus_destroy(&consensus) == RC_OK);
 
-  TEST_ASSERT(database_destroy() == RC_OK);
+  TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
 }

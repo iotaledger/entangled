@@ -12,7 +12,6 @@
 #include "utarray.h"
 
 #include "common/model/transaction.h"
-#include "common/storage/database.h"
 #include "common/storage/tests/helpers/defs.h"
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/conf.h"
@@ -215,7 +214,7 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_valid() {
 
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
-  TEST_ASSERT(database_init() == RC_OK);
+  TEST_ASSERT(storage_init() == RC_OK);
 
   if (argc >= 2) {
     debug_mode = true;
@@ -235,6 +234,6 @@ int main(int argc, char *argv[]) {
       test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invalid);
   RUN_TEST(test_iota_consensus_bundle_validator_validate_size_4_value_valid);
 
-  TEST_ASSERT(database_destroy() == RC_OK);
+  TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
 }

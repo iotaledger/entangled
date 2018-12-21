@@ -18,7 +18,7 @@
 
 #define SQLITE3_LOGGER_ID "sqlite3"
 
-retcode_t init_connection(connection_t const* const conn,
+retcode_t connection_init(connection_t const* const conn,
                           connection_config_t const* const config) {
   char* err_msg = NULL;
   char* sql = NULL;
@@ -67,7 +67,7 @@ retcode_t init_connection(connection_t const* const conn,
   return RC_OK;
 }
 
-retcode_t destroy_connection(connection_t* const conn) {
+retcode_t connection_destroy(connection_t* const conn) {
   if (conn->db != NULL) {
     log_info(SQLITE3_LOGGER_ID, "Destroying connection\n");
     sqlite3_close((sqlite3*)conn->db);
