@@ -214,6 +214,7 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_valid() {
 
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
+  TEST_ASSERT(storage_init() == RC_OK);
 
   if (argc >= 2) {
     debug_mode = true;
@@ -233,5 +234,6 @@ int main(int argc, char *argv[]) {
       test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invalid);
   RUN_TEST(test_iota_consensus_bundle_validator_validate_size_4_value_valid);
 
+  TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
 }

@@ -54,6 +54,12 @@ int main(int argc, char* argv[]) {
 
   logger_output_level_set(stdout, core_g.conf.log_level);
 
+  log_info(MAIN_LOGGER_ID, "Initializing storage\n");
+  if (storage_init() != RC_OK) {
+    log_critical(MAIN_LOGGER_ID, "Initializing storage failed\n");
+    return EXIT_FAILURE;
+  }
+
   log_info(MAIN_LOGGER_ID, "Initializing cIRI core\n");
   if (core_init(&core_g) != RC_OK) {
     log_critical(MAIN_LOGGER_ID, "Initializing cIRI core failed\n");
@@ -99,6 +105,12 @@ int main(int argc, char* argv[]) {
   log_info(MAIN_LOGGER_ID, "Destroying cIRI core\n");
   if (core_destroy(&core_g) != RC_OK) {
     log_error(MAIN_LOGGER_ID, "Destroying cIRI core failed\n");
+    ret = EXIT_FAILURE;
+  }
+
+  log_info(MAIN_LOGGER_ID, "Destroying storage\n");
+  if (storage_destroy() != RC_OK) {
+    log_critical(MAIN_LOGGER_ID, "Destroying storage failed\n");
     ret = EXIT_FAILURE;
   }
 

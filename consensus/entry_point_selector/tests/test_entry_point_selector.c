@@ -63,6 +63,7 @@ void test_entry_point() {
 
 int main(int argc, char* argv[]) {
   UNITY_BEGIN();
+  TEST_ASSERT(storage_init() == RC_OK);
 
   if (argc >= 2) {
     debug_mode = true;
@@ -78,5 +79,6 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_entry_point);
   }
 
+  TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
 }

@@ -206,6 +206,7 @@ void test_check_consistency_true(void) {
 
 int main(void) {
   UNITY_BEGIN();
+  TEST_ASSERT(storage_init() == RC_OK);
 
   config.db_path = test_db_path;
   api.node = &node;
@@ -252,5 +253,6 @@ int main(void) {
 
   TEST_ASSERT(iota_consensus_destroy(&consensus) == RC_OK);
 
+  TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
 }

@@ -116,6 +116,7 @@ void test_store_transactions(void) {
 
 int main(void) {
   UNITY_BEGIN();
+  TEST_ASSERT(storage_init() == RC_OK);
 
   config.db_path = test_db_path;
   api.node = &node;
@@ -138,5 +139,6 @@ int main(void) {
   RUN_TEST(test_store_transactions_invalid_tx);
   RUN_TEST(test_store_transactions);
 
+  TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
 }

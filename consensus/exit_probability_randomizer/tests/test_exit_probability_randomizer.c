@@ -714,6 +714,7 @@ void test_2_chained_bundles(void) {
 
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
+  TEST_ASSERT(storage_init() == RC_OK);
 
   if (argc >= 2) {
     debug_mode = true;
@@ -739,5 +740,6 @@ int main(int argc, char *argv[]) {
   RUN_TEST(test_1_bundle);
   RUN_TEST(test_2_chained_bundles);
 
+  TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
 }

@@ -153,6 +153,7 @@ void test_get_trytes(void) {
 
 int main(void) {
   UNITY_BEGIN();
+  TEST_ASSERT(storage_init() == RC_OK);
 
   config.db_path = test_db_path;
   api.consensus = &consensus;
@@ -164,5 +165,6 @@ int main(void) {
   RUN_TEST(test_get_trytes_max);
   RUN_TEST(test_get_trytes);
 
+  TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
 }

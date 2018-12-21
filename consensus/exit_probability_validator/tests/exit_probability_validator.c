@@ -291,6 +291,7 @@ void test_transaction_valid() {
 
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
+  TEST_ASSERT(storage_init() == RC_OK);
 
   if (argc >= 2) {
     debug_mode = true;
@@ -313,5 +314,7 @@ int main(int argc, char *argv[]) {
   RUN_TEST(test_transaction_exceed_max_transactions);
   RUN_TEST(test_transaction_is_genesis);
   RUN_TEST(test_transaction_valid);
+
+  TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
 }
