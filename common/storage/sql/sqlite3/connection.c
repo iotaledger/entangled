@@ -16,18 +16,31 @@
 #include "common/storage/sql/defs.h"
 #include "utils/logger_helper.h"
 
-#define CONNECTION_LOGGER_ID "stor_sqlite3_conn"
+#define SQLITE3_LOGGER_ID "sqlite3"
 
-retcode_t init_connection(const connection_t* const conn,
-                          const connection_config_t* const config) {
+static void error_log_callback(void* const arg, int const err_code,
+                               char const* const message) {
+  log_error(SQLITE3_LOGGER_ID, "Failed with error code %d: %s\n", err_code,
+            message);
+}
+
+retcode_t init_connection(connection_t const* const conn,
+                          connection_config_t const* const config) {
   retcode_t retcode = RC_OK;
   int rc;
   char* err_msg = 0;
   char* sql;
 
-  logger_helper_init(CONNECTION_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_init(SQLITE3_LOGGER_ID, LOGGER_DEBUG, true);
+
+  if ((rc = sqlite3_config(SQLITE_CONFIG_LOG, error_log_callback, NULL)) !=
+      SQLITE_OK) {
+    log_error(SQLITE3_LOGGER_ID, "Registering error callback failed\n");
+    return RC_SQLITE3_FAILED_LOG_CALLBACK;
+  }
+
   if (config->db_path == NULL) {
-    log_critical(CONNECTION_LOGGER_ID, "No path for db specified\n");
+    log_critical(SQLITE3_LOGGER_ID, "No path for db specified\n");
     return RC_SQLITE3_NO_PATH_FOR_DB_SPECIFIED;
   } else {
     rc = sqlite3_open_v2(config->db_path, (sqlite3**)&conn->db,
@@ -35,11 +48,11 @@ retcode_t init_connection(const connection_t* const conn,
   }
 
   if (rc) {
-    log_critical(CONNECTION_LOGGER_ID, "Failed to open db on path: %s\n",
+    log_critical(SQLITE3_LOGGER_ID, "Failed to open db on path: %s\n",
                  config->db_path);
     return RC_SQLITE3_FAILED_OPEN_DB;
   } else {
-    log_info(CONNECTION_LOGGER_ID, "Connection to database %s created\n",
+    log_info(SQLITE3_LOGGER_ID, "Connection to database %s created\n",
              config->db_path);
   }
 
@@ -52,7 +65,7 @@ retcode_t init_connection(const connection_t* const conn,
   rc = sqlite3_exec((sqlite3*)conn->db, sql, 0, 0, &err_msg);
 
   if (rc != SQLITE_OK) {
-    log_error(CONNECTION_LOGGER_ID, "Failed in statement: %s\n", sql);
+    log_error(SQLITE3_LOGGER_ID, "Failed in statement: %s\n", sql);
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
@@ -61,12 +74,12 @@ retcode_t init_connection(const connection_t* const conn,
   rc = sqlite3_exec((sqlite3*)conn->db, sql, 0, 0, &err_msg);
 
   if (rc != SQLITE_OK) {
-    log_error(CONNECTION_LOGGER_ID, "Failed in statement: %s\n", sql);
+    log_error(SQLITE3_LOGGER_ID, "Failed in statement: %s\n", sql);
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
 
-  log_info(CONNECTION_LOGGER_ID, "Connection to database %s initialized\n",
+  log_info(SQLITE3_LOGGER_ID, "Connection to database %s initialized\n",
            config->db_path);
 
   return retcode;
@@ -74,9 +87,9 @@ retcode_t init_connection(const connection_t* const conn,
 
 retcode_t destroy_connection(connection_t* const conn) {
   if (conn->db != NULL) {
-    log_info(CONNECTION_LOGGER_ID, "Destroying connection\n");
+    log_info(SQLITE3_LOGGER_ID, "Destroying connection\n");
     sqlite3_close((sqlite3*)conn->db);
-    logger_helper_destroy(CONNECTION_LOGGER_ID);
+    logger_helper_destroy(SQLITE3_LOGGER_ID);
     conn->db = NULL;
   }
   return RC_OK;
