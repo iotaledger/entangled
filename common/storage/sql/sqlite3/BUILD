@@ -2,6 +2,7 @@ cc_library(
     name = "sqlite3_storage",
     srcs = [
         "connection.c",
+        "database.c",
         "storage.c",
     ],
     linkopts = ["-pthread"],

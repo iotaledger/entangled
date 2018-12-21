@@ -10,6 +10,7 @@
 #include "common/helpers/digest.h"
 #include "common/model/milestone.h"
 #include "common/model/tests/defs.h"
+#include "common/storage/database.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
@@ -63,6 +64,7 @@ void test_entry_point() {
 
 int main(int argc, char* argv[]) {
   UNITY_BEGIN();
+  TEST_ASSERT(database_init() == RC_OK);
 
   if (argc >= 2) {
     debug_mode = true;
@@ -78,5 +80,6 @@ int main(int argc, char* argv[]) {
     RUN_TEST(test_entry_point);
   }
 
+  TEST_ASSERT(database_destroy() == RC_OK);
   return UNITY_END();
 }

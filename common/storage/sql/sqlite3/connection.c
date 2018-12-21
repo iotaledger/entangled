@@ -18,34 +18,11 @@
 
 #define SQLITE3_LOGGER_ID "sqlite3"
 
-static void error_log_callback(void* const arg, int const err_code,
-                               char const* const message) {
-  log_error(SQLITE3_LOGGER_ID, "Failed with error code %d: %s\n", err_code,
-            message);
-}
-
 retcode_t init_connection(connection_t const* const conn,
                           connection_config_t const* const config) {
   char* err_msg = NULL;
   char* sql = NULL;
   int rc = 0;
-
-  logger_helper_init(SQLITE3_LOGGER_ID, LOGGER_DEBUG, true);
-
-  if ((rc = sqlite3_config(SQLITE_CONFIG_LOG, error_log_callback, NULL)) !=
-      SQLITE_OK) {
-    return RC_SQLITE3_FAILED_CONFIG;
-  }
-
-  // TODO - implement connections pool so no two threads
-  // will access db through same connection simultaneously
-  if ((rc = sqlite3_config(SQLITE_CONFIG_SERIALIZED)) != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_CONFIG;
-  }
-
-  if ((rc = sqlite3_config(SQLITE_CONFIG_MEMSTATUS, 0)) != SQLITE_OK) {
-    return RC_SQLITE3_FAILED_CONFIG;
-  }
 
   if (config->db_path == NULL) {
     log_critical(SQLITE3_LOGGER_ID, "No path for db specified\n");
@@ -94,7 +71,6 @@ retcode_t destroy_connection(connection_t* const conn) {
   if (conn->db != NULL) {
     log_info(SQLITE3_LOGGER_ID, "Destroying connection\n");
     sqlite3_close((sqlite3*)conn->db);
-    logger_helper_destroy(SQLITE3_LOGGER_ID);
     conn->db = NULL;
   }
   return RC_OK;

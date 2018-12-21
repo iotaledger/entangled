@@ -8,6 +8,7 @@
 #include <unity/unity.h>
 
 #include "ciri/api/api.h"
+#include "common/storage/database.h"
 #include "consensus/test_utils/tangle.h"
 #include "gossip/node.h"
 #include "utils/time.h"
@@ -63,6 +64,7 @@ void test_get_node_info(void) {
 
 int main(void) {
   UNITY_BEGIN();
+  TEST_ASSERT(database_init() == RC_OK);
 
   api.node = &node;
   node.neighbors = NULL;
@@ -153,5 +155,6 @@ int main(void) {
   TEST_ASSERT(requester_destroy(&node.transaction_requester) == RC_OK);
   TEST_ASSERT(tangle_cleanup(&consensus.tangle, test_db_path) == RC_OK);
 
+  TEST_ASSERT(database_destroy() == RC_OK);
   return UNITY_END();
 }

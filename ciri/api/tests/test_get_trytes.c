@@ -9,6 +9,7 @@
 
 #include "ciri/api/api.h"
 #include "ciri/api/tests/defs.h"
+#include "common/storage/database.h"
 #include "consensus/test_utils/bundle.h"
 #include "consensus/test_utils/tangle.h"
 
@@ -153,6 +154,7 @@ void test_get_trytes(void) {
 
 int main(void) {
   UNITY_BEGIN();
+  TEST_ASSERT(database_init() == RC_OK);
 
   config.db_path = test_db_path;
   api.consensus = &consensus;
@@ -164,5 +166,6 @@ int main(void) {
   RUN_TEST(test_get_trytes_max);
   RUN_TEST(test_get_trytes);
 
+  TEST_ASSERT(database_destroy() == RC_OK);
   return UNITY_END();
 }
