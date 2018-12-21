@@ -205,19 +205,22 @@ char *iota_statement_milestone_insert =
     "," MILESTONE_COL_HASH ")VALUES(?,?)";
 
 char *iota_statement_milestone_select_by_hash =
-    "SELECT * FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?";
+    "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH
+    " FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_HASH "=?";
 
 char *iota_statement_milestone_select_first =
-    "SELECT * FROM " MILESTONE_TABLE_NAME " ORDER BY " MILESTONE_COL_INDEX
+    "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH
+    " FROM " MILESTONE_TABLE_NAME " ORDER BY " MILESTONE_COL_INDEX
     " ASC LIMIT 1";
 
 char *iota_statement_milestone_select_last =
-    "SELECT * FROM " MILESTONE_TABLE_NAME " ORDER BY " MILESTONE_COL_INDEX
+    "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH
+    " FROM " MILESTONE_TABLE_NAME " ORDER BY " MILESTONE_COL_INDEX
     " DESC LIMIT 1";
 
 char *iota_statement_milestone_select_next =
-    "SELECT * FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX
-    "=(?+1)";
+    "SELECT " MILESTONE_COL_INDEX "," MILESTONE_COL_HASH
+    " FROM " MILESTONE_TABLE_NAME " WHERE " MILESTONE_COL_INDEX "=(?+1)";
 
 char *iota_statement_milestone_exist =
     "SELECT 1 WHERE EXISTS(SELECT 1 "
