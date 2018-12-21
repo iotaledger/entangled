@@ -26,17 +26,25 @@ static void error_log_callback(void* const arg, int const err_code,
 
 retcode_t init_connection(connection_t const* const conn,
                           connection_config_t const* const config) {
-  retcode_t retcode = RC_OK;
-  int rc;
-  char* err_msg = 0;
-  char* sql;
+  char* err_msg = NULL;
+  char* sql = NULL;
+  int rc = 0;
 
   logger_helper_init(SQLITE3_LOGGER_ID, LOGGER_DEBUG, true);
 
   if ((rc = sqlite3_config(SQLITE_CONFIG_LOG, error_log_callback, NULL)) !=
       SQLITE_OK) {
-    log_error(SQLITE3_LOGGER_ID, "Registering error callback failed\n");
-    return RC_SQLITE3_FAILED_LOG_CALLBACK;
+    return RC_SQLITE3_FAILED_CONFIG;
+  }
+
+  // TODO - implement connections pool so no two threads
+  // will access db through same connection simultaneously
+  if ((rc = sqlite3_config(SQLITE_CONFIG_MULTITHREAD)) != SQLITE_OK) {
+    return RC_SQLITE3_FAILED_CONFIG;
+  }
+
+  if ((rc = sqlite3_config(SQLITE_CONFIG_MEMSTATUS, 0)) != SQLITE_OK) {
+    return RC_SQLITE3_FAILED_CONFIG;
   }
 
   if (config->db_path == NULL) {
@@ -56,16 +64,14 @@ retcode_t init_connection(connection_t const* const conn,
              config->db_path);
   }
 
-  // TODO - implement connections pool so no two threads
-  // will access db through same connection simultaneously
-  sqlite3_config(SQLITE_CONFIG_MULTITHREAD);
-  sqlite3_config(SQLITE_CONFIG_MEMSTATUS, 0);
-  sqlite3_busy_timeout((sqlite3*)conn->db, 500);
+  if ((rc = sqlite3_busy_timeout((sqlite3*)conn->db, 500)) != SQLITE_OK) {
+    return RC_SQLITE3_FAILED_CONFIG;
+  }
+
   sql = "PRAGMA journal_mode = WAL";
   rc = sqlite3_exec((sqlite3*)conn->db, sql, 0, 0, &err_msg);
 
   if (rc != SQLITE_OK) {
-    log_error(SQLITE3_LOGGER_ID, "Failed in statement: %s\n", sql);
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
@@ -74,7 +80,6 @@ retcode_t init_connection(connection_t const* const conn,
   rc = sqlite3_exec((sqlite3*)conn->db, sql, 0, 0, &err_msg);
 
   if (rc != SQLITE_OK) {
-    log_error(SQLITE3_LOGGER_ID, "Failed in statement: %s\n", sql);
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
@@ -82,7 +87,7 @@ retcode_t init_connection(connection_t const* const conn,
   log_info(SQLITE3_LOGGER_ID, "Connection to database %s initialized\n",
            config->db_path);
 
-  return retcode;
+  return RC_OK;
 }
 
 retcode_t destroy_connection(connection_t* const conn) {
