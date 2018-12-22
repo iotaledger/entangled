@@ -1,24 +1,24 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 SNAPSHOT_REPOSITORY = "https://raw.githubusercontent.com/iotaledger/snapshots/master"
-SNAPSHOT_TIMESTAMP_MAINNET = "20180917"
+SNAPSHOT_TIMESTAMP_MAINNET = "20181222"
 SNAPSHOT_TIMESTAMP_TESTNET = "20180329"
 
 def fetch_snapshot_files():
     http_file(
         name = "snapshot_conf_mainnet",
         urls = [SNAPSHOT_REPOSITORY + "/mainnet/" + SNAPSHOT_TIMESTAMP_MAINNET + "/snapshot.json"],
-        sha256 = "e798f46384cbc747a7192925c446a17097c9aaf304751a6209ee1bcd49c2ea82",
+        sha256 = "e51ca0324704d79655962b63c90f76bfbae12f35f72124d7608b57fdeafd5caf",
     )
     http_file(
         name = "snapshot_sig_mainnet",
         urls = [SNAPSHOT_REPOSITORY + "/mainnet/" + SNAPSHOT_TIMESTAMP_MAINNET + "/snapshot.sig"],
-        sha256 = "5257c360d627dcec4c518aa26c58e67d9b93ad58d1797f2747dc3db70abe26a5",
+        sha256 = "603f34ea67b03a058bc33c216d0778743072f398afb42e63604ce636b1465cd2",
     )
     http_file(
         name = "snapshot_mainnet",
         urls = [SNAPSHOT_REPOSITORY + "/mainnet/" + SNAPSHOT_TIMESTAMP_MAINNET + "/snapshot.txt"],
-        sha256 = "5c14d76aaea2e864bf578a66571dd1aa7d8d12e611ef122562479e03b8b0c537",
+        sha256 = "f1879f2dc823064aeff256e7777d614d340fd7280d7a1421739bc3d394c2ed8b",
     )
     http_file(
         name = "snapshot_conf_testnet",
