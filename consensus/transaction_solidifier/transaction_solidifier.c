@@ -201,7 +201,7 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash,
 
   // Transaction is not marked solid, but it is a candidate
   if (pack->num_loaded == 1 &&
-      !(transaction_solid((iota_transaction_t)pack->models[0]))) {
+      !(transaction_solid((iota_transaction_t *)pack->models[0]))) {
     *should_branch = true;
     return hash243_set_add(&ts->solid_transactions_candidates, hash);
   } else if (pack->num_loaded == 0) {
@@ -362,7 +362,7 @@ done:
 }
 
 retcode_t iota_consensus_transaction_solidifier_update_status(
-    transaction_solidifier_t *const ts, iota_transaction_t const tx) {
+    transaction_solidifier_t *const ts, iota_transaction_t *const tx) {
   retcode_t ret = RC_OK;
   size_t approvers_count = 0;
 

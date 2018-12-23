@@ -78,7 +78,7 @@ void test_get_trytes_max(void) {
 
   // Storing 2 transactions to get trytes from
 
-  iota_transaction_t txs[2];
+  iota_transaction_t *txs[2];
   tryte_t const *const trytes[2] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES,
                                     TX_2_OF_4_VALUE_BUNDLE_TRYTES};
   transactions_deserialize(trytes, txs, 2, true);
@@ -105,7 +105,7 @@ void test_get_trytes_max(void) {
 void test_get_trytes(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
-  iota_transaction_t txs[4];
+  iota_transaction_t *txs[4];
   tryte_t const *const txs_trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};

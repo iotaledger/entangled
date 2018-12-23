@@ -74,13 +74,13 @@ void flex_hash_array_free(flex_hash_array_t* head);
 typedef UT_array* transaction_array_t;
 transaction_array_t transaction_array_new();
 void transaction_array_push_back(transaction_array_t txs,
-                                 iota_transaction_t tx);
+                                 iota_transaction_t const* const tx);
 size_t transaction_array_len(transaction_array_t txs);
 void transaction_array_free(transaction_array_t txs);
-iota_transaction_t transaction_array_at(transaction_array_t txs, size_t index);
-#define TX_OBJS_FOREACH(txs, tx)                                \
-  for (tx = (iota_transaction_t)utarray_front(txs); tx != NULL; \
-       tx = (iota_transaction_t)utarray_next(txs, tx))
+iota_transaction_t* transaction_array_at(transaction_array_t txs, size_t index);
+#define TX_OBJS_FOREACH(txs, tx)                                 \
+  for (tx = (iota_transaction_t*)utarray_front(txs); tx != NULL; \
+       tx = (iota_transaction_t*)utarray_next(txs, tx))
 
 #ifdef __cplusplus
 }

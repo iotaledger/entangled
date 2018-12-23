@@ -32,7 +32,7 @@ retcode_t iota_tangle_transaction_count(tangle_t const *const tangle,
 }
 
 retcode_t iota_tangle_transaction_store(tangle_t const *const tangle,
-                                        iota_transaction_t const tx) {
+                                        iota_transaction_t const *const tx) {
   return iota_stor_transaction_store(&tangle->conn, tx);
 }
 
@@ -258,8 +258,8 @@ retcode_t iota_tangle_find_tail(tangle_t const *const tangle,
                                 flex_trit_t *const tail,
                                 bool *const found_tail) {
   retcode_t res = RC_OK;
-  struct _iota_transaction next_tx_s;
-  iota_transaction_t next_tx = &next_tx_s;
+  iota_transaction_t next_tx_s;
+  iota_transaction_t *next_tx = &next_tx_s;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   bool found_approver = false;
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, tx_pack);

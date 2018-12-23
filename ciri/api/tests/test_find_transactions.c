@@ -81,7 +81,7 @@ void test_find_transactions_bundles_only(void) {
   find_transactions_res_t *res = find_transactions_res_new();
   hash243_queue_t res_hashes = NULL;
 
-  struct _iota_transaction txs[24];
+  iota_transaction_t txs[24];
 
   tryte_t hash_trytes[NUM_TRYTES_HASH];
   memcpy(hash_trytes, NULL_HASH, NUM_TRYTES_HASH);
@@ -134,7 +134,7 @@ void test_find_transactions_addresses_only(void) {
   find_transactions_res_t *res = find_transactions_res_new();
   hash243_queue_t res_hashes = NULL;
 
-  struct _iota_transaction txs[24];
+  iota_transaction_t txs[24];
 
   tryte_t hash_trytes[NUM_TRYTES_HASH];
   memcpy(hash_trytes, NULL_HASH, NUM_TRYTES_HASH);
@@ -188,7 +188,7 @@ void test_find_transactions_tags_only(void) {
   find_transactions_res_t *res = find_transactions_res_new();
   hash243_queue_t res_hashes = NULL;
 
-  struct _iota_transaction txs[24];
+  iota_transaction_t txs[24];
 
   tryte_t hash_trytes[NUM_TRYTES_HASH];
   memcpy(hash_trytes, NULL_HASH, NUM_TRYTES_HASH);
@@ -238,7 +238,7 @@ void test_find_transactions_approvees_only(void) {
   find_transactions_res_t *res = find_transactions_res_new();
   hash243_queue_t res_hashes = NULL;
 
-  struct _iota_transaction txs[24];
+  iota_transaction_t txs[24];
 
   tryte_t hash_trytes[NUM_TRYTES_HASH];
   memcpy(hash_trytes, NULL_HASH, NUM_TRYTES_HASH);
@@ -298,7 +298,7 @@ void test_find_transactions_intersection(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
 
-  struct _iota_transaction txs[24];
+  iota_transaction_t txs[24];
 
   tryte_t hash_trytes[NUM_TRYTES_HASH];
   memcpy(hash_trytes, NULL_HASH, NUM_TRYTES_HASH);
@@ -401,7 +401,7 @@ void test_find_transactions_max(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
 
-  struct _iota_transaction txs[24];
+  iota_transaction_t txs[24];
 
   tryte_t hash_trytes[NUM_TRYTES_HASH];
   memcpy(hash_trytes, NULL_HASH, NUM_TRYTES_HASH);

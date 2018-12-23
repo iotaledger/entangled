@@ -47,7 +47,7 @@ void test_iota_consensus_bundle_validator_validate_tail_not_found() {
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits, true);
+  iota_transaction_t *test_tx = transaction_deserialize(tx_test_trits, true);
 
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
 
@@ -65,7 +65,7 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
   bundle_transactions_new(&bundle);
   trit_t address[HASH_LENGTH_TRIT];
 
-  iota_transaction_t txs[4];
+  iota_transaction_t *txs[4];
 
   tryte_t const *const trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
@@ -99,7 +99,7 @@ void test_bundle_exceed_supply_pos_invalid() {
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
 
-  iota_transaction_t txs[4];
+  iota_transaction_t *txs[4];
 
   tryte_t const *const trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
@@ -129,7 +129,7 @@ void test_bundle_exceed_supply_neg_invalid() {
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
 
-  iota_transaction_t txs[4];
+  iota_transaction_t *txs[4];
 
   tryte_t const *const trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
@@ -159,7 +159,7 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invali
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
 
-  iota_transaction_t txs[4];
+  iota_transaction_t *txs[4];
 
   tryte_t const *const trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
@@ -190,7 +190,7 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_valid() {
   bundle_transactions_t *bundle;
   bundle_transactions_new(&bundle);
 
-  iota_transaction_t txs[4];
+  iota_transaction_t *txs[4];
 
   tryte_t const *const trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,

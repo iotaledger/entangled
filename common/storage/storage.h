@@ -21,7 +21,7 @@
 
 // Forward declaration
 typedef struct iota_milestone_s iota_milestone_t;
-typedef struct _iota_transaction* iota_transaction_t;
+typedef struct iota_transaction_s iota_transaction_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,8 +56,8 @@ typedef enum transaction_field_e {
 extern retcode_t iota_stor_transaction_count(connection_t const* const conn,
                                              size_t* const count);
 
-extern retcode_t iota_stor_transaction_store(connection_t const* const conn,
-                                             iota_transaction_t const data_in);
+extern retcode_t iota_stor_transaction_store(
+    connection_t const* const conn, iota_transaction_t const* const data_in);
 
 extern retcode_t iota_stor_transaction_load(connection_t const* const conn,
                                             transaction_field_t const field,

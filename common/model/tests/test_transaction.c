@@ -18,7 +18,7 @@ void test_deserialize_and_serialize(void) {
   flex_trits_from_trytes(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          (tryte_t *)TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-  iota_transaction_t transaction = transaction_deserialize(trits, true);
+  iota_transaction_t *transaction = transaction_deserialize(trits, true);
   flex_trit_t *serialized_value = transaction_serialize(transaction);
   TEST_ASSERT_EQUAL_MEMORY(trits, serialized_value, sizeof(trits));
   transaction_free(transaction);
@@ -30,7 +30,7 @@ void test_deserialize_and_serialize_allocated(void) {
   flex_trits_from_trytes(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          (tryte_t *)TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-  struct _iota_transaction transaction = {};
+  iota_transaction_t transaction;
   transaction_deserialize_from_trits(&transaction, trits, true);
   flex_trit_t serialized_value[FLEX_TRIT_SIZE_8019];
   transaction_serialize_on_flex_trits(&transaction, serialized_value);
@@ -38,7 +38,7 @@ void test_deserialize_and_serialize_allocated(void) {
 }
 
 void test_reset(void) {
-  iota_transaction_t transaction = transaction_new();
+  iota_transaction_t *transaction = transaction_new();
   transaction_reset(transaction);
   TEST_ASSERT_EQUAL_INT8(FLEX_TRIT_NULL_VALUE, transaction->essence.address[0]);
   flex_trit_t obsolete_tag[sizeof(transaction->essence.obsolete_tag)];

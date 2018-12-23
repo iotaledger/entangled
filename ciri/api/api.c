@@ -362,7 +362,7 @@ retcode_t iota_api_broadcast_transactions(
     broadcast_transactions_req_t const *const req) {
   retcode_t ret = RC_OK;
   flex_trit_t *elt = NULL;
-  struct _iota_transaction tx;
+  iota_transaction_t tx;
 
   if (api == NULL || req == NULL) {
     return RC_NULL_PARAM;
@@ -386,7 +386,7 @@ retcode_t iota_api_store_transactions(
     iota_api_t const *const api, store_transactions_req_t const *const req) {
   retcode_t ret = RC_OK;
   flex_trit_t *elt = NULL;
-  struct _iota_transaction tx;
+  iota_transaction_t tx;
   bool exists;
 
   if (api == NULL || req == NULL) {

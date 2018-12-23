@@ -290,7 +290,7 @@ retcode_t iota_client_get_transaction_objects(
   retcode_t ret_code = RC_OK;
   get_trytes_res_t* out_trytes = get_trytes_res_new();
   hash8019_queue_entry_t* q_iter = NULL;
-  struct _iota_transaction tx = {};
+  iota_transaction_t tx;
   size_t tx_deserialize_offset = 0;
 
   ret_code = iota_client_get_trytes(serv, tx_hashes, out_trytes);
@@ -323,7 +323,7 @@ retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
   check_consistency_req_t* consistency_req = check_consistency_req_new();
   check_consistency_res_t* consistency_res = check_consistency_res_new();
   get_trytes_res_t* out_trytes = get_trytes_res_new();
-  struct _iota_transaction tx = {};
+  iota_transaction_t tx;
   size_t tx_deserialize_offset = 0;
   uint64_t time_now = 0;
   // Check if transaction wasn't issued before last 6 milestones
@@ -433,7 +433,7 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
   attach_to_tangle_res_t* attach_res = attach_to_tangle_res_new();
   flex_trit_t* elt = NULL;
   size_t tx_deserialize_offset = 0;
-  struct _iota_transaction tx = {};
+  iota_transaction_t tx;
 
   if (!tx_approve_req || !tx_approve_res || !attach_req || !attach_res) {
     ret_code = RC_CCLIENT_NULL_PTR;

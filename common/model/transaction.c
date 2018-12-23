@@ -23,9 +23,9 @@
  ***********************************************************************************************************/
 // Fills up an existing transaction with the serialized data in bytes
 // Return non 0 on success
-size_t transaction_deserialize_trits(iota_transaction_t transaction,
-                                     const flex_trit_t *trits,
-                                     bool compute_hash) {
+size_t transaction_deserialize_trits(iota_transaction_t *const transaction,
+                                     flex_trit_t const *const trits,
+                                     bool const compute_hash) {
   flex_trit_t partial[FLEX_TRIT_SIZE_81];
   trit_t buffer[81];
   size_t offset = 0;
@@ -130,7 +130,7 @@ size_t transaction_deserialize_trits(iota_transaction_t transaction,
   return offset;
 }
 
-size_t _long_to_flex_trit(int64_t value, flex_trit_t *trits) {
+size_t _long_to_flex_trit(int64_t const value, flex_trit_t *const trits) {
   trit_t buffer[NUM_TRITS_VALUE];
   memset(buffer, 0, NUM_TRITS_VALUE);
   size_t long_size = long_to_trits(value, buffer);
@@ -138,10 +138,11 @@ size_t _long_to_flex_trit(int64_t value, flex_trit_t *trits) {
                         NUM_TRITS_VALUE);
   return long_size;
 }
+
 // Serialize an existing transaction
 // Return non 0 on success
-size_t transaction_serialize_to_flex_trits(const iota_transaction_t transaction,
-                                           flex_trit_t *trits) {
+size_t transaction_serialize_to_flex_trits(
+    iota_transaction_t const *const transaction, flex_trit_t *const trits) {
   flex_trit_t partial[FLEX_TRIT_SIZE_81];
   size_t offset = 0, long_size = 0;
   memset(trits, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
@@ -220,8 +221,8 @@ size_t transaction_serialize_to_flex_trits(const iota_transaction_t transaction,
  ***********************************************************************************************************/
 
 // Reset all transaction fields
-void transaction_reset(iota_transaction_t transaction) {
-  memset(transaction, 0, sizeof(struct _iota_transaction));
+void transaction_reset(iota_transaction_t *const transaction) {
+  memset(transaction, 0, sizeof(iota_transaction_t));
   memset(transaction->data.signature_or_message, FLEX_TRIT_NULL_VALUE,
          sizeof(transaction->data.signature_or_message));
   memset(transaction->essence.address, FLEX_TRIT_NULL_VALUE,
@@ -242,7 +243,7 @@ void transaction_reset(iota_transaction_t transaction) {
          sizeof(transaction->consensus.hash));
 }
 
-uint8_t transaction_weight_magnitude(const iota_transaction_t transaction) {
+uint8_t transaction_weight_magnitude(iota_transaction_t *const transaction) {
   uint8_t num_trailing_null_values = 0;
   uint8_t pos = FLEX_TRIT_SIZE_243;
 
@@ -270,9 +271,9 @@ uint8_t transaction_weight_magnitude(const iota_transaction_t transaction) {
  * Constructors
  ***********************************************************************************************************/
 // Creates and returns a new transaction without data
-iota_transaction_t transaction_new(void) {
-  iota_transaction_t transaction;
-  transaction = (iota_transaction_t)malloc(sizeof(struct _iota_transaction));
+iota_transaction_t *transaction_new(void) {
+  iota_transaction_t *transaction;
+  transaction = (iota_transaction_t *)malloc(sizeof(iota_transaction_t));
   if (!transaction) {
     // errno = IOTA_OUT_OF_MEMORY
   }
@@ -282,10 +283,10 @@ iota_transaction_t transaction_new(void) {
 
 // Creates and returns a new transaction from serialized data
 // Returns NULL if failed
-iota_transaction_t transaction_deserialize(const flex_trit_t *trits,
-                                           bool compute_hash) {
-  iota_transaction_t transaction;
-  transaction = transaction_new();
+iota_transaction_t *transaction_deserialize(flex_trit_t const *const trits,
+                                            bool const compute_hash) {
+  iota_transaction_t *transaction = transaction_new();
+
   if (!transaction) {
     // errno = IOTA_OUT_OF_MEMORY
     return NULL;
@@ -303,7 +304,8 @@ iota_transaction_t transaction_deserialize(const flex_trit_t *trits,
  ***********************************************************************************************************/
 // Returns the serialized data from an existing transaction
 // Returns NULL if failed
-flex_trit_t *transaction_serialize(const iota_transaction_t transaction) {
+flex_trit_t *transaction_serialize(
+    iota_transaction_t const *const transaction) {
   size_t num_bytes = FLEX_TRIT_SIZE_8019;
   flex_trit_t *serialized_value =
       (flex_trit_t *)malloc(sizeof(flex_trit_t) * num_bytes);
@@ -320,8 +322,8 @@ flex_trit_t *transaction_serialize(const iota_transaction_t transaction) {
 
 // Places the serialized data from an existing transaction in pre-allocated
 // bytes Returns non 0 on success
-size_t transaction_serialize_on_flex_trits(const iota_transaction_t transaction,
-                                           flex_trit_t *trits) {
+size_t transaction_serialize_on_flex_trits(
+    iota_transaction_t const *const transaction, flex_trit_t *const trits) {
   return transaction_serialize_to_flex_trits(transaction, trits);
 }
 
@@ -330,9 +332,9 @@ size_t transaction_serialize_on_flex_trits(const iota_transaction_t transaction,
  ***********************************************************************************************************/
 // Fills up an existing transaction with the serialized data in trits - returns
 // non 0 on success
-size_t transaction_deserialize_from_trits(iota_transaction_t transaction,
-                                          const flex_trit_t *trits,
-                                          bool compute_hash) {
+size_t transaction_deserialize_from_trits(iota_transaction_t *const transaction,
+                                          flex_trit_t const *const trits,
+                                          bool const compute_hash) {
   return transaction_deserialize_trits(transaction, trits, compute_hash);
 }
 
@@ -340,4 +342,6 @@ size_t transaction_deserialize_from_trits(iota_transaction_t transaction,
  * Destructor
  ***********************************************************************************************************/
 // Free an existing transaction - compatible with free()
-void transaction_free(iota_transaction_t t) { free(t); }
+void transaction_free(iota_transaction_t *const transaction) {
+  free(transaction);
+}

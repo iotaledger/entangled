@@ -61,7 +61,7 @@ void test_check_consistency_missing_tail(void) {
 void test_check_consistency_not_tail(void) {
   check_consistency_req_t *req = check_consistency_req_new();
   check_consistency_res_t *res = check_consistency_res_new();
-  struct _iota_transaction tx;
+  iota_transaction_t tx;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trit_t trits[FLEX_TRIT_SIZE_8019];
 
@@ -86,7 +86,7 @@ void test_check_consistency_not_tail(void) {
 void test_check_consistency_tail_not_solid(void) {
   check_consistency_req_t *req = check_consistency_req_new();
   check_consistency_res_t *res = check_consistency_res_new();
-  struct _iota_transaction tx;
+  iota_transaction_t tx;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trit_t trits[FLEX_TRIT_SIZE_8019];
 
@@ -115,7 +115,7 @@ void test_check_consistency_invalid_bundle(void) {
   check_consistency_req_t *req = check_consistency_req_new();
   check_consistency_res_t *res = check_consistency_res_new();
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  iota_transaction_t txs[4];
+  iota_transaction_t *txs[4];
   tryte_t const *const trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
@@ -149,7 +149,7 @@ void test_check_consistency_consistent_ledger(bool consistency) {
   check_consistency_req_t *req = check_consistency_req_new();
   check_consistency_res_t *res = check_consistency_res_new();
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  iota_transaction_t txs[4];
+  iota_transaction_t *txs[4];
   tryte_t const *const trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};

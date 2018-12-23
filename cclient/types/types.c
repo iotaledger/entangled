@@ -185,8 +185,8 @@ retcode_t flex_hash_to_char_buffer(trit_array_p hash, char_buffer_t* out) {
   return RC_OK;
 }
 
-static UT_icd ut_transactions_icd = {sizeof(struct _iota_transaction), NULL,
-                                     NULL, NULL};
+static UT_icd ut_transactions_icd = {sizeof(iota_transaction_t), NULL, NULL,
+                                     NULL};
 
 transaction_array_t transaction_array_new() {
   transaction_array_t txs = NULL;
@@ -195,7 +195,7 @@ transaction_array_t transaction_array_new() {
 }
 
 void transaction_array_push_back(transaction_array_t txs,
-                                 iota_transaction_t tx) {
+                                 iota_transaction_t const* const tx) {
   utarray_push_back(txs, tx);
 }
 
@@ -204,7 +204,8 @@ size_t transaction_array_len(transaction_array_t txs) {
 }
 void transaction_array_free(transaction_array_t txs) { utarray_free(txs); }
 
-iota_transaction_t transaction_array_at(transaction_array_t txs, size_t index) {
+iota_transaction_t* transaction_array_at(transaction_array_t txs,
+                                         size_t index) {
   // return NULL if not found.
-  return (iota_transaction_t)utarray_eltptr(txs, index);
+  return (iota_transaction_t*)utarray_eltptr(txs, index);
 }

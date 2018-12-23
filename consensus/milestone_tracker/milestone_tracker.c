@@ -27,8 +27,9 @@
 
 static retcode_t validate_coordinator(milestone_tracker_t* const mt,
                                       iota_milestone_t* const candidate,
-                                      iota_transaction_t tx1,
-                                      iota_transaction_t tx2, bool* valid) {
+                                      iota_transaction_t* const tx1,
+                                      iota_transaction_t* const tx2,
+                                      bool* valid) {
   trit_t signature_trits[NUM_TRITS_SIGNATURE];
   trit_t siblings_trits[NUM_TRITS_SIGNATURE];
   trit_t normalized_trunk_trits[HASH_LENGTH_TRIT];
@@ -109,15 +110,15 @@ static retcode_t validate_milestone(
     *milestone_status = MILESTONE_INCOMPLETE;
     goto done;
   } else if (bundle_status == BUNDLE_VALID) {
-    iota_transaction_t tx1 = NULL;
-    iota_transaction_t tx2 = NULL;
+    iota_transaction_t* tx1 = NULL;
+    iota_transaction_t* tx2 = NULL;
 
-    if ((tx1 = (iota_transaction_t)utarray_eltptr(bundle, 0)) == NULL ||
+    if ((tx1 = (iota_transaction_t*)utarray_eltptr(bundle, 0)) == NULL ||
         memcmp(transaction_hash(tx1), candidate->hash, FLEX_TRIT_SIZE_243) !=
             0) {
       goto done;
     }
-    if ((tx2 = (iota_transaction_t)utarray_eltptr(bundle, 1)) == NULL ||
+    if ((tx2 = (iota_transaction_t*)utarray_eltptr(bundle, 1)) == NULL ||
         memcmp(transaction_branch(tx1), transaction_trunk(tx2),
                FLEX_TRIT_SIZE_243) != 0) {
       goto done;
@@ -141,7 +142,7 @@ done:
   return ret;
 }
 
-static uint64_t get_milestone_index(iota_transaction_t const tx) {
+static uint64_t get_milestone_index(iota_transaction_t* const tx) {
   trit_t buffer[NUM_TRITS_OBSOLETE_TAG];
 
   flex_trits_to_trits(buffer, NUM_TRITS_OBSOLETE_TAG,

@@ -52,7 +52,7 @@ retcode_t iota_tangle_transaction_count(tangle_t const *const tangle,
                                         size_t *const count);
 
 retcode_t iota_tangle_transaction_store(tangle_t const *const tangle,
-                                        iota_transaction_t const tx);
+                                        iota_transaction_t const *const tx);
 
 retcode_t iota_tangle_transaction_load(tangle_t const *const tangle,
                                        transaction_field_t const field,

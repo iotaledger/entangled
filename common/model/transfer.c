@@ -45,7 +45,7 @@ static void transfer_iterator_next_data_transaction(
 static void transfer_iterator_next_output_transaction(
     transfer_iterator_t* transfer_iterator, transfer_t* transfer) {
   transfer_value_out_t* output_info = NULL;
-  iota_transaction_t tx = NULL;
+  iota_transaction_t* tx = NULL;
   size_t flex_ret = 0;
 
   if (transfer->type == VALUE_OUT) {
@@ -83,7 +83,7 @@ static void transfer_iterator_next_output_transaction(
 static void transfer_iterator_next_input_transaction(
     transfer_iterator_t* transfer_iterator, transfer_t* transfer) {
   transfer_value_in_t* value_in = NULL;
-  iota_transaction_t tx = transfer_iterator->transaction;
+  iota_transaction_t* tx = transfer_iterator->transaction;
 
   if (transfer->type == VALUE_IN) {
     value_in = (transfer_value_in_t*)transfer->meta;
@@ -350,7 +350,7 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
 
 transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[], size_t len,
                                            Kerl* kerl,
-                                           iota_transaction_t transaction) {
+                                           iota_transaction_t* transaction) {
   transfer_ctx_t* transfer_ctx = NULL;
   transfer_iterator_t* transfer_iterator =
       (transfer_iterator_t*)calloc(1, sizeof(transfer_iterator_t));
@@ -406,9 +406,9 @@ void transfer_iterator_free(transfer_iterator_t** iter) {
   }
 }
 
-iota_transaction_t transfer_iterator_next(
+iota_transaction_t* transfer_iterator_next(
     transfer_iterator_t* transfer_iterator) {
-  iota_transaction_t transaction = NULL;
+  iota_transaction_t* transaction = NULL;
 
   if (transfer_iterator->current_transfer <
       transfer_iterator->transfers_count) {

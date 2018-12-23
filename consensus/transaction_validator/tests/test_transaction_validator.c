@@ -26,7 +26,7 @@ void transaction_invalid_value() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits, true);
+  iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
   conf.snapshot_timestamp_sec = transaction_attachment_timestamp(tx1) / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
@@ -45,7 +45,7 @@ void transaction_invalid_hash() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits, true);
+  iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
   conf.snapshot_timestamp_sec = transaction_attachment_timestamp(tx1) / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
@@ -64,7 +64,7 @@ void transaction_invalid_attachment_timestamp_too_futuristic() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits, true);
+  iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_set_attachment_timestamp(
       tx1, current_timestamp_ms() + 99 * 60 * 60 * 1000);
   transaction_validator_t tv;
@@ -84,7 +84,7 @@ void transaction_invalid_attachment_timestamp_too_old() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits, true);
+  iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
   conf.snapshot_timestamp_sec = current_timestamp_ms() / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
@@ -103,7 +103,7 @@ void transaction_invalid_value_tx_wrong_address() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits, true);
+  iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
   conf.snapshot_timestamp_sec = transaction_attachment_timestamp(tx1) / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
@@ -123,7 +123,7 @@ void transaction_invalid_timestamp_too_futuristic() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits, true);
+  iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_set_attachment_timestamp(tx1, 0);
   transaction_set_timestamp(tx1, current_timestamp_ms() + 99 * 60 * 60 * 1000);
   transaction_validator_t tv;
@@ -143,7 +143,7 @@ void transaction_invalid_timestamp_too_old() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits, true);
+  iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_set_attachment_timestamp(tx1, 0);
   uint64_t current_time = current_timestamp_ms();
   transaction_set_timestamp(tx1, current_time / 1000 - 1);
@@ -164,7 +164,7 @@ void transaction_is_valid() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits, true);
+  iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
   transaction_validator_t tv;
   conf.snapshot_timestamp_sec = transaction_attachment_timestamp(tx1) / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);

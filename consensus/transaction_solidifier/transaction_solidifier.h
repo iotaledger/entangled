@@ -62,7 +62,7 @@ retcode_t iota_consensus_transaction_solidifier_check_and_update_solid_state(
     transaction_solidifier_t *const ts, flex_trit_t *const hash);
 
 retcode_t iota_consensus_transaction_solidifier_update_status(
-    transaction_solidifier_t *const ts, iota_transaction_t const tx);
+    transaction_solidifier_t *const ts, iota_transaction_t *const tx);
 
 #ifdef __cplusplus
 }

@@ -29,7 +29,7 @@ typedef struct iota_stor_pack_s {
                                 .insufficient_capacity = false};
 
 #define DECLARE_PACK_SINGLE_TX(NAME, PTR_NAME, PACK_NAME) \
-  DECLARE_PACK_SINGLE(struct _iota_transaction, NAME, PTR_NAME, PACK_NAME)
+  DECLARE_PACK_SINGLE(iota_transaction_t, NAME, PTR_NAME, PACK_NAME)
 
 #define DECLARE_PACK_SINGLE_MILESTONE(NAME, PTR_NAME, PACK_NAME) \
   DECLARE_PACK_SINGLE(iota_milestone_t, NAME, PTR_NAME, PACK_NAME)
