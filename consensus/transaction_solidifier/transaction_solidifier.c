@@ -8,7 +8,7 @@
 #include "transaction_solidifier.h"
 
 #include "consensus/utils/tangle_traversals.h"
-#include "utils/hash_maps.h"
+#include "utils/hash_indexed_map.h"
 #include "utils/logger_helper.h"
 
 #define TRANSACTION_SOLIDIFIER_LOGGER_ID "transaction_solidifier"

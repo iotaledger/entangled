@@ -18,7 +18,7 @@
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
-#include "utils/hash_maps.h"
+#include "utils/hash_indexed_map.h"
 
 #ifdef __cplusplus
 extern "C" {

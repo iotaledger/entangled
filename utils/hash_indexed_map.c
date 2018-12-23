@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "utils/hash_maps.h"
+#include "utils/hash_indexed_map.h"
 
 /*
  * Hash-indexed_hash_set map
