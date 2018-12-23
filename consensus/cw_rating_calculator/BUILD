@@ -12,6 +12,7 @@ cc_library(
         "//utils:logger_helper",
         "//utils/containers:bitset",
         "//utils/containers/hash:hash243_stack",
+        "//utils/containers/hash:hash_int64_t_map",
         "@com_github_uthash//:uthash",
     ],
 )

@@ -34,7 +34,8 @@ static retcode_t select_approver(
   size_t idx = 0;
 
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
-    if (!hash_int_map_find(&cw_ratings, curr_approver->hash, &curr_rating)) {
+    if (!hash_to_int64_t_map_find(&cw_ratings, curr_approver->hash,
+                                  &curr_rating)) {
       log_error(RANDOM_WALKER_LOGGER_ID, "No rating found for approver\n");
       return RC_CONSENSUS_EXIT_PROBABILITIES_MISSING_RATING;
     }

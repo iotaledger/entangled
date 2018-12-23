@@ -43,18 +43,17 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
     return RC_NULL_PARAM;
   }
 
-  res = cw_rating_dfs_do_dfs_from_db(
-      cw_calc, entry_point, &out->tx_to_approvers, &max_subtangle_size, 0);
-
-  if (res != RC_OK) {
+  if ((res = cw_rating_dfs_do_dfs_from_db(cw_calc, entry_point,
+                                          &out->tx_to_approvers,
+                                          &max_subtangle_size, 0)) != RC_OK) {
     log_error(CW_RATING_CALCULATOR_LOGGER_ID,
               "Failed in DFS from DB, error code is: %" PRIu64 "\n", res);
     return RC_CONSENSUS_CW_FAILED_IN_DFS_FROM_DB;
   }
 
   // Insert first "ratings" entry
-  if ((res = hash_int_map_add(&out->cw_ratings, entry_point,
-                              max_subtangle_size))) {
+  if ((res = hash_to_int64_t_map_add(&out->cw_ratings, entry_point,
+                                     max_subtangle_size))) {
     log_error(CW_RATING_CALCULATOR_LOGGER_ID,
               "Failed adding entrypoint into map\n");
     return res;
@@ -88,8 +87,8 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
       return RC_CONSENSUS_CW_FAILED_IN_LIGHT_DFS;
     }
 
-    if ((res =
-             hash_int_map_add(&out->cw_ratings, curr_hash, sub_tangle_size))) {
+    if ((res = hash_to_int64_t_map_add(&out->cw_ratings, curr_hash,
+                                       sub_tangle_size))) {
       log_error(CW_RATING_CALCULATOR_LOGGER_ID,
                 "Failed in light DFS, error code is: %" PRIu64 "\n", res);
       return res;

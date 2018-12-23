@@ -12,9 +12,9 @@ retcode_t hash_to_{TYPE}_map_add(hash_to_{TYPE}_map_t *const map,
                                   flex_trit_t const *const hash,
                                   {TYPE} const value) {
   hash_to_{TYPE}_map_entry_t *map_entry = NULL;
-
   map_entry = (hash_to_{TYPE}_map_entry_t *)malloc(
       sizeof(hash_to_{TYPE}_map_entry_t));
+
   if (map_entry == NULL) {
     return RC_UTILS_OOM;
   }

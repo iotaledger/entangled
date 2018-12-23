@@ -19,7 +19,6 @@ extern "C" {
 
 typedef struct hash_to_{TYPE}_map_entry_s {
     flex_trit_t hash[FLEX_TRIT_SIZE_243];
-    //flex_trit_t hash[FLEX_TRIT_SIZE_{SIZE}];
     {TYPE} value;
     UT_hash_handle hh;
 } hash_to_{TYPE}_map_entry_t;

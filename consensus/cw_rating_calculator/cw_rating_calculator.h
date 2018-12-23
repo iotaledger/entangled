@@ -16,6 +16,7 @@
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 #include "consensus/tangle/tangle.h"
+#include "utils/containers/hash/hash_int64_t_map.h"
 #include "utils/hash_maps.h"
 
 #define CW_RATING_CALCULATOR_LOGGER_ID "consensus_cw_rating_calculator"
@@ -38,7 +39,7 @@ typedef enum cw_calculation_implementation_e {
 } cw_calculation_implementation_t;
 
 typedef struct cw_calc_result {
-  hash_int_map_t cw_ratings;
+  hash_to_int64_t_map_t cw_ratings;
   hash_to_indexed_hash_set_map_t tx_to_approvers;
 } cw_calc_result;
 

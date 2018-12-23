@@ -32,3 +32,13 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_hash_map",
+    srcs = ["test_hash_map.c"],
+    deps = [
+        ":defs",
+        "//utils/containers/hash:hash_int64_t_map",
+        "@unity",
+    ],
+)
