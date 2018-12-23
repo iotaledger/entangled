@@ -304,7 +304,7 @@ void test_milestone_state_delta(void) {
     hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
     memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
     free(hashed_hash);
-    TEST_ASSERT(hash_to_int64_t_map_add(&state_delta1, hash, i) == RC_OK);
+    TEST_ASSERT(state_delta_add(&state_delta1, hash, i) == RC_OK);
   }
 
   TEST_ASSERT(iota_stor_state_delta_store(&conn, 42, &state_delta1) == RC_OK);
