@@ -1,4 +1,5 @@
 load(":hash_container_generator.bzl", "hash_container_generate")
+load(":hash_map_generator.bzl", "hash_map_generate")
 
 # Sets
 
@@ -79,6 +80,10 @@ hash_container_generate(
 hash_container_generate(
     size = 8019,
     type = "queue",
+)
+
+hash_map_generate(
+    mapped_type = "int64_t",
 )
 
 cc_library(
