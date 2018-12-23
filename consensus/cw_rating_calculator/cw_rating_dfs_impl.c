@@ -35,8 +35,8 @@ retcode_t cw_rating_calculate_dfs(const cw_rating_calculator_t *const cw_calc,
   out->cw_ratings = NULL;
   hash_to_indexed_hash_set_entry_t *curr_hash_to_approvers_entry = NULL;
   hash_to_indexed_hash_set_entry_t *tmp_hash_to_approvers_entry = NULL;
-  size_t sub_tangle_size;
-  size_t max_subtangle_size;
+  int64_t sub_tangle_size;
+  int64_t max_subtangle_size;
   size_t bitset_size;
 
   if (!entry_point) {
