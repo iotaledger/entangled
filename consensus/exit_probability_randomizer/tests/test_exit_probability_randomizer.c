@@ -96,8 +96,8 @@ static void destroy_epv(exit_prob_transaction_validator_t *epv) {
 }
 
 void test_cw_gen_topology(test_tangle_topology topology) {
-  hash_to_int_map_entry_t *curr_cw_entry = NULL;
-  hash_to_int_map_entry_t *tmp_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *curr_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *tmp_cw_entry = NULL;
   size_t num_approvers = 1;
   size_t num_txs = num_approvers + 1;
 
@@ -289,8 +289,8 @@ void test_cw_topology_only_direct_approvers(void) {
 void test_cw_topology_blockchain(void) { test_cw_gen_topology(BLOCKCHAIN); }
 
 void test_cw_topology_four_transactions_diamond(void) {
-  hash_to_int_map_entry_t *curr_cw_entry = NULL;
-  hash_to_int_map_entry_t *tmp_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *curr_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *tmp_cw_entry = NULL;
 
   size_t num_txs = 4;
 
@@ -386,8 +386,8 @@ void test_cw_topology_four_transactions_diamond(void) {
 }
 
 void test_cw_topology_two_inequal_tips(void) {
-  hash_to_int_map_entry_t *curr_cw_entry = NULL;
-  hash_to_int_map_entry_t *tmp_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *curr_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *tmp_cw_entry = NULL;
 
   size_t num_txs = 4;
 
@@ -516,8 +516,8 @@ void test_cw_topology_two_inequal_tips(void) {
 }
 
 void test_1_bundle(void) {
-  hash_to_int_map_entry_t *curr_cw_entry = NULL;
-  hash_to_int_map_entry_t *tmp_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *curr_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *tmp_cw_entry = NULL;
 
   size_t bundle_size = 4;
   init_epv(&epv);
@@ -616,8 +616,8 @@ void test_1_bundle(void) {
 }
 
 void test_2_chained_bundles(void) {
-  hash_to_int_map_entry_t *curr_cw_entry = NULL;
-  hash_to_int_map_entry_t *tmp_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *curr_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *tmp_cw_entry = NULL;
 
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);

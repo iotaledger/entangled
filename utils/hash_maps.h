@@ -20,27 +20,6 @@ extern "C" {
 #endif
 
 /*
- * Hash-int map type and operations
- */
-
-typedef struct hash_to_int_map_entry_s {
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  int64_t value;
-  UT_hash_handle hh;
-} hash_to_int_map_entry_t;
-
-typedef hash_to_int_map_entry_t *hash_int_map_t;
-
-retcode_t hash_int_map_add(hash_int_map_t *const map,
-                           flex_trit_t const *const hash, int64_t const value);
-bool hash_int_map_contains(hash_int_map_t const *const map,
-                           flex_trit_t const *const hash);
-bool hash_int_map_find(hash_int_map_t const *const map,
-                       flex_trit_t const *const hash,
-                       hash_to_int_map_entry_t const **res);
-void hash_int_map_free(hash_int_map_t *const map);
-
-/*
  * Hash-indexed_hash_set map type and operations
  */
 

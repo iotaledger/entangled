@@ -106,7 +106,7 @@ void test_snapshot_create_and_apply_patch() {
   flex_trits_from_trytes(hash1, NUM_TRITS_HASH,
                          (tryte_t*)"O99999999999999999999999999999999999999999999999999999999999999999999999999999999",
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT(state_delta_add(&delta, hash1, -50) == RC_OK);
+  TEST_ASSERT(state_delta_add(&delta, hash1, (int64_t)-50) == RC_OK);
   TEST_ASSERT(iota_snapshot_create_patch(&snapshot, &delta, &patch) == RC_OK);
   TEST_ASSERT(iota_snapshot_apply_patch(&snapshot, &delta, 1) ==
               RC_SNAPSHOT_INCONSISTENT_PATCH);

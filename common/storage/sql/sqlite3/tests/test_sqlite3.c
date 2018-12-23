@@ -300,11 +300,11 @@ void test_milestone_state_delta(void) {
   flex_trit_t *hashed_hash;
 
   flex_trits_from_trits(hash, HASH_LENGTH, trits, HASH_LENGTH, HASH_LENGTH);
-  for (int i = -1000; i <= 1000; i++) {
+  for (int64_t i = -1000; i <= 1000; i++) {
     hashed_hash = iota_flex_digest(hash, HASH_LENGTH);
     memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
     free(hashed_hash);
-    TEST_ASSERT(state_delta_add(&state_delta1, hash, i) == RC_OK);
+    TEST_ASSERT(hash_to_int64_t_map_add(&state_delta1, hash, i) == RC_OK);
   }
 
   TEST_ASSERT(iota_stor_state_delta_store(&conn, 42, &state_delta1) == RC_OK);
@@ -323,7 +323,7 @@ void test_milestone_state_delta(void) {
     memcpy(hash, hashed_hash, FLEX_TRIT_SIZE_243);
     free(hashed_hash);
     TEST_ASSERT_EQUAL_MEMORY(iter->hash, hash, FLEX_TRIT_SIZE_243);
-    TEST_ASSERT_EQUAL_INT(iter->value, i);
+    TEST_ASSERT_EQUAL_INT64(iter->value, i);
     i++;
   }
 

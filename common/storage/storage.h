@@ -17,6 +17,7 @@
 #include "common/trinary/flex_trit.h"
 #include "consensus/snapshot/state_delta.h"
 #include "utils/containers/hash/hash243_queue.h"
+#include "utils/containers/hash/hash243_set.h"
 #include "utils/containers/hash/hash81_queue.h"
 
 // Forward declaration
