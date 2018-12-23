@@ -5,6 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include "common/errors.h"
 #include "utils/containers/hash/hash_int64_t_map.h"
 #include "utils/containers/hash/tests/defs.h"
 
@@ -12,9 +13,7 @@ void test_hash_int64_t_map() {
   hash_to_int64_t_map_t map = NULL;
   hash_to_int64_t_map_entry_t* e = NULL;
   TEST_ASSERT(hash_to_int64_t_map_add(&map, hash243_1) == RC_OK);
-  hash_to_int64_t_map_entry_t* map_entry = NULL;
   TEST_ASSERT(hash_to_int64_t_map_find(&map, hash243_1, &e));
-  TEST_ASSERT(hash_to_int64_t_map_find(&map, hash243_2, &e) == false);
   hash_to_int64_t_map_free(&map);
 }
 
