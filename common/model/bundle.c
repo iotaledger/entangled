@@ -10,8 +10,7 @@
 #include "common/trinary/trit_long.h"
 #include "common/trinary/tryte_long.h"
 
-static UT_icd bundle_transactions_icd = {sizeof(struct _iota_transaction), 0, 0,
-                                         0};
+static UT_icd bundle_transactions_icd = {sizeof(iota_transaction_t), 0, 0, 0};
 
 void bundle_transactions_new(bundle_transactions_t **const bundle) {
   utarray_new(*bundle, &bundle_transactions_icd);
@@ -26,20 +25,20 @@ void bundle_transactions_free(bundle_transactions_t **const bundle) {
 }
 
 void bundle_transactions_add(bundle_transactions_t *const bundle,
-                             iota_transaction_t transaction) {
+                             iota_transaction_t const *const transaction) {
   utarray_push_back(bundle, transaction);
 }
 
 void calculate_bundle_hash(bundle_transactions_t *bundle, flex_trit_t *out) {
-  iota_transaction_t curr_tx = NULL;
+  iota_transaction_t *curr_tx = NULL;
   trit_t essence_trits[NUM_TRITS_ESSENCE];
   Kerl kerl = {};
   init_kerl(&kerl);
 
   trit_t bundle_hash_trits[NUM_TRITS_HASH];
 
-  for (curr_tx = (iota_transaction_t)utarray_front(bundle); curr_tx != NULL;
-       curr_tx = (iota_transaction_t)utarray_next(bundle, curr_tx)) {
+  for (curr_tx = (iota_transaction_t *)utarray_front(bundle); curr_tx != NULL;
+       curr_tx = (iota_transaction_t *)utarray_next(bundle, curr_tx)) {
     absorb_essence(
         &kerl, transaction_address(curr_tx), transaction_value(curr_tx),
         transaction_obsolete_tag(curr_tx), transaction_timestamp(curr_tx),

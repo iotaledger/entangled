@@ -90,7 +90,7 @@ void test_transaction_does_not_exist() {
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
-  iota_transaction_t test_tx = transaction_deserialize(tx_test_trits, true);
+  iota_transaction_t *test_tx = transaction_deserialize(tx_test_trits, true);
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
                   &epv, transaction_hash(test_tx), &is_valid) == RC_OK);
@@ -112,7 +112,7 @@ void test_transaction_not_a_tail() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx3 = transaction_deserialize(transaction_3_trits, true);
+  iota_transaction_t *tx3 = transaction_deserialize(transaction_3_trits, true);
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx3) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_update_solid_state(
@@ -143,7 +143,7 @@ void test_transaction_invalid_delta() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits, true);
+  iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_update_solid_state(
@@ -167,7 +167,7 @@ void test_transaction_below_max_depth() {
 
   bool exist = false;
 
-  iota_transaction_t txs[2];
+  iota_transaction_t *txs[2];
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2, true);
@@ -201,7 +201,7 @@ void test_transaction_exceed_max_transactions() {
 
   bool exist = false;
 
-  iota_transaction_t txs[2];
+  iota_transaction_t *txs[2];
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2, true);
@@ -235,7 +235,7 @@ void test_transaction_is_genesis() {
 
   bool exist = false;
 
-  iota_transaction_t txs[2];
+  iota_transaction_t *txs[2];
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2, true);
@@ -265,7 +265,7 @@ void test_transaction_valid() {
 
   bool exist = false;
 
-  iota_transaction_t txs[2];
+  iota_transaction_t *txs[2];
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2, true);

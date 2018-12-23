@@ -17,7 +17,7 @@
 static size_t MAX_TIMESTAMP_FUTURE_MS = 2 * 60 * 60 * 1000;
 
 static bool has_invalid_timestamp(transaction_validator_t* const tv,
-                                  iota_transaction_t const transaction) {
+                                  iota_transaction_t* const transaction) {
   uint64_t max_future_timestamp_ms =
       current_timestamp_ms() + MAX_TIMESTAMP_FUTURE_MS;
   if (transaction_attachment_timestamp(transaction) == 0) {
@@ -47,8 +47,8 @@ retcode_t iota_consensus_transaction_validator_destroy(
   return RC_OK;
 }
 
-bool iota_consensus_transaction_validate(transaction_validator_t* const tv,
-                                         iota_transaction_t const transaction) {
+bool iota_consensus_transaction_validate(
+    transaction_validator_t* const tv, iota_transaction_t* const transaction) {
   if (transaction_weight_magnitude(transaction) < tv->conf->mwm) {
     log_error(TRANSACTION_VALIDATOR_LOGGER_ID,
               "Validation failed, Invalid hash\n");

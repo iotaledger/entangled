@@ -30,10 +30,10 @@ void test_bundle_hash(void) {
 }
 
 void test_value_out(void) {
-  iota_transaction_t tx;
+  iota_transaction_t* tx;
   transfer_iterator_t* tf_iter = NULL;
   transfer_value_out_t OUTPUT = {SEED, 3, 5};
-  struct _iota_transaction TX = {.loaded_columns_mask = 0};
+  iota_transaction_t TX = {.loaded_columns_mask = 0};
   transfer_t* transfer =
       transfer_value_out_new(&OUTPUT, TAG, ADDRESS, 0, 1509136296);
 
@@ -65,7 +65,7 @@ void test_value_out(void) {
 }
 
 void test_transfer_data(void) {
-  iota_transaction_t tx;
+  iota_transaction_t* tx;
   transfer_iterator_t* tf_iter = NULL;
   transfer_t* transfer = NULL;
 

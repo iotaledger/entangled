@@ -98,7 +98,8 @@ static retcode_t respond_to_request(responder_t const *const responder,
 
   if (pack->num_loaded != 0) {
     // If a transaction or a random tip was found, sends it back to the neighbor
-    iota_transaction_t transaction = ((iota_transaction_t *)(pack->models))[0];
+    iota_transaction_t *transaction =
+        ((iota_transaction_t **)(pack->models))[0];
     flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
     transaction_serialize_on_flex_trits(transaction, transaction_flex_trits);

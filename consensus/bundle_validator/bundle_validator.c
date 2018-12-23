@@ -58,7 +58,7 @@ static retcode_t load_bundle_transactions(tangle_t const* const tangle,
 static retcode_t validate_signature(bundle_transactions_t const* const bundle,
                                     trit_t const* const normalized_bundle,
                                     bool* const is_valid) {
-  iota_transaction_t curr_tx = NULL, curr_inp_tx = NULL;
+  iota_transaction_t *curr_tx = NULL, *curr_inp_tx = NULL;
   Kerl address_kerl, sig_frag_kerl;
   trit_t digested_sig_trits[NUM_TRITS_ADDRESS];
   trit_t digested_address[NUM_TRITS_ADDRESS];
@@ -71,10 +71,10 @@ static retcode_t validate_signature(bundle_transactions_t const* const bundle,
 
   *is_valid = true;
 
-  for (curr_tx = (iota_transaction_t)utarray_eltptr(bundle, 0);
+  for (curr_tx = (iota_transaction_t*)utarray_eltptr(bundle, 0);
        curr_tx != NULL;) {
     if (transaction_value(curr_tx) >= 0) {
-      curr_tx = (iota_transaction_t)utarray_next(bundle, curr_tx);
+      curr_tx = (iota_transaction_t*)utarray_next(bundle, curr_tx);
       continue;
     }
     curr_inp_tx = curr_tx;
@@ -91,7 +91,7 @@ static retcode_t validate_signature(bundle_transactions_t const* const bundle,
                           &normalized_bundle[offset % NUM_TRITS_HASH], key,
                           NUM_TRITS_SIGNATURE, &sig_frag_kerl);
       kerl_absorb(&address_kerl, digested_sig_trits, NUM_TRITS_ADDRESS);
-      curr_inp_tx = (iota_transaction_t)utarray_next(bundle, curr_inp_tx);
+      curr_inp_tx = (iota_transaction_t*)utarray_next(bundle, curr_inp_tx);
       offset = next_offset;
     } while (curr_inp_tx != NULL &&
              memcmp(transaction_address(curr_inp_tx),
@@ -130,7 +130,7 @@ retcode_t iota_consensus_bundle_validator_validate(
     tangle_t const* const tangle, flex_trit_t* const tail_hash,
     bundle_transactions_t* const bundle, bundle_status_t* const status) {
   retcode_t res = RC_OK;
-  iota_transaction_t curr_tx = NULL;
+  iota_transaction_t* curr_tx = NULL;
   size_t index = 0, last_index = 0;
   int64_t bundle_value = 0;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
@@ -152,7 +152,7 @@ retcode_t iota_consensus_bundle_validator_validate(
     return res;
   }
 
-  curr_tx = (iota_transaction_t)utarray_eltptr(bundle, 0);
+  curr_tx = (iota_transaction_t*)utarray_eltptr(bundle, 0);
   last_index = transaction_last_index(curr_tx);
 
   if (utarray_len(bundle) != last_index + 1) {
@@ -163,7 +163,7 @@ retcode_t iota_consensus_bundle_validator_validate(
   memcpy(bundle_hash, transaction_bundle(curr_tx), FLEX_TRIT_SIZE_243);
 
   for (; curr_tx != NULL;
-       curr_tx = (iota_transaction_t)utarray_next(bundle, curr_tx)) {
+       curr_tx = (iota_transaction_t*)utarray_next(bundle, curr_tx)) {
     bundle_value += transaction_value(curr_tx);
 
     if (llabs(bundle_value) > IOTA_SUPPLY) {

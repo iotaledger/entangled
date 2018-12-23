@@ -43,7 +43,7 @@ void test_broadcast_transactions_empty(void) {
 
 void test_broadcast_transactions_invalid_tx(void) {
   broadcast_transactions_req_t *req = broadcast_transactions_req_new();
-  struct _iota_transaction tx;
+  iota_transaction_t tx;
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
 
   // Trying to broadcast an invalid transaction (invalid supply)

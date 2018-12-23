@@ -145,19 +145,19 @@ static void select_milestones_populate_from_row(
     sqlite3_stmt* const statement, iota_milestone_t* const milestone);
 
 static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
-                                                  iota_transaction_t const tx);
+                                                  iota_transaction_t* const tx);
 static void select_transactions_populate_from_row_essence_and_metadata(
-    sqlite3_stmt* const statement, iota_transaction_t const tx);
+    sqlite3_stmt* const statement, iota_transaction_t* const tx);
 
 static void
 select_transactions_populate_from_row_essence_attachment_and_metadata(
-    sqlite3_stmt* const statement, iota_transaction_t const tx);
+    sqlite3_stmt* const statement, iota_transaction_t* const tx);
 
 static void select_transactions_populate_from_row_essence_and_consensus(
-    sqlite3_stmt* const statement, iota_transaction_t const tx);
+    sqlite3_stmt* const statement, iota_transaction_t* const tx);
 
 static void select_transactions_populate_from_row_metadata(
-    sqlite3_stmt* const statement, iota_transaction_t const tx);
+    sqlite3_stmt* const statement, iota_transaction_t* const tx);
 
 static retcode_t prepare_statement(sqlite3* const db,
                                    sqlite3_stmt** const sqlite_statement,
@@ -397,8 +397,8 @@ static retcode_t execute_statement_load_transaction_metadata(
                                     MODEL_TRANSACTION_MODEL_METADATA);
 }
 
-static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
-                                                  iota_transaction_t const tx) {
+static void select_transactions_populate_from_row(
+    sqlite3_stmt* const statement, iota_transaction_t* const tx) {
   column_decompress_load(statement, 0, tx->data.signature_or_message,
                          FLEX_TRIT_SIZE_6561);
   column_decompress_load(statement, 1, tx->essence.address, FLEX_TRIT_SIZE_243);
@@ -426,7 +426,7 @@ static void select_transactions_populate_from_row(sqlite3_stmt* const statement,
 }
 
 static void select_transactions_populate_from_row_essence_and_metadata(
-    sqlite3_stmt* const statement, iota_transaction_t const tx) {
+    sqlite3_stmt* const statement, iota_transaction_t* const tx) {
   column_decompress_load(statement, 0, tx->essence.address, FLEX_TRIT_SIZE_243);
   transaction_set_value(tx, sqlite3_column_int64(statement, 1));
   column_decompress_load(statement, 2, tx->essence.obsolete_tag,
@@ -442,7 +442,7 @@ static void select_transactions_populate_from_row_essence_and_metadata(
 
 static void
 select_transactions_populate_from_row_essence_attachment_and_metadata(
-    sqlite3_stmt* const statement, iota_transaction_t const tx) {
+    sqlite3_stmt* const statement, iota_transaction_t* const tx) {
   column_decompress_load(statement, 0, tx->essence.address, FLEX_TRIT_SIZE_243);
   transaction_set_value(tx, sqlite3_column_int64(statement, 1));
   column_decompress_load(statement, 2, tx->essence.obsolete_tag,
@@ -470,7 +470,7 @@ select_transactions_populate_from_row_essence_attachment_and_metadata(
 }
 
 static void select_transactions_populate_from_row_essence_and_consensus(
-    sqlite3_stmt* const statement, iota_transaction_t const tx) {
+    sqlite3_stmt* const statement, iota_transaction_t* const tx) {
   column_decompress_load(statement, 0, tx->essence.address, FLEX_TRIT_SIZE_243);
   transaction_set_value(tx, sqlite3_column_int64(statement, 1));
   column_decompress_load(statement, 2, tx->essence.obsolete_tag,
@@ -485,7 +485,7 @@ static void select_transactions_populate_from_row_essence_and_consensus(
 }
 
 static void select_transactions_populate_from_row_metadata(
-    sqlite3_stmt* const statement, iota_transaction_t const tx) {
+    sqlite3_stmt* const statement, iota_transaction_t* const tx) {
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 0));
   transaction_set_solid(tx, sqlite3_column_int(statement, 1));
   transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 2));
@@ -518,7 +518,7 @@ done:
 }
 
 retcode_t iota_stor_transaction_store(connection_t const* const conn,
-                                      iota_transaction_t const tx) {
+                                      iota_transaction_t const* const tx) {
   retcode_t ret = RC_OK;
   sqlite3_stmt* sqlite_statement = NULL;
 

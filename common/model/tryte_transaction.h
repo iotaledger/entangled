@@ -18,7 +18,7 @@ namespace model {
 
 class TryteTransaction {
  private:
-  iota_transaction_t iota_transaction;
+  iota_transaction_t* iota_transaction;
 
  public:
   TryteTransaction();
