@@ -98,8 +98,8 @@ static void destroy_epv(exit_prob_transaction_validator_t *epv) {
 void test_cw_gen_topology(test_tangle_topology topology) {
   hash_to_int64_t_map_entry_t *curr_cw_entry = NULL;
   hash_to_int64_t_map_entry_t *tmp_cw_entry = NULL;
-  size_t num_approvers = 1;
-  size_t num_txs = num_approvers + 1;
+  int64_t num_approvers = 50;
+  int64_t num_txs = num_approvers + 1;
 
   init_epv(&epv);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
@@ -145,7 +145,7 @@ void test_cw_gen_topology(test_tangle_topology topology) {
 
   cw_calc_result out;
   bool exist;
-  for (int i = 0; i < num_approvers; i++) {
+  for (size_t i = 0; i < num_approvers; i++) {
     TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_HASH,
                                               transaction_hash(&txs[i]),
                                               &exist) == RC_OK);
