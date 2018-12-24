@@ -80,7 +80,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
               RC_OK);
 
   // We want to avoid unnecessary validation
-  mt.latest_snapshot->index = 99999999999;
+  mt.latest_snapshot->index = 9999999;
   mt.latest_solid_subtangle_milestone_index = max_depth;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(
@@ -96,10 +96,10 @@ static void destroy_epv(exit_prob_transaction_validator_t *epv) {
 }
 
 void test_cw_gen_topology(test_tangle_topology topology) {
-  hash_to_int_map_entry_t *curr_cw_entry = NULL;
-  hash_to_int_map_entry_t *tmp_cw_entry = NULL;
-  size_t num_approvers = 1;
-  size_t num_txs = num_approvers + 1;
+  hash_to_int64_t_map_entry_t *curr_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *tmp_cw_entry = NULL;
+  int64_t num_approvers = 50;
+  int64_t num_txs = num_approvers + 1;
 
   init_epv(&epv);
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
@@ -133,7 +133,7 @@ void test_cw_gen_topology(test_tangle_topology topology) {
     }
   }
 
-  for (int i = 0; i < num_approvers; i++) {
+  for (size_t i = 0; i < num_approvers; i++) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
     TEST_ASSERT(iota_tangle_transaction_update_solid_state(
                     &tangle, txs[i].consensus.hash, true) == RC_OK);
@@ -145,7 +145,7 @@ void test_cw_gen_topology(test_tangle_topology topology) {
 
   cw_calc_result out;
   bool exist;
-  for (int i = 0; i < num_approvers; i++) {
+  for (size_t i = 0; i < num_approvers; i++) {
     TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_HASH,
                                               transaction_hash(&txs[i]),
                                               &exist) == RC_OK);
@@ -163,12 +163,13 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   }
   // First Entry, for both topologies, has to equal the number of total
   // approvers + own weight
-  TEST_ASSERT_EQUAL_INT(out.cw_ratings->value, num_approvers + 1);
+  TEST_ASSERT_EQUAL_INT64(out.cw_ratings->value, num_approvers + 1);
+
   if (topology == ONLY_DIRECT_APPROVERS) {
-    TEST_ASSERT_EQUAL_INT(total_weight, num_approvers + 1 + num_approvers);
+    TEST_ASSERT_EQUAL_INT64(total_weight, num_approvers + 1 + num_approvers);
   } else if (topology == BLOCKCHAIN) {
     // Sum of series 1 + 2 + ... + (num_txs)
-    TEST_ASSERT_EQUAL_INT(total_weight, (num_txs * (num_txs + 1)) / 2);
+    TEST_ASSERT_EQUAL_INT64(total_weight, (num_txs * (num_txs + 1)) / 2);
   }
 
   /// Exit Probabilities - start
@@ -289,8 +290,8 @@ void test_cw_topology_only_direct_approvers(void) {
 void test_cw_topology_blockchain(void) { test_cw_gen_topology(BLOCKCHAIN); }
 
 void test_cw_topology_four_transactions_diamond(void) {
-  hash_to_int_map_entry_t *curr_cw_entry = NULL;
-  hash_to_int_map_entry_t *tmp_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *curr_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *tmp_cw_entry = NULL;
 
   size_t num_txs = 4;
 
@@ -386,8 +387,8 @@ void test_cw_topology_four_transactions_diamond(void) {
 }
 
 void test_cw_topology_two_inequal_tips(void) {
-  hash_to_int_map_entry_t *curr_cw_entry = NULL;
-  hash_to_int_map_entry_t *tmp_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *curr_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *tmp_cw_entry = NULL;
 
   size_t num_txs = 4;
 
@@ -410,7 +411,7 @@ void test_cw_topology_two_inequal_tips(void) {
 
   iota_transaction_t txs[num_txs];
   txs[0] = *test_tx;
-  for (int i = 1; i < num_txs; i++) {
+  for (size_t i = 1; i < num_txs; i++) {
     txs[i] = *test_tx;
     // Different hash for each tx,
     // we don't worry about it not being valid encoding
@@ -424,7 +425,7 @@ void test_cw_topology_two_inequal_tips(void) {
   transaction_set_branch(&txs[3], transaction_hash(&txs[1]));
   transaction_set_trunk(&txs[3], transaction_hash(&txs[1]));
 
-  for (int i = 0; i < num_txs; i++) {
+  for (size_t i = 0; i < num_txs; i++) {
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
     TEST_ASSERT(iota_tangle_transaction_update_solid_state(
                     &tangle, txs[i].consensus.hash, true) == RC_OK);
@@ -438,7 +439,7 @@ void test_cw_topology_two_inequal_tips(void) {
 
   cw_calc_result out;
 
-  for (int i = 0; i < num_txs; i++) {
+  for (size_t i = 0; i < num_txs; i++) {
     TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_HASH,
                                               transaction_hash(&txs[i]),
                                               &exist) == RC_OK);
@@ -449,7 +450,7 @@ void test_cw_topology_two_inequal_tips(void) {
   TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
   TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), num_txs);
 
-  size_t total_weight = 0;
+  int total_weight = 0;
 
   HASH_ITER(hh, out.cw_ratings, curr_cw_entry, tmp_cw_entry) {
     total_weight += curr_cw_entry->value;
@@ -469,7 +470,7 @@ void test_cw_topology_two_inequal_tips(void) {
   /// Select the tip
 
   size_t selected_tip_count = 0;
-  int selections = 200;
+  size_t selections = 200;
   for (size_t i = 0; i < selections; ++i) {
     TEST_ASSERT(iota_consensus_exit_probability_randomize(
                     &ep_randomizer, &epv, &out, ep, tip_trits) == RC_OK);
@@ -482,7 +483,7 @@ void test_cw_topology_two_inequal_tips(void) {
   // We can look on the previous trial as a sample from
   // binomial distribution where `p` = 1/num_approvers, `n` = selections,
   // so we get (mean = `np`, stdev = `np*(1-p)`):
-  double expected_mean = selections / 2;
+  double expected_mean = ((double)selections) / 2;
   double expected_stdev = sqrt(expected_mean * (1 - 1 / 2));
   TEST_ASSERT(selected_tip_count < expected_mean + 3 * expected_stdev);
   TEST_ASSERT(selected_tip_count > expected_mean - 3 * expected_stdev);
@@ -501,7 +502,6 @@ void test_cw_topology_two_inequal_tips(void) {
   }
 
   TEST_ASSERT_EQUAL_INT(selected_tip_count, selections);
-
   TEST_ASSERT(iota_consensus_ep_randomizer_destroy(&ep_randomizer) == RC_OK);
 
   /// Exit Probabilities - end
@@ -516,8 +516,8 @@ void test_cw_topology_two_inequal_tips(void) {
 }
 
 void test_1_bundle(void) {
-  hash_to_int_map_entry_t *curr_cw_entry = NULL;
-  hash_to_int_map_entry_t *tmp_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *curr_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *tmp_cw_entry = NULL;
 
   size_t bundle_size = 4;
   init_epv(&epv);
@@ -616,8 +616,8 @@ void test_1_bundle(void) {
 }
 
 void test_2_chained_bundles(void) {
-  hash_to_int_map_entry_t *curr_cw_entry = NULL;
-  hash_to_int_map_entry_t *tmp_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *curr_cw_entry = NULL;
+  hash_to_int64_t_map_entry_t *tmp_cw_entry = NULL;
 
   TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
                                             DFS_FROM_ENTRY_POINT) == RC_OK);

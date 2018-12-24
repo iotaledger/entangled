@@ -12,7 +12,7 @@
 #include "consensus/conf.h"
 #include "consensus/snapshot/snapshot.h"
 #include "utils/containers/hash/hash243_stack.h"
-#include "utils/hash_maps.h"
+#include "utils/hash_indexed_map.h"
 
 #ifdef __cplusplus
 extern "C" {

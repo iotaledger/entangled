@@ -69,8 +69,8 @@ cc_library(
 
 cc_library(
     name = "hash_maps",
-    srcs = ["hash_maps.c"],
-    hdrs = ["hash_maps.h"],
+    srcs = ["hash_indexed_map.c"],
+    hdrs = ["hash_indexed_map.h"],
     deps = [
         "//common:errors",
         "//common/trinary:flex_trit",

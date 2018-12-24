@@ -5,63 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "utils/hash_maps.h"
-
-/*
- * Hash-int map operations
- */
-
-retcode_t hash_int_map_add(hash_int_map_t *const map,
-                           flex_trit_t const *const hash, int64_t const value) {
-  hash_to_int_map_entry_t *map_entry = NULL;
-
-  map_entry =
-      (hash_to_int_map_entry_t *)malloc(sizeof(hash_to_int_map_entry_t));
-  if (map_entry == NULL) {
-    return RC_UTILS_OOM;
-  }
-  memcpy(map_entry->hash, hash, FLEX_TRIT_SIZE_243);
-  map_entry->value = value;
-  HASH_ADD(hh, *map, hash, FLEX_TRIT_SIZE_243, map_entry);
-  return RC_OK;
-}
-
-bool hash_int_map_contains(hash_int_map_t const *const map,
-                           flex_trit_t const *const hash) {
-  hash_to_int_map_entry_t *entry = NULL;
-
-  if (*map == NULL) {
-    return false;
-  }
-
-  HASH_FIND(hh, *map, hash, FLEX_TRIT_SIZE_243, entry);
-  return entry != NULL;
-}
-
-void hash_int_map_free(hash_int_map_t *const map) {
-  hash_to_int_map_entry_t *curr_entry = NULL;
-  hash_to_int_map_entry_t *tmp_entry = NULL;
-
-  HASH_ITER(hh, *map, curr_entry, tmp_entry) {
-    HASH_DEL(*map, curr_entry);
-    free(curr_entry);
-  }
-  *map = NULL;
-}
-
-bool hash_int_map_find(hash_int_map_t const *const map,
-                       flex_trit_t const *const hash,
-                       hash_to_int_map_entry_t const **res) {
-  if (map == NULL || *map == NULL) {
-    return false;
-  }
-  if (res == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  HASH_FIND(hh, *map, hash, FLEX_TRIT_SIZE_243, *res);
-  return *res != NULL;
-}
+#include "utils/hash_indexed_map.h"
 
 /*
  * Hash-indexed_hash_set map

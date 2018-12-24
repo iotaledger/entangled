@@ -21,11 +21,11 @@
 
 static retcode_t select_approver(
     ep_randomizer_t const *const exit_probability_randomizer,
-    hash_int_map_t const cw_ratings, hash243_set_t const *const approvers,
-    flex_trit_t *const approver) {
+    hash_to_int64_t_map_t const cw_ratings,
+    hash243_set_t const *const approvers, flex_trit_t *const approver) {
   hash243_set_entry_t *curr_approver = NULL;
   hash243_set_entry_t *tmp_approver = NULL;
-  hash_to_int_map_entry_t const *curr_rating = NULL;
+  hash_to_int64_t_map_entry_t const *curr_rating = NULL;
   size_t num_approvers = hash243_set_size(approvers);
   int64_t weights[num_approvers];
   double sum_weights = 0;
@@ -34,7 +34,8 @@ static retcode_t select_approver(
   size_t idx = 0;
 
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
-    if (!hash_int_map_find(&cw_ratings, curr_approver->hash, &curr_rating)) {
+    if (!hash_to_int64_t_map_find(&cw_ratings, curr_approver->hash,
+                                  &curr_rating)) {
       log_error(RANDOM_WALKER_LOGGER_ID, "No rating found for approver\n");
       return RC_CONSENSUS_EXIT_PROBABILITIES_MISSING_RATING;
     }
