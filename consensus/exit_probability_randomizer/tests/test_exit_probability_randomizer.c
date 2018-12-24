@@ -163,7 +163,7 @@ void test_cw_gen_topology(test_tangle_topology topology) {
   }
   // First Entry, for both topologies, has to equal the number of total
   // approvers + own weight
-  // TEST_ASSERT_EQUAL_INT64(out.cw_ratings->value, num_approvers + 1);
+  TEST_ASSERT_EQUAL_INT64(out.cw_ratings->value, num_approvers + 1);
 
   if (topology == ONLY_DIRECT_APPROVERS) {
     TEST_ASSERT_EQUAL_INT64(total_weight, num_approvers + 1 + num_approvers);
