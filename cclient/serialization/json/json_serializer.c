@@ -1490,7 +1490,7 @@ retcode_t json_broadcast_transactions_serialize_request(
 }
 
 retcode_t json_store_transactions_serialize_request(
-    const serializer_t* const s, store_transactions_req_t* const req,
+    const serializer_t* const s, store_transactions_req_t const* const req,
     char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* json_text = NULL;

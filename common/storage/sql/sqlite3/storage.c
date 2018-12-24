@@ -237,18 +237,6 @@ static retcode_t execute_statement_load_gen(
   return RC_OK;
 }
 
-static retcode_t execute_statement_load_solid_state(
-    sqlite3_stmt* const sqlite_statement, bool* const is_solid) {
-  int rc = sqlite3_step(sqlite_statement);
-  if (rc == SQLITE_ROW) {
-    *is_solid = sqlite3_column_int(sqlite_statement, 0);
-  } else {
-    return RC_SQLITE3_FAILED_STEP;
-  }
-
-  return RC_OK;
-}
-
 static retcode_t execute_statement_load_hashes(
     sqlite3_stmt* const sqlite_statement, iota_stor_pack_t* const pack) {
   return execute_statement_load_gen(sqlite_statement, pack, pack->capacity,

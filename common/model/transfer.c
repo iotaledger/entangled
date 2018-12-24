@@ -18,7 +18,7 @@ static void transfer_iterator_next_data_transaction(
   transfer_data_t* trans_data = NULL;
   size_t data_len = 0, offset = 0, len = 0;
   size_t flex_ret = 0;
-  const flex_trit_t* data = NULL;
+
   if (transfer->type == DATA) {
     trans_data = (transfer_data_t*)transfer->meta;
     // Length of message in trits
