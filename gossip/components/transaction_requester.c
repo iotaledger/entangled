@@ -125,7 +125,7 @@ retcode_t requester_clear_request(
 
 retcode_t request_transaction(
     transaction_requester_t *const transaction_requester,
-    flex_trit_t *const hash, bool const is_milestone) {
+    flex_trit_t const *const hash, bool const is_milestone) {
   retcode_t ret = RC_OK;
   bool exists = false;
 

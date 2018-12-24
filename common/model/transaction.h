@@ -396,6 +396,8 @@ static inline void transaction_set_arrival_timestamp(
  * Utility functions
  ***********************************************************************************************************/
 
+void transaction_reset(iota_transaction_t *const transaction);
+
 extern uint8_t transaction_weight_magnitude(
     iota_transaction_t *const transaction);
 

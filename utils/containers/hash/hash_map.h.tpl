@@ -25,16 +25,15 @@ typedef struct hash_to_{TYPE}_map_entry_s {
 
 typedef hash_to_{TYPE}_map_entry_t *hash_to_{TYPE}_map_t;
 
-
-retcode_t hash_{TYPE}_map_add(hash_to_{TYPE}_map_t *const map,
+retcode_t hash_to_{TYPE}_map_add(hash_to_{TYPE}_map_t *const map,
         flex_trit_t const *const hash,
 {TYPE} const value);
-bool hash_{TYPE}_map_contains(hash_to_{TYPE}_map_t const *const map,
+bool hash_to_{TYPE}_map_contains(hash_to_{TYPE}_map_t const *const map,
         flex_trit_t const *const hash);
-bool hash_{TYPE}_map_find(hash_to_{TYPE}_map_t const *const map,
+bool hash_to_{TYPE}_map_find(hash_to_{TYPE}_map_t const *const map,
         flex_trit_t const *const hash,
-hash_to_{TYPE}_map_entry_t const **res);
-void hash_{TYPE}_map_free(hash_to_{TYPE}_map_t *const map);
+hash_to_{TYPE}_map_entry_t ** const res);
+void hash_to_{TYPE}_map_free(hash_to_{TYPE}_map_t *const map);
 
 
 #ifdef __cplusplus

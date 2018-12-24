@@ -7,9 +7,6 @@
 
 #include "trit_ptrit.h"
 
-#define HIGH_BITS 0xFFFFFFFFFFFFFFFF
-#define LOW_BITS 0x0000000000000000
-
 void trits_to_ptrits(trit_t const *const trits, ptrit_t *const ptrits,
                      size_t const index, size_t const length) {
   size_t j = 0;

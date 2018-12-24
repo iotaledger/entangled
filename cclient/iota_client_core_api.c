@@ -514,7 +514,7 @@ done:
 
 retcode_t iota_client_store_transactions(
     const iota_client_service_t* const service,
-    store_transactions_req_t* const req) {
+    store_transactions_req_t const* const req) {
   retcode_t result = RC_OK;
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();

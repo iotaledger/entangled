@@ -62,9 +62,9 @@ void ptrit_transform(PCurl *const ctx) {
   size_t round = 0;
   for (; round < ctx->type; ++round) {
     if (round & 1)
-      ptrit_sbox(ctx->state, &s.state);
+      ptrit_sbox(ctx->state, s.state);
     else
-      ptrit_sbox(&s.state, ctx->state);
+      ptrit_sbox(s.state, ctx->state);
   }
 
   if (round & 1) memcpy(ctx->state, s.state, sizeof(ctx->state));
