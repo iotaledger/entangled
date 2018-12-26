@@ -12,6 +12,7 @@
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
+#include "utils/containers/hash/hash_double_map.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,7 +23,6 @@ void iota_consensus_random_walker_init(ep_randomizer_t *const randomizer);
 retcode_t iota_consensus_random_walker_randomize(
     ep_randomizer_t const *const exit_probability_randomizer,
     exit_prob_transaction_validator_t *const ep_validator,
-
     cw_calc_result *const cw_result, flex_trit_t const *const ep,
     flex_trit_t *tip);
 

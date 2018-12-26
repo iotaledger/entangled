@@ -6,6 +6,7 @@
  */
 
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
+#include "consensus/exit_probability_randomizer/exit_prob_map.h"
 #include "consensus/exit_probability_randomizer/walker.h"
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
@@ -22,6 +23,8 @@ retcode_t iota_consensus_ep_randomizer_init(
   ep_randomizer->tangle = tangle;
   if (impl == EP_RANDOM_WALK) {
     iota_consensus_random_walker_init(ep_randomizer);
+  } else if (impl == EP_RANDOMIZE_MAP_AND_SAMPLE) {
+    iota_consensus_exit_prob_map_init(ep_randomizer);
   } else if (impl == EP_NO_IMPLEMENTATION) {
     return RC_CONSENSUS_NOT_IMPLEMENTED;
   }
