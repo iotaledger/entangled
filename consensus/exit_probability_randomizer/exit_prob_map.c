@@ -35,7 +35,7 @@ static void iota_consensus_exit_prob_map_add_exit_probs(
 static retcode_t iota_consensus_exit_prob_remove_invalid_tip_candidates(
     cw_calc_result *const cw_result,
     exit_prob_transaction_validator_t *const ep_validator) {
-  retcode_t ret;
+  retcode_t ret = RC_OK;
   hash243_set_entry_t *tip_entry = NULL;
   hash243_set_entry_t *tip_tmp_entry = NULL;
   hash243_set_t tips = NULL;
@@ -47,18 +47,20 @@ static retcode_t iota_consensus_exit_prob_remove_invalid_tip_candidates(
              ep_validator, tip_entry->hash, &has_valid_tail)) != RC_OK) {
       log_error(EXIT_PROB_MAP_LOGGER_ID,
                 "Tail transaction validation failed: %" PRIu64 "\n", ret);
-      return ret;
+      goto done;
     }
     if (!has_valid_tail) {
       if (!hash_to_indexed_hash_set_map_find(
               &cw_result->tx_to_approvers, tip_entry->hash, &approvers_entry)) {
-        return RC_OK;
+        goto done;
       }
       hash243_set_remove(&approvers_entry->approvers, tip_entry->hash);
     }
   }
+
+done:
   hash243_set_free(&tips);
-  return RC_OK;
+  return ret;
 }
 
 /*
