@@ -1,0 +1,206 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+#include <inttypes.h>
+#include <math.h>
+
+#include "consensus/exit_probability_randomizer/exit_prob_map.h"
+#include "consensus/exit_probability_randomizer/global_calcs.h"
+#include "utils/handles/rand.h"
+#include "utils/logger_helper.h"
+#include "utils/macros.h"
+
+#define EXIT_PROB_MAP_LOGGER_ID "consensus_exit_prob_map"
+
+/*
+ * Private functions
+ */
+
+static void iota_consensus_exit_prob_map_add_exit_probs(
+    hash_to_double_map_t **const hash_to_probs, flex_trit_t const *const hash,
+    double value) {
+  hash_to_double_map_entry_t *curr_approver_entry = NULL;
+  if (hash_to_double_map_find(*hash_to_probs, hash, &curr_approver_entry)) {
+    curr_approver_entry->value += value;
+
+  } else {
+    hash_to_double_map_add(*hash_to_probs, hash, value);
+  }
+}
+
+/*
+ * Public functions
+ */
+
+void iota_consensus_exit_prob_map_init(ep_randomizer_t *const randomizer) {
+  randomizer->base.vtable = exit_prob_map_vtable;
+  ep_prob_map_randomizer_t *prob_randomizer =
+      (ep_prob_map_randomizer_t *const)randomizer;
+  prob_randomizer->exit_probs = NULL;
+  prob_randomizer->transition_probs = NULL;
+}
+
+retcode_t iota_consensus_exit_prob_map_randomize(
+    ep_randomizer_t const *const randomizer,
+    exit_prob_transaction_validator_t *const ep_validator,
+    cw_calc_result *const cw_result, flex_trit_t const *const ep,
+    flex_trit_t *tip) {
+  retcode_t ret;
+  ep_prob_map_randomizer_t *prob_randomizer =
+      (ep_prob_map_randomizer_t *const)randomizer;
+
+  static cw_rating_calculator_t calc;
+  // TODO - enable polymorphism
+  iota_consensus_cw_rating_init(&calc, &randomizer->tangle,
+                                DFS_FROM_ENTRY_POINT);
+  double rand_weight;
+  if (cw_result == NULL) {
+    iota_consensus_exit_prob_map_reset(randomizer);
+    if ((ret = iota_consensus_cw_rating_calculate(&calc, ep, cw_result)) !=
+        RC_OK) {
+      return ret;
+    }
+  }
+
+  if (prob_randomizer->exit_probs == NULL) {
+    if ((ret = iota_consensus_exit_prob_map_calculate_probs(
+             randomizer, ep_validator, cw_result, ep,
+             &prob_randomizer->exit_probs,
+             &prob_randomizer->transition_probs)) != RC_OK) {
+      return ret;
+    }
+  }
+
+  hash243_set_t tips = NULL;
+  iota_consensus_exit_prob_map_eps_extract_tips(cw_result, &tips);
+  rand_weight = rand_handle_probability();
+  hash243_set_entry_t *tip_entry = NULL;
+  hash243_set_entry_t *tip_tmp_entry = NULL;
+  hash_to_double_map_entry_t *curr_ep = NULL;
+
+  HASH_ITER(hh, tips, tip_entry, tip_tmp_entry) {
+    hash_to_double_map_find(&prob_randomizer->exit_probs, tip_entry->hash,
+                            &curr_ep);
+    rand_weight -= curr_ep->value;
+    if (rand_weight <= 0) {
+      memcpy(tip, tip_entry->hash, FLEX_TRIT_SIZE_243);
+      break;
+    }
+  }
+  hash243_set_free(&tips);
+  return RC_OK;
+}
+
+retcode_t iota_consensus_exit_prob_map_calculate_probs(
+    ep_randomizer_t const *const exit_probability_randomizer,
+    exit_prob_transaction_validator_t *const ep_validator,
+    cw_calc_result *const cw_result, flex_trit_t const *const ep,
+    hash_to_double_map_t *const hash_to_exit_probs,
+    hash_to_double_map_t *const hash_to_trans_probs) {
+  retcode_t ret;
+  bool ep_is_valid = false;
+  hash243_queue_t queue = NULL;
+  hash_to_indexed_hash_set_entry_t *aps = NULL;
+  hash_to_double_map_entry_t *curr_tx_entry = NULL;
+  hash243_set_entry_t *approver_entry = NULL;
+  hash243_set_entry_t *tmp_entry = NULL;
+  size_t num_approvers;
+  size_t approver_idx;
+  flex_trit_t *curr_tx;
+
+  if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(
+           ep_validator, ep, &ep_is_valid)) != RC_OK) {
+    log_error(EXIT_PROB_MAP_LOGGER_ID,
+              "Entry point validation failed: %" PRIu64 "\n", ret);
+    return ret;
+  } else if (!ep_is_valid) {
+    log_error(EXIT_PROB_MAP_LOGGER_ID, "Invalid entry point\n");
+    return RC_CONSENSUS_EXIT_PROBABILITIES_INVALID_ENTRYPOINT;
+  }
+
+  hash_to_double_map_add(hash_to_trans_probs, ep, 1);
+  hash_to_double_map_add(hash_to_exit_probs, ep, 1);
+  hash243_queue_push(&queue, ep);
+
+  while (hash243_queue_count(queue)) {
+    curr_tx = hash243_queue_peek(queue);
+    hash_to_indexed_hash_set_map_find(&cw_result->tx_to_approvers, curr_tx,
+                                      &aps);
+    hash_to_double_map_find(hash_to_exit_probs, curr_tx, &curr_tx_entry);
+    num_approvers = hash243_set_size(&aps->approvers);
+    double trans_probs_to_direct_approvers[num_approvers];
+    map_transition_probabilities(exit_probability_randomizer->conf->alpha,
+                                 cw_result->cw_ratings, &aps->approvers,
+                                 trans_probs_to_direct_approvers);
+    approver_idx = 0;
+    HASH_ITER(hh, aps->approvers, approver_entry, tmp_entry) {
+      iota_consensus_exit_prob_map_add_exit_probs(
+          &hash_to_exit_probs, approver_entry->hash,
+          (trans_probs_to_direct_approvers[approver_idx] *
+           curr_tx_entry->value));
+      iota_consensus_exit_prob_map_add_exit_probs(
+          &hash_to_trans_probs, approver_entry->hash,
+          (trans_probs_to_direct_approvers[approver_idx] *
+           curr_tx_entry->value));
+      hash243_queue_push(&queue, approver_entry->hash);
+      approver_idx++;
+    }
+
+    if (!iota_consensus_is_tx_a_tip(&cw_result->tx_to_approvers, curr_tx)) {
+      curr_tx_entry->value = 0;
+    }
+
+    hash243_queue_pop(&queue);
+  }
+  hash243_queue_free(&queue);
+  return RC_OK;
+}
+
+void iota_consensus_exit_prob_map_eps_extract_tips(
+    cw_calc_result *const cw_result, hash243_set_t *const tips) {
+  hash_to_indexed_hash_set_entry_t *curr_hash_to_approvers_entry = NULL;
+  hash_to_indexed_hash_set_entry_t *tmp_hash_to_approvers_entry = NULL;
+  HASH_ITER(hh, cw_result->tx_to_approvers, curr_hash_to_approvers_entry,
+            tmp_hash_to_approvers_entry) {
+    if (hash243_set_size(&curr_hash_to_approvers_entry->approvers) == 0) {
+      hash243_set_add(tips, curr_hash_to_approvers_entry->hash);
+    }
+  }
+}
+
+double iota_consensus_exit_prob_map_sum_probs(
+    hash_to_double_map_t *const hash_to_probs) {
+  double sum = 0;
+  hash_to_double_map_entry_t *exit_prob_entry = NULL;
+  hash243_set_entry_t *tip_entry = NULL;
+  hash243_set_entry_t *tmp_tip_entry = NULL;
+  hash243_set_t keys = NULL;
+  hash_to_double_map_keys(hash_to_probs, &keys);
+  HASH_ITER(hh, keys, tip_entry, tmp_tip_entry) {
+    if (hash_to_double_map_find(hash_to_probs, tip_entry->hash,
+                                &exit_prob_entry)) {
+      sum += exit_prob_entry->value;
+    }
+  }
+  hash243_set_free(&keys);
+  return sum;
+}
+
+void iota_consensus_exit_prob_map_destroy(
+    ep_randomizer_t *const exit_probability_randomizer) {
+  iota_consensus_exit_prob_map_reset(exit_probability_randomizer);
+}
+
+void iota_consensus_exit_prob_map_reset(
+    ep_randomizer_t *const exit_probability_randomizer) {
+  ep_prob_map_randomizer_t *prob_randomizer =
+      (ep_prob_map_randomizer_t *const)exit_probability_randomizer;
+  if (prob_randomizer->exit_probs) {
+    hash_to_double_map_free(&prob_randomizer->exit_probs);
+    hash_to_double_map_free(&prob_randomizer->transition_probs);
+  }
+}

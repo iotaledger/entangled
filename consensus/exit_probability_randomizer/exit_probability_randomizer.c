@@ -33,6 +33,9 @@ retcode_t iota_consensus_ep_randomizer_init(
 
 retcode_t iota_consensus_ep_randomizer_destroy(
     ep_randomizer_t *const ep_randomizer) {
+  if (ep_randomizer->base.vtable.exit_probability_destroy != NULL) {
+    ep_randomizer->base.vtable.exit_probability_destroy(ep_randomizer);
+  }
   logger_helper_destroy(EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID);
   ep_randomizer->tangle = NULL;
   return RC_OK;

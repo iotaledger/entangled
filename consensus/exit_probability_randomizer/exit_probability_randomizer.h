@@ -36,6 +36,9 @@ typedef struct {
       exit_prob_transaction_validator_t *const epv,
       cw_calc_result *const cw_result, flex_trit_t const *const ep,
       flex_trit_t *const tip);
+
+  void (*exit_probability_destroy)(ep_randomizer_t const *const ep_randomizer);
+
 } ep_randomizer_vtable;
 
 struct ep_randomizer_base_s {

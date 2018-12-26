@@ -28,6 +28,7 @@ retcode_t iota_consensus_random_walker_randomize(
 
 static ep_randomizer_vtable random_walk_vtable = {
     .exit_probability_randomize = iota_consensus_random_walker_randomize,
+    .exit_probability_destroy = NULL,
 };
 
 #ifdef __cplusplus
