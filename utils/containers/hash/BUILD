@@ -86,6 +86,10 @@ hash_map_generate(
     mapped_type = "int64_t",
 )
 
+hash_map_generate(
+    mapped_type = "double",
+)
+
 cc_library(
     name = "hash_array",
     srcs = ["hash_array.c"],
