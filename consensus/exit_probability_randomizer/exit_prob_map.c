@@ -178,9 +178,7 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(
       approver_idx++;
     }
 
-    if (!iota_consensus_is_tx_a_tip(&cw_rhash_to_indexed_hash_set_entry_t
-                                        *approvers_entry = NULL;
-                                    esult->tx_to_approvers, curr_tx)) {
+    if (!iota_consensus_is_tx_a_tip(&cw_result->tx_to_approvers, curr_tx)) {
       curr_tx_entry->value = 0;
     }
 
