@@ -42,23 +42,19 @@ static retcode_t iota_consensus_exit_prob_remove_invalid_tip_candidates(
   hash_to_indexed_hash_set_entry_t *approvers_entry = NULL;
   iota_consensus_exit_prob_map_eps_extract_tips(cw_result, &tips);
   HASH_ITER(hh, tips, tip_entry, tip_tmp_entry) {
-    if (iota_consensus_is_tx_a_tip(&cw_result->tx_to_approvers,
-                                   tip_entry->hash)) {
-      bool has_valid_tail = true;
-      if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(
-               ep_validator, tip_entry->hash, &has_valid_tail)) != RC_OK) {
-        log_error(EXIT_PROB_MAP_LOGGER_ID,
-                  "Tail transaction validation failed: %" PRIu64 "\n", ret);
-        return ret;
+    bool has_valid_tail = true;
+    if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(
+             ep_validator, tip_entry->hash, &has_valid_tail)) != RC_OK) {
+      log_error(EXIT_PROB_MAP_LOGGER_ID,
+                "Tail transaction validation failed: %" PRIu64 "\n", ret);
+      return ret;
+    }
+    if (!has_valid_tail) {
+      if (!hash_to_indexed_hash_set_map_find(
+              &cw_result->tx_to_approvers, tip_entry->hash, &approvers_entry)) {
+        return RC_OK;
       }
-      if (!has_valid_tail) {
-        if (!hash_to_indexed_hash_set_map_find(&cw_result->tx_to_approvers,
-                                               tip_entry->hash,
-                                               &approvers_entry)) {
-          return RC_OK;
-        }
-        hash243_set_remove(&approvers_entry->approvers, tip_entry->hash);
-      }
+      hash243_set_remove(&approvers_entry->approvers, tip_entry->hash);
     }
   }
   hash243_set_free(&tips);
@@ -194,7 +190,10 @@ void iota_consensus_exit_prob_map_eps_extract_tips(
   hash_to_indexed_hash_set_entry_t *tmp_hash_to_approvers_entry = NULL;
   HASH_ITER(hh, cw_result->tx_to_approvers, curr_hash_to_approvers_entry,
             tmp_hash_to_approvers_entry) {
-    hash243_set_add(tips, curr_hash_to_approvers_entry->hash);
+    if (iota_consensus_is_tx_a_tip(&cw_result->tx_to_approvers,
+                                   curr_hash_to_approvers_entry->hash)) {
+      hash243_set_add(tips, curr_hash_to_approvers_entry->hash);
+    }
   }
 }
 
