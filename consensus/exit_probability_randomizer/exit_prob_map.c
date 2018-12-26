@@ -32,6 +32,39 @@ static void iota_consensus_exit_prob_map_add_exit_probs(
   }
 }
 
+static retcode_t iota_consensus_exit_prob_remove_invalid_tip_candidates(
+    cw_calc_result *const cw_result,
+    exit_prob_transaction_validator_t *const ep_validator) {
+  retcode_t ret;
+  hash243_set_entry_t *tip_entry = NULL;
+  hash243_set_entry_t *tip_tmp_entry = NULL;
+  hash243_set_t tips = NULL;
+  hash_to_indexed_hash_set_entry_t *approvers_entry = NULL;
+  iota_consensus_exit_prob_map_eps_extract_tips(cw_result, &tips);
+  HASH_ITER(hh, tips, tip_entry, tip_tmp_entry) {
+    if (iota_consensus_is_tx_a_tip(&cw_result->tx_to_approvers,
+                                   tip_entry->hash)) {
+      bool has_valid_tail = true;
+      if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(
+               ep_validator, tip_entry->hash, &has_valid_tail)) != RC_OK) {
+        log_error(EXIT_PROB_MAP_LOGGER_ID,
+                  "Tail transaction validation failed: %" PRIu64 "\n", ret);
+        return ret;
+      }
+      if (!has_valid_tail) {
+        if (!hash_to_indexed_hash_set_map_find(&cw_result->tx_to_approvers,
+                                               tip_entry->hash,
+                                               &approvers_entry)) {
+          return RC_OK;
+        }
+        hash243_set_remove(&approvers_entry->approvers, tip_entry->hash);
+      }
+    }
+  }
+  hash243_set_free(&tips);
+  return RC_OK;
+}
+
 /*
  * Public functions
  */
@@ -53,18 +86,7 @@ retcode_t iota_consensus_exit_prob_map_randomize(
   ep_prob_map_randomizer_t *prob_randomizer =
       (ep_prob_map_randomizer_t *const)randomizer;
 
-  static cw_rating_calculator_t calc;
-  // TODO - enable polymorphism
-  iota_consensus_cw_rating_init(&calc, &randomizer->tangle,
-                                DFS_FROM_ENTRY_POINT);
   double rand_weight;
-  if (cw_result == NULL) {
-    iota_consensus_exit_prob_map_reset(randomizer);
-    if ((ret = iota_consensus_cw_rating_calculate(&calc, ep, cw_result)) !=
-        RC_OK) {
-      return ret;
-    }
-  }
 
   if (prob_randomizer->exit_probs == NULL) {
     if ((ret = iota_consensus_exit_prob_map_calculate_probs(
@@ -77,6 +99,7 @@ retcode_t iota_consensus_exit_prob_map_randomize(
 
   hash243_set_t tips = NULL;
   iota_consensus_exit_prob_map_eps_extract_tips(cw_result, &tips);
+  // Randomizes uniformly a value between 0 to 1
   rand_weight = rand_handle_probability();
   hash243_set_entry_t *tip_entry = NULL;
   hash243_set_entry_t *tip_tmp_entry = NULL;
@@ -122,6 +145,11 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(
     return RC_CONSENSUS_EXIT_PROBABILITIES_INVALID_ENTRYPOINT;
   }
 
+  if ((ret = iota_consensus_exit_prob_remove_invalid_tip_candidates(
+           cw_result, ep_validator)) != RC_OK) {
+    return ret;
+  }
+
   hash_to_double_map_add(hash_to_trans_probs, ep, 1);
   hash_to_double_map_add(hash_to_exit_probs, ep, 1);
   hash243_queue_push(&queue, ep);
@@ -150,7 +178,9 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(
       approver_idx++;
     }
 
-    if (!iota_consensus_is_tx_a_tip(&cw_result->tx_to_approvers, curr_tx)) {
+    if (!iota_consensus_is_tx_a_tip(&cw_rhash_to_indexed_hash_set_entry_t
+                                        *approvers_entry = NULL;
+                                    esult->tx_to_approvers, curr_tx)) {
       curr_tx_entry->value = 0;
     }
 
@@ -166,9 +196,7 @@ void iota_consensus_exit_prob_map_eps_extract_tips(
   hash_to_indexed_hash_set_entry_t *tmp_hash_to_approvers_entry = NULL;
   HASH_ITER(hh, cw_result->tx_to_approvers, curr_hash_to_approvers_entry,
             tmp_hash_to_approvers_entry) {
-    if (hash243_set_size(&curr_hash_to_approvers_entry->approvers) == 0) {
-      hash243_set_add(tips, curr_hash_to_approvers_entry->hash);
-    }
+    hash243_set_add(tips, curr_hash_to_approvers_entry->hash);
   }
 }
 

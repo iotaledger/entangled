@@ -31,6 +31,25 @@ void iota_consensus_exit_prob_map_reset(
 
 void iota_consensus_exit_prob_map_init(ep_randomizer_t *const randomizer);
 
+/**
+ * Randomize a tip selection based on exit probabilities
+ * This implementation does not validate the entry point upon
+ * every randomization but rather when the entire exit probabilities map
+ * is being calculated (when "iota_consensus_exit_prob_map_calculate_probs" is
+ * called), when the Tangle is updated with new transaction user should
+ * recalculate "cw_result" and make sure to call
+ * "iota_consensus_exit_prob_map_reset" before randomizing again, to get a new
+ * exit probabilities calculation
+ *
+ * @param exit_probability_randomizer The base class
+ * @param ep_validator The validator - used for the entry point
+ * @param cw_result The cumulative weight data
+ * @param ep The entry point hash - this is not required in this implementation
+ * @param tip The selected tip hash
+ *
+ * @return a status code
+ */
+
 retcode_t iota_consensus_exit_prob_map_randomize(
     ep_randomizer_t const *const exit_probability_randomizer,
     exit_prob_transaction_validator_t *const ep_validator,
@@ -41,8 +60,7 @@ retcode_t iota_consensus_exit_prob_map_randomize(
  *
  * @param exit_probability_randomizer The base class
  * @param ep_validator The validator - used for the entry point
- * @param cw_result The cumulative weight data, Null means that cw will be
- * recalculated
+ * @param cw_result The cumulative weight data
  * @param ep The entry point hash
  * @param hash_to_exit_probs The mapping of the calculated exit probabilities -
  * non tips will have 0 probability
