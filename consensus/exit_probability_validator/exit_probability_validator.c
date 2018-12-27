@@ -128,7 +128,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
     if (hash243_set_size(&visited_hashes) == epv->conf->below_max_depth) {
       log_error(WALKER_VALIDATOR_LOGGER_ID,
                 "Validation failed, exceeded num of transactions\n");
-      *below_max_depth = false;
+      *below_max_depth = true;
       break;
     }
 

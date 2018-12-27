@@ -223,7 +223,7 @@ void test_transaction_exceed_max_transactions() {
   bool is_valid = false;
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
                   &epv, transaction_hash(txs[0]), &is_valid) == RC_OK);
-  TEST_ASSERT(is_valid);
+  TEST_ASSERT(!is_valid);
 
   transactions_free(txs, 2);
   destroy_epv(&epv);
