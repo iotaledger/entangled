@@ -65,6 +65,6 @@ void hash_to_{TYPE}_map_keys(hash_to_{TYPE}_map_t *const map, hash243_set_t * co
   hash_to_{TYPE}_map_entry_t *curr_entry = NULL;
   hash_to_{TYPE}_map_entry_t *tmp_entry = NULL;
   HASH_ITER(hh, *map, curr_entry, tmp_entry) {
-  hash243_set_add(keys,curr_entry->hash);
+    hash243_set_add(keys,curr_entry->hash);
   }
 }

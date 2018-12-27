@@ -26,6 +26,14 @@ struct ep_prob_map_randomizer_s {
   hash_to_double_map_t transition_probs;
 };
 
+/**
+ * Resets the exit and transition probabilities maps so it can be recalculated,
+ * This function needs to be locked for write
+ *
+ * @param exit_probability_randomizer The base class
+ *
+ * @return void
+ */
 void iota_consensus_exit_prob_map_reset(
     ep_randomizer_t *const exit_probability_randomizer);
 
@@ -41,6 +49,8 @@ void iota_consensus_exit_prob_map_init(ep_randomizer_t *const randomizer);
  * "iota_consensus_exit_prob_map_reset" before randomizing again, to get a new
  * exit probabilities calculation
  *
+ * This function needs to be locked for read
+ *
  * @param exit_probability_randomizer The base class
  * @param ep_validator The validator - used for the entry point
  * @param cw_result The cumulative weight data
@@ -49,7 +59,6 @@ void iota_consensus_exit_prob_map_init(ep_randomizer_t *const randomizer);
  *
  * @return a status code
  */
-
 retcode_t iota_consensus_exit_prob_map_randomize(
     ep_randomizer_t const *const exit_probability_randomizer,
     exit_prob_transaction_validator_t *const ep_validator,
@@ -57,6 +66,8 @@ retcode_t iota_consensus_exit_prob_map_randomize(
     flex_trit_t *tip);
 /**
  * Calculates exit and overall transition probabilities
+ *
+ * This function needs to be locked for write
  *
  * @param exit_probability_randomizer The base class
  * @param ep_validator The validator - used for the entry point
@@ -69,7 +80,6 @@ retcode_t iota_consensus_exit_prob_map_randomize(
  *
  * @return a status code
  */
-
 retcode_t iota_consensus_exit_prob_map_calculate_probs(
     ep_randomizer_t const *const exit_probability_randomizer,
     exit_prob_transaction_validator_t *const ep_validator,
@@ -80,23 +90,25 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(
 /**
  * Virtual distructor
  *
+ * This function needs to be locked for write
+ *
  * @param exit_probability_randomizer The base class
  *
  * @return void
  */
-
 void iota_consensus_exit_prob_map_destroy(
     ep_randomizer_t *const exit_probability_randomizer);
 
 /**
  * Extracts tips into set
  *
+ * This function needs to be locked for read
+ *
  * @param cw_result The cumulative weight data
  * @param tips The result set
  *
  * @return void
  */
-
 void iota_consensus_exit_prob_map_eps_extract_tips(
     cw_calc_result *const cw_result, hash243_set_t *const tips);
 

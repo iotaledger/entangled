@@ -26,7 +26,6 @@ static void iota_consensus_exit_prob_map_add_exit_probs(
   hash_to_double_map_entry_t *curr_approver_entry = NULL;
   if (hash_to_double_map_find(*hash_to_probs, hash, &curr_approver_entry)) {
     curr_approver_entry->value += value;
-
   } else {
     hash_to_double_map_add(*hash_to_probs, hash, value);
   }
@@ -82,9 +81,7 @@ retcode_t iota_consensus_exit_prob_map_randomize(
     flex_trit_t *tip) {
   retcode_t ret;
   ep_prob_map_randomizer_t *prob_randomizer =
-      (ep_prob_map_randomizer_t *const)randomizer;
-
-  double rand_weight;
+      (ep_prob_map_randomizer_t *)randomizer;
 
   if (prob_randomizer->exit_probs == NULL) {
     if ((ret = iota_consensus_exit_prob_map_calculate_probs(
@@ -98,7 +95,7 @@ retcode_t iota_consensus_exit_prob_map_randomize(
   hash243_set_t tips = NULL;
   iota_consensus_exit_prob_map_eps_extract_tips(cw_result, &tips);
   // Randomizes uniformly a value between 0 to 1
-  rand_weight = rand_handle_probability();
+  double rand_weight = rand_handle_probability();
   hash243_set_entry_t *tip_entry = NULL;
   hash243_set_entry_t *tip_tmp_entry = NULL;
   hash_to_double_map_entry_t *curr_ep = NULL;
