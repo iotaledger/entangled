@@ -47,10 +47,9 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(tx, tx_models, tx_pack);
 
-  ret = iota_tangle_transaction_load_partial(
-      epv->tangle, tail_hash, &tx_pack,
-      PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA);
-  if (ret != RC_OK) {
+  if ((ret = iota_tangle_transaction_load_partial(
+           epv->tangle, tail_hash, &tx_pack,
+           PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA)) != RC_OK) {
     *is_valid = false;
     return ret;
   }
@@ -69,9 +68,9 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
     return RC_OK;
   }
 
-  ret = iota_consensus_ledger_validator_update_delta(
-      epv->lv, &epv->analyzed_hashes, &epv->delta, tail_hash, is_valid);
-  if (ret != RC_OK) {
+  if ((ret = iota_consensus_ledger_validator_update_delta(
+           epv->lv, &epv->analyzed_hashes, &epv->delta, tail_hash, is_valid)) !=
+      RC_OK) {
     *is_valid = false;
     return ret;
   }
@@ -84,11 +83,14 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
 
   bool below_max_depth = false;
 
-  ret = iota_consensus_exit_prob_transaction_validator_below_max_depth(
-      epv, tail_hash,
-      epv->mt->latest_solid_subtangle_milestone_index - epv->conf->max_depth,
-      &below_max_depth);
-  if (ret != RC_OK) {
+  uint32_t lowest_allowed_depth =
+      epv->mt->latest_solid_subtangle_milestone_index < epv->conf->max_depth
+          ? epv->mt->latest_solid_subtangle_milestone_index
+          : epv->mt->latest_solid_subtangle_milestone_index -
+                epv->conf->max_depth;
+
+  if ((ret = iota_consensus_exit_prob_transaction_validator_below_max_depth(
+           epv, tail_hash, lowest_allowed_depth, &below_max_depth)) != RC_OK) {
     return ret;
   }
 
@@ -109,6 +111,8 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
     uint32_t lowest_allowed_depth, bool *below_max_depth) {
   retcode_t res = RC_OK;
 
+  bool is_genesis_hash;
+  flex_trit_t *curr_hash_trits;
   hash243_stack_t non_analyzed_hashes = NULL;
   if ((res = hash243_stack_push(&non_analyzed_hashes, tail_hash)) != RC_OK) {
     return res;
@@ -118,6 +122,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
   DECLARE_PACK_SINGLE_TX(curr_tx_s, curr_tx, pack);
 
   hash243_set_t visited_hashes = NULL;
+  uint32_t curr_snapshot_index;
 
   while (non_analyzed_hashes != NULL) {
     if (hash243_set_size(&visited_hashes) == epv->conf->below_max_depth) {
@@ -127,8 +132,11 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
       break;
     }
 
-    flex_trit_t *curr_hash_trits = hash243_stack_peek(non_analyzed_hashes);
+    curr_hash_trits = hash243_stack_peek(non_analyzed_hashes);
+    is_genesis_hash = (memcmp(epv->conf->genesis_hash, curr_hash_trits,
+                              FLEX_TRIT_SIZE_243) == 0);
     if (hash243_set_contains(&visited_hashes, curr_hash_trits)) {
+      hash243_stack_pop(&non_analyzed_hashes);
       continue;
     }
 
@@ -136,22 +144,26 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
     if ((res = hash243_set_add(&visited_hashes, curr_hash_trits))) {
       break;
     }
+    if (!is_genesis_hash) {
+      hash_pack_reset(&pack);
+      if ((res = iota_tangle_transaction_load_partial(
+               epv->tangle, curr_hash_trits, &pack,
+               PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA)) != RC_OK) {
+        return res;
+      }
+      curr_snapshot_index = transaction_snapshot_index(&curr_tx_s);
+    } else {
+      curr_snapshot_index = 0;
+    }
 
-    hash_pack_reset(&pack);
-    res = iota_tangle_transaction_load_partial(
-        epv->tangle, curr_hash_trits, &pack,
-        PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA);
-    bool tail_is_not_genesis = (transaction_snapshot_index(&curr_tx_s) != 0 ||
-                                memcmp(epv->conf->genesis_hash, curr_hash_trits,
-                                       FLEX_TRIT_SIZE_243) == 0);
-    if (tail_is_not_genesis &&
-        (transaction_snapshot_index(&curr_tx_s) < lowest_allowed_depth)) {
+    if (curr_snapshot_index < lowest_allowed_depth) {
       log_error(WALKER_VALIDATOR_LOGGER_ID,
                 "Validation failed, transaction is below max depth\n");
       *below_max_depth = true;
       break;
     }
-    if (transaction_snapshot_index(curr_tx) == 0) {
+    hash243_stack_pop(&non_analyzed_hashes);
+    if (!is_genesis_hash && transaction_snapshot_index(curr_tx) == 0) {
       if ((res = hash243_stack_push(&non_analyzed_hashes,
                                     transaction_trunk(curr_tx))) != RC_OK) {
         return res;
@@ -161,7 +173,6 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
         return res;
       }
     }
-    hash243_stack_pop(&non_analyzed_hashes);
   }
 
   hash243_stack_free(&non_analyzed_hashes);

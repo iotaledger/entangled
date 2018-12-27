@@ -230,36 +230,6 @@ void test_transaction_exceed_max_transactions() {
   max_txs_below_max_depth = 15;
 }
 
-void test_transaction_is_genesis() {
-  init_epv(&epv);
-
-  bool exist = false;
-
-  iota_transaction_t *txs[2];
-
-  tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
-  transactions_deserialize(trytes, txs, 2, true);
-  build_tangle(&tangle, txs, 2);
-
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
-                  &tangle, txs[0]->consensus.hash, true) == RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
-                  &tangle, txs[1]->consensus.hash, true) == RC_OK);
-
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
-                                            NULL, &exist) == RC_OK);
-
-  TEST_ASSERT(exist == true);
-
-  bool is_valid = false;
-  TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, transaction_hash(txs[0]), &is_valid) == RC_OK);
-  TEST_ASSERT(!is_valid);
-
-  transactions_free(txs, 2);
-  destroy_epv(&epv);
-}
-
 void test_transaction_valid() {
   init_epv(&epv);
 
@@ -269,6 +239,9 @@ void test_transaction_valid() {
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
   transactions_deserialize(trytes, txs, 2, true);
+  transaction_set_branch(txs[0], consensus_conf.genesis_hash);
+  transaction_set_branch(txs[1], consensus_conf.genesis_hash);
+  transaction_set_trunk(txs[1], consensus_conf.genesis_hash);
   build_tangle(&tangle, txs, 2);
 
   TEST_ASSERT(iota_tangle_transaction_update_solid_state(
@@ -281,10 +254,12 @@ void test_transaction_valid() {
 
   TEST_ASSERT(exist == true);
 
-  bool is_valid = false;
+  epv.mt->latest_solid_subtangle_milestone_index = max_depth;
+  bool is_valid;
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
                   &epv, transaction_hash(txs[0]), &is_valid) == RC_OK);
-  TEST_ASSERT(!is_valid);
+  TEST_ASSERT(is_valid);
+  epv.mt->latest_solid_subtangle_milestone_index = 0;
   transactions_free(txs, 2);
   destroy_epv(&epv);
 }
@@ -312,7 +287,6 @@ int main(int argc, char *argv[]) {
   RUN_TEST(test_transaction_invalid_delta);
   RUN_TEST(test_transaction_below_max_depth);
   RUN_TEST(test_transaction_exceed_max_transactions);
-  RUN_TEST(test_transaction_is_genesis);
   RUN_TEST(test_transaction_valid);
 
   TEST_ASSERT(storage_destroy() == RC_OK);
