@@ -38,7 +38,7 @@ retcode_t storage_init() {
 
   // TODO - implement connections pool so no two threads
   // will access db through same connection simultaneously
-  if (sqlite3_config(SQLITE_CONFIG_SERIALIZED) != SQLITE_OK) {
+  if (sqlite3_config(SQLITE_CONFIG_MULTITHREAD) != SQLITE_OK) {
     return RC_SQLITE3_FAILED_CONFIG;
   }
 

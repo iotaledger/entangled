@@ -10,7 +10,7 @@
 #include "consensus/tangle/tangle.h"
 #include "utils/logger_helper.h"
 
-#define TANGLE_LOGGER_ID "consensus_tangle"
+#define TANGLE_LOGGER_ID "tangle"
 
 retcode_t iota_tangle_init(tangle_t *const tangle,
                            connection_config_t const *const conf) {

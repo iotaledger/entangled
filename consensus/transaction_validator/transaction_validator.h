@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2018 IOTA Stiftung
- * https://github.com/iotaledger/entangled
+ * https://github.com/iotaledger/enggd
  *
  * Refer to the LICENSE file for licensing information
  */
@@ -12,9 +12,8 @@
 #include <stdint.h>
 
 #include "common/errors.h"
-#include "common/storage/connection.h"
+#include "common/model/transaction.h"
 #include "consensus/conf.h"
-#include "consensus/tangle/tangle.h"
 
 #ifdef __cplusplus
 extern "C" {

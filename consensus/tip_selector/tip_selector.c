@@ -15,7 +15,7 @@
 #include "consensus/tip_selector/tip_selector.h"
 #include "utils/logger_helper.h"
 
-#define TIP_SELECTOR_LOGGER_ID "consensus_tip_selector"
+#define TIP_SELECTOR_LOGGER_ID "tip_selector"
 
 retcode_t iota_consensus_tip_selector_init(
     tip_selector_t *const tip_selector, iota_consensus_conf_t *const conf,
@@ -24,7 +24,7 @@ retcode_t iota_consensus_tip_selector_init(
     ep_randomizer_t *const ep_randomizer,
     exit_prob_transaction_validator_t *const walker_validator,
     ledger_validator_t *const ledger_validator,
-    milestone_tracker_t *const milestone_tracker, tangle_t *const tangle) {
+    milestone_tracker_t *const milestone_tracker) {
   tip_selector->conf = conf;
   tip_selector->cw_rating_calculator = cw_rating_calculator;
   tip_selector->entry_point_selector = entry_point_selector;
@@ -32,13 +32,13 @@ retcode_t iota_consensus_tip_selector_init(
   tip_selector->walker_validator = walker_validator;
   tip_selector->ledger_validator = ledger_validator;
   tip_selector->milestone_tracker = milestone_tracker;
-  tip_selector->tangle = tangle;
   return RC_OK;
 }
 
 retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
-    tip_selector_t *const tip_selector, size_t const depth,
-    flex_trit_t const *const reference, tips_pair_t *const tips) {
+    tip_selector_t *const tip_selector, tangle_t *const tangle,
+    size_t const depth, flex_trit_t const *const reference,
+    tips_pair_t *const tips) {
   retcode_t ret = RC_OK;
   flex_trit_t ep_trits[FLEX_TRIT_SIZE_243];
   flex_trit_t *ep_p = ep_trits;
@@ -50,22 +50,22 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
       &tip_selector->milestone_tracker->latest_snapshot->rw_lock);
 
   if ((ret = iota_consensus_entry_point_selector_get_entry_point(
-           tip_selector->entry_point_selector, depth, ep_p)) != RC_OK) {
+           tip_selector->entry_point_selector, tangle, depth, ep_p)) != RC_OK) {
     log_error(TIP_SELECTOR_LOGGER_ID,
               "Getting entry point failed with error %" PRIu64 "\n", ret);
     goto done;
   }
 
   if ((ret = iota_consensus_cw_rating_calculate(
-           tip_selector->cw_rating_calculator, ep_p, &rating_results)) !=
-      RC_OK) {
+           tip_selector->cw_rating_calculator, tangle, ep_p,
+           &rating_results)) != RC_OK) {
     log_error(TIP_SELECTOR_LOGGER_ID,
               "Calculating CW ratings failed with error %" PRIu64 "\n", ret);
     goto done;
   }
 
   if ((ret = iota_consensus_exit_probability_randomize(
-           tip_selector->ep_randomizer, tip_selector->walker_validator,
+           tip_selector->ep_randomizer, tip_selector->walker_validator, tangle,
            &rating_results, ep_p, tips->trunk)) != RC_OK) {
     log_error(TIP_SELECTOR_LOGGER_ID,
               "Getting trunk tip failed with error %" PRIu64 "\n", ret);
@@ -85,7 +85,7 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
   }
 
   if ((ret = iota_consensus_exit_probability_randomize(
-           tip_selector->ep_randomizer, tip_selector->walker_validator,
+           tip_selector->ep_randomizer, tip_selector->walker_validator, tangle,
            &rating_results, ep_p, tips->branch)) != RC_OK) {
     log_error(TIP_SELECTOR_LOGGER_ID,
               "Getting branch tip failed with error %" PRIu64 "\n", ret);
@@ -96,7 +96,8 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
   }
 
   if ((ret = iota_consensus_ledger_validator_check_consistency(
-           tip_selector->ledger_validator, tips_stack, &consistent)) != RC_OK) {
+           tip_selector->ledger_validator, tangle, tips_stack, &consistent)) !=
+      RC_OK) {
     log_error(TIP_SELECTOR_LOGGER_ID,
               "Checking consistency of tips failed with error %" PRIu64 "\n",
               ret);
@@ -124,7 +125,6 @@ retcode_t iota_consensus_tip_selector_destroy(
   tip_selector->walker_validator = NULL;
   tip_selector->ledger_validator = NULL;
   tip_selector->milestone_tracker = NULL;
-  tip_selector->tangle = NULL;
   logger_helper_destroy(TIP_SELECTOR_LOGGER_ID);
   return RC_OK;
 }

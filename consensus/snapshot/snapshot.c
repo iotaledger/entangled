@@ -11,7 +11,7 @@
 #include "utils/logger_helper.h"
 #include "utils/signed_files.h"
 
-#define SNAPSHOT_LOGGER_ID "consensus_snapshot"
+#define SNAPSHOT_LOGGER_ID "snapshot"
 
 /*
  * Private functions

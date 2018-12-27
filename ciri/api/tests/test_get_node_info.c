@@ -17,6 +17,7 @@ static char *ciri_db_path = "ciri/api/tests/ciri.db";
 static iota_api_t api;
 static node_t node;
 static connection_config_t config;
+static tangle_t tangle;
 static iota_consensus_t consensus;
 
 static int LATEST_MILESTONE_INDEX = 909909;
@@ -69,13 +70,11 @@ int main(void) {
   node.neighbors = NULL;
   rw_lock_handle_init(&node.neighbors_lock);
   node.conf.requester_queue_size = 100;
-  TEST_ASSERT(requester_init(&node.transaction_requester, &node,
-                             &consensus.tangle) == RC_OK);
+  TEST_ASSERT(requester_init(&node.transaction_requester, &node) == RC_OK);
   TEST_ASSERT(broadcaster_init(&node.broadcaster, &node) == RC_OK);
   config.db_path = test_db_path;
-  TEST_ASSERT(tangle_setup(&consensus.tangle, &config, test_db_path,
-                           ciri_db_path) == RC_OK);
-  node.transaction_requester.tangle = &consensus.tangle;
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
   api.consensus = &consensus;
   api.consensus->milestone_tracker.latest_milestone_index =
       LATEST_MILESTONE_INDEX;
@@ -132,12 +131,12 @@ int main(void) {
 
   // Adding requests
 
-  TEST_ASSERT(request_transaction(&node.transaction_requester, hashes[0],
-                                  false) == RC_OK);
-  TEST_ASSERT(request_transaction(&node.transaction_requester, hashes[1],
-                                  false) == RC_OK);
-  TEST_ASSERT(request_transaction(&node.transaction_requester, hashes[2],
-                                  false) == RC_OK);
+  TEST_ASSERT(request_transaction(&node.transaction_requester, &tangle,
+                                  hashes[0], false) == RC_OK);
+  TEST_ASSERT(request_transaction(&node.transaction_requester, &tangle,
+                                  hashes[1], false) == RC_OK);
+  TEST_ASSERT(request_transaction(&node.transaction_requester, &tangle,
+                                  hashes[2], false) == RC_OK);
 
   // Adding broadcasts
 
@@ -152,7 +151,7 @@ int main(void) {
   neighbors_free(&node.neighbors);
   rw_lock_handle_destroy(&node.neighbors_lock);
   TEST_ASSERT(requester_destroy(&node.transaction_requester) == RC_OK);
-  TEST_ASSERT(tangle_cleanup(&consensus.tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 
   TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();

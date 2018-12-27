@@ -35,7 +35,6 @@ typedef struct tip_selector_s {
   exit_prob_transaction_validator_t *walker_validator;
   ledger_validator_t *ledger_validator;
   milestone_tracker_t *milestone_tracker;
-  tangle_t *tangle;
 } tip_selector_t;
 
 retcode_t iota_consensus_tip_selector_init(
@@ -45,11 +44,12 @@ retcode_t iota_consensus_tip_selector_init(
     ep_randomizer_t *const ep_randomizer,
     exit_prob_transaction_validator_t *const walker_validator,
     ledger_validator_t *const ledger_validator,
-    milestone_tracker_t *const milestone_tracker, tangle_t *const tangle);
+    milestone_tracker_t *const milestone_tracker);
 
 retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
-    tip_selector_t *const tip_selector, size_t const depth,
-    flex_trit_t const *const reference, tips_pair_t *const tips);
+    tip_selector_t *const tip_selector, tangle_t *const tangle,
+    size_t const depth, flex_trit_t const *const reference,
+    tips_pair_t *const tips);
 
 retcode_t iota_consensus_tip_selector_destroy(
     tip_selector_t *const tip_selector);

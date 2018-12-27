@@ -7,6 +7,7 @@
 
 #include "gossip/components/tips_requester.h"
 #include "common/model/milestone.h"
+#include "consensus/tangle/tangle.h"
 #include "gossip/iota_packet.h"
 #include "gossip/node.h"
 #include "utils/logger_helper.h"
@@ -24,6 +25,8 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
   DECLARE_PACK_SINGLE_TX(transaction, transaction_ptr, transaction_pack);
   DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr,
                                 milestone_pack);
+  connection_config_t db_conf = {.db_path = "ciri/db/ciri-mainnet.db"};
+  tangle_t tangle;
 
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
@@ -31,17 +34,22 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
     return NULL;
   }
 
+  if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
+    log_critical(TIPS_REQUESTER_LOGGER_ID,
+                 "Initializing tangle connection failed\n");
+    return NULL;
+  }
+
   while (tips_requester->running) {
     hash_pack_reset(&milestone_pack);
-    if (iota_tangle_milestone_load_last(tips_requester->tangle,
-                                        &milestone_pack) != RC_OK ||
+    if (iota_tangle_milestone_load_last(&tangle, &milestone_pack) != RC_OK ||
         milestone_pack.num_loaded == 0) {
       continue;
     }
     hash_pack_reset(&transaction_pack);
-    if (iota_tangle_transaction_load(
-            tips_requester->tangle, TRANSACTION_FIELD_HASH,
-            latest_milestone.hash, &transaction_pack) != RC_OK ||
+    if (iota_tangle_transaction_load(&tangle, TRANSACTION_FIELD_HASH,
+                                     latest_milestone.hash,
+                                     &transaction_pack) != RC_OK ||
         transaction_pack.num_loaded == 0) {
       continue;
     }
@@ -67,6 +75,11 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
     sleep(TIPS_REQUESTER_INTERVAL);
   }
 
+  if (iota_tangle_destroy(&tangle) != RC_OK) {
+    log_critical(TIPS_REQUESTER_LOGGER_ID,
+                 "Destroying tangle connection failed\n");
+  }
+
   return NULL;
 }
 
@@ -75,8 +88,8 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
  */
 
 retcode_t tips_requester_init(tips_requester_t *const tips_requester,
-                              node_t *const node, tangle_t *const tangle) {
-  if (tips_requester == NULL || node == NULL || tangle == NULL) {
+                              node_t *const node) {
+  if (tips_requester == NULL || node == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -84,7 +97,6 @@ retcode_t tips_requester_init(tips_requester_t *const tips_requester,
 
   tips_requester->running = false;
   tips_requester->node = node;
-  tips_requester->tangle = tangle;
 
   return RC_OK;
 }
@@ -133,7 +145,6 @@ retcode_t tips_requester_destroy(tips_requester_t *const tips_requester) {
   }
 
   tips_requester->node = NULL;
-  tips_requester->tangle = NULL;
 
   logger_helper_destroy(TIPS_REQUESTER_LOGGER_ID);
 

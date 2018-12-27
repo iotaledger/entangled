@@ -18,22 +18,23 @@ static char *ciri_db_path = "ciri/api/tests/ciri.db";
 static connection_config_t config;
 static iota_api_t api;
 static node_t node;
+static tangle_t tangle;
 static iota_consensus_t consensus;
 
 void setUp(void) {
-  TEST_ASSERT(tangle_setup(&api.consensus->tangle, &config, test_db_path,
-                           ciri_db_path) == RC_OK);
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
 }
 
 void tearDown(void) {
-  TEST_ASSERT(tangle_cleanup(&api.consensus->tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
 void test_check_consistency_invalid_subtangle_status(void) {
   check_consistency_req_t *req = check_consistency_req_new();
   check_consistency_res_t *res = check_consistency_res_new();
 
-  TEST_ASSERT(iota_api_check_consistency(&api, req, res) ==
+  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res) ==
               RC_API_INVALID_SUBTANGLE_STATUS);
   TEST_ASSERT(res->state == false);
 
@@ -50,7 +51,7 @@ void test_check_consistency_missing_tail(void) {
                          HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
   hash243_queue_push(&req->tails, hash);
 
-  TEST_ASSERT(iota_api_check_consistency(&api, req, res) ==
+  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res) ==
               RC_API_TAIL_MISSING);
   TEST_ASSERT(res->state == false);
 
@@ -73,10 +74,10 @@ void test_check_consistency_not_tail(void) {
   hash243_queue_push(&req->tails, hash);
 
   transaction_deserialize_from_trits(&tx, trits, true);
-  TEST_ASSERT(iota_tangle_transaction_store(&api.consensus->tangle, &tx) ==
-              RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_store(&tangle, &tx) == RC_OK);
 
-  TEST_ASSERT(iota_api_check_consistency(&api, req, res) == RC_API_NOT_TAIL);
+  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res) ==
+              RC_API_NOT_TAIL);
   TEST_ASSERT(res->state == false);
 
   check_consistency_req_free(&req);
@@ -98,12 +99,11 @@ void test_check_consistency_tail_not_solid(void) {
   hash243_queue_push(&req->tails, hash);
 
   transaction_deserialize_from_trits(&tx, trits, true);
-  TEST_ASSERT(iota_tangle_transaction_store(&api.consensus->tangle, &tx) ==
-              RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&api.consensus->tangle,
-                                                         hash, false) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_store(&tangle, &tx) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, hash,
+                                                         false) == RC_OK);
 
-  TEST_ASSERT(iota_api_check_consistency(&api, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res) == RC_OK);
   TEST_ASSERT(res->state == false);
   TEST_ASSERT_EQUAL_STRING(res->info->data, API_TAILS_NOT_SOLID);
 
@@ -131,12 +131,12 @@ void test_check_consistency_invalid_bundle(void) {
                         NUM_TRITS_PER_FLEX_TRIT);
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_1_OF_4_HASH,
                          HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
-  TEST_ASSERT(build_tangle(&api.consensus->tangle, txs, 4) == RC_OK);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&api.consensus->tangle,
-                                                         hash, true) == RC_OK);
+  TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, hash, true) ==
+              RC_OK);
   hash243_queue_push(&req->tails, hash);
 
-  TEST_ASSERT(iota_api_check_consistency(&api, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res) == RC_OK);
   TEST_ASSERT(res->state == false);
   TEST_ASSERT_EQUAL_STRING(res->info->data, API_TAILS_BUNDLE_INVALID);
 
@@ -166,12 +166,12 @@ void test_check_consistency_consistent_ledger(bool consistency) {
     }
   }
 
-  TEST_ASSERT(build_tangle(&api.consensus->tangle, txs, 4) == RC_OK);
+  TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
   for (size_t i = 0; i < 4; i++) {
     flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, hashes[i], HASH_LENGTH_TRYTE,
                            HASH_LENGTH_TRYTE);
     TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(
-                    &api.consensus->tangle, hash,
+                    &tangle, hash,
                     api.consensus->milestone_tracker
                             .latest_solid_subtangle_milestone_index -
                         5) == RC_OK);
@@ -179,10 +179,10 @@ void test_check_consistency_consistent_ledger(bool consistency) {
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_1_OF_4_HASH,
                          HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
   hash243_queue_push(&req->tails, hash);
-  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&api.consensus->tangle,
-                                                         hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, hash, true) ==
+              RC_OK);
 
-  TEST_ASSERT(iota_api_check_consistency(&api, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res) == RC_OK);
   if (consistency) {
     TEST_ASSERT(res->state == true);
     TEST_ASSERT_NULL(res->info->data);
@@ -214,24 +214,22 @@ int main(void) {
 
   TEST_ASSERT(iota_gossip_conf_init(&api.node->conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.consensus->conf) == RC_OK);
-  TEST_ASSERT(requester_init(&api.node->transaction_requester, api.node,
-                             &api.consensus->tangle) == RC_OK);
+  TEST_ASSERT(requester_init(&api.node->transaction_requester, api.node) ==
+              RC_OK);
   TEST_ASSERT(tips_cache_init(&api.node->tips,
                               api.node->conf.tips_cache_size) == RC_OK);
 
-  // Since iota_consensus_init already initialize tangle, no need to call setUp
-  copy_file(test_db_path, ciri_db_path);
+  setUp();
 
   // Avoid verifying snapshot signature
   api.consensus->conf.snapshot_signature_file[0] = '\0';
 
-  TEST_ASSERT(iota_consensus_init(api.consensus, &config,
+  TEST_ASSERT(iota_consensus_init(api.consensus, &tangle,
                                   &api.node->transaction_requester,
                                   &api.node->tips) == RC_OK);
 
   state_delta_destroy(&api.consensus->snapshot.state);
 
-  // Need to call it since RUN_TEST will call setUp/tearDown automatically
   tearDown();
 
   RUN_TEST(test_check_consistency_invalid_subtangle_status);

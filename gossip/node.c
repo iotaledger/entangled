@@ -52,8 +52,7 @@ static retcode_t node_transaction_requester_init(node_t* const node,
   retcode_t ret = RC_OK;
   iota_stor_pack_t pack;
 
-  if ((ret = requester_init(&node->transaction_requester, node, tangle)) !=
-      RC_OK) {
+  if ((ret = requester_init(&node->transaction_requester, node)) != RC_OK) {
     return ret;
   }
 
@@ -63,15 +62,14 @@ static retcode_t node_transaction_requester_init(node_t* const node,
   }
 
   if ((ret = iota_tangle_transaction_load_hashes_of_requests(
-           &node->core->consensus.tangle, &pack,
-           node->conf.requester_queue_size)) != RC_OK) {
+           tangle, &pack, node->conf.requester_queue_size)) != RC_OK) {
     log_error(NODE_LOGGER_ID,
               "Loading hashes of transactions to request failed\n");
     goto done;
   }
 
   for (size_t i = 0; i < pack.num_loaded; i++) {
-    if ((ret = request_transaction(&node->transaction_requester,
+    if ((ret = request_transaction(&node->transaction_requester, tangle,
                                    ((flex_trit_t*)(pack.models[i])), false)) !=
         RC_OK) {
       log_error(NODE_LOGGER_ID, "Requesting transaction failed\n");
@@ -87,7 +85,8 @@ done:
   return ret;
 }
 
-static retcode_t node_tips_cache_init(node_t* const node) {
+static retcode_t node_tips_cache_init(node_t* const node,
+                                      tangle_t* const tangle) {
   retcode_t ret = RC_OK;
   iota_stor_pack_t pack;
 
@@ -106,8 +105,7 @@ static retcode_t node_tips_cache_init(node_t* const node) {
   }
 
   if ((ret = iota_tangle_transaction_load_hashes_of_tips(
-           &node->core->consensus.tangle, &pack, node->conf.tips_cache_size)) !=
-      RC_OK) {
+           tangle, &pack, node->conf.tips_cache_size)) != RC_OK) {
     log_error(NODE_LOGGER_ID, "Loading hashes of tips failed\n");
     goto done;
   }
@@ -159,7 +157,7 @@ retcode_t node_init(node_t* const node, core_t* const core,
   }
 
   log_info(NODE_LOGGER_ID, "Initializing processor component\n");
-  if (processor_init(&node->processor, node, tangle,
+  if (processor_init(&node->processor, node,
                      &core->consensus.transaction_validator,
                      &core->consensus.transaction_solidifier,
                      &core->consensus.milestone_tracker) != RC_OK) {
@@ -175,14 +173,13 @@ retcode_t node_init(node_t* const node, core_t* const core,
   }
 
   log_info(NODE_LOGGER_ID, "Initializing responder component\n");
-  if (responder_init(&node->responder, node, tangle) != RC_OK) {
+  if (responder_init(&node->responder, node) != RC_OK) {
     log_critical(NODE_LOGGER_ID, "Initializing responder component failed\n");
     return RC_NODE_FAILED_RESPONDER_INIT;
   }
 
   log_info(NODE_LOGGER_ID, "Initializing tips requester component\n");
-  if ((ret = tips_requester_init(&node->tips_requester, node,
-                                 &core->consensus.tangle)) != RC_OK) {
+  if ((ret = tips_requester_init(&node->tips_requester, node)) != RC_OK) {
     log_critical(NODE_LOGGER_ID,
                  "Initializing  tips requester component failed\n");
     return ret;
@@ -196,7 +193,7 @@ retcode_t node_init(node_t* const node, core_t* const core,
   }
 
   log_info(NODE_LOGGER_ID, "Initializing tips cache\n");
-  if ((ret = node_tips_cache_init(node)) != RC_OK) {
+  if ((ret = node_tips_cache_init(node, tangle)) != RC_OK) {
     log_error(NODE_LOGGER_ID, "Initializing tips cache failed\n");
     return ret;
   }

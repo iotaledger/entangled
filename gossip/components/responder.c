@@ -6,6 +6,7 @@
  */
 
 #include "gossip/components/responder.h"
+#include "consensus/tangle/tangle.h"
 #include "gossip/neighbor.h"
 #include "gossip/node.h"
 #include "utils/handles/rand.h"
@@ -24,6 +25,7 @@
  * - if non-null hash: gets the corresponding transaction
  *
  * @param responder The responder
+ * @param tangle A tangle
  * @param neighbor The requesting neighbor
  * @param hash The request hash
  * @param pack A stor pack to be filled with a transaction
@@ -31,6 +33,7 @@
  * @return a status code
  */
 static retcode_t get_transaction_for_request(responder_t const *const responder,
+                                             tangle_t *const tangle,
                                              neighbor_t *const neighbor,
                                              flex_trit_t const *const hash,
                                              iota_stor_pack_t *const pack) {
@@ -51,9 +54,8 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
       if ((ret = tips_cache_random_tip(&responder->node->tips, tip)) != RC_OK) {
         return ret;
       }
-      if ((ret = iota_tangle_transaction_load(
-               responder->tangle, TRANSACTION_FIELD_HASH, tip, pack)) !=
-              RC_OK ||
+      if ((ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
+                                              tip, pack)) != RC_OK ||
           pack->num_loaded == 0) {
         return ret;
       }
@@ -64,8 +66,8 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
   else {
     log_debug(RESPONDER_LOGGER_ID,
               "Responding to regular transaction request\n");
-    if ((ret = iota_tangle_transaction_load(
-             responder->tangle, TRANSACTION_FIELD_HASH, hash, pack)) != RC_OK) {
+    if ((ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
+                                            hash, pack)) != RC_OK) {
       log_warning(RESPONDER_LOGGER_ID, "Loading transaction failed\n");
       return ret;
     }
@@ -80,6 +82,7 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
  * - requesting a missing transaction
  *
  * @param responder The responder
+ * @param tangle A tangle
  * @param neighbor The requesting neighbor
  * @param hash The request hash
  * @param pack A stor pack containing a transaction
@@ -87,6 +90,7 @@ static retcode_t get_transaction_for_request(responder_t const *const responder,
  * @return a status code
  */
 static retcode_t respond_to_request(responder_t const *const responder,
+                                    tangle_t *const tangle,
                                     neighbor_t *const neighbor,
                                     flex_trit_t const *const hash,
                                     iota_stor_pack_t *const pack) {
@@ -103,7 +107,7 @@ static retcode_t respond_to_request(responder_t const *const responder,
     flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
 
     transaction_serialize_on_flex_trits(transaction, transaction_flex_trits);
-    if ((ret = neighbor_send(responder->node, neighbor,
+    if ((ret = neighbor_send(responder->node, tangle, neighbor,
                              transaction_flex_trits)) != RC_OK) {
       log_warning(RESPONDER_LOGGER_ID, "Sending transaction failed\n");
       return ret;
@@ -114,7 +118,7 @@ static retcode_t respond_to_request(responder_t const *const responder,
     if (!flex_trits_are_null(hash, FLEX_TRIT_SIZE_243) &&
         rand_handle_probability() < responder->node->conf.p_propagate_request) {
       if ((ret = request_transaction(&responder->node->transaction_requester,
-                                     hash, false)) != RC_OK) {
+                                     tangle, hash, false)) != RC_OK) {
         log_warning(RESPONDER_LOGGER_ID, "Requesting transaction failed\n");
         return ret;
       }
@@ -134,8 +138,16 @@ static void *responder_routine(responder_t *const responder) {
   transaction_request_t *request_ptr = NULL;
   transaction_request_t request;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
+  connection_config_t db_conf = {.db_path = "ciri/db/ciri-mainnet.db"};
+  tangle_t tangle;
 
   if (responder == NULL) {
+    return NULL;
+  }
+
+  if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
+    log_critical(RESPONDER_LOGGER_ID,
+                 "Initializing tangle connection failed\n");
     return NULL;
   }
 
@@ -161,18 +173,22 @@ static void *responder_routine(responder_t *const responder) {
 
     log_debug(RESPONDER_LOGGER_ID, "Responding to request\n");
     hash_pack_reset(&pack);
-    if (get_transaction_for_request(responder, request.neighbor, request.hash,
-                                    &pack) != RC_OK) {
+    if (get_transaction_for_request(responder, &tangle, request.neighbor,
+                                    request.hash, &pack) != RC_OK) {
       log_warning(RESPONDER_LOGGER_ID,
                   "Getting transaction for request failed\n");
-    } else if (respond_to_request(responder, request.neighbor, request.hash,
-                                  &pack) != RC_OK) {
+    } else if (respond_to_request(responder, &tangle, request.neighbor,
+                                  request.hash, &pack) != RC_OK) {
       log_warning(RESPONDER_LOGGER_ID, "Replying to request failed\n");
     }
   }
 
   lock_handle_unlock(&lock_cond);
   lock_handle_destroy(&lock_cond);
+
+  if (iota_tangle_destroy(&tangle) != RC_OK) {
+    log_critical(RESPONDER_LOGGER_ID, "Destroying tangle connection failed\n");
+  }
 
   return NULL;
 }
@@ -181,9 +197,8 @@ static void *responder_routine(responder_t *const responder) {
  * Public functions
  */
 
-retcode_t responder_init(responder_t *const responder, node_t *const node,
-                         tangle_t *const tangle) {
-  if (responder == NULL || node == NULL || tangle == NULL) {
+retcode_t responder_init(responder_t *const responder, node_t *const node) {
+  if (responder == NULL || node == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -194,7 +209,6 @@ retcode_t responder_init(responder_t *const responder, node_t *const node,
   rw_lock_handle_init(&responder->lock);
   cond_handle_init(&responder->cond);
   responder->node = node;
-  responder->tangle = tangle;
 
   return RC_OK;
 }
@@ -248,7 +262,6 @@ retcode_t responder_destroy(responder_t *const responder) {
   rw_lock_handle_destroy(&responder->lock);
   cond_handle_destroy(&responder->cond);
   responder->node = NULL;
-  responder->tangle = NULL;
 
   logger_helper_destroy(RESPONDER_LOGGER_ID);
 

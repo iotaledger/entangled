@@ -33,7 +33,6 @@ typedef struct transaction_solidifier_s transaction_solidifier_t;
 typedef struct milestone_tracker_s {
   bool running;
   iota_consensus_conf_t* conf;
-  tangle_t* tangle;
   snapshot_t* latest_snapshot;
   uint64_t milestone_start_index;
   thread_handle_t milestone_validator;
@@ -55,7 +54,6 @@ typedef struct milestone_tracker_s {
  *
  * @param mt The milestone tracker
  * @param conf Consensus configuration
- * @param tangle A tangle
  * @param snapshot An initial snapshot
  * @param lv A ledger validator
  *
@@ -63,7 +61,6 @@ typedef struct milestone_tracker_s {
  */
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
                                       iota_consensus_conf_t* const conf,
-                                      tangle_t* const tangle,
                                       snapshot_t* const snapshot,
                                       ledger_validator_t* const lv,
                                       transaction_solidifier_t* ts);
@@ -72,10 +69,12 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
  * Starts a milestone tracker
  *
  * @param mt The milestone tracker
+ * @param tangle A tangle
  *
  * @return a status code
  */
-retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt);
+retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt,
+                                       tangle_t* const tangle);
 
 /**
  * Stops a milestone tracker

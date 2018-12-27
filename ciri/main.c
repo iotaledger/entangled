@@ -19,6 +19,8 @@ static core_t core_g;
 
 int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
+  tangle_t tangle;
+  connection_config_t db_conf = {.db_path = "ciri/db/ciri-mainnet.db"};
 
   rand_handle_seed(time(NULL));
 
@@ -60,14 +62,19 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
+  if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
+    log_critical(MAIN_LOGGER_ID, "Initializing tangle connection failed\n");
+    return EXIT_FAILURE;
+  }
+
   log_info(MAIN_LOGGER_ID, "Initializing cIRI core\n");
-  if (core_init(&core_g) != RC_OK) {
+  if (core_init(&core_g, &tangle) != RC_OK) {
     log_critical(MAIN_LOGGER_ID, "Initializing cIRI core failed\n");
     return EXIT_FAILURE;
   }
 
   log_info(MAIN_LOGGER_ID, "Starting cIRI core\n");
-  if (core_start(&core_g) != RC_OK) {
+  if (core_start(&core_g, &tangle) != RC_OK) {
     log_critical(MAIN_LOGGER_ID, "Starting cIRI core failed\n");
     return EXIT_FAILURE;
   }
@@ -81,8 +88,7 @@ int main(int argc, char* argv[]) {
 
   size_t count = 0;
   while (true) {
-    if (iota_tangle_transaction_count(&core_g.consensus.tangle, &count) !=
-        RC_OK) {
+    if (iota_tangle_transaction_count(&tangle, &count) != RC_OK) {
       ret = EXIT_FAILURE;
       break;
     }
@@ -111,6 +117,11 @@ int main(int argc, char* argv[]) {
   log_info(MAIN_LOGGER_ID, "Destroying storage\n");
   if (storage_destroy() != RC_OK) {
     log_critical(MAIN_LOGGER_ID, "Destroying storage failed\n");
+    ret = EXIT_FAILURE;
+  }
+
+  if (iota_tangle_destroy(&tangle) != RC_OK) {
+    log_critical(MAIN_LOGGER_ID, "Destroying tangle connection failed\n");
     ret = EXIT_FAILURE;
   }
 

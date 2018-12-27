@@ -18,15 +18,16 @@ static char *ciri_db_path = "ciri/api/tests/ciri.db";
 static connection_config_t config;
 static iota_api_t api;
 static node_t node;
+static tangle_t tangle;
 static iota_consensus_t consensus;
 
 void setUp(void) {
-  TEST_ASSERT(tangle_setup(&api.consensus->tangle, &config, test_db_path,
-                           ciri_db_path) == RC_OK);
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
 }
 
 void tearDown(void) {
-  TEST_ASSERT(tangle_cleanup(&api.consensus->tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
 void test_get_transactions_to_approve_invalid_depth(void) {
@@ -36,7 +37,7 @@ void test_get_transactions_to_approve_invalid_depth(void) {
       get_transactions_to_approve_res_new();
 
   get_transactions_to_approve_req_set_depth(req, 42);
-  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, req, res) ==
+  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res) ==
               RC_API_INVALID_DEPTH_INPUT);
 
   get_transactions_to_approve_req_free(&req);
@@ -61,7 +62,7 @@ void test_get_transactions_to_approve_invalid_subtangle_status(void) {
 
   get_transactions_to_approve_req_set_depth(req, 5);
 
-  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, req, res) ==
+  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res) ==
               RC_API_INVALID_SUBTANGLE_STATUS);
 
   consensus.milestone_tracker.latest_solid_subtangle_milestone_index =
@@ -84,22 +85,20 @@ int main(void) {
 
   TEST_ASSERT(iota_gossip_conf_init(&api.node->conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.consensus->conf) == RC_OK);
-  TEST_ASSERT(requester_init(&api.node->transaction_requester, api.node,
-                             &api.consensus->tangle) == RC_OK);
+  TEST_ASSERT(requester_init(&api.node->transaction_requester, api.node) ==
+              RC_OK);
   TEST_ASSERT(tips_cache_init(&api.node->tips,
                               api.node->conf.tips_cache_size) == RC_OK);
 
-  // Since iota_consensus_init already initialize tangle, no need to call setUp
-  copy_file(test_db_path, ciri_db_path);
+  setUp();
 
   // Avoid verifying snapshot signature
   api.consensus->conf.snapshot_signature_file[0] = '\0';
 
-  TEST_ASSERT(iota_consensus_init(api.consensus, &config,
+  TEST_ASSERT(iota_consensus_init(api.consensus, &tangle,
                                   &api.node->transaction_requester,
                                   &api.node->tips) == RC_OK);
 
-  // Need to call it since RUN_TEST will call setUp/tearDown automatically
   tearDown();
 
   RUN_TEST(test_get_transactions_to_approve_invalid_depth);

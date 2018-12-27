@@ -11,7 +11,7 @@
 #define CONSENSUS_LOGGER_ID "consensus"
 
 retcode_t iota_consensus_init(
-    iota_consensus_t *const consensus, connection_config_t const *const db_conf,
+    iota_consensus_t *const consensus, tangle_t *const tangle,
     transaction_requester_t *const transaction_requester,
     tips_cache_t *const tips) {
   retcode_t ret = RC_OK;
@@ -27,7 +27,7 @@ retcode_t iota_consensus_init(
   log_info(CONSENSUS_LOGGER_ID,
            "Initializing cumulative weight rating calculator\n");
   if ((ret = iota_consensus_cw_rating_init(
-           &consensus->cw_rating_calculator, &consensus->tangle,
+           &consensus->cw_rating_calculator,
            DEFAULT_TIP_SELECTION_CW_CALC_IMPL)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing cumulative weight rating calculator failed\n");
@@ -36,8 +36,8 @@ retcode_t iota_consensus_init(
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing entry point selector\n");
   if ((ret = iota_consensus_entry_point_selector_init(
-           &consensus->entry_point_selector, &consensus->milestone_tracker,
-           &consensus->tangle)) != RC_OK) {
+           &consensus->entry_point_selector, &consensus->milestone_tracker)) !=
+      RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing entry point selector failed\n");
     return ret;
@@ -45,7 +45,7 @@ retcode_t iota_consensus_init(
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing exit probability randomizer\n");
   if ((ret = iota_consensus_ep_randomizer_init(
-           &consensus->ep_randomizer, &consensus->conf, &consensus->tangle,
+           &consensus->ep_randomizer, &consensus->conf,
            DEFAULT_TIP_SELECTION_EP_RAND_IMPL)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing exit probability randomizer failed\n");
@@ -55,7 +55,7 @@ retcode_t iota_consensus_init(
   log_info(CONSENSUS_LOGGER_ID,
            "Initializing exit probability transaction validator\n");
   if ((ret = iota_consensus_exit_prob_transaction_validator_init(
-           &consensus->conf, &consensus->tangle, &consensus->milestone_tracker,
+           &consensus->conf, &consensus->milestone_tracker,
            &consensus->ledger_validator,
            &consensus->exit_prob_transaction_validator)) != RC_OK) {
     log_critical(
@@ -74,7 +74,7 @@ retcode_t iota_consensus_init(
   log_info(CONSENSUS_LOGGER_ID, "Initializing transaction solidifier\n");
   if ((ret = iota_consensus_transaction_solidifier_init(
            &consensus->transaction_solidifier, &consensus->conf,
-           &consensus->tangle, transaction_requester, tips)) != RC_OK) {
+           transaction_requester, tips)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing transaction solidifier failed\n");
     return ret;
@@ -82,17 +82,11 @@ retcode_t iota_consensus_init(
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing milestone tracker\n");
   if ((ret = iota_milestone_tracker_init(
-           &consensus->milestone_tracker, &consensus->conf, &consensus->tangle,
+           &consensus->milestone_tracker, &consensus->conf,
            &consensus->snapshot, &consensus->ledger_validator,
            &consensus->transaction_solidifier)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID,
                  "Initializing milestone tracker failed\n");
-    return ret;
-  }
-
-  log_info(CONSENSUS_LOGGER_ID, "Initializing tangle\n");
-  if ((ret = iota_tangle_init(&consensus->tangle, db_conf)) != RC_OK) {
-    log_critical(CONSENSUS_LOGGER_ID, "Initializing tangle failed\n");
     return ret;
   }
 
@@ -102,8 +96,8 @@ retcode_t iota_consensus_init(
            &consensus->cw_rating_calculator, &consensus->entry_point_selector,
            &consensus->ep_randomizer,
            &consensus->exit_prob_transaction_validator,
-           &consensus->ledger_validator, &consensus->milestone_tracker,
-           &consensus->tangle)) != RC_OK) {
+           &consensus->ledger_validator, &consensus->milestone_tracker)) !=
+      RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Initializing tip selector failed\n");
     return ret;
   }
@@ -118,7 +112,7 @@ retcode_t iota_consensus_init(
 
   log_info(CONSENSUS_LOGGER_ID, "Initializing ledger validator\n");
   if ((ret = iota_consensus_ledger_validator_init(
-           &consensus->ledger_validator, &consensus->conf, &consensus->tangle,
+           &consensus->ledger_validator, tangle, &consensus->conf,
            &consensus->milestone_tracker)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Initializing ledger validator failed\n");
     return ret;
@@ -127,12 +121,13 @@ retcode_t iota_consensus_init(
   return ret;
 }
 
-retcode_t iota_consensus_start(iota_consensus_t *const consensus) {
+retcode_t iota_consensus_start(iota_consensus_t *const consensus,
+                               tangle_t *const tangle) {
   retcode_t ret = RC_OK;
 
   log_info(CONSENSUS_LOGGER_ID, "Starting milestone tracker\n");
-  if ((ret = iota_milestone_tracker_start(&consensus->milestone_tracker)) !=
-      RC_OK) {
+  if ((ret = iota_milestone_tracker_start(&consensus->milestone_tracker,
+                                          tangle)) != RC_OK) {
     log_critical(CONSENSUS_LOGGER_ID, "Starting milestone tracker failed\n");
     return ret;
   }
@@ -226,11 +221,6 @@ retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
   log_info(CONSENSUS_LOGGER_ID, "Destroying snapshot\n");
   if ((ret = iota_snapshot_destroy(&consensus->snapshot)) != RC_OK) {
     log_error(CONSENSUS_LOGGER_ID, "Destroying snapshot failed\n");
-  }
-
-  log_info(CONSENSUS_LOGGER_ID, "Destroying tangle\n");
-  if ((ret = iota_tangle_destroy(&consensus->tangle)) != RC_OK) {
-    log_error(CONSENSUS_LOGGER_ID, "Destroying tangle failed\n");
   }
 
   log_info(CONSENSUS_LOGGER_ID, "Destroying tip selector\n");
