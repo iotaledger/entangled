@@ -61,6 +61,24 @@ static milestone_tracker_t mt;
 static ledger_validator_t lv;
 static transaction_solidifier_t ts;
 
+void test_sum_probabilities_1_ep_mapping(ep_randomizer_t *const ep_randomizer,
+                                         flex_trit_t const *const ep,
+                                         cw_calc_result const *const out);
+void test_1_bundle(ep_randomizer_implementation_t ep_impl,
+                   ep_randomizer_t *const ep_randomizer);
+void test_cw_topology_five_transactions_diamond_and_a_tail(
+    ep_randomizer_implementation_t ep_impl,
+    ep_randomizer_t *const ep_randomizer);
+void test_cw_topology_two_inequal_tips(ep_randomizer_implementation_t ep_impl,
+                                       ep_randomizer_t *const ep_randomizer);
+void test_2_chained_bundles(ep_randomizer_implementation_t ep_impl,
+                            ep_randomizer_t *const ep_randomizer);
+void test_cw_topology_four_transactions_diamond(
+    ep_randomizer_implementation_t ep_impl,
+    ep_randomizer_t *const ep_randomizer);
+void test_single_tx_tangle_base(ep_randomizer_implementation_t ep_impl,
+                                ep_randomizer_t *const ep_randomizer);
+
 void setUp() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
               RC_OK);
@@ -462,8 +480,8 @@ void test_cw_topology_five_transactions_diamond_and_a_tail(
 
   size_t num_txs = 5;
 
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
-                                            DFS_FROM_ENTRY_POINT) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, DFS_FROM_ENTRY_POINT) ==
+              RC_OK);
 
   bool exist;
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
@@ -520,9 +538,10 @@ void test_cw_topology_five_transactions_diamond_and_a_tail(
                                               &exist) == RC_OK);
     TEST_ASSERT(exist);
   }
-  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, &tangle,
-                                            DFS_FROM_ENTRY_POINT) == RC_OK);
-  TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, ep, &out) == RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_init(&calc, DFS_FROM_ENTRY_POINT) ==
+              RC_OK);
+  TEST_ASSERT(iota_consensus_cw_rating_calculate(&calc, &tangle, ep, &out) ==
+              RC_OK);
   TEST_ASSERT_EQUAL_INT(HASH_COUNT(out.tx_to_approvers), num_txs);
 
   size_t total_weight = 0;
@@ -534,14 +553,14 @@ void test_cw_topology_five_transactions_diamond_and_a_tail(
   TEST_ASSERT_EQUAL_INT(total_weight, 5 + 3 + 3 + 2 + 1);
 
   conf.alpha = 0.01;
-  TEST_ASSERT(iota_consensus_ep_randomizer_init(ep_randomizer, &conf, &tangle,
+  TEST_ASSERT(iota_consensus_ep_randomizer_init(ep_randomizer, &conf,
                                                 ep_impl) == RC_OK);
 
   flex_trit_t tip_trits[FLEX_TRIT_SIZE_243];
 
   /// Select the tip
   TEST_ASSERT(iota_consensus_exit_probability_randomize(
-                  ep_randomizer, &epv, &out, ep, tip_trits) == RC_OK);
+                  ep_randomizer, &tangle, &epv, &out, ep, tip_trits) == RC_OK);
 
   /// Check that tip was selected
   TEST_ASSERT_EQUAL_MEMORY(tip_trits, transaction_hash(&txs[num_txs - 1]),
@@ -926,14 +945,14 @@ void test_sum_probabilities_1_ep_mapping(ep_randomizer_t *const ep_randomizer,
   hash_to_double_map_t hash_to_exit_probs = NULL;
   hash_to_double_map_t hash_to_trans_probs = NULL;
 
-  iota_consensus_exit_prob_map_calculate_probs(
-      ep_randomizer, &epv, out, ep, &hash_to_exit_probs, &hash_to_trans_probs);
+  iota_consensus_exit_prob_map_calculate_probs(ep_randomizer, &tangle, &epv,
+                                               out, ep, &hash_to_exit_probs,
+                                               &hash_to_trans_probs);
   double sum_exit_probs =
       iota_consensus_exit_prob_map_sum_probs(&hash_to_exit_probs);
   double sum_trans_probs =
       iota_consensus_exit_prob_map_sum_probs(&hash_to_trans_probs);
 
-  hash_to_double_map_entry_t *exit_prob_entry = NULL;
   TEST_ASSERT_EQUAL_INT(sum_exit_probs, 1);
   TEST_ASSERT(sum_trans_probs >= 1);
   hash_to_double_map_free(&hash_to_exit_probs);

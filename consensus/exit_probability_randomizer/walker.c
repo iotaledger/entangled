@@ -26,12 +26,10 @@ static retcode_t select_approver(
     hash243_set_t const *const approvers, flex_trit_t *const approver) {
   hash243_set_entry_t *curr_approver = NULL;
   hash243_set_entry_t *tmp_approver = NULL;
-  hash_to_int64_t_map_entry_t const *curr_rating = NULL;
   size_t num_approvers = hash243_set_size(approvers);
   double transition_probs[num_approvers];
   double sum_transition_probs = 0;
   double target = 0;
-  double max_weight = 0;
   size_t idx = 0;
   retcode_t ret;
 
