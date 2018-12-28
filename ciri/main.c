@@ -20,7 +20,7 @@ static core_t core_g;
 int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
   tangle_t tangle;
-  connection_config_t db_conf = {.db_path = "ciri/db/ciri-mainnet.db"};
+  connection_config_t db_conf;
 
   rand_handle_seed(time(NULL));
 
@@ -62,6 +62,7 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
+  db_conf.db_path = core_g.conf.db_path;
   if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
     log_critical(MAIN_LOGGER_ID, "Initializing tangle connection failed\n");
     return EXIT_FAILURE;

@@ -67,6 +67,8 @@ typedef struct iota_consensus_conf_s {
   // Number of trailing ternary 0s that must appear at the end of a transaction
   // hash. Difficulty can be described as 3^mwm
   uint8_t mwm;
+  // Path of the DB file
+  char db_path[128];
 } iota_consensus_conf_t;
 
 /**

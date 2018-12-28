@@ -78,7 +78,10 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf,
   switch (key) {
     // cIRI configuration
     case 'd':  // --db-path
-      strcpy(ciri_conf->db_path, value);
+      strncpy(ciri_conf->db_path, value, sizeof(ciri_conf->db_path));
+      strncpy(consensus_conf->db_path, value, sizeof(consensus_conf->db_path));
+      strncpy(gossip_conf->db_path, value, sizeof(gossip_conf->db_path));
+      strncpy(api_conf->db_path, value, sizeof(api_conf->db_path));
       break;
     case 'h':  // --help
       iota_usage();
@@ -207,7 +210,11 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf,
   }
 
   ciri_conf->log_level = DEFAULT_LOG_LEVEL;
-  strcpy(ciri_conf->db_path, DEFAULT_DB_PATH);
+  strncpy(ciri_conf->db_path, DEFAULT_DB_PATH, sizeof(ciri_conf->db_path));
+  strncpy(consensus_conf->db_path, DEFAULT_DB_PATH,
+          sizeof(consensus_conf->db_path));
+  strncpy(gossip_conf->db_path, DEFAULT_DB_PATH, sizeof(gossip_conf->db_path));
+  strncpy(api_conf->db_path, DEFAULT_DB_PATH, sizeof(api_conf->db_path));
 
   if ((ret = iota_consensus_conf_init(consensus_conf)) != RC_OK) {
     return ret;

@@ -66,6 +66,8 @@ typedef struct iota_gossip_conf_s {
   size_t tips_cache_size;
   // Size of the requester queue
   size_t requester_queue_size;
+  // Path of the DB file
+  char db_path[128];
 } iota_gossip_conf_t;
 
 /**

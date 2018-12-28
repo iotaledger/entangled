@@ -250,7 +250,7 @@ done:
  * @param processor The processor state
  */
 static void *processor_routine(processor_t *const processor) {
-  connection_config_t db_conf = {.db_path = "ciri/db/ciri-mainnet.db"};
+  connection_config_t db_conf = {.db_path = processor->node->conf.db_path};
   tangle_t tangle;
   size_t j;
 

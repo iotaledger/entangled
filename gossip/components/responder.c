@@ -138,7 +138,7 @@ static void *responder_routine(responder_t *const responder) {
   transaction_request_t *request_ptr = NULL;
   transaction_request_t request;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  connection_config_t db_conf = {.db_path = "ciri/db/ciri-mainnet.db"};
+  connection_config_t db_conf = {.db_path = responder->node->conf.db_path};
   tangle_t tangle;
 
   if (responder == NULL) {

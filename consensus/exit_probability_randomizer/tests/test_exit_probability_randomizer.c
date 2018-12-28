@@ -255,8 +255,6 @@ void test_single_tx_tangle_base(ep_randomizer_implementation_t ep_impl,
   cw_calc_result out;
   bool exist = false;
 
-  fprintf(stderr, "TANGLE %p\n", tangle.conn.db);
-
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
   flex_trits_from_trytes(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
