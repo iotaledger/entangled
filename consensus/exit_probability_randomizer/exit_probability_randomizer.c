@@ -11,16 +11,14 @@
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 
-#define EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID \
-  "consensus_exit_probability_randomizer"
+#define EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID "exit_probability_randomizer"
 
 retcode_t iota_consensus_ep_randomizer_init(
     ep_randomizer_t *const ep_randomizer, iota_consensus_conf_t *const conf,
-    tangle_t *const tangle, ep_randomizer_implementation_t impl) {
+    ep_randomizer_implementation_t impl) {
   logger_helper_init(EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID, LOGGER_DEBUG, true);
   rand_handle_seed(time(NULL));
   ep_randomizer->conf = conf;
-  ep_randomizer->tangle = tangle;
   if (impl == EP_RANDOM_WALK) {
     iota_consensus_random_walker_init(ep_randomizer);
   } else if (impl == EP_RANDOMIZE_MAP_AND_SAMPLE) {
@@ -37,15 +35,14 @@ retcode_t iota_consensus_ep_randomizer_destroy(
     ep_randomizer->base.vtable.exit_probability_destroy(ep_randomizer);
   }
   logger_helper_destroy(EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID);
-  ep_randomizer->tangle = NULL;
   return RC_OK;
 }
 
 retcode_t iota_consensus_exit_probability_randomize(
-    ep_randomizer_t const *const ep_randomizer,
+    ep_randomizer_t const *const ep_randomizer, tangle_t *const tangle,
     exit_prob_transaction_validator_t *const epv,
     cw_calc_result *const cw_result, flex_trit_t const *const ep,
     flex_trit_t *tip) {
   return ep_randomizer->base.vtable.exit_probability_randomize(
-      ep_randomizer, epv, cw_result, ep, tip);
+      ep_randomizer, tangle, epv, cw_result, ep, tip);
 }

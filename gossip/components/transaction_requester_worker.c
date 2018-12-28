@@ -26,8 +26,17 @@ static void *transaction_requester_routine(
   flex_trit_t transaction[FLEX_TRIT_SIZE_8019];
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
+  connection_config_t db_conf = {.db_path =
+                                     transaction_requester->node->conf.db_path};
+  tangle_t tangle;
 
   if (transaction_requester == NULL) {
+    return NULL;
+  }
+
+  if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
+    log_critical(REQUESTER_LOGGER_ID,
+                 "Initializing tangle connection failed\n");
     return NULL;
   }
 
@@ -40,8 +49,8 @@ static void *transaction_requester_routine(
       memset(transaction, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
     } else {
       hash_pack_reset(&pack);
-      ret = iota_tangle_transaction_load(transaction_requester->tangle,
-                                         TRANSACTION_FIELD_HASH, hash, &pack);
+      ret = iota_tangle_transaction_load(&tangle, TRANSACTION_FIELD_HASH, hash,
+                                         &pack);
       if (ret == RC_OK && pack.num_loaded != 0) {
         transaction_serialize_on_flex_trits(txp, transaction);
       } else {
@@ -50,14 +59,18 @@ static void *transaction_requester_routine(
     }
     rw_lock_handle_rdlock(&transaction_requester->node->neighbors_lock);
     LL_FOREACH(transaction_requester->node->neighbors, iter) {
-      if (neighbor_send(transaction_requester->node, iter, transaction) !=
-          RC_OK) {
+      if (neighbor_send(transaction_requester->node, &tangle, iter,
+                        transaction) != RC_OK) {
         log_warning(REQUESTER_LOGGER_ID, "Sending request failed\n");
       }
     }
     rw_lock_handle_unlock(&transaction_requester->node->neighbors_lock);
   sleep:
     sleep_ms(REQUESTER_INTERVAL);
+  }
+
+  if (iota_tangle_destroy(&tangle) != RC_OK) {
+    log_critical(REQUESTER_LOGGER_ID, "Destroying tangle connection failed\n");
   }
 
   return NULL;

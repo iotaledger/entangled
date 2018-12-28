@@ -25,7 +25,6 @@ typedef struct transaction_requester_s {
   hash243_set_t milestones;
   hash243_set_t transactions;
   node_t *node;
-  tangle_t *tangle;
   rw_lock_handle_t lock;
 } transaction_requester_t;
 
@@ -38,12 +37,11 @@ extern "C" {
  *
  * @param transaction_requester The transaction requester
  * @param node A node
- * @param tangle A tangle
  *
  * @return a status code
  */
 retcode_t requester_init(transaction_requester_t *const transaction_requester,
-                         node_t *const node, tangle_t *const tangle);
+                         node_t *const node);
 
 /**
  * Destroys a transaction requester
@@ -102,6 +100,7 @@ retcode_t requester_clear_request(
  * Adds a transaction to be requested by a transaction requester
  *
  * @param transaction_requester The transaction requester
+ * @param tangle A tangle
  * @param hash The transaction to request
  * @param is_milestone Whether the hash is a milestone or not
  *
@@ -109,12 +108,14 @@ retcode_t requester_clear_request(
  */
 retcode_t request_transaction(
     transaction_requester_t *const transaction_requester,
-    flex_trit_t const *const hash, bool const is_milestone);
+    tangle_t *const tangle, flex_trit_t const *const hash,
+    bool const is_milestone);
 
 /**
  * Gets a transaction to request from a transaction requester
  *
  * @param transaction_requester The transaction requester
+ * @param tangle A tangle
  * @param hash The transaction to be requested
  * @param milestone Whether to request a milestone or not
  *
@@ -122,7 +123,7 @@ retcode_t request_transaction(
  */
 retcode_t get_transaction_to_request(
     transaction_requester_t *const transaction_requester,
-    flex_trit_t *const hash, bool const milestone);
+    tangle_t *const tangle, flex_trit_t *const hash, bool const milestone);
 
 /**
  * Tells whether the requester queue is empty or not

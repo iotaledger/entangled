@@ -61,17 +61,17 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   strcpy(consensus_conf.snapshot_conf_file, snapshot_conf_path);
   strcpy(consensus_conf.snapshot_signature_file, "");
   TEST_ASSERT(iota_snapshot_init(&snapshot, &consensus_conf) == RC_OK);
-  iota_consensus_transaction_solidifier_init(&ts, &consensus_conf, &tangle,
-                                             NULL, NULL);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &consensus_conf, &tangle,
-                                          &snapshot, &lv, &ts) == RC_OK);
-  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &consensus_conf,
-                                                   &tangle, &mt) == RC_OK);
+  TEST_ASSERT(iota_consensus_transaction_solidifier_init(&ts, &consensus_conf,
+                                                         NULL, NULL) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &consensus_conf, &snapshot, &lv,
+                                          &ts) == RC_OK);
+  TEST_ASSERT(iota_consensus_ledger_validator_init(
+                  &lv, &tangle, &consensus_conf, &mt) == RC_OK);
   // We want to avoid unnecessary validation
   mt.latest_snapshot->index = 99999999999;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(
-                  &consensus_conf, &tangle, &mt, &lv, epv) == RC_OK);
+                  &consensus_conf, &mt, &lv, epv) == RC_OK);
 }
 
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
@@ -93,7 +93,8 @@ void test_transaction_does_not_exist() {
   iota_transaction_t *test_tx = transaction_deserialize(tx_test_trits, true);
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, transaction_hash(test_tx), &is_valid) == RC_OK);
+                  &epv, &tangle, transaction_hash(test_tx), &is_valid) ==
+              RC_OK);
   TEST_ASSERT(!is_valid);
 
   destroy_epv(&epv);
@@ -125,7 +126,7 @@ void test_transaction_not_a_tail() {
 
   bool is_valid = false;
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, transaction_hash(tx3), &is_valid) == RC_OK);
+                  &epv, &tangle, transaction_hash(tx3), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
   transaction_free(tx3);
   destroy_epv(&epv);
@@ -155,7 +156,7 @@ void test_transaction_invalid_delta() {
 
   bool is_valid = false;
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, transaction_hash(tx1), &is_valid) == RC_OK);
+                  &epv, &tangle, transaction_hash(tx1), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
   transaction_free(tx1);
@@ -188,7 +189,7 @@ void test_transaction_below_max_depth() {
 
   bool is_valid = false;
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, transaction_hash(txs[0]), &is_valid) == RC_OK);
+                  &epv, &tangle, transaction_hash(txs[0]), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
   transactions_free(txs, 2);
@@ -222,7 +223,7 @@ void test_transaction_exceed_max_transactions() {
 
   bool is_valid = false;
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, transaction_hash(txs[0]), &is_valid) == RC_OK);
+                  &epv, &tangle, transaction_hash(txs[0]), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
   transactions_free(txs, 2);
@@ -257,7 +258,7 @@ void test_transaction_valid() {
   epv.mt->latest_solid_subtangle_milestone_index = max_depth;
   bool is_valid;
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, transaction_hash(txs[0]), &is_valid) == RC_OK);
+                  &epv, &tangle, transaction_hash(txs[0]), &is_valid) == RC_OK);
   TEST_ASSERT(is_valid);
   epv.mt->latest_solid_subtangle_milestone_index = 0;
   transactions_free(txs, 2);

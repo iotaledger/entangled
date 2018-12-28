@@ -9,106 +9,16 @@
 #include "utarray.h"
 #include "utils/logger_helper.h"
 
-#define WALKER_VALIDATOR_LOGGER_ID "consensus_walker_validator"
+#define WALKER_VALIDATOR_LOGGER_ID "walker_validator"
 
-retcode_t iota_consensus_exit_prob_transaction_validator_init(
-    iota_consensus_conf_t *const conf, tangle_t *const tangle,
-    milestone_tracker_t *const mt, ledger_validator_t *const lv,
-    exit_prob_transaction_validator_t *epv) {
-  logger_helper_init(WALKER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
-  epv->conf = conf;
-  epv->tangle = tangle;
-  epv->mt = mt;
-  epv->lv = lv;
-  epv->delta = NULL;
-  epv->analyzed_hashes = NULL;
-  epv->max_depth_ok_memoization = NULL;
-  return RC_OK;
-}
+/*
+ * Private functions
+ */
 
-retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
-    exit_prob_transaction_validator_t *epv) {
-  logger_helper_destroy(WALKER_VALIDATOR_LOGGER_ID);
-
-  hash243_set_free(&epv->max_depth_ok_memoization);
-  hash243_set_free(&epv->analyzed_hashes);
-  state_delta_destroy(&epv->delta);
-  epv->delta = NULL;
-  epv->tangle = NULL;
-  epv->mt = NULL;
-  epv->lv = NULL;
-
-  return RC_OK;
-}
-
-retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
-    exit_prob_transaction_validator_t *const epv,
-    flex_trit_t const *const tail_hash, bool *const is_valid) {
-  retcode_t ret = RC_OK;
-  DECLARE_PACK_SINGLE_TX(tx, tx_models, tx_pack);
-
-  if ((ret = iota_tangle_transaction_load_partial(
-           epv->tangle, tail_hash, &tx_pack,
-           PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA)) != RC_OK) {
-    *is_valid = false;
-    return ret;
-  }
-
-  if (tx_pack.num_loaded == 0) {
-    *is_valid = false;
-    log_error(WALKER_VALIDATOR_LOGGER_ID,
-              "Validation failed, transaction is missing in db\n");
-    return RC_OK;
-  }
-
-  if (transaction_current_index(&tx) != 0) {
-    log_error(WALKER_VALIDATOR_LOGGER_ID,
-              "Validation failed, transaction is not a tail\n");
-    *is_valid = false;
-    return RC_OK;
-  }
-
-  if ((ret = iota_consensus_ledger_validator_update_delta(
-           epv->lv, &epv->analyzed_hashes, &epv->delta, tail_hash, is_valid)) !=
-      RC_OK) {
-    *is_valid = false;
-    return ret;
-  }
-
-  if (!*is_valid) {
-    log_error(WALKER_VALIDATOR_LOGGER_ID,
-              "Validation failed, tail is inconsistent\n");
-    return RC_OK;
-  }
-
-  bool below_max_depth = false;
-
-  uint32_t lowest_allowed_depth =
-      epv->mt->latest_solid_subtangle_milestone_index < epv->conf->max_depth
-          ? epv->mt->latest_solid_subtangle_milestone_index
-          : epv->mt->latest_solid_subtangle_milestone_index -
-                epv->conf->max_depth;
-
-  if ((ret = iota_consensus_exit_prob_transaction_validator_below_max_depth(
-           epv, tail_hash, lowest_allowed_depth, &below_max_depth)) != RC_OK) {
-    return ret;
-  }
-
-  if (below_max_depth) {
-    *is_valid = false;
-    log_error(WALKER_VALIDATOR_LOGGER_ID,
-              "Validation failed, tail is below max depth\n");
-    return RC_OK;
-  }
-
-  *is_valid = true;
-
-  return ret;
-}
-
-retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
-    exit_prob_transaction_validator_t *epv, flex_trit_t const *const tail_hash,
-    uint32_t lowest_allowed_depth, bool *below_max_depth) {
+static retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
+    exit_prob_transaction_validator_t *epv, tangle_t *const tangle,
+    flex_trit_t const *const tail_hash, uint32_t lowest_allowed_depth,
+    bool *below_max_depth) {
   retcode_t res = RC_OK;
 
   bool is_genesis_hash;
@@ -147,7 +57,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
     if (!is_genesis_hash) {
       hash_pack_reset(&pack);
       if ((res = iota_tangle_transaction_load_partial(
-               epv->tangle, curr_hash_trits, &pack,
+               tangle, curr_hash_trits, &pack,
                PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA)) != RC_OK) {
         return res;
       }
@@ -183,4 +93,101 @@ retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
   }
 
   return res;
+}
+
+/*
+ * Public functions
+ */
+
+retcode_t iota_consensus_exit_prob_transaction_validator_init(
+    iota_consensus_conf_t *const conf, milestone_tracker_t *const mt,
+    ledger_validator_t *const lv, exit_prob_transaction_validator_t *epv) {
+  logger_helper_init(WALKER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
+  epv->conf = conf;
+  epv->mt = mt;
+  epv->lv = lv;
+  epv->delta = NULL;
+  epv->analyzed_hashes = NULL;
+  epv->max_depth_ok_memoization = NULL;
+  return RC_OK;
+}
+
+retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
+    exit_prob_transaction_validator_t *epv) {
+  logger_helper_destroy(WALKER_VALIDATOR_LOGGER_ID);
+
+  hash243_set_free(&epv->max_depth_ok_memoization);
+  hash243_set_free(&epv->analyzed_hashes);
+  state_delta_destroy(&epv->delta);
+  epv->delta = NULL;
+  epv->mt = NULL;
+  epv->lv = NULL;
+
+  return RC_OK;
+}
+
+retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
+    exit_prob_transaction_validator_t *const epv, tangle_t *const tangle,
+    flex_trit_t const *const tail_hash, bool *const is_valid) {
+  retcode_t ret = RC_OK;
+  DECLARE_PACK_SINGLE_TX(tx, tx_models, tx_pack);
+
+  if ((ret = iota_tangle_transaction_load_partial(
+           tangle, tail_hash, &tx_pack,
+           PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA)) != RC_OK) {
+    *is_valid = false;
+    return ret;
+  }
+
+  if (tx_pack.num_loaded == 0) {
+    *is_valid = false;
+    log_error(WALKER_VALIDATOR_LOGGER_ID,
+              "Validation failed, transaction is missing in db\n");
+    return RC_OK;
+  }
+
+  if (transaction_current_index(&tx) != 0) {
+    log_error(WALKER_VALIDATOR_LOGGER_ID,
+              "Validation failed, transaction is not a tail\n");
+    *is_valid = false;
+    return RC_OK;
+  }
+
+  if ((ret = iota_consensus_ledger_validator_update_delta(
+           epv->lv, tangle, &epv->analyzed_hashes, &epv->delta, tail_hash,
+           is_valid)) != RC_OK) {
+    *is_valid = false;
+    return ret;
+  }
+
+  if (!*is_valid) {
+    log_error(WALKER_VALIDATOR_LOGGER_ID,
+              "Validation failed, tail is inconsistent\n");
+    return RC_OK;
+  }
+
+  bool below_max_depth = false;
+
+  uint32_t lowest_allowed_depth =
+      epv->mt->latest_solid_subtangle_milestone_index < epv->conf->max_depth
+          ? epv->mt->latest_solid_subtangle_milestone_index
+          : epv->mt->latest_solid_subtangle_milestone_index -
+                epv->conf->max_depth;
+
+  if ((ret = iota_consensus_exit_prob_transaction_validator_below_max_depth(
+           epv, tangle, tail_hash, lowest_allowed_depth, &below_max_depth)) !=
+      RC_OK) {
+    return ret;
+  }
+
+  if (below_max_depth) {
+    *is_valid = false;
+    log_error(WALKER_VALIDATOR_LOGGER_ID,
+              "Validation failed, tail is below max depth\n");
+    return RC_OK;
+  }
+
+  *is_valid = true;
+
+  return ret;
 }

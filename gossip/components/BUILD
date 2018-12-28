@@ -129,6 +129,7 @@ cc_library(
     hdrs = ["responder.h"],
     deps = [
         ":responder_shared",
+        "//consensus/tangle",
         "//gossip:neighbor_shared",
         "//gossip:node_shared",
         "//utils/handles:rand",
@@ -150,6 +151,7 @@ cc_library(
     deps = [
         ":tips_requester_shared",
         "//common/model:milestone",
+        "//consensus/tangle",
         "//gossip:iota_packet",
         "//gossip:node_shared",
         "//utils:logger_helper",

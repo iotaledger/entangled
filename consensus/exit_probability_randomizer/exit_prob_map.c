@@ -32,7 +32,7 @@ static void iota_consensus_exit_prob_map_add_exit_probs(
 }
 
 static retcode_t iota_consensus_exit_prob_remove_invalid_tip_candidates(
-    cw_calc_result *const cw_result,
+    tangle_t *const tangle, cw_calc_result *const cw_result,
     exit_prob_transaction_validator_t *const ep_validator) {
   retcode_t ret = RC_OK;
   hash243_set_entry_t *tip_entry = NULL;
@@ -43,7 +43,8 @@ static retcode_t iota_consensus_exit_prob_remove_invalid_tip_candidates(
   HASH_ITER(hh, tips, tip_entry, tip_tmp_entry) {
     bool has_valid_tail = true;
     if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(
-             ep_validator, tip_entry->hash, &has_valid_tail)) != RC_OK) {
+             ep_validator, tangle, tip_entry->hash, &has_valid_tail)) !=
+        RC_OK) {
       log_error(EXIT_PROB_MAP_LOGGER_ID,
                 "Tail transaction validation failed: %" PRIu64 "\n", ret);
       goto done;
@@ -75,7 +76,7 @@ void iota_consensus_exit_prob_map_init(ep_randomizer_t *const randomizer) {
 }
 
 retcode_t iota_consensus_exit_prob_map_randomize(
-    ep_randomizer_t const *const randomizer,
+    ep_randomizer_t const *const randomizer, tangle_t *const tangle,
     exit_prob_transaction_validator_t *const ep_validator,
     cw_calc_result *const cw_result, flex_trit_t const *const ep,
     flex_trit_t *tip) {
@@ -85,7 +86,7 @@ retcode_t iota_consensus_exit_prob_map_randomize(
 
   if (prob_randomizer->exit_probs == NULL) {
     if ((ret = iota_consensus_exit_prob_map_calculate_probs(
-             randomizer, ep_validator, cw_result, ep,
+             randomizer, tangle, ep_validator, cw_result, ep,
              &prob_randomizer->exit_probs,
              &prob_randomizer->transition_probs)) != RC_OK) {
       return ret;
@@ -115,6 +116,7 @@ retcode_t iota_consensus_exit_prob_map_randomize(
 
 retcode_t iota_consensus_exit_prob_map_calculate_probs(
     ep_randomizer_t const *const exit_probability_randomizer,
+    tangle_t *const tangle,
     exit_prob_transaction_validator_t *const ep_validator,
     cw_calc_result *const cw_result, flex_trit_t const *const ep,
     hash_to_double_map_t *const hash_to_exit_probs,
@@ -131,7 +133,7 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(
   flex_trit_t *curr_tx;
 
   if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(
-           ep_validator, ep, &ep_is_valid)) != RC_OK) {
+           ep_validator, tangle, ep, &ep_is_valid)) != RC_OK) {
     log_error(EXIT_PROB_MAP_LOGGER_ID,
               "Entry point validation failed: %" PRIu64 "\n", ret);
     return ret;
@@ -141,7 +143,7 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(
   }
 
   if ((ret = iota_consensus_exit_prob_remove_invalid_tip_candidates(
-           cw_result, ep_validator)) != RC_OK) {
+           tangle, cw_result, ep_validator)) != RC_OK) {
     return ret;
   }
 
@@ -214,12 +216,12 @@ double iota_consensus_exit_prob_map_sum_probs(
   return sum;
 }
 
-void iota_consensus_exit_prob_map_destroy(
+retcode_t iota_consensus_exit_prob_map_destroy(
     ep_randomizer_t *const exit_probability_randomizer) {
-  iota_consensus_exit_prob_map_reset(exit_probability_randomizer);
+  return iota_consensus_exit_prob_map_reset(exit_probability_randomizer);
 }
 
-void iota_consensus_exit_prob_map_reset(
+retcode_t iota_consensus_exit_prob_map_reset(
     ep_randomizer_t *const exit_probability_randomizer) {
   ep_prob_map_randomizer_t *prob_randomizer =
       (ep_prob_map_randomizer_t *const)exit_probability_randomizer;
@@ -227,4 +229,5 @@ void iota_consensus_exit_prob_map_reset(
     hash_to_double_map_free(&prob_randomizer->exit_probs);
     hash_to_double_map_free(&prob_randomizer->transition_probs);
   }
+  return RC_OK;
 }

@@ -23,7 +23,6 @@ extern "C" {
 
 typedef struct entry_point_selector_s {
   milestone_tracker_t *mt;
-  tangle_t *tangle;
 } entry_point_selector_t;
 
 /**
@@ -31,13 +30,11 @@ typedef struct entry_point_selector_s {
  *
  * @param eps The entry point selector
  * @param mt A milestone tracker
- * @param tangle A tangle
  *
  * @return a status code
  */
 retcode_t iota_consensus_entry_point_selector_init(
-    entry_point_selector_t *const eps, milestone_tracker_t *const mt,
-    tangle_t *const tangle);
+    entry_point_selector_t *const eps, milestone_tracker_t *const mt);
 
 /**
  * Gets an entry point for the random walk.
@@ -45,14 +42,15 @@ retcode_t iota_consensus_entry_point_selector_init(
  * milestone.
  *
  * @param eps The entry point selector
+ * @param tangle A tangle
  * @param depth The depth
  * @param ep The entry point
  *
  * @return a status code
  */
 retcode_t iota_consensus_entry_point_selector_get_entry_point(
-    entry_point_selector_t *const eps, size_t const depth,
-    flex_trit_t *const ep);
+    entry_point_selector_t *const eps, tangle_t *const tangle,
+    size_t const depth, flex_trit_t *const ep);
 
 /**
  * Destroys an entry point selector

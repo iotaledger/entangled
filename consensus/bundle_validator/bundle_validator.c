@@ -12,7 +12,7 @@
 #include "consensus/conf.h"
 #include "utils/logger_helper.h"
 
-#define BUNDLE_VALIDATOR_LOGGER_ID "consensus_bundle_validator"
+#define BUNDLE_VALIDATOR_LOGGER_ID "bundle_validator"
 
 /*
  * Private functions

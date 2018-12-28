@@ -84,7 +84,8 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor,
   return RC_OK;
 }
 
-retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
+retcode_t neighbor_send(node_t *const node, tangle_t *const tangle,
+                        neighbor_t *const neighbor,
                         flex_trit_t const *const transaction) {
   retcode_t ret = RC_OK;
   iota_packet_t packet;
@@ -100,8 +101,8 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
 
   bool is_milestone = rand_handle_probability() < node->conf.p_select_milestone;
 
-  if ((ret = get_transaction_to_request(&node->transaction_requester, request,
-                                        is_milestone)) != RC_OK) {
+  if ((ret = get_transaction_to_request(&node->transaction_requester, tangle,
+                                        request, is_milestone)) != RC_OK) {
     return ret;
   }
 

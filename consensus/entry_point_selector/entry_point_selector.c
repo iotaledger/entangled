@@ -14,27 +14,24 @@
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
 
-#define ENTRY_POINT_SELECTOR_LOGGER_ID "consensus_entry_point_selector"
+#define ENTRY_POINT_SELECTOR_LOGGER_ID "entry_point_selector"
 
 retcode_t iota_consensus_entry_point_selector_init(
-    entry_point_selector_t *const eps, milestone_tracker_t *const mt,
-    tangle_t *const tangle) {
+    entry_point_selector_t *const eps, milestone_tracker_t *const mt) {
   logger_helper_init(ENTRY_POINT_SELECTOR_LOGGER_ID, LOGGER_DEBUG, true);
   eps->mt = mt;
-  eps->tangle = tangle;
   return RC_OK;
 }
 
 retcode_t iota_consensus_entry_point_selector_get_entry_point(
-    entry_point_selector_t *const eps, size_t const depth,
-    flex_trit_t *const ep) {
+    entry_point_selector_t *const eps, tangle_t *const tangle,
+    size_t const depth, flex_trit_t *const ep) {
   retcode_t ret = RC_OK;
   uint64_t milestone_index = MAX(
       (int64_t)eps->mt->latest_solid_subtangle_milestone_index - depth - 1, 0);
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
-  if ((ret = iota_tangle_milestone_load_next(eps->tangle, milestone_index,
-                                             &pack))) {
+  if ((ret = iota_tangle_milestone_load_next(tangle, milestone_index, &pack))) {
     log_error(ENTRY_POINT_SELECTOR_LOGGER_ID,
               "Finding closest next milestone failed with error %" PRIu64 "\n",
               ret);
@@ -54,6 +51,5 @@ retcode_t iota_consensus_entry_point_selector_destroy(
     entry_point_selector_t *const eps) {
   logger_helper_destroy(ENTRY_POINT_SELECTOR_LOGGER_ID);
   eps->mt = NULL;
-  eps->tangle = NULL;
   return RC_OK;
 }

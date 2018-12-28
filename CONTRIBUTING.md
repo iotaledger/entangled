@@ -29,3 +29,18 @@ extern "C" {
 ```
 
 It will avoid having function symbols mangled leading to linkage errors when used in a C++ project. You can find more information about this [here](https://stackoverflow.com/questions/3789340/combining-c-and-c-how-does-ifdef-cplusplus-work).
+
+### 3. Parameters ordering
+
+- Always put the main component as first parameter.
+- If any, always put tangle as second parameter.
+
+```c
+retcode_t iota_api_store_transactions(
+    iota_api_t const *const api, tangle_t *const tangle,
+    store_transactions_req_t const *const req);
+
+retcode_t iota_consensus_ledger_validator_update_snapshot(
+    ledger_validator_t const *const lv, tangle_t *const tangle,
+    iota_milestone_t *const milestone, bool *const has_snapshot);
+```

@@ -210,6 +210,7 @@ done:
 }
 
 retcode_t iota_api_find_transactions(iota_api_t const *const api,
+                                     tangle_t *const tangle,
                                      find_transactions_req_t const *const req,
                                      find_transactions_res_t *const res) {
   retcode_t ret = RC_OK;
@@ -229,9 +230,9 @@ retcode_t iota_api_find_transactions(iota_api_t const *const api,
   // TODO Refactor stor_pack #618
   hash_pack_init(&pack, 1024);
 
-  if ((ret = iota_tangle_transaction_find(&api->consensus->tangle, req->bundles,
-                                          req->addresses, req->tags,
-                                          req->approvees, &pack)) != RC_OK) {
+  if ((ret = iota_tangle_transaction_find(tangle, req->bundles, req->addresses,
+                                          req->tags, req->approvees, &pack)) !=
+      RC_OK) {
     goto done;
   }
 
@@ -252,6 +253,7 @@ done:
 }
 
 retcode_t iota_api_get_trytes(iota_api_t const *const api,
+                              tangle_t *const tangle,
                               get_trytes_req_t const *const req,
                               get_trytes_res_t *const res) {
   retcode_t ret = RC_OK;
@@ -270,9 +272,8 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api,
   CDL_FOREACH(req->hashes, iter) {
     hash_pack_reset(&pack);
     // NOTE Concurrency needs to be taken care of
-    if ((ret = iota_tangle_transaction_load(&api->consensus->tangle,
-                                            TRANSACTION_FIELD_HASH, iter->hash,
-                                            &pack)) != RC_OK) {
+    if ((ret = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH,
+                                            iter->hash, &pack)) != RC_OK) {
       return ret;
     }
 
@@ -309,7 +310,7 @@ retcode_t iota_api_get_balances(iota_api_t const *const api,
 }
 
 retcode_t iota_api_get_transactions_to_approve(
-    iota_api_t const *const api,
+    iota_api_t const *const api, tangle_t *const tangle,
     get_transactions_to_approve_req_t const *const req,
     get_transactions_to_approve_res_t *const res) {
   retcode_t ret = RC_OK;
@@ -328,8 +329,8 @@ retcode_t iota_api_get_transactions_to_approve(
   }
 
   if ((ret = iota_consensus_tip_selector_get_transactions_to_approve(
-           &api->consensus->tip_selector, req->depth, req->reference, &tips)) !=
-      RC_OK) {
+           &api->consensus->tip_selector, tangle, req->depth, req->reference,
+           &tips)) != RC_OK) {
     return ret;
   }
 
@@ -383,7 +384,8 @@ retcode_t iota_api_broadcast_transactions(
 }
 
 retcode_t iota_api_store_transactions(
-    iota_api_t const *const api, store_transactions_req_t const *const req) {
+    iota_api_t const *const api, tangle_t *const tangle,
+    store_transactions_req_t const *const req) {
   retcode_t ret = RC_OK;
   flex_trit_t *elt = NULL;
   iota_transaction_t tx;
@@ -397,19 +399,19 @@ retcode_t iota_api_store_transactions(
     transaction_deserialize_from_trits(&tx, elt, true);
     if (iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
-      if ((ret = iota_tangle_transaction_exist(
-               &api->consensus->tangle, TRANSACTION_FIELD_HASH,
-               transaction_hash(&tx), &exists)) != RC_OK) {
+      if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH,
+                                               transaction_hash(&tx),
+                                               &exists)) != RC_OK) {
         return ret;
       }
       if (!exists) {
         // NOTE Concurrency needs to be taken care of
-        if ((ret = iota_tangle_transaction_store(&api->consensus->tangle,
-                                                 &tx)) != RC_OK) {
+        if ((ret = iota_tangle_transaction_store(tangle, &tx)) != RC_OK) {
           return ret;
         }
         if ((ret = iota_consensus_transaction_solidifier_update_status(
-                 &api->consensus->transaction_solidifier, &tx)) != RC_OK) {
+                 &api->consensus->transaction_solidifier, tangle, &tx)) !=
+            RC_OK) {
           log_warning(API_LOGGER_ID, "Updating transaction status failed\n");
           return ret;
         }
@@ -432,6 +434,7 @@ retcode_t iota_api_were_addresses_spent_from(
 }
 
 retcode_t iota_api_check_consistency(iota_api_t const *const api,
+                                     tangle_t *const tangle,
                                      check_consistency_req_t const *const req,
                                      check_consistency_res_t *const res) {
   retcode_t ret = RC_OK;
@@ -455,8 +458,8 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api,
     bundle_transactions_new(&bundle);
     hash_pack_reset(&pack);
     if ((ret = iota_tangle_transaction_load_partial(
-             &api->consensus->tangle, iter->hash, &pack,
-             PARTIAL_TX_MODEL_ESSENCE_METADATA)) != RC_OK) {
+             tangle, iter->hash, &pack, PARTIAL_TX_MODEL_ESSENCE_METADATA)) !=
+        RC_OK) {
     } else if (pack.num_loaded == 0) {
       ret = RC_API_TAIL_MISSING;
     } else if (tx.essence.current_index != 0) {
@@ -464,8 +467,7 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api,
     } else if (!tx.metadata.solid) {
       char_buffer_set(res->info, API_TAILS_NOT_SOLID);
     } else if ((ret = iota_consensus_bundle_validator_validate(
-                    &api->consensus->tangle, iter->hash, bundle,
-                    &bundle_status)) != RC_OK) {
+                    tangle, iter->hash, bundle, &bundle_status)) != RC_OK) {
     } else if (bundle_status != BUNDLE_VALID ||
                bundle_transactions_size(bundle) == 0) {
       char_buffer_set(res->info, API_TAILS_BUNDLE_INVALID);
@@ -480,12 +482,11 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api,
       &api->consensus->milestone_tracker.latest_snapshot->rw_lock);
 
   if ((ret = iota_consensus_exit_prob_transaction_validator_init(
-           &api->consensus->conf, &api->consensus->tangle,
-           &api->consensus->milestone_tracker,
+           &api->consensus->conf, &api->consensus->milestone_tracker,
            &api->consensus->ledger_validator, &walker_validator)) == RC_OK) {
     CDL_FOREACH(req->tails, iter) {
       if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(
-               &walker_validator, iter->hash, &res->state)) != RC_OK) {
+               &walker_validator, tangle, iter->hash, &res->state)) != RC_OK) {
         break;
       } else if (!res->state) {
         char_buffer_set(res->info, API_TAILS_NOT_CONSISTENT);

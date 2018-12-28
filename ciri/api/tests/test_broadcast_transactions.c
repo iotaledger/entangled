@@ -19,15 +19,16 @@ static char *ciri_db_path = "ciri/api/tests/ciri.db";
 static connection_config_t config;
 static iota_api_t api;
 static node_t node;
+static tangle_t tangle;
 static iota_consensus_t consensus;
 
 void setUp(void) {
-  TEST_ASSERT(tangle_setup(&api.consensus->tangle, &config, test_db_path,
-                           ciri_db_path) == RC_OK);
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
 }
 
 void tearDown(void) {
-  TEST_ASSERT(tangle_cleanup(&api.consensus->tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
 void test_broadcast_transactions_empty(void) {

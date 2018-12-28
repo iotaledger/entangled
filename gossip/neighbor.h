@@ -19,6 +19,7 @@
 
 // Forward declarations
 typedef struct node_s node_t;
+typedef struct tangle_s tangle_t;
 
 typedef struct neighbor_s {
   endpoint_t endpoint;
@@ -75,12 +76,14 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor,
  * Sends transaction flex trits to a neighbor
  *
  * @param node A node
+ * @param tangle A tangle
  * @param neighbor The neighbor
  * @param transaction The transaction flex trits
  *
  * @return a status code
  */
-retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
+retcode_t neighbor_send(node_t *const node, tangle_t *const tangle,
+                        neighbor_t *const neighbor,
                         flex_trit_t const *const transaction);
 
 /**

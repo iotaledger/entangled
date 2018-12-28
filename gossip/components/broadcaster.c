@@ -7,6 +7,7 @@
 
 #include <string.h>
 
+#include "consensus/tangle/tangle.h"
 #include "gossip/components/broadcaster.h"
 #include "gossip/node.h"
 #include "utils/logger_helper.h"
@@ -22,10 +23,19 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
   neighbor_t *iter = NULL;
   flex_trit_t *transaction_flex_trits_ptr = NULL;
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
+  connection_config_t db_conf = {.db_path = broadcaster->node->conf.db_path};
+  tangle_t tangle;
 
   if (broadcaster == NULL) {
     return NULL;
   }
+
+  if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
+    log_critical(BROADCASTER_LOGGER_ID,
+                 "Initializing tangle connection failed\n");
+    return NULL;
+  }
+
   lock_handle_t lock_cond;
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
@@ -50,8 +60,8 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
     log_debug(BROADCASTER_LOGGER_ID, "Broadcasting transaction\n");
     rw_lock_handle_rdlock(&broadcaster->node->neighbors_lock);
     LL_FOREACH(broadcaster->node->neighbors, iter) {
-      if (neighbor_send(broadcaster->node, iter, transaction_flex_trits) !=
-          RC_OK) {
+      if (neighbor_send(broadcaster->node, &tangle, iter,
+                        transaction_flex_trits) != RC_OK) {
         log_warning(BROADCASTER_LOGGER_ID, "Broadcasting transaction failed\n");
       }
     }
@@ -60,6 +70,12 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
 
   lock_handle_unlock(&lock_cond);
   lock_handle_destroy(&lock_cond);
+
+  if (iota_tangle_destroy(&tangle) != RC_OK) {
+    log_critical(BROADCASTER_LOGGER_ID,
+                 "Destroying tangle connection failed\n");
+  }
+
   return NULL;
 }
 

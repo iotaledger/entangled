@@ -10,7 +10,7 @@
 
 #define CORE_LOGGER_ID "core"
 
-retcode_t core_init(core_t* const core) {
+retcode_t core_init(core_t* const core, tangle_t* const tangle) {
   if (core == NULL) {
     return RC_CORE_NULL_CORE;
   }
@@ -18,10 +18,8 @@ retcode_t core_init(core_t* const core) {
   logger_helper_init(CORE_LOGGER_ID, LOGGER_DEBUG, true);
   core->running = false;
 
-  connection_config_t db_conf = {.db_path = core->conf.db_path};
-
   log_info(CORE_LOGGER_ID, "Initializing consensus\n");
-  if (iota_consensus_init(&core->consensus, &db_conf,
+  if (iota_consensus_init(&core->consensus, tangle,
                           &core->node.transaction_requester,
                           &core->node.tips) != RC_OK) {
     log_critical(CORE_LOGGER_ID, "Initializing consensus failed\n");
@@ -29,7 +27,7 @@ retcode_t core_init(core_t* const core) {
   }
 
   log_info(CORE_LOGGER_ID, "Initializing node gossip components\n");
-  if (node_init(&core->node, core, &core->consensus.tangle) != RC_OK) {
+  if (node_init(&core->node, core, tangle) != RC_OK) {
     log_critical(CORE_LOGGER_ID,
                  "Initializing node gossip components failed\n");
     return RC_CORE_FAILED_NODE_INIT;
@@ -45,13 +43,13 @@ retcode_t core_init(core_t* const core) {
   return RC_OK;
 }
 
-retcode_t core_start(core_t* const core) {
+retcode_t core_start(core_t* const core, tangle_t* const tangle) {
   if (core == NULL) {
     return RC_CORE_NULL_CORE;
   }
 
   log_info(CORE_LOGGER_ID, "Starting consensus\n");
-  if (iota_consensus_start(&core->consensus) != RC_OK) {
+  if (iota_consensus_start(&core->consensus, tangle) != RC_OK) {
     log_critical(CORE_LOGGER_ID, "Starting consensus failed\n");
     return RC_CORE_FAILED_CONSENSUS_START;
   }

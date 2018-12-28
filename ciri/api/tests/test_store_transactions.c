@@ -19,21 +19,22 @@ static char *ciri_db_path = "ciri/api/tests/ciri.db";
 static connection_config_t config;
 static iota_api_t api;
 static node_t node;
+static tangle_t tangle;
 static iota_consensus_t consensus;
 
 void setUp(void) {
-  TEST_ASSERT(tangle_setup(&api.consensus->tangle, &config, test_db_path,
-                           ciri_db_path) == RC_OK);
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
 }
 
 void tearDown(void) {
-  TEST_ASSERT(tangle_cleanup(&api.consensus->tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
 void test_store_transactions_empty(void) {
   store_transactions_req_t *req = store_transactions_req_new();
 
-  TEST_ASSERT(iota_api_store_transactions(&api, req) == RC_OK);
+  TEST_ASSERT(iota_api_store_transactions(&api, &tangle, req) == RC_OK);
 
   store_transactions_req_free(&req);
   TEST_ASSERT(req == NULL);
@@ -56,15 +57,14 @@ void test_store_transactions_invalid_tx(void) {
 
   hash_array_push(req->trytes, tx_trits);
 
-  TEST_ASSERT(iota_api_store_transactions(&api, req) == RC_OK);
+  TEST_ASSERT(iota_api_store_transactions(&api, &tangle, req) == RC_OK);
 
   // Checking that it hasn't been stored
 
   flex_trits_from_trytes(hash_trits, HASH_LENGTH_TRIT, TX_1_OF_4_HASH,
                          HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
-  TEST_ASSERT(iota_tangle_transaction_load(&api.consensus->tangle,
-                                           TRANSACTION_FIELD_HASH, hash_trits,
-                                           &pack) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_load(&tangle, TRANSACTION_FIELD_HASH,
+                                           hash_trits, &pack) == RC_OK);
   TEST_ASSERT(pack.num_loaded == 0);
 
   store_transactions_req_free(&req);
@@ -91,16 +91,15 @@ void test_store_transactions(void) {
                            NUM_TRYTES_SERIALIZED_TRANSACTION);
     hash_array_push(req->trytes, tx_trits);
   }
-  TEST_ASSERT(iota_api_store_transactions(&api, req) == RC_OK);
+  TEST_ASSERT(iota_api_store_transactions(&api, &tangle, req) == RC_OK);
   // Checking that they have been stored
 
   for (size_t i = 0; i < 4; i++) {
     hash_pack_reset(&pack);
     flex_trits_from_trytes(hash_trits, HASH_LENGTH_TRIT, hashes_trytes[i],
                            HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
-    TEST_ASSERT(iota_tangle_transaction_load(&api.consensus->tangle,
-                                             TRANSACTION_FIELD_HASH, hash_trits,
-                                             &pack) == RC_OK);
+    TEST_ASSERT(iota_tangle_transaction_load(&tangle, TRANSACTION_FIELD_HASH,
+                                             hash_trits, &pack) == RC_OK);
     TEST_ASSERT(pack.num_loaded == 1);
     transaction_serialize_on_flex_trits(txp, tx_trits);
     flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION, tx_trits,
@@ -122,8 +121,8 @@ int main(void) {
   api.node = &node;
   api.consensus = &consensus;
   TEST_ASSERT(iota_gossip_conf_init(&api.node->conf) == RC_OK);
-  TEST_ASSERT(requester_init(&api.node->transaction_requester, api.node,
-                             &api.consensus->tangle) == RC_OK);
+  TEST_ASSERT(requester_init(&api.node->transaction_requester, api.node) ==
+              RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.consensus->conf) == RC_OK);
   api.consensus->conf.snapshot_timestamp_sec = 1536845195;
   api.consensus->conf.mwm = 1;
@@ -132,8 +131,7 @@ int main(void) {
   tips_cache_init(&api.node->tips, 5000);
   iota_consensus_transaction_solidifier_init(
       &api.consensus->transaction_solidifier, &api.consensus->conf,
-      &api.consensus->tangle, &api.node->transaction_requester,
-      &api.node->tips);
+      &api.node->transaction_requester, &api.node->tips);
 
   RUN_TEST(test_store_transactions_empty);
   RUN_TEST(test_store_transactions_invalid_tx);

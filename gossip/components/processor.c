@@ -29,6 +29,7 @@
  * If valid and new: stores and broadcasts it.
  *
  * @param processor The processor state
+ * @param tangle A tangle
  * @param neighbor The neighbor that sent the packet
  * @param packet The packet from which to process transaction bytes
  * @param curl_hash The CurlP81 hash of the transaction
@@ -36,6 +37,7 @@
  * @return a status code
  */
 static retcode_t process_transaction_bytes(processor_t const *const processor,
+                                           tangle_t *const tangle,
                                            neighbor_t *const neighbor,
                                            iota_packet_t const *const packet,
                                            flex_trit_t const *const curl_hash) {
@@ -85,9 +87,8 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
   // TODO Add transaction hash to cache
 
   // Checks if the transaction is already persisted
-  if ((ret = iota_tangle_transaction_exist(
-           processor->tangle, TRANSACTION_FIELD_HASH, curl_hash, &exists)) !=
-      RC_OK) {
+  if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH,
+                                           curl_hash, &exists)) != RC_OK) {
     log_warning(PROCESSOR_LOGGER_ID, "Checking if transaction exists failed\n");
     goto failure;
   }
@@ -95,15 +96,15 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
   if (!exists) {
     // Stores the new transaction
     log_debug(PROCESSOR_LOGGER_ID, "Storing new transaction\n");
-    if ((ret = iota_tangle_transaction_store(processor->tangle,
-                                             &transaction)) != RC_OK) {
+    if ((ret = iota_tangle_transaction_store(tangle, &transaction)) != RC_OK) {
       log_warning(PROCESSOR_LOGGER_ID, "Storing new transaction failed\n");
       goto failure;
     }
 
     // Updates transaction status
     if ((ret = iota_consensus_transaction_solidifier_update_status(
-             processor->transaction_solidifier, &transaction)) != RC_OK) {
+             processor->transaction_solidifier, tangle, &transaction)) !=
+        RC_OK) {
       log_warning(PROCESSOR_LOGGER_ID, "Updating transaction status failed\n");
       return ret;
     }
@@ -189,11 +190,13 @@ static retcode_t process_request_bytes(processor_t const *const processor,
  * Processes a packet
  *
  * @param processor The processor state
+ * @param tangle A tangle
  * @param packet The packet
  *
  * @return a status code
  */
 static retcode_t process_packet(processor_t const *const processor,
+                                tangle_t *const tangle,
                                 iota_packet_t const *const packet,
                                 flex_trit_t const *const hash) {
   retcode_t ret = RC_OK;
@@ -217,8 +220,8 @@ static retcode_t process_packet(processor_t const *const processor,
     neighbor->nbr_all_tx++;
 
     log_debug(PROCESSOR_LOGGER_ID, "Processing transaction bytes\n");
-    if ((ret = process_transaction_bytes(processor, neighbor, packet, hash)) !=
-        RC_OK) {
+    if ((ret = process_transaction_bytes(processor, tangle, neighbor, packet,
+                                         hash)) != RC_OK) {
       log_warning(PROCESSOR_LOGGER_ID, "Processing transaction bytes failed\n");
       goto done;
     }
@@ -247,7 +250,19 @@ done:
  * @param processor The processor state
  */
 static void *processor_routine(processor_t *const processor) {
+  connection_config_t db_conf = {.db_path = processor->node->conf.db_path};
+  tangle_t tangle;
   size_t j;
+
+  if (processor == NULL) {
+    return NULL;
+  }
+
+  if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
+    log_critical(PROCESSOR_LOGGER_ID,
+                 "Initializing tangle connection failed\n");
+    return NULL;
+  }
 
   const size_t PACKET_MAX = 64;
   size_t packet_cnt = 0;
@@ -263,10 +278,6 @@ static void *processor_routine(processor_t *const processor) {
   ptrit_t *txs_acc = calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(ptrit_t));
 
   flex_trit_t flex_hash[FLEX_TRIT_SIZE_243];
-
-  if (processor == NULL) {
-    return NULL;
-  }
 
   lock_handle_t lock_cond;
   lock_handle_init(&lock_cond);
@@ -313,7 +324,7 @@ static void *processor_routine(processor_t *const processor) {
       flex_trits_from_trits(flex_hash, HASH_LENGTH_TRIT, hash, HASH_LENGTH_TRIT,
                             HASH_LENGTH_TRIT);
 
-      if (process_packet(processor, &packets[j], flex_hash) != RC_OK) {
+      if (process_packet(processor, &tangle, &packets[j], flex_hash) != RC_OK) {
         log_warning(PROCESSOR_LOGGER_ID, "Processing packet failed\n");
       }
     }
@@ -321,6 +332,10 @@ static void *processor_routine(processor_t *const processor) {
 
   lock_handle_unlock(&lock_cond);
   lock_handle_destroy(&lock_cond);
+
+  if (iota_tangle_destroy(&tangle) != RC_OK) {
+    log_critical(PROCESSOR_LOGGER_ID, "Destroying tangle connection failed\n");
+  }
 
   free(curl);
   free(packets);
@@ -336,13 +351,11 @@ static void *processor_routine(processor_t *const processor) {
  */
 
 retcode_t processor_init(processor_t *const processor, node_t *const node,
-                         tangle_t *const tangle,
                          transaction_validator_t *const transaction_validator,
                          transaction_solidifier_t *const transaction_solidifier,
                          milestone_tracker_t *const milestone_tracker) {
-  if (processor == NULL || node == NULL || tangle == NULL ||
-      transaction_validator == NULL || transaction_solidifier == NULL ||
-      milestone_tracker == NULL) {
+  if (processor == NULL || node == NULL || transaction_validator == NULL ||
+      transaction_solidifier == NULL || milestone_tracker == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -353,7 +366,6 @@ retcode_t processor_init(processor_t *const processor, node_t *const node,
   rw_lock_handle_init(&processor->lock);
   cond_handle_init(&processor->cond);
   processor->node = node;
-  processor->tangle = tangle;
   processor->transaction_validator = transaction_validator;
   processor->transaction_solidifier = transaction_solidifier;
   processor->milestone_tracker = milestone_tracker;
@@ -406,7 +418,6 @@ retcode_t processor_destroy(processor_t *const processor) {
   rw_lock_handle_destroy(&processor->lock);
   cond_handle_destroy(&processor->cond);
   processor->node = NULL;
-  processor->tangle = NULL;
   processor->transaction_validator = NULL;
   processor->transaction_solidifier = NULL;
   processor->milestone_tracker = NULL;

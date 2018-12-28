@@ -12,7 +12,7 @@
 #include "utils/logger_helper.h"
 #include "utils/time.h"
 
-#define TRANSACTION_VALIDATOR_LOGGER_ID "consensus_transaction_validator"
+#define TRANSACTION_VALIDATOR_LOGGER_ID "transaction_validator"
 
 static size_t MAX_TIMESTAMP_FUTURE_MS = 2 * 60 * 60 * 1000;
 

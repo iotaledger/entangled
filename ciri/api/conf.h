@@ -32,6 +32,8 @@ typedef struct iota_api_conf_s {
   // Maximum number of transactions that will be returned by the 'getTrytes' API
   // call
   size_t max_get_trytes;
+  // Path of the DB file
+  char db_path[128];
 } iota_api_conf_t;
 
 /**

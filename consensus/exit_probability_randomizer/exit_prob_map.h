@@ -32,9 +32,9 @@ struct ep_prob_map_randomizer_s {
  *
  * @param exit_probability_randomizer The base class
  *
- * @return void
+ * @return a status code
  */
-void iota_consensus_exit_prob_map_reset(
+retcode_t iota_consensus_exit_prob_map_reset(
     ep_randomizer_t *const exit_probability_randomizer);
 
 void iota_consensus_exit_prob_map_init(ep_randomizer_t *const randomizer);
@@ -61,6 +61,7 @@ void iota_consensus_exit_prob_map_init(ep_randomizer_t *const randomizer);
  */
 retcode_t iota_consensus_exit_prob_map_randomize(
     ep_randomizer_t const *const exit_probability_randomizer,
+    tangle_t *const tangle,
     exit_prob_transaction_validator_t *const ep_validator,
     cw_calc_result *const cw_result, flex_trit_t const *const ep,
     flex_trit_t *tip);
@@ -82,6 +83,7 @@ retcode_t iota_consensus_exit_prob_map_randomize(
  */
 retcode_t iota_consensus_exit_prob_map_calculate_probs(
     ep_randomizer_t const *const exit_probability_randomizer,
+    tangle_t *const tangle,
     exit_prob_transaction_validator_t *const ep_validator,
     cw_calc_result *const cw_result, flex_trit_t const *const ep,
     hash_to_double_map_t *const hash_to_exit_probs,
@@ -94,9 +96,9 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(
  *
  * @param exit_probability_randomizer The base class
  *
- * @return void
+ * @return a statuc code
  */
-void iota_consensus_exit_prob_map_destroy(
+retcode_t iota_consensus_exit_prob_map_destroy(
     ep_randomizer_t *const exit_probability_randomizer);
 
 /**

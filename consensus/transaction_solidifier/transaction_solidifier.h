@@ -29,7 +29,6 @@ extern "C" {
 
 typedef struct transaction_solidifier_s {
   iota_consensus_conf_t *conf;
-  tangle_t *tangle;
   transaction_requester_t *transaction_requester;
   thread_handle_t thread;
   bool running;
@@ -41,7 +40,6 @@ typedef struct transaction_solidifier_s {
 
 retcode_t iota_consensus_transaction_solidifier_init(
     transaction_solidifier_t *const ts, iota_consensus_conf_t *const conf,
-    tangle_t *const tangle,
     transaction_requester_t *const transaction_requester,
     tips_cache_t *const tips);
 
@@ -55,14 +53,16 @@ retcode_t iota_consensus_transaction_solidifier_destroy(
     transaction_solidifier_t *const ts);
 
 retcode_t iota_consensus_transaction_solidifier_check_solidity(
-    transaction_solidifier_t *const ts, flex_trit_t *const hash,
-    bool is_milestone, bool *const is_solid);
+    transaction_solidifier_t *const ts, tangle_t *const tangle,
+    flex_trit_t *const hash, bool is_milestone, bool *const is_solid);
 
 retcode_t iota_consensus_transaction_solidifier_check_and_update_solid_state(
-    transaction_solidifier_t *const ts, flex_trit_t *const hash);
+    transaction_solidifier_t *const ts, tangle_t *const tangle,
+    flex_trit_t *const hash);
 
 retcode_t iota_consensus_transaction_solidifier_update_status(
-    transaction_solidifier_t *const ts, iota_transaction_t *const tx);
+    transaction_solidifier_t *const ts, tangle_t *const tangle,
+    iota_transaction_t *const tx);
 
 #ifdef __cplusplus
 }
