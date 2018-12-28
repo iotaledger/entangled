@@ -5,8 +5,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdint.h>
-#include <stdio.h>
 #include <string.h>
 
 #include <sqlite3.h>
@@ -27,36 +25,27 @@ retcode_t connection_init(connection_t const* const conn,
   if (config->db_path == NULL) {
     log_critical(SQLITE3_LOGGER_ID, "No path for db specified\n");
     return RC_SQLITE3_NO_PATH_FOR_DB_SPECIFIED;
-  } else {
-    rc = sqlite3_open_v2(config->db_path, (sqlite3**)&conn->db,
-                         SQLITE_OPEN_READWRITE, NULL);
   }
 
-  if (rc) {
+  if ((rc = sqlite3_open_v2(config->db_path, (sqlite3**)&conn->db,
+                            SQLITE_OPEN_READWRITE | SQLITE_OPEN_NOMUTEX,
+                            NULL)) != SQLITE_OK) {
     log_critical(SQLITE3_LOGGER_ID, "Failed to open db on path: %s\n",
                  config->db_path);
     return RC_SQLITE3_FAILED_OPEN_DB;
-  } else {
-    log_info(SQLITE3_LOGGER_ID, "Connection to database %s created\n",
-             config->db_path);
   }
+
+  log_info(SQLITE3_LOGGER_ID, "Connection to database %s created\n",
+           config->db_path);
 
   if ((rc = sqlite3_busy_timeout((sqlite3*)conn->db, 1000)) != SQLITE_OK) {
     return RC_SQLITE3_FAILED_CONFIG;
   }
 
-  sql = "PRAGMA journal_mode = WAL";
-  rc = sqlite3_exec((sqlite3*)conn->db, sql, 0, 0, &err_msg);
+  sql = "PRAGMA journal_mode = WAL;PRAGMA foreign_keys = ON";
 
-  if (rc != SQLITE_OK) {
-    sqlite3_free(err_msg);
-    return RC_SQLITE3_FAILED_INSERT_DB;
-  }
-
-  sql = "PRAGMA foreign_keys = ON";
-  rc = sqlite3_exec((sqlite3*)conn->db, sql, 0, 0, &err_msg);
-
-  if (rc != SQLITE_OK) {
+  if ((rc = sqlite3_exec((sqlite3*)conn->db, sql, NULL, NULL, &err_msg)) !=
+      SQLITE_OK) {
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
