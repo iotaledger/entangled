@@ -10,7 +10,7 @@
 
 retcode_t hash_to_{TYPE}_map_add(hash_to_{TYPE}_map_t *const map,
                                   flex_trit_t const *const hash,
-                                  {TYPE} const value) {
+                                  {TYPE} value) {
   hash_to_{TYPE}_map_entry_t *map_entry = NULL;
   map_entry = (hash_to_{TYPE}_map_entry_t *)malloc(
       sizeof(hash_to_{TYPE}_map_entry_t));
@@ -59,4 +59,12 @@ void hash_to_{TYPE}_map_free(hash_to_{TYPE}_map_t *const map) {
     free(curr_entry);
   }
   *map = NULL;
+}
+
+void hash_to_{TYPE}_map_keys(hash_to_{TYPE}_map_t *const map, hash243_set_t * const keys){
+  hash_to_{TYPE}_map_entry_t *curr_entry = NULL;
+  hash_to_{TYPE}_map_entry_t *tmp_entry = NULL;
+  HASH_ITER(hh, *map, curr_entry, tmp_entry) {
+    hash243_set_add(keys,curr_entry->hash);
+  }
 }

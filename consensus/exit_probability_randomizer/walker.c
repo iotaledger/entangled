@@ -8,6 +8,7 @@
 #include <inttypes.h>
 #include <math.h>
 
+#include "consensus/exit_probability_randomizer/global_calcs.h"
 #include "consensus/exit_probability_randomizer/walker.h"
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
@@ -27,32 +28,27 @@ static retcode_t select_approver(
   hash243_set_entry_t *tmp_approver = NULL;
   hash_to_int64_t_map_entry_t const *curr_rating = NULL;
   size_t num_approvers = hash243_set_size(approvers);
-  int64_t weights[num_approvers];
-  double sum_weights = 0;
+  double transition_probs[num_approvers];
+  double sum_transition_probs = 0;
   double target = 0;
-  int64_t max_weight = 0;
+  double max_weight = 0;
   size_t idx = 0;
+  retcode_t ret;
 
-  HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
-    if (!hash_to_int64_t_map_find(&cw_ratings, curr_approver->hash,
-                                  &curr_rating)) {
-      log_error(RANDOM_WALKER_LOGGER_ID, "No rating found for approver\n");
-      return RC_CONSENSUS_EXIT_PROBABILITIES_MISSING_RATING;
-    }
-    weights[idx++] = curr_rating->value;
-    max_weight = MAX(max_weight, curr_rating->value);
+  if ((ret = map_transition_probabilities(
+           exit_probability_randomizer->conf->alpha, cw_ratings, approvers,
+           transition_probs)) != RC_OK) {
+    return ret;
   }
 
   for (idx = 0; idx < num_approvers; ++idx) {
-    weights[idx] -= max_weight;
-    weights[idx] = exp(weights[idx] * exit_probability_randomizer->conf->alpha);
-    sum_weights += weights[idx];
+    sum_transition_probs += transition_probs[idx];
   }
 
   idx = 0;
-  target = rand_handle_probability() * sum_weights;
+  target = rand_handle_probability() * sum_transition_probs;
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
-    if ((target = (target - weights[idx++])) <= 0) {
+    if ((target = (target - transition_probs[idx++])) <= 0) {
       memcpy(approver, curr_approver->hash, FLEX_TRIT_SIZE_243);
       break;
     }
@@ -141,9 +137,8 @@ retcode_t iota_consensus_random_walker_randomize(
   size_t num_traversed_tails = 1;
   flex_trit_t const *curr_tail_hash = ep;
   flex_trit_t approver_tail_hash[FLEX_TRIT_SIZE_243];
-  ret = iota_consensus_exit_prob_transaction_validator_is_valid(
-      ep_validator, ep, &ep_is_valid);
-  if (ret != RC_OK) {
+  if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(
+           ep_validator, ep, &ep_is_valid)) != RC_OK) {
     log_error(RANDOM_WALKER_LOGGER_ID,
               "Entry point validation failed: %" PRIu64 "\n", ret);
     return ret;
@@ -153,10 +148,10 @@ retcode_t iota_consensus_random_walker_randomize(
   }
 
   do {
-    ret = random_walker_select_approver_tail(
-        exit_probability_randomizer, ep_validator, cw_result, curr_tail_hash,
-        approver_tail_hash, &has_approver_tail);
-    if (ret != RC_OK) {
+    if ((ret = random_walker_select_approver_tail(
+             exit_probability_randomizer, ep_validator, cw_result,
+             curr_tail_hash, approver_tail_hash, &has_approver_tail)) !=
+        RC_OK) {
       log_error(RANDOM_WALKER_LOGGER_ID,
                 "Selecting approver tail failed: %" PRIu64 "\n", ret);
       return ret;

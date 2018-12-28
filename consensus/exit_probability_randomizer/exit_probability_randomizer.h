@@ -26,7 +26,7 @@ typedef struct ep_randomizer_s ep_randomizer_t;
 typedef enum ep_randomizer_implementation_e {
   EP_NO_IMPLEMENTATION,
   EP_RANDOM_WALK,
-  EP_RANDOMIZE_SAMPLE,
+  EP_RANDOMIZE_MAP_AND_SAMPLE,
 } ep_randomizer_implementation_t;
 
 typedef struct {
@@ -36,6 +36,9 @@ typedef struct {
       exit_prob_transaction_validator_t *const epv,
       cw_calc_result *const cw_result, flex_trit_t const *const ep,
       flex_trit_t *const tip);
+
+  void (*exit_probability_destroy)(ep_randomizer_t const *const ep_randomizer);
+
 } ep_randomizer_vtable;
 
 struct ep_randomizer_base_s {

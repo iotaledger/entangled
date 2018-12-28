@@ -47,6 +47,7 @@ def hash_map_generate(mapped_type):
             "//common:errors",
             "//common/trinary:flex_trit",
             "//utils/handles:rand",
+            "//utils/containers/hash:hash243_set",
             "@com_github_uthash//:uthash",
         ],
         visibility = ["//visibility:public"],
