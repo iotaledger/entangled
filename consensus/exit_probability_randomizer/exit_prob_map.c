@@ -10,6 +10,7 @@
 
 #include "consensus/exit_probability_randomizer/exit_prob_map.h"
 #include "consensus/exit_probability_randomizer/global_calcs.h"
+#include "exit_prob_map.h"
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
@@ -67,28 +68,25 @@ done:
  * Public functions
  */
 
-void iota_consensus_exit_prob_map_init(ep_randomizer_t *const randomizer) {
-  randomizer->base.vtable = exit_prob_map_vtable;
-  ep_prob_map_randomizer_t *prob_randomizer =
-      (ep_prob_map_randomizer_t *const)randomizer;
-  prob_randomizer->exit_probs = NULL;
-  prob_randomizer->transition_probs = NULL;
+void iota_consensus_exit_prob_map_init(
+    ep_prob_map_randomizer_t *const randomizer) {
+  randomizer->base.base.vtable = exit_prob_map_vtable;
+  randomizer->exit_probs = NULL;
+  randomizer->transition_probs = NULL;
 }
 
 retcode_t iota_consensus_exit_prob_map_randomize(
-    ep_randomizer_t const *const randomizer, tangle_t *const tangle,
+    ep_prob_map_randomizer_t const *const randomizer, tangle_t *const tangle,
     exit_prob_transaction_validator_t *const ep_validator,
     cw_calc_result *const cw_result, flex_trit_t const *const ep,
     flex_trit_t *tip) {
   retcode_t ret;
-  ep_prob_map_randomizer_t *prob_randomizer =
-      (ep_prob_map_randomizer_t *)randomizer;
 
-  if (prob_randomizer->exit_probs == NULL) {
+  if (randomizer->exit_probs == NULL) {
     if ((ret = iota_consensus_exit_prob_map_calculate_probs(
              randomizer, tangle, ep_validator, cw_result, ep,
-             &prob_randomizer->exit_probs,
-             &prob_randomizer->transition_probs)) != RC_OK) {
+             &randomizer->exit_probs, &randomizer->transition_probs)) !=
+        RC_OK) {
       return ret;
     }
   }
@@ -102,8 +100,7 @@ retcode_t iota_consensus_exit_prob_map_randomize(
   hash_to_double_map_entry_t *curr_ep = NULL;
 
   HASH_ITER(hh, tips, tip_entry, tip_tmp_entry) {
-    hash_to_double_map_find(&prob_randomizer->exit_probs, tip_entry->hash,
-                            &curr_ep);
+    hash_to_double_map_find(&randomizer->exit_probs, tip_entry->hash, &curr_ep);
     rand_weight -= curr_ep->value;
     if (rand_weight <= 0) {
       memcpy(tip, tip_entry->hash, FLEX_TRIT_SIZE_243);
@@ -115,7 +112,7 @@ retcode_t iota_consensus_exit_prob_map_randomize(
 }
 
 retcode_t iota_consensus_exit_prob_map_calculate_probs(
-    ep_randomizer_t const *const exit_probability_randomizer,
+    ep_prob_map_randomizer_t const *const exit_probability_randomizer,
     tangle_t *const tangle,
     exit_prob_transaction_validator_t *const ep_validator,
     cw_calc_result *const cw_result, flex_trit_t const *const ep,
@@ -158,7 +155,7 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(
     hash_to_double_map_find(hash_to_exit_probs, curr_tx, &curr_tx_entry);
     num_approvers = hash243_set_size(&aps->approvers);
     double trans_probs_to_direct_approvers[num_approvers];
-    map_transition_probabilities(exit_probability_randomizer->conf->alpha,
+    map_transition_probabilities(exit_probability_randomizer->base.conf->alpha,
                                  cw_result->cw_ratings, &aps->approvers,
                                  trans_probs_to_direct_approvers);
     approver_idx = 0;
@@ -217,14 +214,12 @@ double iota_consensus_exit_prob_map_sum_probs(
 }
 
 retcode_t iota_consensus_exit_prob_map_destroy(
-    ep_randomizer_t *const exit_probability_randomizer) {
+    ep_prob_map_randomizer_t *const exit_probability_randomizer) {
   return iota_consensus_exit_prob_map_reset(exit_probability_randomizer);
 }
 
 retcode_t iota_consensus_exit_prob_map_reset(
-    ep_randomizer_t *const exit_probability_randomizer) {
-  ep_prob_map_randomizer_t *prob_randomizer =
-      (ep_prob_map_randomizer_t *const)exit_probability_randomizer;
+    ep_prob_map_randomizer_t *const prob_randomizer) {
   if (prob_randomizer->exit_probs) {
     hash_to_double_map_free(&prob_randomizer->exit_probs);
     hash_to_double_map_free(&prob_randomizer->transition_probs);

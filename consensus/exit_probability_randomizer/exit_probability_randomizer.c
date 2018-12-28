@@ -22,7 +22,8 @@ retcode_t iota_consensus_ep_randomizer_init(
   if (impl == EP_RANDOM_WALK) {
     iota_consensus_random_walker_init(ep_randomizer);
   } else if (impl == EP_RANDOMIZE_MAP_AND_SAMPLE) {
-    iota_consensus_exit_prob_map_init(ep_randomizer);
+    iota_consensus_exit_prob_map_init(
+        (ep_prob_map_randomizer_t *)ep_randomizer);
   } else if (impl == EP_NO_IMPLEMENTATION) {
     return RC_CONSENSUS_NOT_IMPLEMENTED;
   }

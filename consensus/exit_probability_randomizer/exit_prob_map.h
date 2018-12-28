@@ -35,9 +35,10 @@ struct ep_prob_map_randomizer_s {
  * @return a status code
  */
 retcode_t iota_consensus_exit_prob_map_reset(
-    ep_randomizer_t *const exit_probability_randomizer);
+    ep_prob_map_randomizer_t *const exit_probability_randomizer);
 
-void iota_consensus_exit_prob_map_init(ep_randomizer_t *const randomizer);
+void iota_consensus_exit_prob_map_init(
+    ep_prob_map_randomizer_t *const randomizer);
 
 /**
  * Randomize a tip selection based on exit probabilities
@@ -60,7 +61,7 @@ void iota_consensus_exit_prob_map_init(ep_randomizer_t *const randomizer);
  * @return a status code
  */
 retcode_t iota_consensus_exit_prob_map_randomize(
-    ep_randomizer_t const *const exit_probability_randomizer,
+    ep_prob_map_randomizer_t const *const exit_probability_randomizer,
     tangle_t *const tangle,
     exit_prob_transaction_validator_t *const ep_validator,
     cw_calc_result *const cw_result, flex_trit_t const *const ep,
@@ -82,7 +83,7 @@ retcode_t iota_consensus_exit_prob_map_randomize(
  * @return a status code
  */
 retcode_t iota_consensus_exit_prob_map_calculate_probs(
-    ep_randomizer_t const *const exit_probability_randomizer,
+    ep_prob_map_randomizer_t const *const exit_probability_randomizer,
     tangle_t *const tangle,
     exit_prob_transaction_validator_t *const ep_validator,
     cw_calc_result *const cw_result, flex_trit_t const *const ep,
@@ -99,7 +100,7 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(
  * @return a statuc code
  */
 retcode_t iota_consensus_exit_prob_map_destroy(
-    ep_randomizer_t *const exit_probability_randomizer);
+    ep_prob_map_randomizer_t *const exit_probability_randomizer);
 
 /**
  * Extracts tips into set
