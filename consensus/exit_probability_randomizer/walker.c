@@ -59,7 +59,7 @@ static retcode_t select_approver(
 
 static retcode_t find_tail_if_valid(
     ep_randomizer_t const *const exit_probability_randomizer,
-    exit_prob_transaction_validator_t *const epv, tangle_t *const tangle,
+    tangle_t *const tangle, exit_prob_transaction_validator_t *const epv,
     flex_trit_t *const tx_hash, bool *const has_valid_tail) {
   retcode_t ret = RC_OK;
 
@@ -84,7 +84,7 @@ static retcode_t find_tail_if_valid(
 
 static retcode_t random_walker_select_approver_tail(
     ep_randomizer_t const *const exit_probability_randomizer,
-    exit_prob_transaction_validator_t *const epv, tangle_t *const tangle,
+    tangle_t *const tangle, exit_prob_transaction_validator_t *const epv,
     cw_calc_result *const cw_result, flex_trit_t const *const curr_tail_hash,
     flex_trit_t *const approver, bool *const has_approver_tail) {
   retcode_t ret = RC_OK;
@@ -104,7 +104,7 @@ static retcode_t random_walker_select_approver_tail(
       return ret;
     }
 
-    if ((ret = find_tail_if_valid(exit_probability_randomizer, epv, tangle,
+    if ((ret = find_tail_if_valid(exit_probability_randomizer, tangle, epv,
                                   approver, has_approver_tail)) != RC_OK) {
       return ret;
     }
@@ -127,9 +127,10 @@ void iota_consensus_random_walker_init(ep_randomizer_t *const randomizer) {
 
 retcode_t iota_consensus_random_walker_randomize(
     ep_randomizer_t const *const exit_probability_randomizer,
+    tangle_t *const tangle,
     exit_prob_transaction_validator_t *const ep_validator,
-    tangle_t *const tangle, cw_calc_result *const cw_result,
-    flex_trit_t const *const ep, flex_trit_t *tip) {
+    cw_calc_result *const cw_result, flex_trit_t const *const ep,
+    flex_trit_t *tip) {
   retcode_t ret = RC_OK;
   bool ep_is_valid = false;
   bool has_approver_tail = false;

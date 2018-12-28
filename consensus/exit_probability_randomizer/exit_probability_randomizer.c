@@ -39,10 +39,10 @@ retcode_t iota_consensus_ep_randomizer_destroy(
 }
 
 retcode_t iota_consensus_exit_probability_randomize(
-    ep_randomizer_t const *const ep_randomizer,
-    exit_prob_transaction_validator_t *const epv, tangle_t *const tangle,
+    ep_randomizer_t const *const ep_randomizer, tangle_t *const tangle,
+    exit_prob_transaction_validator_t *const epv,
     cw_calc_result *const cw_result, flex_trit_t const *const ep,
     flex_trit_t *tip) {
   return ep_randomizer->base.vtable.exit_probability_randomize(
-      ep_randomizer, epv, tangle, cw_result, ep, tip);
+      ep_randomizer, tangle, epv, cw_result, ep, tip);
 }
