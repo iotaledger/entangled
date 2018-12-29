@@ -6,7 +6,6 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/model:transaction",
-        "//common/trinary:trit_array",
         "//consensus:conf",
         "//consensus/tangle",
         "//consensus/utils:tangle_traversals",
@@ -14,7 +13,6 @@ cc_library(
         "//gossip/components:transaction_requester",
         "//utils:logger_helper",
         "//utils/containers/hash:hash243_set",
-        "//utils/containers/hash:hash243_stack",
         "//utils/handles:lock",
         "//utils/handles:thread",
     ],
