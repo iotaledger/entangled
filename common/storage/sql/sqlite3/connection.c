@@ -38,7 +38,7 @@ retcode_t connection_init(connection_t const* const conn,
   log_info(SQLITE3_LOGGER_ID, "Connection to database %s created\n",
            config->db_path);
 
-  if ((rc = sqlite3_busy_timeout((sqlite3*)conn->db, 1000)) != SQLITE_OK) {
+  if ((rc = sqlite3_busy_timeout((sqlite3*)conn->db, 10000)) != SQLITE_OK) {
     return RC_SQLITE3_FAILED_CONFIG;
   }
 
