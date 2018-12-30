@@ -70,24 +70,18 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc,
   }
 
   return cw_rating_calculate_dfs_ratings_from_approvers_map(
-      cw_calc, entry_point, out->tx_to_approvers, &out->cw_ratings, true);
+      max_subtangle_size, out->tx_to_approvers, &out->cw_ratings, true);
 }
 
 retcode_t cw_rating_calculate_dfs_ratings_from_approvers_map(
-    cw_rating_calculator_t const *const cw_calc, flex_trit_t *entry_point,
+    size_t max_subtangle_size,
     hash_to_indexed_hash_set_map_t const tx_to_approvers,
     hash_to_int64_t_map_t *const cw_ratings, bool skip_entry_point_rating) {
   retcode_t res;
   uint64_t sub_tangle_size;
   hash_to_indexed_hash_set_entry_t *curr_hash_to_approvers_entry = NULL;
   hash_to_indexed_hash_set_entry_t *tmp_hash_to_approvers_entry = NULL;
-  uint64_t bitset_size;
-
-  hash_to_indexed_hash_set_map_find(&tx_to_approvers, entry_point,
-                                    &curr_hash_to_approvers_entry);
-
-  bitset_size = bistset_required_size(
-      hash243_set_size(&curr_hash_to_approvers_entry->approvers));
+  uint32_t bitset_size = bistset_required_size(max_subtangle_size);
 
   uint64_t visited_raw_bits[bitset_size];
   bitset_t visited_txs_bitset = {.raw_bits = visited_raw_bits,
