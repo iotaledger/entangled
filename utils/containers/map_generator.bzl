@@ -49,6 +49,7 @@ def map_generate(key_type, value_type):
             "//common:errors",
             "@com_github_uthash//:uthash",
             "//common/trinary:flex_trit",
+            "//utils/containers:person_example",
         ],
         visibility = ["//visibility:public"],
     )

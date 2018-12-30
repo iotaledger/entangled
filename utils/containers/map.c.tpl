@@ -20,8 +20,8 @@ retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_add({KEY_TYPE}_to_{VALUE_TYPE}_map_t *c
     return RC_UTILS_OOM;
   }
 
-  map_entry->key = *key;
-  map_entry->value = value;
+  memcpy(&map_entry->key,key, sizeof({KEY_TYPE}));
+  memcpy(&map_entry->value,&value, sizeof({VALUE_TYPE}));
   HASH_ADD(hh, *map, key, sizeof({KEY_TYPE}), map_entry);
   return RC_OK;
 }

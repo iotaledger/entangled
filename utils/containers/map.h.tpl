@@ -5,17 +5,24 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __UTILS_CONTAINERS_{KEY_TYPE }_{VALUE_TYPE }_MAP_H__
-#define __UTILS_CONTAINERS_ {KEY_TYPE}_{VALUE_TYPE}_MAP_H__
+#ifndef __UTILS_CONTAINERS_{KEY_TYPE}_{VALUE_TYPE}_MAP_H__
+#define __UTILS_CONTAINERS_{KEY_TYPE}_{VALUE_TYPE}_MAP_H__
 
 #include <stdbool.h>
 #include "uthash.h"
 #include "common/errors.h"
 
 
+//INCLUDE HERE FILES FOR ADDITIONAL TYPES SUPPORT
+#include "utils/containers/person_example.h"
+
+
 /*
  * This Generic map allows mapping any key type to any value type
- * assuming that key can be trivially copied
+ * assuming that key can be trivially copied, to allow for
+ * user-defined types, user should add dependency in "map_generator.bzl"
+ * and include the required files in this header file
+ *
  */
 
 #ifdef __cplusplus
