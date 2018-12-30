@@ -40,6 +40,11 @@ extern retcode_t cw_rating_calculate_dfs(
     cw_rating_calculator_t const *const cw_calc, tangle_t *const tangle,
     flex_trit_t *entry_point, cw_calc_result *out);
 
+extern retcode_t cw_rating_calculate_dfs_ratings_from_approvers_map(
+    cw_rating_calculator_t const *const cw_calc, flex_trit_t *entry_point,
+    hash_to_indexed_hash_set_map_t const tx_to_approvers,
+    hash_to_int64_t_map_t *const cw_ratings, bool skip_entry_point_rating);
+
 static cw_calculator_vtable cw_topological_vtable = {
     .cw_rating_calculate = cw_rating_calculate_dfs,
 };
