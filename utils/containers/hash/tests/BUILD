@@ -1,6 +1,7 @@
 cc_library(
     name = "defs",
     hdrs = ["defs.h"],
+    visibility = ["//visibility:public"],
 )
 
 cc_test(
