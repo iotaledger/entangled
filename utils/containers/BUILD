@@ -14,11 +14,6 @@ cc_library(
 )
 
 map_generate(
-    key_type = "double",
-    value_type = "double",
-)
-
-map_generate(
     key_type = "person_example_t",
     value_type = "int",
 )
