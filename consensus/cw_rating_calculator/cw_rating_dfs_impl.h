@@ -41,7 +41,7 @@ extern retcode_t cw_rating_calculate_dfs(
     flex_trit_t *entry_point, cw_calc_result *out);
 
 extern retcode_t cw_rating_calculate_dfs_ratings_from_approvers_map(
-    cw_rating_calculator_t const *const cw_calc, flex_trit_t *entry_point,
+    size_t max_subtangle_size,
     hash_to_indexed_hash_set_map_t const tx_to_approvers,
     hash_to_int64_t_map_t *const cw_ratings, bool skip_entry_point_rating);
 

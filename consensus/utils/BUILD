@@ -11,3 +11,13 @@ cc_library(
         "//utils/containers/hash:hash243_stack",
     ],
 )
+
+cc_library(
+    name = "tangle_simulator",
+    srcs = ["tangle_simulator.c"],
+    hdrs = ["tangle_simulator.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//consensus/cw_rating_calculator",
+    ],
+)
