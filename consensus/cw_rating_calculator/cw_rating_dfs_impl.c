@@ -69,7 +69,26 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc,
     return RC_OK;
   }
 
-  bitset_size = bistset_required_size(max_subtangle_size);
+  return cw_rating_calculate_dfs_ratings_from_approvers_map(
+      cw_calc, entry_point, out->tx_to_approvers, &out->cw_ratings, true);
+}
+
+retcode_t cw_rating_calculate_dfs_ratings_from_approvers_map(
+    cw_rating_calculator_t const *const cw_calc, flex_trit_t *entry_point,
+    hash_to_indexed_hash_set_map_t const tx_to_approvers,
+    hash_to_int64_t_map_t *const cw_ratings, bool skip_entry_point_rating) {
+  retcode_t res;
+  uint64_t sub_tangle_size;
+  hash_to_indexed_hash_set_entry_t *curr_hash_to_approvers_entry = NULL;
+  hash_to_indexed_hash_set_entry_t *tmp_hash_to_approvers_entry = NULL;
+  uint64_t bitset_size;
+
+  hash_to_indexed_hash_set_map_find(&tx_to_approvers, entry_point,
+                                    &curr_hash_to_approvers_entry);
+
+  bitset_size = bistset_required_size(
+      hash243_set_size(&curr_hash_to_approvers_entry->approvers));
+
   uint64_t visited_raw_bits[bitset_size];
   bitset_t visited_txs_bitset = {.raw_bits = visited_raw_bits,
                                  .bitset_integer_index = 0,
@@ -77,7 +96,7 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc,
                                  .size = bitset_size};
 
   flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
-  HASH_ITER(hh, out->tx_to_approvers, curr_hash_to_approvers_entry,
+  HASH_ITER(hh, tx_to_approvers, curr_hash_to_approvers_entry,
             tmp_hash_to_approvers_entry) {
     if (curr_hash_to_approvers_entry->idx == 0) {
       continue;
@@ -85,7 +104,7 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc,
 
     bitset_reset(&visited_txs_bitset);
     memcpy(curr_hash, curr_hash_to_approvers_entry->hash, FLEX_TRIT_SIZE_243);
-    if ((res = cw_rating_dfs_do_dfs_light(out->tx_to_approvers, curr_hash,
+    if ((res = cw_rating_dfs_do_dfs_light(tx_to_approvers, curr_hash,
                                           &visited_txs_bitset,
                                           &sub_tangle_size)) != RC_OK) {
       log_error(logger_id, "Failed in light DFS, error code is: %" PRIu64 "\n",
@@ -93,7 +112,7 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc,
       return RC_CONSENSUS_CW_FAILED_IN_LIGHT_DFS;
     }
 
-    if ((res = hash_to_int64_t_map_add(&out->cw_ratings, curr_hash,
+    if ((res = hash_to_int64_t_map_add(cw_ratings, curr_hash,
                                        sub_tangle_size))) {
       log_error(logger_id, "Failed in light DFS, error code is: %" PRIu64 "\n",
                 res);
