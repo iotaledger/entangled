@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -6,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <search.h>
+
 #include "utils/containers/{KEY_TYPE}_to_{VALUE_TYPE}_map.h"
 
 retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_add({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
