@@ -223,11 +223,9 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash,
     lock_handle_unlock(&ts->lock);
     return ret;
   } else if (pack->num_loaded == 0) {
-    if (memcmp(hash, ts->conf->genesis_hash, FLEX_TRIT_SIZE_243) != 0) {
-      params->is_solid = false;
-      return request_transaction(ts->transaction_requester, tangle, hash,
-                                 params->is_milestone);
-    }
+    params->is_solid = false;
+    return request_transaction(ts->transaction_requester, tangle, hash,
+                               params->is_milestone);
   }
 
   return RC_OK;
