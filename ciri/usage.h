@@ -44,6 +44,12 @@ typedef enum cli_arg_value_e {
   CONF_SNAPSHOT_SIGNATURE_PUBKEY,
   CONF_SNAPSHOT_TIMESTAMP,
 
+  // Perceptive node configurartion
+  CONF_PERCEPTIVE_NODE_ENABLE,
+  CONF_PERCEPTIVE_NODE_INTERVAL,
+  CONF_PERCEPTIVE_NODE_SEQUENCE_SIZE,
+  CONF_PERCEPTIVE_NODE_TEST_SAMPLE_SIZE,
+
 } cli_arg_value_t;
 
 typedef enum cli_arg_requirement_e {
@@ -121,12 +127,24 @@ static struct cli_argument_s {
      REQUIRED_ARG},
     {"port", 'p', "HTTP API listen port.", REQUIRED_ARG},
 
+    // Perceptive node configuration
+    {"perceptive_node_enable", CONF_PERCEPTIVE_NODE_ENABLE,
+     "Should perceptive node monitoring be enabled", REQUIRED_ARG},
+    {"perceptive_node_interval", CONF_PERCEPTIVE_NODE_INTERVAL,
+     "Perceptive node monitoring interval in seconds", REQUIRED_ARG},
+    {"perceptive_node_test_sample_size", CONF_PERCEPTIVE_NODE_TEST_SAMPLE_SIZE,
+     "Sample size of generated distribution for testing transactions quality",
+     REQUIRED_ARG},
+    {"perceptive_node_sequence_size", CONF_PERCEPTIVE_NODE_SEQUENCE_SIZE,
+     "The tested transactions sequence size", REQUIRED_ARG},
+
     // Consensus configuration
 
     {"alpha", CONF_ALPHA,
      "Randomness of the tip selection. Value must be in [0, inf] where 0 is "
      "most random and inf is most deterministic.",
      REQUIRED_ARG},
+
     {"below-max-depth", CONF_BELOW_MAX_DEPTH,
      "Maximum number of unconfirmed transactions that may be analysed to find "
      "the latest referenced milestone by the currently visited transaction "
@@ -161,7 +179,8 @@ static struct cli_argument_s {
      "Public key of the snapshot signature.", REQUIRED_ARG},
     {"snapshot-timestamp", CONF_SNAPSHOT_TIMESTAMP,
      "Epoch time of the last snapshot.", REQUIRED_ARG},
-    {NULL, 0, NULL, NO_ARG}};
+    {NULL, 0, NULL, NO_ARG},
+};
 
 static char* short_options = "hl:d:n:t:u:p:";
 

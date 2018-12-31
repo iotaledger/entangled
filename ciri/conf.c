@@ -69,11 +69,12 @@ static int get_conf_key(char const* const key) {
   return cli_arguments_g[i].val;
 }
 
-static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf,
-                                iota_consensus_conf_t* const consensus_conf,
-                                iota_gossip_conf_t* const gossip_conf,
-                                iota_api_conf_t* const api_conf, int const key,
-                                char const* const value) {
+static retcode_t set_conf_value(
+    iota_ciri_conf_t* const ciri_conf,
+    iota_consensus_conf_t* const consensus_conf,
+    iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf,
+    iota_perceptive_node_conf_t* perceptive_node_conf, int const key,
+    char const* const value) {
   retcode_t ret = RC_OK;
 
   switch (key) {
@@ -188,6 +189,23 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf,
       consensus_conf->snapshot_timestamp_sec = atoi(value);
       break;
 
+      // Perceptive node configuration
+
+    case CONF_PERCEPTIVE_NODE_ENABLE:
+      perceptive_node_conf->is_enabled = (strcmp("true", value) == 0);
+      break;
+
+    case CONF_PERCEPTIVE_NODE_INTERVAL:
+      perceptive_node_conf->monitoring_interval_seconds = atoi(value);
+      break;
+    case CONF_PERCEPTIVE_NODE_TEST_SAMPLE_SIZE:
+      perceptive_node_conf->test_sample_size = atoi(value);
+      break;
+
+    case CONF_PERCEPTIVE_NODE_SEQUENCE_SIZE:
+      perceptive_node_conf->monitored_transactions_sequence_size = atoi(value);
+      break;
+
     default:
       iota_usage();
       return RC_CIRI_CONF_INVALID_ARGUMENTS;
@@ -200,13 +218,15 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf,
  * Public functions
  */
 
-retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf,
-                                 iota_consensus_conf_t* const consensus_conf,
-                                 iota_gossip_conf_t* const gossip_conf,
-                                 iota_api_conf_t* const api_conf) {
+retcode_t iota_ciri_conf_default(
+    iota_ciri_conf_t* const ciri_conf,
+    iota_consensus_conf_t* const consensus_conf,
+    iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf,
+    iota_perceptive_node_conf_t* const perceptive_node_conf) {
   retcode_t ret = RC_OK;
 
-  if (ciri_conf == NULL || gossip_conf == NULL || consensus_conf == NULL) {
+  if (ciri_conf == NULL || gossip_conf == NULL || consensus_conf == NULL ||
+      perceptive_node_conf == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -216,6 +236,8 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf,
           sizeof(consensus_conf->db_path));
   strncpy(gossip_conf->db_path, DEFAULT_DB_PATH, sizeof(gossip_conf->db_path));
   strncpy(api_conf->db_path, DEFAULT_DB_PATH, sizeof(api_conf->db_path));
+  strncpy(perceptive_node_conf->db_path, DEFAULT_DB_PATH,
+          sizeof(perceptive_node_conf->db_path));
 
   if ((ret = iota_consensus_conf_init(consensus_conf)) != RC_OK) {
     return ret;
@@ -229,13 +251,18 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf,
     return ret;
   }
 
+  if ((ret = iota_perceptive_node_conf_init(perceptive_node_conf)) != RC_OK) {
+    return ret;
+  }
+
   return ret;
 }
 
-retcode_t iota_ciri_conf_file(iota_ciri_conf_t* const ciri_conf,
-                              iota_consensus_conf_t* const consensus_conf,
-                              iota_gossip_conf_t* const gossip_conf,
-                              iota_api_conf_t* const api_conf) {
+retcode_t iota_ciri_conf_file(
+    iota_ciri_conf_t* const ciri_conf,
+    iota_consensus_conf_t* const consensus_conf,
+    iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf,
+    iota_perceptive_node_conf_t* const perceptive_node_conf) {
   retcode_t ret = RC_OK;
   yaml_parser_t parser;
   yaml_token_t token;
@@ -274,7 +301,8 @@ retcode_t iota_ciri_conf_file(iota_ciri_conf_t* const ciri_conf,
           key = get_conf_key(arg);
         } else {  // Value
           if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf,
-                                    api_conf, key, arg) != RC_OK)) {
+                                    api_conf, perceptive_node_conf, key,
+                                    arg) != RC_OK)) {
             goto done;
           }
         }
@@ -294,11 +322,12 @@ done:
   return ret;
 }
 
-retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
-                             iota_consensus_conf_t* const consensus_conf,
-                             iota_gossip_conf_t* const gossip_conf,
-                             iota_api_conf_t* const api_conf, int argc,
-                             char** argv) {
+retcode_t iota_ciri_conf_cli(
+    iota_ciri_conf_t* const ciri_conf,
+    iota_consensus_conf_t* const consensus_conf,
+    iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf,
+    iota_perceptive_node_conf_t* const perceptive_node_conf, int argc,
+    char** argv) {
   int key;
   retcode_t ret = RC_OK;
   struct option* long_options = build_options();
@@ -306,7 +335,7 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
   while ((key = getopt_long(argc, argv, short_options, long_options, NULL)) !=
          -1) {
     if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf,
-                              key, optarg) != RC_OK)) {
+                              perceptive_node_conf, key, optarg) != RC_OK)) {
       break;
     }
   }

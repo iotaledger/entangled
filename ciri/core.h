@@ -10,6 +10,7 @@
 
 #include "ciri/api/api.h"
 #include "ciri/conf.h"
+#include "ciri/perceptive_node/perceptive_node.h"
 #include "consensus/consensus.h"
 #include "gossip/components/transaction_requester.h"
 #include "gossip/node.h"
@@ -24,6 +25,7 @@ typedef struct core_s {
   iota_consensus_t consensus;
   iota_node_t node;
   iota_api_t api;
+  iota_perceptive_node_t perceptive_node;
 } core_t;
 
 /**
