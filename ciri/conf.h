@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 #include "ciri/api/conf.h"
+#include "ciri/perceptive_node/conf.h"
 #include "common/errors.h"
 #include "consensus/conf.h"
 #include "gossip/conf.h"
@@ -41,13 +42,15 @@ typedef struct iota_ciri_conf_s {
  * @param consensus_conf Consensus configuration variables
  * @param gossip_conf Gossip configuration variables
  * @param api_conf API configuration variables
+ * @param perceptive_node_conf Perceptive Node configuration variables
  *
  * @return a status code
  */
-retcode_t iota_ciri_conf_default(iota_ciri_conf_t *const ciri_conf,
-                                 iota_consensus_conf_t *const consensus_conf,
-                                 iota_gossip_conf_t *const gossip_conf,
-                                 iota_api_conf_t *const api_conf);
+retcode_t iota_ciri_conf_default(
+    iota_ciri_conf_t *const ciri_conf,
+    iota_consensus_conf_t *const consensus_conf,
+    iota_gossip_conf_t *const gossip_conf, iota_api_conf_t *const api_conf,
+    iota_perceptive_node_conf_t *const perceptive_node_conf);
 
 /**
  * Initializes configurations with values from file
@@ -57,13 +60,15 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t *const ciri_conf,
  * @param consensus_conf Consensus configuration variables
  * @param gossip_conf Gossip configuration variables
  * @param api_conf API configuration variables
+ * @param perceptive_node_conf Perceptive Node configuration variables
  *
  * @return a status code
  */
-retcode_t iota_ciri_conf_file(iota_ciri_conf_t *const ciri_conf,
-                              iota_consensus_conf_t *const consensus_conf,
-                              iota_gossip_conf_t *const gossip_conf,
-                              iota_api_conf_t *const api_conf);
+retcode_t iota_ciri_conf_file(
+    iota_ciri_conf_t *const ciri_conf,
+    iota_consensus_conf_t *const consensus_conf,
+    iota_gossip_conf_t *const gossip_conf, iota_api_conf_t *const api_conf,
+    iota_perceptive_node_conf_t *const perceptive_node_conf);
 
 /**
  * Initializes configurations with values from CLI
@@ -74,14 +79,16 @@ retcode_t iota_ciri_conf_file(iota_ciri_conf_t *const ciri_conf,
  * @param gossip_conf Gossip configuration variables
  * @param argc Number of arguments of the CLI
  * @param argv Arguments of the CLI
+ * @param perceptive_node_conf Perceptive Node configuration variables
  *
  * @return a status code
  */
-retcode_t iota_ciri_conf_cli(iota_ciri_conf_t *const ciri_conf,
-                             iota_consensus_conf_t *const consensus_conf,
-                             iota_gossip_conf_t *const gossip_conf,
-                             iota_api_conf_t *const api_conf, int argc,
-                             char **argv);
+retcode_t iota_ciri_conf_cli(
+    iota_ciri_conf_t *const ciri_conf,
+    iota_consensus_conf_t *const consensus_conf,
+    iota_gossip_conf_t *const gossip_conf, iota_api_conf_t *const api_conf,
+    iota_perceptive_node_conf_t *const perceptive_node_conf, int argc,
+    char **argv);
 
 #ifdef __cplusplus
 }

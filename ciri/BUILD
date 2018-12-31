@@ -24,6 +24,7 @@ cc_library(
     deps = [
         ":conf",
         "//ciri/api",
+        "//ciri/perceptive_node",
         "//consensus",
         "//gossip:node_shared",
     ],
@@ -56,6 +57,7 @@ cc_library(
     deps = [
         ":usage",
         "//ciri/api:conf",
+        "//ciri/perceptive_node:conf",
         "//common:errors",
         "//consensus:conf",
         "//gossip:conf",

@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "ciri/core.h"
+#include "ciri/perceptive_node/perceptive_node.h"
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 
@@ -33,22 +34,24 @@ int main(int argc, char* argv[]) {
   // Default configuration
 
   if (iota_ciri_conf_default(&core_g.conf, &core_g.consensus.conf,
-                             &core_g.node.conf, &core_g.api.conf) != RC_OK) {
+                             &core_g.node.conf, &core_g.api.conf,
+                             &core_g.perceptive_node.conf) != RC_OK) {
     return EXIT_FAILURE;
   }
 
   // File configuration
 
   if (iota_ciri_conf_file(&core_g.conf, &core_g.consensus.conf,
-                          &core_g.node.conf, &core_g.api.conf) != RC_OK) {
+                          &core_g.node.conf, &core_g.api.conf,
+                          &core_g.perceptive_node.conf) != RC_OK) {
     return EXIT_FAILURE;
   }
 
   // CLI configuration
 
   if (iota_ciri_conf_cli(&core_g.conf, &core_g.consensus.conf,
-                         &core_g.node.conf, &core_g.api.conf, argc,
-                         argv) != RC_OK) {
+                         &core_g.node.conf, &core_g.api.conf,
+                         &core_g.perceptive_node.conf, argc, argv) != RC_OK) {
     return EXIT_FAILURE;
   }
 

@@ -41,10 +41,19 @@ retcode_t core_init(core_t* const core, tangle_t* const tangle) {
     return RC_CORE_FAILED_API_INIT;
   }
 
-  return RC_OK;
+  if (core->perceptive_node.conf.is_enabled) {
+    log_info(CORE_LOGGER_ID, "Initializing Perceptive Node\n");
+    if (iota_perceptive_node_init(&core->perceptive_node, &core->consensus) !=
+        RC_OK) {
+      log_critical(CORE_LOGGER_ID, "Initializing Perceptive Node failed\n");
+      return RC_PERCEPTIVE_NODE_FAILED_INIT;
+    }
+
+    return RC_OK;
+  }
 }
 
-retcode_t core_start(core_t* const core, tangle_t* const tangle) {
+retcode_t core_start(core_t *const core, tangle_t *const tangle) {
   if (core == NULL) {
     return RC_CORE_NULL_CORE;
   }
@@ -67,12 +76,20 @@ retcode_t core_start(core_t* const core, tangle_t* const tangle) {
     return RC_CORE_FAILED_API_START;
   }
 
+  if (core->perceptive_node.conf.is_enabled) {
+    log_info(CORE_LOGGER_ID, "Starting Perceptive Node\n");
+    if (iota_perceptive_node_start(&core->perceptive_node) != RC_OK) {
+      log_critical(CORE_LOGGER_ID, "Starting Perceptive Node failed\n");
+      return RC_PERCEPTIVE_NODE_FAILED_START;
+    }
+  }
+
   core->running = true;
 
   return RC_OK;
 }
 
-retcode_t core_stop(core_t* const core) {
+retcode_t core_stop(core_t *const core) {
   retcode_t ret = RC_OK;
 
   if (core == NULL) {
@@ -101,10 +118,18 @@ retcode_t core_stop(core_t* const core) {
     return RC_CORE_FAILED_CONSENSUS_STOP;
   }
 
+  if (core->perceptive_node.conf.is_enabled) {
+    log_info(CORE_LOGGER_ID, "Stopping perceptive node\n");
+    if (iota_perceptive_node_stop(&core->perceptive_node) != RC_OK) {
+      log_critical(CORE_LOGGER_ID, "Stopping Perceptive Node failed\n");
+      return RC_PERCEPTIVE_NODE_FAILED_STOP;
+    }
+  }
+
   return ret;
 }
 
-retcode_t core_destroy(core_t* const core) {
+retcode_t core_destroy(core_t *const core) {
   retcode_t ret = RC_OK;
 
   if (core == NULL) {
@@ -131,6 +156,13 @@ retcode_t core_destroy(core_t* const core) {
     ret = RC_CORE_FAILED_CONSENSUS_DESTROY;
   }
 
+  if (core->perceptive_node.conf.is_enabled) {
+    log_info(CORE_LOGGER_ID, "Destroying Perceptive Node\n");
+    if (iota_perceptive_node_destroy(&core->perceptive_node) != RC_OK) {
+      log_critical(CORE_LOGGER_ID, "Destroying Perceptive Node failed\n");
+      ret = RC_PERCEPTIVE_NODE_FAILED_DESTROY;
+    }
+  }
+
   logger_helper_release(logger_id);
-  return ret;
 }
