@@ -24,6 +24,8 @@
 #include "utils/time.h"
 
 #define MILESTONE_TRACKER_LOGGER_ID "milestone_tracker"
+#define MILESTONE_VALIDATION_INTERVAL 10uLL
+#define SOLID_MILESTONE_RESCAN_INTERVAL 5000uLL
 
 static retcode_t validate_coordinator(milestone_tracker_t* const mt,
                                       iota_milestone_t* const candidate,
@@ -277,7 +279,6 @@ static retcode_t update_latest_solid_subtangle_milestone(
 
 static void* milestone_solidifier(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
-  uint64_t scan_time = 0;
   uint64_t previous_solid_subtangle_latest_milestone_index = 0;
   connection_config_t db_conf = {.db_path = mt->conf->db_path};
   tangle_t tangle;
@@ -295,7 +296,6 @@ static void* milestone_solidifier(void* arg) {
   while (mt->running) {
     log_debug(MILESTONE_TRACKER_LOGGER_ID,
               "Scanning for latest solid subtangle milestone\n");
-    scan_time = current_timestamp_ms();
     previous_solid_subtangle_latest_milestone_index =
         mt->latest_solid_subtangle_milestone_index;
     if (mt->latest_solid_subtangle_milestone_index <
@@ -307,15 +307,14 @@ static void* milestone_solidifier(void* arg) {
     }
     if (previous_solid_subtangle_latest_milestone_index !=
         mt->latest_solid_subtangle_milestone_index) {
-      // TODO messageQ publish lmsi/lmhs
       log_info(MILESTONE_TRACKER_LOGGER_ID,
                "Latest solid subtangle milestone has changed from #%" PRIu64
                " to #%" PRIu64 "\n",
                previous_solid_subtangle_latest_milestone_index,
                mt->latest_solid_subtangle_milestone_index);
+      continue;
     }
-    sleep_ms(MAX(1, SOLID_MILESTONE_RESCAN_INTERVAL -
-                        (current_timestamp_ms() - scan_time)));
+    sleep_ms(SOLID_MILESTONE_RESCAN_INTERVAL);
   }
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
