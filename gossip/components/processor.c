@@ -79,8 +79,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
   // Validates the transaction
   if (!iota_consensus_transaction_validate(processor->transaction_validator,
                                            &transaction)) {
-    log_warning(PROCESSOR_LOGGER_ID, "Invalid transaction\n");
-    ret = RC_PROCESSOR_INVALID_TRANSACTION;
+    log_debug(PROCESSOR_LOGGER_ID, "Invalid transaction\n");
     goto failure;
   }
 

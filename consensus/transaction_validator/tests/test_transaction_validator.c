@@ -31,7 +31,7 @@ void transaction_invalid_value() {
   conf.snapshot_timestamp_sec = transaction_attachment_timestamp(tx1) / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
   transaction_set_value(tx1, -IOTA_SUPPLY - 1);
-  TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
+  TEST_ASSERT_FALSE(iota_consensus_transaction_validate(&tv, tx1));
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
   transaction_free(tx1);
@@ -50,7 +50,7 @@ void transaction_invalid_hash() {
   conf.snapshot_timestamp_sec = transaction_attachment_timestamp(tx1) / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
   tx1->consensus.hash[FLEX_TRIT_SIZE_243 - 1] = tx1->consensus.hash[0];
-  TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
+  TEST_ASSERT_FALSE(iota_consensus_transaction_validate(&tv, tx1));
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
   transaction_free(tx1);
@@ -70,7 +70,7 @@ void transaction_invalid_attachment_timestamp_too_futuristic() {
   transaction_validator_t tv;
   conf.snapshot_timestamp_sec = 0;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
-  TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
+  TEST_ASSERT_FALSE(iota_consensus_transaction_validate(&tv, tx1));
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
   transaction_free(tx1);
@@ -89,7 +89,7 @@ void transaction_invalid_attachment_timestamp_too_old() {
   conf.snapshot_timestamp_sec = current_timestamp_ms() / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
   tx1->consensus.hash[FLEX_TRIT_SIZE_243 - 1] = tx1->consensus.hash[0];
-  TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
+  TEST_ASSERT_FALSE(iota_consensus_transaction_validate(&tv, tx1));
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
   transaction_free(tx1);
@@ -109,7 +109,7 @@ void transaction_invalid_value_tx_wrong_address() {
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
   transaction_address(tx1)[FLEX_TRIT_SIZE_243 - 1] =
       transaction_address(tx1)[4];
-  TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
+  TEST_ASSERT_FALSE(iota_consensus_transaction_validate(&tv, tx1));
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
   transaction_free(tx1);
@@ -129,7 +129,7 @@ void transaction_invalid_timestamp_too_futuristic() {
   transaction_validator_t tv;
   conf.snapshot_timestamp_sec = 0;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
-  TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
+  TEST_ASSERT_FALSE(iota_consensus_transaction_validate(&tv, tx1));
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
   transaction_free(tx1);
@@ -150,7 +150,7 @@ void transaction_invalid_timestamp_too_old() {
   transaction_validator_t tv;
   conf.snapshot_timestamp_sec = current_time / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
-  TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1) == false);
+  TEST_ASSERT_FALSE(iota_consensus_transaction_validate(&tv, tx1));
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
   transaction_free(tx1);
@@ -168,7 +168,7 @@ void transaction_is_valid() {
   transaction_validator_t tv;
   conf.snapshot_timestamp_sec = transaction_attachment_timestamp(tx1) / 1000;
   TEST_ASSERT(iota_consensus_transaction_validator_init(&tv, &conf) == RC_OK);
-  TEST_ASSERT(iota_consensus_transaction_validate(&tv, tx1));
+  TEST_ASSERT_TRUE(iota_consensus_transaction_validate(&tv, tx1));
 
   TEST_ASSERT(iota_consensus_transaction_validator_destroy(&tv) == RC_OK);
   transaction_free(tx1);
