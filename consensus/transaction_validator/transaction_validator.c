@@ -50,19 +50,20 @@ retcode_t iota_consensus_transaction_validator_destroy(
 bool iota_consensus_transaction_validate(
     transaction_validator_t* const tv, iota_transaction_t* const transaction) {
   if (transaction_weight_magnitude(transaction) < tv->conf->mwm) {
-    log_error(TRANSACTION_VALIDATOR_LOGGER_ID,
-              "Validation failed, Invalid hash\n");
+    log_debug(TRANSACTION_VALIDATOR_LOGGER_ID,
+              "Validation failed, invalid weight magnitude\n");
     return false;
   }
 
   if (has_invalid_timestamp(tv, transaction)) {
-    log_error(TRANSACTION_VALIDATOR_LOGGER_ID,
-              "Validation failed, Invalid timestamp\n");
+    log_debug(TRANSACTION_VALIDATOR_LOGGER_ID,
+              "Validation failed, invalid timestamp\n");
     return false;
   }
+
   if (llabs(transaction_value(transaction)) > IOTA_SUPPLY) {
-    log_error(TRANSACTION_VALIDATOR_LOGGER_ID,
-              "Validation failed, Invalid value\n");
+    log_debug(TRANSACTION_VALIDATOR_LOGGER_ID,
+              "Validation failed, invalid value\n");
     return false;
   }
 
@@ -72,8 +73,8 @@ bool iota_consensus_transaction_validate(
                       NUM_TRITS_PER_FLEX_TRIT, NUM_TRITS_PER_FLEX_TRIT);
   if (transaction_value(transaction) != 0 &&
       buffer[NUM_TRITS_PER_FLEX_TRIT - 1] != 0) {
-    log_error(TRANSACTION_VALIDATOR_LOGGER_ID,
-              "Validation failed, Invalid address for value transaction\n");
+    log_debug(TRANSACTION_VALIDATOR_LOGGER_ID,
+              "Validation failed, invalid address for value transaction\n");
     return false;
   }
 

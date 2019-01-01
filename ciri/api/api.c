@@ -371,12 +371,13 @@ retcode_t iota_api_broadcast_transactions(
 
   HASH_ARRAY_FOREACH(req->trytes, elt) {
     transaction_deserialize_from_trits(&tx, elt, true);
-    if (iota_consensus_transaction_validate(
+    if (!iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
-      // TODO priority queue on weight_magnitude
-      if ((ret = broadcaster_on_next(&api->node->broadcaster, elt)) != RC_OK) {
-        return ret;
-      }
+      continue;
+    }
+    // TODO priority queue on weight_magnitude
+    if ((ret = broadcaster_on_next(&api->node->broadcaster, elt)) != RC_OK) {
+      return ret;
     }
   }
 
@@ -397,27 +398,28 @@ retcode_t iota_api_store_transactions(
 
   HASH_ARRAY_FOREACH(req->trytes, elt) {
     transaction_deserialize_from_trits(&tx, elt, true);
-    if (iota_consensus_transaction_validate(
+    if (!iota_consensus_transaction_validate(
             &api->consensus->transaction_validator, &tx)) {
-      if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH,
-                                               transaction_hash(&tx),
-                                               &exists)) != RC_OK) {
-        return ret;
-      }
-      if (!exists) {
-        // NOTE Concurrency needs to be taken care of
-        if ((ret = iota_tangle_transaction_store(tangle, &tx)) != RC_OK) {
-          return ret;
-        }
-        if ((ret = iota_consensus_transaction_solidifier_update_status(
-                 &api->consensus->transaction_solidifier, tangle, &tx)) !=
-            RC_OK) {
-          log_warning(API_LOGGER_ID, "Updating transaction status failed\n");
-          return ret;
-        }
-        // TODO store metadata: arrival_time, status, sender (#407)
-      }
+      continue;
     }
+    if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH,
+                                             transaction_hash(&tx), &exists)) !=
+        RC_OK) {
+      return ret;
+    }
+    if (exists) {
+      continue;
+    }
+    // NOTE Concurrency needs to be taken care of
+    if ((ret = iota_tangle_transaction_store(tangle, &tx)) != RC_OK) {
+      return ret;
+    }
+    if ((ret = iota_consensus_transaction_solidifier_update_status(
+             &api->consensus->transaction_solidifier, tangle, &tx)) != RC_OK) {
+      log_warning(API_LOGGER_ID, "Updating transaction status failed\n");
+      return ret;
+    }
+    // TODO store metadata: arrival_time, status, sender (#407)
   }
 
   return ret;
