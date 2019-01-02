@@ -5,7 +5,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <math.h>
 #include <stdlib.h>
 
 #include "consensus/transaction_validator/transaction_validator.h"
@@ -14,67 +13,93 @@
 
 #define TRANSACTION_VALIDATOR_LOGGER_ID "transaction_validator"
 
-static size_t MAX_TIMESTAMP_FUTURE_MS = 2 * 60 * 60 * 1000;
+static uint64_t MAX_TIMESTAMP_FUTURE_MS = 2 * 60 * 60 * 1000;
 
-static bool has_invalid_timestamp(transaction_validator_t* const tv,
-                                  iota_transaction_t* const transaction) {
-  uint64_t max_future_timestamp_ms =
-      current_timestamp_ms() + MAX_TIMESTAMP_FUTURE_MS;
-  if (transaction_attachment_timestamp(transaction) == 0) {
-    return (transaction_timestamp(transaction) <
-                tv->conf->snapshot_timestamp_sec &&
-            memcmp(tv->conf->genesis_hash, transaction_hash(transaction),
-                   FLEX_TRIT_SIZE_243)) ||
-           transaction_timestamp(transaction) * 1000 > max_future_timestamp_ms;
+/*
+ * Private functions
+ */
+
+/**
+ * Checks if the timestamp of the transaction is below the last global snapshot
+ * time or more than MAX_TIMESTAMP_FUTURE_MS milliseconds in the future, then
+ * being invalid.
+ * First, the attachment timestamp (set after performing PoW) is checked, and
+ * if not available the regular timestamp is checked.
+ * Genesis transaction will always be valid.
+ *
+ * @param tv Transaction validator
+ * @param transaction Transaction under test
+ *
+ * @returns true if timestamp is invalid, false otherwise
+ */
+static bool has_invalid_timestamp(transaction_validator_t const* const tv,
+                                  iota_transaction_t const* const transaction) {
+  uint64_t timestamp_ms = transaction_attachment_timestamp(transaction) == 0
+                              ? transaction_timestamp(transaction) * 1000UL
+                              : transaction_attachment_timestamp(transaction);
+  bool is_too_futuristic =
+      timestamp_ms > (current_timestamp_ms() + MAX_TIMESTAMP_FUTURE_MS);
+  bool is_below_snapshot =
+      timestamp_ms < tv->conf->snapshot_timestamp_sec * 1000UL;
+
+  if (is_too_futuristic) {
+    return true;
   }
 
-  return transaction_attachment_timestamp(transaction) <
-             tv->conf->snapshot_timestamp_sec * 1000 ||
-         transaction_attachment_timestamp(transaction) >
-             max_future_timestamp_ms;
+  if (is_below_snapshot) {
+    return memcmp(transaction_hash(transaction), tv->conf->genesis_hash,
+                  FLEX_TRIT_SIZE_243) != 0;
+  }
+
+  return false;
 }
+
+/*
+ * Public functions
+ */
 
 retcode_t iota_consensus_transaction_validator_init(
     transaction_validator_t* const tv, iota_consensus_conf_t* const conf) {
   logger_helper_init(TRANSACTION_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   tv->conf = conf;
+
   return RC_OK;
 }
 
 retcode_t iota_consensus_transaction_validator_destroy(
     transaction_validator_t* const tv) {
+  tv->conf = NULL;
   logger_helper_destroy(TRANSACTION_VALIDATOR_LOGGER_ID);
+
   return RC_OK;
 }
 
 bool iota_consensus_transaction_validate(
-    transaction_validator_t* const tv, iota_transaction_t* const transaction) {
+    transaction_validator_t const* const tv,
+    iota_transaction_t const* const transaction) {
   if (transaction_weight_magnitude(transaction) < tv->conf->mwm) {
     log_debug(TRANSACTION_VALIDATOR_LOGGER_ID,
-              "Validation failed, invalid weight magnitude\n");
+              "Validation failed: insufficient transaction weight\n");
     return false;
   }
 
   if (has_invalid_timestamp(tv, transaction)) {
     log_debug(TRANSACTION_VALIDATOR_LOGGER_ID,
-              "Validation failed, invalid timestamp\n");
+              "Validation failed: invalid timestamp\n");
     return false;
   }
 
   if (llabs(transaction_value(transaction)) > IOTA_SUPPLY) {
     log_debug(TRANSACTION_VALIDATOR_LOGGER_ID,
-              "Validation failed, invalid value\n");
+              "Validation failed: invalid value\n");
     return false;
   }
 
-  trit_t buffer[NUM_TRITS_PER_FLEX_TRIT];
-  flex_trits_to_trits(buffer, NUM_TRITS_PER_FLEX_TRIT,
-                      &transaction->essence.address[FLEX_TRIT_SIZE_243 - 1],
-                      NUM_TRITS_PER_FLEX_TRIT, NUM_TRITS_PER_FLEX_TRIT);
   if (transaction_value(transaction) != 0 &&
-      buffer[NUM_TRITS_PER_FLEX_TRIT - 1] != 0) {
+      flex_trits_at(transaction_address(transaction), NUM_TRITS_ADDRESS,
+                    NUM_TRITS_ADDRESS - 1) != 0) {
     log_debug(TRANSACTION_VALIDATOR_LOGGER_ID,
-              "Validation failed, invalid address for value transaction\n");
+              "Validation failed: invalid address for value transaction\n");
     return false;
   }
 
