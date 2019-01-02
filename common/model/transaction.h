@@ -79,11 +79,11 @@ typedef struct iota_transaction_fields_attachment_s {
   // 81 trytes = 243 trits
   flex_trit_t branch[FLEX_TRIT_SIZE_243];
   // 9 trytes = 27 trits
-  int64_t attachment_timestamp;
+  uint64_t attachment_timestamp;
   // 9 trytes = 27 trits
-  int64_t attachment_timestamp_lower;
+  uint64_t attachment_timestamp_lower;
   // 9 trytes = 27 trits
-  int64_t attachment_timestamp_upper;
+  uint64_t attachment_timestamp_upper;
   // 27 trytes = 81 trits
   flex_trit_t nonce[FLEX_TRIT_SIZE_81];
   // 27 trytes = 81 trits
@@ -103,7 +103,7 @@ typedef struct iota_transaction_fields_data_s {
 typedef struct iota_transaction_fields_metadata_s {
   uint64_t snapshot_index;
   bool solid;
-  int64_t arrival_timestamp;
+  uint64_t arrival_timestamp;
 } iota_transaction_fields_metadata_t;
 
 typedef struct iota_transaction_s {
@@ -131,9 +131,9 @@ typedef enum _field_mask {
 
 // Get the transaction signature
 static inline flex_trit_t *transaction_signature(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_DATA);
-  return transaction->data.signature_or_message;
+  return (flex_trit_t *)transaction->data.signature_or_message;
 }
 
 // Set the transaction signature (copy argument)
@@ -145,9 +145,9 @@ static inline void transaction_set_signature(
 
 // Get the transaction message
 static inline flex_trit_t *transaction_message(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_DATA);
-  return transaction->data.signature_or_message;
+  return (flex_trit_t *)transaction->data.signature_or_message;
 }
 
 // Set the transaction message (copy argument)
@@ -159,9 +159,9 @@ static inline void transaction_set_message(
 
 // Get the transaction address
 static inline flex_trit_t *transaction_address(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_ESSENCE);
-  return transaction->essence.address;
+  return (flex_trit_t *)transaction->essence.address;
 }
 
 // Set the transaction address (copy argument)
@@ -172,7 +172,8 @@ static inline void transaction_set_address(
 }
 
 // Get the transaction value
-static inline int64_t transaction_value(iota_transaction_t *const transaction) {
+static inline int64_t transaction_value(
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_ESSENCE);
   return transaction->essence.value;
 }
@@ -185,9 +186,9 @@ static inline void transaction_set_value(iota_transaction_t *const transaction,
 
 // Get the transaction obsolete tag
 static inline flex_trit_t *transaction_obsolete_tag(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_ESSENCE);
-  return transaction->essence.obsolete_tag;
+  return (flex_trit_t *)transaction->essence.obsolete_tag;
 }
 
 // Set the transaction obsolete tag
@@ -200,7 +201,7 @@ static inline void transaction_set_obsolete_tag(
 
 // Get the transaction timestamp
 static inline uint64_t transaction_timestamp(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_ESSENCE);
   return transaction->essence.timestamp;
 }
@@ -213,7 +214,7 @@ static inline void transaction_set_timestamp(
 
 // Get the transaction current index
 static inline int64_t transaction_current_index(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_ESSENCE);
   return transaction->essence.current_index;
 }
@@ -226,7 +227,7 @@ static inline void transaction_set_current_index(
 
 // Get the transaction last index
 static inline int64_t transaction_last_index(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   return transaction->essence.last_index;
 }
 
@@ -238,9 +239,9 @@ static inline void transaction_set_last_index(
 
 // Get the transaction bundle
 static inline flex_trit_t *transaction_bundle(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_ESSENCE);
-  return transaction->essence.bundle;
+  return (flex_trit_t *)transaction->essence.bundle;
 }
 
 // Set the transaction bundle (copy argument)
@@ -252,9 +253,9 @@ static inline void transaction_set_bundle(iota_transaction_t *const transaction,
 
 // Get the transaction trunk
 static inline flex_trit_t *transaction_trunk(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_ATTACHMENT);
-  return transaction->attachment.trunk;
+  return (flex_trit_t *)transaction->attachment.trunk;
 }
 
 // Set the transaction trunk (copy argument)
@@ -266,9 +267,9 @@ static inline void transaction_set_trunk(iota_transaction_t *const transaction,
 
 // Get the transaction branch
 static inline flex_trit_t *transaction_branch(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_ATTACHMENT);
-  return transaction->attachment.branch;
+  return (flex_trit_t *)transaction->attachment.branch;
 }
 
 // Set the transaction branch (copy argument)
@@ -280,9 +281,9 @@ static inline void transaction_set_branch(iota_transaction_t *const transaction,
 
 // Get the transaction tag
 static inline flex_trit_t *transaction_tag(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_ATTACHMENT);
-  return transaction->attachment.tag;
+  return (flex_trit_t *)transaction->attachment.tag;
 }
 
 // Set the transaction tag (copy argument)
@@ -292,49 +293,49 @@ static inline void transaction_set_tag(iota_transaction_t *const transaction,
 }
 
 // Get the transaction attachment timestamp
-static inline int64_t transaction_attachment_timestamp(
-    iota_transaction_t *const transaction) {
+static inline uint64_t transaction_attachment_timestamp(
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_ATTACHMENT);
   return transaction->attachment.attachment_timestamp;
 }
 
 // Set the transaction attachment timestamp
 static inline void transaction_set_attachment_timestamp(
-    iota_transaction_t *const transaction, int64_t const timestamp) {
+    iota_transaction_t *const transaction, uint64_t const timestamp) {
   transaction->attachment.attachment_timestamp = timestamp;
 }
 
 // Get the transaction attachment timestamp lower
-static inline int64_t transaction_attachment_timestamp_lower(
-    iota_transaction_t *const transaction) {
+static inline uint64_t transaction_attachment_timestamp_lower(
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_ATTACHMENT);
   return transaction->attachment.attachment_timestamp_lower;
 }
 
 // Set the transaction attachment timestamp lower
 static inline void transaction_set_attachment_timestamp_lower(
-    iota_transaction_t *const transaction, int64_t const timestamp) {
+    iota_transaction_t *const transaction, uint64_t const timestamp) {
   transaction->attachment.attachment_timestamp_lower = timestamp;
 }
 
 // Get the transaction attachment timestamp upper
-static inline int64_t transaction_attachment_timestamp_upper(
-    iota_transaction_t *const transaction) {
+static inline uint64_t transaction_attachment_timestamp_upper(
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_ATTACHMENT);
   return transaction->attachment.attachment_timestamp_upper;
 }
 
 // Set the transaction attachment timestamp upper
 static inline void transaction_set_attachment_timestamp_upper(
-    iota_transaction_t *const transaction, int64_t const timestamp) {
+    iota_transaction_t *const transaction, uint64_t const timestamp) {
   transaction->attachment.attachment_timestamp_upper = timestamp;
 }
 
 // Get the transaction nonce
 static inline flex_trit_t *transaction_nonce(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_ATTACHMENT);
-  return transaction->attachment.nonce;
+  return (flex_trit_t *)transaction->attachment.nonce;
 }
 
 // Set the transaction nonce (copy argument)
@@ -346,9 +347,9 @@ static inline void transaction_set_nonce(iota_transaction_t *const transaction,
 
 // Get the transaction hash
 static inline flex_trit_t *transaction_hash(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_CONSENSUS);
-  return transaction->consensus.hash;
+  return (flex_trit_t *)transaction->consensus.hash;
 }
 
 // Set the transaction hash (copy argument)
@@ -359,7 +360,7 @@ static inline void transaction_set_hash(iota_transaction_t *const transaction,
 }
 
 static inline uint64_t transaction_snapshot_index(
-    iota_transaction_t *const transaction) {
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_METADATA);
   return transaction->metadata.snapshot_index;
 }
@@ -369,7 +370,8 @@ static inline void transaction_set_snapshot_index(
   transaction->metadata.snapshot_index = snapshot_index;
 }
 
-static inline bool transaction_solid(iota_transaction_t *const transaction) {
+static inline bool transaction_solid(
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_METADATA);
   return transaction->metadata.solid;
 }
@@ -380,15 +382,15 @@ static inline void transaction_set_solid(iota_transaction_t *const transaction,
 }
 
 // Get the transaction arrival timestamp
-static inline int64_t transaction_arrival_timestamp(
-    iota_transaction_t *const transaction) {
+static inline uint64_t transaction_arrival_timestamp(
+    iota_transaction_t const *const transaction) {
   assert(transaction->loaded_columns_mask & MASK_METADATA);
   return transaction->metadata.arrival_timestamp;
 }
 
 // Set the transaction arrival timestamp
 static inline void transaction_set_arrival_timestamp(
-    iota_transaction_t *const transaction, int64_t const timestamp) {
+    iota_transaction_t *const transaction, uint64_t const timestamp) {
   transaction->metadata.arrival_timestamp = timestamp;
 }
 
@@ -398,8 +400,8 @@ static inline void transaction_set_arrival_timestamp(
 
 void transaction_reset(iota_transaction_t *const transaction);
 
-extern uint8_t transaction_weight_magnitude(
-    iota_transaction_t *const transaction);
+uint8_t transaction_weight_magnitude(
+    iota_transaction_t const *const transaction);
 
 /***********************************************************************************************************
  * Constructors

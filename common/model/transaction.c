@@ -244,7 +244,8 @@ void transaction_reset(iota_transaction_t *const transaction) {
          sizeof(transaction->consensus.hash));
 }
 
-uint8_t transaction_weight_magnitude(iota_transaction_t *const transaction) {
+uint8_t transaction_weight_magnitude(
+    iota_transaction_t const *const transaction) {
   uint8_t num_trailing_null_values = 0;
   uint8_t pos = FLEX_TRIT_SIZE_243;
 
