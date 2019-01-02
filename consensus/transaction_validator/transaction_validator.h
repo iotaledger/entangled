@@ -48,7 +48,7 @@ retcode_t iota_consensus_transaction_validator_destroy(
 
 /**
  * Runs the following validation checks on a transaction:
- * - Sufficient PoW was performed
+ * - Sufficient weight
  * - Timestamps are above the last global snapshot and not too far in the future
  * - Values are lower than the maximum supply
  * - For value transactions, the address has a 0 as the last trit due to the

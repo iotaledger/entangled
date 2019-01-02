@@ -34,22 +34,24 @@ static uint64_t MAX_TIMESTAMP_FUTURE_MS = 2 * 60 * 60 * 1000;
  */
 static bool has_invalid_timestamp(transaction_validator_t const* const tv,
                                   iota_transaction_t const* const transaction) {
-  uint64_t max_future_timestamp_ms =
-      current_timestamp_ms() + MAX_TIMESTAMP_FUTURE_MS;
+  uint64_t timestamp_ms = transaction_attachment_timestamp(transaction) == 0
+                              ? transaction_timestamp(transaction) * 1000UL
+                              : transaction_attachment_timestamp(transaction);
+  bool is_too_futuristic =
+      timestamp_ms > (current_timestamp_ms() + MAX_TIMESTAMP_FUTURE_MS);
+  bool is_below_snapshot =
+      timestamp_ms < tv->conf->snapshot_timestamp_sec * 1000UL;
 
-  if (transaction_attachment_timestamp(transaction) == 0) {
-    return (transaction_timestamp(transaction) <
-                tv->conf->snapshot_timestamp_sec &&
-            memcmp(transaction_hash(transaction), tv->conf->genesis_hash,
-                   FLEX_TRIT_SIZE_243) != 0) ||
-           (transaction_timestamp(transaction) * 1000UL >
-            max_future_timestamp_ms);
+  if (is_too_futuristic) {
+    return true;
   }
 
-  return (transaction_attachment_timestamp(transaction) <
-          tv->conf->snapshot_timestamp_sec * 1000UL) ||
-         (transaction_attachment_timestamp(transaction) >
-          max_future_timestamp_ms);
+  if (is_below_snapshot) {
+    return memcmp(transaction_hash(transaction), tv->conf->genesis_hash,
+                  FLEX_TRIT_SIZE_243) != 0;
+  }
+
+  return false;
 }
 
 /*
@@ -77,7 +79,7 @@ bool iota_consensus_transaction_validate(
     iota_transaction_t const* const transaction) {
   if (transaction_weight_magnitude(transaction) < tv->conf->mwm) {
     log_debug(TRANSACTION_VALIDATOR_LOGGER_ID,
-              "Validation failed: insufficient PoW performed\n");
+              "Validation failed: insufficient transaction weight\n");
     return false;
   }
 
