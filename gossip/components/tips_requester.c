@@ -93,7 +93,7 @@ retcode_t tips_requester_init(tips_requester_t *const tips_requester,
     return RC_NULL_PARAM;
   }
 
-  logger_helper_init(TIPS_REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(TIPS_REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
 
   tips_requester->running = false;
   tips_requester->node = node;
@@ -146,7 +146,7 @@ retcode_t tips_requester_destroy(tips_requester_t *const tips_requester) {
 
   tips_requester->node = NULL;
 
-  logger_helper_destroy(TIPS_REQUESTER_LOGGER_ID);
+  logger_helper_release(TIPS_REQUESTER_LOGGER_ID);
 
   return RC_OK;
 }

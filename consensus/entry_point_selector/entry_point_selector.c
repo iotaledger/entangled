@@ -18,7 +18,7 @@
 
 retcode_t iota_consensus_entry_point_selector_init(
     entry_point_selector_t *const eps, milestone_tracker_t *const mt) {
-  logger_helper_init(ENTRY_POINT_SELECTOR_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(ENTRY_POINT_SELECTOR_LOGGER_ID, LOGGER_DEBUG, true);
   eps->mt = mt;
   return RC_OK;
 }
@@ -49,7 +49,7 @@ retcode_t iota_consensus_entry_point_selector_get_entry_point(
 
 retcode_t iota_consensus_entry_point_selector_destroy(
     entry_point_selector_t *const eps) {
-  logger_helper_destroy(ENTRY_POINT_SELECTOR_LOGGER_ID);
+  logger_helper_release(ENTRY_POINT_SELECTOR_LOGGER_ID);
   eps->mt = NULL;
   return RC_OK;
 }

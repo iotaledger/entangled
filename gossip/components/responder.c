@@ -202,7 +202,7 @@ retcode_t responder_init(responder_t *const responder, node_t *const node) {
     return RC_NULL_PARAM;
   }
 
-  logger_helper_init(RESPONDER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(RESPONDER_LOGGER_ID, LOGGER_DEBUG, true);
 
   responder->running = false;
   responder->queue = NULL;
@@ -263,7 +263,7 @@ retcode_t responder_destroy(responder_t *const responder) {
   cond_handle_destroy(&responder->cond);
   responder->node = NULL;
 
-  logger_helper_destroy(RESPONDER_LOGGER_ID);
+  logger_helper_release(RESPONDER_LOGGER_ID);
 
   return ret;
 }

@@ -25,6 +25,7 @@ retcode_t iota_consensus_tip_selector_init(
     exit_prob_transaction_validator_t *const walker_validator,
     ledger_validator_t *const ledger_validator,
     milestone_tracker_t *const milestone_tracker) {
+  logger_helper_enable(TIP_SELECTOR_LOGGER_ID, LOGGER_DEBUG, true);
   tip_selector->conf = conf;
   tip_selector->cw_rating_calculator = cw_rating_calculator;
   tip_selector->entry_point_selector = entry_point_selector;
@@ -125,6 +126,6 @@ retcode_t iota_consensus_tip_selector_destroy(
   tip_selector->walker_validator = NULL;
   tip_selector->ledger_validator = NULL;
   tip_selector->milestone_tracker = NULL;
-  logger_helper_destroy(TIP_SELECTOR_LOGGER_ID);
+  logger_helper_release(TIP_SELECTOR_LOGGER_ID);
   return RC_OK;
 }

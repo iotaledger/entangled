@@ -21,6 +21,7 @@ cc_library(
     hdrs = ["logger_helper.h"],
     copts = ["-DLOGGER_ENABLE"],
     deps = [
+        "//common:errors",
         "//utils/handles:lock",
         "@com_github_embear_logger//:logger",
     ],

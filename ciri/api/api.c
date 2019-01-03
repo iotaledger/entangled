@@ -512,7 +512,7 @@ retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
     return RC_NULL_PARAM;
   }
 
-  logger_helper_init(API_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(API_LOGGER_ID, LOGGER_DEBUG, true);
   api->running = false;
   api->node = node;
   api->consensus = consensus;
@@ -554,6 +554,6 @@ retcode_t iota_api_destroy(iota_api_t *const api) {
     return RC_STILL_RUNNING;
   }
 
-  logger_helper_destroy(API_LOGGER_ID);
+  logger_helper_release(API_LOGGER_ID);
   return RC_OK;
 }

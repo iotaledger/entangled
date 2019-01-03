@@ -15,7 +15,7 @@
 #define JSON_LOGGER_ID "json_serializer"
 
 void logger_init_json_serializer() {
-  logger_helper_init(JSON_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(JSON_LOGGER_ID, LOGGER_DEBUG, true);
   log_info(JSON_LOGGER_ID, "[%s:%d] enable logger %s.\n", __func__, __LINE__,
            JSON_LOGGER_ID);
 }
@@ -23,7 +23,7 @@ void logger_init_json_serializer() {
 void logger_destroy_json_serializer() {
   log_info(JSON_LOGGER_ID, "[%s:%d] destroy logger %s.\n", __func__, __LINE__,
            JSON_LOGGER_ID);
-  logger_helper_destroy(JSON_LOGGER_ID);
+  logger_helper_release(JSON_LOGGER_ID);
 }
 
 void init_json_serializer(serializer_t* serializer) {

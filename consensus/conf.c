@@ -137,7 +137,7 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
     return RC_NULL_PARAM;
   }
 
-  logger_helper_init(CONSENSUS_CONF_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(CONSENSUS_CONF_LOGGER_ID, LOGGER_DEBUG, true);
 
   memset(conf->genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   conf->max_depth = DEFAULT_TIP_SELECTION_MAX_DEPTH;
@@ -151,7 +151,7 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
 
   ret = iota_snapshot_conf_init(conf);
 
-  logger_helper_destroy(CONSENSUS_CONF_LOGGER_ID);
+  logger_helper_release(CONSENSUS_CONF_LOGGER_ID);
 
   return ret;
 }

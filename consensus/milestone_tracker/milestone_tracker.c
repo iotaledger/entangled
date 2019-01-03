@@ -334,7 +334,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
     return RC_CONSENSUS_MT_NULL_SELF;
   }
 
-  logger_helper_init(MILESTONE_TRACKER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(MILESTONE_TRACKER_LOGGER_ID, LOGGER_DEBUG, true);
   memset(mt, 0, sizeof(milestone_tracker_t));
   mt->running = false;
   mt->conf = conf;
@@ -455,7 +455,7 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt) {
   hash243_queue_free(&mt->candidates);
   rw_lock_handle_destroy(&mt->candidates_lock);
   memset(mt, 0, sizeof(milestone_tracker_t));
-  logger_helper_destroy(MILESTONE_TRACKER_LOGGER_ID);
+  logger_helper_release(MILESTONE_TRACKER_LOGGER_ID);
 
   return ret;
 }

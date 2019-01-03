@@ -11,7 +11,7 @@
 #define CCLIENT_EXTENDED_LOGGER_ID "cclient_extended_api"
 
 void iota_client_extended_init() {
-  logger_helper_init(CCLIENT_EXTENDED_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(CCLIENT_EXTENDED_LOGGER_ID, LOGGER_DEBUG, true);
   log_info(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d] enable logger %s.\n", __func__,
            __LINE__, CCLIENT_EXTENDED_LOGGER_ID);
 }
@@ -19,7 +19,7 @@ void iota_client_extended_init() {
 void iota_client_extended_destroy() {
   log_info(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d] destroy logger %s.\n", __func__,
            __LINE__, CCLIENT_EXTENDED_LOGGER_ID);
-  logger_helper_destroy(CCLIENT_EXTENDED_LOGGER_ID);
+  logger_helper_release(CCLIENT_EXTENDED_LOGGER_ID);
 }
 
 static retcode_t is_unused_address(iota_client_service_t const* const serv,

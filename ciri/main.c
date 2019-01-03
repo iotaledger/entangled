@@ -24,13 +24,10 @@ int main(int argc, char* argv[]) {
 
   rand_handle_seed(time(NULL));
 
-  if (LOGGER_VERSION != logger_version()) {
+  if (logger_helper_init() != RC_OK) {
     return EXIT_FAILURE;
   }
-  logger_init();
-  logger_output_register(stdout);
-  logger_output_level_set(stdout, LOGGER_WARNING);
-  logger_helper_init(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(MAIN_LOGGER_ID, LOGGER_DEBUG, true);
 
   // Default configuration
 
@@ -123,6 +120,10 @@ int main(int argc, char* argv[]) {
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(MAIN_LOGGER_ID, "Destroying tangle connection failed\n");
+    ret = EXIT_FAILURE;
+  }
+
+  if (logger_helper_destroy() != RC_OK) {
     ret = EXIT_FAILURE;
   }
 

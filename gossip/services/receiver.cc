@@ -16,7 +16,7 @@ bool receiver_service_start(receiver_service_t* const service) {
   if (service == NULL) {
     return false;
   }
-  logger_helper_init(RECEIVER_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(RECEIVER_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
   try {
     boost::asio::io_context ctx;
     service->context = &ctx;
@@ -60,6 +60,6 @@ bool receiver_service_stop(receiver_service_t* const service) {
               "Stopping receiver service failed: %s\n", e.what());
     return false;
   }
-  logger_helper_destroy(RECEIVER_SERVICE_LOGGER_ID);
+  logger_helper_release(RECEIVER_SERVICE_LOGGER_ID);
   return true;
 }

@@ -14,11 +14,11 @@
 
 retcode_t iota_tangle_init(tangle_t *const tangle,
                            connection_config_t const *const conf) {
-  logger_helper_init(TANGLE_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(TANGLE_LOGGER_ID, LOGGER_DEBUG, true);
   return connection_init(&tangle->conn, conf);
 }
 retcode_t iota_tangle_destroy(tangle_t *const tangle) {
-  logger_helper_destroy(TANGLE_LOGGER_ID);
+  logger_helper_release(TANGLE_LOGGER_ID);
   return connection_destroy(&tangle->conn);
 }
 

@@ -78,13 +78,13 @@ TcpReceiverService::TcpReceiverService(receiver_service_t* const service,
     : service_(service),
       acceptor_(context, boost::asio::ip::tcp::endpoint(
                              boost::asio::ip::tcp::v4(), port)) {
-  logger_helper_init(TCP_RECEIVER_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(TCP_RECEIVER_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
   acceptor_.set_option(boost::asio::socket_base::reuse_address(true));
   accept();
 }
 
 TcpReceiverService::~TcpReceiverService() {
-  logger_helper_destroy(TCP_RECEIVER_SERVICE_LOGGER_ID);
+  logger_helper_release(TCP_RECEIVER_SERVICE_LOGGER_ID);
 }
 
 void TcpReceiverService::accept() {

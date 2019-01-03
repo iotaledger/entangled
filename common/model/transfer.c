@@ -100,13 +100,13 @@ static void transfer_iterator_next_input_transaction(
  ***********************************************************************************************************/
 
 void transfer_logger_init() {
-  logger_helper_init(TRANSFER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(TRANSFER_LOGGER_ID, LOGGER_DEBUG, true);
   log_info(TRANSFER_LOGGER_ID, "Enable logger %s.\n", TRANSFER_LOGGER_ID);
 }
 
 void transfer_logger_destroy() {
   log_info(TRANSFER_LOGGER_ID, "Destroy logger %s.\n", TRANSFER_LOGGER_ID);
-  logger_helper_destroy(TRANSFER_LOGGER_ID);
+  logger_helper_release(TRANSFER_LOGGER_ID);
 }
 
 bool validate_output(transfer_value_out_t const* const output) {

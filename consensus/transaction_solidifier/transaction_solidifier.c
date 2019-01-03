@@ -139,7 +139,7 @@ retcode_t iota_consensus_transaction_solidifier_init(
   ts->solid_transactions_candidates = NULL;
   ts->tips = tips;
   lock_handle_init(&ts->lock);
-  logger_helper_init(TRANSACTION_SOLIDIFIER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(TRANSACTION_SOLIDIFIER_LOGGER_ID, LOGGER_DEBUG, true);
   return RC_OK;
 }
 
@@ -199,7 +199,7 @@ retcode_t iota_consensus_transaction_solidifier_destroy(
 
   lock_handle_destroy(&ts->lock);
 
-  logger_helper_destroy(TRANSACTION_SOLIDIFIER_LOGGER_ID);
+  logger_helper_release(TRANSACTION_SOLIDIFIER_LOGGER_ID);
   return RC_OK;
 }
 
