@@ -84,6 +84,8 @@ static retcode_t set_conf_value(
       strncpy(consensus_conf->db_path, value, sizeof(consensus_conf->db_path));
       strncpy(gossip_conf->db_path, value, sizeof(gossip_conf->db_path));
       strncpy(api_conf->db_path, value, sizeof(api_conf->db_path));
+      strncpy(perceptive_node_conf->db_path, value,
+              sizeof(perceptive_node_conf->db_path));
       break;
     case 'h':  // --help
       iota_usage();

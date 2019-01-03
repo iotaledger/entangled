@@ -6,6 +6,7 @@
  */
 
 #include "ciri/core.h"
+#include "ciri/perceptive_node/perceptive_node.h"
 #include "utils/logger_helper.h"
 
 #define CORE_LOGGER_ID "core"
@@ -43,8 +44,8 @@ retcode_t core_init(core_t *const core, tangle_t *const tangle) {
 
   if (core->perceptive_node.conf.is_enabled) {
     log_info(CORE_LOGGER_ID, "Initializing Perceptive Node\n");
-    if (iota_perceptive_node_init(&core->perceptive_node, &core->consensus) !=
-        RC_OK) {
+    if (iota_perceptive_node_init(&core->perceptive_node, &core->consensus,
+                                  core->node.neighbors) != RC_OK) {
       log_critical(CORE_LOGGER_ID, "Initializing Perceptive Node failed\n");
       return RC_PERCEPTIVE_NODE_FAILED_INIT;
     }

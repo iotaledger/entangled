@@ -17,11 +17,6 @@
 
 static logger_id_t logger_id;
 
-static retcode_t cw_rating_dfs_do_dfs_from_db(
-    cw_rating_calculator_t const *const cw_calc, tangle_t *const tangle,
-    flex_trit_t *entry_point, hash_to_indexed_hash_set_map_t *tx_to_approvers,
-    uint64_t *subtangle_size, int64_t subtangle_before_timestamp);
-
 static retcode_t cw_rating_dfs_do_dfs_light(
     hash_to_indexed_hash_set_map_t tx_to_approvers, flex_trit_t *ep,
     bitset_t *visited_bitset, uint64_t *subtangle_size);
@@ -117,7 +112,7 @@ retcode_t cw_rating_calculate_dfs_ratings_from_approvers_map(
   return RC_OK;
 }
 
-static retcode_t cw_rating_dfs_do_dfs_from_db(
+retcode_t cw_rating_dfs_do_dfs_from_db(
     cw_rating_calculator_t const *const cw_calc, tangle_t *const tangle,
     flex_trit_t *entry_point, hash_to_indexed_hash_set_map_t *tx_to_approvers,
     uint64_t *subtangle_size, int64_t subtangle_before_timestamp) {

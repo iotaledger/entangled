@@ -7,6 +7,7 @@ cc_library(
     deps = [
         ":conf",
         "//consensus",
+        "//utils/containers/hash:hash_array",
     ],
 )
 
@@ -17,5 +18,7 @@ cc_library(
         "conf.h",
     ],
     hdrs = ["conf.h"],
-    deps = ["//common:errors"],
+    deps = [
+        "//common:errors",
+    ],
 )
