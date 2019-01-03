@@ -158,6 +158,8 @@ neighbor_t *neighbors_find_by_endpoint_values(neighbor_t *const neighbors,
                                               uint16_t const port,
                                               protocol_type_t const protocol);
 
+int neighbor_cmp(neighbor_t const *const lhs, neighbor_t const *const rhs);
+
 #ifdef __cplusplus
 }
 #endif

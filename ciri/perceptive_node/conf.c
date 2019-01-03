@@ -6,6 +6,7 @@
  */
 
 #include "ciri/perceptive_node/conf.h"
+#include <string.h>
 
 #define DEFAULT_TEST_SAMPLE_SIZE 200
 #define DEFAULT_SEQUENCE_SIZE 50

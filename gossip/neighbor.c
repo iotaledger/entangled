@@ -114,8 +114,7 @@ retcode_t neighbor_send(node_t *const node, tangle_t *const tangle,
   return neighbor_send_packet(node, neighbor, &packet);
 }
 
-static int neighbor_cmp(neighbor_t const *const lhs,
-                        neighbor_t const *const rhs) {
+int neighbor_cmp(neighbor_t const *const lhs, neighbor_t const *const rhs) {
   if (lhs == NULL || rhs == NULL) {
     return false;
   }

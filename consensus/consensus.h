@@ -13,6 +13,7 @@
 #include "consensus/conf.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
 #include "consensus/entry_point_selector/entry_point_selector.h"
+#include "consensus/exit_probability_randomizer/exit_prob_map.h"
 #include "consensus/exit_probability_randomizer/exit_probability_randomizer.h"
 #include "consensus/exit_probability_validator/exit_probability_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
