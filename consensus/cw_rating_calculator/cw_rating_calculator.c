@@ -11,7 +11,7 @@
 
 retcode_t iota_consensus_cw_rating_init(cw_rating_calculator_t *const cw_calc,
                                         cw_calculation_implementation_t impl) {
-  logger_helper_init(CW_RATING_CALCULATOR_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(CW_RATING_CALCULATOR_LOGGER_ID, LOGGER_DEBUG, true);
   if (impl == DFS_FROM_ENTRY_POINT) {
     init_cw_calculator_dfs(&cw_calc->base);
     return RC_OK;
@@ -20,7 +20,7 @@ retcode_t iota_consensus_cw_rating_init(cw_rating_calculator_t *const cw_calc,
 }
 
 retcode_t iota_consensus_cw_rating_destroy(cw_rating_calculator_t *cw_calc) {
-  logger_helper_destroy(CW_RATING_CALCULATOR_LOGGER_ID);
+  logger_helper_release(CW_RATING_CALCULATOR_LOGGER_ID);
   return RC_OK;
 }
 

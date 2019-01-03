@@ -21,7 +21,7 @@ retcode_t receiver_init(receiver_state_t *const state, node_t *const node,
     return RC_RECEIVER_COMPONENT_NULL_NODE;
   }
 
-  logger_helper_init(RECEIVER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(RECEIVER_COMPONENT_LOGGER_ID, LOGGER_DEBUG, true);
   memset(state, 0, sizeof(receiver_state_t));
   state->running = false;
   state->tcp_service.port = tcp_port;
@@ -103,6 +103,6 @@ retcode_t receiver_destroy(receiver_state_t *const state) {
     return RC_RECEIVER_COMPONENT_STILL_RUNNING;
   }
 
-  logger_helper_destroy(RECEIVER_COMPONENT_LOGGER_ID);
+  logger_helper_release(RECEIVER_COMPONENT_LOGGER_ID);
   return RC_OK;
 }

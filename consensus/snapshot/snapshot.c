@@ -83,7 +83,7 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot,
     return RC_SNAPSHOT_NULL_SELF;
   }
 
-  logger_helper_init(SNAPSHOT_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(SNAPSHOT_LOGGER_ID, LOGGER_DEBUG, true);
   rw_lock_handle_init(&snapshot->rw_lock);
   snapshot->conf = conf;
   snapshot->index = 0;
@@ -124,7 +124,7 @@ retcode_t iota_snapshot_destroy(snapshot_t *const snapshot) {
 
   state_delta_destroy(&snapshot->state);
   rw_lock_handle_destroy(&snapshot->rw_lock);
-  logger_helper_destroy(SNAPSHOT_LOGGER_ID);
+  logger_helper_release(SNAPSHOT_LOGGER_ID);
   return ret;
 }
 

@@ -89,7 +89,7 @@ retcode_t broadcaster_init(broadcaster_t *const broadcaster,
     return RC_NULL_PARAM;
   }
 
-  logger_helper_init(BROADCASTER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(BROADCASTER_LOGGER_ID, LOGGER_DEBUG, true);
   memset(broadcaster, 0, sizeof(broadcaster_t));
   broadcaster->running = false;
   broadcaster->node = node;
@@ -111,7 +111,7 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
   hash8019_queue_free(&broadcaster->queue);
   rw_lock_handle_destroy(&broadcaster->lock);
   cond_handle_destroy(&broadcaster->cond);
-  logger_helper_destroy(BROADCASTER_LOGGER_ID);
+  logger_helper_release(BROADCASTER_LOGGER_ID);
 
   return RC_OK;
 }

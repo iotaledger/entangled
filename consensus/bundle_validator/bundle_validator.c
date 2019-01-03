@@ -117,12 +117,12 @@ static retcode_t validate_signature(bundle_transactions_t const* const bundle,
  */
 
 retcode_t iota_consensus_bundle_validator_init() {
-  logger_helper_init(BUNDLE_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(BUNDLE_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   return RC_OK;
 }
 
 retcode_t iota_consensus_bundle_validator_destroy() {
-  logger_helper_destroy(BUNDLE_VALIDATOR_LOGGER_ID);
+  logger_helper_release(BUNDLE_VALIDATOR_LOGGER_ID);
   return RC_OK;
 }
 

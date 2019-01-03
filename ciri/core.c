@@ -15,7 +15,7 @@ retcode_t core_init(core_t* const core, tangle_t* const tangle) {
     return RC_CORE_NULL_CORE;
   }
 
-  logger_helper_init(CORE_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(CORE_LOGGER_ID, LOGGER_DEBUG, true);
   core->running = false;
 
   log_info(CORE_LOGGER_ID, "Initializing consensus\n");
@@ -130,6 +130,6 @@ retcode_t core_destroy(core_t* const core) {
     ret = RC_CORE_FAILED_CONSENSUS_DESTROY;
   }
 
-  logger_helper_destroy(CORE_LOGGER_ID);
+  logger_helper_release(CORE_LOGGER_ID);
   return ret;
 }

@@ -24,7 +24,7 @@ retcode_t requester_init(transaction_requester_t *const transaction_requester,
     return RC_NULL_PARAM;
   }
 
-  logger_helper_init(REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
   memset(transaction_requester, 0, sizeof(transaction_requester_t));
   transaction_requester->node = node;
   transaction_requester->running = false;
@@ -47,7 +47,7 @@ retcode_t requester_destroy(
   hash243_set_free(&transaction_requester->transactions);
   transaction_requester->node = NULL;
   rw_lock_handle_destroy(&transaction_requester->lock);
-  logger_helper_destroy(REQUESTER_LOGGER_ID);
+  logger_helper_release(REQUESTER_LOGGER_ID);
 
   return RC_OK;
 }

@@ -102,7 +102,7 @@ static retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
 retcode_t iota_consensus_exit_prob_transaction_validator_init(
     iota_consensus_conf_t *const conf, milestone_tracker_t *const mt,
     ledger_validator_t *const lv, exit_prob_transaction_validator_t *epv) {
-  logger_helper_init(WALKER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(WALKER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   epv->conf = conf;
   epv->mt = mt;
   epv->lv = lv;
@@ -114,7 +114,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_init(
 
 retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
     exit_prob_transaction_validator_t *epv) {
-  logger_helper_destroy(WALKER_VALIDATOR_LOGGER_ID);
+  logger_helper_release(WALKER_VALIDATOR_LOGGER_ID);
 
   hash243_set_free(&epv->max_depth_ok_memoization);
   hash243_set_free(&epv->analyzed_hashes);

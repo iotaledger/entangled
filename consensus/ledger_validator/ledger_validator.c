@@ -220,7 +220,7 @@ retcode_t iota_consensus_ledger_validator_init(
     iota_consensus_conf_t *const conf, milestone_tracker_t *const mt) {
   retcode_t ret = RC_OK;
 
-  logger_helper_init(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   lv->conf = conf;
   lv->milestone_tracker = mt;
 
@@ -237,7 +237,7 @@ retcode_t iota_consensus_ledger_validator_init(
 retcode_t iota_consensus_ledger_validator_destroy(
     ledger_validator_t *const lv) {
   lv->milestone_tracker = NULL;
-  logger_helper_destroy(LEDGER_VALIDATOR_LOGGER_ID);
+  logger_helper_release(LEDGER_VALIDATOR_LOGGER_ID);
   return RC_OK;
 }
 

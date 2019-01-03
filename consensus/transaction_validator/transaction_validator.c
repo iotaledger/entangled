@@ -60,7 +60,7 @@ static bool has_invalid_timestamp(transaction_validator_t const* const tv,
 
 retcode_t iota_consensus_transaction_validator_init(
     transaction_validator_t* const tv, iota_consensus_conf_t* const conf) {
-  logger_helper_init(TRANSACTION_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(TRANSACTION_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   tv->conf = conf;
 
   return RC_OK;
@@ -69,7 +69,7 @@ retcode_t iota_consensus_transaction_validator_init(
 retcode_t iota_consensus_transaction_validator_destroy(
     transaction_validator_t* const tv) {
   tv->conf = NULL;
-  logger_helper_destroy(TRANSACTION_VALIDATOR_LOGGER_ID);
+  logger_helper_release(TRANSACTION_VALIDATOR_LOGGER_ID);
 
   return RC_OK;
 }

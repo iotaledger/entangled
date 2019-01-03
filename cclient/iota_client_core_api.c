@@ -12,7 +12,7 @@
 #define CCLIENT_CORE_LOGGER_ID "cclient_core_api"
 
 retcode_t iota_client_core_init(iota_client_service_t* const serv) {
-  logger_helper_init(CCLIENT_CORE_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(CCLIENT_CORE_LOGGER_ID, LOGGER_DEBUG, true);
   log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d] enable logger %s.\n", __func__,
            __LINE__, CCLIENT_CORE_LOGGER_ID);
   return iota_client_service_init(serv);
@@ -21,7 +21,7 @@ retcode_t iota_client_core_init(iota_client_service_t* const serv) {
 void iota_client_core_destroy(iota_client_service_t* const serv) {
   log_info(CCLIENT_CORE_LOGGER_ID, "[%s:%d] destroy logger %s.\n", __func__,
            __LINE__, CCLIENT_CORE_LOGGER_ID);
-  logger_helper_destroy(CCLIENT_CORE_LOGGER_ID);
+  logger_helper_release(CCLIENT_CORE_LOGGER_ID);
   iota_client_service_destroy(serv);
 }
 

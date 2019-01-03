@@ -29,7 +29,7 @@ static void error_log_callback(void* const arg, int const err_code,
 }
 
 retcode_t storage_init() {
-  logger_helper_init(SQLITE3_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(SQLITE3_LOGGER_ID, LOGGER_DEBUG, true);
 
   if (sqlite3_config(SQLITE_CONFIG_LOG, error_log_callback, NULL) !=
       SQLITE_OK) {
@@ -54,7 +54,7 @@ retcode_t storage_init() {
 }
 
 retcode_t storage_destroy() {
-  logger_helper_destroy(SQLITE3_LOGGER_ID);
+  logger_helper_release(SQLITE3_LOGGER_ID);
 
   if (sqlite3_shutdown() != SQLITE_OK) {
     return RC_SQLITE3_FAILED_SHUTDOWN;

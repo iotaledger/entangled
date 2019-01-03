@@ -14,7 +14,7 @@ void logger_init_types() {
 #undef oom
 #define oom() log_info(TYPES_LOGGER_ID, "[%s:%d] OOM.\n", __func__, __LINE__)
 
-  logger_helper_init(TYPES_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(TYPES_LOGGER_ID, LOGGER_DEBUG, true);
   log_info(TYPES_LOGGER_ID, "[%s:%d] enable logger %s.\n", __func__, __LINE__,
            TYPES_LOGGER_ID);
 }
@@ -22,7 +22,7 @@ void logger_init_types() {
 void logger_destroy_types() {
   log_info(TYPES_LOGGER_ID, "[%s:%d] destroy logger %s.\n", __func__, __LINE__,
            TYPES_LOGGER_ID);
-  logger_helper_destroy(TYPES_LOGGER_ID);
+  logger_helper_release(TYPES_LOGGER_ID);
 }
 
 char_buffer_t* char_buffer_new() {

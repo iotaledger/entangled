@@ -358,7 +358,7 @@ retcode_t processor_init(processor_t *const processor, node_t *const node,
     return RC_NULL_PARAM;
   }
 
-  logger_helper_init(PROCESSOR_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(PROCESSOR_LOGGER_ID, LOGGER_DEBUG, true);
 
   processor->running = false;
   processor->queue = NULL;
@@ -421,7 +421,7 @@ retcode_t processor_destroy(processor_t *const processor) {
   processor->transaction_solidifier = NULL;
   processor->milestone_tracker = NULL;
 
-  logger_helper_destroy(PROCESSOR_LOGGER_ID);
+  logger_helper_release(PROCESSOR_LOGGER_ID);
 
   return RC_OK;
 }

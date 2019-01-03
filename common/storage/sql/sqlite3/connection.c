@@ -35,9 +35,6 @@ retcode_t connection_init(connection_t const* const conn,
     return RC_SQLITE3_FAILED_OPEN_DB;
   }
 
-  log_info(SQLITE3_LOGGER_ID, "Connection to database %s created\n",
-           config->db_path);
-
   if ((rc = sqlite3_busy_timeout((sqlite3*)conn->db, 10000)) != SQLITE_OK) {
     return RC_SQLITE3_FAILED_CONFIG;
   }
@@ -49,9 +46,6 @@ retcode_t connection_init(connection_t const* const conn,
     sqlite3_free(err_msg);
     return RC_SQLITE3_FAILED_INSERT_DB;
   }
-
-  log_info(SQLITE3_LOGGER_ID, "Connection to database %s initialized\n",
-           config->db_path);
 
   return RC_OK;
 }

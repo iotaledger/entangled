@@ -140,7 +140,7 @@ retcode_t node_init(node_t* const node, core_t* const core,
     return RC_NODE_NULL_CORE;
   }
 
-  logger_helper_init(NODE_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_helper_enable(NODE_LOGGER_ID, LOGGER_DEBUG, true);
   node->running = false;
   node->core = core;
 
@@ -353,7 +353,7 @@ retcode_t node_destroy(node_t* const node) {
   tips_cache_destroy(&node->tips);
   free(node->conf.neighbors);
 
-  logger_helper_destroy(NODE_LOGGER_ID);
+  logger_helper_release(NODE_LOGGER_ID);
 
   return ret;
 }
