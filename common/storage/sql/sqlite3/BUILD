@@ -5,7 +5,10 @@ cc_library(
         "storage.c",
         "wrappers.c",
     ],
-    hdrs = ["wrappers.h"],
+    hdrs = [
+        "connection.h",
+        "wrappers.h",
+    ],
     linkopts = ["-pthread"],
     visibility = ["//visibility:public"],
     deps = [

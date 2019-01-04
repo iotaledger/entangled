@@ -8,26 +8,19 @@
 #ifndef __COMMON_STORAGE_CONNECTION_H__
 #define __COMMON_STORAGE_CONNECTION_H__
 
-#include <stdbool.h>
-
 #include "common/errors.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct connection_t {
-  void* db;
-  void* data;
-} connection_t;
-
 typedef struct connection_config_t {
-  const char* db_path;
+  char const* db_path;
 } connection_config_t;
 
-extern retcode_t connection_init(connection_t* const,
+extern retcode_t connection_init(void** const connection,
                                  connection_config_t const* const config);
-extern retcode_t connection_destroy(connection_t* const);
+extern retcode_t connection_destroy(void* const connection);
 
 #ifdef __cplusplus
 }
