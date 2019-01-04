@@ -192,6 +192,15 @@ retcode_t node_init(node_t* const node, core_t* const core,
     return RC_NODE_FAILED_REQUESTER_INIT;
   }
 
+  log_info(NODE_LOGGER_ID, "Initializing tips solidifier component\n");
+  if ((ret = tips_solidifier_init(
+           &node->tips_solidifier, &node->conf, &node->tips,
+           &core->consensus.transaction_solidifier)) != RC_OK) {
+    log_critical(NODE_LOGGER_ID,
+                 "Initializing  tips solidifier component failed\n");
+    return ret;
+  }
+
   log_info(NODE_LOGGER_ID, "Initializing tips cache\n");
   if ((ret = node_tips_cache_init(node, tangle)) != RC_OK) {
     log_error(NODE_LOGGER_ID, "Initializing tips cache failed\n");
@@ -242,6 +251,12 @@ retcode_t node_start(node_t* const node) {
   if ((ret = requester_start(&node->transaction_requester)) != RC_OK) {
     log_critical(NODE_LOGGER_ID,
                  "Starting transaction requester component failed\n");
+    return ret;
+  }
+
+  log_info(NODE_LOGGER_ID, "Starting tips solidifier component\n");
+  if ((ret = tips_solidifier_start(&node->tips_solidifier)) != RC_OK) {
+    log_critical(NODE_LOGGER_ID, "Starting tips solidifier component failed\n");
     return ret;
   }
 
@@ -296,6 +311,11 @@ retcode_t node_stop(node_t* const node) {
               "Stopping transaction requester component failed\n");
   }
 
+  log_info(NODE_LOGGER_ID, "Stopping tips solidifier component\n");
+  if ((ret = tips_solidifier_stop(&node->tips_solidifier)) != RC_OK) {
+    log_error(NODE_LOGGER_ID, "Stopping tips solidifier component failed\n");
+  }
+
   return ret;
 }
 
@@ -313,6 +333,11 @@ retcode_t node_destroy(node_t* const node) {
     log_error(NODE_LOGGER_ID,
               "Destroying transaction requester component failed\n");
     ret = RC_NODE_FAILED_REQUESTER_DESTROY;
+  }
+
+  log_info(NODE_LOGGER_ID, "Destroying tips solidifier component\n");
+  if ((ret = tips_solidifier_destroy(&node->tips_solidifier)) != RC_OK) {
+    log_error(NODE_LOGGER_ID, "Destroying tips solidifier component failed\n");
   }
 
   log_info(NODE_LOGGER_ID, "Destroying tips requester component\n");

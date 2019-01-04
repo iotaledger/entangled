@@ -14,6 +14,7 @@
 #include "gossip/components/receiver.h"
 #include "gossip/components/responder.h"
 #include "gossip/components/tips_requester.h"
+#include "gossip/components/tips_solidifier.h"
 #include "gossip/components/transaction_requester.h"
 #include "gossip/components/transaction_requester_worker.h"
 #include "gossip/neighbor.h"
@@ -37,6 +38,7 @@ typedef struct node_s {
   responder_t responder;
   transaction_requester_t transaction_requester;
   tips_requester_t tips_requester;
+  tips_solidifier_t tips_solidifier;
   neighbor_t* neighbors;
   rw_lock_handle_t neighbors_lock;
   tips_cache_t tips;
