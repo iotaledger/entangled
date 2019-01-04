@@ -34,7 +34,6 @@ typedef struct transaction_solidifier_s {
   bool running;
   lock_handle_t lock;
   hash243_set_t newly_set_solid_transactions;
-  hash243_set_t solid_transactions_candidates;
   tips_cache_t *tips;
 } transaction_solidifier_t;
 
