@@ -18,13 +18,14 @@ extern "C" {
 
 typedef struct connection_t {
   void* db;
+  void* data;
 } connection_t;
 
 typedef struct connection_config_t {
   const char* db_path;
 } connection_config_t;
 
-extern retcode_t connection_init(connection_t const* const,
+extern retcode_t connection_init(connection_t* const,
                                  connection_config_t const* const config);
 extern retcode_t connection_destroy(connection_t* const);
 

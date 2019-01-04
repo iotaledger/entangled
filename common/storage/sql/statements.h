@@ -14,6 +14,36 @@
 extern "C" {
 #endif
 
+typedef struct iota_statements_s {
+  sqlite3_stmt* transaction_insert;
+  sqlite3_stmt* transaction_select_by_hash;
+  sqlite3_stmt* transaction_select_hashes_by_address;
+  sqlite3_stmt* transaction_select_hashes_of_approvers;
+  sqlite3_stmt* transaction_select_hashes_of_approvers_before_date;
+  sqlite3_stmt* transaction_select_hashes_of_transactions_to_request;
+  sqlite3_stmt* transaction_select_hashes_of_tips;
+  sqlite3_stmt* transaction_select_hashes_of_milestone_candidates;
+  sqlite3_stmt* transaction_update_snapshot_index;
+  sqlite3_stmt* transaction_update_solid_state;
+  sqlite3_stmt* transaction_exist;
+  sqlite3_stmt* transaction_exist_by_hash;
+  sqlite3_stmt* transaction_approvers_count;
+  sqlite3_stmt* transaction_count;
+  sqlite3_stmt* transaction_select_essence_and_metadata;
+  sqlite3_stmt* transaction_select_essence_attachment_and_metadata;
+  sqlite3_stmt* transaction_select_essence_and_consensus;
+  sqlite3_stmt* transaction_select_metadata;
+  sqlite3_stmt* milestone_insert;
+  sqlite3_stmt* milestone_select_by_hash;
+  sqlite3_stmt* milestone_select_first;
+  sqlite3_stmt* milestone_select_last;
+  sqlite3_stmt* milestone_select_next;
+  sqlite3_stmt* milestone_exist;
+  sqlite3_stmt* milestone_exist_by_hash;
+  sqlite3_stmt* state_delta_store;
+  sqlite3_stmt* state_delta_load;
+} iota_statements_t;
+
 /*
  * Generic statement builders
  */
