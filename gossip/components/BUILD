@@ -157,3 +157,25 @@ cc_library(
         "//utils:logger_helper",
     ],
 )
+
+cc_library(
+    name = "tips_solidifier_shared",
+    hdrs = ["tips_solidifier.h"],
+    deps = [
+        "//common:errors",
+        "//gossip:conf",
+        "//gossip:tips_cache",
+        "//utils/handles:thread",
+    ],
+)
+
+cc_library(
+    name = "tips_solidifier",
+    srcs = ["tips_solidifier.c"],
+    deps = [
+        ":tips_solidifier_shared",
+        "//consensus/tangle",
+        "//consensus/transaction_solidifier",
+        "//utils:logger_helper",
+    ],
+)
