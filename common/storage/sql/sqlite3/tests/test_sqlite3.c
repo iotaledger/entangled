@@ -415,6 +415,7 @@ void test_transactions_update_solid_states_two_transaction(void) {
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
   TEST_ASSERT(transaction_solid(&tx));
   hash243_set_free(&hashes);
+  transaction_free(test_tx);
 }
 
 void test_transactions_arrival_time(void) {
