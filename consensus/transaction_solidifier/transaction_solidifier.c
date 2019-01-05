@@ -54,8 +54,8 @@ static retcode_t propagate_solid_transactions(
   iota_stor_pack_t hash_pack;
 
   lock_handle_lock(&ts->lock);
-  transactions_to_propagate = ts->newly_set_solid_transactions;
-  ts->newly_set_solid_transactions = NULL;
+  transactions_to_propagate = ts->new_solid_transactions_to_propagate;
+  ts->new_solid_transactions_to_propagate = NULL;
   lock_handle_unlock(&ts->lock);
 
   if ((ret = hash_pack_init(&hash_pack, 32)) != RC_OK) {
@@ -108,7 +108,7 @@ static void *spawn_solid_transactions_propagation(void *arg) {
   }
 
   while (ts->running) {
-    while (hash243_set_size(&ts->newly_set_solid_transactions) > 0) {
+    while (hash243_set_size(&ts->new_solid_transactions_to_propagate) > 0) {
       if (propagate_solid_transactions(ts, &tangle) != RC_OK) {
         log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
                   "Solid transaction propagation failed\n");
@@ -136,7 +136,7 @@ retcode_t iota_consensus_transaction_solidifier_init(
   ts->conf = conf;
   ts->transaction_requester = transaction_requester;
   ts->running = false;
-  ts->newly_set_solid_transactions = NULL;
+  ts->new_solid_transactions_to_propagate = NULL;
   ts->tips = tips;
   lock_handle_init(&ts->lock);
   logger_helper_enable(TRANSACTION_SOLIDIFIER_LOGGER_ID, LOGGER_DEBUG, true);
@@ -193,7 +193,7 @@ retcode_t iota_consensus_transaction_solidifier_destroy(
   }
 
   ts->transaction_requester = NULL;
-  ts->newly_set_solid_transactions = NULL;
+  ts->new_solid_transactions_to_propagate = NULL;
   ts->conf = NULL;
 
   lock_handle_destroy(&ts->lock);
@@ -211,10 +211,20 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash,
   check_solidity_do_func_params_t *params = data;
   transaction_solidifier_t *ts = params->ts;
   tangle_t *tangle = params->tangle;
+  bool is_in_new_solid_transactions_to_propagate = false;
 
   // Transaction is not marked solid, but it is a candidate
   if (pack->num_loaded == 1 &&
       !(transaction_solid((iota_transaction_t *)pack->models[0]))) {
+    lock_handle_lock(&ts->lock);
+    is_in_new_solid_transactions_to_propagate =
+        hash243_set_contains(ts->new_solid_transactions_to_propagate, hash);
+    lock_handle_unlock(&ts->lock);
+    // We don't need to branch if current transaction is already found to be
+    // solid
+    if (is_in_new_solid_transactions_to_propagate) {
+      return RC_OK;
+    }
     *should_branch = true;
     return hash243_set_add(params->solid_transactions_candidates, hash);
   } else if (pack->num_loaded == 0) {
@@ -269,7 +279,7 @@ retcode_t iota_consensus_transaction_solidifier_check_solidity(
 
     lock_handle_lock(&ts->lock);
     hash243_set_append(&solid_transactions_candidates,
-                       &ts->newly_set_solid_transactions);
+                       &ts->new_solid_transactions_to_propagate);
     lock_handle_unlock(&ts->lock);
   }
 
@@ -394,7 +404,7 @@ static retcode_t add_new_solid_transaction(transaction_solidifier_t *const ts,
   retcode_t ret = RC_OK;
 
   lock_handle_lock(&ts->lock);
-  ret = hash243_set_add(&ts->newly_set_solid_transactions, hash);
+  ret = hash243_set_add(&ts->new_solid_transactions_to_propagate, hash);
   lock_handle_unlock(&ts->lock);
 
   if (ret != RC_OK) {

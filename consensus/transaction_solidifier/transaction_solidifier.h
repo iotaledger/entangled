@@ -33,7 +33,7 @@ typedef struct transaction_solidifier_s {
   thread_handle_t thread;
   bool running;
   lock_handle_t lock;
-  hash243_set_t newly_set_solid_transactions;
+  hash243_set_t new_solid_transactions_to_propagate;
   tips_cache_t *tips;
 } transaction_solidifier_t;
 
