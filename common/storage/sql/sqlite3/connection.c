@@ -172,7 +172,7 @@ static retcode_t finalize_statements(sqlite3_connection_t* const connection) {
   return ret;
 }
 
-retcode_t connection_init(void** const connection,
+retcode_t connection_init(opaque_connection_t* const connection,
                           connection_config_t const* const config) {
   sqlite3_connection_t* sqlite3_connection = NULL;
   char* err_msg = NULL;
@@ -183,10 +183,10 @@ retcode_t connection_init(void** const connection,
     return RC_NULL_PARAM;
   }
 
-  if ((*connection = calloc(1, sizeof(sqlite3_connection_t))) == NULL) {
+  if ((connection->actual = calloc(1, sizeof(sqlite3_connection_t))) == NULL) {
     return RC_OOM;
   }
-  sqlite3_connection = *connection;
+  sqlite3_connection = (sqlite3_connection_t*)connection->actual;
 
   if (config->db_path == NULL) {
     log_critical(SQLITE3_LOGGER_ID, "No path for db specified\n");
@@ -216,13 +216,14 @@ retcode_t connection_init(void** const connection,
   return prepare_statements(sqlite3_connection);
 }
 
-retcode_t connection_destroy(void* const connection) {
-  sqlite3_connection_t* sqlite3_connection = connection;
+retcode_t connection_destroy(opaque_connection_t* const connection) {
+  sqlite3_connection_t* sqlite3_connection = NULL;
   retcode_t ret = RC_OK;
 
-  if (sqlite3_connection == NULL) {
+  if (connection == NULL) {
     return RC_NULL_PARAM;
   }
+  sqlite3_connection = (sqlite3_connection_t*)connection->actual;
 
   ret = finalize_statements(sqlite3_connection);
   sqlite3_close(sqlite3_connection->db);
