@@ -67,6 +67,13 @@ static retcode_t propagate_solid_transactions(
       break;
     }
 
+    if ((ret = iota_tangle_transaction_update_solid_state(
+             tangle, curr_entry->hash, true)) != RC_OK) {
+      log_error(TRANSACTION_SOLIDIFIER_LOGGER_ID,
+                "Updating solid state failed\n");
+      return ret;
+    }
+
     hash_pack_reset(&hash_pack);
     if ((ret = iota_tangle_transaction_load_hashes_of_approvers(
              tangle, curr_entry->hash, &hash_pack, 0)) != RC_OK) {
@@ -220,8 +227,6 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash,
     is_in_new_solid_transactions_to_propagate =
         hash243_set_contains(ts->new_solid_transactions_to_propagate, hash);
     lock_handle_unlock(&ts->lock);
-    // We don't need to branch if current transaction is already found to be
-    // solid
     if (is_in_new_solid_transactions_to_propagate) {
       return RC_OK;
     }
