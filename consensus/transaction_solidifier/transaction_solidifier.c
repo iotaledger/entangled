@@ -86,6 +86,9 @@ static retcode_t propagate_solid_transactions(
     for (size_t approver_index = 0; approver_index < hash_pack.num_loaded;
          ++approver_index) {
       approver_hash = ((flex_trit_t *)hash_pack.models[approver_index]);
+      if (hash243_set_contains(&transactions_to_propagate, approver_hash)) {
+        continue;
+      }
       if ((ret =
                iota_consensus_transaction_solidifier_check_and_update_solid_state(
                    ts, tangle, approver_hash)) != RC_OK) {
@@ -225,7 +228,7 @@ static retcode_t check_solidity_do_func(flex_trit_t *hash,
       !(transaction_solid((iota_transaction_t *)pack->models[0]))) {
     lock_handle_lock(&ts->lock);
     is_in_new_solid_transactions_to_propagate =
-        hash243_set_contains(ts->new_solid_transactions_to_propagate, hash);
+        hash243_set_contains(&ts->new_solid_transactions_to_propagate, hash);
     lock_handle_unlock(&ts->lock);
     if (is_in_new_solid_transactions_to_propagate) {
       return RC_OK;
