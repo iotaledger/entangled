@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 typedef struct tangle_s {
-  opaque_connection_t connection;
+  storage_connection_t connection;
 } tangle_t;
 
 typedef enum _partial_transaction_model {

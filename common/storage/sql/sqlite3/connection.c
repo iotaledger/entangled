@@ -172,7 +172,7 @@ static retcode_t finalize_statements(sqlite3_connection_t* const connection) {
   return ret;
 }
 
-retcode_t connection_init(opaque_connection_t* const connection,
+retcode_t connection_init(storage_connection_t* const connection,
                           connection_config_t const* const config) {
   sqlite3_connection_t* sqlite3_connection = NULL;
   char* err_msg = NULL;
@@ -216,7 +216,7 @@ retcode_t connection_init(opaque_connection_t* const connection,
   return prepare_statements(sqlite3_connection);
 }
 
-retcode_t connection_destroy(opaque_connection_t* const connection) {
+retcode_t connection_destroy(storage_connection_t* const connection) {
   sqlite3_connection_t* sqlite3_connection = NULL;
   retcode_t ret = RC_OK;
 

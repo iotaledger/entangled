@@ -61,7 +61,7 @@ const flex_trit_t HASH[] = {
 };
 #endif
 
-static opaque_connection_t connection;
+static storage_connection_t connection;
 
 void test_init_connection(void) {
   connection_config_t config;
