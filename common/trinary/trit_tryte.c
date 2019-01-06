@@ -5,7 +5,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <assert.h>
 #include <string.h>
 
 #include "common/defs.h"
@@ -68,34 +67,33 @@ uint8_t set_trit_at(tryte_t *const trytes, size_t const length, size_t index,
 
 void trits_to_trytes(trit_t const *const trits, tryte_t *const trytes,
                      size_t const length) {
-  int j = 0,
-      end = length < NUMBER_OF_TRITS_IN_A_TRYTE ? length
-                                                : NUMBER_OF_TRITS_IN_A_TRYTE,
-      i = end;
-  for (; i-- > 0;) {
-    j *= 3;
-    j += trits[i];
+  int k = 0;
+
+  for (size_t i = 0, j = 0; i < length; i += 3, j++) {
+    k = 0;
+    for (size_t l = length - i < NUMBER_OF_TRITS_IN_A_TRYTE
+                        ? length - i
+                        : NUMBER_OF_TRITS_IN_A_TRYTE;
+         l-- > 0;) {
+      k *= 3;
+      k += trits[i + l];
+    }
+    if (k < 0) {
+      k += TRYTE_SPACE;
+    }
+    trytes[j] = TRYTE_ALPHABET[k];
   }
-  // int j = trits[0] + trits[1] * 3 + trits[2] * 9;
-  if (j < 0) {
-    j += TRYTE_SPACE;
-  }
-  trytes[0] = TRYTE_ALPHABET[(size_t)j];
-  if (length <= NUMBER_OF_TRITS_IN_A_TRYTE) {
-    return;
-  }
-  trits_to_trytes(&trits[NUMBER_OF_TRITS_IN_A_TRYTE], &trytes[1],
-                  length - NUMBER_OF_TRITS_IN_A_TRYTE);
 }
 
-void trytes_to_trits(tryte_t const *const tryte, trit_t *const trits,
+void trytes_to_trits(tryte_t const *const trytes, trit_t *const trits,
                      size_t const length) {
   if (length == 0) {
     return;
   }
-  memcpy(trits,
-         TRYTE_TO_TRITS_MAPPINGS[strchr(TRYTE_ALPHABET, tryte[0]) -
-                                 TRYTE_ALPHABET],
-         NUMBER_OF_TRITS_IN_A_TRYTE * sizeof(trit_t));
-  trytes_to_trits(&tryte[1], &trits[NUMBER_OF_TRITS_IN_A_TRYTE], length - 1);
+
+  for (size_t i = 0, j = 0; i < length; i++, j += 3) {
+    memcpy(trits + j,
+           TRYTE_TO_TRITS_MAPPINGS[trytes[i] == '9' ? 0 : trytes[i] - '@'],
+           NUMBER_OF_TRITS_IN_A_TRYTE);
+  }
 }

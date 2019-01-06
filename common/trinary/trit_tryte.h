@@ -22,7 +22,7 @@ uint8_t set_trit_at(tryte_t *const trytes, size_t const length, size_t index,
                     trit_t trit);
 void trits_to_trytes(trit_t const *const trits, tryte_t *const trytes,
                      size_t const length);
-void trytes_to_trits(tryte_t const *const tryte, trit_t *const trits,
+void trytes_to_trits(tryte_t const *const trytes, trit_t *const trits,
                      size_t const length);
 
 #endif
