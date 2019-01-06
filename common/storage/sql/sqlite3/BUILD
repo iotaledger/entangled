@@ -3,6 +3,11 @@ cc_library(
     srcs = [
         "connection.c",
         "storage.c",
+        "wrappers.c",
+    ],
+    hdrs = [
+        "connection.h",
+        "wrappers.h",
     ],
     linkopts = ["-pthread"],
     visibility = ["//visibility:public"],
