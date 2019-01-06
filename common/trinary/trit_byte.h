@@ -15,8 +15,6 @@ extern "C" {
 #include "common/trinary/bytes.h"
 #include "common/trinary/trits.h"
 
-#define NUMBER_OF_TRITS_IN_A_BYTE 5
-
 /// Returns the number of bytes needed to pack num_trits trits
 /// @param[in] num_trits - the number of trits to pack
 /// @return size_t - the number of bytes needed

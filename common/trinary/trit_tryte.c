@@ -7,29 +7,19 @@
 
 #include <string.h>
 
-#include "common/defs.h"
 #include "common/trinary/trit_tryte.h"
 
-#define TRYTE_SPACE 27
-#define TRITS_TO_TRYTES_MAP                                                 \
-  {0, 0, 0}, {1, 0, 0}, {-1, 1, 0}, {0, 1, 0}, {1, 1, 0}, {-1, -1, 1},      \
-      {0, -1, 1}, {1, -1, 1}, {-1, 0, 1}, {0, 0, 1}, {1, 0, 1}, {-1, 1, 1}, \
-      {0, 1, 1}, {1, 1, 1}, {-1, -1, -1}, {0, -1, -1}, {1, -1, -1},         \
-      {-1, 0, -1}, {0, 0, -1}, {1, 0, -1}, {-1, 1, -1}, {0, 1, -1},         \
-      {1, 1, -1}, {-1, -1, 0}, {0, -1, 0}, {1, -1, 0}, {                    \
-    -1, 0, 0                                                                \
-  }
+static const trit_t
+    TRYTE_TO_TRITS_MAPPINGS[TRYTE_SPACE][NUMBER_OF_TRITS_IN_A_TRYTE] = {
+        {0, 0, 0},   {1, 0, 0},   {-1, 1, 0},  {0, 1, 0},   {1, 1, 0},
+        {-1, -1, 1}, {0, -1, 1},  {1, -1, 1},  {-1, 0, 1},  {0, 0, 1},
+        {1, 0, 1},   {-1, 1, 1},  {0, 1, 1},   {1, 1, 1},   {-1, -1, -1},
+        {0, -1, -1}, {1, -1, -1}, {-1, 0, -1}, {0, 0, -1},  {1, 0, -1},
+        {-1, 1, -1}, {0, 1, -1},  {1, 1, -1},  {-1, -1, 0}, {0, -1, 0},
+        {1, -1, 0},  {-1, 0, 0}};
 
-static const trit_t TRYTE_TO_TRITS_MAPPINGS[TRYTE_SPACE]
-                                           [NUMBER_OF_TRITS_IN_A_TRYTE] = {
-                                               TRITS_TO_TRYTES_MAP};
-
-size_t num_trytes_for_trits(size_t num_trits) {
-  return (num_trits + NUMBER_OF_TRITS_IN_A_TRYTE - 1) /
-         NUMBER_OF_TRITS_IN_A_TRYTE;
-}
-
-trit_t get_trit_at(tryte_t *const trytes, size_t const length, size_t index) {
+trit_t get_trit_at(tryte_t const *const trytes, size_t const length,
+                   size_t const index) {
   size_t tindex = index / 3U;
   if (tindex >= length) {
     return 0;
@@ -40,8 +30,8 @@ trit_t get_trit_at(tryte_t *const trytes, size_t const length, size_t index) {
   return TRYTE_TO_TRITS_MAPPINGS[cindex][tindex];
 }
 
-uint8_t set_trit_at(tryte_t *const trytes, size_t const length, size_t index,
-                    trit_t trit) {
+uint8_t set_trit_at(tryte_t *const trytes, size_t const length,
+                    size_t const index, trit_t const trit) {
   size_t tindex = index / 3U;
   if (tindex >= length) {
     return 0;

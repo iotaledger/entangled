@@ -12,4 +12,4 @@
 
 typedef int8_t tryte_t;
 
-#endif
+#endif  // __COMMON_TRINARY_TRYTE_H_

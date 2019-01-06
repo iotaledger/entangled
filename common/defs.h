@@ -13,6 +13,7 @@
 // Trytes related definitions
 
 #define TRYTE_ALPHABET "9ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#define TRYTE_SPACE 27
 #define TRYTE_VALUE_MAX 13
 #define TRYTE_VALUE_MIN -13
 #define TRYTE_WIDTH 3
