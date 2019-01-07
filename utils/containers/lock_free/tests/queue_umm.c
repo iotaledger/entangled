@@ -13,21 +13,21 @@
 
 void queue_integers_same_thread() {
   iota_lf_umm_queue_int_t queue;
-  iota_lock_free_queue_umm_init_owner(&queue, sizeof(int));
-  iota_lock_free_queue_umm_init_user(&queue);
+  iota_lf_umm_queue_int_init_owner(&queue, sizeof(int));
+  iota_lf_umm_queue_int_init_user(&queue);
   for (int i = 0; i < 1000; ++i) {
-    iota_lock_free_queue_umm_enqueue(&queue, &i);
+    iota_lf_umm_queue_int_enqueue(&queue, &i);
   }
 
   enum lfds711_misc_flag dummy_element_flag;
   int expected_current = 0;
-  while (iota_lock_free_queue_umm_count(&queue)) {
+  while (iota_lf_umm_queue_int_count(&queue)) {
     iota_lf_queue_umm_int_t* dequeued_element =
-        iota_lock_free_queue_umm_dequeue(&queue);
+        iota_lf_umm_queue_int_dequeue(&queue);
     TEST_ASSERT_EQUAL_INT((dequeued_element->data), expected_current++);
   }
 
-  iota_lock_free_queue_umm_free(&queue);
+  iota_lf_umm_queue_int_free(&queue);
 }
 
 int main(void) {

@@ -44,7 +44,7 @@ typedef struct {
  * @return void
  */
 
-void iota_lock_free_queue_umm_init_owner(iota_lf_umm_queue_{TYPE}_t* const queue,
+void iota_lf_umm_queue_{TYPE}_init_owner(iota_lf_umm_queue_{TYPE}_t* const queue,
                                          uint32_t element_size);
 
 /**
@@ -56,7 +56,7 @@ void iota_lock_free_queue_umm_init_owner(iota_lf_umm_queue_{TYPE}_t* const queue
  * @return void
  */
 
-void iota_lock_free_queue_umm_init_user(iota_lf_umm_queue_{TYPE}_t* const queue);
+void iota_lf_umm_queue_{TYPE}_init_user(iota_lf_umm_queue_{TYPE}_t* const queue);
 
 /**
  * Frees the queue
@@ -66,7 +66,7 @@ void iota_lock_free_queue_umm_init_user(iota_lf_umm_queue_{TYPE}_t* const queue)
  * @return void
  */
 
-void* iota_lock_free_queue_umm_free(iota_lf_umm_queue_{TYPE}_t* const queue);
+void* iota_lf_umm_queue_{TYPE}_free(iota_lf_umm_queue_{TYPE}_t* const queue);
 
 /**
  * Enqueues an element
@@ -77,7 +77,7 @@ void* iota_lock_free_queue_umm_free(iota_lf_umm_queue_{TYPE}_t* const queue);
  * @return error code
  */
 
-retcode_t iota_lock_free_queue_umm_enqueue(iota_lf_umm_queue_{TYPE}_t* const queue,
+retcode_t iota_lf_umm_queue_{TYPE}_enqueue(iota_lf_umm_queue_{TYPE}_t* const queue,
                                            void const* const data);
 
 /**
@@ -88,7 +88,7 @@ retcode_t iota_lock_free_queue_umm_enqueue(iota_lf_umm_queue_{TYPE}_t* const que
  * @return the dequeued element or NULL
  */
 
-iota_lf_queue_umm_{TYPE}_t* iota_lock_free_queue_umm_dequeue(
+iota_lf_queue_umm_{TYPE}_t* iota_lf_umm_queue_{TYPE}_dequeue(
         iota_lf_umm_queue_{TYPE}_t* const queue);
 
 /**
@@ -99,7 +99,7 @@ iota_lf_queue_umm_{TYPE}_t* iota_lock_free_queue_umm_dequeue(
  * @return the number of elements
  */
 
-size_t iota_lock_free_queue_umm_count(const iota_lf_umm_queue_{TYPE}_t* const queue);
+size_t iota_lf_umm_queue_{TYPE}_count(const iota_lf_umm_queue_{TYPE}_t* const queue);
 
 #ifdef __cplusplus
 }
