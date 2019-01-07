@@ -5,14 +5,14 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef __COMMON_TRINARY_TRIT_LONG_H__
 #define __COMMON_TRINARY_TRIT_LONG_H__
 
 #include "common/trinary/trits.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /// Returns the number of trits needed to encode the value
 /// @return size_t - the number of trit needed to encode the value
@@ -53,7 +53,8 @@ int encode_long(int64_t const value, trit_t *const trits,
 int64_t decode_long(trit_t const *const trits, size_t const num_trits,
                     size_t *const size);
 
-#endif
 #ifdef __cplusplus
 }
 #endif
+
+#endif  // __COMMON_TRINARY_TRIT_LONG_H__

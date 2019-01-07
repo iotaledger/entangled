@@ -13,11 +13,20 @@
 // Trytes related definitions
 
 #define TRYTE_ALPHABET "9ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-#define TRYTE_VALUE_MAX 13
-#define TRYTE_VALUE_MIN -13
-#define TRYTE_WIDTH 3
 
 // Conversion definitions
+
+#define TRYTE_SPACE 27
+#define BYTE_SPACE 243
+
+#define TRYTE_VALUE_MAX 13
+#define BYTE_VALUE_MAX 121
+
+#define TRYTE_VALUE_MIN -13
+#define BYTE_VALUE_MIN -121
+
+#define TRYTE_WIDTH 3
+#define BYTE_WIDTH 5
 
 #define NUMBER_OF_TRITS_IN_A_TRYTE 3
 #define NUMBER_OF_TRITS_IN_A_BYTE 5

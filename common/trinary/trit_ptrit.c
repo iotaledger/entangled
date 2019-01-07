@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "trit_ptrit.h"
+#include "common/trinary/trit_ptrit.h"
 
 void trits_to_ptrits(trit_t const *const trits, ptrit_t *const ptrits,
                      size_t const index, size_t const length) {
@@ -54,8 +54,9 @@ void trits_to_ptrits_fill(trit_t const *const trits, ptrit_t *const ptrits,
 }
 
 void ptrits_to_trits(ptrit_t const *const ptrits, trit_t *const trits,
-                     size_t const index, size_t length) {
+                     size_t const index, size_t const length) {
   size_t j = 0;
+
   if (length == 0) {
     return;
   }

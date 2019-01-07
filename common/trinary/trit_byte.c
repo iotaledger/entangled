@@ -6,45 +6,155 @@
  */
 
 #include <assert.h>
+#include <string.h>
 
-#include "common/defs.h"
 #include "common/trinary/trit_byte.h"
 #include "utils/macros.h"
 
+// Since the LUT can be quite heavy for little devices, it is possible to
+// disable it and recompute values at runtime
+#ifndef NO_BYTES_TRITS_LUT
+
+// Values are ordered like this: 0, 1, ... 120, 121, -121, -120, ... -2, -1
+static trit_t const BYTES_TRITS_LUT[BYTE_SPACE][NUMBER_OF_TRITS_IN_A_BYTE] = {
+    {0, 0, 0, 0, 0},     {1, 0, 0, 0, 0},     {-1, 1, 0, 0, 0},
+    {0, 1, 0, 0, 0},     {1, 1, 0, 0, 0},     {-1, -1, 1, 0, 0},
+    {0, -1, 1, 0, 0},    {1, -1, 1, 0, 0},    {-1, 0, 1, 0, 0},
+    {0, 0, 1, 0, 0},     {1, 0, 1, 0, 0},     {-1, 1, 1, 0, 0},
+    {0, 1, 1, 0, 0},     {1, 1, 1, 0, 0},     {-1, -1, -1, 1, 0},
+    {0, -1, -1, 1, 0},   {1, -1, -1, 1, 0},   {-1, 0, -1, 1, 0},
+    {0, 0, -1, 1, 0},    {1, 0, -1, 1, 0},    {-1, 1, -1, 1, 0},
+    {0, 1, -1, 1, 0},    {1, 1, -1, 1, 0},    {-1, -1, 0, 1, 0},
+    {0, -1, 0, 1, 0},    {1, -1, 0, 1, 0},    {-1, 0, 0, 1, 0},
+    {0, 0, 0, 1, 0},     {1, 0, 0, 1, 0},     {-1, 1, 0, 1, 0},
+    {0, 1, 0, 1, 0},     {1, 1, 0, 1, 0},     {-1, -1, 1, 1, 0},
+    {0, -1, 1, 1, 0},    {1, -1, 1, 1, 0},    {-1, 0, 1, 1, 0},
+    {0, 0, 1, 1, 0},     {1, 0, 1, 1, 0},     {-1, 1, 1, 1, 0},
+    {0, 1, 1, 1, 0},     {1, 1, 1, 1, 0},     {-1, -1, -1, -1, 1},
+    {0, -1, -1, -1, 1},  {1, -1, -1, -1, 1},  {-1, 0, -1, -1, 1},
+    {0, 0, -1, -1, 1},   {1, 0, -1, -1, 1},   {-1, 1, -1, -1, 1},
+    {0, 1, -1, -1, 1},   {1, 1, -1, -1, 1},   {-1, -1, 0, -1, 1},
+    {0, -1, 0, -1, 1},   {1, -1, 0, -1, 1},   {-1, 0, 0, -1, 1},
+    {0, 0, 0, -1, 1},    {1, 0, 0, -1, 1},    {-1, 1, 0, -1, 1},
+    {0, 1, 0, -1, 1},    {1, 1, 0, -1, 1},    {-1, -1, 1, -1, 1},
+    {0, -1, 1, -1, 1},   {1, -1, 1, -1, 1},   {-1, 0, 1, -1, 1},
+    {0, 0, 1, -1, 1},    {1, 0, 1, -1, 1},    {-1, 1, 1, -1, 1},
+    {0, 1, 1, -1, 1},    {1, 1, 1, -1, 1},    {-1, -1, -1, 0, 1},
+    {0, -1, -1, 0, 1},   {1, -1, -1, 0, 1},   {-1, 0, -1, 0, 1},
+    {0, 0, -1, 0, 1},    {1, 0, -1, 0, 1},    {-1, 1, -1, 0, 1},
+    {0, 1, -1, 0, 1},    {1, 1, -1, 0, 1},    {-1, -1, 0, 0, 1},
+    {0, -1, 0, 0, 1},    {1, -1, 0, 0, 1},    {-1, 0, 0, 0, 1},
+    {0, 0, 0, 0, 1},     {1, 0, 0, 0, 1},     {-1, 1, 0, 0, 1},
+    {0, 1, 0, 0, 1},     {1, 1, 0, 0, 1},     {-1, -1, 1, 0, 1},
+    {0, -1, 1, 0, 1},    {1, -1, 1, 0, 1},    {-1, 0, 1, 0, 1},
+    {0, 0, 1, 0, 1},     {1, 0, 1, 0, 1},     {-1, 1, 1, 0, 1},
+    {0, 1, 1, 0, 1},     {1, 1, 1, 0, 1},     {-1, -1, -1, 1, 1},
+    {0, -1, -1, 1, 1},   {1, -1, -1, 1, 1},   {-1, 0, -1, 1, 1},
+    {0, 0, -1, 1, 1},    {1, 0, -1, 1, 1},    {-1, 1, -1, 1, 1},
+    {0, 1, -1, 1, 1},    {1, 1, -1, 1, 1},    {-1, -1, 0, 1, 1},
+    {0, -1, 0, 1, 1},    {1, -1, 0, 1, 1},    {-1, 0, 0, 1, 1},
+    {0, 0, 0, 1, 1},     {1, 0, 0, 1, 1},     {-1, 1, 0, 1, 1},
+    {0, 1, 0, 1, 1},     {1, 1, 0, 1, 1},     {-1, -1, 1, 1, 1},
+    {0, -1, 1, 1, 1},    {1, -1, 1, 1, 1},    {-1, 0, 1, 1, 1},
+    {0, 0, 1, 1, 1},     {1, 0, 1, 1, 1},     {-1, 1, 1, 1, 1},
+    {0, 1, 1, 1, 1},     {1, 1, 1, 1, 1},     {-1, -1, -1, -1, -1},
+    {0, -1, -1, -1, -1}, {1, -1, -1, -1, -1}, {-1, 0, -1, -1, -1},
+    {0, 0, -1, -1, -1},  {1, 0, -1, -1, -1},  {-1, 1, -1, -1, -1},
+    {0, 1, -1, -1, -1},  {1, 1, -1, -1, -1},  {-1, -1, 0, -1, -1},
+    {0, -1, 0, -1, -1},  {1, -1, 0, -1, -1},  {-1, 0, 0, -1, -1},
+    {0, 0, 0, -1, -1},   {1, 0, 0, -1, -1},   {-1, 1, 0, -1, -1},
+    {0, 1, 0, -1, -1},   {1, 1, 0, -1, -1},   {-1, -1, 1, -1, -1},
+    {0, -1, 1, -1, -1},  {1, -1, 1, -1, -1},  {-1, 0, 1, -1, -1},
+    {0, 0, 1, -1, -1},   {1, 0, 1, -1, -1},   {-1, 1, 1, -1, -1},
+    {0, 1, 1, -1, -1},   {1, 1, 1, -1, -1},   {-1, -1, -1, 0, -1},
+    {0, -1, -1, 0, -1},  {1, -1, -1, 0, -1},  {-1, 0, -1, 0, -1},
+    {0, 0, -1, 0, -1},   {1, 0, -1, 0, -1},   {-1, 1, -1, 0, -1},
+    {0, 1, -1, 0, -1},   {1, 1, -1, 0, -1},   {-1, -1, 0, 0, -1},
+    {0, -1, 0, 0, -1},   {1, -1, 0, 0, -1},   {-1, 0, 0, 0, -1},
+    {0, 0, 0, 0, -1},    {1, 0, 0, 0, -1},    {-1, 1, 0, 0, -1},
+    {0, 1, 0, 0, -1},    {1, 1, 0, 0, -1},    {-1, -1, 1, 0, -1},
+    {0, -1, 1, 0, -1},   {1, -1, 1, 0, -1},   {-1, 0, 1, 0, -1},
+    {0, 0, 1, 0, -1},    {1, 0, 1, 0, -1},    {-1, 1, 1, 0, -1},
+    {0, 1, 1, 0, -1},    {1, 1, 1, 0, -1},    {-1, -1, -1, 1, -1},
+    {0, -1, -1, 1, -1},  {1, -1, -1, 1, -1},  {-1, 0, -1, 1, -1},
+    {0, 0, -1, 1, -1},   {1, 0, -1, 1, -1},   {-1, 1, -1, 1, -1},
+    {0, 1, -1, 1, -1},   {1, 1, -1, 1, -1},   {-1, -1, 0, 1, -1},
+    {0, -1, 0, 1, -1},   {1, -1, 0, 1, -1},   {-1, 0, 0, 1, -1},
+    {0, 0, 0, 1, -1},    {1, 0, 0, 1, -1},    {-1, 1, 0, 1, -1},
+    {0, 1, 0, 1, -1},    {1, 1, 0, 1, -1},    {-1, -1, 1, 1, -1},
+    {0, -1, 1, 1, -1},   {1, -1, 1, 1, -1},   {-1, 0, 1, 1, -1},
+    {0, 0, 1, 1, -1},    {1, 0, 1, 1, -1},    {-1, 1, 1, 1, -1},
+    {0, 1, 1, 1, -1},    {1, 1, 1, 1, -1},    {-1, -1, -1, -1, 0},
+    {0, -1, -1, -1, 0},  {1, -1, -1, -1, 0},  {-1, 0, -1, -1, 0},
+    {0, 0, -1, -1, 0},   {1, 0, -1, -1, 0},   {-1, 1, -1, -1, 0},
+    {0, 1, -1, -1, 0},   {1, 1, -1, -1, 0},   {-1, -1, 0, -1, 0},
+    {0, -1, 0, -1, 0},   {1, -1, 0, -1, 0},   {-1, 0, 0, -1, 0},
+    {0, 0, 0, -1, 0},    {1, 0, 0, -1, 0},    {-1, 1, 0, -1, 0},
+    {0, 1, 0, -1, 0},    {1, 1, 0, -1, 0},    {-1, -1, 1, -1, 0},
+    {0, -1, 1, -1, 0},   {1, -1, 1, -1, 0},   {-1, 0, 1, -1, 0},
+    {0, 0, 1, -1, 0},    {1, 0, 1, -1, 0},    {-1, 1, 1, -1, 0},
+    {0, 1, 1, -1, 0},    {1, 1, 1, -1, 0},    {-1, -1, -1, 0, 0},
+    {0, -1, -1, 0, 0},   {1, -1, -1, 0, 0},   {-1, 0, -1, 0, 0},
+    {0, 0, -1, 0, 0},    {1, 0, -1, 0, 0},    {-1, 1, -1, 0, 0},
+    {0, 1, -1, 0, 0},    {1, 1, -1, 0, 0},    {-1, -1, 0, 0, 0},
+    {0, -1, 0, 0, 0},    {1, -1, 0, 0, 0},    {-1, 0, 0, 0, 0}};
+
+#else
+
 static const byte_t byte_radix[] = {1, 3, 9, 27, 81};
 
-void trits_to_bytes(trit_t *trits, byte_t *bytes, size_t num_trits) {
+#endif  // NO_BYTES_TRITS_LUT
+
+byte_t trits_to_byte(trit_t const *const trits, size_t const num_trits) {
+  byte_t byte = 0;
+
+  assert(num_trits <= NUMBER_OF_TRITS_IN_A_BYTE);
+  if (num_trits == 0) {
+    return 0;
+  }
+
+  for (int i = num_trits - 1; i >= 0; i--) {
+    byte = byte * RADIX + trits[i];
+  }
+
+  return byte;
+}
+
+void trits_to_bytes(trit_t const *const trits, byte_t *const bytes,
+                    size_t const num_trits) {
   if (num_trits == 0) {
     return;
   }
-  size_t end = MIN(num_trits, NUMBER_OF_TRITS_IN_A_BYTE);
-  bytes[0] = trits_to_byte(trits, 0, end);
-  trits_to_bytes(&trits[end], &bytes[1], num_trits - end);
+
+  for (size_t i = 0, j = 0; i < num_trits;
+       i += NUMBER_OF_TRITS_IN_A_BYTE, j++) {
+    bytes[j] =
+        trits_to_byte(trits + i, MIN(num_trits - i, NUMBER_OF_TRITS_IN_A_BYTE));
+  }
 }
 
-size_t min_bytes(size_t const num_trits) {
-  return (num_trits + NUMBER_OF_TRITS_IN_A_BYTE - 1) /
-         NUMBER_OF_TRITS_IN_A_BYTE;
-}
-
-byte_t trits_to_byte(trit_t const *const trits, byte_t const cum,
-                     size_t const num_trits) {
+void byte_to_trits(byte_t const byte, trit_t *const trits,
+                   size_t const num_trits) {
   assert(num_trits <= NUMBER_OF_TRITS_IN_A_BYTE);
   if (num_trits == 0) {
-    return cum;
+    return;
   }
-  byte_t byte = cum * RADIX + trits[num_trits - 1];
-  return trits_to_byte(trits, byte, num_trits - 1);
-}
 
-void _byte_to_trits(byte_t byte, trit_t *const trits, size_t j, size_t i) {
+#ifndef NO_BYTES_TRITS_LUT
+  memcpy(trits, BYTES_TRITS_LUT[byte < 0 ? BYTE_SPACE + byte : byte],
+         num_trits);
+#else
+  size_t j = NUMBER_OF_TRITS_IN_A_BYTE - 1;
+  size_t i = num_trits - 1;
+  byte_t value = byte;
+
   while (j < -1) {
     trit_t trit = 0;
-    if (byte > (byte_radix[j] >> 1)) {
-      byte -= byte_radix[j];
+    if (value > (byte_radix[j] >> 1)) {
+      value -= byte_radix[j];
       trit = 1;
-    } else if (byte < -(byte_radix[j] >> 1)) {
-      byte += byte_radix[j];
+    } else if (value < -(byte_radix[j] >> 1)) {
+      value += byte_radix[j];
       trit = -1;
     }
     if (j == i) {
@@ -53,6 +163,7 @@ void _byte_to_trits(byte_t byte, trit_t *const trits, size_t j, size_t i) {
     }
     j -= 1;
   }
+#endif  // NO_BYTES_TRITS_LUT
 }
 
 void bytes_to_trits(byte_t const *const bytes, size_t const num_bytes,
@@ -61,15 +172,10 @@ void bytes_to_trits(byte_t const *const bytes, size_t const num_bytes,
   if (num_bytes == 0 || num_trits == 0) {
     return;
   }
-  size_t end = MIN(num_trits, NUMBER_OF_TRITS_IN_A_BYTE);
-  _byte_to_trits(*bytes, trits, NUMBER_OF_TRITS_IN_A_BYTE - 1, end - 1);
-  bytes_to_trits(&bytes[1], num_bytes - 1, &trits[end], num_trits - end);
-}
 
-void byte_to_trits(byte_t byte, trit_t *const trit, size_t const num_trits) {
-  assert(num_trits <= NUMBER_OF_TRITS_IN_A_BYTE);
-  if (num_trits == 0) {
-    return;
+  for (size_t i = 0, j = 0; i < num_trits && j < num_bytes;
+       i += NUMBER_OF_TRITS_IN_A_BYTE, j++) {
+    byte_to_trits(bytes[j], &trits[i],
+                  MIN(num_trits - i, NUMBER_OF_TRITS_IN_A_BYTE));
   }
-  _byte_to_trits(byte, trit, NUMBER_OF_TRITS_IN_A_BYTE - 1, num_trits - 1);
 }

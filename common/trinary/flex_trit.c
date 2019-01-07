@@ -79,12 +79,12 @@ size_t flex_trits_slice(flex_trit_t *const to_flex_trits, size_t const to_len,
       bytes_to_trits(((byte_t *)flex_trits + i + 1), 1, ((trit_t *)trits + 5),
                      5);
     }
-    to_flex_trits[j] = trits_to_byte(trits + offset, 0, 5);
+    to_flex_trits[j] = trits_to_byte(trits + offset, 5);
   }
   // There is a risk of noise after the last trit so we need to clean up
   uint8_t residual = num_trits % 5U;
   if (residual) {
-    to_flex_trits[num_bytes - 1] = trits_to_byte(trits + offset, 0, residual);
+    to_flex_trits[num_bytes - 1] = trits_to_byte(trits + offset, residual);
   }
 #endif
   return num_bytes;
@@ -285,7 +285,7 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
   if (num_trits > len || num_trits > to_len) {
     return 0;
   }
-  memset(bytes, 0, min_bytes(to_len));
+  memset(bytes, 0, MIN_BYTES(to_len));
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
   trits_to_bytes((trit_t *)flex_trits, bytes, num_trits);
 #elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE) || \
@@ -312,7 +312,7 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
       offset += max_trits;
     }
     trits_for_byte = MIN(5, offset);
-    bytes[j] = trits_to_byte(shifter.trits, 0, trits_for_byte);
+    bytes[j] = trits_to_byte(shifter.trits, trits_for_byte);
 #if BYTE_ORDER == LITTLE_ENDIAN
     shifter.val = shifter.val >> 40;
 #elif BYTE_ORDER == BIG_ENDIAN
@@ -321,13 +321,13 @@ size_t flex_trits_to_bytes(byte_t *bytes, size_t to_len,
     offset -= 5;
   }
 #elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
-  size_t num_bytes = min_bytes(num_trits);
+  size_t num_bytes = MIN_BYTES(num_trits);
   size_t residual = num_trits % 5;
   if (residual) {
     trit_t last_byte[5] = {0};
     num_bytes--;
     byte_to_trits(flex_trits[num_bytes], last_byte, 5);
-    bytes[num_bytes] = trits_to_byte(last_byte, 0, residual);
+    bytes[num_bytes] = trits_to_byte(last_byte, residual);
   }
   memcpy(bytes, flex_trits, num_bytes);
 #endif
@@ -343,7 +343,7 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
   }
   memset(to_flex_trits, FLEX_TRIT_NULL_VALUE, NUM_FLEX_TRITS_FOR_TRITS(to_len));
 #if defined(FLEX_TRIT_ENCODING_1_TRIT_PER_BYTE)
-  size_t num_bytes = min_bytes(num_trits);
+  size_t num_bytes = MIN_BYTES(num_trits);
   bytes_to_trits(bytes, num_bytes, to_flex_trits, num_trits);
 #elif defined(FLEX_TRIT_ENCODING_3_TRITS_PER_BYTE) || \
     defined(FLEX_TRIT_ENCODING_4_TRITS_PER_BYTE)
@@ -373,13 +373,13 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
     offset -= trits_for_byte;
   }
 #elif defined(FLEX_TRIT_ENCODING_5_TRITS_PER_BYTE)
-  size_t num_bytes = min_bytes(num_trits);
+  size_t num_bytes = MIN_BYTES(num_trits);
   size_t residual = num_trits % 5;
   if (residual) {
     trit_t last_byte[5] = {0};
     num_bytes--;
     byte_to_trits(bytes[num_bytes], last_byte, 5);
-    to_flex_trits[num_bytes] = trits_to_byte(last_byte, 0, residual);
+    to_flex_trits[num_bytes] = trits_to_byte(last_byte, residual);
   }
   memcpy(to_flex_trits, bytes, num_bytes);
 #endif
