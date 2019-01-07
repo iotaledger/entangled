@@ -10,15 +10,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-
-static void iota_lf_queue_umm_cleanup_callback(
-        struct lfds711_queue_umm_state *qumms,
-        struct lfds711_queue_umm_element *qumme,
-        enum lfds711_misc_flag dummy_element_flag) {
-
-
-}
-
 void iota_lf_umm_queue_{TYPE}_init_owner(iota_lf_umm_queue_{TYPE}_t* const queue,
                                          uint32_t element_size) {
   lfds711_queue_umm_init_valid_on_current_logical_core(
@@ -42,15 +33,17 @@ void* iota_lf_umm_queue_{TYPE}_free(iota_lf_umm_queue_{TYPE}_t* const queue) {
   //Dequeue will add all allocated queued element to the freelist
   while (iota_lf_umm_queue_{TYPE}_dequeue(queue));
   lfds711_queue_umm_cleanup(&queue->queue, NULL);
+
   while (lfds711_freelist_pop(&queue->freelist, &fe, NULL)) {
     queue_element = LFDS711_FREELIST_GET_VALUE_FROM_ELEMENT(*fe);
     free(queue_element);
   }
+
   lfds711_freelist_cleanup(&queue->freelist, NULL);
 }
 
 retcode_t iota_lf_umm_queue_{TYPE}_enqueue(iota_lf_umm_queue_{TYPE}_t* const queue,
-                                           void const* const data) {
+        {TYPE} const* const data) {
   iota_lf_queue_umm_{TYPE}_t* p = NULL;
   bool reused_element = false;
 

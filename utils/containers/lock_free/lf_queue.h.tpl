@@ -78,7 +78,7 @@ void* iota_lf_umm_queue_{TYPE}_free(iota_lf_umm_queue_{TYPE}_t* const queue);
  */
 
 retcode_t iota_lf_umm_queue_{TYPE}_enqueue(iota_lf_umm_queue_{TYPE}_t* const queue,
-                                           void const* const data);
+                                            {TYPE} const* const data);
 
 /**
  * Dequeues an element
