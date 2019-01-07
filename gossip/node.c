@@ -288,16 +288,16 @@ retcode_t node_stop(node_t* const node) {
     ret = RC_NODE_FAILED_PROCESSOR_STOP;
   }
 
-  log_info(NODE_LOGGER_ID, "Stopping receiver component\n");
-  if (receiver_stop(&node->receiver) != RC_OK) {
-    log_error(NODE_LOGGER_ID, "Stopping receiver component failed\n");
-    ret = RC_NODE_FAILED_RECEIVER_STOP;
-  }
-
   log_info(NODE_LOGGER_ID, "Stopping responder component\n");
   if (responder_stop(&node->responder) != RC_OK) {
     log_error(NODE_LOGGER_ID, "Stopping responder component failed\n");
     ret = RC_NODE_FAILED_RESPONDER_STOP;
+  }
+
+  log_info(NODE_LOGGER_ID, "Stopping receiver component\n");
+  if (receiver_stop(&node->receiver) != RC_OK) {
+    log_error(NODE_LOGGER_ID, "Stopping receiver component failed\n");
+    ret = RC_NODE_FAILED_RECEIVER_STOP;
   }
 
   log_info(NODE_LOGGER_ID, "Stopping tips requester component\n");
@@ -351,16 +351,16 @@ retcode_t node_destroy(node_t* const node) {
     ret = RC_NODE_FAILED_BROADCASTER_DESTROY;
   }
 
-  log_info(NODE_LOGGER_ID, "Destroying processor component\n");
-  if (processor_destroy(&node->processor) != RC_OK) {
-    log_error(NODE_LOGGER_ID, "Destroying processor component failed\n");
-    ret = RC_NODE_FAILED_PROCESSOR_DESTROY;
-  }
-
   log_info(NODE_LOGGER_ID, "Destroying receiver component\n");
   if (receiver_destroy(&node->receiver) != RC_OK) {
     log_error(NODE_LOGGER_ID, "Destroying receiver component failed\n");
     ret = RC_NODE_FAILED_RECEIVER_DESTROY;
+  }
+
+  log_info(NODE_LOGGER_ID, "Destroying processor component\n");
+  if (processor_destroy(&node->processor) != RC_OK) {
+    log_error(NODE_LOGGER_ID, "Destroying processor component failed\n");
+    ret = RC_NODE_FAILED_PROCESSOR_DESTROY;
   }
 
   log_info(NODE_LOGGER_ID, "Destroying responder component\n");
