@@ -23,6 +23,6 @@ void ascii_to_trytes(char const *const input, tryte_t *const output) {
 void trytes_to_ascii(tryte_t const *const input, char *const output) {
   for (int i = 0; input[i]; i += 2) {
     output[i / 2] =
-        index_of_tryte(input[i]) + index_of_tryte(input[i + 1]) * TRYTE_SPACE;
+        INDEX_OF_TRYTE(input[i]) + INDEX_OF_TRYTE(input[i + 1]) * TRYTE_SPACE;
   }
 }

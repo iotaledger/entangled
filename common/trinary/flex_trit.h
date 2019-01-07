@@ -153,7 +153,7 @@ static inline uint8_t flex_trits_set_at(flex_trit_t *const flex_trits,
   index = index / 5U;
   byte_to_trits(*(flex_trits + index), trits, 5);
   trits[tindex] = trit;
-  flex_trits[index] = trits_to_byte(trits, 0, 5);
+  flex_trits[index] = trits_to_byte(trits, 5);
 #endif
   return 1;
 }

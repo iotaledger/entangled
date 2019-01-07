@@ -17,7 +17,7 @@
 void test_trit_to_byte(void) {
   trit_t trits[] = {TRITS_IN};
   size_t trits_size = sizeof(trits) / sizeof(trit_t);
-  byte_t bytes[min_bytes(trits_size)];
+  byte_t bytes[MIN_BYTES(trits_size)];
   byte_t exp[] = {BYTES_EXP};
   trits_to_bytes(trits, bytes, trits_size);
   TEST_ASSERT_EQUAL_MEMORY(exp, bytes, sizeof(exp));
@@ -27,7 +27,7 @@ void test_to_from_byte(void) {
   trit_t trits[] = {TRITS_IN};
   size_t trits_size = sizeof(trits) / sizeof(trit_t);
   trit_t trits_out[trits_size];
-  size_t bytes_size = min_bytes(trits_size);
+  size_t bytes_size = MIN_BYTES(trits_size);
   byte_t bytes[bytes_size];
   trits_to_bytes(trits, bytes, trits_size);
   bytes_to_trits(bytes, bytes_size, trits_out, trits_size);
@@ -40,7 +40,7 @@ void test_from_byte(void) {
   size_t trits_size = sizeof(trits) / sizeof(trit_t);
   trit_t trits_out[trits_size];
   trit_t partial_trits[trits_size];
-  size_t bytes_size = min_bytes(trits_size);
+  size_t bytes_size = MIN_BYTES(trits_size);
   for (int len = 0; len <= trits_size; len++) {
     memset(trits_out, 0, trits_size);
     memset(partial_trits, 0, trits_size);
