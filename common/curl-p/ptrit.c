@@ -5,24 +5,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "indices.h"
-#include "ptrit.h"
+#include "common/curl-p/ptrit.h"
 
-static const size_t CURL_INDEX[STATE_LENGTH + 1] = {__INDEX_TABLE};
+static void ptrit_transform(PCurl *const ctx) {
+  PCurl s = {0};
+  size_t round = 0;
+  ptrit_t *lhs, *rhs;
 
-static void ptrit_sbox(ptrit_t *const c, ptrit_t const *const s) {
-  ptrit_s alpha, beta, gamma, delta;
-  size_t i = 0;
-
-  for (; i < STATE_LENGTH; ++i) {
-    alpha = s[CURL_INDEX[i]].low;
-    beta = s[CURL_INDEX[i]].high;
-    gamma = s[CURL_INDEX[i + 1]].high;
-    delta = (alpha | (~gamma)) & (s[CURL_INDEX[i + 1]].low ^ beta);
-
-    c[i].low = ~delta;
-    c[i].high = (alpha ^ gamma) | delta;
+  for (; round < ctx->type; ++round) {
+    if (round & 1) {
+      lhs = ctx->state;
+      rhs = s.state;
+    } else {
+      lhs = s.state;
+      rhs = ctx->state;
+    }
+    ptrit_sbox(lhs, rhs);
   }
+
+  if (round & 1) memcpy(ctx->state, s.state, sizeof(ctx->state));
 }
 
 void ptrit_curl_init(PCurl *const ctx, CurlType type) {
@@ -32,10 +33,11 @@ void ptrit_curl_init(PCurl *const ctx, CurlType type) {
 
 void ptrit_curl_absorb(PCurl *const ctx, ptrit_t const *const trits,
                        size_t length) {
-  size_t numChunks =
+  size_t num_chunks =
       length / HASH_LENGTH_TRIT + ((length % HASH_LENGTH_TRIT) ? 1 : 0);
   size_t i = 0;
-  for (; i < numChunks; ++i) {
+
+  for (; i < num_chunks; ++i) {
     memcpy(ctx->state, trits + i * HASH_LENGTH_TRIT,
            (length < HASH_LENGTH_TRIT ? length : HASH_LENGTH_TRIT) *
                sizeof(ptrit_t));
@@ -45,29 +47,17 @@ void ptrit_curl_absorb(PCurl *const ctx, ptrit_t const *const trits,
 }
 
 void ptrit_curl_squeeze(PCurl *const ctx, ptrit_t *const trits, size_t length) {
-  size_t numChunks =
+  size_t num_chunks =
       length / HASH_LENGTH_TRIT + ((length % HASH_LENGTH_TRIT) ? 1 : 0);
   size_t i = 0;
-  for (; i < numChunks; ++i) {
+
+  for (; i < num_chunks; ++i) {
     memcpy(trits + i * HASH_LENGTH_TRIT, ctx->state,
            (length < HASH_LENGTH_TRIT ? length : HASH_LENGTH_TRIT) *
                sizeof(ptrit_t));
     ptrit_transform(ctx);
     length = length < HASH_LENGTH_TRIT ? 0 : length - HASH_LENGTH_TRIT;
   }
-}
-
-void ptrit_transform(PCurl *const ctx) {
-  PCurl s = {0};
-  size_t round = 0;
-  for (; round < ctx->type; ++round) {
-    if (round & 1)
-      ptrit_sbox(ctx->state, s.state);
-    else
-      ptrit_sbox(s.state, ctx->state);
-  }
-
-  if (round & 1) memcpy(ctx->state, s.state, sizeof(ctx->state));
 }
 
 void ptrit_curl_reset(PCurl *const ctx) {

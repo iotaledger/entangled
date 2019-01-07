@@ -20,6 +20,7 @@ cc_library(
         ":curl-p-const",
         "//common:stdint",
         "//common/trinary:trits",
+        "//utils:forced_inline",
     ],
 )
 
@@ -48,6 +49,7 @@ cc_library(
         "//common:stdint",
         "//common/trinary:ptrits",
         "//common/trinary:trits",
+        "//utils:forced_inline",
     ],
 )
 

@@ -6,6 +6,11 @@ cc_library(
 )
 
 cc_library(
+    name = "forced_inline",
+    hdrs = ["forced_inline.h"],
+)
+
+cc_library(
     name = "files",
     srcs = ["files.c"],
     hdrs = ["files.h"],
