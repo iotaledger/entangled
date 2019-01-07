@@ -39,6 +39,8 @@ void* iota_lf_umm_queue_{TYPE}_free(iota_lf_umm_queue_{TYPE}_t* const queue) {
     return;
   }
 
+  //Dequeue will add all allocated queued element to the freelist
+  while (iota_lf_umm_queue_{TYPE}_dequeue(queue));
   lfds711_queue_umm_cleanup(&queue->queue, NULL);
   while (lfds711_freelist_pop(&queue->freelist, &fe, NULL)) {
     queue_element = LFDS711_FREELIST_GET_VALUE_FROM_ELEMENT(*fe);
