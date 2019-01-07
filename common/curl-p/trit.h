@@ -11,7 +11,6 @@
 #include <string.h>
 
 #include "common/curl-p/const.h"
-#include "common/curl-p/indices.h"
 #include "common/trinary/trits.h"
 #include "utils/forced_inline.h"
 
@@ -23,12 +22,6 @@ typedef struct {
   trit_t state[STATE_LENGTH];
   CurlType type;
 } Curl;
-
-#define __TRUTH_TABLE 1, 0, -1, 2, 1, -1, 0, 2, -1, 1, 0
-
-static const size_t CURL_INDEX[STATE_LENGTH + 1] = {__INDEX_TABLE};
-
-static const trit_t TRUTH_TABLE[11] = {__TRUTH_TABLE};
 
 static FORCED_INLINE void sbox(Curl* const c, Curl* const s) {
   size_t i = 0;

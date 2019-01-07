@@ -2,11 +2,15 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "curl-p-const",
+    srcs = ["const.c"],
     hdrs = [
         "const.h",
         "indices.h",
     ],
-    deps = ["//common:defs"],
+    deps = [
+        "//common:defs",
+        "//common/trinary:trits",
+    ],
 )
 
 cc_library(

@@ -7,25 +7,6 @@
 
 #include "common/curl-p/ptrit.h"
 
-static void ptrit_transform(PCurl *const ctx) {
-  PCurl s = {0};
-  size_t round = 0;
-  ptrit_t *lhs, *rhs;
-
-  for (; round < ctx->type; ++round) {
-    if (round & 1) {
-      lhs = ctx->state;
-      rhs = s.state;
-    } else {
-      lhs = s.state;
-      rhs = ctx->state;
-    }
-    ptrit_sbox(lhs, rhs);
-  }
-
-  if (round & 1) memcpy(ctx->state, s.state, sizeof(ctx->state));
-}
-
 void ptrit_curl_init(PCurl *const ctx, CurlType type) {
   ptrit_curl_reset(ctx);
   ctx->type = type;
@@ -58,6 +39,25 @@ void ptrit_curl_squeeze(PCurl *const ctx, ptrit_t *const trits, size_t length) {
     ptrit_transform(ctx);
     length = length < HASH_LENGTH_TRIT ? 0 : length - HASH_LENGTH_TRIT;
   }
+}
+
+void ptrit_transform(PCurl *const ctx) {
+  PCurl s = {0};
+  size_t round = 0;
+  ptrit_t *lhs, *rhs;
+
+  for (; round < ctx->type; ++round) {
+    if (round & 1) {
+      lhs = ctx->state;
+      rhs = s.state;
+    } else {
+      lhs = s.state;
+      rhs = ctx->state;
+    }
+    ptrit_sbox(lhs, rhs);
+  }
+
+  if (round & 1) memcpy(ctx->state, s.state, sizeof(ctx->state));
 }
 
 void ptrit_curl_reset(PCurl *const ctx) {
