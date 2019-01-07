@@ -12,7 +12,6 @@
 
 #include "common/curl-p/const.h"
 #include "common/trinary/trits.h"
-#include "utils/forced_inline.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,14 +21,6 @@ typedef struct {
   trit_t state[STATE_LENGTH];
   CurlType type;
 } Curl;
-
-static FORCED_INLINE void sbox(Curl* const c, Curl* const s) {
-  size_t i = 0;
-  for (; i < STATE_LENGTH; ++i) {
-    c->state[i] = TRUTH_TABLE[s->state[CURL_INDEX[i]] +
-                              ((unsigned)s->state[CURL_INDEX[i + 1]] << 2) + 5];
-  }
-}
 
 void init_curl(Curl* ctx);
 void curl_absorb(Curl* const ctx, trit_t const* const trits, size_t length);
