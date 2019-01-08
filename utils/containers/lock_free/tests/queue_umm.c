@@ -12,8 +12,8 @@
 #include "utils/containers/lock_free/lf_queue_int.h"
 
 void queue_integers_same_thread() {
-  iota_lf_umm_queue_int_t queue;
-  iota_lf_umm_queue_int_init_owner(&queue, sizeof(int));
+  iota_lf_umm_queue_t queue;
+  iota_lf_umm_queue_int_init_owner(&queue);
   iota_lf_umm_queue_int_init_user(&queue);
   for (int i = 0; i < 1000; ++i) {
     iota_lf_umm_queue_int_enqueue(&queue, &i);

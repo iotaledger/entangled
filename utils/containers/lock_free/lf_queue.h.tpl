@@ -9,14 +9,15 @@
  * UMM - unbounded queue, multiple producers, multiple consumers
  */
 
-#ifndef __UTILS_CONTAINERS_LOCK_FREE_QUEUE_UMM_H__
-#define __UTILS_CONTAINERS_LOCK_FREE_QUEUE_UMM_H__
+#ifndef __UTILS_CONTAINERS_LOCK_FREE_LF_QUEUE_UMM_{TYPE}_H__
+#define __UTILS_CONTAINERS_LOCK_FREE_LF_QUEUE_UMM_{TYPE}_H__
 
 #include <stddef.h>
 #include <stdint-gcc.h>
 
 #include <liblfds711.h>
 #include "common/errors.h"
+#include "utils/containers/lock_free/queue_structs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,8 +45,7 @@ typedef struct {
  * @return void
  */
 
-void iota_lf_umm_queue_{TYPE}_init_owner(iota_lf_umm_queue_{TYPE}_t* const queue,
-                                         uint32_t element_size);
+void iota_lf_umm_queue_{TYPE}_init_owner(iota_lf_umm_queue_t* const queue);
 
 /**
  * Init user function
@@ -56,7 +56,7 @@ void iota_lf_umm_queue_{TYPE}_init_owner(iota_lf_umm_queue_{TYPE}_t* const queue
  * @return void
  */
 
-void iota_lf_umm_queue_{TYPE}_init_user(iota_lf_umm_queue_{TYPE}_t* const queue);
+void iota_lf_umm_queue_{TYPE}_init_user(iota_lf_umm_queue_t* const queue);
 
 /**
  * Frees the queue
@@ -66,7 +66,7 @@ void iota_lf_umm_queue_{TYPE}_init_user(iota_lf_umm_queue_{TYPE}_t* const queue)
  * @return void
  */
 
-void* iota_lf_umm_queue_{TYPE}_free(iota_lf_umm_queue_{TYPE}_t* const queue);
+void* iota_lf_umm_queue_{TYPE}_free(iota_lf_umm_queue_t* const queue);
 
 /**
  * Enqueues an element
@@ -77,7 +77,7 @@ void* iota_lf_umm_queue_{TYPE}_free(iota_lf_umm_queue_{TYPE}_t* const queue);
  * @return error code
  */
 
-retcode_t iota_lf_umm_queue_{TYPE}_enqueue(iota_lf_umm_queue_{TYPE}_t* const queue,
+retcode_t iota_lf_umm_queue_{TYPE}_enqueue(iota_lf_umm_queue_t* const queue,
                                             {TYPE} const* const data);
 
 /**
@@ -89,7 +89,7 @@ retcode_t iota_lf_umm_queue_{TYPE}_enqueue(iota_lf_umm_queue_{TYPE}_t* const que
  */
 
 iota_lf_queue_umm_{TYPE}_t* iota_lf_umm_queue_{TYPE}_dequeue(
-        iota_lf_umm_queue_{TYPE}_t* const queue);
+        iota_lf_umm_queue_t* const queue);
 
 /**
  * count number of elements
@@ -99,10 +99,10 @@ iota_lf_queue_umm_{TYPE}_t* iota_lf_umm_queue_{TYPE}_dequeue(
  * @return the number of elements
  */
 
-size_t iota_lf_umm_queue_{TYPE}_count(const iota_lf_umm_queue_{TYPE}_t* const queue);
+size_t iota_lf_umm_queue_{TYPE}_count(const iota_lf_umm_queue_t* const queue);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // __UTILS_CONTAINERS_LOCK_FREE_QUEUE_UMM_H__
+#endif  // __UTILS_CONTAINERS_LOCK_FREE_LF_QUEUE_UMM_{TYPE}_H__

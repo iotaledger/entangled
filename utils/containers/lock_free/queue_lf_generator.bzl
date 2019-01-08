@@ -47,6 +47,7 @@ def queue_generate(type):
             "//common:errors",
             "@liblfds",
             "//utils/containers:person_example",
+            "//utils/containers/lock_free:lf_queue_struct",
         ],
         visibility = ["//visibility:public"],
     )
