@@ -13,6 +13,8 @@ extern "C" {
 #define __COMMON_MODEL_TRANSACTION_H_
 
 #include <assert.h>
+#include <inttypes.h>
+#include <stdio.h>
 
 #include "common/trinary/flex_trit.h"
 
@@ -399,6 +401,8 @@ static inline void transaction_set_arrival_timestamp(
  ***********************************************************************************************************/
 
 void transaction_reset(iota_transaction_t *const transaction);
+// for debugging
+void transaction_obj_dump(iota_transaction_t *tx_obj);
 
 uint8_t transaction_weight_magnitude(
     iota_transaction_t const *const transaction);

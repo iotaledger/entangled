@@ -347,3 +347,65 @@ size_t transaction_deserialize_from_trits(iota_transaction_t *const transaction,
 void transaction_free(iota_transaction_t *const transaction) {
   free(transaction);
 }
+
+// for debugging
+void transaction_obj_dump(iota_transaction_t *tx_obj) {
+  tryte_t trytes_81[NUM_TRYTES_HASH + 1];
+  tryte_t trytes_27[NUM_TRYTES_TAG + 1];
+
+  printf("==========Transaction Object==========\n");
+  // address
+  flex_trits_to_trytes(trytes_81, NUM_TRYTES_HASH, transaction_address(tx_obj),
+                       NUM_TRITS_HASH, NUM_TRITS_HASH);
+  trytes_81[NUM_TRYTES_HASH] = '\0';
+  printf("addr: %s\n", trytes_81);
+
+  printf("value: %" PRId64 "\n", transaction_value(tx_obj));
+
+  flex_trits_to_trytes(trytes_81, NUM_TRYTES_HASH,
+                       transaction_obsolete_tag(tx_obj), NUM_TRITS_HASH,
+                       NUM_TRITS_HASH);
+  trytes_81[NUM_TRYTES_HASH] = '\0';
+  printf("obsolete_tag: %s\n", trytes_81);
+
+  printf("timestamp: %" PRId64 "\n", transaction_timestamp(tx_obj));
+  printf("curr index: %" PRId64 " \nlast index: %" PRId64 "\n",
+         transaction_current_index(tx_obj), transaction_last_index(tx_obj));
+
+  flex_trits_to_trytes(trytes_81, NUM_TRYTES_HASH, transaction_bundle(tx_obj),
+                       NUM_TRITS_HASH, NUM_TRITS_HASH);
+  trytes_81[NUM_TRYTES_HASH] = '\0';
+  printf("bundle: %s\n", trytes_81);
+
+  flex_trits_to_trytes(trytes_81, NUM_TRYTES_HASH, transaction_trunk(tx_obj),
+                       NUM_TRITS_HASH, NUM_TRITS_HASH);
+  trytes_81[NUM_TRYTES_HASH] = '\0';
+  printf("trunk: %s\n", trytes_81);
+
+  flex_trits_to_trytes(trytes_81, NUM_TRYTES_HASH, transaction_branch(tx_obj),
+                       NUM_TRITS_HASH, NUM_TRITS_HASH);
+  trytes_81[NUM_TRYTES_HASH] = '\0';
+  printf("branch: %s\n", trytes_81);
+
+  flex_trits_to_trytes(trytes_27, NUM_TRYTES_TAG, transaction_tag(tx_obj),
+                       NUM_TRITS_TAG, NUM_TRITS_TAG);
+  trytes_27[NUM_TRYTES_TAG] = '\0';
+  printf("tag: %s\n", trytes_27);
+
+  printf("attachment_timestamp: %" PRId64 "\n",
+         transaction_attachment_timestamp(tx_obj));
+  printf("attachment_timestamp_lower: %" PRId64 "\n",
+         transaction_attachment_timestamp_lower(tx_obj));
+  printf("attachment_timestamp_upper: %" PRId64 "\n",
+         transaction_attachment_timestamp_upper(tx_obj));
+
+  flex_trits_to_trytes(trytes_27, NUM_TRYTES_TAG, transaction_nonce(tx_obj),
+                       NUM_TRITS_TAG, NUM_TRITS_TAG);
+  trytes_27[NUM_TRYTES_TAG] = '\0';
+  printf("nonce: %s\n", trytes_27);
+
+  flex_trits_to_trytes(trytes_81, NUM_TRYTES_HASH, transaction_hash(tx_obj),
+                       NUM_TRITS_HASH, NUM_TRITS_HASH);
+  trytes_81[NUM_TRYTES_HASH] = '\0';
+  printf("hash: %s\n", trytes_81);
+}

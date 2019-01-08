@@ -20,7 +20,10 @@ extern "C" {
 #include "common/trinary/trit_long.h"
 #include "utils/logger_helper.h"
 
-#define NUM_TRITS_ESSENCE 486
+// bundle essence = 486 trits
+#define NUM_TRITS_ESSENCE                                         \
+  (NUM_TRITS_ADDRESS + NUM_TRITS_VALUE + NUM_TRITS_OBSOLETE_TAG + \
+   NUM_TRITS_TIMESTAMP + NUM_TRITS_CURRENT_INDEX + NUM_TRITS_LAST_INDEX)
 
 typedef enum { DATA = 0, VALUE_OUT, VALUE_IN } transfer_type_e;
 

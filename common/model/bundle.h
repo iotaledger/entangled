@@ -10,6 +10,7 @@
 
 #include "common/kerl/kerl.h"
 #include "common/model/transaction.h"
+#include "common/sign/normalize.h"
 #include "common/trinary/flex_trit.h"
 #include "utarray.h"
 
@@ -35,6 +36,12 @@ static inline size_t bundle_transactions_size(
 }
 
 void calculate_bundle_hash(bundle_transactions_t *bundle, flex_trit_t *out);
+void finalize_bundle(bundle_transactions_t *bundle);
+void dump_bundle(bundle_transactions_t *bundle);
+
+#define BUNDLE_FOREACH(txs, tx)                                   \
+  for (tx = (iota_transaction_t *)utarray_front(txs); tx != NULL; \
+       tx = (iota_transaction_t *)utarray_next(txs, tx))
 
 #ifdef __cplusplus
 }

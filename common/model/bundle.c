@@ -51,3 +51,55 @@ void calculate_bundle_hash(bundle_transactions_t *bundle, flex_trit_t *out) {
   flex_trits_from_trits(out, NUM_TRITS_HASH, bundle_hash_trits, NUM_TRITS_HASH,
                         NUM_TRITS_HASH);
 }
+
+void finalize_bundle(bundle_transactions_t *bundle) {
+  iota_transaction_t *curr_tx = NULL;
+  bool valid_bundle = false;
+  iota_transaction_t *head_tx = NULL;
+  byte_t normalized_hash[HASH_LENGTH_TRYTE];
+  trit_t increased_tag_trits[NUM_TRITS_TAG];
+  flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
+  trit_t one[NUM_TRITS_TAG] = {
+      1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+  Kerl kerl = {};
+  init_kerl(&kerl);
+
+  while (!valid_bundle) {
+  update_hash:
+    // bundel hash
+    calculate_bundle_hash(bundle, bundle_hash);
+    // update bundle_hash
+    BUNDLE_FOREACH(bundle, curr_tx) {
+      transaction_set_bundle(curr_tx, bundle_hash);
+    }
+    // normalize
+    normalize_hash(bundle_hash, normalized_hash);
+    kerl_reset(&kerl);
+    // checking 'M'
+    for (int i = 0; i < HASH_LENGTH_TRYTE; i++) {
+      if (normalized_hash[i] == 13) {
+        // Insecure bundle. Increment Tag and recompute bundle hash.
+        head_tx = (iota_transaction_t *)utarray_front(bundle);
+        flex_trits_to_trits(increased_tag_trits, NUM_TRITS_TAG,
+                            transaction_obsolete_tag(head_tx), NUM_TRITS_TAG,
+                            NUM_TRITS_TAG);
+        add_trits(one, increased_tag_trits, NUM_TRITS_TAG);
+        flex_trits_from_trits(transaction_obsolete_tag(head_tx), NUM_TRITS_TAG,
+                              increased_tag_trits, NUM_TRITS_TAG,
+                              NUM_TRITS_TAG);
+        goto update_hash;
+      }
+    }
+    valid_bundle = true;
+  }
+}
+
+// for debugging
+void dump_bundle(bundle_transactions_t *bundle) {
+  iota_transaction_t *curr_tx = NULL;
+  BUNDLE_FOREACH(bundle, curr_tx) { transaction_obj_dump(curr_tx); }
+}
