@@ -1,8 +1,8 @@
 cc_test(
-    name = "queue_lf",
-    srcs = ["queue_umm.c"],
+    name = "lf_mpmc_queue",
+    srcs = ["lf_mpmc_queue.c"],
     deps = [
-        "//utils/containers/lock_free:lf_queue_int",
+        "//utils/containers/lock_free:lf_mpmc_queue_int",
         "@unity",
     ],
 )

@@ -1,5 +1,5 @@
-load(":queue_lf_generator.bzl", "queue_generate")
+load(":container_generator.bzl", "container_generate")
 
-queue_generate(
+container_generate(
     type = "int",
 )

@@ -25,17 +25,17 @@ _queue_generator = rule(
     },
 )
 
-def queue_generate(type):
-    base = str("lf_queue_") + str(type)
+def container_generate(type):
+    base = str("lf_mpmc_queue_") + str(type)
     source = base + ".c"
     header = base + ".h"
 
     _queue_generator(
         name = base + "_generator",
         source = source,
-        source_template = "//utils/containers/lock_free:lf_queue.c.tpl",
+        source_template = "//utils/containers/lock_free:lf_mpmc_queue.c.tpl",
         header = header,
-        header_template = "//utils/containers/lock_free:lf_queue.h.tpl",
+        header_template = "//utils/containers/lock_free:lf_mpmc_queue.h.tpl",
         type = type,
     )
 
@@ -45,8 +45,7 @@ def queue_generate(type):
         hdrs = [header],
         deps = [
             "//common:errors",
-            "@liblfds",
-            "//utils/containers:person_example",
+            "@concurrencykit",
         ],
         visibility = ["//visibility:public"],
     )
