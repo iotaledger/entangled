@@ -6,13 +6,7 @@
 #include <string.h>
 
 #include "common/curl-p/bct.h"
-#include "common/curl-p/indices.h"
-
-#define __TRUTH_TABLE 1, 0, -1, 2, 1, -1, 0, 2, -1, 1, 0
-
-static const size_t CURL_INDEX[STATE_LENGTH + 1] = {__INDEX_TABLE};
-
-static const trit_t TRUTH_TABLE[11] = {__TRUTH_TABLE};
+#include "common/curl-p/const.h"
 
 void s_transform(BCurl *const ctx);
 void transform_round(BCurl *const, BCurl *const, size_t const);

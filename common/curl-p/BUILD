@@ -2,11 +2,15 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "curl-p-const",
+    srcs = ["const.c"],
     hdrs = [
         "const.h",
         "indices.h",
     ],
-    deps = ["//common:defs"],
+    deps = [
+        "//common:defs",
+        "//common/trinary:trits",
+    ],
 )
 
 cc_library(
@@ -20,6 +24,7 @@ cc_library(
         ":curl-p-const",
         "//common:stdint",
         "//common/trinary:trits",
+        "//utils:forced_inline",
     ],
 )
 
@@ -48,6 +53,7 @@ cc_library(
         "//common:stdint",
         "//common/trinary:ptrits",
         "//common/trinary:trits",
+        "//utils:forced_inline",
     ],
 )
 
