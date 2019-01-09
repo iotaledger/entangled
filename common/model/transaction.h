@@ -13,8 +13,10 @@ extern "C" {
 #define __COMMON_MODEL_TRANSACTION_H_
 
 #include <assert.h>
+#ifdef DEBUG
 #include <inttypes.h>
 #include <stdio.h>
+#endif
 
 #include "common/trinary/flex_trit.h"
 

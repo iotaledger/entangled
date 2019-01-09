@@ -11,6 +11,11 @@
 #include "common/trinary/tryte_long.h"
 
 static UT_icd bundle_transactions_icd = {sizeof(iota_transaction_t), 0, 0, 0};
+static const trit_t one[NUM_TRITS_TAG] = {
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 void bundle_transactions_new(bundle_transactions_t **const bundle) {
   utarray_new(*bundle, &bundle_transactions_icd);
@@ -37,8 +42,7 @@ void calculate_bundle_hash(bundle_transactions_t *bundle, flex_trit_t *out) {
 
   trit_t bundle_hash_trits[NUM_TRITS_HASH];
 
-  for (curr_tx = (iota_transaction_t *)utarray_front(bundle); curr_tx != NULL;
-       curr_tx = (iota_transaction_t *)utarray_next(bundle, curr_tx)) {
+  BUNDLE_FOREACH(bundle, curr_tx) {
     absorb_essence(
         &kerl, transaction_address(curr_tx), transaction_value(curr_tx),
         transaction_obsolete_tag(curr_tx), transaction_timestamp(curr_tx),
@@ -59,23 +63,14 @@ void finalize_bundle(bundle_transactions_t *bundle) {
   byte_t normalized_hash[HASH_LENGTH_TRYTE];
   trit_t increased_tag_trits[NUM_TRITS_TAG];
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
-  trit_t one[NUM_TRITS_TAG] = {
-      1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
   Kerl kerl = {};
   init_kerl(&kerl);
 
   while (!valid_bundle) {
   update_hash:
-    // bundel hash
+    // bundle hash
     calculate_bundle_hash(bundle, bundle_hash);
-    // update bundle_hash
-    BUNDLE_FOREACH(bundle, curr_tx) {
-      transaction_set_bundle(curr_tx, bundle_hash);
-    }
     // normalize
     normalize_hash(bundle_hash, normalized_hash);
     kerl_reset(&kerl);
@@ -95,11 +90,17 @@ void finalize_bundle(bundle_transactions_t *bundle) {
       }
     }
     valid_bundle = true;
+    // update bundle_hash
+    BUNDLE_FOREACH(bundle, curr_tx) {
+      transaction_set_bundle(curr_tx, bundle_hash);
+    }
   }
 }
 
 // for debugging
 void dump_bundle(bundle_transactions_t *bundle) {
+#ifdef DEBUG
   iota_transaction_t *curr_tx = NULL;
   BUNDLE_FOREACH(bundle, curr_tx) { transaction_obj_dump(curr_tx); }
+#endif
 }
