@@ -22,7 +22,7 @@ typedef struct iota_perceptive_node_conf_s {
   int32_t monitoring_interval_seconds;
   int32_t monitored_transactions_sequence_size;
   int32_t test_sample_size;
-
+  uint16_t random_walk_depth;
 } iota_perceptive_node_conf_t;
 
 extern retcode_t iota_perceptive_node_conf_init(

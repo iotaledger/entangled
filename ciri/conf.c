@@ -208,6 +208,9 @@ static retcode_t set_conf_value(
       perceptive_node_conf->monitored_transactions_sequence_size = atoi(value);
       break;
 
+    case CONF_PERCEPTIVE_NODE_RANDOM_WALK_DEPTH:
+      perceptive_node_conf->random_walk_depth = atoi(value);
+
     default:
       iota_usage();
       return RC_CIRI_CONF_INVALID_ARGUMENTS;

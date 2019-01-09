@@ -396,10 +396,10 @@ retcode_t iota_perceptive_node_on_next_transaction(
     // TODO - randomize next timestamp
     pn->monitoring_data.monitoring_next_timestamp =
         now + pn->conf.monitoring_interval_seconds;
-    // TODO - depth
     if ((ret = iota_consensus_entry_point_selector_get_entry_point(
-             &pn->consensus->entry_point_selector, pn->tangle, 3,
-             pn->monitoring_data.entry_point)) != RC_OK) {
+             &pn->consensus->entry_point_selector, pn->tangle,
+             pn->conf.random_walk_depth, pn->monitoring_data.entry_point)) !=
+        RC_OK) {
       return ret;
     }
   }
