@@ -27,7 +27,7 @@ retcode_t logger_helper_init() {
 }
 
 retcode_t logger_helper_destroy() {
-  lock_handle_unlock(&lock);
+  lock_handle_destroy(&lock);
 
   return RC_OK;
 }
