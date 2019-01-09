@@ -352,7 +352,8 @@ retcode_t processor_init(processor_t *const processor, node_t *const node,
   processor->transaction_solidifier = transaction_solidifier;
   processor->milestone_tracker = milestone_tracker;
 
-  if ((ret = lf_mpmc_queue_iota_packet_t_init(&processor->queue))) {
+  if ((ret = lf_mpmc_queue_iota_packet_t_init(&processor->queue,
+                                              sizeof(iota_packet_t)))) {
     log_critical(PROCESSOR_LOGGER_ID, "Initializing packet queue failed\n");
     return ret;
   }
