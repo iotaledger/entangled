@@ -12,7 +12,7 @@
 void queue_integers_same_thread() {
   lf_mpmc_queue_int_t queue;
 
-  TEST_ASSERT(lf_mpmc_queue_int_init(&queue) == RC_OK);
+  TEST_ASSERT(lf_mpmc_queue_int_init(&queue, sizeof(int)) == RC_OK);
 
   TEST_ASSERT_TRUE(LF_MPMC_QUEUE_IS_EMPTY(&queue));
   TEST_ASSERT_EQUAL_INT(lf_mpmc_queue_int_count(&queue), 0);

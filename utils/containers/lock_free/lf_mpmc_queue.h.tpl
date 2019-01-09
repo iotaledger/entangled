@@ -13,28 +13,32 @@
 #include "common/errors.h"
 {INCLUDE}
 
-#define LF_MPMC_QUEUE_IS_EMPTY(f) CK_FIFO_MPMC_ISEMPTY(f)
-#define LF_MPMC_QUEUE_FIRST(f) CK_FIFO_MPMC_FIRST(f)
-#define LF_MPMC_QUEUE_NEXT(f) CK_FIFO_MPMC_NEXT(m)
-#define LF_MPMC_QUEUE_FOREACH(fifo, entry) CK_FIFO_MPMC_FOREACH(fifo, entry)
-#define LF_MPMC_QUEUE_FOREACH_SAFE(fifo, entry, T) \
-  CK_FIFO_MPMC_FOREACH_SAFE(fifo, entry, T)
+#define LF_MPMC_QUEUE_IS_EMPTY(queue) CK_FIFO_MPMC_ISEMPTY(&(queue)->fifo)
+#define LF_MPMC_QUEUE_FIRST(queue) CK_FIFO_MPMC_FIRST(&(queue)->fifo)
+#define LF_MPMC_QUEUE_NEXT(queue) CK_FIFO_MPMC_NEXT(&(queue)->fifo)
+#define LF_MPMC_QUEUE_FOREACH(queue, entry) CK_FIFO_MPMC_FOREACH(&(queue)->fifo, entry)
+#define LF_MPMC_QUEUE_FOREACH_SAFE(queue, entry, T) \
+  CK_FIFO_MPMC_FOREACH_SAFE(&(queue)->fifo, entry, T)
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 // A generic concurrent lock-free Multi Producer Multi Consumer queue
-typedef ck_fifo_mpmc_t lf_mpmc_queue_{TYPE}_t;
+typedef struct lf_mpmc_queue_{TYPE}_s {
+  ck_fifo_mpmc_t fifo;
+  size_t element_size;
+} lf_mpmc_queue_{TYPE}_t;
 
 /**
  * Initializes a lock-free MPMC queue
  *
  * @param queue The queue
+ * @param element_size The size of an element
  *
  * @return a status code
  */
-retcode_t lf_mpmc_queue_{TYPE}_init(lf_mpmc_queue_{TYPE}_t* const queue);
+retcode_t lf_mpmc_queue_{TYPE}_init(lf_mpmc_queue_{TYPE}_t* const queue, size_t const element_size);
 
 /**
  * Destroys a lock-free MPMC queue

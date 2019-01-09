@@ -9,7 +9,7 @@
 
 #include "utils/containers/lock_free/lf_mpmc_queue_{TYPE}.h"
 
-retcode_t lf_mpmc_queue_{TYPE}_init(lf_mpmc_queue_{TYPE}_t* const queue) {
+retcode_t lf_mpmc_queue_{TYPE}_init(lf_mpmc_queue_{TYPE}_t* const queue, size_t const element_size) {
   ck_fifo_mpmc_entry_t* stub = NULL;
 
   if (queue == NULL) {
@@ -20,7 +20,8 @@ retcode_t lf_mpmc_queue_{TYPE}_init(lf_mpmc_queue_{TYPE}_t* const queue) {
     return RC_OOM;
   }
 
-  ck_fifo_mpmc_init(queue, stub);
+  ck_fifo_mpmc_init(&queue->fifo, stub);
+  queue->element_size = element_size;
 
   return RC_OK;
 }
@@ -32,7 +33,7 @@ retcode_t lf_mpmc_queue_{TYPE}_destroy(lf_mpmc_queue_{TYPE}_t* const queue) {
     return RC_NULL_PARAM;
   }
 
-  ck_fifo_mpmc_deinit(queue, &garbage);
+  ck_fifo_mpmc_deinit(&queue->fifo, &garbage);
 
   if (garbage == NULL) {
     return RC_NULL_PARAM;
@@ -52,18 +53,18 @@ retcode_t lf_mpmc_queue_{TYPE}_enqueue(lf_mpmc_queue_{TYPE}_t* const queue,
     return RC_NULL_PARAM;
   }
 
-  if ((entry = malloc(sizeof({TYPE}))) == NULL) {
+  if ((entry = malloc(queue->element_size)) == NULL) {
     return RC_OOM;
   }
 
-  memcpy(entry, element, sizeof({TYPE}));
+  memcpy(entry, element, queue->element_size);
 
   if ((fifo_entry = malloc(sizeof(ck_fifo_mpmc_entry_t))) == NULL) {
     free(entry);
     return RC_OOM;
   }
 
-  ck_fifo_mpmc_enqueue(queue, fifo_entry, entry);
+  ck_fifo_mpmc_enqueue(&queue->fifo, fifo_entry, entry);
 
   return RC_OK;
 }
@@ -77,11 +78,11 @@ retcode_t lf_mpmc_queue_{TYPE}_dequeue(lf_mpmc_queue_{TYPE}_t* const queue,
     return RC_NULL_PARAM;
   }
 
-  if (ck_fifo_mpmc_dequeue(queue, &entry, &fifo_entry) == false) {
+  if (ck_fifo_mpmc_dequeue(&queue->fifo, &entry, &fifo_entry) == false) {
     return RC_NULL_PARAM;
   }
 
-  memcpy(element, entry, sizeof({TYPE}));
+  memcpy(element, entry, queue->element_size);
 
   free(entry);
   free(fifo_entry);
@@ -98,11 +99,11 @@ retcode_t lf_mpmc_queue_{TYPE}_trydequeue(lf_mpmc_queue_{TYPE}_t* const queue,
     return RC_NULL_PARAM;
   }
 
-  if ((*status = ck_fifo_mpmc_trydequeue(queue, &entry, &fifo_entry)) == false) {
+  if ((*status = ck_fifo_mpmc_trydequeue(&queue->fifo, &entry, &fifo_entry)) == false) {
     return RC_OK;
   }
 
-  memcpy(element, entry, sizeof({TYPE}));
+  memcpy(element, entry, queue->element_size);
 
   free(entry);
   free(fifo_entry);
