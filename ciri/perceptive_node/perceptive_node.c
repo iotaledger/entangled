@@ -302,7 +302,7 @@ retcode_t iota_perceptive_node_init(struct iota_perceptive_node_s *const pn,
   // TODO - conf
   hash_array_reserve(&pn->monitoring_data.monitored_transactions_seq,
                      pn->conf.monitored_transactions_sequence_size * 4);
-  double_array_reserve(&pn->monitoring_data.test_lf_distribution_samples,
+  double_array_reserve(pn->monitoring_data.test_lf_distribution_samples,
                        pn->conf.test_sample_size);
 
   if ((ret = iota_consensus_cw_rating_init(&pn->cw_calc,
