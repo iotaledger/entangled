@@ -34,7 +34,7 @@ void bundle_transactions_add(bundle_transactions_t *const bundle,
   utarray_push_back(bundle, transaction);
 }
 
-void calculate_bundle_hash(bundle_transactions_t *bundle, flex_trit_t *out) {
+void bundle_calculate_hash(bundle_transactions_t *bundle, flex_trit_t *out) {
   iota_transaction_t *curr_tx = NULL;
   trit_t essence_trits[NUM_TRITS_ESSENCE];
   Kerl kerl = {};
@@ -56,7 +56,7 @@ void calculate_bundle_hash(bundle_transactions_t *bundle, flex_trit_t *out) {
                         NUM_TRITS_HASH);
 }
 
-void finalize_bundle(bundle_transactions_t *bundle) {
+void bundle_finalize(bundle_transactions_t *bundle) {
   iota_transaction_t *curr_tx = NULL;
   bool valid_bundle = false;
   iota_transaction_t *head_tx = NULL;
@@ -70,7 +70,7 @@ void finalize_bundle(bundle_transactions_t *bundle) {
   while (!valid_bundle) {
   update_hash:
     // bundle hash
-    calculate_bundle_hash(bundle, bundle_hash);
+    bundle_calculate_hash(bundle, bundle_hash);
     // normalize
     normalize_hash(bundle_hash, normalized_hash);
     kerl_reset(&kerl);
@@ -98,7 +98,7 @@ void finalize_bundle(bundle_transactions_t *bundle) {
 }
 
 // for debugging
-void dump_bundle(bundle_transactions_t *bundle) {
+void bundle_dump(bundle_transactions_t *bundle) {
 #ifdef DEBUG
   iota_transaction_t *curr_tx = NULL;
   BUNDLE_FOREACH(bundle, curr_tx) { transaction_obj_dump(curr_tx); }

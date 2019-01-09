@@ -199,7 +199,7 @@ retcode_t iota_consensus_bundle_validator_validate(
         break;
       }
 
-      calculate_bundle_hash(bundle, bundle_hash_calculated);
+      bundle_calculate_hash(bundle, bundle_hash_calculated);
       if (memcmp(bundle_hash, bundle_hash_calculated, FLEX_TRIT_SIZE_243) !=
           0) {
         log_error(logger_id, "Bundle hash provided differs from calculated\n");

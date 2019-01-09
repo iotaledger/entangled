@@ -33,7 +33,7 @@ void test_normalized_bundle(void) {
   TEST_ASSERT_EQUAL_MEMORY(bytes, normalized_bundle_bytes, length);
 }
 
-void test_finalize_bundle(void) {
+void test_bundle_finalize(void) {
   bundle_transactions_t *bundle = NULL;
   flex_trit_t addr_sender[FLEX_TRIT_SIZE_243] = {};
   flex_trit_t addr_reciver[FLEX_TRIT_SIZE_243] = {};
@@ -90,8 +90,8 @@ void test_finalize_bundle(void) {
   tx.loaded_columns_mask |= MASK_ALL_COLUMNS;
   bundle_transactions_add(bundle, &tx);
 
-  finalize_bundle(bundle);
-  dump_bundle(bundle);
+  bundle_finalize(bundle);
+  bundle_dump(bundle);
   bundle_tx = (iota_transaction_t *)utarray_front(bundle);
 
   TEST_ASSERT_EQUAL_MEMORY(transaction_obsolete_tag(bundle_tx), obsolete_tag,
@@ -104,7 +104,7 @@ int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_normalized_bundle);
-  RUN_TEST(test_finalize_bundle);
+  RUN_TEST(test_bundle_finalize);
 
   return UNITY_END();
 }
