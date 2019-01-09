@@ -15,12 +15,14 @@ void queue_integers_same_thread() {
   TEST_ASSERT(lf_mpmc_queue_int_init(&queue) == RC_OK);
 
   TEST_ASSERT_TRUE(LF_MPMC_QUEUE_IS_EMPTY(&queue));
+  TEST_ASSERT_EQUAL_INT(lf_mpmc_queue_int_count(&queue), 0);
 
   for (int i = 0; i < 1000; ++i) {
     TEST_ASSERT(lf_mpmc_queue_int_enqueue(&queue, &i) == RC_OK);
   }
 
   TEST_ASSERT_FALSE(LF_MPMC_QUEUE_IS_EMPTY(&queue));
+  TEST_ASSERT_EQUAL_INT(lf_mpmc_queue_int_count(&queue), 1000);
 
   int dequeued = 0;
   for (int i = 0; i < 1000; ++i) {
@@ -29,6 +31,7 @@ void queue_integers_same_thread() {
   }
 
   TEST_ASSERT_TRUE(LF_MPMC_QUEUE_IS_EMPTY(&queue));
+  TEST_ASSERT_EQUAL_INT(lf_mpmc_queue_int_count(&queue), 0);
 
   TEST_ASSERT(lf_mpmc_queue_int_destroy(&queue) == RC_OK);
 }

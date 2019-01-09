@@ -88,3 +88,24 @@ retcode_t lf_mpmc_queue_{TYPE}_dequeue(lf_mpmc_queue_{TYPE}_t* const queue,
 
   return RC_OK;
 }
+
+retcode_t lf_mpmc_queue_{TYPE}_trydequeue(lf_mpmc_queue_{TYPE}_t* const queue,
+                                          {TYPE}* const element, bool *status) {
+  {TYPE}* entry = NULL;
+  ck_fifo_mpmc_entry_t* fifo_entry = NULL;
+
+  if (queue == NULL || element == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if ((*status = ck_fifo_mpmc_trydequeue(queue, &entry, &fifo_entry)) == false) {
+    return RC_OK;
+  }
+
+  memcpy(element, entry, sizeof({TYPE}));
+
+  free(entry);
+  free(fifo_entry);
+
+  return RC_OK;
+}

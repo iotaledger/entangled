@@ -28,9 +28,7 @@ cc_library(
     deps = [
         "//consensus/transaction_validator",
         "//gossip:iota_packet",
-        "//utils/handles:cond",
-        "//utils/handles:lock",
-        "//utils/handles:rw_lock",
+        "//utils/containers/lock_free:lf_mpmc_queue_iota_packet_t",
         "//utils/handles:thread",
     ],
 )

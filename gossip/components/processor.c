@@ -17,7 +17,6 @@
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_LOGGER_ID "processor"
-#define PROCESSOR_TIMEOUT_SEC 1
 
 /*
  * Private functions
@@ -265,7 +264,7 @@ static void *processor_routine(processor_t *const processor) {
 
   const size_t PACKET_MAX = 64;
   size_t packet_cnt = 0;
-  iota_packet_t *packet_ptr = NULL;
+  bool status = true;
   iota_packet_t *packets = calloc(PACKET_MAX, sizeof(iota_packet_t));
 
   trit_t *tx = calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(trit_t));
@@ -278,28 +277,16 @@ static void *processor_routine(processor_t *const processor) {
 
   flex_trit_t flex_hash[FLEX_TRIT_SIZE_243];
 
-  lock_handle_t lock_cond;
-  lock_handle_init(&lock_cond);
-  lock_handle_lock(&lock_cond);
-
   while (processor->running) {
-    if (processor_is_empty(processor)) {
-      cond_handle_timedwait(&processor->cond, &lock_cond,
-                            PROCESSOR_TIMEOUT_SEC);
+    while (processor->running && LF_MPMC_QUEUE_IS_EMPTY(&processor->queue)) {
+      ck_pr_stall();
     }
 
-    rw_lock_handle_wrlock(&processor->lock);
-    for (packet_cnt = 0; packet_cnt < PACKET_MAX; packet_cnt++) {
-      packet_ptr = iota_packet_queue_peek(processor->queue);
-      if (packet_ptr == NULL) {
-        goto process_packets;
-      }
-      packets[packet_cnt] = *packet_ptr;
-      iota_packet_queue_pop(&processor->queue);
+    status = true;
+    for (packet_cnt = 0; status && packet_cnt < PACKET_MAX; packet_cnt++) {
+      lf_mpmc_queue_iota_packet_t_trydequeue(&processor->queue,
+                                             &packets[packet_cnt], &status);
     }
-
-  process_packets:
-    rw_lock_handle_unlock(&processor->lock);
 
     if (packet_cnt == 0) {
       continue;
@@ -329,9 +316,6 @@ static void *processor_routine(processor_t *const processor) {
     }
   }
 
-  lock_handle_unlock(&lock_cond);
-  lock_handle_destroy(&lock_cond);
-
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(PROCESSOR_LOGGER_ID, "Destroying tangle connection failed\n");
   }
@@ -353,6 +337,8 @@ retcode_t processor_init(processor_t *const processor, node_t *const node,
                          transaction_validator_t *const transaction_validator,
                          transaction_solidifier_t *const transaction_solidifier,
                          milestone_tracker_t *const milestone_tracker) {
+  retcode_t ret = RC_OK;
+
   if (processor == NULL || node == NULL || transaction_validator == NULL ||
       transaction_solidifier == NULL || milestone_tracker == NULL) {
     return RC_NULL_PARAM;
@@ -361,15 +347,17 @@ retcode_t processor_init(processor_t *const processor, node_t *const node,
   logger_helper_enable(PROCESSOR_LOGGER_ID, LOGGER_DEBUG, true);
 
   processor->running = false;
-  processor->queue = NULL;
-  rw_lock_handle_init(&processor->lock);
-  cond_handle_init(&processor->cond);
   processor->node = node;
   processor->transaction_validator = transaction_validator;
   processor->transaction_solidifier = transaction_solidifier;
   processor->milestone_tracker = milestone_tracker;
 
-  return RC_OK;
+  if ((ret = lf_mpmc_queue_iota_packet_t_init(&processor->queue))) {
+    log_critical(PROCESSOR_LOGGER_ID, "Initializing packet queue failed\n");
+    return ret;
+  }
+
+  return ret;
 }
 
 retcode_t processor_start(processor_t *const processor) {
@@ -407,23 +395,26 @@ retcode_t processor_stop(processor_t *const processor) {
 }
 
 retcode_t processor_destroy(processor_t *const processor) {
+  retcode_t ret = RC_OK;
+
   if (processor == NULL) {
     return RC_NULL_PARAM;
   } else if (processor->running) {
     return RC_STILL_RUNNING;
   }
 
-  iota_packet_queue_free(&processor->queue);
-  rw_lock_handle_destroy(&processor->lock);
-  cond_handle_destroy(&processor->cond);
   processor->node = NULL;
   processor->transaction_validator = NULL;
   processor->transaction_solidifier = NULL;
   processor->milestone_tracker = NULL;
 
+  if ((ret = lf_mpmc_queue_iota_packet_t_destroy(&processor->queue))) {
+    log_critical(PROCESSOR_LOGGER_ID, "Destroying packet queue failed\n");
+  }
+
   logger_helper_release(PROCESSOR_LOGGER_ID);
 
-  return RC_OK;
+  return ret;
 }
 
 retcode_t processor_on_next(processor_t *const processor,
@@ -434,31 +425,12 @@ retcode_t processor_on_next(processor_t *const processor,
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_wrlock(&processor->lock);
-  ret = iota_packet_queue_push(&processor->queue, &packet);
-  rw_lock_handle_unlock(&processor->lock);
-
-  if (ret != RC_OK) {
+  if ((ret = lf_mpmc_queue_iota_packet_t_enqueue(&processor->queue, &packet)) !=
+      RC_OK) {
     log_warning(PROCESSOR_LOGGER_ID,
                 "Pushing packet to processor queue failed\n");
     return ret;
-  } else {
-    cond_handle_signal(&processor->cond);
   }
 
   return RC_OK;
-}
-
-size_t processor_size(processor_t *const processor) {
-  size_t size = 0;
-
-  if (processor == NULL) {
-    return 0;
-  }
-
-  rw_lock_handle_rdlock(&processor->lock);
-  size = iota_packet_queue_count(processor->queue);
-  rw_lock_handle_unlock(&processor->lock);
-
-  return size;
 }

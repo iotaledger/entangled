@@ -13,9 +13,7 @@
 #include "common/errors.h"
 #include "consensus/transaction_validator/transaction_validator.h"
 #include "gossip/iota_packet.h"
-#include "utils/handles/cond.h"
-#include "utils/handles/lock.h"
-#include "utils/handles/rw_lock.h"
+#include "utils/containers/lock_free/lf_mpmc_queue_iota_packet_t.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
@@ -30,9 +28,7 @@ typedef struct milestone_tracker_s milestone_tracker_t;
 typedef struct processor_s {
   thread_handle_t thread;
   bool running;
-  iota_packet_queue_t queue;
-  rw_lock_handle_t lock;
-  cond_handle_t cond;
+  lf_mpmc_queue_iota_packet_t_t queue;
   node_t *node;
   transaction_validator_t *transaction_validator;
   transaction_solidifier_t *transaction_solidifier;
@@ -104,17 +100,12 @@ retcode_t processor_on_next(processor_t *const processor,
  *
  * @return a status code
  */
-size_t processor_size(processor_t *const processor);
+static inline size_t processor_size(processor_t *const processor) {
+  if (processor == NULL) {
+    return 0;
+  }
 
-/**
- * Tells whether the processor queue is empty or not
- *
- * @param processor The processor
- *
- * @return true if empty, false otherwise
- */
-static inline bool processor_is_empty(processor_t *const processor) {
-  return processor->queue == NULL;
+  return lf_mpmc_queue_iota_packet_t_count(&processor->queue);
 }
 
 #ifdef __cplusplus

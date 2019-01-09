@@ -11,6 +11,7 @@
 #include <ck_fifo.h>
 
 #include "common/errors.h"
+{INCLUDE}
 
 #define LF_MPMC_QUEUE_IS_EMPTY(f) CK_FIFO_MPMC_ISEMPTY(f)
 #define LF_MPMC_QUEUE_FIRST(f) CK_FIFO_MPMC_FIRST(f)
@@ -33,7 +34,6 @@ typedef ck_fifo_mpmc_t lf_mpmc_queue_{TYPE}_t;
  *
  * @return a status code
  */
-
 retcode_t lf_mpmc_queue_{TYPE}_init(lf_mpmc_queue_{TYPE}_t* const queue);
 
 /**
@@ -43,7 +43,6 @@ retcode_t lf_mpmc_queue_{TYPE}_init(lf_mpmc_queue_{TYPE}_t* const queue);
  *
  * @return a status code
  */
-
 retcode_t lf_mpmc_queue_{TYPE}_destroy(lf_mpmc_queue_{TYPE}_t* const queue);
 
 /**
@@ -54,7 +53,6 @@ retcode_t lf_mpmc_queue_{TYPE}_destroy(lf_mpmc_queue_{TYPE}_t* const queue);
  *
  * @return a status code
  */
-
 retcode_t lf_mpmc_queue_{TYPE}_enqueue(lf_mpmc_queue_{TYPE}_t* const queue,
                                        {TYPE} const* const element);
 
@@ -66,9 +64,41 @@ retcode_t lf_mpmc_queue_{TYPE}_enqueue(lf_mpmc_queue_{TYPE}_t* const queue,
  *
  * @return a status code
  */
-
 retcode_t lf_mpmc_queue_{TYPE}_dequeue(lf_mpmc_queue_{TYPE}_t* const queue,
                                        {TYPE} * const element);
+
+/**
+ * Tries to dequeue an element from a lock-free MPMC queue
+ *
+ * @param queue The queue
+ * @param element The element to dequeue into
+ *
+ * @return a status code
+ */
+retcode_t lf_mpmc_queue_{TYPE}_trydequeue(lf_mpmc_queue_{TYPE}_t* const queue,
+                                          {TYPE} * const element, bool * const status);
+
+/**
+ * Counts the number of elements in a lock-free MPMC queue
+ *
+ * @param queue The queue
+ *
+ * @return the number of elements
+ */
+static inline size_t lf_mpmc_queue_{TYPE}_count(lf_mpmc_queue_{TYPE}_t const * const queue) {
+  size_t count = 0;
+  ck_fifo_mpmc_entry_t* entry = NULL;
+
+  if (queue == NULL) {
+    return 0;
+  }
+
+  LF_MPMC_QUEUE_FOREACH(queue, entry) {
+    count++;
+  }
+
+  return count;
+}
 
 #ifdef __cplusplus
 }
