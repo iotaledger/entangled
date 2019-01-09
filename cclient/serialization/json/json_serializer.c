@@ -1113,7 +1113,7 @@ retcode_t json_get_transactions_to_approve_serialize_request(
 
   cJSON_AddItemToObject(json_root, "depth", cJSON_CreateNumber(obj->depth));
 
-  if (!flex_trits_are_null(obj->reference, FLEX_TRIT_SIZE_243)) {
+  if (obj->reference) {
     ret = flex_trits_to_json_string(json_root, "reference", obj->reference,
                                     NUM_TRITS_HASH);
     if (ret != RC_OK) {
@@ -1438,6 +1438,13 @@ retcode_t json_attach_to_tangle_deserialize_response(
   }
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
+  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
+    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+              STR_CCLIENT_RES_ERROR, json_item->valuestring);
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_RES_ERROR;
+  }
+  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "exception");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
     log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
