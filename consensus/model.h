@@ -18,10 +18,10 @@
 extern "C" {
 #endif
 
-typedef struct tips_pair {
+typedef struct hash_pair {
   flex_trit_t trunk[FLEX_TRIT_SIZE_243];
   flex_trit_t branch[FLEX_TRIT_SIZE_243];
-} tips_pair_t;
+} hash_pair_t;
 
 #ifdef __cplusplus
 }

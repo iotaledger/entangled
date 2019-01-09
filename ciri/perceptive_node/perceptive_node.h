@@ -14,7 +14,9 @@
 #include "common/trinary/flex_trit.h"
 #include "consensus/consensus.h"
 #include "gossip/neighbor.h"
+#include "utils/containers/arrays/double_array.h"
 #include "utils/containers/hash/hash_array.h"
+#include "utils/containers/hash/hash_hash_pair_t_map.h"
 #include "utils/handles/thread.h"
 #include "utils/logger_helper.h"
 
@@ -42,13 +44,16 @@ typedef struct perceptive_node_monitoring_data_s {
   // A set containing hashes of transactions that were received from
   // the currently monitored neighbor, since current monitoring session has
   // started
-  hash243_set_t txs_from_monitored_neighbor;
+  hash_to_hash_pair_t_map_t txs_from_monitored_neighbor;
+  uint32_t txs_from_monitored_neighbor_size;
   // A vector containing all hashes in the order they were received
   // From all neighbors, since current monitoring session has started.
   transactions_sequence_t *txs_sequence_from_all_neighbors;
   bool is_currently_monitoring;
   flex_trit_t entry_point[FLEX_TRIT_SIZE_243];
-
+  // Should contain lf scores of sequences that were generated using tip
+  // selection
+  double_array_p test_lf_distribution_samples;
 } perceptive_node_monitoring_data_t;
 
 typedef struct iota_perceptive_node_s {

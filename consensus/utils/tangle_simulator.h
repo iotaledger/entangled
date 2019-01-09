@@ -17,7 +17,7 @@ extern "C" {
 /**
  * Add transaction to tx_to_approvers and recalc ratings
  * which is considered for the tipselection, keep in mind, whenever this
- * function is called, this param should be incremented
+ * function is called, max_subtangle_size param should be incremented
  *
  * @param max_subtangle_size The tangle size from the entry point [in]
  * @param hash The new transaction's hash

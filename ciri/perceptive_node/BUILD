@@ -7,7 +7,10 @@ cc_library(
     deps = [
         ":conf",
         "//consensus",
+        "//consensus/utils:tangle_simulator",
+        "//utils/containers/arrays:double_array",
         "//utils/containers/hash:hash_array",
+        "//utils/containers/hash:hash_hash_pair_t_map",
     ],
 )
 

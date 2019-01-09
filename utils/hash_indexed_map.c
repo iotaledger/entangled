@@ -69,3 +69,29 @@ void hash_to_indexed_hash_set_map_free(
   }
   *map = NULL;
 }
+
+retcode_t hash_to_indexed_hash_set_map_clone(
+    hash_to_indexed_hash_set_map_t *src, hash_to_indexed_hash_set_map_t *dst) {
+  retcode_t ret = RC_OK;
+  hash_to_indexed_hash_set_entry_t *curr_entry = NULL;
+  hash_to_indexed_hash_set_entry_t *tmp_entry = NULL;
+  hash_to_indexed_hash_set_entry_t *new_indexed_entry = NULL;
+
+  HASH_ITER(hh, *src, curr_entry, tmp_entry) {
+    if ((ret = hash_to_indexed_hash_set_map_add_new_set(
+             dst, curr_entry->hash, &new_indexed_entry, curr_entry->idx)) !=
+        RC_OK) {
+      goto cleanup;
+    }
+    if ((ret = hash243_set_append(&((*src)->approvers),
+                                  &new_indexed_entry->approvers)) != RC_OK) {
+      goto cleanup;
+    }
+  }
+
+cleanup:
+  if (ret) {
+    hash_to_indexed_hash_set_map_free(dst);
+  }
+  return ret;
+}
