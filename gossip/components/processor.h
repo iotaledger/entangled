@@ -18,7 +18,6 @@
 
 // Forward declarations
 typedef struct node_s node_t;
-typedef struct tangle_s tangle_t;
 typedef struct transaction_solidifier_s transaction_solidifier_t;
 typedef struct milestone_tracker_s milestone_tracker_t;
 

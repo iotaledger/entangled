@@ -264,7 +264,7 @@ static void *processor_routine(processor_t *const processor) {
 
   const size_t PACKET_MAX = 64;
   size_t packet_cnt = 0;
-  bool status = true;
+  bool has_dequeued = true;
   iota_packet_t *packets = calloc(PACKET_MAX, sizeof(iota_packet_t));
 
   trit_t *tx = calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(trit_t));
@@ -282,10 +282,15 @@ static void *processor_routine(processor_t *const processor) {
       ck_pr_stall();
     }
 
-    status = true;
-    for (packet_cnt = 0; status && packet_cnt < PACKET_MAX; packet_cnt++) {
-      lf_mpmc_queue_iota_packet_t_trydequeue(&processor->queue,
-                                             &packets[packet_cnt], &status);
+    has_dequeued = true;
+    for (packet_cnt = 0; has_dequeued && packet_cnt < PACKET_MAX;
+         packet_cnt++) {
+      if (lf_mpmc_queue_iota_packet_t_trydequeue(&processor->queue,
+                                                 &packets[packet_cnt],
+                                                 &has_dequeued) != RC_OK) {
+        log_warning(PROCESSOR_LOGGER_ID, "Dequeuing packet failed\n");
+        break;
+      }
     }
 
     if (packet_cnt == 0) {
@@ -354,7 +359,7 @@ retcode_t processor_init(processor_t *const processor, node_t *const node,
 
   if ((ret = lf_mpmc_queue_iota_packet_t_init(&processor->queue,
                                               sizeof(iota_packet_t)))) {
-    log_critical(PROCESSOR_LOGGER_ID, "Initializing packet queue failed\n");
+    log_critical(PROCESSOR_LOGGER_ID, "Initializing queue failed\n");
     return ret;
   }
 
@@ -409,8 +414,8 @@ retcode_t processor_destroy(processor_t *const processor) {
   processor->transaction_solidifier = NULL;
   processor->milestone_tracker = NULL;
 
-  if ((ret = lf_mpmc_queue_iota_packet_t_destroy(&processor->queue))) {
-    log_critical(PROCESSOR_LOGGER_ID, "Destroying packet queue failed\n");
+  if ((ret = lf_mpmc_queue_iota_packet_t_destroy(&processor->queue)) != RC_OK) {
+    log_critical(PROCESSOR_LOGGER_ID, "Destroying queue failed\n");
   }
 
   logger_helper_release(PROCESSOR_LOGGER_ID);
@@ -428,10 +433,9 @@ retcode_t processor_on_next(processor_t *const processor,
 
   if ((ret = lf_mpmc_queue_iota_packet_t_enqueue(&processor->queue, &packet)) !=
       RC_OK) {
-    log_warning(PROCESSOR_LOGGER_ID,
-                "Pushing packet to processor queue failed\n");
+    log_warning(PROCESSOR_LOGGER_ID, "Enqueuing packet failed\n");
     return ret;
   }
 
-  return RC_OK;
+  return ret;
 }

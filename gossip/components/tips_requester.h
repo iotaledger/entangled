@@ -15,7 +15,6 @@
 
 // Forward declarations
 typedef struct node_s node_t;
-typedef struct tangle_s tangle_t;
 
 typedef struct tips_requester_s {
   thread_handle_t thread;
