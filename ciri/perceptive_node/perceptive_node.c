@@ -60,7 +60,7 @@ static double calculate_current_tip_attachment_prob(
 }
 
 static retcode_t calculate_lf_prob_value(iota_perceptive_node_t *const pn,
-                                         float *const lf_prob) {
+                                         double *const lf_prob) {
   retcode_t ret = RC_OK;
   *lf_prob = 1.0;
   flex_trit_t *curr_tx_hash;
@@ -72,7 +72,11 @@ static retcode_t calculate_lf_prob_value(iota_perceptive_node_t *const pn,
   hash_to_hash_pair_t_map_entry_t *curr_tip_entry = NULL;
   hash_to_indexed_hash_set_map_t approvers_map = NULL;
 
-  iota_consensus_exit_prob_map_init(&ep_prob_map_randomizer);
+  if ((ret = iota_consensus_ep_randomizer_init(
+           &ep_prob_map_randomizer, &pn->consensus->conf,
+           EP_RANDOMIZE_MAP_AND_SAMPLE)) != RC_OK) {
+    return ret;
+  }
 
   if ((ret = hash_to_indexed_hash_set_map_clone(md->base_approvers_map,
                                                 &approvers_map)) != RC_OK) {
@@ -95,7 +99,7 @@ static retcode_t calculate_lf_prob_value(iota_perceptive_node_t *const pn,
     if (hash_to_hash_pair_t_map_find(&md->txs_from_monitored_neighbor,
                                      curr_tx_hash, &curr_tip_entry)) {
       if ((ret = iota_consensus_exit_prob_map_calculate_probs(
-               &pn->ep_prob_map_randomizer, pn->tangle,
+               &ep_prob_map_randomizer, pn->tangle,
                &pn->consensus->exit_prob_transaction_validator, &cw_ratings,
                pn->monitoring_data.entry_point,
                &ep_prob_map_randomizer.transition_probs,
@@ -106,13 +110,13 @@ static retcode_t calculate_lf_prob_value(iota_perceptive_node_t *const pn,
       *lf_prob *= calculate_current_tip_attachment_prob(
           &ep_prob_map_randomizer.transition_probs, &cw_ratings,
           curr_tip_entry);
+    }
 
-      if ((ret = tangle_simulator_add_transaction_recalc_ratings(
-               curr_subtangle_size++, curr_tx_hash,
-               curr_tip_entry->value.branch, curr_tip_entry->value.trunk,
-               &approvers_map, &cw_ratings.cw_ratings)) != RC_OK) {
-        goto cleanup;
-      }
+    if ((ret = tangle_simulator_add_transaction_recalc_ratings(
+             curr_subtangle_size++, curr_tx_hash, curr_tip_entry->value.branch,
+             curr_tip_entry->value.trunk, &approvers_map,
+             &cw_ratings.cw_ratings)) != RC_OK) {
+      goto cleanup;
     }
   }
 cleanup:
@@ -121,12 +125,12 @@ cleanup:
   return ret;
 }
 
-static retcode_t calculate_samples_from_ls_distribution(
+static retcode_t calculate_samples_from_lf_distribution(
     iota_perceptive_node_t *const pn) {
   retcode_t ret = RC_OK;
   flex_trit_t *curr_tx_hash;
   perceptive_node_monitoring_data_t *md = &pn->monitoring_data;
-  uint32_t curr_subtangle_size = md->subtangle_size;
+  uint32_t curr_subtangle_size;
   uint32_t orig_subtangle_size = md->subtangle_size;
   flex_trit_t curr_selected_tip[FLEX_TRIT_SIZE_243];
   cw_calc_result cw_ratings;
@@ -137,7 +141,11 @@ static retcode_t calculate_samples_from_ls_distribution(
 
   hash_to_indexed_hash_set_map_t approvers_map = NULL;
 
-  iota_consensus_exit_prob_map_init(&ep_prob_map_randomizer);
+  if ((ret = iota_consensus_ep_randomizer_init(
+           &ep_prob_map_randomizer, &pn->consensus->conf,
+           EP_RANDOMIZE_MAP_AND_SAMPLE)) != RC_OK) {
+    return ret;
+  }
 
   if ((ret = hash_to_indexed_hash_set_map_clone(md->base_approvers_map,
                                                 &approvers_map)) != RC_OK) {
@@ -153,6 +161,7 @@ static retcode_t calculate_samples_from_ls_distribution(
   for (size_t sample_idx = 0; sample_idx < pn->conf.test_sample_size;
        ++sample_idx) {
     curr_lf_prob = 1.0;
+    curr_subtangle_size = orig_subtangle_size;
     // This loop iterate through the received transactions sequence in the
     // order of which they were received and for each transaction, if it
     // belongs to the node we currently are monitoring, we calculate the
@@ -164,23 +173,24 @@ static retcode_t calculate_samples_from_ls_distribution(
       if (hash_to_hash_pair_t_map_find(&md->txs_from_monitored_neighbor,
                                        curr_tx_hash, &curr_tip_entry)) {
         if ((ret = iota_consensus_exit_prob_map_calculate_probs(
-                 &pn->ep_prob_map_randomizer, pn->tangle,
+                 &ep_prob_map_randomizer, pn->tangle,
                  &pn->consensus->exit_prob_transaction_validator, &cw_ratings,
                  pn->monitoring_data.entry_point,
                  &ep_prob_map_randomizer.transition_probs,
                  &ep_prob_map_randomizer.exit_probs)) != RC_OK) {
           goto cleanup;
         }
-
+        // Get first tip (trunk)
         if ((ret = iota_consensus_exit_prob_map_randomize(
-                 &pn->ep_prob_map_randomizer, pn->tangle,
+                 &ep_prob_map_randomizer, pn->tangle,
                  &pn->consensus->exit_prob_transaction_validator, &cw_ratings,
                  pn->monitoring_data.entry_point,
                  curr_tip_entry->value.trunk)) != RC_OK) {
           return ret;
         }
+        // Get second tip (branch)
         if ((ret = iota_consensus_exit_prob_map_randomize(
-                 &pn->ep_prob_map_randomizer, pn->tangle,
+                 &ep_prob_map_randomizer, pn->tangle,
                  &pn->consensus->exit_prob_transaction_validator, &cw_ratings,
                  pn->monitoring_data.entry_point,
                  curr_tip_entry->value.branch)) != RC_OK) {
@@ -190,13 +200,13 @@ static retcode_t calculate_samples_from_ls_distribution(
         curr_lf_prob *= calculate_current_tip_attachment_prob(
             &ep_prob_map_randomizer.transition_probs, &cw_ratings,
             curr_tip_entry);
-
-        if ((ret = tangle_simulator_add_transaction_recalc_ratings(
-                 curr_subtangle_size++, curr_selected_tip,
-                 curr_tip_entry->value.branch, curr_tip_entry->value.trunk,
-                 &approvers_map, &cw_ratings.cw_ratings)) != RC_OK) {
-          goto cleanup;
-        }
+      }
+      // Update tangle with newly attached transaction
+      if ((ret = tangle_simulator_add_transaction_recalc_ratings(
+               curr_subtangle_size++, curr_selected_tip,
+               curr_tip_entry->value.branch, curr_tip_entry->value.trunk,
+               &approvers_map, &cw_ratings.cw_ratings)) != RC_OK) {
+        goto cleanup;
       }
     }
 
@@ -252,7 +262,7 @@ static void *perceptive_node_do_test(iota_perceptive_node_t *const pn) {
     goto cleanup;
   }
 
-  if (calculate_samples_from_ls_distribution(pn) != RC_OK) {
+  if (calculate_samples_from_lf_distribution(pn) != RC_OK) {
     goto cleanup;
   }
 
@@ -297,12 +307,6 @@ retcode_t iota_perceptive_node_init(struct iota_perceptive_node_s *const pn,
 
   if ((ret = iota_consensus_cw_rating_init(&pn->cw_calc,
                                            DFS_FROM_ENTRY_POINT)) != RC_OK) {
-    return ret;
-  }
-
-  if ((ret = iota_consensus_ep_randomizer_init(
-           &pn->ep_prob_map_randomizer, &pn->consensus->conf,
-           EP_RANDOMIZE_MAP_AND_SAMPLE)) != RC_OK) {
     return ret;
   }
 
@@ -365,11 +369,6 @@ retcode_t iota_perceptive_node_destroy(iota_perceptive_node_t *const pn) {
     return RC_PERCEPTIVE_NODE_STILL_RUNNING;
   }
 
-  if ((ret = iota_consensus_ep_randomizer_destroy(
-           &pn->ep_prob_map_randomizer)) != RC_OK) {
-    return ret;
-  }
-
   if ((ret = iota_consensus_cw_rating_destroy(&pn->cw_calc)) != RC_OK) {
     return ret;
   }
@@ -407,6 +406,8 @@ retcode_t iota_perceptive_node_on_next_transaction(
 
   hash_array_push(pn->monitoring_data.txs_sequence_from_all_neighbors,
                   transaction_hash(transaction));
+  // If current transaction is from the monitored node, then we want to store
+  // it in the map so we can get it's LF value
   if (neighbor_cmp(from, pn->monitoring_data.monitored_neighbor) == 0) {
     memcpy(attachment_point.trunk, transaction_trunk(transaction),
            FLEX_TRIT_SIZE_243);
