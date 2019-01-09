@@ -13,7 +13,6 @@
 #include "utils/logger_helper.h"
 
 #define BROADCASTER_LOGGER_ID "broadcaster"
-#define BROADCASTER_TIMEOUT_SEC 5
 
 /*
  * Private functions
@@ -21,8 +20,8 @@
 
 static void *broadcaster_routine(broadcaster_t *const broadcaster) {
   neighbor_t *iter = NULL;
-  flex_trit_t *transaction_flex_trits_ptr = NULL;
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
+  bool has_dequeued = false;
   connection_config_t db_conf = {.db_path = broadcaster->node->conf.db_path};
   tangle_t tangle;
 
@@ -36,26 +35,22 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
     return NULL;
   }
 
-  lock_handle_t lock_cond;
-  lock_handle_init(&lock_cond);
-  lock_handle_lock(&lock_cond);
-
   while (broadcaster->running) {
-    if (broadcaster_is_empty(broadcaster)) {
-      cond_handle_timedwait(&broadcaster->cond, &lock_cond,
-                            BROADCASTER_TIMEOUT_SEC);
+    while (broadcaster->running &&
+           LF_MPMC_QUEUE_IS_EMPTY(&broadcaster->queue)) {
+      ck_pr_stall();
     }
 
-    rw_lock_handle_wrlock(&broadcaster->lock);
-    transaction_flex_trits_ptr = hash8019_queue_peek(broadcaster->queue);
-    if (transaction_flex_trits_ptr == NULL) {
-      rw_lock_handle_unlock(&broadcaster->lock);
+    if (lf_mpmc_queue_flex_trit_t_trydequeue(&broadcaster->queue,
+                                             transaction_flex_trits,
+                                             &has_dequeued) != RC_OK) {
+      log_warning(BROADCASTER_LOGGER_ID, "Dequeuing packet failed\n");
       continue;
     }
-    memcpy(transaction_flex_trits, transaction_flex_trits_ptr,
-           FLEX_TRIT_SIZE_8019);
-    hash8019_queue_pop(&broadcaster->queue);
-    rw_lock_handle_unlock(&broadcaster->lock);
+
+    if (!has_dequeued) {
+      continue;
+    }
 
     log_debug(BROADCASTER_LOGGER_ID, "Broadcasting transaction\n");
     rw_lock_handle_rdlock(&broadcaster->node->neighbors_lock);
@@ -67,9 +62,6 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
     }
     rw_lock_handle_unlock(&broadcaster->node->neighbors_lock);
   }
-
-  lock_handle_unlock(&lock_cond);
-  lock_handle_destroy(&lock_cond);
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(BROADCASTER_LOGGER_ID,
@@ -85,6 +77,8 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
 
 retcode_t broadcaster_init(broadcaster_t *const broadcaster,
                            node_t *const node) {
+  retcode_t ret = RC_OK;
+
   if (broadcaster == NULL || node == NULL) {
     return RC_NULL_PARAM;
   }
@@ -93,14 +87,19 @@ retcode_t broadcaster_init(broadcaster_t *const broadcaster,
   memset(broadcaster, 0, sizeof(broadcaster_t));
   broadcaster->running = false;
   broadcaster->node = node;
-  broadcaster->queue = NULL;
-  rw_lock_handle_init(&broadcaster->lock);
-  cond_handle_init(&broadcaster->cond);
 
-  return RC_OK;
+  if ((ret = lf_mpmc_queue_flex_trit_t_init(&broadcaster->queue,
+                                            FLEX_TRIT_SIZE_8019))) {
+    log_critical(BROADCASTER_LOGGER_ID, "Initializing queue failed\n");
+    return ret;
+  }
+
+  return ret;
 }
 
 retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
+  retcode_t ret = RC_OK;
+
   if (broadcaster == NULL) {
     return RC_NULL_PARAM;
   } else if (broadcaster->running) {
@@ -108,12 +107,14 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
   }
 
   broadcaster->node = NULL;
-  hash8019_queue_free(&broadcaster->queue);
-  rw_lock_handle_destroy(&broadcaster->lock);
-  cond_handle_destroy(&broadcaster->cond);
+
+  if ((ret = lf_mpmc_queue_flex_trit_t_destroy(&broadcaster->queue))) {
+    log_critical(BROADCASTER_LOGGER_ID, "Destroying queue failed\n");
+  }
+
   logger_helper_release(BROADCASTER_LOGGER_ID);
 
-  return RC_OK;
+  return ret;
 }
 
 retcode_t broadcaster_start(broadcaster_t *const broadcaster) {
@@ -140,33 +141,13 @@ retcode_t broadcaster_on_next(broadcaster_t *const broadcaster,
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_wrlock(&broadcaster->lock);
-  ret = hash8019_queue_push(&broadcaster->queue, transaction_flex_trits);
-  rw_lock_handle_unlock(&broadcaster->lock);
-
-  if (ret != RC_OK) {
-    log_warning(BROADCASTER_LOGGER_ID,
-                "Pushing transaction flex trits to broadcaster queue failed\n");
-    return RC_BROADCASTER_FAILED_PUSH_QUEUE;
-  } else {
-    cond_handle_signal(&broadcaster->cond);
+  if ((ret = lf_mpmc_queue_flex_trit_t_enqueue(
+           &broadcaster->queue, transaction_flex_trits)) != RC_OK) {
+    log_warning(BROADCASTER_LOGGER_ID, "Enqueuing packet failed\n");
+    return ret;
   }
 
-  return RC_OK;
-}
-
-size_t broadcaster_size(broadcaster_t *const broadcaster) {
-  size_t size = 0;
-
-  if (broadcaster == NULL) {
-    return 0;
-  }
-
-  rw_lock_handle_rdlock(&broadcaster->lock);
-  size = hash8019_queue_count(broadcaster->queue);
-  rw_lock_handle_unlock(&broadcaster->lock);
-
-  return size;
+  return ret;
 }
 
 retcode_t broadcaster_stop(broadcaster_t *const broadcaster) {

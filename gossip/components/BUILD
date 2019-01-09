@@ -4,9 +4,7 @@ cc_library(
     name = "broadcaster_shared",
     hdrs = ["broadcaster.h"],
     deps = [
-        "//utils/containers/hash:hash8019_queue",
-        "//utils/handles:cond",
-        "//utils/handles:rw_lock",
+        "//utils/containers/lock_free:lf_mpmc_queue_flex_trit_t",
         "//utils/handles:thread",
     ],
 )

@@ -99,7 +99,7 @@ retcode_t processor_on_next(processor_t *const processor,
  *
  * @return a status code
  */
-static inline size_t processor_size(processor_t *const processor) {
+static inline size_t processor_size(processor_t const *const processor) {
   if (processor == NULL) {
     return 0;
   }

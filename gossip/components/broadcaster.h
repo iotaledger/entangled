@@ -11,9 +11,7 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
-#include "utils/containers/hash/hash8019_queue.h"
-#include "utils/handles/cond.h"
-#include "utils/handles/rw_lock.h"
+#include "utils/containers/lock_free/lf_mpmc_queue_flex_trit_t.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
@@ -23,9 +21,7 @@ typedef struct broadcaster_s {
   thread_handle_t thread;
   bool running;
   node_t *node;
-  hash8019_queue_t queue;
-  rw_lock_handle_t lock;
-  cond_handle_t cond;
+  lf_mpmc_queue_flex_trit_t_t queue;
 } broadcaster_t;
 
 #ifdef __cplusplus
@@ -73,15 +69,6 @@ retcode_t broadcaster_on_next(broadcaster_t *const broadcaster,
                               flex_trit_t const *const flex_trits);
 
 /**
- * Gets the size of the broadcaster queue
- *
- * @param broadcaster The broadcaster
- *
- * @return a status code
- */
-size_t broadcaster_size(broadcaster_t *const broadcaster);
-
-/**
  * Stops a broadcaster
  *
  * @param broadcaster The broadcaster
@@ -91,14 +78,18 @@ size_t broadcaster_size(broadcaster_t *const broadcaster);
 retcode_t broadcaster_stop(broadcaster_t *const broadcaster);
 
 /**
- * Tells whether the broadcaster queue is empty or not
+ * Gets the size of the broadcaster queue
  *
  * @param broadcaster The broadcaster
  *
- * @return true if empty, false otherwise
+ * @return a status code
  */
-static inline bool broadcaster_is_empty(broadcaster_t *const broadcaster) {
-  return broadcaster->queue == NULL;
+static inline size_t broadcaster_size(broadcaster_t const *const broadcaster) {
+  if (broadcaster == NULL) {
+    return 0;
+  }
+
+  return lf_mpmc_queue_flex_trit_t_count(&broadcaster->queue);
 }
 
 #ifdef __cplusplus

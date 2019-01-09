@@ -9,3 +9,9 @@ container_generate(
     type = "iota_packet_t",
     deps = ["//gossip:iota_packet"],
 )
+
+container_generate(
+    include = "common/trinary/flex_trit.h",
+    type = "flex_trit_t",
+    deps = ["//common/trinary:flex_trit"],
+)
