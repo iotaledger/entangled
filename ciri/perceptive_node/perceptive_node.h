@@ -59,10 +59,10 @@ typedef struct perceptive_node_monitoring_data_s {
 typedef struct iota_perceptive_node_s {
   iota_perceptive_node_conf_t conf;
   thread_handle_t thread;
+  // TODO - atomicity
   bool test_thread_running;
   tangle_t *tangle;
   iota_consensus_t *consensus;
-  ep_prob_map_randomizer_t ep_prob_map_randomizer;
   cw_rating_calculator_t cw_calc;
   neighbor_t *neighbors;
   perceptive_node_monitoring_data_t monitoring_data;
