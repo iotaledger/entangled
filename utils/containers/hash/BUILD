@@ -90,6 +90,10 @@ hash_map_generate(
     mapped_type = "double",
 )
 
+hash_map_generate(
+    mapped_type = "hash_pair_t",
+)
+
 cc_library(
     name = "hash_array",
     srcs = ["hash_array.c"],

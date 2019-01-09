@@ -16,6 +16,7 @@ retcode_t tangle_simulator_add_transaction_recalc_ratings(
 
   hash_to_indexed_hash_set_entry_t *indexed_branch_entry = NULL;
   hash_to_indexed_hash_set_entry_t *indexed_trunk_entry = NULL;
+  hash_to_indexed_hash_set_entry_t *indexed_new_hash_entry = NULL;
 
   if ((res = hash_to_indexed_hash_set_map_find(
            tx_to_approvers, branch, &indexed_branch_entry)) != RC_OK) {
@@ -37,6 +38,12 @@ retcode_t tangle_simulator_add_transaction_recalc_ratings(
     }
   }
 
+  if ((res = hash_to_indexed_hash_set_map_add_new_set(
+           tx_to_approvers, hash, &indexed_new_hash_entry,
+           max_subtangle_size++)) != RC_OK) {
+    return res;
+  }
+
   return cw_rating_calculate_dfs_ratings_from_approvers_map(
-      max_subtangle_size + 2, *tx_to_approvers, cw_ratings, false);
+      max_subtangle_size, *tx_to_approvers, cw_ratings, false);
 }

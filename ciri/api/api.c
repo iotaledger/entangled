@@ -316,7 +316,7 @@ retcode_t iota_api_get_transactions_to_approve(
     get_transactions_to_approve_req_t const *const req,
     get_transactions_to_approve_res_t *const res) {
   retcode_t ret = RC_OK;
-  tips_pair_t tips;
+  hash_pair_t tips;
 
   if (api == NULL || req == NULL || res == NULL) {
     return RC_NULL_PARAM;

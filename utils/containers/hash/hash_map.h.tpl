@@ -12,6 +12,7 @@
 
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
+#include "consensus/model.h"
 #include "utils/containers/hash/hash243_set.h"
 
 #ifdef __cplusplus

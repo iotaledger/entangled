@@ -44,6 +44,9 @@ retcode_t hash_to_indexed_hash_set_map_add_new_set(
     hash_to_indexed_hash_set_entry_t **const new_set_entry, size_t const index);
 void hash_to_indexed_hash_set_map_free(hash_to_indexed_hash_set_map_t *map);
 
+retcode_t hash_to_indexed_hash_set_map_clone(
+    hash_to_indexed_hash_set_map_t *src, hash_to_indexed_hash_set_map_t *dst);
+
 #ifdef __cplusplus
 }
 #endif
