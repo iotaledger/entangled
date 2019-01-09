@@ -44,7 +44,7 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
     if (lf_mpmc_queue_flex_trit_t_trydequeue(&broadcaster->queue,
                                              transaction_flex_trits,
                                              &has_dequeued) != RC_OK) {
-      log_warning(BROADCASTER_LOGGER_ID, "Dequeuing packet failed\n");
+      log_warning(BROADCASTER_LOGGER_ID, "Dequeuing transaction failed\n");
       continue;
     }
 
@@ -89,7 +89,7 @@ retcode_t broadcaster_init(broadcaster_t *const broadcaster,
   broadcaster->node = node;
 
   if ((ret = lf_mpmc_queue_flex_trit_t_init(&broadcaster->queue,
-                                            FLEX_TRIT_SIZE_8019))) {
+                                            FLEX_TRIT_SIZE_8019)) != RC_OK) {
     log_critical(BROADCASTER_LOGGER_ID, "Initializing queue failed\n");
     return ret;
   }
@@ -108,7 +108,7 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
 
   broadcaster->node = NULL;
 
-  if ((ret = lf_mpmc_queue_flex_trit_t_destroy(&broadcaster->queue))) {
+  if ((ret = lf_mpmc_queue_flex_trit_t_destroy(&broadcaster->queue)) != RC_OK) {
     log_critical(BROADCASTER_LOGGER_ID, "Destroying queue failed\n");
   }
 
@@ -143,7 +143,7 @@ retcode_t broadcaster_on_next(broadcaster_t *const broadcaster,
 
   if ((ret = lf_mpmc_queue_flex_trit_t_enqueue(
            &broadcaster->queue, transaction_flex_trits)) != RC_OK) {
-    log_warning(BROADCASTER_LOGGER_ID, "Enqueuing packet failed\n");
+    log_warning(BROADCASTER_LOGGER_ID, "Enqueuing transaction failed\n");
     return ret;
   }
 

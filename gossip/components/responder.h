@@ -13,9 +13,7 @@
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 #include "gossip/transaction_request.h"
-#include "utils/handles/cond.h"
-#include "utils/handles/lock.h"
-#include "utils/handles/rw_lock.h"
+#include "utils/containers/lock_free/lf_mpmc_queue_transaction_request_t.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
@@ -29,9 +27,7 @@ typedef struct node_s node_t;
 typedef struct responder_s {
   thread_handle_t thread;
   bool running;
-  transaction_request_queue_t queue;
-  rw_lock_handle_t lock;
-  cond_handle_t cond;
+  lf_mpmc_queue_transaction_request_t_t queue;
   node_t *node;
 } responder_t;
 
@@ -96,17 +92,12 @@ retcode_t responder_on_next(responder_t *const responder,
  *
  * @return a status code
  */
-size_t responder_size(responder_t *const responder);
+static inline size_t responder_size(responder_t *const responder) {
+  if (responder == NULL) {
+    return 0;
+  }
 
-/**
- * Tells whether the responder queue is empty or not
- *
- * @param responder The responder
- *
- * @return true if empty, false otherwise
- */
-static inline bool responder_is_empty(responder_t *const responder) {
-  return responder->queue == NULL;
+  return lf_mpmc_queue_transaction_request_t_count(&responder->queue);
 }
 
 #ifdef __cplusplus

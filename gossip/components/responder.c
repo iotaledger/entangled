@@ -13,7 +13,6 @@
 #include "utils/logger_helper.h"
 
 #define RESPONDER_LOGGER_ID "responder"
-#define RESPONDER_TIMEOUT_SEC 1
 
 /**
  * Private functions
@@ -135,8 +134,8 @@ static retcode_t respond_to_request(responder_t const *const responder,
  * @param responder The responder state
  */
 static void *responder_routine(responder_t *const responder) {
-  transaction_request_t *request_ptr = NULL;
   transaction_request_t request;
+  bool has_dequeued = false;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
   connection_config_t db_conf = {.db_path = responder->node->conf.db_path};
   tangle_t tangle;
@@ -151,25 +150,21 @@ static void *responder_routine(responder_t *const responder) {
     return NULL;
   }
 
-  lock_handle_t lock_cond;
-  lock_handle_init(&lock_cond);
-  lock_handle_lock(&lock_cond);
-
   while (responder->running) {
-    if (responder_is_empty(responder)) {
-      cond_handle_timedwait(&responder->cond, &lock_cond,
-                            RESPONDER_TIMEOUT_SEC);
+    while (responder->running && LF_MPMC_QUEUE_IS_EMPTY(&responder->queue)) {
+      ck_pr_stall();
     }
 
-    rw_lock_handle_wrlock(&responder->lock);
-    request_ptr = transaction_request_queue_peek(responder->queue);
-    if (request_ptr == NULL) {
-      rw_lock_handle_unlock(&responder->lock);
+    if (lf_mpmc_queue_transaction_request_t_trydequeue(
+            &responder->queue, &request, &has_dequeued) != RC_OK) {
+      log_warning(RESPONDER_LOGGER_ID,
+                  "Dequeuing transaction request failed\n");
       continue;
     }
-    request = *request_ptr;
-    transaction_request_queue_pop(&responder->queue);
-    rw_lock_handle_unlock(&responder->lock);
+
+    if (!has_dequeued) {
+      continue;
+    }
 
     log_debug(RESPONDER_LOGGER_ID, "Responding to request\n");
     hash_pack_reset(&pack);
@@ -183,9 +178,6 @@ static void *responder_routine(responder_t *const responder) {
     }
   }
 
-  lock_handle_unlock(&lock_cond);
-  lock_handle_destroy(&lock_cond);
-
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(RESPONDER_LOGGER_ID, "Destroying tangle connection failed\n");
   }
@@ -198,6 +190,8 @@ static void *responder_routine(responder_t *const responder) {
  */
 
 retcode_t responder_init(responder_t *const responder, node_t *const node) {
+  retcode_t ret = RC_OK;
+
   if (responder == NULL || node == NULL) {
     return RC_NULL_PARAM;
   }
@@ -205,12 +199,15 @@ retcode_t responder_init(responder_t *const responder, node_t *const node) {
   logger_helper_enable(RESPONDER_LOGGER_ID, LOGGER_DEBUG, true);
 
   responder->running = false;
-  responder->queue = NULL;
-  rw_lock_handle_init(&responder->lock);
-  cond_handle_init(&responder->cond);
   responder->node = node;
 
-  return RC_OK;
+  if ((ret = lf_mpmc_queue_transaction_request_t_init(
+           &responder->queue, sizeof(transaction_request_t))) != RC_OK) {
+    log_critical(RESPONDER_LOGGER_ID, "Initializing queue failed\n");
+    return ret;
+  }
+
+  return ret;
 }
 
 retcode_t responder_start(responder_t *const responder) {
@@ -258,10 +255,12 @@ retcode_t responder_destroy(responder_t *const responder) {
     return RC_STILL_RUNNING;
   }
 
-  transaction_request_queue_free(&responder->queue);
-  rw_lock_handle_destroy(&responder->lock);
-  cond_handle_destroy(&responder->cond);
   responder->node = NULL;
+
+  if ((ret = lf_mpmc_queue_transaction_request_t_destroy(&responder->queue)) !=
+      RC_OK) {
+    log_critical(RESPONDER_LOGGER_ID, "Destroying queue failed\n");
+  }
 
   logger_helper_release(RESPONDER_LOGGER_ID);
 
@@ -272,36 +271,19 @@ retcode_t responder_on_next(responder_t *const responder,
                             neighbor_t *const neighbor,
                             flex_trit_t const *const hash) {
   retcode_t ret = RC_OK;
+  transaction_request_t request;
 
   if (responder == NULL || neighbor == NULL || hash == NULL) {
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_wrlock(&responder->lock);
-  ret = transaction_request_queue_push(&responder->queue, neighbor, hash);
-  rw_lock_handle_unlock(&responder->lock);
-
-  if (ret != RC_OK) {
-    log_warning(RESPONDER_LOGGER_ID,
-                "Pushing transaction_request to responder queue failed\n");
+  request.neighbor = neighbor;
+  memcpy(request.hash, hash, FLEX_TRIT_SIZE_243);
+  if ((ret = lf_mpmc_queue_transaction_request_t_enqueue(&responder->queue,
+                                                         &request)) != RC_OK) {
+    log_warning(RESPONDER_LOGGER_ID, "Enqueuing transaction request failed\n");
     return ret;
-  } else {
-    cond_handle_signal(&responder->cond);
   }
 
-  return RC_OK;
-}
-
-size_t responder_size(responder_t *const responder) {
-  size_t size = 0;
-
-  if (responder == NULL) {
-    return 0;
-  }
-
-  rw_lock_handle_rdlock(&responder->lock);
-  size = transaction_request_queue_count(responder->queue);
-  rw_lock_handle_unlock(&responder->lock);
-
-  return size;
+  return ret;
 }

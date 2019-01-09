@@ -112,9 +112,7 @@ cc_library(
     hdrs = ["responder.h"],
     deps = [
         "//gossip:transaction_request",
-        "//utils/handles:cond",
-        "//utils/handles:lock",
-        "//utils/handles:rw_lock",
+        "//utils/containers/lock_free:lf_mpmc_queue_transaction_request_t",
         "//utils/handles:thread",
     ],
 )

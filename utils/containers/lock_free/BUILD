@@ -15,3 +15,9 @@ container_generate(
     type = "flex_trit_t",
     deps = ["//common/trinary:flex_trit"],
 )
+
+container_generate(
+    include = "gossip/transaction_request.h",
+    type = "transaction_request_t",
+    deps = ["//gossip:transaction_request"],
+)
