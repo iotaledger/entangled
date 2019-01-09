@@ -49,6 +49,7 @@ typedef enum cli_arg_value_e {
   CONF_PERCEPTIVE_NODE_INTERVAL,
   CONF_PERCEPTIVE_NODE_SEQUENCE_SIZE,
   CONF_PERCEPTIVE_NODE_TEST_SAMPLE_SIZE,
+  CONF_PERCEPTIVE_NODE_RANDOM_WALK_DEPTH,
 
 } cli_arg_value_t;
 
@@ -137,6 +138,9 @@ static struct cli_argument_s {
      REQUIRED_ARG},
     {"perceptive_node_sequence_size", CONF_PERCEPTIVE_NODE_SEQUENCE_SIZE,
      "The tested transactions sequence size", REQUIRED_ARG},
+    {"perceptive_node_random_walk_depth",
+     CONF_PERCEPTIVE_NODE_RANDOM_WALK_DEPTH,
+     "The depth from which to start random walk", REQUIRED_ARG},
 
     // Consensus configuration
 
