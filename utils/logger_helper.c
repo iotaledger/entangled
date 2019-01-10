@@ -61,12 +61,17 @@ void logger_helper_release(char const* const logger_id) {
 void logger_helper_print(char const* const logger_id,
                          logger_level_t const level, char const* const format,
                          ...) {
-  logger_id_t id;
   va_list argp;
+  logger_id_t id;
+
+  if (level < logger_output_level_get(stdout)) {
+    return;
+  }
+
+  id = logger_id_request(logger_id);
 
   va_start(argp, format);
   lock_handle_lock(&lock);
-  id = logger_id_request(logger_id);
   logger_va(id, level, format, argp);
   lock_handle_unlock(&lock);
   va_end(argp);
