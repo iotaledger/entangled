@@ -32,7 +32,7 @@ typedef UT_array transactions_sequence_t;
 
 typedef struct perceptive_node_monitoring_data_s {
   hash_array_p monitored_transactions_seq;
-  neighbor_t *monitored_neighbor;
+  neighbor_t monitored_neighbor;
   // Current monitoring session starting time
   uint64_t monitoring_start_timestamp;
   // Next monitoring session starting time

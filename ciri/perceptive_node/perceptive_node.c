@@ -8,6 +8,7 @@
 #include "ciri/perceptive_node/perceptive_node.h"
 #include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
 #include "consensus/utils/tangle_simulator.h"
+#include "utils/handles/rand.h"
 #include "utils/macros.h"
 
 #define PERCEPTIVE_NODE_LOGGER_ID "perceptive_node"
@@ -35,6 +36,32 @@ static void destroy_monitoring_data(iota_perceptive_node_t *const pn) {
   hash_array_free(pn->monitoring_data.txs_sequence_from_all_neighbors);
   hash_to_indexed_hash_set_map_free(pn->monitoring_data.base_approvers_map);
   pn->monitoring_data.txs_from_monitored_neighbor_size = 0;
+}
+
+static void randomize_next_monitored_neighbor(
+    iota_perceptive_node_t *const pn) {
+  neighbor_t_to_uint32_t_map_entry_t *curr_entry = NULL;
+  neighbor_t_to_uint32_t_map_entry_t *tmp_entry = NULL;
+
+  uint32_t total_transactions_count = 0;
+  HASH_ITER(hh, pn->neighbors_to_recent_transactions_count, curr_entry,
+            tmp_entry) {
+    total_transactions_count += curr_entry->value;
+  }
+
+  double randomized_target =
+      rand_handle_probability() * total_transactions_count;
+  curr_entry = NULL;
+  HASH_ITER(hh, pn->neighbors_to_recent_transactions_count, curr_entry,
+            tmp_entry) {
+    randomized_target -= curr_entry->value;
+    if (randomized_target <= 0) {
+      memcpy(&pn->monitoring_data.monitored_neighbor, &curr_entry->key,
+             sizeof(neighbor_t));
+      break;
+    }
+  }
+  reset_neighbors_stats(pn);
 }
 
 static double calculate_current_tip_attachment_prob(
@@ -276,7 +303,6 @@ cleanup:
   double_array_free(pn->monitoring_data.test_lf_distribution_samples);
   pn->monitoring_data.test_lf_distribution_samples = NULL;
   clear_monitoring_data(pn);
-  reset_neighbors_stats(pn);
   return NULL;
 }
 
@@ -323,7 +349,6 @@ retcode_t iota_perceptive_node_init(struct iota_perceptive_node_s *const pn,
   }
   reset_neighbors_stats(pn);
 
-  pn->monitoring_data.monitored_neighbor = NULL;
   pn->monitoring_data.monitored_transactions_seq = NULL;
   pn->monitoring_data.monitoring_start_timestamp = 0;
   pn->monitoring_data.txs_from_monitored_neighbor = NULL;
@@ -376,6 +401,7 @@ retcode_t iota_perceptive_node_destroy(iota_perceptive_node_t *const pn) {
   if ((ret = iota_consensus_cw_rating_destroy(&pn->cw_calc)) != RC_OK) {
     return ret;
   }
+  neighbor_t_to_uint32_t_map_free(&pn->neighbors_to_recent_transactions_count);
   destroy_monitoring_data(pn);
   logger_helper_destroy(PERCEPTIVE_NODE_LOGGER_ID);
 
@@ -390,6 +416,8 @@ retcode_t iota_perceptive_node_on_next_transaction(
   hash_pair_t attachment_point;
   uint32_t node_transaction_count;
 
+  // If this is not a monitoring session period, keep on collecting
+  // Data on neighbors
   if (pn->monitoring_data.is_currently_monitoring == false &&
       now < pn->monitoring_data.monitoring_next_timestamp) {
     node_transaction_count = neighbor_t_to_uint32_t_map_at(
@@ -403,9 +431,7 @@ retcode_t iota_perceptive_node_on_next_transaction(
       now > pn->monitoring_data.monitoring_next_timestamp) {
     pn->monitoring_data.txs_from_monitored_neighbor_size = 0;
     pn->monitoring_data.is_currently_monitoring = true;
-    // TODO - We should randomize the next monitored neighbor
-    // based on its TPS relative to overall TPS instead
-    pn->monitoring_data.monitored_neighbor = from;
+    randomize_next_monitored_neighbor(pn);
     pn->monitoring_data.monitoring_start_timestamp = now;
     // TODO - randomize next timestamp
     pn->monitoring_data.monitoring_next_timestamp =
@@ -422,7 +448,7 @@ retcode_t iota_perceptive_node_on_next_transaction(
                   transaction_hash(transaction));
   // If current transaction is from the monitored node, then we want to store
   // it in the map so we can get it's LF value
-  if (neighbor_cmp(from, pn->monitoring_data.monitored_neighbor) == 0) {
+  if (neighbor_cmp(from, &pn->monitoring_data.monitored_neighbor) == 0) {
     memcpy(attachment_point.one, transaction_trunk(transaction),
            FLEX_TRIT_SIZE_243);
     memcpy(attachment_point.two, transaction_branch(transaction),
