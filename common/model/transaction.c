@@ -7,6 +7,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#ifdef DEBUG
+#include <inttypes.h>
+#include <stdio.h>
+#endif
 
 #include "common/curl-p/digest.h"
 #include "common/model/transaction.h"

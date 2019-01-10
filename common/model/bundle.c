@@ -11,11 +11,6 @@
 #include "common/trinary/tryte_long.h"
 
 static UT_icd bundle_transactions_icd = {sizeof(iota_transaction_t), 0, 0, 0};
-static const trit_t one[NUM_TRITS_TAG] = {
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 void bundle_transactions_new(bundle_transactions_t **const bundle) {
   utarray_new(*bundle, &bundle_transactions_icd);
@@ -67,6 +62,10 @@ void bundle_finalize(bundle_transactions_t *bundle) {
   Kerl kerl = {};
   init_kerl(&kerl);
 
+  head_tx = (iota_transaction_t *)utarray_front(bundle);
+  flex_trits_to_trits(increased_tag_trits, NUM_TRITS_TAG,
+                      transaction_obsolete_tag(head_tx), NUM_TRITS_TAG,
+                      NUM_TRITS_TAG);
   while (!valid_bundle) {
   update_hash:
     // bundle hash
@@ -78,11 +77,7 @@ void bundle_finalize(bundle_transactions_t *bundle) {
     for (int i = 0; i < HASH_LENGTH_TRYTE; i++) {
       if (normalized_hash[i] == 13) {
         // Insecure bundle. Increment Tag and recompute bundle hash.
-        head_tx = (iota_transaction_t *)utarray_front(bundle);
-        flex_trits_to_trits(increased_tag_trits, NUM_TRITS_TAG,
-                            transaction_obsolete_tag(head_tx), NUM_TRITS_TAG,
-                            NUM_TRITS_TAG);
-        add_trits(one, increased_tag_trits, NUM_TRITS_TAG);
+        add_assign(increased_tag_trits, NUM_TRITS_TAG, 1);
         flex_trits_from_trits(transaction_obsolete_tag(head_tx), NUM_TRITS_TAG,
                               increased_tag_trits, NUM_TRITS_TAG,
                               NUM_TRITS_TAG);

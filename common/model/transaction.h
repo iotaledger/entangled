@@ -13,10 +13,6 @@ extern "C" {
 #define __COMMON_MODEL_TRANSACTION_H_
 
 #include <assert.h>
-#ifdef DEBUG
-#include <inttypes.h>
-#include <stdio.h>
-#endif
 
 #include "common/trinary/flex_trit.h"
 
@@ -55,6 +51,11 @@ extern "C" {
 #define NUM_TRYTES_ATTACHMENT_TIMESTAMP_UPPER 9
 #define NUM_TRYTES_NONCE 27
 #define NUM_TRYTES_HASH 81
+
+// bundle essence = 486 trits
+#define NUM_TRITS_ESSENCE                                         \
+  (NUM_TRITS_ADDRESS + NUM_TRITS_VALUE + NUM_TRITS_OBSOLETE_TAG + \
+   NUM_TRITS_TIMESTAMP + NUM_TRITS_CURRENT_INDEX + NUM_TRITS_LAST_INDEX)
 
 /***********************************************************************************************************
  * Transaction data structure
