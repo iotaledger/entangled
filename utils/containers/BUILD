@@ -14,11 +14,15 @@ cc_library(
 )
 
 map_generate(
+    include = "utils/containers/person_example.h",
     key_type = "person_example_t",
     value_type = "int",
+    deps = "//utils/containers:person_example",
 )
 
 map_generate(
+    include = "gossip/neighbor.h",
     key_type = "neighbor_t",
     value_type = "uint32_t",
+    deps = "//gossip:neighbor",
 )

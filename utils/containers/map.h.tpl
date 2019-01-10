@@ -14,8 +14,7 @@
 
 
 //INCLUDE HERE FILES FOR ADDITIONAL TYPES SUPPORT
-#include "utils/containers/person_example.h"
-#include "gossip/neighbor.h"
+#include {INCLUDE}
 
 
 /*

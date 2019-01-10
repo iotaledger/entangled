@@ -29,7 +29,7 @@ hash243_array_p hash243_array_new();
 hash6561_array_p hash6561_array_new();
 hash8019_array_p hash8019_array_new();
 
-void c(hash_array_p array, flex_trit_t const* const trits);
+void push_back(hash_array_p array, flex_trit_t const* const trits);
 uint32_t hash_array_len(hash_array_p array);
 void hash_array_free(hash_array_p array);
 flex_trit_t* hash_array_at(hash_array_p array, uint32_t index);

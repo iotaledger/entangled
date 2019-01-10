@@ -2,12 +2,12 @@ def _map_generator_impl(ctx):
     ctx.actions.expand_template(
         template = ctx.file.source_template,
         output = ctx.outputs.source,
-        substitutions = {"{KEY_TYPE}": str(ctx.attr.key_type), "{VALUE_TYPE}": str(ctx.attr.value_type)},
+        substitutions = {"{KEY_TYPE}": str(ctx.attr.key_type), "{VALUE_TYPE}": str(ctx.attr.value_type), "{INCLUDE}": str(ctx.attr.include)},
     )
     ctx.actions.expand_template(
         template = ctx.file.header_template,
         output = ctx.outputs.header,
-        substitutions = {"{KEY_TYPE}": str(ctx.attr.key_type), "{VALUE_TYPE}": str(ctx.attr.value_type)},
+        substitutions = {"{KEY_TYPE}": str(ctx.attr.key_type), "{VALUE_TYPE}": str(ctx.attr.value_type), "{INCLUDE}": str("\"") + str(ctx.attr.include) + str("\"")},
     )
 
 _map_generator = rule(
@@ -19,6 +19,8 @@ _map_generator = rule(
         "header_template": attr.label(mandatory = True, allow_single_file = True),
         "key_type": attr.string(mandatory = True),
         "value_type": attr.string(mandatory = True),
+        "include": attr.string(mandatory = True),
+        "deps": attr.string(mandatory = True),
     },
     outputs = {
         "source": "%{source}",
@@ -26,7 +28,7 @@ _map_generator = rule(
     },
 )
 
-def map_generate(key_type, value_type):
+def map_generate(key_type, value_type, include, deps):
     base = str(key_type) + str("_to_") + str(value_type) + "_map"
     source = base + ".c"
     header = base + ".h"
@@ -39,6 +41,8 @@ def map_generate(key_type, value_type):
         header_template = "//utils/containers:map.h.tpl",
         key_type = key_type,
         value_type = value_type,
+        include = include,
+        deps = deps,
     )
 
     native.cc_library(
@@ -49,8 +53,7 @@ def map_generate(key_type, value_type):
             "//common:errors",
             "@com_github_uthash//:uthash",
             "//common/trinary:flex_trit",
-            "//utils/containers:person_example",
-            "//gossip:neighbor",
+            str(deps),
         ],
         visibility = ["//visibility:public"],
     )
