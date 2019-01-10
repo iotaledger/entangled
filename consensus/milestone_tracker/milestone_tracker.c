@@ -24,7 +24,6 @@
 #include "utils/time.h"
 
 #define MILESTONE_TRACKER_LOGGER_ID "milestone_tracker"
-#define MILESTONE_VALIDATION_INTERVAL 10uLL
 #define SOLID_MILESTONE_RESCAN_INTERVAL 5000uLL
 
 static retcode_t validate_coordinator(milestone_tracker_t* const mt,
@@ -158,8 +157,8 @@ static void* milestone_validator(void* arg) {
   milestone_tracker_t* mt = (milestone_tracker_t*)arg;
   iota_milestone_t candidate;
   DECLARE_PACK_SINGLE_TX(tx, tx_ptr, pack);
-  flex_trit_t* peek = NULL;
   milestone_status_t milestone_status;
+  bool has_dequeued = false;
   connection_config_t db_conf = {.db_path = mt->conf->db_path};
   tangle_t tangle;
 
@@ -174,44 +173,47 @@ static void* milestone_validator(void* arg) {
   }
 
   while (mt->running) {
-    rw_lock_handle_wrlock(&mt->candidates_lock);
-    peek = hash243_queue_peek(mt->candidates);
-
-    if (peek != NULL) {
-      memcpy(candidate.hash, peek, FLEX_TRIT_SIZE_243);
-      hash243_queue_pop(&mt->candidates);
-      rw_lock_handle_unlock(&mt->candidates_lock);
-      hash_pack_reset(&pack);
-      if (iota_tangle_transaction_load_partial(
-              &tangle, candidate.hash, &pack,
-              PARTIAL_TX_MODEL_ESSENCE_CONSENSUS) == RC_OK &&
-          pack.num_loaded != 0) {
-        candidate.index = get_milestone_index(&tx);
-        if (validate_milestone(mt, &tangle, &candidate, &milestone_status) !=
-            RC_OK) {
-          log_warning(MILESTONE_TRACKER_LOGGER_ID,
-                      "Validating milestone failed\n");
-          continue;
-        }
-        if (milestone_status == MILESTONE_VALID) {
-          iota_tangle_milestone_store(&tangle, &candidate);
-          if (candidate.index > mt->latest_milestone_index) {
-            log_info(MILESTONE_TRACKER_LOGGER_ID,
-                     "Latest milestone has changed from #%" PRIu64
-                     " to #%" PRIu64 " (%d remaining candidates)\n",
-                     mt->latest_milestone_index, candidate.index,
-                     hash243_queue_count(mt->candidates));
-            mt->latest_milestone_index = candidate.index;
-            memcpy(mt->latest_milestone, candidate.hash, FLEX_TRIT_SIZE_243);
-          }
-        } else if (milestone_status == MILESTONE_INCOMPLETE) {
-          iota_milestone_tracker_add_candidate(mt, candidate.hash);
-        }
-      }
-    } else {
-      rw_lock_handle_unlock(&mt->candidates_lock);
+    while (mt->running && LF_MPMC_QUEUE_IS_EMPTY(&mt->candidates)) {
+      ck_pr_stall();
     }
-    sleep_ms(MILESTONE_VALIDATION_INTERVAL);
+
+    if (lf_mpmc_queue_flex_trit_t_trydequeue(&mt->candidates, candidate.hash,
+                                             &has_dequeued) != RC_OK) {
+      log_warning(MILESTONE_TRACKER_LOGGER_ID, "Dequeuing candidate failed\n");
+      continue;
+    }
+
+    if (!has_dequeued) {
+      continue;
+    }
+
+    hash_pack_reset(&pack);
+    if (iota_tangle_transaction_load_partial(
+            &tangle, candidate.hash, &pack,
+            PARTIAL_TX_MODEL_ESSENCE_CONSENSUS) == RC_OK &&
+        pack.num_loaded != 0) {
+      candidate.index = get_milestone_index(&tx);
+      if (validate_milestone(mt, &tangle, &candidate, &milestone_status) !=
+          RC_OK) {
+        log_warning(MILESTONE_TRACKER_LOGGER_ID,
+                    "Validating milestone failed\n");
+        continue;
+      }
+      if (milestone_status == MILESTONE_VALID) {
+        iota_tangle_milestone_store(&tangle, &candidate);
+        if (candidate.index > mt->latest_milestone_index) {
+          log_info(MILESTONE_TRACKER_LOGGER_ID,
+                   "Latest milestone has changed from #%" PRIu64 " to #%" PRIu64
+                   " (%d remaining candidates)\n",
+                   mt->latest_milestone_index, candidate.index,
+                   iota_milestone_tracker_candidates_count(mt));
+          mt->latest_milestone_index = candidate.index;
+          memcpy(mt->latest_milestone, candidate.hash, FLEX_TRIT_SIZE_243);
+        }
+      } else if (milestone_status == MILESTONE_INCOMPLETE) {
+        iota_milestone_tracker_add_candidate(mt, candidate.hash);
+      }
+    }
   }
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
@@ -330,6 +332,8 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
                                       snapshot_t* const snapshot,
                                       ledger_validator_t* const lv,
                                       transaction_solidifier_t* const ts) {
+  retcode_t ret = RC_OK;
+
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
   }
@@ -341,14 +345,19 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   mt->latest_snapshot = snapshot;
   mt->ledger_validator = lv;
   mt->transaction_solidifier = ts;
-  mt->candidates = NULL;
-  rw_lock_handle_init(&mt->candidates_lock);
   memcpy(mt->coordinator, conf->coordinator, FLEX_TRIT_SIZE_243);
   mt->milestone_start_index = conf->last_milestone;
   mt->latest_milestone_index = conf->last_milestone;
   mt->latest_solid_subtangle_milestone_index = conf->last_milestone;
 
-  return RC_OK;
+  if ((ret = lf_mpmc_queue_flex_trit_t_init(&mt->candidates,
+                                            FLEX_TRIT_SIZE_243)) != RC_OK) {
+    log_critical(MILESTONE_TRACKER_LOGGER_ID,
+                 "Initializing candidates queue failed\n");
+    return ret;
+  }
+
+  return ret;
 }
 
 retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt,
@@ -452,8 +461,11 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt) {
     return RC_CONSENSUS_MT_STILL_RUNNING;
   }
 
-  hash243_queue_free(&mt->candidates);
-  rw_lock_handle_destroy(&mt->candidates_lock);
+  if ((ret = lf_mpmc_queue_flex_trit_t_destroy(&mt->candidates)) != RC_OK) {
+    log_critical(MILESTONE_TRACKER_LOGGER_ID,
+                 "Destroying candidates queue failed\n");
+  }
+
   memset(mt, 0, sizeof(milestone_tracker_t));
   logger_helper_release(MILESTONE_TRACKER_LOGGER_ID);
 
@@ -468,15 +480,11 @@ retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt,
     return RC_NULL_PARAM;
   }
 
-  rw_lock_handle_wrlock(&mt->candidates_lock);
-  ret = hash243_queue_push(&mt->candidates, hash);
-  rw_lock_handle_unlock(&mt->candidates_lock);
-
-  if (ret != RC_OK) {
-    log_warning(MILESTONE_TRACKER_LOGGER_ID,
-                "Pushing candidate hash to candidates queue failed\n");
-    return RC_OOM;
+  if ((ret = lf_mpmc_queue_flex_trit_t_enqueue(&mt->candidates, hash)) !=
+      RC_OK) {
+    log_warning(MILESTONE_TRACKER_LOGGER_ID, "Enqueuing candidate failed\n");
+    return ret;
   }
 
-  return RC_OK;
+  return ret;
 }

@@ -12,8 +12,7 @@
 
 #include "common/errors.h"
 #include "consensus/conf.h"
-#include "utils/containers/hash/hash243_queue.h"
-#include "utils/handles/rw_lock.h"
+#include "utils/containers/lock_free/lf_mpmc_queue_flex_trit_t.h"
 #include "utils/handles/thread.h"
 
 #ifdef __cplusplus
@@ -41,8 +40,7 @@ typedef struct milestone_tracker_s {
   flex_trit_t coordinator[FLEX_TRIT_SIZE_243];
   ledger_validator_t* ledger_validator;
   transaction_solidifier_t* transaction_solidifier;
-  hash243_queue_t candidates;
-  rw_lock_handle_t candidates_lock;
+  lf_mpmc_queue_flex_trit_t_t candidates;
   // bool accept_any_testnet_coo;
 } milestone_tracker_t;
 
@@ -101,6 +99,22 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt);
  */
 retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt,
                                                flex_trit_t const* const hash);
+
+/**
+ * Gets the size of the candidates queue
+ *
+ * @param mt The milestone tracker
+ *
+ * @return a status code
+ */
+static inline size_t iota_milestone_tracker_candidates_count(
+    milestone_tracker_t* const mt) {
+  if (mt == NULL) {
+    return 0;
+  }
+
+  return lf_mpmc_queue_flex_trit_t_count(&mt->candidates);
+}
 
 #ifdef __cplusplus
 }
