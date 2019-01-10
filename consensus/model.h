@@ -19,8 +19,8 @@ extern "C" {
 #endif
 
 typedef struct hash_pair {
-  flex_trit_t trunk[FLEX_TRIT_SIZE_243];
-  flex_trit_t branch[FLEX_TRIT_SIZE_243];
+  flex_trit_t one[FLEX_TRIT_SIZE_243];
+  flex_trit_t two[FLEX_TRIT_SIZE_243];
 } hash_pair_t;
 
 #ifdef __cplusplus

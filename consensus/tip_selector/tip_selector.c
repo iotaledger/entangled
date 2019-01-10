@@ -69,12 +69,12 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
 
   if ((ret = iota_consensus_exit_probability_randomize(
            tip_selector->ep_randomizer, tangle, tip_selector->walker_validator,
-           &rating_results, ep_p, tips->trunk)) != RC_OK) {
+           &rating_results, ep_p, tips->one)) != RC_OK) {
     log_error(logger_id, "Getting trunk tip failed with error %" PRIu64 "\n",
               ret);
     goto done;
   }
-  if ((ret = hash243_stack_push(&tips_stack, tips->trunk)) != RC_OK) {
+  if ((ret = hash243_stack_push(&tips_stack, tips->one)) != RC_OK) {
     goto done;
   }
 
@@ -89,12 +89,12 @@ retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
 
   if ((ret = iota_consensus_exit_probability_randomize(
            tip_selector->ep_randomizer, tangle, tip_selector->walker_validator,
-           &rating_results, ep_p, tips->branch)) != RC_OK) {
+           &rating_results, ep_p, tips->two)) != RC_OK) {
     log_error(logger_id, "Getting branch tip failed with error %" PRIu64 "\n",
               ret);
     goto done;
   }
-  if ((ret = hash243_stack_push(&tips_stack, tips->branch)) != RC_OK) {
+  if ((ret = hash243_stack_push(&tips_stack, tips->two)) != RC_OK) {
     goto done;
   }
 

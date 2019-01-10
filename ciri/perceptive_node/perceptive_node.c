@@ -39,16 +39,16 @@ static double calculate_current_tip_attachment_prob(
   hash_to_double_map_entry_t *exit_prob_entry = NULL;
   double prob = 1.0;
 
-  if (memcmp(map_entry->value.branch, map_entry->value.trunk,
-             FLEX_TRIT_SIZE_243) == 0) {
-    hash_to_double_map_find(trans_probs, map_entry->value.branch,
+  if (memcmp(map_entry->value.one, map_entry->value.two, FLEX_TRIT_SIZE_243) ==
+      0) {
+    hash_to_double_map_find(trans_probs, map_entry->value.one,
                             &exit_prob_entry);
     prob *= exit_prob_entry->value * exit_prob_entry->value;
   } else {
-    hash_to_double_map_find(trans_probs, map_entry->value.branch,
+    hash_to_double_map_find(trans_probs, map_entry->value.one,
                             &exit_prob_entry);
     prob *= exit_prob_entry->value;
-    hash_to_double_map_find(trans_probs, map_entry->value.trunk,
+    hash_to_double_map_find(trans_probs, map_entry->value.two,
                             &exit_prob_entry);
     prob *= exit_prob_entry->value;
     prob *= 2;
@@ -113,8 +113,8 @@ static retcode_t calculate_lf_prob_value(iota_perceptive_node_t *const pn,
     }
 
     if ((ret = tangle_simulator_add_transaction_recalc_ratings(
-             curr_subtangle_size++, curr_tx_hash, curr_tip_entry->value.branch,
-             curr_tip_entry->value.trunk, &approvers_map,
+             curr_subtangle_size++, curr_tx_hash, curr_tip_entry->value.one,
+             curr_tip_entry->value.two, &approvers_map,
              &cw_ratings.cw_ratings)) != RC_OK) {
       goto cleanup;
     }
@@ -184,16 +184,16 @@ static retcode_t calculate_samples_from_lf_distribution(
         if ((ret = iota_consensus_exit_prob_map_randomize(
                  &ep_prob_map_randomizer, pn->tangle,
                  &pn->consensus->exit_prob_transaction_validator, &cw_ratings,
-                 pn->monitoring_data.entry_point,
-                 curr_tip_entry->value.trunk)) != RC_OK) {
+                 pn->monitoring_data.entry_point, curr_tip_entry->value.one)) !=
+            RC_OK) {
           return ret;
         }
         // Get second tip (branch)
         if ((ret = iota_consensus_exit_prob_map_randomize(
                  &ep_prob_map_randomizer, pn->tangle,
                  &pn->consensus->exit_prob_transaction_validator, &cw_ratings,
-                 pn->monitoring_data.entry_point,
-                 curr_tip_entry->value.branch)) != RC_OK) {
+                 pn->monitoring_data.entry_point, curr_tip_entry->value.two)) !=
+            RC_OK) {
           return ret;
         }
 
@@ -204,7 +204,7 @@ static retcode_t calculate_samples_from_lf_distribution(
       // Update tangle with newly attached transaction
       if ((ret = tangle_simulator_add_transaction_recalc_ratings(
                curr_subtangle_size++, curr_selected_tip,
-               curr_tip_entry->value.branch, curr_tip_entry->value.trunk,
+               curr_tip_entry->value.one, curr_tip_entry->value.two,
                &approvers_map, &cw_ratings.cw_ratings)) != RC_OK) {
         goto cleanup;
       }
@@ -241,8 +241,6 @@ static double calculate_r_score_from_lf_prob(iota_perceptive_node_t *const pn,
 static void *perceptive_node_do_test(iota_perceptive_node_t *const pn) {
   double test_r_score;
   pn->test_thread_running = true;
-  // TODO -
-  // Pick a neighbor and start monitoring
   log_info(PERCEPTIVE_NODE_LOGGER_ID, "In %s, running likelihood test\n",
            __FUNCTION__);
   if (cw_rating_dfs_do_dfs_from_db(
@@ -255,7 +253,7 @@ static void *perceptive_node_do_test(iota_perceptive_node_t *const pn) {
     goto cleanup;
   }
 
-  float lf_score;
+  double lf_score;
   if (calculate_lf_prob_value(pn, &lf_score) != RC_OK) {
     log_error(PERCEPTIVE_NODE_LOGGER_ID,
               "In %s, failed in LF score calculation\n", __FUNCTION__);
@@ -409,9 +407,9 @@ retcode_t iota_perceptive_node_on_next_transaction(
   // If current transaction is from the monitored node, then we want to store
   // it in the map so we can get it's LF value
   if (neighbor_cmp(from, pn->monitoring_data.monitored_neighbor) == 0) {
-    memcpy(attachment_point.trunk, transaction_trunk(transaction),
+    memcpy(attachment_point.one, transaction_trunk(transaction),
            FLEX_TRIT_SIZE_243);
-    memcpy(attachment_point.branch, transaction_branch(transaction),
+    memcpy(attachment_point.two, transaction_branch(transaction),
            FLEX_TRIT_SIZE_243);
     hash_to_hash_pair_t_map_add(
         &pn->monitoring_data.txs_from_monitored_neighbor,
