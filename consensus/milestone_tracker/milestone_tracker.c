@@ -462,8 +462,8 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt) {
   }
 
   if ((ret = lf_mpmc_queue_flex_trit_t_destroy(&mt->candidates)) != RC_OK) {
-    log_critical(MILESTONE_TRACKER_LOGGER_ID,
-                 "Destroying candidates queue failed\n");
+    log_error(MILESTONE_TRACKER_LOGGER_ID,
+              "Destroying candidates queue failed\n");
   }
 
   memset(mt, 0, sizeof(milestone_tracker_t));

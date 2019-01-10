@@ -259,7 +259,7 @@ retcode_t responder_destroy(responder_t *const responder) {
 
   if ((ret = lf_mpmc_queue_transaction_request_t_destroy(&responder->queue)) !=
       RC_OK) {
-    log_critical(RESPONDER_LOGGER_ID, "Destroying queue failed\n");
+    log_error(RESPONDER_LOGGER_ID, "Destroying queue failed\n");
   }
 
   logger_helper_release(RESPONDER_LOGGER_ID);

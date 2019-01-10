@@ -109,7 +109,7 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
   broadcaster->node = NULL;
 
   if ((ret = lf_mpmc_queue_flex_trit_t_destroy(&broadcaster->queue)) != RC_OK) {
-    log_critical(BROADCASTER_LOGGER_ID, "Destroying queue failed\n");
+    log_error(BROADCASTER_LOGGER_ID, "Destroying queue failed\n");
   }
 
   logger_helper_release(BROADCASTER_LOGGER_ID);

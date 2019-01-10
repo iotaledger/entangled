@@ -415,7 +415,7 @@ retcode_t processor_destroy(processor_t *const processor) {
   processor->milestone_tracker = NULL;
 
   if ((ret = lf_mpmc_queue_iota_packet_t_destroy(&processor->queue)) != RC_OK) {
-    log_critical(PROCESSOR_LOGGER_ID, "Destroying queue failed\n");
+    log_error(PROCESSOR_LOGGER_ID, "Destroying queue failed\n");
   }
 
   logger_helper_release(PROCESSOR_LOGGER_ID);
