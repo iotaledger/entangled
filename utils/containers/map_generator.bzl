@@ -50,6 +50,7 @@ def map_generate(key_type, value_type):
             "@com_github_uthash//:uthash",
             "//common/trinary:flex_trit",
             "//utils/containers:person_example",
+            "//gossip:neighbor",
         ],
         visibility = ["//visibility:public"],
     )

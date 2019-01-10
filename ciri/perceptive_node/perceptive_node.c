@@ -24,6 +24,11 @@ static void clear_monitoring_data(iota_perceptive_node_t *const pn) {
   pn->monitoring_data.txs_from_monitored_neighbor_size = 0;
 }
 
+static void reset_neighbors_stats(iota_perceptive_node_t *const pn) {
+  neighbor_t_to_uint32_t_map_set_all(
+      &pn->neighbors_to_recent_transactions_count, 0);
+}
+
 static void destroy_monitoring_data(iota_perceptive_node_t *const pn) {
   hash_to_hash_pair_t_map_free(
       &pn->monitoring_data.txs_from_monitored_neighbor);
@@ -271,6 +276,7 @@ cleanup:
   double_array_free(pn->monitoring_data.test_lf_distribution_samples);
   pn->monitoring_data.test_lf_distribution_samples = NULL;
   clear_monitoring_data(pn);
+  reset_neighbors_stats(pn);
   return NULL;
 }
 
@@ -283,6 +289,7 @@ retcode_t iota_perceptive_node_init(struct iota_perceptive_node_s *const pn,
   }
 
   pn->neighbors = NULL;
+  pn->neighbors_to_recent_transactions_count = NULL;
   logger_helper_init(PERCEPTIVE_NODE_LOGGER_ID, LOGGER_DEBUG, true);
   pn->test_thread_running = false;
   pn->consensus = consensus;
@@ -309,13 +316,12 @@ retcode_t iota_perceptive_node_init(struct iota_perceptive_node_s *const pn,
   }
 
   neighbor_t *elt = NULL;
-  neighbor_t *tmp = NULL;
-
   LL_FOREACH(neighbors, elt) {
     if ((ret = neighbors_add(&pn->neighbors, elt)) != RC_OK) {
       return ret;
     }
   }
+  reset_neighbors_stats(pn);
 
   pn->monitoring_data.monitored_neighbor = NULL;
   pn->monitoring_data.monitored_transactions_seq = NULL;
@@ -382,6 +388,16 @@ retcode_t iota_perceptive_node_on_next_transaction(
   retcode_t ret;
   uint64_t now = current_timestamp_ms();
   hash_pair_t attachment_point;
+  uint32_t node_transaction_count;
+
+  if (pn->monitoring_data.is_currently_monitoring == false &&
+      now < pn->monitoring_data.monitoring_next_timestamp) {
+    node_transaction_count = neighbor_t_to_uint32_t_map_at(
+        &pn->neighbors_to_recent_transactions_count, from);
+    neighbor_t_to_uint32_t_map_set(&pn->neighbors_to_recent_transactions_count,
+                                   from, node_transaction_count++);
+    return RC_OK;
+  }
   // Start a new sequence
   if (pn->monitoring_data.is_currently_monitoring == false &&
       now > pn->monitoring_data.monitoring_next_timestamp) {

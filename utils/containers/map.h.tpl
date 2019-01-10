@@ -15,6 +15,7 @@
 
 //INCLUDE HERE FILES FOR ADDITIONAL TYPES SUPPORT
 #include "utils/containers/person_example.h"
+#include "gossip/neighbor.h"
 
 
 /*
@@ -49,6 +50,15 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_contains(
 bool {KEY_TYPE}_to_{VALUE_TYPE}_map_find({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map,
                           {KEY_TYPE} const *const key,
                           {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t **const res);
+
+{VALUE_TYPE} {KEY_TYPE}_to_{VALUE_TYPE}_map_at(
+{KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map,
+{KEY_TYPE} const *const key);
+
+bool {KEY_TYPE}_to_{VALUE_TYPE}_map_set(
+{KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map,
+{KEY_TYPE} const *const key,
+{VALUE_TYPE} const * const value);
 
 void {KEY_TYPE}_to_{VALUE_TYPE}_map_free({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map);
 

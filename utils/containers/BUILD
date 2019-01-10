@@ -17,3 +17,8 @@ map_generate(
     key_type = "person_example_t",
     value_type = "int",
 )
+
+map_generate(
+    key_type = "neighbor_t",
+    value_type = "uint32_t",
+)
