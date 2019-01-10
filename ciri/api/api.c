@@ -336,8 +336,8 @@ retcode_t iota_api_get_transactions_to_approve(
     return ret;
   }
 
-  get_transactions_to_approve_res_set_branch(res, tips.branch);
-  get_transactions_to_approve_res_set_trunk(res, tips.trunk);
+  get_transactions_to_approve_res_set_branch(res, tips.two);
+  get_transactions_to_approve_res_set_trunk(res, tips.one);
 
   return ret;
 }
