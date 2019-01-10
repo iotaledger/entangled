@@ -64,6 +64,13 @@ static void randomize_next_monitored_neighbor(
   reset_neighbors_stats(pn);
 }
 
+static void randomize_next_monitoring_timestamp(
+    iota_perceptive_node_t *const pn, int64_t now) {
+  pn->monitoring_data.monitoring_next_timestamp =
+      rand_handle_probability() * pn->conf.monitoring_interval_seconds +
+      pn->conf.monitoring_interval_seconds;
+}
+
 static double calculate_current_tip_attachment_prob(
     hash_to_double_map_t const *const trans_probs,
     cw_calc_result const *const cw_result,
@@ -355,9 +362,7 @@ retcode_t iota_perceptive_node_init(struct iota_perceptive_node_s *const pn,
   pn->monitoring_data.txs_from_monitored_neighbor = NULL;
   pn->monitoring_data.txs_sequence_from_all_neighbors = NULL;
 
-  // TODO - randomize next time
-  pn->monitoring_data.monitoring_next_timestamp =
-      current_timestamp_ms() + pn->conf.monitoring_interval_seconds;
+  randomize_next_monitoring_timestamp(pn, current_timestamp_ms());
 
   return RC_OK;
 }
@@ -434,9 +439,7 @@ retcode_t iota_perceptive_node_on_next_transaction(
     pn->monitoring_data.is_currently_monitoring = true;
     randomize_next_monitored_neighbor(pn);
     pn->monitoring_data.monitoring_start_timestamp = now;
-    // TODO - randomize next timestamp
-    pn->monitoring_data.monitoring_next_timestamp =
-        now + pn->conf.monitoring_interval_seconds;
+    randomize_next_monitoring_timestamp(pn, now);
     if ((ret = iota_consensus_entry_point_selector_get_entry_point(
              &pn->consensus->entry_point_selector, pn->tangle,
              pn->conf.random_walk_depth, pn->monitoring_data.entry_point)) !=
