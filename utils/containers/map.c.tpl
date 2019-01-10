@@ -64,7 +64,6 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_find({KEY_TYPE}_to_{VALUE_TYPE}_map_t const 
   }
 
   HASH_FIND(hh, map->map, key, map->key_size, *res);
-
   return *res != NULL;
 }
 
