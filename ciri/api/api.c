@@ -17,6 +17,8 @@
 
 #define API_LOGGER_ID "api"
 
+static logger_id_t logger_id;
+
 /*
  * Private functions
  */
@@ -140,12 +142,12 @@ retcode_t iota_api_add_neighbors(iota_api_t const *const api,
     if ((ret = neighbor_init_with_uri(&neighbor, *uri)) != RC_OK) {
       return ret;
     }
-    log_info(API_LOGGER_ID, "Adding neighbor %s\n", *uri);
+    log_info(logger_id, "Adding neighbor %s\n", *uri);
     rw_lock_handle_wrlock(&api->node->neighbors_lock);
     if (neighbors_add(&api->node->neighbors, &neighbor) == RC_OK) {
       res->added_neighbors++;
     } else {
-      log_warning(API_LOGGER_ID, "Adding neighbor %s failed\n", *uri);
+      log_warning(logger_id, "Adding neighbor %s failed\n", *uri);
     }
     rw_lock_handle_unlock(&api->node->neighbors_lock);
   }
@@ -170,12 +172,12 @@ retcode_t iota_api_remove_neighbors(iota_api_t const *const api,
     if ((ret = neighbor_init_with_uri(&neighbor, *uri)) != RC_OK) {
       return ret;
     }
-    log_info(API_LOGGER_ID, "Removing neighbor %s\n", *uri);
+    log_info(logger_id, "Removing neighbor %s\n", *uri);
     rw_lock_handle_wrlock(&api->node->neighbors_lock);
     if (neighbors_remove(&api->node->neighbors, &neighbor) == RC_OK) {
       res->removed_neighbors++;
     } else {
-      log_warning(API_LOGGER_ID, "Removing neighbor %s failed\n", *uri);
+      log_warning(logger_id, "Removing neighbor %s failed\n", *uri);
     }
     rw_lock_handle_unlock(&api->node->neighbors_lock);
   }
@@ -416,7 +418,7 @@ retcode_t iota_api_store_transactions(
     }
     if ((ret = iota_consensus_transaction_solidifier_update_status(
              &api->consensus->transaction_solidifier, tangle, &tx)) != RC_OK) {
-      log_warning(API_LOGGER_ID, "Updating transaction status failed\n");
+      log_warning(logger_id, "Updating transaction status failed\n");
       return ret;
     }
     // TODO store metadata: arrival_time, status, sender (#407)
@@ -512,7 +514,7 @@ retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
     return RC_NULL_PARAM;
   }
 
-  logger_helper_enable(API_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id = logger_helper_enable(API_LOGGER_ID, LOGGER_DEBUG, true);
   api->running = false;
   api->node = node;
   api->consensus = consensus;
@@ -554,6 +556,6 @@ retcode_t iota_api_destroy(iota_api_t *const api) {
     return RC_STILL_RUNNING;
   }
 
-  logger_helper_release(API_LOGGER_ID);
+  logger_helper_release(logger_id);
   return RC_OK;
 }

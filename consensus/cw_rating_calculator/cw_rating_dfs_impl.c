@@ -13,6 +13,10 @@
 #include "utils/containers/hash/hash243_stack.h"
 #include "utils/logger_helper.h"
 
+#define CW_RATING_CALCULATOR_LOGGER_ID "cw_rating_calculator"
+
+static logger_id_t logger_id;
+
 static retcode_t cw_rating_dfs_do_dfs_from_db(
     cw_rating_calculator_t const *const cw_calc, tangle_t *const tangle,
     flex_trit_t *entry_point, hash_to_indexed_hash_set_map_t *tx_to_approvers,
@@ -23,6 +27,8 @@ static retcode_t cw_rating_dfs_do_dfs_light(
     bitset_t *visited_bitset, uint64_t *subtangle_size);
 
 void init_cw_calculator_dfs(cw_rating_calculator_base_t *calculator) {
+  logger_id =
+      logger_helper_enable(CW_RATING_CALCULATOR_LOGGER_ID, LOGGER_DEBUG, true);
   calculator->vtable = cw_topological_vtable;
 }
 
@@ -47,16 +53,15 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc,
   if ((res = cw_rating_dfs_do_dfs_from_db(cw_calc, tangle, entry_point,
                                           &out->tx_to_approvers,
                                           &max_subtangle_size, 0)) != RC_OK) {
-    log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-              "Failed in DFS from DB, error code is: %" PRIu64 "\n", res);
+    log_error(logger_id, "Failed in DFS from DB, error code is: %" PRIu64 "\n",
+              res);
     return RC_CONSENSUS_CW_FAILED_IN_DFS_FROM_DB;
   }
 
   // Insert first "ratings" entry
   if ((res = hash_to_int64_t_map_add(&out->cw_ratings, entry_point,
                                      max_subtangle_size))) {
-    log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-              "Failed adding entrypoint into map\n");
+    log_error(logger_id, "Failed adding entrypoint into map\n");
     return res;
   }
 
@@ -83,15 +88,15 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc,
     if ((res = cw_rating_dfs_do_dfs_light(out->tx_to_approvers, curr_hash,
                                           &visited_txs_bitset,
                                           &sub_tangle_size)) != RC_OK) {
-      log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-                "Failed in light DFS, error code is: %" PRIu64 "\n", res);
+      log_error(logger_id, "Failed in light DFS, error code is: %" PRIu64 "\n",
+                res);
       return RC_CONSENSUS_CW_FAILED_IN_LIGHT_DFS;
     }
 
     if ((res = hash_to_int64_t_map_add(&out->cw_ratings, curr_hash,
                                        sub_tangle_size))) {
-      log_error(CW_RATING_CALCULATOR_LOGGER_ID,
-                "Failed in light DFS, error code is: %" PRIu64 "\n", res);
+      log_error(logger_id, "Failed in light DFS, error code is: %" PRIu64 "\n",
+                res);
       return res;
     }
   }
@@ -127,7 +132,7 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(
       hash_pack_reset(&pack);
       if ((res = iota_tangle_transaction_load_hashes_of_approvers(
                tangle, curr_tx_hash, &pack, subtangle_before_timestamp))) {
-        log_error(CW_RATING_CALCULATOR_LOGGER_ID,
+        log_error(logger_id,
                   "Failed in loading approvers, error code is: %" PRIu64 "\n",
                   res);
         return res;

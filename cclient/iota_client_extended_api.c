@@ -10,16 +10,19 @@
 
 #define CCLIENT_EXTENDED_LOGGER_ID "cclient_extended_api"
 
+static logger_id_t logger_id;
+
 void iota_client_extended_init() {
-  logger_helper_enable(CCLIENT_EXTENDED_LOGGER_ID, LOGGER_DEBUG, true);
-  log_info(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d] enable logger %s.\n", __func__,
-           __LINE__, CCLIENT_EXTENDED_LOGGER_ID);
+  logger_id =
+      logger_helper_enable(CCLIENT_EXTENDED_LOGGER_ID, LOGGER_DEBUG, true);
+  log_info(logger_id, "[%s:%d] enable logger %s.\n", __func__, __LINE__,
+           CCLIENT_EXTENDED_LOGGER_ID);
 }
 
 void iota_client_extended_destroy() {
-  log_info(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d] destroy logger %s.\n", __func__,
-           __LINE__, CCLIENT_EXTENDED_LOGGER_ID);
-  logger_helper_release(CCLIENT_EXTENDED_LOGGER_ID);
+  log_info(logger_id, "[%s:%d] destroy logger %s.\n", __func__, __LINE__,
+           CCLIENT_EXTENDED_LOGGER_ID);
+  logger_helper_release(logger_id);
 }
 
 static retcode_t is_unused_address(iota_client_service_t const* const serv,
@@ -30,7 +33,7 @@ static retcode_t is_unused_address(iota_client_service_t const* const serv,
   find_transactions_req_t* find_tran_req = NULL;
   find_transactions_res_t* find_tran_res = NULL;
 
-  log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
   find_tran_req = find_transactions_req_new();
   find_tran_res = find_transactions_res_new();
   if (!find_tran_req || !find_tran_res) {
@@ -62,7 +65,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
   size_t addr_index = 0;
   bool is_unused = true;
 
-  log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
   // security validation
   if (addr_opt.security == 0 || addr_opt.security > 3) {
     return RC_CCLIENT_INVALID_SECURITY;
@@ -124,7 +127,7 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
   size_t counter = 0;
   out_input->total_balance = 0;
 
-  log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
   // get address list
   ret_code = iota_client_get_new_address(serv, seed, addr_opt,
                                          &balances_req->addresses);
@@ -147,7 +150,7 @@ retcode_t iota_client_get_inputs(iota_client_service_t const* const serv,
     // check if balance is sufficient
     if (out_input->total_balance < threshold) {
       ret_code = RC_CCLIENT_INSUFFICIENT_BALANCE;
-      log_warning(CCLIENT_EXTENDED_LOGGER_ID, "insufficient balance\n");
+      log_warning(logger_id, "insufficient balance\n");
     }
   }
 
@@ -262,11 +265,10 @@ retcode_t iota_client_find_transaction_objects(
   retcode_t ret_code = RC_OK;
   find_transactions_res_t* find_tx_res = find_transactions_res_new();
 
-  log_debug(CCLIENT_EXTENDED_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
   if (!find_tx_res) {
     ret_code = RC_CCLIENT_NULL_PTR;
-    log_error(CCLIENT_EXTENDED_LOGGER_ID,
-              "%s create request object failed: %s\n", __func__,
+    log_error(logger_id, "%s create request object failed: %s\n", __func__,
               error_2_string(ret_code));
     goto done;
   }
@@ -302,8 +304,7 @@ retcode_t iota_client_get_transaction_objects(
         transaction_array_push_back(out_tx_objs, &tx);
       } else {
         ret_code = RC_CCLIENT_TX_DESERIALIZE_FAILED;
-        log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s: %s.\n", __func__,
-                  error_2_string(ret_code));
+        log_error(logger_id, "%s: %s.\n", __func__, error_2_string(ret_code));
         goto done;
       }
     }
@@ -336,7 +337,7 @@ retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
   ret_code =
       iota_client_check_consistency(serv, consistency_req, consistency_res);
   if (ret_code) {
-    log_warning(CCLIENT_EXTENDED_LOGGER_ID, "check consistency failed\n");
+    log_warning(logger_id, "check consistency failed\n");
     goto done;
   }
   if (consistency_res->state) {
@@ -349,7 +350,7 @@ retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
       if (tx_deserialize_offset) {
         // is above max depth
         time_now = current_timestamp_ms();
-        log_debug(CCLIENT_EXTENDED_LOGGER_ID,
+        log_debug(logger_id,
                   "checking depth, attachment_timestamp %ld, time: %ld\n",
                   tx.attachment.attachment_timestamp, time_now);
         if ((tx.attachment.attachment_timestamp < time_now) &&
@@ -358,8 +359,7 @@ retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
         }
       } else {
         ret_code = RC_CCLIENT_TX_DESERIALIZE_FAILED;
-        log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s: %s.\n", __func__,
-                  error_2_string(ret_code));
+        log_error(logger_id, "%s: %s.\n", __func__, error_2_string(ret_code));
         goto done;
       }
     }
@@ -472,8 +472,7 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
       transaction_array_push_back(out_transactions, &tx);
     } else {
       ret_code = RC_CCLIENT_TX_DESERIALIZE_FAILED;
-      log_error(CCLIENT_EXTENDED_LOGGER_ID, "%s: %s.\n", __func__,
-                error_2_string(ret_code));
+      log_error(logger_id, "%s: %s.\n", __func__, error_2_string(ret_code));
       goto done;
     }
   }

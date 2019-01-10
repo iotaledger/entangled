@@ -9,20 +9,22 @@
 
 #define TYPES_LOGGER_ID "types"
 
+static logger_id_t logger_id;
+
 void logger_init_types() {
 // overwrite oom in utarray
 #undef oom
-#define oom() log_info(TYPES_LOGGER_ID, "[%s:%d] OOM.\n", __func__, __LINE__)
+#define oom() log_info(logger_id, "[%s:%d] OOM.\n", __func__, __LINE__)
 
-  logger_helper_enable(TYPES_LOGGER_ID, LOGGER_DEBUG, true);
-  log_info(TYPES_LOGGER_ID, "[%s:%d] enable logger %s.\n", __func__, __LINE__,
+  logger_id = logger_helper_enable(TYPES_LOGGER_ID, LOGGER_DEBUG, true);
+  log_info(logger_id, "[%s:%d] enable logger %s.\n", __func__, __LINE__,
            TYPES_LOGGER_ID);
 }
 
 void logger_destroy_types() {
-  log_info(TYPES_LOGGER_ID, "[%s:%d] destroy logger %s.\n", __func__, __LINE__,
+  log_info(logger_id, "[%s:%d] destroy logger %s.\n", __func__, __LINE__,
            TYPES_LOGGER_ID);
-  logger_helper_release(TYPES_LOGGER_ID);
+  logger_helper_release(logger_id);
 }
 
 char_buffer_t* char_buffer_new() {
@@ -31,7 +33,7 @@ char_buffer_t* char_buffer_new() {
     out->length = 0;
     out->data = NULL;
   } else {
-    log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s \n", __func__, __LINE__,
               STR_CCLIENT_NULL_PTR);
   }
   return out;
@@ -43,8 +45,7 @@ retcode_t char_buffer_allocate(char_buffer_t* in, const size_t n) {
   }
   in->data = (char*)malloc(sizeof(char) * (n + 1));
   if (in->data == NULL) {
-    log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
-              STR_CCLIENT_OOM);
+    log_error(logger_id, "[%s:%d] %s \n", __func__, __LINE__, STR_CCLIENT_OOM);
     return RC_CCLIENT_OOM;
   }
   in->length = n;
@@ -57,8 +58,7 @@ retcode_t char_buffer_set(char_buffer_t* in, char const* const str) {
 
   in->data = (char*)realloc(in->data, sizeof(char) * (size + 1));
   if (in->data == NULL) {
-    log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
-              STR_CCLIENT_OOM);
+    log_error(logger_id, "[%s:%d] %s \n", __func__, __LINE__, STR_CCLIENT_OOM);
     return RC_CCLIENT_OOM;
   }
   in->length = size;
@@ -126,7 +126,7 @@ flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
       free(elt);
     }
   } else {
-    log_warning(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
+    log_warning(logger_id, "[%s:%d] %s \n", __func__, __LINE__,
                 STR_CCLIENT_NULL_PTR);
   }
   return head;
@@ -164,13 +164,13 @@ retcode_t flex_hash_to_char_buffer(trit_array_p hash, char_buffer_t* out) {
   retcode_t ret = RC_OK;
   size_t trits_len = 0;
   if (hash == NULL || hash->trits == NULL) {
-    log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s \n", __func__, __LINE__,
               STR_CCLIENT_NULL_PTR);
     return RC_CCLIENT_NULL_PTR;
   }
   ret = char_buffer_allocate(out, hash->num_trits / 3);
   if (ret != RC_OK) {
-    log_error(TYPES_LOGGER_ID, "[%s:%d] %s \n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s \n", __func__, __LINE__,
               error_2_string(ret));
     return ret;
   }

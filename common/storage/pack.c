@@ -9,9 +9,6 @@
 
 #include "common/storage/pack.h"
 #include "common/trinary/trit_array.h"
-#include "utils/logger_helper.h"
-
-#define STORAGE_PACKS_LOGGER_ID "storage_packs"
 
 retcode_t hash_pack_resize(iota_stor_pack_t *pack, size_t resize_factor) {
   if (resize_factor < 1) {
@@ -26,7 +23,6 @@ retcode_t hash_pack_resize(iota_stor_pack_t *pack, size_t resize_factor) {
   pack->capacity *= resize_factor;
   pack->models = realloc(pack->models, sizeof(flex_trit_t *) * pack->capacity);
   if (pack->models == NULL) {
-    log_error(STORAGE_PACKS_LOGGER_ID, "Failed in realloc\n");
     return RC_STORAGE_OOM;
   }
 
@@ -46,7 +42,6 @@ retcode_t hash_pack_init(iota_stor_pack_t *pack, size_t size) {
   pack->insufficient_capacity = false;
   pack->models = malloc(sizeof(flex_trit_t *) * pack->capacity);
   if (pack->models == NULL) {
-    log_error(STORAGE_PACKS_LOGGER_ID, "Failed in malloc\n");
     return RC_STORAGE_OOM;
   }
 

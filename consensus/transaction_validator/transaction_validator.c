@@ -13,6 +13,7 @@
 
 #define TRANSACTION_VALIDATOR_LOGGER_ID "transaction_validator"
 
+static logger_id_t logger_id;
 static uint64_t MAX_TIMESTAMP_FUTURE_MS = 2 * 60 * 60 * 1000;
 
 /*
@@ -60,7 +61,8 @@ static bool has_invalid_timestamp(transaction_validator_t const* const tv,
 
 retcode_t iota_consensus_transaction_validator_init(
     transaction_validator_t* const tv, iota_consensus_conf_t* const conf) {
-  logger_helper_enable(TRANSACTION_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id =
+      logger_helper_enable(TRANSACTION_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   tv->conf = conf;
 
   return RC_OK;
@@ -69,7 +71,7 @@ retcode_t iota_consensus_transaction_validator_init(
 retcode_t iota_consensus_transaction_validator_destroy(
     transaction_validator_t* const tv) {
   tv->conf = NULL;
-  logger_helper_release(TRANSACTION_VALIDATOR_LOGGER_ID);
+  logger_helper_release(logger_id);
 
   return RC_OK;
 }
@@ -78,27 +80,25 @@ bool iota_consensus_transaction_validate(
     transaction_validator_t const* const tv,
     iota_transaction_t const* const transaction) {
   if (transaction_weight_magnitude(transaction) < tv->conf->mwm) {
-    log_debug(TRANSACTION_VALIDATOR_LOGGER_ID,
+    log_debug(logger_id,
               "Validation failed: insufficient transaction weight\n");
     return false;
   }
 
   if (has_invalid_timestamp(tv, transaction)) {
-    log_debug(TRANSACTION_VALIDATOR_LOGGER_ID,
-              "Validation failed: invalid timestamp\n");
+    log_debug(logger_id, "Validation failed: invalid timestamp\n");
     return false;
   }
 
   if (llabs(transaction_value(transaction)) > IOTA_SUPPLY) {
-    log_debug(TRANSACTION_VALIDATOR_LOGGER_ID,
-              "Validation failed: invalid value\n");
+    log_debug(logger_id, "Validation failed: invalid value\n");
     return false;
   }
 
   if (transaction_value(transaction) != 0 &&
       flex_trits_at(transaction_address(transaction), NUM_TRITS_ADDRESS,
                     NUM_TRITS_ADDRESS - 1) != 0) {
-    log_debug(TRANSACTION_VALIDATOR_LOGGER_ID,
+    log_debug(logger_id,
               "Validation failed: invalid address for value transaction\n");
     return false;
   }

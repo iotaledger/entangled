@@ -16,9 +16,12 @@
 
 #define ENTRY_POINT_SELECTOR_LOGGER_ID "entry_point_selector"
 
+static logger_id_t logger_id;
+
 retcode_t iota_consensus_entry_point_selector_init(
     entry_point_selector_t *const eps, milestone_tracker_t *const mt) {
-  logger_helper_enable(ENTRY_POINT_SELECTOR_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id =
+      logger_helper_enable(ENTRY_POINT_SELECTOR_LOGGER_ID, LOGGER_DEBUG, true);
   eps->mt = mt;
   return RC_OK;
 }
@@ -32,7 +35,7 @@ retcode_t iota_consensus_entry_point_selector_get_entry_point(
   DECLARE_PACK_SINGLE_MILESTONE(milestone, milestone_ptr, pack);
 
   if ((ret = iota_tangle_milestone_load_next(tangle, milestone_index, &pack))) {
-    log_error(ENTRY_POINT_SELECTOR_LOGGER_ID,
+    log_error(logger_id,
               "Finding closest next milestone failed with error %" PRIu64 "\n",
               ret);
     return ret;
@@ -49,7 +52,7 @@ retcode_t iota_consensus_entry_point_selector_get_entry_point(
 
 retcode_t iota_consensus_entry_point_selector_destroy(
     entry_point_selector_t *const eps) {
-  logger_helper_release(ENTRY_POINT_SELECTOR_LOGGER_ID);
+  logger_helper_release(logger_id);
   eps->mt = NULL;
   return RC_OK;
 }

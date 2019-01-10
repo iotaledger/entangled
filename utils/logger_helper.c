@@ -27,52 +27,50 @@ retcode_t logger_helper_init() {
 }
 
 retcode_t logger_helper_destroy() {
+  logger_output_deregister(stdout);
   lock_handle_destroy(&lock);
 
   return RC_OK;
 }
 
-void logger_helper_enable(char const* const logger_id,
-                          logger_level_t const level, bool const enable_color) {
-  logger_id_t id;
+logger_id_t logger_helper_enable(char const* const logger_name,
+                                 logger_level_t const level,
+                                 bool const enable_color) {
+  logger_id_t logger_id;
 
   lock_handle_lock(&lock);
-  id = logger_id_request(logger_id);
-  logger_id_enable(id);
-  logger_id_level_set(id, level);
-  logger_id_prefix_set(id,
+  logger_id = logger_id_request(logger_name);
+  logger_id_enable(logger_id);
+  logger_id_level_set(logger_id, level);
+  logger_id_prefix_set(logger_id,
                        (LOGGER_PFX_DATE | LOGGER_PFX_NAME | LOGGER_PFX_LEVEL));
   if (enable_color) {
-    logger_id_color_console_set(id, LOGGER_FG_GREEN, LOGGER_BG_BLACK,
+    logger_id_color_console_set(logger_id, LOGGER_FG_GREEN, LOGGER_BG_BLACK,
                                 LOGGER_ATTR_BRIGHT | LOGGER_ATTR_UNDERLINE);
   }
   lock_handle_unlock(&lock);
+
+  return logger_id;
 }
 
-void logger_helper_release(char const* const logger_id) {
-  logger_id_t id;
-
+void logger_helper_release(logger_id_t const logger_id) {
   lock_handle_lock(&lock);
-  id = logger_id_request(logger_id);
-  logger_id_release(id);
+  logger_id_release(logger_id);
   lock_handle_unlock(&lock);
 }
 
-void logger_helper_print(char const* const logger_id,
+void logger_helper_print(logger_id_t const logger_id,
                          logger_level_t const level, char const* const format,
                          ...) {
   va_list argp;
-  logger_id_t id;
 
   if (level < logger_output_level_get(stdout)) {
     return;
   }
 
-  id = logger_id_request(logger_id);
-
   va_start(argp, format);
   lock_handle_lock(&lock);
-  logger_va(id, level, format, argp);
+  logger_va(logger_id, level, format, argp);
   lock_handle_unlock(&lock);
   va_end(argp);
 }

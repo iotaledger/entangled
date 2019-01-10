@@ -11,6 +11,8 @@
 
 #define WALKER_VALIDATOR_LOGGER_ID "walker_validator"
 
+static logger_id_t logger_id;
+
 /*
  * Private functions
  */
@@ -36,8 +38,7 @@ static retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
 
   while (non_analyzed_hashes != NULL) {
     if (hash243_set_size(&visited_hashes) == epv->conf->below_max_depth) {
-      log_error(WALKER_VALIDATOR_LOGGER_ID,
-                "Validation failed, exceeded num of transactions\n");
+      log_error(logger_id, "Validation failed, exceeded num of transactions\n");
       *below_max_depth = true;
       break;
     }
@@ -67,7 +68,7 @@ static retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
     }
 
     if (curr_snapshot_index < lowest_allowed_depth) {
-      log_error(WALKER_VALIDATOR_LOGGER_ID,
+      log_error(logger_id,
                 "Validation failed, transaction is below max depth\n");
       *below_max_depth = true;
       break;
@@ -102,7 +103,8 @@ static retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
 retcode_t iota_consensus_exit_prob_transaction_validator_init(
     iota_consensus_conf_t *const conf, milestone_tracker_t *const mt,
     ledger_validator_t *const lv, exit_prob_transaction_validator_t *epv) {
-  logger_helper_enable(WALKER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id =
+      logger_helper_enable(WALKER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   epv->conf = conf;
   epv->mt = mt;
   epv->lv = lv;
@@ -114,7 +116,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_init(
 
 retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
     exit_prob_transaction_validator_t *epv) {
-  logger_helper_release(WALKER_VALIDATOR_LOGGER_ID);
+  logger_helper_release(logger_id);
 
   hash243_set_free(&epv->max_depth_ok_memoization);
   hash243_set_free(&epv->analyzed_hashes);
@@ -141,14 +143,12 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
 
   if (tx_pack.num_loaded == 0) {
     *is_valid = false;
-    log_error(WALKER_VALIDATOR_LOGGER_ID,
-              "Validation failed, transaction is missing in db\n");
+    log_error(logger_id, "Validation failed, transaction is missing in db\n");
     return RC_OK;
   }
 
   if (transaction_current_index(&tx) != 0) {
-    log_error(WALKER_VALIDATOR_LOGGER_ID,
-              "Validation failed, transaction is not a tail\n");
+    log_error(logger_id, "Validation failed, transaction is not a tail\n");
     *is_valid = false;
     return RC_OK;
   }
@@ -161,8 +161,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
   }
 
   if (!*is_valid) {
-    log_error(WALKER_VALIDATOR_LOGGER_ID,
-              "Validation failed, tail is inconsistent\n");
+    log_error(logger_id, "Validation failed, tail is inconsistent\n");
     return RC_OK;
   }
 
@@ -182,8 +181,7 @@ retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
 
   if (below_max_depth) {
     *is_valid = false;
-    log_error(WALKER_VALIDATOR_LOGGER_ID,
-              "Validation failed, tail is below max depth\n");
+    log_error(logger_id, "Validation failed, tail is below max depth\n");
     return RC_OK;
   }
 

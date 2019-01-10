@@ -14,7 +14,9 @@
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
 
-#define EXIT_PROB_MAP_LOGGER_ID "consensus_exit_prob_map"
+#define EXIT_PROB_MAP_LOGGER_ID "exit_prob_map"
+
+static logger_id_t logger_id;
 
 /*
  * Private functions
@@ -45,8 +47,8 @@ static retcode_t iota_consensus_exit_prob_remove_invalid_tip_candidates(
     if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(
              ep_validator, tangle, tip_entry->hash, &has_valid_tail)) !=
         RC_OK) {
-      log_error(EXIT_PROB_MAP_LOGGER_ID,
-                "Tail transaction validation failed: %" PRIu64 "\n", ret);
+      log_error(logger_id, "Tail transaction validation failed: %" PRIu64 "\n",
+                ret);
       goto done;
     }
     if (!has_valid_tail) {
@@ -73,6 +75,7 @@ void iota_consensus_exit_prob_map_init(ep_randomizer_t *const randomizer) {
       (ep_prob_map_randomizer_t *const)randomizer;
   prob_randomizer->exit_probs = NULL;
   prob_randomizer->transition_probs = NULL;
+  logger_id = logger_helper_enable(EXIT_PROB_MAP_LOGGER_ID, LOGGER_DEBUG, true);
 }
 
 retcode_t iota_consensus_exit_prob_map_randomize(
@@ -134,11 +137,10 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(
 
   if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(
            ep_validator, tangle, ep, &ep_is_valid)) != RC_OK) {
-    log_error(EXIT_PROB_MAP_LOGGER_ID,
-              "Entry point validation failed: %" PRIu64 "\n", ret);
+    log_error(logger_id, "Entry point validation failed: %" PRIu64 "\n", ret);
     return ret;
   } else if (!ep_is_valid) {
-    log_error(EXIT_PROB_MAP_LOGGER_ID, "Invalid entry point\n");
+    log_error(logger_id, "Invalid entry point\n");
     return RC_CONSENSUS_EXIT_PROBABILITIES_INVALID_ENTRYPOINT;
   }
 
@@ -218,6 +220,7 @@ double iota_consensus_exit_prob_map_sum_probs(
 
 retcode_t iota_consensus_exit_prob_map_destroy(
     ep_randomizer_t *const exit_probability_randomizer) {
+  logger_helper_release(logger_id);
   return iota_consensus_exit_prob_map_reset(exit_probability_randomizer);
 }
 

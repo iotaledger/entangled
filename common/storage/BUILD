@@ -22,6 +22,5 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/trinary:trit_array",
-        "//utils:logger_helper",
     ],
 )
