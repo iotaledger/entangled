@@ -6,6 +6,7 @@
  */
 
 #include "ciri/perceptive_node/perceptive_node.h"
+#include <math.h>
 #include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
 #include "consensus/utils/tangle_simulator.h"
 #include "utils/handles/rand.h"
@@ -146,9 +147,10 @@ static retcode_t calculate_lf_prob_value(iota_perceptive_node_t *const pn,
         goto cleanup;
       }
 
-      *lf_prob *= calculate_current_tip_attachment_prob(
-          &ep_prob_map_randomizer.transition_probs, &cw_ratings,
-          curr_tip_entry);
+      *lf_prob *= pow(calculate_current_tip_attachment_prob(
+                          &ep_prob_map_randomizer.transition_probs, &cw_ratings,
+                          curr_tip_entry),
+                      1 / (double)pn->conf.test_sample_size);
     }
 
     if ((ret = tangle_simulator_add_transaction_recalc_ratings(
@@ -236,9 +238,10 @@ static retcode_t calculate_samples_from_lf_distribution(
           return ret;
         }
 
-        curr_lf_prob *= calculate_current_tip_attachment_prob(
-            &ep_prob_map_randomizer.transition_probs, &cw_ratings,
-            curr_tip_entry);
+        curr_lf_prob *= pow(calculate_current_tip_attachment_prob(
+                                &ep_prob_map_randomizer.transition_probs,
+                                &cw_ratings, curr_tip_entry),
+                            1 / (double)pn->conf.test_sample_size);
       }
       // Update tangle with newly attached transaction
       if ((ret = tangle_simulator_add_transaction_recalc_ratings(
