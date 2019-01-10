@@ -30,3 +30,8 @@ typed_container_generate(
 cc_library(
     name = "dummy_dep",
 )
+
+map_generate(
+    key_type = "neighbor_t",
+    value_type = "uint32_t",
+)

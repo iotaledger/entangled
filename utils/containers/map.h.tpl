@@ -61,6 +61,17 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_cmp({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *
 bool {KEY_TYPE}_to_{VALUE_TYPE}_map_remove({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
 {KEY_TYPE} const *const key);
 
+{VALUE_TYPE} {KEY_TYPE}_to_{VALUE_TYPE}_map_at(
+{KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map,
+{KEY_TYPE} const *const key);
+
+bool {KEY_TYPE}_to_{VALUE_TYPE}_map_set({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map,
+                                        {KEY_TYPE} const *const key,
+                                        {VALUE_TYPE} const * const value);
+
+void {KEY_TYPE}_to_{VALUE_TYPE}_map_set_all({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
+                                            {VALUE_TYPE} const * const value);
+
 #ifdef __cplusplus
 }
 #endif

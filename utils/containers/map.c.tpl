@@ -60,7 +60,7 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_find({KEY_TYPE}_to_{VALUE_TYPE}_map_t const 
     return false;
   }
   if (res == NULL) {
-    return RC_NULL_PARAM;
+    return false;
   }
 
   HASH_FIND(hh, map->map, key, map->key_size, *res);
@@ -117,4 +117,39 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_remove({KEY_TYPE}_to_{VALUE_TYPE}_map_t *con
   }
 
   return entry != NULL;
+
+{VALUE_TYPE} {KEY_TYPE}_to_{VALUE_TYPE}_map_at(
+{KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map,
+{KEY_TYPE} const *const key){
+{KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *entry = NULL;
+
+    assert(map && map->map);
+    HASH_FIND(hh, map->map, key, sizeof({KEY_TYPE}), entry);
+    assert(entry);
+    return entry->value;
+}
+
+bool {KEY_TYPE}_to_{VALUE_TYPE}_map_set(
+{KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map,
+{KEY_TYPE} const *const key,
+{VALUE_TYPE} const * const value) {
+ {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t* res;
+ if (map == NULL || map->map == NULL) {
+     return false;
+ }
+
+HASH_FIND(hh, map->map, key, sizeof({KEY_TYPE}), res);
+    memcpy(res->value,value,sizeof({VALUE_TYPE}));
+    return res != NULL;
+}
+
+void {KEY_TYPE}_to_{VALUE_TYPE}_map_set_all(
+                                            {KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
+                                            {VALUE_TYPE} const * const value) {
+    {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *curr_entry = NULL;
+    {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *tmp_entry = NULL;
+
+    HASH_ITER(hh, map->map, curr_entry, tmp_entry) {
+        memcpy(&curr_entry->value,value,sizeof({VALUE_TYPE}));
+    }
 }

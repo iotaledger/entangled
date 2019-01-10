@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 #include "ciri/perceptive_node/conf.h"
+#include "ciri/perceptive_node/neighbor_t_to_uint32_t_map.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 #include "consensus/consensus.h"
@@ -17,6 +18,7 @@
 #include "utils/containers/arrays/double_array.h"
 #include "utils/containers/hash/hash_array.h"
 #include "utils/containers/hash/hash_hash_pair_t_map.h"
+
 #include "utils/handles/thread.h"
 #include "utils/logger_helper.h"
 
@@ -65,6 +67,7 @@ typedef struct iota_perceptive_node_s {
   iota_consensus_t *consensus;
   cw_rating_calculator_t cw_calc;
   neighbor_t *neighbors;
+  neighbor_t_to_uint32_t_map_t neighbors_to_recent_transactions_count;
   perceptive_node_monitoring_data_t monitoring_data;
 } iota_perceptive_node_t;
 
