@@ -6,6 +6,7 @@
  */
 
 #include "ciri/perceptive_node/perceptive_node.h"
+#include <float.h>
 #include <math.h>
 #include "consensus/cw_rating_calculator/cw_rating_dfs_impl.h"
 #include "consensus/utils/tangle_simulator.h"
@@ -307,7 +308,10 @@ static void *perceptive_node_do_test(iota_perceptive_node_t *const pn) {
   }
 
   test_r_score = calculate_r_score_from_lf_prob(pn, lf_score);
-  // Log test duration
+  log_info(PERCEPTIVE_NODE_LOGGER_ID,
+           "In %s, Finished test for node %s with r value: %.f\n", __FUNCTION__,
+           pn->monitoring_data.monitored_neighbor.endpoint.host, DECIMAL_DIG,
+           lf_score);
 
 cleanup:
   double_array_free(pn->monitoring_data.test_lf_distribution_samples);
