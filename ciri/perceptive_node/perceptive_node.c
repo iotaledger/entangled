@@ -46,7 +46,7 @@ static void randomize_next_monitored_neighbor(
   neighbor_t_to_uint32_t_map_entry_t *tmp_entry = NULL;
 
   uint32_t total_transactions_count = 0;
-  HASH_ITER(hh, pn->neighbors_to_recent_transactions_count, curr_entry,
+  HASH_ITER(hh, pn->neighbors_to_recent_transactions_count.map, curr_entry,
             tmp_entry) {
     total_transactions_count += curr_entry->value;
   }
@@ -54,7 +54,7 @@ static void randomize_next_monitored_neighbor(
   double randomized_target =
       rand_handle_probability() * total_transactions_count;
   curr_entry = NULL;
-  HASH_ITER(hh, pn->neighbors_to_recent_transactions_count, curr_entry,
+  HASH_ITER(hh, pn->neighbors_to_recent_transactions_count.map, curr_entry,
             tmp_entry) {
     randomized_target -= curr_entry->value;
     if (randomized_target <= 0) {
