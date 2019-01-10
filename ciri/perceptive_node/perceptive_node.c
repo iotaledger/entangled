@@ -69,7 +69,7 @@ static void randomize_next_monitored_neighbor(
 static void randomize_next_monitoring_timestamp(
     iota_perceptive_node_t *const pn, int64_t now) {
   pn->monitoring_data.monitoring_next_timestamp =
-      rand_handle_probability() * pn->conf.monitoring_interval_seconds +
+      now + rand_handle_probability() * pn->conf.monitoring_interval_seconds +
       pn->conf.monitoring_interval_seconds;
 }
 
