@@ -46,10 +46,11 @@ typedef enum cli_arg_value_e {
 
   // Perceptive node configurartion
   CONF_PERCEPTIVE_NODE_ENABLE,
-  CONF_PERCEPTIVE_NODE_INTERVAL,
+  CONF_PERCEPTIVE_NODE_MIN_INTERVAL_SECONDS,
   CONF_PERCEPTIVE_NODE_SEQUENCE_SIZE,
   CONF_PERCEPTIVE_NODE_TEST_SAMPLE_SIZE,
   CONF_PERCEPTIVE_NODE_RANDOM_WALK_DEPTH,
+  CONF_PERCEPTIVE_NODE_MIN_HASH_POWER_RATIO,
 
 } cli_arg_value_t;
 
@@ -85,9 +86,11 @@ static struct cli_argument_s {
     {"neighbors", 'n', "URIs of neighbouring nodes, separated by a space.",
      REQUIRED_ARG},
     {"p-propagate-request", CONF_P_PROPAGATE_REQUEST,
-     "Probability of propagating the request of a transaction to a neighbor "
+     "Probability of propagating the request of a transaction to a "
+     "neighbor "
      "node if it can't be found. This should be low since we don't want to "
-     "propagate non-existing transactions that spam the network. Value must be "
+     "propagate non-existing transactions that spam the network. Value "
+     "must be "
      "in [0,1].",
      REQUIRED_ARG},
     {"p-remove-request", CONF_P_REMOVE_REQUEST,
@@ -103,7 +106,8 @@ static struct cli_argument_s {
      "Value must be in [0,1].",
      REQUIRED_ARG},
     {"p-send-milestone", CONF_P_SEND_MILESTONE,
-     "Probability of sending a milestone transaction when the node looks for a "
+     "Probability of sending a milestone transaction when the node looks "
+     "for a "
      "random transaction to send to a neighbor. Value must be in [0,1].",
      REQUIRED_ARG},
     {"requester-queue-size", CONF_REQUESTER_QUEUE_SIZE,
@@ -119,11 +123,13 @@ static struct cli_argument_s {
 
     {"max-find-transactions", CONF_MAX_FIND_TRANSACTIONS,
      "The maximal number of transactions that may be returned by the "
-     "'findTransactions' API call. If the number of transactions found exceeds "
+     "'findTransactions' API call. If the number of transactions found "
+     "exceeds "
      "this number an error will be returned",
      REQUIRED_ARG},
     {"max-get-trytes", CONF_MAX_GET_TRYTES,
-     "Maximum number of transactions that will be returned by the 'getTrytes' "
+     "Maximum number of transactions that will be returned by the "
+     "'getTrytes' "
      "API call.",
      REQUIRED_ARG},
     {"port", 'p', "HTTP API listen port.", REQUIRED_ARG},
@@ -131,16 +137,24 @@ static struct cli_argument_s {
     // Perceptive node configuration
     {"perceptive_node_enable", CONF_PERCEPTIVE_NODE_ENABLE,
      "Should perceptive node monitoring be enabled", REQUIRED_ARG},
-    {"perceptive_node_interval", CONF_PERCEPTIVE_NODE_INTERVAL,
+    {"perceptive_node_min_interval", CONF_PERCEPTIVE_NODE_MIN_INTERVAL_SECONDS,
      "Perceptive node monitoring interval in seconds", REQUIRED_ARG},
     {"perceptive_node_test_sample_size", CONF_PERCEPTIVE_NODE_TEST_SAMPLE_SIZE,
-     "Sample size of generated distribution for testing transactions quality",
+     "Sample size of generated distribution for testing transactions "
+     "quality",
      REQUIRED_ARG},
     {"perceptive_node_sequence_size", CONF_PERCEPTIVE_NODE_SEQUENCE_SIZE,
      "The tested transactions sequence size", REQUIRED_ARG},
     {"perceptive_node_random_walk_depth",
      CONF_PERCEPTIVE_NODE_RANDOM_WALK_DEPTH,
      "The depth from which to start random walk", REQUIRED_ARG},
+
+    {"perceptive_node_min_hash_power_ratio",
+     CONF_PERCEPTIVE_NODE_MIN_HASH_POWER_RATIO,
+     "The minimal hash power ratio of a node (calculated against all "
+     "neighbors in the period between monitoring sessions) to qualify for "
+     "monitoring",
+     REQUIRED_ARG},
 
     // Consensus configuration
 
