@@ -196,7 +196,7 @@ static retcode_t set_conf_value(
       perceptive_node_conf->is_enabled = (strcmp("true", value) == 0);
       break;
 
-    case CONF_PERCEPTIVE_NODE_INTERVAL:
+    case CONF_PERCEPTIVE_NODE_MIN_INTERVAL_SECONDS:
       perceptive_node_conf->monitoring_interval_seconds = atoi(value);
       break;
     case CONF_PERCEPTIVE_NODE_TEST_SAMPLE_SIZE:
@@ -209,6 +209,9 @@ static retcode_t set_conf_value(
 
     case CONF_PERCEPTIVE_NODE_RANDOM_WALK_DEPTH:
       perceptive_node_conf->random_walk_depth = atoi(value);
+
+    case CONF_PERCEPTIVE_NODE_MIN_HASH_POWER_RATIO:
+      perceptive_node_conf->min_hash_power_ratio = atof(value);
 
     default:
       iota_usage();

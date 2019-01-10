@@ -344,9 +344,10 @@ retcode_t iota_perceptive_node_init(struct iota_perceptive_node_s *const pn,
   }
 
   hash243_array_new(&pn->monitoring_data.monitored_transactions_seq);
-  // TODO - conf
   hash_array_reserve(&pn->monitoring_data.monitored_transactions_seq,
-                     pn->conf.monitored_transactions_sequence_size * 4);
+                     pn->conf.monitored_transactions_sequence_size /
+                             pn->conf.min_hash_power_ratio +
+                         1);
   double_array_reserve(pn->monitoring_data.test_lf_distribution_samples,
                        pn->conf.test_sample_size);
 
@@ -470,21 +471,24 @@ retcode_t iota_perceptive_node_on_next_transaction(
   }
 
   if (pn->monitoring_data.txs_from_monitored_neighbor_size ==
-          pn->conf.test_sample_size &&
-      pn->test_thread_running == false) {
-    if (thread_handle_create(
-            &pn->thread, (thread_routine_t)perceptive_node_do_test, pn) != 0) {
-      return RC_FAILED_THREAD_SPAWN;
+      pn->conf.test_sample_size) {
+    if (pn->test_thread_running == false) {
+      if (thread_handle_create(&pn->thread,
+                               (thread_routine_t)perceptive_node_do_test,
+                               pn) != 0) {
+        return RC_FAILED_THREAD_SPAWN;
+      }
+    } else if (hash_array_len(
+                   pn->monitoring_data.txs_sequence_from_all_neighbors) *
+                   pn->conf.min_hash_power_ratio >=
+               pn->conf.test_sample_size) {
+      clear_monitoring_data(pn);
+    } else if (pn->test_thread_running) {
+      log_warning(PERCEPTIVE_NODE_LOGGER_ID,
+                  "Can't start another test when one is already running, maybe "
+                  "increase "
+                  "\"monitoring_interval_seconds\"? \n");
     }
-  } else if (hash_array_len(
-                 pn->monitoring_data.txs_sequence_from_all_neighbors) ==
-             pn->conf.test_sample_size * 4) {
-    clear_monitoring_data(pn);
-  } else if (pn->test_thread_running) {
-    log_warning(
-        PERCEPTIVE_NODE_LOGGER_ID,
-        "Can't start another test when one is already running, maybe increase "
-        "\"monitoring_interval_seconds\"? \n");
   }
 
   return RC_OK;
