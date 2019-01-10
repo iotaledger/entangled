@@ -84,7 +84,6 @@ void {KEY_TYPE}_to_{VALUE_TYPE}_map_set_all({KEY_TYPE}_to_{VALUE_TYPE}_map_t *co
 {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *tmp_entry = NULL;
 
 HASH_ITER(hh, *map, curr_entry, tmp_entry) {
-HASH_DEL(*map, curr_entry);
 memcpy(&curr_entry->value,value,sizeof({VALUE_TYPE}));
 }
 }
