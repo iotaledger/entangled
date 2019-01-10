@@ -12,6 +12,7 @@
 
 #include "common/errors.h"
 #include "utils/containers/lock_free/lf_mpmc_queue_flex_trit_t.h"
+#include "utils/handles/cond.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
@@ -22,6 +23,7 @@ typedef struct broadcaster_s {
   bool running;
   node_t *node;
   lf_mpmc_queue_flex_trit_t_t queue;
+  cond_handle_t cond;
 } broadcaster_t;
 
 #ifdef __cplusplus

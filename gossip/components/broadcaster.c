@@ -10,9 +10,11 @@
 #include "consensus/tangle/tangle.h"
 #include "gossip/components/broadcaster.h"
 #include "gossip/node.h"
+#include "utils/handles/lock.h"
 #include "utils/logger_helper.h"
 
 #define BROADCASTER_LOGGER_ID "broadcaster"
+#define BROADCASTER_TIMEOUT_S 1
 
 /*
  * Private functions
@@ -35,10 +37,14 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
     return NULL;
   }
 
+  lock_handle_t lock_cond;
+  lock_handle_init(&lock_cond);
+  lock_handle_lock(&lock_cond);
+
   while (broadcaster->running) {
-    while (broadcaster->running &&
-           LF_MPMC_QUEUE_IS_EMPTY(&broadcaster->queue)) {
-      ck_pr_stall();
+    if (LF_MPMC_QUEUE_IS_EMPTY(&broadcaster->queue)) {
+      cond_handle_timedwait(&broadcaster->cond, &lock_cond,
+                            BROADCASTER_TIMEOUT_S);
     }
 
     if (lf_mpmc_queue_flex_trit_t_trydequeue(&broadcaster->queue,
@@ -62,6 +68,9 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
     }
     rw_lock_handle_unlock(&broadcaster->node->neighbors_lock);
   }
+
+  lock_handle_unlock(&lock_cond);
+  lock_handle_destroy(&lock_cond);
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(BROADCASTER_LOGGER_ID,
@@ -88,6 +97,8 @@ retcode_t broadcaster_init(broadcaster_t *const broadcaster,
   broadcaster->running = false;
   broadcaster->node = node;
 
+  cond_handle_init(&broadcaster->cond);
+
   if ((ret = lf_mpmc_queue_flex_trit_t_init(&broadcaster->queue,
                                             FLEX_TRIT_SIZE_8019)) != RC_OK) {
     log_critical(BROADCASTER_LOGGER_ID, "Initializing queue failed\n");
@@ -107,6 +118,8 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
   }
 
   broadcaster->node = NULL;
+
+  cond_handle_destroy(&broadcaster->cond);
 
   if ((ret = lf_mpmc_queue_flex_trit_t_destroy(&broadcaster->queue)) != RC_OK) {
     log_error(BROADCASTER_LOGGER_ID, "Destroying queue failed\n");
@@ -146,6 +159,8 @@ retcode_t broadcaster_on_next(broadcaster_t *const broadcaster,
     log_warning(BROADCASTER_LOGGER_ID, "Enqueuing transaction failed\n");
     return ret;
   }
+
+  cond_handle_signal(&broadcaster->cond);
 
   return ret;
 }

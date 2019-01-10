@@ -9,10 +9,12 @@
 #include "consensus/tangle/tangle.h"
 #include "gossip/neighbor.h"
 #include "gossip/node.h"
+#include "utils/handles/lock.h"
 #include "utils/handles/rand.h"
 #include "utils/logger_helper.h"
 
 #define RESPONDER_LOGGER_ID "responder"
+#define RESPONDER_TIMEOUT_S 1
 
 /**
  * Private functions
@@ -150,9 +152,13 @@ static void *responder_routine(responder_t *const responder) {
     return NULL;
   }
 
+  lock_handle_t lock_cond;
+  lock_handle_init(&lock_cond);
+  lock_handle_lock(&lock_cond);
+
   while (responder->running) {
-    while (responder->running && LF_MPMC_QUEUE_IS_EMPTY(&responder->queue)) {
-      ck_pr_stall();
+    if (LF_MPMC_QUEUE_IS_EMPTY(&responder->queue)) {
+      cond_handle_timedwait(&responder->cond, &lock_cond, RESPONDER_TIMEOUT_S);
     }
 
     if (lf_mpmc_queue_transaction_request_t_trydequeue(
@@ -178,6 +184,9 @@ static void *responder_routine(responder_t *const responder) {
     }
   }
 
+  lock_handle_unlock(&lock_cond);
+  lock_handle_destroy(&lock_cond);
+
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(RESPONDER_LOGGER_ID, "Destroying tangle connection failed\n");
   }
@@ -200,6 +209,8 @@ retcode_t responder_init(responder_t *const responder, node_t *const node) {
 
   responder->running = false;
   responder->node = node;
+
+  cond_handle_init(&responder->cond);
 
   if ((ret = lf_mpmc_queue_transaction_request_t_init(
            &responder->queue, sizeof(transaction_request_t))) != RC_OK) {
@@ -257,6 +268,8 @@ retcode_t responder_destroy(responder_t *const responder) {
 
   responder->node = NULL;
 
+  cond_handle_destroy(&responder->cond);
+
   if ((ret = lf_mpmc_queue_transaction_request_t_destroy(&responder->queue)) !=
       RC_OK) {
     log_error(RESPONDER_LOGGER_ID, "Destroying queue failed\n");
@@ -284,6 +297,8 @@ retcode_t responder_on_next(responder_t *const responder,
     log_warning(RESPONDER_LOGGER_ID, "Enqueuing transaction request failed\n");
     return ret;
   }
+
+  cond_handle_signal(&responder->cond);
 
   return ret;
 }

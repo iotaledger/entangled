@@ -14,6 +14,7 @@
 #include "consensus/transaction_validator/transaction_validator.h"
 #include "gossip/iota_packet.h"
 #include "utils/containers/lock_free/lf_mpmc_queue_iota_packet_t.h"
+#include "utils/handles/cond.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
@@ -28,6 +29,7 @@ typedef struct processor_s {
   thread_handle_t thread;
   bool running;
   lf_mpmc_queue_iota_packet_t_t queue;
+  cond_handle_t cond;
   node_t *node;
   transaction_validator_t *transaction_validator;
   transaction_solidifier_t *transaction_solidifier;

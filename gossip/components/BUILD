@@ -5,6 +5,7 @@ cc_library(
     hdrs = ["broadcaster.h"],
     deps = [
         "//utils/containers/lock_free:lf_mpmc_queue_flex_trit_t",
+        "//utils/handles:cond",
         "//utils/handles:thread",
     ],
 )
@@ -17,6 +18,7 @@ cc_library(
         "//gossip:neighbor",
         "//gossip:node_shared",
         "//utils:logger_helper",
+        "//utils/handles:lock",
     ],
 )
 
@@ -27,6 +29,7 @@ cc_library(
         "//consensus/transaction_validator",
         "//gossip:iota_packet",
         "//utils/containers/lock_free:lf_mpmc_queue_iota_packet_t",
+        "//utils/handles:cond",
         "//utils/handles:thread",
     ],
 )
@@ -42,6 +45,7 @@ cc_library(
         "//consensus/transaction_solidifier",
         "//gossip:neighbor",
         "//gossip:node_shared",
+        "//utils/handles:lock",
     ],
 )
 
@@ -113,6 +117,7 @@ cc_library(
     deps = [
         "//gossip:transaction_request",
         "//utils/containers/lock_free:lf_mpmc_queue_transaction_request_t",
+        "//utils/handles:cond",
         "//utils/handles:thread",
     ],
 )
@@ -126,6 +131,7 @@ cc_library(
         "//consensus/tangle",
         "//gossip:neighbor_shared",
         "//gossip:node_shared",
+        "//utils/handles:lock",
         "//utils/handles:rand",
     ],
 )

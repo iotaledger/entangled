@@ -14,9 +14,11 @@
 #include "gossip/components/processor.h"
 #include "gossip/neighbor.h"
 #include "gossip/node.h"
+#include "utils/handles/lock.h"
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_LOGGER_ID "processor"
+#define PROCESSOR_TIMEOUT_S 1
 
 /*
  * Private functions
@@ -277,9 +279,13 @@ static void *processor_routine(processor_t *const processor) {
 
   flex_trit_t flex_hash[FLEX_TRIT_SIZE_243];
 
+  lock_handle_t lock_cond;
+  lock_handle_init(&lock_cond);
+  lock_handle_lock(&lock_cond);
+
   while (processor->running) {
-    while (processor->running && LF_MPMC_QUEUE_IS_EMPTY(&processor->queue)) {
-      ck_pr_stall();
+    if (LF_MPMC_QUEUE_IS_EMPTY(&processor->queue)) {
+      cond_handle_timedwait(&processor->cond, &lock_cond, PROCESSOR_TIMEOUT_S);
     }
 
     has_dequeued = true;
@@ -321,6 +327,9 @@ static void *processor_routine(processor_t *const processor) {
     }
   }
 
+  lock_handle_unlock(&lock_cond);
+  lock_handle_destroy(&lock_cond);
+
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(PROCESSOR_LOGGER_ID, "Destroying tangle connection failed\n");
   }
@@ -356,6 +365,8 @@ retcode_t processor_init(processor_t *const processor, node_t *const node,
   processor->transaction_validator = transaction_validator;
   processor->transaction_solidifier = transaction_solidifier;
   processor->milestone_tracker = milestone_tracker;
+
+  cond_handle_init(&processor->cond);
 
   if ((ret = lf_mpmc_queue_iota_packet_t_init(
            &processor->queue, sizeof(iota_packet_t))) != RC_OK) {
@@ -414,6 +425,8 @@ retcode_t processor_destroy(processor_t *const processor) {
   processor->transaction_solidifier = NULL;
   processor->milestone_tracker = NULL;
 
+  cond_handle_destroy(&processor->cond);
+
   if ((ret = lf_mpmc_queue_iota_packet_t_destroy(&processor->queue)) != RC_OK) {
     log_error(PROCESSOR_LOGGER_ID, "Destroying queue failed\n");
   }
@@ -436,6 +449,8 @@ retcode_t processor_on_next(processor_t *const processor,
     log_warning(PROCESSOR_LOGGER_ID, "Enqueuing packet failed\n");
     return ret;
   }
+
+  cond_handle_signal(&processor->cond);
 
   return ret;
 }

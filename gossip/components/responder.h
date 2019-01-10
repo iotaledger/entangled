@@ -14,6 +14,7 @@
 #include "common/trinary/flex_trit.h"
 #include "gossip/transaction_request.h"
 #include "utils/containers/lock_free/lf_mpmc_queue_transaction_request_t.h"
+#include "utils/handles/cond.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
@@ -27,8 +28,9 @@ typedef struct node_s node_t;
 typedef struct responder_s {
   thread_handle_t thread;
   bool running;
-  lf_mpmc_queue_transaction_request_t_t queue;
   node_t *node;
+  lf_mpmc_queue_transaction_request_t_t queue;
+  cond_handle_t cond;
 } responder_t;
 
 #ifdef __cplusplus

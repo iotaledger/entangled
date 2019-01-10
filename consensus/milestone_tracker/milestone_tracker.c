@@ -18,12 +18,14 @@
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
+#include "utils/handles/lock.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
 #include "utils/merkle.h"
 #include "utils/time.h"
 
 #define MILESTONE_TRACKER_LOGGER_ID "milestone_tracker"
+#define MILESTONE_VALIDATOR_TIMEOUT_S 1
 #define SOLID_MILESTONE_RESCAN_INTERVAL 5000uLL
 
 static retcode_t validate_coordinator(milestone_tracker_t* const mt,
@@ -172,9 +174,14 @@ static void* milestone_validator(void* arg) {
     return NULL;
   }
 
+  lock_handle_t lock_cond;
+  lock_handle_init(&lock_cond);
+  lock_handle_lock(&lock_cond);
+
   while (mt->running) {
-    while (mt->running && LF_MPMC_QUEUE_IS_EMPTY(&mt->candidates)) {
-      ck_pr_stall();
+    if (LF_MPMC_QUEUE_IS_EMPTY(&mt->candidates)) {
+      cond_handle_timedwait(&mt->cond, &lock_cond,
+                            MILESTONE_VALIDATOR_TIMEOUT_S);
     }
 
     if (lf_mpmc_queue_flex_trit_t_trydequeue(&mt->candidates, candidate.hash,
@@ -215,6 +222,9 @@ static void* milestone_validator(void* arg) {
       }
     }
   }
+
+  lock_handle_unlock(&lock_cond);
+  lock_handle_destroy(&lock_cond);
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(MILESTONE_TRACKER_LOGGER_ID,
@@ -350,6 +360,8 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
   mt->latest_milestone_index = conf->last_milestone;
   mt->latest_solid_subtangle_milestone_index = conf->last_milestone;
 
+  cond_handle_init(&mt->cond);
+
   if ((ret = lf_mpmc_queue_flex_trit_t_init(&mt->candidates,
                                             FLEX_TRIT_SIZE_243)) != RC_OK) {
     log_critical(MILESTONE_TRACKER_LOGGER_ID,
@@ -466,6 +478,8 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt) {
               "Destroying candidates queue failed\n");
   }
 
+  cond_handle_destroy(&mt->cond);
+
   memset(mt, 0, sizeof(milestone_tracker_t));
   logger_helper_release(MILESTONE_TRACKER_LOGGER_ID);
 
@@ -485,6 +499,8 @@ retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt,
     log_warning(MILESTONE_TRACKER_LOGGER_ID, "Enqueuing candidate failed\n");
     return ret;
   }
+
+  cond_handle_signal(&mt->cond);
 
   return ret;
 }

@@ -5,6 +5,7 @@ cc_library(
     deps = [
         "//common:errors",
         "//utils/containers/lock_free:lf_mpmc_queue_flex_trit_t",
+        "//utils/handles:cond",
         "//utils/handles:thread",
     ],
 )
@@ -23,5 +24,6 @@ cc_library(
         "//utils:macros",
         "//utils:merkle",
         "//utils:time",
+        "//utils/handles:lock",
     ],
 )

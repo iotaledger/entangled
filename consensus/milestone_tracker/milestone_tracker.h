@@ -13,6 +13,7 @@
 #include "common/errors.h"
 #include "consensus/conf.h"
 #include "utils/containers/lock_free/lf_mpmc_queue_flex_trit_t.h"
+#include "utils/handles/cond.h"
 #include "utils/handles/thread.h"
 
 #ifdef __cplusplus
@@ -41,6 +42,7 @@ typedef struct milestone_tracker_s {
   ledger_validator_t* ledger_validator;
   transaction_solidifier_t* transaction_solidifier;
   lf_mpmc_queue_flex_trit_t_t candidates;
+  cond_handle_t cond;
   // bool accept_any_testnet_coo;
 } milestone_tracker_t;
 
