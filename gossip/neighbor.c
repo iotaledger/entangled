@@ -152,6 +152,12 @@ retcode_t neighbors_add(neighbor_t **const neighbors,
     if (udp_endpoint_init(&entry->endpoint) == false) {
       return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
     }
+  } else if (entry->endpoint.protocol == PROTOCOL_TCP) {
+    if (tcp_sender_endpoint_init(&entry->endpoint) != RC_OK) {
+      return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
+    }
+  } else {
+    return RC_NEIGHBOR_INVALID_PROTOCOL;
   }
 
   return RC_OK;
@@ -169,6 +175,12 @@ retcode_t neighbors_remove_entry(neighbor_t **const neighbors,
     if (udp_endpoint_destroy(&neighbor->endpoint) == false) {
       ret = RC_NEIGHBOR_FAILED_ENDPOINT_DESTROY;
     }
+  } else if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
+    if (tcp_sender_endpoint_destroy(&neighbor->endpoint) != RC_OK) {
+      return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
+    }
+  } else {
+    return RC_NEIGHBOR_INVALID_PROTOCOL;
   }
 
   LL_DELETE(*neighbors, neighbor);

@@ -13,7 +13,7 @@
 #include "utils/logger_helper.h"
 
 #define MAIN_LOGGER_ID "main"
-#define STATS_LOG_INTERVAL 10
+#define STATS_LOG_INTERVAL_S 10
 
 static core_t core_g;
 static logger_id_t logger_id;
@@ -78,13 +78,6 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  // TODO remove
-  // Dummy broadcasted packet to begin receiving from UDP neighbors
-  sleep(2);
-  flex_trit_t dummy[FLEX_TRIT_SIZE_8019];
-  memset(dummy, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
-  broadcaster_on_next(&core_g.node.broadcaster, dummy);
-
   size_t count = 0;
   while (true) {
     if (iota_tangle_transaction_count(&tangle, &count) != RC_OK) {
@@ -98,7 +91,7 @@ int main(int argc, char* argv[]) {
              broadcaster_size(&core_g.node.broadcaster),
              requester_size(&core_g.node.transaction_requester),
              responder_size(&core_g.node.responder), count);
-    sleep(STATS_LOG_INTERVAL);
+    sleep(STATS_LOG_INTERVAL_S);
   }
 
   log_info(logger_id, "Stopping cIRI core\n");
