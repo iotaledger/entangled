@@ -356,7 +356,7 @@ size_t flex_trits_from_bytes(flex_trit_t *to_flex_trits, size_t to_len,
   size_t max_trits, trits_for_byte, trits_counter = num_trits;
   for (int i = 0, j = 0; trits_counter; j++) {
     max_trits = MIN(5, trits_counter);
-    if (offset < NUM_TRITS_PER_FLEX_TRIT) {
+    if (offset < NUM_TRITS_PER_FLEX_TRIT && offset < trits_counter) {
       byte_to_trits(bytes[i], shifter.trits + offset, max_trits);
       offset += max_trits;
       i++;
