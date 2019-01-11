@@ -35,8 +35,9 @@ static inline size_t bundle_transactions_size(
   return utarray_len(bundle);
 }
 
-void bundle_calculate_hash(bundle_transactions_t *bundle, flex_trit_t *out);
-void bundle_finalize(bundle_transactions_t *bundle);
+void bundle_calculate_hash(bundle_transactions_t *bundle, Kerl *const kerl,
+                           flex_trit_t *out);
+void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl);
 void bundle_dump(bundle_transactions_t *bundle);
 
 #define BUNDLE_FOREACH(txs, tx)                                   \

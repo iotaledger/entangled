@@ -36,13 +36,15 @@ void test_normalized_bundle(void) {
 void test_bundle_finalize(void) {
   bundle_transactions_t *bundle = NULL;
   flex_trit_t addr_sender[FLEX_TRIT_SIZE_243] = {};
-  flex_trit_t addr_reciver[FLEX_TRIT_SIZE_243] = {};
+  flex_trit_t addr_receiver[FLEX_TRIT_SIZE_243] = {};
   flex_trit_t tag[FLEX_TRIT_SIZE_81] = {};
   flex_trit_t obsolete_tag[FLEX_TRIT_SIZE_81] = {};
   iota_transaction_t tx;
   iota_transaction_t *bundle_tx;
+  Kerl kerl = {};
+
   transaction_reset(&tx);
-  flex_trits_from_trytes(addr_reciver, NUM_TRITS_ADDRESS,
+  flex_trits_from_trytes(addr_receiver, NUM_TRITS_ADDRESS,
     (const tryte_t *)"LQZYGHAQLJLENO9IBSFOFIYHIBKOHEWVAEHKYOED9WBERCCLGGLOJVIZSIUUXGJ9WONIGBXKTVAWUXNHW",
     NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
   flex_trits_from_trytes(addr_sender, NUM_TRITS_ADDRESS,
@@ -56,8 +58,8 @@ void test_bundle_finalize(void) {
                          NUM_TRYTES_TAG, NUM_TRYTES_TAG);
 
   bundle_transactions_new(&bundle);
-  // reciver tx
-  transaction_set_address(&tx, addr_reciver);
+  // receiver tx
+  transaction_set_address(&tx, addr_receiver);
   transaction_set_tag(&tx, tag);
   transaction_set_obsolete_tag(&tx, tag);
   transaction_set_timestamp(&tx, 1546760794);
@@ -90,7 +92,7 @@ void test_bundle_finalize(void) {
   tx.loaded_columns_mask |= MASK_ALL_COLUMNS;
   bundle_transactions_add(bundle, &tx);
 
-  bundle_finalize(bundle);
+  bundle_finalize(bundle, &kerl);
   bundle_dump(bundle);
   bundle_tx = (iota_transaction_t *)utarray_front(bundle);
 

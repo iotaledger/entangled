@@ -29,29 +29,28 @@ void bundle_transactions_add(bundle_transactions_t *const bundle,
   utarray_push_back(bundle, transaction);
 }
 
-void bundle_calculate_hash(bundle_transactions_t *bundle, flex_trit_t *out) {
+void bundle_calculate_hash(bundle_transactions_t *bundle, Kerl *const kerl,
+                           flex_trit_t *out) {
   iota_transaction_t *curr_tx = NULL;
   trit_t essence_trits[NUM_TRITS_ESSENCE];
-  Kerl kerl = {};
-  init_kerl(&kerl);
-
   trit_t bundle_hash_trits[NUM_TRITS_HASH];
+  init_kerl(kerl);
 
   BUNDLE_FOREACH(bundle, curr_tx) {
     absorb_essence(
-        &kerl, transaction_address(curr_tx), transaction_value(curr_tx),
+        kerl, transaction_address(curr_tx), transaction_value(curr_tx),
         transaction_obsolete_tag(curr_tx), transaction_timestamp(curr_tx),
         transaction_current_index(curr_tx), transaction_last_index(curr_tx),
         essence_trits);
   }
 
   // Squeeze kerl to get the bundle hash
-  kerl_squeeze(&kerl, bundle_hash_trits, NUM_TRITS_HASH);
+  kerl_squeeze(kerl, bundle_hash_trits, NUM_TRITS_HASH);
   flex_trits_from_trits(out, NUM_TRITS_HASH, bundle_hash_trits, NUM_TRITS_HASH,
                         NUM_TRITS_HASH);
 }
 
-void bundle_finalize(bundle_transactions_t *bundle) {
+void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl) {
   iota_transaction_t *curr_tx = NULL;
   bool valid_bundle = false;
   iota_transaction_t *head_tx = NULL;
@@ -59,8 +58,7 @@ void bundle_finalize(bundle_transactions_t *bundle) {
   trit_t increased_tag_trits[NUM_TRITS_TAG];
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
 
-  Kerl kerl = {};
-  init_kerl(&kerl);
+  init_kerl(kerl);
 
   head_tx = (iota_transaction_t *)utarray_front(bundle);
   flex_trits_to_trits(increased_tag_trits, NUM_TRITS_TAG,
@@ -69,10 +67,10 @@ void bundle_finalize(bundle_transactions_t *bundle) {
   while (!valid_bundle) {
   update_hash:
     // bundle hash
-    bundle_calculate_hash(bundle, bundle_hash);
+    bundle_calculate_hash(bundle, kerl, bundle_hash);
     // normalize
     normalize_hash(bundle_hash, normalized_hash);
-    kerl_reset(&kerl);
+    kerl_reset(kerl);
     // checking 'M'
     for (int i = 0; i < HASH_LENGTH_TRYTE; i++) {
       if (normalized_hash[i] == 13) {
