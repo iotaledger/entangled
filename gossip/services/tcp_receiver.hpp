@@ -22,7 +22,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
   ~TcpConnection();
 
  public:
-  void start();
+  void start(uint16_t const port);
 
  private:
   receiver_service_t* service_;
@@ -38,7 +38,7 @@ class TcpReceiverService {
   ~TcpReceiverService();
 
  private:
-  void accept();
+  void accept(uint16_t const port);
 
  private:
   receiver_service_t* service_;

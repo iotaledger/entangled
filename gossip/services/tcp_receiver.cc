@@ -30,7 +30,7 @@ TcpConnection::~TcpConnection() {
            remote_host_.c_str(), remote_port_);
 }
 
-void TcpConnection::start() {
+void TcpConnection::start(uint16_t const port) {
   remote_host_ = socket_.remote_endpoint().address().to_string();
 
   // Reading listening port from node
@@ -40,7 +40,7 @@ void TcpConnection::start() {
   size_t len = socket_.read_some(boost::asio::buffer(port_bytes), error);
   if (len != PORT_SIZE) {
     log_warning(logger_id, "Received invalid port from node tcp://%s:%d\n",
-                remote_host_.c_str(), remote_port_);
+                remote_host_.c_str(), socket_.remote_endpoint().port());
     return;
   }
   remote_port_ = std::stoi(std::string(&port_bytes[0], len));
@@ -75,16 +75,19 @@ void TcpConnection::start() {
 
   // Sending listening port to neighbor
 
-  std::stringstream stream;
-  stream << std::setfill('0') << std::setw(PORT_SIZE) << remote_port_;
-  boost::asio::write(*neighbor_socket, boost::asio::buffer(stream.str()),
-                     error);
+  char encoded_port[PORT_SIZE + 1];
+
+  snprintf(encoded_port, PORT_SIZE + 1, "%0*d", PORT_SIZE, port);
+  boost::asio::write(*neighbor_socket,
+                     boost::asio::buffer(encoded_port, PORT_SIZE), error);
 
   neighbor->endpoint.opaque_inetaddr = neighbor_socket;
 
   rw_lock_handle_unlock(&service_->state->node->neighbors_lock);
 
   iota_packet_t packet;
+  boost::crc_32_type result;
+  char crc[CRC_SIZE + 1];
 
   for (;;) {
     std::array<char, PACKET_SIZE + CRC_SIZE> tcp_packet;
@@ -100,16 +103,13 @@ void TcpConnection::start() {
 
     // Computing CRC
 
-    boost::crc_32_type result;
     result.process_bytes(&tcp_packet[0], PACKET_SIZE);
-    stream.clear();
-    stream.str(std::string());
-    stream << std::setfill('0') << std::setw(CRC_SIZE) << std::hex
-           << result.checksum();
+    snprintf(crc, CRC_SIZE + 1, "%0*x", CRC_SIZE, result.checksum());
+    result.reset();
 
     // Checking CRC
 
-    if (stream.str() == std::string(&tcp_packet[0] + PACKET_SIZE, CRC_SIZE)) {
+    if (memcmp(crc, &tcp_packet[0] + PACKET_SIZE, CRC_SIZE) == 0) {
       memcpy(packet.content, &tcp_packet[0], PACKET_SIZE);
       iota_packet_set_endpoint(
           &packet, socket_.remote_endpoint().address().to_string().c_str(),
@@ -132,17 +132,17 @@ TcpReceiverService::TcpReceiverService(receiver_service_t* const service,
   logger_id =
       logger_helper_enable(TCP_RECEIVER_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
   acceptor_.set_option(boost::asio::socket_base::reuse_address(true));
-  accept();
+  accept(port);
 }
 
 TcpReceiverService::~TcpReceiverService() { logger_helper_release(logger_id); }
 
-void TcpReceiverService::accept() {
-  acceptor_.async_accept([this](boost::system::error_code ec,
-                                boost::asio::ip::tcp::socket socket) {
+void TcpReceiverService::accept(uint16_t const port) {
+  acceptor_.async_accept([this, port](boost::system::error_code ec,
+                                      boost::asio::ip::tcp::socket socket) {
     if (!ec) {
-      std::make_shared<TcpConnection>(service_, std::move(socket))->start();
+      std::make_shared<TcpConnection>(service_, std::move(socket))->start(port);
     }
-    accept();
+    accept(port);
   });
 }
