@@ -13,7 +13,7 @@
 #include "utils/logger_helper.h"
 
 #define MAIN_LOGGER_ID "main"
-#define STATS_LOG_INTERVAL 10
+#define STATS_LOG_INTERVAL_S 10
 
 static core_t core_g;
 static logger_id_t logger_id;
@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
              broadcaster_size(&core_g.node.broadcaster),
              requester_size(&core_g.node.transaction_requester),
              responder_size(&core_g.node.responder), count);
-    sleep(STATS_LOG_INTERVAL);
+    sleep(STATS_LOG_INTERVAL_S);
   }
 
   log_info(logger_id, "Stopping cIRI core\n");

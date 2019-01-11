@@ -5,9 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <iomanip>
+
 #include <boost/asio.hpp>
 #include <boost/crc.hpp>
-#include <iomanip>
 
 #include "gossip/iota_packet.h"
 #include "gossip/services/receiver.h"
@@ -25,7 +26,7 @@ retcode_t tcp_sender_endpoint_init(endpoint_t *const endpoint) {
                                                 std::to_string(endpoint->port));
     boost::asio::ip::tcp::endpoint destination = *resolver.resolve(query);
     strcpy(endpoint->ip, destination.address().to_string().c_str());
-  } catch (std::exception const &e) {
+  } catch (...) {
     return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
   }
 
@@ -57,7 +58,7 @@ bool tcp_send(receiver_service_t *const service, endpoint_t *const endpoint,
                        ignored_error);
     boost::asio::write(*socket, boost::asio::buffer(stream.str()),
                        ignored_error);
-  } catch (std::exception const &e) {
+  } catch (...) {
     return false;
   }
   return true;
