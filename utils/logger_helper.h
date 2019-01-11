@@ -33,12 +33,11 @@ typedef struct logger_t logger_t;
 
 retcode_t logger_helper_init();
 retcode_t logger_helper_destroy();
-
-void logger_helper_enable(char const* const logger_id,
-                          logger_level_t const level, bool const enable_color);
-void logger_helper_release(char const* const logger_id);
-
-void logger_helper_print(char const* const logger_id,
+logger_id_t logger_helper_enable(char const* const logger_name,
+                                 logger_level_t const level,
+                                 bool const enable_color);
+void logger_helper_release(logger_id_t const logger_id);
+void logger_helper_print(logger_id_t const logger_id,
                          logger_level_t const level, char const* const format,
                          ...);
 

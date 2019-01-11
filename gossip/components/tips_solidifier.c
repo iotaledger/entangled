@@ -14,6 +14,8 @@
 #define TIPS_SOLIDIFIER_LOGGER_ID "tips_solidifier"
 #define TIPS_SOLIDIFICATION_INTERVAL_MS 750
 
+static logger_id_t logger_id;
+
 /*
  * Private functions
  */
@@ -38,8 +40,7 @@ static void *tips_solidifier_routine(tips_solidifier_t *const tips_solidifier) {
   }
 
   if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
-    log_critical(TIPS_SOLIDIFIER_LOGGER_ID,
-                 "Initializing tangle connection failed\n");
+    log_critical(logger_id, "Initializing tangle connection failed\n");
     return NULL;
   }
 
@@ -49,22 +50,19 @@ static void *tips_solidifier_routine(tips_solidifier_t *const tips_solidifier) {
     }
 
     if (tips_cache_random_tip(tips_solidifier->tips, tip) != RC_OK) {
-      log_warning(TIPS_SOLIDIFIER_LOGGER_ID,
-                  "Accessing random tip from cache failed\n");
+      log_warning(logger_id, "Accessing random tip from cache failed\n");
       goto sleep;
     }
 
     if (iota_tangle_transaction_approvers_count(&tangle, tip,
                                                 &approvers_count) != RC_OK) {
-      log_warning(TIPS_SOLIDIFIER_LOGGER_ID,
-                  "Counting number of approvers of tip failed\n");
+      log_warning(logger_id, "Counting number of approvers of tip failed\n");
       goto sleep;
     }
 
     if (approvers_count != 0) {
       if (tips_cache_remove(tips_solidifier->tips, tip) != RC_OK) {
-        log_warning(TIPS_SOLIDIFIER_LOGGER_ID,
-                    "Removing tip from cache failed\n");
+        log_warning(logger_id, "Removing tip from cache failed\n");
       }
       goto sleep;
     }
@@ -73,15 +71,13 @@ static void *tips_solidifier_routine(tips_solidifier_t *const tips_solidifier) {
     if (iota_consensus_transaction_solidifier_check_solidity(
             tips_solidifier->transaction_solidifier, &tangle, tip, false,
             &is_solid) != RC_OK) {
-      log_warning(TIPS_SOLIDIFIER_LOGGER_ID,
-                  "Checking solidity of tip failed\n");
+      log_warning(logger_id, "Checking solidity of tip failed\n");
       goto sleep;
     }
 
     if (is_solid) {
       if (tips_cache_set_solid(tips_solidifier->tips, tip) != RC_OK) {
-        log_warning(TIPS_SOLIDIFIER_LOGGER_ID,
-                    "Changing status of tip to solid failed\n");
+        log_warning(logger_id, "Changing status of tip to solid failed\n");
       }
     }
 
@@ -90,8 +86,7 @@ static void *tips_solidifier_routine(tips_solidifier_t *const tips_solidifier) {
   }
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
-    log_critical(TIPS_SOLIDIFIER_LOGGER_ID,
-                 "Destroying tangle connection failed\n");
+    log_critical(logger_id, "Destroying tangle connection failed\n");
   }
 
   return NULL;
@@ -110,7 +105,8 @@ retcode_t tips_solidifier_init(
     return RC_NULL_PARAM;
   }
 
-  logger_helper_enable(TIPS_SOLIDIFIER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id =
+      logger_helper_enable(TIPS_SOLIDIFIER_LOGGER_ID, LOGGER_DEBUG, true);
   tips_solidifier->conf = conf;
   tips_solidifier->running = false;
   tips_solidifier->tips = tips;
@@ -124,13 +120,12 @@ retcode_t tips_solidifier_start(tips_solidifier_t *const tips_solidifier) {
     return RC_NULL_PARAM;
   }
 
-  log_info(TIPS_SOLIDIFIER_LOGGER_ID, "Spawning tips solidifier thread\n");
+  log_info(logger_id, "Spawning tips solidifier thread\n");
   tips_solidifier->running = true;
   if (thread_handle_create(&tips_solidifier->thread,
                            (thread_routine_t)tips_solidifier_routine,
                            tips_solidifier) != 0) {
-    log_error(TIPS_SOLIDIFIER_LOGGER_ID,
-              "Spawning tips solidifier thread failed\n");
+    log_error(logger_id, "Spawning tips solidifier thread failed\n");
     return RC_FAILED_THREAD_SPAWN;
   }
 
@@ -144,11 +139,10 @@ retcode_t tips_solidifier_stop(tips_solidifier_t *const tips_solidifier) {
     return RC_OK;
   }
 
-  log_info(TIPS_SOLIDIFIER_LOGGER_ID, "Shutting down tips solidifier thread\n");
+  log_info(logger_id, "Shutting down tips solidifier thread\n");
   tips_solidifier->running = false;
   if (thread_handle_join(tips_solidifier->thread, NULL) != 0) {
-    log_error(TIPS_SOLIDIFIER_LOGGER_ID,
-              "Shutting down tips solidifier thread failed\n");
+    log_error(logger_id, "Shutting down tips solidifier thread failed\n");
     return RC_FAILED_THREAD_JOIN;
   }
 
@@ -166,7 +160,7 @@ retcode_t tips_solidifier_destroy(tips_solidifier_t *const tips_solidifier) {
   tips_solidifier->tips = NULL;
   tips_solidifier->transaction_solidifier = NULL;
 
-  logger_helper_release(TIPS_SOLIDIFIER_LOGGER_ID);
+  logger_helper_release(logger_id);
 
   return RC_OK;
 }

@@ -17,6 +17,8 @@
 
 #define SQLITE3_LOGGER_ID "sqlite3"
 
+static logger_id_t logger_id;
+
 static retcode_t prepare_statements(sqlite3_connection_t* const connection) {
   retcode_t ret = RC_OK;
 
@@ -114,7 +116,7 @@ static retcode_t prepare_statements(sqlite3_connection_t* const connection) {
                            iota_statement_state_delta_load);
 
   if (ret != RC_OK) {
-    log_error(SQLITE3_LOGGER_ID, "Preparing statements failed\n");
+    log_error(logger_id, "Preparing statements failed\n");
   }
 
   return ret;
@@ -166,7 +168,7 @@ static retcode_t finalize_statements(sqlite3_connection_t* const connection) {
   ret |= finalize_statement(connection->statements.state_delta_load);
 
   if (ret != RC_OK) {
-    log_error(SQLITE3_LOGGER_ID, "Finalizing statements failed\n");
+    log_error(logger_id, "Finalizing statements failed\n");
   }
 
   return ret;
@@ -183,21 +185,22 @@ retcode_t connection_init(storage_connection_t* const connection,
     return RC_NULL_PARAM;
   }
 
+  logger_id = logger_helper_enable(SQLITE3_LOGGER_ID, LOGGER_DEBUG, true);
+
   if ((connection->actual = calloc(1, sizeof(sqlite3_connection_t))) == NULL) {
     return RC_OOM;
   }
   sqlite3_connection = (sqlite3_connection_t*)connection->actual;
 
   if (config->db_path == NULL) {
-    log_critical(SQLITE3_LOGGER_ID, "No path for db specified\n");
+    log_critical(logger_id, "No path for db specified\n");
     return RC_SQLITE3_NO_PATH_FOR_DB_SPECIFIED;
   }
 
   if ((rc = sqlite3_open_v2(config->db_path, &sqlite3_connection->db,
                             SQLITE_OPEN_READWRITE | SQLITE_OPEN_NOMUTEX,
                             NULL)) != SQLITE_OK) {
-    log_critical(SQLITE3_LOGGER_ID, "Failed to open db on path: %s\n",
-                 config->db_path);
+    log_critical(logger_id, "Failed to open db on path: %s\n", config->db_path);
     return RC_SQLITE3_FAILED_OPEN_DB;
   }
 

@@ -17,6 +17,8 @@
 
 #define LEDGER_VALIDATOR_LOGGER_ID "ledger_validator"
 
+static logger_id_t logger_id;
+
 /*
  * Private functions
  */
@@ -31,8 +33,7 @@ static retcode_t update_snapshot_milestone_do_func(flex_trit_t *const hash,
 
   if (pack->num_loaded == 0) {
     *should_stop = true;
-    log_error(LEDGER_VALIDATOR_LOGGER_ID, "In %s, could not load milestone\n",
-              __FUNCTION__);
+    log_error(logger_id, "In %s, could not load milestone\n", __FUNCTION__);
     return RC_LEDGER_VALIDATOR_COULD_NOT_LOAD_MILESTONE;
   }
   iota_transaction_t *transaction = pack->models[0];
@@ -81,7 +82,7 @@ static retcode_t build_snapshot(ledger_validator_t const *const lv,
 
   while (pack.num_loaded != 0) {
     if (milestone.index % 10000 == 0) {
-      log_info(LEDGER_VALIDATOR_LOGGER_ID,
+      log_info(logger_id,
                "Building snapshot... Consistent: #%" PRIu64
                ", Candidate: #%" PRIu64 "\n",
                *consistent_index, milestone.index);
@@ -105,8 +106,7 @@ static retcode_t build_snapshot(ledger_validator_t const *const lv,
         *consistent_index = milestone.index;
         memcpy(consistent_hash, milestone.hash, FLEX_TRIT_SIZE_243);
       } else {
-        log_critical(LEDGER_VALIDATOR_LOGGER_ID,
-                     "Inconsistent state delta loaded\n");
+        log_critical(logger_id, "Inconsistent state delta loaded\n");
         ret = RC_LEDGER_VALIDATOR_INCONSISTENT_DELTA;
         goto done;
       }
@@ -220,14 +220,15 @@ retcode_t iota_consensus_ledger_validator_init(
     iota_consensus_conf_t *const conf, milestone_tracker_t *const mt) {
   retcode_t ret = RC_OK;
 
-  logger_helper_enable(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id =
+      logger_helper_enable(LEDGER_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   lv->conf = conf;
   lv->milestone_tracker = mt;
 
   if ((ret = build_snapshot(lv, tangle,
                             &mt->latest_solid_subtangle_milestone_index,
                             mt->latest_solid_subtangle_milestone)) != RC_OK) {
-    log_critical(LEDGER_VALIDATOR_LOGGER_ID, "Building snapshot failed\n");
+    log_critical(logger_id, "Building snapshot failed\n");
     return ret;
   }
 
@@ -237,7 +238,7 @@ retcode_t iota_consensus_ledger_validator_init(
 retcode_t iota_consensus_ledger_validator_destroy(
     ledger_validator_t *const lv) {
   lv->milestone_tracker = NULL;
-  logger_helper_release(LEDGER_VALIDATOR_LOGGER_ID);
+  logger_helper_release(logger_id);
   return RC_OK;
 }
 
@@ -269,7 +270,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
              lv, tangle, NULL, &delta, milestone->hash,
              iota_snapshot_get_index(lv->milestone_tracker->latest_snapshot),
              true, &valid_delta)) != RC_OK) {
-      log_error(LEDGER_VALIDATOR_LOGGER_ID, "Getting latest delta failed\n");
+      log_error(logger_id, "Getting latest delta failed\n");
       goto done;
     } else if (!valid_delta) {
       *has_snapshot = false;
@@ -278,14 +279,13 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
     if ((ret = iota_snapshot_create_patch(
              lv->milestone_tracker->latest_snapshot, &delta, &patch)) !=
         RC_OK) {
-      log_error(LEDGER_VALIDATOR_LOGGER_ID, "Creating patch failed\n");
+      log_error(logger_id, "Creating patch failed\n");
       goto done;
     }
     if ((*has_snapshot = state_delta_is_consistent(&patch))) {
       if ((ret = update_snapshot_milestone(lv, tangle, milestone->hash,
                                            milestone->index)) != RC_OK) {
-        log_error(LEDGER_VALIDATOR_LOGGER_ID,
-                  "Updating snapshot milestone failed\n");
+        log_error(logger_id, "Updating snapshot milestone failed\n");
         goto done;
       }
       if (!state_delta_empty(delta)) {
@@ -297,7 +297,7 @@ retcode_t iota_consensus_ledger_validator_update_snapshot(
       if ((ret =
                iota_snapshot_apply_patch(lv->milestone_tracker->latest_snapshot,
                                          &delta, milestone->index)) != RC_OK) {
-        log_error(LEDGER_VALIDATOR_LOGGER_ID, "Applying patch failed\n");
+        log_error(logger_id, "Applying patch failed\n");
         goto done;
       }
     }
@@ -370,7 +370,7 @@ retcode_t iota_consensus_ledger_validator_update_delta(
            lv, tangle, &visited_hashes, &tip_state, tip,
            iota_snapshot_get_index(lv->milestone_tracker->latest_snapshot),
            false, &valid_delta)) != RC_OK) {
-    log_error(LEDGER_VALIDATOR_LOGGER_ID, "Getting latest delta failed\n");
+    log_error(logger_id, "Getting latest delta failed\n");
     goto done;
   }
 
@@ -379,19 +379,19 @@ retcode_t iota_consensus_ledger_validator_update_delta(
   }
 
   if ((ret = state_delta_apply_patch(&tip_state, delta)) != RC_OK) {
-    log_error(LEDGER_VALIDATOR_LOGGER_ID, "Applying patch failed\n");
+    log_error(logger_id, "Applying patch failed\n");
     goto done;
   }
 
   if ((ret = iota_snapshot_create_patch(lv->milestone_tracker->latest_snapshot,
                                         &tip_state, &patch)) != RC_OK) {
-    log_error(LEDGER_VALIDATOR_LOGGER_ID, "Creating patch failed\n");
+    log_error(logger_id, "Creating patch failed\n");
     goto done;
   }
 
   if (state_delta_is_consistent(&patch)) {
     if ((ret = state_delta_merge_patch(delta, &tip_state)) != RC_OK) {
-      log_error(LEDGER_VALIDATOR_LOGGER_ID, "Merging patch failed\n");
+      log_error(logger_id, "Merging patch failed\n");
       goto done;
     }
     if ((ret = hash243_set_append(&visited_hashes, analyzed_hashes)) != RC_OK) {

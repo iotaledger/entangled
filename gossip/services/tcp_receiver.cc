@@ -11,6 +11,8 @@
 
 #define TCP_RECEIVER_SERVICE_LOGGER_ID "tcp_receiver_service"
 
+static logger_id_t logger_id;
+
 /*
  * TcpConnection
  */
@@ -22,8 +24,7 @@ TcpConnection::TcpConnection(receiver_service_t* const service,
 }
 
 TcpConnection::~TcpConnection() {
-  log_info(TCP_RECEIVER_SERVICE_LOGGER_ID,
-           "Connection lost with node tcp://%s:%d\n",
+  log_info(logger_id, "Connection lost with node tcp://%s:%d\n",
            socket_.remote_endpoint().address().to_string().c_str(),
            socket_.remote_endpoint().port());
 }
@@ -38,14 +39,14 @@ void TcpConnection::start() {
       service_->state->node->neighbors, host, port, PROTOCOL_TCP);
 
   if (neighbor == NULL) {
-    log_info(TCP_RECEIVER_SERVICE_LOGGER_ID,
+    log_info(logger_id,
              "Connection denied with non-tethered neighbor tcp://%s:%d\n", host,
              port);
     rw_lock_handle_unlock(&service_->state->node->neighbors_lock);
     return;
   }
 
-  log_info(TCP_RECEIVER_SERVICE_LOGGER_ID,
+  log_info(logger_id,
            "Connection accepted with tethered neighbor tcp://%s:%d\n", host,
            port);
   rw_lock_handle_unlock(&service_->state->node->neighbors_lock);
@@ -78,14 +79,13 @@ TcpReceiverService::TcpReceiverService(receiver_service_t* const service,
     : service_(service),
       acceptor_(context, boost::asio::ip::tcp::endpoint(
                              boost::asio::ip::tcp::v4(), port)) {
-  logger_helper_enable(TCP_RECEIVER_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id =
+      logger_helper_enable(TCP_RECEIVER_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
   acceptor_.set_option(boost::asio::socket_base::reuse_address(true));
   accept();
 }
 
-TcpReceiverService::~TcpReceiverService() {
-  logger_helper_release(TCP_RECEIVER_SERVICE_LOGGER_ID);
-}
+TcpReceiverService::~TcpReceiverService() { logger_helper_release(logger_id); }
 
 void TcpReceiverService::accept() {
   acceptor_.async_accept([this](boost::system::error_code ec,

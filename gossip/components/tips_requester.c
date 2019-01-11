@@ -15,6 +15,8 @@
 #define TIPS_REQUESTER_LOGGER_ID "tips_requester"
 #define TIPS_REQUESTER_INTERVAL 5
 
+static logger_id_t logger_id;
+
 /*
  * Private functions
  */
@@ -35,8 +37,7 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
   }
 
   if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
-    log_critical(TIPS_REQUESTER_LOGGER_ID,
-                 "Initializing tangle connection failed\n");
+    log_critical(logger_id, "Initializing tangle connection failed\n");
     return NULL;
   }
 
@@ -67,8 +68,7 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
     rw_lock_handle_rdlock(&tips_requester->node->neighbors_lock);
     LL_FOREACH(tips_requester->node->neighbors, iter) {
       if (neighbor_send_packet(tips_requester->node, iter, &packet) != RC_OK) {
-        log_warning(TIPS_REQUESTER_LOGGER_ID,
-                    "Sending tip request to neighbor failed\n");
+        log_warning(logger_id, "Sending tip request to neighbor failed\n");
       }
     }
     rw_lock_handle_unlock(&tips_requester->node->neighbors_lock);
@@ -76,8 +76,7 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
   }
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
-    log_critical(TIPS_REQUESTER_LOGGER_ID,
-                 "Destroying tangle connection failed\n");
+    log_critical(logger_id, "Destroying tangle connection failed\n");
   }
 
   return NULL;
@@ -93,7 +92,8 @@ retcode_t tips_requester_init(tips_requester_t *const tips_requester,
     return RC_NULL_PARAM;
   }
 
-  logger_helper_enable(TIPS_REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id =
+      logger_helper_enable(TIPS_REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
 
   tips_requester->running = false;
   tips_requester->node = node;
@@ -106,13 +106,12 @@ retcode_t tips_requester_start(tips_requester_t *const tips_requester) {
     return RC_NULL_PARAM;
   }
 
-  log_info(TIPS_REQUESTER_LOGGER_ID, "Spawning tips requester thread\n");
+  log_info(logger_id, "Spawning tips requester thread\n");
   tips_requester->running = true;
   if (thread_handle_create(&tips_requester->thread,
                            (thread_routine_t)tips_requester_routine,
                            tips_requester) != 0) {
-    log_critical(TIPS_REQUESTER_LOGGER_ID,
-                 "Spawning tips requester thread failed\n");
+    log_critical(logger_id, "Spawning tips requester thread failed\n");
     return RC_FAILED_THREAD_SPAWN;
   }
 
@@ -126,11 +125,10 @@ retcode_t tips_requester_stop(tips_requester_t *const tips_requester) {
     return RC_OK;
   }
 
-  log_info(TIPS_REQUESTER_LOGGER_ID, "Shutting down tips requester thread\n");
+  log_info(logger_id, "Shutting down tips requester thread\n");
   tips_requester->running = false;
   if (thread_handle_join(tips_requester->thread, NULL) != 0) {
-    log_error(TIPS_REQUESTER_LOGGER_ID,
-              "Shutting down tips requester thread failed\n");
+    log_error(logger_id, "Shutting down tips requester thread failed\n");
     return RC_FAILED_THREAD_JOIN;
   }
 
@@ -146,7 +144,7 @@ retcode_t tips_requester_destroy(tips_requester_t *const tips_requester) {
 
   tips_requester->node = NULL;
 
-  logger_helper_release(TIPS_REQUESTER_LOGGER_ID);
+  logger_helper_release(logger_id);
 
   return RC_OK;
 }

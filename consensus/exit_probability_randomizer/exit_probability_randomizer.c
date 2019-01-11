@@ -13,11 +13,13 @@
 
 #define EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID "exit_probability_randomizer"
 
+static logger_id_t logger_id;
+
 retcode_t iota_consensus_ep_randomizer_init(
     ep_randomizer_t *const ep_randomizer, iota_consensus_conf_t *const conf,
     ep_randomizer_implementation_t impl) {
-  logger_helper_enable(EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID, LOGGER_DEBUG,
-                       true);
+  logger_id = logger_helper_enable(EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID,
+                                   LOGGER_DEBUG, true);
   rand_handle_seed(time(NULL));
   ep_randomizer->conf = conf;
   if (impl == EP_RANDOM_WALK) {
@@ -35,7 +37,7 @@ retcode_t iota_consensus_ep_randomizer_destroy(
   if (ep_randomizer->base.vtable.exit_probability_destroy != NULL) {
     ep_randomizer->base.vtable.exit_probability_destroy(ep_randomizer);
   }
-  logger_helper_release(EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID);
+  logger_helper_release(logger_id);
   return RC_OK;
 }
 

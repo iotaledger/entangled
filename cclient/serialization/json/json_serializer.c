@@ -14,16 +14,18 @@
 
 #define JSON_LOGGER_ID "json_serializer"
 
+static logger_id_t logger_id;
+
 void logger_init_json_serializer() {
-  logger_helper_enable(JSON_LOGGER_ID, LOGGER_DEBUG, true);
-  log_info(JSON_LOGGER_ID, "[%s:%d] enable logger %s.\n", __func__, __LINE__,
+  logger_id = logger_helper_enable(JSON_LOGGER_ID, LOGGER_DEBUG, true);
+  log_info(logger_id, "[%s:%d] enable logger %s.\n", __func__, __LINE__,
            JSON_LOGGER_ID);
 }
 
 void logger_destroy_json_serializer() {
-  log_info(JSON_LOGGER_ID, "[%s:%d] destroy logger %s.\n", __func__, __LINE__,
+  log_info(logger_id, "[%s:%d] destroy logger %s.\n", __func__, __LINE__,
            JSON_LOGGER_ID);
-  logger_helper_release(JSON_LOGGER_ID);
+  logger_helper_release(logger_id);
 }
 
 void init_json_serializer(serializer_t* serializer) {
@@ -45,7 +47,7 @@ static retcode_t json_array_to_uint64(cJSON const* const obj,
       }
     }
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not array\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
@@ -58,7 +60,7 @@ static retcode_t utarray_to_json_array(UT_array const* const ut,
   if (utarray_len(ut) > 0) {
     cJSON* array_obj = cJSON_CreateArray();
     if (array_obj == NULL) {
-      log_critical(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+      log_critical(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
                    STR_CCLIENT_JSON_CREATE);
       return RC_CCLIENT_JSON_CREATE;
     }
@@ -86,7 +88,7 @@ static flex_hash_array_t* json_array_to_flex_hash_array(
       }
     }
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not array\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return NULL;
   }
@@ -151,7 +153,7 @@ static retcode_t json_string_to_flex_hash(cJSON const* const json_obj,
   retcode_t ret = RC_OK;
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, key);
   if (json_value == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s.\n", __func__, __LINE__,
               STR_CCLIENT_JSON_KEY, key);
     return RC_CCLIENT_JSON_KEY;
   }
@@ -161,7 +163,7 @@ static retcode_t json_string_to_flex_hash(cJSON const* const json_obj,
       return ret;
     }
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not string\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not string\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
@@ -181,7 +183,7 @@ static retcode_t json_boolean_array_to_utarray(cJSON const* const obj,
       utarray_push_back(ut, &bl);
     }
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not array\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
@@ -192,7 +194,7 @@ static retcode_t json_get_int(cJSON const* const json_obj,
                               char const* const obj_name, int* const num) {
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
   if (json_value == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s.\n", __func__, __LINE__,
               STR_CCLIENT_JSON_KEY, obj_name);
     return RC_CCLIENT_JSON_KEY;
   }
@@ -200,7 +202,7 @@ static retcode_t json_get_int(cJSON const* const json_obj,
   if (cJSON_IsNumber(json_value)) {
     *num = json_value->valueint;
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not number\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not number\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
@@ -213,7 +215,7 @@ static retcode_t json_get_uint16(cJSON const* const json_obj,
                                  uint16_t* const num) {
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
   if (json_value == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s.\n", __func__, __LINE__,
               STR_CCLIENT_JSON_KEY, obj_name);
     return RC_CCLIENT_JSON_KEY;
   }
@@ -221,7 +223,7 @@ static retcode_t json_get_uint16(cJSON const* const json_obj,
   if (cJSON_IsNumber(json_value)) {
     *num = (uint16_t)json_value->valueint;
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not number\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not number\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
@@ -234,7 +236,7 @@ static retcode_t json_get_uint32(cJSON const* const json_obj,
                                  uint32_t* const num) {
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
   if (json_value == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s.\n", __func__, __LINE__,
               STR_CCLIENT_JSON_KEY, obj_name);
     return RC_CCLIENT_JSON_KEY;
   }
@@ -242,7 +244,7 @@ static retcode_t json_get_uint32(cJSON const* const json_obj,
   if (cJSON_IsNumber(json_value)) {
     *num = (uint32_t)json_value->valuedouble;
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not number\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not number\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
@@ -255,7 +257,7 @@ static retcode_t json_get_uint64(cJSON const* const json_obj,
                                  uint64_t* const num) {
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
   if (json_value == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s.\n", __func__, __LINE__,
               STR_CCLIENT_JSON_KEY, obj_name);
     return RC_CCLIENT_JSON_KEY;
   }
@@ -263,7 +265,7 @@ static retcode_t json_get_uint64(cJSON const* const json_obj,
   if (cJSON_IsNumber(json_value)) {
     *num = (uint64_t)json_value->valuedouble;
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not number\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not number\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
@@ -278,7 +280,7 @@ static retcode_t json_get_string(cJSON const* const json_obj,
   size_t str_len = 0;
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
   if (json_value == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s.\n", __func__, __LINE__,
               STR_CCLIENT_JSON_KEY, obj_name);
     return RC_CCLIENT_JSON_KEY;
   }
@@ -287,14 +289,14 @@ static retcode_t json_get_string(cJSON const* const json_obj,
     str_len = strlen(json_value->valuestring);
     ret = char_buffer_allocate(text, str_len);
     if (ret != RC_OK) {
-      log_error(JSON_LOGGER_ID, "[%s:%d] memory allocation failed.\n", __func__,
+      log_error(logger_id, "[%s:%d] memory allocation failed.\n", __func__,
                 __LINE__);
       return ret;
     }
 
     strcpy(text->data, json_value->valuestring);
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not string\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not string\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
@@ -354,7 +356,7 @@ static retcode_t json_array_to_hash243_queue(cJSON const* const obj,
       }
     }
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not array\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
@@ -381,7 +383,7 @@ static retcode_t json_array_to_hash243_stack(cJSON const* const obj,
       }
     }
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not array\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
@@ -441,7 +443,7 @@ static retcode_t json_array_to_hash8019_queue(cJSON const* const obj,
       }
     }
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not array\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
@@ -475,7 +477,7 @@ static retcode_t json_string_to_flex_trits(cJSON const* const json_obj,
   size_t trit_len = 0;
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, key);
   if (json_value == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s.\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s.\n", __func__, __LINE__,
               STR_CCLIENT_JSON_KEY, key);
     return RC_CCLIENT_JSON_KEY;
   }
@@ -487,7 +489,7 @@ static retcode_t json_string_to_flex_trits(cJSON const* const json_obj,
       return RC_CCLIENT_FLEX_TRITS;
     }
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not string\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not string\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
@@ -611,7 +613,7 @@ static retcode_t json_array_to_hash8019_array(cJSON const* const obj,
       }
     }
   } else {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s not array\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s not array\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     return RC_CCLIENT_JSON_PARSE;
   }
@@ -624,10 +626,10 @@ retcode_t json_find_transactions_serialize_request(
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) {
-    log_critical(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_critical(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
                  STR_CCLIENT_JSON_CREATE);
     return RC_CCLIENT_JSON_CREATE;
   }
@@ -669,7 +671,7 @@ retcode_t json_find_transactions_serialize_request(
   return ret;
 
 err:
-  log_error(JSON_LOGGER_ID, "[%s:%d] error!\n", __func__, __LINE__);
+  log_error(logger_id, "[%s:%d] error!\n", __func__, __LINE__);
   cJSON_Delete(json_root);
   return ret;
 }
@@ -677,13 +679,13 @@ err:
 retcode_t json_find_transactions_deserialize_response(
     serializer_t const* const s, char const* const obj,
     find_transactions_res_t* out) {
-  log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_info(logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
 
   if (json_obj == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
@@ -691,7 +693,7 @@ retcode_t json_find_transactions_deserialize_response(
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
@@ -710,10 +712,10 @@ retcode_t json_get_balances_serialize_request(
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) {
-    log_critical(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_critical(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
                  STR_CCLIENT_JSON_CREATE);
     return RC_CCLIENT_JSON_CREATE;
   }
@@ -757,10 +759,10 @@ retcode_t json_get_balances_deserialize_response(serializer_t const* const s,
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
-  log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_info(logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
   if (json_obj == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
@@ -768,7 +770,7 @@ retcode_t json_get_balances_deserialize_response(serializer_t const* const s,
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
@@ -802,10 +804,10 @@ retcode_t json_get_inclusion_state_serialize_request(
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) {
-    log_critical(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_critical(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
                  STR_CCLIENT_JSON_CREATE);
     return RC_CCLIENT_JSON_CREATE;
   }
@@ -844,10 +846,10 @@ retcode_t json_get_inclusion_state_deserialize_response(
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
-  log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_info(logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
   if (json_obj == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
@@ -855,7 +857,7 @@ retcode_t json_get_inclusion_state_deserialize_response(
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
@@ -871,7 +873,7 @@ retcode_t json_get_neighbors_serialize_request(const serializer_t* const s,
                                                char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* req_text = "{\"command\":\"getNeighbors\"}";
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   ret = char_buffer_allocate(out, strlen(req_text));
   if (ret == RC_OK) {
     strcpy(out->data, req_text);
@@ -888,9 +890,9 @@ retcode_t json_get_neighbors_deserialize_response(const serializer_t* const s,
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
 
-  log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_info(logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   if (json_obj == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
@@ -898,7 +900,7 @@ retcode_t json_get_neighbors_deserialize_response(const serializer_t* const s,
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
@@ -942,7 +944,7 @@ retcode_t json_get_node_info_serialize_request(const serializer_t* const s,
                                                char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* req_text = "{\"command\":\"getNodeInfo\"}";
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   ret = char_buffer_allocate(out, strlen(req_text));
   if (ret == RC_OK) {
     strcpy(out->data, req_text);
@@ -956,10 +958,10 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
-  log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_info(logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
   if (json_obj == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
@@ -967,7 +969,7 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t* const s,
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
@@ -1056,7 +1058,7 @@ retcode_t json_get_tips_serialize_request(const serializer_t* const s,
                                           char_buffer_t* out) {
   retcode_t ret = RC_OK;
   const char* req_text = "{\"command\":\"getTips\"}";
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   ret = char_buffer_allocate(out, strlen(req_text));
   if (ret == RC_OK) {
     strcpy(out->data, req_text);
@@ -1070,10 +1072,10 @@ retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
-  log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_info(logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
   if (json_obj == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
@@ -1081,7 +1083,7 @@ retcode_t json_get_tips_deserialize_response(const serializer_t* const s,
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
@@ -1100,10 +1102,10 @@ retcode_t json_get_transactions_to_approve_serialize_request(
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) {
-    log_critical(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_critical(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
                  STR_CCLIENT_JSON_CREATE);
     return RC_CCLIENT_JSON_CREATE;
   }
@@ -1142,10 +1144,10 @@ retcode_t json_get_transactions_to_approve_deserialize_response(
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
-  log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_info(logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
   if (json_obj == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
@@ -1153,7 +1155,7 @@ retcode_t json_get_transactions_to_approve_deserialize_response(
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
@@ -1182,10 +1184,10 @@ retcode_t json_add_neighbors_serialize_request(
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) {
-    log_critical(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_critical(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
                  STR_CCLIENT_JSON_CREATE);
     return RC_CCLIENT_JSON_CREATE;
   }
@@ -1219,10 +1221,10 @@ retcode_t json_add_neighbors_deserialize_response(const serializer_t* const s,
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
-  log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_info(logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
   if (json_obj == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
@@ -1230,7 +1232,7 @@ retcode_t json_add_neighbors_deserialize_response(const serializer_t* const s,
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
@@ -1248,10 +1250,10 @@ retcode_t json_remove_neighbors_serialize_request(
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) {
-    log_critical(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_critical(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
                  STR_CCLIENT_JSON_CREATE);
     return RC_CCLIENT_JSON_CREATE;
   }
@@ -1285,10 +1287,10 @@ retcode_t json_remove_neighbors_deserialize_response(
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
-  log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_info(logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
   if (json_obj == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
@@ -1296,7 +1298,7 @@ retcode_t json_remove_neighbors_deserialize_response(
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
@@ -1314,10 +1316,10 @@ retcode_t json_get_trytes_serialize_request(const serializer_t* const s,
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) {
-    log_critical(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_critical(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
                  STR_CCLIENT_JSON_CREATE);
     return RC_CCLIENT_JSON_CREATE;
   }
@@ -1350,10 +1352,10 @@ retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
-  log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_info(logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
   if (json_obj == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
@@ -1361,7 +1363,7 @@ retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
@@ -1377,10 +1379,10 @@ retcode_t json_attach_to_tangle_serialize_request(
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) {
-    log_critical(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_critical(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
                  STR_CCLIENT_JSON_CREATE);
     return RC_CCLIENT_JSON_CREATE;
   }
@@ -1428,10 +1430,10 @@ retcode_t json_attach_to_tangle_deserialize_response(
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
-  log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_info(logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
   if (json_obj == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
@@ -1439,14 +1441,14 @@ retcode_t json_attach_to_tangle_deserialize_response(
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
   }
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "exception");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
@@ -1465,10 +1467,10 @@ retcode_t json_broadcast_transactions_serialize_request(
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) {
-    log_critical(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_critical(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
                  STR_CCLIENT_JSON_CREATE);
     return RC_CCLIENT_JSON_CREATE;
   }
@@ -1502,10 +1504,10 @@ retcode_t json_store_transactions_serialize_request(
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) {
-    log_critical(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_critical(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
                  STR_CCLIENT_JSON_CREATE);
     return RC_CCLIENT_JSON_CREATE;
   }
@@ -1539,10 +1541,10 @@ retcode_t json_check_consistency_serialize_request(
   retcode_t ret = RC_OK;
   const char* json_text = NULL;
   size_t len = 0;
-  log_info(JSON_LOGGER_ID, "[%s:%d]\n", __func__, __LINE__);
+  log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON* json_root = cJSON_CreateObject();
   if (json_root == NULL) {
-    log_critical(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_critical(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
                  STR_CCLIENT_JSON_CREATE);
     return RC_CCLIENT_JSON_CREATE;
   }
@@ -1577,9 +1579,9 @@ retcode_t json_check_consistency_deserialize_response(
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
 
-  log_info(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  log_info(logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   if (json_obj == NULL) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
@@ -1587,7 +1589,7 @@ retcode_t json_check_consistency_deserialize_response(
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(JSON_LOGGER_ID, "[%s:%d] %s %s\n", __func__, __LINE__,
+    log_error(logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
               STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;

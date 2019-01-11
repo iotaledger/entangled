@@ -9,6 +9,8 @@
 
 #define TRANSFER_LOGGER_ID "transfer"
 
+static logger_id_t logger_id;
+
 /***********************************************************************************************************
  * Private interface
  ***********************************************************************************************************/
@@ -33,12 +35,12 @@ static void transfer_iterator_next_data_transaction(
         transfer_iterator->transaction->data.signature_or_message, len,
         trans_data->data, data_len, offset, len);
     if (flex_ret == 0) {
-      log_warning(TRANSFER_LOGGER_ID, "[%s:%d] flex_trits slicing failed.\n",
-                  __func__, __LINE__);
+      log_warning(logger_id, "[%s:%d] flex_trits slicing failed.\n", __func__,
+                  __LINE__);
     }
   } else {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] the transfer type doesn't match.\n",
-              __func__, __LINE__);
+    log_error(logger_id, "[%s:%d] the transfer type doesn't match.\n", __func__,
+              __LINE__);
   }
 }
 
@@ -71,12 +73,12 @@ static void transfer_iterator_next_output_transaction(
             transfer_iterator->current_transfer_transaction_index,
         NUM_TRITS_SIGNATURE);
     if (flex_ret == 0) {
-      log_warning(TRANSFER_LOGGER_ID, "[%s:%d] flex_trits slicing failed.\n",
-                  __func__, __LINE__);
+      log_warning(logger_id, "[%s:%d] flex_trits slicing failed.\n", __func__,
+                  __LINE__);
     }
   } else {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] the transfer type doesn't match.\n",
-              __func__, __LINE__);
+    log_error(logger_id, "[%s:%d] the transfer type doesn't match.\n", __func__,
+              __LINE__);
   }
 }
 
@@ -90,8 +92,8 @@ static void transfer_iterator_next_input_transaction(
     memcpy(transaction_signature(tx), value_in->data, value_in->len);
     transaction_set_value(tx, transfer->value);
   } else {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] the transfer type doesn't match.\n",
-              __func__, __LINE__);
+    log_error(logger_id, "[%s:%d] the transfer type doesn't match.\n", __func__,
+              __LINE__);
   }
 }
 
@@ -100,25 +102,23 @@ static void transfer_iterator_next_input_transaction(
  ***********************************************************************************************************/
 
 void transfer_logger_init() {
-  logger_helper_enable(TRANSFER_LOGGER_ID, LOGGER_DEBUG, true);
-  log_info(TRANSFER_LOGGER_ID, "Enable logger %s.\n", TRANSFER_LOGGER_ID);
+  logger_id = logger_helper_enable(TRANSFER_LOGGER_ID, LOGGER_DEBUG, true);
+  log_info(logger_id, "Enable logger %s.\n", TRANSFER_LOGGER_ID);
 }
 
 void transfer_logger_destroy() {
-  log_info(TRANSFER_LOGGER_ID, "Destroy logger %s.\n", TRANSFER_LOGGER_ID);
-  logger_helper_release(TRANSFER_LOGGER_ID);
+  log_info(logger_id, "Destroy logger %s.\n", TRANSFER_LOGGER_ID);
+  logger_helper_release(logger_id);
 }
 
 bool validate_output(transfer_value_out_t const* const output) {
   if (!output->seed) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] seed is NULL.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] seed is NULL.\n", __func__, __LINE__);
     return false;
   }
 
   if (output->security < 1 || output->security > 3) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] security leve error.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] security leve error.\n", __func__, __LINE__);
     return false;
   }
   return true;
@@ -132,20 +132,19 @@ transfer_t* transfer_data_new(flex_trit_t const* const address,
   transfer_data_t* tf_data = NULL;
   transfer_t* transfer = NULL;
   if (!address) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] address cannot be NULL.\n", __func__,
+    log_error(logger_id, "[%s:%d] address cannot be NULL.\n", __func__,
               __LINE__);
     return NULL;
   }
 
   if (!tag) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] tag cannot be NULL.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] tag cannot be NULL.\n", __func__, __LINE__);
     return NULL;
   }
 
   if (!data && data_len != 0) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] data length should be 0.\n",
-              __func__, __LINE__);
+    log_error(logger_id, "[%s:%d] data length should be 0.\n", __func__,
+              __LINE__);
     return NULL;
   }
 
@@ -154,8 +153,7 @@ transfer_t* transfer_data_new(flex_trit_t const* const address,
     transfer = (transfer_t*)calloc(1, sizeof(transfer_t));
     if (!transfer) {
       free(tf_data);
-      log_error(TRANSFER_LOGGER_ID, "[%s:%d] Out of Memory.\n", __func__,
-                __LINE__);
+      log_error(logger_id, "[%s:%d] Out of Memory.\n", __func__, __LINE__);
       return NULL;
     }
 
@@ -180,27 +178,24 @@ transfer_t* transfer_value_out_new(transfer_value_out_t const* const output,
   transfer_value_out_t* value_out = NULL;
   transfer_t* tf = NULL;
   if (!validate_output(output)) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] output is invalid.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] output is invalid.\n", __func__, __LINE__);
     return NULL;
   }
 
   if (!address) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] address cannot be NULL.\n", __func__,
+    log_error(logger_id, "[%s:%d] address cannot be NULL.\n", __func__,
               __LINE__);
     return NULL;
   }
 
   if (!tag) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] tag cannot be NULL.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] tag cannot be NULL.\n", __func__, __LINE__);
     return NULL;
   }
 
   tf = (transfer_t*)calloc(1, sizeof(transfer_t));
   if (!tf) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] Out of Memory.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] Out of Memory.\n", __func__, __LINE__);
     return NULL;
   }
 
@@ -228,35 +223,32 @@ transfer_t* transfer_value_in_new(flex_trit_t const* const address,
   transfer_value_in_t* value_in = NULL;
   transfer_t* tf = NULL;
   if (!address) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] address cannot be NULL.\n", __func__,
+    log_error(logger_id, "[%s:%d] address cannot be NULL.\n", __func__,
               __LINE__);
     return NULL;
   }
 
   if (!tag) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] tag cannot be NULL.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] tag cannot be NULL.\n", __func__, __LINE__);
     return NULL;
   }
 
   if (!data && data_len != 0) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] data length should be 0.\n",
-              __func__, __LINE__);
+    log_error(logger_id, "[%s:%d] data length should be 0.\n", __func__,
+              __LINE__);
     return NULL;
   }
 
   tf = (transfer_t*)calloc(1, sizeof(transfer_t));
   if (!tf) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] Out of Memory.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] Out of Memory.\n", __func__, __LINE__);
     return NULL;
   }
 
   value_in = (transfer_value_in_t*)calloc(1, sizeof(transfer_value_in_t));
   if (!value_in) {
     free(tf);
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] Out of Memory.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] Out of Memory.\n", __func__, __LINE__);
     return NULL;
   }
   value_in->len = data_len;
@@ -300,8 +292,7 @@ size_t transfer_transactions_count(transfer_t* tf) {
 transfer_ctx_t* transfer_ctx_new() {
   transfer_ctx_t* tf_ctx = (transfer_ctx_t*)calloc(1, sizeof(transfer_ctx_t));
   if (!tf_ctx) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] Out of Memory.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] Out of Memory.\n", __func__, __LINE__);
     return NULL;
   }
   memset(tf_ctx->bundle, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
@@ -355,8 +346,7 @@ transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[], size_t len,
   transfer_iterator_t* transfer_iterator =
       (transfer_iterator_t*)calloc(1, sizeof(transfer_iterator_t));
   if (!transfer_iterator) {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] Out of Memory.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] Out of Memory.\n", __func__, __LINE__);
     return NULL;
   }
 
@@ -374,8 +364,7 @@ transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[], size_t len,
   transfer_ctx = transfer_ctx_new();
   if (!transfer_ctx) {
     transfer_iterator_free(&transfer_iterator);
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] Out of Memory.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] Out of Memory.\n", __func__, __LINE__);
     return NULL;
   }
   if (transfer_ctx_init(transfer_ctx, transfers, len)) {
@@ -384,8 +373,7 @@ transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[], size_t len,
     memcpy(transfer_iterator->bundle_hash, transfer_ctx->bundle,
            FLEX_TRIT_SIZE_243);
   } else {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] Invalid transfers.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] Invalid transfers.\n", __func__, __LINE__);
   }
   transfer_ctx_free(transfer_ctx);
   transfer_iterator->iota_signature_gen = iota_flex_sign_signature_gen;

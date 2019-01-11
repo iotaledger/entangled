@@ -19,8 +19,6 @@
 #include "utils/containers/hash/hash_int64_t_map.h"
 #include "utils/hash_indexed_map.h"
 
-#define CW_RATING_CALCULATOR_LOGGER_ID "consensus_cw_rating_calculator"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

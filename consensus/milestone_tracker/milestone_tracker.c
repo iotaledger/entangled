@@ -27,6 +27,8 @@
 #define MILESTONE_VALIDATION_INTERVAL 10uLL
 #define SOLID_MILESTONE_RESCAN_INTERVAL 5000uLL
 
+static logger_id_t logger_id;
+
 static retcode_t validate_coordinator(milestone_tracker_t* const mt,
                                       iota_milestone_t* const candidate,
                                       iota_transaction_t* const tx1,
@@ -107,7 +109,7 @@ static retcode_t validate_milestone(
   }
   if ((ret = iota_consensus_bundle_validator_validate(
            tangle, candidate->hash, bundle, &bundle_status)) != RC_OK) {
-    log_warning(MILESTONE_TRACKER_LOGGER_ID, "Validating bundle failed\n");
+    log_warning(logger_id, "Validating bundle failed\n");
     goto done;
   } else if (bundle_status == BUNDLE_INCOMPLETE) {
     *milestone_status = MILESTONE_INCOMPLETE;
@@ -129,8 +131,7 @@ static retcode_t validate_milestone(
 
     if ((ret = validate_coordinator(mt, candidate, tx1, tx2, &valid)) !=
         RC_OK) {
-      log_warning(MILESTONE_TRACKER_LOGGER_ID,
-                  "Validating coordinator failed\n");
+      log_warning(logger_id, "Validating coordinator failed\n");
       goto done;
     }
     if (valid) {
@@ -168,8 +169,7 @@ static void* milestone_validator(void* arg) {
   }
 
   if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
-    log_critical(MILESTONE_TRACKER_LOGGER_ID,
-                 "Initializing tangle connection failed\n");
+    log_critical(logger_id, "Initializing tangle connection failed\n");
     return NULL;
   }
 
@@ -189,14 +189,13 @@ static void* milestone_validator(void* arg) {
         candidate.index = get_milestone_index(&tx);
         if (validate_milestone(mt, &tangle, &candidate, &milestone_status) !=
             RC_OK) {
-          log_warning(MILESTONE_TRACKER_LOGGER_ID,
-                      "Validating milestone failed\n");
+          log_warning(logger_id, "Validating milestone failed\n");
           continue;
         }
         if (milestone_status == MILESTONE_VALID) {
           iota_tangle_milestone_store(&tangle, &candidate);
           if (candidate.index > mt->latest_milestone_index) {
-            log_info(MILESTONE_TRACKER_LOGGER_ID,
+            log_info(logger_id,
                      "Latest milestone has changed from #%" PRIu64
                      " to #%" PRIu64 " (%d remaining candidates)\n",
                      mt->latest_milestone_index, candidate.index,
@@ -215,8 +214,7 @@ static void* milestone_validator(void* arg) {
   }
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
-    log_critical(MILESTONE_TRACKER_LOGGER_ID,
-                 "Destroying tangle connection failed\n");
+    log_critical(logger_id, "Destroying tangle connection failed\n");
   }
 
   return NULL;
@@ -255,7 +253,7 @@ static retcode_t update_latest_solid_subtangle_milestone(
       if ((ret = iota_consensus_ledger_validator_update_snapshot(
                mt->ledger_validator, tangle, &milestone, &has_snapshot)) !=
           RC_OK) {
-        log_error(MILESTONE_TRACKER_LOGGER_ID, "Updating snapshot failed\n");
+        log_error(logger_id, "Updating snapshot failed\n");
         return ret;
       } else if (has_snapshot) {
         mt->latest_solid_subtangle_milestone_index = milestone.index;
@@ -288,26 +286,24 @@ static void* milestone_solidifier(void* arg) {
   }
 
   if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
-    log_critical(MILESTONE_TRACKER_LOGGER_ID,
-                 "Initializing tangle connection failed\n");
+    log_critical(logger_id, "Initializing tangle connection failed\n");
     return NULL;
   }
 
   while (mt->running) {
-    log_debug(MILESTONE_TRACKER_LOGGER_ID,
-              "Scanning for latest solid subtangle milestone\n");
+    log_debug(logger_id, "Scanning for latest solid subtangle milestone\n");
     previous_solid_subtangle_latest_milestone_index =
         mt->latest_solid_subtangle_milestone_index;
     if (mt->latest_solid_subtangle_milestone_index <
         mt->latest_milestone_index) {
       if (update_latest_solid_subtangle_milestone(mt, &tangle) != RC_OK) {
-        log_warning(MILESTONE_TRACKER_LOGGER_ID,
+        log_warning(logger_id,
                     "Updating latest solid subtangle milestone failed\n");
       }
     }
     if (previous_solid_subtangle_latest_milestone_index !=
         mt->latest_solid_subtangle_milestone_index) {
-      log_info(MILESTONE_TRACKER_LOGGER_ID,
+      log_info(logger_id,
                "Latest solid subtangle milestone has changed from #%" PRIu64
                " to #%" PRIu64 "\n",
                previous_solid_subtangle_latest_milestone_index,
@@ -318,8 +314,7 @@ static void* milestone_solidifier(void* arg) {
   }
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
-    log_critical(MILESTONE_TRACKER_LOGGER_ID,
-                 "Destroying tangle connection failed\n");
+    log_critical(logger_id, "Destroying tangle connection failed\n");
   }
 
   return NULL;
@@ -334,7 +329,8 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
     return RC_CONSENSUS_MT_NULL_SELF;
   }
 
-  logger_helper_enable(MILESTONE_TRACKER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id =
+      logger_helper_enable(MILESTONE_TRACKER_LOGGER_ID, LOGGER_DEBUG, true);
   memset(mt, 0, sizeof(milestone_tracker_t));
   mt->running = false;
   mt->conf = conf;
@@ -370,18 +366,15 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt,
     mt->latest_milestone_index = latest_milestone.index;
     memcpy(mt->latest_milestone, latest_milestone.hash, FLEX_TRIT_SIZE_243);
   }
-  log_info(MILESTONE_TRACKER_LOGGER_ID, "Latest milestone: #%d\n",
-           mt->latest_milestone_index);
+  log_info(logger_id, "Latest milestone: #%d\n", mt->latest_milestone_index);
 
   hash_pack_init(&hash_pack, 512);
 
   if ((ret = iota_tangle_transaction_load_hashes_of_milestone_candidates(
            tangle, &hash_pack, mt->coordinator)) != RC_OK) {
-    log_critical(MILESTONE_TRACKER_LOGGER_ID,
-                 "Loading milestone candidates failed\n");
+    log_critical(logger_id, "Loading milestone candidates failed\n");
   }
-  log_info(MILESTONE_TRACKER_LOGGER_ID, "Loaded %d milestone candidates\n",
-           hash_pack.num_loaded);
+  log_info(logger_id, "Loaded %d milestone candidates\n", hash_pack.num_loaded);
 
   for (size_t i = 0; i < hash_pack.num_loaded; i++) {
     iota_milestone_tracker_add_candidate(mt,
@@ -389,24 +382,20 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt,
   }
   hash_pack_free(&hash_pack);
 
-  log_info(MILESTONE_TRACKER_LOGGER_ID,
-           "Spawning milestone validator thread\n");
+  log_info(logger_id, "Spawning milestone validator thread\n");
   if (thread_handle_create(&mt->milestone_validator,
                            (thread_routine_t)milestone_validator, mt) != 0) {
-    log_critical(MILESTONE_TRACKER_LOGGER_ID,
-                 "Spawning milestone validator thread failed\n");
+    log_critical(logger_id, "Spawning milestone validator thread failed\n");
     return RC_CONSENSUS_MT_FAILED_THREAD_SPAWN;
   }
 
-  log_info(MILESTONE_TRACKER_LOGGER_ID, "Latest solid milestone: #%d\n",
+  log_info(logger_id, "Latest solid milestone: #%d\n",
            mt->latest_solid_subtangle_milestone_index);
 
-  log_info(MILESTONE_TRACKER_LOGGER_ID,
-           "Spawning milestone solidifier thread\n");
+  log_info(logger_id, "Spawning milestone solidifier thread\n");
   if (thread_handle_create(&mt->milestone_solidifier,
                            (thread_routine_t)milestone_solidifier, mt) != 0) {
-    log_critical(MILESTONE_TRACKER_LOGGER_ID,
-                 "Spawning milestone solidifier thread failed\n");
+    log_critical(logger_id, "Spawning milestone solidifier thread failed\n");
     return RC_CONSENSUS_MT_FAILED_THREAD_SPAWN;
   }
 
@@ -424,19 +413,15 @@ retcode_t iota_milestone_tracker_stop(milestone_tracker_t* const mt) {
 
   mt->running = false;
 
-  log_info(MILESTONE_TRACKER_LOGGER_ID,
-           "Shutting down milestone validator thread\n");
+  log_info(logger_id, "Shutting down milestone validator thread\n");
   if (thread_handle_join(mt->milestone_validator, NULL) != 0) {
-    log_error(MILESTONE_TRACKER_LOGGER_ID,
-              "Shutting down milestone validator thread failed\n");
+    log_error(logger_id, "Shutting down milestone validator thread failed\n");
     ret = RC_CONSENSUS_MT_FAILED_THREAD_JOIN;
   }
 
-  log_info(MILESTONE_TRACKER_LOGGER_ID,
-           "Shutting down milestone solidifier thread\n");
+  log_info(logger_id, "Shutting down milestone solidifier thread\n");
   if (thread_handle_join(mt->milestone_solidifier, NULL) != 0) {
-    log_error(MILESTONE_TRACKER_LOGGER_ID,
-              "Shutting down milestone solidifier thread failed\n");
+    log_error(logger_id, "Shutting down milestone solidifier thread failed\n");
     ret = RC_CONSENSUS_MT_FAILED_THREAD_JOIN;
   }
 
@@ -455,7 +440,7 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt) {
   hash243_queue_free(&mt->candidates);
   rw_lock_handle_destroy(&mt->candidates_lock);
   memset(mt, 0, sizeof(milestone_tracker_t));
-  logger_helper_release(MILESTONE_TRACKER_LOGGER_ID);
+  logger_helper_release(logger_id);
 
   return ret;
 }
@@ -473,7 +458,7 @@ retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt,
   rw_lock_handle_unlock(&mt->candidates_lock);
 
   if (ret != RC_OK) {
-    log_warning(MILESTONE_TRACKER_LOGGER_ID,
+    log_warning(logger_id,
                 "Pushing candidate hash to candidates queue failed\n");
     return RC_OOM;
   }
