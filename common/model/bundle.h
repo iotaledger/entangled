@@ -38,7 +38,9 @@ static inline size_t bundle_transactions_size(
 void bundle_calculate_hash(bundle_transactions_t *bundle, Kerl *const kerl,
                            flex_trit_t *out);
 void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl);
+#ifdef DEBUG
 void bundle_dump(bundle_transactions_t *bundle);
+#endif
 
 #define BUNDLE_FOREACH(txs, tx)                                   \
   for (tx = (iota_transaction_t *)utarray_front(txs); tx != NULL; \

@@ -352,9 +352,8 @@ void transaction_free(iota_transaction_t *const transaction) {
   free(transaction);
 }
 
-// for debugging
-void transaction_obj_dump(iota_transaction_t *tx_obj) {
 #ifdef DEBUG
+void transaction_obj_dump(iota_transaction_t *tx_obj) {
   tryte_t trytes_81[NUM_TRYTES_HASH + 1];
   tryte_t trytes_27[NUM_TRYTES_TAG + 1];
 
@@ -413,5 +412,5 @@ void transaction_obj_dump(iota_transaction_t *tx_obj) {
                        NUM_TRITS_HASH, NUM_TRITS_HASH);
   trytes_81[NUM_TRYTES_HASH] = '\0';
   printf("hash: %s\n", trytes_81);
-#endif
 }
+#endif

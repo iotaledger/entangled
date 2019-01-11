@@ -58,8 +58,6 @@ void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl) {
   trit_t increased_tag_trits[NUM_TRITS_TAG];
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
 
-  init_kerl(kerl);
-
   head_tx = (iota_transaction_t *)utarray_front(bundle);
   flex_trits_to_trits(increased_tag_trits, NUM_TRITS_TAG,
                       transaction_obsolete_tag(head_tx), NUM_TRITS_TAG,
@@ -70,7 +68,6 @@ void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl) {
     bundle_calculate_hash(bundle, kerl, bundle_hash);
     // normalize
     normalize_hash(bundle_hash, normalized_hash);
-    kerl_reset(kerl);
     // checking 'M'
     for (int i = 0; i < HASH_LENGTH_TRYTE; i++) {
       if (normalized_hash[i] == 13) {
@@ -90,10 +87,9 @@ void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl) {
   }
 }
 
-// for debugging
-void bundle_dump(bundle_transactions_t *bundle) {
 #ifdef DEBUG
+void bundle_dump(bundle_transactions_t *bundle) {
   iota_transaction_t *curr_tx = NULL;
   BUNDLE_FOREACH(bundle, curr_tx) { transaction_obj_dump(curr_tx); }
-#endif
 }
+#endif

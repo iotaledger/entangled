@@ -93,7 +93,9 @@ void test_bundle_finalize(void) {
   bundle_transactions_add(bundle, &tx);
 
   bundle_finalize(bundle, &kerl);
+#ifdef DEBUG
   bundle_dump(bundle);
+#endif
   bundle_tx = (iota_transaction_t *)utarray_front(bundle);
 
   TEST_ASSERT_EQUAL_MEMORY(transaction_obsolete_tag(bundle_tx), obsolete_tag,
