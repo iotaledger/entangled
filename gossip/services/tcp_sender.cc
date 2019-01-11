@@ -46,17 +46,17 @@ bool tcp_send(receiver_service_t *const service, endpoint_t *const endpoint,
   }
 
   try {
+    char crc[CRC_SIZE + 1];
     auto socket = reinterpret_cast<boost::asio::ip::tcp::socket *>(
         endpoint->opaque_inetaddr);
     boost::system::error_code ignored_error;
     boost::crc_32_type result;
+
     result.process_bytes(packet->content, PACKET_SIZE);
-    std::stringstream stream;
-    stream << std::setfill('0') << std::setw(16) << std::hex
-           << result.checksum();
+    snprintf(crc, CRC_SIZE + 1, "%0*x", CRC_SIZE, result.checksum());
     boost::asio::write(*socket, boost::asio::buffer(packet->content),
                        ignored_error);
-    boost::asio::write(*socket, boost::asio::buffer(stream.str()),
+    boost::asio::write(*socket, boost::asio::buffer(crc, CRC_SIZE),
                        ignored_error);
   } catch (...) {
     return false;

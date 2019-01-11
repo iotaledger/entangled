@@ -25,6 +25,7 @@ TcpConnection::TcpConnection(receiver_service_t* const service,
     : service_(service), socket_(std::move(socket)) {}
 
 TcpConnection::~TcpConnection() {
+  socket_.close();
   log_info(logger_id, "Connection lost with tethered node tcp://%s:%d\n",
            remote_host_.c_str(), remote_port_);
 }
@@ -90,11 +91,7 @@ void TcpConnection::start() {
 
     boost::asio::read(socket_, boost::asio::buffer(tcp_packet), error);
 
-    if (error == boost::asio::error::eof) {
-      socket_.close();
-      break;
-    } else if (error) {
-      socket_.close();
+    if (error) {
       log_warning(logger_id,
                   "Reading from tethered node tcp://%s:%d failed: %s\n",
                   remote_host_.c_str(), remote_port_, error.message().c_str());
