@@ -32,7 +32,7 @@ bool hash_to_indexed_hash_set_map_find(
     return false;
   }
   if (res == NULL) {
-    return RC_NULL_PARAM;
+    return false;
   }
   HASH_FIND(hh, *map, hash, FLEX_TRIT_SIZE_243, *res);
   return *res != NULL;

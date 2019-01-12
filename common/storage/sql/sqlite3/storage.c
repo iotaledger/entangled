@@ -24,14 +24,15 @@
 
 #define SQLITE3_LOGGER_ID "sqlite3"
 
+static logger_id_t logger_id;
+
 static void error_log_callback(void* const arg, int const err_code,
                                char const* const message) {
-  log_error(SQLITE3_LOGGER_ID, "Failed with error code %d: %s\n", err_code,
-            message);
+  log_error(logger_id, "Failed with error code %d: %s\n", err_code, message);
 }
 
 retcode_t storage_init() {
-  logger_helper_enable(SQLITE3_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id = logger_helper_enable(SQLITE3_LOGGER_ID, LOGGER_DEBUG, true);
 
   if (sqlite3_config(SQLITE_CONFIG_LOG, error_log_callback, NULL) !=
       SQLITE_OK) {
@@ -56,7 +57,7 @@ retcode_t storage_init() {
 }
 
 retcode_t storage_destroy() {
-  logger_helper_release(SQLITE3_LOGGER_ID);
+  logger_helper_release(logger_id);
 
   if (sqlite3_shutdown() != SQLITE_OK) {
     return RC_SQLITE3_FAILED_SHUTDOWN;

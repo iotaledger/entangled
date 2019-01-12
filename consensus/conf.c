@@ -15,6 +15,8 @@
 
 #define CONSENSUS_CONF_LOGGER_ID "consensus_conf"
 
+static logger_id_t logger_id;
+
 retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
   retcode_t ret = RC_OK;
   FILE *file = NULL;
@@ -24,16 +26,14 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
         *coordinator = NULL;
 
   if ((file = fopen(conf->snapshot_conf_file, "r")) == NULL) {
-    log_error(CONSENSUS_CONF_LOGGER_ID,
-              "Snapshot configuration file not found\n");
+    log_error(logger_id, "Snapshot configuration file not found\n");
     ret = RC_SNAPSHOT_FILE_NOT_FOUND;
     goto done;
   }
 
   if (fseek(file, 0, SEEK_END) < 0 || (len = ftell(file)) <= 0 ||
       fseek(file, 0, SEEK_SET) < 0) {
-    log_error(CONSENSUS_CONF_LOGGER_ID,
-              "Invalid snapshot configuration file\n");
+    log_error(logger_id, "Invalid snapshot configuration file\n");
     ret = RC_SNAPSHOT_INVALID_FILE;
     goto done;
   }
@@ -44,8 +44,7 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
   }
 
   if (fread(content, 1, len, file) < 0) {
-    log_error(CONSENSUS_CONF_LOGGER_ID,
-              "Invalid snapshot configuration file\n");
+    log_error(logger_id, "Invalid snapshot configuration file\n");
     ret = RC_SNAPSHOT_INVALID_FILE;
     goto done;
   }
@@ -112,7 +111,7 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
 json_error : {
   const char *error_ptr = cJSON_GetErrorPtr();
   if (error_ptr != NULL) {
-    log_error(CONSENSUS_CONF_LOGGER_ID, "%s\n", error_ptr);
+    log_error(logger_id, "%s\n", error_ptr);
   }
   ret = RC_SNAPSHOT_FAILED_JSON_PARSING;
 }
@@ -137,7 +136,8 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
     return RC_NULL_PARAM;
   }
 
-  logger_helper_enable(CONSENSUS_CONF_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id =
+      logger_helper_enable(CONSENSUS_CONF_LOGGER_ID, LOGGER_DEBUG, true);
 
   memset(conf->genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   conf->max_depth = DEFAULT_TIP_SELECTION_MAX_DEPTH;
@@ -151,7 +151,7 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
 
   ret = iota_snapshot_conf_init(conf);
 
-  logger_helper_release(CONSENSUS_CONF_LOGGER_ID);
+  logger_helper_release(logger_id);
 
   return ret;
 }

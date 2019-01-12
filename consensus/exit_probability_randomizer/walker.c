@@ -16,6 +16,8 @@
 
 #define RANDOM_WALKER_LOGGER_ID "random_walker"
 
+static logger_id_t logger_id;
+
 /*
  * Private functions
  */
@@ -64,16 +66,15 @@ static retcode_t find_tail_if_valid(
   *has_valid_tail = false;
   ret = iota_tangle_find_tail(tangle, tx_hash, tx_hash, has_valid_tail);
   if (ret != RC_OK) {
-    log_error(RANDOM_WALKER_LOGGER_ID, "Finding tail failed: %" PRIu64 "\n",
-              ret);
+    log_error(logger_id, "Finding tail failed: %" PRIu64 "\n", ret);
     return ret;
   }
   if (*has_valid_tail) {
     ret = iota_consensus_exit_prob_transaction_validator_is_valid(
         epv, tangle, tx_hash, has_valid_tail);
     if (ret != RC_OK) {
-      log_error(RANDOM_WALKER_LOGGER_ID,
-                "Tail transaction validation failed: %" PRIu64 "\n", ret);
+      log_error(logger_id, "Tail transaction validation failed: %" PRIu64 "\n",
+                ret);
       return ret;
     }
   }
@@ -120,6 +121,7 @@ static retcode_t random_walker_select_approver_tail(
  */
 
 void iota_consensus_random_walker_init(ep_randomizer_t *const randomizer) {
+  logger_id = logger_helper_enable(RANDOM_WALKER_LOGGER_ID, LOGGER_DEBUG, true);
   randomizer->base.vtable = random_walk_vtable;
 }
 
@@ -137,11 +139,10 @@ retcode_t iota_consensus_random_walker_randomize(
   flex_trit_t approver_tail_hash[FLEX_TRIT_SIZE_243];
   if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(
            ep_validator, tangle, ep, &ep_is_valid)) != RC_OK) {
-    log_error(RANDOM_WALKER_LOGGER_ID,
-              "Entry point validation failed: %" PRIu64 "\n", ret);
+    log_error(logger_id, "Entry point validation failed: %" PRIu64 "\n", ret);
     return ret;
   } else if (!ep_is_valid) {
-    log_error(RANDOM_WALKER_LOGGER_ID, "Invalid entry point\n");
+    log_error(logger_id, "Invalid entry point\n");
     return RC_CONSENSUS_EXIT_PROBABILITIES_INVALID_ENTRYPOINT;
   }
 
@@ -150,8 +151,8 @@ retcode_t iota_consensus_random_walker_randomize(
              exit_probability_randomizer, tangle, ep_validator, cw_result,
              curr_tail_hash, approver_tail_hash, &has_approver_tail)) !=
         RC_OK) {
-      log_error(RANDOM_WALKER_LOGGER_ID,
-                "Selecting approver tail failed: %" PRIu64 "\n", ret);
+      log_error(logger_id, "Selecting approver tail failed: %" PRIu64 "\n",
+                ret);
       return ret;
     } else if (has_approver_tail) {
       curr_tail_hash = approver_tail_hash;
@@ -160,8 +161,7 @@ retcode_t iota_consensus_random_walker_randomize(
   } while (has_approver_tail);
 
   memcpy(tip, curr_tail_hash, FLEX_TRIT_SIZE_243);
-  log_debug(RANDOM_WALKER_LOGGER_ID,
-            "Number of tails traversed to find tip: %" PRIu64 "\n",
+  log_debug(logger_id, "Number of tails traversed to find tip: %" PRIu64 "\n",
             num_traversed_tails);
 
   return ret;

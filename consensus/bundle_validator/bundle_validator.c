@@ -14,6 +14,8 @@
 
 #define BUNDLE_VALIDATOR_LOGGER_ID "bundle_validator"
 
+static logger_id_t logger_id;
+
 /*
  * Private functions
  */
@@ -30,7 +32,7 @@ static retcode_t load_bundle_transactions(tangle_t const* const tangle,
   res = iota_tangle_transaction_load(tangle, TRANSACTION_FIELD_HASH, tail_hash,
                                      &pack);
   if (res != RC_OK || pack.num_loaded == 0) {
-    log_error(BUNDLE_VALIDATOR_LOGGER_ID,
+    log_error(logger_id,
               "No transactions were loaded for the provided tail hash\n");
     return res;
   }
@@ -117,12 +119,13 @@ static retcode_t validate_signature(bundle_transactions_t const* const bundle,
  */
 
 retcode_t iota_consensus_bundle_validator_init() {
-  logger_helper_enable(BUNDLE_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id =
+      logger_helper_enable(BUNDLE_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   return RC_OK;
 }
 
 retcode_t iota_consensus_bundle_validator_destroy() {
-  logger_helper_release(BUNDLE_VALIDATOR_LOGGER_ID);
+  logger_helper_release(logger_id);
   return RC_OK;
 }
 
@@ -139,15 +142,14 @@ retcode_t iota_consensus_bundle_validator_validate(
   *status = BUNDLE_VALID;
 
   if (bundle == NULL) {
-    log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Bundle is not initialized\n");
+    log_error(logger_id, "Bundle is not initialized\n");
     *status = BUNDLE_NOT_INITIALIZED;
     return RC_CONSENSUS_NULL_BUNDLE_PTR;
   }
 
   res = load_bundle_transactions(tangle, tail_hash, bundle);
   if (res != RC_OK || utarray_len(bundle) == 0) {
-    log_error(BUNDLE_VALIDATOR_LOGGER_ID,
-              "Loading transactions for tail failed\n");
+    log_error(logger_id, "Loading transactions for tail failed\n");
     *status = BUNDLE_TAIL_NOT_FOUND;
     return res;
   }
@@ -167,14 +169,14 @@ retcode_t iota_consensus_bundle_validator_validate(
     bundle_value += transaction_value(curr_tx);
 
     if (llabs(bundle_value) > IOTA_SUPPLY) {
-      log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Invalid bundle supply\n");
+      log_error(logger_id, "Invalid bundle supply\n");
       *status = BUNDLE_INVALID_VALUE;
       break;
     }
 
     if (transaction_current_index(curr_tx) != index++ ||
         transaction_last_index(curr_tx) != last_index) {
-      log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Invalid transaction in bundle\n");
+      log_error(logger_id, "Invalid transaction in bundle\n");
       *status = BUNDLE_INVALID_TX;
       break;
     }
@@ -182,7 +184,7 @@ retcode_t iota_consensus_bundle_validator_validate(
     if (transaction_value(curr_tx) != 0 &&
         flex_trits_at(transaction_address(curr_tx), NUM_TRITS_ADDRESS,
                       NUM_TRITS_ADDRESS - 1) != 0) {
-      log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Invalid input address\n");
+      log_error(logger_id, "Invalid input address\n");
       *status = BUNDLE_INVALID_INPUT_ADDRESS;
       break;
     }
@@ -192,7 +194,7 @@ retcode_t iota_consensus_bundle_validator_validate(
       trit_t normalized_bundle[HASH_LENGTH_TRIT];
 
       if (bundle_value != 0) {
-        log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Bundle value is not zero\n");
+        log_error(logger_id, "Bundle value is not zero\n");
         *status = BUNDLE_INVALID_VALUE;
         break;
       }
@@ -200,8 +202,7 @@ retcode_t iota_consensus_bundle_validator_validate(
       calculate_bundle_hash(bundle, bundle_hash_calculated);
       if (memcmp(bundle_hash, bundle_hash_calculated, FLEX_TRIT_SIZE_243) !=
           0) {
-        log_error(BUNDLE_VALIDATOR_LOGGER_ID,
-                  "Bundle hash provided differs from calculated\n");
+        log_error(logger_id, "Bundle hash provided differs from calculated\n");
         *status = BUNDLE_INVALID_HASH;
         break;
       }
@@ -210,7 +211,7 @@ retcode_t iota_consensus_bundle_validator_validate(
 
       res = validate_signature(bundle, normalized_bundle, &valid_sig);
       if (res != RC_OK || !valid_sig) {
-        log_error(BUNDLE_VALIDATOR_LOGGER_ID, "Invalid signature\n");
+        log_error(logger_id, "Invalid signature\n");
         *status = BUNDLE_INVALID_SIGNATURE;
         break;
       }

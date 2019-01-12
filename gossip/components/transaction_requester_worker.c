@@ -15,6 +15,8 @@
 #define REQUESTER_LOGGER_ID "requester"
 #define REQUESTER_INTERVAL 10
 
+static logger_id_t logger_id;
+
 /*
  * Private functions
  */
@@ -35,8 +37,7 @@ static void *transaction_requester_routine(
   }
 
   if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
-    log_critical(REQUESTER_LOGGER_ID,
-                 "Initializing tangle connection failed\n");
+    log_critical(logger_id, "Initializing tangle connection failed\n");
     return NULL;
   }
 
@@ -61,7 +62,7 @@ static void *transaction_requester_routine(
     LL_FOREACH(transaction_requester->node->neighbors, iter) {
       if (neighbor_send(transaction_requester->node, &tangle, iter,
                         transaction) != RC_OK) {
-        log_warning(REQUESTER_LOGGER_ID, "Sending request failed\n");
+        log_warning(logger_id, "Sending request failed\n");
       }
     }
     rw_lock_handle_unlock(&transaction_requester->node->neighbors_lock);
@@ -70,7 +71,7 @@ static void *transaction_requester_routine(
   }
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
-    log_critical(REQUESTER_LOGGER_ID, "Destroying tangle connection failed\n");
+    log_critical(logger_id, "Destroying tangle connection failed\n");
   }
 
   return NULL;
@@ -86,7 +87,8 @@ retcode_t requester_start(
     return RC_NULL_PARAM;
   }
 
-  log_info(REQUESTER_LOGGER_ID, "Spawning transaction requester thread\n");
+  logger_id = logger_helper_enable(REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
+  log_info(logger_id, "Spawning transaction requester thread\n");
   transaction_requester->running = true;
   if (thread_handle_create(&transaction_requester->thread,
                            (thread_routine_t)transaction_requester_routine,
@@ -104,11 +106,10 @@ retcode_t requester_stop(transaction_requester_t *const transaction_requester) {
     return RC_OK;
   }
 
-  log_info(REQUESTER_LOGGER_ID, "Shutting down transaction requester thread\n");
+  log_info(logger_id, "Shutting down transaction requester thread\n");
   transaction_requester->running = false;
   if (thread_handle_join(transaction_requester->thread, NULL) != 0) {
-    log_error(REQUESTER_LOGGER_ID,
-              "Shutting down transaction requester thread failed\n");
+    log_error(logger_id, "Shutting down transaction requester thread failed\n");
     return RC_FAILED_THREAD_JOIN;
   }
 

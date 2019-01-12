@@ -19,6 +19,8 @@
 #define PROCESSOR_LOGGER_ID "processor"
 #define PROCESSOR_TIMEOUT_SEC 1
 
+static logger_id_t logger_id;
+
 /*
  * Private functions
  */
@@ -61,7 +63,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
                             NUM_TRITS_SERIALIZED_TRANSACTION,
                             NUM_TRITS_SERIALIZED_TRANSACTION) !=
       NUM_TRITS_SERIALIZED_TRANSACTION) {
-    log_warning(PROCESSOR_LOGGER_ID, "Invalid transaction bytes\n");
+    log_warning(logger_id, "Invalid transaction bytes\n");
     ret = RC_PROCESSOR_INVALID_TRANSACTION;
     goto failure;
   }
@@ -70,7 +72,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
   if (transaction_deserialize_from_trits(&transaction, transaction_flex_trits,
                                          false) !=
       NUM_TRITS_SERIALIZED_TRANSACTION) {
-    log_warning(PROCESSOR_LOGGER_ID, "Deserializing transaction failed\n");
+    log_warning(logger_id, "Deserializing transaction failed\n");
     ret = RC_PROCESSOR_INVALID_TRANSACTION;
     goto failure;
   }
@@ -79,7 +81,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
   // Validates the transaction
   if (!iota_consensus_transaction_validate(processor->transaction_validator,
                                            &transaction)) {
-    log_debug(PROCESSOR_LOGGER_ID, "Invalid transaction\n");
+    log_debug(logger_id, "Invalid transaction\n");
     goto failure;
   }
 
@@ -88,15 +90,15 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
   // Checks if the transaction is already persisted
   if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH,
                                            curl_hash, &exists)) != RC_OK) {
-    log_warning(PROCESSOR_LOGGER_ID, "Checking if transaction exists failed\n");
+    log_warning(logger_id, "Checking if transaction exists failed\n");
     goto failure;
   }
 
   if (!exists) {
     // Stores the new transaction
-    log_debug(PROCESSOR_LOGGER_ID, "Storing new transaction\n");
+    log_debug(logger_id, "Storing new transaction\n");
     if ((ret = iota_tangle_transaction_store(tangle, &transaction)) != RC_OK) {
-      log_warning(PROCESSOR_LOGGER_ID, "Storing new transaction failed\n");
+      log_warning(logger_id, "Storing new transaction failed\n");
       goto failure;
     }
 
@@ -104,7 +106,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
     if ((ret = iota_consensus_transaction_solidifier_update_status(
              processor->transaction_solidifier, tangle, &transaction)) !=
         RC_OK) {
-      log_warning(PROCESSOR_LOGGER_ID, "Updating transaction status failed\n");
+      log_warning(logger_id, "Updating transaction status failed\n");
       return ret;
     }
 
@@ -113,8 +115,7 @@ static retcode_t process_transaction_bytes(processor_t const *const processor,
     // Broadcast the new transaction
     if ((ret = broadcaster_on_next(&processor->node->broadcaster,
                                    transaction_flex_trits)) != RC_OK) {
-      log_warning(PROCESSOR_LOGGER_ID,
-                  "Propagating packet to broadcaster failed\n");
+      log_warning(logger_id, "Propagating packet to broadcaster failed\n");
       goto failure;
     }
 
@@ -164,7 +165,7 @@ static retcode_t process_request_bytes(processor_t const *const processor,
                             processor->node->conf.request_hash_size_trit,
                             processor->node->conf.request_hash_size_trit) !=
       processor->node->conf.request_hash_size_trit) {
-    log_warning(PROCESSOR_LOGGER_ID, "Invalid request bytes\n");
+    log_warning(logger_id, "Invalid request bytes\n");
     return RC_PROCESSOR_INVALID_REQUEST;
   }
 
@@ -177,8 +178,7 @@ static retcode_t process_request_bytes(processor_t const *const processor,
   // Adds request to the responder queue
   if ((ret = responder_on_next(&processor->node->responder, neighbor,
                                request_hash)) != RC_OK) {
-    log_warning(PROCESSOR_LOGGER_ID,
-                "Propagating request to responder failed\n");
+    log_warning(logger_id, "Propagating request to responder failed\n");
     return ret;
   }
 
@@ -213,26 +213,25 @@ static retcode_t process_packet(processor_t const *const processor,
   protocol = packet->source.protocol == PROTOCOL_TCP ? "tcp" : "udp";
 
   if (neighbor) {
-    log_debug(PROCESSOR_LOGGER_ID,
-              "Processing packet from tethered node %s://%s:%d\n", protocol,
-              neighbor->endpoint.host, neighbor->endpoint.port);
+    log_debug(logger_id, "Processing packet from tethered node %s://%s:%d\n",
+              protocol, neighbor->endpoint.host, neighbor->endpoint.port);
     neighbor->nbr_all_tx++;
 
-    log_debug(PROCESSOR_LOGGER_ID, "Processing transaction bytes\n");
+    log_debug(logger_id, "Processing transaction bytes\n");
     if ((ret = process_transaction_bytes(processor, tangle, neighbor, packet,
                                          hash)) != RC_OK) {
-      log_warning(PROCESSOR_LOGGER_ID, "Processing transaction bytes failed\n");
+      log_warning(logger_id, "Processing transaction bytes failed\n");
       goto done;
     }
 
-    log_debug(PROCESSOR_LOGGER_ID, "Processing request bytes\n");
+    log_debug(logger_id, "Processing request bytes\n");
     if ((ret = process_request_bytes(processor, neighbor, packet, hash)) !=
         RC_OK) {
-      log_warning(PROCESSOR_LOGGER_ID, "Processing request bytes failed\n");
+      log_warning(logger_id, "Processing request bytes failed\n");
       goto done;
     }
   } else {
-    log_debug(PROCESSOR_LOGGER_ID,
+    log_debug(logger_id,
               "Discarding packet from non-tethered node %s://%s:%d\n", protocol,
               packet->source.ip, packet->source.port);
     // TODO Testnet add non-tethered neighbor
@@ -258,8 +257,7 @@ static void *processor_routine(processor_t *const processor) {
   }
 
   if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
-    log_critical(PROCESSOR_LOGGER_ID,
-                 "Initializing tangle connection failed\n");
+    log_critical(logger_id, "Initializing tangle connection failed\n");
     return NULL;
   }
 
@@ -324,7 +322,7 @@ static void *processor_routine(processor_t *const processor) {
                             HASH_LENGTH_TRIT);
 
       if (process_packet(processor, &tangle, &packets[j], flex_hash) != RC_OK) {
-        log_warning(PROCESSOR_LOGGER_ID, "Processing packet failed\n");
+        log_warning(logger_id, "Processing packet failed\n");
       }
     }
   }
@@ -333,7 +331,7 @@ static void *processor_routine(processor_t *const processor) {
   lock_handle_destroy(&lock_cond);
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
-    log_critical(PROCESSOR_LOGGER_ID, "Destroying tangle connection failed\n");
+    log_critical(logger_id, "Destroying tangle connection failed\n");
   }
 
   free(curl);
@@ -358,7 +356,7 @@ retcode_t processor_init(processor_t *const processor, node_t *const node,
     return RC_NULL_PARAM;
   }
 
-  logger_helper_enable(PROCESSOR_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id = logger_helper_enable(PROCESSOR_LOGGER_ID, LOGGER_DEBUG, true);
 
   processor->running = false;
   processor->queue = NULL;
@@ -377,12 +375,12 @@ retcode_t processor_start(processor_t *const processor) {
     return RC_NULL_PARAM;
   }
 
-  log_info(PROCESSOR_LOGGER_ID, "Spawning processor thread\n");
+  log_info(logger_id, "Spawning processor thread\n");
   processor->running = true;
   if (thread_handle_create(&processor->thread,
                            (thread_routine_t)processor_routine,
                            processor) != 0) {
-    log_critical(PROCESSOR_LOGGER_ID, "Spawning processor thread failed\n");
+    log_critical(logger_id, "Spawning processor thread failed\n");
     return RC_FAILED_THREAD_SPAWN;
   }
 
@@ -396,10 +394,10 @@ retcode_t processor_stop(processor_t *const processor) {
     return RC_OK;
   }
 
-  log_info(PROCESSOR_LOGGER_ID, "Shutting down processor thread\n");
+  log_info(logger_id, "Shutting down processor thread\n");
   processor->running = false;
   if (thread_handle_join(processor->thread, NULL) != 0) {
-    log_error(PROCESSOR_LOGGER_ID, "Shutting down processor thread failed\n");
+    log_error(logger_id, "Shutting down processor thread failed\n");
     return RC_FAILED_THREAD_JOIN;
   }
 
@@ -421,7 +419,7 @@ retcode_t processor_destroy(processor_t *const processor) {
   processor->transaction_solidifier = NULL;
   processor->milestone_tracker = NULL;
 
-  logger_helper_release(PROCESSOR_LOGGER_ID);
+  logger_helper_release(logger_id);
 
   return RC_OK;
 }
@@ -439,8 +437,7 @@ retcode_t processor_on_next(processor_t *const processor,
   rw_lock_handle_unlock(&processor->lock);
 
   if (ret != RC_OK) {
-    log_warning(PROCESSOR_LOGGER_ID,
-                "Pushing packet to processor queue failed\n");
+    log_warning(logger_id, "Pushing packet to processor queue failed\n");
     return ret;
   } else {
     cond_handle_signal(&processor->cond);

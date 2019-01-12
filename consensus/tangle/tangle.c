@@ -12,14 +12,16 @@
 
 #define TANGLE_LOGGER_ID "tangle"
 
+static logger_id_t logger_id;
+
 retcode_t iota_tangle_init(tangle_t *const tangle,
                            connection_config_t const *const conf) {
-  logger_helper_enable(TANGLE_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id = logger_helper_enable(TANGLE_LOGGER_ID, LOGGER_DEBUG, true);
   return connection_init(&tangle->connection, conf);
 }
 
 retcode_t iota_tangle_destroy(tangle_t *const tangle) {
-  logger_helper_release(TANGLE_LOGGER_ID);
+  logger_helper_release(logger_id);
   return connection_destroy(&tangle->connection);
 }
 
@@ -76,7 +78,7 @@ retcode_t iota_tangle_transaction_load_hashes_of_approvers(
   }
 
   if (res != RC_OK) {
-    log_error(TANGLE_LOGGER_ID,
+    log_error(logger_id,
               "Failed in loading approvers, error code is: %" PRIu64 "\n", res);
   }
 
@@ -119,7 +121,7 @@ retcode_t iota_tangle_transaction_load_hashes_of_requests(
   }
 
   if (res != RC_OK) {
-    log_error(TANGLE_LOGGER_ID,
+    log_error(logger_id,
               "Failed in loading hash requests, error code is: %" PRIu64 "\n",
               res);
   }
@@ -144,7 +146,7 @@ retcode_t iota_tangle_transaction_load_hashes_of_tips(
   }
 
   if (res != RC_OK) {
-    log_error(TANGLE_LOGGER_ID,
+    log_error(logger_id,
               "Failed in loading hashes of tips, error code is: %" PRIu64 "\n",
               res);
   }
@@ -169,7 +171,7 @@ retcode_t iota_tangle_transaction_load_hashes_of_milestone_candidates(
   }
 
   if (res != RC_OK) {
-    log_error(TANGLE_LOGGER_ID,
+    log_error(logger_id,
               "Failed in loading hashes of milestone candidates, error code "
               "is: %" PRIu64 "\n",
               res);
