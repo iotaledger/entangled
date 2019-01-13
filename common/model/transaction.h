@@ -52,6 +52,11 @@ extern "C" {
 #define NUM_TRYTES_NONCE 27
 #define NUM_TRYTES_HASH 81
 
+// bundle essence = 486 trits
+#define NUM_TRITS_ESSENCE                                         \
+  (NUM_TRITS_ADDRESS + NUM_TRITS_VALUE + NUM_TRITS_OBSOLETE_TAG + \
+   NUM_TRITS_TIMESTAMP + NUM_TRITS_CURRENT_INDEX + NUM_TRITS_LAST_INDEX)
+
 /***********************************************************************************************************
  * Transaction data structure
  ***********************************************************************************************************/
@@ -399,6 +404,9 @@ static inline void transaction_set_arrival_timestamp(
  ***********************************************************************************************************/
 
 void transaction_reset(iota_transaction_t *const transaction);
+#ifdef DEBUG
+void transaction_obj_dump(iota_transaction_t *tx_obj);
+#endif
 
 uint8_t transaction_weight_magnitude(
     iota_transaction_t const *const transaction);

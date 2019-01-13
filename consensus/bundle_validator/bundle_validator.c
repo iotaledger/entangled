@@ -138,6 +138,7 @@ retcode_t iota_consensus_bundle_validator_validate(
   int64_t bundle_value = 0;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   bool valid_sig = true;
+  Kerl kerl = {};
 
   *status = BUNDLE_VALID;
 
@@ -199,7 +200,7 @@ retcode_t iota_consensus_bundle_validator_validate(
         break;
       }
 
-      calculate_bundle_hash(bundle, bundle_hash_calculated);
+      bundle_calculate_hash(bundle, &kerl, bundle_hash_calculated);
       if (memcmp(bundle_hash, bundle_hash_calculated, FLEX_TRIT_SIZE_243) !=
           0) {
         log_error(logger_id, "Bundle hash provided differs from calculated\n");

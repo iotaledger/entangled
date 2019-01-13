@@ -20,8 +20,6 @@ extern "C" {
 #include "common/trinary/trit_long.h"
 #include "utils/logger_helper.h"
 
-#define NUM_TRITS_ESSENCE 486
-
 typedef enum { DATA = 0, VALUE_OUT, VALUE_IN } transfer_type_e;
 
 /***********************************************************************************************************
