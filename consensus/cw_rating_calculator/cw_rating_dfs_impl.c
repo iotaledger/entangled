@@ -101,8 +101,8 @@ retcode_t cw_rating_calculate_dfs_ratings_from_approvers_map(
       return RC_CONSENSUS_CW_FAILED_IN_LIGHT_DFS;
     }
 
-    if ((res = hash_to_int64_t_map_add(cw_ratings, curr_hash,
-                                       sub_tangle_size))) {
+    if ((res =
+             hash_to_int64_t_map_add(cw_ratings, curr_hash, sub_tangle_size))) {
       log_error(logger_id, "Failed in light DFS, error code is: %" PRIu64 "\n",
                 res);
       return res;
