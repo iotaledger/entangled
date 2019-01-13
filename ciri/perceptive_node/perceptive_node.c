@@ -15,6 +15,8 @@
 
 #define PERCEPTIVE_NODE_LOGGER_ID "perceptive_node"
 
+static logger_id_t logger_id;
+
 /*
  * Private functions
  */
@@ -284,22 +286,21 @@ static double calculate_r_score_from_lf_prob(iota_perceptive_node_t *const pn,
 static void *perceptive_node_do_test(iota_perceptive_node_t *const pn) {
   double test_r_score;
   pn->test_thread_running = true;
-  log_info(PERCEPTIVE_NODE_LOGGER_ID, "In %s, running likelihood test\n",
-           __FUNCTION__);
+  log_info(logger_id, "In %s, running likelihood test\n", __FUNCTION__);
   if (cw_rating_dfs_do_dfs_from_db(
           &pn->cw_calc, pn->tangle, pn->monitoring_data.entry_point,
           pn->monitoring_data.base_approvers_map,
           &pn->monitoring_data.subtangle_size,
           pn->monitoring_data.monitoring_start_timestamp) != RC_OK) {
-    log_error(PERCEPTIVE_NODE_LOGGER_ID,
-              "In %s, failed in ratings calculation\n", __FUNCTION__);
+    log_error(logger_id, "In %s, failed in ratings calculation\n",
+              __FUNCTION__);
     goto cleanup;
   }
 
   double lf_score;
   if (calculate_lf_prob_value(pn, &lf_score) != RC_OK) {
-    log_error(PERCEPTIVE_NODE_LOGGER_ID,
-              "In %s, failed in LF score calculation\n", __FUNCTION__);
+    log_error(logger_id, "In %s, failed in LF score calculation\n",
+              __FUNCTION__);
     goto cleanup;
   }
 
@@ -308,10 +309,9 @@ static void *perceptive_node_do_test(iota_perceptive_node_t *const pn) {
   }
 
   test_r_score = calculate_r_score_from_lf_prob(pn, lf_score);
-  log_info(PERCEPTIVE_NODE_LOGGER_ID,
-           "In %s, Finished test for node %s with r value: %.f\n", __FUNCTION__,
-           pn->monitoring_data.monitored_neighbor.endpoint.host, DECIMAL_DIG,
-           lf_score);
+  log_info(logger_id, "In %s, Finished test for node %s with r value: %.f\n",
+           __FUNCTION__, pn->monitoring_data.monitored_neighbor.endpoint.host,
+           DECIMAL_DIG, lf_score);
 
 cleanup:
   double_array_free(pn->monitoring_data.test_lf_distribution_samples);
@@ -332,6 +332,7 @@ retcode_t iota_perceptive_node_init(struct iota_perceptive_node_s *const pn,
   neighbor_t_to_uint32_t_map_init(&pn->neighbors_to_recent_transactions_count,
                                   sizeof(neighbor_t));
   logger_helper_init(PERCEPTIVE_NODE_LOGGER_ID, LOGGER_DEBUG, true);
+
   pn->test_thread_running = false;
   pn->consensus = consensus;
   pn->monitoring_data.base_approvers_map = NULL;
@@ -379,7 +380,7 @@ retcode_t iota_perceptive_node_start(iota_perceptive_node_t *const pn) {
     return RC_NULL_PARAM;
   }
 
-  log_info(PERCEPTIVE_NODE_LOGGER_ID, "Starting perceptive node\n");
+  log_info(logger_id, "Starting perceptive node\n");
 
   // This function is noop atm
 
@@ -395,8 +396,7 @@ retcode_t iota_perceptive_node_stop(iota_perceptive_node_t *const pn) {
   log_info(PERCEPTIVE_NODE_LOGGER_ID, "Shutting down perceptive node thread\n");
   pn->test_thread_running = false;
   if (thread_handle_join(pn->thread, NULL) != 0) {
-    log_error(PERCEPTIVE_NODE_LOGGER_ID,
-              "Shutting down perceptive_node thread failed\n");
+    log_error(logger_id, "Shutting down perceptive_node thread failed\n");
     return RC_FAILED_THREAD_JOIN;
   }
 
@@ -417,7 +417,7 @@ retcode_t iota_perceptive_node_destroy(iota_perceptive_node_t *const pn) {
   }
   neighbor_t_to_uint32_t_map_free(&pn->neighbors_to_recent_transactions_count);
   destroy_monitoring_data(pn);
-  logger_helper_destroy(PERCEPTIVE_NODE_LOGGER_ID);
+  logger_helper_release(logger_id);
 
   return RC_OK;
 }
@@ -485,7 +485,7 @@ retcode_t iota_perceptive_node_on_next_transaction(
                pn->conf.test_sample_size) {
       clear_monitoring_data(pn);
     } else if (pn->test_thread_running) {
-      log_warning(PERCEPTIVE_NODE_LOGGER_ID,
+      log_warning(logger_id,
                   "Can't start another test when one is already running, maybe "
                   "increase "
                   "\"monitoring_interval_seconds\"? \n");
