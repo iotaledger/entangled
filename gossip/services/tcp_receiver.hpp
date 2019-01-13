@@ -22,15 +22,13 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
   ~TcpConnection();
 
  public:
-  void start();
-
- private:
-  void receive();
+  void start(uint16_t const port);
 
  private:
   receiver_service_t* service_;
   boost::asio::ip::tcp::socket socket_;
-  iota_packet_t packet_;
+  std::string remote_host_;
+  uint16_t remote_port_;
 };
 
 class TcpReceiverService {
@@ -40,7 +38,7 @@ class TcpReceiverService {
   ~TcpReceiverService();
 
  private:
-  void accept();
+  void accept(uint16_t const port);
 
  private:
   receiver_service_t* service_;

@@ -16,6 +16,9 @@ typedef struct receiver_service_s receiver_service_t;
 extern "C" {
 #endif
 
+retcode_t tcp_sender_endpoint_init(endpoint_t *const endpoint);
+retcode_t tcp_sender_endpoint_destroy(endpoint_t *const endpoint);
+
 /**
  * Sends a TCP packet to an endpoint
  *

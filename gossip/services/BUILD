@@ -28,6 +28,7 @@ cc_library(
         "//gossip:neighbor",
         "//utils:logger_helper",
         "@boost//:asio",
+        "@boost//:crc",
     ],
 )
 
@@ -40,6 +41,7 @@ cc_library(
         "//gossip:iota_packet",
         "//utils:logger_helper",
         "@boost//:asio",
+        "@boost//:crc",
     ],
 )
 
