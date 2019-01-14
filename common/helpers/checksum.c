@@ -20,7 +20,6 @@
 IOTA_EXPORT char* iota_checksum(const char* input, const size_t input_length,
                                 const size_t checksum_length) {
   Kerl kerl;
-  init_kerl(&kerl);
 
   if (checksum_length == 0) {
     return NULL;
@@ -50,7 +49,6 @@ IOTA_EXPORT flex_trit_t* iota_flex_checksum(const flex_trit_t* flex_trits,
                                             const size_t num_trits,
                                             const size_t checksum_length) {
   Kerl kerl;
-  init_kerl(&kerl);
 
   if (checksum_length == 0) {
     return NULL;

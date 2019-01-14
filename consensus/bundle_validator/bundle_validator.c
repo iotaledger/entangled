@@ -68,9 +68,6 @@ static retcode_t validate_signature(bundle_transactions_t const* const bundle,
   flex_trit_t digest[FLEX_TRIT_SIZE_243];
   size_t offset = 0, next_offset = 0;
 
-  init_kerl(&address_kerl);
-  init_kerl(&sig_frag_kerl);
-
   *is_valid = true;
 
   for (curr_tx = (iota_transaction_t*)utarray_eltptr(bundle, 0);
@@ -82,9 +79,9 @@ static retcode_t validate_signature(bundle_transactions_t const* const bundle,
     curr_inp_tx = curr_tx;
     offset = 0;
     next_offset = 0;
-    kerl_reset(&address_kerl);
+    init_kerl(&address_kerl);
     do {
-      kerl_reset(&sig_frag_kerl);
+      init_kerl(&sig_frag_kerl);
       next_offset = (offset + ISS_FRAGMENTS * RADIX - 1) % NUM_TRITS_HASH + 1;
       flex_trits_to_trits(key, NUM_TRITS_SIGNATURE,
                           transaction_signature(curr_inp_tx),
