@@ -322,6 +322,7 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
   transfer_t* tf = NULL;
   int64_t value;
 
+  init_kerl(kerl);
   // Calculate bundle hash
   for (i = 0; i < tx_len; i++) {
     tf = transfers[i];

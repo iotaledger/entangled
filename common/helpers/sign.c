@@ -49,8 +49,6 @@ IOTA_EXPORT char* iota_sign_address_gen(char const* const seed,
   iss_kerl_key_digest(key, key, key_length, &kerl);
   iss_kerl_address(key, key, security * HASH_LENGTH_TRIT, &kerl);
 
-  kerl_reset(&kerl);
-
   trits_to_trytes(key, (tryte_t*)address, HASH_LENGTH_TRIT);
   memset(key, 0, key_length * sizeof(trit_t));
 
@@ -132,8 +130,6 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_address_gen(
 
   iss_kerl_key_digest(key, key, key_length, &kerl);
   iss_kerl_address(key, key, security * HASH_LENGTH_TRIT, &kerl);
-
-  kerl_reset(&kerl);
 
   flex_trits_from_trits(address, HASH_LENGTH_TRIT, key, key_length,
                         HASH_LENGTH_TRIT);

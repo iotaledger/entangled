@@ -19,7 +19,6 @@ void test_bundle_hash(void) {
 
   transfer_t* transfers[1] = {transfer};
   Kerl kerl = {};
-  init_kerl(&kerl);
   transfer_ctx_t* transfer_ctx = transfer_ctx_new();
   transfer_ctx_init(transfer_ctx, transfers, 1);
   transfer_ctx_hash(transfer_ctx, &kerl, transfers, 1);
@@ -39,7 +38,6 @@ void test_value_out(void) {
 
   transfer_t* transfers[1] = {transfer};
   Kerl kerl = {};
-  init_kerl(&kerl);
   tf_iter = transfer_iterator_new(transfers, 1, &kerl, &TX);
   TEST_ASSERT_NOT_NULL(tf_iter);
   tf_iter->transaction = &TX;
@@ -79,7 +77,6 @@ void test_transfer_data(void) {
 
   transfer_t* transfers[1] = {transfer};
   Kerl kerl = {};
-  init_kerl(&kerl);
   tf_iter = transfer_iterator_new(transfers, 1, &kerl, NULL);
   TEST_ASSERT_NOT_NULL(tf_iter);
 
