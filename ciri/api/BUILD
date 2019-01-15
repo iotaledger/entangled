@@ -22,6 +22,8 @@ cc_library(
         "//gossip/components:broadcaster",
         "//utils:logger_helper",
         "//utils/handles:thread",
+        "@cJSON",
+        "@libmicrohttpd",
     ],
 )
 
