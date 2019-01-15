@@ -197,8 +197,3 @@ void mss_save(imss *m, trits_t b);
 
 /*! \brief Deserialize Merkle tree. */
 err_t mss_load(imss *m, trits_t *b);
-
-bool_t mss_test_store(imss *m, imss *m2, iprng *p, ispongos *s, iwots *w,
-                      mss_mt_height_t D);
-
-bool_t mss_test(imss *m, iprng *p, ispongos *s, iwots *w, mss_mt_height_t D);

@@ -44,5 +44,3 @@ void spongos_decr(ispongos *s, trits_t X, trits_t Y);
 void spongos_hash(ispongos *s, trits_t X, trits_t Y);
 
 void spongos_hashn(ispongos *s, size_t n, trits_t *Xs, trits_t Y);
-
-bool_t spongos_test(ispongos *s);

@@ -224,5 +224,3 @@ void trits_print2(char const *pfx, trits_t x, char const *sfx);
 #else
 #define trits_dbg_print(x)
 #endif
-
-bool_t trits_test();

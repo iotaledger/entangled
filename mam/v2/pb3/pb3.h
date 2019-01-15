@@ -100,5 +100,3 @@ err_t pb3_unwrap_squeeze_ntrytes(ispongos *s, trits_t *b, size_t n);
 
 void pb3_absorb_external_ntrytes(ispongos *s, trits_t t);
 void pb3_squeeze_external_ntrytes(ispongos *s, trits_t t);
-
-bool_t pb3_test();

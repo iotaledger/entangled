@@ -81,6 +81,3 @@ err_t prng_create(ialloc *a, iprng *p);
 
 /*! \brief Deallocate memory for PRNG secret key. */
 void prng_destroy(ialloc *a, iprng *p);
-
-bool_t prng_test(iprng *p /*!< [in] PRNG interface */
-);

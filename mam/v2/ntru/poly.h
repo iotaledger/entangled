@@ -29,6 +29,39 @@
 #define MAM2_POLY_N_LOG 10
 #define MAM2_POLY_N (1 << MAM2_POLY_N_LOG)
 
+/*!
+\brief γ²ⁿ ≡ γ γ⁻¹ ≡ 1 (mod q).
+\brief ωⁿ  ≡ ω ω⁻¹ ≡ 1 (mod q). ω ≡ γ² (mod q).
+\brief n n⁻¹ ≡ 1 (mod q).
+*/
+#if defined(MAM2_POLY_MRED_BINARY)
+#define MAM2_POLY_COEFF_GAMMA ((poly_coeff_t)4059)
+#define MAM2_POLY_COEFF_GAMMA_INV ((poly_coeff_t)2340)
+#define MAM2_POLY_COEFF_OMEGA ((poly_coeff_t)3835)
+#define MAM2_POLY_COEFF_OMEGA_INV ((poly_coeff_t)5601)
+#define MAM2_POLY_COEFF_N ((poly_coeff_t)10924)
+#define MAM2_POLY_COEFF_N_INV ((poly_coeff_t)64)
+#define MAM2_POLY_COEFF_ONE ((poly_coeff_t)4091)
+#define MAM2_POLY_COEFF_MINUS_ONE \
+  ((poly_coeff_t)MAM2_POLY_Q - MAM2_POLY_COEFF_ONE)
+
+/*! R = 2¹⁶. */
+#define MAM2_POLY_MRED_R_LOG 16
+/*! R⁻¹ = 9 2⁸ ≡ 2304 (mod q). */
+#define MAM2_POLY_MRED_RI 2304
+/*! q⁻¹ q - R R⁻¹ = 1 */
+#define MAM2_POLY_MRED_Q_INV 12287
+#else
+#define MAM2_POLY_COEFF_GAMMA ((poly_coeff_t)7)
+#define MAM2_POLY_COEFF_GAMMA_INV ((poly_coeff_t)-3511)
+#define MAM2_POLY_COEFF_OMEGA ((poly_coeff_t)49)
+#define MAM2_POLY_COEFF_OMEGA_INV ((poly_coeff_t)1254)
+#define MAM2_POLY_COEFF_N ((poly_coeff_t)1024)
+#define MAM2_POLY_COEFF_N_INV ((poly_coeff_t)-12)
+#define MAM2_POLY_COEFF_ONE ((poly_coeff_t)1)
+#define MAM2_POLY_COEFF_MINUS_ONE ((poly_coeff_t)-1)
+#endif
+
 /*! \brief Type of polynomial coefficeints mods (q).
 \note Depending on configuration coefficients may be
 represented in Montgomery reduced form.
@@ -91,5 +124,3 @@ bool_t poly_from_trits(poly_t f, trits_t t);
 void poly_to_trits(poly_t f, trits_t t);
 
 void poly_print(char const *s, poly_t f);
-
-bool_t poly_test();

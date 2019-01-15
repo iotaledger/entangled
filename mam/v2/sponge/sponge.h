@@ -116,6 +116,3 @@ void sponge_hashn(isponge *s,  /*!< [in] sponge interface */
                   trits_t *Xs, /*!< [in] input data blocks */
                   trits_t Y    /*!< [out] hash value */
 );
-
-/*! \brief Sponge test (AE). */
-bool_t sponge_test(isponge *s);

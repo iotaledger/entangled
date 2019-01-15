@@ -5,19 +5,6 @@ load(":defs.bzl", "TRINARY_INTERLEAVED_1_TRITS_PER_WORD_DEFS")
 load(":defs.bzl", "TRINARY_PACKED_1_TRITS_PER_WORD_DEFS")
 
 cc_library(
-    name = "mam",
-    srcs = ["mam.c"],
-    hdrs = ["mam.h"],
-    deps = [
-        ":defs",
-        ":list",
-        "//mam/v2/ntru",
-        "//mam/v2/pb3",
-        "//mam/v2/prng",
-    ],
-)
-
-cc_library(
     name = "defs",
     hdrs = ["defs.h"],
     defines = select({

@@ -70,5 +70,3 @@ bool_t ntru_decr(intru *n,    /*!< [in] NTRU interface */
 err_t ntru_create(ialloc *a, intru *n);
 
 void ntru_destroy(ialloc *a, intru *n);
-
-bool_t ntru_test(intru *n, ispongos *s, iprng *p);

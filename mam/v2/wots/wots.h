@@ -47,6 +47,8 @@ void wots_init(iwots *w,  /*!< [in,out] WOTS interface */
                isponge *s /*!< [in] Sponge interface */
 );
 
+trits_t wots_sk_trits(iwots *w);
+
 /*! \brief Generate WOTS private key. */
 void wots_gen_sk(iwots *w, /*!< [in] WOTS interface */
                  iprng *p, /*!< [in] PRNG interface */
@@ -99,5 +101,3 @@ err_t wots_create(ialloc *a, iwots *w);
 
 /*! \brief Deallocate memory for WOTS private key. */
 void wots_destroy(ialloc *a, iwots *w);
-
-bool_t wots_test(iwots *w, iprng *p);

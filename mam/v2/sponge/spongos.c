@@ -111,35 +111,3 @@ void spongos_hashn(ispongos *s, size_t n, trits_t *Xs, trits_t Y) {
   spongos_commit(s);
   spongos_squeeze(s, Y);
 }
-
-bool_t spongos_test(ispongos *s) {
-  bool_t r = 1;
-  MAM2_TRITS_DEF0(x, 243);
-  MAM2_TRITS_DEF0(y, 243);
-  MAM2_TRITS_DEF0(z, 243);
-  x = MAM2_TRITS_INIT(x, 243);
-  y = MAM2_TRITS_INIT(y, 243);
-  z = MAM2_TRITS_INIT(z, 243);
-
-  trits_set_zero(x);
-
-  spongos_init(s);
-  spongos_absorb(s, x);
-  spongos_squeeze(s, y);
-
-  spongos_init(s);
-  spongos_absorb(s, x);
-  spongos_commit(s);
-  spongos_encr(s, x, z);
-
-  r = r && trits_cmp_eq(y, z);
-
-  spongos_init(s);
-  spongos_absorb(s, x);
-  spongos_commit(s);
-  spongos_decr(s, z, z);
-
-  r = r && trits_cmp_eq(x, z);
-
-  return r;
-}
