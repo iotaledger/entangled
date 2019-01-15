@@ -40,6 +40,7 @@ typedef struct iota_api_s {
   iota_consensus_t *consensus;
   serializer_t serializer;
   serializer_type_t serializer_type;
+  void *opaque_state;
 } iota_api_t;
 
 /**
