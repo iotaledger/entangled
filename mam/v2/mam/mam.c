@@ -18,7 +18,7 @@
 #include "mam/v2/mam/mam.h"
 #include "mam/v2/pb3/pb3.h"
 
-err_t mam_mss_create(mam_ialloc *ma, imss *m, iprng *p, mss_mt_height_t d,
+err_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p, mss_mt_height_t d,
                      trits_t N1, trits_t N2) {
   err_t e = err_internal_error;
   ialloc *a;
@@ -46,7 +46,7 @@ err_t mam_mss_create(mam_ialloc *ma, imss *m, iprng *p, mss_mt_height_t d,
     m->sg->s = ma->create_sponge(a);
     err_guard(m->sg->s, err_bad_alloc);
 
-    m->w = mam_alloc(a, sizeof(iwots));
+    m->w = mam_alloc(a, sizeof(wots_t));
     err_guard(m->w, err_bad_alloc);
     err_bind(wots_create(a, m->w));
 
@@ -62,7 +62,7 @@ err_t mam_mss_create(mam_ialloc *ma, imss *m, iprng *p, mss_mt_height_t d,
   return e;
 }
 
-void mam_mss_destroy(mam_ialloc *ma, imss *m) {
+void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m) {
   ialloc *a;
   MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
@@ -86,20 +86,20 @@ void mam_mss_destroy(mam_ialloc *ma, imss *m) {
   mss_destroy(a, m);
 }
 
-trits_t mam_channel_id(mam_channel *ch) {
+trits_t mam_channel_id(mam_channel_t *ch) {
   return trits_from_rep(MAM2_CHANNEL_ID_SIZE, ch->id);
 }
-trits_t mam_channel_name(mam_channel *ch) { return ch->m->N1; }
-static size_t mam_channel_sig_size(mam_channel *ch) {
+trits_t mam_channel_name(mam_channel_t *ch) { return ch->m->N1; }
+static size_t mam_channel_sig_size(mam_channel_t *ch) {
   return MAM2_MSS_SIG_SIZE(ch->m->d);
 }
 
-err_t mam_channel_create(mam_ialloc *ma, /*!< [in] Allocator. */
-                         iprng *p,       /*! [in] Shared PRNG interface used to
-                                            generate WOTS private keys. */
+err_t mam_channel_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
+                         prng_t *p, /*! [in] Shared PRNG interface used to
+                                      generate WOTS private keys. */
                          mss_mt_height_t d, /*!< [in] MSS MT height. */
                          trits_t ch_name,   /*!< [in] Channel name. */
-                         mam_channel *ch    /*!< [out] Channel. */
+                         mam_channel_t *ch  /*!< [out] Channel. */
 ) {
   err_t e = err_internal_error;
 
@@ -116,8 +116,8 @@ err_t mam_channel_create(mam_ialloc *ma, /*!< [in] Allocator. */
   return e;
 }
 
-void mam_channel_destroy(mam_ialloc *ma, /*!< [in] Allocator. */
-                         mam_channel *ch /*!< [out] Channel. */
+void mam_channel_destroy(mam_ialloc_t *ma, /*!< [in] Allocator. */
+                         mam_channel_t *ch /*!< [out] Channel. */
 ) {
   MAM2_ASSERT(ma);
   MAM2_ASSERT(ch);
@@ -125,22 +125,22 @@ void mam_channel_destroy(mam_ialloc *ma, /*!< [in] Allocator. */
   mam_mss_destroy(ma, ch->m);
 }
 
-trits_t mam_endpoint_id(mam_endpoint *ep) {
+trits_t mam_endpoint_id(mam_endpoint_t *ep) {
   return trits_from_rep(MAM2_ENDPOINT_ID_SIZE, ep->id);
 }
-trits_t mam_endpoint_chname(mam_endpoint *ep) { return ep->m->N1; }
-trits_t mam_endpoint_name(mam_endpoint *ep) { return ep->m->N2; }
-static size_t mam_endpoint_sig_size(mam_endpoint *ep) {
+trits_t mam_endpoint_chname(mam_endpoint_t *ep) { return ep->m->N1; }
+trits_t mam_endpoint_name(mam_endpoint_t *ep) { return ep->m->N2; }
+static size_t mam_endpoint_sig_size(mam_endpoint_t *ep) {
   return MAM2_MSS_SIG_SIZE(ep->m->d);
 }
 
-err_t mam_endpoint_create(mam_ialloc *ma, /*!< [in] Allocator. */
-                          iprng *p,       /*! [in] Shared PRNG interface used to
-                                             generate WOTS private keys. */
+err_t mam_endpoint_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
+                          prng_t *p, /*! [in] Shared PRNG interface used to
+                                       generate WOTS private keys. */
                           mss_mt_height_t d, /*!< [in] MSS MT height. */
                           trits_t ch_name,   /*!< [in] Channel name. */
                           trits_t ep_name,   /*!< [in] Endpoint name. */
-                          mam_endpoint *ep   /*!< [out] Endpoint. */
+                          mam_endpoint_t *ep /*!< [out] Endpoint. */
 ) {
   err_t e = err_internal_error;
 
@@ -157,8 +157,8 @@ err_t mam_endpoint_create(mam_ialloc *ma, /*!< [in] Allocator. */
   return e;
 }
 
-void mam_endpoint_destroy(mam_ialloc *ma,  /*!< [in] Allocator. */
-                          mam_endpoint *ep /*!< [out] Endpoint. */
+void mam_endpoint_destroy(mam_ialloc_t *ma,  /*!< [in] Allocator. */
+                          mam_endpoint_t *ep /*!< [out] Endpoint. */
 ) {
   MAM2_ASSERT(ma);
   MAM2_ASSERT(ep);
@@ -166,17 +166,17 @@ void mam_endpoint_destroy(mam_ialloc *ma,  /*!< [in] Allocator. */
   mam_mss_destroy(ma, ep->m);
 }
 
-trits_t mam_psk_id(mam_psk *p) {
+trits_t mam_psk_id(mam_psk_t *p) {
   return trits_from_rep(MAM2_PSK_ID_SIZE, p->id);
 }
-trits_t mam_psk_trits(mam_psk *p) {
+trits_t mam_psk_trits(mam_psk_t *p) {
   return trits_from_rep(MAM2_PSK_SIZE, p->psk);
 }
 
-trits_t mam_ntru_pk_trits(mam_ntru_pk *p) {
+trits_t mam_ntru_pk_trits(mam_ntru_pk_t *p) {
   return trits_from_rep(MAM2_NTRU_PK_SIZE, p->pk);
 }
-trits_t mam_ntru_pk_id(mam_ntru_pk *p) {
+trits_t mam_ntru_pk_id(mam_ntru_pk_t *p) {
   return trits_from_rep(MAM2_NTRU_ID_SIZE, p->pk);
 }
 
@@ -188,14 +188,14 @@ static size_t mam_wrap_mac_size() {
          /*  squeeze tryte mac[81]; */
          + pb3_sizeof_ntrytes(81);
 }
-static void mam_wrap_mac(ispongos *s, trits_t *b) {
+static void mam_wrap_mac(spongos_t *s, trits_t *b) {
   MAM2_ASSERT(mam_wrap_mac_size() <= trits_size(*b));
   /*  commit; */
   spongos_commit(s);
   /*  squeeze tryte mac[81]; */
   pb3_wrap_squeeze_ntrytes(s, b, 81);
 }
-static err_t mam_unwrap_mac(ispongos *s, trits_t *b) {
+static err_t mam_unwrap_mac(spongos_t *s, trits_t *b) {
   err_t e = err_internal_error;
 
   do {
@@ -209,7 +209,7 @@ static err_t mam_unwrap_mac(ispongos *s, trits_t *b) {
   return e;
 }
 
-static size_t mam_wrap_mssig_size(imss *m) {
+static size_t mam_wrap_mssig_size(mss_t *m) {
   size_t const sz = MAM2_MSS_SIG_SIZE(m->d) / 3;
   return 0
          /*  commit; */
@@ -220,7 +220,7 @@ static size_t mam_wrap_mssig_size(imss *m) {
          /*  skip tryte sig[sz]; */
          + pb3_sizeof_ntrytes(sz);
 }
-static void mam_wrap_mssig(ispongos *s, trits_t *b, imss *m) {
+static void mam_wrap_mssig(spongos_t *s, trits_t *b, mss_t *m) {
   MAM2_TRITS_DEF0(mac, MAM2_MSS_HASH_SIZE);
   size_t const sz = MAM2_MSS_SIG_SIZE(m->d) / 3;
   mac = MAM2_TRITS_INIT(mac, MAM2_MSS_HASH_SIZE);
@@ -236,8 +236,8 @@ static void mam_wrap_mssig(ispongos *s, trits_t *b, imss *m) {
   /*  skip tryte sig[sz]; */
   mss_sign(m, mac, pb3_trits_take(b, pb3_sizeof_ntrytes(sz)));
 }
-static err_t mam_unwrap_mssig(ispongos *s, trits_t *b, ispongos *ms,
-                              ispongos *ws, trits_t pk) {
+static err_t mam_unwrap_mssig(spongos_t *s, trits_t *b, spongos_t *ms,
+                              spongos_t *ws, trits_t pk) {
   err_t e = err_internal_error;
   bool_t r = 1;
 
@@ -262,7 +262,7 @@ static err_t mam_unwrap_mssig(ispongos *s, trits_t *b, ispongos *ms,
   return e;
 }
 
-static size_t mam_wrap_signedid_size(imss *m) {
+static size_t mam_wrap_signedid_size(mss_t *m) {
   size_t const sz = MAM2_MSS_SIG_SIZE(m->d) / 3;
   return 0
          /*  absorb tryte id[81]; */
@@ -270,7 +270,7 @@ static size_t mam_wrap_signedid_size(imss *m) {
          /*  MSSig mssig; */
          + mam_wrap_mssig_size(m);
 }
-static void mam_wrap_signedid(ispongos *s, trits_t *b, trits_t id, imss *m) {
+static void mam_wrap_signedid(spongos_t *s, trits_t *b, trits_t id, mss_t *m) {
   MAM2_ASSERT(mam_wrap_signedid_size(m) <= trits_size(*b));
   MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(id));
 
@@ -279,8 +279,8 @@ static void mam_wrap_signedid(ispongos *s, trits_t *b, trits_t id, imss *m) {
   /*  MSSig mssig; */
   mam_wrap_mssig(s, b, m);
 }
-static err_t mam_unwrap_signedid(ispongos *s, trits_t *b, trits_t id,
-                                 ispongos *ms, ispongos *ws, trits_t pk) {
+static err_t mam_unwrap_signedid(spongos_t *s, trits_t *b, trits_t id,
+                                 spongos_t *ms, spongos_t *ws, trits_t pk) {
   err_t e = err_internal_error;
   bool_t r = 1;
 
@@ -305,7 +305,7 @@ size_t mam_wrap_channel_size() {
          /*  absorb external tryte chid[81]; */
          + 0;
 }
-void mam_wrap_channel(ispongos *s, trits_t *b, tryte_t ver, trits_t chid) {
+void mam_wrap_channel(spongos_t *s, trits_t *b, tryte_t ver, trits_t chid) {
   MAM2_ASSERT(mam_wrap_channel_size() <= trits_size(*b));
   MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(chid));
 
@@ -314,7 +314,7 @@ void mam_wrap_channel(ispongos *s, trits_t *b, tryte_t ver, trits_t chid) {
   /*  absorb external tryte chid[81]; */
   pb3_absorb_external_ntrytes(s, chid);
 }
-err_t mam_unwrap_channel(ispongos *s, trits_t *b, tryte_t *ver, trits_t chid) {
+err_t mam_unwrap_channel(spongos_t *s, trits_t *b, tryte_t *ver, trits_t chid) {
   err_t e = err_internal_error;
   do {
     /*  absorb tryte ver; */
@@ -334,9 +334,9 @@ size_t mam_wrap_pubkey_chid_size() {
          /*  absorb null chid; */
          + 0;
 }
-void mam_wrap_pubkey_chid(ispongos *s, trits_t *b) { /*  absorb null chid; */
+void mam_wrap_pubkey_chid(spongos_t *s, trits_t *b) { /*  absorb null chid; */
 }
-err_t mam_unwrap_pubkey_chid(ispongos *s, trits_t *b) {
+err_t mam_unwrap_pubkey_chid(spongos_t *s, trits_t *b) {
   /*  absorb null chid; */
   return err_ok;
 }
@@ -346,14 +346,14 @@ size_t mam_wrap_pubkey_epid_size() {
          /*  absorb tryte epid[81]; */
          + pb3_sizeof_ntrytes(81);
 }
-void mam_wrap_pubkey_epid(ispongos *s, trits_t *b, trits_t epid) {
+void mam_wrap_pubkey_epid(spongos_t *s, trits_t *b, trits_t epid) {
   MAM2_ASSERT(mam_wrap_pubkey_epid_size() <= trits_size(*b));
   MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(epid));
 
   /*  absorb tryte epid[81]; */
   pb3_wrap_absorb_ntrytes(s, b, epid);
 }
-err_t mam_unwrap_pubkey_epid(ispongos *s, trits_t *b, trits_t epid) {
+err_t mam_unwrap_pubkey_epid(spongos_t *s, trits_t *b, trits_t epid) {
   err_t e = err_internal_error;
   do {
     /*  absorb tryte epid[81]; */
@@ -364,21 +364,25 @@ err_t mam_unwrap_pubkey_epid(ispongos *s, trits_t *b, trits_t epid) {
   return e;
 }
 
-size_t mam_wrap_pubkey_chid1_size(imss *m) { return mam_wrap_signedid_size(m); }
-void mam_wrap_pubkey_chid1(ispongos *s, trits_t *b, trits_t chid1, imss *m) {
+size_t mam_wrap_pubkey_chid1_size(mss_t *m) {
+  return mam_wrap_signedid_size(m);
+}
+void mam_wrap_pubkey_chid1(spongos_t *s, trits_t *b, trits_t chid1, mss_t *m) {
   mam_wrap_signedid(s, b, chid1, m);
 }
-err_t mam_unwrap_pubkey_chid1(ispongos *s, trits_t *b, trits_t chid1,
-                              ispongos *ms, ispongos *ws, trits_t pk) {
+err_t mam_unwrap_pubkey_chid1(spongos_t *s, trits_t *b, trits_t chid1,
+                              spongos_t *ms, spongos_t *ws, trits_t pk) {
   return mam_unwrap_signedid(s, b, chid1, ms, ws, pk);
 }
 
-size_t mam_wrap_pubkey_epid1_size(imss *m) { return mam_wrap_signedid_size(m); }
-void mam_wrap_pubkey_epid1(ispongos *s, trits_t *b, trits_t epid1, imss *m) {
+size_t mam_wrap_pubkey_epid1_size(mss_t *m) {
+  return mam_wrap_signedid_size(m);
+}
+void mam_wrap_pubkey_epid1(spongos_t *s, trits_t *b, trits_t epid1, mss_t *m) {
   mam_wrap_signedid(s, b, epid1, m);
 }
-err_t mam_unwrap_pubkey_epid1(ispongos *s, trits_t *b, trits_t epid1,
-                              ispongos *ms, ispongos *ws, trits_t pk) {
+err_t mam_unwrap_pubkey_epid1(spongos_t *s, trits_t *b, trits_t epid1,
+                              spongos_t *ms, spongos_t *ws, trits_t pk) {
   return mam_unwrap_signedid(s, b, epid1, ms, ws, pk);
 }
 
@@ -389,14 +393,14 @@ size_t mam_wrap_keyload_plain_size() {
          /*  absorb tryte key[81]; */
          + pb3_sizeof_ntrytes(81);
 }
-void mam_wrap_keyload_plain(ispongos *s, trits_t *b, trits_t key) {
+void mam_wrap_keyload_plain(spongos_t *s, trits_t *b, trits_t key) {
   MAM2_ASSERT(mam_wrap_keyload_plain_size() <= trits_size(*b));
   MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(key));
 
   /*  absorb tryte key[81]; */
   pb3_wrap_absorb_ntrytes(s, b, key);
 }
-err_t mam_unwrap_keyload_plain(ispongos *s, trits_t *b, trits_t key) {
+err_t mam_unwrap_keyload_plain(spongos_t *s, trits_t *b, trits_t key) {
   err_t e = err_internal_error;
   do {
     /*  absorb tryte key[81]; */
@@ -417,7 +421,7 @@ size_t mam_wrap_keyload_psk_size() {
          /*  crypt tryte ekey[81]; */
          + pb3_sizeof_ntrytes(81);
 }
-void mam_wrap_keyload_psk(ispongos *s, trits_t *b, trits_t key, trits_t id,
+void mam_wrap_keyload_psk(spongos_t *s, trits_t *b, trits_t key, trits_t id,
                           trits_t psk) {
   MAM2_ASSERT(mam_wrap_keyload_psk_size() <= trits_size(*b));
   MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(key));
@@ -433,7 +437,7 @@ void mam_wrap_keyload_psk(ispongos *s, trits_t *b, trits_t key, trits_t id,
   /*  crypt tryte ekey[81]; */
   pb3_wrap_crypt_ntrytes(s, b, key);
 }
-err_t mam_unwrap_keyload_psk(ispongos *s, trits_t *b, trits_t key,
+err_t mam_unwrap_keyload_psk(spongos_t *s, trits_t *b, trits_t key,
                              bool_t *key_found, trits_t pskid, trits_t psk) {
   err_t e = err_internal_error;
   MAM2_TRITS_DEF0(id, MAM2_PSK_ID_SIZE);
@@ -477,8 +481,8 @@ size_t mam_wrap_keyload_ntru_size() {
          /*  absorb tryte ekey[3072]; */
          + pb3_sizeof_ntrytes(3072);
 }
-void mam_wrap_keyload_ntru(ispongos *s, trits_t *b, trits_t key, trits_t pk,
-                           iprng *p, ispongos *ns, trits_t N) {
+void mam_wrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key, trits_t pk,
+                           prng_t *p, spongos_t *ns, trits_t N) {
   trits_t ekey;
 
   MAM2_ASSERT(mam_wrap_keyload_ntru_size() <= trits_size(*b));
@@ -492,9 +496,9 @@ void mam_wrap_keyload_ntru(ispongos *s, trits_t *b, trits_t key, trits_t pk,
   ntru_encr(pk, p, ns, key, N, ekey);
   spongos_absorb(s, ekey);
 }
-err_t mam_unwrap_keyload_ntru(ispongos *s, trits_t *b, trits_t key,
-                              bool_t *key_found, trits_t pkid, intru *n,
-                              ispongos *ns) {
+err_t mam_unwrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key,
+                              bool_t *key_found, trits_t pkid, ntru_t *n,
+                              spongos_t *ns) {
   err_t e = err_internal_error;
   trits_t ekey;
   MAM2_TRITS_DEF0(id, 81);
@@ -534,30 +538,30 @@ size_t mam_wrap_checksum_none_size() {
          /*  absorb null none; */
          + 0;
 }
-void mam_wrap_checksum_none(ispongos *s, trits_t *b) {
+void mam_wrap_checksum_none(spongos_t *s, trits_t *b) {
   /*  absorb null none; */
 }
-err_t mam_unwrap_checksum_none(ispongos *s, trits_t *b) {
+err_t mam_unwrap_checksum_none(spongos_t *s, trits_t *b) {
   /*  absorb null none; */
   return err_ok;
 }
 
 size_t mam_wrap_checksum_mac_size() { return mam_wrap_mac_size(); }
-void mam_wrap_checksum_mac(ispongos *s, trits_t *b) { mam_wrap_mac(s, b); }
-err_t mam_unwrap_checksum_mac(ispongos *s, trits_t *b) {
+void mam_wrap_checksum_mac(spongos_t *s, trits_t *b) { mam_wrap_mac(s, b); }
+err_t mam_unwrap_checksum_mac(spongos_t *s, trits_t *b) {
   return mam_unwrap_mac(s, b);
 }
 
-size_t mam_wrap_checksum_mssig_size(imss *m) { return mam_wrap_mssig_size(m); }
-void mam_wrap_checksum_mssig(ispongos *s, trits_t *b, imss *m) {
+size_t mam_wrap_checksum_mssig_size(mss_t *m) { return mam_wrap_mssig_size(m); }
+void mam_wrap_checksum_mssig(spongos_t *s, trits_t *b, mss_t *m) {
   mam_wrap_mssig(s, b, m);
 }
-err_t mam_unwrap_checksum_mssig(ispongos *s, trits_t *b, ispongos *ms,
-                                ispongos *ws, trits_t pk) {
+err_t mam_unwrap_checksum_mssig(spongos_t *s, trits_t *b, spongos_t *ms,
+                                spongos_t *ws, trits_t pk) {
   return mam_unwrap_mssig(s, b, ms, ws, pk);
 }
 
-size_t mam_send_msg_size(mam_send_msg_context *cfg) {
+size_t mam_send_msg_size(mam_send_msg_context_t *cfg) {
   size_t sz = 0;
 
   MAM2_ASSERT(cfg && cfg->ch);
@@ -622,38 +626,38 @@ size_t mam_send_msg_size(mam_send_msg_context *cfg) {
   return sz;
 }
 
-trits_t mam_send_msg_cfg_chid(mam_send_msg_context *cfg) {
+trits_t mam_send_msg_cfg_chid(mam_send_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->ch);
   return mam_channel_id(cfg->ch);
 }
-trits_t mam_send_msg_cfg_chid1(mam_send_msg_context *cfg) {
+trits_t mam_send_msg_cfg_chid1(mam_send_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->ch1);
   return mam_channel_id(cfg->ch1);
 }
-trits_t mam_send_msg_cfg_epid(mam_send_msg_context *cfg) {
+trits_t mam_send_msg_cfg_epid(mam_send_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->ep);
   return mam_endpoint_id(cfg->ep);
 }
-trits_t mam_send_msg_cfg_epid1(mam_send_msg_context *cfg) {
+trits_t mam_send_msg_cfg_epid1(mam_send_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->ep1);
   return mam_endpoint_id(cfg->ep1);
 }
-trits_t mam_send_msg_cfg_nonce(mam_send_msg_context *cfg) {
+trits_t mam_send_msg_cfg_nonce(mam_send_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   return trits_from_rep(MAM2_HEADER_NONCE_SIZE, cfg->nonce);
 }
-trits_t mam_send_msg_cfg_key(mam_send_msg_context *cfg) {
+trits_t mam_send_msg_cfg_key(mam_send_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   return trits_from_rep(MAM2_SPONGE_KEY_SIZE, cfg->key);
 }
 
-void mam_send_msg(mam_send_msg_context *cfg, trits_t *b) {
-  ispongos *s;
-  ispongos *fork;
+void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *b) {
+  spongos_t *s;
+  spongos_t *fork;
 
   MAM2_TRITS_DEF0(skn, MAM2_MSS_SKN_SIZE);
   skn = MAM2_TRITS_INIT(skn, MAM2_MSS_SKN_SIZE);
@@ -771,7 +775,8 @@ void mam_send_msg(mam_send_msg_context *cfg, trits_t *b) {
   trits_set_zero(mam_send_msg_cfg_key(cfg));
 }
 
-size_t mam_send_packet_size(mam_send_packet_context *cfg, size_t payload_size) {
+size_t mam_send_packet_size(mam_send_packet_context_t *cfg,
+                            size_t payload_size) {
   size_t sz = 0;
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(0 == payload_size % 3);
@@ -800,9 +805,9 @@ size_t mam_send_packet_size(mam_send_packet_context *cfg, size_t payload_size) {
   return sz;
 }
 
-void mam_send_packet(mam_send_packet_context *cfg, trits_t payload,
+void mam_send_packet(mam_send_packet_context_t *cfg, trits_t payload,
                      trits_t *b) {
-  ispongos *s;
+  spongos_t *s;
   tryte_t checksum;
 
   MAM2_ASSERT(cfg);
@@ -839,48 +844,48 @@ void mam_send_packet(mam_send_packet_context *cfg, trits_t payload,
   spongos_commit(s);
 }
 
-trits_t mam_recv_msg_cfg_chid(mam_recv_msg_context *cfg) {
+trits_t mam_recv_msg_cfg_chid(mam_recv_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->chid);
   return trits_from_rep(MAM2_CHANNEL_ID_SIZE, cfg->chid);
 }
-trits_t mam_recv_msg_cfg_chid1(mam_recv_msg_context *cfg) {
+trits_t mam_recv_msg_cfg_chid1(mam_recv_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->chid1);
   return trits_from_rep(MAM2_CHANNEL_ID_SIZE, cfg->chid1);
 }
-trits_t mam_recv_msg_cfg_epid(mam_recv_msg_context *cfg) {
+trits_t mam_recv_msg_cfg_epid(mam_recv_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->epid);
   return trits_from_rep(MAM2_ENDPOINT_ID_SIZE, cfg->epid);
 }
-trits_t mam_recv_msg_cfg_epid1(mam_recv_msg_context *cfg) {
+trits_t mam_recv_msg_cfg_epid1(mam_recv_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->epid1);
   return trits_from_rep(MAM2_ENDPOINT_ID_SIZE, cfg->epid1);
 }
-trits_t mam_recv_msg_cfg_nonce(mam_recv_msg_context *cfg) {
+trits_t mam_recv_msg_cfg_nonce(mam_recv_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   return trits_from_rep(MAM2_HEADER_NONCE_SIZE, cfg->nonce);
 }
-trits_t mam_recv_msg_cfg_key(mam_recv_msg_context *cfg) {
+trits_t mam_recv_msg_cfg_key(mam_recv_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   return trits_from_rep(MAM2_SPONGE_KEY_SIZE, cfg->key);
 }
-trits_t mam_recv_msg_cfg_psk_id(mam_recv_msg_context *cfg) {
+trits_t mam_recv_msg_cfg_psk_id(mam_recv_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   return trits_from_rep(MAM2_PSK_ID_SIZE, cfg->psk_id);
 }
-trits_t mam_recv_msg_cfg_ntru_id(mam_recv_msg_context *cfg) {
+trits_t mam_recv_msg_cfg_ntru_id(mam_recv_msg_context_t *cfg) {
   MAM2_ASSERT(cfg);
   return trits_from_rep(MAM2_NTRU_ID_SIZE, cfg->ntru_id);
 }
 
-err_t mam_recv_msg(mam_recv_msg_context *cfg, trits_t *b) {
+err_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
   err_t e = err_internal_error;
 
-  ispongos *s;
-  ispongos *fork;
+  spongos_t *s;
+  spongos_t *fork;
 
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->chid);
@@ -987,11 +992,11 @@ err_t mam_recv_msg(mam_recv_msg_context *cfg, trits_t *b) {
   return e;
 }
 
-err_t mam_recv_packet(mam_recv_packet_context *cfg, trits_t *b,
+err_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
                       trits_t *payload) {
   err_t e = err_internal_error;
   ialloc *a;
-  ispongos *s;
+  spongos_t *s;
   trits_t p = trits_null();
 
   MAM2_ASSERT(cfg);

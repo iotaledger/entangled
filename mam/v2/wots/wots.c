@@ -17,7 +17,7 @@
 
 #include "mam/v2/wots/wots.h"
 
-static void wots_calc_pks(ispongos *s, trits_t sk_pks, trits_t pk) {
+static void wots_calc_pks(spongos_t *s, trits_t sk_pks, trits_t pk) {
   size_t i, j;
   trits_t sk_part, pks = sk_pks;
 
@@ -34,7 +34,7 @@ static void wots_calc_pks(ispongos *s, trits_t sk_pks, trits_t pk) {
   spongos_hash(s, pks, pk);
 }
 
-static void wots_hash_sign(ispongos *s, trits_t sk_sig, trits_t H) {
+static void wots_hash_sign(spongos_t *s, trits_t sk_sig, trits_t H) {
   size_t i;
   trint9_t t = 0;
   trint3_t j, h;
@@ -65,7 +65,7 @@ static void wots_hash_sign(ispongos *s, trits_t sk_sig, trits_t H) {
   }
 }
 
-static void wots_hash_verify(ispongos *s, trits_t sig_pks, trits_t H) {
+static void wots_hash_verify(spongos_t *s, trits_t sig_pks, trits_t H) {
   size_t i;
   trint9_t t = 0;
   trint3_t j, h;
@@ -96,29 +96,29 @@ static void wots_hash_verify(ispongos *s, trits_t sig_pks, trits_t H) {
   }
 }
 
-trits_t wots_sk_trits(iwots *w) {
+trits_t wots_sk_trits(wots_t *w) {
   return trits_from_rep(MAM2_WOTS_SK_SIZE, w->sk);
 }
 
-void wots_init(iwots *w, isponge *s) {
+void wots_init(wots_t *w, sponge_t *s) {
   MAM2_ASSERT(w);
   MAM2_ASSERT(s);
   w->sg->s = s;
 }
 
-void wots_gen_sk(iwots *w, iprng *p, trits_t N) {
+void wots_gen_sk(wots_t *w, prng_t *p, trits_t N) {
   wots_gen_sk3(w, p, N, trits_null(), trits_null());
 }
 
-void wots_gen_sk2(iwots *w, iprng *p, trits_t N1, trits_t N2) {
+void wots_gen_sk2(wots_t *w, prng_t *p, trits_t N1, trits_t N2) {
   wots_gen_sk3(w, p, N1, N2, trits_null());
 }
 
-void wots_gen_sk3(iwots *w, iprng *p, trits_t N1, trits_t N2, trits_t N3) {
+void wots_gen_sk3(wots_t *w, prng_t *p, trits_t N1, trits_t N2, trits_t N3) {
   prng_gen3(p, MAM2_PRNG_DST_WOTSKEY, N1, N2, N3, wots_sk_trits(w));
 }
 
-void wots_calc_pk(iwots *w, trits_t pk) {
+void wots_calc_pk(wots_t *w, trits_t pk) {
   MAM2_TRITS_DEF0(sk_pks, MAM2_WOTS_SK_SIZE);
   sk_pks = MAM2_TRITS_INIT(sk_pks, MAM2_WOTS_SK_SIZE);
 
@@ -127,12 +127,12 @@ void wots_calc_pk(iwots *w, trits_t pk) {
   trits_set_zero(sk_pks);
 }
 
-void wots_sign(iwots *w, trits_t H, trits_t sig) {
+void wots_sign(wots_t *w, trits_t H, trits_t sig) {
   trits_copy(wots_sk_trits(w), sig);
   wots_hash_sign(w->sg, sig, H);
 }
 
-void wots_recover(ispongos *s, trits_t H, trits_t sig, trits_t pk) {
+void wots_recover(spongos_t *s, trits_t H, trits_t sig, trits_t pk) {
   MAM2_TRITS_DEF0(sig_pks, MAM2_WOTS_SK_SIZE);
   sig_pks = MAM2_TRITS_INIT(sig_pks, MAM2_WOTS_SK_SIZE);
 
@@ -143,7 +143,7 @@ void wots_recover(ispongos *s, trits_t H, trits_t sig, trits_t pk) {
   spongos_hash(s, sig_pks, pk);
 }
 
-bool_t wots_verify(ispongos *s, trits_t H, trits_t sig, trits_t pk) {
+bool_t wots_verify(spongos_t *s, trits_t H, trits_t sig, trits_t pk) {
   MAM2_TRITS_DEF0(sig_pk, MAM2_WOTS_PK_SIZE);
   sig_pk = MAM2_TRITS_INIT(sig_pk, MAM2_WOTS_PK_SIZE);
 
@@ -151,11 +151,11 @@ bool_t wots_verify(ispongos *s, trits_t H, trits_t sig, trits_t pk) {
   return trits_cmp_eq(pk, sig_pk);
 }
 
-err_t wots_create(ialloc *a, iwots *w) {
+err_t wots_create(ialloc *a, wots_t *w) {
   err_t e = err_internal_error;
   MAM2_ASSERT(w);
   do {
-    memset(w, 0, sizeof(iwots));
+    memset(w, 0, sizeof(wots_t));
     w->sk = mam_words_alloc(a, MAM2_WORDS(MAM2_WOTS_SK_SIZE));
     err_guard(w->sk, err_bad_alloc);
     e = err_ok;
@@ -163,7 +163,7 @@ err_t wots_create(ialloc *a, iwots *w) {
   return e;
 }
 
-void wots_destroy(ialloc *a, iwots *w) {
+void wots_destroy(ialloc *a, wots_t *w) {
   MAM2_ASSERT(w);
   mam_words_free(a, w->sk);
   w->sk = 0;

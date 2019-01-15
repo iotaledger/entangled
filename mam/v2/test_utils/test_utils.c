@@ -31,32 +31,32 @@ void test_f(void *buf, word_t *s) {
   trits_copy(y, x);
 }
 
-intru *test_ntru_init(test_ntru_t *n) {
+ntru_t *test_ntru_init(test_ntru_t *n) {
   n->n.id = n->id;
   n->n.sk = n->sk;
   n->n.f = n->f;
   return &n->n;
 }
 
-iprng *test_prng_init(test_prng_t *p, isponge *s) {
+prng_t *test_prng_init(test_prng_t *p, sponge_t *s) {
   p->p.s = s;
   p->p.k = p->key;
   return &p->p;
 }
 
-isponge *test_sponge_init(test_sponge_t *s) {
+sponge_t *test_sponge_init(test_sponge_t *s) {
   s->s.f = test_f;
   s->s.stack = s->stack;
   s->s.s = s->state;
   return &s->s;
 }
 
-ispongos *test_spongos_init(test_spongos_t *sg, isponge *s) {
+spongos_t *test_spongos_init(test_spongos_t *sg, sponge_t *s) {
   sg->s = s;
   return sg;
 }
 
-iwots *test_wots_init(test_wots_t *w, isponge *s) {
+wots_t *test_wots_init(test_wots_t *w, sponge_t *s) {
   w->w.sg->s = s;
   w->w.sk = w->sk;
   return &w->w;
@@ -67,48 +67,48 @@ iwots *test_wots_init(test_wots_t *w, isponge *s) {
 #endif
 
 #if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss(D, sfx)                  \
-  typedef struct _test_mss##sfx {             \
-    imss m;                                   \
-    word_t ap[MAM2_MSS_MT_AUTH_WORDS(D)];     \
-    uint32_t ap_check;                        \
-    word_t hs[MAM2_MSS_MT_HASH_WORDS(D, 1)];  \
-    uint32_t hs_check;                        \
-    mss_mt_node ns[MAM2_MSS_MT_NODES(D) + 1]; \
-    uint32_t ns_check;                        \
-    mss_mt_stack ss[MAM2_MSS_MT_STACKS(D)];   \
-    uint32_t ss_check;                        \
+#define def_test_mss(D, sfx)                    \
+  typedef struct _test_mss##sfx {               \
+    mss_t m;                                    \
+    word_t ap[MAM2_MSS_MT_AUTH_WORDS(D)];       \
+    uint32_t ap_check;                          \
+    word_t hs[MAM2_MSS_MT_HASH_WORDS(D, 1)];    \
+    uint32_t hs_check;                          \
+    mss_mt_node_t ns[MAM2_MSS_MT_NODES(D) + 1]; \
+    uint32_t ns_check;                          \
+    mss_mt_stack_t ss[MAM2_MSS_MT_STACKS(D)];   \
+    uint32_t ss_check;                          \
   } test_mss##sfx
 #else
 #define def_test_mss(D, sfx)         \
   typedef struct _test_mss##sfx {    \
-    imss m;                          \
+    mss_t m;                         \
     word_t mt[MAM2_MSS_MT_WORDS(D)]; \
     uint32_t mt_check;               \
   } test_mss##sfx
 #endif
 
 #if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss_init(D, sfx)                     \
-  static imss *test_mss_init##sfx(test_mss##sfx *m) { \
-    m->m.ap = m->ap;                                  \
-    m->ap_check = 0xdeadbeef;                         \
-    m->m.hs = m->hs;                                  \
-    m->hs_check = 0xdeadbeef;                         \
-    m->m.ns = m->ns;                                  \
-    m->ns_check = 0xdeadbeef;                         \
-    m->m.ss = m->ss;                                  \
-    m->ss_check = 0xdeadbeef;                         \
-    return &m->m;                                     \
+#define def_test_mss_init(D, sfx)                      \
+  static mss_t *test_mss_init##sfx(test_mss##sfx *m) { \
+    m->m.ap = m->ap;                                   \
+    m->ap_check = 0xdeadbeef;                          \
+    m->m.hs = m->hs;                                   \
+    m->hs_check = 0xdeadbeef;                          \
+    m->m.ns = m->ns;                                   \
+    m->ns_check = 0xdeadbeef;                          \
+    m->m.ss = m->ss;                                   \
+    m->ss_check = 0xdeadbeef;                          \
+    return &m->m;                                      \
   }
 #else
-#define def_test_mss_init(D, sfx)                               \
-  static imss *test_mss_init##sfx(test_mss##sfx *m, iwots *w) { \
-    m->m.d = D;                                                 \
-    m->m.ws = w;                                                \
-    m->m.mt = m->mt;                                            \
-    m->mt_check = 0xdeadbeef;                                   \
-    return &m->m;                                               \
+#define def_test_mss_init(D, sfx)                                 \
+  static mss_t *test_mss_init##sfx(test_mss##sfx *m, wots_t *w) { \
+    m->m.d = D;                                                   \
+    m->m.ws = w;                                                  \
+    m->m.mt = m->mt;                                              \
+    m->mt_check = 0xdeadbeef;                                     \
+    return &m->m;                                                 \
   }
 #endif
 
@@ -157,7 +157,7 @@ static char *bool_str(bool_t b) {
 
 void _sponge_hash(size_t Xn, char *X, size_t Yn, char *Y) {
   test_sponge_t _s[1];
-  isponge *s = test_sponge_init(_s);
+  sponge_t *s = test_sponge_init(_s);
 
   ialloc *a = 0;
   trits_t tX = trits_alloc(a, 3 * Xn);
@@ -176,7 +176,7 @@ void _sponge_hash(size_t Xn, char *X, size_t Yn, char *Y) {
 bool_t _sponge_point_test() {
   bool_t r = 1, ok;
   test_sponge_t _s[1];
-  isponge *s = test_sponge_init(_s);
+  sponge_t *s = test_sponge_init(_s);
 
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
   MAM2_TRITS_DEF0(X, 2 * MAM2_SPONGE_RATE + 3);
@@ -301,7 +301,7 @@ bool_t _sponge_point_test() {
 
 void _sponge_encr(size_t Kn, char *K, size_t Xn, char *X, size_t Yn, char *Y) {
   test_sponge_t _s[1];
-  isponge *s = test_sponge_init(_s);
+  sponge_t *s = test_sponge_init(_s);
 
   ialloc *a = 0;
   trits_t tK = trits_alloc(a, 3 * Kn);
@@ -322,7 +322,7 @@ void _sponge_encr(size_t Kn, char *K, size_t Xn, char *X, size_t Yn, char *Y) {
 
 void _sponge_decr(size_t Kn, char *K, size_t Yn, char *Y, size_t Xn, char *X) {
   test_sponge_t _s[1];
-  isponge *s = test_sponge_init(_s);
+  sponge_t *s = test_sponge_init(_s);
 
   ialloc *a = 0;
   trits_t tK = trits_alloc(a, 3 * Kn);
@@ -344,8 +344,8 @@ void _sponge_decr(size_t Kn, char *K, size_t Yn, char *Y, size_t Xn, char *X) {
 void _prng_gen(size_t Kn, char *K, size_t Nn, char *N, size_t Yn, char *Y) {
   test_sponge_t _s[1];
   test_prng_t _p[1];
-  isponge *s = test_sponge_init(_s);
-  iprng *p = test_prng_init(_p, s);
+  sponge_t *s = test_sponge_init(_s);
+  prng_t *p = test_prng_init(_p, s);
 
   ialloc *a = 0;
   trits_t tK = trits_alloc(a, 3 * Kn);
@@ -369,10 +369,10 @@ void _wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   test_spongos_t _sg[1];
   test_prng_t _p[1];
   test_wots_t _w[1];
-  isponge *s = test_sponge_init(_s);
-  ispongos *sg = test_spongos_init(_sg, s);
-  iprng *p = test_prng_init(_p, s);
-  iwots *w = test_wots_init(_w, s);
+  sponge_t *s = test_sponge_init(_s);
+  spongos_t *sg = test_spongos_init(_sg, s);
+  prng_t *p = test_prng_init(_p, s);
+  wots_t *w = test_wots_init(_w, s);
 
   ialloc *a = 0;
   trits_t tK = trits_alloc(a, 3 * Kn);
@@ -399,7 +399,7 @@ void _wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   trits_free(a, tsig);
 }
 
-void test_gen_sponge(iprng *p, isponge *s) {
+void test_gen_sponge(prng_t *p, sponge_t *s) {
 #define TEST_MAX_SIZE (MAM2_SPONGE_RATE * 3)
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
   MAM2_TRITS_DEF0(X, TEST_MAX_SIZE);
@@ -436,7 +436,7 @@ void test_gen_sponge(iprng *p, isponge *s) {
 #undef TEST_MAX_SIZE
 }
 
-void test_gen_spongos(iprng *p, ispongos *s) {
+void test_gen_spongos(prng_t *p, spongos_t *s) {
 #define TEST_MAX_SIZE (MAM2_SPONGE_RATE * 3)
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
   MAM2_TRITS_DEF0(X, TEST_MAX_SIZE);
@@ -475,7 +475,7 @@ void test_gen_spongos(iprng *p, ispongos *s) {
 #undef TEST_MAX_SIZE
 }
 
-void test_gen_prng(iprng *p, iprng *r, isponge *s) {
+void test_gen_prng(prng_t *p, prng_t *r, sponge_t *s) {
 #define TEST_MAX_SIZE (MAM2_SPONGE_RATE * 3)
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
   MAM2_TRITS_DEF0(N, TEST_MAX_SIZE);
@@ -518,7 +518,7 @@ void test_gen_prng(iprng *p, iprng *r, isponge *s) {
 #undef TEST_MAX_SIZE
 }
 
-void test_gen_wots(iprng *p, iwots *w, isponge *s, iprng *r) {
+void test_gen_wots(prng_t *p, wots_t *w, sponge_t *s, prng_t *r) {
 #define TEST_MAX_SIZE (MAM2_SPONGE_RATE * 3)
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
   MAM2_TRITS_DEF0(N, TEST_MAX_SIZE);
@@ -570,7 +570,7 @@ void test_gen_wots(iprng *p, iwots *w, isponge *s, iprng *r) {
 }
 
 #if 0
-void test_gen_mss(iprng *p, imss *m, iprng *r, isponge *s, iwots *w)
+void test_gen_mss(prng_t *p, mss_t *m, prng_t *r, sponge_t *s, wots_t *w)
 {
 #define TEST_MAX_SIZE (MAM2_SPONGE_RATE * 3)
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
@@ -625,7 +625,7 @@ void test_gen_mss(iprng *p, imss *m, iprng *r, isponge *s, iwots *w)
 #undef TEST_MAX_SIZE
 }
 
-void test_gen_ntru(iprng *p, intru *n)
+void test_gen_ntru(prng_t *p, ntru_t *n)
 {
 #define TEST_MAX_SIZE (MAM2_SPONGE_RATE * 3)
   MAM2_TRITS_DEF0(K, MAM2_PRNG_KEY_SIZE);
@@ -676,11 +676,11 @@ void test_gen_ntru(iprng *p, intru *n)
 }
 #endif
 
-static isponge *test_create_sponge(ialloc *a) {
+static sponge_t *test_create_sponge(ialloc *a) {
   test_sponge_t *t = mam2_alloc(a, sizeof(test_sponge_t));
   return test_sponge_init(t);
 }
-static void test_delete_sponge(ialloc *a, isponge *s) {
+static void test_delete_sponge(ialloc *a, sponge_t *s) {
   mam2_free(a, (test_sponge_t *)s);
 }
 
@@ -696,18 +696,18 @@ static void test_delete_sponge(ialloc *a, isponge *s) {
 //   test_mss _m[1];
 //   test_ntru_t _n[1];
 //
-//   isponge *s = test_sponge_init(_s);
-//   ispongos *sg = test_spongos_init(_sg, s);
-//   iprng *p = test_prng_init(_p, s);
-//   iprng *pa = test_prng_init(_pa, s);
-//   iprng *pb = test_prng_init(_pb, s);
-//   iwots *w = test_wots_init(_w, s);
-//   imss *m1 = test_mss_init1(_m1);
-//   imss *m2 = test_mss_init2(_m2);
-//   imss *m3 = test_mss_init3(_m3);
-//   imss *m4 = test_mss_init4(_m4);
-//   imss *m = test_mss_init(_m);
-//   intru *n = test_ntru_init(_n);
+//   sponge_t *s = test_sponge_init(_s);
+//   spongos_t *sg = test_spongos_init(_sg, s);
+//   prng_t *p = test_prng_init(_p, s);
+//   prng_t *pa = test_prng_init(_pa, s);
+//   prng_t *pb = test_prng_init(_pb, s);
+//   wots_t *w = test_wots_init(_w, s);
+//   mss_t *m1 = test_mss_init1(_m1);
+//   mss_t *m2 = test_mss_init2(_m2);
+//   mss_t *m3 = test_mss_init3(_m3);
+//   mss_t *m4 = test_mss_init4(_m4);
+//   mss_t *m = test_mss_init(_m);
+//   ntru_t *n = test_ntru_init(_n);
 //
 // #if 0
 //   test_gen_sponge(p, s);
@@ -736,21 +736,21 @@ static void test_delete_sponge(ialloc *a, isponge *s) {
 //   test_mss _m[1];
 //   test_ntru _n[1];
 //
-//   isponge *s = test_sponge_init(_s);
-//   ispongos *sg = test_spongos_init(_sg, s);
-//   iprng *p = test_prng_init(_p, s);
-//   iprng *pa = test_prng_init(_pa, s);
-//   iprng *pb = test_prng_init(_pb, s);
-//   iwots *w = test_wots_init(_w, s);
-//   imss *m1 = test_mss_init1(_m1);
-//   imss *m2 = test_mss_init2(_m2);
-//   imss *m3 = test_mss_init3(_m3);
-//   imss *m4 = test_mss_init4(_m4);
-//   imss *m42 = test_mss_init4(_m42);
-//   imss *m5 = test_mss_init5(_m5);
-//   imss *mx = test_mss_initx(_mx);
-//   imss *m = test_mss_init(_m);
-//   intru *n = test_ntru_init(_n);
+//   sponge_t *s = test_sponge_init(_s);
+//   spongos_t *sg = test_spongos_init(_sg, s);
+//   prng_t *p = test_prng_init(_p, s);
+//   prng_t *pa = test_prng_init(_pa, s);
+//   prng_t *pb = test_prng_init(_pb, s);
+//   wots_t *w = test_wots_init(_w, s);
+//   mss_t *m1 = test_mss_init1(_m1);
+//   mss_t *m2 = test_mss_init2(_m2);
+//   mss_t *m3 = test_mss_init3(_m3);
+//   mss_t *m4 = test_mss_init4(_m4);
+//   mss_t *m42 = test_mss_init4(_m42);
+//   mss_t *m5 = test_mss_init5(_m5);
+//   mss_t *mx = test_mss_initx(_mx);
+//   mss_t *m = test_mss_init(_m);
+//   ntru_t *n = test_ntru_init(_n);
 //
 //   bool_t r = 1, rr;
 //   clock_t clk;

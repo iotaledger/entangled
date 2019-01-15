@@ -18,27 +18,27 @@
 
 #include "mam/v2/prng/prng.h"
 
-static void prng_absorbn(isponge *s, size_t n, trits_t *KdN) {
+static void prng_absorbn(sponge_t *s, size_t n, trits_t *KdN) {
   sponge_init(s);
   sponge_absorbn(s, MAM2_SPONGE_CTL_KEY, n, KdN);
 }
 
-static void prng_squeeze(isponge *s, trits_t Y) {
+static void prng_squeeze(sponge_t *s, trits_t Y) {
   sponge_squeeze(s, MAM2_SPONGE_CTL_PRN, Y);
 }
 
-static trits_t prng_key_trits(iprng *p) {
+static trits_t prng_key_trits(prng_t *p) {
   return trits_from_rep(MAM2_PRNG_KEY_SIZE, p->k);
 }
 
-void prng_init(iprng *p, isponge *s, trits_t K) {
+void prng_init(prng_t *p, sponge_t *s, trits_t K) {
   MAM2_ASSERT(trits_size(K) == MAM2_PRNG_KEY_SIZE);
 
   p->s = s;
   trits_copy(K, prng_key_trits(p));
 }
 
-void prng_gen(iprng *p, trint3_t d, trits_t N, trits_t Y) {
+void prng_gen(prng_t *p, trint3_t d, trits_t N, trits_t Y) {
   MAM2_TRITS_DEF0(dt, 3);
   trits_t KdN[3];
   dt = MAM2_TRITS_INIT(dt, 3);
@@ -51,7 +51,7 @@ void prng_gen(iprng *p, trint3_t d, trits_t N, trits_t Y) {
   prng_squeeze(p->s, Y);
 }
 
-void prng_gen2(iprng *p, trint3_t d, trits_t N1, trits_t N2, trits_t Y) {
+void prng_gen2(prng_t *p, trint3_t d, trits_t N1, trits_t N2, trits_t Y) {
   MAM2_TRITS_DEF0(dt, 3);
   trits_t KdN[4];
   dt = MAM2_TRITS_INIT(dt, 3);
@@ -65,7 +65,7 @@ void prng_gen2(iprng *p, trint3_t d, trits_t N1, trits_t N2, trits_t Y) {
   prng_squeeze(p->s, Y);
 }
 
-void prng_gen3(iprng *p, trint3_t d, trits_t N1, trits_t N2, trits_t N3,
+void prng_gen3(prng_t *p, trint3_t d, trits_t N1, trits_t N2, trits_t N3,
                trits_t Y) {
   MAM2_TRITS_DEF0(dt, 3);
   trits_t KdN[5];
@@ -81,7 +81,7 @@ void prng_gen3(iprng *p, trint3_t d, trits_t N1, trits_t N2, trits_t N3,
   prng_squeeze(p->s, Y);
 }
 
-void prng_gen_str(iprng *p, trint3_t d, char const *nonce, trits_t Y) {
+void prng_gen_str(prng_t *p, trint3_t d, char const *nonce, trits_t Y) {
   size_t n;
   MAM2_TRITS_DEF0(N, MAM2_SPONGE_RATE);
   N = MAM2_TRITS_INIT(N, MAM2_SPONGE_RATE);
@@ -93,11 +93,11 @@ void prng_gen_str(iprng *p, trint3_t d, char const *nonce, trits_t Y) {
   prng_gen(p, d, N, Y);
 }
 
-err_t prng_create(ialloc *a, iprng *p) {
+err_t prng_create(ialloc *a, prng_t *p) {
   err_t e = err_internal_error;
   MAM2_ASSERT(p);
   do {
-    memset(p, 0, sizeof(iprng));
+    memset(p, 0, sizeof(prng_t));
     p->k = mam_words_alloc(a, MAM2_WORDS(MAM2_PRNG_KEY_SIZE));
     err_guard(p->k, err_bad_alloc);
     e = err_ok;
@@ -105,7 +105,7 @@ err_t prng_create(ialloc *a, iprng *p) {
   return e;
 }
 
-void prng_destroy(ialloc *a, iprng *p) {
+void prng_destroy(ialloc *a, prng_t *p) {
   MAM2_ASSERT(p);
   mam_words_free(a, p->k);
   p->k = 0;

@@ -20,7 +20,7 @@ static void ntru_test_f(void *buf, word_t *s) {
   trits_set1(x, 1);
 }
 
-static void ntru_test_gen(intru *n, trits_t rf, trits_t rg, trits_t pk) {
+static void ntru_test_gen(ntru_t *n, trits_t rf, trits_t rg, trits_t pk) {
   poly_coeff_t *f;
   MAM2_POLY_DEF(g);
   MAM2_POLY_DEF(h);
@@ -47,7 +47,7 @@ static void ntru_test_gen(intru *n, trits_t rf, trits_t rg, trits_t pk) {
   poly_to_trits(h, pk);
 }
 
-bool_t ntru_test(intru *n, ispongos *s, iprng *p) {
+bool_t ntru_test(ntru_t *n, spongos_t *s, prng_t *p) {
   bool_t r = 1;
   size_t i;
   size_t test_count = 30;

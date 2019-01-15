@@ -12,7 +12,7 @@
 
 #include "mam/v2/wots/wots.h"
 
-bool_t wots_test(iwots *w, iprng *p) {
+bool_t wots_test(wots_t *w, prng_t *p) {
   bool_t r = 1;
   MAM2_TRITS_DEF0(N, 18);
   MAM2_TRITS_DEF0(pk, MAM2_WOTS_PK_SIZE);

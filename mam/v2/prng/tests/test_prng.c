@@ -12,7 +12,7 @@
 
 #include "mam/v2/prng/prng.h"
 
-bool_t prng_test(iprng *p) {
+bool_t prng_test(prng_t *p) {
   bool_t r = 1;
   MAM2_TRITS_DEF0(K, MAM2_PRNG_KEY_SIZE);
   MAM2_TRITS_DEF0(N, 18);

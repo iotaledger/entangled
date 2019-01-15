@@ -12,7 +12,7 @@
 
 #include "mam/v2/sponge/sponge.h"
 
-static bool_t sponge_test_hash(isponge *s) {
+static bool_t sponge_test_hash(sponge_t *s) {
   bool_t r = 1;
   MAM2_TRITS_DEF0(X0, MAM2_SPONGE_RATE * 3);
   trits_t Xs[3], X;
@@ -45,7 +45,7 @@ static bool_t sponge_test_hash(isponge *s) {
   return r;
 }
 
-static bool_t sponge_test_ae(isponge *s) {
+static bool_t sponge_test_ae(sponge_t *s) {
 #define MAM2_SPONGE_TEST_MAX_K 1110
   size_t k, i;
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
@@ -114,7 +114,7 @@ static bool_t sponge_test_ae(isponge *s) {
   return 1;
 }
 
-bool_t sponge_test(isponge *s) {
+bool_t sponge_test(sponge_t *s) {
   return 1 && sponge_test_ae(s) && sponge_test_hash(s);
 }
 

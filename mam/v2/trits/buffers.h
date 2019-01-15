@@ -18,7 +18,7 @@
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
 
-typedef struct {
+typedef struct buffers_s {
   trits_t X;   /*!< the head */
   size_t n;    /*!< buffers count in the tail */
   trits_t *Xs; /*!< the tail buffers */

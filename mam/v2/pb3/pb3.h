@@ -82,21 +82,21 @@ err_t pb3_decode_ntrytes(trits_t ntrytes, trits_t *b);
 Protobuf3 spongos modifier handling
 */
 
-void pb3_wrap_absorb_tryte(ispongos *s, trits_t *b, tryte_t t);
-err_t pb3_unwrap_absorb_tryte(ispongos *s, trits_t *b, tryte_t *t);
-void pb3_wrap_absorb_trint(ispongos *s, trits_t *b, trint9_t t);
-err_t pb3_unwrap_absorb_trint(ispongos *s, trits_t *b, trint9_t *t);
-void pb3_wrap_absorb_longtrint(ispongos *s, trits_t *b, trint18_t t);
-err_t pb3_unwrap_absorb_longtrint(ispongos *s, trits_t *b, trint18_t *t);
-void pb3_wrap_absorb_sizet(ispongos *s, trits_t *b, size_t t);
-err_t pb3_unwrap_absorb_sizet(ispongos *s, trits_t *b, size_t *t);
+void pb3_wrap_absorb_tryte(spongos_t *s, trits_t *b, tryte_t t);
+err_t pb3_unwrap_absorb_tryte(spongos_t *s, trits_t *b, tryte_t *t);
+void pb3_wrap_absorb_trint(spongos_t *s, trits_t *b, trint9_t t);
+err_t pb3_unwrap_absorb_trint(spongos_t *s, trits_t *b, trint9_t *t);
+void pb3_wrap_absorb_longtrint(spongos_t *s, trits_t *b, trint18_t t);
+err_t pb3_unwrap_absorb_longtrint(spongos_t *s, trits_t *b, trint18_t *t);
+void pb3_wrap_absorb_sizet(spongos_t *s, trits_t *b, size_t t);
+err_t pb3_unwrap_absorb_sizet(spongos_t *s, trits_t *b, size_t *t);
 
-void pb3_wrap_absorb_ntrytes(ispongos *s, trits_t *b, trits_t t);
-err_t pb3_unwrap_absorb_ntrytes(ispongos *s, trits_t *b, trits_t t);
-void pb3_wrap_crypt_ntrytes(ispongos *s, trits_t *b, trits_t t);
-err_t pb3_unwrap_crypt_ntrytes(ispongos *s, trits_t *b, trits_t t);
-void pb3_wrap_squeeze_ntrytes(ispongos *s, trits_t *b, size_t n);
-err_t pb3_unwrap_squeeze_ntrytes(ispongos *s, trits_t *b, size_t n);
+void pb3_wrap_absorb_ntrytes(spongos_t *s, trits_t *b, trits_t t);
+err_t pb3_unwrap_absorb_ntrytes(spongos_t *s, trits_t *b, trits_t t);
+void pb3_wrap_crypt_ntrytes(spongos_t *s, trits_t *b, trits_t t);
+err_t pb3_unwrap_crypt_ntrytes(spongos_t *s, trits_t *b, trits_t t);
+void pb3_wrap_squeeze_ntrytes(spongos_t *s, trits_t *b, size_t n);
+err_t pb3_unwrap_squeeze_ntrytes(spongos_t *s, trits_t *b, size_t n);
 
-void pb3_absorb_external_ntrytes(ispongos *s, trits_t t);
-void pb3_squeeze_external_ntrytes(ispongos *s, trits_t t);
+void pb3_absorb_external_ntrytes(spongos_t *s, trits_t t);
+void pb3_squeeze_external_ntrytes(spongos_t *s, trits_t t);

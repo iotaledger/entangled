@@ -12,7 +12,7 @@
 
 #include "mam/v2/mss/mss.h"
 
-bool_t mss_test_store(imss *m, imss *m2, iprng *p, ispongos *s, iwots *w,
+bool_t mss_test_store(mss_t *m, mss_t *m2, prng_t *p, spongos_t *s, wots_t *w,
                       mss_mt_height_t D) {
   bool_t r = 1;
   err_t e;
@@ -74,7 +74,8 @@ bool_t mss_test_store(imss *m, imss *m2, iprng *p, ispongos *s, iwots *w,
   return r;
 }
 
-bool_t mss_test(imss *m, iprng *p, ispongos *s, iwots *w, mss_mt_height_t D) {
+bool_t mss_test(mss_t *m, prng_t *p, spongos_t *s, wots_t *w,
+                mss_mt_height_t D) {
   bool_t r = 1;
   MAM2_TRITS_DEF0(K, MAM2_PRNG_KEY_SIZE);
   mss_mt_height_t d;

@@ -19,7 +19,7 @@
 /*! \brief Array of trits.
 `p -> |...d...|......|`
 */
-typedef struct _trits_t {
+typedef struct trits_s {
   size_t n; /*!< total number of trits pointed to by `p` */
   size_t d; /*!< offset of the first trit; number of available trits is `n-d` */
   word_t *p; /*!< pointer to the words holding trits */
