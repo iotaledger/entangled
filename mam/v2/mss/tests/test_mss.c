@@ -15,7 +15,7 @@
 bool_t mss_test_store(mss_t *m, mss_t *m2, prng_t *p, spongos_t *s, wots_t *w,
                       mss_mt_height_t D) {
   bool_t r = 1;
-  err_t e;
+  retcode_t e;
   mss_mt_height_t d;
   MAM2_TRITS_DEF0(K, MAM2_PRNG_KEY_SIZE);
   MAM2_TRITS_DEF0(N, 24);
@@ -64,7 +64,7 @@ bool_t mss_test_store(mss_t *m, mss_t *m2, prng_t *p, spongos_t *s, wots_t *w,
       store = trits_take(store_, mss_stored_size(m));
       mss_save(m, store);
       e = mss_load(m2, &store);
-      MAM2_ASSERT(err_ok == e);
+      MAM2_ASSERT(RC_OK == e);
       mss_sign(m2, H, sig2);
 
       r = r && trits_cmp_eq(sig, sig2);

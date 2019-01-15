@@ -13,7 +13,7 @@
 #include "mam/v2/pb3/pb3.h"
 
 static bool_t pb3_test_sizet(size_t n) {
-  err_t e;
+  retcode_t e;
   bool_t ok = 1;
   size_t k = pb3_sizeof_sizet(n);
   size_t m = 0;
@@ -29,7 +29,7 @@ static bool_t pb3_test_sizet(size_t n) {
   e = pb3_decode_sizet(&m, &b);
   ok = ok && trits_is_empty(b);
 
-  return (e == err_ok && ok && m == n);
+  return (e == RC_OK && ok && m == n);
 }
 
 static bool_t pb3_test_sizets() {

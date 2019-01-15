@@ -15,8 +15,8 @@
 #ifndef __MAM_V2_MSS_MSS_H__
 #define __MAM_V2_MSS_MSS_H__
 
+#include "common/errors.h"
 #include "mam/v2/defs.h"
-#include "mam/v2/err.h"
 #include "mam/v2/prng/prng.h"
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/trits/trits.h"
@@ -192,7 +192,7 @@ bool_t mss_verify(
 \note Non Merkle tree related objects (WOTS, PRNG, Spongos interfaces)
       must be allocated separately.
 */
-err_t mss_create(ialloc *a, mss_t *m, mss_mt_height_t d);
+retcode_t mss_create(ialloc *a, mss_t *m, mss_mt_height_t d);
 
 /*! \brief Deallocate memory for internal Merkle tree structure.
 \note Pointer `m` must be freed afterwards.
@@ -205,6 +205,6 @@ size_t mss_stored_size(mss_t *m);
 void mss_save(mss_t *m, trits_t b);
 
 /*! \brief Deserialize Merkle tree. */
-err_t mss_load(mss_t *m, trits_t *b);
+retcode_t mss_load(mss_t *m, trits_t *b);
 
 #endif  // __MAM_V2_MSS_MSS_H__

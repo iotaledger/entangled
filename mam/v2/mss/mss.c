@@ -541,34 +541,33 @@ bool_t mss_verify(spongos_t *ms, spongos_t *ws, trits_t H, trits_t sig,
   return trits_cmp_eq(apk, pk);
 }
 
-err_t mss_create(ialloc *a, mss_t *m, mss_mt_height_t d) {
-  err_t e = err_internal_error;
+retcode_t mss_create(ialloc *a, mss_t *m, mss_mt_height_t d) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
   MAM2_ASSERT(m);
 
   do {
     memset(m, 0, sizeof(mss_t));
-    err_guard(0 <= d && d <= MAM2_MSS_MAX_D, err_invalid_argument);
+    err_guard(0 <= d && d <= MAM2_MSS_MAX_D, RC_MAM2_INVALID_ARGUMENT);
 
-#if defined(MAM2_MSS_TRAVERSAL)
-    m->ap = mam_words_alloc(a, MAM2_MSS_MT_AUTH_WORDS(d));
-    err_guard(m->ap, err_bad_alloc);
+#if defined(MAM2_MSS_TRAVERSAL) m->ap =
+    mam_words_alloc(a, MAM2_MSS_MT_AUTH_WORDS(d));
+    err_guard(m->ap, RC_OOM);
 
     /* add 1 extra hash for dirty hack (see mss.c) */
     m->hs = mam_words_alloc(a, MAM2_MSS_MT_HASH_WORDS(d, 1));
-    err_guard(m->hs, err_bad_alloc);
+    err_guard(m->hs, RC_OOM);
 
     /* add 1 extra node for dirty hack (see mss.c) */
     m->ns = mam_alloc(a, sizeof(mss_mt_node_t) * (MAM2_MSS_MT_NODES(d) + 1));
-    err_guard(m->ns, err_bad_alloc);
+    err_guard(m->ns, RC_OOM);
 
     m->ss = mam_alloc(a, sizeof(mss_mt_stack_t) * MAM2_MSS_MT_STACKS(d));
-    err_guard(m->ns, err_bad_alloc);
-#else
-    m->mt = mam_words_alloc(a, MAM2_MSS_MT_WORDS(d));
-    err_guard(m->mt, err_bad_alloc);
+    err_guard(m->ns, RC_OOM);
+#else m->mt = mam_words_alloc(a, MAM2_MSS_MT_WORDS(d));
+    err_guard(m->mt, RC_OOM);
 #endif
 
-    e = err_ok;
+    e = RC_OK;
   } while (0);
 
   /* do not free here in case of error */
@@ -685,25 +684,26 @@ void mss_save(mss_t *m, trits_t b) {
   mss_mt_save(m, trits_drop(b, 18));
 }
 
-err_t mss_load(mss_t *m, trits_t *b) {
-  err_t e = err_internal_error;
+retcode_t mss_load(mss_t *m, trits_t *b) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   mss_mt_height_t d;
   mss_mt_idx_t skn;
 
   do {
-    err_guard(4 + 14 <= trits_size(*b), err_buffer_too_small);
+    err_guard(4 + 14 <= trits_size(*b), RC_MAM2_BUFFER_TOO_SMALL);
     err_guard(mss_parse_skn(&d, &skn, trits_advance(b, 4 + 14)),
-              err_invalid_value);
-    err_guard(d == m->d, err_invalid_value);
+              RC_MAM2_INVALID_VALUE);
+    err_guard(d == m->d, RC_MAM2_INVALID_VALUE);
 
 #if defined(MAM2_MSS_TRAVERSAL)
     mss_mt_rewind(m, skn);
 #endif
-    err_guard(mss_mt_stored_size(m) <= trits_size(*b), err_buffer_too_small);
+    err_guard(mss_mt_stored_size(m) <= trits_size(*b),
+              RC_MAM2_BUFFER_TOO_SMALL);
     mss_mt_load(m, trits_advance(b, mss_mt_stored_size(m)));
 
-    e = err_ok;
+    e = RC_OK;
   } while (0);
 
   return e;

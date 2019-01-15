@@ -93,14 +93,14 @@ void prng_gen_str(prng_t *p, trint3_t d, char const *nonce, trits_t Y) {
   prng_gen(p, d, N, Y);
 }
 
-err_t prng_create(ialloc *a, prng_t *p) {
-  err_t e = err_internal_error;
+retcode_t prng_create(ialloc *a, prng_t *p) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
   MAM2_ASSERT(p);
   do {
     memset(p, 0, sizeof(prng_t));
     p->key = mam_words_alloc(a, MAM2_WORDS(MAM2_PRNG_KEY_SIZE));
-    err_guard(p->key, err_bad_alloc);
-    e = err_ok;
+    err_guard(p->k, RC_OOM);
+    e = RC_OK;
   } while (0);
   return e;
 }
