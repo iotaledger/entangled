@@ -60,6 +60,7 @@ void ntru_encr(trits_t pk,  /*!< [in] NTRU public key */
                trits_t N,   /*!< [in] nonce */
                trits_t Y    /*!< [out] encrypted K */
 );
+void ntru_encr_r(trits_t pk, ispongos *s, trits_t r, trits_t K, trits_t Y);
 
 bool_t ntru_decr(intru *n,    /*!< [in] NTRU interface */
                  ispongos *s, /*!< [in] Spongos interface */

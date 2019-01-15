@@ -16,7 +16,7 @@
 #include "mam/v2/ntru/poly_param.h"
 
 #if defined(MAM2_POLY_MRED_BINARY)
-static poly_coeff_t poly_coeff_mredd(poly_dcoeff_t m) {
+poly_coeff_t poly_coeff_mredd(poly_dcoeff_t m) {
   poly_coeff_t s;
   s = m;
 
@@ -38,7 +38,7 @@ static poly_coeff_t poly_coeff_mredd(poly_dcoeff_t m) {
 \brief Convert integer into internal polynomial coefficient representation.
 \note The input integer must be within the range [-(Q-1)/2,...,(Q-1)/2].
 */
-static poly_coeff_t poly_coeff_from_trint9(trint9_t t) {
+poly_coeff_t poly_coeff_from_trint9(trint9_t t) {
 #if defined(MAM2_POLY_MRED_BINARY)
   /* `c*R (mod q)` */
   poly_dcoeff_t d;
@@ -58,7 +58,7 @@ static poly_coeff_t poly_coeff_from_trint9(trint9_t t) {
 \brief Convert internal polynomial coefficient representation into an integer.
 \note The output integer will be within the range [-(Q-1)/2,...,(Q-1)/2].
 */
-static trint9_t poly_coeff_to_trint9(poly_coeff_t c) {
+trint9_t poly_coeff_to_trint9(poly_coeff_t c) {
 #if defined(MAM2_POLY_MRED_BINARY)
   /* `c/R (mods q)` */
   poly_dcoeff_t d = c;
@@ -72,7 +72,7 @@ static trint9_t poly_coeff_to_trint9(poly_coeff_t c) {
 #endif
 }
 
-static poly_coeff_t poly_coeff_from_trint1(trint1_t t) {
+poly_coeff_t poly_coeff_from_trint1(trint1_t t) {
   poly_coeff_t c = 0;
   MAM2_ASSERT_TRINT1(t);
   if (0 < t)
@@ -85,7 +85,7 @@ static poly_coeff_t poly_coeff_from_trint1(trint1_t t) {
 }
 
 /*! a + b (mods q) */
-static poly_coeff_t poly_coeff_add(poly_coeff_t a, poly_coeff_t b) {
+poly_coeff_t poly_coeff_add(poly_coeff_t a, poly_coeff_t b) {
 #if defined(MAM2_POLY_MRED_BINARY)
   /* u = a + b mod R */
   poly_coeff_t c = a + b;
@@ -105,7 +105,7 @@ static poly_coeff_t poly_coeff_add(poly_coeff_t a, poly_coeff_t b) {
 }
 
 /*! a - b (mods q) */
-static poly_coeff_t poly_coeff_sub(poly_coeff_t a, poly_coeff_t b) {
+poly_coeff_t poly_coeff_sub(poly_coeff_t a, poly_coeff_t b) {
 #if defined(MAM2_POLY_MRED_BINARY)
   /* u = a - b mod R */
   poly_coeff_t c = a < b ? MAM2_POLY_Q + a - b : a - b;
@@ -116,7 +116,7 @@ static poly_coeff_t poly_coeff_sub(poly_coeff_t a, poly_coeff_t b) {
 }
 
 /*! a * b (mods q) */
-static poly_coeff_t poly_coeff_mul(poly_coeff_t a, poly_coeff_t b) {
+poly_coeff_t poly_coeff_mul(poly_coeff_t a, poly_coeff_t b) {
 #if defined(MAM2_POLY_MRED_BINARY)
   return poly_coeff_mredd((poly_dcoeff_t)a * b);
 #else
@@ -128,8 +128,8 @@ static poly_coeff_t poly_coeff_mul(poly_coeff_t a, poly_coeff_t b) {
 }
 
 /*! a * b + c (mods q) */
-static poly_coeff_t poly_coeff_mul_add(poly_coeff_t a, poly_coeff_t b,
-                                       poly_coeff_t c) {
+poly_coeff_t poly_coeff_mul_add(poly_coeff_t a, poly_coeff_t b,
+                                poly_coeff_t c) {
 #if defined(MAM2_POLY_MRED_BINARY)
   return poly_coeff_add(poly_coeff_mul(a, b), c);
 #else
@@ -140,7 +140,7 @@ static poly_coeff_t poly_coeff_mul_add(poly_coeff_t a, poly_coeff_t b,
 #endif
 }
 
-static poly_coeff_t poly_coeff_inv(poly_coeff_t a) {
+poly_coeff_t poly_coeff_inv(poly_coeff_t a) {
   poly_coeff_t e, t;
   size_t i;
   MAM2_ASSERT(MAM2_POLY_Q == ((3 * (1 << 12)) + 1));
@@ -161,7 +161,7 @@ static poly_coeff_t poly_coeff_inv(poly_coeff_t a) {
 }
 
 #if 0
-static void poly_coeff_exp_table(poly_coeff_t u, size_t n, poly_coeff_t *t)
+ void poly_coeff_exp_table(poly_coeff_t u, size_t n, poly_coeff_t *t)
 {
   size_t i;
   poly_coeff_t c = MAM2_POLY_COEFF_ONE;
@@ -382,22 +382,19 @@ void poly_print(char const *s, poly_t f) {
   }
   printf("\n");
 }
-
-static bool_t poly_is_one(poly_t h) {
+bool_t poly_is_one(poly_t h) {
   size_t i;
   for (i = 1; i < MAM2_POLY_N; ++i)
     if (h[i] != 0) break;
   return (MAM2_POLY_COEFF_ONE == h[0]) && (i == MAM2_POLY_N) ? 1 : 0;
 }
-
-static bool_t poly_is_eq(poly_t f, poly_t g) {
+bool_t poly_is_eq(poly_t f, poly_t g) {
   bool_t r = 1;
   size_t i;
   for (i = 0; r && i < MAM2_POLY_N; ++i) r = (f[i] == g[i]) ? 1 : 0;
   return r;
 }
-
-static void poly_mul(poly_t f, poly_t g, poly_t h) {
+void poly_mul(poly_t f, poly_t g, poly_t h) {
   typedef trint9_t poly2_t[2 * MAM2_POLY_N - 1];
   poly2_t fg;
   size_t i, j;
@@ -412,21 +409,18 @@ static void poly_mul(poly_t f, poly_t g, poly_t h) {
     h[i] = poly_coeff_sub(fg[i], fg[i + MAM2_POLY_N]);
   h[i] = fg[i];
 }
-
-static poly_coeff_t poly_eval(poly_t f, poly_coeff_t x) {
+poly_coeff_t poly_eval(poly_t f, poly_coeff_t x) {
   poly_coeff_t r = 0;
   size_t i;
   for (i = MAM2_POLY_N; i--;) r = poly_coeff_mul_add(x, r, f[i]);
   return r;
 }
-
-static void poly_ntt2(poly_t f, poly_t t) {
+void poly_ntt2(poly_t f, poly_t t) {
   size_t i;
   for (i = 0; i < MAM2_POLY_N; ++i)
     t[i] = poly_eval(f, poly_gamma_exp[i + i + 1]);
 }
-
-static void poly_intt2(poly_t t, poly_t f) {
+void poly_intt2(poly_t t, poly_t f) {
   size_t i;
   for (i = 0; i < MAM2_POLY_N; ++i)
     f[i] =
@@ -434,8 +428,7 @@ static void poly_intt2(poly_t t, poly_t f) {
                                       poly_gamma_exp[2 * MAM2_POLY_N - i]),
                        poly_eval(t, poly_gamma_exp[2 * MAM2_POLY_N - (i + i)]));
 }
-
-static size_t poly_coeff_order(poly_coeff_t u, poly_coeff_t *ui) {
+size_t poly_coeff_order(poly_coeff_t u, poly_coeff_t *ui) {
   size_t i;
   poly_coeff_t v;
 
@@ -447,8 +440,7 @@ static size_t poly_coeff_order(poly_coeff_t u, poly_coeff_t *ui) {
 
   return 0;
 }
-
-static trint9_t poly_norm(poly_t f) {
+trint9_t poly_norm(poly_t f) {
   size_t i;
   trint9_t t, n = 0;
   for (i = 0; i != MAM2_POLY_N; ++i) {

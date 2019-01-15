@@ -86,6 +86,15 @@ typedef struct _mss_mt_stack {
   (MAM2_WORDS(MAM2_WOTS_PK_SIZE) * (2 * (1 << d) - 1))
 #endif
 
+#if defined(MAM2_MSS_TRAVERSAL)
+#define MAM2_MSS_MT_MAX_STORED_SIZE(d) \
+  ((d) * ((d) + 3) / 2 * MAM2_MSS_MT_HASH_SIZE)
+#else
+#define MAM2_MSS_MT_MAX_STORED_SIZE(d) \
+  (((1 << ((d) + 1)) - 1) * MAM2_MSS_MT_HASH_SIZE)
+#endif
+#define MAM2_MSS_MAX_STORED_SIZE(d) (4 + 14 + MAM2_MSS_MT_MAX_STORED_SIZE(d))
+
 /*! \brief MSS interface used to generate public key and sign. */
 typedef struct _imss {
   trint6_t d;     /*!< Merkle tree height. */

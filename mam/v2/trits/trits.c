@@ -436,13 +436,13 @@ trit_t trit_sub(trit_t y, trit_t s) {
   x = MAM2_TRIT_NORM(x);
   return x;
 }
-static void trit_swap_add(trit_t *x, trit_t *s) {
+void trit_swap_add(trit_t *x, trit_t *s) {
   trit_t y = *x + *s;
   y = MAM2_TRIT_NORM(y);
   *s = *x;
   *x = y;
 }
-static void trit_swap_sub(trit_t *y, trit_t *s) {
+void trit_swap_sub(trit_t *y, trit_t *s) {
   trit_t x = *y - *s;
   x = MAM2_TRIT_NORM(x);
   *s = x;

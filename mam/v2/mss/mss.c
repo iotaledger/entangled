@@ -599,15 +599,6 @@ void mss_destroy(ialloc *a, imss *m) {
 #endif
 }
 
-#if defined(MAM2_MSS_TRAVERSAL)
-#define MAM2_MSS_MT_MAX_STORED_SIZE(d) \
-  ((d) * ((d) + 3) / 2 * MAM2_MSS_MT_HASH_SIZE)
-#else
-#define MAM2_MSS_MT_MAX_STORED_SIZE(d) \
-  (((1 << ((d) + 1)) - 1) * MAM2_MSS_MT_HASH_SIZE)
-#endif
-#define MAM2_MSS_MAX_STORED_SIZE(d) (4 + 14 + MAM2_MSS_MT_MAX_STORED_SIZE(d))
-
 static size_t mss_mt_stored_size(imss *m) {
   size_t s = 0;
 #if defined(MAM2_MSS_TRAVERSAL)

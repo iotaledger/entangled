@@ -77,8 +77,7 @@ void ntru_gen(intru *n, iprng *p, trits_t N, trits_t pk) {
   trits_set_zero(r);
 }
 
-static void ntru_encr_r(trits_t pk, ispongos *s, trits_t r, trits_t K,
-                        trits_t Y) {
+void ntru_encr_r(trits_t pk, ispongos *s, trits_t r, trits_t K, trits_t Y) {
   bool_t ok = 0;
   MAM2_POLY_DEF(h);
   MAM2_POLY_DEF(t);

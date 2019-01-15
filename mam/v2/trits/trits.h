@@ -165,6 +165,9 @@ void trits_copy_sub(trits_t y, trits_t s, trits_t x);
 void trits_swap_add(trits_t x, trits_t s);
 void trits_swap_sub(trits_t y, trits_t s);
 
+void trit_swap_add(trit_t *x, trit_t *s);
+void trit_swap_sub(trit_t *y, trit_t *s);
+
 size_t trits_copy_add_min(trits_t x, trits_t s, trits_t y);
 size_t trits_copy_sub_min(trits_t x, trits_t s, trits_t y);
 size_t trits_swap_add_min(trits_t x, trits_t s);
