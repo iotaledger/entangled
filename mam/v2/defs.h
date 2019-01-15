@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2018 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * MAM is based on an original implementation & specification by apmi.bsu.by
+ * [ITSec Lab]
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
 /*!
 \file defs.h
 \brief MAM2 common definitions.
@@ -8,10 +18,6 @@
 #if 0
 #define MAM2_DEBUG
 #endif
-
-#define static
-#define static
-#define inline
 
 /*! \brief MAM2 allocator type; nothing for now. */
 typedef void ialloc;
