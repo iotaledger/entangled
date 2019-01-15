@@ -5,6 +5,7 @@ cc_library(
     srcs = ["pb3.c"],
     hdrs = ["pb3.h"],
     deps = [
+        "//mam/v2:alloc",
         "//mam/v2/mss",
     ],
 )

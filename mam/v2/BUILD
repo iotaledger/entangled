@@ -17,12 +17,18 @@ cc_library(
 )
 
 cc_library(
-    name = "list",
-    srcs = ["list.h"],
-    hdrs = ["list.h"],
+    name = "alloc",
+    srcs = ["alloc.c"],
+    hdrs = ["alloc.h"],
+    deps = [":defs"],
 )
 
 cc_library(
     name = "err",
     hdrs = ["err.h"],
+)
+
+cc_library(
+    name = "list",
+    hdrs = ["list.h"],
 )

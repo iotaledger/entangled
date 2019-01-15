@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["ntru.h"],
     deps = [
         ":poly",
+        "//mam/v2:alloc",
         "//mam/v2/prng",
         "//mam/v2/sponge:spongos",
     ],
