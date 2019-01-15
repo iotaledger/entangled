@@ -14,14 +14,19 @@
 extern "C" {
 #endif
 
-typedef struct {
+typedef struct get_transactions_to_approve_req_s {
   uint32_t depth;
-  flex_trit_t reference[FLEX_TRIT_SIZE_243];
+  flex_trit_t* reference;
 } get_transactions_to_approve_req_t;
 
 get_transactions_to_approve_req_t* get_transactions_to_approve_req_new();
 void get_transactions_to_approve_req_free(
-    get_transactions_to_approve_req_t** req);
+    get_transactions_to_approve_req_t** const req);
+void get_transactions_to_approve_req_set_depth(
+    get_transactions_to_approve_req_t* const req, uint32_t const depth);
+void get_transactions_to_approve_req_set_reference(
+    get_transactions_to_approve_req_t* const req,
+    flex_trit_t const* const reference);
 
 #ifdef __cplusplus
 }

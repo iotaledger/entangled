@@ -132,18 +132,16 @@ retcode_t state_delta_serialize(state_delta_t const *const delta,
 
 retcode_t state_delta_deserialize(byte_t const *const bytes, size_t const size,
                                   state_delta_t *const delta) {
+  retcode_t ret;
   uint64_t offset = 0;
-  state_delta_entry_t *new = NULL;
 
   for (size_t i = 0; i < size / (FLEX_TRIT_SIZE_243 + sizeof(int64_t)); i++) {
-    if ((new = malloc(sizeof(state_delta_entry_t))) == NULL) {
-      return RC_SNAPSHOT_OOM;
+    if ((ret = state_delta_add(
+             delta, bytes + offset,
+             *((int64_t *)(bytes + offset + FLEX_TRIT_SIZE_243)))) != RC_OK) {
+      return ret;
     }
-    memcpy(new->hash, bytes + offset, FLEX_TRIT_SIZE_243);
-    offset += FLEX_TRIT_SIZE_243;
-    memcpy(&new->value, bytes + offset, sizeof(int64_t));
-    offset += sizeof(int64_t);
-    HASH_ADD(hh, *delta, hash, FLEX_TRIT_SIZE_243, new);
+    offset += FLEX_TRIT_SIZE_243 + sizeof(int64_t);
   }
   return RC_OK;
 }

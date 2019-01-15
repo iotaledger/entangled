@@ -12,16 +12,16 @@
 #include <stdint.h>
 
 #include "common/errors.h"
-#include "common/trinary/trit_array.h"
+#include "common/trinary/flex_trit.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct tips_pair {
-  trit_array_p trunk;
-  trit_array_p branch;
-} tips_pair;
+  flex_trit_t trunk[FLEX_TRIT_SIZE_243];
+  flex_trit_t branch[FLEX_TRIT_SIZE_243];
+} tips_pair_t;
 
 #ifdef __cplusplus
 }

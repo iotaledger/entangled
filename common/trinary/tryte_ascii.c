@@ -13,23 +13,16 @@ void ascii_to_trytes(char const *const input, tryte_t *const output) {
 
   for (int i = 0; input[i]; i++) {
     dec = input[i];
-    first = dec % 27;
-    second = (dec - first) / 27;
+    first = dec % TRYTE_SPACE;
+    second = (dec - first) / TRYTE_SPACE;
     output[j++] = TRYTE_ALPHABET[first];
     output[j++] = TRYTE_ALPHABET[second];
   }
 }
 
-static int index_of_tryte(tryte_t tryte) {
-  if (tryte == '9') {
-    return 0;
-  }
-  return tryte - 'A' + 1;
-}
-
 void trytes_to_ascii(tryte_t const *const input, char *const output) {
   for (int i = 0; input[i]; i += 2) {
     output[i / 2] =
-        index_of_tryte(input[i]) + index_of_tryte(input[i + 1]) * 27;
+        INDEX_OF_TRYTE(input[i]) + INDEX_OF_TRYTE(input[i + 1]) * TRYTE_SPACE;
   }
 }

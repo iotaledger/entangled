@@ -5,56 +5,44 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <assert.h>
 #include <string.h>
 
-#include "common/defs.h"
 #include "common/trinary/trit_tryte.h"
 
-#define TRYTE_SPACE 27
-#define TRITS_TO_TRYTES_MAP                                                 \
-  {0, 0, 0}, {1, 0, 0}, {-1, 1, 0}, {0, 1, 0}, {1, 1, 0}, {-1, -1, 1},      \
-      {0, -1, 1}, {1, -1, 1}, {-1, 0, 1}, {0, 0, 1}, {1, 0, 1}, {-1, 1, 1}, \
-      {0, 1, 1}, {1, 1, 1}, {-1, -1, -1}, {0, -1, -1}, {1, -1, -1},         \
-      {-1, 0, -1}, {0, 0, -1}, {1, 0, -1}, {-1, 1, -1}, {0, 1, -1},         \
-      {1, 1, -1}, {-1, -1, 0}, {0, -1, 0}, {1, -1, 0}, {                    \
-    -1, 0, 0                                                                \
-  }
+static const trit_t TRYTES_TRITS_LUT[TRYTE_SPACE][NUMBER_OF_TRITS_IN_A_TRYTE] =
+    {{0, 0, 0},   {1, 0, 0},   {-1, 1, 0},  {0, 1, 0},   {1, 1, 0},
+     {-1, -1, 1}, {0, -1, 1},  {1, -1, 1},  {-1, 0, 1},  {0, 0, 1},
+     {1, 0, 1},   {-1, 1, 1},  {0, 1, 1},   {1, 1, 1},   {-1, -1, -1},
+     {0, -1, -1}, {1, -1, -1}, {-1, 0, -1}, {0, 0, -1},  {1, 0, -1},
+     {-1, 1, -1}, {0, 1, -1},  {1, 1, -1},  {-1, -1, 0}, {0, -1, 0},
+     {1, -1, 0},  {-1, 0, 0}};
 
-static const trit_t TRYTE_TO_TRITS_MAPPINGS[TRYTE_SPACE]
-                                           [NUMBER_OF_TRITS_IN_A_TRYTE] = {
-                                               TRITS_TO_TRYTES_MAP};
-
-size_t num_trytes_for_trits(size_t num_trits) {
-  return (num_trits + NUMBER_OF_TRITS_IN_A_TRYTE - 1) /
-         NUMBER_OF_TRITS_IN_A_TRYTE;
-}
-
-trit_t get_trit_at(tryte_t *const trytes, size_t const length, size_t index) {
+trit_t get_trit_at(tryte_t const *const trytes, size_t const length,
+                   size_t const index) {
   size_t tindex = index / 3U;
   if (tindex >= length) {
     return 0;
   }
   tryte_t tryte = trytes[tindex];
-  size_t cindex = tryte == '9' ? 0 : tryte - '@';
+  size_t cindex = INDEX_OF_TRYTE(tryte);
   tindex = index % 3U;
-  return TRYTE_TO_TRITS_MAPPINGS[cindex][tindex];
+  return TRYTES_TRITS_LUT[cindex][tindex];
 }
 
-uint8_t set_trit_at(tryte_t *const trytes, size_t const length, size_t index,
-                    trit_t trit) {
+uint8_t set_trit_at(tryte_t *const trytes, size_t const length,
+                    size_t const index, trit_t const trit) {
   size_t tindex = index / 3U;
   if (tindex >= length) {
     return 0;
   }
   tryte_t tryte = trytes[tindex];
-  size_t cindex = tryte == '9' ? 0 : tryte - '@';
+  size_t cindex = INDEX_OF_TRYTE(tryte);
   trit_t trits[3];
   if (cindex > 26) {
     // uninitialized
-    memcpy(trits, TRYTE_TO_TRITS_MAPPINGS[0], NUMBER_OF_TRITS_IN_A_TRYTE);
+    memcpy(trits, TRYTES_TRITS_LUT[0], NUMBER_OF_TRITS_IN_A_TRYTE);
   } else {
-    memcpy(trits, TRYTE_TO_TRITS_MAPPINGS[cindex], NUMBER_OF_TRITS_IN_A_TRYTE);
+    memcpy(trits, TRYTES_TRITS_LUT[cindex], NUMBER_OF_TRITS_IN_A_TRYTE);
   }
   size_t uindex = index % 3U;
   trits[uindex] = trit;
@@ -68,34 +56,32 @@ uint8_t set_trit_at(tryte_t *const trytes, size_t const length, size_t index,
 
 void trits_to_trytes(trit_t const *const trits, tryte_t *const trytes,
                      size_t const length) {
-  int j = 0,
-      end = length < NUMBER_OF_TRITS_IN_A_TRYTE ? length
-                                                : NUMBER_OF_TRITS_IN_A_TRYTE,
-      i = end;
-  for (; i-- > 0;) {
-    j *= 3;
-    j += trits[i];
+  int k = 0;
+
+  for (size_t i = 0, j = 0; i < length; i += RADIX, j++) {
+    k = 0;
+    for (size_t l = length - i < NUMBER_OF_TRITS_IN_A_TRYTE
+                        ? length - i
+                        : NUMBER_OF_TRITS_IN_A_TRYTE;
+         l-- > 0;) {
+      k *= RADIX;
+      k += trits[i + l];
+    }
+    if (k < 0) {
+      k += TRYTE_SPACE;
+    }
+    trytes[j] = TRYTE_ALPHABET[k];
   }
-  // int j = trits[0] + trits[1] * 3 + trits[2] * 9;
-  if (j < 0) {
-    j += TRYTE_SPACE;
-  }
-  trytes[0] = TRYTE_ALPHABET[(size_t)j];
-  if (length <= NUMBER_OF_TRITS_IN_A_TRYTE) {
-    return;
-  }
-  trits_to_trytes(&trits[NUMBER_OF_TRITS_IN_A_TRYTE], &trytes[1],
-                  length - NUMBER_OF_TRITS_IN_A_TRYTE);
 }
 
-void trytes_to_trits(tryte_t const *const tryte, trit_t *const trits,
+void trytes_to_trits(tryte_t const *const trytes, trit_t *const trits,
                      size_t const length) {
   if (length == 0) {
     return;
   }
-  memcpy(trits,
-         TRYTE_TO_TRITS_MAPPINGS[strchr(TRYTE_ALPHABET, tryte[0]) -
-                                 TRYTE_ALPHABET],
-         NUMBER_OF_TRITS_IN_A_TRYTE * sizeof(trit_t));
-  trytes_to_trits(&tryte[1], &trits[NUMBER_OF_TRITS_IN_A_TRYTE], length - 1);
+
+  for (size_t i = 0, j = 0; i < length; i++, j += RADIX) {
+    memcpy(trits + j, TRYTES_TRITS_LUT[INDEX_OF_TRYTE(trytes[i])],
+           NUMBER_OF_TRITS_IN_A_TRYTE);
+  }
 }

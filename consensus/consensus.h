@@ -18,7 +18,6 @@
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/snapshot/snapshot.h"
-#include "consensus/tangle/tangle.h"
 #include "consensus/tip_selector/tip_selector.h"
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "consensus/transaction_validator/transaction_validator.h"
@@ -32,7 +31,6 @@ typedef struct iota_consensus_s {
   ledger_validator_t ledger_validator;
   milestone_tracker_t milestone_tracker;
   snapshot_t snapshot;
-  tangle_t tangle;
   tip_selector_t tip_selector;
   transaction_validator_t transaction_validator;
   transaction_solidifier_t transaction_solidifier;
@@ -46,25 +44,27 @@ extern "C" {
  * Initializes all consensus components
  *
  * @param consensus The consensus
- * @param db_conf Database configuration
+ * @param tangle A tangle
  * @param transaction_requester A transaction requester
  * @param tips A tips cache
  *
  * @return a status code
  */
-retcode_t iota_consensus_init(iota_consensus_t* const consensus,
-                              connection_config_t const* const db_conf,
-                              requester_state_t* const transaction_requester,
-                              tips_cache_t* const tips);
+retcode_t iota_consensus_init(
+    iota_consensus_t* const consensus, tangle_t* const tangle,
+    transaction_requester_t* const transaction_requester,
+    tips_cache_t* const tips);
 
 /**
  * Starts all consensus components
  *
  * @param consensus The consensus
+ * @param tangle A tangle
  *
  * @return a status code
  */
-retcode_t iota_consensus_start(iota_consensus_t* const consensus);
+retcode_t iota_consensus_start(iota_consensus_t* const consensus,
+                               tangle_t* const tangle);
 
 /**
  * Stops all consensus components

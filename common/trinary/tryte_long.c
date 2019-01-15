@@ -5,26 +5,25 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/trinary/tryte_long.h"
 #include <math.h>
 
-#define TRYTE_SPACE 27
-#define TRYTE_STRING "9ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+#include "common/defs.h"
+#include "common/trinary/tryte_long.h"
 
 size_t min_trytes(int64_t const value) {
   // Need minimum 1 tryte to represent any number
   size_t num = 1;
   int64_t v_abs = value < 0 ? -value : value;
   // As long as value is > than (27^2)/2, need one more tryte
-  while (v_abs > pow(27, num) / 2) {
+  while (v_abs > pow(TRYTE_SPACE, num) / 2) {
     num++;
   }
   return num;
 }
 
-int64_t trytes_to_long(tryte_t const *const trytes, size_t const i) {
+int64_t trytes_to_long(tryte_t const *const trytes, size_t const length) {
   int64_t value = 0;
-  for (size_t j = 0; j < i; j++) {
+  for (size_t j = 0; j < length; j++) {
     tryte_t tryte = trytes[j];
     // Trivial case, tryte value is 0
     if (tryte == '9') {
@@ -33,8 +32,8 @@ int64_t trytes_to_long(tryte_t const *const trytes, size_t const i) {
     // Get the tryte index - it's also the tryte value
     tryte = tryte - '@';
     // For indexes > 13 the value is negative
-    if (tryte > 13) {
-      tryte = tryte - 27;
+    if (tryte > TRYTE_VALUE_MAX) {
+      tryte = tryte - TRYTE_SPACE;
     }
     // Accumulate the tryte values
     value += tryte * pow(TRYTE_SPACE, j);
@@ -62,10 +61,10 @@ size_t long_to_trytes(int64_t const value, tryte_t *const trytes) {
     // If the original value was negative, the tryte value should also be
     // negative
     if (negative) {
-      tryte = tryte ? 27 - tryte : tryte;
+      tryte = tryte ? TRYTE_SPACE - tryte : tryte;
       v_abs = -v_abs;
     }
-    trytes[i] = TRYTE_STRING[tryte];
+    trytes[i] = TRYTE_ALPHABET[tryte];
   }
   return num_trytes;
 }

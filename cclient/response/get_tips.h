@@ -15,11 +15,10 @@ extern "C" {
 #endif
 
 typedef struct get_tips_res_s {
-  hash243_queue_t hashes;
+  hash243_stack_t hashes;
 } get_tips_res_t;
 
 get_tips_res_t* get_tips_res_new();
-flex_trit_t* get_tips_res_hash_at(get_tips_res_t* res, size_t index);
 size_t get_tips_res_hash_num(get_tips_res_t* res);
 void get_tips_res_free(get_tips_res_t** res);
 

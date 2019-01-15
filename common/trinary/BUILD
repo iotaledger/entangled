@@ -105,6 +105,7 @@ cc_library(
     hdrs = ["tryte_long.h"],
     deps = [
         ":tryte",
+        "//common:defs",
     ],
 )
 

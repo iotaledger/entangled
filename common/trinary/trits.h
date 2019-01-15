@@ -12,4 +12,4 @@
 
 typedef int8_t trit_t;
 
-#endif
+#endif  // __COMMON_TRINARY_TRIT_H_

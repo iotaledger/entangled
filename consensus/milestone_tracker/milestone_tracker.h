@@ -16,9 +16,6 @@
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
-#define MILESTONE_VALIDATION_INTERVAL 10uLL
-#define SOLID_MILESTONE_RESCAN_INTERVAL 5000uLL
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,16 +30,15 @@ typedef struct transaction_solidifier_s transaction_solidifier_t;
 typedef struct milestone_tracker_s {
   bool running;
   iota_consensus_conf_t* conf;
-  tangle_t* tangle;
   snapshot_t* latest_snapshot;
   uint64_t milestone_start_index;
   thread_handle_t milestone_validator;
   uint64_t latest_milestone_index;
-  trit_array_p latest_milestone;
+  flex_trit_t latest_milestone[FLEX_TRIT_SIZE_243];
   thread_handle_t milestone_solidifier;
   uint64_t latest_solid_subtangle_milestone_index;
-  trit_array_p latest_solid_subtangle_milestone;
-  trit_array_p coordinator;
+  flex_trit_t latest_solid_subtangle_milestone[FLEX_TRIT_SIZE_243];
+  flex_trit_t coordinator[FLEX_TRIT_SIZE_243];
   ledger_validator_t* ledger_validator;
   transaction_solidifier_t* transaction_solidifier;
   hash243_queue_t candidates;
@@ -55,7 +51,6 @@ typedef struct milestone_tracker_s {
  *
  * @param mt The milestone tracker
  * @param conf Consensus configuration
- * @param tangle A tangle
  * @param snapshot An initial snapshot
  * @param lv A ledger validator
  *
@@ -63,7 +58,6 @@ typedef struct milestone_tracker_s {
  */
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
                                       iota_consensus_conf_t* const conf,
-                                      tangle_t* const tangle,
                                       snapshot_t* const snapshot,
                                       ledger_validator_t* const lv,
                                       transaction_solidifier_t* ts);
@@ -72,10 +66,12 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
  * Starts a milestone tracker
  *
  * @param mt The milestone tracker
+ * @param tangle A tangle
  *
  * @return a status code
  */
-retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt);
+retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt,
+                                       tangle_t* const tangle);
 
 /**
  * Stops a milestone tracker

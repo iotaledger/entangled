@@ -30,19 +30,21 @@ typedef struct core_s {
  * Initializes a core
  *
  * @param core The core
+ * @param tangle A tangle
  *
  * @return a status code
  */
-retcode_t core_init(core_t *const core);
+retcode_t core_init(core_t *const core, tangle_t *const tangle);
 
 /**
  * Starts a core
  *
  * @param core The core
+ * @param tangle A tangle
  *
  * @return a status code
  */
-retcode_t core_start(core_t *const core);
+retcode_t core_start(core_t *const core, tangle_t *const tangle);
 
 /**
  * Stops a core

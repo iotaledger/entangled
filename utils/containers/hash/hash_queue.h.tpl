@@ -31,7 +31,7 @@ retcode_t hash{SIZE}_queue_push(hash{SIZE}_queue_t *const queue,
 void hash{SIZE}_queue_pop(hash{SIZE}_queue_t *const queue);
 flex_trit_t *hash{SIZE}_queue_peek(hash{SIZE}_queue_t const queue);
 void hash{SIZE}_queue_free(hash{SIZE}_queue_t *const queue);
-size_t hash{SIZE}_queue_count(hash{SIZE}_queue_t *const queue);
+size_t hash{SIZE}_queue_count(hash{SIZE}_queue_t const queue);
 flex_trit_t *hash{SIZE}_queue_at(hash{SIZE}_queue_t *const queue, size_t index);
 
 #ifdef __cplusplus

@@ -13,6 +13,7 @@
 #include "common/errors.h"
 
 #define DEFAULT_API_PORT 14265
+#define DEFAULT_MAX_FIND_TRANSACTIONS 100000;
 #define DEFAULT_MAX_GET_TRYTES 10000;
 
 #ifdef __cplusplus
@@ -24,9 +25,15 @@ extern "C" {
 typedef struct iota_api_conf_s {
   // HTTP API listen port
   uint16_t port;
+  // The maximal number of transactions that may be returned by the
+  // 'findTransactions' API call. If the number of transactions found exceeds
+  // this number an error will be returned
+  size_t max_find_transactions;
   // Maximum number of transactions that will be returned by the 'getTrytes' API
   // call
   size_t max_get_trytes;
+  // Path of the DB file
+  char db_path[128];
 } iota_api_conf_t;
 
 /**

@@ -16,6 +16,7 @@ cc_library(
         "//common/helpers:digest",
         "//common/helpers:pow",
         "//common/helpers:sign",
+        "//utils:time",
         "//utils/containers/hash:hash243_queue",
     ],
 )

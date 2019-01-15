@@ -14,11 +14,10 @@
 #include "uthash.h"
 
 #include "common/errors.h"
-#include "common/trinary/trit_array.h"
+#include "common/trinary/flex_trit.h"
 #include "consensus/tangle/tangle.h"
-#include "utils/hash_maps.h"
-
-#define CW_RATING_CALCULATOR_LOGGER_ID "consensus_cw_rating_calculator"
+#include "utils/containers/hash/hash_int64_t_map.h"
+#include "utils/hash_indexed_map.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,14 +37,15 @@ typedef enum cw_calculation_implementation_e {
 } cw_calculation_implementation_t;
 
 typedef struct cw_calc_result {
-  hash_int_map_t cw_ratings;
+  hash_to_int64_t_map_t cw_ratings;
   hash_to_indexed_hash_set_map_t tx_to_approvers;
 } cw_calc_result;
 
 typedef struct {
   // find_transactions_request
-  retcode_t (*cw_rating_calculate)(const cw_rating_calculator_t *const,
-                                   trit_array_p entry_point,
+  retcode_t (*cw_rating_calculate)(cw_rating_calculator_t const *const,
+                                   tangle_t *const tangle,
+                                   flex_trit_t *entry_point,
                                    cw_calc_result *result);
 
 } cw_calculator_vtable;
@@ -55,20 +55,19 @@ struct cw_rating_calculator_base {
 };
 
 struct cw_rating_calculator_t {
-  tangle_t *tangle;
   cw_rating_calculator_base_t base;
 };
 
 extern retcode_t iota_consensus_cw_rating_init(
-    cw_rating_calculator_t *const cw_calc, tangle_t *const tangle,
+    cw_rating_calculator_t *const cw_calc,
     cw_calculation_implementation_t impl);
 
 extern retcode_t iota_consensus_cw_rating_destroy(
     cw_rating_calculator_t *cw_calc);
 
 extern retcode_t iota_consensus_cw_rating_calculate(
-    const cw_rating_calculator_t *cw_calc, trit_array_p entry_point,
-    cw_calc_result *out);
+    cw_rating_calculator_t const *const cw_calc, tangle_t *const tangle,
+    flex_trit_t const *entry_point, cw_calc_result *out);
 
 extern void cw_calc_result_destroy(cw_calc_result *const calc_result);
 

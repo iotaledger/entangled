@@ -19,15 +19,16 @@ static char *ciri_db_path = "ciri/api/tests/ciri.db";
 static connection_config_t config;
 static iota_api_t api;
 static node_t node;
+static tangle_t tangle;
 static iota_consensus_t consensus;
 
 void setUp(void) {
-  TEST_ASSERT(tangle_setup(&api.consensus->tangle, &config, test_db_path,
-                           ciri_db_path) == RC_OK);
+  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
+              RC_OK);
 }
 
 void tearDown(void) {
-  TEST_ASSERT(tangle_cleanup(&api.consensus->tangle, test_db_path) == RC_OK);
+  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
 }
 
 void test_broadcast_transactions_empty(void) {
@@ -43,7 +44,7 @@ void test_broadcast_transactions_empty(void) {
 
 void test_broadcast_transactions_invalid_tx(void) {
   broadcast_transactions_req_t *req = broadcast_transactions_req_new();
-  struct _iota_transaction tx;
+  iota_transaction_t tx;
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
 
   // Trying to broadcast an invalid transaction (invalid supply)
@@ -51,10 +52,10 @@ void test_broadcast_transactions_invalid_tx(void) {
   flex_trits_from_trytes(
       tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TX_1_OF_4_VALUE_BUNDLE_TRYTES,
       NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
-  transaction_deserialize_from_trits(&tx, tx_trits);
-  tx.value = -IOTA_SUPPLY - 1;
+  transaction_deserialize_from_trits(&tx, tx_trits, false);
+  transaction_set_value(&tx, -IOTA_SUPPLY - 1);
   transaction_serialize_on_flex_trits(&tx, tx_trits);
-  hash8019_stack_push(&req->trytes, tx_trits);
+  hash_array_push(req->trytes, tx_trits);
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req) == RC_OK);
 
   TEST_ASSERT_EQUAL_INT(broadcaster_size(&api.node->broadcaster), 0);
@@ -76,7 +77,7 @@ void test_broadcast_transactions(void) {
     flex_trits_from_trytes(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                            txs_trytes[i], NUM_TRYTES_SERIALIZED_TRANSACTION,
                            NUM_TRYTES_SERIALIZED_TRANSACTION);
-    hash8019_stack_push(&req->trytes, tx_trits);
+    hash_array_push(req->trytes, tx_trits);
   }
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req) == RC_OK);
 
@@ -88,6 +89,7 @@ void test_broadcast_transactions(void) {
 
 int main(void) {
   UNITY_BEGIN();
+  TEST_ASSERT(storage_init() == RC_OK);
 
   config.db_path = test_db_path;
   api.consensus = &consensus;
@@ -104,5 +106,6 @@ int main(void) {
   RUN_TEST(test_broadcast_transactions_invalid_tx);
   RUN_TEST(test_broadcast_transactions);
 
+  TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
 }
