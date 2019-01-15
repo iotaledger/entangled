@@ -15,7 +15,7 @@
 #pragma once
 
 #include "mam/v2/defs.h"
-#include "mam/v2/trits.h"
+#include "mam/v2/trits/trits.h"
 
 /*! \brief Sponge state rate. */
 #define MAM2_SPONGE_RATE 486

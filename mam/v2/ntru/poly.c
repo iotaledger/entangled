@@ -12,8 +12,8 @@
 \file poly.c
 \brief MAM2 NTRU polynomials arithmetic.
 */
-#include "poly.h"
-#include "poly_param.h"
+#include "mam/v2/ntru/poly.h"
+#include "mam/v2/ntru/poly_param.h"
 
 /*!
 \brief γ²ⁿ ≡ γ γ⁻¹ ≡ 1 (mod q).

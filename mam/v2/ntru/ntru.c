@@ -12,10 +12,11 @@
 \file ntru.c
 \brief MAM2 NTRU layer.
 */
-#include "ntru.h"
-#include "poly.h"
 
 #include <memory.h>
+
+#include "mam/v2/ntru/ntru.h"
+#include "mam/v2/ntru/poly.h"
 
 trits_t ntru_id_trits(intru *n) {
   return trits_from_rep(MAM2_NTRU_ID_SIZE, n->id);

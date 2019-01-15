@@ -16,7 +16,7 @@
 #pragma once
 
 #include "mam/v2/defs.h"
-#include "mam/v2/trits.h"
+#include "mam/v2/trits/trits.h"
 
 typedef struct {
   trits_t X;   /*!< the head */

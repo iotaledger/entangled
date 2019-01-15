@@ -12,9 +12,9 @@
 \file pb3.c
 \brief MAM2 Protobuf3 layer.
 */
-#include "pb3.h"
-#include "mss.h"
-#include "prng.h"
+#include "mam/v2/pb3/pb3.h"
+#include "mam/v2/mss/mss.h"
+#include "mam/v2/prng/prng.h"
 
 trits_t pb3_trits_take(trits_t *b, size_t n) { return trits_advance(b, n); }
 

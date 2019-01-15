@@ -18,12 +18,12 @@
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
 #include "mam/v2/list.h"
-#include "mam/v2/mss.h"
-#include "mam/v2/ntru.h"
-#include "mam/v2/prng.h"
-#include "mam/v2/sponge.h"
-#include "mam/v2/trits.h"
-#include "mam/v2/wots.h"
+#include "mam/v2/mss/mss.h"
+#include "mam/v2/ntru/ntru.h"
+#include "mam/v2/prng/prng.h"
+#include "mam/v2/sponge/sponge.h"
+#include "mam/v2/trits/trits.h"
+#include "mam/v2/wots/wots.h"
 
 typedef struct _mam_ialloc {
   ialloc *a; /*!< Context passed to `create_sponge` and `destroy_sponge`. */

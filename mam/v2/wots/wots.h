@@ -15,9 +15,10 @@
 #pragma once
 
 #include "mam/v2/defs.h"
-#include "mam/v2/prng.h"
-#include "mam/v2/spongos.h"
-#include "mam/v2/trits.h"
+#include "mam/v2/err.h"
+#include "mam/v2/prng/prng.h"
+#include "mam/v2/sponge/spongos.h"
+#include "mam/v2/trits/trits.h"
 
 /*! \brief WOTS public key size. */
 #define MAM2_WOTS_PK_SIZE 243
@@ -92,8 +93,6 @@ bool_t wots_verify(ispongos *s, /*!< [in] Spongos interface */
                    trits_t sig, /*!< [in] signature */
                    trits_t pk   /*!< [in] public key */
 );
-
-#include "mam/v2/err.h"
 
 /*! \brief Allocate memory for WOTS private key. */
 err_t wots_create(ialloc *a, iwots *w);

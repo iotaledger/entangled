@@ -12,9 +12,8 @@
 \file sponge.c
 \brief MAM2 Sponge layer.
 */
-#include "sponge.h"
-
-#include "buffers.h"
+#include "mam/v2/sponge/sponge.h"
+#include "mam/v2/trits/buffers.h"
 
 static trits_t sponge_state_trits(isponge *s) {
   return trits_from_rep(MAM2_SPONGE_WIDTH, s->s);

@@ -12,10 +12,11 @@
 \file mam.c
 \brief MAM2 layer.
 */
-#include "mam.h"
-#include "pb3.h"
 
 #include <string.h>
+
+#include "mam/v2/mam.h"
+#include "mam/v2/pb3/pb3.h"
 
 err_t mam_mss_create(mam_ialloc *ma, imss *m, iprng *p, mss_mt_height_t d,
                      trits_t N1, trits_t N2) {

@@ -12,8 +12,11 @@
 \file trits.c
 \brief Basic trinary array operations.
 */
-#include "trits.h"
-#include <malloc.h>
+
+#include <memory.h>
+#include <stdio.h>
+
+#include "mam/v2/trits/trits.h"
 
 static char const trinary_alphabet[] =
     "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"; /* [-13..13] */
@@ -642,8 +645,6 @@ void trits_free(ialloc *a, trits_t x) {
   }
 }
 
-#include <stdio.h>
-
 void trits_print(trits_t x) {
   for (; !trits_is_empty(x); x = trits_drop_min(x, 3))
     printf("%c", trits_get_char(x));
@@ -654,8 +655,6 @@ void trits_print2(char const *pfx, trits_t x, char const *sfx) {
   trits_print(x);
   if (sfx) printf("%s", sfx);
 }
-
-#include <memory.h>
 
 static bool_t trits_test_trit() {
   bool_t r = 1;

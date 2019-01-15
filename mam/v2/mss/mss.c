@@ -13,9 +13,10 @@
 \file mss.c
 \brief MAM2 MSS layer.
 */
-#include "mss.h"
 
 #include <memory.h>
+
+#include "mam/v2/mss/mss.h"
 
 #define MAM2_MSS_MAX_SKN(d) (((trint18_t)1 << (d)) - 1)
 

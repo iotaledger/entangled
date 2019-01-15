@@ -15,7 +15,7 @@
 #pragma once
 
 #include "mam/v2/defs.h"
-#include "mam/v2/trits.h"
+#include "mam/v2/trits/trits.h"
 
 /*! \brief Use Montgomery reduction. */
 /*#define MAM2_POLY_MRED_BINARY*/

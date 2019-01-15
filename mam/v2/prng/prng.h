@@ -15,8 +15,9 @@
 #pragma once
 
 #include "mam/v2/defs.h"
-#include "mam/v2/sponge.h"
-#include "mam/v2/trits.h"
+#include "mam/v2/err.h"
+#include "mam/v2/sponge/sponge.h"
+#include "mam/v2/trits/trits.h"
 
 /*! \brief PRNG key size. */
 #define MAM2_PRNG_KEY_SIZE 243
@@ -74,8 +75,6 @@ void prng_gen_str(iprng *p,          /*!< [in] PRNG interface */
                   char const *nonce, /*!< [in] nonce */
                   trits_t Y          /*!< [out] pseudorandom trits */
 );
-
-#include "mam/v2/err.h"
 
 /*! \brief Allocate memory for PRNG secret key. */
 err_t prng_create(ialloc *a, iprng *p);

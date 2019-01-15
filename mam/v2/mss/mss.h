@@ -17,10 +17,10 @@
 
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
-#include "mam/v2/prng.h"
-#include "mam/v2/spongos.h"
-#include "mam/v2/trits.h"
-#include "mam/v2/wots.h"
+#include "mam/v2/prng/prng.h"
+#include "mam/v2/sponge/spongos.h"
+#include "mam/v2/trits/trits.h"
+#include "mam/v2/wots/wots.h"
 
 /*! \brief Use Merkle tree traversal algorithm on MSS layer. */
 #define MAM2_MSS_TRAVERSAL
@@ -176,8 +176,6 @@ bool_t mss_verify(
     trits_t sig,  /*!< [in] signature */
     trits_t pk    /*!< [in] public key (Merkle-tree root) */
 );
-
-#include "mam/v2/err.h"
 
 /*! \brief Allocate memory for internal Merkle tree structure.
 \note `mss_init` must still be called afterwards.

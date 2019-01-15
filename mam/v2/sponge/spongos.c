@@ -12,8 +12,8 @@
 \file spongos.c
 \brief MAM2 Spongos layer.
 */
-#include "spongos.h"
-#include "sponge.h"
+#include "mam/v2/sponge/spongos.h"
+#include "mam/v2/sponge/sponge.h"
 
 static trits_t spongos_outer_trits(ispongos *s) {
   return trits_drop(sponge_outer_trits(s->s), s->pos);

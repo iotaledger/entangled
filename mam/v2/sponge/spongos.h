@@ -15,8 +15,7 @@
 #pragma once
 
 #include "mam/v2/defs.h"
-#include "mam/v2/trits.h"
-/*#include "mam/v2/sponge.h"*/
+#include "mam/v2/trits/trits.h"
 
 struct _isponge;
 typedef struct _ispongos {

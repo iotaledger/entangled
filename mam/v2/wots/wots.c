@@ -12,9 +12,10 @@
 \file wots.c
 \brief MAM2 WOTS layer.
 */
-#include "wots.h"
 
 #include <string.h>
+
+#include "mam/v2/wots/wots.h"
 
 static void wots_calc_pks(ispongos *s, trits_t sk_pks, trits_t pk) {
   size_t i, j;

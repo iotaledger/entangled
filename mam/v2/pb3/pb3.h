@@ -16,7 +16,8 @@
 
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
-#include "mam/v2/trits.h"
+#include "mam/v2/sponge/spongos.h"
+#include "mam/v2/trits/trits.h"
 
 trits_t pb3_trits_take(trits_t *b, size_t n);
 
@@ -80,7 +81,6 @@ err_t pb3_decode_ntrytes(trits_t ntrytes, trits_t *b);
 /*
 Protobuf3 spongos modifier handling
 */
-#include "mam/v2/spongos.h"
 
 void pb3_wrap_absorb_tryte(ispongos *s, trits_t *b, tryte_t t);
 err_t pb3_unwrap_absorb_tryte(ispongos *s, trits_t *b, tryte_t *t);

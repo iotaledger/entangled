@@ -12,10 +12,11 @@
 \file prng.c
 \brief MAM2 PRNG layer.
 */
-#include "prng.h"
 
 #include <memory.h>
 #include <string.h>
+
+#include "mam/v2/prng/prng.h"
 
 static void prng_absorbn(isponge *s, size_t n, trits_t *KdN) {
   sponge_init(s);

@@ -13,7 +13,7 @@
 \file buffers.c
 \brief Trits collection to simplify buffered operations.
 */
-#include "buffers.h"
+#include "mam/v2/trits/buffers.h"
 
 buffers_t buffers_init(size_t n, trits_t *Xs) {
   buffers_t bs;
