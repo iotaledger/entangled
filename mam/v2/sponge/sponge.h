@@ -12,7 +12,8 @@
 \file sponge.h
 \brief MAM2 Sponge layer.
 */
-#pragma once
+#ifndef __MAM_V2_SPONGE_SPONGE_H__
+#define __MAM_V2_SPONGE_SPONGE_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
@@ -116,3 +117,5 @@ void sponge_hashn(sponge_t *s, /*!< [in] sponge interface */
                   trits_t *Xs, /*!< [in] input data blocks */
                   trits_t Y    /*!< [out] hash value */
 );
+
+#endif  // __MAM_V2_SPONGE_SPONGE_H__

@@ -12,7 +12,8 @@
 \file defs.h
 \brief MAM2 common definitions.
 */
-#pragma once
+#ifndef __MAM_V2_DEFS_H__
+#define __MAM_V2_DEFS_H__
 
 /*! \brief Enable debug output macros. */
 #if 0
@@ -219,3 +220,5 @@ typedef uint8_t byte;
 #if 0
 #define MAM2_POLY_MRED_BINARY
 #endif
+
+#endif  // __MAM_V2_DEFS_H__

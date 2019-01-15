@@ -13,7 +13,8 @@
 \file mss.c
 \brief MAM2 MSS layer.
 */
-#pragma once
+#ifndef __MAM_V2_MSS_MSS_H__
+#define __MAM_V2_MSS_MSS_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
@@ -206,3 +207,5 @@ void mss_save(mss_t *m, trits_t b);
 
 /*! \brief Deserialize Merkle tree. */
 err_t mss_load(mss_t *m, trits_t *b);
+
+#endif  // __MAM_V2_MSS_MSS_H__

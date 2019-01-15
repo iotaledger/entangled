@@ -12,7 +12,8 @@
 \file pb3.h
 \brief MAM2 Protobuf3 layer.
 */
-#pragma once
+#ifndef __MAM_V2_PB3_PB3_H__
+#define __MAM_V2_PB3_PB3_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
@@ -100,3 +101,5 @@ err_t pb3_unwrap_squeeze_ntrytes(spongos_t *s, trits_t *b, size_t n);
 
 void pb3_absorb_external_ntrytes(spongos_t *s, trits_t t);
 void pb3_squeeze_external_ntrytes(spongos_t *s, trits_t t);
+
+#endif  // __MAM_V2_PB3_PB3_H__

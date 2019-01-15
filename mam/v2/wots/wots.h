@@ -12,7 +12,8 @@
 \file wots.h
 \brief MAM2 WOTS layer.
 */
-#pragma once
+#ifndef __MAM_V2_WOTS_WOTS_H__
+#define __MAM_V2_WOTS_WOTS_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
@@ -101,3 +102,5 @@ err_t wots_create(ialloc *a, wots_t *w);
 
 /*! \brief Deallocate memory for WOTS private key. */
 void wots_destroy(ialloc *a, wots_t *w);
+
+#endif  // __MAM_V2_WOTS_WOTS_H__

@@ -12,7 +12,8 @@
 \file trits.h
 \brief Basic trinary array operations.
 */
-#pragma once
+#ifndef __MAM_V2_TRITS_TRITS_H__
+#define __MAM_V2_TRITS_TRITS_H__
 
 #include "mam/v2/defs.h"
 
@@ -227,3 +228,5 @@ void trits_print2(char const *pfx, trits_t x, char const *sfx);
 #else
 #define trits_dbg_print(x)
 #endif
+
+#endif  // __MAM_V2_TRITS_TRITS_H__

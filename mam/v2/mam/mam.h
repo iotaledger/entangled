@@ -13,7 +13,8 @@
 \file mam.h
 \brief MAM2 layer.
 */
-#pragma once
+#ifndef __MAM_V2_MAM_MAM_H__
+#define __MAM_V2_MAM_MAM_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
@@ -314,3 +315,5 @@ trits_t mam_recv_msg_cfg_nonce(mam_recv_msg_context_t *cfg);
 trits_t mam_recv_msg_cfg_key(mam_recv_msg_context_t *cfg);
 trits_t mam_recv_msg_cfg_psk_id(mam_recv_msg_context_t *cfg);
 trits_t mam_recv_msg_cfg_ntru_id(mam_recv_msg_context_t *cfg);
+
+#endif  // __MAM_V2_MAM_MAM_H__

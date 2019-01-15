@@ -13,6 +13,9 @@
 \brief MAM2 NTRU polynomials parameters.
 */
 
+#ifndef __MAM_V2_NTRU_POLY_PARAM_H__
+#define __MAM_V2_NTRU_POLY_PARAM_H__
+
 /* \brief [γ⁰=1, γ⁻¹, …, γ²ⁿ⁻¹=γ⁻¹, γ²ⁿ=1] */
 #if defined(MAM2_POLY_MRED_BINARY)
 static poly_coeff_t poly_gamma_exp[2 * MAM2_POLY_N + 1] = {
@@ -493,3 +496,5 @@ static size_t poly_idx_rev[MAM2_POLY_N] = {
     0x0bf, 0x2bf, 0x1bf, 0x3bf, 0x07f, 0x27f, 0x17f, 0x37f, 0x0ff, 0x2ff, 0x1ff,
     0x3ff,
 };
+
+#endif  // __MAM_V2_NTRU_POLY_PARAM_H__

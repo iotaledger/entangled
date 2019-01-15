@@ -12,7 +12,8 @@
 \file prng.h
 \brief MAM2 PRNG layer.
 */
-#pragma once
+#ifndef __MAM_V2_PRNG_PRNG_H__
+#define __MAM_V2_PRNG_PRNG_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
@@ -81,3 +82,5 @@ err_t prng_create(ialloc *a, prng_t *p);
 
 /*! \brief Deallocate memory for PRNG secret key. */
 void prng_destroy(ialloc *a, prng_t *p);
+
+#endif  // __MAM_V2_PRNG_PRNG_H__

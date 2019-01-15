@@ -13,7 +13,8 @@
 \file buffers.h
 \brief Trits collection to simplify buffered operations.
 */
-#pragma once
+#ifndef __MAM_V2_TRITS_BUFFERS_H__
+#define __MAM_V2_TRITS_BUFFERS_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
@@ -43,3 +44,5 @@ size_t buffers_copy_to(buffers_t *tb, trits_t buf);
 /*! \brief Copy buffers `*tb` from a source `buf`; return the number of trits
  * copied. */
 size_t buffers_copy_from(buffers_t *tb, trits_t buf);
+
+#endif  // __MAM_V2_TRITS_BUFFERS_H__

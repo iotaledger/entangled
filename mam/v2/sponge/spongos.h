@@ -12,7 +12,8 @@
 \file spongos.h
 \brief MAM2 Spongos layer.
 */
-#pragma once
+#ifndef __MAM_V2_SPONGE_SPONGOS_H__
+#define __MAM_V2_SPONGE_SPONGOS_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/sponge/sponge.h"
@@ -44,3 +45,5 @@ void spongos_decr(spongos_t *s, trits_t X, trits_t Y);
 void spongos_hash(spongos_t *s, trits_t X, trits_t Y);
 
 void spongos_hashn(spongos_t *s, size_t n, trits_t *Xs, trits_t Y);
+
+#endif  // __MAM_V2_SPONGE_SPONGOS_H__

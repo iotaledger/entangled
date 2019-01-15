@@ -12,7 +12,8 @@
 \file alloc.h
 \brief MAM2 memory allocator.
 */
-#pragma once
+#ifndef __MAM_V2_ALLOC_H__
+#define __MAM_V2_ALLOC_H__
 
 #include "mam/v2/defs.h"
 
@@ -26,3 +27,5 @@ void mam_free(ialloc *a, void *p);
 word_t *mam_words_alloc(ialloc *a, size_t wc);
 
 void mam_words_free(ialloc *a, word_t *ws);
+
+#endif  // __MAM_V2_ALLOC_H__

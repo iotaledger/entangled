@@ -13,7 +13,8 @@
 \file ntru.h
 \brief MAM2 NTRU layer.
 */
-#pragma once
+#ifndef __MAM_V2_NTRU_NTRU_H__
+#define __MAM_V2_NTRU_NTRU_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/prng/prng.h"
@@ -71,3 +72,5 @@ bool_t ntru_decr(ntru_t *n,    /*!< [in] NTRU interface */
 err_t ntru_create(ialloc *a, ntru_t *n);
 
 void ntru_destroy(ialloc *a, ntru_t *n);
+
+#endif  // __MAM_V2_NTRU_NTRU_H__

@@ -12,7 +12,8 @@
 \file poly.h
 \brief MAM2 NTRU polynomials arithmetic.
 */
-#pragma once
+#ifndef __MAM_V2_NTRU_POLY_H__
+#define __MAM_V2_NTRU_POLY_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
@@ -124,3 +125,5 @@ bool_t poly_from_trits(poly_t f, trits_t t);
 void poly_to_trits(poly_t f, trits_t t);
 
 void poly_print(char const *s, poly_t f);
+
+#endif  // __MAM_V2_NTRU_POLY_H__
