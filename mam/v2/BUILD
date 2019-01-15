@@ -64,6 +64,7 @@ cc_library(
     hdrs = ["prng.h"],
     deps = [
         ":defs",
+        ":err",
         ":sponge",
         ":trits",
     ],
@@ -82,12 +83,22 @@ cc_library(
 )
 
 cc_library(
+    name = "spongos",
+    srcs = ["spongos.c"],
+    hdrs = ["spongos.h"],
+    deps = [
+        ":sponge",
+    ],
+)
+
+cc_library(
     name = "wots",
     srcs = ["wots.c"],
     hdrs = ["wots.h"],
     deps = [
         ":prng",
         ":sponge",
+        ":spongos",
     ],
 )
 
@@ -106,8 +117,9 @@ cc_library(
     srcs = ["ntru.c"],
     hdrs = ["ntru.h"],
     deps = [
+        ":poly",
         ":prng",
-        ":sponge",
+        ":spongos",
     ],
 )
 
@@ -118,5 +130,23 @@ cc_library(
     deps = [
         ":mss",
         "//common:errors",
+    ],
+)
+
+cc_library(
+    name = "err",
+    hdrs = ["err.h"],
+)
+
+cc_library(
+    name = "poly",
+    srcs = ["poly.c"],
+    hdrs = [
+        "poly.h",
+        "poly_param.h",
+    ],
+    deps = [
+        ":defs",
+        ":trits",
     ],
 )
