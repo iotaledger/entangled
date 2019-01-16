@@ -16,7 +16,7 @@
 #include "mam/v2/sponge/sponge.h"
 
 static trits_t spongos_outer_trits(spongos_t *s) {
-  return trits_drop(sponge_outer_trits(s->s), s->pos);
+  return trits_drop(sponge_outer_trits(s->sponge), s->pos);
 }
 
 static void spongos_update(spongos_t *s, size_t n) {
@@ -25,18 +25,18 @@ static void spongos_update(spongos_t *s, size_t n) {
 }
 
 void spongos_fork(spongos_t *s, spongos_t *fork) {
-  sponge_fork(s->s, fork->s);
+  sponge_fork(s->sponge, fork->sponge);
   fork->pos = s->pos;
 }
 
 void spongos_init(spongos_t *s) {
-  sponge_init(s->s);
+  sponge_init(s->sponge);
   s->pos = 0;
 }
 
 void spongos_commit(spongos_t *s) {
   if (0 != s->pos) {
-    sponge_transform(s->s);
+    sponge_transform(s->sponge);
     s->pos = 0;
   }
 }

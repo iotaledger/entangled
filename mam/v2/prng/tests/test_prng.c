@@ -29,13 +29,13 @@ bool_t prng_test(prng_t *p) {
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM");
-  sponge_init(p->s);
-  sponge_absorb(p->s, MAM2_SPONGE_CTL_KEY, K);
-  sponge_squeeze(p->s, MAM2_SPONGE_CTL_KEY, K);
+  sponge_init(p->sponge);
+  sponge_absorb(p->sponge, MAM2_SPONGE_CTL_KEY, K);
+  sponge_squeeze(p->sponge, MAM2_SPONGE_CTL_KEY, K);
   /* init N */
   trits_set_zero(N);
 
-  prng_init(p, p->s, K);
+  prng_init(p, p->sponge, K);
   prng_gen(p, 0, N, Y1);
   prng_gen(p, 1, N, Y2);
   r = r && !trits_cmp_eq(Y1, Y2);

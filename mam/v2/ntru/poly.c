@@ -17,20 +17,20 @@
 
 #if defined(MAM2_POLY_MRED_BINARY)
 poly_coeff_t poly_coeff_mredd(poly_dcoeff_t m) {
-  poly_coeff_t s;
-  s = m;
+  poly_coeff_t spongos;
+  spongos = m;
 
-  s = (poly_coeff_t)m * MAM2_POLY_MRED_Q_INV;
-  /*s = (s << 12) + (s << 13) - s;*/
+  spongos = (poly_coeff_t)m * MAM2_POLY_MRED_Q_INV;
+  /*spongos = (spongos << 12) + (spongos << 13) - spongos;*/
 
-  m = m + s * MAM2_POLY_Q;
-  /*m = m + (s << 12) + (s << 13) + s;*/
+  m = m + spongos * MAM2_POLY_Q;
+  /*m = m + (spongos << 12) + (spongos << 13) + spongos;*/
 
-  /* s := m div R */
-  s = m >> MAM2_POLY_MRED_R_LOG;
-  s = (s < MAM2_POLY_Q) ? s : (s - MAM2_POLY_Q);
-  MAM2_ASSERT(s < MAM2_POLY_Q);
-  return s;
+  /* spongos := m div R */
+  spongos = m >> MAM2_POLY_MRED_R_LOG;
+  spongos = (spongos < MAM2_POLY_Q) ? spongos : (spongos - MAM2_POLY_Q);
+  MAM2_ASSERT(spongos < MAM2_POLY_Q);
+  return spongos;
 }
 #endif
 
@@ -173,16 +173,16 @@ poly_coeff_t poly_coeff_inv(poly_coeff_t a) {
 #include <stdio.h>
  void poly_gen_param()
 {
-  size_t i, j, k;
+  size_t i, j, key;
   FILE *f;
 
   for(i = 0; i < MAM2_POLY_N; ++i)
   {
-    k = 0;
+    key = 0;
     for(j = 0; j < MAM2_POLY_N_LOG; ++j)
       if(i & (1 << j))
-        k |= 1 << (MAM2_POLY_N_LOG - 1 - j);
-    poly_idx_rev[i] = k;
+        key |= 1 << (MAM2_POLY_N_LOG - 1 - j);
+    poly_idx_rev[i] = key;
   }
 
   poly_coeff_exp_table(
@@ -375,7 +375,7 @@ void poly_to_trits(poly_t f, trits_t t) {
 
 void poly_print(char const *s, poly_t f) {
   size_t i;
-  if (s) printf("%s", s);
+  if (s) printf("%spongos", s);
   for (i = 0; i != 16 /*MAM2_POLY_N*/; ++i) {
     if (0 == (i % 16)) printf("\n");
     printf("%d ", (int)poly_coeff_to_trint9(f[i]));

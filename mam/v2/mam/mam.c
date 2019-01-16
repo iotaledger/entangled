@@ -44,18 +44,18 @@ err_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p, mss_mt_height_t d,
       trits_copy(N2, m->N2);
     }
 
-    m->sg->s = ma->create_sponge(a);
-    err_guard(m->sg->s, err_bad_alloc);
+    m->sg->sponge = ma->create_sponge(a);
+    err_guard(m->sg->sponge, err_bad_alloc);
 
     m->w = mam_alloc(a, sizeof(wots_t));
     err_guard(m->w, err_bad_alloc);
     err_bind(wots_create(a, m->w));
 
-    m->w->sg->s = ma->create_sponge(a);
-    err_guard(m->w->sg->s, err_bad_alloc);
-    wots_init(m->w, m->w->sg->s);
+    m->w->sg->sponge = ma->create_sponge(a);
+    err_guard(m->w->sg->sponge, err_bad_alloc);
+    wots_init(m->w, m->w->sg->sponge);
 
-    mss_init(m, p, m->sg->s, m->w, d, m->N1, m->N2);
+    mss_init(m, p, m->sg->sponge, m->w, d, m->N1, m->N2);
 
     e = err_ok;
   } while (0);
@@ -75,14 +75,14 @@ void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m) {
   trits_free(a, m->N2);
 
   if (m->w) {
-    ma->destroy_sponge(a, m->w->sg->s);
-    m->w->sg->s = 0;
+    ma->destroy_sponge(a, m->w->sg->sponge);
+    m->w->sg->sponge = 0;
   }
   wots_destroy(a, m->w);
   m->w = 0;
 
-  ma->destroy_sponge(a, m->sg->s);
-  m->sg->s = 0;
+  ma->destroy_sponge(a, m->sg->sponge);
+  m->sg->sponge = 0;
 
   mss_destroy(a, m);
 }
@@ -665,10 +665,10 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *b) {
 
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->ch);
-  MAM2_ASSERT(cfg->s->s);
-  MAM2_ASSERT(cfg->fork->s);
+  MAM2_ASSERT(cfg->spongos->sponge);
+  MAM2_ASSERT(cfg->fork->sponge);
   MAM2_ASSERT(b);
-  s = cfg->s;
+  s = cfg->spongos;
   fork = cfg->fork;
 
   MAM2_ASSERT(!(trits_size(*b) < mam_send_msg_size(cfg)));
@@ -797,9 +797,9 @@ size_t mam_send_packet_size(mam_send_packet_context_t *cfg,
     /*    MAC mac = 1; */
     sz += mam_wrap_checksum_mac_size();
   else if (mam_msg_checksum_mssig == cfg->checksum) {
-    MAM2_ASSERT(cfg->m);
+    MAM2_ASSERT(cfg->mss);
     /*    MSSig mssig = 2; */
-    sz += mam_wrap_checksum_mssig_size(cfg->m);
+    sz += mam_wrap_checksum_mssig_size(cfg->mss);
   } else
     MAM2_ASSERT(0);
   /*  commit; */
@@ -812,9 +812,9 @@ void mam_send_packet(mam_send_packet_context_t *cfg, trits_t payload,
   tryte_t checksum;
 
   MAM2_ASSERT(cfg);
-  MAM2_ASSERT(cfg->s->s);
+  MAM2_ASSERT(cfg->spongos->sponge);
   MAM2_ASSERT(b);
-  s = cfg->s;
+  s = cfg->spongos;
 
   MAM2_ASSERT(
       !(trits_size(*b) < mam_send_packet_size(cfg, trits_size(payload))));
@@ -837,7 +837,7 @@ void mam_send_packet(mam_send_packet_context_t *cfg, trits_t payload,
     mam_wrap_checksum_mac(s, b);
   else if (mam_msg_checksum_mssig == cfg->checksum)
     /*    MSSig mssig = 2; */
-    mam_wrap_checksum_mssig(s, b, cfg->m);
+    mam_wrap_checksum_mssig(s, b, cfg->mss);
   else
     MAM2_ASSERT(0);
 
@@ -894,8 +894,8 @@ err_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
   MAM2_ASSERT(cfg->epid);
   MAM2_ASSERT(cfg->epid1);
   MAM2_ASSERT(cfg->ma);
-  MAM2_ASSERT(cfg->s);
-  s = cfg->s;
+  MAM2_ASSERT(cfg->spongos);
+  s = cfg->spongos;
   fork = cfg->fork;
 
   do {
@@ -918,13 +918,13 @@ err_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
       if (mam_msg_pubkey_chid1 == pubkey) { /*  SignedId chid1 = 2; */
         /*TODO: verify chid is trusted */
         err_bind(mam_unwrap_pubkey_chid1(s, b, mam_recv_msg_cfg_chid1(cfg),
-                                         cfg->ms, cfg->ws,
+                                         cfg->spongos_mss, cfg->spongos_wots,
                                          mam_recv_msg_cfg_chid(cfg)));
         /*TODO: record new channel/endpoint */
       } else if (mam_msg_pubkey_epid1 == pubkey) { /*  SignedId epid1 = 3; */
         /*TODO: verify chid is trusted */
         err_bind(mam_unwrap_pubkey_epid1(s, b, mam_recv_msg_cfg_epid1(cfg),
-                                         cfg->ms, cfg->ws,
+                                         cfg->spongos_mss, cfg->spongos_wots,
                                          mam_recv_msg_cfg_chid(cfg)));
         /*TODO: record new channel/endpoint */
       } else if (mam_msg_pubkey_epid ==
@@ -973,7 +973,7 @@ err_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
             if (cfg->ntru)
               err_bind(mam_unwrap_keyload_ntru(
                   fork, b, mam_recv_msg_cfg_key(cfg), &key_found,
-                  ntru_id_trits(cfg->ntru), cfg->ntru, cfg->ns));
+                  ntru_id_trits(cfg->ntru), cfg->ntru, cfg->spongos_ntru));
           } else
             err_guard(0, err_pb3_bad_oneof);
         }
@@ -1001,11 +1001,11 @@ err_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
   trits_t p = trits_null();
 
   MAM2_ASSERT(cfg);
-  MAM2_ASSERT(cfg->s);
+  MAM2_ASSERT(cfg->spongos);
   MAM2_ASSERT(cfg->ma);
   MAM2_ASSERT(b);
   MAM2_ASSERT(payload);
-  s = cfg->s;
+  s = cfg->spongos;
   a = cfg->ma->a;
 
   do {

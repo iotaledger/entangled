@@ -13,6 +13,7 @@
 \brief MAM2 WOTS layer.
 */
 
+#include <malloc.h>
 #include <string.h>
 
 #include "mam/v2/alloc.h"
@@ -104,7 +105,7 @@ trits_t wots_sk_trits(wots_t *w) {
 void wots_init(wots_t *w, sponge_t *s) {
   MAM2_ASSERT(w);
   MAM2_ASSERT(s);
-  w->sg->s = s;
+  w->sg->sponge = s;
 }
 
 void wots_gen_sk(wots_t *w, prng_t *p, trits_t N) {
@@ -168,4 +169,5 @@ void wots_destroy(ialloc *a, wots_t *w) {
   MAM2_ASSERT(w);
   mam_words_free(a, w->sk);
   w->sk = 0;
+  free(w);
 }

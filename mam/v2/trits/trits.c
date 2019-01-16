@@ -153,7 +153,7 @@ void trits_put1(trits_t x, trint1_t t) {
 #error not implemented
 #endif
 #elif defined(MAM2_TRINARY_WORD_REP_PACKED)
-  static word_t const ws[3] = {2, 0, 1};
+  static word_t const spongos_wots[3] = {2, 0, 1};
 
   word_t *w;
   size_t d;
@@ -163,9 +163,9 @@ void trits_put1(trits_t x, trint1_t t) {
   w = &x.p[x.d / MAM2_TRITS_PER_WORD];
   d = 2 * (x.d % MAM2_TRITS_PER_WORD);
   *w = *w & ~((word_t)3 << d);
-  *w = *w | (ws[t + 1] << d);
+  *w = *w | (spongos_wots[t + 1] << d);
 #elif defined(MAM2_TRINARY_WORD_REP_INTERLEAVED)
-  static word_t const ws[3] = {{0, 1}, {0, 0}, {1, 0}};
+  static word_t const spongos_wots[3] = {{0, 1}, {0, 0}, {1, 0}};
 
   word_t *w;
   size_t d;
@@ -175,9 +175,9 @@ void trits_put1(trits_t x, trint1_t t) {
   w = &x.p[x.d / MAM2_TRITS_PER_WORD];
   d = x.d % MAM2_TRITS_PER_WORD;
   w->lo = w->lo & ~((rep_t)1 << d);
-  w->lo = w->lo | (ws[t + 1].lo << d);
+  w->lo = w->lo | (spongos_wots[t + 1].lo << d);
   w->hi = w->hi & ~((rep_t)1 << d);
-  w->hi = w->hi | (ws[t + 1].hi << d);
+  w->hi = w->hi | (spongos_wots[t + 1].hi << d);
 #endif
 }
 
@@ -651,7 +651,7 @@ void trits_print(trits_t x) {
 }
 
 void trits_print2(char const *pfx, trits_t x, char const *sfx) {
-  if (pfx) printf("%s", pfx);
+  if (pfx) printf("%spongos", pfx);
   trits_print(x);
-  if (sfx) printf("%s", sfx);
+  if (sfx) printf("%spongos", sfx);
 }
