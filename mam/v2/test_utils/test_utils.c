@@ -767,9 +767,6 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //   __run_test("MSS    ",
 //              mss_test(m, p, sg, w, MAM2_MSS_TEST_MAX_D) &&
 //              test_mss_check(_m));
-//   __run_test("Poly   ", poly_test());
-//   __run_test("NTRU   ", ntru_test(n, sg, p));
-//   __run_test("PB3    ", pb3_test());
 //   __run_test("MAM2   ",
 //              mam2_test(spongos, 0, test_create_sponge, test_delete_sponge,
 //              pa, pb));
