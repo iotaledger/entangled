@@ -35,12 +35,14 @@ ntru_t *test_ntru_init(test_ntru_t *n) {
   n->n.id = n->id;
   n->n.sk = n->sk;
   n->n.f = n->f;
+  memset(n->n.sk, 0, MAM2_NTRU_SK_SIZE);
   return &n->n;
 }
 
 prng_t *test_prng_init(test_prng_t *p, sponge_t *s) {
   p->p.sponge = s;
   p->p.key = p->key;
+  memset(p->p.key, 0, MAM2_PRNG_KEY_SIZE);
   return &p->p;
 }
 
@@ -48,6 +50,7 @@ sponge_t *test_sponge_init(test_sponge_t *s) {
   s->s.f = test_f;
   s->s.stack = s->stack;
   s->s.s = s->state;
+  memset(s->s.s, 0, MAM2_SPONGE_WIDTH);
   return &s->s;
 }
 
@@ -59,6 +62,7 @@ spongos_t *test_spongos_init(test_spongos_t *sg, sponge_t *s) {
 wots_t *test_wots_init(test_wots_t *w, sponge_t *s) {
   w->w.sg->sponge = s;
   w->w.sk = w->sk;
+  memset(w->w.sk, 0, MAM2_WOTS_SK_PART_SIZE);
   return &w->w;
 }
 
@@ -748,10 +752,8 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //     r = r && rr;                                        \
 //   } while (0)
 //
-//   __run_test("Trits  ", trits_test());
 //   __run_test("Sponge ", sponge_test(spongos));
 //   __run_test("Spongos", spongos_test(sg));
-//   __run_test("WOTS   ", wots_test(w, p));
 //   __run_test("MSS1   ", mss_test(m1, p, sg, w, 1) && test_mss_check1(_m1));
 //   __run_test("MSS2   ", mss_test(m2, p, sg, w, 2) && test_mss_check2(_m2));
 //   __run_test("MSS3   ", mss_test(m3, p, sg, w, 3) && test_mss_check3(_m3));

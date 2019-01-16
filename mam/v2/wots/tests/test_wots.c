@@ -10,10 +10,17 @@
 
 #include <unity/unity.h>
 
+#include "mam/v2/test_utils/test_utils.h"
 #include "mam/v2/wots/wots.h"
 
-bool_t wots_test(wots_t *w, prng_t *p) {
-  bool_t r = 1;
+static void wots_test(void) {
+  test_sponge_t test_sponge;
+  test_prng_t test_prng;
+  test_wots_t test_wots;
+  sponge_t *sponge = test_sponge_init(&test_sponge);
+  prng_t *prng = test_prng_init(&test_prng, sponge);
+  wots_t *wots = test_wots_init(&test_wots, sponge);
+
   MAM2_TRITS_DEF0(N, 18);
   MAM2_TRITS_DEF0(pk, MAM2_WOTS_PK_SIZE);
   MAM2_TRITS_DEF0(H, MAM2_WOTS_HASH_SIZE);
@@ -27,32 +34,34 @@ bool_t wots_test(wots_t *w, prng_t *p) {
 
   trits_set_zero(N);
   trits_set_zero(H);
-  trits_set_zero(wots_sk_trits(w));
+  trits_set_zero(wots_sk_trits(wots));
 
-  prng_gen(p, 7, N, H);
-  wots_gen_sk(w, p, N);
-  wots_calc_pk(w, pk);
-  wots_sign(w, H, sig);
-  /*wots_recover(w->sg, H, sig, pkr);*/
-  r = r && wots_verify(w->sg, H, sig, pk);
+  prng_gen(prng, 7, N, H);
+  wots_gen_sk(wots, prng, N);
+  wots_calc_pk(wots, pk);
+  wots_sign(wots, H, sig);
+
+  /*wots_recover(wots->sg, H, sig, pkr);*/
+
+  TEST_ASSERT_TRUE(wots_verify(wots->sg, H, sig, pk));
 
   trits_put1(H, trit_add(trits_get1(H), 1));
-  r = r && !wots_verify(w->sg, H, sig, pk);
+  TEST_ASSERT_TRUE(!wots_verify(wots->sg, H, sig, pk));
   trits_put1(H, trit_sub(trits_get1(H), 1));
 
   trits_put1(sig, trit_add(trits_get1(sig), 1));
-  r = r && !wots_verify(w->sg, H, sig, pk);
+  TEST_ASSERT_TRUE(!wots_verify(wots->sg, H, sig, pk));
   trits_put1(sig, trit_sub(trits_get1(sig), 1));
 
   trits_put1(pk, trit_add(trits_get1(pk), 1));
-  r = r && !wots_verify(w->sg, H, sig, pk);
+  TEST_ASSERT_TRUE(!wots_verify(wots->sg, H, sig, pk));
   trits_put1(pk, trit_sub(trits_get1(pk), 1));
-
-  return r;
 }
 
 int main(void) {
   UNITY_BEGIN();
+
+  RUN_TEST(wots_test);
 
   return UNITY_END();
 }
