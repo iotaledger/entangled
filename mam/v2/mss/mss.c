@@ -549,8 +549,8 @@ retcode_t mss_create(ialloc *a, mss_t *m, mss_mt_height_t d) {
     memset(m, 0, sizeof(mss_t));
     err_guard(0 <= d && d <= MAM2_MSS_MAX_D, RC_MAM2_INVALID_ARGUMENT);
 
-#if defined(MAM2_MSS_TRAVERSAL) m->ap =
-    mam_words_alloc(a, MAM2_MSS_MT_AUTH_WORDS(d));
+#if defined(MAM2_MSS_TRAVERSAL)
+    m->ap = mam_words_alloc(a, MAM2_MSS_MT_AUTH_WORDS(d));
     err_guard(m->ap, RC_OOM);
 
     /* add 1 extra hash for dirty hack (see mss.c) */
@@ -563,7 +563,8 @@ retcode_t mss_create(ialloc *a, mss_t *m, mss_mt_height_t d) {
 
     m->ss = mam_alloc(a, sizeof(mss_mt_stack_t) * MAM2_MSS_MT_STACKS(d));
     err_guard(m->ns, RC_OOM);
-#else m->mt = mam_words_alloc(a, MAM2_MSS_MT_WORDS(d));
+#else
+    m->mt = mam_words_alloc(a, MAM2_MSS_MT_WORDS(d));
     err_guard(m->mt, RC_OOM);
 #endif
 

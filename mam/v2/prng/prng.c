@@ -99,7 +99,7 @@ retcode_t prng_create(ialloc *a, prng_t *p) {
   do {
     memset(p, 0, sizeof(prng_t));
     p->key = mam_words_alloc(a, MAM2_WORDS(MAM2_PRNG_KEY_SIZE));
-    err_guard(p->k, RC_OOM);
+    err_guard(p->key, RC_OOM);
     e = RC_OK;
   } while (0);
   return e;
