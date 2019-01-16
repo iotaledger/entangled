@@ -14,7 +14,7 @@
 
 #include "mam/v2/trits/trits.h"
 
-static void trits_put_get_test() {
+static void trits_put_get_test(void) {
   trit_t t0, t;
   size_t i;
 
@@ -40,7 +40,7 @@ static void trits_put_get_test() {
   }
 }
 
-static void trits_add_sub_test() {
+static void trits_add_sub_test(void) {
   trit_t x, x1, x2, s1, s2, y1, y2;
   size_t ix, is;
   trit_t const ts[3] = {-1, 0, 1};
@@ -74,7 +74,7 @@ static void trits_add_sub_test() {
     }
 }
 
-static void trits_bytes_test() {
+static void trits_bytes_test(void) {
   trits_t x, y;
   byte b[3];
   size_t n, k;
