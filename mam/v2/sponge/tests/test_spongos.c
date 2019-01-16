@@ -11,9 +11,14 @@
 #include <unity/unity.h>
 
 #include "mam/v2/sponge/spongos.h"
+#include "mam/v2/test_utils/test_utils.h"
 
-bool_t spongos_test(spongos_t *s) {
-  bool_t r = 1;
+void spongos_test(void) {
+  test_sponge_t test_sponge;
+  test_spongos_t test_spongos;
+  sponge_t *sponge = test_sponge_init(&test_sponge);
+  spongos_t *spongos = test_spongos_init(&test_spongos, sponge);
+
   MAM2_TRITS_DEF0(x, 243);
   MAM2_TRITS_DEF0(y, 243);
   MAM2_TRITS_DEF0(z, 243);
@@ -23,29 +28,29 @@ bool_t spongos_test(spongos_t *s) {
 
   trits_set_zero(x);
 
-  spongos_init(s);
-  spongos_absorb(s, x);
-  spongos_squeeze(s, y);
+  spongos_init(spongos);
+  spongos_absorb(spongos, x);
+  spongos_squeeze(spongos, y);
 
-  spongos_init(s);
-  spongos_absorb(s, x);
-  spongos_commit(s);
-  spongos_encr(s, x, z);
+  spongos_init(spongos);
+  spongos_absorb(spongos, x);
+  spongos_commit(spongos);
+  spongos_encr(spongos, x, z);
 
-  r = r && trits_cmp_eq(y, z);
+  TEST_ASSERT_TRUE(trits_cmp_eq(y, z));
 
-  spongos_init(s);
-  spongos_absorb(s, x);
-  spongos_commit(s);
-  spongos_decr(s, z, z);
+  spongos_init(spongos);
+  spongos_absorb(spongos, x);
+  spongos_commit(spongos);
+  spongos_decr(spongos, z, z);
 
-  r = r && trits_cmp_eq(x, z);
-
-  return r;
+  TEST_ASSERT_TRUE(trits_cmp_eq(x, z));
 }
 
 int main(void) {
   UNITY_BEGIN();
+
+  RUN_TEST(spongos_test);
 
   return UNITY_END();
 }
