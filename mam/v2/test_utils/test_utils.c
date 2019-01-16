@@ -744,20 +744,13 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 // #define __run_test(n, f)                                \
 //   do {                                                  \
 //     printf(n);                                          \
-//     clk = clock();                                      \
 //     rr = f;                                             \
-//     clk = clock() - clk;                                \
-//     printf(" \t%spongos \t%d clk\n", bool_str(rr), (int)clk); \
 //     r = r && rr;                                        \
 //   } while (0)
 //
 //   __run_test("Trits  ", trits_test());
 //   __run_test("Sponge ", sponge_test(spongos));
 //   __run_test("Spongos", spongos_test(sg));
-// #if 0
-//   __run_test("Curl   ", curl_test());
-// #endif
-//   __run_test("PRNG   ", prng_test(p));
 //   __run_test("WOTS   ", wots_test(w, p));
 //   __run_test("MSS1   ", mss_test(m1, p, sg, w, 1) && test_mss_check1(_m1));
 //   __run_test("MSS2   ", mss_test(m2, p, sg, w, 2) && test_mss_check2(_m2));
@@ -807,7 +800,6 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //   size_t sponge_encr_Yn = 162;
 //   size_t sponge_decr_Xn = 162;
 //   size_t prng_gen_Yn = 162;
-//   clock_t clk;
 //
 //   char sponge_hash_Y[81];
 //   char sponge_encr_Y[162];
