@@ -13,7 +13,7 @@
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/test_utils/test_utils.h"
 
-void spongos_test(void) {
+static void spongos_test(void) {
   test_sponge_t test_sponge;
   test_spongos_t test_spongos;
   sponge_t *sponge = test_sponge_init(&test_sponge);

@@ -66,93 +66,6 @@ wots_t *test_wots_init(test_wots_t *w, sponge_t *s) {
   return &w->w;
 }
 
-#if !defined(MAM2_MSS_TEST_MAX_D)
-#define MAM2_MSS_TEST_MAX_D 3
-#endif
-
-#if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss(D, sfx)                    \
-  typedef struct _test_mss##sfx {               \
-    mss_t m;                                    \
-    word_t ap[MAM2_MSS_MT_AUTH_WORDS(D)];       \
-    uint32_t ap_check;                          \
-    word_t hs[MAM2_MSS_MT_HASH_WORDS(D, 1)];    \
-    uint32_t hs_check;                          \
-    mss_mt_node_t ns[MAM2_MSS_MT_NODES(D) + 1]; \
-    uint32_t ns_check;                          \
-    mss_mt_stack_t ss[MAM2_MSS_MT_STACKS(D)];   \
-    uint32_t ss_check;                          \
-  } test_mss##sfx
-#else
-#define def_test_mss(D, sfx)         \
-  typedef struct _test_mss##sfx {    \
-    mss_t m;                         \
-    word_t mt[MAM2_MSS_MT_WORDS(D)]; \
-    uint32_t mt_check;               \
-  } test_mss##sfx
-#endif
-
-#if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss_init(D, sfx)                      \
-  static mss_t *test_mss_init##sfx(test_mss##sfx *m) { \
-    m->m.ap = m->ap;                                   \
-    m->ap_check = 0xdeadbeef;                          \
-    m->m.hs = m->hs;                                   \
-    m->hs_check = 0xdeadbeef;                          \
-    m->m.ns = m->ns;                                   \
-    m->ns_check = 0xdeadbeef;                          \
-    m->m.ss = m->ss;                                   \
-    m->ss_check = 0xdeadbeef;                          \
-    return &m->m;                                      \
-  }
-#else
-#define def_test_mss_init(D, sfx)                                 \
-  static mss_t *test_mss_init##sfx(test_mss##sfx *m, wots_t *w) { \
-    m->m.d = D;                                                   \
-    m->m.spongos_wots = w;                                        \
-    m->m.mt = m->mt;                                              \
-    m->mt_check = 0xdeadbeef;                                     \
-    return &m->m;                                                 \
-  }
-#endif
-
-#if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss_check(D, sfx)                                        \
-  static bool_t test_mss_check##sfx(test_mss##sfx *m) {                   \
-    return 1 && m->ap_check == 0xdeadbeef && m->hs_check == 0xdeadbeef && \
-           m->ns_check == 0xdeadbeef && m->ss_check == 0xdeadbeef;        \
-  }
-#else
-#define def_test_mss_check(D, sfx)                      \
-  static bool_t test_mss_check##sfx(test_mss##sfx *m) { \
-    return 1 && m->mt_check == 0xdeadbeef;              \
-  }
-#endif
-
-def_test_mss(1, 1);
-def_test_mss(2, 2);
-def_test_mss(3, 3);
-def_test_mss(4, 4);
-def_test_mss(5, 5);
-def_test_mss(10, x);
-def_test_mss(MAM2_MSS_TEST_MAX_D, );
-
-def_test_mss_init(1, 1);
-def_test_mss_init(2, 2);
-def_test_mss_init(3, 3);
-def_test_mss_init(4, 4);
-def_test_mss_init(5, 5);
-def_test_mss_init(10, x);
-def_test_mss_init(MAM2_MSS_TEST_MAX_D, );
-
-def_test_mss_check(1, 1);
-def_test_mss_check(2, 2);
-def_test_mss_check(3, 3);
-def_test_mss_check(4, 4);
-def_test_mss_check(5, 5);
-def_test_mss_check(10, x);
-def_test_mss_check(MAM2_MSS_TEST_MAX_D, );
-
 static char *bool_str(bool_t b) {
   static char *yes = "ok";
   static char *no = "failed";
@@ -752,20 +665,6 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //     r = r && rr;                                        \
 //   } while (0)
 //
-//   __run_test("Spongos", spongos_test(sg));
-//   __run_test("MSS1   ", mss_test(m1, p, sg, w, 1) && test_mss_check1(_m1));
-//   __run_test("MSS2   ", mss_test(m2, p, sg, w, 2) && test_mss_check2(_m2));
-//   __run_test("MSS3   ", mss_test(m3, p, sg, w, 3) && test_mss_check3(_m3));
-//   __run_test("MSS4   ", mss_test(m4, p, sg, w, 4) && test_mss_check4(_m4));
-//   __run_test("MSS4sto", mss_test_store(m4, m42, p, sg, w, 4) &&
-//                             test_mss_check4(_m4) && test_mss_check4(_m42));
-// #if 0
-//   __run_test("MSS5   ", mss_test(m5, p, sg, w, 5) && test_mss_check5(_m5));
-//   __run_test("MSSX   ", mss_test(mx, p, sg, w, 10) && test_mss_checkx(_mx));
-// #endif
-//   __run_test("MSS    ",
-//              mss_test(m, p, sg, w, MAM2_MSS_TEST_MAX_D) &&
-//              test_mss_check(_m));
 //   __run_test("MAM2   ",
 //              mam2_test(spongos, 0, test_create_sponge, test_delete_sponge,
 //              pa, pb));

@@ -21,6 +21,10 @@
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/wots/wots.h"
 
+#if !defined(MAM2_MSS_TEST_MAX_D)
+#define MAM2_MSS_TEST_MAX_D 3
+#endif
+
 typedef struct test_ntru_s {
   ntru_t n;
   word_t id[MAM2_WORDS(81)];
