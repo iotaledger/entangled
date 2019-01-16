@@ -35,7 +35,7 @@ typedef struct trits_s {
   trits_t X
 
 #if 0
-#define MAM2_TRITS_DEF(X, k) MAM2_TRITS_DEF0(X, k) = MAM2_TRITS_INIT(X, k)
+#define MAM2_TRITS_DEF(X, key) MAM2_TRITS_DEF0(X, key) = MAM2_TRITS_INIT(X, key)
 #endif
 
 #define MAM2_TRITS_DIV_WORD(t) ((t) / MAM2_TRITS_PER_WORD)

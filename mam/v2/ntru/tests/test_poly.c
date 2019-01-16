@@ -57,7 +57,7 @@ bool_t poly_test_ntt() {
       f[i] = poly_coeff_add(a, poly_coeff_mul(c, f[i]));
   }
 
-  dbg_printf("k=%d\tki=%d\n", k, ki);
+  dbg_printf("key=%d\tki=%d\n", k, ki);
   return r;
 }
 

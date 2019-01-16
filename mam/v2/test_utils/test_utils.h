@@ -11,6 +11,7 @@
 #ifndef __MAM_V2_TEST_UTILS_TEST_UTILS_H__
 #define __MAM_V2_TEST_UTILS_TEST_UTILS_H__
 
+#include <stdlib.h>
 #include "mam/v2/mss/mss.h"
 #include "mam/v2/ntru/ntru.h"
 #include "mam/v2/ntru/poly.h"
@@ -49,5 +50,13 @@ prng_t *test_prng_init(test_prng_t *p, sponge_t *s);
 sponge_t *test_sponge_init(test_sponge_t *s);
 spongos_t *test_spongos_init(test_spongos_t *sg, sponge_t *s);
 wots_t *test_wots_init(test_wots_t *w, sponge_t *s);
+
+static inline sponge_t *test_create_sponge(ialloc *a) {
+  test_sponge_t *t = malloc(sizeof(test_sponge_t));
+  return test_sponge_init(t);
+}
+static inline void test_delete_sponge(ialloc *a, sponge_t *s) {
+  free((test_sponge_t *)s);
+}
 
 #endif  // __MAM_V2_TEST_UTILS_TEST_UTILS_H__

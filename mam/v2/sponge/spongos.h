@@ -20,7 +20,7 @@
 #include "mam/v2/trits/trits.h"
 
 typedef struct spongos_s {
-  sponge_t *s;
+  sponge_t *sponge;
   size_t pos;
 } spongos_t;
 

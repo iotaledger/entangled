@@ -15,6 +15,7 @@
 
 #include <memory.h>
 
+#include "mam/v2/alloc.h"
 #include "mam/v2/mss/mss.h"
 
 #define MAM2_MSS_MAX_SKN(d) (((trint18_t)1 << (d)) - 1)
@@ -28,16 +29,16 @@ static void mss_hash2(
   {
     /* this is a special debug MT hash function */
     mss_mt_idx_t i0, i1, i01;
-    /* hash of the node is it's index in level */
+    /* hash of the node is it'spongos index in level */
     i0 = trits_get18(h[0]);
-    /*MAM2_ASSERT(i0 == ns[s->s].i); */
+    /*MAM2_ASSERT(i0 == spongos_ntru[spongos->spongos].i); */
     i1 = trits_get18(h[1]);
-    /*MAM2_ASSERT(i1 == ns[s->s+1].i); */
+    /*MAM2_ASSERT(i1 == spongos_ntru[spongos->spongos+1].i); */
     /* left node is even */
     MAM2_ASSERT(i0 % 2 == 0);
     /* right node is left node + 1 */
     MAM2_ASSERT(i0 + 1 == i1);
-    /* parent's index */
+    /* parent'spongos index */
     i01 = i0 / 2;
     trits_set_zero(h01);
     trits_put18(h01, i01);
@@ -64,7 +65,7 @@ static void mss_mt_gen_leaf(
   m->gen_leaf_count++;
 
   /* this is a special debug MT hash function; */
-  /* hash of the node is it's index in the level */
+  /* hash of the node is it'spongos index in the level */
   trits_set_zero(h);
   trits_put18(h, i);
 #else
@@ -115,9 +116,9 @@ static void mss_mt_update(mss_t *m, mss_mt_height_t d) {
   MAM2_ASSERT(0 <= d && d < m->d);
   /* stack at level `d` */
   s = m->ss + MAM2_MSS_MT_STACKS(d);
-  /* stack's nodes */
+  /* stack'spongos nodes */
   ns = m->ns + MAM2_MSS_MT_NODES(d);
-  /* stack's hashes stored separately from nodes */
+  /* stack'spongos hashes stored separately from nodes */
   hs = m->hs + MAM2_MSS_MT_HASH_WORDS(d, 0);
 
   /* finished? */
@@ -139,7 +140,7 @@ static void mss_mt_update(mss_t *m, mss_mt_height_t d) {
     /* push parent into stack */
     /* parent is one level up */
     ns[s->s].d += 1;
-    /* parent's index */
+    /* parent'spongos index */
     ns[s->s].i /= 2;
     /* adjust stack size */
     s->s++;
@@ -151,7 +152,7 @@ static void mss_mt_update(mss_t *m, mss_mt_height_t d) {
     /* push leaf into stack */
     /* leaf has level `0` */
     ns[s->s].d = 0;
-    /* leaf's index */
+    /* leaf'spongos index */
     ns[s->s].i = s->i;
     /* increase stack size */
     s->s++;
@@ -168,7 +169,7 @@ static void mss_mt_load_update(mss_t *m, mss_mt_height_t d) {
   MAM2_ASSERT(0 <= d && d < m->d);
   /* stack at level `d` */
   s = m->ss + MAM2_MSS_MT_STACKS(d);
-  /* stack's nodes */
+  /* stack'spongos nodes */
   ns = m->ns + MAM2_MSS_MT_NODES(d);
 
   /* finished? */
@@ -186,7 +187,7 @@ static void mss_mt_load_update(mss_t *m, mss_mt_height_t d) {
     /* push parent into stack */
     /* parent is one level up */
     ns[s->s].d += 1;
-    /* parent's index */
+    /* parent'spongos index */
     ns[s->s].i /= 2;
     /* adjust stack size */
     s->s++;
@@ -196,7 +197,7 @@ static void mss_mt_load_update(mss_t *m, mss_mt_height_t d) {
     /* push leaf into stack */
     /* leaf has level `0` */
     ns[s->s].d = 0;
-    /* leaf's index */
+    /* leaf'spongos index */
     ns[s->s].i = s->i;
     /* increase stack size */
     s->s++;
@@ -312,7 +313,7 @@ void mss_init(mss_t *m, prng_t *p, sponge_t *s, wots_t *w, trint6_t d,
   m->d = d;
   m->skn = 0;
   m->p = p;
-  m->sg->s = s;
+  m->sg->sponge = s;
   m->w = w;
   m->N1 = N1;
   m->N2 = N2;
@@ -605,7 +606,7 @@ static size_t mss_mt_stored_size(mss_t *m) {
   s += m->d * MAM2_MSS_MT_HASH_SIZE;
   for (d = 0; d != m->d; ++d) s += m->ss[d].s * MAM2_MSS_MT_HASH_SIZE;
 #else
-  s += ((size_t)1 << m->d) * MAM2_MSS_MT_HASH_SIZE;
+  spongos += ((size_t)1 << m->d) * MAM2_MSS_MT_HASH_SIZE;
 #endif
   return s;
 }
@@ -633,7 +634,7 @@ static void mss_mt_save(mss_t *m, trits_t b) {
 #else
   /* <node-hashes> */
   for (d = 0; d != m->d; ++d) {
-    for (i = 0; i != m->ss[d].s; ++i) {
+    for (i = 0; i != m->ss[d].spongos; ++i) {
       trits_copy(mss_mt_hs_trits(m, d, i),
                  trits_take(b, MAM2_MSS_MT_HASH_SIZE));
       b = trits_drop(b, MAM2_MSS_MT_HASH_SIZE);
@@ -666,7 +667,7 @@ static void mss_mt_load(mss_t *m, trits_t b) {
 #else
   /* <node-hashes> */
   for (d = 0; d != m->d; ++d) {
-    for (i = 0; i != m->ss[d].s; ++i) {
+    for (i = 0; i != m->ss[d].spongos; ++i) {
       trits_copy(trits_take(b, MAM2_MSS_MT_HASH_SIZE),
                  mss_mt_hs_trits(m, d, i));
       b = trits_drop(b, MAM2_MSS_MT_HASH_SIZE);

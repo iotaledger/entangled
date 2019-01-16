@@ -34,8 +34,8 @@ typedef word_t prng_key_t[MAM2_WORDS(MAM2_PRNG_KEY_SIZE)];
 
 /*! \brief PRNG interface. */
 typedef struct prng_s {
-  sponge_t *s; /*!< sponge interface */
-  word_t *k;   /*!< key */
+  sponge_t *sponge; /*!< sponge interface */
+  word_t *key;      /*!< key */
 } prng_t;
 
 /*! \brief PRNG initialization. */

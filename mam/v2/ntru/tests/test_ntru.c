@@ -14,7 +14,7 @@
 #include "mam/v2/ntru/poly.h"
 
 /* \brief This special trivial spongos transform is used
-in order to get `AE(s;k)=1^n`. */
+in order to get `AE(spongos;key)=1^n`. */
 static void ntru_test_f(void *buf, word_t *s) {
   trits_t x = trits_from_rep(MAM2_SPONGE_RATE, s);
   trits_set1(x, 1);
@@ -69,9 +69,9 @@ bool_t ntru_test(ntru_t *n, spongos_t *s, prng_t *p) {
                  "AAABBBCCCAAABBBCCCAAABBBCCC"
                  "AAABBBCCCAAABBBCCCAAABBBCCC"
                  "AAABBBCCCAAABBBCCCAAABBBCCC");
-  /* it's safe to reuse sponge from spongos for prng */
+  /* it'spongos safe to reuse sponge from spongos for prng */
   /* as spongos is exclusively used in ntru_encr/ntru_decr. */
-  prng_init(p, s->s, key);
+  prng_init(p, s->sponge, key);
 
   /* decryption failure special test case */
   {
@@ -82,9 +82,9 @@ bool_t ntru_test(ntru_t *n, spongos_t *s, prng_t *p) {
     v = MAM2_TRITS_INIT(v, MAM2_NTRU_SK_SIZE);
 
     /* save current spongos transform */
-    sf = s->s->f;
+    sf = s->sponge->f;
     /* and use a special one for this case */
-    s->s->f = ntru_test_f;
+    s->sponge->f = ntru_test_f;
 
     trits_set1(v, 1);
     trits_set1(trits_drop(v, 512), -1);
@@ -93,7 +93,7 @@ bool_t ntru_test(ntru_t *n, spongos_t *s, prng_t *p) {
     trits_set1(u, 1);
     trits_set1(key, 0);
     /* encrypt with (1+x+x^2+..) as noise */
-    /* key=0^n so that encr(s;key)=1^n */
+    /* key=0^n so that encr(spongos;key)=1^n */
     ntru_encr_r(pk, s, u, key, ekey);
 
     /* decryption should fail! as there will be overflow in 511-th coeff */
@@ -121,7 +121,7 @@ bool_t ntru_test(ntru_t *n, spongos_t *s, prng_t *p) {
     trits_put1(u, 1);
 
     /* restore the original spongos transform */
-    s->s->f = sf;
+    s->sponge->f = sf;
   }
 
   i = 0;

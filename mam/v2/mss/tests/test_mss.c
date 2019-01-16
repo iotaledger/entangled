@@ -42,7 +42,7 @@ bool_t mss_test_store(mss_t *m, mss_t *m2, prng_t *p, spongos_t *s, wots_t *w,
                  "ABCNOABCNKOZWYKOZWYSDF9SDF9"
                  "YSDF9QABCNKOZWYSDF9ABCNKOZW"
                  "SDF9CABCABCNKOZWYNKOZWYSDF9");
-  prng_init(p, p->s, K);
+  prng_init(p, p->sponge, K);
   trits_set_zero(N);
   trits_set_zero(H);
   trits_from_str(H,
@@ -54,8 +54,8 @@ bool_t mss_test_store(mss_t *m, mss_t *m2, prng_t *p, spongos_t *s, wots_t *w,
     sig = trits_take(sig_, MAM2_MSS_SIG_SIZE(d));
     sig2 = trits_take(sig2_, MAM2_MSS_SIG_SIZE(d));
 
-    mss_init(m, p, s->s, w, d, N, trits_null());
-    mss_init(m2, p, s->s, w, d, N, trits_null());
+    mss_init(m, p, s->sponge, w, d, N, trits_null());
+    mss_init(m2, p, s->sponge, w, d, N, trits_null());
     mss_gen(m, pk);
 
     do {
@@ -97,7 +97,7 @@ bool_t mss_test(mss_t *m, prng_t *p, spongos_t *s, wots_t *w,
                  "ABCNOABCNKOZWYKOZWYSDF9SDF9"
                  "YSDF9QABCNKOZWYSDF9ABCNKOZW"
                  "SDF9CABCABCNKOZWYNKOZWYSDF9");
-  prng_init(p, p->s, K);
+  prng_init(p, p->sponge, K);
   trits_set_zero(N);
   trits_set_zero(H);
   trits_from_str(H,
@@ -116,7 +116,7 @@ bool_t mss_test(mss_t *m, prng_t *p, spongos_t *s, wots_t *w,
 
     dbg_printf("========================\nD = %d\n", d);
 
-    mss_init(m, p, s->s, w, d, N, trits_null());
+    mss_init(m, p, s->sponge, w, d, N, trits_null());
     mss_gen(m, pk);
 
     dbg_printf("mss pk \t");
