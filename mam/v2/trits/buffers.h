@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -13,12 +12,13 @@
 \file buffers.h
 \brief Trits collection to simplify buffered operations.
 */
-#pragma once
+#ifndef __MAM_V2_TRITS_BUFFERS_H__
+#define __MAM_V2_TRITS_BUFFERS_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
 
-typedef struct {
+typedef struct buffers_s {
   trits_t X;   /*!< the head */
   size_t n;    /*!< buffers count in the tail */
   trits_t *Xs; /*!< the tail buffers */
@@ -43,3 +43,5 @@ size_t buffers_copy_to(buffers_t *tb, trits_t buf);
 /*! \brief Copy buffers `*tb` from a source `buf`; return the number of trits
  * copied. */
 size_t buffers_copy_from(buffers_t *tb, trits_t buf);
+
+#endif  // __MAM_V2_TRITS_BUFFERS_H__

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -13,7 +12,8 @@
 \file err.h
 \brief MAM2 errors.
 */
-#pragma once
+#ifndef __MAM_V2_ERR_H__
+#define __MAM_V2_ERR_H__
 
 typedef enum _err_t {
   err_ok = 0,
@@ -94,3 +94,5 @@ err_t run_f()
     e = (err);               \
     continue;                \
   } else
+
+#endif  // __MAM_V2_ERR_H__

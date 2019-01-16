@@ -12,35 +12,38 @@
 \file spongos.h
 \brief MAM2 Spongos layer.
 */
-#pragma once
+#ifndef __MAM_V2_SPONGE_SPONGOS_H__
+#define __MAM_V2_SPONGE_SPONGOS_H__
 
 #include "mam/v2/defs.h"
+#include "mam/v2/sponge/sponge.h"
 #include "mam/v2/trits/trits.h"
 
-struct _isponge;
-typedef struct _ispongos {
-  struct _isponge *s;
+typedef struct spongos_s {
+  sponge_t *s;
   size_t pos;
-} ispongos;
+} spongos_t;
 
-void spongos_fork(ispongos *s, ispongos *fork);
+void spongos_fork(spongos_t *s, spongos_t *fork);
 
-void spongos_init(ispongos *s);
+void spongos_init(spongos_t *s);
 
-void spongos_commit(ispongos *s);
+void spongos_commit(spongos_t *s);
 
-void spongos_absorb(ispongos *s, trits_t X);
+void spongos_absorb(spongos_t *s, trits_t X);
 
-void spongos_absorbn(ispongos *s, size_t n, trits_t *Xs);
+void spongos_absorbn(spongos_t *s, size_t n, trits_t *Xs);
 
-void spongos_squeeze(ispongos *s, trits_t Y);
+void spongos_squeeze(spongos_t *s, trits_t Y);
 
-bool_t spongos_squeeze_eq(ispongos *s, trits_t Y);
+bool_t spongos_squeeze_eq(spongos_t *s, trits_t Y);
 
-void spongos_encr(ispongos *s, trits_t X, trits_t Y);
+void spongos_encr(spongos_t *s, trits_t X, trits_t Y);
 
-void spongos_decr(ispongos *s, trits_t X, trits_t Y);
+void spongos_decr(spongos_t *s, trits_t X, trits_t Y);
 
-void spongos_hash(ispongos *s, trits_t X, trits_t Y);
+void spongos_hash(spongos_t *s, trits_t X, trits_t Y);
 
-void spongos_hashn(ispongos *s, size_t n, trits_t *Xs, trits_t Y);
+void spongos_hashn(spongos_t *s, size_t n, trits_t *Xs, trits_t Y);
+
+#endif  // __MAM_V2_SPONGE_SPONGOS_H__

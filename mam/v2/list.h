@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -13,7 +12,8 @@
 \file list.h
 \brief List template.
 */
-#pragma once
+#ifndef __MAM_V2_LIST_H__
+#define __MAM_V2_LIST_H__
 
 #define def_mam_list_node(info_type, node_name) \
   typedef struct _##node_name {                 \
@@ -84,3 +84,5 @@
     mam / v2_list_node_remove_this(node); \
   }                                       \
   while (0)
+
+#endif  // __MAM_V2_LIST_H__

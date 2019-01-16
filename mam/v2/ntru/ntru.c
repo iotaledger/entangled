@@ -18,15 +18,15 @@
 #include "mam/v2/ntru/ntru.h"
 #include "mam/v2/ntru/poly.h"
 
-trits_t ntru_id_trits(intru *n) {
+trits_t ntru_id_trits(ntru_t *n) {
   return trits_from_rep(MAM2_NTRU_ID_SIZE, n->id);
 }
 
-trits_t ntru_sk_trits(intru *n) {
+trits_t ntru_sk_trits(ntru_t *n) {
   return trits_from_rep(MAM2_NTRU_SK_SIZE, n->sk);
 }
 
-void ntru_load_sk(intru *n) {
+void ntru_load_sk(ntru_t *n) {
   poly_coeff_t *f;
   f = (poly_coeff_t *)n->f;
 
@@ -37,7 +37,7 @@ void ntru_load_sk(intru *n) {
   poly_ntt(f, f);
 }
 
-void ntru_gen(intru *n, iprng *p, trits_t N, trits_t pk) {
+void ntru_gen(ntru_t *n, prng_t *p, trits_t N, trits_t pk) {
   MAM2_TRITS_DEF0(i, 81);
   MAM2_TRITS_DEF0(r, 2 * MAM2_NTRU_SK_SIZE);
   poly_coeff_t *f;
@@ -77,7 +77,7 @@ void ntru_gen(intru *n, iprng *p, trits_t N, trits_t pk) {
   trits_set_zero(r);
 }
 
-void ntru_encr_r(trits_t pk, ispongos *s, trits_t r, trits_t K, trits_t Y) {
+void ntru_encr_r(trits_t pk, spongos_t *s, trits_t r, trits_t K, trits_t Y) {
   bool_t ok = 0;
   MAM2_POLY_DEF(h);
   MAM2_POLY_DEF(t);
@@ -112,7 +112,7 @@ void ntru_encr_r(trits_t pk, ispongos *s, trits_t r, trits_t K, trits_t Y) {
   memset(h, 0, sizeof(h));
 }
 
-void ntru_encr(trits_t pk, iprng *p, ispongos *s, trits_t K, trits_t N,
+void ntru_encr(trits_t pk, prng_t *p, spongos_t *s, trits_t K, trits_t N,
                trits_t Y) {
   trits_t r;
 
@@ -125,7 +125,7 @@ void ntru_encr(trits_t pk, iprng *p, ispongos *s, trits_t K, trits_t N,
   ntru_encr_r(pk, s, r, K, Y);
 }
 
-bool_t ntru_decr(intru *n, ispongos *s, trits_t Y, trits_t K) {
+bool_t ntru_decr(ntru_t *n, spongos_t *s, trits_t Y, trits_t K) {
   bool_t b;
   poly_coeff_t *f;
   MAM2_POLY_DEF(t);
@@ -173,7 +173,7 @@ bool_t ntru_decr(intru *n, ispongos *s, trits_t Y, trits_t K) {
   return b;
 }
 
-err_t ntru_create(ialloc *a, intru *n) {
+err_t ntru_create(ialloc *a, ntru_t *n) {
   err_t e = err_internal_error;
   word_t *id = 0, *sk = 0;
   void *f = 0;
@@ -203,7 +203,7 @@ err_t ntru_create(ialloc *a, intru *n) {
   return e;
 }
 
-void ntru_destroy(ialloc *a, intru *n) {
+void ntru_destroy(ialloc *a, ntru_t *n) {
   MAM2_ASSERT(n);
   mam_words_free(a, n->id);
   n->id = 0;

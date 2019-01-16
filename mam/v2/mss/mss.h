@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -13,7 +12,8 @@
 \file mss.c
 \brief MAM2 MSS layer.
 */
-#pragma once
+#ifndef __MAM_V2_MSS_MSS_H__
+#define __MAM_V2_MSS_MSS_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/err.h"
@@ -57,20 +57,20 @@ typedef trint18_t mss_mt_idx_t;
 
 /*! \brief Node info, specifies position of the node in the MT.
 \note Corresponding hash-value is stored externally. */
-typedef struct _mss_mt_node {
+typedef struct mss_mt_node_s {
   mss_mt_height_t d; /*!< Height. */
   mss_mt_idx_t i;    /*!< Level index. */
-} mss_mt_node;
+} mss_mt_node_t;
 /*! \brief Number of auxiliary MT nodes used by tree-traversal algorithm */
 #define MAM2_MSS_MT_NODES(d) ((d) * ((d) + 1) / 2)
 
 /*! \brief Stack info.
 \note Stack nodes are stored externally. */
-typedef struct _mss_mt_stack {
+typedef struct mss_mt_stack_s {
   mss_mt_height_t d; /*!< Height. */
   mss_mt_idx_t i;    /*!< Level index. */
   size_t s;          /*!< Size of stack. */
-} mss_mt_stack;
+} mss_mt_stack_t;
 /*! \brief Number of auxiliary stacks used by tree-traversal algorithm */
 #define MAM2_MSS_MT_STACKS(d) (d)
 #define MAM2_MSS_MT_STACK_CAPACITY(d) ((d) + 1)
@@ -96,18 +96,18 @@ typedef struct _mss_mt_stack {
 #define MAM2_MSS_MAX_STORED_SIZE(d) (4 + 14 + MAM2_MSS_MT_MAX_STORED_SIZE(d))
 
 /*! \brief MSS interface used to generate public key and sign. */
-typedef struct _imss {
-  trint6_t d;     /*!< Merkle tree height. */
-  trint18_t skn;  /*!< Current WOTS private key number. */
-  iprng *p;       /*!< PRNG interface used to generate WOTS private keys. */
-  ispongos sg[1]; /*!< Spongos interface used to hash Merkle tree nodes. */
-  iwots *w;       /*!< WOTS interface used to generate keys and sign. */
+typedef struct mss_s {
+  trint6_t d;      /*!< Merkle tree height. */
+  trint18_t skn;   /*!< Current WOTS private key number. */
+  prng_t *p;       /*!< PRNG interface used to generate WOTS private keys. */
+  spongos_t sg[1]; /*!< Spongos interface used to hash Merkle tree nodes. */
+  wots_t *w;       /*!< WOTS interface used to generate keys and sign. */
 #if defined(MAM2_MSS_TRAVERSAL)
-  word_t *ap;       /*!< Current authentication path; `d` hash values. */
-  word_t *hs;       /*!< Buffer storing hash-values of auxiliary nodes;
-                    MAM2_MSS_MT_NODES(d) hash-values in total. */
-  mss_mt_node *ns;  /*<! Auxiliary node infos. */
-  mss_mt_stack *ss; /*<! Stacks used by traversal algorithm. */
+  word_t *ap;         /*!< Current authentication path; `d` hash values. */
+  word_t *hs;         /*!< Buffer storing hash-values of auxiliary nodes;
+                      MAM2_MSS_MT_NODES(d) hash-values in total. */
+  mss_mt_node_t *ns;  /*<! Auxiliary node infos. */
+  mss_mt_stack_t *ss; /*<! Stacks used by traversal algorithm. */
 #else
   word_t *mt; /*!< Buffer storing complete Merkle-tree. */
 #endif
@@ -115,7 +115,7 @@ typedef struct _imss {
 #if defined(MAM2_MSS_DEBUG)
   size_t gen_leaf_count, hash_node_count;
 #endif
-} imss;
+} mss_t;
 
 #if defined(MAM2_MSS_TRAVERSAL)
 /*! \note
@@ -127,8 +127,8 @@ It is achieved by allocating one extra node:
 
 ```
   word_t *alloc_words(size_t word_count);
-  mss_mt_node *alloc_nodes(size_t node_count);
-  mss_mt_stack *alloc_stacks(size_t stack_count);
+  mss_mt_node_t *alloc_nodes(size_t node_count);
+  mss_mt_stack_t *alloc_stacks(size_t stack_count);
   mss_mt_height_t D;
 
   size_t total_nodes = MAM2_MSS_MT_NODES(D)+1;
@@ -145,45 +145,45 @@ It is achieved by allocating one extra node:
 \note MSS Merkle tree should already be allocated
   and initialized for the current height.
 */
-void mss_init(imss *m,    /*!< [in] MSS interface */
-              iprng *p,   /*!< [in] PRNG interface */
-              isponge *s, /*!< [in] Sponge interface */
-              iwots *w,   /*!< [in] WOTS interface */
-              trint6_t d, /*!< [in] Merkle-tree height */
-              trits_t N1, /*!< [in] first nonce */
-              trits_t N2  /*!< [in] second nonce */
+void mss_init(mss_t *m,    /*!< [in] MSS interface */
+              prng_t *p,   /*!< [in] PRNG interface */
+              sponge_t *s, /*!< [in] Sponge interface */
+              wots_t *w,   /*!< [in] WOTS interface */
+              trint6_t d,  /*!< [in] Merkle-tree height */
+              trits_t N1,  /*!< [in] first nonce */
+              trits_t N2   /*!< [in] second nonce */
 );
 
 /*! \brief Generate MSS keys. */
-void mss_gen(imss *m,   /*!< [in] MSS interface */
+void mss_gen(mss_t *m,  /*!< [in] MSS interface */
              trits_t pk /*!< [out] public key, Merkle-tree root */
 );
 
 /*! \brief Encode MSS `skn`. */
 void mss_skn(
-    imss *m,    /*!< [in] MSS interface */
+    mss_t *m,   /*!< [in] MSS interface */
     trits_t skn /*!< [out] encoded height and current private key number */
 );
 
 /*! \brief Encode MSS authentication path. */
-void mss_apath(imss *m,     /*!< [in] MSS interface */
+void mss_apath(mss_t *m,    /*!< [in] MSS interface */
                trint18_t i, /*!< [in] number of WOTS instance */
                trits_t p    /*!< [out] authentication path */
 );
 
 /*! \brief Generate MSS signature. */
-void mss_sign(imss *m,    /*!< [in] MSS interface */
+void mss_sign(mss_t *m,   /*!< [in] MSS interface */
               trits_t H,  /*!< [in] hash value tbs */
               trits_t sig /*!< [out] signature */
 );
 
 /*! \brief Verify MSS signature. */
 bool_t mss_verify(
-    ispongos *ms, /*!< [in] Spongos interface to hash Merkle Tree */
-    ispongos *ws, /*!< [in] Spongos interface to hash WOTS iterations */
-    trits_t H,    /*!< [in] signed hash value */
-    trits_t sig,  /*!< [in] signature */
-    trits_t pk    /*!< [in] public key (Merkle-tree root) */
+    spongos_t *ms, /*!< [in] Spongos interface to hash Merkle Tree */
+    spongos_t *ws, /*!< [in] Spongos interface to hash WOTS iterations */
+    trits_t H,     /*!< [in] signed hash value */
+    trits_t sig,   /*!< [in] signature */
+    trits_t pk     /*!< [in] public key (Merkle-tree root) */
 );
 
 /*! \brief Allocate memory for internal Merkle tree structure.
@@ -192,17 +192,19 @@ bool_t mss_verify(
 \note Non Merkle tree related objects (WOTS, PRNG, Spongos interfaces)
       must be allocated separately.
 */
-err_t mss_create(ialloc *a, imss *m, mss_mt_height_t d);
+err_t mss_create(ialloc *a, mss_t *m, mss_mt_height_t d);
 
 /*! \brief Deallocate memory for internal Merkle tree structure.
 \note Pointer `m` must be freed afterwards.
 */
-void mss_destroy(ialloc *a, imss *m);
+void mss_destroy(ialloc *a, mss_t *m);
 
-size_t mss_stored_size(imss *m);
+size_t mss_stored_size(mss_t *m);
 
 /*! \brief Serialize Merkle tree. */
-void mss_save(imss *m, trits_t b);
+void mss_save(mss_t *m, trits_t b);
 
 /*! \brief Deserialize Merkle tree. */
-err_t mss_load(imss *m, trits_t *b);
+err_t mss_load(mss_t *m, trits_t *b);
+
+#endif  // __MAM_V2_MSS_MSS_H__

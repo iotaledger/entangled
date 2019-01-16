@@ -12,14 +12,15 @@
 \file trits.h
 \brief Basic trinary array operations.
 */
-#pragma once
+#ifndef __MAM_V2_TRITS_TRITS_H__
+#define __MAM_V2_TRITS_TRITS_H__
 
 #include "mam/v2/defs.h"
 
 /*! \brief Array of trits.
 `p -> |...d...|......|`
 */
-typedef struct _trits_t {
+typedef struct trits_s {
   size_t n; /*!< total number of trits pointed to by `p` */
   size_t d; /*!< offset of the first trit; number of available trits is `n-d` */
   word_t *p; /*!< pointer to the words holding trits */
@@ -227,3 +228,5 @@ void trits_print2(char const *pfx, trits_t x, char const *sfx);
 #else
 #define trits_dbg_print(x)
 #endif
+
+#endif  // __MAM_V2_TRITS_TRITS_H__

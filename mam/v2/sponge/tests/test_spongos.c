@@ -12,7 +12,7 @@
 
 #include "mam/v2/sponge/spongos.h"
 
-bool_t spongos_test(ispongos *s) {
+bool_t spongos_test(spongos_t *s) {
   bool_t r = 1;
   MAM2_TRITS_DEF0(x, 243);
   MAM2_TRITS_DEF0(y, 243);
