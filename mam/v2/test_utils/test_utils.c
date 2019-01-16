@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <malloc.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
 #include "mam/v2/alloc.h"

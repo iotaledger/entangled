@@ -13,7 +13,7 @@
 \brief MAM2 WOTS layer.
 */
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "mam/v2/alloc.h"
