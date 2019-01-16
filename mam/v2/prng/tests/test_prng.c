@@ -13,7 +13,7 @@
 #include "mam/v2/prng/prng.h"
 #include "mam/v2/test_utils/test_utils.h"
 
-void prng_test(void) {
+static void prng_test(void) {
   test_sponge_t test_sponge;
   test_prng_t test_prng;
   sponge_t *sponge = test_sponge_init(&test_sponge);
