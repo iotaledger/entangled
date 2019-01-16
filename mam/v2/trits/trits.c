@@ -634,12 +634,12 @@ bool_t trits_inc(trits_t x) {
   return 0;
 }
 
-trits_t trits_alloc(ialloc *a, size_t n) {
+trits_t trits_alloc(size_t n) {
   word_t *p = malloc(MAM2_WORDS(n));
   return trits_from_rep(n, p);
 }
 
-void trits_free(ialloc *a, trits_t x) {
+void trits_free(trits_t x) {
   if (x.p) {
     free(x.p);
   }

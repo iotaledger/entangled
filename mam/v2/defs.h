@@ -20,9 +20,6 @@
 #define MAM2_DEBUG
 #endif
 
-/*! \brief MAM2 allocator type; nothing for now. */
-typedef void ialloc;
-
 #include <stddef.h>
 #include <stdint.h>
 

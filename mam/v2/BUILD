@@ -17,13 +17,6 @@ cc_library(
 )
 
 cc_library(
-    name = "alloc",
-    srcs = ["alloc.c"],
-    hdrs = ["alloc.h"],
-    deps = [":defs"],
-)
-
-cc_library(
     name = "list",
     hdrs = ["list.h"],
 )

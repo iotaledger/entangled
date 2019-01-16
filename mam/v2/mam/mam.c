@@ -13,45 +13,43 @@
 \brief MAM2 layer.
 */
 
+#include <stdlib.h>
 #include <string.h>
 
-#include "mam/v2/alloc.h"
 #include "mam/v2/mam/mam.h"
 #include "mam/v2/pb3/pb3.h"
 
 retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
                          mss_mt_height_t d, trits_t N1, trits_t N2) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  ialloc *a;
   MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
-  a = ma->a;
 
   do {
-    err_bind(mss_create(a, m, d));
+    err_bind(mss_create(m, d));
 
     m->N1 = trits_null();
     if (!trits_is_empty(N1)) {
-      m->N1 = trits_alloc(a, trits_size(N1));
+      m->N1 = trits_alloc(trits_size(N1));
       err_guard(!trits_is_null(m->N1), RC_OOM);
       trits_copy(N1, m->N1);
     }
 
     m->N2 = trits_null();
     if (!trits_is_empty(N2)) {
-      m->N2 = trits_alloc(a, trits_size(N2));
+      m->N2 = trits_alloc(trits_size(N2));
       err_guard(!trits_is_null(m->N2), RC_OOM);
       trits_copy(N2, m->N2);
     }
 
-    m->sg->sponge = ma->create_sponge(a);
+    m->sg->sponge = ma->create_sponge();
     err_guard(m->sg->sponge, RC_OOM);
 
-    m->w = mam_alloc(a, sizeof(wots_t));
+    m->w = malloc(sizeof(wots_t));
     err_guard(m->w, RC_OOM);
-    err_bind(wots_create(a, m->w));
+    err_bind(wots_create(m->w));
 
-    m->w->sg->sponge = ma->create_sponge(a);
+    m->w->sg->sponge = ma->create_sponge();
     err_guard(m->w->sg->sponge, RC_OOM);
     wots_init(m->w, m->w->sg->sponge);
 
@@ -64,27 +62,25 @@ retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
 }
 
 void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m) {
-  ialloc *a;
   MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
-  a = ma->a;
 
   m->p = 0;
 
-  trits_free(a, m->N1);
-  trits_free(a, m->N2);
+  trits_free(m->N1);
+  trits_free(m->N2);
 
   if (m->w) {
-    ma->destroy_sponge(a, m->w->sg->sponge);
+    ma->destroy_sponge(m->w->sg->sponge);
     m->w->sg->sponge = 0;
   }
-  wots_destroy(a, m->w);
+  wots_destroy(m->w);
   m->w = 0;
 
-  ma->destroy_sponge(a, m->sg->sponge);
+  ma->destroy_sponge(m->sg->sponge);
   m->sg->sponge = 0;
 
-  mss_destroy(a, m);
+  mss_destroy(m);
 }
 
 trits_t mam_channel_id(mam_channel_t *ch) {
@@ -998,7 +994,6 @@ retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
 retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
                           trits_t *payload) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  ialloc *a;
   spongos_t *s;
   trits_t p = trits_null();
 
@@ -1008,7 +1003,6 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
   MAM2_ASSERT(b);
   MAM2_ASSERT(payload);
   s = cfg->spongos;
-  a = cfg->ma->a;
 
   do {
     size_t sz = 0;
@@ -1022,7 +1016,7 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
     err_bind(pb3_unwrap_absorb_sizet(s, b, &sz));
     /*  crypt tryte payload[sz]; */
     if (trits_is_null(*payload)) {
-      p = trits_alloc(a, pb3_sizeof_ntrytes(sz));
+      p = trits_alloc(pb3_sizeof_ntrytes(sz));
       err_guard(!trits_is_null(p), RC_OOM);
     } else {
       err_guard(trits_size(*payload) <= pb3_sizeof_ntrytes(sz),
@@ -1056,6 +1050,6 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
     e = RC_OK;
   } while (0);
 
-  trits_free(a, p);
+  trits_free(p);
   return e;
 }

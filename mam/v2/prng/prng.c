@@ -93,20 +93,20 @@ void prng_gen_str(prng_t *p, trint3_t d, char const *nonce, trits_t Y) {
   prng_gen(p, d, N, Y);
 }
 
-retcode_t prng_create(ialloc *a, prng_t *p) {
+retcode_t prng_create(prng_t *p) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   MAM2_ASSERT(p);
   do {
     memset(p, 0, sizeof(prng_t));
-    p->key = mam_words_alloc(a, MAM2_WORDS(MAM2_PRNG_KEY_SIZE));
+    p->key = malloc(sizeof(word_t) * MAM2_WORDS(MAM2_PRNG_KEY_SIZE));
     err_guard(p->key, RC_OOM);
     e = RC_OK;
   } while (0);
   return e;
 }
 
-void prng_destroy(ialloc *a, prng_t *p) {
+void prng_destroy(prng_t *p) {
   MAM2_ASSERT(p);
-  mam_words_free(a, p->key);
+  free(p->key);
   p->key = 0;
 }

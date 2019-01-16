@@ -98,9 +98,9 @@ bool_t wots_verify(spongos_t *s, /*!< [in] Spongos interface */
 );
 
 /*! \brief Allocate memory for WOTS private key. */
-retcode_t wots_create(ialloc *a, wots_t *w);
+retcode_t wots_create(wots_t *w);
 
 /*! \brief Deallocate memory for WOTS private key. */
-void wots_destroy(ialloc *a, wots_t *w);
+void wots_destroy(wots_t *w);
 
 #endif  // __MAM_V2_WOTS_WOTS_H__

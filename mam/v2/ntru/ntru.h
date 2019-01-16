@@ -68,8 +68,8 @@ bool_t ntru_decr(ntru_t *n,    /*!< [in] NTRU interface */
                  trits_t K     /*!< [out] decrypted session symmetric key */
 );
 
-retcode_t ntru_create(ialloc *a, ntru_t *n);
+retcode_t ntru_create(ntru_t *n);
 
-void ntru_destroy(ialloc *a, ntru_t *n);
+void ntru_destroy(ntru_t *n);
 
 #endif  // __MAM_V2_NTRU_NTRU_H__

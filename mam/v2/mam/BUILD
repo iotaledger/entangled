@@ -5,7 +5,6 @@ cc_library(
     srcs = ["mam.c"],
     hdrs = ["mam.h"],
     deps = [
-        "//mam/v2:alloc",
         "//mam/v2:defs",
         "//mam/v2:list",
         "//mam/v2/ntru",

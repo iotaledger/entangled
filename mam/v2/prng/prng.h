@@ -78,9 +78,9 @@ void prng_gen_str(prng_t *p,         /*!< [in] PRNG interface */
 );
 
 /*! \brief Allocate memory for PRNG secret key. */
-retcode_t prng_create(ialloc *a, prng_t *p);
+retcode_t prng_create(prng_t *p);
 
 /*! \brief Deallocate memory for PRNG secret key. */
-void prng_destroy(ialloc *a, prng_t *p);
+void prng_destroy(prng_t *p);
 
 #endif  // __MAM_V2_PRNG_PRNG_H__

@@ -5,7 +5,6 @@ cc_library(
     srcs = ["wots.c"],
     hdrs = ["wots.h"],
     deps = [
-        "//mam/v2:alloc",
         "//mam/v2/prng",
         "//mam/v2/sponge",
         "//mam/v2/sponge:spongos",
