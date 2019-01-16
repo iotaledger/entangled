@@ -752,7 +752,6 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //     r = r && rr;                                        \
 //   } while (0)
 //
-//   __run_test("Sponge ", sponge_test(spongos));
 //   __run_test("Spongos", spongos_test(sg));
 //   __run_test("MSS1   ", mss_test(m1, p, sg, w, 1) && test_mss_check1(_m1));
 //   __run_test("MSS2   ", mss_test(m2, p, sg, w, 2) && test_mss_check2(_m2));

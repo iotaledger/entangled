@@ -48,7 +48,7 @@ static void ntru_test_gen(ntru_t *n, trits_t rf, trits_t rg, trits_t pk) {
   poly_to_trits(h, pk);
 }
 
-void ntru_test(void) {
+static void ntru_test(void) {
   test_sponge_t test_sponge;
   test_spongos_t test_spongos;
   test_prng_t test_prng;
