@@ -15,6 +15,7 @@
 
 #include <string.h>
 
+#include "mam/v2/alloc.h"
 #include "mam/v2/wots/wots.h"
 
 static void wots_calc_pks(spongos_t *s, trits_t sk_pks, trits_t pk) {

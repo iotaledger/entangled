@@ -15,6 +15,7 @@
 
 #include <memory.h>
 
+#include "mam/v2/alloc.h"
 #include "mam/v2/ntru/ntru.h"
 #include "mam/v2/ntru/poly.h"
 

@@ -15,6 +15,7 @@
 
 #include <string.h>
 
+#include "mam/v2/alloc.h"
 #include "mam/v2/mam/mam.h"
 #include "mam/v2/pb3/pb3.h"
 

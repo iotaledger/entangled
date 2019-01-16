@@ -8,6 +8,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <malloc.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -675,14 +676,6 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 #undef TEST_MAX_SIZE
 }
 #endif
-
-static sponge_t *test_create_sponge(ialloc *a) {
-  test_sponge_t *t = mam2_alloc(a, sizeof(test_sponge_t));
-  return test_sponge_init(t);
-}
-static void test_delete_sponge(ialloc *a, sponge_t *s) {
-  mam2_free(a, (test_sponge_t *)s);
-}
 
 // bool_t _gen() {
 //   test_sponge_t _s[1];
