@@ -513,7 +513,7 @@ size_t transaction_deserialize_from_trits(iota_transaction_t *const transaction,
  * Spam transaction
  ***********************************************************************************************************/
 // Creates a new spam transaction
-iota_transaction_t transaction_new_spam(void);
+iota_transaction_t *transaction_new_spam(void);
 /***********************************************************************************************************
  * Destructor
  ***********************************************************************************************************/

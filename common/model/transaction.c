@@ -356,9 +356,9 @@ size_t transaction_deserialize_from_trits(iota_transaction_t *const transaction,
  * Spam transaction
  ***********************************************************************************************************/
 // Creates a new spam transaction
-iota_transaction_t transaction_new_spam(void) {
+iota_transaction_t *transaction_new_spam(void) {
   tryte_t message[NUM_TRYTES_SIGNATURE];
-  iota_transaction_t spam_transaction = transaction_new();
+  iota_transaction_t *spam_transaction = transaction_new();
   if (!spam_transaction) {
     return NULL;
   }

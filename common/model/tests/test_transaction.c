@@ -50,7 +50,7 @@ void test_reset(void) {
 }
 
 void test_spam_transaction(void) {
-  iota_transaction_t transaction = transaction_new_spam();
+  iota_transaction_t *transaction = transaction_new_spam();
   TEST_ASSERT_EQUAL_MEMORY(TRITS, transaction->signature_or_message,
                            sizeof(transaction->signature_or_message));
   TEST_ASSERT_EQUAL_MEMORY(TRITS, transaction->address,
