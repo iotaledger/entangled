@@ -12,7 +12,7 @@
 
 #include "mam/v2/pb3/pb3.h"
 
-static bool_t pb3_test_sizet(size_t n) {
+static bool_t pb3_sizet_test(size_t n) {
   retcode_t e;
   bool_t ok = 1;
   size_t k = pb3_sizeof_sizet(n);
@@ -32,41 +32,42 @@ static bool_t pb3_test_sizet(size_t n) {
   return (e == RC_OK && ok && m == n);
 }
 
-static bool_t pb3_test_sizets() {
-  bool_t r = 1;
-
+static void pb3_sizets_test(void) {
   size_t n, k;
 
   n = 0;
-  for (k = 0; r && k < 1000; ++k) r = pb3_test_sizet(n++);
+  for (k = 0; k < 1000; ++k) {
+    TEST_ASSERT_TRUE(pb3_sizet_test(n++));
+  };
 
   if ((5 * sizeof(size_t) + 2) / 3 < 14) {
-    for (n = 1, k = 0; k < sizeof(size_t); ++k) n *= 243;
+    for (n = 1, k = 0; k < sizeof(size_t); ++k) {
+      n *= 243;
+    }
     n -= 50;
-    for (k = 0; r && k < 100; ++k) r = pb3_test_sizet(n++);
+    for (k = 0; k < 100; ++k) {
+      TEST_ASSERT_TRUE(pb3_sizet_test(n++));
+    }
 
     n = (size_t)0 - 100;
-    for (k = 0; r && k < 100; ++k) r = pb3_test_sizet(n++);
+    for (k = 0; k < 100; ++k) {
+      TEST_ASSERT_TRUE(pb3_sizet_test(n++));
+    }
   }
 
   /* n = 2026277576509488133ull; (27^13-1)/2 */
   /*n = SIZE_MAX;*/
   n = 2026277576509488133ull;
   n -= 99;
-  for (k = 0; r && k < 100; ++k) r = pb3_test_sizet(n++);
-
-  return r;
-}
-
-bool_t pb3_test() {
-  bool_t r = 1;
-  r = r && pb3_test_sizets();
-  /*TODO*/
-  return r;
+  for (k = 0; k < 100; ++k) {
+    TEST_ASSERT_TRUE(pb3_sizet_test(n++));
+  };
 }
 
 int main(void) {
   UNITY_BEGIN();
+
+  RUN_TEST(pb3_sizets_test);
 
   return UNITY_END();
 }

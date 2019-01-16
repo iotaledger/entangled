@@ -195,7 +195,7 @@ static void poly_ntrufail_test(void) {
   TEST_ASSERT_TRUE(-6 * 1024 == poly_coeff_to_trint9(s[511]));
 }
 
-void poly_param_test(void) {
+static void poly_param_test(void) {
   size_t o, i;
   poly_coeff_t y, yi, w, wi, n, ni, e;
 
