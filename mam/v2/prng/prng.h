@@ -15,8 +15,8 @@
 #ifndef __MAM_V2_PRNG_PRNG_H__
 #define __MAM_V2_PRNG_PRNG_H__
 
+#include "common/errors.h"
 #include "mam/v2/defs.h"
-#include "mam/v2/err.h"
 #include "mam/v2/sponge/sponge.h"
 #include "mam/v2/trits/trits.h"
 
@@ -78,7 +78,7 @@ void prng_gen_str(prng_t *p,         /*!< [in] PRNG interface */
 );
 
 /*! \brief Allocate memory for PRNG secret key. */
-err_t prng_create(ialloc *a, prng_t *p);
+retcode_t prng_create(ialloc *a, prng_t *p);
 
 /*! \brief Deallocate memory for PRNG secret key. */
 void prng_destroy(ialloc *a, prng_t *p);

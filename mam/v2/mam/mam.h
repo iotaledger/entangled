@@ -15,8 +15,8 @@
 #ifndef __MAM_V2_MAM_MAM_H__
 #define __MAM_V2_MAM_MAM_H__
 
+#include "common/errors.h"
 #include "mam/v2/defs.h"
-#include "mam/v2/err.h"
 #include "mam/v2/list.h"
 #include "mam/v2/mss/mss.h"
 #include "mam/v2/ntru/ntru.h"
@@ -33,8 +33,8 @@ typedef struct mam_ialloc_s {
   void (*destroy_sponge)(ialloc *a, sponge_t *); /*!< Deallocator. */
 } mam_ialloc_t;
 
-err_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p, mss_mt_height_t d,
-                     trits_t N1, trits_t N2);
+retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
+                         mss_mt_height_t d, trits_t N1, trits_t N2);
 
 void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m);
 
@@ -54,12 +54,12 @@ def_mam_list(mam_channel_node, mam_channel_list);
 \brief Allocate memory for internal objects,
   and generate MSS public key.
 */
-err_t mam_channel_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
-                         prng_t *p, /*! [in] Shared PRNG interface used to
-                                      generate WOTS private keys. */
-                         mss_mt_height_t d, /*!< [in] MSS MT height. */
-                         trits_t ch_name,   /*!< [in] Channel name. */
-                         mam_channel_t *ch  /*!< [out] Channel. */
+retcode_t mam_channel_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
+                             prng_t *p, /*! [in] Shared PRNG interface used to
+                                          generate WOTS private keys. */
+                             mss_mt_height_t d, /*!< [in] MSS MT height. */
+                             trits_t ch_name,   /*!< [in] Channel name. */
+                             mam_channel_t *ch  /*!< [out] Channel. */
 );
 
 /*
@@ -93,13 +93,13 @@ def_mam_list(mam_endpoint_node, mam_endpoint_list);
 \brief Allocate memory for internal objects,
   and generate MSS public key.
 */
-err_t mam_endpoint_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
-                          prng_t *p, /*! [in] Shared PRNG interface used to
-                                       generate WOTS private keys. */
-                          mss_mt_height_t d, /*!< [in] MSS MT height. */
-                          trits_t ch_name,   /*!< [in] Channel name. */
-                          trits_t ep_name,   /*!< [in] Endpoint name. */
-                          mam_endpoint_t *ep /*!< [out] Endpoint. */
+retcode_t mam_endpoint_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
+                              prng_t *p, /*! [in] Shared PRNG interface used to
+                                           generate WOTS private keys. */
+                              mss_mt_height_t d, /*!< [in] MSS MT height. */
+                              trits_t ch_name,   /*!< [in] Channel name. */
+                              trits_t ep_name,   /*!< [in] Endpoint name. */
+                              mam_endpoint_t *ep /*!< [out] Endpoint. */
 );
 
 /* \brief Deallocate memory for internal objects. */
@@ -142,61 +142,62 @@ def_mam_list(mam_ntru_pk_node, mam_ntru_pk_list);
 
 size_t mam_wrap_channel_size();
 void mam_wrap_channel(spongos_t *s, trits_t *b, tryte_t ver, trits_t chid);
-err_t mam_unwrap_channel(spongos_t *s, trits_t *b, tryte_t *ver, trits_t chid);
+retcode_t mam_unwrap_channel(spongos_t *s, trits_t *b, tryte_t *ver,
+                             trits_t chid);
 
 /* Endpoint */
 
 size_t mam_wrap_pubkey_chid_size();
 void mam_wrap_pubkey_chid(spongos_t *s, trits_t *b);
-err_t mam_unwrap_pubkey_chid(spongos_t *s, trits_t *b);
+retcode_t mam_unwrap_pubkey_chid(spongos_t *s, trits_t *b);
 
 size_t mam_wrap_pubkey_epid_size();
 void mam_wrap_pubkey_epid(spongos_t *s, trits_t *b, trits_t epid);
-err_t mam_unwrap_pubkey_epid(spongos_t *s, trits_t *b, trits_t epid);
+retcode_t mam_unwrap_pubkey_epid(spongos_t *s, trits_t *b, trits_t epid);
 
 size_t mam_wrap_pubkey_chid1_size(mss_t *m);
 void mam_wrap_pubkey_chid1(spongos_t *s, trits_t *b, trits_t chid1, mss_t *m);
-err_t mam_unwrap_pubkey_chid1(spongos_t *s, trits_t *b, trits_t chid1,
-                              spongos_t *ms, spongos_t *ws, trits_t pk);
+retcode_t mam_unwrap_pubkey_chid1(spongos_t *s, trits_t *b, trits_t chid1,
+                                  spongos_t *ms, spongos_t *ws, trits_t pk);
 
 size_t mam_wrap_pubkey_epid1_size(mss_t *m);
 void mam_wrap_pubkey_epid1(spongos_t *s, trits_t *b, trits_t epid1, mss_t *m);
-err_t mam_unwrap_pubkey_epid1(spongos_t *s, trits_t *b, trits_t epid1,
-                              spongos_t *ms, spongos_t *ws, trits_t pk);
+retcode_t mam_unwrap_pubkey_epid1(spongos_t *s, trits_t *b, trits_t epid1,
+                                  spongos_t *ms, spongos_t *ws, trits_t pk);
 
 /* Header, Keyload */
 
 size_t mam_wrap_keyload_plain_size();
 void mam_wrap_keyload_plain(spongos_t *s, trits_t *b, trits_t key);
-err_t mam_unwrap_keyload_plain(spongos_t *s, trits_t *b, trits_t key);
+retcode_t mam_unwrap_keyload_plain(spongos_t *s, trits_t *b, trits_t key);
 
 size_t mam_wrap_keyload_psk_size();
 void mam_wrap_keyload_psk(spongos_t *s, trits_t *b, trits_t key, trits_t id,
                           trits_t psk);
-err_t mam_unwrap_keyload_psk(spongos_t *s, trits_t *b, trits_t key,
-                             bool_t *key_found, trits_t id, trits_t psk);
+retcode_t mam_unwrap_keyload_psk(spongos_t *s, trits_t *b, trits_t key,
+                                 bool_t *key_found, trits_t id, trits_t psk);
 
 size_t mam_wrap_keyload_ntru_size();
 void mam_wrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key, trits_t pk,
                            prng_t *p, spongos_t *ns, trits_t N);
-err_t mam_unwrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key,
-                              bool_t *key_found, trits_t pkid, ntru_t *n,
-                              spongos_t *ns);
+retcode_t mam_unwrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key,
+                                  bool_t *key_found, trits_t pkid, ntru_t *n,
+                                  spongos_t *ns);
 
 /* Packet */
 
 size_t mam_wrap_checksum_none_size();
 void mam_wrap_checksum_none(spongos_t *s, trits_t *b);
-err_t mam_unwrap_checksum_none(spongos_t *s, trits_t *b);
+retcode_t mam_unwrap_checksum_none(spongos_t *s, trits_t *b);
 
 size_t mam_wrap_checksum_mac_size();
 void mam_wrap_checksum_mac(spongos_t *s, trits_t *b);
-err_t mam_unwrap_checksum_mac(spongos_t *s, trits_t *b);
+retcode_t mam_unwrap_checksum_mac(spongos_t *s, trits_t *b);
 
 size_t mam_wrap_checksum_mssig_size(mss_t *m);
 void mam_wrap_checksum_mssig(spongos_t *s, trits_t *b, mss_t *m);
-err_t mam_unwrap_checksum_mssig(spongos_t *s, trits_t *b, spongos_t *ms,
-                                spongos_t *ws, trits_t pk);
+retcode_t mam_unwrap_checksum_mssig(spongos_t *s, trits_t *b, spongos_t *ms,
+                                    spongos_t *ws, trits_t pk);
 
 typedef enum mam_msg_pubkey_e {
   mam_msg_pubkey_chid = 0,
@@ -285,7 +286,7 @@ typedef struct mam_recv_msg_context_s {
   ntru_t *ntru; /*!< NTRU sk to decrypt message. */
 } mam_recv_msg_context_t;
 
-err_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *msg);
+retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *msg);
 
 typedef struct mam_recv_packet_context_s {
   mam_ialloc_t *ma;     /*!< Allocator. */
@@ -296,8 +297,8 @@ typedef struct mam_recv_packet_context_s {
   spongos_t ws[1];      /*!< Spongos interface used by WOTS. */
 } mam_recv_packet_context_t;
 
-err_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *packet,
-                      trits_t *payload);
+retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *packet,
+                          trits_t *payload);
 
 trits_t mam_send_msg_cfg_chid(mam_send_msg_context_t *cfg);
 trits_t mam_send_msg_cfg_chid1(mam_send_msg_context_t *cfg);

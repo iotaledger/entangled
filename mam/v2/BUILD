@@ -24,11 +24,6 @@ cc_library(
 )
 
 cc_library(
-    name = "err",
-    hdrs = ["err.h"],
-)
-
-cc_library(
     name = "list",
     hdrs = ["list.h"],
 )

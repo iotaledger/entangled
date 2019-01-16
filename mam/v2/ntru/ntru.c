@@ -174,8 +174,8 @@ bool_t ntru_decr(ntru_t *n, spongos_t *s, trits_t Y, trits_t K) {
   return b;
 }
 
-err_t ntru_create(ialloc *a, ntru_t *n) {
-  err_t e = err_internal_error;
+retcode_t ntru_create(ialloc *a, ntru_t *n) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
   word_t *id = 0, *sk = 0;
   void *f = 0;
 
@@ -183,11 +183,11 @@ err_t ntru_create(ialloc *a, ntru_t *n) {
 
   do {
     id = mam_words_alloc(a, MAM2_WORDS(MAM2_NTRU_ID_SIZE));
-    err_guard(id, err_bad_alloc);
+    err_guard(id, RC_OOM);
     sk = mam_words_alloc(a, MAM2_WORDS(MAM2_NTRU_SK_SIZE));
-    err_guard(sk, err_bad_alloc);
+    err_guard(sk, RC_OOM);
     f = mam_alloc(a, sizeof(poly_t));
-    err_guard(f, err_bad_alloc);
+    err_guard(f, RC_OOM);
 
     n->id = id;
     n->sk = sk;
@@ -195,7 +195,7 @@ err_t ntru_create(ialloc *a, ntru_t *n) {
     id = 0;
     sk = 0;
     f = 0;
-    e = err_ok;
+    e = RC_OK;
   } while (0);
 
   mam_words_free(a, id);

@@ -153,14 +153,14 @@ bool_t wots_verify(spongos_t *s, trits_t H, trits_t sig, trits_t pk) {
   return trits_cmp_eq(pk, sig_pk);
 }
 
-err_t wots_create(ialloc *a, wots_t *w) {
-  err_t e = err_internal_error;
+retcode_t wots_create(ialloc *a, wots_t *w) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
   MAM2_ASSERT(w);
   do {
     memset(w, 0, sizeof(wots_t));
     w->sk = mam_words_alloc(a, MAM2_WORDS(MAM2_WOTS_SK_SIZE));
-    err_guard(w->sk, err_bad_alloc);
-    e = err_ok;
+    err_guard(w->sk, RC_OOM);
+    e = RC_OK;
   } while (0);
   return e;
 }

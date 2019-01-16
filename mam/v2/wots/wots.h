@@ -15,8 +15,8 @@
 #ifndef __MAM_V2_WOTS_WOTS_H__
 #define __MAM_V2_WOTS_WOTS_H__
 
+#include "common/errors.h"
 #include "mam/v2/defs.h"
-#include "mam/v2/err.h"
 #include "mam/v2/prng/prng.h"
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/trits/trits.h"
@@ -98,7 +98,7 @@ bool_t wots_verify(spongos_t *s, /*!< [in] Spongos interface */
 );
 
 /*! \brief Allocate memory for WOTS private key. */
-err_t wots_create(ialloc *a, wots_t *w);
+retcode_t wots_create(ialloc *a, wots_t *w);
 
 /*! \brief Deallocate memory for WOTS private key. */
 void wots_destroy(ialloc *a, wots_t *w);
