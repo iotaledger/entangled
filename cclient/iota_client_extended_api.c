@@ -503,7 +503,6 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
   transfer_iterator_t* transfer_iterator = NULL;
   Kerl kerl = {};
 
-  init_kerl(&kerl);
   transfer_iterator =
       transfer_iterator_new(transfers, num_transfer, &kerl, &TX);
 
@@ -518,7 +517,7 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
               __func__, error_2_string(ret_code));
   }
 
-  // TODO finalize bundle
+  bundle_finalize(out_bundle, &kerl);
   return ret_code;
 }
 

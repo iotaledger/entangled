@@ -38,6 +38,7 @@ static void transfer_iterator_next_data_transaction(
       log_warning(logger_id, "[%s:%d] flex_trits slicing failed.\n", __func__,
                   __LINE__);
     }
+    transfer_iterator->transaction->loaded_columns_mask |= MASK_DATA;
   } else {
     log_error(logger_id, "[%s:%d] the transfer type doesn't match.\n", __func__,
               __LINE__);
@@ -76,6 +77,7 @@ static void transfer_iterator_next_output_transaction(
       log_warning(logger_id, "[%s:%d] flex_trits slicing failed.\n", __func__,
                   __LINE__);
     }
+    transfer_iterator->transaction->loaded_columns_mask |= MASK_DATA;
   } else {
     log_error(logger_id, "[%s:%d] the transfer type doesn't match.\n", __func__,
               __LINE__);
@@ -418,6 +420,7 @@ iota_transaction_t* transfer_iterator_next(
                                   transfer_iterator->current_transaction_index);
     transaction_set_last_index(transaction,
                                transfer_iterator->transactions_count - 1);
+    transaction->loaded_columns_mask = MASK_ESSENCE;
 
     // Set transaction type specific fields
     switch (transfer->type) {
