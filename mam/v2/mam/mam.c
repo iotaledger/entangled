@@ -891,7 +891,7 @@ retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
   MAM2_ASSERT(cfg->chid1);
   MAM2_ASSERT(cfg->epid);
   MAM2_ASSERT(cfg->epid1);
-  MAM2_ASSERT(cfg->ma);
+  MAM2_ASSERT(cfg->allocator);
   MAM2_ASSERT(cfg->spongos);
   s = cfg->spongos;
   fork = cfg->fork;
@@ -999,7 +999,7 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
 
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->spongos);
-  MAM2_ASSERT(cfg->ma);
+  MAM2_ASSERT(cfg->allocator);
   MAM2_ASSERT(b);
   MAM2_ASSERT(payload);
   s = cfg->spongos;

@@ -87,7 +87,7 @@ static trits_t mam_test_generic_send_msg(
   {
     mam_send_msg_context_t *cfg = cfg_msga;
 
-    cfg->ma = 0;
+    cfg->allocator = 0;
     cfg->spongos->sponge = sponge_send;
     cfg->fork->sponge = fork_sponge_send;
     cfg->prng = prng_a;
@@ -243,7 +243,7 @@ static void mam_test_generic_receive_msg(
   {
     mam_recv_msg_context_t *cfg = cfg_msg_recv;
 
-    cfg->ma = ma;
+    cfg->allocator = ma;
     cfg->pubkey = -1;
     cfg->spongos->sponge = sponge_recv;
     cfg->fork->sponge = fork_sponge_recv;
@@ -278,21 +278,20 @@ static void mam_test_generic_receive_packet(
     {
       mam_recv_packet_context_t *cfg = cfg_packet_receive;
 
-      cfg->ma = ma;
+      cfg->allocator = ma;
       cfg->spongos->sponge = cfg_msg_recv->spongos->sponge;
       cfg->spongos->pos = cfg_msg_recv->spongos->pos;
       cfg->ord = -1;
       cfg->pk = trits_null();
-      if (mam_msg_pubkey_chid == cfg_msg_recv->pubkey)
+      if (mam_msg_pubkey_chid == cfg_msg_recv->pubkey) {
         cfg->pk = mam_recv_msg_cfg_chid(cfg_msg_recv);
-      else if (mam_msg_pubkey_epid == cfg_msg_recv->pubkey)
+      } else if (mam_msg_pubkey_epid == cfg_msg_recv->pubkey) {
         cfg->pk = mam_recv_msg_cfg_epid(cfg_msg_recv);
-      else if (mam_msg_pubkey_chid1 == cfg_msg_recv->pubkey)
+      } else if (mam_msg_pubkey_chid1 == cfg_msg_recv->pubkey) {
         cfg->pk = mam_recv_msg_cfg_chid1(cfg_msg_recv);
-      else if (mam_msg_pubkey_epid1 == cfg_msg_recv->pubkey)
+      } else if (mam_msg_pubkey_epid1 == cfg_msg_recv->pubkey) {
         cfg->pk = mam_recv_msg_cfg_chid1(cfg_msg_recv);
-      else
-        ;
+      }
       cfg->ms->sponge = cfg_msg_recv->spongos_mss->sponge;
       cfg->ws->sponge = cfg_msg_recv->spongos_wots->sponge;
     }
