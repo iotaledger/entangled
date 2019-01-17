@@ -44,9 +44,9 @@ static trits_t mam_test_generic_send_msg(
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   trits_t msg = trits_null();
-  mam_pre_shared_key_node pska[1], pskb[1];
+  mam_pre_shared_key_node_t_t pska[1], pskb[1];
   ntru_t ntru[1];
-  mam_ntru_public_key_node ntru_pk[1];
+  mam_ntru_public_key_node_t ntru_pk[1];
   mam_ialloc_t ma[1];
   sponge_t *sponge_send = 0, *fork_sponge_send = 0, *ntru_sponge_send = 0;
 
@@ -199,8 +199,8 @@ static void mam_test_generic_receive_msg(
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   mam_ialloc_t ma[1];
-  mam_pre_shared_key_node pre_shared_key[1];
-  mam_ntru_public_key_node ntru_pk[1];
+  mam_pre_shared_key_node_t_t pre_shared_key[1];
+  mam_ntru_public_key_node_t ntru_pk[1];
   ntru_t ntru[1];
 
   sponge_t *sponge_recv = 0, *fork_sponge_recv = 0, *mss_sponge_recv = 0,

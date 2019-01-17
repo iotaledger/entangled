@@ -588,8 +588,8 @@ size_t mam_send_msg_size(mam_send_msg_context_t *cfg) {
   sz += pb3_sizeof_ntrytes(MAM2_HEADER_NONCE_SIZE / 3);
   {
     size_t keyload_count = 0;
-    mam_pre_shared_key_node *ipsk;
-    mam_ntru_public_key_node *intru_pk;
+    mam_pre_shared_key_node_t_t *ipsk;
+    mam_ntru_public_key_node_t *intru_pk;
 
     if (cfg->key_plain) {
       ++keyload_count;
@@ -722,8 +722,8 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg) {
     {
       size_t keyload_count = 0;
       tryte_t keyload;
-      mam_pre_shared_key_node *ipsk;
-      mam_ntru_public_key_node *ntru_pk;
+      mam_pre_shared_key_node_t_t *ipsk;
+      mam_ntru_public_key_node_t *ntru_pk;
 
       if (cfg->key_plain) ++keyload_count;
       for (ipsk = cfg->pre_shared_keys.begin; ipsk; ipsk = ipsk->next)
