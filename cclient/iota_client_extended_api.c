@@ -98,14 +98,14 @@ cleanup:
 
 static retcode_t traverse_bundle(iota_client_service_t const* const serv,
                                  flex_trit_t const* const tail_hash,
-                                 transaction_objs_t* const tx_objs,
-                                 hash8019_stack_t* trytes) {
+                                 bundle_transactions_t* const bundle,
+                                 hash8019_array_p trytes) {
   retcode_t ret_code = RC_OK;
   get_trytes_req_t* get_trytes_req = NULL;
   get_trytes_res_t* get_trytes_res = NULL;
-  iota_transaction_t* tx;
+  iota_transaction_t tx;
   flex_trit_t* tmp_trytes;
-  flex_trit_t* trunk_hash = (flex_trit_t*)tail_hash;
+  flex_trit_t trunk_hash[FLEX_TRIT_SIZE_243];
   int64_t current_index, last_index;
 
   log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -124,7 +124,10 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
               error_2_string(ret_code));
     goto cleanup;
   }
+
+  memcpy(trunk_hash, tail_hash, FLEX_TRIT_SIZE_243);
   do {
+    transaction_reset(&tx);
     // Create request and response to get_trytes API
     // Add the trunk hash to the request parameters
     ret_code = hash243_queue_push(&get_trytes_req->hashes, trunk_hash);
@@ -150,35 +153,28 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
       goto cleanup;
     }
     // Create a new transaction with the received trytes
-    tx = transaction_deserialize(tmp_trytes, true);
-    if (!tx) {
-      ret_code = RC_CCLIENT_OOM;
-      log_error(logger_id, "%s transaction_deserialize failed: %s\n", __func__,
-                error_2_string(ret_code));
-      goto cleanup;
-    }
-    current_index = transaction_current_index(tx);
-    last_index = transaction_last_index(tx);
+    transaction_deserialize_from_trits(&tx, tmp_trytes, true);
+
+    current_index = transaction_current_index(&tx);
+    last_index = transaction_last_index(&tx);
     // Get the next tail_hash from the transaction
-    trunk_hash = transaction_trunk(tx);
+    memcpy(trunk_hash, transaction_trunk(&tx), FLEX_TRIT_SIZE_243);
     // If we want the raw trytes, add them to the stack
     if (trytes) {
-      hash8019_stack_push(trytes, tmp_trytes);
+      hash_array_push(trytes, tmp_trytes);
     }
-    if (tx_objs) {
+    if (bundle) {
       // Check that the first transaction we get is really a tail transaction
       // Its index must be 0 and the list of transactions empty.
       // It is an error if the first transaction has index > 0
-      if (!utarray_len(tx_objs) && transaction_current_index(tx)) {
+      if (!utarray_len(bundle) && transaction_current_index(&tx)) {
         ret_code = RC_CCLIENT_INVALID_TAIL_HASH;
         log_error(logger_id, "%s not a tail transaction: %s\n", __func__,
                   error_2_string(ret_code));
         goto cleanup;
       }
       // The transaction is valid, add it to the transaction list
-      utarray_push_back(tx_objs, tx);
-    } else {
-      transaction_free(tx);
+      bundle_transactions_add(bundle, &tx);
     }
     // The response is not needed anymore
     hash8019_queue_free(&get_trytes_res->trytes);
@@ -190,11 +186,11 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
   return ret_code;
 
 cleanup:
-  if (tx_objs) {
-    utarray_clear(tx_objs);
+  if (bundle) {
+    utarray_clear(bundle);
   }
   if (trytes) {
-    hash8019_stack_free(trytes);
+    hash_array_free(trytes);
   }
   // done:
   get_trytes_req_free(&get_trytes_req);
@@ -695,7 +691,7 @@ retcode_t iota_client_send_transfer(
 
 retcode_t iota_client_broadcast_bundle(iota_client_service_t const* const serv,
                                        flex_trit_t const* const tail_hash,
-                                       transaction_objs_t* const tx_objs) {
+                                       bundle_transactions_t* const bundle) {
   retcode_t ret_code = RC_OK;
   broadcast_transactions_req_t* broadcast_transactions_req = NULL;
 
@@ -710,8 +706,8 @@ retcode_t iota_client_broadcast_bundle(iota_client_service_t const* const serv,
   }
 
   log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
-  ret_code = traverse_bundle(serv, tail_hash, tx_objs,
-                             &broadcast_transactions_req->trytes);
+  ret_code = traverse_bundle(serv, tail_hash, bundle,
+                             broadcast_transactions_req->trytes);
   if (ret_code != RC_OK) {
     log_error(logger_id, "%s traverse_bundle failed: %s\n", __func__,
               error_2_string(ret_code));
@@ -733,22 +729,22 @@ cleanup:
 
 retcode_t iota_client_get_bundle(iota_client_service_t const* const serv,
                                  flex_trit_t const* const tail_hash,
-                                 transaction_objs_t* tx_objs) {
+                                 bundle_transactions_t* const bundle) {
   retcode_t ret_code = RC_OK;
 
   log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
 
-  ret_code = iota_client_traverse_bundle(serv, tail_hash, tx_objs);
+  ret_code = iota_client_traverse_bundle(serv, tail_hash, bundle);
   // Validate bundle
   return ret_code;
 }
 
 retcode_t iota_client_traverse_bundle(iota_client_service_t const* const serv,
                                       flex_trit_t const* const tail_hash,
-                                      transaction_objs_t* const tx_objs) {
+                                      bundle_transactions_t* const bundle) {
   log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
 
-  return traverse_bundle(serv, tail_hash, tx_objs, NULL);
+  return traverse_bundle(serv, tail_hash, bundle, NULL);
 }
 
 retcode_t iota_client_promote_transaction(
@@ -787,11 +783,11 @@ retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv,
                                     int const depth, int const mwm,
                                     transaction_objs_t* const tx_objs) {
   retcode_t ret_code = RC_OK;
-  hash8019_stack_t trytes;
+  hash8019_array_p trytes = hash8019_array_new();
 
   log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
 
-  ret_code = traverse_bundle(serv, tail_hash, NULL, &trytes);
+  ret_code = traverse_bundle(serv, tail_hash, NULL, trytes);
   if (ret_code != RC_OK) {
     log_error(logger_id, "%s traverse_bundle failed: %s\n", __func__,
               error_2_string(ret_code));
@@ -808,6 +804,6 @@ retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv,
   }
 
 cleanup:
-  hash8019_stack_free(&trytes);
+  hash_array_free(trytes);
   return ret_code;
 }
