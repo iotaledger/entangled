@@ -12,6 +12,60 @@
 
 static UT_icd bundle_transactions_icd = {sizeof(iota_transaction_t), 0, 0, 0};
 
+static retcode_t validate_signature(bundle_transactions_t const *const bundle,
+                                    trit_t const *const normalized_bundle,
+                                    bool *const is_valid) {
+  iota_transaction_t *curr_tx = NULL, *curr_inp_tx = NULL;
+  Kerl address_kerl, sig_frag_kerl;
+  trit_t digested_sig_trits[NUM_TRITS_ADDRESS];
+  trit_t digested_address[NUM_TRITS_ADDRESS];
+  trit_t key[NUM_TRITS_SIGNATURE];
+  flex_trit_t digest[FLEX_TRIT_SIZE_243];
+  size_t offset = 0, next_offset = 0;
+
+  *is_valid = true;
+
+  for (curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
+       curr_tx != NULL;) {
+    if (transaction_value(curr_tx) >= 0) {
+      curr_tx = (iota_transaction_t *)utarray_next(bundle, curr_tx);
+      continue;
+    }
+    curr_inp_tx = curr_tx;
+    offset = 0;
+    next_offset = 0;
+    init_kerl(&address_kerl);
+    do {
+      init_kerl(&sig_frag_kerl);
+      next_offset = (offset + ISS_FRAGMENTS * RADIX - 1) % NUM_TRITS_HASH + 1;
+      flex_trits_to_trits(key, NUM_TRITS_SIGNATURE,
+                          transaction_signature(curr_inp_tx),
+                          NUM_TRITS_SIGNATURE, NUM_TRITS_SIGNATURE);
+      iss_kerl_sig_digest(digested_sig_trits,
+                          &normalized_bundle[offset % NUM_TRITS_HASH], key,
+                          NUM_TRITS_SIGNATURE, &sig_frag_kerl);
+      kerl_absorb(&address_kerl, digested_sig_trits, NUM_TRITS_ADDRESS);
+      curr_inp_tx = (iota_transaction_t *)utarray_next(bundle, curr_inp_tx);
+      offset = next_offset;
+    } while (curr_inp_tx != NULL &&
+             memcmp(transaction_address(curr_inp_tx),
+                    transaction_address(curr_tx), FLEX_TRIT_SIZE_243) == 0 &&
+             transaction_value(curr_inp_tx) == 0);
+
+    kerl_squeeze(&address_kerl, digested_address, NUM_TRITS_ADDRESS);
+    flex_trits_from_trits(digest, NUM_TRITS_HASH, digested_address,
+                          NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
+
+    if (memcmp(digest, transaction_address(curr_tx), FLEX_TRIT_SIZE_243) != 0) {
+      *is_valid = false;
+      break;
+    }
+    curr_tx = curr_inp_tx;
+  }
+
+  return RC_OK;
+}
+
 void bundle_transactions_new(bundle_transactions_t **const bundle) {
   utarray_new(*bundle, &bundle_transactions_icd);
 }
@@ -85,6 +139,82 @@ void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl) {
       transaction_set_bundle(curr_tx, bundle_hash);
     }
   }
+}
+
+retcode_t bundle_validator(bundle_transactions_t *const bundle,
+                           bundle_status_t *const status) {
+  retcode_t res = RC_OK;
+  iota_transaction_t *curr_tx = NULL;
+  int64_t index = 0, last_index = 0;
+  int64_t bundle_value = 0;
+  flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
+  bool valid_sig = true;
+  Kerl kerl = {};
+
+  *status = BUNDLE_VALID;
+
+  if (bundle == NULL) {
+    *status = BUNDLE_NOT_INITIALIZED;
+    return RC_NULL_PARAM;
+  }
+
+  curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
+  last_index = transaction_last_index(curr_tx);
+
+  if (utarray_len(bundle) != last_index + 1) {
+    *status = BUNDLE_INCOMPLETE;
+    return res;
+  }
+
+  memcpy(bundle_hash, transaction_bundle(curr_tx), FLEX_TRIT_SIZE_243);
+
+  BUNDLE_FOREACH(bundle, curr_tx) {
+    bundle_value += transaction_value(curr_tx);
+
+    if (llabs(bundle_value) > MAX_IOTA_SUPPLY) {
+      *status = BUNDLE_INVALID_VALUE;
+      break;
+    }
+
+    if (transaction_current_index(curr_tx) != index++ ||
+        transaction_last_index(curr_tx) != last_index) {
+      *status = BUNDLE_INVALID_TX;
+      break;
+    }
+
+    if (transaction_value(curr_tx) != 0 &&
+        flex_trits_at(transaction_address(curr_tx), NUM_TRITS_ADDRESS,
+                      NUM_TRITS_ADDRESS - 1) != 0) {
+      *status = BUNDLE_INVALID_INPUT_ADDRESS;
+      break;
+    }
+
+    if (transaction_current_index(curr_tx) == last_index) {
+      flex_trit_t bundle_hash_calculated[FLEX_TRIT_SIZE_243];
+      trit_t normalized_bundle[HASH_LENGTH_TRIT];
+
+      if (bundle_value != 0) {
+        *status = BUNDLE_INVALID_VALUE;
+        break;
+      }
+
+      bundle_calculate_hash(bundle, &kerl, bundle_hash_calculated);
+      if (memcmp(bundle_hash, bundle_hash_calculated, FLEX_TRIT_SIZE_243) !=
+          0) {
+        *status = BUNDLE_INVALID_HASH;
+        break;
+      }
+
+      normalize_hash_trits(bundle_hash_calculated, normalized_bundle);
+
+      res = validate_signature(bundle, normalized_bundle, &valid_sig);
+      if (res != RC_OK || !valid_sig) {
+        *status = BUNDLE_INVALID_SIGNATURE;
+        break;
+      }
+    }
+  }
+  return RC_OK;
 }
 
 #ifdef DEBUG
