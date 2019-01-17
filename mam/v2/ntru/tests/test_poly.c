@@ -192,7 +192,6 @@ static void poly_ntrufail_test(void) {
   poly_intt(h, h);
   TEST_ASSERT_TRUE(3 * 1024 == poly_coeff_to_trint9(h[511]));
   poly_add(h, s, s);
-  fprintf(stderr, "POLY_LOG: %d %d\n", -6 * 1024, poly_coeff_to_trint9(s[511]));
   TEST_ASSERT_TRUE(-6 * 1024 == poly_coeff_to_trint9(s[511]));
 }
 
