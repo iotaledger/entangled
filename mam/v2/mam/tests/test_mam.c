@@ -248,45 +248,19 @@ static trits_t mam_test_generic_send_packet(
 }
 
 static void mam_test_generic_receive_msg(
-    sponge_t *spongos_sponge, sponge_t *fork_sponge, sponge_t *ntru_sponge,
     void *sponge_alloc_ctx, sponge_t *(create_sponge)(void *ctx),
     void (*destroy_sponge)(void *ctx, sponge_t *), prng_t *pa, prng_t *pb,
-    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
-    mam_msg_checksum_t checksum, mam_channel_t *const cha, trits_t *const msg,
-    size_t *const pos) {
+    mam_channel_t *const cha, trits_t *const msg,
+    mam_recv_msg_context_t *const cfg_msg_recv) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-}
 
-static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
-                             sponge_t *(create_sponge)(void *ctx),
-                             void (*destroy_sponge)(void *ctx, sponge_t *),
-                             prng_t *pa, prng_t *pb) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
   mam_ialloc_t ma[1];
+  mam_psk_node pskb[1];
+  mam_ntru_pk_node nbpk[1];
+  ntru_t nb[1];
+
   sponge_t *sponge_recv = 0, *fork_sponge_recv = 0, *mss_sponge_recv = 0,
            *wots_sponge_recv = 0, *ntru_sponge_recv = 0;
-
-  trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
-
-  mss_mt_height_t d = 1;
-  char const *cha_name_str = "CHANAME";
-  char const *ch1a_name_str = "CHANAME9";
-  char const *epa_name_str = "EPANAME";
-  char const *ep1a_name_str = "EPANAME9";
-  mam_channel_t *cha = 0, *ch1a = 0;
-  mam_endpoint_t *epa = 0, *ep1a = 0;
-
-  mam_psk_node pska[1], pskb[1];
-  ntru_t nb[1];
-  mam_ntru_pk_node nbpk[1];
-
-  mam_send_msg_context_t cfg_msg_send[1];
-  mam_recv_msg_context_t cfg_msg_recv[1];
-  mam_recv_packet_context_t cfg_packetb[1];
-
-  mam_msg_pubkey_t pubkey;     /* chid=0, epid=1, chid1=2, epid1=3 */
-  mam_msg_keyload_t keyload;   /* plain=0, psk=1, ntru=2 */
-  mam_msg_checksum_t checksum; /* none=0, mac=1, mssig=2 */
 
   /* init alloc */
   {
@@ -301,6 +275,126 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
     sponge_recv = ma->create_sponge();
     fork_sponge_recv = ma->create_sponge();
   }
+
+  /* gen psk */
+  {
+    pskb->prev = pskb->next = 0;
+    trits_from_str(mam_psk_id(&pskb->info), "PSKIDBPSKIDBPSKIDBPSKIDBPSK");
+    prng_gen_str(pb, MAM2_PRNG_DST_SECKEY, "PSKBNONCE",
+                 mam_psk_trits(&pskb->info));
+  }
+  /* gen recipient'spongos ntru keys */
+  {
+    MAM2_TRITS_DEF0(N, 30);
+    N = MAM2_TRITS_INIT(N, 30);
+    trits_from_str(N, "NTRUBNONCE");
+
+    e = ntru_create(nb);
+    ntru_gen(nb, pb, N, mam_ntru_pk_trits(&nbpk->info));
+    TEST_ASSERT(RC_OK == e);
+  }
+
+  /* init recv msg context */
+  {
+    mam_recv_msg_context_t *cfg = cfg_msg_recv;
+
+    cfg->ma = ma;
+    cfg->pubkey = -1;
+    cfg->spongos->sponge = sponge_recv;
+    cfg->fork->sponge = fork_sponge_recv;
+    cfg->spongos_mss->sponge = mss_sponge_recv;
+    cfg->spongos_wots->sponge = wots_sponge_recv;
+    cfg->spongos_ntru->sponge = ntru_sponge_recv;
+
+    cfg->psk = &pskb->info;
+    cfg->ntru = nb;
+
+    trits_copy(mam_channel_id(cha), mam_recv_msg_cfg_chid(cfg));
+  }
+
+  e = mam_recv_msg(cfg_msg_recv, msg);
+  TEST_ASSERT(RC_OK == e);
+  TEST_ASSERT(trits_is_empty(*msg));
+}
+
+static void mam_test_generic_receive_packet(
+    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
+    mam_msg_checksum_t checksum, mam_channel_t *const cha,
+    mam_endpoint_t *const epa, mam_channel_t *const ch1a,
+    mam_endpoint_t *const ep1a,
+    mam_recv_msg_context_t const *const cfg_msg_recv,
+    trits_t const *const packet, trits_t *const payload) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
+  mam_ialloc_t ma[1];
+  mam_recv_packet_context_t cfg_packet_receive[1];
+  /* send/recv packet */
+  {
+    /*trits_free(a, payload);*/ /* init recv packet context */
+    {
+      mam_recv_packet_context_t *cfg = cfg_packet_receive;
+
+      cfg->ma = ma;
+      cfg->spongos->sponge = cfg_msg_recv->spongos->sponge;
+      cfg->spongos->pos = cfg_msg_recv->spongos->pos;
+      cfg->ord = -1;
+      cfg->pk = trits_null();
+      if (mam_msg_pubkey_chid == cfg_msg_recv->pubkey)
+        cfg->pk = mam_recv_msg_cfg_chid(cfg_msg_recv);
+      else if (mam_msg_pubkey_epid == cfg_msg_recv->pubkey)
+        cfg->pk = mam_recv_msg_cfg_epid(cfg_msg_recv);
+      else if (mam_msg_pubkey_chid1 == cfg_msg_recv->pubkey)
+        cfg->pk = mam_recv_msg_cfg_chid1(cfg_msg_recv);
+      else if (mam_msg_pubkey_epid1 == cfg_msg_recv->pubkey)
+        cfg->pk = mam_recv_msg_cfg_chid1(cfg_msg_recv);
+      else
+        ;
+      cfg->ms->sponge = cfg_msg_recv->spongos_mss->sponge;
+      cfg->ws->sponge = cfg_msg_recv->spongos_wots->sponge;
+    }
+
+    e = mam_recv_packet(cfg_packet_receive, packet, payload);
+    TEST_ASSERT(RC_OK == e);
+    TEST_ASSERT(trits_is_empty(*packet));
+    TEST_ASSERT(trits_is_empty(*payload));
+    *payload = trits_pickup_all(*payload);
+  }
+}
+
+static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
+                             sponge_t *(create_sponge)(void *ctx),
+                             void (*destroy_sponge)(void *ctx, sponge_t *),
+                             prng_t *pa, prng_t *pb) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
+  mam_ialloc_t ma[1];
+
+  trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
+
+  mss_mt_height_t d = 1;
+  char const *cha_name_str = "CHANAME";
+  char const *ch1a_name_str = "CHANAME9";
+  char const *epa_name_str = "EPANAME";
+  char const *ep1a_name_str = "EPANAME9";
+  mam_channel_t *cha = 0, *ch1a = 0;
+  mam_endpoint_t *epa = 0, *ep1a = 0;
+
+  mam_psk_node pska[1];
+  ntru_t nb[1];
+  mam_ntru_pk_node nbpk[1];
+
+  mam_send_msg_context_t cfg_msg_send[1];
+  mam_recv_msg_context_t cfg_msg_recv[1];
+  mam_recv_packet_context_t cfg_packet_receive[1];
+
+  mam_msg_pubkey_t pubkey;     /* chid=0, epid=1, chid1=2, epid1=3 */
+  mam_msg_keyload_t keyload;   /* plain=0, psk=1, ntru=2 */
+  mam_msg_checksum_t checksum; /* none=0, mac=1, mssig=2 */
+
+  /* init alloc */
+  {
+    ma->create_sponge = create_sponge;
+    ma->destroy_sponge = destroy_sponge;
+  }
+
   /* init rng */
   {
     MAM2_TRITS_DEF0(k, MAM2_PRNG_KEY_SIZE);
@@ -372,11 +466,6 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
     trits_from_str(mam_psk_id(&pska->info), "PSKIDAPSKIDAPSKIDAPSKIDAPSK");
     prng_gen_str(pa, MAM2_PRNG_DST_SECKEY, "PSKANONCE",
                  mam_psk_trits(&pska->info));
-
-    pskb->prev = pskb->next = 0;
-    trits_from_str(mam_psk_id(&pskb->info), "PSKIDBPSKIDBPSKIDBPSKIDBPSK");
-    prng_gen_str(pb, MAM2_PRNG_DST_SECKEY, "PSKBNONCE",
-                 mam_psk_trits(&pskb->info));
   }
   /* gen recipient'spongos ntru keys */
   {
@@ -387,24 +476,6 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
     e = ntru_create(nb);
     ntru_gen(nb, pb, N, mam_ntru_pk_trits(&nbpk->info));
     TEST_ASSERT(RC_OK == e);
-  }
-
-  /* init recv msg context */
-  {
-    mam_recv_msg_context_t *cfg = cfg_msg_recv;
-
-    cfg->ma = ma;
-    cfg->pubkey = -1;
-    cfg->spongos->sponge = sponge_recv;
-    cfg->fork->sponge = fork_sponge_recv;
-    cfg->spongos_mss->sponge = mss_sponge_recv;
-    cfg->spongos_wots->sponge = wots_sponge_recv;
-    cfg->spongos_ntru->sponge = ntru_sponge_recv;
-
-    cfg->psk = &pskb->info;
-    cfg->ntru = nb;
-
-    trits_copy(mam_channel_id(cha), mam_recv_msg_cfg_chid(cfg));
   }
 
   for (pubkey = 0; pubkey < 4; ++pubkey) /* chid=0, epid=1, chid1=2, epid1=3
@@ -419,9 +490,9 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
               sponge_alloc_ctx, create_sponge, destroy_sponge, pa, pb, pubkey,
               keyload, checksum, cha, epa, ch1a, ep1a, cfg_msg_send);
 
-          e = mam_recv_msg(cfg_msg_recv, &msg);
-          TEST_ASSERT(RC_OK == e);
-          TEST_ASSERT(trits_is_empty(msg));
+          mam_test_generic_receive_msg(sponge_alloc_ctx, create_sponge,
+                                       destroy_sponge, pa, pb, cha, &msg,
+                                       cfg_msg_recv);
         }
 
         char const *payload_str = "PAYLOAD9999";
@@ -432,57 +503,24 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
 
         /* send/recv packet */
         {
-          /*trits_free(a, payload);*/ /* init recv packet context */
-          {
-            mam_recv_packet_context_t *cfg = cfg_packetb;
-
-            cfg->ma = ma;
-            cfg->spongos->sponge = cfg_msg_recv->spongos->sponge;
-            cfg->spongos->pos = cfg_msg_recv->spongos->pos;
-            cfg->ord = -1;
-            cfg->pk = trits_null();
-            if (mam_msg_pubkey_chid == cfg_msg_recv->pubkey)
-              cfg->pk = mam_recv_msg_cfg_chid(cfg_msg_recv);
-            else if (mam_msg_pubkey_epid == cfg_msg_recv->pubkey)
-              cfg->pk = mam_recv_msg_cfg_epid(cfg_msg_recv);
-            else if (mam_msg_pubkey_chid1 == cfg_msg_recv->pubkey)
-              cfg->pk = mam_recv_msg_cfg_chid1(cfg_msg_recv);
-            else if (mam_msg_pubkey_epid1 == cfg_msg_recv->pubkey)
-              cfg->pk = mam_recv_msg_cfg_chid1(cfg_msg_recv);
-            else
-              ;
-            cfg->ms->sponge = mss_sponge_recv;
-            cfg->ws->sponge = wots_sponge_recv;
-          }
-
-          e = mam_recv_packet(cfg_packetb, &packet, &payload);
-          TEST_ASSERT(RC_OK == e);
-          TEST_ASSERT(trits_is_empty(packet));
-          TEST_ASSERT(trits_is_empty(payload));
-          payload = trits_pickup_all(payload);
+          mam_test_generic_receive_packet(pubkey, keyload, checksum, cha, epa,
+                                          ch1a, ep1a, cfg_msg_recv, &packet,
+                                          &payload);
           TEST_ASSERT(trits_cmp_eq_str(payload, payload_str));
         }
 
-        /* destroy trits */
+        /* cleanup */
         {
           trits_free(msg);
           trits_free(packet);
           trits_free(payload);
-        }
 
-        ma->destroy_sponge(cfg_msg_send->spongos->sponge);
-        ma->destroy_sponge(cfg_msg_send->fork->sponge);
-        ma->destroy_sponge(cfg_msg_send->ns->sponge);
+          ma->destroy_sponge(cfg_msg_send->spongos->sponge);
+          ma->destroy_sponge(cfg_msg_send->fork->sponge);
+          ma->destroy_sponge(cfg_msg_send->ns->sponge);
+        }
       }
 
-  /* destroy spongos */
-  {
-    ma->destroy_sponge(sponge_recv);
-    ma->destroy_sponge(fork_sponge_recv);
-    ma->destroy_sponge(mss_sponge_recv);
-    ma->destroy_sponge(wots_sponge_recv);
-    ma->destroy_sponge(ntru_sponge_recv);
-  }
   /* destroy channels/endpoints */
   {
     if (cha) mam_channel_destroy(ma, cha);
