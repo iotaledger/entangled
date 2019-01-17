@@ -25,8 +25,8 @@ tryte_t tryte_from_trits(trit_t t0, trit_t t1, trit_t t2) {
   return (tryte_t)t0 + (tryte_t)3 * (tryte_t)t1 + (tryte_t)9 * (tryte_t)t2;
 }
 
-bool_t tryte_from_char(tryte_t *t, char c) {
-  bool_t r = 1;
+bool tryte_from_char(tryte_t *t, char c) {
+  bool r = true;
 
   if ('N' <= c && c <= 'Z')
     *t = (tryte_t)(c - 'N') - 13;
@@ -50,7 +50,7 @@ char tryte_to_char(tryte_t t) {
 /*! \brief Minimum of two values. */
 static size_t min(size_t k, size_t n) { return k < n ? k : n; }
 
-bool_t trits_is_empty(trits_t x) { return (x.n == x.d); }
+bool trits_is_empty(trits_t x) { return (x.n == x.d); }
 
 size_t trits_size(trits_t x) { return (x.n - x.d); }
 
@@ -283,7 +283,7 @@ char trits_get_char(trits_t x) {
   return tryte_to_char(i);
 }
 
-bool_t trits_put_char(trits_t x, char c) {
+bool trits_put_char(trits_t x, char c) {
   trit_t ts[3] = {0, 0, 0};
   tryte_t i = 0;
   size_t k;
@@ -313,7 +313,7 @@ byte trits_get_byte(trits_t x) {
   return (0 <= i) ? (byte)i : (byte)(243 + i);
 }
 
-bool_t trits_put_byte(trits_t x, byte b) {
+bool trits_put_byte(trits_t x, byte b) {
   trit_t ts[5] = {0, 0, 0, 0, 0};
   int i = (b <= 121) ? (int)b : ((int)b - 243);
   size_t k;
@@ -349,8 +349,8 @@ void trits_to_str(trits_t x, char *s) {
   for (; !trits_is_empty(x); x = trits_drop_min(x, 3)) *s++ = trits_get_char(x);
 }
 
-bool_t trits_from_str(trits_t x, char const *s) {
-  bool_t r = 1;
+bool trits_from_str(trits_t x, char const *s) {
+  bool r = true;
 
   for (; r && !trits_is_empty(x); x = trits_drop_min(x, 3))
     r = trits_put_char(x, *s++);
@@ -363,8 +363,8 @@ void trits_to_bytes(trits_t x, byte *bs) {
     *bs++ = trits_get_byte(x);
 }
 
-bool_t trits_from_bytes(trits_t x, byte const *bs) {
-  bool_t r = 1;
+bool trits_from_bytes(trits_t x, byte const *bs) {
+  bool r = true;
 
   for (; r && !trits_is_empty(x); x = trits_drop_min(x, 5))
     r = trits_put_byte(x, *bs++);
@@ -584,12 +584,12 @@ int trits_cmp_grlex(trits_t x, trits_t y) {
   return d;
 }
 
-bool_t trits_cmp_eq(trits_t x, trits_t y) {
+bool trits_cmp_eq(trits_t x, trits_t y) {
   return (0 == trits_cmp_grlex(x, y)) ? 1 : 0;
 }
 
-bool_t trits_cmp_eq_str(trits_t x, char const *y) {
-  bool_t r = 1;
+bool trits_cmp_eq_str(trits_t x, char const *y) {
+  bool r = true;
 
   for (; r && !trits_is_empty(x); x = trits_drop_min(x, 3))
     r = (trits_get_char(x) == *y++) && r;
@@ -597,11 +597,11 @@ bool_t trits_cmp_eq_str(trits_t x, char const *y) {
   return r;
 }
 
-bool_t trits_is_same(trits_t x, trits_t y) {
+bool trits_is_same(trits_t x, trits_t y) {
   return (x.p == y.p) && (x.d == y.d); /* && (x.n == y.n) */
 }
 
-bool_t trits_is_overlapped(trits_t x, trits_t y) {
+bool trits_is_overlapped(trits_t x, trits_t y) {
   word_t *x_first = x.p + (x.d / MAM2_TRITS_PER_WORD);
   word_t *x_last =
       x.p + (x.n / MAM2_TRITS_PER_WORD) + ((x.n % MAM2_TRITS_PER_WORD) ? 1 : 0);
@@ -622,9 +622,9 @@ trits_t trits_diff(trits_t begin, trits_t end) {
 
 trits_t trits_null() { return trits_from_rep(0, 0); }
 
-bool_t trits_is_null(trits_t x) { return (0 == x.p); }
+bool trits_is_null(trits_t x) { return (0 == x.p); }
 
-bool_t trits_inc(trits_t x) {
+bool trits_inc(trits_t x) {
   trit_t t;
   for (; !trits_is_empty(x); x = trits_drop(x, 1)) {
     t = trit_add(trits_get1(x), 1);

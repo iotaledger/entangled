@@ -144,7 +144,7 @@ void wots_recover(spongos_t *s, trits_t H, trits_t sig, trits_t pk) {
   spongos_hash(s, sig_pks, pk);
 }
 
-bool_t wots_verify(spongos_t *s, trits_t H, trits_t sig, trits_t pk) {
+bool wots_verify(spongos_t *s, trits_t H, trits_t sig, trits_t pk) {
   MAM2_TRITS_DEF0(sig_pk, MAM2_WOTS_PK_SIZE);
   sig_pk = MAM2_TRITS_INIT(sig_pk, MAM2_WOTS_PK_SIZE);
 

@@ -47,7 +47,7 @@ typedef struct trits_s {
 #define MAM2_TRITS_MOD_WORD(t) ((t) % MAM2_TRITS_PER_WORD)
 
 /*! \brief Check `x.n` against zero. */
-bool_t trits_is_empty(trits_t x);
+bool trits_is_empty(trits_t x);
 
 /*! \brief Size of `x`. */
 size_t trits_size(trits_t x);
@@ -97,9 +97,9 @@ trint18_t trits_get18(trits_t x);
 void trits_put18(trits_t x, trint18_t t);
 
 char trits_get_char(trits_t x);
-bool_t trits_put_char(trits_t x, char c);
+bool trits_put_char(trits_t x, char c);
 byte trits_get_byte(trits_t x);
-bool_t trits_put_byte(trits_t x, byte b);
+bool trits_put_byte(trits_t x, byte b);
 
 /*! \brief Get trits: `t`[i] := `x`[i]. */
 void trits_get(trits_t x, trit_t *t);
@@ -117,7 +117,7 @@ void trits_to_str(trits_t x, char *s);
 \note `trits_size(x)` must be multiple of 3.
 Size of `s` must be equal `trits_size(x)/3`.
 */
-bool_t trits_from_str(trits_t x, char const *s);
+bool trits_from_str(trits_t x, char const *s);
 
 /*! \brief Convert trits to bytes.
 Size of `bs` must be equal `ceil(trits_size(x)/5)`.
@@ -127,7 +127,7 @@ void trits_to_bytes(trits_t x, byte *bs);
 /*! \brief Convert trits from bytes.
 Size of `bs` must be equal `ceil(trits_size(x)/5)`.
 */
-bool_t trits_from_bytes(trits_t x, byte const *bs);
+bool trits_from_bytes(trits_t x, byte const *bs);
 
 /*! \brief Set zero trits: `x` := t^n. */
 void trits_set1(trits_t x, trit_t t);
@@ -182,17 +182,17 @@ size_t trits_swap_sub_min(trits_t x, trits_t s);
 int trits_cmp_grlex(trits_t x, trits_t y);
 
 /*! \brief Compare trits: `x` =? `y`. */
-bool_t trits_cmp_eq(trits_t x, trits_t y);
+bool trits_cmp_eq(trits_t x, trits_t y);
 
-bool_t trits_cmp_eq_str(trits_t x, char const *y);
+bool trits_cmp_eq_str(trits_t x, char const *y);
 
 /*! \brief Check whether `x` and `y` point to the same memory location.
 \note `trits_is_same(x, y)` implies `0 == trits_cmp_grlex(x, y)` but not vice
 versa. */
-bool_t trits_is_same(trits_t x, trits_t y);
+bool trits_is_same(trits_t x, trits_t y);
 
 /*! \brief Check whether `x` and `y` point to overlapped memory location. */
-bool_t trits_is_overlapped(trits_t x, trits_t y);
+bool trits_is_overlapped(trits_t x, trits_t y);
 
 /*! \brief Return `x` such that:
 `trits_is_same(trits_drop(begin, trits_size(x)), end)` and
@@ -210,10 +210,10 @@ to allocate memory for trits. But in certain cases where the size of memory
 is difficult to trac memory can be allocated within a callee.
 In such case trits should be passed by pointer: `trits_t *x`.
 */
-bool_t trits_is_null(trits_t x);
+bool trits_is_null(trits_t x);
 
 /*! \brief Increment trits with carry. Return false if overflow would occur. */
-bool_t trits_inc(trits_t x);
+bool trits_inc(trits_t x);
 
 /*! \brief Alloc `n` trits. */
 trits_t trits_alloc(size_t n);

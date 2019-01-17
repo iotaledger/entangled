@@ -12,9 +12,9 @@
 
 #include "mam/v2/pb3/pb3.h"
 
-static bool_t pb3_sizet_test(size_t n) {
+static bool pb3_sizet_test(size_t n) {
   retcode_t e;
-  bool_t ok = 1;
+  bool ok = true;
   size_t k = pb3_sizeof_sizet(n);
   size_t m = 0;
   MAM2_TRITS_DEF0(b0, 3 * 14); /* 14 trytes max */

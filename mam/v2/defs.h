@@ -20,6 +20,7 @@
 #define MAM2_DEBUG
 #endif
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -174,10 +175,6 @@ trit_t trit_add(trit_t x, trit_t s);
 /*! \brief Return `y - s (mods 3)`. */
 trit_t trit_sub(trit_t y, trit_t s);
 
-/*! \brief Boolean type with zero as `false`(`no`) and non-zero as
- * `true`(`yes`). */
-typedef trint1_t bool_t;
-
 /*! \brief Signed integer type capable of storing 3 trits
 with values in range [-13,..,-1,0,1,..,13]. */
 typedef int8_t trint3_t;
@@ -189,7 +186,7 @@ tryte_t tryte_from_trits(trit_t t0, trit_t t1, trit_t t2);
 
 char tryte_to_char(tryte_t t);
 
-bool_t tryte_from_char(tryte_t *t, char c);
+bool tryte_from_char(tryte_t *t, char c);
 
 /*! \brief Signed integer type capable of storing 6 trits
 with values in range [-(3^6-1)/2=-364,..,-1,0,1,..,364=(3^6-1)/2]. */

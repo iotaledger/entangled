@@ -66,7 +66,7 @@ wots_t *test_wots_init(test_wots_t *w, sponge_t *s) {
   return &w->w;
 }
 
-static char *bool_str(bool_t b) {
+static char *bool_str(bool b) {
   static char *yes = "ok";
   static char *no = "failed";
   return b ? yes : no;
@@ -89,8 +89,8 @@ void _sponge_hash(size_t Xn, char *X, size_t Yn, char *Y) {
   trits_free(tY);
 }
 
-bool_t _sponge_point_test() {
-  bool_t r = 1, ok;
+bool _sponge_point_test() {
+  bool r = true, ok;
   test_sponge_t _s[1];
   sponge_t *s = test_sponge_init(_s);
 
@@ -588,7 +588,7 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 }
 #endif
 
-// bool_t _gen() {
+// bool _gen() {
 //   test_sponge_t _s[1];
 //   test_spongos_t _sg[1];
 //   test_prng_t _p[1], _pa[1], _pb[1];
@@ -625,7 +625,7 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //   return 1;
 // }
 //
-// bool_t _() {
+// bool _() {
 //   test_sponge _s[1];
 //   test_spongos _sg[1];
 //   test_prng _p[1], _pa[1], _pb[1];
@@ -656,7 +656,7 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //   mss_t *m = test_mss_init(_m);
 //   ntru_t *n = test_ntru_init(_n);
 //
-//   bool_t r = 1, rr;
+//   bool r = true, rr;
 //   clock_t clk;
 // #define __run_test(n, f)                                \
 //   do {                                                  \
@@ -692,7 +692,7 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //       "AZNODFGXCVKNLMOXHABCYZ99WER"
 //       "FGWERVHABCKXCNLM9AZNODOXYZ9";
 //
-//   bool_t r = 1;
+//   bool r = true;
 //   size_t sponge_hash_Yn = 81;
 //   size_t sponge_encr_Yn = 162;
 //   size_t sponge_decr_Xn = 162;

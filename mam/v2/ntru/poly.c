@@ -258,8 +258,8 @@ void poly_conv(poly_t tf, poly_t tg, poly_t th) {
   for (i = 0; i < MAM2_POLY_N; ++i) th[i] = poly_coeff_mul(tf[i], tg[i]);
 }
 
-bool_t poly_has_inv(poly_t t) {
-  bool_t r = 1;
+bool poly_has_inv(poly_t t) {
+  bool r = true;
   size_t i;
   for (i = 0; r && i < MAM2_POLY_N; ++i) r = (0 != t[i]) ? 1 : 0;
   return r;
@@ -350,7 +350,7 @@ void poly_small_from_trits(poly_t f, trits_t t) {
     f[i] = poly_coeff_from_trint1(trits_get1(t));
 }
 
-bool_t poly_from_trits(poly_t f, trits_t t) {
+bool poly_from_trits(poly_t f, trits_t t) {
   size_t i;
   trint9_t c;
   MAM2_ASSERT(trits_size(t) == 9 * MAM2_POLY_N);
@@ -382,14 +382,14 @@ void poly_print(char const *s, poly_t f) {
   }
   printf("\n");
 }
-bool_t poly_is_one(poly_t h) {
+bool poly_is_one(poly_t h) {
   size_t i;
   for (i = 1; i < MAM2_POLY_N; ++i)
     if (h[i] != 0) break;
   return (MAM2_POLY_COEFF_ONE == h[0]) && (i == MAM2_POLY_N) ? 1 : 0;
 }
-bool_t poly_is_eq(poly_t f, poly_t g) {
-  bool_t r = 1;
+bool poly_is_eq(poly_t f, poly_t g) {
+  bool r = true;
   size_t i;
   for (i = 0; r && i < MAM2_POLY_N; ++i) r = (f[i] == g[i]) ? 1 : 0;
   return r;

@@ -387,7 +387,7 @@ void pb3_wrap_squeeze_ntrytes(spongos_t *s, trits_t *b, size_t n) {
 }
 retcode_t pb3_unwrap_squeeze_ntrytes(spongos_t *s, trits_t *b, size_t n) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  bool_t r;
+  bool r;
 
   do {
     err_guard(pb3_sizeof_ntrytes(n) <= trits_size(*b), RC_MAM2_PB3_EOF);

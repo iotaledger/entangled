@@ -178,13 +178,13 @@ size_t mam_wrap_keyload_psk_size();
 void mam_wrap_keyload_psk(spongos_t *s, trits_t *b, trits_t key, trits_t id,
                           trits_t psk);
 retcode_t mam_unwrap_keyload_psk(spongos_t *s, trits_t *b, trits_t key,
-                                 bool_t *key_found, trits_t id, trits_t psk);
+                                 bool *key_found, trits_t id, trits_t psk);
 
 size_t mam_wrap_keyload_ntru_size();
 void mam_wrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key, trits_t pk,
                            prng_t *p, spongos_t *ns, trits_t N);
 retcode_t mam_unwrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key,
-                                  bool_t *key_found, trits_t pkid, ntru_t *n,
+                                  bool *key_found, trits_t pkid, ntru_t *n,
                                   spongos_t *ns);
 
 /* Packet */
@@ -240,7 +240,7 @@ typedef struct mam_send_msg_context_s {
                                                        unique for each key. */
   word_t session_key[MAM2_WORDS(
       MAM2_SPONGE_KEY_SIZE)]; /*!< Trits (memory) for session key. */
-  bool_t key_plain;           /*!< Include session key in plain? */
+  bool key_plain;             /*!< Include session key in plain? */
   mam_pre_shared_keys_list
       pre_shared_keys; /*!< Encrypt message for these psks. */
   mam_ntru_pk_list
@@ -277,7 +277,7 @@ typedef struct mam_recv_msg_context_s {
   spongos_t spongos_mss[1];  /*!< Sponge interface used by MSS layer */
   spongos_t spongos_wots[1]; /*!< Sponge interface used by WOTS layer */
   spongos_t spongos_ntru[1]; /*!< Sponge interface used by NTRU layer */
-  bool_t ep_sig;             /*!< Signed? */
+  bool ep_sig;               /*!< Signed? */
   /*TODO: check for trusted chid/epid*/
   /*TODO: handle (add to trusted list) new chid1*/
 

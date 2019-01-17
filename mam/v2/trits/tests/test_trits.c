@@ -100,8 +100,8 @@ static void trits_bytes_test(void) {
   }
 }
 
-static bool_t trits_trytes(trits_t x, char *s, char *t) {
-  bool_t r = 1;
+static bool trits_trytes(trits_t x, char *s, char *t) {
+  bool r = true;
   size_t n = trits_size(x) / 3;
   trits_t y;
   trint1_t s1;
