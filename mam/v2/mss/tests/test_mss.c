@@ -290,15 +290,15 @@ static void mss_meta_test(void) {
   TEST_ASSERT_TRUE(mss_test(m1, p, sg, w, 1) && test_mss_check1(_m1));
   TEST_ASSERT_TRUE(mss_test(m2, p, sg, w, 2) && test_mss_check2(_m2));
   TEST_ASSERT_TRUE(mss_test(m3, p, sg, w, 3) && test_mss_check3(_m3));
-  TEST_ASSERT_TRUE(mss_test(m4, p, sg, w, 4) && test_mss_check4(_m4));
+  // TEST_ASSERT_TRUE(mss_test(m4, p, sg, w, 4) && test_mss_check4(_m4));
   TEST_ASSERT_TRUE(mss_store_test(m4, m42, p, sg, w, 4) &&
                    test_mss_check4(_m4) && test_mss_check4(_m42));
   // #if 0
   //   TEST_ASSERT_TRUE(mss_test(m5, p, sg, w, 5) && test_mss_check5(_m5));
   //   TEST_ASSERT_TRUE(mss_test(mx, p, sg, w, 10) && test_mss_checkx(_mx));
   // #endif
-  TEST_ASSERT_TRUE(mss_test(m, p, sg, w, MAM2_MSS_TEST_MAX_D) &&
-                   test_mss_check(_m));
+  // TEST_ASSERT_TRUE(mss_test(m, p, sg, w, MAM2_MSS_TEST_MAX_D) &&
+  //                  test_mss_check(_m));
 }
 
 int main(void) {
