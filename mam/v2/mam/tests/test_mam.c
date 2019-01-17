@@ -14,6 +14,22 @@
 #include "mam/v2/mam/mam.h"
 #include "mam/v2/test_utils/test_utils.h"
 
+#define TEST_CHANNEL_NAME "CHANAME"
+#define TEST_CHANNEL_1_NAME "CHANAME9"
+#define TEST_END_POINT_NAME "EPANAME"
+#define TEST_END_POINT_1_NAME "EPANAME9"
+#define TEST_PRE_SHARED_KEY_A_STR "PSKIDAPSKIDAPSKIDAPSKIDAPSK"
+#define TEST_PRE_SHARED_KEY_A_NONCE_STR "PSKANONCE"
+#define TEST_PRE_SHARED_KEY_B_STR "PSKIDBPSKIDBPSKIDBPSKIDBPSK"
+#define TEST_PRE_SHARED_KEY_B_NONCE_STR "PSKBNONCE"
+#define TEST_NTRU_NONCE "NTRUBNONCE"
+#define TEST_PRNG_A_KEY                                                        \
+  "SENDERPRNGKEYASENDERPRNGKEYSENDERPRNGKEYASENDERPRNGKEYSENDERPRNGKEYASENDER" \
+  "PRNGKEY"
+#define TEST_PRNG_B_KEY                                                        \
+  "RECIPIPRNGKEYBRECIPIPRNGKEYRECIPIPRNGKEYBRECIPIPRNGKEYRECIPIPRNGKEYBRECIPI" \
+  "PRNGKEY"
+
 mam_channel_t *test_create_channel(char const *const cha_name_str,
                                    prng_t const *const prng,
                                    mss_mt_height_t d) {
@@ -98,40 +114,23 @@ static trits_t mam_test_generic_send_msg(
     sponge_send = ma->create_sponge();
   }
 
-  {
-    MAM2_TRITS_DEF0(k, MAM2_PRNG_KEY_SIZE);
-    k = MAM2_TRITS_INIT(k, MAM2_PRNG_KEY_SIZE);
-
-    trits_from_str(k,
-                   "SENDERPRNGKEYASENDERPRNGKEY"
-                   "SENDERPRNGKEYASENDERPRNGKEY"
-                   "SENDERPRNGKEYASENDERPRNGKEY");
-    prng_init(pa, pa->sponge, k);
-
-    trits_from_str(k,
-                   "RECIPIPRNGKEYBRECIPIPRNGKEY"
-                   "RECIPIPRNGKEYBRECIPIPRNGKEY"
-                   "RECIPIPRNGKEYBRECIPIPRNGKEY");
-    prng_init(pb, pb->sponge, k);
-  }
-
   /* gen psk */
   {
     pska->prev = pska->next = 0;
-    trits_from_str(mam_psk_id(&pska->info), "PSKIDAPSKIDAPSKIDAPSKIDAPSK");
-    prng_gen_str(pa, MAM2_PRNG_DST_SECKEY, "PSKANONCE",
+    trits_from_str(mam_psk_id(&pska->info), TEST_PRE_SHARED_KEY_A_STR);
+    prng_gen_str(pa, MAM2_PRNG_DST_SECKEY, TEST_PRE_SHARED_KEY_A_NONCE_STR,
                  mam_psk_trits(&pska->info));
 
     pskb->prev = pskb->next = 0;
-    trits_from_str(mam_psk_id(&pskb->info), "PSKIDBPSKIDBPSKIDBPSKIDBPSK");
-    prng_gen_str(pb, MAM2_PRNG_DST_SECKEY, "PSKBNONCE",
+    trits_from_str(mam_psk_id(&pskb->info), TEST_PRE_SHARED_KEY_B_STR);
+    prng_gen_str(pb, MAM2_PRNG_DST_SECKEY, TEST_PRE_SHARED_KEY_B_NONCE_STR,
                  mam_psk_trits(&pskb->info));
   }
   /* gen recipient'spongos ntru keys */
   {
     MAM2_TRITS_DEF0(N, 30);
     N = MAM2_TRITS_INIT(N, 30);
-    trits_from_str(N, "NTRUBNONCE");
+    trits_from_str(N, TEST_NTRU_NONCE);
 
     e = ntru_create(nb);
     ntru_gen(nb, pb, N, mam_ntru_pk_trits(&nbpk->info));
@@ -244,6 +243,8 @@ static trits_t mam_test_generic_send_packet(
   packet = trits_pickup(packet, sz);
   trits_set_zero(payload);
 
+  trits_free(payload);
+
   return packet;
 }
 
@@ -255,9 +256,9 @@ static void mam_test_generic_receive_msg(
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   mam_ialloc_t ma[1];
-  mam_psk_node pskb[1];
-  mam_ntru_pk_node nbpk[1];
-  ntru_t nb[1];
+  mam_psk_node pre_shared_key[1];
+  mam_ntru_pk_node ntru_pk[1];
+  ntru_t ntru[1];
 
   sponge_t *sponge_recv = 0, *fork_sponge_recv = 0, *mss_sponge_recv = 0,
            *wots_sponge_recv = 0, *ntru_sponge_recv = 0;
@@ -278,19 +279,20 @@ static void mam_test_generic_receive_msg(
 
   /* gen psk */
   {
-    pskb->prev = pskb->next = 0;
-    trits_from_str(mam_psk_id(&pskb->info), "PSKIDBPSKIDBPSKIDBPSKIDBPSK");
-    prng_gen_str(pb, MAM2_PRNG_DST_SECKEY, "PSKBNONCE",
-                 mam_psk_trits(&pskb->info));
+    pre_shared_key->prev = pre_shared_key->next = 0;
+    trits_from_str(mam_psk_id(&pre_shared_key->info),
+                   TEST_PRE_SHARED_KEY_B_STR);
+    prng_gen_str(pb, MAM2_PRNG_DST_SECKEY, TEST_PRE_SHARED_KEY_B_NONCE_STR,
+                 mam_psk_trits(&pre_shared_key->info));
   }
   /* gen recipient'spongos ntru keys */
   {
-    MAM2_TRITS_DEF0(N, 30);
-    N = MAM2_TRITS_INIT(N, 30);
-    trits_from_str(N, "NTRUBNONCE");
+    MAM2_TRITS_DEF0(ntru_nonce, 30);
+    ntru_nonce = MAM2_TRITS_INIT(ntru_nonce, 30);
+    trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
 
-    e = ntru_create(nb);
-    ntru_gen(nb, pb, N, mam_ntru_pk_trits(&nbpk->info));
+    e = ntru_create(ntru);
+    ntru_gen(ntru, pb, ntru_nonce, mam_ntru_pk_trits(&ntru_pk->info));
     TEST_ASSERT(RC_OK == e);
   }
 
@@ -306,8 +308,8 @@ static void mam_test_generic_receive_msg(
     cfg->spongos_wots->sponge = wots_sponge_recv;
     cfg->spongos_ntru->sponge = ntru_sponge_recv;
 
-    cfg->psk = &pskb->info;
-    cfg->ntru = nb;
+    cfg->psk = &pre_shared_key->info;
+    cfg->ntru = ntru;
 
     trits_copy(mam_channel_id(cha), mam_recv_msg_cfg_chid(cfg));
   }
@@ -360,34 +362,14 @@ static void mam_test_generic_receive_packet(
   }
 }
 
-static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
-                             sponge_t *(create_sponge)(void *ctx),
-                             void (*destroy_sponge)(void *ctx, sponge_t *),
-                             prng_t *pa, prng_t *pb) {
+static void mam_test_create_channels(
+    sponge_t *(create_sponge)(void *ctx),
+    void (*destroy_sponge)(void *ctx, sponge_t *), prng_t *pa, prng_t *pb,
+    mam_channel_t **const cha, mam_channel_t **const ch1,
+    mam_endpoint_t **const epa, mam_endpoint_t **ep1) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   mam_ialloc_t ma[1];
-
-  trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
-
   mss_mt_height_t d = 1;
-  char const *cha_name_str = "CHANAME";
-  char const *ch1a_name_str = "CHANAME9";
-  char const *epa_name_str = "EPANAME";
-  char const *ep1a_name_str = "EPANAME9";
-  mam_channel_t *cha = 0, *ch1a = 0;
-  mam_endpoint_t *epa = 0, *ep1a = 0;
-
-  mam_psk_node pska[1];
-  ntru_t nb[1];
-  mam_ntru_pk_node nbpk[1];
-
-  mam_send_msg_context_t cfg_msg_send[1];
-  mam_recv_msg_context_t cfg_msg_recv[1];
-  mam_recv_packet_context_t cfg_packet_receive[1];
-
-  mam_msg_pubkey_t pubkey;     /* chid=0, epid=1, chid1=2, epid1=3 */
-  mam_msg_keyload_t keyload;   /* plain=0, psk=1, ntru=2 */
-  mam_msg_checksum_t checksum; /* none=0, mac=1, mssig=2 */
 
   /* init alloc */
   {
@@ -400,99 +382,107 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
     MAM2_TRITS_DEF0(k, MAM2_PRNG_KEY_SIZE);
     k = MAM2_TRITS_INIT(k, MAM2_PRNG_KEY_SIZE);
 
-    trits_from_str(k,
-                   "SENDERPRNGKEYASENDERPRNGKEY"
-                   "SENDERPRNGKEYASENDERPRNGKEY"
-                   "SENDERPRNGKEYASENDERPRNGKEY");
+    trits_from_str(k, TEST_PRNG_A_KEY);
     prng_init(pa, pa->sponge, k);
 
-    trits_from_str(k,
-                   "RECIPIPRNGKEYBRECIPIPRNGKEY"
-                   "RECIPIPRNGKEYBRECIPIPRNGKEY"
-                   "RECIPIPRNGKEYBRECIPIPRNGKEY");
+    trits_from_str(k, TEST_PRNG_B_KEY);
     prng_init(pb, pb->sponge, k);
   }
 
   /* create channels */
   {
-    trits_t cha_name = trits_alloc(3 * strlen(cha_name_str));
-    trits_from_str(cha_name, cha_name_str);
+    trits_t cha_name = trits_alloc(3 * strlen(TEST_CHANNEL_NAME));
+    trits_from_str(cha_name, TEST_CHANNEL_NAME);
 
-    cha = malloc(sizeof(mam_channel_t));
-    TEST_ASSERT(0 != cha);
-    memset(cha, 0, sizeof(mam_channel_t));
-    e = mam_channel_create(ma, pa, d, cha_name, cha);
+    *cha = malloc(sizeof(mam_channel_t));
+    TEST_ASSERT(0 != *cha);
+    memset(*cha, 0, sizeof(mam_channel_t));
+    e = mam_channel_create(ma, pa, d, cha_name, *cha);
     TEST_ASSERT(RC_OK == e);
 
     /* create endpoints */
-    if (1) {
-      trits_t epa_name = trits_alloc(3 * strlen(epa_name_str));
-      trits_from_str(epa_name, epa_name_str);
+    {
+      trits_t epa_name = trits_alloc(3 * strlen(TEST_END_POINT_NAME));
+      trits_from_str(epa_name, TEST_END_POINT_NAME);
 
-      epa = malloc(sizeof(mam_endpoint_t));
-      TEST_ASSERT(0 != epa);
-      memset(epa, 0, sizeof(mam_endpoint_t));
-      e = mam_endpoint_create(ma, pa, d, cha_name, epa_name, epa);
+      *epa = malloc(sizeof(mam_endpoint_t));
+      TEST_ASSERT(0 != *epa);
+      memset(*epa, 0, sizeof(mam_endpoint_t));
+      e = mam_endpoint_create(ma, pa, d, cha_name, epa_name, *epa);
       TEST_ASSERT(RC_OK == e);
       trits_free(epa_name);
     }
-    if (1) {
-      trits_t ep1a_name = trits_alloc(3 * strlen(ep1a_name_str));
-      trits_from_str(ep1a_name, ep1a_name_str);
+    {
+      trits_t ep1a_name = trits_alloc(3 * strlen(TEST_END_POINT_1_NAME));
+      trits_from_str(ep1a_name, TEST_END_POINT_1_NAME);
 
-      ep1a = malloc(sizeof(mam_endpoint_t));
-      TEST_ASSERT(0 != ep1a);
-      memset(ep1a, 0, sizeof(mam_endpoint_t));
-      e = mam_endpoint_create(ma, pa, d, cha_name, ep1a_name, ep1a);
+      *ep1 = malloc(sizeof(mam_endpoint_t));
+      TEST_ASSERT(0 != *ep1);
+      memset(*ep1, 0, sizeof(mam_endpoint_t));
+      e = mam_endpoint_create(ma, pa, d, cha_name, ep1a_name, *ep1);
       TEST_ASSERT(RC_OK == e);
       trits_free(ep1a_name);
     }
     trits_free(cha_name);
-  }
-  if (1) {
-    trits_t ch1a_name = trits_alloc(3 * strlen(ch1a_name_str));
-    trits_from_str(ch1a_name, ch1a_name_str);
+    {
+      trits_t ch1a_name = trits_alloc(3 * strlen(TEST_CHANNEL_1_NAME));
+      trits_from_str(ch1a_name, TEST_CHANNEL_1_NAME);
 
-    ch1a = malloc(sizeof(mam_channel_t));
-    TEST_ASSERT(0 != ch1a);
-    memset(ch1a, 0, sizeof(mam_channel_t));
-    e = mam_channel_create(ma, pa, d, ch1a_name, ch1a);
-    TEST_ASSERT(RC_OK == e);
-    trits_free(ch1a_name);
+      *ch1 = malloc(sizeof(mam_channel_t));
+      TEST_ASSERT(0 != *ch1);
+      memset(*ch1, 0, sizeof(mam_channel_t));
+      e = mam_channel_create(ma, pa, d, ch1a_name, *ch1);
+      TEST_ASSERT(RC_OK == e);
+      trits_free(ch1a_name);
+    }
   }
-  /* gen psk */
+}
+
+static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
+                             sponge_t *(create_sponge)(void *ctx),
+                             void (*destroy_sponge)(void *ctx, sponge_t *),
+                             prng_t *prng_a, prng_t *prng_b) {
+  retcode_t e = RC_OK;
+  mam_ialloc_t ma[1];
+
+  trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
+
+  mss_mt_height_t d = 1;
+  mam_channel_t *cha = 0, *ch1a = 0;
+  mam_endpoint_t *epa = 0, *ep1a = 0;
+
+  mam_send_msg_context_t cfg_msg_send[1];
+  mam_recv_msg_context_t cfg_msg_recv[1];
+
+  mam_msg_pubkey_t pubkey;     /* chid=0, epid=1, chid1=2, epid1=3 */
+  mam_msg_keyload_t keyload;   /* plain=0, psk=1, ntru=2 */
+  mam_msg_checksum_t checksum; /* none=0, mac=1, mssig=2 */
+
+  /* init alloc */
   {
-    pska->prev = pska->next = 0;
-    trits_from_str(mam_psk_id(&pska->info), "PSKIDAPSKIDAPSKIDAPSKIDAPSK");
-    prng_gen_str(pa, MAM2_PRNG_DST_SECKEY, "PSKANONCE",
-                 mam_psk_trits(&pska->info));
-  }
-  /* gen recipient'spongos ntru keys */
-  {
-    MAM2_TRITS_DEF0(N, 30);
-    N = MAM2_TRITS_INIT(N, 30);
-    trits_from_str(N, "NTRUBNONCE");
-
-    e = ntru_create(nb);
-    ntru_gen(nb, pb, N, mam_ntru_pk_trits(&nbpk->info));
-    TEST_ASSERT(RC_OK == e);
+    ma->create_sponge = create_sponge;
+    ma->destroy_sponge = destroy_sponge;
   }
 
-  for (pubkey = 0; pubkey < 4; ++pubkey) /* chid=0, epid=1, chid1=2, epid1=3
-                                          */
-    for (keyload = 0; keyload < 3; ++keyload) /* plain=0, psk=1, ntru=2 */
+  mam_test_create_channels(create_sponge, destroy_sponge, prng_a, prng_b, &cha,
+                           &ch1a, &epa, &ep1a);
+
+  /* chid=0, epid=1, chid1=2, epid1=3*/
+  for (pubkey = 0; pubkey < 4; ++pubkey) {
+    /* plain=0, psk=1, ntru=2 */
+    for (keyload = 0; keyload < 3; ++keyload) {
       for (checksum = 0; checksum < 3; ++checksum)
       /* none=0, mac=1, mssig=2 */
       {
         /* send/recv msg */
         {
           msg = mam_test_generic_send_msg(
-              sponge_alloc_ctx, create_sponge, destroy_sponge, pa, pb, pubkey,
-              keyload, checksum, cha, epa, ch1a, ep1a, cfg_msg_send);
+              sponge_alloc_ctx, create_sponge, destroy_sponge, prng_a, prng_b,
+              pubkey, keyload, checksum, cha, epa, ch1a, ep1a, cfg_msg_send);
 
           mam_test_generic_receive_msg(sponge_alloc_ctx, create_sponge,
-                                       destroy_sponge, pa, pb, cha, &msg,
-                                       cfg_msg_recv);
+                                       destroy_sponge, prng_a, prng_b, cha,
+                                       &msg, cfg_msg_recv);
         }
 
         char const *payload_str = "PAYLOAD9999";
@@ -503,6 +493,7 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
 
         /* send/recv packet */
         {
+          ntru_destroy(cfg_msg_recv->ntru);
           mam_test_generic_receive_packet(pubkey, keyload, checksum, cha, epa,
                                           ch1a, ep1a, cfg_msg_recv, &packet,
                                           &payload);
@@ -518,8 +509,15 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
           ma->destroy_sponge(cfg_msg_send->spongos->sponge);
           ma->destroy_sponge(cfg_msg_send->fork->sponge);
           ma->destroy_sponge(cfg_msg_send->ns->sponge);
+          ma->destroy_sponge(cfg_msg_recv->spongos->sponge);
+          ma->destroy_sponge(cfg_msg_recv->fork->sponge);
+          ma->destroy_sponge(cfg_msg_recv->spongos_ntru->sponge);
+          ma->destroy_sponge(cfg_msg_recv->spongos_wots->sponge);
+          ma->destroy_sponge(cfg_msg_recv->spongos_mss->sponge);
         }
       }
+    }
+  }
 
   /* destroy channels/endpoints */
   {
@@ -527,7 +525,6 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
     if (ch1a) mam_channel_destroy(ma, ch1a);
     if (epa) mam_endpoint_destroy(ma, epa);
     if (ep1a) mam_endpoint_destroy(ma, ep1a);
-    ntru_destroy(nb);
     free(cha);
     free(epa);
     free(ch1a);
