@@ -70,13 +70,12 @@ void test_init_send_msg_cfg(mam_send_msg_context_t *const cfg,
 }
 
 static trits_t mam_test_generic_send_msg(
-    sponge_t *spongos_sponge, sponge_t *fork_sponge, sponge_t *ntru_sponge,
     void *sponge_alloc_ctx, sponge_t *(create_sponge)(void *ctx),
     void (*destroy_sponge)(void *ctx, sponge_t *), prng_t *pa, prng_t *pb,
     mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
     mam_msg_checksum_t checksum, mam_channel_t *const cha,
     mam_endpoint_t *const epa, mam_channel_t *const ch1a,
-    mam_endpoint_t *const ep1a, size_t *const pos) {
+    mam_endpoint_t *const ep1a, mam_send_msg_context_t *const cfg_msga) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   trits_t msg = trits_null();
@@ -84,7 +83,20 @@ static trits_t mam_test_generic_send_msg(
   mam_psk_node pska[1], pskb[1];
   ntru_t nb[1];
   mam_ntru_pk_node nbpk[1];
-  mam_send_msg_context_t cfg_msga[1];
+  mam_ialloc_t ma[1];
+  sponge_t *sponge_send = 0, *fork_sponge_send = 0, *ntru_sponge_send = 0;
+
+  /* init alloc */
+  {
+    ma->create_sponge = create_sponge;
+    ma->destroy_sponge = destroy_sponge;
+  }
+
+  {
+    fork_sponge_send = ma->create_sponge();
+    ntru_sponge_send = ma->create_sponge();
+    sponge_send = ma->create_sponge();
+  }
 
   {
     MAM2_TRITS_DEF0(k, MAM2_PRNG_KEY_SIZE);
@@ -129,11 +141,11 @@ static trits_t mam_test_generic_send_msg(
     mam_send_msg_context_t *cfg = cfg_msga;
 
     cfg->ma = 0;
-    cfg->spongos->sponge = spongos_sponge;
-    cfg->fork->sponge = fork_sponge;
+    cfg->spongos->sponge = sponge_send;
+    cfg->fork->sponge = fork_sponge_send;
     cfg->prng = pa;
     cfg->rng = pa;
-    cfg->ns->sponge = ntru_sponge;
+    cfg->ns->sponge = ntru_sponge_send;
 
     cfg->ch = cha;
     cfg->ch1 = 0;
@@ -178,8 +190,6 @@ static trits_t mam_test_generic_send_msg(
   TEST_ASSERT(trits_is_empty(msg));
   msg = trits_pickup(msg, sz);
 
-  *pos = cfg_msga->spongos->pos;
-
   ntru_destroy(nb);
 
   return msg;
@@ -201,8 +211,6 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
                              prng_t *pa, prng_t *pb) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   mam_ialloc_t ma[1];
-
-  sponge_t *sponge_send = 0, *fork_sponge_send = 0, *ntru_sponge_send = 0;
   sponge_t *sponge_recv = 0, *fork_sponge_recv = 0, *mss_sponge_recv = 0,
            *wots_sponge_recv = 0, *ntru_sponge_recv = 0;
 
@@ -220,6 +228,7 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
   ntru_t nb[1];
   mam_ntru_pk_node nbpk[1];
 
+  mam_send_msg_context_t cfg_msg_send[1];
   mam_recv_msg_context_t cfg_msgb[1];
   mam_send_packet_context_t cfg_packeta[1];
   mam_recv_packet_context_t cfg_packetb[1];
@@ -235,10 +244,6 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
   }
   /* create spongos */
   {
-    fork_sponge_send = ma->create_sponge();
-    ntru_sponge_send = ma->create_sponge();
-    sponge_send = ma->create_sponge();
-
     mss_sponge_recv = ma->create_sponge();
     wots_sponge_recv = ma->create_sponge();
     ntru_sponge_recv = ma->create_sponge();
@@ -357,13 +362,11 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
       for (checksum = 0; checksum < 3; ++checksum)
       /* none=0, mac=1, mssig=2 */
       {
-        size_t pos;
         /* send/recv msg */
         {
           msg = mam_test_generic_send_msg(
-              sponge_send, fork_sponge_send, ntru_sponge_send, sponge_alloc_ctx,
-              create_sponge, destroy_sponge, pa, pb, pubkey, keyload, checksum,
-              cha, epa, ch1a, ep1a, &pos);
+              sponge_alloc_ctx, create_sponge, destroy_sponge, pa, pb, pubkey,
+              keyload, checksum, cha, epa, ch1a, ep1a, cfg_msg_send);
 
           e = mam_recv_msg(cfg_msgb, &msg);
           TEST_ASSERT(RC_OK == e);
@@ -374,8 +377,8 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
         {
           mam_send_packet_context_t *cfg = cfg_packeta;
 
-          cfg->spongos->sponge = sponge_send;
-          cfg->spongos->pos = pos;
+          cfg->spongos->sponge = cfg_msg_send->spongos->sponge;
+          cfg->spongos->pos = cfg_msg_send->spongos->pos;
           cfg->ord = 0;
           cfg->checksum = checksum;
           cfg->mss = 0;
@@ -448,14 +451,14 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
           trits_free(packet);
           trits_free(payload);
         }
+
+        ma->destroy_sponge(cfg_msg_send->spongos->sponge);
+        ma->destroy_sponge(cfg_msg_send->fork->sponge);
+        ma->destroy_sponge(cfg_msg_send->ns->sponge);
       }
 
   /* destroy spongos */
   {
-    ma->destroy_sponge(sponge_send);
-    ma->destroy_sponge(fork_sponge_send);
-    ma->destroy_sponge(ntru_sponge_send);
-
     ma->destroy_sponge(sponge_recv);
     ma->destroy_sponge(fork_sponge_recv);
     ma->destroy_sponge(mss_sponge_recv);
