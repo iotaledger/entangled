@@ -761,7 +761,7 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *b) {
         /*  KeyloadNTRU ntru = 2; */
         mam_wrap_keyload_ntru(fork, b, mam_send_msg_cfg_key(cfg),
                               mam_ntru_pk_trits(&intru_pk->info), cfg->rng,
-                              cfg->ns, mam_send_msg_cfg_nonce(cfg));
+                              cfg->spongos_ntru, mam_send_msg_cfg_nonce(cfg));
       }
     }
 
@@ -891,7 +891,7 @@ retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
   MAM2_ASSERT(cfg->chid1);
   MAM2_ASSERT(cfg->epid);
   MAM2_ASSERT(cfg->epid1);
-  MAM2_ASSERT(cfg->ma);
+  MAM2_ASSERT(cfg->allocator);
   MAM2_ASSERT(cfg->spongos);
   s = cfg->spongos;
   fork = cfg->fork;
@@ -999,7 +999,7 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
 
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->spongos);
-  MAM2_ASSERT(cfg->ma);
+  MAM2_ASSERT(cfg->allocator);
   MAM2_ASSERT(b);
   MAM2_ASSERT(payload);
   s = cfg->spongos;
@@ -1036,7 +1036,8 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
       err_bind(mam_unwrap_checksum_mac(s, b));
     } else if (mam_msg_checksum_mssig == checksum) {
       /*    MSSig mssig = 2; */
-      err_bind(mam_unwrap_checksum_mssig(s, b, cfg->ms, cfg->ws, cfg->pk));
+      err_bind(mam_unwrap_checksum_mssig(s, b, cfg->spongos_mss,
+                                         cfg->spongos_wots, cfg->pk));
     } else {
       err_guard(0, RC_MAM2_PB3_BAD_ONEOF);
     }

@@ -14,6 +14,7 @@
 */
 
 #include <memory.h>
+#include <stdlib.h>
 
 #include "mam/v2/ntru/ntru.h"
 #include "mam/v2/ntru/poly.h"
@@ -191,24 +192,18 @@ retcode_t ntru_create(ntru_t *n) {
     n->id = id;
     n->sk = sk;
     n->f = f;
-    id = 0;
-    sk = 0;
-    f = 0;
     e = RC_OK;
   } while (0);
 
-  free(id);
-  free(sk);
-  free(f);
   return e;
 }
 
 void ntru_destroy(ntru_t *n) {
   MAM2_ASSERT(n);
   free(n->id);
-  n->id = 0;
+  n->id = NULL;
   free(n->sk);
-  n->sk = 0;
+  n->sk = NULL;
   free(n->f);
-  n->f = 0;
+  n->f = NULL;
 }
