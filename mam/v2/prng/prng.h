@@ -20,6 +20,10 @@
 #include "mam/v2/sponge/sponge.h"
 #include "mam/v2/trits/trits.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! \brief PRNG key size. */
 #define MAM2_PRNG_KEY_SIZE 243
 
@@ -82,5 +86,9 @@ retcode_t prng_create(prng_t *p);
 
 /*! \brief Deallocate memory for PRNG secret key. */
 void prng_destroy(prng_t *p);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __MAM_V2_PRNG_PRNG_H__

@@ -21,6 +21,10 @@
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/trits/trits.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! \brief WOTS public key size. */
 #define MAM2_WOTS_PK_SIZE 243
 /*! \brief WOTS private key part size. */
@@ -102,5 +106,9 @@ retcode_t wots_create(wots_t *w);
 
 /*! \brief Deallocate memory for WOTS private key. */
 void wots_destroy(wots_t *w);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __MAM_V2_WOTS_WOTS_H__

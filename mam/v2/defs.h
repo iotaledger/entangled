@@ -23,6 +23,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined(NDEBUG) /*&& defined(MAM2_DEBUG)*/
 /* enable `assert` in RELEASE */
 #undef NDEBUG
@@ -216,6 +220,10 @@ typedef uint8_t byte;
 
 #if 0
 #define MAM2_POLY_MRED_BINARY
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif  // __MAM_V2_DEFS_H__

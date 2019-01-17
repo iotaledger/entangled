@@ -20,6 +20,10 @@
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/trits/trits.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! \brief NTRU public key - 3g(x)/(1+3f(x)) - size. */
 #define MAM2_NTRU_PK_SIZE 9216
 /*! \brief NTRU private key - f(x) - size. */
@@ -71,5 +75,9 @@ bool_t ntru_decr(ntru_t *n,    /*!< [in] NTRU interface */
 retcode_t ntru_create(ntru_t *n);
 
 void ntru_destroy(ntru_t *n);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __MAM_V2_NTRU_NTRU_H__
