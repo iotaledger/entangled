@@ -201,9 +201,9 @@ retcode_t ntru_create(ntru_t *n) {
 void ntru_destroy(ntru_t *n) {
   MAM2_ASSERT(n);
   free(n->id);
-  n->id = 0;
+  n->id = NULL;
   free(n->sk);
-  n->sk = 0;
+  n->sk = NULL;
   free(n->f);
-  n->f = 0;
+  n->f = NULL;
 }

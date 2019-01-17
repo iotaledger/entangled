@@ -260,6 +260,9 @@ static void mam_test_generic_receive_msg(
   e = mam_recv_msg(cfg_msg_recv, msg);
   TEST_ASSERT(RC_OK == e);
   TEST_ASSERT(trits_is_empty(*msg));
+
+  ntru_destroy(cfg_msg_recv->ntru);
+  cfg_msg_recv->ntru = NULL;
 }
 
 static void mam_test_generic_receive_packet(
@@ -425,7 +428,6 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
           mam_test_generic_receive_msg(sponge_alloc_ctx, create_sponge,
                                        destroy_sponge, prng_b, cha, &msg,
                                        cfg_msg_recv);
-          ntru_destroy(cfg_msg_recv->ntru);
         }
 
         char const *payload_str = "PAYLOAD9999";
