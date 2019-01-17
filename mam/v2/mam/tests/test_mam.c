@@ -195,6 +195,58 @@ static trits_t mam_test_generic_send_msg(
   return msg;
 }
 
+static trits_t mam_test_generic_send_packet(
+    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
+    mam_msg_checksum_t checksum, mam_channel_t *const cha,
+    mam_endpoint_t *const epa, mam_channel_t *const ch1a,
+    mam_endpoint_t *const ep1a,
+    mam_send_msg_context_t const *const cfg_msg_send, char const *payload_str) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
+
+  trits_t packet = trits_null(), payload = trits_null();
+  mam_send_packet_context_t cfg_packet_send[1];
+
+  /* init send packet context */
+  {
+    mam_send_packet_context_t *cfg = cfg_packet_send;
+
+    cfg->spongos->sponge = cfg_msg_send->spongos->sponge;
+    cfg->spongos->pos = cfg_msg_send->spongos->pos;
+    cfg->ord = 0;
+    cfg->checksum = checksum;
+    cfg->mss = 0;
+    if (mam_msg_checksum_mssig == cfg->checksum) {
+      if (mam_msg_pubkey_chid == pubkey)
+        cfg->mss = cha->m;
+      else if (mam_msg_pubkey_epid == pubkey)
+        cfg->mss = epa->m;
+      else if (mam_msg_pubkey_chid1 == pubkey)
+        cfg->mss = ch1a->m;
+      else if (mam_msg_pubkey_epid1 == pubkey)
+        cfg->mss = ep1a->m;
+      else
+        ;
+    }
+  }
+
+  size_t sz;
+
+  payload = trits_alloc(3 * strlen(payload_str));
+  TEST_ASSERT(!trits_is_null(payload));
+  trits_from_str(payload, payload_str);
+
+  sz = mam_send_packet_size(cfg_packet_send, trits_size(payload));
+  packet = trits_alloc(sz);
+  TEST_ASSERT(!trits_is_null(packet));
+
+  mam_send_packet(cfg_packet_send, payload, &packet);
+  TEST_ASSERT(trits_is_empty(packet));
+  packet = trits_pickup(packet, sz);
+  trits_set_zero(payload);
+
+  return packet;
+}
+
 static void mam_test_generic_receive_msg(
     sponge_t *spongos_sponge, sponge_t *fork_sponge, sponge_t *ntru_sponge,
     void *sponge_alloc_ctx, sponge_t *(create_sponge)(void *ctx),
@@ -229,8 +281,7 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
   mam_ntru_pk_node nbpk[1];
 
   mam_send_msg_context_t cfg_msg_send[1];
-  mam_recv_msg_context_t cfg_msgb[1];
-  mam_send_packet_context_t cfg_packeta[1];
+  mam_recv_msg_context_t cfg_msg_recv[1];
   mam_recv_packet_context_t cfg_packetb[1];
 
   mam_msg_pubkey_t pubkey;     /* chid=0, epid=1, chid1=2, epid1=3 */
@@ -340,7 +391,7 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
 
   /* init recv msg context */
   {
-    mam_recv_msg_context_t *cfg = cfg_msgb;
+    mam_recv_msg_context_t *cfg = cfg_msg_recv;
 
     cfg->ma = ma;
     cfg->pubkey = -1;
@@ -368,74 +419,41 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
               sponge_alloc_ctx, create_sponge, destroy_sponge, pa, pb, pubkey,
               keyload, checksum, cha, epa, ch1a, ep1a, cfg_msg_send);
 
-          e = mam_recv_msg(cfg_msgb, &msg);
+          e = mam_recv_msg(cfg_msg_recv, &msg);
           TEST_ASSERT(RC_OK == e);
           TEST_ASSERT(trits_is_empty(msg));
         }
 
-        /* init send packet context */
-        {
-          mam_send_packet_context_t *cfg = cfg_packeta;
-
-          cfg->spongos->sponge = cfg_msg_send->spongos->sponge;
-          cfg->spongos->pos = cfg_msg_send->spongos->pos;
-          cfg->ord = 0;
-          cfg->checksum = checksum;
-          cfg->mss = 0;
-          if (mam_msg_checksum_mssig == cfg->checksum) {
-            if (mam_msg_pubkey_chid == pubkey)
-              cfg->mss = cha->m;
-            else if (mam_msg_pubkey_epid == pubkey)
-              cfg->mss = epa->m;
-            else if (mam_msg_pubkey_chid1 == pubkey)
-              cfg->mss = ch1a->m;
-            else if (mam_msg_pubkey_epid1 == pubkey)
-              cfg->mss = ep1a->m;
-            else
-              ;
-          }
-        }
-        /* init recv packet context */
-        {
-          mam_recv_packet_context_t *cfg = cfg_packetb;
-
-          cfg->ma = ma;
-          cfg->spongos->sponge = cfg_msgb->spongos->sponge;
-          cfg->spongos->pos = cfg_msgb->spongos->pos;
-          cfg->ord = -1;
-          cfg->pk = trits_null();
-          if (mam_msg_pubkey_chid == cfg_msgb->pubkey)
-            cfg->pk = mam_recv_msg_cfg_chid(cfg_msgb);
-          else if (mam_msg_pubkey_epid == cfg_msgb->pubkey)
-            cfg->pk = mam_recv_msg_cfg_epid(cfg_msgb);
-          else if (mam_msg_pubkey_chid1 == cfg_msgb->pubkey)
-            cfg->pk = mam_recv_msg_cfg_chid1(cfg_msgb);
-          else if (mam_msg_pubkey_epid1 == cfg_msgb->pubkey)
-            cfg->pk = mam_recv_msg_cfg_chid1(cfg_msgb);
-          else
-            ;
-          cfg->ms->sponge = mss_sponge_recv;
-          cfg->ws->sponge = wots_sponge_recv;
-        }
+        char const *payload_str = "PAYLOAD9999";
+        payload = trits_alloc(3 * strlen(payload_str));
+        packet =
+            mam_test_generic_send_packet(pubkey, keyload, checksum, cha, epa,
+                                         ch1a, ep1a, cfg_msg_send, payload_str);
 
         /* send/recv packet */
         {
-          size_t sz;
-          char const *payload_str = "PAYLOAD9999";
+          /*trits_free(a, payload);*/ /* init recv packet context */
+          {
+            mam_recv_packet_context_t *cfg = cfg_packetb;
 
-          payload = trits_alloc(3 * strlen(payload_str));
-          TEST_ASSERT(!trits_is_null(payload));
-          trits_from_str(payload, payload_str);
-
-          sz = mam_send_packet_size(cfg_packeta, trits_size(payload));
-          packet = trits_alloc(sz);
-          TEST_ASSERT(!trits_is_null(packet));
-
-          mam_send_packet(cfg_packeta, payload, &packet);
-          TEST_ASSERT(trits_is_empty(packet));
-          packet = trits_pickup(packet, sz);
-          trits_set_zero(payload);
-          /*trits_free(a, payload);*/
+            cfg->ma = ma;
+            cfg->spongos->sponge = cfg_msg_recv->spongos->sponge;
+            cfg->spongos->pos = cfg_msg_recv->spongos->pos;
+            cfg->ord = -1;
+            cfg->pk = trits_null();
+            if (mam_msg_pubkey_chid == cfg_msg_recv->pubkey)
+              cfg->pk = mam_recv_msg_cfg_chid(cfg_msg_recv);
+            else if (mam_msg_pubkey_epid == cfg_msg_recv->pubkey)
+              cfg->pk = mam_recv_msg_cfg_epid(cfg_msg_recv);
+            else if (mam_msg_pubkey_chid1 == cfg_msg_recv->pubkey)
+              cfg->pk = mam_recv_msg_cfg_chid1(cfg_msg_recv);
+            else if (mam_msg_pubkey_epid1 == cfg_msg_recv->pubkey)
+              cfg->pk = mam_recv_msg_cfg_chid1(cfg_msg_recv);
+            else
+              ;
+            cfg->ms->sponge = mss_sponge_recv;
+            cfg->ws->sponge = wots_sponge_recv;
+          }
 
           e = mam_recv_packet(cfg_packetb, &packet, &payload);
           TEST_ASSERT(RC_OK == e);
