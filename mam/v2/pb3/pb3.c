@@ -222,7 +222,7 @@ static retcode_t pb3_decode_ntrytes2(trits_t *ntrytes, trits_t *b) {
   return e;
 }
 
- retcode_t pb3_decode_trytes2(ialloc *a, trits_t *trytes, trits_t *b)
+retcode_t pb3_decode_trytes2(trits_t *trytes, trits_t *b)
 {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   trits_t t;
@@ -237,7 +237,7 @@ static retcode_t pb3_decode_ntrytes2(trits_t *ntrytes, trits_t *b) {
 
     if(trits_is_null(*trytes))
     {
-      t = trits_alloc(a, 3 * n);
+      t = trits_alloc(3 * n);
       err_guard(!trits_is_null(t), err_bad_alloc);
       err_bind(pb3_decode_ntrytes(t, b));
       *trytes = t;
@@ -253,7 +253,7 @@ static retcode_t pb3_decode_ntrytes2(trits_t *ntrytes, trits_t *b) {
   } while(0);
 
   if(!trits_is_null(t))
-    trits_free(a, t);
+    trits_free(t);
 
   return e;
 }

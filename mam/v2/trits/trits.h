@@ -212,10 +212,10 @@ bool_t trits_is_null(trits_t x);
 bool_t trits_inc(trits_t x);
 
 /*! \brief Alloc `n` trits. */
-trits_t trits_alloc(ialloc *a, size_t n);
+trits_t trits_alloc(size_t n);
 
 /*! \brief Free trits `x`. */
-void trits_free(ialloc *a, trits_t x);
+void trits_free(trits_t x);
 
 /*! \brief Print string rep of `x` into stdout. */
 void trits_print(trits_t x);

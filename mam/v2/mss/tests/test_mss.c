@@ -83,7 +83,6 @@ bool_t mss_test(mss_t *m, prng_t *p, spongos_t *s, wots_t *w,
   MAM2_TRITS_DEF0(H, MAM2_MSS_HASH_SIZE);
   MAM2_TRITS_DEF0(pk, MAM2_MSS_PK_SIZE);
   /*MAM2_TRITS_DEF0(sig_, MAM2_MSS_SIG_SIZE(MAM2_MSS_TEST_MAX_D)); */
-  ialloc *a = 0;
   trits_t sig_;
 
   K = MAM2_TRITS_INIT(K, MAM2_PRNG_KEY_SIZE);
@@ -91,7 +90,7 @@ bool_t mss_test(mss_t *m, prng_t *p, spongos_t *s, wots_t *w,
   H = MAM2_TRITS_INIT(H, MAM2_MSS_HASH_SIZE);
   pk = MAM2_TRITS_INIT(pk, MAM2_MSS_PK_SIZE);
   /*sig_ = MAM2_TRITS_INIT(sig_, MAM2_MSS_SIG_SIZE(MAM2_MSS_TEST_MAX_D)); */
-  sig_ = trits_alloc(a, MAM2_MSS_SIG_SIZE(D));
+  sig_ = trits_alloc(MAM2_MSS_SIG_SIZE(D));
 
   trits_from_str(K,
                  "ABCNOABCNKOZWYKOZWYSDF9SDF9"
@@ -168,7 +167,7 @@ bool_t mss_test(mss_t *m, prng_t *p, spongos_t *s, wots_t *w,
 #endif
   }
 
-  trits_free(a, sig_);
+  trits_free(sig_);
 
   return r;
 }

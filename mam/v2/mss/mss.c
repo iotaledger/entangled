@@ -15,7 +15,6 @@
 
 #include <memory.h>
 
-#include "mam/v2/alloc.h"
 #include "mam/v2/mss/mss.h"
 
 #define MAM2_MSS_MAX_SKN(d) (((trint18_t)1 << (d)) - 1)
@@ -541,7 +540,7 @@ bool_t mss_verify(spongos_t *ms, spongos_t *ws, trits_t H, trits_t sig,
   return trits_cmp_eq(apk, pk);
 }
 
-retcode_t mss_create(ialloc *a, mss_t *m, mss_mt_height_t d) {
+retcode_t mss_create(mss_t *m, mss_mt_height_t d) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   MAM2_ASSERT(m);
 
@@ -550,21 +549,21 @@ retcode_t mss_create(ialloc *a, mss_t *m, mss_mt_height_t d) {
     err_guard(0 <= d && d <= MAM2_MSS_MAX_D, RC_MAM2_INVALID_ARGUMENT);
 
 #if defined(MAM2_MSS_TRAVERSAL)
-    m->ap = mam_words_alloc(a, MAM2_MSS_MT_AUTH_WORDS(d));
+    m->ap = malloc(sizeof(word_t) * MAM2_MSS_MT_AUTH_WORDS(d));
     err_guard(m->ap, RC_OOM);
 
     /* add 1 extra hash for dirty hack (see mss.c) */
-    m->hs = mam_words_alloc(a, MAM2_MSS_MT_HASH_WORDS(d, 1));
+    m->hs = malloc(sizeof(word_t) * MAM2_MSS_MT_HASH_WORDS(d, 1));
     err_guard(m->hs, RC_OOM);
 
     /* add 1 extra node for dirty hack (see mss.c) */
-    m->ns = mam_alloc(a, sizeof(mss_mt_node_t) * (MAM2_MSS_MT_NODES(d) + 1));
+    m->ns = malloc(sizeof(mss_mt_node_t) * (MAM2_MSS_MT_NODES(d) + 1));
     err_guard(m->ns, RC_OOM);
 
-    m->ss = mam_alloc(a, sizeof(mss_mt_stack_t) * MAM2_MSS_MT_STACKS(d));
+    m->ss = malloc(sizeof(mss_mt_stack_t) * MAM2_MSS_MT_STACKS(d));
     err_guard(m->ns, RC_OOM);
 #else
-    m->mt = mam_words_alloc(a, MAM2_MSS_MT_WORDS(d));
+    m->mt = malloc(sizeof(word_t) * MAM2_MSS_MT_WORDS(d));
     err_guard(m->mt, RC_OOM);
 #endif
 
@@ -575,25 +574,25 @@ retcode_t mss_create(ialloc *a, mss_t *m, mss_mt_height_t d) {
   return e;
 }
 
-void mss_destroy(ialloc *a, mss_t *m) {
+void mss_destroy(mss_t *m) {
   MAM2_ASSERT(m);
 
 #if defined(MAM2_MSS_TRAVERSAL)
   if (m->ap) {
-    mam_words_free(a, m->ap), m->ap = 0;
+    free(m->ap), m->ap = 0;
   }
   if (m->hs) {
-    mam_words_free(a, m->hs), m->hs = 0;
+    free(m->hs), m->hs = 0;
   }
   if (m->ns) {
-    mam_free(a, m->ns), m->ns = 0;
+    free(m->ns), m->ns = 0;
   }
   if (m->ss) {
-    mam_free(a, m->ss), m->ss = 0;
+    free(m->ss), m->ss = 0;
   }
 #else
   if (m->mt) {
-    mam_words_free(a, m->mt);
+    free(m->mt);
     m->mt = 0;
   }
 #endif

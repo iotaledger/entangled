@@ -6,7 +6,6 @@ cc_library(
     hdrs = ["prng.h"],
     deps = [
         "//common:errors",
-        "//mam/v2:alloc",
         "//mam/v2:defs",
         "//mam/v2/sponge",
         "//mam/v2/trits",

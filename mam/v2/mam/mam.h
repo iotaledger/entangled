@@ -26,11 +26,10 @@
 #include "mam/v2/wots/wots.h"
 
 typedef struct mam_ialloc_s {
-  ialloc *a; /*!< Context passed to `create_sponge` and `destroy_sponge`. */
-  sponge_t *(*create_sponge)(
-      ialloc *a); /*!< Allocator for sponge interfaces used by
-                     channels/endpoints (WOTS, PB3 sponge, PB3 fork sponge). */
-  void (*destroy_sponge)(ialloc *a, sponge_t *); /*!< Deallocator. */
+  sponge_t *(*create_sponge)(); /*!< Allocator for sponge interfaces used by
+                                              channels/endpoints (WOTS, PB3
+                                   sponge, PB3 fork sponge). */
+  void (*destroy_sponge)(sponge_t *); /*!< Deallocator. */
 } mam_ialloc_t;
 
 retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,

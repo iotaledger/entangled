@@ -192,12 +192,12 @@ bool_t mss_verify(
 \note Non Merkle tree related objects (WOTS, PRNG, Spongos interfaces)
       must be allocated separately.
 */
-retcode_t mss_create(ialloc *a, mss_t *m, mss_mt_height_t d);
+retcode_t mss_create(mss_t *m, mss_mt_height_t d);
 
 /*! \brief Deallocate memory for internal Merkle tree structure.
 \note Pointer `m` must be freed afterwards.
 */
-void mss_destroy(ialloc *a, mss_t *m);
+void mss_destroy(mss_t *m);
 
 size_t mss_stored_size(mss_t *m);
 

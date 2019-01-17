@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mam/v2/alloc.h"
 #include "mam/v2/wots/wots.h"
 
 static void wots_calc_pks(spongos_t *s, trits_t sk_pks, trits_t pk) {
@@ -153,21 +152,21 @@ bool_t wots_verify(spongos_t *s, trits_t H, trits_t sig, trits_t pk) {
   return trits_cmp_eq(pk, sig_pk);
 }
 
-retcode_t wots_create(ialloc *a, wots_t *w) {
+retcode_t wots_create(wots_t *w) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   MAM2_ASSERT(w);
   do {
     memset(w, 0, sizeof(wots_t));
-    w->sk = mam_words_alloc(a, MAM2_WORDS(MAM2_WOTS_SK_SIZE));
+    w->sk = malloc(sizeof(word_t) * MAM2_WORDS(MAM2_WOTS_SK_SIZE));
     err_guard(w->sk, RC_OOM);
     e = RC_OK;
   } while (0);
   return e;
 }
 
-void wots_destroy(ialloc *a, wots_t *w) {
+void wots_destroy(wots_t *w) {
   MAM2_ASSERT(w);
-  mam_words_free(a, w->sk);
+  free(w->sk);
   w->sk = 0;
   free(w);
 }

@@ -76,7 +76,7 @@ retcode_t pb3_decode_ntrytes(trits_t ntrytes, trits_t *b);
 
  retcode_t pb3_decode_trytes(trits_t *trytes, trits_t *b);
 
- retcode_t pb3_decode_trytes2(ialloc *a, trits_t *trytes, trits_t *b);
+ retcode_t pb3_decode_trytes2(trits_t *trytes, trits_t *b);
 #endif
 
 /*
