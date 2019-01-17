@@ -79,7 +79,7 @@ void ntru_gen(ntru_t *n, prng_t *p, trits_t N, trits_t pk) {
 }
 
 void ntru_encr_r(trits_t pk, spongos_t *s, trits_t r, trits_t K, trits_t Y) {
-  bool_t ok = 0;
+  bool ok = false;
   MAM2_POLY_DEF(h);
   MAM2_POLY_DEF(t);
 
@@ -126,8 +126,8 @@ void ntru_encr(trits_t pk, prng_t *p, spongos_t *s, trits_t K, trits_t N,
   ntru_encr_r(pk, s, r, K, Y);
 }
 
-bool_t ntru_decr(ntru_t *n, spongos_t *s, trits_t Y, trits_t K) {
-  bool_t b;
+bool ntru_decr(ntru_t *n, spongos_t *s, trits_t Y, trits_t K) {
+  bool b;
   poly_coeff_t *f;
   MAM2_POLY_DEF(t);
   MAM2_POLY_DEF(r);

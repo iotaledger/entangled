@@ -95,10 +95,10 @@ void wots_recover(spongos_t *s, /*!< [in] Spongos interface */
 );
 
 /*! \brief Verify WOTS signature. */
-bool_t wots_verify(spongos_t *s, /*!< [in] Spongos interface */
-                   trits_t H,    /*!< [in] signed hash value */
-                   trits_t sig,  /*!< [in] signature */
-                   trits_t pk    /*!< [in] public key */
+bool wots_verify(spongos_t *s, /*!< [in] Spongos interface */
+                 trits_t H,    /*!< [in] signed hash value */
+                 trits_t sig,  /*!< [in] signature */
+                 trits_t pk    /*!< [in] public key */
 );
 
 /*! \brief Allocate memory for WOTS private key. */

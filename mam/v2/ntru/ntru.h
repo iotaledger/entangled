@@ -66,10 +66,10 @@ void ntru_encr(trits_t pk,   /*!< [in] NTRU public key */
 );
 void ntru_encr_r(trits_t pk, spongos_t *s, trits_t r, trits_t K, trits_t Y);
 
-bool_t ntru_decr(ntru_t *n,    /*!< [in] NTRU interface */
-                 spongos_t *s, /*!< [in] Spongos interface */
-                 trits_t Y,    /*!< [in] encrypted K */
-                 trits_t K     /*!< [out] decrypted session symmetric key */
+bool ntru_decr(ntru_t *n,    /*!< [in] NTRU interface */
+               spongos_t *s, /*!< [in] Spongos interface */
+               trits_t Y,    /*!< [in] encrypted K */
+               trits_t K     /*!< [out] decrypted session symmetric key */
 );
 
 retcode_t ntru_create(ntru_t *n);

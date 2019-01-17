@@ -35,7 +35,7 @@ buffers_t buffers_init(size_t n, trits_t *Xs);
 \note However if the tail buffers consist of empty buffers only
 it will _not_ be considered empty!
 */
-bool_t buffers_is_empty(buffers_t tb);
+bool buffers_is_empty(buffers_t tb);
 
 /*! \brief Sum of head and tail buffers sizes. */
 size_t buffers_size(buffers_t tb);

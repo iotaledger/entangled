@@ -236,7 +236,7 @@ static void mam_wrap_mssig(spongos_t *s, trits_t *b, mss_t *m) {
 static retcode_t mam_unwrap_mssig(spongos_t *s, trits_t *b, spongos_t *ms,
                                   spongos_t *ws, trits_t pk) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  bool_t r = 1;
+  bool r = true;
 
   MAM2_TRITS_DEF0(mac, MAM2_MSS_HASH_SIZE);
   size_t sz;
@@ -279,7 +279,7 @@ static void mam_wrap_signedid(spongos_t *s, trits_t *b, trits_t id, mss_t *m) {
 static retcode_t mam_unwrap_signedid(spongos_t *s, trits_t *b, trits_t id,
                                      spongos_t *ms, spongos_t *ws, trits_t pk) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  bool_t r = 1;
+  bool r = true;
 
   do {
     /*  absorb tryte id[81]; */
@@ -436,8 +436,7 @@ void mam_wrap_keyload_psk(spongos_t *s, trits_t *b, trits_t key, trits_t id,
   pb3_wrap_crypt_ntrytes(s, b, key);
 }
 retcode_t mam_unwrap_keyload_psk(spongos_t *s, trits_t *b, trits_t key,
-                                 bool_t *key_found, trits_t pskid,
-                                 trits_t psk) {
+                                 bool *key_found, trits_t pskid, trits_t psk) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   MAM2_TRITS_DEF0(id, MAM2_PSK_ID_SIZE);
   id = MAM2_TRITS_INIT(id, MAM2_PSK_ID_SIZE);
@@ -496,7 +495,7 @@ void mam_wrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key, trits_t pk,
   spongos_absorb(s, ekey);
 }
 retcode_t mam_unwrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key,
-                                  bool_t *key_found, trits_t pkid, ntru_t *n,
+                                  bool *key_found, trits_t pkid, ntru_t *n,
                                   spongos_t *ns) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   trits_t ekey;
@@ -948,7 +947,7 @@ retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
       {
         /*  repeated */
         size_t keyload_count = 0;
-        bool_t key_found = 0;
+        bool key_found = false;
 
         err_bind(pb3_unwrap_absorb_sizet(s, b, &keyload_count));
 

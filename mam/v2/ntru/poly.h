@@ -105,7 +105,7 @@ void poly_sub(poly_t f, poly_t g, poly_t h);
 void poly_conv(poly_t tf, poly_t tg, poly_t th);
 
 /*! \brief ∃? h(x) : 1 ≡ f(x) * h(x) mods (m(x), q), t = NTT(f) */
-bool_t poly_has_inv(poly_t t);
+bool poly_has_inv(poly_t t);
 
 /*! \brief h(x) := f⁻¹(x) mods (m(x), q), tf = NTT(f), th = NTT(h) */
 void poly_inv(poly_t tf, poly_t th);
@@ -123,7 +123,7 @@ void poly_round_to_trits(poly_t f, trits_t t);
 void poly_small_from_trits(poly_t f, trits_t t);
 
 /*! \brief fᵢ := tᵢ */
-bool_t poly_from_trits(poly_t f, trits_t t);
+bool poly_from_trits(poly_t f, trits_t t);
 
 /*! \brief tᵢ := fᵢ ??? */
 void poly_to_trits(poly_t f, trits_t t);
@@ -142,8 +142,8 @@ poly_coeff_t poly_coeff_inv(poly_coeff_t a);
 void poly_coeff_exp_table(poly_coeff_t u, size_t n, poly_coeff_t *t);
 void poly_gen_param();
 void poly_round_small(poly_t f, poly_t h);
-bool_t poly_is_one(poly_t h);
-bool_t poly_is_eq(poly_t f, poly_t g);
+bool poly_is_one(poly_t h);
+bool poly_is_eq(poly_t f, poly_t g);
 void poly_mul(poly_t f, poly_t g, poly_t h);
 poly_coeff_t poly_eval(poly_t f, poly_coeff_t x);
 void poly_ntt2(poly_t f, poly_t t);

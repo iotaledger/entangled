@@ -430,7 +430,7 @@ void mss_skn(mss_t *m, trits_t skn) {
   trits_copy(trits_take(ts, 14), trits_drop(skn, 4));
 }
 
-static bool_t mss_parse_skn(trint6_t *d, trint18_t *skn, trits_t t) {
+static bool mss_parse_skn(trint6_t *d, trint18_t *skn, trits_t t) {
   MAM2_TRITS_DEF0(ts, 18);
   ts = MAM2_TRITS_INIT(ts, 18);
 
@@ -499,7 +499,7 @@ void mss_sign(mss_t *m, trits_t H, trits_t sig) {
   mss_apath(m, m->skn, sig);
 }
 
-bool_t mss_next(mss_t *m) {
+bool mss_next(mss_t *m) {
   if (m->skn == MAM2_MSS_MAX_SKN(m->d)) return 0;
 
 #if defined(MAM2_MSS_TRAVERSAL)
@@ -513,8 +513,8 @@ bool_t mss_next(mss_t *m) {
   return 1;
 }
 
-bool_t mss_verify(spongos_t *ms, spongos_t *ws, trits_t H, trits_t sig,
-                  trits_t pk) {
+bool mss_verify(spongos_t *ms, spongos_t *ws, trits_t H, trits_t sig,
+                trits_t pk) {
   trint6_t d;
   trint18_t skn;
   MAM2_TRITS_DEF0(apk, MAM2_MSS_MT_HASH_SIZE);

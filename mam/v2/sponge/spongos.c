@@ -62,8 +62,8 @@ void spongos_squeeze(spongos_t *s, trits_t Y) {
   }
 }
 
-bool_t spongos_squeeze_eq(spongos_t *s, trits_t Y) {
-  bool_t r = 1;
+bool spongos_squeeze_eq(spongos_t *s, trits_t Y) {
+  bool r = true;
   size_t n;
   trits_t y;
   for (n = 0; !trits_is_empty(Y); Y = trits_drop(Y, n)) {

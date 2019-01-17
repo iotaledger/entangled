@@ -182,7 +182,7 @@ void mss_sign(mss_t *m,   /*!< [in] MSS interface */
 );
 
 /*! \brief Verify MSS signature. */
-bool_t mss_verify(
+bool mss_verify(
     spongos_t *ms, /*!< [in] Spongos interface to hash Merkle Tree */
     spongos_t *ws, /*!< [in] Spongos interface to hash WOTS iterations */
     trits_t H,     /*!< [in] signed hash value */
