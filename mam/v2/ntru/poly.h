@@ -126,4 +126,25 @@ void poly_to_trits(poly_t f, trits_t t);
 
 void poly_print(char const *s, poly_t f);
 
+poly_coeff_t poly_coeff_mredd(poly_dcoeff_t m);
+poly_coeff_t poly_coeff_from_trint9(trint9_t t);
+trint9_t poly_coeff_to_trint9(poly_coeff_t c);
+poly_coeff_t poly_coeff_from_trint1(trint1_t t);
+poly_coeff_t poly_coeff_add(poly_coeff_t a, poly_coeff_t b);
+poly_coeff_t poly_coeff_sub(poly_coeff_t a, poly_coeff_t b);
+poly_coeff_t poly_coeff_mul(poly_coeff_t a, poly_coeff_t b);
+poly_coeff_t poly_coeff_mul_add(poly_coeff_t a, poly_coeff_t b, poly_coeff_t c);
+poly_coeff_t poly_coeff_inv(poly_coeff_t a);
+void poly_coeff_exp_table(poly_coeff_t u, size_t n, poly_coeff_t *t);
+void poly_gen_param();
+void poly_round_small(poly_t f, poly_t h);
+bool_t poly_is_one(poly_t h);
+bool_t poly_is_eq(poly_t f, poly_t g);
+void poly_mul(poly_t f, poly_t g, poly_t h);
+poly_coeff_t poly_eval(poly_t f, poly_coeff_t x);
+void poly_ntt2(poly_t f, poly_t t);
+void poly_intt2(poly_t t, poly_t f);
+size_t poly_coeff_order(poly_coeff_t u, poly_coeff_t *ui);
+trint9_t poly_norm(poly_t f);
+
 #endif  // __MAM_V2_NTRU_POLY_H__
