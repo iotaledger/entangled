@@ -14,6 +14,7 @@
 */
 
 #include <memory.h>
+#include <stdlib.h>
 
 #include "mam/v2/mss/mss.h"
 

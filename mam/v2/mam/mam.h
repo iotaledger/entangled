@@ -220,12 +220,12 @@ typedef enum mam_msg_checksum_e {
 #define MAM2_HEADER_NONCE_SIZE 81
 
 typedef struct mam_send_msg_context_s {
-  mam_ialloc_t *ma;     /*!< Allocator. */
-  spongos_t spongos[1]; /*!< Main Spongos interface to wrap PB3 messages. */
-  spongos_t fork[1];    /*!< Spongos interface for PB3 forks. */
-  prng_t *prng;    /*!< Shared deterministic PRNG instance to gen MSS keys. */
-  prng_t *rng;     /*!< Volatile PRNG instance to generate ephemeral keys. */
-  spongos_t ns[1]; /*!< Spongos interface used by NTRU encr. */
+  mam_ialloc_t *allocator; /*!< Allocator. */
+  spongos_t spongos[1];    /*!< Main Spongos interface to wrap PB3 messages. */
+  spongos_t fork[1];       /*!< Spongos interface for PB3 forks. */
+  prng_t *prng; /*!< Shared deterministic PRNG instance to gen MSS keys. */
+  prng_t *rng;  /*!< Volatile PRNG instance to generate ephemeral keys. */
+  spongos_t spongos_ntru[1]; /*!< Spongos interface used by NTRU encr. */
 
   mam_channel_t *ch;   /*!< Current channel. */
   mam_channel_t *ch1;  /*!< New channel (may be null). */
@@ -259,9 +259,9 @@ void mam_send_packet(mam_send_packet_context_t *cfg, trits_t payload,
                      trits_t *packet);
 
 typedef struct mam_recv_msg_context_s {
-  mam_ialloc_t *ma;     /*!< Allocator. */
-  spongos_t spongos[1]; /*!< Main Spongos interface */
-  spongos_t fork[1];    /*!< Spongos interface for PB3 forks. */
+  mam_ialloc_t *allocator; /*!< Allocator. */
+  spongos_t spongos[1];    /*!< Main Spongos interface */
+  spongos_t fork[1];       /*!< Spongos interface for PB3 forks. */
 
   mam_msg_pubkey_t pubkey;
   word_t chid[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
@@ -288,12 +288,12 @@ typedef struct mam_recv_msg_context_s {
 retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *msg);
 
 typedef struct mam_recv_packet_context_s {
-  mam_ialloc_t *ma;     /*!< Allocator. */
-  spongos_t spongos[1]; /*!< Main Spongos interface */
-  trint18_t ord;        /*!< Packet ordinal number. */
-  trits_t pk;           /*!< Channel/Endpoint id - MSS public key. */
-  spongos_t ms[1];      /*!< Spongos interface used by MSS. */
-  spongos_t ws[1];      /*!< Spongos interface used by WOTS. */
+  mam_ialloc_t *allocator;   /*!< Allocator. */
+  spongos_t spongos[1];      /*!< Main Spongos interface */
+  trint18_t ord;             /*!< Packet ordinal number. */
+  trits_t pk;                /*!< Channel/Endpoint id - MSS public key. */
+  spongos_t spongos_mss[1];  /*!< Spongos interface used by MSS. */
+  spongos_t spongos_wots[1]; /*!< Spongos interface used by WOTS. */
 } mam_recv_packet_context_t;
 
 retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *packet,
