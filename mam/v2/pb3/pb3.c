@@ -133,7 +133,7 @@ retcode_t pb3_decode_sizet(size_t *n, trits_t *b) {
       s = trits_pickup(s, 3);
       /* higher tryte in the representation */
       t = trits_get3(s);
-      err_guard(t > 0, err_invalid_value); /* can't be 0 or negative */
+      err_guard(t > 0, RC_MAM2_INVALID_VALUE); /* can't be 0 or negative */
       *n = (size_t)t;
 
       for (; d--;) {
