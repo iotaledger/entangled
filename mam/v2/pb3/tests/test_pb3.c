@@ -32,6 +32,20 @@ static bool pb3_sizet_test(size_t n) {
   return (e == RC_OK && ok && m == n);
 }
 
+static bool pb3_test_sizet_overflow() {
+  retcode_t e;
+  size_t n;
+  MAM2_TRITS_DEF0(x, 3 * (1 + 8));
+
+  x = MAM2_TRITS_INIT(x, 3 * (1 + 8));
+  trits_set1(x, 1);
+  trits_put3(x, 8);
+  /* x = pb3_encode_sizet((27^8-1)/2) > 2^32 */
+
+  e = pb3_decode_sizet(&n, &x);
+  return e == RC_MAM2_PB3_SIZET_NOT_SUPPORTED;
+}
+
 static void pb3_sizets_test(void) {
   size_t n, k;
 
@@ -41,6 +55,7 @@ static void pb3_sizets_test(void) {
   };
 
   if ((5 * sizeof(size_t) + 2) / 3 < 14) {
+    /* this should be the case on a 32-bit platform */
     for (n = 1, k = 0; k < sizeof(size_t); ++k) {
       n *= 243;
     }
@@ -53,15 +68,17 @@ static void pb3_sizets_test(void) {
     for (k = 0; k < 100; ++k) {
       TEST_ASSERT_TRUE(pb3_sizet_test(n++));
     }
+    TEST_ASSERT_TRUE(pb3_test_sizet_overflow());
+  } else {
+    /* this should be the case on a 64-bit platform */
+    /*n = SIZE_MAX;*/
+    n = (size_t)MAM2_PB3_SIZE_MAX;
+    n -= 99;
+    for (k = 0; k < 100; ++k) {
+      TEST_ASSERT_TRUE(pb3_sizet_test(n++));
+    }
+    TEST_ASSERT_TRUE(!pb3_test_sizet_overflow());
   }
-
-  /* n = 2026277576509488133ull; (27^13-1)/2 */
-  /*n = SIZE_MAX;*/
-  n = 2026277576509488133ull;
-  n -= 99;
-  for (k = 0; k < 100; ++k) {
-    TEST_ASSERT_TRUE(pb3_sizet_test(n++));
-  };
 }
 
 int main(void) {
