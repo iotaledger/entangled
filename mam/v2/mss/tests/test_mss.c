@@ -11,9 +11,97 @@
 #include <unity/unity.h>
 
 #include "mam/v2/mss/mss.h"
+#include "mam/v2/test_utils/test_utils.h"
 
-bool_t mss_test_store(mss_t *m, mss_t *m2, prng_t *p, spongos_t *s, wots_t *w,
-                      mss_mt_height_t D) {
+#if !defined(MAM2_MSS_TEST_MAX_D)
+#define MAM2_MSS_TEST_MAX_D 3
+#endif
+
+#if defined(MAM2_MSS_TRAVERSAL)
+#define def_test_mss(D, sfx)                    \
+  typedef struct test_mss##sfx##_s {            \
+    mss_t m;                                    \
+    word_t ap[MAM2_MSS_MT_AUTH_WORDS(D)];       \
+    uint32_t ap_check;                          \
+    word_t hs[MAM2_MSS_MT_HASH_WORDS(D, 1)];    \
+    uint32_t hs_check;                          \
+    mss_mt_node_t ns[MAM2_MSS_MT_NODES(D) + 1]; \
+    uint32_t ns_check;                          \
+    mss_mt_stack_t ss[MAM2_MSS_MT_STACKS(D)];   \
+    uint32_t ss_check;                          \
+  } test_mss##sfx##_t
+#else
+#define def_test_mss(D, sfx)         \
+  typedef struct test_mss##sfx##_s { \
+    mss_t m;                         \
+    word_t mt[MAM2_MSS_MT_WORDS(D)]; \
+    uint32_t mt_check;               \
+  } test_mss##sfx##_t
+#endif
+
+#if defined(MAM2_MSS_TRAVERSAL)
+#define def_test_mss_init(D, sfx)                          \
+  static mss_t *test_mss_init##sfx(test_mss##sfx##_t *m) { \
+    m->m.ap = m->ap;                                       \
+    m->ap_check = 0xdeadbeef;                              \
+    m->m.hs = m->hs;                                       \
+    m->hs_check = 0xdeadbeef;                              \
+    m->m.ns = m->ns;                                       \
+    m->ns_check = 0xdeadbeef;                              \
+    m->m.ss = m->ss;                                       \
+    m->ss_check = 0xdeadbeef;                              \
+    return &m->m;                                          \
+  }
+#else
+#define def_test_mss_init(D, sfx)                                     \
+  static mss_t *test_mss_init##sfx(test_mss##sfx##_t *m, wots_t *w) { \
+    m->m.d = D;                                                       \
+    m->m.spongos_wots = w;                                            \
+    m->m.mt = m->mt;                                                  \
+    m->mt_check = 0xdeadbeef;                                         \
+    return &m->m;                                                     \
+  }
+#endif
+
+#if defined(MAM2_MSS_TRAVERSAL)
+#define def_test_mss_check(D, sfx)                                        \
+  static bool_t test_mss_check##sfx(test_mss##sfx##_t *m) {               \
+    return 1 && m->ap_check == 0xdeadbeef && m->hs_check == 0xdeadbeef && \
+           m->ns_check == 0xdeadbeef && m->ss_check == 0xdeadbeef;        \
+  }
+#else
+#define def_test_mss_check(D, sfx)                          \
+  static bool_t test_mss_check##sfx(test_mss##sfx##_t *m) { \
+    return 1 && m->mt_check == 0xdeadbeef;                  \
+  }
+#endif
+
+def_test_mss(1, 1);
+def_test_mss(2, 2);
+def_test_mss(3, 3);
+def_test_mss(4, 4);
+def_test_mss(5, 5);
+def_test_mss(10, x);
+def_test_mss(MAM2_MSS_TEST_MAX_D, );
+
+def_test_mss_init(1, 1);
+def_test_mss_init(2, 2);
+def_test_mss_init(3, 3);
+def_test_mss_init(4, 4);
+def_test_mss_init(5, 5);
+def_test_mss_init(10, x);
+def_test_mss_init(MAM2_MSS_TEST_MAX_D, );
+
+def_test_mss_check(1, 1);
+def_test_mss_check(2, 2);
+def_test_mss_check(3, 3);
+def_test_mss_check(4, 4);
+def_test_mss_check(5, 5);
+def_test_mss_check(10, x);
+def_test_mss_check(MAM2_MSS_TEST_MAX_D, );
+
+static bool_t mss_store_test(mss_t *m, mss_t *m2, prng_t *p, spongos_t *s,
+                             wots_t *w, mss_mt_height_t D) {
   bool_t r = 1;
   retcode_t e;
   mss_mt_height_t d;
@@ -74,8 +162,8 @@ bool_t mss_test_store(mss_t *m, mss_t *m2, prng_t *p, spongos_t *s, wots_t *w,
   return r;
 }
 
-bool_t mss_test(mss_t *m, prng_t *p, spongos_t *s, wots_t *w,
-                mss_mt_height_t D) {
+static bool_t mss_test(mss_t *m, prng_t *p, spongos_t *s, wots_t *w,
+                       mss_mt_height_t D) {
   bool_t r = 1;
   MAM2_TRITS_DEF0(K, MAM2_PRNG_KEY_SIZE);
   mss_mt_height_t d;
@@ -172,8 +260,51 @@ bool_t mss_test(mss_t *m, prng_t *p, spongos_t *s, wots_t *w,
   return r;
 }
 
+static void mss_meta_test(void) {
+  test_sponge_t _s[1];
+  test_spongos_t _sg[1];
+  test_prng_t _p[1];
+  test_wots_t _w[1];
+  test_mss1_t _m1[1];
+  test_mss2_t _m2[1];
+  test_mss3_t _m3[1];
+  test_mss4_t _m4[1];
+  test_mss4_t _m42[1];
+  test_mss5_t _m5[1];
+  test_mssx_t _mx[1];
+  test_mss_t _m[1];
+
+  sponge_t *spongos = test_sponge_init(_s);
+  spongos_t *sg = test_spongos_init(_sg, spongos);
+  prng_t *p = test_prng_init(_p, spongos);
+  wots_t *w = test_wots_init(_w, spongos);
+  mss_t *m1 = test_mss_init1(_m1);
+  mss_t *m2 = test_mss_init2(_m2);
+  mss_t *m3 = test_mss_init3(_m3);
+  mss_t *m4 = test_mss_init4(_m4);
+  mss_t *m42 = test_mss_init4(_m42);
+  mss_t *m5 = test_mss_init5(_m5);
+  mss_t *mx = test_mss_initx(_mx);
+  mss_t *m = test_mss_init(_m);
+
+  TEST_ASSERT_TRUE(mss_test(m1, p, sg, w, 1) && test_mss_check1(_m1));
+  TEST_ASSERT_TRUE(mss_test(m2, p, sg, w, 2) && test_mss_check2(_m2));
+  TEST_ASSERT_TRUE(mss_test(m3, p, sg, w, 3) && test_mss_check3(_m3));
+  // TEST_ASSERT_TRUE(mss_test(m4, p, sg, w, 4) && test_mss_check4(_m4));
+  TEST_ASSERT_TRUE(mss_store_test(m4, m42, p, sg, w, 4) &&
+                   test_mss_check4(_m4) && test_mss_check4(_m42));
+  // #if 0
+  //   TEST_ASSERT_TRUE(mss_test(m5, p, sg, w, 5) && test_mss_check5(_m5));
+  //   TEST_ASSERT_TRUE(mss_test(mx, p, sg, w, 10) && test_mss_checkx(_mx));
+  // #endif
+  // TEST_ASSERT_TRUE(mss_test(m, p, sg, w, MAM2_MSS_TEST_MAX_D) &&
+  //                  test_mss_check(_m));
+}
+
 int main(void) {
   UNITY_BEGIN();
+
+  RUN_TEST(mss_meta_test);
 
   return UNITY_END();
 }
