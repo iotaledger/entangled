@@ -202,8 +202,9 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   mam_ialloc_t ma[1];
 
-  sponge_t *sa = 0, *forka = 0, *nsa = 0;
-  sponge_t *sb = 0, *forkb = 0, *msb = 0, *wsb = 0, *nsb = 0;
+  sponge_t *sponge_send = 0, *fork_sponge_send = 0, *ntru_sponge_send = 0;
+  sponge_t *sponge_recv = 0, *fork_sponge_recv = 0, *mss_sponge_recv = 0,
+           *wots_sponge_recv = 0, *ntru_sponge_recv = 0;
 
   trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
 
@@ -234,15 +235,15 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
   }
   /* create spongos */
   {
-    forka = ma->create_sponge();
-    nsa = ma->create_sponge();
-    sa = ma->create_sponge();
+    fork_sponge_send = ma->create_sponge();
+    ntru_sponge_send = ma->create_sponge();
+    sponge_send = ma->create_sponge();
 
-    msb = ma->create_sponge();
-    wsb = ma->create_sponge();
-    nsb = ma->create_sponge();
-    sb = ma->create_sponge();
-    forkb = ma->create_sponge();
+    mss_sponge_recv = ma->create_sponge();
+    wots_sponge_recv = ma->create_sponge();
+    ntru_sponge_recv = ma->create_sponge();
+    sponge_recv = ma->create_sponge();
+    fork_sponge_recv = ma->create_sponge();
   }
   /* init rng */
   {
@@ -332,36 +333,37 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
     TEST_ASSERT(RC_OK == e);
   }
 
+  /* init recv msg context */
+  {
+    mam_recv_msg_context_t *cfg = cfg_msgb;
+
+    cfg->ma = ma;
+    cfg->pubkey = -1;
+    cfg->spongos->sponge = sponge_recv;
+    cfg->fork->sponge = fork_sponge_recv;
+    cfg->spongos_mss->sponge = mss_sponge_recv;
+    cfg->spongos_wots->sponge = wots_sponge_recv;
+    cfg->spongos_ntru->sponge = ntru_sponge_recv;
+
+    cfg->psk = &pskb->info;
+    cfg->ntru = nb;
+
+    trits_copy(mam_channel_id(cha), mam_recv_msg_cfg_chid(cfg));
+  }
+
   for (pubkey = 0; pubkey < 4; ++pubkey) /* chid=0, epid=1, chid1=2, epid1=3
                                           */
     for (keyload = 0; keyload < 3; ++keyload) /* plain=0, psk=1, ntru=2 */
       for (checksum = 0; checksum < 3; ++checksum)
       /* none=0, mac=1, mssig=2 */
       {
-        /* init recv msg context */
-        {
-          mam_recv_msg_context_t *cfg = cfg_msgb;
-
-          cfg->ma = ma;
-          cfg->pubkey = -1;
-          cfg->spongos->sponge = sb;
-          cfg->fork->sponge = forkb;
-          cfg->spongos_mss->sponge = msb;
-          cfg->spongos_wots->sponge = wsb;
-          cfg->spongos_ntru->sponge = nsb;
-
-          cfg->psk = &pskb->info;
-          cfg->ntru = nb;
-
-          trits_copy(mam_channel_id(cha), mam_recv_msg_cfg_chid(cfg));
-        }
-
         size_t pos;
         /* send/recv msg */
         {
           msg = mam_test_generic_send_msg(
-              sa, forka, nsa, sponge_alloc_ctx, create_sponge, destroy_sponge,
-              pa, pb, pubkey, keyload, checksum, cha, epa, ch1a, ep1a, &pos);
+              sponge_send, fork_sponge_send, ntru_sponge_send, sponge_alloc_ctx,
+              create_sponge, destroy_sponge, pa, pb, pubkey, keyload, checksum,
+              cha, epa, ch1a, ep1a, &pos);
 
           e = mam_recv_msg(cfg_msgb, &msg);
           TEST_ASSERT(RC_OK == e);
@@ -372,7 +374,7 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
         {
           mam_send_packet_context_t *cfg = cfg_packeta;
 
-          cfg->spongos->sponge = sa;
+          cfg->spongos->sponge = sponge_send;
           cfg->spongos->pos = pos;
           cfg->ord = 0;
           cfg->checksum = checksum;
@@ -395,7 +397,7 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
           mam_recv_packet_context_t *cfg = cfg_packetb;
 
           cfg->ma = ma;
-          cfg->spongos->sponge = sb;
+          cfg->spongos->sponge = cfg_msgb->spongos->sponge;
           cfg->spongos->pos = cfg_msgb->spongos->pos;
           cfg->ord = -1;
           cfg->pk = trits_null();
@@ -409,8 +411,8 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
             cfg->pk = mam_recv_msg_cfg_chid1(cfg_msgb);
           else
             ;
-          cfg->ms->sponge = msb;
-          cfg->ws->sponge = wsb;
+          cfg->ms->sponge = mss_sponge_recv;
+          cfg->ws->sponge = wots_sponge_recv;
         }
 
         /* send/recv packet */
@@ -450,15 +452,15 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
 
   /* destroy spongos */
   {
-    ma->destroy_sponge(sa);
-    ma->destroy_sponge(forka);
-    ma->destroy_sponge(nsa);
+    ma->destroy_sponge(sponge_send);
+    ma->destroy_sponge(fork_sponge_send);
+    ma->destroy_sponge(ntru_sponge_send);
 
-    ma->destroy_sponge(sb);
-    ma->destroy_sponge(forkb);
-    ma->destroy_sponge(msb);
-    ma->destroy_sponge(wsb);
-    ma->destroy_sponge(nsb);
+    ma->destroy_sponge(sponge_recv);
+    ma->destroy_sponge(fork_sponge_recv);
+    ma->destroy_sponge(mss_sponge_recv);
+    ma->destroy_sponge(wots_sponge_recv);
+    ma->destroy_sponge(ntru_sponge_recv);
   }
   /* destroy channels/endpoints */
   {
