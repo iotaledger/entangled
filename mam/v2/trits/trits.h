@@ -17,6 +17,10 @@
 
 #include "mam/v2/defs.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! \brief Array of trits.
 `p -> |...d...|......|`
 */
@@ -227,6 +231,10 @@ void trits_print2(char const *pfx, trits_t x, char const *sfx);
 #define trits_dbg_print(x) trits_print(x)
 #else
 #define trits_dbg_print(x)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif  // __MAM_V2_TRITS_TRITS_H__

@@ -25,6 +25,10 @@
 #include "mam/v2/trits/trits.h"
 #include "mam/v2/wots/wots.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct mam_ialloc_s {
   sponge_t *(*create_sponge)(); /*!< Allocator for sponge interfaces used by
                                               channels/endpoints (WOTS, PB3
@@ -314,5 +318,9 @@ trits_t mam_recv_msg_cfg_nonce(mam_recv_msg_context_t *cfg);
 trits_t mam_recv_msg_cfg_key(mam_recv_msg_context_t *cfg);
 trits_t mam_recv_msg_cfg_psk_id(mam_recv_msg_context_t *cfg);
 trits_t mam_recv_msg_cfg_ntru_id(mam_recv_msg_context_t *cfg);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __MAM_V2_MAM_MAM_H__

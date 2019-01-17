@@ -22,6 +22,10 @@
 #include "mam/v2/trits/trits.h"
 #include "mam/v2/wots/wots.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! \brief Use Merkle tree traversal algorithm on MSS layer. */
 #define MAM2_MSS_TRAVERSAL
 
@@ -206,5 +210,9 @@ void mss_save(mss_t *m, trits_t b);
 
 /*! \brief Deserialize Merkle tree. */
 retcode_t mss_load(mss_t *m, trits_t *b);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __MAM_V2_MSS_MSS_H__

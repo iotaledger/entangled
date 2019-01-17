@@ -18,6 +18,10 @@
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! \brief Use Montgomery reduction. */
 /*#define MAM2_POLY_MRED_BINARY*/
 
@@ -146,5 +150,9 @@ void poly_ntt2(poly_t f, poly_t t);
 void poly_intt2(poly_t t, poly_t f);
 size_t poly_coeff_order(poly_coeff_t u, poly_coeff_t *ui);
 trint9_t poly_norm(poly_t f);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __MAM_V2_NTRU_POLY_H__

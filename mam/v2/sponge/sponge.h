@@ -18,6 +18,10 @@
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! \brief Sponge state rate. */
 #define MAM2_SPONGE_RATE 486
 /*! \brief Sponge state control. */
@@ -117,5 +121,9 @@ void sponge_hashn(sponge_t *s, /*!< [in] sponge interface */
                   trits_t *Xs, /*!< [in] input data blocks */
                   trits_t Y    /*!< [out] hash value */
 );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __MAM_V2_SPONGE_SPONGE_H__

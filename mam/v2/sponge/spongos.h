@@ -19,6 +19,10 @@
 #include "mam/v2/sponge/sponge.h"
 #include "mam/v2/trits/trits.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct spongos_s {
   sponge_t *sponge;
   size_t pos;
@@ -45,5 +49,9 @@ void spongos_decr(spongos_t *s, trits_t X, trits_t Y);
 void spongos_hash(spongos_t *s, trits_t X, trits_t Y);
 
 void spongos_hashn(spongos_t *s, size_t n, trits_t *Xs, trits_t Y);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __MAM_V2_SPONGE_SPONGOS_H__

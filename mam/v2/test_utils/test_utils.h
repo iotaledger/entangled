@@ -21,6 +21,10 @@
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/wots/wots.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if !defined(MAM2_MSS_TEST_MAX_D)
 #define MAM2_MSS_TEST_MAX_D 3
 #endif
@@ -61,5 +65,9 @@ static inline sponge_t *test_create_sponge() {
   return test_sponge_init(t);
 }
 static inline void test_delete_sponge(sponge_t *s) { free((test_sponge_t *)s); }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __MAM_V2_TEST_UTILS_TEST_UTILS_H__

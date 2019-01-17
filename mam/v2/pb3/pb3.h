@@ -20,6 +20,10 @@
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/trits/trits.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 trits_t pb3_trits_take(trits_t *b, size_t n);
 
 /*
@@ -101,5 +105,9 @@ retcode_t pb3_unwrap_squeeze_ntrytes(spongos_t *s, trits_t *b, size_t n);
 
 void pb3_absorb_external_ntrytes(spongos_t *s, trits_t t);
 void pb3_squeeze_external_ntrytes(spongos_t *s, trits_t t);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __MAM_V2_PB3_PB3_H__

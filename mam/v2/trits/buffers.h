@@ -18,6 +18,10 @@
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct buffers_s {
   trits_t X;   /*!< the head */
   size_t n;    /*!< buffers count in the tail */
@@ -43,5 +47,9 @@ size_t buffers_copy_to(buffers_t *tb, trits_t buf);
 /*! \brief Copy buffers `*tb` from a source `buf`; return the number of trits
  * copied. */
 size_t buffers_copy_from(buffers_t *tb, trits_t buf);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __MAM_V2_TRITS_BUFFERS_H__
