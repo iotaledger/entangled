@@ -761,7 +761,7 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *b) {
         /*  KeyloadNTRU ntru = 2; */
         mam_wrap_keyload_ntru(fork, b, mam_send_msg_cfg_key(cfg),
                               mam_ntru_pk_trits(&intru_pk->info), cfg->rng,
-                              cfg->ns, mam_send_msg_cfg_nonce(cfg));
+                              cfg->spongos_ntru, mam_send_msg_cfg_nonce(cfg));
       }
     }
 

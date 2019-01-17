@@ -223,9 +223,9 @@ typedef struct mam_send_msg_context_s {
   mam_ialloc_t *ma;     /*!< Allocator. */
   spongos_t spongos[1]; /*!< Main Spongos interface to wrap PB3 messages. */
   spongos_t fork[1];    /*!< Spongos interface for PB3 forks. */
-  prng_t *prng;    /*!< Shared deterministic PRNG instance to gen MSS keys. */
-  prng_t *rng;     /*!< Volatile PRNG instance to generate ephemeral keys. */
-  spongos_t ns[1]; /*!< Spongos interface used by NTRU encr. */
+  prng_t *prng; /*!< Shared deterministic PRNG instance to gen MSS keys. */
+  prng_t *rng;  /*!< Volatile PRNG instance to generate ephemeral keys. */
+  spongos_t spongos_ntru[1]; /*!< Spongos interface used by NTRU encr. */
 
   mam_channel_t *ch;   /*!< Current channel. */
   mam_channel_t *ch1;  /*!< New channel (may be null). */
