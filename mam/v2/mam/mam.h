@@ -288,12 +288,12 @@ typedef struct mam_recv_msg_context_s {
 retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *msg);
 
 typedef struct mam_recv_packet_context_s {
-  mam_ialloc_t *allocator; /*!< Allocator. */
-  spongos_t spongos[1];    /*!< Main Spongos interface */
-  trint18_t ord;           /*!< Packet ordinal number. */
-  trits_t pk;              /*!< Channel/Endpoint id - MSS public key. */
-  spongos_t ms[1];         /*!< Spongos interface used by MSS. */
-  spongos_t ws[1];         /*!< Spongos interface used by WOTS. */
+  mam_ialloc_t *allocator;   /*!< Allocator. */
+  spongos_t spongos[1];      /*!< Main Spongos interface */
+  trint18_t ord;             /*!< Packet ordinal number. */
+  trits_t pk;                /*!< Channel/Endpoint id - MSS public key. */
+  spongos_t spongos_mss[1];  /*!< Spongos interface used by MSS. */
+  spongos_t spongos_wots[1]; /*!< Spongos interface used by WOTS. */
 } mam_recv_packet_context_t;
 
 retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *packet,

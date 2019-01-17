@@ -292,8 +292,8 @@ static void mam_test_generic_receive_packet(
       } else if (mam_msg_pubkey_epid1 == cfg_msg_recv->pubkey) {
         cfg->pk = mam_recv_msg_cfg_chid1(cfg_msg_recv);
       }
-      cfg->ms->sponge = cfg_msg_recv->spongos_mss->sponge;
-      cfg->ws->sponge = cfg_msg_recv->spongos_wots->sponge;
+      cfg->spongos_mss->sponge = cfg_msg_recv->spongos_mss->sponge;
+      cfg->spongos_wots->sponge = cfg_msg_recv->spongos_wots->sponge;
     }
 
     e = mam_recv_packet(cfg_packet_receive, packet, payload);
@@ -425,6 +425,7 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
           mam_test_generic_receive_msg(sponge_alloc_ctx, create_sponge,
                                        destroy_sponge, prng_b, cha, &msg,
                                        cfg_msg_recv);
+          ntru_destroy(cfg_msg_recv->ntru);
         }
 
         char const *payload_str = "PAYLOAD9999";
@@ -432,10 +433,8 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
         packet = mam_test_generic_send_first_packet(pubkey, keyload, checksum,
                                                     cha, epa, ch1a, ep1a,
                                                     cfg_msg_send, payload_str);
-
         /* send/recv packet */
         {
-          ntru_destroy(cfg_msg_recv->ntru);
           mam_test_generic_receive_packet(pubkey, keyload, checksum, cha, epa,
                                           ch1a, ep1a, cfg_msg_recv, &packet,
                                           &payload);

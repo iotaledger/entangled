@@ -1036,7 +1036,8 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
       err_bind(mam_unwrap_checksum_mac(s, b));
     } else if (mam_msg_checksum_mssig == checksum) {
       /*    MSSig mssig = 2; */
-      err_bind(mam_unwrap_checksum_mssig(s, b, cfg->ms, cfg->ws, cfg->pk));
+      err_bind(mam_unwrap_checksum_mssig(s, b, cfg->spongos_mss,
+                                         cfg->spongos_wots, cfg->pk));
     } else {
       err_guard(0, RC_MAM2_PB3_BAD_ONEOF);
     }
