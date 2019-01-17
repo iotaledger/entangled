@@ -97,6 +97,13 @@ void pb3_encode_sizet(size_t n, trits_t *b) {
 
   pb3_encode_tryte((tryte_t)d, b);
 
+  if (27 < n) {
+    /* explicitly unroll the first iteration safely */
+    --d;
+    pb3_encode_tryte((tryte_t)MAM2_MODS(n - 27, 27, 27), b);
+    n = 1 + MAM2_DIVS(n - 27, 27, 27);
+  }
+
   for (; d--; n = MAM2_DIVS(n, 27, 27))
     pb3_encode_tryte((tryte_t)MAM2_MODS(n, 27, 27), b);
   MAM2_ASSERT(0 == n);
@@ -108,25 +115,34 @@ retcode_t pb3_decode_sizet(size_t *n, trits_t *b) {
   MAM2_ASSERT(0 != n);
 
   do {
-    size_t m, s_pos, s_neg;
-    tryte_t t;
-
     tryte_t d;
     err_guard(trits_size(*b) >= 3, RC_MAM2_PB3_EOF);
     d = trits_get3(*b);
     *b = trits_drop(*b, 3);
     err_guard(0 <= d && d <= 13, RC_MAM2_INVALID_VALUE);
-
     err_guard(trits_size(*b) >= 3 * (size_t)d, RC_MAM2_PB3_EOF);
-    for (s_pos = s_neg = 0, m = 1; d--; *b = trits_drop(*b, 3), m *= 27) {
-      if ((t = trits_get3(*b)) < 0)
-        s_neg += (size_t)(-t) * m;
-      else
-        s_pos += (size_t)(t)*m;
-    }
-    err_guard(s_pos >= s_neg, RC_MAM2_NEGATIVE_VALUE);
+    /* move pointer to the end */
+    *b = trits_drop(*b, 3 * (size_t)d);
 
-    *n = s_pos - s_neg;
+    *n = 0;
+    if (0 < d) {
+      tryte_t t;
+      trits_t s = *b;
+
+      --d;
+      s = trits_pickup(s, 3);
+      /* higher tryte in the representation */
+      t = trits_get3(s);
+      err_guard(t > 0, err_invalid_value); /* can't be 0 or negative */
+      *n = (size_t)t;
+
+      for (; d--;) {
+        s = trits_pickup(s, 3);
+        t = trits_get3(s);
+        *n *= 27;
+        *n += (size_t)t;
+      }
+    }
 
     e = RC_OK;
   } while (0);
