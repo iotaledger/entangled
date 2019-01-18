@@ -8,11 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file wots.c
-\brief MAM2 WOTS layer.
-*/
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -35,7 +30,13 @@ static void wots_calc_pks(spongos_t *s, trits_t sk_pks, trits_t pk) {
   spongos_hash(s, pks, pk);
 }
 
-static void wots_hash_sign(spongos_t *s, trits_t sk_sig, trits_t H) {
+typedef enum wots_hash_operation_e {
+  WOTS_HASH_SIGN,
+  WOTS_HASH_VERIFY
+} wots_hash_operation_t;
+
+static void wots_hash_sign_or_verify(spongos_t *s, trits_t sk_sig, trits_t H,
+                                     wots_hash_operation_t operation) {
   size_t i;
   trint9_t t = 0;
   trint3_t j, h;
@@ -50,6 +51,7 @@ static void wots_hash_sign(spongos_t *s, trits_t sk_sig, trits_t H) {
 
     h = trits_get3(trits_drop(H, i * 3));
     t += h;
+    h = (operation == WOTS_HASH_SIGN ? h : -h);
 
     for (j = -13; j < h; ++j) spongos_hash(s, sig_part, sig_part);
   }
@@ -61,43 +63,13 @@ static void wots_hash_sign(spongos_t *s, trits_t sk_sig, trits_t H) {
 
     h = MAM2_MODS(t, 19683, 27);
     t = MAM2_DIVS(t, 19683, 27);
+    h = (operation == WOTS_HASH_SIGN ? h : -h);
 
     for (j = -13; j < h; ++j) spongos_hash(s, sig_part, sig_part);
   }
 }
 
-static void wots_hash_verify(spongos_t *s, trits_t sig_pks, trits_t H) {
-  size_t i;
-  trint9_t t = 0;
-  trint3_t j, h;
-  trits_t sig_part;
-
-  MAM2_ASSERT(trits_size(sig_pks) == MAM2_WOTS_SK_SIZE);
-  MAM2_ASSERT(trits_size(H) == MAM2_WOTS_HASH_SIZE);
-
-  for (i = 0; i < MAM2_WOTS_SK_PART_COUNT - 3; ++i) {
-    sig_part = trits_take(sig_pks, MAM2_WOTS_SK_PART_SIZE);
-    sig_pks = trits_drop(sig_pks, MAM2_WOTS_SK_PART_SIZE);
-
-    h = trits_get3(trits_drop(H, i * 3));
-    t += h;
-
-    for (j = -13; j < -h; ++j) spongos_hash(s, sig_part, sig_part);
-  }
-
-  t = -t;
-  for (; i < MAM2_WOTS_SK_PART_COUNT; ++i) {
-    sig_part = trits_take(sig_pks, MAM2_WOTS_SK_PART_SIZE);
-    sig_pks = trits_drop(sig_pks, MAM2_WOTS_SK_PART_SIZE);
-
-    h = MAM2_MODS(t, 19683, 27);
-    t = MAM2_DIVS(t, 19683, 27);
-
-    for (j = -13; j < -h; ++j) spongos_hash(s, sig_part, sig_part);
-  }
-}
-
-trits_t wots_sk_trits(wots_t *w) {
+static trits_t wots_sk_trits(wots_t *w) {
   return trits_from_rep(MAM2_WOTS_SK_SIZE, w->secret_key);
 }
 
@@ -149,7 +121,7 @@ void wots_calc_pk(wots_t *w, trits_t pk) {
 
 void wots_sign(wots_t *w, trits_t H, trits_t sig) {
   trits_copy(wots_sk_trits(w), sig);
-  wots_hash_sign(&w->spongos, sig, H);
+  wots_hash_sign_or_verify(&w->spongos, sig, H, WOTS_HASH_SIGN);
 }
 
 void wots_recover(spongos_t *s, trits_t H, trits_t sig, trits_t pk) {
@@ -159,7 +131,7 @@ void wots_recover(spongos_t *s, trits_t H, trits_t sig, trits_t pk) {
   MAM2_ASSERT(trits_size(pk) == MAM2_WOTS_PK_SIZE);
 
   trits_copy(sig, sig_pks);
-  wots_hash_verify(s, sig_pks, H);
+  wots_hash_sign_or_verify(s, sig_pks, H, WOTS_HASH_VERIFY);
   spongos_hash(s, sig_pks, pk);
 }
 
