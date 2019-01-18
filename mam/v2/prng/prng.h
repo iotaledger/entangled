@@ -45,14 +45,14 @@ typedef struct prng_s {
  *
  * @return a status code
  */
-retcode_t prng_create(prng_t *prng);
+retcode_t prng_create(prng_t *const prng);
 
 /**
  * Deallocates memory for PRNG secret key
  *
  * @param prng A PRNG interface
  */
-void prng_destroy(prng_t *prng);
+void prng_destroy(prng_t *const prng);
 
 /**
  * PRNG initialization
@@ -61,7 +61,8 @@ void prng_destroy(prng_t *prng);
  * @param sponge A sponge interface
  * @param secret_key A secret key of size MAM2_PRNG_KEY_SIZE
  */
-void prng_init(prng_t *prng, sponge_t *sponge, trits_t secret_key);
+void prng_init(prng_t *const prng, sponge_t *const sponge,
+               trits_t const secret_key);
 
 /**
  * PRNG output generation with a nonce
@@ -71,7 +72,8 @@ void prng_init(prng_t *prng, sponge_t *sponge, trits_t secret_key);
  * @param nonce The nonce
  * @param output Pseudorandom output trits
  */
-void prng_gen(prng_t *prng, tryte_t destination, trits_t nonce, trits_t output);
+void prng_gen(prng_t const *const prng, tryte_t const destination,
+              trits_t const nonce, trits_t output);
 
 /**
  * PRNG output generation with two nonces
@@ -82,8 +84,8 @@ void prng_gen(prng_t *prng, tryte_t destination, trits_t nonce, trits_t output);
  * @param nonce2 The second nonce
  * @param output Pseudorandom output trits
  */
-void prng_gen2(prng_t *prng, tryte_t destination, trits_t nonce1,
-               trits_t nonce2, trits_t output);
+void prng_gen2(prng_t const *const prng, tryte_t const destination,
+               trits_t const nonce1, trits_t const nonce2, trits_t output);
 
 /**
  * PRNG output generation with three nonces
@@ -95,8 +97,9 @@ void prng_gen2(prng_t *prng, tryte_t destination, trits_t nonce1,
  * @param nonce3 The third nonce
  * @param output Pseudorandom output trits
  */
-void prng_gen3(prng_t *prng, tryte_t destination, trits_t nonce1,
-               trits_t nonce2, trits_t nonce3, trits_t output);
+void prng_gen3(prng_t const *const prng, tryte_t const destination,
+               trits_t const nonce1, trits_t const nonce2, trits_t const nonce3,
+               trits_t output);
 
 #ifdef __cplusplus
 }

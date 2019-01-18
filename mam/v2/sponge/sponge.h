@@ -84,10 +84,10 @@ void sponge_absorb(sponge_t *s, /*!< [in] sponge interface */
 
 /*! \brief Absorb concatenation of `Xs[0]`..`Xs[n-1]` */
 void sponge_absorbn(
-    sponge_t *s, /*!< [in] sponge interface */
-    trit_t c2,   /*!< [in] control trit encoding input data type */
-    size_t n,    /*!< [in] input data blocks count */
-    trits_t *Xs  /*!< [in] input data blocks */
+    sponge_t *s,            /*!< [in] sponge interface */
+    trit_t c2,              /*!< [in] control trit encoding input data type */
+    size_t n,               /*!< [in] input data blocks count */
+    trits_t const *const Xs /*!< [in] input data blocks */
 );
 
 /*! \brief Sponge squeezing. */

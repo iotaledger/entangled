@@ -96,7 +96,7 @@ void sponge_absorb(sponge_t *s, trit_t c2, trits_t X) {
   } while (!trits_is_empty(X));
 }
 
-void sponge_absorbn(sponge_t *s, trit_t c2, size_t n, trits_t *Xs) {
+void sponge_absorbn(sponge_t *s, trit_t c2, size_t n, trits_t const *const Xs) {
   buffers_t tb;
   size_t m;
   trits_t s1;
