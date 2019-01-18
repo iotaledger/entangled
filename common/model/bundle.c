@@ -59,9 +59,9 @@ static retcode_t validate_signatures(bundle_transactions_t const *const bundle,
       break;
     }
     curr_tx = curr_inp_tx;
+    *is_valid = true;
   }
 
-  *is_valid = true;
   return RC_OK;
 }
 
@@ -210,8 +210,8 @@ retcode_t bundle_validator(bundle_transactions_t *const bundle,
         break;
       }
     }
+    *status = BUNDLE_VALID;
   }
-  *status = BUNDLE_VALID;
   return RC_OK;
 }
 
