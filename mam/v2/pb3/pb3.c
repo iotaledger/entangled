@@ -73,6 +73,7 @@ retcode_t pb3_decode_longtrint(trint18_t *t, trits_t *b) {
 
 static size_t pb3_sizet_trytes(size_t n) {
   size_t const max_d = (5 * sizeof(size_t) + 2) / 3;
+  MAM2_ASSERT(n <= MAM2_PB3_SIZE_MAX);
 
   size_t d = 0, m = 1;
   for (; d < max_d && (n > (m - 1) / 2);) m *= 27, ++d;
@@ -128,20 +129,24 @@ retcode_t pb3_decode_sizet(size_t *n, trits_t *b) {
     if (0 < d) {
       tryte_t t;
       trits_t s = *b;
+      uint64_t m;
 
       --d;
       s = trits_pickup(s, 3);
       /* higher tryte in the representation */
       t = trits_get3(s);
       err_guard(t > 0, RC_MAM2_INVALID_VALUE); /* can't be 0 or negative */
-      *n = (size_t)t;
+      m = (size_t)t;
 
       for (; d--;) {
         s = trits_pickup(s, 3);
         t = trits_get3(s);
-        *n *= 27;
-        *n += (size_t)t;
+        m *= 27;
+        m += (uint64_t)t;
       }
+      /* value may be truncated here */
+      *n = (size_t)m;
+      err_guard(m == (uint64_t)*n, RC_MAM2_PB3_SIZET_NOT_SUPPORTED);
     }
 
     e = RC_OK;
