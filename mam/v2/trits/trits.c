@@ -60,11 +60,11 @@ size_t trits_size_min(trits_t x, size_t s) {
   return n;
 }
 
-trits_t trits_from_rep(size_t n, word_t *w) {
+trits_t trits_from_rep(size_t n, trit_t *t) {
   trits_t x;
   x.n = n;
   x.d = 0;
-  x.p = w;
+  x.p = t;
   return x;
 }
 
@@ -110,75 +110,17 @@ trits_t trits_advance(trits_t *b, size_t n) {
 }
 
 trint1_t trits_get1(trits_t x) {
-#if defined(MAM2_TRINARY_WORD_REP_INT)
-#if (MAM2_TRITS_PER_WORD == 1)
   MAM2_ASSERT(!trits_is_empty(x));
   MAM2_ASSERT_TRINT1(x.p[x.d]);
 
   return x.p[x.d];
-#else
-#error not implemented
-#endif
-#elif defined(MAM2_TRINARY_WORD_REP_PACKED)
-  static trint1_t const ts[4] = {0, 1, -1, 0};
-
-  word_t *w;
-  size_t d;
-  MAM2_ASSERT(!trits_is_empty(x));
-
-  w = &x.p[x.d / MAM2_TRITS_PER_WORD];
-  d = 2 * (x.d % MAM2_TRITS_PER_WORD);
-  return ts[3 & (*w >> d)];
-#elif defined(MAM2_TRINARY_WORD_REP_INTERLEAVED)
-  static trint1_t const ts[2][2] = {{0, -1}, {1, 0}};
-
-  word_t *w;
-  size_t d;
-  MAM2_ASSERT(!trits_is_empty(x));
-
-  w = &x.p[x.d / MAM2_TRITS_PER_WORD];
-  d = x.d % MAM2_TRITS_PER_WORD;
-  return ts[1 & (w->lo >> d)][1 & (w->hi >> d)];
-#endif
 }
 
 void trits_put1(trits_t x, trint1_t t) {
-#if defined(MAM2_TRINARY_WORD_REP_INT)
-#if (MAM2_TRITS_PER_WORD == 1)
   MAM2_ASSERT(!trits_is_empty(x));
   MAM2_ASSERT_TRINT1(t);
 
   x.p[x.d] = t;
-#else
-#error not implemented
-#endif
-#elif defined(MAM2_TRINARY_WORD_REP_PACKED)
-  static word_t const spongos_wots[3] = {2, 0, 1};
-
-  word_t *w;
-  size_t d;
-  MAM2_ASSERT(!trits_is_empty(x));
-  MAM2_ASSERT_TRINT1(t);
-
-  w = &x.p[x.d / MAM2_TRITS_PER_WORD];
-  d = 2 * (x.d % MAM2_TRITS_PER_WORD);
-  *w = *w & ~((word_t)3 << d);
-  *w = *w | (spongos_wots[t + 1] << d);
-#elif defined(MAM2_TRINARY_WORD_REP_INTERLEAVED)
-  static word_t const spongos_wots[3] = {{0, 1}, {0, 0}, {1, 0}};
-
-  word_t *w;
-  size_t d;
-  MAM2_ASSERT(!trits_is_empty(x));
-  MAM2_ASSERT_TRINT1(t);
-
-  w = &x.p[x.d / MAM2_TRITS_PER_WORD];
-  d = x.d % MAM2_TRITS_PER_WORD;
-  w->lo = w->lo & ~((rep_t)1 << d);
-  w->lo = w->lo | (spongos_wots[t + 1].lo << d);
-  w->hi = w->hi & ~((rep_t)1 << d);
-  w->hi = w->hi | (spongos_wots[t + 1].hi << d);
-#endif
 }
 
 trint3_t trits_get3(trits_t x) {
@@ -602,12 +544,10 @@ bool trits_is_same(trits_t x, trits_t y) {
 }
 
 bool trits_is_overlapped(trits_t x, trits_t y) {
-  word_t *x_first = x.p + (x.d / MAM2_TRITS_PER_WORD);
-  word_t *x_last =
-      x.p + (x.n / MAM2_TRITS_PER_WORD) + ((x.n % MAM2_TRITS_PER_WORD) ? 1 : 0);
-  word_t *y_first = y.p + (y.d / MAM2_TRITS_PER_WORD);
-  word_t *y_last =
-      y.p + (y.n / MAM2_TRITS_PER_WORD) + ((y.n % MAM2_TRITS_PER_WORD) ? 1 : 0);
+  trit_t *x_first = x.p + x.d;
+  trit_t *x_last = x.p + x.n;
+  trit_t *y_first = y.p + y.d;
+  trit_t *y_last = y.p + y.n;
   return (x_first < y_last) && (y_first < x_last);
 }
 
@@ -635,7 +575,7 @@ bool trits_inc(trits_t x) {
 }
 
 trits_t trits_alloc(size_t n) {
-  word_t *p = malloc(MAM2_WORDS(n));
+  trit_t *p = malloc(n);
   return trits_from_rep(n, p);
 }
 

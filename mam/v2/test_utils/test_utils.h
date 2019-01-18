@@ -31,8 +31,8 @@ extern "C" {
 
 typedef struct test_ntru_s {
   ntru_t n;
-  word_t id[MAM2_WORDS(81)];
-  word_t sk[MAM2_WORDS(MAM2_NTRU_SK_SIZE)];
+  trit_t id[81];
+  trit_t sk[MAM2_NTRU_SK_SIZE];
   poly_t f;
 } test_ntru_t;
 

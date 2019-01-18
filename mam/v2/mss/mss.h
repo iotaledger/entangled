@@ -79,15 +79,14 @@ typedef struct mss_mt_stack_s {
 #define MAM2_MSS_MT_STACKS(d) (d)
 #define MAM2_MSS_MT_STACK_CAPACITY(d) ((d) + 1)
 
-#define MAM2_MSS_HASH_IDX(i) (MAM2_WORDS(MAM2_MSS_MT_HASH_SIZE) * (i))
+#define MAM2_MSS_HASH_IDX(i) (MAM2_MSS_MT_HASH_SIZE * (i))
 /*! \brief Memory for hash-values. TODO: Add 1 extra hash for mss_gen. */
 #define MAM2_MSS_MT_HASH_WORDS(d, i) \
   MAM2_MSS_HASH_IDX(MAM2_MSS_MT_NODES(d) + (i))
 #define MAM2_MSS_MT_AUTH_WORDS(d) MAM2_MSS_HASH_IDX(d)
 #else
 /*! \brief MSS Merkle-tree implementation storage words. */
-#define MAM2_MSS_MT_WORDS(d) \
-  (MAM2_WORDS(MAM2_WOTS_PK_SIZE) * (2 * (1 << d) - 1))
+#define MAM2_MSS_MT_WORDS(d) (MAM2_WOTS_PK_SIZE * (2 * (1 << (d)) - 1))
 #endif
 
 #if defined(MAM2_MSS_TRAVERSAL)
@@ -107,13 +106,13 @@ typedef struct mss_s {
   spongos_t sg[1]; /*!< Spongos interface used to hash Merkle tree nodes. */
   wots_t *w;       /*!< WOTS interface used to generate keys and sign. */
 #if defined(MAM2_MSS_TRAVERSAL)
-  word_t *ap;         /*!< Current authentication path; `d` hash values. */
-  word_t *hs;         /*!< Buffer storing hash-values of auxiliary nodes;
+  trit_t *ap;         /*!< Current authentication path; `d` hash values. */
+  trit_t *hs;         /*!< Buffer storing hash-values of auxiliary nodes;
                       MAM2_MSS_MT_NODES(d) hash-values in total. */
   mss_mt_node_t *ns;  /*<! Auxiliary node infos. */
   mss_mt_stack_t *ss; /*<! Stacks used by traversal algorithm. */
 #else
-  word_t *mt; /*!< Buffer storing complete Merkle-tree. */
+  trit_t *mt; /*!< Buffer storing complete Merkle-tree. */
 #endif
   trits_t N1, N2; /*!< Nonce = `N1`||`N2`, stored pointers only, NOT copies. */
 #if defined(MAM2_MSS_DEBUG)
@@ -130,15 +129,15 @@ for the purpose of key gen stack `D-1` must have capacity `D+1`.
 It is achieved by allocating one extra node:
 
 ```
-  word_t *alloc_words(size_t word_count);
+  trit_t *alloc_words(size_t word_count);
   mss_mt_node_t *alloc_nodes(size_t node_count);
   mss_mt_stack_t *alloc_stacks(size_t stack_count);
   mss_mt_height_t D;
 
   size_t total_nodes = MAM2_MSS_MT_NODES(D)+1;
   m->d = D;
-  m->ap = alloc_words(D * MAM2_WORDS(MAM2_MSS_MT_HASH_SIZE));
-  m->hs = alloc_words(total_nodes * MAM2_WORDS(MAM2_MSS_MT_HASH_SIZE));
+  m->ap = alloc_words(D * MAM2_MSS_MT_HASH_SIZE);
+  m->hs = alloc_words(total_nodes * MAM2_MSS_MT_HASH_SIZE);
   m->ns = alloc_nodes(total_nodes);
   m->ss = alloc_stacks(D);
 ```

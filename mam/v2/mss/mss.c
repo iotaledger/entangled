@@ -83,7 +83,7 @@ static void mss_mt_gen_leaf(
 }
 
 #if defined(MAM2_MSS_TRAVERSAL)
-static trits_t mss_hash_idx(word_t *p, size_t i) {
+static trits_t mss_hash_idx(trit_t *p, size_t i) {
   return trits_from_rep(MAM2_MSS_MT_HASH_SIZE, p + MAM2_MSS_HASH_IDX(i));
 }
 
@@ -109,7 +109,7 @@ static void mss_mt_init(mss_t *m) {
 static void mss_mt_update(mss_t *m, mss_mt_height_t d) {
   mss_mt_stack_t *s;
   mss_mt_node_t *ns;
-  word_t *hs;
+  trit_t *hs;
   trits_t h[2], wpk;
 
   /* current level must be lower than MT height */
@@ -282,8 +282,8 @@ static trits_t mss_mt_node_t_trits(mss_t *m, trint6_t d, trint18_t i) {
   MAM2_ASSERT(i < ((trint18_t)1 << d));
 
   size_t idx = ((size_t)1 << d) + i - 1;
-  word_t *w = m->mt + MAM2_WORDS(MAM2_MSS_MT_HASH_SIZE) * idx;
-  return trits_from_rep(MAM2_MSS_MT_HASH_SIZE, w);
+  trit_t *t = m->mt + MAM2_MSS_MT_HASH_SIZE * idx;
+  return trits_from_rep(MAM2_MSS_MT_HASH_SIZE, t);
 }
 #endif
 
@@ -336,7 +336,7 @@ void mss_gen(mss_t *m, trits_t pk) {
     mss_mt_height_t d = m->d - 1;
     mss_mt_stack_t *s = m->ss + MAM2_MSS_MT_STACKS(d);
     mss_mt_node_t *ns = m->ns + MAM2_MSS_MT_NODES(d), *n;
-    word_t *hs = m->hs + MAM2_MSS_MT_HASH_WORDS(d, 0);
+    trit_t *hs = m->hs + MAM2_MSS_MT_HASH_WORDS(d, 0);
 
     /* init stack */
     /* max node height is `D` */
@@ -550,11 +550,11 @@ retcode_t mss_create(mss_t *m, mss_mt_height_t d) {
     err_guard(0 <= d && d <= MAM2_MSS_MAX_D, RC_MAM2_INVALID_ARGUMENT);
 
 #if defined(MAM2_MSS_TRAVERSAL)
-    m->ap = malloc(sizeof(word_t) * MAM2_MSS_MT_AUTH_WORDS(d));
+    m->ap = malloc(sizeof(trit_t) * MAM2_MSS_MT_AUTH_WORDS(d));
     err_guard(m->ap, RC_OOM);
 
     /* add 1 extra hash for dirty hack (see mss.c) */
-    m->hs = malloc(sizeof(word_t) * MAM2_MSS_MT_HASH_WORDS(d, 1));
+    m->hs = malloc(sizeof(trit_t) * MAM2_MSS_MT_HASH_WORDS(d, 1));
     err_guard(m->hs, RC_OOM);
 
     /* add 1 extra node for dirty hack (see mss.c) */
@@ -564,7 +564,7 @@ retcode_t mss_create(mss_t *m, mss_mt_height_t d) {
     m->ss = malloc(sizeof(mss_mt_stack_t) * MAM2_MSS_MT_STACKS(d));
     err_guard(m->ns, RC_OOM);
 #else
-    m->mt = malloc(sizeof(word_t) * MAM2_MSS_MT_WORDS(d));
+    m->mt = malloc(sizeof(trit_t) * MAM2_MSS_MT_WORDS(d));
     err_guard(m->mt, RC_OOM);
 #endif
 

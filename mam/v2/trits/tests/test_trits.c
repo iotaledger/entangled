@@ -18,12 +18,12 @@ static void trits_put_get_test(void) {
   trit_t t0, t;
   size_t i;
 
-  MAM2_TRITS_DEF0(x, MAM2_TRITS_PER_WORD);
+  MAM2_TRITS_DEF0(x, 1);
 
-  x = MAM2_TRITS_INIT(x, MAM2_TRITS_PER_WORD);
+  x = MAM2_TRITS_INIT(x, 1);
   trits_set_zero(x);
 
-  for (i = 0; i < MAM2_TRITS_PER_WORD; ++i) {
+  for (i = 0; i < 1; ++i) {
     trits_put1(x, t0 = -1);
     t = trits_get1(x);
     TEST_ASSERT_TRUE(t == t0);

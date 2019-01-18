@@ -176,15 +176,15 @@ bool ntru_decr(ntru_t *n, spongos_t *s, trits_t Y, trits_t K) {
 
 retcode_t ntru_create(ntru_t *n) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  word_t *id = 0, *sk = 0;
+  trit_t *id = 0, *sk = 0;
   void *f = 0;
 
   MAM2_ASSERT(n);
 
   do {
-    id = malloc(sizeof(word_t) * MAM2_WORDS(MAM2_NTRU_ID_SIZE));
+    id = malloc(sizeof(trit_t) * MAM2_NTRU_ID_SIZE);
     err_guard(id, RC_OOM);
-    sk = malloc(sizeof(word_t) * MAM2_WORDS(MAM2_NTRU_SK_SIZE));
+    sk = malloc(sizeof(trit_t) * MAM2_NTRU_SK_SIZE);
     err_guard(sk, RC_OOM);
     f = malloc(sizeof(poly_t));
     err_guard(f, RC_OOM);
