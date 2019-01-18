@@ -14,9 +14,9 @@
 
 #include "mam/v2/test_utils/test_utils.h"
 
-void test_f(void *buf, word_t *s) {
+void test_f(void *buf, trit_t *s) {
   trits_t x = trits_from_rep(MAM2_SPONGE_RATE, s);
-  trits_t y = trits_from_rep(MAM2_SPONGE_RATE, (word_t *)buf);
+  trits_t y = trits_from_rep(MAM2_SPONGE_RATE, (trit_t *)buf);
   trits_t x0 = trits_take(x, MAM2_SPONGE_RATE / 2);
   trits_t x1 = trits_drop(x, MAM2_SPONGE_RATE / 2);
   trits_t x2 =

@@ -27,12 +27,12 @@ extern "C" {
 typedef struct trits_s {
   size_t n; /*!< total number of trits pointed to by `p` */
   size_t d; /*!< offset of the first trit; number of available trits is `n-d` */
-  word_t *p; /*!< pointer to the words holding trits */
+  trit_t *p; /*!< pointer to the trits */
 } trits_t;
 
 #define MAM2_TRITS_INIT(X, k) trits_from_rep(k, X##_p)
 
-#define MAM2_TRITS_DECL(X, k) word_t X##_p[MAM2_WORDS(k)]
+#define MAM2_TRITS_DECL(X, k) trit_t X##_p[k]
 
 #define MAM2_TRITS_DEF0(X, k) \
   MAM2_TRITS_DECL(X, k);      \
@@ -41,10 +41,6 @@ typedef struct trits_s {
 #if 0
 #define MAM2_TRITS_DEF(X, key) MAM2_TRITS_DEF0(X, key) = MAM2_TRITS_INIT(X, key)
 #endif
-
-#define MAM2_TRITS_DIV_WORD(t) ((t) / MAM2_TRITS_PER_WORD)
-
-#define MAM2_TRITS_MOD_WORD(t) ((t) % MAM2_TRITS_PER_WORD)
 
 /*! \brief Check `x.n` against zero. */
 bool trits_is_empty(trits_t x);
@@ -56,7 +52,7 @@ size_t trits_size(trits_t x);
 size_t trits_size_min(trits_t x, size_t s);
 
 /*! \brief Construct `n` trits from representation `w`. */
-trits_t trits_from_rep(size_t n, word_t *w);
+trits_t trits_from_rep(size_t n, trit_t *t);
 
 /*! \brief Take the first `n` trits from `x`. */
 trits_t trits_take(trits_t x, size_t n);

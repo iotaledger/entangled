@@ -16,7 +16,7 @@
 
 /* \brief This special trivial spongos transform is used
 in order to get `AE(spongos;key)=1^n`. */
-static void ntru_test_f(void *buf, word_t *s) {
+static void ntru_test_f(void *buf, trit_t *s) {
   trits_t x = trits_from_rep(MAM2_SPONGE_RATE, s);
   trits_set1(x, 1);
 }
@@ -85,7 +85,7 @@ static void ntru_test(void) {
 
   /* decryption failure special test case */
   {
-    void (*sf)(void *, word_t *);
+    void (*sf)(void *, trit_t *);
     MAM2_TRITS_DEF0(u, MAM2_NTRU_SK_SIZE);
     MAM2_TRITS_DEF0(v, MAM2_NTRU_SK_SIZE);
     u = MAM2_TRITS_INIT(u, MAM2_NTRU_SK_SIZE);

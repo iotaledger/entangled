@@ -40,7 +40,7 @@ extern "C" {
 #define MAM2_SPONGE_MAC_SIZE 243
 
 /*! \brief Sponge state. */
-typedef word_t sponge_state_t[MAM2_WORDS(MAM2_SPONGE_WIDTH)];
+typedef trit_t sponge_state_t[MAM2_SPONGE_WIDTH];
 
 /*! \brief c2 control trit DATA */
 #define MAM2_SPONGE_CTL_DATA 0
@@ -57,9 +57,9 @@ typedef word_t sponge_state_t[MAM2_WORDS(MAM2_SPONGE_WIDTH)];
 
 /*! \brief Sponge interface. */
 typedef struct sponge_s {
-  void (*f)(void *, word_t *); /*!< sponge transformation */
+  void (*f)(void *, trit_t *); /*!< sponge transformation */
   void *stack;                 /*!< additional memory used by `f` */
-  word_t *s;                   /*!< sponge state */
+  trit_t *s;                   /*!< sponge state */
 } sponge_t;
 
 void sponge_transform(sponge_t *s);

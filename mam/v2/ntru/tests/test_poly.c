@@ -16,7 +16,7 @@
 static void poly_ntt_test(void) {
   size_t i, k, ki;
   poly_t f, g, fg, tf, tg, tfg, itf, itg, itfg, tif, itif, fitif, t2, it2;
-  poly_coeff_t c = 7, a = 13, n = MAM2_POLY_N, two = 1;
+  poly_coeff_t c = 7, a = 13, two = 1;
 
   for (i = 0; i < MAM2_POLY_N; ++i, two = poly_coeff_mul(two, 2))
     f[i] = 0,     /*two,*/

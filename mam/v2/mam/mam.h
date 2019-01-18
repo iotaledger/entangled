@@ -42,7 +42,7 @@ retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
 void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m);
 
 #define MAM2_CHANNEL_ID_SIZE MAM2_MSS_MT_HASH_SIZE
-typedef word_t chid_t[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
+typedef trit_t chid_t[MAM2_CHANNEL_ID_SIZE];
 typedef struct mam_channel_s {
   mss_t m[1]; /*!< MSS instance. */
   chid_t id;  /*!< MSS public key. */
@@ -80,7 +80,7 @@ mam_channel_save, mam_channel_load
 */
 
 #define MAM2_ENDPOINT_ID_SIZE MAM2_MSS_MT_HASH_SIZE
-typedef word_t epid_t[MAM2_WORDS(MAM2_MSS_MT_HASH_SIZE)];
+typedef trit_t epid_t[MAM2_MSS_MT_HASH_SIZE];
 typedef struct mam_endpoint_s {
   mss_t m[1]; /*!< MSS instance. */
   epid_t id;  /*!< MSS public key. */
@@ -120,8 +120,8 @@ mam_endpoint_save, mam_endpoint_load
 #define MAM2_PSK_SIZE 243
 /*! \brief Preshared key. */
 typedef struct mam_pre_shared_key_s {
-  word_t id[MAM2_WORDS(MAM2_PSK_ID_SIZE)];
-  word_t pre_shared_key[MAM2_WORDS(MAM2_PSK_SIZE)];
+  trit_t id[MAM2_PSK_ID_SIZE];
+  trit_t pre_shared_key[MAM2_PSK_SIZE];
 } mam_pre_shared_key_t;
 
 trits_t mam_psk_id(mam_pre_shared_key_t *p);
@@ -132,7 +132,7 @@ def_mam_list(mam_pre_shared_key_node_t, mam_pre_shared_keys_list);
 
 /*! \brief Recipient's NTRU public key. */
 typedef struct mam_ntru_pk_s {
-  word_t pk[MAM2_WORDS(MAM2_NTRU_PK_SIZE)];
+  trit_t pk[MAM2_NTRU_PK_SIZE];
 } mam_ntru_pk_t;
 
 trits_t mam_ntru_pk_id(mam_ntru_pk_t *p);
@@ -236,11 +236,11 @@ typedef struct mam_send_msg_context_s {
   mam_endpoint_t *ep;  /*!< Current endpoint (may be null). */
   mam_endpoint_t *ep1; /*!< New endpoint (may be null). */
 
-  word_t nonce[MAM2_WORDS(MAM2_HEADER_NONCE_SIZE)]; /*!< Message nonce, must be
+  trit_t nonce[MAM2_HEADER_NONCE_SIZE]; /*!< Message nonce, must be
                                                        unique for each key. */
-  word_t session_key[MAM2_WORDS(
-      MAM2_SPONGE_KEY_SIZE)]; /*!< Trits (memory) for session key. */
-  bool key_plain;             /*!< Include session key in plain? */
+  trit_t
+      session_key[MAM2_SPONGE_KEY_SIZE]; /*!< Trits (memory) for session key. */
+  bool key_plain;                        /*!< Include session key in plain? */
   mam_pre_shared_keys_list
       pre_shared_keys; /*!< Encrypt message for these psks. */
   mam_ntru_pk_list
@@ -270,10 +270,10 @@ typedef struct mam_recv_msg_context_s {
   spongos_t fork[1];       /*!< Spongos interface for PB3 forks. */
 
   mam_msg_pubkey_t pubkey;
-  word_t chid[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
-  word_t chid1[MAM2_WORDS(MAM2_CHANNEL_ID_SIZE)];
-  word_t epid[MAM2_WORDS(MAM2_ENDPOINT_ID_SIZE)];
-  word_t epid1[MAM2_WORDS(MAM2_ENDPOINT_ID_SIZE)];
+  trit_t chid[MAM2_CHANNEL_ID_SIZE];
+  trit_t chid1[MAM2_CHANNEL_ID_SIZE];
+  trit_t epid[MAM2_ENDPOINT_ID_SIZE];
+  trit_t epid1[MAM2_ENDPOINT_ID_SIZE];
   spongos_t spongos_mss[1];  /*!< Sponge interface used by MSS layer */
   spongos_t spongos_wots[1]; /*!< Sponge interface used by WOTS layer */
   spongos_t spongos_ntru[1]; /*!< Sponge interface used by NTRU layer */
@@ -281,14 +281,12 @@ typedef struct mam_recv_msg_context_s {
   /*TODO: check for trusted chid/epid*/
   /*TODO: handle (add to trusted list) new chid1*/
 
-  word_t nonce[MAM2_WORDS(MAM2_HEADER_NONCE_SIZE)];
-  word_t key[MAM2_WORDS(
-      MAM2_SPONGE_KEY_SIZE)]; /*!< Trits (memory) for session key. */
-  word_t psk_id[MAM2_WORDS(MAM2_PSK_ID_SIZE)]; /*!< Buffer to read PSK id to. */
-  word_t
-      ntru_id[MAM2_WORDS(MAM2_NTRU_ID_SIZE)]; /*!< Buffer to read NTRU id to. */
-  mam_pre_shared_key_t *psk;                  /*!< PSK to decrypt message. */
-  ntru_t *ntru; /*!< NTRU sk to decrypt message. */
+  trit_t nonce[MAM2_HEADER_NONCE_SIZE];
+  trit_t key[MAM2_SPONGE_KEY_SIZE];  /*!< Trits (memory) for session key. */
+  trit_t psk_id[MAM2_PSK_ID_SIZE];   /*!< Buffer to read PSK id to. */
+  trit_t ntru_id[MAM2_NTRU_ID_SIZE]; /*!< Buffer to read NTRU id to. */
+  mam_pre_shared_key_t *psk;         /*!< PSK to decrypt message. */
+  ntru_t *ntru;                      /*!< NTRU sk to decrypt message. */
 } mam_recv_msg_context_t;
 
 retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *msg);
