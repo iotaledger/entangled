@@ -12,11 +12,24 @@
 
 static UT_icd bundle_transactions_icd = {sizeof(iota_transaction_t), 0, 0, 0};
 
+/**
+ * Validate signatures in a bundle,
+ * it's a private method called by bundle_validator()
+ *
+ * @param {bundle_transactions_t} bundle - the bundle with transactions.
+ * @param {trit_t} normalized_bundle - the bundle hash
+ * @param {Kerl} address_kerl - the kerl instance for address calculation
+ * @param {Kerl} sig_frag_kerl - the kerl instance for signature calculation
+ * @param {bool} is_valid - the result of validation
+ *
+ * @return {retcode_t}
+ */
 static retcode_t validate_signatures(bundle_transactions_t const *const bundle,
                                      trit_t const *const normalized_bundle,
+                                     Kerl *const address_kerl,
+                                     Kerl *const sig_frag_kerl,
                                      bool *const is_valid) {
   iota_transaction_t *curr_tx = NULL, *curr_inp_tx = NULL;
-  Kerl address_kerl, sig_frag_kerl;
   trit_t digested_sig_trits[NUM_TRITS_ADDRESS];
   trit_t digested_address[NUM_TRITS_ADDRESS];
   trit_t key[NUM_TRITS_SIGNATURE];
@@ -32,17 +45,17 @@ static retcode_t validate_signatures(bundle_transactions_t const *const bundle,
     curr_inp_tx = curr_tx;
     offset = 0;
     next_offset = 0;
-    init_kerl(&address_kerl);
+    init_kerl(address_kerl);
     do {
-      init_kerl(&sig_frag_kerl);
+      init_kerl(sig_frag_kerl);
       next_offset = (offset + ISS_FRAGMENTS * RADIX - 1) % NUM_TRITS_HASH + 1;
       flex_trits_to_trits(key, NUM_TRITS_SIGNATURE,
                           transaction_signature(curr_inp_tx),
                           NUM_TRITS_SIGNATURE, NUM_TRITS_SIGNATURE);
       iss_kerl_sig_digest(digested_sig_trits,
                           &normalized_bundle[offset % NUM_TRITS_HASH], key,
-                          NUM_TRITS_SIGNATURE, &sig_frag_kerl);
-      kerl_absorb(&address_kerl, digested_sig_trits, NUM_TRITS_ADDRESS);
+                          NUM_TRITS_SIGNATURE, sig_frag_kerl);
+      kerl_absorb(address_kerl, digested_sig_trits, NUM_TRITS_ADDRESS);
       curr_inp_tx = (iota_transaction_t *)utarray_next(bundle, curr_inp_tx);
       offset = next_offset;
     } while (curr_inp_tx != NULL &&
@@ -50,7 +63,7 @@ static retcode_t validate_signatures(bundle_transactions_t const *const bundle,
                     transaction_address(curr_tx), FLEX_TRIT_SIZE_243) == 0 &&
              transaction_value(curr_inp_tx) == 0);
 
-    kerl_squeeze(&address_kerl, digested_address, NUM_TRITS_ADDRESS);
+    kerl_squeeze(address_kerl, digested_address, NUM_TRITS_ADDRESS);
     flex_trits_from_trits(digest, NUM_TRITS_HASH, digested_address,
                           NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
 
@@ -145,10 +158,12 @@ retcode_t bundle_validator(bundle_transactions_t *const bundle,
   retcode_t res = RC_OK;
   iota_transaction_t *curr_tx = NULL;
   int64_t index = 0, last_index = 0;
-  int64_t bundle_value = 0;
+  int64_t bundle_value = 0, tx_value = 0;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   bool valid_sig = false;
-  Kerl kerl = {};
+  Kerl shared_kerl1 = {}, shared_kerl2 = {};
+  flex_trit_t bundle_hash_calculated[FLEX_TRIT_SIZE_243];
+  trit_t normalized_bundle[HASH_LENGTH_TRIT];
 
   if (bundle == NULL) {
     *status = BUNDLE_NOT_INITIALIZED;
@@ -166,8 +181,13 @@ retcode_t bundle_validator(bundle_transactions_t *const bundle,
   memcpy(bundle_hash, transaction_bundle(curr_tx), FLEX_TRIT_SIZE_243);
 
   BUNDLE_FOREACH(bundle, curr_tx) {
-    bundle_value += transaction_value(curr_tx);
+    tx_value = transaction_value(curr_tx);
+    if (llabs(tx_value) > MAX_IOTA_SUPPLY) {
+      *status = BUNDLE_INVALID_VALUE;
+      break;
+    }
 
+    bundle_value += tx_value;
     if (llabs(bundle_value) > MAX_IOTA_SUPPLY) {
       *status = BUNDLE_INVALID_VALUE;
       break;
@@ -187,15 +207,12 @@ retcode_t bundle_validator(bundle_transactions_t *const bundle,
     }
 
     if (transaction_current_index(curr_tx) == last_index) {
-      flex_trit_t bundle_hash_calculated[FLEX_TRIT_SIZE_243];
-      trit_t normalized_bundle[HASH_LENGTH_TRIT];
-
       if (bundle_value != 0) {
         *status = BUNDLE_INVALID_VALUE;
         break;
       }
 
-      bundle_calculate_hash(bundle, &kerl, bundle_hash_calculated);
+      bundle_calculate_hash(bundle, &shared_kerl1, bundle_hash_calculated);
       if (memcmp(bundle_hash, bundle_hash_calculated, FLEX_TRIT_SIZE_243) !=
           0) {
         *status = BUNDLE_INVALID_HASH;
@@ -204,7 +221,8 @@ retcode_t bundle_validator(bundle_transactions_t *const bundle,
 
       normalize_hash_trits(bundle_hash_calculated, normalized_bundle);
 
-      res = validate_signatures(bundle, normalized_bundle, &valid_sig);
+      res = validate_signatures(bundle, normalized_bundle, &shared_kerl1,
+                                &shared_kerl2, &valid_sig);
       if (res != RC_OK || !valid_sig) {
         *status = BUNDLE_INVALID_SIGNATURE;
         break;

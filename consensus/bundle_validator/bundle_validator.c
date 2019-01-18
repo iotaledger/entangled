@@ -76,11 +76,6 @@ retcode_t iota_consensus_bundle_validator_validate(
     tangle_t const* const tangle, flex_trit_t* const tail_hash,
     bundle_transactions_t* const bundle, bundle_status_t* const status) {
   retcode_t res = RC_OK;
-  iota_transaction_t* curr_tx = NULL;
-  size_t index = 0, last_index = 0;
-  int64_t bundle_value = 0;
-  flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
-  Kerl kerl = {};
 
   if (bundle == NULL) {
     log_error(logger_id, "Bundle is not initialized\n");
