@@ -80,10 +80,7 @@ retcode_t iota_consensus_bundle_validator_validate(
   size_t index = 0, last_index = 0;
   int64_t bundle_value = 0;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
-  bool valid_sig = true;
   Kerl kerl = {};
-
-  *status = BUNDLE_VALID;
 
   if (bundle == NULL) {
     log_error(logger_id, "Bundle is not initialized\n");

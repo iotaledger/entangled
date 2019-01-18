@@ -12,9 +12,9 @@
 
 static UT_icd bundle_transactions_icd = {sizeof(iota_transaction_t), 0, 0, 0};
 
-static retcode_t validate_signature(bundle_transactions_t const *const bundle,
-                                    trit_t const *const normalized_bundle,
-                                    bool *const is_valid) {
+static retcode_t validate_signatures(bundle_transactions_t const *const bundle,
+                                     trit_t const *const normalized_bundle,
+                                     bool *const is_valid) {
   iota_transaction_t *curr_tx = NULL, *curr_inp_tx = NULL;
   Kerl address_kerl, sig_frag_kerl;
   trit_t digested_sig_trits[NUM_TRITS_ADDRESS];
@@ -22,8 +22,6 @@ static retcode_t validate_signature(bundle_transactions_t const *const bundle,
   trit_t key[NUM_TRITS_SIGNATURE];
   flex_trit_t digest[FLEX_TRIT_SIZE_243];
   size_t offset = 0, next_offset = 0;
-
-  *is_valid = true;
 
   for (curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
        curr_tx != NULL;) {
@@ -63,6 +61,7 @@ static retcode_t validate_signature(bundle_transactions_t const *const bundle,
     curr_tx = curr_inp_tx;
   }
 
+  *is_valid = true;
   return RC_OK;
 }
 
@@ -148,10 +147,8 @@ retcode_t bundle_validator(bundle_transactions_t *const bundle,
   int64_t index = 0, last_index = 0;
   int64_t bundle_value = 0;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
-  bool valid_sig = true;
+  bool valid_sig = false;
   Kerl kerl = {};
-
-  *status = BUNDLE_VALID;
 
   if (bundle == NULL) {
     *status = BUNDLE_NOT_INITIALIZED;
@@ -207,13 +204,14 @@ retcode_t bundle_validator(bundle_transactions_t *const bundle,
 
       normalize_hash_trits(bundle_hash_calculated, normalized_bundle);
 
-      res = validate_signature(bundle, normalized_bundle, &valid_sig);
+      res = validate_signatures(bundle, normalized_bundle, &valid_sig);
       if (res != RC_OK || !valid_sig) {
         *status = BUNDLE_INVALID_SIGNATURE;
         break;
       }
     }
   }
+  *status = BUNDLE_VALID;
   return RC_OK;
 }
 
