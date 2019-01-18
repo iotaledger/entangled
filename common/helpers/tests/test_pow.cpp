@@ -61,7 +61,7 @@ TEST(PoWTest, testsPoW) {
 
   const std::string NONCE = "GGD9999999OKGA9999999999999";
 
-  auto nonce = iota_pow(TX_TRYTES.c_str(), 9);
+  auto nonce = iota_pow_trytes(TX_TRYTES.c_str(), 9);
   EXPECT_EQ(nonce, NONCE);
   std::free(nonce);
 }
@@ -963,7 +963,7 @@ TEST(PoWTest, testsFlexPoW) {
 #endif
   const size_t NUM_TRITS = 8019;
 
-  auto nonce = iota_flex_pow(TX_TRITS, NUM_TRITS, 9);
+  auto nonce = iota_pow_flex(TX_TRITS, NUM_TRITS, 9);
   EXPECT_TRUE(memcmp(nonce, NONCE, sizeof(NONCE)) == 0);
   std::free(nonce);
 }

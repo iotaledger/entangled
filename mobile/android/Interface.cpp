@@ -14,7 +14,7 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_pow(
   const char* trytes = env->GetStringUTFChars(jtrytes, 0);
   char* nonce = (char*)calloc(27 + 1, sizeof(char));
 
-  char* foundNonce = iota_pow_trytes((const char*)trytes, mwm);
+  char* foundNonce = iota_pow_flex((const char*)trytes, mwm);
   memcpy(nonce, foundNonce, 27);
   free(foundNonce);
 
