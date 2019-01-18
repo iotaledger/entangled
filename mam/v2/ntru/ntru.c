@@ -50,7 +50,7 @@ void ntru_gen(ntru_t *n, prng_t *p, trits_t N, trits_t pk) {
 
   trits_set_zero(i);
   do {
-    prng_gen2(p, MAM2_PRNG_DST_NTRUKEY, N, i, r);
+    prng_gen2(p, MAM2_PRNG_DST_NTRU_KEY, N, i, r);
     poly_small_from_trits(f, trits_take(r, MAM2_NTRU_SK_SIZE));
     poly_small_from_trits(g, trits_drop(r, MAM2_NTRU_SK_SIZE));
 
@@ -122,7 +122,7 @@ void ntru_encr(trits_t pk, prng_t *p, spongos_t *s, trits_t K, trits_t N,
   MAM2_ASSERT(!trits_is_same(K, Y));
 
   r = trits_take(Y, MAM2_NTRU_SK_SIZE);
-  prng_gen2(p, MAM2_PRNG_DST_NTRUKEY, K, N, r);
+  prng_gen2(p, MAM2_PRNG_DST_NTRU_KEY, K, N, r);
   ntru_encr_r(pk, s, r, K, Y);
 }
 

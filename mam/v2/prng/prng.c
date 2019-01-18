@@ -13,7 +13,7 @@
 \brief MAM2 PRNG layer.
 */
 
-#include <memory.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "mam/v2/prng/prng.h"
@@ -28,7 +28,25 @@ static void prng_squeeze(sponge_t *s, trits_t Y) {
 }
 
 static trits_t prng_key_trits(prng_t *p) {
-  return trits_from_rep(MAM2_PRNG_KEY_SIZE, p->key);
+  return trits_from_rep(MAM2_PRNG_KEY_SIZE, p->secret_key);
+}
+
+retcode_t prng_create(prng_t *p) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
+  MAM2_ASSERT(p);
+  do {
+    memset(p, 0, sizeof(prng_t));
+    p->secret_key = malloc(sizeof(trit_t) * MAM2_PRNG_KEY_SIZE);
+    err_guard(p->secret_key, RC_OOM);
+    e = RC_OK;
+  } while (0);
+  return e;
+}
+
+void prng_destroy(prng_t *p) {
+  MAM2_ASSERT(p);
+  free(p->secret_key);
+  p->secret_key = 0;
 }
 
 void prng_init(prng_t *p, sponge_t *s, trits_t K) {
@@ -79,34 +97,4 @@ void prng_gen3(prng_t *p, trint3_t d, trits_t N1, trits_t N2, trits_t N3,
   trits_put3(dt, d);
   prng_absorbn(p->sponge, 5, KdN);
   prng_squeeze(p->sponge, Y);
-}
-
-void prng_gen_str(prng_t *p, trint3_t d, char const *nonce, trits_t Y) {
-  size_t n;
-  MAM2_TRITS_DEF0(N, MAM2_SPONGE_RATE);
-  N = MAM2_TRITS_INIT(N, MAM2_SPONGE_RATE);
-
-  n = strlen(nonce) * 3;
-  N = trits_take_min(N, n);
-  trits_from_str(N, nonce);
-
-  prng_gen(p, d, N, Y);
-}
-
-retcode_t prng_create(prng_t *p) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  MAM2_ASSERT(p);
-  do {
-    memset(p, 0, sizeof(prng_t));
-    p->key = malloc(sizeof(trit_t) * MAM2_PRNG_KEY_SIZE);
-    err_guard(p->key, RC_OOM);
-    e = RC_OK;
-  } while (0);
-  return e;
-}
-
-void prng_destroy(prng_t *p) {
-  MAM2_ASSERT(p);
-  free(p->key);
-  p->key = 0;
 }

@@ -8,10 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file prng.h
-\brief MAM2 PRNG layer.
-*/
 #ifndef __MAM_V2_PRNG_PRNG_H__
 #define __MAM_V2_PRNG_PRNG_H__
 
@@ -20,72 +16,87 @@
 #include "mam/v2/sponge/sponge.h"
 #include "mam/v2/trits/trits.h"
 
+// PRNG secret key size
+#define MAM2_PRNG_KEY_SIZE 243
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*! \brief PRNG key size. */
-#define MAM2_PRNG_KEY_SIZE 243
+typedef enum prng_destination_tryte_e {
+  // PRNG AE destination tryte
+  MAM2_PRNG_DST_SEC_KEY = 0,
+  // PRNG WOTS destination tryte
+  MAM2_PRNG_DST_WOTS_KEY = 1,
+  // PRNG NTRU destination tryte
+  MAM2_PRNG_DST_NTRU_KEY = 2
+} prng_destination_tryte_t;
 
-typedef trit_t prng_key_t[MAM2_PRNG_KEY_SIZE];
-
-/*! \brief PRNG AE destination tryte. */
-#define MAM2_PRNG_DST_SECKEY 0
-/*! \brief PRNG WOTS destination tryte. */
-#define MAM2_PRNG_DST_WOTSKEY 1
-/*! \brief PRNG NTRU destination tryte. */
-#define MAM2_PRNG_DST_NTRUKEY 2
-
-/*! \brief PRNG interface. */
+// PRNG layer interface
 typedef struct prng_s {
-  sponge_t *sponge; /*!< sponge interface */
-  trit_t *key;      /*!< key */
+  sponge_t *sponge;
+  trit_t *secret_key;
 } prng_t;
 
-/*! \brief PRNG initialization. */
-void prng_init(prng_t *p,   /*!< [in] PRNG interface */
-               sponge_t *s, /*!< [in] Sponge interface */
-               trits_t K    /*!< [in] key of size MAM2_PRNG_KEY_SIZE */
-);
+/**
+ * Allocates memory for PRNG secret key
+ *
+ * @param prng A PRNG interface
+ *
+ * @return a status code
+ */
+retcode_t prng_create(prng_t *prng);
 
-/*! \brief PRNG output generation. */
-void prng_gen(prng_t *p,  /*!< [in] PRNG interface */
-              trint3_t d, /*!< [in] destination tryte */
-              trits_t N,  /*!< [in] nonce */
-              trits_t Y   /*!< [out] pseudorandom trits */
-);
+/**
+ * Deallocates memory for PRNG secret key
+ *
+ * @param prng A PRNG interface
+ */
+void prng_destroy(prng_t *prng);
 
-/*! \brief PRNG output generation with
-nonce `N1` || `N2`. */
-void prng_gen2(prng_t *p,  /*!< [in] PRNG interface */
-               trint3_t d, /*!< [in] destination tryte */
-               trits_t N1, /*!< [in] first nonce */
-               trits_t N2, /*!< [in] second nonce */
-               trits_t Y   /*!< [out] pseudorandom trits */
-);
+/**
+ * PRNG initialization
+ *
+ * @param prng A PRNG interface
+ * @param sponge A sponge interface
+ * @param secret_key A secret key of size MAM2_PRNG_KEY_SIZE
+ */
+void prng_init(prng_t *prng, sponge_t *sponge, trits_t secret_key);
 
-/*! \brief PRNG output generation with
-nonce `N1` || `N2` || `N3`. */
-void prng_gen3(prng_t *p,  /*!< [in] PRNG interface */
-               trint3_t d, /*!< [in] destination tryte */
-               trits_t N1, /*!< [in] first nonce */
-               trits_t N2, /*!< [in] second nonce */
-               trits_t N3, /*!< [in] third nonce */
-               trits_t Y   /*!< [out] pseudorandom trits */
-);
+/**
+ * PRNG output generation with a nonce
+ *
+ * @param prng A PRNG interface
+ * @param destination A destination tryte
+ * @param nonce The nonce
+ * @param output Pseudorandom output trits
+ */
+void prng_gen(prng_t *prng, tryte_t destination, trits_t nonce, trits_t output);
 
-/*! \brief PRNG output generation. */
-void prng_gen_str(prng_t *p,         /*!< [in] PRNG interface */
-                  trint3_t d,        /*!< [in] destination tryte */
-                  char const *nonce, /*!< [in] nonce */
-                  trits_t Y          /*!< [out] pseudorandom trits */
-);
+/**
+ * PRNG output generation with two nonces
+ *
+ * @param prng A PRNG interface
+ * @param destination A destination tryte
+ * @param nonce1 The first nonce
+ * @param nonce2 The second nonce
+ * @param output Pseudorandom output trits
+ */
+void prng_gen2(prng_t *prng, tryte_t destination, trits_t nonce1,
+               trits_t nonce2, trits_t output);
 
-/*! \brief Allocate memory for PRNG secret key. */
-retcode_t prng_create(prng_t *p);
-
-/*! \brief Deallocate memory for PRNG secret key. */
-void prng_destroy(prng_t *p);
+/**
+ * PRNG output generation with three nonces
+ *
+ * @param prng A PRNG interface
+ * @param destination A destination tryte
+ * @param nonce1 The first nonce
+ * @param nonce2 The second nonce
+ * @param nonce3 The third nonce
+ * @param output Pseudorandom output trits
+ */
+void prng_gen3(prng_t *prng, tryte_t destination, trits_t nonce1,
+               trits_t nonce2, trits_t nonce3, trits_t output);
 
 #ifdef __cplusplus
 }

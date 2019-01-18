@@ -13,8 +13,8 @@
 \brief Basic trinary array operations.
 */
 
-#include <memory.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "mam/v2/trits/trits.h"
 

@@ -66,12 +66,12 @@ static trits_t mam_test_generic_send_msg(
   {
     pska->prev = pska->next = 0;
     trits_from_str(mam_psk_id(&pska->info), TEST_PRE_SHARED_KEY_A_STR);
-    prng_gen_str(prng_a, MAM2_PRNG_DST_SECKEY, TEST_PRE_SHARED_KEY_A_NONCE_STR,
+    prng_gen_str(prng_a, MAM2_PRNG_DST_SEC_KEY, TEST_PRE_SHARED_KEY_A_NONCE_STR,
                  mam_psk_trits(&pska->info));
 
     pskb->prev = pskb->next = 0;
     trits_from_str(mam_psk_id(&pskb->info), TEST_PRE_SHARED_KEY_B_STR);
-    prng_gen_str(prng_b, MAM2_PRNG_DST_SECKEY, TEST_PRE_SHARED_KEY_B_NONCE_STR,
+    prng_gen_str(prng_b, MAM2_PRNG_DST_SEC_KEY, TEST_PRE_SHARED_KEY_B_NONCE_STR,
                  mam_psk_trits(&pskb->info));
   }
   /* gen recipient'spongos ntru keys */
@@ -225,7 +225,7 @@ static void mam_test_generic_receive_msg(
     pre_shared_key->prev = pre_shared_key->next = 0;
     trits_from_str(mam_psk_id(&pre_shared_key->info),
                    TEST_PRE_SHARED_KEY_B_STR);
-    prng_gen_str(prng, MAM2_PRNG_DST_SECKEY, TEST_PRE_SHARED_KEY_B_NONCE_STR,
+    prng_gen_str(prng, MAM2_PRNG_DST_SEC_KEY, TEST_PRE_SHARED_KEY_B_NONCE_STR,
                  mam_psk_trits(&pre_shared_key->info));
   }
   /* gen recipient'spongos ntru keys */
