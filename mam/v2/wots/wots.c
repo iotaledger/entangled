@@ -157,7 +157,7 @@ retcode_t wots_create(wots_t *w) {
   MAM2_ASSERT(w);
   do {
     memset(w, 0, sizeof(wots_t));
-    w->sk = malloc(sizeof(word_t) * MAM2_WORDS(MAM2_WOTS_SK_SIZE));
+    w->sk = malloc(sizeof(trit_t) * MAM2_WOTS_SK_SIZE);
     err_guard(w->sk, RC_OOM);
     e = RC_OK;
   } while (0);

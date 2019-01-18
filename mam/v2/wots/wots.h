@@ -39,12 +39,12 @@ extern "C" {
 /*! \brief WOTS signature size. */
 #define MAM2_WOTS_SIG_SIZE MAM2_WOTS_SK_SIZE
 
-typedef word_t wots_sk_t[MAM2_WORDS(MAM2_WOTS_SK_SIZE)];
+typedef trit_t wots_sk_t[MAM2_WOTS_SK_SIZE];
 
 /*! \brief WOTS interface. */
 typedef struct wots_s {
   spongos_t sg[1]; /*!< spongos interface */
-  word_t *sk;      /*!< private key */
+  trit_t *sk;      /*!< private key */
 } wots_t;
 
 /*! \brief Init WOTS interface with Sponge. */

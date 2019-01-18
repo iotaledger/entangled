@@ -21,9 +21,9 @@
 #define def_test_mss(D, sfx)                    \
   typedef struct test_mss##sfx##_s {            \
     mss_t m;                                    \
-    word_t ap[MAM2_MSS_MT_AUTH_WORDS(D)];       \
+    trit_t ap[MAM2_MSS_MT_AUTH_WORDS(D)];       \
     uint32_t ap_check;                          \
-    word_t hs[MAM2_MSS_MT_HASH_WORDS(D, 1)];    \
+    trit_t hs[MAM2_MSS_MT_HASH_WORDS(D, 1)];    \
     uint32_t hs_check;                          \
     mss_mt_node_t ns[MAM2_MSS_MT_NODES(D) + 1]; \
     uint32_t ns_check;                          \
@@ -34,7 +34,7 @@
 #define def_test_mss(D, sfx)         \
   typedef struct test_mss##sfx##_s { \
     mss_t m;                         \
-    word_t mt[MAM2_MSS_MT_WORDS(D)]; \
+    trit_t mt[MAM2_MSS_MT_WORDS(D)]; \
     uint32_t mt_check;               \
   } test_mss##sfx##_t
 #endif

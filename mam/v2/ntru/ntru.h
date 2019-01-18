@@ -36,9 +36,9 @@ extern "C" {
 #define MAM2_NTRU_ID_SIZE 81
 
 typedef struct ntru_s {
-  word_t
+  trit_t
       *id; /*!< Key id - the first 27 trytes of the corresponding public key.*/
-  word_t *sk; /*!< Private key words - small coefficients of polynomial f. */
+  trit_t *sk; /*!< Private key trits - small coefficients of polynomial f. */
   void *
       f; /*!< Internal representation (`poly_t`) of a private key: NTT(1+3f). */
 } ntru_t;

@@ -98,7 +98,7 @@ retcode_t prng_create(prng_t *p) {
   MAM2_ASSERT(p);
   do {
     memset(p, 0, sizeof(prng_t));
-    p->key = malloc(sizeof(word_t) * MAM2_WORDS(MAM2_PRNG_KEY_SIZE));
+    p->key = malloc(sizeof(trit_t) * MAM2_PRNG_KEY_SIZE);
     err_guard(p->key, RC_OOM);
     e = RC_OK;
   } while (0);
