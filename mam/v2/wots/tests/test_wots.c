@@ -34,27 +34,27 @@ static void wots_test(void) {
 
   trits_set_zero(N);
   trits_set_zero(H);
-  trits_set_zero(wots_sk_trits(wots));
+  trits_set_zero(trits_from_rep(MAM2_WOTS_SK_SIZE, wots->secret_key));
 
   prng_gen(prng, 7, N, H);
   wots_gen_sk(wots, prng, N);
   wots_calc_pk(wots, pk);
   wots_sign(wots, H, sig);
 
-  /*wots_recover(wots->sg, H, sig, pkr);*/
+  /*wots_recover(&wots->spongos, H, sig, pkr);*/
 
-  TEST_ASSERT_TRUE(wots_verify(wots->sg, H, sig, pk));
+  TEST_ASSERT_TRUE(wots_verify(&wots->spongos, H, sig, pk));
 
   trits_put1(H, trit_add(trits_get1(H), 1));
-  TEST_ASSERT_TRUE(!wots_verify(wots->sg, H, sig, pk));
+  TEST_ASSERT_TRUE(!wots_verify(&wots->spongos, H, sig, pk));
   trits_put1(H, trit_sub(trits_get1(H), 1));
 
   trits_put1(sig, trit_add(trits_get1(sig), 1));
-  TEST_ASSERT_TRUE(!wots_verify(wots->sg, H, sig, pk));
+  TEST_ASSERT_TRUE(!wots_verify(&wots->spongos, H, sig, pk));
   trits_put1(sig, trit_sub(trits_get1(sig), 1));
 
   trits_put1(pk, trit_add(trits_get1(pk), 1));
-  TEST_ASSERT_TRUE(!wots_verify(wots->sg, H, sig, pk));
+  TEST_ASSERT_TRUE(!wots_verify(&wots->spongos, H, sig, pk));
   trits_put1(pk, trit_sub(trits_get1(pk), 1));
 }
 

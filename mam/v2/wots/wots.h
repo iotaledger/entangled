@@ -8,10 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file wots.h
-\brief MAM2 WOTS layer.
-*/
 #ifndef __MAM_V2_WOTS_WOTS_H__
 #define __MAM_V2_WOTS_WOTS_H__
 
@@ -21,91 +17,125 @@
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/trits/trits.h"
 
+// WOTS public key size
+#define MAM2_WOTS_PK_SIZE 243
+// WOTS secret key part size
+#define MAM2_WOTS_SK_PART_SIZE 162
+// WOTS secret key parts count
+#define MAM2_WOTS_SK_PART_COUNT 81
+// WOTS secret key size
+#define MAM2_WOTS_SK_SIZE (MAM2_WOTS_SK_PART_SIZE * MAM2_WOTS_SK_PART_COUNT)
+// WOTS signed hash value size
+#define MAM2_WOTS_HASH_SIZE 234
+// WOTS signature size
+#define MAM2_WOTS_SIG_SIZE MAM2_WOTS_SK_SIZE
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*! \brief WOTS public key size. */
-#define MAM2_WOTS_PK_SIZE 243
-/*! \brief WOTS private key part size. */
-#define MAM2_WOTS_SK_PART_SIZE 162
-/*! \brief WOTS private key parts count. */
-#define MAM2_WOTS_SK_PART_COUNT 81
-/*! \brief WOTS private key size. */
-#define MAM2_WOTS_SK_SIZE (MAM2_WOTS_SK_PART_SIZE * MAM2_WOTS_SK_PART_COUNT)
-
-/*! \brief WOTS signed hash value size. */
-#define MAM2_WOTS_HASH_SIZE 234
-/*! \brief WOTS signature size. */
-#define MAM2_WOTS_SIG_SIZE MAM2_WOTS_SK_SIZE
-
-typedef trit_t wots_sk_t[MAM2_WOTS_SK_SIZE];
-
-/*! \brief WOTS interface. */
+// WOTS layer interface
 typedef struct wots_s {
-  spongos_t sg[1]; /*!< spongos interface */
-  trit_t *sk;      /*!< private key */
+  spongos_t spongos;
+  trit_t *secret_key;
 } wots_t;
 
-/*! \brief Init WOTS interface with Sponge. */
-void wots_init(wots_t *w,  /*!< [in,out] WOTS interface */
-               sponge_t *s /*!< [in] Sponge interface */
-);
+/**
+ * Allocates memory for WOTS secret key
+ *
+ * @param wots A WOTS interface
+ *
+ * @return a status code
+ */
+retcode_t wots_create(wots_t *wots);
 
-trits_t wots_sk_trits(wots_t *w);
+/**
+ * Deallocates memory for WOTS secret key
+ *
+ * @param wots A WOTS interface
+ */
+void wots_destroy(wots_t *wots);
 
-/*! \brief Generate WOTS private key. */
-void wots_gen_sk(wots_t *w, /*!< [in] WOTS interface */
-                 prng_t *p, /*!< [in] PRNG interface */
-                 trits_t N  /*!< [in] nonce */
-);
+/**
+ * Initializes a WOTS interface with a sponge
+ *
+ * @param wots A WOTS interface
+ * @param sponge A sponge interface
+ */
+void wots_init(wots_t *wots, sponge_t *sponge);
 
-/*! \brief Generate WOTS private key. */
-void wots_gen_sk2(wots_t *w,  /*!< [in] WOTS interface */
-                  prng_t *p,  /*!< [in] PRNG interface */
-                  trits_t N1, /*!< [in] first nonce */
-                  trits_t N2  /*!< [in] second nonce */
-);
+/**
+ * Generates a WOTS secret key with a nonce
+ *
+ * @param wots A WOTS interface
+ * @param prng A PRNG interface
+ * @param nonce The nonce
+ */
+void wots_gen_sk(wots_t *wots, prng_t *prng, trits_t nonce);
 
-/*! \brief Generate WOTS private key. */
-void wots_gen_sk3(wots_t *w,  /*!< [in] WOTS interface */
-                  prng_t *p,  /*!< [in] PRNG interface */
-                  trits_t N1, /*!< [in] first nonce */
-                  trits_t N2, /*!< [in] second nonce */
-                  trits_t N3  /*!< [in] third nonce */
-);
+/**
+ * Generates a WOTS secret key with two nonces
+ *
+ * @param wots A WOTS interface
+ * @param prng A PRNG interface
+ * @param nonce1 The first nonce
+ * @param nonce2 The second nonce
+ */
+void wots_gen_sk2(wots_t *wots, prng_t *prng, trits_t nonce1, trits_t nonce2);
 
-/*! \brief Calculate WOTS public key.
-\note Private key must have already been generated. */
-void wots_calc_pk(wots_t *w, /*!< [in] WOTS interface */
-                  trits_t pk /*!< [out] public key */
-);
+/**
+ * Generate a WOTS secret key with three nonces
+ *
+ * @param wots A WOTS interface
+ * @param prng A PRNG interface
+ * @param nonce1 The first nonce
+ * @param nonce2 The second nonce
+ * @param nonce3 The third nonce
+ */
+void wots_gen_sk3(wots_t *wots, prng_t *prng, trits_t nonce1, trits_t nonce2,
+                  trits_t nonce3);
 
-/*! \brief Generate WOTS signature. */
-void wots_sign(wots_t *w,  /*!< [in] WOTS interface */
-               trits_t H,  /*!< [in] hash value tbs */
-               trits_t sig /*!< [out] signature */
-);
+/**
+ * Calculates a WOTS public key
+ * Private key must have already been generated
+ *
+ * @param wots A WOTS interface
+ * @param public_key The public key
+ */
+void wots_calc_pk(wots_t *wots, trits_t public_key);
 
-/*! \brief Recover WOTS public key from signature. */
-void wots_recover(spongos_t *s, /*!< [in] Spongos interface */
-                  trits_t H,    /*!< [in] signed hash value */
-                  trits_t sig,  /*!< [in] signature */
-                  trits_t pk    /*!< [out] presumed public key */
-);
+/**
+ * Generates a WOTS signature
+ *
+ * @param wots A WOTS interface
+ * @param hash A hash to be signed
+ * @param signature The signature
+ */
+void wots_sign(wots_t *wots, trits_t hash, trits_t signature);
 
-/*! \brief Verify WOTS signature. */
-bool wots_verify(spongos_t *s, /*!< [in] Spongos interface */
-                 trits_t H,    /*!< [in] signed hash value */
-                 trits_t sig,  /*!< [in] signature */
-                 trits_t pk    /*!< [in] public key */
-);
+/**
+ * Recovers a WOTS public key from a signature
+ *
+ * @param spongos A spongos interface
+ * @param hash A signed hash
+ * @param signature The signature
+ * @param public_key The recovered public key
+ */
+void wots_recover(spongos_t *spongos, trits_t hash, trits_t signature,
+                  trits_t public_key);
 
-/*! \brief Allocate memory for WOTS private key. */
-retcode_t wots_create(wots_t *w);
-
-/*! \brief Deallocate memory for WOTS private key. */
-void wots_destroy(wots_t *w);
+/**
+ * Verifies a WOTS signature
+ *
+ * @param spongos A spongos interface
+ * @param hash A signed hash
+ * @param signature The signature
+ * @param public_key The presumed public key
+ *
+ * @return true if valid, false otherwise
+ */
+bool wots_verify(spongos_t *spongos, trits_t hash, trits_t signature,
+                 trits_t public_key);
 
 #ifdef __cplusplus
 }

@@ -50,8 +50,8 @@ typedef struct test_sponge_s {
 typedef spongos_t test_spongos_t;
 
 typedef struct test_wots_s {
-  wots_t w;
-  wots_sk_t sk;
+  wots_t wots;
+  trit_t secret_key[MAM2_WOTS_SK_SIZE];
 } test_wots_t;
 
 ntru_t *test_ntru_init(test_ntru_t *n);

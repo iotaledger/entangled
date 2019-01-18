@@ -60,10 +60,10 @@ spongos_t *test_spongos_init(test_spongos_t *sg, sponge_t *s) {
 }
 
 wots_t *test_wots_init(test_wots_t *w, sponge_t *s) {
-  w->w.sg->sponge = s;
-  w->w.sk = w->sk;
-  memset(w->w.sk, 0, MAM2_WOTS_SK_PART_SIZE);
-  return &w->w;
+  w->wots.spongos.sponge = s;
+  w->wots.secret_key = w->secret_key;
+  memset(w->wots.secret_key, 0, MAM2_WOTS_SK_PART_SIZE);
+  return &w->wots;
 }
 
 void prng_gen_str(prng_t *p, trint3_t d, char const *nonce, trits_t Y) {

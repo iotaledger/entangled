@@ -98,13 +98,32 @@ static void wots_hash_verify(spongos_t *s, trits_t sig_pks, trits_t H) {
 }
 
 trits_t wots_sk_trits(wots_t *w) {
-  return trits_from_rep(MAM2_WOTS_SK_SIZE, w->sk);
+  return trits_from_rep(MAM2_WOTS_SK_SIZE, w->secret_key);
+}
+
+retcode_t wots_create(wots_t *w) {
+  retcode_t e = RC_MAM2_INTERNAL_ERROR;
+  MAM2_ASSERT(w);
+  do {
+    memset(w, 0, sizeof(wots_t));
+    w->secret_key = malloc(sizeof(trit_t) * MAM2_WOTS_SK_SIZE);
+    err_guard(w->secret_key, RC_OOM);
+    e = RC_OK;
+  } while (0);
+  return e;
+}
+
+void wots_destroy(wots_t *w) {
+  MAM2_ASSERT(w);
+  free(w->secret_key);
+  w->secret_key = 0;
+  free(w);
 }
 
 void wots_init(wots_t *w, sponge_t *s) {
   MAM2_ASSERT(w);
   MAM2_ASSERT(s);
-  w->sg->sponge = s;
+  w->spongos.sponge = s;
 }
 
 void wots_gen_sk(wots_t *w, prng_t *p, trits_t N) {
@@ -124,13 +143,13 @@ void wots_calc_pk(wots_t *w, trits_t pk) {
   sk_pks = MAM2_TRITS_INIT(sk_pks, MAM2_WOTS_SK_SIZE);
 
   trits_copy(wots_sk_trits(w), sk_pks);
-  wots_calc_pks(w->sg, sk_pks, pk);
+  wots_calc_pks(&w->spongos, sk_pks, pk);
   trits_set_zero(sk_pks);
 }
 
 void wots_sign(wots_t *w, trits_t H, trits_t sig) {
   trits_copy(wots_sk_trits(w), sig);
-  wots_hash_sign(w->sg, sig, H);
+  wots_hash_sign(&w->spongos, sig, H);
 }
 
 void wots_recover(spongos_t *s, trits_t H, trits_t sig, trits_t pk) {
@@ -150,23 +169,4 @@ bool wots_verify(spongos_t *s, trits_t H, trits_t sig, trits_t pk) {
 
   wots_recover(s, H, sig, sig_pk);
   return trits_cmp_eq(pk, sig_pk);
-}
-
-retcode_t wots_create(wots_t *w) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  MAM2_ASSERT(w);
-  do {
-    memset(w, 0, sizeof(wots_t));
-    w->sk = malloc(sizeof(trit_t) * MAM2_WOTS_SK_SIZE);
-    err_guard(w->sk, RC_OOM);
-    e = RC_OK;
-  } while (0);
-  return e;
-}
-
-void wots_destroy(wots_t *w) {
-  MAM2_ASSERT(w);
-  free(w->sk);
-  w->sk = 0;
-  free(w);
 }
