@@ -1,4 +1,5 @@
 load(":map_generator.bzl", "map_generate")
+load(":type_container_generator.bzl", "type_container_generate")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -16,4 +17,20 @@ cc_library(
 map_generate(
     key_type = "person_example_t",
     value_type = "int",
+)
+
+type_container_generate(
+    container_type = "set",
+    value_type = "int",
+)
+
+type_container_generate(
+    additional_deps = "//mam/v2/mam",
+    additional_include_path = "mam/v2/mam/mam.h",
+    container_type = "set",
+    value_type = "mam_pre_shared_key_t",
+)
+
+cc_library(
+    name = "dummy_dep",
 )
