@@ -17,6 +17,8 @@
 
 #include "common/errors.h"
 #include "mam/v2/defs.h"
+#include "mam/v2/mam/mam_ntru_pk_t_set.h"
+#include "mam/v2/mam/mam_pre_shared_key_t_set.h"
 #include "mam/v2/mam/mam_types.h"
 #include "mam/v2/mss/mss.h"
 #include "mam/v2/ntru/ntru.h"
@@ -24,8 +26,6 @@
 #include "mam/v2/sponge/sponge.h"
 #include "mam/v2/trits/trits.h"
 #include "mam/v2/wots/wots.h"
-#include "utils/containers/mam_ntru_pk_t_set.h"
-#include "utils/containers/mam_pre_shared_key_t_set.h"
 
 #ifdef __cplusplus
 extern "C" {

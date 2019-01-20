@@ -2,7 +2,7 @@ def _type_container_generator_impl(ctx):
     ctx.actions.expand_template(
         template = ctx.file.source_template,
         output = ctx.outputs.source,
-        substitutions = {"{TYPE}": str(ctx.attr.value_type)},
+        substitutions = {"{TYPE}": str(ctx.attr.value_type), "{PARENT_DIRECTORY}": str(ctx.attr.parent_directory)},
     )
 
     ADDITIONAL_INCLUDE_PATH_ACTUAL = ""
@@ -28,6 +28,7 @@ _type_container_generator = rule(
         "value_type": attr.string(mandatory = True),
         "additional_include_path": attr.string(mandatory = False),
         "additional_deps": attr.string(mandatory = False),
+        "parent_directory": attr.string(mandatory = False),
     },
     outputs = {
         "source": "%{source}",
@@ -35,7 +36,7 @@ _type_container_generator = rule(
     },
 )
 
-def type_container_generate(container_type, value_type, additional_include_path = "", additional_deps = "//utils/containers:dummy_dep"):
+def type_container_generate(container_type, value_type, additional_include_path = "", additional_deps = "//utils/containers:dummy_dep", parent_directory = "utils/containers"):
     base = value_type + str("_") + container_type
     source = base + ".c"
     header = base + ".h"
@@ -50,6 +51,7 @@ def type_container_generate(container_type, value_type, additional_include_path 
         value_type = value_type,
         additional_include_path = additional_include_path,
         additional_deps = additional_deps,
+        parent_directory = parent_directory,
     )
 
     native.cc_library(
