@@ -47,14 +47,14 @@ typedef struct wots_s {
  *
  * @return a status code
  */
-retcode_t wots_create(wots_t *wots);
+retcode_t wots_create(wots_t *const wots);
 
 /**
  * Deallocates memory for WOTS secret key
  *
  * @param wots A WOTS interface
  */
-void wots_destroy(wots_t *wots);
+void wots_destroy(wots_t *const wots);
 
 /**
  * Initializes a WOTS interface with a sponge
@@ -62,7 +62,7 @@ void wots_destroy(wots_t *wots);
  * @param wots A WOTS interface
  * @param sponge A sponge interface
  */
-void wots_init(wots_t *wots, sponge_t *sponge);
+void wots_init(wots_t *const wots, sponge_t *const sponge);
 
 /**
  * Generates a WOTS secret key with a nonce
@@ -71,7 +71,8 @@ void wots_init(wots_t *wots, sponge_t *sponge);
  * @param prng A PRNG interface
  * @param nonce The nonce
  */
-void wots_gen_sk(wots_t *wots, prng_t *prng, trits_t nonce);
+void wots_gen_sk(wots_t *const wots, prng_t const *const prng,
+                 trits_t const nonce);
 
 /**
  * Generates a WOTS secret key with two nonces
@@ -81,7 +82,8 @@ void wots_gen_sk(wots_t *wots, prng_t *prng, trits_t nonce);
  * @param nonce1 The first nonce
  * @param nonce2 The second nonce
  */
-void wots_gen_sk2(wots_t *wots, prng_t *prng, trits_t nonce1, trits_t nonce2);
+void wots_gen_sk2(wots_t *const wots, prng_t const *const prng,
+                  trits_t const nonce1, trits_t const nonce2);
 
 /**
  * Generate a WOTS secret key with three nonces
@@ -92,8 +94,9 @@ void wots_gen_sk2(wots_t *wots, prng_t *prng, trits_t nonce1, trits_t nonce2);
  * @param nonce2 The second nonce
  * @param nonce3 The third nonce
  */
-void wots_gen_sk3(wots_t *wots, prng_t *prng, trits_t nonce1, trits_t nonce2,
-                  trits_t nonce3);
+void wots_gen_sk3(wots_t *const wots, prng_t const *const prng,
+                  trits_t const nonce1, trits_t const nonce2,
+                  trits_t const nonce3);
 
 /**
  * Calculates a WOTS public key
@@ -102,7 +105,7 @@ void wots_gen_sk3(wots_t *wots, prng_t *prng, trits_t nonce1, trits_t nonce2,
  * @param wots A WOTS interface
  * @param public_key The public key
  */
-void wots_calc_pk(wots_t *wots, trits_t public_key);
+void wots_calc_pk(wots_t *const wots, trits_t public_key);
 
 /**
  * Generates a WOTS signature
@@ -111,7 +114,7 @@ void wots_calc_pk(wots_t *wots, trits_t public_key);
  * @param hash A hash to be signed
  * @param signature The signature
  */
-void wots_sign(wots_t *wots, trits_t hash, trits_t signature);
+void wots_sign(wots_t *const wots, trits_t const hash, trits_t signature);
 
 /**
  * Recovers a WOTS public key from a signature
@@ -121,8 +124,8 @@ void wots_sign(wots_t *wots, trits_t hash, trits_t signature);
  * @param signature The signature
  * @param public_key The recovered public key
  */
-void wots_recover(spongos_t *spongos, trits_t hash, trits_t signature,
-                  trits_t public_key);
+void wots_recover(spongos_t *const spongos, trits_t const hash,
+                  trits_t const signature, trits_t public_key);
 
 /**
  * Verifies a WOTS signature
@@ -134,8 +137,8 @@ void wots_recover(spongos_t *spongos, trits_t hash, trits_t signature,
  *
  * @return true if valid, false otherwise
  */
-bool wots_verify(spongos_t *spongos, trits_t hash, trits_t signature,
-                 trits_t public_key);
+bool wots_verify(spongos_t *const spongos, trits_t const hash,
+                 trits_t const signature, trits_t const public_key);
 
 #ifdef __cplusplus
 }
