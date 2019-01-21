@@ -6,9 +6,7 @@ def _typed_container_generator_impl(ctx):
     )
 
     ADDITIONAL_INCLUDE_PATH_ACTUAL = ""
-    if ctx.attr.additional_include_path == "":
-        ADDITIONAL_INCLUDE_PATH_ACTUAL = ""
-    else:
+    if ctx.attr.additional_include_path != "":
         ADDITIONAL_INCLUDE_PATH_ACTUAL = "#include " + "\"" + ctx.attr.additional_include_path + "\""
 
     ctx.actions.expand_template(
