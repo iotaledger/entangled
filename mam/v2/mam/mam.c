@@ -570,27 +570,26 @@ size_t mam_send_msg_size(mam_send_msg_context_t *cfg) {
   /* endpoint */
   /*  absorb oneof pubkey */
   sz += pb3_sizeof_oneof();
-  if (cfg->ch1) /*    SignedId chid1 = 2; */
+
+  if (cfg->ch1) {
+    // SignedId chid1 = 2;
     sz += mam_wrap_pubkey_chid1_size(cfg->ch->m);
-  else if (cfg->ep1)
-    /*    SignedId epid1 = 3; */
+  } else if (cfg->ep1) {
+    // SignedId epid1 = 3;
     sz += mam_wrap_pubkey_epid1_size(cfg->ch->m);
-  else if (cfg->ep)
-    /*    absorb tryte epid[81] = 1; */
+  } else if (cfg->ep) {
+    // absorb tryte epid[81] = 1;
     sz += mam_wrap_pubkey_epid_size();
-  else
-    /*    null chid = 0; */
+  } else {
+    //  null chid = 0;
     sz += mam_wrap_pubkey_chid_size();
+  }
 
   /* header */
   /*  absorb tryte nonce[27]; */
   sz += pb3_sizeof_ntrytes(MAM2_HEADER_NONCE_SIZE / 3);
   {
     size_t keyload_count = 0;
-    mam_pre_shared_key_t_set_entry_t *curr_entry = NULL;
-    mam_pre_shared_key_t_set_entry_t *tmp_entry = NULL;
-    mam_ntru_pk_t_set_entry_t *curr_entry_ntru = NULL;
-    mam_ntru_pk_t_set_entry_t *tmp_entry_ntru = NULL;
 
     if (cfg->key_plain) {
       ++keyload_count;
@@ -600,21 +599,17 @@ size_t mam_send_msg_size(mam_send_msg_context_t *cfg) {
       sz += mam_wrap_keyload_plain_size();
     }
 
-    HASH_ITER(hh, cfg->pre_shared_keys, curr_entry, tmp_entry) {
-      ++keyload_count;
-      /*  absorb oneof */
-      sz += pb3_sizeof_oneof();
-      /*  message KeyloadPSK */
-      sz += mam_wrap_keyload_psk_size();
-    }
+    size_t num_pre_shared_keys =
+        mam_pre_shared_key_t_set_size(&cfg->pre_shared_keys);
+    keyload_count += num_pre_shared_keys;
+    sz += (pb3_sizeof_oneof() + mam_wrap_keyload_psk_size()) *
+          num_pre_shared_keys;
 
-    HASH_ITER(hh, cfg->ntru_public_keys_set, curr_entry, tmp_entry) {
-      ++keyload_count;
-      /*  absorb oneof */
-      sz += pb3_sizeof_oneof();
-      /*  message KeyloadNTRU */
-      sz += mam_wrap_keyload_ntru_size();
-    }
+    size_t num_pre_ntru_keys =
+        mam_ntru_pk_t_set_size(&cfg->ntru_public_keys_set);
+    keyload_count += num_pre_ntru_keys;
+    sz +=
+        (pb3_sizeof_oneof() + mam_wrap_keyload_ntru_size()) * num_pre_ntru_keys;
 
     /*  absorb repeated */
     sz += pb3_sizeof_repeated(keyload_count);
