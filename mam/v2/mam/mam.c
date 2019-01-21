@@ -21,42 +21,54 @@
 
 retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
                          mss_mt_height_t d, trits_t N1, trits_t N2) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
+  retcode_t e;
   MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
 
-  do {
-    err_bind(mss_create(m, d));
+  if ((e = mss_create(m, d)) != RC_OK) {
+    return e;
+  }
 
-    m->N1 = trits_null();
-    if (!trits_is_empty(N1)) {
-      m->N1 = trits_alloc(trits_size(N1));
-      err_guard(!trits_is_null(m->N1), RC_OOM);
-      trits_copy(N1, m->N1);
+  m->N1 = trits_null();
+  if (!trits_is_empty(N1)) {
+    m->N1 = trits_alloc(trits_size(N1));
+    if (trits_is_null(m->N1)) {
+      return RC_OOM;
     }
+    trits_copy(N1, m->N1);
+  }
 
-    m->N2 = trits_null();
-    if (!trits_is_empty(N2)) {
-      m->N2 = trits_alloc(trits_size(N2));
-      err_guard(!trits_is_null(m->N2), RC_OOM);
-      trits_copy(N2, m->N2);
+  m->N2 = trits_null();
+  if (!trits_is_empty(N2)) {
+    m->N2 = trits_alloc(trits_size(N2));
+    if (trits_is_null(m->N2)) {
+      return RC_OOM;
     }
+    trits_copy(N2, m->N2);
+  }
 
-    m->sg->sponge = ma->create_sponge();
-    err_guard(m->sg->sponge, RC_OOM);
+  m->sg->sponge = ma->create_sponge();
+  if (!m->sg->sponge) {
+    return RC_OOM;
+  }
 
-    m->w = malloc(sizeof(wots_t));
-    err_guard(m->w, RC_OOM);
-    err_bind(wots_create(m->w));
+  m->w = malloc(sizeof(wots_t));
+  if (!m->w) {
+    return RC_OOM;
+  }
+  if (e = (wots_create(m->w)) != RC_OK) {
+    return e;
+  }
 
-    m->w->spongos.sponge = ma->create_sponge();
-    err_guard(m->w->spongos.sponge, RC_OOM);
-    wots_init(m->w, m->w->spongos.sponge);
+  m->w->spongos.sponge = ma->create_sponge();
+  if (!m->w->spongos.sponge) {
+    return RC_OOM;
+  }
+  wots_init(m->w, m->w->spongos.sponge);
 
-    mss_init(m, p, m->sg->sponge, m->w, d, m->N1, m->N2);
+  mss_init(m, p, m->sg->sponge, m->w, d, m->N1, m->N2);
 
-    e = RC_OK;
-  } while (0);
+  e = RC_OK;
 
   return e;
 }
@@ -677,7 +689,6 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg) {
             mam_send_msg_cfg_session_key(cfg));
 
   /* choose recipient */
-
   spongos_init(spongos);
 
   /* wrap Channel */
@@ -789,18 +800,21 @@ size_t mam_send_packet_size(mam_send_packet_context_t *cfg,
        /*  absorb oneof checksum */
        + pb3_sizeof_oneof();
 
-  if (mam_msg_checksum_none == cfg->checksum) /*    absorb null none = 0; */
+  if (mam_msg_checksum_none == cfg->checksum) {
+    // absorb null none = 0;
     sz += mam_wrap_checksum_none_size();
-  else if (mam_msg_checksum_mac == cfg->checksum)
-    /*    MAC mac = 1; */
+  } else if (mam_msg_checksum_mac == cfg->checksum) {
+    //  MAC mac = 1;
     sz += mam_wrap_checksum_mac_size();
-  else if (mam_msg_checksum_mssig == cfg->checksum) {
+  } else if (mam_msg_checksum_mssig == cfg->checksum) {
+    //  MSSig mssig = 2;
     MAM2_ASSERT(cfg->mss);
-    /*    MSSig mssig = 2; */
     sz += mam_wrap_checksum_mssig_size(cfg->mss);
-  } else
+  } else {
+    /*  commit; */
     MAM2_ASSERT(0);
-  /*  commit; */
+  }
+
   return sz;
 }
 
