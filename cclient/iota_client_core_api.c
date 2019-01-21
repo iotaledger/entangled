@@ -434,65 +434,44 @@ retcode_t iota_client_attach_to_tangle(
     const iota_client_service_t* const service,
     const attach_to_tangle_req_t* const req, attach_to_tangle_res_t* res) {
   retcode_t result = RC_OK;
-  flex_trit_t prev_tx_hash[FLEX_TRIT_SIZE_243];
-  iota_transaction_t tx = {};
   char_buffer_t* res_buff = NULL;
   char_buffer_t* req_buff = NULL;
-  flex_trit_t* array_elt = NULL;
-  flex_trit_t* nonce = NULL;
-  flex_trit_t* raw_tx = NULL;
+  bundle_transactions_t* bundle = NULL;
 
   if (service == NULL) {
     log_info(logger_id, "[%s:%d] local PoW\n", __func__, __LINE__);
-    memset(prev_tx_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+    iota_transaction_t tx = {};
+    flex_trit_t* array_elt = NULL;
+    flex_trit_t* tx_trytes = NULL;
+    // create bundle
+    bundle_transactions_new(&bundle);
     HASH_ARRAY_FOREACH(req->trytes, array_elt) {
       transaction_deserialize_from_trits(&tx, array_elt, false);
-      transaction_set_trunk(
-          &tx, flex_trits_are_null(prev_tx_hash, FLEX_TRIT_SIZE_243)
-                   ? req->trunk
-                   : prev_tx_hash);
-      transaction_set_branch(
-          &tx, flex_trits_are_null(prev_tx_hash, FLEX_TRIT_SIZE_243)
-                   ? req->branch
-                   : req->trunk);
+      bundle_transactions_add(bundle, &tx);
+    }
 
-      if (flex_trits_are_null(transaction_tag(&tx), FLEX_TRIT_SIZE_27)) {
-        transaction_set_tag(&tx, transaction_obsolete_tag(&tx));
-      }
-      transaction_set_attachment_timestamp(&tx, current_timestamp_ms());
-      transaction_set_attachment_timestamp_lower(&tx, 0);
-      transaction_set_attachment_timestamp_upper(&tx, 3812798742493LL);
+    // PoW on bundle
+    if (iota_pow_bundle(bundle, req->trunk, req->branch, req->mwm) != RC_OK) {
+      log_info(logger_id, "[%s:%d] PoW failed.\n", __func__, __LINE__);
+      result = RC_CCLIENT_POW_FAILED;
+      goto done;
+    }
 
-      raw_tx = transaction_serialize(&tx);
-      if (raw_tx) {
-        nonce = iota_flex_pow(raw_tx, FLEX_TRIT_SIZE_8019, req->mwm);
-        if (nonce) {
-          transaction_set_nonce(&tx, nonce);
-          free(nonce);
-        } else {
-          log_info(logger_id, "[%s:%d] calculating PoW failed.\n", __func__,
-                   __LINE__);
-          return RC_CCLIENT_POW_FAILED;
-        }
-        free(raw_tx);
-      } else {
-        log_info(logger_id,
-                 "[%s:%d] transaction serialize failed during PoW.\n", __func__,
-                 __LINE__);
-        return RC_CCLIENT_TX_DESERIALIZE_FAILED;
-      }
-
-      memcpy(prev_tx_hash, transaction_hash(&tx), FLEX_TRIT_SIZE_243);
-      raw_tx = transaction_serialize(&tx);
-      if (raw_tx) {
-        hash_array_push(res->trytes, transaction_serialize(&tx));
+    // bundle to trytes
+    iota_transaction_t* curr_tx = NULL;
+    BUNDLE_FOREACH(bundle, curr_tx) {
+      tx_trytes = transaction_serialize(curr_tx);
+      if (tx_trytes) {
+        hash_array_push(res->trytes, tx_trytes);
+        free(tx_trytes);
+        tx_trytes = NULL;
       } else {
         log_info(logger_id, "[%s:%d] transaction serialize failed.\n", __func__,
                  __LINE__);
-        return RC_CCLIENT_TX_DESERIALIZE_FAILED;
+        result = RC_CCLIENT_TX_DESERIALIZE_FAILED;
+        goto done;
       }
     }
-
   } else {
     log_info(logger_id, "[%s:%d] remote PoW\n", __func__, __LINE__);
     res_buff = char_buffer_new();
@@ -527,6 +506,9 @@ done:
   }
   if (res_buff) {
     char_buffer_free(res_buff);
+  }
+  if (bundle) {
+    bundle_transactions_free(&bundle);
   }
   return result;
 }
