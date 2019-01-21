@@ -2,12 +2,12 @@ def _hash_map_generator_impl(ctx):
     ctx.actions.expand_template(
         template = ctx.file.source_template,
         output = ctx.outputs.source,
-        substitutions = {"{TYPE}": str(ctx.attr.mapped_type)},
+        substitutions = {"{TYPE}": ctx.attr.mapped_type},
     )
     ctx.actions.expand_template(
         template = ctx.file.header_template,
         output = ctx.outputs.header,
-        substitutions = {"{TYPE}": str(ctx.attr.mapped_type)},
+        substitutions = {"{TYPE}": ctx.attr.mapped_type},
     )
 
 _hash_map_generator = rule(
@@ -26,7 +26,7 @@ _hash_map_generator = rule(
 )
 
 def hash_map_generate(mapped_type):
-    base = "hash_" + str(mapped_type) + "_map"
+    base = "hash_" + mapped_type + "_map"
     source = base + ".c"
     header = base + ".h"
 
