@@ -17,13 +17,15 @@
 
 #include "common/errors.h"
 #include "mam/v2/defs.h"
-#include "mam/v2/list.h"
+#include "mam/v2/mam/mam_types.h"
 #include "mam/v2/mss/mss.h"
 #include "mam/v2/ntru/ntru.h"
 #include "mam/v2/prng/prng.h"
 #include "mam/v2/sponge/sponge.h"
 #include "mam/v2/trits/trits.h"
 #include "mam/v2/wots/wots.h"
+#include "utils/containers/mam_ntru_pk_t_set.h"
+#include "utils/containers/mam_pre_shared_key_t_set.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,9 +51,6 @@ typedef struct mam_channel_s {
 } mam_channel_t;
 trits_t mam_channel_id(mam_channel_t *ch);
 trits_t mam_channel_name(mam_channel_t *ch);
-
-def_mam_list_node(mam_channel_t, mam_channel_node);
-def_mam_list(mam_channel_node, mam_channel_list);
 
 /*
 \brief Allocate memory for internal objects,
@@ -89,9 +88,6 @@ trits_t mam_endpoint_id(mam_endpoint_t *ep);
 trits_t mam_endpoint_chname(mam_endpoint_t *ep);
 trits_t mam_endpoint_name(mam_endpoint_t *ep);
 
-def_mam_list_node(mam_endpoint_t, mam_endpoint_node);
-def_mam_list(mam_endpoint_node, mam_endpoint_list);
-
 /*
 \brief Allocate memory for internal objects,
   and generate MSS public key.
@@ -115,31 +111,11 @@ TODO: endpoint serialization
 mam_endpoint_save, mam_endpoint_load
 */
 
-#define MAM2_KEY_ID_SIZE 81
-#define MAM2_PSK_ID_SIZE 81
-#define MAM2_PSK_SIZE 243
-/*! \brief Preshared key. */
-typedef struct mam_pre_shared_key_s {
-  trit_t id[MAM2_PSK_ID_SIZE];
-  trit_t pre_shared_key[MAM2_PSK_SIZE];
-} mam_pre_shared_key_t;
-
 trits_t mam_psk_id(mam_pre_shared_key_t *p);
 trits_t mam_psk_trits(mam_pre_shared_key_t *p);
 
-def_mam_list_node(mam_pre_shared_key_t, mam_pre_shared_key_node_t);
-def_mam_list(mam_pre_shared_key_node_t, mam_pre_shared_keys_list);
-
-/*! \brief Recipient's NTRU public key. */
-typedef struct mam_ntru_pk_s {
-  trit_t pk[MAM2_NTRU_PK_SIZE];
-} mam_ntru_pk_t;
-
 trits_t mam_ntru_pk_id(mam_ntru_pk_t *p);
 trits_t mam_ntru_pk_trits(mam_ntru_pk_t *p);
-
-def_mam_list_node(mam_ntru_pk_t, mam_ntru_public_key_node_t);
-def_mam_list(mam_ntru_public_key_node_t, mam_ntru_pk_list);
 
 /* Channel */
 
@@ -241,10 +217,10 @@ typedef struct mam_send_msg_context_s {
   trit_t
       session_key[MAM2_SPONGE_KEY_SIZE]; /*!< Trits (memory) for session key. */
   bool key_plain;                        /*!< Include session key in plain? */
-  mam_pre_shared_keys_list
+  mam_pre_shared_key_t_set_t
       pre_shared_keys; /*!< Encrypt message for these psks. */
-  mam_ntru_pk_list
-      ntru_public_keys; /*!< Encrypt message for these NTRU public keys. */
+  mam_ntru_pk_t_set_t
+      ntru_public_keys_set; /*!< Encrypt message for these NTRU public keys. */
 } mam_send_msg_context_t;
 
 size_t mam_send_msg_size(mam_send_msg_context_t *cfg);

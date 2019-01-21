@@ -25,10 +25,17 @@ type_container_generate(
 )
 
 type_container_generate(
-    additional_deps = "//mam/v2/mam",
-    additional_include_path = "mam/v2/mam/mam.h",
+    additional_deps = "//mam/v2/mam:mam_types",
+    additional_include_path = "mam/v2/mam/mam_types.h",
     container_type = "set",
     value_type = "mam_pre_shared_key_t",
+)
+
+type_container_generate(
+    additional_deps = "//mam/v2/mam:mam_types",
+    additional_include_path = "mam/v2/mam/mam_types.h",
+    container_type = "set",
+    value_type = "mam_ntru_pk_t",
 )
 
 cc_library(
