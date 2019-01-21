@@ -27,6 +27,13 @@ static bool poly_is_eq(poly_t f, poly_t g) {
   return r;
 }
 
+poly_coeff_t poly_eval(poly_t f, poly_coeff_t x) {
+  poly_coeff_t r = 0;
+  size_t i;
+  for (i = MAM2_POLY_N; i--;) r = poly_coeff_mul_add(x, r, f[i]);
+  return r;
+}
+
 static void poly_mul(poly_t f, poly_t g, poly_t h) {
   typedef trint9_t poly2_t[2 * MAM2_POLY_N - 1];
   poly2_t fg;

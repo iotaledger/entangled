@@ -22,12 +22,13 @@
 #define MAM2_POLY_N_LOG 10
 #define MAM2_POLY_N (1 << MAM2_POLY_N_LOG)
 
-/*
+/**
  * γ²ⁿ ≡ γ γ⁻¹ ≡ 1 (mod q)
  * ωⁿ  ≡ ω ω⁻¹ ≡ 1 (mod q). ω ≡ γ² (mod q)
  * n n⁻¹ ≡ 1 (mod q)
  */
 #if defined(MAM2_POLY_MRED_BINARY)
+
 #define MAM2_POLY_COEFF_GAMMA ((poly_coeff_t)4059)
 #define MAM2_POLY_COEFF_GAMMA_INV ((poly_coeff_t)2340)
 #define MAM2_POLY_COEFF_OMEGA ((poly_coeff_t)3835)
@@ -37,14 +38,15 @@
 #define MAM2_POLY_COEFF_ONE ((poly_coeff_t)4091)
 #define MAM2_POLY_COEFF_MINUS_ONE \
   ((poly_coeff_t)MAM2_POLY_Q - MAM2_POLY_COEFF_ONE)
-
-/*! R = 2¹⁶. */
+// R = 2¹⁶
 #define MAM2_POLY_MRED_R_LOG 16
-/*! R⁻¹ = 9 2⁸ ≡ 2304 (mod q). */
+// R⁻¹ = 9 2⁸ ≡ 2304 (mod q)
 #define MAM2_POLY_MRED_RI 2304
-/*! q⁻¹ q - R R⁻¹ = 1 */
+// q⁻¹ q - R R⁻¹ = 1
 #define MAM2_POLY_MRED_Q_INV 12287
+
 #else
+
 #define MAM2_POLY_COEFF_GAMMA ((poly_coeff_t)7)
 #define MAM2_POLY_COEFF_GAMMA_INV ((poly_coeff_t)-3511)
 #define MAM2_POLY_COEFF_OMEGA ((poly_coeff_t)49)
@@ -53,16 +55,18 @@
 #define MAM2_POLY_COEFF_N_INV ((poly_coeff_t)-12)
 #define MAM2_POLY_COEFF_ONE ((poly_coeff_t)1)
 #define MAM2_POLY_COEFF_MINUS_ONE ((poly_coeff_t)-1)
+
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*! \brief Type of polynomial coefficeints mods (q).
-\note Depending on configuration coefficients may be
-represented in Montgomery reduced form.
-*/
+/**
+ * Type of polynomial coefficients mods (q)
+ * Depending on configuration, coefficients may be represented in Montgomery
+ * reduced form
+ */
 #if defined(MAM2_POLY_MRED_BINARY)
 typedef uint16_t poly_coeff_t;
 typedef uint32_t poly_dcoeff_t;
@@ -71,63 +75,94 @@ typedef trint9_t poly_coeff_t;
 typedef trint18_t poly_dcoeff_t;
 #endif
 
-/*! \brief Type of polynomials mods (x^n+1, q). */
+// Type of polynomials mods (x^n+1, q)
 typedef poly_coeff_t poly_t[MAM2_POLY_N];
 #define MAM2_POLY_DEF(f) poly_t f
 
-/*! \brief f(x) := f(x) + 1; f(x)/3 is small */
+#if defined(MAM2_POLY_MRED_BINARY)
+poly_coeff_t poly_coeff_mredd(poly_dcoeff_t m);
+#endif
+
+// f(x) := f(x) + 1; f(x)/3 is small
 void poly_small3_add1(poly_t f);
 
-/*! \brief h(x) := 3 f(x); f(x) is small */
+// h(x) := 3 f(x); f(x) is small
 void poly_small_mul3(poly_t f, poly_t h);
 
-/*! \brief h(x) := f(x) + g(x) mods (m(x), q) */
+// h(x) := f(x) + g(x) mods (m(x), q)
 void poly_add(poly_t f, poly_t g, poly_t h);
 
-/*! \brief h(x) := f(x) - g(x) mods (m(x), q) */
+// h(x) := f(x) - g(x) mods (m(x), q)
 void poly_sub(poly_t f, poly_t g, poly_t h);
 
-/*!
-\brief th := NTT(f) ⊛ NTT(g) mods (m(x), q)
-\note h(x) ≡ f(x) * g(x) mods (m(x), q)
-*/
+/**
+ * th := NTT(f) ⊛ NTT(g) mods (m(x), q)
+ * h(x) ≡ f(x) * g(x) mods (m(x), q)
+ */
 void poly_conv(poly_t tf, poly_t tg, poly_t th);
 
-/*! \brief ∃? h(x) : 1 ≡ f(x) * h(x) mods (m(x), q), t = NTT(f) */
+// ∃? h(x) : 1 ≡ f(x) * h(x) mods (m(x), q), t = NTT(f)
 bool poly_has_inv(poly_t t);
 
-/*! \brief h(x) := f⁻¹(x) mods (m(x), q), tf = NTT(f), th = NTT(h) */
+// h(x) := f⁻¹(x) mods (m(x), q), tf = NTT(f), th = NTT(h)
 void poly_inv(poly_t tf, poly_t th);
 
-/*! \brief t(x) := NTT(f) */
+/**
+ * t(x) := NTT(f)
+ * tⱼ = f(γ²ʲ⁺¹) ≡ Σᵢfᵢγ⁽²ʲ⁺¹⁾ⁱ
+ */
 void poly_ntt(poly_t f, poly_t t);
 
-/*! \brief f(x) := NTT⁻¹(t) */
+/**
+ * f(x) := NTT⁻¹(t)
+ * fₖ = γ⁻ᵏn⁻¹ t(γ⁻²ᵏ)
+ *
+ * t(γ⁻²ᵏ)
+ * ≡ Σⱼtⱼγ⁻²ᵏʲ
+ * ≡ Σⱼ(Σᵢfᵢγ⁽²ʲ⁺¹⁾ⁱ)γ⁻²ᵏʲ
+ * ≡ Σᵢfᵢ(Σⱼγ⁽²ʲ⁺¹⁾ⁱ⁻²ᵏʲ)
+ * ≡ Σᵢfᵢγⁱ(Σⱼγ²ʲ⁽ⁱ⁻ᵏ⁾)
+ * ≡ fₖγᵏn
+ */
 void poly_intt(poly_t t, poly_t f);
 
-/*! \brief tᵢ := fᵢ (mods 3) */
+// tᵢ := fᵢ (mods 3)
 void poly_round_to_trits(poly_t f, trits_t t);
 
-/*! \brief fᵢ := tᵢ */
+// fᵢ := tᵢ
 void poly_small_from_trits(poly_t f, trits_t t);
 
-/*! \brief fᵢ := tᵢ */
+// fᵢ := tᵢ
 bool poly_from_trits(poly_t f, trits_t t);
 
-/*! \brief tᵢ := fᵢ ??? */
+// tᵢ := fᵢ ???
 void poly_to_trits(poly_t f, trits_t t);
 
+/**
+ * Convert integer into internal polynomial coefficient representation
+ * The input integer must be within the range [-(Q-1)/2,...,(Q-1)/2]
+ */
 poly_coeff_t poly_coeff_from_trint9(trint9_t t);
+
+/**
+ * Convert internal polynomial coefficient representation into an integer
+ * The output integer will be within the range [-(Q-1)/2,...,(Q-1)/2]
+ */
 trint9_t poly_coeff_to_trint9(poly_coeff_t c);
+
+// a + b (mods q)
 poly_coeff_t poly_coeff_add(poly_coeff_t a, poly_coeff_t b);
+
+// a - b (mods q)
 poly_coeff_t poly_coeff_sub(poly_coeff_t a, poly_coeff_t b);
+
+// a * b (mods q)
 poly_coeff_t poly_coeff_mul(poly_coeff_t a, poly_coeff_t b);
+
+// a * b + c (mods q)
 poly_coeff_t poly_coeff_mul_add(poly_coeff_t a, poly_coeff_t b, poly_coeff_t c);
-void poly_mul(poly_t f, poly_t g, poly_t h);
-poly_coeff_t poly_eval(poly_t f, poly_coeff_t x);
-void poly_ntt2(poly_t f, poly_t t);
-void poly_intt2(poly_t t, poly_t f);
-size_t poly_coeff_order(poly_coeff_t u, poly_coeff_t *ui);
+
+poly_coeff_t poly_coeff_inv(poly_coeff_t a);
 
 #ifdef __cplusplus
 }
