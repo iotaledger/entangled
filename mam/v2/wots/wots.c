@@ -116,7 +116,7 @@ void wots_gen_sk2(wots_t *w, prng_t *p, trits_t N1, trits_t N2) {
 }
 
 void wots_gen_sk3(wots_t *w, prng_t *p, trits_t N1, trits_t N2, trits_t N3) {
-  prng_gen3(p, MAM2_PRNG_DST_WOTSKEY, N1, N2, N3, wots_sk_trits(w));
+  prng_gen3(p, MAM2_PRNG_DST_WOTS_KEY, N1, N2, N3, wots_sk_trits(w));
 }
 
 void wots_calc_pk(wots_t *w, trits_t pk) {

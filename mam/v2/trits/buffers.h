@@ -29,7 +29,7 @@ typedef struct buffers_s {
 } buffers_t;
 
 /*! \brief Init buffers with empty head. */
-buffers_t buffers_init(size_t n, trits_t *Xs);
+buffers_t buffers_init(size_t n, trits_t const *const Xs);
 
 /*! \brief Check whether head is empty and there is no tail.
 \note However if the tail buffers consist of empty buffers only

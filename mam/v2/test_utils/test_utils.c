@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include "mam/v2/test_utils/test_utils.h"
@@ -41,8 +41,8 @@ ntru_t *test_ntru_init(test_ntru_t *n) {
 
 prng_t *test_prng_init(test_prng_t *p, sponge_t *s) {
   p->p.sponge = s;
-  p->p.key = p->key;
-  memset(p->p.key, 0, MAM2_PRNG_KEY_SIZE);
+  p->p.secret_key = p->secret_key;
+  memset(p->p.secret_key, 0, MAM2_PRNG_KEY_SIZE);
   return &p->p;
 }
 
@@ -66,10 +66,16 @@ wots_t *test_wots_init(test_wots_t *w, sponge_t *s) {
   return &w->w;
 }
 
-static char *bool_str(bool b) {
-  static char *yes = "ok";
-  static char *no = "failed";
-  return b ? yes : no;
+void prng_gen_str(prng_t *p, trint3_t d, char const *nonce, trits_t Y) {
+  size_t n;
+  MAM2_TRITS_DEF0(N, MAM2_SPONGE_RATE);
+  N = MAM2_TRITS_INIT(N, MAM2_SPONGE_RATE);
+
+  n = strlen(nonce) * 3;
+  N = trits_take_min(N, n);
+  trits_from_str(N, nonce);
+
+  prng_gen(p, d, N, Y);
 }
 
 void _sponge_hash(size_t Xn, char *X, size_t Yn, char *Y) {
@@ -279,11 +285,9 @@ void _prng_gen(size_t Kn, char *K, size_t Nn, char *N, size_t Yn, char *Y) {
 void _wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
                     char *pk, size_t Hn, char *H, size_t sign, char *sig) {
   test_sponge_t _s[1];
-  test_spongos_t _sg[1];
   test_prng_t _p[1];
   test_wots_t _w[1];
   sponge_t *s = test_sponge_init(_s);
-  spongos_t *sg = test_spongos_init(_sg, s);
   prng_t *p = test_prng_init(_p, s);
   wots_t *w = test_wots_init(_w, s);
 
@@ -325,7 +329,7 @@ void test_gen_sponge(prng_t *p, sponge_t *s) {
   Y = MAM2_TRITS_INIT(Y, TEST_MAX_SIZE);
   H = MAM2_TRITS_INIT(H, MAM2_SPONGE_RATE);
 
-  prng_gen_str(p, MAM2_PRNG_DST_SECKEY, "SPONGEKEY", K);
+  prng_gen_str(p, MAM2_PRNG_DST_SEC_KEY, "SPONGEKEY", K);
   prng_gen_str(p, 4, "SPONGEDATA", X);
 
   printf("sponge\n");
@@ -362,7 +366,7 @@ void test_gen_spongos(prng_t *p, spongos_t *s) {
   Y = MAM2_TRITS_INIT(Y, TEST_MAX_SIZE);
   H = MAM2_TRITS_INIT(H, MAM2_SPONGE_RATE);
 
-  prng_gen_str(p, MAM2_PRNG_DST_SECKEY, "SPONGEKEY", K);
+  prng_gen_str(p, MAM2_PRNG_DST_SEC_KEY, "SPONGEKEY", K);
   prng_gen_str(p, 4, "SPONGEDATA", X);
 
   printf("spongos\n");
@@ -399,7 +403,7 @@ void test_gen_prng(prng_t *p, prng_t *r, sponge_t *s) {
   N = MAM2_TRITS_INIT(N, TEST_MAX_SIZE);
   X = MAM2_TRITS_INIT(X, TEST_MAX_SIZE);
 
-  prng_gen_str(p, MAM2_PRNG_DST_SECKEY, "PRNGKEY", K);
+  prng_gen_str(p, MAM2_PRNG_DST_SEC_KEY, "PRNGKEY", K);
   prng_gen_str(p, 4, "PRNGNONCE", N);
   prng_init(r, s, K);
 
@@ -408,7 +412,7 @@ void test_gen_prng(prng_t *p, prng_t *r, sponge_t *s) {
     n = trits_take_min(N, 33);
     x = trits_take(X, ns[i]);
 
-    prng_gen(r, MAM2_PRNG_DST_SECKEY, n, x);
+    prng_gen(r, MAM2_PRNG_DST_SEC_KEY, n, x);
 
     trits_print2("\tK\t=", K, "\n");
     trits_print2("\tn\t=", n, "\n");
@@ -419,7 +423,7 @@ void test_gen_prng(prng_t *p, prng_t *r, sponge_t *s) {
     n = trits_take(N, ns[i]);
     x = trits_take_min(X, 33);
 
-    prng_gen(r, MAM2_PRNG_DST_SECKEY, n, x);
+    prng_gen(r, MAM2_PRNG_DST_SEC_KEY, n, x);
 
     trits_print2("\tK\t=", K, "\n");
     trits_print2("\tn\t=", n, "\n");
@@ -446,7 +450,7 @@ void test_gen_wots(prng_t *p, wots_t *w, sponge_t *s, prng_t *r) {
   H = MAM2_TRITS_INIT(H, MAM2_WOTS_HASH_SIZE);
   X = MAM2_TRITS_INIT(X, MAM2_WOTS_SIG_SIZE);
 
-  prng_gen_str(p, MAM2_PRNG_DST_SECKEY, "WOTSPRNGKEY", K);
+  prng_gen_str(p, MAM2_PRNG_DST_SEC_KEY, "WOTSPRNGKEY", K);
   prng_gen_str(p, 4, "WOTSNONCE", N);
 
   wots_init(w, s);
@@ -499,7 +503,7 @@ void test_gen_mss(prng_t *p, mss_t *m, prng_t *r, sponge_t *spongos, wots_t *w)
   H = MAM2_TRITS_INIT(H, MAM2_WOTS_HASH_SIZE);
   X = MAM2_TRITS_INIT(X, MAM2_WOTS_SIG_SIZE);
 
-  prng_gen_str(p, MAM2_PRNG_DST_SECKEY, "WOTSPRNGKEY", K);
+  prng_gen_str(p, MAM2_PRNG_DST_SEC_KEY, "WOTSPRNGKEY", K);
   prng_gen_str(p, 4, "WOTSNONCE", N);
 
   printf("mss\n");
@@ -556,10 +560,10 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
   Y = MAM2_TRITS_INIT(Y, MAM2_NTRU_EKEY_SIZE);
   N = MAM2_TRITS_INIT(N, TEST_MAX_SIZE);
 
-  prng_gen_str(p, MAM2_PRNG_DST_SECKEY, "NTRUGENNONCE", n);
-  prng_gen_str(p, MAM2_PRNG_DST_SECKEY, "NTRUENCRNONCE", n);
-  prng_gen_str(p, MAM2_PRNG_DST_SECKEY, "NTRUPRNGKEY", K);
-  prng_gen_str(p, MAM2_PRNG_DST_SECKEY, "NTRUKEY", X);
+  prng_gen_str(p, MAM2_PRNG_DST_SEC_KEY, "NTRUGENNONCE", n);
+  prng_gen_str(p, MAM2_PRNG_DST_SEC_KEY, "NTRUENCRNONCE", n);
+  prng_gen_str(p, MAM2_PRNG_DST_SEC_KEY, "NTRUPRNGKEY", K);
+  prng_gen_str(p, MAM2_PRNG_DST_SEC_KEY, "NTRUKEY", X);
 
   prng_init(r, K);
 
