@@ -85,7 +85,6 @@ static trits_t mam_test_generic_send_msg(
   {
     mam_send_msg_context_t *cfg = cfg_msga;
 
-    cfg->allocator = 0;
     cfg->spongos->sponge = sponge_send;
     cfg->fork->sponge = fork_sponge_send;
     cfg->prng = prng_a;
