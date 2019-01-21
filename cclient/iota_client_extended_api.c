@@ -81,6 +81,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
           goto done;
         }
         free(tmp);
+        tmp = NULL;
       } else {
         // gen address failed.
         ret = RC_CCLIENT_NULL_PTR;
@@ -100,6 +101,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
           goto done;
         }
         free(tmp);
+        tmp = NULL;
       } else {
         // gen address failed.
         ret = RC_CCLIENT_NULL_PTR;
@@ -517,7 +519,6 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
               __func__, error_2_string(ret_code));
   }
 
-  bundle_finalize(out_bundle, &kerl);
   return ret_code;
 }
 
