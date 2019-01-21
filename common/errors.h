@@ -104,6 +104,17 @@ extern "C" {
     continue;                \
   } else
 
+#define ERR_BIND_RETURN(expr, e) \
+  if (RC_OK != (e = (expr)))     \
+    return e;                    \
+  else
+
+#define ERR_GUARD_RETURN(expr, err, e) \
+  if (!(expr)) {                       \
+    e = (err);                         \
+    return e;                          \
+  } else
+
 /** Return Codes */
 enum retcode_t {
   // Success (equal to zero)
