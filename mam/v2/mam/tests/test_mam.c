@@ -129,6 +129,8 @@ static trits_t mam_test_generic_send_msg(
   msg = trits_pickup(msg, sz);
 
   ntru_destroy(ntru);
+  mam_pre_shared_key_t_set_free(&cfg_msga->pre_shared_keys);
+  mam_ntru_pk_t_set_free(&cfg_msga->ntru_public_keys_set);
 
   return msg;
 }
