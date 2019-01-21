@@ -24,6 +24,8 @@ void test_ints_set() {
   for (int i = 0; i < 100; ++i) {
     TEST_ASSERT(int_set_contains(&set, &i));
   }
+
+  int_set_free(&set);
 }
 
 int main(void) {
