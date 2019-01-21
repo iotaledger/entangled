@@ -49,9 +49,9 @@ retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
     err_guard(m->w, RC_OOM);
     err_bind(wots_create(m->w));
 
-    m->w->sg->sponge = ma->create_sponge();
-    err_guard(m->w->sg->sponge, RC_OOM);
-    wots_init(m->w, m->w->sg->sponge);
+    m->w->spongos.sponge = ma->create_sponge();
+    err_guard(m->w->spongos.sponge, RC_OOM);
+    wots_init(m->w, m->w->spongos.sponge);
 
     mss_init(m, p, m->sg->sponge, m->w, d, m->N1, m->N2);
 
@@ -71,8 +71,8 @@ void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m) {
   trits_free(m->N2);
 
   if (m->w) {
-    ma->destroy_sponge(m->w->sg->sponge);
-    m->w->sg->sponge = 0;
+    ma->destroy_sponge(m->w->spongos.sponge);
+    m->w->spongos.sponge = 0;
   }
   wots_destroy(m->w);
   m->w = 0;
