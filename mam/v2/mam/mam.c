@@ -250,9 +250,9 @@ static retcode_t mam_unwrap_mssig(spongos_t *s, trits_t *b, spongos_t *ms,
   /*  absorb sizet sz; */
   ERR_BIND_RETURN(pb3_unwrap_absorb_sizet(s, b, &sz));
   /*  skip tryte sig[sz]; */
-  ERR_GURAD_RETURN(pb3_sizeof_ntrytes(sz) <= trits_size(*b), RC_MAM2_PB3_EOF);
+  ERR_GUARD_RETURN(pb3_sizeof_ntrytes(sz) <= trits_size(*b), RC_MAM2_PB3_EOF);
   r = mss_verify(ms, ws, mac, pb3_trits_take(b, pb3_sizeof_ntrytes(sz)), pk);
-  ERR_GURAD_RETURN(r, RC_MAM2_PB3_BAD_SIG);
+  ERR_GUARD_RETURN(r, RC_MAM2_PB3_BAD_SIG);
 
   return e;
 }
@@ -441,7 +441,7 @@ retcode_t mam_unwrap_keyload_psk(spongos_t *s, trits_t *b, trits_t key,
 
   /* TODO: retcode_t (*lookup_psk)(void *ctx, trits_t id); */
   if (trits_cmp_eq(pskid, id)) {
-    ERR_GURAD_RETURN(!*key_found, RC_MAM2_KEYLOAD_OVERLOADED);
+    ERR_GUARD_RETURN(!*key_found, RC_MAM2_KEYLOAD_OVERLOADED);
     *key_found = 1;
 
     /*  absorb external tryte psk[81]; */
@@ -451,7 +451,7 @@ retcode_t mam_unwrap_keyload_psk(spongos_t *s, trits_t *b, trits_t key,
     /*  crypt tryte ekey[81]; */
     ERR_BIND_RETURN(pb3_unwrap_crypt_ntrytes(s, b, key));
   } else { /* skip */
-    ERR_GURAD_RETURN(MAM2_SPONGE_KEY_SIZE <= trits_size(*b), RC_MAM2_PB3_EOF);
+    ERR_GUARD_RETURN(MAM2_SPONGE_KEY_SIZE <= trits_size(*b), RC_MAM2_PB3_EOF);
     pb3_trits_take(b, MAM2_SPONGE_KEY_SIZE);
     /* spongos state is corrupted */
   }
@@ -495,17 +495,17 @@ retcode_t mam_unwrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key,
   /*  absorb tryte id[27]; */
   ERR_BIND_RETURN(pb3_unwrap_absorb_ntrytes(s, b, id));
   if (trits_cmp_eq(pkid, id)) {
-    ERR_GURAD_RETURN(!*key_found, RC_MAM2_KEYLOAD_OVERLOADED);
+    ERR_GUARD_RETURN(!*key_found, RC_MAM2_KEYLOAD_OVERLOADED);
     *key_found = 1;
 
     /*  absorb tryte ekey[3072]; */
-    ERR_GURAD_RETURN(MAM2_NTRU_EKEY_SIZE <= trits_size(*b), RC_MAM2_PB3_EOF);
+    ERR_GUARD_RETURN(MAM2_NTRU_EKEY_SIZE <= trits_size(*b), RC_MAM2_PB3_EOF);
     ekey = pb3_trits_take(b, MAM2_NTRU_EKEY_SIZE);
-    ERR_GURAD_RETURN(trits_cmp_eq(pkid, id), RC_MAM2_KEYLOAD_IRRELEVANT);
-    ERR_GURAD_RETURN(ntru_decr(n, ns, ekey, key), RC_MAM2_PB3_BAD_EKEY);
+    ERR_GUARD_RETURN(trits_cmp_eq(pkid, id), RC_MAM2_KEYLOAD_IRRELEVANT);
+    ERR_GUARD_RETURN(ntru_decr(n, ns, ekey, key), RC_MAM2_PB3_BAD_EKEY);
     spongos_absorb(s, ekey);
   } else { /* skip */
-    ERR_GURAD_RETURN(MAM2_NTRU_EKEY_SIZE <= trits_size(*b), RC_MAM2_PB3_EOF);
+    ERR_GUARD_RETURN(MAM2_NTRU_EKEY_SIZE <= trits_size(*b), RC_MAM2_PB3_EOF);
     pb3_trits_take(b, MAM2_NTRU_EKEY_SIZE);
     /* spongos state is corrupted */
   }
@@ -889,14 +889,14 @@ retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
   {
     tryte_t ver = -1;
     ERR_BIND_RETURN(mam_unwrap_channel(s, b, &ver, mam_recv_msg_cfg_chid(cfg)));
-    ERR_GURAD_RETURN(0 == ver, RC_MAM2_VERSION_NOT_SUPPORTED);
+    ERR_GUARD_RETURN(0 == ver, RC_MAM2_VERSION_NOT_SUPPORTED);
   }
 
   /* unwrap Endpoint */
   {
     tryte_t pubkey = -1;
     ERR_BIND_RETURN(pb3_unwrap_absorb_tryte(s, b, &pubkey));
-    ERR_GURAD_RETURN(0 <= pubkey && pubkey <= 3, RC_MAM2_PB3_BAD_ONEOF);
+    ERR_GUARD_RETURN(0 <= pubkey && pubkey <= 3, RC_MAM2_PB3_BAD_ONEOF);
     cfg->pubkey = (mam_msg_pubkey_t)pubkey;
 
     if (mam_msg_pubkey_chid1 == pubkey) { /*  SignedId chid1 = 2; */
@@ -938,14 +938,14 @@ retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
 
         /*  absorb oneof keyload */
         ERR_BIND_RETURN(pb3_unwrap_absorb_tryte(s, b, &keyload));
-        ERR_GURAD_RETURN(0 <= keyload && keyload <= 2, RC_MAM2_PB3_BAD_ONEOF);
+        ERR_GUARD_RETURN(0 <= keyload && keyload <= 2, RC_MAM2_PB3_BAD_ONEOF);
         /*  fork; */
         spongos_fork(s, fork);
 
         if (mam_msg_keyload_plain == keyload) { /*  KeyloadPlain plain = 0; */
           ERR_BIND_RETURN(
               mam_unwrap_keyload_plain(fork, b, mam_recv_msg_cfg_key(cfg)));
-          ERR_GURAD_RETURN(!key_found, RC_MAM2_KEYLOAD_OVERLOADED);
+          ERR_GUARD_RETURN(!key_found, RC_MAM2_KEYLOAD_OVERLOADED);
           key_found = 1;
         } else if (mam_msg_keyload_psk == keyload) { /*  KeyloadPSK psk = 1; */
           if (cfg->psk)
@@ -959,10 +959,10 @@ retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
                 fork, b, mam_recv_msg_cfg_key(cfg), &key_found,
                 ntru_id_trits(cfg->ntru), cfg->ntru, cfg->spongos_ntru));
         } else
-          ERR_GURAD_RETURN(0, RC_MAM2_PB3_BAD_ONEOF);
+          ERR_GUARD_RETURN(0, RC_MAM2_PB3_BAD_ONEOF);
       }
 
-      ERR_GURAD_RETURN(key_found, RC_MAM2_KEYLOAD_IRRELEVANT);
+      ERR_GUARD_RETURN(key_found, RC_MAM2_KEYLOAD_IRRELEVANT);
     }
   }
 
@@ -999,9 +999,9 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
   /*  crypt tryte payload[sz]; */
   if (trits_is_null(*payload)) {
     p = trits_alloc(pb3_sizeof_ntrytes(sz));
-    ERR_GURAD_RETURN(!trits_is_null(p), RC_OOM);
+    ERR_GUARD_RETURN(!trits_is_null(p), RC_OOM);
   } else {
-    ERR_GURAD_RETURN(trits_size(*payload) <= pb3_sizeof_ntrytes(sz),
+    ERR_GUARD_RETURN(trits_size(*payload) <= pb3_sizeof_ntrytes(sz),
                      RC_MAM2_BUFFER_TOO_SMALL);
     p = pb3_trits_take(payload, pb3_sizeof_ntrytes(sz));
   }
@@ -1021,7 +1021,7 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
     ERR_BIND_RETURN(mam_unwrap_checksum_mssig(s, b, cfg->spongos_mss,
                                               cfg->spongos_wots, cfg->pk));
   } else {
-    ERR_GURAD_RETURN(0, RC_MAM2_PB3_BAD_ONEOF);
+    ERR_GUARD_RETURN(0, RC_MAM2_PB3_BAD_ONEOF);
   }
 
   /*  commit; */

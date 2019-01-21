@@ -109,7 +109,7 @@ extern "C" {
     return e;                 \
   else
 
-#define ERR_GURAD_RETURN(expr, err) \
+#define ERR_GUARD_RETURN(expr, err) \
   if (!(expr)) {                    \
     e = (err);                      \
     return e;                       \
