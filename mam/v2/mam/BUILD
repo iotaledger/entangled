@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("//utils/containers:type_container_generator.bzl", "type_container_generate")
+load("//utils/containers:typed_container_generator.bzl", "typed_container_generate")
 
 cc_library(
     name = "mam",
@@ -25,7 +25,7 @@ cc_library(
     ],
 )
 
-type_container_generate(
+typed_container_generate(
     additional_deps = ":mam_types",
     additional_include_path = "mam/v2/mam/mam_types.h",
     container_type = "set",
@@ -33,7 +33,7 @@ type_container_generate(
     value_type = "mam_ntru_pk_t",
 )
 
-type_container_generate(
+typed_container_generate(
     additional_deps = "//mam/v2/mam:mam_types",
     additional_include_path = "mam/v2/mam/mam_types.h",
     container_type = "set",

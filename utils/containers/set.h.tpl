@@ -29,7 +29,7 @@ typedef {TYPE}_set_entry_t *{TYPE}_set_t;
 typedef retcode_t (*{TYPE}_on_container_func)(void *container,
                                                 {TYPE} *type);
 
-uint32_t {TYPE}_set_size({TYPE}_set_t const *const set);
+size_t {TYPE}_set_size({TYPE}_set_t const *const set);
 retcode_t {TYPE}_set_add({TYPE}_set_t *const set,
                             {TYPE} const *const value);
 retcode_t {TYPE}_set_remove({TYPE}_set_t *const set,

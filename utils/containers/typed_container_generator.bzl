@@ -1,4 +1,4 @@
-def _type_container_generator_impl(ctx):
+def _typed_container_generator_impl(ctx):
     ctx.actions.expand_template(
         template = ctx.file.source_template,
         output = ctx.outputs.source,
@@ -18,7 +18,7 @@ def _type_container_generator_impl(ctx):
     )
 
 _type_container_generator = rule(
-    implementation = _type_container_generator_impl,
+    implementation = _typed_container_generator_impl,
     attrs = {
         "source": attr.string(mandatory = True),
         "source_template": attr.label(mandatory = True, allow_single_file = True),
@@ -36,7 +36,7 @@ _type_container_generator = rule(
     },
 )
 
-def type_container_generate(container_type, value_type, additional_include_path = "", additional_deps = "//utils/containers:dummy_dep", parent_directory = "utils/containers"):
+def typed_container_generate(container_type, value_type, additional_include_path = "", additional_deps = "//utils/containers:dummy_dep", parent_directory = "utils/containers"):
     base = value_type + str("_") + container_type
     source = base + ".c"
     header = base + ".h"

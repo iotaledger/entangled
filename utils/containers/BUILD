@@ -1,5 +1,5 @@
 load(":map_generator.bzl", "map_generate")
-load(":type_container_generator.bzl", "type_container_generate")
+load(":typed_container_generator.bzl", "typed_container_generate")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -19,7 +19,7 @@ map_generate(
     value_type = "int",
 )
 
-type_container_generate(
+typed_container_generate(
     container_type = "set",
     value_type = "int",
 )

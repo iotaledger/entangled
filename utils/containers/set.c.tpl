@@ -7,7 +7,7 @@
 
 #include "{PARENT_DIRECTORY}/{TYPE}_set.h"
 
-uint32_t {TYPE}_set_size({TYPE}_set_t const *const set) {
+size_t {TYPE}_set_size({TYPE}_set_t const *const set) {
   return HASH_COUNT(*set);
 }
 
