@@ -7,3 +7,12 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_set",
+    srcs = ["test_set.c"],
+    deps = [
+        "//utils/containers:int_set",
+        "@unity",
+    ],
+)

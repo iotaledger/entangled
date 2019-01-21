@@ -44,9 +44,9 @@ static trits_t mam_test_generic_send_msg(
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   trits_t msg = trits_null();
-  mam_pre_shared_key_node_t pska[1], pskb[1];
+  mam_pre_shared_key_t pska[1], pskb[1];
   ntru_t ntru[1];
-  mam_ntru_public_key_node_t ntru_pk[1];
+  mam_ntru_pk_t ntru_pk[1];
   mam_ialloc_t ma[1];
   sponge_t *sponge_send = 0, *fork_sponge_send = 0, *ntru_sponge_send = 0;
 
@@ -64,15 +64,13 @@ static trits_t mam_test_generic_send_msg(
 
   /* gen psk */
   {
-    pska->prev = pska->next = 0;
-    trits_from_str(mam_psk_id(&pska->info), TEST_PRE_SHARED_KEY_A_STR);
+    trits_from_str(mam_psk_id(pska), TEST_PRE_SHARED_KEY_A_STR);
     prng_gen_str(prng_a, MAM2_PRNG_DST_SEC_KEY, TEST_PRE_SHARED_KEY_A_NONCE_STR,
-                 mam_psk_trits(&pska->info));
+                 mam_psk_trits(pska));
 
-    pskb->prev = pskb->next = 0;
-    trits_from_str(mam_psk_id(&pskb->info), TEST_PRE_SHARED_KEY_B_STR);
+    trits_from_str(mam_psk_id(pskb), TEST_PRE_SHARED_KEY_B_STR);
     prng_gen_str(prng_b, MAM2_PRNG_DST_SEC_KEY, TEST_PRE_SHARED_KEY_B_NONCE_STR,
-                 mam_psk_trits(&pskb->info));
+                 mam_psk_trits(pskb));
   }
   /* gen recipient'spongos ntru keys */
   {
@@ -81,7 +79,7 @@ static trits_t mam_test_generic_send_msg(
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
 
     e = ntru_create(ntru);
-    ntru_gen(ntru, prng_b, ntru_nonce, mam_ntru_pk_trits(&ntru_pk->info));
+    ntru_gen(ntru, prng_b, ntru_nonce, mam_ntru_pk_trits(ntru_pk));
     TEST_ASSERT(RC_OK == e);
   }
   {
@@ -107,20 +105,15 @@ static trits_t mam_test_generic_send_msg(
     }
 
     cfg->key_plain = 0;
-    cfg->pre_shared_keys.begin = NULL;
-    cfg->pre_shared_keys.end = NULL;
-    cfg->ntru_public_keys.begin = NULL;
-    cfg->ntru_public_keys.end = NULL;
+    cfg->pre_shared_keys = NULL;
+    cfg->ntru_public_keys_set = NULL;
     if (mam_msg_keyload_plain == keyload)
       cfg->key_plain = 1;
     else if (mam_msg_keyload_psk == keyload) {
-      pska->prev = pska->next = NULL;
-      pskb->prev = pskb->next = NULL;
-      mam_list_insert_end(cfg->pre_shared_keys, pska);
-      mam_list_insert_end(cfg->pre_shared_keys, pskb);
+      mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pska);
+      mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pskb);
     } else if (mam_msg_keyload_ntru == keyload) {
-      ntru_pk->prev = ntru_pk->next = NULL;
-      mam_list_insert_end(cfg->ntru_public_keys, ntru_pk);
+      mam_ntru_pk_t_set_add(&cfg->ntru_public_keys_set, ntru_pk);
     }
 
     trits_from_str(mam_send_msg_cfg_nonce(cfg), "SENDERNONCEAAAAASENDERNONCE");
@@ -136,6 +129,8 @@ static trits_t mam_test_generic_send_msg(
   msg = trits_pickup(msg, sz);
 
   ntru_destroy(ntru);
+  mam_pre_shared_key_t_set_free(&cfg_msga->pre_shared_keys);
+  mam_ntru_pk_t_set_free(&cfg_msga->ntru_public_keys_set);
 
   return msg;
 }
@@ -199,8 +194,8 @@ static void mam_test_generic_receive_msg(
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   mam_ialloc_t ma[1];
-  mam_pre_shared_key_node_t pre_shared_key[1];
-  mam_ntru_public_key_node_t ntru_pk[1];
+  mam_pre_shared_key_t pre_shared_key[1];
+  mam_ntru_pk_t ntru_pk[1];
   ntru_t ntru[1];
 
   sponge_t *sponge_recv = 0, *fork_sponge_recv = 0, *mss_sponge_recv = 0,
@@ -222,11 +217,9 @@ static void mam_test_generic_receive_msg(
 
   /* gen psk */
   {
-    pre_shared_key->prev = pre_shared_key->next = 0;
-    trits_from_str(mam_psk_id(&pre_shared_key->info),
-                   TEST_PRE_SHARED_KEY_B_STR);
+    trits_from_str(mam_psk_id(pre_shared_key), TEST_PRE_SHARED_KEY_B_STR);
     prng_gen_str(prng, MAM2_PRNG_DST_SEC_KEY, TEST_PRE_SHARED_KEY_B_NONCE_STR,
-                 mam_psk_trits(&pre_shared_key->info));
+                 mam_psk_trits(pre_shared_key));
   }
   /* gen recipient'spongos ntru keys */
   {
@@ -235,7 +228,7 @@ static void mam_test_generic_receive_msg(
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
 
     e = ntru_create(ntru);
-    ntru_gen(ntru, prng, ntru_nonce, mam_ntru_pk_trits(&ntru_pk->info));
+    ntru_gen(ntru, prng, ntru_nonce, mam_ntru_pk_trits(ntru_pk));
     TEST_ASSERT(RC_OK == e);
   }
 
@@ -251,7 +244,7 @@ static void mam_test_generic_receive_msg(
     cfg->spongos_wots->sponge = wots_sponge_recv;
     cfg->spongos_ntru->sponge = ntru_sponge_recv;
 
-    cfg->psk = &pre_shared_key->info;
+    cfg->psk = pre_shared_key;
     cfg->ntru = ntru;
 
     trits_copy(mam_channel_id(cha), mam_recv_msg_cfg_chid(cfg));
