@@ -219,7 +219,7 @@ retcode_t bundle_validator(bundle_transactions_t *const bundle,
         break;
       }
 
-      normalize_hash_trits(bundle_hash_calculated, normalized_bundle);
+      normalize_flex_hash_to_trits(bundle_hash_calculated, normalized_bundle);
 
       res = validate_signatures(bundle, normalized_bundle, &shared_kerl1,
                                 &shared_kerl2, &valid_sig);

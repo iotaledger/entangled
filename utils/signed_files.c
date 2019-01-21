@@ -46,7 +46,7 @@ static retcode_t validate_signature(char const *const signature_filename,
   curl.type = CURL_P_81;
   init_curl(&curl);
 
-  normalize_hash_trits(digest, normalized_digest);
+  normalize_flex_hash_to_trits(digest, normalized_digest);
 
   int i;
   for (i = 0; i < 3 && (read = getline(&line, &len, fp)) > 0; i++) {

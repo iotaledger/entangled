@@ -24,6 +24,7 @@ cc_library(
     deps = [
         "//common:defs",
         "//common/kerl",
+        "//common/sign:normalize",
         "//common/sign/v1:iss_kerl",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_array",

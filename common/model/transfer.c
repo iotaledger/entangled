@@ -40,7 +40,6 @@ static void transfer_iterator_next_data_transaction(
       log_warning(logger_id, "[%s:%d] flex_trits slicing failed.\n", __func__,
                   __LINE__);
     }
-    transfer_iterator->transaction->loaded_columns_mask |= MASK_DATA;
   } else {
     log_error(logger_id, "[%s:%d] the transfer type doesn't match.\n", __func__,
               __LINE__);
@@ -79,7 +78,6 @@ static void transfer_iterator_next_output_transaction(
       log_warning(logger_id, "[%s:%d] flex_trits slicing failed.\n", __func__,
                   __LINE__);
     }
-    transfer_iterator->transaction->loaded_columns_mask |= MASK_DATA;
   } else {
     log_error(logger_id, "[%s:%d] the transfer type doesn't match.\n", __func__,
               __LINE__);
@@ -354,7 +352,7 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
                           HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 
     // normalize
-    normalize_hash(transfer_ctx->bundle, normalized_hash);
+    normalize_flex_hash(transfer_ctx->bundle, normalized_hash);
     // checking 'M'
     for (i = 0; i < HASH_LENGTH_TRYTE; i++) {
       if (normalized_hash[i] == 13) {
@@ -446,7 +444,8 @@ iota_transaction_t* transfer_iterator_next(
                                   transfer_iterator->current_transaction_index);
     transaction_set_last_index(transaction,
                                transfer_iterator->transactions_count - 1);
-    transaction->loaded_columns_mask = MASK_ESSENCE | MASK_DATA;
+    transaction->loaded_columns_mask.essence = MASK_ESSENCE_ALL;
+    transaction->loaded_columns_mask.data = MASK_DATA_SIG_OR_MSG;
 
     // Set transaction type specific fields
     switch (transfer->type) {
