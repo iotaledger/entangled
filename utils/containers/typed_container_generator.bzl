@@ -2,19 +2,17 @@ def _typed_container_generator_impl(ctx):
     ctx.actions.expand_template(
         template = ctx.file.source_template,
         output = ctx.outputs.source,
-        substitutions = {"{TYPE}": str(ctx.attr.value_type), "{PARENT_DIRECTORY}": str(ctx.attr.parent_directory)},
+        substitutions = {"{TYPE}": ctx.attr.value_type, "{PARENT_DIRECTORY}": ctx.attr.parent_directory},
     )
 
     ADDITIONAL_INCLUDE_PATH_ACTUAL = ""
-    if str(ctx.attr.additional_include_path) == "":
-        ADDITIONAL_INCLUDE_PATH_ACTUAL = ""
-    else:
-        ADDITIONAL_INCLUDE_PATH_ACTUAL = "#include " + "\"" + str(ctx.attr.additional_include_path) + "\""
+    if ctx.attr.additional_include_path != "":
+        ADDITIONAL_INCLUDE_PATH_ACTUAL = "#include " + "\"" + ctx.attr.additional_include_path + "\""
 
     ctx.actions.expand_template(
         template = ctx.file.header_template,
         output = ctx.outputs.header,
-        substitutions = {"{TYPE}": str(ctx.attr.value_type), "{ADDITIONAL_INCLUDE_PATH}": ADDITIONAL_INCLUDE_PATH_ACTUAL},
+        substitutions = {"{TYPE}": ctx.attr.value_type, "{ADDITIONAL_INCLUDE_PATH}": ADDITIONAL_INCLUDE_PATH_ACTUAL},
     )
 
 _type_container_generator = rule(
@@ -37,7 +35,7 @@ _type_container_generator = rule(
 )
 
 def typed_container_generate(container_type, value_type, additional_include_path = "", additional_deps = "//utils/containers:dummy_dep", parent_directory = "utils/containers"):
-    base = value_type + str("_") + container_type
+    base = value_type + "_" + container_type
     source = base + ".c"
     header = base + ".h"
 
