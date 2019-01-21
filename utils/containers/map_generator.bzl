@@ -2,12 +2,12 @@ def _map_generator_impl(ctx):
     ctx.actions.expand_template(
         template = ctx.file.source_template,
         output = ctx.outputs.source,
-        substitutions = {"{KEY_TYPE}": str(ctx.attr.key_type), "{VALUE_TYPE}": str(ctx.attr.value_type)},
+        substitutions = {"{KEY_TYPE}": ctx.attr.key_type, "{VALUE_TYPE}": ctx.attr.value_type},
     )
     ctx.actions.expand_template(
         template = ctx.file.header_template,
         output = ctx.outputs.header,
-        substitutions = {"{KEY_TYPE}": str(ctx.attr.key_type), "{VALUE_TYPE}": str(ctx.attr.value_type)},
+        substitutions = {"{KEY_TYPE}": ctx.attr.key_type, "{VALUE_TYPE}": ctx.attr.value_type},
     )
 
 _map_generator = rule(
@@ -27,7 +27,7 @@ _map_generator = rule(
 )
 
 def map_generate(key_type, value_type):
-    base = str(key_type) + str("_to_") + str(value_type) + "_map"
+    base = key_type + "_to_" + value_type + "_map"
     source = base + ".c"
     header = base + ".h"
 
