@@ -19,8 +19,6 @@
 #include "utarray.h"
 #include "utils/export.h"
 
-#define NONCE_LENGTH 27 * 3
-
 IOTA_EXPORT char *iota_pow_trytes(char const *const trytes_in,
                                   uint8_t const mwm) {
   Curl curl;
@@ -42,12 +40,12 @@ IOTA_EXPORT char *iota_pow_trytes(char const *const trytes_in,
     return NULL;
   }
   tryte_t *nonce_trytes =
-      (tryte_t *)calloc(NONCE_LENGTH / 3 + 1, sizeof(tryte_t));
+      (tryte_t *)calloc(NUM_TRITS_NONCE / 3 + 1, sizeof(tryte_t));
   if (!nonce_trytes) {
     free(nonce_trits);
     return NULL;
   }
-  trits_to_trytes(nonce_trits, nonce_trytes, NONCE_LENGTH);
+  trits_to_trytes(nonce_trits, nonce_trytes, NUM_TRITS_NONCE);
   free(nonce_trits);
 
   return (char *)nonce_trytes;
@@ -69,15 +67,15 @@ IOTA_EXPORT flex_trit_t *iota_pow_flex(flex_trit_t const *const flex_trits_in,
   if (!nonce_trits) {
     return NULL;
   }
-  size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NONCE_LENGTH);
+  size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_NONCE);
   flex_trit_t *nonce_flex_trits =
       (flex_trit_t *)calloc(flex_len, sizeof(flex_trit_t));
   if (!nonce_flex_trits) {
     free(nonce_trits);
     return NULL;
   }
-  flex_trits_from_trits(nonce_flex_trits, NONCE_LENGTH, nonce_trits,
-                        NONCE_LENGTH, NONCE_LENGTH);
+  flex_trits_from_trits(nonce_flex_trits, NUM_TRITS_NONCE, nonce_trits,
+                        NUM_TRITS_NONCE, NUM_TRITS_NONCE);
   free(nonce_trits);
 
   return nonce_flex_trits;
