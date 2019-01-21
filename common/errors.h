@@ -104,15 +104,15 @@ extern "C" {
     continue;                \
   } else
 
-#define ERR_BIND_RETURN(expr) \
-  if (RC_OK != (e = (expr)))  \
-    return e;                 \
+#define ERR_BIND_RETURN(expr, e) \
+  if (RC_OK != (e = (expr)))     \
+    return e;                    \
   else
 
-#define ERR_GUARD_RETURN(expr, err) \
-  if (!(expr)) {                    \
-    e = (err);                      \
-    return e;                       \
+#define ERR_GUARD_RETURN(expr, err, e) \
+  if (!(expr)) {                       \
+    e = (err);                         \
+    return e;                          \
   } else
 
 /** Return Codes */
