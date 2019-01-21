@@ -219,7 +219,7 @@ typedef struct mam_send_msg_context_s {
   mam_pre_shared_key_t_set_t
       pre_shared_keys; /*!< Encrypt message for these psks. */
   mam_ntru_pk_t_set_t
-      ntru_public_keys_set; /*!< Encrypt message for these NTRU public keys. */
+      ntru_public_keys; /*!< Encrypt message for these NTRU public keys. */
 } mam_send_msg_context_t;
 
 size_t mam_send_msg_size(mam_send_msg_context_t *cfg);

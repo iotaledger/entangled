@@ -105,14 +105,14 @@ static trits_t mam_test_generic_send_msg(
 
     cfg->key_plain = 0;
     cfg->pre_shared_keys = NULL;
-    cfg->ntru_public_keys_set = NULL;
+    cfg->ntru_public_keys = NULL;
     if (mam_msg_keyload_plain == keyload)
       cfg->key_plain = 1;
     else if (mam_msg_keyload_psk == keyload) {
       mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pska);
       mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pskb);
     } else if (mam_msg_keyload_ntru == keyload) {
-      mam_ntru_pk_t_set_add(&cfg->ntru_public_keys_set, ntru_pk);
+      mam_ntru_pk_t_set_add(&cfg->ntru_public_keys, ntru_pk);
     }
 
     trits_from_str(mam_send_msg_cfg_nonce(cfg), "SENDERNONCEAAAAASENDERNONCE");
@@ -129,7 +129,7 @@ static trits_t mam_test_generic_send_msg(
 
   ntru_destroy(ntru);
   mam_pre_shared_key_t_set_free(&cfg_msga->pre_shared_keys);
-  mam_ntru_pk_t_set_free(&cfg_msga->ntru_public_keys_set);
+  mam_ntru_pk_t_set_free(&cfg_msga->ntru_public_keys);
 
   return msg;
 }
