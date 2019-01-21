@@ -14,11 +14,11 @@
 */
 #include "mam/v2/trits/buffers.h"
 
-buffers_t buffers_init(size_t n, trits_t *Xs) {
+buffers_t buffers_init(size_t n, trits_t const *const Xs) {
   buffers_t bs;
   bs.X = trits_null();
   bs.n = n;
-  bs.Xs = Xs;
+  bs.Xs = (trits_t *const)Xs;
   return bs;
 }
 

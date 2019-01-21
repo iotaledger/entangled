@@ -38,7 +38,7 @@ typedef struct test_ntru_s {
 
 typedef struct test_prng_s {
   prng_t p;
-  prng_key_t key;
+  trit_t secret_key[MAM2_PRNG_KEY_SIZE];
 } test_prng_t;
 
 typedef struct test_sponge_s {
@@ -50,8 +50,8 @@ typedef struct test_sponge_s {
 typedef spongos_t test_spongos_t;
 
 typedef struct test_wots_s {
-  wots_t w;
-  wots_sk_t sk;
+  wots_t wots;
+  trit_t secret_key[MAM2_WOTS_SK_SIZE];
 } test_wots_t;
 
 ntru_t *test_ntru_init(test_ntru_t *n);
@@ -65,6 +65,17 @@ static inline sponge_t *test_create_sponge() {
   return test_sponge_init(t);
 }
 static inline void test_delete_sponge(sponge_t *s) { free((test_sponge_t *)s); }
+
+/**
+ * PRNG output generation
+ *
+ * @param prng A PRNG interface
+ * @param destination A destination tryte
+ * @param nonce The nonce as a string
+ * @param output Pseudorandom output trits
+ */
+void prng_gen_str(prng_t *prng, tryte_t destination, char const *nonce,
+                  trits_t output);
 
 #ifdef __cplusplus
 }
