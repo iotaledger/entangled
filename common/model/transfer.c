@@ -420,7 +420,7 @@ iota_transaction_t* transfer_iterator_next(
                                   transfer_iterator->current_transaction_index);
     transaction_set_last_index(transaction,
                                transfer_iterator->transactions_count - 1);
-    transaction->loaded_columns_mask = MASK_ESSENCE;
+    transaction->loaded_columns_mask = MASK_ESSENCE | MASK_DATA;
 
     // Set transaction type specific fields
     switch (transfer->type) {
