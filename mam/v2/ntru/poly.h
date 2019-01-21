@@ -83,35 +83,140 @@ typedef poly_coeff_t poly_t[MAM2_POLY_N];
 poly_coeff_t poly_coeff_mredd(poly_dcoeff_t m);
 #endif
 
+static inline poly_coeff_t poly_coeff_from_trint1(trint1_t const t) {
+  MAM2_ASSERT_TRINT1(t);
+
+  if (t > 0)
+    return MAM2_POLY_COEFF_ONE;
+  else if (t < 0)
+    return MAM2_POLY_COEFF_MINUS_ONE;
+  return 0;
+}
+
+/**
+ * Convert integer into internal polynomial coefficient representation
+ * The input integer must be within the range [-(Q-1)/2,...,(Q-1)/2]
+ */
+poly_coeff_t poly_coeff_from_trint9(trint9_t const t);
+
+/**
+ * Convert internal polynomial coefficient representation into an integer
+ * The output integer will be within the range [-(Q-1)/2,...,(Q-1)/2]
+ */
+trint9_t poly_coeff_to_trint9(poly_coeff_t c);
+
+// a + b (mods q)
+poly_coeff_t poly_coeff_add(poly_coeff_t const a, poly_coeff_t const b);
+
+// a - b (mods q)
+static inline poly_coeff_t poly_coeff_sub(poly_coeff_t const a,
+                                          poly_coeff_t const b) {
+#if defined(MAM2_POLY_MRED_BINARY)
+  /* u = a - b mod R */
+  poly_coeff_t c = a < b ? MAM2_POLY_Q + a - b : a - b;
+  return c;
+#else
+  return poly_coeff_add(a, -b);
+#endif
+}
+
+// a * b (mods q)
+static inline poly_coeff_t poly_coeff_mul(poly_coeff_t const a,
+                                          poly_coeff_t const b) {
+#if defined(MAM2_POLY_MRED_BINARY)
+  return poly_coeff_mredd((poly_dcoeff_t)a * b);
+#else
+  poly_dcoeff_t prod = (poly_dcoeff_t)a * b;
+
+  prod = MAM2_MODS(prod, ((trint18_t)MAM2_POLY_Q * (trint18_t)MAM2_POLY_Q),
+                   MAM2_POLY_Q);
+
+  return prod;
+#endif
+}
+
+// a * b + c (mods q)
+poly_coeff_t poly_coeff_mul_add(poly_coeff_t const a, poly_coeff_t const b,
+                                poly_coeff_t const c) {
+#if defined(MAM2_POLY_MRED_BINARY)
+  return poly_coeff_add(poly_coeff_mul(a, b), c);
+#else
+  poly_dcoeff_t prod = (poly_dcoeff_t)a * b + c;
+
+  prod = MAM2_MODS(prod, ((trint18_t)MAM2_POLY_Q * (trint18_t)MAM2_POLY_Q),
+                   MAM2_POLY_Q);
+
+  return prod;
+#endif
+}
+
+poly_coeff_t poly_coeff_inv(poly_coeff_t const a);
+
 // f(x) := f(x) + 1; f(x)/3 is small
-void poly_small3_add1(poly_t f);
+static inline void poly_small3_add1(poly_t f) {
+#if !defined(MAM2_POLY_MRED_BINARY)
+  MAM2_ASSERT(-3 <= f[0] && f[0] <= 3);
+#endif
+  f[0] += MAM2_POLY_COEFF_ONE;
+}
 
 // h(x) := 3 f(x); f(x) is small
-void poly_small_mul3(poly_t f, poly_t h);
+static inline void poly_small_mul3(poly_t const f, poly_t h) {
+  poly_coeff_t c;
+
+  for (size_t i = 0; i < MAM2_POLY_N; ++i) {
+    c = poly_coeff_add(f[i], f[i]);
+    h[i] = poly_coeff_add(c, f[i]);
+  }
+}
 
 // h(x) := f(x) + g(x) mods (m(x), q)
-void poly_add(poly_t f, poly_t g, poly_t h);
+static inline void poly_add(poly_t const f, poly_t const g, poly_t h) {
+  for (size_t i = 0; i < MAM2_POLY_N; ++i) {
+    h[i] = poly_coeff_add(f[i], g[i]);
+  }
+}
 
 // h(x) := f(x) - g(x) mods (m(x), q)
-void poly_sub(poly_t f, poly_t g, poly_t h);
+static inline void poly_sub(poly_t const f, poly_t const g, poly_t h) {
+  for (size_t i = 0; i < MAM2_POLY_N; ++i) {
+    h[i] = poly_coeff_sub(f[i], g[i]);
+  }
+}
 
 /**
  * th := NTT(f) ⊛ NTT(g) mods (m(x), q)
  * h(x) ≡ f(x) * g(x) mods (m(x), q)
  */
-void poly_conv(poly_t tf, poly_t tg, poly_t th);
+static inline void poly_conv(poly_t const tf, poly_t const tg, poly_t th) {
+  for (size_t i = 0; i < MAM2_POLY_N; ++i) {
+    th[i] = poly_coeff_mul(tf[i], tg[i]);
+  }
+}
 
 // ∃? h(x) : 1 ≡ f(x) * h(x) mods (m(x), q), t = NTT(f)
-bool poly_has_inv(poly_t t);
+static inline bool poly_has_inv(poly_t const t) {
+  bool r = true;
+
+  for (size_t i = 0; r && i < MAM2_POLY_N; ++i) {
+    r = (0 != t[i]) ? 1 : 0;
+  }
+
+  return r;
+}
 
 // h(x) := f⁻¹(x) mods (m(x), q), tf = NTT(f), th = NTT(h)
-void poly_inv(poly_t tf, poly_t th);
+static inline void poly_inv(poly_t const tf, poly_t th) {
+  for (size_t i = 0; i < MAM2_POLY_N; ++i) {
+    th[i] = poly_coeff_inv(tf[i]);
+  }
+}
 
 /**
  * t(x) := NTT(f)
  * tⱼ = f(γ²ʲ⁺¹) ≡ Σᵢfᵢγ⁽²ʲ⁺¹⁾ⁱ
  */
-void poly_ntt(poly_t f, poly_t t);
+void poly_ntt(poly_t const f, poly_t t);
 
 /**
  * f(x) := NTT⁻¹(t)
@@ -124,45 +229,30 @@ void poly_ntt(poly_t f, poly_t t);
  * ≡ Σᵢfᵢγⁱ(Σⱼγ²ʲ⁽ⁱ⁻ᵏ⁾)
  * ≡ fₖγᵏn
  */
-void poly_intt(poly_t t, poly_t f);
+void poly_intt(poly_t const t, poly_t f);
 
 // tᵢ := fᵢ (mods 3)
-void poly_round_to_trits(poly_t f, trits_t t);
+void poly_round_to_trits(poly_t const f, trits_t t);
 
 // fᵢ := tᵢ
-void poly_small_from_trits(poly_t f, trits_t t);
+static inline void poly_small_from_trits(poly_t f, trits_t t) {
+  MAM2_ASSERT(trits_size(t) == MAM2_POLY_N);
+
+  for (size_t i = 0; i < MAM2_POLY_N; ++i, t = trits_drop(t, 1))
+    f[i] = poly_coeff_from_trint1(trits_get1(t));
+}
 
 // fᵢ := tᵢ
 bool poly_from_trits(poly_t f, trits_t t);
 
 // tᵢ := fᵢ ???
-void poly_to_trits(poly_t f, trits_t t);
+static inline void poly_to_trits(poly_t f, trits_t t) {
+  MAM2_ASSERT(trits_size(t) == 9 * MAM2_POLY_N);
 
-/**
- * Convert integer into internal polynomial coefficient representation
- * The input integer must be within the range [-(Q-1)/2,...,(Q-1)/2]
- */
-poly_coeff_t poly_coeff_from_trint9(trint9_t t);
-
-/**
- * Convert internal polynomial coefficient representation into an integer
- * The output integer will be within the range [-(Q-1)/2,...,(Q-1)/2]
- */
-trint9_t poly_coeff_to_trint9(poly_coeff_t c);
-
-// a + b (mods q)
-poly_coeff_t poly_coeff_add(poly_coeff_t a, poly_coeff_t b);
-
-// a - b (mods q)
-poly_coeff_t poly_coeff_sub(poly_coeff_t a, poly_coeff_t b);
-
-// a * b (mods q)
-poly_coeff_t poly_coeff_mul(poly_coeff_t a, poly_coeff_t b);
-
-// a * b + c (mods q)
-poly_coeff_t poly_coeff_mul_add(poly_coeff_t a, poly_coeff_t b, poly_coeff_t c);
-
-poly_coeff_t poly_coeff_inv(poly_coeff_t a);
+  for (size_t i = 0; i < MAM2_POLY_N; ++i, t = trits_drop(t, 9)) {
+    trits_put9(t, poly_coeff_to_trint9(f[i]));
+  }
+}
 
 #ifdef __cplusplus
 }
