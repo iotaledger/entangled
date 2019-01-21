@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdbool.h>
+
 #include "common/model/transfer.h"
 
 #define TRANSFER_LOGGER_ID "transfer"
@@ -319,28 +321,52 @@ bool transfer_ctx_init(transfer_ctx_t* transfer_ctx, transfer_t* transfers[],
 // Calculates the bundle hash for a collection of transfers
 void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
                        transfer_t* transfers[], uint32_t tx_len) {
-  uint32_t i, j, count, current_index = 0;
+  size_t i, j, count, current_index = 0;
   trit_t essence_trits[NUM_TRITS_ESSENCE];
   trit_t bundle_trit[HASH_LENGTH_TRIT];
+  byte_t normalized_hash[HASH_LENGTH_TRYTE];
   transfer_t* tf = NULL;
   int64_t value;
+  bool valid_bundle = false;
+  trit_t first_tx_tag_trits[NUM_TRITS_TAG];
+  flex_trits_to_trits(first_tx_tag_trits, NUM_TRITS_TAG, transfers[0]->tag,
+                      NUM_TRITS_TAG, NUM_TRITS_TAG);
 
-  init_kerl(kerl);
-  // Calculate bundle hash
-  for (i = 0; i < tx_len; i++) {
-    tf = transfers[i];
-    count = transfer_transactions_count(tf);
-    for (j = 0; j < count; j++) {
-      value = tf->type == VALUE_OUT ? (j == 0 ? tf->value : 0) : 0;
-      absorb_essence(kerl, tf->address, value, tf->tag, tf->timestamp,
-                     current_index, transfer_ctx->count - 1, essence_trits);
-      current_index++;
+  while (!valid_bundle) {
+  loop:
+    init_kerl(kerl);
+    // Calculate bundle hash
+    current_index = 0;
+    for (i = 0; i < tx_len; i++) {
+      tf = transfers[i];
+      count = transfer_transactions_count(tf);
+      for (j = 0; j < count; j++) {
+        value = tf->type == VALUE_OUT ? (j == 0 ? tf->value : 0) : tf->value;
+        absorb_essence(kerl, tf->address, value, tf->tag, tf->timestamp,
+                       current_index, transfer_ctx->count - 1, essence_trits);
+        current_index++;
+      }
     }
+
+    // Squeeze kerl to get the bundle hash
+    kerl_squeeze(kerl, bundle_trit, HASH_LENGTH_TRIT);
+    flex_trits_from_trits(transfer_ctx->bundle, HASH_LENGTH_TRIT, bundle_trit,
+                          HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+
+    // normalize
+    normalize_hash(transfer_ctx->bundle, normalized_hash);
+    // checking 'M'
+    for (i = 0; i < HASH_LENGTH_TRYTE; i++) {
+      if (normalized_hash[i] == 13) {
+        // Insecure bundle. Increment Tag and recompute bundle hash.
+        add_assign(first_tx_tag_trits, NUM_TRITS_TAG, 1);
+        flex_trits_from_trits(transfers[0]->tag, NUM_TRITS_TAG,
+                              first_tx_tag_trits, NUM_TRITS_TAG, NUM_TRITS_TAG);
+        goto loop;
+      }
+    }
+    valid_bundle = true;
   }
-  // Squeeze kerl to get the bundle hash
-  kerl_squeeze(kerl, bundle_trit, HASH_LENGTH_TRIT);
-  flex_trits_from_trits(transfer_ctx->bundle, HASH_LENGTH_TRIT, bundle_trit,
-                        HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 }
 
 transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[],
