@@ -14,7 +14,7 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_pow(
   const char* trytes = env->GetStringUTFChars(jtrytes, 0);
   char* nonce = (char*)calloc(27 + 1, sizeof(char));
 
-  char* foundNonce = iota_pow((const char*)trytes, mwm);
+  char* foundNonce = iota_pow_trytes((const char*)trytes, mwm);
   memcpy(nonce, foundNonce, 27);
   free(foundNonce);
 
@@ -22,6 +22,17 @@ JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_pow(
   free(nonce);
 
   return out;
+}
+
+/*
+ * Class:     org_iota_mobile_Interface
+ * Method:    iota_pow_bundle
+ * Signature:
+ * ([Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)[Ljava/lang/String;
+ */
+JNIEXPORT jobjectArray JNICALL Java_org_iota_mobile_Interface_iota_1pow_1bundle(
+    JNIEnv*, jclass, jobjectArray, jstring, jstring, jint) {
+  return NULL;
 }
 
 JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_sign_address_gen(
