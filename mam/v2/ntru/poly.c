@@ -8,10 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file poly.c
-\brief MAM2 NTRU polynomials arithmetic.
-*/
 #include "mam/v2/ntru/poly.h"
 #include "mam/v2/ntru/poly_param.h"
 
@@ -160,73 +156,6 @@ poly_coeff_t poly_coeff_inv(poly_coeff_t a) {
   return e;
 }
 
-#if 0
- void poly_coeff_exp_table(poly_coeff_t u, size_t n, poly_coeff_t *t)
-{
-  size_t i;
-  poly_coeff_t c = MAM2_POLY_COEFF_ONE;
-  for(i = 0; i < n; ++i,
-      c = poly_coeff_mul(c, u))
-    t[i] = c;
-}
-
-#include <stdio.h>
- void poly_gen_param()
-{
-  size_t i, j, key;
-  FILE *f;
-
-  for(i = 0; i < MAM2_POLY_N; ++i)
-  {
-    key = 0;
-    for(j = 0; j < MAM2_POLY_N_LOG; ++j)
-      if(i & (1 << j))
-        key |= 1 << (MAM2_POLY_N_LOG - 1 - j);
-    poly_idx_rev[i] = key;
-  }
-
-  poly_coeff_exp_table(
-    MAM2_POLY_COEFF_GAMMA,
-    2*MAM2_POLY_N+1,
-    poly_gamma_exp);
-
-  if(f = fopen("poly_idx_rev.c", "w"))
-  {
-    fprintf(f, "static size_t poly_idx_rev[MAM2_POLY_N] = {");
-    for(i = 0; i < MAM2_POLY_N; ++i)
-    {
-      if(0 == i % 16)
-        fprintf(f, "\n  ");
-      fprintf(f, "0x%03x, ", poly_idx_rev[i]);
-    }
-    fprintf(f, "};\n");
-    fclose(f);
-  }
-
-  if(f = fopen("poly_gamma_exp.c", "w"))
-  {
-    fprintf(f, "static poly_coeff_t poly_gamma_exp[2*MAM2_POLY_N+1] = {");
-    for(i = 0; i <= 2*MAM2_POLY_N; ++i)
-    {
-      if(0 == i % 16)
-        fprintf(f, "\n  ");
-      fprintf(f, "%d, ", poly_gamma_exp[i]);
-    }
-    fprintf(f, "};\n");
-    fclose(f);
-  }
-}
-#endif
-
-void poly_round_small(poly_t f, poly_t h) {
-  size_t i;
-  trint9_t c;
-  for (i = 0; i != MAM2_POLY_N; ++i) {
-    c = poly_coeff_to_trint9(f[i]);
-    h[i] = poly_coeff_from_trint1(MAM2_MODS(c, 27 * 27 * 27, 3));
-  }
-}
-
 void poly_small3_add1(poly_t f) {
 #if !defined(MAM2_POLY_MRED_BINARY)
   MAM2_ASSERT(-3 <= f[0] && f[0] <= 3);
@@ -371,82 +300,9 @@ void poly_to_trits(poly_t f, trits_t t) {
     trits_put9(t, poly_coeff_to_trint9(f[i]));
 }
 
-#include <stdio.h>
-
-void poly_print(char const *s, poly_t f) {
-  size_t i;
-  if (s) printf("%spongos", s);
-  for (i = 0; i != 16 /*MAM2_POLY_N*/; ++i) {
-    if (0 == (i % 16)) printf("\n");
-    printf("%d ", (int)poly_coeff_to_trint9(f[i]));
-  }
-  printf("\n");
-}
-bool poly_is_one(poly_t h) {
-  size_t i;
-  for (i = 1; i < MAM2_POLY_N; ++i)
-    if (h[i] != 0) break;
-  return (MAM2_POLY_COEFF_ONE == h[0]) && (i == MAM2_POLY_N) ? 1 : 0;
-}
-bool poly_is_eq(poly_t f, poly_t g) {
-  bool r = true;
-  size_t i;
-  for (i = 0; r && i < MAM2_POLY_N; ++i) r = (f[i] == g[i]) ? 1 : 0;
-  return r;
-}
-void poly_mul(poly_t f, poly_t g, poly_t h) {
-  typedef trint9_t poly2_t[2 * MAM2_POLY_N - 1];
-  poly2_t fg;
-  size_t i, j;
-
-  for (i = 0; i < 2 * MAM2_POLY_N - 1; ++i) fg[i] = 0;
-
-  for (i = 0; i < MAM2_POLY_N; ++i)
-    for (j = 0; j < MAM2_POLY_N; ++j)
-      fg[i + j] = poly_coeff_mul_add(f[i], g[j], fg[i + j]);
-
-  for (i = 0; i < MAM2_POLY_N - 1; ++i)
-    h[i] = poly_coeff_sub(fg[i], fg[i + MAM2_POLY_N]);
-  h[i] = fg[i];
-}
 poly_coeff_t poly_eval(poly_t f, poly_coeff_t x) {
   poly_coeff_t r = 0;
   size_t i;
   for (i = MAM2_POLY_N; i--;) r = poly_coeff_mul_add(x, r, f[i]);
   return r;
-}
-void poly_ntt2(poly_t f, poly_t t) {
-  size_t i;
-  for (i = 0; i < MAM2_POLY_N; ++i)
-    t[i] = poly_eval(f, poly_gamma_exp[i + i + 1]);
-}
-void poly_intt2(poly_t t, poly_t f) {
-  size_t i;
-  for (i = 0; i < MAM2_POLY_N; ++i)
-    f[i] =
-        poly_coeff_mul(poly_coeff_mul(MAM2_POLY_COEFF_N_INV,
-                                      poly_gamma_exp[2 * MAM2_POLY_N - i]),
-                       poly_eval(t, poly_gamma_exp[2 * MAM2_POLY_N - (i + i)]));
-}
-size_t poly_coeff_order(poly_coeff_t u, poly_coeff_t *ui) {
-  size_t i;
-  poly_coeff_t v;
-
-  *ui = MAM2_POLY_COEFF_ONE;
-  for (i = 0; i++ < MAM2_POLY_Q; *ui = v)
-    if (MAM2_POLY_COEFF_ONE == (v = poly_coeff_mul(*ui, u)))
-      /*MAM2_ASSERT(poly_coeff_inv(u) == *ui);*/
-      return i;
-
-  return 0;
-}
-trint9_t poly_norm(poly_t f) {
-  size_t i;
-  trint9_t t, n = 0;
-  for (i = 0; i != MAM2_POLY_N; ++i) {
-    t = poly_coeff_to_trint9(f[i]);
-    t = t < 0 ? -t : t;
-    n = n < t ? t : n;
-  }
-  return n;
 }

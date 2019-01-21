@@ -8,37 +8,25 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file poly.h
-\brief MAM2 NTRU polynomials arithmetic.
-*/
 #ifndef __MAM_V2_NTRU_POLY_H__
 #define __MAM_V2_NTRU_POLY_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/*! \brief Use Montgomery reduction. */
-/*#define MAM2_POLY_MRED_BINARY*/
-
-/*! \brief Prime modulus q = 3*2^12+1.
-\note Some algorithms are specifically crafted for this value. */
+// Prime modulus q = 3*2^12+1
+// Some algorithms are specifically crafted for this value
 #define MAM2_POLY_Q 12289
 
-/*! \brief Degree `n` of polynomial `m(x) = (x^n+1)`. */
-/*#define MAM2_POLY_MRED_BINARY*/
+// Degree `n` of polynomial `m(x) = (x^n+1)`
 #define MAM2_POLY_N_LOG 10
 #define MAM2_POLY_N (1 << MAM2_POLY_N_LOG)
 
-/*!
-\brief γ²ⁿ ≡ γ γ⁻¹ ≡ 1 (mod q).
-\brief ωⁿ  ≡ ω ω⁻¹ ≡ 1 (mod q). ω ≡ γ² (mod q).
-\brief n n⁻¹ ≡ 1 (mod q).
-*/
+/*
+ * γ²ⁿ ≡ γ γ⁻¹ ≡ 1 (mod q)
+ * ωⁿ  ≡ ω ω⁻¹ ≡ 1 (mod q). ω ≡ γ² (mod q)
+ * n n⁻¹ ≡ 1 (mod q)
+ */
 #if defined(MAM2_POLY_MRED_BINARY)
 #define MAM2_POLY_COEFF_GAMMA ((poly_coeff_t)4059)
 #define MAM2_POLY_COEFF_GAMMA_INV ((poly_coeff_t)2340)
@@ -67,6 +55,10 @@ extern "C" {
 #define MAM2_POLY_COEFF_MINUS_ONE ((poly_coeff_t)-1)
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! \brief Type of polynomial coefficeints mods (q).
 \note Depending on configuration coefficients may be
 represented in Montgomery reduced form.
@@ -82,9 +74,6 @@ typedef trint18_t poly_dcoeff_t;
 /*! \brief Type of polynomials mods (x^n+1, q). */
 typedef poly_coeff_t poly_t[MAM2_POLY_N];
 #define MAM2_POLY_DEF(f) poly_t f
-
-/*! \brief h(x) := f(x) (mods 3) */
-void poly_round_small(poly_t f, poly_t h);
 
 /*! \brief f(x) := f(x) + 1; f(x)/3 is small */
 void poly_small3_add1(poly_t f);
@@ -128,28 +117,17 @@ bool poly_from_trits(poly_t f, trits_t t);
 /*! \brief tᵢ := fᵢ ??? */
 void poly_to_trits(poly_t f, trits_t t);
 
-void poly_print(char const *s, poly_t f);
-
-poly_coeff_t poly_coeff_mredd(poly_dcoeff_t m);
 poly_coeff_t poly_coeff_from_trint9(trint9_t t);
 trint9_t poly_coeff_to_trint9(poly_coeff_t c);
-poly_coeff_t poly_coeff_from_trint1(trint1_t t);
 poly_coeff_t poly_coeff_add(poly_coeff_t a, poly_coeff_t b);
 poly_coeff_t poly_coeff_sub(poly_coeff_t a, poly_coeff_t b);
 poly_coeff_t poly_coeff_mul(poly_coeff_t a, poly_coeff_t b);
 poly_coeff_t poly_coeff_mul_add(poly_coeff_t a, poly_coeff_t b, poly_coeff_t c);
-poly_coeff_t poly_coeff_inv(poly_coeff_t a);
-void poly_coeff_exp_table(poly_coeff_t u, size_t n, poly_coeff_t *t);
-void poly_gen_param();
-void poly_round_small(poly_t f, poly_t h);
-bool poly_is_one(poly_t h);
-bool poly_is_eq(poly_t f, poly_t g);
 void poly_mul(poly_t f, poly_t g, poly_t h);
 poly_coeff_t poly_eval(poly_t f, poly_coeff_t x);
 void poly_ntt2(poly_t f, poly_t t);
 void poly_intt2(poly_t t, poly_t f);
 size_t poly_coeff_order(poly_coeff_t u, poly_coeff_t *ui);
-trint9_t poly_norm(poly_t f);
 
 #ifdef __cplusplus
 }
