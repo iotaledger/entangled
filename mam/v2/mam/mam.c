@@ -56,7 +56,7 @@ retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
   if (!m->w) {
     return RC_OOM;
   }
-  if (e = (wots_create(m->w)) != RC_OK) {
+  if ((e = (wots_create(m->w))) != RC_OK) {
     return e;
   }
 
@@ -735,7 +735,7 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg) {
       mam_ntru_pk_t_set_entry_t *curr_entry_ntru = NULL;
       mam_ntru_pk_t_set_entry_t *tmp_entry_ntru = NULL;
 
-      HASH_ITER(hh, cfg->ntru_public_keys, curr_entry_psk, tmp_entry_psk) {
+      HASH_ITER(hh, cfg->ntru_public_keys, curr_entry_ntru, tmp_entry_ntru) {
         /*  absorb oneof keyload */
         keyload = (tryte_t)mam_msg_keyload_ntru;
         pb3_wrap_absorb_tryte(spongos, msg, keyload);
@@ -743,7 +743,7 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg) {
         spongos_fork(spongos, fork);
         /*  KeyloadNTRU ntru = 2; */
         mam_wrap_keyload_ntru(fork, msg, mam_send_msg_cfg_session_key(cfg),
-                              mam_ntru_pk_trits(&curr_entry_psk->value),
+                              mam_ntru_pk_trits(&curr_entry_ntru->value),
                               cfg->rng, cfg->spongos_ntru,
                               mam_send_msg_cfg_nonce(cfg));
       }
