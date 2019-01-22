@@ -136,8 +136,9 @@ static inline poly_coeff_t poly_coeff_mul(poly_coeff_t const a,
 }
 
 // a * b + c (mods q)
-poly_coeff_t poly_coeff_mul_add(poly_coeff_t const a, poly_coeff_t const b,
-                                poly_coeff_t const c) {
+static inline poly_coeff_t poly_coeff_mul_add(poly_coeff_t const a,
+                                              poly_coeff_t const b,
+                                              poly_coeff_t const c) {
 #if defined(MAM2_POLY_MRED_BINARY)
   return poly_coeff_add(poly_coeff_mul(a, b), c);
 #else
