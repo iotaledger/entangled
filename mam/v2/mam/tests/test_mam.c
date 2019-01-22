@@ -35,9 +35,9 @@
 // TODO - Test functions should take set of prng_t instead of raw ptrs
 
 static trits_t mam_test_generic_send_msg(
-    void *sponge_alloc_ctx, sponge_t *(create_sponge)(void *ctx),
-    void (*destroy_sponge)(void *ctx, sponge_t *), prng_t *prng_a,
-    prng_t *prng_b, mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
+    void *sponge_alloc_ctx, sponge_t *(create_sponge)(),
+    void (*destroy_sponge)(sponge_t *), prng_t *prng_a, prng_t *prng_b,
+    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
     mam_msg_checksum_t checksum, mam_channel_t *const cha,
     mam_endpoint_t *const epa, mam_channel_t *const ch1a,
     mam_endpoint_t *const ep1a, mam_send_msg_context_t *const cfg_msga) {
@@ -186,10 +186,9 @@ static trits_t mam_test_generic_send_first_packet(
 }
 
 static void mam_test_generic_receive_msg(
-    void *sponge_alloc_ctx, sponge_t *(create_sponge)(void *ctx),
-    void (*destroy_sponge)(void *ctx, sponge_t *), prng_t *prng,
-    mam_channel_t *const cha, trits_t *const msg,
-    mam_recv_msg_context_t *const cfg_msg_recv) {
+    void *sponge_alloc_ctx, sponge_t *(create_sponge)(),
+    void (*destroy_sponge)(sponge_t *), prng_t *prng, mam_channel_t *const cha,
+    trits_t *const msg, mam_recv_msg_context_t *const cfg_msg_recv) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   mam_ialloc_t ma[1];
@@ -299,11 +298,12 @@ static void mam_test_generic_receive_packet(
   }
 }
 
-static void mam_test_create_channels(
-    sponge_t *(create_sponge)(void *ctx),
-    void (*destroy_sponge)(void *ctx, sponge_t *), prng_t *prng,
-    mam_channel_t **const cha, mam_channel_t **const ch1,
-    mam_endpoint_t **const epa, mam_endpoint_t **ep1) {
+static void mam_test_create_channels(sponge_t *(create_sponge)(),
+                                     void (*destroy_sponge)(sponge_t *),
+                                     prng_t *prng, mam_channel_t **const cha,
+                                     mam_channel_t **const ch1,
+                                     mam_endpoint_t **const epa,
+                                     mam_endpoint_t **ep1) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   mam_ialloc_t ma[1];
   mss_mt_height_t d = TEST_MSS_DEPTH;
@@ -373,9 +373,9 @@ static void mam_test_create_channels(
 }
 
 static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
-                             sponge_t *(create_sponge)(void *ctx),
-                             void (*destroy_sponge)(void *ctx, sponge_t *),
-                             prng_t *prng_a, prng_t *prng_b) {
+                             sponge_t *(create_sponge)(),
+                             void (*destroy_sponge)(sponge_t *), prng_t *prng_a,
+                             prng_t *prng_b) {
   retcode_t e = RC_OK;
   mam_ialloc_t ma[1];
 
