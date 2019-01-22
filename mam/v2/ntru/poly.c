@@ -12,7 +12,7 @@
 #include "mam/v2/ntru/poly_param.h"
 
 /*
- * Private functions
+ * Public functions
  */
 
 #if defined(MAM2_POLY_MRED_BINARY)
@@ -33,10 +33,6 @@ poly_coeff_t poly_coeff_mredd(poly_dcoeff_t m) {
   return s;
 }
 #endif
-
-/*
- * Public functions
- */
 
 void poly_ntt(poly_t const f, poly_t t) {
   poly_t u;

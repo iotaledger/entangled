@@ -239,8 +239,9 @@ void poly_round_to_trits(poly_t const f, trits_t t);
 static inline void poly_small_from_trits(poly_t f, trits_t t) {
   MAM2_ASSERT(trits_size(t) == MAM2_POLY_N);
 
-  for (size_t i = 0; i < MAM2_POLY_N; ++i, t = trits_drop(t, 1))
+  for (size_t i = 0; i < MAM2_POLY_N; ++i, t = trits_drop(t, 1)) {
     f[i] = poly_coeff_from_trint1(trits_get1(t));
+  }
 }
 
 // fᵢ := tᵢ
