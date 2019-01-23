@@ -363,7 +363,7 @@ retcode_t iota_client_send_transfer(iota_client_service_t const* const serv,
  * @param {int} depth - Depth
  * @param {int} mwm - Min weight magnitude
  * @param {trit_array_p} reference - Optional reference hash
- * @param {bool} local_PoW- apply local PoW
+ * @param {bool} local_pow - apply local PoW
  * @param {hashes_t} out_transactions - Returns list of attached transactions
  *
  * @return {retcode_t}
@@ -375,7 +375,7 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
                                   hash8019_array_p const trytes,
                                   uint32_t const depth, uint32_t const mwm,
                                   flex_trit_t const* const reference,
-                                  bool const local_PoW,
+                                  bool const local_pow,
                                   transaction_array_t out_transactions);
 
 /**

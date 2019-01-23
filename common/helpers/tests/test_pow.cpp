@@ -84,15 +84,15 @@ TEST(PoWTest, testsFlexPoW) {
   auto nonce = iota_pow_flex(tx, FLEX_TRIT_SIZE_8019, 9);
 
   flex_trits_insert_from_pos(
-      tx, NUM_TRITS_SERIALIZED_TRANSACTION, nonce, NUM_TRITS_NONCE,
-      NUM_TRITS_SERIALIZED_TRANSACTION - NUM_TRITS_NONCE, 0, NUM_TRITS_NONCE);
+      tx, NUM_TRITS_SERIALIZED_TRANSACTION, nonce, NUM_TRITS_NONCE, 0,
+      NUM_TRITS_SERIALIZED_TRANSACTION - NUM_TRITS_NONCE, NUM_TRITS_NONCE);
   auto c_fhash = iota_flex_digest(tx, FLEX_TRIT_SIZE_8019);
 
-  tryte_t c_hash[81] = {0};
-  flex_trits_to_trytes(c_hash, NUM_TRITS_HASH, c_fhash, NUM_TRITS_HASH,
+  tryte_t c_hash[NUM_TRYTES_HASH] = {0};
+  flex_trits_to_trytes(c_hash, NUM_TRYTES_HASH, c_fhash, NUM_TRITS_HASH,
                        NUM_TRITS_HASH);
 
-  auto hash = std::string((const char *)c_hash, 81);
+  auto hash = std::string((const char *)c_hash, NUM_TRYTES_HASH);
 
   std::cerr << hash << std::endl;
 

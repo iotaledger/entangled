@@ -423,7 +423,7 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
                                   hash8019_array_p const trytes,
                                   uint32_t const depth, uint32_t const mwm,
                                   flex_trit_t const* const reference,
-                                  bool const local_PoW,
+                                  bool const local_pow,
                                   transaction_array_t out_transactions) {
   retcode_t ret_code = RC_OK;
   get_transactions_to_approve_req_t* tx_approve_req =
@@ -457,7 +457,7 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
   attach_req->mwm = mwm;
   attach_req->trytes = trytes;
   // attach to tangle
-  if (local_PoW) {
+  if (local_pow) {
     ret_code = iota_client_attach_to_tangle(NULL, attach_req, attach_res);
   } else {
     ret_code = iota_client_attach_to_tangle(serv, attach_req, attach_res);
