@@ -18,17 +18,17 @@
 #endif
 
 #if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss(D, sfx)                    \
-  typedef struct test_mss##sfx##_s {            \
-    mss_t m;                                    \
-    trit_t ap[MAM2_MSS_MT_AUTH_WORDS(D)];       \
-    uint32_t ap_check;                          \
-    trit_t hs[MAM2_MSS_MT_HASH_WORDS(D, 1)];    \
-    uint32_t hs_check;                          \
-    mss_mt_node_t ns[MAM2_MSS_MT_NODES(D) + 1]; \
-    uint32_t ns_check;                          \
-    mss_mt_stack_t ss[MAM2_MSS_MT_STACKS(D)];   \
-    uint32_t ss_check;                          \
+#define def_test_mss(D, sfx)                           \
+  typedef struct test_mss##sfx##_s {                   \
+    mss_t m;                                           \
+    trit_t auth_path[MAM2_MSS_MT_AUTH_WORDS(D)];       \
+    uint32_t ap_check;                                 \
+    trit_t nodes_hashes[MAM2_MSS_MT_HASH_WORDS(D, 1)]; \
+    uint32_t hs_check;                                 \
+    mss_mt_node_t nodes[MAM2_MSS_MT_NODES(D) + 1];     \
+    uint32_t ns_check;                                 \
+    mss_mt_stack_t stacks[MAM2_MSS_MT_STACKS(D)];      \
+    uint32_t ss_check;                                 \
   } test_mss##sfx##_t
 #else
 #define def_test_mss(D, sfx)         \
@@ -42,20 +42,20 @@
 #if defined(MAM2_MSS_TRAVERSAL)
 #define def_test_mss_init(D, sfx)                          \
   static mss_t *test_mss_init##sfx(test_mss##sfx##_t *m) { \
-    m->m.ap = m->ap;                                       \
+    m->m.auth_path = m->auth_path;                         \
     m->ap_check = 0xdeadbeef;                              \
-    m->m.hs = m->hs;                                       \
+    m->m.nodes_hashes = m->nodes_hashes;                   \
     m->hs_check = 0xdeadbeef;                              \
-    m->m.ns = m->ns;                                       \
+    m->m.nodes = m->nodes;                                 \
     m->ns_check = 0xdeadbeef;                              \
-    m->m.ss = m->ss;                                       \
+    m->m.stacks = m->stacks;                               \
     m->ss_check = 0xdeadbeef;                              \
     return &m->m;                                          \
   }
 #else
 #define def_test_mss_init(D, sfx)                                     \
   static mss_t *test_mss_init##sfx(test_mss##sfx##_t *m, wots_t *w) { \
-    m->m.d = D;                                                       \
+    m->m.height = D;                                                  \
     m->m.spongos_wots = w;                                            \
     m->m.mt = m->mt;                                                  \
     m->mt_check = 0xdeadbeef;                                         \
@@ -201,7 +201,7 @@ static bool mss_test(mss_t *m, prng_t *p, spongos_t *s, wots_t *w,
     trits_t sig_apath = trits_drop(sig, MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE);
 #endif
 
-    dbg_printf("========================\nD = %d\n", d);
+    dbg_printf("========================\nD = %height\n", d);
 
     mss_init(m, p, s->sponge, w, d, N, trits_null());
     mss_gen(m, pk);
@@ -211,7 +211,7 @@ static bool mss_test(mss_t *m, prng_t *p, spongos_t *s, wots_t *w,
     dbg_printf("\n");
 
     do {
-      dbg_printf("------------------------\nskn = %d\n", m->skn);
+      dbg_printf("------------------------\nskn = %height\n", m->skn);
       mss_sign(m, H, sig);
       r = r && mss_verify(s, &w->spongos, H, sig, pk);
 
@@ -249,9 +249,9 @@ static bool mss_test(mss_t *m, prng_t *p, spongos_t *s, wots_t *w,
     } while (mss_next(m));
 
 #if defined(MAM2_MSS_DEBUG)
-    dbg_printf("\nd = %d\n", m->d);
-    dbg_printf("  leafs = %d\n", m->gen_leaf_count);
-    dbg_printf("  nodes = %d\n", m->hash_node_count);
+    dbg_printf("\nd = %height\n", m->height);
+    dbg_printf("  leafs = %height\n", m->gen_leaf_count);
+    dbg_printf("  nodes = %height\n", m->hash_node_count);
 #endif
   }
 
