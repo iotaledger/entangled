@@ -13,8 +13,8 @@
 \brief Basic trinary array operations.
 */
 
-#include <memory.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "mam/v2/trits/trits.h"
 
@@ -25,8 +25,8 @@ tryte_t tryte_from_trits(trit_t t0, trit_t t1, trit_t t2) {
   return (tryte_t)t0 + (tryte_t)3 * (tryte_t)t1 + (tryte_t)9 * (tryte_t)t2;
 }
 
-bool_t tryte_from_char(tryte_t *t, char c) {
-  bool_t r = 1;
+bool tryte_from_char(tryte_t *t, char c) {
+  bool r = true;
 
   if ('N' <= c && c <= 'Z')
     *t = (tryte_t)(c - 'N') - 13;
@@ -50,7 +50,7 @@ char tryte_to_char(tryte_t t) {
 /*! \brief Minimum of two values. */
 static size_t min(size_t k, size_t n) { return k < n ? k : n; }
 
-bool_t trits_is_empty(trits_t x) { return (x.n == x.d); }
+bool trits_is_empty(trits_t x) { return (x.n == x.d); }
 
 size_t trits_size(trits_t x) { return (x.n - x.d); }
 
@@ -60,11 +60,11 @@ size_t trits_size_min(trits_t x, size_t s) {
   return n;
 }
 
-trits_t trits_from_rep(size_t n, word_t *w) {
+trits_t trits_from_rep(size_t n, trit_t *t) {
   trits_t x;
   x.n = n;
   x.d = 0;
-  x.p = w;
+  x.p = t;
   return x;
 }
 
@@ -110,75 +110,17 @@ trits_t trits_advance(trits_t *b, size_t n) {
 }
 
 trint1_t trits_get1(trits_t x) {
-#if defined(MAM2_TRINARY_WORD_REP_INT)
-#if (MAM2_TRITS_PER_WORD == 1)
   MAM2_ASSERT(!trits_is_empty(x));
   MAM2_ASSERT_TRINT1(x.p[x.d]);
 
   return x.p[x.d];
-#else
-#error not implemented
-#endif
-#elif defined(MAM2_TRINARY_WORD_REP_PACKED)
-  static trint1_t const ts[4] = {0, 1, -1, 0};
-
-  word_t *w;
-  size_t d;
-  MAM2_ASSERT(!trits_is_empty(x));
-
-  w = &x.p[x.d / MAM2_TRITS_PER_WORD];
-  d = 2 * (x.d % MAM2_TRITS_PER_WORD);
-  return ts[3 & (*w >> d)];
-#elif defined(MAM2_TRINARY_WORD_REP_INTERLEAVED)
-  static trint1_t const ts[2][2] = {{0, -1}, {1, 0}};
-
-  word_t *w;
-  size_t d;
-  MAM2_ASSERT(!trits_is_empty(x));
-
-  w = &x.p[x.d / MAM2_TRITS_PER_WORD];
-  d = x.d % MAM2_TRITS_PER_WORD;
-  return ts[1 & (w->lo >> d)][1 & (w->hi >> d)];
-#endif
 }
 
 void trits_put1(trits_t x, trint1_t t) {
-#if defined(MAM2_TRINARY_WORD_REP_INT)
-#if (MAM2_TRITS_PER_WORD == 1)
   MAM2_ASSERT(!trits_is_empty(x));
   MAM2_ASSERT_TRINT1(t);
 
   x.p[x.d] = t;
-#else
-#error not implemented
-#endif
-#elif defined(MAM2_TRINARY_WORD_REP_PACKED)
-  static word_t const ws[3] = {2, 0, 1};
-
-  word_t *w;
-  size_t d;
-  MAM2_ASSERT(!trits_is_empty(x));
-  MAM2_ASSERT_TRINT1(t);
-
-  w = &x.p[x.d / MAM2_TRITS_PER_WORD];
-  d = 2 * (x.d % MAM2_TRITS_PER_WORD);
-  *w = *w & ~((word_t)3 << d);
-  *w = *w | (ws[t + 1] << d);
-#elif defined(MAM2_TRINARY_WORD_REP_INTERLEAVED)
-  static word_t const ws[3] = {{0, 1}, {0, 0}, {1, 0}};
-
-  word_t *w;
-  size_t d;
-  MAM2_ASSERT(!trits_is_empty(x));
-  MAM2_ASSERT_TRINT1(t);
-
-  w = &x.p[x.d / MAM2_TRITS_PER_WORD];
-  d = x.d % MAM2_TRITS_PER_WORD;
-  w->lo = w->lo & ~((rep_t)1 << d);
-  w->lo = w->lo | (ws[t + 1].lo << d);
-  w->hi = w->hi & ~((rep_t)1 << d);
-  w->hi = w->hi | (ws[t + 1].hi << d);
-#endif
 }
 
 trint3_t trits_get3(trits_t x) {
@@ -283,7 +225,7 @@ char trits_get_char(trits_t x) {
   return tryte_to_char(i);
 }
 
-bool_t trits_put_char(trits_t x, char c) {
+bool trits_put_char(trits_t x, char c) {
   trit_t ts[3] = {0, 0, 0};
   tryte_t i = 0;
   size_t k;
@@ -313,7 +255,7 @@ byte trits_get_byte(trits_t x) {
   return (0 <= i) ? (byte)i : (byte)(243 + i);
 }
 
-bool_t trits_put_byte(trits_t x, byte b) {
+bool trits_put_byte(trits_t x, byte b) {
   trit_t ts[5] = {0, 0, 0, 0, 0};
   int i = (b <= 121) ? (int)b : ((int)b - 243);
   size_t k;
@@ -349,8 +291,8 @@ void trits_to_str(trits_t x, char *s) {
   for (; !trits_is_empty(x); x = trits_drop_min(x, 3)) *s++ = trits_get_char(x);
 }
 
-bool_t trits_from_str(trits_t x, char const *s) {
-  bool_t r = 1;
+bool trits_from_str(trits_t x, char const *s) {
+  bool r = true;
 
   for (; r && !trits_is_empty(x); x = trits_drop_min(x, 3))
     r = trits_put_char(x, *s++);
@@ -363,8 +305,8 @@ void trits_to_bytes(trits_t x, byte *bs) {
     *bs++ = trits_get_byte(x);
 }
 
-bool_t trits_from_bytes(trits_t x, byte const *bs) {
-  bool_t r = 1;
+bool trits_from_bytes(trits_t x, byte const *bs) {
+  bool r = true;
 
   for (; r && !trits_is_empty(x); x = trits_drop_min(x, 5))
     r = trits_put_byte(x, *bs++);
@@ -584,12 +526,12 @@ int trits_cmp_grlex(trits_t x, trits_t y) {
   return d;
 }
 
-bool_t trits_cmp_eq(trits_t x, trits_t y) {
+bool trits_cmp_eq(trits_t x, trits_t y) {
   return (0 == trits_cmp_grlex(x, y)) ? 1 : 0;
 }
 
-bool_t trits_cmp_eq_str(trits_t x, char const *y) {
-  bool_t r = 1;
+bool trits_cmp_eq_str(trits_t x, char const *y) {
+  bool r = true;
 
   for (; r && !trits_is_empty(x); x = trits_drop_min(x, 3))
     r = (trits_get_char(x) == *y++) && r;
@@ -597,17 +539,15 @@ bool_t trits_cmp_eq_str(trits_t x, char const *y) {
   return r;
 }
 
-bool_t trits_is_same(trits_t x, trits_t y) {
+bool trits_is_same(trits_t x, trits_t y) {
   return (x.p == y.p) && (x.d == y.d); /* && (x.n == y.n) */
 }
 
-bool_t trits_is_overlapped(trits_t x, trits_t y) {
-  word_t *x_first = x.p + (x.d / MAM2_TRITS_PER_WORD);
-  word_t *x_last =
-      x.p + (x.n / MAM2_TRITS_PER_WORD) + ((x.n % MAM2_TRITS_PER_WORD) ? 1 : 0);
-  word_t *y_first = y.p + (y.d / MAM2_TRITS_PER_WORD);
-  word_t *y_last =
-      y.p + (y.n / MAM2_TRITS_PER_WORD) + ((y.n % MAM2_TRITS_PER_WORD) ? 1 : 0);
+bool trits_is_overlapped(trits_t x, trits_t y) {
+  trit_t *x_first = x.p + x.d;
+  trit_t *x_last = x.p + x.n;
+  trit_t *y_first = y.p + y.d;
+  trit_t *y_last = y.p + y.n;
   return (x_first < y_last) && (y_first < x_last);
 }
 
@@ -622,9 +562,9 @@ trits_t trits_diff(trits_t begin, trits_t end) {
 
 trits_t trits_null() { return trits_from_rep(0, 0); }
 
-bool_t trits_is_null(trits_t x) { return (0 == x.p); }
+bool trits_is_null(trits_t x) { return (0 == x.p); }
 
-bool_t trits_inc(trits_t x) {
+bool trits_inc(trits_t x) {
   trit_t t;
   for (; !trits_is_empty(x); x = trits_drop(x, 1)) {
     t = trit_add(trits_get1(x), 1);
@@ -634,12 +574,12 @@ bool_t trits_inc(trits_t x) {
   return 0;
 }
 
-trits_t trits_alloc(ialloc *a, size_t n) {
-  word_t *p = malloc(MAM2_WORDS(n));
+trits_t trits_alloc(size_t n) {
+  trit_t *p = malloc(n);
   return trits_from_rep(n, p);
 }
 
-void trits_free(ialloc *a, trits_t x) {
+void trits_free(trits_t x) {
   if (x.p) {
     free(x.p);
   }
@@ -651,7 +591,7 @@ void trits_print(trits_t x) {
 }
 
 void trits_print2(char const *pfx, trits_t x, char const *sfx) {
-  if (pfx) printf("%s", pfx);
+  if (pfx) printf("%spongos", pfx);
   trits_print(x);
-  if (sfx) printf("%s", sfx);
+  if (sfx) printf("%spongos", sfx);
 }

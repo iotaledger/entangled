@@ -8,105 +8,85 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file prng.c
-\brief MAM2 PRNG layer.
-*/
-
-#include <memory.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "mam/v2/prng/prng.h"
 
-static void prng_absorbn(isponge *s, size_t n, trits_t *KdN) {
-  sponge_init(s);
-  sponge_absorbn(s, MAM2_SPONGE_CTL_KEY, n, KdN);
+/*
+ * Private functions
+ */
+
+static inline void prng_absorbn(sponge_t *const sponge, size_t const n,
+                                trits_t const *const KdN) {
+  sponge_init(sponge);
+  sponge_absorbn(sponge, MAM2_SPONGE_CTL_KEY, n, KdN);
 }
 
-static void prng_squeeze(isponge *s, trits_t Y) {
-  sponge_squeeze(s, MAM2_SPONGE_CTL_PRN, Y);
+static inline void prng_squeeze(sponge_t *const sponge, trits_t output) {
+  sponge_squeeze(sponge, MAM2_SPONGE_CTL_PRN, output);
 }
 
-static trits_t prng_key_trits(iprng *p) {
-  return trits_from_rep(MAM2_PRNG_KEY_SIZE, p->k);
+static inline trits_t prng_secret_key_trits(prng_t const *const prng) {
+  return trits_from_rep(MAM2_PRNG_KEY_SIZE, prng->secret_key);
 }
 
-void prng_init(iprng *p, isponge *s, trits_t K) {
-  MAM2_ASSERT(trits_size(K) == MAM2_PRNG_KEY_SIZE);
+/*
+ * Public functions
+ */
 
-  p->s = s;
-  trits_copy(K, prng_key_trits(p));
+retcode_t prng_create(prng_t *const prng) {
+  retcode_t ret = RC_OK;
+  MAM2_ASSERT(prng);
+
+  prng->sponge = NULL;
+  if ((prng->secret_key = calloc(MAM2_PRNG_KEY_SIZE, sizeof(trit_t))) == NULL) {
+    return RC_OOM;
+  }
+
+  return ret;
 }
 
-void prng_gen(iprng *p, trint3_t d, trits_t N, trits_t Y) {
-  MAM2_TRITS_DEF0(dt, 3);
-  trits_t KdN[3];
-  dt = MAM2_TRITS_INIT(dt, 3);
+void prng_destroy(prng_t *const prng) {
+  MAM2_ASSERT(prng);
 
-  KdN[0] = prng_key_trits(p);
-  KdN[1] = dt;
-  KdN[2] = N;
-  trits_put3(dt, d);
-  prng_absorbn(p->s, 3, KdN);
-  prng_squeeze(p->s, Y);
+  prng->sponge = NULL;
+  free(prng->secret_key);
+  prng->secret_key = NULL;
 }
 
-void prng_gen2(iprng *p, trint3_t d, trits_t N1, trits_t N2, trits_t Y) {
-  MAM2_TRITS_DEF0(dt, 3);
-  trits_t KdN[4];
-  dt = MAM2_TRITS_INIT(dt, 3);
+void prng_init(prng_t *const prng, sponge_t *const sponge,
+               trits_t const secret_key) {
+  MAM2_ASSERT(trits_size(secret_key) == MAM2_PRNG_KEY_SIZE);
 
-  KdN[0] = prng_key_trits(p);
-  KdN[1] = dt;
-  KdN[2] = N1;
-  KdN[3] = N2;
-  trits_put3(dt, d);
-  prng_absorbn(p->s, 4, KdN);
-  prng_squeeze(p->s, Y);
+  prng->sponge = sponge;
+  trits_copy(secret_key, prng_secret_key_trits(prng));
 }
 
-void prng_gen3(iprng *p, trint3_t d, trits_t N1, trits_t N2, trits_t N3,
-               trits_t Y) {
-  MAM2_TRITS_DEF0(dt, 3);
+void prng_gen(prng_t const *const prng, tryte_t const destination,
+              trits_t const nonce, trits_t output) {
+  prng_gen3(prng, destination, nonce, trits_null(), trits_null(), output);
+}
+
+void prng_gen2(prng_t const *const prng, tryte_t const destination,
+               trits_t const nonce1, trits_t const nonce2, trits_t output) {
+  prng_gen3(prng, destination, nonce1, nonce2, trits_null(), output);
+}
+
+void prng_gen3(prng_t const *const prng, tryte_t const destination,
+               trits_t const nonce1, trits_t const nonce2, trits_t const nonce3,
+               trits_t output) {
   trits_t KdN[5];
+  MAM2_TRITS_DEF0(dt, 3);
   dt = MAM2_TRITS_INIT(dt, 3);
 
-  KdN[0] = prng_key_trits(p);
+  KdN[0] = prng_secret_key_trits(prng);
   KdN[1] = dt;
-  KdN[2] = N1;
-  KdN[3] = N2;
-  KdN[4] = N3;
-  trits_put3(dt, d);
-  prng_absorbn(p->s, 5, KdN);
-  prng_squeeze(p->s, Y);
-}
+  KdN[2] = nonce1;
+  KdN[3] = nonce2;
+  KdN[4] = nonce3;
+  trits_put3(dt, destination);
 
-void prng_gen_str(iprng *p, trint3_t d, char const *nonce, trits_t Y) {
-  size_t n;
-  MAM2_TRITS_DEF0(N, MAM2_SPONGE_RATE);
-  N = MAM2_TRITS_INIT(N, MAM2_SPONGE_RATE);
-
-  n = strlen(nonce) * 3;
-  N = trits_take_min(N, n);
-  trits_from_str(N, nonce);
-
-  prng_gen(p, d, N, Y);
-}
-
-err_t prng_create(ialloc *a, iprng *p) {
-  err_t e = err_internal_error;
-  MAM2_ASSERT(p);
-  do {
-    memset(p, 0, sizeof(iprng));
-    p->k = mam_words_alloc(a, MAM2_WORDS(MAM2_PRNG_KEY_SIZE));
-    err_guard(p->k, err_bad_alloc);
-    e = err_ok;
-  } while (0);
-  return e;
-}
-
-void prng_destroy(ialloc *a, iprng *p) {
-  MAM2_ASSERT(p);
-  mam_words_free(a, p->k);
-  p->k = 0;
+  prng_absorbn(prng->sponge, 5, KdN);
+  prng_squeeze(prng->sponge, output);
 }

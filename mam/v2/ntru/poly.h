@@ -12,10 +12,15 @@
 \file poly.h
 \brief MAM2 NTRU polynomials arithmetic.
 */
-#pragma once
+#ifndef __MAM_V2_NTRU_POLY_H__
+#define __MAM_V2_NTRU_POLY_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*! \brief Use Montgomery reduction. */
 /*#define MAM2_POLY_MRED_BINARY*/
@@ -100,7 +105,7 @@ void poly_sub(poly_t f, poly_t g, poly_t h);
 void poly_conv(poly_t tf, poly_t tg, poly_t th);
 
 /*! \brief ∃? h(x) : 1 ≡ f(x) * h(x) mods (m(x), q), t = NTT(f) */
-bool_t poly_has_inv(poly_t t);
+bool poly_has_inv(poly_t t);
 
 /*! \brief h(x) := f⁻¹(x) mods (m(x), q), tf = NTT(f), th = NTT(h) */
 void poly_inv(poly_t tf, poly_t th);
@@ -118,9 +123,36 @@ void poly_round_to_trits(poly_t f, trits_t t);
 void poly_small_from_trits(poly_t f, trits_t t);
 
 /*! \brief fᵢ := tᵢ */
-bool_t poly_from_trits(poly_t f, trits_t t);
+bool poly_from_trits(poly_t f, trits_t t);
 
 /*! \brief tᵢ := fᵢ ??? */
 void poly_to_trits(poly_t f, trits_t t);
 
 void poly_print(char const *s, poly_t f);
+
+poly_coeff_t poly_coeff_mredd(poly_dcoeff_t m);
+poly_coeff_t poly_coeff_from_trint9(trint9_t t);
+trint9_t poly_coeff_to_trint9(poly_coeff_t c);
+poly_coeff_t poly_coeff_from_trint1(trint1_t t);
+poly_coeff_t poly_coeff_add(poly_coeff_t a, poly_coeff_t b);
+poly_coeff_t poly_coeff_sub(poly_coeff_t a, poly_coeff_t b);
+poly_coeff_t poly_coeff_mul(poly_coeff_t a, poly_coeff_t b);
+poly_coeff_t poly_coeff_mul_add(poly_coeff_t a, poly_coeff_t b, poly_coeff_t c);
+poly_coeff_t poly_coeff_inv(poly_coeff_t a);
+void poly_coeff_exp_table(poly_coeff_t u, size_t n, poly_coeff_t *t);
+void poly_gen_param();
+void poly_round_small(poly_t f, poly_t h);
+bool poly_is_one(poly_t h);
+bool poly_is_eq(poly_t f, poly_t g);
+void poly_mul(poly_t f, poly_t g, poly_t h);
+poly_coeff_t poly_eval(poly_t f, poly_coeff_t x);
+void poly_ntt2(poly_t f, poly_t t);
+void poly_intt2(poly_t t, poly_t f);
+size_t poly_coeff_order(poly_coeff_t u, poly_coeff_t *ui);
+trint9_t poly_norm(poly_t f);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  // __MAM_V2_NTRU_POLY_H__

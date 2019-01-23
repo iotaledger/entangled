@@ -12,10 +12,15 @@
 \file sponge.h
 \brief MAM2 Sponge layer.
 */
-#pragma once
+#ifndef __MAM_V2_SPONGE_SPONGE_H__
+#define __MAM_V2_SPONGE_SPONGE_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*! \brief Sponge state rate. */
 #define MAM2_SPONGE_RATE 486
@@ -35,7 +40,7 @@
 #define MAM2_SPONGE_MAC_SIZE 243
 
 /*! \brief Sponge state. */
-typedef word_t sponge_state_t[MAM2_WORDS(MAM2_SPONGE_WIDTH)];
+typedef trit_t sponge_state_t[MAM2_SPONGE_WIDTH];
 
 /*! \brief c2 control trit DATA */
 #define MAM2_SPONGE_CTL_DATA 0
@@ -51,68 +56,74 @@ typedef word_t sponge_state_t[MAM2_WORDS(MAM2_SPONGE_WIDTH)];
 #define MAM2_SPONGE_CTL_MAC -1
 
 /*! \brief Sponge interface. */
-typedef struct _isponge {
-  void (*f)(void *, word_t *); /*!< sponge transformation */
+typedef struct sponge_s {
+  void (*f)(void *, trit_t *); /*!< sponge transformation */
   void *stack;                 /*!< additional memory used by `f` */
-  word_t *s;                   /*!< sponge state */
-} isponge;
+  trit_t *s;                   /*!< sponge state */
+} sponge_t;
 
-void sponge_transform(isponge *s);
+void sponge_transform(sponge_t *s);
 
 /*! \brief Fork (copy) sponge state. `fork` must be initialized. */
-void sponge_fork(isponge *s, isponge *fork);
+void sponge_fork(sponge_t *s, sponge_t *fork);
 
 /*! \brief Get part (the first `rate` trits) of the sponge outer state.
 \note It is usually used with `sponge_absorb1`.
 */
-trits_t sponge_outer_trits(isponge *s);
+trits_t sponge_outer_trits(sponge_t *s);
 
 /*! \brief Sponge state initialization. */
-void sponge_init(isponge *s /*!< [in] sponge interface */
+void sponge_init(sponge_t *s /*!< [in] sponge interface */
 );
 
 /*! \brief Sponge absorption. */
-void sponge_absorb(isponge *s, /*!< [in] sponge interface */
+void sponge_absorb(sponge_t *s, /*!< [in] sponge interface */
                    trit_t c2, /*!< [in] control trit encoding input data type */
                    trits_t X  /*!< [in] input data */
 );
 
 /*! \brief Absorb concatenation of `Xs[0]`..`Xs[n-1]` */
 void sponge_absorbn(
-    isponge *s, /*!< [in] sponge interface */
-    trit_t c2,  /*!< [in] control trit encoding input data type */
-    size_t n,   /*!< [in] input data blocks count */
-    trits_t *Xs /*!< [in] input data blocks */
+    sponge_t *s,            /*!< [in] sponge interface */
+    trit_t c2,              /*!< [in] control trit encoding input data type */
+    size_t n,               /*!< [in] input data blocks count */
+    trits_t const *const Xs /*!< [in] input data blocks */
 );
 
 /*! \brief Sponge squeezing. */
 void sponge_squeeze(
-    isponge *s, /*!< [in] sponge interface */
-    trit_t c2,  /*!< [in] control trit encoding output data type */
-    trits_t Y   /*!< [out] output data */
+    sponge_t *s, /*!< [in] sponge interface */
+    trit_t c2,   /*!< [in] control trit encoding output data type */
+    trits_t Y    /*!< [out] output data */
 );
 
 /*! \brief Sponge AE encryption. */
-void sponge_encr(isponge *s, /*!< [in] sponge interface */
-                 trits_t X,  /*!< [in] plaintext */
-                 trits_t Y   /*!< [out] ciphertext */
+void sponge_encr(sponge_t *s, /*!< [in] sponge interface */
+                 trits_t X,   /*!< [in] plaintext */
+                 trits_t Y    /*!< [out] ciphertext */
 );
 
 /*! \brief Sponge AE decryption. */
-void sponge_decr(isponge *s, /*!< [in] sponge interface */
-                 trits_t X,  /*!< [in] ciphertext */
-                 trits_t Y   /*!< [out] plaintext */
+void sponge_decr(sponge_t *s, /*!< [in] sponge interface */
+                 trits_t X,   /*!< [in] ciphertext */
+                 trits_t Y    /*!< [out] plaintext */
 );
 
 /*! \brief Sponge hashing. */
-void sponge_hash(isponge *s, /*!< [in] sponge interface */
-                 trits_t X,  /*!< [in] input data */
-                 trits_t Y   /*!< [out] hash value */
+void sponge_hash(sponge_t *s, /*!< [in] sponge interface */
+                 trits_t X,   /*!< [in] input data */
+                 trits_t Y    /*!< [out] hash value */
 );
 
 /*! \brief Sponge hashing. */
-void sponge_hashn(isponge *s,  /*!< [in] sponge interface */
+void sponge_hashn(sponge_t *s, /*!< [in] sponge interface */
                   size_t n,    /*!< [in] input data blocks count */
                   trits_t *Xs, /*!< [in] input data blocks */
                   trits_t Y    /*!< [out] hash value */
 );
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  // __MAM_V2_SPONGE_SPONGE_H__

@@ -8,39 +8,100 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <string.h>
+
 #include <unity/unity.h>
 
 #include "mam/v2/trits/trits.h"
 
-static bool_t trits_test_trit() {
-  bool_t r = 1;
-  MAM2_TRITS_DEF0(x, MAM2_TRITS_PER_WORD);
+static void trits_put_get_test(void) {
   trit_t t0, t;
   size_t i;
-  x = MAM2_TRITS_INIT(x, MAM2_TRITS_PER_WORD);
 
+  MAM2_TRITS_DEF0(x, 1);
+
+  x = MAM2_TRITS_INIT(x, 1);
   trits_set_zero(x);
-  for (i = 0; i < MAM2_TRITS_PER_WORD; ++i) {
+
+  for (i = 0; i < 1; ++i) {
     trits_put1(x, t0 = -1);
     t = trits_get1(x);
-    r = r && (t == t0);
+    TEST_ASSERT_TRUE(t == t0);
 
     trits_put1(x, t0 = 0);
     t = trits_get1(x);
-    r = r && (t == t0);
+    TEST_ASSERT_TRUE(t == t0);
 
     trits_put1(x, t0 = 1);
     t = trits_get1(x);
-    r = r && (t == t0);
+    TEST_ASSERT_TRUE(t == t0);
 
     x = trits_drop(x, 1);
   }
-
-  return r;
 }
 
-static bool_t trits_test_trytes(trits_t x, char *s, char *t) {
-  bool_t r = 1;
+static void trits_add_sub_test(void) {
+  trit_t x, x1, x2, s1, s2, y1, y2;
+  size_t ix, is;
+  trit_t const ts[3] = {-1, 0, 1};
+
+  for (ix = 0; ix < 3; ++ix)
+    for (is = 0; is < 3; ++is) {
+      x = ts[ix];
+
+      s1 = ts[is];
+      y1 = trit_add(x, s1);
+      s1 = x;
+
+      y2 = x;
+      s2 = ts[is];
+      trit_swap_add(&y2, &s2);
+
+      TEST_ASSERT_TRUE(s1 == s2);
+      TEST_ASSERT_TRUE(y1 == y2);
+
+      s1 = ts[is];
+      x1 = trit_sub(y1, s1);
+      s1 = x1;
+
+      x2 = y2;
+      s2 = ts[is];
+      trit_swap_sub(&x2, &s2);
+
+      TEST_ASSERT_TRUE(s1 == s2);
+      TEST_ASSERT_TRUE(x == x1);
+      TEST_ASSERT_TRUE(x == x2);
+    }
+}
+
+static void trits_bytes_test(void) {
+  trits_t x, y;
+  byte b[3];
+  size_t n, k;
+
+  MAM2_TRITS_DEF0(x0, 5 * 3);
+  MAM2_TRITS_DEF0(y0, 5 * 3);
+
+  x0 = MAM2_TRITS_INIT(x0, 5 * 3);
+  y0 = MAM2_TRITS_INIT(y0, 5 * 3);
+
+  for (n = 0; n < 11; ++n) {
+    x = trits_take(x0, n);
+    y = trits_take(y0, n);
+    trits_set_zero(x);
+    k = 0;
+    do {
+      trits_to_bytes(x, b);
+      trits_set_zero(y);
+      TEST_ASSERT_TRUE(trits_from_bytes(y, b));
+      TEST_ASSERT_TRUE(trits_cmp_eq(x, y));
+      k++;
+    } while (trits_inc(x));
+  }
+}
+
+static bool trits_trytes(trits_t x, char *s, char *t) {
+  bool r = true;
   size_t n = trits_size(x) / 3;
   trits_t y;
   trint1_t s1;
@@ -91,92 +152,27 @@ static bool_t trits_test_trytes(trits_t x, char *s, char *t) {
   return r;
 }
 
-static bool_t trits_test_add_sub() {
-  bool_t r = 1;
-  trit_t x, x1, x2, s1, s2, y1, y2;
-  size_t ix, is;
-  trit_t const ts[3] = {-1, 0, 1};
-
-  for (ix = 0; ix < 3; ++ix)
-    for (is = 0; is < 3; ++is) {
-      x = ts[ix];
-
-      s1 = ts[is];
-      y1 = trit_add(x, s1);
-      s1 = x;
-
-      y2 = x;
-      s2 = ts[is];
-      trit_swap_add(&y2, &s2);
-
-      r = r && (s1 == s2) && (y1 == y2);
-
-      s1 = ts[is];
-      x1 = trit_sub(y1, s1);
-      s1 = x1;
-
-      x2 = y2;
-      s2 = ts[is];
-      trit_swap_sub(&x2, &s2);
-
-      r = r && (s1 == s2) && (x == x1) && (x == x2);
-    }
-
-  return r;
-}
-
-static bool_t trits_test_bytes() {
-  bool_t r = 1;
-  MAM2_TRITS_DEF0(x0, 5 * 3);
-  MAM2_TRITS_DEF0(y0, 5 * 3);
-  trits_t x, y;
-  byte b[3];
-  size_t n, k;
-  x0 = MAM2_TRITS_INIT(x0, 5 * 3);
-  y0 = MAM2_TRITS_INIT(y0, 5 * 3);
-
-  for (n = 0; r && n < 11; ++n) {
-    x = trits_take(x0, n);
-    y = trits_take(y0, n);
-    trits_set_zero(x);
-    k = 0;
-    do {
-      trits_to_bytes(x, b);
-      trits_set_zero(y);
-      r = r && trits_from_bytes(y, b);
-      r = r && trits_cmp_eq(x, y);
-      k++;
-    } while (r && trits_inc(x));
-  }
-
-  return r;
-}
-
-bool_t trits_test() {
-  bool_t r = 1;
+static void trits_test(void) {
   char s[6 * 4 + 1] = "KLMNOPQABCDWXYZ9ZA9NZA9N";
   char t[6 * 4];
-  size_t n;
   trits_t x;
+
   MAM2_TRITS_DEF0(y, 3 * 6 * 4);
   y = MAM2_TRITS_INIT(y, 3 * 6 * 4);
 
-  r = r && trits_test_trit();
-
-  for (n = 0; n <= 6 * 4; ++n) {
+  for (size_t n = 0; n <= 6 * 4; ++n) {
     x = trits_take(y, 3 * n);
-    r = r && trits_test_trytes(x, s, t);
+    TEST_ASSERT_TRUE(trits_trytes(x, s, t));
   }
-
-  r = r && trits_test_add_sub();
-
-  r = r && trits_test_bytes();
-
-  return r;
 }
 
 int main(void) {
   UNITY_BEGIN();
+
+  RUN_TEST(trits_put_get_test);
+  RUN_TEST(trits_add_sub_test);
+  RUN_TEST(trits_bytes_test);
+  RUN_TEST(trits_test);
 
   return UNITY_END();
 }

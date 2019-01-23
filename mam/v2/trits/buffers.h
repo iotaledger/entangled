@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -9,37 +8,76 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file buffers.h
-\brief Trits collection to simplify buffered operations.
-*/
-#pragma once
+#ifndef __MAM_V2_TRITS_BUFFERS_H__
+#define __MAM_V2_TRITS_BUFFERS_H__
 
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
 
-typedef struct {
-  trits_t X;   /*!< the head */
-  size_t n;    /*!< buffers count in the tail */
-  trits_t *Xs; /*!< the tail buffers */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct buffers_s {
+  trits_t head;
+  trits_t *tail;
+  size_t count;
 } buffers_t;
 
-/*! \brief Init buffers with empty head. */
-buffers_t buffers_init(size_t n, trits_t *Xs);
+/**
+ * Init buffers with empty head
+ *
+ * @param count The number of trit arrays
+ * @param trits The trit arrays
+ *
+ * @return the buffers
+ */
+buffers_t buffers_init(size_t const count, trits_t const *const trits);
 
-/*! \brief Check whether head is empty and there is no tail.
-\note However if the tail buffers consist of empty buffers only
-it will _not_ be considered empty!
-*/
-bool_t buffers_is_empty(buffers_t tb);
+/**
+ * Check whether head is empty and there is no tail
+ * However if the tail buffers consist of empty buffers only it will _not_
+ * be considered empty!
+ *
+ * @param buffers The buffers
+ *
+ * @return true if empty, false otherwise
+ */
+static inline bool buffers_is_empty(buffers_t const buffers) {
+  return trits_is_empty(buffers.head) && (buffers.count == 0);
+}
 
-/*! \brief Sum of head and tail buffers sizes. */
-size_t buffers_size(buffers_t tb);
+/**
+ * Sum of head and tail buffers sizes
+ *
+ * @param buffers The buffers
+ *
+ * @return the size of the buffers
+ */
+size_t buffers_size(buffers_t buffers);
 
-/*! \brief Copy buffers `*tb` to a destination `buf`; return the number of trits
- * copied. */
-size_t buffers_copy_to(buffers_t *tb, trits_t buf);
+/**
+ * Copy buffers `*buffers` to a destination `trits`
+ *
+ * @param buffers The buffers
+ * @param trits The trits
+ *
+ * @return the number of trits copied
+ */
+size_t buffers_copy_to(buffers_t *const buffers, trits_t trits);
 
-/*! \brief Copy buffers `*tb` from a source `buf`; return the number of trits
- * copied. */
-size_t buffers_copy_from(buffers_t *tb, trits_t buf);
+/**
+ * Copy buffers `*buffers` from a source `trits`
+ *
+ * @param
+ * @param
+ *
+ * @return return the number of trits copied
+ */
+size_t buffers_copy_from(buffers_t *const buffers, trits_t trits);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif  // __MAM_V2_TRITS_BUFFERS_H__

@@ -5,7 +5,7 @@ cc_library(
     srcs = ["mss.c"],
     hdrs = ["mss.h"],
     deps = [
-        "//mam/v2:alloc",
+        "//common:errors",
         "//mam/v2/wots",
     ],
 )

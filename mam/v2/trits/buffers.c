@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 IOTA Stiftung
  * https://github.com/iotaledger/entangled
@@ -9,70 +8,64 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file buffers.c
-\brief Trits collection to simplify buffered operations.
-*/
 #include "mam/v2/trits/buffers.h"
 
-buffers_t buffers_init(size_t n, trits_t *Xs) {
-  buffers_t bs;
-  bs.X = trits_null();
-  bs.n = n;
-  bs.Xs = Xs;
-  return bs;
+buffers_t buffers_init(size_t const count, trits_t const *const trits) {
+  buffers_t buffers;
+
+  buffers.head = trits_null();
+  buffers.count = count;
+  buffers.tail = (trits_t *const)trits;
+
+  return buffers;
 }
 
-bool_t buffers_is_empty(buffers_t bs) {
-  return trits_is_empty(bs.X) && (0 == bs.n);
-}
-
-size_t buffers_size(buffers_t bs) {
+size_t buffers_size(buffers_t buffers) {
   size_t m = 0;
 
-  for (; !buffers_is_empty(bs);) {
-    m += trits_size(bs.X);
-    bs.X = trits_null();
+  for (; !buffers_is_empty(buffers);) {
+    m += trits_size(buffers.head);
+    buffers.head = trits_null();
 
-    if (0 < bs.n) {
-      bs.X = *bs.Xs++;
-      bs.n--;
+    if (0 < buffers.count) {
+      buffers.head = *buffers.tail++;
+      buffers.count--;
     }
   }
 
   return m;
 }
 
-size_t buffers_copy_to(buffers_t *bs, trits_t buf) {
+size_t buffers_copy_to(buffers_t *const buffers, trits_t trits) {
   size_t k, m = 0;
 
-  for (; !trits_is_empty(buf) && !buffers_is_empty(*bs);) {
-    k = trits_copy_min(bs->X, buf);
-    bs->X = trits_drop(bs->X, k);
-    buf = trits_drop(buf, k);
+  for (; !trits_is_empty(trits) && !buffers_is_empty(*buffers);) {
+    k = trits_copy_min(buffers->head, trits);
+    buffers->head = trits_drop(buffers->head, k);
+    trits = trits_drop(trits, k);
     m += k;
 
-    if (trits_is_empty(bs->X) && (0 < bs->n)) {
-      bs->X = *bs->Xs++;
-      bs->n--;
+    if (trits_is_empty(buffers->head) && (0 < buffers->count)) {
+      buffers->head = *buffers->tail++;
+      buffers->count--;
     }
   }
 
   return m;
 }
 
-size_t buffers_copy_from(buffers_t *bs, trits_t buf) {
+size_t buffers_copy_from(buffers_t *const buffers, trits_t trits) {
   size_t k, m = 0;
 
-  for (; !trits_is_empty(buf) && !buffers_is_empty(*bs);) {
-    k = trits_copy_min(buf, bs->X);
-    bs->X = trits_drop(bs->X, k);
-    buf = trits_drop(buf, k);
+  for (; !trits_is_empty(trits) && !buffers_is_empty(*buffers);) {
+    k = trits_copy_min(trits, buffers->head);
+    buffers->head = trits_drop(buffers->head, k);
+    trits = trits_drop(trits, k);
     m += k;
 
-    if (trits_is_empty(bs->X) && (0 < bs->n)) {
-      bs->X = *bs->Xs++;
-      bs->n--;
+    if (trits_is_empty(buffers->head) && (0 < buffers->count)) {
+      buffers->head = *buffers->tail++;
+      buffers->count--;
     }
   }
 

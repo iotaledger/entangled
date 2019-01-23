@@ -17,18 +17,6 @@
 extern "C" {
 #endif
 
-typedef enum bundle_status_e {
-  BUNDLE_VALID,
-  BUNDLE_NOT_INITIALIZED,
-  BUNDLE_TAIL_NOT_FOUND,
-  BUNDLE_INCOMPLETE,
-  BUNDLE_INVALID_TX,
-  BUNDLE_INVALID_INPUT_ADDRESS,
-  BUNDLE_INVALID_VALUE,
-  BUNDLE_INVALID_HASH,
-  BUNDLE_INVALID_SIGNATURE
-} bundle_status_t;
-
 retcode_t iota_consensus_bundle_validator_init();
 retcode_t iota_consensus_bundle_validator_destroy();
 retcode_t iota_consensus_bundle_validator_validate(

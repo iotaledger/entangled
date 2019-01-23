@@ -15,33 +15,33 @@
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/sponge/sponge.h"
 
-static trits_t spongos_outer_trits(ispongos *s) {
-  return trits_drop(sponge_outer_trits(s->s), s->pos);
+static trits_t spongos_outer_trits(spongos_t *s) {
+  return trits_drop(sponge_outer_trits(s->sponge), s->pos);
 }
 
-static void spongos_update(ispongos *s, size_t n) {
+static void spongos_update(spongos_t *s, size_t n) {
   s->pos += n;
   if (s->pos == MAM2_SPONGE_RATE) spongos_commit(s);
 }
 
-void spongos_fork(ispongos *s, ispongos *fork) {
-  sponge_fork(s->s, fork->s);
+void spongos_fork(spongos_t *s, spongos_t *fork) {
+  sponge_fork(s->sponge, fork->sponge);
   fork->pos = s->pos;
 }
 
-void spongos_init(ispongos *s) {
-  sponge_init(s->s);
+void spongos_init(spongos_t *s) {
+  sponge_init(s->sponge);
   s->pos = 0;
 }
 
-void spongos_commit(ispongos *s) {
+void spongos_commit(spongos_t *s) {
   if (0 != s->pos) {
-    sponge_transform(s->s);
+    sponge_transform(s->sponge);
     s->pos = 0;
   }
 }
 
-void spongos_absorb(ispongos *s, trits_t X) {
+void spongos_absorb(spongos_t *s, trits_t X) {
   size_t n;
   for (n = 0; !trits_is_empty(X); X = trits_drop(X, n)) {
     n = trits_copy_min(X, spongos_outer_trits(s));
@@ -49,11 +49,11 @@ void spongos_absorb(ispongos *s, trits_t X) {
   }
 }
 
-void spongos_absorbn(ispongos *s, size_t n, trits_t *Xs) {
+void spongos_absorbn(spongos_t *s, size_t n, trits_t *Xs) {
   for (; n--;) spongos_absorb(s, *Xs++);
 }
 
-void spongos_squeeze(ispongos *s, trits_t Y) {
+void spongos_squeeze(spongos_t *s, trits_t Y) {
   size_t n;
   for (n = 0; !trits_is_empty(Y); Y = trits_drop(Y, n)) {
     n = trits_copy_min(spongos_outer_trits(s), Y);
@@ -62,8 +62,8 @@ void spongos_squeeze(ispongos *s, trits_t Y) {
   }
 }
 
-bool_t spongos_squeeze_eq(ispongos *s, trits_t Y) {
-  bool_t r = 1;
+bool spongos_squeeze_eq(spongos_t *s, trits_t Y) {
+  bool r = true;
   size_t n;
   trits_t y;
   for (n = 0; !trits_is_empty(Y); Y = trits_drop(Y, n)) {
@@ -76,7 +76,7 @@ bool_t spongos_squeeze_eq(ispongos *s, trits_t Y) {
   return r;
 }
 
-void spongos_encr(ispongos *s, trits_t X, trits_t Y) {
+void spongos_encr(spongos_t *s, trits_t X, trits_t Y) {
   size_t n;
   for (n = 0; !trits_is_empty(Y); Y = trits_drop(Y, n), X = trits_drop(X, n)) {
     if (trits_is_same(X, Y))
@@ -87,7 +87,7 @@ void spongos_encr(ispongos *s, trits_t X, trits_t Y) {
   }
 }
 
-void spongos_decr(ispongos *s, trits_t X, trits_t Y) {
+void spongos_decr(spongos_t *s, trits_t X, trits_t Y) {
   size_t n;
   for (n = 0; !trits_is_empty(Y); Y = trits_drop(Y, n), X = trits_drop(X, n)) {
     if (trits_is_same(X, Y))
@@ -98,14 +98,14 @@ void spongos_decr(ispongos *s, trits_t X, trits_t Y) {
   }
 }
 
-void spongos_hash(ispongos *s, trits_t X, trits_t Y) {
+void spongos_hash(spongos_t *s, trits_t X, trits_t Y) {
   spongos_init(s);
   spongos_absorb(s, X);
   spongos_commit(s);
   spongos_squeeze(s, Y);
 }
 
-void spongos_hashn(ispongos *s, size_t n, trits_t *Xs, trits_t Y) {
+void spongos_hashn(spongos_t *s, size_t n, trits_t *Xs, trits_t Y) {
   spongos_init(s);
   spongos_absorbn(s, n, Xs);
   spongos_commit(s);

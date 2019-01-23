@@ -15,20 +15,20 @@
 #include "mam/v2/sponge/sponge.h"
 #include "mam/v2/trits/buffers.h"
 
-static trits_t sponge_state_trits(isponge *s) {
+static trits_t sponge_state_trits(sponge_t *s) {
   return trits_from_rep(MAM2_SPONGE_WIDTH, s->s);
 }
 
-static trits_t sponge_control_trits(isponge *s) {
+static trits_t sponge_control_trits(sponge_t *s) {
   return trits_take(trits_drop(sponge_state_trits(s), MAM2_SPONGE_RATE),
                     MAM2_SPONGE_CONTROL);
 }
 
-trits_t sponge_outer_trits(isponge *s) {
+trits_t sponge_outer_trits(sponge_t *s) {
   return trits_take(sponge_state_trits(s), MAM2_SPONGE_RATE);
 }
 
-static void sponge_set_control12(isponge *s, trit_t c1, trit_t c2) {
+static void sponge_set_control12(sponge_t *s, trit_t c1, trit_t c2) {
   trits_t t = trits_take(sponge_control_trits(s), 3);
   trits_drop(t, 1);
   trits_put1(t, c1);
@@ -36,7 +36,8 @@ static void sponge_set_control12(isponge *s, trit_t c1, trit_t c2) {
   trits_put1(t, c2);
 }
 
-static void sponge_set_control012(isponge *s, trit_t c0, trit_t c1, trit_t c2) {
+static void sponge_set_control012(sponge_t *s, trit_t c0, trit_t c1,
+                                  trit_t c2) {
   trits_t t = trits_take(sponge_control_trits(s), 3);
   trits_put1(t, c0);
   trits_drop(t, 1);
@@ -45,7 +46,8 @@ static void sponge_set_control012(isponge *s, trit_t c0, trit_t c1, trit_t c2) {
   trits_put1(t, c2);
 }
 
-static void sponge_set_control345(isponge *s, trit_t c3, trit_t c4, trit_t c5) {
+static void sponge_set_control345(sponge_t *s, trit_t c3, trit_t c4,
+                                  trit_t c5) {
   trits_t t = trits_drop(sponge_control_trits(s), 3);
   trits_put1(t, c3);
   trits_drop(t, 1);
@@ -54,19 +56,19 @@ static void sponge_set_control345(isponge *s, trit_t c3, trit_t c4, trit_t c5) {
   trits_put1(t, c5);
 }
 
-static trit_t sponge_get_control1(isponge *s) {
+static trit_t sponge_get_control1(sponge_t *s) {
   return trits_get1(trits_drop(sponge_control_trits(s), 1));
 }
 
-void sponge_transform(isponge *s) { s->f(s->stack, s->s); }
+void sponge_transform(sponge_t *s) { s->f(s->stack, s->s); }
 
-void sponge_fork(isponge *s, isponge *fork) {
+void sponge_fork(sponge_t *s, sponge_t *fork) {
   trits_copy(sponge_state_trits(s), sponge_state_trits(fork));
 }
 
-void sponge_init(isponge *s) { trits_set_zero(sponge_state_trits(s)); }
+void sponge_init(sponge_t *s) { trits_set_zero(sponge_state_trits(s)); }
 
-void sponge_absorb(isponge *s, trit_t c2, trits_t X) {
+void sponge_absorb(sponge_t *s, trit_t c2, trits_t X) {
   trits_t s1;
   trits_t Xi;
   size_t ni;
@@ -94,7 +96,7 @@ void sponge_absorb(isponge *s, trit_t c2, trits_t X) {
   } while (!trits_is_empty(X));
 }
 
-void sponge_absorbn(isponge *s, trit_t c2, size_t n, trits_t *Xs) {
+void sponge_absorbn(sponge_t *s, trit_t c2, size_t n, trits_t const *const Xs) {
   buffers_t tb;
   size_t m;
   trits_t s1;
@@ -124,7 +126,7 @@ void sponge_absorbn(isponge *s, trit_t c2, size_t n, trits_t *Xs) {
   } while (0 < m);
 }
 
-void sponge_squeeze(isponge *s, trit_t c2, trits_t Y) {
+void sponge_squeeze(sponge_t *s, trit_t c2, trits_t Y) {
   trits_t s1;
   trits_t Yi;
   size_t ni;
@@ -148,7 +150,7 @@ void sponge_squeeze(isponge *s, trit_t c2, trits_t Y) {
   } while (!trits_is_empty(Y));
 }
 
-void sponge_encr(isponge *s, trits_t X, trits_t Y) {
+void sponge_encr(sponge_t *s, trits_t X, trits_t Y) {
   trits_t s1;
   trits_t Xi, Yi;
   size_t ni;
@@ -180,7 +182,7 @@ void sponge_encr(isponge *s, trits_t X, trits_t Y) {
   } while (!trits_is_empty(X));
 }
 
-void sponge_decr(isponge *s, trits_t Y, trits_t X) {
+void sponge_decr(sponge_t *s, trits_t Y, trits_t X) {
   trits_t s1;
   trits_t Xi, Yi;
   size_t ni;
@@ -212,13 +214,13 @@ void sponge_decr(isponge *s, trits_t Y, trits_t X) {
   } while (!trits_is_empty(Y));
 }
 
-void sponge_hash(isponge *s, trits_t X, trits_t Y) {
+void sponge_hash(sponge_t *s, trits_t X, trits_t Y) {
   sponge_init(s);
   sponge_absorb(s, MAM2_SPONGE_CTL_DATA, X);
   sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, Y);
 }
 
-void sponge_hashn(isponge *s, size_t n, trits_t *Xs, trits_t Y) {
+void sponge_hashn(sponge_t *s, size_t n, trits_t *Xs, trits_t Y) {
   sponge_init(s);
   sponge_absorbn(s, MAM2_SPONGE_CTL_DATA, n, Xs);
   sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, Y);

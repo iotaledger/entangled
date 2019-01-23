@@ -16,7 +16,6 @@ cc_library(
     hdrs = ["trits.h"],
     deps = [
         "//common/trinary:trit_tryte",
-        "//mam/v2:alloc",
         "//mam/v2:defs",
     ],
 )

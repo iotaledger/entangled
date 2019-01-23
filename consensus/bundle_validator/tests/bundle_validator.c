@@ -40,17 +40,17 @@ void tearDown() {
 
 void test_iota_consensus_bundle_validator_validate_tail_not_found() {
   bundle_transactions_t *bundle;
-  bundle_transactions_new(&bundle);
-
+  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
+  iota_transaction_t *test_tx = NULL;
   flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
+
   flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                          TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t *test_tx = transaction_deserialize(tx_test_trits, true);
+  test_tx = transaction_deserialize(tx_test_trits, true);
 
-  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
-
+  bundle_transactions_new(&bundle);
   TEST_ASSERT(iota_consensus_bundle_validator_validate(
                   &tangle, transaction_hash(test_tx), bundle, &bundle_status) ==
               RC_OK);
@@ -62,11 +62,10 @@ void test_iota_consensus_bundle_validator_validate_tail_not_found() {
 
 void test_bundle_size_1_value_with_wrong_address_invalid() {
   bundle_transactions_t *bundle;
-  bundle_transactions_new(&bundle);
+  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
   trit_t address[HASH_LENGTH_TRIT];
-
+  bool exist = false;
   iota_transaction_t *txs[4];
-
   tryte_t const *const trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
@@ -77,15 +76,13 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
   address[HASH_LENGTH_TRIT - 1] = -1;
   flex_trits_from_trits(transaction_address(txs[0]), HASH_LENGTH_TRIT, address,
                         HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-  build_tangle(&tangle, txs, 4);
+  TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
 
-  bool exist = false;
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
-  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
-
+  bundle_transactions_new(&bundle);
   TEST_ASSERT(iota_consensus_bundle_validator_validate(
                   &tangle, transaction_hash(txs[0]), bundle, &bundle_status) ==
               RC_OK);
@@ -97,25 +94,22 @@ void test_bundle_size_1_value_with_wrong_address_invalid() {
 
 void test_bundle_exceed_supply_pos_invalid() {
   bundle_transactions_t *bundle;
-  bundle_transactions_new(&bundle);
-
+  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
   iota_transaction_t *txs[4];
-
+  bool exist = false;
   tryte_t const *const trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
 
   transactions_deserialize(trytes, txs, 4, true);
   transaction_set_value(txs[0], IOTA_SUPPLY + 1);
-  build_tangle(&tangle, txs, 4);
+  TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
 
-  bool exist = false;
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
-  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
-
+  bundle_transactions_new(&bundle);
   TEST_ASSERT(iota_consensus_bundle_validator_validate(
                   &tangle, transaction_hash(txs[0]), bundle, &bundle_status) ==
               RC_OK);
@@ -127,25 +121,22 @@ void test_bundle_exceed_supply_pos_invalid() {
 
 void test_bundle_exceed_supply_neg_invalid() {
   bundle_transactions_t *bundle;
-  bundle_transactions_new(&bundle);
-
   iota_transaction_t *txs[4];
-
+  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
+  bool exist = false;
   tryte_t const *const trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
 
   transactions_deserialize(trytes, txs, 4, true);
   transaction_set_value(txs[0], -IOTA_SUPPLY - 1);
-  build_tangle(&tangle, txs, 4);
+  TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
 
-  bool exist = false;
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
 
-  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
-
+  bundle_transactions_new(&bundle);
   TEST_ASSERT(iota_consensus_bundle_validator_validate(
                   &tangle, transaction_hash(txs[0]), bundle, &bundle_status) ==
               RC_OK);
@@ -157,15 +148,15 @@ void test_bundle_exceed_supply_neg_invalid() {
 
 void test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invalid() {
   bundle_transactions_t *bundle;
-  bundle_transactions_new(&bundle);
-
   iota_transaction_t *txs[4];
-
+  trit_t buffer[NUM_TRITS_PER_FLEX_TRIT];
+  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
   tryte_t const *const trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
+
   transactions_deserialize(trytes, txs, 4, true);
-  trit_t buffer[NUM_TRITS_PER_FLEX_TRIT];
+
   flex_trits_to_trits(buffer, NUM_TRITS_PER_FLEX_TRIT,
                       transaction_signature(txs[1]), NUM_TRITS_PER_FLEX_TRIT,
                       NUM_TRITS_PER_FLEX_TRIT);
@@ -174,10 +165,9 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invali
                         buffer, NUM_TRITS_PER_FLEX_TRIT,
                         NUM_TRITS_PER_FLEX_TRIT);
 
-  build_tangle(&tangle, txs, 4);
+  TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
 
-  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
-
+  bundle_transactions_new(&bundle);
   TEST_ASSERT(iota_consensus_bundle_validator_validate(
                   &tangle, transaction_hash(txs[0]), bundle, &bundle_status) ==
               RC_OK);
@@ -188,22 +178,22 @@ void test_iota_consensus_bundle_validator_validate_size_4_value_wrong_sig_invali
 
 void test_iota_consensus_bundle_validator_validate_size_4_value_valid() {
   bundle_transactions_t *bundle;
-  bundle_transactions_new(&bundle);
-
+  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
   iota_transaction_t *txs[4];
+  bool exist = false;
 
   tryte_t const *const trytes[4] = {
       TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
       TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
-  transactions_deserialize(trytes, txs, 4, true);
-  build_tangle(&tangle, txs, 4);
 
-  bool exist = false;
+  transactions_deserialize(trytes, txs, 4, true);
+  TEST_ASSERT(build_tangle(&tangle, txs, 4) == RC_OK);
+
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
   TEST_ASSERT(exist == true);
-  bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
 
+  bundle_transactions_new(&bundle);
   TEST_ASSERT(iota_consensus_bundle_validator_validate(
                   &tangle, transaction_hash(txs[0]), bundle, &bundle_status) ==
               RC_OK);
