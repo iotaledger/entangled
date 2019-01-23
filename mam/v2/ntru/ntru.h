@@ -29,7 +29,7 @@ extern "C" {
 /*! \brief NTRU private key - f(x) - size. */
 #define MAM2_NTRU_SK_SIZE 1024
 /*! \brief NTRU session symmetric key size. */
-#define MAM2_NTRU_KEY_SIZE 243
+#define MAM2_NTRU_KEY_SIZE MAM2_SPONGE_KEY_SIZE
 /*! \brief NTRU encrypted key size. */
 #define MAM2_NTRU_EKEY_SIZE 9216
 /*! \brief NTRU id size. */

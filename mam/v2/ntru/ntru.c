@@ -84,7 +84,7 @@ void ntru_encr_r(trits_t pk, spongos_t *s, trits_t r, trits_t K, trits_t Y) {
   MAM2_POLY_DEF(t);
 
   MAM2_ASSERT(trits_size(r) == MAM2_NTRU_SK_SIZE);
-  MAM2_ASSERT(trits_size(K) == MAM2_SPONGE_KEY_SIZE);
+  MAM2_ASSERT(trits_size(K) == MAM2_NTRU_KEY_SIZE);
   MAM2_ASSERT(trits_size(Y) == MAM2_NTRU_EKEY_SIZE);
 
   ok = poly_from_trits(h, pk);
@@ -102,8 +102,8 @@ void ntru_encr_r(trits_t pk, spongos_t *s, trits_t r, trits_t K, trits_t Y) {
   spongos_init(s);
   spongos_absorb(s, Y);
   spongos_commit(s);
-  spongos_encr(s, K, trits_take(r, MAM2_SPONGE_KEY_SIZE));
-  spongos_squeeze(s, trits_drop(r, MAM2_SPONGE_KEY_SIZE));
+  spongos_encr(s, K, trits_take(r, MAM2_NTRU_KEY_SIZE));
+  spongos_squeeze(s, trits_drop(r, MAM2_NTRU_KEY_SIZE));
   poly_small_from_trits(h, r);
 
   /* Y = r*h + AE(r*h;K) */
@@ -117,7 +117,7 @@ void ntru_encr(trits_t pk, prng_t *p, spongos_t *s, trits_t K, trits_t N,
                trits_t Y) {
   trits_t r;
 
-  MAM2_ASSERT(trits_size(K) == MAM2_SPONGE_KEY_SIZE);
+  MAM2_ASSERT(trits_size(K) == MAM2_NTRU_KEY_SIZE);
   MAM2_ASSERT(trits_size(Y) == MAM2_NTRU_EKEY_SIZE);
   MAM2_ASSERT(!trits_is_same(K, Y));
 
@@ -138,7 +138,7 @@ bool ntru_decr(ntru_t *n, spongos_t *s, trits_t Y, trits_t K) {
   rh = MAM2_TRITS_INIT(rh, MAM2_NTRU_EKEY_SIZE);
   m = MAM2_TRITS_INIT(m, MAM2_NTRU_SK_SIZE - MAM2_NTRU_KEY_SIZE);
 
-  MAM2_ASSERT(trits_size(K) == MAM2_SPONGE_KEY_SIZE);
+  MAM2_ASSERT(trits_size(K) == MAM2_NTRU_KEY_SIZE);
   MAM2_ASSERT(trits_size(Y) == MAM2_NTRU_EKEY_SIZE);
 
   /* f is NTT form */
