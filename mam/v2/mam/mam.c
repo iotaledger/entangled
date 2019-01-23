@@ -1040,6 +1040,5 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
   if (trits_is_null(*payload)) *payload = p;
   p = trits_null();
 
-  trits_free(p);
   return e;
 }
