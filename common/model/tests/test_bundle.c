@@ -66,7 +66,6 @@ void test_bundle_finalize(void) {
   transaction_set_value(&tx, 1000);
   transaction_set_current_index(&tx, 0);
   transaction_set_last_index(&tx, 2);
-  tx.loaded_columns_mask |= MASK_ALL_COLUMNS;
   bundle_transactions_add(bundle, &tx);
 
   // sender tx
@@ -78,7 +77,6 @@ void test_bundle_finalize(void) {
   transaction_set_value(&tx, -1000);
   transaction_set_current_index(&tx, 1);
   transaction_set_last_index(&tx, 2);
-  tx.loaded_columns_mask |= MASK_ALL_COLUMNS;
   bundle_transactions_add(bundle, &tx);
   // security level 2
   transaction_reset(&tx);
@@ -89,7 +87,6 @@ void test_bundle_finalize(void) {
   transaction_set_value(&tx, 0);
   transaction_set_current_index(&tx, 2);
   transaction_set_last_index(&tx, 2);
-  tx.loaded_columns_mask |= MASK_ALL_COLUMNS;
   bundle_transactions_add(bundle, &tx);
 
   bundle_finalize(bundle, &kerl);
