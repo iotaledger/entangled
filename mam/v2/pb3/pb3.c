@@ -8,275 +8,196 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file pb3.c
-\brief MAM2 Protobuf3 layer.
-*/
 #include "mam/v2/pb3/pb3.h"
 
-trits_t pb3_trits_take(trits_t *b, size_t n) { return trits_advance(b, n); }
+trits_t pb3_trits_take(trits_t *const b, size_t const n) {
+  return trits_advance(b, n);
+}
 
-/*
-Protobuf3 primitive types
-null, tryte, size_t, trytes, tryte [n]
-*/
+/**
+ * Protobuf3 primitive types
+ * null, tryte, size_t, trytes, tryte [n]
+ */
 
 size_t pb3_sizeof_tryte() { return 3; }
 
-void pb3_encode_tryte(tryte_t t, trits_t *b) {
-  MAM2_ASSERT(b && !(trits_size(*b) < pb3_sizeof_tryte()));
-  trits_put3(pb3_trits_take(b, 3), t);
+void pb3_encode_tryte(tryte_t const tryte, trits_t *const buffer) {
+  MAM2_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_tryte()));
+
+  trits_put3(pb3_trits_take(buffer, 3), tryte);
 }
 
-retcode_t pb3_decode_tryte(tryte_t *t, trits_t *b) {
-  MAM2_ASSERT(0 != t);
+retcode_t pb3_decode_tryte(tryte_t *const tryte, trits_t *const buffer) {
+  MAM2_ASSERT(tryte);
 
-  if (trits_size(*b) < pb3_sizeof_tryte()) return RC_MAM2_PB3_EOF;
+  if (trits_size(*buffer) < pb3_sizeof_tryte()) {
+    return RC_MAM2_PB3_EOF;
+  }
 
-  *t = trits_get3(pb3_trits_take(b, 3));
+  *tryte = trits_get3(pb3_trits_take(buffer, 3));
+
   return RC_OK;
 }
 
 size_t pb3_sizeof_trint() { return 9; }
 
-void pb3_encode_trint(trint9_t t, trits_t *b) {
-  MAM2_ASSERT(b && !(trits_size(*b) < pb3_sizeof_trint()));
-  trits_put9(pb3_trits_take(b, 9), t);
+void pb3_encode_trint(trint9_t const trint, trits_t *const buffer) {
+  MAM2_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_trint()));
+
+  trits_put9(pb3_trits_take(buffer, 9), trint);
 }
 
-retcode_t pb3_decode_trint(trint9_t *t, trits_t *b) {
-  MAM2_ASSERT(0 != t);
+retcode_t pb3_decode_trint(trint9_t *const trint, trits_t *const buffer) {
+  MAM2_ASSERT(trint);
 
-  if (trits_size(*b) < pb3_sizeof_trint()) return RC_MAM2_PB3_EOF;
+  if (trits_size(*buffer) < pb3_sizeof_trint()) {
+    return RC_MAM2_PB3_EOF;
+  }
 
-  *t = trits_get9(pb3_trits_take(b, 9));
+  *trint = trits_get9(pb3_trits_take(buffer, 9));
+
   return RC_OK;
 }
 
 size_t pb3_sizeof_longtrint() { return 18; }
 
-void pb3_encode_longtrint(trint18_t t, trits_t *b) {
-  MAM2_ASSERT(b && !(trits_size(*b) < pb3_sizeof_longtrint()));
-  trits_put18(pb3_trits_take(b, 18), t);
+void pb3_encode_longtrint(trint18_t const trint, trits_t *const buffer) {
+  MAM2_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_longtrint()));
+
+  trits_put18(pb3_trits_take(buffer, 18), trint);
 }
 
-retcode_t pb3_decode_longtrint(trint18_t *t, trits_t *b) {
-  MAM2_ASSERT(0 != t);
+retcode_t pb3_decode_longtrint(trint18_t *const trint, trits_t *const buffer) {
+  MAM2_ASSERT(trint);
 
-  if (trits_size(*b) < pb3_sizeof_longtrint()) return RC_MAM2_PB3_EOF;
+  if (trits_size(*buffer) < pb3_sizeof_longtrint()) {
+    return RC_MAM2_PB3_EOF;
+  }
 
-  *t = trits_get18(pb3_trits_take(b, 18));
+  *trint = trits_get18(pb3_trits_take(buffer, 18));
+
   return RC_OK;
 }
 
-static size_t pb3_sizet_trytes(size_t n) {
-  size_t const max_d = (5 * sizeof(size_t) + 2) / 3;
+static size_t pb3_size_t_trytes(size_t const n) {
   MAM2_ASSERT(n <= MAM2_PB3_SIZE_MAX);
 
+  size_t const max_d = (5 * sizeof(size_t) + 2) / 3;
   size_t d = 0, m = 1;
-  for (; d < max_d && (n > (m - 1) / 2);) m *= 27, ++d;
+
+  for (; d < max_d && (n > (m - 1) / 2);) {
+    m *= 27;
+    ++d;
+  }
 
   return d;
 }
 
-size_t pb3_sizeof_sizet(size_t n) {
-  size_t d = pb3_sizet_trytes(n);
+size_t pb3_sizeof_size_t(size_t const n) {
+  size_t d = pb3_size_t_trytes(n);
   MAM2_ASSERT(d < 14);
 
   /* one extra tryte to encode `d` */
   return 3 * (d + 1);
 }
 
-void pb3_encode_sizet(size_t n, trits_t *b) {
-  size_t d;
+void pb3_encode_size_t(size_t n, trits_t *const buffer) {
+  MAM2_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_size_t(n)));
 
-  MAM2_ASSERT(b && !(trits_size(*b) < pb3_sizeof_sizet(n)));
-  d = pb3_sizet_trytes(n);
+  size_t d = pb3_size_t_trytes(n);
   MAM2_ASSERT(d < 14);
 
-  pb3_encode_tryte((tryte_t)d, b);
+  pb3_encode_tryte((tryte_t)d, buffer);
 
-  if (27 < n) {
+  if (n > 27) {
     /* explicitly unroll the first iteration safely */
     --d;
-    pb3_encode_tryte((tryte_t)MAM2_MODS(n - 27, 27, 27), b);
+    pb3_encode_tryte((tryte_t)MAM2_MODS(n - 27, 27, 27), buffer);
     n = 1 + MAM2_DIVS(n - 27, 27, 27);
   }
 
-  for (; d--; n = MAM2_DIVS(n, 27, 27))
-    pb3_encode_tryte((tryte_t)MAM2_MODS(n, 27, 27), b);
+  for (; d--; n = MAM2_DIVS(n, 27, 27)) {
+    pb3_encode_tryte((tryte_t)MAM2_MODS(n, 27, 27), buffer);
+  }
+
   MAM2_ASSERT(0 == n);
 }
 
-retcode_t pb3_decode_sizet(size_t *n, trits_t *b) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
+retcode_t pb3_decode_size_t(size_t *const n, trits_t *const buffer) {
+  MAM2_ASSERT(n != 0);
 
-  MAM2_ASSERT(0 != n);
+  tryte_t d;
 
-  do {
-    tryte_t d;
-    err_guard(trits_size(*b) >= 3, RC_MAM2_PB3_EOF);
-    d = trits_get3(*b);
-    *b = trits_drop(*b, 3);
-    err_guard(0 <= d && d <= 13, RC_MAM2_INVALID_VALUE);
-    err_guard(trits_size(*b) >= 3 * (size_t)d, RC_MAM2_PB3_EOF);
-    /* move pointer to the end */
-    *b = trits_drop(*b, 3 * (size_t)d);
+  if (trits_size(*buffer) < 3) {
+    return RC_MAM2_PB3_EOF;
+  }
 
-    *n = 0;
-    if (0 < d) {
-      tryte_t t;
-      trits_t s = *b;
-      uint64_t m;
+  d = trits_get3(*buffer);
+  *buffer = trits_drop(*buffer, 3);
+  if (d < 0 || d > 13) {
+    return RC_MAM2_INVALID_VALUE;
+  }
+  if (trits_size(*buffer) < 3 * (size_t)d) {
+    return RC_MAM2_PB3_EOF;
+  }
 
-      --d;
+  /* move pointer to the end */
+  *buffer = trits_drop(*buffer, 3 * (size_t)d);
+
+  *n = 0;
+  if (0 < d) {
+    tryte_t t;
+    trits_t s = *buffer;
+    uint64_t m;
+
+    --d;
+    s = trits_pickup(s, 3);
+    /* higher tryte in the representation */
+    t = trits_get3(s);
+    /* can't be 0 or negative */
+    if (t <= 0) {
+      return RC_MAM2_INVALID_VALUE;
+    }
+    m = (size_t)t;
+
+    for (; d--;) {
       s = trits_pickup(s, 3);
-      /* higher tryte in the representation */
       t = trits_get3(s);
-      err_guard(t > 0, RC_MAM2_INVALID_VALUE); /* can't be 0 or negative */
-      m = (size_t)t;
-
-      for (; d--;) {
-        s = trits_pickup(s, 3);
-        t = trits_get3(s);
-        m *= 27;
-        m += (uint64_t)t;
-      }
-      /* value may be truncated here */
-      *n = (size_t)m;
-      err_guard(m == (uint64_t)*n, RC_MAM2_PB3_SIZET_NOT_SUPPORTED);
+      m *= 27;
+      m += (uint64_t)t;
     }
+    /* value may be truncated here */
+    *n = (size_t)m;
+    if (m != (uint64_t)*n) {
+      return RC_MAM2_PB3_SIZE_T_NOT_SUPPORTED;
+    }
+  }
 
-    e = RC_OK;
-  } while (0);
-
-  return e;
+  return RC_OK;
 }
 
-size_t pb3_sizeof_ntrytes(size_t n) { return 3 * n; }
+size_t pb3_sizeof_ntrytes(size_t const n) { return 3 * n; }
 
-void pb3_encode_ntrytes(trits_t ntrytes, trits_t *b) {
+void pb3_encode_ntrytes(trits_t const ntrytes, trits_t *const buffer) {
   size_t n = trits_size(ntrytes);
   MAM2_ASSERT(0 == (n % 3));
-  MAM2_ASSERT(b && n <= trits_size(*b));
+  MAM2_ASSERT(buffer && n <= trits_size(*buffer));
 
-  trits_copy(ntrytes, pb3_trits_take(b, n));
+  trits_copy(ntrytes, pb3_trits_take(buffer, n));
 }
 
-static trits_t pb3_encode_ntrytes2(size_t n, trits_t *b) {
-  MAM2_ASSERT(0 == (n % 3));
-  MAM2_ASSERT(b && n <= trits_size(*b));
-
-  return pb3_trits_take(b, n);
-}
-
-retcode_t pb3_decode_ntrytes(trits_t ntrytes, trits_t *b) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
+retcode_t pb3_decode_ntrytes(trits_t const ntrytes, trits_t *const buffer) {
   size_t n = trits_size(ntrytes);
-  MAM2_ASSERT(b && 0 == (n % 3));
+  MAM2_ASSERT(buffer && (n % 3) == 0);
 
-  do {
-    err_guard(n <= trits_size(*b), RC_MAM2_PB3_EOF);
-    trits_copy(pb3_trits_take(b, n), ntrytes);
+  if (n > trits_size(*buffer)) {
+    return RC_MAM2_PB3_EOF;
+  }
 
-    e = RC_OK;
-  } while (0);
+  trits_copy(pb3_trits_take(buffer, n), ntrytes);
 
-  return e;
+  return RC_OK;
 }
-
-static retcode_t pb3_decode_ntrytes2(trits_t *ntrytes, trits_t *b) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  size_t n;
-  MAM2_ASSERT(ntrytes);
-  n = trits_size(*ntrytes);
-  MAM2_ASSERT(b && 0 == (n % 3));
-
-  do {
-    err_guard(n <= trits_size(*b), RC_MAM2_PB3_EOF);
-    *ntrytes = pb3_trits_take(b, n);
-
-    e = RC_OK;
-  } while (0);
-
-  return e;
-}
-
-#if 0
- size_t pb3_sizeof_trytes(size_t n)
-{
-  return 0
-    + pb3_sizeof_sizet(n)
-    + pb3_sizeof_ntrytes(n)
-    ;
-}
-
- void pb3_encode_trytes(trits_t trytes, trits_t *b)
-{
-  size_t n = trits_size(trytes);
-  MAM2_ASSERT(0 == (n % 3));
-
-  pb3_encode_sizet(n/3, b);
-  pb3_encode_ntrytes(trytes, b);
-}
-
- retcode_t pb3_decode_trytes(trits_t *trytes, trits_t *b)
-{
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
-
-  MAM2_ASSERT(0 != trytes);
-
-  do {
-    size_t n = 0;
-    err_bind(pb3_decode_sizet(&n, b));
-    err_guard(trits_size(*b) >= pb3_sizeof_ntrytes(n), RC_MAM2_PB3_EOF);
-
-    err_guard(trits_size(*trytes) >= 3*n, err_buffer_too_small);
-    err_bind(pb3_decode_ntrytes(*trytes, b));
-    *trytes = trits_drop(*trytes, 3*n);
-
-    e = RC_OK;
-  } while(0);
-
-  return e;
-}
-
-retcode_t pb3_decode_trytes2(trits_t *trytes, trits_t *b)
-{
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  trits_t t;
-  t = trits_null();
-
-  MAM2_ASSERT(0 != trytes);
-
-  do {
-    size_t n = 0;
-    err_bind(pb3_decode_sizet(&n, b));
-    err_guard(trits_size(*b) >= pb3_sizeof_ntrytes(n), RC_MAM2_PB3_EOF);
-
-    if(trits_is_null(*trytes))
-    {
-      t = trits_alloc(3 * n);
-      err_guard(!trits_is_null(t), err_bad_alloc);
-      err_bind(pb3_decode_ntrytes(t, b));
-      *trytes = t;
-      t = trits_null();
-    } else
-    {
-      err_guard(trits_size(*trytes) >= 3*n, err_buffer_too_small);
-      err_bind(pb3_decode_ntrytes(*trytes, b));
-      *trytes = trits_drop(*trytes, 3*n);
-    }
-
-    e = RC_OK;
-  } while(0);
-
-  if(!trits_is_null(t))
-    trits_free(t);
-
-  return e;
-}
-#endif
 
 /*
 Protobuf3 spongos modifier handling
@@ -330,17 +251,17 @@ retcode_t pb3_unwrap_absorb_longtrint(spongos_t *s, trits_t *b, trint18_t *t) {
   } while (0);
   return e;
 }
-void pb3_wrap_absorb_sizet(spongos_t *s, trits_t *b, size_t t) {
+void pb3_wrap_absorb_size_t(spongos_t *s, trits_t *b, size_t t) {
   trits_t b0 = *b;
-  pb3_encode_sizet(t, b);
+  pb3_encode_size_t(t, b);
   spongos_absorb(s, trits_diff(b0, *b));
 }
-retcode_t pb3_unwrap_absorb_sizet(spongos_t *s, trits_t *b, size_t *t) {
+retcode_t pb3_unwrap_absorb_size_t(spongos_t *s, trits_t *b, size_t *t) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   trits_t b0;
   do {
     b0 = *b;
-    err_bind(pb3_decode_sizet(t, b));
+    err_bind(pb3_decode_size_t(t, b));
     spongos_absorb(s, trits_diff(b0, *b));
     e = RC_OK;
   } while (0);
