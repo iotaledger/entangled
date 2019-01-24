@@ -30,9 +30,9 @@ extern "C" {
 #endif
 
 typedef struct test_ntru_s {
-  ntru_t n;
-  trit_t id[81];
-  trit_t sk[MAM2_NTRU_SK_SIZE];
+  ntru_t ntru;
+  trit_t public_key_id[81];
+  trit_t secret_key[MAM2_NTRU_SK_SIZE];
   poly_t f;
 } test_ntru_t;
 

@@ -10,6 +10,7 @@ cc_library(
         ":mam_ntru_pk_t_set",
         ":mam_pre_shared_key_t_set",
         "//mam/v2:defs",
+        "//mam/v2/mss",
         "//mam/v2/ntru",
         "//mam/v2/pb3",
         "//mam/v2/prng",
