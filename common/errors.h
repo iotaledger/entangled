@@ -111,7 +111,7 @@ extern "C" {
 
 #define ERR_BIND_GO_TO(expr, e, label) \
   if (RC_OK != (e = (expr)))           \
-    go to label;                       \
+    goto label;                        \
   else
 
 #define ERR_GUARD_RETURN(expr, err, e) \
@@ -123,7 +123,7 @@ extern "C" {
 #define ERR_GUARD_GO_TO(expr, err, e, label) \
   if (!(expr)) {                             \
     e = (err);                               \
-    go to;                                   \
+    goto;                                    \
   } else
 
 /** Return Codes */
