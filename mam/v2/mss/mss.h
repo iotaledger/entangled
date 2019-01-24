@@ -209,6 +209,8 @@ void mss_auth_path(mss_t *mss, trint18_t skn, trits_t path);
 
 void mss_sign(mss_t *mss, trits_t hash, trits_t sig);
 
+bool mss_next(mss_t *mss);
+
 /**
  * Verifies MSS signature.
  *
