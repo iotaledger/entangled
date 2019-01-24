@@ -514,7 +514,7 @@ void mss_auth_path(mss_t *mss, trint18_t skn, trits_t path) {
     trits_t curr_auth_path_part = mss_hash_idx(mss->auth_path, height);
 #else
     trits_t curr_auth_path_part =
-        mss_mt_node_t_trits(mss, height, (0 == skn % 2) ? skn + skn : skn - 1);
+        mss_mt_node_t_trits(mss, height, (0 == skn % 2) ? skn + 1 : skn - 1);
 #endif
     trits_copy(curr_auth_path_part, path_part_out);
 
@@ -658,7 +658,7 @@ static size_t mss_mt_stored_size(mss_t *mss) {
   for (height = 0; height != mss->height; ++height)
     size += mss->stacks[height].size * MAM2_MSS_MT_HASH_SIZE;
 #else
-  size += ((size_t)1 << mss->height) * MAM2_MSS_MT_HASH_SIZE;
+  size += (((size_t)1 << (mss->height + 1)) - 1) * MAM2_MSS_MT_HASH_SIZE;
 #endif
   return size;
 }
@@ -685,14 +685,14 @@ static void mss_mt_save(mss_t *mss, trits_t buffer) {
     }
   }
 #else
-  /* <node-hashes> */
-  for (height = 0; height != mss->height; ++height) {
-    for (i = 0; i != mss->stacks[height].spongos; ++i) {
-      trits_copy(mss_mt_node_hash_trits(mss, height, i),
+  height = mss->height;
+  do {
+    for (i = 0; i != (mss_mt_idx_t)1 << height; ++i) {
+      trits_copy(mss_mt_node_t_trits(mss, height, i),
                  trits_take(buffer, MAM2_MSS_MT_HASH_SIZE));
       buffer = trits_drop(buffer, MAM2_MSS_MT_HASH_SIZE);
     }
-  }
+  } while (height-- > 0);
 #endif
 }
 
@@ -723,13 +723,14 @@ static void mss_mt_load(mss_t *mss, trits_t buffer) {
   }
 #else
   /* <node-hashes> */
-  for (height = 0; height != mss->height; ++height) {
-    for (i = 0; i != mss->stacks[height].spongos; ++i) {
+  height = mss->height;
+  do {
+    for (i = 0; i != (mss_mt_idx_t)1 << height; ++i) {
       trits_copy(trits_take(buffer, MAM2_MSS_MT_HASH_SIZE),
-                 mss_mt_hs_trits(mss, height, i));
+                 mss_mt_node_t_trits(mss, height, i));
       buffer = trits_drop(buffer, MAM2_MSS_MT_HASH_SIZE);
     }
-  }
+  } while (height-- > 0);
 #endif
 }
 
@@ -755,6 +756,8 @@ retcode_t mss_load(mss_t *mss, trits_t *b) {
 
 #if defined(MAM2_MSS_TRAVERSAL)
   mss_mt_rewind(mss, skn);
+#else
+  mss->skn = skn;
 #endif
   ERR_GUARD_RETURN(mss_mt_stored_size(mss) <= trits_size(*b),
                    RC_MAM2_BUFFER_TOO_SMALL, e);

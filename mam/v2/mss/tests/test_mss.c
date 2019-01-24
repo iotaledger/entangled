@@ -53,13 +53,11 @@
     return &m->m;                                          \
   }
 #else
-#define def_test_mss_init(D, sfx)                                     \
-  static mss_t *test_mss_init##sfx(test_mss##sfx##_t *m, wots_t *w) { \
-    m->m.height = D;                                                  \
-    m->m.wots = w;                                                    \
-    m->m.mt = m->mt;                                                  \
-    m->mt_check = 0xdeadbeef;                                         \
-    return &m->m;                                                     \
+#define def_test_mss_init(D, sfx)                          \
+  static mss_t *test_mss_init##sfx(test_mss##sfx##_t *m) { \
+    m->m.mt = m->mt;                                       \
+    m->mt_check = 0xdeadbeef;                              \
+    return &m->m;                                          \
   }
 #endif
 
@@ -283,16 +281,6 @@ static void mss_meta_test(void) {
   prng_t *p = test_prng_init(_p, spongos);
   wots_t *w = test_wots_init(_w, spongos);
 
-#ifndef MAM2_MSS_TRAVERSAL
-  mss_t *m1 = test_mss_init1(_m1, _w);
-  mss_t *m2 = test_mss_init2(_m2, _w);
-  mss_t *m3 = test_mss_init3(_m3, _w);
-  mss_t *m4 = test_mss_init4(_m4, _w);
-  mss_t *m42 = test_mss_init4(_m42, _w);
-  mss_t *m5 = test_mss_init5(_m5, _w);
-  mss_t *mx = test_mss_initx(_mx, _w);
-  mss_t *m = test_mss_init(_m, _w);
-#else
   mss_t *m1 = test_mss_init1(_m1);
   mss_t *m2 = test_mss_init2(_m2);
   mss_t *m3 = test_mss_init3(_m3);
@@ -301,7 +289,6 @@ static void mss_meta_test(void) {
   mss_t *m5 = test_mss_init5(_m5);
   mss_t *mx = test_mss_initx(_mx);
   mss_t *m = test_mss_init(_m);
-#endif
 
   TEST_ASSERT_TRUE(mss_test(m1, p, sg, w, 1) && test_mss_check1(_m1));
   TEST_ASSERT_TRUE(mss_test(m2, p, sg, w, 2) && test_mss_check2(_m2));
