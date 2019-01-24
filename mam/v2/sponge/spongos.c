@@ -61,14 +61,16 @@ void spongos_squeeze(spongos_t *const spongos, trits_t output) {
   }
 }
 
-bool spongos_squeeze_eq(spongos_t *const spongos, trits_t output) {
+bool spongos_squeeze_eq(spongos_t *const spongos, trits_t expected_output) {
   bool r = true;
   trits_t y;
 
-  for (size_t n = 0; !trits_is_empty(output); output = trits_drop(output, n)) {
-    y = trits_take_min(spongos_outer_trits(spongos), trits_size(output));
+  for (size_t n = 0; !trits_is_empty(expected_output);
+       expected_output = trits_drop(expected_output, n)) {
+    y = trits_take_min(spongos_outer_trits(spongos),
+                       trits_size(expected_output));
     n = trits_size(y);
-    r = trits_cmp_eq(y, trits_take(output, n)) && r;
+    r = trits_cmp_eq(y, trits_take(expected_output, n)) && r;
     trits_set_zero(trits_take(spongos_outer_trits(spongos), n));
     spongos_update(spongos, n);
   }
@@ -91,24 +93,30 @@ void spongos_hashn(spongos_t *const spongos, size_t const n, trits_t *inputs,
   spongos_squeeze(spongos, output);
 }
 
-void spongos_encr(spongos_t *const spongos, trits_t input, trits_t output) {
-  for (size_t n = 0; !trits_is_empty(output);
-       output = trits_drop(output, n), input = trits_drop(input, n)) {
-    if (trits_is_same(input, output))
-      n = trits_swap_add_min(input, spongos_outer_trits(spongos));
+void spongos_encr(spongos_t *const spongos, trits_t plaintext,
+                  trits_t ciphertext) {
+  for (size_t n = 0; !trits_is_empty(ciphertext);
+       ciphertext = trits_drop(ciphertext, n),
+              plaintext = trits_drop(plaintext, n)) {
+    if (trits_is_same(plaintext, ciphertext))
+      n = trits_swap_add_min(plaintext, spongos_outer_trits(spongos));
     else
-      n = trits_copy_add_min(input, spongos_outer_trits(spongos), output);
+      n = trits_copy_add_min(plaintext, spongos_outer_trits(spongos),
+                             ciphertext);
     spongos_update(spongos, n);
   }
 }
 
-void spongos_decr(spongos_t *const spongos, trits_t input, trits_t output) {
-  for (size_t n = 0; !trits_is_empty(output);
-       output = trits_drop(output, n), input = trits_drop(input, n)) {
-    if (trits_is_same(input, output))
-      n = trits_swap_sub_min(input, spongos_outer_trits(spongos));
+void spongos_decr(spongos_t *const spongos, trits_t ciphertext,
+                  trits_t plaintext) {
+  for (size_t n = 0; !trits_is_empty(plaintext);
+       plaintext = trits_drop(plaintext, n),
+              ciphertext = trits_drop(ciphertext, n)) {
+    if (trits_is_same(ciphertext, plaintext))
+      n = trits_swap_sub_min(ciphertext, spongos_outer_trits(spongos));
     else
-      n = trits_copy_sub_min(input, spongos_outer_trits(spongos), output);
+      n = trits_copy_sub_min(ciphertext, spongos_outer_trits(spongos),
+                             plaintext);
     spongos_update(spongos, n);
   }
 }
