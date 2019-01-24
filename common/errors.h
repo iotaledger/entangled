@@ -109,10 +109,21 @@ extern "C" {
     return e;                    \
   else
 
+#define ERR_BIND_GO_TO(expr, e, label) \
+  if (RC_OK != (e = (expr)))           \
+    go to label;                       \
+  else
+
 #define ERR_GUARD_RETURN(expr, err, e) \
   if (!(expr)) {                       \
     e = (err);                         \
     return e;                          \
+  } else
+
+#define ERR_GUARD_GO_TO(expr, err, e, label) \
+  if (!(expr)) {                             \
+    e = (err);                               \
+    go to;                                   \
   } else
 
 /** Return Codes */
