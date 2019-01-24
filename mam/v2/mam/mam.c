@@ -29,22 +29,22 @@ retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
     return e;
   }
 
-  m->N1 = trits_null();
+  m->nonce1 = trits_null();
   if (!trits_is_empty(N1)) {
-    m->N1 = trits_alloc(trits_size(N1));
-    if (trits_is_null(m->N1)) {
+    m->nonce1 = trits_alloc(trits_size(N1));
+    if (trits_is_null(m->nonce1)) {
       return RC_OOM;
     }
-    trits_copy(N1, m->N1);
+    trits_copy(N1, m->nonce1);
   }
 
-  m->N2 = trits_null();
+  m->nonce2 = trits_null();
   if (!trits_is_empty(N2)) {
-    m->N2 = trits_alloc(trits_size(N2));
-    if (trits_is_null(m->N2)) {
+    m->nonce2 = trits_alloc(trits_size(N2));
+    if (trits_is_null(m->nonce2)) {
       return RC_OOM;
     }
-    trits_copy(N2, m->N2);
+    trits_copy(N2, m->nonce2);
   }
 
   m->sg->sponge = ma->create_sponge();
@@ -52,21 +52,21 @@ retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
     return RC_OOM;
   }
 
-  m->w = malloc(sizeof(wots_t));
-  if (!m->w) {
+  m->wots = malloc(sizeof(wots_t));
+  if (!m->wots) {
     return RC_OOM;
   }
-  if ((e = (wots_create(m->w))) != RC_OK) {
+  if ((e = (wots_create(m->wots))) != RC_OK) {
     return e;
   }
 
-  m->w->spongos.sponge = ma->create_sponge();
-  if (!m->w->spongos.sponge) {
+  m->wots->spongos.sponge = ma->create_sponge();
+  if (!m->wots->spongos.sponge) {
     return RC_OOM;
   }
-  wots_init(m->w, m->w->spongos.sponge);
+  wots_init(m->wots, m->wots->spongos.sponge);
 
-  mss_init(m, p, m->sg->sponge, m->w, d, m->N1, m->N2);
+  mss_init(m, p, m->sg->sponge, m->wots, d, m->nonce1, m->nonce2);
 
   e = RC_OK;
 
@@ -77,17 +77,17 @@ void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m) {
   MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
 
-  m->p = 0;
+  m->prng = 0;
 
-  trits_free(m->N1);
-  trits_free(m->N2);
+  trits_free(m->nonce1);
+  trits_free(m->nonce2);
 
-  if (m->w) {
-    ma->destroy_sponge(m->w->spongos.sponge);
-    m->w->spongos.sponge = 0;
+  if (m->wots) {
+    ma->destroy_sponge(m->wots->spongos.sponge);
+    m->wots->spongos.sponge = 0;
   }
-  wots_destroy(m->w);
-  m->w = 0;
+  wots_destroy(m->wots);
+  m->wots = 0;
 
   ma->destroy_sponge(m->sg->sponge);
   m->sg->sponge = 0;
@@ -98,9 +98,9 @@ void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m) {
 trits_t mam_channel_id(mam_channel_t *ch) {
   return trits_from_rep(MAM2_CHANNEL_ID_SIZE, ch->id);
 }
-trits_t mam_channel_name(mam_channel_t *ch) { return ch->m->N1; }
+trits_t mam_channel_name(mam_channel_t *ch) { return ch->m->nonce1; }
 static size_t mam_channel_sig_size(mam_channel_t *ch) {
-  return MAM2_MSS_SIG_SIZE(ch->m->d);
+  return MAM2_MSS_SIG_SIZE(ch->m->height);
 }
 
 retcode_t mam_channel_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
@@ -133,10 +133,10 @@ void mam_channel_destroy(mam_ialloc_t *ma, /*!< [in] Allocator. */
 trits_t mam_endpoint_id(mam_endpoint_t *ep) {
   return trits_from_rep(MAM2_ENDPOINT_ID_SIZE, ep->id);
 }
-trits_t mam_endpoint_chname(mam_endpoint_t *ep) { return ep->m->N1; }
-trits_t mam_endpoint_name(mam_endpoint_t *ep) { return ep->m->N2; }
+trits_t mam_endpoint_chname(mam_endpoint_t *ep) { return ep->m->nonce1; }
+trits_t mam_endpoint_name(mam_endpoint_t *ep) { return ep->m->nonce2; }
 static size_t mam_endpoint_sig_size(mam_endpoint_t *ep) {
-  return MAM2_MSS_SIG_SIZE(ep->m->d);
+  return MAM2_MSS_SIG_SIZE(ep->m->height);
 }
 
 retcode_t mam_endpoint_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
@@ -208,7 +208,7 @@ static retcode_t mam_unwrap_mac(spongos_t *s, trits_t *b) {
 }
 
 static size_t mam_wrap_mssig_size(mss_t *m) {
-  size_t const sz = MAM2_MSS_SIG_SIZE(m->d) / 3;
+  size_t const sz = MAM2_MSS_SIG_SIZE(m->height) / 3;
   return 0
          /*  commit; */
          /*  external squeeze tryte mac[78]; */
@@ -220,7 +220,7 @@ static size_t mam_wrap_mssig_size(mss_t *m) {
 }
 static void mam_wrap_mssig(spongos_t *s, trits_t *b, mss_t *m) {
   MAM2_TRITS_DEF0(mac, MAM2_MSS_HASH_SIZE);
-  size_t const sz = MAM2_MSS_SIG_SIZE(m->d) / 3;
+  size_t const sz = MAM2_MSS_SIG_SIZE(m->height) / 3;
   mac = MAM2_TRITS_INIT(mac, MAM2_MSS_HASH_SIZE);
 
   MAM2_ASSERT(mam_wrap_mssig_size(m) <= trits_size(*b));
@@ -259,7 +259,7 @@ static retcode_t mam_unwrap_mssig(spongos_t *s, trits_t *b, spongos_t *ms,
 }
 
 static size_t mam_wrap_signedid_size(mss_t *m) {
-  size_t const sz = MAM2_MSS_SIG_SIZE(m->d) / 3;
+  size_t const sz = MAM2_MSS_SIG_SIZE(m->height) / 3;
   return 0
          /*  absorb tryte id[81]; */
          + pb3_sizeof_ntrytes(81)
