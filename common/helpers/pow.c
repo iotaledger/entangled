@@ -67,9 +67,8 @@ IOTA_EXPORT flex_trit_t *iota_pow_flex(flex_trit_t const *const flex_trits_in,
   if (!nonce_trits) {
     return NULL;
   }
-  size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(NUM_TRITS_NONCE);
   flex_trit_t *nonce_flex_trits =
-      (flex_trit_t *)calloc(flex_len, sizeof(flex_trit_t));
+      (flex_trit_t *)calloc(NUM_TRITS_NONCE, sizeof(flex_trit_t));
   if (!nonce_flex_trits) {
     free(nonce_trits);
     return NULL;
