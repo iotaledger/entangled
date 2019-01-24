@@ -17,8 +17,8 @@
 
 static void mss_hash2(
     spongos_t *s,
-    trits_t hashes[2],    /*!< [in] hash values of left and right child nodes */
-    trits_t hashed_hashes /*!< [out] hash value of their parent */
+    trits_t hashes[2],  /*!< [in] hash values of left and right child nodes */
+    trits_t parent_hash /*!< [out] hash value of their parent */
 ) {
 #if defined(MAM2_MSS_DEBUG)
   {
@@ -35,19 +35,20 @@ static void mss_hash2(
     MAM2_ASSERT(i0 + 1 == i1);
     /* parent'spongos index */
     i01 = i0 / 2;
-    trits_set_zero(hashed_hashes);
-    trits_put18(hashed_hashes, i01);
+    trits_set_zero(parent_hash);
+    trits_put18(parent_hash, i01);
   }
 #else
-  spongos_hashn(s, 2, hashes, hashed_hashes);
+  spongos_hashn(s, 2, hashes, parent_hash);
 #endif
 }
 
-static void mss_mt_hash2(mss_t *m, trits_t hashes[2], trits_t hashed_hashes) {
+static void mss_mt_hash2(mss_t *mss, trits_t children_hashes[2],
+                         trits_t parent_hash) {
 #if defined(MAM2_MSS_DEBUG)
-  m->hash_node_count++;
+  mss->hash_node_count++;
 #endif
-  mss_hash2(m->sg, hashes, hashed_hashes);
+  mss_hash2(mss->sg, children_hashes, parent_hash);
 }
 
 static void mss_mt_gen_leaf(
