@@ -8,11 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file mss.c
-\brief MAM2 MSS layer.
-*/
-
 #include <memory.h>
 #include <stdlib.h>
 
@@ -306,12 +301,12 @@ void mss_mt_rewind(mss_t *mss, trint18_t skn) {
   }
 }
 #else
-static trits_t mss_mt_node_t_trits(mss_t *m, trint6_t height, trint18_t i) {
-  MAM2_ASSERT(height <= m->height);
+static trits_t mss_mt_node_t_trits(mss_t *mss, trint6_t height, trint18_t i) {
+  MAM2_ASSERT(height <= mss->height);
   MAM2_ASSERT(i < ((trint18_t)1 << height));
 
   size_t idx = ((size_t)1 << height) + i - 1;
-  trit_t *t = m->mt + MAM2_MSS_MT_HASH_SIZE * idx;
+  trit_t *t = mss->mt + MAM2_MSS_MT_HASH_SIZE * idx;
   return trits_from_rep(MAM2_MSS_MT_HASH_SIZE, t);
 }
 #endif
@@ -506,7 +501,7 @@ void mss_auth_path(mss_t *mss, trint18_t skn, trits_t path) {
   MAM2_ASSERT(trits_size(path) == MAM2_MSS_APATH_SIZE(mss->height));
 
 #if defined(MAM2_MSS_TRAVERSAL)
-  /*current apath is already stored in `m->ap` */
+  // current apath is already stored in `mss->ap`
   for (height = 0; height < mss->height; ++height)
 #else
   /* note, level height is reversed (compared to traversal): */
@@ -518,7 +513,7 @@ void mss_auth_path(mss_t *mss, trint18_t skn, trits_t path) {
 #if defined(MAM2_MSS_TRAVERSAL)
     trits_t curr_auth_path_part = mss_hash_idx(mss->auth_path, height);
 #else
-    trits_t ni =
+    trits_t curr_auth_path_part =
         mss_mt_node_t_trits(mss, height, (0 == skn % 2) ? skn + skn : skn - 1);
 #endif
     trits_copy(curr_auth_path_part, path_part_out);
@@ -623,8 +618,8 @@ retcode_t mss_create(mss_t *mss, mss_mt_height_t height) {
   mss->stacks = malloc(sizeof(mss_mt_stack_t) * MAM2_MSS_MT_STACKS(height));
   ERR_GUARD_RETURN(mss->nodes, RC_OOM, e);
 #else
-  m->mt = malloc(sizeof(trit_t) * MAM2_MSS_MT_WORDS(height));
-  ERR_GUARD_RETURN(m->mt, RC_OOM, e);
+  mss->mt = malloc(sizeof(trit_t) * MAM2_MSS_MT_WORDS(height));
+  ERR_GUARD_RETURN(mss->mt, RC_OOM, e);
 #endif
 
   /* do not free here in case of error */
@@ -663,7 +658,7 @@ static size_t mss_mt_stored_size(mss_t *mss) {
   for (height = 0; height != mss->height; ++height)
     size += mss->stacks[height].size * MAM2_MSS_MT_HASH_SIZE;
 #else
-  spongos += ((size_t)1 << mss->height) * MAM2_MSS_MT_HASH_SIZE;
+  size += ((size_t)1 << mss->height) * MAM2_MSS_MT_HASH_SIZE;
 #endif
   return size;
 }
@@ -691,9 +686,9 @@ static void mss_mt_save(mss_t *mss, trits_t buffer) {
   }
 #else
   /* <node-hashes> */
-  for (height = 0; height != m->height; ++height) {
-    for (i = 0; i != mss->ss[height].spongos; ++i) {
-      trits_copy(mss_mt_hs_trits(mss, height, i),
+  for (height = 0; height != mss->height; ++height) {
+    for (i = 0; i != mss->stacks[height].spongos; ++i) {
+      trits_copy(mss_mt_node_hash_trits(mss, height, i),
                  trits_take(buffer, MAM2_MSS_MT_HASH_SIZE));
       buffer = trits_drop(buffer, MAM2_MSS_MT_HASH_SIZE);
     }
@@ -701,7 +696,10 @@ static void mss_mt_save(mss_t *mss, trits_t buffer) {
 #endif
 }
 
-/*! \note `mss_mt_rewind` must be called prior `mss_mt_load`. */
+/*!
+ * \note `mss_mt_rewind` must be called prior `mss_mt_load`.
+ */
+
 static void mss_mt_load(mss_t *mss, trits_t buffer) {
   mss_mt_height_t height;
   mss_mt_idx_t i;
@@ -725,8 +723,8 @@ static void mss_mt_load(mss_t *mss, trits_t buffer) {
   }
 #else
   /* <node-hashes> */
-  for (height = 0; height != m->height; ++height) {
-    for (i = 0; i != mss->ss[height].spongos; ++i) {
+  for (height = 0; height != mss->height; ++height) {
+    for (i = 0; i != mss->stacks[height].spongos; ++i) {
       trits_copy(trits_take(buffer, MAM2_MSS_MT_HASH_SIZE),
                  mss_mt_hs_trits(mss, height, i));
       buffer = trits_drop(buffer, MAM2_MSS_MT_HASH_SIZE);

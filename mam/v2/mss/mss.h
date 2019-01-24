@@ -26,9 +26,6 @@
 extern "C" {
 #endif
 
-/*! \brief Use Merkle tree traversal algorithm on MSS layer. */
-#define MAM2_MSS_TRAVERSAL
-
 /*! \brief Enable debug MT hash function to ease MT traversal debug. */
 /*#define MAM2_MSS_DEBUG*/
 
