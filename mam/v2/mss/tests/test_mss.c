@@ -202,7 +202,7 @@ static bool mss_test(mss_t *mss, prng_t *prng, spongos_t *spongos, wots_t *wots,
     trits_t sig_apath = trits_drop(sig, MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE);
 #endif
 
-    dbg_printf("========================\nD = %height\n", curr_height);
+    dbg_printf("========================\ncurr_height = %d\n", curr_height);
 
     mss_init(mss, prng, spongos->sponge, wots, curr_height, nonce,
              trits_null());
@@ -213,7 +213,7 @@ static bool mss_test(mss_t *mss, prng_t *prng, spongos_t *spongos, wots_t *wots,
     dbg_printf("\n");
 
     do {
-      dbg_printf("------------------------\nskn = %height\n", mss->skn);
+      dbg_printf("------------------------\nskn = %d\n", mss->skn);
       mss_sign(mss, hash, sig);
       r = r && mss_verify(spongos, &wots->spongos, hash, sig, pk);
 
@@ -251,9 +251,9 @@ static bool mss_test(mss_t *mss, prng_t *prng, spongos_t *spongos, wots_t *wots,
     } while (mss_next(mss));
 
 #if defined(MAM2_MSS_DEBUG)
-    dbg_printf("\nd = %height\n", m->height);
-    dbg_printf("  leafs = %height\n", m->gen_leaf_count);
-    dbg_printf("  nodes = %height\n", m->hash_node_count);
+    dbg_printf("\nd = %d\n", mss->height);
+    dbg_printf("  leafs = %d\n", mss->gen_leaf_count);
+    dbg_printf("  nodes = %d\n", mss->hash_node_count);
 #endif
   }
 

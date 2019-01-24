@@ -512,7 +512,7 @@ void test_gen_mss(prng_t *p, mss_t *m, prng_t *r, sponge_t *spongos, wots_t *w)
 
   for(i = 0; spongos_ntru[i] < TEST_MAX_SIZE; ++i)
   {
-    mss_init(m, r, spongos, w, height, n1, n2);
+    mss_init(m, r, spongos, w, d, n1, n2);
     mss_gen(m, pk);
     mss_sign(m, H, sig);
     mss_save(m, );

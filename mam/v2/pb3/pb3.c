@@ -97,7 +97,7 @@ size_t pb3_sizeof_size_t(size_t const n) {
   size_t d = pb3_size_t_trytes(n);
   MAM2_ASSERT(d < 14);
 
-  /* one extra tryte to encode `height` */
+  /* one extra tryte to encode `d` */
   return 3 * (d + 1);
 }
 
