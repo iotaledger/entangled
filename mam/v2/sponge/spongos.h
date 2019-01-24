@@ -76,9 +76,9 @@ void spongos_squeeze(spongos_t *const spongos, trits_t output);
  * Generates output data and check for equality with given output
  *
  * @param spongos A spongos interface
- * @param output Output data
+ * @param expected_output Expected output data
  */
-bool spongos_squeeze_eq(spongos_t *const spongos, trits_t output);
+bool spongos_squeeze_eq(spongos_t *const spongos, trits_t expected_output);
 
 /**
  * Hashes input data
@@ -104,19 +104,21 @@ void spongos_hashn(spongos_t *const spongos, size_t const n, trits_t *inputs,
  * Encrypts plaintext
  *
  * @param spongos A spongos interface
- * @param input plaintext input
- * @param output Encrypted output
+ * @param plaintext Plaintext input
+ * @param ciphertext Ciphertext output
  */
-void spongos_encr(spongos_t *const spongos, trits_t input, trits_t output);
+void spongos_encr(spongos_t *const spongos, trits_t plaintext,
+                  trits_t ciphertext);
 
 /**
- * Decrypts cyphertext
+ * Decrypts ciphertext
  *
  * @param spongos A spongos interface
- * @param input Cyphertext input
- * @param output Decrypted output
+ * @param ciphertext Ciphertext input
+ * @param plaintext Plaintext output
  */
-void spongos_decr(spongos_t *const spongos, trits_t input, trits_t output);
+void spongos_decr(spongos_t *const spongos, trits_t ciphertext,
+                  trits_t plaintext);
 
 #ifdef __cplusplus
 }

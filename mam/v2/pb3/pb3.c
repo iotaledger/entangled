@@ -286,7 +286,7 @@ retcode_t pb3_unwrap_absorb_size_t(spongos_t *const spongos,
 
   b0 = *buffer;
   if ((ret = pb3_decode_size_t(t, buffer)) != RC_OK) {
-    return RC_OK;
+    return ret;
   }
   spongos_absorb(spongos, trits_diff(b0, *buffer));
 

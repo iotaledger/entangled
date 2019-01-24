@@ -78,25 +78,25 @@ def_test_mss(1, 1);
 def_test_mss(2, 2);
 def_test_mss(3, 3);
 def_test_mss(4, 4);
-def_test_mss(5, 5);
-def_test_mss(10, x);
-def_test_mss(MAM2_MSS_TEST_MAX_D, );
+// def_test_mss(5, 5);
+// def_test_mss(10, x);
+// def_test_mss(MAM2_MSS_TEST_MAX_D, );
 
 def_test_mss_init(1, 1);
 def_test_mss_init(2, 2);
 def_test_mss_init(3, 3);
 def_test_mss_init(4, 4);
-def_test_mss_init(5, 5);
-def_test_mss_init(10, x);
-def_test_mss_init(MAM2_MSS_TEST_MAX_D, );
+// def_test_mss_init(5, 5);
+// def_test_mss_init(10, x);
+// def_test_mss_init(MAM2_MSS_TEST_MAX_D, );
 
 def_test_mss_check(1, 1);
 def_test_mss_check(2, 2);
 def_test_mss_check(3, 3);
 def_test_mss_check(4, 4);
-def_test_mss_check(5, 5);
-def_test_mss_check(10, x);
-def_test_mss_check(MAM2_MSS_TEST_MAX_D, );
+// def_test_mss_check(5, 5);
+// def_test_mss_check(10, x);
+// def_test_mss_check(MAM2_MSS_TEST_MAX_D, );
 
 static bool mss_store_test(mss_t *mss1, mss_t *mss2, prng_t *prng,
                            spongos_t *spongos, wots_t *wots,
@@ -272,9 +272,9 @@ static void mss_meta_test(void) {
   test_mss3_t _m3[1];
   test_mss4_t _m4[1];
   test_mss4_t _m42[1];
-  test_mss5_t _m5[1];
-  test_mssx_t _mx[1];
-  test_mss_t _m[1];
+  // test_mss5_t _m5[1];
+  // test_mssx_t _mx[1];
+  // test_mss_t _m[1];
 
   sponge_t *spongos = test_sponge_init(_s);
   spongos_t *sg = test_spongos_init(_sg, spongos);
@@ -286,9 +286,9 @@ static void mss_meta_test(void) {
   mss_t *m3 = test_mss_init3(_m3);
   mss_t *m4 = test_mss_init4(_m4);
   mss_t *m42 = test_mss_init4(_m42);
-  mss_t *m5 = test_mss_init5(_m5);
-  mss_t *mx = test_mss_initx(_mx);
-  mss_t *m = test_mss_init(_m);
+  // mss_t *m5 = test_mss_init5(_m5);
+  // mss_t *mx = test_mss_initx(_mx);
+  // mss_t *m = test_mss_init(_m);
 
   TEST_ASSERT_TRUE(mss_test(m1, p, sg, w, 1) && test_mss_check1(_m1));
   TEST_ASSERT_TRUE(mss_test(m2, p, sg, w, 2) && test_mss_check2(_m2));

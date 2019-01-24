@@ -60,11 +60,11 @@ size_t trits_size_min(trits_t x, size_t s) {
   return n;
 }
 
-trits_t trits_from_rep(size_t n, trit_t *t) {
+trits_t trits_from_rep(size_t const n, trit_t const *const t) {
   trits_t x;
   x.n = n;
   x.d = 0;
-  x.p = t;
+  x.p = (trit_t *)t;
   return x;
 }
 
