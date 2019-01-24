@@ -123,7 +123,7 @@ extern "C" {
 #define ERR_GUARD_GO_TO(expr, err, e, label) \
   if (!(expr)) {                             \
     e = (err);                               \
-    goto;                                    \
+    goto label;                              \
   } else
 
 /** Return Codes */
