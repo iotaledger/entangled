@@ -72,7 +72,7 @@ static void wots_hash_sign_or_recover(spongos_t *const spongos,
   }
 }
 
-static trits_t wots_secret_key_trits(wots_t const *const wots) {
+static inline trits_t wots_secret_key_trits(wots_t const *const wots) {
   return trits_from_rep(MAM2_WOTS_SK_SIZE, wots->secret_key);
 }
 
