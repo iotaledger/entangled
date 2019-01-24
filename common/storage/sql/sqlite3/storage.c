@@ -296,19 +296,26 @@ static void select_transactions_populate_from_row(
     sqlite3_stmt* const statement, iota_transaction_t* const tx) {
   column_decompress_load(statement, 0, tx->data.signature_or_message,
                          FLEX_TRIT_SIZE_6561);
+  tx->loaded_columns_mask.data |= MASK_DATA_SIG_OR_MSG;
   column_decompress_load(statement, 1, tx->essence.address, FLEX_TRIT_SIZE_243);
+  tx->loaded_columns_mask.essence |= MASK_ESSENCE_ADDRESS;
   transaction_set_value(tx, sqlite3_column_int64(statement, 2));
   column_decompress_load(statement, 3, tx->essence.obsolete_tag,
                          FLEX_TRIT_SIZE_81);
+  tx->loaded_columns_mask.essence |= MASK_ESSENCE_OBSOLETE_TAG;
   transaction_set_timestamp(tx, sqlite3_column_int64(statement, 4));
   transaction_set_current_index(tx, sqlite3_column_int64(statement, 5));
   transaction_set_last_index(tx, sqlite3_column_int64(statement, 6));
   column_decompress_load(statement, 7, tx->essence.bundle, FLEX_TRIT_SIZE_243);
+  tx->loaded_columns_mask.essence |= MASK_ESSENCE_BUNDLE;
   column_decompress_load(statement, 8, tx->attachment.trunk,
                          FLEX_TRIT_SIZE_243);
+  tx->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TRUNK;
   column_decompress_load(statement, 9, tx->attachment.branch,
                          FLEX_TRIT_SIZE_243);
+  tx->loaded_columns_mask.attachment |= MASK_ATTACHMENT_BRANCH;
   column_decompress_load(statement, 10, tx->attachment.tag, FLEX_TRIT_SIZE_81);
+  tx->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TAG;
   transaction_set_attachment_timestamp(tx, sqlite3_column_int64(statement, 11));
   transaction_set_attachment_timestamp_upper(
       tx, sqlite3_column_int64(statement, 12));
@@ -316,40 +323,48 @@ static void select_transactions_populate_from_row(
       tx, sqlite3_column_int64(statement, 13));
   column_decompress_load(statement, 14, tx->attachment.nonce,
                          FLEX_TRIT_SIZE_81);
+  tx->loaded_columns_mask.attachment |= MASK_ATTACHMENT_NONCE;
   column_decompress_load(statement, 15, tx->consensus.hash, FLEX_TRIT_SIZE_243);
-  tx->loaded_columns_mask = (MASK_ALL_COLUMNS & (~MASK_METADATA));
+  tx->loaded_columns_mask.consensus |= MASK_CONSENSUS_HASH;
 }
 
 static void select_transactions_populate_from_row_essence_and_metadata(
     sqlite3_stmt* const statement, iota_transaction_t* const tx) {
   column_decompress_load(statement, 0, tx->essence.address, FLEX_TRIT_SIZE_243);
+  tx->loaded_columns_mask.essence |= MASK_ESSENCE_ADDRESS;
   transaction_set_value(tx, sqlite3_column_int64(statement, 1));
   column_decompress_load(statement, 2, tx->essence.obsolete_tag,
                          FLEX_TRIT_SIZE_81);
+  tx->loaded_columns_mask.essence |= MASK_ESSENCE_OBSOLETE_TAG;
   transaction_set_timestamp(tx, sqlite3_column_int64(statement, 3));
   transaction_set_current_index(tx, sqlite3_column_int64(statement, 4));
   transaction_set_last_index(tx, sqlite3_column_int64(statement, 5));
   column_decompress_load(statement, 6, tx->essence.bundle, FLEX_TRIT_SIZE_243);
+  tx->loaded_columns_mask.essence |= MASK_ESSENCE_BUNDLE;
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 7));
   transaction_set_solid(tx, sqlite3_column_int(statement, 8));
-  tx->loaded_columns_mask = MASK_ESSENCE | MASK_METADATA;
 }
 
 static void
 select_transactions_populate_from_row_essence_attachment_and_metadata(
     sqlite3_stmt* const statement, iota_transaction_t* const tx) {
   column_decompress_load(statement, 0, tx->essence.address, FLEX_TRIT_SIZE_243);
+  tx->loaded_columns_mask.essence |= MASK_ESSENCE_ADDRESS;
   transaction_set_value(tx, sqlite3_column_int64(statement, 1));
   column_decompress_load(statement, 2, tx->essence.obsolete_tag,
                          FLEX_TRIT_SIZE_81);
+  tx->loaded_columns_mask.essence |= MASK_ESSENCE_OBSOLETE_TAG;
   transaction_set_timestamp(tx, sqlite3_column_int64(statement, 3));
   transaction_set_current_index(tx, sqlite3_column_int64(statement, 4));
   transaction_set_last_index(tx, sqlite3_column_int64(statement, 5));
   column_decompress_load(statement, 6, tx->essence.bundle, FLEX_TRIT_SIZE_243);
+  tx->loaded_columns_mask.essence |= MASK_ESSENCE_BUNDLE;
   column_decompress_load(statement, 7, tx->attachment.trunk,
                          FLEX_TRIT_SIZE_243);
+  tx->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TRUNK;
   column_decompress_load(statement, 8, tx->attachment.branch,
                          FLEX_TRIT_SIZE_243);
+  tx->loaded_columns_mask.attachment |= MASK_ATTACHMENT_BRANCH;
   transaction_set_attachment_timestamp(tx, sqlite3_column_int64(statement, 9));
   transaction_set_attachment_timestamp_upper(
       tx, sqlite3_column_int64(statement, 10));
@@ -357,26 +372,29 @@ select_transactions_populate_from_row_essence_attachment_and_metadata(
       tx, sqlite3_column_int64(statement, 11));
   column_decompress_load(statement, 12, tx->attachment.nonce,
                          FLEX_TRIT_SIZE_81);
+  tx->loaded_columns_mask.attachment |= MASK_ATTACHMENT_NONCE;
   column_decompress_load(statement, 13, tx->attachment.tag, FLEX_TRIT_SIZE_81);
+  tx->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TAG;
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 14));
   transaction_set_solid(tx, sqlite3_column_int(statement, 15));
   transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 16));
-  tx->loaded_columns_mask = MASK_ESSENCE | MASK_ATTACHMENT | MASK_METADATA;
 }
 
 static void select_transactions_populate_from_row_essence_and_consensus(
     sqlite3_stmt* const statement, iota_transaction_t* const tx) {
   column_decompress_load(statement, 0, tx->essence.address, FLEX_TRIT_SIZE_243);
+  tx->loaded_columns_mask.essence |= MASK_ESSENCE_ADDRESS;
   transaction_set_value(tx, sqlite3_column_int64(statement, 1));
   column_decompress_load(statement, 2, tx->essence.obsolete_tag,
                          FLEX_TRIT_SIZE_81);
+  tx->loaded_columns_mask.essence |= MASK_ESSENCE_OBSOLETE_TAG;
   transaction_set_timestamp(tx, sqlite3_column_int64(statement, 3));
   transaction_set_current_index(tx, sqlite3_column_int64(statement, 4));
   transaction_set_last_index(tx, sqlite3_column_int64(statement, 5));
   column_decompress_load(statement, 6, tx->essence.bundle, FLEX_TRIT_SIZE_243);
+  tx->loaded_columns_mask.essence |= MASK_ESSENCE_BUNDLE;
   column_decompress_load(statement, 7, tx->consensus.hash, FLEX_TRIT_SIZE_243);
-
-  tx->loaded_columns_mask = MASK_ESSENCE | MASK_CONSENSUS;
+  tx->loaded_columns_mask.consensus |= MASK_CONSENSUS_HASH;
 }
 
 static void select_transactions_populate_from_row_metadata(
@@ -384,7 +402,6 @@ static void select_transactions_populate_from_row_metadata(
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 0));
   transaction_set_solid(tx, sqlite3_column_int(statement, 1));
   transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 2));
-  tx->loaded_columns_mask = MASK_METADATA;
 }
 
 retcode_t iota_stor_transaction_count(
