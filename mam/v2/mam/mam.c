@@ -1010,28 +1010,28 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
     p = trits_alloc(pb3_sizeof_ntrytes(sz));
     ERR_GUARD_RETURN(!trits_is_null(p), RC_OOM, e);
   } else {
-    ERR_GUARD_RETURN(trits_size(*payload) <= pb3_sizeof_ntrytes(sz),
-                     RC_MAM2_BUFFER_TOO_SMALL, e);
+    ERR_GUARD_GOTO(trits_size(*payload) <= pb3_sizeof_ntrytes(sz),
+                   RC_MAM2_BUFFER_TOO_SMALL, e, cleanup);
     p = pb3_trits_take(payload, pb3_sizeof_ntrytes(sz));
   }
-  ERR_BIND_RETURN(pb3_unwrap_crypt_ntrytes(s, b, p), e);
+  ERR_BIND_GOTO(pb3_unwrap_crypt_ntrytes(s, b, p), e, cleanup);
 
   /*  absorb oneof checksum */
-  ERR_BIND_RETURN(pb3_unwrap_absorb_tryte(s, b, &checksum), e);
+  ERR_BIND_GOTO(pb3_unwrap_absorb_tryte(s, b, &checksum), e, cleanup);
 
   if (mam_msg_checksum_none == checksum) {
     /*    absorb null none = 0; */
-    ERR_BIND_RETURN(mam_unwrap_checksum_none(s, b), e);
+    ERR_BIND_GOTO(mam_unwrap_checksum_none(s, b), e, cleanup);
   } else if (mam_msg_checksum_mac == checksum) {
     /*    MAC mac = 1; */
-    ERR_BIND_RETURN(mam_unwrap_checksum_mac(s, b), e);
+    ERR_BIND_GOTO(mam_unwrap_checksum_mac(s, b), e, cleanup);
   } else if (mam_msg_checksum_mssig == checksum) {
     /*    MSSig mssig = 2; */
-    ERR_BIND_RETURN(mam_unwrap_checksum_mssig(s, b, cfg->spongos_mss,
-                                              cfg->spongos_wots, cfg->pk),
-                    e);
+    ERR_BIND_GOTO(mam_unwrap_checksum_mssig(s, b, cfg->spongos_mss,
+                                            cfg->spongos_wots, cfg->pk),
+                  e, cleanup);
   } else {
-    ERR_GUARD_RETURN(0, RC_MAM2_PB3_BAD_ONEOF, e);
+    ERR_GUARD_GOTO(0, RC_MAM2_PB3_BAD_ONEOF, e, cleanup);
   }
 
   /*  commit; */
@@ -1040,6 +1040,7 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
   if (trits_is_null(*payload)) *payload = p;
   p = trits_null();
 
+cleanup:
   trits_free(p);
   return e;
 }
