@@ -32,11 +32,11 @@ void test_f(void *buf, trit_t *s) {
 }
 
 ntru_t *test_ntru_init(test_ntru_t *n) {
-  n->n.id = n->id;
-  n->n.sk = n->sk;
-  n->n.f = n->f;
-  memset(n->n.sk, 0, MAM2_NTRU_SK_SIZE);
-  return &n->n;
+  n->ntru.public_key_id = n->public_key_id;
+  n->ntru.secret_key = n->secret_key;
+  n->ntru.f = n->f;
+  memset(n->ntru.secret_key, 0, MAM2_NTRU_SK_SIZE);
+  return &n->ntru;
 }
 
 prng_t *test_prng_init(test_prng_t *p, sponge_t *s) {
