@@ -109,9 +109,9 @@ extern "C" {
     return e;                    \
   else
 
-#define ERR_BIND_GO_TO(expr, e, label) \
-  if (RC_OK != (e = (expr)))           \
-    goto label;                        \
+#define ERR_BIND_GOTO(expr, e, label) \
+  if (RC_OK != (e = (expr)))          \
+    goto label;                       \
   else
 
 #define ERR_GUARD_RETURN(expr, err, e) \
@@ -120,10 +120,10 @@ extern "C" {
     return e;                          \
   } else
 
-#define ERR_GUARD_GO_TO(expr, err, e, label) \
-  if (!(expr)) {                             \
-    e = (err);                               \
-    goto label;                              \
+#define ERR_GUARD_GOTO(expr, err, e, label) \
+  if (!(expr)) {                            \
+    e = (err);                              \
+    goto label;                             \
   } else
 
 /** Return Codes */
