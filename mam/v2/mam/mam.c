@@ -213,8 +213,8 @@ static size_t mam_wrap_mssig_size(mss_t *m) {
          /*  commit; */
          /*  external squeeze tryte mac[78]; */
          + 0
-         /*  absorb sizet sz; */
-         + pb3_sizeof_sizet(sz)
+         /*  absorb size_t sz; */
+         + pb3_sizeof_size_t(sz)
          /*  skip tryte sig[sz]; */
          + pb3_sizeof_ntrytes(sz);
 }
@@ -229,8 +229,8 @@ static void mam_wrap_mssig(spongos_t *s, trits_t *b, mss_t *m) {
   spongos_commit(s);
   /*  external squeeze tryte mac[78]; */
   pb3_squeeze_external_ntrytes(s, mac);
-  /*  absorb sizet sz; */
-  pb3_wrap_absorb_sizet(s, b, sz);
+  /*  absorb size_t sz; */
+  pb3_wrap_absorb_size_t(s, b, sz);
   /*  skip tryte sig[sz]; */
   mss_sign(m, mac, pb3_trits_take(b, pb3_sizeof_ntrytes(sz)));
 }
@@ -246,8 +246,8 @@ static retcode_t mam_unwrap_mssig(spongos_t *s, trits_t *b, spongos_t *ms,
   spongos_commit(s);
   /*  external squeeze tryte mac[78]; */
   pb3_squeeze_external_ntrytes(s, mac);
-  /*  absorb sizet sz; */
-  ERR_BIND_RETURN(pb3_unwrap_absorb_sizet(s, b, &sz), e);
+  /*  absorb size_t sz; */
+  ERR_BIND_RETURN(pb3_unwrap_absorb_size_t(s, b, &sz), e);
   /*  skip tryte sig[sz]; */
   ERR_GUARD_RETURN(pb3_sizeof_ntrytes(sz) <= trits_size(*b), RC_MAM2_PB3_EOF,
                    e);
@@ -705,7 +705,7 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg) {
       keyload_count += mam_pre_shared_key_t_set_size(&cfg->pre_shared_keys);
       keyload_count += mam_ntru_pk_t_set_size(&cfg->ntru_public_keys);
       /*  repeated */
-      pb3_wrap_absorb_sizet(spongos, msg, keyload_count);
+      pb3_wrap_absorb_size_t(spongos, msg, keyload_count);
 
       if (cfg->key_plain) {
         /*  absorb oneof keyload */
@@ -767,7 +767,7 @@ size_t mam_send_packet_size(mam_send_packet_context_t *cfg,
        /*  absorb long trint ord; */
        + pb3_sizeof_longtrint()
        /*  absorb tryte sz; */
-       + pb3_sizeof_sizet(payload_size / 3)
+       + pb3_sizeof_size_t(payload_size / 3)
        /*  crypt tryte payload[sz]; */
        + pb3_sizeof_ntrytes(payload_size / 3)
        /*  absorb oneof checksum */
@@ -808,7 +808,7 @@ void mam_send_packet(mam_send_packet_context_t *cfg, trits_t payload,
   pb3_wrap_absorb_longtrint(s, b, cfg->ord);
 
   /*  absorb tryte sz; */
-  pb3_wrap_absorb_sizet(s, b, trits_size(payload) / 3);
+  pb3_wrap_absorb_size_t(s, b, trits_size(payload) / 3);
   /*  crypt tryte payload[sz]; */
   pb3_wrap_crypt_ntrytes(s, b, payload);
 
@@ -936,7 +936,7 @@ retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
       size_t keyload_count = 0;
       bool key_found = false;
 
-      ERR_BIND_RETURN(pb3_unwrap_absorb_sizet(s, b, &keyload_count), e);
+      ERR_BIND_RETURN(pb3_unwrap_absorb_size_t(s, b, &keyload_count), e);
 
       for (e = RC_OK; e == RC_OK && keyload_count--;) {
         tryte_t keyload = -1;
@@ -1004,7 +1004,7 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
   /*TODO: check ord */
 
   /*  absorb tryte sz; */
-  ERR_BIND_RETURN(pb3_unwrap_absorb_sizet(s, b, &sz), e);
+  ERR_BIND_RETURN(pb3_unwrap_absorb_size_t(s, b, &sz), e);
   /*  crypt tryte payload[sz]; */
   if (trits_is_null(*payload)) {
     p = trits_alloc(pb3_sizeof_ntrytes(sz));
