@@ -49,8 +49,8 @@ prng_t *test_prng_init(test_prng_t *p, sponge_t *s) {
 sponge_t *test_sponge_init(test_sponge_t *s) {
   s->s.f = test_f;
   s->s.stack = s->stack;
-  s->s.s = s->state;
-  memset(s->s.s, 0, MAM2_SPONGE_WIDTH);
+  s->s.state = s->state;
+  memset(s->s.state, 0, MAM2_SPONGE_WIDTH);
   return &s->s;
 }
 
