@@ -8,10 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file spongos.h
-\brief MAM2 Spongos layer.
-*/
 #ifndef __MAM_V2_SPONGE_SPONGOS_H__
 #define __MAM_V2_SPONGE_SPONGOS_H__
 
@@ -28,27 +24,99 @@ typedef struct spongos_s {
   size_t pos;
 } spongos_t;
 
-void spongos_fork(spongos_t *s, spongos_t *fork);
+/**
+ * Initializes a spongos state
+ *
+ * @param spongos A spongos interface
+ */
+void spongos_init(spongos_t *const spongos);
 
-void spongos_init(spongos_t *s);
+/**
+ * Creates an equivalent spongos instance
+ *
+ * @param spongos A spongos interface
+ * @param fork The fork
+ */
+void spongos_fork(spongos_t const *const spongos, spongos_t *const fork);
 
-void spongos_commit(spongos_t *s);
+/**
+ * Commits changes in the rate part
+ *
+ * @param spongos A spongos interface
+ */
+void spongos_commit(spongos_t *const spongos);
 
-void spongos_absorb(spongos_t *s, trits_t X);
+/**
+ * Processes input data
+ *
+ * @param spongos A spongos interface
+ * @param input Input data
+ */
+void spongos_absorb(spongos_t *const spongos, trits_t input);
 
-void spongos_absorbn(spongos_t *s, size_t n, trits_t *Xs);
+/**
+ * Processes n inputs data
+ *
+ * @param spongos A spongos interface
+ * @param n Number of input data
+ * @param inputs Inputs data
+ */
+void spongos_absorbn(spongos_t *const spongos, size_t const n,
+                     trits_t *const inputs);
 
-void spongos_squeeze(spongos_t *s, trits_t Y);
+/**
+ * Generates output data
+ *
+ * @param spongos A spongos interface
+ * @param output Output data
+ */
+void spongos_squeeze(spongos_t *const spongos, trits_t output);
 
-bool spongos_squeeze_eq(spongos_t *s, trits_t Y);
+/**
+ * Generates output data and check for equality with given output
+ *
+ * @param spongos A spongos interface
+ * @param output Output data
+ */
+bool spongos_squeeze_eq(spongos_t *const spongos, trits_t output);
 
-void spongos_encr(spongos_t *s, trits_t X, trits_t Y);
+/**
+ * Hashes input data
+ *
+ * @param spongos A spongos interface
+ * @param input Input data
+ * @param output Output data
+ */
+void spongos_hash(spongos_t *const spongos, trits_t input, trits_t output);
 
-void spongos_decr(spongos_t *s, trits_t X, trits_t Y);
+/**
+ * Hashes n input data
+ *
+ * @param spongos A spongos interface
+ * @param n Number of input data
+ * @param inputs Inputs data
+ * @param output Output data
+ */
+void spongos_hashn(spongos_t *const spongos, size_t const n, trits_t *inputs,
+                   trits_t output);
 
-void spongos_hash(spongos_t *s, trits_t X, trits_t Y);
+/**
+ * Encrypts plaintext
+ *
+ * @param spongos A spongos interface
+ * @param input plaintext input
+ * @param output Encrypted output
+ */
+void spongos_encr(spongos_t *const spongos, trits_t input, trits_t output);
 
-void spongos_hashn(spongos_t *s, size_t n, trits_t *Xs, trits_t Y);
+/**
+ * Decrypts cyphertext
+ *
+ * @param spongos A spongos interface
+ * @param input Cyphertext input
+ * @param output Decrypted output
+ */
+void spongos_decr(spongos_t *const spongos, trits_t input, trits_t output);
 
 #ifdef __cplusplus
 }
