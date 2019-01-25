@@ -184,7 +184,7 @@ nonstd::optional<std::string> powTX(nonstd::optional<std::string> maybeTx,
 
   auto tx = std::move(maybeTx.value());
 
-  char* foundNonce = iota_pow(tx.data(), mwm);
+  char* foundNonce = iota_pow_trytes(tx.data(), mwm);
   tx.replace(2646, 27, foundNonce);
   free(foundNonce);
 
