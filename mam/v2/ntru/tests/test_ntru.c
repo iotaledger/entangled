@@ -52,14 +52,8 @@ static void ntru_test_gen(ntru_t *n, trits_t rf, trits_t rg, trits_t pk) {
 }
 
 static void ntru_decr_fail_test(void) {
-  test_sponge_t test_sponge;
-  test_spongos_t test_spongos;
-  test_prng_t test_prng;
   test_ntru_t test_ntru;
 
-  sponge_t *sponge = test_sponge_init(&test_sponge);
-  spongos_t *spongos = test_spongos_init(&test_spongos, sponge);
-  prng_t *prng = test_prng_init(&test_prng, sponge);
   ntru_t *ntru = test_ntru_init(&test_ntru);
 
   poly_coeff_t *f0;
@@ -106,7 +100,7 @@ static void ntru_decr_fail_test(void) {
   s->sponge = _s;
   s->sponge->f = ntru_test_f;
   s->sponge->stack = &mask;
-  s->sponge->s = state;
+  s->sponge->state = state;
 
   trits_set1(u, 1);
   trits_set1(key, 0);
