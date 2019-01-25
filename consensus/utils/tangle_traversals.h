@@ -44,7 +44,7 @@ typedef retcode_t (*tangle_traversal_functor)(flex_trit_t* const hash,
  *
  * @return error value.
  */
-retcode_t tangle_traversal_dfs_to_genesis(tangle_t* const tangle,
+retcode_t tangle_traversal_dfs_to_genesis(tangle_t const* const tangle,
                                           tangle_traversal_functor func,
                                           flex_trit_t const* const entry_point,
                                           flex_trit_t const* const genesis_hash,

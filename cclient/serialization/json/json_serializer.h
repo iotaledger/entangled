@@ -118,7 +118,7 @@ retcode_t json_broadcast_transactions_serialize_request(
 
 // store_transactions request
 retcode_t json_store_transactions_serialize_request(
-    const serializer_t* const s, store_transactions_req_t* const obj,
+    const serializer_t* const s, store_transactions_req_t const* const obj,
     char_buffer_t* out);
 
 retcode_t json_check_consistency_serialize_request(

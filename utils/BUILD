@@ -6,6 +6,11 @@ cc_library(
 )
 
 cc_library(
+    name = "forced_inline",
+    hdrs = ["forced_inline.h"],
+)
+
+cc_library(
     name = "files",
     srcs = ["files.c"],
     hdrs = ["files.h"],
@@ -21,6 +26,7 @@ cc_library(
     hdrs = ["logger_helper.h"],
     copts = ["-DLOGGER_ENABLE"],
     deps = [
+        "//common:errors",
         "//utils/handles:lock",
         "@com_github_embear_logger//:logger",
     ],
@@ -69,8 +75,8 @@ cc_library(
 
 cc_library(
     name = "hash_maps",
-    srcs = ["hash_maps.c"],
-    hdrs = ["hash_maps.h"],
+    srcs = ["hash_indexed_map.c"],
+    hdrs = ["hash_indexed_map.h"],
     deps = [
         "//common:errors",
         "//common/trinary:flex_trit",

@@ -21,7 +21,6 @@ typedef struct tips_requester_s {
   thread_handle_t thread;
   bool running;
   node_t *node;
-  tangle_t *tangle;
 } tips_requester_t;
 
 #ifdef __cplusplus
@@ -38,7 +37,7 @@ extern "C" {
  * @return a status code
  */
 retcode_t tips_requester_init(tips_requester_t *const tips_requester,
-                              node_t *const node, tangle_t *const tangle);
+                              node_t *const node);
 
 /**
  * Starts a tips requester

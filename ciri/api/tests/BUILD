@@ -15,6 +15,15 @@ genrule(
 )
 
 cc_test(
+    name = "test_add_neighbors",
+    srcs = ["test_add_neighbors.c"],
+    deps = [
+        "//ciri/api",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_broadcast_transactions",
     srcs = ["test_broadcast_transactions.c"],
     data = [":db_file"],
@@ -27,10 +36,54 @@ cc_test(
 )
 
 cc_test(
+    name = "test_check_consistency",
+    srcs = ["test_check_consistency.c"],
+    data = [":db_file"],
+    deps = [
+        "//ciri/api",
+        "//consensus/test_utils",
+        "@unity",
+    ],
+)
+
+cc_test(
+    name = "test_find_transactions",
+    srcs = ["test_find_transactions.c"],
+    data = [":db_file"],
+    deps = [
+        ":defs",
+        "//ciri/api",
+        "//consensus/test_utils",
+        "@unity",
+    ],
+)
+
+cc_test(
+    name = "test_get_node_info",
+    srcs = ["test_get_node_info.c"],
+    data = [":db_file"],
+    deps = [
+        "//ciri/api",
+        "//consensus/test_utils",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_get_tips",
     srcs = ["test_get_tips.c"],
     deps = [
         ":defs",
+        "//ciri/api",
+        "@unity",
+    ],
+)
+
+cc_test(
+    name = "test_get_transactions_to_approve",
+    srcs = ["test_get_transactions_to_approve.c"],
+    data = [":db_file"],
+    deps = [
         "//ciri/api",
         "//consensus/test_utils",
         "@unity",
@@ -45,6 +98,15 @@ cc_test(
         ":defs",
         "//ciri/api",
         "//consensus/test_utils",
+        "@unity",
+    ],
+)
+
+cc_test(
+    name = "test_remove_neighbors",
+    srcs = ["test_remove_neighbors.c"],
+    deps = [
+        "//ciri/api",
         "@unity",
     ],
 )

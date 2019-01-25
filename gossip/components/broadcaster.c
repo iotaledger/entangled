@@ -7,32 +7,42 @@
 
 #include <string.h>
 
+#include "consensus/tangle/tangle.h"
 #include "gossip/components/broadcaster.h"
 #include "gossip/node.h"
-#include "utils/containers/lists/concurrent_list_neighbor.h"
 #include "utils/logger_helper.h"
 
 #define BROADCASTER_LOGGER_ID "broadcaster"
 #define BROADCASTER_TIMEOUT_SEC 5
+
+static logger_id_t logger_id;
 
 /*
  * Private functions
  */
 
 static void *broadcaster_routine(broadcaster_t *const broadcaster) {
-  concurrent_list_node_neighbor_t *iter = NULL;
+  neighbor_t *iter = NULL;
   flex_trit_t *transaction_flex_trits_ptr = NULL;
   flex_trit_t transaction_flex_trits[FLEX_TRIT_SIZE_8019];
+  connection_config_t db_conf = {.db_path = broadcaster->node->conf.db_path};
+  tangle_t tangle;
 
   if (broadcaster == NULL) {
     return NULL;
   }
+
+  if (iota_tangle_init(&tangle, &db_conf) != RC_OK) {
+    log_critical(logger_id, "Initializing tangle connection failed\n");
+    return NULL;
+  }
+
   lock_handle_t lock_cond;
   lock_handle_init(&lock_cond);
   lock_handle_lock(&lock_cond);
 
   while (broadcaster->running) {
-    if (broadcaster_size(broadcaster) == 0) {
+    if (broadcaster_is_empty(broadcaster)) {
       cond_handle_timedwait(&broadcaster->cond, &lock_cond,
                             BROADCASTER_TIMEOUT_SEC);
     }
@@ -48,22 +58,24 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
     hash8019_queue_pop(&broadcaster->queue);
     rw_lock_handle_unlock(&broadcaster->lock);
 
-    log_debug(BROADCASTER_LOGGER_ID, "Broadcasting transaction\n");
-    if (broadcaster->node->neighbors) {
-      iter = broadcaster->node->neighbors->front;
-      while (iter) {
-        if (neighbor_send(broadcaster->node, &iter->data,
-                          transaction_flex_trits)) {
-          log_warning(BROADCASTER_LOGGER_ID,
-                      "Broadcasting transaction failed\n");
-        }
-        iter = iter->next;
+    log_debug(logger_id, "Broadcasting transaction\n");
+    rw_lock_handle_rdlock(&broadcaster->node->neighbors_lock);
+    LL_FOREACH(broadcaster->node->neighbors, iter) {
+      if (neighbor_send(broadcaster->node, &tangle, iter,
+                        transaction_flex_trits) != RC_OK) {
+        log_warning(logger_id, "Broadcasting transaction failed\n");
       }
     }
+    rw_lock_handle_unlock(&broadcaster->node->neighbors_lock);
   }
 
   lock_handle_unlock(&lock_cond);
   lock_handle_destroy(&lock_cond);
+
+  if (iota_tangle_destroy(&tangle) != RC_OK) {
+    log_critical(logger_id, "Destroying tangle connection failed\n");
+  }
+
   return NULL;
 }
 
@@ -77,7 +89,7 @@ retcode_t broadcaster_init(broadcaster_t *const broadcaster,
     return RC_NULL_PARAM;
   }
 
-  logger_helper_init(BROADCASTER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id = logger_helper_enable(BROADCASTER_LOGGER_ID, LOGGER_DEBUG, true);
   memset(broadcaster, 0, sizeof(broadcaster_t));
   broadcaster->running = false;
   broadcaster->node = node;
@@ -99,7 +111,7 @@ retcode_t broadcaster_destroy(broadcaster_t *const broadcaster) {
   hash8019_queue_free(&broadcaster->queue);
   rw_lock_handle_destroy(&broadcaster->lock);
   cond_handle_destroy(&broadcaster->cond);
-  logger_helper_destroy(BROADCASTER_LOGGER_ID);
+  logger_helper_release(logger_id);
 
   return RC_OK;
 }
@@ -109,7 +121,7 @@ retcode_t broadcaster_start(broadcaster_t *const broadcaster) {
     return RC_NULL_PARAM;
   }
 
-  log_info(BROADCASTER_LOGGER_ID, "Spawning broadcaster thread\n");
+  log_info(logger_id, "Spawning broadcaster thread\n");
   broadcaster->running = true;
   if (thread_handle_create(&broadcaster->thread,
                            (thread_routine_t)broadcaster_routine,
@@ -133,7 +145,7 @@ retcode_t broadcaster_on_next(broadcaster_t *const broadcaster,
   rw_lock_handle_unlock(&broadcaster->lock);
 
   if (ret != RC_OK) {
-    log_warning(BROADCASTER_LOGGER_ID,
+    log_warning(logger_id,
                 "Pushing transaction flex trits to broadcaster queue failed\n");
     return RC_BROADCASTER_FAILED_PUSH_QUEUE;
   } else {
@@ -151,7 +163,7 @@ size_t broadcaster_size(broadcaster_t *const broadcaster) {
   }
 
   rw_lock_handle_rdlock(&broadcaster->lock);
-  size = hash8019_queue_count(&broadcaster->queue);
+  size = hash8019_queue_count(broadcaster->queue);
   rw_lock_handle_unlock(&broadcaster->lock);
 
   return size;
@@ -164,11 +176,10 @@ retcode_t broadcaster_stop(broadcaster_t *const broadcaster) {
     return RC_OK;
   }
 
-  log_info(BROADCASTER_LOGGER_ID, "Shutting down broadcaster thread\n");
+  log_info(logger_id, "Shutting down broadcaster thread\n");
   broadcaster->running = false;
   if (thread_handle_join(broadcaster->thread, NULL) != 0) {
-    log_error(BROADCASTER_LOGGER_ID,
-              "Shutting down broadcaster thread failed\n");
+    log_error(logger_id, "Shutting down broadcaster thread failed\n");
     return RC_FAILED_THREAD_JOIN;
   }
 

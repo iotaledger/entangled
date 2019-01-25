@@ -44,18 +44,20 @@ void copy_bct_to_trits(trit_t *const t, bct_t const *const s, size_t const i,
 }
 
 void write_trit(bct_t *const data, int const t, trit_t const v) {
+  size_t off = toffset(t);
+  size_t idx = tindex(t);
   switch (v) {
     case 1:
-      data[tindex(t)] &= ~(1 << toffset(t));
-      data[tindex(t)] |= 1 << (toffset(t) + 1);
+      data[idx] &= ~(1 << off);
+      data[idx] |= 1 << (off + 1);
       break;
     case -1:
-      data[tindex(t)] |= 1 << toffset(t);
-      data[tindex(t)] &= ~(1 << (toffset(t) + 1));
+      data[idx] |= 1 << off;
+      data[idx] &= ~(1 << (off + 1));
       break;
     default:
-      data[tindex(t)] |= 1 << toffset(t);
-      data[tindex(t)] |= 1 << (toffset(t) + 1);
+      data[idx] |= 1 << off;
+      data[idx] |= 1 << (off + 1);
   }
 }
 

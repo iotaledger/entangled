@@ -18,7 +18,7 @@
 #include "consensus/ledger_validator/ledger_validator.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/tangle/tangle.h"
-#include "utils/hash_maps.h"
+#include "utils/hash_indexed_map.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +30,6 @@ extern "C" {
 
 typedef struct exit_prob_transaction_validator_s {
   iota_consensus_conf_t *conf;
-  tangle_t *tangle;
   milestone_tracker_t *mt;
   ledger_validator_t *lv;
   state_delta_t delta;
@@ -39,21 +38,15 @@ typedef struct exit_prob_transaction_validator_s {
 } exit_prob_transaction_validator_t;
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_init(
-    iota_consensus_conf_t *const conf, tangle_t *const tangle,
-    milestone_tracker_t *const mt, ledger_validator_t *const lv,
-    exit_prob_transaction_validator_t *epv);
+    iota_consensus_conf_t *const conf, milestone_tracker_t *const mt,
+    ledger_validator_t *const lv, exit_prob_transaction_validator_t *epv);
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
     exit_prob_transaction_validator_t *epv);
 
 extern retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
-    exit_prob_transaction_validator_t *const epv,
-    trit_array_t const *const tail_hash, bool *const is_valid);
-
-extern retcode_t iota_consensus_exit_prob_transaction_validator_below_max_depth(
-    exit_prob_transaction_validator_t *ep_validator,
-    trit_array_t const *const tail_hash, uint32_t lowest_allowed_depth,
-    bool *below_max_depth);
+    exit_prob_transaction_validator_t *const epv, tangle_t *const tangle,
+    flex_trit_t const *const tail_hash, bool *const is_valid);
 
 #ifdef __cplusplus
 }

@@ -20,8 +20,6 @@ extern "C" {
 #include "common/trinary/trit_long.h"
 #include "utils/logger_helper.h"
 
-#define NUM_TRITS_ESSENCE 486
-
 typedef enum { DATA = 0, VALUE_OUT, VALUE_IN } transfer_type_e;
 
 /***********************************************************************************************************
@@ -133,21 +131,21 @@ typedef struct _transfer_iterator {
   size_t current_transaction_index;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   flex_trit_t *transaction_signature;
-  iota_transaction_t transaction;
+  iota_transaction_t *transaction;
   uint8_t dynamic_transaction;
   iota_signature_generator iota_signature_gen;
   transfer_t **transfers;
 } transfer_iterator_t;
 
 // Returns the next transaction
-iota_transaction_t transfer_iterator_next(
+iota_transaction_t *transfer_iterator_next(
     transfer_iterator_t *transfer_iterator);
 
 // Creates and returns a new transfer iterator
 // if `transaction` is NULL will be dynamically allocated a transaction object.
 transfer_iterator_t *transfer_iterator_new(transfer_t *transfers[], size_t len,
                                            Kerl *kerl,
-                                           iota_transaction_t transaction);
+                                           iota_transaction_t *transaction);
 
 // Free an existing transfer iterator
 void transfer_iterator_free(transfer_iterator_t **iter);

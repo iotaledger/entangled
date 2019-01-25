@@ -5,27 +5,33 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#ifndef __COMMON_TRINARY_TRIT_TRYTE_H_
+#define __COMMON_TRINARY_TRIT_TRYTE_H_
+
+#include "common/defs.h"
+#include "common/trinary/trits.h"
+#include "common/trinary/tryte.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef __COMMON_TRINARY_TRIT_TRYTE_H_
-#define __COMMON_TRINARY_TRIT_TRYTE_H_
+static inline size_t num_trytes_for_trits(size_t num_trits) {
+  return (num_trits + NUMBER_OF_TRITS_IN_A_TRYTE - 1) /
+         NUMBER_OF_TRITS_IN_A_TRYTE;
+}
 
-#include "common/stdint.h"
-#include "common/trinary/trits.h"
-#include "common/trinary/tryte.h"
-
-size_t num_trytes_for_trits(size_t num_trits);
-trit_t get_trit_at(tryte_t *const trytes, size_t const length, size_t index);
-uint8_t set_trit_at(tryte_t *const trytes, size_t const length, size_t index,
-                    trit_t trit);
+trit_t get_trit_at(tryte_t const *const trytes, size_t const length,
+                   size_t const index);
+uint8_t set_trit_at(tryte_t *const trytes, size_t const length,
+                    size_t const index, trit_t const trit);
 void trits_to_trytes(trit_t const *const trits, tryte_t *const trytes,
                      size_t const length);
-void trytes_to_trits(tryte_t const *const tryte, trit_t *const trits,
+void trytes_to_trits(tryte_t const *const trytes, trit_t *const trits,
                      size_t const length);
 
-#endif
 #ifdef __cplusplus
 }
 #endif
+
+#endif  // __COMMON_TRINARY_TRIT_TRYTE_H_

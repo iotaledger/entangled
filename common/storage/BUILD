@@ -9,6 +9,8 @@ cc_library(
         "//consensus/snapshot:state_delta",
         "//utils:hash_maps",
         "//utils:logger_helper",
+        "//utils/containers/hash:hash243_queue",
+        "//utils/containers/hash:hash81_queue",
     ],
 )
 
@@ -20,6 +22,5 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/trinary:trit_array",
-        "//utils:logger_helper",
     ],
 )

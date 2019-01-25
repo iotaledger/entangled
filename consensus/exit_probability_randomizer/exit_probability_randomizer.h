@@ -26,16 +26,19 @@ typedef struct ep_randomizer_s ep_randomizer_t;
 typedef enum ep_randomizer_implementation_e {
   EP_NO_IMPLEMENTATION,
   EP_RANDOM_WALK,
-  EP_RANDOMIZE_SAMPLE,
+  EP_RANDOMIZE_MAP_AND_SAMPLE,
 } ep_randomizer_implementation_t;
 
 typedef struct {
   // find_transactions_request
   retcode_t (*exit_probability_randomize)(
-      ep_randomizer_t const *const ep_randomizer,
+      ep_randomizer_t const *const ep_randomizer, tangle_t *const tangle,
       exit_prob_transaction_validator_t *const epv,
-      cw_calc_result *const cw_result, trit_array_t const *const ep,
-      trit_array_t *const tip);
+      cw_calc_result *const cw_result, flex_trit_t const *const ep,
+      flex_trit_t *const tip);
+
+  retcode_t (*exit_probability_destroy)(ep_randomizer_t *const ep_randomizer);
+
 } ep_randomizer_vtable;
 
 struct ep_randomizer_base_s {
@@ -45,20 +48,20 @@ struct ep_randomizer_base_s {
 struct ep_randomizer_s {
   ep_randomizer_base_t base;
   iota_consensus_conf_t *conf;
-  tangle_t *tangle;
 };
 
 extern retcode_t iota_consensus_ep_randomizer_init(
     ep_randomizer_t *const ep_randomizer, iota_consensus_conf_t *const conf,
-    tangle_t *const tangle, ep_randomizer_implementation_t);
+    ep_randomizer_implementation_t);
 extern retcode_t iota_consensus_ep_randomizer_destroy(
     ep_randomizer_t *const ep_randomizer);
 
 extern retcode_t iota_consensus_exit_probability_randomize(
     ep_randomizer_t const *const exit_probability_randomizer,
+    tangle_t *const tangle,
     exit_prob_transaction_validator_t *const ep_validator,
-    cw_calc_result *const cw_result, trit_array_t const *const ep,
-    trit_array_t *const tip);
+    cw_calc_result *const cw_result, flex_trit_t const *const ep,
+    flex_trit_t *tip);
 
 #ifdef __cplusplus
 }

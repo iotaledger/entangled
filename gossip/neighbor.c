@@ -5,11 +5,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include <string.h>
+#include <stdlib.h>
 
-#include "common/model/transaction.h"
 #include "common/network/uri_parser.h"
-#include "common/trinary/trit_array.h"
 #include "gossip/iota_packet.h"
 #include "gossip/neighbor.h"
 #include "gossip/node.h"
@@ -22,7 +20,7 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
   char scheme[MAX_SCHEME_LENGTH];
 
   if (neighbor == NULL) {
-    return RC_NEIGHBOR_NULL_NEIGHBOR;
+    return RC_NULL_PARAM;
   }
   if (uri == NULL) {
     return RC_NEIGHBOR_NULL_URI;
@@ -34,12 +32,8 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
   }
   if (strcmp(scheme, "tcp") == 0) {
     neighbor->endpoint.protocol = PROTOCOL_TCP;
-    strcpy(neighbor->endpoint.ip, neighbor->endpoint.host);
   } else if (strcmp(scheme, "udp") == 0) {
     neighbor->endpoint.protocol = PROTOCOL_UDP;
-    if (udp_endpoint_init(&neighbor->endpoint) == false) {
-      return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
-    }
   } else {
     return RC_NEIGHBOR_INVALID_PROTOCOL;
   }
@@ -50,8 +44,9 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
                                     char const *const ip, uint16_t const port,
                                     protocol_type_t const protocol) {
   if (neighbor == NULL) {
-    return RC_NEIGHBOR_NULL_NEIGHBOR;
+    return RC_NULL_PARAM;
   }
+
   memset(neighbor, 0, sizeof(neighbor_t));
   neighbor->endpoint.protocol = protocol;
   if (ip) {
@@ -89,7 +84,8 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor,
   return RC_OK;
 }
 
-retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
+retcode_t neighbor_send(node_t *const node, tangle_t *const tangle,
+                        neighbor_t *const neighbor,
                         flex_trit_t const *const transaction) {
   retcode_t ret = RC_OK;
   iota_packet_t packet;
@@ -104,14 +100,162 @@ retcode_t neighbor_send(node_t *const node, neighbor_t *const neighbor,
   }
 
   bool is_milestone = rand_handle_probability() < node->conf.p_select_milestone;
-  if ((ret = get_transaction_to_request(&node->transaction_requester, request,
-                                        is_milestone)) != RC_OK) {
+
+  if ((ret = get_transaction_to_request(&node->transaction_requester, tangle,
+                                        request, is_milestone)) != RC_OK) {
     return ret;
   }
+
   if ((ret = iota_packet_set_request(
            &packet, request, node->conf.request_hash_size_trit)) != RC_OK) {
     return ret;
   }
 
   return neighbor_send_packet(node, neighbor, &packet);
+}
+
+static int neighbor_cmp(neighbor_t const *const lhs,
+                        neighbor_t const *const rhs) {
+  if (lhs == NULL || rhs == NULL) {
+    return false;
+  }
+
+  return !((strcmp(lhs->endpoint.ip, rhs->endpoint.ip) == 0 ||
+            strcmp(lhs->endpoint.host, rhs->endpoint.host) == 0) &&
+           lhs->endpoint.port == rhs->endpoint.port &&
+           lhs->endpoint.protocol == rhs->endpoint.protocol);
+}
+
+retcode_t neighbors_add(neighbor_t **const neighbors,
+                        neighbor_t const *const neighbor) {
+  neighbor_t *entry = NULL;
+  neighbor_t *elt = NULL;
+
+  if (neighbors == NULL || neighbor == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  LL_SEARCH(*neighbors, elt, neighbor, neighbor_cmp);
+
+  if (elt != NULL) {
+    return RC_NEIGHBOR_ALREADY_PAIRED;
+  }
+
+  if ((entry = malloc(sizeof(neighbor_t))) == NULL) {
+    return RC_OOM;
+  }
+
+  memcpy(entry, neighbor, sizeof(neighbor_t));
+  LL_PREPEND(*neighbors, entry);
+
+  if (entry->endpoint.protocol == PROTOCOL_UDP) {
+    if (udp_endpoint_init(&entry->endpoint) == false) {
+      return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
+    }
+  } else if (entry->endpoint.protocol == PROTOCOL_TCP) {
+    if (tcp_sender_endpoint_init(&entry->endpoint) != RC_OK) {
+      return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
+    }
+  } else {
+    return RC_NEIGHBOR_INVALID_PROTOCOL;
+  }
+
+  return RC_OK;
+}
+
+retcode_t neighbors_remove_entry(neighbor_t **const neighbors,
+                                 neighbor_t *const neighbor) {
+  retcode_t ret = RC_OK;
+
+  if (neighbors == NULL || neighbor == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if (neighbor->endpoint.protocol == PROTOCOL_UDP) {
+    if (udp_endpoint_destroy(&neighbor->endpoint) == false) {
+      ret = RC_NEIGHBOR_FAILED_ENDPOINT_DESTROY;
+    }
+  } else if (neighbor->endpoint.protocol == PROTOCOL_TCP) {
+    if (tcp_sender_endpoint_destroy(&neighbor->endpoint) != RC_OK) {
+      return RC_NEIGHBOR_FAILED_ENDPOINT_INIT;
+    }
+  } else {
+    return RC_NEIGHBOR_INVALID_PROTOCOL;
+  }
+
+  LL_DELETE(*neighbors, neighbor);
+  free(neighbor);
+
+  return ret;
+}
+
+retcode_t neighbors_remove(neighbor_t **const neighbors,
+                           neighbor_t *const neighbor) {
+  neighbor_t *elt = NULL;
+
+  if (neighbors == NULL || neighbor == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  LL_SEARCH(*neighbors, elt, neighbor, neighbor_cmp);
+
+  if (elt == NULL) {
+    return RC_NEIGHBOR_NOT_PAIRED;
+  }
+
+  return neighbors_remove_entry(neighbors, elt);
+}
+
+retcode_t neighbors_free(neighbor_t **const neighbors) {
+  neighbor_t *elt = NULL;
+  neighbor_t *tmp = NULL;
+  retcode_t ret = RC_OK;
+
+  LL_FOREACH_SAFE(*neighbors, elt, tmp) {
+    ret = neighbors_remove_entry(neighbors, elt);
+  }
+
+  return ret;
+}
+
+size_t neighbors_count(neighbor_t *const neighbors) {
+  size_t count = 0;
+  neighbor_t *elt = NULL;
+
+  if (neighbors == NULL) {
+    return 0;
+  }
+
+  LL_COUNT(neighbors, elt, count);
+  return count;
+}
+
+neighbor_t *neighbors_find_by_endpoint(neighbor_t *const neighbors,
+                                       endpoint_t const *const endpoint) {
+  if (neighbors == NULL || endpoint == NULL) {
+    return NULL;
+  }
+
+  return neighbors_find_by_endpoint_values(neighbors, endpoint->ip,
+                                           endpoint->port, endpoint->protocol);
+}
+
+neighbor_t *neighbors_find_by_endpoint_values(neighbor_t *const neighbors,
+                                              char const *const ip,
+                                              uint16_t const port,
+                                              protocol_type_t const protocol) {
+  neighbor_t cmp;
+  neighbor_t *elt;
+
+  if (neighbors == NULL) {
+    return NULL;
+  }
+
+  if (neighbor_init_with_values(&cmp, ip, port, protocol)) {
+    return NULL;
+  }
+
+  LL_SEARCH(neighbors, elt, &cmp, neighbor_cmp);
+
+  return elt;
 }

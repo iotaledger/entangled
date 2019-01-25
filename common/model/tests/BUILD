@@ -33,6 +33,7 @@ cc_test(
     deps = [
         ":defs",
         "//common/model:tryte_transaction",
+        "//common/trinary:flex_trit",
         "@com_google_googletest//:gtest_main",
     ],
 )

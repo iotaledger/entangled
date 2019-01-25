@@ -16,7 +16,7 @@ extern "C" {
 
 typedef struct store_transactions_req_s {
   // List of raw transactions data to be stored
-  hash8019_stack_t trytes;
+  hash8019_array_p trytes;
 } store_transactions_req_t;
 
 store_transactions_req_t* store_transactions_req_new();

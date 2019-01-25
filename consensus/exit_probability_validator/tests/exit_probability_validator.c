@@ -44,7 +44,6 @@ static milestone_tracker_t mt;
 static ledger_validator_t lv;
 static transaction_solidifier_t ts;
 static iota_consensus_conf_t consensus_conf;
-static iota_gossip_conf_t gossip_conf;
 
 void setUp() {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
@@ -54,7 +53,6 @@ void setUp() {
 void tearDown() { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK); }
 
 static void init_epv(exit_prob_transaction_validator_t *const epv) {
-  iota_gossip_conf_init(&gossip_conf);
   iota_consensus_conf_init(&consensus_conf);
   consensus_conf.max_depth = max_depth;
   consensus_conf.below_max_depth = max_txs_below_max_depth;
@@ -63,17 +61,17 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   strcpy(consensus_conf.snapshot_conf_file, snapshot_conf_path);
   strcpy(consensus_conf.snapshot_signature_file, "");
   TEST_ASSERT(iota_snapshot_init(&snapshot, &consensus_conf) == RC_OK);
-  iota_consensus_transaction_solidifier_init(&ts, &consensus_conf, &tangle,
-                                             NULL, NULL);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &consensus_conf, &tangle,
-                                          &snapshot, &lv, &ts) == RC_OK);
-  TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &consensus_conf,
-                                                   &tangle, &mt) == RC_OK);
+  TEST_ASSERT(iota_consensus_transaction_solidifier_init(&ts, &consensus_conf,
+                                                         NULL, NULL) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &consensus_conf, &snapshot, &lv,
+                                          &ts) == RC_OK);
+  TEST_ASSERT(iota_consensus_ledger_validator_init(
+                  &lv, &tangle, &consensus_conf, &mt) == RC_OK);
   // We want to avoid unnecessary validation
   mt.latest_snapshot->index = 99999999999;
 
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_init(
-                  &consensus_conf, &tangle, &mt, &lv, epv) == RC_OK);
+                  &consensus_conf, &mt, &lv, epv) == RC_OK);
 }
 
 static void destroy_epv(exit_prob_transaction_validator_t *epv) {
@@ -88,21 +86,26 @@ void test_transaction_does_not_exist() {
   init_epv(&epv);
 
   bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, (flex_trit_t *)TEST_TRANSACTION.hash,
-                       NUM_TRITS_HASH);
+  flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];
+  flex_trits_from_trytes(tx_test_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         TEST_TX_TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+  iota_transaction_t *test_tx = transaction_deserialize(tx_test_trits, true);
+
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
+                  &epv, &tangle, transaction_hash(test_tx), &is_valid) ==
+              RC_OK);
   TEST_ASSERT(!is_valid);
 
-  trit_array_free(tail);
   destroy_epv(&epv);
+  transaction_free(test_tx);
 }
 
 void test_transaction_not_a_tail() {
   init_epv(&epv);
 
   bool exist = false;
+  bool is_valid = false;
 
   flex_trit_t transaction_3_trits[FLEX_TRIT_SIZE_8019];
 
@@ -111,23 +114,20 @@ void test_transaction_not_a_tail() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx3 = transaction_deserialize(transaction_3_trits);
+  iota_transaction_t *tx3 = transaction_deserialize(transaction_3_trits, true);
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx3) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, tx3->consensus.hash, true) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
-  bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, (flex_trit_t *)tx3->hash, NUM_TRITS_HASH);
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
+                  &epv, &tangle, transaction_hash(tx3), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
-
-  trit_array_free(tail);
   transaction_free(tx3);
   destroy_epv(&epv);
 }
@@ -136,6 +136,7 @@ void test_transaction_invalid_delta() {
   init_epv(&epv);
 
   bool exist = false;
+  bool is_valid = false;
 
   flex_trit_t transaction_1_trits[FLEX_TRIT_SIZE_8019];
 
@@ -144,25 +145,20 @@ void test_transaction_invalid_delta() {
                          NUM_TRYTES_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
-  iota_transaction_t tx1 = transaction_deserialize(transaction_1_trits);
-  tx1->snapshot_index = 0;
-  tx1->solid = 1;
+  iota_transaction_t *tx1 = transaction_deserialize(transaction_1_trits, true);
 
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, tx1) == RC_OK);
-
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, tx1->consensus.hash, true) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
-  bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, (flex_trit_t *)tx1->hash, NUM_TRITS_HASH);
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
+                  &epv, &tangle, transaction_hash(tx1), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
-  trit_array_free(tail);
   transaction_free(tx1);
   destroy_epv(&epv);
 }
@@ -171,29 +167,31 @@ void test_transaction_below_max_depth() {
   init_epv(&epv);
 
   bool exist = false;
+  bool is_valid = false;
 
-  iota_transaction_t txs[2];
+  iota_transaction_t *txs[2];
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
-  transactions_deserialize(trytes, txs, 2);
-  txs[0]->snapshot_index = max_depth - 1;
-  txs[0]->solid = 1;
-  txs[1]->solid = 1;
+  transactions_deserialize(trytes, txs, 2, true);
+  transaction_set_snapshot_index(txs[0], max_depth + 1);
+  transaction_set_solid(txs[0], true);
+  transaction_set_solid(txs[1], true);
   build_tangle(&tangle, txs, 2);
+
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[0]->consensus.hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[1]->consensus.hash, true) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
-  bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, (flex_trit_t *)txs[0]->hash, NUM_TRITS_HASH);
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
+                  &epv, &tangle, transaction_hash(txs[0]), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
 
-  trit_array_free(tail);
   transactions_free(txs, 2);
   destroy_epv(&epv);
 }
@@ -203,101 +201,73 @@ void test_transaction_exceed_max_transactions() {
   init_epv(&epv);
 
   bool exist = false;
+  bool is_valid = false;
 
-  iota_transaction_t txs[2];
+  iota_transaction_t *txs[2];
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
-  transactions_deserialize(trytes, txs, 2);
-  txs[0]->snapshot_index = max_depth + 1;
-  txs[0]->solid = 1;
-  txs[1]->snapshot_index = max_depth + 1;
-  txs[1]->solid = 1;
-  memcpy(txs[1]->trunk, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
-  memcpy(txs[1]->branch, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
-  memcpy(txs[0]->branch, consensus_conf.genesis_hash, FLEX_TRIT_SIZE_243);
+  transactions_deserialize(trytes, txs, 2, true);
+  transaction_set_trunk(txs[1], consensus_conf.genesis_hash);
+  transaction_set_branch(txs[1], consensus_conf.genesis_hash);
+  transaction_set_branch(txs[0], consensus_conf.genesis_hash);
   build_tangle(&tangle, txs, 2);
+
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[0]->consensus.hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[1]->consensus.hash, true) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
-  bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, (flex_trit_t *)txs[0]->hash, NUM_TRITS_HASH);
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
-  TEST_ASSERT(is_valid);
+                  &epv, &tangle, transaction_hash(txs[0]), &is_valid) == RC_OK);
+  TEST_ASSERT(!is_valid);
 
-  trit_array_free(tail);
   transactions_free(txs, 2);
   destroy_epv(&epv);
   max_txs_below_max_depth = 15;
-}
-
-void test_transaction_is_genesis() {
-  init_epv(&epv);
-
-  bool exist = false;
-
-  iota_transaction_t txs[2];
-
-  tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
-  transactions_deserialize(trytes, txs, 2);
-  txs[0]->snapshot_index = 0;
-  txs[0]->solid = 1;
-  txs[1]->solid = 1;
-  build_tangle(&tangle, txs, 2);
-
-  TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
-                                            NULL, &exist) == RC_OK);
-
-  TEST_ASSERT(exist == true);
-
-  bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, (flex_trit_t *)txs[0]->hash, NUM_TRITS_HASH);
-  TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
-  TEST_ASSERT(!is_valid);
-
-  trit_array_free(tail);
-  transactions_free(txs, 2);
-  destroy_epv(&epv);
 }
 
 void test_transaction_valid() {
   init_epv(&epv);
 
   bool exist = false;
+  bool is_valid = false;
 
-  iota_transaction_t txs[2];
+  iota_transaction_t *txs[2];
 
   tryte_t const *const trytes[2] = {TX_1_OF_2, TX_2_OF_2};
-  transactions_deserialize(trytes, txs, 2);
-  txs[0]->solid = 1;
-  txs[1]->solid = 1;
+  transactions_deserialize(trytes, txs, 2, true);
+  transaction_set_branch(txs[0], consensus_conf.genesis_hash);
+  transaction_set_branch(txs[1], consensus_conf.genesis_hash);
+  transaction_set_trunk(txs[1], consensus_conf.genesis_hash);
   build_tangle(&tangle, txs, 2);
+
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[0]->consensus.hash, true) == RC_OK);
+  TEST_ASSERT(iota_tangle_transaction_update_solid_state(
+                  &tangle, txs[1]->consensus.hash, true) == RC_OK);
 
   TEST_ASSERT(iota_tangle_transaction_exist(&tangle, TRANSACTION_FIELD_NONE,
                                             NULL, &exist) == RC_OK);
 
   TEST_ASSERT(exist == true);
 
-  bool is_valid = false;
-  trit_array_p tail = trit_array_new(NUM_TRITS_HASH);
-  trit_array_set_trits(tail, (flex_trit_t *)txs[0]->hash, NUM_TRITS_HASH);
+  epv.mt->latest_solid_subtangle_milestone_index = max_depth;
   TEST_ASSERT(iota_consensus_exit_prob_transaction_validator_is_valid(
-                  &epv, tail, &is_valid) == RC_OK);
+                  &epv, &tangle, transaction_hash(txs[0]), &is_valid) == RC_OK);
   TEST_ASSERT(!is_valid);
-
-  trit_array_free(tail);
+  epv.mt->latest_solid_subtangle_milestone_index = 0;
   transactions_free(txs, 2);
   destroy_epv(&epv);
 }
 
 int main(int argc, char *argv[]) {
   UNITY_BEGIN();
+  TEST_ASSERT(storage_init() == RC_OK);
 
   if (argc >= 2) {
     debug_mode = true;
@@ -318,8 +288,8 @@ int main(int argc, char *argv[]) {
   RUN_TEST(test_transaction_invalid_delta);
   RUN_TEST(test_transaction_below_max_depth);
   RUN_TEST(test_transaction_exceed_max_transactions);
-  RUN_TEST(test_transaction_is_genesis);
   RUN_TEST(test_transaction_valid);
 
+  TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
 }

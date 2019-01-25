@@ -49,9 +49,7 @@ cc_library(
     deps = [
         ":neighbor_shared",
         ":node_shared",
-        "//common/model:transaction",
         "//common/network:uri_parser",
-        "//common/trinary:trit_array",
         "//gossip/components:transaction_requester",
         "//gossip/services:tcp_sender",
         "//gossip/services:udp_sender",
@@ -86,13 +84,16 @@ cc_library(
     name = "node_shared",
     hdrs = ["node.h"],
     deps = [
+        ":neighbor_shared",
         ":tips_cache",
         "//gossip/components:broadcaster_shared",
         "//gossip/components:processor_shared",
         "//gossip/components:receiver_shared",
         "//gossip/components:responder_shared",
         "//gossip/components:tips_requester_shared",
-        "//gossip/components:transaction_requester",
+        "//gossip/components:tips_solidifier_shared",
+        "//gossip/components:transaction_requester_shared",
+        "//gossip/components:transaction_requester_worker_shared",
     ],
 )
 
@@ -107,5 +108,8 @@ cc_library(
         "//gossip/components:receiver",
         "//gossip/components:responder",
         "//gossip/components:tips_requester",
+        "//gossip/components:tips_solidifier",
+        "//gossip/components:transaction_requester",
+        "//gossip/components:transaction_requester_worker",
     ],
 )
