@@ -52,7 +52,7 @@ size_t trits_size(trits_t x);
 size_t trits_size_min(trits_t x, size_t s);
 
 /*! \brief Construct `n` trits from representation `w`. */
-trits_t trits_from_rep(size_t n, trit_t *t);
+trits_t trits_from_rep(size_t const n, trit_t const *const t);
 
 /*! \brief Take the first `n` trits from `x`. */
 trits_t trits_take(trits_t x, size_t n);

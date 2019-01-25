@@ -36,9 +36,11 @@ size_t transaction_deserialize_trits(iota_transaction_t *const transaction,
   flex_trits_slice(transaction->data.signature_or_message, NUM_TRITS_SIGNATURE,
                    trits, NUM_TRITS_SERIALIZED_TRANSACTION, offset,
                    NUM_TRITS_SIGNATURE);
+  transaction->loaded_columns_mask.data |= MASK_DATA_SIG_OR_MSG;
   offset += NUM_TRITS_SIGNATURE;
   flex_trits_slice(transaction->essence.address, NUM_TRITS_ADDRESS, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_ADDRESS);
+  transaction->loaded_columns_mask.essence |= MASK_ESSENCE_ADDRESS;
   offset += NUM_TRITS_ADDRESS;
   flex_trits_slice(partial, NUM_TRITS_VALUE, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_VALUE);
@@ -49,6 +51,7 @@ size_t transaction_deserialize_trits(iota_transaction_t *const transaction,
   flex_trits_slice(transaction->essence.obsolete_tag, NUM_TRITS_OBSOLETE_TAG,
                    trits, NUM_TRITS_SERIALIZED_TRANSACTION, offset,
                    NUM_TRITS_OBSOLETE_TAG);
+  transaction->loaded_columns_mask.essence |= MASK_ESSENCE_OBSOLETE_TAG;
   offset += NUM_TRITS_OBSOLETE_TAG;
   flex_trits_slice(partial, NUM_TRITS_TIMESTAMP, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset,
@@ -75,15 +78,19 @@ size_t transaction_deserialize_trits(iota_transaction_t *const transaction,
   offset += NUM_TRITS_LAST_INDEX;
   flex_trits_slice(transaction->essence.bundle, NUM_TRITS_BUNDLE, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_BUNDLE);
+  transaction->loaded_columns_mask.essence |= MASK_ESSENCE_BUNDLE;
   offset += NUM_TRITS_BUNDLE;
   flex_trits_slice(transaction->attachment.trunk, NUM_TRITS_TRUNK, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_TRUNK);
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TRUNK;
   offset += NUM_TRITS_TRUNK;
   flex_trits_slice(transaction->attachment.branch, NUM_TRITS_BRANCH, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_BRANCH);
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_BRANCH;
   offset += NUM_TRITS_BRANCH;
   flex_trits_slice(transaction->attachment.tag, NUM_TRITS_TAG, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_TAG);
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TAG;
   offset += NUM_TRITS_TAG;
   flex_trits_slice(partial, NUM_TRITS_ATTACHMENT_TIMESTAMP, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset,
@@ -114,6 +121,7 @@ size_t transaction_deserialize_trits(iota_transaction_t *const transaction,
   offset += NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER;
   flex_trits_slice(transaction->attachment.nonce, NUM_TRITS_NONCE, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_NONCE);
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_NONCE;
   offset += NUM_TRITS_NONCE;
 
   if (compute_hash) {
@@ -127,10 +135,9 @@ size_t transaction_deserialize_trits(iota_transaction_t *const transaction,
     curl_digest(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, hash, &curl);
     flex_trits_from_trits(transaction->consensus.hash, NUM_TRITS_HASH, hash,
                           NUM_TRITS_HASH, NUM_TRITS_HASH);
+    transaction->loaded_columns_mask.consensus |= MASK_CONSENSUS_HASH;
   }
 
-  transaction->loaded_columns_mask |=
-      (MASK_ESSENCE | MASK_ATTACHMENT | MASK_CONSENSUS | MASK_DATA);
   return offset;
 }
 

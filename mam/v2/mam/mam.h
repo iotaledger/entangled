@@ -278,21 +278,21 @@ typedef struct mam_recv_packet_context_s {
 retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *packet,
                           trits_t *payload);
 
-trits_t mam_send_msg_cfg_chid(mam_send_msg_context_t *cfg);
-trits_t mam_send_msg_cfg_chid1(mam_send_msg_context_t *cfg);
-trits_t mam_send_msg_cfg_epid(mam_send_msg_context_t *cfg);
-trits_t mam_send_msg_cfg_epid1(mam_send_msg_context_t *cfg);
-trits_t mam_send_msg_cfg_nonce(mam_send_msg_context_t *cfg);
-trits_t mam_send_msg_cfg_session_key(mam_send_msg_context_t *cfg);
+trits_t mam_send_msg_cfg_chid(mam_send_msg_context_t const *const cfg);
+trits_t mam_send_msg_cfg_chid1(mam_send_msg_context_t const *const cfg);
+trits_t mam_send_msg_cfg_epid(mam_send_msg_context_t const *const cfg);
+trits_t mam_send_msg_cfg_epid1(mam_send_msg_context_t const *const cfg);
+trits_t mam_send_msg_cfg_nonce(mam_send_msg_context_t const *const cfg);
+trits_t mam_send_msg_cfg_session_key(mam_send_msg_context_t const *const cfg);
 
-trits_t mam_recv_msg_cfg_chid(mam_recv_msg_context_t *cfg);
-trits_t mam_recv_msg_cfg_chid1(mam_recv_msg_context_t *cfg);
-trits_t mam_recv_msg_cfg_epid(mam_recv_msg_context_t *cfg);
-trits_t mam_recv_msg_cfg_epid1(mam_recv_msg_context_t *cfg);
-trits_t mam_recv_msg_cfg_nonce(mam_recv_msg_context_t *cfg);
-trits_t mam_recv_msg_cfg_key(mam_recv_msg_context_t *cfg);
-trits_t mam_recv_msg_cfg_psk_id(mam_recv_msg_context_t *cfg);
-trits_t mam_recv_msg_cfg_ntru_id(mam_recv_msg_context_t *cfg);
+trits_t mam_recv_msg_cfg_chid(mam_recv_msg_context_t const *const cfg);
+trits_t mam_recv_msg_cfg_chid1(mam_recv_msg_context_t const *const cfg);
+trits_t mam_recv_msg_cfg_epid(mam_recv_msg_context_t const *const cfg);
+trits_t mam_recv_msg_cfg_epid1(mam_recv_msg_context_t const *const cfg);
+trits_t mam_recv_msg_cfg_nonce(mam_recv_msg_context_t const *const cfg);
+trits_t mam_recv_msg_cfg_key(mam_recv_msg_context_t const *const cfg);
+trits_t mam_recv_msg_cfg_psk_id(mam_recv_msg_context_t const *const cfg);
+trits_t mam_recv_msg_cfg_ntru_id(mam_recv_msg_context_t const *const cfg);
 
 #ifdef __cplusplus
 }

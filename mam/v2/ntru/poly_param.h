@@ -8,11 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file poly_param.h
-\brief MAM2 NTRU polynomials parameters.
-*/
-
 #ifndef __MAM_V2_NTRU_POLY_PARAM_H__
 #define __MAM_V2_NTRU_POLY_PARAM_H__
 
@@ -20,7 +15,7 @@
 extern "C" {
 #endif
 
-/* \brief [γ⁰=1, γ⁻¹, …, γ²ⁿ⁻¹=γ⁻¹, γ²ⁿ=1] */
+// [γ⁰=1, γ⁻¹, …, γ²ⁿ⁻¹=γ⁻¹, γ²ⁿ=1]
 #if defined(MAM2_POLY_MRED_BINARY)
 static poly_coeff_t poly_gamma_exp[2 * MAM2_POLY_N + 1] = {
     4091,  4059,  3835,  2267,  3580,  482,   3374,  11329, 5569,  2116,  2523,
@@ -403,7 +398,7 @@ static poly_coeff_t poly_gamma_exp[2 * MAM2_POLY_N + 1] = {
 };
 #endif
 
-/* \brief (b₀,b₁,…,bₙ₋₁) → (bₙ₋₁,…,b₁,b₀) */
+// (b₀,b₁,…,bₙ₋₁) → (bₙ₋₁,…,b₁,b₀)
 static size_t poly_idx_rev[MAM2_POLY_N] = {
     0x000, 0x200, 0x100, 0x300, 0x080, 0x280, 0x180, 0x380, 0x040, 0x240, 0x140,
     0x340, 0x0c0, 0x2c0, 0x1c0, 0x3c0, 0x020, 0x220, 0x120, 0x320, 0x0a0, 0x2a0,
