@@ -43,6 +43,7 @@ cc_library(
         "//common/pow",
         "//common/trinary:flex_trit",
         "//utils:export",
+        "//utils:time",
         "@com_github_uthash//:uthash",
     ],
 )

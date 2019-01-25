@@ -18,6 +18,7 @@
 #include "digest.h"
 #include "utarray.h"
 #include "utils/export.h"
+#include "utils/time.h"
 
 IOTA_EXPORT char *iota_pow_trytes(char const *const trytes_in,
                                   uint8_t const mwm) {
@@ -105,6 +106,9 @@ IOTA_EXPORT retcode_t iota_pow_bundle(bundle_transactions_t *const bundle,
     // Set trunk & branch
     transaction_set_trunk(tx, ctrunk);
     transaction_set_branch(tx, branch);
+    transaction_set_attachment_timestamp(tx, current_timestamp_ms());
+    transaction_set_attachment_timestamp_lower(tx, 0);
+    transaction_set_attachment_timestamp_upper(tx, 3812798742493LL);
 
     txflex = transaction_serialize(tx);
 
