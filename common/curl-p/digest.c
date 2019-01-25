@@ -10,7 +10,6 @@
 #include "common/curl-p/digest.h"
 #include "common/trinary/trit_tryte.h"
 
-
 void curl_digest(trit_t const* const trits, size_t const len, trit_t* const out,
                  Curl* const curl) {
   trit_t digest[HASH_LENGTH_TRIT];

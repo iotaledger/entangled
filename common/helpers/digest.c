@@ -7,14 +7,12 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <stdlib.h>
 
 #include "common/curl-p/digest.h"
 #include "common/defs.h"
 #include "common/helpers/digest.h"
 #include "common/trinary/trit_tryte.h"
 #include "utils/export.h"
-
 
 #define TRYTE_LENGTH 2673
 

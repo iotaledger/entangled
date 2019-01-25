@@ -50,7 +50,6 @@ load(
 
 apple_rules_dependencies()
 
-
 load("@rules_iota//:defs.bzl", "iota_deps")
 
 iota_deps()

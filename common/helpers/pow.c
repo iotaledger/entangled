@@ -15,7 +15,6 @@
 #include "common/trinary/trit_tryte.h"
 #include "utils/export.h"
 
-
 #define NONCE_LENGTH 27 * 3
 
 IOTA_EXPORT char* iota_pow(char const* const trytes_in, uint8_t const mwm) {
