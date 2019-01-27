@@ -106,9 +106,9 @@ static trits_t mam_test_generic_send_msg(
     cfg->key_plain = 0;
     cfg->pre_shared_keys = NULL;
     cfg->ntru_public_keys = NULL;
-    if (mam_msg_keyload_plain == keyload)
+    if (mam_msg_keyload_plain == keyload) {
       cfg->key_plain = 1;
-    else if (mam_msg_keyload_psk == keyload) {
+    } else if (mam_msg_keyload_psk == keyload) {
       mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pska);
       mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pskb);
     } else if (mam_msg_keyload_ntru == keyload) {

@@ -9,6 +9,7 @@
  */
 
 #include "mam/v2/pb3/pb3.h"
+#include "common/defs.h"
 
 trits_t pb3_trits_take(trits_t *const b, size_t const n) {
   return trits_advance(b, n);
@@ -19,12 +20,12 @@ trits_t pb3_trits_take(trits_t *const b, size_t const n) {
  * null, tryte, size_t, trytes, tryte [n]
  */
 
-size_t pb3_sizeof_tryte() { return 3; }
+size_t pb3_sizeof_tryte() { return NUMBER_OF_TRITS_IN_A_TRYTE; }
 
 void pb3_encode_tryte(tryte_t const tryte, trits_t *const buffer) {
   MAM2_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_tryte()));
 
-  trits_put3(pb3_trits_take(buffer, 3), tryte);
+  trits_put3(pb3_trits_take(buffer, NUMBER_OF_TRITS_IN_A_TRYTE), tryte);
 }
 
 retcode_t pb3_decode_tryte(tryte_t *const tryte, trits_t *const buffer) {

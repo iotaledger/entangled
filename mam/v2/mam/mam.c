@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "common/defs.h"
 #include "mam/v2/mam/mam.h"
 #include "mam/v2/pb3/pb3.h"
 
@@ -600,7 +601,7 @@ size_t mam_send_msg_size(mam_send_msg_context_t *cfg) {
 
   /* header */
   /*  absorb tryte nonce[27]; */
-  sz += pb3_sizeof_ntrytes(MAM2_HEADER_NONCE_SIZE / 3);
+  sz += pb3_sizeof_ntrytes(MAM2_HEADER_NONCE_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
   {
     size_t keyload_count = 0;
 
