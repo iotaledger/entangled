@@ -29,6 +29,7 @@ extern "C" {
 #define STR_CCLIENT_TX_DESERIALIZE_FAILED \
   "deserializing transaction object failed"
 #define STR_CCLIENT_INSUFFICIENT_BALANCE "Insufficient balance"
+#define STR_CCLIENT_POW_FAILED "Local PoW failed"
 
 #ifdef __cplusplus
 }

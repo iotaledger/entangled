@@ -43,8 +43,8 @@ typedef struct test_prng_s {
 
 typedef struct test_sponge_s {
   sponge_t s;
-  sponge_state_t stack;
-  sponge_state_t state;
+  trit_t stack[MAM2_SPONGE_WIDTH];
+  trit_t state[MAM2_SPONGE_WIDTH];
 } test_sponge_t;
 
 typedef spongos_t test_spongos_t;
