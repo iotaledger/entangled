@@ -30,17 +30,21 @@
   "RECIPIPRNGKEYBRECIPIPRNGKEYRECIPIPRNGKEYBRECIPIPRNGKEYRECIPIPRNGKEYBRECIPI" \
   "PRNGKEY"
 
+#define TEST_MSG_NONCE "SENDERNOAAAAANCEAAAAASENDERNONCE"
+
+#define TEST_PACKET_1_PAYLOAD "THISISSOMEEXAMPLEPAYLOAD"
+
 #define TEST_MSS_DEPTH 1
 
 // TODO - Test functions should take set of prng_t instead of raw ptrs
 
 static trits_t mam_test_generic_send_msg(
-    void *sponge_alloc_ctx, sponge_t *(create_sponge)(),
-    void (*destroy_sponge)(sponge_t *), prng_t *prng_a, prng_t *prng_b,
-    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
-    mam_msg_checksum_t checksum, mam_channel_t *const cha,
-    mam_endpoint_t *const epa, mam_channel_t *const ch1a,
-    mam_endpoint_t *const ep1a, mam_send_msg_context_t *const cfg_msga) {
+    sponge_t *(create_sponge)(), void (*destroy_sponge)(sponge_t *),
+    prng_t *prng_a, prng_t *prng_b, mam_msg_pubkey_t pubkey,
+    mam_msg_keyload_t keyload, mam_msg_checksum_t checksum,
+    mam_channel_t *const cha, mam_endpoint_t *const epa,
+    mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
+    mam_send_msg_context_t *const cfg_msga) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   trits_t msg = trits_null();
@@ -115,7 +119,7 @@ static trits_t mam_test_generic_send_msg(
       mam_ntru_pk_t_set_add(&cfg->ntru_public_keys, ntru_pk);
     }
 
-    trits_from_str(mam_send_msg_cfg_nonce(cfg), "SENDERNONCEAAAAASENDERNONCE");
+    trits_from_str(mam_send_msg_cfg_nonce(cfg), TEST_MSG_NONCE);
   }
 
   size_t sz;
@@ -135,10 +139,9 @@ static trits_t mam_test_generic_send_msg(
 }
 
 static trits_t mam_test_generic_send_first_packet(
-    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
-    mam_msg_checksum_t checksum, mam_channel_t *const cha,
-    mam_endpoint_t *const epa, mam_channel_t *const ch1a,
-    mam_endpoint_t *const ep1a,
+    mam_msg_pubkey_t pubkey, mam_msg_checksum_t checksum,
+    mam_channel_t *const cha, mam_endpoint_t *const epa,
+    mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
     mam_send_msg_context_t const *const cfg_msg_send, char const *payload_str) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
@@ -186,9 +189,9 @@ static trits_t mam_test_generic_send_first_packet(
 }
 
 static void mam_test_generic_receive_msg(
-    void *sponge_alloc_ctx, sponge_t *(create_sponge)(),
-    void (*destroy_sponge)(sponge_t *), prng_t *prng, mam_channel_t *const cha,
-    trits_t *const msg, mam_recv_msg_context_t *const cfg_msg_recv) {
+    sponge_t *(create_sponge)(), void (*destroy_sponge)(sponge_t *),
+    prng_t *prng, mam_channel_t *const cha, trits_t *const msg,
+    mam_recv_msg_context_t *const cfg_msg_recv) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   mam_ialloc_t ma[1];
@@ -257,10 +260,6 @@ static void mam_test_generic_receive_msg(
 }
 
 static void mam_test_generic_receive_packet(
-    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
-    mam_msg_checksum_t checksum, mam_channel_t *const cha,
-    mam_endpoint_t *const epa, mam_channel_t *const ch1a,
-    mam_endpoint_t *const ep1a,
     mam_recv_msg_context_t const *const cfg_msg_recv,
     trits_t const *const packet, trits_t *const payload) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
@@ -372,7 +371,7 @@ static void mam_test_create_channels(sponge_t *(create_sponge)(),
   }
 }
 
-static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
+static void mam_test_generic(void *sponge_alloc_ctx,
                              sponge_t *(create_sponge)(),
                              void (*destroy_sponge)(sponge_t *), prng_t *prng_a,
                              prng_t *prng_b) {
@@ -381,7 +380,6 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
 
   trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
 
-  mss_mt_height_t d = TEST_MSS_DEPTH;
   mam_channel_t *cha = 0, *ch1a = 0;
   mam_endpoint_t *epa = 0, *ep1a = 0;
 
@@ -401,8 +399,7 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
   mam_test_create_channels(create_sponge, destroy_sponge, prng_a, &cha, &ch1a,
                            &epa, &ep1a);
 
-  char const *payload_str = "PAYLOAD9999";
-  payload = trits_alloc(3 * strlen(payload_str));
+  payload = trits_alloc(3 * strlen(TEST_PACKET_1_PAYLOAD));
 
   /* chid=0, epid=1, chid1=2, epid1=3*/
   for (pubkey = 0; pubkey < 4; ++pubkey) {
@@ -413,25 +410,22 @@ static void mam_test_generic(sponge_t *s, void *sponge_alloc_ctx,
       {
         /* send msg and packet */
         {
-          msg = mam_test_generic_send_msg(
-              sponge_alloc_ctx, create_sponge, destroy_sponge, prng_a, prng_b,
-              pubkey, keyload, checksum, cha, epa, ch1a, ep1a, cfg_msg_send);
+          msg = mam_test_generic_send_msg(create_sponge, destroy_sponge, prng_a,
+                                          prng_b, pubkey, keyload, checksum,
+                                          cha, epa, ch1a, ep1a, cfg_msg_send);
 
           packet = mam_test_generic_send_first_packet(
-              pubkey, keyload, checksum, cha, epa, ch1a, ep1a, cfg_msg_send,
-              payload_str);
+              pubkey, checksum, cha, epa, ch1a, ep1a, cfg_msg_send,
+              TEST_PACKET_1_PAYLOAD);
         }
 
         /* recv msg and packet */
         {
-          mam_test_generic_receive_msg(sponge_alloc_ctx, create_sponge,
-                                       destroy_sponge, prng_b, cha, &msg,
-                                       cfg_msg_recv);
+          mam_test_generic_receive_msg(create_sponge, destroy_sponge, prng_b,
+                                       cha, &msg, cfg_msg_recv);
 
-          mam_test_generic_receive_packet(pubkey, keyload, checksum, cha, epa,
-                                          ch1a, ep1a, cfg_msg_recv, &packet,
-                                          &payload);
-          TEST_ASSERT(trits_cmp_eq_str(payload, payload_str));
+          mam_test_generic_receive_packet(cfg_msg_recv, &packet, &payload);
+          TEST_ASSERT(trits_cmp_eq_str(payload, TEST_PACKET_1_PAYLOAD));
         }
 
         /* cleanup */
@@ -476,7 +470,7 @@ void mam_test() {
   prng_t *pa = test_prng_init(_pa, s);
   prng_t *pb = test_prng_init(_pb, s);
 
-  mam_test_generic(s, NULL, test_create_sponge, test_delete_sponge, pa, pb);
+  mam_test_generic(NULL, test_create_sponge, test_delete_sponge, pa, pb);
 }
 
 int main(void) {
