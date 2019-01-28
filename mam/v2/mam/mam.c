@@ -15,54 +15,56 @@
 #include "mam/v2/mam/mam.h"
 #include "mam/v2/pb3/pb3.h"
 
-retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
-                         mss_mt_height_t d, trits_t N1, trits_t N2) {
+retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *mss, prng_t *p,
+                         mss_mt_height_t height, trits_t nonce1,
+                         trits_t nonce2) {
   retcode_t e;
   MAM2_ASSERT(ma);
-  MAM2_ASSERT(m);
+  MAM2_ASSERT(mss);
 
-  if ((e = mss_create(m, d)) != RC_OK) {
+  if ((e = mss_create(mss, height)) != RC_OK) {
     return e;
   }
 
-  m->nonce1 = trits_null();
-  if (!trits_is_empty(N1)) {
-    m->nonce1 = trits_alloc(trits_size(N1));
-    if (trits_is_null(m->nonce1)) {
+  mss->nonce1 = trits_null();
+  if (!trits_is_empty(nonce1)) {
+    mss->nonce1 = trits_alloc(trits_size(nonce1));
+    if (trits_is_null(mss->nonce1)) {
       return RC_OOM;
     }
-    trits_copy(N1, m->nonce1);
+    trits_copy(nonce1, mss->nonce1);
   }
 
-  m->nonce2 = trits_null();
-  if (!trits_is_empty(N2)) {
-    m->nonce2 = trits_alloc(trits_size(N2));
-    if (trits_is_null(m->nonce2)) {
+  mss->nonce2 = trits_null();
+  if (!trits_is_empty(nonce2)) {
+    mss->nonce2 = trits_alloc(trits_size(nonce2));
+    if (trits_is_null(mss->nonce2)) {
       return RC_OOM;
     }
-    trits_copy(N2, m->nonce2);
+    trits_copy(nonce2, mss->nonce2);
   }
 
-  m->sg->sponge = ma->create_sponge();
-  if (!m->sg->sponge) {
+  mss->spongos->sponge = ma->create_sponge();
+  if (!mss->spongos->sponge) {
     return RC_OOM;
   }
 
-  m->wots = malloc(sizeof(wots_t));
-  if (!m->wots) {
+  mss->wots = malloc(sizeof(wots_t));
+  if (!mss->wots) {
     return RC_OOM;
   }
-  if ((e = (wots_create(m->wots))) != RC_OK) {
+  if ((e = (wots_create(mss->wots))) != RC_OK) {
     return e;
   }
 
-  m->wots->spongos.sponge = ma->create_sponge();
-  if (!m->wots->spongos.sponge) {
+  mss->wots->spongos.sponge = ma->create_sponge();
+  if (!mss->wots->spongos.sponge) {
     return RC_OOM;
   }
-  wots_init(m->wots, m->wots->spongos.sponge);
+  wots_init(mss->wots, mss->wots->spongos.sponge);
 
-  mss_init(m, p, m->sg->sponge, m->wots, d, m->nonce1, m->nonce2);
+  mss_init(mss, p, mss->spongos->sponge, mss->wots, height, mss->nonce1,
+           mss->nonce2);
 
   e = RC_OK;
 
@@ -85,8 +87,8 @@ void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m) {
   wots_destroy(m->wots);
   m->wots = 0;
 
-  ma->destroy_sponge(m->sg->sponge);
-  m->sg->sponge = 0;
+  ma->destroy_sponge(m->spongos->sponge);
+  m->spongos->sponge = 0;
 
   mss_destroy(m);
 }
@@ -95,14 +97,14 @@ trits_t mam_channel_id(mam_channel_t *ch) {
   return trits_from_rep(MAM2_CHANNEL_ID_SIZE, ch->id);
 }
 
-trits_t mam_channel_name(mam_channel_t *ch) { return ch->m->nonce1; }
+trits_t mam_channel_name(mam_channel_t *ch) { return ch->mss->nonce1; }
 static size_t mam_channel_sig_size(mam_channel_t *ch) {
-  return MAM2_MSS_SIG_SIZE(ch->m->height);
+  return MAM2_MSS_SIG_SIZE(ch->mss->height);
 }
 
 retcode_t mam_channel_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
-                             prng_t *p, /*! [in] Shared PRNG interface used to
-                                          generate WOTS private keys. */
+                             prng_t *prng, /*! [in] Shared PRNG interface used
+                                          to generate WOTS private keys. */
                              mss_mt_height_t d, /*!< [in] MSS MT height. */
                              trits_t ch_name,   /*!< [in] Channel name. */
                              mam_channel_t *ch  /*!< [out] Channel. */
@@ -112,8 +114,9 @@ retcode_t mam_channel_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
   MAM2_ASSERT(ma);
   MAM2_ASSERT(ch);
 
-  ERR_BIND_RETURN(mam_mss_create(ma, ch->m, p, d, ch_name, trits_null()), e);
-  mss_gen(ch->m, mam_channel_id(ch));
+  ERR_BIND_RETURN(mam_mss_create(ma, ch->mss, prng, d, ch_name, trits_null()),
+                  e);
+  mss_gen(ch->mss, mam_channel_id(ch));
 
   return e;
 }
@@ -124,19 +127,19 @@ void mam_channel_destroy(mam_ialloc_t *ma, /*!< [in] Allocator. */
   MAM2_ASSERT(ma);
   MAM2_ASSERT(ch);
 
-  mam_mss_destroy(ma, ch->m);
+  mam_mss_destroy(ma, ch->mss);
 }
 
 trits_t mam_endpoint_id(mam_endpoint_t *ep) {
   return trits_from_rep(MAM2_ENDPOINT_ID_SIZE, ep->id);
 }
 
-trits_t mam_endpoint_chname(mam_endpoint_t *ep) { return ep->m->nonce1; }
+trits_t mam_endpoint_chname(mam_endpoint_t *ep) { return ep->mss->nonce1; }
 
-trits_t mam_endpoint_name(mam_endpoint_t *ep) { return ep->m->nonce2; }
+trits_t mam_endpoint_name(mam_endpoint_t *ep) { return ep->mss->nonce2; }
 
 static size_t mam_endpoint_sig_size(mam_endpoint_t *ep) {
-  return MAM2_MSS_SIG_SIZE(ep->m->height);
+  return MAM2_MSS_SIG_SIZE(ep->mss->height);
 }
 
 retcode_t mam_endpoint_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
@@ -152,8 +155,8 @@ retcode_t mam_endpoint_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
   MAM2_ASSERT(ma);
   MAM2_ASSERT(ep);
 
-  ERR_BIND_RETURN(mam_mss_create(ma, ep->m, p, d, ch_name, ep_name), e);
-  mss_gen(ep->m, mam_endpoint_id(ep));
+  ERR_BIND_RETURN(mam_mss_create(ma, ep->mss, p, d, ch_name, ep_name), e);
+  mss_gen(ep->mss, mam_endpoint_id(ep));
 
   return e;
 }
@@ -164,7 +167,7 @@ void mam_endpoint_destroy(mam_ialloc_t *ma,  /*!< [in] Allocator. */
   MAM2_ASSERT(ma);
   MAM2_ASSERT(ep);
 
-  mam_mss_destroy(ma, ep->m);
+  mam_mss_destroy(ma, ep->mss);
 }
 
 trits_t mam_psk_id(mam_pre_shared_key_t *p) {
@@ -587,10 +590,10 @@ size_t mam_send_msg_size(mam_send_msg_context_t *cfg) {
 
   if (cfg->ch1) {
     // SignedId chid1 = 2;
-    sz += mam_wrap_pubkey_chid1_size(cfg->ch->m);
+    sz += mam_wrap_pubkey_chid1_size(cfg->ch->mss);
   } else if (cfg->ep1) {
     // SignedId epid1 = 3;
-    sz += mam_wrap_pubkey_epid1_size(cfg->ch->m);
+    sz += mam_wrap_pubkey_epid1_size(cfg->ch->mss);
   } else if (cfg->ep) {
     // absorb tryte epid[81] = 1;
     sz += mam_wrap_pubkey_epid_size();
@@ -686,9 +689,9 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg) {
   MAM2_ASSERT(!(trits_size(*msg) < mam_send_msg_size(cfg)));
 
   if (cfg->ep) {
-    mss_skn(cfg->ep->m, skn);
+    mss_skn(cfg->ep->mss, skn);
   } else {
-    mss_skn(cfg->ch->m, skn);
+    mss_skn(cfg->ch->mss, skn);
   }
   /* generate session key */
   prng_gen3(cfg->rng, MAM2_PRNG_DST_SEC_KEY, mam_channel_name(cfg->ch),
@@ -709,12 +712,12 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg) {
       pubkey = (tryte_t)mam_msg_pubkey_chid1;
       pb3_wrap_absorb_tryte(spongos, msg, pubkey);
       mam_wrap_pubkey_chid1(spongos, msg, mam_send_msg_cfg_chid1(cfg),
-                            cfg->ch->m);
+                            cfg->ch->mss);
     } else if (cfg->ep1) { /*  SignedId epid1 = 3; */
       pubkey = (tryte_t)mam_msg_pubkey_epid1;
       pb3_wrap_absorb_tryte(spongos, msg, pubkey);
       mam_wrap_pubkey_epid1(spongos, msg, mam_send_msg_cfg_epid1(cfg),
-                            cfg->ch->m);
+                            cfg->ch->mss);
     } else if (cfg->ep) { /*  absorb tryte epid[81] = 1; */
       pubkey = (tryte_t)mam_msg_pubkey_epid;
       pb3_wrap_absorb_tryte(spongos, msg, pubkey);

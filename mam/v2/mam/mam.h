@@ -38,16 +38,17 @@ typedef struct mam_ialloc_s {
   void (*destroy_sponge)(sponge_t *); /*!< Deallocator. */
 } mam_ialloc_t;
 
-retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
-                         mss_mt_height_t d, trits_t N1, trits_t N2);
+retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *mss, prng_t *p,
+                         mss_mt_height_t height, trits_t nonce1,
+                         trits_t nonce2);
 
 void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m);
 
 #define MAM2_CHANNEL_ID_SIZE MAM2_MSS_MT_HASH_SIZE
 typedef trit_t chid_t[MAM2_CHANNEL_ID_SIZE];
 typedef struct mam_channel_s {
-  mss_t m[1]; /*!< MSS instance. */
-  chid_t id;  /*!< MSS public key. */
+  mss_t mss[1]; /*!< MSS instance. */
+  chid_t id;    /*!< MSS public key. */
 } mam_channel_t;
 trits_t mam_channel_id(mam_channel_t *ch);
 trits_t mam_channel_name(mam_channel_t *ch);
@@ -57,8 +58,8 @@ trits_t mam_channel_name(mam_channel_t *ch);
   and generate MSS public key.
 */
 retcode_t mam_channel_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
-                             prng_t *p, /*! [in] Shared PRNG interface used to
-                                          generate WOTS private keys. */
+                             prng_t *prng, /*! [in] Shared PRNG interface used
+                                          to generate WOTS private keys. */
                              mss_mt_height_t d, /*!< [in] MSS MT height. */
                              trits_t ch_name,   /*!< [in] Channel name. */
                              mam_channel_t *ch  /*!< [out] Channel. */
@@ -81,8 +82,8 @@ mam_channel_save, mam_channel_load
 #define MAM2_ENDPOINT_ID_SIZE MAM2_MSS_MT_HASH_SIZE
 typedef trit_t epid_t[MAM2_MSS_MT_HASH_SIZE];
 typedef struct mam_endpoint_s {
-  mss_t m[1]; /*!< MSS instance. */
-  epid_t id;  /*!< MSS public key. */
+  mss_t mss[1]; /*!< MSS instance. */
+  epid_t id;    /*!< MSS public key. */
 } mam_endpoint_t;
 trits_t mam_endpoint_id(mam_endpoint_t *ep);
 trits_t mam_endpoint_chname(mam_endpoint_t *ep);

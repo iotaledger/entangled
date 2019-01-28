@@ -101,8 +101,9 @@ typedef struct mss_s {
   trint6_t height; /*!< Merkle tree height. */
   trint18_t skn;   /*!< Current WOTS private key number. */
   prng_t *prng;    /*!< PRNG interface used to generate WOTS private keys. */
-  spongos_t sg[1]; /*!< Spongos interface used to hash Merkle tree nodes. */
-  wots_t *wots;    /*!< WOTS interface used to generate keys and sign. */
+  spongos_t
+      spongos[1]; /*!< Spongos interface used to hash Merkle tree nodes. */
+  wots_t *wots;   /*!< WOTS interface used to generate keys and sign. */
 #if defined(MAM2_MSS_TRAVERSAL)
   trit_t *auth_path;      /*!< Current authentication path; `d` hash values. */
   trit_t *nodes_hashes;   /*!< Buffer storing hash-values of auxiliary nodes;

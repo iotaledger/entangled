@@ -11,6 +11,7 @@
 #include <string.h>
 #include <unity/unity.h>
 
+#include "common/defs.h"
 #include "mam/v2/mam/mam.h"
 #include "mam/v2/test_utils/test_utils.h"
 
@@ -159,13 +160,13 @@ static trits_t mam_test_generic_send_first_packet(
     cfg->mss = 0;
     if (mam_msg_checksum_mssig == cfg->checksum) {
       if (mam_msg_pubkey_chid == pubkey) {
-        cfg->mss = cha->m;
+        cfg->mss = cha->mss;
       } else if (mam_msg_pubkey_epid == pubkey) {
-        cfg->mss = epa->m;
+        cfg->mss = epa->mss;
       } else if (mam_msg_pubkey_chid1 == pubkey) {
-        cfg->mss = ch1a->m;
+        cfg->mss = ch1a->mss;
       } else if (mam_msg_pubkey_epid1 == pubkey) {
-        cfg->mss = ep1a->m;
+        cfg->mss = ep1a->mss;
       }
     }
   }
@@ -305,7 +306,6 @@ static void mam_test_create_channels(sponge_t *(create_sponge)(),
                                      mam_endpoint_t **ep1) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   mam_ialloc_t ma[1];
-  mss_mt_height_t d = TEST_MSS_DEPTH;
 
   /* init alloc */
   {
@@ -324,13 +324,14 @@ static void mam_test_create_channels(sponge_t *(create_sponge)(),
 
   /* create channels */
   {
-    trits_t cha_name = trits_alloc(3 * strlen(TEST_CHANNEL_NAME));
+    trits_t cha_name =
+        trits_alloc(NUMBER_OF_TRITS_IN_A_TRYTE * strlen(TEST_CHANNEL_NAME));
     trits_from_str(cha_name, TEST_CHANNEL_NAME);
 
     *cha = malloc(sizeof(mam_channel_t));
     TEST_ASSERT(0 != *cha);
     memset(*cha, 0, sizeof(mam_channel_t));
-    e = mam_channel_create(ma, prng, d, cha_name, *cha);
+    e = mam_channel_create(ma, prng, TEST_MSS_DEPTH, cha_name, *cha);
     TEST_ASSERT(RC_OK == e);
 
     /* create endpoints */
@@ -341,7 +342,8 @@ static void mam_test_create_channels(sponge_t *(create_sponge)(),
       *epa = malloc(sizeof(mam_endpoint_t));
       TEST_ASSERT(0 != *epa);
       memset(*epa, 0, sizeof(mam_endpoint_t));
-      e = mam_endpoint_create(ma, prng, d, cha_name, epa_name, *epa);
+      e = mam_endpoint_create(ma, prng, TEST_MSS_DEPTH, cha_name, epa_name,
+                              *epa);
       TEST_ASSERT(RC_OK == e);
       trits_free(epa_name);
     }
@@ -352,7 +354,8 @@ static void mam_test_create_channels(sponge_t *(create_sponge)(),
       *ep1 = malloc(sizeof(mam_endpoint_t));
       TEST_ASSERT(0 != *ep1);
       memset(*ep1, 0, sizeof(mam_endpoint_t));
-      e = mam_endpoint_create(ma, prng, d, cha_name, ep1a_name, *ep1);
+      e = mam_endpoint_create(ma, prng, TEST_MSS_DEPTH, cha_name, ep1a_name,
+                              *ep1);
       TEST_ASSERT(RC_OK == e);
       trits_free(ep1a_name);
     }
@@ -364,7 +367,7 @@ static void mam_test_create_channels(sponge_t *(create_sponge)(),
       *ch1 = malloc(sizeof(mam_channel_t));
       TEST_ASSERT(0 != *ch1);
       memset(*ch1, 0, sizeof(mam_channel_t));
-      e = mam_channel_create(ma, prng, d, ch1a_name, *ch1);
+      e = mam_channel_create(ma, prng, TEST_MSS_DEPTH, ch1a_name, *ch1);
       TEST_ASSERT(RC_OK == e);
       trits_free(ch1a_name);
     }

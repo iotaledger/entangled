@@ -48,7 +48,7 @@ static void mss_mt_hash2(mss_t *mss, trits_t children_hashes[2],
 #if defined(MAM2_MSS_DEBUG)
   mss->hash_node_count++;
 #endif
-  mss_hash2(mss->sg, children_hashes, parent_hash);
+  mss_hash2(mss->spongos, children_hashes, parent_hash);
 }
 
 static void mss_mt_gen_leaf(
@@ -344,7 +344,7 @@ void mss_init(mss_t *mss, prng_t *prng, sponge_t *sponge, wots_t *wots,
   mss->height = height;
   mss->skn = 0;
   mss->prng = prng;
-  mss->sg->sponge = sponge;
+  mss->spongos->sponge = sponge;
   mss->wots = wots;
   mss->nonce1 = nonce1;
   mss->nonce2 = nonce2;
