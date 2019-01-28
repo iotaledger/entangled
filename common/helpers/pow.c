@@ -132,7 +132,7 @@ IOTA_EXPORT retcode_t iota_pow_bundle(bundle_transactions_t *const bundle,
     free(txflex);
   } while (cur_idx != 0);
 
-  if (ctrunk != trunk && ctrunk != NULL) {
+  if (ctrunk != trunk) {
     free(ctrunk);
   }
   return RC_OK;
