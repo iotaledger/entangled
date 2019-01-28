@@ -38,9 +38,13 @@ cc_library(
     hdrs = ["pow.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":digest",
+        "//common/model:bundle",
         "//common/pow",
         "//common/trinary:flex_trit",
         "//utils:export",
+        "//utils:time",
+        "@com_github_uthash//:uthash",
     ],
 )
 
