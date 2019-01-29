@@ -613,12 +613,12 @@ size_t mam_send_msg_size(mam_send_msg_context_t *cfg) {
     }
 
     size_t num_pre_shared_keys =
-        mam_pre_shared_key_t_set_size(&cfg->pre_shared_keys);
+        mam_pre_shared_key_t_set_size(cfg->pre_shared_keys);
     keyload_count += num_pre_shared_keys;
     sz += (pb3_sizeof_oneof() + mam_wrap_keyload_psk_size()) *
           num_pre_shared_keys;
 
-    size_t num_pre_ntru_keys = mam_ntru_pk_t_set_size(&cfg->ntru_public_keys);
+    size_t num_pre_ntru_keys = mam_ntru_pk_t_set_size(cfg->ntru_public_keys);
     keyload_count += num_pre_ntru_keys;
     sz +=
         (pb3_sizeof_oneof() + mam_wrap_keyload_ntru_size()) * num_pre_ntru_keys;
@@ -735,8 +735,8 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg) {
       tryte_t keyload;
 
       if (cfg->key_plain) ++keyload_count;
-      keyload_count += mam_pre_shared_key_t_set_size(&cfg->pre_shared_keys);
-      keyload_count += mam_ntru_pk_t_set_size(&cfg->ntru_public_keys);
+      keyload_count += mam_pre_shared_key_t_set_size(cfg->pre_shared_keys);
+      keyload_count += mam_ntru_pk_t_set_size(cfg->ntru_public_keys);
       /*  repeated */
       pb3_wrap_absorb_size_t(spongos, msg, keyload_count);
 
