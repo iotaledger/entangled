@@ -19,9 +19,11 @@ cc_library(
 
 cc_library(
     name = "mam_types",
+    srcs = ["mam_types.c"],
     hdrs = ["mam_types.h"],
     deps = [
         "//mam/v2:defs",
+        "//mam/v2/ntru",
         "//mam/v2/trits",
     ],
 )

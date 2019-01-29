@@ -513,7 +513,7 @@ retcode_t mam_unwrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key,
   id = MAM2_TRITS_INIT(id, 81);
 
   MAM2_ASSERT(MAM2_NTRU_KEY_SIZE == trits_size(key));
-  MAM2_ASSERT(MAM2_KEY_ID_SIZE == trits_size(pkid));
+  MAM2_ASSERT(MAM2_NTRU_ID_SIZE == trits_size(pkid));
 
   /*  absorb tryte id[27]; */
   ERR_BIND_RETURN(pb3_unwrap_absorb_ntrytes(s, b, id), e);
