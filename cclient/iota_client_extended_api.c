@@ -81,6 +81,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
           goto done;
         }
         free(tmp);
+        tmp = NULL;
       } else {
         // gen address failed.
         ret = RC_CCLIENT_NULL_PTR;
@@ -100,6 +101,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
           goto done;
         }
         free(tmp);
+        tmp = NULL;
       } else {
         // gen address failed.
         ret = RC_CCLIENT_NULL_PTR;
@@ -490,5 +492,57 @@ done:
     attach_req->trytes = NULL;
     attach_to_tangle_req_free(&attach_req);
   }
+  return ret_code;
+}
+
+retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
+                                        transfer_t** const transfers,
+                                        uint32_t const num_transfer,
+                                        bundle_transactions_t* out_bundle) {
+  retcode_t ret_code = RC_OK;
+  iota_transaction_t TX = {};
+  iota_transaction_t* tx = NULL;
+  transfer_iterator_t* transfer_iterator = NULL;
+  Kerl kerl = {};
+
+  transfer_iterator =
+      transfer_iterator_new(transfers, num_transfer, &kerl, &TX);
+
+  if (transfer_iterator) {
+    for (tx = transfer_iterator_next(transfer_iterator); tx;
+         tx = transfer_iterator_next(transfer_iterator)) {
+      bundle_transactions_add(out_bundle, tx);
+    }
+  } else {
+    ret_code = RC_CCLIENT_INVALID_TRANSFER;
+    log_error(CCLIENT_EXTENDED_LOGGER_ID, "preparing transfer failed: %s\n",
+              __func__, error_2_string(ret_code));
+  }
+
+  return ret_code;
+}
+
+retcode_t iota_client_send_transfer(
+    iota_client_service_t const* const serv, int const depth, int const mwm,
+    bool local_pow, transfer_t** const transfers, uint32_t num_transfer,
+    flex_trit_t const* const reference, bundle_transactions_t* out_tx_objs) {
+  retcode_t ret_code = RC_OK;
+  hash8019_array_p raw_tx = hash8019_array_new();
+  iota_transaction_t* tx = NULL;
+
+  // prepare transfer
+  ret_code =
+      iota_client_prepare_transfers(serv, transfers, num_transfer, out_tx_objs);
+  if (ret_code == RC_OK) {
+    BUNDLE_FOREACH(out_tx_objs, tx) {
+      // tx trytes must be in order, from last to 0.
+      utarray_insert(raw_tx, transaction_serialize(tx), 0);
+    }
+
+    ret_code = iota_client_send_trytes(serv, raw_tx, depth, mwm, reference,
+                                       local_pow, out_tx_objs);
+  }
+
+  hash_array_free(raw_tx);
   return ret_code;
 }

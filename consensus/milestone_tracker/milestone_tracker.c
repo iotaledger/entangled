@@ -52,7 +52,7 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt,
                       NUM_TRITS_SIGNATURE);
   curl.type = CURL_P_27;
   init_curl(&curl);
-  normalize_hash_trits(transaction_trunk(tx1), normalized_trunk_trits);
+  normalize_flex_hash_to_trits(transaction_trunk(tx1), normalized_trunk_trits);
   iss_curl_sig_digest(sig_digest, normalized_trunk_trits, signature_trits,
                       NUM_TRITS_SIGNATURE, &curl);
   curl_reset(&curl);

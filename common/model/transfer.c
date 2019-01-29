@@ -5,7 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <stdbool.h>
+
 #include "common/model/transfer.h"
+#include "common/sign/normalize.h"
 
 #define TRANSFER_LOGGER_ID "transfer"
 
@@ -18,7 +21,7 @@ static logger_id_t logger_id;
 static void transfer_iterator_next_data_transaction(
     transfer_iterator_t* transfer_iterator, transfer_t* transfer) {
   transfer_data_t* trans_data = NULL;
-  size_t data_len = 0, offset = 0, len = 0;
+  uint32_t data_len = 0, offset = 0, len = 0;
   size_t flex_ret = 0;
 
   if (transfer->type == DATA) {
@@ -127,7 +130,7 @@ bool validate_output(transfer_value_out_t const* const output) {
 // create data transfer object.
 transfer_t* transfer_data_new(flex_trit_t const* const address,
                               flex_trit_t const* const tag,
-                              flex_trit_t const* const data, size_t data_len,
+                              flex_trit_t const* const data, uint32_t data_len,
                               uint64_t timestamp) {
   transfer_data_t* tf_data = NULL;
   transfer_t* transfer = NULL;
@@ -219,7 +222,7 @@ transfer_t* transfer_value_out_new(transfer_value_out_t const* const output,
 transfer_t* transfer_value_in_new(flex_trit_t const* const address,
                                   flex_trit_t const* const tag, int64_t value,
                                   flex_trit_t const* const data,
-                                  size_t data_len, uint64_t timestamp) {
+                                  uint32_t data_len, uint64_t timestamp) {
   transfer_value_in_t* value_in = NULL;
   transfer_t* tf = NULL;
   if (!address) {
@@ -271,7 +274,7 @@ void transfer_free(transfer_t** transfer) {
   }
 }
 
-size_t transfer_transactions_count(transfer_t* tf) {
+uint32_t transfer_transactions_count(transfer_t* tf) {
   transfer_data_t* data = NULL;
   transfer_value_out_t* value_out = NULL;
   switch (tf->type) {
@@ -302,11 +305,12 @@ transfer_ctx_t* transfer_ctx_new() {
 void transfer_ctx_free(transfer_ctx_t* transfer_ctx) { free(transfer_ctx); }
 
 bool transfer_ctx_init(transfer_ctx_t* transfer_ctx, transfer_t* transfers[],
-                       size_t len) {
-  size_t i;
+                       uint32_t len) {
+  uint32_t i;
   int64_t total = 0;
+  transfer_t* transfer = NULL;
   for (i = 0; i < len; i++) {
-    transfer_t* transfer = transfers[i];
+    transfer = transfers[i];
     transfer_ctx->count += transfer_transactions_count(transfer);
     total += transfer->value;
   }
@@ -315,35 +319,59 @@ bool transfer_ctx_init(transfer_ctx_t* transfer_ctx, transfer_t* transfers[],
 
 // Calculates the bundle hash for a collection of transfers
 void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
-                       transfer_t* transfers[], size_t tx_len) {
+                       transfer_t* transfers[], uint32_t tx_len) {
   size_t i, j, count, current_index = 0;
   trit_t essence_trits[NUM_TRITS_ESSENCE];
   trit_t bundle_trit[HASH_LENGTH_TRIT];
+  byte_t normalized_hash[HASH_LENGTH_TRYTE];
   transfer_t* tf = NULL;
   int64_t value;
+  bool valid_bundle = false;
+  trit_t first_tx_tag_trits[NUM_TRITS_TAG];
+  flex_trits_to_trits(first_tx_tag_trits, NUM_TRITS_TAG, transfers[0]->tag,
+                      NUM_TRITS_TAG, NUM_TRITS_TAG);
 
-  init_kerl(kerl);
-  // Calculate bundle hash
-  for (i = 0; i < tx_len; i++) {
-    tf = transfers[i];
-    count = transfer_transactions_count(tf);
-    for (j = 0; j < count; j++) {
-      value = tf->type == VALUE_OUT ? (j == 0 ? tf->value : 0) : 0;
-      absorb_essence(kerl, tf->address, value, tf->tag, tf->timestamp,
-                     current_index, transfer_ctx->count - 1, essence_trits);
-      current_index++;
+  while (!valid_bundle) {
+  loop:
+    init_kerl(kerl);
+    // Calculate bundle hash
+    current_index = 0;
+    for (i = 0; i < tx_len; i++) {
+      tf = transfers[i];
+      count = transfer_transactions_count(tf);
+      for (j = 0; j < count; j++) {
+        value = tf->type == VALUE_OUT ? (j == 0 ? tf->value : 0) : tf->value;
+        absorb_essence(kerl, tf->address, value, tf->tag, tf->timestamp,
+                       current_index, transfer_ctx->count - 1, essence_trits);
+        current_index++;
+      }
     }
+
+    // Squeeze kerl to get the bundle hash
+    kerl_squeeze(kerl, bundle_trit, HASH_LENGTH_TRIT);
+    flex_trits_from_trits(transfer_ctx->bundle, HASH_LENGTH_TRIT, bundle_trit,
+                          HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+
+    // normalize
+    normalize_flex_hash(transfer_ctx->bundle, normalized_hash);
+    // checking 'M'
+    for (i = 0; i < HASH_LENGTH_TRYTE; i++) {
+      if (normalized_hash[i] == 13) {
+        // Insecure bundle. Increment Tag and recompute bundle hash.
+        add_assign(first_tx_tag_trits, NUM_TRITS_TAG, 1);
+        flex_trits_from_trits(transfers[0]->tag, NUM_TRITS_TAG,
+                              first_tx_tag_trits, NUM_TRITS_TAG, NUM_TRITS_TAG);
+        goto loop;
+      }
+    }
+    valid_bundle = true;
   }
-  // Squeeze kerl to get the bundle hash
-  kerl_squeeze(kerl, bundle_trit, HASH_LENGTH_TRIT);
-  flex_trits_from_trits(transfer_ctx->bundle, HASH_LENGTH_TRIT, bundle_trit,
-                        HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
 }
 
-transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[], size_t len,
-                                           Kerl* kerl,
+transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[],
+                                           uint32_t len, Kerl* kerl,
                                            iota_transaction_t* transaction) {
-  transfer_ctx_t* transfer_ctx = NULL;
+  transfer_ctx_t transfer_ctx = {};
   transfer_iterator_t* transfer_iterator =
       (transfer_iterator_t*)calloc(1, sizeof(transfer_iterator_t));
   if (!transfer_iterator) {
@@ -362,21 +390,15 @@ transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[], size_t len,
 
   transfer_iterator->transfers = transfers;
   transfer_iterator->transfers_count = len;
-  transfer_ctx = transfer_ctx_new();
-  if (!transfer_ctx) {
-    transfer_iterator_free(&transfer_iterator);
-    log_error(logger_id, "[%s:%d] Out of Memory.\n", __func__, __LINE__);
-    return NULL;
-  }
-  if (transfer_ctx_init(transfer_ctx, transfers, len)) {
-    transfer_iterator->transactions_count = transfer_ctx->count;
-    transfer_ctx_hash(transfer_ctx, kerl, transfers, len);
-    memcpy(transfer_iterator->bundle_hash, transfer_ctx->bundle,
+  if (transfer_ctx_init(&transfer_ctx, transfers, len)) {
+    transfer_iterator->transactions_count = transfer_ctx.count;
+    transfer_ctx_hash(&transfer_ctx, kerl, transfers, len);
+    memcpy(transfer_iterator->bundle_hash, transfer_ctx.bundle,
            FLEX_TRIT_SIZE_243);
   } else {
     log_error(logger_id, "[%s:%d] Invalid transfers.\n", __func__, __LINE__);
+    return NULL;
   }
-  transfer_ctx_free(transfer_ctx);
   transfer_iterator->iota_signature_gen = iota_flex_sign_signature_gen;
   return transfer_iterator;
 }
@@ -403,7 +425,7 @@ iota_transaction_t* transfer_iterator_next(
       transfer_iterator->transfers_count) {
     transfer_t* transfer =
         transfer_iterator->transfers[transfer_iterator->current_transfer];
-    size_t count = transfer_transactions_count(transfer);
+    uint32_t count = transfer_transactions_count(transfer);
     if (transfer_iterator->current_transfer_transaction_index >= count) {
       transfer_iterator->current_transfer++;
       transfer_iterator->current_transfer_transaction_index = 0;
@@ -422,6 +444,8 @@ iota_transaction_t* transfer_iterator_next(
                                   transfer_iterator->current_transaction_index);
     transaction_set_last_index(transaction,
                                transfer_iterator->transactions_count - 1);
+    transaction->loaded_columns_mask.essence = MASK_ESSENCE_ALL;
+    transaction->loaded_columns_mask.data = MASK_DATA_SIG_OR_MSG;
 
     // Set transaction type specific fields
     switch (transfer->type) {
