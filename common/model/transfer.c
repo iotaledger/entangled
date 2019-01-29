@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 #include "common/model/transfer.h"
+#include "common/sign/normalize.h"
 
 #define TRANSFER_LOGGER_ID "transfer"
 
@@ -395,8 +396,7 @@ transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[],
     memcpy(transfer_iterator->bundle_hash, transfer_ctx.bundle,
            FLEX_TRIT_SIZE_243);
   } else {
-    log_error(TRANSFER_LOGGER_ID, "[%s:%d] Invalid transfers.\n", __func__,
-              __LINE__);
+    log_error(logger_id, "[%s:%d] Invalid transfers.\n", __func__, __LINE__);
     return NULL;
   }
   transfer_iterator->iota_signature_gen = iota_flex_sign_signature_gen;
