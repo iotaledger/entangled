@@ -7,8 +7,8 @@
 
 #include "{PARENT_DIRECTORY}/{TYPE}_set.h"
 
-size_t {TYPE}_set_size({TYPE}_set_t const *const set) {
-  return HASH_COUNT(*set);
+size_t {TYPE}_set_size({TYPE}_set_t const set) {
+  return HASH_COUNT(set);
 }
 
 retcode_t {TYPE}_set_add({TYPE}_set_t *const set,
