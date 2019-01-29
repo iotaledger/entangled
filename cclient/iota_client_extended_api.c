@@ -522,12 +522,10 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
   return ret_code;
 }
 
-retcode_t iota_client_send_transfer(iota_client_service_t const* const serv,
-                                    int const depth, int const mwm,
-                                    transfer_t** const transfers,
-                                    uint32_t num_transfer,
-                                    flex_trit_t const* const reference,
-                                    bundle_transactions_t* out_tx_objs) {
+retcode_t iota_client_send_transfer(
+    iota_client_service_t const* const serv, int const depth, int const mwm,
+    bool local_pow, transfer_t** const transfers, uint32_t num_transfer,
+    flex_trit_t const* const reference, bundle_transactions_t* out_tx_objs) {
   retcode_t ret_code = RC_OK;
   hash8019_array_p raw_tx = hash8019_array_new();
   iota_transaction_t* tx = NULL;
@@ -542,7 +540,7 @@ retcode_t iota_client_send_transfer(iota_client_service_t const* const serv,
     }
 
     ret_code = iota_client_send_trytes(serv, raw_tx, depth, mwm, reference,
-                                       out_tx_objs);
+                                       local_pow, out_tx_objs);
   }
 
   hash_array_free(raw_tx);
