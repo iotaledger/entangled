@@ -62,6 +62,8 @@ static void test_psks_serialization(void) {
   TEST_ASSERT_TRUE(mam_pre_shared_key_t_set_cmp(psks_1, psks_2));
 
   trits_free(trits);
+  mam_pre_shared_key_t_set_free(&psks_1);
+  mam_pre_shared_key_t_set_free(&psks_2);
 }
 
 int main(void) {
