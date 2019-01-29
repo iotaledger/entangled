@@ -28,6 +28,15 @@ typedef struct mam_pre_shared_key_s {
   trit_t pre_shared_key[MAM2_PSK_SIZE];
 } mam_pre_shared_key_t;
 
+typedef struct mam_pre_shared_key_t_set_entry_s
+    mam_pre_shared_key_t_set_entry_t;
+typedef mam_pre_shared_key_t_set_entry_t* mam_pre_shared_key_t_set_t;
+
+size_t psks_serialized_size(mam_pre_shared_key_t_set_t const psks);
+retcode_t psks_serialize(mam_pre_shared_key_t_set_t const psks, trits_t trits);
+retcode_t psks_deserialize(trits_t const trits,
+                           mam_pre_shared_key_t_set_t* const psks);
+
 // Recipient's NTRU public key
 typedef struct mam_ntru_pk_s {
   trit_t pk[MAM2_NTRU_PK_SIZE];
