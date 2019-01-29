@@ -7,3 +7,13 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_mam_types",
+    srcs = ["test_mam_types.c"],
+    deps = [
+        "//mam/v2/mam:mam_pre_shared_key_t_set",
+        "//mam/v2/mam:mam_types",
+        "@unity",
+    ],
+)
