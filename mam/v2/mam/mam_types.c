@@ -20,12 +20,11 @@ retcode_t psks_serialize(mam_pre_shared_key_t_set_t const psks, trits_t trits) {
   mam_pre_shared_key_t_set_entry_t *tmp = NULL;
 
   HASH_ITER(hh, psks, entry, tmp) {
-    trits_t id = trits_from_rep(MAM2_PSK_ID_SIZE, entry->value.id);
-    trits_copy(id, trits_take(trits, MAM2_PSK_ID_SIZE));
+    trits_copy(trits_from_rep(MAM2_PSK_ID_SIZE, entry->value.id),
+               trits_take(trits, MAM2_PSK_ID_SIZE));
     trits = trits_drop(trits, MAM2_PSK_ID_SIZE);
-    trits_t pre_shared_key =
-        trits_from_rep(MAM2_PSK_SIZE, entry->value.pre_shared_key);
-    trits_copy(pre_shared_key, trits_take(trits, MAM2_PSK_SIZE));
+    trits_copy(trits_from_rep(MAM2_PSK_SIZE, entry->value.pre_shared_key),
+               trits_take(trits, MAM2_PSK_SIZE));
     trits = trits_drop(trits, MAM2_PSK_SIZE);
   }
 
