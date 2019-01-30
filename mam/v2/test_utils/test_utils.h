@@ -30,7 +30,7 @@ extern "C" {
 #endif
 
 typedef struct test_ntru_s {
-  ntru_t ntru;
+  mam_ntru_sk_t ntru;
   trit_t public_key_id[81];
   trit_t secret_key[MAM2_NTRU_SK_SIZE];
   poly_t f;
@@ -54,7 +54,7 @@ typedef struct test_wots_s {
   trit_t secret_key[MAM2_WOTS_SK_SIZE];
 } test_wots_t;
 
-ntru_t *test_ntru_init(test_ntru_t *n);
+mam_ntru_sk_t *test_ntru_init(test_ntru_t *n);
 prng_t *test_prng_init(test_prng_t *p, sponge_t *s);
 sponge_t *test_sponge_init(test_sponge_t *s);
 spongos_t *test_spongos_init(test_spongos_t *sg, sponge_t *s);

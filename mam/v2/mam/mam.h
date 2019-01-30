@@ -16,10 +16,10 @@
 #include "mam/v2/mam/alloc.h"
 #include "mam/v2/mam/channel.h"
 #include "mam/v2/mam/endpoint.h"
-#include "mam/v2/mam/mam_ntru_pk_t_set.h"
 #include "mam/v2/mam/mam_pre_shared_key_t_set.h"
 #include "mam/v2/mam/mam_types.h"
 #include "mam/v2/mss/mss.h"
+#include "mam/v2/ntru/mam_ntru_pk_t_set.h"
 #include "mam/v2/ntru/ntru.h"
 #include "mam/v2/prng/prng.h"
 #include "mam/v2/sponge/sponge.h"
@@ -77,8 +77,8 @@ size_t mam_wrap_keyload_ntru_size();
 void mam_wrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key, trits_t pk,
                            prng_t *p, spongos_t *ns, trits_t N);
 retcode_t mam_unwrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key,
-                                  bool *key_found, trits_t pkid, ntru_t *n,
-                                  spongos_t *ns);
+                                  bool *key_found, trits_t pkid,
+                                  mam_ntru_sk_t *n, spongos_t *ns);
 
 /* Packet */
 
@@ -178,7 +178,7 @@ typedef struct mam_recv_msg_context_s {
   trit_t psk_id[MAM2_PSK_ID_SIZE];   /*!< Buffer to read PSK id to. */
   trit_t ntru_id[MAM2_NTRU_ID_SIZE]; /*!< Buffer to read NTRU id to. */
   mam_pre_shared_key_t *psk;         /*!< PSK to decrypt message. */
-  ntru_t *ntru;                      /*!< NTRU sk to decrypt message. */
+  mam_ntru_sk_t *ntru;               /*!< NTRU sk to decrypt message. */
 } mam_recv_msg_context_t;
 
 retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *msg);

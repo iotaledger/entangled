@@ -12,34 +12,19 @@
 #define __MAM_V2_NTRU_NTRU_H__
 
 #include "mam/v2/defs.h"
+#include "mam/v2/ntru/ntru_types.h"
 #include "mam/v2/prng/prng.h"
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/trits/trits.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-// NTRU public key - 3g(x)/(1+3f(x)) - size
-#define MAM2_NTRU_PK_SIZE 9216
-// NTRU private key - f(x) - size
-#define MAM2_NTRU_SK_SIZE 1024
 // NTRU session symmetric key size
 #define MAM2_NTRU_KEY_SIZE MAM2_SPONGE_KEY_SIZE
 // NTRU encrypted key size
 #define MAM2_NTRU_EKEY_SIZE 9216
-// NTRU id size
-#define MAM2_NTRU_ID_SIZE 81
 
-// NTRU layer interface
-typedef struct ntru_s {
-  // Key id - the first 27 trytes of the corresponding public key
-  trit_t *public_key_id;
-  // Private key trits - small coefficients of polynomial f
-  trit_t *secret_key;
-  // Internal representation (`poly_t`) of a private key: NTT(1+3f)
-  void *f;
-} ntru_t;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Allocates memory for a NTRU interface
@@ -48,14 +33,14 @@ typedef struct ntru_s {
  *
  * @return a status code
  */
-retcode_t ntru_create(ntru_t *const ntru);
+retcode_t ntru_create(mam_ntru_sk_t *const ntru);
 
 /**
  * Deallocates memory for a NTRU interface
  *
  * @param ntru A NTRU interface
  */
-void ntru_destroy(ntru_t *const ntru);
+void ntru_destroy(mam_ntru_sk_t *const ntru);
 
 /**
  * Gets public key id trits
@@ -64,7 +49,7 @@ void ntru_destroy(ntru_t *const ntru);
  *
  * @return the id trits
  */
-static inline trits_t ntru_id_trits(ntru_t const *const ntru) {
+static inline trits_t ntru_id_trits(mam_ntru_sk_t const *const ntru) {
   return trits_from_rep(MAM2_NTRU_ID_SIZE, ntru->public_key_id);
 }
 
@@ -75,7 +60,7 @@ static inline trits_t ntru_id_trits(ntru_t const *const ntru) {
  *
  * @return the secret  key trits
  */
-static inline trits_t ntru_sk_trits(ntru_t const *const ntru) {
+static inline trits_t ntru_sk_trits(mam_ntru_sk_t const *const ntru) {
   return trits_from_rep(MAM2_NTRU_SK_SIZE, ntru->secret_key);
 }
 
@@ -87,7 +72,7 @@ static inline trits_t ntru_sk_trits(ntru_t const *const ntru) {
  * @param nonce A nonce
  * @param public_key A NTRU public key: serialized NTT of polynomial h=3g/(1+3f)
  */
-void ntru_gen(ntru_t const *const ntru, prng_t const *const prng,
+void ntru_gen(mam_ntru_sk_t const *const ntru, prng_t const *const prng,
               trits_t const nonce, trits_t public_key);
 
 /**
@@ -127,8 +112,18 @@ void ntru_encr_r(trits_t const public_key, spongos_t *const spongos,
  *
  * @return
  */
-bool ntru_decr(ntru_t const *const ntru, spongos_t *const spongos,
+bool ntru_decr(mam_ntru_sk_t const *const ntru, spongos_t *const spongos,
                trits_t const encrypted_session_key, trits_t session_key);
+
+/**
+ * NTRU load the sk functional representation from sk
+ *
+ * @param ntru A NTRU interface
+ *
+ * @return
+ */
+
+void ntru_load_sk(mam_ntru_sk_t *n);
 
 #ifdef __cplusplus
 }
