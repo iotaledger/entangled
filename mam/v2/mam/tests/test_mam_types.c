@@ -96,15 +96,15 @@ static void test_ntru_serialization(void) {
     TEST_ASSERT(mam_ntru_pk_t_set_add(&ntru_set_1, &ntru) == RC_OK);
   }
 
-  size_t size = ntru_serialized_size(ntru_set_1);
+  size_t size = ntru_pks_serialized_size(ntru_set_1);
 
   TEST_ASSERT_EQUAL_INT(size, 26 * MAM2_NTRU_PK_SIZE);
 
   trits_t trits = trits_alloc(size);
 
-  TEST_ASSERT(ntru_serialize(ntru_set_1, trits) == RC_OK);
+  TEST_ASSERT(ntru_pks_serialize(ntru_set_1, trits) == RC_OK);
 
-  TEST_ASSERT(ntru_deserialize(trits, &ntru_set_2) == RC_OK);
+  TEST_ASSERT(ntru_pks_deserialize(trits, &ntru_set_2) == RC_OK);
 
   TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(ntru_set_1, ntru_set_2));
 

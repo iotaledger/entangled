@@ -45,10 +45,11 @@ typedef struct mam_ntru_pk_s {
 typedef struct mam_ntru_pk_t_set_entry_s mam_ntru_pk_t_set_entry_t;
 typedef mam_ntru_pk_t_set_entry_t* mam_ntru_pk_t_set_t;
 
-size_t ntru_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set);
-retcode_t ntru_serialize(mam_ntru_pk_t_set_t const ntru_pk_set, trits_t trits);
-retcode_t ntru_deserialize(trits_t const trits,
-                           mam_ntru_pk_t_set_t* const ntru_pk_set);
+size_t ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set);
+retcode_t ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
+                             trits_t trits);
+retcode_t ntru_pks_deserialize(trits_t const trits,
+                               mam_ntru_pk_t_set_t* const ntru_pk_set);
 
 #ifdef __cplusplus
 }

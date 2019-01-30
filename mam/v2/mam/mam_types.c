@@ -53,11 +53,12 @@ retcode_t psks_deserialize(trits_t const trits,
   return ret;
 }
 
-size_t ntru_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set) {
+size_t ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set) {
   return mam_ntru_pk_t_set_size(ntru_pk_set) * sizeof(mam_ntru_pk_t);
 }
 
-retcode_t ntru_serialize(mam_ntru_pk_t_set_t const ntru_pk_set, trits_t trits) {
+retcode_t ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
+                             trits_t trits) {
   mam_ntru_pk_t_set_entry_t *entry = NULL;
   mam_ntru_pk_t_set_entry_t *tmp = NULL;
 
@@ -69,8 +70,8 @@ retcode_t ntru_serialize(mam_ntru_pk_t_set_t const ntru_pk_set, trits_t trits) {
 
   return RC_OK;
 }
-retcode_t ntru_deserialize(trits_t const trits,
-                           mam_ntru_pk_t_set_t *const ntru_pk_set) {
+retcode_t ntru_pks_deserialize(trits_t const trits,
+                               mam_ntru_pk_t_set_t *const ntru_pk_set) {
   retcode_t ret = RC_OK;
   trits_t cpy = trits;
   mam_ntru_pk_t ntru;
