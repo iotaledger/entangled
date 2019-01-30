@@ -18,16 +18,29 @@ cc_library(
 )
 
 cc_library(
-    name = "mam_types",
+    name = "mam_types_hdr",
     hdrs = ["mam_types.h"],
     deps = [
         "//mam/v2:defs",
+        "//mam/v2/ntru",
+        "//mam/v2/trits",
+    ],
+)
+
+cc_library(
+    name = "mam_types",
+    srcs = ["mam_types.c"],
+    deps = [
+        ":mam_pre_shared_key_t_set",
+        ":mam_types_hdr",
+        "//mam/v2:defs",
+        "//mam/v2/ntru",
         "//mam/v2/trits",
     ],
 )
 
 typed_container_generate(
-    additional_deps = ":mam_types",
+    additional_deps = ":mam_types_hdr",
     additional_include_path = "mam/v2/mam/mam_types.h",
     container_type = "set",
     parent_directory = "mam/v2/mam",
@@ -35,7 +48,7 @@ typed_container_generate(
 )
 
 typed_container_generate(
-    additional_deps = "//mam/v2/mam:mam_types",
+    additional_deps = ":mam_types_hdr",
     additional_include_path = "mam/v2/mam/mam_types.h",
     container_type = "set",
     parent_directory = "mam/v2/mam",
