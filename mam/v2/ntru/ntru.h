@@ -17,6 +17,11 @@
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/trits/trits.h"
 
+// NTRU session symmetric key size
+#define MAM2_NTRU_KEY_SIZE MAM2_SPONGE_KEY_SIZE
+// NTRU encrypted key size
+#define MAM2_NTRU_EKEY_SIZE 9216
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,14 +33,14 @@ extern "C" {
  *
  * @return a status code
  */
-retcode_t ntru_create(mam_ntru_t *const ntru);
+retcode_t ntru_create(mam_ntru_sk_t *const ntru);
 
 /**
  * Deallocates memory for a NTRU interface
  *
  * @param ntru A NTRU interface
  */
-void ntru_destroy(mam_ntru_t *const ntru);
+void ntru_destroy(mam_ntru_sk_t *const ntru);
 
 /**
  * Gets public key id trits
@@ -44,8 +49,8 @@ void ntru_destroy(mam_ntru_t *const ntru);
  *
  * @return the id trits
  */
-static inline trits_t ntru_id_trits(mam_ntru_t const *const ntru) {
-  return trits_from_rep(MAM2_NTRU_ID_SIZE, ntru->data.public_key_id);
+static inline trits_t ntru_id_trits(mam_ntru_sk_t const *const ntru) {
+  return trits_from_rep(MAM2_NTRU_ID_SIZE, ntru->public_key_id);
 }
 
 /**
@@ -55,8 +60,8 @@ static inline trits_t ntru_id_trits(mam_ntru_t const *const ntru) {
  *
  * @return the secret  key trits
  */
-static inline trits_t ntru_sk_trits(mam_ntru_t const *const ntru) {
-  return trits_from_rep(MAM2_NTRU_SK_SIZE, ntru->data.secret_key);
+static inline trits_t ntru_sk_trits(mam_ntru_sk_t const *const ntru) {
+  return trits_from_rep(MAM2_NTRU_SK_SIZE, ntru->secret_key);
 }
 
 /**
@@ -67,7 +72,7 @@ static inline trits_t ntru_sk_trits(mam_ntru_t const *const ntru) {
  * @param nonce A nonce
  * @param public_key A NTRU public key: serialized NTT of polynomial h=3g/(1+3f)
  */
-void ntru_gen(mam_ntru_t const *const ntru, prng_t const *const prng,
+void ntru_gen(mam_ntru_sk_t const *const ntru, prng_t const *const prng,
               trits_t const nonce, trits_t public_key);
 
 /**
@@ -107,7 +112,7 @@ void ntru_encr_r(trits_t const public_key, spongos_t *const spongos,
  *
  * @return
  */
-bool ntru_decr(mam_ntru_t const *const ntru, spongos_t *const spongos,
+bool ntru_decr(mam_ntru_sk_t const *const ntru, spongos_t *const spongos,
                trits_t const encrypted_session_key, trits_t session_key);
 
 /**
@@ -118,7 +123,7 @@ bool ntru_decr(mam_ntru_t const *const ntru, spongos_t *const spongos,
  * @return
  */
 
-void ntru_load_sk(mam_ntru_t *n);
+void ntru_load_sk(mam_ntru_sk_t *n);
 
 #ifdef __cplusplus
 }

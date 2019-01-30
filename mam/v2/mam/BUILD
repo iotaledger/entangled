@@ -69,6 +69,7 @@ cc_library(
         ":mam_pre_shared_key_t_set",
         ":mam_types_hdr",
         "//mam/v2:defs",
+        "//mam/v2/ntru",
         "//mam/v2/trits",
     ],
 )

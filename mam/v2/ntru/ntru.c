@@ -14,7 +14,7 @@
 #include "mam/v2/ntru/ntru.h"
 #include "mam/v2/ntru/poly.h"
 
-retcode_t ntru_create(mam_ntru_t *const ntru) {
+retcode_t ntru_create(mam_ntru_sk_t *const ntru) {
   MAM2_ASSERT(ntru);
 
   if ((ntru->f = malloc(sizeof(poly_t))) == NULL) {
@@ -25,13 +25,13 @@ retcode_t ntru_create(mam_ntru_t *const ntru) {
   return RC_OK;
 }
 
-void ntru_destroy(mam_ntru_t *const ntru) {
+void ntru_destroy(mam_ntru_sk_t *const ntru) {
   MAM2_ASSERT(ntru);
   free(ntru->f);
   ntru->f = NULL;
 }
 
-void ntru_gen(mam_ntru_t const *const ntru, prng_t const *const prng,
+void ntru_gen(mam_ntru_sk_t const *const ntru, prng_t const *const prng,
               trits_t const nonce, trits_t public_key) {
   MAM2_TRITS_DEF0(nonce_i, 81);
   MAM2_TRITS_DEF0(secret_key, 2 * MAM2_NTRU_SK_SIZE);
@@ -115,14 +115,14 @@ void ntru_encr_r(trits_t const public_key, spongos_t *const spongos,
   spongos_squeeze(spongos, trits_drop(r, MAM2_NTRU_KEY_SIZE));
   poly_small_from_trits(h, r);
 
-  /* Y = r*h + AE(r*h;secret_keK) */
+  /* Y = r*h + AE(r*h;K) */
   poly_add(s, h, s);
   poly_to_trits(s, encrypted_session_key);
 
   memset(h, 0, sizeof(h));
 }
 
-bool ntru_decr(mam_ntru_t const *const ntru, spongos_t *const spongos,
+bool ntru_decr(mam_ntru_sk_t const *const ntru, spongos_t *const spongos,
                trits_t const encrypted_session_key, trits_t session_key) {
   MAM2_ASSERT(trits_size(session_key) == MAM2_NTRU_KEY_SIZE);
   MAM2_ASSERT(trits_size(encrypted_session_key) == MAM2_NTRU_EKEY_SIZE);
@@ -174,7 +174,7 @@ bool ntru_decr(mam_ntru_t const *const ntru, spongos_t *const spongos,
   return b;
 }
 
-void ntru_load_sk(mam_ntru_t *n) {
+void ntru_load_sk(mam_ntru_sk_t *n) {
   poly_coeff_t *f;
   f = (poly_coeff_t *)n->f;
 

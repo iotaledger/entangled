@@ -23,7 +23,8 @@ static void ntru_test_f(void *buf, trit_t *s) {
   trits_add(x, trits_advance(b, MAM2_SPONGE_RATE), x);
 }
 
-static void ntru_test_gen(mam_ntru_t *n, trits_t rf, trits_t rg, trits_t pk) {
+static void ntru_test_gen(mam_ntru_sk_t *n, trits_t rf, trits_t rg,
+                          trits_t pk) {
   poly_coeff_t *f;
   MAM2_POLY_DEF(g);
   MAM2_POLY_DEF(h);
@@ -54,7 +55,7 @@ static void ntru_test_gen(mam_ntru_t *n, trits_t rf, trits_t rg, trits_t pk) {
 static void ntru_decr_fail_test(void) {
   test_ntru_t test_ntru;
 
-  mam_ntru_t *ntru = test_ntru_init(&test_ntru);
+  mam_ntru_sk_t *ntru = test_ntru_init(&test_ntru);
 
   poly_coeff_t *f0;
   MAM2_TRITS_DEF0(nonce, 3 * 10);
@@ -210,7 +211,7 @@ static void ntru_test(void) {
   sponge_t *sponge = test_sponge_init(&test_sponge);
   spongos_t *spongos = test_spongos_init(&test_spongos, sponge);
   prng_t *prng = test_prng_init(&test_prng, sponge);
-  mam_ntru_t *ntru = test_ntru_init(&test_ntru);
+  mam_ntru_sk_t *ntru = test_ntru_init(&test_ntru);
 
   size_t i;
   size_t test_count = 30;

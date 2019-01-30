@@ -12,6 +12,7 @@
 #include "mam/v2/mam/mam_ntru_pk_t_set.h"
 #include "mam/v2/mam/mam_ntru_sk_t_set.h"
 #include "mam/v2/mam/mam_pre_shared_key_t_set.h"
+#include "mam/v2/ntru/ntru.h"
 
 size_t mam_psks_serialized_size(mam_pre_shared_key_t_set_t const psks) {
   return mam_pre_shared_key_t_set_size(psks) * sizeof(mam_pre_shared_key_t);
@@ -91,13 +92,13 @@ retcode_t mam_ntru_pks_deserialize(trits_t const trits,
   return ret;
 }
 
-size_t mam_ntru_sk_serialized_size(mam_ntru_sk_t_set_t const ntru_sk_set) {
+size_t mam_ntru_sks_serialized_size(mam_ntru_sk_t_set_t const ntru_sk_set) {
   return mam_ntru_sk_t_set_size(ntru_sk_set) *
          (MAM2_NTRU_ID_SIZE + MAM2_NTRU_SK_SIZE);
 }
 
-retcode_t mam_ntru_sk_serialize(mam_ntru_sk_t_set_t const ntru_sk_set,
-                                trits_t trits) {
+retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sk_set,
+                                 trits_t trits) {
   mam_ntru_sk_t_set_entry_t *entry = NULL;
   mam_ntru_sk_t_set_entry_t *tmp = NULL;
 
@@ -113,8 +114,8 @@ retcode_t mam_ntru_sk_serialize(mam_ntru_sk_t_set_t const ntru_sk_set,
   return RC_OK;
 }
 
-retcode_t mam_ntru_sk_deserialize(trits_t const trits,
-                                  mam_ntru_sk_t_set_t *const ntru_sk_set) {
+retcode_t mam_ntru_sks_deserialize(trits_t const trits,
+                                   mam_ntru_sk_t_set_t *const ntru_sk_set) {
   retcode_t ret = RC_OK;
   trits_t cpy = trits;
   mam_ntru_sk_t ntru_sk;
@@ -126,6 +127,8 @@ retcode_t mam_ntru_sk_deserialize(trits_t const trits,
     trits_copy(trits_take(cpy, MAM2_NTRU_SK_SIZE),
                trits_from_rep(MAM2_NTRU_SK_SIZE, ntru_sk.secret_key));
     cpy = trits_drop(cpy, MAM2_NTRU_SK_SIZE);
+    ntru_create(&ntru_sk);
+    ntru_load_sk(&ntru_sk);
     if ((ret = mam_ntru_sk_t_set_add(ntru_sk_set, &ntru_sk)) != RC_OK) {
       break;
     }

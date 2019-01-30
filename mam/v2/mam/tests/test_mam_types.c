@@ -56,17 +56,31 @@ static bool mam_ntru_pk_t_set_cmp(mam_ntru_pk_t_set_t const ntru_pk_set_1,
 
 static bool mam_ntru_sk_t_set_cmp(mam_ntru_sk_t_set_t const ntru_sk_set_1,
                                   mam_ntru_sk_t_set_t const ntru_sk_set_2) {
-  mam_ntru_sk_t_set_entry_t *entry = NULL;
-  mam_ntru_sk_t_set_entry_t *tmp = NULL;
+  mam_ntru_sk_t_set_entry_t *entry1 = NULL;
+  mam_ntru_sk_t_set_entry_t *tmp1 = NULL;
+
+  mam_ntru_sk_t_set_entry_t *entry2 = NULL;
+  mam_ntru_sk_t_set_entry_t *tmp2 = NULL;
+
+  mam_ntru_sk_t_set_t equal_elements_set = NULL;
 
   TEST_ASSERT_EQUAL_INT(mam_ntru_sk_t_set_size(ntru_sk_set_1),
                         mam_ntru_sk_t_set_size(ntru_sk_set_2));
 
-  HASH_ITER(hh, ntru_sk_set_1, entry, tmp) {
-    if (!mam_ntru_sk_t_set_contains(&ntru_sk_set_2, &entry->value)) {
-      return false;
+  // We have to loop in O(N^2) because mam_ntru_sk_t_set_contains compares hash
+  // value based on
+  // the address assigned into the "f" field in the ntru_sk_t type
+  HASH_ITER(hh, ntru_sk_set_1, entry1, tmp1) {
+    HASH_ITER(hh, ntru_sk_set_2, entry2, tmp2) {
+      if (!memcmp(&entry1->value, &entry2->value,
+                  MAM2_NTRU_ID_SIZE + MAM2_NTRU_SK_SIZE)) {
+        mam_ntru_sk_t_set_add(&equal_elements_set, &entry2->value);
+      }
     }
   }
+
+  TEST_ASSERT_EQUAL_INT(mam_ntru_sk_t_set_size(ntru_sk_set_1),
+                        mam_ntru_sk_t_set_size(equal_elements_set));
 
   return true;
 }
@@ -147,15 +161,15 @@ static void test_ntru_sk_serialization(void) {
   }
 
   size_t size1 = mam_ntru_sk_t_set_size(ntru_sk_set_1);
-  size_t size = mam_ntru_sk_serialized_size(ntru_sk_set_1);
+  size_t size = mam_ntru_sks_serialized_size(ntru_sk_set_1);
 
   TEST_ASSERT_EQUAL_INT(size, 3 * (MAM2_NTRU_ID_SIZE + MAM2_NTRU_SK_SIZE));
 
   trits_t trits = trits_alloc(size);
 
-  TEST_ASSERT(mam_ntru_sk_serialize(ntru_sk_set_1, trits) == RC_OK);
+  TEST_ASSERT(mam_ntru_sks_serialize(ntru_sk_set_1, trits) == RC_OK);
 
-  TEST_ASSERT(mam_ntru_sk_deserialize(trits, &ntru_sk_set_2) == RC_OK);
+  TEST_ASSERT(mam_ntru_sks_deserialize(trits, &ntru_sk_set_2) == RC_OK);
 
   TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(ntru_sk_set_1, ntru_sk_set_2));
 
