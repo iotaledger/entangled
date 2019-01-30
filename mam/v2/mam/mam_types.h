@@ -65,12 +65,29 @@ retcode_t ntru_pks_deserialize(trits_t const trits,
 // NTRU layer interface
 typedef struct mam_ntru_s {
   // Key id - the first 27 trytes of the corresponding public key
-  trit_t* public_key_id;
+  trit_t public_key_id[MAM2_NTRU_ID_SIZE];
   // Private key trits - small coefficients of polynomial f
-  trit_t* secret_key;
+  trit_t secret_key[MAM2_NTRU_SK_SIZE];
   // Internal representation (`poly_t`) of a private key: NTT(1+3f)
   void* f;
 } mam_ntru_t;
+
+// NTRU layer interface
+typedef struct mam_ntru_sk_s {
+  // Key id - the first 27 trytes of the corresponding public key
+  trit_t public_key_id[MAM2_NTRU_ID_SIZE];
+  // Private key trits - small coefficients of polynomial f
+  trit_t secret_key[MAM2_NTRU_SK_SIZE];
+} mam_ntru_sk_t;
+
+typedef struct mam_ntru_sk_t_set_entry_s mam_ntru_sk_t_set_entry_t;
+typedef mam_ntru_sk_t_set_entry_t* mam_ntru_sk_t_set_t;
+
+size_t mam_ntru_sk_serialized_size(mam_ntru_sk_t_set_t const ntru_sk_set);
+retcode_t mam_ntru_sk_serialize(mam_ntru_sk_t_set_t const ntru_sk_set,
+                                trits_t trits);
+retcode_t mam_ntru_sk_deserialize(trits_t const trits,
+                                  mam_ntru_sk_t_set_t* const ntru_sk_set);
 
 #ifdef __cplusplus
 }

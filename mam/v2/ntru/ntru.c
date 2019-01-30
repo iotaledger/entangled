@@ -17,12 +17,7 @@
 retcode_t ntru_create(mam_ntru_t *const ntru) {
   MAM2_ASSERT(ntru);
 
-  if ((ntru->public_key_id = malloc(sizeof(trit_t) * MAM2_NTRU_ID_SIZE)) ==
-          NULL ||
-      (ntru->secret_key = malloc(sizeof(trit_t) * MAM2_NTRU_SK_SIZE)) == NULL ||
-      (ntru->f = malloc(sizeof(poly_t))) == NULL) {
-    free(ntru->public_key_id);
-    free(ntru->secret_key);
+  if ((ntru->f = malloc(sizeof(poly_t))) == NULL) {
     free(ntru->f);
     return RC_OOM;
   }
@@ -32,11 +27,6 @@ retcode_t ntru_create(mam_ntru_t *const ntru) {
 
 void ntru_destroy(mam_ntru_t *const ntru) {
   MAM2_ASSERT(ntru);
-
-  free(ntru->public_key_id);
-  ntru->public_key_id = NULL;
-  free(ntru->secret_key);
-  ntru->secret_key = NULL;
   free(ntru->f);
   ntru->f = NULL;
 }

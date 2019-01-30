@@ -14,8 +14,10 @@
 
 #include "common/trinary/trit_tryte.h"
 #include "mam/v2/mam/mam_ntru_pk_t_set.h"
+#include "mam/v2/mam/mam_ntru_sk_t_set.h"
 #include "mam/v2/mam/mam_pre_shared_key_t_set.h"
 #include "mam/v2/mam/mam_types.h"
+#include "mam/v2/ntru/ntru.h"
 
 static bool mam_pre_shared_key_t_set_cmp(
     mam_pre_shared_key_t_set_t const psks_1,
@@ -35,16 +37,33 @@ static bool mam_pre_shared_key_t_set_cmp(
   return true;
 }
 
-static bool mam_ntru_pk_t_set_cmp(mam_ntru_pk_t_set_t const ntru_set_1,
-                                  mam_ntru_pk_t_set_t const ntru_set_2) {
+static bool mam_ntru_pk_t_set_cmp(mam_ntru_pk_t_set_t const ntru_pk_set_1,
+                                  mam_ntru_pk_t_set_t const ntru_pk_set_2) {
   mam_ntru_pk_t_set_entry_t *entry = NULL;
   mam_ntru_pk_t_set_entry_t *tmp = NULL;
 
-  TEST_ASSERT_EQUAL_INT(mam_ntru_pk_t_set_size(ntru_set_1),
-                        mam_ntru_pk_t_set_size(ntru_set_2));
+  TEST_ASSERT_EQUAL_INT(mam_ntru_pk_t_set_size(ntru_pk_set_1),
+                        mam_ntru_pk_t_set_size(ntru_pk_set_2));
 
-  HASH_ITER(hh, ntru_set_1, entry, tmp) {
-    if (!mam_ntru_pk_t_set_contains(&ntru_set_2, &entry->value)) {
+  HASH_ITER(hh, ntru_pk_set_1, entry, tmp) {
+    if (!mam_ntru_pk_t_set_contains(&ntru_pk_set_2, &entry->value)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+static bool mam_ntru_sk_t_set_cmp(mam_ntru_sk_t_set_t const ntru_sk_set_1,
+                                  mam_ntru_sk_t_set_t const ntru_sk_set_2) {
+  mam_ntru_sk_t_set_entry_t *entry = NULL;
+  mam_ntru_sk_t_set_entry_t *tmp = NULL;
+
+  TEST_ASSERT_EQUAL_INT(mam_ntru_sk_t_set_size(ntru_sk_set_1),
+                        mam_ntru_sk_t_set_size(ntru_sk_set_2));
+
+  HASH_ITER(hh, ntru_sk_set_1, entry, tmp) {
+    if (!mam_ntru_sk_t_set_contains(&ntru_sk_set_2, &entry->value)) {
       return false;
     }
   }
@@ -84,7 +103,7 @@ static void test_psks_serialization(void) {
   mam_pre_shared_key_t_set_free(&psks_2);
 }
 
-static void test_ntru_serialization(void) {
+static void test_ntru_pk_serialization(void) {
   mam_ntru_pk_t_set_t ntru_set_1 = NULL;
   mam_ntru_pk_t_set_t ntru_set_2 = NULL;
   mam_ntru_pk_t ntru;
@@ -113,11 +132,45 @@ static void test_ntru_serialization(void) {
   mam_ntru_pk_t_set_free(&ntru_set_2);
 }
 
+static void test_ntru_sk_serialization(void) {
+  mam_ntru_sk_t_set_t ntru_sk_set_1 = NULL;
+  mam_ntru_sk_t_set_t ntru_sk_set_2 = NULL;
+  mam_ntru_sk_t ntru_sk;
+
+  // NOTE: this is not a good example for how to generate an NTRU key
+  // since the public_key_id is derived from the secret key rather than
+  // being set
+  for (int i = -1; i <= 1; i++) {
+    memset(ntru_sk.public_key_id, i, MAM2_NTRU_ID_SIZE);
+    memset(ntru_sk.secret_key, i, MAM2_NTRU_SK_SIZE);
+    TEST_ASSERT(mam_ntru_sk_t_set_add(&ntru_sk_set_1, &ntru_sk) == RC_OK);
+  }
+
+  size_t size1 = mam_ntru_sk_t_set_size(ntru_sk_set_1);
+  size_t size = mam_ntru_sk_serialized_size(ntru_sk_set_1);
+
+  TEST_ASSERT_EQUAL_INT(size, 3 * (MAM2_NTRU_ID_SIZE + MAM2_NTRU_SK_SIZE));
+
+  trits_t trits = trits_alloc(size);
+
+  TEST_ASSERT(mam_ntru_sk_serialize(ntru_sk_set_1, trits) == RC_OK);
+
+  TEST_ASSERT(mam_ntru_sk_deserialize(trits, &ntru_sk_set_2) == RC_OK);
+
+  TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(ntru_sk_set_1, ntru_sk_set_2));
+
+  mam_ntru_sk_t_set_free(&ntru_sk_set_1);
+  mam_ntru_sk_t_set_free(&ntru_sk_set_2);
+
+  trits_free(trits);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_psks_serialization);
-  RUN_TEST(test_ntru_serialization);
+  RUN_TEST(test_ntru_pk_serialization);
+  RUN_TEST(test_ntru_sk_serialization);
 
   return UNITY_END();
 }

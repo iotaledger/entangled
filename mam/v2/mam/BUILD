@@ -65,7 +65,7 @@ cc_library(
     srcs = ["mam_types.c"],
     deps = [
         ":mam_ntru_pk_t_set",
-        ":mam_ntru_t_set",
+        ":mam_ntru_sk_t_set",
         ":mam_pre_shared_key_t_set",
         ":mam_types_hdr",
         "//mam/v2:defs",
@@ -94,5 +94,5 @@ typed_container_generate(
     additional_include_path = "mam/v2/mam/mam_types.h",
     container_type = "set",
     parent_directory = "mam/v2/mam",
-    value_type = "mam_ntru_t",
+    value_type = "mam_ntru_sk_t",
 )
