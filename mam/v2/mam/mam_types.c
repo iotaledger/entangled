@@ -70,6 +70,7 @@ retcode_t ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
 
   return RC_OK;
 }
+
 retcode_t ntru_pks_deserialize(trits_t const trits,
                                mam_ntru_pk_t_set_t *const ntru_pk_set) {
   retcode_t ret = RC_OK;
