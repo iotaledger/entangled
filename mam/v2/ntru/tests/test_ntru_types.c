@@ -63,6 +63,8 @@ static bool mam_ntru_sk_t_set_cmp(mam_ntru_sk_t_set_t const ntru_sk_set_1,
   TEST_ASSERT_EQUAL_INT(mam_ntru_sk_t_set_size(ntru_sk_set_1),
                         mam_ntru_sk_t_set_size(equal_elements_set));
 
+  mam_ntru_sk_t_set_free(&equal_elements_set);
+
   return true;
 }
 

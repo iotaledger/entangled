@@ -76,6 +76,7 @@ retcode_t mam_ntru_sks_deserialize(trits_t const trits,
   retcode_t ret = RC_OK;
   trits_t cpy = trits;
   mam_ntru_sk_t ntru_sk;
+  ntru_create(&ntru_sk);
 
   while (!trits_is_empty(cpy)) {
     trits_copy(trits_take(cpy, MAM2_NTRU_ID_SIZE),
@@ -84,12 +85,13 @@ retcode_t mam_ntru_sks_deserialize(trits_t const trits,
     trits_copy(trits_take(cpy, MAM2_NTRU_SK_SIZE),
                trits_from_rep(MAM2_NTRU_SK_SIZE, ntru_sk.secret_key));
     cpy = trits_drop(cpy, MAM2_NTRU_SK_SIZE);
-    ntru_create(&ntru_sk);
     ntru_load_sk(&ntru_sk);
     if ((ret = mam_ntru_sk_t_set_add(ntru_sk_set, &ntru_sk)) != RC_OK) {
       break;
     }
   }
+
+  ntru_destroy(&ntru_sk);
 
   return ret;
 }
