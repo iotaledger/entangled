@@ -8,9 +8,9 @@
 #ifndef CCLIENT_IOTA_CORE_API_H_
 #define CCLIENT_IOTA_CORE_API_H_
 
+#include "cclient/response/responses.h"
 #include "cclient/service.h"
 #include "request/requests.h"
-#include "response/responses.h"
 #include "utils/logger_helper.h"
 
 #ifdef __cplusplus
