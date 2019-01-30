@@ -12,7 +12,7 @@
 #define __MAM_V2_NTRU_NTRU_H__
 
 #include "mam/v2/defs.h"
-#include "mam/v2/mam/mam_types.h"
+#include "mam/v2/ntru/ntru_types.h"
 #include "mam/v2/prng/prng.h"
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/trits/trits.h"

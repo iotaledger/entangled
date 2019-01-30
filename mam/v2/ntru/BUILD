@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//utils/containers:typed_container_generator.bzl", "typed_container_generate")
+
 config_setting(
     name = "mred_binary",
     values = {"define": "mred_binary=1"},
@@ -15,6 +17,7 @@ cc_library(
     srcs = ["ntru.c"],
     hdrs = ["ntru.h"],
     deps = [
+        ":ntru_types_hdr",
         ":poly",
         "//mam/v2/mam:mam_types_hdr",
         "//mam/v2/prng",
@@ -57,4 +60,42 @@ cc_library(
         "//mam/v2:defs",
         "//mam/v2/trits",
     ],
+)
+
+cc_library(
+    name = "ntru_types_hdr",
+    hdrs = ["ntru_types.h"],
+    deps = [
+        "//common:errors",
+        "//mam/v2:defs",
+        "//mam/v2/trits",
+    ],
+)
+
+cc_library(
+    name = "ntru_types",
+    srcs = ["ntru_types.c"],
+    deps = [
+        ":mam_ntru_pk_t_set",
+        ":mam_ntru_sk_t_set",
+        "//mam/v2:defs",
+        "//mam/v2/ntru",
+        "//mam/v2/trits",
+    ],
+)
+
+typed_container_generate(
+    additional_deps = ":ntru_types_hdr",
+    additional_include_path = "mam/v2/ntru/ntru_types.h",
+    container_type = "set",
+    parent_directory = "mam/v2/ntru",
+    value_type = "mam_ntru_pk_t",
+)
+
+typed_container_generate(
+    additional_deps = ":ntru_types_hdr",
+    additional_include_path = "mam/v2/ntru/ntru_types.h",
+    container_type = "set",
+    parent_directory = "mam/v2/ntru",
+    value_type = "mam_ntru_sk_t",
 )

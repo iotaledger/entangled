@@ -14,7 +14,6 @@ cc_test(
     deps = [
         "//mam/v2/mam:mam_pre_shared_key_t_set",
         "//mam/v2/mam:mam_types",
-        "//mam/v2/ntru",
         "@unity",
     ],
 )
