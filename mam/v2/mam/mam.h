@@ -8,15 +8,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file mam.h
-\brief MAM2 layer.
-*/
 #ifndef __MAM_V2_MAM_MAM_H__
 #define __MAM_V2_MAM_MAM_H__
 
 #include "common/errors.h"
 #include "mam/v2/defs.h"
+#include "mam/v2/mam/alloc.h"
 #include "mam/v2/mam/mam_ntru_pk_t_set.h"
 #include "mam/v2/mam/mam_pre_shared_key_t_set.h"
 #include "mam/v2/mam/mam_types.h"
@@ -30,13 +27,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct mam_ialloc_s {
-  sponge_t *(*create_sponge)(); /*!< Allocator for sponge interfaces used by
-                                              channels/endpoints (WOTS, PB3
-                                   sponge, PB3 fork sponge). */
-  void (*destroy_sponge)(sponge_t *); /*!< Deallocator. */
-} mam_ialloc_t;
 
 retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
                          mss_mt_height_t d, trits_t N1, trits_t N2);
