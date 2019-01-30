@@ -156,11 +156,11 @@ static trits_t mam_test_generic_send_first_packet(
     cfg->mss = 0;
     if (mam_msg_checksum_mssig == cfg->checksum) {
       if (mam_msg_pubkey_chid == pubkey) {
-        cfg->mss = cha->m;
+        cfg->mss = &cha->mss;
       } else if (mam_msg_pubkey_epid == pubkey) {
         cfg->mss = epa->m;
       } else if (mam_msg_pubkey_chid1 == pubkey) {
-        cfg->mss = ch1a->m;
+        cfg->mss = &ch1a->mss;
       } else if (mam_msg_pubkey_epid1 == pubkey) {
         cfg->mss = ep1a->m;
       }

@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["mam.h"],
     deps = [
         ":alloc",
+        ":channel",
         ":mam_ntru_pk_t_set",
         ":mam_pre_shared_key_t_set",
         "//mam/v2:defs",
@@ -23,6 +24,18 @@ cc_library(
     hdrs = ["alloc.h"],
     deps = [
         "//mam/v2/sponge",
+    ],
+)
+
+cc_library(
+    name = "channel",
+    srcs = ["channel.c"],
+    hdrs = ["channel.h"],
+    deps = [
+        ":alloc",
+        "//mam/v2/mss",
+        "//mam/v2/pb3",
+        "//mam/v2/trits",
     ],
 )
 

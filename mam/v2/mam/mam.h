@@ -14,6 +14,7 @@
 #include "common/errors.h"
 #include "mam/v2/defs.h"
 #include "mam/v2/mam/alloc.h"
+#include "mam/v2/mam/channel.h"
 #include "mam/v2/mam/mam_ntru_pk_t_set.h"
 #include "mam/v2/mam/mam_pre_shared_key_t_set.h"
 #include "mam/v2/mam/mam_types.h"
@@ -32,41 +33,6 @@ retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
                          mss_mt_height_t d, trits_t N1, trits_t N2);
 
 void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m);
-
-#define MAM2_CHANNEL_ID_SIZE MAM2_MSS_MT_HASH_SIZE
-typedef trit_t chid_t[MAM2_CHANNEL_ID_SIZE];
-typedef struct mam_channel_s {
-  mss_t m[1]; /*!< MSS instance. */
-  chid_t id;  /*!< MSS public key. */
-} mam_channel_t;
-trits_t mam_channel_id(mam_channel_t *ch);
-trits_t mam_channel_name(mam_channel_t *ch);
-
-/*
-\brief Allocate memory for internal objects,
-  and generate MSS public key.
-*/
-retcode_t mam_channel_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
-                             prng_t *p, /*! [in] Shared PRNG interface used to
-                                          generate WOTS private keys. */
-                             mss_mt_height_t d, /*!< [in] MSS MT height. */
-                             trits_t ch_name,   /*!< [in] Channel name. */
-                             mam_channel_t *ch  /*!< [out] Channel. */
-);
-
-/*
-\brief Deallocate memory for internal objects.
-\note Before destroying channel make sure to destroy
-  all associated endpoints.
-*/
-void mam_channel_destroy(mam_ialloc_t *ma, /*!< [in] Allocator. */
-                         mam_channel_t *ch /*!< [out] Channel. */
-);
-
-/*
-TODO: channel serialization
-mam_channel_save, mam_channel_load
-*/
 
 #define MAM2_ENDPOINT_ID_SIZE MAM2_MSS_MT_HASH_SIZE
 typedef trit_t epid_t[MAM2_MSS_MT_HASH_SIZE];
@@ -106,13 +72,6 @@ trits_t mam_psk_trits(mam_pre_shared_key_t *p);
 
 trits_t mam_ntru_pk_id(mam_ntru_pk_t *p);
 trits_t mam_ntru_pk_trits(mam_ntru_pk_t *p);
-
-/* Channel */
-
-size_t mam_wrap_channel_size();
-void mam_wrap_channel(spongos_t *s, trits_t *b, tryte_t ver, trits_t chid);
-retcode_t mam_unwrap_channel(spongos_t *s, trits_t *b, tryte_t *ver,
-                             trits_t chid);
 
 /* Endpoint */
 
