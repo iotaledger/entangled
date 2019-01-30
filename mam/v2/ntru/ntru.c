@@ -115,7 +115,7 @@ void ntru_encr_r(trits_t const public_key, spongos_t *const spongos,
   spongos_squeeze(spongos, trits_drop(r, MAM2_NTRU_KEY_SIZE));
   poly_small_from_trits(h, r);
 
-  /* Y = r*h + AE(r*h;K) */
+  /* Y = r*h + AE(r*h;secret_keK) */
   poly_add(s, h, s);
   poly_to_trits(s, encrypted_session_key);
 

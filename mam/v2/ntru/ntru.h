@@ -45,7 +45,7 @@ void ntru_destroy(mam_ntru_t *const ntru);
  * @return the id trits
  */
 static inline trits_t ntru_id_trits(mam_ntru_t const *const ntru) {
-  return trits_from_rep(MAM2_NTRU_ID_SIZE, ntru->public_key_id);
+  return trits_from_rep(MAM2_NTRU_ID_SIZE, ntru->data.public_key_id);
 }
 
 /**
@@ -56,7 +56,7 @@ static inline trits_t ntru_id_trits(mam_ntru_t const *const ntru) {
  * @return the secret  key trits
  */
 static inline trits_t ntru_sk_trits(mam_ntru_t const *const ntru) {
-  return trits_from_rep(MAM2_NTRU_SK_SIZE, ntru->secret_key);
+  return trits_from_rep(MAM2_NTRU_SK_SIZE, ntru->data.secret_key);
 }
 
 /**

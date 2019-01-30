@@ -32,10 +32,10 @@ void test_f(void *buf, trit_t *s) {
 }
 
 mam_ntru_t *test_ntru_init(test_ntru_t *n) {
-  memcpy(n->ntru.public_key_id, n->public_key_id, MAM2_NTRU_ID_SIZE);
-  memcpy(n->ntru.secret_key, n->secret_key, MAM2_NTRU_SK_SIZE);
+  memcpy(n->ntru.data.public_key_id, n->public_key_id, MAM2_NTRU_ID_SIZE);
+  memcpy(n->ntru.data.secret_key, n->secret_key, MAM2_NTRU_SK_SIZE);
   n->ntru.f = n->f;
-  memset(n->ntru.secret_key, 0, MAM2_NTRU_SK_SIZE);
+  memset(n->ntru.data.secret_key, 0, MAM2_NTRU_SK_SIZE);
   return &n->ntru;
 }
 
