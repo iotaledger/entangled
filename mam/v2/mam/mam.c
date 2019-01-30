@@ -396,7 +396,7 @@ void mam_wrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key, trits_t pk,
 }
 
 retcode_t mam_unwrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key,
-                                  bool *key_found, trits_t pkid, ntru_t *n,
+                                  bool *key_found, trits_t pkid, mam_ntru_t *n,
                                   spongos_t *ns) {
   retcode_t e = RC_OK;
   trits_t ekey;

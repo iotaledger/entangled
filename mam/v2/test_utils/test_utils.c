@@ -31,7 +31,7 @@ void test_f(void *buf, trit_t *s) {
   trits_copy(y, x);
 }
 
-ntru_t *test_ntru_init(test_ntru_t *n) {
+mam_ntru_t *test_ntru_init(test_ntru_t *n) {
   n->ntru.public_key_id = n->public_key_id;
   n->ntru.secret_key = n->secret_key;
   n->ntru.f = n->f;
