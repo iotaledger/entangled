@@ -48,7 +48,7 @@ retcode_t mam_psks_deserialize(trits_t const trits,
                trits_from_rep(MAM2_PSK_SIZE, psk.pre_shared_key));
     cpy = trits_drop(cpy, MAM2_PSK_SIZE);
     if ((ret = mam_pre_shared_key_t_set_add(psks, &psk)) != RC_OK) {
-      return ret;
+      break;
     }
   }
 
@@ -84,7 +84,7 @@ retcode_t mam_ntru_pks_deserialize(trits_t const trits,
                trits_from_rep(MAM2_NTRU_PK_SIZE, ntru_pk.pk));
     cpy = trits_drop(cpy, MAM2_NTRU_PK_SIZE);
     if ((ret = mam_ntru_pk_t_set_add(ntru_pk_set, &ntru_pk)) != RC_OK) {
-      return ret;
+      break;
     }
   }
 
@@ -127,7 +127,7 @@ retcode_t mam_ntru_sk_deserialize(trits_t const trits,
                trits_from_rep(MAM2_NTRU_SK_SIZE, ntru_sk.secret_key));
     cpy = trits_drop(cpy, MAM2_NTRU_SK_SIZE);
     if ((ret = mam_ntru_sk_t_set_add(ntru_sk_set, &ntru_sk)) != RC_OK) {
-      return ret;
+      break;
     }
   }
 
