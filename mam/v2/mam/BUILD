@@ -31,6 +31,7 @@ cc_library(
     name = "mam_types",
     srcs = ["mam_types.c"],
     deps = [
+        ":mam_ntru_pk_t_set",
         ":mam_pre_shared_key_t_set",
         ":mam_types_hdr",
         "//mam/v2:defs",
