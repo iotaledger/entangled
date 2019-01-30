@@ -87,6 +87,10 @@ static retcode_t prepare_statements(sqlite3_connection_t* const connection) {
   ret |= prepare_statement(connection->db,
                            &connection->statements.transaction_select_metadata,
                            iota_statement_transaction_select_metadata);
+  ret |= prepare_statement(
+      connection->db,
+      &connection->statements.transaction_select_obsolete_tag,
+      iota_statement_transaction_select_obsolete_tag);
   ret |= prepare_statement(connection->db,
                            &connection->statements.milestone_insert,
                            iota_statement_milestone_insert);
@@ -157,6 +161,8 @@ static retcode_t finalize_statements(sqlite3_connection_t* const connection) {
   ret |= finalize_statement(
       connection->statements.transaction_select_essence_and_consensus);
   ret |= finalize_statement(connection->statements.transaction_select_metadata);
+  ret |= finalize_statement(
+      connection->statements.transaction_select_obsolete_tag);
   ret |= finalize_statement(connection->statements.milestone_insert);
   ret |= finalize_statement(connection->statements.milestone_select_by_hash);
   ret |= finalize_statement(connection->statements.milestone_select_first);

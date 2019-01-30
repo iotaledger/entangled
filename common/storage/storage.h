@@ -82,6 +82,10 @@ extern retcode_t iota_stor_transaction_load_metadata(
     storage_connection_t const* const connection, flex_trit_t const* const hash,
     iota_stor_pack_t* const pack);
 
+extern retcode_t iota_stor_transaction_load_obsolete_tag(
+    storage_connection_t const* const connection, flex_trit_t const* const hash,
+    iota_stor_pack_t* const pack);
+
 extern retcode_t iota_stor_transaction_exist(
     storage_connection_t const* const connection,
     transaction_field_t const field, flex_trit_t const* const key,

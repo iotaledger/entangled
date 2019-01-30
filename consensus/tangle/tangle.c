@@ -99,6 +99,9 @@ retcode_t iota_tangle_transaction_load_partial(
   } else if (models_mask == PARTIAL_TX_MODEL_ESSENCE_CONSENSUS) {
     return iota_stor_transaction_load_essence_and_consensus(&tangle->connection,
                                                             hash, pack);
+  } else if (models_mask == PARTIAL_TX_MODEL_OBSOLETE_TAG) {
+    return iota_stor_transaction_load_obsolete_tag(&tangle->connection, hash,
+                                                   pack);
   } else {
     return RC_CONSENSUS_NOT_IMPLEMENTED;
   }

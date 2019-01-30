@@ -35,6 +35,7 @@ typedef struct iota_statements_s {
   sqlite3_stmt* transaction_select_essence_attachment_and_metadata;
   sqlite3_stmt* transaction_select_essence_and_consensus;
   sqlite3_stmt* transaction_select_metadata;
+  sqlite3_stmt* transaction_select_obsolete_tag;
   sqlite3_stmt* milestone_insert;
   sqlite3_stmt* milestone_select_by_hash;
   sqlite3_stmt* milestone_select_first;
@@ -81,6 +82,7 @@ extern char* iota_statement_transaction_select_essence_and_metadata;
 extern char* iota_statement_transaction_select_essence_attachment_and_metadata;
 extern char* iota_statement_transaction_select_essence_and_consensus;
 extern char* iota_statement_transaction_select_metadata;
+extern char* iota_statement_transaction_select_obsolete_tag;
 
 /*
  * Transaction statement builders

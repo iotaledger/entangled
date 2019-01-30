@@ -165,6 +165,10 @@ char *iota_statement_transaction_select_metadata =
     "," TRANSACTION_COL_ARRIVAL_TIME " FROM " TRANSACTION_TABLE_NAME
     " WHERE " TRANSACTION_COL_HASH "=?";
 
+char *iota_statement_transaction_select_obsolete_tag =
+    "SELECT " TRANSACTION_COL_OBSOLETE_TAG " FROM " TRANSACTION_TABLE_NAME
+    " WHERE " TRANSACTION_COL_HASH "=?";
+
 /*
  * Transaction statement builders
  */

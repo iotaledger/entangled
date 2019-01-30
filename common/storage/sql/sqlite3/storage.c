@@ -99,6 +99,9 @@ static void select_transactions_populate_from_row_essence_and_consensus(
 static void select_transactions_populate_from_row_metadata(
     sqlite3_stmt* const statement, iota_transaction_t* const tx);
 
+static void select_transactions_populate_from_row_obsolete_tag(
+    sqlite3_stmt* const statement, iota_transaction_t* const tx);
+
 enum load_model {
   MODEL_TRANSACTION,
   MODEL_HASH,
@@ -107,6 +110,7 @@ enum load_model {
   MODEL_TRANSACTION_ESSENCE_ATTACHMENT_METADATA,
   MODEL_TRANSACTION_MODEL_ESSENCE_CONSENSUS,
   MODEL_TRANSACTION_MODEL_METADATA,
+  MODEL_TRANSACTION_OBSOLETE_TAG,
 };
 
 static retcode_t execute_statement_load_gen(
@@ -140,6 +144,9 @@ static retcode_t execute_statement_load_gen(
           sqlite_statement, pack->models[pack->num_loaded++]);
     } else if (model == MODEL_TRANSACTION_MODEL_METADATA) {
       select_transactions_populate_from_row_metadata(
+          sqlite_statement, pack->models[pack->num_loaded++]);
+    } else if (model == MODEL_TRANSACTION_OBSOLETE_TAG) {
+      select_transactions_populate_from_row_obsolete_tag(
           sqlite_statement, pack->models[pack->num_loaded++]);
     } else {
       return RC_SQLITE3_FAILED_NOT_IMPLEMENTED;
@@ -292,6 +299,12 @@ static retcode_t execute_statement_load_transaction_metadata(
                                     MODEL_TRANSACTION_MODEL_METADATA);
 }
 
+static retcode_t execute_statement_load_transaction_obsolete_tag(
+    sqlite3_stmt* const sqlite_statement, iota_stor_pack_t* const pack) {
+  return execute_statement_load_gen(sqlite_statement, pack, pack->capacity,
+                                    MODEL_TRANSACTION_OBSOLETE_TAG);
+}
+
 static void select_transactions_populate_from_row(
     sqlite3_stmt* const statement, iota_transaction_t* const tx) {
   column_decompress_load(statement, 0, tx->data.signature_or_message,
@@ -402,6 +415,13 @@ static void select_transactions_populate_from_row_metadata(
   transaction_set_snapshot_index(tx, sqlite3_column_int64(statement, 0));
   transaction_set_solid(tx, sqlite3_column_int(statement, 1));
   transaction_set_arrival_timestamp(tx, sqlite3_column_int64(statement, 2));
+}
+
+static void select_transactions_populate_from_row_obsolete_tag(
+    sqlite3_stmt* const statement, iota_transaction_t* const tx) {
+  column_decompress_load(statement, 0, tx->essence.obsolete_tag,
+                         FLEX_TRIT_SIZE_81);
+  tx->loaded_columns_mask.essence |= MASK_ESSENCE_OBSOLETE_TAG;
 }
 
 retcode_t iota_stor_transaction_count(
@@ -611,6 +631,31 @@ retcode_t iota_stor_transaction_load_metadata(
 
   if ((ret = execute_statement_load_transaction_metadata(sqlite_statement,
                                                          pack)) != RC_OK) {
+    goto done;
+  }
+
+done:
+  sqlite3_reset(sqlite_statement);
+  return ret;
+}
+
+retcode_t iota_stor_transaction_load_obsolete_tag(
+    storage_connection_t const* const connection, flex_trit_t const* const hash,
+    iota_stor_pack_t* const pack) {
+  sqlite3_connection_t const* sqlite3_connection =
+      (sqlite3_connection_t*)connection->actual;
+  retcode_t ret = RC_OK;
+  sqlite3_stmt* sqlite_statement =
+      sqlite3_connection->statements.transaction_select_obsolete_tag;
+
+  if (column_compress_bind(sqlite_statement, 1, hash, FLEX_TRIT_SIZE_243) !=
+      RC_OK) {
+    ret = RC_SQLITE3_FAILED_BINDING;
+    goto done;
+  }
+
+  if ((ret = execute_statement_load_transaction_obsolete_tag(sqlite_statement,
+                                                             pack)) != RC_OK) {
     goto done;
   }
 

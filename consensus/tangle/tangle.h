@@ -36,6 +36,7 @@ typedef enum _partial_transaction_model {
   PARTIAL_TX_MODEL_ESSENCE_METADATA,
   PARTIAL_TX_MODEL_ESSENCE_ATTACHMENT_METADATA,
   PARTIAL_TX_MODEL_ESSENCE_CONSENSUS,
+  PARTIAL_TX_MODEL_OBSOLETE_TAG,
 } partial_transaction_model_e;
 
 retcode_t iota_tangle_init(tangle_t *const tangle,
