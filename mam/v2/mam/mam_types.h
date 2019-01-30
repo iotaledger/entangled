@@ -32,10 +32,11 @@ typedef struct mam_pre_shared_key_t_set_entry_s
     mam_pre_shared_key_t_set_entry_t;
 typedef mam_pre_shared_key_t_set_entry_t* mam_pre_shared_key_t_set_t;
 
-size_t psks_serialized_size(mam_pre_shared_key_t_set_t const psks);
-retcode_t psks_serialize(mam_pre_shared_key_t_set_t const psks, trits_t trits);
-retcode_t psks_deserialize(trits_t const trits,
-                           mam_pre_shared_key_t_set_t* const psks);
+size_t mam_psks_serialized_size(mam_pre_shared_key_t_set_t const psks);
+retcode_t mam_psks_serialize(mam_pre_shared_key_t_set_t const psks,
+                             trits_t trits);
+retcode_t mam_psks_deserialize(trits_t const trits,
+                               mam_pre_shared_key_t_set_t* const psks);
 
 // NTRU public key - 3g(x)/(1+3f(x)) - size
 #define MAM2_NTRU_PK_SIZE 9216
@@ -56,11 +57,11 @@ typedef struct mam_ntru_pk_s {
 typedef struct mam_ntru_pk_t_set_entry_s mam_ntru_pk_t_set_entry_t;
 typedef mam_ntru_pk_t_set_entry_t* mam_ntru_pk_t_set_t;
 
-size_t ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set);
-retcode_t ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
-                             trits_t trits);
-retcode_t ntru_pks_deserialize(trits_t const trits,
-                               mam_ntru_pk_t_set_t* const ntru_pk_set);
+size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set);
+retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
+                                 trits_t trits);
+retcode_t mam_ntru_pks_deserialize(trits_t const trits,
+                                   mam_ntru_pk_t_set_t* const ntru_pk_set);
 
 // NTRU layer interface
 typedef struct mam_ntru_s {

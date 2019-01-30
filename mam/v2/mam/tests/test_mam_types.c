@@ -86,15 +86,15 @@ static void test_psks_serialization(void) {
     TEST_ASSERT(mam_pre_shared_key_t_set_add(&psks_1, &psk) == RC_OK);
   }
 
-  size_t size = psks_serialized_size(psks_1);
+  size_t size = mam_psks_serialized_size(psks_1);
 
   TEST_ASSERT_EQUAL_INT(size, 26 * (MAM2_PSK_ID_SIZE + MAM2_PSK_SIZE));
 
   trits_t trits = trits_alloc(size);
 
-  TEST_ASSERT(psks_serialize(psks_1, trits) == RC_OK);
+  TEST_ASSERT(mam_psks_serialize(psks_1, trits) == RC_OK);
 
-  TEST_ASSERT(psks_deserialize(trits, &psks_2) == RC_OK);
+  TEST_ASSERT(mam_psks_deserialize(trits, &psks_2) == RC_OK);
 
   TEST_ASSERT_TRUE(mam_pre_shared_key_t_set_cmp(psks_1, psks_2));
 
@@ -115,15 +115,15 @@ static void test_ntru_pk_serialization(void) {
     TEST_ASSERT(mam_ntru_pk_t_set_add(&ntru_set_1, &ntru) == RC_OK);
   }
 
-  size_t size = ntru_pks_serialized_size(ntru_set_1);
+  size_t size = mam_ntru_pks_serialized_size(ntru_set_1);
 
   TEST_ASSERT_EQUAL_INT(size, 26 * MAM2_NTRU_PK_SIZE);
 
   trits_t trits = trits_alloc(size);
 
-  TEST_ASSERT(ntru_pks_serialize(ntru_set_1, trits) == RC_OK);
+  TEST_ASSERT(mam_ntru_pks_serialize(ntru_set_1, trits) == RC_OK);
 
-  TEST_ASSERT(ntru_pks_deserialize(trits, &ntru_set_2) == RC_OK);
+  TEST_ASSERT(mam_ntru_pks_deserialize(trits, &ntru_set_2) == RC_OK);
 
   TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(ntru_set_1, ntru_set_2));
 

@@ -13,11 +13,12 @@
 #include "mam/v2/mam/mam_ntru_sk_t_set.h"
 #include "mam/v2/mam/mam_pre_shared_key_t_set.h"
 
-size_t psks_serialized_size(mam_pre_shared_key_t_set_t const psks) {
+size_t mam_psks_serialized_size(mam_pre_shared_key_t_set_t const psks) {
   return mam_pre_shared_key_t_set_size(psks) * sizeof(mam_pre_shared_key_t);
 }
 
-retcode_t psks_serialize(mam_pre_shared_key_t_set_t const psks, trits_t trits) {
+retcode_t mam_psks_serialize(mam_pre_shared_key_t_set_t const psks,
+                             trits_t trits) {
   mam_pre_shared_key_t_set_entry_t *entry = NULL;
   mam_pre_shared_key_t_set_entry_t *tmp = NULL;
 
@@ -33,8 +34,8 @@ retcode_t psks_serialize(mam_pre_shared_key_t_set_t const psks, trits_t trits) {
   return RC_OK;
 }
 
-retcode_t psks_deserialize(trits_t const trits,
-                           mam_pre_shared_key_t_set_t *const psks) {
+retcode_t mam_psks_deserialize(trits_t const trits,
+                               mam_pre_shared_key_t_set_t *const psks) {
   retcode_t ret = RC_OK;
   trits_t cpy = trits;
   mam_pre_shared_key_t psk;
@@ -54,12 +55,12 @@ retcode_t psks_deserialize(trits_t const trits,
   return ret;
 }
 
-size_t ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set) {
+size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set) {
   return mam_ntru_pk_t_set_size(ntru_pk_set) * sizeof(mam_ntru_pk_t);
 }
 
-retcode_t ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
-                             trits_t trits) {
+retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
+                                 trits_t trits) {
   mam_ntru_pk_t_set_entry_t *entry = NULL;
   mam_ntru_pk_t_set_entry_t *tmp = NULL;
 
@@ -72,8 +73,8 @@ retcode_t ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
   return RC_OK;
 }
 
-retcode_t ntru_pks_deserialize(trits_t const trits,
-                               mam_ntru_pk_t_set_t *const ntru_pk_set) {
+retcode_t mam_ntru_pks_deserialize(trits_t const trits,
+                                   mam_ntru_pk_t_set_t *const ntru_pk_set) {
   retcode_t ret = RC_OK;
   trits_t cpy = trits;
   mam_ntru_pk_t ntru_pk;
