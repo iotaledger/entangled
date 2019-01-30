@@ -110,6 +110,16 @@ void ntru_encr_r(trits_t const public_key, spongos_t *const spongos,
 bool ntru_decr(mam_ntru_t const *const ntru, spongos_t *const spongos,
                trits_t const encrypted_session_key, trits_t session_key);
 
+/**
+ * NTRU load the sk functional representation from sk
+ *
+ * @param ntru A NTRU interface
+ *
+ * @return
+ */
+
+void ntru_load_sk(mam_ntru_t *n);
+
 #ifdef __cplusplus
 }
 #endif

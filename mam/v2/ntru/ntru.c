@@ -173,3 +173,14 @@ bool ntru_decr(mam_ntru_t const *const ntru, spongos_t *const spongos,
 
   return b;
 }
+
+void ntru_load_sk(mam_ntru_t *n) {
+  poly_coeff_t *f;
+  f = (poly_coeff_t *)n->f;
+
+  poly_small_from_trits(f, ntru_sk_trits(n));
+  /* f := NTT(1+3f) */
+  poly_small_mul3(f, f);
+  poly_small3_add1(f);
+  poly_ntt(f, f);
+}
