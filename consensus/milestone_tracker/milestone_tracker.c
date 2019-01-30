@@ -184,7 +184,7 @@ static void* milestone_validator(void* arg) {
       hash_pack_reset(&pack);
       if (iota_tangle_transaction_load_partial(
               &tangle, candidate.hash, &pack,
-              PARTIAL_TX_MODEL_ESSENCE_CONSENSUS) == RC_OK &&
+              PARTIAL_TX_MODEL_OBSOLETE_TAG) == RC_OK &&
           pack.num_loaded != 0) {
         candidate.index = get_milestone_index(&tx);
         if (validate_milestone(mt, &tangle, &candidate, &milestone_status) !=
