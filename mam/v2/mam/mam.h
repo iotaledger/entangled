@@ -15,6 +15,7 @@
 #include "mam/v2/defs.h"
 #include "mam/v2/mam/alloc.h"
 #include "mam/v2/mam/channel.h"
+#include "mam/v2/mam/endpoint.h"
 #include "mam/v2/mam/mam_ntru_pk_t_set.h"
 #include "mam/v2/mam/mam_pre_shared_key_t_set.h"
 #include "mam/v2/mam/mam_types.h"
@@ -33,39 +34,6 @@ retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
                          mss_mt_height_t d, trits_t N1, trits_t N2);
 
 void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m);
-
-#define MAM2_ENDPOINT_ID_SIZE MAM2_MSS_MT_HASH_SIZE
-typedef trit_t epid_t[MAM2_MSS_MT_HASH_SIZE];
-typedef struct mam_endpoint_s {
-  mss_t m[1]; /*!< MSS instance. */
-  epid_t id;  /*!< MSS public key. */
-} mam_endpoint_t;
-trits_t mam_endpoint_id(mam_endpoint_t *ep);
-trits_t mam_endpoint_chname(mam_endpoint_t *ep);
-trits_t mam_endpoint_name(mam_endpoint_t *ep);
-
-/*
-\brief Allocate memory for internal objects,
-  and generate MSS public key.
-*/
-retcode_t mam_endpoint_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
-                              prng_t *p, /*! [in] Shared PRNG interface used to
-                                           generate WOTS private keys. */
-                              mss_mt_height_t d, /*!< [in] MSS MT height. */
-                              trits_t ch_name,   /*!< [in] Channel name. */
-                              trits_t ep_name,   /*!< [in] Endpoint name. */
-                              mam_endpoint_t *ep /*!< [out] Endpoint. */
-);
-
-/* \brief Deallocate memory for internal objects. */
-void mam_endpoint_destroy(mam_ialloc_t *ma,  /*!< [in] Allocator. */
-                          mam_endpoint_t *ep /*!< [out] Endpoint. */
-);
-
-/*
-TODO: endpoint serialization
-mam_endpoint_save, mam_endpoint_load
-*/
 
 trits_t mam_psk_id(mam_pre_shared_key_t *p);
 trits_t mam_psk_trits(mam_pre_shared_key_t *p);

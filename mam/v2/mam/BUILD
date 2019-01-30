@@ -9,6 +9,7 @@ cc_library(
     deps = [
         ":alloc",
         ":channel",
+        ":endpoint",
         ":mam_ntru_pk_t_set",
         ":mam_pre_shared_key_t_set",
         "//mam/v2:defs",
@@ -35,6 +36,17 @@ cc_library(
         ":alloc",
         "//mam/v2/mss",
         "//mam/v2/pb3",
+        "//mam/v2/trits",
+    ],
+)
+
+cc_library(
+    name = "endpoint",
+    srcs = ["endpoint.c"],
+    hdrs = ["endpoint.h"],
+    deps = [
+        ":alloc",
+        "//mam/v2/mss",
         "//mam/v2/trits",
     ],
 )

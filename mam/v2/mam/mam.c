@@ -90,46 +90,6 @@ void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m) {
   mss_destroy(m);
 }
 
-trits_t mam_endpoint_id(mam_endpoint_t *ep) {
-  return trits_from_rep(MAM2_ENDPOINT_ID_SIZE, ep->id);
-}
-
-trits_t mam_endpoint_chname(mam_endpoint_t *ep) { return ep->m->nonce1; }
-
-trits_t mam_endpoint_name(mam_endpoint_t *ep) { return ep->m->nonce2; }
-
-static size_t mam_endpoint_sig_size(mam_endpoint_t *ep) {
-  return MAM2_MSS_SIG_SIZE(ep->m->height);
-}
-
-retcode_t mam_endpoint_create(mam_ialloc_t *ma, /*!< [in] Allocator. */
-                              prng_t *p, /*! [in] Shared PRNG interface used to
-                                           generate WOTS private keys. */
-                              mss_mt_height_t d, /*!< [in] MSS MT height. */
-                              trits_t ch_name,   /*!< [in] Channel name. */
-                              trits_t ep_name,   /*!< [in] Endpoint name. */
-                              mam_endpoint_t *ep /*!< [out] Endpoint. */
-) {
-  retcode_t e = RC_OK;
-
-  MAM2_ASSERT(ma);
-  MAM2_ASSERT(ep);
-
-  ERR_BIND_RETURN(mam_mss_create(ma, ep->m, p, d, ch_name, ep_name), e);
-  mss_gen(ep->m, mam_endpoint_id(ep));
-
-  return e;
-}
-
-void mam_endpoint_destroy(mam_ialloc_t *ma,  /*!< [in] Allocator. */
-                          mam_endpoint_t *ep /*!< [out] Endpoint. */
-) {
-  MAM2_ASSERT(ma);
-  MAM2_ASSERT(ep);
-
-  mam_mss_destroy(ma, ep->m);
-}
-
 trits_t mam_psk_id(mam_pre_shared_key_t *p) {
   return trits_from_rep(MAM2_PSK_ID_SIZE, p->id);
 }
@@ -616,7 +576,7 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg) {
   MAM2_ASSERT(!(trits_size(*msg) < mam_send_msg_size(cfg)));
 
   if (cfg->ep) {
-    mss_skn(cfg->ep->m, skn);
+    mss_skn(&cfg->ep->mss, skn);
   } else {
     mss_skn(&cfg->ch->mss, skn);
   }

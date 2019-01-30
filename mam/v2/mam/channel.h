@@ -45,7 +45,7 @@ trits_t mam_channel_id(mam_channel_t const *const channel);
 trits_t mam_channel_name(mam_channel_t const *const channel);
 
 /**
- * Allocates memory for internal objects, and generate MSS public key
+ * Allocates memory for internal objects, and generates MSS public key
  *
  * @param allocator A MAM allocator
  * @param prng A shared PRNG interface used to generate WOTS private keys
