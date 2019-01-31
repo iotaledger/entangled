@@ -76,3 +76,31 @@ retcode_t mam_channel_unwrap(mam_spongos_t *const spongos,
 
   return ret;
 }
+
+size_t mam_channel_serialized_size(mam_channel_t const *const channel) {
+  return 0;
+}
+
+retcode_t mam_channel_serialize(mam_channel_t const *const channel,
+                                trits_t *const buffer) {
+  return RC_OK;
+}
+
+retcode_t mam_channel_deserialize(trits_t *const buffer,
+                                  mam_channel_t *const channel) {
+  return RC_OK;
+}
+
+size_t mam_channels_serialized_size(mam_channel_t_set_t const channels) {
+  return 0;
+}
+
+retcode_t mam_channels_serialize(mam_channel_t_set_t const channels,
+                                 trits_t *const buffer) {
+  return RC_OK;
+}
+
+retcode_t mam_channels_deserialize(trits_t *const buffer,
+                                   mam_channel_t_set_t *const channels) {
+  return RC_OK;
+}

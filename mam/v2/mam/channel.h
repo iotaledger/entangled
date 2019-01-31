@@ -25,6 +25,9 @@ typedef struct mam_channel_s {
   trit_t id[MAM2_CHANNEL_ID_SIZE];
 } mam_channel_t;
 
+typedef struct mam_channel_t_set_entry_s mam_channel_t_set_entry_t;
+typedef mam_channel_t_set_entry_t *mam_channel_t_set_t;
+
 /**
  * Gets a channel's id
  *
@@ -100,10 +103,21 @@ retcode_t mam_channel_unwrap(mam_spongos_t *const spongos,
                              trits_t *const buffer, tryte_t *const version,
                              trits_t channel_id);
 
-/*
-TODO: channel serialization
-mam_channel_save, mam_channel_load
-*/
+size_t mam_channel_serialized_size(mam_channel_t const *const channel);
+
+retcode_t mam_channel_serialize(mam_channel_t const *const channel,
+                                trits_t *const buffer);
+
+retcode_t mam_channel_deserialize(trits_t *const buffer,
+                                  mam_channel_t *const channel);
+
+size_t mam_channels_serialized_size(mam_channel_t_set_t const channels);
+
+retcode_t mam_channels_serialize(mam_channel_t_set_t const channels,
+                                 trits_t *const buffer);
+
+retcode_t mam_channels_deserialize(trits_t *const buffer,
+                                   mam_channel_t_set_t *const channels);
 
 #ifdef __cplusplus
 }

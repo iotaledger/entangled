@@ -21,13 +21,21 @@ cc_library(
 )
 
 cc_library(
-    name = "channel",
-    srcs = ["channel.c"],
+    name = "channel_hdr",
     hdrs = ["channel.h"],
     deps = [
         "//mam/v2/mss",
-        "//mam/v2/pb3",
         "//mam/v2/trits",
+    ],
+)
+
+cc_library(
+    name = "channel",
+    srcs = ["channel.c"],
+    deps = [
+        ":channel_hdr",
+        ":mam_channel_t_set",
+        "//mam/v2/pb3",
     ],
 )
 
@@ -86,4 +94,12 @@ typed_container_generate(
     container_type = "set",
     parent_directory = "mam/v2/mam",
     value_type = "mam_endpoint_t",
+)
+
+typed_container_generate(
+    additional_deps = "channel_hdr",
+    additional_include_path = "mam/v2/mam/channel.h",
+    container_type = "set",
+    parent_directory = "mam/v2/mam",
+    value_type = "mam_channel_t",
 )

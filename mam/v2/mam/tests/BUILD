@@ -29,3 +29,15 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_channel",
+    srcs = ["test_channel.c"],
+    deps = [
+        "//mam/v2/mam",
+        "//mam/v2/mam:channel",
+        "//mam/v2/mam:mam_channel_t_set",
+        "//mam/v2/test_utils",
+        "@unity",
+    ],
+)
