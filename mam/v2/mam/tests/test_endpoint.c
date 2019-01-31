@@ -18,6 +18,25 @@
 #include "mam/v2/mam/mam_endpoint_t_set.h"
 #include "mam/v2/test_utils/test_utils.h"
 
+static bool mam_endpoint_t_set_cmp(mam_endpoint_t_set_t const endpoints_1,
+                                   mam_endpoint_t_set_t const endpoints_2) {
+  mam_endpoint_t_set_entry_t *entry_1 = NULL;
+  mam_endpoint_t_set_entry_t *tmp_1 = NULL;
+  mam_endpoint_t_set_entry_t *entry_2 = NULL;
+  mam_endpoint_t_set_entry_t *tmp_2 = NULL;
+
+  if (mam_endpoint_t_set_size(endpoints_1) !=
+      mam_endpoint_t_set_size(endpoints_2)) {
+    return false;
+  }
+
+  HASH_ITER(hh, endpoints_1, entry_1, tmp_1) {
+    HASH_ITER(hh, endpoints_2, entry_2, tmp_2) {}
+  }
+
+  return true;
+}
+
 void test_endpoint(void) {
   mam_endpoint_t_set_t endpoints_1 = NULL;
   mam_endpoint_t_set_t endpoints_2 = NULL;
@@ -63,6 +82,8 @@ void test_endpoint(void) {
   TEST_ASSERT(mam_endpoints_serialize(endpoints_1, &trits) == RC_OK);
 
   TEST_ASSERT(mam_endpoints_deserialize(&cpy, &endpoints_2) == RC_OK);
+
+  TEST_ASSERT_TRUE(mam_endpoint_t_set_cmp(endpoints_1, endpoints_2));
 
   trits_free(trits);
   trits_free(channel_name_trits);

@@ -21,8 +21,10 @@ static bool mam_pre_shared_key_t_set_cmp(
   mam_pre_shared_key_t_set_entry_t *entry = NULL;
   mam_pre_shared_key_t_set_entry_t *tmp = NULL;
 
-  TEST_ASSERT_EQUAL_INT(mam_pre_shared_key_t_set_size(psks_1),
-                        mam_pre_shared_key_t_set_size(psks_2));
+  if (mam_pre_shared_key_t_set_size(psks_1) !=
+      mam_pre_shared_key_t_set_size(psks_2)) {
+    return false;
+  }
 
   HASH_ITER(hh, psks_1, entry, tmp) {
     if (!mam_pre_shared_key_t_set_contains(&psks_2, &entry->value)) {
