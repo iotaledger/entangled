@@ -9,13 +9,13 @@
 #include <glog/logging.h>
 #include <rx.hpp>
 
-#include "iota/tanglescope/common/iri.hpp"
-#include "iota/tanglescope/common/zmqpub.hpp"
-
-#include "iota/tanglescope/statscollector.hpp"
-#include "iota/tanglescope/statscollector/analyzer.hpp"
-#include "iota/tanglescope/statscollector/stats/frame.hpp"
 #include "tanglescope/common/iri.hpp"
+#include "tanglescope/common/zmqpub.hpp"
+
+#include "tanglescope/common/iri.hpp"
+#include "tanglescope/statscollector/analyzer.hpp"
+#include "tanglescope/statscollector/stats/frame.hpp"
+#include "tanglescope/statscollector/statscollector.hpp"
 
 using namespace iota::tanglescope;
 

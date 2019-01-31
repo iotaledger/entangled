@@ -1,7 +1,10 @@
-#include "iota/tanglescope/tanglewidthcollector.hpp"
-#include <glog/logging.h>
-#include <iota/tanglescope/common/tangledb.hpp>
+#include "tanglescope/tanglewidthcollector.hpp"
+
 #include <map>
+
+#include <glog/logging.h>
+
+#include "tanglescope/common/tangledb.hpp"
 
 namespace iota {
 namespace tanglescope {

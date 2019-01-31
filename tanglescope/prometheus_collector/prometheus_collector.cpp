@@ -1,4 +1,4 @@
-#include <iota/tanglescope/prometheus_collector/prometheus_collector.hpp>
+#include "tanglescope/prometheus_collector/prometheus_collector.hpp"
 
 namespace iota {
 namespace tanglescope {

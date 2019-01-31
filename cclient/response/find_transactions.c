@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "response/find_transactions.h"
+#include "cclient/response/find_transactions.h"
 
 find_transactions_res_t* find_transactions_res_new() {
   find_transactions_res_t* res =

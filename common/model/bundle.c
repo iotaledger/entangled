@@ -133,7 +133,7 @@ void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl) {
     // bundle hash
     bundle_calculate_hash(bundle, kerl, bundle_hash);
     // normalize
-    normalize_hash(bundle_hash, normalized_hash);
+    normalize_flex_hash(bundle_hash, normalized_hash);
     // checking 'M'
     for (int i = 0; i < HASH_LENGTH_TRYTE; i++) {
       if (normalized_hash[i] == 13) {

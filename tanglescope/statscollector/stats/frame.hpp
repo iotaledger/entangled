@@ -4,7 +4,7 @@
 #include <memory>
 #include <shared_mutex>
 
-#include "iota/tanglescope/common/iri.hpp"
+#include "tanglescope/common/iri.hpp"
 
 #include "stats.hpp"
 

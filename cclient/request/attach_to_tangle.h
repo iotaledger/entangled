@@ -8,7 +8,7 @@
 #ifndef CCLIENT_REQUEST_ATTACH_TO_TANGLE_H
 #define CCLIENT_REQUEST_ATTACH_TO_TANGLE_H
 
-#include "types/types.h"
+#include "cclient/types/types.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -4,10 +4,10 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <iota/tanglescope/prometheus_collector/prometheus_collector.hpp>
-#include "iota/tanglescope/common/iri.hpp"
-#include "iota/tanglescope/statscollector/analyzer.hpp"
-#include "iota/tanglescope/statscollector/stats/stats.hpp"
+#include "tanglescope/common/iri.hpp"
+#include "tanglescope/prometheus_collector/prometheus_collector.hpp"
+#include "tanglescope/statscollector/analyzer.hpp"
+#include "tanglescope/statscollector/stats/stats.hpp"
 
 using namespace iota::tanglescope;
 using namespace iota::tanglescope::statscollector;
