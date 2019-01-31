@@ -250,7 +250,8 @@ void mss_destroy(mss_t *mss);
  *
  * @return size_t The size for stored MT
  */
-size_t mss_stored_size(mss_t *mss);
+
+size_t mss_stored_size(mss_t const *const mss);
 
 /**
  * Serialize Merkle tree.
@@ -260,7 +261,8 @@ size_t mss_stored_size(mss_t *mss);
  *
  * @return void
  */
-void mss_save(mss_t *mss, trits_t buffer);
+
+void mss_save(mss_t const *const mss, trits_t buffer);
 
 /**
  * Deerialize Merkle tree.

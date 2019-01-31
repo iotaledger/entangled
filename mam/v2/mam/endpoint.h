@@ -22,8 +22,11 @@ extern "C" {
 
 typedef struct mam_endpoint_s {
   mss_t mss;
-  trit_t id[MAM2_MSS_MT_HASH_SIZE];
+  trit_t id[MAM2_ENDPOINT_ID_SIZE];
 } mam_endpoint_t;
+
+typedef struct mam_endpoint_t_set_entry_s mam_endpoint_t_set_entry_t;
+typedef mam_endpoint_t_set_entry_t *mam_endpoint_t_set_t;
 
 /**
  * Gets an endpoint's id
@@ -78,10 +81,21 @@ retcode_t mam_endpoint_create(mam_prng_t const *const prng,
  */
 void mam_endpoint_destroy(mam_endpoint_t *const endpoint);
 
-/*
-TODO: endpoint serialization
-mam_endpoint_save, mam_endpoint_load
-*/
+size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint);
+
+retcode_t mam_endpoint_serialize(mam_endpoint_t const *const endpoint,
+                                 trits_t *const buffer);
+
+retcode_t mam_endpoint_deserialize(trits_t *const buffer,
+                                   mam_endpoint_t *const endpoint);
+
+size_t mam_endpoints_serialized_size(mam_endpoint_t_set_t const endpoints);
+
+retcode_t mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints,
+                                  trits_t *const buffer);
+
+retcode_t mam_endpoints_deserialize(trits_t *const buffer,
+                                    mam_endpoint_t_set_t *const endpoints);
 
 #ifdef __cplusplus
 }

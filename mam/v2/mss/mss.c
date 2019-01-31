@@ -659,7 +659,7 @@ void mss_destroy(mss_t *mss) {
 #endif
 }
 
-static size_t mss_mt_stored_size(mss_t *mss) {
+static size_t mss_mt_stored_size(mss_t const *const mss) {
   size_t size = 0;
 #if defined(MAM2_MSS_TRAVERSAL)
   mss_mt_height_t height;
@@ -672,7 +672,7 @@ static size_t mss_mt_stored_size(mss_t *mss) {
   return size;
 }
 
-static void mss_mt_save(mss_t *mss, trits_t buffer) {
+static void mss_mt_save(mss_t const *const mss, trits_t buffer) {
   mss_mt_height_t height;
   mss_mt_idx_t i;
 
@@ -743,9 +743,11 @@ static void mss_mt_load(mss_t *mss, trits_t buffer) {
 #endif
 }
 
-size_t mss_stored_size(mss_t *mss) { return 4 + 14 + mss_mt_stored_size(mss); }
+size_t mss_stored_size(mss_t const *const mss) {
+  return 4 + 14 + mss_mt_stored_size(mss);
+}
 
-void mss_save(mss_t *mss, trits_t buffer) {
+void mss_save(mss_t const *const mss, trits_t buffer) {
   MAM2_ASSERT(mss_stored_size(mss) == trits_size(buffer));
 
   mss_skn(mss, trits_take(buffer, MAM2_MSS_SKN_SIZE));
