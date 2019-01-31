@@ -1,17 +1,16 @@
 #pragma once
 
+#include <chrono>
+#include <cstdint>
+#include <memory>
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
-#include <chrono>
-#include <cstdint>
-#include <memory>
-#include <shared_mutex>
-
-#include <iota/tanglescope/prometheus_collector/prometheus_collector.hpp>
-#include "iota/tanglescope/common/iri.hpp"
+#include "tanglescope/common/iri.hpp"
+#include "tanglescope/prometheus_collector/prometheus_collector.hpp"
 
 using namespace iota::tanglescope;
 

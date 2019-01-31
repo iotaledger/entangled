@@ -1,7 +1,9 @@
-#include "iota/tanglescope/common/zmqdbloader.hpp"
+#include "tanglescope/common/zmqdbloader.hpp"
+
 #include <glog/logging.h>
-#include <iota/tanglescope/common/tangledb.hpp>
-#include <iota/tanglescope/common/zmqpub.hpp>
+
+#include "tanglescope/common/tangledb.hpp"
+#include "tanglescope/common/zmqpub.hpp"
 
 namespace iota {
 namespace tanglescope {

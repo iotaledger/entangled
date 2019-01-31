@@ -1,17 +1,19 @@
+#include <list>
+
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <yaml-cpp/yaml.h>
 #include <boost/thread/executor.hpp>
 #include <boost/thread/future.hpp>
-#include <iota/tanglescope/blowballcollector.hpp>
-#include <iota/tanglescope/common/txauxiliary.hpp>
-#include <iota/tanglescope/common/zmqdbloader.hpp>
-#include <iota/tanglescope/echocollector.hpp>
-#include <iota/tanglescope/statscollector.hpp>
-#include <iota/tanglescope/tanglewidthcollector.hpp>
-#include <iota/tanglescope/tipselectioncollector.hpp>
-#include <list>
+
+#include "tanglescope/blowballcollector.hpp"
+#include "tanglescope/common/txauxiliary.hpp"
+#include "tanglescope/common/zmqdbloader.hpp"
 #include "tanglescope/confirmationratecollector.hpp"
+#include "tanglescope/echocollector.hpp"
+#include "tanglescope/statscollector/statscollector.hpp"
+#include "tanglescope/tanglewidthcollector.hpp"
+#include "tanglescope/tipselectioncollector.hpp"
 
 DEFINE_string(ConfigurationPath, "", "YAML's configuration file path");
 

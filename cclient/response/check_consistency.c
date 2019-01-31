@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "response/check_consistency.h"
+#include "cclient/response/check_consistency.h"
 
 check_consistency_res_t* check_consistency_res_new() {
   check_consistency_res_t* res =

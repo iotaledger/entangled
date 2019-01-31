@@ -1,7 +1,7 @@
 #pragma once
 
-#include "iota/tanglescope/common/iri.hpp"
 #include "stats.hpp"
+#include "tanglescope/common/iri.hpp"
 
 using namespace iota::tanglescope;
 

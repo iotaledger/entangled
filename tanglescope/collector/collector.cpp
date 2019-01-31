@@ -1,4 +1,4 @@
-#include <iota/tanglescope/collector/collector.hpp>
+#include "tanglescope/collector/collector.hpp"
 
 namespace iota {
 namespace tanglescope {

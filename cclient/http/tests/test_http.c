@@ -123,7 +123,9 @@ void test_http(void) {
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "form");
   // For some reason the server echoes the data into the key of the json object
   char* string = json_item->child->string;
+
   TEST_ASSERT_EQUAL_STRING(data, string);
+
   cJSON_Delete(json_obj);
   char_buffer_free(req);
   char_buffer_free(res);

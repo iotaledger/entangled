@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "response/get_trytes.h"
+#include "cclient/response/get_trytes.h"
 
 get_trytes_res_t* get_trytes_res_new() {
   get_trytes_res_t* res = (get_trytes_res_t*)malloc(sizeof(get_trytes_res_t));

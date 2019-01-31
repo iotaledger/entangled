@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "request/add_neighbors.h"
+#include "cclient/request/add_neighbors.h"
 
 add_neighbors_req_t* add_neighbors_req_new() {
   add_neighbors_req_t* req =

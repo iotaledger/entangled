@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "response/remove_neighbors.h"
+#include "cclient/response/remove_neighbors.h"
 
 remove_neighbors_res_t* remove_neighbors_res_new() {
   remove_neighbors_res_t* res =

@@ -5,7 +5,6 @@ cc_library(
         "*.hpp",
     ]),
     hdrs = glob(["*.hpp"]),
-    include_prefix = "iota/tanglescope/prometheus_collector",
     visibility = ["//visibility:public"],
     deps = [
         "//tanglescope/collector",

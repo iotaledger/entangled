@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "response/attach_to_tangle.h"
+#include "cclient/response/attach_to_tangle.h"
 
 attach_to_tangle_res_t* attach_to_tangle_res_new() {
   attach_to_tangle_res_t* res =

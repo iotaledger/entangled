@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iota/tanglescope/common/iri.hpp>
 #include <libcuckoo/cuckoohash_map.hh>
 #include <set>
 #include <vector>
@@ -9,6 +8,7 @@
 #include <boost/thread/future.hpp>
 
 #include "cppclient/beast.h"
+#include "tanglescope/common/iri.hpp"
 /*
  * Under this namespace are functions to allow complex queries over IRI
  */

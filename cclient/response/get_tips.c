@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "response/get_tips.h"
+#include "cclient/response/get_tips.h"
 
 get_tips_res_t* get_tips_res_new() {
   get_tips_res_t* res = (get_tips_res_t*)malloc(sizeof(get_tips_res_t));
