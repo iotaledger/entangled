@@ -162,8 +162,13 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, prng_t *prng,
       TEST_ASSERT(mss_load(mss2, &store) == RC_OK);
       mss_test_cmp_mss(mss1, mss2);
       mss_sign(mss2, hash, sig2);
-
       TEST_ASSERT_TRUE(trits_cmp_eq(sig, sig2));
+      if (!trits_is_null(mss2->nonce1)) {
+        trits_free(mss2->nonce1);
+      }
+      if (!trits_is_null(mss2->nonce2)) {
+        trits_free(mss2->nonce2);
+      }
     } while (mss_next(mss1));
   }
 

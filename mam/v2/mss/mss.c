@@ -645,6 +645,12 @@ void mss_destroy(mss_t *mss) {
   if (mss->stacks) {
     free(mss->stacks), mss->stacks = 0;
   }
+  if (!trits_is_null(mss->nonce1)) {
+    trits_free(mss->nonce1);
+  }
+  if (!trits_is_null(mss->nonce2)) {
+    trits_free(mss->nonce2);
+  }
 #else
   if (mss->mt) {
     free(mss->mt);
