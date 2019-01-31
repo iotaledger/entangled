@@ -26,7 +26,6 @@ typedef flex_hash_array_t transfer_list_t;
 typedef flex_hash_array_t transaction_list_t;
 typedef flex_hash_array_t booleans_t;
 typedef flex_hash_array_t input_list_t;
-typedef UT_array transaction_objs_t;
 
 typedef struct {
   int64_t balance;
@@ -136,7 +135,7 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
  * @param {bundle_transactions_t} bundle - Bundle as array of transaction
  * objects.
  *
- * @returns {retcode_t}
+ * @returns {bundle_status_t}
  * - `INVALID_TRANSACTION_HASH`
  * - `INVALID_TAIL_HASH`: Provided transaction is not tail (`currentIndex !==
  * 0`)
@@ -145,9 +144,9 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
  *
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetBundle.ts#L38
  */
-retcode_t iota_client_get_bundle(iota_client_service_t const* const serv,
-                                 flex_trit_t const* const tail_hash,
-                                 bundle_transactions_t* bundle);
+bundle_status_t iota_client_get_bundle(iota_client_service_t const* const serv,
+                                       flex_trit_t const* const tail_hash,
+                                       bundle_transactions_t* bundle);
 
 /**
  * Creates and returns an `Inputs` object by generating addresses and fetching
@@ -225,7 +224,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
  *
  * @param {iota_client_service_t} serv - client service
  * @param {hashes_t} hashes - Array of transaction hashes
- * @param {transaction_objs_t} tx_objs - List of transaction objects.
+ * @param {transaction_array_t} tx_objs - List of transaction objects.
  *
  * @returns {retcode_t}
  * - `INVALID_TRANSACTION_HASH`
@@ -312,7 +311,7 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
 retcode_t iota_client_promote_transaction(
     iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
     int const depth, int const mwm, transfer_list_t const* const transfers,
-    transaction_objs_t* const tx_objs);
+    transaction_array_t* const tx_objs);
 
 /**
  * Reattaches a transfer to tangle by selecting tips & performing the

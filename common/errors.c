@@ -112,6 +112,8 @@ const char* error_2_string(retcode_t err) {
       return STR_CCLIENT_POW_FAILED;
     case RC_CCLIENT_INVALID_TRANSFER:
       return SRT_CCLIENT_INVALID_TRANSFER;
+    case RC_CCLIENT_INVALID_BUNDLE:
+      return SRT_CCLIENT_INVALID_BUNDLE;
 
     // Consensus module
     case RC_CONSENSUS_NOT_IMPLEMENTED:

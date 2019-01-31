@@ -31,6 +31,7 @@ extern "C" {
 #define STR_CCLIENT_INSUFFICIENT_BALANCE "Insufficient balance"
 #define STR_CCLIENT_POW_FAILED "Local PoW failed"
 #define SRT_CCLIENT_INVALID_TRANSFER "Invalid transfers"
+#define SRT_CCLIENT_INVALID_BUNDLE "Invalid bundle"
 
 #ifdef __cplusplus
 }
