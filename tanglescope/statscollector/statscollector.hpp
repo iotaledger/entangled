@@ -1,9 +1,11 @@
 #pragma once
 
-#include <prometheus/exposer.h>
-#include <iota/tanglescope/prometheus_collector/prometheus_collector.hpp>
 #include <string>
 #include <unordered_set>
+
+#include <prometheus/exposer.h>
+
+#include "tanglescope/prometheus_collector/prometheus_collector.hpp"
 
 namespace iota {
 namespace tanglescope {

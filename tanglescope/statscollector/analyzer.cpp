@@ -4,9 +4,9 @@
 
 #include <glog/logging.h>
 
-#include "iota/tanglescope/common/iri.hpp"
+#include "tanglescope/common/iri.hpp"
 
-#include "iota/tanglescope/statscollector/analyzer.hpp"
+#include "tanglescope/statscollector/analyzer.hpp"
 
 namespace iota {
 namespace tanglescope {

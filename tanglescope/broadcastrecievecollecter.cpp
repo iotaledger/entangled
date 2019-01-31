@@ -7,15 +7,15 @@
 #include <iostream>
 #include <iota/models/bundle.hpp>
 #include <iota/models/transaction.hpp>
-#include <iota/tanglescope/common/tangledb.hpp>
-#include <iota/tanglescope/common/txauxiliary.hpp>
-#include <iota/tanglescope/common/zmqpub.hpp>
 #include <list>
 #include <map>
 #include <set>
 #include <unordered_set>
 
 #include "tanglescope/broadcastrecievecollecter.hpp"
+#include "tanglescope/common/tangledb.hpp"
+#include "tanglescope/common/txauxiliary.hpp"
+#include "tanglescope/common/zmqpub.hpp"
 
 constexpr static auto DEPTH = 3;
 

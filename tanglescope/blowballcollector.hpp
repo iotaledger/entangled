@@ -2,12 +2,13 @@
 
 #include <prometheus/exposer.h>
 #include <chrono>
-#include <iota/tanglescope/common/iri.hpp>
-#include <iota/tanglescope/prometheus_collector/prometheus_collector.hpp>
 #include <libcuckoo/cuckoohash_map.hh>
 #include <list>
 #include <rx.hpp>
 #include <string>
+
+#include "tanglescope/common/iri.hpp"
+#include "tanglescope/prometheus_collector/prometheus_collector.hpp"
 
 namespace iota {
 namespace tanglescope {
