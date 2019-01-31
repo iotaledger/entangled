@@ -11,7 +11,9 @@
 #include <memory.h>
 #include <stdlib.h>
 
+#include "common/defs.h"
 #include "mam/v2/mss/mss.h"
+#include "mam/v2/pb3/pb3.h"
 
 #define MAM2_MSS_MAX_SKN(d) (((trint18_t)1 << (d)) - 1)
 
@@ -651,6 +653,31 @@ void mss_destroy(mss_t *mss) {
 #endif
 }
 
+static size_t mss_nonces_stored_size(mss_t *mss) {
+  size_t size = 0;
+  if (!trits_is_null(mss->nonce1)) {
+    size +=
+        pb3_sizeof_size_t(trits_size(mss->nonce1) / NUMBER_OF_TRITS_IN_A_TRYTE);
+    // The size of nonce1
+    size += pb3_sizeof_ntrytes(trits_size(mss->nonce1) /
+                               NUMBER_OF_TRITS_IN_A_TRYTE);
+  } else {
+    size += pb3_sizeof_size_t(0);
+  }
+
+  if (!trits_is_null(mss->nonce2)) {
+    size +=
+        pb3_sizeof_size_t(trits_size(mss->nonce2) / NUMBER_OF_TRITS_IN_A_TRYTE);
+    // The size of nonce1
+    size += pb3_sizeof_ntrytes(trits_size(mss->nonce2) /
+                               NUMBER_OF_TRITS_IN_A_TRYTE);
+  } else {
+    size += pb3_sizeof_size_t(0);
+  }
+
+  return size;
+}
+
 static size_t mss_mt_stored_size(mss_t *mss) {
   size_t size = 0;
 #if defined(MAM2_MSS_TRAVERSAL)
@@ -661,6 +688,7 @@ static size_t mss_mt_stored_size(mss_t *mss) {
 #else
   size += (((size_t)1 << (mss->height + 1)) - 1) * MAM2_MSS_MT_HASH_SIZE;
 #endif
+
   return size;
 }
 
@@ -735,13 +763,60 @@ static void mss_mt_load(mss_t *mss, trits_t buffer) {
 #endif
 }
 
-size_t mss_stored_size(mss_t *mss) { return 4 + 14 + mss_mt_stored_size(mss); }
+size_t mss_stored_size(mss_t *mss) {
+  return 4 + 14 + mss_nonces_stored_size(mss) + mss_mt_stored_size(mss);
+}
+
+static mss_save_nonces(mss_t *mss, trits_t buffer) {
+  if (!trits_is_null(mss->nonce1)) {
+    pb3_encode_size_t(trits_size(mss->nonce1) / NUMBER_OF_TRITS_IN_A_TRYTE,
+                      &buffer);
+    pb3_encode_ntrytes(mss->nonce1, &buffer);
+  } else {
+    pb3_encode_size_t(0, &buffer);
+  }
+
+  if (!trits_is_null(mss->nonce2)) {
+    pb3_encode_size_t(trits_size(mss->nonce2) / NUMBER_OF_TRITS_IN_A_TRYTE,
+                      &buffer);
+    pb3_encode_ntrytes(mss->nonce2, &buffer);
+  } else {
+    pb3_encode_size_t(0, &buffer);
+  }
+}
 
 void mss_save(mss_t *mss, trits_t buffer) {
   MAM2_ASSERT(mss_stored_size(mss) == trits_size(buffer));
 
   mss_skn(mss, trits_take(buffer, MAM2_MSS_SKN_SIZE));
-  mss_mt_save(mss, trits_drop(buffer, MAM2_MSS_SKN_SIZE));
+  buffer = trits_drop(buffer, MAM2_MSS_SKN_SIZE);
+  mss_save_nonces(mss, buffer);
+  buffer = trits_drop(buffer, mss_nonces_stored_size(mss));
+  mss_mt_save(mss, buffer);
+}
+
+retcode_t mss_load_nonces(mss_t *mss, trits_t *b) {
+  retcode_t e = RC_OK;
+
+  // trytes name; // nonce1
+  mss->nonce1 = trits_null();
+  // mss->nonce2 = trits_null();
+  size_t sz = 0;
+  pb3_decode_size_t(&sz, b);
+  if (sz > 0) {
+    mss->nonce1 = trits_alloc(sz * NUMBER_OF_TRITS_IN_A_TRYTE);
+    ERR_GUARD_RETURN(!trits_is_null(mss->nonce1), RC_OOM, e);
+    ERR_BIND_RETURN(pb3_decode_ntrytes(mss->nonce1, b), e);
+  }
+
+  pb3_decode_size_t(&sz, b);
+  if (sz > 0) {
+    mss->nonce2 = trits_alloc(sz * NUMBER_OF_TRITS_IN_A_TRYTE);
+    ERR_GUARD_RETURN(!trits_is_null(mss->nonce2), RC_OOM, e);
+    ERR_BIND_RETURN(pb3_decode_ntrytes(mss->nonce2, b), e);
+  }
+
+  return e;
 }
 
 retcode_t mss_load(mss_t *mss, trits_t *b) {
@@ -754,6 +829,8 @@ retcode_t mss_load(mss_t *mss, trits_t *b) {
   ERR_GUARD_RETURN(mss_parse_skn(&height, &skn, trits_advance(b, 4 + 14)),
                    RC_MAM2_INVALID_VALUE, e);
   ERR_GUARD_RETURN(height == mss->height, RC_MAM2_INVALID_VALUE, e);
+
+  mss_load_nonces(mss, b);
 
 #if defined(MAM2_MSS_TRAVERSAL)
   mss_mt_rewind(mss, skn);

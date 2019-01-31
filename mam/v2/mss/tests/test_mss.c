@@ -98,6 +98,13 @@ def_test_mss_check(4, 4);
 // def_test_mss_check(10, x);
 // def_test_mss_check(MAM2_MSS_TEST_MAX_D, );
 
+static void mss_test_cmp_mss(mss_t *mss1, mss_t *mss2) {
+  TEST_ASSERT(mss1->skn == mss2->skn);
+  TEST_ASSERT(mss1->height == mss2->height);
+  TEST_ASSERT(trits_cmp_eq(mss1->nonce1, mss2->nonce1));
+  TEST_ASSERT(trits_cmp_eq(mss1->nonce2, mss2->nonce2));
+}
+
 static bool mss_store_test(mss_t *mss1, mss_t *mss2, prng_t *prng,
                            spongos_t *spongos, wots_t *wots,
                            mss_mt_height_t max_height) {
@@ -152,11 +159,11 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, prng_t *prng,
 
       store = trits_take(store_, mss_stored_size(mss1));
       mss_save(mss1, store);
-      e = mss_load(mss2, &store);
-      MAM2_ASSERT(RC_OK == e);
+      TEST_ASSERT(mss_load(mss2, &store) == RC_OK);
+      mss_test_cmp_mss(mss1, mss2);
       mss_sign(mss2, hash, sig2);
 
-      r = r && trits_cmp_eq(sig, sig2);
+      TEST_ASSERT_TRUE(trits_cmp_eq(sig, sig2));
     } while (mss_next(mss1));
   }
 
@@ -293,9 +300,10 @@ static void mss_meta_test(void) {
   TEST_ASSERT_TRUE(mss_test(m1, p, sg, w, 1) && test_mss_check1(_m1));
   TEST_ASSERT_TRUE(mss_test(m2, p, sg, w, 2) && test_mss_check2(_m2));
   TEST_ASSERT_TRUE(mss_test(m3, p, sg, w, 3) && test_mss_check3(_m3));
-  // TEST_ASSERT_TRUE(mss_test(m4, p, sg, w, 4) && test_mss_check4(_m4));
-  TEST_ASSERT_TRUE(mss_store_test(m4, m42, p, sg, w, 4) &&
-                   test_mss_check4(_m4) && test_mss_check4(_m42));
+  TEST_ASSERT_TRUE(mss_test(m4, p, sg, w, 4) && test_mss_check4(_m4));
+  TEST_ASSERT_TRUE(mss_store_test(m4, m42, p, sg, w, 4));
+  TEST_ASSERT_TRUE(test_mss_check4(_m4));
+  TEST_ASSERT_TRUE(test_mss_check4(_m42));
   // #if 0
   //   TEST_ASSERT_TRUE(mss_test(m5, p, sg, w, 5) && test_mss_check5(_m5));
   //   TEST_ASSERT_TRUE(mss_test(mx, p, sg, w, 10) && test_mss_checkx(_mx));

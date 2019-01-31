@@ -7,6 +7,7 @@ cc_library(
     defines = ["MAM2_MSS_TRAVERSAL"],
     deps = [
         "//common:errors",
+        "//mam/v2/pb3",
         "//mam/v2/wots",
     ],
 )
