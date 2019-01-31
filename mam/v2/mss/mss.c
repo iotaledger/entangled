@@ -85,16 +85,17 @@ static void mss_mt_gen_leaf(
 }
 
 #if defined(MAM2_MSS_TRAVERSAL)
-static trits_t mss_hash_idx(trit_t *p, size_t i) {
+static trits_t mss_hash_idx(trit_t const *const p, size_t i) {
   return trits_from_rep(MAM2_MSS_MT_HASH_SIZE, p + MAM2_MSS_HASH_IDX(i));
 }
 
-static trits_t mss_mt_auth_path_trits(mss_t *mss, mss_mt_height_t height) {
+static trits_t mss_mt_auth_path_trits(mss_t const *const mss,
+                                      mss_mt_height_t height) {
   return mss_hash_idx(mss->auth_path, height);
 }
 
-static trits_t mss_mt_node_hash_trits(mss_t *mss, mss_mt_height_t height,
-                                      size_t i) {
+static trits_t mss_mt_node_hash_trits(mss_t const *const mss,
+                                      mss_mt_height_t height, size_t i) {
   return mss_hash_idx(mss->nodes_hashes, MAM2_MSS_MT_NODES(height) + i);
 }
 
@@ -468,7 +469,7 @@ void mss_gen(mss_t *mss, trits_t pk) {
 #endif
 }
 
-void mss_skn(mss_t *mss, trits_t skn) {
+void mss_skn(mss_t const *const mss, trits_t skn) {
   MAM2_TRITS_DEF0(trits, MAM2_MSS_SKN_SIZE);
   trits = MAM2_TRITS_INIT(trits, MAM2_MSS_SKN_SIZE);
 

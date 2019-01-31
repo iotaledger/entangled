@@ -174,7 +174,7 @@ void mss_gen(mss_t *mss, trits_t pk);
  * @return void
  */
 void mss_skn(
-    mss_t *mss, /*!< [in] MSS interface */
+    mss_t const *const mss, /*!< [in] MSS interface */
     trits_t skn /*!< [out] encoded height and current private key number */
 );
 
