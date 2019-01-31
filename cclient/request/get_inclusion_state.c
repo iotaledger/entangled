@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "request/get_inclusion_state.h"
+#include "cclient/request/get_inclusion_state.h"
 
 get_inclusion_state_req_t* get_inclusion_state_req_new() {
   get_inclusion_state_req_t* req =

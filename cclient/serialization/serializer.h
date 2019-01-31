@@ -9,8 +9,8 @@
 #define CCLIENT_SERIALIZATION_SERIALIZER_H
 
 #include <stdlib.h>
-#include "request/requests.h"
-#include "response/responses.h"
+#include "cclient/request/requests.h"
+#include "cclient/response/responses.h"
 
 #ifdef __cplusplus
 extern "C" {

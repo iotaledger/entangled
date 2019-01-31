@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "request/check_consistency.h"
+#include "cclient/request/check_consistency.h"
 
 check_consistency_req_t* check_consistency_req_new() {
   check_consistency_req_t* req =
