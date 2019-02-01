@@ -20,6 +20,16 @@
 #define CHANNEL_NAME_SIZE 27
 #define ENDPOINT_NAME_SIZE 27
 
+static void mam_endpoints_destroy(mam_ialloc_t const *const allocator,
+                                  mam_endpoint_t_set_t const endpoints) {
+  mam_endpoint_t_set_entry_t *entry = NULL;
+  mam_endpoint_t_set_entry_t *tmp = NULL;
+
+  HASH_ITER(hh, endpoints, entry, tmp) {
+    mam_endpoint_destroy(allocator, &entry->value);
+  }
+}
+
 static bool mam_endpoint_t_set_cmp(mam_endpoint_t_set_t const endpoints_1,
                                    mam_endpoint_t_set_t const endpoints_2) {
   mam_endpoint_t_set_entry_t *entry_1 = NULL;
@@ -95,6 +105,10 @@ void test_endpoint(void) {
 
   TEST_ASSERT_TRUE(mam_endpoint_t_set_cmp(endpoints_1, endpoints_2));
 
+  mam_endpoints_destroy(&allocator, endpoints_1);
+  mam_endpoints_destroy(&allocator, endpoints_2);
+  mam_endpoint_t_set_free(&endpoints_1);
+  mam_endpoint_t_set_free(&endpoints_2);
   trits_free(trits);
   trits_free(channel_name_trits);
   trits_free(endpoint_name_trits);
