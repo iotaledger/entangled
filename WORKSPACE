@@ -10,7 +10,7 @@ git_repository(
 
 git_repository(
     name = "iota_toolchains",
-    commit = "9a6c200013d971524f8427b6a404bab0a67a9328",
+    commit = "965cda744c7cc2d86ea1d963f2977358f59a2135",
     remote = "https://github.com/iotaledger/toolchains.git",
 )
 
