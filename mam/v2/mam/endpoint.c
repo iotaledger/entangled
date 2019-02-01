@@ -144,7 +144,15 @@ retcode_t mam_endpoint_deserialize(trits_t *const buffer,
     return ret;
   }
 
-  mss_init(&endpoint->mss, prng, height, channel_name, endpoint->name);
+  // mss_init(&endpoint->mss, prng, height, channel_name, endpoint->name);
+
+  // TODO: need to pass prng, sponge, wots somehow
+  // mss_init(ep->mss, prng, sponge, wots, d, nonce1, nonce2);
+
+  // TODO: uncomment when mss_init is called
+  // if ((ret = mss_load(&endpoint->mss, buffer)) != RC_OK) { //mss
+  //   return ret;
+  // }
 
   if ((ret = mss_load(&endpoint->mss, buffer)) != RC_OK) {
     return ret;
