@@ -37,14 +37,14 @@ android_ndk_repository(
     api_level = 14,
 )
 
+# Setup third-party dependencies
+
 load("@rules_iota//:defs.bzl", "iota_deps")
+load("@iota_toolchains//:toolchains.bzl", "setup_toolchains")
+load("//tools:snapshot.bzl", "fetch_snapshot_files")
 
 iota_deps()
 
-load("@iota_toolchains//:toolchains.bzl", "setup_toolchains")
-
 setup_toolchains()
-
-load("//tools:snapshot.bzl", "fetch_snapshot_files")
 
 fetch_snapshot_files()
