@@ -21,8 +21,9 @@ extern "C" {
 #endif
 
 typedef struct mam_channel_s {
-  mss_t mss;
   trit_t id[MAM2_CHANNEL_ID_SIZE];
+  trits_t name;
+  mss_t mss;
 } mam_channel_t;
 
 typedef struct mam_channel_t_set_entry_s mam_channel_t_set_entry_t;

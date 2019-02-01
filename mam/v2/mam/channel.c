@@ -17,7 +17,7 @@ trits_t mam_channel_id(mam_channel_t const *const channel) {
 }
 
 trits_t mam_channel_name(mam_channel_t const *const channel) {
-  return channel->mss.nonce1;
+  return channel->name;
 }
 
 retcode_t mam_channel_create(mam_prng_t const *const prng,
@@ -27,6 +27,11 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
   MAM2_ASSERT(channel);
 
   retcode_t ret = RC_OK;
+
+  if (trits_is_null(channel->name = trits_alloc(trits_size(channel_name)))) {
+    return RC_OOM;
+  }
+  trits_copy(channel_name, channel->name);
 
   if ((ret = mam_mss_create(&channel->mss, prng, height, channel_name,
                             trits_null())) != RC_OK) {
@@ -41,6 +46,7 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
 void mam_channel_destroy(mam_channel_t *const channel) {
   MAM2_ASSERT(channel);
 
+  trits_free(channel->name);
   mam_mss_destroy(&channel->mss);
 }
 
