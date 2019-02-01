@@ -24,6 +24,7 @@ static bool mam_channel_t_set_cmp(mam_channel_t_set_t const channels_1,
   mam_channel_t_set_entry_t *tmp_1 = NULL;
   mam_channel_t_set_entry_t *entry_2 = NULL;
   mam_channel_t_set_entry_t *tmp_2 = NULL;
+  size_t match = 0;
 
   if (mam_channel_t_set_size(channels_1) !=
       mam_channel_t_set_size(channels_2)) {
@@ -31,13 +32,22 @@ static bool mam_channel_t_set_cmp(mam_channel_t_set_t const channels_1,
   }
 
   HASH_ITER(hh, channels_1, entry_1, tmp_1) {
-    HASH_ITER(hh, channels_2, entry_2, tmp_2) {}
+    HASH_ITER(hh, channels_2, entry_2, tmp_2) {
+      if (memcmp(entry_1->value.id, entry_2->value.id, MAM2_ENDPOINT_ID_SIZE) ==
+              0 &&
+          trits_cmp_eq(entry_1->value.name, entry_2->value.name)) {
+        // TODO check MSS
+        // TODO check endpoints
+        match++;
+      }
+    }
   }
 
-  return true;
+  return match == mam_channel_t_set_size(channels_1);
 }
 
 void test_channel(void) {
+  mam_channel_t channel;
   mam_channel_t_set_t channels_1 = NULL;
   mam_channel_t_set_t channels_2 = NULL;
 
@@ -61,8 +71,6 @@ void test_channel(void) {
   prng_init(prng, prng->sponge, prng_key);
 
   for (size_t i = 1; i < 5; i++) {
-    mam_channel_t channel;
-
     memset(channel_name, 'A' + 2 * i, 27);
     trytes_to_trits(channel_name, channel_name_trits.p, 27);
     TEST_ASSERT(mam_channel_create(&allocator, prng, i, channel_name_trits,
