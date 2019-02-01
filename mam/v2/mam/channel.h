@@ -11,6 +11,7 @@
 #ifndef __MAM_V2_MAM_CHANNEL_H__
 #define __MAM_V2_MAM_CHANNEL_H__
 
+#include "mam/v2/mam/mam_endpoint_t_set.h"
 #include "mam/v2/mss/mss.h"
 #include "mam/v2/trits/trits.h"
 
@@ -24,6 +25,7 @@ typedef struct mam_channel_s {
   trit_t id[MAM2_CHANNEL_ID_SIZE];
   trits_t name;
   mss_t mss;
+  mam_endpoint_t_set_t endpoints;
 } mam_channel_t;
 
 typedef struct mam_channel_t_set_entry_s mam_channel_t_set_entry_t;

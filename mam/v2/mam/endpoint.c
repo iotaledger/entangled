@@ -67,6 +67,17 @@ retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t endpoints) {
   return RC_OK;
 }
 
+void mam_endpoints_destroy(mam_ialloc_t const *const allocator,
+                           mam_endpoint_t_set_t *const endpoints) {
+  mam_endpoint_t_set_entry_t *entry = NULL;
+  mam_endpoint_t_set_entry_t *tmp = NULL;
+
+  HASH_ITER(hh, *endpoints, entry, tmp) {
+    mam_endpoint_destroy(allocator, &entry->value);
+  }
+  mam_endpoint_t_set_free(endpoints);
+}
+
 size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint) {
   size_t mss_size = mss_stored_size(&endpoint->mss);
 

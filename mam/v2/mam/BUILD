@@ -24,6 +24,7 @@ cc_library(
     name = "channel_hdr",
     hdrs = ["channel.h"],
     deps = [
+        ":mam_endpoint_t_set",
         "//mam/v2/mss",
         "//mam/v2/trits",
     ],

@@ -40,6 +40,8 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
 
   mss_gen(&channel->mss, mam_channel_id(channel));
 
+  channel->endpoints = NULL;
+
   return ret;
 }
 
@@ -48,6 +50,7 @@ void mam_channel_destroy(mam_channel_t *const channel) {
 
   trits_free(channel->name);
   mam_mss_destroy(&channel->mss);
+  mam_endpoints_destroy(&channel->endpoints);
 }
 
 size_t mam_channel_wrap_size() {

@@ -84,6 +84,9 @@ retcode_t mam_endpoint_destroy(mam_endpoint_t *const endpoint);
 
 retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t endpoints);
 
+void mam_endpoints_destroy(mam_ialloc_t const *const allocator,
+                           mam_endpoint_t_set_t *const endpoints);
+
 size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint);
 
 retcode_t mam_endpoint_serialize(mam_endpoint_t const *const endpoint,
