@@ -14,9 +14,11 @@
 
 #include "common/trinary/trit_tryte.h"
 #include "mam/v2/mam/endpoint.h"
-#include "mam/v2/mam/mam.h"
 #include "mam/v2/mam/mam_endpoint_t_set.h"
 #include "mam/v2/test_utils/test_utils.h"
+
+#define CHANNEL_NAME_SIZE 27
+#define ENDPOINT_NAME_SIZE 27
 
 static bool mam_endpoint_t_set_cmp(mam_endpoint_t_set_t const endpoints_1,
                                    mam_endpoint_t_set_t const endpoints_2) {
@@ -24,6 +26,7 @@ static bool mam_endpoint_t_set_cmp(mam_endpoint_t_set_t const endpoints_1,
   mam_endpoint_t_set_entry_t *tmp_1 = NULL;
   mam_endpoint_t_set_entry_t *entry_2 = NULL;
   mam_endpoint_t_set_entry_t *tmp_2 = NULL;
+  size_t match = 0;
 
   if (mam_endpoint_t_set_size(endpoints_1) !=
       mam_endpoint_t_set_size(endpoints_2)) {
@@ -31,13 +34,19 @@ static bool mam_endpoint_t_set_cmp(mam_endpoint_t_set_t const endpoints_1,
   }
 
   HASH_ITER(hh, endpoints_1, entry_1, tmp_1) {
-    HASH_ITER(hh, endpoints_2, entry_2, tmp_2) {}
+    HASH_ITER(hh, endpoints_2, entry_2, tmp_2) {
+      if (memcmp(entry_1->value.id, entry_2->value.id, MAM2_ENDPOINT_ID_SIZE) ==
+          0) {
+        match++;
+      }
+    }
   }
 
-  return true;
+  return match == mam_endpoint_t_set_size(endpoints_1);
 }
 
 void test_endpoint(void) {
+  mam_endpoint_t endpoint;
   mam_endpoint_t_set_t endpoints_1 = NULL;
   mam_endpoint_t_set_t endpoints_2 = NULL;
 
@@ -45,10 +54,10 @@ void test_endpoint(void) {
   sponge_t *sponge = test_sponge_init(&test_sponge);
   test_prng_t test_prng;
   prng_t *prng = test_prng_init(&test_prng, sponge);
-  tryte_t channel_name[27];
-  trits_t channel_name_trits = trits_alloc(81);
-  tryte_t endpoint_name[27];
-  trits_t endpoint_name_trits = trits_alloc(81);
+  tryte_t channel_name[CHANNEL_NAME_SIZE];
+  trits_t channel_name_trits = trits_alloc(CHANNEL_NAME_SIZE * 3);
+  tryte_t endpoint_name[ENDPOINT_NAME_SIZE];
+  trits_t endpoint_name_trits = trits_alloc(ENDPOINT_NAME_SIZE * 3);
   mam_ialloc_t allocator = {.create_sponge = test_create_sponge,
                             .destroy_sponge = test_delete_sponge};
 
@@ -63,14 +72,12 @@ void test_endpoint(void) {
   prng_init(prng, prng->sponge, prng_key);
 
   for (size_t i = 1; i < 5; i++) {
-    mam_endpoint_t endpoint;
-
-    memset(channel_name, 'A' + 2 * i, 27);
-    trytes_to_trits(channel_name, channel_name_trits.p, 27);
-    memset(endpoint_name, 'A' + 2 * i + 1, 27);
-    trytes_to_trits(endpoint_name, endpoint_name_trits.p, 27);
-    mam_endpoint_create(&allocator, prng, i, channel_name_trits,
-                        endpoint_name_trits, &endpoint);
+    memset(channel_name, 'A' + 2 * i, CHANNEL_NAME_SIZE);
+    trytes_to_trits(channel_name, channel_name_trits.p, CHANNEL_NAME_SIZE);
+    memset(endpoint_name, 'A' + 2 * i + 1, ENDPOINT_NAME_SIZE);
+    trytes_to_trits(endpoint_name, endpoint_name_trits.p, ENDPOINT_NAME_SIZE);
+    TEST_ASSERT(mam_endpoint_create(&allocator, prng, i, channel_name_trits,
+                                    endpoint_name_trits, &endpoint) == RC_OK);
     TEST_ASSERT(mam_endpoint_t_set_add(&endpoints_1, &endpoint) == RC_OK);
   }
 

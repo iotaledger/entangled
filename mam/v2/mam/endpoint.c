@@ -60,7 +60,6 @@ retcode_t mam_endpoint_serialize(mam_endpoint_t const *const endpoint,
                                  trits_t *const buffer) {
   size_t mss_size = mss_stored_size(&endpoint->mss);
 
-  fprintf(stderr, "SERIALIZE\n");
   pb3_encode_ntrytes(trits_from_rep(MAM2_ENDPOINT_ID_SIZE, endpoint->id),
                      buffer);
   pb3_encode_size_t(mss_size, buffer);
@@ -110,9 +109,11 @@ retcode_t mam_endpoint_deserialize(trits_t *const buffer,
   // mss_init(ep->mss, prng, sponge, wots, d, nonce1, nonce2);
 
   // TODO: update mss_save interface
-  if ((ret = mss_load(&endpoint->mss, buffer)) != RC_OK) {
-    return ret;
-  }
+  // if ((ret = mss_load(&endpoint->mss, buffer)) != RC_OK) {
+  //   return ret;
+  // }
+
+  trits_advance(buffer, mss_size);
 
   return ret;
 }
@@ -120,13 +121,13 @@ retcode_t mam_endpoint_deserialize(trits_t *const buffer,
 size_t mam_endpoints_serialized_size(mam_endpoint_t_set_t const endpoints) {
   mam_endpoint_t_set_entry_t *entry = NULL;
   mam_endpoint_t_set_entry_t *tmp = NULL;
-  size_t s = pb3_sizeof_size_t(mam_endpoint_t_set_size(endpoints));
+  size_t size = pb3_sizeof_size_t(mam_endpoint_t_set_size(endpoints));
 
   HASH_ITER(hh, endpoints, entry, tmp) {
-    s += mam_endpoint_serialized_size(&entry->value);
+    size += mam_endpoint_serialized_size(&entry->value);
   }
 
-  return s;
+  return size;
 }
 
 retcode_t mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints,
