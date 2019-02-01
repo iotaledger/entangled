@@ -36,7 +36,8 @@ static bool mam_endpoint_t_set_cmp(mam_endpoint_t_set_t const endpoints_1,
   HASH_ITER(hh, endpoints_1, entry_1, tmp_1) {
     HASH_ITER(hh, endpoints_2, entry_2, tmp_2) {
       if (memcmp(entry_1->value.id, entry_2->value.id, MAM2_ENDPOINT_ID_SIZE) ==
-          0) {
+              0 &&
+          trits_cmp_eq(entry_1->value.name, entry_2->value.name)) {
         match++;
       }
     }

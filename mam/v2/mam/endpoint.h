@@ -21,8 +21,9 @@ extern "C" {
 #endif
 
 typedef struct mam_endpoint_s {
-  mss_t mss;
   trit_t id[MAM2_ENDPOINT_ID_SIZE];
+  trits_t name;
+  mss_t mss;
 } mam_endpoint_t;
 
 typedef struct mam_endpoint_t_set_entry_s mam_endpoint_t_set_entry_t;

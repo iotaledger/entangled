@@ -33,8 +33,13 @@ retcode_t mam_endpoint_create(mam_prng_t const *const prng,
 
   retcode_t ret = RC_OK;
 
-  if ((ret = mam_mss_create(&endpoint->mss, prng, height, channel_name,
-                            endpoint_name)) != RC_OK) {
+  if (trits_is_null(endpoint->name = trits_alloc(trits_size(endpoint_name)))) {
+    return RC_OOM;
+  }
+  trits_copy(endpoint_name, endpoint->name);
+
+  if ((ret = mam_mss_create(allocator, &endpoint->mss, prng, height,
+                            channel_name, endpoint_name)) != RC_OK) {
     return ret;
   }
 
@@ -46,13 +51,16 @@ retcode_t mam_endpoint_create(mam_prng_t const *const prng,
 void mam_endpoint_destroy(mam_endpoint_t *const endpoint) {
   MAM2_ASSERT(endpoint);
 
-  mam_mss_destroy(&endpoint->mss);
+  trits_free(endpoint->name);
+  mam_mss_destroy(allocator, &endpoint->mss);
 }
 
 size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint) {
   size_t mss_size = mss_stored_size(&endpoint->mss);
 
   return pb3_sizeof_ntrytes(MAM2_ENDPOINT_ID_SIZE / 3) +
+         pb3_sizeof_size_t(trits_size(endpoint->name)) +
+         pb3_sizeof_ntrytes(trits_size(endpoint->name) / 3) +
          pb3_sizeof_size_t(mss_size) + pb3_sizeof_ntrytes(mss_size / 3);
 }
 
@@ -62,8 +70,9 @@ retcode_t mam_endpoint_serialize(mam_endpoint_t const *const endpoint,
 
   pb3_encode_ntrytes(trits_from_rep(MAM2_ENDPOINT_ID_SIZE, endpoint->id),
                      buffer);
+  pb3_encode_size_t(trits_size(endpoint->name), buffer);
+  pb3_encode_ntrytes(endpoint->name, buffer);
   pb3_encode_size_t(mss_size, buffer);
-  // TODO: update mss_save interface
   mss_save(&endpoint->mss, trits_take(*buffer, mss_size));
   trits_advance(buffer, mss_size);
 
@@ -73,7 +82,7 @@ retcode_t mam_endpoint_serialize(mam_endpoint_t const *const endpoint,
 retcode_t mam_endpoint_deserialize(trits_t *const buffer,
                                    mam_endpoint_t *const endpoint) {
   retcode_t ret = RC_OK;
-  size_t mss_size = 0;
+  size_t size = 0;
   mss_mt_height_t height = 0;
 
   fprintf(stderr, "DESERIALIZE\n");
@@ -86,11 +95,21 @@ retcode_t mam_endpoint_deserialize(trits_t *const buffer,
     return ret;
   }
 
-  if ((ret = pb3_decode_size_t(&mss_size, buffer)) != RC_OK) {
+  if ((ret = pb3_decode_size_t(&size, buffer)) != RC_OK) {
+    return ret;
+  }
+  if (trits_is_null(endpoint->name = trits_alloc(size))) {
+    return RC_OOM;
+  }
+  if ((ret = pb3_decode_ntrytes(endpoint->name, buffer)) != RC_OK) {
     return ret;
   }
 
-  fprintf(stderr, "MSS SIZE %d\n", mss_size);
+  if ((ret = pb3_decode_size_t(&size, buffer)) != RC_OK) {
+    return ret;
+  }
+
+  fprintf(stderr, "MSS SIZE %d\n", size);
 
   MAM2_TRITS_DEF0(ts, MAM2_MSS_SKN_SIZE);
   ts = MAM2_TRITS_INIT(ts, MAM2_MSS_SKN_SIZE);
@@ -113,7 +132,7 @@ retcode_t mam_endpoint_deserialize(trits_t *const buffer,
   //   return ret;
   // }
 
-  trits_advance(buffer, mss_size);
+  trits_advance(buffer, size);
 
   return ret;
 }
