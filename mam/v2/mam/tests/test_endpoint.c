@@ -38,6 +38,7 @@ static bool mam_endpoint_t_set_cmp(mam_endpoint_t_set_t const endpoints_1,
       if (memcmp(entry_1->value.id, entry_2->value.id, MAM2_ENDPOINT_ID_SIZE) ==
               0 &&
           trits_cmp_eq(entry_1->value.name, entry_2->value.name)) {
+        // TODO check MSS
         match++;
       }
     }
@@ -89,7 +90,8 @@ void test_endpoint(void) {
 
   TEST_ASSERT(mam_endpoints_serialize(endpoints_1, &trits) == RC_OK);
 
-  TEST_ASSERT(mam_endpoints_deserialize(&cpy, &endpoints_2) == RC_OK);
+  TEST_ASSERT(mam_endpoints_deserialize(&cpy, channel_name_trits,
+                                        &endpoints_2) == RC_OK);
 
   TEST_ASSERT_TRUE(mam_endpoint_t_set_cmp(endpoints_1, endpoints_2));
 

@@ -88,6 +88,7 @@ retcode_t mam_endpoint_serialize(mam_endpoint_t const *const endpoint,
                                  trits_t *const buffer);
 
 retcode_t mam_endpoint_deserialize(trits_t *const buffer,
+                                   trits_t const channel_name,
                                    mam_endpoint_t *const endpoint);
 
 size_t mam_endpoints_serialized_size(mam_endpoint_t_set_t const endpoints);
@@ -96,6 +97,7 @@ retcode_t mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints,
                                   trits_t *const buffer);
 
 retcode_t mam_endpoints_deserialize(trits_t *const buffer,
+                                    trits_t const channel_name,
                                     mam_endpoint_t_set_t *const endpoints);
 
 #ifdef __cplusplus
