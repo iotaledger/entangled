@@ -8,17 +8,17 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/wallet/wallet.h"
+#include "mam/v2/state/state.h"
 #include "mam/v2/mam/mam_pre_shared_key_t_set.h"
 
-retcode_t mam_wallet_init(mam_wallet_t* const wallet) {
-  wallet->psks = NULL;
+retcode_t mam_state_init(mam_state_t* const state) {
+  state->psks = NULL;
 
   return RC_OK;
 }
 
-retcode_t mam_wallet_destroy(mam_wallet_t* const wallet) {
-  mam_pre_shared_key_t_set_free(&wallet->psks);
+retcode_t mam_state_destroy(mam_state_t* const state) {
+  mam_pre_shared_key_t_set_free(&state->psks);
 
   return RC_OK;
 }
