@@ -98,7 +98,7 @@ def_test_mss_check(4, 4);
 // def_test_mss_check(10, x);
 // def_test_mss_check(MAM2_MSS_TEST_MAX_D, );
 
-static bool mss_store_test(mss_t *mss1, mss_t *mss2, prng_t *prng,
+static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
                            spongos_t *spongos, wots_t *wots,
                            mss_mt_height_t max_height) {
   bool r = true;
@@ -129,7 +129,7 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, prng_t *prng,
                  "ABCNOABCNKOZWYKOZWYSDF9SDF9"
                  "YSDF9QABCNKOZWYSDF9ABCNKOZW"
                  "SDF9CABCABCNKOZWYNKOZWYSDF9");
-  prng_init(prng, prng->sponge, key);
+  mam_prng_init(prng, prng->sponge, key);
   trits_set_zero(nonce);
   trits_set_zero(hash);
   trits_from_str(hash,
@@ -163,8 +163,8 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, prng_t *prng,
   return r;
 }
 
-static bool mss_test(mss_t *mss, prng_t *prng, spongos_t *spongos, wots_t *wots,
-                     mss_mt_height_t max_height) {
+static bool mss_test(mss_t *mss, mam_prng_t *prng, spongos_t *spongos,
+                     wots_t *wots, mss_mt_height_t max_height) {
   bool r = true;
   MAM2_TRITS_DEF0(key, MAM2_PRNG_KEY_SIZE);
   mss_mt_height_t curr_height;
@@ -185,7 +185,7 @@ static bool mss_test(mss_t *mss, prng_t *prng, spongos_t *spongos, wots_t *wots,
                  "ABCNOABCNKOZWYKOZWYSDF9SDF9"
                  "YSDF9QABCNKOZWYSDF9ABCNKOZW"
                  "SDF9CABCABCNKOZWYNKOZWYSDF9");
-  prng_init(prng, prng->sponge, key);
+  mam_prng_init(prng, prng->sponge, key);
   trits_set_zero(nonce);
   trits_set_zero(hash);
   trits_from_str(hash,
@@ -263,7 +263,7 @@ static bool mss_test(mss_t *mss, prng_t *prng, spongos_t *spongos, wots_t *wots,
 }
 
 static void mss_meta_test(void) {
-  test_sponge_t _s[1];
+  test_mam_sponge_t _s[1];
   test_spongos_t _sg[1];
   test_prng_t _p[1];
   test_wots_t _w[1];
@@ -276,9 +276,9 @@ static void mss_meta_test(void) {
   // test_mssx_t _mx[1];
   // test_mss_t _m[1];
 
-  sponge_t *spongos = test_sponge_init(_s);
+  mam_sponge_t *spongos = test_sponge_init(_s);
   spongos_t *sg = test_spongos_init(_sg, spongos);
-  prng_t *p = test_prng_init(_p, spongos);
+  mam_prng_t *p = test_prng_init(_p, spongos);
   wots_t *w = test_wots_init(_w, spongos);
 
   mss_t *m1 = test_mss_init1(_m1);

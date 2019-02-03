@@ -56,7 +56,7 @@ trits_t mam_channel_name(mam_channel_t const *const channel);
  * @return a status code
  */
 retcode_t mam_channel_create(mam_ialloc_t const *const allocator,
-                             prng_t const *const prng,
+                             mam_prng_t const *const prng,
                              mss_mt_height_t const height,
                              trits_t const channel_name,
                              mam_channel_t *const channel);

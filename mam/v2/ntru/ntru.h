@@ -72,7 +72,7 @@ static inline trits_t ntru_sk_trits(mam_ntru_sk_t const *const ntru) {
  * @param nonce A nonce
  * @param public_key A NTRU public key: serialized NTT of polynomial h=3g/(1+3f)
  */
-void ntru_gen(mam_ntru_sk_t const *const ntru, prng_t const *const prng,
+void ntru_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
               trits_t const nonce, trits_t public_key);
 
 /**
@@ -85,7 +85,7 @@ void ntru_gen(mam_ntru_sk_t const *const ntru, prng_t const *const prng,
  * @param nonce A nonce
  * @param encrypted_session_key The encrypted session key
  */
-void ntru_encr(trits_t const public_key, prng_t const *const prng,
+void ntru_encr(trits_t const public_key, mam_prng_t const *const prng,
                spongos_t *const spongos, trits_t const session_key,
                trits_t const nonce, trits_t encrypted_session_key);
 

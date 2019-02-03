@@ -14,8 +14,8 @@
 #include "mam/v2/test_utils/test_utils.h"
 
 static void sponge_hash_test(void) {
-  test_sponge_t test_sponge;
-  sponge_t *sponge = test_sponge_init(&test_sponge);
+  test_mam_sponge_t test_sponge;
+  mam_sponge_t *sponge = test_sponge_init(&test_sponge);
 
   MAM2_TRITS_DEF0(X0, MAM2_SPONGE_RATE * 3);
   trits_t Xs[3], X;
@@ -47,8 +47,8 @@ static void sponge_hash_test(void) {
 }
 
 static void sponge_ae_test(void) {
-  test_sponge_t test_sponge;
-  sponge_t *sponge = test_sponge_init(&test_sponge);
+  test_mam_sponge_t test_sponge;
+  mam_sponge_t *sponge = test_sponge_init(&test_sponge);
 
 #define MAM2_SPONGE_TEST_MAX_K 1110
   size_t k, i;

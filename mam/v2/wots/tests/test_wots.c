@@ -14,11 +14,11 @@
 #include "mam/v2/wots/wots.h"
 
 static void wots_test(void) {
-  test_sponge_t test_sponge;
+  test_mam_sponge_t test_sponge;
   test_prng_t test_prng;
   test_wots_t test_wots;
-  sponge_t *sponge = test_sponge_init(&test_sponge);
-  prng_t *prng = test_prng_init(&test_prng, sponge);
+  mam_sponge_t *sponge = test_sponge_init(&test_sponge);
+  mam_prng_t *prng = test_prng_init(&test_prng, sponge);
   wots_t *wots = test_wots_init(&test_wots, sponge);
 
   MAM2_TRITS_DEF0(N, 18);
@@ -36,7 +36,7 @@ static void wots_test(void) {
   trits_set_zero(H);
   trits_set_zero(trits_from_rep(MAM2_WOTS_SK_SIZE, wots->secret_key));
 
-  prng_gen(prng, 7, N, H);
+  mam_prng_gen(prng, 7, N, H);
   wots_gen_sk(wots, prng, N);
   wots_calc_pk(wots, pk);
   wots_sign(wots, H, sig);

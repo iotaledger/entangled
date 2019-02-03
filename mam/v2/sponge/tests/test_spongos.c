@@ -14,9 +14,9 @@
 #include "mam/v2/test_utils/test_utils.h"
 
 static void spongos_test(void) {
-  test_sponge_t test_sponge;
+  test_mam_sponge_t test_sponge;
   test_spongos_t test_spongos;
-  sponge_t *sponge = test_sponge_init(&test_sponge);
+  mam_sponge_t *sponge = test_sponge_init(&test_sponge);
   spongos_t *spongos = test_spongos_init(&test_spongos, sponge);
 
   MAM2_TRITS_DEF0(x, 243);
