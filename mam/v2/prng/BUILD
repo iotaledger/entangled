@@ -32,11 +32,8 @@ cc_library(
     hdrs = ["prng_types.h"],
     deps = [
         ":mam_prng_t_set",
-        "//common:errors",
-        "//mam/v2:defs",
+        ":prng_types_hdr",
         "//mam/v2/pb3",
-        "//mam/v2/sponge",
-        "//mam/v2/trits",
     ],
 )
 
