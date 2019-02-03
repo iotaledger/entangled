@@ -34,7 +34,7 @@ void spongos_fork(spongos_t const *const spongos, spongos_t *const fork) {
 
 void spongos_commit(spongos_t *const spongos) {
   if (spongos->pos != 0) {
-    mam_sponge_transform(spongos->sponge);
+    sponge_transform(spongos->sponge);
     spongos->pos = 0;
   }
 }

@@ -34,6 +34,7 @@ cc_library(
         ":mam_prng_t_set",
         "//common:errors",
         "//mam/v2:defs",
+        "//mam/v2/pb3",
         "//mam/v2/sponge",
         "//mam/v2/trits",
     ],

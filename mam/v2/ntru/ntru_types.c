@@ -12,6 +12,7 @@
 #include "mam/v2/ntru/mam_ntru_pk_t_set.h"
 #include "mam/v2/ntru/mam_ntru_sk_t_set.h"
 #include "mam/v2/ntru/ntru.h"
+#include "mam/v2/pb3/pb3.h"
 
 size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set) {
   return mam_ntru_pk_t_set_size(ntru_pk_set) * sizeof(mam_ntru_pk_t);
@@ -23,9 +24,8 @@ retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
   mam_ntru_pk_t_set_entry_t *tmp = NULL;
 
   HASH_ITER(hh, ntru_pk_set, entry, tmp) {
-    trits_copy(trits_from_rep(MAM2_NTRU_PK_SIZE, entry->value.pk),
-               trits_take(trits, MAM2_NTRU_PK_SIZE));
-    trits = trits_drop(trits, MAM2_NTRU_PK_SIZE);
+    pb3_encode_ntrytes(trits_from_rep(MAM2_NTRU_PK_SIZE, entry->value.pk),
+                       &trits);
   }
 
   return RC_OK;
@@ -34,13 +34,10 @@ retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
 retcode_t mam_ntru_pks_deserialize(trits_t const trits,
                                    mam_ntru_pk_t_set_t *const ntru_pk_set) {
   retcode_t ret = RC_OK;
-  trits_t cpy = trits;
   mam_ntru_pk_t ntru_pk;
 
-  while (!trits_is_empty(cpy)) {
-    trits_copy(trits_take(cpy, MAM2_NTRU_PK_SIZE),
-               trits_from_rep(MAM2_NTRU_PK_SIZE, ntru_pk.pk));
-    cpy = trits_drop(cpy, MAM2_NTRU_PK_SIZE);
+  while (!trits_is_empty(trits)) {
+    pb3_decode_ntrytes(trits_from_rep(MAM2_NTRU_PK_SIZE, ntru_pk.pk), &trits);
     if ((ret = mam_ntru_pk_t_set_add(ntru_pk_set, &ntru_pk)) != RC_OK) {
       break;
     }

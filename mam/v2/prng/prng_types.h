@@ -32,7 +32,7 @@ typedef enum prng_destination_tryte_e {
 } prng_destination_tryte_t;
 
 // PRNG layer interface
-typedef struct prng_s {
+typedef struct mam_prng_s {
   mam_sponge_t* sponge;
   trit_t secret_key[MAM2_PRNG_KEY_SIZE];
 } mam_prng_t;

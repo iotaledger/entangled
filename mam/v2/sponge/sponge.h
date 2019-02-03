@@ -83,7 +83,7 @@ void sponge_init(mam_sponge_t *const sponge);
  *
  * @param sponge Sponge interface
  */
-void mam_sponge_transform(mam_sponge_t *const sponge);
+void sponge_transform(mam_sponge_t *const sponge);
 
 /**
  * Fork (copy) sponge state. `fork` must be initialized

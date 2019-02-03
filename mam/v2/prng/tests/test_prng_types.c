@@ -41,9 +41,7 @@ static bool mam_prng_t_set_cmp(mam_prng_t_set_t const set1,
     }
   }
 
-  TEST_ASSERT_EQUAL_INT(mam_prng_t_set_size(set1), equal_elements_count);
-
-  return true;
+  return mam_prng_t_set_size(set1) == equal_elements_count;
 }
 
 static void test_prng_serialization(void) {

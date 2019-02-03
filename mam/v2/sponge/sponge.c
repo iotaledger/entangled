@@ -68,7 +68,7 @@ void sponge_init(mam_sponge_t *const sponge) {
   trits_set_zero(sponge_state_trits(sponge));
 }
 
-void mam_sponge_transform(mam_sponge_t *const sponge) {
+void sponge_transform(mam_sponge_t *const sponge) {
   sponge->f(sponge->stack, sponge->state);
 }
 
@@ -95,7 +95,7 @@ void sponge_absorb(mam_sponge_t *const sponge, trit_t const c2, trits_t data) {
 
     if (sponge_get_control1(sponge) != 0) {
       sponge_set_control345(sponge, c0, c1, c2);
-      mam_sponge_transform(sponge);
+      sponge_transform(sponge);
     }
 
     trits_copy(curr_data_part, trits_take(s1, ni));
@@ -126,7 +126,7 @@ void sponge_absorbn(mam_sponge_t *const sponge, trit_t const c2, size_t const n,
 
     if (sponge_get_control1(sponge) != 0) {
       sponge_set_control345(sponge, c0, c1, c2);
-      mam_sponge_transform(sponge);
+      sponge_transform(sponge);
     }
 
     buffers_copy_to(&buffers, trits_take(outer_state_trits, ni));
@@ -151,7 +151,7 @@ void sponge_squeeze(mam_sponge_t *const sponge, trit_t const c2,
     c1 = trits_is_empty(squeezed) ? -1 : 1;
 
     sponge_set_control345(sponge, c0, c1, c2);
-    mam_sponge_transform(sponge);
+    sponge_transform(sponge);
 
     trits_copy(trits_take(outer_state_trits, ni), curr_squeezed);
     trits_set_zero(trits_take(outer_state_trits, ni));
@@ -183,7 +183,7 @@ void sponge_encr(mam_sponge_t *const sponge, trits_t plaintext,
     c1 = trits_is_empty(plaintext) ? -1 : 1;
 
     sponge_set_control345(sponge, c0, c1, c2);
-    mam_sponge_transform(sponge);
+    sponge_transform(sponge);
 
     if (trits_is_same(curr_plaintext_part, curr_ciphertext_part)) {
       trits_swap_add(curr_plaintext_part, trits_take(outer_state_trits, ni));
@@ -220,7 +220,7 @@ void sponge_decr(mam_sponge_t *const sponge, trits_t ciphertext,
     c1 = trits_is_empty(plaintext) ? -1 : 1;
 
     sponge_set_control345(sponge, c0, c1, c2);
-    mam_sponge_transform(sponge);
+    sponge_transform(sponge);
 
     if (trits_is_same(curr_plainttext_part, curr_ciphertext_part)) {
       trits_swap_sub(curr_ciphertext_part, trits_take(outer_state_trits, ni));

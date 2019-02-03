@@ -9,16 +9,19 @@
  */
 
 #include "mam/v2/prng/prng_types.h"
+#include "mam/v2/pb3/pb3.h"
 #include "mam/v2/prng/mam_prng_t_set.h"
 
 size_t mam_prng_serialized_size() { return MAM2_PRNG_KEY_SIZE; }
 
 void mam_prng_serialize(mam_prng_t const *const prng, trits_t trits) {
-  trits_copy(trits_from_rep(MAM2_PRNG_KEY_SIZE, prng->secret_key), trits);
+  pb3_encode_ntrytes(trits_from_rep(MAM2_PRNG_KEY_SIZE, prng->secret_key),
+                     &trits);
 }
 
 void mam_prng_deserialize(trits_t const trits, mam_prng_t *const prng) {
-  trits_copy(trits, trits_from_rep(MAM2_PRNG_KEY_SIZE, prng->secret_key));
+  pb3_decode_ntrytes(trits_from_rep(MAM2_PRNG_KEY_SIZE, prng->secret_key),
+                     &trits);
 }
 
 size_t mam_prngs_serialized_size(mam_prng_t_set_t const prng_set) {
