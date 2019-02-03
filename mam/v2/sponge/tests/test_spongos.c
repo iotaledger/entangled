@@ -48,8 +48,7 @@ static void mam_spongos_test(void) {
   MAM2_TRITS_DEF0(spongos_trits, mam_spongos_serialized_size(spongos));
   spongos_trits =
       MAM2_TRITS_INIT(spongos_trits, mam_spongos_serialized_size(spongos));
-  mam_spongos_serialize(spongos, &spongos_trits);
-  spongos_trits.d = 0;
+  mam_spongos_serialize(spongos, spongos_trits);
   deserialized_spongos.sponge = test_create_sponge();
   mam_spongos_deserialize(&spongos_trits, &deserialized_spongos);
 

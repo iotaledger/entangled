@@ -15,10 +15,10 @@ size_t mam_spongos_serialized_size(mam_spongos_t const *const spongos) {
   return pb3_sizeof_size_t(spongos->pos) + MAM2_SPONGE_WIDTH;
 }
 
-void mam_spongos_serialize(mam_spongos_t const *const spongos, trits_t *trits) {
-  pb3_encode_size_t(spongos->pos, trits);
+void mam_spongos_serialize(mam_spongos_t const *const spongos, trits_t trits) {
+  pb3_encode_size_t(spongos->pos, &trits);
   pb3_encode_ntrytes(trits_from_rep(MAM2_SPONGE_WIDTH, spongos->sponge->state),
-                     trits);
+                     &trits);
 }
 
 void mam_spongos_deserialize(trits_t *const trits,

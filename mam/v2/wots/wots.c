@@ -170,10 +170,11 @@ size_t mam_wots_serialized_size(mam_wots_t const *const wots) {
          pb3_sizeof_ntrytes(MAM2_WOTS_SK_SIZE);
 }
 
-void mam_wots_serialize(mam_wots_t const *const wots, trits_t *const trits) {
+void mam_wots_serialize(mam_wots_t const *const wots, trits_t trits) {
   mam_spongos_serialize(&wots->spongos, trits);
+  trits = trits_drop(trits,mam_spongos_serialized_size(&wots->spongos));
   pb3_encode_ntrytes(trits_from_rep(MAM2_WOTS_SK_SIZE, wots->secret_key),
-                     trits);
+                     &trits);
 }
 
 void mam_mam_wots_deserialize(trits_t const *const trits,

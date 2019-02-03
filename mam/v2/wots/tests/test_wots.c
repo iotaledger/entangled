@@ -65,8 +65,7 @@ static void mam_wots_test(void) {
 
   // Test Serialization
 
-  mam_wots_serialize(wots, &serialized_wots_trits);
-  serialized_wots_trits.d = 0;
+  mam_wots_serialize(wots, serialized_wots_trits);
   mam_mam_wots_deserialize(&serialized_wots_trits, &deserialized_wots);
 
   TEST_ASSERT_EQUAL_MEMORY(wots->secret_key, deserialized_wots.secret_key,
