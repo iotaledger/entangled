@@ -8,6 +8,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <memory.h>
 #include <unity/unity.h>
 
 #include "mam/v2/ntru/ntru.h"
@@ -101,7 +102,6 @@ static void ntru_decr_fail_test(void) {
   s->sponge = _s;
   s->sponge->f = ntru_test_f;
   s->sponge->stack = &mask;
-  s->sponge->state = state;
 
   trits_set1(u, 1);
   trits_set1(key, 0);
