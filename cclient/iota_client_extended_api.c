@@ -56,46 +56,6 @@ done:
   return ret_code;
 }
 
-static retcode_t check_consistency(iota_client_service_t const* const serv,
-                                   flex_trit_t const* const tail_tx) {
-  retcode_t ret_code = RC_OK;
-  check_consistency_req_t* consistency_req = NULL;
-  check_consistency_res_t* consistency_res = NULL;
-
-  log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
-
-  consistency_req = check_consistency_req_new();
-  if (!consistency_req) {
-    ret_code = RC_CCLIENT_NULL_PTR;
-    log_error(logger_id, "%s check_consistency_req_new failed: %s\n", __func__,
-              error_2_string(ret_code));
-    goto cleanup;
-  }
-  consistency_res = check_consistency_res_new();
-  if (!consistency_res) {
-    ret_code = RC_CCLIENT_NULL_PTR;
-    log_error(logger_id, "%s check_consistency_res_new failed: %s\n", __func__,
-              error_2_string(ret_code));
-    goto cleanup;
-  }
-
-  hash243_queue_push(&consistency_req->tails, tail_tx);
-  ret_code =
-      iota_client_check_consistency(serv, consistency_req, consistency_res);
-  if (ret_code) {
-    log_warning(logger_id, "check consistency failed\n");
-    goto cleanup;
-  }
-  if (!consistency_res->state) {
-    ret_code = RC_CCLIENT_CONSISTENCY;
-  }
-
-cleanup:
-  check_consistency_req_free(&consistency_req);
-  check_consistency_res_free(consistency_res);
-  return ret_code;
-}
-
 static retcode_t traverse_bundle(iota_client_service_t const* const serv,
                                  flex_trit_t const* const tail_hash,
                                  bundle_transactions_t* const bundle,
@@ -103,10 +63,10 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
   retcode_t ret_code = RC_OK;
   get_trytes_req_t* get_trytes_req = NULL;
   get_trytes_res_t* get_trytes_res = NULL;
-  iota_transaction_t tx;
-  flex_trit_t* tmp_trytes;
+  iota_transaction_t tx = {};
+  flex_trit_t* tmp_trytes = NULL;
   flex_trit_t trunk_hash[FLEX_TRIT_SIZE_243];
-  int64_t current_index, last_index;
+  int64_t current_index = 0, last_index = 0;
 
   log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
 
@@ -630,10 +590,7 @@ done:
   get_transactions_to_approve_req_free(&tx_approve_req);
   get_transactions_to_approve_res_free(&tx_approve_res);
   attach_to_tangle_res_free(&attach_res);
-  if (attach_req) {
-    attach_req->trytes = NULL;
-    attach_to_tangle_req_free(&attach_req);
-  }
+  attach_to_tangle_req_free(&attach_req);
   return ret_code;
 }
 
@@ -750,32 +707,49 @@ retcode_t iota_client_promote_transaction(
     iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
     int const depth, int const mwm, transfer_list_t const* const transfers,
     transaction_array_t* const tx_objs) {
+  log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
   retcode_t ret_code = RC_OK;
   iota_transaction_t* spam_transaction = NULL;
 
-  log_debug(logger_id, "[%s:%d]\n", __func__, __LINE__);
-
   // check consistency
-  ret_code = check_consistency(serv, tail_hash);
-  if (ret_code != RC_OK) {
-    log_error(logger_id, "%s check_consistency failed: %s\n", __func__,
-              error_2_string(ret_code));
-    return ret_code;
-  }
-
-  // adding spam transaction
-  spam_transaction = transaction_new_spam();
-  if (!spam_transaction) {
+  check_consistency_req_t* consistency_req = check_consistency_req_new();
+  check_consistency_res_t* consistency_res = check_consistency_res_new();
+  if (!consistency_req || !consistency_res) {
     ret_code = RC_CCLIENT_OOM;
-    log_error(logger_id, "%s transaction_deserialize failed: %s\n", __func__,
-              error_2_string(ret_code));
-    return ret_code;
+    goto done;
   }
 
-  // Waiting for iota_client_send_transfer implementation
-  // return iota_client_send_transfer(serv, tail_hash, depth, mwm, transfers,
-  // tx_objs);
+  hash243_queue_push(&consistency_req->tails, tail_hash);
+  ret_code =
+      iota_client_check_consistency(serv, consistency_req, consistency_res);
+  if (ret_code != RC_OK) {
+    log_error(logger_id, "%s checking consistency failed: %s\n", __func__,
+              error_2_string(ret_code));
+    goto done;
+  }
 
+  if (consistency_res->state) {
+    // adding spam transaction
+    spam_transaction = transaction_new();
+    if (!spam_transaction) {
+      ret_code = RC_CCLIENT_OOM;
+      log_error(logger_id, "%s transaction_deserialize failed: %s\n", __func__,
+                error_2_string(ret_code));
+      goto done;
+    }
+
+    // Waiting for iota_client_send_transfer implementation
+    // return iota_client_send_transfer(serv, tail_hash, depth, mwm, transfers,
+    // tx_objs);
+
+  } else {
+    log_warning(logger_id, "%s the tail is not consistency: %s\n", __func__,
+                consistency_res->info);
+  }
+
+done:
+  check_consistency_req_free(&consistency_req);
+  check_consistency_res_free(consistency_res);
   return ret_code;
 }
 
@@ -796,7 +770,7 @@ retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv,
   if (bundle_status == BUNDLE_VALID) {
     // bundle to trytes
     BUNDLE_FOREACH(bundle, curr_tx) {
-      transaction_serialize_to_flex_trits(curr_tx, flex_tx);
+      transaction_serialize_on_flex_trits(curr_tx, flex_tx);
       hash_array_push(trytes, flex_tx);
     }
 

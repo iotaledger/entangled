@@ -49,23 +49,12 @@ void test_reset(void) {
   transaction_free(transaction);
 }
 
-void test_spam_transaction(void) {
-  iota_transaction_t *transaction = transaction_new_spam();
-  TEST_ASSERT_EQUAL_MEMORY(TRITS, transaction->signature_or_message,
-                           sizeof(transaction->signature_or_message));
-  TEST_ASSERT_EQUAL_MEMORY(TRITS, transaction->address,
-                           sizeof(transaction->address));
-  TEST_ASSERT_EQUAL_MEMORY(TRITS, transaction->tag, sizeof(transaction->tag));
-  transaction_free(transaction);
-}
-
 int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_deserialize_and_serialize);
   RUN_TEST(test_deserialize_and_serialize_allocated);
   RUN_TEST(test_reset);
-  RUN_TEST(test_spam_transaction);
 
   return UNITY_END();
 }

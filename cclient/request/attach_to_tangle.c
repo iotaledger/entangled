@@ -24,10 +24,6 @@ void attach_to_tangle_req_free(attach_to_tangle_req_t** req) {
     return;
   }
 
-  if ((*req)->trytes) {
-    hash_array_free((*req)->trytes);
-  }
-
   free(*req);
   *req = NULL;
 }
