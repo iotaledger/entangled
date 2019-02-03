@@ -41,7 +41,6 @@ mam_ntru_sk_t *test_ntru_init(test_ntru_t *n) {
 
 mam_prng_t *test_prng_init(test_prng_t *p, mam_sponge_t *s) {
   p->p.sponge = s;
-  p->p.secret_key = p->secret_key;
   memset(p->p.secret_key, 0, MAM2_PRNG_KEY_SIZE);
   return &p->p;
 }

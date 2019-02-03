@@ -41,19 +41,13 @@ retcode_t mam_prng_create(mam_prng_t *const prng) {
   MAM2_ASSERT(prng);
 
   prng->sponge = NULL;
-  if ((prng->secret_key = calloc(MAM2_PRNG_KEY_SIZE, sizeof(trit_t))) == NULL) {
-    return RC_OOM;
-  }
 
   return ret;
 }
 
 void mam_prng_destroy(mam_prng_t *const prng) {
   MAM2_ASSERT(prng);
-
   prng->sponge = NULL;
-  free(prng->secret_key);
-  prng->secret_key = NULL;
 }
 
 void mam_prng_init(mam_prng_t *const prng, mam_sponge_t *const sponge,
