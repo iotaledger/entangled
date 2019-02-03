@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include "mam/v2/prng/prng.h"
+#include "mam/v2/prng/prng_t_set.h"
 
 /*
  * Private functions

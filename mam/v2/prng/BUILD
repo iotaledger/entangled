@@ -1,3 +1,5 @@
+load("//utils/containers:typed_container_generator.bzl", "typed_container_generate")
+
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
@@ -5,9 +7,42 @@ cc_library(
     srcs = ["prng.c"],
     hdrs = ["prng.h"],
     deps = [
+        ":prng_types",
         "//common:errors",
         "//mam/v2:defs",
         "//mam/v2/sponge",
         "//mam/v2/trits",
     ],
+)
+
+cc_library(
+    name = "prng_types_hdr",
+    hdrs = ["prng_types.h"],
+    deps = [
+        "//common:errors",
+        "//mam/v2:defs",
+        "//mam/v2/sponge",
+        "//mam/v2/trits",
+    ],
+)
+
+cc_library(
+    name = "prng_types",
+    srcs = ["prng_types.c"],
+    hdrs = ["prng_types.h"],
+    deps = [
+        ":prng_t_set",
+        "//common:errors",
+        "//mam/v2:defs",
+        "//mam/v2/sponge",
+        "//mam/v2/trits",
+    ],
+)
+
+typed_container_generate(
+    additional_deps = ":prng_types_hdr",
+    additional_include_path = "mam/v2/prng/prng_types.h",
+    container_type = "set",
+    parent_directory = "mam/v2/prng",
+    value_type = "prng_t",
 )

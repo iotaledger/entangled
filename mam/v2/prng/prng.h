@@ -13,30 +13,13 @@
 
 #include "common/errors.h"
 #include "mam/v2/defs.h"
+#include "mam/v2/prng/prng_types.h"
 #include "mam/v2/sponge/sponge.h"
 #include "mam/v2/trits/trits.h"
-
-// PRNG secret key size
-#define MAM2_PRNG_KEY_SIZE 243
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef enum prng_destination_tryte_e {
-  // PRNG AE destination tryte
-  MAM2_PRNG_DST_SEC_KEY = 0,
-  // PRNG WOTS destination tryte
-  MAM2_PRNG_DST_WOTS_KEY = 1,
-  // PRNG NTRU destination tryte
-  MAM2_PRNG_DST_NTRU_KEY = 2
-} prng_destination_tryte_t;
-
-// PRNG layer interface
-typedef struct prng_s {
-  sponge_t *sponge;
-  trit_t *secret_key;
-} prng_t;
 
 /**
  * Allocates memory for PRNG secret key
