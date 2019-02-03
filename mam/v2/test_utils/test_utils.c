@@ -57,7 +57,7 @@ mam_spongos_t *test_mam_spongos_init(test_mam_spongos_t *sg, mam_sponge_t *s) {
   return sg;
 }
 
-wots_t *test_wots_init(test_wots_t *w, mam_sponge_t *s) {
+mam_wots_t *test_mam_wots_init(test_mam_wots_t *w, mam_sponge_t *s) {
   w->wots.spongos.sponge = s;
   w->wots.secret_key = w->secret_key;
   memset(w->wots.secret_key, 0, MAM2_WOTS_SK_PART_SIZE);
@@ -283,15 +283,15 @@ void _prng_gen(size_t Kn, char *K, size_t Nn, char *N, size_t Yn, char *Y) {
   trits_free(tY);
 }
 
-void _wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
-                    char *pk, size_t Hn, char *H, size_t sign, char *sig) {
+void _mam_wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
+                        char *pk, size_t Hn, char *H, size_t sign, char *sig) {
   test_mam_sponge_t _s[1];
   test_prng_t _p[1];
-  test_wots_t _w[1];
+  test_mam_wots_t _w[1];
 
   mam_sponge_t *s = test_mam_sponge_init(_s);
   mam_prng_t *p = test_prng_init(_p, s);
-  wots_t *w = test_wots_init(_w, s);
+  mam_wots_t *w = test_mam_wots_init(_w, s);
 
   trits_t tK = trits_alloc(3 * Kn);
   trits_t tN = trits_alloc(3 * Nn);
@@ -302,12 +302,12 @@ void _wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   trits_from_str(tK, K);
   mam_prng_init(p, s, tK);
   trits_from_str(tN, N);
-  wots_gen_sk(w, p, tN);
-  wots_calc_pk(w, tpk);
+  mam_wots_gen_sk(w, p, tN);
+  mam_wots_calc_pk(w, tpk);
   trits_to_str(tpk, pk);
 
   trits_from_str(tH, H);
-  wots_sign(w, tH, tsig);
+  mam_wots_sign(w, tH, tsig);
   trits_to_str(tsig, sig);
 
   trits_free(tK);
@@ -436,7 +436,8 @@ void test_gen_prng(mam_prng_t *p, mam_prng_t *r, mam_sponge_t *s) {
 #undef TEST_MAX_SIZE
 }
 
-void test_gen_wots(mam_prng_t *p, wots_t *w, mam_sponge_t *s, mam_prng_t *r) {
+void test_gen_wots(mam_prng_t *p, mam_wots_t *w, mam_sponge_t *s,
+                   mam_prng_t *r) {
 #define TEST_MAX_SIZE (MAM2_SPONGE_RATE * 3)
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
   MAM2_TRITS_DEF0(N, TEST_MAX_SIZE);
@@ -455,7 +456,7 @@ void test_gen_wots(mam_prng_t *p, wots_t *w, mam_sponge_t *s, mam_prng_t *r) {
   prng_gen_str(p, MAM2_PRNG_DST_SEC_KEY, "WOTSPRNGKEY", K);
   prng_gen_str(p, 4, "WOTSNONCE", N);
 
-  wots_init(w, s);
+  mam_wots_init(w, s);
   mam_prng_init(r, s, K);
 
   printf("wots\n");
@@ -465,20 +466,20 @@ void test_gen_wots(mam_prng_t *p, wots_t *w, mam_sponge_t *s, mam_prng_t *r) {
   for (i = 0; ns[i] < TEST_MAX_SIZE; ++i) {
     n = trits_take(N, ns[i]);
 
-    wots_gen_sk(w, r, n);
-    wots_calc_pk(w, Q);
+    mam_wots_gen_sk(w, r, n);
+    mam_wots_calc_pk(w, Q);
     trits_print2("\tn\t=", n, "\n");
     trits_print2("\tpk\t=", Q, "\n");
     printf("----------\n");
 
     prng_gen_str(p, 4, "WOTSHASH", H);
-    wots_sign(w, H, X);
+    mam_wots_sign(w, H, X);
     trits_print2("\tH\t=", H, "\n");
     trits_print2("\tsig\t=", X, "\n");
     printf("----------\n");
 
     prng_gen_str(p, 4, "WOTSHASH9", H);
-    wots_sign(w, H, X);
+    mam_wots_sign(w, H, X);
     trits_print2("\tH\t=", H, "\n");
     trits_print2("\tsig\t=", X, "\n");
     printf("----------\n");
@@ -488,7 +489,7 @@ void test_gen_wots(mam_prng_t *p, wots_t *w, mam_sponge_t *s, mam_prng_t *r) {
 }
 
 #if 0
-void test_gen_mss(prng_t *p, mss_t *m, prng_t *r, mam_sponge_t *spongos, wots_t *w)
+void test_gen_mss(prng_t *p, mss_t *m, prng_t *r, mam_sponge_t *spongos, mam_wots_t *w)
 {
 #define TEST_MAX_SIZE (MAM2_SPONGE_RATE * 3)
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
@@ -521,20 +522,20 @@ void test_gen_mss(prng_t *p, mss_t *m, prng_t *r, mam_sponge_t *spongos, wots_t 
 
     n = trits_take(N, spongos_ntru[i]);
 
-    wots_gen_sk(w, r, n);
-    wots_calc_pk(w, Q);
+    mam_wots_gen_sk(w, r, n);
+    mam_wots_calc_pk(w, Q);
     trits_print2("\tn\t=", n, "\n");
     trits_print2("\tpk\t=", Q, "\n");
     printf("----------\n");
 
     prng_gen_str(p, 4, "WOTSHASH", H);
-    wots_sign(w, H, X);
+    mam_wots_sign(w, H, X);
     trits_print2("\tH\t=", H, "\n");
     trits_print2("\tsig\t=", X, "\n");
     printf("----------\n");
 
     prng_gen_str(p, 4, "WOTSHASH9", H);
-    wots_sign(w, H, X);
+    mam_wots_sign(w, H, X);
     trits_print2("\tH\t=", H, "\n");
     trits_print2("\tsig\t=", X, "\n");
     printf("----------\n");
@@ -598,7 +599,7 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //   test_mam_sponge_t _s[1];
 //   test_mam_spongos_t _sg[1];
 //   test_prng_t _p[1], _pa[1], _pb[1];
-//   test_wots_t _w[1];
+//   test_mam_wots_t _w[1];
 //   test_mss1 _m1[1];
 //   test_mss2 _m2[1];
 //   test_mss3 _m3[1];
@@ -611,7 +612,7 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //   prng_t *p = test_prng_init(_p, spongos);
 //   prng_t *pa = test_prng_init(_pa, spongos);
 //   prng_t *pb = test_prng_init(_pb, spongos);
-//   wots_t *w = test_wots_init(_w, spongos);
+//   mam_wots_t *w = test_mam_wots_init(_w, spongos);
 //   mss_t *m1 = test_mss_init1(_m1);
 //   mss_t *m2 = test_mss_init2(_m2);
 //   mss_t *m3 = test_mss_init3(_m3);
@@ -651,7 +652,7 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //   prng_t *p = test_prng_init(_p, spongos);
 //   prng_t *pa = test_prng_init(_pa, spongos);
 //   prng_t *pb = test_prng_init(_pb, spongos);
-//   wots_t *w = test_wots_init(_w, spongos);
+//   mam_wots_t *w = test_mam_wots_init(_w, spongos);
 //   mss_t *m1 = test_mss_init1(_m1);
 //   mss_t *m2 = test_mss_init2(_m2);
 //   mss_t *m3 = test_mss_init3(_m3);
@@ -708,8 +709,8 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //   char mam_sponge_encr_Y[162];
 //   char mam_sponge_decr_X[162];
 //   char prng_gen_Y[162];
-//   char wots_gen_sign_pk[MAM2_WOTS_PK_SIZE / 3];
-//   char wots_gen_sign_sig[MAM2_WOTS_SIG_SIZE / 3];
+//   char mam_wots_gen_sign_pk[MAM2_WOTS_PK_SIZE / 3];
+//   char mam_wots_gen_sign_sig[MAM2_WOTS_SIG_SIZE / 3];
 //
 //   do {
 //     r = _() && r;
@@ -718,9 +719,9 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //     mam_sponge_encr(81, K, 162, X, mam_sponge_encr_Yn, mam_sponge_encr_Y);
 //     mam_sponge_decr(81, K, 162, X, mam_sponge_decr_Xn, mam_sponge_decr_X);
 //     prng_gen(81, K, 12, N, prng_gen_Yn, prng_gen_Y);
-//     wots_gen_sign(81, K, 12, N, MAM2_WOTS_PK_SIZE / 3, wots_gen_sign_pk, 78,
-//     H,
-//                   MAM2_WOTS_SIG_SIZE / 3, wots_gen_sign_sig);
+//     mam_wots_gen_sign(81, K, 12, N, MAM2_WOTS_PK_SIZE / 3,
+//     mam_wots_gen_sign_pk, 78, H,
+//                   MAM2_WOTS_SIG_SIZE / 3, mam_wots_gen_sign_sig);
 //   } while (0)
 // }
 //

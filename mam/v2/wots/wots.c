@@ -17,8 +17,8 @@
  * Private functions
  */
 
-static void wots_calc_pks(mam_spongos_t *const spongos, trits_t secret_key,
-                          trits_t public_key) {
+static void mam_wots_calc_pks(mam_spongos_t *const spongos, trits_t secret_key,
+                              trits_t public_key) {
   trits_t secret_key_part;
 
   for (size_t i = 0; i < MAM2_WOTS_SK_PART_COUNT; ++i) {
@@ -72,7 +72,7 @@ static void wots_hash_sign_or_recover(mam_spongos_t *const spongos,
   }
 }
 
-static inline trits_t wots_secret_key_trits(wots_t const *const wots) {
+static inline trits_t wots_secret_key_trits(mam_wots_t const *const wots) {
   return trits_from_rep(MAM2_WOTS_SK_SIZE, wots->secret_key);
 }
 
@@ -80,18 +80,18 @@ static inline trits_t wots_secret_key_trits(wots_t const *const wots) {
  * Public functions
  */
 
-retcode_t wots_create(wots_t *const wots) {
+retcode_t mam_wots_create(mam_wots_t *const wots) {
   retcode_t ret = RC_OK;
   MAM2_ASSERT(wots);
 
-  memset(wots, 0, sizeof(wots_t));
+  memset(wots, 0, sizeof(mam_wots_t));
   if ((wots->secret_key = calloc(MAM2_WOTS_SK_SIZE, sizeof(trit_t))) == NULL) {
     return RC_OOM;
   }
   return ret;
 }
 
-void wots_destroy(wots_t *const wots) {
+void mam_wots_destroy(mam_wots_t *const wots) {
   MAM2_ASSERT(wots);
 
   free(wots->secret_key);
@@ -99,44 +99,45 @@ void wots_destroy(wots_t *const wots) {
   free(wots);
 }
 
-void wots_init(wots_t *const wots, mam_sponge_t *const sponge) {
+void mam_wots_init(mam_wots_t *const wots, mam_sponge_t *const sponge) {
   MAM2_ASSERT(wots);
   MAM2_ASSERT(sponge);
 
   wots->spongos.sponge = sponge;
 }
 
-void wots_gen_sk(wots_t *const wots, mam_prng_t const *const prng,
-                 trits_t const nonce) {
-  wots_gen_sk3(wots, prng, nonce, trits_null(), trits_null());
+void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *const prng,
+                     trits_t const nonce) {
+  mam_wots_gen_sk3(wots, prng, nonce, trits_null(), trits_null());
 }
 
-void wots_gen_sk2(wots_t *const wots, mam_prng_t const *const prng,
-                  trits_t const nonce1, trits_t const nonce2) {
-  wots_gen_sk3(wots, prng, nonce1, nonce2, trits_null());
+void mam_wots_gen_sk2(mam_wots_t *const wots, mam_prng_t const *const prng,
+                      trits_t const nonce1, trits_t const nonce2) {
+  mam_wots_gen_sk3(wots, prng, nonce1, nonce2, trits_null());
 }
 
-void wots_gen_sk3(wots_t *const wots, mam_prng_t const *const prng,
-                  trits_t const nonce1, trits_t const nonce2,
-                  trits_t const nonce3) {
+void mam_wots_gen_sk3(mam_wots_t *const wots, mam_prng_t const *const prng,
+                      trits_t const nonce1, trits_t const nonce2,
+                      trits_t const nonce3) {
   mam_prng_gen3(prng, MAM2_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3,
                 wots_secret_key_trits(wots));
 }
 
-void wots_calc_pk(wots_t *const wots, trits_t public_key) {
+void mam_wots_calc_pk(mam_wots_t *const wots, trits_t public_key) {
   MAM2_ASSERT(trits_size(public_key) == MAM2_WOTS_PK_SIZE);
 
   MAM2_TRITS_DEF0(secret_key, MAM2_WOTS_SK_SIZE);
   secret_key = MAM2_TRITS_INIT(secret_key, MAM2_WOTS_SK_SIZE);
 
   trits_copy(wots_secret_key_trits(wots), secret_key);
-  wots_calc_pks(&wots->spongos, secret_key, public_key);
+  mam_wots_calc_pks(&wots->spongos, secret_key, public_key);
   mam_spongos_hash(&wots->spongos, secret_key, public_key);
 
   trits_set_zero(secret_key);
 }
 
-void wots_sign(wots_t *const wots, trits_t const hash, trits_t signature) {
+void mam_wots_sign(mam_wots_t *const wots, trits_t const hash,
+                   trits_t signature) {
   MAM2_ASSERT(trits_size(hash) == MAM2_WOTS_HASH_SIZE);
   MAM2_ASSERT(trits_size(signature) == MAM2_WOTS_SK_SIZE);
 
@@ -144,8 +145,8 @@ void wots_sign(wots_t *const wots, trits_t const hash, trits_t signature) {
   wots_hash_sign_or_recover(&wots->spongos, signature, hash, WOTS_HASH_SIGN);
 }
 
-void wots_recover(mam_spongos_t *const spongos, trits_t const hash,
-                  trits_t const signature, trits_t public_key) {
+void mam_wots_recover(mam_spongos_t *const spongos, trits_t const hash,
+                      trits_t const signature, trits_t public_key) {
   MAM2_ASSERT(trits_size(hash) == MAM2_WOTS_HASH_SIZE);
   MAM2_ASSERT(trits_size(signature) == MAM2_WOTS_SK_SIZE);
 
@@ -157,12 +158,12 @@ void wots_recover(mam_spongos_t *const spongos, trits_t const hash,
   mam_spongos_hash(spongos, sig_pks, public_key);
 }
 
-bool wots_verify(mam_spongos_t *const spongos, trits_t const hash,
-                 trits_t const signature, trits_t const public_key) {
+bool mam_wots_verify(mam_spongos_t *const spongos, trits_t const hash,
+                     trits_t const signature, trits_t const public_key) {
   MAM2_TRITS_DEF0(recovered_public_key, MAM2_WOTS_PK_SIZE);
   recovered_public_key =
       MAM2_TRITS_INIT(recovered_public_key, MAM2_WOTS_PK_SIZE);
 
-  wots_recover(spongos, hash, signature, recovered_public_key);
+  mam_wots_recover(spongos, hash, signature, recovered_public_key);
   return trits_cmp_eq(public_key, recovered_public_key);
 }

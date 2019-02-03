@@ -47,11 +47,11 @@ retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, mam_prng_t *p,
     return RC_OOM;
   }
 
-  m->wots = malloc(sizeof(wots_t));
+  m->wots = malloc(sizeof(mam_wots_t));
   if (!m->wots) {
     return RC_OOM;
   }
-  if ((e = (wots_create(m->wots))) != RC_OK) {
+  if ((e = (mam_wots_create(m->wots))) != RC_OK) {
     return e;
   }
 
@@ -59,7 +59,7 @@ retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, mam_prng_t *p,
   if (!m->wots->spongos.sponge) {
     return RC_OOM;
   }
-  wots_init(m->wots, m->wots->spongos.sponge);
+  mam_wots_init(m->wots, m->wots->spongos.sponge);
 
   mss_init(m, p, m->sg->sponge, m->wots, d, m->nonce1, m->nonce2);
 
@@ -81,7 +81,7 @@ void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m) {
     ma->destroy_sponge(m->wots->spongos.sponge);
     m->wots->spongos.sponge = 0;
   }
-  wots_destroy(m->wots);
+  mam_wots_destroy(m->wots);
   m->wots = 0;
 
   ma->destroy_sponge(m->sg->sponge);

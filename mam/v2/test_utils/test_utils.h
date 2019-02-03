@@ -50,15 +50,15 @@ typedef struct test_sponge_s {
 typedef mam_spongos_t test_mam_spongos_t;
 
 typedef struct test_wots_s {
-  wots_t wots;
+  mam_wots_t wots;
   trit_t secret_key[MAM2_WOTS_SK_SIZE];
-} test_wots_t;
+} test_mam_wots_t;
 
 mam_ntru_sk_t *test_ntru_init(test_ntru_t *n);
 mam_prng_t *test_prng_init(test_prng_t *p, mam_sponge_t *s);
 mam_sponge_t *test_mam_sponge_init(test_mam_sponge_t *s);
 mam_spongos_t *test_mam_spongos_init(test_mam_spongos_t *sg, mam_sponge_t *s);
-wots_t *test_wots_init(test_wots_t *w, mam_sponge_t *s);
+mam_wots_t *test_mam_wots_init(test_mam_wots_t *w, mam_sponge_t *s);
 
 static inline mam_sponge_t *test_create_sponge() {
   test_mam_sponge_t *t = malloc(sizeof(test_mam_sponge_t));
