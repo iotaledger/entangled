@@ -59,7 +59,6 @@ mam_spongos_t *test_mam_spongos_init(test_mam_spongos_t *sg, mam_sponge_t *s) {
 
 mam_wots_t *test_mam_wots_init(test_mam_wots_t *w, mam_sponge_t *s) {
   w->wots.spongos.sponge = s;
-  w->wots.secret_key = w->secret_key;
   memset(w->wots.secret_key, 0, MAM2_WOTS_SK_PART_SIZE);
   return &w->wots;
 }

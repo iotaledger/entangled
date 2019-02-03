@@ -37,7 +37,7 @@ extern "C" {
 // WOTS layer interface
 typedef struct mam_wots_s {
   mam_spongos_t spongos;
-  trit_t *secret_key;
+  trit_t secret_key[MAM2_WOTS_SK_SIZE];
 } mam_wots_t;
 
 /**
@@ -144,10 +144,10 @@ bool mam_wots_verify(mam_spongos_t *const spongos, trits_t const hash,
 
 size_t mam_wots_serialized_size(mam_wots_t const *const wots);
 
-void mam_wots_serialize(mam_wots_t const *const wots, trits_t trits);
+void mam_wots_serialize(mam_wots_t const *const wots, trits_t *const trits);
 
-void mam_mam_wots_deserialize(mam_wots_t const trits,
-                              mam_spongos_t *const wots);
+void mam_mam_wots_deserialize(trits_t const *const trits,
+                              mam_wots_t *const wots);
 
 #ifdef __cplusplus
 }

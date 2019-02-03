@@ -48,12 +48,18 @@ static void mam_spongos_test(void) {
   MAM2_TRITS_DEF0(spongos_trits, mam_spongos_serialized_size(spongos));
   spongos_trits =
       MAM2_TRITS_INIT(spongos_trits, mam_spongos_serialized_size(spongos));
-  mam_spongos_serialize(spongos, spongos_trits);
-  // mam_spongos_deserialize(spongos_trits,&deserialized_spongos);
+  mam_spongos_serialize(spongos, &spongos_trits);
+  spongos_trits.d = 0;
+  deserialized_spongos.sponge = test_create_sponge();
+  mam_spongos_deserialize(&spongos_trits, &deserialized_spongos);
 
-  // TEST_ASSERT_EQUAL_INT(spongos->pos,deserialized_spongos.pos);
+  TEST_ASSERT_EQUAL_INT(spongos->pos, deserialized_spongos.pos);
+  TEST_ASSERT_EQUAL_MEMORY(spongos->sponge->state,
+                           deserialized_spongos.sponge->state,
+                           MAM2_SPONGE_WIDTH);
 
   TEST_ASSERT_TRUE(trits_cmp_eq(x, z));
+  test_delete_sponge(deserialized_spongos.sponge);
 }
 
 int main(void) {

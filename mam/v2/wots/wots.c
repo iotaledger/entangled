@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "mam/v2/pb3/pb3.h"
+#include "mam/v2/sponge/spongos_types.h"
 #include "mam/v2/wots/wots.h"
 
 /*
@@ -85,17 +87,12 @@ retcode_t mam_wots_create(mam_wots_t *const wots) {
   MAM2_ASSERT(wots);
 
   memset(wots, 0, sizeof(mam_wots_t));
-  if ((wots->secret_key = calloc(MAM2_WOTS_SK_SIZE, sizeof(trit_t))) == NULL) {
-    return RC_OOM;
-  }
   return ret;
 }
 
 void mam_wots_destroy(mam_wots_t *const wots) {
   MAM2_ASSERT(wots);
-
-  free(wots->secret_key);
-  wots->secret_key = NULL;
+  memset(wots->secret_key, 0, MAM2_WOTS_SK_SIZE);
   free(wots);
 }
 
@@ -166,4 +163,22 @@ bool mam_wots_verify(mam_spongos_t *const spongos, trits_t const hash,
 
   mam_wots_recover(spongos, hash, signature, recovered_public_key);
   return trits_cmp_eq(public_key, recovered_public_key);
+}
+
+size_t mam_wots_serialized_size(mam_wots_t const *const wots) {
+  return mam_spongos_serialized_size(&wots->spongos) +
+         pb3_sizeof_ntrytes(MAM2_WOTS_SK_SIZE);
+}
+
+void mam_wots_serialize(mam_wots_t const *const wots, trits_t *const trits) {
+  mam_spongos_serialize(&wots->spongos, trits);
+  pb3_encode_ntrytes(trits_from_rep(MAM2_WOTS_SK_SIZE, wots->secret_key),
+                     trits);
+}
+
+void mam_mam_wots_deserialize(trits_t const *const trits,
+                              mam_wots_t *const wots) {
+  mam_spongos_deserialize(trits, &wots->spongos);
+  pb3_decode_ntrytes(trits_from_rep(MAM2_WOTS_SK_SIZE, wots->secret_key),
+                     trits);
 }
