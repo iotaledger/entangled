@@ -12,16 +12,16 @@
 #include "common/defs.h"
 #include "mam/v2/trits/buffers.h"
 
-static trits_t sponge_state_trits(sponge_t const *const sponge) {
+static trits_t sponge_state_trits(mam_sponge_t const *const sponge) {
   return trits_from_rep(MAM2_SPONGE_WIDTH, sponge->state);
 }
 
-static trits_t sponge_control_trits(sponge_t const *const sponge) {
+static trits_t sponge_control_trits(mam_sponge_t const *const sponge) {
   return trits_take(trits_drop(sponge_state_trits(sponge), MAM2_SPONGE_RATE),
                     MAM2_SPONGE_CONTROL);
 }
 
-static void sponge_set_control12(sponge_t *const sponge, trit_t const c1,
+static void sponge_set_control12(mam_sponge_t *const sponge, trit_t const c1,
                                  trit_t const c2) {
   trits_t t =
       trits_take(sponge_control_trits(sponge), NUMBER_OF_TRITS_IN_A_TRYTE);
@@ -32,7 +32,7 @@ static void sponge_set_control12(sponge_t *const sponge, trit_t const c1,
   trits_put1(t, c2);
 }
 
-static void sponge_set_control012(sponge_t *const sponge, trit_t const c0,
+static void sponge_set_control012(mam_sponge_t *const sponge, trit_t const c0,
                                   trit_t const c1, trit_t const c2) {
   trits_t t =
       trits_take(sponge_control_trits(sponge), NUMBER_OF_TRITS_IN_A_TRYTE);
@@ -44,7 +44,7 @@ static void sponge_set_control012(sponge_t *const sponge, trit_t const c0,
   trits_put1(t, c2);
 }
 
-static void sponge_set_control345(sponge_t *const sponge, trit_t const c3,
+static void sponge_set_control345(mam_sponge_t *const sponge, trit_t const c3,
                                   trit_t const c4, trit_t const c5) {
   trits_t t =
       trits_drop(sponge_control_trits(sponge), NUMBER_OF_TRITS_IN_A_TRYTE);
@@ -56,27 +56,27 @@ static void sponge_set_control345(sponge_t *const sponge, trit_t const c3,
   trits_put1(t, c5);
 }
 
-static trit_t sponge_get_control1(sponge_t const *const sponge) {
+static trit_t sponge_get_control1(mam_sponge_t const *const sponge) {
   return trits_get1(trits_drop(sponge_control_trits(sponge), 1));
 }
 
-trits_t sponge_outer_trits(sponge_t const *const sponge) {
+trits_t sponge_outer_trits(mam_sponge_t const *const sponge) {
   return trits_take(sponge_state_trits(sponge), MAM2_SPONGE_RATE);
 }
 
-void sponge_init(sponge_t *const sponge) {
+void sponge_init(mam_sponge_t *const sponge) {
   trits_set_zero(sponge_state_trits(sponge));
 }
 
-void sponge_transform(sponge_t *const sponge) {
+void mam_sponge_transform(mam_sponge_t *const sponge) {
   sponge->f(sponge->stack, sponge->state);
 }
 
-void sponge_fork(sponge_t const *const sponge, sponge_t *const fork) {
+void sponge_fork(mam_sponge_t const *const sponge, mam_sponge_t *const fork) {
   trits_copy(sponge_state_trits(sponge), sponge_state_trits(fork));
 }
 
-void sponge_absorb(sponge_t *const sponge, trit_t const c2, trits_t data) {
+void sponge_absorb(mam_sponge_t *const sponge, trit_t const c2, trits_t data) {
   trits_t s1;
   trits_t curr_data_part;
   size_t ni;
@@ -95,7 +95,7 @@ void sponge_absorb(sponge_t *const sponge, trit_t const c2, trits_t data) {
 
     if (sponge_get_control1(sponge) != 0) {
       sponge_set_control345(sponge, c0, c1, c2);
-      sponge_transform(sponge);
+      mam_sponge_transform(sponge);
     }
 
     trits_copy(curr_data_part, trits_take(s1, ni));
@@ -104,7 +104,7 @@ void sponge_absorb(sponge_t *const sponge, trit_t const c2, trits_t data) {
   } while (!trits_is_empty(data));
 }
 
-void sponge_absorbn(sponge_t *const sponge, trit_t const c2, size_t const n,
+void sponge_absorbn(mam_sponge_t *const sponge, trit_t const c2, size_t const n,
                     trits_t const *const data_blocks) {
   buffers_t buffers;
   size_t m;
@@ -126,7 +126,7 @@ void sponge_absorbn(sponge_t *const sponge, trit_t const c2, size_t const n,
 
     if (sponge_get_control1(sponge) != 0) {
       sponge_set_control345(sponge, c0, c1, c2);
-      sponge_transform(sponge);
+      mam_sponge_transform(sponge);
     }
 
     buffers_copy_to(&buffers, trits_take(outer_state_trits, ni));
@@ -135,7 +135,8 @@ void sponge_absorbn(sponge_t *const sponge, trit_t const c2, size_t const n,
   } while (0 < m);
 }
 
-void sponge_squeeze(sponge_t *const sponge, trit_t const c2, trits_t squeezed) {
+void sponge_squeeze(mam_sponge_t *const sponge, trit_t const c2,
+                    trits_t squeezed) {
   trits_t outer_state_trits;
   trits_t curr_squeezed;
   size_t ni;
@@ -150,7 +151,7 @@ void sponge_squeeze(sponge_t *const sponge, trit_t const c2, trits_t squeezed) {
     c1 = trits_is_empty(squeezed) ? -1 : 1;
 
     sponge_set_control345(sponge, c0, c1, c2);
-    sponge_transform(sponge);
+    mam_sponge_transform(sponge);
 
     trits_copy(trits_take(outer_state_trits, ni), curr_squeezed);
     trits_set_zero(trits_take(outer_state_trits, ni));
@@ -159,7 +160,7 @@ void sponge_squeeze(sponge_t *const sponge, trit_t const c2, trits_t squeezed) {
   } while (!trits_is_empty(squeezed));
 }
 
-void sponge_encr(sponge_t *const sponge, trits_t plaintext,
+void sponge_encr(mam_sponge_t *const sponge, trits_t plaintext,
                  trits_t ciphertext) {
   trits_t outer_state_trits;
   trits_t curr_plaintext_part, curr_ciphertext_part;
@@ -182,7 +183,7 @@ void sponge_encr(sponge_t *const sponge, trits_t plaintext,
     c1 = trits_is_empty(plaintext) ? -1 : 1;
 
     sponge_set_control345(sponge, c0, c1, c2);
-    sponge_transform(sponge);
+    mam_sponge_transform(sponge);
 
     if (trits_is_same(curr_plaintext_part, curr_ciphertext_part)) {
       trits_swap_add(curr_plaintext_part, trits_take(outer_state_trits, ni));
@@ -196,7 +197,7 @@ void sponge_encr(sponge_t *const sponge, trits_t plaintext,
   } while (!trits_is_empty(plaintext));
 }
 
-void sponge_decr(sponge_t *const sponge, trits_t ciphertext,
+void sponge_decr(mam_sponge_t *const sponge, trits_t ciphertext,
                  trits_t plaintext) {
   trits_t outer_state_trits;
   trits_t curr_plainttext_part, curr_ciphertext_part;
@@ -219,7 +220,7 @@ void sponge_decr(sponge_t *const sponge, trits_t ciphertext,
     c1 = trits_is_empty(plaintext) ? -1 : 1;
 
     sponge_set_control345(sponge, c0, c1, c2);
-    sponge_transform(sponge);
+    mam_sponge_transform(sponge);
 
     if (trits_is_same(curr_plainttext_part, curr_ciphertext_part)) {
       trits_swap_sub(curr_ciphertext_part, trits_take(outer_state_trits, ni));
@@ -232,14 +233,14 @@ void sponge_decr(sponge_t *const sponge, trits_t ciphertext,
   } while (!trits_is_empty(ciphertext));
 }
 
-void sponge_hash(sponge_t *const sponge, trits_t const plaintext,
+void sponge_hash(mam_sponge_t *const sponge, trits_t const plaintext,
                  trits_t digest) {
   sponge_init(sponge);
   sponge_absorb(sponge, MAM2_SPONGE_CTL_DATA, plaintext);
   sponge_squeeze(sponge, MAM2_SPONGE_CTL_HASH, digest);
 }
 
-void sponge_hashn(sponge_t *const sponge, size_t const n,
+void sponge_hashn(mam_sponge_t *const sponge, size_t const n,
                   trits_t const *const plaintext_blocks, trits_t digest) {
   sponge_init(sponge);
   sponge_absorbn(sponge, MAM2_SPONGE_CTL_DATA, n, plaintext_blocks);

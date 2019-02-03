@@ -18,13 +18,13 @@
  * Private functions
  */
 
-static inline void prng_absorbn(sponge_t *const sponge, size_t const n,
+static inline void prng_absorbn(mam_sponge_t *const sponge, size_t const n,
                                 trits_t const *const KdN) {
   sponge_init(sponge);
   sponge_absorbn(sponge, MAM2_SPONGE_CTL_KEY, n, KdN);
 }
 
-static inline void prng_squeeze(sponge_t *const sponge, trits_t output) {
+static inline void prng_squeeze(mam_sponge_t *const sponge, trits_t output) {
   sponge_squeeze(sponge, MAM2_SPONGE_CTL_PRN, output);
 }
 
@@ -56,7 +56,7 @@ void mam_prng_destroy(mam_prng_t *const prng) {
   prng->secret_key = NULL;
 }
 
-void mam_prng_init(mam_prng_t *const prng, sponge_t *const sponge,
+void mam_prng_init(mam_prng_t *const prng, mam_sponge_t *const sponge,
                    trits_t const secret_key) {
   MAM2_ASSERT(trits_size(secret_key) == MAM2_PRNG_KEY_SIZE);
 

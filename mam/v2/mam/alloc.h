@@ -25,8 +25,8 @@ extern "C" {
  * @field destroy_sponge Deallocator
  */
 typedef struct mam_ialloc_s {
-  sponge_t *(*create_sponge)();
-  void (*destroy_sponge)(sponge_t *);
+  mam_sponge_t *(*create_sponge)();
+  void (*destroy_sponge)(mam_sponge_t *);
 } mam_ialloc_t;
 
 #ifdef __cplusplus

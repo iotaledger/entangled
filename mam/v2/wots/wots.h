@@ -62,7 +62,7 @@ void wots_destroy(wots_t *const wots);
  * @param wots A WOTS interface
  * @param sponge A sponge interface
  */
-void wots_init(wots_t *const wots, sponge_t *const sponge);
+void wots_init(wots_t *const wots, mam_sponge_t *const sponge);
 
 /**
  * Generates a WOTS secret key with a nonce

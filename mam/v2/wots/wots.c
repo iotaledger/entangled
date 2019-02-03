@@ -99,7 +99,7 @@ void wots_destroy(wots_t *const wots) {
   free(wots);
 }
 
-void wots_init(wots_t *const wots, sponge_t *const sponge) {
+void wots_init(wots_t *const wots, mam_sponge_t *const sponge) {
   MAM2_ASSERT(wots);
   MAM2_ASSERT(sponge);
 

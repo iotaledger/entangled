@@ -44,7 +44,7 @@ void mam_prng_destroy(mam_prng_t *const prng);
  * @param sponge A sponge interface
  * @param secret_key A secret key of size MAM2_PRNG_KEY_SIZE
  */
-void mam_prng_init(mam_prng_t *const prng, sponge_t *const sponge,
+void mam_prng_init(mam_prng_t *const prng, mam_sponge_t *const sponge,
                    trits_t const secret_key);
 
 /**

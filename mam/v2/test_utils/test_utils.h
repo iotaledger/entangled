@@ -42,10 +42,10 @@ typedef struct test_prng_s {
 } test_prng_t;
 
 typedef struct test_sponge_s {
-  sponge_t s;
+  mam_sponge_t s;
   trit_t stack[MAM2_SPONGE_WIDTH];
   trit_t state[MAM2_SPONGE_WIDTH];
-} test_sponge_t;
+} test_mam_sponge_t;
 
 typedef spongos_t test_spongos_t;
 
@@ -55,16 +55,18 @@ typedef struct test_wots_s {
 } test_wots_t;
 
 mam_ntru_sk_t *test_ntru_init(test_ntru_t *n);
-mam_prng_t *test_prng_init(test_prng_t *p, sponge_t *s);
-sponge_t *test_sponge_init(test_sponge_t *s);
-spongos_t *test_spongos_init(test_spongos_t *sg, sponge_t *s);
-wots_t *test_wots_init(test_wots_t *w, sponge_t *s);
+mam_prng_t *test_prng_init(test_prng_t *p, mam_sponge_t *s);
+mam_sponge_t *test_sponge_init(test_mam_sponge_t *s);
+spongos_t *test_spongos_init(test_spongos_t *sg, mam_sponge_t *s);
+wots_t *test_wots_init(test_wots_t *w, mam_sponge_t *s);
 
-static inline sponge_t *test_create_sponge() {
-  test_sponge_t *t = malloc(sizeof(test_sponge_t));
+static inline mam_sponge_t *test_create_sponge() {
+  test_mam_sponge_t *t = malloc(sizeof(test_mam_sponge_t));
   return test_sponge_init(t);
 }
-static inline void test_delete_sponge(sponge_t *s) { free((test_sponge_t *)s); }
+static inline void test_delete_sponge(mam_sponge_t *s) {
+  free((test_mam_sponge_t *)s);
+}
 
 /**
  * PRNG output generation
