@@ -22,22 +22,6 @@ extern "C" {
 #endif
 
 /**
- * Allocates memory for PRNG secret key
- *
- * @param prng A PRNG interface
- *
- * @return a status code
- */
-retcode_t mam_prng_create(mam_prng_t *const prng);
-
-/**
- * Deallocates memory for PRNG secret key
- *
- * @param prng A PRNG interface
- */
-void mam_prng_destroy(mam_prng_t *const prng);
-
-/**
  * PRNG initialization
  *
  * @param prng A PRNG interface

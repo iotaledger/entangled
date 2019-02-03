@@ -36,20 +36,6 @@ static inline trits_t prng_secret_key_trits(mam_prng_t const *const prng) {
  * Public functions
  */
 
-retcode_t mam_prng_create(mam_prng_t *const prng) {
-  retcode_t ret = RC_OK;
-  MAM2_ASSERT(prng);
-
-  prng->sponge = NULL;
-
-  return ret;
-}
-
-void mam_prng_destroy(mam_prng_t *const prng) {
-  MAM2_ASSERT(prng);
-  prng->sponge = NULL;
-}
-
 void mam_prng_init(mam_prng_t *const prng, mam_sponge_t *const sponge,
                    trits_t const secret_key) {
   MAM2_ASSERT(trits_size(secret_key) == MAM2_PRNG_KEY_SIZE);
