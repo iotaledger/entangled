@@ -164,11 +164,6 @@ void sponge_hash(mam_sponge_t *const sponge, trits_t const plaintext,
 void sponge_hashn(mam_sponge_t *const sponge, size_t const n,
                   trits_t const *const plaintext_blocks, trits_t digest);
 
-size_t mam_sponge_serialized_size(mam_sponge_t const *const sponge);
-retcode_t mam_sponge_serialize(mam_sponge_t const *const sponge, trits_t trits);
-retcode_t mam_sponge_deserialize(trits_t const trits,
-                                 mam_sponge_t *const sponge);
-
 #ifdef __cplusplus
 }
 #endif
