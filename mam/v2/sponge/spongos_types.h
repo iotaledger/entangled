@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 
-typedef struct spongos_s {
+typedef struct mam_spongos_s {
   mam_sponge_t *sponge;
   size_t pos;
 } mam_spongos_t;
