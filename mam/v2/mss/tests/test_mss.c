@@ -99,7 +99,7 @@ def_test_mss_check(4, 4);
 // def_test_mss_check(MAM2_MSS_TEST_MAX_D, );
 
 static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
-                           spongos_t *spongos, wots_t *wots,
+                           mam_spongos_t *spongos, wots_t *wots,
                            mss_mt_height_t max_height) {
   bool r = true;
   retcode_t e;
@@ -163,7 +163,7 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
   return r;
 }
 
-static bool mss_test(mss_t *mss, mam_prng_t *prng, spongos_t *spongos,
+static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
                      wots_t *wots, mss_mt_height_t max_height) {
   bool r = true;
   MAM2_TRITS_DEF0(key, MAM2_PRNG_KEY_SIZE);
@@ -264,7 +264,7 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, spongos_t *spongos,
 
 static void mss_meta_test(void) {
   test_mam_sponge_t _s[1];
-  test_spongos_t _sg[1];
+  test_mam_spongos_t _sg[1];
   test_prng_t _p[1];
   test_wots_t _w[1];
   test_mss1_t _m1[1];
@@ -276,8 +276,8 @@ static void mss_meta_test(void) {
   // test_mssx_t _mx[1];
   // test_mss_t _m[1];
 
-  mam_sponge_t *spongos = test_sponge_init(_s);
-  spongos_t *sg = test_spongos_init(_sg, spongos);
+  mam_sponge_t *spongos = test_mam_sponge_init(_s);
+  mam_spongos_t *sg = test_mam_spongos_init(_sg, spongos);
   mam_prng_t *p = test_prng_init(_p, spongos);
   wots_t *w = test_wots_init(_w, spongos);
 

@@ -36,7 +36,7 @@ extern "C" {
 
 // WOTS layer interface
 typedef struct wots_s {
-  spongos_t spongos;
+  mam_spongos_t spongos;
   trit_t *secret_key;
 } wots_t;
 
@@ -124,7 +124,7 @@ void wots_sign(wots_t *const wots, trits_t const hash, trits_t signature);
  * @param signature The signature
  * @param public_key The recovered public key
  */
-void wots_recover(spongos_t *const spongos, trits_t const hash,
+void wots_recover(mam_spongos_t *const spongos, trits_t const hash,
                   trits_t const signature, trits_t public_key);
 
 /**
@@ -137,7 +137,7 @@ void wots_recover(spongos_t *const spongos, trits_t const hash,
  *
  * @return true if valid, false otherwise
  */
-bool wots_verify(spongos_t *const spongos, trits_t const hash,
+bool wots_verify(mam_spongos_t *const spongos, trits_t const hash,
                  trits_t const signature, trits_t const public_key);
 
 #ifdef __cplusplus

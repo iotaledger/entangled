@@ -469,7 +469,7 @@ static void mam_test_generic(mam_sponge_t *s, void *sponge_alloc_ctx,
 
 void mam_test() {
   test_mam_sponge_t _s[1];
-  mam_sponge_t *s = test_sponge_init(_s);
+  mam_sponge_t *s = test_mam_sponge_init(_s);
 
   test_prng_t _pa[1], _pb[1];
   mam_prng_t *pa = test_prng_init(_pa, s);

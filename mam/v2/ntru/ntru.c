@@ -72,7 +72,7 @@ void ntru_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
 }
 
 void ntru_encr(trits_t const public_key, mam_prng_t const *const prng,
-               spongos_t *const spongos, trits_t const session_key,
+               mam_spongos_t *const spongos, trits_t const session_key,
                trits_t const nonce, trits_t encrypted_session_key) {
   MAM2_ASSERT(trits_size(session_key) == MAM2_NTRU_KEY_SIZE);
   MAM2_ASSERT(trits_size(encrypted_session_key) == MAM2_NTRU_EKEY_SIZE);
@@ -85,7 +85,7 @@ void ntru_encr(trits_t const public_key, mam_prng_t const *const prng,
   ntru_encr_r(public_key, spongos, r, session_key, encrypted_session_key);
 }
 
-void ntru_encr_r(trits_t const public_key, spongos_t *const spongos,
+void ntru_encr_r(trits_t const public_key, mam_spongos_t *const spongos,
                  trits_t const r, trits_t const session_key,
                  trits_t encrypted_session_key) {
   MAM2_ASSERT(trits_size(r) == MAM2_NTRU_SK_SIZE);
@@ -108,11 +108,11 @@ void ntru_encr_r(trits_t const public_key, spongos_t *const spongos,
 
   /* h(x) = AE(r*h;K) */
   poly_to_trits(s, encrypted_session_key);
-  spongos_init(spongos);
-  spongos_absorb(spongos, encrypted_session_key);
-  spongos_commit(spongos);
-  spongos_encr(spongos, session_key, trits_take(r, MAM2_NTRU_KEY_SIZE));
-  spongos_squeeze(spongos, trits_drop(r, MAM2_NTRU_KEY_SIZE));
+  mam_spongos_init(spongos);
+  mam_spongos_absorb(spongos, encrypted_session_key);
+  mam_spongos_commit(spongos);
+  mam_spongos_encr(spongos, session_key, trits_take(r, MAM2_NTRU_KEY_SIZE));
+  mam_spongos_squeeze(spongos, trits_drop(r, MAM2_NTRU_KEY_SIZE));
   poly_small_from_trits(h, r);
 
   /* Y = r*h + AE(r*h;K) */
@@ -122,7 +122,7 @@ void ntru_encr_r(trits_t const public_key, spongos_t *const spongos,
   memset(h, 0, sizeof(h));
 }
 
-bool ntru_decr(mam_ntru_sk_t const *const ntru, spongos_t *const spongos,
+bool ntru_decr(mam_ntru_sk_t const *const ntru, mam_spongos_t *const spongos,
                trits_t const encrypted_session_key, trits_t session_key) {
   MAM2_ASSERT(trits_size(session_key) == MAM2_NTRU_KEY_SIZE);
   MAM2_ASSERT(trits_size(encrypted_session_key) == MAM2_NTRU_EKEY_SIZE);
@@ -158,11 +158,11 @@ bool ntru_decr(mam_ntru_sk_t const *const ntru, spongos_t *const spongos,
   poly_to_trits(s, rh);
 
   /* K = AD(rh;kt) */
-  spongos_init(spongos);
-  spongos_absorb(spongos, rh);
-  spongos_commit(spongos);
-  spongos_decr(spongos, trits_take(kt, MAM2_NTRU_KEY_SIZE), session_key);
-  spongos_squeeze(spongos, m);
+  mam_spongos_init(spongos);
+  mam_spongos_absorb(spongos, rh);
+  mam_spongos_commit(spongos);
+  mam_spongos_decr(spongos, trits_take(kt, MAM2_NTRU_KEY_SIZE), session_key);
+  mam_spongos_squeeze(spongos, m);
   b = trits_cmp_eq(m, trits_drop(kt, MAM2_NTRU_KEY_SIZE));
 
   trits_set_zero(kt);

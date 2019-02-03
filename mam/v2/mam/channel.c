@@ -52,7 +52,7 @@ size_t mam_channel_wrap_size() {
   return pb3_sizeof_tryte() + 0;
 }
 
-void mam_channel_wrap(spongos_t *const spongos, trits_t *const buffer,
+void mam_channel_wrap(mam_spongos_t *const spongos, trits_t *const buffer,
                       tryte_t const version, trits_t const channel_id) {
   MAM2_ASSERT(mam_channel_wrap_size() <= trits_size(*buffer));
   MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(channel_id));
@@ -63,8 +63,9 @@ void mam_channel_wrap(spongos_t *const spongos, trits_t *const buffer,
   pb3_absorb_external_ntrytes(spongos, channel_id);
 }
 
-retcode_t mam_channel_unwrap(spongos_t *const spongos, trits_t *const buffer,
-                             tryte_t *const version, trits_t channel_id) {
+retcode_t mam_channel_unwrap(mam_spongos_t *const spongos,
+                             trits_t *const buffer, tryte_t *const version,
+                             trits_t channel_id) {
   MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(channel_id));
 
   retcode_t ret = RC_OK;

@@ -16,7 +16,7 @@
 static void prng_test(void) {
   test_mam_sponge_t test_sponge;
   test_prng_t test_prng;
-  mam_sponge_t *sponge = test_sponge_init(&test_sponge);
+  mam_sponge_t *sponge = test_mam_sponge_init(&test_sponge);
   mam_prng_t *prng = test_prng_init(&test_prng, sponge);
 
   MAM2_TRITS_DEF0(K, MAM2_PRNG_KEY_SIZE);
@@ -35,9 +35,9 @@ static void prng_test(void) {
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM");
 
-  sponge_init(prng->sponge);
-  sponge_absorb(prng->sponge, MAM2_SPONGE_CTL_KEY, K);
-  sponge_squeeze(prng->sponge, MAM2_SPONGE_CTL_KEY, K);
+  mam_sponge_init(prng->sponge);
+  mam_sponge_absorb(prng->sponge, MAM2_SPONGE_CTL_KEY, K);
+  mam_sponge_squeeze(prng->sponge, MAM2_SPONGE_CTL_KEY, K);
 
   mam_prng_init(prng, prng->sponge, K);
   mam_prng_gen(prng, 0, N, Y1);

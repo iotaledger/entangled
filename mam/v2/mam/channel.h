@@ -86,7 +86,7 @@ size_t mam_channel_wrap_size();
  * @param version The MAM version
  * @param channel_id The channel id
  */
-void mam_channel_wrap(spongos_t *const spongos, trits_t *const buffer,
+void mam_channel_wrap(mam_spongos_t *const spongos, trits_t *const buffer,
                       tryte_t const version, trits_t const channel_id);
 
 /**
@@ -99,8 +99,9 @@ void mam_channel_wrap(spongos_t *const spongos, trits_t *const buffer,
  *
  * @return a status code
  */
-retcode_t mam_channel_unwrap(spongos_t *const spongos, trits_t *const buffer,
-                             tryte_t *const version, trits_t channel_id);
+retcode_t mam_channel_unwrap(mam_spongos_t *const spongos,
+                             trits_t *const buffer, tryte_t *const version,
+                             trits_t channel_id);
 
 /*
 TODO: channel serialization

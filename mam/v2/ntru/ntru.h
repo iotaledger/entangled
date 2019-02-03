@@ -86,7 +86,7 @@ void ntru_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
  * @param encrypted_session_key The encrypted session key
  */
 void ntru_encr(trits_t const public_key, mam_prng_t const *const prng,
-               spongos_t *const spongos, trits_t const session_key,
+               mam_spongos_t *const spongos, trits_t const session_key,
                trits_t const nonce, trits_t encrypted_session_key);
 
 /**
@@ -98,7 +98,7 @@ void ntru_encr(trits_t const public_key, mam_prng_t const *const prng,
  * @param session_key A session symmetric key to be encrypted
  * @param encrypted_session_key The encrypted session key
  */
-void ntru_encr_r(trits_t const public_key, spongos_t *const spongos,
+void ntru_encr_r(trits_t const public_key, mam_spongos_t *const spongos,
                  trits_t const r, trits_t const session_key,
                  trits_t encrypted_session_key);
 
@@ -112,7 +112,7 @@ void ntru_encr_r(trits_t const public_key, spongos_t *const spongos,
  *
  * @return
  */
-bool ntru_decr(mam_ntru_sk_t const *const ntru, spongos_t *const spongos,
+bool ntru_decr(mam_ntru_sk_t const *const ntru, mam_spongos_t *const spongos,
                trits_t const encrypted_session_key, trits_t session_key);
 
 /**

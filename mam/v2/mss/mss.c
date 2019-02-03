@@ -16,7 +16,7 @@
 #define MAM2_MSS_MAX_SKN(d) (((trint18_t)1 << (d)) - 1)
 
 static void mss_hash2(
-    spongos_t *s,
+    mam_spongos_t *s,
     trits_t hashes[2],  /*!< [in] hash values of left and right child nodes */
     trits_t parent_hash /*!< [out] hash value of their parent */
 ) {
@@ -39,7 +39,7 @@ static void mss_hash2(
     trits_put18(parent_hash, i01);
   }
 #else
-  spongos_hashn(s, 2, hashes, parent_hash);
+  mam_spongos_hashn(s, 2, hashes, parent_hash);
 #endif
 }
 
@@ -323,7 +323,7 @@ static trits_t mss_mt_node_t_trits(mss_t *mss, trint6_t height, trint18_t i) {
  * @return void
  */
 
-static void mss_fold_auth_path(spongos_t *spongos, mss_mt_idx_t skn,
+static void mss_fold_auth_path(mam_spongos_t *spongos, mss_mt_idx_t skn,
                                trits_t auth_path, trits_t pk) {
   trits_t hashes[2];
 
@@ -563,8 +563,8 @@ bool mss_next(mss_t *mss) {
   return 1;
 }
 
-bool mss_verify(spongos_t *mt_spongos, spongos_t *wots_spongos, trits_t hash,
-                trits_t sig, trits_t pk) {
+bool mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos,
+                trits_t hash, trits_t sig, trits_t pk) {
   trint6_t height;
   trint18_t skn;
   MAM2_TRITS_DEF0(calculated_pk, MAM2_MSS_MT_HASH_SIZE);

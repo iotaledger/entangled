@@ -101,8 +101,8 @@ typedef struct mss_s {
   trint6_t height;  /*!< Merkle tree height. */
   trint18_t skn;    /*!< Current WOTS private key number. */
   mam_prng_t *prng; /*!< PRNG interface used to generate WOTS private keys. */
-  spongos_t sg[1];  /*!< Spongos interface used to hash Merkle tree nodes. */
-  wots_t *wots;     /*!< WOTS interface used to generate keys and sign. */
+  mam_spongos_t sg[1]; /*!< Spongos interface used to hash Merkle tree nodes. */
+  wots_t *wots;        /*!< WOTS interface used to generate keys and sign. */
 #if defined(MAM2_MSS_TRAVERSAL)
   trit_t *auth_path;      /*!< Current authentication path; `d` hash values. */
   trit_t *nodes_hashes;   /*!< Buffer storing hash-values of auxiliary nodes;
@@ -223,8 +223,8 @@ bool mss_next(mss_t *mss);
  * @return bool True is the signature is correct, False otherwise
  */
 
-bool mss_verify(spongos_t *mt_spongos, spongos_t *wots_spongos, trits_t hash,
-                trits_t sig, trits_t pk);
+bool mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos,
+                trits_t hash, trits_t sig, trits_t pk);
 
 /**
  * Allocate memory for internal Merkle tree structure.

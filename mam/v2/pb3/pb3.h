@@ -66,42 +66,43 @@ retcode_t pb3_decode_ntrytes(trits_t const ntrytes, trits_t *const buffer);
  * Protobuf3 spongos modifier handling
  */
 
-void pb3_wrap_absorb_tryte(spongos_t *const spongos, trits_t *const buffer,
+void pb3_wrap_absorb_tryte(mam_spongos_t *const spongos, trits_t *const buffer,
                            tryte_t const tryte);
-retcode_t pb3_unwrap_absorb_tryte(spongos_t *const spongos,
+retcode_t pb3_unwrap_absorb_tryte(mam_spongos_t *const spongos,
                                   trits_t *const buffer, tryte_t *const tryte);
 
-void pb3_wrap_absorb_trint(spongos_t *const spongos, trits_t *const buffer,
+void pb3_wrap_absorb_trint(mam_spongos_t *const spongos, trits_t *const buffer,
                            trint9_t const trint);
-retcode_t pb3_unwrap_absorb_trint(spongos_t *const spongos,
+retcode_t pb3_unwrap_absorb_trint(mam_spongos_t *const spongos,
                                   trits_t *const buffer, trint9_t *const trint);
 
-void pb3_wrap_absorb_longtrint(spongos_t *const spongos, trits_t *const buffer,
-                               trint18_t const trint);
-retcode_t pb3_unwrap_absorb_longtrint(spongos_t *const spongos,
+void pb3_wrap_absorb_longtrint(mam_spongos_t *const spongos,
+                               trits_t *const buffer, trint18_t const trint);
+retcode_t pb3_unwrap_absorb_longtrint(mam_spongos_t *const spongos,
                                       trits_t *const buffer,
                                       trint18_t *const trint);
 
-void pb3_wrap_absorb_size_t(spongos_t *const spongos, trits_t *const buffer,
+void pb3_wrap_absorb_size_t(mam_spongos_t *const spongos, trits_t *const buffer,
                             size_t const t);
-retcode_t pb3_unwrap_absorb_size_t(spongos_t *const spongos,
+retcode_t pb3_unwrap_absorb_size_t(mam_spongos_t *const spongos,
                                    trits_t *const buffer, size_t *const t);
 
-void pb3_wrap_absorb_ntrytes(spongos_t *const spongos, trits_t *const buffer,
-                             trits_t const trits);
-retcode_t pb3_unwrap_absorb_ntrytes(spongos_t *const spongos,
+void pb3_wrap_absorb_ntrytes(mam_spongos_t *const spongos,
+                             trits_t *const buffer, trits_t const trits);
+retcode_t pb3_unwrap_absorb_ntrytes(mam_spongos_t *const spongos,
                                     trits_t *const buffer, trits_t const trits);
-void pb3_wrap_crypt_ntrytes(spongos_t *const spongos, trits_t *const buffer,
+void pb3_wrap_crypt_ntrytes(mam_spongos_t *const spongos, trits_t *const buffer,
                             trits_t const trits);
-retcode_t pb3_unwrap_crypt_ntrytes(spongos_t *const spongos,
+retcode_t pb3_unwrap_crypt_ntrytes(mam_spongos_t *const spongos,
                                    trits_t *const buffer, trits_t const trits);
-void pb3_wrap_squeeze_ntrytes(spongos_t *const spongos, trits_t *const buffer,
-                              size_t const n);
-retcode_t pb3_unwrap_squeeze_ntrytes(spongos_t *const spongos,
+void pb3_wrap_squeeze_ntrytes(mam_spongos_t *const spongos,
+                              trits_t *const buffer, size_t const n);
+retcode_t pb3_unwrap_squeeze_ntrytes(mam_spongos_t *const spongos,
                                      trits_t *const buffer, size_t const n);
 
-void pb3_absorb_external_ntrytes(spongos_t *const spongos, trits_t const trits);
-void pb3_squeeze_external_ntrytes(spongos_t *const spongos,
+void pb3_absorb_external_ntrytes(mam_spongos_t *const spongos,
+                                 trits_t const trits);
+void pb3_squeeze_external_ntrytes(mam_spongos_t *const spongos,
                                   trits_t const trits);
 
 #ifdef __cplusplus

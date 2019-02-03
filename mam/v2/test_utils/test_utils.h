@@ -47,7 +47,7 @@ typedef struct test_sponge_s {
   trit_t state[MAM2_SPONGE_WIDTH];
 } test_mam_sponge_t;
 
-typedef spongos_t test_spongos_t;
+typedef mam_spongos_t test_mam_spongos_t;
 
 typedef struct test_wots_s {
   wots_t wots;
@@ -56,13 +56,13 @@ typedef struct test_wots_s {
 
 mam_ntru_sk_t *test_ntru_init(test_ntru_t *n);
 mam_prng_t *test_prng_init(test_prng_t *p, mam_sponge_t *s);
-mam_sponge_t *test_sponge_init(test_mam_sponge_t *s);
-spongos_t *test_spongos_init(test_spongos_t *sg, mam_sponge_t *s);
+mam_sponge_t *test_mam_sponge_init(test_mam_sponge_t *s);
+mam_spongos_t *test_mam_spongos_init(test_mam_spongos_t *sg, mam_sponge_t *s);
 wots_t *test_wots_init(test_wots_t *w, mam_sponge_t *s);
 
 static inline mam_sponge_t *test_create_sponge() {
   test_mam_sponge_t *t = malloc(sizeof(test_mam_sponge_t));
-  return test_sponge_init(t);
+  return test_mam_sponge_init(t);
 }
 static inline void test_delete_sponge(mam_sponge_t *s) {
   free((test_mam_sponge_t *)s);

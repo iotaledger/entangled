@@ -45,7 +45,7 @@ mam_prng_t *test_prng_init(test_prng_t *p, mam_sponge_t *s) {
   return &p->p;
 }
 
-mam_sponge_t *test_sponge_init(test_mam_sponge_t *s) {
+mam_sponge_t *test_mam_sponge_init(test_mam_sponge_t *s) {
   s->s.f = test_f;
   s->s.stack = s->stack;
   s->s.state = s->state;
@@ -53,7 +53,7 @@ mam_sponge_t *test_sponge_init(test_mam_sponge_t *s) {
   return &s->s;
 }
 
-spongos_t *test_spongos_init(test_spongos_t *sg, mam_sponge_t *s) {
+mam_spongos_t *test_mam_spongos_init(test_mam_spongos_t *sg, mam_sponge_t *s) {
   sg->sponge = s;
   return sg;
 }
@@ -77,17 +77,17 @@ void prng_gen_str(mam_prng_t *p, trint3_t d, char const *nonce, trits_t Y) {
   mam_prng_gen(p, d, N, Y);
 }
 
-void _sponge_hash(size_t Xn, char *X, size_t Yn, char *Y) {
+void _mam_sponge_hash(size_t Xn, char *X, size_t Yn, char *Y) {
   test_mam_sponge_t _s[1];
-  mam_sponge_t *s = test_sponge_init(_s);
+  mam_sponge_t *s = test_mam_sponge_init(_s);
 
   trits_t tX = trits_alloc(3 * Xn);
   trits_t tY = trits_alloc(3 * Yn);
 
-  sponge_init(s);
+  mam_sponge_init(s);
   trits_from_str(tX, X);
-  sponge_absorb(s, MAM2_SPONGE_CTL_DATA, tX);
-  sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, tY);
+  mam_sponge_absorb(s, MAM2_SPONGE_CTL_DATA, tX);
+  mam_sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, tY);
   trits_to_str(tY, Y);
 
   trits_free(tX);
@@ -97,7 +97,7 @@ void _sponge_hash(size_t Xn, char *X, size_t Yn, char *Y) {
 bool _sponge_point_test() {
   bool r = true, ok;
   test_mam_sponge_t _s[1];
-  mam_sponge_t *s = test_sponge_init(_s);
+  mam_sponge_t *s = test_mam_sponge_init(_s);
 
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
   MAM2_TRITS_DEF0(X, 2 * MAM2_SPONGE_RATE + 3);
@@ -169,50 +169,50 @@ bool _sponge_point_test() {
   MAM2_ASSERT(ok);
   trits_set_zero(Y);
 
-  sponge_init(s);
+  mam_sponge_init(s);
   x = X;
-  sponge_absorb(s, MAM2_SPONGE_CTL_DATA, x);
+  mam_sponge_absorb(s, MAM2_SPONGE_CTL_DATA, x);
   y = trits_take(Y, MAM2_SPONGE_HASH_SIZE);
-  sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, y);
+  mam_sponge_squeeze(s, MAM2_SPONGE_CTL_HASH, y);
   t = trits_take(T, MAM2_SPONGE_HASH_SIZE);
   ok = trits_from_str(t, hash_y);
   MAM2_ASSERT(ok);
   r = trits_cmp_eq(y, t) && r;
 
-  sponge_init(s);
-  sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
+  mam_sponge_init(s);
+  mam_sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
   x = X;
   y = Y;
-  sponge_encr(s, x, y);
+  mam_sponge_encr(s, x, y);
   ok = trits_from_str(t, encr_y);
   MAM2_ASSERT(ok);
   r = trits_cmp_eq(y, t) && r;
 
-  sponge_init(s);
-  sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
+  mam_sponge_init(s);
+  mam_sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
   x = X;
   y = Y;
   trits_copy(x, y);
-  sponge_encr(s, y, y);
+  mam_sponge_encr(s, y, y);
   ok = trits_from_str(t, encr_y);
   MAM2_ASSERT(ok);
   r = trits_cmp_eq(y, t) && r;
 
-  sponge_init(s);
-  sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
+  mam_sponge_init(s);
+  mam_sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
   x = X;
   y = Y;
-  sponge_decr(s, x, y);
+  mam_sponge_decr(s, x, y);
   ok = trits_from_str(t, decr_y);
   MAM2_ASSERT(ok);
   r = trits_cmp_eq(y, t) && r;
 
-  sponge_init(s);
-  sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
+  mam_sponge_init(s);
+  mam_sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
   x = X;
   y = Y;
   trits_copy(x, y);
-  sponge_decr(s, y, y);
+  mam_sponge_decr(s, y, y);
   ok = trits_from_str(t, decr_y);
   MAM2_ASSERT(ok);
   r = trits_cmp_eq(y, t) && r;
@@ -220,19 +220,20 @@ bool _sponge_point_test() {
   return r;
 }
 
-void _sponge_encr(size_t Kn, char *K, size_t Xn, char *X, size_t Yn, char *Y) {
+void _mam_sponge_encr(size_t Kn, char *K, size_t Xn, char *X, size_t Yn,
+                      char *Y) {
   test_mam_sponge_t _s[1];
-  mam_sponge_t *s = test_sponge_init(_s);
+  mam_sponge_t *s = test_mam_sponge_init(_s);
 
   trits_t tK = trits_alloc(3 * Kn);
   trits_t tX = trits_alloc(3 * Xn);
   trits_t tY = trits_alloc(3 * Yn);
 
-  sponge_init(s);
+  mam_sponge_init(s);
   trits_from_str(tK, K);
-  sponge_absorb(s, MAM2_SPONGE_CTL_KEY, tK);
+  mam_sponge_absorb(s, MAM2_SPONGE_CTL_KEY, tK);
   trits_from_str(tX, X);
-  sponge_encr(s, tX, tY);
+  mam_sponge_encr(s, tX, tY);
   trits_to_str(tY, Y);
 
   trits_free(tK);
@@ -240,19 +241,20 @@ void _sponge_encr(size_t Kn, char *K, size_t Xn, char *X, size_t Yn, char *Y) {
   trits_free(tY);
 }
 
-void _sponge_decr(size_t Kn, char *K, size_t Yn, char *Y, size_t Xn, char *X) {
+void _mam_sponge_decr(size_t Kn, char *K, size_t Yn, char *Y, size_t Xn,
+                      char *X) {
   test_mam_sponge_t _s[1];
-  mam_sponge_t *s = test_sponge_init(_s);
+  mam_sponge_t *s = test_mam_sponge_init(_s);
 
   trits_t tK = trits_alloc(3 * Kn);
   trits_t tY = trits_alloc(3 * Yn);
   trits_t tX = trits_alloc(3 * Xn);
 
-  sponge_init(s);
+  mam_sponge_init(s);
   trits_from_str(tK, K);
-  sponge_absorb(s, MAM2_SPONGE_CTL_KEY, tK);
+  mam_sponge_absorb(s, MAM2_SPONGE_CTL_KEY, tK);
   trits_from_str(tY, Y);
-  sponge_decr(s, tY, tX);
+  mam_sponge_decr(s, tY, tX);
   trits_to_str(tX, X);
 
   trits_free(tK);
@@ -263,7 +265,8 @@ void _sponge_decr(size_t Kn, char *K, size_t Yn, char *Y, size_t Xn, char *X) {
 void _prng_gen(size_t Kn, char *K, size_t Nn, char *N, size_t Yn, char *Y) {
   test_mam_sponge_t _s[1];
   test_prng_t _p[1];
-  mam_sponge_t *s = test_sponge_init(_s);
+
+  mam_sponge_t *s = test_mam_sponge_init(_s);
   mam_prng_t *p = test_prng_init(_p, s);
 
   trits_t tK = trits_alloc(3 * Kn);
@@ -286,7 +289,8 @@ void _wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   test_mam_sponge_t _s[1];
   test_prng_t _p[1];
   test_wots_t _w[1];
-  mam_sponge_t *s = test_sponge_init(_s);
+
+  mam_sponge_t *s = test_mam_sponge_init(_s);
   mam_prng_t *p = test_prng_init(_p, s);
   wots_t *w = test_wots_init(_w, s);
 
@@ -336,10 +340,10 @@ void test_gen_sponge(mam_prng_t *p, mam_sponge_t *s) {
     x = trits_take(X, ns[i]);
     y = trits_take(Y, ns[i]);
 
-    sponge_init(s);
-    sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
-    sponge_encr(s, x, y);
-    sponge_squeeze(s, MAM2_SPONGE_CTL_MAC, H);
+    mam_sponge_init(s);
+    mam_sponge_absorb(s, MAM2_SPONGE_CTL_KEY, K);
+    mam_sponge_encr(s, x, y);
+    mam_sponge_squeeze(s, MAM2_SPONGE_CTL_MAC, H);
 
     trits_print2("\tK\t=", K, "\n");
     trits_print2("\tx\t=", x, "\n");
@@ -351,7 +355,7 @@ void test_gen_sponge(mam_prng_t *p, mam_sponge_t *s) {
 #undef TEST_MAX_SIZE
 }
 
-void test_gen_spongos(mam_prng_t *p, spongos_t *s) {
+void test_gen_spongos(mam_prng_t *p, mam_spongos_t *s) {
 #define TEST_MAX_SIZE (MAM2_SPONGE_RATE * 3)
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
   MAM2_TRITS_DEF0(X, TEST_MAX_SIZE);
@@ -373,12 +377,12 @@ void test_gen_spongos(mam_prng_t *p, spongos_t *s) {
     x = trits_take(X, ns[i]);
     y = trits_take(Y, ns[i]);
 
-    spongos_init(s);
-    spongos_absorb(s, K);
-    spongos_commit(s);
-    spongos_encr(s, x, y);
-    spongos_commit(s);
-    spongos_squeeze(s, H);
+    mam_spongos_init(s);
+    mam_spongos_absorb(s, K);
+    mam_spongos_commit(s);
+    mam_spongos_encr(s, x, y);
+    mam_spongos_commit(s);
+    mam_spongos_squeeze(s, H);
 
     trits_print2("\tK\t=", K, "\n");
     trits_print2("\tx\t=", x, "\n");
@@ -593,7 +597,7 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 
 // bool _gen() {
 //   test_mam_sponge_t _s[1];
-//   test_spongos_t _sg[1];
+//   test_mam_spongos_t _sg[1];
 //   test_prng_t _p[1], _pa[1], _pb[1];
 //   test_wots_t _w[1];
 //   test_mss1 _m1[1];
@@ -603,8 +607,8 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //   test_mss _m[1];
 //   test_ntru_t _n[1];
 //
-//   mam_sponge_t *spongos = test_sponge_init(_s);
-//   spongos_t *sg = test_spongos_init(_sg, spongos);
+//   mam_sponge_t *spongos = test_mam_sponge_init(_s);
+//   mam_spongos_t *sg = test_mam_spongos_init(_sg, spongos);
 //   prng_t *p = test_prng_init(_p, spongos);
 //   prng_t *pa = test_prng_init(_pa, spongos);
 //   prng_t *pb = test_prng_init(_pb, spongos);
@@ -643,8 +647,8 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //   test_mss _m[1];
 //   test_ntru _n[1];
 //
-//   mam_sponge_t *spongos = test_sponge_init(_s);
-//   spongos_t *sg = test_spongos_init(_sg, spongos);
+//   mam_sponge_t *spongos = test_mam_sponge_init(_s);
+//   mam_spongos_t *sg = test_mam_spongos_init(_sg, spongos);
 //   prng_t *p = test_prng_init(_p, spongos);
 //   prng_t *pa = test_prng_init(_pa, spongos);
 //   prng_t *pb = test_prng_init(_pb, spongos);
@@ -696,14 +700,14 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //       "FGWERVHABCKXCNLM9AZNODOXYZ9";
 //
 //   bool r = true;
-//   size_t sponge_hash_Yn = 81;
-//   size_t sponge_encr_Yn = 162;
-//   size_t sponge_decr_Xn = 162;
+//   size_t mam_sponge_hash_Yn = 81;
+//   size_t mam_sponge_encr_Yn = 162;
+//   size_t mam_sponge_decr_Xn = 162;
 //   size_t prng_gen_Yn = 162;
 //
-//   char sponge_hash_Y[81];
-//   char sponge_encr_Y[162];
-//   char sponge_decr_X[162];
+//   char mam_sponge_hash_Y[81];
+//   char mam_sponge_encr_Y[162];
+//   char mam_sponge_decr_X[162];
 //   char prng_gen_Y[162];
 //   char wots_gen_sign_pk[MAM2_WOTS_PK_SIZE / 3];
 //   char wots_gen_sign_sig[MAM2_WOTS_SIG_SIZE / 3];
@@ -711,9 +715,9 @@ void test_gen_ntru(prng_t *p, ntru_t *n)
 //   do {
 //     r = _() && r;
 //     r = sponge_point_test() && r;
-//     sponge_hash(162, X, sponge_hash_Yn, sponge_hash_Y);
-//     sponge_encr(81, K, 162, X, sponge_encr_Yn, sponge_encr_Y);
-//     sponge_decr(81, K, 162, X, sponge_decr_Xn, sponge_decr_X);
+//     mam_sponge_hash(162, X, mam_sponge_hash_Yn, mam_sponge_hash_Y);
+//     mam_sponge_encr(81, K, 162, X, mam_sponge_encr_Yn, mam_sponge_encr_Y);
+//     mam_sponge_decr(81, K, 162, X, mam_sponge_decr_Xn, mam_sponge_decr_X);
 //     prng_gen(81, K, 12, N, prng_gen_Yn, prng_gen_Y);
 //     wots_gen_sign(81, K, 12, N, MAM2_WOTS_PK_SIZE / 3, wots_gen_sign_pk, 78,
 //     H,
