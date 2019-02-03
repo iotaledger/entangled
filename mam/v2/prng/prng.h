@@ -28,14 +28,14 @@ extern "C" {
  *
  * @return a status code
  */
-retcode_t prng_create(mam_prng_t *const prng);
+retcode_t mam_prng_create(mam_prng_t *const prng);
 
 /**
  * Deallocates memory for PRNG secret key
  *
  * @param prng A PRNG interface
  */
-void prng_destroy(mam_prng_t *const prng);
+void mam_prng_destroy(mam_prng_t *const prng);
 
 /**
  * PRNG initialization
@@ -44,8 +44,8 @@ void prng_destroy(mam_prng_t *const prng);
  * @param sponge A sponge interface
  * @param secret_key A secret key of size MAM2_PRNG_KEY_SIZE
  */
-void prng_init(mam_prng_t *const prng, sponge_t *const sponge,
-               trits_t const secret_key);
+void mam_prng_init(mam_prng_t *const prng, sponge_t *const sponge,
+                   trits_t const secret_key);
 
 /**
  * PRNG output generation with a nonce
@@ -55,8 +55,8 @@ void prng_init(mam_prng_t *const prng, sponge_t *const sponge,
  * @param nonce The nonce
  * @param output Pseudorandom output trits
  */
-void prng_gen(mam_prng_t const *const prng, tryte_t const destination,
-              trits_t const nonce, trits_t output);
+void mam_prng_gen(mam_prng_t const *const prng, tryte_t const destination,
+                  trits_t const nonce, trits_t output);
 
 /**
  * PRNG output generation with two nonces
@@ -67,8 +67,8 @@ void prng_gen(mam_prng_t const *const prng, tryte_t const destination,
  * @param nonce2 The second nonce
  * @param output Pseudorandom output trits
  */
-void prng_gen2(mam_prng_t const *const prng, tryte_t const destination,
-               trits_t const nonce1, trits_t const nonce2, trits_t output);
+void mam_prng_gen2(mam_prng_t const *const prng, tryte_t const destination,
+                   trits_t const nonce1, trits_t const nonce2, trits_t output);
 
 /**
  * PRNG output generation with three nonces
@@ -80,9 +80,9 @@ void prng_gen2(mam_prng_t const *const prng, tryte_t const destination,
  * @param nonce3 The third nonce
  * @param output Pseudorandom output trits
  */
-void prng_gen3(mam_prng_t const *const prng, tryte_t const destination,
-               trits_t const nonce1, trits_t const nonce2, trits_t const nonce3,
-               trits_t output);
+void mam_prng_gen3(mam_prng_t const *const prng, tryte_t const destination,
+                   trits_t const nonce1, trits_t const nonce2,
+                   trits_t const nonce3, trits_t output);
 
 #ifdef __cplusplus
 }

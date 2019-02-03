@@ -39,9 +39,9 @@ static void prng_test(void) {
   sponge_absorb(prng->sponge, MAM2_SPONGE_CTL_KEY, K);
   sponge_squeeze(prng->sponge, MAM2_SPONGE_CTL_KEY, K);
 
-  prng_init(prng, prng->sponge, K);
-  prng_gen(prng, 0, N, Y1);
-  prng_gen(prng, 1, N, Y2);
+  mam_prng_init(prng, prng->sponge, K);
+  mam_prng_gen(prng, 0, N, Y1);
+  mam_prng_gen(prng, 1, N, Y2);
 
   TEST_ASSERT_TRUE(!trits_cmp_eq(Y1, Y2));
 }

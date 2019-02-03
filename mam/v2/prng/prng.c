@@ -36,7 +36,7 @@ static inline trits_t prng_secret_key_trits(mam_prng_t const *const prng) {
  * Public functions
  */
 
-retcode_t prng_create(mam_prng_t *const prng) {
+retcode_t mam_prng_create(mam_prng_t *const prng) {
   retcode_t ret = RC_OK;
   MAM2_ASSERT(prng);
 
@@ -48,7 +48,7 @@ retcode_t prng_create(mam_prng_t *const prng) {
   return ret;
 }
 
-void prng_destroy(mam_prng_t *const prng) {
+void mam_prng_destroy(mam_prng_t *const prng) {
   MAM2_ASSERT(prng);
 
   prng->sponge = NULL;
@@ -56,27 +56,27 @@ void prng_destroy(mam_prng_t *const prng) {
   prng->secret_key = NULL;
 }
 
-void prng_init(mam_prng_t *const prng, sponge_t *const sponge,
-               trits_t const secret_key) {
+void mam_prng_init(mam_prng_t *const prng, sponge_t *const sponge,
+                   trits_t const secret_key) {
   MAM2_ASSERT(trits_size(secret_key) == MAM2_PRNG_KEY_SIZE);
 
   prng->sponge = sponge;
   trits_copy(secret_key, prng_secret_key_trits(prng));
 }
 
-void prng_gen(mam_prng_t const *const prng, tryte_t const destination,
-              trits_t const nonce, trits_t output) {
-  prng_gen3(prng, destination, nonce, trits_null(), trits_null(), output);
+void mam_prng_gen(mam_prng_t const *const prng, tryte_t const destination,
+                  trits_t const nonce, trits_t output) {
+  mam_prng_gen3(prng, destination, nonce, trits_null(), trits_null(), output);
 }
 
-void prng_gen2(mam_prng_t const *const prng, tryte_t const destination,
-               trits_t const nonce1, trits_t const nonce2, trits_t output) {
-  prng_gen3(prng, destination, nonce1, nonce2, trits_null(), output);
+void mam_prng_gen2(mam_prng_t const *const prng, tryte_t const destination,
+                   trits_t const nonce1, trits_t const nonce2, trits_t output) {
+  mam_prng_gen3(prng, destination, nonce1, nonce2, trits_null(), output);
 }
 
-void prng_gen3(mam_prng_t const *const prng, tryte_t const destination,
-               trits_t const nonce1, trits_t const nonce2, trits_t const nonce3,
-               trits_t output) {
+void mam_prng_gen3(mam_prng_t const *const prng, tryte_t const destination,
+                   trits_t const nonce1, trits_t const nonce2,
+                   trits_t const nonce3, trits_t output) {
   trits_t KdN[5];
   MAM2_TRITS_DEF0(dt, 3);
   dt = MAM2_TRITS_INIT(dt, 3);

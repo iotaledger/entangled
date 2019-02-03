@@ -119,8 +119,8 @@ void wots_gen_sk2(wots_t *const wots, mam_prng_t const *const prng,
 void wots_gen_sk3(wots_t *const wots, mam_prng_t const *const prng,
                   trits_t const nonce1, trits_t const nonce2,
                   trits_t const nonce3) {
-  prng_gen3(prng, MAM2_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3,
-            wots_secret_key_trits(wots));
+  mam_prng_gen3(prng, MAM2_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3,
+                wots_secret_key_trits(wots));
 }
 
 void wots_calc_pk(wots_t *const wots, trits_t public_key) {

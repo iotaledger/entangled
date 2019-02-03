@@ -43,7 +43,7 @@ void ntru_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
 
   trits_set_zero(nonce_i);
   do {
-    prng_gen2(prng, MAM2_PRNG_DST_NTRU_KEY, nonce, nonce_i, secret_key);
+    mam_prng_gen2(prng, MAM2_PRNG_DST_NTRU_KEY, nonce, nonce_i, secret_key);
     poly_small_from_trits(f, trits_take(secret_key, MAM2_NTRU_SK_SIZE));
     poly_small_from_trits(g, trits_drop(secret_key, MAM2_NTRU_SK_SIZE));
 
@@ -81,7 +81,7 @@ void ntru_encr(trits_t const public_key, mam_prng_t const *const prng,
   trits_t r;
 
   r = trits_take(encrypted_session_key, MAM2_NTRU_SK_SIZE);
-  prng_gen2(prng, MAM2_PRNG_DST_NTRU_KEY, session_key, nonce, r);
+  mam_prng_gen2(prng, MAM2_PRNG_DST_NTRU_KEY, session_key, nonce, r);
   ntru_encr_r(public_key, spongos, r, session_key, encrypted_session_key);
 }
 

@@ -210,7 +210,7 @@ static void ntru_test(void) {
 
   sponge_t *sponge = test_sponge_init(&test_sponge);
   spongos_t *spongos = test_spongos_init(&test_spongos, sponge);
-  prng_t *prng = test_prng_init(&test_prng, sponge);
+  mam_prng_t *prng = test_prng_init(&test_prng, sponge);
   mam_ntru_sk_t *ntru = test_ntru_init(&test_ntru);
 
   size_t i;
@@ -235,7 +235,7 @@ static void ntru_test(void) {
                  "AAABBBCCCAAABBBCCCAAABBBCCC");
   /* it'spongos safe to reuse sponge from spongos for prng */
   /* as spongos is exclusively used in ntru_encr/ntru_decr. */
-  prng_init(prng, spongos->sponge, key);
+  mam_prng_init(prng, spongos->sponge, key);
 
   i = 0;
   trits_set_zero(key);
@@ -270,7 +270,7 @@ static void ntru_test(void) {
        * 1));*/
 
       trits_from_str(nonce, "NONCE9KEY9");
-      prng_gen(prng, MAM2_PRNG_DST_SEC_KEY, nonce, key);
+      mam_prng_gen(prng, MAM2_PRNG_DST_SEC_KEY, nonce, key);
     } while (0 != (++i % (test_count / 10)));
   } while (++i < test_count);
 }

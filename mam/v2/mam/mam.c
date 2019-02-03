@@ -581,9 +581,9 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg) {
     mss_skn(&cfg->ch->mss, skn);
   }
   /* generate session key */
-  prng_gen3(cfg->rng, MAM2_PRNG_DST_SEC_KEY, mam_channel_name(cfg->ch),
-            cfg->ep ? mam_endpoint_name(cfg->ep) : trits_null(), skn,
-            mam_send_msg_cfg_session_key(cfg));
+  mam_prng_gen3(cfg->rng, MAM2_PRNG_DST_SEC_KEY, mam_channel_name(cfg->ch),
+                cfg->ep ? mam_endpoint_name(cfg->ep) : trits_null(), skn,
+                mam_send_msg_cfg_session_key(cfg));
 
   /* choose recipient */
   spongos_init(spongos);

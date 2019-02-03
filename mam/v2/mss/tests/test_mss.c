@@ -129,7 +129,7 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
                  "ABCNOABCNKOZWYKOZWYSDF9SDF9"
                  "YSDF9QABCNKOZWYSDF9ABCNKOZW"
                  "SDF9CABCABCNKOZWYNKOZWYSDF9");
-  prng_init(prng, prng->sponge, key);
+  mam_prng_init(prng, prng->sponge, key);
   trits_set_zero(nonce);
   trits_set_zero(hash);
   trits_from_str(hash,
@@ -185,7 +185,7 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, spongos_t *spongos,
                  "ABCNOABCNKOZWYKOZWYSDF9SDF9"
                  "YSDF9QABCNKOZWYSDF9ABCNKOZW"
                  "SDF9CABCABCNKOZWYNKOZWYSDF9");
-  prng_init(prng, prng->sponge, key);
+  mam_prng_init(prng, prng->sponge, key);
   trits_set_zero(nonce);
   trits_set_zero(hash);
   trits_from_str(hash,

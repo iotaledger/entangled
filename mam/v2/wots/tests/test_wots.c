@@ -36,7 +36,7 @@ static void wots_test(void) {
   trits_set_zero(H);
   trits_set_zero(trits_from_rep(MAM2_WOTS_SK_SIZE, wots->secret_key));
 
-  prng_gen(prng, 7, N, H);
+  mam_prng_gen(prng, 7, N, H);
   wots_gen_sk(wots, prng, N);
   wots_calc_pk(wots, pk);
   wots_sign(wots, H, sig);
