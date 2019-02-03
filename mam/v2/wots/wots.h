@@ -71,7 +71,7 @@ void wots_init(wots_t *const wots, sponge_t *const sponge);
  * @param prng A PRNG interface
  * @param nonce The nonce
  */
-void wots_gen_sk(wots_t *const wots, prng_t const *const prng,
+void wots_gen_sk(wots_t *const wots, mam_prng_t const *const prng,
                  trits_t const nonce);
 
 /**
@@ -82,7 +82,7 @@ void wots_gen_sk(wots_t *const wots, prng_t const *const prng,
  * @param nonce1 The first nonce
  * @param nonce2 The second nonce
  */
-void wots_gen_sk2(wots_t *const wots, prng_t const *const prng,
+void wots_gen_sk2(wots_t *const wots, mam_prng_t const *const prng,
                   trits_t const nonce1, trits_t const nonce2);
 
 /**
@@ -94,7 +94,7 @@ void wots_gen_sk2(wots_t *const wots, prng_t const *const prng,
  * @param nonce2 The second nonce
  * @param nonce3 The third nonce
  */
-void wots_gen_sk3(wots_t *const wots, prng_t const *const prng,
+void wots_gen_sk3(wots_t *const wots, mam_prng_t const *const prng,
                   trits_t const nonce1, trits_t const nonce2,
                   trits_t const nonce3);
 

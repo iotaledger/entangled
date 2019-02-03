@@ -335,7 +335,7 @@ static void mss_fold_auth_path(spongos_t *spongos, mss_mt_idx_t skn,
   }
 }
 
-void mss_init(mss_t *mss, prng_t *prng, sponge_t *sponge, wots_t *wots,
+void mss_init(mss_t *mss, mam_prng_t *prng, sponge_t *sponge, wots_t *wots,
               trint6_t height, trits_t nonce1, trits_t nonce2) {
   MAM2_ASSERT(mss);
   MAM2_ASSERT(prng);

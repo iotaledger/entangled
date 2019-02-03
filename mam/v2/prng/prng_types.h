@@ -35,7 +35,7 @@ typedef enum prng_destination_tryte_e {
 typedef struct prng_s {
   sponge_t *sponge;
   trit_t *secret_key;
-} prng_t;
+} mam_prng_t;
 
 #ifdef __cplusplus
 }

@@ -30,7 +30,7 @@
 extern "C" {
 #endif
 
-retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
+retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, mam_prng_t *p,
                          mss_mt_height_t d, trits_t N1, trits_t N2);
 
 void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m);
@@ -75,7 +75,7 @@ retcode_t mam_unwrap_keyload_psk(spongos_t *s, trits_t *b, trits_t key,
 
 size_t mam_wrap_keyload_ntru_size();
 void mam_wrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key, trits_t pk,
-                           prng_t *p, spongos_t *ns, trits_t N);
+                           mam_prng_t *p, spongos_t *ns, trits_t N);
 retcode_t mam_unwrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key,
                                   bool *key_found, trits_t pkid,
                                   mam_ntru_sk_t *n, spongos_t *ns);
@@ -119,8 +119,8 @@ typedef enum mam_msg_checksum_e {
 typedef struct mam_send_msg_context_s {
   spongos_t spongos[1]; /*!< Main Spongos interface to wrap PB3 messages. */
   spongos_t fork[1];    /*!< Spongos interface for PB3 forks. */
-  prng_t *prng; /*!< Shared deterministic PRNG instance to gen MSS keys. */
-  prng_t *rng;  /*!< Volatile PRNG instance to generate ephemeral keys. */
+  mam_prng_t *prng; /*!< Shared deterministic PRNG instance to gen MSS keys. */
+  mam_prng_t *rng;  /*!< Volatile PRNG instance to generate ephemeral keys. */
   spongos_t spongos_ntru[1]; /*!< Spongos interface used by NTRU encr. */
 
   mam_channel_t *ch;   /*!< Current channel. */

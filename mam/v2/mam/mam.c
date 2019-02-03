@@ -14,7 +14,7 @@
 #include "mam/v2/mam/mam.h"
 #include "mam/v2/pb3/pb3.h"
 
-retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, prng_t *p,
+retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, mam_prng_t *p,
                          mss_mt_height_t d, trits_t N1, trits_t N2) {
   retcode_t e;
   MAM2_ASSERT(ma);
@@ -380,7 +380,7 @@ size_t mam_wrap_keyload_ntru_size() {
 }
 
 void mam_wrap_keyload_ntru(spongos_t *s, trits_t *b, trits_t key, trits_t pk,
-                           prng_t *p, spongos_t *ns, trits_t N) {
+                           mam_prng_t *p, spongos_t *ns, trits_t N) {
   trits_t ekey;
 
   MAM2_ASSERT(mam_wrap_keyload_ntru_size() <= trits_size(*b));

@@ -31,7 +31,7 @@ void ntru_destroy(mam_ntru_sk_t *const ntru) {
   ntru->f = NULL;
 }
 
-void ntru_gen(mam_ntru_sk_t const *const ntru, prng_t const *const prng,
+void ntru_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
               trits_t const nonce, trits_t public_key) {
   MAM2_TRITS_DEF0(nonce_i, 81);
   MAM2_TRITS_DEF0(secret_key, 2 * MAM2_NTRU_SK_SIZE);
@@ -71,7 +71,7 @@ void ntru_gen(mam_ntru_sk_t const *const ntru, prng_t const *const prng,
   trits_set_zero(secret_key);
 }
 
-void ntru_encr(trits_t const public_key, prng_t const *const prng,
+void ntru_encr(trits_t const public_key, mam_prng_t const *const prng,
                spongos_t *const spongos, trits_t const session_key,
                trits_t const nonce, trits_t encrypted_session_key) {
   MAM2_ASSERT(trits_size(session_key) == MAM2_NTRU_KEY_SIZE);

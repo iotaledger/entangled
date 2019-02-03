@@ -66,7 +66,7 @@ trits_t mam_endpoint_name(mam_endpoint_t const *const endpoint);
  * @return a status code
  */
 retcode_t mam_endpoint_create(mam_ialloc_t const *const allocator,
-                              prng_t const *const prng,
+                              mam_prng_t const *const prng,
                               mss_mt_height_t const height,
                               trits_t const channel_name,
                               trits_t const endpoint_name,

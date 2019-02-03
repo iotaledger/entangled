@@ -39,7 +39,7 @@ mam_ntru_sk_t *test_ntru_init(test_ntru_t *n) {
   return &n->ntru;
 }
 
-prng_t *test_prng_init(test_prng_t *p, sponge_t *s) {
+mam_prng_t *test_prng_init(test_prng_t *p, sponge_t *s) {
   p->p.sponge = s;
   p->p.secret_key = p->secret_key;
   memset(p->p.secret_key, 0, MAM2_PRNG_KEY_SIZE);
@@ -66,7 +66,7 @@ wots_t *test_wots_init(test_wots_t *w, sponge_t *s) {
   return &w->wots;
 }
 
-void prng_gen_str(prng_t *p, trint3_t d, char const *nonce, trits_t Y) {
+void prng_gen_str(mam_prng_t *p, trint3_t d, char const *nonce, trits_t Y) {
   size_t n;
   MAM2_TRITS_DEF0(N, MAM2_SPONGE_RATE);
   N = MAM2_TRITS_INIT(N, MAM2_SPONGE_RATE);
@@ -265,7 +265,7 @@ void _prng_gen(size_t Kn, char *K, size_t Nn, char *N, size_t Yn, char *Y) {
   test_sponge_t _s[1];
   test_prng_t _p[1];
   sponge_t *s = test_sponge_init(_s);
-  prng_t *p = test_prng_init(_p, s);
+  mam_prng_t *p = test_prng_init(_p, s);
 
   trits_t tK = trits_alloc(3 * Kn);
   trits_t tN = trits_alloc(3 * Nn);
@@ -288,7 +288,7 @@ void _wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   test_prng_t _p[1];
   test_wots_t _w[1];
   sponge_t *s = test_sponge_init(_s);
-  prng_t *p = test_prng_init(_p, s);
+  mam_prng_t *p = test_prng_init(_p, s);
   wots_t *w = test_wots_init(_w, s);
 
   trits_t tK = trits_alloc(3 * Kn);
@@ -315,7 +315,7 @@ void _wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   trits_free(tsig);
 }
 
-void test_gen_sponge(prng_t *p, sponge_t *s) {
+void test_gen_sponge(mam_prng_t *p, sponge_t *s) {
 #define TEST_MAX_SIZE (MAM2_SPONGE_RATE * 3)
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
   MAM2_TRITS_DEF0(X, TEST_MAX_SIZE);
@@ -352,7 +352,7 @@ void test_gen_sponge(prng_t *p, sponge_t *s) {
 #undef TEST_MAX_SIZE
 }
 
-void test_gen_spongos(prng_t *p, spongos_t *s) {
+void test_gen_spongos(mam_prng_t *p, spongos_t *s) {
 #define TEST_MAX_SIZE (MAM2_SPONGE_RATE * 3)
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
   MAM2_TRITS_DEF0(X, TEST_MAX_SIZE);
@@ -391,7 +391,7 @@ void test_gen_spongos(prng_t *p, spongos_t *s) {
 #undef TEST_MAX_SIZE
 }
 
-void test_gen_prng(prng_t *p, prng_t *r, sponge_t *s) {
+void test_gen_prng(mam_prng_t *p, mam_prng_t *r, sponge_t *s) {
 #define TEST_MAX_SIZE (MAM2_SPONGE_RATE * 3)
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
   MAM2_TRITS_DEF0(N, TEST_MAX_SIZE);
@@ -434,7 +434,7 @@ void test_gen_prng(prng_t *p, prng_t *r, sponge_t *s) {
 #undef TEST_MAX_SIZE
 }
 
-void test_gen_wots(prng_t *p, wots_t *w, sponge_t *s, prng_t *r) {
+void test_gen_wots(mam_prng_t *p, wots_t *w, sponge_t *s, mam_prng_t *r) {
 #define TEST_MAX_SIZE (MAM2_SPONGE_RATE * 3)
   MAM2_TRITS_DEF0(K, MAM2_SPONGE_KEY_SIZE);
   MAM2_TRITS_DEF0(N, TEST_MAX_SIZE);

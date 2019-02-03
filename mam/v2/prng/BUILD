@@ -31,7 +31,7 @@ cc_library(
     srcs = ["prng_types.c"],
     hdrs = ["prng_types.h"],
     deps = [
-        ":prng_t_set",
+        ":mam_prng_t_set",
         "//common:errors",
         "//mam/v2:defs",
         "//mam/v2/sponge",
@@ -44,5 +44,5 @@ typed_container_generate(
     additional_include_path = "mam/v2/prng/prng_types.h",
     container_type = "set",
     parent_directory = "mam/v2/prng",
-    value_type = "prng_t",
+    value_type = "mam_prng_t",
 )

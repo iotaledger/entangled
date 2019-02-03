@@ -11,8 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "mam/v2/prng/mam_prng_t_set.h"
 #include "mam/v2/prng/prng.h"
-#include "mam/v2/prng/prng_t_set.h"
 
 /*
  * Private functions
@@ -28,7 +28,7 @@ static inline void prng_squeeze(sponge_t *const sponge, trits_t output) {
   sponge_squeeze(sponge, MAM2_SPONGE_CTL_PRN, output);
 }
 
-static inline trits_t prng_secret_key_trits(prng_t const *const prng) {
+static inline trits_t prng_secret_key_trits(mam_prng_t const *const prng) {
   return trits_from_rep(MAM2_PRNG_KEY_SIZE, prng->secret_key);
 }
 
@@ -36,7 +36,7 @@ static inline trits_t prng_secret_key_trits(prng_t const *const prng) {
  * Public functions
  */
 
-retcode_t prng_create(prng_t *const prng) {
+retcode_t prng_create(mam_prng_t *const prng) {
   retcode_t ret = RC_OK;
   MAM2_ASSERT(prng);
 
@@ -48,7 +48,7 @@ retcode_t prng_create(prng_t *const prng) {
   return ret;
 }
 
-void prng_destroy(prng_t *const prng) {
+void prng_destroy(mam_prng_t *const prng) {
   MAM2_ASSERT(prng);
 
   prng->sponge = NULL;
@@ -56,7 +56,7 @@ void prng_destroy(prng_t *const prng) {
   prng->secret_key = NULL;
 }
 
-void prng_init(prng_t *const prng, sponge_t *const sponge,
+void prng_init(mam_prng_t *const prng, sponge_t *const sponge,
                trits_t const secret_key) {
   MAM2_ASSERT(trits_size(secret_key) == MAM2_PRNG_KEY_SIZE);
 
@@ -64,17 +64,17 @@ void prng_init(prng_t *const prng, sponge_t *const sponge,
   trits_copy(secret_key, prng_secret_key_trits(prng));
 }
 
-void prng_gen(prng_t const *const prng, tryte_t const destination,
+void prng_gen(mam_prng_t const *const prng, tryte_t const destination,
               trits_t const nonce, trits_t output) {
   prng_gen3(prng, destination, nonce, trits_null(), trits_null(), output);
 }
 
-void prng_gen2(prng_t const *const prng, tryte_t const destination,
+void prng_gen2(mam_prng_t const *const prng, tryte_t const destination,
                trits_t const nonce1, trits_t const nonce2, trits_t output) {
   prng_gen3(prng, destination, nonce1, nonce2, trits_null(), output);
 }
 
-void prng_gen3(prng_t const *const prng, tryte_t const destination,
+void prng_gen3(mam_prng_t const *const prng, tryte_t const destination,
                trits_t const nonce1, trits_t const nonce2, trits_t const nonce3,
                trits_t output) {
   trits_t KdN[5];
