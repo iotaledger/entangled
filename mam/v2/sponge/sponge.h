@@ -59,7 +59,7 @@ extern "C" {
 typedef struct sponge_s {
   void (*f)(void *, trit_t *);
   void *stack;
-  trit_t *state;
+  trit_t state[MAM2_SPONGE_WIDTH];
 } mam_sponge_t;
 
 /**

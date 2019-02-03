@@ -48,7 +48,6 @@ mam_prng_t *test_prng_init(test_prng_t *p, mam_sponge_t *s) {
 mam_sponge_t *test_mam_sponge_init(test_mam_sponge_t *s) {
   s->s.f = test_f;
   s->s.stack = s->stack;
-  s->s.state = s->state;
   memset(s->s.state, 0, MAM2_SPONGE_WIDTH);
   return &s->s;
 }

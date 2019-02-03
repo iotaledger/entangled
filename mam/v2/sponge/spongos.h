@@ -13,16 +13,12 @@
 
 #include "mam/v2/defs.h"
 #include "mam/v2/sponge/sponge.h"
+#include "mam/v2/sponge/spongos_types.h"
 #include "mam/v2/trits/trits.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef struct spongos_s {
-  mam_sponge_t *sponge;
-  size_t pos;
-} mam_spongos_t;
 
 /**
  * Initializes a spongos state
@@ -122,6 +118,12 @@ void mam_spongos_encr(mam_spongos_t *const spongos, trits_t plaintext,
  */
 void mam_spongos_decr(mam_spongos_t *const spongos, trits_t ciphertext,
                       trits_t plaintext);
+
+size_t mam_spongos_serialized_size(mam_spongos_t const *const spongos);
+
+void mam_spongos_serialize(mam_spongos_t const *const spongos, trits_t trits);
+
+void mam_spongos_deserialize(trits_t const trits, mam_spongos_t *const spongos);
 
 #ifdef __cplusplus
 }
