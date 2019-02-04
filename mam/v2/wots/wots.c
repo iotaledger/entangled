@@ -164,22 +164,3 @@ bool mam_wots_verify(mam_spongos_t *const spongos, trits_t const hash,
   mam_wots_recover(spongos, hash, signature, recovered_public_key);
   return trits_cmp_eq(public_key, recovered_public_key);
 }
-
-size_t mam_wots_serialized_size(mam_wots_t const *const wots) {
-  return mam_spongos_serialized_size(&wots->spongos) +
-         pb3_sizeof_ntrytes(MAM2_WOTS_SK_SIZE);
-}
-
-void mam_wots_serialize(mam_wots_t const *const wots, trits_t trits) {
-  mam_spongos_serialize(&wots->spongos, trits);
-  trits = trits_drop(trits,mam_spongos_serialized_size(&wots->spongos));
-  pb3_encode_ntrytes(trits_from_rep(MAM2_WOTS_SK_SIZE, wots->secret_key),
-                     &trits);
-}
-
-void mam_mam_wots_deserialize(trits_t const *const trits,
-                              mam_wots_t *const wots) {
-  mam_spongos_deserialize(trits, &wots->spongos);
-  pb3_decode_ntrytes(trits_from_rep(MAM2_WOTS_SK_SIZE, wots->secret_key),
-                     trits);
-}

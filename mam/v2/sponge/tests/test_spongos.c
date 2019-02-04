@@ -50,7 +50,8 @@ static void mam_spongos_test(void) {
       MAM2_TRITS_INIT(spongos_trits, mam_spongos_serialized_size(spongos));
   mam_spongos_serialize(spongos, spongos_trits);
   deserialized_spongos.sponge = test_create_sponge();
-  mam_spongos_deserialize(&spongos_trits, &deserialized_spongos);
+  TEST_ASSERT_EQUAL(
+      RC_OK, mam_spongos_deserialize(&spongos_trits, &deserialized_spongos));
 
   TEST_ASSERT_EQUAL_INT(spongos->pos, deserialized_spongos.pos);
   TEST_ASSERT_EQUAL_MEMORY(spongos->sponge->state,
