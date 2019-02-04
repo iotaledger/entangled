@@ -20,12 +20,12 @@
 
 static inline void prng_absorbn(mam_sponge_t *const sponge, size_t const n,
                                 trits_t const *const KdN) {
-  sponge_init(sponge);
-  sponge_absorbn(sponge, MAM2_SPONGE_CTL_KEY, n, KdN);
+  mam_sponge_init(sponge);
+  mam_sponge_absorbn(sponge, MAM2_SPONGE_CTL_KEY, n, KdN);
 }
 
 static inline void prng_squeeze(mam_sponge_t *const sponge, trits_t output) {
-  sponge_squeeze(sponge, MAM2_SPONGE_CTL_PRN, output);
+  mam_sponge_squeeze(sponge, MAM2_SPONGE_CTL_PRN, output);
 }
 
 static inline trits_t prng_secret_key_trits(mam_prng_t const *const prng) {

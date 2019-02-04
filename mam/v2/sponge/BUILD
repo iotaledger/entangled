@@ -19,5 +19,24 @@ cc_library(
     hdrs = ["spongos.h"],
     deps = [
         ":sponge",
+        ":spongos_types_hdr",
+    ],
+)
+
+cc_library(
+    name = "spongos_types_hdr",
+    hdrs = ["spongos_types.h"],
+    deps = [
+        ":sponge",
+    ],
+)
+
+cc_library(
+    name = "spongos_types",
+    srcs = ["spongos_types.c"],
+    hdrs = ["spongos_types.h"],
+    deps = [
+        ":sponge",
+        "//mam/v2/pb3",
     ],
 )

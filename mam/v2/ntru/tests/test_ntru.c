@@ -8,6 +8,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <memory.h>
 #include <unity/unity.h>
 
 #include "mam/v2/ntru/ntru.h"
@@ -68,7 +69,7 @@ static void ntru_decr_fail_test(void) {
   trit_t state[MAM2_SPONGE_WIDTH];
   MAM2_TRITS_DEF0(buf, MAM2_NTRU_EKEY_SIZE + MAM2_NTRU_SK_SIZE);
   mam_sponge_t _s[1];
-  spongos_t s[1];
+  mam_spongos_t s[1];
   /* mask is used to make spongos output equal 1* */
   trits_t mask;
 
@@ -101,7 +102,6 @@ static void ntru_decr_fail_test(void) {
   s->sponge = _s;
   s->sponge->f = ntru_test_f;
   s->sponge->stack = &mask;
-  s->sponge->state = state;
 
   trits_set1(u, 1);
   trits_set1(key, 0);
@@ -204,12 +204,12 @@ static void ntru_decr_fail_test(void) {
 
 static void ntru_test(void) {
   test_mam_sponge_t test_sponge;
-  test_spongos_t test_spongos;
+  test_mam_spongos_t test_spongos;
   test_prng_t test_prng;
   test_ntru_t test_ntru;
 
-  mam_sponge_t *sponge = test_sponge_init(&test_sponge);
-  spongos_t *spongos = test_spongos_init(&test_spongos, sponge);
+  mam_sponge_t *sponge = test_mam_sponge_init(&test_sponge);
+  mam_spongos_t *spongos = test_mam_spongos_init(&test_spongos, sponge);
   mam_prng_t *prng = test_prng_init(&test_prng, sponge);
   mam_ntru_sk_t *ntru = test_ntru_init(&test_ntru);
 
