@@ -52,13 +52,11 @@ extern "C" {
 /**
  * Sponge interface
  *
- * @field f sponge transformation
- * @field stack Additional memory used by `f`
+ * @field stack Additional memory used by the transformation function
  * @field state sponge state
  */
 typedef struct sponge_s {
-  void (*f)(void *, trit_t *);
-  void *stack;
+  trit_t stack[MAM2_SPONGE_WIDTH];
   trit_t state[MAM2_SPONGE_WIDTH];
 } mam_sponge_t;
 

@@ -14,23 +14,6 @@
 
 #include "mam/v2/test_utils/test_utils.h"
 
-void test_f(void *buf, trit_t *s) {
-  trits_t x = trits_from_rep(MAM2_SPONGE_RATE, s);
-  trits_t y = trits_from_rep(MAM2_SPONGE_RATE, (trit_t *)buf);
-  trits_t x0 = trits_take(x, MAM2_SPONGE_RATE / 2);
-  trits_t x1 = trits_drop(x, MAM2_SPONGE_RATE / 2);
-  trits_t x2 =
-      trits_drop(trits_from_rep(MAM2_SPONGE_WIDTH, s), MAM2_SPONGE_RATE);
-
-  trits_add(x0, x1, x0);
-  trits_add(x0, x2, x0);
-  trits_add(x0, x2, x2);
-
-  trits_copy(trits_take(x, MAM2_SPONGE_RATE - 6), trits_drop(y, 6));
-  trits_copy(trits_drop(x, MAM2_SPONGE_RATE - 6), trits_take(y, 6));
-  trits_copy(y, x);
-}
-
 mam_ntru_sk_t *test_ntru_init(test_ntru_t *n) {
   memcpy(n->ntru.public_key_id, n->public_key_id, MAM2_NTRU_ID_SIZE);
   memcpy(n->ntru.secret_key, n->secret_key, MAM2_NTRU_SK_SIZE);
@@ -46,8 +29,7 @@ mam_prng_t *test_prng_init(test_prng_t *p, mam_sponge_t *s) {
 }
 
 mam_sponge_t *test_mam_sponge_init(test_mam_sponge_t *s) {
-  s->s.f = test_f;
-  s->s.stack = s->stack;
+  memset(s->s.stack, 0, MAM2_SPONGE_WIDTH);
   memset(s->s.state, 0, MAM2_SPONGE_WIDTH);
   return &s->s;
 }
