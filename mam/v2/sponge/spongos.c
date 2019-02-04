@@ -9,10 +9,11 @@
  */
 
 #include "mam/v2/sponge/spongos.h"
+#include <stdlib.h>
 #include "mam/v2/sponge/sponge.h"
 
 static trits_t spongos_outer_trits(mam_spongos_t *const spongos) {
-  return trits_drop(mam_sponge_outer_trits(spongos->sponge), spongos->pos);
+  return trits_drop(mam_sponge_outer_trits(&spongos->sponge), spongos->pos);
 }
 
 static void spongos_update(mam_spongos_t *const spongos, size_t const n) {
@@ -23,19 +24,19 @@ static void spongos_update(mam_spongos_t *const spongos, size_t const n) {
 }
 
 void mam_spongos_init(mam_spongos_t *const spongos) {
-  mam_sponge_init(spongos->sponge);
+  mam_sponge_init(&spongos->sponge);
   spongos->pos = 0;
 }
 
 void mam_mam_spongos_fork(mam_spongos_t const *const spongos,
                           mam_spongos_t *const fork) {
-  mam_sponge_fork(spongos->sponge, fork->sponge);
+  mam_sponge_fork(&spongos->sponge, &fork->sponge);
   fork->pos = spongos->pos;
 }
 
 void mam_spongos_commit(mam_spongos_t *const spongos) {
   if (spongos->pos != 0) {
-    mam_sponge_transform(spongos->sponge);
+    mam_sponge_transform(&spongos->sponge);
     spongos->pos = 0;
   }
 }
@@ -122,4 +123,10 @@ void mam_spongos_decr(mam_spongos_t *const spongos, trits_t ciphertext,
                              plaintext);
     spongos_update(spongos, n);
   }
+}
+
+void mam_spongos_copy(mam_spongos_t const *const src,
+                      mam_spongos_t *const dst) {
+  memcpy(dst->sponge.state, src->sponge.state, MAM2_SPONGE_WIDTH);
+  dst->pos = src->pos;
 }

@@ -42,12 +42,8 @@ retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, mam_prng_t *p,
     trits_copy(N2, m->nonce2);
   }
 
-  m->sg->sponge = ma->create_sponge();
-  if (!m->sg->sponge) {
-    return RC_OOM;
-  }
 
-  mss_init(m, p, m->sg->sponge, d, m->nonce1, m->nonce2);
+  mss_init(m, p, &m->sg->sponge, d, m->nonce1, m->nonce2);
 
   e = RC_OK;
 
@@ -62,9 +58,6 @@ void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m) {
 
   trits_free(m->nonce1);
   trits_free(m->nonce2);
-
-  ma->destroy_sponge(m->sg->sponge);
-  m->sg->sponge = 0;
 
   mss_destroy(m);
 }
@@ -556,8 +549,6 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg) {
 
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->ch);
-  MAM2_ASSERT(cfg->spongos->sponge);
-  MAM2_ASSERT(cfg->fork->sponge);
   MAM2_ASSERT(msg);
   spongos = cfg->spongos;
   fork = cfg->fork;
@@ -710,7 +701,6 @@ void mam_send_packet(mam_send_packet_context_t *cfg, trits_t payload,
   tryte_t checksum;
 
   MAM2_ASSERT(cfg);
-  MAM2_ASSERT(cfg->spongos->sponge);
   MAM2_ASSERT(b);
   s = cfg->spongos;
 

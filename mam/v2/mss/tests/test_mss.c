@@ -141,8 +141,8 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
     sig = trits_take(sig_, MAM2_MSS_SIG_SIZE(curr_height));
     sig2 = trits_take(sig2_, MAM2_MSS_SIG_SIZE(curr_height));
 
-    mss_init(mss1, prng, spongos->sponge, curr_height, nonce, trits_null());
-    mss_init(mss2, prng, spongos->sponge, curr_height, nonce, trits_null());
+    mss_init(mss1, prng, &spongos->sponge, curr_height, nonce, trits_null());
+    mss_init(mss2, prng, &spongos->sponge, curr_height, nonce, trits_null());
     mss_gen(mss1, pk);
 
     do {
@@ -202,7 +202,8 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
 
     dbg_printf("========================\ncurr_height = %d\n", curr_height);
 
-    mss_init(mss, prng, spongos->sponge, curr_height, nonce, trits_null());
+    mss_init(mss, prng, &spongos->sponge, curr_height, nonce, trits_null());
+
     mss_gen(mss, pk);
 
     dbg_printf("mss pk \t");
@@ -277,7 +278,7 @@ static void mss_meta_test(void) {
   mam_spongos_t *sg = test_mam_spongos_init(_sg, spongos);
 
   mam_prng_t *p = test_prng_init(_p);
-  mam_wots_t *w = test_mam_wots_init(_w, spongos);
+  mam_wots_t *w = test_mam_wots_init(_w);
   mss_t *m1 = test_mss_init1(_m1);
   mss_t *m2 = test_mss_init2(_m2);
   mss_t *m3 = test_mss_init3(_m3);

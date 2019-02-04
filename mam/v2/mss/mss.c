@@ -350,7 +350,6 @@ void mss_init(mss_t *mss, mam_prng_t *prng, mam_sponge_t *sponge,
   mss->height = height;
   mss->skn = 0;
   mss->prng = prng;
-  mss->sg->sponge = sponge;
   mss->nonce1 = nonce1;
   mss->nonce2 = nonce2;
 #if defined(MAM2_MSS_TRAVERSAL)

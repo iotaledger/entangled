@@ -25,6 +25,7 @@ extern "C" {
  *
  * @param spongos A spongos interface
  */
+
 void mam_spongos_init(mam_spongos_t *const spongos);
 
 /**
@@ -33,6 +34,7 @@ void mam_spongos_init(mam_spongos_t *const spongos);
  * @param spongos A spongos interface
  * @param fork The fork
  */
+
 void mam_mam_spongos_fork(mam_spongos_t const *const spongos,
                           mam_spongos_t *const fork);
 
@@ -41,6 +43,7 @@ void mam_mam_spongos_fork(mam_spongos_t const *const spongos,
  *
  * @param spongos A spongos interface
  */
+
 void mam_spongos_commit(mam_spongos_t *const spongos);
 
 /**
@@ -49,6 +52,7 @@ void mam_spongos_commit(mam_spongos_t *const spongos);
  * @param spongos A spongos interface
  * @param input Input data
  */
+
 void mam_spongos_absorb(mam_spongos_t *const spongos, trits_t input);
 
 /**
@@ -58,6 +62,7 @@ void mam_spongos_absorb(mam_spongos_t *const spongos, trits_t input);
  * @param n Number of input data
  * @param inputs Inputs data
  */
+
 void mam_spongos_absorbn(mam_spongos_t *const spongos, size_t const n,
                          trits_t *const inputs);
 
@@ -67,6 +72,7 @@ void mam_spongos_absorbn(mam_spongos_t *const spongos, size_t const n,
  * @param spongos A spongos interface
  * @param output Output data
  */
+
 void mam_spongos_squeeze(mam_spongos_t *const spongos, trits_t output);
 
 /**
@@ -75,6 +81,7 @@ void mam_spongos_squeeze(mam_spongos_t *const spongos, trits_t output);
  * @param spongos A spongos interface
  * @param expected_output Expected output data
  */
+
 bool mam_spongos_squeeze_eq(mam_spongos_t *const spongos,
                             trits_t expected_output);
 
@@ -85,6 +92,7 @@ bool mam_spongos_squeeze_eq(mam_spongos_t *const spongos,
  * @param input Input data
  * @param output Output data
  */
+
 void mam_spongos_hash(mam_spongos_t *const spongos, trits_t input,
                       trits_t output);
 
@@ -96,6 +104,7 @@ void mam_spongos_hash(mam_spongos_t *const spongos, trits_t input,
  * @param inputs Inputs data
  * @param output Output data
  */
+
 void mam_spongos_hashn(mam_spongos_t *const spongos, size_t const n,
                        trits_t *inputs, trits_t output);
 
@@ -106,6 +115,7 @@ void mam_spongos_hashn(mam_spongos_t *const spongos, size_t const n,
  * @param plaintext Plaintext input
  * @param ciphertext Ciphertext output
  */
+
 void mam_spongos_encr(mam_spongos_t *const spongos, trits_t plaintext,
                       trits_t ciphertext);
 
@@ -116,8 +126,18 @@ void mam_spongos_encr(mam_spongos_t *const spongos, trits_t plaintext,
  * @param ciphertext Ciphertext input
  * @param plaintext Plaintext output
  */
+
 void mam_spongos_decr(mam_spongos_t *const spongos, trits_t ciphertext,
                       trits_t plaintext);
+
+/**
+ * Copy spongos from src to dst
+ *
+ * @param src The source
+ * @param dst The destination
+ */
+
+void mam_spongos_copy(mam_spongos_t const *const src, mam_spongos_t *const dst);
 
 #ifdef __cplusplus
 }
