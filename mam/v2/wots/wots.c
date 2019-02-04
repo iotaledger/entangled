@@ -82,11 +82,11 @@ static inline trits_t wots_secret_key_trits(mam_wots_t const *const wots) {
  * Public functions
  */
 
-void mam_wots_init(mam_wots_t *const wots, mam_sponge_t *const sponge) {
+void mam_wots_init(mam_wots_t *const wots) {
   MAM2_ASSERT(wots);
-  MAM2_ASSERT(sponge);
 
-  memset(wots, 0, sizeof(mam_wots_t));
+  mam_spongos_init(&wots->spongos);
+  memset(wots->secret_key, 0, MAM2_WOTS_SK_SIZE);
 }
 
 void mam_wots_destroy(mam_wots_t *const wots) {

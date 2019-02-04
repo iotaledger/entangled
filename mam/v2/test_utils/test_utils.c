@@ -18,11 +18,6 @@ mam_spongos_t *test_mam_spongos_init(test_mam_spongos_t *sg, mam_sponge_t *s) {
   return sg;
 }
 
-mam_wots_t *test_mam_wots_init(test_mam_wots_t *w) {
-  memset(w->wots.secret_key, 0, MAM2_WOTS_SK_PART_SIZE);
-  return &w->wots;
-}
-
 void prng_gen_str(mam_prng_t *p, trint3_t d, char const *nonce, trits_t Y) {
   size_t n;
   MAM2_TRITS_DEF0(N, MAM2_SPONGE_RATE);
@@ -236,11 +231,9 @@ void _prng_gen(size_t Kn, char *K, size_t Nn, char *N, size_t Yn, char *Y) {
 
 void _mam_wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
                         char *pk, size_t Hn, char *H, size_t sign, char *sig) {
-  test_mam_wots_t _w[1];
-
   mam_sponge_t s;
   mam_prng_t p;
-  mam_wots_t *w = test_mam_wots_init(_w);
+  mam_wots_t w;
 
   trits_t tK = trits_alloc(3 * Kn);
   trits_t tN = trits_alloc(3 * Nn);
@@ -249,16 +242,17 @@ void _mam_wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   trits_t tsig = trits_alloc(3 * sign);
 
   mam_sponge_init(&s);
+  mam_wots_init(&w);
 
   trits_from_str(tK, K);
   mam_prng_init(&p, tK);
   trits_from_str(tN, N);
-  mam_wots_gen_sk(w, &p, tN);
-  mam_wots_calc_pk(w, tpk);
+  mam_wots_gen_sk(&w, &p, tN);
+  mam_wots_calc_pk(&w, tpk);
   trits_to_str(tpk, pk);
 
   trits_from_str(tH, H);
-  mam_wots_sign(w, tH, tsig);
+  mam_wots_sign(&w, tH, tsig);
   trits_to_str(tsig, sig);
 
   trits_free(tK);

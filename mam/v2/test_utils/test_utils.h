@@ -31,13 +31,7 @@ extern "C" {
 
 typedef mam_spongos_t test_mam_spongos_t;
 
-typedef struct test_wots_s {
-  mam_wots_t wots;
-  trit_t secret_key[MAM2_WOTS_SK_SIZE];
-} test_mam_wots_t;
-
 mam_spongos_t *test_mam_spongos_init(test_mam_spongos_t *sg, mam_sponge_t *s);
-mam_wots_t *test_mam_wots_init(test_mam_wots_t *w);
 
 /**
  * PRNG output generation
