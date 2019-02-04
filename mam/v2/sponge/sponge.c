@@ -69,7 +69,8 @@ void mam_sponge_init(mam_sponge_t *const sponge) {
 }
 
 void mam_sponge_transform(mam_sponge_t *const sponge) {
-  sponge->f(sponge->stack, sponge->state);
+  // TODO mam2: replace sponge transformation function #773
+  test_f(sponge->stack, sponge->state);
 }
 
 void mam_sponge_fork(mam_sponge_t const *const sponge,
