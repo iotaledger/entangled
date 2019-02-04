@@ -85,6 +85,7 @@ static void ntru_test(void) {
       mam_prng_gen(&prng, MAM2_PRNG_DST_SEC_KEY, nonce, key);
     } while (0 != (++i % (test_count / 10)));
   } while (++i < test_count);
+  ntru_destroy(&ntru);
 }
 
 int main(void) {
