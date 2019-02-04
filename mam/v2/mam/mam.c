@@ -14,10 +14,9 @@
 #include "mam/v2/mam/mam.h"
 #include "mam/v2/pb3/pb3.h"
 
-retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, mam_prng_t *p,
-                         mss_mt_height_t d, trits_t N1, trits_t N2) {
+retcode_t mam_mss_create(mss_t *m, mam_prng_t *p, mss_mt_height_t d, trits_t N1,
+                         trits_t N2) {
   retcode_t e;
-  MAM2_ASSERT(ma);
   MAM2_ASSERT(m);
 
   if ((e = mss_create(m, d)) != RC_OK) {
@@ -50,8 +49,7 @@ retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, mam_prng_t *p,
   return e;
 }
 
-void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m) {
-  MAM2_ASSERT(ma);
+void mam_mss_destroy(mss_t *m) {
   MAM2_ASSERT(m);
 
   m->prng = 0;
@@ -789,7 +787,6 @@ retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
   MAM2_ASSERT(cfg->chid1);
   MAM2_ASSERT(cfg->epid);
   MAM2_ASSERT(cfg->epid1);
-  MAM2_ASSERT(cfg->allocator);
   MAM2_ASSERT(cfg->spongos);
   s = cfg->spongos;
   fork = cfg->fork;
@@ -901,7 +898,6 @@ retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *b,
 
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->spongos);
-  MAM2_ASSERT(cfg->allocator);
   MAM2_ASSERT(b);
   MAM2_ASSERT(payload);
   s = cfg->spongos;

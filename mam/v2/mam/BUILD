@@ -7,7 +7,6 @@ cc_library(
     srcs = ["mam.c"],
     hdrs = ["mam.h"],
     deps = [
-        ":alloc",
         ":channel",
         ":endpoint",
         ":mam_types",
@@ -22,19 +21,10 @@ cc_library(
 )
 
 cc_library(
-    name = "alloc",
-    hdrs = ["alloc.h"],
-    deps = [
-        "//mam/v2/sponge",
-    ],
-)
-
-cc_library(
     name = "channel",
     srcs = ["channel.c"],
     hdrs = ["channel.h"],
     deps = [
-        ":alloc",
         "//mam/v2/mss",
         "//mam/v2/pb3",
         "//mam/v2/trits",
@@ -46,7 +36,6 @@ cc_library(
     srcs = ["endpoint.c"],
     hdrs = ["endpoint.h"],
     deps = [
-        ":alloc",
         "//mam/v2/mss",
         "//mam/v2/trits",
     ],

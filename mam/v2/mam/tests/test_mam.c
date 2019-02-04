@@ -170,7 +170,6 @@ static void mam_test_generic_receive_msg(
     mam_recv_msg_context_t *const cfg_msg_recv) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
-  mam_ialloc_t ma[1];
   mam_pre_shared_key_t pre_shared_key[1];
   mam_ntru_pk_t ntru_pk[1];
   mam_ntru_sk_t ntru[1];
@@ -196,7 +195,6 @@ static void mam_test_generic_receive_msg(
   {
     mam_recv_msg_context_t *cfg = cfg_msg_recv;
 
-    cfg->allocator = ma;
     cfg->pubkey = -1;
     cfg->psk = pre_shared_key;
     cfg->ntru = ntru;
@@ -252,7 +250,6 @@ static void mam_test_create_channels(mam_prng_t *prng,
                                      mam_endpoint_t **const epa,
                                      mam_endpoint_t **ep1) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  mam_ialloc_t ma[1];
   mss_mt_height_t d = TEST_MSS_DEPTH;
 
   /* init rng */
@@ -272,7 +269,7 @@ static void mam_test_create_channels(mam_prng_t *prng,
     *cha = malloc(sizeof(mam_channel_t));
     TEST_ASSERT(0 != *cha);
     memset(*cha, 0, sizeof(mam_channel_t));
-    e = mam_channel_create(ma, prng, d, cha_name, *cha);
+    e = mam_channel_create(prng, d, cha_name, *cha);
     TEST_ASSERT(RC_OK == e);
 
     /* create endpoints */
@@ -283,7 +280,7 @@ static void mam_test_create_channels(mam_prng_t *prng,
       *epa = malloc(sizeof(mam_endpoint_t));
       TEST_ASSERT(0 != *epa);
       memset(*epa, 0, sizeof(mam_endpoint_t));
-      e = mam_endpoint_create(ma, prng, d, cha_name, epa_name, *epa);
+      e = mam_endpoint_create(prng, d, cha_name, epa_name, *epa);
       TEST_ASSERT(RC_OK == e);
       trits_free(epa_name);
     }
@@ -294,7 +291,7 @@ static void mam_test_create_channels(mam_prng_t *prng,
       *ep1 = malloc(sizeof(mam_endpoint_t));
       TEST_ASSERT(0 != *ep1);
       memset(*ep1, 0, sizeof(mam_endpoint_t));
-      e = mam_endpoint_create(ma, prng, d, cha_name, ep1a_name, *ep1);
+      e = mam_endpoint_create(prng, d, cha_name, ep1a_name, *ep1);
       TEST_ASSERT(RC_OK == e);
       trits_free(ep1a_name);
     }
@@ -306,7 +303,7 @@ static void mam_test_create_channels(mam_prng_t *prng,
       *ch1 = malloc(sizeof(mam_channel_t));
       TEST_ASSERT(0 != *ch1);
       memset(*ch1, 0, sizeof(mam_channel_t));
-      e = mam_channel_create(ma, prng, d, ch1a_name, *ch1);
+      e = mam_channel_create(prng, d, ch1a_name, *ch1);
       TEST_ASSERT(RC_OK == e);
       trits_free(ch1a_name);
     }
@@ -316,7 +313,6 @@ static void mam_test_create_channels(mam_prng_t *prng,
 static void mam_test_generic(void *sponge_alloc_ctx, mam_prng_t *prng_a,
                              mam_prng_t *prng_b) {
   retcode_t e = RC_OK;
-  mam_ialloc_t ma[1];
 
   trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
 
@@ -375,10 +371,10 @@ static void mam_test_generic(void *sponge_alloc_ctx, mam_prng_t *prng_a,
 
   /* destroy channels/endpoints */
   {
-    if (cha) mam_channel_destroy(ma, cha);
-    if (ch1a) mam_channel_destroy(ma, ch1a);
-    if (epa) mam_endpoint_destroy(ma, epa);
-    if (ep1a) mam_endpoint_destroy(ma, ep1a);
+    if (cha) mam_channel_destroy(cha);
+    if (ch1a) mam_channel_destroy(ch1a);
+    if (epa) mam_endpoint_destroy(epa);
+    if (ep1a) mam_endpoint_destroy(ep1a);
     free(cha);
     free(epa);
     free(ch1a);
