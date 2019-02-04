@@ -263,7 +263,6 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
 static void mss_meta_test(void) {
   test_mam_sponge_t _s[1];
   test_mam_spongos_t _sg[1];
-  test_prng_t _p[1];
   test_mam_wots_t _w[1];
   test_mss1_t _m1[1];
   test_mss2_t _m2[1];
@@ -277,7 +276,7 @@ static void mss_meta_test(void) {
   mam_sponge_t *spongos = test_mam_sponge_init(_s);
   mam_spongos_t *sg = test_mam_spongos_init(_sg, spongos);
 
-  mam_prng_t *p = test_prng_init(_p);
+  mam_prng_t p;
   mam_wots_t *w = test_mam_wots_init(_w);
   mss_t *m1 = test_mss_init1(_m1);
   mss_t *m2 = test_mss_init2(_m2);
@@ -288,11 +287,11 @@ static void mss_meta_test(void) {
   // mss_t *mx = test_mss_initx(_mx);
   // mss_t *m = test_mss_init(_m);
 
-  TEST_ASSERT_TRUE(mss_test(m1, p, sg, w, 1) && test_mss_check1(_m1));
-  TEST_ASSERT_TRUE(mss_test(m2, p, sg, w, 2) && test_mss_check2(_m2));
-  TEST_ASSERT_TRUE(mss_test(m3, p, sg, w, 3) && test_mss_check3(_m3));
+  TEST_ASSERT_TRUE(mss_test(m1, &p, sg, w, 1) && test_mss_check1(_m1));
+  TEST_ASSERT_TRUE(mss_test(m2, &p, sg, w, 2) && test_mss_check2(_m2));
+  TEST_ASSERT_TRUE(mss_test(m3, &p, sg, w, 3) && test_mss_check3(_m3));
   // TEST_ASSERT_TRUE(mss_test(m4, p, sg, w, 4) && test_mss_check4(_m4));
-  TEST_ASSERT_TRUE(mss_store_test(m4, m42, p, sg, w, 4) &&
+  TEST_ASSERT_TRUE(mss_store_test(m4, m42, &p, sg, w, 4) &&
                    test_mss_check4(_m4) && test_mss_check4(_m42));
   // #if 0
   //   TEST_ASSERT_TRUE(mss_test(m5, p, sg, w, 5) && test_mss_check5(_m5));
