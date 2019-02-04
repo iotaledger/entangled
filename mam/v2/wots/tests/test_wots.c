@@ -18,7 +18,7 @@ static void mam_wots_test(void) {
   test_prng_t test_prng;
   test_mam_wots_t test_wots;
   mam_sponge_t *sponge = test_mam_sponge_init(&test_sponge);
-  mam_prng_t *prng = test_prng_init(&test_prng, sponge);
+  mam_prng_t *prng = test_prng_init(&test_prng);
   mam_wots_t *wots = test_mam_wots_init(&test_wots, sponge);
 
   MAM2_TRITS_DEF0(N, 18);

@@ -319,7 +319,7 @@ static void mam_test_create_channels(
     k = MAM2_TRITS_INIT(k, MAM2_PRNG_KEY_SIZE);
 
     trits_from_str(k, TEST_PRNG_A_KEY);
-    mam_prng_init(prng, prng->sponge, k);
+    mam_prng_init(prng, k);
   }
 
   /* create channels */
@@ -472,8 +472,8 @@ void mam_test() {
   mam_sponge_t *s = test_mam_sponge_init(_s);
 
   test_prng_t _pa[1], _pb[1];
-  mam_prng_t *pa = test_prng_init(_pa, s);
-  mam_prng_t *pb = test_prng_init(_pb, s);
+  mam_prng_t *pa = test_prng_init(_pa);
+  mam_prng_t *pb = test_prng_init(_pb);
 
   mam_test_generic(s, NULL, test_create_sponge, test_delete_sponge, pa, pb);
 }

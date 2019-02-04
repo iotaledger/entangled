@@ -22,8 +22,7 @@ mam_ntru_sk_t *test_ntru_init(test_ntru_t *n) {
   return &n->ntru;
 }
 
-mam_prng_t *test_prng_init(test_prng_t *p, mam_sponge_t *s) {
-  p->p.sponge = s;
+mam_prng_t *test_prng_init(test_prng_t *p) {
   memset(p->p.secret_key, 0, MAM2_PRNG_KEY_SIZE);
   return &p->p;
 }
@@ -243,18 +242,16 @@ void _mam_sponge_decr(size_t Kn, char *K, size_t Yn, char *Y, size_t Xn,
 }
 
 void _prng_gen(size_t Kn, char *K, size_t Nn, char *N, size_t Yn, char *Y) {
-  test_mam_sponge_t _s[1];
   test_prng_t _p[1];
 
-  mam_sponge_t *s = test_mam_sponge_init(_s);
-  mam_prng_t *p = test_prng_init(_p, s);
+  mam_prng_t *p = test_prng_init(_p);
 
   trits_t tK = trits_alloc(3 * Kn);
   trits_t tN = trits_alloc(3 * Nn);
   trits_t tY = trits_alloc(3 * Yn);
 
   trits_from_str(tK, K);
-  mam_prng_init(p, s, tK);
+  mam_prng_init(p, tK);
   trits_from_str(tN, N);
   mam_prng_gen(p, 0, tN, tY);
   trits_to_str(tY, Y);
@@ -271,7 +268,7 @@ void _mam_wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   test_mam_wots_t _w[1];
 
   mam_sponge_t *s = test_mam_sponge_init(_s);
-  mam_prng_t *p = test_prng_init(_p, s);
+  mam_prng_t *p = test_prng_init(_p);
   mam_wots_t *w = test_mam_wots_init(_w, s);
 
   trits_t tK = trits_alloc(3 * Kn);
@@ -281,7 +278,7 @@ void _mam_wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
   trits_t tsig = trits_alloc(3 * sign);
 
   trits_from_str(tK, K);
-  mam_prng_init(p, s, tK);
+  mam_prng_init(p, tK);
   trits_from_str(tN, N);
   mam_wots_gen_sk(w, p, tN);
   mam_wots_calc_pk(w, tpk);
@@ -388,7 +385,7 @@ void test_gen_prng(mam_prng_t *p, mam_prng_t *r, mam_sponge_t *s) {
 
   prng_gen_str(p, MAM2_PRNG_DST_SEC_KEY, "PRNGKEY", K);
   prng_gen_str(p, 4, "PRNGNONCE", N);
-  mam_prng_init(r, s, K);
+  mam_prng_init(r, K);
 
   printf("prng\n");
   for (i = 0; ns[i] < TEST_MAX_SIZE; ++i) {
@@ -438,7 +435,7 @@ void test_gen_wots(mam_prng_t *p, mam_wots_t *w, mam_sponge_t *s,
   prng_gen_str(p, 4, "WOTSNONCE", N);
 
   mam_wots_init(w, s);
-  mam_prng_init(r, s, K);
+  mam_prng_init(r, K);
 
   printf("wots\n");
   trits_print2("\tK\t=", K, "\n");
