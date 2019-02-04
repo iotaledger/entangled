@@ -35,11 +35,11 @@
 // TODO - Test functions should take set of prng_t instead of raw ptrs
 
 static trits_t mam_test_generic_send_msg(
-    void *sponge_alloc_ctx, mam_prng_t *prng_a, mam_prng_t *prng_b,
-    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
-    mam_msg_checksum_t checksum, mam_channel_t *const cha,
-    mam_endpoint_t *const epa, mam_channel_t *const ch1a,
-    mam_endpoint_t *const ep1a, mam_send_msg_context_t *const cfg_msga) {
+    mam_prng_t *prng_a, mam_prng_t *prng_b, mam_msg_pubkey_t pubkey,
+    mam_msg_keyload_t keyload, mam_msg_checksum_t checksum,
+    mam_channel_t *const cha, mam_endpoint_t *const epa,
+    mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
+    mam_send_msg_context_t *const cfg_msga) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   trits_t msg = trits_null();
@@ -310,8 +310,7 @@ static void mam_test_create_channels(mam_prng_t *prng,
   }
 }
 
-static void mam_test_generic(void *sponge_alloc_ctx, mam_prng_t *prng_a,
-                             mam_prng_t *prng_b) {
+static void mam_test_generic(mam_prng_t *prng_a, mam_prng_t *prng_b) {
   retcode_t e = RC_OK;
 
   trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
@@ -341,9 +340,9 @@ static void mam_test_generic(void *sponge_alloc_ctx, mam_prng_t *prng_a,
       {
         /* send msg and packet */
         {
-          msg = mam_test_generic_send_msg(sponge_alloc_ctx, prng_a, prng_b,
-                                          pubkey, keyload, checksum, cha, epa,
-                                          ch1a, ep1a, cfg_msg_send);
+          msg = mam_test_generic_send_msg(prng_a, prng_b, pubkey, keyload,
+                                          checksum, cha, epa, ch1a, ep1a,
+                                          cfg_msg_send);
 
           packet = mam_test_generic_send_first_packet(
               pubkey, checksum, cha, epa, ch1a, ep1a, cfg_msg_send,
@@ -389,7 +388,7 @@ void mam_test() {
   mam_prng_t *pa = test_prng_init(_pa);
   mam_prng_t *pb = test_prng_init(_pb);
 
-  mam_test_generic(NULL, pa, pb);
+  mam_test_generic(pa, pb);
 }
 
 int main(void) {
