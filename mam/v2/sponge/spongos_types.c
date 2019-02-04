@@ -24,7 +24,7 @@ void mam_spongos_serialize(mam_spongos_t const *const spongos, trits_t trits) {
 retcode_t mam_spongos_deserialize(trits_t *const trits,
                                   mam_spongos_t *const spongos) {
   retcode_t err;
-  pb3_decode_size_t(&spongos->pos, trits);
+  ERR_BIND_RETURN(pb3_decode_size_t(&spongos->pos, trits), err);
   ERR_BIND_RETURN(
       pb3_decode_ntrytes(
           trits_from_rep(MAM2_SPONGE_WIDTH, spongos->sponge->state), trits),
