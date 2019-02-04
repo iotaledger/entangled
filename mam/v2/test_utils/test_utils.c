@@ -14,14 +14,6 @@
 
 #include "mam/v2/test_utils/test_utils.h"
 
-mam_ntru_sk_t *test_ntru_init(test_ntru_t *n) {
-  memcpy(n->ntru.public_key_id, n->public_key_id, MAM2_NTRU_ID_SIZE);
-  memcpy(n->ntru.secret_key, n->secret_key, MAM2_NTRU_SK_SIZE);
-  n->ntru.f = n->f;
-  memset(n->ntru.secret_key, 0, MAM2_NTRU_SK_SIZE);
-  return &n->ntru;
-}
-
 mam_sponge_t *test_mam_sponge_init(test_mam_sponge_t *s) {
   memset(s->s.stack, 0, MAM2_SPONGE_WIDTH);
   memset(s->s.state, 0, MAM2_SPONGE_WIDTH);

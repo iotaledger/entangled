@@ -63,7 +63,7 @@ static trits_t mam_test_generic_send_msg(
     ntru_nonce = MAM2_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
 
-    e = ntru_create(ntru);
+    e = ntru_init(ntru);
     ntru_gen(ntru, prng_b, ntru_nonce, mam_ntru_pk_trits(ntru_pk));
     TEST_ASSERT(RC_OK == e);
   }
@@ -186,7 +186,7 @@ static void mam_test_generic_receive_msg(
     ntru_nonce = MAM2_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
 
-    e = ntru_create(ntru);
+    e = ntru_init(ntru);
     ntru_gen(ntru, prng, ntru_nonce, mam_ntru_pk_trits(ntru_pk));
     TEST_ASSERT(RC_OK == e);
   }

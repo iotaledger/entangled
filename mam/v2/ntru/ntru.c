@@ -14,9 +14,10 @@
 #include "mam/v2/ntru/ntru.h"
 #include "mam/v2/ntru/poly.h"
 
-retcode_t ntru_create(mam_ntru_sk_t *const ntru) {
+retcode_t ntru_init(mam_ntru_sk_t *const ntru) {
   MAM2_ASSERT(ntru);
 
+  memset(ntru, 0, sizeof(mam_ntru_sk_t));
   if ((ntru->f = malloc(sizeof(poly_t))) == NULL) {
     free(ntru->f);
     return RC_OOM;
