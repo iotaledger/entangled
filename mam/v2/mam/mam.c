@@ -41,8 +41,7 @@ retcode_t mam_mss_create(mss_t *m, mam_prng_t *p, mss_mt_height_t d, trits_t N1,
     trits_copy(N2, m->nonce2);
   }
 
-
-  mss_init(m, p, &m->sg->sponge, d, m->nonce1, m->nonce2);
+  mss_init(m, p, d, m->nonce1, m->nonce2);
 
   e = RC_OK;
 

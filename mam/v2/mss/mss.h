@@ -155,8 +155,8 @@ It is achieved by allocating one extra node:
  * @return void
  */
 
-void mss_init(mss_t *mss, mam_prng_t *prng, mam_sponge_t *sponge,
-              trint6_t height, trits_t nonce1, trits_t nonce2);
+void mss_init(mss_t *mss, mam_prng_t *prng, trint6_t height, trits_t nonce1,
+              trits_t nonce2);
 /**
  * Generate MSS keys, stores current and next auth_path
  *
