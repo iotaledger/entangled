@@ -55,6 +55,9 @@ static void mss_mt_gen_leaf(
     mss_t *mss, mss_mt_idx_t i, /*!< [in] leaf index: `0 <= i < 2^D` */
     trits_t pk                  /*!< [out] WOTS pk / leaf hash */
 ) {
+  mam_wots_t wots;
+  mam_sponge_t sponge;
+
 #if defined(MAM2_MSS_DEBUG)
   MAM2_ASSERT(0 <= i && i <= MAM2_MSS_MAX_SKN(mss->height));
 
@@ -65,16 +68,19 @@ static void mss_mt_gen_leaf(
   trits_set_zero(h);
   trits_put18(h, i);
 #else
+
   MAM2_TRITS_DEF0(nonce_i, MAM2_MSS_SKN_SIZE);
+  mam_sponge_init(&sponge);
+  mam_wots_init(&wots, &sponge);
 
   MAM2_ASSERT(0 <= i && i <= MAM2_MSS_MAX_SKN(mss->height));
   nonce_i = MAM2_TRITS_INIT(nonce_i, MAM2_MSS_SKN_SIZE);
 
   /* gen sk from current leaf index */
   trits_put18(nonce_i, i);
-  mam_wots_gen_sk3(mss->wots, mss->prng, mss->nonce1, mss->nonce2, nonce_i);
+  mam_wots_gen_sk3(&wots, mss->prng, mss->nonce1, mss->nonce2, nonce_i);
   /* calc pk & push hash */
-  mam_wots_calc_pk(mss->wots, pk);
+  mam_wots_calc_pk(&wots, pk);
 #endif
 }
 
@@ -336,8 +342,7 @@ static void mss_fold_auth_path(mam_spongos_t *spongos, mss_mt_idx_t skn,
 }
 
 void mss_init(mss_t *mss, mam_prng_t *prng, mam_sponge_t *sponge,
-              mam_wots_t *wots, trint6_t height, trits_t nonce1,
-              trits_t nonce2) {
+              trint6_t height, trits_t nonce1, trits_t nonce2) {
   MAM2_ASSERT(mss);
   MAM2_ASSERT(prng);
   MAM2_ASSERT(0 <= height && height <= MAM2_MSS_MAX_D);
@@ -346,7 +351,6 @@ void mss_init(mss_t *mss, mam_prng_t *prng, mam_sponge_t *sponge,
   mss->skn = 0;
   mss->prng = prng;
   mss->sg->sponge = sponge;
-  mss->wots = wots;
   mss->nonce1 = nonce1;
   mss->nonce2 = nonce2;
 #if defined(MAM2_MSS_TRAVERSAL)
@@ -525,6 +529,8 @@ void mss_auth_path(mss_t *mss, trint18_t skn, trits_t path) {
 }
 
 void mss_sign(mss_t *mss, trits_t hash, trits_t sig) {
+  mam_wots_t wots;
+  mam_sponge_t sponge;
   MAM2_ASSERT(trits_size(sig) == MAM2_MSS_SIG_SIZE(mss->height));
 
   // Write both tree height and the sk index to the signature
@@ -535,15 +541,17 @@ void mss_sign(mss_t *mss, trits_t hash, trits_t sig) {
   /* instead of WOTS sig gen WOTS pk directly */
   mss_mt_gen_leaf(mss, mss->skn, trits_take(sig, MAM2_MSS_MT_HASH_SIZE));
 #else
+  mam_sponge_init(&sponge);
+  mam_wots_init(&wots, &sponge);
   {
     // Generate the current (skn) secret key
     MAM2_TRITS_DEF0(nonce_i, MAM2_MSS_SKN_SIZE);
     nonce_i = MAM2_TRITS_INIT(nonce_i, MAM2_MSS_SKN_SIZE);
     trits_put18(nonce_i, mss->skn);
-    mam_wots_gen_sk3(mss->wots, mss->prng, mss->nonce1, mss->nonce2, nonce_i);
+    mam_wots_gen_sk3(&wots, mss->prng, mss->nonce1, mss->nonce2, nonce_i);
   }
 
-  mam_wots_sign(mss->wots, hash, trits_take(sig, MAM2_WOTS_SIG_SIZE));
+  mam_wots_sign(&wots, hash, trits_take(sig, MAM2_WOTS_SIG_SIZE));
 #endif
   sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
 
