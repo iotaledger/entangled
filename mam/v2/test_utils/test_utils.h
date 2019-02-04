@@ -55,7 +55,7 @@ typedef struct test_wots_s {
 } test_mam_wots_t;
 
 mam_ntru_sk_t *test_ntru_init(test_ntru_t *n);
-mam_prng_t *test_prng_init(test_prng_t *p, mam_sponge_t *s);
+mam_prng_t *test_prng_init(test_prng_t *p);
 mam_sponge_t *test_mam_sponge_init(test_mam_sponge_t *s);
 mam_spongos_t *test_mam_spongos_init(test_mam_spongos_t *sg, mam_sponge_t *s);
 mam_wots_t *test_mam_wots_init(test_mam_wots_t *w, mam_sponge_t *s);

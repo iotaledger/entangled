@@ -52,7 +52,7 @@ static void ntru_test(void) {
 
   mam_sponge_t *sponge = test_mam_sponge_init(&test_sponge);
   mam_spongos_t *spongos = test_mam_spongos_init(&test_spongos, sponge);
-  mam_prng_t *prng = test_prng_init(&test_prng, sponge);
+  mam_prng_t *prng = test_prng_init(&test_prng);
   mam_ntru_sk_t *ntru = test_ntru_init(&test_ntru);
 
   size_t i;
@@ -77,7 +77,7 @@ static void ntru_test(void) {
                  "AAABBBCCCAAABBBCCCAAABBBCCC");
   /* it'spongos safe to reuse sponge from spongos for prng */
   /* as spongos is exclusively used in ntru_encr/ntru_decr. */
-  mam_prng_init(prng, spongos->sponge, key);
+  mam_prng_init(prng, key);
 
   i = 0;
   trits_set_zero(key);
