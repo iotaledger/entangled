@@ -14,8 +14,7 @@
 #include "mam/v2/test_utils/test_utils.h"
 
 static void mam_sponge_hash_test(void) {
-  test_mam_sponge_t test_sponge;
-  mam_sponge_t *sponge = test_mam_sponge_init(&test_sponge);
+  mam_sponge_t sponge;
 
   MAM2_TRITS_DEF0(X0, MAM2_SPONGE_RATE * 3);
   trits_t Xs[3], X;
@@ -26,14 +25,16 @@ static void mam_sponge_hash_test(void) {
   Y1 = MAM2_TRITS_INIT(Y1, 243);
   Y2 = MAM2_TRITS_INIT(Y2, 243);
 
+  mam_sponge_init(&sponge);
+
   for (n = 0; n < MAM2_SPONGE_RATE * 3; n += MAM2_SPONGE_RATE / 2) {
     X = trits_take(X0, n);
     trits_set_zero(X);
-    mam_sponge_hash(sponge, X, Y1);
+    mam_sponge_hash(&sponge, X, Y1);
 
     if (0 && 0 < n) {
       trits_put1(X, trit_add(trits_get1(X), 1));
-      mam_sponge_hash(sponge, X, Y2);
+      mam_sponge_hash(&sponge, X, Y2);
       trits_put1(X, trit_sub(trits_get1(X), 1));
       TEST_ASSERT_TRUE(!trits_cmp_eq(Y1, Y2));
     }
@@ -41,14 +42,13 @@ static void mam_sponge_hash_test(void) {
     Xs[0] = trits_take(X, n / 3);
     Xs[1] = trits_take(trits_drop(X, n / 3), n / 4);
     Xs[2] = trits_drop(X, n / 3 + n / 4);
-    mam_sponge_hashn(sponge, 3, Xs, Y2);
+    mam_sponge_hashn(&sponge, 3, Xs, Y2);
     TEST_ASSERT_TRUE(trits_cmp_eq(Y1, Y2));
   }
 }
 
 static void sponge_ae_test(void) {
-  test_mam_sponge_t test_sponge;
-  mam_sponge_t *sponge = test_mam_sponge_init(&test_sponge);
+  mam_sponge_t sponge;
 
 #define MAM2_SPONGE_TEST_MAX_K 1110
   size_t k, i;
@@ -86,32 +86,32 @@ static void sponge_ae_test(void) {
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM");
-  mam_sponge_init(sponge);
-  mam_sponge_absorb(sponge, MAM2_SPONGE_CTL_KEY, K);
-  mam_sponge_squeeze(sponge, MAM2_SPONGE_CTL_PRN, K);
+  mam_sponge_init(&sponge);
+  mam_sponge_absorb(&sponge, MAM2_SPONGE_CTL_KEY, K);
+  mam_sponge_squeeze(&sponge, MAM2_SPONGE_CTL_PRN, K);
 
   for (i = 0; (k = ks[i++]) <= MAM2_SPONGE_TEST_MAX_K;) {
     X = MAM2_TRITS_INIT(X, k);
     Y = MAM2_TRITS_INIT(Y, k);
     Z = MAM2_TRITS_INIT(Z, k);
 
-    mam_sponge_init(sponge);
-    mam_sponge_absorb(sponge, MAM2_SPONGE_CTL_KEY, K);
-    mam_sponge_encr(sponge, X, Y); /* Y=E(X) */
+    mam_sponge_init(&sponge);
+    mam_sponge_absorb(&sponge, MAM2_SPONGE_CTL_KEY, K);
+    mam_sponge_encr(&sponge, X, Y); /* Y=E(X) */
 
-    mam_sponge_init(sponge);
-    mam_sponge_absorb(sponge, MAM2_SPONGE_CTL_KEY, K);
-    mam_sponge_decr(sponge, Y, Z); /* Z=D(E(X)) */
+    mam_sponge_init(&sponge);
+    mam_sponge_absorb(&sponge, MAM2_SPONGE_CTL_KEY, K);
+    mam_sponge_decr(&sponge, Y, Z); /* Z=D(E(X)) */
     TEST_ASSERT_TRUE(trits_cmp_eq(X, Z));
 
-    mam_sponge_init(sponge);
-    mam_sponge_absorb(sponge, MAM2_SPONGE_CTL_KEY, K);
-    mam_sponge_encr(sponge, Z, Z); /* Z=E(Z=X) */
+    mam_sponge_init(&sponge);
+    mam_sponge_absorb(&sponge, MAM2_SPONGE_CTL_KEY, K);
+    mam_sponge_encr(&sponge, Z, Z); /* Z=E(Z=X) */
     TEST_ASSERT_TRUE(trits_cmp_eq(Y, Z));
 
-    mam_sponge_init(sponge);
-    mam_sponge_absorb(sponge, MAM2_SPONGE_CTL_KEY, K);
-    mam_sponge_decr(sponge, Z, Z); /* Z=D(Z=E(X)) */
+    mam_sponge_init(&sponge);
+    mam_sponge_absorb(&sponge, MAM2_SPONGE_CTL_KEY, K);
+    mam_sponge_decr(&sponge, Z, Z); /* Z=D(Z=E(X)) */
     TEST_ASSERT_TRUE(trits_cmp_eq(X, Z));
   }
 

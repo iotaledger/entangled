@@ -37,6 +37,7 @@ static void mam_wots_test(void) {
   trits_set_zero(K);
   trits_set_zero(trits_from_rep(MAM2_WOTS_SK_SIZE, wots->secret_key));
 
+  mam_sponge_init(&sponge);
   mam_prng_init(&prng, K);
   mam_prng_gen(&prng, 7, N, H);
   mam_wots_gen_sk(wots, &prng, N);

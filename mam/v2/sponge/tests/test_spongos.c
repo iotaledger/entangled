@@ -15,11 +15,12 @@
 #include "mam/v2/test_utils/test_utils.h"
 
 static void mam_spongos_test(void) {
-  test_mam_sponge_t test_sponge;
   test_mam_spongos_t test_spongos;
-  mam_sponge_t *sponge = test_mam_sponge_init(&test_sponge);
-  mam_spongos_t *spongos = test_mam_spongos_init(&test_spongos, sponge);
+  mam_sponge_t sponge;
+  mam_spongos_t *spongos = test_mam_spongos_init(&test_spongos, &sponge);
   mam_spongos_t deserialized_spongos;
+
+  mam_sponge_init(&sponge);
 
   MAM2_TRITS_DEF0(x, 243);
   MAM2_TRITS_DEF0(y, 243);

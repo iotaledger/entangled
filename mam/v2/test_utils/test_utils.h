@@ -29,12 +29,6 @@ extern "C" {
 #define MAM2_MSS_TEST_MAX_D 3
 #endif
 
-typedef struct test_sponge_s {
-  mam_sponge_t s;
-  trit_t stack[MAM2_SPONGE_WIDTH];
-  trit_t state[MAM2_SPONGE_WIDTH];
-} test_mam_sponge_t;
-
 typedef mam_spongos_t test_mam_spongos_t;
 
 typedef struct test_wots_s {
@@ -42,7 +36,6 @@ typedef struct test_wots_s {
   trit_t secret_key[MAM2_WOTS_SK_SIZE];
 } test_mam_wots_t;
 
-mam_sponge_t *test_mam_sponge_init(test_mam_sponge_t *s);
 mam_spongos_t *test_mam_spongos_init(test_mam_spongos_t *sg, mam_sponge_t *s);
 mam_wots_t *test_mam_wots_init(test_mam_wots_t *w);
 

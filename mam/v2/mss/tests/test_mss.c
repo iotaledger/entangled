@@ -261,7 +261,6 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
 }
 
 static void mss_meta_test(void) {
-  test_mam_sponge_t _s[1];
   test_mam_spongos_t _sg[1];
   test_mam_wots_t _w[1];
   test_mss1_t _m1[1];
@@ -273,8 +272,8 @@ static void mss_meta_test(void) {
   // test_mssx_t _mx[1];
   // test_mss_t _m[1];
 
-  mam_sponge_t *spongos = test_mam_sponge_init(_s);
-  mam_spongos_t *sg = test_mam_spongos_init(_sg, spongos);
+  mam_sponge_t sponge;
+  mam_spongos_t *sg = test_mam_spongos_init(_sg, &sponge);
 
   mam_prng_t p;
   mam_wots_t *w = test_mam_wots_init(_w);

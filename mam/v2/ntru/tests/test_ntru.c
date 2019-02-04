@@ -16,11 +16,10 @@
 #include "mam/v2/test_utils/test_utils.h"
 
 static void ntru_test(void) {
-  test_mam_sponge_t test_sponge;
   test_mam_spongos_t test_spongos;
 
-  mam_sponge_t *sponge = test_mam_sponge_init(&test_sponge);
-  mam_spongos_t *spongos = test_mam_spongos_init(&test_spongos, sponge);
+  mam_sponge_t sponge;
+  mam_spongos_t *spongos = test_mam_spongos_init(&test_spongos, &sponge);
   mam_prng_t prng;
   mam_ntru_sk_t ntru;
 
@@ -45,6 +44,7 @@ static void ntru_test(void) {
                  "AAABBBCCCAAABBBCCCAAABBBCCC");
   /* it'spongos safe to reuse sponge from spongos for prng */
   /* as spongos is exclusively used in ntru_encr/ntru_decr. */
+  mam_sponge_init(&sponge);
   mam_prng_init(&prng, key);
   ntru_init(&ntru);
   f0 = (poly_coeff_t *)ntru.f;
