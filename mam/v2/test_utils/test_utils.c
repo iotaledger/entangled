@@ -14,10 +14,6 @@
 
 #include "mam/v2/test_utils/test_utils.h"
 
-mam_spongos_t *test_mam_spongos_init(test_mam_spongos_t *sg, mam_sponge_t *s) {
-  return sg;
-}
-
 void prng_gen_str(mam_prng_t *p, trint3_t d, char const *nonce, trits_t Y) {
   size_t n;
   MAM2_TRITS_DEF0(N, MAM2_SPONGE_RATE);

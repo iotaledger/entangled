@@ -29,10 +29,6 @@ extern "C" {
 #define MAM2_MSS_TEST_MAX_D 3
 #endif
 
-typedef mam_spongos_t test_mam_spongos_t;
-
-mam_spongos_t *test_mam_spongos_init(test_mam_spongos_t *sg, mam_sponge_t *s);
-
 /**
  * PRNG output generation
  *
