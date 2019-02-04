@@ -8,9 +8,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/sponge/spongos.h"
-#include <stdlib.h>
+#include <string.h>
+
 #include "mam/v2/sponge/sponge.h"
+#include "mam/v2/sponge/spongos.h"
 
 static trits_t spongos_outer_trits(mam_spongos_t *const spongos) {
   return trits_drop(mam_sponge_outer_trits(&spongos->sponge), spongos->pos);

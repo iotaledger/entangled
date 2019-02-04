@@ -8,6 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <string.h>
+
 #include <unity/unity.h>
 
 #include "mam/v2/sponge/spongos.h"
