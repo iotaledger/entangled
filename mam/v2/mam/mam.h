@@ -13,7 +13,6 @@
 
 #include "common/errors.h"
 #include "mam/v2/defs.h"
-#include "mam/v2/mam/alloc.h"
 #include "mam/v2/mam/channel.h"
 #include "mam/v2/mam/endpoint.h"
 #include "mam/v2/mam/mam_pre_shared_key_t_set.h"
@@ -30,10 +29,10 @@
 extern "C" {
 #endif
 
-retcode_t mam_mss_create(mam_ialloc_t *ma, mss_t *m, mam_prng_t *p,
-                         mss_mt_height_t d, trits_t N1, trits_t N2);
+retcode_t mam_mss_create(mss_t *m, mam_prng_t *p, mss_mt_height_t d, trits_t N1,
+                         trits_t N2);
 
-void mam_mss_destroy(mam_ialloc_t *ma, mss_t *m);
+void mam_mss_destroy(mss_t *m);
 
 trits_t mam_psk_id(mam_pre_shared_key_t *p);
 trits_t mam_psk_trits(mam_pre_shared_key_t *p);
@@ -163,7 +162,6 @@ void mam_send_packet(mam_send_packet_context_t *cfg, trits_t payload,
                      trits_t *packet);
 
 typedef struct mam_recv_msg_context_s {
-  mam_ialloc_t *allocator;  /*!< Allocator. */
   mam_spongos_t spongos[1]; /*!< Main Spongos interface */
   mam_spongos_t fork[1];    /*!< Spongos interface for PB3 forks. */
 
@@ -190,7 +188,6 @@ typedef struct mam_recv_msg_context_s {
 retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *msg);
 
 typedef struct mam_recv_packet_context_s {
-  mam_ialloc_t *allocator;       /*!< Allocator. */
   mam_spongos_t spongos[1];      /*!< Main Spongos interface */
   trint18_t ord;                 /*!< Packet ordinal number. */
   trits_t pk;                    /*!< Channel/Endpoint id - MSS public key. */

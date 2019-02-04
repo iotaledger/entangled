@@ -34,12 +34,10 @@ mam_sponge_t *test_mam_sponge_init(test_mam_sponge_t *s) {
 }
 
 mam_spongos_t *test_mam_spongos_init(test_mam_spongos_t *sg, mam_sponge_t *s) {
-  sg->sponge = s;
   return sg;
 }
 
-mam_wots_t *test_mam_wots_init(test_mam_wots_t *w, mam_sponge_t *s) {
-  w->wots.spongos.sponge = s;
+mam_wots_t *test_mam_wots_init(test_mam_wots_t *w) {
   memset(w->wots.secret_key, 0, MAM2_WOTS_SK_PART_SIZE);
   return &w->wots;
 }
@@ -269,7 +267,7 @@ void _mam_wots_gen_sign(size_t Kn, char *K, size_t Nn, char *N, size_t pkn,
 
   mam_sponge_t *s = test_mam_sponge_init(_s);
   mam_prng_t *p = test_prng_init(_p);
-  mam_wots_t *w = test_mam_wots_init(_w, s);
+  mam_wots_t *w = test_mam_wots_init(_w);
 
   trits_t tK = trits_alloc(3 * Kn);
   trits_t tN = trits_alloc(3 * Nn);
@@ -434,7 +432,6 @@ void test_gen_wots(mam_prng_t *p, mam_wots_t *w, mam_sponge_t *s,
   prng_gen_str(p, MAM2_PRNG_DST_SEC_KEY, "WOTSPRNGKEY", K);
   prng_gen_str(p, 4, "WOTSNONCE", N);
 
-  mam_wots_init(w, s);
   mam_prng_init(r, K);
 
   printf("wots\n");

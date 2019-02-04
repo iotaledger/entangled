@@ -11,7 +11,6 @@
 #ifndef __MAM_V2_MAM_CHANNEL_H__
 #define __MAM_V2_MAM_CHANNEL_H__
 
-#include "mam/v2/mam/alloc.h"
 #include "mam/v2/mss/mss.h"
 #include "mam/v2/trits/trits.h"
 
@@ -55,8 +54,7 @@ trits_t mam_channel_name(mam_channel_t const *const channel);
  *
  * @return a status code
  */
-retcode_t mam_channel_create(mam_ialloc_t const *const allocator,
-                             mam_prng_t const *const prng,
+retcode_t mam_channel_create(mam_prng_t const *const prng,
                              mss_mt_height_t const height,
                              trits_t const channel_name,
                              mam_channel_t *const channel);
@@ -68,8 +66,7 @@ retcode_t mam_channel_create(mam_ialloc_t const *const allocator,
  * @param allocator A MAM allocator
  * @param channel The channel
  */
-void mam_channel_destroy(mam_ialloc_t const *const allocator,
-                         mam_channel_t *const channel);
+void mam_channel_destroy(mam_channel_t *const channel);
 
 /**
  * Gets the size of a wrapped channel

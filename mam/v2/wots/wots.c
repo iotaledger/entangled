@@ -87,7 +87,6 @@ void mam_wots_init(mam_wots_t *const wots, mam_sponge_t *const sponge) {
   MAM2_ASSERT(sponge);
 
   memset(wots, 0, sizeof(mam_wots_t));
-  wots->spongos.sponge = sponge;
 }
 
 void mam_wots_destroy(mam_wots_t *const wots) {

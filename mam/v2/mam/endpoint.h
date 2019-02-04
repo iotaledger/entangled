@@ -11,7 +11,6 @@
 #ifndef __MAM_V2_MAM_ENDPOINT_H__
 #define __MAM_V2_MAM_ENDPOINT_H__
 
-#include "mam/v2/mam/alloc.h"
 #include "mam/v2/mss/mss.h"
 #include "mam/v2/trits/trits.h"
 
@@ -65,8 +64,7 @@ trits_t mam_endpoint_name(mam_endpoint_t const *const endpoint);
  *
  * @return a status code
  */
-retcode_t mam_endpoint_create(mam_ialloc_t const *const allocator,
-                              mam_prng_t const *const prng,
+retcode_t mam_endpoint_create(mam_prng_t const *const prng,
                               mss_mt_height_t const height,
                               trits_t const channel_name,
                               trits_t const endpoint_name,
@@ -78,8 +76,7 @@ retcode_t mam_endpoint_create(mam_ialloc_t const *const allocator,
  * @param allocator A MAM allocator
  * @param endpoint The endpoint
  */
-void mam_endpoint_destroy(mam_ialloc_t const *const allocator,
-                          mam_endpoint_t *const endpoint);
+void mam_endpoint_destroy(mam_endpoint_t *const endpoint);
 
 /*
 TODO: endpoint serialization
