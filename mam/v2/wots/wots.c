@@ -82,25 +82,18 @@ static inline trits_t wots_secret_key_trits(mam_wots_t const *const wots) {
  * Public functions
  */
 
-retcode_t mam_wots_create(mam_wots_t *const wots) {
-  retcode_t ret = RC_OK;
-  MAM2_ASSERT(wots);
-
-  memset(wots, 0, sizeof(mam_wots_t));
-  return ret;
-}
-
-void mam_wots_destroy(mam_wots_t *const wots) {
-  MAM2_ASSERT(wots);
-  memset(wots->secret_key, 0, MAM2_WOTS_SK_SIZE);
-  free(wots);
-}
-
 void mam_wots_init(mam_wots_t *const wots, mam_sponge_t *const sponge) {
   MAM2_ASSERT(wots);
   MAM2_ASSERT(sponge);
 
+  memset(wots, 0, sizeof(mam_wots_t));
   wots->spongos.sponge = sponge;
+}
+
+void mam_wots_destroy(mam_wots_t *const wots) {
+  MAM2_ASSERT(wots);
+
+  memset(wots, 0, sizeof(mam_wots_t));
 }
 
 void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *const prng,
