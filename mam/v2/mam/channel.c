@@ -115,7 +115,7 @@ retcode_t mam_channel_serialize(mam_channel_t const *const channel,
   return RC_OK;
 }
 
-retcode_t mam_channel_deserialize(trits_t *const buffer,
+retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
                                   mam_channel_t *const channel) {
   retcode_t ret = RC_OK;
   size_t size = 0;
@@ -152,18 +152,13 @@ retcode_t mam_channel_deserialize(trits_t *const buffer,
     return ret;
   }
 
-  // TODO: need to pass prng, sponge, wots somehow
-  // mss_init(ep->mss, prng, sponge, wots, d, nonce1, nonce2);
+  mss_init(&channel->mss, prng, height, channel->name, trits_null());
 
-  // TODO: uncomment when mss_init is called
-  // if ((ret = mss_load(&channel->mss, buffer)) != RC_OK) { // mss
-  //   return ret;
-  // }
+  if ((ret = mss_load(&channel->mss, buffer)) != RC_OK) {
+    return ret;
+  }
 
-  // TODO: remove when MSS is loaded
-  trits_advance(buffer, size);
-
-  mam_endpoints_deserialize(buffer, channel->name,
+  mam_endpoints_deserialize(buffer, channel->name, prng,
                             &channel->endpoints);  // endpoints
 
   return ret;
@@ -202,6 +197,7 @@ retcode_t mam_channels_serialize(mam_channel_t_set_t const channels,
 }
 
 retcode_t mam_channels_deserialize(trits_t *const buffer,
+                                   mam_prng_t *const prng,
                                    mam_channel_t_set_t *const channels) {
   retcode_t ret = RC_OK;
   mam_channel_t channel;
@@ -212,7 +208,7 @@ retcode_t mam_channels_deserialize(trits_t *const buffer,
   }
 
   while (size--) {
-    if ((ret = mam_channel_deserialize(buffer, &channel)) !=
+    if ((ret = mam_channel_deserialize(buffer, prng, &channel)) !=
         RC_OK) {  // channel
       return ret;
     }

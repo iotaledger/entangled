@@ -51,14 +51,9 @@ void test_channel(void) {
   mam_channel_t_set_t channels_1 = NULL;
   mam_channel_t_set_t channels_2 = NULL;
 
-  test_sponge_t test_sponge;
-  sponge_t *sponge = test_sponge_init(&test_sponge);
-  test_prng_t test_prng;
-  prng_t *prng = test_prng_init(&test_prng, sponge);
+  mam_prng_t prng;
   tryte_t channel_name[27];
   trits_t channel_name_trits = trits_alloc(81);
-  mam_ialloc_t allocator = {.create_sponge = test_create_sponge,
-                            .destroy_sponge = test_delete_sponge};
 
   MAM2_TRITS_DEF0(prng_key, MAM2_PRNG_KEY_SIZE);
   prng_key = MAM2_TRITS_INIT(prng_key, MAM2_PRNG_KEY_SIZE);
@@ -67,14 +62,13 @@ void test_channel(void) {
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM");
 
-  sponge_init(sponge);
-  prng_init(prng, prng->sponge, prng_key);
+  mam_prng_init(&prng, prng_key);
 
   for (size_t i = 1; i < 5; i++) {
     memset(channel_name, 'A' + 2 * i, 27);
     trytes_to_trits(channel_name, channel_name_trits.p, 27);
-    TEST_ASSERT(mam_channel_create(&allocator, prng, i, channel_name_trits,
-                                   &channel) == RC_OK);
+    TEST_ASSERT(mam_channel_create(&prng, i, channel_name_trits, &channel) ==
+                RC_OK);
     TEST_ASSERT(mam_channel_t_set_add(&channels_1, &channel) == RC_OK);
   }
 
@@ -85,7 +79,7 @@ void test_channel(void) {
 
   TEST_ASSERT(mam_channels_serialize(channels_1, &trits) == RC_OK);
 
-  TEST_ASSERT(mam_channels_deserialize(&cpy, &channels_2) == RC_OK);
+  TEST_ASSERT(mam_channels_deserialize(&cpy, &prng, &channels_2) == RC_OK);
 
   TEST_ASSERT_TRUE(mam_channel_t_set_cmp(channels_1, channels_2));
 

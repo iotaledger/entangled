@@ -58,24 +58,14 @@ retcode_t mam_endpoint_destroy(mam_endpoint_t *const endpoint) {
   return RC_OK;
 }
 
-retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t endpoints) {
+retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t *const endpoints) {
   mam_endpoint_t_set_entry_t *entry = NULL;
   mam_endpoint_t_set_entry_t *tmp = NULL;
 
-  HASH_ITER(hh, endpoints, entry, tmp) { mam_endpoint_destroy(&entry->value); }
+  HASH_ITER(hh, *endpoints, entry, tmp) { mam_endpoint_destroy(&entry->value); }
+  mam_endpoint_t_set_free(endpoints);
 
   return RC_OK;
-}
-
-void mam_endpoints_destroy(mam_ialloc_t const *const allocator,
-                           mam_endpoint_t_set_t *const endpoints) {
-  mam_endpoint_t_set_entry_t *entry = NULL;
-  mam_endpoint_t_set_entry_t *tmp = NULL;
-
-  HASH_ITER(hh, *endpoints, entry, tmp) {
-    mam_endpoint_destroy(allocator, &entry->value);
-  }
-  mam_endpoint_t_set_free(endpoints);
 }
 
 size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint) {
@@ -144,15 +134,7 @@ retcode_t mam_endpoint_deserialize(trits_t *const buffer,
     return ret;
   }
 
-  // mss_init(&endpoint->mss, prng, height, channel_name, endpoint->name);
-
-  // TODO: need to pass prng, sponge, wots somehow
-  // mss_init(ep->mss, prng, sponge, wots, d, nonce1, nonce2);
-
-  // TODO: uncomment when mss_init is called
-  // if ((ret = mss_load(&endpoint->mss, buffer)) != RC_OK) { //mss
-  //   return ret;
-  // }
+  mss_init(&endpoint->mss, prng, height, channel_name, endpoint->name);
 
   if ((ret = mss_load(&endpoint->mss, buffer)) != RC_OK) {
     return ret;
