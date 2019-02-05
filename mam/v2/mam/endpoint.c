@@ -52,7 +52,7 @@ retcode_t mam_endpoint_destroy(mam_endpoint_t *const endpoint) {
   MAM2_ASSERT(endpoint);
 
   trits_free(endpoint->name);
-  mam_mss_destroy(&endpoint->mss);
+  mss_destroy(&endpoint->mss);
 
   return RC_OK;
 }

@@ -641,21 +641,25 @@ void mss_destroy(mss_t *mss) {
 
 #if defined(MAM2_MSS_TRAVERSAL)
   if (mss->auth_path) {
-    free(mss->auth_path), mss->auth_path = 0;
+    free(mss->auth_path);
+    mss->auth_path = NULL;
   }
   if (mss->nodes_hashes) {
-    free(mss->nodes_hashes), mss->nodes_hashes = 0;
+    free(mss->nodes_hashes);
+    mss->nodes_hashes = NULL;
   }
   if (mss->nodes) {
-    free(mss->nodes), mss->nodes = 0;
+    free(mss->nodes);
+    mss->nodes = NULL;
   }
   if (mss->stacks) {
-    free(mss->stacks), mss->stacks = 0;
+    free(mss->stacks);
+    mss->stacks = NULL;
   }
 #else
   if (mss->mt) {
     free(mss->mt);
-    mss->mt = 0;
+    mss->mt = NULL;
   }
 #endif
 }
