@@ -63,7 +63,7 @@ static trits_t mam_test_generic_send_msg(
     ntru_nonce = MAM2_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
 
-    e = ntru_create(ntru);
+    e = ntru_init(ntru);
     ntru_gen(ntru, prng_b, ntru_nonce, mam_ntru_pk_trits(ntru_pk));
     TEST_ASSERT(RC_OK == e);
   }
@@ -186,7 +186,7 @@ static void mam_test_generic_receive_msg(
     ntru_nonce = MAM2_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
 
-    e = ntru_create(ntru);
+    e = ntru_init(ntru);
     ntru_gen(ntru, prng, ntru_nonce, mam_ntru_pk_trits(ntru_pk));
     TEST_ASSERT(RC_OK == e);
   }
@@ -384,11 +384,16 @@ static void mam_test_generic(mam_prng_t *prng_a, mam_prng_t *prng_b) {
 }
 
 void mam_test() {
-  test_prng_t _pa[1], _pb[1];
-  mam_prng_t *pa = test_prng_init(_pa);
-  mam_prng_t *pb = test_prng_init(_pb);
+  MAM2_TRITS_DEF0(K, MAM2_PRNG_KEY_SIZE);
+  K = MAM2_TRITS_INIT(K, MAM2_PRNG_KEY_SIZE);
 
-  mam_test_generic(pa, pb);
+  mam_prng_t pa;
+  mam_prng_t pb;
+
+  trits_set_zero(K);
+  mam_prng_init(&pa, K);
+  mam_prng_init(&pb, K);
+  mam_test_generic(&pa, &pb);
 }
 
 int main(void) {

@@ -33,7 +33,7 @@ extern "C" {
  *
  * @return a status code
  */
-retcode_t ntru_create(mam_ntru_sk_t *const ntru);
+retcode_t ntru_init(mam_ntru_sk_t *const ntru);
 
 /**
  * Deallocates memory for a NTRU interface

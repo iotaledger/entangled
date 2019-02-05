@@ -71,7 +71,7 @@ static void mss_mt_gen_leaf(
 
   MAM2_TRITS_DEF0(nonce_i, MAM2_MSS_SKN_SIZE);
   mam_sponge_init(&sponge);
-  mam_wots_init(&wots, &sponge);
+  mam_wots_init(&wots);
 
   MAM2_ASSERT(0 <= i && i <= MAM2_MSS_MAX_SKN(mss->height));
   nonce_i = MAM2_TRITS_INIT(nonce_i, MAM2_MSS_SKN_SIZE);
@@ -541,7 +541,7 @@ void mss_sign(mss_t *mss, trits_t hash, trits_t sig) {
   mss_mt_gen_leaf(mss, mss->skn, trits_take(sig, MAM2_MSS_MT_HASH_SIZE));
 #else
   mam_sponge_init(&sponge);
-  mam_wots_init(&wots, &sponge);
+  mam_wots_init(&wots);
   {
     // Generate the current (skn) secret key
     MAM2_TRITS_DEF0(nonce_i, MAM2_MSS_SKN_SIZE);
