@@ -32,12 +32,21 @@ cc_library(
 )
 
 cc_library(
-    name = "endpoint",
-    srcs = ["endpoint.c"],
+    name = "endpoint_hdr",
     hdrs = ["endpoint.h"],
     deps = [
         "//mam/v2/mss",
         "//mam/v2/trits",
+    ],
+)
+
+cc_library(
+    name = "endpoint",
+    srcs = ["endpoint.c"],
+    deps = [
+        ":endpoint_hdr",
+        ":mam_endpoint_t_set",
+        "//mam/v2/pb3",
     ],
 )
 
@@ -69,4 +78,12 @@ typed_container_generate(
     container_type = "set",
     parent_directory = "mam/v2/mam",
     value_type = "mam_pre_shared_key_t",
+)
+
+typed_container_generate(
+    additional_deps = ":endpoint_hdr",
+    additional_include_path = "mam/v2/mam/endpoint.h",
+    container_type = "set",
+    parent_directory = "mam/v2/mam",
+    value_type = "mam_endpoint_t",
 )

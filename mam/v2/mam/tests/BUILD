@@ -17,3 +17,15 @@ cc_test(
         "@unity",
     ],
 )
+
+cc_test(
+    name = "test_endpoint",
+    srcs = ["test_endpoint.c"],
+    deps = [
+        "//mam/v2/mam",
+        "//mam/v2/mam:endpoint",
+        "//mam/v2/mam:mam_endpoint_t_set",
+        "//mam/v2/test_utils",
+        "@unity",
+    ],
+)
