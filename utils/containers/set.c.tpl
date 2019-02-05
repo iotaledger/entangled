@@ -90,6 +90,10 @@ return *entry != NULL;
 void {TYPE}_set_free({TYPE}_set_t *const set) {
   {TYPE}_set_entry_t *iter = NULL, *tmp = NULL;
 
+  if (set == NULL || *set == NULL) {
+    return;
+  }
+
   HASH_ITER(hh, *set, iter, tmp) {
     HASH_DEL(*set, iter);
     free(iter);

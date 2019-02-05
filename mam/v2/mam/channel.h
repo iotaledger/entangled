@@ -74,6 +74,8 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
  */
 void mam_channel_destroy(mam_channel_t *const channel);
 
+retcode_t mam_channels_destroy(mam_channel_t_set_t *const channels);
+
 /**
  * Gets the size of a wrapped channel
  *

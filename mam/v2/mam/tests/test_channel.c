@@ -83,6 +83,8 @@ void test_channel(void) {
 
   TEST_ASSERT_TRUE(mam_channel_t_set_cmp(channels_1, channels_2));
 
+  mam_channels_destroy(&channels_1);
+  mam_channels_destroy(&channels_2);
   trits_free(trits);
   trits_free(channel_name_trits);
 }

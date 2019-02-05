@@ -91,10 +91,8 @@ void test_endpoint(void) {
 
   TEST_ASSERT_TRUE(mam_endpoint_t_set_cmp(endpoints_1, endpoints_2));
 
-  mam_endpoints_destroy(endpoints_1);
-  mam_endpoints_destroy(endpoints_2);
-  mam_endpoint_t_set_free(&endpoints_1);
-  mam_endpoint_t_set_free(&endpoints_2);
+  mam_endpoints_destroy(&endpoints_1);
+  mam_endpoints_destroy(&endpoints_2);
   trits_free(trits);
   trits_free(channel_name_trits);
   trits_free(endpoint_name_trits);

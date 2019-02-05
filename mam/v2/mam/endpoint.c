@@ -63,6 +63,10 @@ retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t *const endpoints) {
   mam_endpoint_t_set_entry_t *entry = NULL;
   mam_endpoint_t_set_entry_t *tmp = NULL;
 
+  if (endpoints == NULL || *endpoints == NULL) {
+    return RC_OK;
+  }
+
   HASH_ITER(hh, *endpoints, entry, tmp) { mam_endpoint_destroy(&entry->value); }
   mam_endpoint_t_set_free(endpoints);
 

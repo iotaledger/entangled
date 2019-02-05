@@ -280,7 +280,7 @@ static void mam_test_create_channels(mam_prng_t *prng,
       *epa = malloc(sizeof(mam_endpoint_t));
       TEST_ASSERT(0 != *epa);
       memset(*epa, 0, sizeof(mam_endpoint_t));
-      e = mam_endpoint_create(prng, d, cha_name, epa_name, *epa);
+      e = mam_endpoint_create(prng, d, (*cha)->name, epa_name, *epa);
       TEST_ASSERT(RC_OK == e);
       trits_free(epa_name);
     }
@@ -291,7 +291,7 @@ static void mam_test_create_channels(mam_prng_t *prng,
       *ep1 = malloc(sizeof(mam_endpoint_t));
       TEST_ASSERT(0 != *ep1);
       memset(*ep1, 0, sizeof(mam_endpoint_t));
-      e = mam_endpoint_create(prng, d, cha_name, ep1a_name, *ep1);
+      e = mam_endpoint_create(prng, d, (*cha)->name, ep1a_name, *ep1);
       TEST_ASSERT(RC_OK == e);
       trits_free(ep1a_name);
     }
@@ -306,6 +306,7 @@ static void mam_test_create_channels(mam_prng_t *prng,
       TEST_ASSERT(RC_OK == e);
       trits_free(ch1a_name);
     }
+    trits_free(cha_name);
   }
 }
 
@@ -369,8 +370,6 @@ static void mam_test_generic(mam_prng_t *prng_a, mam_prng_t *prng_b) {
 
   /* destroy channels/endpoints */
   {
-    // TODO remove when channels PR is merged !!!
-    trits_free(epa->mss.nonce1);
     if (cha) mam_channel_destroy(cha);
     if (ch1a) mam_channel_destroy(ch1a);
     if (epa) mam_endpoint_destroy(epa);

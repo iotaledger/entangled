@@ -34,10 +34,11 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
   }
   trits_copy(channel_name, channel->name);
 
-  if ((ret = mam_mss_create(&channel->mss, prng, height, channel_name,
-                            trits_null())) != RC_OK) {
+  if ((ret = mss_create(&channel->mss, height)) != RC_OK) {
     return ret;
   }
+
+  mss_init(&channel->mss, prng, height, channel->name, trits_null());
 
   mss_gen(&channel->mss, mam_channel_id(channel));
 
@@ -50,8 +51,22 @@ void mam_channel_destroy(mam_channel_t *const channel) {
   MAM2_ASSERT(channel);
 
   trits_free(channel->name);
-  mam_mss_destroy(&channel->mss);
+  mss_destroy(&channel->mss);
   mam_endpoints_destroy(&channel->endpoints);
+}
+
+retcode_t mam_channels_destroy(mam_channel_t_set_t *const channels) {
+  mam_channel_t_set_entry_t *entry = NULL;
+  mam_channel_t_set_entry_t *tmp = NULL;
+
+  if (channels == NULL || *channels == NULL) {
+    return RC_OK;
+  }
+
+  HASH_ITER(hh, *channels, entry, tmp) { mam_channel_destroy(&entry->value); }
+  mam_channel_t_set_free(channels);
+
+  return RC_OK;
 }
 
 size_t mam_channel_wrap_size() {
@@ -162,6 +177,7 @@ retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
     return ret;
   }
 
+  channel->endpoints = NULL;
   mam_endpoints_deserialize(buffer, channel->name, prng,
                             &channel->endpoints);  // endpoints
 
