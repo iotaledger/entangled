@@ -80,7 +80,9 @@ retcode_t mam_endpoint_create(mam_prng_t const *const prng,
  * @param allocator A MAM allocator
  * @param endpoint The endpoint
  */
-void mam_endpoint_destroy(mam_endpoint_t *const endpoint);
+retcode_t mam_endpoint_destroy(mam_endpoint_t *const endpoint);
+
+retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t endpoints);
 
 size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint);
 

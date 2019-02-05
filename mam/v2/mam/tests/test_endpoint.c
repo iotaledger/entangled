@@ -20,16 +20,6 @@
 #define CHANNEL_NAME_SIZE 27
 #define ENDPOINT_NAME_SIZE 27
 
-static void mam_endpoints_destroy(mam_ialloc_t const *const allocator,
-                                  mam_endpoint_t_set_t const endpoints) {
-  mam_endpoint_t_set_entry_t *entry = NULL;
-  mam_endpoint_t_set_entry_t *tmp = NULL;
-
-  HASH_ITER(hh, endpoints, entry, tmp) {
-    mam_endpoint_destroy(allocator, &entry->value);
-  }
-}
-
 static bool mam_endpoint_t_set_cmp(mam_endpoint_t_set_t const endpoints_1,
                                    mam_endpoint_t_set_t const endpoints_2) {
   mam_endpoint_t_set_entry_t *entry_1 = NULL;
@@ -62,16 +52,12 @@ void test_endpoint(void) {
   mam_endpoint_t_set_t endpoints_1 = NULL;
   mam_endpoint_t_set_t endpoints_2 = NULL;
 
-  test_sponge_t test_sponge;
-  sponge_t *sponge = test_sponge_init(&test_sponge);
-  test_prng_t test_prng;
-  prng_t *prng = test_prng_init(&test_prng, sponge);
+  mam_sponge_t sponge;
+  mam_prng_t prng;
   tryte_t channel_name[CHANNEL_NAME_SIZE];
   trits_t channel_name_trits = trits_alloc(CHANNEL_NAME_SIZE * 3);
   tryte_t endpoint_name[ENDPOINT_NAME_SIZE];
   trits_t endpoint_name_trits = trits_alloc(ENDPOINT_NAME_SIZE * 3);
-  mam_ialloc_t allocator = {.create_sponge = test_create_sponge,
-                            .destroy_sponge = test_delete_sponge};
 
   MAM2_TRITS_DEF0(prng_key, MAM2_PRNG_KEY_SIZE);
   prng_key = MAM2_TRITS_INIT(prng_key, MAM2_PRNG_KEY_SIZE);
@@ -80,15 +66,15 @@ void test_endpoint(void) {
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM");
 
-  sponge_init(sponge);
-  prng_init(prng, prng->sponge, prng_key);
+  mam_sponge_init(&sponge);
+  mam_prng_init(&prng, prng_key);
 
   for (size_t i = 1; i < 5; i++) {
     memset(channel_name, 'A' + 2 * i, CHANNEL_NAME_SIZE);
     trytes_to_trits(channel_name, channel_name_trits.p, CHANNEL_NAME_SIZE);
     memset(endpoint_name, 'A' + 2 * i + 1, ENDPOINT_NAME_SIZE);
     trytes_to_trits(endpoint_name, endpoint_name_trits.p, ENDPOINT_NAME_SIZE);
-    TEST_ASSERT(mam_endpoint_create(&allocator, prng, i, channel_name_trits,
+    TEST_ASSERT(mam_endpoint_create(&prng, i, channel_name_trits,
                                     endpoint_name_trits, &endpoint) == RC_OK);
     TEST_ASSERT(mam_endpoint_t_set_add(&endpoints_1, &endpoint) == RC_OK);
   }
@@ -105,8 +91,8 @@ void test_endpoint(void) {
 
   TEST_ASSERT_TRUE(mam_endpoint_t_set_cmp(endpoints_1, endpoints_2));
 
-  mam_endpoints_destroy(&allocator, endpoints_1);
-  mam_endpoints_destroy(&allocator, endpoints_2);
+  mam_endpoints_destroy(endpoints_1);
+  mam_endpoints_destroy(endpoints_2);
   mam_endpoint_t_set_free(&endpoints_1);
   mam_endpoint_t_set_free(&endpoints_2);
   trits_free(trits);

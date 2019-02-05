@@ -38,8 +38,8 @@ retcode_t mam_endpoint_create(mam_prng_t const *const prng,
   }
   trits_copy(endpoint_name, endpoint->name);
 
-  if ((ret = mam_mss_create(allocator, &endpoint->mss, prng, height,
-                            channel_name, endpoint_name)) != RC_OK) {
+  if ((ret = mam_mss_create(&endpoint->mss, prng, height, channel_name,
+                            endpoint_name)) != RC_OK) {
     return ret;
   }
 
@@ -48,11 +48,22 @@ retcode_t mam_endpoint_create(mam_prng_t const *const prng,
   return ret;
 }
 
-void mam_endpoint_destroy(mam_endpoint_t *const endpoint) {
+retcode_t mam_endpoint_destroy(mam_endpoint_t *const endpoint) {
   MAM2_ASSERT(endpoint);
 
   trits_free(endpoint->name);
-  mam_mss_destroy(allocator, &endpoint->mss);
+  mam_mss_destroy(&endpoint->mss);
+
+  return RC_OK;
+}
+
+retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t endpoints) {
+  mam_endpoint_t_set_entry_t *entry = NULL;
+  mam_endpoint_t_set_entry_t *tmp = NULL;
+
+  HASH_ITER(hh, endpoints, entry, tmp) { mam_endpoint_destroy(&entry->value); }
+
+  return RC_OK;
 }
 
 size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint) {
