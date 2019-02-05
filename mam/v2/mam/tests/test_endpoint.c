@@ -86,13 +86,14 @@ void test_endpoint(void) {
 
   TEST_ASSERT(mam_endpoints_serialize(endpoints_1, &trits) == RC_OK);
 
-  TEST_ASSERT(mam_endpoints_deserialize(&cpy, channel_name_trits,
+  TEST_ASSERT(mam_endpoints_deserialize(&cpy, channel_name_trits, &prng,
                                         &endpoints_2) == RC_OK);
 
   TEST_ASSERT_TRUE(mam_endpoint_t_set_cmp(endpoints_1, endpoints_2));
 
-  mam_endpoints_destroy(endpoints_1);
-  mam_endpoints_destroy(endpoints_2);
+  // TODOO
+  // mam_endpoints_destroy(endpoints_1);
+  // mam_endpoints_destroy(endpoints_2);
   mam_endpoint_t_set_free(&endpoints_1);
   mam_endpoint_t_set_free(&endpoints_2);
   trits_free(trits);
