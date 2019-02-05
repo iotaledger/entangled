@@ -8,10 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file mam.h
-\brief MAM2 layer.
-*/
 #ifndef __MAM_V2_MAM_MAM_TYPES_H__
 #define __MAM_V2_MAM_MAM_TYPES_H__
 
@@ -19,28 +15,28 @@
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
 
+#define MAM2_PSK_ID_SIZE 81
+#define MAM2_PSK_SIZE 243
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define MAM2_KEY_ID_SIZE 81
-#define MAM2_PSK_ID_SIZE 81
-#define MAM2_PSK_SIZE 243
-
-// TODO - move to common def file
-/*! \brief NTRU public key - 3g(x)/(1+3f(x)) - size. */
-#define MAM2_NTRU_PK_SIZE 9216
-
-/*! \brief Preshared key. */
+// Preshared key
 typedef struct mam_pre_shared_key_s {
   trit_t id[MAM2_PSK_ID_SIZE];
   trit_t pre_shared_key[MAM2_PSK_SIZE];
 } mam_pre_shared_key_t;
 
-/*! \brief Recipient's NTRU public key. */
-typedef struct mam_ntru_pk_s {
-  trit_t pk[MAM2_NTRU_PK_SIZE];
-} mam_ntru_pk_t;
+typedef struct mam_pre_shared_key_t_set_entry_s
+    mam_pre_shared_key_t_set_entry_t;
+typedef mam_pre_shared_key_t_set_entry_t* mam_pre_shared_key_t_set_t;
+
+size_t mam_psks_serialized_size(mam_pre_shared_key_t_set_t const psks);
+retcode_t mam_psks_serialize(mam_pre_shared_key_t_set_t const psks,
+                             trits_t trits);
+retcode_t mam_psks_deserialize(trits_t const trits,
+                               mam_pre_shared_key_t_set_t* const psks);
 
 #ifdef __cplusplus
 }

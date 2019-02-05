@@ -8,5 +8,6 @@ cc_library(
         "//mam/v2/prng",
         "//mam/v2/sponge",
         "//mam/v2/sponge:spongos",
+        "//mam/v2/sponge:spongos_types",
     ],
 )

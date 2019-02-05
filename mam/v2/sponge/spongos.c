@@ -8,52 +8,55 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/sponge/spongos.h"
-#include "mam/v2/sponge/sponge.h"
+#include <string.h>
 
-static trits_t spongos_outer_trits(spongos_t *const spongos) {
-  return trits_drop(sponge_outer_trits(spongos->sponge), spongos->pos);
+#include "mam/v2/sponge/sponge.h"
+#include "mam/v2/sponge/spongos.h"
+
+static trits_t spongos_outer_trits(mam_spongos_t *const spongos) {
+  return trits_drop(mam_sponge_outer_trits(&spongos->sponge), spongos->pos);
 }
 
-static void spongos_update(spongos_t *const spongos, size_t const n) {
+static void spongos_update(mam_spongos_t *const spongos, size_t const n) {
   spongos->pos += n;
   if (spongos->pos == MAM2_SPONGE_RATE) {
-    spongos_commit(spongos);
+    mam_spongos_commit(spongos);
   }
 }
 
-void spongos_init(spongos_t *const spongos) {
-  sponge_init(spongos->sponge);
+void mam_spongos_init(mam_spongos_t *const spongos) {
+  mam_sponge_init(&spongos->sponge);
   spongos->pos = 0;
 }
 
-void spongos_fork(spongos_t const *const spongos, spongos_t *const fork) {
-  sponge_fork(spongos->sponge, fork->sponge);
+void mam_mam_spongos_fork(mam_spongos_t const *const spongos,
+                          mam_spongos_t *const fork) {
+  mam_sponge_fork(&spongos->sponge, &fork->sponge);
   fork->pos = spongos->pos;
 }
 
-void spongos_commit(spongos_t *const spongos) {
+void mam_spongos_commit(mam_spongos_t *const spongos) {
   if (spongos->pos != 0) {
-    sponge_transform(spongos->sponge);
+    mam_sponge_transform(&spongos->sponge);
     spongos->pos = 0;
   }
 }
 
-void spongos_absorb(spongos_t *const spongos, trits_t input) {
+void mam_spongos_absorb(mam_spongos_t *const spongos, trits_t input) {
   for (size_t n = 0; !trits_is_empty(input); input = trits_drop(input, n)) {
     n = trits_copy_min(input, spongos_outer_trits(spongos));
     spongos_update(spongos, n);
   }
 }
 
-void spongos_absorbn(spongos_t *const spongos, size_t const n,
-                     trits_t *const inputs) {
+void mam_spongos_absorbn(mam_spongos_t *const spongos, size_t const n,
+                         trits_t *const inputs) {
   for (size_t i = 0; i < n; i++) {
-    spongos_absorb(spongos, inputs[i]);
+    mam_spongos_absorb(spongos, inputs[i]);
   }
 }
 
-void spongos_squeeze(spongos_t *const spongos, trits_t output) {
+void mam_spongos_squeeze(mam_spongos_t *const spongos, trits_t output) {
   for (size_t n = 0; !trits_is_empty(output); output = trits_drop(output, n)) {
     n = trits_copy_min(spongos_outer_trits(spongos), output);
     trits_set_zero(trits_take(spongos_outer_trits(spongos), n));
@@ -61,7 +64,8 @@ void spongos_squeeze(spongos_t *const spongos, trits_t output) {
   }
 }
 
-bool spongos_squeeze_eq(spongos_t *const spongos, trits_t expected_output) {
+bool mam_spongos_squeeze_eq(mam_spongos_t *const spongos,
+                            trits_t expected_output) {
   bool r = true;
   trits_t y;
 
@@ -78,23 +82,24 @@ bool spongos_squeeze_eq(spongos_t *const spongos, trits_t expected_output) {
   return r;
 }
 
-void spongos_hash(spongos_t *const spongos, trits_t input, trits_t output) {
-  spongos_init(spongos);
-  spongos_absorb(spongos, input);
-  spongos_commit(spongos);
-  spongos_squeeze(spongos, output);
+void mam_spongos_hash(mam_spongos_t *const spongos, trits_t input,
+                      trits_t output) {
+  mam_spongos_init(spongos);
+  mam_spongos_absorb(spongos, input);
+  mam_spongos_commit(spongos);
+  mam_spongos_squeeze(spongos, output);
 }
 
-void spongos_hashn(spongos_t *const spongos, size_t const n, trits_t *inputs,
-                   trits_t output) {
-  spongos_init(spongos);
-  spongos_absorbn(spongos, n, inputs);
-  spongos_commit(spongos);
-  spongos_squeeze(spongos, output);
+void mam_spongos_hashn(mam_spongos_t *const spongos, size_t const n,
+                       trits_t *inputs, trits_t output) {
+  mam_spongos_init(spongos);
+  mam_spongos_absorbn(spongos, n, inputs);
+  mam_spongos_commit(spongos);
+  mam_spongos_squeeze(spongos, output);
 }
 
-void spongos_encr(spongos_t *const spongos, trits_t plaintext,
-                  trits_t ciphertext) {
+void mam_spongos_encr(mam_spongos_t *const spongos, trits_t plaintext,
+                      trits_t ciphertext) {
   for (size_t n = 0; !trits_is_empty(ciphertext);
        ciphertext = trits_drop(ciphertext, n),
               plaintext = trits_drop(plaintext, n)) {
@@ -107,8 +112,8 @@ void spongos_encr(spongos_t *const spongos, trits_t plaintext,
   }
 }
 
-void spongos_decr(spongos_t *const spongos, trits_t ciphertext,
-                  trits_t plaintext) {
+void mam_spongos_decr(mam_spongos_t *const spongos, trits_t ciphertext,
+                      trits_t plaintext) {
   for (size_t n = 0; !trits_is_empty(plaintext);
        plaintext = trits_drop(plaintext, n),
               ciphertext = trits_drop(ciphertext, n)) {
@@ -119,4 +124,10 @@ void spongos_decr(spongos_t *const spongos, trits_t ciphertext,
                              plaintext);
     spongos_update(spongos, n);
   }
+}
+
+void mam_spongos_copy(mam_spongos_t const *const src,
+                      mam_spongos_t *const dst) {
+  memcpy(dst->sponge.state, src->sponge.state, MAM2_SPONGE_WIDTH);
+  dst->pos = src->pos;
 }

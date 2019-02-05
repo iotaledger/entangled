@@ -98,8 +98,8 @@ def_test_mss_check(4, 4);
 // def_test_mss_check(10, x);
 // def_test_mss_check(MAM2_MSS_TEST_MAX_D, );
 
-static bool mss_store_test(mss_t *mss1, mss_t *mss2, prng_t *prng,
-                           spongos_t *spongos, wots_t *wots,
+static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
+                           mam_spongos_t *spongos, mam_wots_t *wots,
                            mss_mt_height_t max_height) {
   bool r = true;
   retcode_t e;
@@ -129,7 +129,7 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, prng_t *prng,
                  "ABCNOABCNKOZWYKOZWYSDF9SDF9"
                  "YSDF9QABCNKOZWYSDF9ABCNKOZW"
                  "SDF9CABCABCNKOZWYNKOZWYSDF9");
-  prng_init(prng, prng->sponge, key);
+  mam_prng_init(prng, key);
   trits_set_zero(nonce);
   trits_set_zero(hash);
   trits_from_str(hash,
@@ -141,10 +141,8 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, prng_t *prng,
     sig = trits_take(sig_, MAM2_MSS_SIG_SIZE(curr_height));
     sig2 = trits_take(sig2_, MAM2_MSS_SIG_SIZE(curr_height));
 
-    mss_init(mss1, prng, spongos->sponge, wots, curr_height, nonce,
-             trits_null());
-    mss_init(mss2, prng, spongos->sponge, wots, curr_height, nonce,
-             trits_null());
+    mss_init(mss1, prng, curr_height, nonce, trits_null());
+    mss_init(mss2, prng, curr_height, nonce, trits_null());
     mss_gen(mss1, pk);
 
     do {
@@ -163,8 +161,8 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, prng_t *prng,
   return r;
 }
 
-static bool mss_test(mss_t *mss, prng_t *prng, spongos_t *spongos, wots_t *wots,
-                     mss_mt_height_t max_height) {
+static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
+                     mam_wots_t *wots, mss_mt_height_t max_height) {
   bool r = true;
   MAM2_TRITS_DEF0(key, MAM2_PRNG_KEY_SIZE);
   mss_mt_height_t curr_height;
@@ -185,7 +183,7 @@ static bool mss_test(mss_t *mss, prng_t *prng, spongos_t *spongos, wots_t *wots,
                  "ABCNOABCNKOZWYKOZWYSDF9SDF9"
                  "YSDF9QABCNKOZWYSDF9ABCNKOZW"
                  "SDF9CABCABCNKOZWYNKOZWYSDF9");
-  prng_init(prng, prng->sponge, key);
+  mam_prng_init(prng, key);
   trits_set_zero(nonce);
   trits_set_zero(hash);
   trits_from_str(hash,
@@ -204,8 +202,8 @@ static bool mss_test(mss_t *mss, prng_t *prng, spongos_t *spongos, wots_t *wots,
 
     dbg_printf("========================\ncurr_height = %d\n", curr_height);
 
-    mss_init(mss, prng, spongos->sponge, wots, curr_height, nonce,
-             trits_null());
+    mss_init(mss, prng, curr_height, nonce, trits_null());
+
     mss_gen(mss, pk);
 
     dbg_printf("mss pk \t");
@@ -263,10 +261,6 @@ static bool mss_test(mss_t *mss, prng_t *prng, spongos_t *spongos, wots_t *wots,
 }
 
 static void mss_meta_test(void) {
-  test_sponge_t _s[1];
-  test_spongos_t _sg[1];
-  test_prng_t _p[1];
-  test_wots_t _w[1];
   test_mss1_t _m1[1];
   test_mss2_t _m2[1];
   test_mss3_t _m3[1];
@@ -276,11 +270,10 @@ static void mss_meta_test(void) {
   // test_mssx_t _mx[1];
   // test_mss_t _m[1];
 
-  sponge_t *spongos = test_sponge_init(_s);
-  spongos_t *sg = test_spongos_init(_sg, spongos);
-  prng_t *p = test_prng_init(_p, spongos);
-  wots_t *w = test_wots_init(_w, spongos);
+  mam_spongos_t sg;
 
+  mam_prng_t p;
+  mam_wots_t w;
   mss_t *m1 = test_mss_init1(_m1);
   mss_t *m2 = test_mss_init2(_m2);
   mss_t *m3 = test_mss_init3(_m3);
@@ -290,11 +283,14 @@ static void mss_meta_test(void) {
   // mss_t *mx = test_mss_initx(_mx);
   // mss_t *m = test_mss_init(_m);
 
-  TEST_ASSERT_TRUE(mss_test(m1, p, sg, w, 1) && test_mss_check1(_m1));
-  TEST_ASSERT_TRUE(mss_test(m2, p, sg, w, 2) && test_mss_check2(_m2));
-  TEST_ASSERT_TRUE(mss_test(m3, p, sg, w, 3) && test_mss_check3(_m3));
+  mam_wots_init(&w);
+  mam_spongos_init(&sg);
+
+  TEST_ASSERT_TRUE(mss_test(m1, &p, &sg, &w, 1) && test_mss_check1(_m1));
+  TEST_ASSERT_TRUE(mss_test(m2, &p, &sg, &w, 2) && test_mss_check2(_m2));
+  TEST_ASSERT_TRUE(mss_test(m3, &p, &sg, &w, 3) && test_mss_check3(_m3));
   // TEST_ASSERT_TRUE(mss_test(m4, p, sg, w, 4) && test_mss_check4(_m4));
-  TEST_ASSERT_TRUE(mss_store_test(m4, m42, p, sg, w, 4) &&
+  TEST_ASSERT_TRUE(mss_store_test(m4, m42, &p, &sg, &w, 4) &&
                    test_mss_check4(_m4) && test_mss_check4(_m42));
   // #if 0
   //   TEST_ASSERT_TRUE(mss_test(m5, p, sg, w, 5) && test_mss_check5(_m5));

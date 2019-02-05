@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "request/broadcast_transactions.h"
+#include "cclient/request/broadcast_transactions.h"
 
 broadcast_transactions_req_t* broadcast_transactions_req_new() {
   broadcast_transactions_req_t* req = (broadcast_transactions_req_t*)malloc(

@@ -30,6 +30,7 @@ extern "C" {
   "deserializing transaction object failed"
 #define STR_CCLIENT_INSUFFICIENT_BALANCE "Insufficient balance"
 #define STR_CCLIENT_POW_FAILED "Local PoW failed"
+#define SRT_CCLIENT_INVALID_TRANSFER "Invalid transfers"
 
 #ifdef __cplusplus
 }

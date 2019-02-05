@@ -14,10 +14,7 @@
 #include "mam/v2/test_utils/test_utils.h"
 
 static void prng_test(void) {
-  test_sponge_t test_sponge;
-  test_prng_t test_prng;
-  sponge_t *sponge = test_sponge_init(&test_sponge);
-  prng_t *prng = test_prng_init(&test_prng, sponge);
+  mam_prng_t prng;
 
   MAM2_TRITS_DEF0(K, MAM2_PRNG_KEY_SIZE);
   MAM2_TRITS_DEF0(N, 18);
@@ -35,13 +32,9 @@ static void prng_test(void) {
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM");
 
-  sponge_init(prng->sponge);
-  sponge_absorb(prng->sponge, MAM2_SPONGE_CTL_KEY, K);
-  sponge_squeeze(prng->sponge, MAM2_SPONGE_CTL_KEY, K);
-
-  prng_init(prng, prng->sponge, K);
-  prng_gen(prng, 0, N, Y1);
-  prng_gen(prng, 1, N, Y2);
+  mam_prng_init(&prng, K);
+  mam_prng_gen(&prng, 0, N, Y1);
+  mam_prng_gen(&prng, 1, N, Y2);
 
   TEST_ASSERT_TRUE(!trits_cmp_eq(Y1, Y2));
 }

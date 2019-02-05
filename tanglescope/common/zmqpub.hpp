@@ -1,9 +1,11 @@
 #pragma once
 
 #include <atomic>
-#include <iota/tanglescope/common/iri.hpp>
 #include <memory>
+
 #include <rx.hpp>
+
+#include "tanglescope/common/iri.hpp"
 
 namespace iota {
 namespace tanglescope {

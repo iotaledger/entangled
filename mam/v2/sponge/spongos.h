@@ -13,23 +13,19 @@
 
 #include "mam/v2/defs.h"
 #include "mam/v2/sponge/sponge.h"
+#include "mam/v2/sponge/spongos_types.h"
 #include "mam/v2/trits/trits.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct spongos_s {
-  sponge_t *sponge;
-  size_t pos;
-} spongos_t;
-
 /**
  * Initializes a spongos state
  *
  * @param spongos A spongos interface
  */
-void spongos_init(spongos_t *const spongos);
+void mam_spongos_init(mam_spongos_t *const spongos);
 
 /**
  * Creates an equivalent spongos instance
@@ -37,14 +33,15 @@ void spongos_init(spongos_t *const spongos);
  * @param spongos A spongos interface
  * @param fork The fork
  */
-void spongos_fork(spongos_t const *const spongos, spongos_t *const fork);
+void mam_mam_spongos_fork(mam_spongos_t const *const spongos,
+                          mam_spongos_t *const fork);
 
 /**
  * Commits changes in the rate part
  *
  * @param spongos A spongos interface
  */
-void spongos_commit(spongos_t *const spongos);
+void mam_spongos_commit(mam_spongos_t *const spongos);
 
 /**
  * Processes input data
@@ -52,7 +49,7 @@ void spongos_commit(spongos_t *const spongos);
  * @param spongos A spongos interface
  * @param input Input data
  */
-void spongos_absorb(spongos_t *const spongos, trits_t input);
+void mam_spongos_absorb(mam_spongos_t *const spongos, trits_t input);
 
 /**
  * Processes n inputs data
@@ -61,8 +58,8 @@ void spongos_absorb(spongos_t *const spongos, trits_t input);
  * @param n Number of input data
  * @param inputs Inputs data
  */
-void spongos_absorbn(spongos_t *const spongos, size_t const n,
-                     trits_t *const inputs);
+void mam_spongos_absorbn(mam_spongos_t *const spongos, size_t const n,
+                         trits_t *const inputs);
 
 /**
  * Generates output data
@@ -70,7 +67,7 @@ void spongos_absorbn(spongos_t *const spongos, size_t const n,
  * @param spongos A spongos interface
  * @param output Output data
  */
-void spongos_squeeze(spongos_t *const spongos, trits_t output);
+void mam_spongos_squeeze(mam_spongos_t *const spongos, trits_t output);
 
 /**
  * Generates output data and check for equality with given output
@@ -78,7 +75,8 @@ void spongos_squeeze(spongos_t *const spongos, trits_t output);
  * @param spongos A spongos interface
  * @param expected_output Expected output data
  */
-bool spongos_squeeze_eq(spongos_t *const spongos, trits_t expected_output);
+bool mam_spongos_squeeze_eq(mam_spongos_t *const spongos,
+                            trits_t expected_output);
 
 /**
  * Hashes input data
@@ -87,7 +85,8 @@ bool spongos_squeeze_eq(spongos_t *const spongos, trits_t expected_output);
  * @param input Input data
  * @param output Output data
  */
-void spongos_hash(spongos_t *const spongos, trits_t input, trits_t output);
+void mam_spongos_hash(mam_spongos_t *const spongos, trits_t input,
+                      trits_t output);
 
 /**
  * Hashes n input data
@@ -97,8 +96,8 @@ void spongos_hash(spongos_t *const spongos, trits_t input, trits_t output);
  * @param inputs Inputs data
  * @param output Output data
  */
-void spongos_hashn(spongos_t *const spongos, size_t const n, trits_t *inputs,
-                   trits_t output);
+void mam_spongos_hashn(mam_spongos_t *const spongos, size_t const n,
+                       trits_t *inputs, trits_t output);
 
 /**
  * Encrypts plaintext
@@ -107,8 +106,8 @@ void spongos_hashn(spongos_t *const spongos, size_t const n, trits_t *inputs,
  * @param plaintext Plaintext input
  * @param ciphertext Ciphertext output
  */
-void spongos_encr(spongos_t *const spongos, trits_t plaintext,
-                  trits_t ciphertext);
+void mam_spongos_encr(mam_spongos_t *const spongos, trits_t plaintext,
+                      trits_t ciphertext);
 
 /**
  * Decrypts ciphertext
@@ -117,8 +116,16 @@ void spongos_encr(spongos_t *const spongos, trits_t plaintext,
  * @param ciphertext Ciphertext input
  * @param plaintext Plaintext output
  */
-void spongos_decr(spongos_t *const spongos, trits_t ciphertext,
-                  trits_t plaintext);
+void mam_spongos_decr(mam_spongos_t *const spongos, trits_t ciphertext,
+                      trits_t plaintext);
+
+/**
+ * Copy spongos from src to dst
+ *
+ * @param src The source
+ * @param dst The destination
+ */
+void mam_spongos_copy(mam_spongos_t const *const src, mam_spongos_t *const dst);
 
 #ifdef __cplusplus
 }

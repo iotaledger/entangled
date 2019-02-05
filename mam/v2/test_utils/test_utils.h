@@ -29,43 +29,6 @@ extern "C" {
 #define MAM2_MSS_TEST_MAX_D 3
 #endif
 
-typedef struct test_ntru_s {
-  ntru_t ntru;
-  trit_t public_key_id[81];
-  trit_t secret_key[MAM2_NTRU_SK_SIZE];
-  poly_t f;
-} test_ntru_t;
-
-typedef struct test_prng_s {
-  prng_t p;
-  trit_t secret_key[MAM2_PRNG_KEY_SIZE];
-} test_prng_t;
-
-typedef struct test_sponge_s {
-  sponge_t s;
-  trit_t stack[MAM2_SPONGE_WIDTH];
-  trit_t state[MAM2_SPONGE_WIDTH];
-} test_sponge_t;
-
-typedef spongos_t test_spongos_t;
-
-typedef struct test_wots_s {
-  wots_t wots;
-  trit_t secret_key[MAM2_WOTS_SK_SIZE];
-} test_wots_t;
-
-ntru_t *test_ntru_init(test_ntru_t *n);
-prng_t *test_prng_init(test_prng_t *p, sponge_t *s);
-sponge_t *test_sponge_init(test_sponge_t *s);
-spongos_t *test_spongos_init(test_spongos_t *sg, sponge_t *s);
-wots_t *test_wots_init(test_wots_t *w, sponge_t *s);
-
-static inline sponge_t *test_create_sponge() {
-  test_sponge_t *t = malloc(sizeof(test_sponge_t));
-  return test_sponge_init(t);
-}
-static inline void test_delete_sponge(sponge_t *s) { free((test_sponge_t *)s); }
-
 /**
  * PRNG output generation
  *
@@ -74,7 +37,7 @@ static inline void test_delete_sponge(sponge_t *s) { free((test_sponge_t *)s); }
  * @param nonce The nonce as a string
  * @param output Pseudorandom output trits
  */
-void prng_gen_str(prng_t *prng, tryte_t destination, char const *nonce,
+void prng_gen_str(mam_prng_t *prng, tryte_t destination, char const *nonce,
                   trits_t output);
 
 #ifdef __cplusplus

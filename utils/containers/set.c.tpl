@@ -7,8 +7,8 @@
 
 #include "{PARENT_DIRECTORY}/{TYPE}_set.h"
 
-size_t {TYPE}_set_size({TYPE}_set_t const *const set) {
-  return HASH_COUNT(*set);
+size_t {TYPE}_set_size({TYPE}_set_t const set) {
+  return HASH_COUNT(set);
 }
 
 retcode_t {TYPE}_set_add({TYPE}_set_t *const set,
@@ -89,6 +89,10 @@ return *entry != NULL;
 
 void {TYPE}_set_free({TYPE}_set_t *const set) {
   {TYPE}_set_entry_t *iter = NULL, *tmp = NULL;
+
+  if (set == NULL || *set == NULL) {
+    return;
+  }
 
   HASH_ITER(hh, *set, iter, tmp) {
     HASH_DEL(*set, iter);

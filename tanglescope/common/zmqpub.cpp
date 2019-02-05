@@ -22,7 +22,7 @@ void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s,
 
   zmq::context_t context(1);
   zmq::socket_t subscriber(context, ZMQ_SUB);
-  subscriber.setsockopt(ZMQ_IDENTITY, "iota/tanglescope/common", 5);
+  subscriber.setsockopt(ZMQ_IDENTITY, "tanglescope/common", 5);
   subscriber.setsockopt(ZMQ_SUBSCRIBE, "", 0);
   subscriber.connect(uri);
 

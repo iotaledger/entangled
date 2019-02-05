@@ -5,6 +5,7 @@ cc_library(
     srcs = ["sponge.c"],
     hdrs = ["sponge.h"],
     deps = [
+        "//common:errors",
         "//common/trinary:add",
         "//mam/v2:defs",
         "//mam/v2/trits",
@@ -18,5 +19,24 @@ cc_library(
     hdrs = ["spongos.h"],
     deps = [
         ":sponge",
+        ":spongos_types_hdr",
+    ],
+)
+
+cc_library(
+    name = "spongos_types_hdr",
+    hdrs = ["spongos_types.h"],
+    deps = [
+        ":sponge",
+    ],
+)
+
+cc_library(
+    name = "spongos_types",
+    srcs = ["spongos_types.c"],
+    hdrs = ["spongos_types.h"],
+    deps = [
+        ":sponge",
+        "//mam/v2/pb3",
     ],
 )

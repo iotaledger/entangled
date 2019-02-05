@@ -19,7 +19,7 @@ void test_ints_set() {
     int_set_add(&set, &i);
   }
 
-  TEST_ASSERT_EQUAL_INT(int_set_size(&set), 100);
+  TEST_ASSERT_EQUAL_INT(int_set_size(set), 100);
 
   for (int i = 0; i < 100; ++i) {
     TEST_ASSERT(int_set_contains(&set, &i));
