@@ -38,10 +38,11 @@ retcode_t mam_endpoint_create(mam_prng_t const *const prng,
   }
   trits_copy(endpoint_name, endpoint->name);
 
-  if ((ret = mam_mss_create(&endpoint->mss, prng, height, channel_name,
-                            endpoint_name)) != RC_OK) {
+  if ((ret = mss_create(&endpoint->mss, height)) != RC_OK) {
     return ret;
   }
+
+  mss_init(&endpoint->mss, prng, height, channel_name, endpoint->name);
 
   mss_gen(&endpoint->mss, mam_endpoint_id(endpoint));
 

@@ -295,7 +295,6 @@ static void mam_test_create_channels(mam_prng_t *prng,
       TEST_ASSERT(RC_OK == e);
       trits_free(ep1a_name);
     }
-    trits_free(cha_name);
     {
       trits_t ch1a_name = trits_alloc(3 * strlen(TEST_CHANNEL_1_NAME));
       trits_from_str(ch1a_name, TEST_CHANNEL_1_NAME);
@@ -316,8 +315,8 @@ static void mam_test_generic(mam_prng_t *prng_a, mam_prng_t *prng_b) {
   trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
 
   mss_mt_height_t d = TEST_MSS_DEPTH;
-  mam_channel_t *cha = 0, *ch1a = 0;
-  mam_endpoint_t *epa = 0, *ep1a = 0;
+  mam_channel_t *cha = NULL, *ch1a = NULL;
+  mam_endpoint_t *epa = NULL, *ep1a = NULL;
 
   mam_send_msg_context_t cfg_msg_send[1];
   mam_recv_msg_context_t cfg_msg_recv[1];
@@ -370,6 +369,8 @@ static void mam_test_generic(mam_prng_t *prng_a, mam_prng_t *prng_b) {
 
   /* destroy channels/endpoints */
   {
+    // TODO remove when channels PR is merged !!!
+    trits_free(epa->mss.nonce1);
     if (cha) mam_channel_destroy(cha);
     if (ch1a) mam_channel_destroy(ch1a);
     if (epa) mam_endpoint_destroy(epa);
