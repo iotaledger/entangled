@@ -18,17 +18,6 @@
 
 static core_t core_g;
 
-bool signal_handler_core_end(universal_signal_num_t signo) {
-  if (signo == ctrl_c) {
-    log_info(MAIN_LOGGER_ID, "Stopping cIRI core\n");
-    if (core_stop(&core_g)) {
-      log_error(MAIN_LOGGER_ID, "Stopping cIRI core failed\n");
-    }
-  }
-
-  return false;
-}
-
 int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
 

@@ -16,8 +16,20 @@
 
 #include <signal.h>
 #include <stdlib.h>
+#include "utils/logger_helper.h"
 
-typedef enum UNIVERSAL_SIGNAL_NUM { null, ctrl_c } universal_signal_num_t;
+/*
+ *  This enum is declared for consistent name of signal for c5 ross platfrom
+ * developing the naming order is followed by POSIX.1-1990 the standard signals
+ * table is at http://man7.org/linux/man-pages/man7/signal.7.html
+ *
+ */
+
+typedef enum UNIVERSAL_SIGNAL_NUM {
+  null,
+  signal_hang_up,
+  ctrl_c
+} universal_signal_num_t;
 
 #if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
     (defined(__APPLE__) && defined(__MACH__))
@@ -26,29 +38,14 @@ typedef enum UNIVERSAL_SIGNAL_NUM { null, ctrl_c } universal_signal_num_t;
 #define CTRL_C_SIGNAL SIGINT
 #define SIGNAL_ERROR SIG_ERR
 
-void signal_handler_posix(int signo);
-void (*handler)(universal_signal_num_t);
-
-static inline __sighandler_t register_signal(
-    int SIG, void (*signal_handler)(universal_signal_num_t)) {
-  handler = signal_handler;
-  return signal(SIG, signal_handler_posix);
-}
-
 #elif defined(_WIN32)
+
 #include <Windows.h>
 
 #define CTRL_C_SIGNAL CTRL_C_EVENT
 #define SIGNAL_ERROR FALSE
 
 BOOL signal_handler_WIN(DWORD dwCtrlType);
-void (*handler)(universal_signal_num_t);
-
-static inline __sighandler_t register_signal(
-    int SIG, void (*signal_handler)(universal_signal_num_t)) {
-  handler = signal_handler;
-  return SetConsoleCtrlHandler((PHANDLER_ROUTINE)signal_handler_WIN, TRUE);
-}
 
 #else
 
@@ -56,16 +53,17 @@ static inline __sighandler_t register_signal(
 
 #endif  // __unix__
         /*
-         * Register signal
+         * Register signal, call register_signal wherever we need to catch signals
          *
          * @param the signal(interrupt) we hope to be caught
          *
-         * @param the function stop and destroy core
+         * @param the function used to be signal_handler i.e. function used to stop and
+         * destroy core
          *
          * @return signal_error if singal_handler went wrong
          */
 
-static inline __sighandler_t register_signal(
-    int SIG, void (*signal_handler)(universal_signal_num_t));
+__sighandler_t register_signal(universal_signal_num_t SIG,
+                               bool (*register_signal_handler)());
 
 #endif  // __UTILS_HANDLES_SIGNAL_H__
