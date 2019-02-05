@@ -9,6 +9,7 @@
  */
 
 #include "mam/v2/mam/channel.h"
+#include "common/defs.h"
 #include "mam/v2/mam/mam_channel_t_set.h"
 #include "mam/v2/pb3/pb3.h"
 
@@ -91,12 +92,15 @@ size_t mam_channel_serialized_size(mam_channel_t const *const channel) {
   size_t mss_size = mss_stored_size(&channel->mss);
   size_t endpoints_size = mam_endpoints_serialized_size(channel->endpoints);
 
-  return pb3_sizeof_ntrytes(MAM2_CHANNEL_ID_SIZE / 3) +       // id
-         pb3_sizeof_size_t(trits_size(channel->name)) +       // name size
-         pb3_sizeof_ntrytes(trits_size(channel->name) / 3) +  // name
-         pb3_sizeof_size_t(mss_size) +                        // mss size
-         pb3_sizeof_ntrytes(mss_size / 3) +                   // mss
-         pb3_sizeof_ntrytes(endpoints_size / 3);              // endpoints
+  return pb3_sizeof_ntrytes(MAM2_CHANNEL_ID_SIZE /
+                            NUMBER_OF_TRITS_IN_A_TRYTE) +  // id
+         pb3_sizeof_size_t(trits_size(channel->name)) +    // name size
+         pb3_sizeof_ntrytes(trits_size(channel->name) /
+                            NUMBER_OF_TRITS_IN_A_TRYTE) +  // name
+         pb3_sizeof_size_t(mss_size) +                     // mss size
+         pb3_sizeof_ntrytes(mss_size / NUMBER_OF_TRITS_IN_A_TRYTE) +  // mss
+         pb3_sizeof_ntrytes(endpoints_size /
+                            NUMBER_OF_TRITS_IN_A_TRYTE);  // endpoints
 }
 
 retcode_t mam_channel_serialize(mam_channel_t const *const channel,
