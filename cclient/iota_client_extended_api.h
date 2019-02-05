@@ -133,9 +133,10 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
  * @param {iota_client_service_t} serv - client service
  * @param {flex_trit_t} tail_hash- Tail transaction hash
  * @param {bundle_transactions_t} bundle - Bundle as array of transaction
+ * @param {bundle_status_t} bundle_status - bundle status
  * objects.
  *
- * @returns {bundle_status_t}
+ * @returns {retcode_t}
  * - `INVALID_TRANSACTION_HASH`
  * - `INVALID_TAIL_HASH`: Provided transaction is not tail (`currentIndex !==
  * 0`)
@@ -144,9 +145,10 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
  *
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetBundle.ts#L38
  */
-bundle_status_t iota_client_get_bundle(iota_client_service_t const* const serv,
-                                       flex_trit_t const* const tail_hash,
-                                       bundle_transactions_t* bundle);
+retcode_t iota_client_get_bundle(iota_client_service_t const* const serv,
+                                 flex_trit_t const* const tail_hash,
+                                 bundle_transactions_t* const bundle,
+                                 bundle_status_t* const bundle_status);
 
 /**
  * Creates and returns an `Inputs` object by generating addresses and fetching
