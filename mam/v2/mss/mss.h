@@ -31,8 +31,13 @@ extern "C" {
 
 /*! \brief MSS public key size. */
 #define MAM2_MSS_PK_SIZE 243
+/*! \brief Trits needed to encode tree depth part of SKN. */
+#define MAM2_MSS_SKN_TREE_DEPTH_SIZE 4
+/*! \brief Trits needed to encode key number part of SKN. */
+#define MAM2_MSS_SKN_KEY_NUMBER_SIZE 14
 /*! \brief Trits needed to encode `skn`: tree depth and key number. */
-#define MAM2_MSS_SKN_SIZE 18
+#define MAM2_MSS_SKN_SIZE \
+  (MAM2_MSS_SKN_TREE_DEPTH_SIZE + MAM2_MSS_SKN_KEY_NUMBER_SIZE)
 /*! \brief MSS authentication path size of height `d`. */
 #define MAM2_MSS_APATH_SIZE(d) (MAM2_WOTS_PK_SIZE * d)
 /*! \brief MSS signature size with a tree of height `d`. */
@@ -47,7 +52,8 @@ extern "C" {
 /*! \brief Size of hash values stored in Merkle tree */
 #define MAM2_MSS_MT_HASH_SIZE MAM2_WOTS_PK_SIZE
 
-/*! \brief Leaves have height `0`, root has height `D`; `0 <= d < D`; `D <= 20`.
+/*! \brief Leaves have height `0`, root has height `D`; `0 <= d < D`; `D <=
+ * 20`.
  */
 typedef trint6_t mss_mt_height_t;
 /*! \brief Index (skn) of leaf/node on the level of height `d`; 0 <= i <

@@ -9,6 +9,7 @@
  */
 
 #include "mam/v2/mam/endpoint.h"
+#include "common/defs.h"
 #include "mam/v2/mam/mam_endpoint_t_set.h"
 #include "mam/v2/pb3/pb3.h"
 
@@ -58,11 +59,16 @@ retcode_t mam_endpoint_destroy(mam_endpoint_t *const endpoint) {
   return RC_OK;
 }
 
-retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t endpoints) {
+retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t *const endpoints) {
   mam_endpoint_t_set_entry_t *entry = NULL;
   mam_endpoint_t_set_entry_t *tmp = NULL;
 
-  HASH_ITER(hh, endpoints, entry, tmp) { mam_endpoint_destroy(&entry->value); }
+  if (endpoints == NULL || *endpoints == NULL) {
+    return RC_OK;
+  }
+
+  HASH_ITER(hh, *endpoints, entry, tmp) { mam_endpoint_destroy(&entry->value); }
+  mam_endpoint_t_set_free(endpoints);
 
   return RC_OK;
 }
@@ -70,11 +76,13 @@ retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t endpoints) {
 size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint) {
   size_t mss_size = mss_stored_size(&endpoint->mss);
 
-  return pb3_sizeof_ntrytes(MAM2_ENDPOINT_ID_SIZE / 3) +       // id
-         pb3_sizeof_size_t(trits_size(endpoint->name)) +       // name size
-         pb3_sizeof_ntrytes(trits_size(endpoint->name) / 3) +  // name
-         pb3_sizeof_size_t(mss_size) +                         // mss size
-         pb3_sizeof_ntrytes(mss_size / 3);                     // mss
+  return pb3_sizeof_ntrytes(MAM2_ENDPOINT_ID_SIZE /
+                            NUMBER_OF_TRITS_IN_A_TRYTE) +  // id
+         pb3_sizeof_size_t(trits_size(endpoint->name)) +   // name size
+         pb3_sizeof_ntrytes(trits_size(endpoint->name) /
+                            NUMBER_OF_TRITS_IN_A_TRYTE) +            // name
+         pb3_sizeof_size_t(mss_size) +                               // mss size
+         pb3_sizeof_ntrytes(mss_size / NUMBER_OF_TRITS_IN_A_TRYTE);  // mss
 }
 
 retcode_t mam_endpoint_serialize(mam_endpoint_t const *const endpoint,

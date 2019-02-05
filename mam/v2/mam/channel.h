@@ -11,6 +11,7 @@
 #ifndef __MAM_V2_MAM_CHANNEL_H__
 #define __MAM_V2_MAM_CHANNEL_H__
 
+#include "mam/v2/mam/mam_endpoint_t_set.h"
 #include "mam/v2/mss/mss.h"
 #include "mam/v2/trits/trits.h"
 
@@ -21,9 +22,14 @@ extern "C" {
 #endif
 
 typedef struct mam_channel_s {
-  mss_t mss;
   trit_t id[MAM2_CHANNEL_ID_SIZE];
+  trits_t name;
+  mss_t mss;
+  mam_endpoint_t_set_t endpoints;
 } mam_channel_t;
+
+typedef struct mam_channel_t_set_entry_s mam_channel_t_set_entry_t;
+typedef mam_channel_t_set_entry_t *mam_channel_t_set_t;
 
 /**
  * Gets a channel's id
@@ -68,6 +74,8 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
  */
 void mam_channel_destroy(mam_channel_t *const channel);
 
+retcode_t mam_channels_destroy(mam_channel_t_set_t *const channels);
+
 /**
  * Gets the size of a wrapped channel
  *
@@ -100,10 +108,22 @@ retcode_t mam_channel_unwrap(mam_spongos_t *const spongos,
                              trits_t *const buffer, tryte_t *const version,
                              trits_t channel_id);
 
-/*
-TODO: channel serialization
-mam_channel_save, mam_channel_load
-*/
+size_t mam_channel_serialized_size(mam_channel_t const *const channel);
+
+retcode_t mam_channel_serialize(mam_channel_t const *const channel,
+                                trits_t *const buffer);
+
+retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
+                                  mam_channel_t *const channel);
+
+size_t mam_channels_serialized_size(mam_channel_t_set_t const channels);
+
+retcode_t mam_channels_serialize(mam_channel_t_set_t const channels,
+                                 trits_t *const buffer);
+
+retcode_t mam_channels_deserialize(trits_t *const buffer,
+                                   mam_prng_t *const prng,
+                                   mam_channel_t_set_t *const channels);
 
 #ifdef __cplusplus
 }
