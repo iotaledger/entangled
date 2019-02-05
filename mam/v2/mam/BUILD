@@ -35,6 +35,7 @@ cc_library(
     srcs = ["channel.c"],
     deps = [
         ":channel_hdr",
+        ":endpoint",
         ":mam_channel_t_set",
         "//mam/v2/pb3",
     ],
