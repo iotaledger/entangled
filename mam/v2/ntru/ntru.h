@@ -39,8 +39,10 @@ retcode_t ntru_init(mam_ntru_sk_t *const ntru);
  * Deallocates memory for a NTRU interface
  *
  * @param ntru A NTRU interface
+ *
+ * @return a status code
  */
-void ntru_destroy(mam_ntru_sk_t *const ntru);
+retcode_t ntru_destroy(mam_ntru_sk_t *const ntru);
 
 /**
  * Gets public key id trits
