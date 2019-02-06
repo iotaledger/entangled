@@ -67,9 +67,9 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
   flex_trit_t* tmp_trytes = NULL;
   flex_trit_t trunk_hash[FLEX_TRIT_SIZE_243];
   int64_t current_index = 0, last_index = 0;
+  bool is_tail = true;
 
   log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
-
   get_trytes_req = get_trytes_req_new();
   if (!get_trytes_req) {
     ret_code = RC_CCLIENT_OOM;
@@ -85,64 +85,16 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
     goto cleanup;
   }
 
-  ret_code = hash243_queue_push(&get_trytes_req->hashes, tail_hash);
-  if (ret_code != RC_OK) {
-    log_error(logger_id, "%s hash243_queue_push failed: %s\n", __func__,
-              error_2_string(ret_code));
-    goto cleanup;
-  }
-  // Get trytes from the given tail hash
-  ret_code = iota_client_get_trytes(serv, get_trytes_req, get_trytes_res);
-  if (ret_code != RC_OK) {
-    log_error(logger_id, "%s iota_client_get_trytes failed: %s\n", __func__,
-              error_2_string(ret_code));
-    goto cleanup;
-  }
-  hash243_queue_pop(&get_trytes_req->hashes);
-  // Get the transaction trytes
-  tmp_trytes = hash8019_queue_at(&get_trytes_res->trytes, 0);
-  if (!tmp_trytes) {
-    ret_code = RC_CCLIENT_RES_ERROR;
-    log_error(logger_id, "%s read transaction trytes failed: %s\n", __func__,
-              error_2_string(ret_code));
-    goto cleanup;
-  }
-  // Create a transaction with the received trytes
-  transaction_deserialize_from_trits(&tx, tmp_trytes, false);
-  transaction_set_hash(&tx, tail_hash);
-  current_index = transaction_current_index(&tx);
-  // Check that the first transaction we get is really a tail transaction
-  // Its index must be 0 and the list of transactions empty.
-  // It is an error if the first transaction has index > 0
-  if (current_index != 0) {
-    ret_code = RC_CCLIENT_INVALID_TAIL_HASH;
-    log_error(logger_id, "%s current index is not zero: %s\n", __func__,
-              error_2_string(ret_code));
-    goto cleanup;
-  }
-  last_index = transaction_last_index(&tx);
-  if (trytes) {
-    // save raw tyrtes if we want them.
-    hash_array_push(trytes, tmp_trytes);
-  }
-  if (bundle) {
-    // add this transaction to bundle
-    bundle_transactions_add(bundle, &tx);
-  }
-  // The response is not needed anymore
-  hash8019_queue_free(&get_trytes_res->trytes);
-
-  // fetch the rest transactions
   do {
-    // Get the next trunk_hash from the transaction
-    memcpy(trunk_hash, transaction_trunk(&tx), FLEX_TRIT_SIZE_243);
+    memcpy(trunk_hash, is_tail ? tail_hash : transaction_trunk(&tx),
+           FLEX_TRIT_SIZE_243);
     ret_code = hash243_queue_push(&get_trytes_req->hashes, trunk_hash);
     if (ret_code != RC_OK) {
       log_error(logger_id, "%s hash243_queue_push failed: %s\n", __func__,
                 error_2_string(ret_code));
       goto cleanup;
     }
-    // get trytes from the given trunk hash
+    // get trytes from the given hash
     ret_code = iota_client_get_trytes(serv, get_trytes_req, get_trytes_res);
     if (ret_code != RC_OK) {
       log_error(logger_id, "%s iota_client_get_trytes failed: %s\n", __func__,
@@ -151,7 +103,7 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
     }
     hash243_queue_pop(&get_trytes_req->hashes);
     // Get the transaction trytes
-    tmp_trytes = hash8019_queue_at(&get_trytes_res->trytes, 0);
+    tmp_trytes = hash8019_queue_peek(get_trytes_res->trytes);
     if (!tmp_trytes) {
       ret_code = RC_CCLIENT_RES_ERROR;
       log_error(logger_id, "%s read transaction trytes failed: %s\n", __func__,
@@ -160,15 +112,33 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
     }
     // Create a transaction with the received trytes
     transaction_deserialize_from_trits(&tx, tmp_trytes, false);
-    transaction_set_hash(&tx, trunk_hash);
-    current_index = transaction_current_index(&tx);
+    transaction_set_hash(&tx, is_tail ? tail_hash : trunk_hash);
+    if (is_tail) {
+      current_index = transaction_current_index(&tx);
+      // Check that the first transaction we get is really a tail transaction
+      // Its index must be 0 and the list of transactions empty.
+      // It is an error if the first transaction has index > 0
+      if (current_index != 0) {
+        ret_code = RC_CCLIENT_INVALID_TAIL_HASH;
+        log_error(logger_id, "%s current index is not zero: %s\n", __func__,
+                  error_2_string(ret_code));
+        goto cleanup;
+      }
+      last_index = transaction_last_index(&tx);
+      is_tail = false;
+    } else {
+      current_index = transaction_current_index(&tx);
+    }
 
     if (trytes) {
+      // save raw trytes if we want them.
       hash_array_push(trytes, tmp_trytes);
     }
     if (bundle) {
+      // add this transaction to bundle
       bundle_transactions_add(bundle, &tx);
     }
+    // The response is not needed anymore
     hash8019_queue_free(&get_trytes_res->trytes);
   } while (current_index != last_index);
   get_trytes_req_free(&get_trytes_req);
