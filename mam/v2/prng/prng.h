@@ -27,7 +27,14 @@ extern "C" {
  * @param prng A PRNG interface
  * @param secret_key A secret key of size MAM2_PRNG_KEY_SIZE
  */
-void mam_prng_init(mam_prng_t *const prng, trits_t const secret_key);
+retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key);
+
+/**
+ * PRNG deinitialization
+ *
+ * @param prng A PRNG interface
+ */
+retcode_t mam_prng_destroy(mam_prng_t *const prng);
 
 /**
  * PRNG output generation with a nonce
