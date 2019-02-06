@@ -35,43 +35,21 @@
 // TODO - Test functions should take set of prng_t instead of raw ptrs
 
 static trits_t mam_test_generic_send_msg(
-    mam_prng_t *prng_a, mam_prng_t *prng_b, mam_msg_pubkey_t pubkey,
-    mam_msg_keyload_t keyload, mam_msg_checksum_t checksum,
-    mam_channel_t *const cha, mam_endpoint_t *const epa,
-    mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
-    mam_send_msg_context_t *const cfg_msga) {
+    mam_pre_shared_key_t *prng, mam_pre_shared_key_t const *const pska,
+    mam_pre_shared_key_t const *const pskb, mam_ntru_pk_t const *const ntru_pk,
+    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
+    mam_msg_checksum_t checksum, mam_channel_t *const cha,
+    mam_endpoint_t *const epa, mam_channel_t *const ch1a,
+    mam_endpoint_t *const ep1a, mam_send_msg_context_t *const cfg_msga) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   trits_t msg = trits_null();
-  mam_pre_shared_key_t pska[1], pskb[1];
-  mam_ntru_sk_t ntru[1];
-  mam_ntru_pk_t ntru_pk[1];
 
-  /* gen psk */
-  {
-    trits_from_str(mam_psk_id(pska), TEST_PRE_SHARED_KEY_A_STR);
-    prng_gen_str(prng_a, MAM2_PRNG_DST_SEC_KEY, TEST_PRE_SHARED_KEY_A_NONCE_STR,
-                 mam_psk_trits(pska));
-
-    trits_from_str(mam_psk_id(pskb), TEST_PRE_SHARED_KEY_B_STR);
-    prng_gen_str(prng_b, MAM2_PRNG_DST_SEC_KEY, TEST_PRE_SHARED_KEY_B_NONCE_STR,
-                 mam_psk_trits(pskb));
-  }
-  /* gen recipient'spongos ntru keys */
-  {
-    MAM2_TRITS_DEF0(ntru_nonce, 30);
-    ntru_nonce = MAM2_TRITS_INIT(ntru_nonce, 30);
-    trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
-
-    e = ntru_init(ntru);
-    ntru_gen(ntru, prng_b, ntru_nonce, mam_ntru_pk_trits(ntru_pk));
-    TEST_ASSERT(RC_OK == e);
-  }
   {
     mam_send_msg_context_t *cfg = cfg_msga;
 
-    cfg->prng = prng_a;
-    cfg->rng = prng_a;
+    cfg->prng = prng;
+    cfg->rng = prng;
 
     cfg->ch = cha;
     cfg->ch1 = NULL;
@@ -108,8 +86,6 @@ static trits_t mam_test_generic_send_msg(
   mam_send_msg(cfg_msga, &msg);
   TEST_ASSERT(trits_is_empty(msg));
   msg = trits_pickup(msg, sz);
-
-  ntru_destroy(ntru);
   mam_pre_shared_key_t_set_free(&cfg_msga->pre_shared_keys);
   mam_ntru_pk_t_set_free(&cfg_msga->ntru_public_keys);
 
@@ -166,30 +142,10 @@ static trits_t mam_test_generic_send_first_packet(
 }
 
 static void mam_test_generic_receive_msg(
-    mam_prng_t *prng, mam_channel_t *const cha, trits_t *const msg,
-    mam_recv_msg_context_t *const cfg_msg_recv) {
+    mam_pre_shared_key_t const *const pre_shared_key,
+    mam_ntru_sk_t const *const ntru, mam_channel_t *const cha,
+    trits_t *const msg, mam_recv_msg_context_t *const cfg_msg_recv) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-
-  mam_pre_shared_key_t pre_shared_key[1];
-  mam_ntru_pk_t ntru_pk[1];
-  mam_ntru_sk_t ntru[1];
-
-  /* gen psk */
-  {
-    trits_from_str(mam_psk_id(pre_shared_key), TEST_PRE_SHARED_KEY_B_STR);
-    prng_gen_str(prng, MAM2_PRNG_DST_SEC_KEY, TEST_PRE_SHARED_KEY_B_NONCE_STR,
-                 mam_psk_trits(pre_shared_key));
-  }
-  /* gen recipient'spongos ntru keys */
-  {
-    MAM2_TRITS_DEF0(ntru_nonce, 30);
-    ntru_nonce = MAM2_TRITS_INIT(ntru_nonce, 30);
-    trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
-
-    e = ntru_init(ntru);
-    ntru_gen(ntru, prng, ntru_nonce, mam_ntru_pk_trits(ntru_pk));
-    TEST_ASSERT(RC_OK == e);
-  }
 
   /* init recv msg context */
   {
@@ -206,7 +162,6 @@ static void mam_test_generic_receive_msg(
   TEST_ASSERT(RC_OK == e);
   TEST_ASSERT(trits_is_empty(*msg));
 
-  ntru_destroy(cfg_msg_recv->ntru);
   cfg_msg_recv->ntru = NULL;
 }
 
@@ -301,7 +256,8 @@ static void mam_test_create_channels(mam_prng_t *prng,
   }
 }
 
-static void mam_test_generic(mam_prng_t *prng_a, mam_prng_t *prng_b) {
+static void mam_test_generic(mam_prng_t *prng_sender,
+                             mam_prng_t *prng_receiver) {
   retcode_t e = RC_OK;
 
   trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
@@ -317,10 +273,38 @@ static void mam_test_generic(mam_prng_t *prng_a, mam_prng_t *prng_b) {
   mam_msg_keyload_t keyload;   /* plain=0, psk=1, ntru=2 */
   mam_msg_checksum_t checksum; /* none=0, mac=1, mssig=2 */
 
-  mam_test_create_channels(prng_a, &cha, &ch1a, &epa, &ep1a);
+  mam_test_create_channels(prng_sender, &cha, &ch1a, &epa, &ep1a);
 
   char const *payload_str = "PAYLOAD9999";
   payload = trits_alloc(3 * strlen(payload_str));
+
+  mam_ntru_sk_t ntru[1];
+  mam_ntru_pk_t ntru_pk[1];
+
+  /* gen recipient'spongos ntru keys, public key is shared with sender */
+  {
+    retcode_t e;
+    MAM2_TRITS_DEF0(ntru_nonce, 30);
+    ntru_nonce = MAM2_TRITS_INIT(ntru_nonce, 30);
+    trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
+
+    e = ntru_init(ntru);
+    ntru_gen(ntru, prng_receiver, ntru_nonce, mam_ntru_pk_trits(ntru_pk));
+    TEST_ASSERT(RC_OK == e);
+  }
+
+  mam_pre_shared_key_t pska[1], pskb[1];
+
+  /* gen psk */
+  {
+    trits_from_str(mam_psk_id(pska), TEST_PRE_SHARED_KEY_A_STR);
+    prng_gen_str(prng_sender, MAM2_PRNG_DST_SEC_KEY,
+                 TEST_PRE_SHARED_KEY_A_NONCE_STR, mam_psk_trits(pska));
+
+    trits_from_str(mam_psk_id(pskb), TEST_PRE_SHARED_KEY_B_STR);
+    prng_gen_str(prng_receiver, MAM2_PRNG_DST_SEC_KEY,
+                 TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_trits(pskb));
+  }
 
   /* chid=0, epid=1, chid1=2, epid1=3*/
   for (pubkey = 0; pubkey < 4; ++pubkey) {
@@ -331,9 +315,9 @@ static void mam_test_generic(mam_prng_t *prng_a, mam_prng_t *prng_b) {
       {
         /* send msg and packet */
         {
-          msg = mam_test_generic_send_msg(prng_a, prng_b, pubkey, keyload,
-                                          checksum, cha, epa, ch1a, ep1a,
-                                          cfg_msg_send);
+          msg = mam_test_generic_send_msg(prng_sender, pska, pskb, ntru_pk,
+                                          pubkey, keyload, checksum, cha, epa,
+                                          ch1a, ep1a, cfg_msg_send);
 
           packet = mam_test_generic_send_first_packet(
               pubkey, checksum, cha, epa, ch1a, ep1a, cfg_msg_send,
@@ -342,7 +326,7 @@ static void mam_test_generic(mam_prng_t *prng_a, mam_prng_t *prng_b) {
 
         /* recv msg and packet */
         {
-          mam_test_generic_receive_msg(prng_b, cha, &msg, cfg_msg_recv);
+          mam_test_generic_receive_msg(pskb, ntru, cha, &msg, cfg_msg_recv);
 
           mam_test_generic_receive_packet(cfg_msg_recv, &packet, &payload);
           TEST_ASSERT(trits_cmp_eq_str(payload, payload_str));
@@ -356,6 +340,8 @@ static void mam_test_generic(mam_prng_t *prng_a, mam_prng_t *prng_b) {
       }
     }
   }
+
+  ntru_destroy(ntru);
 
   trits_free(payload);
 
@@ -383,12 +369,13 @@ void mam_test() {
   key_b = MAM2_TRITS_INIT(key_b, MAM2_PRNG_KEY_SIZE);
   trits_from_str(key_b, TEST_PRNG_B_KEY);
 
-  mam_prng_t pa;
-  mam_prng_t pb;
+  mam_prng_t prng_sender;
+  mam_prng_t prng_receiver;
 
-  mam_prng_init(&pa, key_a);
-  mam_prng_init(&pb, key_b);
-  mam_test_generic(&pa, &pb);
+  mam_prng_init(&prng_sender, key_a);
+  mam_prng_init(&prng_receiver, key_b);
+
+  mam_test_generic(&prng_sender, &prng_receiver);
 }
 
 int main(void) {
