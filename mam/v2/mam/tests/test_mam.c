@@ -252,15 +252,6 @@ static void mam_test_create_channels(mam_prng_t *prng,
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   mss_mt_height_t d = TEST_MSS_DEPTH;
 
-  /* init rng */
-  {
-    MAM2_TRITS_DEF0(k, MAM2_PRNG_KEY_SIZE);
-    k = MAM2_TRITS_INIT(k, MAM2_PRNG_KEY_SIZE);
-
-    trits_from_str(k, TEST_PRNG_A_KEY);
-    mam_prng_init(prng, k);
-  }
-
   /* create channels */
   {
     trits_t cha_name = trits_alloc(3 * strlen(TEST_CHANNEL_NAME));
@@ -384,15 +375,19 @@ static void mam_test_generic(mam_prng_t *prng_a, mam_prng_t *prng_b) {
 }
 
 void mam_test() {
-  MAM2_TRITS_DEF0(K, MAM2_PRNG_KEY_SIZE);
-  K = MAM2_TRITS_INIT(K, MAM2_PRNG_KEY_SIZE);
+  MAM2_TRITS_DEF0(key_a, MAM2_PRNG_KEY_SIZE);
+  key_a = MAM2_TRITS_INIT(key_a, MAM2_PRNG_KEY_SIZE);
+  trits_from_str(key_a, TEST_PRNG_A_KEY);
+
+  MAM2_TRITS_DEF0(key_b, MAM2_PRNG_KEY_SIZE);
+  key_b = MAM2_TRITS_INIT(key_b, MAM2_PRNG_KEY_SIZE);
+  trits_from_str(key_b, TEST_PRNG_B_KEY);
 
   mam_prng_t pa;
   mam_prng_t pb;
 
-  trits_set_zero(K);
-  mam_prng_init(&pa, K);
-  mam_prng_init(&pb, K);
+  mam_prng_init(&pa, key_a);
+  mam_prng_init(&pb, key_b);
   mam_test_generic(&pa, &pb);
 }
 
