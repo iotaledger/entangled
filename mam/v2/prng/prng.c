@@ -14,10 +14,18 @@
 #include "mam/v2/prng/mam_prng_t_set.h"
 #include "mam/v2/prng/prng.h"
 
-void mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
+retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
   MAM2_ASSERT(trits_size(secret_key) == MAM2_PRNG_KEY_SIZE);
 
   trits_copy(secret_key, trits_from_rep(MAM2_PRNG_KEY_SIZE, prng->secret_key));
+
+  return RC_OK;
+}
+
+retcode_t mam_prng_destroy(mam_prng_t *const prng) {
+  memset(prng, 0, sizeof(mam_prng_t));
+
+  return RC_OK;
 }
 
 void mam_prng_gen(mam_prng_t const *const prng, tryte_t const destination,

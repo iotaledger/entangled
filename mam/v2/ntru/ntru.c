@@ -12,24 +12,21 @@
 #include <string.h>
 
 #include "mam/v2/ntru/ntru.h"
-#include "mam/v2/ntru/poly.h"
 
 retcode_t ntru_init(mam_ntru_sk_t *const ntru) {
   MAM2_ASSERT(ntru);
 
   memset(ntru, 0, sizeof(mam_ntru_sk_t));
-  if ((ntru->f = malloc(sizeof(poly_t))) == NULL) {
-    free(ntru->f);
-    return RC_OOM;
-  }
 
   return RC_OK;
 }
 
-void ntru_destroy(mam_ntru_sk_t *const ntru) {
+retcode_t ntru_destroy(mam_ntru_sk_t *const ntru) {
   MAM2_ASSERT(ntru);
-  free(ntru->f);
-  ntru->f = NULL;
+
+  memset(ntru, 0, sizeof(mam_ntru_sk_t));
+
+  return RC_OK;
 }
 
 void ntru_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
