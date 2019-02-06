@@ -43,6 +43,7 @@ typedef enum UNIVERSAL_SIGNAL_NUM {
 #include <Windows.h>
 
 #define CTRL_C_SIGNAL CTRL_C_EVENT
+#define SIGNAL_SUCCESS TRUE
 #define SIGNAL_ERROR FALSE
 
 BOOL signal_handler_WIN(DWORD dwCtrlType);
@@ -64,6 +65,6 @@ BOOL signal_handler_WIN(DWORD dwCtrlType);
          */
 
 __sighandler_t register_signal(universal_signal_num_t SIG,
-                               bool (*register_signal_handler)());
+                               void (*register_signal_handler)());
 
 #endif  // __UTILS_HANDLES_SIGNAL_H__

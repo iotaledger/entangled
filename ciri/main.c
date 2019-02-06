@@ -18,8 +18,24 @@
 
 static core_t core_g;
 
+void signal_handler() {
+  log_info(MAIN_LOGGER_ID, "Stopping cIRI core\n");
+  if (core_stop(&core_g) != RC_OK) {
+    log_error(MAIN_LOGGER_ID, "Stopping cIRI core failed\n");
+  }
+
+  log_info(MAIN_LOGGER_ID, "Destroying cIRI core\n");
+  if (core_destroy(&core_g) != RC_OK) {
+    log_error(MAIN_LOGGER_ID, "Destroying cIRI core failed\n");
+  }
+}
+
 int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
+
+  if (register_signal(ctrl_c, signal_handler) == SIGNAL_ERROR) {
+    return EXIT_FAILURE;
+  }
 
   rand_handle_seed(time(NULL));
 
@@ -72,18 +88,6 @@ int main(int argc, char* argv[]) {
   memset(dummy, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
   broadcaster_on_next(&core_g.node.broadcaster, dummy);
   sleep(1000);
-
-  log_info(MAIN_LOGGER_ID, "Stopping cIRI core\n");
-  if (core_stop(&core_g) != RC_OK) {
-    log_error(MAIN_LOGGER_ID, "Stopping cIRI core failed\n");
-    ret = EXIT_FAILURE;
-  }
-
-  log_info(MAIN_LOGGER_ID, "Destroying cIRI core\n");
-  if (core_destroy(&core_g) != RC_OK) {
-    log_error(MAIN_LOGGER_ID, "Destroying cIRI core failed\n");
-    ret = EXIT_FAILURE;
-  }
 
   return ret;
 }

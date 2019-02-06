@@ -13,31 +13,30 @@
 /*
  * @para universal_signal_num_t SIG: assign the signal number which is going to
  * handle.
- * @para bool (*signal_handler)(): signal handler of each signal needs
+ * @para void (*signal_handler)(): signal handler of each signal needs
  */
 __sighandler_t register_signal(universal_signal_num_t SIG,
-                               bool (*register_signal_handler)()) {
+                               void (*register_signal_handler)()) {
   return signal((int)SIG, register_signal_handler);
 }
 
 #elif defined(_WIN32)
 
-BOOL signal_handler_WIN(DWORD dwCtrlType) {
-  universal_signal_num_t uni_signo = null;
-  if (dwCtrlType == CTRL_C_SIGNAL) {
-    uni_signo = ctrl_c;
-  }
+BOOL WINAPI signal_handler_WIN(DWORD dwCtrlType) {
+  switch (fdwCtrlType) {
+    // Handle the CTRL-C signal.
+    case CTRL_C_EVENT:
+      printf("Ctrl-C event\n\n");
 
-  if (uni_signo != null) {
-    signal_handler(uni_signo);
-    return TRUE;
+      return SIGNAL_SUCCESS;
+    default:
+      return SIGNAL_ERROR;
   }
-
-  return signal_error;
 }
 
-static inline __sighandler_t register_signal(int SIG) {
-  return SetConsoleCtrlHandler((PHANDLER_ROUTINE)signal_handler_WIN, TRUE);
+__sighandler_t register_signal(universal_signal_num_t SIG,
+                               void (*register_signal_handler)()) {
+  return SetConsoleCtrlHandler(signal_handler_WIN, TRUE);
 }
 
 #endif
