@@ -8,9 +8,9 @@
 #ifndef CCLIENT_IOTA_CORE_API_H_
 #define CCLIENT_IOTA_CORE_API_H_
 
+#include "cclient/request/requests.h"
+#include "cclient/response/responses.h"
 #include "cclient/service.h"
-#include "request/requests.h"
-#include "response/responses.h"
 #include "utils/logger_helper.h"
 
 #ifdef __cplusplus
@@ -211,7 +211,7 @@ retcode_t iota_client_get_transactions_to_approve(
  * https://iota.readme.io/reference#attachtotangle
  *
  *
- * @param service IRI node end point.
+ * @param service IRI node end point, NULL for local PoW.
  * @param req Request containing the attachment params
  * @param res Response containing trytes
  *

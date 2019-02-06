@@ -13,6 +13,7 @@
 #include "common/defs.h"
 #include "common/helpers/sign.h"
 #include "common/kerl/kerl.h"
+#include "common/sign/normalize.h"
 #include "common/sign/v1/iss_kerl.h"
 #include "common/trinary/trit_tryte.h"
 #include "utils/export.h"
@@ -83,7 +84,10 @@ IOTA_EXPORT char* iota_sign_signature_gen(char const* const seed,
   init_kerl(&kerl);
 
   trytes_to_trits((tryte_t*)seed, subseed, HASH_LENGTH_TRIT / RADIX);
+
   trytes_to_trits((tryte_t*)bundle_hash, hash, HASH_LENGTH_TRIT / RADIX);
+  normalize_hash_to_trits(hash, hash);
+
   iss_kerl_subseed(subseed, subseed, index, &kerl);
   iss_kerl_key(subseed, key, key_length, &kerl);
   memset(subseed, 0, HASH_LENGTH_TRIT * sizeof(trit_t));
@@ -170,8 +174,7 @@ IOTA_EXPORT flex_trit_t* iota_flex_sign_signature_gen(
 
   flex_trits_to_trits(subseed, HASH_LENGTH_TRIT, seed, HASH_LENGTH_TRIT,
                       HASH_LENGTH_TRIT);
-  flex_trits_to_trits(hash, HASH_LENGTH_TRIT, bundle_hash, HASH_LENGTH_TRIT,
-                      HASH_LENGTH_TRIT);
+  normalize_flex_hash_to_trits(bundle_hash, hash);
 
   iss_kerl_subseed(subseed, subseed, index, &kerl);
   iss_kerl_key(subseed, key, key_length, &kerl);

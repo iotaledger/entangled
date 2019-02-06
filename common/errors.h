@@ -104,6 +104,28 @@ extern "C" {
     continue;                \
   } else
 
+#define ERR_BIND_RETURN(expr, e) \
+  if (RC_OK != (e = (expr)))     \
+    return e;                    \
+  else
+
+#define ERR_BIND_GOTO(expr, e, label) \
+  if (RC_OK != (e = (expr)))          \
+    goto label;                       \
+  else
+
+#define ERR_GUARD_RETURN(expr, err, e) \
+  if (!(expr)) {                       \
+    e = (err);                         \
+    return e;                          \
+  } else
+
+#define ERR_GUARD_GOTO(expr, err, e, label) \
+  if (!(expr)) {                            \
+    e = (err);                              \
+    goto label;                             \
+  } else
+
 /** Return Codes */
 enum retcode_t {
   // Success (equal to zero)
@@ -268,6 +290,8 @@ enum retcode_t {
       0x0E | RC_MODULE_CCLIENT | RC_SEVERITY_MODERATE,
   RC_CCLIENT_INSUFFICIENT_BALANCE =
       0x0F | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,
+  RC_CCLIENT_POW_FAILED = 0x10 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,
+  RC_CCLIENT_INVALID_TRANSFER = 0x11 | RC_MODULE_CCLIENT | RC_SEVERITY_MODERATE,
 
   // Consensus module
   RC_CONSENSUS_NOT_IMPLEMENTED = 0x01 | RC_MODULE_CONSENSUS | RC_SEVERITY_MAJOR,
@@ -442,13 +466,15 @@ enum retcode_t {
   RC_MAM2_PB3_BAD_MAC = 0x0B | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
   RC_MAM2_PB3_BAD_SIG = 0x0C | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
   RC_MAM2_PB3_BAD_EKEY = 0x0D | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
-  RC_MAM2_CHANNEL_NOT_FOUND = 0x0E | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
-  RC_MAM2_ENDPOINT_NOT_FOUND = 0x0F | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
-  RC_MAM2_VERSION_NOT_SUPPORTED = 0x10 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
-  RC_MAM2_CHANNEL_NOT_TRUSTED = 0x11 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
-  RC_MAM2_ENDPOINT_NOT_TRUSTED = 0x12 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
-  RC_MAM2_KEYLOAD_IRRELEVANT = 0x13 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
-  RC_MAM2_KEYLOAD_OVERLOADED = 0x14 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
+  RC_MAM2_PB3_SIZE_T_NOT_SUPPORTED =
+      0x0E | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
+  RC_MAM2_CHANNEL_NOT_FOUND = 0x0F | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
+  RC_MAM2_ENDPOINT_NOT_FOUND = 0x10 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
+  RC_MAM2_VERSION_NOT_SUPPORTED = 0x11 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
+  RC_MAM2_CHANNEL_NOT_TRUSTED = 0x12 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
+  RC_MAM2_ENDPOINT_NOT_TRUSTED = 0x13 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
+  RC_MAM2_KEYLOAD_IRRELEVANT = 0x14 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
+  RC_MAM2_KEYLOAD_OVERLOADED = 0x15 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
 };
 
 typedef enum retcode_t retcode_t;

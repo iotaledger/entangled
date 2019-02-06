@@ -1,11 +1,13 @@
 #pragma once
 
-#include <yaml-cpp/yaml.h>
 #include <chrono>
-#include <iota/tanglescope/common/iri.hpp>
 #include <memory>
-#include <rx.hpp>
 #include <string>
+
+#include <yaml-cpp/yaml.h>
+#include <rx.hpp>
+
+#include "tanglescope/common/iri.hpp"
 
 namespace iota {
 namespace tanglescope {

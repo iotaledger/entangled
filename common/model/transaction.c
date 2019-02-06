@@ -7,6 +7,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#ifdef DEBUG
+#include <inttypes.h>
+#include <stdio.h>
+#endif
 
 #include "common/curl-p/digest.h"
 #include "common/model/transaction.h"
@@ -32,9 +36,11 @@ size_t transaction_deserialize_trits(iota_transaction_t *const transaction,
   flex_trits_slice(transaction->data.signature_or_message, NUM_TRITS_SIGNATURE,
                    trits, NUM_TRITS_SERIALIZED_TRANSACTION, offset,
                    NUM_TRITS_SIGNATURE);
+  transaction->loaded_columns_mask.data |= MASK_DATA_SIG_OR_MSG;
   offset += NUM_TRITS_SIGNATURE;
   flex_trits_slice(transaction->essence.address, NUM_TRITS_ADDRESS, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_ADDRESS);
+  transaction->loaded_columns_mask.essence |= MASK_ESSENCE_ADDRESS;
   offset += NUM_TRITS_ADDRESS;
   flex_trits_slice(partial, NUM_TRITS_VALUE, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_VALUE);
@@ -45,6 +51,7 @@ size_t transaction_deserialize_trits(iota_transaction_t *const transaction,
   flex_trits_slice(transaction->essence.obsolete_tag, NUM_TRITS_OBSOLETE_TAG,
                    trits, NUM_TRITS_SERIALIZED_TRANSACTION, offset,
                    NUM_TRITS_OBSOLETE_TAG);
+  transaction->loaded_columns_mask.essence |= MASK_ESSENCE_OBSOLETE_TAG;
   offset += NUM_TRITS_OBSOLETE_TAG;
   flex_trits_slice(partial, NUM_TRITS_TIMESTAMP, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset,
@@ -71,15 +78,19 @@ size_t transaction_deserialize_trits(iota_transaction_t *const transaction,
   offset += NUM_TRITS_LAST_INDEX;
   flex_trits_slice(transaction->essence.bundle, NUM_TRITS_BUNDLE, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_BUNDLE);
+  transaction->loaded_columns_mask.essence |= MASK_ESSENCE_BUNDLE;
   offset += NUM_TRITS_BUNDLE;
   flex_trits_slice(transaction->attachment.trunk, NUM_TRITS_TRUNK, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_TRUNK);
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TRUNK;
   offset += NUM_TRITS_TRUNK;
   flex_trits_slice(transaction->attachment.branch, NUM_TRITS_BRANCH, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_BRANCH);
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_BRANCH;
   offset += NUM_TRITS_BRANCH;
   flex_trits_slice(transaction->attachment.tag, NUM_TRITS_TAG, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_TAG);
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_TAG;
   offset += NUM_TRITS_TAG;
   flex_trits_slice(partial, NUM_TRITS_ATTACHMENT_TIMESTAMP, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset,
@@ -110,6 +121,7 @@ size_t transaction_deserialize_trits(iota_transaction_t *const transaction,
   offset += NUM_TRITS_ATTACHMENT_TIMESTAMP_UPPER;
   flex_trits_slice(transaction->attachment.nonce, NUM_TRITS_NONCE, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset, NUM_TRITS_NONCE);
+  transaction->loaded_columns_mask.attachment |= MASK_ATTACHMENT_NONCE;
   offset += NUM_TRITS_NONCE;
 
   if (compute_hash) {
@@ -123,10 +135,9 @@ size_t transaction_deserialize_trits(iota_transaction_t *const transaction,
     curl_digest(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, hash, &curl);
     flex_trits_from_trits(transaction->consensus.hash, NUM_TRITS_HASH, hash,
                           NUM_TRITS_HASH, NUM_TRITS_HASH);
+    transaction->loaded_columns_mask.consensus |= MASK_CONSENSUS_HASH;
   }
 
-  transaction->loaded_columns_mask |=
-      (MASK_ESSENCE | MASK_ATTACHMENT | MASK_CONSENSUS | MASK_DATA);
   return offset;
 }
 
@@ -347,3 +358,66 @@ size_t transaction_deserialize_from_trits(iota_transaction_t *const transaction,
 void transaction_free(iota_transaction_t *const transaction) {
   free(transaction);
 }
+
+#ifdef DEBUG
+void transaction_obj_dump(iota_transaction_t *tx_obj) {
+  tryte_t trytes_81[NUM_TRYTES_HASH + 1];
+  tryte_t trytes_27[NUM_TRYTES_TAG + 1];
+
+  printf("==========Transaction Object==========\n");
+  // address
+  flex_trits_to_trytes(trytes_81, NUM_TRYTES_HASH, transaction_address(tx_obj),
+                       NUM_TRITS_HASH, NUM_TRITS_HASH);
+  trytes_81[NUM_TRYTES_HASH] = '\0';
+  printf("addr: %s\n", trytes_81);
+
+  printf("value: %" PRId64 "\n", transaction_value(tx_obj));
+
+  flex_trits_to_trytes(trytes_81, NUM_TRYTES_HASH,
+                       transaction_obsolete_tag(tx_obj), NUM_TRITS_HASH,
+                       NUM_TRITS_HASH);
+  trytes_81[NUM_TRYTES_HASH] = '\0';
+  printf("obsolete_tag: %s\n", trytes_81);
+
+  printf("timestamp: %" PRId64 "\n", transaction_timestamp(tx_obj));
+  printf("curr index: %" PRId64 " \nlast index: %" PRId64 "\n",
+         transaction_current_index(tx_obj), transaction_last_index(tx_obj));
+
+  flex_trits_to_trytes(trytes_81, NUM_TRYTES_HASH, transaction_bundle(tx_obj),
+                       NUM_TRITS_HASH, NUM_TRITS_HASH);
+  trytes_81[NUM_TRYTES_HASH] = '\0';
+  printf("bundle: %s\n", trytes_81);
+
+  flex_trits_to_trytes(trytes_81, NUM_TRYTES_HASH, transaction_trunk(tx_obj),
+                       NUM_TRITS_HASH, NUM_TRITS_HASH);
+  trytes_81[NUM_TRYTES_HASH] = '\0';
+  printf("trunk: %s\n", trytes_81);
+
+  flex_trits_to_trytes(trytes_81, NUM_TRYTES_HASH, transaction_branch(tx_obj),
+                       NUM_TRITS_HASH, NUM_TRITS_HASH);
+  trytes_81[NUM_TRYTES_HASH] = '\0';
+  printf("branch: %s\n", trytes_81);
+
+  flex_trits_to_trytes(trytes_27, NUM_TRYTES_TAG, transaction_tag(tx_obj),
+                       NUM_TRITS_TAG, NUM_TRITS_TAG);
+  trytes_27[NUM_TRYTES_TAG] = '\0';
+  printf("tag: %s\n", trytes_27);
+
+  printf("attachment_timestamp: %" PRId64 "\n",
+         transaction_attachment_timestamp(tx_obj));
+  printf("attachment_timestamp_lower: %" PRId64 "\n",
+         transaction_attachment_timestamp_lower(tx_obj));
+  printf("attachment_timestamp_upper: %" PRId64 "\n",
+         transaction_attachment_timestamp_upper(tx_obj));
+
+  flex_trits_to_trytes(trytes_27, NUM_TRYTES_TAG, transaction_nonce(tx_obj),
+                       NUM_TRITS_TAG, NUM_TRITS_TAG);
+  trytes_27[NUM_TRYTES_TAG] = '\0';
+  printf("nonce: %s\n", trytes_27);
+
+  flex_trits_to_trytes(trytes_81, NUM_TRYTES_HASH, transaction_hash(tx_obj),
+                       NUM_TRITS_HASH, NUM_TRITS_HASH);
+  trytes_81[NUM_TRYTES_HASH] = '\0';
+  printf("hash: %s\n", trytes_81);
+}
+#endif

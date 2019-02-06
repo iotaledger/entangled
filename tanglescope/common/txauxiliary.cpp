@@ -1,16 +1,16 @@
-
 #include "txauxiliary.hpp"
-#include <gflags/gflags.h>
-#include <glog/logging.h>
-#include <iota/tanglescope/common/tangledb.hpp>
+
 #include <set>
 
+#include <gflags/gflags.h>
+#include <glog/logging.h>
 #include <iota/models/bundle.hpp>
 #include <iota/models/transaction.hpp>
 
 #include "common/helpers/digest.h"
 #include "common/helpers/pow.h"
 #include "common/trinary/tryte_long.h"
+#include "tanglescope/common/tangledb.hpp"
 
 DEFINE_string(transactionAddress,
               "JURSJVFIECKJYEHPATCXADQGHABKOOEZCRUHLIDHPNPIGRCXBFBWVISWCF9ODWQK"
@@ -100,7 +100,7 @@ std::set<std::string> getUnconfirmedTXs(
         LOG(ERROR) << " Exception: " << e.what();
       }
     }
-    return std::move(res);
+    return res;
   }
 
   return std::set<std::string>();
@@ -184,7 +184,7 @@ nonstd::optional<std::string> powTX(nonstd::optional<std::string> maybeTx,
 
   auto tx = std::move(maybeTx.value());
 
-  char* foundNonce = iota_pow(tx.data(), mwm);
+  char* foundNonce = iota_pow_trytes(tx.data(), mwm);
   tx.replace(2646, 27, foundNonce);
   free(foundNonce);
 
@@ -201,7 +201,7 @@ HashedTX hashTX(boost::future<nonstd::optional<std::string>> fuTx) {
   char* digest = iota_digest(tx.data());
   HashedTX hashed = {digest, std::move(tx)};
   free(digest);
-  return std::move(hashed);
+  return hashed;
 }
 }  // namespace txAuxiliary
 }  // namespace tanglescope

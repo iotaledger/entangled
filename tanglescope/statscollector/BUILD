@@ -11,7 +11,6 @@ cc_library(
         ["**/*.hpp"],
         exclude = ["tests/**/*.hpp"],
     ),
-    include_prefix = "iota/tanglescope/statscollector",
     deps = [
         "//tanglescope/common",
         "//tanglescope/prometheus_collector",
@@ -36,7 +35,6 @@ cc_library(
     name = "statscollector",
     srcs = ["statscollector.cpp"],
     hdrs = glob(["statscollector.hpp"]),
-    include_prefix = "iota/tanglescope",
     visibility = ["//visibility:public"],
     deps = [
         ":shared",

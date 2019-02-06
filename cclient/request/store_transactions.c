@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "request/store_transactions.h"
+#include "cclient/request/store_transactions.h"
 
 store_transactions_req_t* store_transactions_req_new() {
   store_transactions_req_t* req =

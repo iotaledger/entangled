@@ -2,8 +2,8 @@
 #include <glog/logging.h>
 #include <set>
 
-#include <iota/tanglescope/blowballcollector.hpp>
-#include <iota/tanglescope/common/zmqpub.hpp>
+#include "tanglescope/blowballcollector.hpp"
+#include "tanglescope/common/zmqpub.hpp"
 
 using namespace iota::tanglescope;
 

@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "request/get_transactions_to_approve.h"
+#include "cclient/request/get_transactions_to_approve.h"
 
 get_transactions_to_approve_req_t* get_transactions_to_approve_req_new() {
   get_transactions_to_approve_req_t* req =

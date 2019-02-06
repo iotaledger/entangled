@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "response/get_balances.h"
+#include "cclient/response/get_balances.h"
 
 get_balances_res_t* get_balances_res_new() {
   get_balances_res_t* res =

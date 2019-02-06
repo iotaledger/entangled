@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "request/find_transactions.h"
+#include "cclient/request/find_transactions.h"
 
 find_transactions_req_t* find_transactions_req_new() {
   find_transactions_req_t* req =

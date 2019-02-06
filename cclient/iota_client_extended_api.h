@@ -9,8 +9,11 @@
 #define CCLIENT_IOTA_EXTENDED_API_H_
 
 #include "common/helpers/sign.h"
+#include "common/model/bundle.h"
+#include "common/model/transfer.h"
 #include "iota_client_core_api.h"
 #include "utils/containers/hash/hash243_queue.h"
+#include "utils/time.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -286,13 +289,9 @@ retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createPrepareTransfers.ts#L97
  */
 retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
-                                        trit_array_p const seed,
-                                        int const security,
-                                        transfer_list_t const* const transfers,
-                                        trit_array_p const remainder,
-                                        input_list_t const* const inputs,
-                                        hashes_t* out_bundle_trytes);
-
+                                        transfer_t** const transfers,
+                                        uint32_t const num_transfer,
+                                        bundle_transactions_t* out_bundle);
 /**
  * Attempts to promote a transaction using a provided bundle and, if successful,
  * returns the promoting Transactions.
@@ -347,11 +346,10 @@ retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv,
                                     transaction_objs_t out_tx_objs);
 
 // https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createSendTransfer.ts#L22
-retcode_t iota_client_send_transfer(iota_client_service_t const* const serv,
-                                    trit_array_p const seed, int const depth,
-                                    int const mwm,
-                                    transfer_list_t const* const transfers,
-                                    transaction_objs_t out_tx_objs);
+retcode_t iota_client_send_transfer(
+    iota_client_service_t const* const serv, int const depth, int const mwm,
+    bool local_pow, transfer_t** const transfers, uint32_t num_transfer,
+    flex_trit_t const* const reference, bundle_transactions_t* out_tx_objs);
 
 /**
  * [Attaches to tanlge]{@link #module_core.attachToTangle}, [stores]{@link
@@ -363,6 +361,7 @@ retcode_t iota_client_send_transfer(iota_client_service_t const* const serv,
  * @param {int} depth - Depth
  * @param {int} mwm - Min weight magnitude
  * @param {trit_array_p} reference - Optional reference hash
+ * @param {bool} local_pow - apply local PoW
  * @param {hashes_t} out_transactions - Returns list of attached transactions
  *
  * @return {retcode_t}
@@ -374,6 +373,7 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
                                   hash8019_array_p const trytes,
                                   uint32_t const depth, uint32_t const mwm,
                                   flex_trit_t const* const reference,
+                                  bool const local_pow,
                                   transaction_array_t out_transactions);
 
 /**
