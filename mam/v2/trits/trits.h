@@ -222,13 +222,6 @@ void trits_print(trits_t x);
 
 void trits_print2(char const *pfx, trits_t x, char const *sfx);
 
-/*! \brief Print string rep of `x` into stdout if MAM2_DEBUG defined. */
-#ifdef MAM2_DEBUG
-#define trits_dbg_print(x) trits_print(x)
-#else
-#define trits_dbg_print(x)
-#endif
-
 #ifdef __cplusplus
 }
 #endif

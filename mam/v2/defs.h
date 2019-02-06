@@ -15,11 +15,6 @@
 #ifndef __MAM_V2_DEFS_H__
 #define __MAM_V2_DEFS_H__
 
-/*! \brief Enable debug output macros. */
-#if 0
-#define MAM2_DEBUG
-#endif
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -28,20 +23,7 @@
 extern "C" {
 #endif
 
-#if defined(NDEBUG) /*&& defined(MAM2_DEBUG)*/
-/* enable `assert` in RELEASE */
-#undef NDEBUG
 #include <assert.h>
-#define NDEBUG
-#endif
-#include <assert.h>
-
-#ifdef MAM2_DEBUG
-#include <stdio.h>
-#define dbg_printf(...) printf(__VA_ARGS__)
-#else
-#define dbg_printf(...)
-#endif
 
 /*! `M = 3^n`, `m = 3^k`, `n>k`. t \in [-(M-1)/2 .. (M-1)/2]. */
 #define MAM2_MODS(t, M, m) ((((t) + ((M - 1) / 2)) % (m)) - ((m - 1) / 2))

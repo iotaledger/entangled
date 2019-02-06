@@ -194,39 +194,27 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
   for (curr_height = 1; r && curr_height <= max_height; ++curr_height) {
     trits_t sig = trits_take(sig_, MAM2_MSS_SIG_SIZE(curr_height));
     trits_t sig_skn = trits_take(sig, MAM2_MSS_SKN_SIZE);
-#if !defined(MAM2_MSS_DEBUG)
     trits_t sig_wots =
         trits_take(trits_drop(sig, MAM2_MSS_SKN_SIZE), MAM2_WOTS_SIG_SIZE);
     trits_t sig_apath = trits_drop(sig, MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE);
-#endif
-
-    dbg_printf("========================\ncurr_height = %d\n", curr_height);
 
     mss_init(mss, prng, curr_height, nonce, trits_null());
 
     mss_gen(mss, pk);
 
-    dbg_printf("mss pk \t");
-    trits_dbg_print(pk);
-    dbg_printf("\n");
-
     do {
-      dbg_printf("------------------------\nskn = %d\n", mss->skn);
       mss_sign(mss, hash, sig);
       r = r && mss_verify(spongos, &wots->spongos, hash, sig, pk);
 
-#if !defined(MAM2_MSS_DEBUG)
       /* H is ignored, makes no sense to modify and check */
       trits_put1(hash, trit_add(trits_get1(hash), 1));
       r = r && !mss_verify(spongos, &wots->spongos, hash, sig, pk);
       trits_put1(hash, trit_sub(trits_get1(hash), 1));
-#endif
 
       trits_put1(sig_skn, trit_add(trits_get1(sig_skn), 1));
       r = r && !mss_verify(spongos, &wots->spongos, hash, sig, pk);
       trits_put1(sig_skn, trit_sub(trits_get1(sig_skn), 1));
 
-#if !defined(MAM2_MSS_DEBUG)
       /* WOTS sig is ignored, makes no sense to modify and check */
       trits_put1(sig_wots, trit_add(trits_get1(sig_wots), 1));
       r = r && !mss_verify(spongos, &wots->spongos, hash, sig, pk);
@@ -237,7 +225,6 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
         r = r && !mss_verify(spongos, &wots->spongos, hash, sig, pk);
         trits_put1(sig_apath, trit_sub(trits_get1(sig_apath), 1));
       }
-#endif
 
       r = r && !mss_verify(spongos, &wots->spongos, hash,
                            trits_take(sig, trits_size(sig) - 1), pk);
@@ -247,12 +234,6 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
       trits_put1(pk, trit_sub(trits_get1(pk), 1));
 
     } while (mss_next(mss));
-
-#if defined(MAM2_MSS_DEBUG)
-    dbg_printf("\nd = %d\n", mss->height);
-    dbg_printf("  leafs = %d\n", mss->gen_leaf_count);
-    dbg_printf("  nodes = %d\n", mss->hash_node_count);
-#endif
   }
 
   trits_free(sig_);
