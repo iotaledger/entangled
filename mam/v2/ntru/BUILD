@@ -66,6 +66,7 @@ cc_library(
     name = "ntru_types_hdr",
     hdrs = ["ntru_types.h"],
     deps = [
+        ":poly",
         "//common:errors",
         "//mam/v2:defs",
         "//mam/v2/trits",
