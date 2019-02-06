@@ -13,6 +13,7 @@
 
 #include "common/errors.h"
 #include "mam/v2/defs.h"
+#include "mam/v2/ntru/poly.h"
 #include "mam/v2/trits/trits.h"
 
 // NTRU public key - 3g(x)/(1+3f(x)) - size
@@ -43,7 +44,7 @@ typedef struct mam_ntru_sk_s {
   // Private key trits - small coefficients of polynomial f
   trit_t secret_key[MAM2_NTRU_SK_SIZE];
   // Internal representation (`poly_t`) of a private key: NTT(1+3f)
-  void* f;
+  poly_t f;
 } mam_ntru_sk_t;
 
 typedef struct mam_ntru_sk_t_set_entry_s mam_ntru_sk_t_set_entry_t;
