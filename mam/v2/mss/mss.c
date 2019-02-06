@@ -15,40 +15,12 @@
 
 #define MAM2_MSS_MAX_SKN(d) (((trint18_t)1 << (d)) - 1)
 
-static void mss_hash2(
-    mam_spongos_t *s,
-    trits_t hashes[2],  /*!< [in] hash values of left and right child nodes */
+static inline void mss_hash2(
+    mam_spongos_t *s, trits_t children_hashes[2], /*!< [in] hash values of left
+                                                     and right child nodes */
     trits_t parent_hash /*!< [out] hash value of their parent */
 ) {
-#if defined(MAM2_MSS_DEBUG)
-  {
-    /* this is a special debug MT hash function */
-    mss_mt_idx_t i0, i1, i01;
-    /* hash of the node is it'spongos index in level */
-    i0 = trits_get18(h[0]);
-    /*MAM2_ASSERT(i0 == spongos_ntru[spongos->spongos].i); */
-    i1 = trits_get18(h[1]);
-    /*MAM2_ASSERT(i1 == spongos_ntru[spongos->spongos+1].i); */
-    /* left node is even */
-    MAM2_ASSERT(i0 % 2 == 0);
-    /* right node is left node + 1 */
-    MAM2_ASSERT(i0 + 1 == i1);
-    /* parent'spongos index */
-    i01 = i0 / 2;
-    trits_set_zero(parent_hash);
-    trits_put18(parent_hash, i01);
-  }
-#else
-  mam_spongos_hashn(s, 2, hashes, parent_hash);
-#endif
-}
-
-static void mss_mt_hash2(mss_t *mss, trits_t children_hashes[2],
-                         trits_t parent_hash) {
-#if defined(MAM2_MSS_DEBUG)
-  mss->hash_node_count++;
-#endif
-  mss_hash2(mss->sg, children_hashes, parent_hash);
+  mam_spongos_hashn(s, 2, children_hashes, parent_hash);
 }
 
 static void mss_mt_gen_leaf(
@@ -57,17 +29,6 @@ static void mss_mt_gen_leaf(
 ) {
   mam_wots_t wots;
   mam_sponge_t sponge;
-
-#if defined(MAM2_MSS_DEBUG)
-  MAM2_ASSERT(0 <= i && i <= MAM2_MSS_MAX_SKN(mss->height));
-
-  mss->gen_leaf_count++;
-
-  /* this is a special debug MT hash function; */
-  /* hash of the node is it'spongos index in the level */
-  trits_set_zero(h);
-  trits_put18(h, i);
-#else
 
   MAM2_TRITS_DEF0(nonce_i, MAM2_MSS_SKN_SIZE);
   mam_sponge_init(&sponge);
@@ -81,7 +42,6 @@ static void mss_mt_gen_leaf(
   mam_wots_gen_sk3(&wots, mss->prng, mss->nonce1, mss->nonce2, nonce_i);
   /* calc pk & push hash */
   mam_wots_calc_pk(&wots, pk);
-#endif
 }
 
 #if defined(MAM2_MSS_TRAVERSAL)
@@ -154,8 +114,8 @@ static void mss_mt_update(mss_t *mss, mss_mt_height_t height) {
     /* dirty hack: at the last level do not overwrite  */
     /* left hash value, but instead right; */
     /* left hash value is needed for MTT algorithm */
-    mss_mt_hash2(mss, hashes,
-                 hashes[nodes[stack->size].height + 1 != mss->height ? 0 : 1]);
+    mss_hash2(mss->sg, hashes,
+              hashes[nodes[stack->size].height + 1 != mss->height ? 0 : 1]);
 
     /* push parent into stack */
     /* parent is one level up */
@@ -356,13 +316,10 @@ void mss_init(mss_t *mss, mam_prng_t *prng, trint6_t height, trits_t nonce1,
 #if defined(MAM2_MSS_TRAVERSAL)
   mss_mt_init(mss);
 #endif
-
-#if defined(MAM2_MSS_DEBUG)
-  m->gen_leaf_count = m->hash_node_count = 0;
-#endif
 }
 
 void mss_gen(mss_t *mss, trits_t pk) {
+  mam_spongos_t spongos;
 #if defined(MAM2_MSS_TRAVERSAL)
   if (0 == mss->height) {
     mss_mt_gen_leaf(mss, 0, pk);
@@ -461,7 +418,7 @@ void mss_gen(mss_t *mss, trits_t pk) {
       h[1] = mss_mt_node_t_trits(mss, height + 1, 2 * i + 1);
       h01 = mss_mt_node_t_trits(mss, height, i);
 
-      mss_mt_hash2(mss, h, h01);
+      mss_hash2(&spongos, h, h01);
     }
   }
 
@@ -537,10 +494,6 @@ void mss_sign(mss_t *mss, trits_t hash, trits_t sig) {
   mss_skn(mss, trits_take(sig, MAM2_MSS_SKN_SIZE));
   sig = trits_drop(sig, MAM2_MSS_SKN_SIZE);
 
-#if defined(MAM2_MSS_DEBUG)
-  /* instead of WOTS sig gen WOTS pk directly */
-  mss_mt_gen_leaf(mss, mss->skn, trits_take(sig, MAM2_MSS_MT_HASH_SIZE));
-#else
   mam_sponge_init(&sponge);
   mam_wots_init(&wots);
   {
@@ -552,7 +505,6 @@ void mss_sign(mss_t *mss, trits_t hash, trits_t sig) {
   }
 
   mam_wots_sign(&wots, hash, trits_take(sig, MAM2_WOTS_SIG_SIZE));
-#endif
   sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
 
   mss_auth_path(mss, mss->skn, sig);
@@ -591,12 +543,8 @@ bool mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos,
   if (trits_size(sig) != (MAM2_MSS_SIG_SIZE(height) - MAM2_MSS_SKN_SIZE))
     return false;
 
-#if defined(MAM2_MSS_DEBUG)
-  trits_copy(trits_take(sig, MAM2_MSS_MT_HASH_SIZE), calculated_pk);
-#else
   mam_wots_recover(wots_spongos, hash, trits_take(sig, MAM2_WOTS_SIG_SIZE),
                    calculated_pk);
-#endif
   sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
 
   mss_fold_auth_path(mt_spongos, skn, sig, calculated_pk);

@@ -26,9 +26,6 @@
 extern "C" {
 #endif
 
-/*! \brief Enable debug MT hash function to ease MT traversal debug. */
-/*#define MAM2_MSS_DEBUG*/
-
 /*! \brief MSS public key size. */
 #define MAM2_MSS_PK_SIZE 243
 /*! \brief Trits needed to encode tree depth part of SKN. */
@@ -119,9 +116,6 @@ typedef struct mss_s {
 #endif
   trits_t nonce1,
       nonce2; /*!< Nonce = `N1`||`N2`, stored pointers only, NOT copies. */
-#if defined(MAM2_MSS_DEBUG)
-  size_t gen_leaf_count, hash_node_count;
-#endif
 } mss_t;
 
 #if defined(MAM2_MSS_TRAVERSAL)
