@@ -10,6 +10,7 @@
 
 #include "mam/v2/state/state.h"
 #include "mam/v2/mam/mam_pre_shared_key_t_set.h"
+#include "mam/v2/ntru/mam_ntru_pk_t_set.h"
 #include "mam/v2/ntru/mam_ntru_sk_t_set.h"
 #include "mam/v2/prng/prng.h"
 
@@ -21,6 +22,7 @@ retcode_t mam_state_init(mam_state_t* const state,
     return ret;
   }
   state->ntru_sks = NULL;
+  state->ntru_pks = NULL;
   state->psks = NULL;
 
   return ret;
@@ -29,6 +31,7 @@ retcode_t mam_state_init(mam_state_t* const state,
 retcode_t mam_state_destroy(mam_state_t* const state) {
   mam_prng_destroy(&state->prng);
   mam_ntru_sk_t_set_free(&state->ntru_sks);
+  mam_ntru_pk_t_set_free(&state->ntru_pks);
   mam_pre_shared_key_t_set_free(&state->psks);
 
   return RC_OK;
@@ -37,4 +40,9 @@ retcode_t mam_state_destroy(mam_state_t* const state) {
 retcode_t mam_state_add_ntru_sk(mam_state_t* const state,
                                 mam_ntru_sk_t const* const ntru_sk) {
   return mam_ntru_sk_t_set_add(&state->ntru_sks, ntru_sk);
+}
+
+retcode_t mam_state_add_ntru_pk(mam_state_t* const state,
+                                mam_ntru_pk_t const* const ntru_pk) {
+  return mam_ntru_pk_t_set_add(&state->ntru_pks, ntru_pk);
 }
