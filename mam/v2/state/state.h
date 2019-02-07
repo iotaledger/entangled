@@ -36,6 +36,10 @@ retcode_t mam_state_add_ntru_sk(mam_state_t* const state,
 
 retcode_t mam_state_add_ntru_pk(mam_state_t* const state,
                                 mam_ntru_pk_t const* const ntru_pk);
+
+retcode_t mam_state_add_psk(mam_state_t* const state,
+                            mam_pre_shared_key_t const* const psk);
+
 #ifdef __cplusplus
 }
 #endif
