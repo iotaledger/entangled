@@ -14,8 +14,12 @@
 #include "gossip/components/receiver.h"
 #include "gossip/components/responder.h"
 #include "gossip/components/tips_requester.h"
+#include "gossip/components/tips_solidifier.h"
 #include "gossip/components/transaction_requester.h"
+#include "gossip/components/transaction_requester_worker.h"
+#include "gossip/neighbor.h"
 #include "gossip/tips_cache.h"
+#include "utils/handles/rw_lock.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,7 +27,6 @@ extern "C" {
 
 // Forward declarations
 typedef struct core_s core_t;
-typedef struct concurrent_list_neighbor_t_s neighbors_list_t;
 
 typedef struct node_s {
   iota_gossip_conf_t conf;
@@ -33,9 +36,11 @@ typedef struct node_s {
   processor_t processor;
   receiver_state_t receiver;
   responder_t responder;
-  requester_state_t transaction_requester;
+  transaction_requester_t transaction_requester;
   tips_requester_t tips_requester;
-  neighbors_list_t* neighbors;
+  tips_solidifier_t tips_solidifier;
+  neighbor_t* neighbors;
+  rw_lock_handle_t neighbors_lock;
   tips_cache_t tips;
 } iota_node_t;
 

@@ -1,8 +1,9 @@
 #pragma once
 
 #include <prometheus/exposer.h>
-#include <iota/tanglescope/collector/collector.hpp>
 #include <string>
+
+#include "tanglescope/collector/collector.hpp"
 
 namespace iota {
 namespace tanglescope {

@@ -8,13 +8,19 @@
 #ifndef CCLIENT_REQUEST_FIND_TRANSACTIONS_H
 #define CCLIENT_REQUEST_FIND_TRANSACTIONS_H
 
-#include "types/types.h"
+#include "cclient/types/types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct {
+typedef struct find_transactions_req_s {
+  /**
+   * List of bundle hashes.
+   * Transactions belonging to bundles will be returned
+   */
+  hash243_queue_t bundles;
+
   /**
    * List of addresses.
    * Transactions with any of these addresses as input/output will be returned
@@ -32,13 +38,6 @@ typedef struct {
    * Transactions which directly approve any of approvees will be returned
    */
   hash243_queue_t approvees;
-  /**
-   * List of bundle hashes.
-   * Transactions belonging to bundles will be returned
-   */
-  hash243_queue_t bundles;
-  // size_t numBundles;
-
 } find_transactions_req_t;
 
 find_transactions_req_t* find_transactions_req_new();

@@ -32,8 +32,7 @@ static retcode_t validate_signature(char const *const signature_filename,
   ssize_t read = 0;
   char *line = NULL;
   size_t len = 0;
-  byte_t normalized_digest[HASH_LENGTH_TRYTE];
-  trit_t normalized_digest_trits[HASH_LENGTH_TRIT];
+  trit_t normalized_digest[HASH_LENGTH_TRIT];
   trit_t sig_digests[3 * HASH_LENGTH_TRIT];
   trit_t sig_trits[NORMALIZED_FRAGMENT_LENGTH * HASH_LENGTH_TRYTE * RADIX];
   trit_t root[HASH_LENGTH_TRIT];
@@ -47,10 +46,7 @@ static retcode_t validate_signature(char const *const signature_filename,
   curl.type = CURL_P_81;
   init_curl(&curl);
 
-  normalize_hash(digest, normalized_digest);
-  for (int c = 0; c < HASH_LENGTH_TRYTE; ++c) {
-    long_to_trits(normalized_digest[c], &normalized_digest_trits[c * RADIX]);
-  }
+  normalize_flex_hash_to_trits(digest, normalized_digest);
 
   int i;
   for (i = 0; i < 3 && (read = getline(&line, &len, fp)) > 0; i++) {
@@ -62,8 +58,8 @@ static retcode_t validate_signature(char const *const signature_filename,
     trytes_to_trits((tryte_t *)line, sig_trits, read);
     iss_curl_sig_digest(
         sig_digests + i * HASH_LENGTH_TRIT,
-        normalized_digest_trits + i * NORMALIZED_FRAGMENT_LENGTH * RADIX,
-        sig_trits, RADIX * read, &curl);
+        normalized_digest + i * NORMALIZED_FRAGMENT_LENGTH * RADIX, sig_trits,
+        RADIX * read, &curl);
     curl_reset(&curl);
   }
   if (i != 3 || read < 0) {

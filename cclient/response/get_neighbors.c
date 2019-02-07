@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "response/get_neighbors.h"
+#include "cclient/response/get_neighbors.h"
 
 void neighbor_info_t_copy(void* _dst, const void* _src) {
   neighbor_info_t *dst = (neighbor_info_t*)_dst, *src = (neighbor_info_t*)_src;

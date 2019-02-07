@@ -8,7 +8,7 @@
 #ifndef CCLIENT_RESPONSE_ATTACH_TO_TANGLE_H
 #define CCLIENT_RESPONSE_ATTACH_TO_TANGLE_H
 
-#include "types/types.h"
+#include "cclient/types/types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,7 +19,7 @@ typedef struct {
    * The returned value is a different set of tryte values which you can input
    * into broadcastTransactions and storeTransactions
    */
-  hash8019_queue_t trytes;
+  hash8019_array_p trytes;
 
 } attach_to_tangle_res_t;
 

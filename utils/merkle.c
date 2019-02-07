@@ -19,10 +19,11 @@ static size_t binary_tree_size(size_t const acc, size_t const depth) {
 size_t merkle_size(size_t const leaf_count) {
   size_t acc = 1, count = leaf_count;
 
-  if (count == 0)
+  if (count == 0) {
     return 0;
-  else if (count == 1)
+  } else if (count == 1) {
     return 1;
+  }
   while (count >= 2) {
     acc += count;
     count = (count + 1) >> 1;

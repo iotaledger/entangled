@@ -2,8 +2,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <yaml-cpp/yaml.h>
-#include <iota/tanglescope/echocollector.hpp>
-#include <iota/tanglescope/statscollector.hpp>
+
+#include "tanglescope/echocollector.hpp"
+#include "tanglescope/statscollector/statscollector.hpp"
 
 using namespace iota::tanglescope::statscollector;
 using namespace iota::tanglescope;

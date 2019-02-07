@@ -47,6 +47,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
-        "//common/trinary:trit_array",
+        "//common/trinary:flex_trit",
     ],
 )

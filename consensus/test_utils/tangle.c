@@ -38,24 +38,24 @@ retcode_t tangle_cleanup(tangle_t *const tangle, char *test_db_path) {
 }
 
 void transactions_deserialize(tryte_t const *const *const transactions_trytes,
-                              iota_transaction_t *txs,
-                              size_t num_transactions) {
+                              iota_transaction_t **txs, size_t num_transactions,
+                              bool compute_hash) {
+  flex_trit_t trits[FLEX_TRIT_SIZE_8019];
   for (size_t i = 0; i < num_transactions; ++i) {
-    flex_trit_t trits[FLEX_TRIT_SIZE_8019];
     flex_trits_from_trytes(
         trits, NUM_TRITS_SERIALIZED_TRANSACTION, transactions_trytes[i],
         NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
-    txs[i] = transaction_deserialize(trits);
+    txs[i] = transaction_deserialize(trits, compute_hash);
   }
 }
 
-void transactions_free(iota_transaction_t *txs, size_t num_transactions) {
+void transactions_free(iota_transaction_t **txs, size_t num_transactions) {
   for (size_t i = 0; i < num_transactions; ++i) {
     transaction_free(txs[i]);
   }
 }
 
-retcode_t build_tangle(tangle_t *const tangle, iota_transaction_t txs[],
+retcode_t build_tangle(tangle_t *const tangle, iota_transaction_t **txs,
                        size_t num_transactions) {
   retcode_t ret;
   for (size_t i = 0; i < num_transactions; ++i) {

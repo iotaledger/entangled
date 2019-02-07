@@ -9,13 +9,13 @@
 #include <glog/logging.h>
 #include <rx.hpp>
 
-#include "iota/tanglescope/common/iri.hpp"
-#include "iota/tanglescope/common/zmqpub.hpp"
-
-#include "iota/tanglescope/statscollector.hpp"
-#include "iota/tanglescope/statscollector/analyzer.hpp"
-#include "iota/tanglescope/statscollector/stats/frame.hpp"
 #include "tanglescope/common/iri.hpp"
+#include "tanglescope/common/zmqpub.hpp"
+
+#include "tanglescope/common/iri.hpp"
+#include "tanglescope/statscollector/analyzer.hpp"
+#include "tanglescope/statscollector/stats/frame.hpp"
+#include "tanglescope/statscollector/statscollector.hpp"
 
 using namespace iota::tanglescope;
 
@@ -125,8 +125,9 @@ void ZMQCollectorImpl::collect(uint32_t bundleConfirmationHistogramRange,
   zmqObservable.observe_on(rxcpp::synchronize_new_thread())
       .as_blocking()
       .subscribe(
-          [weakAnalyzer = std::weak_ptr(analyzer), &gauges = _gauges,
-           &counters = _counters, &lmsi](std::shared_ptr<iri::IRIMessage> msg) {
+          [weakAnalyzer = std::weak_ptr<TXAnalyzer>(analyzer),
+           &gauges = _gauges, &counters = _counters,
+           &lmsi](std::shared_ptr<iri::IRIMessage> msg) {
             auto analyzer = weakAnalyzer.lock();
             // FIXME (@th0br0) Proper error handling.
             if (!analyzer) return;

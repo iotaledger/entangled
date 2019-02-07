@@ -8,23 +8,24 @@
 #ifndef __CONSENSUS_SNAPSHOT_STATE_DELTA_H__
 #define __CONSENSUS_SNAPSHOT_STATE_DELTA_H__
 
-#include "../../utils/hash_maps.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
+#include "utils/containers/hash/hash_int64_t_map.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef hash_to_int_map_entry_t state_delta_entry_t;
+typedef hash_to_int64_t_map_entry_t state_delta_entry_t;
 typedef state_delta_entry_t *state_delta_t;
 
-#define state_delta_add(delta, hash, value) hash_int_map_add(delta, hash, value)
+#define state_delta_add(delta, hash, value) \
+  hash_to_int64_t_map_add(delta, hash, value)
 #define state_delta_find(delta, hash, entry) \
   HASH_FIND(hh, delta, hash, FLEX_TRIT_SIZE_243, entry)
 #define state_delta_size(delta) HASH_COUNT(delta)
 #define state_delta_empty(delta) (state_delta_size(delta) == 0)
-#define state_delta_destroy(delta) hash_int_map_free(delta)
+#define state_delta_destroy(delta) hash_to_int64_t_map_free(delta)
 
 int64_t state_delta_sum(state_delta_t const *const state);
 retcode_t state_delta_add_or_sum(state_delta_t *const state,

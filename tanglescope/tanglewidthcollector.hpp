@@ -1,14 +1,16 @@
 #pragma once
 
+#include <chrono>
+#include <list>
+#include <string>
+
 #include <prometheus/exposer.h>
 #include <boost/thread/executor.hpp>
 #include <boost/thread/future.hpp>
-#include <chrono>
-#include <iota/tanglescope/common/iri.hpp>
-#include <iota/tanglescope/prometheus_collector/prometheus_collector.hpp>
-#include <list>
 #include <rx.hpp>
-#include <string>
+
+#include "tanglescope/common/iri.hpp"
+#include "tanglescope/prometheus_collector/prometheus_collector.hpp"
 
 namespace iota {
 namespace tanglescope {

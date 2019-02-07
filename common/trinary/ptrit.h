@@ -13,7 +13,7 @@
 #define HIGH_BITS 0xFFFFFFFFFFFFFFFF
 #define LOW_BITS 0x0000000000000000
 
-typedef int64_t ptrit_s;
+typedef uint64_t ptrit_s;
 
 typedef struct {
   ptrit_s low;

@@ -16,6 +16,9 @@ typedef struct receiver_service_s receiver_service_t;
 extern "C" {
 #endif
 
+retcode_t tcp_sender_endpoint_init(endpoint_t *const endpoint);
+retcode_t tcp_sender_endpoint_destroy(endpoint_t *const endpoint);
+
 /**
  * Sends a TCP packet to an endpoint
  *
@@ -25,7 +28,7 @@ extern "C" {
  * @return true if sending succeeded, false otherwise
  */
 bool tcp_send(receiver_service_t *const service, endpoint_t *const endpoint,
-              iota_packet_t *const packet);
+              iota_packet_t const *const packet);
 
 #ifdef __cplusplus
 }

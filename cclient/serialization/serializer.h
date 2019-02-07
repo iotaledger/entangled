@@ -9,8 +9,8 @@
 #define CCLIENT_SERIALIZATION_SERIALIZER_H
 
 #include <stdlib.h>
-#include "request/requests.h"
-#include "response/responses.h"
+#include "cclient/request/requests.h"
+#include "cclient/response/responses.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -117,7 +117,7 @@ typedef struct {
       char_buffer_t* out);
 
   retcode_t (*store_transactions_serialize_request)(
-      const serializer_t* const s, store_transactions_req_t* const obj,
+      const serializer_t* const s, store_transactions_req_t const* const obj,
       char_buffer_t* out);
 
   retcode_t (*check_consistency_serialize_request)(

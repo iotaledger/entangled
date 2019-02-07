@@ -8,14 +8,19 @@
 #ifndef CCLIENT_RESPONSE_REMOVE_NEIGHBORS_H
 #define CCLIENT_RESPONSE_REMOVE_NEIGHBORS_H
 
+#include "cclient/types/types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "types/types.h"
-
 // response is a number of neighbors.
-typedef int remove_neighbors_res_t;
+typedef struct remove_neighbors_res_s {
+  int removed_neighbors;
+} remove_neighbors_res_t;
+
+remove_neighbors_res_t* remove_neighbors_res_new();
+void remove_neighbors_res_free(remove_neighbors_res_t** res);
 
 #ifdef __cplusplus
 }

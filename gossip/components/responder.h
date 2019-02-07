@@ -21,7 +21,6 @@
 // Forward declarations
 typedef struct neighbor_s neighbor_t;
 typedef struct node_s node_t;
-typedef struct tangle_s tangle_t;
 
 /**
  * A responder is responsible for responding to transaction requests sent by
@@ -34,7 +33,6 @@ typedef struct responder_s {
   rw_lock_handle_t lock;
   cond_handle_t cond;
   node_t *node;
-  tangle_t *tangle;
 } responder_t;
 
 #ifdef __cplusplus
@@ -46,12 +44,10 @@ extern "C" {
  *
  * @param responder The responder state
  * @param node A node
- * @param tangle A tangle
  *
  * @return a status code
  */
-retcode_t responder_init(responder_t *const responder, node_t *const node,
-                         tangle_t *const tangle);
+retcode_t responder_init(responder_t *const responder, node_t *const node);
 
 /**
  * Starts a responder
@@ -101,6 +97,17 @@ retcode_t responder_on_next(responder_t *const responder,
  * @return a status code
  */
 size_t responder_size(responder_t *const responder);
+
+/**
+ * Tells whether the responder queue is empty or not
+ *
+ * @param responder The responder
+ *
+ * @return true if empty, false otherwise
+ */
+static inline bool responder_is_empty(responder_t *const responder) {
+  return responder->queue == NULL;
+}
 
 #ifdef __cplusplus
 }

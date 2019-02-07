@@ -8,7 +8,7 @@
 #ifndef CCLIENT_RESPONSE_GET_BALANCES_H
 #define CCLIENT_RESPONSE_GET_BALANCES_H
 
-#include "types/types.h"
+#include "cclient/types/types.h"
 
 #ifdef __cplusplus
 extern "C" {

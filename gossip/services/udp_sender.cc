@@ -10,7 +10,6 @@
 #include "gossip/iota_packet.h"
 #include "gossip/services/receiver.h"
 #include "gossip/services/udp_sender.hpp"
-#include "utils/logger_helper.h"
 
 bool udp_endpoint_init(endpoint_t *const endpoint) {
   if (endpoint == NULL) {
@@ -26,8 +25,6 @@ bool udp_endpoint_init(endpoint_t *const endpoint) {
     endpoint->opaque_inetaddr = new boost::asio::ip::udp::endpoint(destination);
     strcpy(endpoint->ip, destination.address().to_string().c_str());
   } catch (std::exception const &e) {
-    log_error("Initiliazing endpoint udp://%s:%d failed: %s", endpoint->host,
-              endpoint->port, e.what());
     return false;
   }
   return true;
@@ -46,7 +43,7 @@ bool udp_endpoint_destroy(endpoint_t *const endpoint) {
 }
 
 bool udp_send(receiver_service_t *const service, endpoint_t *const endpoint,
-              iota_packet_t *const packet) {
+              iota_packet_t const *const packet) {
   if (service == NULL || service->opaque_socket == NULL || endpoint == NULL ||
       endpoint->opaque_inetaddr == NULL) {
     return false;
@@ -61,8 +58,6 @@ bool udp_send(receiver_service_t *const service, endpoint_t *const endpoint,
             endpoint->opaque_inetaddr),
         [](const boost::system::error_code &, std::size_t) {});
   } catch (std::exception const &e) {
-    log_error("Sending packet to udp://%s:%d failed: %s", endpoint->host,
-              endpoint->port, e.what());
     return false;
   }
   return true;

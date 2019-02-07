@@ -20,8 +20,6 @@ extern "C" {
 #include "common/trinary/trit_long.h"
 #include "utils/logger_helper.h"
 
-#define NUM_TRITS_ESSENCE 486
-
 typedef enum { DATA = 0, VALUE_OUT, VALUE_IN } transfer_type_e;
 
 /***********************************************************************************************************
@@ -29,7 +27,7 @@ typedef enum { DATA = 0, VALUE_OUT, VALUE_IN } transfer_type_e;
  ***********************************************************************************************************/
 typedef struct _transfer_data {
   const flex_trit_t *data;
-  size_t len;
+  uint32_t len;  // length of trits
 } transfer_data_t;
 
 /***********************************************************************************************************
@@ -46,7 +44,7 @@ typedef struct _transfer_value_out {
  ***********************************************************************************************************/
 typedef struct _transfer_value_in {
   // can have up to 2187 trytes as data
-  size_t len;
+  uint32_t len;  // length of trits
   const flex_trit_t *data;
 } transfer_value_in_t;
 
@@ -66,7 +64,7 @@ typedef struct _transfer {
 // create a data transfer object.
 transfer_t *transfer_data_new(flex_trit_t const *const address,
                               flex_trit_t const *const tag,
-                              flex_trit_t const *const data, size_t data_len,
+                              flex_trit_t const *const data, uint32_t data_len,
                               uint64_t timestamp);
 
 // create a value_out transfer object.
@@ -79,10 +77,11 @@ transfer_t *transfer_value_out_new(transfer_value_out_t const *const output,
 transfer_t *transfer_value_in_new(flex_trit_t const *const address,
                                   flex_trit_t const *const tag, int64_t value,
                                   flex_trit_t const *const data,
-                                  size_t data_len, uint64_t timestamp);
+                                  uint32_t data_len, uint64_t timestamp);
 
 // Get the number of transactions for this transfer
-size_t transfer_transactions_count(transfer_t *transfer);
+uint32_t transfer_transactions_count(transfer_t *tf);
+
 // Get transfer value
 int64_t transfer_value(transfer_t *tf);
 void transfer_free(transfer_t **transfer);
@@ -91,27 +90,20 @@ void transfer_free(transfer_t **transfer);
  * Transfer Context data structure
  ***********************************************************************************************************/
 typedef struct _transfer_ctx {
-  size_t count;
+  uint32_t count;  // number of transactions
   flex_trit_t bundle[FLEX_TRIT_SIZE_243];
 } transfer_ctx_t;
-typedef transfer_ctx_t *transfer_ctx_p;
 
 // Creates and returns a new transfer context
 bool transfer_ctx_init(transfer_ctx_t *transfer_ctx, transfer_t *transfers[],
-                       size_t len);
+                       uint32_t len);
 
 // Calculates the bundle hash for a collection of transfers
 void transfer_ctx_hash(transfer_ctx_t *transfer_ctx, Kerl *kerl,
-                       transfer_t *transfers[], size_t tx_len);
+                       transfer_t *transfers[], uint32_t tx_len);
 
 // Returns the resulting bundle hash
 // flex_trit_t *transfer_ctx_finalize(transfer_ctx_t *transfer_ctx);
-
-// Creates and returns a new transfer context
-transfer_ctx_t *transfer_ctx_new(void);
-
-// Free an existing transfer context
-void transfer_ctx_free(transfer_ctx_t *transfer_ctx);
 
 void absorb_essence(Kerl *const kerl, flex_trit_t const *address, int64_t value,
                     flex_trit_t const *obsolete_tag, uint64_t timestamp,
@@ -126,28 +118,28 @@ typedef flex_trit_t *(*iota_signature_generator)(const flex_trit_t *seed,
                                                  const flex_trit_t *bundleHash);
 
 typedef struct _transfer_iterator {
-  size_t transfers_count;
-  size_t transactions_count;
-  size_t current_transfer;
-  size_t current_transfer_transaction_index;
-  size_t current_transaction_index;
+  uint32_t transfers_count;
+  uint32_t transactions_count;
+  uint32_t current_transfer;
+  uint32_t current_transfer_transaction_index;
+  uint32_t current_transaction_index;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   flex_trit_t *transaction_signature;
-  iota_transaction_t transaction;
+  iota_transaction_t *transaction;
   uint8_t dynamic_transaction;
   iota_signature_generator iota_signature_gen;
   transfer_t **transfers;
 } transfer_iterator_t;
 
 // Returns the next transaction
-iota_transaction_t transfer_iterator_next(
+iota_transaction_t *transfer_iterator_next(
     transfer_iterator_t *transfer_iterator);
 
 // Creates and returns a new transfer iterator
 // if `transaction` is NULL will be dynamically allocated a transaction object.
-transfer_iterator_t *transfer_iterator_new(transfer_t *transfers[], size_t len,
-                                           Kerl *kerl,
-                                           iota_transaction_t transaction);
+transfer_iterator_t *transfer_iterator_new(transfer_t *transfers[],
+                                           uint32_t len, Kerl *kerl,
+                                           iota_transaction_t *transaction);
 
 // Free an existing transfer iterator
 void transfer_iterator_free(transfer_iterator_t **iter);

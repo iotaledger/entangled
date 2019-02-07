@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <iota/tanglescope/tipselectioncollector.hpp>
+#include "tanglescope/tipselectioncollector.hpp"
 
 using namespace iota::tanglescope;
 using namespace cppclient;

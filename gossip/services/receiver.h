@@ -15,6 +15,9 @@
 #include "gossip/iota_packet.h"
 #include "utils/handles/thread.h"
 
+#define PORT_SIZE 10
+#define CRC_SIZE 16
+
 // Forward declarations
 typedef struct receiver_state_s receiver_state_t;
 

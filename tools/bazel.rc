@@ -6,12 +6,16 @@ test --copt='-ggdb3'
 
 # --config asan: Address sanitizer
 build:asan --strip=never
+build:asan --copt -Wno-macro-redefined
+build:asan --copt -D_FORTIFY_SOURCE=0
 build:asan --copt -fsanitize=address
 build:asan --copt -fno-omit-frame-pointer
 build:asan --linkopt -fsanitize=address
 
 # --config tsan: ThreadSanitizer
 build:tsan --strip=never
+build:tsan --copt -Wno-macro-redefined
+build:tsan --copt -D_FORTIFY_SOURCE=0
 build:tsan --copt -fsanitize=thread
 build:tsan --copt -DTHREAD_SANITIZER
 build:tsan --copt -DDYNAMIC_ANNOTATIONS_ENABLED=1
@@ -22,6 +26,8 @@ build:tsan --linkopt -ltsan
 
 # --config msan: Memory sanitizer
 build:msan --strip=never
+build:msan --copt -Wno-macro-redefined
+build:msan --copt -D_FORTIFY_SOURCE=0
 build:msan --copt -fsanitize=memory
 build:msan --copt -DADDRESS_SANITIZER
 build:msan --copt -fno-omit-frame-pointer
@@ -29,6 +35,8 @@ build:msan --linkopt -fsanitize=memory
 
 # --config ubsan: Undefined Behavior Sanitizer
 build:ubsan --strip=never
+build:ubsan --copt -Wno-macro-redefined
+build:ubsan --copt -D_FORTIFY_SOURCE=0
 build:ubsan --copt -fsanitize=undefined
 build:ubsan --copt -fno-omit-frame-pointer
 build:ubsan --linkopt -fsanitize=undefined

@@ -18,7 +18,7 @@ TryteTransaction::TryteTransaction(const std::string &trytes) {
   flex_trit_t trits[flex_len];
   flex_trits_from_trytes(trits, to_len, (const tryte_t *)trytes.data(),
                          trytes.size(), trytes.size());
-  transaction_deserialize_from_trits(iota_transaction, trits);
+  transaction_deserialize_from_trits(iota_transaction, trits, true);
 }
 
 TryteTransaction::~TryteTransaction() { transaction_free(iota_transaction); }

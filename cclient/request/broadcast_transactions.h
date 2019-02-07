@@ -8,7 +8,7 @@
 #ifndef CCLIENT_REQUEST_BROADCAST_TRANSACTIONS_H
 #define CCLIENT_REQUEST_BROADCAST_TRANSACTIONS_H
 
-#include "types/types.h"
+#include "cclient/types/types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,7 +16,7 @@ extern "C" {
 
 typedef struct broadcast_transactions_req_s {
   // List of raw transactions data to be broadcasted
-  hash8019_stack_t trytes;
+  hash8019_array_p trytes;
 } broadcast_transactions_req_t;
 
 broadcast_transactions_req_t* broadcast_transactions_req_new();

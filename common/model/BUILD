@@ -6,7 +6,9 @@ cc_library(
     hdrs = ["bundle.h"],
     deps = [
         ":transaction",
+        "//common:errors",
         "//common/model:transfer",
+        "//common/sign:normalize",
         "//common/sign/v1:iss_kerl",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_tryte",

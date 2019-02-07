@@ -11,7 +11,9 @@
 #include "utils/logger_helper.h"
 #include "utils/signed_files.h"
 
-#define SNAPSHOT_LOGGER_ID "consensus_snapshot"
+#define SNAPSHOT_LOGGER_ID "snapshot"
+
+static logger_id_t logger_id;
 
 /*
  * Private functions
@@ -28,7 +30,7 @@ static retcode_t iota_snapshot_initial_state(snapshot_t *const snapshot,
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
 
   if ((fp = fopen(snapshot_file, "r")) == NULL) {
-    log_critical(SNAPSHOT_LOGGER_ID, "Opening snapshot file failed\n");
+    log_critical(logger_id, "Opening snapshot file failed\n");
     ret = RC_SNAPSHOT_FILE_NOT_FOUND;
     goto done;
   }
@@ -36,7 +38,7 @@ static retcode_t iota_snapshot_initial_state(snapshot_t *const snapshot,
   while ((rd = getline(&line, &len, fp)) > 0) {
     line[--rd] = '\0';
     if ((delim = strchr(line, ';')) == NULL) {
-      log_critical(SNAPSHOT_LOGGER_ID, "Badly formatted snapshot file\n");
+      log_critical(logger_id, "Badly formatted snapshot file\n");
       ret = RC_SNAPSHOT_INVALID_FILE;
       goto done;
     }
@@ -51,13 +53,13 @@ static retcode_t iota_snapshot_initial_state(snapshot_t *const snapshot,
       supply += value;
     } else if (value < 0) {
       ret = RC_SNAPSHOT_INCONSISTENT_SNAPSHOT;
-      log_critical(SNAPSHOT_LOGGER_ID, "Inconsistent snapshot\n");
+      log_critical(logger_id, "Inconsistent snapshot\n");
       goto done;
     }
   }
   if (supply != IOTA_SUPPLY) {
     ret = RC_SNAPSHOT_INVALID_SUPPLY;
-    log_critical(SNAPSHOT_LOGGER_ID, "Invalid snapshot supply: %ld\n", supply);
+    log_critical(logger_id, "Invalid snapshot supply: %ld\n", supply);
     goto done;
   }
 
@@ -83,7 +85,7 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot,
     return RC_SNAPSHOT_NULL_SELF;
   }
 
-  logger_helper_init(SNAPSHOT_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id = logger_helper_enable(SNAPSHOT_LOGGER_ID, LOGGER_DEBUG, true);
   rw_lock_handle_init(&snapshot->rw_lock);
   snapshot->conf = conf;
   snapshot->index = 0;
@@ -96,20 +98,18 @@ retcode_t iota_snapshot_init(snapshot_t *const snapshot,
              snapshot->conf->snapshot_signature_pubkey,
              snapshot->conf->snapshot_signature_depth,
              snapshot->conf->snapshot_signature_index, &valid)) != RC_OK) {
-      log_critical(SNAPSHOT_LOGGER_ID,
-                   "Validating snapshot signature failed\n");
+      log_critical(logger_id, "Validating snapshot signature failed\n");
       return ret;
     } else if (!valid) {
-      log_critical(SNAPSHOT_LOGGER_ID, "Invalid snapshot signature\n");
+      log_critical(logger_id, "Invalid snapshot signature\n");
       return RC_SNAPSHOT_INVALID_SIGNATURE;
     }
   }
   if ((ret = iota_snapshot_initial_state(snapshot, conf->snapshot_file))) {
-    log_critical(SNAPSHOT_LOGGER_ID,
-                 "Initializing snapshot initial state failed\n");
+    log_critical(logger_id, "Initializing snapshot initial state failed\n");
     return ret;
   }
-  log_info(SNAPSHOT_LOGGER_ID,
+  log_info(logger_id,
            "Consistent snapshot with %ld addresses and correct supply\n",
            HASH_COUNT(snapshot->state));
   return ret;
@@ -124,7 +124,7 @@ retcode_t iota_snapshot_destroy(snapshot_t *const snapshot) {
 
   state_delta_destroy(&snapshot->state);
   rw_lock_handle_destroy(&snapshot->rw_lock);
-  logger_helper_destroy(SNAPSHOT_LOGGER_ID);
+  logger_helper_release(logger_id);
   return ret;
 }
 
@@ -188,7 +188,7 @@ retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
   }
 
   if ((sum = state_delta_sum(patch)) != 0) {
-    log_warning(SNAPSHOT_LOGGER_ID, "Inconsistent snapshot patch\n");
+    log_warning(logger_id, "Inconsistent snapshot patch\n");
     return RC_SNAPSHOT_INCONSISTENT_PATCH;
   }
 

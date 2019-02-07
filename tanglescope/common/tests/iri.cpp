@@ -1,4 +1,4 @@
-#include "iota/tanglescope/common/iri.hpp"
+#include "tanglescope/common/iri.hpp"
 #include <gtest/gtest.h>
 #include <chrono>
 #include <string>

@@ -12,4 +12,6 @@
 
 typedef int8_t tryte_t;
 
-#endif
+#define INDEX_OF_TRYTE(tryte) ((tryte) == '9' ? 0 : ((tryte) - 'A' + 1))
+
+#endif  // __COMMON_TRINARY_TRYTE_H_

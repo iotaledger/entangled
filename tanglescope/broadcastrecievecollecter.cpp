@@ -7,15 +7,15 @@
 #include <iostream>
 #include <iota/models/bundle.hpp>
 #include <iota/models/transaction.hpp>
-#include <iota/tanglescope/common/tangledb.hpp>
-#include <iota/tanglescope/common/txauxiliary.hpp>
-#include <iota/tanglescope/common/zmqpub.hpp>
 #include <list>
 #include <map>
 #include <set>
 #include <unordered_set>
 
 #include "tanglescope/broadcastrecievecollecter.hpp"
+#include "tanglescope/common/tangledb.hpp"
+#include "tanglescope/common/txauxiliary.hpp"
+#include "tanglescope/common/zmqpub.hpp"
 
 constexpr static auto DEPTH = 3;
 
@@ -87,8 +87,9 @@ void BroadcastReceiveCollector::broadcastOneTransaction() {
     artificialyDelay();
     system_clock::time_point t2 = system_clock::now();
     auto duration = duration_cast<milliseconds>(t2 - t1).count();
-    _hashToBroadcastTime.insert(
-        hashed.hash, BroadcastInfo{std::chrono::system_clock::now(), duration});
+    _hashToBroadcastTime.insert(hashed.hash,
+                                BroadcastInfo{std::chrono::system_clock::now(),
+                                              static_cast<uint64_t>(duration)});
 
     auto storeFuture = boost::async(boost::launch::async, [hashed, this] {
       return _api->storeTransactions({hashed.tx});
