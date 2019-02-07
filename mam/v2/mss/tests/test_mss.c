@@ -148,9 +148,9 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
     do {
       mss_sign(mss1, hash, sig);
 
-      store = trits_take(store_, mss_stored_size(mss1));
-      mss_save(mss1, store);
-      e = mss_load(mss2, &store);
+      store = trits_take(store_, mss_serialized_size(mss1));
+      mss_serialize(mss1, store);
+      e = mss_deserialize(mss2, &store);
       MAM2_ASSERT(RC_OK == e);
       mss_sign(mss2, hash, sig2);
 
