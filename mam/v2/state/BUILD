@@ -8,5 +8,6 @@ cc_library(
         "//common:errors",
         "//mam/v2/mam:mam_pre_shared_key_t_set",
         "//mam/v2/mam:mam_types",
+        "//mam/v2/ntru:mam_ntru_sk_t_set",
     ],
 )
