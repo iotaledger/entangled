@@ -433,10 +433,12 @@ void mss_skn(mss_t const *const mss, trits_t skn) {
   MAM2_ASSERT(trits_size(skn) == MAM2_MSS_SKN_SIZE);
 
   trits_put6(trits, mss->height);
-  trits_copy(trits_take(trits, 4), trits_take(skn, 4));
+  trits_copy(trits_take(trits, MAM2_MSS_SKN_TREE_DEPTH_SIZE),
+             trits_take(skn, MAM2_MSS_SKN_TREE_DEPTH_SIZE));
 
   trits_put18(trits, mss->skn);
-  trits_copy(trits_take(trits, 14), trits_drop(skn, 4));
+  trits_copy(trits_take(trits, MAM2_MSS_SKN_KEY_NUMBER_SIZE),
+             trits_drop(skn, MAM2_MSS_SKN_TREE_DEPTH_SIZE));
 }
 
 static bool mss_parse_skn(trint6_t *height, trint18_t *skn, trits_t trits) {
@@ -447,10 +449,12 @@ static bool mss_parse_skn(trint6_t *height, trint18_t *skn, trits_t trits) {
 
   trits_set_zero(ts);
 
-  trits_copy(trits_take(trits, 4), trits_take(ts, 4));
+  trits_copy(trits_take(trits, MAM2_MSS_SKN_TREE_DEPTH_SIZE),
+             trits_take(ts, MAM2_MSS_SKN_TREE_DEPTH_SIZE));
   *height = trits_get6(ts);
 
-  trits_copy(trits_drop(trits, 4), trits_take(ts, 14));
+  trits_copy(trits_drop(trits, MAM2_MSS_SKN_TREE_DEPTH_SIZE),
+             trits_take(ts, MAM2_MSS_SKN_KEY_NUMBER_SIZE));
   *skn = trits_get18(ts);
 
   if (*height < 0 || *skn < 0 || *skn > MAM2_MSS_MAX_SKN(*height)) return 0;
@@ -697,7 +701,8 @@ static void mss_mt_deserialize(mss_t *mss, trits_t buffer) {
 }
 
 size_t mss_serialized_size(mss_t const *const mss) {
-  return 4 + 14 + mss_mt_serialized_size(mss);
+  return MAM2_MSS_SKN_TREE_DEPTH_SIZE + MAM2_MSS_SKN_KEY_NUMBER_SIZE +
+         mss_mt_serialized_size(mss);
 }
 
 void mss_serialize(mss_t const *const mss, trits_t buffer) {
@@ -713,9 +718,15 @@ retcode_t mss_deserialize(mss_t *mss, trits_t *b) {
   mss_mt_height_t height;
   mss_mt_idx_t skn;
 
-  ERR_GUARD_RETURN(4 + 14 <= trits_size(*b), RC_MAM2_BUFFER_TOO_SMALL, e);
-  ERR_GUARD_RETURN(mss_parse_skn(&height, &skn, trits_advance(b, 4 + 14)),
-                   RC_MAM2_INVALID_VALUE, e);
+  ERR_GUARD_RETURN(
+      MAM2_MSS_SKN_TREE_DEPTH_SIZE + MAM2_MSS_SKN_KEY_NUMBER_SIZE <=
+          trits_size(*b),
+      RC_MAM2_BUFFER_TOO_SMALL, e);
+  ERR_GUARD_RETURN(
+      mss_parse_skn(&height, &skn,
+                    trits_advance(b, MAM2_MSS_SKN_TREE_DEPTH_SIZE +
+                                         MAM2_MSS_SKN_KEY_NUMBER_SIZE)),
+      RC_MAM2_INVALID_VALUE, e);
   ERR_GUARD_RETURN(height == mss->height, RC_MAM2_INVALID_VALUE, e);
 
 #if defined(MAM2_MSS_TRAVERSAL)
