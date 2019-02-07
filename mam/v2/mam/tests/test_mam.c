@@ -35,12 +35,12 @@
 // TODO - Test functions should take set of prng_t instead of raw ptrs
 
 static trits_t mam_test_generic_send_msg(
-    mam_pre_shared_key_t *prng, mam_pre_shared_key_t const *const pska,
-    mam_pre_shared_key_t const *const pskb, mam_ntru_pk_t const *const ntru_pk,
-    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
-    mam_msg_checksum_t checksum, mam_channel_t *const cha,
-    mam_endpoint_t *const epa, mam_channel_t *const ch1a,
-    mam_endpoint_t *const ep1a, mam_send_msg_context_t *const cfg_msga) {
+    mam_psk_t *prng, mam_psk_t const *const pska, mam_psk_t const *const pskb,
+    mam_ntru_pk_t const *const ntru_pk, mam_msg_pubkey_t pubkey,
+    mam_msg_keyload_t keyload, mam_msg_checksum_t checksum,
+    mam_channel_t *const cha, mam_endpoint_t *const epa,
+    mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
+    mam_send_msg_context_t *const cfg_msga) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   trits_t msg = trits_null();
@@ -69,8 +69,8 @@ static trits_t mam_test_generic_send_msg(
     if (mam_msg_keyload_plain == keyload)
       cfg->key_plain = 1;
     else if (mam_msg_keyload_psk == keyload) {
-      mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pska);
-      mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pskb);
+      mam_psk_t_set_add(&cfg->pre_shared_keys, pska);
+      mam_psk_t_set_add(&cfg->pre_shared_keys, pskb);
     } else if (mam_msg_keyload_ntru == keyload) {
       mam_ntru_pk_t_set_add(&cfg->ntru_public_keys, ntru_pk);
     }
@@ -86,7 +86,7 @@ static trits_t mam_test_generic_send_msg(
   mam_send_msg(cfg_msga, &msg);
   TEST_ASSERT(trits_is_empty(msg));
   msg = trits_pickup(msg, sz);
-  mam_pre_shared_key_t_set_free(&cfg_msga->pre_shared_keys);
+  mam_psk_t_set_free(&cfg_msga->pre_shared_keys);
   mam_ntru_pk_t_set_free(&cfg_msga->ntru_public_keys);
 
   return msg;
@@ -142,9 +142,9 @@ static trits_t mam_test_generic_send_first_packet(
 }
 
 static void mam_test_generic_receive_msg(
-    mam_pre_shared_key_t const *const pre_shared_key,
-    mam_ntru_sk_t const *const ntru, mam_channel_t *const cha,
-    trits_t *const msg, mam_recv_msg_context_t *const cfg_msg_recv) {
+    mam_psk_t const *const pre_shared_key, mam_ntru_sk_t const *const ntru,
+    mam_channel_t *const cha, trits_t *const msg,
+    mam_recv_msg_context_t *const cfg_msg_recv) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   /* init recv msg context */
@@ -293,7 +293,7 @@ static void mam_test_generic(mam_prng_t *prng_sender,
     TEST_ASSERT(RC_OK == e);
   }
 
-  mam_pre_shared_key_t pska[1], pskb[1];
+  mam_psk_t pska[1], pskb[1];
 
   /* gen psk */
   {

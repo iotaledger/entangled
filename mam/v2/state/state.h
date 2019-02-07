@@ -24,7 +24,7 @@ typedef struct mam_state_s {
   mam_prng_t prng;
   mam_ntru_sk_t_set_t ntru_sks;
   mam_ntru_pk_t_set_t ntru_pks;
-  mam_pre_shared_key_t_set_t psks;
+  mam_psk_t_set_t psks;
 } mam_state_t;
 
 retcode_t mam_state_init(mam_state_t* const state,
@@ -38,7 +38,7 @@ retcode_t mam_state_add_ntru_pk(mam_state_t* const state,
                                 mam_ntru_pk_t const* const ntru_pk);
 
 retcode_t mam_state_add_psk(mam_state_t* const state,
-                            mam_pre_shared_key_t const* const psk);
+                            mam_psk_t const* const psk);
 
 #ifdef __cplusplus
 }
