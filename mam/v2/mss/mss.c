@@ -666,7 +666,7 @@ static void mss_mt_serialize(mss_t const *const mss, trits_t buffer) {
  * \note `mss_mt_rewind` must be called prior `mss_mt_load`.
  */
 
-static void mss_mt_deserialize(mss_t *mss, trits_t buffer) {
+static void mss_mt_deserialize(trits_t buffer, mss_t *mss) {
   mss_mt_height_t height;
   mss_mt_idx_t i;
 
@@ -712,7 +712,7 @@ void mss_serialize(mss_t const *const mss, trits_t buffer) {
   mss_mt_serialize(mss, trits_drop(buffer, MAM2_MSS_SKN_SIZE));
 }
 
-retcode_t mss_deserialize(mss_t *mss, trits_t *b) {
+retcode_t mss_deserialize(trits_t *b, mss_t *mss) {
   retcode_t e = RC_OK;
 
   mss_mt_height_t height;
@@ -736,7 +736,7 @@ retcode_t mss_deserialize(mss_t *mss, trits_t *b) {
 #endif
   ERR_GUARD_RETURN(mss_mt_serialized_size(mss) <= trits_size(*b),
                    RC_MAM2_BUFFER_TOO_SMALL, e);
-  mss_mt_deserialize(mss, trits_advance(b, mss_mt_serialized_size(mss)));
+  mss_mt_deserialize(trits_advance(b, mss_mt_serialized_size(mss)), mss);
 
   return e;
 }

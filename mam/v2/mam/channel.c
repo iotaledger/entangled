@@ -173,7 +173,7 @@ retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
 
   mss_init(&channel->mss, prng, height, channel->name, trits_null());
 
-  if ((ret = mss_deserialize(&channel->mss, buffer)) != RC_OK) {
+  if ((ret = mss_deserialize(buffer, &channel->mss)) != RC_OK) {
     return ret;
   }
 

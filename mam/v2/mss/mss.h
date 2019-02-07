@@ -272,7 +272,7 @@ void mss_serialize(mss_t const *const mss, trits_t buffer);
  *
  * @return void
  */
-retcode_t mss_deserialize(mss_t *mss, trits_t *buffer);
+retcode_t mss_deserialize(trits_t *buffer, mss_t *mss);
 
 #ifdef __cplusplus
 }
