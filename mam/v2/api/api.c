@@ -8,32 +8,35 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/state/state.h"
+#include "mam/v2/api/api.h"
 #include "mam/v2/mam/mam_psk_t_set.h"
 #include "mam/v2/ntru/mam_ntru_pk_t_set.h"
 #include "mam/v2/ntru/mam_ntru_sk_t_set.h"
 #include "mam/v2/prng/prng.h"
 
-retcode_t mam_state_init(mam_state_t* const state,
-                         trits_t const prng_secret_key) {
+retcode_t mam_api_init(mam_api_t* const api, trits_t const prng_secret_key) {
   retcode_t ret = RC_OK;
 
-  state->version = MAM_API_VERSION;
-  if ((ret = mam_prng_init(&state->prng, prng_secret_key)) != RC_OK) {
+  api->version = MAM_API_VERSION;
+  if ((ret = mam_prng_init(&api->prng, prng_secret_key)) != RC_OK) {
     return ret;
   }
-  state->ntru_sks = NULL;
-  state->ntru_pks = NULL;
-  state->psks = NULL;
+  api->ntru_sks = NULL;
+  api->ntru_pks = NULL;
+  api->psks = NULL;
 
   return ret;
 }
 
-retcode_t mam_state_destroy(mam_state_t* const state) {
-  mam_prng_destroy(&state->prng);
-  mam_ntru_sk_t_set_free(&state->ntru_sks);
-  mam_ntru_pk_t_set_free(&state->ntru_pks);
-  mam_psk_t_set_free(&state->psks);
+retcode_t mam_api_destroy(mam_api_t* const api) {
+  retcode_t ret = RC_OK;
+
+  if ((ret = mam_prng_destroy(&api->prng)) != RC_OK) {
+    return ret;
+  }
+  mam_ntru_sk_t_set_free(&api->ntru_sks);
+  mam_ntru_pk_t_set_free(&api->ntru_pks);
+  mam_psk_t_set_free(&api->psks);
 
   return RC_OK;
 }

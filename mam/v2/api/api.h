@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_STATE_STATE_H__
-#define __MAM_V2_STATE_STATE_H__
+#ifndef __MAM_V2_API_API_H__
+#define __MAM_V2_API_API_H__
 
 #include "common/errors.h"
 #include "mam/v2/mam/mam_types.h"
@@ -22,17 +22,16 @@
 extern "C" {
 #endif
 
-typedef struct mam_state_s {
+typedef struct mam_api_s {
   tryte_t version;
   mam_prng_t prng;
   mam_ntru_sk_t_set_t ntru_sks;
   mam_ntru_pk_t_set_t ntru_pks;
   mam_psk_t_set_t psks;
-} mam_state_t;
+} mam_api_t;
 
-retcode_t mam_state_init(mam_state_t* const state,
-                         trits_t const prng_secret_key);
-retcode_t mam_state_destroy(mam_state_t* const state);
+retcode_t mam_api_init(mam_api_t* const api, trits_t const prng_secret_key);
+retcode_t mam_api_destroy(mam_api_t* const api);
 
 retcode_t mam_state_add_ntru_sk(mam_state_t* const state,
                                 mam_ntru_sk_t const* const ntru_sk);
@@ -47,4 +46,4 @@ retcode_t mam_state_add_psk(mam_state_t* const state,
 }
 #endif
 
-#endif  // __MAM_V2_STATE_STATE_H__
+#endif  // __MAM_V2_API_API_H__

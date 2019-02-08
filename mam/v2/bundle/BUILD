@@ -7,7 +7,7 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/model:bundle",
+        "//mam/v2/api",
         "//mam/v2/mam",
-        "//mam/v2/state",
     ],
 )

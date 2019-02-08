@@ -1,9 +1,9 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "state",
-    srcs = ["state.c"],
-    hdrs = ["state.h"],
+    name = "api",
+    srcs = ["api.c"],
+    hdrs = ["api.h"],
     deps = [
         "//common:errors",
         "//mam/v2/mam:mam_psk_t_set",
