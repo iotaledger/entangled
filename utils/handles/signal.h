@@ -19,7 +19,7 @@
 #include "utils/logger_helper.h"
 
 /*
- *  This enum is declared for consistent name of signal for c5 ross platfrom
+ *  This enum is declared for consistent name of signal for cross platfrom
  * developing the naming order is followed by POSIX.1-1990 the standard signals
  * table is at http://man7.org/linux/man-pages/man7/signal.7.html
  *
@@ -38,6 +38,21 @@ typedef enum UNIVERSAL_SIGNAL_NUM {
 #define CTRL_C_SIGNAL SIGINT
 #define SIGNAL_ERROR SIG_ERR
 
+/*
+ * Call regiter_signal with assigned signal_handler, then the signal handler can
+ * work
+ *
+ * @para universal_signal_num_t sig: signal(interrupt) we hope to be caught
+ *
+ * @para void (*signal_handler)(): signal handler of each signal needs
+ *
+ * @return signal_error if singal_handler went wrong
+ */
+static inline __sighandler_t register_signal(
+    universal_signal_num_t sig, void (*register_signal_handler)()) {
+  return signal((int)sig, register_signal_handler);
+}
+
 #elif defined(_WIN32)
 
 #include <Windows.h>
@@ -48,23 +63,15 @@ typedef enum UNIVERSAL_SIGNAL_NUM {
 
 BOOL signal_handler_WIN(DWORD dwCtrlType);
 
+static inline __sighandler_t register_signal(
+    universal_signal_num_t sig, void (*register_signal_handler)()) {
+  return SetConsoleCtrlHandler(signal_handler_WIN, TRUE);
+}
+
 #else
 
 #error "No signal process library found"
 
-#endif  // __unix__
-        /*
-         * Register signal, call register_signal wherever we need to catch signals
-         *
-         * @param the signal(interrupt) we hope to be caught
-         *
-         * @param the function used to be signal_handler i.e. function used to stop and
-         * destroy core
-         *
-         * @return signal_error if singal_handler went wrong
-         */
-
-__sighandler_t register_signal(universal_signal_num_t SIG,
-                               void (*register_signal_handler)());
+#endif  // platform validate
 
 #endif  // __UTILS_HANDLES_SIGNAL_H__

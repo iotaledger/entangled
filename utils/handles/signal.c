@@ -10,33 +10,19 @@
 #if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
     (defined(__APPLE__) && defined(__MACH__))
 
-/*
- * @para universal_signal_num_t SIG: assign the signal number which is going to
- * handle.
- * @para void (*signal_handler)(): signal handler of each signal needs
- */
-__sighandler_t register_signal(universal_signal_num_t SIG,
-                               void (*register_signal_handler)()) {
-  return signal((int)SIG, register_signal_handler);
-}
-
 #elif defined(_WIN32)
 
-BOOL WINAPI signal_handler_WIN(DWORD dwCtrlType) {
+static inline BOOL WINAPI signal_handler_WIN(DWORD dwCtrlType) {
   switch (fdwCtrlType) {
-    // Handle the CTRL-C signal.
     case CTRL_C_EVENT:
-      printf("Ctrl-C event\n\n");
+      // TODO get the funtion with map(ctrl_c)
+
+      log_info(logger_id, "Ctrl-C event\n\n");
 
       return SIGNAL_SUCCESS;
     default:
       return SIGNAL_ERROR;
   }
-}
-
-__sighandler_t register_signal(universal_signal_num_t SIG,
-                               void (*register_signal_handler)()) {
-  return SetConsoleCtrlHandler(signal_handler_WIN, TRUE);
 }
 
 #endif

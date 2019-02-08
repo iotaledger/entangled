@@ -18,40 +18,40 @@
 
 static core_t core_g;
 static logger_id_t logger_id;
+static tangle_t tangle;
 
-void signal_handler() {
+static void signal_handler() {
   log_info(logger_id, "Stopping cIRI core\n");
   if (core_stop(&core_g) != RC_OK) {
     log_error(logger_id, "Stopping cIRI core failed\n");
-    ret = EXIT_FAILURE;
+    // ret = EXIT_FAILURE;
   }
 
   log_info(logger_id, "Destroying cIRI core\n");
   if (core_destroy(&core_g) != RC_OK) {
     log_error(logger_id, "Destroying cIRI core failed\n");
-    ret = EXIT_FAILURE;
+    // ret = EXIT_FAILURE;
   }
 
   log_info(logger_id, "Destroying storage\n");
   if (storage_destroy() != RC_OK) {
     log_error(logger_id, "Destroying storage failed\n");
-    ret = EXIT_FAILURE;
+    // ret = EXIT_FAILURE;
   }
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_error(logger_id, "Destroying tangle connection failed\n");
-    ret = EXIT_FAILURE;
+    // ret = EXIT_FAILURE;
   }
 
   logger_helper_release(logger_id);
   if (logger_helper_destroy() != RC_OK) {
-    ret = EXIT_FAILURE;
+    // ret = EXIT_FAILURE;
   }
 }
 
 int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
-  tangle_t tangle;
   connection_config_t db_conf;
 
   if (register_signal(ctrl_c, signal_handler) == SIGNAL_ERROR) {
