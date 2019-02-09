@@ -9,17 +9,16 @@
 #include "utils/forced_inline.h"
 
 static FORCED_INLINE void ptrit_sbox(ptrit_t *const c, ptrit_t const *const s) {
-  ptrit_s alpha, beta, gamma, delta;
+  ptrit_s alpha, beta, delta;
   size_t i = 0;
 
   for (; i < STATE_LENGTH; ++i) {
     alpha = s[CURL_INDEX[i]].low;
     beta = s[CURL_INDEX[i]].high;
-    gamma = s[CURL_INDEX[i + 1]].high;
-    delta = (alpha | (~gamma)) & (s[CURL_INDEX[i + 1]].low ^ beta);
+    delta = beta ^ s[CURL_INDEX[i + 1]].low;
 
-    c[i].low = ~delta;
-    c[i].high = (alpha ^ gamma) | delta;
+    c[i].low = ~(delta & alpha);
+    c[i].high = delta | (alpha ^ s[CURL_INDEX[i + 1]].high);
   }
 }
 
