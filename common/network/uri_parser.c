@@ -17,10 +17,6 @@ bool uri_parse(char const *const uri, char *const scheme,
   size_t offset = 0;
   char *delim = NULL;
   ip_version_t uri_case;
-  const char *possible_scheme[] = {PROTOCOL_TCP, PROTOCOL_UDP, PROTOCOL_HTTP,
-                                   PROTOCOL_HTTPS};
-  const int possible_scheme_num =
-      sizeof(possible_scheme) / sizeof(*possible_scheme);
 
   if (uri == NULL) {
     return false;
@@ -37,14 +33,6 @@ bool uri_parse(char const *const uri, char *const scheme,
     scheme[length] = '\0';
   }
 
-  // determine if scheme is acceptable type
-  for (int i = 0; i < possible_scheme_num; i++) {
-    if (strncmp(possible_scheme[i], scheme, scheme_len) == 0) {
-      break;
-    } else if (i == (possible_scheme_num - 1)) {
-      return false;
-    }
-  }
   offset += length;
   if (strncmp(uri + offset, "://[", 4) == 0) {
     uri_case = IPV6;
