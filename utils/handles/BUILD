@@ -51,7 +51,7 @@ cc_library(
 )
 
 cc_library(
-    name = "sockets",
-    srcs = ["sockets.c"],
-    hdrs = ["sockets.h"],
+    name = "socket",
+    srcs = ["socket.c"],
+    hdrs = ["socket.h"],
 )

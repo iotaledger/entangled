@@ -13,7 +13,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":shared",
-        "//utils/handles:sockets",
+        "//utils/handles:socket",
         "@http_parser",
     ],
 )
