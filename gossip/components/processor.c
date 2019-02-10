@@ -396,6 +396,7 @@ retcode_t processor_stop(processor_t *const processor) {
 
   log_info(logger_id, "Shutting down processor thread\n");
   processor->running = false;
+  cond_handle_signal(&processor->cond);
   if (thread_handle_join(processor->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down processor thread failed\n");
     return RC_FAILED_THREAD_JOIN;

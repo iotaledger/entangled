@@ -178,6 +178,7 @@ retcode_t broadcaster_stop(broadcaster_t *const broadcaster) {
 
   log_info(logger_id, "Shutting down broadcaster thread\n");
   broadcaster->running = false;
+  cond_handle_signal(&broadcaster->cond);
   if (thread_handle_join(broadcaster->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down broadcaster thread failed\n");
     return RC_FAILED_THREAD_JOIN;
