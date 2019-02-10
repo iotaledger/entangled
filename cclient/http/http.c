@@ -9,7 +9,7 @@
 #include <string.h>
 #include "cclient/service.h"
 #include "http_parser.h"
-#include "network/sockets.h"
+#include "utils/handles/socket.h"
 #include "utils/macros.h"
 
 typedef enum {

@@ -300,20 +300,6 @@ bool trits_from_str(trits_t x, char const *s) {
   return r;
 }
 
-void trits_to_bytes(trits_t x, byte *bs) {
-  for (; !trits_is_empty(x); x = trits_drop_min(x, 5))
-    *bs++ = trits_get_byte(x);
-}
-
-bool trits_from_bytes(trits_t x, byte const *bs) {
-  bool r = true;
-
-  for (; r && !trits_is_empty(x); x = trits_drop_min(x, 5))
-    r = trits_put_byte(x, *bs++);
-
-  return r;
-}
-
 void trits_set1(trits_t x, trit_t t) {
   MAM2_ASSERT_TRINT1(t);
   for (; !trits_is_empty(x); x = trits_drop(x, 1)) trits_put1(x, t);
