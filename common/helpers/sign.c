@@ -61,48 +61,6 @@ cleanup:
   return address;
 }
 
-IOTA_EXPORT char* iota_sign_signature_gen(char const* const seed,
-                                          size_t const index,
-                                          size_t const security,
-                                          char const* const bundle_hash) {
-  Kerl kerl;
-  trit_t* key = NULL;
-  tryte_t* signature = NULL;
-  trit_t hash[HASH_LENGTH_TRIT];
-  trit_t subseed[HASH_LENGTH_TRIT];
-  const size_t key_length = security * ISS_KEY_LENGTH;
-
-  key = calloc(key_length, sizeof(trit_t));
-  if (!key) {
-    return NULL;
-  }
-  signature = calloc(key_length / RADIX + 1, sizeof(tryte_t));
-  if (!signature) {
-    goto cleanup;
-  }
-
-  init_kerl(&kerl);
-
-  trytes_to_trits((tryte_t*)seed, subseed, HASH_LENGTH_TRIT / RADIX);
-
-  trytes_to_trits((tryte_t*)bundle_hash, hash, HASH_LENGTH_TRIT / RADIX);
-  normalize_hash_to_trits(hash, hash);
-
-  iss_kerl_subseed(subseed, subseed, index, &kerl);
-  iss_kerl_key(subseed, key, key_length, &kerl);
-  memset(subseed, 0, HASH_LENGTH_TRIT * sizeof(trit_t));
-
-  iss_kerl_signature(key, hash, key, key_length, &kerl);
-  trits_to_trytes(key, (tryte_t*)signature, key_length);
-
-  memset(key, 0, key_length * sizeof(trit_t));
-
-cleanup:
-  free(key);
-
-  return (char*)signature;
-}
-
 IOTA_EXPORT flex_trit_t* iota_flex_sign_address_gen(
     flex_trit_t const* const seed, size_t const index, size_t const security) {
   if (!(security > 0 && security <= 3)) {
@@ -150,6 +108,48 @@ cleanup:
   return address;
 }
 
+IOTA_EXPORT char* iota_sign_signature_gen(char const* const seed,
+                                          size_t const index,
+                                          size_t const security,
+                                          char const* const bundle_hash) {
+  Kerl kerl;
+  trit_t* key = NULL;
+  tryte_t* signature = NULL;
+  trit_t hash[HASH_LENGTH_TRIT];
+  trit_t subseed[HASH_LENGTH_TRIT];
+  const size_t key_length = security * ISS_KEY_LENGTH;
+
+  key = calloc(key_length, sizeof(trit_t));
+  if (!key) {
+    return NULL;
+  }
+  signature = calloc(key_length / RADIX + 1, sizeof(tryte_t));
+  if (!signature) {
+    goto cleanup;
+  }
+
+  init_kerl(&kerl);
+
+  trytes_to_trits((tryte_t*)seed, subseed, HASH_LENGTH_TRIT / RADIX);
+
+  trytes_to_trits((tryte_t*)bundle_hash, hash, HASH_LENGTH_TRIT / RADIX);
+  normalize_hash_to_trits(hash, hash);
+
+  iss_kerl_subseed(subseed, subseed, index, &kerl);
+  iss_kerl_key(subseed, key, key_length, &kerl);
+  memset(subseed, 0, HASH_LENGTH_TRIT * sizeof(trit_t));
+
+  iss_kerl_signature(key, hash, key, key_length, &kerl);
+  trits_to_trytes(key, (tryte_t*)signature, key_length);
+
+  memset(key, 0, key_length * sizeof(trit_t));
+
+cleanup:
+  free(key);
+
+  return (char*)signature;
+}
+
 IOTA_EXPORT flex_trit_t* iota_flex_sign_signature_gen(
     flex_trit_t const* const seed, size_t const index, size_t const security,
     flex_trit_t const* const bundle_hash) {
@@ -190,6 +190,3 @@ cleanup:
 
   return signature;
 }
-
-#undef RADIX
-#undef NONCE_LENGTH
