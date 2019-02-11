@@ -115,16 +115,6 @@ Size of `s` must be equal `trits_size(x)/3`.
 */
 bool trits_from_str(trits_t x, char const *s);
 
-/*! \brief Convert trits to bytes.
-Size of `bs` must be equal `ceil(trits_size(x)/5)`.
-*/
-void trits_to_bytes(trits_t x, byte *bs);
-
-/*! \brief Convert trits from bytes.
-Size of `bs` must be equal `ceil(trits_size(x)/5)`.
-*/
-bool trits_from_bytes(trits_t x, byte const *bs);
-
 /*! \brief Set zero trits: `x` := t^n. */
 void trits_set1(trits_t x, trit_t t);
 

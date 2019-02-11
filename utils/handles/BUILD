@@ -49,3 +49,9 @@ cc_library(
         "//conditions:default": [],
     }),
 )
+
+cc_library(
+    name = "socket",
+    srcs = ["socket.c"],
+    hdrs = ["socket.h"],
+)
