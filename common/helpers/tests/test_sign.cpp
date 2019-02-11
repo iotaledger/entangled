@@ -33,9 +33,9 @@ TEST(KerlTest, testAddressGeneration) {
       "MLAUELWJHZ9QBPCIYLOXAWCVSZTK9XUEIWQSRLFDWEORDOLVOMOF9RUMFXSAMYWCGXDAVXZM"
       "RWQOJH9RY";
 
-  char* out_1 = iota_sign_address_gen(SEED.c_str(), 0, 1);
-  char* out_2 = iota_sign_address_gen(SEED.c_str(), 2, 2);
-  char* out_3 = iota_sign_address_gen(SEED.c_str(), 2, 3);
+  char* out_1 = iota_sign_address_gen_trytes(SEED.c_str(), 0, 1);
+  char* out_2 = iota_sign_address_gen_trytes(SEED.c_str(), 2, 2);
+  char* out_3 = iota_sign_address_gen_trytes(SEED.c_str(), 2, 3);
 
   EXPECT_EQ(out_1, EX_ADD_0_1);
   EXPECT_EQ(out_2, EX_ADD_2_2);
@@ -251,9 +251,9 @@ TEST(KerlTest, testFlexAddressGeneration) {
   };
 #endif
 
-  flex_trit_t* out_1 = iota_flex_sign_address_gen(SEED, 0, 1);
-  flex_trit_t* out_2 = iota_flex_sign_address_gen(SEED, 2, 2);
-  flex_trit_t* out_3 = iota_flex_sign_address_gen(SEED, 2, 3);
+  flex_trit_t* out_1 = iota_sign_address_gen_flex_trits(SEED, 0, 1);
+  flex_trit_t* out_2 = iota_sign_address_gen_flex_trits(SEED, 2, 2);
+  flex_trit_t* out_3 = iota_sign_address_gen_flex_trits(SEED, 2, 3);
 
   EXPECT_TRUE(memcmp(out_1, EX_ADD_0_1, sizeof(EX_ADD_0_1)) == 0);
   EXPECT_TRUE(memcmp(out_2, EX_ADD_2_2, sizeof(EX_ADD_2_2)) == 0);

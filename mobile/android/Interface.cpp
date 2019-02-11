@@ -35,15 +35,40 @@ JNIEXPORT jobjectArray JNICALL Java_org_iota_mobile_Interface_iota_1pow_1bundle(
   return NULL;
 }
 
+/*
+ * Class:     org_iota_mobile_Interface
+ * Method:    iota_sign_address_gen_trytes
+ * Signature: (Ljava/lang/String;II)Ljava/lang/String;
+ */
 JNIEXPORT jstring JNICALL
-Java_org_iota_mobile_Interface_iota_1sign_1address_1gen(
+Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trytes(
     JNIEnv* env, jclass thiz, jstring jseed, jint index, jint security) {
   const char* seed = env->GetStringUTFChars(jseed, 0);
 
-  char* address = iota_sign_address_gen(seed, index, security);
+  char* address = iota_sign_address_gen_trytes(seed, index, security);
   std::memset((void*)seed, 0, 81);
 
   jstring out = env->NewStringUTF(address);
+  free(address);
+
+  return out;
+}
+
+/*
+ * Class:     org_iota_mobile_Interface
+ * Method:    iota_sign_address_gen_trits
+ * Signature: ([Ljava/lang/Byte;II)[Ljava/lang/Byte;
+ */
+JNIEXPORT jbyteArray JNICALL
+Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trits(
+    JNIEnv* env, jclass thiz, jbyteArray jseed, jint index, jint security) {
+  const trit_t* seed = (trit_t*)env->GetByteArrayElements(jseed, 0);
+
+  trit_t* address = iota_sign_address_gen_trits(seed, index, security);
+  std::memset((void*)seed, 0, 243);
+
+  jbyteArray out = env->NewByteArray(243);
+  env->SetByteArrayRegion(out, 0, 243, (const jbyte*)address);
   free(address);
 
   return out;

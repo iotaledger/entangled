@@ -18,92 +18,96 @@
 #include "common/trinary/trit_tryte.h"
 #include "utils/export.h"
 
-IOTA_EXPORT char* iota_sign_address_gen(char const* const seed,
-                                        size_t const index,
-                                        size_t const security) {
+IOTA_EXPORT trit_t* iota_sign_address_gen_trits(trit_t const* const seed,
+                                                size_t const index,
+                                                size_t const security) {
+  Kerl kerl;
+  trit_t subseed[HASH_LENGTH_TRIT];
+  size_t const key_length = security * ISS_KEY_LENGTH;
+  trit_t* address = NULL;
+  trit_t* key = NULL;
+
   if (!(security > 0 && security <= 3)) {
     return NULL;
   }
 
-  Kerl kerl;
-  trit_t* key = NULL;
-  char* address = NULL;
-  trit_t subseed[HASH_LENGTH_TRIT];
-  const size_t key_length = security * ISS_KEY_LENGTH;
-
-  key = calloc(key_length, sizeof(trit_t));
-  if (!key) {
+  if ((key = calloc(key_length, sizeof(trit_t))) == NULL) {
     return NULL;
   }
-  address = calloc(HASH_LENGTH_TRIT / RADIX + 1, sizeof(tryte_t));
-  if (!address) {
-    goto cleanup;
+
+  if ((address = calloc(HASH_LENGTH_TRIT, sizeof(trit_t))) == NULL) {
+    free(key);
+    return NULL;
   }
+
   init_kerl(&kerl);
 
-  trytes_to_trits((tryte_t*)seed, subseed, HASH_LENGTH_TRIT / RADIX);
+  memcpy(subseed, seed, HASH_LENGTH_TRIT);
   iss_kerl_subseed(subseed, subseed, index, &kerl);
-
   iss_kerl_key(subseed, key, key_length, &kerl);
-  memset(subseed, 0, HASH_LENGTH_TRIT * sizeof(trit_t));
-
+  memset(subseed, 0, HASH_LENGTH_TRIT);
   iss_kerl_key_digest(key, key, key_length, &kerl);
-  iss_kerl_address(key, key, security * HASH_LENGTH_TRIT, &kerl);
-
-  kerl_reset(&kerl);
-
-  trits_to_trytes(key, (tryte_t*)address, HASH_LENGTH_TRIT);
+  iss_kerl_address(key, address, security * HASH_LENGTH_TRIT, &kerl);
   memset(key, 0, key_length * sizeof(trit_t));
-
-cleanup:
+  kerl_reset(&kerl);
   free(key);
 
   return address;
 }
 
-IOTA_EXPORT flex_trit_t* iota_flex_sign_address_gen(
-    flex_trit_t const* const seed, size_t const index, size_t const security) {
+IOTA_EXPORT char* iota_sign_address_gen_trytes(char const* const seed,
+                                               size_t const index,
+                                               size_t const security) {
+  trit_t seed_trits[HASH_LENGTH_TRIT];
+  char* address = NULL;
+  trit_t* address_trits = NULL;
+
   if (!(security > 0 && security <= 3)) {
     return NULL;
   }
 
-  Kerl kerl;
-  trit_t* key = NULL;
-  flex_trit_t* address = NULL;
-  trit_t subseed[HASH_LENGTH_TRIT];
-  const size_t key_length = security * ISS_KEY_LENGTH;
-
-  key = calloc(key_length, sizeof(trit_t));
-  if (!key) {
+  if ((address = calloc(HASH_LENGTH_TRYTE + 1, sizeof(tryte_t))) == NULL) {
     return NULL;
   }
-  address = calloc(NUM_FLEX_TRITS_FOR_TRITS(HASH_LENGTH_TRIT) + 1,
-                   sizeof(flex_trit_t));
-  if (!address) {
-    goto cleanup;
+
+  trytes_to_trits((tryte_t*)seed, seed_trits, HASH_LENGTH_TRYTE);
+  if ((address_trits =
+           iota_sign_address_gen_trits(seed_trits, index, security)) == NULL) {
+    free(address);
+    return NULL;
+  }
+  memset(seed_trits, 0, HASH_LENGTH_TRIT);
+  trits_to_trytes(address_trits, (tryte_t*)address, HASH_LENGTH_TRIT);
+  free(address_trits);
+
+  return address;
+}
+
+IOTA_EXPORT flex_trit_t* iota_sign_address_gen_flex_trits(
+    flex_trit_t const* const seed, size_t const index, size_t const security) {
+  trit_t seed_trits[HASH_LENGTH_TRIT];
+  flex_trit_t* address = NULL;
+  trit_t* address_trits = NULL;
+
+  if (!(security > 0 && security <= 3)) {
+    return NULL;
   }
 
-  init_kerl(&kerl);
+  if ((address = calloc(FLEX_TRIT_SIZE_243, sizeof(flex_trit_t))) == NULL) {
+    return NULL;
+  }
 
-  flex_trits_to_trits(subseed, HASH_LENGTH_TRIT, seed, HASH_LENGTH_TRIT,
+  flex_trits_to_trits(seed_trits, HASH_LENGTH_TRIT, seed, HASH_LENGTH_TRIT,
                       HASH_LENGTH_TRIT);
-  iss_kerl_subseed(subseed, subseed, index, &kerl);
-
-  iss_kerl_key(subseed, key, key_length, &kerl);
-  memset(subseed, 0, HASH_LENGTH_TRIT * sizeof(trit_t));
-
-  iss_kerl_key_digest(key, key, key_length, &kerl);
-  iss_kerl_address(key, key, security * HASH_LENGTH_TRIT, &kerl);
-
-  kerl_reset(&kerl);
-
-  flex_trits_from_trits(address, HASH_LENGTH_TRIT, key, key_length,
-                        HASH_LENGTH_TRIT);
-
-  memset(key, 0, key_length * sizeof(trit_t));
-
-cleanup:
-  free(key);
+  if ((address_trits =
+           iota_sign_address_gen_trits(seed_trits, index, security)) == NULL) {
+    free(address);
+    return NULL;
+  }
+  memset(seed_trits, 0, HASH_LENGTH_TRIT);
+  flex_trits_from_trits(address, HASH_LENGTH_TRIT, address_trits,
+                        HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  free(address_trits);
 
   return address;
 }
