@@ -74,32 +74,6 @@ static void trits_add_sub_test(void) {
     }
 }
 
-static void trits_bytes_test(void) {
-  trits_t x, y;
-  byte b[3];
-  size_t n, k;
-
-  MAM2_TRITS_DEF0(x0, 5 * 3);
-  MAM2_TRITS_DEF0(y0, 5 * 3);
-
-  x0 = MAM2_TRITS_INIT(x0, 5 * 3);
-  y0 = MAM2_TRITS_INIT(y0, 5 * 3);
-
-  for (n = 0; n < 11; ++n) {
-    x = trits_take(x0, n);
-    y = trits_take(y0, n);
-    trits_set_zero(x);
-    k = 0;
-    do {
-      trits_to_bytes(x, b);
-      trits_set_zero(y);
-      TEST_ASSERT_TRUE(trits_from_bytes(y, b));
-      TEST_ASSERT_TRUE(trits_cmp_eq(x, y));
-      k++;
-    } while (trits_inc(x));
-  }
-}
-
 static bool trits_trytes(trits_t x, char *s, char *t) {
   bool r = true;
   size_t n = trits_size(x) / 3;
@@ -171,7 +145,6 @@ int main(void) {
 
   RUN_TEST(trits_put_get_test);
   RUN_TEST(trits_add_sub_test);
-  RUN_TEST(trits_bytes_test);
   RUN_TEST(trits_test);
 
   return UNITY_END();
