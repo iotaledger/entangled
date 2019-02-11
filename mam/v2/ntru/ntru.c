@@ -30,7 +30,7 @@ retcode_t ntru_destroy(mam_ntru_sk_t *const ntru) {
 }
 
 void ntru_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
-              trits_t const nonce, trits_t public_key) {
+              trits_t const nonce) {
   MAM2_TRITS_DEF0(nonce_i, 81);
   MAM2_TRITS_DEF0(secret_key, 2 * MAM2_NTRU_SK_SIZE);
   nonce_i = MAM2_TRITS_INIT(nonce_i, 81);
@@ -62,8 +62,7 @@ void ntru_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
   poly_conv(g, h, h);
   poly_intt(h, h);
 
-  poly_to_trits(h, public_key);
-  trits_copy(trits_take(public_key, MAM2_NTRU_ID_SIZE), ntru_id_trits(ntru));
+  poly_to_trits(h, ntru_pk_trits(ntru));
 
   trits_set_zero(nonce_i);
   trits_set_zero(secret_key);

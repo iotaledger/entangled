@@ -36,7 +36,7 @@
 
 static trits_t mam_test_generic_send_msg(
     mam_pre_shared_key_t *prng, mam_pre_shared_key_t const *const pska,
-    mam_pre_shared_key_t const *const pskb, mam_ntru_pk_t const *const ntru_pk,
+    mam_pre_shared_key_t const *const pskb, mam_ntru_pk_t const ntru_pk,
     mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
     mam_msg_checksum_t checksum, mam_channel_t *const cha,
     mam_endpoint_t *const epa, mam_channel_t *const ch1a,
@@ -72,7 +72,7 @@ static trits_t mam_test_generic_send_msg(
       mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pska);
       mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pskb);
     } else if (mam_msg_keyload_ntru == keyload) {
-      mam_ntru_pk_t_set_add(&cfg->ntru_public_keys, ntru_pk);
+      mam_ntru_pk_t_set_add(&cfg->ntru_public_keys, &ntru_pk);
     }
 
     trits_from_str(mam_send_msg_cfg_nonce(cfg), "SENDERNONCEAAAAASENDERNONCE");
@@ -279,7 +279,6 @@ static void mam_test_generic(mam_prng_t *prng_sender,
   payload = trits_alloc(3 * strlen(payload_str));
 
   mam_ntru_sk_t ntru[1];
-  mam_ntru_pk_t ntru_pk[1];
 
   /* gen recipient'spongos ntru keys, public key is shared with sender */
   {
@@ -289,7 +288,7 @@ static void mam_test_generic(mam_prng_t *prng_sender,
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
 
     e = ntru_init(ntru);
-    ntru_gen(ntru, prng_receiver, ntru_nonce, mam_ntru_pk_trits(ntru_pk));
+    ntru_gen(ntru, prng_receiver, ntru_nonce);
     TEST_ASSERT(RC_OK == e);
   }
 
@@ -315,9 +314,9 @@ static void mam_test_generic(mam_prng_t *prng_sender,
       {
         /* send msg and packet */
         {
-          msg = mam_test_generic_send_msg(prng_sender, pska, pskb, ntru_pk,
-                                          pubkey, keyload, checksum, cha, epa,
-                                          ch1a, ep1a, cfg_msg_send);
+          msg = mam_test_generic_send_msg(
+              prng_sender, pska, pskb, ntru->public_key, pubkey, keyload,
+              checksum, cha, epa, ch1a, ep1a, cfg_msg_send);
 
           packet = mam_test_generic_send_first_packet(
               pubkey, checksum, cha, epa, ch1a, ep1a, cfg_msg_send,
