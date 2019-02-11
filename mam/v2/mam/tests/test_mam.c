@@ -36,7 +36,7 @@
 
 static trits_t mam_test_generic_send_msg(
     mam_pre_shared_key_t *prng, mam_pre_shared_key_t const *const pska,
-    mam_pre_shared_key_t const *const pskb, mam_ntru_pk_t const ntru_pk,
+    mam_pre_shared_key_t const *const pskb, mam_ntru_pk_t const *const ntru_pk,
     mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
     mam_msg_checksum_t checksum, mam_channel_t *const cha,
     mam_endpoint_t *const epa, mam_channel_t *const ch1a,
@@ -72,7 +72,7 @@ static trits_t mam_test_generic_send_msg(
       mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pska);
       mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pskb);
     } else if (mam_msg_keyload_ntru == keyload) {
-      mam_ntru_pk_t_set_add(&cfg->ntru_public_keys, &ntru_pk);
+      mam_ntru_pk_t_set_add(&cfg->ntru_public_keys, ntru_pk);
     }
 
     trits_from_str(mam_send_msg_cfg_nonce(cfg), "SENDERNONCEAAAAASENDERNONCE");
@@ -315,7 +315,7 @@ static void mam_test_generic(mam_prng_t *prng_sender,
         /* send msg and packet */
         {
           msg = mam_test_generic_send_msg(
-              prng_sender, pska, pskb, ntru->public_key, pubkey, keyload,
+              prng_sender, pska, pskb, &ntru->public_key, pubkey, keyload,
               checksum, cha, epa, ch1a, ep1a, cfg_msg_send);
 
           packet = mam_test_generic_send_first_packet(

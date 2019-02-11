@@ -37,31 +37,19 @@ static bool mam_ntru_pk_t_set_cmp(mam_ntru_pk_t_set_t const ntru_pk_set_1,
 
 static bool mam_ntru_sk_t_set_cmp(mam_ntru_sk_t_set_t const ntru_sk_set_1,
                                   mam_ntru_sk_t_set_t const ntru_sk_set_2) {
-  mam_ntru_sk_t_set_entry_t *entry1 = NULL;
-  mam_ntru_sk_t_set_entry_t *tmp1 = NULL;
-
-  mam_ntru_sk_t_set_entry_t *entry2 = NULL;
-  mam_ntru_sk_t_set_entry_t *tmp2 = NULL;
-
-  size_t match = 0;
+  mam_ntru_sk_t_set_entry_t *entry = NULL;
+  mam_ntru_sk_t_set_entry_t *tmp = NULL;
 
   TEST_ASSERT_EQUAL_INT(mam_ntru_sk_t_set_size(ntru_sk_set_1),
                         mam_ntru_sk_t_set_size(ntru_sk_set_2));
 
-  // We have to loop in O(N^2) because mam_ntru_sk_t_set_contains compares hash
-  // value based on
-  // the address assigned into the "f" field in the ntru_sk_t type
-  HASH_ITER(hh, ntru_sk_set_1, entry1, tmp1) {
-    HASH_ITER(hh, ntru_sk_set_2, entry2, tmp2) {
-      if (memcmp(&entry1->value, &entry2->value,
-                 MAM2_NTRU_PK_SIZE + MAM2_NTRU_SK_SIZE) == 0) {
-        match++;
-        break;
-      }
+  HASH_ITER(hh, ntru_sk_set_1, entry, tmp) {
+    if (!mam_ntru_sk_t_set_contains(&ntru_sk_set_2, &entry->value)) {
+      return false;
     }
   }
 
-  return mam_ntru_sk_t_set_size(ntru_sk_set_1) == match;
+  return true;
 }
 
 static void test_ntru_pk_serialization(void) {
@@ -97,13 +85,23 @@ static void test_ntru_sk_serialization(void) {
   mam_ntru_sk_t_set_t ntru_sk_set_1 = NULL;
   mam_ntru_sk_t_set_t ntru_sk_set_2 = NULL;
   mam_ntru_sk_t ntru_sk;
+  mam_prng_t prng;
+  MAM2_TRITS_DEF0(key, MAM2_PRNG_KEY_SIZE);
+  MAM2_TRITS_DEF0(nonce, 3 * 10);
+  key = MAM2_TRITS_INIT(key, MAM2_PRNG_KEY_SIZE);
+  nonce = MAM2_TRITS_INIT(nonce, 3 * 10);
 
-  // NOTE: this is not a good example for how to generate an NTRU key
-  // since the public_key is derived from the secret key rather than
-  // being set
+  trits_from_str(key,
+                 "AAABBBCCCAAABBBCCCAAABBBCCC"
+                 "AAABBBCCCAAABBBCCCAAABBBCCC"
+                 "AAABBBCCCAAABBBCCCAAABBBCCC");
+
+  mam_prng_init(&prng, key);
+  ntru_init(&ntru_sk);
+
   for (int i = -1; i <= 1; i++) {
-    memset(ntru_sk.public_key.key, i, MAM2_NTRU_PK_SIZE);
-    memset(ntru_sk.secret_key, i, MAM2_NTRU_SK_SIZE);
+    memset(nonce.p, i, 3 * 10);
+    ntru_gen(&ntru_sk, &prng, nonce);
     TEST_ASSERT(mam_ntru_sk_t_set_add(&ntru_sk_set_1, &ntru_sk) == RC_OK);
   }
 

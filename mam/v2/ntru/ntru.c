@@ -172,8 +172,7 @@ bool ntru_decr(mam_ntru_sk_t const *const ntru, mam_spongos_t *const spongos,
 }
 
 void ntru_load_sk(mam_ntru_sk_t *n) {
-  poly_coeff_t *f;
-  f = (poly_coeff_t *)n->f;
+  poly_coeff_t *f = (poly_coeff_t *)n->f;
 
   poly_small_from_trits(f, ntru_sk_trits(n));
   /* f := NTT(1+3f) */
