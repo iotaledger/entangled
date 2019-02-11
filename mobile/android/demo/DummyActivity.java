@@ -24,7 +24,7 @@ public class DummyActivity extends Activity{
     Log.e("IOTA", "Calculated address: " + address);
 
     Log.e("IOTA", "Starting Signature");
-    String signature = Interface.iota_sign_signature_gen(SEED, 2, 2, SEED);
+    String signature = Interface.iota_sign_signature_gen_trytes(SEED, 2, 2, SEED);
     Log.e("IOTA", "Seed: " + SEED);
     Log.e("IOTA", "Calculated signature: " + signature);
   }

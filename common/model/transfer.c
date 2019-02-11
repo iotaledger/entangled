@@ -399,7 +399,7 @@ transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[],
     log_error(logger_id, "[%s:%d] Invalid transfers.\n", __func__, __LINE__);
     return NULL;
   }
-  transfer_iterator->iota_signature_gen = iota_flex_sign_signature_gen;
+  transfer_iterator->iota_signature_gen = iota_sign_signature_gen_flex_trits;
   return transfer_iterator;
 }
 

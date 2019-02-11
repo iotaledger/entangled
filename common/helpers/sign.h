@@ -27,11 +27,14 @@ IOTA_EXPORT char* iota_sign_address_gen_trytes(char const* const seed,
 IOTA_EXPORT flex_trit_t* iota_sign_address_gen_flex_trits(
     flex_trit_t const* const seed, size_t const index, size_t const security);
 
-IOTA_EXPORT char* iota_sign_signature_gen(char const* const seed,
-                                          size_t const index,
-                                          size_t const security,
-                                          char const* const bundle_hash);
-IOTA_EXPORT flex_trit_t* iota_flex_sign_signature_gen(
+IOTA_EXPORT trit_t* iota_sign_signature_gen_trits(
+    trit_t const* const seed, size_t const index, size_t const security,
+    trit_t const* const bundle_hash);
+IOTA_EXPORT char* iota_sign_signature_gen_trytes(char const* const seed,
+                                                 size_t const index,
+                                                 size_t const security,
+                                                 char const* const bundle_hash);
+IOTA_EXPORT flex_trit_t* iota_sign_signature_gen_flex_trits(
     flex_trit_t const* const seed, size_t const index, size_t const security,
     flex_trit_t const* const bundle_hash);
 
