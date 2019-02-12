@@ -15,7 +15,7 @@
 #include "mam/v2/defs.h"
 #include "mam/v2/mam/channel.h"
 #include "mam/v2/mam/endpoint.h"
-#include "mam/v2/mam/mam_pre_shared_key_t_set.h"
+#include "mam/v2/mam/mam_psk_t_set.h"
 #include "mam/v2/mam/mam_types.h"
 #include "mam/v2/mss/mss.h"
 #include "mam/v2/ntru/mam_ntru_pk_t_set.h"
@@ -34,8 +34,8 @@ retcode_t mam_mss_create(mss_t *m, mam_prng_t *p, mss_mt_height_t d, trits_t N1,
 
 void mam_mss_destroy(mss_t *m);
 
-trits_t mam_psk_id(mam_pre_shared_key_t *p);
-trits_t mam_psk_trits(mam_pre_shared_key_t *p);
+trits_t mam_psk_id(mam_psk_t *p);
+trits_t mam_psk_trits(mam_psk_t *p);
 
 trits_t mam_ntru_pk_id(mam_ntru_pk_t *p);
 trits_t mam_ntru_pk_trits(mam_ntru_pk_t *p);
@@ -65,10 +65,6 @@ retcode_t mam_unwrap_pubkey_epid1(mam_spongos_t *s, trits_t *b, trits_t epid1,
                                   trits_t pk);
 
 /* Header, Keyload */
-
-size_t mam_wrap_keyload_plain_size();
-void mam_wrap_keyload_plain(mam_spongos_t *s, trits_t *b, trits_t key);
-retcode_t mam_unwrap_keyload_plain(mam_spongos_t *s, trits_t *b, trits_t key);
 
 size_t mam_wrap_keyload_psk_size();
 void mam_wrap_keyload_psk(mam_spongos_t *s, trits_t *b, trits_t key, trits_t id,
@@ -109,7 +105,6 @@ typedef enum mam_msg_pubkey_e {
 } mam_msg_pubkey_t;
 
 typedef enum mam_msg_keyload_e {
-  mam_msg_keyload_plain = 0,
   mam_msg_keyload_psk = 1,
   mam_msg_keyload_ntru = 2,
 } mam_msg_keyload_t;
@@ -120,7 +115,7 @@ typedef enum mam_msg_checksum_e {
   mam_msg_checksum_mssig = 2,
 } mam_msg_checksum_t;
 
-#define MAM2_HEADER_NONCE_SIZE 81
+#define MAM2_HEADER_MSGID_SIZE 81
 
 typedef struct mam_send_msg_context_s {
   mam_spongos_t spongos[1]; /*!< Main Spongos interface to wrap PB3 messages. */
@@ -133,13 +128,12 @@ typedef struct mam_send_msg_context_s {
   mam_endpoint_t *ep;            /*!< Current endpoint (may be null). */
   mam_endpoint_t *ep1;           /*!< New endpoint (may be null). */
 
-  trit_t nonce[MAM2_HEADER_NONCE_SIZE]; /*!< Message nonce, must be
-                                                       unique for each key. */
+  trit_t msgid[MAM2_HEADER_MSGID_SIZE]; /*!< Message id / nonce, must be unique
+                                           for each key. */
+  trint9_t msgtypeid;
   trit_t
       session_key[MAM2_SPONGE_KEY_SIZE]; /*!< Trits (memory) for session key. */
-  bool key_plain;                        /*!< Include session key in plain? */
-  mam_pre_shared_key_t_set_t
-      pre_shared_keys; /*!< Encrypt message for these psks. */
+  mam_psk_t_set_t pre_shared_keys;       /*!< Encrypt message for these psks. */
   mam_ntru_pk_t_set_t
       ntru_public_keys; /*!< Encrypt message for these NTRU public keys. */
 } mam_send_msg_context_t;
@@ -177,11 +171,12 @@ typedef struct mam_recv_msg_context_s {
   /*TODO: check for trusted chid/epid*/
   /*TODO: handle (add to trusted list) new chid1*/
 
-  trit_t nonce[MAM2_HEADER_NONCE_SIZE];
+  trit_t msgid[MAM2_HEADER_MSGID_SIZE];
+  trint9_t msgtypeid;
   trit_t key[MAM2_SPONGE_KEY_SIZE];  /*!< Trits (memory) for session key. */
   trit_t psk_id[MAM2_PSK_ID_SIZE];   /*!< Buffer to read PSK id to. */
   trit_t ntru_id[MAM2_NTRU_ID_SIZE]; /*!< Buffer to read NTRU id to. */
-  mam_pre_shared_key_t *psk;         /*!< PSK to decrypt message. */
+  mam_psk_t *psk;                    /*!< PSK to decrypt message. */
   mam_ntru_sk_t *ntru;               /*!< NTRU sk to decrypt message. */
 } mam_recv_msg_context_t;
 
@@ -202,14 +197,14 @@ trits_t mam_send_msg_cfg_chid(mam_send_msg_context_t const *const cfg);
 trits_t mam_send_msg_cfg_chid1(mam_send_msg_context_t const *const cfg);
 trits_t mam_send_msg_cfg_epid(mam_send_msg_context_t const *const cfg);
 trits_t mam_send_msg_cfg_epid1(mam_send_msg_context_t const *const cfg);
-trits_t mam_send_msg_cfg_nonce(mam_send_msg_context_t const *const cfg);
+trits_t mam_send_msg_cfg_msgid(mam_send_msg_context_t const *const cfg);
 trits_t mam_send_msg_cfg_session_key(mam_send_msg_context_t const *const cfg);
 
 trits_t mam_recv_msg_cfg_chid(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_chid1(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_epid(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_epid1(mam_recv_msg_context_t const *const cfg);
-trits_t mam_recv_msg_cfg_nonce(mam_recv_msg_context_t const *const cfg);
+trits_t mam_recv_msg_cfg_msgid(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_key(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_psk_id(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_ntru_id(mam_recv_msg_context_t const *const cfg);

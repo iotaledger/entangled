@@ -35,14 +35,12 @@
 // TODO - Test functions should take set of prng_t instead of raw ptrs
 
 static trits_t mam_test_generic_send_msg(
-    mam_pre_shared_key_t *prng, mam_pre_shared_key_t const *const pska,
-    mam_pre_shared_key_t const *const pskb, mam_ntru_pk_t const *const ntru_pk,
-    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
-    mam_msg_checksum_t checksum, mam_channel_t *const cha,
-    mam_endpoint_t *const epa, mam_channel_t *const ch1a,
-    mam_endpoint_t *const ep1a, mam_send_msg_context_t *const cfg_msga) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
-
+    mam_prng_t *prng, mam_psk_t const *const pska, mam_psk_t const *const pskb,
+    mam_ntru_pk_t const *const ntru_pk, mam_msg_pubkey_t pubkey,
+    mam_msg_keyload_t keyload, mam_msg_checksum_t checksum,
+    mam_channel_t *const cha, mam_endpoint_t *const epa,
+    mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
+    mam_send_msg_context_t *const cfg_msga) {
   trits_t msg = trits_null();
 
   {
@@ -63,19 +61,17 @@ static trits_t mam_test_generic_send_msg(
       cfg->ep1 = ep1a;
     }
 
-    cfg->key_plain = 0;
     cfg->pre_shared_keys = NULL;
     cfg->ntru_public_keys = NULL;
-    if (mam_msg_keyload_plain == keyload)
-      cfg->key_plain = 1;
-    else if (mam_msg_keyload_psk == keyload) {
-      mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pska);
-      mam_pre_shared_key_t_set_add(&cfg->pre_shared_keys, pskb);
+    if (mam_msg_keyload_psk == keyload) {
+      mam_psk_t_set_add(&cfg->pre_shared_keys, pska);
+      mam_psk_t_set_add(&cfg->pre_shared_keys, pskb);
     } else if (mam_msg_keyload_ntru == keyload) {
       mam_ntru_pk_t_set_add(&cfg->ntru_public_keys, ntru_pk);
     }
 
-    trits_from_str(mam_send_msg_cfg_nonce(cfg), "SENDERNONCEAAAAASENDERNONCE");
+    trits_from_str(mam_send_msg_cfg_msgid(cfg), "SENDERMSGIDAAAAASENDERMSGID");
+    cfg->msgtypeid = 0;
   }
 
   size_t sz;
@@ -86,7 +82,7 @@ static trits_t mam_test_generic_send_msg(
   mam_send_msg(cfg_msga, &msg);
   TEST_ASSERT(trits_is_empty(msg));
   msg = trits_pickup(msg, sz);
-  mam_pre_shared_key_t_set_free(&cfg_msga->pre_shared_keys);
+  mam_psk_t_set_free(&cfg_msga->pre_shared_keys);
   mam_ntru_pk_t_set_free(&cfg_msga->ntru_public_keys);
 
   return msg;
@@ -97,8 +93,6 @@ static trits_t mam_test_generic_send_first_packet(
     mam_channel_t *const cha, mam_endpoint_t *const epa,
     mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
     mam_send_msg_context_t const *const cfg_msg_send, char const *payload_str) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
-
   trits_t packet = trits_null(), payload = trits_null();
   mam_send_packet_context_t cfg_packet_send[1];
 
@@ -142,9 +136,9 @@ static trits_t mam_test_generic_send_first_packet(
 }
 
 static void mam_test_generic_receive_msg(
-    mam_pre_shared_key_t const *const pre_shared_key,
-    mam_ntru_sk_t const *const ntru, mam_channel_t *const cha,
-    trits_t *const msg, mam_recv_msg_context_t *const cfg_msg_recv) {
+    mam_psk_t const *const pre_shared_key, mam_ntru_sk_t const *const ntru,
+    mam_channel_t *const cha, trits_t *const msg,
+    mam_recv_msg_context_t *const cfg_msg_recv) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   /* init recv msg context */
@@ -161,6 +155,9 @@ static void mam_test_generic_receive_msg(
   e = mam_recv_msg(cfg_msg_recv, msg);
   TEST_ASSERT(RC_OK == e);
   TEST_ASSERT(trits_is_empty(*msg));
+  MAM2_ASSERT(trits_cmp_eq_str(mam_recv_msg_cfg_msgid(cfg_msg_recv),
+                               "SENDERMSGIDAAAAASENDERMSGID"));
+  MAM2_ASSERT(cfg_msg_recv->msgtypeid == 0);
 
   cfg_msg_recv->ntru = NULL;
 }
@@ -262,7 +259,6 @@ static void mam_test_generic(mam_prng_t *prng_sender,
 
   trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
 
-  mss_mt_height_t d = TEST_MSS_DEPTH;
   mam_channel_t *cha = NULL, *ch1a = NULL;
   mam_endpoint_t *epa = NULL, *ep1a = NULL;
 
@@ -270,7 +266,7 @@ static void mam_test_generic(mam_prng_t *prng_sender,
   mam_recv_msg_context_t cfg_msg_recv[1];
 
   mam_msg_pubkey_t pubkey;     /* chid=0, epid=1, chid1=2, epid1=3 */
-  mam_msg_keyload_t keyload;   /* plain=0, psk=1, ntru=2 */
+  mam_msg_keyload_t keyload;   /* psk=1, ntru=2 */
   mam_msg_checksum_t checksum; /* none=0, mac=1, mssig=2 */
 
   mam_test_create_channels(prng_sender, &cha, &ch1a, &epa, &ep1a);
@@ -292,7 +288,7 @@ static void mam_test_generic(mam_prng_t *prng_sender,
     TEST_ASSERT(RC_OK == e);
   }
 
-  mam_pre_shared_key_t pska[1], pskb[1];
+  mam_psk_t pska[1], pskb[1];
 
   /* gen psk */
   {
@@ -307,7 +303,7 @@ static void mam_test_generic(mam_prng_t *prng_sender,
 
   /* chid=0, epid=1, chid1=2, epid1=3*/
   for (pubkey = 0; pubkey < 4; ++pubkey) {
-    /* plain=0, psk=1, ntru=2 */
+    /* public=0, psk=1, ntru=2 */
     for (keyload = 0; keyload < 3; ++keyload) {
       for (checksum = 0; checksum < 3; ++checksum)
       /* none=0, mac=1, mssig=2 */

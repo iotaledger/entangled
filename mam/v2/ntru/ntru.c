@@ -78,7 +78,9 @@ void ntru_encr(trits_t const public_key, mam_prng_t const *const prng,
   trits_t r;
 
   r = trits_take(encrypted_session_key, MAM2_NTRU_SK_SIZE);
-  mam_prng_gen2(prng, MAM2_PRNG_DST_NTRU_KEY, session_key, nonce, r);
+  mam_prng_gen3(prng, MAM2_PRNG_DST_NTRU_KEY,
+                trits_take(public_key, MAM2_NTRU_ID_SIZE), session_key, nonce,
+                r);
   ntru_encr_r(public_key, spongos, r, session_key, encrypted_session_key);
 }
 

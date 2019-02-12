@@ -105,7 +105,6 @@ static void test_ntru_sk_serialization(void) {
     TEST_ASSERT(mam_ntru_sk_t_set_add(&ntru_sk_set_1, &ntru_sk) == RC_OK);
   }
 
-  size_t size1 = mam_ntru_sk_t_set_size(ntru_sk_set_1);
   size_t size = mam_ntru_sks_serialized_size(ntru_sk_set_1);
 
   TEST_ASSERT_EQUAL_INT(size, 3 * (MAM2_NTRU_PK_SIZE + MAM2_NTRU_SK_SIZE));
