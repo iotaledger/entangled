@@ -52,7 +52,18 @@ retcode_t ntru_destroy(mam_ntru_sk_t *const ntru);
  * @return the id trits
  */
 static inline trits_t ntru_id_trits(mam_ntru_sk_t const *const ntru) {
-  return trits_from_rep(MAM2_NTRU_ID_SIZE, ntru->public_key_id);
+  return trits_from_rep(MAM2_NTRU_ID_SIZE, ntru->public_key.key);
+}
+
+/**
+ * Gets public key trits
+ *
+ * @param ntru A NTRU interface
+ *
+ * @return the trits
+ */
+static inline trits_t ntru_pk_trits(mam_ntru_sk_t const *const ntru) {
+  return trits_from_rep(MAM2_NTRU_PK_SIZE, ntru->public_key.key);
 }
 
 /**
@@ -72,10 +83,9 @@ static inline trits_t ntru_sk_trits(mam_ntru_sk_t const *const ntru) {
  * @param ntru A NTRU interface
  * @param prng A PRNG interface
  * @param nonce A nonce
- * @param public_key A NTRU public key: serialized NTT of polynomial h=3g/(1+3f)
  */
 void ntru_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
-              trits_t const nonce, trits_t public_key);
+              trits_t const nonce);
 
 /**
  * NTRU encryption of a session key
