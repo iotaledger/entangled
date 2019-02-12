@@ -29,12 +29,12 @@ new_git_repository(
 
 android_sdk_repository(
     name = "androidsdk",
-    api_level = 19,
+    api_level = 27,
 )
 
 android_ndk_repository(
     name = "androidndk",
-    api_level = 14,
+    api_level = 27,
 )
 
 git_repository(
