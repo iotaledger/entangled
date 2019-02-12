@@ -41,19 +41,18 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
   return RC_OK;
 }
 
-retcode_t mam_state_add_ntru_sk(mam_state_t* const state,
-                                mam_ntru_sk_t const* const ntru_sk) {
-  return mam_ntru_sk_t_set_add(&state->ntru_sks, ntru_sk);
+retcode_t mam_api_add_ntru_sk(mam_api_t *const api,
+                              mam_ntru_sk_t const *const ntru_sk) {
+  return mam_ntru_sk_t_set_add(&api->ntru_sks, ntru_sk);
 }
 
-retcode_t mam_state_add_ntru_pk(mam_state_t* const state,
-                                mam_ntru_pk_t const* const ntru_pk) {
-  return mam_ntru_pk_t_set_add(&state->ntru_pks, ntru_pk);
+retcode_t mam_api_add_ntru_pk(mam_api_t *const api,
+                              mam_ntru_pk_t const *const ntru_pk) {
+  return mam_ntru_pk_t_set_add(&api->ntru_pks, ntru_pk);
 }
 
-retcode_t mam_state_add_psk(mam_state_t* const state,
-                            mam_psk_t const* const psk) {
-  return mam_psk_t_set_add(&state->psks, psk);
+retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk) {
+  return mam_psk_t_set_add(&api->psks, psk);
 }
 
 retcode_t mam_api_bundle_write_msg(

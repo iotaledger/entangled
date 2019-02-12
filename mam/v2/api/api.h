@@ -37,6 +37,14 @@ retcode_t mam_api_init(mam_api_t *const api, trits_t const prng_secret_key);
 
 retcode_t mam_api_destroy(mam_api_t *const api);
 
+retcode_t mam_api_add_ntru_sk(mam_api_t *const api,
+                              mam_ntru_sk_t const *const ntru_sk);
+
+retcode_t mam_api_add_ntru_pk(mam_api_t *const api,
+                              mam_ntru_pk_t const *const ntru_pk);
+
+retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk);
+
 retcode_t mam_api_bundle_write_msg(
     mam_api_t *const api, mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
     mam_msg_checksum_t checksum, mam_channel_t const *const cha,
@@ -55,15 +63,6 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
                               mam_channel_t const *const cha,
                               bundle_transactions_t const *const bundle,
                               flex_trit_t *const payload);
-
-retcode_t mam_state_add_ntru_sk(mam_state_t* const state,
-                                mam_ntru_sk_t const* const ntru_sk);
-
-retcode_t mam_state_add_ntru_pk(mam_state_t* const state,
-                                mam_ntru_pk_t const* const ntru_pk);
-
-retcode_t mam_state_add_psk(mam_state_t* const state,
-                            mam_psk_t const* const psk);
 
 #ifdef __cplusplus
 }
