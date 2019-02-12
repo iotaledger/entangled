@@ -59,12 +59,12 @@ void mam_mss_destroy(mss_t *m) {
   mss_destroy(m);
 }
 
-trits_t mam_psk_id(mam_pre_shared_key_t *p) {
+trits_t mam_psk_id(mam_psk_t *p) {
   return trits_from_rep(MAM2_PSK_ID_SIZE, p->id);
 }
 
-trits_t mam_psk_trits(mam_pre_shared_key_t *p) {
-  return trits_from_rep(MAM2_PSK_SIZE, p->pre_shared_key);
+trits_t mam_psk_trits(mam_psk_t *p) {
+  return trits_from_rep(MAM2_PSK_KEY_SIZE, p->key);
 }
 
 trits_t mam_ntru_pk_trits(mam_ntru_pk_t *p) {
@@ -482,8 +482,7 @@ size_t mam_send_msg_size(mam_send_msg_context_t *cfg) {
       sz += mam_wrap_keyload_plain_size();
     }
 
-    size_t num_pre_shared_keys =
-        mam_pre_shared_key_t_set_size(cfg->pre_shared_keys);
+    size_t num_pre_shared_keys = mam_psk_t_set_size(cfg->pre_shared_keys);
     keyload_count += num_pre_shared_keys;
     sz += (pb3_sizeof_oneof() + mam_wrap_keyload_psk_size()) *
           num_pre_shared_keys;
@@ -603,7 +602,7 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg) {
       tryte_t keyload;
 
       if (cfg->key_plain) ++keyload_count;
-      keyload_count += mam_pre_shared_key_t_set_size(cfg->pre_shared_keys);
+      keyload_count += mam_psk_t_set_size(cfg->pre_shared_keys);
       keyload_count += mam_ntru_pk_t_set_size(cfg->ntru_public_keys);
       /*  repeated */
       pb3_wrap_absorb_size_t(spongos, msg, keyload_count);
@@ -618,8 +617,8 @@ void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg) {
         mam_wrap_keyload_plain(fork, msg, mam_send_msg_cfg_session_key(cfg));
       }
 
-      mam_pre_shared_key_t_set_entry_t *curr_entry_psk = NULL;
-      mam_pre_shared_key_t_set_entry_t *tmp_entry_psk = NULL;
+      mam_psk_t_set_entry_t *curr_entry_psk = NULL;
+      mam_psk_t_set_entry_t *tmp_entry_psk = NULL;
 
       HASH_ITER(hh, cfg->pre_shared_keys, curr_entry_psk, tmp_entry_psk) {
         /*  absorb oneof keyload */

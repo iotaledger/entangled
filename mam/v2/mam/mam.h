@@ -15,7 +15,7 @@
 #include "mam/v2/defs.h"
 #include "mam/v2/mam/channel.h"
 #include "mam/v2/mam/endpoint.h"
-#include "mam/v2/mam/mam_pre_shared_key_t_set.h"
+#include "mam/v2/mam/mam_psk_t_set.h"
 #include "mam/v2/mam/mam_types.h"
 #include "mam/v2/mss/mss.h"
 #include "mam/v2/ntru/mam_ntru_pk_t_set.h"
@@ -34,8 +34,8 @@ retcode_t mam_mss_create(mss_t *m, mam_prng_t *p, mss_mt_height_t d, trits_t N1,
 
 void mam_mss_destroy(mss_t *m);
 
-trits_t mam_psk_id(mam_pre_shared_key_t *p);
-trits_t mam_psk_trits(mam_pre_shared_key_t *p);
+trits_t mam_psk_id(mam_psk_t *p);
+trits_t mam_psk_trits(mam_psk_t *p);
 
 trits_t mam_ntru_pk_id(mam_ntru_pk_t *p);
 trits_t mam_ntru_pk_trits(mam_ntru_pk_t *p);
@@ -138,8 +138,7 @@ typedef struct mam_send_msg_context_s {
   trit_t
       session_key[MAM2_SPONGE_KEY_SIZE]; /*!< Trits (memory) for session key. */
   bool key_plain;                        /*!< Include session key in plain? */
-  mam_pre_shared_key_t_set_t
-      pre_shared_keys; /*!< Encrypt message for these psks. */
+  mam_psk_t_set_t pre_shared_keys;       /*!< Encrypt message for these psks. */
   mam_ntru_pk_t_set_t
       ntru_public_keys; /*!< Encrypt message for these NTRU public keys. */
 } mam_send_msg_context_t;
@@ -181,7 +180,7 @@ typedef struct mam_recv_msg_context_s {
   trit_t key[MAM2_SPONGE_KEY_SIZE];  /*!< Trits (memory) for session key. */
   trit_t psk_id[MAM2_PSK_ID_SIZE];   /*!< Buffer to read PSK id to. */
   trit_t ntru_id[MAM2_NTRU_ID_SIZE]; /*!< Buffer to read NTRU id to. */
-  mam_pre_shared_key_t *psk;         /*!< PSK to decrypt message. */
+  mam_psk_t *psk;                    /*!< PSK to decrypt message. */
   mam_ntru_sk_t *ntru;               /*!< NTRU sk to decrypt message. */
 } mam_recv_msg_context_t;
 
