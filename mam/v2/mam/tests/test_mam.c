@@ -275,7 +275,6 @@ static void mam_test_generic(mam_prng_t *prng_sender,
   payload = trits_alloc(3 * strlen(payload_str));
 
   mam_ntru_sk_t ntru[1];
-  mam_ntru_pk_t ntru_pk[1];
 
   /* gen recipient'spongos ntru keys, public key is shared with sender */
   {
@@ -285,7 +284,7 @@ static void mam_test_generic(mam_prng_t *prng_sender,
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
 
     e = ntru_init(ntru);
-    ntru_gen(ntru, prng_receiver, ntru_nonce, mam_ntru_pk_trits(ntru_pk));
+    ntru_gen(ntru, prng_receiver, ntru_nonce);
     TEST_ASSERT(RC_OK == e);
   }
 
@@ -311,9 +310,9 @@ static void mam_test_generic(mam_prng_t *prng_sender,
       {
         /* send msg and packet */
         {
-          msg = mam_test_generic_send_msg(prng_sender, pska, pskb, ntru_pk,
-                                          pubkey, keyload, checksum, cha, epa,
-                                          ch1a, ep1a, cfg_msg_send);
+          msg = mam_test_generic_send_msg(
+              prng_sender, pska, pskb, &ntru->public_key, pubkey, keyload,
+              checksum, cha, epa, ch1a, ep1a, cfg_msg_send);
 
           packet = mam_test_generic_send_first_packet(
               pubkey, checksum, cha, epa, ch1a, ep1a, cfg_msg_send,

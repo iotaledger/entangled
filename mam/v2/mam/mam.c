@@ -68,11 +68,11 @@ trits_t mam_psk_trits(mam_psk_t *p) {
 }
 
 trits_t mam_ntru_pk_trits(mam_ntru_pk_t *p) {
-  return trits_from_rep(MAM2_NTRU_PK_SIZE, p->pk);
+  return trits_from_rep(MAM2_NTRU_PK_SIZE, p->key);
 }
 
 trits_t mam_ntru_pk_id(mam_ntru_pk_t *p) {
-  return trits_from_rep(MAM2_NTRU_ID_SIZE, p->pk);
+  return trits_from_rep(MAM2_NTRU_ID_SIZE, p->key);
 }
 
 /* MAC, MSSig, SignedId */
