@@ -82,7 +82,8 @@ static void mss_mt_init(mss_t *mss) {
  * @return void
  */
 
-static void mss_mt_update(mss_t *mss, mss_mt_height_t height) {
+static void mss_mt_update(mss_t *mss, mam_spongos_t *spongos,
+                          mss_mt_height_t height) {
   mss_mt_stack_t *stack;
   mss_mt_node_t *nodes;
   trit_t *nodes_hashes;
@@ -114,7 +115,7 @@ static void mss_mt_update(mss_t *mss, mss_mt_height_t height) {
     /* dirty hack: at the last level do not overwrite  */
     /* left hash value, but instead right; */
     /* left hash value is needed for MTT algorithm */
-    mss_hash2(mss->sg, hashes,
+    mss_hash2(spongos, hashes,
               hashes[nodes[stack->size].height + 1 != mss->height ? 0 : 1]);
 
     /* push parent into stack */
@@ -229,10 +230,12 @@ static void mss_mt_load_refresh(mss_t *m) {
 }
 
 static void mss_mt_build_stacks(mss_t *mss) {
+  mam_spongos_t spongos;
   /* classic Merkle tree traversal variant */
   mss_mt_height_t height;
   for (height = 0; height < mss->height; ++height) {
-    mss_mt_update(mss, height), mss_mt_update(mss, height);
+    mss_mt_update(mss, &spongos, height);
+    mss_mt_update(mss, &spongos, height);
   }
 }
 
@@ -342,9 +345,11 @@ void mss_gen(mss_t *mss, trits_t pk) {
     /* empty stack */
     stack->size = 0;
 
+    mam_spongos_t spongos;
+
     for (;;) {
       /* update current stack */
-      mss_mt_update(mss, height);
+      mss_mt_update(mss, &spongos, height);
       /* top node */
       node = nodes + (stack->size - 1);
       /* is it root? */
