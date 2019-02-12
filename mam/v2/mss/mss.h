@@ -101,8 +101,8 @@ typedef struct mss_mt_stack_s {
 
 /*! \brief MSS interface used to generate public key and sign. */
 typedef struct mss_s {
-  trint6_t height;  /*!< Merkle tree height. */
-  trint18_t skn;    /*!< Current WOTS private key number. */
+  mss_mt_height_t height; /*!< Merkle tree height. */
+  mss_mt_idx_t skn;       /*!< Current WOTS private key number. */
   mam_prng_t *prng; /*!< PRNG interface used to generate WOTS private keys. */
 #if defined(MAM2_MSS_TRAVERSAL)
   trit_t *auth_path;      /*!< Current authentication path; `d` hash values. */
@@ -154,8 +154,8 @@ It is achieved by allocating one extra node:
  * @return void
  */
 
-void mss_init(mss_t *mss, mam_prng_t *prng, trint6_t height, trits_t nonce1,
-              trits_t nonce2);
+void mss_init(mss_t *mss, mam_prng_t *prng, mss_mt_height_t height,
+              trits_t nonce1, trits_t nonce2);
 /**
  * Generate MSS keys, stores current and next auth_path
  *
@@ -188,7 +188,7 @@ void mss_skn(
  *
  * @return void
  */
-void mss_auth_path(mss_t *mss, trint18_t skn, trits_t path);
+void mss_auth_path(mss_t *mss, mss_mt_idx_t skn, trits_t path);
 
 /**
  * Signs a hash
