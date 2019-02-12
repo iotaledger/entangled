@@ -104,7 +104,7 @@ retcode_t mam_channel_unwrap(mam_spongos_t *const spongos,
 }
 
 size_t mam_channel_serialized_size(mam_channel_t const *const channel) {
-  size_t mss_size = mss_stored_size(&channel->mss);
+  size_t mss_size = mss_serialized_size(&channel->mss);
   size_t endpoints_size = mam_endpoints_serialized_size(channel->endpoints);
 
   return pb3_sizeof_ntrytes(MAM2_CHANNEL_ID_SIZE /
@@ -120,14 +120,14 @@ size_t mam_channel_serialized_size(mam_channel_t const *const channel) {
 
 retcode_t mam_channel_serialize(mam_channel_t const *const channel,
                                 trits_t *const buffer) {
-  size_t mss_size = mss_stored_size(&channel->mss);
+  size_t mss_size = mss_serialized_size(&channel->mss);
 
   pb3_encode_ntrytes(trits_from_rep(MAM2_CHANNEL_ID_SIZE, channel->id),
-                     buffer);                              // id
-  pb3_encode_size_t(trits_size(channel->name), buffer);    // name size
-  pb3_encode_ntrytes(channel->name, buffer);               // name
-  pb3_encode_size_t(mss_size, buffer);                     // mss size
-  mss_save(&channel->mss, trits_take(*buffer, mss_size));  // mss
+                     buffer);                                   // id
+  pb3_encode_size_t(trits_size(channel->name), buffer);         // name size
+  pb3_encode_ntrytes(channel->name, buffer);                    // name
+  pb3_encode_size_t(mss_size, buffer);                          // mss size
+  mss_serialize(&channel->mss, trits_take(*buffer, mss_size));  // mss
   trits_advance(buffer, mss_size);
   mam_endpoints_serialize(channel->endpoints, buffer);  // endpoints
 
@@ -173,7 +173,7 @@ retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
 
   mss_init(&channel->mss, prng, height, channel->name, trits_null());
 
-  if ((ret = mss_load(&channel->mss, buffer)) != RC_OK) {
+  if ((ret = mss_deserialize(buffer, &channel->mss)) != RC_OK) {
     return ret;
   }
 
