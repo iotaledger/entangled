@@ -9,44 +9,43 @@
  */
 
 #include "mam/v2/mam/mam_types.h"
-#include "mam/v2/mam/mam_pre_shared_key_t_set.h"
+#include "mam/v2/mam/mam_psk_t_set.h"
 #include "mam/v2/ntru/ntru.h"
 
-size_t mam_psks_serialized_size(mam_pre_shared_key_t_set_t const psks) {
-  return mam_pre_shared_key_t_set_size(psks) * sizeof(mam_pre_shared_key_t);
+size_t mam_psks_serialized_size(mam_psk_t_set_t const psks) {
+  return mam_psk_t_set_size(psks) * sizeof(mam_psk_t);
 }
 
-retcode_t mam_psks_serialize(mam_pre_shared_key_t_set_t const psks,
-                             trits_t trits) {
-  mam_pre_shared_key_t_set_entry_t *entry = NULL;
-  mam_pre_shared_key_t_set_entry_t *tmp = NULL;
+retcode_t mam_psks_serialize(mam_psk_t_set_t const psks, trits_t trits) {
+  mam_psk_t_set_entry_t *entry = NULL;
+  mam_psk_t_set_entry_t *tmp = NULL;
 
   HASH_ITER(hh, psks, entry, tmp) {
     trits_copy(trits_from_rep(MAM2_PSK_ID_SIZE, entry->value.id),
                trits_take(trits, MAM2_PSK_ID_SIZE));
     trits = trits_drop(trits, MAM2_PSK_ID_SIZE);
-    trits_copy(trits_from_rep(MAM2_PSK_SIZE, entry->value.pre_shared_key),
-               trits_take(trits, MAM2_PSK_SIZE));
-    trits = trits_drop(trits, MAM2_PSK_SIZE);
+    trits_copy(trits_from_rep(MAM2_PSK_KEY_SIZE, entry->value.key),
+               trits_take(trits, MAM2_PSK_KEY_SIZE));
+    trits = trits_drop(trits, MAM2_PSK_KEY_SIZE);
   }
 
   return RC_OK;
 }
 
 retcode_t mam_psks_deserialize(trits_t const trits,
-                               mam_pre_shared_key_t_set_t *const psks) {
+                               mam_psk_t_set_t *const psks) {
   retcode_t ret = RC_OK;
   trits_t cpy = trits;
-  mam_pre_shared_key_t psk;
+  mam_psk_t psk;
 
   while (!trits_is_empty(cpy)) {
     trits_copy(trits_take(cpy, MAM2_PSK_ID_SIZE),
                trits_from_rep(MAM2_PSK_ID_SIZE, psk.id));
     cpy = trits_drop(cpy, MAM2_PSK_ID_SIZE);
-    trits_copy(trits_take(cpy, MAM2_PSK_SIZE),
-               trits_from_rep(MAM2_PSK_SIZE, psk.pre_shared_key));
-    cpy = trits_drop(cpy, MAM2_PSK_SIZE);
-    if ((ret = mam_pre_shared_key_t_set_add(psks, &psk)) != RC_OK) {
+    trits_copy(trits_take(cpy, MAM2_PSK_KEY_SIZE),
+               trits_from_rep(MAM2_PSK_KEY_SIZE, psk.key));
+    cpy = trits_drop(cpy, MAM2_PSK_KEY_SIZE);
+    if ((ret = mam_psk_t_set_add(psks, &psk)) != RC_OK) {
       break;
     }
   }

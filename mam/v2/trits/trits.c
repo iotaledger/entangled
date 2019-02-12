@@ -135,6 +135,7 @@ trint3_t trits_get3(trits_t x) {
 
 void trits_put3(trits_t x, trint3_t t) {
   trint1_t t0, t1, t2;
+  MAM2_ASSERT(-13 <= t && t <= 13);
   MAM2_ASSERT(trits_size(x) >= 3);
 
   t0 = MAM2_MODS(t, 3 * 3 * 3, 3);
@@ -159,6 +160,7 @@ trint6_t trits_get6(trits_t x) {
 
 void trits_put6(trits_t x, trint6_t t) {
   trint3_t t0, t1;
+  MAM2_ASSERT(-364 <= t && t <= 364);
   MAM2_ASSERT(trits_size(x) >= 6);
 
   t0 = MAM2_MODS(t, 27 * 27, 27);
@@ -181,6 +183,7 @@ trint9_t trits_get9(trits_t x) {
 
 void trits_put9(trits_t x, trint9_t t) {
   trint3_t t0, t1, t2;
+  MAM2_ASSERT(-9841 <= t && t <= 9841);
   MAM2_ASSERT(trits_size(x) >= 9);
 
   t0 = MAM2_MODS(t, 27 * 27 * 27, 27);
