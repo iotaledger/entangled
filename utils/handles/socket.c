@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "sockets.h"
+#include "socket.h"
 
 int open_client_socket(char const *const hostname, const size_t port) {
   struct addrinfo hints, *serverinfo, *info;
@@ -43,18 +43,4 @@ int open_client_socket(char const *const hostname, const size_t port) {
   freeaddrinfo(serverinfo);
   // Return socket fd - 0 or greater
   return sockfd;
-}
-
-void close_socket(int sockfd) {
-  if (sockfd != -1) {
-    close(sockfd);
-  }
-}
-
-int receive_on_socket_wait(int sockfd, void *buffer, size_t len) {
-  return recv(sockfd, buffer, len, 0);
-}
-
-int send_on_socket_wait(int sockfd, const void *buffer, size_t len) {
-  return send(sockfd, buffer, len, 0);
 }

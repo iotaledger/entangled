@@ -16,27 +16,25 @@
 #include "mam/v2/trits/trits.h"
 
 #define MAM2_PSK_ID_SIZE 81
-#define MAM2_PSK_SIZE 243
+#define MAM2_PSK_KEY_SIZE 243
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 // Preshared key
-typedef struct mam_pre_shared_key_s {
+typedef struct mam_psk_s {
   trit_t id[MAM2_PSK_ID_SIZE];
-  trit_t pre_shared_key[MAM2_PSK_SIZE];
-} mam_pre_shared_key_t;
+  trit_t key[MAM2_PSK_KEY_SIZE];
+} mam_psk_t;
 
-typedef struct mam_pre_shared_key_t_set_entry_s
-    mam_pre_shared_key_t_set_entry_t;
-typedef mam_pre_shared_key_t_set_entry_t* mam_pre_shared_key_t_set_t;
+typedef struct mam_psk_t_set_entry_s mam_psk_t_set_entry_t;
+typedef mam_psk_t_set_entry_t* mam_psk_t_set_t;
 
-size_t mam_psks_serialized_size(mam_pre_shared_key_t_set_t const psks);
-retcode_t mam_psks_serialize(mam_pre_shared_key_t_set_t const psks,
-                             trits_t trits);
+size_t mam_psks_serialized_size(mam_psk_t_set_t const psks);
+retcode_t mam_psks_serialize(mam_psk_t_set_t const psks, trits_t trits);
 retcode_t mam_psks_deserialize(trits_t const trits,
-                               mam_pre_shared_key_t_set_t* const psks);
+                               mam_psk_t_set_t* const psks);
 
 #ifdef __cplusplus
 }
