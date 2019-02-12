@@ -35,14 +35,12 @@
 // TODO - Test functions should take set of prng_t instead of raw ptrs
 
 static trits_t mam_test_generic_send_msg(
-    mam_psk_t *prng, mam_psk_t const *const pska, mam_psk_t const *const pskb,
+    mam_prng_t *prng, mam_psk_t const *const pska, mam_psk_t const *const pskb,
     mam_ntru_pk_t const *const ntru_pk, mam_msg_pubkey_t pubkey,
     mam_msg_keyload_t keyload, mam_msg_checksum_t checksum,
     mam_channel_t *const cha, mam_endpoint_t *const epa,
     mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
     mam_send_msg_context_t *const cfg_msga) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
-
   trits_t msg = trits_null();
 
   {
@@ -95,8 +93,6 @@ static trits_t mam_test_generic_send_first_packet(
     mam_channel_t *const cha, mam_endpoint_t *const epa,
     mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
     mam_send_msg_context_t const *const cfg_msg_send, char const *payload_str) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
-
   trits_t packet = trits_null(), payload = trits_null();
   mam_send_packet_context_t cfg_packet_send[1];
 
@@ -263,7 +259,6 @@ static void mam_test_generic(mam_prng_t *prng_sender,
 
   trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
 
-  mss_mt_height_t d = TEST_MSS_DEPTH;
   mam_channel_t *cha = NULL, *ch1a = NULL;
   mam_endpoint_t *epa = NULL, *ep1a = NULL;
 
