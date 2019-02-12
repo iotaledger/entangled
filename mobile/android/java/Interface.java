@@ -7,4 +7,5 @@ public class Interface {
     public static native byte[] iota_sign_address_gen_trits(byte[] seed, int index, int security);
     public static native String iota_sign_signature_gen_trytes(String seed, int index, int security, String bundleHash);
     public static native byte[] iota_sign_signature_gen_trits(byte[] seed, int index, int security, byte[] bundleHash);
+    public static native String iota_digest(String trytes);
 }

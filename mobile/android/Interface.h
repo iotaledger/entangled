@@ -61,6 +61,14 @@ JNIEXPORT jbyteArray JNICALL
 Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trits(
     JNIEnv *, jclass, jbyteArray, jint, jint, jbyteArray);
 
+/*
+ * Class:     org_iota_mobile_Interface
+ * Method:    iota_digest
+ * Signature: (Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_iota_mobile_Interface_iota_1digest(
+    JNIEnv *env, jclass thiz, jstring jtrytes);
+
 #ifdef __cplusplus
 }
 #endif
