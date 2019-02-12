@@ -31,12 +31,12 @@ typedef enum UNIVERSAL_SIGNAL_NUM {
   ctrl_c
 } universal_signal_num_t;
 
+#define SIGNAL_ERROR SIG_ERR
+
 #if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
     (defined(__APPLE__) && defined(__MACH__))
 
 #include <unistd.h>
-#define CTRL_C_SIGNAL SIGINT
-#define SIGNAL_ERROR SIG_ERR
 
 /*
  * Call regiter_signal with assigned signal_handler, then the signal handler can
@@ -55,17 +55,11 @@ static inline __sighandler_t register_signal(
 
 #elif defined(_WIN32)
 
-#include <Windows.h>
+typedef void (*SignalHandlerPointer)(int);
 
-#define CTRL_C_SIGNAL CTRL_C_EVENT
-#define SIGNAL_SUCCESS TRUE
-#define SIGNAL_ERROR FALSE
-
-BOOL signal_handler_WIN(DWORD dwCtrlType);
-
-static inline __sighandler_t register_signal(
-    universal_signal_num_t sig, void (*register_signal_handler)()) {
-  return SetConsoleCtrlHandler(signal_handler_WIN, TRUE);
+SignalHandlerPointer register_signal(universal_signal_num_t sig,
+                                     void (*register_signal_handler)()) {
+  return signal((int)sig, register_signal_handler);
 }
 
 #else
