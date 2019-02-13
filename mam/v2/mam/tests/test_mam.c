@@ -61,17 +61,17 @@ static trits_t mam_test_generic_send_msg(
       cfg->ep1 = ep1a;
     }
 
-    cfg->pre_shared_keys = NULL;
-    cfg->ntru_public_keys = NULL;
+    cfg->psks = NULL;
+    cfg->ntru_pks = NULL;
     if (mam_msg_keyload_psk == keyload) {
-      mam_psk_t_set_add(&cfg->pre_shared_keys, pska);
-      mam_psk_t_set_add(&cfg->pre_shared_keys, pskb);
+      mam_psk_t_set_add(&cfg->psks, pska);
+      mam_psk_t_set_add(&cfg->psks, pskb);
     } else if (mam_msg_keyload_ntru == keyload) {
-      mam_ntru_pk_t_set_add(&cfg->ntru_public_keys, ntru_pk);
+      mam_ntru_pk_t_set_add(&cfg->ntru_pks, ntru_pk);
     }
 
-    trits_from_str(mam_send_msg_cfg_msgid(cfg), "SENDERMSGIDAAAAASENDERMSGID");
-    cfg->msgtypeid = 0;
+    trits_from_str(mam_send_msg_cfg_msg_id(cfg), "SENDERMSGIDAAAAASENDERMSGID");
+    cfg->msg_type_id = 0;
   }
 
   size_t sz;
@@ -82,8 +82,8 @@ static trits_t mam_test_generic_send_msg(
   mam_send_msg(cfg_msga, &msg);
   TEST_ASSERT(trits_is_empty(msg));
   msg = trits_pickup(msg, sz);
-  mam_psk_t_set_free(&cfg_msga->pre_shared_keys);
-  mam_ntru_pk_t_set_free(&cfg_msga->ntru_public_keys);
+  mam_psk_t_set_free(&cfg_msga->psks);
+  mam_ntru_pk_t_set_free(&cfg_msga->ntru_pks);
 
   return msg;
 }
@@ -155,9 +155,9 @@ static void mam_test_generic_receive_msg(
   e = mam_recv_msg(cfg_msg_recv, msg);
   TEST_ASSERT(RC_OK == e);
   TEST_ASSERT(trits_is_empty(*msg));
-  MAM2_ASSERT(trits_cmp_eq_str(mam_recv_msg_cfg_msgid(cfg_msg_recv),
+  MAM2_ASSERT(trits_cmp_eq_str(mam_recv_msg_cfg_msg_id(cfg_msg_recv),
                                "SENDERMSGIDAAAAASENDERMSGID"));
-  MAM2_ASSERT(cfg_msg_recv->msgtypeid == 0);
+  MAM2_ASSERT(cfg_msg_recv->msg_type_id == 0);
 
   cfg_msg_recv->ntru = NULL;
 }

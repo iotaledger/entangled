@@ -115,7 +115,7 @@ typedef enum mam_msg_checksum_e {
   mam_msg_checksum_mssig = 2,
 } mam_msg_checksum_t;
 
-#define MAM2_HEADER_MSGID_SIZE 81
+#define MAM2_HEADER_MSG_ID_SIZE 81
 
 typedef struct mam_send_msg_context_s {
   mam_spongos_t spongos[1]; /*!< Main Spongos interface to wrap PB3 messages. */
@@ -125,12 +125,12 @@ typedef struct mam_send_msg_context_s {
   mam_channel_t *ch1;                   /*!< New channel (may be null). */
   mam_endpoint_t *ep;                   /*!< Current endpoint (may be null). */
   mam_endpoint_t *ep1;                  /*!< New endpoint (may be null). */
-  trit_t msgid[MAM2_HEADER_MSGID_SIZE]; /*!< Message id / nonce, must be unique
-                                           for each key. */
-  trint9_t msgtypeid;
-  mam_psk_t_set_t pre_shared_keys; /*!< Encrypt message for these psks. */
+  trit_t msg_id[MAM2_HEADER_MSG_ID_SIZE]; /*!< Message id / nonce, must be
+                                           unique for each key. */
+  trint9_t msg_type_id;
+  mam_psk_t_set_t psks; /*!< Encrypt message for these psks. */
   mam_ntru_pk_t_set_t
-      ntru_public_keys; /*!< Encrypt message for these NTRU public keys. */
+      ntru_pks; /*!< Encrypt message for these NTRU public keys. */
 } mam_send_msg_context_t;
 
 size_t mam_send_msg_size(mam_send_msg_context_t *cfg);
@@ -161,8 +161,8 @@ typedef struct mam_recv_msg_context_s {
   mam_spongos_t spongos_wots[1]; /*!< Sponge interface used by WOTS layer */
   /*TODO: check for trusted chid/epid*/
   /*TODO: handle (add to trusted list) new chid1*/
-  trit_t msgid[MAM2_HEADER_MSGID_SIZE];
-  trint9_t msgtypeid;
+  trit_t msg_id[MAM2_HEADER_MSG_ID_SIZE];
+  trint9_t msg_type_id;
   mam_psk_t *psk;      /*!< PSK to decrypt message. */
   mam_ntru_sk_t *ntru; /*!< NTRU sk to decrypt message. */
 } mam_recv_msg_context_t;
@@ -184,13 +184,13 @@ trits_t mam_send_msg_cfg_chid(mam_send_msg_context_t const *const cfg);
 trits_t mam_send_msg_cfg_chid1(mam_send_msg_context_t const *const cfg);
 trits_t mam_send_msg_cfg_epid(mam_send_msg_context_t const *const cfg);
 trits_t mam_send_msg_cfg_epid1(mam_send_msg_context_t const *const cfg);
-trits_t mam_send_msg_cfg_msgid(mam_send_msg_context_t const *const cfg);
+trits_t mam_send_msg_cfg_msg_id(mam_send_msg_context_t const *const cfg);
 
 trits_t mam_recv_msg_cfg_chid(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_chid1(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_epid(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_epid1(mam_recv_msg_context_t const *const cfg);
-trits_t mam_recv_msg_cfg_msgid(mam_recv_msg_context_t const *const cfg);
+trits_t mam_recv_msg_cfg_msg_id(mam_recv_msg_context_t const *const cfg);
 
 #ifdef __cplusplus
 }
