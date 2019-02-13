@@ -55,8 +55,10 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short const offset,
     return PEARL_DIVER_ERROR;
   }
 
-  SearchInstance *inst = calloc(n_procs, sizeof(SearchInstance));
-  thread_handle_t *tid = calloc(n_procs, sizeof(thread_handle_t));
+  SearchInstance *inst =
+      (SearchInstance *)calloc(n_procs, sizeof(SearchInstance));
+  thread_handle_t *tid =
+      (thread_handle_t *)calloc(n_procs, sizeof(thread_handle_t));
 
   {
     PCurl curl;

@@ -17,7 +17,7 @@ retcode_t hash{SIZE}_set_add(hash{SIZE}_set_t *const set,
   hash{SIZE}_set_entry_t *entry = NULL;
 
   if (!hash{SIZE}_set_contains(set, hash)) {
-    if ((entry = malloc(sizeof(hash{SIZE}_set_entry_t))) == NULL) {
+    if ((entry = (hash{SIZE}_set_entry_t *)malloc(sizeof(hash{SIZE}_set_entry_t))) == NULL) {
       return RC_UTILS_OOM;
     }
     memcpy(entry->hash, hash, FLEX_TRIT_SIZE_{SIZE});
