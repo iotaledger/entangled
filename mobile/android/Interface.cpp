@@ -134,7 +134,7 @@ Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trits(
  * Signature: (Ljava/lang/String;IILjava/lang/String;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_trytes(
+Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trytes(
     JNIEnv* env, jclass thiz, jstring jseed, jint index, jint security,
     jstring jBundleHash) {
   const char* seed = env->GetStringUTFChars(jseed, 0);
