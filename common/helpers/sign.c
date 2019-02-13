@@ -31,11 +31,11 @@ IOTA_EXPORT trit_t* iota_sign_address_gen_trits(trit_t const* const seed,
     return NULL;
   }
 
-  if ((key = calloc(key_length, sizeof(trit_t))) == NULL) {
+  if ((key = (trit_t*)calloc(key_length, sizeof(trit_t))) == NULL) {
     return NULL;
   }
 
-  if ((address = calloc(HASH_LENGTH_TRIT, sizeof(trit_t))) == NULL) {
+  if ((address = (trit_t*)calloc(HASH_LENGTH_TRIT, sizeof(trit_t))) == NULL) {
     free(key);
     return NULL;
   }
@@ -65,7 +65,8 @@ IOTA_EXPORT char* iota_sign_address_gen_trytes(char const* const seed,
     return NULL;
   }
 
-  if ((address = calloc(HASH_LENGTH_TRYTE + 1, sizeof(tryte_t))) == NULL) {
+  if ((address = (char*)calloc(HASH_LENGTH_TRYTE + 1, sizeof(tryte_t))) ==
+      NULL) {
     return NULL;
   }
 
@@ -92,7 +93,8 @@ IOTA_EXPORT flex_trit_t* iota_sign_address_gen_flex_trits(
     return NULL;
   }
 
-  if ((address = calloc(FLEX_TRIT_SIZE_243, sizeof(flex_trit_t))) == NULL) {
+  if ((address = (flex_trit_t*)calloc(FLEX_TRIT_SIZE_243,
+                                      sizeof(flex_trit_t))) == NULL) {
     return NULL;
   }
 
@@ -123,7 +125,7 @@ IOTA_EXPORT trit_t* iota_sign_signature_gen_trits(
     return NULL;
   }
 
-  if ((key = calloc(key_length, sizeof(trit_t))) == NULL) {
+  if ((key = (trit_t*)calloc(key_length, sizeof(trit_t))) == NULL) {
     return NULL;
   }
 
@@ -151,8 +153,8 @@ IOTA_EXPORT char* iota_sign_signature_gen_trytes(
     return NULL;
   }
 
-  if ((signature = calloc(signature_length / RADIX + 1, sizeof(tryte_t))) ==
-      NULL) {
+  if ((signature = (tryte_t*)calloc(signature_length / RADIX + 1,
+                                    sizeof(tryte_t))) == NULL) {
     return NULL;
   }
 
@@ -184,8 +186,9 @@ IOTA_EXPORT flex_trit_t* iota_sign_signature_gen_flex_trits(
     return NULL;
   }
 
-  if ((signature = calloc(NUM_FLEX_TRITS_FOR_TRITS(signature_length),
-                          sizeof(flex_trit_t))) == NULL) {
+  if ((signature = (flex_trit_t*)calloc(
+           NUM_FLEX_TRITS_FOR_TRITS(signature_length), sizeof(flex_trit_t))) ==
+      NULL) {
     return NULL;
   }
 
