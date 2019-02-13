@@ -19,14 +19,11 @@
 #include "mam/v2/ntru/ntru_types.h"
 #include "mam/v2/prng/prng_types.h"
 
-#define MAM_API_VERSION 0
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct mam_api_s {
-  tryte_t version;
   mam_prng_t prng;
   mam_ntru_sk_t_set_t ntru_sks;
   mam_ntru_pk_t_set_t ntru_pks;

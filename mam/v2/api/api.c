@@ -17,7 +17,6 @@
 retcode_t mam_api_init(mam_api_t *const api, trits_t const prng_secret_key) {
   retcode_t ret = RC_OK;
 
-  api->version = MAM_API_VERSION;
   if ((ret = mam_prng_init(&api->prng, prng_secret_key)) != RC_OK) {
     return ret;
   }
