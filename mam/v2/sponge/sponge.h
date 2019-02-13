@@ -56,7 +56,6 @@ extern "C" {
  * @field state sponge state
  */
 typedef struct sponge_s {
-  trit_t stack[MAM2_SPONGE_WIDTH];
   trit_t state[MAM2_SPONGE_WIDTH];
 } mam_sponge_t;
 
