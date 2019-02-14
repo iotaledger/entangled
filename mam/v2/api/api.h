@@ -30,7 +30,7 @@ typedef struct mam_api_s {
   mam_psk_t_set_t psks;
 } mam_api_t;
 
-retcode_t mam_api_init(mam_api_t *const api, trits_t const prng_secret_key);
+retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed);
 
 retcode_t mam_api_destroy(mam_api_t *const api);
 
@@ -42,11 +42,11 @@ retcode_t mam_api_add_ntru_pk(mam_api_t *const api,
 
 retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk);
 
-retcode_t mam_api_bundle_write_msg(
-    mam_api_t *const api, mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
-    mam_msg_checksum_t checksum, mam_channel_t const *const cha,
-    mam_endpoint_t const *const epa, mam_channel_t const *const ch1a,
-    mam_endpoint_t const *const ep1a, flex_trit_t const *const payload,
+retcode_t mam_api_bundle_write_header(
+    mam_api_t *const api, mam_channel_t const *const ch,
+    mam_endpoint_t const *const ep, mam_channel_t const *const ch1,
+    mam_endpoint_t const *const ep1, mam_psk_t_set_t psks,
+    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle);
 
 retcode_t mam_api_bundle_write_packet(

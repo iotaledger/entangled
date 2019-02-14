@@ -119,12 +119,12 @@ typedef enum mam_msg_checksum_e {
 
 typedef struct mam_send_msg_context_s {
   mam_spongos_t spongos[1]; /*!< Main Spongos interface to wrap PB3 messages. */
-  mam_prng_t *prng;  /*!< Shared deterministic PRNG instance to gen MSS keys. */
-  mam_prng_t *rng;   /*!< Volatile PRNG instance to generate ephemeral keys. */
-  mam_channel_t *ch; /*!< Current channel. */
-  mam_channel_t *ch1;                   /*!< New channel (may be null). */
-  mam_endpoint_t *ep;                   /*!< Current endpoint (may be null). */
-  mam_endpoint_t *ep1;                  /*!< New endpoint (may be null). */
+  mam_prng_t *prng; /*!< Shared deterministic PRNG instance to gen MSS keys. */
+  mam_prng_t *rng;  /*!< Volatile PRNG instance to generate ephemeral keys. */
+  mam_channel_t const *ch;   /*!< Current channel. */
+  mam_channel_t const *ch1;  /*!< New channel (may be null). */
+  mam_endpoint_t const *ep;  /*!< Current endpoint (may be null). */
+  mam_endpoint_t const *ep1; /*!< New endpoint (may be null). */
   trit_t msg_id[MAM2_HEADER_MSG_ID_SIZE]; /*!< Message id / nonce, must be
                                            unique for each key. */
   trint9_t msg_type_id;

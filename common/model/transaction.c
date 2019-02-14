@@ -235,8 +235,6 @@ size_t transaction_serialize_to_flex_trits(
 // Reset all transaction fields
 void transaction_reset(iota_transaction_t *const transaction) {
   memset(transaction, 0, sizeof(iota_transaction_t));
-  memset(transaction->data.signature_or_message, FLEX_TRIT_NULL_VALUE,
-         sizeof(transaction->data.signature_or_message));
   memset(transaction->essence.address, FLEX_TRIT_NULL_VALUE,
          sizeof(transaction->essence.address));
   memset(transaction->essence.obsolete_tag, FLEX_TRIT_NULL_VALUE,
@@ -247,12 +245,14 @@ void transaction_reset(iota_transaction_t *const transaction) {
          sizeof(transaction->attachment.trunk));
   memset(transaction->attachment.branch, FLEX_TRIT_NULL_VALUE,
          sizeof(transaction->attachment.branch));
-  memset(transaction->attachment.tag, FLEX_TRIT_NULL_VALUE,
-         sizeof(transaction->attachment.tag));
   memset(transaction->attachment.nonce, FLEX_TRIT_NULL_VALUE,
          sizeof(transaction->attachment.nonce));
+  memset(transaction->attachment.tag, FLEX_TRIT_NULL_VALUE,
+         sizeof(transaction->attachment.tag));
   memset(transaction->consensus.hash, FLEX_TRIT_NULL_VALUE,
          sizeof(transaction->consensus.hash));
+  memset(transaction->data.signature_or_message, FLEX_TRIT_NULL_VALUE,
+         sizeof(transaction->data.signature_or_message));
 }
 
 uint8_t transaction_weight_magnitude(
