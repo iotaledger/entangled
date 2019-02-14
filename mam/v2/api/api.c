@@ -119,19 +119,36 @@ retcode_t mam_api_bundle_write_header(
   }
 
   // TODO Add to pending states
+  // Init ord to 0
+  // copy spongos there
 
   trits_free(header);
 
   return RC_OK;
 }
 
-retcode_t mam_api_bundle_write_packet(
-    mam_api_t *const api, mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
-    mam_msg_checksum_t checksum, mam_channel_t const *const cha,
-    mam_endpoint_t const *const epa, mam_channel_t const *const ch1a,
-    mam_endpoint_t const *const ep1a, flex_trit_t const *const payload,
-    bundle_transactions_t *const bundle) {
-  return RC_MAM2_NOT_IMPLEMENTED;
+retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
+                                      tryte_t const *const payload,
+                                      mam_msg_checksum_t checksum,
+                                      bundle_transactions_t *const bundle) {
+  mam_send_packet_context_t packet_ctx;
+
+  // TODO check if bundle contains header
+
+  // TODO fetch pending state from msgID
+  // TODO copy or get spongos state
+
+  // TODO get from state
+  packet_ctx.ord = 0;
+  packet_ctx.checksum = checksum;
+  // TODO get from state
+  packet_ctx.mss = NULL;
+
+  // TODO increment ord
+
+  // TODO if last remove pending state
+
+  return RC_OK;
 }
 
 retcode_t mam_api_bundle_read(mam_api_t *const api,

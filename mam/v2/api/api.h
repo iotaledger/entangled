@@ -49,12 +49,10 @@ retcode_t mam_api_bundle_write_header(
     mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle);
 
-retcode_t mam_api_bundle_write_packet(
-    mam_api_t *const api, mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
-    mam_msg_checksum_t checksum, mam_channel_t const *const cha,
-    mam_endpoint_t const *const epa, mam_channel_t const *const ch1a,
-    mam_endpoint_t const *const ep1a, flex_trit_t const *const payload,
-    bundle_transactions_t *const bundle);
+retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
+                                      tryte_t const *const payload,
+                                      mam_msg_checksum_t checksum,
+                                      bundle_transactions_t *const bundle);
 
 retcode_t mam_api_bundle_read(mam_api_t *const api,
                               mam_channel_t const *const cha,
