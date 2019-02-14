@@ -16,7 +16,7 @@ retcode_t {TYPE}_set_add({TYPE}_set_t *const set,
   {TYPE}_set_entry_t *entry = NULL;
 
   if (!{TYPE}_set_contains(set, value)) {
-    if ((entry = malloc(sizeof({TYPE}_set_entry_t))) == NULL) {
+    if ((entry = ({TYPE}_set_entry_t *)malloc(sizeof({TYPE}_set_entry_t))) == NULL) {
       return RC_UTILS_OOM;
     }
     memcpy(&entry->value, value, sizeof({TYPE}));

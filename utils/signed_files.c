@@ -111,16 +111,16 @@ static retcode_t digest_file(char const *const filename,
   while ((read = getline(&line, &len, fp)) > 0) {
     line[--read] = '\0';
     // 2 trytes by ASCII character
-    if ((trytes = realloc(trytes, read * 2)) == NULL) {
+    if ((trytes = (tryte_t *)realloc(trytes, read * 2)) == NULL) {
       ret = RC_UTILS_OOM;
       goto done;
     }
     ascii_to_trytes(line, trytes);
     // 3 trits by tryte and size needs to be a multiple of HASH_LENGTH_TRIT
     // (kerl)
-    if ((trits = realloc(trits, HASH_LENGTH_TRIT *
-                                    (((read * 6) / HASH_LENGTH_TRIT) + 1))) ==
-        NULL) {
+    if ((trits = (trit_t *)realloc(
+             trits, HASH_LENGTH_TRIT *
+                        (((read * 6) / HASH_LENGTH_TRIT) + 1))) == NULL) {
       ret = RC_UTILS_OOM;
       goto done;
     }

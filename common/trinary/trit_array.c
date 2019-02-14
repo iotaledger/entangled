@@ -127,7 +127,7 @@ trit_array_p trit_array_new(size_t const num_trits) {
   memset(trit_array, 0, sizeof(struct _trit_array));
   trit_array->num_trits = num_trits;
   trit_array->num_bytes = trit_array_bytes_for_trits(num_trits);
-  trit_array->trits = malloc(trit_array->num_bytes);
+  trit_array->trits = (flex_trit_t *)malloc(trit_array->num_bytes);
   if (!trit_array->trits) {
     trit_array_free(trit_array);
     // errno = IOTA_OUT_OF_MEMORY

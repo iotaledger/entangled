@@ -359,7 +359,7 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
       if (normalized_hash[i] == 13) {
         // Insecure bundle. Increment Tag and recompute bundle hash.
         add_assign(first_tx_tag_trits, NUM_TRITS_TAG, 1);
-        flex_trits_from_trits(transfers[0]->tag, NUM_TRITS_TAG,
+        flex_trits_from_trits((flex_trit_t *const)transfers[0]->tag, NUM_TRITS_TAG,
                               first_tx_tag_trits, NUM_TRITS_TAG, NUM_TRITS_TAG);
         goto loop;
       }
@@ -399,7 +399,7 @@ transfer_iterator_t* transfer_iterator_new(transfer_t* transfers[],
     log_error(logger_id, "[%s:%d] Invalid transfers.\n", __func__, __LINE__);
     return NULL;
   }
-  transfer_iterator->iota_signature_gen = iota_flex_sign_signature_gen;
+  transfer_iterator->iota_signature_gen = iota_sign_signature_gen_flex_trits;
   return transfer_iterator;
 }
 

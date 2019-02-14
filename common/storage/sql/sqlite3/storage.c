@@ -1175,7 +1175,7 @@ retcode_t iota_stor_state_delta_store(
       sqlite3_connection->statements.state_delta_store;
 
   size = state_delta_serialized_size(delta);
-  if ((bytes = calloc(size, sizeof(byte_t))) == NULL) {
+  if ((bytes = (byte_t*)calloc(size, sizeof(byte_t))) == NULL) {
     ret = RC_STORAGE_OOM;
     goto done;
   }
