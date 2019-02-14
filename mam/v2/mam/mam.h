@@ -70,7 +70,7 @@ size_t mam_wrap_keyload_psk_size();
 void mam_wrap_keyload_psk(mam_spongos_t *s, trits_t *b, trits_t key, trits_t id,
                           trits_t psk);
 retcode_t mam_unwrap_keyload_psk(mam_spongos_t *s, trits_t *b, trits_t key,
-                                 bool *key_found, trits_t id, trits_t psk);
+                                 bool *key_found, mam_psk_t *p);
 
 size_t mam_wrap_keyload_ntru_size();
 
@@ -78,8 +78,8 @@ void mam_wrap_keyload_ntru(mam_spongos_t *s, trits_t *b, trits_t key,
                            trits_t pk, mam_prng_t *p, mam_spongos_t *ns,
                            trits_t N);
 retcode_t mam_unwrap_keyload_ntru(mam_spongos_t *s, trits_t *b, trits_t key,
-                                  bool *key_found, trits_t pkid,
-                                  mam_ntru_sk_t *n, mam_spongos_t *ns);
+                                  bool *key_found, mam_ntru_sk_t *n,
+                                  mam_spongos_t *ns);
 
 /* Packet */
 
@@ -119,21 +119,16 @@ typedef enum mam_msg_checksum_e {
 
 typedef struct mam_send_msg_context_s {
   mam_spongos_t spongos[1]; /*!< Main Spongos interface to wrap PB3 messages. */
-  mam_spongos_t fork[1];    /*!< Spongos interface for PB3 forks. */
-  mam_prng_t *prng; /*!< Shared deterministic PRNG instance to gen MSS keys. */
-  mam_prng_t *rng;  /*!< Volatile PRNG instance to generate ephemeral keys. */
-  mam_spongos_t spongos_ntru[1]; /*!< Spongos interface used by NTRU encr. */
-  mam_channel_t *ch;             /*!< Current channel. */
-  mam_channel_t *ch1;            /*!< New channel (may be null). */
-  mam_endpoint_t *ep;            /*!< Current endpoint (may be null). */
-  mam_endpoint_t *ep1;           /*!< New endpoint (may be null). */
-
+  mam_prng_t *prng;  /*!< Shared deterministic PRNG instance to gen MSS keys. */
+  mam_prng_t *rng;   /*!< Volatile PRNG instance to generate ephemeral keys. */
+  mam_channel_t *ch; /*!< Current channel. */
+  mam_channel_t *ch1;                   /*!< New channel (may be null). */
+  mam_endpoint_t *ep;                   /*!< Current endpoint (may be null). */
+  mam_endpoint_t *ep1;                  /*!< New endpoint (may be null). */
   trit_t msgid[MAM2_HEADER_MSGID_SIZE]; /*!< Message id / nonce, must be unique
                                            for each key. */
   trint9_t msgtypeid;
-  trit_t
-      session_key[MAM2_SPONGE_KEY_SIZE]; /*!< Trits (memory) for session key. */
-  mam_psk_t_set_t pre_shared_keys;       /*!< Encrypt message for these psks. */
+  mam_psk_t_set_t pre_shared_keys; /*!< Encrypt message for these psks. */
   mam_ntru_pk_t_set_t
       ntru_public_keys; /*!< Encrypt message for these NTRU public keys. */
 } mam_send_msg_context_t;
@@ -157,8 +152,6 @@ void mam_send_packet(mam_send_packet_context_t *cfg, trits_t payload,
 
 typedef struct mam_recv_msg_context_s {
   mam_spongos_t spongos[1]; /*!< Main Spongos interface */
-  mam_spongos_t fork[1];    /*!< Spongos interface for PB3 forks. */
-
   mam_msg_pubkey_t pubkey;
   trit_t chid[MAM2_CHANNEL_ID_SIZE];
   trit_t chid1[MAM2_CHANNEL_ID_SIZE];
@@ -166,18 +159,12 @@ typedef struct mam_recv_msg_context_s {
   trit_t epid1[MAM2_ENDPOINT_ID_SIZE];
   mam_spongos_t spongos_mss[1];  /*!< Sponge interface used by MSS layer */
   mam_spongos_t spongos_wots[1]; /*!< Sponge interface used by WOTS layer */
-  mam_spongos_t spongos_ntru[1]; /*!< Sponge interface used by NTRU layer */
-  bool ep_sig;                   /*!< Signed? */
   /*TODO: check for trusted chid/epid*/
   /*TODO: handle (add to trusted list) new chid1*/
-
   trit_t msgid[MAM2_HEADER_MSGID_SIZE];
   trint9_t msgtypeid;
-  trit_t key[MAM2_SPONGE_KEY_SIZE];  /*!< Trits (memory) for session key. */
-  trit_t psk_id[MAM2_PSK_ID_SIZE];   /*!< Buffer to read PSK id to. */
-  trit_t ntru_id[MAM2_NTRU_ID_SIZE]; /*!< Buffer to read NTRU id to. */
-  mam_psk_t *psk;                    /*!< PSK to decrypt message. */
-  mam_ntru_sk_t *ntru;               /*!< NTRU sk to decrypt message. */
+  mam_psk_t *psk;      /*!< PSK to decrypt message. */
+  mam_ntru_sk_t *ntru; /*!< NTRU sk to decrypt message. */
 } mam_recv_msg_context_t;
 
 retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *msg);
@@ -198,16 +185,12 @@ trits_t mam_send_msg_cfg_chid1(mam_send_msg_context_t const *const cfg);
 trits_t mam_send_msg_cfg_epid(mam_send_msg_context_t const *const cfg);
 trits_t mam_send_msg_cfg_epid1(mam_send_msg_context_t const *const cfg);
 trits_t mam_send_msg_cfg_msgid(mam_send_msg_context_t const *const cfg);
-trits_t mam_send_msg_cfg_session_key(mam_send_msg_context_t const *const cfg);
 
 trits_t mam_recv_msg_cfg_chid(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_chid1(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_epid(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_epid1(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_msgid(mam_recv_msg_context_t const *const cfg);
-trits_t mam_recv_msg_cfg_key(mam_recv_msg_context_t const *const cfg);
-trits_t mam_recv_msg_cfg_psk_id(mam_recv_msg_context_t const *const cfg);
-trits_t mam_recv_msg_cfg_ntru_id(mam_recv_msg_context_t const *const cfg);
 
 #ifdef __cplusplus
 }
