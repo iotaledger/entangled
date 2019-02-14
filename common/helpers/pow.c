@@ -92,7 +92,7 @@ IOTA_EXPORT retcode_t iota_pow_bundle(bundle_transactions_t *const bundle,
   tx = (iota_transaction_t *)utarray_front(bundle);
   cur_idx = tx->essence.last_index + 1;
 
-  ctrunk = trunk;
+  ctrunk = (flex_trit_t *)trunk;
 
   do {
     cur_idx--;

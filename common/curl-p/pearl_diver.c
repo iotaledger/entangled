@@ -76,7 +76,7 @@ PearlDiverStatus pd_search(Curl *const ctx, unsigned short const offset,
     if (tid[i] == 0) continue;
 
     if (found_index == -1) {
-      thread_handle_join(tid[i], (void *)&found_index);
+      thread_handle_join(tid[i], (void **)&found_index);
 
       if (found_index != -1) {
         found_thread = i;
