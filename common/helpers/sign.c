@@ -27,7 +27,7 @@ IOTA_EXPORT trit_t* iota_sign_address_gen_trits(trit_t const* const seed,
   trit_t* address = NULL;
   trit_t* key = NULL;
 
-  if (!(security > 0 && security <= 3)) {
+  if (seed == NULL || !(security > 0 && security <= 3)) {
     return NULL;
   }
 
@@ -61,7 +61,7 @@ IOTA_EXPORT char* iota_sign_address_gen_trytes(char const* const seed,
   char* address = NULL;
   trit_t* address_trits = NULL;
 
-  if (!(security > 0 && security <= 3)) {
+  if (seed == NULL || !(security > 0 && security <= 3)) {
     return NULL;
   }
 
@@ -89,7 +89,7 @@ IOTA_EXPORT flex_trit_t* iota_sign_address_gen_flex_trits(
   flex_trit_t* address = NULL;
   trit_t* address_trits = NULL;
 
-  if (!(security > 0 && security <= 3)) {
+  if (seed == NULL || !(security > 0 && security <= 3)) {
     return NULL;
   }
 
@@ -118,10 +118,11 @@ IOTA_EXPORT trit_t* iota_sign_signature_gen_trits(
     trit_t const* const bundle_hash) {
   Kerl kerl;
   trit_t subseed[HASH_LENGTH_TRIT];
+  trit_t normalized_bundle_hash[HASH_LENGTH_TRIT];
   size_t const key_length = security * ISS_KEY_LENGTH;
   trit_t* key = NULL;
 
-  if (!(security > 0 && security <= 3)) {
+  if (seed == NULL || !(security > 0 && security <= 3) || bundle_hash == NULL) {
     return NULL;
   }
 
@@ -134,7 +135,8 @@ IOTA_EXPORT trit_t* iota_sign_signature_gen_trits(
   iss_kerl_subseed(subseed, subseed, index, &kerl);
   iss_kerl_key(subseed, key, key_length, &kerl);
   memset(subseed, 0, HASH_LENGTH_TRIT * sizeof(trit_t));
-  iss_kerl_signature(key, bundle_hash, key, key_length, &kerl);
+  normalize_hash_to_trits(bundle_hash, normalized_bundle_hash);
+  iss_kerl_signature(key, normalized_bundle_hash, key, key_length, &kerl);
   kerl_reset(&kerl);
 
   return key;
@@ -149,7 +151,7 @@ IOTA_EXPORT char* iota_sign_signature_gen_trytes(
   tryte_t* signature = NULL;
   trit_t* signature_trits = NULL;
 
-  if (!(security > 0 && security <= 3)) {
+  if (seed == NULL || !(security > 0 && security <= 3) || bundle_hash == NULL) {
     return NULL;
   }
 
@@ -160,7 +162,6 @@ IOTA_EXPORT char* iota_sign_signature_gen_trytes(
 
   trytes_to_trits((tryte_t*)seed, seed_trits, HASH_LENGTH_TRYTE);
   trytes_to_trits((tryte_t*)bundle_hash, bundle_hash_trits, HASH_LENGTH_TRYTE);
-  normalize_hash_to_trits(bundle_hash_trits, bundle_hash_trits);
   if ((signature_trits = iota_sign_signature_gen_trits(
            seed_trits, index, security, bundle_hash_trits)) == NULL) {
     free(signature);
@@ -182,7 +183,7 @@ IOTA_EXPORT flex_trit_t* iota_sign_signature_gen_flex_trits(
   flex_trit_t* signature = NULL;
   trit_t* signature_trits = NULL;
 
-  if (!(security > 0 && security <= 3)) {
+  if (seed == NULL || !(security > 0 && security <= 3) || bundle_hash == NULL) {
     return NULL;
   }
 
@@ -194,7 +195,8 @@ IOTA_EXPORT flex_trit_t* iota_sign_signature_gen_flex_trits(
 
   flex_trits_to_trits(seed_trits, HASH_LENGTH_TRIT, seed, HASH_LENGTH_TRIT,
                       HASH_LENGTH_TRIT);
-  normalize_flex_hash_to_trits(bundle_hash, bundle_hash_trits);
+  flex_trits_to_trits(bundle_hash_trits, HASH_LENGTH_TRIT, bundle_hash,
+                      HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   if ((signature_trits = iota_sign_signature_gen_trits(
            seed_trits, index, security, bundle_hash_trits)) == NULL) {
     free(signature);
