@@ -13,10 +13,6 @@
 /lib/
 .ijwb/
 
-buck-out/
-.buckd/
-.buckconfig.local
-
 .idea/
 pom.xml
 *.iml
