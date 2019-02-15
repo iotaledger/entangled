@@ -52,7 +52,6 @@ cc_library(
 
 cc_library(
     name = "signal",
-    srcs = ["signal.c"],
     hdrs = ["signal.h"],
     deps = ["//utils:logger_helper"],
 )
