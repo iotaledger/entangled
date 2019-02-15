@@ -18,7 +18,7 @@
  */
 
 char *iota_statement_in_clause_build(size_t const count) {
-  char *in_clause = calloc(2 * count + 1, 1);
+  char *in_clause = (char *)calloc(2 * count + 1, 1);
   size_t offset = 0;
 
   if (count != 0) {
@@ -177,7 +177,7 @@ char *iota_statement_transaction_find_build(size_t const bundles_count,
   size_t statement_size = iota_statement_transaction_find_size +
                           2 * bundles_count + 2 * addresses_count +
                           2 * tags_count + 4 * approvees_count;
-  char *statement = malloc(statement_size);
+  char *statement = (char *)malloc(statement_size);
 
   char *bundles_in_clause = iota_statement_in_clause_build(bundles_count);
   char *addresses_in_clause = iota_statement_in_clause_build(addresses_count);

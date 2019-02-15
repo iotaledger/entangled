@@ -5,6 +5,7 @@ cc_library(
         "jni.h",
     ],
     hdrs = ["Interface.h"],
+    linkopts = ["-lm"],
     deps = ["//common/helpers"],
 )
 
