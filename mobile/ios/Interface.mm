@@ -15,6 +15,12 @@
 
 @implementation EntangledIOSBindings
 
++ (NSString*)iota_ios_digest:(NSString*)trytes {
+  const char* ctrytes = [trytes cStringUsingEncoding:NSUTF8StringEncoding];
+  char* digest = iota_digest(ctrytes);
+  return [NSString stringWithFormat:@"%s", digest];
+}
+
 + (NSArray*)iota_ios_pow_bundle:(NSArray*)txsTrytes
                           trunk:(NSString*)trunk
                          branch:(NSString*)branch
