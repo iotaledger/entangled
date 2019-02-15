@@ -598,10 +598,9 @@ void mam_send_msg(mam_send_context_t *ctx, mam_prng_t *prng, mam_channel_t *ch,
   trits_set_zero(session_key);
 }
 
-size_t mam_send_packet_size(mam_send_packet_context_t *cfg,
+size_t mam_send_packet_size(mam_msg_checksum_t checksum, mss_t *mss,
                             size_t payload_size) {
   size_t sz = 0;
-  MAM2_ASSERT(cfg);
   MAM2_ASSERT(0 == payload_size % 3);
   sz = 0
        /*  absorb long trint ord; */
@@ -613,16 +612,16 @@ size_t mam_send_packet_size(mam_send_packet_context_t *cfg,
        /*  absorb oneof checksum */
        + pb3_sizeof_oneof();
 
-  if (mam_msg_checksum_none == cfg->checksum) {
+  if (mam_msg_checksum_none == checksum) {
     // absorb null none = 0;
     sz += mam_wrap_checksum_none_size();
-  } else if (mam_msg_checksum_mac == cfg->checksum) {
+  } else if (mam_msg_checksum_mac == checksum) {
     //  MAC mac = 1;
     sz += mam_wrap_checksum_mac_size();
-  } else if (mam_msg_checksum_mssig == cfg->checksum) {
+  } else if (mam_msg_checksum_mssig == checksum) {
     //  MSSig mssig = 2;
-    MAM2_ASSERT(cfg->mss);
-    sz += mam_wrap_checksum_mssig_size(cfg->mss);
+    MAM2_ASSERT(mss);
+    sz += mam_wrap_checksum_mssig_size(mss);
   } else {
     /*  commit; */
     MAM2_ASSERT(0);
@@ -631,43 +630,38 @@ size_t mam_send_packet_size(mam_send_packet_context_t *cfg,
   return sz;
 }
 
-void mam_send_packet(mam_send_packet_context_t *cfg, trits_t payload,
-                     trits_t *b) {
-  mam_spongos_t *s;
-  tryte_t checksum;
-
-  MAM2_ASSERT(cfg);
+void mam_send_packet(mam_send_context_t *ctx, mam_msg_checksum_t checksum,
+                     trits_t payload, trits_t *b) {
+  MAM2_ASSERT(ctx);
   MAM2_ASSERT(b);
-  s = cfg->spongos;
 
-  MAM2_ASSERT(
-      !(trits_size(*b) < mam_send_packet_size(cfg, trits_size(payload))));
+  MAM2_ASSERT(!(trits_size(*b) <
+                mam_send_packet_size(checksum, ctx->mss, trits_size(payload))));
 
   /*  absorb long trint ord; */
-  pb3_wrap_absorb_longtrint(s, b, cfg->ord);
+  pb3_wrap_absorb_longtrint(&ctx->spongos, b, ctx->ord);
 
   /*  absorb tryte sz; */
-  pb3_wrap_absorb_size_t(s, b, trits_size(payload) / 3);
+  pb3_wrap_absorb_size_t(&ctx->spongos, b, trits_size(payload) / 3);
   /*  crypt tryte payload[sz]; */
-  pb3_wrap_crypt_ntrytes(s, b, payload);
+  pb3_wrap_crypt_ntrytes(&ctx->spongos, b, payload);
 
   /*  absorb oneof checksum */
-  checksum = (tryte_t)cfg->checksum;
-  pb3_wrap_absorb_tryte(s, b, checksum);
-  if (mam_msg_checksum_none == cfg->checksum) {
+  pb3_wrap_absorb_tryte(&ctx->spongos, b, (tryte_t)checksum);
+  if (mam_msg_checksum_none == checksum) {
     /*    absorb null none = 0; */
-    mam_wrap_checksum_none(s, b);
-  } else if (mam_msg_checksum_mac == cfg->checksum) {
+    mam_wrap_checksum_none(&ctx->spongos, b);
+  } else if (mam_msg_checksum_mac == checksum) {
     /*    MAC mac = 1; */
-    mam_wrap_checksum_mac(s, b);
-  } else if (mam_msg_checksum_mssig == cfg->checksum) {
+    mam_wrap_checksum_mac(&ctx->spongos, b);
+  } else if (mam_msg_checksum_mssig == checksum) {
     /*    MSSig mssig = 2; */
-    mam_wrap_checksum_mssig(s, b, cfg->mss);
+    mam_wrap_checksum_mssig(&ctx->spongos, b, ctx->mss);
   } else {
     MAM2_ASSERT(0);
   }
   /*  commit; */
-  mam_spongos_commit(s);
+  mam_spongos_commit(&ctx->spongos);
 }
 
 trits_t mam_recv_msg_cfg_chid(mam_recv_msg_context_t const *const cfg) {
