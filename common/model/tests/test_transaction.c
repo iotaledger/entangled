@@ -49,12 +49,94 @@ void test_reset(void) {
   transaction_free(transaction);
 }
 
+void test_read_transaction_obj(void) {
+  int64_t test_value = 123456;
+  uint64_t test_timestamp = 1477037811737;
+  uint64_t test_attachment_timestamp = 1477037821737;
+  int64_t test_current_index = 2;
+  int64_t test_last_index = 5;
+  uint64_t test_attachment_timestamp_lower = 1477037831737;
+  uint64_t test_attachment_timestamp_upper = 1477037841737;
+  uint64_t test_snapshot_index = 2345;
+  bool test_solid = true;
+  uint64_t test_arrival_timestamp = 1477037812737;
+  iota_transaction_t *transaction = transaction_new();
+
+  // write transaction values
+  transaction_set_address(transaction, TEST_ADDRESS_0);
+  transaction_set_value(transaction, test_value);
+  transaction_set_obsolete_tag(transaction, TEST_OBSOLETE_TAG);
+  transaction_set_timestamp(transaction, test_timestamp);
+  transaction_set_current_index(transaction, test_current_index);
+  transaction_set_last_index(transaction, test_last_index);
+  transaction_set_bundle(transaction, TEST_BUNDLE);
+
+  transaction_set_trunk(transaction, TEST_TRUNK);
+  transaction_set_branch(transaction, TEST_BRANCH);
+  transaction_set_attachment_timestamp(transaction, test_attachment_timestamp);
+  transaction_set_attachment_timestamp_lower(transaction,
+                                             test_attachment_timestamp_lower);
+  transaction_set_attachment_timestamp_upper(transaction,
+                                             test_attachment_timestamp_upper);
+  transaction_set_nonce(transaction, TEST_NONCE);
+  transaction_set_tag(transaction, TEST_TAG_NULL);
+
+  transaction_set_hash(transaction, TEST_HASH);
+  transaction_set_signature(transaction, TEST_SIG_1);
+
+  transaction_set_snapshot_index(transaction, test_snapshot_index);
+  transaction_set_solid(transaction, test_solid);
+  transaction_set_arrival_timestamp(transaction, test_arrival_timestamp);
+
+  // read transaction values
+  TEST_ASSERT_EQUAL_MEMORY(transaction_address(transaction), TEST_ADDRESS_0,
+                           NUM_TRYTES_ADDRESS);
+  TEST_ASSERT_EQUAL_INT(transaction_value(transaction), test_value);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_obsolete_tag(transaction),
+                           TEST_OBSOLETE_TAG, NUM_TRYTES_OBSOLETE_TAG);
+  TEST_ASSERT_EQUAL_INT(transaction_timestamp(transaction), test_timestamp);
+  TEST_ASSERT_EQUAL_INT(transaction_current_index(transaction),
+                        test_current_index);
+  TEST_ASSERT_EQUAL_INT(transaction_last_index(transaction), test_last_index);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_bundle(transaction), TEST_BUNDLE,
+                           NUM_TRYTES_BUNDLE);
+
+  TEST_ASSERT_EQUAL_MEMORY(transaction_trunk(transaction), TEST_TRUNK,
+                           NUM_TRYTES_TRUNK);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_branch(transaction), TEST_BRANCH,
+                           NUM_TRYTES_BRANCH);
+  TEST_ASSERT_EQUAL_INT(transaction_attachment_timestamp(transaction),
+                        test_attachment_timestamp);
+  TEST_ASSERT_EQUAL_INT(transaction_attachment_timestamp_lower(transaction),
+                        test_attachment_timestamp_lower);
+  TEST_ASSERT_EQUAL_INT(transaction_attachment_timestamp_upper(transaction),
+                        test_attachment_timestamp_upper);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_nonce(transaction), TEST_NONCE,
+                           NUM_TRYTES_NONCE);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_tag(transaction), TEST_TAG_NULL,
+                           NUM_TRYTES_TAG);
+
+  TEST_ASSERT_EQUAL_MEMORY(transaction_hash(transaction), TEST_HASH,
+                           NUM_TRYTES_HASH);
+  TEST_ASSERT_EQUAL_MEMORY(transaction_signature(transaction), TEST_SIG_1,
+                           NUM_TRYTES_SIGNATURE);
+
+  TEST_ASSERT_EQUAL_INT(transaction_snapshot_index(transaction),
+                        test_snapshot_index);
+  TEST_ASSERT_EQUAL_INT8(transaction_solid(transaction), test_solid);
+  TEST_ASSERT_EQUAL_INT(transaction_arrival_timestamp(transaction),
+                        test_arrival_timestamp);
+
+  transaction_free(transaction);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_deserialize_and_serialize);
   RUN_TEST(test_deserialize_and_serialize_allocated);
   RUN_TEST(test_reset);
+  RUN_TEST(test_read_transaction_obj);
 
   return UNITY_END();
 }
