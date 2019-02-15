@@ -27,22 +27,20 @@
   return [NSString stringWithFormat:@"%s", foundNonce];
 }
 
-+ (char*)iota_ios_sign_address_gen_trits:(const char*)seed
-                                   index:(const int)index
-                                security:(const int)security {
-  char* address = iota_sign_address_gen_trits(seed, index, security);
-  memset_s((void*)seed, 243, 0, 243);
-  return address;
++ (int8_t*)iota_ios_sign_address_gen_trits:(int8_t*)seed
+                                     index:(const int)index
+                                  security:(const int)security {
+  trit_t* address = iota_sign_address_gen_trits((trit_t*)seed, index, security);
+  return (int8_t*)address;
 }
 
-+ (char*)iota_ios_sign_signature_gen_trits:(const char*)seed
-                                     index:(const int)index
-                                  security:(const int)security
-                                bundleHash:(const char*)bundleHash {
-  char* signature =
-      iota_sign_signature_gen_trits(seed, index, security, bundleHash);
-  memset_s((void*)seed, 243, 0, 243);
-  return signature;
++ (int8_t*)iota_ios_sign_signature_gen_trits:(int8_t*)seed
+                                       index:(const int)index
+                                    security:(const int)security
+                                  bundleHash:(int8_t*)bundleHash {
+  trit_t* signature = iota_sign_signature_gen_trits(
+      (trit_t*)seed, index, security, (trit_t*)bundleHash);
+  return (int8_t*)signature;
 }
 
 + (NSArray*)iota_ios_pow_bundle:(NSArray*)txsTrytes
@@ -58,7 +56,6 @@
   flex_trit_t flexBranch[FLEX_TRIT_SIZE_243];
   NSMutableArray* outputTxsTrytes = [NSMutableArray array];
   NSMutableString* outputTxsTrytesSerialized = @"";
-  size_t i = 0;
 
   flex_trits_from_trytes(
       flexTrunk, NUM_TRITS_TRUNK,

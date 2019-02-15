@@ -40,28 +40,23 @@
     NSTimeInterval durationPoW = [endPoW timeIntervalSinceDate:startPoW] * 1000;
     NSLog(@"%@", [empty stringByAppendingFormat:@"%@ %f %@", @"Completed in", durationPoW, @"ms"]);
     
-    /*
     // Address
     NSLog(@"Starting Address");
     NSDate* startAddress = [NSDate date];
-    char * seedChars = [SEED cStringUsingEncoding:NSUTF8StringEncoding];
-    char * address = iota_ios_sign_address_gen(seedChars, 2, 2);
-    NSString * addressString = [NSString stringWithFormat:@"%s", address];
-    NSLog(@"Calculated address: %@ ", addressString);
+    int8_t* address = [EntangledIOSBindings iota_ios_sign_address_gen_trits:SEED_TRITS index:2 security:2];
     NSDate* endAddress = [NSDate date];
+    free(address);
     NSTimeInterval durationAddress = [endAddress timeIntervalSinceDate:startAddress] * 1000;
     NSLog(@"%@", [empty stringByAppendingFormat:@"%@ %f %@", @"Completed in", durationAddress, @"ms"]);
     
     // Signature
     NSLog(@"Starting Signature");
     NSDate* startSignature = [NSDate date];
-    char * signature = iota_ios_sign_signature_gen(seedChars, 2, 2, seedChars);
-    NSString * signatureString = [NSString stringWithFormat:@"%s", signature];
-    NSLog(@"Caluclated signature: %@ ", signatureString);
+    int8_t* signature = [EntangledIOSBindings iota_ios_sign_signature_gen_trits:SEED_TRITS index:2 security:2 bundleHash:SEED_TRITS];
     NSDate* endSignature = [NSDate date];
+    free(signature);
     NSTimeInterval durationSignature = [endSignature timeIntervalSinceDate:startSignature] * 1000;
     NSLog(@"%@", [empty stringByAppendingFormat:@"%@ %f %@", @"Completed in", durationSignature, @"ms"]);
-    */
     
     // Digest
     NSLog(@"Starting Digest");
