@@ -24,7 +24,7 @@ retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
   mam_ntru_pk_t_set_entry_t *tmp = NULL;
 
   HASH_ITER(hh, ntru_pk_set, entry, tmp) {
-    pb3_encode_ntrytes(trits_from_rep(MAM2_NTRU_PK_SIZE, entry->value.pk),
+    pb3_encode_ntrytes(trits_from_rep(MAM2_NTRU_PK_SIZE, entry->value.key),
                        &trits);
   }
 
@@ -37,7 +37,7 @@ retcode_t mam_ntru_pks_deserialize(trits_t const trits,
   mam_ntru_pk_t ntru_pk;
 
   while (!trits_is_empty(trits)) {
-    pb3_decode_ntrytes(trits_from_rep(MAM2_NTRU_PK_SIZE, ntru_pk.pk), &trits);
+    pb3_decode_ntrytes(trits_from_rep(MAM2_NTRU_PK_SIZE, ntru_pk.key), &trits);
     if ((ret = mam_ntru_pk_t_set_add(ntru_pk_set, &ntru_pk)) != RC_OK) {
       break;
     }
@@ -48,7 +48,7 @@ retcode_t mam_ntru_pks_deserialize(trits_t const trits,
 
 size_t mam_ntru_sks_serialized_size(mam_ntru_sk_t_set_t const ntru_sk_set) {
   return mam_ntru_sk_t_set_size(ntru_sk_set) *
-         (MAM2_NTRU_ID_SIZE + MAM2_NTRU_SK_SIZE);
+         (MAM2_NTRU_PK_SIZE + MAM2_NTRU_SK_SIZE);
 }
 
 retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sk_set,
@@ -57,9 +57,9 @@ retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sk_set,
   mam_ntru_sk_t_set_entry_t *tmp = NULL;
 
   HASH_ITER(hh, ntru_sk_set, entry, tmp) {
-    trits_copy(trits_from_rep(MAM2_NTRU_ID_SIZE, entry->value.public_key_id),
-               trits_take(trits, MAM2_NTRU_ID_SIZE));
-    trits = trits_drop(trits, MAM2_NTRU_ID_SIZE);
+    trits_copy(trits_from_rep(MAM2_NTRU_PK_SIZE, entry->value.public_key.key),
+               trits_take(trits, MAM2_NTRU_PK_SIZE));
+    trits = trits_drop(trits, MAM2_NTRU_PK_SIZE);
     trits_copy(trits_from_rep(MAM2_NTRU_SK_SIZE, entry->value.secret_key),
                trits_take(trits, MAM2_NTRU_SK_SIZE));
     trits = trits_drop(trits, MAM2_NTRU_SK_SIZE);
@@ -76,9 +76,9 @@ retcode_t mam_ntru_sks_deserialize(trits_t const trits,
   ntru_init(&ntru_sk);
 
   while (!trits_is_empty(cpy)) {
-    trits_copy(trits_take(cpy, MAM2_NTRU_ID_SIZE),
-               trits_from_rep(MAM2_NTRU_ID_SIZE, ntru_sk.public_key_id));
-    cpy = trits_drop(cpy, MAM2_NTRU_ID_SIZE);
+    trits_copy(trits_take(cpy, MAM2_NTRU_PK_SIZE),
+               trits_from_rep(MAM2_NTRU_PK_SIZE, ntru_sk.public_key.key));
+    cpy = trits_drop(cpy, MAM2_NTRU_PK_SIZE);
     trits_copy(trits_take(cpy, MAM2_NTRU_SK_SIZE),
                trits_from_rep(MAM2_NTRU_SK_SIZE, ntru_sk.secret_key));
     cpy = trits_drop(cpy, MAM2_NTRU_SK_SIZE);

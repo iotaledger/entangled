@@ -18,7 +18,7 @@ extern "C" {
  * effect if not needed by the underlying API
  */
 #if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
-    (defined(__APPLE__) && defined(__MACH__))
+    (defined(__APPLE__) && defined(__MACH__) || defined(__XTENSA__))
 #include <unistd.h>
 #elif defined(_WIN32)
 #include <Windows.h>

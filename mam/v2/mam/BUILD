@@ -74,7 +74,7 @@ cc_library(
     name = "mam_types",
     srcs = ["mam_types.c"],
     deps = [
-        ":mam_pre_shared_key_t_set",
+        ":mam_psk_t_set",
         ":mam_types_hdr",
         "//mam/v2:defs",
         "//mam/v2/ntru",
@@ -87,7 +87,7 @@ typed_container_generate(
     additional_include_path = "mam/v2/mam/mam_types.h",
     container_type = "set",
     parent_directory = "mam/v2/mam",
-    value_type = "mam_pre_shared_key_t",
+    value_type = "mam_psk_t",
 )
 
 typed_container_generate(

@@ -68,10 +68,11 @@ void mam_sponge_init(mam_sponge_t *const sponge) {
   trits_set_zero(sponge_state_trits(sponge));
 }
 
+// TODO mam2: replace sponge transformation function #773
 void mam_sponge_transform(mam_sponge_t *const sponge) {
-  // TODO mam2: replace sponge transformation function #773
+  trit_t stack[MAM2_SPONGE_WIDTH];
   trits_t x = trits_from_rep(MAM2_SPONGE_RATE, sponge->state);
-  trits_t y = trits_from_rep(MAM2_SPONGE_RATE, (trit_t *)sponge->stack);
+  trits_t y = trits_from_rep(MAM2_SPONGE_RATE, (trit_t *)stack);
   trits_t x0 = trits_take(x, MAM2_SPONGE_RATE / 2);
   trits_t x1 = trits_drop(x, MAM2_SPONGE_RATE / 2);
   trits_t x2 = trits_drop(trits_from_rep(MAM2_SPONGE_WIDTH, sponge->state),

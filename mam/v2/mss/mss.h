@@ -101,10 +101,9 @@ typedef struct mss_mt_stack_s {
 
 /*! \brief MSS interface used to generate public key and sign. */
 typedef struct mss_s {
-  trint6_t height;  /*!< Merkle tree height. */
-  trint18_t skn;    /*!< Current WOTS private key number. */
+  mss_mt_height_t height; /*!< Merkle tree height. */
+  mss_mt_idx_t skn;       /*!< Current WOTS private key number. */
   mam_prng_t *prng; /*!< PRNG interface used to generate WOTS private keys. */
-  mam_spongos_t sg[1]; /*!< Spongos interface used to hash Merkle tree nodes. */
 #if defined(MAM2_MSS_TRAVERSAL)
   trit_t *auth_path;      /*!< Current authentication path; `d` hash values. */
   trit_t *nodes_hashes;   /*!< Buffer storing hash-values of auxiliary nodes;
@@ -155,8 +154,8 @@ It is achieved by allocating one extra node:
  * @return void
  */
 
-void mss_init(mss_t *mss, mam_prng_t *prng, trint6_t height, trits_t nonce1,
-              trits_t nonce2);
+void mss_init(mss_t *mss, mam_prng_t *prng, mss_mt_height_t height,
+              trits_t nonce1, trits_t nonce2);
 /**
  * Generate MSS keys, stores current and next auth_path
  *
@@ -189,7 +188,7 @@ void mss_skn(
  *
  * @return void
  */
-void mss_auth_path(mss_t *mss, trint18_t skn, trits_t path);
+void mss_auth_path(mss_t *mss, mss_mt_idx_t skn, trits_t path);
 
 /**
  * Signs a hash
@@ -251,7 +250,7 @@ void mss_destroy(mss_t *mss);
  * @return size_t The size for stored MT
  */
 
-size_t mss_stored_size(mss_t const *const mss);
+size_t mss_serialized_size(mss_t const *const mss);
 
 /**
  * Serialize Merkle tree.
@@ -262,7 +261,7 @@ size_t mss_stored_size(mss_t const *const mss);
  * @return void
  */
 
-void mss_save(mss_t const *const mss, trits_t buffer);
+void mss_serialize(mss_t const *const mss, trits_t buffer);
 
 /**
  * Deerialize Merkle tree.
@@ -272,7 +271,7 @@ void mss_save(mss_t const *const mss, trits_t buffer);
  *
  * @return void
  */
-retcode_t mss_load(mss_t *mss, trits_t *buffer);
+retcode_t mss_deserialize(trits_t *buffer, mss_t *mss);
 
 #ifdef __cplusplus
 }

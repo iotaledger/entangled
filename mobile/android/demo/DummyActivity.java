@@ -20,11 +20,11 @@ public class DummyActivity extends Activity{
     String SEED = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9";
 
     Log.e("IOTA", "Starting Address");
-    String address = Interface.iota_sign_address_gen(SEED, 2, 2);
+    String address = Interface.iota_sign_address_gen_trytes(SEED, 2, 2);
     Log.e("IOTA", "Calculated address: " + address);
 
     Log.e("IOTA", "Starting Signature");
-    String signature = Interface.iota_sign_signature_gen(SEED, 2, 2, SEED);
+    String signature = Interface.iota_sign_signature_gen_trytes(SEED, 2, 2, SEED);
     Log.e("IOTA", "Seed: " + SEED);
     Log.e("IOTA", "Calculated signature: " + signature);
   }

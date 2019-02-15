@@ -25,7 +25,7 @@
 
 // Recipient's NTRU public key
 typedef struct mam_ntru_pk_s {
-  trit_t pk[MAM2_NTRU_PK_SIZE];
+  trit_t key[MAM2_NTRU_PK_SIZE];
 } mam_ntru_pk_t;
 
 typedef struct mam_ntru_pk_t_set_entry_s mam_ntru_pk_t_set_entry_t;
@@ -39,8 +39,8 @@ retcode_t mam_ntru_pks_deserialize(trits_t const trits,
 
 // NTRU layer interface
 typedef struct mam_ntru_sk_s {
-  // Key id - the first 27 trytes of the corresponding public key
-  trit_t public_key_id[MAM2_NTRU_ID_SIZE];
+  // Public key trits
+  mam_ntru_pk_t public_key;
   // Private key trits - small coefficients of polynomial f
   trit_t secret_key[MAM2_NTRU_SK_SIZE];
   // Internal representation (`poly_t`) of a private key: NTT(1+3f)
