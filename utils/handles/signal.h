@@ -30,7 +30,7 @@ static inline signal_handle_t signal_handle_register(int sig,
 
 #elif defined(unix) || defined(__unix) || defined(__unix__)
 
-typedef sighandler_t signal_handle_t;
+typedef void (*signal_handle_t)(int);
 
 static inline signal_handle_t signal_handle_register(int sig,
                                                      signal_handle_t handler) {
