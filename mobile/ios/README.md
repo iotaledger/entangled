@@ -34,3 +34,6 @@ Since you added this line to your bridging header, it is already available to al
 
 5. Check out the demo app to see how to use EntangledKit's methods
 
+#### Troubleshooting
+- If you see an error that includes something similar to `Undefined symbols for architecture x86_64:
+  "___gxx_personality_v0", referenced from:`, add `-lc++` to `Other Linker Flags` in the Build Settings of your target
