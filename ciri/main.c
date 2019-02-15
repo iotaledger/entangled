@@ -19,8 +19,8 @@
 static core_t ciri_core;
 static logger_id_t logger_id;
 
-static void signal_handler() {
-  if (ciri_core.running) {
+static void signal_handler(int sig) {
+  if (ciri_core.running && sig == SIGINT) {
     log_info(logger_id, "Stopping cIRI core\n");
     if (core_stop(&ciri_core) != RC_OK) {
       log_error(logger_id, "Stopping cIRI core failed\n");
@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
   tangle_t tangle;
   connection_config_t db_conf;
 
-  if (register_signal(ctrl_c, signal_handler) == SIGNAL_ERROR) {
+  if (signal_handle_register(SIGINT, signal_handler) == SIG_ERR) {
     return EXIT_FAILURE;
   }
 

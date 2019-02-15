@@ -9,63 +9,51 @@
 #define __UTILS_HANDLES_SIGNAL_H__
 
 /**
- * We declare a function register_signal() to handle signals while the program
- * executing. This function will catch some exceptional behavior with the
- * program.
+ * We declare a function signal_handle_register() to handle signals while the
+ * program is running
  */
 
 #include <signal.h>
-#include <stdlib.h>
-#include "utils/logger_helper.h"
 
-/*
- *  This enum is declared for consistent name of signal for cross platfrom
- * developing the naming order is followed by POSIX.1-1990 the standard signals
- * table is at http://man7.org/linux/man-pages/man7/signal.7.html
- *
- */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-typedef enum UNIVERSAL_SIGNAL_NUM {
-  null,
-  signal_hang_up,
-  ctrl_c
-} universal_signal_num_t;
+#if defined(_WIN32)
 
-#define SIGNAL_ERROR SIG_ERR
+typedef void (*signal_handle_t)(int);
 
-#if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
-    (defined(__APPLE__) && defined(__MACH__))
-
-#include <unistd.h>
-
-/*
- * Call regiter_signal with assigned signal_handler, then the signal handler can
- * work
- *
- * @para universal_signal_num_t sig: signal(interrupt) we hope to be caught
- *
- * @para void (*signal_handler)(): signal handler of each signal needs
- *
- * @return signal_error if singal_handler went wrong
- */
-static inline __sighandler_t register_signal(
-    universal_signal_num_t sig, void (*register_signal_handler)()) {
-  return signal((int)sig, register_signal_handler);
+static inline signal_handle_t signal_handle_register(int sig,
+                                                     signal_handle_t handler) {
+  return signal(sig, handler);
 }
 
-#elif defined(_WIN32)
+#elif defined(unix) || defined(__unix) || defined(__unix__)
 
-typedef void (*SignalHandlerPointer)(int);
+typedef sighandler_t signal_handle_t;
 
-SignalHandlerPointer register_signal(universal_signal_num_t sig,
-                                     void (*register_signal_handler)()) {
-  return signal((int)sig, register_signal_handler);
+static inline signal_handle_t signal_handle_register(int sig,
+                                                     signal_handle_t handler) {
+  return signal(sig, handler);
+}
+
+#elif defined(__APPLE__) || defined(__MACH__)
+
+typedef sig_t signal_handle_t;
+
+static inline signal_handle_t signal_handle_register(int sig,
+                                                     signal_handle_t handler) {
+  return signal(sig, handler);
 }
 
 #else
 
-#error "No signal process library found"
+#error "No signal primitives found"
 
-#endif  // platform validate
+#endif
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __UTILS_HANDLES_SIGNAL_H__
