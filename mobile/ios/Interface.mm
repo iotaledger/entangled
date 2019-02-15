@@ -27,6 +27,14 @@
   return [NSString stringWithFormat:@"%s", foundNonce];
 }
 
++ (char*)iota_ios_sign_address_gen_trits:(const char*)seed
+                                   index:(const int)index
+                                security:(const int)security {
+  char* address = iota_sign_address_gen_trits(seed, index, security);
+  memset_s((void*)seed, 243, 0, 243);
+  return address;
+}
+
 + (NSArray*)iota_ios_pow_bundle:(NSArray*)txsTrytes
                           trunk:(NSString*)trunk
                          branch:(NSString*)branch
