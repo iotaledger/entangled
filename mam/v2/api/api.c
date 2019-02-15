@@ -17,6 +17,11 @@
 
 retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed) {
   retcode_t ret = RC_OK;
+
+  if (api == NULL || mam_seed == NULL) {
+    return RC_NULL_PARAM;
+  }
+
   MAM2_TRITS_DEF0(mam_seed_trits, MAM2_PRNG_KEY_SIZE);
   mam_seed_trits = MAM2_TRITS_INIT(mam_seed_trits, MAM2_PRNG_KEY_SIZE);
   trits_from_str(mam_seed_trits, (char const *)mam_seed);
@@ -35,6 +40,10 @@ retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed) {
 retcode_t mam_api_destroy(mam_api_t *const api) {
   retcode_t ret = RC_OK;
 
+  if (api == NULL) {
+    return RC_NULL_PARAM;
+  }
+
   if ((ret = mam_prng_destroy(&api->prng)) != RC_OK) {
     return ret;
   }
@@ -47,15 +56,24 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
 
 retcode_t mam_api_add_ntru_sk(mam_api_t *const api,
                               mam_ntru_sk_t const *const ntru_sk) {
+  if (api == NULL || ntru_sk == NULL) {
+    return RC_NULL_PARAM;
+  }
   return mam_ntru_sk_t_set_add(&api->ntru_sks, ntru_sk);
 }
 
 retcode_t mam_api_add_ntru_pk(mam_api_t *const api,
                               mam_ntru_pk_t const *const ntru_pk) {
+  if (api == NULL || ntru_pk == NULL) {
+    return RC_NULL_PARAM;
+  }
   return mam_ntru_pk_t_set_add(&api->ntru_pks, ntru_pk);
 }
 
 retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk) {
+  if (api == NULL || psk == NULL) {
+    return RC_NULL_PARAM;
+  }
   return mam_psk_t_set_add(&api->psks, psk);
 }
 
@@ -72,7 +90,9 @@ retcode_t mam_api_bundle_write_header(
   iota_transaction_t transaction;
   size_t current_index = 0;
 
-  // TODO ch can't be null + check params ?
+  if (api == NULL || ch == NULL || bundle == NULL) {
+    return RC_NULL_PARAM;
+  }
 
   if (bundle_transactions_size(bundle) != 0) {
     return RC_MAM2_BUNDLE_NOT_EMPTY;
@@ -140,6 +160,10 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
                                       bundle_transactions_t *const bundle) {
   mam_send_packet_context_t packet_ctx;
 
+  if (api == NULL || payload == NULL || bundle == NULL) {
+    return RC_NULL_PARAM;
+  }
+
   // TODO check if bundle contains header
 
   // TODO fetch pending state from msgID
@@ -162,5 +186,8 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
                               mam_channel_t const *const cha,
                               bundle_transactions_t const *const bundle,
                               flex_trit_t *const payload) {
-  return RC_MAM2_NOT_IMPLEMENTED;
+  if (api == NULL || cha == NULL || bundle == NULL || payload == NULL) {
+    return RC_NULL_PARAM;
+  }
+  return RC_OK;
 }
