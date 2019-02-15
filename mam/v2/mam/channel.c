@@ -34,6 +34,8 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
   }
   trits_copy(channel_name, channel->name);
 
+  memset(channel->msg_ord, 0, MAM2_CHANNEL_MSG_ORD_SIZE);
+
   if ((ret = mss_create(&channel->mss, height)) != RC_OK) {
     return ret;
   }
@@ -112,6 +114,8 @@ size_t mam_channel_serialized_size(mam_channel_t const *const channel) {
          pb3_sizeof_size_t(trits_size(channel->name)) +    // name size
          pb3_sizeof_ntrytes(trits_size(channel->name) /
                             NUMBER_OF_TRITS_IN_A_TRYTE) +  // name
+         pb3_sizeof_ntrytes(MAM2_CHANNEL_MSG_ORD_SIZE /
+                            NUMBER_OF_TRITS_IN_A_TRYTE) +  // msg_ord
          pb3_sizeof_size_t(mss_size) +                     // mss size
          pb3_sizeof_ntrytes(mss_size / NUMBER_OF_TRITS_IN_A_TRYTE) +  // mss
          pb3_sizeof_ntrytes(endpoints_size /
@@ -123,9 +127,12 @@ retcode_t mam_channel_serialize(mam_channel_t const *const channel,
   size_t mss_size = mss_serialized_size(&channel->mss);
 
   pb3_encode_ntrytes(trits_from_rep(MAM2_CHANNEL_ID_SIZE, channel->id),
-                     buffer);                                   // id
-  pb3_encode_size_t(trits_size(channel->name), buffer);         // name size
-  pb3_encode_ntrytes(channel->name, buffer);                    // name
+                     buffer);                            // id
+  pb3_encode_size_t(trits_size(channel->name), buffer);  // name size
+  pb3_encode_ntrytes(channel->name, buffer);             // name
+  pb3_encode_ntrytes(
+      trits_from_rep(MAM2_CHANNEL_MSG_ORD_SIZE, channel->msg_ord),
+      buffer);                                                  // msg_ord
   pb3_encode_size_t(mss_size, buffer);                          // mss size
   mss_serialize(&channel->mss, trits_take(*buffer, mss_size));  // mss
   trits_advance(buffer, mss_size);
@@ -153,6 +160,12 @@ retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
     return RC_OOM;
   }
   if ((ret = pb3_decode_ntrytes(channel->name, buffer)) != RC_OK) {  // name
+    return ret;
+  }
+
+  if ((ret = pb3_decode_ntrytes(
+           trits_from_rep(MAM2_CHANNEL_MSG_ORD_SIZE, channel->msg_ord),
+           buffer)) != RC_OK) {  // msg_ord
     return ret;
   }
 
