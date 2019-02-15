@@ -35,6 +35,16 @@
   return address;
 }
 
++ (char*)iota_ios_sign_signature_gen_trits:(const char*)seed
+                                     index:(const int)index
+                                  security:(const int)security
+                                bundleHash:(const char*)bundleHash {
+  char* signature =
+      iota_sign_signature_gen_trits(seed, index, security, bundleHash);
+  memset_s((void*)seed, 243, 0, 243);
+  return signature;
+}
+
 + (NSArray*)iota_ios_pow_bundle:(NSArray*)txsTrytes
                           trunk:(NSString*)trunk
                          branch:(NSString*)branch
