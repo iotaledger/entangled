@@ -31,18 +31,16 @@
     NSTimeInterval durationBundlePoW = [endBundlePoW timeIntervalSinceDate:startBundlePoW] * 1000;
     NSLog(@"%@", [empty stringByAppendingFormat:@"%@ %f %@", @"Completed in", durationBundlePoW, @"ms"]);
     
-    /*
     // PoW
     NSLog(@"Starting PoW");
     NSDate* startPoW = [NSDate date];
-    char * trytesChars = [TX_TRYTES cStringUsingEncoding:NSUTF8StringEncoding];
-    char * nonce = iota_ios_pow(trytesChars, 14);
-    NSString * nonceString = [NSString stringWithFormat:@"%s", nonce];
-    NSLog(@"Received nonce: %@ ", nonceString);
+    NSString* nonce = [EntangledIOSBindings iota_ios_pow_trytes:TX_TRYTES mwm:14];
+    NSLog(@"Received nonce: %@ ", nonce);
     NSDate* endPoW = [NSDate date];
     NSTimeInterval durationPoW = [endPoW timeIntervalSinceDate:startPoW] * 1000;
     NSLog(@"%@", [empty stringByAppendingFormat:@"%@ %f %@", @"Completed in", durationPoW, @"ms"]);
     
+    /*
     // Address
     NSLog(@"Starting Address");
     NSDate* startAddress = [NSDate date];

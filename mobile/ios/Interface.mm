@@ -21,6 +21,12 @@
   return [NSString stringWithFormat:@"%s", digest];
 }
 
++ (NSString*)iota_ios_pow_trytes:(NSString*)trytes mwm:(int)mwm {
+  const char* ctrytes = [trytes cStringUsingEncoding:NSUTF8StringEncoding];
+  char* foundNonce = iota_pow_trytes(ctrytes, mwm);
+  return [NSString stringWithFormat:@"%s", foundNonce];
+}
+
 + (NSArray*)iota_ios_pow_bundle:(NSArray*)txsTrytes
                           trunk:(NSString*)trunk
                          branch:(NSString*)branch

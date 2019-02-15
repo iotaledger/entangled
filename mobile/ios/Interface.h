@@ -15,7 +15,7 @@
 @interface EntangledIOSBindings : NSObject
 
 + (NSString*)iota_ios_digest:(NSString*)trytes;
-+ (char*)iota_ios_pow_trytes:(const char*)trytes mwm:(int)mwm;
++ (NSString*)iota_ios_pow_trytes:(NSString*)trytes mwm:(int)mwm;
 + (char*)iota_ios_sign_address_gen_trits:(const char*)seed
                                    index:(const int)index
                                 security:(const int)security;
