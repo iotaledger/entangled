@@ -18,7 +18,7 @@ static tryte_t SENDER_SEED[81] =
     "ERSEED9";
 #define TEST_CHANNEL_NAME "CHANAME"
 #define TEST_MSS_DEPTH 1
-#define HOST "iri04.mainnet.iota.cafe"
+#define HOST "173.249.44.234"
 #define PORT 14265
 
 // TODO Merge into cclient
@@ -49,7 +49,7 @@ static void send_bundle(bundle_transactions_t *const bundle) {
     transaction_serialize_on_flex_trits(curr_tx, trits_8019);
     hash_array_push(raw_trytes, trits_8019);
   }
-  iota_client_send_trytes(&serv, raw_trytes, 6, 14, NULL, true, out_tx_objs);
+  iota_client_send_trytes(&serv, raw_trytes, 1, 14, NULL, true, out_tx_objs);
   hash_array_free(raw_trytes);
   transaction_array_free(out_tx_objs);
 
