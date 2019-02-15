@@ -1,5 +1,5 @@
 //
-//  Interface.m
+//  Interface.mm
 //  EntangledKit
 //
 //
