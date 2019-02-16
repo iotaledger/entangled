@@ -30,7 +30,8 @@
 + (int8_t*)iota_ios_sign_address_gen_trits:(int8_t*)seed
                                      index:(const int)index
                                   security:(const int)security {
-  trit_t* address = iota_sign_address_gen_trits((trit_t*)seed, index, security);
+  trit_t* address = NULL;
+  address = iota_sign_address_gen_trits((trit_t*)seed, index, security);
   return (int8_t*)address;
 }
 
@@ -38,7 +39,8 @@
                                        index:(const int)index
                                     security:(const int)security
                                   bundleHash:(int8_t*)bundleHash {
-  trit_t* signature = iota_sign_signature_gen_trits(
+  trit_t* signature = NULL;
+  signature = iota_sign_signature_gen_trits(
       (trit_t*)seed, index, security, (trit_t*)bundleHash);
   return (int8_t*)signature;
 }

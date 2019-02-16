@@ -20,7 +20,6 @@
     NSString * empty = @"";
     NSLog(@"===Entangled iOS Demo===");
     
-    
     // Bundle PoW
     NSLog(@"Starting Bundle PoW");
     NSDate* startBundlePoW = [NSDate date];
@@ -43,7 +42,8 @@
     // Address
     NSLog(@"Starting Address");
     NSDate* startAddress = [NSDate date];
-    int8_t* address = [EntangledIOSBindings iota_ios_sign_address_gen_trits:SEED_TRITS index:2 security:2];
+    int8_t* address = NULL;
+    address = [EntangledIOSBindings iota_ios_sign_address_gen_trits:SEED_TRITS index:2 security:2];
     NSDate* endAddress = [NSDate date];
     free(address);
     NSTimeInterval durationAddress = [endAddress timeIntervalSinceDate:startAddress] * 1000;
@@ -52,7 +52,8 @@
     // Signature
     NSLog(@"Starting Signature");
     NSDate* startSignature = [NSDate date];
-    int8_t* signature = [EntangledIOSBindings iota_ios_sign_signature_gen_trits:SEED_TRITS index:2 security:2 bundleHash:SEED_TRITS];
+    int8_t* signature = NULL;
+    signature = [EntangledIOSBindings iota_ios_sign_signature_gen_trits:SEED_TRITS index:2 security:2 bundleHash:SEED_TRITS];
     NSDate* endSignature = [NSDate date];
     free(signature);
     NSTimeInterval durationSignature = [endSignature timeIntervalSinceDate:startSignature] * 1000;
