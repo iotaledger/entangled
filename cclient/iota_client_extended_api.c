@@ -136,11 +136,13 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
         // unexpected current index
         ret_code = RC_CCLIENT_INVALID_BUNDLE;
         log_error(logger_id, "%s unexpected current_index\n", __func__);
+        goto cleanup;
       }
       // checking consistency of bundle hash
       if (memcmp(bundle_hash, transaction_bundle(&tx), FLEX_TRIT_SIZE_243)) {
         ret_code = RC_CCLIENT_INVALID_BUNDLE;
         log_error(logger_id, "%s inconsistent bundle hash\n", __func__);
+        goto cleanup;
       }
     }
 
