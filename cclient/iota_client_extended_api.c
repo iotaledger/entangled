@@ -65,8 +65,8 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
   get_trytes_res_t* get_trytes_res = NULL;
   iota_transaction_t tx = {};
   flex_trit_t* tmp_trytes = NULL;
-  flex_trit_t trunk_hash[FLEX_TRIT_SIZE_243];
-  int64_t current_index = 0, last_index = 0;
+  flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
+  int64_t current_index = 0, last_index = 0, next_index = 0;
   bool is_tail = true;
 
   log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -86,9 +86,8 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
   }
 
   do {
-    memcpy(trunk_hash, is_tail ? tail_hash : transaction_trunk(&tx),
-           FLEX_TRIT_SIZE_243);
-    ret_code = hash243_queue_push(&get_trytes_req->hashes, trunk_hash);
+    ret_code = get_trytes_req_add_hash(
+        get_trytes_req, is_tail ? tail_hash : transaction_trunk(&tx));
     if (ret_code != RC_OK) {
       log_error(logger_id, "%s hash243_queue_push failed: %s\n", __func__,
                 error_2_string(ret_code));
@@ -101,7 +100,6 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
                 error_2_string(ret_code));
       goto cleanup;
     }
-    hash243_queue_pop(&get_trytes_req->hashes);
     // Get the transaction trytes
     tmp_trytes = hash8019_queue_peek(get_trytes_res->trytes);
     if (!tmp_trytes) {
@@ -112,7 +110,8 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
     }
     // Create a transaction with the received trytes
     transaction_deserialize_from_trits(&tx, tmp_trytes, false);
-    transaction_set_hash(&tx, is_tail ? tail_hash : trunk_hash);
+    transaction_set_hash(
+        &tx, is_tail ? tail_hash : get_trytes_req_get_hash(get_trytes_req, 0));
     if (is_tail) {
       current_index = transaction_current_index(&tx);
       // Check that the first transaction we get is really a tail transaction
@@ -125,9 +124,24 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
         goto cleanup;
       }
       last_index = transaction_last_index(&tx);
+      memcpy(bundle_hash, transaction_bundle(&tx), FLEX_TRIT_SIZE_243);
       is_tail = false;
+      next_index = current_index + 1;
     } else {
       current_index = transaction_current_index(&tx);
+      // checking index order
+      if (current_index == next_index) {
+        next_index++;
+      } else {
+        // unexpected current index
+        ret_code = RC_CCLIENT_INVALID_BUNDLE;
+        log_error(logger_id, "%s unexpected current_index\n", __func__);
+      }
+      // checking consistency of bundle hash
+      if (memcmp(bundle_hash, transaction_bundle(&tx), FLEX_TRIT_SIZE_243)) {
+        ret_code = RC_CCLIENT_INVALID_BUNDLE;
+        log_error(logger_id, "%s inconsistent bundle hash\n", __func__);
+      }
     }
 
     if (trytes) {
@@ -140,6 +154,7 @@ static retcode_t traverse_bundle(iota_client_service_t const* const serv,
     }
     // The response is not needed anymore
     hash8019_queue_free(&get_trytes_res->trytes);
+    hash243_queue_pop(&get_trytes_req->hashes);
   } while (current_index != last_index);
   get_trytes_req_free(&get_trytes_req);
   get_trytes_res_free(&get_trytes_res);
