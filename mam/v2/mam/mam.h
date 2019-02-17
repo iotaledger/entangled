@@ -31,11 +31,6 @@
 extern "C" {
 #endif
 
-retcode_t mam_mss_create(mss_t *m, mam_prng_t *p, mss_mt_height_t d, trits_t N1,
-                         trits_t N2);
-
-void mam_mss_destroy(mss_t *m);
-
 trits_t mam_psk_id(mam_psk_t *p);
 trits_t mam_psk_trits(mam_psk_t *p);
 
