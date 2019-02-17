@@ -40,50 +40,45 @@ static trits_t mam_test_generic_send_msg(
     mam_msg_keyload_t keyload, mam_msg_checksum_t checksum,
     mam_channel_t *const cha, mam_endpoint_t *const epa,
     mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
-    mam_send_msg_context_t *const cfg_msga) {
+    mam_send_context_t *const send_ctx) {
   trits_t msg = trits_null();
+  mam_channel_t *ch = cha;
+  mam_endpoint_t *ep = NULL;
+  mam_channel_t *ch1 = NULL;
+  mam_endpoint_t *ep1 = NULL;
+  MAM2_TRITS_DEF0(msg_id, MAM2_HEADER_MSGID_SIZE);
+  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_HEADER_MSGID_SIZE);
+  trits_from_str(msg_id, "SENDERMSGIDAAAAASENDERMSGID");
+  trint9_t msg_type_id = 0;
+  mam_psk_t_set_t psks = NULL;
+  mam_ntru_pk_t_set_t ntru_pks = NULL;
 
-  {
-    mam_send_msg_context_t *cfg = cfg_msga;
+  if (mam_msg_pubkey_epid == pubkey) {
+    ep = epa;
+  } else if (mam_msg_pubkey_chid1 == pubkey) {
+    ch1 = ch1a;
+  } else if (mam_msg_pubkey_epid1 == pubkey) {
+    ep1 = ep1a;
+  }
 
-    cfg->prng = prng;
-    cfg->rng = prng;
-
-    cfg->ch = cha;
-    cfg->ch1 = NULL;
-    cfg->ep = NULL;
-    cfg->ep1 = NULL;
-    if (mam_msg_pubkey_epid == pubkey) {
-      cfg->ep = epa;
-    } else if (mam_msg_pubkey_chid1 == pubkey) {
-      cfg->ch1 = ch1a;
-    } else if (mam_msg_pubkey_epid1 == pubkey) {
-      cfg->ep1 = ep1a;
-    }
-
-    cfg->pre_shared_keys = NULL;
-    cfg->ntru_public_keys = NULL;
-    if (mam_msg_keyload_psk == keyload) {
-      mam_psk_t_set_add(&cfg->pre_shared_keys, pska);
-      mam_psk_t_set_add(&cfg->pre_shared_keys, pskb);
-    } else if (mam_msg_keyload_ntru == keyload) {
-      mam_ntru_pk_t_set_add(&cfg->ntru_public_keys, ntru_pk);
-    }
-
-    trits_from_str(mam_send_msg_cfg_msgid(cfg), "SENDERMSGIDAAAAASENDERMSGID");
-    cfg->msgtypeid = 0;
+  if (mam_msg_keyload_psk == keyload) {
+    mam_psk_t_set_add(&psks, pska);
+    mam_psk_t_set_add(&psks, pskb);
+  } else if (mam_msg_keyload_ntru == keyload) {
+    mam_ntru_pk_t_set_add(&ntru_pks, ntru_pk);
   }
 
   size_t sz;
-  sz = mam_send_msg_size(cfg_msga);
+  sz = mam_send_msg_size(ch, ep, ch1, ep1, psks, ntru_pks);
   msg = trits_alloc(sz);
   TEST_ASSERT(!trits_is_null(msg));
 
-  mam_send_msg(cfg_msga, &msg);
+  mam_send_msg(send_ctx, prng, ch, ep, ch1, ep1, msg_id, msg_type_id, psks,
+               ntru_pks, &msg);
   TEST_ASSERT(trits_is_empty(msg));
   msg = trits_pickup(msg, sz);
-  mam_psk_t_set_free(&cfg_msga->pre_shared_keys);
-  mam_ntru_pk_t_set_free(&cfg_msga->ntru_public_keys);
+  mam_psk_t_set_free(&psks);
+  mam_ntru_pk_t_set_free(&ntru_pks);
 
   return msg;
 }
@@ -92,28 +87,20 @@ static trits_t mam_test_generic_send_first_packet(
     mam_msg_pubkey_t pubkey, mam_msg_checksum_t checksum,
     mam_channel_t *const cha, mam_endpoint_t *const epa,
     mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
-    mam_send_msg_context_t const *const cfg_msg_send, char const *payload_str) {
-  trits_t packet = trits_null(), payload = trits_null();
-  mam_send_packet_context_t cfg_packet_send[1];
+    mam_send_context_t *const send_ctx, char const *payload_str) {
+  trits_t packet = trits_null();
+  trits_t payload = trits_null();
 
-  /* init send packet context */
-  {
-    mam_send_packet_context_t *cfg = cfg_packet_send;
-
-    mam_spongos_copy(cfg_msg_send->spongos, cfg->spongos);
-    cfg->ord = 0;
-    cfg->checksum = checksum;
-    cfg->mss = 0;
-    if (mam_msg_checksum_mssig == cfg->checksum) {
-      if (mam_msg_pubkey_chid == pubkey) {
-        cfg->mss = &cha->mss;
-      } else if (mam_msg_pubkey_epid == pubkey) {
-        cfg->mss = &epa->mss;
-      } else if (mam_msg_pubkey_chid1 == pubkey) {
-        cfg->mss = &ch1a->mss;
-      } else if (mam_msg_pubkey_epid1 == pubkey) {
-        cfg->mss = &ep1a->mss;
-      }
+  // mam_spongos_copy(&send_ctx->spongos, cfg->spongos);
+  if (mam_msg_checksum_mssig == checksum) {
+    if (mam_msg_pubkey_chid == pubkey) {
+      send_ctx->mss = &cha->mss;
+    } else if (mam_msg_pubkey_epid == pubkey) {
+      send_ctx->mss = &epa->mss;
+    } else if (mam_msg_pubkey_chid1 == pubkey) {
+      send_ctx->mss = &ch1a->mss;
+    } else if (mam_msg_pubkey_epid1 == pubkey) {
+      send_ctx->mss = &ep1a->mss;
     }
   }
 
@@ -122,11 +109,11 @@ static trits_t mam_test_generic_send_first_packet(
   TEST_ASSERT(!trits_is_null(payload));
   trits_from_str(payload, payload_str);
 
-  sz = mam_send_packet_size(cfg_packet_send, trits_size(payload));
+  sz = mam_send_packet_size(checksum, send_ctx->mss, trits_size(payload));
   packet = trits_alloc(sz);
   TEST_ASSERT(!trits_is_null(packet));
 
-  mam_send_packet(cfg_packet_send, payload, &packet);
+  mam_send_packet(send_ctx, checksum, payload, &packet);
   TEST_ASSERT(trits_is_empty(packet));
   packet = trits_pickup(packet, sz);
   trits_set_zero(payload);
@@ -262,7 +249,11 @@ static void mam_test_generic(mam_prng_t *prng_sender,
   mam_channel_t *cha = NULL, *ch1a = NULL;
   mam_endpoint_t *epa = NULL, *ep1a = NULL;
 
-  mam_send_msg_context_t cfg_msg_send[1];
+  mam_send_context_t send_ctx;
+  mam_spongos_init(&send_ctx.spongos);
+  send_ctx.ord = 0;
+  send_ctx.mss = NULL;
+
   mam_recv_msg_context_t cfg_msg_recv[1];
 
   mam_msg_pubkey_t pubkey;     /* chid=0, epid=1, chid1=2, epid1=3 */
@@ -312,11 +303,10 @@ static void mam_test_generic(mam_prng_t *prng_sender,
         {
           msg = mam_test_generic_send_msg(
               prng_sender, pska, pskb, &ntru->public_key, pubkey, keyload,
-              checksum, cha, epa, ch1a, ep1a, cfg_msg_send);
+              checksum, cha, epa, ch1a, ep1a, &send_ctx);
 
           packet = mam_test_generic_send_first_packet(
-              pubkey, checksum, cha, epa, ch1a, ep1a, cfg_msg_send,
-              payload_str);
+              pubkey, checksum, cha, epa, ch1a, ep1a, &send_ctx, payload_str);
         }
 
         /* recv msg and packet */
