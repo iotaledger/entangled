@@ -49,7 +49,7 @@ void test_reset(void) {
   transaction_free(transaction);
 }
 
-void test_read_transaction_obj(void) {
+void test_read_write_transaction_obj(void) {
   flex_trit_t test_address[FLEX_TRIT_SIZE_243];
   int64_t test_value = 123456;
   flex_trit_t test_obsolete_tag[FLEX_TRIT_SIZE_81];
@@ -167,7 +167,7 @@ int main(void) {
   RUN_TEST(test_deserialize_and_serialize);
   RUN_TEST(test_deserialize_and_serialize_allocated);
   RUN_TEST(test_reset);
-  RUN_TEST(test_read_transaction_obj);
+  RUN_TEST(test_read_write_transaction_obj);
 
   return UNITY_END();
 }
