@@ -183,12 +183,21 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
   return RC_OK;
 }
 
-retcode_t mam_api_bundle_read(mam_api_t *const api,
-                              mam_channel_t const *const cha,
-                              bundle_transactions_t const *const bundle,
-                              flex_trit_t *const payload) {
-  if (api == NULL || cha == NULL || bundle == NULL || payload == NULL) {
-    return RC_NULL_PARAM;
-  }
-  return RC_OK;
+retcode_t mam_api_bundle_read_msg(mam_recv_msg_context_t *const ctx,
+                                  mam_channel_t const *const cha,
+                                  bundle_transactions_t const *const bundle,
+                                  flex_trit_t *const packet_payload,
+                                  bool *has_packet, trits_t session_key,
+                                  trits_t msg_id) {
+  // trit_t session_key_trits[MAM2_SPONGE_KEY_SIZE];
+  // trits_t session_key = trits_from_rep(MAM2_SPONGE_KEY_SIZE,
+  // session_key_trits);
+  return RC_MAM2_NOT_IMPLEMENTED;
 }
+
+retcode_t mam_api_bundle_read_packet(mam_recv_msg_context_t *const ctx,
+                                     mam_channel_t const *const cha,
+                                     bundle_transactions_t const *const bundle,
+                                     trits_t const session_key,
+                                     flex_trit_t *const payload, uint32_t ord,
+                                     trits_t const msg_id) {}

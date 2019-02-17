@@ -761,7 +761,6 @@ trits_t const *const msg, trits_t session_key) {
         pb3_unwrap_absorb_ntrytes(s, msg, mam_msg_recv_cfg_msg_id(cfg)), e);
     /*  absorb trint typeid; */
     ERR_BIND_RETURN(pb3_unwrap_absorb_trint(s, msg, &cfg->msg_type_id), e);
-    
     {
       /*  repeated */
       size_t keyload_count = 0;

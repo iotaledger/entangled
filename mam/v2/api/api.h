@@ -57,10 +57,59 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
                                       mam_msg_checksum_t checksum,
                                       bundle_transactions_t *const bundle);
 
-retcode_t mam_api_bundle_read(mam_api_t *const api,
-                              mam_channel_t const *const cha,
-                              bundle_transactions_t const *const bundle,
-                              flex_trit_t *const payload);
+/**
+ * Checks if a bundle which is assumed to contain MAM message contains header
+ *
+ * @param bundle The bundle
+ *
+ * @return True if the bundle contains MAM header
+ */
+
+bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
+
+/**
+ * Reads MAM's session key and potentially the first packet using NTRU secret
+ * key
+ *
+ * @param ctx - The reading context (Needs to be persisted)
+ * @param cha - The channel the message belongs to
+ * @param bundle - The bundle containing the MAM message
+ * @param packet_payload - First packet payload
+ * @param has_packet - whether or not bundle contained a first packet after the
+ * header
+ * @param session_key - the key for decrypting following packets with the same
+ * message id
+ * @param msg_id - the Message id
+ *
+ * @return return code
+ */
+
+retcode_t mam_api_bundle_read_msg(mam_recv_msg_context_t *const ctx,
+                                  mam_channel_t const *const cha,
+                                  bundle_transactions_t const *const bundle,
+                                  flex_trit_t *const packet_payload,
+                                  bool *has_packet, trits_t session_key,
+                                  trits_t msg_id);
+
+/**
+ * Reads next packet
+ *
+ * @param ctx - The reading context (Needs to be persisted)
+ * @param cha - The channel the message belongs to
+ * @param bundle - The bundle containing the MAM message
+ * @param session_key - the key for decrypting following packets with the same
+ * message id
+ * @param msg_id - the Message id
+ *
+ * @return return code
+ */
+
+retcode_t mam_api_bundle_read_packet(mam_recv_msg_context_t *const ctx,
+                                     mam_channel_t const *const cha,
+                                     bundle_transactions_t const *const bundle,
+                                     trits_t const session_key,
+                                     flex_trit_t *const payload, uint32_t ord,
+                                     trits_t const msg_id);
 
 #ifdef __cplusplus
 }
