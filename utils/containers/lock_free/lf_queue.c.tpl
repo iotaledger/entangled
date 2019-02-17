@@ -55,7 +55,7 @@ retcode_t iota_lf_umm_queue_{TYPE}_enqueue(iota_lf_umm_queue_{TYPE}_t* const que
   if (lfds711_freelist_pop(&queue->freelist, &fe, NULL)) {
     reused_element = true;
     p = LFDS711_FREELIST_GET_VALUE_FROM_ELEMENT(*fe);
-  } else if ((p = malloc(sizeof(iota_lf_queue_umm_{TYPE}_t))) == NULL) {
+  } else if ((p = (iota_lf_queue_umm_{TYPE}_t*)malloc(sizeof(iota_lf_queue_umm_{TYPE}_t))) == NULL) {
     return RC_OOM;
   }
 

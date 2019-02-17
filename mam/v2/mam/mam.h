@@ -25,6 +25,8 @@
 #include "mam/v2/trits/trits.h"
 #include "mam/v2/wots/wots.h"
 
+#define MAM2_HEADER_MSG_ID_SIZE 81
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -115,40 +117,26 @@ typedef enum mam_msg_checksum_e {
   mam_msg_checksum_mssig = 2,
 } mam_msg_checksum_t;
 
-#define MAM2_HEADER_MSG_ID_SIZE 81
-
-typedef struct mam_send_msg_context_s {
-  mam_spongos_t spongos[1]; /*!< Main Spongos interface to wrap PB3 messages. */
-  mam_prng_t *prng; /*!< Shared deterministic PRNG instance to gen MSS keys. */
-  mam_prng_t *rng;  /*!< Volatile PRNG instance to generate ephemeral keys. */
-  mam_channel_t const *ch;   /*!< Current channel. */
-  mam_channel_t const *ch1;  /*!< New channel (may be null). */
-  mam_endpoint_t const *ep;  /*!< Current endpoint (may be null). */
-  mam_endpoint_t const *ep1; /*!< New endpoint (may be null). */
-  trit_t msg_id[MAM2_HEADER_MSG_ID_SIZE]; /*!< Message id / nonce, must be
-                                           unique for each key. */
-  trint9_t msg_type_id;
-  mam_psk_t_set_t psks; /*!< Encrypt message for these psks. */
-  mam_ntru_pk_t_set_t
-      ntru_pks; /*!< Encrypt message for these NTRU public keys. */
-} mam_send_msg_context_t;
-
-size_t mam_send_msg_size(mam_send_msg_context_t *cfg);
-
-void mam_send_msg(mam_send_msg_context_t *cfg, trits_t *msg);
-
-typedef struct mam_send_packet_context_s {
-  mam_spongos_t spongos[1]; /*!< Main Sponge interface */
+typedef struct mam_send_context_s {
+  mam_spongos_t spongos;
   trint18_t ord;
-  mam_msg_checksum_t checksum;
   mss_t *mss;
-} mam_send_packet_context_t;
+} mam_send_context_t;
 
-size_t mam_send_packet_size(mam_send_packet_context_t *cfg,
+size_t mam_send_msg_size(mam_channel_t *ch, mam_endpoint_t *ep,
+                         mam_channel_t *ch1, mam_endpoint_t *ep1,
+                         mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks);
+
+void mam_send_msg(mam_send_context_t *ctx, mam_prng_t *prng, mam_channel_t *ch,
+                  mam_endpoint_t *ep, mam_channel_t *ch1, mam_endpoint_t *ep1,
+                  trits_t msg_id, trint9_t msg_type_id, mam_psk_t_set_t psks,
+                  mam_ntru_pk_t_set_t ntru_pks, trits_t *msg);
+
+size_t mam_send_packet_size(mam_msg_checksum_t checksum, mss_t *mss,
                             size_t payload_size);
 
-void mam_send_packet(mam_send_packet_context_t *cfg, trits_t payload,
-                     trits_t *packet);
+void mam_send_packet(mam_send_context_t *ctx, mam_msg_checksum_t checksum,
+                     trits_t payload, trits_t *b);
 
 typedef struct mam_recv_msg_context_s {
   mam_spongos_t spongos[1]; /*!< Main Spongos interface */
@@ -179,12 +167,6 @@ typedef struct mam_recv_packet_context_s {
 
 retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *packet,
                           trits_t *payload);
-
-trits_t mam_send_msg_cfg_chid(mam_send_msg_context_t const *const cfg);
-trits_t mam_send_msg_cfg_chid1(mam_send_msg_context_t const *const cfg);
-trits_t mam_send_msg_cfg_epid(mam_send_msg_context_t const *const cfg);
-trits_t mam_send_msg_cfg_epid1(mam_send_msg_context_t const *const cfg);
-trits_t mam_send_msg_cfg_msg_id(mam_send_msg_context_t const *const cfg);
 
 trits_t mam_recv_msg_cfg_chid(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_chid1(mam_recv_msg_context_t const *const cfg);

@@ -264,15 +264,18 @@ static void *processor_routine(processor_t *const processor) {
   const size_t PACKET_MAX = 64;
   size_t packet_cnt = 0;
   iota_packet_t *packet_ptr = NULL;
-  iota_packet_t *packets = calloc(PACKET_MAX, sizeof(iota_packet_t));
+  iota_packet_t *packets =
+      (iota_packet_t *)calloc(PACKET_MAX, sizeof(iota_packet_t));
 
-  trit_t *tx = calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(trit_t));
-  trit_t *hash = calloc(HASH_LENGTH_TRIT, sizeof(trit_t));
+  trit_t *tx =
+      (trit_t *)calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(trit_t));
+  trit_t *hash = (trit_t *)calloc(HASH_LENGTH_TRIT, sizeof(trit_t));
 
-  PCurl *curl = calloc(1, sizeof(PCurl));
+  PCurl *curl = (PCurl *)calloc(1, sizeof(PCurl));
   curl->type = 81;
 
-  ptrit_t *txs_acc = calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(ptrit_t));
+  ptrit_t *txs_acc =
+      (ptrit_t *)calloc(NUM_TRITS_SERIALIZED_TRANSACTION, sizeof(ptrit_t));
 
   flex_trit_t flex_hash[FLEX_TRIT_SIZE_243];
 
@@ -396,6 +399,7 @@ retcode_t processor_stop(processor_t *const processor) {
 
   log_info(logger_id, "Shutting down processor thread\n");
   processor->running = false;
+  cond_handle_signal(&processor->cond);
   if (thread_handle_join(processor->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down processor thread failed\n");
     return RC_FAILED_THREAD_JOIN;

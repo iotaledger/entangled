@@ -86,9 +86,11 @@ retcode_t mam_api_bundle_write_header(
   trits_t header = trits_null();
   size_t header_size = 0;
   trits_t header_part = trits_null();
-  mam_send_msg_context_t header_ctx;
+  mam_send_context_t ctx;
   iota_transaction_t transaction;
   size_t current_index = 0;
+  MAM2_TRITS_DEF0(msg_id, MAM2_HEADER_MSG_ID_SIZE);
+  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_HEADER_MSG_ID_SIZE);
 
   if (api == NULL || ch == NULL || bundle == NULL) {
     return RC_NULL_PARAM;
@@ -100,28 +102,16 @@ retcode_t mam_api_bundle_write_header(
 
   // TODO add a random part
   trits_t msg_id_parts[] = {mam_channel_name(ch), mam_channel_msg_ord(ch)};
-  mam_spongos_hashn(header_ctx.spongos, 2, msg_id_parts,
-                    trits_from_rep(MAM2_HEADER_MSG_ID_SIZE, header_ctx.msg_id));
+  mam_spongos_hashn(&ctx.spongos, 2, msg_id_parts, msg_id);
   add_assign(ch->msg_ord, MAM2_HEADER_MSG_ID_SIZE, 1);
 
-  header_ctx.prng = &api->prng;
-  // TODO same PRNG ?
-  header_ctx.rng = &api->prng;
-  header_ctx.ch = ch;
-  header_ctx.ch1 = ch1;
-  header_ctx.ep = ep;
-  header_ctx.ep1 = ep1;
-  // TODO fill msgid
-  header_ctx.msg_type_id = msg_type_id;
-  header_ctx.psks = psks;
-  header_ctx.ntru_pks = ntru_pks;
-
-  header_size = mam_send_msg_size(&header_ctx);
+  header_size = mam_send_msg_size(ch, ep, ch1, ep1, psks, ntru_pks);
   if (trits_is_null(header = trits_alloc(header_size))) {
     return RC_OOM;
   }
 
-  mam_send_msg(&header_ctx, &header);
+  mam_send_msg(&ctx, &api->prng, ch, ep, ch1, ep1, msg_id, msg_type_id, psks,
+               ntru_pks, &header);
   header = trits_pickup(header, header_size);
 
   transaction_reset(&transaction);
@@ -158,7 +148,7 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
                                       tryte_t const *const payload,
                                       mam_msg_checksum_t checksum,
                                       bundle_transactions_t *const bundle) {
-  mam_send_packet_context_t packet_ctx;
+  mam_send_context_t *ctx = NULL;
 
   if (api == NULL || payload == NULL || bundle == NULL) {
     return RC_NULL_PARAM;
@@ -168,12 +158,6 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
 
   // TODO fetch pending state from msgID
   // TODO copy or get spongos state
-
-  // TODO get from state
-  packet_ctx.ord = 0;
-  packet_ctx.checksum = checksum;
-  // TODO get from state
-  packet_ctx.mss = NULL;
 
   // TODO increment ord
 

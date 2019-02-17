@@ -77,7 +77,8 @@ retcode_t iota_packet_queue_push(iota_packet_queue_t *const queue,
     return RC_NULL_PARAM;
   }
 
-  if ((entry = malloc(sizeof(iota_packet_queue_entry_t))) == NULL) {
+  if ((entry = (iota_packet_queue_entry_t *)malloc(
+           sizeof(iota_packet_queue_entry_t))) == NULL) {
     return RC_OOM;
   }
   entry->packet = *packet;

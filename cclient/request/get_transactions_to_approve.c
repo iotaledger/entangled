@@ -38,7 +38,7 @@ void get_transactions_to_approve_req_set_reference(
     get_transactions_to_approve_req_t* const req,
     flex_trit_t const* const reference) {
   if (req->reference == NULL) {
-    req->reference = malloc(FLEX_TRIT_SIZE_243);
+    req->reference = (flex_trit_t*)malloc(FLEX_TRIT_SIZE_243);
   }
   memcpy(req->reference, reference, FLEX_TRIT_SIZE_243);
 }

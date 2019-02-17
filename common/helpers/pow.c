@@ -85,14 +85,24 @@ IOTA_EXPORT retcode_t iota_pow_bundle(bundle_transactions_t *const bundle,
                                       flex_trit_t const *const trunk,
                                       flex_trit_t const *const branch,
                                       uint8_t const mwm) {
-  iota_transaction_t *tx;
-  flex_trit_t *nonce, *txflex, *ctrunk;
+  iota_transaction_t *tx = NULL;
+  flex_trit_t *nonce = NULL;
+  flex_trit_t *txflex = NULL;
+  flex_trit_t *ctrunk = NULL;
   size_t cur_idx = 0;
+
+  if (bundle == NULL || trunk == NULL || branch == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if (bundle_transactions_size(bundle) == 0) {
+    return RC_OK;
+  }
 
   tx = (iota_transaction_t *)utarray_front(bundle);
   cur_idx = tx->essence.last_index + 1;
 
-  ctrunk = trunk;
+  ctrunk = (flex_trit_t *)trunk;
 
   do {
     cur_idx--;
@@ -103,6 +113,10 @@ IOTA_EXPORT retcode_t iota_pow_bundle(bundle_transactions_t *const bundle,
          tx = (iota_transaction_t *)utarray_next(bundle, tx))
       ;
 
+    if (tx == NULL) {
+      return RC_HELPERS_POW_INVALID_TX;
+    }
+
     // Set trunk & branch
     transaction_set_trunk(tx, ctrunk);
     transaction_set_branch(tx, branch);
@@ -110,15 +124,13 @@ IOTA_EXPORT retcode_t iota_pow_bundle(bundle_transactions_t *const bundle,
     transaction_set_attachment_timestamp_lower(tx, 0);
     transaction_set_attachment_timestamp_upper(tx, 3812798742493LL);
 
-    txflex = transaction_serialize(tx);
-
-    if (txflex == NULL) {
+    if ((txflex = transaction_serialize(tx)) == NULL) {
       return RC_OOM;
     }
 
     // Do PoW
-    nonce = iota_pow_flex(txflex, NUM_TRITS_SERIALIZED_TRANSACTION, mwm);
-    if (nonce == NULL) {
+    if ((nonce = iota_pow_flex(txflex, NUM_TRITS_SERIALIZED_TRANSACTION,
+                               mwm)) == NULL) {
       return RC_OOM;
     }
     transaction_set_nonce(tx, nonce);
@@ -128,12 +140,16 @@ IOTA_EXPORT retcode_t iota_pow_bundle(bundle_transactions_t *const bundle,
       free(ctrunk);
     }
 
-    ctrunk = iota_flex_digest(txflex, NUM_TRITS_SERIALIZED_TRANSACTION);
+    if ((ctrunk = iota_flex_digest(txflex, NUM_TRITS_SERIALIZED_TRANSACTION)) ==
+        NULL) {
+      return RC_OOM;
+    }
     free(txflex);
   } while (cur_idx != 0);
 
   if (ctrunk != trunk) {
     free(ctrunk);
   }
+
   return RC_OK;
 }
