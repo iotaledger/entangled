@@ -14,22 +14,6 @@
 #include "mam/v2/mam/mam.h"
 #include "mam/v2/pb3/pb3.h"
 
-trits_t mam_psk_id(mam_psk_t *p) {
-  return trits_from_rep(MAM2_PSK_ID_SIZE, p->id);
-}
-
-trits_t mam_psk_trits(mam_psk_t *p) {
-  return trits_from_rep(MAM2_PSK_KEY_SIZE, p->key);
-}
-
-trits_t mam_ntru_pk_trits(mam_ntru_pk_t *p) {
-  return trits_from_rep(MAM2_NTRU_PK_SIZE, p->key);
-}
-
-trits_t mam_ntru_pk_id(mam_ntru_pk_t *p) {
-  return trits_from_rep(MAM2_NTRU_ID_SIZE, p->key);
-}
-
 /* MAC, MSSig, SignedId */
 
 static size_t mam_wrap_mac_size() {

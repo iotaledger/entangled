@@ -31,12 +31,6 @@
 extern "C" {
 #endif
 
-trits_t mam_psk_id(mam_psk_t *p);
-trits_t mam_psk_trits(mam_psk_t *p);
-
-trits_t mam_ntru_pk_id(mam_ntru_pk_t *p);
-trits_t mam_ntru_pk_trits(mam_ntru_pk_t *p);
-
 /* Endpoint */
 
 size_t mam_wrap_pubkey_chid_size();
