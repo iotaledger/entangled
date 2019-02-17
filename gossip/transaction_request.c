@@ -30,7 +30,8 @@ retcode_t transaction_request_queue_push(
     return RC_NULL_PARAM;
   }
 
-  if ((entry = malloc(sizeof(transaction_request_queue_entry_t))) == NULL) {
+  if ((entry = (transaction_request_queue_entry_t *)malloc(
+           sizeof(transaction_request_queue_entry_t))) == NULL) {
     return RC_OOM;
   }
   entry->request.neighbor = neighbor;

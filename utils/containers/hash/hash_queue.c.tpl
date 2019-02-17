@@ -15,7 +15,7 @@ retcode_t hash{SIZE}_queue_push(hash{SIZE}_queue_t *const queue,
                           flex_trit_t const *const hash) {
   hash{SIZE}_queue_entry_t *entry = NULL;
 
-  if ((entry = malloc(sizeof(hash{SIZE}_queue_entry_t))) == NULL) {
+  if ((entry = (hash{SIZE}_queue_entry_t *)malloc(sizeof(hash{SIZE}_queue_entry_t))) == NULL) {
     return RC_UTILS_OOM;
   }
   memcpy(entry->hash, hash, FLEX_TRIT_SIZE_{SIZE});

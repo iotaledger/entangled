@@ -23,7 +23,8 @@ static struct option* build_options() {
   while (cli_arguments_g[nbr].desc) {
     nbr++;
   }
-  struct option* options = malloc((nbr + 1) * sizeof(struct option));
+  struct option* options =
+      (struct option*)malloc((nbr + 1) * sizeof(struct option));
   size_t i;
   for (i = 0; i < nbr; i++) {
     options[i].name = cli_arguments_g[i].name;
