@@ -25,12 +25,10 @@ static void ntru_test(void) {
   MAM2_POLY_DEF(f);
   MAM2_POLY_DEF(f0);
   MAM2_TRITS_DEF0(nonce, 3 * 10);
-  MAM2_TRITS_DEF0(pk, MAM2_NTRU_PK_SIZE);
   MAM2_TRITS_DEF0(key, MAM2_PRNG_KEY_SIZE);
   MAM2_TRITS_DEF0(ekey, MAM2_NTRU_EKEY_SIZE);
   MAM2_TRITS_DEF0(dekey, MAM2_NTRU_KEY_SIZE);
   nonce = MAM2_TRITS_INIT(nonce, 3 * 10);
-  pk = MAM2_TRITS_INIT(pk, MAM2_NTRU_PK_SIZE);
   key = MAM2_TRITS_INIT(key, MAM2_PRNG_KEY_SIZE);
   ekey = MAM2_TRITS_INIT(ekey, MAM2_NTRU_EKEY_SIZE);
   dekey = MAM2_TRITS_INIT(dekey, MAM2_NTRU_KEY_SIZE);
@@ -44,6 +42,7 @@ static void ntru_test(void) {
   mam_spongos_init(&spongos);
   mam_prng_init(&prng, key);
   ntru_init(&ntru);
+  trits_t pk = ntru_pk_trits(&ntru);
 
   i = 0;
   trits_set_zero(key);
@@ -53,7 +52,7 @@ static void ntru_test(void) {
     trits_set_zero(pk);
     trits_put1(pk, 1);
     poly_small_from_trits(f, trits_take(pk, MAM2_NTRU_SK_SIZE));
-    ntru_gen(&ntru, &prng, nonce, pk);
+    ntru_gen(&ntru, &prng, nonce);
     memcpy(f0, ntru.f, sizeof(poly_t));
     poly_add(f, f0, f);
 
@@ -69,14 +68,10 @@ static void ntru_test(void) {
       TEST_ASSERT_TRUE(!trits_cmp_eq(key, dekey));
       trits_put1(ekey, trit_sub(trits_get1(ekey), 1));
 
-      /*trits_put1(ntru_sk_trits(n), trit_add(trits_get1(ntru_sk_trits(n)),
-       * 1));*/
       memcpy(ntru.f, f, sizeof(poly_t));
       TEST_ASSERT_TRUE(!ntru_decr(&ntru, &spongos, ekey, dekey));
       TEST_ASSERT_TRUE(!trits_cmp_eq(key, dekey));
       memcpy(ntru.f, f0, sizeof(poly_t));
-      /*trits_put1(ntru_sk_trits(n), trit_sub(trits_get1(ntru_sk_trits(n)),
-       * 1));*/
 
       trits_from_str(nonce, "NONCE9KEY9");
       mam_prng_gen(&prng, MAM2_PRNG_DST_SEC_KEY, nonce, key);

@@ -214,7 +214,7 @@ void test_stored_milestone(void) {
                            .insufficient_capacity = false};
 
   for (int i = 0; i < 5; ++i) {
-    pack.models[i] = malloc(sizeof(iota_milestone_t));
+    pack.models[i] = (iota_milestone_t *)malloc(sizeof(iota_milestone_t));
   }
   TEST_ASSERT(iota_stor_milestone_load(&connection, HASH, &pack) == RC_OK);
   TEST_ASSERT_EQUAL_INT(1, pack.num_loaded);
@@ -232,7 +232,7 @@ void test_stored_load_hashes_by_address(void) {
                            .num_loaded = 0,
                            .insufficient_capacity = false};
   for (size_t i = 0; i < 5; ++i) {
-    hashes[i] = malloc(FLEX_TRIT_SIZE_243);
+    hashes[i] = (flex_trit_t *)malloc(FLEX_TRIT_SIZE_243);
   }
 
   flex_trit_t tx_test_trits[FLEX_TRIT_SIZE_8019];

@@ -15,6 +15,7 @@ cc_binary(
     deps = [
         ":core",
         "//utils/handles:rand",
+        "//utils/handles:signal",
     ],
 )
 

@@ -49,7 +49,7 @@ void test_mam_sec(int security) {
   trit_t next_root[next_tree_size * HASH_LENGTH_TRIT];
   int payload_length = payload_min_length(
       message_length, tree_size * HASH_LENGTH_TRIT, index, security);
-  trit_t *payload = malloc(payload_length * sizeof(trit_t));
+  trit_t *payload = (trit_t *)malloc(payload_length * sizeof(trit_t));
 
   Curl curl;
   curl.type = CURL_P_27;

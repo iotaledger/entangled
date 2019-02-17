@@ -27,6 +27,12 @@ static bool mam_endpoint_t_set_cmp(mam_endpoint_t_set_t const endpoints_1,
   mam_endpoint_t_set_entry_t *entry_2 = NULL;
   mam_endpoint_t_set_entry_t *tmp_2 = NULL;
   size_t match = 0;
+  MAM2_TRITS_DEF0(hash, MAM2_MSS_HASH_SIZE);
+  hash = MAM2_TRITS_INIT(hash, MAM2_MSS_HASH_SIZE);
+  trits_from_str(hash,
+                 "ABCNKOZWYSDF9OABCNKOZWYSDF9"
+                 "ABCNKOZWYSDF9QABCNKOZWYSDF9"
+                 "ABCNKOZWYSDF9CABCNKOZWYSDF9");
 
   if (mam_endpoint_t_set_size(endpoints_1) !=
       mam_endpoint_t_set_size(endpoints_2)) {
@@ -38,8 +44,18 @@ static bool mam_endpoint_t_set_cmp(mam_endpoint_t_set_t const endpoints_1,
       if (memcmp(entry_1->value.id, entry_2->value.id, MAM2_ENDPOINT_ID_SIZE) ==
               0 &&
           trits_cmp_eq(entry_1->value.name, entry_2->value.name)) {
-        // TODO check MSS
-        match++;
+        MAM2_TRITS_DEF0(sig1, MAM2_MSS_SIG_SIZE(entry_1->value.mss.height));
+        MAM2_TRITS_DEF0(sig2, MAM2_MSS_SIG_SIZE(entry_2->value.mss.height));
+        sig1 =
+            MAM2_TRITS_INIT(sig1, MAM2_MSS_SIG_SIZE(entry_1->value.mss.height));
+        sig2 =
+            MAM2_TRITS_INIT(sig2, MAM2_MSS_SIG_SIZE(entry_2->value.mss.height));
+        mss_sign(&entry_1->value.mss, hash, sig1);
+        mss_sign(&entry_2->value.mss, hash, sig2);
+        if (trits_cmp_eq(sig1, sig2)) {
+          match++;
+          break;
+        }
       }
     }
   }

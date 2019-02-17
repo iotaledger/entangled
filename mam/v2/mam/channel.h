@@ -11,11 +11,13 @@
 #ifndef __MAM_V2_MAM_CHANNEL_H__
 #define __MAM_V2_MAM_CHANNEL_H__
 
+#include "common/trinary/add.h"
 #include "mam/v2/mam/mam_endpoint_t_set.h"
 #include "mam/v2/mss/mss.h"
 #include "mam/v2/trits/trits.h"
 
 #define MAM2_CHANNEL_ID_SIZE MAM2_MSS_MT_HASH_SIZE
+#define MAM2_CHANNEL_MSG_ORD_SIZE 81
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,6 +26,7 @@ extern "C" {
 typedef struct mam_channel_s {
   trit_t id[MAM2_CHANNEL_ID_SIZE];
   trits_t name;
+  trit_t msg_ord[MAM2_CHANNEL_MSG_ORD_SIZE];
   mss_t mss;
   mam_endpoint_t_set_t endpoints;
 } mam_channel_t;

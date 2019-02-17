@@ -141,7 +141,7 @@ retcode_t neighbors_add(neighbor_t **const neighbors,
     return RC_NEIGHBOR_ALREADY_PAIRED;
   }
 
-  if ((entry = malloc(sizeof(neighbor_t))) == NULL) {
+  if ((entry = (neighbor_t *)malloc(sizeof(neighbor_t))) == NULL) {
     return RC_OOM;
   }
 

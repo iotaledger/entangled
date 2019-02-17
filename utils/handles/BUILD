@@ -49,3 +49,15 @@ cc_library(
         "//conditions:default": [],
     }),
 )
+
+cc_library(
+    name = "signal",
+    hdrs = ["signal.h"],
+    deps = ["//utils:logger_helper"],
+)
+
+cc_library(
+    name = "socket",
+    srcs = ["socket.c"],
+    hdrs = ["socket.h"],
+)
