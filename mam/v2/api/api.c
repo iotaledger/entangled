@@ -82,17 +82,15 @@ retcode_t mam_api_bundle_write_header(
     mam_endpoint_t const *const ep, mam_channel_t const *const ch1,
     mam_endpoint_t const *const ep1, mam_psk_t_set_t psks,
     mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-    bundle_transactions_t *const bundle) {
+    bundle_transactions_t *const bundle, trit_t *const msg_id) {
   trits_t header = trits_null();
   size_t header_size = 0;
   trits_t header_part = trits_null();
   mam_send_context_t ctx;
   iota_transaction_t transaction;
   size_t current_index = 0;
-  MAM2_TRITS_DEF0(msg_id, MAM2_MSG_ID_SIZE);
-  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_MSG_ID_SIZE);
 
-  if (api == NULL || ch == NULL || bundle == NULL) {
+  if (api == NULL || ch == NULL || bundle == NULL || msg_id == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -102,7 +100,8 @@ retcode_t mam_api_bundle_write_header(
 
   // TODO add a random part
   trits_t msg_id_parts[] = {mam_channel_name(ch), mam_channel_msg_ord(ch)};
-  mam_spongos_hashn(&ctx.spongos, 2, msg_id_parts, msg_id);
+  mam_spongos_hashn(&ctx.spongos, 2, msg_id_parts,
+                    trits_from_rep(MAM2_MSG_ID_SIZE, msg_id));
   add_assign(ch->msg_ord, MAM2_MSG_ID_SIZE, 1);
 
   header_size = mam_send_msg_size(ch, ep, ch1, ep1, psks, ntru_pks);
@@ -110,7 +109,8 @@ retcode_t mam_api_bundle_write_header(
     return RC_OOM;
   }
 
-  mam_send_msg(&ctx, &api->prng, ch, ep, ch1, ep1, msg_id, msg_type_id, psks,
+  mam_send_msg(&ctx, &api->prng, ch, ep, ch1, ep1,
+               trits_from_rep(MAM2_MSG_ID_SIZE, msg_id), msg_type_id, psks,
                ntru_pks, &header);
   header = trits_pickup(header, header_size);
 

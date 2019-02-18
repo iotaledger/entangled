@@ -47,7 +47,7 @@ retcode_t mam_api_bundle_write_header(
     mam_endpoint_t const *const ep, mam_channel_t const *const ch1,
     mam_endpoint_t const *const ep1, mam_psk_t_set_t psks,
     mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-    bundle_transactions_t *const bundle);
+    bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
                                       tryte_t const *const payload,

@@ -61,6 +61,7 @@ int main(void) {
   mam_api_t api;
   bundle_transactions_t *bundle = NULL;
   int ret = EXIT_SUCCESS;
+  trit_t msg_id[MAM2_MSG_ID_SIZE];
 
   if (mam_api_init(&api, SENDER_SEED) != RC_OK) {
     fprintf(stderr, "mam_api_init failed\n");
@@ -75,7 +76,7 @@ int main(void) {
 
   bundle_transactions_new(&bundle);
   mam_api_bundle_write_header(&api, cha, NULL, NULL, NULL, NULL, NULL, 0,
-                              bundle);
+                              bundle, msg_id);
   send_bundle(bundle);
   bundle_transactions_free(&bundle);
 
