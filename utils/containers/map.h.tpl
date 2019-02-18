@@ -32,12 +32,12 @@ typedef struct {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_s {
 } {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t;
 
 typedef struct {KEY_TYPE}_to_{VALUE_TYPE}_map_s {
-  size_t element_size;
+  size_t key_size;
   {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t* map;
 } {KEY_TYPE}_to_{VALUE_TYPE}_map_t;
 
 retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_init({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
-                                              size_t element_size);
+                                              size_t key_size);
 
 retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_add({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
                                              {KEY_TYPE} const *const key,
