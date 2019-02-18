@@ -53,6 +53,15 @@ trits_t mam_channel_id(mam_channel_t const *const channel);
 trits_t mam_channel_name(mam_channel_t const *const channel);
 
 /**
+ * Gets a channel's msg_ord
+ *
+ * @param channel The channel
+ *
+ * @return the channel's msg_ord
+ */
+trits_t mam_channel_msg_ord(mam_channel_t const *const channel);
+
+/**
  * Allocates memory for internal objects, and generates MSS public key
  *
  * @param allocator A MAM allocator

@@ -46,8 +46,8 @@ static trits_t mam_test_generic_send_msg(
   mam_endpoint_t *ep = NULL;
   mam_channel_t *ch1 = NULL;
   mam_endpoint_t *ep1 = NULL;
-  MAM2_TRITS_DEF0(msg_id, MAM2_HEADER_MSGID_SIZE);
-  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_HEADER_MSGID_SIZE);
+  MAM2_TRITS_DEF0(msg_id, MAM2_HEADER_MSG_ID_SIZE);
+  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_HEADER_MSG_ID_SIZE);
   trits_from_str(msg_id, "SENDERMSGIDAAAAASENDERMSGID");
   trint9_t msg_type_id = 0;
   mam_psk_t_set_t psks = NULL;
@@ -142,9 +142,9 @@ static void mam_test_generic_receive_msg(
   e = mam_recv_msg(cfg_msg_recv, msg);
   TEST_ASSERT(RC_OK == e);
   TEST_ASSERT(trits_is_empty(*msg));
-  MAM2_ASSERT(trits_cmp_eq_str(mam_recv_msg_cfg_msgid(cfg_msg_recv),
+  MAM2_ASSERT(trits_cmp_eq_str(mam_recv_msg_cfg_msg_id(cfg_msg_recv),
                                "SENDERMSGIDAAAAASENDERMSGID"));
-  MAM2_ASSERT(cfg_msg_recv->msgtypeid == 0);
+  MAM2_ASSERT(cfg_msg_recv->msg_type_id == 0);
 
   cfg_msg_recv->ntru = NULL;
 }

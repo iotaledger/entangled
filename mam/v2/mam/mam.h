@@ -25,7 +25,7 @@
 #include "mam/v2/trits/trits.h"
 #include "mam/v2/wots/wots.h"
 
-#define MAM2_HEADER_MSGID_SIZE 81
+#define MAM2_HEADER_MSG_ID_SIZE 81
 
 #ifdef __cplusplus
 extern "C" {
@@ -138,8 +138,8 @@ typedef struct mam_recv_msg_context_s {
   mam_spongos_t spongos_wots[1]; /*!< Sponge interface used by WOTS layer */
   /*TODO: check for trusted chid/epid*/
   /*TODO: handle (add to trusted list) new chid1*/
-  trit_t msgid[MAM2_HEADER_MSGID_SIZE];
-  trint9_t msgtypeid;
+  trit_t msg_id[MAM2_HEADER_MSG_ID_SIZE];
+  trint9_t msg_type_id;
   mam_psk_t *psk;      /*!< PSK to decrypt message. */
   mam_ntru_sk_t *ntru; /*!< NTRU sk to decrypt message. */
 } mam_recv_msg_context_t;
@@ -161,7 +161,7 @@ trits_t mam_recv_msg_cfg_chid(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_chid1(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_epid(mam_recv_msg_context_t const *const cfg);
 trits_t mam_recv_msg_cfg_epid1(mam_recv_msg_context_t const *const cfg);
-trits_t mam_recv_msg_cfg_msgid(mam_recv_msg_context_t const *const cfg);
+trits_t mam_recv_msg_cfg_msg_id(mam_recv_msg_context_t const *const cfg);
 
 #ifdef __cplusplus
 }
