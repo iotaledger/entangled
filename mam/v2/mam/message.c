@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mam/v2/mam/mam.h"
+#include "mam/v2/mam/message.h"
 #include "mam/v2/pb3/pb3.h"
 
 /* MAC, MSSig, SignedId */
@@ -127,6 +127,42 @@ static retcode_t mam_unwrap_signedid(mam_spongos_t *s, trits_t *b, trits_t id,
   ERR_BIND_RETURN(mam_unwrap_mssig(s, b, ms, ws, pk), e);
 
   return e;
+}
+
+/* Channel */
+
+size_t mam_channel_wrap_size() {
+  // absorb tryte version + absorb external tryte channel_id[81]
+  return pb3_sizeof_tryte() + 0;
+}
+
+void mam_channel_wrap(mam_spongos_t *const spongos, trits_t *const buffer,
+                      tryte_t const version, trits_t const channel_id) {
+  MAM2_ASSERT(mam_channel_wrap_size() <= trits_size(*buffer));
+  MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(channel_id));
+
+  // absorb tryte version
+  pb3_wrap_absorb_tryte(spongos, buffer, version);
+  // absorb external tryte channel_id[81]
+  pb3_absorb_external_ntrytes(spongos, channel_id);
+}
+
+retcode_t mam_channel_unwrap(mam_spongos_t *const spongos,
+                             trits_t *const buffer, tryte_t *const version,
+                             trits_t channel_id) {
+  MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(channel_id));
+
+  retcode_t ret = RC_OK;
+
+  // absorb tryte version
+  if ((ret = pb3_unwrap_absorb_tryte(spongos, buffer, version)) != RC_OK) {
+    return ret;
+  }
+
+  // absorb external tryte channel_id[81]
+  pb3_absorb_external_ntrytes(spongos, channel_id);
+
+  return ret;
 }
 
 /* Endpoint */

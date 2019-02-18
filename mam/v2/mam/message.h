@@ -31,6 +31,15 @@
 extern "C" {
 #endif
 
+/* Channel */
+
+size_t mam_channel_wrap_size();
+void mam_channel_wrap(mam_spongos_t *const spongos, trits_t *const buffer,
+                      tryte_t const version, trits_t const channel_id);
+retcode_t mam_channel_unwrap(mam_spongos_t *const spongos,
+                             trits_t *const buffer, tryte_t *const version,
+                             trits_t channel_id);
+
 /* Endpoint */
 
 size_t mam_wrap_pubkey_chid_size();

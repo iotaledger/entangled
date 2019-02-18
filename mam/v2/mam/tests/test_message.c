@@ -11,7 +11,7 @@
 #include <string.h>
 #include <unity/unity.h>
 
-#include "mam/v2/mam/mam.h"
+#include "mam/v2/mam/message.h"
 #include "mam/v2/test_utils/test_utils.h"
 
 #define TEST_CHANNEL_NAME "CHANAME"
@@ -34,7 +34,7 @@
 
 // TODO - Test functions should take set of prng_t instead of raw ptrs
 
-static trits_t mam_test_generic_send_msg(
+static trits_t message_test_generic_send_msg(
     mam_prng_t *prng, mam_psk_t const *const pska, mam_psk_t const *const pskb,
     mam_ntru_pk_t const *const ntru_pk, mam_msg_pubkey_t pubkey,
     mam_msg_keyload_t keyload, mam_msg_checksum_t checksum,
@@ -83,7 +83,7 @@ static trits_t mam_test_generic_send_msg(
   return msg;
 }
 
-static trits_t mam_test_generic_send_first_packet(
+static trits_t message_test_generic_send_first_packet(
     mam_msg_pubkey_t pubkey, mam_msg_checksum_t checksum,
     mam_channel_t *const cha, mam_endpoint_t *const epa,
     mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
@@ -122,7 +122,7 @@ static trits_t mam_test_generic_send_first_packet(
   return packet;
 }
 
-static void mam_test_generic_receive_msg(
+static void message_test_generic_receive_msg(
     mam_psk_t const *const pre_shared_key, mam_ntru_sk_t const *const ntru,
     mam_channel_t *const cha, trits_t *const msg,
     mam_recv_msg_context_t *const cfg_msg_recv) {
@@ -149,7 +149,7 @@ static void mam_test_generic_receive_msg(
   cfg_msg_recv->ntru = NULL;
 }
 
-static void mam_test_generic_receive_packet(
+static void message_test_generic_receive_packet(
     mam_recv_msg_context_t const *const cfg_msg_recv,
     trits_t const *const packet, trits_t *const payload) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
@@ -183,11 +183,11 @@ static void mam_test_generic_receive_packet(
   }
 }
 
-static void mam_test_create_channels(mam_prng_t *prng,
-                                     mam_channel_t **const cha,
-                                     mam_channel_t **const ch1,
-                                     mam_endpoint_t **const epa,
-                                     mam_endpoint_t **ep1) {
+static void message_test_create_channels(mam_prng_t *prng,
+                                         mam_channel_t **const cha,
+                                         mam_channel_t **const ch1,
+                                         mam_endpoint_t **const epa,
+                                         mam_endpoint_t **ep1) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
   mss_mt_height_t d = TEST_MSS_DEPTH;
 
@@ -240,8 +240,8 @@ static void mam_test_create_channels(mam_prng_t *prng,
   }
 }
 
-static void mam_test_generic(mam_prng_t *prng_sender,
-                             mam_prng_t *prng_receiver) {
+static void message_test_generic(mam_prng_t *prng_sender,
+                                 mam_prng_t *prng_receiver) {
   retcode_t e = RC_OK;
 
   trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
@@ -260,7 +260,7 @@ static void mam_test_generic(mam_prng_t *prng_sender,
   mam_msg_keyload_t keyload;   /* psk=1, ntru=2 */
   mam_msg_checksum_t checksum; /* none=0, mac=1, mssig=2 */
 
-  mam_test_create_channels(prng_sender, &cha, &ch1a, &epa, &ep1a);
+  message_test_create_channels(prng_sender, &cha, &ch1a, &epa, &ep1a);
 
   char const *payload_str = "PAYLOAD9999";
   payload = trits_alloc(3 * strlen(payload_str));
@@ -301,19 +301,19 @@ static void mam_test_generic(mam_prng_t *prng_sender,
       {
         /* send msg and packet */
         {
-          msg = mam_test_generic_send_msg(
+          msg = message_test_generic_send_msg(
               prng_sender, pska, pskb, &ntru->public_key, pubkey, keyload,
               checksum, cha, epa, ch1a, ep1a, &send_ctx);
 
-          packet = mam_test_generic_send_first_packet(
+          packet = message_test_generic_send_first_packet(
               pubkey, checksum, cha, epa, ch1a, ep1a, &send_ctx, payload_str);
         }
 
         /* recv msg and packet */
         {
-          mam_test_generic_receive_msg(pskb, ntru, cha, &msg, cfg_msg_recv);
+          message_test_generic_receive_msg(pskb, ntru, cha, &msg, cfg_msg_recv);
 
-          mam_test_generic_receive_packet(cfg_msg_recv, &packet, &payload);
+          message_test_generic_receive_packet(cfg_msg_recv, &packet, &payload);
           TEST_ASSERT(trits_cmp_eq_str(payload, payload_str));
         }
 
@@ -345,7 +345,7 @@ static void mam_test_generic(mam_prng_t *prng_sender,
   TEST_ASSERT(e == RC_OK);
 }
 
-void mam_test() {
+void message_test() {
   MAM2_TRITS_DEF0(key_a, MAM2_PRNG_KEY_SIZE);
   key_a = MAM2_TRITS_INIT(key_a, MAM2_PRNG_KEY_SIZE);
   trits_from_str(key_a, TEST_PRNG_A_KEY);
@@ -360,11 +360,11 @@ void mam_test() {
   mam_prng_init(&prng_sender, key_a);
   mam_prng_init(&prng_receiver, key_b);
 
-  mam_test_generic(&prng_sender, &prng_receiver);
+  message_test_generic(&prng_sender, &prng_receiver);
 }
 
 int main(void) {
   UNITY_BEGIN();
-  RUN_TEST(mam_test);
+  RUN_TEST(message_test);
   return UNITY_END();
 }

@@ -14,8 +14,8 @@
 #include "common/errors.h"
 #include "common/model/bundle.h"
 #include "common/trinary/flex_trit.h"
-#include "mam/v2/mam/mam.h"
 #include "mam/v2/mam/mam_types.h"
+#include "mam/v2/mam/message.h"
 #include "mam/v2/ntru/ntru_types.h"
 #include "mam/v2/prng/prng_types.h"
 
