@@ -9,6 +9,7 @@
 #define __UTILS_CONTAINERS_{KEY_TYPE}_{VALUE_TYPE}_MAP_H__
 
 #include <stdbool.h>
+
 #include "uthash.h"
 #include "common/errors.h"
 
@@ -33,22 +34,26 @@ typedef struct {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_s {
   {KEY_TYPE} key;
   {VALUE_TYPE} value;
   UT_hash_handle hh;
-}
-{KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t;
+} {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t;
 
-typedef {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *{KEY_TYPE}_to_{VALUE_TYPE}_map_t;
+typedef struct {KEY_TYPE}_to_{VALUE_TYPE}_map_s {
+  size_t element_size;
+  {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t* map;
+} {KEY_TYPE}_to_{VALUE_TYPE}_map_t;
+
+retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_init({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
+                                              size_t element_size);
 
 retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_add({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
-                        {KEY_TYPE} const *const key,
-                        {VALUE_TYPE} const value);
+                                             {KEY_TYPE} const *const key,
+                                             {VALUE_TYPE} const value);
 
-bool {KEY_TYPE}_to_{VALUE_TYPE}_map_contains(
-     {KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map,
-     {KEY_TYPE} const *const key);
+bool {KEY_TYPE}_to_{VALUE_TYPE}_map_contains({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map,
+                                             {KEY_TYPE} const *const key);
 
 bool {KEY_TYPE}_to_{VALUE_TYPE}_map_find({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map,
-                          {KEY_TYPE} const *const key,
-                          {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t **const res);
+                                         {KEY_TYPE} const *const key,
+                                         {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t **const res);
 
 void {KEY_TYPE}_to_{VALUE_TYPE}_map_free({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map);
 
@@ -56,4 +61,4 @@ void {KEY_TYPE}_to_{VALUE_TYPE}_map_free({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const
 }
 #endif
 
-#endif  // __UTILS_CONTAINERS_HASH_HASH{TYPE}_MAP_H__
+#endif  // __UTILS_CONTAINERS_{KEY_TYPE}_{VALUE_TYPE}_MAP_H__
