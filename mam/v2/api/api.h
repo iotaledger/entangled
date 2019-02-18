@@ -43,7 +43,7 @@ retcode_t mam_api_add_ntru_pk(mam_api_t *const api,
 retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk);
 
 retcode_t mam_api_bundle_write_header(
-    mam_api_t *const api, mam_channel_t const *const ch,
+    mam_api_t *const api, mam_channel_t *const ch,
     mam_endpoint_t const *const ep, mam_channel_t const *const ch1,
     mam_endpoint_t const *const ep1, mam_psk_t_set_t psks,
     mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,

@@ -78,17 +78,12 @@ retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk) {
 }
 
 retcode_t mam_api_bundle_write_header(
-    mam_api_t *const api, mam_channel_t const *const ch,
+    mam_api_t *const api, mam_channel_t *const ch,
     mam_endpoint_t const *const ep, mam_channel_t const *const ch1,
     mam_endpoint_t const *const ep1, mam_psk_t_set_t psks,
     mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  trits_t header = trits_null();
-  size_t header_size = 0;
-  trits_t header_part = trits_null();
   mam_send_context_t ctx;
-  iota_transaction_t transaction;
-  size_t current_index = 0;
 
   if (api == NULL || ch == NULL || bundle == NULL || msg_id == NULL) {
     return RC_NULL_PARAM;
@@ -99,47 +94,58 @@ retcode_t mam_api_bundle_write_header(
   }
 
   // TODO add a random part
-  trits_t msg_id_parts[] = {mam_channel_name(ch), mam_channel_msg_ord(ch)};
-  mam_spongos_hashn(&ctx.spongos, 2, msg_id_parts,
-                    trits_from_rep(MAM2_MSG_ID_SIZE, msg_id));
-  add_assign(ch->msg_ord, MAM2_MSG_ID_SIZE, 1);
+  {
+    trits_t msg_id_parts[] = {mam_channel_name(ch), mam_channel_msg_ord(ch)};
 
-  header_size = mam_send_msg_size(ch, ep, ch1, ep1, psks, ntru_pks);
-  if (trits_is_null(header = trits_alloc(header_size))) {
-    return RC_OOM;
+    mam_spongos_hashn(&ctx.spongos, 2, msg_id_parts,
+                      trits_from_rep(MAM2_MSG_ID_SIZE, msg_id));
+    add_assign(ch->msg_ord, MAM2_MSG_ID_SIZE, 1);
   }
 
-  mam_send_msg(&ctx, &api->prng, ch, ep, ch1, ep1,
-               trits_from_rep(MAM2_MSG_ID_SIZE, msg_id), msg_type_id, psks,
-               ntru_pks, &header);
-  header = trits_pickup(header, header_size);
+  {
+    trits_t header = trits_null();
+    size_t header_size = 0;
+    trits_t header_part = trits_null();
+    iota_transaction_t transaction;
 
-  transaction_reset(&transaction);
-  // TODO setter ?
-  flex_trits_from_trits(transaction.essence.address, NUM_TRITS_ADDRESS, ch->id,
-                        NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
-  transaction_set_last_index(&transaction,
-                             (header_size - 1) / NUM_TRITS_SIGNATURE);
-  // TODO set masks ?
-  transaction.loaded_columns_mask.essence = MASK_ESSENCE_ALL;
-  while (!trits_is_empty(header)) {
-    header_part = trits_take_min(header, NUM_TRITS_SIGNATURE);
-    header = trits_drop_min(header, NUM_TRITS_SIGNATURE);
-    transaction_set_timestamp(&transaction, current_timestamp_ms() / 1000);
-    transaction_set_current_index(&transaction, current_index);
+    header_size = mam_send_msg_size(ch, ep, ch1, ep1, psks, ntru_pks);
+    if (trits_is_null(header = trits_alloc(header_size))) {
+      return RC_OOM;
+    }
+
+    mam_send_msg(&ctx, &api->prng, ch, ep, ch1, ep1,
+                 trits_from_rep(MAM2_MSG_ID_SIZE, msg_id), msg_type_id, psks,
+                 ntru_pks, &header);
+    header = trits_pickup(header, header_size);
+
+    transaction_reset(&transaction);
     // TODO setter ?
-    flex_trits_from_trits(transaction.data.signature_or_message,
-                          NUM_TRITS_SIGNATURE, header_part.p + header_part.d,
-                          trits_size(header_part), trits_size(header_part));
-    bundle_transactions_add(bundle, &transaction);
-    current_index++;
+    flex_trits_from_trits(transaction.essence.address, NUM_TRITS_ADDRESS,
+                          ch->id, NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
+    transaction_set_last_index(&transaction,
+                               (header_size - 1) / NUM_TRITS_SIGNATURE);
+    // TODO set masks ?
+    transaction.loaded_columns_mask.essence = MASK_ESSENCE_ALL;
+
+    for (size_t current_index = 0; !trits_is_empty(header); current_index++) {
+      header_part = trits_take_min(header, NUM_TRITS_SIGNATURE);
+      header = trits_drop_min(header, NUM_TRITS_SIGNATURE);
+      transaction_set_timestamp(&transaction, current_timestamp_ms() / 1000);
+      transaction_set_current_index(&transaction, current_index);
+      // TODO setter ?
+      flex_trits_from_trits(transaction.data.signature_or_message,
+                            NUM_TRITS_SIGNATURE, header_part.p + header_part.d,
+                            trits_size(header_part), trits_size(header_part));
+      bundle_transactions_add(bundle, &transaction);
+    }
+
+    // TODO Add to pending states
+
+    ctx.ord = 0;
+    ctx.mss = NULL;
+
+    trits_free(header);
   }
-
-  // TODO Add to pending states
-  // Init ord to 0
-  // copy spongos there
-
-  trits_free(header);
 
   return RC_OK;
 }
