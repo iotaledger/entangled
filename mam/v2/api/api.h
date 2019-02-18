@@ -74,12 +74,11 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
  * @param ctx - The reading context (Needs to be persisted)
  * @param cha - The channel the message belongs to
  * @param bundle - The bundle containing the MAM message
- * @param packet_payload - First packet payload
- * @param has_packet - whether or not bundle contained a first packet after the
- * header
+ * @param packet_payload - First packet payload [out] (will be allocated if
+ * packet is present)
  * @param session_key - the key for decrypting following packets with the same
- * message id
- * @param msg_id - the Message id
+ * [out] (known size) message id
+ * @param msg_id - the Message id [out]
  *
  * @return return code
  */
@@ -87,9 +86,8 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
 retcode_t mam_api_bundle_read_msg(mam_recv_msg_context_t *const ctx,
                                   mam_channel_t const *const cha,
                                   bundle_transactions_t const *const bundle,
-                                  flex_trit_t *const packet_payload,
-                                  bool *has_packet, trits_t session_key,
-                                  trits_t msg_id);
+                                  flex_trit_t **const packet_payload,
+                                  trits_t session_key, trits_t msg_id);
 
 /**
  * Reads next packet
