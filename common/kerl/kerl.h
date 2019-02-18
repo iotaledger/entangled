@@ -12,7 +12,11 @@ extern "C" {
 #ifndef __COMMON_KERL_KERL_H_
 #define __COMMON_KERL_KERL_H_
 
+#ifdef __XTENSA__
+#include "FIPS202/KeccakHash.h"
+#else
 #include <keccak/KeccakHash.h>
+#endif
 
 #include "common/curl-p/const.h"
 #include "common/stdint.h"
