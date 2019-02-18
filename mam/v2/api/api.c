@@ -89,8 +89,8 @@ retcode_t mam_api_bundle_write_header(
   mam_send_context_t ctx;
   iota_transaction_t transaction;
   size_t current_index = 0;
-  MAM2_TRITS_DEF0(msg_id, MAM2_HEADER_MSG_ID_SIZE);
-  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_HEADER_MSG_ID_SIZE);
+  MAM2_TRITS_DEF0(msg_id, MAM2_MSG_ID_SIZE);
+  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_MSG_ID_SIZE);
 
   if (api == NULL || ch == NULL || bundle == NULL) {
     return RC_NULL_PARAM;
@@ -103,7 +103,7 @@ retcode_t mam_api_bundle_write_header(
   // TODO add a random part
   trits_t msg_id_parts[] = {mam_channel_name(ch), mam_channel_msg_ord(ch)};
   mam_spongos_hashn(&ctx.spongos, 2, msg_id_parts, msg_id);
-  add_assign(ch->msg_ord, MAM2_HEADER_MSG_ID_SIZE, 1);
+  add_assign(ch->msg_ord, MAM2_MSG_ID_SIZE, 1);
 
   header_size = mam_send_msg_size(ch, ep, ch1, ep1, psks, ntru_pks);
   if (trits_is_null(header = trits_alloc(header_size))) {

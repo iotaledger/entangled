@@ -393,7 +393,7 @@ size_t mam_send_msg_size(mam_channel_t *ch, mam_endpoint_t *ep,
 
   /* header */
   /*  absorb tryte msg_id[27]; */
-  sz += pb3_sizeof_ntrytes(MAM2_HEADER_MSG_ID_SIZE / 3);
+  sz += pb3_sizeof_ntrytes(MAM2_MSG_ID_SIZE / 3);
   /*  absorb trint typeid; */
   sz += pb3_sizeof_trint();
   {
@@ -629,7 +629,7 @@ trits_t mam_recv_msg_cfg_epid1(mam_recv_msg_context_t const *const cfg) {
 
 trits_t mam_recv_msg_cfg_msg_id(mam_recv_msg_context_t const *const cfg) {
   MAM2_ASSERT(cfg);
-  return trits_from_rep(MAM2_HEADER_MSG_ID_SIZE, cfg->msg_id);
+  return trits_from_rep(MAM2_MSG_ID_SIZE, cfg->msg_id);
 }
 
 retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *b) {
