@@ -161,7 +161,7 @@ retcode_t bundle_validator(bundle_transactions_t *const bundle,
   int64_t bundle_value = 0, tx_value = 0;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   bool valid_sig = false;
-  Kerl shared_kerl1 = {}, shared_kerl2 = {};
+  Kerl shared_kerl1, shared_kerl2;
   flex_trit_t bundle_hash_calculated[FLEX_TRIT_SIZE_243];
   trit_t normalized_bundle[HASH_LENGTH_TRIT];
 
