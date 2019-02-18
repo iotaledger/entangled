@@ -14,67 +14,6 @@
 #include "mam/v2/mam/mam.h"
 #include "mam/v2/pb3/pb3.h"
 
-retcode_t mam_mss_create(mss_t *m, mam_prng_t *p, mss_mt_height_t d, trits_t N1,
-                         trits_t N2) {
-  retcode_t e;
-  MAM2_ASSERT(m);
-
-  if ((e = mss_create(m, d)) != RC_OK) {
-    return e;
-  }
-
-  m->nonce1 = trits_null();
-  if (!trits_is_empty(N1)) {
-    m->nonce1 = trits_alloc(trits_size(N1));
-    if (trits_is_null(m->nonce1)) {
-      return RC_OOM;
-    }
-    trits_copy(N1, m->nonce1);
-  }
-
-  m->nonce2 = trits_null();
-  if (!trits_is_empty(N2)) {
-    m->nonce2 = trits_alloc(trits_size(N2));
-    if (trits_is_null(m->nonce2)) {
-      return RC_OOM;
-    }
-    trits_copy(N2, m->nonce2);
-  }
-
-  mss_init(m, p, d, m->nonce1, m->nonce2);
-
-  e = RC_OK;
-
-  return e;
-}
-
-void mam_mss_destroy(mss_t *m) {
-  MAM2_ASSERT(m);
-
-  m->prng = 0;
-
-  trits_free(m->nonce1);
-  trits_free(m->nonce2);
-
-  mss_destroy(m);
-}
-
-trits_t mam_psk_id(mam_psk_t *p) {
-  return trits_from_rep(MAM2_PSK_ID_SIZE, p->id);
-}
-
-trits_t mam_psk_trits(mam_psk_t *p) {
-  return trits_from_rep(MAM2_PSK_KEY_SIZE, p->key);
-}
-
-trits_t mam_ntru_pk_trits(mam_ntru_pk_t *p) {
-  return trits_from_rep(MAM2_NTRU_PK_SIZE, p->key);
-}
-
-trits_t mam_ntru_pk_id(mam_ntru_pk_t *p) {
-  return trits_from_rep(MAM2_NTRU_ID_SIZE, p->key);
-}
-
 /* MAC, MSSig, SignedId */
 
 static size_t mam_wrap_mac_size() {
