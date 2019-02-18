@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_MAM_MAM_H__
-#define __MAM_V2_MAM_MAM_H__
+#ifndef __MAM_V2_MAM_MESSAGE_H__
+#define __MAM_V2_MAM_MESSAGE_H__
 
 #include "common/errors.h"
 #include "mam/v2/defs.h"
@@ -49,28 +49,30 @@ typedef enum mam_msg_checksum_e {
   mam_msg_checksum_mssig = 2,
 } mam_msg_checksum_t;
 
-typedef struct mam_send_context_s {
+typedef struct mam_msg_send_context_s {
   mam_spongos_t spongos;
   trint18_t ord;
   mss_t *mss;
-} mam_send_context_t;
+} mam_msg_send_context_t;
 
-size_t mam_send_msg_size(mam_channel_t *ch, mam_endpoint_t *ep,
+size_t mam_msg_send_size(mam_channel_t *ch, mam_endpoint_t *ep,
                          mam_channel_t *ch1, mam_endpoint_t *ep1,
                          mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks);
 
-void mam_send_msg(mam_send_context_t *ctx, mam_prng_t *prng, mam_channel_t *ch,
-                  mam_endpoint_t *ep, mam_channel_t *ch1, mam_endpoint_t *ep1,
-                  trits_t msg_id, trint9_t msg_type_id, mam_psk_t_set_t psks,
-                  mam_ntru_pk_t_set_t ntru_pks, trits_t *msg);
+void mam_msg_send(mam_msg_send_context_t *ctx, mam_prng_t *prng,
+                  mam_channel_t *ch, mam_endpoint_t *ep, mam_channel_t *ch1,
+                  mam_endpoint_t *ep1, trits_t msg_id, trint9_t msg_type_id,
+                  mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks,
+                  trits_t *msg);
 
-size_t mam_send_packet_size(mam_msg_checksum_t checksum, mss_t *mss,
-                            size_t payload_size);
+size_t mam_msg_send_packet_size(mam_msg_checksum_t checksum, mss_t *mss,
+                                size_t payload_size);
 
-void mam_send_packet(mam_send_context_t *ctx, mam_msg_checksum_t checksum,
-                     trits_t payload, trits_t *b);
+void mam_msg_send_packet(mam_msg_send_context_t *ctx,
+                         mam_msg_checksum_t checksum, trits_t payload,
+                         trits_t *b);
 
-typedef struct mam_recv_msg_context_s {
+typedef struct mam_msg_recv_context_s {
   mam_spongos_t spongos[1]; /*!< Main Spongos interface */
   mam_msg_pubkey_t pubkey;
   trit_t chid[MAM2_CHANNEL_ID_SIZE];
@@ -85,29 +87,29 @@ typedef struct mam_recv_msg_context_s {
   trint9_t msg_type_id;
   mam_psk_t *psk;      /*!< PSK to decrypt message. */
   mam_ntru_sk_t *ntru; /*!< NTRU sk to decrypt message. */
-} mam_recv_msg_context_t;
+} mam_msg_recv_context_t;
 
-retcode_t mam_recv_msg(mam_recv_msg_context_t *cfg, trits_t *msg);
+retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t *msg);
 
-typedef struct mam_recv_packet_context_s {
+typedef struct mam_msg_recv_packet_context_s {
   mam_spongos_t spongos[1];      /*!< Main Spongos interface */
   trint18_t ord;                 /*!< Packet ordinal number. */
   trits_t pk;                    /*!< Channel/Endpoint id - MSS public key. */
   mam_spongos_t spongos_mss[1];  /*!< Spongos interface used by MSS. */
   mam_spongos_t spongos_wots[1]; /*!< Spongos interface used by WOTS. */
-} mam_recv_packet_context_t;
+} mam_msg_recv_packet_context_t;
 
-retcode_t mam_recv_packet(mam_recv_packet_context_t *cfg, trits_t *packet,
-                          trits_t *payload);
+retcode_t mam_msg_recv_packet(mam_msg_recv_packet_context_t *cfg,
+                              trits_t *packet, trits_t *payload);
 
-trits_t mam_recv_msg_cfg_chid(mam_recv_msg_context_t const *const cfg);
-trits_t mam_recv_msg_cfg_chid1(mam_recv_msg_context_t const *const cfg);
-trits_t mam_recv_msg_cfg_epid(mam_recv_msg_context_t const *const cfg);
-trits_t mam_recv_msg_cfg_epid1(mam_recv_msg_context_t const *const cfg);
-trits_t mam_recv_msg_cfg_msg_id(mam_recv_msg_context_t const *const cfg);
+trits_t mam_msg_recv_cfg_chid(mam_msg_recv_context_t const *const cfg);
+trits_t mam_msg_recv_cfg_chid1(mam_msg_recv_context_t const *const cfg);
+trits_t mam_msg_recv_cfg_epid(mam_msg_recv_context_t const *const cfg);
+trits_t mam_msg_recv_cfg_epid1(mam_msg_recv_context_t const *const cfg);
+trits_t mam_msg_recv_cfg_msg_id(mam_msg_recv_context_t const *const cfg);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // __MAM_V2_MAM_MAM_H__
+#endif  // __MAM_V2_MAM_MESSAGE_H__
