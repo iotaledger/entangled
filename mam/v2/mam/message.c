@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include "mam/v2/mam/message.h"
+#include "mam/v2/ntru/mam_ntru_sk_t_set.h"
 #include "mam/v2/pb3/pb3.h"
 
 /* MAC, MSSig, SignedId */
@@ -272,29 +273,34 @@ static void mam_msg_wrap_keyload_psk(mam_spongos_t *s, trits_t *b, trits_t key,
 
 static retcode_t mam_msg_unwrap_keyload_psk(mam_spongos_t *s, trits_t *b,
                                             trits_t key, bool *key_found,
-                                            mam_psk_t *p) {
+                                            mam_psk_t_set_t *p) {
   retcode_t e = RC_OK;
   MAM2_TRITS_DEF0(id, MAM2_PSK_ID_SIZE);
   id = MAM2_TRITS_INIT(id, MAM2_PSK_ID_SIZE);
 
-  trits_t pskid = mam_psk_id(p);
-  trits_t psk = mam_psk_trits(p);
-
   MAM2_ASSERT(key_found);
   MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(key));
-  MAM2_ASSERT(trits_is_empty(pskid) ||
-              pb3_sizeof_ntrytes(81) == trits_size(psk));
 
   /*  absorb tryte id[27]; */
   ERR_BIND_RETURN(pb3_unwrap_absorb_ntrytes(s, b, id), e);
 
+  mam_psk_t_set_entry_t *entry = NULL;
+  mam_psk_t_set_entry_t *tmp = NULL;
+  bool psk_found = false;
+  HASH_ITER(hh, *p, entry, tmp) {
+    if (trits_cmp_eq(id, mam_psk_id(&entry->value))) {
+      psk_found = true;
+      break;
+    }
+  }
+
   /* TODO: retcode_t (*lookup_psk)(void *ctx, trits_t id); */
-  if (trits_cmp_eq(pskid, id)) {
+  if (psk_found) {
     ERR_GUARD_RETURN(!*key_found, RC_MAM2_KEYLOAD_OVERLOADED, e);
     *key_found = 1;
 
     /*  absorb external tryte psk[81]; */
-    pb3_absorb_external_ntrytes(s, psk);
+    pb3_absorb_external_ntrytes(s, mam_psk_trits(&entry->value));
     /*  commit; */
     mam_spongos_commit(s);
     /*  crypt tryte ekey[81]; */
@@ -336,28 +342,37 @@ static void mam_msg_wrap_keyload_ntru(mam_spongos_t *s, trits_t *b, trits_t key,
 
 static retcode_t mam_msg_unwrap_keyload_ntru(mam_spongos_t *s, trits_t *b,
                                              trits_t key, bool *key_found,
-                                             mam_ntru_sk_t *n,
+                                             mam_ntru_sk_t_set_t *n,
                                              mam_spongos_t *ns) {
   retcode_t e = RC_OK;
   trits_t ekey;
   MAM2_TRITS_DEF0(id, 81);
   id = MAM2_TRITS_INIT(id, 81);
-  trits_t pkid = ntru_id_trits(n);
 
   MAM2_ASSERT(MAM2_NTRU_KEY_SIZE == trits_size(key));
-  MAM2_ASSERT(MAM2_NTRU_ID_SIZE == trits_size(pkid));
 
   /*  absorb tryte id[27]; */
   ERR_BIND_RETURN(pb3_unwrap_absorb_ntrytes(s, b, id), e);
-  if (trits_cmp_eq(pkid, id)) {
+
+  mam_ntru_sk_t_set_entry_t *entry = NULL;
+  mam_ntru_sk_t_set_entry_t *tmp = NULL;
+  bool ntru_found = false;
+  HASH_ITER(hh, *n, entry, tmp) {
+    if (trits_cmp_eq(id, mam_ntru_pk_id(&entry->value.public_key))) {
+      ntru_found = true;
+      break;
+    }
+  }
+
+  if (ntru_found) {
     ERR_GUARD_RETURN(!*key_found, RC_MAM2_KEYLOAD_OVERLOADED, e);
     *key_found = 1;
 
     /*  absorb tryte ekey[3072]; */
     ERR_GUARD_RETURN(MAM2_NTRU_EKEY_SIZE <= trits_size(*b), RC_MAM2_PB3_EOF, e);
     ekey = pb3_trits_take(b, MAM2_NTRU_EKEY_SIZE);
-    ERR_GUARD_RETURN(trits_cmp_eq(pkid, id), RC_MAM2_KEYLOAD_IRRELEVANT, e);
-    ERR_GUARD_RETURN(ntru_decr(n, ns, ekey, key), RC_MAM2_PB3_BAD_EKEY, e);
+    ERR_GUARD_RETURN(ntru_decr(&entry->value, ns, ekey, key),
+                     RC_MAM2_PB3_BAD_EKEY, e);
     mam_spongos_absorb(s, ekey);
   } else { /* skip */
     ERR_GUARD_RETURN(MAM2_NTRU_EKEY_SIZE <= trits_size(*b), RC_MAM2_PB3_EOF, e);
@@ -770,20 +785,18 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t *b) {
           mam_mam_spongos_fork(s, &spongos_fork);
 
           if (mam_msg_keyload_psk == keyload) { /*  KeyloadPSK psk = 1; */
-            if (cfg->psk) {
-              ERR_BIND_RETURN(
-                  mam_msg_unwrap_keyload_psk(&spongos_fork, b, session_key,
-                                             &key_found, cfg->psk),
-                  e);
-            }
+            ERR_BIND_RETURN(
+                mam_msg_unwrap_keyload_psk(&spongos_fork, b, session_key,
+                                           &key_found, &cfg->psks),
+                e);
+
           } else if (mam_msg_keyload_ntru ==
                      keyload) { /*  KeyloadNTRU ntru = 2; */
-            if (cfg->ntru) {
-              ERR_BIND_RETURN(mam_msg_unwrap_keyload_ntru(
-                                  &spongos_fork, b, session_key, &key_found,
-                                  cfg->ntru, &spongos_ntru),
-                              e);
-            }
+            ERR_BIND_RETURN(mam_msg_unwrap_keyload_ntru(
+                                &spongos_fork, b, session_key, &key_found,
+                                &cfg->ntrus, &spongos_ntru),
+                            e);
+
           } else
             ERR_GUARD_RETURN(0, RC_MAM2_PB3_BAD_ONEOF, e);
         }

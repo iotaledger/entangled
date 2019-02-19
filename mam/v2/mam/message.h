@@ -85,8 +85,8 @@ typedef struct mam_msg_recv_context_s {
   /*TODO: handle (add to trusted list) new chid1*/
   trit_t msg_id[MAM2_MSG_ID_SIZE];
   trint9_t msg_type_id;
-  mam_psk_t *psk;      /*!< PSK to decrypt message. */
-  mam_ntru_sk_t *ntru; /*!< NTRU sk to decrypt message. */
+  mam_psk_t_set_t psks;      /*!< PSK to decrypt message. */
+  mam_ntru_sk_t_set_t ntrus; /*!< NTRU sk to decrypt message. */
 } mam_msg_recv_context_t;
 
 retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t *msg);

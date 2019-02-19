@@ -12,6 +12,7 @@
 #include <unity/unity.h>
 
 #include "mam/v2/mam/message.h"
+#include "mam/v2/ntru/mam_ntru_sk_t_set.h"
 #include "mam/v2/test_utils/test_utils.h"
 
 #define TEST_CHANNEL_NAME "CHANAME"
@@ -133,8 +134,10 @@ static void message_test_generic_receive_msg(
     mam_msg_recv_context_t *cfg = cfg_msg_recv;
 
     cfg->pubkey = -1;
-    cfg->psk = pre_shared_key;
-    cfg->ntru = ntru;
+    cfg->psks = NULL;
+    TEST_ASSERT(mam_psk_t_set_add(&cfg->psks, pre_shared_key) == RC_OK);
+    cfg->ntrus = NULL;
+    TEST_ASSERT(mam_ntru_sk_t_set_add(&cfg->ntrus, ntru) == RC_OK);
 
     trits_copy(mam_channel_id(cha), mam_msg_recv_cfg_chid(cfg));
   }
@@ -146,7 +149,8 @@ static void message_test_generic_receive_msg(
                                "SENDERMSGIDAAAAASENDERMSGID"));
   MAM2_ASSERT(cfg_msg_recv->msg_type_id == 0);
 
-  cfg_msg_recv->ntru = NULL;
+  mam_ntru_sk_t_set_free(&cfg_msg_recv->ntrus);
+  mam_psk_t_set_free(&cfg_msg_recv->psks);
 }
 
 static void message_test_generic_receive_packet(
