@@ -33,6 +33,10 @@ retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed) {
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
   api->psks = NULL;
+  if ((ret = trit_t_to_mam_msg_send_context_t_map_init(
+           &api->send_ctxs, MAM2_MSG_ID_SIZE)) != RC_OK) {
+    return ret;
+  }
 
   return ret;
 }
@@ -44,14 +48,13 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
     return RC_NULL_PARAM;
   }
 
-  if ((ret = mam_prng_destroy(&api->prng)) != RC_OK) {
-    return ret;
-  }
+  ret = mam_prng_destroy(&api->prng);
   mam_ntru_sk_t_set_free(&api->ntru_sks);
   mam_ntru_pk_t_set_free(&api->ntru_pks);
   mam_psk_t_set_free(&api->psks);
+  ret = trit_t_to_mam_msg_send_context_t_map_free(&api->send_ctxs);
 
-  return RC_OK;
+  return ret;
 }
 
 retcode_t mam_api_add_ntru_sk(mam_api_t *const api,
@@ -83,6 +86,7 @@ retcode_t mam_api_bundle_write_header(
     mam_endpoint_t const *const ep1, mam_psk_t_set_t psks,
     mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id) {
+  retcode_t ret = RC_OK;
   mam_msg_send_context_t ctx;
 
   if (api == NULL || ch == NULL || bundle == NULL || msg_id == NULL) {
@@ -144,25 +148,28 @@ retcode_t mam_api_bundle_write_header(
     }
 
     trits_free(header);
-
-    ctx.ord = 0;
-    ctx.mss = NULL;
-
-    // TODO Add to pending states
   }
 
-  return RC_OK;
+  ctx.ord = 0;
+  ctx.mss = NULL;
+
+  return trit_t_to_mam_msg_send_context_t_map_add(&api->send_ctxs, msg_id, ctx);
 }
 
 retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
+                                      trit_t *const msg_id,
                                       tryte_t const *const payload,
                                       mam_msg_checksum_t checksum,
                                       bundle_transactions_t *const bundle) {
   mam_msg_send_context_t *ctx = NULL;
+  trit_t_to_mam_msg_send_context_t_map_entry_t *entry = NULL;
 
   if (api == NULL || payload == NULL || bundle == NULL) {
     return RC_NULL_PARAM;
   }
+
+  bool found = trit_t_to_mam_msg_send_context_t_map_find(&api->send_ctxs,
+                                                         msg_id, &entry);
 
   // TODO check if bundle contains header
 

@@ -77,6 +77,7 @@ int main(void) {
   bundle_transactions_new(&bundle);
   mam_api_bundle_write_header(&api, cha, NULL, NULL, NULL, NULL, NULL, 0,
                               bundle, msg_id);
+  mam_api_bundle_write_packet(&api, msg_id, "TEST", 0, bundle);
   send_bundle(bundle);
   bundle_transactions_free(&bundle);
 
