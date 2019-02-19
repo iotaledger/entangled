@@ -53,3 +53,15 @@ size_t hash{SIZE}_stack_count(hash{SIZE}_stack_t const stack) {
   }
   return count;
 }
+
+flex_trit_t *hash{SIZE}_stack_at(hash{SIZE}_stack_t const stack, size_t index) {
+  hash{SIZE}_stack_entry_t *iter = NULL;
+  size_t count = 0;
+  LL_FOREACH(stack, iter) {
+    if (count == index) {
+      return (flex_trit_t *)(iter->hash);
+    }
+    count++;
+  }
+  return NULL;
+}

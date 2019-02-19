@@ -26,6 +26,9 @@
 extern "C" {
 #endif
 
+trits_t mam_ntru_pk_id(mam_ntru_pk_t const *const ntru_pk);
+trits_t mam_ntru_pk_trits(mam_ntru_pk_t const *const ntru_pk);
+
 /**
  * Allocates memory for a NTRU interface
  *

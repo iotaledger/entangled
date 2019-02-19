@@ -53,6 +53,15 @@ trits_t mam_channel_id(mam_channel_t const *const channel);
 trits_t mam_channel_name(mam_channel_t const *const channel);
 
 /**
+ * Gets a channel's msg_ord
+ *
+ * @param channel The channel
+ *
+ * @return the channel's msg_ord
+ */
+trits_t mam_channel_msg_ord(mam_channel_t const *const channel);
+
+/**
  * Allocates memory for internal objects, and generates MSS public key
  *
  * @param allocator A MAM allocator
@@ -78,38 +87,6 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
 void mam_channel_destroy(mam_channel_t *const channel);
 
 retcode_t mam_channels_destroy(mam_channel_t_set_t *const channels);
-
-/**
- * Gets the size of a wrapped channel
- *
- * @return the wrapped channel size
- */
-size_t mam_channel_wrap_size();
-
-/**
- * Wraps a channel into a trits buffer
- *
- * @param spongos A spongos interface
- * @param buffer The buffer
- * @param version The MAM version
- * @param channel_id The channel id
- */
-void mam_channel_wrap(mam_spongos_t *const spongos, trits_t *const buffer,
-                      tryte_t const version, trits_t const channel_id);
-
-/**
- * Unwraps a channel from a trits buffer
- *
- * @param spongos A spongos interface
- * @param buffer The buffer
- * @param version The MAM version
- * @param channel_id The channel id
- *
- * @return a status code
- */
-retcode_t mam_channel_unwrap(mam_spongos_t *const spongos,
-                             trits_t *const buffer, tryte_t *const version,
-                             trits_t channel_id);
 
 size_t mam_channel_serialized_size(mam_channel_t const *const channel);
 

@@ -12,6 +12,14 @@
 #include "mam/v2/mam/mam_psk_t_set.h"
 #include "mam/v2/ntru/ntru.h"
 
+trits_t mam_psk_id(mam_psk_t const *const psk) {
+  return trits_from_rep(MAM2_PSK_ID_SIZE, psk->id);
+}
+
+trits_t mam_psk_trits(mam_psk_t const *const psk) {
+  return trits_from_rep(MAM2_PSK_KEY_SIZE, psk->key);
+}
+
 size_t mam_psks_serialized_size(mam_psk_t_set_t const psks) {
   return mam_psk_t_set_size(psks) * sizeof(mam_psk_t);
 }

@@ -31,6 +31,9 @@ typedef struct mam_psk_s {
 typedef struct mam_psk_t_set_entry_s mam_psk_t_set_entry_t;
 typedef mam_psk_t_set_entry_t* mam_psk_t_set_t;
 
+trits_t mam_psk_id(mam_psk_t const* const psk);
+trits_t mam_psk_trits(mam_psk_t const* const psk);
+
 size_t mam_psks_serialized_size(mam_psk_t_set_t const psks);
 retcode_t mam_psks_serialize(mam_psk_t_set_t const psks, trits_t trits);
 retcode_t mam_psks_deserialize(trits_t const trits,
