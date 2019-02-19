@@ -66,7 +66,8 @@ size_t transaction_deserialize_trits(iota_transaction_t *const transaction,
                    NUM_TRITS_CURRENT_INDEX);
   flex_trits_to_trits(buffer, NUM_TRITS_CURRENT_INDEX, partial,
                       NUM_TRITS_CURRENT_INDEX, NUM_TRITS_CURRENT_INDEX);
-  transaction_set_current_index(transaction, trits_to_long(buffer, 27));
+  transaction_set_current_index(transaction,
+                                trits_to_long(buffer, NUM_TRITS_CURRENT_INDEX));
   offset += NUM_TRITS_CURRENT_INDEX;
   flex_trits_slice(partial, NUM_TRITS_LAST_INDEX, trits,
                    NUM_TRITS_SERIALIZED_TRANSACTION, offset,
