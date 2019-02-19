@@ -83,7 +83,7 @@ retcode_t mam_api_bundle_write_header(
     mam_endpoint_t const *const ep1, mam_psk_t_set_t psks,
     mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  mam_send_context_t ctx;
+  mam_msg_send_context_t ctx;
 
   if (api == NULL || ch == NULL || bundle == NULL || msg_id == NULL) {
     return RC_NULL_PARAM;
@@ -109,12 +109,12 @@ retcode_t mam_api_bundle_write_header(
     iota_transaction_t transaction;
     flex_trit_t buffer[FLEX_TRIT_SIZE_6561];
 
-    header_size = mam_send_msg_size(ch, ep, ch1, ep1, psks, ntru_pks);
+    header_size = mam_msg_send_size(ch, ep, ch1, ep1, psks, ntru_pks);
     if (trits_is_null(header = trits_alloc(header_size))) {
       return RC_OOM;
     }
 
-    mam_send_msg(&ctx, &api->prng, ch, ep, ch1, ep1,
+    mam_msg_send(&ctx, &api->prng, ch, ep, ch1, ep1,
                  trits_from_rep(MAM2_MSG_ID_SIZE, msg_id), msg_type_id, psks,
                  ntru_pks, &header);
     header = trits_pickup(header, header_size);
@@ -158,7 +158,7 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
                                       tryte_t const *const payload,
                                       mam_msg_checksum_t checksum,
                                       bundle_transactions_t *const bundle) {
-  mam_send_context_t *ctx = NULL;
+  mam_msg_send_context_t *ctx = NULL;
 
   if (api == NULL || payload == NULL || bundle == NULL) {
     return RC_NULL_PARAM;
