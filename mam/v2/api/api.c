@@ -179,7 +179,7 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
   mam_msg_send_context_t *ctx = NULL;
   trit_t_to_mam_msg_send_context_t_map_entry_t *entry = NULL;
 
-  if (api == NULL || payload == NULL || bundle == NULL) {
+  if (api == NULL || msg_id == NULL || payload == NULL || bundle == NULL) {
     return RC_NULL_PARAM;
   }
 
