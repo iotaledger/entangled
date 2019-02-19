@@ -3,9 +3,9 @@ package(default_visibility = ["//visibility:public"])
 load("//utils/containers:typed_container_generator.bzl", "typed_container_generate")
 
 cc_library(
-    name = "mam",
-    srcs = ["mam.c"],
-    hdrs = ["mam.h"],
+    name = "message",
+    srcs = ["message.c"],
+    hdrs = ["message.h"],
     deps = [
         ":channel",
         ":endpoint",
