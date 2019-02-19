@@ -2,7 +2,7 @@ def _map_generator_impl(ctx):
     ctx.actions.expand_template(
         template = ctx.file.source_template,
         output = ctx.outputs.source,
-        substitutions = {"{KEY_TYPE}": ctx.attr.key_type, "{VALUE_TYPE}": ctx.attr.value_type},
+        substitutions = {"{KEY_TYPE}": ctx.attr.key_type, "{VALUE_TYPE}": ctx.attr.value_type, "{PARENT_DIRECTORY}": ctx.attr.parent_directory},
     )
 
     ADDITIONAL_INCLUDE_PATH_ACTUAL = ""
@@ -58,6 +58,7 @@ def map_generate(key_type, value_type, additional_include_path = "", additional_
         hdrs = [header],
         deps = [
             "//common:errors",
+            "//common/trinary:trits",
             "@com_github_uthash//:uthash",
         ] + additional_deps,
         visibility = ["//visibility:public"],
