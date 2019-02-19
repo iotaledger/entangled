@@ -12,6 +12,7 @@
 
 #include "uthash.h"
 #include "common/errors.h"
+#include "common/trinary/trits.h"
 {ADDITIONAL_INCLUDE_PATH}
 
 /*
@@ -26,7 +27,7 @@ extern "C" {
 #endif
 
 typedef struct {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_s {
-  {KEY_TYPE} key;
+  {KEY_TYPE} *key;
   {VALUE_TYPE} value;
   UT_hash_handle hh;
 } {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t;
@@ -50,7 +51,7 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_find({KEY_TYPE}_to_{VALUE_TYPE}_map_t const 
                                          {KEY_TYPE} const *const key,
                                          {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t **const res);
 
-void {KEY_TYPE}_to_{VALUE_TYPE}_map_free({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map);
+retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_free({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map);
 
 #ifdef __cplusplus
 }

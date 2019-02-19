@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "utils/containers/{KEY_TYPE}_to_{VALUE_TYPE}_map.h"
+#include "{PARENT_DIRECTORY}/{KEY_TYPE}_to_{VALUE_TYPE}_map.h"
 
 retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_init({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
                                               size_t key_size) {
@@ -25,9 +25,13 @@ retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_add({KEY_TYPE}_to_{VALUE_TYPE}_map_t *c
     return RC_UTILS_OOM;
   }
 
-  memcpy(&map_entry->key, key, map->key_size);
+  if ((map_entry->key = ({KEY_TYPE}*)malloc(map->key_size)) == NULL) {
+    return RC_UTILS_OOM;
+  }
+
+  memcpy(map_entry->key, key, map->key_size);
   memcpy(&map_entry->value,&value, sizeof({VALUE_TYPE}));
-  HASH_ADD(hh, map->map, key, map->key_size, map_entry);
+  HASH_ADD_KEYPTR(hh, map->map, key, map->key_size, map_entry);
 
   return RC_OK;
 }
@@ -60,14 +64,16 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_find({KEY_TYPE}_to_{VALUE_TYPE}_map_t const 
   return *res != NULL;
 }
 
-void {KEY_TYPE}_to_{VALUE_TYPE}_map_free({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map) {
+retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_free({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map) {
   {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *curr_entry = NULL;
   {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *tmp_entry = NULL;
 
   HASH_ITER(hh, map->map, curr_entry, tmp_entry) {
+    free(curr_entry->key);
     HASH_DEL(map->map, curr_entry);
     free(curr_entry);
   }
 
   map->map = NULL;
+  return RC_OK;
 }
