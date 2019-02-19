@@ -150,6 +150,9 @@ static void message_test_generic_receive_msg(
   MAM2_ASSERT(cfg_msg_recv->msg_type_id == 0);
 
   cfg_msg_recv->ntrus = NULL;
+
+  mam_ntru_sk_t_set_free(&cfg_msg_recv->ntrus);
+  mam_psk_t_set_free(&cfg_msg_recv->psks);
 }
 
 static void message_test_generic_receive_packet(
