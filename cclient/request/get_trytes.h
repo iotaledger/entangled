@@ -22,6 +22,16 @@ typedef struct get_trytes_req_s {
 get_trytes_req_t* get_trytes_req_new();
 void get_trytes_req_free(get_trytes_req_t** const req);
 
+static inline retcode_t get_trytes_req_add_hash(get_trytes_req_t* const req,
+                                                flex_trit_t const* const hash) {
+  return hash243_queue_push(&req->hashes, hash);
+}
+
+static inline flex_trit_t* get_trytes_req_get_hash(get_trytes_req_t* const req,
+                                                   size_t index) {
+  return hash243_queue_at(&req->hashes, index);
+}
+
 #ifdef __cplusplus
 }
 #endif
