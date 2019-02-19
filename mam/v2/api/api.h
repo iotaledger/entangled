@@ -83,11 +83,26 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
  * @return return code
  */
 
-retcode_t mam_api_bundle_read_msg(mam_recv_msg_context_t *const ctx,
-                                  mam_channel_t const *const cha,
+retcode_t mam_api_bundle_read_msg(mam_msg_recv_context_t *const ctx,
                                   bundle_transactions_t const *const bundle,
                                   flex_trit_t **const packet_payload,
-                                  trits_t session_key, trits_t msg_id);
+                                  trits_t msg_id);
+
+/**
+ * Reads MAM's header
+ *
+ * @param ctx - The reading context (Needs to be persisted)
+ * @param cha - The channel the message belongs to
+ * @param bundle - The bundle containing the MAM message
+ * @param session_key - the key for decrypting following packets with the same
+ * [out] (known size) message id
+ * @param msg_id - the Message id [out]
+ *
+ * @return return code
+ */
+
+retcode_t mam_api_bundle_read_header(mam_msg_recv_context_t *const ctx,
+                                     trits_t *const msg, trits_t msg_id);
 
 /**
  * Reads next packet
@@ -102,10 +117,8 @@ retcode_t mam_api_bundle_read_msg(mam_recv_msg_context_t *const ctx,
  * @return return code
  */
 
-retcode_t mam_api_bundle_read_packet(mam_recv_msg_context_t *const ctx,
-                                     mam_channel_t const *const cha,
+retcode_t mam_api_bundle_read_packet(mam_msg_recv_context_t *const ctx,
                                      bundle_transactions_t const *const bundle,
-                                     trits_t const session_key,
                                      flex_trit_t *const payload, uint32_t ord,
                                      trits_t const msg_id);
 

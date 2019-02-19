@@ -700,8 +700,7 @@ trits_t mam_msg_recv_cfg_msg_id(mam_msg_recv_context_t const *const cfg) {
   return trits_from_rep(MAM2_MSG_ID_SIZE, cfg->msg_id);
 }
 
-retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg,
-trits_t const *const msg, trits_t session_key) {
+retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t const *const msg) {
   retcode_t e = RC_OK;
   mam_spongos_t *s;
 
@@ -715,11 +714,14 @@ trits_t const *const msg, trits_t session_key) {
 
   mam_spongos_init(s);
 
+  trit_t session_key_trits[MAM2_SPONGE_KEY_SIZE];
+  trits_t session_key = trits_from_rep(MAM2_SPONGE_KEY_SIZE, session_key_trits);
+
   /* unwrap Channel */
   {
     tryte_t ver = -1;
     ERR_BIND_RETURN(
-    mam_msg_channel_unwrap(s, msg, &ver, mam_msg_recv_cfg_chid(cfg)), e);
+        mam_msg_channel_unwrap(s, msg, &ver, mam_msg_recv_cfg_chid(cfg)), e);
     ERR_GUARD_RETURN(0 == ver, RC_MAM2_VERSION_NOT_SUPPORTED, e);
   }
 
@@ -733,7 +735,7 @@ trits_t const *const msg, trits_t session_key) {
     if (mam_msg_pubkey_chid1 == pubkey) { /*  SignedId chid1 = 2; */
       /*TODO: verify chid is trusted */
       ERR_BIND_RETURN(mam_msg_unwrap_pubkey_chid1(
-                          s,msg, mam_msg_recv_cfg_chid1(cfg), cfg->spongos_mss,
+                          s, msg, mam_msg_recv_cfg_chid1(cfg), cfg->spongos_mss,
                           cfg->spongos_wots, mam_msg_recv_cfg_chid(cfg)),
                       e);
       /*TODO: record new channel/endpoint */

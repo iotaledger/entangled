@@ -190,11 +190,26 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle) {
   return flex_trits_are_null(transaction_tag(tx), NUM_TRITS_TAG);
 }
 
-retcode_t mam_api_bundle_read_msg(mam_recv_msg_context_t *const ctx,
-                                  mam_channel_t const *const cha,
+trits_t msg_trits_from_bundle(bundle_transactions_t const *const bundle,
+                              trit_t const msg_trits[],
+                              size_t num_trits_in_bundle) {
+  iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
+
+  trit_t *msg_trits_ptr = msg_trits;
+  BUNDLE_FOREACH(bundle, curr_tx) {
+    flex_trits_to_trits(msg_trits_ptr, NUM_TRITS_SIGNATURE,
+                        transaction_signature(curr_tx), NUM_TRITS_SIGNATURE,
+                        NUM_TRITS_SIGNATURE);
+    msg_trits_ptr += NUM_TRITS_SIGNATURE;
+  }
+
+  return trits_from_rep(num_trits_in_bundle, msg_trits);
+}
+
+retcode_t mam_api_bundle_read_msg(mam_msg_recv_context_t *const ctx,
                                   bundle_transactions_t const *const bundle,
                                   flex_trit_t **const packet_payload,
-                                  trits_t session_key, trits_t msg_id) {
+                                  trits_t msg_id) {
   retcode_t err = RC_OK;
   MAM2_ASSERT(packet_payload && *packet_payload == NULL);
   if (!mam_api_bundle_contains_header(bundle)) {
@@ -206,18 +221,9 @@ retcode_t mam_api_bundle_read_msg(mam_recv_msg_context_t *const ctx,
   size_t num_trits_in_bundle =
       bundle_transactions_size(bundle) * NUM_TRITS_SIGNATURE;
   trit_t msg_trits[num_trits_in_bundle];
-  iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
+  trits_t msg = msg_trits_from_bundle(bundle, msg_trits, num_trits_in_bundle);
 
-  trit_t *msg_trits_ptr = msg_trits;
-  BUNDLE_FOREACH(bundle, curr_tx) {
-    flex_trits_to_trits(msg_trits_ptr, NUM_TRITS_SIGNATURE,
-                        transaction_signature(curr_tx), NUM_TRITS_SIGNATURE,
-                        NUM_TRITS_SIGNATURE);
-    msg_trits_ptr += NUM_TRITS_SIGNATURE;
-  }
-
-  trits_t msg = trits_from_rep(num_trits_in_bundle, msg_trits);
-  ERR_BIND_RETURN(mam_recv_msg(ctx, &msg, session_key), err);
+  ERR_BIND_RETURN(mam_api_bundle_read_header(ctx, &msg, msg_id), err);
 
   size_t packet_index = msg.d / NUM_TRITS_SIGNATURE + 1;
   if (packet_index < bundle_transactions_size(bundle) - 1) {
@@ -226,7 +232,7 @@ retcode_t mam_api_bundle_read_msg(mam_recv_msg_context_t *const ctx,
         NUM_TRITS_SIGNATURE;
     trit_t packet_trits[num_trits_in_packet];
     trits_t packet = trits_from_rep(num_trits_in_packet, packet_trits);
-    ERR_BIND_RETURN(mam_recv_packet(ctx, &msg, &packet), err);
+    ERR_BIND_RETURN(mam_msg_recv_packet(ctx, &msg, &packet), err);
 
     *packet_payload = malloc(NUM_FLEX_TRITS_FOR_TRITS(num_trits_in_packet));
     flex_trits_from_trits(*packet_payload, num_trits_in_packet, packet_trits,
@@ -236,9 +242,16 @@ retcode_t mam_api_bundle_read_msg(mam_recv_msg_context_t *const ctx,
   return RC_OK;
 }
 
-retcode_t mam_api_bundle_read_packet(mam_recv_msg_context_t *const ctx,
-                                     mam_channel_t const *const cha,
+retcode_t mam_api_bundle_read_header(mam_msg_recv_context_t *const ctx,
+                                     trits_t *const msg, trits_t msg_id) {
+  retcode_t err;
+  ERR_BIND_RETURN(mam_msg_recv(ctx, msg), err);
+  return err;
+}
+
+retcode_t mam_api_bundle_read_packet(mam_msg_recv_context_t *const ctx,
                                      bundle_transactions_t const *const bundle,
-                                     trits_t const session_key,
-                                     flex_trit_t *const payload, uint32_t ord,
-                                     trits_t const msg_id) {}
+                                     flex_trit_t *const packet_payload,
+                                     uint32_t ord, trits_t const msg_id) {
+  return RC_OK;
+}

@@ -22,9 +22,8 @@ static tryte_t SENDER_SEED[81] =
 #define PORT 14265
 
 static tryte_t BUNDLE_HASH[NUM_TRYTES_BUNDLE] =
-    "WZTKBBGBRLCOXSXCQFF9HHHDTLG9LT9UTZWRXJRU9QAEYKILHHSQD"
-    "I9HGMCH9WRHFRVLCXKXJLOLZEY9A"
-    "I9HGMCH9WRHFRVLCXKXJLOLZEY9A";
+    "GBZHG9RDJNLGKLFNQZL9IBQABHDKNLIHNWKPRKICXQAYCJRYTFCSAAPPGBODBTGCWOVDHBJXLH"
+    "LJXXWPD";
 
 static void get_first_bundle_from_transactions(
     transaction_array_t const transactions,
@@ -94,19 +93,16 @@ static void receive_bundle(mam_channel_t const *const cha,
 
   get_first_bundle_from_transactions(out_tx_objs, bundle);
 
-  mam_recv_msg_context_t cfg;
+  mam_msg_recv_context_t cfg;
   cfg.pubkey = -1;
   cfg.psk = NULL;
   cfg.ntru = NULL;
-  trits_copy(mam_channel_id(cha), mam_recv_msg_cfg_chid(&cfg));
+  trits_copy(mam_channel_id(cha), mam_msg_recv_cfg_chid(&cfg));
 
   flex_trit_t *packet_payload = NULL;
-  trit_t session_key_trits[MAM2_SPONGE_KEY_SIZE];
-  trits_t session_key = trits_from_rep(MAM2_SPONGE_KEY_SIZE, session_key_trits);
   trit_t msg_id_trits[NUM_TRITS_TAG];
   trits_t msg_id = trits_from_rep(NUM_TRITS_TAG, msg_id_trits);
-  err = mam_api_bundle_read_msg(&cfg, cha, bundle, &packet_payload, session_key,
-                                msg_id);
+  err = mam_api_bundle_read_msg(&cfg, bundle, &packet_payload, msg_id);
   if (err == RC_OK) {
     fprintf(stderr, "mam_api_bundle_read_msg succeeded\n");
   } else {

@@ -89,7 +89,7 @@ typedef struct mam_msg_recv_context_s {
   mam_ntru_sk_t_set_t ntrus; /*!< NTRU sk to decrypt message. */
 } mam_msg_recv_context_t;
 
-retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t *msg);
+retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t const *const msg);
 
 typedef struct mam_msg_recv_packet_context_s {
   mam_spongos_t spongos[1];      /*!< Main Spongos interface */
