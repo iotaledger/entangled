@@ -192,7 +192,8 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
   if (addr_opt.total != 0) {  // return addresses in a list
     for (addr_index = addr_opt.start; addr_index < addr_opt.total;
          addr_index++) {
-      tmp = iota_flex_sign_address_gen(seed, addr_index, addr_opt.security);
+      tmp =
+          iota_sign_address_gen_flex_trits(seed, addr_index, addr_opt.security);
       if (tmp) {
         ret = hash243_queue_push(out_addresses, tmp);
         if (ret) {
@@ -208,7 +209,8 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
     }
   } else {  // return addresses include the latest unused address.
     for (addr_index = 0;; addr_index++) {
-      tmp = iota_flex_sign_address_gen(seed, addr_index, addr_opt.security);
+      tmp =
+          iota_sign_address_gen_flex_trits(seed, addr_index, addr_opt.security);
       if (tmp) {
         ret = hash243_queue_push(out_addresses, tmp);
         if (ret) {
@@ -301,7 +303,8 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
 
   // get addresses
   for (addr_index = 0;; addr_index++) {
-    tmp_addr = iota_flex_sign_address_gen(seed, addr_index, addr_opt.security);
+    tmp_addr =
+        iota_sign_address_gen_flex_trits(seed, addr_index, addr_opt.security);
     if (tmp_addr) {
       // check tx
       size_t tx_num = 0;

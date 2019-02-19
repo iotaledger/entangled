@@ -13,6 +13,14 @@
 
 #include "mam/v2/ntru/ntru.h"
 
+trits_t mam_ntru_pk_id(mam_ntru_pk_t const *const ntru_pk) {
+  return trits_from_rep(MAM2_NTRU_ID_SIZE, ntru_pk->key);
+}
+
+trits_t mam_ntru_pk_trits(mam_ntru_pk_t const *const ntru_pk) {
+  return trits_from_rep(MAM2_NTRU_PK_SIZE, ntru_pk->key);
+}
+
 retcode_t ntru_init(mam_ntru_sk_t *const ntru) {
   MAM2_ASSERT(ntru);
 
