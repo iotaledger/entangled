@@ -7,9 +7,9 @@ cc_library(
     deps = [
         "//common:errors",
         "//common/model:bundle",
-        "//mam/v2/mam",
         "//mam/v2/mam:mam_psk_t_set",
         "//mam/v2/mam:mam_types",
+        "//mam/v2/mam:message",
         "//mam/v2/ntru:mam_ntru_pk_t_set",
         "//mam/v2/ntru:mam_ntru_sk_t_set",
         "//utils:time",

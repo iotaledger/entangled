@@ -14,8 +14,8 @@
 
 #include "common/trinary/trit_tryte.h"
 #include "mam/v2/mam/channel.h"
-#include "mam/v2/mam/mam.h"
 #include "mam/v2/mam/mam_channel_t_set.h"
+#include "mam/v2/mam/message.h"
 #include "mam/v2/test_utils/test_utils.h"
 
 static bool mam_channel_t_set_cmp(mam_channel_t_set_t const channels_1,
