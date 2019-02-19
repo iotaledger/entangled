@@ -46,8 +46,8 @@ static trits_t message_test_generic_send_msg(
   mam_endpoint_t *ep = NULL;
   mam_channel_t *ch1 = NULL;
   mam_endpoint_t *ep1 = NULL;
-  MAM2_TRITS_DEF0(msg_id, MAM2_HEADER_MSG_ID_SIZE);
-  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_HEADER_MSG_ID_SIZE);
+  MAM2_TRITS_DEF0(msg_id, MAM2_MSG_ID_SIZE);
+  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_MSG_ID_SIZE);
   trits_from_str(msg_id, "SENDERMSGIDAAAAASENDERMSGID");
   trint9_t msg_type_id = 0;
   mam_psk_t_set_t psks = NULL;

@@ -28,7 +28,8 @@ void person_to_int_map() {
   person_example_t_to_int_map_t map;
   person_example_t_to_int_map_entry_t* e = NULL;
 
-  TEST_ASSERT(person_example_t_to_int_map_init(&map, sizeof(p1.name)) == RC_OK);
+  TEST_ASSERT(person_example_t_to_int_map_init(
+                  &map, sizeof(person_example_t)) == RC_OK);
 
   TEST_ASSERT(person_example_t_to_int_map_find(&map, &p1, &e) == false);
   TEST_ASSERT(person_example_t_to_int_map_add(&map, &p1, p1_value) == RC_OK);

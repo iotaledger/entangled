@@ -33,6 +33,10 @@ retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed) {
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
   api->psks = NULL;
+  if ((ret = trit_t_to_mam_msg_send_context_t_map_init(
+           &api->send_ctxs, MAM2_MSG_ID_SIZE)) != RC_OK) {
+    return ret;
+  }
 
   return ret;
 }
@@ -44,14 +48,13 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
     return RC_NULL_PARAM;
   }
 
-  if ((ret = mam_prng_destroy(&api->prng)) != RC_OK) {
-    return ret;
-  }
+  ret = mam_prng_destroy(&api->prng);
   mam_ntru_sk_t_set_free(&api->ntru_sks);
   mam_ntru_pk_t_set_free(&api->ntru_pks);
   mam_psk_t_set_free(&api->psks);
+  ret = trit_t_to_mam_msg_send_context_t_map_free(&api->send_ctxs);
 
-  return RC_OK;
+  return ret;
 }
 
 retcode_t mam_api_add_ntru_sk(mam_api_t *const api,
@@ -78,21 +81,15 @@ retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk) {
 }
 
 retcode_t mam_api_bundle_write_header(
-    mam_api_t *const api, mam_channel_t const *const ch,
+    mam_api_t *const api, mam_channel_t *const ch,
     mam_endpoint_t const *const ep, mam_channel_t const *const ch1,
     mam_endpoint_t const *const ep1, mam_psk_t_set_t psks,
     mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-    bundle_transactions_t *const bundle) {
-  trits_t header = trits_null();
-  size_t header_size = 0;
-  trits_t header_part = trits_null();
+    bundle_transactions_t *const bundle, trit_t *const msg_id) {
+  retcode_t ret = RC_OK;
   mam_msg_send_context_t ctx;
-  iota_transaction_t transaction;
-  size_t current_index = 0;
-  MAM2_TRITS_DEF0(msg_id, MAM2_HEADER_MSG_ID_SIZE);
-  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_HEADER_MSG_ID_SIZE);
 
-  if (api == NULL || ch == NULL || bundle == NULL) {
+  if (api == NULL || ch == NULL || bundle == NULL || msg_id == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -101,58 +98,78 @@ retcode_t mam_api_bundle_write_header(
   }
 
   // TODO add a random part
-  trits_t msg_id_parts[] = {mam_channel_name(ch), mam_channel_msg_ord(ch)};
-  mam_spongos_hashn(&ctx.spongos, 2, msg_id_parts, msg_id);
-  add_assign(ch->msg_ord, MAM2_HEADER_MSG_ID_SIZE, 1);
+  {
+    trits_t msg_id_parts[] = {mam_channel_name(ch), mam_channel_msg_ord(ch)};
 
-  header_size = mam_msg_send_size(ch, ep, ch1, ep1, psks, ntru_pks);
-  if (trits_is_null(header = trits_alloc(header_size))) {
-    return RC_OOM;
+    mam_spongos_hashn(&ctx.spongos, 2, msg_id_parts,
+                      trits_from_rep(MAM2_MSG_ID_SIZE, msg_id));
+    add_assign(ch->msg_ord, MAM2_MSG_ID_SIZE, 1);
   }
 
-  mam_msg_send(&ctx, &api->prng, ch, ep, ch1, ep1, msg_id, msg_type_id, psks,
-               ntru_pks, &header);
-  header = trits_pickup(header, header_size);
+  {
+    trits_t header = trits_null();
+    size_t header_size = 0;
+    trits_t header_part = trits_null();
+    iota_transaction_t transaction;
+    flex_trit_t buffer[FLEX_TRIT_SIZE_6561];
 
-  transaction_reset(&transaction);
-  // TODO setter ?
-  flex_trits_from_trits(transaction.essence.address, NUM_TRITS_ADDRESS, ch->id,
-                        NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
-  transaction_set_last_index(&transaction,
-                             (header_size - 1) / NUM_TRITS_SIGNATURE);
-  // TODO set masks ?
-  transaction.loaded_columns_mask.essence = MASK_ESSENCE_ALL;
-  while (!trits_is_empty(header)) {
-    header_part = trits_take_min(header, NUM_TRITS_SIGNATURE);
-    header = trits_drop_min(header, NUM_TRITS_SIGNATURE);
+    header_size = mam_msg_send_size(ch, ep, ch1, ep1, psks, ntru_pks);
+    if (trits_is_null(header = trits_alloc(header_size))) {
+      return RC_OOM;
+    }
+
+    mam_msg_send(&ctx, &api->prng, ch, ep, ch1, ep1,
+                 trits_from_rep(MAM2_MSG_ID_SIZE, msg_id), msg_type_id, psks,
+                 ntru_pks, &header);
+    header = trits_pickup(header, header_size);
+
+    transaction_reset(&transaction);
+    flex_trits_from_trits(buffer, NUM_TRITS_ADDRESS, ch->id, NUM_TRITS_ADDRESS,
+                          NUM_TRITS_ADDRESS);
+    transaction_set_address(&transaction, buffer);
+    transaction_set_value(&transaction, 0);
+    transaction_set_obsolete_tag(&transaction,
+                                 transaction.data.signature_or_message);
     transaction_set_timestamp(&transaction, current_timestamp_ms() / 1000);
-    transaction_set_current_index(&transaction, current_index);
-    // TODO setter ?
-    flex_trits_from_trits(transaction.data.signature_or_message,
-                          NUM_TRITS_SIGNATURE, header_part.p + header_part.d,
-                          trits_size(header_part), trits_size(header_part));
-    bundle_transactions_add(bundle, &transaction);
-    current_index++;
+    transaction_set_last_index(&transaction,
+                               (header_size - 1) / NUM_TRITS_SIGNATURE);
+    transaction_set_tag(&transaction, transaction.data.signature_or_message);
+
+    for (size_t current_index = 0; !trits_is_empty(header); current_index++) {
+      header_part = trits_take_min(header, NUM_TRITS_SIGNATURE);
+      header = trits_drop_min(header, NUM_TRITS_SIGNATURE);
+      transaction_set_current_index(&transaction, current_index);
+      memset(buffer, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_6561);
+      flex_trits_from_trits(buffer, NUM_TRITS_SIGNATURE,
+                            header_part.p + header_part.d,
+                            trits_size(header_part), trits_size(header_part));
+      transaction_set_message(&transaction, buffer);
+      bundle_transactions_add(bundle, &transaction);
+    }
+
+    trits_free(header);
   }
 
-  // TODO Add to pending states
-  // Init ord to 0
-  // copy spongos there
+  ctx.ord = 0;
+  ctx.mss = NULL;
 
-  trits_free(header);
-
-  return RC_OK;
+  return trit_t_to_mam_msg_send_context_t_map_add(&api->send_ctxs, msg_id, ctx);
 }
 
 retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
+                                      trit_t *const msg_id,
                                       tryte_t const *const payload,
                                       mam_msg_checksum_t checksum,
                                       bundle_transactions_t *const bundle) {
   mam_msg_send_context_t *ctx = NULL;
+  trit_t_to_mam_msg_send_context_t_map_entry_t *entry = NULL;
 
   if (api == NULL || payload == NULL || bundle == NULL) {
     return RC_NULL_PARAM;
   }
+
+  bool found = trit_t_to_mam_msg_send_context_t_map_find(&api->send_ctxs,
+                                                         msg_id, &entry);
 
   // TODO check if bundle contains header
 
