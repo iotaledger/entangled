@@ -183,13 +183,14 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
     return RC_NULL_PARAM;
   }
 
-  bool found = trit_t_to_mam_msg_send_context_t_map_find(&api->send_ctxs,
-                                                         msg_id, &entry);
+  if (!trit_t_to_mam_msg_send_context_t_map_find(&api->send_ctxs, msg_id,
+                                                 &entry) ||
+      entry == NULL) {
+    return RC_MAM2_MESSAGE_NOT_FOUND;
+  }
+  ctx = &entry->value;
 
   // TODO check if bundle contains header
-
-  // TODO fetch pending state from msgID
-  // TODO copy or get spongos state
 
   // TODO increment ord
 
