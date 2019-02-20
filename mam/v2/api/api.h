@@ -54,6 +54,7 @@ retcode_t mam_api_bundle_write_header(
     bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
+                                      mam_channel_t *const ch,
                                       trit_t *const msg_id,
                                       tryte_t const *const payload,
                                       mam_msg_checksum_t checksum,

@@ -17,6 +17,44 @@
 #include "mam/v2/prng/prng.h"
 #include "utils/time.h"
 
+/*
+ * Private functions
+ */
+
+static void mam_api_bundle_wrap(bundle_transactions_t *const bundle,
+                                trit_t *address, trits_t message) {
+  iota_transaction_t transaction;
+  flex_trit_t buffer[FLEX_TRIT_SIZE_6561];
+  trits_t message_part = trits_null();
+
+  transaction_reset(&transaction);
+  flex_trits_from_trits(buffer, NUM_TRITS_ADDRESS, address, NUM_TRITS_ADDRESS,
+                        NUM_TRITS_ADDRESS);
+  transaction_set_address(&transaction, buffer);
+  transaction_set_value(&transaction, 0);
+  transaction_set_obsolete_tag(&transaction,
+                               transaction.data.signature_or_message);
+  transaction_set_timestamp(&transaction, current_timestamp_ms() / 1000);
+  transaction_set_tag(&transaction, transaction.data.signature_or_message);
+
+  while (!trits_is_empty(message)) {
+    message_part = trits_take_min(message, NUM_TRITS_SIGNATURE);
+    message = trits_drop_min(message, NUM_TRITS_SIGNATURE);
+    memset(buffer, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_6561);
+    flex_trits_from_trits(buffer, NUM_TRITS_SIGNATURE,
+                          message_part.p + message_part.d,
+                          trits_size(message_part), trits_size(message_part));
+    transaction_set_message(&transaction, buffer);
+    bundle_transactions_add(bundle, &transaction);
+  }
+
+  bundle_reset_indexes(bundle);
+}
+
+/*
+ * Public functions
+ */
+
 retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed) {
   retcode_t ret = RC_OK;
 
@@ -124,44 +162,16 @@ retcode_t mam_api_bundle_write_header(
   {
     trits_t header = trits_null();
     size_t header_size = 0;
-    trits_t header_part = trits_null();
-    iota_transaction_t transaction;
-    flex_trit_t buffer[FLEX_TRIT_SIZE_6561];
 
     header_size = mam_msg_send_size(ch, ep, ch1, ep1, psks, ntru_pks);
     if (trits_is_null(header = trits_alloc(header_size))) {
       return RC_OOM;
     }
-
     mam_msg_send(&ctx, &api->prng, ch, ep, ch1, ep1,
                  trits_from_rep(MAM2_MSG_ID_SIZE, msg_id), msg_type_id, psks,
                  ntru_pks, &header);
     header = trits_pickup(header, header_size);
-
-    transaction_reset(&transaction);
-    flex_trits_from_trits(buffer, NUM_TRITS_ADDRESS, ch->id, NUM_TRITS_ADDRESS,
-                          NUM_TRITS_ADDRESS);
-    transaction_set_address(&transaction, buffer);
-    transaction_set_value(&transaction, 0);
-    transaction_set_obsolete_tag(&transaction,
-                                 transaction.data.signature_or_message);
-    transaction_set_timestamp(&transaction, current_timestamp_ms() / 1000);
-    transaction_set_last_index(&transaction,
-                               (header_size - 1) / NUM_TRITS_SIGNATURE);
-    transaction_set_tag(&transaction, transaction.data.signature_or_message);
-
-    for (size_t current_index = 0; !trits_is_empty(header); current_index++) {
-      header_part = trits_take_min(header, NUM_TRITS_SIGNATURE);
-      header = trits_drop_min(header, NUM_TRITS_SIGNATURE);
-      transaction_set_current_index(&transaction, current_index);
-      memset(buffer, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_6561);
-      flex_trits_from_trits(buffer, NUM_TRITS_SIGNATURE,
-                            header_part.p + header_part.d,
-                            trits_size(header_part), trits_size(header_part));
-      transaction_set_message(&transaction, buffer);
-      bundle_transactions_add(bundle, &transaction);
-    }
-
+    mam_api_bundle_wrap(bundle, ch->id, header);
     trits_free(header);
   }
 
@@ -172,6 +182,7 @@ retcode_t mam_api_bundle_write_header(
 }
 
 retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
+                                      mam_channel_t *const ch,
                                       trit_t *const msg_id,
                                       tryte_t const *const payload,
                                       mam_msg_checksum_t checksum,
@@ -179,20 +190,39 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
   mam_msg_send_context_t *ctx = NULL;
   trit_t_to_mam_msg_send_context_t_map_entry_t *entry = NULL;
 
-  if (api == NULL || payload == NULL || bundle == NULL) {
+  if (api == NULL || msg_id == NULL || payload == NULL || bundle == NULL) {
     return RC_NULL_PARAM;
   }
 
-  bool found = trit_t_to_mam_msg_send_context_t_map_find(&api->send_ctxs,
-                                                         msg_id, &entry);
+  if (!trit_t_to_mam_msg_send_context_t_map_find(&api->send_ctxs, msg_id,
+                                                 &entry) ||
+      entry == NULL) {
+    return RC_MAM2_MESSAGE_NOT_FOUND;
+  }
+  ctx = &entry->value;
+
+  {
+    trits_t packet = trits_null();
+    size_t packet_size = 0;
+    MAM2_TRITS_DEF0(payload_trits, strlen(payload) * 3);
+    payload_trits = MAM2_TRITS_INIT(payload_trits, strlen(payload) * 3);
+    trits_from_str(payload_trits, payload);
+
+    packet_size =
+        mam_msg_send_packet_size(checksum, ctx->mss, strlen(payload) * 3);
+    if (trits_is_null(packet = trits_alloc(packet_size))) {
+      return RC_OOM;
+    }
+
+    mam_msg_send_packet(ctx, checksum, payload_trits, &packet);
+    packet = trits_pickup(packet, packet_size);
+    mam_api_bundle_wrap(bundle, ch->id, packet);
+    trits_free(packet);
+  }
+
+  ctx->ord++;
 
   // TODO check if bundle contains header
-
-  // TODO fetch pending state from msgID
-  // TODO copy or get spongos state
-
-  // TODO increment ord
-
   // TODO if last remove pending state
 
   return RC_OK;
