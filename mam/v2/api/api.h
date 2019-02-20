@@ -14,6 +14,7 @@
 #include "common/errors.h"
 #include "common/model/bundle.h"
 #include "common/trinary/flex_trit.h"
+#include "mam/v2/api/trit_t_to_mam_msg_recv_context_t_map.h"
 #include "mam/v2/api/trit_t_to_mam_msg_send_context_t_map.h"
 #include "mam/v2/mam/mam_types.h"
 #include "mam/v2/mam/message.h"
@@ -30,6 +31,7 @@ typedef struct mam_api_s {
   mam_ntru_pk_t_set_t ntru_pks;
   mam_psk_t_set_t psks;
   trit_t_to_mam_msg_send_context_t_map_t send_ctxs;
+  trit_t_to_mam_msg_recv_context_t_map_t recv_ctxs;
 } mam_api_t;
 
 retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed);
@@ -57,10 +59,44 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
                                       mam_msg_checksum_t checksum,
                                       bundle_transactions_t *const bundle);
 
-retcode_t mam_api_bundle_read(mam_api_t *const api,
-                              mam_channel_t const *const cha,
-                              bundle_transactions_t const *const bundle,
-                              flex_trit_t *const payload);
+/**
+ * Checks if a bundle which is assumed to contain MAM message contains header
+ *
+ * @param bundle The bundle
+ *
+ * @return True if the bundle contains MAM header
+ */
+
+bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
+
+/**
+ * Reads MAM's session key and potentially the first packet using NTRU secret
+ * key
+ *
+ * @param api - The API
+ * @param bundle - The bundle containing the MAM message
+ * @param packet_payload - First packet payload [out] (will be allocated if
+ * packet is present)
+ *
+ * @return return code
+ */
+
+retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
+                                  bundle_transactions_t const *const bundle,
+                                  flex_trit_t **const packet_payload);
+
+/**
+ * Reads next packet
+ *
+ * @param api - The API
+ * @param bundle - The bundle containing the MAM message
+ *
+ * @return return code
+ */
+
+retcode_t mam_api_bundle_read_packet(mam_api_t const *const api,
+                                     bundle_transactions_t const *const bundle,
+                                     flex_trit_t **const payload);
 
 #ifdef __cplusplus
 }

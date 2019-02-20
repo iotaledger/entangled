@@ -143,6 +143,7 @@ static void message_test_generic_receive_msg(
   }
 
   e = mam_msg_recv(cfg_msg_recv, msg);
+
   TEST_ASSERT(RC_OK == e);
   TEST_ASSERT(trits_is_empty(*msg));
   MAM2_ASSERT(trits_cmp_eq_str(mam_msg_recv_cfg_msg_id(cfg_msg_recv),

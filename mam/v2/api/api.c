@@ -9,6 +9,8 @@
  */
 
 #include "mam/v2/api/api.h"
+#include <stdlib.h>
+#include "common/model/bundle.h"
 #include "mam/v2/mam/mam_psk_t_set.h"
 #include "mam/v2/ntru/mam_ntru_pk_t_set.h"
 #include "mam/v2/ntru/mam_ntru_sk_t_set.h"
@@ -33,10 +35,13 @@ retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed) {
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
   api->psks = NULL;
-  if ((ret = trit_t_to_mam_msg_send_context_t_map_init(
-           &api->send_ctxs, MAM2_MSG_ID_SIZE)) != RC_OK) {
-    return ret;
-  }
+
+  ERR_BIND_RETURN(trit_t_to_mam_msg_send_context_t_map_init(&api->send_ctxs,
+                                                            MAM2_MSG_ID_SIZE),
+                  ret);
+  ERR_BIND_RETURN(trit_t_to_mam_msg_recv_context_t_map_init(&api->recv_ctxs,
+                                                            MAM2_MSG_ID_SIZE),
+                  ret);
 
   return ret;
 }
@@ -49,10 +54,20 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
   }
 
   ret = mam_prng_destroy(&api->prng);
+  if (ret != RC_OK) {
+    // TODO - LOG
+  }
   mam_ntru_sk_t_set_free(&api->ntru_sks);
   mam_ntru_pk_t_set_free(&api->ntru_pks);
   mam_psk_t_set_free(&api->psks);
   ret = trit_t_to_mam_msg_send_context_t_map_free(&api->send_ctxs);
+  if (ret != RC_OK) {
+    // TODO - LOG
+  }
+  ret = trit_t_to_mam_msg_recv_context_t_map_free(&api->recv_ctxs);
+  if (ret != RC_OK) {
+    // TODO - LOG
+  }
 
   return ret;
 }
@@ -183,12 +198,119 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
   return RC_OK;
 }
 
-retcode_t mam_api_bundle_read(mam_api_t *const api,
-                              mam_channel_t const *const cha,
-                              bundle_transactions_t const *const bundle,
-                              flex_trit_t *const payload) {
-  if (api == NULL || cha == NULL || bundle == NULL || payload == NULL) {
-    return RC_NULL_PARAM;
+bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle) {
+  iota_transaction_t *tx = (iota_transaction_t *)utarray_front(bundle);
+  return flex_trits_are_null(transaction_tag(tx), FLEX_TRIT_SIZE_81);
+}
+
+trits_t msg_trits_from_bundle(bundle_transactions_t const *const bundle,
+                              const trit_t msg_trits[],
+                              size_t num_trits_in_bundle, size_t start_index) {
+  iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
+
+  trit_t *msg_trits_ptr = msg_trits;
+  size_t curr_tx_index = 0;
+  BUNDLE_FOREACH(bundle, curr_tx) {
+    if (curr_tx_index++ < start_index) {
+      continue;
+    }
+    flex_trits_to_trits(msg_trits_ptr, NUM_TRITS_SIGNATURE,
+                        transaction_signature(curr_tx), NUM_TRITS_SIGNATURE,
+                        NUM_TRITS_SIGNATURE);
+    msg_trits_ptr += NUM_TRITS_SIGNATURE;
+  }
+
+  return trits_from_rep(num_trits_in_bundle, msg_trits);
+}
+
+static retcode_t mam_api_bundle_read_header(
+    mam_msg_recv_context_t const *const ctx, trits_t *const msg) {
+  retcode_t err;
+  ERR_BIND_RETURN(mam_msg_recv(ctx, msg), err);
+  return err;
+}
+
+retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
+                                  bundle_transactions_t const *const bundle,
+                                  flex_trit_t **const packet_payload) {
+  retcode_t err = RC_OK;
+  MAM2_ASSERT(packet_payload && *packet_payload == NULL);
+  if (!mam_api_bundle_contains_header(bundle)) {
+    return RC_MAM2_BUNDLE_DOES_NOT_CONTAIN_HEADER;
+  }
+
+  mam_msg_recv_context_t cfg;
+  cfg.pubkey = -1;
+  cfg.psks = api->ntru_pks;
+  cfg.ntrus = api->ntru_sks;
+  trit_t ch_id_trits_raw[NUM_TRITS_ADDRESS];
+  iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
+  flex_trits_to_trits(ch_id_trits_raw, NUM_TRITS_ADDRESS,
+                      transaction_address(curr_tx), NUM_TRITS_ADDRESS,
+                      NUM_TRITS_ADDRESS);
+  trits_t ch_id_trits = trits_from_rep(NUM_TRITS_ADDRESS, ch_id_trits_raw);
+  trits_copy(ch_id_trits, mam_msg_recv_cfg_chid(&cfg));
+
+  // Flatten flex_trits encoded in transaction sig_or_fragment field
+  // into a single long trits_t data structure
+  size_t num_trits_in_bundle =
+      bundle_transactions_size(bundle) * NUM_TRITS_SIGNATURE;
+  trit_t msg_trits[num_trits_in_bundle];
+  trits_t msg =
+      msg_trits_from_bundle(bundle, msg_trits, num_trits_in_bundle, 0);
+
+  ERR_BIND_RETURN(mam_api_bundle_read_header(&cfg, &msg), err);
+
+  ERR_BIND_RETURN(trit_t_to_mam_msg_recv_context_t_map_add(
+                      &api->recv_ctxs, mam_msg_recv_cfg_msg_id(&cfg).p, cfg),
+                  err);
+
+  size_t packet_index = msg.d / NUM_TRITS_SIGNATURE + 1;
+  if (packet_index < bundle_transactions_size(bundle)) {
+    size_t num_trits_in_packet =
+        (bundle_transactions_size(bundle) - packet_index) * NUM_TRITS_SIGNATURE;
+    trit_t packet_trits[num_trits_in_packet];
+    trits_t packet = trits_from_rep(num_trits_in_packet, packet_trits);
+    msg = trits_drop(msg, NUM_TRITS_SIGNATURE - msg.d);
+    ERR_BIND_RETURN(mam_msg_recv_packet(&cfg, &msg, &packet), err);
+
+    *packet_payload = malloc(NUM_FLEX_TRITS_FOR_TRITS(num_trits_in_packet));
+    flex_trits_from_trits(*packet_payload, num_trits_in_packet, packet_trits,
+                          num_trits_in_packet, num_trits_in_packet);
+  }
+
+  return RC_OK;
+}
+
+retcode_t mam_api_bundle_read_packet(mam_api_t const *const api,
+                                     bundle_transactions_t const *const bundle,
+                                     flex_trit_t **const packet_payload) {
+  retcode_t err;
+  trit_t_to_mam_msg_recv_context_t_map_entry_t *entry = NULL;
+
+  iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
+  trit_t msg_id[NUM_TRITS_TAG];
+  flex_trits_to_trits(msg_id, NUM_TRITS_TAG, transaction_tag(curr_tx),
+                      NUM_TRITS_TAG, NUM_TRITS_TAG);
+  bool found = trit_t_to_mam_msg_recv_context_t_map_find(&api->recv_ctxs,
+                                                         msg_id, &entry);
+  size_t num_trits_in_bundle =
+      bundle_transactions_size(bundle) * NUM_TRITS_SIGNATURE;
+  trit_t msg_trits[num_trits_in_bundle];
+  trits_t msg =
+      msg_trits_from_bundle(bundle, msg_trits, num_trits_in_bundle, 0);
+
+  if (found) {
+    size_t num_trits_in_packet =
+        bundle_transactions_size(bundle) * NUM_TRITS_SIGNATURE;
+    trit_t packet_trits[num_trits_in_packet];
+    trits_t packet = trits_from_rep(num_trits_in_packet, packet_trits);
+    ERR_BIND_RETURN(mam_msg_recv_packet(&entry->value, &msg, &packet), err);
+    *packet_payload = malloc(NUM_FLEX_TRITS_FOR_TRITS(num_trits_in_packet));
+    flex_trits_from_trits(*packet_payload, num_trits_in_packet, packet_trits,
+                          num_trits_in_packet, num_trits_in_packet);
+  } else {
+    return RC_MAM2_RECV_CTX_NOT_FOUND;
   }
   return RC_OK;
 }

@@ -700,11 +700,9 @@ trits_t mam_msg_recv_cfg_msg_id(mam_msg_recv_context_t const *const cfg) {
   return trits_from_rep(MAM2_MSG_ID_SIZE, cfg->msg_id);
 }
 
-retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t *b) {
+retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t const *const msg) {
   retcode_t e = RC_OK;
   mam_spongos_t *s;
-  trit_t session_key_trits[MAM2_SPONGE_KEY_SIZE];
-  trits_t session_key = trits_from_rep(MAM2_SPONGE_KEY_SIZE, session_key_trits);
 
   MAM2_ASSERT(cfg);
   MAM2_ASSERT(cfg->chid);
@@ -716,41 +714,44 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t *b) {
 
   mam_spongos_init(s);
 
+  trit_t session_key_trits[MAM2_SPONGE_KEY_SIZE];
+  trits_t session_key = trits_from_rep(MAM2_SPONGE_KEY_SIZE, session_key_trits);
+
   /* unwrap Channel */
   {
     tryte_t ver = -1;
     ERR_BIND_RETURN(
-        mam_msg_channel_unwrap(s, b, &ver, mam_msg_recv_cfg_chid(cfg)), e);
+        mam_msg_channel_unwrap(s, msg, &ver, mam_msg_recv_cfg_chid(cfg)), e);
     ERR_GUARD_RETURN(0 == ver, RC_MAM2_VERSION_NOT_SUPPORTED, e);
   }
 
   /* unwrap Endpoint */
   {
     tryte_t pubkey = -1;
-    ERR_BIND_RETURN(pb3_unwrap_absorb_tryte(s, b, &pubkey), e);
+    ERR_BIND_RETURN(pb3_unwrap_absorb_tryte(s, msg, &pubkey), e);
     ERR_GUARD_RETURN(0 <= pubkey && pubkey <= 3, RC_MAM2_PB3_BAD_ONEOF, e);
     cfg->pubkey = (mam_msg_pubkey_t)pubkey;
 
     if (mam_msg_pubkey_chid1 == pubkey) { /*  SignedId chid1 = 2; */
       /*TODO: verify chid is trusted */
       ERR_BIND_RETURN(mam_msg_unwrap_pubkey_chid1(
-                          s, b, mam_msg_recv_cfg_chid1(cfg), cfg->spongos_mss,
+                          s, msg, mam_msg_recv_cfg_chid1(cfg), cfg->spongos_mss,
                           cfg->spongos_wots, mam_msg_recv_cfg_chid(cfg)),
                       e);
       /*TODO: record new channel/endpoint */
     } else if (mam_msg_pubkey_epid1 == pubkey) { /*  SignedId epid1 = 3; */
       /*TODO: verify chid is trusted */
       ERR_BIND_RETURN(mam_msg_unwrap_pubkey_epid1(
-                          s, b, mam_msg_recv_cfg_epid1(cfg), cfg->spongos_mss,
+                          s, msg, mam_msg_recv_cfg_epid1(cfg), cfg->spongos_mss,
                           cfg->spongos_wots, mam_msg_recv_cfg_chid(cfg)),
                       e);
       /*TODO: record new channel/endpoint */
     } else if (mam_msg_pubkey_epid ==
                pubkey) { /*  absorb tryte epid[81] = 1; */
       ERR_BIND_RETURN(
-          mam_msg_unwrap_pubkey_epid(s, b, mam_msg_recv_cfg_epid(cfg)), e);
+          mam_msg_unwrap_pubkey_epid(s, msg, mam_msg_recv_cfg_epid(cfg)), e);
     } else if (mam_msg_pubkey_chid == pubkey) { /*  absorb null chid = 0; */
-      ERR_BIND_RETURN(mam_msg_unwrap_pubkey_chid(s, b), e);
+      ERR_BIND_RETURN(mam_msg_unwrap_pubkey_chid(s, msg), e);
     } else
       MAM2_ASSERT(0);
   }
@@ -759,17 +760,16 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t *b) {
   {
     /*  absorb tryte msg_id[27]; */
     ERR_BIND_RETURN(
-        pb3_unwrap_absorb_ntrytes(s, b, mam_msg_recv_cfg_msg_id(cfg)), e);
+        pb3_unwrap_absorb_ntrytes(s, msg, mam_msg_recv_cfg_msg_id(cfg)), e);
     /*  absorb trint typeid; */
-    ERR_BIND_RETURN(pb3_unwrap_absorb_trint(s, b, &cfg->msg_type_id), e);
-
+    ERR_BIND_RETURN(pb3_unwrap_absorb_trint(s, msg, &cfg->msg_type_id), e);
     {
       /*  repeated */
       size_t keyload_count = 0;
       bool key_found = false;
       mam_spongos_t spongos_ntru;
 
-      ERR_BIND_RETURN(pb3_unwrap_absorb_size_t(s, b, &keyload_count), e);
+      ERR_BIND_RETURN(pb3_unwrap_absorb_size_t(s, msg, &keyload_count), e);
 
       if (0 < keyload_count) {
         mam_spongos_t spongos_fork;
@@ -778,7 +778,7 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t *b) {
           tryte_t keyload = -1;
 
           /*  absorb oneof keyload */
-          ERR_BIND_RETURN(pb3_unwrap_absorb_tryte(s, b, &keyload), e);
+          ERR_BIND_RETURN(pb3_unwrap_absorb_tryte(s, msg, &keyload), e);
           ERR_GUARD_RETURN(1 <= keyload && keyload <= 2, RC_MAM2_PB3_BAD_ONEOF,
                            e);
           /*  fork; */
@@ -786,14 +786,14 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t *b) {
 
           if (mam_msg_keyload_psk == keyload) { /*  KeyloadPSK psk = 1; */
             ERR_BIND_RETURN(
-                mam_msg_unwrap_keyload_psk(&spongos_fork, b, session_key,
+                mam_msg_unwrap_keyload_psk(&spongos_fork, msg, session_key,
                                            &key_found, &cfg->psks),
                 e);
 
           } else if (mam_msg_keyload_ntru ==
                      keyload) { /*  KeyloadNTRU ntru = 2; */
             ERR_BIND_RETURN(mam_msg_unwrap_keyload_ntru(
-                                &spongos_fork, b, session_key, &key_found,
+                                &spongos_fork, msg, session_key, &key_found,
                                 &cfg->ntrus, &spongos_ntru),
                             e);
 
@@ -842,7 +842,7 @@ retcode_t mam_msg_recv_packet(mam_msg_recv_packet_context_t *cfg, trits_t *b,
     p = trits_alloc(pb3_sizeof_ntrytes(sz));
     ERR_GUARD_RETURN(!trits_is_null(p), RC_OOM, e);
   } else {
-    ERR_GUARD_GOTO(trits_size(*payload) <= pb3_sizeof_ntrytes(sz),
+    ERR_GUARD_GOTO(trits_size(*payload) >= pb3_sizeof_ntrytes(sz),
                    RC_MAM2_BUFFER_TOO_SMALL, e, cleanup);
     p = pb3_trits_take(payload, pb3_sizeof_ntrytes(sz));
   }
