@@ -172,6 +172,7 @@ retcode_t mam_api_bundle_write_header(
 }
 
 retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
+                                      mam_channel_t *const ch,
                                       trit_t *const msg_id,
                                       tryte_t const *const payload,
                                       mam_msg_checksum_t checksum,
@@ -189,6 +190,56 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
     return RC_MAM2_MESSAGE_NOT_FOUND;
   }
   ctx = &entry->value;
+
+  /////////////////////////////////
+  {
+    trits_t packet = trits_null();
+    size_t packet_size = 0;
+    trits_t packet_part = trits_null();
+    iota_transaction_t transaction;
+    flex_trit_t buffer[FLEX_TRIT_SIZE_6561];
+    MAM2_TRITS_DEF0(payload_trits, strlen(payload) * 3);
+    payload_trits = MAM2_TRITS_INIT(payload_trits, strlen(payload) * 3);
+    trits_from_str(payload_trits, payload);
+
+    packet_size =
+        mam_msg_send_packet_size(checksum, ctx->mss, strlen(payload) * 3);
+    if (trits_is_null(packet = trits_alloc(packet_size))) {
+      return RC_OOM;
+    }
+
+    mam_msg_send_packet(ctx, checksum, payload_trits, &packet);
+    packet = trits_pickup(packet, packet_size);
+
+    transaction_reset(&transaction);
+    flex_trits_from_trits(buffer, NUM_TRITS_ADDRESS, ch->id, NUM_TRITS_ADDRESS,
+                          NUM_TRITS_ADDRESS);
+    transaction_set_address(&transaction, buffer);
+    transaction_set_value(&transaction, 0);
+    transaction_set_obsolete_tag(&transaction,
+                                 transaction.data.signature_or_message);
+    transaction_set_timestamp(&transaction, current_timestamp_ms() / 1000);
+    transaction_set_last_index(&transaction,
+                               (packet_size - 1) / NUM_TRITS_SIGNATURE);
+    transaction_set_tag(&transaction, transaction.data.signature_or_message);
+
+    for (size_t current_index = 0; !trits_is_empty(packet); current_index++) {
+      packet_part = trits_take_min(packet, NUM_TRITS_SIGNATURE);
+      packet = trits_drop_min(packet, NUM_TRITS_SIGNATURE);
+      transaction_set_current_index(&transaction, current_index);
+      memset(buffer, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_6561);
+      flex_trits_from_trits(buffer, NUM_TRITS_SIGNATURE,
+                            packet_part.p + packet_part.d,
+                            trits_size(packet_part), trits_size(packet_part));
+      transaction_set_message(&transaction, buffer);
+      bundle_transactions_add(bundle, &transaction);
+    }
+
+    bundle_reset_indexes(bundle);
+
+    trits_free(packet);
+  }
+  ///////////////////////////////////
 
   // TODO check if bundle contains header
 
