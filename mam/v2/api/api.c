@@ -267,10 +267,16 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
 
   size_t packet_index = msg.d / NUM_TRITS_SIGNATURE + 1;
   if (packet_index < bundle_transactions_size(bundle)) {
-    ERR_BIND_RETURN(mam_api_bundle_read_packet(api, bundle, packet_payload,
-                                               mam_msg_recv_cfg_msg_id(&cfg).p,
-                                               packet_index),
-                    err);
+    size_t num_trits_in_packet =
+        (bundle_transactions_size(bundle) - packet_index) * NUM_TRITS_SIGNATURE;
+    trit_t packet_trits[num_trits_in_packet];
+    trits_t packet = trits_from_rep(num_trits_in_packet, packet_trits);
+    msg = trits_drop(msg, NUM_TRITS_SIGNATURE - msg.d);
+    ERR_BIND_RETURN(mam_msg_recv_packet(&cfg, &msg, &packet), err);
+
+    *packet_payload = malloc(NUM_FLEX_TRITS_FOR_TRITS(num_trits_in_packet));
+    flex_trits_from_trits(*packet_payload, num_trits_in_packet, packet_trits,
+                          num_trits_in_packet, num_trits_in_packet);
   }
 
   return RC_OK;
@@ -278,11 +284,14 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
 
 retcode_t mam_api_bundle_read_packet(mam_api_t const *const api,
                                      bundle_transactions_t const *const bundle,
-                                     flex_trit_t **const packet_payload,
-                                     trit_t const *const msg_id,
-                                     size_t start_index) {
+                                     flex_trit_t **const packet_payload) {
   retcode_t err;
   trit_t_to_mam_msg_recv_context_t_map_entry_t *entry = NULL;
+
+  iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
+  trit_t msg_id[NUM_TRITS_TAG];
+  flex_trits_to_trits(msg_id, NUM_TRITS_TAG, transaction_tag(curr_tx),
+                      NUM_TRITS_TAG, NUM_TRITS_TAG);
   bool found = trit_t_to_mam_msg_recv_context_t_map_find(&api->recv_ctxs,
                                                          msg_id, &entry);
   size_t num_trits_in_bundle =
@@ -293,12 +302,10 @@ retcode_t mam_api_bundle_read_packet(mam_api_t const *const api,
 
   if (found) {
     size_t num_trits_in_packet =
-        (bundle_transactions_size(bundle) - start_index) * NUM_TRITS_SIGNATURE;
+        bundle_transactions_size(bundle) * NUM_TRITS_SIGNATURE;
     trit_t packet_trits[num_trits_in_packet];
     trits_t packet = trits_from_rep(num_trits_in_packet, packet_trits);
-    msg = trits_drop(msg, NUM_TRITS_SIGNATURE - msg.d);
     ERR_BIND_RETURN(mam_msg_recv_packet(&entry->value, &msg, &packet), err);
-
     *packet_payload = malloc(NUM_FLEX_TRITS_FOR_TRITS(num_trits_in_packet));
     flex_trits_from_trits(*packet_payload, num_trits_in_packet, packet_trits,
                           num_trits_in_packet, num_trits_in_packet);

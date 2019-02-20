@@ -90,18 +90,13 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
  *
  * @param api - The API
  * @param bundle - The bundle containing the MAM message
- * @param msg_id - the Message id
- * @param start_index - should be 0 if the bundle does not contain header,
- * otherwise, the next transaction after the header
  *
  * @return return code
  */
 
 retcode_t mam_api_bundle_read_packet(mam_api_t const *const api,
                                      bundle_transactions_t const *const bundle,
-                                     flex_trit_t **const payload,
-                                     trit_t const *const msg_id,
-                                     size_t start_index);
+                                     flex_trit_t **const payload);
 
 #ifdef __cplusplus
 }
