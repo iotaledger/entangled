@@ -75,10 +75,7 @@ void mam_msg_send_packet(mam_msg_send_context_t *ctx,
 typedef struct mam_msg_recv_context_s {
   mam_spongos_t spongos; /*!< Main Spongos interface */
   mam_msg_pubkey_t pubkey;
-  trit_t chid[MAM2_CHANNEL_ID_SIZE];
-  trit_t chid1[MAM2_CHANNEL_ID_SIZE];
-  trit_t epid[MAM2_ENDPOINT_ID_SIZE];
-  trit_t epid1[MAM2_ENDPOINT_ID_SIZE];
+  trit_t pk[MAM2_CHANNEL_ID_SIZE];
   mam_spongos_t spongos_mss[1];  /*!< Sponge interface used by MSS layer */
   mam_spongos_t spongos_wots[1]; /*!< Sponge interface used by WOTS layer */
   /*TODO: check for trusted chid/epid*/
@@ -102,10 +99,6 @@ typedef struct mam_msg_recv_packet_context_s {
 retcode_t mam_msg_recv_packet(mam_msg_recv_packet_context_t *cfg,
                               trits_t *packet, trits_t *payload);
 
-trits_t mam_msg_recv_cfg_chid(mam_msg_recv_context_t const *const cfg);
-trits_t mam_msg_recv_cfg_chid1(mam_msg_recv_context_t const *const cfg);
-trits_t mam_msg_recv_cfg_epid(mam_msg_recv_context_t const *const cfg);
-trits_t mam_msg_recv_cfg_epid1(mam_msg_recv_context_t const *const cfg);
 trits_t mam_msg_recv_cfg_msg_id(mam_msg_recv_context_t const *const cfg);
 
 #ifdef __cplusplus

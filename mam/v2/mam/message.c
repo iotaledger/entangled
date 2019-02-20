@@ -671,30 +671,6 @@ void mam_msg_send_packet(mam_msg_send_context_t *ctx,
   mam_spongos_commit(&ctx->spongos);
 }
 
-trits_t mam_msg_recv_cfg_chid(mam_msg_recv_context_t const *const cfg) {
-  MAM2_ASSERT(cfg);
-  MAM2_ASSERT(cfg->chid);
-  return trits_from_rep(MAM2_CHANNEL_ID_SIZE, cfg->chid);
-}
-
-trits_t mam_msg_recv_cfg_chid1(mam_msg_recv_context_t const *const cfg) {
-  MAM2_ASSERT(cfg);
-  MAM2_ASSERT(cfg->chid1);
-  return trits_from_rep(MAM2_CHANNEL_ID_SIZE, cfg->chid1);
-}
-
-trits_t mam_msg_recv_cfg_epid(mam_msg_recv_context_t const *const cfg) {
-  MAM2_ASSERT(cfg);
-  MAM2_ASSERT(cfg->epid);
-  return trits_from_rep(MAM2_ENDPOINT_ID_SIZE, cfg->epid);
-}
-
-trits_t mam_msg_recv_cfg_epid1(mam_msg_recv_context_t const *const cfg) {
-  MAM2_ASSERT(cfg);
-  MAM2_ASSERT(cfg->epid1);
-  return trits_from_rep(MAM2_ENDPOINT_ID_SIZE, cfg->epid1);
-}
-
 trits_t mam_msg_recv_cfg_msg_id(mam_msg_recv_context_t const *const cfg) {
   MAM2_ASSERT(cfg);
   return trits_from_rep(MAM2_MSG_ID_SIZE, cfg->msg_id);
@@ -705,11 +681,10 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t const *const msg) {
   mam_spongos_t *s;
 
   MAM2_ASSERT(cfg);
-  MAM2_ASSERT(cfg->chid);
-  MAM2_ASSERT(cfg->chid1);
-  MAM2_ASSERT(cfg->epid);
-  MAM2_ASSERT(cfg->epid1);
+
   s = &cfg->spongos;
+  trit_t chid[MAM2_CHANNEL_ID_SIZE];
+  memcpy(chid, cfg->pk, MAM2_CHANNEL_ID_SIZE);
 
   mam_spongos_init(s);
 
@@ -720,7 +695,9 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t const *const msg) {
   {
     tryte_t ver = -1;
     ERR_BIND_RETURN(
-        mam_msg_channel_unwrap(s, msg, &ver, mam_msg_recv_cfg_chid(cfg)), e);
+        mam_msg_channel_unwrap(s, msg, &ver,
+                               trits_from_rep(MAM2_CHANNEL_ID_SIZE, chid)),
+        e);
     ERR_GUARD_RETURN(0 == ver, RC_MAM2_VERSION_NOT_SUPPORTED, e);
   }
 
@@ -734,21 +711,25 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t const *const msg) {
     if (mam_msg_pubkey_chid1 == pubkey) { /*  SignedId chid1 = 2; */
       /*TODO: verify chid is trusted */
       ERR_BIND_RETURN(mam_msg_unwrap_pubkey_chid1(
-                          s, msg, mam_msg_recv_cfg_chid1(cfg), cfg->spongos_mss,
-                          cfg->spongos_wots, mam_msg_recv_cfg_chid(cfg)),
+                          s, msg, trits_from_rep(MAM2_CHANNEL_ID_SIZE, cfg->pk),
+                          cfg->spongos_mss, cfg->spongos_wots,
+                          trits_from_rep(MAM2_CHANNEL_ID_SIZE, chid)),
                       e);
       /*TODO: record new channel/endpoint */
     } else if (mam_msg_pubkey_epid1 == pubkey) { /*  SignedId epid1 = 3; */
       /*TODO: verify chid is trusted */
       ERR_BIND_RETURN(mam_msg_unwrap_pubkey_epid1(
-                          s, msg, mam_msg_recv_cfg_epid1(cfg), cfg->spongos_mss,
-                          cfg->spongos_wots, mam_msg_recv_cfg_chid(cfg)),
+                          s, msg, trits_from_rep(MAM2_CHANNEL_ID_SIZE, cfg->pk),
+                          cfg->spongos_mss, cfg->spongos_wots,
+                          trits_from_rep(MAM2_CHANNEL_ID_SIZE, chid)),
                       e);
       /*TODO: record new channel/endpoint */
     } else if (mam_msg_pubkey_epid ==
                pubkey) { /*  absorb tryte epid[81] = 1; */
       ERR_BIND_RETURN(
-          mam_msg_unwrap_pubkey_epid(s, msg, mam_msg_recv_cfg_epid(cfg)), e);
+          mam_msg_unwrap_pubkey_epid(
+              s, msg, trits_from_rep(MAM2_CHANNEL_ID_SIZE, cfg->pk)),
+          e);
     } else if (mam_msg_pubkey_chid == pubkey) { /*  absorb null chid = 0; */
       ERR_BIND_RETURN(mam_msg_unwrap_pubkey_chid(s, msg), e);
     } else

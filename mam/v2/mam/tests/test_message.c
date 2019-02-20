@@ -139,7 +139,8 @@ static void message_test_generic_receive_msg(
     cfg->ntrus = NULL;
     TEST_ASSERT(mam_ntru_sk_t_set_add(&cfg->ntrus, ntru) == RC_OK);
 
-    trits_copy(mam_channel_id(cha), mam_msg_recv_cfg_chid(cfg));
+    trits_copy(mam_channel_id(cha),
+               trits_from_rep(MAM2_CHANNEL_ID_SIZE, cfg->pk));
   }
 
   e = mam_msg_recv(cfg_msg_recv, msg);
@@ -166,16 +167,7 @@ static void message_test_generic_receive_packet(
       mam_msg_recv_packet_context_t *cfg = cfg_packet_receive;
       mam_spongos_copy(&cfg_msg_recv->spongos, &cfg->spongos);
       cfg->ord = -1;
-      cfg->pk = trits_null();
-      if (mam_msg_pubkey_chid == cfg_msg_recv->pubkey) {
-        cfg->pk = mam_msg_recv_cfg_chid(cfg_msg_recv);
-      } else if (mam_msg_pubkey_epid == cfg_msg_recv->pubkey) {
-        cfg->pk = mam_msg_recv_cfg_epid(cfg_msg_recv);
-      } else if (mam_msg_pubkey_chid1 == cfg_msg_recv->pubkey) {
-        cfg->pk = mam_msg_recv_cfg_chid1(cfg_msg_recv);
-      } else if (mam_msg_pubkey_epid1 == cfg_msg_recv->pubkey) {
-        cfg->pk = mam_msg_recv_cfg_chid1(cfg_msg_recv);
-      }
+      cfg->pk = trits_from_rep(MAM2_CHANNEL_ID_SIZE, cfg_msg_recv->pk);
       mam_spongos_copy(cfg_msg_recv->spongos_mss, cfg->spongos_mss);
       mam_spongos_copy(cfg_msg_recv->spongos_wots, cfg->spongos_wots);
     }

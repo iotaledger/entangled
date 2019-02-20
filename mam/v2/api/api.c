@@ -176,6 +176,7 @@ retcode_t mam_api_bundle_write_header(
   }
 
   ctx.ord = 0;
+  // TODO set the right MSS
   ctx.mss = NULL;
 
   return trit_t_to_mam_msg_send_context_t_map_add(&api->send_ctxs, msg_id, ctx);
@@ -273,13 +274,9 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
   cfg.pubkey = -1;
   cfg.psks = api->ntru_pks;
   cfg.ntrus = api->ntru_sks;
-  trit_t ch_id_trits_raw[NUM_TRITS_ADDRESS];
   iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
-  flex_trits_to_trits(ch_id_trits_raw, NUM_TRITS_ADDRESS,
-                      transaction_address(curr_tx), NUM_TRITS_ADDRESS,
-                      NUM_TRITS_ADDRESS);
-  trits_t ch_id_trits = trits_from_rep(NUM_TRITS_ADDRESS, ch_id_trits_raw);
-  trits_copy(ch_id_trits, mam_msg_recv_cfg_chid(&cfg));
+  flex_trits_to_trits(cfg.pk, NUM_TRITS_ADDRESS, transaction_address(curr_tx),
+                      NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
 
   // Flatten flex_trits encoded in transaction sig_or_fragment field
   // into a single long trits_t data structure
