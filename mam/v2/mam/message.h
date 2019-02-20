@@ -81,24 +81,17 @@ typedef struct mam_msg_recv_context_s {
   /*TODO: handle (add to trusted list) new chid1*/
   trit_t msg_id[MAM2_MSG_ID_SIZE];
   trint9_t msg_type_id;
+  trint18_t ord;             /*!< Packet ordinal number. */
   mam_psk_t_set_t psks;      /*!< PSK to decrypt message. */
   mam_ntru_sk_t_set_t ntrus; /*!< NTRU sk to decrypt message. */
 } mam_msg_recv_context_t;
 
-retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t const *const msg);
+retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg);
 
-typedef struct mam_msg_recv_packet_context_s {
-  mam_spongos_t spongos;         /*!< Main Spongos interface */
-  trint18_t ord;                 /*!< Packet ordinal number. */
-  trits_t pk;                    /*!< Channel/Endpoint id - MSS public key. */
-  mam_spongos_t spongos_mss[1];  /*!< Spongos interface used by MSS. */
-  mam_spongos_t spongos_wots[1]; /*!< Spongos interface used by WOTS. */
-} mam_msg_recv_packet_context_t;
+retcode_t mam_msg_recv_packet(mam_msg_recv_context_t *ctx, trits_t *packet,
+                              trits_t *payload);
 
-retcode_t mam_msg_recv_packet(mam_msg_recv_packet_context_t *cfg,
-                              trits_t *packet, trits_t *payload);
-
-trits_t mam_msg_recv_cfg_msg_id(mam_msg_recv_context_t const *const cfg);
+trits_t mam_msg_recv_cfg_msg_id(mam_msg_recv_context_t const *const ctx);
 
 #ifdef __cplusplus
 }

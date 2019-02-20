@@ -155,23 +155,15 @@ static void message_test_generic_receive_msg(
 }
 
 static void message_test_generic_receive_packet(
-    mam_msg_recv_context_t const *const cfg_msg_recv,
-    trits_t const *const packet, trits_t *const payload) {
+    mam_msg_recv_context_t *const ctx, trits_t const *const packet,
+    trits_t *const payload) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  mam_msg_recv_packet_context_t cfg_packet_receive[1];
   /* send/recv packet */
   {
     /*trits_free(a, payload);*/ /* init recv packet context */
-    {
-      mam_msg_recv_packet_context_t *cfg = cfg_packet_receive;
-      mam_spongos_copy(&cfg_msg_recv->spongos, &cfg->spongos);
-      cfg->ord = -1;
-      cfg->pk = trits_from_rep(MAM2_CHANNEL_ID_SIZE, cfg_msg_recv->pk);
-      mam_spongos_copy(cfg_msg_recv->spongos_mss, cfg->spongos_mss);
-      mam_spongos_copy(cfg_msg_recv->spongos_wots, cfg->spongos_wots);
-    }
+    ctx->ord = -1;
 
-    e = mam_msg_recv_packet(cfg_packet_receive, packet, payload);
+    e = mam_msg_recv_packet(ctx, packet, payload);
     TEST_ASSERT(RC_OK == e);
     TEST_ASSERT(trits_is_empty(*packet));
     TEST_ASSERT(trits_is_empty(*payload));
