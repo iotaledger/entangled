@@ -702,6 +702,8 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
 
   /* unwrap Endpoint */
   {
+    mam_spongos_t spongos_mss;
+    mam_spongos_t spongos_wots;
     tryte_t pubkey = -1;
     ERR_BIND_RETURN(pb3_unwrap_absorb_tryte(&ctx->spongos, msg, &pubkey), e);
     ERR_GUARD_RETURN(0 <= pubkey && pubkey <= 3, RC_MAM2_PB3_BAD_ONEOF, e);
@@ -711,16 +713,17 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
       ERR_BIND_RETURN(
           mam_msg_unwrap_pubkey_chid1(
               &ctx->spongos, msg, trits_from_rep(MAM2_CHANNEL_ID_SIZE, ctx->pk),
-              &ctx->spongos_mss, &ctx->spongos_wots,
+              &spongos_mss, &spongos_wots,
               trits_from_rep(MAM2_CHANNEL_ID_SIZE, chid)),
           e);
       /*TODO: record new channel/endpoint */
     } else if (mam_msg_pubkey_epid1 == pubkey) { /*  SignedId epid1 = 3; */
+
       /*TODO: verify chid is trusted */
       ERR_BIND_RETURN(
           mam_msg_unwrap_pubkey_epid1(
               &ctx->spongos, msg, trits_from_rep(MAM2_CHANNEL_ID_SIZE, ctx->pk),
-              &ctx->spongos_mss, &ctx->spongos_wots,
+              &spongos_mss, &spongos_wots,
               trits_from_rep(MAM2_CHANNEL_ID_SIZE, chid)),
           e);
       /*TODO: record new channel/endpoint */
@@ -843,9 +846,11 @@ retcode_t mam_msg_recv_packet(mam_msg_recv_context_t *ctx, trits_t *b,
     /*    MAC mac = 1; */
     ERR_BIND_GOTO(mam_msg_unwrap_checksum_mac(&ctx->spongos, b), e, cleanup);
   } else if (mam_msg_checksum_mssig == checksum) {
+    mam_spongos_t spongos_mss;
+    mam_spongos_t spongos_wots;
     /*    MSSig mssig = 2; */
     ERR_BIND_GOTO(mam_msg_unwrap_checksum_mssig(
-                      &ctx->spongos, b, &ctx->spongos_mss, &ctx->spongos_wots,
+                      &ctx->spongos, b, &spongos_mss, &spongos_wots,
                       trits_from_rep(MAM2_CHANNEL_ID_SIZE, ctx->pk)),
                   e, cleanup);
   } else {

@@ -55,6 +55,15 @@ typedef struct mam_msg_send_context_s {
   mss_t *mss;
 } mam_msg_send_context_t;
 
+typedef struct mam_msg_recv_context_s {
+  mam_spongos_t spongos; /*!< Main Spongos interface */
+  trit_t pk[MAM2_CHANNEL_ID_SIZE];
+  /*TODO: check for trusted chid/epid*/
+  /*TODO: handle (add to trusted list) new chid1*/
+  trit_t msg_id[MAM2_MSG_ID_SIZE];
+  trint18_t ord; /*!< Packet ordinal number. */
+} mam_msg_recv_context_t;
+
 size_t mam_msg_send_size(mam_channel_t *ch, mam_endpoint_t *ep,
                          mam_channel_t *ch1, mam_endpoint_t *ep1,
                          mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks);
@@ -71,17 +80,6 @@ size_t mam_msg_send_packet_size(mam_msg_checksum_t checksum, mss_t *mss,
 void mam_msg_send_packet(mam_msg_send_context_t *ctx,
                          mam_msg_checksum_t checksum, trits_t payload,
                          trits_t *b);
-
-typedef struct mam_msg_recv_context_s {
-  mam_spongos_t spongos; /*!< Main Spongos interface */
-  trit_t pk[MAM2_CHANNEL_ID_SIZE];
-  mam_spongos_t spongos_mss;  /*!< Sponge interface used by MSS layer */
-  mam_spongos_t spongos_wots; /*!< Sponge interface used by WOTS layer */
-  /*TODO: check for trusted chid/epid*/
-  /*TODO: handle (add to trusted list) new chid1*/
-  trit_t msg_id[MAM2_MSG_ID_SIZE];
-  trint18_t ord; /*!< Packet ordinal number. */
-} mam_msg_recv_context_t;
 
 retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
                        mam_psk_t_set_t psks, mam_ntru_sk_t_set_t ntru_sks);
