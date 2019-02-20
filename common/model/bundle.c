@@ -245,8 +245,8 @@ void bundle_reset_indexes(bundle_transactions_t *const bundle) {
   last_index = bundle_transactions_size(bundle) - 1;
 
   BUNDLE_FOREACH(bundle, current_tx) {
-    current_tx->essence.last_index = last_index;
-    current_tx->essence.current_index = current_index;
+    transaction_set_last_index(current_tx, last_index);
+    transaction_set_current_index(current_tx, current_index);
     current_index++;
   }
 }

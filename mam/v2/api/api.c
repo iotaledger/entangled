@@ -146,14 +146,11 @@ retcode_t mam_api_bundle_write_header(
     transaction_set_obsolete_tag(&transaction,
                                  transaction.data.signature_or_message);
     transaction_set_timestamp(&transaction, current_timestamp_ms() / 1000);
-    transaction_set_last_index(&transaction,
-                               (header_size - 1) / NUM_TRITS_SIGNATURE);
     transaction_set_tag(&transaction, transaction.data.signature_or_message);
 
-    for (size_t current_index = 0; !trits_is_empty(header); current_index++) {
+    while (!trits_is_empty(header)) {
       header_part = trits_take_min(header, NUM_TRITS_SIGNATURE);
       header = trits_drop_min(header, NUM_TRITS_SIGNATURE);
-      transaction_set_current_index(&transaction, current_index);
       memset(buffer, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_6561);
       flex_trits_from_trits(buffer, NUM_TRITS_SIGNATURE,
                             header_part.p + header_part.d,
@@ -161,6 +158,8 @@ retcode_t mam_api_bundle_write_header(
       transaction_set_message(&transaction, buffer);
       bundle_transactions_add(bundle, &transaction);
     }
+
+    bundle_reset_indexes(bundle);
 
     trits_free(header);
   }
@@ -219,14 +218,11 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
     transaction_set_obsolete_tag(&transaction,
                                  transaction.data.signature_or_message);
     transaction_set_timestamp(&transaction, current_timestamp_ms() / 1000);
-    transaction_set_last_index(&transaction,
-                               (packet_size - 1) / NUM_TRITS_SIGNATURE);
     transaction_set_tag(&transaction, transaction.data.signature_or_message);
 
-    for (size_t current_index = 0; !trits_is_empty(packet); current_index++) {
+    while (!trits_is_empty(packet)) {
       packet_part = trits_take_min(packet, NUM_TRITS_SIGNATURE);
       packet = trits_drop_min(packet, NUM_TRITS_SIGNATURE);
-      transaction_set_current_index(&transaction, current_index);
       memset(buffer, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_6561);
       flex_trits_from_trits(buffer, NUM_TRITS_SIGNATURE,
                             packet_part.p + packet_part.d,
