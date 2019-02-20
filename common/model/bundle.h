@@ -56,6 +56,8 @@ void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl);
 retcode_t bundle_validator(bundle_transactions_t *const bundle,
                            bundle_status_t *const status);
 
+void bundle_reset_indexes(bundle_transactions_t *const bundle);
+
 #ifdef DEBUG
 void bundle_dump(bundle_transactions_t *bundle);
 #endif

@@ -233,6 +233,24 @@ retcode_t bundle_validator(bundle_transactions_t *const bundle,
   return RC_OK;
 }
 
+void bundle_reset_indexes(bundle_transactions_t *const bundle) {
+  size_t last_index = 0;
+  size_t current_index = 0;
+  iota_transaction_t *current_tx = NULL;
+
+  if (bundle == NULL) {
+    return;
+  }
+
+  last_index = bundle_transactions_size(bundle) - 1;
+
+  BUNDLE_FOREACH(bundle, current_tx) {
+    current_tx->essence.last_index = last_index;
+    current_tx->essence.current_index = current_index;
+    current_index++;
+  }
+}
+
 #ifdef DEBUG
 void bundle_dump(bundle_transactions_t *bundle) {
   iota_transaction_t *curr_tx = NULL;
