@@ -738,13 +738,16 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
 
   /* unwrap Header */
   {
+    trint9_t msg_type_id;
+
     /*  absorb tryte msg_id[27]; */
     ERR_BIND_RETURN(pb3_unwrap_absorb_ntrytes(&ctx->spongos, msg,
                                               mam_msg_recv_cfg_msg_id(ctx)),
                     e);
     /*  absorb trint typeid; */
-    ERR_BIND_RETURN(
-        pb3_unwrap_absorb_trint(&ctx->spongos, msg, &ctx->msg_type_id), e);
+    ERR_BIND_RETURN(pb3_unwrap_absorb_trint(&ctx->spongos, msg, &msg_type_id),
+                    e);
+    // TODO switch case on the msg_type_id
     {
       /*  repeated */
       size_t keyload_count = 0;

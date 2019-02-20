@@ -80,7 +80,6 @@ typedef struct mam_msg_recv_context_s {
   /*TODO: check for trusted chid/epid*/
   /*TODO: handle (add to trusted list) new chid1*/
   trit_t msg_id[MAM2_MSG_ID_SIZE];
-  trint9_t msg_type_id;
   trint18_t ord; /*!< Packet ordinal number. */
 } mam_msg_recv_context_t;
 
