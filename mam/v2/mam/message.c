@@ -273,7 +273,7 @@ static void mam_msg_wrap_keyload_psk(mam_spongos_t *s, trits_t *b, trits_t key,
 
 static retcode_t mam_msg_unwrap_keyload_psk(mam_spongos_t *s, trits_t *b,
                                             trits_t key, bool *key_found,
-                                            mam_psk_t_set_t *p) {
+                                            mam_psk_t_set_t p) {
   retcode_t e = RC_OK;
   MAM2_TRITS_DEF0(id, MAM2_PSK_ID_SIZE);
   id = MAM2_TRITS_INIT(id, MAM2_PSK_ID_SIZE);
@@ -287,7 +287,7 @@ static retcode_t mam_msg_unwrap_keyload_psk(mam_spongos_t *s, trits_t *b,
   mam_psk_t_set_entry_t *entry = NULL;
   mam_psk_t_set_entry_t *tmp = NULL;
   bool psk_found = false;
-  HASH_ITER(hh, *p, entry, tmp) {
+  HASH_ITER(hh, p, entry, tmp) {
     if (trits_cmp_eq(id, mam_psk_id(&entry->value))) {
       psk_found = true;
       break;
@@ -342,7 +342,7 @@ static void mam_msg_wrap_keyload_ntru(mam_spongos_t *s, trits_t *b, trits_t key,
 
 static retcode_t mam_msg_unwrap_keyload_ntru(mam_spongos_t *s, trits_t *b,
                                              trits_t key, bool *key_found,
-                                             mam_ntru_sk_t_set_t *n,
+                                             mam_ntru_sk_t_set_t n,
                                              mam_spongos_t *ns) {
   retcode_t e = RC_OK;
   trits_t ekey;
@@ -357,7 +357,7 @@ static retcode_t mam_msg_unwrap_keyload_ntru(mam_spongos_t *s, trits_t *b,
   mam_ntru_sk_t_set_entry_t *entry = NULL;
   mam_ntru_sk_t_set_entry_t *tmp = NULL;
   bool ntru_found = false;
-  HASH_ITER(hh, *n, entry, tmp) {
+  HASH_ITER(hh, n, entry, tmp) {
     if (trits_cmp_eq(id, mam_ntru_pk_id(&entry->value.public_key))) {
       ntru_found = true;
       break;
@@ -676,7 +676,8 @@ trits_t mam_msg_recv_cfg_msg_id(mam_msg_recv_context_t const *const cfg) {
   return trits_from_rep(MAM2_MSG_ID_SIZE, cfg->msg_id);
 }
 
-retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg) {
+retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
+                       mam_psk_t_set_t psks, mam_ntru_sk_t_set_t ntru_sks) {
   retcode_t e = RC_OK;
 
   MAM2_ASSERT(ctx);
@@ -770,14 +771,14 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg) {
           if (mam_msg_keyload_psk == keyload) { /*  KeyloadPSK psk = 1; */
             ERR_BIND_RETURN(
                 mam_msg_unwrap_keyload_psk(&spongos_fork, msg, session_key,
-                                           &key_found, &ctx->psks),
+                                           &key_found, psks),
                 e);
 
           } else if (mam_msg_keyload_ntru ==
                      keyload) { /*  KeyloadNTRU ntru = 2; */
             ERR_BIND_RETURN(mam_msg_unwrap_keyload_ntru(
                                 &spongos_fork, msg, session_key, &key_found,
-                                &ctx->ntrus, &spongos_ntru),
+                                ntru_sks, &spongos_ntru),
                             e);
 
           } else

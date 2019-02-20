@@ -130,19 +130,17 @@ static void message_test_generic_receive_msg(
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   /* init recv msg context */
-  {
-    mam_msg_recv_context_t *cfg = cfg_msg_recv;
+  mam_msg_recv_context_t *cfg = cfg_msg_recv;
+  mam_psk_t_set_t psks = NULL;
+  mam_ntru_sk_t_set_t ntru_sks = NULL;
 
-    cfg->psks = NULL;
-    TEST_ASSERT(mam_psk_t_set_add(&cfg->psks, pre_shared_key) == RC_OK);
-    cfg->ntrus = NULL;
-    TEST_ASSERT(mam_ntru_sk_t_set_add(&cfg->ntrus, ntru) == RC_OK);
+  TEST_ASSERT(mam_psk_t_set_add(&psks, pre_shared_key) == RC_OK);
+  TEST_ASSERT(mam_ntru_sk_t_set_add(&ntru_sks, ntru) == RC_OK);
 
-    trits_copy(mam_channel_id(cha),
-               trits_from_rep(MAM2_CHANNEL_ID_SIZE, cfg->pk));
-  }
+  trits_copy(mam_channel_id(cha),
+             trits_from_rep(MAM2_CHANNEL_ID_SIZE, cfg->pk));
 
-  e = mam_msg_recv(cfg_msg_recv, msg);
+  e = mam_msg_recv(cfg_msg_recv, msg, psks, ntru_sks);
 
   TEST_ASSERT(RC_OK == e);
   TEST_ASSERT(trits_is_empty(*msg));
@@ -150,8 +148,8 @@ static void message_test_generic_receive_msg(
                                "SENDERMSGIDAAAAASENDERMSGID"));
   MAM2_ASSERT(cfg_msg_recv->msg_type_id == 0);
 
-  mam_ntru_sk_t_set_free(&cfg_msg_recv->ntrus);
-  mam_psk_t_set_free(&cfg_msg_recv->psks);
+  mam_ntru_sk_t_set_free(&ntru_sks);
+  mam_psk_t_set_free(&psks);
 }
 
 static void message_test_generic_receive_packet(

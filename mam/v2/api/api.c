@@ -255,9 +255,10 @@ trits_t msg_trits_from_bundle(bundle_transactions_t const *const bundle,
 }
 
 static retcode_t mam_api_bundle_read_header(
-    mam_msg_recv_context_t const *const ctx, trits_t *const msg) {
+    mam_msg_recv_context_t const *const ctx, trits_t *const msg,
+    mam_psk_t_set_t psks, mam_ntru_sk_t_set_t ntru_sks) {
   retcode_t err;
-  ERR_BIND_RETURN(mam_msg_recv(ctx, msg), err);
+  ERR_BIND_RETURN(mam_msg_recv(ctx, msg, psks, ntru_sks), err);
   return err;
 }
 
@@ -270,11 +271,9 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
     return RC_MAM2_BUNDLE_DOES_NOT_CONTAIN_HEADER;
   }
 
-  mam_msg_recv_context_t cfg;
-  cfg.psks = api->ntru_pks;
-  cfg.ntrus = api->ntru_sks;
+  mam_msg_recv_context_t ctx;
   iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
-  flex_trits_to_trits(cfg.pk, NUM_TRITS_ADDRESS, transaction_address(curr_tx),
+  flex_trits_to_trits(ctx.pk, NUM_TRITS_ADDRESS, transaction_address(curr_tx),
                       NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
 
   // Flatten flex_trits encoded in transaction sig_or_fragment field
@@ -285,10 +284,11 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
   trits_t msg =
       msg_trits_from_bundle(bundle, msg_trits, num_trits_in_bundle, 0);
 
-  ERR_BIND_RETURN(mam_api_bundle_read_header(&cfg, &msg), err);
+  ERR_BIND_RETURN(
+      mam_api_bundle_read_header(&ctx, &msg, api->psks, api->ntru_sks), err);
 
   ERR_BIND_RETURN(trit_t_to_mam_msg_recv_context_t_map_add(
-                      &api->recv_ctxs, mam_msg_recv_cfg_msg_id(&cfg).p, cfg),
+                      &api->recv_ctxs, mam_msg_recv_cfg_msg_id(&ctx).p, ctx),
                   err);
 
   size_t packet_index = msg.d / NUM_TRITS_SIGNATURE + 1;
@@ -298,7 +298,7 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
     trit_t packet_trits[num_trits_in_packet];
     trits_t packet = trits_from_rep(num_trits_in_packet, packet_trits);
     msg = trits_drop(msg, NUM_TRITS_SIGNATURE - msg.d);
-    ERR_BIND_RETURN(mam_msg_recv_packet(&cfg, &msg, &packet), err);
+    ERR_BIND_RETURN(mam_msg_recv_packet(&ctx, &msg, &packet), err);
 
     *packet_payload = malloc(NUM_FLEX_TRITS_FOR_TRITS(num_trits_in_packet));
     flex_trits_from_trits(*packet_payload, num_trits_in_packet, packet_trits,

@@ -81,12 +81,11 @@ typedef struct mam_msg_recv_context_s {
   /*TODO: handle (add to trusted list) new chid1*/
   trit_t msg_id[MAM2_MSG_ID_SIZE];
   trint9_t msg_type_id;
-  trint18_t ord;             /*!< Packet ordinal number. */
-  mam_psk_t_set_t psks;      /*!< PSK to decrypt message. */
-  mam_ntru_sk_t_set_t ntrus; /*!< NTRU sk to decrypt message. */
+  trint18_t ord; /*!< Packet ordinal number. */
 } mam_msg_recv_context_t;
 
-retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg);
+retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
+                       mam_psk_t_set_t psks, mam_ntru_sk_t_set_t ntru_sks);
 
 retcode_t mam_msg_recv_packet(mam_msg_recv_context_t *ctx, trits_t *packet,
                               trits_t *payload);
