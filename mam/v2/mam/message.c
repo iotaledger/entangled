@@ -704,7 +704,6 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t const *const msg) {
     tryte_t pubkey = -1;
     ERR_BIND_RETURN(pb3_unwrap_absorb_tryte(&cfg->spongos, msg, &pubkey), e);
     ERR_GUARD_RETURN(0 <= pubkey && pubkey <= 3, RC_MAM2_PB3_BAD_ONEOF, e);
-    cfg->pubkey = (mam_msg_pubkey_t)pubkey;
 
     if (mam_msg_pubkey_chid1 == pubkey) { /*  SignedId chid1 = 2; */
       /*TODO: verify chid is trusted */

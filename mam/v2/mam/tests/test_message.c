@@ -133,7 +133,6 @@ static void message_test_generic_receive_msg(
   {
     mam_msg_recv_context_t *cfg = cfg_msg_recv;
 
-    cfg->pubkey = -1;
     cfg->psks = NULL;
     TEST_ASSERT(mam_psk_t_set_add(&cfg->psks, pre_shared_key) == RC_OK);
     cfg->ntrus = NULL;

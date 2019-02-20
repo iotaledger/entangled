@@ -271,7 +271,6 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
   }
 
   mam_msg_recv_context_t cfg;
-  cfg.pubkey = -1;
   cfg.psks = api->ntru_pks;
   cfg.ntrus = api->ntru_sks;
   iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);

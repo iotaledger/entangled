@@ -74,7 +74,6 @@ void mam_msg_send_packet(mam_msg_send_context_t *ctx,
 
 typedef struct mam_msg_recv_context_s {
   mam_spongos_t spongos; /*!< Main Spongos interface */
-  mam_msg_pubkey_t pubkey;
   trit_t pk[MAM2_CHANNEL_ID_SIZE];
   mam_spongos_t spongos_mss[1];  /*!< Sponge interface used by MSS layer */
   mam_spongos_t spongos_wots[1]; /*!< Sponge interface used by WOTS layer */
