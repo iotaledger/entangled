@@ -95,9 +95,7 @@ static void receive_bundle(mam_api_t const *const api,
   get_first_bundle_from_transactions(out_tx_objs, bundle);
 
   flex_trit_t *packet_payload = NULL;
-  trit_t msg_id_trits[NUM_TRITS_TAG];
-  err =
-      mam_api_bundle_read_msg(api, cha, bundle, &packet_payload, msg_id_trits);
+  err = mam_api_bundle_read_msg(api, cha, bundle, &packet_payload);
   if (err == RC_OK) {
     fprintf(stderr, "mam_api_bundle_read_msg succeeded\n");
   } else {
