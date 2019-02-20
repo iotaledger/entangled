@@ -710,7 +710,7 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg) {
       ERR_BIND_RETURN(
           mam_msg_unwrap_pubkey_chid1(
               &ctx->spongos, msg, trits_from_rep(MAM2_CHANNEL_ID_SIZE, ctx->pk),
-              ctx->spongos_mss, ctx->spongos_wots,
+              &ctx->spongos_mss, &ctx->spongos_wots,
               trits_from_rep(MAM2_CHANNEL_ID_SIZE, chid)),
           e);
       /*TODO: record new channel/endpoint */
@@ -719,7 +719,7 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg) {
       ERR_BIND_RETURN(
           mam_msg_unwrap_pubkey_epid1(
               &ctx->spongos, msg, trits_from_rep(MAM2_CHANNEL_ID_SIZE, ctx->pk),
-              ctx->spongos_mss, ctx->spongos_wots,
+              &ctx->spongos_mss, &ctx->spongos_wots,
               trits_from_rep(MAM2_CHANNEL_ID_SIZE, chid)),
           e);
       /*TODO: record new channel/endpoint */
@@ -841,7 +841,7 @@ retcode_t mam_msg_recv_packet(mam_msg_recv_context_t *ctx, trits_t *b,
   } else if (mam_msg_checksum_mssig == checksum) {
     /*    MSSig mssig = 2; */
     ERR_BIND_GOTO(mam_msg_unwrap_checksum_mssig(
-                      &ctx->spongos, b, ctx->spongos_mss, ctx->spongos_wots,
+                      &ctx->spongos, b, &ctx->spongos_mss, &ctx->spongos_wots,
                       trits_from_rep(MAM2_CHANNEL_ID_SIZE, ctx->pk)),
                   e, cleanup);
   } else {

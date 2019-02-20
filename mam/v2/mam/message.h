@@ -75,8 +75,8 @@ void mam_msg_send_packet(mam_msg_send_context_t *ctx,
 typedef struct mam_msg_recv_context_s {
   mam_spongos_t spongos; /*!< Main Spongos interface */
   trit_t pk[MAM2_CHANNEL_ID_SIZE];
-  mam_spongos_t spongos_mss[1];  /*!< Sponge interface used by MSS layer */
-  mam_spongos_t spongos_wots[1]; /*!< Sponge interface used by WOTS layer */
+  mam_spongos_t spongos_mss;  /*!< Sponge interface used by MSS layer */
+  mam_spongos_t spongos_wots; /*!< Sponge interface used by WOTS layer */
   /*TODO: check for trusted chid/epid*/
   /*TODO: handle (add to trusted list) new chid1*/
   trit_t msg_id[MAM2_MSG_ID_SIZE];
