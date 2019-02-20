@@ -164,7 +164,7 @@ static void message_test_generic_receive_packet(
     /*trits_free(a, payload);*/ /* init recv packet context */
     {
       mam_msg_recv_packet_context_t *cfg = cfg_packet_receive;
-      mam_spongos_copy(cfg_msg_recv->spongos, cfg->spongos);
+      mam_spongos_copy(&cfg_msg_recv->spongos, &cfg->spongos);
       cfg->ord = -1;
       cfg->pk = trits_null();
       if (mam_msg_pubkey_chid == cfg_msg_recv->pubkey) {

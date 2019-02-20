@@ -73,7 +73,7 @@ void mam_msg_send_packet(mam_msg_send_context_t *ctx,
                          trits_t *b);
 
 typedef struct mam_msg_recv_context_s {
-  mam_spongos_t spongos[1]; /*!< Main Spongos interface */
+  mam_spongos_t spongos; /*!< Main Spongos interface */
   mam_msg_pubkey_t pubkey;
   trit_t chid[MAM2_CHANNEL_ID_SIZE];
   trit_t chid1[MAM2_CHANNEL_ID_SIZE];
@@ -92,7 +92,7 @@ typedef struct mam_msg_recv_context_s {
 retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t const *const msg);
 
 typedef struct mam_msg_recv_packet_context_s {
-  mam_spongos_t spongos[1];      /*!< Main Spongos interface */
+  mam_spongos_t spongos;         /*!< Main Spongos interface */
   trint18_t ord;                 /*!< Packet ordinal number. */
   trits_t pk;                    /*!< Channel/Endpoint id - MSS public key. */
   mam_spongos_t spongos_mss[1];  /*!< Spongos interface used by MSS. */

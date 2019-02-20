@@ -709,8 +709,7 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *cfg, trits_t const *const msg) {
   MAM2_ASSERT(cfg->chid1);
   MAM2_ASSERT(cfg->epid);
   MAM2_ASSERT(cfg->epid1);
-  MAM2_ASSERT(cfg->spongos);
-  s = cfg->spongos;
+  s = &cfg->spongos;
 
   mam_spongos_init(s);
 
@@ -823,10 +822,9 @@ retcode_t mam_msg_recv_packet(mam_msg_recv_packet_context_t *cfg, trits_t *b,
   trits_t p = trits_null();
 
   MAM2_ASSERT(cfg);
-  MAM2_ASSERT(cfg->spongos);
   MAM2_ASSERT(b);
   MAM2_ASSERT(payload);
-  s = cfg->spongos;
+  s = &cfg->spongos;
 
   size_t sz = 0;
   tryte_t checksum = -1;
