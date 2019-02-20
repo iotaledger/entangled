@@ -167,14 +167,11 @@ retcode_t mam_api_bundle_write_header(
     if (trits_is_null(header = trits_alloc(header_size))) {
       return RC_OOM;
     }
-
     mam_msg_send(&ctx, &api->prng, ch, ep, ch1, ep1,
                  trits_from_rep(MAM2_MSG_ID_SIZE, msg_id), msg_type_id, psks,
                  ntru_pks, &header);
     header = trits_pickup(header, header_size);
-
     mam_api_bundle_wrap(bundle, ch->id, header);
-
     trits_free(header);
   }
 
@@ -204,7 +201,6 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
   }
   ctx = &entry->value;
 
-  /////////////////////////////////
   {
     trits_t packet = trits_null();
     size_t packet_size = 0;
@@ -220,17 +216,13 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
 
     mam_msg_send_packet(ctx, checksum, payload_trits, &packet);
     packet = trits_pickup(packet, packet_size);
-
     mam_api_bundle_wrap(bundle, ch->id, packet);
-
     trits_free(packet);
   }
-  ///////////////////////////////////
+
+  ctx->ord++;
 
   // TODO check if bundle contains header
-
-  // TODO increment ord
-
   // TODO if last remove pending state
 
   return RC_OK;
