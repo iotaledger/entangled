@@ -25,10 +25,6 @@ static tryte_t BUNDLE_HASH[NUM_TRYTES_BUNDLE] =
     "YKJJHKXLXWHIBNSHZTLEXOOHJXHKWIGGSIGDVKFSCKQZOISJXTN9JPCZGAH9KWJXIKKESSQICC"
     "DEWKZD9";
 
-static tryte_t CH_ID[NUM_TRYTES_ADDRESS] =
-    "99999999999999999999999999999ND9999999999999999999999999999999999999999999"
-    "9999999";
-
 static void get_first_bundle_from_transactions(
     transaction_array_t const transactions,
     bundle_transactions_t *const bundle) {
@@ -56,7 +52,6 @@ static void get_first_bundle_from_transactions(
 }
 // TODO Merge into cclient
 static void receive_bundle(mam_api_t const *const api,
-                           flex_trit_t const *const ch_id,
                            flex_trit_t const *const bundle_hash) {
   iota_client_service_t serv;
   serv.http.path = "/";
@@ -99,7 +94,7 @@ static void receive_bundle(mam_api_t const *const api,
   get_first_bundle_from_transactions(out_tx_objs, bundle);
 
   flex_trit_t *packet_payload = NULL;
-  err = mam_api_bundle_read_msg(api, ch_id, bundle, &packet_payload);
+  err = mam_api_bundle_read_msg(api, bundle, &packet_payload);
   if (err == RC_OK) {
     fprintf(stderr, "mam_api_bundle_read_msg succeeded\n");
   } else {
@@ -127,10 +122,7 @@ int main(void) {
   flex_trits_from_trytes(bundle_hash, NUM_TRITS_HASH, BUNDLE_HASH,
                          NUM_TRITS_HASH, NUM_TRYTES_BUNDLE);
 
-  flex_trit_t ch_id[FLEX_TRIT_SIZE_243];
-  flex_trits_from_trytes(ch_id, NUM_TRITS_ADDRESS, CH_ID, NUM_TRITS_ADDRESS,
-                         NUM_TRYTES_ADDRESS);
-  receive_bundle(&api, ch_id, bundle_hash);
+  receive_bundle(&api, bundle_hash);
   if (mam_api_destroy(&api) != RC_OK) {
     fprintf(stderr, "mam_api_destroy failed\n");
     ret = EXIT_FAILURE;

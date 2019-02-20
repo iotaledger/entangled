@@ -74,7 +74,6 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
  * key
  *
  * @param api - The API
- * @param ch_id - The channel the message belongs to
  * @param bundle - The bundle containing the MAM message
  * @param packet_payload - First packet payload [out] (will be allocated if
  * packet is present)
@@ -83,7 +82,6 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
  */
 
 retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
-                                  flex_trit_t const *const ch_id,
                                   bundle_transactions_t const *const bundle,
                                   flex_trit_t **const packet_payload);
 

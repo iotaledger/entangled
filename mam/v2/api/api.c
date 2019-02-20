@@ -231,7 +231,6 @@ static retcode_t mam_api_bundle_read_header(
 }
 
 retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
-                                  flex_trit_t const *const ch_id,
                                   bundle_transactions_t const *const bundle,
                                   flex_trit_t **const packet_payload) {
   retcode_t err = RC_OK;
@@ -245,8 +244,10 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
   cfg.psks = api->ntru_pks;
   cfg.ntrus = api->ntru_sks;
   trit_t ch_id_trits_raw[NUM_TRITS_ADDRESS];
-  flex_trits_to_trits(ch_id_trits_raw, NUM_TRITS_ADDRESS, ch_id,
-                      NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
+  iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
+  flex_trits_to_trits(ch_id_trits_raw, NUM_TRITS_ADDRESS,
+                      transaction_address(curr_tx), NUM_TRITS_ADDRESS,
+                      NUM_TRITS_ADDRESS);
   trits_t ch_id_trits = trits_from_rep(NUM_TRITS_ADDRESS, ch_id_trits_raw);
   trits_copy(ch_id_trits, mam_msg_recv_cfg_chid(&cfg));
 
