@@ -95,8 +95,8 @@ static void receive_bundle(mam_channel_t const *const cha,
 
   mam_msg_recv_context_t cfg;
   cfg.pubkey = -1;
-  cfg.psk = NULL;
-  cfg.ntru = NULL;
+  cfg.psks = NULL;
+  cfg.ntrus = NULL;
   trits_copy(mam_channel_id(cha), mam_msg_recv_cfg_chid(&cfg));
 
   flex_trit_t *packet_payload = NULL;
