@@ -7,6 +7,7 @@ cc_library(
     srcs = ["api.c"],
     hdrs = ["api.h"],
     deps = [
+        ":trit_t_to_mam_msg_recv_context_t_map",
         ":trit_t_to_mam_msg_send_context_t_map",
         "//common:errors",
         "//common/model:bundle",
@@ -25,4 +26,12 @@ map_generate(
     key_type = "trit_t",
     parent_directory = "mam/v2/api",
     value_type = "mam_msg_send_context_t",
+)
+
+map_generate(
+    additional_deps = ["//mam/v2/mam:message"],
+    additional_include_path = "mam/v2/mam/message.h",
+    key_type = "trit_t",
+    parent_directory = "mam/v2/api",
+    value_type = "mam_msg_recv_context_t",
 )

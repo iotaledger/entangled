@@ -14,6 +14,7 @@
 #include "common/errors.h"
 #include "common/model/bundle.h"
 #include "common/trinary/flex_trit.h"
+#include "mam/v2/api/trit_t_to_mam_msg_recv_context_t_map.h"
 #include "mam/v2/api/trit_t_to_mam_msg_send_context_t_map.h"
 #include "mam/v2/mam/mam_types.h"
 #include "mam/v2/mam/message.h"
@@ -30,6 +31,7 @@ typedef struct mam_api_s {
   mam_ntru_pk_t_set_t ntru_pks;
   mam_psk_t_set_t psks;
   trit_t_to_mam_msg_send_context_t_map_t send_ctxs;
+  trit_t_to_mam_msg_recv_context_t_map_t recv_ctxs;
 } mam_api_t;
 
 retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed);
@@ -71,7 +73,7 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
  * Reads MAM's session key and potentially the first packet using NTRU secret
  * key
  *
- * @param ctx - The reading context (Needs to be persisted)
+ * @param api - The API
  * @param cha - The channel the message belongs to
  * @param bundle - The bundle containing the MAM message
  * @param packet_payload - First packet payload [out] (will be allocated if
@@ -83,31 +85,16 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
  * @return return code
  */
 
-retcode_t mam_api_bundle_read_msg(mam_msg_recv_context_t *const ctx,
+retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
+                                  mam_channel_t const *const cha,
                                   bundle_transactions_t const *const bundle,
                                   flex_trit_t **const packet_payload,
-                                  trits_t msg_id);
-
-/**
- * Reads MAM's header
- *
- * @param ctx - The reading context (Needs to be persisted)
- * @param cha - The channel the message belongs to
- * @param bundle - The bundle containing the MAM message
- * @param session_key - the key for decrypting following packets with the same
- * [out] (known size) message id
- * @param msg_id - the Message id [out]
- *
- * @return return code
- */
-
-retcode_t mam_api_bundle_read_header(mam_msg_recv_context_t *const ctx,
-                                     trits_t *const msg, trits_t msg_id);
+                                  trit_t const *const msg_id);
 
 /**
  * Reads next packet
  *
- * @param ctx - The reading context (Needs to be persisted)
+ * @param api - The API
  * @param cha - The channel the message belongs to
  * @param bundle - The bundle containing the MAM message
  * @param session_key - the key for decrypting following packets with the same
@@ -117,10 +104,10 @@ retcode_t mam_api_bundle_read_header(mam_msg_recv_context_t *const ctx,
  * @return return code
  */
 
-retcode_t mam_api_bundle_read_packet(mam_msg_recv_context_t *const ctx,
+retcode_t mam_api_bundle_read_packet(mam_api_t const *const api,
                                      bundle_transactions_t const *const bundle,
                                      flex_trit_t *const payload, uint32_t ord,
-                                     trits_t const msg_id);
+                                     trit_t const *const msg_id);
 
 #ifdef __cplusplus
 }

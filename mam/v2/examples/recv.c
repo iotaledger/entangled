@@ -51,7 +51,8 @@ static void get_first_bundle_from_transactions(
   }
 }
 // TODO Merge into cclient
-static void receive_bundle(mam_channel_t const *const cha,
+static void receive_bundle(mam_api_t const *const api,
+                           mam_channel_t const *const cha,
                            flex_trit_t const *const bundle_hash) {
   iota_client_service_t serv;
   serv.http.path = "/";
@@ -93,16 +94,10 @@ static void receive_bundle(mam_channel_t const *const cha,
 
   get_first_bundle_from_transactions(out_tx_objs, bundle);
 
-  mam_msg_recv_context_t cfg;
-  cfg.pubkey = -1;
-  cfg.psks = NULL;
-  cfg.ntrus = NULL;
-  trits_copy(mam_channel_id(cha), mam_msg_recv_cfg_chid(&cfg));
-
   flex_trit_t *packet_payload = NULL;
   trit_t msg_id_trits[NUM_TRITS_TAG];
-  trits_t msg_id = trits_from_rep(NUM_TRITS_TAG, msg_id_trits);
-  err = mam_api_bundle_read_msg(&cfg, bundle, &packet_payload, msg_id);
+  err =
+      mam_api_bundle_read_msg(api, cha, bundle, &packet_payload, msg_id_trits);
   if (err == RC_OK) {
     fprintf(stderr, "mam_api_bundle_read_msg succeeded\n");
   } else {
@@ -114,6 +109,7 @@ static void receive_bundle(mam_channel_t const *const cha,
   iota_client_extended_destroy();
   iota_client_core_destroy(&serv);
   bundle_transactions_free(&bundle);
+  hash243_queue_free(&req.bundles);
 }
 
 int main(void) {
@@ -134,12 +130,14 @@ int main(void) {
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   flex_trits_from_trytes(bundle_hash, NUM_TRITS_HASH, BUNDLE_HASH,
                          NUM_TRITS_HASH, NUM_TRYTES_BUNDLE);
-  receive_bundle(cha, bundle_hash);
-
+  receive_bundle(&api, cha, bundle_hash);
   if (mam_api_destroy(&api) != RC_OK) {
     fprintf(stderr, "mam_api_destroy failed\n");
     ret = EXIT_FAILURE;
   }
+  mam_channel_destroy(cha);
+  free(cha);
+  trits_free(cha_name);
 
   return ret;
 }

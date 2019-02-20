@@ -35,10 +35,13 @@ retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed) {
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
   api->psks = NULL;
-  if ((ret = trit_t_to_mam_msg_send_context_t_map_init(
-           &api->send_ctxs, MAM2_MSG_ID_SIZE)) != RC_OK) {
-    return ret;
-  }
+
+  ERR_BIND_RETURN(trit_t_to_mam_msg_send_context_t_map_init(&api->send_ctxs,
+                                                            MAM2_MSG_ID_SIZE),
+                  ret);
+  ERR_BIND_RETURN(trit_t_to_mam_msg_recv_context_t_map_init(&api->recv_ctxs,
+                                                            MAM2_MSG_ID_SIZE),
+                  ret);
 
   return ret;
 }
@@ -54,7 +57,10 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
   mam_ntru_sk_t_set_free(&api->ntru_sks);
   mam_ntru_pk_t_set_free(&api->ntru_pks);
   mam_psk_t_set_free(&api->psks);
-  ret = trit_t_to_mam_msg_send_context_t_map_free(&api->send_ctxs);
+  ERR_BIND_RETURN(trit_t_to_mam_msg_send_context_t_map_free(&api->send_ctxs),
+                  ret);
+  ERR_BIND_RETURN(trit_t_to_mam_msg_recv_context_t_map_free(&api->recv_ctxs),
+                  ret);
 
   return ret;
 }
@@ -206,15 +212,29 @@ trits_t msg_trits_from_bundle(bundle_transactions_t const *const bundle,
   return trits_from_rep(num_trits_in_bundle, msg_trits);
 }
 
-retcode_t mam_api_bundle_read_msg(mam_msg_recv_context_t *const ctx,
+static retcode_t mam_api_bundle_read_header(
+    mam_msg_recv_context_t const *const ctx, trits_t *const msg) {
+  retcode_t err;
+  ERR_BIND_RETURN(mam_msg_recv(ctx, msg), err);
+  return err;
+}
+
+retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
+                                  mam_channel_t const *const cha,
                                   bundle_transactions_t const *const bundle,
                                   flex_trit_t **const packet_payload,
-                                  trits_t msg_id) {
+                                  trit_t const *const msg_id) {
   retcode_t err = RC_OK;
   MAM2_ASSERT(packet_payload && *packet_payload == NULL);
   if (!mam_api_bundle_contains_header(bundle)) {
     return RC_MAM2_BUNDLE_DOES_NOT_CONTAIN_HEADER;
   }
+
+  mam_msg_recv_context_t cfg;
+  cfg.pubkey = -1;
+  cfg.psks = NULL;
+  cfg.ntrus = NULL;
+  trits_copy(mam_channel_id(cha), mam_msg_recv_cfg_chid(&cfg));
 
   // Flatten flex_trits encoded in transaction sig_or_fragment field
   // into a single long trits_t data structure
@@ -223,7 +243,7 @@ retcode_t mam_api_bundle_read_msg(mam_msg_recv_context_t *const ctx,
   trit_t msg_trits[num_trits_in_bundle];
   trits_t msg = msg_trits_from_bundle(bundle, msg_trits, num_trits_in_bundle);
 
-  ERR_BIND_RETURN(mam_api_bundle_read_header(ctx, &msg, msg_id), err);
+  ERR_BIND_RETURN(mam_api_bundle_read_header(&cfg, &msg), err);
 
   size_t packet_index = msg.d / NUM_TRITS_SIGNATURE + 1;
   if (packet_index < bundle_transactions_size(bundle) - 1) {
@@ -232,26 +252,24 @@ retcode_t mam_api_bundle_read_msg(mam_msg_recv_context_t *const ctx,
         NUM_TRITS_SIGNATURE;
     trit_t packet_trits[num_trits_in_packet];
     trits_t packet = trits_from_rep(num_trits_in_packet, packet_trits);
-    ERR_BIND_RETURN(mam_msg_recv_packet(ctx, &msg, &packet), err);
+    ERR_BIND_RETURN(mam_msg_recv_packet(&cfg, &msg, &packet), err);
 
     *packet_payload = malloc(NUM_FLEX_TRITS_FOR_TRITS(num_trits_in_packet));
     flex_trits_from_trits(*packet_payload, num_trits_in_packet, packet_trits,
                           num_trits_in_packet, num_trits_in_packet);
   }
 
-  return RC_OK;
+  return trit_t_to_mam_msg_recv_context_t_map_add(&api->recv_ctxs, msg_id, cfg);
 }
 
-retcode_t mam_api_bundle_read_header(mam_msg_recv_context_t *const ctx,
-                                     trits_t *const msg, trits_t msg_id) {
-  retcode_t err;
-  ERR_BIND_RETURN(mam_msg_recv(ctx, msg), err);
-  return err;
-}
-
-retcode_t mam_api_bundle_read_packet(mam_msg_recv_context_t *const ctx,
+retcode_t mam_api_bundle_read_packet(mam_api_t const *const api,
                                      bundle_transactions_t const *const bundle,
                                      flex_trit_t *const packet_payload,
-                                     uint32_t ord, trits_t const msg_id) {
+                                     uint32_t ord, trit_t const *const msg_id) {
+  mam_msg_recv_context_t *ctx = NULL;
+  trit_t_to_mam_msg_recv_context_t_map_entry_t *entry = NULL;
+  bool found = trit_t_to_mam_msg_recv_context_t_map_find(&api->recv_ctxs,
+                                                         msg_id, &entry);
+  // TODO - return error if not found
   return RC_OK;
 }
