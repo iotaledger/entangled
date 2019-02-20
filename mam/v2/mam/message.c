@@ -842,7 +842,7 @@ retcode_t mam_msg_recv_packet(mam_msg_recv_packet_context_t *cfg, trits_t *b,
     p = trits_alloc(pb3_sizeof_ntrytes(sz));
     ERR_GUARD_RETURN(!trits_is_null(p), RC_OOM, e);
   } else {
-    ERR_GUARD_GOTO(trits_size(*payload) <= pb3_sizeof_ntrytes(sz),
+    ERR_GUARD_GOTO(trits_size(*payload) >= pb3_sizeof_ntrytes(sz),
                    RC_MAM2_BUFFER_TOO_SMALL, e, cleanup);
     p = pb3_trits_take(payload, pb3_sizeof_ntrytes(sz));
   }

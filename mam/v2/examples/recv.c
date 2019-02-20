@@ -22,8 +22,8 @@ static tryte_t SENDER_SEED[81] =
 #define PORT 14265
 
 static tryte_t BUNDLE_HASH[NUM_TRYTES_BUNDLE] =
-    "GBZHG9RDJNLGKLFNQZL9IBQABHDKNLIHNWKPRKICXQAYCJRYTFCSAAPPGBODBTGCWOVDHBJXLH"
-    "LJXXWPD";
+    "YKJJHKXLXWHIBNSHZTLEXOOHJXHKWIGGSIGDVKFSCKQZOISJXTN9JPCZGAH9KWJXIKKESSQICC"
+    "DEWKZD9";
 
 static void get_first_bundle_from_transactions(
     transaction_array_t const transactions,
@@ -44,7 +44,7 @@ static void get_first_bundle_from_transactions(
     if (transaction_current_index(curr_tx) ==
             (transaction_current_index(&prev) + 1) &&
         (memcmp(transaction_hash(curr_tx), transaction_trunk(&prev),
-                NUM_TRITS_HASH) == 0)) {
+                FLEX_TRIT_SIZE_243) == 0)) {
       bundle_transactions_add(bundle, curr_tx);
       prev = *curr_tx;
     }

@@ -91,10 +91,8 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
  * Reads next packet
  *
  * @param api - The API
- * @param cha - The channel the message belongs to
  * @param bundle - The bundle containing the MAM message
- * @param session_key - the key for decrypting following packets with the same
- * message id
+ * @param ord - the packet index
  * @param msg_id - the Message id
  *
  * @return return code

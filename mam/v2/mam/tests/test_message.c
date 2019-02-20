@@ -142,8 +142,6 @@ static void message_test_generic_receive_msg(
     trits_copy(mam_channel_id(cha), mam_msg_recv_cfg_chid(cfg));
   }
 
-  trit_t session_key_trits[MAM2_SPONGE_KEY_SIZE];
-  trits_t session_key = trits_from_rep(MAM2_SPONGE_KEY_SIZE, session_key_trits);
   e = mam_msg_recv(cfg_msg_recv, msg);
 
   TEST_ASSERT(RC_OK == e);

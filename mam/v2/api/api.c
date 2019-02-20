@@ -54,13 +54,20 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
   }
 
   ret = mam_prng_destroy(&api->prng);
+  if (ret != RC_OK) {
+    // TODO - LOG
+  }
   mam_ntru_sk_t_set_free(&api->ntru_sks);
   mam_ntru_pk_t_set_free(&api->ntru_pks);
   mam_psk_t_set_free(&api->psks);
-  ERR_BIND_RETURN(trit_t_to_mam_msg_send_context_t_map_free(&api->send_ctxs),
-                  ret);
-  ERR_BIND_RETURN(trit_t_to_mam_msg_recv_context_t_map_free(&api->recv_ctxs),
-                  ret);
+  ret = trit_t_to_mam_msg_send_context_t_map_free(&api->send_ctxs);
+  if (ret != RC_OK) {
+    // TODO - LOG
+  }
+  ret = trit_t_to_mam_msg_recv_context_t_map_free(&api->recv_ctxs);
+  if (ret != RC_OK) {
+    // TODO - LOG
+  }
 
   return ret;
 }
@@ -193,16 +200,20 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
 
 bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle) {
   iota_transaction_t *tx = (iota_transaction_t *)utarray_front(bundle);
-  return flex_trits_are_null(transaction_tag(tx), NUM_TRITS_TAG);
+  return flex_trits_are_null(transaction_tag(tx), FLEX_TRIT_SIZE_81);
 }
 
 trits_t msg_trits_from_bundle(bundle_transactions_t const *const bundle,
-                              trit_t const msg_trits[],
-                              size_t num_trits_in_bundle) {
+                              const trit_t msg_trits[],
+                              size_t num_trits_in_bundle, size_t start_index) {
   iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
 
   trit_t *msg_trits_ptr = msg_trits;
+  size_t curr_tx_index = 0;
   BUNDLE_FOREACH(bundle, curr_tx) {
+    if (curr_tx_index++ < start_index) {
+      continue;
+    }
     flex_trits_to_trits(msg_trits_ptr, NUM_TRITS_SIGNATURE,
                         transaction_signature(curr_tx), NUM_TRITS_SIGNATURE,
                         NUM_TRITS_SIGNATURE);
@@ -240,17 +251,18 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
   size_t num_trits_in_bundle =
       bundle_transactions_size(bundle) * NUM_TRITS_SIGNATURE;
   trit_t msg_trits[num_trits_in_bundle];
-  trits_t msg = msg_trits_from_bundle(bundle, msg_trits, num_trits_in_bundle);
+  trits_t msg =
+      msg_trits_from_bundle(bundle, msg_trits, num_trits_in_bundle, 0);
 
   ERR_BIND_RETURN(mam_api_bundle_read_header(&cfg, &msg), err);
 
   size_t packet_index = msg.d / NUM_TRITS_SIGNATURE + 1;
-  if (packet_index < bundle_transactions_size(bundle) - 1) {
+  if (packet_index < bundle_transactions_size(bundle)) {
     size_t num_trits_in_packet =
-        (bundle_transactions_size(bundle) - 1 - packet_index) *
-        NUM_TRITS_SIGNATURE;
+        (bundle_transactions_size(bundle) - packet_index) * NUM_TRITS_SIGNATURE;
     trit_t packet_trits[num_trits_in_packet];
     trits_t packet = trits_from_rep(num_trits_in_packet, packet_trits);
+    msg = trits_drop(msg, NUM_TRITS_SIGNATURE - msg.d);
     ERR_BIND_RETURN(mam_msg_recv_packet(&cfg, &msg, &packet), err);
 
     *packet_payload = malloc(NUM_FLEX_TRITS_FOR_TRITS(num_trits_in_packet));
