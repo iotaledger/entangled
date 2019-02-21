@@ -39,20 +39,20 @@ typedef mam_endpoint_t_set_entry_t *mam_endpoint_t_set_t;
 trits_t mam_endpoint_id(mam_endpoint_t const *const endpoint);
 
 /**
- * Gets an enpoint channel's name
+ * Gets an endpoint channel's name
  *
  * @param endpoint The endpoint
  *
- * @return the enpoint channel's name
+ * @return the endpoint channel's name
  */
 trits_t mam_endpoint_channel_name(mam_endpoint_t const *const endpoint);
 
 /**
- * Gets an enpoint's name
+ * Gets an endpoint's name
  *
  * @param endpoint The endpoint
  *
- * @return the enpoint's name
+ * @return the endpoint's name
  */
 trits_t mam_endpoint_name(mam_endpoint_t const *const endpoint);
 
