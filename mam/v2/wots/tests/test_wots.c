@@ -44,20 +44,22 @@ static void mam_wots_test(void) {
   mam_wots_calc_pk(&wots, pk);
   mam_wots_sign(&wots, H, sig);
 
+  mam_spongos_t wots_spongos;
+  mam_spongos_init(&wots_spongos);
   /*mam_wots_recover(&wots.spongos, H, sig, pkr);*/
 
-  TEST_ASSERT_TRUE(mam_wots_verify(&wots.spongos, H, sig, pk));
+  TEST_ASSERT_TRUE(mam_wots_verify(&wots_spongos, H, sig, pk));
 
   trits_put1(H, trit_add(trits_get1(H), 1));
-  TEST_ASSERT_TRUE(!mam_wots_verify(&wots.spongos, H, sig, pk));
+  TEST_ASSERT_TRUE(!mam_wots_verify(&wots_spongos, H, sig, pk));
   trits_put1(H, trit_sub(trits_get1(H), 1));
 
   trits_put1(sig, trit_add(trits_get1(sig), 1));
-  TEST_ASSERT_TRUE(!mam_wots_verify(&wots.spongos, H, sig, pk));
+  TEST_ASSERT_TRUE(!mam_wots_verify(&wots_spongos, H, sig, pk));
   trits_put1(sig, trit_sub(trits_get1(sig), 1));
 
   trits_put1(pk, trit_add(trits_get1(pk), 1));
-  TEST_ASSERT_TRUE(!mam_wots_verify(&wots.spongos, H, sig, pk));
+  TEST_ASSERT_TRUE(!mam_wots_verify(&wots_spongos, H, sig, pk));
   trits_put1(pk, trit_sub(trits_get1(pk), 1));
 }
 
