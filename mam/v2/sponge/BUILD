@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["sponge.h"],
     deps = [
         "//common:errors",
+        "//common/curl-p:trit",
         "//common/trinary:add",
         "//mam/v2:defs",
         "//mam/v2/trits",

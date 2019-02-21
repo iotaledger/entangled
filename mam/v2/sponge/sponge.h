@@ -25,6 +25,8 @@
 #define MAM2_SPONGE_WIDTH \
   (MAM2_SPONGE_RATE + MAM2_SPONGE_CONTROL + MAM2_SPONGE_CAPACITY)
 
+#define MAM2_SPONGE_ROUNDS 81
+
 // Sponge fixed key size
 #define MAM2_SPONGE_KEY_SIZE 243
 // Sponge fixed hash size

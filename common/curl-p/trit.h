@@ -23,6 +23,7 @@ typedef struct {
 } Curl;
 
 void init_curl(Curl* ctx);
+void curl_transform(trit_t* const state, size_t const rounds);
 void curl_absorb(Curl* const ctx, trit_t const* const trits, size_t length);
 void curl_squeeze(Curl* const ctx, trit_t* const trits, size_t length);
 void curl_reset(Curl* const ctx);
