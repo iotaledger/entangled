@@ -41,6 +41,8 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
   memset(channel->msg_ord, 0, MAM2_CHANNEL_MSG_ORD_SIZE);
 
   if ((ret = mss_create(&channel->mss, height)) != RC_OK) {
+    trits_free(channel->name);
+    channel->name = trits_null();
     return ret;
   }
 
