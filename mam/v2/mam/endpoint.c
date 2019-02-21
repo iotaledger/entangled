@@ -52,13 +52,10 @@ retcode_t mam_endpoint_create(mam_prng_t const *const prng,
   return ret;
 }
 
-retcode_t mam_endpoint_destroy(mam_endpoint_t *const endpoint) {
+void mam_endpoint_destroy(mam_endpoint_t *const endpoint) {
   MAM2_ASSERT(endpoint);
-
   trits_free(endpoint->name);
   mss_destroy(&endpoint->mss);
-
-  return RC_OK;
 }
 
 retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t *const endpoints) {
