@@ -141,6 +141,7 @@ retcode_t mam_endpoint_deserialize(trits_t *const buffer,
   mss_init(&endpoint->mss, prng, height, channel_name, endpoint->name);
 
   if ((ret = mss_deserialize(buffer, &endpoint->mss)) != RC_OK) {
+    mss_destroy(&endpoint->mss);
     return ret;
   }
 
