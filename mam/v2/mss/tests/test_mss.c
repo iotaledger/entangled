@@ -75,7 +75,7 @@
 #endif
 
 def_test_mss(1, 1);
-def_test_mss(2, 2);
+// def_test_mss(2, 2);
 def_test_mss(3, 3);
 def_test_mss(4, 4);
 // def_test_mss(5, 5);
@@ -83,7 +83,7 @@ def_test_mss(4, 4);
 // def_test_mss(MAM2_MSS_TEST_MAX_D, );
 
 def_test_mss_init(1, 1);
-def_test_mss_init(2, 2);
+// def_test_mss_init(2, 2);
 def_test_mss_init(3, 3);
 def_test_mss_init(4, 4);
 // def_test_mss_init(5, 5);
@@ -91,7 +91,7 @@ def_test_mss_init(4, 4);
 // def_test_mss_init(MAM2_MSS_TEST_MAX_D, );
 
 def_test_mss_check(1, 1);
-def_test_mss_check(2, 2);
+// def_test_mss_check(2, 2);
 def_test_mss_check(3, 3);
 def_test_mss_check(4, 4);
 // def_test_mss_check(5, 5);
@@ -243,7 +243,7 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
 
 static void mss_meta_test(void) {
   test_mss1_t _m1[1];
-  test_mss2_t _m2[1];
+  // test_mss2_t _m2[1];
   test_mss3_t _m3[1];
   test_mss4_t _m4[1];
   test_mss4_t _m42[1];
@@ -256,7 +256,7 @@ static void mss_meta_test(void) {
   mam_prng_t p;
   mam_wots_t w;
   mss_t *m1 = test_mss_init1(_m1);
-  mss_t *m2 = test_mss_init2(_m2);
+  // mss_t *m2 = test_mss_init2(_m2);
   mss_t *m3 = test_mss_init3(_m3);
   mss_t *m4 = test_mss_init4(_m4);
   mss_t *m42 = test_mss_init4(_m42);
@@ -268,11 +268,12 @@ static void mss_meta_test(void) {
   mam_spongos_init(&sg);
 
   TEST_ASSERT_TRUE(mss_test(m1, &p, &sg, &w, 1) && test_mss_check1(_m1));
-  TEST_ASSERT_TRUE(mss_test(m2, &p, &sg, &w, 2) && test_mss_check2(_m2));
+  TEST_ASSERT_TRUE(mss_store_test(m4, m42, &p, &sg, &w, 2) &&
+                   test_mss_check4(_m4) && test_mss_check4(_m42));
+  // TEST_ASSERT_TRUE(mss_test(m2, &p, &sg, &w, 2) && test_mss_check2(_m2));
   TEST_ASSERT_TRUE(mss_test(m3, &p, &sg, &w, 3) && test_mss_check3(_m3));
   // TEST_ASSERT_TRUE(mss_test(m4, p, sg, w, 4) && test_mss_check4(_m4));
-  TEST_ASSERT_TRUE(mss_store_test(m4, m42, &p, &sg, &w, 4) &&
-                   test_mss_check4(_m4) && test_mss_check4(_m42));
+
   // #if 0
   //   TEST_ASSERT_TRUE(mss_test(m5, p, sg, w, 5) && test_mss_check5(_m5));
   //   TEST_ASSERT_TRUE(mss_test(mx, p, sg, w, 10) && test_mss_checkx(_mx));

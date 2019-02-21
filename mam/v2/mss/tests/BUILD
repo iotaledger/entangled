@@ -1,5 +1,6 @@
 cc_test(
     name = "test_mss",
+    timeout = "long",
     srcs = ["test_mss.c"],
     deps = [
         "//mam/v2/mss",
