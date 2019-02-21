@@ -42,7 +42,7 @@ void bundle_transactions_add(bundle_transactions_t *const bundle,
                              iota_transaction_t const *const transaction);
 
 static inline size_t bundle_transactions_size(
-    bundle_transactions_t *const bundle) {
+    bundle_transactions_t const *const bundle) {
   if (bundle == NULL) {
     return 0;
   }

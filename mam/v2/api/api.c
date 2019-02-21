@@ -176,6 +176,7 @@ retcode_t mam_api_bundle_write_header(
   }
 
   ctx.ord = 0;
+  // TODO set the right MSS
   ctx.mss = NULL;
 
   return trit_t_to_mam_msg_send_context_t_map_add(&api->send_ctxs, msg_id, ctx);
@@ -254,9 +255,10 @@ trits_t msg_trits_from_bundle(bundle_transactions_t const *const bundle,
 }
 
 static retcode_t mam_api_bundle_read_header(
-    mam_msg_recv_context_t const *const ctx, trits_t *const msg) {
+    mam_msg_recv_context_t const *const ctx, trits_t *const msg,
+    mam_psk_t_set_t psks, mam_ntru_sk_t_set_t ntru_sks, trits_t msg_id) {
   retcode_t err;
-  ERR_BIND_RETURN(mam_msg_recv(ctx, msg), err);
+  ERR_BIND_RETURN(mam_msg_recv(ctx, msg, psks, ntru_sks, msg_id), err);
   return err;
 }
 
@@ -264,22 +266,17 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
                                   bundle_transactions_t const *const bundle,
                                   flex_trit_t **const packet_payload) {
   retcode_t err = RC_OK;
+  trit_t msg_id[MAM2_MSG_ID_SIZE];
+
   MAM2_ASSERT(packet_payload && *packet_payload == NULL);
   if (!mam_api_bundle_contains_header(bundle)) {
     return RC_MAM2_BUNDLE_DOES_NOT_CONTAIN_HEADER;
   }
 
-  mam_msg_recv_context_t cfg;
-  cfg.pubkey = -1;
-  cfg.psks = api->ntru_pks;
-  cfg.ntrus = api->ntru_sks;
-  trit_t ch_id_trits_raw[NUM_TRITS_ADDRESS];
+  mam_msg_recv_context_t ctx;
   iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
-  flex_trits_to_trits(ch_id_trits_raw, NUM_TRITS_ADDRESS,
-                      transaction_address(curr_tx), NUM_TRITS_ADDRESS,
-                      NUM_TRITS_ADDRESS);
-  trits_t ch_id_trits = trits_from_rep(NUM_TRITS_ADDRESS, ch_id_trits_raw);
-  trits_copy(ch_id_trits, mam_msg_recv_cfg_chid(&cfg));
+  flex_trits_to_trits(ctx.pk, NUM_TRITS_ADDRESS, transaction_address(curr_tx),
+                      NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
 
   // Flatten flex_trits encoded in transaction sig_or_fragment field
   // into a single long trits_t data structure
@@ -289,11 +286,14 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
   trits_t msg =
       msg_trits_from_bundle(bundle, msg_trits, num_trits_in_bundle, 0);
 
-  ERR_BIND_RETURN(mam_api_bundle_read_header(&cfg, &msg), err);
+  ERR_BIND_RETURN(
+      mam_api_bundle_read_header(&ctx, &msg, api->psks, api->ntru_sks,
+                                 trits_from_rep(MAM2_MSG_ID_SIZE, msg_id)),
+      err);
 
-  ERR_BIND_RETURN(trit_t_to_mam_msg_recv_context_t_map_add(
-                      &api->recv_ctxs, mam_msg_recv_cfg_msg_id(&cfg).p, cfg),
-                  err);
+  ERR_BIND_RETURN(
+      trit_t_to_mam_msg_recv_context_t_map_add(&api->recv_ctxs, msg_id, ctx),
+      err);
 
   size_t packet_index = msg.d / NUM_TRITS_SIGNATURE + 1;
   if (packet_index < bundle_transactions_size(bundle)) {
@@ -302,7 +302,7 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
     trit_t packet_trits[num_trits_in_packet];
     trits_t packet = trits_from_rep(num_trits_in_packet, packet_trits);
     msg = trits_drop(msg, NUM_TRITS_SIGNATURE - msg.d);
-    ERR_BIND_RETURN(mam_msg_recv_packet(&cfg, &msg, &packet), err);
+    ERR_BIND_RETURN(mam_msg_recv_packet(&ctx, &msg, &packet), err);
 
     *packet_payload = malloc(NUM_FLEX_TRITS_FOR_TRITS(num_trits_in_packet));
     flex_trits_from_trits(*packet_payload, num_trits_in_packet, packet_trits,
