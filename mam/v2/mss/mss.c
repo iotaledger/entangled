@@ -564,35 +564,34 @@ bool mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos,
 }
 
 retcode_t mss_create(mss_t *mss, mss_mt_height_t height) {
-  retcode_t e = RC_OK;
   MAM2_ASSERT(mss);
 
   memset(mss, 0, sizeof(mss_t));
   ERR_GUARD_RETURN(0 <= height && height <= MAM2_MSS_MAX_D,
-                   RC_MAM2_INVALID_ARGUMENT, e);
+                   RC_MAM2_INVALID_ARGUMENT);
 
 #if defined(MAM2_MSS_TRAVERSAL)
   mss->auth_path = malloc(sizeof(trit_t) * MAM2_MSS_MT_AUTH_WORDS(height));
-  ERR_GUARD_RETURN(mss->auth_path, RC_OOM, e);
+  ERR_GUARD_RETURN(mss->auth_path, RC_OOM);
 
   /* add 1 extra hash for dirty hack (see mss.c) */
   mss->nodes_hashes =
       malloc(sizeof(trit_t) * MAM2_MSS_MT_HASH_WORDS(height, 1));
-  ERR_GUARD_RETURN(mss->nodes_hashes, RC_OOM, e);
+  ERR_GUARD_RETURN(mss->nodes_hashes, RC_OOM);
 
   /* add 1 extra node for dirty hack (see mss.c) */
   mss->nodes = malloc(sizeof(mss_mt_node_t) * (MAM2_MSS_MT_NODES(height) + 1));
-  ERR_GUARD_RETURN(mss->nodes, RC_OOM, e);
+  ERR_GUARD_RETURN(mss->nodes, RC_OOM);
 
   mss->stacks = malloc(sizeof(mss_mt_stack_t) * MAM2_MSS_MT_STACKS(height));
-  ERR_GUARD_RETURN(mss->nodes, RC_OOM, e);
+  ERR_GUARD_RETURN(mss->nodes, RC_OOM);
 #else
   mss->mt = malloc(sizeof(trit_t) * MAM2_MSS_MT_WORDS(height));
   ERR_GUARD_RETURN(mss->mt, RC_OOM, e);
 #endif
 
   /* do not free here in case of error */
-  return e;
+  return RC_OK;
 }
 
 void mss_destroy(mss_t *mss) {
@@ -720,21 +719,19 @@ void mss_serialize(mss_t const *const mss, trits_t buffer) {
 }
 
 retcode_t mss_deserialize(trits_t *b, mss_t *mss) {
-  retcode_t e = RC_OK;
-
   mss_mt_height_t height;
   mss_mt_idx_t skn;
 
   ERR_GUARD_RETURN(
       MAM2_MSS_SKN_TREE_DEPTH_SIZE + MAM2_MSS_SKN_KEY_NUMBER_SIZE <=
           trits_size(*b),
-      RC_MAM2_BUFFER_TOO_SMALL, e);
+      RC_MAM2_BUFFER_TOO_SMALL);
   ERR_GUARD_RETURN(
       mss_parse_skn(&height, &skn,
                     trits_advance(b, MAM2_MSS_SKN_TREE_DEPTH_SIZE +
                                          MAM2_MSS_SKN_KEY_NUMBER_SIZE)),
-      RC_MAM2_INVALID_VALUE, e);
-  ERR_GUARD_RETURN(height == mss->height, RC_MAM2_INVALID_VALUE, e);
+      RC_MAM2_INVALID_VALUE);
+  ERR_GUARD_RETURN(height == mss->height, RC_MAM2_INVALID_VALUE);
 
 #if defined(MAM2_MSS_TRAVERSAL)
   mss_mt_rewind(mss, skn);
@@ -742,8 +739,8 @@ retcode_t mss_deserialize(trits_t *b, mss_t *mss) {
   mss->skn = skn;
 #endif
   ERR_GUARD_RETURN(mss_mt_serialized_size(mss) <= trits_size(*b),
-                   RC_MAM2_BUFFER_TOO_SMALL, e);
+                   RC_MAM2_BUFFER_TOO_SMALL);
   mss_mt_deserialize(trits_advance(b, mss_mt_serialized_size(mss)), mss);
 
-  return e;
+  return RC_OK;
 }
