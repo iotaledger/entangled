@@ -671,13 +671,9 @@ void mam_msg_send_packet(mam_msg_send_context_t *ctx,
   mam_spongos_commit(&ctx->spongos);
 }
 
-trits_t mam_msg_recv_cfg_msg_id(mam_msg_recv_context_t const *const cfg) {
-  MAM2_ASSERT(cfg);
-  return trits_from_rep(MAM2_MSG_ID_SIZE, cfg->msg_id);
-}
-
 retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
-                       mam_psk_t_set_t psks, mam_ntru_sk_t_set_t ntru_sks) {
+                       mam_psk_t_set_t psks, mam_ntru_sk_t_set_t ntru_sks,
+                       trits_t msg_id) {
   retcode_t e = RC_OK;
 
   MAM2_ASSERT(ctx);
@@ -744,9 +740,7 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
     trint9_t msg_type_id;
 
     /*  absorb tryte msg_id[27]; */
-    ERR_BIND_RETURN(pb3_unwrap_absorb_ntrytes(&ctx->spongos, msg,
-                                              mam_msg_recv_cfg_msg_id(ctx)),
-                    e);
+    ERR_BIND_RETURN(pb3_unwrap_absorb_ntrytes(&ctx->spongos, msg, msg_id), e);
     /*  absorb trint typeid; */
     ERR_BIND_RETURN(pb3_unwrap_absorb_trint(&ctx->spongos, msg, &msg_type_id),
                     e);

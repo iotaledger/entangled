@@ -60,7 +60,6 @@ typedef struct mam_msg_recv_context_s {
   trit_t pk[MAM2_CHANNEL_ID_SIZE];
   /*TODO: check for trusted chid/epid*/
   /*TODO: handle (add to trusted list) new chid1*/
-  trit_t msg_id[MAM2_MSG_ID_SIZE];
   trint18_t ord; /*!< Packet ordinal number. */
 } mam_msg_recv_context_t;
 
@@ -82,12 +81,11 @@ void mam_msg_send_packet(mam_msg_send_context_t *ctx,
                          trits_t *b);
 
 retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
-                       mam_psk_t_set_t psks, mam_ntru_sk_t_set_t ntru_sks);
+                       mam_psk_t_set_t psks, mam_ntru_sk_t_set_t ntru_sks,
+                       trits_t msg_id);
 
 retcode_t mam_msg_recv_packet(mam_msg_recv_context_t *ctx, trits_t *packet,
                               trits_t *payload);
-
-trits_t mam_msg_recv_cfg_msg_id(mam_msg_recv_context_t const *const ctx);
 
 #ifdef __cplusplus
 }
