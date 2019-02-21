@@ -96,7 +96,7 @@ void test_channel(void) {
   trits_t trits = trits_alloc(size);
   trits_t cpy = trits;
 
-  TEST_ASSERT(mam_channels_serialize(channels_1, &trits) == RC_OK);
+  mam_channels_serialize(channels_1, &trits);
 
   TEST_ASSERT(mam_channels_deserialize(&cpy, &prng, &channels_2) == RC_OK);
 
