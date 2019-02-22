@@ -84,3 +84,10 @@ cc_library(
         "@com_github_uthash//:uthash",
     ],
 )
+
+cc_library(
+    name = "memset_safe",
+    srcs = ["memset_safe.c"],
+    hdrs = ["memset_safe.h"],
+    deps = ["//common:errors"],
+)

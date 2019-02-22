@@ -439,7 +439,7 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt) {
 
   hash243_queue_free(&mt->candidates);
   rw_lock_handle_destroy(&mt->candidates_lock);
-  memset(mt, 0, sizeof(milestone_tracker_t));
+  memset_safe(mt, sizeof(milestone_tracker_t), 0, sizeof(milestone_tracker_t));
   logger_helper_release(logger_id);
 
   return ret;
