@@ -14,6 +14,7 @@ extern "C" {
 
 #include <stdlib.h>
 #include "cclient/service.h"
+#include "utils/memset_safe.h"
 
 extern const char* khttp_ApplicationJson;
 extern const char* khttp_ApplicationFormUrlencoded;

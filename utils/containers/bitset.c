@@ -17,7 +17,8 @@ void bitset_reset(bitset_t* const bitset) {
   if (bitset->size == 0) {
     return;
   }
-  memset(bitset->raw_bits, 0, bitset->size * sizeof(*(bitset->raw_bits)));
+  memset_safe(bitset->raw_bits, bitset->size * sizeof(*(bitset->raw_bits)), 0,
+              bitset->size * sizeof(*(bitset->raw_bits)));
 }
 
 bool bitset_is_set(bitset_t* const bitset, size_t pos) {

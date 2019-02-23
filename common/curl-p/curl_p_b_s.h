@@ -10,6 +10,7 @@
 
 #include "common/curl-p/bct.h"
 #include "common/curl-p/const.h"
+#include "utils/memset_safe.h"
 
 #define S_STATE_LENGTH 183
 

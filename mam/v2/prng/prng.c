@@ -20,7 +20,7 @@ void mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
 }
 
 void mam_prng_destroy(mam_prng_t *const prng) {
-  memset(prng, 0, sizeof(mam_prng_t));
+  memset_safe(prng, sizeof(mam_prng_t), 0, sizeof(mam_prng_t));
 }
 
 void mam_prng_gen(mam_prng_t const *const prng,

@@ -117,7 +117,7 @@ static retcode_t read_data_from_iota_service(int sockfd,
     } else if (response_context.status == IOTA_REQUEST_STATUS_DONE) {
       return RC_OK;
     }
-    memset(buffer, 0, sizeof(buffer));
+    memset_safe(buffer, sizeof(buffer), 0, sizeof(buffer));
   }
   if (num_received <= 0) {
     return RC_CCLIENT_HTTP;

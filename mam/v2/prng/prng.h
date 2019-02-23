@@ -16,6 +16,7 @@
 #include "mam/v2/prng/prng_types.h"
 #include "mam/v2/sponge/sponge.h"
 #include "mam/v2/trits/trits.h"
+#include "utils/memset_safe.h"
 
 #ifdef __cplusplus
 extern "C" {
