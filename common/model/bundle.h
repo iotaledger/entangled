@@ -42,7 +42,7 @@ void bundle_transactions_add(bundle_transactions_t *const bundle,
                              iota_transaction_t const *const transaction);
 
 static inline size_t bundle_transactions_size(
-    bundle_transactions_t *const bundle) {
+    bundle_transactions_t const *const bundle) {
   if (bundle == NULL) {
     return 0;
   }
@@ -55,6 +55,8 @@ void bundle_calculate_hash(bundle_transactions_t *bundle, Kerl *const kerl,
 void bundle_finalize(bundle_transactions_t *bundle, Kerl *const kerl);
 retcode_t bundle_validator(bundle_transactions_t *const bundle,
                            bundle_status_t *const status);
+
+void bundle_reset_indexes(bundle_transactions_t *const bundle);
 
 #ifdef DEBUG
 void bundle_dump(bundle_transactions_t *bundle);

@@ -13,12 +13,12 @@
 int open_client_socket(char const *const hostname, const size_t port) {
   struct addrinfo hints, *serverinfo, *info;
   char port_string[6];
-  int sockfd;
+  int sockfd = -1;
 
   memset(&hints, 0, sizeof hints);
   hints.ai_family = AF_UNSPEC;  // use AF_INET6 to force IPv6
   hints.ai_socktype = SOCK_STREAM;
-  sprintf(port_string, "%lu", port);
+  sprintf(port_string, "%zu", port);
   if (getaddrinfo(hostname, port_string, &hints, &serverinfo) != 0) {
     return -1;
   }

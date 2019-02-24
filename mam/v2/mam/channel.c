@@ -21,6 +21,10 @@ trits_t mam_channel_name(mam_channel_t const *const channel) {
   return channel->name;
 }
 
+trits_t mam_channel_msg_ord(mam_channel_t const *const channel) {
+  return trits_from_rep(MAM2_CHANNEL_MSG_ORD_SIZE, channel->msg_ord);
+}
+
 retcode_t mam_channel_create(mam_prng_t const *const prng,
                              mss_mt_height_t const height,
                              trits_t const channel_name,
@@ -69,40 +73,6 @@ retcode_t mam_channels_destroy(mam_channel_t_set_t *const channels) {
   mam_channel_t_set_free(channels);
 
   return RC_OK;
-}
-
-size_t mam_channel_wrap_size() {
-  // absorb tryte version + absorb external tryte channel_id[81]
-  return pb3_sizeof_tryte() + 0;
-}
-
-void mam_channel_wrap(mam_spongos_t *const spongos, trits_t *const buffer,
-                      tryte_t const version, trits_t const channel_id) {
-  MAM2_ASSERT(mam_channel_wrap_size() <= trits_size(*buffer));
-  MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(channel_id));
-
-  // absorb tryte version
-  pb3_wrap_absorb_tryte(spongos, buffer, version);
-  // absorb external tryte channel_id[81]
-  pb3_absorb_external_ntrytes(spongos, channel_id);
-}
-
-retcode_t mam_channel_unwrap(mam_spongos_t *const spongos,
-                             trits_t *const buffer, tryte_t *const version,
-                             trits_t channel_id) {
-  MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(channel_id));
-
-  retcode_t ret = RC_OK;
-
-  // absorb tryte version
-  if ((ret = pb3_unwrap_absorb_tryte(spongos, buffer, version)) != RC_OK) {
-    return ret;
-  }
-
-  // absorb external tryte channel_id[81]
-  pb3_absorb_external_ntrytes(spongos, channel_id);
-
-  return ret;
 }
 
 size_t mam_channel_serialized_size(mam_channel_t const *const channel) {

@@ -85,9 +85,9 @@ IOTA_EXPORT retcode_t iota_pow_bundle(bundle_transactions_t *const bundle,
                                       flex_trit_t const *const trunk,
                                       flex_trit_t const *const branch,
                                       uint8_t const mwm) {
+  flex_trit_t txflex[FLEX_TRIT_SIZE_8019];
   iota_transaction_t *tx = NULL;
   flex_trit_t *nonce = NULL;
-  flex_trit_t *txflex = NULL;
   flex_trit_t *ctrunk = NULL;
   size_t cur_idx = 0;
 
@@ -124,9 +124,7 @@ IOTA_EXPORT retcode_t iota_pow_bundle(bundle_transactions_t *const bundle,
     transaction_set_attachment_timestamp_lower(tx, 0);
     transaction_set_attachment_timestamp_upper(tx, 3812798742493LL);
 
-    if ((txflex = transaction_serialize(tx)) == NULL) {
-      return RC_OOM;
-    }
+    transaction_serialize_on_flex_trits(tx, txflex);
 
     // Do PoW
     if ((nonce = iota_pow_flex(txflex, NUM_TRITS_SERIALIZED_TRANSACTION,
@@ -140,11 +138,13 @@ IOTA_EXPORT retcode_t iota_pow_bundle(bundle_transactions_t *const bundle,
       free(ctrunk);
     }
 
+    transaction_serialize_on_flex_trits(tx, txflex);
+
     if ((ctrunk = iota_flex_digest(txflex, NUM_TRITS_SERIALIZED_TRANSACTION)) ==
         NULL) {
       return RC_OOM;
     }
-    free(txflex);
+
   } while (cur_idx != 0);
 
   if (ctrunk != trunk) {

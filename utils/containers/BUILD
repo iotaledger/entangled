@@ -12,9 +12,12 @@ cc_library(
 cc_library(
     name = "person_example",
     hdrs = ["person_example.h"],
+    deps = ["//common/trinary:flex_trit"],
 )
 
 map_generate(
+    additional_deps = [":person_example"],
+    additional_include_path = "utils/containers/person_example.h",
     key_type = "person_example_t",
     value_type = "int",
 )

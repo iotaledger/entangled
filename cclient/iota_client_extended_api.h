@@ -24,7 +24,6 @@ typedef flex_hash_array_t address_list_t;
 typedef flex_hash_array_t inputs_list_t;
 typedef flex_hash_array_t transfer_list_t;
 typedef flex_hash_array_t transaction_list_t;
-typedef flex_hash_array_t transaction_objs_t;
 typedef flex_hash_array_t booleans_t;
 typedef flex_hash_array_t input_list_t;
 
@@ -63,7 +62,7 @@ void iota_client_extended_destroy();
  *
  * @param {iota_client_service_t} serv - client service
  * @param {trit_array_p} tail_hash - Tail transaction hash
- * @param {transaction_objs_t} out_tx_objs - List of transaction objects
+ * @param {bundle_transactions_t} bundle - a bundle object
  *
  * @returns {retcode_t}
  * - `INVALID_HASH`: Invalid tail transaction hash
@@ -73,8 +72,8 @@ void iota_client_extended_destroy();
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createBroadcastBundle.ts#L38
  */
 retcode_t iota_client_broadcast_bundle(iota_client_service_t const* const serv,
-                                       trit_array_p const* const tail_hash,
-                                       transaction_list_t* out_tx_objs);
+                                       flex_trit_t const* const tail_hash,
+                                       bundle_transactions_t* const bundle);
 
 /**
  * Wrapper function for iota_client_find_transactions() and
@@ -88,7 +87,7 @@ retcode_t iota_client_broadcast_bundle(iota_client_service_t const* const serv,
  * @param {hashes_t} bundles - List of bundle hashes
  * @param {hashes_t} tags - List of tags
  * @param {hashes_t} approvees - List of approvees
- * @param {transaction_list_t} out_tx_objs - List ofatransaction objects.
+ * @param {transaction_list_t} tx_objs - List of transaction objects.
  *
  * @returns {retcode_t}
  * - `INVALID_SEARCH_KEY`
@@ -132,8 +131,9 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
  * iota_client_traverse_bundle() and traversing through `trunk transaction`.
  *
  * @param {iota_client_service_t} serv - client service
- * @param {trit_array_p} tail_hash- Tail transaction hash
- * @param {transaction_objs_t} out_tx_objs - Bundle as array of transaction
+ * @param {flex_trit_t} tail_hash- Tail transaction hash
+ * @param {bundle_transactions_t} bundle - Bundle as array of transaction
+ * @param {bundle_status_t} bundle_status - bundle status
  * objects.
  *
  * @returns {retcode_t}
@@ -146,15 +146,16 @@ retcode_t iota_client_get_account_data(iota_client_service_t const* const serv,
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetBundle.ts#L38
  */
 retcode_t iota_client_get_bundle(iota_client_service_t const* const serv,
-                                 trit_array_p const tail_hash,
-                                 transaction_objs_t* out_tx_objs);
+                                 flex_trit_t const* const tail_hash,
+                                 bundle_transactions_t* const bundle,
+                                 bundle_status_t* const bundle_status);
 
 /**
  * Creates and returns an `Inputs` object by generating addresses and fetching
  * their latest balance.
  *
  * @param {iota_client_service_t} serv - client service
- * @param {trit_array_p} seed
+ * @param {flex_trit_t} seed
  * @param {address_opt_t} addr_opt - address options: Starting key index,
  * Security level, Ending Key index.
  * @param {threshold} [options.threshold] - Minimum amount of balance required
@@ -225,7 +226,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
  *
  * @param {iota_client_service_t} serv - client service
  * @param {hashes_t} hashes - Array of transaction hashes
- * @param {transaction_objs_t} out_tx_objs - List of transaction objects.
+ * @param {transaction_array_t} tx_objs - List of transaction objects.
  *
  * @returns {retcode_t}
  * - `INVALID_TRANSACTION_HASH`
@@ -310,9 +311,9 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createPromoteTransaction.ts#L51
  */
 retcode_t iota_client_promote_transaction(
-    iota_client_service_t const* const serv, trit_array_p const tail_hash,
+    iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
     int const depth, int const mwm, transfer_list_t const* const transfers,
-    transaction_list_t* out_transactions);
+    transaction_array_t* const tx_objs);
 
 /**
  * Reattaches a transfer to tangle by selecting tips & performing the
@@ -328,7 +329,7 @@ retcode_t iota_client_promote_transaction(
  * transaction hash. This is used by iota_client_attach_to_tangle() function to
  * search for a valid `nonce`. Currently is `14` on mainnet & spamnnet and `9`
  * on most other testnets.
- * @param {transaction_objs_t} out_tx_objs - Analyzed Transaction objects.
+ * @param {bundle_transactions_t} bundle - Analyzed Transaction objects.
  *
  *
  * @returns {retcode_t}
@@ -341,9 +342,9 @@ retcode_t iota_client_promote_transaction(
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createReplayBundle.ts#L38
  */
 retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv,
-                                    trit_array_p const tail, int const depth,
-                                    int const mwm,
-                                    transaction_objs_t out_tx_objs);
+                                    flex_trit_t const* const tail_hash,
+                                    int const depth, int const mwm,
+                                    bundle_transactions_t* const bundle);
 
 // https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createSendTransfer.ts#L22
 retcode_t iota_client_send_transfer(
@@ -405,10 +406,10 @@ retcode_t iota_client_store_and_broadcast(
  * Fetches the bundle of a given the _tail_ transaction hash, by traversing
  * through `trunkTransaction`. It does not validate the bundle.
  *
- * @param {trit_array_p} trunk_tx- Trunk transaction, should be tail
+ * @param {flex_trit_t} tail_hash- Trunk transaction, should be tail
  * (`currentIndex == 0`)
  * @param {hashes_t} bundles - List of accumulated transactions
- * @param {transaction_objs_t} out_tx_objs - Bundle as array of transaction
+ * @param {bundle_transactions_t} bundle - Bundle as array of transaction
  * objects
  *
  * @returns {retcode_t}
@@ -421,9 +422,8 @@ retcode_t iota_client_store_and_broadcast(
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createTraverseBundle.ts#L36
  */
 retcode_t iota_client_traverse_bundle(iota_client_service_t const* const serv,
-                                      trit_array_p const trunk_tx,
-                                      hashes_t const* const bundles,
-                                      transfer_list_t* out_tx_objs);
+                                      flex_trit_t const* const tail_hash,
+                                      bundle_transactions_t* const bundle);
 
 #ifdef __cplusplus
 }

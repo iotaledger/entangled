@@ -161,7 +161,7 @@ retcode_t bundle_validator(bundle_transactions_t *const bundle,
   int64_t bundle_value = 0, tx_value = 0;
   flex_trit_t bundle_hash[FLEX_TRIT_SIZE_243];
   bool valid_sig = false;
-  Kerl shared_kerl1 = {}, shared_kerl2 = {};
+  Kerl shared_kerl1, shared_kerl2;
   flex_trit_t bundle_hash_calculated[FLEX_TRIT_SIZE_243];
   trit_t normalized_bundle[HASH_LENGTH_TRIT];
 
@@ -231,6 +231,24 @@ retcode_t bundle_validator(bundle_transactions_t *const bundle,
     *status = BUNDLE_VALID;
   }
   return RC_OK;
+}
+
+void bundle_reset_indexes(bundle_transactions_t *const bundle) {
+  size_t last_index = 0;
+  size_t current_index = 0;
+  iota_transaction_t *current_tx = NULL;
+
+  if (bundle == NULL) {
+    return;
+  }
+
+  last_index = bundle_transactions_size(bundle) - 1;
+
+  BUNDLE_FOREACH(bundle, current_tx) {
+    transaction_set_last_index(current_tx, last_index);
+    transaction_set_current_index(current_tx, current_index);
+    current_index++;
+  }
 }
 
 #ifdef DEBUG
