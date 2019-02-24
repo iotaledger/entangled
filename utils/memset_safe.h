@@ -14,7 +14,20 @@
 extern "C" {
 #endif
 
+#ifndef __STDC_LIB_EXT1__
+
 retcode_t memset_safe(void *dest, size_t destsz, int ch, size_t count);
+
+#else
+
+#include <string.h>
+
+static inline retcode_t memset_safe(void *dest, size_t destsz, int ch,
+                                    size_t count) {
+  return (!memset_s(dest, destsz, ch, count)) ? RC_OK : RC_OOM;
+}
+
+#endif
 
 #ifdef __cplusplus
 }

@@ -8,6 +8,8 @@
 #include "utils/memset_safe.h"
 #include <stdint.h>
 
+#ifndef __STDC_LIB_EXT1__
+
 retcode_t memset_safe(void *dest, size_t destsz, int ch, size_t count) {
   if (dest == NULL) {
     return RC_OOM;
@@ -24,3 +26,5 @@ retcode_t memset_safe(void *dest, size_t destsz, int ch, size_t count) {
 
   return RC_OK;
 }
+
+#endif
