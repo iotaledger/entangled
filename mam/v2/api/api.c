@@ -295,9 +295,6 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
 
   size_t packet_index = msg.d / NUM_TRITS_SIGNATURE + 1;
   if (packet_index < bundle_transactions_size(bundle)) {
-    if (ctx.ord != 1) {
-      return RC_MAM2_MESSAGE_CORRUPT;
-    }
     size_t num_trits_in_packet =
         (bundle_transactions_size(bundle) - packet_index) * NUM_TRITS_SIGNATURE;
     trit_t packet_trits[num_trits_in_packet];
