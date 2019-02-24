@@ -215,13 +215,12 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
       return RC_OOM;
     }
 
+    ctx->ord++;
     mam_msg_send_packet(ctx, checksum, payload_trits, &packet);
     packet = trits_pickup(packet, packet_size);
     mam_api_bundle_wrap(bundle, ch->id, packet);
     trits_free(packet);
   }
-
-  ctx->ord++;
 
   // TODO check if bundle contains header
   // TODO if last remove pending state
@@ -237,7 +236,7 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle) {
 trits_t msg_trits_from_bundle(bundle_transactions_t const *const bundle,
                               const trit_t msg_trits[],
                               size_t num_trits_in_bundle, size_t start_index) {
-  iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
+  iota_transaction_t *curr_tx;
 
   trit_t *msg_trits_ptr = msg_trits;
   size_t curr_tx_index = 0;
@@ -286,10 +285,9 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
   trits_t msg =
       msg_trits_from_bundle(bundle, msg_trits, num_trits_in_bundle, 0);
 
-  ERR_BIND_RETURN(
-      mam_api_bundle_read_header(&ctx, &msg, api->psks, api->ntru_sks,
-                                 trits_from_rep(MAM2_MSG_ID_SIZE, msg_id)),
-      err);
+  ERR_BIND_RETURN(mam_msg_recv(&ctx, &msg, api->psks, api->ntru_sks,
+                               trits_from_rep(MAM2_MSG_ID_SIZE, msg_id)),
+                  err);
 
   ERR_BIND_RETURN(
       trit_t_to_mam_msg_recv_context_t_map_add(&api->recv_ctxs, msg_id, ctx),
@@ -297,6 +295,9 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
 
   size_t packet_index = msg.d / NUM_TRITS_SIGNATURE + 1;
   if (packet_index < bundle_transactions_size(bundle)) {
+    if (ctx.ord != 1) {
+      return RC_MAM2_MESSAGE_CORRUPT;
+    }
     size_t num_trits_in_packet =
         (bundle_transactions_size(bundle) - packet_index) * NUM_TRITS_SIGNATURE;
     trit_t packet_trits[num_trits_in_packet];

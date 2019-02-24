@@ -17,11 +17,15 @@
 static void get_first_bundle_from_transactions(
     transaction_array_t const transactions,
     bundle_transactions_t *const bundle) {
-  iota_transaction_t *tail;
+  iota_transaction_t *tail = NULL;
   TX_OBJS_FOREACH(transactions, tail) {
     if (transaction_current_index(tail) == 0) {
       break;
     }
+  }
+
+  if (tail == NULL) {
+    return;
   }
 
   bundle_transactions_add(bundle, tail);
@@ -53,9 +57,9 @@ static void recv_example_init_client_service(
   iota_client_core_init(serv);
 }
 
-static transaction_array_t get_bundle_transactions(
-    iota_client_service_t *const serv, flex_trit_t const *const bundle_hash) {
-  transaction_array_t out_tx_objs = transaction_array_new();
+static void get_bundle_transactions(iota_client_service_t *const serv,
+                                    flex_trit_t const *const bundle_hash,
+                                    transaction_array_t *const out_tx_objs) {
   recv_example_req.approvees = NULL;
   recv_example_req.bundles = NULL;
   recv_example_req.tags = NULL;
@@ -63,7 +67,7 @@ static transaction_array_t get_bundle_transactions(
   hash243_queue_push(&recv_example_req.bundles, bundle_hash);
   // TODO - replace with iota_client_get_bundle when it's implemented
   retcode_t err = iota_client_find_transaction_objects(serv, &recv_example_req,
-                                                       out_tx_objs);
+                                                       *out_tx_objs);
   if (err != RC_OK) {
     fprintf(stderr, "iota_client_find_transaction_objects failed with %d\n",
             err);
@@ -72,12 +76,10 @@ static transaction_array_t get_bundle_transactions(
     fprintf(stderr, "iota_client_find_transaction_objects succeeded\n");
   }
 
-  if (utarray_len(out_tx_objs) > 0) {
+  if (utarray_len(*out_tx_objs) > 0) {
     fprintf(stderr, "number of transactions for given address: %d\n",
-            utarray_len(out_tx_objs));
+            utarray_len(*out_tx_objs));
   }
-
-  return out_tx_objs;
 }
 
 static void receive_bundle_public_channel(
@@ -87,12 +89,21 @@ static void receive_bundle_public_channel(
   recv_example_init_client_service(&serv);
   iota_client_extended_init();
 
-  transaction_array_t out_tx_objs = get_bundle_transactions(&serv, bundle_hash);
+  transaction_array_t out_tx_objs = transaction_array_new();
+  get_bundle_transactions(&serv, bundle_hash, &out_tx_objs);
 
   bundle_transactions_t *bundle = NULL;
   bundle_transactions_new(&bundle);
 
+  if (out_tx_objs == NULL) {
+    return;
+  }
+
   get_first_bundle_from_transactions(out_tx_objs, bundle);
+
+  if (bundle_transactions_size(bundle) == 0) {
+    return;
+  }
 
   flex_trit_t *packet_payload = NULL;
   err = mam_api_bundle_read_msg(api, bundle, &packet_payload);
@@ -118,12 +129,17 @@ static void receive_bundle_psk_channel(mam_api_t const *const api,
   recv_example_init_client_service(&serv);
   iota_client_extended_init();
 
-  transaction_array_t out_tx_objs = get_bundle_transactions(&serv, bundle_hash);
+  transaction_array_t out_tx_objs = transaction_array_new();
+  get_bundle_transactions(&serv, bundle_hash, &out_tx_objs);
 
   bundle_transactions_t *bundle = NULL;
   bundle_transactions_new(&bundle);
 
   get_first_bundle_from_transactions(out_tx_objs, bundle);
+
+  if (bundle_transactions_size(bundle) == 0) {
+    return;
+  }
 
   flex_trit_t *packet_payload = NULL;
 
