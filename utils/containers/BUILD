@@ -7,7 +7,6 @@ cc_library(
     name = "bitset",
     srcs = ["bitset.c"],
     hdrs = ["bitset.h"],
-    deps = ["//utils:memset_safe"],
 )
 
 cc_library(

@@ -21,7 +21,6 @@ cc_library(
         "//consensus/snapshot",
         "//consensus/transaction_solidifier",
         "//utils:macros",
-        "//utils:memset_safe",
         "//utils:merkle",
         "//utils:time",
     ],

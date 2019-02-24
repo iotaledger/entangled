@@ -12,8 +12,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "utils/memset_safe.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
