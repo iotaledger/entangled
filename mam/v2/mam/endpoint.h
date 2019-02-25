@@ -96,8 +96,8 @@ retcode_t mam_endpoint_deserialize(trits_t *const buffer,
 
 size_t mam_endpoints_serialized_size(mam_endpoint_t_set_t const endpoints);
 
-retcode_t mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints,
-                                  trits_t *const buffer);
+void mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints,
+                             trits_t *const buffer);
 
 retcode_t mam_endpoints_deserialize(trits_t *const buffer,
                                     trits_t const channel_name,

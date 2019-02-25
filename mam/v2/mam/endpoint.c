@@ -161,8 +161,8 @@ size_t mam_endpoints_serialized_size(mam_endpoint_t_set_t const endpoints) {
   return size;
 }
 
-retcode_t mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints,
-                                  trits_t *const buffer) {
+void mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints,
+                             trits_t *const buffer) {
   mam_endpoint_t_set_entry_t *entry = NULL;
   mam_endpoint_t_set_entry_t *tmp = NULL;
 
