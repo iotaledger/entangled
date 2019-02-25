@@ -190,6 +190,7 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
                  "ABCNKOZWYSDF9OABCNKOZWYSDF9"
                  "ABCNKOZWYSDF9QABCNKOZWYSDF9"
                  "ABCNKOZWYSDF9CABCNKOZWYSDF9");
+  mam_spongos_t wots_spongos;
 
   for (curr_height = 1; r && curr_height <= max_height; ++curr_height) {
     trits_t sig = trits_take(sig_, MAM2_MSS_SIG_SIZE(curr_height));
@@ -204,33 +205,34 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
 
     do {
       mss_sign(mss, hash, sig);
-      r = r && mss_verify(spongos, &wots->spongos, hash, sig, pk);
+      mam_spongos_init(&wots_spongos);
+      r = r && mss_verify(spongos, &wots_spongos, hash, sig, pk);
 
       /* H is ignored, makes no sense to modify and check */
       trits_put1(hash, trit_add(trits_get1(hash), 1));
-      r = r && !mss_verify(spongos, &wots->spongos, hash, sig, pk);
+      r = r && !mss_verify(spongos, &wots_spongos, hash, sig, pk);
       trits_put1(hash, trit_sub(trits_get1(hash), 1));
 
       trits_put1(sig_skn, trit_add(trits_get1(sig_skn), 1));
-      r = r && !mss_verify(spongos, &wots->spongos, hash, sig, pk);
+      r = r && !mss_verify(spongos, &wots_spongos, hash, sig, pk);
       trits_put1(sig_skn, trit_sub(trits_get1(sig_skn), 1));
 
       /* WOTS sig is ignored, makes no sense to modify and check */
       trits_put1(sig_wots, trit_add(trits_get1(sig_wots), 1));
-      r = r && !mss_verify(spongos, &wots->spongos, hash, sig, pk);
+      r = r && !mss_verify(spongos, &wots_spongos, hash, sig, pk);
       trits_put1(sig_wots, trit_sub(trits_get1(sig_wots), 1));
 
       if (!trits_is_empty(sig_apath)) {
         trits_put1(sig_apath, trit_add(trits_get1(sig_apath), 1));
-        r = r && !mss_verify(spongos, &wots->spongos, hash, sig, pk);
+        r = r && !mss_verify(spongos, &wots_spongos, hash, sig, pk);
         trits_put1(sig_apath, trit_sub(trits_get1(sig_apath), 1));
       }
 
-      r = r && !mss_verify(spongos, &wots->spongos, hash,
+      r = r && !mss_verify(spongos, &wots_spongos, hash,
                            trits_take(sig, trits_size(sig) - 1), pk);
 
       trits_put1(pk, trit_add(trits_get1(pk), 1));
-      r = r && !mss_verify(spongos, &wots->spongos, hash, sig, pk);
+      r = r && !mss_verify(spongos, &wots_spongos, hash, sig, pk);
       trits_put1(pk, trit_sub(trits_get1(pk), 1));
 
     } while (mss_next(mss));

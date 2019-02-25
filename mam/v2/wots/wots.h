@@ -36,7 +36,6 @@ extern "C" {
 
 // WOTS layer interface
 typedef struct mam_wots_s {
-  mam_spongos_t spongos;
   trit_t secret_key[MAM2_WOTS_SK_SIZE];
 } mam_wots_t;
 

@@ -39,20 +39,20 @@ typedef mam_endpoint_t_set_entry_t *mam_endpoint_t_set_t;
 trits_t mam_endpoint_id(mam_endpoint_t const *const endpoint);
 
 /**
- * Gets an enpoint channel's name
+ * Gets an endpoint channel's name
  *
  * @param endpoint The endpoint
  *
- * @return the enpoint channel's name
+ * @return the endpoint channel's name
  */
 trits_t mam_endpoint_channel_name(mam_endpoint_t const *const endpoint);
 
 /**
- * Gets an enpoint's name
+ * Gets an endpoint's name
  *
  * @param endpoint The endpoint
  *
- * @return the enpoint's name
+ * @return the endpoint's name
  */
 trits_t mam_endpoint_name(mam_endpoint_t const *const endpoint);
 
@@ -80,14 +80,14 @@ retcode_t mam_endpoint_create(mam_prng_t const *const prng,
  * @param allocator A MAM allocator
  * @param endpoint The endpoint
  */
-retcode_t mam_endpoint_destroy(mam_endpoint_t *const endpoint);
+void mam_endpoint_destroy(mam_endpoint_t *const endpoint);
 
 retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t *const endpoints);
 
 size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint);
 
-retcode_t mam_endpoint_serialize(mam_endpoint_t const *const endpoint,
-                                 trits_t *const buffer);
+void mam_endpoint_serialize(mam_endpoint_t const *const endpoint,
+                            trits_t *const buffer);
 
 retcode_t mam_endpoint_deserialize(trits_t *const buffer,
                                    trits_t const channel_name,
@@ -96,8 +96,8 @@ retcode_t mam_endpoint_deserialize(trits_t *const buffer,
 
 size_t mam_endpoints_serialized_size(mam_endpoint_t_set_t const endpoints);
 
-retcode_t mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints,
-                                  trits_t *const buffer);
+void mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints,
+                             trits_t *const buffer);
 
 retcode_t mam_endpoints_deserialize(trits_t *const buffer,
                                     trits_t const channel_name,

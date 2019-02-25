@@ -29,7 +29,7 @@ typedef enum prng_destination_tryte_e {
   MAM2_PRNG_DST_WOTS_KEY = 1,
   // PRNG NTRU destination tryte
   MAM2_PRNG_DST_NTRU_KEY = 2
-} prng_destination_tryte_t;
+} mam_prng_destination_tryte_t;
 
 // PRNG layer interface
 typedef struct mam_prng_s {
