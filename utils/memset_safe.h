@@ -20,6 +20,7 @@ retcode_t memset_safe(void *dest, size_t destsz, int ch, size_t count);
 
 #else
 
+#define __STDC_WANT_LIB_EXT1__ 1
 #include <string.h>
 
 static inline retcode_t memset_safe(void *dest, size_t destsz, int ch,
