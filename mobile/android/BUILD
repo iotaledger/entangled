@@ -5,6 +5,10 @@ cc_library(
         "jni.h",
     ],
     hdrs = ["Interface.h"],
+    defines = [
+        "APP_PLATFORM=android-19",
+        "ANDROID_NATIVE_API_LEVEL=19",
+    ],
     linkopts = ["-lm"],
     deps = ["//common/helpers"],
 )
