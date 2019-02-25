@@ -116,10 +116,9 @@ extern "C" {
     goto label;                       \
   else
 
-#define ERR_GUARD_RETURN(expr, err, e) \
-  if (!(expr)) {                       \
-    e = (err);                         \
-    return e;                          \
+#define ERR_GUARD_RETURN(expr, err) \
+  if (!(expr)) {                    \
+    return err;                     \
   } else
 
 #define ERR_GUARD_GOTO(expr, err, e, label) \

@@ -66,9 +66,7 @@ retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed) {
   mam_seed_trits = MAM2_TRITS_INIT(mam_seed_trits, MAM2_PRNG_KEY_SIZE);
   trits_from_str(mam_seed_trits, (char const *)mam_seed);
 
-  if ((ret = mam_prng_init(&api->prng, mam_seed_trits)) != RC_OK) {
-    return ret;
-  }
+  mam_prng_init(&api->prng, mam_seed_trits);
   trits_set_zero(mam_seed_trits);
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
@@ -91,10 +89,7 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
     return RC_NULL_PARAM;
   }
 
-  ret = mam_prng_destroy(&api->prng);
-  if (ret != RC_OK) {
-    // TODO - LOG
-  }
+  mam_prng_destroy(&api->prng);
   mam_ntru_sk_t_set_free(&api->ntru_sks);
   mam_ntru_pk_t_set_free(&api->ntru_pks);
   mam_psk_t_set_free(&api->psks);
