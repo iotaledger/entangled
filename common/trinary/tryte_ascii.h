@@ -17,7 +17,8 @@ extern "C" {
 #endif
 
 void ascii_to_trytes(char const *const input, tryte_t *const output);
-void trytes_to_ascii(tryte_t const *const intput, char *const ouput);
+void trytes_to_ascii(tryte_t const *const intput, size_t const input_size,
+                     char *const ouput);
 
 #ifdef __cplusplus
 }
