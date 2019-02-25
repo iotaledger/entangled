@@ -9,6 +9,7 @@
 #define __COMMON_MODEL_TESTS_DEFS_H__
 
 #include "common/model/transaction.h"
+
 static int64_t TEST_VALUE = 123456;
 static uint64_t TEST_TIMESTAMP = 1477037811737;
 static int64_t TEST_CURRENT_INDEX = 2;

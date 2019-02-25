@@ -63,7 +63,11 @@ void test_read_write_transaction_obj(void) {
 
   iota_transaction_t transaction;
 
+  transaction_reset(&transaction);
+
   // write transaction values
+
+  // Essence
   flex_trits_from_trytes(TEST_FLEX_TRIT_ADDRESS, NUM_TRITS_ADDRESS,
                          TEST_ADDRESS_0, NUM_TRYTES_ADDRESS,
                          NUM_TRYTES_ADDRESS);
@@ -94,6 +98,7 @@ void test_read_write_transaction_obj(void) {
   TEST_ASSERT_TRUE(transaction.loaded_columns_mask.essence &
                    MASK_ESSENCE_BUNDLE);
 
+  // Attachment
   flex_trits_from_trytes(TEST_FLEX_TRIT_TRUNK, NUM_TRITS_TRUNK, TEST_TRUNK,
                          NUM_TRYTES_TRUNK, NUM_TRYTES_TRUNK);
   transaction_set_trunk(&transaction, TEST_FLEX_TRIT_TRUNK);
@@ -126,17 +131,21 @@ void test_read_write_transaction_obj(void) {
   TEST_ASSERT_TRUE(transaction.loaded_columns_mask.attachment &
                    MASK_ATTACHMENT_TAG);
 
+  // Consensus
   flex_trits_from_trytes(TEST_FLEX_TRIT_HASH, NUM_TRITS_HASH, TEST_HASH,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   transaction_set_hash(&transaction, TEST_FLEX_TRIT_HASH);
   TEST_ASSERT_TRUE(transaction.loaded_columns_mask.consensus &
                    MASK_CONSENSUS_HASH);
+
+  // Data
   flex_trits_from_trytes(TEST_FLEX_TRIT_SIGNATURE, NUM_TRITS_SIGNATURE,
                          TEST_SIG_1, NUM_TRYTES_SIGNATURE,
                          NUM_TRYTES_SIGNATURE);
   transaction_set_signature(&transaction, TEST_FLEX_TRIT_SIGNATURE);
   TEST_ASSERT_TRUE(transaction.loaded_columns_mask.data & MASK_DATA_SIG_OR_MSG);
 
+  // Metadata
   transaction_set_snapshot_index(&transaction, TEST_SNAPSHOT_INDEX);
   TEST_ASSERT_TRUE(transaction.loaded_columns_mask.metadata &
                    MASK_METADATA_SNAPSHOT_INDEX);
@@ -148,6 +157,8 @@ void test_read_write_transaction_obj(void) {
                    MASK_METADATA_ARRIVAL_TIMESTAMP);
 
   // read transaction values
+
+  // Essence
   TEST_ASSERT_EQUAL_MEMORY(transaction_address(&transaction),
                            TEST_FLEX_TRIT_ADDRESS,
                            sizeof(TEST_FLEX_TRIT_ADDRESS));
@@ -164,6 +175,7 @@ void test_read_write_transaction_obj(void) {
                            TEST_FLEX_TRIT_BUNDLE,
                            sizeof(TEST_FLEX_TRIT_BUNDLE));
 
+  // Attachment
   TEST_ASSERT_EQUAL_MEMORY(transaction_trunk(&transaction),
                            TEST_FLEX_TRIT_TRUNK, sizeof(TEST_FLEX_TRIT_TRUNK));
   TEST_ASSERT_EQUAL_MEMORY(transaction_branch(&transaction),
@@ -180,18 +192,14 @@ void test_read_write_transaction_obj(void) {
   TEST_ASSERT_EQUAL_MEMORY(transaction_tag(&transaction), TEST_FLEX_TRIT_TAG,
                            sizeof(TEST_FLEX_TRIT_TAG));
 
+  // Consensus
   TEST_ASSERT_EQUAL_MEMORY(transaction_hash(&transaction), TEST_FLEX_TRIT_HASH,
                            sizeof(TEST_FLEX_TRIT_HASH));
   TEST_ASSERT_EQUAL_MEMORY(transaction_signature(&transaction),
                            TEST_FLEX_TRIT_SIGNATURE,
                            sizeof(TEST_FLEX_TRIT_SIGNATURE));
 
-  TEST_ASSERT_EQUAL_INT64(transaction_snapshot_index(&transaction),
-                          TEST_SNAPSHOT_INDEX);
-  TEST_ASSERT_EQUAL_INT8(transaction_solid(&transaction), TEST_SOLID);
-  TEST_ASSERT_EQUAL_INT64(transaction_arrival_timestamp(&transaction),
-                          TEST_ARRIVAL_TIMESTAMP);
-
+  // Data
   // test transaction_set_message() individually
   transaction.loaded_columns_mask.data ^= MASK_DATA_SIG_OR_MSG;
   flex_trits_from_trytes(TEST_FLEX_TRIT_MESSAGE, NUM_TRITS_MESSAGE, TEST_MSG,
@@ -201,6 +209,13 @@ void test_read_write_transaction_obj(void) {
   TEST_ASSERT_EQUAL_MEMORY(transaction_signature(&transaction),
                            TEST_FLEX_TRIT_MESSAGE,
                            sizeof(TEST_FLEX_TRIT_MESSAGE));
+
+  // Metadata
+  TEST_ASSERT_EQUAL_INT64(transaction_snapshot_index(&transaction),
+                          TEST_SNAPSHOT_INDEX);
+  TEST_ASSERT_EQUAL_INT8(transaction_solid(&transaction), TEST_SOLID);
+  TEST_ASSERT_EQUAL_INT64(transaction_arrival_timestamp(&transaction),
+                          TEST_ARRIVAL_TIMESTAMP);
 }
 
 int main(void) {
