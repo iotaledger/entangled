@@ -2,7 +2,9 @@ cc_binary(
     name = "send",
     srcs = ["send.c"],
     deps = [
+        ":commmon",
         "//cclient:api",
+        "//common/trinary:tryte_ascii",
         "//mam/v2/api",
     ],
 )
@@ -13,6 +15,7 @@ cc_binary(
     deps = [
         ":commmon",
         "//cclient:api",
+        "//common/trinary:tryte_ascii",
         "//mam/v2/api",
     ],
 )
