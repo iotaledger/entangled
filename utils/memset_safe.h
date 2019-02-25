@@ -8,7 +8,10 @@
 #ifndef __UTILS_MEMSET_SAFE_H__
 #define __UTILS_MEMSET_SAFE_H__
 
-#include "common/errors.h"
+#define __STDC_WANT_LIB_EXT1__ 1
+#include <errno.h>
+#include <stdint.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,16 +19,14 @@ extern "C" {
 
 #ifndef __STDC_LIB_EXT1__
 
-retcode_t memset_safe(void *dest, size_t destsz, int ch, size_t count);
+typedef int errno_t;
+errno_t memset_safe(void *dest, size_t destsz, int ch, size_t count);
 
 #else
 
-#define __STDC_WANT_LIB_EXT1__ 1
-#include <string.h>
-
-static inline retcode_t memset_safe(void *dest, size_t destsz, int ch,
-                                    size_t count) {
-  return (!memset_s(dest, destsz, ch, count)) ? RC_OK : RC_OOM;
+static inline errno_t memset_safe(void *dest, size_t destsz, int ch,
+                                  size_t count) {
+  return memset_s(dest, destsz, ch, count);
 }
 
 #endif

@@ -6,17 +6,16 @@
  */
 
 #include "utils/memset_safe.h"
-#include <stdint.h>
 
 #ifndef __STDC_LIB_EXT1__
 
-retcode_t memset_safe(void *dest, size_t destsz, int ch, size_t count) {
+errno_t memset_safe(void *dest, size_t destsz, int ch, size_t count) {
   if (dest == NULL) {
-    return RC_OOM;
-  } else if (destsz > SIZE_MAX) {
-    return RC_OOM;
+    return EINVAL;
+  } else if (destsz > SIZE_MAX || count > SIZE_MAX) {
+    return E2BIG;
   } else if (count > destsz) {
-    return RC_OOM;
+    return EOVERFLOW;
   }
 
   volatile unsigned char *ptr = dest;
@@ -24,7 +23,7 @@ retcode_t memset_safe(void *dest, size_t destsz, int ch, size_t count) {
     *ptr++ = ch;
   }
 
-  return RC_OK;
+  return 0;
 }
 
 #endif
