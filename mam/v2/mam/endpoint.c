@@ -154,8 +154,8 @@ size_t mam_endpoints_serialized_size(mam_endpoint_t_set_t const endpoints) {
   size_t size = pb3_sizeof_size_t(
       mam_endpoint_t_set_size(endpoints));  // endpoints number
 
-  HASH_ITER(hh, endpoints, entry, tmp) {
-    size += mam_endpoint_serialized_size(&entry->value);  // endpoint
+  HASH_ITER(hh, endpoints, entry, tmp) {  // endpoint
+    size += mam_endpoint_serialized_size(&entry->value);
   }
 
   return size;

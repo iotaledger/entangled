@@ -24,19 +24,19 @@ void mam_prng_destroy(mam_prng_t *const prng) {
 }
 
 void mam_prng_gen(mam_prng_t const *const prng,
-                  prng_destination_tryte_t const destination,
+                  mam_prng_destination_tryte_t const destination,
                   trits_t const nonce, trits_t output) {
   mam_prng_gen3(prng, destination, nonce, trits_null(), trits_null(), output);
 }
 
 void mam_prng_gen2(mam_prng_t const *const prng,
-                   prng_destination_tryte_t const destination,
+                   mam_prng_destination_tryte_t const destination,
                    trits_t const nonce1, trits_t const nonce2, trits_t output) {
   mam_prng_gen3(prng, destination, nonce1, nonce2, trits_null(), output);
 }
 
 void mam_prng_gen3(mam_prng_t const *const prng,
-                   prng_destination_tryte_t const destination,
+                   mam_prng_destination_tryte_t const destination,
                    trits_t const nonce1, trits_t const nonce2,
                    trits_t const nonce3, trits_t output) {
   mam_sponge_t sponge;

@@ -190,6 +190,7 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
                  "ABCNKOZWYSDF9OABCNKOZWYSDF9"
                  "ABCNKOZWYSDF9QABCNKOZWYSDF9"
                  "ABCNKOZWYSDF9CABCNKOZWYSDF9");
+  mam_spongos_t wots_spongos;
 
   for (curr_height = 1; r && curr_height <= max_height; ++curr_height) {
     trits_t sig = trits_take(sig_, MAM2_MSS_SIG_SIZE(curr_height));
@@ -204,7 +205,6 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
 
     do {
       mss_sign(mss, hash, sig);
-      mam_spongos_t wots_spongos;
       mam_spongos_init(&wots_spongos);
       r = r && mss_verify(spongos, &wots_spongos, hash, sig, pk);
 

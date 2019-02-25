@@ -173,8 +173,8 @@ size_t mam_channels_serialized_size(mam_channel_t_set_t const channels) {
   size_t size =
       pb3_sizeof_size_t(mam_channel_t_set_size(channels));  // channels number
 
-  HASH_ITER(hh, channels, entry, tmp) {
-    size += mam_channel_serialized_size(&entry->value);  // channel
+  HASH_ITER(hh, channels, entry, tmp) {  // channel
+    size += mam_channel_serialized_size(&entry->value);
   }
 
   return size;
