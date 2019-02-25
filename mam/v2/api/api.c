@@ -177,12 +177,10 @@ retcode_t mam_api_bundle_write_header(
   return trit_t_to_mam_msg_send_context_t_map_add(&api->send_ctxs, msg_id, ctx);
 }
 
-retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
-                                      mam_channel_t *const ch,
-                                      trit_t *const msg_id,
-                                      tryte_t const *const payload,
-                                      mam_msg_checksum_t checksum,
-                                      bundle_transactions_t *const bundle) {
+retcode_t mam_api_bundle_write_packet(
+    mam_api_t *const api, mam_channel_t *const ch, trit_t *const msg_id,
+    tryte_t const *const payload, size_t const payload_size,
+    mam_msg_checksum_t checksum, bundle_transactions_t *const bundle) {
   mam_msg_send_context_t *ctx = NULL;
   trit_t_to_mam_msg_send_context_t_map_entry_t *entry = NULL;
 
@@ -200,12 +198,12 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
   {
     trits_t packet = trits_null();
     size_t packet_size = 0;
-    MAM2_TRITS_DEF0(payload_trits, strlen(payload) * 3);
-    payload_trits = MAM2_TRITS_INIT(payload_trits, strlen(payload) * 3);
+    MAM2_TRITS_DEF0(payload_trits, payload_size * 3);
+    payload_trits = MAM2_TRITS_INIT(payload_trits, payload_size * 3);
     trits_from_str(payload_trits, payload);
 
     packet_size =
-        mam_msg_send_packet_size(checksum, ctx->mss, strlen(payload) * 3);
+        mam_msg_send_packet_size(checksum, ctx->mss, payload_size * 3);
     if (trits_is_null(packet = trits_alloc(packet_size))) {
       return RC_OOM;
     }
@@ -259,11 +257,12 @@ static retcode_t mam_api_bundle_read_header(
 
 retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
                                   bundle_transactions_t const *const bundle,
-                                  flex_trit_t **const packet_payload) {
+                                  tryte_t **const payload,
+                                  size_t *const payload_size) {
   retcode_t err = RC_OK;
   trit_t msg_id[MAM2_MSG_ID_SIZE];
 
-  MAM2_ASSERT(packet_payload && *packet_payload == NULL);
+  MAM2_ASSERT(payload && *payload == NULL && payload_size);
   if (!mam_api_bundle_contains_header(bundle)) {
     return RC_MAM2_BUNDLE_DOES_NOT_CONTAIN_HEADER;
   }
@@ -294,14 +293,13 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
   if (packet_index < bundle_transactions_size(bundle)) {
     size_t num_trits_in_packet =
         (bundle_transactions_size(bundle) - packet_index) * NUM_TRITS_SIGNATURE;
-    trit_t packet_trits[num_trits_in_packet];
-    trits_t packet = trits_from_rep(num_trits_in_packet, packet_trits);
+    trits_t packet = trits_null();
     msg = trits_drop(msg, NUM_TRITS_SIGNATURE - msg.d);
     ERR_BIND_RETURN(mam_msg_recv_packet(&ctx, &msg, &packet), err);
 
-    *packet_payload = malloc(NUM_FLEX_TRITS_FOR_TRITS(num_trits_in_packet));
-    flex_trits_from_trits(*packet_payload, num_trits_in_packet, packet_trits,
-                          num_trits_in_packet, num_trits_in_packet);
+    *payload_size = trits_size(packet) / 3;
+    *payload = malloc(*payload_size * sizeof(tryte_t));
+    trits_to_trytes(packet.p, *payload, *payload_size * 3);
   }
 
   return RC_OK;

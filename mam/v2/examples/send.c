@@ -11,24 +11,19 @@
 #include <stdio.h>
 
 #include "cclient/iota_client_extended_api.h"
+#include "common/trinary/tryte_ascii.h"
 #include "mam/v2/api/api.h"
-
-static tryte_t SENDER_SEED[81] =
-    "SENDERSEEDSENDERSEEDSENDERSEEDSENDERSEEDSENDERSEEDSENDERSEEDSENDERSEEDSEND"
-    "ERSEED9";
-#define TEST_CHANNEL_NAME "CHANAME"
-#define TEST_MSS_DEPTH 1
-#define HOST "173.249.44.234"
-#define PORT 14265
+#include "mam/v2/examples/common.h"
 
 // TODO Merge into cclient
-static void send_bundle(bundle_transactions_t *const bundle) {
+static void send_bundle(char const *const host, uint16_t const port,
+                        bundle_transactions_t *const bundle) {
   iota_client_service_t serv;
   serv.http.path = "/";
   serv.http.content_type = "application/json";
   serv.http.accept = "application/json";
-  serv.http.host = HOST;
-  serv.http.port = PORT;
+  serv.http.host = host;
+  serv.http.port = port;
   serv.http.api_version = 1;
   serv.serializer_type = SR_JSON;
   iota_client_core_init(&serv);
@@ -41,11 +36,22 @@ static void send_bundle(bundle_transactions_t *const bundle) {
   hash8019_array_p raw_trytes = hash8019_array_new();
   iota_transaction_t *curr_tx = NULL;
   flex_trit_t trits_8019[FLEX_TRIT_SIZE_8019];
+
+  fprintf(stderr, "Address: ");
+  for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
+    fprintf(stderr, "%c",
+            ((iota_transaction_t *)utarray_front(bundle))->essence.address[i]);
+  }
+  fprintf(stderr, "\n");
+
+  fprintf(stderr, "Bundle: ");
+  for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
+    fprintf(stderr, "%c",
+            ((iota_transaction_t *)utarray_front(bundle))->essence.bundle[i]);
+  }
+  fprintf(stderr, "\n");
+
   BUNDLE_FOREACH(bundle, curr_tx) {
-    for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
-      fprintf(stderr, "%c", curr_tx->essence.address[i]);
-    }
-    fprintf(stderr, "\n");
     transaction_serialize_on_flex_trits(curr_tx, trits_8019);
     hash_array_push(raw_trytes, trits_8019);
   }
@@ -57,11 +63,16 @@ static void send_bundle(bundle_transactions_t *const bundle) {
   iota_client_core_destroy(&serv);
 }
 
-int main(void) {
+int main(int ac, char **av) {
   mam_api_t api;
   bundle_transactions_t *bundle = NULL;
   int ret = EXIT_SUCCESS;
   trit_t msg_id[MAM2_MSG_ID_SIZE];
+
+  if (ac != 4) {
+    fprintf(stderr, "usage: send <host> <port> <payload>\n");
+    return EXIT_FAILURE;
+  }
 
   if (mam_api_init(&api, SENDER_SEED) != RC_OK) {
     fprintf(stderr, "mam_api_init failed\n");
@@ -75,10 +86,26 @@ int main(void) {
   mam_channel_create(&api.prng, TEST_MSS_DEPTH, cha_name, cha);
 
   bundle_transactions_new(&bundle);
-  mam_api_bundle_write_header(&api, cha, NULL, NULL, NULL, NULL, NULL, 0,
-                              bundle, msg_id);
-  mam_api_bundle_write_packet(&api, cha, msg_id, "TEAMHOUMOUS", 0, bundle);
-  send_bundle(bundle);
+
+  {
+    mam_psk_t_set_t psks = NULL;
+
+    mam_psk_t_set_add(&psks, &psk);
+    mam_api_bundle_write_header(&api, cha, NULL, NULL, NULL, psks, NULL, 0,
+                                bundle, msg_id);
+  }
+
+  {
+    tryte_t *payload_trytes =
+        (tryte_t *)malloc(2 * strlen(av[3]) * sizeof(tryte_t));
+
+    ascii_to_trytes(av[3], payload_trytes);
+    mam_api_bundle_write_packet(&api, cha, msg_id, payload_trytes,
+                                strlen(av[3]) * 2, 0, bundle);
+    free(payload_trytes);
+  }
+
+  send_bundle(av[1], atoi(av[2]), bundle);
   bundle_transactions_free(&bundle);
 
   if (mam_api_destroy(&api) != RC_OK) {

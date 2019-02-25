@@ -53,12 +53,10 @@ retcode_t mam_api_bundle_write_header(
     mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id);
 
-retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
-                                      mam_channel_t *const ch,
-                                      trit_t *const msg_id,
-                                      tryte_t const *const payload,
-                                      mam_msg_checksum_t checksum,
-                                      bundle_transactions_t *const bundle);
+retcode_t mam_api_bundle_write_packet(
+    mam_api_t *const api, mam_channel_t *const ch, trit_t *const msg_id,
+    tryte_t const *const payload, size_t const payload_size,
+    mam_msg_checksum_t checksum, bundle_transactions_t *const bundle);
 
 /**
  * Checks if a bundle which is assumed to contain MAM message contains header
@@ -84,7 +82,8 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
 
 retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
                                   bundle_transactions_t const *const bundle,
-                                  flex_trit_t **const packet_payload);
+                                  tryte_t **const payload,
+                                  size_t *const payload_size);
 
 /**
  * Reads next packet
