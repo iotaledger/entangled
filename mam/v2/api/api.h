@@ -82,7 +82,8 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
 
 retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
                                   bundle_transactions_t const *const bundle,
-                                  flex_trit_t **const packet_payload);
+                                  tryte_t **const payload,
+                                  size_t *const payload_size);
 
 /**
  * Reads next packet

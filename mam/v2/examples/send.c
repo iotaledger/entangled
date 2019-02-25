@@ -101,7 +101,7 @@ int main(int ac, char **av) {
 
     ascii_to_trytes(av[3], payload_trytes);
     mam_api_bundle_write_packet(&api, cha, msg_id, payload_trytes,
-                                strlen(av[3]) / 2, 0, bundle);
+                                strlen(av[3]) * 2, 0, bundle);
     free(payload_trytes);
   }
 
