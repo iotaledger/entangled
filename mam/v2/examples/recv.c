@@ -11,6 +11,7 @@
 #include <stdio.h>
 
 #include "cclient/iota_client_extended_api.h"
+#include "common/trinary/tryte_ascii.h"
 #include "mam/v2/api/api.h"
 #include "mam/v2/examples/common.h"
 
@@ -135,7 +136,7 @@ int main(int ac, char **av) {
     return EXIT_FAILURE;
   }
 
-  if (mam_api_init(&api, SENDER_SEED) != RC_OK) {
+  if (mam_api_init(&api, (tryte_t *)DUMMY_SEED) != RC_OK) {
     fprintf(stderr, "mam_api_init failed\n");
     return EXIT_FAILURE;
   }

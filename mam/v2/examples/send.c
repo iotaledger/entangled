@@ -69,12 +69,12 @@ int main(int ac, char **av) {
   int ret = EXIT_SUCCESS;
   trit_t msg_id[MAM2_MSG_ID_SIZE];
 
-  if (ac != 4) {
-    fprintf(stderr, "usage: send <host> <port> <payload>\n");
+  if (ac != 5) {
+    fprintf(stderr, "usage: send <host> <port> <seed> <payload>\n");
     return EXIT_FAILURE;
   }
 
-  if (mam_api_init(&api, SENDER_SEED) != RC_OK) {
+  if (mam_api_init(&api, (tryte_t *)av[3]) != RC_OK) {
     fprintf(stderr, "mam_api_init failed\n");
     return EXIT_FAILURE;
   }
@@ -97,11 +97,11 @@ int main(int ac, char **av) {
 
   {
     tryte_t *payload_trytes =
-        (tryte_t *)malloc(2 * strlen(av[3]) * sizeof(tryte_t));
+        (tryte_t *)malloc(2 * strlen(av[4]) * sizeof(tryte_t));
 
-    ascii_to_trytes(av[3], payload_trytes);
+    ascii_to_trytes(av[4], payload_trytes);
     mam_api_bundle_write_packet(&api, cha, msg_id, payload_trytes,
-                                strlen(av[3]) * 2, 0, bundle);
+                                strlen(av[4]) * 2, 0, bundle);
     free(payload_trytes);
   }
 
