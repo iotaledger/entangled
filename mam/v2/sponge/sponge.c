@@ -69,7 +69,6 @@ void mam_sponge_init(mam_sponge_t *const sponge) {
   trits_set_zero(sponge_state_trits(sponge));
 }
 
-// TODO mam2: replace sponge transformation function #773
 void mam_sponge_transform(mam_sponge_t *const sponge) {
   mam_troika_transform(sponge->state, MAM2_SPONGE_WIDTH);
 }

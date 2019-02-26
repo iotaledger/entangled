@@ -12,7 +12,6 @@
 #include "common/troika/troika.h"
 #include "mam/v2/trits/trits.h"
 
-/*void troika_permutation(trit_t *state, unsigned long num_rounds)*/
 void mam_troika_transform(trit_t *const state, size_t state_size) {
   size_t i;
   for (i = 0; i != state_size; ++i) {
