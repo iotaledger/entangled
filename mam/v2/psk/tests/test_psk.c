@@ -9,11 +9,12 @@
  */
 
 #include <string.h>
+
 #include <unity/unity.h>
 
 #include "common/trinary/trit_tryte.h"
-#include "mam/v2/mam/mam_psk_t_set.h"
-#include "mam/v2/mam/mam_types.h"
+#include "mam/v2/psk/mam_psk_t_set.h"
+#include "mam/v2/psk/psk.h"
 
 static bool mam_psk_t_set_cmp(mam_psk_t_set_t const psks_1,
                               mam_psk_t_set_t const psks_2) {

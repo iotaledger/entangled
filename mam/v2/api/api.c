@@ -8,13 +8,14 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/api/api.h"
 #include <stdlib.h>
+
 #include "common/model/bundle.h"
-#include "mam/v2/mam/mam_psk_t_set.h"
+#include "mam/v2/api/api.h"
 #include "mam/v2/ntru/mam_ntru_pk_t_set.h"
 #include "mam/v2/ntru/mam_ntru_sk_t_set.h"
 #include "mam/v2/prng/prng.h"
+#include "mam/v2/psk/mam_psk_t_set.h"
 #include "utils/time.h"
 
 /*
