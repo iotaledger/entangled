@@ -736,11 +736,12 @@ retcode_t iota_client_promote_transaction(
   iota_transaction_t* curr_tx = NULL;
   check_consistency_req_t* consistency_req = NULL;
   check_consistency_res_t* consistency_res = NULL;
+  flex_trit_t flex_tx[FLEX_TRIT_SIZE_8019] = {};
   log_info(logger_id, "[%s:%d]\n", __func__, __LINE__);
 
   ret_code = bundle_validator(bundle, &bundle_status);
   if (ret_code != RC_OK) {
-    log_error(logger_id, "%s bundle_validator erro code: %d", __func__,
+    log_error(logger_id, "%s bundle_validator error code: %d", __func__,
               bundle_status);
     goto done;
   }
@@ -801,8 +802,13 @@ retcode_t iota_client_promote_transaction(
                                 mwm);
       get_transactions_to_approve_res_free(&gtta_res);
       BUNDLE_FOREACH(bundle, curr_tx) {
-        attach_to_tangle_req_add_trytes(att_req,
-                                        transaction_serialize(curr_tx));
+        if (!transaction_serialize_on_flex_trits(curr_tx, flex_tx)) {
+          attach_to_tangle_req_add_trytes(att_req, flex_tx);
+        } else {
+          ret_code = RC_CCLIENT_TX_DESERIALIZE_FAILED;
+          log_error(logger_id, "%s\n", error_2_string(ret_code));
+          goto done;
+        }
       }
       ret_code = iota_client_attach_to_tangle(serv, att_req, att_res);
       attach_to_tangle_req_free(&att_req);
