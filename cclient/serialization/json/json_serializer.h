@@ -10,7 +10,6 @@
 
 #include <stdlib.h>
 
-#include "cclient/serialization/json/check_consistency.h"
 #include "cclient/serialization/serializer.h"
 
 #ifdef __cplusplus
