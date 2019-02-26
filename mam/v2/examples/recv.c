@@ -11,6 +11,7 @@
 #include <stdio.h>
 
 #include "cclient/iota_client_extended_api.h"
+#include "common/trinary/tryte_ascii.h"
 #include "mam/v2/api/api.h"
 #include "mam/v2/examples/common.h"
 
@@ -108,10 +109,11 @@ static void receive_bundle(mam_api_t *const api, char const *const host,
   err = mam_api_bundle_read_msg(api, bundle, &payload_trytes, &payload_size);
 
   if (err == RC_OK) {
-    char *payload = malloc(payload_size * 2);
+    char *payload = calloc(payload_size * 2 + 1, sizeof(char));
 
-    trytes_to_ascii(payload_trytes, payload_size * 2, payload);
+    trytes_to_ascii(payload_trytes, payload_size, payload);
     fprintf(stderr, "Payload: %s\n", payload);
+    free(payload);
 
   } else {
     fprintf(stderr, "mam_api_bundle_read_msg failed with err: %d\n", err);
@@ -135,7 +137,7 @@ int main(int ac, char **av) {
     return EXIT_FAILURE;
   }
 
-  if (mam_api_init(&api, SENDER_SEED) != RC_OK) {
+  if (mam_api_init(&api, (tryte_t *)DUMMY_SEED) != RC_OK) {
     fprintf(stderr, "mam_api_init failed\n");
     return EXIT_FAILURE;
   }

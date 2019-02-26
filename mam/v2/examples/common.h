@@ -9,11 +9,12 @@
  */
 
 #include <stdio.h>
+
 #include "common/trinary/trit_tryte.h"
 
-static tryte_t SENDER_SEED[81] =
-    "SENDERSEEDSENDERSEEDSENDERSEEDSENDERSEEDSENDERSEEDSENDERSEEDSENDERSEEDSEND"
-    "ERSEED9";
+#define DUMMY_SEED                                                             \
+  "DUMMYSEEDDUMMYSEEDDUMMYSEEDDUMMYSEEDDUMMYSEEDDUMMYSEEDDUMMYSEEDDUMMYSEED99" \
+  "9999999"
 #define TEST_CHANNEL_NAME "CHANAME"
 #define TEST_MSS_DEPTH 1
 
