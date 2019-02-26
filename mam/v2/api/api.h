@@ -16,10 +16,10 @@
 #include "common/trinary/flex_trit.h"
 #include "mam/v2/api/trit_t_to_mam_msg_recv_context_t_map.h"
 #include "mam/v2/api/trit_t_to_mam_msg_send_context_t_map.h"
-#include "mam/v2/mam/mam_types.h"
 #include "mam/v2/mam/message.h"
 #include "mam/v2/ntru/ntru_types.h"
 #include "mam/v2/prng/prng_types.h"
+#include "mam/v2/psk/psk.h"
 
 #ifdef __cplusplus
 extern "C" {
