@@ -1,5 +1,6 @@
 cc_test(
     name = "test_message",
+    timeout = "long",
     srcs = ["test_message.c"],
     deps = [
         "//mam/v2/mam:message",
