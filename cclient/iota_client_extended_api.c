@@ -764,6 +764,9 @@ retcode_t iota_client_promote_transaction(
   }
 
   if (consistency_res->state) {
+    // consistency req/res are not needed.
+    check_consistency_req_free(&consistency_req);
+    check_consistency_res_free(consistency_res);
     // adding spam transaction
     transaction_reset(&spam_transaction);
     bundle_transactions_add(bundle, &spam_transaction);
@@ -782,6 +785,7 @@ retcode_t iota_client_promote_transaction(
     get_transactions_to_approve_req_set_reference(gtta_req, tail_hash);
     ret_code =
         iota_client_get_transactions_to_approve(serv, gtta_req, gtta_res);
+    get_transactions_to_approve_req_free(&gtta_req);
     if (ret_code == RC_OK) {
       // attach to tangle
       att_req = attach_to_tangle_req_new();
@@ -795,11 +799,13 @@ retcode_t iota_client_promote_transaction(
       }
       attach_to_tangle_req_init(att_req, gtta_res->trunk, gtta_res->branch,
                                 mwm);
+      get_transactions_to_approve_res_free(&gtta_res);
       BUNDLE_FOREACH(bundle, curr_tx) {
         attach_to_tangle_req_add_trytes(att_req,
                                         transaction_serialize(curr_tx));
       }
       ret_code = iota_client_attach_to_tangle(serv, att_req, att_res);
+      attach_to_tangle_req_free(&att_req);
       if (ret_code != RC_OK) {
         log_error(logger_id, "attach_to_tangle failed: %s\n",
                   error_2_string(ret_code));
