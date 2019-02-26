@@ -7,6 +7,7 @@
 
 #include "cclient/service.h"
 #include "cclient/serialization/json/json_serializer.h"
+#include "cclient/serialization/json/logger.h"
 #include "utils/logger_helper.h"
 
 retcode_t iota_client_service_init(iota_client_service_t* const serv) {

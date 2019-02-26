@@ -10,6 +10,7 @@ cc_library(
     deps = [
         ":serializer_base",
         "@cJSON",
+        "@com_github_uthash//:uthash",
     ],
 )
 
