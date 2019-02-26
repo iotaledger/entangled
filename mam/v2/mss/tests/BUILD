@@ -5,6 +5,7 @@ cc_test(
     deps = [
         "//mam/v2/mss",
         "//mam/v2/test_utils",
+        "//utils/handles:rand",
         "@unity",
     ],
 )
