@@ -46,6 +46,59 @@ retcode_t json_add_neighbors_serialize_request(
   return ret;
 }
 
+retcode_t json_add_neighbors_serialize_response(
+    const serializer_t *const s, const add_neighbors_res_t *const res,
+    char_buffer_t *out) {
+  retcode_t ret = RC_OK;
+  const char *json_text = NULL;
+  size_t len = 0;
+
+  log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+
+  cJSON *json_root = cJSON_CreateObject();
+  if (json_root == NULL) {
+    log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_JSON_CREATE);
+    return RC_CCLIENT_JSON_CREATE;
+  }
+
+  cJSON_AddItemToObject(json_root, "addedNeighbors",
+                        cJSON_CreateNumber(res->added_neighbors));
+
+  json_text = cJSON_PrintUnformatted(json_root);
+  if (json_text) {
+    len = strlen(json_text);
+    ret = char_buffer_allocate(out, len);
+    if (ret == RC_OK) {
+      strncpy(out->data, json_text, len);
+    }
+    cJSON_free((void *)json_text);
+  }
+
+  cJSON_Delete(json_root);
+  return ret;
+}
+
+retcode_t json_add_neighbors_deserialize_request(const serializer_t *const s,
+                                                 const char *const obj,
+                                                 add_neighbors_req_t *out) {
+  retcode_t ret = RC_OK;
+  cJSON *json_obj = cJSON_Parse(obj);
+  log_info(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+
+  if (json_obj == NULL) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_PARSE);
+    cJSON_Delete(json_obj);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  json_string_array_to_utarray(json_obj, "uris", out->uris);
+
+  cJSON_Delete(json_obj);
+  return ret;
+}
+
 retcode_t json_add_neighbors_deserialize_response(const serializer_t *const s,
                                                   const char *const obj,
                                                   add_neighbors_res_t *out) {

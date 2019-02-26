@@ -17,8 +17,16 @@ add_neighbors_req_t* add_neighbors_req_new() {
   return req;
 }
 
-void add_neighbors_req_add(add_neighbors_req_t* req, const char* uri) {
+void add_neighbors_req_uris_add(add_neighbors_req_t* req, const char* uri) {
   utarray_push_back(req->uris, &uri);
+}
+
+size_t add_neighbors_req_uris_len(add_neighbors_req_t* req) {
+  return utarray_len(req->uris);
+}
+
+const char* add_neighbors_req_uris_at(add_neighbors_req_t* req, size_t idx) {
+  return *(const char**)utarray_eltptr(req->uris, idx);
 }
 
 void add_neighbors_req_free(add_neighbors_req_t** req) {
