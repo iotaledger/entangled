@@ -8,9 +8,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/mam/mam_types.h"
-#include "mam/v2/mam/mam_psk_t_set.h"
+#include "mam/v2/psk/psk.h"
 #include "mam/v2/ntru/ntru.h"
+#include "mam/v2/psk/mam_psk_t_set.h"
 
 trits_t mam_psk_id(mam_psk_t const *const psk) {
   return trits_from_rep(MAM2_PSK_ID_SIZE, psk->id);

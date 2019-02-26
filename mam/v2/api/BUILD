@@ -11,11 +11,11 @@ cc_library(
         ":trit_t_to_mam_msg_send_context_t_map",
         "//common:errors",
         "//common/model:bundle",
-        "//mam/v2/mam:mam_psk_t_set",
-        "//mam/v2/mam:mam_types",
         "//mam/v2/mam:message",
         "//mam/v2/ntru:mam_ntru_pk_t_set",
         "//mam/v2/ntru:mam_ntru_sk_t_set",
+        "//mam/v2/psk",
+        "//mam/v2/psk:mam_psk_t_set",
         "//utils:time",
     ],
 )

@@ -8,7 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "mam/v2/mam/mam_types.h"
 #include "mam/v2/ntru/mam_ntru_pk_t_set.h"
 #include "mam/v2/ntru/mam_ntru_sk_t_set.h"
 #include "mam/v2/ntru/ntru.h"
