@@ -11,6 +11,7 @@
 #include "mam/v2/sponge/sponge.h"
 #include "common/defs.h"
 #include "mam/v2/trits/buffers.h"
+#include "mam/v2/troika/troika.h"
 
 static trits_t sponge_state_trits(mam_sponge_t const *const sponge) {
   return trits_from_rep(MAM2_SPONGE_WIDTH, sponge->state);
@@ -70,21 +71,7 @@ void mam_sponge_init(mam_sponge_t *const sponge) {
 
 // TODO mam2: replace sponge transformation function #773
 void mam_sponge_transform(mam_sponge_t *const sponge) {
-  trit_t stack[MAM2_SPONGE_WIDTH];
-  trits_t x = trits_from_rep(MAM2_SPONGE_RATE, sponge->state);
-  trits_t y = trits_from_rep(MAM2_SPONGE_RATE, (trit_t *)stack);
-  trits_t x0 = trits_take(x, MAM2_SPONGE_RATE / 2);
-  trits_t x1 = trits_drop(x, MAM2_SPONGE_RATE / 2);
-  trits_t x2 = trits_drop(trits_from_rep(MAM2_SPONGE_WIDTH, sponge->state),
-                          MAM2_SPONGE_RATE);
-
-  trits_add(x0, x1, x0);
-  trits_add(x0, x2, x0);
-  trits_add(x0, x2, x2);
-
-  trits_copy(trits_take(x, MAM2_SPONGE_RATE - 6), trits_drop(y, 6));
-  trits_copy(trits_drop(x, MAM2_SPONGE_RATE - 6), trits_take(y, 6));
-  trits_copy(y, x);
+  mam_troika_transform(sponge->state, MAM2_SPONGE_WIDTH);
 }
 
 void mam_sponge_fork(mam_sponge_t const *const sponge,

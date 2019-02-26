@@ -1,12 +1,25 @@
 /*
- * Copyright (c) 2018 IOTA Stiftung
- * https://github.com/iotaledger/entangled
+* Copyright (c) 2019 IOTA Stiftung
+* Copyright (c) 2019 Cybercrypt A/S
  *
- * MAM is based on an original implementation & specification by apmi.bsu.by
- * [ITSec Lab]
- *
- * Refer to the LICENSE file for licensing information
- */
+* https://github.com/iotaledger/entangled
+*
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 
 #include <assert.h>
 #include <stdio.h>
@@ -276,7 +289,7 @@ static const int shift_lanes_param[27] = {19, 13, 21, 10, 24, 15, 2,  9,  3,
                                           14, 0,  6,  5,  1,  25, 22, 23, 20,
                                           7,  17, 26, 12, 8,  18, 16, 11, 4};
 
-void PrintTroikaSlice(trit_t *state, int slice) {
+void print_troika_slice(trit_t *state, int slice) {
   fprintf(stderr, "#### Slice %i ####\n", slice);
   for (int row = 0; row < ROWS; ++row) {
     for (int column = 0; column < COLUMNS; ++column) {
@@ -295,15 +308,15 @@ void PrintTroikaSlice(trit_t *state, int slice) {
   fprintf(stderr, "\n");
 }
 
-void PrintTroikaState(trit_t *state) {
+void print_troika_state(trit_t *state) {
   // fprintf(stderr, "Troika State:\n");
 
   for (int slice = 0; slice < SLICES; ++slice) {
-    PrintTroikaSlice(state, slice);
+    print_troika_slice(state, slice);
   }
 }
 
-void Subtryte_ts(trit_t *state) {
+void subtryte_ts(trit_t *state) {
   int sbox_idx;
 
   for (sbox_idx = 0; sbox_idx < NUM_SBOXES; ++sbox_idx) {
@@ -318,7 +331,7 @@ void Subtryte_ts(trit_t *state) {
   }
 }
 
-void ShiftRows(trit_t *state) {
+void shift_rows(trit_t *state) {
   int slice, row, col, old_idx, new_idx;
 
   trit_t new_state[STATESIZE];
@@ -337,7 +350,7 @@ void ShiftRows(trit_t *state) {
   memcpy(state, new_state, STATESIZE);
 }
 
-void ShiftLanes(trit_t *state) {
+void shift_lanes(trit_t *state) {
   int slice, row, col, old_idx, new_idx, new_slice;
 
   trit_t new_state[STATESIZE];
@@ -356,7 +369,7 @@ void ShiftLanes(trit_t *state) {
   memcpy(state, new_state, STATESIZE);
 }
 
-void AddColumnParity(trit_t *state) {
+void add_column_parity(trit_t *state) {
   int slice, row, col, col_sum, idx, sum_to_add;
 
   trit_t parity[SLICES * COLUMNS];
@@ -385,7 +398,7 @@ void AddColumnParity(trit_t *state) {
   }
 }
 
-void AddRoundConstant(trit_t *state, int round) {
+void add_round_constant(trit_t *state, int round) {
   int slice, col, idx;
 
   for (slice = 0; slice < SLICES; ++slice) {
@@ -397,25 +410,25 @@ void AddRoundConstant(trit_t *state, int round) {
   }
 }
 
-void TroikaPermutation(trit_t *state, unsigned long long num_rounds) {
+void troika_permutation(trit_t *state, unsigned long long num_rounds) {
   unsigned long long round;
 
   assert(num_rounds <= NUM_ROUNDS);
 
   // PrintTroikaState(state);
   for (round = 0; round < num_rounds; round++) {
-    Subtryte_ts(state);
-    ShiftRows(state);
-    ShiftLanes(state);
-    AddColumnParity(state);
-    AddRoundConstant(state, round);
+    subtryte_ts(state);
+    shift_rows(state);
+    shift_lanes(state);
+    add_column_parity(state);
+    add_round_constant(state, round);
   }
   // PrintTroikaState(state);
 }
 
-void TroikaAbsorb(trit_t *state, unsigned int rate, const trit_t *message,
-                  unsigned long long message_length,
-                  unsigned long long num_rounds) {
+void troika_absorb(trit_t *state, unsigned int rate, const trit_t *message,
+                   unsigned long long message_length,
+                   unsigned long long num_rounds) {
   unsigned long long trit_idx;
 
   while (message_length >= rate) {
@@ -423,7 +436,7 @@ void TroikaAbsorb(trit_t *state, unsigned int rate, const trit_t *message,
     for (trit_idx = 0; trit_idx < rate; ++trit_idx) {
       state[trit_idx] = message[trit_idx];
     }
-    TroikaPermutation(state, num_rounds);
+    troika_permutation(state, num_rounds);
     message_length -= rate;
     message += rate;
   }
@@ -446,12 +459,12 @@ void TroikaAbsorb(trit_t *state, unsigned int rate, const trit_t *message,
   }
 }
 
-void TroikaSqueeze(trit_t *hash, unsigned long long hash_length,
-                   unsigned int rate, trit_t *state,
-                   unsigned long long num_rounds) {
+void troika_squeeze(trit_t *hash, unsigned long long hash_length,
+                    unsigned int rate, trit_t *state,
+                    unsigned long long num_rounds) {
   unsigned long long trit_idx;
   while (hash_length >= rate) {
-    TroikaPermutation(state, num_rounds);
+    troika_permutation(state, num_rounds);
     // Extract rate output
     for (trit_idx = 0; trit_idx < rate; ++trit_idx) {
       hash[trit_idx] = state[trit_idx];
@@ -462,23 +475,24 @@ void TroikaSqueeze(trit_t *hash, unsigned long long hash_length,
 
   // Check if there is a last incomplete block
   if (hash_length % rate) {
-    TroikaPermutation(state, num_rounds);
+    troika_permutation(state, num_rounds);
     for (trit_idx = 0; trit_idx < hash_length; ++trit_idx) {
       hash[trit_idx] = state[trit_idx];
     }
   }
 }
 
-void Troika(trit_t *out, unsigned long long outlen, const trit_t *in,
+void troika(trit_t *out, unsigned long long outlen, const trit_t *in,
             unsigned long long inlen) {
-  TroikaVarRounds(out, outlen, in, inlen, NUM_ROUNDS);
+  troika_var_rounds(out, outlen, in, inlen, NUM_ROUNDS);
 }
 
-void TroikaVarRounds(trit_t *out, unsigned long long outlen, const trit_t *in,
-                     unsigned long long inlen, unsigned long long num_rounds) {
+void troika_var_rounds(trit_t *out, unsigned long long outlen, const trit_t *in,
+                       unsigned long long inlen,
+                       unsigned long long num_rounds) {
   trit_t state[STATESIZE];
 
   memset(state, 0, STATESIZE);
-  TroikaAbsorb(state, TROIKA_RATE, in, inlen, num_rounds);
-  TroikaSqueeze(out, outlen, TROIKA_RATE, state, num_rounds);
+  troika_absorb(state, TROIKA_RATE, in, inlen, num_rounds);
+  troika_squeeze(out, outlen, TROIKA_RATE, state, num_rounds);
 }
