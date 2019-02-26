@@ -57,17 +57,16 @@ static void mam_api_bundle_wrap(bundle_transactions_t *const bundle,
 
 retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed) {
   retcode_t ret = RC_OK;
+  trit_t mam_seed_trits[MAM2_PRNG_KEY_SIZE];
 
   if (api == NULL || mam_seed == NULL) {
     return RC_NULL_PARAM;
   }
 
-  MAM2_TRITS_DEF0(mam_seed_trits, MAM2_PRNG_KEY_SIZE);
-  mam_seed_trits = MAM2_TRITS_INIT(mam_seed_trits, MAM2_PRNG_KEY_SIZE);
-  trits_from_str(mam_seed_trits, (char const *)mam_seed);
-
-  mam_prng_init(&api->prng, mam_seed_trits);
-  trits_set_zero(mam_seed_trits);
+  trytes_to_trits(mam_seed, mam_seed_trits, MAM2_PRNG_KEY_SIZE / 3);
+  mam_prng_init(&api->prng, trits_from_rep(MAM2_PRNG_KEY_SIZE, mam_seed_trits));
+  // TODO use safe memset
+  memset(mam_seed_trits, 0, MAM2_PRNG_KEY_SIZE);
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
   api->psks = NULL;
