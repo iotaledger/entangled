@@ -294,7 +294,7 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
     size_t num_trits_in_packet =
         (bundle_transactions_size(bundle) - packet_index) * NUM_TRITS_SIGNATURE;
     trits_t packet = trits_null();
-    msg = trits_drop(msg, NUM_TRITS_SIGNATURE - msg.d);
+    trits_advance(&msg, NUM_TRITS_SIGNATURE - msg.d % NUM_TRITS_SIGNATURE);
     ERR_BIND_RETURN(mam_msg_recv_packet(&ctx, &msg, &packet), err);
 
     *payload_size = trits_size(packet) / 3;
