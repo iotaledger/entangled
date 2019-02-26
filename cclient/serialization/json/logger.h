@@ -5,18 +5,19 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef CCLIENT_SERIALIZATION_JSON_SERIALIZER_H
-#define CCLIENT_SERIALIZATION_JSON_SERIALIZER_H
+#ifndef CCLIENT_SERIALIZATION_JSON_LOGGER_H
+#define CCLIENT_SERIALIZATION_JSON_LOGGER_H
 
-#include <stdlib.h>
-
-#include "cclient/serialization/serializer.h"
+#include "utils/logger_helper.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void init_json_serializer(serializer_t* serializer);
+extern logger_id_t json_logger_id;
+
+void logger_init_json_serializer();
+void logger_destroy_json_serializer();
 
 #ifdef __cplusplus
 }

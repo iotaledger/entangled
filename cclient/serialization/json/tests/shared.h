@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef CCLIENT_TEST_JSON_H
-#define CCLIENT_TEST_JSON_H
+#ifndef CCLIENT_SERIALIZATION_JSON_TESTS_TEST_JSON_H_H
+#define CCLIENT_SERIALIZATION_JSON_TESTS_TEST_JSON_H_H
 
 #include <stdlib.h>
 #include <string.h>
@@ -196,4 +196,4 @@ extern "C" {
 }
 #endif
 
-#endif  // CCLIENT_TEST_JSON_H
+#endif  // CCLIENT_SERIALIZATION_JSON_TESTS_TEST_JSON_H_H

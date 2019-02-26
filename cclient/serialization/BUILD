@@ -10,6 +10,7 @@ cc_library(
     deps = [
         ":serializer_base",
         "@cJSON",
+        "@com_github_uthash//:uthash",
     ],
 )
 
@@ -25,17 +26,5 @@ cc_library(
     deps = [
         "//cclient/request:requests",
         "//cclient/response:responses",
-    ],
-)
-
-cc_test(
-    name = "test_json",
-    srcs = [
-        "tests/test_json.c",
-        "tests/test_json.h",
-    ],
-    deps = [
-        ":serializer_json",
-        "@unity",
     ],
 )
