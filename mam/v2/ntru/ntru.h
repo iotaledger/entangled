@@ -17,6 +17,8 @@
 #include "mam/v2/sponge/spongos.h"
 #include "mam/v2/trits/trits.h"
 
+#include "utils/memset_safe.h"
+
 // NTRU session symmetric key size
 #define MAM2_NTRU_KEY_SIZE MAM2_SPONGE_KEY_SIZE
 // NTRU encrypted key size

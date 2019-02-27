@@ -10,7 +10,7 @@ git_repository(
 
 git_repository(
     name = "iota_toolchains",
-    commit = "965cda744c7cc2d86ea1d963f2977358f59a2135",
+    commit = "8df84b381fcc3d87acd605d1053f307276db71df",
     remote = "https://github.com/iotaledger/toolchains.git",
 )
 
@@ -29,12 +29,12 @@ new_git_repository(
 
 android_sdk_repository(
     name = "androidsdk",
-    api_level = 27,
+    api_level = 19,
 )
 
 android_ndk_repository(
     name = "androidndk",
-    api_level = 27,
+    api_level = 14,
 )
 
 git_repository(

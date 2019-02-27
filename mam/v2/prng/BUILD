@@ -12,6 +12,7 @@ cc_library(
         "//mam/v2:defs",
         "//mam/v2/sponge",
         "//mam/v2/trits",
+        "//utils:memset_safe",
     ],
 )
 

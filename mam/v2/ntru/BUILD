@@ -19,9 +19,9 @@ cc_library(
     deps = [
         ":ntru_types_hdr",
         ":poly",
-        "//mam/v2/mam:mam_types_hdr",
         "//mam/v2/prng",
         "//mam/v2/sponge:spongos",
+        "//utils:memset_safe",
     ],
 )
 

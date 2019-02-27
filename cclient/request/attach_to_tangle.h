@@ -29,7 +29,7 @@ typedef struct {
   /**
    * Min Weight Magnitude,Proof of Work intensity. Minimum value is 18
    */
-  int32_t mwm;
+  uint8_t mwm;
   /**
    * List of trytes (raw transaction data) to attach to the tangle.
    */
@@ -39,6 +39,11 @@ typedef struct {
 
 attach_to_tangle_req_t* attach_to_tangle_req_new();
 void attach_to_tangle_req_free(attach_to_tangle_req_t** req);
+void attach_to_tangle_req_init(attach_to_tangle_req_t* req,
+                               flex_trit_t const* const trunk,
+                               flex_trit_t const* const branch, uint8_t mwm);
+void attach_to_tangle_req_add_trytes(attach_to_tangle_req_t* req,
+                                     flex_trit_t const* const raw_trytes);
 
 #ifdef __cplusplus
 }

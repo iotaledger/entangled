@@ -90,16 +90,16 @@ retcode_t mam_channels_destroy(mam_channel_t_set_t *const channels);
 
 size_t mam_channel_serialized_size(mam_channel_t const *const channel);
 
-retcode_t mam_channel_serialize(mam_channel_t const *const channel,
-                                trits_t *const buffer);
+void mam_channel_serialize(mam_channel_t const *const channel,
+                           trits_t *const buffer);
 
 retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
                                   mam_channel_t *const channel);
 
 size_t mam_channels_serialized_size(mam_channel_t_set_t const channels);
 
-retcode_t mam_channels_serialize(mam_channel_t_set_t const channels,
-                                 trits_t *const buffer);
+void mam_channels_serialize(mam_channel_t_set_t const channels,
+                            trits_t *const buffer);
 
 retcode_t mam_channels_deserialize(trits_t *const buffer,
                                    mam_prng_t *const prng,

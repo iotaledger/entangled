@@ -100,7 +100,7 @@ void test_endpoint(void) {
   trits_t trits = trits_alloc(size);
   trits_t cpy = trits;
 
-  TEST_ASSERT(mam_endpoints_serialize(endpoints_1, &trits) == RC_OK);
+  mam_endpoints_serialize(endpoints_1, &trits);
 
   TEST_ASSERT(mam_endpoints_deserialize(&cpy, channel_name_trits, &prng,
                                         &endpoints_2) == RC_OK);

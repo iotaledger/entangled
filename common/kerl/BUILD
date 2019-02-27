@@ -16,6 +16,7 @@ cc_library(
         "//common:defs",
         "//common:stdint",
         "//common/trinary:trits",
+        "//utils:memset_safe",
     ],
 )
 

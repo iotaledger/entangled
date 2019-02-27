@@ -35,7 +35,7 @@ void test_trytes_to_ascii(void) {
   size_t size = strlen((char *)trytes) / 2;
   char buffer[size];
 
-  trytes_to_ascii(trytes, buffer);
+  trytes_to_ascii(trytes, strlen((char *)trytes), buffer);
   TEST_ASSERT_EQUAL_MEMORY(ascii, buffer, size);
 }
 

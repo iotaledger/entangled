@@ -19,10 +19,10 @@ void test_add_neighbors(void) {
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(node.neighbors), 0);
 
-  add_neighbors_req_add(req, "udp://8.8.8.1:15001");
-  add_neighbors_req_add(req, "udp://8.8.8.2:15002");
-  add_neighbors_req_add(req, "tcp://8.8.8.3:15003");
-  add_neighbors_req_add(req, "tcp://8.8.8.4:15004");
+  add_neighbors_req_uris_add(req, "udp://8.8.8.1:15001");
+  add_neighbors_req_uris_add(req, "udp://8.8.8.2:15002");
+  add_neighbors_req_uris_add(req, "tcp://8.8.8.3:15003");
+  add_neighbors_req_uris_add(req, "tcp://8.8.8.4:15004");
 
   TEST_ASSERT(iota_api_add_neighbors(&api, req, res) == RC_OK);
 
@@ -62,9 +62,9 @@ void test_add_neighbors_with_already_paired(void) {
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(node.neighbors), 4);
 
-  add_neighbors_req_add(req, "udp://8.8.8.1:15001");
-  add_neighbors_req_add(req, "udp://8.8.8.5:15005");
-  add_neighbors_req_add(req, "tcp://8.8.8.3:15003");
+  add_neighbors_req_uris_add(req, "udp://8.8.8.1:15001");
+  add_neighbors_req_uris_add(req, "udp://8.8.8.5:15005");
+  add_neighbors_req_uris_add(req, "tcp://8.8.8.3:15003");
 
   TEST_ASSERT(iota_api_add_neighbors(&api, req, res) == RC_OK);
 
@@ -86,9 +86,9 @@ void test_add_neighbors_with_invalid(void) {
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(node.neighbors), 5);
 
-  add_neighbors_req_add(req, "udp://8.8.8.6:15006");
-  add_neighbors_req_add(req, "udp://8.8.8.7@15007");
-  add_neighbors_req_add(req, "udp://8.8.8.8:15008");
+  add_neighbors_req_uris_add(req, "udp://8.8.8.6:15006");
+  add_neighbors_req_uris_add(req, "udp://8.8.8.7@15007");
+  add_neighbors_req_uris_add(req, "udp://8.8.8.8:15008");
 
   TEST_ASSERT(iota_api_add_neighbors(&api, req, res) ==
               RC_NEIGHBOR_FAILED_URI_PARSING);

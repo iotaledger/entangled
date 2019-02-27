@@ -7,6 +7,7 @@
 
 #include "common/curl-p/bct.h"
 #include "common/curl-p/const.h"
+#include "utils/memset_safe.h"
 
 void s_transform(BCurl *const ctx);
 void transform_round(BCurl *const, BCurl *const, size_t const);
@@ -66,5 +67,6 @@ void sbox(BCurl *const c, BCurl const *const s, size_t const i) {
 }
 
 void s_curl_reset(BCurl *const ctx) {
-  memset(ctx->state, 0, S_STATE_LENGTH * sizeof(bct_t));
+  memset_safe(ctx->state, S_STATE_LENGTH * sizeof(bct_t), 0,
+              S_STATE_LENGTH * sizeof(bct_t));
 }

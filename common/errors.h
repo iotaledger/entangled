@@ -116,10 +116,9 @@ extern "C" {
     goto label;                       \
   else
 
-#define ERR_GUARD_RETURN(expr, err, e) \
-  if (!(expr)) {                       \
-    e = (err);                         \
-    return e;                          \
+#define ERR_GUARD_RETURN(expr, err) \
+  if (!(expr)) {                    \
+    return err;                     \
   } else
 
 #define ERR_GUARD_GOTO(expr, err, e, label) \
@@ -480,6 +479,10 @@ enum retcode_t {
   RC_MAM2_KEYLOAD_IRRELEVANT = 0x14 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
   RC_MAM2_KEYLOAD_OVERLOADED = 0x15 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
   RC_MAM2_BUNDLE_NOT_EMPTY = 0x16 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
+  RC_MAM2_BUNDLE_DOES_NOT_CONTAIN_HEADER =
+      0x17 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
+  RC_MAM2_RECV_CTX_NOT_FOUND = 0x18 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
+  RC_MAM2_MESSAGE_NOT_FOUND = 0x19 | RC_MODULE_MAM2 | RC_SEVERITY_MODERATE,
 
   // Helpers Module
   RC_HELPERS_POW_INVALID_TX = 0x01 | RC_MODULE_HELPERS | RC_SEVERITY_MODERATE,

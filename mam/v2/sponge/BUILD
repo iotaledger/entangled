@@ -10,6 +10,7 @@ cc_library(
         "//mam/v2:defs",
         "//mam/v2/trits",
         "//mam/v2/trits:buffers",
+        "//mam/v2/troika",
     ],
 )
 

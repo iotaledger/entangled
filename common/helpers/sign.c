@@ -134,7 +134,8 @@ IOTA_EXPORT trit_t* iota_sign_signature_gen_trits(
   memcpy(subseed, seed, HASH_LENGTH_TRIT);
   iss_kerl_subseed(subseed, subseed, index, &kerl);
   iss_kerl_key(subseed, key, key_length, &kerl);
-  memset(subseed, 0, HASH_LENGTH_TRIT * sizeof(trit_t));
+  memset_safe(subseed, HASH_LENGTH_TRIT * sizeof(trit_t), 0,
+              HASH_LENGTH_TRIT * sizeof(trit_t));
   normalize_hash_to_trits(bundle_hash, normalized_bundle_hash);
   iss_kerl_signature(key, normalized_bundle_hash, key, key_length, &kerl);
   kerl_reset(&kerl);
@@ -167,7 +168,7 @@ IOTA_EXPORT char* iota_sign_signature_gen_trytes(
     free(signature);
     return NULL;
   }
-  memset(seed_trits, 0, HASH_LENGTH_TRIT);
+  memset_safe(seed_trits, HASH_LENGTH_TRIT, 0, HASH_LENGTH_TRIT);
   trits_to_trytes(signature_trits, (tryte_t*)signature, signature_length);
   free(signature_trits);
 
@@ -202,7 +203,7 @@ IOTA_EXPORT flex_trit_t* iota_sign_signature_gen_flex_trits(
     free(signature);
     return NULL;
   }
-  memset(seed_trits, 0, HASH_LENGTH_TRIT);
+  memset_safe(seed_trits, HASH_LENGTH_TRIT, 0, HASH_LENGTH_TRIT);
   flex_trits_from_trits(signature, signature_length, signature_trits,
                         signature_length, signature_length);
   free(signature_trits);

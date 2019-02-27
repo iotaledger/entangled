@@ -1,5 +1,6 @@
 cc_test(
     name = "test_message",
+    timeout = "long",
     srcs = ["test_message.c"],
     deps = [
         "//mam/v2/mam:message",
@@ -9,17 +10,8 @@ cc_test(
 )
 
 cc_test(
-    name = "test_mam_types",
-    srcs = ["test_mam_types.c"],
-    deps = [
-        "//mam/v2/mam:mam_psk_t_set",
-        "//mam/v2/mam:mam_types",
-        "@unity",
-    ],
-)
-
-cc_test(
     name = "test_endpoint",
+    timeout = "long",
     srcs = ["test_endpoint.c"],
     deps = [
         "//mam/v2/mam:endpoint",
@@ -32,6 +24,7 @@ cc_test(
 
 cc_test(
     name = "test_channel",
+    timeout = "long",
     srcs = ["test_channel.c"],
     deps = [
         "//mam/v2/mam:channel",

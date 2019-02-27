@@ -14,31 +14,29 @@
 #include "mam/v2/prng/mam_prng_t_set.h"
 #include "mam/v2/prng/prng.h"
 
-retcode_t mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
+void mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
   MAM2_ASSERT(trits_size(secret_key) == MAM2_PRNG_KEY_SIZE);
-
   trits_copy(secret_key, trits_from_rep(MAM2_PRNG_KEY_SIZE, prng->secret_key));
-
-  return RC_OK;
 }
 
-retcode_t mam_prng_destroy(mam_prng_t *const prng) {
-  memset(prng, 0, sizeof(mam_prng_t));
-
-  return RC_OK;
+void mam_prng_destroy(mam_prng_t *const prng) {
+  memset_safe(prng, sizeof(mam_prng_t), 0, sizeof(mam_prng_t));
 }
 
-void mam_prng_gen(mam_prng_t const *const prng, tryte_t const destination,
+void mam_prng_gen(mam_prng_t const *const prng,
+                  mam_prng_destination_tryte_t const destination,
                   trits_t const nonce, trits_t output) {
   mam_prng_gen3(prng, destination, nonce, trits_null(), trits_null(), output);
 }
 
-void mam_prng_gen2(mam_prng_t const *const prng, tryte_t const destination,
+void mam_prng_gen2(mam_prng_t const *const prng,
+                   mam_prng_destination_tryte_t const destination,
                    trits_t const nonce1, trits_t const nonce2, trits_t output) {
   mam_prng_gen3(prng, destination, nonce1, nonce2, trits_null(), output);
 }
 
-void mam_prng_gen3(mam_prng_t const *const prng, tryte_t const destination,
+void mam_prng_gen3(mam_prng_t const *const prng,
+                   mam_prng_destination_tryte_t const destination,
                    trits_t const nonce1, trits_t const nonce2,
                    trits_t const nonce3, trits_t output) {
   mam_sponge_t sponge;

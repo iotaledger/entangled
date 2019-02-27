@@ -312,8 +312,8 @@ retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
  */
 retcode_t iota_client_promote_transaction(
     iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
-    int const depth, int const mwm, transfer_list_t const* const transfers,
-    transaction_array_t* const tx_objs);
+    int const depth, int const mwm, bundle_transactions_t* const bundle,
+    bundle_transactions_t* const out_bundle);
 
 /**
  * Reattaches a transfer to tangle by selecting tips & performing the
