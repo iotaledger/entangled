@@ -239,7 +239,7 @@ trits_t msg_trits_from_bundle(bundle_transactions_t const *const bundle,
       continue;
     }
     flex_trits_to_trits(msg_trits_ptr, NUM_TRITS_SIGNATURE,
-                        transaction_signature(curr_tx), NUM_TRITS_SIGNATURE,
+                        transaction_message(curr_tx), NUM_TRITS_SIGNATURE,
                         NUM_TRITS_SIGNATURE);
     msg_trits_ptr += NUM_TRITS_SIGNATURE;
   }
@@ -291,15 +291,12 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
 
   size_t packet_index = msg.d / NUM_TRITS_SIGNATURE + 1;
   if (packet_index < bundle_transactions_size(bundle)) {
-    size_t num_trits_in_packet =
-        (bundle_transactions_size(bundle) - packet_index) * NUM_TRITS_SIGNATURE;
-    trits_t packet = trits_null();
+    trits_t payload_trits = trits_null();
     trits_advance(&msg, NUM_TRITS_SIGNATURE - msg.d % NUM_TRITS_SIGNATURE);
-    ERR_BIND_RETURN(mam_msg_recv_packet(&ctx, &msg, &packet), err);
-
-    *payload_size = trits_size(packet) / 3;
+    ERR_BIND_RETURN(mam_msg_recv_packet(&ctx, &msg, &payload_trits), err);
+    *payload_size = trits_size(payload_trits) / 3;
     *payload = malloc(*payload_size * sizeof(tryte_t));
-    trits_to_trytes(packet.p, *payload, *payload_size * 3);
+    trits_to_trytes(payload_trits.p, *payload, *payload_size * 3);
   }
 
   return RC_OK;

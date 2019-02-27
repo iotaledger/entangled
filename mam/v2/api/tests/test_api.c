@@ -269,7 +269,7 @@ static void test_api_write_packet(
   ascii_to_trytes(payload1, payload_trytes);
 
   TEST_ASSERT(mam_api_bundle_write_packet(api, cha, msg_id, payload_trytes,
-                                          strlen(payload1) * 2, checksum,
+                                          2 * strlen(payload1), checksum,
                                           bundle) == RC_OK);
 
   free(payload_trytes);
@@ -286,8 +286,9 @@ static void test_api_read_msg(mam_api_t *const api,
   TEST_ASSERT(mam_api_bundle_read_msg(api, bundle, &payload_trytes,
                                       &payload_size) == RC_OK);
 
-  *payload2 = (char *)calloc(payload_size * 2 + 1, sizeof(char));
+  *payload2 = (char *)calloc(payload_size / 2 + 1, sizeof(char));
   trytes_to_ascii(payload_trytes, payload_size, *payload2);
+  free(payload_trytes);
 }
 
 static void test_api_create_channels(mam_api_t *api, mam_channel_t **const cha,
