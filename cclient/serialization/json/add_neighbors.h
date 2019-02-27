@@ -22,6 +22,14 @@ retcode_t json_add_neighbors_serialize_request(
     const serializer_t* const s, const add_neighbors_req_t* const obj,
     char_buffer_t* out);
 
+retcode_t json_add_neighbors_serialize_response(
+    const serializer_t* const s, const add_neighbors_res_t* const obj,
+    char_buffer_t* out);
+
+retcode_t json_add_neighbors_deserialize_request(const serializer_t* const s,
+                                                 const char* const obj,
+                                                 add_neighbors_req_t* out);
+
 retcode_t json_add_neighbors_deserialize_response(const serializer_t* const s,
                                                   const char* const obj,
                                                   add_neighbors_res_t* out);
