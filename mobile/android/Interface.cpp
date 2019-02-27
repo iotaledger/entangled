@@ -7,6 +7,8 @@
 #include "common/helpers/pow.h"
 #include "common/helpers/sign.h"
 
+#include "utils/memset_safe.h"
+
 #include "Interface.h"
 
 extern "C" {
@@ -111,7 +113,7 @@ Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trytes(
   if ((address = iota_sign_address_gen_trytes(seed, index, security)) == NULL) {
     return NULL;
   }
-  std::memset((void*)seed, 0, 81);
+  memset_safe((void*)seed, 81, 0, 81);
 
   jstring out = env->NewStringUTF(address);
   free(address);
@@ -133,7 +135,7 @@ Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trits(
   if ((address = iota_sign_address_gen_trits(seed, index, security)) == NULL) {
     return NULL;
   }
-  std::memset((void*)seed, 0, 243);
+  memset_safe((void*)seed, 243, 0, 243);
 
   jbyteArray out = env->NewByteArray(243);
   env->SetByteArrayRegion(out, 0, 243, (const jbyte*)address);
@@ -159,7 +161,7 @@ Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trytes(
                                                   bundleHash)) == NULL) {
     return NULL;
   }
-  std::memset((void*)seed, 0, 81);
+  memset_safe((void*)seed, 81, 0, 81);
 
   jstring out = env->NewStringUTF(signature);
   free(signature);
@@ -184,7 +186,7 @@ Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trits(
                                                  bundleHash)) == NULL) {
     return NULL;
   }
-  std::memset((void*)seed, 0, 243);
+  memset_safe((void*)seed, 243, 0, 243);
 
   int signatureLength = 6561 * security;
   jbyteArray out = env->NewByteArray(signatureLength);
