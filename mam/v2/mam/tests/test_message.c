@@ -277,10 +277,10 @@ static void message_test_generic(mam_prng_t *prng_sender,
   }
 
   /* chid=0, epid=1, chid1=2, epid1=3*/
-  for (pubkey = 0; pubkey < 4; ++pubkey) {
+  for (pubkey = 0; (int)pubkey < 4; ++pubkey) {
     /* public=0, psk=1, ntru=2 */
-    for (keyload = 0; keyload < 3; ++keyload) {
-      for (checksum = 0; checksum < 3; ++checksum)
+    for (keyload = 0; (int)keyload < 3; ++keyload) {
+      for (checksum = 0; (int)checksum < 3; ++checksum)
       /* none=0, mac=1, mssig=2 */
       {
         /* send msg and packet */
