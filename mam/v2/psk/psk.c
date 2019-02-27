@@ -10,6 +10,7 @@
 
 #include "mam/v2/psk/psk.h"
 #include "mam/v2/ntru/ntru.h"
+#include "mam/v2/pb3/pb3.h"
 #include "mam/v2/psk/mam_psk_t_set.h"
 
 trits_t mam_psk_id(mam_psk_t const *const psk) {
