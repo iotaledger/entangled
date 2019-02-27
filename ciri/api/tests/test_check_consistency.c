@@ -39,7 +39,7 @@ void test_check_consistency_invalid_subtangle_status(void) {
   TEST_ASSERT(res->state == false);
 
   check_consistency_req_free(&req);
-  check_consistency_res_free(res);
+  check_consistency_res_free(&res);
 }
 
 void test_check_consistency_missing_tail(void) {
@@ -56,7 +56,7 @@ void test_check_consistency_missing_tail(void) {
   TEST_ASSERT(res->state == false);
 
   check_consistency_req_free(&req);
-  check_consistency_res_free(res);
+  check_consistency_res_free(&res);
 }
 
 void test_check_consistency_not_tail(void) {
@@ -81,7 +81,7 @@ void test_check_consistency_not_tail(void) {
   TEST_ASSERT(res->state == false);
 
   check_consistency_req_free(&req);
-  check_consistency_res_free(res);
+  check_consistency_res_free(&res);
 }
 
 void test_check_consistency_tail_not_solid(void) {
@@ -108,7 +108,7 @@ void test_check_consistency_tail_not_solid(void) {
   TEST_ASSERT_EQUAL_STRING(res->info->data, API_TAILS_NOT_SOLID);
 
   check_consistency_req_free(&req);
-  check_consistency_res_free(res);
+  check_consistency_res_free(&res);
 }
 
 void test_check_consistency_invalid_bundle(void) {
@@ -141,7 +141,7 @@ void test_check_consistency_invalid_bundle(void) {
   TEST_ASSERT_EQUAL_STRING(res->info->data, API_TAILS_BUNDLE_INVALID);
 
   check_consistency_req_free(&req);
-  check_consistency_res_free(res);
+  check_consistency_res_free(&res);
   transactions_free(txs, 4);
 }
 
@@ -184,15 +184,16 @@ void test_check_consistency_consistent_ledger(bool consistency) {
 
   TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res) == RC_OK);
   if (consistency) {
-    TEST_ASSERT(res->state == true);
-    TEST_ASSERT_NULL(res->info->data);
+    TEST_ASSERT_TRUE(res->state);
+    TEST_ASSERT_NULL(res->info);
   } else {
-    TEST_ASSERT(res->state == false);
+    TEST_ASSERT_FALSE(res->state);
+    TEST_ASSERT_NOT_NULL(res->info);
     TEST_ASSERT_EQUAL_STRING(res->info->data, API_TAILS_NOT_CONSISTENT);
   }
 
   check_consistency_req_free(&req);
-  check_consistency_res_free(res);
+  check_consistency_res_free(&res);
   transactions_free(txs, 4);
 }
 

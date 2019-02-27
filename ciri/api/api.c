@@ -473,15 +473,15 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api,
     } else if (tx.essence.current_index != 0) {
       ret = RC_API_NOT_TAIL;
     } else if (!tx.metadata.solid) {
-      char_buffer_set(res->info, API_TAILS_NOT_SOLID);
+      check_consistency_res_info_set(res, API_TAILS_NOT_SOLID);
     } else if ((ret = iota_consensus_bundle_validator_validate(
                     tangle, iter->hash, bundle, &bundle_status)) != RC_OK) {
     } else if (bundle_status != BUNDLE_VALID ||
                bundle_transactions_size(bundle) == 0) {
-      char_buffer_set(res->info, API_TAILS_BUNDLE_INVALID);
+      check_consistency_res_info_set(res, API_TAILS_BUNDLE_INVALID);
     }
     bundle_transactions_free(&bundle);
-    if (ret != RC_OK || res->info->data != NULL) {
+    if (ret != RC_OK || (res->info != NULL && res->info->data != NULL)) {
       return ret;
     }
   }
@@ -497,7 +497,7 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api,
                &walker_validator, tangle, iter->hash, &res->state)) != RC_OK) {
         break;
       } else if (!res->state) {
-        char_buffer_set(res->info, API_TAILS_NOT_CONSISTENT);
+        check_consistency_res_info_set(res, API_TAILS_NOT_CONSISTENT);
         break;
       }
     }

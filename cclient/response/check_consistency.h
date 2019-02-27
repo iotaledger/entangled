@@ -20,7 +20,9 @@ typedef struct check_consistency_res_s {
 } check_consistency_res_t;
 
 check_consistency_res_t* check_consistency_res_new();
-void check_consistency_res_free(check_consistency_res_t* res);
+retcode_t check_consistency_res_info_set(check_consistency_res_t* res,
+                                         const char* info);
+retcode_t check_consistency_res_free(check_consistency_res_t** res);
 
 #ifdef __cplusplus
 }
