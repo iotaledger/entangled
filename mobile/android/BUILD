@@ -6,7 +6,10 @@ cc_library(
     ],
     hdrs = ["Interface.h"],
     linkopts = ["-lm"],
-    deps = ["//common/helpers"],
+    deps = [
+        "//common/helpers",
+        "//utils:memset_safe",
+    ],
 )
 
 android_binary(
