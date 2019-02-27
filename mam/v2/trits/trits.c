@@ -541,12 +541,14 @@ bool trits_is_overlapped(trits_t x, trits_t y) {
 }
 
 trits_t trits_diff(trits_t begin, trits_t end) {
-  MAM2_ASSERT(trits_is_overlapped(begin, end) || trits_is_empty(end));
-  MAM2_ASSERT(begin.p == end.p);
-  MAM2_ASSERT(begin.n == end.n);
-  MAM2_ASSERT(begin.d <= end.d);
+  MAM2_ASSERT(begin.p == end.p);    // same buffer
+  MAM2_ASSERT(begin.d <= end.d);    // begin before end
+  MAM2_ASSERT(begin.d <= begin.n);  // begin consistent
+  MAM2_ASSERT(end.d <= end.n);      // end consistent
 
-  return trits_take(begin, end.d - begin.d);
+  begin.n = end.d;
+
+  return begin;
 }
 
 trits_t trits_null() { return trits_from_rep(0, 0); }
