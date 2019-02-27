@@ -7,9 +7,15 @@
 
 #include "utils/memset_safe.h"
 
-#ifndef __STDC_LIB_EXT1__
+#define __STDC_WANT_LIB_EXT1__ 1
+#include <errno.h>
+#include <stdint.h>
+#include <string.h>
 
-errno_t memset_safe(void *dest, size_t destsz, int ch, size_t count) {
+int memset_safe(void *dest, size_t destsz, int ch, size_t count) {
+#ifdef __STDC_LIB_EXT1__
+  return memset_s(dest, destsz, ch, count);
+#else
   if (dest == NULL) {
     return EINVAL;
   } else if (destsz > SIZE_MAX || count > SIZE_MAX) {
@@ -24,6 +30,5 @@ errno_t memset_safe(void *dest, size_t destsz, int ch, size_t count) {
   }
 
   return 0;
-}
-
 #endif
+}

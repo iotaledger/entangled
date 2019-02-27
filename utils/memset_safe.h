@@ -8,28 +8,13 @@
 #ifndef __UTILS_MEMSET_SAFE_H__
 #define __UTILS_MEMSET_SAFE_H__
 
-#define __STDC_WANT_LIB_EXT1__ 1
-#include <errno.h>
-#include <stdint.h>
-#include <string.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifndef __STDC_LIB_EXT1__
-
-typedef int errno_t;
-errno_t memset_safe(void *dest, size_t destsz, int ch, size_t count);
-
-#else
-
-static inline errno_t memset_safe(void *dest, size_t destsz, int ch,
-                                  size_t count) {
-  return memset_s(dest, destsz, ch, count);
-}
-
-#endif
+int memset_safe(void *dest, size_t destsz, int ch, size_t count);
 
 #ifdef __cplusplus
 }
