@@ -111,6 +111,7 @@ Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trytes(
   char const* seed = env->GetStringUTFChars(jseed, 0);
 
   if ((address = iota_sign_address_gen_trytes(seed, index, security)) == NULL) {
+    memset_safe((void*)seed, 81, 0, 81);
     return NULL;
   }
   memset_safe((void*)seed, 81, 0, 81);
@@ -133,6 +134,7 @@ Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trits(
   trit_t const* seed = (trit_t*)env->GetByteArrayElements(jseed, 0);
 
   if ((address = iota_sign_address_gen_trits(seed, index, security)) == NULL) {
+    memset_safe((void*)seed, 81, 0, 81);
     return NULL;
   }
   memset_safe((void*)seed, 243, 0, 243);
@@ -159,6 +161,7 @@ Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trytes(
 
   if ((signature = iota_sign_signature_gen_trytes(seed, index, security,
                                                   bundleHash)) == NULL) {
+    memset_safe((void*)seed, 81, 0, 81);
     return NULL;
   }
   memset_safe((void*)seed, 81, 0, 81);
@@ -184,6 +187,7 @@ Java_org_iota_mobile_Interface_iota_1sign_1signature_1gen_1trits(
 
   if ((signature = iota_sign_signature_gen_trits(seed, index, security,
                                                  bundleHash)) == NULL) {
+    memset_safe((void*)seed, 243, 0, 243);
     return NULL;
   }
   memset_safe((void*)seed, 243, 0, 243);
