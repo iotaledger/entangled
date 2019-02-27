@@ -204,7 +204,7 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
     mss_gen(mss, pk);
 
     do {
-      if (curr_height > 1 && ((rand() % 2) == 0)) {
+      if (curr_height > 1 && ((rand_handle_rand() % 2) == 0)) {
         continue;
       }
       mss_sign(mss, hash, sig);
