@@ -73,6 +73,8 @@ static serializer_vtable json_vtable = {
         json_attach_to_tangle_deserialize_response,
     .broadcast_transactions_serialize_request =
         json_broadcast_transactions_serialize_request,
+    .broadcast_transactions_deserialize_request =
+        json_broadcast_transactions_deserialize_request,
     .store_transactions_serialize_request =
         json_store_transactions_serialize_request,
     .check_consistency_serialize_request =

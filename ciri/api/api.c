@@ -371,6 +371,10 @@ retcode_t iota_api_broadcast_transactions(
     return RC_NULL_PARAM;
   }
 
+  if (req->trytes == NULL) {
+    return ret;
+  }
+
   HASH_ARRAY_FOREACH(req->trytes, elt) {
     transaction_deserialize_from_trits(&tx, elt, true);
     if (!iota_consensus_transaction_validate(
