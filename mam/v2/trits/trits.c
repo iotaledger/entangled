@@ -546,7 +546,7 @@ trits_t trits_diff(trits_t begin, trits_t end) {
   MAM2_ASSERT(begin.n == end.n);
   MAM2_ASSERT(begin.d <= end.d);
 
-  return trits_from_rep(end.d - begin.d, begin.p);
+  return trits_take(begin, end.d - begin.d);
 }
 
 trits_t trits_null() { return trits_from_rep(0, 0); }
