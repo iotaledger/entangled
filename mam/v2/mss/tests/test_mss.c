@@ -12,6 +12,7 @@
 
 #include "mam/v2/mss/mss.h"
 #include "mam/v2/test_utils/test_utils.h"
+#include "utils/handles/rand.h"
 
 #if !defined(MAM2_MSS_TEST_MAX_D)
 #define MAM2_MSS_TEST_MAX_D 3
@@ -99,7 +100,6 @@ def_test_mss_check(4, 4);
 // def_test_mss_check(MAM2_MSS_TEST_MAX_D, );
 
 static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
-                           mam_spongos_t *spongos, mam_wots_t *wots,
                            mss_mt_height_t max_height) {
   bool r = true;
   retcode_t e;
@@ -162,7 +162,7 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
 }
 
 static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
-                     mam_wots_t *wots, mss_mt_height_t max_height) {
+                     mss_mt_height_t max_height) {
   bool r = true;
   MAM2_TRITS_DEF0(key, MAM2_PRNG_KEY_SIZE);
   mss_mt_height_t curr_height;
@@ -204,6 +204,9 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
     mss_gen(mss, pk);
 
     do {
+      if (curr_height > 1 && ((rand_handle_rand() % 2) == 0)) {
+        continue;
+      }
       mss_sign(mss, hash, sig);
       mam_spongos_init(&wots_spongos);
       r = r && mss_verify(spongos, &wots_spongos, hash, sig, pk);
@@ -256,7 +259,6 @@ static void mss_meta_test(void) {
   mam_spongos_t sg;
 
   mam_prng_t p;
-  mam_wots_t w;
   mss_t *m1 = test_mss_init1(_m1);
   mss_t *m2 = test_mss_init2(_m2);
   mss_t *m3 = test_mss_init3(_m3);
@@ -266,15 +268,14 @@ static void mss_meta_test(void) {
   // mss_t *mx = test_mss_initx(_mx);
   // mss_t *m = test_mss_init(_m);
 
-  mam_wots_init(&w);
   mam_spongos_init(&sg);
 
-  TEST_ASSERT_TRUE(mss_test(m1, &p, &sg, &w, 1) && test_mss_check1(_m1));
-  TEST_ASSERT_TRUE(mss_test(m2, &p, &sg, &w, 2) && test_mss_check2(_m2));
-  TEST_ASSERT_TRUE(mss_test(m3, &p, &sg, &w, 3) && test_mss_check3(_m3));
-  // TEST_ASSERT_TRUE(mss_test(m4, p, sg, w, 4) && test_mss_check4(_m4));
-  TEST_ASSERT_TRUE(mss_store_test(m4, m42, &p, &sg, &w, 4) &&
-                   test_mss_check4(_m4) && test_mss_check4(_m42));
+  TEST_ASSERT_TRUE(mss_test(m1, &p, &sg, 1) && test_mss_check1(_m1));
+  TEST_ASSERT_TRUE(mss_test(m2, &p, &sg, 2) && test_mss_check2(_m2));
+  TEST_ASSERT_TRUE(mss_test(m3, &p, &sg, 3) && test_mss_check3(_m3));
+  // TEST_ASSERT_TRUE(mss_test(m4, &p, &sg, 4) && test_mss_check4(_m4));
+  TEST_ASSERT_TRUE(mss_store_test(m4, m42, &p, 2) && test_mss_check4(_m4) &&
+                   test_mss_check4(_m42));
   // #if 0
   //   TEST_ASSERT_TRUE(mss_test(m5, p, sg, w, 5) && test_mss_check5(_m5));
   //   TEST_ASSERT_TRUE(mss_test(mx, p, sg, w, 10) && test_mss_checkx(_mx));

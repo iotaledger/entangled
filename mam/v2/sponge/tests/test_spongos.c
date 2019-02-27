@@ -33,6 +33,7 @@ static void mam_spongos_test(void) {
 
   mam_spongos_init(&spongos);
   mam_spongos_absorb(&spongos, x);
+  mam_spongos_commit(&spongos);
   mam_spongos_squeeze(&spongos, y);
 
   mam_spongos_init(&spongos);
