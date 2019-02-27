@@ -21,6 +21,30 @@ extern "C" {
 #include "cclient/types/types.h"
 #include "common/errors.h"
 
+#define JSON_CHECK_ERROR(OBJ, ITEM, LOGGER)                    \
+  do {                                                         \
+    if (OBJ == NULL) {                                         \
+      log_error(LOGGER, "[%s:%d] %s\n", __func__, __LINE__,    \
+                STR_CCLIENT_JSON_PARSE);                       \
+      cJSON_Delete(OBJ);                                       \
+      return RC_CCLIENT_JSON_PARSE;                            \
+    }                                                          \
+    ITEM = cJSON_GetObjectItemCaseSensitive(OBJ, "error");     \
+    if (cJSON_IsString(ITEM) && (ITEM->valuestring != NULL)) { \
+      log_error(LOGGER, "[%s:%d] %s %s\n", __func__, __LINE__, \
+                STR_CCLIENT_RES_ERROR, ITEM->valuestring);     \
+      cJSON_Delete(OBJ);                                       \
+      return RC_CCLIENT_RES_ERROR;                             \
+    }                                                          \
+    ITEM = cJSON_GetObjectItemCaseSensitive(OBJ, "exception"); \
+    if (cJSON_IsString(ITEM) && (ITEM->valuestring != NULL)) { \
+      log_error(LOGGER, "[%s:%d] %s %s\n", __func__, __LINE__, \
+                STR_CCLIENT_RES_ERROR, ITEM->valuestring);     \
+      cJSON_Delete(OBJ);                                       \
+      return RC_CCLIENT_RES_ERROR;                             \
+    }                                                          \
+  } while (0);
+
 retcode_t json_array_to_uint64(cJSON const *const obj,
                                char const *const obj_name, UT_array *ut);
 
@@ -38,6 +62,9 @@ retcode_t json_string_array_to_utarray(cJSON const *const obj,
 
 retcode_t json_get_int(cJSON const *const json_obj, char const *const obj_name,
                        int *const num);
+
+retcode_t json_get_uint8(cJSON const *const json_obj,
+                         char const *const obj_name, uint8_t *const num);
 
 retcode_t json_get_uint16(cJSON const *const json_obj,
                           char const *const obj_name, uint16_t *const num);
@@ -77,9 +104,9 @@ retcode_t flex_trits_to_json_string(cJSON *const json_obj,
                                     flex_trit_t const *const hash,
                                     size_t num_trits);
 
-retcode_t json_string_to_flex_trits(cJSON const *const json_obj,
-                                    char const *const key, flex_trit_t hash[],
-                                    size_t num_trits);
+retcode_t json_string_hash_to_flex_trits(cJSON const *const json_obj,
+                                         char const *const key,
+                                         flex_trit_t *hash);
 
 retcode_t hash8019_queue_to_json_array(hash8019_queue_t queue,
                                        cJSON *const json_root,

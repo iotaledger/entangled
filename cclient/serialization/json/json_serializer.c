@@ -65,6 +65,10 @@ static serializer_vtable json_vtable = {
     .get_trytes_deserialize_response = json_get_trytes_deserialize_response,
     .attach_to_tangle_serialize_request =
         json_attach_to_tangle_serialize_request,
+    .attach_to_tangle_serialize_response =
+        json_attach_to_tangle_serialize_response,
+    .attach_to_tangle_deserialize_request =
+        json_attach_to_tangle_deserialize_request,
     .attach_to_tangle_deserialize_response =
         json_attach_to_tangle_deserialize_response,
     .broadcast_transactions_serialize_request =

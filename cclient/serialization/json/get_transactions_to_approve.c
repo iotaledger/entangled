@@ -74,14 +74,14 @@ retcode_t json_get_transactions_to_approve_deserialize_response(
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_string_to_flex_trits(json_obj, "trunkTransaction", out->trunk,
-                                  NUM_TRITS_HASH);
+  ret =
+      json_string_hash_to_flex_trits(json_obj, "trunkTransaction", out->trunk);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_string_to_flex_trits(json_obj, "branchTransaction", out->branch,
-                                  NUM_TRITS_HASH);
+  ret = json_string_hash_to_flex_trits(json_obj, "branchTransaction",
+                                       out->branch);
   if (ret != RC_OK) {
     goto end;
   }
