@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "shared.h"
+#include "cclient/serialization/json/tests/shared.h"
 
 void test_serialize_get_neighbors(void) {
   serializer_t serializer;

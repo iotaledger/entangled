@@ -78,6 +78,33 @@ retcode_t json_boolean_array_to_utarray(cJSON const* const obj,
   return RC_OK;
 }
 
+retcode_t json_string_array_to_utarray(cJSON const* const obj,
+                                       char const* const obj_name,
+                                       UT_array* const ut) {
+  char* str = NULL;
+
+  cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
+  if (cJSON_IsArray(json_item)) {
+    cJSON* current_obj = NULL;
+    cJSON_ArrayForEach(current_obj, json_item) {
+      str = cJSON_GetStringValue(current_obj);
+      if (!str) {
+        log_error(json_logger_id, "[%s:%d] encountered non-string array member",
+                  __func__, __LINE__);
+        return RC_CCLIENT_JSON_PARSE;
+      }
+
+      utarray_push_back(ut, &str);
+    }
+  } else {
+    log_error(json_logger_id, "[%s:%d] %s not array\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_PARSE);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  return RC_OK;
+}
+
 retcode_t json_get_int(cJSON const* const json_obj, char const* const obj_name,
                        int* const num) {
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);

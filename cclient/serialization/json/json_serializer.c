@@ -30,6 +30,11 @@
 #include "cclient/serialization/json/store_transactions.h"
 
 static serializer_vtable json_vtable = {
+    .add_neighbors_serialize_request = json_add_neighbors_serialize_request,
+    .add_neighbors_serialize_response = json_add_neighbors_serialize_response,
+    .add_neighbors_deserialize_request = json_add_neighbors_deserialize_request,
+    .add_neighbors_deserialize_response =
+        json_add_neighbors_deserialize_response,
     .find_transactions_serialize_request =
         json_find_transactions_serialize_request,
     .find_transactions_deserialize_response =
@@ -52,9 +57,6 @@ static serializer_vtable json_vtable = {
         json_get_transactions_to_approve_serialize_request,
     .get_transactions_to_approve_deserialize_response =
         json_get_transactions_to_approve_deserialize_response,
-    .add_neighbors_serialize_request = json_add_neighbors_serialize_request,
-    .add_neighbors_deserialize_response =
-        json_add_neighbors_deserialize_response,
     .remove_neighbors_serialize_request =
         json_remove_neighbors_serialize_request,
     .remove_neighbors_deserialize_response =
