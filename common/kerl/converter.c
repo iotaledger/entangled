@@ -122,7 +122,7 @@ void convert_bytes_to_trits(uint8_t *const bytes, trit_t *const trits) {
   uint32_t *base = (uint32_t *)bytes;
 
   if (is_null(base)) {
-    memset(trits, 0, TRIT_LEN);
+    memset_safe(trits, TRIT_LEN, 0, TRIT_LEN);
     return;
   }
 

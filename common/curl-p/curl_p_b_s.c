@@ -74,5 +74,6 @@ void sbox(bct_s_curl_t *const c, bct_s_curl_t *const s, size_t const i,
 }
 
 void s_curl_reset(bct_s_curl_t *ctx) {
-  memset(ctx->state, 0, S_S_STATE_LENGTH * sizeof(bct_t));
+  memset_safe(ctx->state, S_S_STATE_LENGTH * sizeof(bct_t), 0,
+              S_S_STATE_LENGTH * sizeof(bct_t));
 }

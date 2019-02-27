@@ -14,6 +14,7 @@ extern "C" {
 
 #include "common/stdint.h"
 #include "common/trinary/trits.h"
+#include "utils/memset_safe.h"
 
 void convert_trits_to_bytes(trit_t const *const trits, uint8_t *const bytes);
 

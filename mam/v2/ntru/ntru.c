@@ -32,7 +32,7 @@ retcode_t ntru_init(mam_ntru_sk_t *const ntru) {
 retcode_t ntru_destroy(mam_ntru_sk_t *const ntru) {
   MAM2_ASSERT(ntru);
 
-  memset(ntru, 0, sizeof(mam_ntru_sk_t));
+  memset_safe(ntru, sizeof(mam_ntru_sk_t), 0, sizeof(mam_ntru_sk_t));
 
   return RC_OK;
 }

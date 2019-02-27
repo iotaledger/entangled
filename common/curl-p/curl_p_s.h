@@ -9,6 +9,7 @@
 #define __CURL_S_H__
 
 #include "common/trinary/trits.h"
+#include "utils/memset_safe.h"
 
 #define S_STATE_LENGTH 81
 

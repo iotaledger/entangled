@@ -21,6 +21,7 @@ cc_library(
         ":poly",
         "//mam/v2/prng",
         "//mam/v2/sponge:spongos",
+        "//utils:memset_safe",
     ],
 )
 

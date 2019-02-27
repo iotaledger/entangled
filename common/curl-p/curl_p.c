@@ -61,4 +61,6 @@ void curl_squeeze(Curl *const ctx, trit_t *const trits, size_t length) {
   }
 }
 
-void curl_reset(Curl *const ctx) { memset(ctx->state, 0, sizeof(ctx->state)); }
+void curl_reset(Curl *const ctx) {
+  memset_safe(ctx->state, sizeof(ctx->state), 0, sizeof(ctx->state));
+}

@@ -10,6 +10,7 @@
 
 #include "common/curl-p/const.h"
 #include "common/trinary/ptrit.h"
+#include "utils/memset_safe.h"
 
 #ifdef __cplusplus
 extern "C" {
