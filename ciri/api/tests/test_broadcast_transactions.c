@@ -55,7 +55,8 @@ void test_broadcast_transactions_invalid_tx(void) {
   transaction_deserialize_from_trits(&tx, tx_trits, false);
   transaction_set_value(&tx, -IOTA_SUPPLY - 1);
   transaction_serialize_on_flex_trits(&tx, tx_trits);
-  hash_array_push(req->trytes, tx_trits);
+
+  broadcast_transactions_req_trytes_add(req, tx_trits);
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req) == RC_OK);
 
   TEST_ASSERT_EQUAL_INT(broadcaster_size(&api.node->broadcaster), 0);
@@ -77,7 +78,7 @@ void test_broadcast_transactions(void) {
     flex_trits_from_trytes(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
                            txs_trytes[i], NUM_TRYTES_SERIALIZED_TRANSACTION,
                            NUM_TRYTES_SERIALIZED_TRANSACTION);
-    hash_array_push(req->trytes, tx_trits);
+    broadcast_transactions_req_trytes_add(req, tx_trits);
   }
   TEST_ASSERT(iota_api_broadcast_transactions(&api, req) == RC_OK);
 

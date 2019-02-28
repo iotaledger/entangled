@@ -25,6 +25,11 @@ typedef struct check_consistency_req_s {
 check_consistency_req_t* check_consistency_req_new();
 void check_consistency_req_free(check_consistency_req_t** req);
 
+static inline retcode_t check_consistency_req_tails_add(
+    check_consistency_req_t* const req, const flex_trit_t* const hash) {
+  return hash243_queue_push(&req->tails, hash);
+}
+
 #ifdef __cplusplus
 }
 #endif
