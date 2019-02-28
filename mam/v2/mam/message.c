@@ -276,6 +276,8 @@ static retcode_t mam_msg_unwrap_keyload_psk(mam_spongos_t *s, trits_t *b,
   retcode_t e = RC_OK;
   MAM2_TRITS_DEF0(id, MAM2_PSK_ID_SIZE);
   id = MAM2_TRITS_INIT(id, MAM2_PSK_ID_SIZE);
+  trit_t key2_trits[MAM2_SPONGE_KEY_SIZE];
+  trits_t key2 = trits_from_rep(MAM2_SPONGE_KEY_SIZE, key2_trits);
 
   MAM2_ASSERT(key_found);
   MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(key));
@@ -293,17 +295,21 @@ static retcode_t mam_msg_unwrap_keyload_psk(mam_spongos_t *s, trits_t *b,
     }
   }
 
-  /* TODO: retcode_t (*lookup_psk)(void *ctx, trits_t id); */
   if (psk_found) {
-    ERR_GUARD_RETURN(!*key_found, RC_MAM2_KEYLOAD_OVERLOADED);
-    *key_found = 1;
-
     /*  absorb external tryte psk[81]; */
     pb3_absorb_external_ntrytes(s, mam_psk_trits(&entry->value));
     /*  commit; */
     mam_spongos_commit(s);
     /*  crypt tryte ekey[81]; */
-    ERR_BIND_RETURN(pb3_unwrap_crypt_ntrytes(s, b, key), e);
+    ERR_BIND_RETURN(pb3_unwrap_crypt_ntrytes(s, b, key2), e);
+
+    if (*key_found) {
+      ERR_GUARD_RETURN(trits_cmp_eq(key, key2), RC_MAM2_KEYLOAD_OVERLOADED);
+    } else {
+      trits_copy(key2, key);
+      *key_found = true;
+    }
+
   } else { /* skip */
     ERR_GUARD_RETURN(MAM2_SPONGE_KEY_SIZE <= trits_size(*b), RC_MAM2_PB3_EOF);
     pb3_trits_take(b, MAM2_SPONGE_KEY_SIZE);
@@ -346,6 +352,8 @@ static retcode_t mam_msg_unwrap_keyload_ntru(mam_spongos_t *s, trits_t *b,
   trits_t ekey;
   MAM2_TRITS_DEF0(id, 81);
   id = MAM2_TRITS_INIT(id, 81);
+  trit_t key2_trits[MAM2_SPONGE_KEY_SIZE];
+  trits_t key2 = trits_from_rep(MAM2_SPONGE_KEY_SIZE, key2_trits);
 
   MAM2_ASSERT(MAM2_NTRU_KEY_SIZE == trits_size(key));
 
@@ -363,15 +371,20 @@ static retcode_t mam_msg_unwrap_keyload_ntru(mam_spongos_t *s, trits_t *b,
   }
 
   if (ntru_found) {
-    ERR_GUARD_RETURN(!*key_found, RC_MAM2_KEYLOAD_OVERLOADED);
-    *key_found = 1;
-
     /*  absorb tryte ekey[3072]; */
     ERR_GUARD_RETURN(MAM2_NTRU_EKEY_SIZE <= trits_size(*b), RC_MAM2_PB3_EOF);
     ekey = pb3_trits_take(b, MAM2_NTRU_EKEY_SIZE);
-    ERR_GUARD_RETURN(ntru_decr(&entry->value, ns, ekey, key),
+    ERR_GUARD_RETURN(ntru_decr(&entry->value, ns, ekey, key2),
                      RC_MAM2_PB3_BAD_EKEY);
     mam_spongos_absorb(s, ekey);
+
+    if (*key_found) {
+      ERR_GUARD_RETURN(trits_cmp_eq(key, key2), RC_MAM2_KEYLOAD_OVERLOADED);
+    } else {
+      trits_copy(key2, key);
+      *key_found = true;
+    }
+
   } else { /* skip */
     ERR_GUARD_RETURN(MAM2_NTRU_EKEY_SIZE <= trits_size(*b), RC_MAM2_PB3_EOF);
     pb3_trits_take(b, MAM2_NTRU_EKEY_SIZE);
