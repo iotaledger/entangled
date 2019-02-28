@@ -304,6 +304,7 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
     *payload_size = trits_size(payload_trits) / 3;
     *payload = malloc(*payload_size * sizeof(tryte_t));
     trits_to_trytes(payload_trits.p, *payload, *payload_size * 3);
+    trits_free(payload_trits);
   }
 
   return RC_OK;
