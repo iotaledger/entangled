@@ -134,7 +134,7 @@ Java_org_iota_mobile_Interface_iota_1sign_1address_1gen_1trits(
   trit_t const* seed = (trit_t*)env->GetByteArrayElements(jseed, 0);
 
   if ((address = iota_sign_address_gen_trits(seed, index, security)) == NULL) {
-    memset_safe((void*)seed, 81, 0, 81);
+    memset_safe((void*)seed, 243, 0, 243);
     return NULL;
   }
   memset_safe((void*)seed, 243, 0, 243);
