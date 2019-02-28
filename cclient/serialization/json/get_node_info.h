@@ -19,6 +19,9 @@ extern "C" {
 
 retcode_t json_get_node_info_serialize_request(const serializer_t* const s,
                                                char_buffer_t* out);
+retcode_t json_get_node_info_serialize_response(
+    const serializer_t* const s, const get_node_info_res_t* const obj,
+    char_buffer_t* out);
 retcode_t json_get_node_info_deserialize_response(
     const serializer_t* const s, const char* const obj,
     get_node_info_res_t* const res);
