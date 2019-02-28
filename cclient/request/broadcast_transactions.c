@@ -21,18 +21,28 @@ void broadcast_transactions_req_free(broadcast_transactions_req_t **const req) {
   if (!req || !(*req)) {
     return;
   }
+
   broadcast_transactions_req_t *tmp = *req;
+
   if (tmp->trytes) {
     hash_array_free(tmp->trytes);
   }
+
   free(tmp);
   *req = NULL;
 }
 
-void broadcast_transactions_req_trytes_add(
+retcode_t broadcast_transactions_req_trytes_add(
     broadcast_transactions_req_t *req, flex_trit_t const *const raw_trytes) {
   if (!req->trytes) {
     req->trytes = hash8019_array_new();
   }
+
+  if (!req->trytes) {
+    return RC_OOM;
+  }
+
   hash_array_push(req->trytes, raw_trytes);
+
+  return RC_OK;
 }
