@@ -1,5 +1,6 @@
 cc_test(
     name = "test_api",
+    timeout = "long",
     srcs = ["test_api.c"],
     deps = [
         "//common/trinary:tryte_ascii",
