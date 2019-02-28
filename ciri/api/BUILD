@@ -16,10 +16,25 @@ cc_library(
         ":conf",
         "//cclient/request:requests",
         "//cclient/response:responses",
-        "//cclient/serialization:serializer_json",
         "//common:errors",
         "//consensus",
         "//gossip/components:broadcaster",
+        "//utils:logger_helper",
+        "//utils/handles:thread",
+    ],
+)
+
+cc_library(
+    name = "http",
+    srcs = ["http.c"],
+    hdrs = ["http.h"],
+    deps = [
+        ":api",
+        "//cclient/request:requests",
+        "//cclient/response:responses",
+        "//cclient/serialization:serializer",
+        "//cclient/serialization:serializer_json",
+        "//common:errors",
         "//utils:logger_helper",
         "//utils/handles:thread",
         "@cJSON",

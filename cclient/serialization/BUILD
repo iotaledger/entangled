@@ -8,17 +8,14 @@ cc_library(
     ]),
     visibility = ["//visibility:public"],
     deps = [
-        ":serializer_base",
+        ":serializer",
         "@cJSON",
         "@com_github_uthash//:uthash",
     ],
 )
 
 cc_library(
-    name = "serializer_base",
-    srcs = glob([
-        "serializer.h",
-    ]),
+    name = "serializer",
     hdrs = glob([
         "serializer.h",
     ]),
