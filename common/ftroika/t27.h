@@ -37,42 +37,42 @@ typedef struct {
   uint32_t n;
 } t27_t;
 
-static t27_t t27_init(const uint32_t a, const uint32_t b) {
+static inline t27_t t27_init(const uint32_t a, const uint32_t b) {
   t27_t r;
   r.p = a;
   r.n = b;
   return r;
 }
 
-static int t27_eq(const t27_t a, const t27_t b) {
+static inline int t27_eq(const t27_t a, const t27_t b) {
   if (a.p == b.p && a.n == b.n) {
     return 1;
   }
   return 0;
 }
 
-static t27_t t27_clean(t27_t a) {
+static inline t27_t t27_clean(t27_t a) {
   t27_t r;
   r.p = a.p & 0x07ffffff;
   r.n = a.n & 0x07ffffff;
   return r;
 }
 
-static t27_t t27_sum(const t27_t* a, const t27_t* b) {
+static inline t27_t t27_sum(const t27_t* a, const t27_t* b) {
   t27_t r;
   r.p = (_1(a) & _0(b)) | (_0(a) & _1(b)) | (_2(a) & _2(b));
   r.n = (_2(a) & _0(b)) | (_0(a) & _2(b)) | (_1(a) & _1(b));
   return r;
 }
 
-static t27_t t27_roll(t27_t a, const int n) {
+static inline t27_t t27_roll(t27_t a, const int n) {
   t27_t r;
   r.p = ((a.p << n) | (a.p >> (27 - n))) & 0x07ffffff;
   r.n = ((a.n << n) | (a.n >> (27 - n))) & 0x07ffffff;
   return r;
 }
 
-static uint8_t t27_get(const t27_t* a, const int pos) {
+static inline uint8_t t27_get(const t27_t* a, const int pos) {
   const uint32_t mask = 1 << pos;
   if (a->p & mask) {
     return 1;
@@ -82,7 +82,7 @@ static uint8_t t27_get(const t27_t* a, const int pos) {
   return 0;
 }
 
-static void t27_set(t27_t* a, const int pos, const uint8_t val) {
+static inline void t27_set(t27_t* a, const int pos, const uint8_t val) {
   if (val > 2) return;
   const uint32_t mask = 1 << pos;
   const uint32_t unmask = ~mask;
@@ -97,7 +97,7 @@ static void t27_set(t27_t* a, const int pos, const uint8_t val) {
   }
 }
 
-void state_to_fstate(trit_t* state, t27_t* fstate) {
+static inline void state_to_fstate(trit_t* state, t27_t* fstate) {
   const int slices = 27, colums = 9, rows = 3, slicesize = rows * colums;
   for (int slice = 0; slice < slices; ++slice) {
     for (int row = 0; row < rows; ++row) {
@@ -109,7 +109,7 @@ void state_to_fstate(trit_t* state, t27_t* fstate) {
   }
 }
 
-void fstate_to_state(t27_t* fstate, trit_t* state) {
+static inline void fstate_to_state(t27_t* fstate, trit_t* state) {
   for (int i = 0; i < 729; ++i) {
     state[i] = t27_get(fstate, i);
   }
