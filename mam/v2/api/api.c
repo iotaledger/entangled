@@ -52,6 +52,27 @@ static void mam_api_bundle_wrap(bundle_transactions_t *const bundle,
   bundle_reset_indexes(bundle);
 }
 
+static trits_t mam_api_bundle_unwrap(bundle_transactions_t const *const bundle,
+                                     trit_t const *msg_trits,
+                                     size_t num_trits_in_bundle,
+                                     size_t start_index) {
+  iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
+  trit_t *msg_trits_ptr = msg_trits;
+  size_t curr_tx_index = 0;
+
+  BUNDLE_FOREACH(bundle, curr_tx) {
+    if (curr_tx_index++ < start_index) {
+      continue;
+    }
+    flex_trits_to_trits(msg_trits_ptr, NUM_TRITS_SIGNATURE,
+                        transaction_message(curr_tx), NUM_TRITS_SIGNATURE,
+                        NUM_TRITS_SIGNATURE);
+    msg_trits_ptr += NUM_TRITS_SIGNATURE;
+  }
+
+  return trits_from_rep(num_trits_in_bundle, msg_trits);
+}
+
 /*
  * Public functions
  */
@@ -234,26 +255,6 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle) {
   return flex_trits_are_null(transaction_tag(tx), FLEX_TRIT_SIZE_81);
 }
 
-trits_t msg_trits_from_bundle(bundle_transactions_t const *const bundle,
-                              const trit_t msg_trits[],
-                              size_t num_trits_in_bundle, size_t start_index) {
-  iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
-
-  trit_t *msg_trits_ptr = msg_trits;
-  size_t curr_tx_index = 0;
-  BUNDLE_FOREACH(bundle, curr_tx) {
-    if (curr_tx_index++ < start_index) {
-      continue;
-    }
-    flex_trits_to_trits(msg_trits_ptr, NUM_TRITS_SIGNATURE,
-                        transaction_message(curr_tx), NUM_TRITS_SIGNATURE,
-                        NUM_TRITS_SIGNATURE);
-    msg_trits_ptr += NUM_TRITS_SIGNATURE;
-  }
-
-  return trits_from_rep(num_trits_in_bundle, msg_trits);
-}
-
 static retcode_t mam_api_bundle_read_header(
     mam_msg_recv_context_t const *const ctx, trits_t *const msg,
     mam_psk_t_set_t psks, mam_ntru_sk_t_set_t ntru_sks, trits_t msg_id) {
@@ -285,7 +286,7 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
       bundle_transactions_size(bundle) * NUM_TRITS_SIGNATURE;
   trit_t msg_trits[num_trits_in_bundle];
   trits_t msg =
-      msg_trits_from_bundle(bundle, msg_trits, num_trits_in_bundle, 0);
+      mam_api_bundle_unwrap(bundle, msg_trits, num_trits_in_bundle, 0);
 
   ERR_BIND_RETURN(
       mam_api_bundle_read_header(&ctx, &msg, api->psks, api->ntru_sks,
@@ -326,7 +327,7 @@ retcode_t mam_api_bundle_read_packet(mam_api_t const *const api,
       bundle_transactions_size(bundle) * NUM_TRITS_SIGNATURE;
   trit_t msg_trits[num_trits_in_bundle];
   trits_t msg =
-      msg_trits_from_bundle(bundle, msg_trits, num_trits_in_bundle, 0);
+      mam_api_bundle_unwrap(bundle, msg_trits, num_trits_in_bundle, 0);
 
   if (found) {
     size_t num_trits_in_packet =
