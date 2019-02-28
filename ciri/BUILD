@@ -12,7 +12,6 @@ cc_binary(
         "//config:testnet": ["db/ciri-testnet.db"],
         "//conditions:default": ["db/ciri-mainnet.db"],
     }) + [":conf.yml"],
-    linkstatic = False,
     deps = [
         ":core",
         "//utils/handles:rand",
