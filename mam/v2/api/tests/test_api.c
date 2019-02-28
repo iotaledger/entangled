@@ -297,6 +297,7 @@ static void test_api_create_channels(mam_api_t *api, mam_channel_t **const cha,
                                      mam_endpoint_t **ep1) {
   mss_mt_height_t d = TEST_MSS_DEPTH;
 
+  // TODO usse api methods
   /* create channels */
   {
     trits_t cha_name = trits_alloc(3 * strlen(TEST_CHANNEL_NAME));
@@ -348,34 +349,23 @@ static void test_api_generic(mam_api_t *const api) {
   retcode_t e = RC_OK;
   bundle_transactions_t *bundle = NULL;
   trit_t msg_id[MAM2_MSG_ID_SIZE];
-
   mam_channel_t *cha = NULL, *ch1a = NULL;
   mam_endpoint_t *epa = NULL, *ep1a = NULL;
-
-  mam_msg_pubkey_t pubkey;     /* chid=0, epid=1, chid1=2, epid1=3 */
-  mam_msg_keyload_t keyload;   /* public=0, psk=1, ntru=2 */
-  mam_msg_checksum_t checksum; /* none=0, mac=1, mssig=2 */
+  char *payload2 = NULL;
+  mam_ntru_sk_t ntru[1];
+  mam_psk_t pska[1], pskb[1];
 
   test_api_create_channels(api, &cha, &ch1a, &epa, &ep1a);
 
-  char *payload2 = NULL;
-
-  mam_ntru_sk_t ntru[1];
-
   /* gen recipient'spongos ntru keys, public key is shared with sender */
   {
-    retcode_t e;
     MAM2_TRITS_DEF0(ntru_nonce, 30);
     ntru_nonce = MAM2_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
-
-    e = ntru_init(ntru);
+    TEST_ASSERT(ntru_init(ntru) == RC_OK);
     ntru_gen(ntru, &api->prng, ntru_nonce);
-    TEST_ASSERT(RC_OK == e);
-    mam_api_add_ntru_sk(api, ntru);
+    TEST_ASSERT(mam_api_add_ntru_sk(api, ntru) == RC_OK);
   }
-
-  mam_psk_t pska[1], pskb[1];
 
   /* gen psk */
   {
@@ -383,19 +373,19 @@ static void test_api_generic(mam_api_t *const api) {
     prng_gen_str(&api->prng, MAM2_PRNG_DST_SEC_KEY,
                  TEST_PRE_SHARED_KEY_A_NONCE_STR, mam_psk_trits(pska));
     // mam_api_add_psk(api, pska);
-
     trits_from_str(mam_psk_id(pskb), TEST_PRE_SHARED_KEY_B_STR);
     prng_gen_str(&api->prng, MAM2_PRNG_DST_SEC_KEY,
                  TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_trits(pskb));
-    mam_api_add_psk(api, pskb);
+    TEST_ASSERT(mam_api_add_psk(api, pskb) == RC_OK);
   }
 
   /* chid=0, epid=1, chid1=2, epid1=3*/
-  for (pubkey = 0; (int)pubkey < 4; ++pubkey) {
+  for (mam_msg_pubkey_t pubkey = 0; (int)pubkey < 4; ++pubkey) {
     /* public=0, psk=1, ntru=2 */
-    for (keyload = 0; (int)keyload < 3; ++keyload) {
+    for (mam_msg_keyload_t keyload = 0; (int)keyload < 3; ++keyload) {
       /* none=0, mac=1, mssig=2 */
-      for (checksum = 0; (int)checksum < 1 /*3*/; ++checksum) {
+      for (mam_msg_checksum_t checksum = 0; (int)checksum < 1 /*3*/;
+           ++checksum) {
         fprintf(stderr, "pubkey %d, keyload %d, checksum %d\n", pubkey, keyload,
                 checksum);
         bundle_transactions_new(&bundle);
@@ -408,7 +398,6 @@ static void test_api_generic(mam_api_t *const api) {
 
         /* recv header and packet */
         test_api_read_msg(api, bundle, pskb, ntru, cha, &payload2);
-        // message_test_generic_receive_packet(&packet, &payload);
         TEST_ASSERT_EQUAL_STRING(PAYLOAD, payload2);
 
         /* cleanup */
@@ -421,14 +410,22 @@ static void test_api_generic(mam_api_t *const api) {
 
   /* destroy channels/endpoints */
   {
-    if (cha) mam_channel_destroy(cha);
-    if (ch1a) mam_channel_destroy(ch1a);
-    if (epa) mam_endpoint_destroy(epa);
-    if (ep1a) mam_endpoint_destroy(ep1a);
-    free(cha);
-    free(epa);
-    free(ch1a);
-    free(ep1a);
+    if (cha) {
+      mam_channel_destroy(cha);
+      free(cha);
+    }
+    if (ch1a) {
+      mam_channel_destroy(ch1a);
+      free(ch1a);
+    }
+    if (epa) {
+      mam_endpoint_destroy(epa);
+      free(epa);
+    }
+    if (ep1a) {
+      mam_endpoint_destroy(ep1a);
+      free(ep1a);
+    }
   }
 
   TEST_ASSERT(e == RC_OK);
