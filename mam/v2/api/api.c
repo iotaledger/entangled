@@ -171,8 +171,15 @@ retcode_t mam_api_bundle_write_header(
   }
 
   ctx.ord = 0;
-  // TODO set the right MSS
-  ctx.mss = NULL;
+  if (ch1) {
+    ctx.mss = &ch1->mss;
+  } else if (ep1) {
+    ctx.mss = &ep1->mss;
+  } else if (ep) {
+    ctx.mss = &ep->mss;
+  } else if (ch) {
+    ctx.mss = &ch->mss;
+  }
 
   return trit_t_to_mam_msg_send_context_t_map_add(&api->send_ctxs, msg_id, ctx);
 }

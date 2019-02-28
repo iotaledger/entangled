@@ -384,10 +384,7 @@ static void test_api_generic(mam_api_t *const api) {
     /* public=0, psk=1, ntru=2 */
     for (mam_msg_keyload_t keyload = 0; (int)keyload < 3; ++keyload) {
       /* none=0, mac=1, mssig=2 */
-      for (mam_msg_checksum_t checksum = 0; (int)checksum < 1 /*3*/;
-           ++checksum) {
-        fprintf(stderr, "pubkey %d, keyload %d, checksum %d\n", pubkey, keyload,
-                checksum);
+      for (mam_msg_checksum_t checksum = 0; (int)checksum < 3; ++checksum) {
         bundle_transactions_new(&bundle);
 
         /* send header and packet */
