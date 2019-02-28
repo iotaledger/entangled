@@ -6,7 +6,7 @@ cc_library(
     hdrs = ["troika.h"],
     deps = [
         "//common:stdint",
-        "//common/troika",
+        "//common/ftroika",
         "//mam/v2:defs",
         "//mam/v2/trits",
     ],

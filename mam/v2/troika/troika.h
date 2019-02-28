@@ -10,7 +10,7 @@
 #ifndef __MAM_V2_TROIKA_H__
 #define __MAM_V2_TROIKA_H__
 
-#include "common/troika/troika.h"
+#include "common/ftroika/ftroika.h"
 #include "mam/v2/defs.h"
 
 /*#define MAM2_TROIKA_NUM_ROUNDS 12*/
