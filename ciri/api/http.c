@@ -11,6 +11,7 @@
 #include "cclient/request/requests.h"
 #include "cclient/response/responses.h"
 #include "cclient/serialization/json/json_serializer.h"
+#include "cclient/types/types.h"
 #include "ciri/api/api.h"
 #include "ciri/api/http.h"
 #include "utils/logger_helper.h"
@@ -24,6 +25,49 @@ typedef struct iota_api_http_sess_s {
   bool valid_content_type;
   char_buffer_t *request;
 } iota_api_http_sess_t;
+
+static retcode_t iota_api_http_process_request(iota_api_http_t *http,
+                                               const char *command,
+                                               const char *payload,
+                                               char_buffer_t *const out) {
+  retcode_t ret = RC_OK;
+  if (strcmp(command, "getNodeInfo") == 0) {
+    get_node_info_res_t *res = get_node_info_res_new();
+    if (!res) {
+      ret = RC_OOM;
+      goto gni;
+    }
+    ret = iota_api_get_node_info(http->api, res);
+    if (ret) goto gni;
+
+    ret = http->serializer.vtable.get_node_info_serialize_response(
+        &http->serializer, res, out);
+
+  gni:
+    get_node_info_res_free(&res);
+  } else if (strcmp(command, "checkConsistency") == 0) {
+    check_consistency_req_t *req = check_consistency_req_new();
+    check_consistency_res_t *res = check_consistency_res_new();
+
+    ret = http->serializer.vtable.check_consistency_deserialize_request(
+        &http->serializer, payload, req);
+    if (ret) goto cc;
+
+    ret = iota_api_check_consistency(http->api, http->api->tangle, req, res);
+    if (ret) goto cc;
+
+    ret = http->serializer.vtable.check_consistency_serialize_response(
+        &http->serializer, res, out);
+
+  cc:
+    check_consistency_req_free(&req);
+    check_consistency_res_free(&res);
+  } else {
+    ret = RC_API_INVALID_COMMAND;
+  }
+
+  return ret;
+}
 
 static int iota_api_http_header_iter(void *cls, enum MHD_ValueKind kind,
                                      const char *key, const char *value) {
@@ -98,18 +142,35 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection,
     goto cleanup;
   }
 
-  response = MHD_create_response_from_buffer(strlen(json_item->valuestring),
-                                             json_item->valuestring,
+  char *command_str = strdup(json_item->valuestring);
+  char_buffer_t *buf = char_buffer_new();
+  cJSON_Delete(json_obj);
+
+  if (iota_api_http_process_request(api, command_str, sess->request->data,
+                                    buf)) {
+    free(command_str);
+    char_buffer_free(buf);
+    ret = MHD_NO;
+    goto cleanup;
+  }
+
+  free(command_str);
+
+  response = MHD_create_response_from_buffer(buf->length, buf->data,
                                              MHD_RESPMEM_MUST_COPY);
   MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_TYPE,
                           "application/json");
   ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
   MHD_destroy_response(response);
 
-  cJSON_Delete(json_obj);
+  char_buffer_free(buf);
 
 cleanup:
   if (sess) {
+    if (sess->request) {
+      char_buffer_free(sess->request);
+    }
+
     free(sess);
   }
   *ptr = NULL;
