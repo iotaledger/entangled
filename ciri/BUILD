@@ -25,6 +25,7 @@ cc_library(
     deps = [
         ":conf",
         "//ciri/api",
+        "//ciri/api:http",
         "//consensus",
         "//gossip:node_shared",
     ],

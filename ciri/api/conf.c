@@ -12,7 +12,6 @@ retcode_t iota_api_conf_init(iota_api_conf_t* const conf) {
     return RC_NULL_PARAM;
   }
 
-  conf->port = DEFAULT_API_PORT;
   conf->max_find_transactions = DEFAULT_MAX_FIND_TRANSACTIONS;
   conf->max_get_trytes = DEFAULT_MAX_GET_TRYTES;
 

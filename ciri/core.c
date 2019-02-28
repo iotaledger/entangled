@@ -33,9 +33,15 @@ retcode_t core_init(core_t* const core, tangle_t* const tangle) {
   }
 
   log_info(logger_id, "Initializing API\n");
-  if (iota_api_init(&core->api, &core->node, &core->consensus, SR_JSON) != RC_OK) {
+  if (iota_api_init(&core->api, &core->node, &core->consensus) != RC_OK) {
     log_critical(logger_id, "Initializing API failed\n");
     return RC_CORE_FAILED_API_INIT;
+  }
+
+  log_info(logger_id, "Initializing API HTTP\n");
+  if (iota_api_http_init(&core->http, &core->api) != RC_OK) {
+    log_critical(logger_id, "Initializing API HTTP failed\n");
+    return RC_CORE_FAILED_API_HTTP_INIT;
   }
 
   return RC_OK;
@@ -64,6 +70,12 @@ retcode_t core_start(core_t* const core, tangle_t* const tangle) {
     return RC_CORE_FAILED_API_START;
   }
 
+  log_info(logger_id, "Starting API HTTP\n");
+  if (iota_api_http_start(&core->http) != RC_OK) {
+    log_critical(logger_id, "Starting API HTTP failed\n");
+    return RC_CORE_FAILED_API_HTTP_START;
+  }
+
   core->running = true;
 
   return RC_OK;
@@ -84,6 +96,12 @@ retcode_t core_stop(core_t* const core) {
   if (node_stop(&core->node) != RC_OK) {
     log_error(logger_id, "Stopping node gossip components failed\n");
     ret = RC_CORE_FAILED_NODE_STOP;
+  }
+
+  log_info(logger_id, "Stopping API HTTP\n");
+  if (iota_api_http_stop(&core->http) != RC_OK) {
+    log_error(logger_id, "Stopping API HTTP failed\n");
+    ret = RC_CORE_FAILED_API_HTTP_STOP;
   }
 
   log_info(logger_id, "Stopping API\n");
@@ -108,6 +126,12 @@ retcode_t core_destroy(core_t* const core) {
     return RC_CORE_NULL_CORE;
   } else if (core->running) {
     return RC_CORE_STILL_RUNNING;
+  }
+
+  log_info(logger_id, "Destroying API HTTP\n");
+  if (iota_api_http_destroy(&core->http) != RC_OK) {
+    log_error(logger_id, "Destroying API HTTP failed\n");
+    ret = RC_CORE_FAILED_API_HTTP_DESTROY;
   }
 
   log_info(logger_id, "Destroying API\n");
