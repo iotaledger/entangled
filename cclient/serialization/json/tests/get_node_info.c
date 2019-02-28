@@ -7,7 +7,7 @@
 
 #include "cclient/serialization/json/tests/shared.h"
 
-void test_serialize_get_node_info(void) {
+static void test_request(void) {
   serializer_t serializer;
   const char* json_text = "{\"command\":\"getNodeInfo\"}";
 
@@ -22,14 +22,15 @@ void test_serialize_get_node_info(void) {
   char_buffer_free(serializer_out);
 }
 
-void test_deserialize_get_node_info(void) {
+static void test_response(void) {
   serializer_t serializer;
+  char_buffer_t* serializer_out = char_buffer_new();
+
   init_json_serializer(&serializer);
   const char* json_text =
       "{"
         "\"appName\":\"" TEST_INFO_APP_NAME "\","
         "\"appVersion\":\"" TEST_INFO_APP_VERSION "\","
-        "\"duration\":1,"
         "\"latestMilestone\":\"" TEST_81_TRYTES_1 "\","
         "\"latestMilestoneIndex\":" STR(TEST_INFO_LATEST_MILESTONE_INDEX) ","
         "\"latestSolidSubtangleMilestone\":\"" TEST_81_TRYTES_2 "\","
@@ -81,12 +82,17 @@ void test_deserialize_get_node_info(void) {
   TEST_ASSERT_EQUAL_MEMORY(hash, node_info->coordinator_address,
                            FLEX_TRIT_SIZE_243);
 
+  serializer.vtable.get_node_info_serialize_response(&serializer, node_info,
+                                                     serializer_out);
+  TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
+
   get_node_info_res_free(&node_info);
+  char_buffer_free(serializer_out);
 }
 int main(void) {
   UNITY_BEGIN();
 
-  RUN_TEST(test_serialize_get_node_info);
-  RUN_TEST(test_deserialize_get_node_info);
+  RUN_TEST(test_request);
+  RUN_TEST(test_response);
   return UNITY_END();
 }
