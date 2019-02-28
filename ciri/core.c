@@ -33,7 +33,8 @@ retcode_t core_init(core_t* const core, tangle_t* const tangle) {
   }
 
   log_info(logger_id, "Initializing API\n");
-  if (iota_api_init(&core->api, &core->node, &core->consensus) != RC_OK) {
+  if (iota_api_init(&core->api, &core->node, &core->consensus, tangle) !=
+      RC_OK) {
     log_critical(logger_id, "Initializing API failed\n");
     return RC_CORE_FAILED_API_INIT;
   }

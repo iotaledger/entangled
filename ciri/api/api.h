@@ -39,6 +39,7 @@ typedef struct iota_api_s {
   bool running;
   node_t *node;
   iota_consensus_t *consensus;
+  tangle_t *tangle;
 } iota_api_t;
 
 /**
@@ -51,7 +52,8 @@ typedef struct iota_api_s {
  * @return a status code
  */
 retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
-                        iota_consensus_t *const consensus);
+                        iota_consensus_t *const consensus,
+                        tangle_t *const tangle);
 
 /**
  * Starts an API
