@@ -149,17 +149,13 @@ static void message_test_generic_receive_packet(
     mam_msg_recv_context_t *const ctx, trits_t const *const packet,
     trits_t *const payload) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  /* send/recv packet */
-  {
-    /*trits_free(a, payload);*/ /* init recv packet context */
-    ctx->ord = -1;
+  ctx->ord = 0;
 
-    e = mam_msg_recv_packet(ctx, packet, payload);
-    TEST_ASSERT(RC_OK == e);
-    TEST_ASSERT(trits_is_empty(*packet));
-    TEST_ASSERT(trits_is_empty(*payload));
-    *payload = trits_pickup_all(*payload);
-  }
+  e = mam_msg_recv_packet(ctx, packet, payload);
+  TEST_ASSERT(RC_OK == e);
+  TEST_ASSERT(trits_is_empty(*packet));
+  TEST_ASSERT(trits_is_empty(*payload));
+  *payload = trits_pickup_all(*payload);
 }
 
 static void message_test_create_channels(mam_prng_t *prng,

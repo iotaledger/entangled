@@ -287,6 +287,8 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
   flex_trits_to_trits(ctx.pk, NUM_TRITS_ADDRESS, transaction_address(curr_tx),
                       NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
 
+  ctx.ord = 1;
+
   // Flatten flex_trits encoded in transaction sig_or_fragment field
   // into a single long trits_t data structure
   size_t num_trits_in_bundle =
