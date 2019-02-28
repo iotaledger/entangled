@@ -323,7 +323,6 @@ void mss_init(mss_t *mss, mam_prng_t *prng, mss_mt_height_t height,
 }
 
 void mss_gen(mss_t *mss, trits_t pk) {
-  mam_spongos_t spongos;
 #if defined(MAM2_MSS_TRAVERSAL)
   if (0 == mss->height) {
     mss_mt_gen_leaf(mss, 0, pk);

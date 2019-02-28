@@ -9,6 +9,9 @@
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
+static const char *kCmdName = "broadcastTransactions";
+static const char *kTrytes = "trytes";
+
 retcode_t json_broadcast_transactions_serialize_request(
     const serializer_t *const s, broadcast_transactions_req_t *const req,
     char_buffer_t *out) {
@@ -23,10 +26,9 @@ retcode_t json_broadcast_transactions_serialize_request(
     return RC_CCLIENT_JSON_CREATE;
   }
 
-  cJSON_AddItemToObject(json_root, "command",
-                        cJSON_CreateString("broadcastTransactions"));
+  cJSON_AddItemToObject(json_root, "command", cJSON_CreateString(kCmdName));
 
-  ret = hash8019_array_to_json_array(req->trytes, json_root, "trytes");
+  ret = hash8019_array_to_json_array(req->trytes, json_root, kTrytes);
   if (ret != RC_OK) {
     cJSON_Delete(json_root);
     return ret;
@@ -43,5 +45,27 @@ retcode_t json_broadcast_transactions_serialize_request(
   }
 
   cJSON_Delete(json_root);
+  return ret;
+}
+
+retcode_t json_broadcast_transactions_deserialize_request(
+    const serializer_t *const s, const char *const obj,
+    broadcast_transactions_req_t *const out) {
+  retcode_t ret = RC_OK;
+
+  if (out->trytes == NULL) {
+    out->trytes = hash8019_array_new();
+  }
+
+  cJSON *json_obj = cJSON_Parse(obj);
+  cJSON *json_item;
+
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
+
+  ret = json_array_to_hash8019_array(json_obj, kTrytes, out->trytes);
+
+done:
+  cJSON_Delete(json_obj);
   return ret;
 }

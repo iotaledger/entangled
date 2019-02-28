@@ -21,7 +21,13 @@ extern "C" {
 retcode_t json_check_consistency_serialize_request(
     const serializer_t *const s, check_consistency_req_t *const obj,
     char_buffer_t *out);
+retcode_t json_check_consistency_serialize_response(
+    const serializer_t *const s, check_consistency_res_t *const obj,
+    char_buffer_t *out);
 
+retcode_t json_check_consistency_deserialize_request(
+    const serializer_t *const s, const char *const obj,
+    check_consistency_req_t *out);
 retcode_t json_check_consistency_deserialize_response(
     const serializer_t *const s, const char *const obj,
     check_consistency_res_t *out);
