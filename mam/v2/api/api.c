@@ -270,14 +270,6 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle) {
   return trits_get18(trits_from_rep(18, tag + MAM2_MSG_ID_SIZE)) == 0;
 }
 
-static retcode_t mam_api_bundle_read_header(
-    mam_msg_recv_context_t const *const ctx, trits_t *const msg,
-    mam_psk_t_set_t psks, mam_ntru_sk_t_set_t ntru_sks, trits_t msg_id) {
-  retcode_t err;
-  ERR_BIND_RETURN(mam_msg_recv(ctx, msg, psks, ntru_sks, msg_id), err);
-  return err;
-}
-
 retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
                                   bundle_transactions_t const *const bundle,
                                   tryte_t **const payload,
@@ -303,10 +295,11 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
   trits_t msg =
       mam_api_bundle_unwrap(bundle, msg_trits, num_trits_in_bundle, 0);
 
-  ERR_BIND_RETURN(
-      mam_api_bundle_read_header(&ctx, &msg, api->psks, api->ntru_sks,
-                                 trits_from_rep(MAM2_MSG_ID_SIZE, msg_id)),
-      err);
+  flex_trits_to_trits(msg_id, MAM2_MSG_ID_SIZE, transaction_tag(curr_tx),
+                      NUM_TRITS_TAG, MAM2_MSG_ID_SIZE);
+  ERR_BIND_RETURN(mam_msg_recv(&ctx, &msg, api->psks, api->ntru_sks,
+                               trits_from_rep(MAM2_MSG_ID_SIZE, msg_id)),
+                  err);
 
   ERR_BIND_RETURN(
       trit_t_to_mam_msg_recv_context_t_map_add(&api->recv_ctxs, msg_id, ctx),

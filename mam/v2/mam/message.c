@@ -454,9 +454,7 @@ size_t mam_msg_send_size(mam_channel_t *ch, mam_endpoint_t *ep,
   }
 
   /* header */
-  /*  absorb tryte msg_id[27]; */
-  sz += pb3_sizeof_ntrytes(MAM2_MSG_ID_SIZE / 3);
-  /*  absorb trint typeid; */
+  /* absorb trint typeid; */
   sz += pb3_sizeof_trint();
   {
     size_t keyload_count = 0;
@@ -547,7 +545,7 @@ void mam_msg_send(mam_msg_send_context_t *ctx, mam_prng_t *prng,
   /* wrap Header */
   {
     /*  absorb tryte msgid[27]; */
-    pb3_wrap_absorb_ntrytes(&ctx->spongos, msg, msg_id);
+    pb3_absorb_external_ntrytes(&ctx->spongos, msg_id);
     /*  absorb trint typeid; */
     pb3_wrap_absorb_trint(&ctx->spongos, msg, msg_type_id);
 
@@ -738,7 +736,7 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
     trint9_t msg_type_id;
 
     /*  absorb tryte msg_id[27]; */
-    ERR_BIND_RETURN(pb3_unwrap_absorb_ntrytes(&ctx->spongos, msg, msg_id), e);
+    pb3_absorb_external_ntrytes(&ctx->spongos, msg_id);
     /*  absorb trint typeid; */
     ERR_BIND_RETURN(pb3_unwrap_absorb_trint(&ctx->spongos, msg, &msg_type_id),
                     e);
