@@ -125,6 +125,27 @@ retcode_t json_get_int(cJSON const* const json_obj, char const* const obj_name,
   return RC_OK;
 }
 
+retcode_t json_get_uint8(cJSON const* const json_obj,
+                         char const* const obj_name, uint8_t* const num) {
+  cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
+  if (json_value == NULL) {
+    log_error(json_logger_id, "[%s:%d] %s %s.\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_KEY, obj_name);
+    return RC_CCLIENT_JSON_KEY;
+  }
+
+  if (cJSON_IsNumber(json_value) && json_value->valueint >= 0 &&
+      json_value->valueint <= UINT8_MAX) {
+    *num = (uint8_t)json_value->valueint;
+  } else {
+    log_error(json_logger_id, "[%s:%d] %s not number\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_PARSE);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  return RC_OK;
+}
+
 retcode_t json_get_uint16(cJSON const* const json_obj,
                           char const* const obj_name, uint16_t* const num) {
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
@@ -134,7 +155,8 @@ retcode_t json_get_uint16(cJSON const* const json_obj,
     return RC_CCLIENT_JSON_KEY;
   }
 
-  if (cJSON_IsNumber(json_value)) {
+  if (cJSON_IsNumber(json_value) && json_value->valueint >= 0 &&
+      json_value->valueint <= UINT16_MAX) {
     *num = (uint16_t)json_value->valueint;
   } else {
     log_error(json_logger_id, "[%s:%d] %s not number\n", __func__, __LINE__,
@@ -154,8 +176,9 @@ retcode_t json_get_uint32(cJSON const* const json_obj,
     return RC_CCLIENT_JSON_KEY;
   }
 
-  if (cJSON_IsNumber(json_value)) {
-    *num = (uint32_t)json_value->valuedouble;
+  if (cJSON_IsNumber(json_value) && json_value->valueint >= 0 &&
+      json_value->valueint <= UINT32_MAX) {
+    *num = (uint32_t)json_value->valueint;
   } else {
     log_error(json_logger_id, "[%s:%d] %s not number\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);
@@ -381,9 +404,9 @@ retcode_t flex_trits_to_json_string(cJSON* const json_obj,
   }
   return RC_OK;
 }
-retcode_t json_string_to_flex_trits(cJSON const* const json_obj,
-                                    char const* const key, flex_trit_t hash[],
-                                    size_t num_trits) {
+retcode_t json_string_hash_to_flex_trits(cJSON const* const json_obj,
+                                         char const* const key,
+                                         flex_trit_t* hash) {
   retcode_t ret = RC_OK;
   size_t trit_len = 0;
   cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, key);

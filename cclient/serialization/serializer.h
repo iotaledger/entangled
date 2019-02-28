@@ -105,6 +105,12 @@ typedef struct {
   retcode_t (*attach_to_tangle_serialize_request)(
       const serializer_t* const s, const attach_to_tangle_req_t* const obj,
       char_buffer_t* out);
+  retcode_t (*attach_to_tangle_serialize_response)(
+      const serializer_t* const s, const attach_to_tangle_res_t* const obj,
+      char_buffer_t* out);
+  retcode_t (*attach_to_tangle_deserialize_request)(
+      const serializer_t* const s, const char* const obj,
+      attach_to_tangle_req_t* out);
   retcode_t (*attach_to_tangle_deserialize_response)(
       const serializer_t* const s, const char* const obj,
       attach_to_tangle_res_t* out);
@@ -112,6 +118,9 @@ typedef struct {
   retcode_t (*broadcast_transactions_serialize_request)(
       const serializer_t* const s, broadcast_transactions_req_t* const obj,
       char_buffer_t* out);
+  retcode_t (*broadcast_transactions_deserialize_request)(
+      const serializer_t* const s, const char* const obj,
+      broadcast_transactions_req_t* const out);
 
   retcode_t (*store_transactions_serialize_request)(
       const serializer_t* const s, store_transactions_req_t const* const obj,
@@ -120,6 +129,12 @@ typedef struct {
   retcode_t (*check_consistency_serialize_request)(
       const serializer_t* const s, check_consistency_req_t* const obj,
       char_buffer_t* out);
+  retcode_t (*check_consistency_serialize_response)(
+      const serializer_t* const s, check_consistency_res_t* const obj,
+      char_buffer_t* out);
+  retcode_t (*check_consistency_deserialize_request)(
+      const serializer_t* const s, const char* const obj,
+      check_consistency_req_t* out);
   retcode_t (*check_consistency_deserialize_response)(
       const serializer_t* const s, const char* const obj,
       check_consistency_res_t* out);

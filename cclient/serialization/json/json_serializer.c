@@ -65,14 +65,24 @@ static serializer_vtable json_vtable = {
     .get_trytes_deserialize_response = json_get_trytes_deserialize_response,
     .attach_to_tangle_serialize_request =
         json_attach_to_tangle_serialize_request,
+    .attach_to_tangle_serialize_response =
+        json_attach_to_tangle_serialize_response,
+    .attach_to_tangle_deserialize_request =
+        json_attach_to_tangle_deserialize_request,
     .attach_to_tangle_deserialize_response =
         json_attach_to_tangle_deserialize_response,
     .broadcast_transactions_serialize_request =
         json_broadcast_transactions_serialize_request,
+    .broadcast_transactions_deserialize_request =
+        json_broadcast_transactions_deserialize_request,
     .store_transactions_serialize_request =
         json_store_transactions_serialize_request,
     .check_consistency_serialize_request =
         json_check_consistency_serialize_request,
+    .check_consistency_serialize_response =
+        json_check_consistency_serialize_response,
+    .check_consistency_deserialize_request =
+        json_check_consistency_deserialize_request,
     .check_consistency_deserialize_response =
         json_check_consistency_deserialize_response,
 };

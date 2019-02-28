@@ -4,6 +4,7 @@
 
 #include "common/curl-p/trit.h"
 #include "utils/forced_inline.h"
+#include "utils/memset_safe.h"
 
 static FORCED_INLINE void sbox(Curl *const c, Curl *const s) {
   size_t i = 0;
