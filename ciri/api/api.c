@@ -509,7 +509,8 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api,
 }
 
 retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
-                        iota_consensus_t *const consensus) {
+                        iota_consensus_t *const consensus,
+                        tangle_t *const tangle) {
   if (api == NULL) {
     return RC_NULL_PARAM;
   }
@@ -518,6 +519,7 @@ retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
   api->running = false;
   api->node = node;
   api->consensus = consensus;
+  api->tangle = tangle;
 
   return RC_OK;
 }
