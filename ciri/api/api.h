@@ -11,7 +11,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "cclient/serialization/serializer.h"
+#include "cclient/request/requests.h"
+#include "cclient/response/responses.h"
 #include "ciri/api/conf.h"
 #include "common/errors.h"
 #include "consensus/consensus.h"
@@ -38,9 +39,6 @@ typedef struct iota_api_s {
   bool running;
   node_t *node;
   iota_consensus_t *consensus;
-  serializer_t serializer;
-  serializer_type_t serializer_type;
-  void *opaque_state;
 } iota_api_t;
 
 /**
@@ -49,13 +47,11 @@ typedef struct iota_api_s {
  * @param api The API
  * @param node A node
  * @param consensus A consensus
- * @param serializer_type A serializer type
  *
  * @return a status code
  */
 retcode_t iota_api_init(iota_api_t *const api, node_t *const node,
-                        iota_consensus_t *const consensus,
-                        serializer_type_t const serializer_type);
+                        iota_consensus_t *const consensus);
 
 /**
  * Starts an API
