@@ -20,11 +20,11 @@
 
 static logger_id_t logger_id;
 
-typedef struct iota_api_http_sess_s {
+typedef struct iota_api_http_session_s {
   bool valid_api_version;
   bool valid_content_type;
   char_buffer_t *request;
-} iota_api_http_sess_t;
+} iota_api_http_session_t;
 
 static retcode_t iota_api_http_process_request(iota_api_http_t *http,
                                                const char *command,
@@ -71,7 +71,7 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *http,
 
 static int iota_api_http_header_iter(void *cls, enum MHD_ValueKind kind,
                                      const char *key, const char *value) {
-  iota_api_http_sess_t *sess = cls;
+  iota_api_http_session_t *sess = cls;
 
   if (0 == strcmp(MHD_HTTP_HEADER_CONTENT_TYPE, key)) {
     sess->valid_content_type = !strcmp("application/json", value);
@@ -86,17 +86,20 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection,
                                  const char *url, const char *method,
                                  const char *version, const char *upload_data,
                                  size_t *upload_data_size, void **ptr) {
-  int ret;
+  int ret = MHD_NO;
   iota_api_http_t *api = (iota_api_http_t *)cls;
-  iota_api_http_sess_t *sess = *ptr;
-  struct MHD_Response *response;
+  iota_api_http_session_t *sess = *ptr;
+  struct MHD_Response *response = NULL;
+  cJSON *json_obj = NULL, *json_item = NULL;
+  char_buffer_t *response_buf = NULL;
+  char *command_str = NULL;
 
   if (strncmp(method, MHD_HTTP_METHOD_POST, 4) != 0) {
     return MHD_NO;
   }
 
   if (sess == NULL) {
-    sess = calloc(1, sizeof(iota_api_http_sess_t));
+    sess = calloc(1, sizeof(iota_api_http_session_t));
     *ptr = sess;
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND,
@@ -133,38 +136,40 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection,
     goto cleanup;
   }
 
-  cJSON *json_obj = cJSON_Parse(sess->request->data);
-  cJSON *json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "command");
+  json_obj = cJSON_Parse(sess->request->data);
+  if (!json_obj) {
+    ret = MHD_NO;
+    goto cleanup;
+  }
 
+  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "command");
   if (!cJSON_IsString(json_item) || (json_item->valuestring == NULL)) {
     cJSON_Delete(json_obj);
     ret = MHD_NO;
     goto cleanup;
   }
 
-  char *command_str = strdup(json_item->valuestring);
-  char_buffer_t *buf = char_buffer_new();
+  command_str = strdup(json_item->valuestring);
   cJSON_Delete(json_obj);
 
+  response_buf = char_buffer_new();
   if (iota_api_http_process_request(api, command_str, sess->request->data,
-                                    buf)) {
+                                    response_buf)) {
     free(command_str);
-    char_buffer_free(buf);
+    char_buffer_free(response_buf);
     ret = MHD_NO;
     goto cleanup;
   }
-
   free(command_str);
 
-  response = MHD_create_response_from_buffer(buf->length, buf->data,
-                                             MHD_RESPMEM_MUST_COPY);
+  response = MHD_create_response_from_buffer(
+      response_buf->length, response_buf->data, MHD_RESPMEM_MUST_COPY);
   MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_TYPE,
                           "application/json");
   ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
   MHD_destroy_response(response);
 
-  char_buffer_free(buf);
-
+  char_buffer_free(response_buf);
 cleanup:
   if (sess) {
     if (sess->request) {
