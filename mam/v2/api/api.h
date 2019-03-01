@@ -94,9 +94,10 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
  * @return return code
  */
 
-retcode_t mam_api_bundle_read_packet(mam_api_t const *const api,
+retcode_t mam_api_bundle_read_packet(mam_api_t *const api,
                                      bundle_transactions_t const *const bundle,
-                                     flex_trit_t **const payload);
+                                     tryte_t **const payload,
+                                     size_t *const payload_size);
 
 #ifdef __cplusplus
 }
