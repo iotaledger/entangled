@@ -322,8 +322,9 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
   size_t packet_index = msg.d / NUM_TRITS_SIGNATURE + 1;
   if (packet_index < bundle_transactions_size(bundle)) {
     trits_advance(&msg, NUM_TRITS_SIGNATURE - msg.d % NUM_TRITS_SIGNATURE);
-    return mam_api_bundle_read_packet_from_msg(api, &ctx, msg, payload,
-                                               payload_size);
+    ERR_BIND_RETURN(mam_api_bundle_read_packet_from_msg(api, &ctx, msg, payload,
+                                                        payload_size),
+                    err);
   }
 
   ERR_BIND_RETURN(
