@@ -357,8 +357,6 @@ static void test_api_generic() {
   mam_ntru_sk_t ntru[1];
   mam_psk_t pska[1], pskb[1];
 
-  test_api_create_channels(&api, &cha, &ch1a, &epa, &ep1a);
-
   /* gen recipient'spongos ntru keys, public key is shared with sender */
   {
     MAM2_TRITS_DEF0(ntru_nonce, 30);
@@ -406,6 +404,68 @@ static void test_api_generic() {
     }
   }
 
+  TEST_ASSERT(e == RC_OK);
+}
+
+static void test_api_multiple_packets() {
+  bundle_transactions_t *bundle = NULL;
+  trit_t msg_id[MAM2_MSG_ID_SIZE];
+  tryte_t *payload_in = (tryte_t *)
+      "RYFJ9ZCHZFYZSHCMBJPDHLQBODCMRMDH9CLGGVWJCZRJSNDWBTMWSBPYPFIIOLXEMKSJ9LJO"
+      "AFBFPJL9XMGGZXFCZHFDLOLODLMLNERWGUBXUJCMHJXWJPGX9R9HUPIHEIPNNMXTULSMHJGP"
+      "TDKYEFZ9FDKFOBBQS9QZ9LODBRQMVCKYIUXIPWMDNPSZEK9ZTDCJEFEQEAJAEABJQWPVCGSM"
+      "WEZLLSDYWLWQPRENHOTDQYP9QTIULYOE9OIVEWUXTMYUMPTMHOYFRJMWJUKM9QAJKVQW9ADY"
+      "TZFQTNDISJYNTSFIEESDZJJJUPBDJKNEYNMOIZOKFCARBCXVFTPQZEKVZBNZOSKMRHAJXG9U"
+      "ZBNEUXM9LARLTSRQXYACOVOCIFHUETWFXXOLSSQSKNFUANYIGVMXTOZYSYBIXTRTYOWQRVTF"
+      "VMMXSH9WVQKEYRALLTBJIBYJIMTV99PATCFBKXZPLIBPNQZYJLDUXRWKPRRJTPKWQAQFFQWS"
+      "VAHUOAAOWJLSYVYLI99RNUONKEEJYFIMEWBIKLGARGTABJDCHKQM9LFFMKQXHFSCGJXAYCLF"
+      "RFLWPKPPNHOWIMEFNRCGNDCHMEYYJWHPRJOYOFFPNISVUNMVYFW9ECUZBDOSUCFZPOREJMND"
+      "ZMZYWUBBFICWJ9IYHJDIDGLPERWCYXMFHXZGNLWXOCXBGEWZFKITEUMEVNUWLRUMHEZUJMRI"
+      "TTNKN9PBUR9MOZINMWWTRXVRRZHQVP9QDJPGBZALBVI9GXNZYQTOPKDJPXPLADTBUNRQFLTE"
+      "Q9XLMEPTJUWYIGNQMMLECGXAQOSFMDWFBFUYB9FEUMXSCRQVQMT9E9CEPRVQWQFVWT9UC9FH"
+      "NTCCRUHOOWXORIRHNNZUOQCSOGJCRUWCQHCLZMRNIWUESDEQWPHLLNEHXFDLRUEOTLQERNPT"
+      "OHNGGXIWJCKGKEGRFXYFLVOQVYQOVZ9QWGGBGZBLPVNQOBA9VYGKZE9MQYOHDKNE";
+  size_t payload_in_size = strlen((char *)payload_in);
+  tryte_t *payload_out = NULL;
+  size_t payload_out_size = 0;
+
+  // send and receive header
+  {
+    bundle_transactions_new(&bundle);
+    TEST_ASSERT(mam_api_bundle_write_header(&api, cha, NULL, NULL, NULL, NULL,
+                                            NULL, 0, bundle, msg_id) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_read_msg(&api, bundle, &payload_out,
+                                        &payload_out_size) == RC_OK);
+    TEST_ASSERT(payload_out == NULL);
+    TEST_ASSERT(payload_out_size == 0);
+    bundle_transactions_free(&bundle);
+  }
+
+  // send and receive packets
+  for (size_t i = 0; i < 256; i++) {
+    bundle_transactions_new(&bundle);
+    TEST_ASSERT(mam_api_bundle_write_packet(
+                    &api, cha, msg_id, payload_in, payload_in_size,
+                    (mam_msg_checksum_t)(i % 3), bundle) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_read_packet(&api, bundle, &payload_out,
+                                           &payload_out_size) == RC_OK);
+    TEST_ASSERT_EQUAL_MEMORY(payload_in, payload_out, payload_in_size);
+    free(payload_out);
+    payload_out = NULL;
+    payload_out_size = 0;
+    bundle_transactions_free(&bundle);
+  }
+}
+
+int main(void) {
+  UNITY_BEGIN();
+
+  TEST_ASSERT(mam_api_init(&api, API_SEED) == RC_OK);
+  test_api_create_channels(&api, &cha, &ch1a, &epa, &ep1a);
+
+  RUN_TEST(test_api_generic);
+  RUN_TEST(test_api_multiple_packets);
+
   /* destroy channels/endpoints */
   {
     if (cha) {
@@ -425,17 +485,6 @@ static void test_api_generic() {
       free(ep1a);
     }
   }
-
-  TEST_ASSERT(e == RC_OK);
-}
-
-int main(void) {
-  UNITY_BEGIN();
-
-  TEST_ASSERT(mam_api_init(&api, API_SEED) == RC_OK);
-
-  RUN_TEST(test_api_generic);
-
   TEST_ASSERT(mam_api_destroy(&api) == RC_OK);
 
   return UNITY_END();
