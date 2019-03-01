@@ -29,7 +29,7 @@ retcode_t json_get_node_info_serialize_request(const serializer_t *const s,
                                                char_buffer_t *out) {
   retcode_t ret = RC_OK;
   const char *req_text = "{\"command\":\"getNodeInfo\"}";
-  log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   ret = char_buffer_allocate(out, strlen(req_text));
   if (ret == RC_OK) {
     strcpy(out->data, req_text);
@@ -110,8 +110,8 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t *const s,
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
-  log_info(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   ret = json_get_string(json_obj, kAppName, out->app_name);
