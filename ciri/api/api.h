@@ -35,7 +35,6 @@ extern "C" {
  */
 typedef struct iota_api_s {
   iota_api_conf_t conf;
-  thread_handle_t thread;
   bool running;
   node_t *node;
   iota_consensus_t *consensus;
