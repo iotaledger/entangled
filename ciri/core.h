@@ -8,8 +8,6 @@
 #ifndef __CIRI_CORE_H__
 #define __CIRI_CORE_H__
 
-#include "ciri/api/api.h"
-#include "ciri/api/http.h"
 #include "ciri/conf.h"
 #include "consensus/consensus.h"
 #include "gossip/components/transaction_requester.h"
@@ -24,8 +22,6 @@ typedef struct core_s {
   iota_ciri_conf_t conf;
   iota_consensus_t consensus;
   iota_node_t node;
-  iota_api_t api;
-  iota_api_http_t http;
 } core_t;
 
 /**

@@ -14,6 +14,8 @@ cc_binary(
     }) + [":conf.yml"],
     deps = [
         ":core",
+        "//ciri/api",
+        "//ciri/api:http",
         "//utils/handles:rand",
         "//utils/handles:signal",
     ],
@@ -24,8 +26,6 @@ cc_library(
     hdrs = ["core.h"],
     deps = [
         ":conf",
-        "//ciri/api",
-        "//ciri/api:http",
         "//consensus",
         "//gossip:node_shared",
     ],
