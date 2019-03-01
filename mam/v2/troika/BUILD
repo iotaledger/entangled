@@ -7,6 +7,7 @@ cc_library(
     deps = [
         "//common:stdint",
         "//common/ftroika",
+        "//common/troika",
         "//mam/v2:defs",
         "//mam/v2/trits",
     ],
