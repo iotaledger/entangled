@@ -82,7 +82,7 @@ typedef struct {
 
   retcode_t (*get_node_info_serialize_request)(serializer_t const* const,
                                                char_buffer_t* out);
-  
+
   retcode_t (*get_node_info_deserialize_response)(serializer_t const* const,
     const char* const obj,
             get_node_info_res_t* out);

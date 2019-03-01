@@ -14,7 +14,12 @@ retcode_t json_get_balances_serialize_request(
     char_buffer_t *out) {
   retcode_t ret = RC_OK;
   const char *json_text = NULL;
+<<<<<<< HEAD
   log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+=======
+  size_t len = 0;
+  log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+>>>>>>> cclient/serialization/json: reduce log verbosity and increase JSON_CHECK_ERROR macro usage
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__,
@@ -122,8 +127,11 @@ retcode_t json_get_balances_deserialize_response(serializer_t const *const s,
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
-  log_info(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
+<<<<<<< HEAD
+=======
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+>>>>>>> cclient/serialization/json: reduce log verbosity and increase JSON_CHECK_ERROR macro usage
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   ret = json_array_to_uint64(json_obj, "balances", out->balances);
