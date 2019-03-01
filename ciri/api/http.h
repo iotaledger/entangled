@@ -67,15 +67,6 @@ retcode_t iota_api_http_stop(iota_api_http_t *const api);
  */
 retcode_t iota_api_http_destroy(iota_api_http_t *const api);
 
-/**
- * Returns information about your node.
- *
- * @param api The API
- * @param res The response
- *
- * @return a status code
- */
-
 #ifdef __cplusplus
 }
 #endif
