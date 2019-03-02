@@ -19,8 +19,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef COMMON_TROIKA_H
-#define COMMON_TROIKA_H
+#ifndef __COMMON_TROIKA_H__
+#define __COMMON_TROIKA_H__
 
 #include "common/trinary/trits.h"
 #include "common/trinary/tryte.h"
@@ -69,11 +69,11 @@ void troika_squeeze(trit_t *hash, unsigned long long hash_length,
                     unsigned int rate, trit_t *state,
                     unsigned long long num_rounds);
 
-void subtryte_ts(trit_t *state);
+void sub_trytes(trit_t *state);
 void shift_rows(trit_t *state);
 void shift_lanes(trit_t *state);
 void add_column_parity(trit_t *state);
 void add_round_constant(trit_t *state, int round);
 void troika_permutation(trit_t *state, unsigned long long num_rounds);
 
-#endif  // COMMON_TROIKA_H
+#endif  // __COMMON_TROIKA_H__
