@@ -32,11 +32,6 @@
 extern "C" {
 #endif
 
-typedef trit_array_p address_t;
-typedef trit_array_p bundle_hash_t;
-typedef trit_array_p tag_t;
-typedef trit_array_p tx_hash_t;
-
 typedef struct {
   size_t length;
   char* data;
@@ -54,10 +49,6 @@ char_buffer_t* char_buffer_new();
 retcode_t char_buffer_allocate(char_buffer_t* in, const size_t n);
 retcode_t char_buffer_set(char_buffer_t* in, char const* const str);
 void char_buffer_free(char_buffer_t* in);
-
-retcode_t flex_hash_to_trytes(const trit_array_p hash, char* trytes);
-retcode_t trytes_to_flex_hash(trit_array_p hash, const char* trytes);
-retcode_t flex_hash_to_char_buffer(trit_array_p hash, char_buffer_t* out);
 
 typedef UT_array* transaction_array_t;
 transaction_array_t transaction_array_new();
