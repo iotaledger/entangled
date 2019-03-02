@@ -17,13 +17,19 @@
 
 + (NSString*)iota_ios_digest:(NSString*)trytes {
   const char* ctrytes = [trytes cStringUsingEncoding:NSUTF8StringEncoding];
-  char* digest = iota_digest(ctrytes);
+  char* digest = NULL;
+  if ((digest = iota_digest(ctrytes)) == NULL) {
+    return NULL;
+  }
   return [NSString stringWithFormat:@"%s", digest];
 }
 
 + (NSString*)iota_ios_pow_trytes:(NSString*)trytes mwm:(int)mwm {
   const char* ctrytes = [trytes cStringUsingEncoding:NSUTF8StringEncoding];
-  char* foundNonce = iota_pow_trytes(ctrytes, mwm);
+  char* foundNonce = NULL;
+  if ((foundNonce = iota_pow_trytes(ctrytes, mwm)) == NULL) {
+    return NULL;
+  }
   return [NSString stringWithFormat:@"%s", foundNonce];
 }
 
