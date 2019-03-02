@@ -490,7 +490,7 @@ retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
 
 done:
   check_consistency_req_free(&consistency_req);
-  check_consistency_res_free(consistency_res);
+  check_consistency_res_free(&consistency_res);
   get_trytes_res_free(&out_trytes);
   return ret_code;
 }
@@ -767,7 +767,7 @@ retcode_t iota_client_promote_transaction(
   if (consistency_res->state) {
     // consistency req/res are not needed.
     check_consistency_req_free(&consistency_req);
-    check_consistency_res_free(consistency_res);
+    check_consistency_res_free(&consistency_res);
     // adding spam transaction
     transaction_reset(&spam_transaction);
     bundle_transactions_add(bundle, &spam_transaction);
@@ -828,13 +828,13 @@ retcode_t iota_client_promote_transaction(
     }
 
   } else {
-    log_warning(logger_id, "%s the tail is not consistency: %s\n", __func__,
-                consistency_res->info);
+    log_warning(logger_id, "%s the tail is not consistent: %s\n", __func__,
+                consistency_res->info->data);
   }
 
 done:
   check_consistency_req_free(&consistency_req);
-  check_consistency_res_free(consistency_res);
+  check_consistency_res_free(&consistency_res);
   get_transactions_to_approve_req_free(&gtta_req);
   get_transactions_to_approve_res_free(&gtta_res);
   attach_to_tangle_req_free(&att_req);

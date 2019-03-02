@@ -38,10 +38,9 @@
 static trits_t message_test_generic_send_msg(
     mam_prng_t *prng, mam_psk_t const *const pska, mam_psk_t const *const pskb,
     mam_ntru_pk_t const *const ntru_pk, mam_msg_pubkey_t pubkey,
-    mam_msg_keyload_t keyload, mam_msg_checksum_t checksum,
-    mam_channel_t *const cha, mam_endpoint_t *const epa,
-    mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
-    mam_msg_send_context_t *const send_ctx) {
+    mam_msg_keyload_t keyload, mam_channel_t *const cha,
+    mam_endpoint_t *const epa, mam_channel_t *const ch1a,
+    mam_endpoint_t *const ep1a, mam_msg_send_context_t *const send_ctx) {
   trits_t msg = trits_null();
   mam_channel_t *ch = cha;
   mam_endpoint_t *ep = NULL;
@@ -92,7 +91,6 @@ static trits_t message_test_generic_send_first_packet(
   trits_t packet = trits_null();
   trits_t payload = trits_null();
 
-  // mam_spongos_copy(&send_ctx->spongos, cfg->spongos);
   if (mam_msg_checksum_mssig == checksum) {
     if (mam_msg_pubkey_chid == pubkey) {
       send_ctx->mss = &cha->mss;
@@ -279,17 +277,17 @@ static void message_test_generic(mam_prng_t *prng_sender,
   }
 
   /* chid=0, epid=1, chid1=2, epid1=3*/
-  for (pubkey = 0; pubkey < 4; ++pubkey) {
+  for (pubkey = 0; (int)pubkey < 4; ++pubkey) {
     /* public=0, psk=1, ntru=2 */
-    for (keyload = 0; keyload < 3; ++keyload) {
-      for (checksum = 0; checksum < 3; ++checksum)
+    for (keyload = 0; (int)keyload < 3; ++keyload) {
+      for (checksum = 0; (int)checksum < 3; ++checksum)
       /* none=0, mac=1, mssig=2 */
       {
         /* send msg and packet */
         {
           msg = message_test_generic_send_msg(
-              prng_sender, pska, pskb, &ntru->public_key, pubkey, keyload,
-              checksum, cha, epa, ch1a, ep1a, &send_ctx);
+              prng_sender, pska, pskb, &ntru->public_key, pubkey, keyload, cha,
+              epa, ch1a, ep1a, &send_ctx);
 
           packet = message_test_generic_send_first_packet(
               pubkey, checksum, cha, epa, ch1a, ep1a, &send_ctx, payload_str);
