@@ -1,7 +1,7 @@
 ## Entangled for iOS
 
 #### Compiling
-To build with bitcode (using a workaround for [this issue](https://github.com/bazelbuild/rules_apple/issues/163)): `bazel build --ios_multi_cpus=i386,x86_64,armv7,arm64 --copt=-fembed-bitcode --copt=-Ofast //mobile/ios:ios_bindings`
+To build with bitcode (using a workaround for [this issue](https://github.com/bazelbuild/rules_apple/issues/163)): `bazel build --ios_multi_cpus=i386,x86_64,armv7,arm64 --copt=-fembed-bitcode --copt=-O3 //mobile/ios:ios_bindings`
 
 To build without bitcode:
 `bazel build --ios_multi_cpus=i386,x86_64,armv7,arm64 -c opt //mobile/ios:ios_bindings`
