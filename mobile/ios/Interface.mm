@@ -21,7 +21,9 @@
   if ((digest = iota_digest(ctrytes)) == NULL) {
     return NULL;
   }
-  return [NSString stringWithFormat:@"%s", digest];
+  NSString* outputDigest = [NSString stringWithFormat:@"%s", digest];
+  free(digest);
+  return outputDigest;
 }
 
 + (NSString*)iota_ios_pow_trytes:(NSString*)trytes mwm:(int)mwm {
@@ -30,7 +32,9 @@
   if ((foundNonce = iota_pow_trytes(ctrytes, mwm)) == NULL) {
     return NULL;
   }
-  return [NSString stringWithFormat:@"%s", foundNonce];
+  NSString* outputNonce = [NSString stringWithFormat:@"%s", foundNonce];
+  free(foundNonce);
+  return outputNonce;
 }
 
 + (int8_t*)iota_ios_sign_address_gen_trits:(int8_t*)seed
