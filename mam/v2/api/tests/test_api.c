@@ -372,7 +372,6 @@ static void test_api_generic(mam_api_t *const api) {
     trits_from_str(mam_psk_id(pska), TEST_PRE_SHARED_KEY_A_STR);
     prng_gen_str(&api->prng, MAM2_PRNG_DST_SEC_KEY,
                  TEST_PRE_SHARED_KEY_A_NONCE_STR, mam_psk_trits(pska));
-    // mam_api_add_psk(api, pska);
     trits_from_str(mam_psk_id(pskb), TEST_PRE_SHARED_KEY_B_STR);
     prng_gen_str(&api->prng, MAM2_PRNG_DST_SEC_KEY,
                  TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_trits(pskb));
