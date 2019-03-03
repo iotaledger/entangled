@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "mam/v2/trits/trits.h"
 
@@ -277,13 +278,9 @@ bool trits_put_byte(trits_t x, byte b) {
   return 1;
 }
 
-void trits_get(trits_t x, trit_t *t) {
-  for (; !trits_is_empty(x); x = trits_drop(x, 1)) *t++ = trits_get1(x);
-}
+void trits_get(trits_t x, trit_t *t) { memcpy(t, x.p + x.d, trits_size(x)); }
 
-void trits_put(trits_t x, trit_t *t) {
-  for (; !trits_is_empty(x); x = trits_drop(x, 1)) trits_put1(x, *t++);
-}
+void trits_put(trits_t x, trit_t *t) { memcpy(x.p + x.d, t, trits_size(x)); }
 
 void trits_to_str(trits_t x, char *s) {
   for (; !trits_is_empty(x); x = trits_drop_min(x, 3)) *s++ = trits_get_char(x);
@@ -300,7 +297,7 @@ bool trits_from_str(trits_t x, char const *s) {
 
 void trits_set1(trits_t x, trit_t t) {
   MAM2_ASSERT_TRINT1(t);
-  for (; !trits_is_empty(x); x = trits_drop(x, 1)) trits_put1(x, t);
+  memset(x.p + x.d, t, trits_size(x));
 }
 
 void trits_set_zero(trits_t x) { trits_set1(x, 0); }
@@ -309,8 +306,7 @@ void trits_copy(trits_t x, trits_t y) {
   MAM2_ASSERT(trits_size(x) == trits_size(y));
   MAM2_ASSERT(trits_is_same(x, y) || !trits_is_overlapped(x, y));
 
-  for (; !trits_is_empty(x); x = trits_drop(x, 1), y = trits_drop(y, 1))
-    trits_put1(y, trits_get1(x));
+  memcpy(y.p + y.d, x.p + x.d, trits_size(x));
 }
 
 size_t trits_copy_min(trits_t x, trits_t y) {
