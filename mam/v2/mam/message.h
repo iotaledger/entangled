@@ -31,6 +31,8 @@
 extern "C" {
 #endif
 
+#define MAM2_MSG_ORD_SIZE 18
+
 typedef enum mam_msg_pubkey_e {
   mam_msg_pubkey_chid = 0,
   mam_msg_pubkey_epid = 1,
@@ -86,6 +88,15 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
 
 retcode_t mam_msg_recv_packet(mam_msg_recv_context_t *ctx, trits_t *packet,
                               trits_t *payload);
+
+size_t mam_msg_send_ctx_serialized_size(
+    mam_msg_send_context_t const *const ctx);
+
+void mam_msg_send_ctx_serialize(mam_msg_send_context_t const *const ctx,
+                                trits_t *const buffer);
+
+retcode_t mam_msg_send_ctx_deserialize(trits_t *const buffer,
+                                       mam_msg_send_context_t *const ctx);
 
 #ifdef __cplusplus
 }

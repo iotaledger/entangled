@@ -31,6 +31,8 @@
   "RECIPIPRNGKEYBRECIPIPRNGKEYRECIPIPRNGKEYBRECIPIPRNGKEYRECIPIPRNGKEYBRECIPI" \
   "PRNGKEY"
 
+#define TEST_PLAINTEXT1 "WHATANONSENSEMESSAGE"
+
 #define TEST_MSS_DEPTH 1
 
 // TODO - Test functions should take set of prng_t instead of raw ptrs
@@ -343,8 +345,32 @@ void message_test() {
   message_test_generic(&prng_sender, &prng_receiver);
 }
 
+void serialize_send_ctx_test() {
+  mam_msg_send_context_t send_ctx;
+  mam_msg_send_context_t deserialized_ctx;
+  mam_spongos_init(&send_ctx.spongos);
+  send_ctx.ord = 0;
+
+  MAM2_TRITS_DEF0(rand_msg, strlen(TEST_PLAINTEXT1));
+  rand_msg = MAM2_TRITS_INIT(rand_msg, strlen(TEST_PLAINTEXT1));
+  trits_from_str(rand_msg, TEST_PLAINTEXT1);
+  mam_spongos_absorb(&send_ctx.spongos, rand_msg);
+  MAM2_TRITS_DEF0(ctx_buffer, mam_msg_send_ctx_serialized_size(&send_ctx));
+  ctx_buffer =
+      MAM2_TRITS_INIT(ctx_buffer, mam_msg_send_ctx_serialized_size(&send_ctx));
+  mam_msg_send_ctx_serialize(&send_ctx, &ctx_buffer);
+  ctx_buffer =
+      trits_pickup(ctx_buffer, mam_msg_send_ctx_serialized_size(&send_ctx));
+  mam_msg_send_ctx_deserialize(&ctx_buffer, &deserialized_ctx);
+  TEST_ASSERT_EQUAL_INT(send_ctx.ord, deserialized_ctx.ord);
+  TEST_ASSERT_EQUAL_INT(send_ctx.spongos.pos, deserialized_ctx.spongos.pos);
+  TEST_ASSERT_EQUAL_MEMORY(&send_ctx.spongos.sponge,
+                           &deserialized_ctx.spongos.sponge, MAM2_SPONGE_WIDTH);
+}
+
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(message_test);
+  RUN_TEST(serialize_send_ctx_test);
   return UNITY_END();
 }

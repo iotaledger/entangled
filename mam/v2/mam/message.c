@@ -877,3 +877,23 @@ cleanup:
   trits_free(p);
   return e;
 }
+
+size_t mam_msg_send_ctx_serialized_size(
+    mam_msg_send_context_t const *const ctx) {
+  return mam_spongos_serialized_size(&ctx->spongos) + MAM2_MSG_ORD_SIZE;
+}
+
+void mam_msg_send_ctx_serialize(mam_msg_send_context_t const *const ctx,
+                                trits_t *const buffer) {
+  mam_spongos_serialize(&ctx->spongos, buffer);
+  trits_put18(*buffer, ctx->ord);
+  trits_advance(buffer, MAM2_MSG_ORD_SIZE);
+}
+
+retcode_t mam_msg_send_ctx_deserialize(trits_t *const buffer,
+                                       mam_msg_send_context_t *const ctx) {
+  retcode_t err;
+  ERR_BIND_RETURN(mam_spongos_deserialize(buffer, &ctx->spongos), err);
+  ctx->ord = trits_get18(*buffer);
+  trits_advance(buffer, MAM2_MSG_ORD_SIZE);
+}
