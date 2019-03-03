@@ -167,8 +167,7 @@ transfer_t* transfer_data_new(flex_trit_t const* const address,
     transfer->address = address;
     transfer->value = 0;
     transfer->tag = tag;
-    flex_trits_slice(transfer->obsolete_tag, NUM_TRITS_TAG, tag, NUM_TRITS_TAG,
-                     0, NUM_TRITS_TAG);
+    memcpy(transfer->obsolete_tag, tag, FLEX_TRIT_SIZE_81);
     transfer->timestamp = timestamp;
     transfer->meta = (void*)tf_data;
   }
@@ -215,8 +214,7 @@ transfer_t* transfer_value_out_new(transfer_value_out_t const* const output,
   tf->address = address;
   tf->value = value;
   tf->tag = tag;
-  flex_trits_slice(tf->obsolete_tag, NUM_TRITS_TAG, tag, NUM_TRITS_TAG, 0,
-                   NUM_TRITS_TAG);
+  memcpy(tf->obsolete_tag, tag, FLEX_TRIT_SIZE_81);
   tf->timestamp = timestamp;
   tf->meta = (void*)value_out;
   return tf;
@@ -264,8 +262,7 @@ transfer_t* transfer_value_in_new(flex_trit_t const* const address,
   tf->type = VALUE_IN;
   tf->address = address;
   tf->tag = tag;
-  flex_trits_slice(tf->obsolete_tag, NUM_TRITS_TAG, tag, NUM_TRITS_TAG, 0,
-                   NUM_TRITS_TAG);
+  memcpy(tf->obsolete_tag, tag, FLEX_TRIT_SIZE_81);
   tf->value = value;
   tf->timestamp = timestamp;
   tf->meta = (void*)value_in;
