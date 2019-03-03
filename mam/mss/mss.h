@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_MSS_MSS_H__
-#define __MAM_V2_MSS_MSS_H__
+#ifndef __MAM_MSS_MSS_H__
+#define __MAM_MSS_MSS_H__
 
 #include "common/errors.h"
 #include "mam/defs.h"
@@ -272,4 +272,4 @@ retcode_t mam_mss_deserialize(trits_t *buffer, mam_mss_t *mss);
 }
 #endif
 
-#endif  // __MAM_V2_MSS_MSS_H__
+#endif  // __MAM_MSS_MSS_H__

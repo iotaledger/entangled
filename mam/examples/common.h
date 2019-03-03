@@ -8,6 +8,9 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#ifndef __MAM_EXAMPLES_COMMON_H__
+#define __MAM_EXAMPLES_COMMON_H__
+
 #include <stdio.h>
 
 #include "common/trinary/trit_tryte.h"
@@ -41,3 +44,5 @@ mam_psk_t const psk = {
             0,  0,  -1, 1,  -1, 1,  1,  1,  -1, 0,  1,  1,  0,  0,  -1, -1, -1,
             0,  0,  1,  0,  1,  0,  -1, 1,  -1, 0,  1,  0,  -1, 1,  1,  -1, -1,
             0,  0,  -1, 0,  -1}};
+
+#endif  // __MAM_EXAMPLES_COMMON_H__

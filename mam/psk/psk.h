@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_MAM_MAM_TYPES_H__
-#define __MAM_V2_MAM_MAM_TYPES_H__
+#ifndef __MAM_PSK_PSK_H__
+#define __MAM_PSK_PSK_H__
 
 #include "common/errors.h"
 #include "mam/defs.h"
@@ -43,4 +43,4 @@ retcode_t mam_psks_deserialize(trits_t const trits,
 }
 #endif
 
-#endif  // __MAM_V2_MAM_MAM_TYPES_H__
+#endif  // __MAM_PSK_PSK_H__

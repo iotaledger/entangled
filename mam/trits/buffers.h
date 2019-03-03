@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_TRITS_BUFFERS_H__
-#define __MAM_V2_TRITS_BUFFERS_H__
+#ifndef __MAM_TRITS_BUFFERS_H__
+#define __MAM_TRITS_BUFFERS_H__
 
 #include "mam/defs.h"
 #include "mam/trits/trits.h"
@@ -80,4 +80,4 @@ size_t buffers_copy_from(buffers_t *const buffers, trits_t trits);
 }
 #endif
 
-#endif  // __MAM_V2_TRITS_BUFFERS_H__
+#endif  // __MAM_TRITS_BUFFERS_H__

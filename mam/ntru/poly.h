@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_NTRU_POLY_H__
-#define __MAM_V2_NTRU_POLY_H__
+#ifndef __MAM_NTRU_POLY_H__
+#define __MAM_NTRU_POLY_H__
 
 #include "mam/defs.h"
 #include "mam/trits/trits.h"
@@ -259,4 +259,4 @@ static inline void poly_to_trits(poly_t f, trits_t t) {
 }
 #endif
 
-#endif  // __MAM_V2_NTRU_POLY_H__
+#endif  // __MAM_NTRU_POLY_H__

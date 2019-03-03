@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_PRNG_PRNG_H__
-#define __MAM_V2_PRNG_PRNG_H__
+#ifndef __MAM_PRNG_PRNG_H__
+#define __MAM_PRNG_PRNG_H__
 
 #include "common/errors.h"
 #include "mam/defs.h"
@@ -81,4 +81,4 @@ void mam_prng_gen3(mam_prng_t const *const prng,
 }
 #endif
 
-#endif  // __MAM_V2_PRNG_PRNG_H__
+#endif  // __MAM_PRNG_PRNG_H__

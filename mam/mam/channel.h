@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_MAM_CHANNEL_H__
-#define __MAM_V2_MAM_CHANNEL_H__
+#ifndef __MAM_MAM_CHANNEL_H__
+#define __MAM_MAM_CHANNEL_H__
 
 #include "common/trinary/add.h"
 #include "mam/mam/mam_endpoint_t_set.h"
@@ -109,4 +109,4 @@ retcode_t mam_channels_deserialize(trits_t *const buffer,
 }
 #endif
 
-#endif  // __MAM_V2_MAM_CHANNEL_H__
+#endif  // __MAM_MAM_CHANNEL_H__

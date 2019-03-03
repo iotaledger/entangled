@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_API_API_H__
-#define __MAM_V2_API_API_H__
+#ifndef __MAM_API_API_H__
+#define __MAM_API_API_H__
 
 #include "common/errors.h"
 #include "common/model/bundle.h"
@@ -103,4 +103,4 @@ retcode_t mam_api_bundle_read_packet(mam_api_t *const api,
 }
 #endif
 
-#endif  // __MAM_V2_API_API_H__
+#endif  // __MAM_API_API_H__

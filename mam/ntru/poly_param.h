@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_NTRU_POLY_PARAM_H__
-#define __MAM_V2_NTRU_POLY_PARAM_H__
+#ifndef __MAM_NTRU_POLY_PARAM_H__
+#define __MAM_NTRU_POLY_PARAM_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -500,4 +500,4 @@ static size_t poly_idx_rev[MAM_POLY_N] = {
 }
 #endif
 
-#endif  // __MAM_V2_NTRU_POLY_PARAM_H__
+#endif  // __MAM_NTRU_POLY_PARAM_H__

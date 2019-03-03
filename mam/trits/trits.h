@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_TRITS_TRITS_H__
-#define __MAM_V2_TRITS_TRITS_H__
+#ifndef __MAM_TRITS_TRITS_H__
+#define __MAM_TRITS_TRITS_H__
 
 #include <string.h>
 
@@ -234,4 +234,4 @@ void trits_print2(char const *pfx, trits_t x, char const *sfx);
 }
 #endif
 
-#endif  // __MAM_V2_TRITS_TRITS_H__
+#endif  // __MAM_TRITS_TRITS_H__

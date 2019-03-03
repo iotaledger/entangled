@@ -7,8 +7,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_TROIKA_H__
-#define __MAM_V2_TROIKA_H__
+#ifndef __MAM_TROIKA_TROIKA_H__
+#define __MAM_TROIKA_TROIKA_H__
 
 #include "common/ftroika/ftroika.h"
 #include "common/troika/troika.h"
@@ -19,4 +19,4 @@
 void mam_ftroika_transform(trit_t *const state, size_t state_size);
 void mam_troika_transform(trit_t *const state, size_t state_size);
 
-#endif  //__MAM_V2_TROIKA_H__
+#endif  //__MAM_TROIKA_TROIKA_H__

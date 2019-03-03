@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_TEST_UTILS_TEST_UTILS_H__
-#define __MAM_V2_TEST_UTILS_TEST_UTILS_H__
+#ifndef __MAM_TEST_UTILS_TEST_UTILS_H__
+#define __MAM_TEST_UTILS_TEST_UTILS_H__
 
 #include <stdlib.h>
 
@@ -44,4 +44,4 @@ void prng_gen_str(mam_prng_t *prng, tryte_t destination, char const *nonce,
 }
 #endif
 
-#endif  // __MAM_V2_TEST_UTILS_TEST_UTILS_H__
+#endif  // __MAM_TEST_UTILS_TEST_UTILS_H__

@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_PRNG_PRNG_TYPES_H__
-#define __MAM_V2_PRNG_PRNG_TYPES_H__
+#ifndef __MAM_PRNG_PRNG_TYPES_H__
+#define __MAM_PRNG_PRNG_TYPES_H__
 
 #include "mam/defs.h"
 #include "mam/sponge/sponge.h"
@@ -52,4 +52,4 @@ void mam_prng_deserialize(trits_t const trits, mam_prng_t* const prng);
 }
 #endif
 
-#endif  // __MAM_V2_PRNG_PRNG_TYPES_H__
+#endif  // __MAM_PRNG_PRNG_TYPES_H__

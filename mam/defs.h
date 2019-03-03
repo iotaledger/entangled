@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_DEFS_H__
-#define __MAM_V2_DEFS_H__
+#ifndef __MAM_DEFS_H__
+#define __MAM_DEFS_H__
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -86,4 +86,4 @@ typedef uint8_t byte;
 }
 #endif
 
-#endif  // __MAM_V2_DEFS_H__
+#endif  // __MAM_DEFS_H__

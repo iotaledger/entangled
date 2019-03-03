@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_SPONGE_SPONGE_H__
-#define __MAM_V2_SPONGE_SPONGE_H__
+#ifndef __MAM_SPONGE_SPONGE_H__
+#define __MAM_SPONGE_SPONGE_H__
 
 #include "common/errors.h"
 #include "mam/defs.h"
@@ -162,4 +162,4 @@ void mam_sponge_hashn(mam_sponge_t *const sponge, size_t const n,
 }
 #endif
 
-#endif  // __MAM_V2_SPONGE_SPONGE_H__
+#endif  // __MAM_SPONGE_SPONGE_H__

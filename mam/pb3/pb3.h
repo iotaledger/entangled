@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_PB3_PB3_H__
-#define __MAM_V2_PB3_PB3_H__
+#ifndef __MAM_PB3_PB3_H__
+#define __MAM_PB3_PB3_H__
 
 #include "common/errors.h"
 #include "mam/defs.h"
@@ -109,4 +109,4 @@ void pb3_squeeze_external_ntrytes(mam_spongos_t *const spongos,
 }
 #endif
 
-#endif  // __MAM_V2_PB3_PB3_H__
+#endif  // __MAM_PB3_PB3_H__

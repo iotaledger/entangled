@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_SPONGE_SPONGOS_TYPES_H__
-#define __MAM_V2_SPONGE_SPONGOS_TYPES_H__
+#ifndef __MAM_SPONGE_SPONGOS_TYPES_H__
+#define __MAM_SPONGE_SPONGOS_TYPES_H__
 
 #include "mam/defs.h"
 #include "mam/sponge/sponge.h"
@@ -36,4 +36,4 @@ retcode_t mam_spongos_deserialize(trits_t *const trits,
 }
 #endif
 
-#endif  // __MAM_V2_SPONGE_SPONGOS_TYPES_H__
+#endif  // __MAM_SPONGE_SPONGOS_TYPES_H__

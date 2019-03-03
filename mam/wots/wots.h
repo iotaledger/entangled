@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_WOTS_WOTS_H__
-#define __MAM_V2_WOTS_WOTS_H__
+#ifndef __MAM_WOTS_WOTS_H__
+#define __MAM_WOTS_WOTS_H__
 
 #include "common/errors.h"
 #include "mam/defs.h"
@@ -135,4 +135,4 @@ bool mam_wots_verify(mam_spongos_t *const spongos, trits_t const hash,
 }
 #endif
 
-#endif  // __MAM_V2_WOTS_WOTS_H__
+#endif  // __MAM_WOTS_WOTS_H__

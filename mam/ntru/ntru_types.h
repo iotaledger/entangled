@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_NTRU_NTRU_TYPES_H__
-#define __MAM_V2_NTRU_NTRU_TYPES_H__
+#ifndef __MAM_NTRU_NTRU_TYPES_H__
+#define __MAM_NTRU_NTRU_TYPES_H__
 
 #include "common/errors.h"
 #include "mam/defs.h"
@@ -56,4 +56,4 @@ retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sk_set,
 retcode_t mam_ntru_sks_deserialize(trits_t const trits,
                                    mam_ntru_sk_t_set_t* const ntru_sk_set);
 
-#endif  // __MAM_V2_NTRU_NTRU_TYPES_H__
+#endif  // __MAM_NTRU_NTRU_TYPES_H__

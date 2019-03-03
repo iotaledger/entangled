@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_MAM_MESSAGE_H__
-#define __MAM_V2_MAM_MESSAGE_H__
+#ifndef __MAM_MAM_MESSAGE_H__
+#define __MAM_MAM_MESSAGE_H__
 
 #include "common/errors.h"
 #include "mam/defs.h"
@@ -110,4 +110,4 @@ retcode_t mam_msg_recv_ctx_deserialize(trits_t *const buffer,
 }
 #endif
 
-#endif  // __MAM_V2_MAM_MESSAGE_H__
+#endif  // __MAM_MAM_MESSAGE_H__

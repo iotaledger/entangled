@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_MAM_ENDPOINT_H__
-#define __MAM_V2_MAM_ENDPOINT_H__
+#ifndef __MAM_MAM_ENDPOINT_H__
+#define __MAM_MAM_ENDPOINT_H__
 
 #include "mam/mss/mss.h"
 #include "mam/trits/trits.h"
@@ -108,4 +108,4 @@ retcode_t mam_endpoints_deserialize(trits_t *const buffer,
 }
 #endif
 
-#endif  // __MAM_V2_MAM_ENDPOINT_H__
+#endif  // __MAM_MAM_ENDPOINT_H__

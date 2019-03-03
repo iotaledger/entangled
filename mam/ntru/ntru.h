@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_V2_NTRU_NTRU_H__
-#define __MAM_V2_NTRU_NTRU_H__
+#ifndef __MAM_NTRU_NTRU_H__
+#define __MAM_NTRU_NTRU_H__
 
 #include "mam/defs.h"
 #include "mam/ntru/ntru_types.h"
@@ -146,4 +146,4 @@ void ntru_load_sk(mam_ntru_sk_t *n);
 }
 #endif
 
-#endif  // __MAM_V2_NTRU_NTRU_H__
+#endif  // __MAM_NTRU_NTRU_H__
