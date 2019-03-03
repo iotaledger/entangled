@@ -277,14 +277,6 @@ bool trits_put_byte(trits_t x, byte b) {
   return 1;
 }
 
-void trits_get(trits_t x, trit_t *t) {
-  for (; !trits_is_empty(x); x = trits_drop(x, 1)) *t++ = trits_get1(x);
-}
-
-void trits_put(trits_t x, trit_t *t) {
-  for (; !trits_is_empty(x); x = trits_drop(x, 1)) trits_put1(x, *t++);
-}
-
 void trits_to_str(trits_t x, char *s) {
   for (; !trits_is_empty(x); x = trits_drop_min(x, 3)) *s++ = trits_get_char(x);
 }
@@ -296,21 +288,6 @@ bool trits_from_str(trits_t x, char const *s) {
     r = trits_put_char(x, *s++);
 
   return r;
-}
-
-void trits_set1(trits_t x, trit_t t) {
-  MAM2_ASSERT_TRINT1(t);
-  for (; !trits_is_empty(x); x = trits_drop(x, 1)) trits_put1(x, t);
-}
-
-void trits_set_zero(trits_t x) { trits_set1(x, 0); }
-
-void trits_copy(trits_t x, trits_t y) {
-  MAM2_ASSERT(trits_size(x) == trits_size(y));
-  MAM2_ASSERT(trits_is_same(x, y) || !trits_is_overlapped(x, y));
-
-  for (; !trits_is_empty(x); x = trits_drop(x, 1), y = trits_drop(y, 1))
-    trits_put1(y, trits_get1(x));
 }
 
 size_t trits_copy_min(trits_t x, trits_t y) {
@@ -521,18 +498,6 @@ bool trits_cmp_eq_str(trits_t x, char const *y) {
     r = (trits_get_char(x) == *y++) && r;
 
   return r;
-}
-
-bool trits_is_same(trits_t x, trits_t y) {
-  return (x.p == y.p) && (x.d == y.d); /* && (x.n == y.n) */
-}
-
-bool trits_is_overlapped(trits_t x, trits_t y) {
-  trit_t *x_first = x.p + x.d;
-  trit_t *x_last = x.p + x.n;
-  trit_t *y_first = y.p + y.d;
-  trit_t *y_last = y.p + y.n;
-  return (x_first < y_last) && (y_first < x_last);
 }
 
 trits_t trits_diff(trits_t begin, trits_t end) {

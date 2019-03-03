@@ -15,6 +15,8 @@
 #ifndef __MAM_V2_TRITS_TRITS_H__
 #define __MAM_V2_TRITS_TRITS_H__
 
+#include <string.h>
+
 #include "mam/v2/defs.h"
 
 #ifdef __cplusplus
@@ -97,11 +99,31 @@ bool trits_put_char(trits_t x, char c);
 byte trits_get_byte(trits_t x);
 bool trits_put_byte(trits_t x, byte b);
 
+/*! \brief Check whether `x` and `y` point to the same memory location.
+\note `trits_is_same(x, y)` implies `0 == trits_cmp_grlex(x, y)` but not vice
+versa. */
+static inline bool trits_is_same(trits_t x, trits_t y) {
+  return (x.p == y.p) && (x.d == y.d); /* && (x.n == y.n) */
+}
+
+/*! \brief Check whether `x` and `y` point to overlapped memory location. */
+static inline bool trits_is_overlapped(trits_t x, trits_t y) {
+  trit_t *x_first = x.p + x.d;
+  trit_t *x_last = x.p + x.n;
+  trit_t *y_first = y.p + y.d;
+  trit_t *y_last = y.p + y.n;
+  return (x_first < y_last) && (y_first < x_last);
+}
+
 /*! \brief Get trits: `t`[i] := `x`[i]. */
-void trits_get(trits_t x, trit_t *t);
+static inline void trits_get(trits_t x, trit_t *t) {
+  memcpy(t, x.p + x.d, trits_size(x));
+}
 
 /*! \brief Put trits: `x`[i] := `t`[i]. */
-void trits_put(trits_t x, trit_t *t);
+static inline void trits_put(trits_t x, trit_t *t) {
+  memcpy(x.p + x.d, t, trits_size(x));
+}
 
 /*! \brief Convert trytes to string.
 \note `trits_size(x)` must be multiple of 3.
@@ -116,13 +138,21 @@ Size of `s` must be equal `trits_size(x)/3`.
 bool trits_from_str(trits_t x, char const *s);
 
 /*! \brief Set zero trits: `x` := t^n. */
-void trits_set1(trits_t x, trit_t t);
+static inline void trits_set1(trits_t x, trit_t t) {
+  MAM2_ASSERT_TRINT1(t);
+  memset(x.p + x.d, t, trits_size(x));
+}
 
 /*! \brief Set zero trits: `x` := 0^n. */
-void trits_set_zero(trits_t x);
+static inline void trits_set_zero(trits_t x) { trits_set1(x, 0); }
 
 /*! \brief Copy trits: `y` := `x`. */
-void trits_copy(trits_t x, trits_t y);
+static inline void trits_copy(trits_t x, trits_t y) {
+  MAM2_ASSERT(trits_size(x) == trits_size(y));
+  MAM2_ASSERT(trits_is_same(x, y) || !trits_is_overlapped(x, y));
+
+  memcpy(y.p + y.d, x.p + x.d, trits_size(x));
+}
 
 /*! \brief Copy minimal number of trits contained in `x` and `y`.
 Return number of trits copied. */
@@ -171,14 +201,6 @@ int trits_cmp_grlex(trits_t x, trits_t y);
 bool trits_cmp_eq(trits_t x, trits_t y);
 
 bool trits_cmp_eq_str(trits_t x, char const *y);
-
-/*! \brief Check whether `x` and `y` point to the same memory location.
-\note `trits_is_same(x, y)` implies `0 == trits_cmp_grlex(x, y)` but not vice
-versa. */
-bool trits_is_same(trits_t x, trits_t y);
-
-/*! \brief Check whether `x` and `y` point to overlapped memory location. */
-bool trits_is_overlapped(trits_t x, trits_t y);
 
 /*! \brief Return `x` such that:
 `trits_is_same(trits_drop(begin, trits_size(x)), end)` and
