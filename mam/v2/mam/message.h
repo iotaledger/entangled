@@ -54,7 +54,7 @@ typedef enum mam_msg_checksum_e {
 typedef struct mam_msg_send_context_s {
   mam_spongos_t spongos;
   trint18_t ord;
-  mss_t *mss;
+  mam_mss_t *mss;
 } mam_msg_send_context_t;
 
 typedef struct mam_msg_recv_context_s {
@@ -75,7 +75,7 @@ void mam_msg_send(mam_msg_send_context_t *ctx, mam_prng_t *prng,
                   mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks,
                   trits_t *msg);
 
-size_t mam_msg_send_packet_size(mam_msg_checksum_t checksum, mss_t *mss,
+size_t mam_msg_send_packet_size(mam_msg_checksum_t checksum, mam_mss_t *mss,
                                 size_t payload_size);
 
 void mam_msg_send_packet(mam_msg_send_context_t *ctx,

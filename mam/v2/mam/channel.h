@@ -27,7 +27,7 @@ typedef struct mam_channel_s {
   trit_t id[MAM2_CHANNEL_ID_SIZE];
   trits_t name;
   trit_t msg_ord[MAM2_CHANNEL_MSG_ORD_SIZE];
-  mss_t mss;
+  mam_mss_t mss;
   mam_endpoint_t_set_t endpoints;
 } mam_channel_t;
 

@@ -43,7 +43,7 @@ static retcode_t mam_msg_unwrap_mac(mam_spongos_t *s, trits_t *b) {
   return e;
 }
 
-static size_t mam_msg_wrap_mssig_size(mss_t *m) {
+static size_t mam_msg_wrap_mssig_size(mam_mss_t *m) {
   size_t const sz = MAM2_MSS_SIG_SIZE(m->height) / 3;
   return 0
          /*  commit; */
@@ -55,7 +55,7 @@ static size_t mam_msg_wrap_mssig_size(mss_t *m) {
          + pb3_sizeof_ntrytes(sz);
 }
 
-static void mam_msg_wrap_mssig(mam_spongos_t *s, trits_t *b, mss_t *m) {
+static void mam_msg_wrap_mssig(mam_spongos_t *s, trits_t *b, mam_mss_t *m) {
   MAM2_TRITS_DEF0(mac, MAM2_MSS_HASH_SIZE);
   size_t const sz = MAM2_MSS_SIG_SIZE(m->height) / 3;
   mac = MAM2_TRITS_INIT(mac, MAM2_MSS_HASH_SIZE);
@@ -69,7 +69,7 @@ static void mam_msg_wrap_mssig(mam_spongos_t *s, trits_t *b, mss_t *m) {
   /*  absorb size_t sz; */
   pb3_wrap_absorb_size_t(s, b, sz);
   /*  skip tryte sig[sz]; */
-  mss_sign(m, mac, pb3_trits_take(b, pb3_sizeof_ntrytes(sz)));
+  mam_mss_sign(m, mac, pb3_trits_take(b, pb3_sizeof_ntrytes(sz)));
 }
 
 static retcode_t mam_msg_unwrap_mssig(mam_spongos_t *s, trits_t *b,
@@ -90,13 +90,14 @@ static retcode_t mam_msg_unwrap_mssig(mam_spongos_t *s, trits_t *b,
   /*  skip tryte sig[sz]; */
   ERR_GUARD_RETURN(pb3_sizeof_ntrytes(sz) <= trits_size(*b), RC_MAM2_PB3_EOF);
   ERR_GUARD_RETURN(
-      mss_verify(ms, ws, mac, pb3_trits_take(b, pb3_sizeof_ntrytes(sz)), pk),
+      mam_mss_verify(ms, ws, mac, pb3_trits_take(b, pb3_sizeof_ntrytes(sz)),
+                     pk),
       RC_MAM2_PB3_BAD_SIG);
 
   return e;
 }
 
-static size_t mam_msg_wrap_signedid_size(mss_t *m) {
+static size_t mam_msg_wrap_signedid_size(mam_mss_t *m) {
   return 0
          /*  absorb tryte id[81]; */
          + pb3_sizeof_ntrytes(81)
@@ -105,7 +106,7 @@ static size_t mam_msg_wrap_signedid_size(mss_t *m) {
 }
 
 static void mam_msg_wrap_signedid(mam_spongos_t *s, trits_t *b, trits_t id,
-                                  mss_t *m) {
+                                  mam_mss_t *m) {
   MAM2_ASSERT(mam_msg_wrap_signedid_size(m) <= trits_size(*b));
   MAM2_ASSERT(pb3_sizeof_ntrytes(81) == trits_size(id));
 
@@ -210,12 +211,12 @@ static retcode_t mam_msg_unwrap_pubkey_epid(mam_spongos_t *s, trits_t *b,
   return e;
 }
 
-static size_t mam_msg_wrap_pubkey_chid1_size(mss_t *m) {
+static size_t mam_msg_wrap_pubkey_chid1_size(mam_mss_t *m) {
   return mam_msg_wrap_signedid_size(m);
 }
 
 static void mam_msg_wrap_pubkey_chid1(mam_spongos_t *s, trits_t *b,
-                                      trits_t chid1, mss_t *m) {
+                                      trits_t chid1, mam_mss_t *m) {
   mam_msg_wrap_signedid(s, b, chid1, m);
 }
 
@@ -225,12 +226,12 @@ static retcode_t mam_msg_unwrap_pubkey_chid1(mam_spongos_t *s, trits_t *b,
   return mam_msg_unwrap_signedid(s, b, chid1, ms, ws, pk);
 }
 
-static size_t mam_msg_wrap_pubkey_epid1_size(mss_t *m) {
+static size_t mam_msg_wrap_pubkey_epid1_size(mam_mss_t *m) {
   return mam_msg_wrap_signedid_size(m);
 }
 
 static void mam_msg_wrap_pubkey_epid1(mam_spongos_t *s, trits_t *b,
-                                      trits_t epid1, mss_t *m) {
+                                      trits_t epid1, mam_mss_t *m) {
   mam_msg_wrap_signedid(s, b, epid1, m);
 }
 
@@ -423,12 +424,12 @@ static retcode_t mam_msg_unwrap_checksum_mac(mam_spongos_t *s, trits_t *b) {
   return mam_msg_unwrap_mac(s, b);
 }
 
-static size_t mam_msg_wrap_checksum_mssig_size(mss_t *m) {
+static size_t mam_msg_wrap_checksum_mssig_size(mam_mss_t *m) {
   return mam_msg_wrap_mssig_size(m);
 }
 
 static void mam_msg_wrap_checksum_mssig(mam_spongos_t *s, trits_t *b,
-                                        mss_t *m) {
+                                        mam_mss_t *m) {
   mam_msg_wrap_mssig(s, b, m);
 }
 
@@ -511,9 +512,9 @@ void mam_msg_send(mam_msg_send_context_t *ctx, mam_prng_t *prng,
                 mam_msg_send_size(ch, ep, ch1, ep1, psks, ntru_pks)));
 
   if (ep) {
-    mss_skn(&ep->mss, skn);
+    mam_mss_skn(&ep->mss, skn);
   } else {
-    mss_skn(&ch->mss, skn);
+    mam_mss_skn(&ch->mss, skn);
   }
 
   /* generate session key */
@@ -613,7 +614,7 @@ void mam_msg_send(mam_msg_send_context_t *ctx, mam_prng_t *prng,
   trits_set_zero(session_key);
 }
 
-size_t mam_msg_send_packet_size(mam_msg_checksum_t checksum, mss_t *mss,
+size_t mam_msg_send_packet_size(mam_msg_checksum_t checksum, mam_mss_t *mss,
                                 size_t payload_size) {
   size_t sz = 0;
   MAM2_ASSERT(0 == payload_size % 3);
