@@ -566,7 +566,7 @@ retcode_t mam_mss_create(mam_mss_t *mss, mss_mt_height_t height) {
 
   memset(mss, 0, sizeof(mam_mss_t));
   ERR_GUARD_RETURN(0 <= height && height <= MAM_MSS_MAX_D,
-                   RC_MAM2_INVALID_ARGUMENT);
+                   RC_MAM_INVALID_ARGUMENT);
 
 #if defined(MAM_MSS_TRAVERSAL)
   mss->auth_path = malloc(sizeof(trit_t) * MAM_MSS_MT_AUTH_WORDS(height));
@@ -720,21 +720,20 @@ retcode_t mam_mss_deserialize(trits_t *buffer, mam_mss_t *mss) {
 
   ERR_GUARD_RETURN(MAM_MSS_SKN_TREE_DEPTH_SIZE + MAM_MSS_SKN_KEY_NUMBER_SIZE <=
                        trits_size(*buffer),
-                   RC_MAM2_BUFFER_TOO_SMALL);
+                   RC_MAM_BUFFER_TOO_SMALL);
   ERR_GUARD_RETURN(
       mss_parse_skn(&height, &skn,
                     trits_advance(buffer, MAM_MSS_SKN_TREE_DEPTH_SIZE +
                                               MAM_MSS_SKN_KEY_NUMBER_SIZE)),
-      RC_MAM2_INVALID_VALUE);
-  ERR_GUARD_RETURN(height == mss->height, RC_MAM2_INVALID_VALUE);
+      RC_MAM_INVALID_VALUE);
+  ERR_GUARD_RETURN(height == mss->height, RC_MAM_INVALID_VALUE);
 
-#if defined(MAM_MSS_TRAVERSAL)
-  mss_mt_rewind(mss, skn);
+#if defined(MAM_MSS_TRAVERSAL) mss_mt_rewind(mss, skn);
 #else
   mss->skn = skn;
 #endif
   ERR_GUARD_RETURN(mss_mt_serialized_size(mss) <= trits_size(*buffer),
-                   RC_MAM2_BUFFER_TOO_SMALL);
+                   RC_MAM_BUFFER_TOO_SMALL);
   mss_mt_deserialize(trits_advance(buffer, mss_mt_serialized_size(mss)), mss);
 
   return RC_OK;

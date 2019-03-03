@@ -31,7 +31,7 @@ retcode_t pb3_decode_tryte(tryte_t *const tryte, trits_t *const buffer) {
   MAM_ASSERT(tryte);
 
   if (trits_size(*buffer) < pb3_sizeof_tryte()) {
-    return RC_MAM2_PB3_EOF;
+    return RC_MAM_PB3_EOF;
   }
 
   *tryte = trits_get3(pb3_trits_take(buffer, 3));
@@ -51,7 +51,7 @@ retcode_t pb3_decode_trint(trint9_t *const trint, trits_t *const buffer) {
   MAM_ASSERT(trint);
 
   if (trits_size(*buffer) < pb3_sizeof_trint()) {
-    return RC_MAM2_PB3_EOF;
+    return RC_MAM_PB3_EOF;
   }
 
   *trint = trits_get9(pb3_trits_take(buffer, 9));
@@ -71,7 +71,7 @@ retcode_t pb3_decode_longtrint(trint18_t *const trint, trits_t *const buffer) {
   MAM_ASSERT(trint);
 
   if (trits_size(*buffer) < pb3_sizeof_longtrint()) {
-    return RC_MAM2_PB3_EOF;
+    return RC_MAM_PB3_EOF;
   }
 
   *trint = trits_get18(pb3_trits_take(buffer, 18));
@@ -129,16 +129,16 @@ retcode_t pb3_decode_size_t(size_t *const n, trits_t *const buffer) {
   tryte_t d;
 
   if (trits_size(*buffer) < 3) {
-    return RC_MAM2_PB3_EOF;
+    return RC_MAM_PB3_EOF;
   }
 
   d = trits_get3(*buffer);
   *buffer = trits_drop(*buffer, 3);
   if (d < 0 || d > 13) {
-    return RC_MAM2_INVALID_VALUE;
+    return RC_MAM_INVALID_VALUE;
   }
   if (trits_size(*buffer) < 3 * (size_t)d) {
-    return RC_MAM2_PB3_EOF;
+    return RC_MAM_PB3_EOF;
   }
 
   /* move pointer to the end */
@@ -156,7 +156,7 @@ retcode_t pb3_decode_size_t(size_t *const n, trits_t *const buffer) {
     t = trits_get3(s);
     /* can't be 0 or negative */
     if (t <= 0) {
-      return RC_MAM2_INVALID_VALUE;
+      return RC_MAM_INVALID_VALUE;
     }
     m = (size_t)t;
 
@@ -169,7 +169,7 @@ retcode_t pb3_decode_size_t(size_t *const n, trits_t *const buffer) {
     /* value may be truncated here */
     *n = (size_t)m;
     if (m != (uint64_t)*n) {
-      return RC_MAM2_PB3_SIZE_T_NOT_SUPPORTED;
+      return RC_MAM_PB3_SIZE_T_NOT_SUPPORTED;
     }
   }
 
@@ -191,7 +191,7 @@ retcode_t pb3_decode_ntrytes(trits_t const ntrytes, trits_t *const buffer) {
   MAM_ASSERT(buffer && (n % 3) == 0);
 
   if (n > trits_size(*buffer)) {
-    return RC_MAM2_PB3_EOF;
+    return RC_MAM_PB3_EOF;
   }
 
   trits_copy(pb3_trits_take(buffer, n), ntrytes);
@@ -331,7 +331,7 @@ retcode_t pb3_unwrap_crypt_ntrytes(mam_spongos_t *const spongos,
   MAM_ASSERT(0 == (n % 3));
 
   if (n > trits_size(*buffer)) {
-    return RC_MAM2_PB3_EOF;
+    return RC_MAM_PB3_EOF;
   }
   mam_spongos_decr(spongos, pb3_trits_take(buffer, n), trits);
 
@@ -348,11 +348,11 @@ void pb3_wrap_squeeze_ntrytes(mam_spongos_t *const spongos,
 retcode_t pb3_unwrap_squeeze_ntrytes(mam_spongos_t *const spongos,
                                      trits_t *const buffer, size_t const n) {
   if (pb3_sizeof_ntrytes(n) > trits_size(*buffer)) {
-    return RC_MAM2_PB3_EOF;
+    return RC_MAM_PB3_EOF;
   }
   if (!mam_spongos_squeeze_eq(spongos,
                               pb3_trits_take(buffer, pb3_sizeof_ntrytes(n)))) {
-    return RC_MAM2_PB3_BAD_MAC;
+    return RC_MAM_PB3_BAD_MAC;
   }
 
   return RC_OK;

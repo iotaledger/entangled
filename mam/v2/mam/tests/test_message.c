@@ -125,7 +125,7 @@ static void message_test_generic_receive_msg(
     mam_psk_t const *const pre_shared_key, mam_ntru_sk_t const *const ntru,
     mam_channel_t *const cha, trits_t *const msg,
     mam_msg_recv_context_t *const cfg_msg_recv, trits_t msg_id) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
+  retcode_t e = RC_MAM_INTERNAL_ERROR;
 
   /* init recv msg context */
   mam_msg_recv_context_t *cfg = cfg_msg_recv;
@@ -149,7 +149,7 @@ static void message_test_generic_receive_msg(
 static void message_test_generic_receive_packet(
     mam_msg_recv_context_t *const ctx, trits_t const *const packet,
     trits_t *const payload) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
+  retcode_t e = RC_MAM_INTERNAL_ERROR;
   ctx->ord = 0;
 
   e = mam_msg_recv_packet(ctx, packet, payload);
@@ -164,7 +164,7 @@ static void message_test_create_channels(mam_prng_t *prng,
                                          mam_channel_t **const ch1,
                                          mam_endpoint_t **const epa,
                                          mam_endpoint_t **ep1) {
-  retcode_t e = RC_MAM2_INTERNAL_ERROR;
+  retcode_t e = RC_MAM_INTERNAL_ERROR;
   mss_mt_height_t d = TEST_MSS_DEPTH;
 
   /* create channels */

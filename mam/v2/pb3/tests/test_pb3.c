@@ -43,7 +43,7 @@ static bool pb3_test_size_t_overflow() {
   /* x = pb3_encode_size_t((27^8-1)/2) > 2^32 */
 
   e = pb3_decode_size_t(&n, &x);
-  return e == RC_MAM2_PB3_SIZE_T_NOT_SUPPORTED;
+  return e == RC_MAM_PB3_SIZE_T_NOT_SUPPORTED;
 }
 
 static void pb3_size_t_tests(void) {

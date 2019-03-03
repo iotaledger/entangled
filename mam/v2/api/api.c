@@ -173,7 +173,7 @@ retcode_t mam_api_bundle_write_header(
   }
 
   if (bundle_transactions_size(bundle) != 0) {
-    return RC_MAM2_BUNDLE_NOT_EMPTY;
+    return RC_MAM_BUNDLE_NOT_EMPTY;
   }
 
   // TODO add a random part
@@ -230,7 +230,7 @@ retcode_t mam_api_bundle_write_packet(
   if (!trit_t_to_mam_msg_send_context_t_map_find(&api->send_ctxs, msg_id,
                                                  &entry) ||
       entry == NULL) {
-    return RC_MAM2_MESSAGE_NOT_FOUND;
+    return RC_MAM_MESSAGE_NOT_FOUND;
   }
   ctx = &entry->value;
 
@@ -295,7 +295,7 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
 
   MAM_ASSERT(payload && *payload == NULL && payload_size);
   if (!mam_api_bundle_contains_header(bundle)) {
-    return RC_MAM2_BUNDLE_DOES_NOT_CONTAIN_HEADER;
+    return RC_MAM_BUNDLE_DOES_NOT_CONTAIN_HEADER;
   }
 
   mam_msg_recv_context_t ctx;
@@ -352,7 +352,7 @@ retcode_t mam_api_bundle_read_packet(mam_api_t *const api,
   if (!trit_t_to_mam_msg_recv_context_t_map_find(&api->recv_ctxs, tag,
                                                  &entry) ||
       entry == NULL) {
-    return RC_MAM2_MESSAGE_NOT_FOUND;
+    return RC_MAM_MESSAGE_NOT_FOUND;
   }
 
   size_t num_trits_in_bundle =
