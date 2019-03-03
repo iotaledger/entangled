@@ -881,11 +881,13 @@ cleanup:
 
 size_t mam_msg_send_ctx_serialized_size(
     mam_msg_send_context_t const *const ctx) {
-  return mam_spongos_serialized_size(&ctx->spongos) + MAM2_MSG_ORD_SIZE;
+  return mam_spongos_serialized_size(&ctx->spongos) + MAM2_MSG_ORD_SIZE +
+         MAM2_MSS_PK_SIZE;
 }
 
 void mam_msg_send_ctx_serialize(mam_msg_send_context_t const *const ctx,
                                 trits_t *const buffer) {
+  pb3_encode_ntrytes(trits_from_rep(MAM2_MSS_PK_SIZE, ctx->mss->root), buffer);
   mam_spongos_serialize(&ctx->spongos, buffer);
   trits_put18(*buffer, ctx->ord);
   trits_advance(buffer, MAM2_MSG_ORD_SIZE);
@@ -893,8 +895,13 @@ void mam_msg_send_ctx_serialize(mam_msg_send_context_t const *const ctx,
 
 retcode_t mam_msg_send_ctx_deserialize(trits_t *const buffer,
                                        mam_msg_send_context_t *const ctx) {
-  retcode_t err;
-  ERR_BIND_RETURN(mam_spongos_deserialize(buffer, &ctx->spongos), err);
+  retcode_t ret;
+  trits_t root_id = trits_from_rep(MAM2_MSS_PK_SIZE, ctx->mss->root);
+  if ((ret = pb3_decode_ntrytes(root_id, buffer) != RC_OK)) {
+    return ret;
+  }
+  ERR_BIND_RETURN(mam_spongos_deserialize(buffer, &ctx->spongos), ret);
   ctx->ord = trits_get18(*buffer);
   trits_advance(buffer, MAM2_MSG_ORD_SIZE);
+  return ret;
 }
