@@ -70,7 +70,7 @@ void mam_sponge_init(mam_sponge_t *const sponge) {
 }
 
 void mam_sponge_transform(mam_sponge_t *const sponge) {
-  mam_troika_transform(sponge->state, MAM2_SPONGE_WIDTH);
+  mam_ftroika_transform(sponge->state, MAM2_SPONGE_WIDTH);
 }
 
 void mam_sponge_fork(mam_sponge_t const *const sponge,

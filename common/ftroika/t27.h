@@ -28,6 +28,11 @@
 #include "common/ftroika/general.h"
 #include "common/trinary/trits.h"
 
+#define T27_NUM_COLUMNS 9
+#define T27_NUM_SLICES 27
+#define T27_NUM_ROWS 3
+#define T27_SLICE_SIZE (T27_NUM_COLUMNS * T27_NUM_ROWS)
+
 // trits are stored as two bits, one inside p, the other inside n, both have the
 // same 'index' names 'p' (positive) and 'n' (negative) result from using these
 // functions in a lib for balanced ternary before so i just left them here
@@ -98,20 +103,25 @@ static inline void t27_set(t27_t* a, const int pos, const uint8_t val) {
 }
 
 static inline void state_to_fstate(trit_t* state, t27_t* fstate) {
-  const int slices = 27, colums = 9, rows = 3, slicesize = rows * colums;
-  for (int slice = 0; slice < slices; ++slice) {
-    for (int row = 0; row < rows; ++row) {
-      for (int colum = 0; colum < colums; ++colum) {
-        trit_t t = state[slicesize * slice + colums * row + colum];
-        t27_set(&fstate[colums * row + colum], slice, t);
+  for (size_t slice = 0; slice < T27_NUM_SLICES; ++slice) {
+    for (size_t row = 0; row < T27_NUM_ROWS; ++row) {
+      for (size_t colum = 0; colum < T27_NUM_COLUMNS; ++colum) {
+        trit_t t =
+            state[T27_SLICE_SIZE * slice + T27_NUM_COLUMNS * row + colum];
+        t27_set(&fstate[T27_NUM_COLUMNS * row + colum], slice, t);
       }
     }
   }
 }
 
 static inline void fstate_to_state(t27_t* fstate, trit_t* state) {
-  for (int i = 0; i < 729; ++i) {
-    state[i] = t27_get(fstate, i);
+  for (size_t slice = 0; slice < T27_NUM_SLICES; ++slice) {
+    for (size_t row = 0; row < T27_NUM_ROWS; ++row) {
+      for (size_t colum = 0; colum < T27_NUM_COLUMNS; ++colum) {
+        state[T27_SLICE_SIZE * slice + T27_NUM_COLUMNS * row + colum] =
+            t27_get(&fstate[T27_NUM_COLUMNS * row + colum], slice);
+      }
+    }
   }
 }
 
