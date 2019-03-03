@@ -76,6 +76,13 @@ void test_value_out(void) {
                          NUM_TRYTES_SIGNATURE, NUM_TRYTES_SIGNATURE);
   TEST_ASSERT_EQUAL_MEMORY(sig_buff, tx->data.signature_or_message,
                            FLEX_TRIT_SIZE_6561);
+  TEST_ASSERT_EQUAL_MEMORY(tag, tx->attachment.tag, FLEX_TRIT_SIZE_81);
+
+  flex_trit_t obsolete_tag[FLEX_TRIT_SIZE_81];
+  flex_trits_from_trytes(obsolete_tag, NUM_TRITS_TAG, TEST_OBSOLETE_TAG_1,
+                         NUM_TRYTES_TAG, NUM_TRYTES_TAG);
+  TEST_ASSERT_EQUAL_MEMORY(obsolete_tag, tx->essence.obsolete_tag,
+                           FLEX_TRIT_SIZE_81);
 
   tx = transfer_iterator_next(tf_iter);
   TEST_ASSERT_NOT_NULL(tx);
@@ -83,6 +90,8 @@ void test_value_out(void) {
                          NUM_TRYTES_SIGNATURE, NUM_TRYTES_SIGNATURE);
   TEST_ASSERT_EQUAL_MEMORY(sig_buff, tx->data.signature_or_message,
                            FLEX_TRIT_SIZE_6561);
+  TEST_ASSERT_EQUAL_MEMORY(tag, tx->attachment.tag, FLEX_TRIT_SIZE_81);
+  TEST_ASSERT_EQUAL_MEMORY(tag, tx->essence.obsolete_tag, FLEX_TRIT_SIZE_81);
 
   tx = transfer_iterator_next(tf_iter);
   TEST_ASSERT_NOT_NULL(tx);
@@ -90,6 +99,8 @@ void test_value_out(void) {
                          NUM_TRYTES_SIGNATURE, NUM_TRYTES_SIGNATURE);
   TEST_ASSERT_EQUAL_MEMORY(sig_buff, tx->data.signature_or_message,
                            FLEX_TRIT_SIZE_6561);
+  TEST_ASSERT_EQUAL_MEMORY(tag, tx->attachment.tag, FLEX_TRIT_SIZE_81);
+  TEST_ASSERT_EQUAL_MEMORY(tag, tx->essence.obsolete_tag, FLEX_TRIT_SIZE_81);
 
   tx = transfer_iterator_next(tf_iter);
   TEST_ASSERT_NULL(tx);
