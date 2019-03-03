@@ -48,7 +48,10 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
 
   mss_init(&channel->mss, prng, height, channel->name, trits_null());
 
-  mss_gen(&channel->mss, mam_channel_id(channel));
+  mss_gen(&channel->mss);
+
+  trits_t pk1 = trits_from_rep(MAM2_MSS_PK_SIZE, channel->mss.root);
+  trits_copy(pk1, mam_channel_id(channel));
 
   channel->endpoints = NULL;
 

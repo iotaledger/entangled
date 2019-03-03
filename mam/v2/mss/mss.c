@@ -322,10 +322,11 @@ void mss_init(mss_t *mss, mam_prng_t *prng, mss_mt_height_t height,
 #endif
 }
 
-void mss_gen(mss_t *mss, trits_t pk) {
+void mss_gen(mss_t *mss) {
+  trits_t root_trits = trits_from_rep(MAM2_MSS_PK_SIZE, mss->root);
 #if defined(MAM2_MSS_TRAVERSAL)
   if (0 == mss->height) {
-    mss_mt_gen_leaf(mss, 0, pk);
+    mss_mt_gen_leaf(mss, 0, root_trits);
   } else {
     /* reuse stack `D-1`, by construction (see note in mss.h) */
     /* it has capacity `D+1` */
@@ -356,7 +357,7 @@ void mss_gen(mss_t *mss, trits_t pk) {
       if (node->height == mss->height) { /* done */
         /* copy pk, it is stored outside of stack due to dirty hack */
         trits_t hash = mss_hash_idx(nodes_hashes, stack->size);
-        trits_copy(hash, pk);
+        trits_copy(hash, root_trits);
         /* init stack */
         stack->height = mss->height - 1;
         stack->level_idx = 0;
@@ -427,7 +428,7 @@ void mss_gen(mss_t *mss, trits_t pk) {
     }
   }
 
-  trits_copy(mss_mt_node_t_trits(mss, 0, 0), pk);
+  trits_copy(mss_mt_node_t_trits(mss, 0, 0), root_trits);
 #endif
 }
 

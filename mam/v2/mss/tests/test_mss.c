@@ -107,7 +107,6 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
   MAM2_TRITS_DEF0(key, MAM2_PRNG_KEY_SIZE);
   MAM2_TRITS_DEF0(nonce, 24);
   MAM2_TRITS_DEF0(hash, MAM2_MSS_HASH_SIZE);
-  MAM2_TRITS_DEF0(pk, MAM2_MSS_PK_SIZE);
   MAM2_TRITS_DEF0(pk2, MAM2_MSS_PK_SIZE);
   MAM2_TRITS_DEF0(sig_, MAM2_MSS_SIG_SIZE(5));
   MAM2_TRITS_DEF0(sig2_, MAM2_MSS_SIG_SIZE(5));
@@ -117,7 +116,6 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
   key = MAM2_TRITS_INIT(key, MAM2_PRNG_KEY_SIZE);
   nonce = MAM2_TRITS_INIT(nonce, 24);
   hash = MAM2_TRITS_INIT(hash, MAM2_MSS_HASH_SIZE);
-  pk = MAM2_TRITS_INIT(pk, MAM2_MSS_PK_SIZE);
   pk2 = MAM2_TRITS_INIT(pk2, MAM2_MSS_PK_SIZE);
   sig_ = MAM2_TRITS_INIT(sig_, MAM2_MSS_SIG_SIZE(5));
   sig2_ = MAM2_TRITS_INIT(sig2_, MAM2_MSS_SIG_SIZE(5));
@@ -143,7 +141,7 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
 
     mss_init(mss1, prng, curr_height, nonce, trits_null());
     mss_init(mss2, prng, curr_height, nonce, trits_null());
-    mss_gen(mss1, pk);
+    mss_gen(mss1);
 
     do {
       mss_sign(mss1, hash, sig);
@@ -201,7 +199,9 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
 
     mss_init(mss, prng, curr_height, nonce, trits_null());
 
-    mss_gen(mss, pk);
+    mss_gen(mss);
+
+    trits_t pk = trits_from_rep(MAM2_MSS_PK_SIZE, mss->root);
 
     do {
       if (curr_height > 1 && ((rand_handle_rand() % 2) == 0)) {

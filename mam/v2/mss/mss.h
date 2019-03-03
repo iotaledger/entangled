@@ -115,6 +115,8 @@ typedef struct mss_s {
 #endif
   trits_t nonce1,
       nonce2; /*!< Nonce = `N1`||`N2`, stored pointers only, NOT copies. */
+
+  trit_t root[MAM2_MSS_PK_SIZE];
 } mss_t;
 
 #if defined(MAM2_MSS_TRAVERSAL)
@@ -160,10 +162,9 @@ void mss_init(mss_t *mss, mam_prng_t *prng, mss_mt_height_t height,
  * Generate MSS keys, stores current and next auth_path
  *
  * @param mss [in] MSS interface
- * @param pk [out] [out] public key, Merkle-tree root
  * @return void
  */
-void mss_gen(mss_t *mss, trits_t pk);
+void mss_gen(mss_t *mss);
 
 /**
  * Encodes mss height and current sk index
