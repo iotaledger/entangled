@@ -167,6 +167,7 @@ transfer_t* transfer_data_new(flex_trit_t const* const address,
     transfer->address = address;
     transfer->value = 0;
     transfer->tag = tag;
+    memcpy(transfer->obsolete_tag, tag, FLEX_TRIT_SIZE_81);
     transfer->timestamp = timestamp;
     transfer->meta = (void*)tf_data;
   }
@@ -213,6 +214,7 @@ transfer_t* transfer_value_out_new(transfer_value_out_t const* const output,
   tf->address = address;
   tf->value = value;
   tf->tag = tag;
+  memcpy(tf->obsolete_tag, tag, FLEX_TRIT_SIZE_81);
   tf->timestamp = timestamp;
   tf->meta = (void*)value_out;
   return tf;
@@ -260,6 +262,7 @@ transfer_t* transfer_value_in_new(flex_trit_t const* const address,
   tf->type = VALUE_IN;
   tf->address = address;
   tf->tag = tag;
+  memcpy(tf->obsolete_tag, tag, FLEX_TRIT_SIZE_81);
   tf->value = value;
   tf->timestamp = timestamp;
   tf->meta = (void*)value_in;
@@ -328,8 +331,8 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
   int64_t value;
   bool valid_bundle = false;
   trit_t first_tx_tag_trits[NUM_TRITS_TAG];
-  flex_trits_to_trits(first_tx_tag_trits, NUM_TRITS_TAG, transfers[0]->tag,
-                      NUM_TRITS_TAG, NUM_TRITS_TAG);
+  flex_trits_to_trits(first_tx_tag_trits, NUM_TRITS_TAG,
+                      transfers[0]->obsolete_tag, NUM_TRITS_TAG, NUM_TRITS_TAG);
 
   while (!valid_bundle) {
   loop:
@@ -341,8 +344,9 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
       count = transfer_transactions_count(tf);
       for (j = 0; j < count; j++) {
         value = tf->type == VALUE_OUT ? (j == 0 ? tf->value : 0) : tf->value;
-        absorb_essence(kerl, tf->address, value, tf->tag, tf->timestamp,
-                       current_index, transfer_ctx->count - 1, essence_trits);
+        absorb_essence(kerl, tf->address, value, tf->obsolete_tag,
+                       tf->timestamp, current_index, transfer_ctx->count - 1,
+                       essence_trits);
         current_index++;
       }
     }
@@ -359,7 +363,7 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl,
       if (normalized_hash[i] == 13) {
         // Insecure bundle. Increment Tag and recompute bundle hash.
         add_assign(first_tx_tag_trits, NUM_TRITS_TAG, 1);
-        flex_trits_from_trits((flex_trit_t*)transfers[0]->tag, NUM_TRITS_TAG,
+        flex_trits_from_trits(transfers[0]->obsolete_tag, NUM_TRITS_TAG,
                               first_tx_tag_trits, NUM_TRITS_TAG, NUM_TRITS_TAG);
         goto loop;
       }
@@ -438,7 +442,7 @@ iota_transaction_t* transfer_iterator_next(
     transaction_set_bundle(transaction, transfer_iterator->bundle_hash);
     transaction_set_address(transaction, transfer->address);
     transaction_set_tag(transaction, transfer->tag);
-    transaction_set_obsolete_tag(transaction, transfer->tag);
+    transaction_set_obsolete_tag(transaction, transfer->obsolete_tag);
     transaction_set_timestamp(transaction, transfer->timestamp);
     transaction_set_current_index(transaction,
                                   transfer_iterator->current_transaction_index);
