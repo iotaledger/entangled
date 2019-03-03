@@ -9,8 +9,21 @@
  */
 
 #include "mam/v2/troika/troika.h"
-#include "common/troika/troika.h"
 #include "mam/v2/trits/trits.h"
+
+void mam_ftroika_transform(trit_t *const state, size_t state_size) {
+  size_t i;
+  t27_t fstate[SLICES];
+  for (i = 0; i != state_size; ++i) {
+    state[i] += 1;
+  }
+  state_to_fstate(state, fstate);
+  ftroika_permutation(fstate, MAM2_TROIKA_NUM_ROUNDS);
+  fstate_to_state(fstate, state);
+  for (i = 0; i != state_size; ++i) {
+    state[i] -= 1;
+  }
+}
 
 void mam_troika_transform(trit_t *const state, size_t state_size) {
   size_t i;
