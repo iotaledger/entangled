@@ -110,56 +110,6 @@ retcode_t trytes_to_flex_hash(trit_array_p hash, const char* trytes) {
   return RC_OK;
 }
 
-// For utlist marcos, we must initialize head to NULL.
-flex_hash_array_t* flex_hash_array_new() { return NULL; }
-
-flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
-                                          char const* const trytes) {
-  flex_hash_array_t* elt =
-      (flex_hash_array_t*)malloc(sizeof(flex_hash_array_t));
-
-  if (elt != NULL) {
-    elt->hash = trit_array_new_from_trytes((tryte_t*)trytes);
-    if (elt->hash) {
-      LL_APPEND(head, elt);
-    } else {
-      free(elt);
-    }
-  } else {
-    log_warning(logger_id, "[%s:%d] %s \n", __func__, __LINE__,
-                STR_CCLIENT_NULL_PTR);
-  }
-  return head;
-}
-
-int flex_hash_array_count(flex_hash_array_t* head) {
-  flex_hash_array_t* elt = NULL;
-  int count = 0;
-  LL_COUNT(head, elt, count);
-  return count;
-}
-
-trit_array_p flex_hash_array_at(flex_hash_array_t* head, size_t index) {
-  flex_hash_array_t* elt = NULL;
-  int count = 0;
-  LL_FOREACH(head, elt) {
-    if (count == index) {
-      return elt->hash;
-    }
-    count++;
-  }
-  return NULL;
-}
-
-void flex_hash_array_free(flex_hash_array_t* head) {
-  flex_hash_array_t *elt, *tmp;
-  LL_FOREACH_SAFE(head, elt, tmp) {
-    LL_DELETE(head, elt);
-    trit_array_free(elt->hash);
-    free(elt);
-  }
-}
-
 retcode_t flex_hash_to_char_buffer(trit_array_p hash, char_buffer_t* out) {
   retcode_t ret = RC_OK;
   size_t trits_len = 0;
