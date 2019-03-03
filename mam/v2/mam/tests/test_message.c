@@ -40,15 +40,13 @@ static trits_t message_test_generic_send_msg(
     mam_ntru_pk_t const *const ntru_pk, mam_msg_pubkey_t pubkey,
     mam_msg_keyload_t keyload, mam_channel_t *const cha,
     mam_endpoint_t *const epa, mam_channel_t *const ch1a,
-    mam_endpoint_t *const ep1a, mam_msg_send_context_t *const send_ctx) {
+    mam_endpoint_t *const ep1a, mam_msg_send_context_t *const send_ctx,
+    trits_t msg_id) {
   trits_t msg = trits_null();
   mam_channel_t *ch = cha;
   mam_endpoint_t *ep = NULL;
   mam_channel_t *ch1 = NULL;
   mam_endpoint_t *ep1 = NULL;
-  MAM2_TRITS_DEF0(msg_id, MAM2_MSG_ID_SIZE);
-  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_MSG_ID_SIZE);
-  trits_from_str(msg_id, "SENDERMSGIDAAAAASENDERMSGID");
   trint9_t msg_type_id = 0;
   mam_psk_t_set_t psks = NULL;
   mam_ntru_pk_t_set_t ntru_pks = NULL;
@@ -124,15 +122,13 @@ static trits_t message_test_generic_send_first_packet(
 static void message_test_generic_receive_msg(
     mam_psk_t const *const pre_shared_key, mam_ntru_sk_t const *const ntru,
     mam_channel_t *const cha, trits_t *const msg,
-    mam_msg_recv_context_t *const cfg_msg_recv) {
+    mam_msg_recv_context_t *const cfg_msg_recv, trits_t msg_id) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
 
   /* init recv msg context */
   mam_msg_recv_context_t *cfg = cfg_msg_recv;
   mam_psk_t_set_t psks = NULL;
   mam_ntru_sk_t_set_t ntru_sks = NULL;
-  MAM2_TRITS_DEF0(msg_id, MAM2_MSG_ID_SIZE);
-  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_MSG_ID_SIZE);
 
   TEST_ASSERT(mam_psk_t_set_add(&psks, pre_shared_key) == RC_OK);
   TEST_ASSERT(mam_ntru_sk_t_set_add(&ntru_sks, ntru) == RC_OK);
@@ -144,7 +140,6 @@ static void message_test_generic_receive_msg(
 
   TEST_ASSERT(RC_OK == e);
   TEST_ASSERT(trits_is_empty(*msg));
-  MAM2_ASSERT(trits_cmp_eq_str(msg_id, "SENDERMSGIDAAAAASENDERMSGID"));
 
   mam_ntru_sk_t_set_free(&ntru_sks);
   mam_psk_t_set_free(&psks);
@@ -154,17 +149,13 @@ static void message_test_generic_receive_packet(
     mam_msg_recv_context_t *const ctx, trits_t const *const packet,
     trits_t *const payload) {
   retcode_t e = RC_MAM2_INTERNAL_ERROR;
-  /* send/recv packet */
-  {
-    /*trits_free(a, payload);*/ /* init recv packet context */
-    ctx->ord = -1;
+  ctx->ord = 0;
 
-    e = mam_msg_recv_packet(ctx, packet, payload);
-    TEST_ASSERT(RC_OK == e);
-    TEST_ASSERT(trits_is_empty(*packet));
-    TEST_ASSERT(trits_is_empty(*payload));
-    *payload = trits_pickup_all(*payload);
-  }
+  e = mam_msg_recv_packet(ctx, packet, payload);
+  TEST_ASSERT(RC_OK == e);
+  TEST_ASSERT(trits_is_empty(*packet));
+  TEST_ASSERT(trits_is_empty(*payload));
+  *payload = trits_pickup_all(*payload);
 }
 
 static void message_test_create_channels(mam_prng_t *prng,
@@ -276,6 +267,10 @@ static void message_test_generic(mam_prng_t *prng_sender,
                  TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_trits(pskb));
   }
 
+  MAM2_TRITS_DEF0(msg_id, MAM2_MSG_ID_SIZE);
+  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_MSG_ID_SIZE);
+  trits_from_str(msg_id, "SENDERMSGIDAAAAASENDERMSGID");
+
   /* chid=0, epid=1, chid1=2, epid1=3*/
   for (pubkey = 0; (int)pubkey < 4; ++pubkey) {
     /* public=0, psk=1, ntru=2 */
@@ -287,7 +282,7 @@ static void message_test_generic(mam_prng_t *prng_sender,
         {
           msg = message_test_generic_send_msg(
               prng_sender, pska, pskb, &ntru->public_key, pubkey, keyload, cha,
-              epa, ch1a, ep1a, &send_ctx);
+              epa, ch1a, ep1a, &send_ctx, msg_id);
 
           packet = message_test_generic_send_first_packet(
               pubkey, checksum, cha, epa, ch1a, ep1a, &send_ctx, payload_str);
@@ -295,7 +290,8 @@ static void message_test_generic(mam_prng_t *prng_sender,
 
         /* recv msg and packet */
         {
-          message_test_generic_receive_msg(pskb, ntru, cha, &msg, cfg_msg_recv);
+          message_test_generic_receive_msg(pskb, ntru, cha, &msg, cfg_msg_recv,
+                                           msg_id);
 
           message_test_generic_receive_packet(cfg_msg_recv, &packet, &payload);
           TEST_ASSERT(trits_cmp_eq_str(payload, payload_str));

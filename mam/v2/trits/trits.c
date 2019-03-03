@@ -8,11 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file trits.c
-\brief Basic trinary array operations.
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 

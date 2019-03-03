@@ -56,7 +56,8 @@ static void send_bundle(char const *const host, uint16_t const port,
     hash_array_push(raw_trytes, trits_8019);
   }
   iota_client_send_trytes(&serv, raw_trytes, 1, 14, NULL, true, out_tx_objs);
-  hash_array_free(raw_trytes);
+  // TODO uncomment
+  // hash_array_free(raw_trytes);
   transaction_array_free(out_tx_objs);
 
   iota_client_extended_destroy();

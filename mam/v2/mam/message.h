@@ -25,7 +25,7 @@
 #include "mam/v2/trits/trits.h"
 #include "mam/v2/wots/wots.h"
 
-#define MAM2_MSG_ID_SIZE 81
+#define MAM2_MSG_ID_SIZE 63
 
 #ifdef __cplusplus
 extern "C" {

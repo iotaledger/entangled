@@ -14,6 +14,10 @@
 #include "mam/v2/api/api.h"
 #include "mam/v2/test_utils/test_utils.h"
 
+static mam_api_t api;
+static mam_channel_t *cha = NULL, *ch1a = NULL;
+static mam_endpoint_t *epa = NULL, *ep1a = NULL;
+
 static tryte_t API_SEED[] =
     "APISEEDAPISEEDAPISEEDAPISEEDAPISEEDAPISEEDAPISEEDAPISEEDAPISEEDAPISEEDAPIS"
     "EEDAPI9";
@@ -345,17 +349,13 @@ static void test_api_create_channels(mam_api_t *api, mam_channel_t **const cha,
   }
 }
 
-static void test_api_generic(mam_api_t *const api) {
+static void test_api_generic() {
   retcode_t e = RC_OK;
   bundle_transactions_t *bundle = NULL;
   trit_t msg_id[MAM2_MSG_ID_SIZE];
-  mam_channel_t *cha = NULL, *ch1a = NULL;
-  mam_endpoint_t *epa = NULL, *ep1a = NULL;
   char *payload2 = NULL;
   mam_ntru_sk_t ntru[1];
   mam_psk_t pska[1], pskb[1];
-
-  test_api_create_channels(api, &cha, &ch1a, &epa, &ep1a);
 
   /* gen recipient'spongos ntru keys, public key is shared with sender */
   {
@@ -363,20 +363,19 @@ static void test_api_generic(mam_api_t *const api) {
     ntru_nonce = MAM2_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
     TEST_ASSERT(ntru_init(ntru) == RC_OK);
-    ntru_gen(ntru, &api->prng, ntru_nonce);
-    TEST_ASSERT(mam_api_add_ntru_sk(api, ntru) == RC_OK);
+    ntru_gen(ntru, &api.prng, ntru_nonce);
+    TEST_ASSERT(mam_api_add_ntru_sk(&api, ntru) == RC_OK);
   }
 
   /* gen psk */
   {
     trits_from_str(mam_psk_id(pska), TEST_PRE_SHARED_KEY_A_STR);
-    prng_gen_str(&api->prng, MAM2_PRNG_DST_SEC_KEY,
+    prng_gen_str(&api.prng, MAM2_PRNG_DST_SEC_KEY,
                  TEST_PRE_SHARED_KEY_A_NONCE_STR, mam_psk_trits(pska));
-    // mam_api_add_psk(api, pska);
     trits_from_str(mam_psk_id(pskb), TEST_PRE_SHARED_KEY_B_STR);
-    prng_gen_str(&api->prng, MAM2_PRNG_DST_SEC_KEY,
+    prng_gen_str(&api.prng, MAM2_PRNG_DST_SEC_KEY,
                  TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_trits(pskb));
-    TEST_ASSERT(mam_api_add_psk(api, pskb) == RC_OK);
+    TEST_ASSERT(mam_api_add_psk(&api, pskb) == RC_OK);
   }
 
   /* chid=0, epid=1, chid1=2, epid1=3*/
@@ -388,13 +387,13 @@ static void test_api_generic(mam_api_t *const api) {
         bundle_transactions_new(&bundle);
 
         /* send header and packet */
-        test_api_write_header(api, pska, pskb, &ntru->public_key, pubkey,
+        test_api_write_header(&api, pska, pskb, &ntru->public_key, pubkey,
                               keyload, cha, epa, ch1a, ep1a, bundle, msg_id);
-        test_api_write_packet(api, bundle, msg_id, pubkey, checksum, cha, epa,
+        test_api_write_packet(&api, bundle, msg_id, pubkey, checksum, cha, epa,
                               ch1a, ep1a, PAYLOAD);
 
         /* recv header and packet */
-        test_api_read_msg(api, bundle, pskb, ntru, cha, &payload2);
+        test_api_read_msg(&api, bundle, pskb, ntru, cha, &payload2);
         TEST_ASSERT_EQUAL_STRING(PAYLOAD, payload2);
 
         /* cleanup */
@@ -404,6 +403,68 @@ static void test_api_generic(mam_api_t *const api) {
       }
     }
   }
+
+  TEST_ASSERT(e == RC_OK);
+}
+
+static void test_api_multiple_packets() {
+  bundle_transactions_t *bundle = NULL;
+  trit_t msg_id[MAM2_MSG_ID_SIZE];
+  tryte_t *payload_in = (tryte_t *)
+      "RYFJ9ZCHZFYZSHCMBJPDHLQBODCMRMDH9CLGGVWJCZRJSNDWBTMWSBPYPFIIOLXEMKSJ9LJO"
+      "AFBFPJL9XMGGZXFCZHFDLOLODLMLNERWGUBXUJCMHJXWJPGX9R9HUPIHEIPNNMXTULSMHJGP"
+      "TDKYEFZ9FDKFOBBQS9QZ9LODBRQMVCKYIUXIPWMDNPSZEK9ZTDCJEFEQEAJAEABJQWPVCGSM"
+      "WEZLLSDYWLWQPRENHOTDQYP9QTIULYOE9OIVEWUXTMYUMPTMHOYFRJMWJUKM9QAJKVQW9ADY"
+      "TZFQTNDISJYNTSFIEESDZJJJUPBDJKNEYNMOIZOKFCARBCXVFTPQZEKVZBNZOSKMRHAJXG9U"
+      "ZBNEUXM9LARLTSRQXYACOVOCIFHUETWFXXOLSSQSKNFUANYIGVMXTOZYSYBIXTRTYOWQRVTF"
+      "VMMXSH9WVQKEYRALLTBJIBYJIMTV99PATCFBKXZPLIBPNQZYJLDUXRWKPRRJTPKWQAQFFQWS"
+      "VAHUOAAOWJLSYVYLI99RNUONKEEJYFIMEWBIKLGARGTABJDCHKQM9LFFMKQXHFSCGJXAYCLF"
+      "RFLWPKPPNHOWIMEFNRCGNDCHMEYYJWHPRJOYOFFPNISVUNMVYFW9ECUZBDOSUCFZPOREJMND"
+      "ZMZYWUBBFICWJ9IYHJDIDGLPERWCYXMFHXZGNLWXOCXBGEWZFKITEUMEVNUWLRUMHEZUJMRI"
+      "TTNKN9PBUR9MOZINMWWTRXVRRZHQVP9QDJPGBZALBVI9GXNZYQTOPKDJPXPLADTBUNRQFLTE"
+      "Q9XLMEPTJUWYIGNQMMLECGXAQOSFMDWFBFUYB9FEUMXSCRQVQMT9E9CEPRVQWQFVWT9UC9FH"
+      "NTCCRUHOOWXORIRHNNZUOQCSOGJCRUWCQHCLZMRNIWUESDEQWPHLLNEHXFDLRUEOTLQERNPT"
+      "OHNGGXIWJCKGKEGRFXYFLVOQVYQOVZ9QWGGBGZBLPVNQOBA9VYGKZE9MQYOHDKNE";
+  size_t payload_in_size = strlen((char *)payload_in);
+  tryte_t *payload_out = NULL;
+  size_t payload_out_size = 0;
+
+  // send and receive header
+  {
+    bundle_transactions_new(&bundle);
+    TEST_ASSERT(mam_api_bundle_write_header(&api, cha, NULL, NULL, NULL, NULL,
+                                            NULL, 0, bundle, msg_id) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_read_msg(&api, bundle, &payload_out,
+                                        &payload_out_size) == RC_OK);
+    TEST_ASSERT(payload_out == NULL);
+    TEST_ASSERT(payload_out_size == 0);
+    bundle_transactions_free(&bundle);
+  }
+
+  // send and receive packets
+  for (size_t i = 0; i < 256; i++) {
+    bundle_transactions_new(&bundle);
+    TEST_ASSERT(mam_api_bundle_write_packet(
+                    &api, cha, msg_id, payload_in, payload_in_size,
+                    (mam_msg_checksum_t)(i % 3), bundle) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_read_packet(&api, bundle, &payload_out,
+                                           &payload_out_size) == RC_OK);
+    TEST_ASSERT_EQUAL_MEMORY(payload_in, payload_out, payload_in_size);
+    free(payload_out);
+    payload_out = NULL;
+    payload_out_size = 0;
+    bundle_transactions_free(&bundle);
+  }
+}
+
+int main(void) {
+  UNITY_BEGIN();
+
+  TEST_ASSERT(mam_api_init(&api, API_SEED) == RC_OK);
+  test_api_create_channels(&api, &cha, &ch1a, &epa, &ep1a);
+
+  RUN_TEST(test_api_generic);
+  RUN_TEST(test_api_multiple_packets);
 
   /* destroy channels/endpoints */
   {
@@ -424,24 +485,7 @@ static void test_api_generic(mam_api_t *const api) {
       free(ep1a);
     }
   }
-
-  TEST_ASSERT(e == RC_OK);
-}
-
-void test_api() {
-  mam_api_t api;
-
-  TEST_ASSERT(mam_api_init(&api, API_SEED) == RC_OK);
-
-  test_api_generic(&api);
-
   TEST_ASSERT(mam_api_destroy(&api) == RC_OK);
-}
-
-int main(void) {
-  UNITY_BEGIN();
-
-  RUN_TEST(test_api);
 
   return UNITY_END();
 }
