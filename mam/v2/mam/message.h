@@ -26,12 +26,11 @@
 #include "mam/v2/wots/wots.h"
 
 #define MAM2_MSG_ID_SIZE 63
+#define MAM2_MSG_ORD_SIZE 18
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define MAM2_MSG_ORD_SIZE 18
 
 typedef enum mam_msg_pubkey_e {
   mam_msg_pubkey_chid = 0,
