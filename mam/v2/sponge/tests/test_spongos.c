@@ -22,12 +22,12 @@ static void mam_spongos_test(void) {
 
   mam_spongos_init(&spongos);
 
-  MAM2_TRITS_DEF0(x, 243);
-  MAM2_TRITS_DEF0(y, 243);
-  MAM2_TRITS_DEF0(z, 243);
-  x = MAM2_TRITS_INIT(x, 243);
-  y = MAM2_TRITS_INIT(y, 243);
-  z = MAM2_TRITS_INIT(z, 243);
+  MAM_TRITS_DEF0(x, 243);
+  MAM_TRITS_DEF0(y, 243);
+  MAM_TRITS_DEF0(z, 243);
+  x = MAM_TRITS_INIT(x, 243);
+  y = MAM_TRITS_INIT(y, 243);
+  z = MAM_TRITS_INIT(z, 243);
 
   trits_set_zero(x);
 
@@ -47,20 +47,19 @@ static void mam_spongos_test(void) {
   mam_spongos_absorb(&spongos, x);
   mam_spongos_commit(&spongos);
   mam_spongos_decr(&spongos, z, z);
-  MAM2_TRITS_DEF0(spongos_trits, mam_spongos_serialized_size(&spongos));
+  MAM_TRITS_DEF0(spongos_trits, mam_spongos_serialized_size(&spongos));
   spongos_trits =
-      MAM2_TRITS_INIT(spongos_trits, mam_spongos_serialized_size(&spongos));
+      MAM_TRITS_INIT(spongos_trits, mam_spongos_serialized_size(&spongos));
   mam_spongos_serialize(&spongos, &spongos_trits);
   spongos_trits =
       trits_pickup(spongos_trits, mam_spongos_serialized_size(&spongos));
-  memset(deserialized_spongos.sponge.state, 0, MAM2_SPONGE_WIDTH);
+  memset(deserialized_spongos.sponge.state, 0, MAM_SPONGE_WIDTH);
   TEST_ASSERT_EQUAL(
       RC_OK, mam_spongos_deserialize(&spongos_trits, &deserialized_spongos));
 
   TEST_ASSERT_EQUAL_INT(spongos.pos, deserialized_spongos.pos);
   TEST_ASSERT_EQUAL_MEMORY(spongos.sponge.state,
-                           deserialized_spongos.sponge.state,
-                           MAM2_SPONGE_WIDTH);
+                           deserialized_spongos.sponge.state, MAM_SPONGE_WIDTH);
 
   TEST_ASSERT_TRUE(trits_cmp_eq(x, z));
 }

@@ -14,7 +14,7 @@
 #include "common/troika/troika.h"
 #include "mam/v2/defs.h"
 
-#define MAM2_TROIKA_NUM_ROUNDS 24
+#define MAM_TROIKA_NUM_ROUNDS 24
 
 void mam_ftroika_transform(trit_t *const state, size_t state_size);
 void mam_troika_transform(trit_t *const state, size_t state_size);

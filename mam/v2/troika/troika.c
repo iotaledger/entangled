@@ -18,7 +18,7 @@ void mam_ftroika_transform(trit_t *const state, size_t state_size) {
     state[i] += 1;
   }
   state_to_fstate(state, fstate);
-  ftroika_permutation(fstate, MAM2_TROIKA_NUM_ROUNDS);
+  ftroika_permutation(fstate, MAM_TROIKA_NUM_ROUNDS);
   fstate_to_state(fstate, state);
   for (i = 0; i != state_size; ++i) {
     state[i] -= 1;
@@ -30,7 +30,7 @@ void mam_troika_transform(trit_t *const state, size_t state_size) {
   for (i = 0; i != state_size; ++i) {
     state[i] += 1;
   }
-  troika_permutation(state, MAM2_TROIKA_NUM_ROUNDS);
+  troika_permutation(state, MAM_TROIKA_NUM_ROUNDS);
   for (i = 0; i != state_size; ++i) {
     state[i] -= 1;
   }

@@ -42,7 +42,7 @@ cc_library(
         "poly.h",
         "poly_param.h",
     ],
-    defines = ["MAM2_POLY_MRED_BINARY"],
+    defines = ["MAM_POLY_MRED_BINARY"],
     deps = [
         "//mam/v2:defs",
         "//mam/v2/trits",

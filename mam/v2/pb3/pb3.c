@@ -22,13 +22,13 @@ trits_t pb3_trits_take(trits_t *const b, size_t const n) {
 size_t pb3_sizeof_tryte() { return 3; }
 
 void pb3_encode_tryte(tryte_t const tryte, trits_t *const buffer) {
-  MAM2_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_tryte()));
+  MAM_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_tryte()));
 
   trits_put3(pb3_trits_take(buffer, 3), tryte);
 }
 
 retcode_t pb3_decode_tryte(tryte_t *const tryte, trits_t *const buffer) {
-  MAM2_ASSERT(tryte);
+  MAM_ASSERT(tryte);
 
   if (trits_size(*buffer) < pb3_sizeof_tryte()) {
     return RC_MAM2_PB3_EOF;
@@ -42,13 +42,13 @@ retcode_t pb3_decode_tryte(tryte_t *const tryte, trits_t *const buffer) {
 size_t pb3_sizeof_trint() { return 9; }
 
 void pb3_encode_trint(trint9_t const trint, trits_t *const buffer) {
-  MAM2_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_trint()));
+  MAM_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_trint()));
 
   trits_put9(pb3_trits_take(buffer, 9), trint);
 }
 
 retcode_t pb3_decode_trint(trint9_t *const trint, trits_t *const buffer) {
-  MAM2_ASSERT(trint);
+  MAM_ASSERT(trint);
 
   if (trits_size(*buffer) < pb3_sizeof_trint()) {
     return RC_MAM2_PB3_EOF;
@@ -62,13 +62,13 @@ retcode_t pb3_decode_trint(trint9_t *const trint, trits_t *const buffer) {
 size_t pb3_sizeof_longtrint() { return 18; }
 
 void pb3_encode_longtrint(trint18_t const trint, trits_t *const buffer) {
-  MAM2_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_longtrint()));
+  MAM_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_longtrint()));
 
   trits_put18(pb3_trits_take(buffer, 18), trint);
 }
 
 retcode_t pb3_decode_longtrint(trint18_t *const trint, trits_t *const buffer) {
-  MAM2_ASSERT(trint);
+  MAM_ASSERT(trint);
 
   if (trits_size(*buffer) < pb3_sizeof_longtrint()) {
     return RC_MAM2_PB3_EOF;
@@ -80,7 +80,7 @@ retcode_t pb3_decode_longtrint(trint18_t *const trint, trits_t *const buffer) {
 }
 
 static size_t pb3_size_t_trytes(size_t const n) {
-  MAM2_ASSERT(n <= MAM2_PB3_SIZE_MAX);
+  MAM_ASSERT(n <= MAM_PB3_SIZE_MAX);
 
   size_t const max_d = (5 * sizeof(size_t) + 2) / 3;
   size_t d = 0, m = 1;
@@ -95,36 +95,36 @@ static size_t pb3_size_t_trytes(size_t const n) {
 
 size_t pb3_sizeof_size_t(size_t const n) {
   size_t d = pb3_size_t_trytes(n);
-  MAM2_ASSERT(d < 14);
+  MAM_ASSERT(d < 14);
 
   /* one extra tryte to encode `d` */
   return 3 * (d + 1);
 }
 
 void pb3_encode_size_t(size_t n, trits_t *const buffer) {
-  MAM2_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_size_t(n)));
+  MAM_ASSERT(buffer && !(trits_size(*buffer) < pb3_sizeof_size_t(n)));
 
   size_t d = pb3_size_t_trytes(n);
-  MAM2_ASSERT(d < 14);
+  MAM_ASSERT(d < 14);
 
   pb3_encode_tryte((tryte_t)d, buffer);
 
   if (n > 27) {
     /* explicitly unroll the first iteration safely */
     --d;
-    pb3_encode_tryte((tryte_t)MAM2_MODS(n - 27, 27, 27), buffer);
-    n = 1 + MAM2_DIVS(n - 27, 27, 27);
+    pb3_encode_tryte((tryte_t)MAM_MODS(n - 27, 27, 27), buffer);
+    n = 1 + MAM_DIVS(n - 27, 27, 27);
   }
 
-  for (; d--; n = MAM2_DIVS(n, 27, 27)) {
-    pb3_encode_tryte((tryte_t)MAM2_MODS(n, 27, 27), buffer);
+  for (; d--; n = MAM_DIVS(n, 27, 27)) {
+    pb3_encode_tryte((tryte_t)MAM_MODS(n, 27, 27), buffer);
   }
 
-  MAM2_ASSERT(0 == n);
+  MAM_ASSERT(0 == n);
 }
 
 retcode_t pb3_decode_size_t(size_t *const n, trits_t *const buffer) {
-  MAM2_ASSERT(n != 0);
+  MAM_ASSERT(n != 0);
 
   tryte_t d;
 
@@ -180,15 +180,15 @@ size_t pb3_sizeof_ntrytes(size_t const n) { return 3 * n; }
 
 void pb3_encode_ntrytes(trits_t const ntrytes, trits_t *const buffer) {
   size_t n = trits_size(ntrytes);
-  MAM2_ASSERT(0 == (n % 3));
-  MAM2_ASSERT(buffer && n <= trits_size(*buffer));
+  MAM_ASSERT(0 == (n % 3));
+  MAM_ASSERT(buffer && n <= trits_size(*buffer));
 
   trits_copy(ntrytes, pb3_trits_take(buffer, n));
 }
 
 retcode_t pb3_decode_ntrytes(trits_t const ntrytes, trits_t *const buffer) {
   size_t n = trits_size(ntrytes);
-  MAM2_ASSERT(buffer && (n % 3) == 0);
+  MAM_ASSERT(buffer && (n % 3) == 0);
 
   if (n > trits_size(*buffer)) {
     return RC_MAM2_PB3_EOF;
@@ -319,8 +319,8 @@ retcode_t pb3_unwrap_absorb_ntrytes(mam_spongos_t *const spongos,
 void pb3_wrap_crypt_ntrytes(mam_spongos_t *const spongos, trits_t *const buffer,
                             trits_t const trits) {
   size_t n = trits_size(trits);
-  MAM2_ASSERT(0 == (n % 3));
-  MAM2_ASSERT(n <= trits_size(*buffer));
+  MAM_ASSERT(0 == (n % 3));
+  MAM_ASSERT(n <= trits_size(*buffer));
 
   mam_spongos_encr(spongos, trits, pb3_trits_take(buffer, n));
 }
@@ -328,7 +328,7 @@ void pb3_wrap_crypt_ntrytes(mam_spongos_t *const spongos, trits_t *const buffer,
 retcode_t pb3_unwrap_crypt_ntrytes(mam_spongos_t *const spongos,
                                    trits_t *const buffer, trits_t const trits) {
   size_t n = trits_size(trits);
-  MAM2_ASSERT(0 == (n % 3));
+  MAM_ASSERT(0 == (n % 3));
 
   if (n > trits_size(*buffer)) {
     return RC_MAM2_PB3_EOF;
@@ -340,7 +340,7 @@ retcode_t pb3_unwrap_crypt_ntrytes(mam_spongos_t *const spongos,
 
 void pb3_wrap_squeeze_ntrytes(mam_spongos_t *const spongos,
                               trits_t *const buffer, size_t const n) {
-  MAM2_ASSERT(pb3_sizeof_ntrytes(n) <= trits_size(*buffer));
+  MAM_ASSERT(pb3_sizeof_ntrytes(n) <= trits_size(*buffer));
 
   mam_spongos_squeeze(spongos, pb3_trits_take(buffer, pb3_sizeof_ntrytes(n)));
 }
@@ -360,14 +360,14 @@ retcode_t pb3_unwrap_squeeze_ntrytes(mam_spongos_t *const spongos,
 
 void pb3_absorb_external_ntrytes(mam_spongos_t *const spongos,
                                  trits_t const trits) {
-  MAM2_ASSERT(0 == (trits_size(trits) % 3));
+  MAM_ASSERT(0 == (trits_size(trits) % 3));
 
   mam_spongos_absorb(spongos, trits);
 }
 
 void pb3_squeeze_external_ntrytes(mam_spongos_t *const spongos,
                                   trits_t const trits) {
-  MAM2_ASSERT(0 == (trits_size(trits) % 3));
+  MAM_ASSERT(0 == (trits_size(trits) % 3));
 
   mam_spongos_squeeze(spongos, trits);
 }

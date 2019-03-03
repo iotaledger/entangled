@@ -68,7 +68,7 @@ int main(int ac, char **av) {
   mam_api_t api;
   bundle_transactions_t *bundle = NULL;
   int ret = EXIT_SUCCESS;
-  trit_t msg_id[MAM2_MSG_ID_SIZE];
+  trit_t msg_id[MAM_MSG_ID_SIZE];
 
   if (ac != 5) {
     fprintf(stderr, "usage: send <host> <port> <seed> <payload>\n");

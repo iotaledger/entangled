@@ -15,8 +15,8 @@
 #include "mam/v2/defs.h"
 #include "mam/v2/trits/trits.h"
 
-#define MAM2_PSK_ID_SIZE 81
-#define MAM2_PSK_KEY_SIZE 243
+#define MAM_PSK_ID_SIZE 81
+#define MAM_PSK_KEY_SIZE 243
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,8 +24,8 @@ extern "C" {
 
 // Preshared key
 typedef struct mam_psk_s {
-  trit_t id[MAM2_PSK_ID_SIZE];
-  trit_t key[MAM2_PSK_KEY_SIZE];
+  trit_t id[MAM_PSK_ID_SIZE];
+  trit_t key[MAM_PSK_KEY_SIZE];
 } mam_psk_t;
 
 typedef struct mam_psk_t_set_entry_s mam_psk_t_set_entry_t;

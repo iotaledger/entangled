@@ -135,8 +135,7 @@ static void message_test_generic_receive_msg(
   TEST_ASSERT(mam_psk_t_set_add(&psks, pre_shared_key) == RC_OK);
   TEST_ASSERT(mam_ntru_sk_t_set_add(&ntru_sks, ntru) == RC_OK);
 
-  trits_copy(mam_channel_id(cha),
-             trits_from_rep(MAM2_CHANNEL_ID_SIZE, cfg->pk));
+  trits_copy(mam_channel_id(cha), trits_from_rep(MAM_CHANNEL_ID_SIZE, cfg->pk));
 
   e = mam_msg_recv(cfg_msg_recv, msg, psks, ntru_sks, msg_id);
 
@@ -247,8 +246,8 @@ static void message_test_generic(mam_prng_t *prng_sender,
   /* gen recipient'spongos ntru keys, public key is shared with sender */
   {
     retcode_t e;
-    MAM2_TRITS_DEF0(ntru_nonce, 30);
-    ntru_nonce = MAM2_TRITS_INIT(ntru_nonce, 30);
+    MAM_TRITS_DEF0(ntru_nonce, 30);
+    ntru_nonce = MAM_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
 
     e = ntru_init(ntru);
@@ -261,16 +260,16 @@ static void message_test_generic(mam_prng_t *prng_sender,
   /* gen psk */
   {
     trits_from_str(mam_psk_id(pska), TEST_PRE_SHARED_KEY_A_STR);
-    prng_gen_str(prng_sender, MAM2_PRNG_DST_SEC_KEY,
+    prng_gen_str(prng_sender, MAM_PRNG_DST_SEC_KEY,
                  TEST_PRE_SHARED_KEY_A_NONCE_STR, mam_psk_trits(pska));
 
     trits_from_str(mam_psk_id(pskb), TEST_PRE_SHARED_KEY_B_STR);
-    prng_gen_str(prng_receiver, MAM2_PRNG_DST_SEC_KEY,
+    prng_gen_str(prng_receiver, MAM_PRNG_DST_SEC_KEY,
                  TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_trits(pskb));
   }
 
-  MAM2_TRITS_DEF0(msg_id, MAM2_MSG_ID_SIZE);
-  msg_id = MAM2_TRITS_INIT(msg_id, MAM2_MSG_ID_SIZE);
+  MAM_TRITS_DEF0(msg_id, MAM_MSG_ID_SIZE);
+  msg_id = MAM_TRITS_INIT(msg_id, MAM_MSG_ID_SIZE);
   trits_from_str(msg_id, "SENDERMSGIDAAAAASENDERMSGID");
 
   /* chid=0, epid=1, chid1=2, epid1=3*/
@@ -328,12 +327,12 @@ static void message_test_generic(mam_prng_t *prng_sender,
 }
 
 void message_test() {
-  MAM2_TRITS_DEF0(key_a, MAM2_PRNG_KEY_SIZE);
-  key_a = MAM2_TRITS_INIT(key_a, MAM2_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(key_a, MAM_PRNG_KEY_SIZE);
+  key_a = MAM_TRITS_INIT(key_a, MAM_PRNG_KEY_SIZE);
   trits_from_str(key_a, TEST_PRNG_A_KEY);
 
-  MAM2_TRITS_DEF0(key_b, MAM2_PRNG_KEY_SIZE);
-  key_b = MAM2_TRITS_INIT(key_b, MAM2_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(key_b, MAM_PRNG_KEY_SIZE);
+  key_b = MAM_TRITS_INIT(key_b, MAM_PRNG_KEY_SIZE);
   trits_from_str(key_b, TEST_PRNG_B_KEY);
 
   mam_prng_t prng_sender;

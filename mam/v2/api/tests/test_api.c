@@ -352,15 +352,15 @@ static void test_api_create_channels(mam_api_t *api, mam_channel_t **const cha,
 static void test_api_generic() {
   retcode_t e = RC_OK;
   bundle_transactions_t *bundle = NULL;
-  trit_t msg_id[MAM2_MSG_ID_SIZE];
+  trit_t msg_id[MAM_MSG_ID_SIZE];
   char *payload2 = NULL;
   mam_ntru_sk_t ntru[1];
   mam_psk_t pska[1], pskb[1];
 
   /* gen recipient'spongos ntru keys, public key is shared with sender */
   {
-    MAM2_TRITS_DEF0(ntru_nonce, 30);
-    ntru_nonce = MAM2_TRITS_INIT(ntru_nonce, 30);
+    MAM_TRITS_DEF0(ntru_nonce, 30);
+    ntru_nonce = MAM_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
     TEST_ASSERT(ntru_init(ntru) == RC_OK);
     ntru_gen(ntru, &api.prng, ntru_nonce);
@@ -370,10 +370,10 @@ static void test_api_generic() {
   /* gen psk */
   {
     trits_from_str(mam_psk_id(pska), TEST_PRE_SHARED_KEY_A_STR);
-    prng_gen_str(&api.prng, MAM2_PRNG_DST_SEC_KEY,
+    prng_gen_str(&api.prng, MAM_PRNG_DST_SEC_KEY,
                  TEST_PRE_SHARED_KEY_A_NONCE_STR, mam_psk_trits(pska));
     trits_from_str(mam_psk_id(pskb), TEST_PRE_SHARED_KEY_B_STR);
-    prng_gen_str(&api.prng, MAM2_PRNG_DST_SEC_KEY,
+    prng_gen_str(&api.prng, MAM_PRNG_DST_SEC_KEY,
                  TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_trits(pskb));
     TEST_ASSERT(mam_api_add_psk(&api, pskb) == RC_OK);
   }
@@ -409,7 +409,7 @@ static void test_api_generic() {
 
 static void test_api_multiple_packets() {
   bundle_transactions_t *bundle = NULL;
-  trit_t msg_id[MAM2_MSG_ID_SIZE];
+  trit_t msg_id[MAM_MSG_ID_SIZE];
   tryte_t *payload_in = (tryte_t *)
       "RYFJ9ZCHZFYZSHCMBJPDHLQBODCMRMDH9CLGGVWJCZRJSNDWBTMWSBPYPFIIOLXEMKSJ9LJO"
       "AFBFPJL9XMGGZXFCZHFDLOLODLMLNERWGUBXUJCMHJXWJPGX9R9HUPIHEIPNNMXTULSMHJGP"

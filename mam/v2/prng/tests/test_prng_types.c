@@ -48,21 +48,21 @@ static void test_prng_serialization(void) {
   mam_prng_t_set_t set1 = NULL;
   mam_prng_t_set_t set2 = NULL;
 
-  tryte_t secret_key_str[MAM2_PRNG_KEY_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE];
+  tryte_t secret_key_str[MAM_PRNG_KEY_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE];
 
   mam_prng_t prngs[26];
 
   for (size_t i = 0; i < 26; i++) {
     memset(secret_key_str, 'A' + i,
-           MAM2_PRNG_KEY_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
+           MAM_PRNG_KEY_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
     trytes_to_trits(secret_key_str, prngs[i].secret_key,
-                    MAM2_PRNG_KEY_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
+                    MAM_PRNG_KEY_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
     TEST_ASSERT(mam_prng_t_set_add(&set1, &prngs[i]) == RC_OK);
   }
 
   size_t size = mam_prngs_serialized_size(set1);
 
-  TEST_ASSERT_EQUAL_INT(size, 26 * (MAM2_PRNG_KEY_SIZE));
+  TEST_ASSERT_EQUAL_INT(size, 26 * (MAM_PRNG_KEY_SIZE));
 
   trits_t trits = trits_alloc(size);
 

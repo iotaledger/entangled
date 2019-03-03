@@ -8,10 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file trits.h
-\brief Basic trinary array operations.
-*/
 #ifndef __MAM_V2_TRITS_TRITS_H__
 #define __MAM_V2_TRITS_TRITS_H__
 
@@ -32,16 +28,16 @@ typedef struct trits_s {
   trit_t *p; /*!< pointer to the trits */
 } trits_t;
 
-#define MAM2_TRITS_INIT(X, k) trits_from_rep(k, X##_p)
+#define MAM_TRITS_INIT(X, k) trits_from_rep(k, X##_p)
 
-#define MAM2_TRITS_DECL(X, k) trit_t X##_p[k]
+#define MAM_TRITS_DECL(X, k) trit_t X##_p[k]
 
-#define MAM2_TRITS_DEF0(X, k) \
-  MAM2_TRITS_DECL(X, k);      \
+#define MAM_TRITS_DEF0(X, k) \
+  MAM_TRITS_DECL(X, k);      \
   trits_t X
 
 #if 0
-#define MAM2_TRITS_DEF(X, key) MAM2_TRITS_DEF0(X, key) = MAM2_TRITS_INIT(X, key)
+#define MAM_TRITS_DEF(X, key) MAM_TRITS_DEF0(X, key) = MAM_TRITS_INIT(X, key)
 #endif
 
 /*! \brief Check `x.n` against zero. */

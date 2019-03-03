@@ -16,17 +16,17 @@
 #include "mam/v2/mss/mss.h"
 #include "mam/v2/trits/trits.h"
 
-#define MAM2_CHANNEL_ID_SIZE MAM2_MSS_MT_HASH_SIZE
-#define MAM2_CHANNEL_MSG_ORD_SIZE 81
+#define MAM_CHANNEL_ID_SIZE MAM_MSS_MT_HASH_SIZE
+#define MAM_CHANNEL_MSG_ORD_SIZE 81
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef struct mam_channel_s {
-  trit_t id[MAM2_CHANNEL_ID_SIZE];
+  trit_t id[MAM_CHANNEL_ID_SIZE];
   trits_t name;
-  trit_t msg_ord[MAM2_CHANNEL_MSG_ORD_SIZE];
+  trit_t msg_ord[MAM_CHANNEL_MSG_ORD_SIZE];
   mam_mss_t mss;
   mam_endpoint_t_set_t endpoints;
 } mam_channel_t;

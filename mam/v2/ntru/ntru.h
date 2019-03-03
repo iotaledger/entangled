@@ -20,9 +20,9 @@
 #include "utils/memset_safe.h"
 
 // NTRU session symmetric key size
-#define MAM2_NTRU_KEY_SIZE MAM2_SPONGE_KEY_SIZE
+#define MAM_NTRU_KEY_SIZE MAM_SPONGE_KEY_SIZE
 // NTRU encrypted key size
-#define MAM2_NTRU_EKEY_SIZE 9216
+#define MAM_NTRU_EKEY_SIZE 9216
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,7 +57,7 @@ retcode_t ntru_destroy(mam_ntru_sk_t *const ntru);
  * @return the id trits
  */
 static inline trits_t ntru_id_trits(mam_ntru_sk_t const *const ntru) {
-  return trits_from_rep(MAM2_NTRU_ID_SIZE, ntru->public_key.key);
+  return trits_from_rep(MAM_NTRU_ID_SIZE, ntru->public_key.key);
 }
 
 /**
@@ -68,7 +68,7 @@ static inline trits_t ntru_id_trits(mam_ntru_sk_t const *const ntru) {
  * @return the trits
  */
 static inline trits_t ntru_pk_trits(mam_ntru_sk_t const *const ntru) {
-  return trits_from_rep(MAM2_NTRU_PK_SIZE, ntru->public_key.key);
+  return trits_from_rep(MAM_NTRU_PK_SIZE, ntru->public_key.key);
 }
 
 /**
@@ -79,7 +79,7 @@ static inline trits_t ntru_pk_trits(mam_ntru_sk_t const *const ntru) {
  * @return the secret  key trits
  */
 static inline trits_t ntru_sk_trits(mam_ntru_sk_t const *const ntru) {
-  return trits_from_rep(MAM2_NTRU_SK_SIZE, ntru->secret_key);
+  return trits_from_rep(MAM_NTRU_SK_SIZE, ntru->secret_key);
 }
 
 /**

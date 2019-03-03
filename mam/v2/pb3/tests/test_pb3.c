@@ -17,9 +17,9 @@ static bool pb3_size_t_test(size_t n) {
   bool ok = true;
   size_t k = pb3_sizeof_size_t(n);
   size_t m = 0;
-  MAM2_TRITS_DEF0(b0, 3 * 14); /* 14 trytes max */
+  MAM_TRITS_DEF0(b0, 3 * 14); /* 14 trytes max */
   trits_t b;
-  b0 = MAM2_TRITS_INIT(b0, 3 * 14); /* 14 trytes max */
+  b0 = MAM_TRITS_INIT(b0, 3 * 14); /* 14 trytes max */
 
   b = trits_take(b0, k);
   pb3_encode_size_t(n, &b);
@@ -35,9 +35,9 @@ static bool pb3_size_t_test(size_t n) {
 static bool pb3_test_size_t_overflow() {
   retcode_t e;
   size_t n;
-  MAM2_TRITS_DEF0(x, 3 * (1 + 8));
+  MAM_TRITS_DEF0(x, 3 * (1 + 8));
 
-  x = MAM2_TRITS_INIT(x, 3 * (1 + 8));
+  x = MAM_TRITS_INIT(x, 3 * (1 + 8));
   trits_set1(x, 1);
   trits_put3(x, 8);
   /* x = pb3_encode_size_t((27^8-1)/2) > 2^32 */
@@ -72,7 +72,7 @@ static void pb3_size_t_tests(void) {
   } else {
     /* this should be the case on a 64-bit platform */
     /*n = SIZE_MAX;*/
-    n = (size_t)MAM2_PB3_SIZE_MAX;
+    n = (size_t)MAM_PB3_SIZE_MAX;
     n -= 99;
     for (k = 0; k < 100; ++k) {
       TEST_ASSERT_TRUE(pb3_size_t_test(n++));

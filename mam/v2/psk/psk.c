@@ -14,11 +14,11 @@
 #include "mam/v2/psk/mam_psk_t_set.h"
 
 trits_t mam_psk_id(mam_psk_t const *const psk) {
-  return trits_from_rep(MAM2_PSK_ID_SIZE, psk->id);
+  return trits_from_rep(MAM_PSK_ID_SIZE, psk->id);
 }
 
 trits_t mam_psk_trits(mam_psk_t const *const psk) {
-  return trits_from_rep(MAM2_PSK_KEY_SIZE, psk->key);
+  return trits_from_rep(MAM_PSK_KEY_SIZE, psk->key);
 }
 
 size_t mam_psks_serialized_size(mam_psk_t_set_t const psks) {
@@ -30,9 +30,9 @@ retcode_t mam_psks_serialize(mam_psk_t_set_t const psks, trits_t trits) {
   mam_psk_t_set_entry_t *tmp = NULL;
 
   HASH_ITER(hh, psks, entry, tmp) {
-    pb3_encode_ntrytes(trits_from_rep(MAM2_PSK_ID_SIZE, entry->value.id),
+    pb3_encode_ntrytes(trits_from_rep(MAM_PSK_ID_SIZE, entry->value.id),
                        &trits);
-    pb3_encode_ntrytes(trits_from_rep(MAM2_PSK_KEY_SIZE, entry->value.key),
+    pb3_encode_ntrytes(trits_from_rep(MAM_PSK_KEY_SIZE, entry->value.key),
                        &trits);
   }
 
@@ -46,8 +46,8 @@ retcode_t mam_psks_deserialize(trits_t const trits,
   mam_psk_t psk;
 
   while (!trits_is_empty(cpy)) {
-    pb3_decode_ntrytes(trits_from_rep(MAM2_PSK_ID_SIZE, psk.id), &cpy);
-    pb3_decode_ntrytes(trits_from_rep(MAM2_PSK_KEY_SIZE, psk.key), &cpy);
+    pb3_decode_ntrytes(trits_from_rep(MAM_PSK_ID_SIZE, psk.id), &cpy);
+    pb3_decode_ntrytes(trits_from_rep(MAM_PSK_KEY_SIZE, psk.key), &cpy);
     if ((ret = mam_psk_t_set_add(psks, &psk)) != RC_OK) {
       break;
     }

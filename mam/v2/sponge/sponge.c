@@ -14,12 +14,12 @@
 #include "mam/v2/troika/troika.h"
 
 static trits_t sponge_state_trits(mam_sponge_t const *const sponge) {
-  return trits_from_rep(MAM2_SPONGE_WIDTH, sponge->state);
+  return trits_from_rep(MAM_SPONGE_WIDTH, sponge->state);
 }
 
 static trits_t sponge_control_trits(mam_sponge_t const *const sponge) {
-  return trits_take(trits_drop(sponge_state_trits(sponge), MAM2_SPONGE_RATE),
-                    MAM2_SPONGE_CONTROL);
+  return trits_take(trits_drop(sponge_state_trits(sponge), MAM_SPONGE_RATE),
+                    MAM_SPONGE_CONTROL);
 }
 
 static void sponge_set_control12(mam_sponge_t *const sponge, trit_t const c1,
@@ -62,7 +62,7 @@ static trit_t sponge_get_control1(mam_sponge_t const *const sponge) {
 }
 
 trits_t mam_sponge_outer_trits(mam_sponge_t const *const sponge) {
-  return trits_take(sponge_state_trits(sponge), MAM2_SPONGE_RATE);
+  return trits_take(sponge_state_trits(sponge), MAM_SPONGE_RATE);
 }
 
 void mam_sponge_init(mam_sponge_t *const sponge) {
@@ -70,7 +70,7 @@ void mam_sponge_init(mam_sponge_t *const sponge) {
 }
 
 void mam_sponge_transform(mam_sponge_t *const sponge) {
-  mam_ftroika_transform(sponge->state, MAM2_SPONGE_WIDTH);
+  mam_ftroika_transform(sponge->state, MAM_SPONGE_WIDTH);
 }
 
 void mam_sponge_fork(mam_sponge_t const *const sponge,
@@ -85,15 +85,15 @@ void mam_sponge_absorb(mam_sponge_t *const sponge, trit_t const c2,
   size_t ni;
   trit_t c0 = 1, c1;
 
-  MAM2_ASSERT(c2 == MAM2_SPONGE_CTL_DATA || c2 == MAM2_SPONGE_CTL_KEY);
+  MAM_ASSERT(c2 == MAM_SPONGE_CTL_DATA || c2 == MAM_SPONGE_CTL_KEY);
 
   s1 = mam_sponge_outer_trits(sponge);
 
   do {
-    curr_data_part = trits_take_min(data, MAM2_SPONGE_RATE);
+    curr_data_part = trits_take_min(data, MAM_SPONGE_RATE);
     ni = trits_size(curr_data_part);
     data = trits_drop(data, ni);
-    c0 = (ni < MAM2_SPONGE_RATE) ? 0 : 1;
+    c0 = (ni < MAM_SPONGE_RATE) ? 0 : 1;
     c1 = trits_is_empty(data) ? -1 : 1;
 
     if (sponge_get_control1(sponge) != 0) {
@@ -115,16 +115,16 @@ void mam_sponge_absorbn(mam_sponge_t *const sponge, trit_t const c2,
   size_t ni;
   trit_t c0 = 1, c1;
 
-  MAM2_ASSERT(c2 == MAM2_SPONGE_CTL_DATA || c2 == MAM2_SPONGE_CTL_KEY);
+  MAM_ASSERT(c2 == MAM_SPONGE_CTL_DATA || c2 == MAM_SPONGE_CTL_KEY);
 
   buffers = buffers_init(n, data_blocks);
   m = buffers_size(buffers);
   outer_state_trits = mam_sponge_outer_trits(sponge);
 
   do {
-    ni = (m < MAM2_SPONGE_RATE) ? m : MAM2_SPONGE_RATE;
+    ni = (m < MAM_SPONGE_RATE) ? m : MAM_SPONGE_RATE;
     m -= ni;
-    c0 = (ni < MAM2_SPONGE_RATE) ? 0 : 1;
+    c0 = (ni < MAM_SPONGE_RATE) ? 0 : 1;
     c1 = (0 == m) ? -1 : 1;
 
     if (sponge_get_control1(sponge) != 0) {
@@ -148,7 +148,7 @@ void mam_sponge_squeeze(mam_sponge_t *const sponge, trit_t const c2,
   outer_state_trits = mam_sponge_outer_trits(sponge);
 
   do {
-    curr_squeezed = trits_take_min(squeezed, MAM2_SPONGE_RATE);
+    curr_squeezed = trits_take_min(squeezed, MAM_SPONGE_RATE);
     ni = trits_size(curr_squeezed);
     squeezed = trits_drop(squeezed, ni);
     c1 = trits_is_empty(squeezed) ? -1 : 1;
@@ -170,19 +170,19 @@ void mam_sponge_encr(mam_sponge_t *const sponge, trits_t plaintext,
   size_t ni;
   trit_t c0 = 1, c1, c2 = -1;
 
-  MAM2_ASSERT(trits_size(plaintext) == trits_size(ciphertext));
-  MAM2_ASSERT(trits_is_same(plaintext, ciphertext) ||
-              !trits_is_overlapped(plaintext, ciphertext));
+  MAM_ASSERT(trits_size(plaintext) == trits_size(ciphertext));
+  MAM_ASSERT(trits_is_same(plaintext, ciphertext) ||
+             !trits_is_overlapped(plaintext, ciphertext));
 
   outer_state_trits = mam_sponge_outer_trits(sponge);
 
   do {
-    curr_plaintext_part = trits_take_min(plaintext, MAM2_SPONGE_RATE);
-    curr_ciphertext_part = trits_take_min(ciphertext, MAM2_SPONGE_RATE);
+    curr_plaintext_part = trits_take_min(plaintext, MAM_SPONGE_RATE);
+    curr_ciphertext_part = trits_take_min(ciphertext, MAM_SPONGE_RATE);
     ni = trits_size(curr_plaintext_part);
     plaintext = trits_drop(plaintext, ni);
     ciphertext = trits_drop(ciphertext, ni);
-    c0 = (ni < MAM2_SPONGE_RATE) ? 0 : 1;
+    c0 = (ni < MAM_SPONGE_RATE) ? 0 : 1;
     c1 = trits_is_empty(plaintext) ? -1 : 1;
 
     sponge_set_control345(sponge, c0, c1, c2);
@@ -207,19 +207,19 @@ void mam_sponge_decr(mam_sponge_t *const sponge, trits_t ciphertext,
   size_t ni;
   trit_t c0 = 1, c1, c2 = -1;
 
-  MAM2_ASSERT(trits_size(plaintext) == trits_size(ciphertext));
-  MAM2_ASSERT(trits_is_same(plaintext, ciphertext) ||
-              !trits_is_overlapped(plaintext, ciphertext));
+  MAM_ASSERT(trits_size(plaintext) == trits_size(ciphertext));
+  MAM_ASSERT(trits_is_same(plaintext, ciphertext) ||
+             !trits_is_overlapped(plaintext, ciphertext));
 
   outer_state_trits = mam_sponge_outer_trits(sponge);
 
   do {
-    curr_plainttext_part = trits_take_min(plaintext, MAM2_SPONGE_RATE);
-    curr_ciphertext_part = trits_take_min(ciphertext, MAM2_SPONGE_RATE);
+    curr_plainttext_part = trits_take_min(plaintext, MAM_SPONGE_RATE);
+    curr_ciphertext_part = trits_take_min(ciphertext, MAM_SPONGE_RATE);
     ni = trits_size(curr_plainttext_part);
     plaintext = trits_drop(plaintext, ni);
     ciphertext = trits_drop(ciphertext, ni);
-    c0 = (ni < MAM2_SPONGE_RATE) ? 0 : 1;
+    c0 = (ni < MAM_SPONGE_RATE) ? 0 : 1;
     c1 = trits_is_empty(plaintext) ? -1 : 1;
 
     sponge_set_control345(sponge, c0, c1, c2);
@@ -239,13 +239,13 @@ void mam_sponge_decr(mam_sponge_t *const sponge, trits_t ciphertext,
 void mam_sponge_hash(mam_sponge_t *const sponge, trits_t const plaintext,
                      trits_t digest) {
   mam_sponge_init(sponge);
-  mam_sponge_absorb(sponge, MAM2_SPONGE_CTL_DATA, plaintext);
-  mam_sponge_squeeze(sponge, MAM2_SPONGE_CTL_HASH, digest);
+  mam_sponge_absorb(sponge, MAM_SPONGE_CTL_DATA, plaintext);
+  mam_sponge_squeeze(sponge, MAM_SPONGE_CTL_HASH, digest);
 }
 
 void mam_sponge_hashn(mam_sponge_t *const sponge, size_t const n,
                       trits_t const *const plaintext_blocks, trits_t digest) {
   mam_sponge_init(sponge);
-  mam_sponge_absorbn(sponge, MAM2_SPONGE_CTL_DATA, n, plaintext_blocks);
-  mam_sponge_squeeze(sponge, MAM2_SPONGE_CTL_HASH, digest);
+  mam_sponge_absorbn(sponge, MAM_SPONGE_CTL_DATA, n, plaintext_blocks);
+  mam_sponge_squeeze(sponge, MAM_SPONGE_CTL_HASH, digest);
 }

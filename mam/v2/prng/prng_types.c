@@ -12,15 +12,15 @@
 #include "mam/v2/pb3/pb3.h"
 #include "mam/v2/prng/mam_prng_t_set.h"
 
-size_t mam_prng_serialized_size() { return MAM2_PRNG_KEY_SIZE; }
+size_t mam_prng_serialized_size() { return MAM_PRNG_KEY_SIZE; }
 
 void mam_prng_serialize(mam_prng_t const *const prng, trits_t trits) {
-  pb3_encode_ntrytes(trits_from_rep(MAM2_PRNG_KEY_SIZE, prng->secret_key),
+  pb3_encode_ntrytes(trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key),
                      &trits);
 }
 
 void mam_prng_deserialize(trits_t const trits, mam_prng_t *const prng) {
-  pb3_decode_ntrytes(trits_from_rep(MAM2_PRNG_KEY_SIZE, prng->secret_key),
+  pb3_decode_ntrytes(trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key),
                      &trits);
 }
 
@@ -33,8 +33,8 @@ retcode_t mam_prngs_serialize(mam_prng_t_set_t const prng_set, trits_t trits) {
   mam_prng_t_set_entry_t *tmp = NULL;
 
   HASH_ITER(hh, prng_set, entry, tmp) {
-    mam_prng_serialize(&entry->value, trits_take(trits, MAM2_PRNG_KEY_SIZE));
-    trits = trits_drop(trits, MAM2_PRNG_KEY_SIZE);
+    mam_prng_serialize(&entry->value, trits_take(trits, MAM_PRNG_KEY_SIZE));
+    trits = trits_drop(trits, MAM_PRNG_KEY_SIZE);
   }
 
   return RC_OK;

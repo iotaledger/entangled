@@ -16,34 +16,34 @@
 #include "mam/v2/trits/trits.h"
 
 // Sponge state rate
-#define MAM2_SPONGE_RATE 486
+#define MAM_SPONGE_RATE 486
 // Sponge state control
-#define MAM2_SPONGE_CONTROL 6
+#define MAM_SPONGE_CONTROL 6
 // Sponge state capacity
-#define MAM2_SPONGE_CAPACITY 237
+#define MAM_SPONGE_CAPACITY 237
 // Sponge state width
-#define MAM2_SPONGE_WIDTH \
-  (MAM2_SPONGE_RATE + MAM2_SPONGE_CONTROL + MAM2_SPONGE_CAPACITY)
+#define MAM_SPONGE_WIDTH \
+  (MAM_SPONGE_RATE + MAM_SPONGE_CONTROL + MAM_SPONGE_CAPACITY)
 
 // Sponge fixed key size
-#define MAM2_SPONGE_KEY_SIZE 243
+#define MAM_SPONGE_KEY_SIZE 243
 // Sponge fixed hash size
-#define MAM2_SPONGE_HASH_SIZE 243
+#define MAM_SPONGE_HASH_SIZE 243
 // Sponge fixed MAC size
-#define MAM2_SPONGE_MAC_SIZE 243
+#define MAM_SPONGE_MAC_SIZE 243
 
 // c2 control trit DATA
-#define MAM2_SPONGE_CTL_DATA 0
+#define MAM_SPONGE_CTL_DATA 0
 // c2 control trit HASH
-#define MAM2_SPONGE_CTL_HASH 0
+#define MAM_SPONGE_CTL_HASH 0
 // c2 control trit KEY
-#define MAM2_SPONGE_CTL_KEY 1
+#define MAM_SPONGE_CTL_KEY 1
 // c2 control trit PRN
-#define MAM2_SPONGE_CTL_PRN 1
+#define MAM_SPONGE_CTL_PRN 1
 // c2 control trit TEXT
-#define MAM2_SPONGE_CTL_TEXT -1
+#define MAM_SPONGE_CTL_TEXT -1
 // c2 control trit MAC
-#define MAM2_SPONGE_CTL_MAC -1
+#define MAM_SPONGE_CTL_MAC -1
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,7 +56,7 @@ extern "C" {
  * @field state sponge state
  */
 typedef struct sponge_s {
-  trit_t state[MAM2_SPONGE_WIDTH];
+  trit_t state[MAM_SPONGE_WIDTH];
 } mam_sponge_t;
 
 /**

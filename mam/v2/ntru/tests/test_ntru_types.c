@@ -56,17 +56,17 @@ static void test_ntru_pk_serialization(void) {
   mam_ntru_pk_t_set_t ntru_set_1 = NULL;
   mam_ntru_pk_t_set_t ntru_set_2 = NULL;
   mam_ntru_pk_t ntru;
-  tryte_t ntru_pk[MAM2_NTRU_PK_SIZE / 3];
+  tryte_t ntru_pk[MAM_NTRU_PK_SIZE / 3];
 
   for (size_t i = 0; i < 26; i++) {
-    memset(ntru_pk, 'A' + i, MAM2_NTRU_PK_SIZE / 3);
-    trytes_to_trits(ntru_pk, ntru.key, MAM2_NTRU_PK_SIZE / 3);
+    memset(ntru_pk, 'A' + i, MAM_NTRU_PK_SIZE / 3);
+    trytes_to_trits(ntru_pk, ntru.key, MAM_NTRU_PK_SIZE / 3);
     TEST_ASSERT(mam_ntru_pk_t_set_add(&ntru_set_1, &ntru) == RC_OK);
   }
 
   size_t size = mam_ntru_pks_serialized_size(ntru_set_1);
 
-  TEST_ASSERT_EQUAL_INT(size, 26 * MAM2_NTRU_PK_SIZE);
+  TEST_ASSERT_EQUAL_INT(size, 26 * MAM_NTRU_PK_SIZE);
 
   trits_t trits = trits_alloc(size);
 
@@ -86,10 +86,10 @@ static void test_ntru_sk_serialization(void) {
   mam_ntru_sk_t_set_t ntru_sk_set_2 = NULL;
   mam_ntru_sk_t ntru_sk;
   mam_prng_t prng;
-  MAM2_TRITS_DEF0(key, MAM2_PRNG_KEY_SIZE);
-  MAM2_TRITS_DEF0(nonce, 3 * 10);
-  key = MAM2_TRITS_INIT(key, MAM2_PRNG_KEY_SIZE);
-  nonce = MAM2_TRITS_INIT(nonce, 3 * 10);
+  MAM_TRITS_DEF0(key, MAM_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(nonce, 3 * 10);
+  key = MAM_TRITS_INIT(key, MAM_PRNG_KEY_SIZE);
+  nonce = MAM_TRITS_INIT(nonce, 3 * 10);
 
   trits_from_str(key,
                  "AAABBBCCCAAABBBCCCAAABBBCCC"
@@ -107,7 +107,7 @@ static void test_ntru_sk_serialization(void) {
 
   size_t size = mam_ntru_sks_serialized_size(ntru_sk_set_1);
 
-  TEST_ASSERT_EQUAL_INT(size, 3 * (MAM2_NTRU_PK_SIZE + MAM2_NTRU_SK_SIZE));
+  TEST_ASSERT_EQUAL_INT(size, 3 * (MAM_NTRU_PK_SIZE + MAM_NTRU_SK_SIZE));
 
   trits_t trits = trits_alloc(size);
 

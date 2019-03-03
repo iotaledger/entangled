@@ -25,8 +25,8 @@ static bool mam_channel_t_set_cmp(mam_channel_t_set_t const channels_1,
   mam_channel_t_set_entry_t *entry_2 = NULL;
   mam_channel_t_set_entry_t *tmp_2 = NULL;
   size_t match = 0;
-  MAM2_TRITS_DEF0(hash, MAM2_MSS_HASH_SIZE);
-  hash = MAM2_TRITS_INIT(hash, MAM2_MSS_HASH_SIZE);
+  MAM_TRITS_DEF0(hash, MAM_MSS_HASH_SIZE);
+  hash = MAM_TRITS_INIT(hash, MAM_MSS_HASH_SIZE);
   trits_from_str(hash,
                  "ABCNKOZWYSDF9OABCNKOZWYSDF9"
                  "ABCNKOZWYSDF9QABCNKOZWYSDF9"
@@ -39,17 +39,17 @@ static bool mam_channel_t_set_cmp(mam_channel_t_set_t const channels_1,
 
   HASH_ITER(hh, channels_1, entry_1, tmp_1) {
     HASH_ITER(hh, channels_2, entry_2, tmp_2) {
-      if (memcmp(entry_1->value.id, entry_2->value.id, MAM2_ENDPOINT_ID_SIZE) ==
+      if (memcmp(entry_1->value.id, entry_2->value.id, MAM_ENDPOINT_ID_SIZE) ==
               0 &&
           trits_cmp_eq(entry_1->value.name, entry_2->value.name) &&
           memcmp(entry_1->value.msg_ord, entry_2->value.msg_ord,
-                 MAM2_CHANNEL_MSG_ORD_SIZE) == 0) {
-        MAM2_TRITS_DEF0(sig1, MAM2_MSS_SIG_SIZE(entry_1->value.mss.height));
-        MAM2_TRITS_DEF0(sig2, MAM2_MSS_SIG_SIZE(entry_2->value.mss.height));
+                 MAM_CHANNEL_MSG_ORD_SIZE) == 0) {
+        MAM_TRITS_DEF0(sig1, MAM_MSS_SIG_SIZE(entry_1->value.mss.height));
+        MAM_TRITS_DEF0(sig2, MAM_MSS_SIG_SIZE(entry_2->value.mss.height));
         sig1 =
-            MAM2_TRITS_INIT(sig1, MAM2_MSS_SIG_SIZE(entry_1->value.mss.height));
+            MAM_TRITS_INIT(sig1, MAM_MSS_SIG_SIZE(entry_1->value.mss.height));
         sig2 =
-            MAM2_TRITS_INIT(sig2, MAM2_MSS_SIG_SIZE(entry_2->value.mss.height));
+            MAM_TRITS_INIT(sig2, MAM_MSS_SIG_SIZE(entry_2->value.mss.height));
         mam_mss_sign(&entry_1->value.mss, hash, sig1);
         mam_mss_sign(&entry_2->value.mss, hash, sig2);
         if (trits_cmp_eq(sig1, sig2)) {
@@ -73,8 +73,8 @@ void test_channel(void) {
   tryte_t channel_name[27];
   trits_t channel_name_trits = trits_alloc(81);
 
-  MAM2_TRITS_DEF0(prng_key, MAM2_PRNG_KEY_SIZE);
-  prng_key = MAM2_TRITS_INIT(prng_key, MAM2_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(prng_key, MAM_PRNG_KEY_SIZE);
+  prng_key = MAM_TRITS_INIT(prng_key, MAM_PRNG_KEY_SIZE);
   trits_from_str(prng_key,
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
                  "NOPQRSTUVWXYZ9ABCDEFGHIJKLM"
@@ -87,7 +87,7 @@ void test_channel(void) {
     trytes_to_trits(channel_name, channel_name_trits.p, 27);
     TEST_ASSERT(mam_channel_create(&prng, i, channel_name_trits, &channel) ==
                 RC_OK);
-    add_assign(channel.msg_ord, MAM2_CHANNEL_MSG_ORD_SIZE, i);
+    add_assign(channel.msg_ord, MAM_CHANNEL_MSG_ORD_SIZE, i);
     TEST_ASSERT(mam_channel_t_set_add(&channels_1, &channel) == RC_OK);
   }
 

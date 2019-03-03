@@ -25,8 +25,8 @@
 #include "mam/v2/trits/trits.h"
 #include "mam/v2/wots/wots.h"
 
-#define MAM2_MSG_ID_SIZE 63
-#define MAM2_MSG_ORD_SIZE 18
+#define MAM_MSG_ID_SIZE 63
+#define MAM_MSG_ORD_SIZE 18
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,7 +58,7 @@ typedef struct mam_msg_send_context_s {
 
 typedef struct mam_msg_recv_context_s {
   mam_spongos_t spongos; /*!< Main Spongos interface */
-  trit_t pk[MAM2_CHANNEL_ID_SIZE];
+  trit_t pk[MAM_CHANNEL_ID_SIZE];
   /*TODO: check for trusted chid/epid*/
   /*TODO: handle (add to trusted list) new chid1*/
   trint18_t ord; /*!< Packet ordinal number. */

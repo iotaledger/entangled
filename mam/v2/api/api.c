@@ -82,25 +82,25 @@ static trits_t mam_api_bundle_unwrap(bundle_transactions_t const *const bundle,
 
 retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed) {
   retcode_t ret = RC_OK;
-  trit_t mam_seed_trits[MAM2_PRNG_KEY_SIZE];
+  trit_t mam_seed_trits[MAM_PRNG_KEY_SIZE];
 
   if (api == NULL || mam_seed == NULL) {
     return RC_NULL_PARAM;
   }
 
-  trytes_to_trits(mam_seed, mam_seed_trits, MAM2_PRNG_KEY_SIZE / 3);
-  mam_prng_init(&api->prng, trits_from_rep(MAM2_PRNG_KEY_SIZE, mam_seed_trits));
+  trytes_to_trits(mam_seed, mam_seed_trits, MAM_PRNG_KEY_SIZE / 3);
+  mam_prng_init(&api->prng, trits_from_rep(MAM_PRNG_KEY_SIZE, mam_seed_trits));
   // TODO use safe memset
-  memset(mam_seed_trits, 0, MAM2_PRNG_KEY_SIZE);
+  memset(mam_seed_trits, 0, MAM_PRNG_KEY_SIZE);
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
   api->psks = NULL;
 
   ERR_BIND_RETURN(trit_t_to_mam_msg_send_context_t_map_init(&api->send_ctxs,
-                                                            MAM2_MSG_ID_SIZE),
+                                                            MAM_MSG_ID_SIZE),
                   ret);
   ERR_BIND_RETURN(trit_t_to_mam_msg_recv_context_t_map_init(&api->recv_ctxs,
-                                                            MAM2_MSG_ID_SIZE),
+                                                            MAM_MSG_ID_SIZE),
                   ret);
 
   return ret;
@@ -154,8 +154,8 @@ retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk) {
 
 void mam_api_tag(trit_t *const tag, trit_t const *const msg_id,
                  trint18_t const ord) {
-  memcpy(tag, msg_id, MAM2_MSG_ID_SIZE);
-  trits_put18(trits_from_rep(18, tag + MAM2_MSG_ID_SIZE), ord);
+  memcpy(tag, msg_id, MAM_MSG_ID_SIZE);
+  trits_put18(trits_from_rep(18, tag + MAM_MSG_ID_SIZE), ord);
 }
 
 retcode_t mam_api_bundle_write_header(
@@ -181,8 +181,8 @@ retcode_t mam_api_bundle_write_header(
     trits_t msg_id_parts[] = {mam_channel_name(ch), mam_channel_msg_ord(ch)};
 
     mam_spongos_hashn(&ctx.spongos, 2, msg_id_parts,
-                      trits_from_rep(MAM2_MSG_ID_SIZE, msg_id));
-    add_assign(ch->msg_ord, MAM2_MSG_ID_SIZE, 1);
+                      trits_from_rep(MAM_MSG_ID_SIZE, msg_id));
+    add_assign(ch->msg_ord, MAM_MSG_ID_SIZE, 1);
     mam_api_tag(tag, msg_id, 0);
   }
 
@@ -195,7 +195,7 @@ retcode_t mam_api_bundle_write_header(
       return RC_OOM;
     }
     mam_msg_send(&ctx, &api->prng, ch, ep, ch1, ep1,
-                 trits_from_rep(MAM2_MSG_ID_SIZE, msg_id), msg_type_id, psks,
+                 trits_from_rep(MAM_MSG_ID_SIZE, msg_id), msg_type_id, psks,
                  ntru_pks, &header);
     header = trits_pickup(header, header_size);
     mam_api_bundle_wrap(bundle, ch->id, tag, header);
@@ -238,8 +238,8 @@ retcode_t mam_api_bundle_write_packet(
     trit_t tag[NUM_TRITS_TAG];
     trits_t packet = trits_null();
     size_t packet_size = 0;
-    MAM2_TRITS_DEF0(payload_trits, payload_size * 3);
-    payload_trits = MAM2_TRITS_INIT(payload_trits, payload_size * 3);
+    MAM_TRITS_DEF0(payload_trits, payload_size * 3);
+    payload_trits = MAM_TRITS_INIT(payload_trits, payload_size * 3);
     trits_from_str(payload_trits, payload);
 
     packet_size =
@@ -267,7 +267,7 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle) {
 
   flex_trits_to_trits(tag, NUM_TRITS_TAG, transaction_tag(tx), NUM_TRITS_TAG,
                       NUM_TRITS_TAG);
-  return trits_get18(trits_from_rep(18, tag + MAM2_MSG_ID_SIZE)) == 0;
+  return trits_get18(trits_from_rep(18, tag + MAM_MSG_ID_SIZE)) == 0;
 }
 
 static retcode_t mam_api_bundle_read_packet_from_msg(
@@ -291,9 +291,9 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
                                   tryte_t **const payload,
                                   size_t *const payload_size) {
   retcode_t err = RC_OK;
-  trit_t msg_id[MAM2_MSG_ID_SIZE];
+  trit_t msg_id[MAM_MSG_ID_SIZE];
 
-  MAM2_ASSERT(payload && *payload == NULL && payload_size);
+  MAM_ASSERT(payload && *payload == NULL && payload_size);
   if (!mam_api_bundle_contains_header(bundle)) {
     return RC_MAM2_BUNDLE_DOES_NOT_CONTAIN_HEADER;
   }
@@ -313,10 +313,10 @@ retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
   trits_t msg =
       mam_api_bundle_unwrap(bundle, msg_trits, num_trits_in_bundle, 0);
 
-  flex_trits_to_trits(msg_id, MAM2_MSG_ID_SIZE, transaction_tag(curr_tx),
-                      NUM_TRITS_TAG, MAM2_MSG_ID_SIZE);
+  flex_trits_to_trits(msg_id, MAM_MSG_ID_SIZE, transaction_tag(curr_tx),
+                      NUM_TRITS_TAG, MAM_MSG_ID_SIZE);
   ERR_BIND_RETURN(mam_msg_recv(&ctx, &msg, api->psks, api->ntru_sks,
-                               trits_from_rep(MAM2_MSG_ID_SIZE, msg_id)),
+                               trits_from_rep(MAM_MSG_ID_SIZE, msg_id)),
                   err);
 
   size_t packet_index = msg.d / NUM_TRITS_SIGNATURE + 1;

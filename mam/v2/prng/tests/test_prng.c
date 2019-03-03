@@ -16,14 +16,14 @@
 static void prng_test(void) {
   mam_prng_t prng;
 
-  MAM2_TRITS_DEF0(K, MAM2_PRNG_KEY_SIZE);
-  MAM2_TRITS_DEF0(N, 18);
-  MAM2_TRITS_DEF0(Y1, 243 * 2 + 18);
-  MAM2_TRITS_DEF0(Y2, 243 * 2 + 18);
-  K = MAM2_TRITS_INIT(K, MAM2_PRNG_KEY_SIZE);
-  N = MAM2_TRITS_INIT(N, 18);
-  Y1 = MAM2_TRITS_INIT(Y1, 243 * 2 + 18);
-  Y2 = MAM2_TRITS_INIT(Y2, 243 * 2 + 18);
+  MAM_TRITS_DEF0(K, MAM_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(N, 18);
+  MAM_TRITS_DEF0(Y1, 243 * 2 + 18);
+  MAM_TRITS_DEF0(Y2, 243 * 2 + 18);
+  K = MAM_TRITS_INIT(K, MAM_PRNG_KEY_SIZE);
+  N = MAM_TRITS_INIT(N, 18);
+  Y1 = MAM_TRITS_INIT(Y1, 243 * 2 + 18);
+  Y2 = MAM_TRITS_INIT(Y2, 243 * 2 + 18);
 
   trits_set_zero(K);
   trits_set_zero(N);

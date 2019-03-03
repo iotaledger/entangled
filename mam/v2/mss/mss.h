@@ -8,10 +8,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-/*!
-\file mss.c
-\brief MAM2 MSS layer.
-*/
 #ifndef __MAM_V2_MSS_MSS_H__
 #define __MAM_V2_MSS_MSS_H__
 
@@ -27,27 +23,27 @@ extern "C" {
 #endif
 
 /*! \brief MSS public key size. */
-#define MAM2_MSS_PK_SIZE 243
+#define MAM_MSS_PK_SIZE 243
 /*! \brief Trits needed to encode tree depth part of SKN. */
-#define MAM2_MSS_SKN_TREE_DEPTH_SIZE 4
+#define MAM_MSS_SKN_TREE_DEPTH_SIZE 4
 /*! \brief Trits needed to encode key number part of SKN. */
-#define MAM2_MSS_SKN_KEY_NUMBER_SIZE 14
+#define MAM_MSS_SKN_KEY_NUMBER_SIZE 14
 /*! \brief Trits needed to encode `skn`: tree depth and key number. */
-#define MAM2_MSS_SKN_SIZE \
-  (MAM2_MSS_SKN_TREE_DEPTH_SIZE + MAM2_MSS_SKN_KEY_NUMBER_SIZE)
+#define MAM_MSS_SKN_SIZE \
+  (MAM_MSS_SKN_TREE_DEPTH_SIZE + MAM_MSS_SKN_KEY_NUMBER_SIZE)
 /*! \brief MSS authentication path size of height `d`. */
-#define MAM2_MSS_APATH_SIZE(d) (MAM2_WOTS_PK_SIZE * d)
+#define MAM_MSS_APATH_SIZE(d) (MAM_WOTS_PK_SIZE * d)
 /*! \brief MSS signature size with a tree of height `d`. */
-#define MAM2_MSS_SIG_SIZE(d) \
-  (MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE + MAM2_MSS_APATH_SIZE(d))
+#define MAM_MSS_SIG_SIZE(d) \
+  (MAM_MSS_SKN_SIZE + MAM_WOTS_SIG_SIZE + MAM_MSS_APATH_SIZE(d))
 /*! \brief MSS signed hash value size. */
-#define MAM2_MSS_HASH_SIZE MAM2_WOTS_HASH_SIZE
+#define MAM_MSS_HASH_SIZE MAM_WOTS_HASH_SIZE
 
 /*! \brief Max Merkle tree height. */
-#define MAM2_MSS_MAX_D 20
+#define MAM_MSS_MAX_D 20
 
 /*! \brief Size of hash values stored in Merkle tree */
-#define MAM2_MSS_MT_HASH_SIZE MAM2_WOTS_PK_SIZE
+#define MAM_MSS_MT_HASH_SIZE MAM_WOTS_PK_SIZE
 
 /*! \brief Leaves have height `0`, root has height `D`; `0 <= d < D`; `D <=
  * 20`.
@@ -57,7 +53,7 @@ typedef trint6_t mss_mt_height_t;
  * 2^(D-d). */
 typedef trint18_t mss_mt_idx_t;
 
-#if defined(MAM2_MSS_TRAVERSAL)
+#if defined(MAM_MSS_TRAVERSAL)
 
 /*! \brief Node info, specifies position of the node in the MT.
 \note Corresponding hash-value is stored externally. */
@@ -66,7 +62,7 @@ typedef struct mss_mt_node_s {
   mss_mt_idx_t level_idx; /*!< Level index. */
 } mss_mt_node_t;
 /*! \brief Number of auxiliary MT nodes used by tree-traversal algorithm */
-#define MAM2_MSS_MT_NODES(d) ((d) * ((d) + 1) / 2)
+#define MAM_MSS_MT_NODES(d) ((d) * ((d) + 1) / 2)
 
 /*! \brief Stack info.
 \note Stack nodes are stored externally. */
@@ -76,38 +72,36 @@ typedef struct mss_mt_stack_s {
   size_t size;            /*!< Size of stack. */
 } mss_mt_stack_t;
 /*! \brief Number of auxiliary stacks used by tree-traversal algorithm */
-#define MAM2_MSS_MT_STACKS(d) (d)
-#define MAM2_MSS_MT_STACK_CAPACITY(d) ((d) + 1)
+#define MAM_MSS_MT_STACKS(d) (d)
+#define MAM_MSS_MT_STACK_CAPACITY(d) ((d) + 1)
 
-#define MAM2_MSS_HASH_IDX(i) (MAM2_MSS_MT_HASH_SIZE * (i))
+#define MAM_MSS_HASH_IDX(i) (MAM_MSS_MT_HASH_SIZE * (i))
 /*! \brief Memory for hash-values. TODO: Add 1 extra hash for mss_gen. */
-#define MAM2_MSS_MT_HASH_WORDS(d, i) \
-  MAM2_MSS_HASH_IDX(MAM2_MSS_MT_NODES(d) + (i))
-#define MAM2_MSS_MT_AUTH_WORDS(d) MAM2_MSS_HASH_IDX(d)
+#define MAM_MSS_MT_HASH_WORDS(d, i) MAM_MSS_HASH_IDX(MAM_MSS_MT_NODES(d) + (i))
+#define MAM_MSS_MT_AUTH_WORDS(d) MAM_MSS_HASH_IDX(d)
 #else
 /*! \brief MSS Merkle-tree implementation storage words. */
-#define MAM2_MSS_MT_WORDS(height) \
-  (MAM2_WOTS_PK_SIZE * (2 * (1 << (height)) - 1))
+#define MAM_MSS_MT_WORDS(height) (MAM_WOTS_PK_SIZE * (2 * (1 << (height)) - 1))
 #endif
 
-#if defined(MAM2_MSS_TRAVERSAL)
-#define MAM2_MSS_MT_MAX_STORED_SIZE(d) \
-  ((d) * ((d) + 3) / 2 * MAM2_MSS_MT_HASH_SIZE)
+#if defined(MAM_MSS_TRAVERSAL)
+#define MAM_MSS_MT_MAX_STORED_SIZE(d) \
+  ((d) * ((d) + 3) / 2 * MAM_MSS_MT_HASH_SIZE)
 #else
-#define MAM2_MSS_MT_MAX_STORED_SIZE(height) \
-  (((1 << ((height) + 1)) - 1) * MAM2_MSS_MT_HASH_SIZE)
+#define MAM_MSS_MT_MAX_STORED_SIZE(height) \
+  (((1 << ((height) + 1)) - 1) * MAM_MSS_MT_HASH_SIZE)
 #endif
-#define MAM2_MSS_MAX_STORED_SIZE(d) (4 + 14 + MAM2_MSS_MT_MAX_STORED_SIZE(d))
+#define MAM_MSS_MAX_STORED_SIZE(d) (4 + 14 + MAM_MSS_MT_MAX_STORED_SIZE(d))
 
 /*! \brief MSS interface used to generate public key and sign. */
 typedef struct mss_s {
   mss_mt_height_t height; /*!< Merkle tree height. */
   mss_mt_idx_t skn;       /*!< Current WOTS private key number. */
   mam_prng_t *prng; /*!< PRNG interface used to generate WOTS private keys. */
-#if defined(MAM2_MSS_TRAVERSAL)
+#if defined(MAM_MSS_TRAVERSAL)
   trit_t *auth_path;      /*!< Current authentication path; `d` hash values. */
   trit_t *nodes_hashes;   /*!< Buffer storing hash-values of auxiliary nodes;
-                MAM2_MSS_MT_NODES(d) hash-values in total. */
+                MAM_MSS_MT_NODES(d) hash-values in total. */
   mss_mt_node_t *nodes;   /*<! Auxiliary node infos. */
   mss_mt_stack_t *stacks; /*<! Stacks used by traversal algorithm. */
 #else
@@ -119,7 +113,7 @@ typedef struct mss_s {
   trit_t root[MAM2_MSS_PK_SIZE];
 } mam_mss_t;
 
-#if defined(MAM2_MSS_TRAVERSAL)
+#if defined(MAM_MSS_TRAVERSAL)
 /*! \note
 MSS key gen requires stack of capacity `D+1`.
 In order to save space stack at level `D-1` is reused.
@@ -133,10 +127,10 @@ It is achieved by allocating one extra node:
   mss_mt_stack_t *alloc_stacks(size_t stack_count);
   mss_mt_height_t D;
 
-  size_t total_nodes = MAM2_MSS_MT_NODES(D)+1;
+  size_t total_nodes = MAM_MSS_MT_NODES(D)+1;
   m->height = D;
-  m->ap = alloc_words(D * MAM2_MSS_MT_HASH_SIZE);
-  m->hs = alloc_words(total_nodes * MAM2_MSS_MT_HASH_SIZE);
+  m->ap = alloc_words(D * MAM_MSS_MT_HASH_SIZE);
+  m->hs = alloc_words(total_nodes * MAM_MSS_MT_HASH_SIZE);
   m->nodes = alloc_nodes(total_nodes);
   m->stacks = alloc_stacks(D);
 ```

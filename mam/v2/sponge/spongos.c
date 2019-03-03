@@ -19,7 +19,7 @@ static trits_t spongos_outer_trits(mam_spongos_t *const spongos) {
 
 static void spongos_update(mam_spongos_t *const spongos, size_t const n) {
   spongos->pos += n;
-  if (spongos->pos == MAM2_SPONGE_RATE) {
+  if (spongos->pos == MAM_SPONGE_RATE) {
     mam_spongos_commit(spongos);
   }
 }
@@ -128,6 +128,6 @@ void mam_spongos_decr(mam_spongos_t *const spongos, trits_t ciphertext,
 
 void mam_spongos_copy(mam_spongos_t const *const src,
                       mam_spongos_t *const dst) {
-  memcpy(dst->sponge.state, src->sponge.state, MAM2_SPONGE_WIDTH);
+  memcpy(dst->sponge.state, src->sponge.state, MAM_SPONGE_WIDTH);
   dst->pos = src->pos;
 }

@@ -18,9 +18,9 @@ static void trits_put_get_test(void) {
   trit_t t0, t;
   size_t i;
 
-  MAM2_TRITS_DEF0(x, 1);
+  MAM_TRITS_DEF0(x, 1);
 
-  x = MAM2_TRITS_INIT(x, 1);
+  x = MAM_TRITS_INIT(x, 1);
   trits_set_zero(x);
 
   for (i = 0; i < 1; ++i) {
@@ -83,7 +83,7 @@ static bool trits_trytes(trits_t x, char *s, char *t) {
   trint9_t s9;
   trint18_t s18;
 
-  MAM2_ASSERT(0 == (trits_size(x) % 3));
+  MAM_ASSERT(0 == (trits_size(x) % 3));
 
   trits_from_str(x, s);
 
@@ -131,8 +131,8 @@ static void trits_test(void) {
   char t[6 * 4];
   trits_t x;
 
-  MAM2_TRITS_DEF0(y, 3 * 6 * 4);
-  y = MAM2_TRITS_INIT(y, 3 * 6 * 4);
+  MAM_TRITS_DEF0(y, 3 * 6 * 4);
+  y = MAM_TRITS_INIT(y, 3 * 6 * 4);
 
   for (size_t n = 0; n <= 6 * 4; ++n) {
     x = trits_take(y, 3 * n);

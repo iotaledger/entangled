@@ -22,16 +22,16 @@ static void ntru_test(void) {
 
   size_t i;
   size_t test_count = 30;
-  MAM2_POLY_DEF(f);
-  MAM2_POLY_DEF(f0);
-  MAM2_TRITS_DEF0(nonce, 3 * 10);
-  MAM2_TRITS_DEF0(key, MAM2_PRNG_KEY_SIZE);
-  MAM2_TRITS_DEF0(ekey, MAM2_NTRU_EKEY_SIZE);
-  MAM2_TRITS_DEF0(dekey, MAM2_NTRU_KEY_SIZE);
-  nonce = MAM2_TRITS_INIT(nonce, 3 * 10);
-  key = MAM2_TRITS_INIT(key, MAM2_PRNG_KEY_SIZE);
-  ekey = MAM2_TRITS_INIT(ekey, MAM2_NTRU_EKEY_SIZE);
-  dekey = MAM2_TRITS_INIT(dekey, MAM2_NTRU_KEY_SIZE);
+  MAM_POLY_DEF(f);
+  MAM_POLY_DEF(f0);
+  MAM_TRITS_DEF0(nonce, 3 * 10);
+  MAM_TRITS_DEF0(key, MAM_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(ekey, MAM_NTRU_EKEY_SIZE);
+  MAM_TRITS_DEF0(dekey, MAM_NTRU_KEY_SIZE);
+  nonce = MAM_TRITS_INIT(nonce, 3 * 10);
+  key = MAM_TRITS_INIT(key, MAM_PRNG_KEY_SIZE);
+  ekey = MAM_TRITS_INIT(ekey, MAM_NTRU_EKEY_SIZE);
+  dekey = MAM_TRITS_INIT(dekey, MAM_NTRU_KEY_SIZE);
 
   trits_from_str(key,
                  "AAABBBCCCAAABBBCCCAAABBBCCC"
@@ -51,7 +51,7 @@ static void ntru_test(void) {
     TEST_ASSERT_TRUE(trits_from_str(nonce, "NONCE9PK99"));
     trits_set_zero(pk);
     trits_put1(pk, 1);
-    poly_small_from_trits(f, trits_take(pk, MAM2_NTRU_SK_SIZE));
+    poly_small_from_trits(f, trits_take(pk, MAM_NTRU_SK_SIZE));
     ntru_gen(&ntru, &prng, nonce);
     memcpy(f0, ntru.f, sizeof(poly_t));
     poly_add(f, f0, f);
@@ -74,7 +74,7 @@ static void ntru_test(void) {
       memcpy(ntru.f, f0, sizeof(poly_t));
 
       trits_from_str(nonce, "NONCE9KEY9");
-      mam_prng_gen(&prng, MAM2_PRNG_DST_SEC_KEY, nonce, key);
+      mam_prng_gen(&prng, MAM_PRNG_DST_SEC_KEY, nonce, key);
     } while (0 != (++i % (test_count / 10)));
   } while (++i < test_count);
   ntru_destroy(&ntru);

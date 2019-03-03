@@ -15,8 +15,8 @@
 #include "mam/v2/prng/prng.h"
 
 void mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
-  MAM2_ASSERT(trits_size(secret_key) == MAM2_PRNG_KEY_SIZE);
-  trits_copy(secret_key, trits_from_rep(MAM2_PRNG_KEY_SIZE, prng->secret_key));
+  MAM_ASSERT(trits_size(secret_key) == MAM_PRNG_KEY_SIZE);
+  trits_copy(secret_key, trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key));
 }
 
 void mam_prng_destroy(mam_prng_t *const prng) {
@@ -41,10 +41,10 @@ void mam_prng_gen3(mam_prng_t const *const prng,
                    trits_t const nonce3, trits_t output) {
   mam_sponge_t sponge;
   trits_t KdN[5];
-  MAM2_TRITS_DEF0(dt, 3);
-  dt = MAM2_TRITS_INIT(dt, 3);
+  MAM_TRITS_DEF0(dt, 3);
+  dt = MAM_TRITS_INIT(dt, 3);
 
-  KdN[0] = trits_from_rep(MAM2_PRNG_KEY_SIZE, prng->secret_key);
+  KdN[0] = trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key);
   KdN[1] = dt;
   KdN[2] = nonce1;
   KdN[3] = nonce2;
@@ -52,6 +52,6 @@ void mam_prng_gen3(mam_prng_t const *const prng,
   trits_put3(dt, destination);
 
   mam_sponge_init(&sponge);
-  mam_sponge_absorbn(&sponge, MAM2_SPONGE_CTL_KEY, 5, KdN);
-  mam_sponge_squeeze(&sponge, MAM2_SPONGE_CTL_PRN, output);
+  mam_sponge_absorbn(&sponge, MAM_SPONGE_CTL_KEY, 5, KdN);
+  mam_sponge_squeeze(&sponge, MAM_SPONGE_CTL_PRN, output);
 }

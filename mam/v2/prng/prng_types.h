@@ -16,7 +16,7 @@
 #include "mam/v2/trits/trits.h"
 
 // PRNG secret key size
-#define MAM2_PRNG_KEY_SIZE 243
+#define MAM_PRNG_KEY_SIZE 243
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,16 +24,16 @@ extern "C" {
 
 typedef enum prng_destination_tryte_e {
   // PRNG AE destination tryte
-  MAM2_PRNG_DST_SEC_KEY = 0,
+  MAM_PRNG_DST_SEC_KEY = 0,
   // PRNG WOTS destination tryte
-  MAM2_PRNG_DST_WOTS_KEY = 1,
+  MAM_PRNG_DST_WOTS_KEY = 1,
   // PRNG NTRU destination tryte
-  MAM2_PRNG_DST_NTRU_KEY = 2
+  MAM_PRNG_DST_NTRU_KEY = 2
 } mam_prng_destination_tryte_t;
 
 // PRNG layer interface
 typedef struct mam_prng_s {
-  trit_t secret_key[MAM2_PRNG_KEY_SIZE];
+  trit_t secret_key[MAM_PRNG_KEY_SIZE];
 } mam_prng_t;
 
 typedef struct mam_prng_t_set_entry_s mam_prng_t_set_entry_t;

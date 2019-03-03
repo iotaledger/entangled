@@ -18,17 +18,17 @@
 #include "mam/v2/trits/trits.h"
 
 // WOTS public key size
-#define MAM2_WOTS_PK_SIZE 243
+#define MAM_WOTS_PK_SIZE 243
 // WOTS secret key part size
-#define MAM2_WOTS_SK_PART_SIZE 162
+#define MAM_WOTS_SK_PART_SIZE 162
 // WOTS secret key parts count
-#define MAM2_WOTS_SK_PART_COUNT 81
+#define MAM_WOTS_SK_PART_COUNT 81
 // WOTS secret key size
-#define MAM2_WOTS_SK_SIZE (MAM2_WOTS_SK_PART_SIZE * MAM2_WOTS_SK_PART_COUNT)
+#define MAM_WOTS_SK_SIZE (MAM_WOTS_SK_PART_SIZE * MAM_WOTS_SK_PART_COUNT)
 // WOTS signed hash value size
-#define MAM2_WOTS_HASH_SIZE 234
+#define MAM_WOTS_HASH_SIZE 234
 // WOTS signature size
-#define MAM2_WOTS_SIG_SIZE MAM2_WOTS_SK_SIZE
+#define MAM_WOTS_SIG_SIZE MAM_WOTS_SK_SIZE
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,7 +36,7 @@ extern "C" {
 
 // WOTS layer interface
 typedef struct mam_wots_s {
-  trit_t secret_key[MAM2_WOTS_SK_SIZE];
+  trit_t secret_key[MAM_WOTS_SK_SIZE];
 } mam_wots_t;
 
 /**

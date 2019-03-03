@@ -13,7 +13,7 @@
 
 #include "mam/v2/mss/mss.h"
 
-#define MAM2_MSS_MAX_SKN(d) (((mss_mt_idx_t)1 << (d)) - 1)
+#define MAM_MSS_MAX_SKN(d) (((mss_mt_idx_t)1 << (d)) - 1)
 
 static inline void mss_hash2(
     mam_spongos_t *s, trits_t children_hashes[2], /*!< [in] hash values of left
@@ -30,12 +30,12 @@ static void mss_mt_gen_leaf(
   mam_wots_t wots;
   mam_sponge_t sponge;
 
-  MAM2_TRITS_DEF0(nonce_i, MAM2_MSS_SKN_SIZE);
+  MAM_TRITS_DEF0(nonce_i, MAM_MSS_SKN_SIZE);
   mam_sponge_init(&sponge);
   mam_wots_init(&wots);
 
-  MAM2_ASSERT(0 <= i && i <= MAM2_MSS_MAX_SKN(mss->height));
-  nonce_i = MAM2_TRITS_INIT(nonce_i, MAM2_MSS_SKN_SIZE);
+  MAM_ASSERT(0 <= i && i <= MAM_MSS_MAX_SKN(mss->height));
+  nonce_i = MAM_TRITS_INIT(nonce_i, MAM_MSS_SKN_SIZE);
 
   /* gen sk from current leaf index */
   trits_put18(nonce_i, i);
@@ -44,9 +44,9 @@ static void mss_mt_gen_leaf(
   mam_wots_calc_pk(&wots, pk);
 }
 
-#if defined(MAM2_MSS_TRAVERSAL)
+#if defined(MAM_MSS_TRAVERSAL)
 static trits_t mss_hash_idx(trit_t const *const p, size_t i) {
-  return trits_from_rep(MAM2_MSS_MT_HASH_SIZE, p + MAM2_MSS_HASH_IDX(i));
+  return trits_from_rep(MAM_MSS_MT_HASH_SIZE, p + MAM_MSS_HASH_IDX(i));
 }
 
 static trits_t mss_mt_auth_path_trits(mam_mss_t const *const mss,
@@ -56,7 +56,7 @@ static trits_t mss_mt_auth_path_trits(mam_mss_t const *const mss,
 
 static trits_t mss_mt_node_hash_trits(mam_mss_t const *const mss,
                                       mss_mt_height_t height, size_t i) {
-  return mss_hash_idx(mss->nodes_hashes, MAM2_MSS_MT_NODES(height) + i);
+  return mss_hash_idx(mss->nodes_hashes, MAM_MSS_MT_NODES(height) + i);
 }
 
 static void mss_mt_init(mam_mss_t *mss) {
@@ -90,13 +90,13 @@ static void mss_mt_update(mam_mss_t *mss, mam_spongos_t *spongos,
   trits_t hashes[2], wots_pk;
 
   /* current level must be lower than MT height */
-  MAM2_ASSERT(0 <= height && height < mss->height);
+  MAM_ASSERT(0 <= height && height < mss->height);
   /* stack at level `height` */
-  stack = mss->stacks + MAM2_MSS_MT_STACKS(height);
+  stack = mss->stacks + MAM_MSS_MT_STACKS(height);
   /* stack'spongos nodes */
-  nodes = mss->nodes + MAM2_MSS_MT_NODES(height);
+  nodes = mss->nodes + MAM_MSS_MT_NODES(height);
   /* stack'spongos hashes stored separately from nodes */
-  nodes_hashes = mss->nodes_hashes + MAM2_MSS_MT_HASH_WORDS(height, 0);
+  nodes_hashes = mss->nodes_hashes + MAM_MSS_MT_HASH_WORDS(height, 0);
 
   /* finished? */
   if ((0 != stack->size) && (nodes[stack->size - 1].height >= stack->height)) {
@@ -125,7 +125,7 @@ static void mss_mt_update(mam_mss_t *mss, mam_spongos_t *spongos,
     nodes[stack->size].level_idx /= 2;
     /* adjust stack size */
     stack->size++;
-  } else if (stack->level_idx <= MAM2_MSS_MAX_SKN(mss->height)) {
+  } else if (stack->level_idx <= MAM_MSS_MAX_SKN(mss->height)) {
     /* pk will be put on top of the stack */
     wots_pk = mss_hash_idx(nodes_hashes, stack->size);
     mss_mt_gen_leaf(mss, stack->level_idx, wots_pk);
@@ -147,11 +147,11 @@ static void mss_mt_load_update(mam_mss_t *mss, mss_mt_height_t height) {
   mss_mt_node_t *nodes;
 
   /* current level must be lower than MT height */
-  MAM2_ASSERT(0 <= height && height < mss->height);
+  MAM_ASSERT(0 <= height && height < mss->height);
   /* stack at level `height` */
-  stack = mss->stacks + MAM2_MSS_MT_STACKS(height);
+  stack = mss->stacks + MAM_MSS_MT_STACKS(height);
   /* stack'spongos nodes */
-  nodes = mss->nodes + MAM2_MSS_MT_NODES(height);
+  nodes = mss->nodes + MAM_MSS_MT_NODES(height);
 
   /* finished? */
   if ((0 != stack->size) && (nodes[stack->size - 1].height >= stack->height))
@@ -174,7 +174,7 @@ static void mss_mt_load_update(mam_mss_t *mss, mss_mt_height_t height) {
     nodes[stack->size].level_idx /= 2;
     /* adjust stack size */
     stack->size++;
-  } else if (stack->level_idx <= MAM2_MSS_MAX_SKN(mss->height)) {
+  } else if (stack->level_idx <= MAM_MSS_MAX_SKN(mss->height)) {
     /* pk will be put on top of the stack */
 
     /* push leaf into stack */
@@ -201,7 +201,7 @@ static void mss_mt_refresh(mam_mss_t *mss) {
     }
 
     stack = mss->stacks + height;
-    MAM2_ASSERT(stack->size == 1);
+    MAM_ASSERT(stack->size == 1);
     trits_copy(mss_mt_node_hash_trits(mss, height, stack->size - 1),
                mss_mt_auth_path_trits(mss, height));
 
@@ -221,7 +221,7 @@ static void mss_mt_load_refresh(mam_mss_t *m) {
     if ((m->skn + 1) % dd != 0) break;
 
     s = m->stacks + d;
-    MAM2_ASSERT(s->size == 1);
+    MAM_ASSERT(s->size == 1);
 
     s->level_idx = (m->skn + 1 + dd) ^ dd;
     s->height = d;
@@ -252,8 +252,8 @@ void mss_mt_rewind(mam_mss_t *mss, mss_mt_idx_t skn) {
   mss_mt_height_t height;
 
   for (height = 0; height < mss->height; ++height) {
-    stack = mss->stacks + MAM2_MSS_MT_STACKS(height);
-    nodes = mss->nodes + MAM2_MSS_MT_NODES(height);
+    stack = mss->stacks + MAM_MSS_MT_STACKS(height);
+    nodes = mss->nodes + MAM_MSS_MT_NODES(height);
 
     stack->height = height;
     stack->level_idx = 0;
@@ -274,12 +274,12 @@ void mss_mt_rewind(mam_mss_t *mss, mss_mt_idx_t skn) {
 #else
 static trits_t mss_mt_node_t_trits(mss_t *mss, mss_mt_height_t height,
                                    mss_mt_idx_t i) {
-  MAM2_ASSERT(height <= mss->height);
-  MAM2_ASSERT(i < ((mss_mt_idx_t)1 << height));
+  MAM_ASSERT(height <= mss->height);
+  MAM_ASSERT(i < ((mss_mt_idx_t)1 << height));
 
   size_t idx = ((size_t)1 << height) + i - 1;
-  trit_t *t = mss->mt + MAM2_MSS_MT_HASH_SIZE * idx;
-  return trits_from_rep(MAM2_MSS_MT_HASH_SIZE, t);
+  trit_t *t = mss->mt + MAM_MSS_MT_HASH_SIZE * idx;
+  return trits_from_rep(MAM_MSS_MT_HASH_SIZE, t);
 }
 #endif
 
@@ -299,31 +299,31 @@ static void mss_fold_auth_path(mam_spongos_t *spongos, mss_mt_idx_t skn,
   trits_t hashes[2];
 
   for (; !trits_is_empty(auth_path);
-       skn /= 2, auth_path = trits_drop(auth_path, MAM2_MSS_MT_HASH_SIZE)) {
+       skn /= 2, auth_path = trits_drop(auth_path, MAM_MSS_MT_HASH_SIZE)) {
     hashes[skn % 2] = pk;
-    hashes[1 - (skn % 2)] = trits_take(auth_path, MAM2_MSS_MT_HASH_SIZE);
+    hashes[1 - (skn % 2)] = trits_take(auth_path, MAM_MSS_MT_HASH_SIZE);
     mss_hash2(spongos, hashes, pk);
   }
 }
 
 void mam_mss_init(mam_mss_t *mss, mam_prng_t *prng, mss_mt_height_t height,
                   trits_t nonce1, trits_t nonce2) {
-  MAM2_ASSERT(mss);
-  MAM2_ASSERT(prng);
-  MAM2_ASSERT(0 <= height && height <= MAM2_MSS_MAX_D);
+  MAM_ASSERT(mss);
+  MAM_ASSERT(prng);
+  MAM_ASSERT(0 <= height && height <= MAM_MSS_MAX_D);
 
   mss->height = height;
   mss->skn = 0;
   mss->prng = prng;
   mss->nonce1 = nonce1;
   mss->nonce2 = nonce2;
-#if defined(MAM2_MSS_TRAVERSAL)
+#if defined(MAM_MSS_TRAVERSAL)
   mss_mt_init(mss);
 #endif
 }
 
 void mam_mss_gen(mam_mss_t *mss) {
-  trits_t root_trits = trits_from_rep(MAM2_MSS_PK_SIZE, mss->root);
+  trits_t root_trits = trits_from_rep(MAM_MSS_PK_SIZE, mss->root);
 #if defined(MAM2_MSS_TRAVERSAL)
   if (0 == mss->height) {
     mss_mt_gen_leaf(mss, 0, root_trits);
@@ -331,12 +331,11 @@ void mam_mss_gen(mam_mss_t *mss) {
     /* reuse stack `D-1`, by construction (see note in mss.h) */
     /* it has capacity `D+1` */
     mss_mt_height_t height = mss->height - 1;
-    mss_mt_stack_t *stack = mss->stacks + MAM2_MSS_MT_STACKS(height);
-    mss_mt_node_t *nodes = mss->nodes + MAM2_MSS_MT_NODES(height);
+    mss_mt_stack_t *stack = mss->stacks + MAM_MSS_MT_STACKS(height);
+    mss_mt_node_t *nodes = mss->nodes + MAM_MSS_MT_NODES(height);
     mss_mt_node_t *node;
 
-    trit_t *nodes_hashes =
-        mss->nodes_hashes + MAM2_MSS_MT_HASH_WORDS(height, 0);
+    trit_t *nodes_hashes = mss->nodes_hashes + MAM_MSS_MT_HASH_WORDS(height, 0);
 
     /* init stack */
     /* max node height is `D` */
@@ -387,16 +386,16 @@ void mam_mss_gen(mam_mss_t *mss) {
                   mss->height)) { /* push to stack `n->height` */
           /* stack `n->height` */
           mss_mt_stack_t *current_node_height_stack =
-              mss->stacks + MAM2_MSS_MT_STACKS(node->height);
+              mss->stacks + MAM_MSS_MT_STACKS(node->height);
           /* stack `n->height` nodes */
           mss_mt_node_t *current_node_height_nodes =
-              mss->nodes + MAM2_MSS_MT_NODES(node->height);
+              mss->nodes + MAM_MSS_MT_NODES(node->height);
           /* node `n` hash */
           trits_t hash = mss_hash_idx(nodes_hashes, stack->size - 1);
           /* stack `n->height` first node hash */
           trits_t hd = mss_mt_node_hash_trits(mss, node->height, 0);
 
-          MAM2_ASSERT(0 == current_node_height_stack->size);
+          MAM_ASSERT(0 == current_node_height_stack->size);
           /* copy hash */
           trits_copy(hash, hd);
           /* copy node */
@@ -433,38 +432,38 @@ void mam_mss_gen(mam_mss_t *mss) {
 }
 
 void mam_mss_skn(mam_mss_t const *const mss, trits_t skn) {
-  MAM2_TRITS_DEF0(trits, MAM2_MSS_SKN_SIZE);
-  trits = MAM2_TRITS_INIT(trits, MAM2_MSS_SKN_SIZE);
+  MAM2_TRITS_DEF0(trits, MAM_MSS_SKN_SIZE);
+  trits = MAM2_TRITS_INIT(trits, MAM_MSS_SKN_SIZE);
 
-  MAM2_ASSERT(trits_size(skn) == MAM2_MSS_SKN_SIZE);
+  MAM_ASSERT(trits_size(skn) == MAM_MSS_SKN_SIZE);
 
   trits_put6(trits, mss->height);
-  trits_copy(trits_take(trits, MAM2_MSS_SKN_TREE_DEPTH_SIZE),
-             trits_take(skn, MAM2_MSS_SKN_TREE_DEPTH_SIZE));
+  trits_copy(trits_take(trits, MAM_MSS_SKN_TREE_DEPTH_SIZE),
+             trits_take(skn, MAM_MSS_SKN_TREE_DEPTH_SIZE));
 
   trits_put18(trits, mss->skn);
-  trits_copy(trits_take(trits, MAM2_MSS_SKN_KEY_NUMBER_SIZE),
-             trits_drop(skn, MAM2_MSS_SKN_TREE_DEPTH_SIZE));
+  trits_copy(trits_take(trits, MAM_MSS_SKN_KEY_NUMBER_SIZE),
+             trits_drop(skn, MAM_MSS_SKN_TREE_DEPTH_SIZE));
 }
 
 static bool mss_parse_skn(mss_mt_height_t *height, mss_mt_idx_t *skn,
                           trits_t trits) {
-  MAM2_TRITS_DEF0(ts, MAM2_MSS_SKN_SIZE);
-  ts = MAM2_TRITS_INIT(ts, MAM2_MSS_SKN_SIZE);
+  MAM_TRITS_DEF0(ts, MAM_MSS_SKN_SIZE);
+  ts = MAM_TRITS_INIT(ts, MAM_MSS_SKN_SIZE);
 
-  MAM2_ASSERT(MAM2_MSS_SKN_SIZE == trits_size(trits));
+  MAM_ASSERT(MAM_MSS_SKN_SIZE == trits_size(trits));
 
   trits_set_zero(ts);
 
-  trits_copy(trits_take(trits, MAM2_MSS_SKN_TREE_DEPTH_SIZE),
-             trits_take(ts, MAM2_MSS_SKN_TREE_DEPTH_SIZE));
+  trits_copy(trits_take(trits, MAM_MSS_SKN_TREE_DEPTH_SIZE),
+             trits_take(ts, MAM_MSS_SKN_TREE_DEPTH_SIZE));
   *height = trits_get6(ts);
 
-  trits_copy(trits_drop(trits, MAM2_MSS_SKN_TREE_DEPTH_SIZE),
-             trits_take(ts, MAM2_MSS_SKN_KEY_NUMBER_SIZE));
+  trits_copy(trits_drop(trits, MAM_MSS_SKN_TREE_DEPTH_SIZE),
+             trits_take(ts, MAM_MSS_SKN_KEY_NUMBER_SIZE));
   *skn = trits_get18(ts);
 
-  if (*height < 0 || *skn < 0 || *skn > MAM2_MSS_MAX_SKN(*height)) return 0;
+  if (*height < 0 || *skn < 0 || *skn > MAM_MSS_MAX_SKN(*height)) return 0;
 
   return 1;
 }
@@ -472,9 +471,9 @@ void mam_mss_auth_path(mam_mss_t *mss, mss_mt_idx_t skn, trits_t path) {
   mss_mt_height_t height;
   trits_t path_part_out;
 
-  MAM2_ASSERT(trits_size(path) == MAM2_MSS_APATH_SIZE(mss->height));
+  MAM_ASSERT(trits_size(path) == MAM_MSS_APATH_SIZE(mss->height));
 
-#if defined(MAM2_MSS_TRAVERSAL)
+#if defined(MAM_MSS_TRAVERSAL)
   // current apath is already stored in `mss->ap`
   for (height = 0; height < mss->height; ++height)
 #else
@@ -483,8 +482,8 @@ void mam_mss_auth_path(mam_mss_t *mss, mss_mt_idx_t skn, trits_t path) {
   for (height = mss->height; height; --height, skn = skn / 2)
 #endif
   {
-    path_part_out = trits_take(path, MAM2_MSS_MT_HASH_SIZE);
-#if defined(MAM2_MSS_TRAVERSAL)
+    path_part_out = trits_take(path, MAM_MSS_MT_HASH_SIZE);
+#if defined(MAM_MSS_TRAVERSAL)
     trits_t curr_auth_path_part = mss_hash_idx(mss->auth_path, height);
 #else
     trits_t curr_auth_path_part =
@@ -492,71 +491,70 @@ void mam_mss_auth_path(mam_mss_t *mss, mss_mt_idx_t skn, trits_t path) {
 #endif
     trits_copy(curr_auth_path_part, path_part_out);
 
-    path = trits_drop(path, MAM2_MSS_MT_HASH_SIZE);
+    path = trits_drop(path, MAM_MSS_MT_HASH_SIZE);
   }
 }
 
 void mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig) {
   mam_wots_t wots;
   mam_sponge_t sponge;
-  MAM2_ASSERT(trits_size(sig) == MAM2_MSS_SIG_SIZE(mss->height));
+  MAM_ASSERT(trits_size(sig) == MAM_MSS_SIG_SIZE(mss->height));
 
   // Write both tree height and the sk index to the signature
-  mam_mss_skn(mss, trits_take(sig, MAM2_MSS_SKN_SIZE));
-  sig = trits_drop(sig, MAM2_MSS_SKN_SIZE);
+  mam_mss_skn(mss, trits_take(sig, MAM_MSS_SKN_SIZE));
+  sig = trits_drop(sig, MAM_MSS_SKN_SIZE);
 
   mam_sponge_init(&sponge);
   mam_wots_init(&wots);
   {
     // Generate the current (skn) secret key
-    MAM2_TRITS_DEF0(nonce_i, MAM2_MSS_SKN_SIZE);
-    nonce_i = MAM2_TRITS_INIT(nonce_i, MAM2_MSS_SKN_SIZE);
+    MAM_TRITS_DEF0(nonce_i, MAM_MSS_SKN_SIZE);
+    nonce_i = MAM_TRITS_INIT(nonce_i, MAM_MSS_SKN_SIZE);
     trits_put18(nonce_i, mss->skn);
     mam_wots_gen_sk3(&wots, mss->prng, mss->nonce1, mss->nonce2, nonce_i);
   }
 
-  mam_wots_sign(&wots, hash, trits_take(sig, MAM2_WOTS_SIG_SIZE));
-  sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
+  mam_wots_sign(&wots, hash, trits_take(sig, MAM_WOTS_SIG_SIZE));
+  sig = trits_drop(sig, MAM_WOTS_SIG_SIZE);
 
   mam_mss_auth_path(mss, mss->skn, sig);
 }
 
 bool mam_mss_next(mam_mss_t *mss) {
-  if (mss->skn == MAM2_MSS_MAX_SKN(mss->height)) return false;
+  if (mss->skn == MAM_MSS_MAX_SKN(mss->height)) return false;
 
-#if defined(MAM2_MSS_TRAVERSAL)
-  if (mss->skn < MAM2_MSS_MAX_SKN(mss->height)) {
-    mss_mt_refresh(mss);
-    mss_mt_build_stacks(mss);
-  }
+#if defined(MAM_MSS_TRAVERSAL) if (mss->skn < MAM_MSS_MAX_SKN(mss->height)) {
+  mss_mt_refresh(mss);
+  mss_mt_build_stacks(mss);
+}
 #endif
 
-  mss->skn++;
-  return 1;
+mss->skn++;
+return 1;
 }
 
 bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos,
                     trits_t hash, trits_t sig, trits_t pk) {
   mss_mt_height_t height;
   mss_mt_idx_t skn;
-  MAM2_TRITS_DEF0(calculated_pk, MAM2_MSS_MT_HASH_SIZE);
-  calculated_pk = MAM2_TRITS_INIT(calculated_pk, MAM2_MSS_MT_HASH_SIZE);
+  MAM_TRITS_DEF0(calculated_pk, MAM_MSS_MT_HASH_SIZE);
+  calculated_pk = MAM_TRITS_INIT(calculated_pk, MAM_MSS_MT_HASH_SIZE);
 
-  MAM2_ASSERT(trits_size(pk) == MAM2_MSS_PK_SIZE);
+  MAM_ASSERT(trits_size(pk) == MAM_MSS_PK_SIZE);
 
-  if (trits_size(sig) < MAM2_MSS_SIG_SIZE(0)) return false;
+  if (trits_size(sig) < MAM_MSS_SIG_SIZE(0)) return false;
 
-  if (!mss_parse_skn(&height, &skn, trits_take(sig, MAM2_MSS_SKN_SIZE))) {
+  if (!mss_parse_skn(&height, &skn, trits_take(sig, MAM_MSS_SKN_SIZE))) {
     return false;
   }
 
-  sig = trits_drop(sig, MAM2_MSS_SKN_SIZE);
-  if (trits_size(sig) != (MAM2_MSS_SIG_SIZE(height) - MAM2_MSS_SKN_SIZE))
+  sig = trits_drop(sig, MAM_MSS_SKN_SIZE);
+  if (trits_size(sig) != (MAM_MSS_SIG_SIZE(height) - MAM_MSS_SKN_SIZE))
     return false;
 
-  mam_wots_recover(wots_spongos, hash, trits_take(sig, MAM2_WOTS_SIG_SIZE),
+  mam_wots_recover(wots_spongos, hash, trits_take(sig, MAM_WOTS_SIG_SIZE),
                    calculated_pk);
-  sig = trits_drop(sig, MAM2_WOTS_SIG_SIZE);
+  sig = trits_drop(sig, MAM_WOTS_SIG_SIZE);
 
   mss_fold_auth_path(mt_spongos, skn, sig, calculated_pk);
 
@@ -564,29 +562,28 @@ bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos,
 }
 
 retcode_t mam_mss_create(mam_mss_t *mss, mss_mt_height_t height) {
-  MAM2_ASSERT(mss);
+  MAM_ASSERT(mss);
 
   memset(mss, 0, sizeof(mam_mss_t));
-  ERR_GUARD_RETURN(0 <= height && height <= MAM2_MSS_MAX_D,
+  ERR_GUARD_RETURN(0 <= height && height <= MAM_MSS_MAX_D,
                    RC_MAM2_INVALID_ARGUMENT);
 
-#if defined(MAM2_MSS_TRAVERSAL)
-  mss->auth_path = malloc(sizeof(trit_t) * MAM2_MSS_MT_AUTH_WORDS(height));
+#if defined(MAM_MSS_TRAVERSAL)
+  mss->auth_path = malloc(sizeof(trit_t) * MAM_MSS_MT_AUTH_WORDS(height));
   ERR_GUARD_RETURN(mss->auth_path, RC_OOM);
 
   /* add 1 extra hash for dirty hack (see mss.c) */
-  mss->nodes_hashes =
-      malloc(sizeof(trit_t) * MAM2_MSS_MT_HASH_WORDS(height, 1));
+  mss->nodes_hashes = malloc(sizeof(trit_t) * MAM_MSS_MT_HASH_WORDS(height, 1));
   ERR_GUARD_RETURN(mss->nodes_hashes, RC_OOM);
 
   /* add 1 extra node for dirty hack (see mss.c) */
-  mss->nodes = malloc(sizeof(mss_mt_node_t) * (MAM2_MSS_MT_NODES(height) + 1));
+  mss->nodes = malloc(sizeof(mss_mt_node_t) * (MAM_MSS_MT_NODES(height) + 1));
   ERR_GUARD_RETURN(mss->nodes, RC_OOM);
 
-  mss->stacks = malloc(sizeof(mss_mt_stack_t) * MAM2_MSS_MT_STACKS(height));
+  mss->stacks = malloc(sizeof(mss_mt_stack_t) * MAM_MSS_MT_STACKS(height));
   ERR_GUARD_RETURN(mss->nodes, RC_OOM);
 #else
-  mss->mt = malloc(sizeof(trit_t) * MAM2_MSS_MT_WORDS(height));
+  mss->mt = malloc(sizeof(trit_t) * MAM_MSS_MT_WORDS(height));
   ERR_GUARD_RETURN(mss->mt, RC_OOM, e);
 #endif
 
@@ -595,25 +592,24 @@ retcode_t mam_mss_create(mam_mss_t *mss, mss_mt_height_t height) {
 }
 
 void mam_mss_destroy(mam_mss_t *mss) {
-  MAM2_ASSERT(mss);
+  MAM_ASSERT(mss);
 
-#if defined(MAM2_MSS_TRAVERSAL)
-  if (mss->auth_path) {
-    free(mss->auth_path);
-    mss->auth_path = NULL;
-  }
-  if (mss->nodes_hashes) {
-    free(mss->nodes_hashes);
-    mss->nodes_hashes = NULL;
-  }
-  if (mss->nodes) {
-    free(mss->nodes);
-    mss->nodes = NULL;
-  }
-  if (mss->stacks) {
-    free(mss->stacks);
-    mss->stacks = NULL;
-  }
+#if defined(MAM_MSS_TRAVERSAL) if (mss->auth_path) {
+  free(mss->auth_path);
+  mss->auth_path = NULL;
+}
+if (mss->nodes_hashes) {
+  free(mss->nodes_hashes);
+  mss->nodes_hashes = NULL;
+}
+if (mss->nodes) {
+  free(mss->nodes);
+  mss->nodes = NULL;
+}
+if (mss->stacks) {
+  free(mss->stacks);
+  mss->stacks = NULL;
+}
 #else
   if (mss->mt) {
     free(mss->mt);
@@ -624,13 +620,13 @@ void mam_mss_destroy(mam_mss_t *mss) {
 
 static size_t mss_mt_serialized_size(mam_mss_t const *const mss) {
   size_t size = 0;
-#if defined(MAM2_MSS_TRAVERSAL)
+#if defined(MAM_MSS_TRAVERSAL)
   mss_mt_height_t height;
-  size += mss->height * MAM2_MSS_MT_HASH_SIZE;
+  size += mss->height * MAM_MSS_MT_HASH_SIZE;
   for (height = 0; height != mss->height; ++height)
-    size += mss->stacks[height].size * MAM2_MSS_MT_HASH_SIZE;
+    size += mss->stacks[height].size * MAM_MSS_MT_HASH_SIZE;
 #else
-  size += (((size_t)1 << (mss->height + 1)) - 1) * MAM2_MSS_MT_HASH_SIZE;
+  size += (((size_t)1 << (mss->height + 1)) - 1) * MAM_MSS_MT_HASH_SIZE;
 #endif
   return size;
 }
@@ -639,21 +635,21 @@ static void mss_mt_serialize(mam_mss_t const *const mss, trits_t buffer) {
   mss_mt_height_t height;
   mss_mt_idx_t i;
 
-  MAM2_ASSERT(trits_size(buffer) == mss_mt_serialized_size(mss));
+  MAM_ASSERT(trits_size(buffer) == mss_mt_serialized_size(mss));
 
-#if defined(MAM2_MSS_TRAVERSAL)
+#if defined(MAM_MSS_TRAVERSAL)
   /* <apath> */
   for (height = 0; height != mss->height; ++height) {
     trits_copy(mss_mt_auth_path_trits(mss, height),
-               trits_take(buffer, MAM2_MSS_MT_HASH_SIZE));
-    buffer = trits_drop(buffer, MAM2_MSS_MT_HASH_SIZE);
+               trits_take(buffer, MAM_MSS_MT_HASH_SIZE));
+    buffer = trits_drop(buffer, MAM_MSS_MT_HASH_SIZE);
   }
   /* <node-hashes> */
   for (height = 0; height != mss->height; ++height) {
     for (i = 0; i != mss->stacks[height].size; ++i) {
       trits_copy(mss_mt_node_hash_trits(mss, height, i),
-                 trits_take(buffer, MAM2_MSS_MT_HASH_SIZE));
-      buffer = trits_drop(buffer, MAM2_MSS_MT_HASH_SIZE);
+                 trits_take(buffer, MAM_MSS_MT_HASH_SIZE));
+      buffer = trits_drop(buffer, MAM_MSS_MT_HASH_SIZE);
     }
   }
 #else
@@ -661,8 +657,8 @@ static void mss_mt_serialize(mam_mss_t const *const mss, trits_t buffer) {
   do {
     for (i = 0; i != (mss_mt_idx_t)1 << height; ++i) {
       trits_copy(mss_mt_node_t_trits(mss, height, i),
-                 trits_take(buffer, MAM2_MSS_MT_HASH_SIZE));
-      buffer = trits_drop(buffer, MAM2_MSS_MT_HASH_SIZE);
+                 trits_take(buffer, MAM_MSS_MT_HASH_SIZE));
+      buffer = trits_drop(buffer, MAM_MSS_MT_HASH_SIZE);
     }
   } while (height-- > 0);
 #endif
@@ -676,21 +672,21 @@ static void mss_mt_deserialize(trits_t buffer, mam_mss_t *mss) {
   mss_mt_height_t height;
   mss_mt_idx_t i;
 
-  MAM2_ASSERT(trits_size(buffer) == mss_mt_serialized_size(mss));
+  MAM_ASSERT(trits_size(buffer) == mss_mt_serialized_size(mss));
 
-#if defined(MAM2_MSS_TRAVERSAL)
+#if defined(MAM_MSS_TRAVERSAL)
   /* <apath> */
   for (height = 0; height != mss->height; ++height) {
-    trits_copy(trits_take(buffer, MAM2_MSS_MT_HASH_SIZE),
+    trits_copy(trits_take(buffer, MAM_MSS_MT_HASH_SIZE),
                mss_mt_auth_path_trits(mss, height));
-    buffer = trits_drop(buffer, MAM2_MSS_MT_HASH_SIZE);
+    buffer = trits_drop(buffer, MAM_MSS_MT_HASH_SIZE);
   }
   /* <node-hashes> */
   for (height = 0; height != mss->height; ++height) {
     for (i = 0; i != mss->stacks[height].size; ++i) {
-      trits_copy(trits_take(buffer, MAM2_MSS_MT_HASH_SIZE),
+      trits_copy(trits_take(buffer, MAM_MSS_MT_HASH_SIZE),
                  mss_mt_node_hash_trits(mss, height, i));
-      buffer = trits_drop(buffer, MAM2_MSS_MT_HASH_SIZE);
+      buffer = trits_drop(buffer, MAM_MSS_MT_HASH_SIZE);
     }
   }
 #else
@@ -698,42 +694,41 @@ static void mss_mt_deserialize(trits_t buffer, mam_mss_t *mss) {
   height = mss->height;
   do {
     for (i = 0; i != (mss_mt_idx_t)1 << height; ++i) {
-      trits_copy(trits_take(buffer, MAM2_MSS_MT_HASH_SIZE),
+      trits_copy(trits_take(buffer, MAM_MSS_MT_HASH_SIZE),
                  mss_mt_node_t_trits(mss, height, i));
-      buffer = trits_drop(buffer, MAM2_MSS_MT_HASH_SIZE);
+      buffer = trits_drop(buffer, MAM_MSS_MT_HASH_SIZE);
     }
   } while (height-- > 0);
 #endif
 }
 
 size_t mam_mss_serialized_size(mam_mss_t const *const mss) {
-  return MAM2_MSS_SKN_TREE_DEPTH_SIZE + MAM2_MSS_SKN_KEY_NUMBER_SIZE +
+  return MAM_MSS_SKN_TREE_DEPTH_SIZE + MAM_MSS_SKN_KEY_NUMBER_SIZE +
          mss_mt_serialized_size(mss);
 }
 
 void mam_mss_serialize(mam_mss_t const *const mss, trits_t buffer) {
-  MAM2_ASSERT(mam_mss_serialized_size(mss) == trits_size(buffer));
+  MAM_ASSERT(mam_mss_serialized_size(mss) == trits_size(buffer));
 
-  mam_mss_skn(mss, trits_take(buffer, MAM2_MSS_SKN_SIZE));
-  mss_mt_serialize(mss, trits_drop(buffer, MAM2_MSS_SKN_SIZE));
+  mam_mss_skn(mss, trits_take(buffer, MAM_MSS_SKN_SIZE));
+  mss_mt_serialize(mss, trits_drop(buffer, MAM_MSS_SKN_SIZE));
 }
 
 retcode_t mam_mss_deserialize(trits_t *buffer, mam_mss_t *mss) {
   mss_mt_height_t height;
   mss_mt_idx_t skn;
 
-  ERR_GUARD_RETURN(
-      MAM2_MSS_SKN_TREE_DEPTH_SIZE + MAM2_MSS_SKN_KEY_NUMBER_SIZE <=
-          trits_size(*buffer),
-      RC_MAM2_BUFFER_TOO_SMALL);
+  ERR_GUARD_RETURN(MAM_MSS_SKN_TREE_DEPTH_SIZE + MAM_MSS_SKN_KEY_NUMBER_SIZE <=
+                       trits_size(*buffer),
+                   RC_MAM2_BUFFER_TOO_SMALL);
   ERR_GUARD_RETURN(
       mss_parse_skn(&height, &skn,
-                    trits_advance(buffer, MAM2_MSS_SKN_TREE_DEPTH_SIZE +
-                                              MAM2_MSS_SKN_KEY_NUMBER_SIZE)),
+                    trits_advance(buffer, MAM_MSS_SKN_TREE_DEPTH_SIZE +
+                                              MAM_MSS_SKN_KEY_NUMBER_SIZE)),
       RC_MAM2_INVALID_VALUE);
   ERR_GUARD_RETURN(height == mss->height, RC_MAM2_INVALID_VALUE);
 
-#if defined(MAM2_MSS_TRAVERSAL)
+#if defined(MAM_MSS_TRAVERSAL)
   mss_mt_rewind(mss, skn);
 #else
   mss->skn = skn;

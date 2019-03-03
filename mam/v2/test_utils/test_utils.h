@@ -25,8 +25,8 @@
 extern "C" {
 #endif
 
-#if !defined(MAM2_MSS_TEST_MAX_D)
-#define MAM2_MSS_TEST_MAX_D 3
+#if !defined(MAM_MSS_TEST_MAX_D)
+#define MAM_MSS_TEST_MAX_D 3
 #endif
 
 /**

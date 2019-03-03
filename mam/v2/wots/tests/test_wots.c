@@ -17,24 +17,24 @@ static void mam_wots_test(void) {
   mam_prng_t prng;
   mam_wots_t wots;
 
-  MAM2_TRITS_DEF0(N, 18);
-  MAM2_TRITS_DEF0(pk, MAM2_WOTS_PK_SIZE);
-  MAM2_TRITS_DEF0(H, MAM2_WOTS_HASH_SIZE);
-  MAM2_TRITS_DEF0(sig, MAM2_WOTS_SIG_SIZE);
-  MAM2_TRITS_DEF0(K, MAM2_PRNG_KEY_SIZE);
+  MAM_TRITS_DEF0(N, 18);
+  MAM_TRITS_DEF0(pk, MAM_WOTS_PK_SIZE);
+  MAM_TRITS_DEF0(H, MAM_WOTS_HASH_SIZE);
+  MAM_TRITS_DEF0(sig, MAM_WOTS_SIG_SIZE);
+  MAM_TRITS_DEF0(K, MAM_PRNG_KEY_SIZE);
 
-  /*MAM2_TRITS_DEF0(pkr, MAM2_WOTS_PK_SIZE);*/
-  N = MAM2_TRITS_INIT(N, 18);
-  pk = MAM2_TRITS_INIT(pk, MAM2_WOTS_PK_SIZE);
-  H = MAM2_TRITS_INIT(H, MAM2_WOTS_HASH_SIZE);
-  sig = MAM2_TRITS_INIT(sig, MAM2_WOTS_SIG_SIZE);
-  K = MAM2_TRITS_INIT(K, MAM2_PRNG_KEY_SIZE);
-  /*pkr = MAM2_TRITS_INIT(pkr, MAM2_WOTS_PK_SIZE);*/
+  /*MAM_TRITS_DEF0(pkr, MAM_WOTS_PK_SIZE);*/
+  N = MAM_TRITS_INIT(N, 18);
+  pk = MAM_TRITS_INIT(pk, MAM_WOTS_PK_SIZE);
+  H = MAM_TRITS_INIT(H, MAM_WOTS_HASH_SIZE);
+  sig = MAM_TRITS_INIT(sig, MAM_WOTS_SIG_SIZE);
+  K = MAM_TRITS_INIT(K, MAM_PRNG_KEY_SIZE);
+  /*pkr = MAM_TRITS_INIT(pkr, MAM_WOTS_PK_SIZE);*/
 
   trits_set_zero(N);
   trits_set_zero(H);
   trits_set_zero(K);
-  trits_set_zero(trits_from_rep(MAM2_WOTS_SK_SIZE, wots.secret_key));
+  trits_set_zero(trits_from_rep(MAM_WOTS_SK_SIZE, wots.secret_key));
 
   // mam_sponge_init(&sponge);
   mam_prng_init(&prng, K);

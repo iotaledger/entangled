@@ -16,8 +16,8 @@ extern "C" {
 #endif
 
 // [γ⁰=1, γ⁻¹, …, γ²ⁿ⁻¹=γ⁻¹, γ²ⁿ=1]
-#if defined(MAM2_POLY_MRED_BINARY)
-static poly_coeff_t poly_gamma_exp[2 * MAM2_POLY_N + 1] = {
+#if defined(MAM_POLY_MRED_BINARY)
+static poly_coeff_t poly_gamma_exp[2 * MAM_POLY_N + 1] = {
     4091,  4059,  3835,  2267,  3580,  482,   3374,  11329, 5569,  2116,  2523,
     5372,  737,   5159,  11535, 7011,  12210, 11736, 8418,  9770,  6945,  11748,
     8502,  10358, 11061, 3693,  1273,  8911,  932,   6524,  8801,  162,   1134,
@@ -207,7 +207,7 @@ static poly_coeff_t poly_gamma_exp[2 * MAM2_POLY_N + 1] = {
     5601,  2340,  4091,
 };
 #else
-static poly_coeff_t poly_gamma_exp[2 * MAM2_POLY_N + 1] = {
+static poly_coeff_t poly_gamma_exp[2 * MAM_POLY_N + 1] = {
     1,     7,     49,    343,   2401,  4518,  -5241, 180,   1260,  -3469, 295,
     2065,  2166,  2873,  -4467, 5598,  2319,  3944,  3030,  -3368, 1002,  -5275,
     -58,   -406,  -2842, 4684,  -4079, -3975, -3247, 1849,  654,   4578,  -4821,
@@ -399,7 +399,7 @@ static poly_coeff_t poly_gamma_exp[2 * MAM2_POLY_N + 1] = {
 #endif
 
 // (b₀,b₁,…,bₙ₋₁) → (bₙ₋₁,…,b₁,b₀)
-static size_t poly_idx_rev[MAM2_POLY_N] = {
+static size_t poly_idx_rev[MAM_POLY_N] = {
     0x000, 0x200, 0x100, 0x300, 0x080, 0x280, 0x180, 0x380, 0x040, 0x240, 0x140,
     0x340, 0x0c0, 0x2c0, 0x1c0, 0x3c0, 0x020, 0x220, 0x120, 0x320, 0x0a0, 0x2a0,
     0x1a0, 0x3a0, 0x060, 0x260, 0x160, 0x360, 0x0e0, 0x2e0, 0x1e0, 0x3e0, 0x010,
