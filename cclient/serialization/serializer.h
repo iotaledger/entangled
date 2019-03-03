@@ -46,10 +46,18 @@ typedef struct {
       find_transactions_res_t* out);
 
   retcode_t (*get_balances_serialize_request)(
-      const serializer_t* const, const get_balances_req_t* const obj,
+      const serializer_t* const s, const get_balances_req_t* const obj,
       char_buffer_t* out);
 
-  retcode_t (*get_balances_deserialize_response)(serializer_t const* const,
+  retcode_t (*get_balances_deserialize_request)(const serializer_t* const s,
+                                                char const* const obj,
+                                                get_balances_req_t* const out);
+
+  retcode_t (*get_balances_serialize_response)(
+      serializer_t const* const s, const get_balances_res_t* const obj,
+      char_buffer_t* out);
+
+  retcode_t (*get_balances_deserialize_response)(serializer_t const* const s,
                                                  char const* const obj,
                                                  get_balances_res_t* const out);
 

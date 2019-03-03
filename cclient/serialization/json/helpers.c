@@ -208,6 +208,26 @@ retcode_t json_get_uint64(cJSON const* const json_obj,
   return RC_OK;
 }
 
+retcode_t json_get_size_t_num(cJSON const* const json_obj,
+                              char const* const obj_name, size_t* const num) {
+  cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
+  if (json_value == NULL) {
+    log_error(json_logger_id, "[%s:%d] %s %s.\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_KEY, obj_name);
+    return RC_CCLIENT_JSON_KEY;
+  }
+
+  if (cJSON_IsNumber(json_value)) {
+    *num = (size_t)json_value->valuedouble;
+  } else {
+    log_error(json_logger_id, "[%s:%d] %s not number\n", __func__, __LINE__,
+              STR_CCLIENT_JSON_PARSE);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+
+  return RC_OK;
+}
+
 retcode_t json_get_string(cJSON const* const json_obj,
                           char const* const obj_name,
                           char_buffer_t* const text) {

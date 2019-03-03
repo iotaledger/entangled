@@ -21,6 +21,12 @@ extern "C" {
 retcode_t json_get_balances_serialize_request(
     const serializer_t* const s, get_balances_req_t const* const req,
     char_buffer_t* out);
+retcode_t json_get_balances_deserialize_request(const serializer_t* const s,
+                                                char const* const obj,
+                                                get_balances_req_t* const req);
+retcode_t json_get_balances_serialize_response(
+    serializer_t const* const s, const get_balances_res_t* const res,
+    char_buffer_t* out);
 retcode_t json_get_balances_deserialize_response(const serializer_t* const s,
                                                  const char* const obj,
                                                  get_balances_res_t* const res);
