@@ -50,7 +50,9 @@ static void mam_spongos_test(void) {
   MAM2_TRITS_DEF0(spongos_trits, mam_spongos_serialized_size(&spongos));
   spongos_trits =
       MAM2_TRITS_INIT(spongos_trits, mam_spongos_serialized_size(&spongos));
-  mam_spongos_serialize(&spongos, spongos_trits);
+  mam_spongos_serialize(&spongos, &spongos_trits);
+  spongos_trits =
+      trits_pickup(spongos_trits, mam_spongos_serialized_size(&spongos));
   memset(deserialized_spongos.sponge.state, 0, MAM2_SPONGE_WIDTH);
   TEST_ASSERT_EQUAL(
       RC_OK, mam_spongos_deserialize(&spongos_trits, &deserialized_spongos));
