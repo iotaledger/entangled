@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "common/trinary/add.h"
-#include "mam/v1/mask.h"
+#include "mam/prototype/mask.h"
 
 void mask(trit_t *const dest, trit_t const *const message, size_t const length,
           Curl *const c) {

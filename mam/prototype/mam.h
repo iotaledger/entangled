@@ -5,12 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_H__
-#define __MAM_H__
+#ifndef __MAM_PROTOTYPE_MAM_H__
+#define __MAM_PROTOTYPE_MAM_H__
 
 #include "common/curl-p/hamming.h"
 #include "common/trinary/trit_long.h"
-#include "mam/v1/mask.h"
+#include "mam/prototype/mask.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -100,4 +100,4 @@ int mam_parse(trit_t *const payload, size_t const payload_length,
 }
 #endif
 
-#endif  //__MAM_H__
+#endif  //__MAM_PROTOTYPE_MAM_H__

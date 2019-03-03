@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_MASK_H__
-#define __MAM_MASK_H__
+#ifndef __MAM_PROTOTYPE_MASK_H__
+#define __MAM_PROTOTYPE_MASK_H__
 
 #include "common/curl-p/trit.h"
 
@@ -40,4 +40,4 @@ void unmask(trit_t *const dest, trit_t const *const cipher, size_t const length,
 }
 #endif
 
-#endif  //__MAM_MASK_H__
+#endif  //__MAM_PROTOTYPE_MASK_H__

@@ -5,7 +5,7 @@ cc_test(
     deps =
         [
             "//common/trinary:trit_tryte",
-            "//mam/v1:mam",
+            "//mam/prototype:mam",
             "@unity",
         ],
 )
@@ -16,7 +16,7 @@ cc_test(
     deps =
         [
             "//common/trinary:trit_tryte",
-            "//mam/v1:mask",
+            "//mam/prototype:mask",
             "@unity",
         ],
 )
