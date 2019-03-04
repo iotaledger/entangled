@@ -40,6 +40,8 @@ static serializer_vtable json_vtable = {
     .find_transactions_deserialize_response =
         json_find_transactions_deserialize_response,
     .get_balances_serialize_request = json_get_balances_serialize_request,
+    .get_balances_deserialize_request = json_get_balances_deserialize_request,
+    .get_balances_serialize_response = json_get_balances_serialize_response,
     .get_balances_deserialize_response = json_get_balances_deserialize_response,
     .get_inclusion_state_serialize_request =
         json_get_inclusion_state_serialize_request,

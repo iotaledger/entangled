@@ -59,6 +59,29 @@ retcode_t utarray_to_json_array(UT_array const* const ut,
   return RC_OK;
 }
 
+retcode_t utarray_uint64_to_json_array(UT_array const* const ut,
+                                       cJSON* const json_root,
+                                       char const* const obj_name) {
+  if (utarray_len(ut) > 0) {
+    cJSON* array_obj = cJSON_CreateArray();
+    if (array_obj == NULL) {
+      log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__,
+                   STR_CCLIENT_JSON_CREATE);
+      return RC_CCLIENT_JSON_CREATE;
+    }
+
+    cJSON_AddItemToObject(json_root, obj_name, array_obj);
+
+    uint64_t* p = NULL;
+    while ((p = (uint64_t*)utarray_next(ut, p))) {
+      char buffer[20];
+      sprintf(buffer, "%lld", *p);
+      cJSON_AddItemToArray(array_obj, cJSON_CreateString(buffer));
+    }
+  }
+  return RC_OK;
+}
+
 retcode_t json_boolean_array_to_utarray(cJSON const* const obj,
                                         char const* const obj_name,
                                         UT_array* const ut) {
@@ -199,26 +222,6 @@ retcode_t json_get_uint64(cJSON const* const json_obj,
 
   if (cJSON_IsNumber(json_value)) {
     *num = (uint64_t)json_value->valuedouble;
-  } else {
-    log_error(json_logger_id, "[%s:%d] %s not number\n", __func__, __LINE__,
-              STR_CCLIENT_JSON_PARSE);
-    return RC_CCLIENT_JSON_PARSE;
-  }
-
-  return RC_OK;
-}
-
-retcode_t json_get_size_t_num(cJSON const* const json_obj,
-                              char const* const obj_name, size_t* const num) {
-  cJSON* json_value = cJSON_GetObjectItemCaseSensitive(json_obj, obj_name);
-  if (json_value == NULL) {
-    log_error(json_logger_id, "[%s:%d] %s %s.\n", __func__, __LINE__,
-              STR_CCLIENT_JSON_KEY, obj_name);
-    return RC_CCLIENT_JSON_KEY;
-  }
-
-  if (cJSON_IsNumber(json_value)) {
-    *num = (size_t)json_value->valuedouble;
   } else {
     log_error(json_logger_id, "[%s:%d] %s not number\n", __func__, __LINE__,
               STR_CCLIENT_JSON_PARSE);

@@ -52,6 +52,10 @@ retcode_t utarray_to_json_array(UT_array const *const ut,
                                 cJSON *const json_root,
                                 char const *const obj_name);
 
+retcode_t utarray_uint64_to_json_array(UT_array const *const ut,
+                                       cJSON *const json_root,
+                                       char const *const obj_name);
+
 retcode_t json_boolean_array_to_utarray(cJSON const *const obj,
                                         char const *const obj_name,
                                         UT_array *const ut);
@@ -74,9 +78,6 @@ retcode_t json_get_uint32(cJSON const *const json_obj,
 
 retcode_t json_get_uint64(cJSON const *const json_obj,
                           char const *const obj_name, uint64_t *const num);
-
-retcode_t json_get_size_t_num(cJSON const *const json_obj,
-                              char const *const obj_name, size_t *const num);
 
 retcode_t json_get_string(cJSON const *const json_obj,
                           char const *const obj_name,

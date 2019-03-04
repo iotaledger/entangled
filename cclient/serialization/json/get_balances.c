@@ -79,7 +79,7 @@ retcode_t json_get_balances_deserialize_request(const serializer_t *const s,
     return RC_CCLIENT_RES_ERROR;
   }
 
-  ret = json_get_size_t_num(json_obj, "threshold", req->threshold);
+  ret = json_get_uint8(json_obj, "threshold", &req->threshold);
   if (ret) {
     goto end;
   }
@@ -114,10 +114,12 @@ retcode_t json_get_balances_serialize_response(
     return RC_CCLIENT_JSON_CREATE;
   }
 
-  cJSON_AddItemToObject(json_root, "command",
-                        cJSON_CreateString("getBalances"));
+  ret = utarray_uint64_to_json_array(res->balances, json_root, "balances");
+  if (ret != RC_OK) {
+    goto err;
+  }
 
-  ret = utarray_to_json_array(res->balances, json_root, "balances");
+  ret = hash243_queue_to_json_array(res->milestone, json_root, "references");
   if (ret != RC_OK) {
     goto err;
   }
@@ -125,10 +127,6 @@ retcode_t json_get_balances_serialize_response(
   cJSON_AddItemToObject(json_root, "milestoneIndex",
                         cJSON_CreateNumber(res->milestoneIndex));
 
-  ret = hash243_queue_to_json_array(res->milestone, json_root, "milestone");
-  if (ret != RC_OK) {
-    goto err;
-  }
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
     len = strlen(json_text);
