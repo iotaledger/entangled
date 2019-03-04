@@ -13,7 +13,7 @@
 
 #include <string.h>
 
-#include "mam/v2/defs.h"
+#include "mam/defs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -135,7 +135,7 @@ bool trits_from_str(trits_t x, char const *s);
 
 /*! \brief Set zero trits: `x` := t^n. */
 static inline void trits_set1(trits_t x, trit_t t) {
-  MAM2_ASSERT_TRINT1(t);
+  MAM_ASSERT_TRINT1(t);
   memset(x.p + x.d, t, trits_size(x));
 }
 
@@ -144,8 +144,8 @@ static inline void trits_set_zero(trits_t x) { trits_set1(x, 0); }
 
 /*! \brief Copy trits: `y` := `x`. */
 static inline void trits_copy(trits_t x, trits_t y) {
-  MAM2_ASSERT(trits_size(x) == trits_size(y));
-  MAM2_ASSERT(trits_is_same(x, y) || !trits_is_overlapped(x, y));
+  MAM_ASSERT(trits_size(x) == trits_size(y));
+  MAM_ASSERT(trits_is_same(x, y) || !trits_is_overlapped(x, y));
 
   memcpy(y.p + y.d, x.p + x.d, trits_size(x));
 }

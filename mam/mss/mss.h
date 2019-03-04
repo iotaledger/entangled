@@ -110,7 +110,7 @@ typedef struct mss_s {
   trits_t nonce1,
       nonce2; /*!< Nonce = `N1`||`N2`, stored pointers only, NOT copies. */
 
-  trit_t root[MAM2_MSS_PK_SIZE];
+  trit_t root[MAM_MSS_PK_SIZE];
 } mam_mss_t;
 
 #if defined(MAM_MSS_TRAVERSAL)

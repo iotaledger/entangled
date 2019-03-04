@@ -49,7 +49,7 @@ retcode_t mam_endpoint_create(mam_prng_t const *const prng,
 
   mam_mss_gen(&endpoint->mss);
 
-  trits_t pk1 = trits_from_rep(MAM2_MSS_PK_SIZE, endpoint->mss.root);
+  trits_t pk1 = trits_from_rep(MAM_MSS_PK_SIZE, endpoint->mss.root);
   trits_copy(pk1, mam_endpoint_id(endpoint));
 
   return ret;

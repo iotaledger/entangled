@@ -34,24 +34,24 @@
 #else
 #define def_test_mss(D, sfx)         \
   typedef struct test_mss##sfx##_s { \
-    mss_t m;                         \
+    mam_mss_t m;                     \
     trit_t mt[MAM_MSS_MT_WORDS(D)];  \
     uint32_t mt_check;               \
   } test_mss##sfx##_t
 #endif
 
 #if defined(MAM_MSS_TRAVERSAL)
-#define def_test_mss_init(D, sfx)                          \
-  static mss_t *test_mss_init##sfx(test_mss##sfx##_t *m) { \
-    m->m.auth_path = m->auth_path;                         \
-    m->ap_check = 0xdeadbeef;                              \
-    m->m.nodes_hashes = m->nodes_hashes;                   \
-    m->hs_check = 0xdeadbeef;                              \
-    m->m.nodes = m->nodes;                                 \
-    m->ns_check = 0xdeadbeef;                              \
-    m->m.stacks = m->stacks;                               \
-    m->ss_check = 0xdeadbeef;                              \
-    return &m->m;                                          \
+#define def_test_mss_init(D, sfx)                              \
+  static mam_mss_t *test_mss_init##sfx(test_mss##sfx##_t *m) { \
+    m->m.auth_path = m->auth_path;                             \
+    m->ap_check = 0xdeadbeef;                                  \
+    m->m.nodes_hashes = m->nodes_hashes;                       \
+    m->hs_check = 0xdeadbeef;                                  \
+    m->m.nodes = m->nodes;                                     \
+    m->ns_check = 0xdeadbeef;                                  \
+    m->m.stacks = m->stacks;                                   \
+    m->ss_check = 0xdeadbeef;                                  \
+    return &m->m;                                              \
   }
 #else
 #define def_test_mss_init(D, sfx)                              \
@@ -201,7 +201,7 @@ static bool mss_test(mam_mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
 
     mam_mss_gen(mss);
 
-    trits_t pk = trits_from_rep(MAM2_MSS_PK_SIZE, mss->root);
+    trits_t pk = trits_from_rep(MAM_MSS_PK_SIZE, mss->root);
 
     do {
       if (curr_height > 1 && ((rand_handle_rand() % 2) == 0)) {

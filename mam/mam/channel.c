@@ -50,7 +50,7 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
 
   mam_mss_gen(&channel->mss);
 
-  trits_t pk1 = trits_from_rep(MAM2_MSS_PK_SIZE, channel->mss.root);
+  trits_t pk1 = trits_from_rep(MAM_MSS_PK_SIZE, channel->mss.root);
   trits_copy(pk1, mam_channel_id(channel));
 
   channel->endpoints = NULL;

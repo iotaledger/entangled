@@ -324,7 +324,7 @@ void mam_mss_init(mam_mss_t *mss, mam_prng_t *prng, mss_mt_height_t height,
 
 void mam_mss_gen(mam_mss_t *mss) {
   trits_t root_trits = trits_from_rep(MAM_MSS_PK_SIZE, mss->root);
-#if defined(MAM2_MSS_TRAVERSAL)
+#if defined(MAM_MSS_TRAVERSAL)
   if (0 == mss->height) {
     mss_mt_gen_leaf(mss, 0, root_trits);
   } else {
@@ -432,8 +432,8 @@ void mam_mss_gen(mam_mss_t *mss) {
 }
 
 void mam_mss_skn(mam_mss_t const *const mss, trits_t skn) {
-  MAM2_TRITS_DEF0(trits, MAM_MSS_SKN_SIZE);
-  trits = MAM2_TRITS_INIT(trits, MAM_MSS_SKN_SIZE);
+  MAM_TRITS_DEF0(trits, MAM_MSS_SKN_SIZE);
+  trits = MAM_TRITS_INIT(trits, MAM_MSS_SKN_SIZE);
 
   MAM_ASSERT(trits_size(skn) == MAM_MSS_SKN_SIZE);
 
@@ -521,16 +521,19 @@ void mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig) {
 }
 
 bool mam_mss_next(mam_mss_t *mss) {
-  if (mss->skn == MAM_MSS_MAX_SKN(mss->height)) return false;
+  if (mss->skn == MAM_MSS_MAX_SKN(mss->height)) {
+    return false;
+  }
 
-#if defined(MAM_MSS_TRAVERSAL) if (mss->skn < MAM_MSS_MAX_SKN(mss->height)) {
-  mss_mt_refresh(mss);
-  mss_mt_build_stacks(mss);
-}
+#if defined(MAM_MSS_TRAVERSAL)
+  if (mss->skn < MAM_MSS_MAX_SKN(mss->height)) {
+    mss_mt_refresh(mss);
+    mss_mt_build_stacks(mss);
+  }
 #endif
 
-mss->skn++;
-return 1;
+  mss->skn++;
+  return true;
 }
 
 bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos,
@@ -594,22 +597,23 @@ retcode_t mam_mss_create(mam_mss_t *mss, mss_mt_height_t height) {
 void mam_mss_destroy(mam_mss_t *mss) {
   MAM_ASSERT(mss);
 
-#if defined(MAM_MSS_TRAVERSAL) if (mss->auth_path) {
-  free(mss->auth_path);
-  mss->auth_path = NULL;
-}
-if (mss->nodes_hashes) {
-  free(mss->nodes_hashes);
-  mss->nodes_hashes = NULL;
-}
-if (mss->nodes) {
-  free(mss->nodes);
-  mss->nodes = NULL;
-}
-if (mss->stacks) {
-  free(mss->stacks);
-  mss->stacks = NULL;
-}
+#if defined(MAM_MSS_TRAVERSAL)
+  if (mss->auth_path) {
+    free(mss->auth_path);
+    mss->auth_path = NULL;
+  }
+  if (mss->nodes_hashes) {
+    free(mss->nodes_hashes);
+    mss->nodes_hashes = NULL;
+  }
+  if (mss->nodes) {
+    free(mss->nodes);
+    mss->nodes = NULL;
+  }
+  if (mss->stacks) {
+    free(mss->stacks);
+    mss->stacks = NULL;
+  }
 #else
   if (mss->mt) {
     free(mss->mt);
@@ -728,7 +732,8 @@ retcode_t mam_mss_deserialize(trits_t *buffer, mam_mss_t *mss) {
       RC_MAM_INVALID_VALUE);
   ERR_GUARD_RETURN(height == mss->height, RC_MAM_INVALID_VALUE);
 
-#if defined(MAM_MSS_TRAVERSAL) mss_mt_rewind(mss, skn);
+#if defined(MAM_MSS_TRAVERSAL)
+  mss_mt_rewind(mss, skn);
 #else
   mss->skn = skn;
 #endif
