@@ -115,3 +115,21 @@ retcode_t {TYPE}_set_for_each({TYPE}_set_t const *const set,
   }
   return ret;
 }
+
+bool {TYPE}_set_cmp({TYPE}_set_t const *const lhs,
+                          {TYPE}_set_t const *const rhs){
+
+  if (HASH_COUNT(*lhs) != HASH_COUNT(*rhs)){
+    return false;
+  }
+
+  {TYPE}_set_entry_t *curr_entry = NULL;
+  {TYPE}_set_entry_t *tmp_entry = NULL;
+
+  HASH_ITER(hh, *lhs, curr_entry, tmp_entry) {
+      if (!({TYPE}_set_contains(rhs, &curr_entry->value))){
+        return false;
+      }
+  }
+  return true;
+}
