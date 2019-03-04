@@ -28,10 +28,10 @@ find_transactions_req_t recv_example_req;
 
 extern mam_psk_t const psk;
 
-void send_bundle(char const *const host, uint16_t const port,
-                 bundle_transactions_t *const bundle);
-void receive_bundle(char const *const host, uint16_t const port,
-                    tryte_t const *const bundle_hash,
-                    bundle_transactions_t *const bundle);
+retcode_t send_bundle(char const *const host, uint16_t const port,
+                      bundle_transactions_t *const bundle);
+retcode_t receive_bundle(char const *const host, uint16_t const port,
+                         tryte_t const *const bundle_hash,
+                         bundle_transactions_t *const bundle);
 
 #endif  // __MAM_EXAMPLES_COMMON_H__

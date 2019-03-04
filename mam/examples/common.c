@@ -33,8 +33,8 @@ mam_psk_t const psk = {
             0,  0,  -1, 0,  -1}};
 
 // TODO Merge into cclient
-void send_bundle(char const *const host, uint16_t const port,
-                 bundle_transactions_t *const bundle) {
+retcode_t send_bundle(char const *const host, uint16_t const port,
+                      bundle_transactions_t *const bundle) {
   iota_client_service_t serv;
   serv.http.path = "/";
   serv.http.content_type = "application/json";
@@ -54,20 +54,6 @@ void send_bundle(char const *const host, uint16_t const port,
   iota_transaction_t *curr_tx = NULL;
   flex_trit_t trits_8019[FLEX_TRIT_SIZE_8019];
 
-  fprintf(stderr, "Address: ");
-  for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
-    fprintf(stderr, "%c",
-            ((iota_transaction_t *)utarray_front(bundle))->essence.address[i]);
-  }
-  fprintf(stderr, "\n");
-
-  fprintf(stderr, "Bundle: ");
-  for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
-    fprintf(stderr, "%c",
-            ((iota_transaction_t *)utarray_front(bundle))->essence.bundle[i]);
-  }
-  fprintf(stderr, "\n");
-
   BUNDLE_FOREACH(bundle, curr_tx) {
     transaction_serialize_on_flex_trits(curr_tx, trits_8019);
     hash_array_push(raw_trytes, trits_8019);
@@ -79,6 +65,7 @@ void send_bundle(char const *const host, uint16_t const port,
 
   iota_client_extended_destroy();
   iota_client_core_destroy(&serv);
+  return RC_OK;
 }
 
 static void get_first_bundle_from_transactions(
@@ -153,9 +140,9 @@ static transaction_array_t get_bundle_transactions(
 }
 
 // TODO Merge into cclient
-void receive_bundle(char const *const host, uint16_t const port,
-                    tryte_t const *const bundle_hash,
-                    bundle_transactions_t *const bundle) {
+retcode_t receive_bundle(char const *const host, uint16_t const port,
+                         tryte_t const *const bundle_hash,
+                         bundle_transactions_t *const bundle) {
   iota_client_service_t serv;
   recv_example_init_client_service(&serv, host, port);
   iota_client_extended_init();
@@ -171,4 +158,5 @@ void receive_bundle(char const *const host, uint16_t const port,
 
   hash243_queue_free(&recv_example_req.bundles);
   recv_example_req.bundles = NULL;
+  return RC_OK;
 }
