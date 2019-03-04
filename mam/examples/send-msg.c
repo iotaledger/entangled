@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-#include "mam/examples/common.h"
+#include "mam/examples/send-common.h"
 
 int main(int ac, char **av) {
   mam_api_t api;
@@ -45,25 +45,10 @@ int main(int ac, char **av) {
   bundle_transactions_new(&bundle);
 
   // Writing header to bundle
-  {
-    mam_psk_t_set_t psks = NULL;
-
-    mam_psk_t_set_add(&psks, &psk);
-    mam_api_bundle_write_header(&api, channel, NULL, NULL, NULL, psks, NULL, 0,
-                                bundle, msg_id);
-    mam_psk_t_set_free(&psks);
-  }
+  mam_example_write_header(&api, channel, bundle, msg_id);
 
   // Writing packet to bundle
-  {
-    tryte_t *payload_trytes =
-        (tryte_t *)malloc(2 * strlen(av[4]) * sizeof(tryte_t));
-
-    ascii_to_trytes(av[4], payload_trytes);
-    mam_api_bundle_write_packet(&api, channel, msg_id, payload_trytes,
-                                strlen(av[4]) * 2, 0, bundle);
-    free(payload_trytes);
-  }
+  mam_example_write_packet(&api, channel, bundle, av[4], msg_id);
 
   // Sending bundle
   if ((err = send_bundle(av[1], atoi(av[2]), bundle)) != RC_OK) {
@@ -82,16 +67,6 @@ int main(int ac, char **av) {
   for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
     fprintf(stderr, "%c",
             ((iota_transaction_t *)utarray_front(bundle))->essence.bundle[i]);
-  }
-  fprintf(stderr, "\n");
-
-  tryte_t msg_id_trytes[MAM_MSG_ID_SIZE / 3];
-
-  trits_to_trytes(msg_id, msg_id_trytes, MAM_MSG_ID_SIZE);
-
-  fprintf(stderr, "Message ID: ");
-  for (size_t i = 0; i < MAM_MSG_ID_SIZE / 3; i++) {
-    fprintf(stderr, "%c", msg_id_trytes[i]);
   }
   fprintf(stderr, "\n");
 

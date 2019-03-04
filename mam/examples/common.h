@@ -11,8 +11,6 @@
 #ifndef __MAM_EXAMPLES_COMMON_H__
 #define __MAM_EXAMPLES_COMMON_H__
 
-#include <stdio.h>
-
 #include "cclient/iota_client_extended_api.h"
 #include "common/trinary/trit_tryte.h"
 #include "common/trinary/tryte_ascii.h"
@@ -24,6 +22,10 @@
 #define TEST_CHANNEL_NAME "CHANAME"
 #define TEST_MSS_DEPTH 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 find_transactions_req_t recv_example_req;
 
 extern mam_psk_t const psk;
@@ -33,5 +35,9 @@ retcode_t send_bundle(char const *const host, uint16_t const port,
 retcode_t receive_bundle(char const *const host, uint16_t const port,
                          tryte_t const *const bundle_hash,
                          bundle_transactions_t *const bundle);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // __MAM_EXAMPLES_COMMON_H__
