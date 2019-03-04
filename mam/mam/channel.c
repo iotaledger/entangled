@@ -14,7 +14,7 @@
 #include "mam/pb3/pb3.h"
 
 trits_t mam_channel_id(mam_channel_t const *const channel) {
-  return trits_from_rep(MAM_CHANNEL_ID_SIZE, channel->id);
+  return trits_from_rep(MAM_CHANNEL_ID_SIZE, channel->mss.root);
 }
 
 trits_t mam_channel_name(mam_channel_t const *const channel) {
@@ -50,9 +50,6 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
 
   mam_mss_gen(&channel->mss);
 
-  trits_t pk1 = trits_from_rep(MAM_MSS_PK_SIZE, channel->mss.root);
-  trits_copy(pk1, mam_channel_id(channel));
-
   channel->endpoints = NULL;
 
   return ret;
@@ -84,9 +81,7 @@ size_t mam_channel_serialized_size(mam_channel_t const *const channel) {
   size_t mss_size = mam_mss_serialized_size(&channel->mss);
   size_t endpoints_size = mam_endpoints_serialized_size(channel->endpoints);
 
-  return pb3_sizeof_ntrytes(MAM_CHANNEL_ID_SIZE /
-                            NUMBER_OF_TRITS_IN_A_TRYTE) +  // id
-         pb3_sizeof_size_t(trits_size(channel->name)) +    // name size
+  return pb3_sizeof_size_t(trits_size(channel->name)) +  // name size
          pb3_sizeof_ntrytes(trits_size(channel->name) /
                             NUMBER_OF_TRITS_IN_A_TRYTE) +  // name
          pb3_sizeof_ntrytes(MAM_CHANNEL_MSG_ORD_SIZE /
@@ -101,8 +96,6 @@ void mam_channel_serialize(mam_channel_t const *const channel,
                            trits_t *const buffer) {
   size_t mss_size = mam_mss_serialized_size(&channel->mss);
 
-  pb3_encode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_SIZE, channel->id),
-                     buffer);                            // id
   pb3_encode_size_t(trits_size(channel->name), buffer);  // name size
   pb3_encode_ntrytes(channel->name, buffer);             // name
   pb3_encode_ntrytes(trits_from_rep(MAM_CHANNEL_MSG_ORD_SIZE, channel->msg_ord),
@@ -118,12 +111,6 @@ retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
   retcode_t ret = RC_OK;
   size_t size = 0;
   mss_mt_height_t height = 0;
-
-  if ((ret = pb3_decode_ntrytes(
-           trits_from_rep(MAM_CHANNEL_ID_SIZE, channel->id), buffer)) !=
-      RC_OK) {  // id
-    return ret;
-  }
 
   if ((ret = pb3_decode_size_t(&size, buffer)) != RC_OK) {  // name size
     return ret;

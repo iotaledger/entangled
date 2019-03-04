@@ -198,7 +198,7 @@ retcode_t mam_api_bundle_write_header(
                  trits_from_rep(MAM_MSG_ID_SIZE, msg_id), msg_type_id, psks,
                  ntru_pks, &header);
     header = trits_pickup(header, header_size);
-    mam_api_bundle_wrap(bundle, ch->id, tag, header);
+    mam_api_bundle_wrap(bundle, mam_channel_id(ch).p, tag, header);
     trits_free(header);
   }
 
@@ -252,7 +252,7 @@ retcode_t mam_api_bundle_write_packet(
     packet = trits_pickup(packet, packet_size);
     // TODO negate if last packet
     mam_api_tag(tag, msg_id, ctx->ord++);
-    mam_api_bundle_wrap(bundle, ch->id, tag, packet);
+    mam_api_bundle_wrap(bundle, mam_channel_id(ch).p, tag, packet);
     trits_free(packet);
   }
 
