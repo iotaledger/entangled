@@ -13,7 +13,10 @@
 
 #include <stdio.h>
 
+#include "cclient/iota_client_extended_api.h"
 #include "common/trinary/trit_tryte.h"
+#include "common/trinary/tryte_ascii.h"
+#include "mam/api/api.h"
 
 #define DUMMY_SEED                                                             \
   "DUMMYSEEDDUMMYSEEDDUMMYSEEDDUMMYSEEDDUMMYSEEDDUMMYSEEDDUMMYSEEDDUMMYSEED99" \
@@ -23,26 +26,12 @@
 
 find_transactions_req_t recv_example_req;
 
-mam_psk_t const psk = {
-    .id = {1,  0,  -1, -1, 0,  -1, -1, 0,  0,  1,  -1, 0,  1,  0,  0,  1,  1,
-           1,  -1, 1,  1,  0,  1,  1,  0,  0,  -1, 1,  -1, -1, -1, -1, -1, -1,
-           -1, 1,  -1, -1, 0,  -1, -1, 1,  0,  -1, -1, -1, 1,  1,  1,  0,  0,
-           -1, 1,  -1, -1, -1, 0,  -1, 1,  -1, -1, -1, 1,  1,  -1, 1,  0,  0,
-           1,  1,  1,  -1, -1, 0,  0,  -1, -1, 1,  0,  -1, 1},
-    .key = {-1, 1,  -1, -1, 1,  -1, -1, 0,  0,  0,  -1, -1, 1,  1,  1,  -1, -1,
-            -1, 0,  0,  0,  0,  -1, -1, 1,  1,  1,  0,  -1, -1, -1, 0,  0,  0,
-            -1, -1, 1,  -1, 0,  0,  1,  0,  0,  -1, 1,  1,  0,  -1, 0,  0,  1,
-            -1, 1,  0,  1,  0,  0,  -1, 1,  1,  -1, 1,  0,  -1, 0,  -1, 1,  -1,
-            -1, -1, 0,  -1, -1, 0,  -1, -1, 0,  0,  -1, -1, 1,  -1, 0,  0,  -1,
-            -1, -1, -1, 0,  -1, -1, -1, 1,  -1, -1, 1,  1,  1,  1,  1,  0,  1,
-            0,  1,  -1, 0,  0,  1,  0,  1,  0,  0,  1,  0,  -1, 0,  1,  1,  0,
-            0,  -1, -1, 1,  1,  0,  0,  1,  -1, 1,  1,  1,  0,  1,  1,  1,  0,
-            0,  -1, -1, -1, -1, 1,  1,  1,  0,  0,  -1, 0,  1,  -1, 1,  1,  1,
-            0,  0,  1,  -1, -1, 0,  -1, 1,  -1, 1,  0,  0,  1,  -1, 0,  1,  -1,
-            0,  0,  1,  1,  1,  1,  1,  0,  0,  1,  -1, 1,  -1, 1,  0,  1,  1,
-            1,  -1, 0,  0,  -1, 1,  1,  0,  -1, -1, 0,  0,  -1, 1,  0,  1,  -1,
-            0,  0,  -1, 1,  -1, 1,  1,  1,  -1, 0,  1,  1,  0,  0,  -1, -1, -1,
-            0,  0,  1,  0,  1,  0,  -1, 1,  -1, 0,  1,  0,  -1, 1,  1,  -1, -1,
-            0,  0,  -1, 0,  -1}};
+extern mam_psk_t const psk;
+
+void send_bundle(char const *const host, uint16_t const port,
+                 bundle_transactions_t *const bundle);
+void receive_bundle(char const *const host, uint16_t const port,
+                    tryte_t const *const bundle_hash,
+                    bundle_transactions_t *const bundle);
 
 #endif  // __MAM_EXAMPLES_COMMON_H__

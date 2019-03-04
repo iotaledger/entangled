@@ -3,9 +3,6 @@ cc_binary(
     srcs = ["send.c"],
     deps = [
         ":commmon",
-        "//cclient/api",
-        "//common/trinary:tryte_ascii",
-        "//mam/api",
     ],
 )
 
@@ -14,16 +11,17 @@ cc_binary(
     srcs = ["recv.c"],
     deps = [
         ":commmon",
-        "//cclient/api",
-        "//common/trinary:tryte_ascii",
-        "//mam/api",
     ],
 )
 
 cc_library(
     name = "commmon",
+    srcs = ["common.c"],
     hdrs = ["common.h"],
     deps = [
+        "//cclient:api",
         "//common/trinary:trit_tryte",
+        "//common/trinary:tryte_ascii",
+        "//mam/api",
     ],
 )

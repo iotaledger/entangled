@@ -10,59 +10,7 @@
 
 #include <stdio.h>
 
-#include "cclient/api/extended/extended_api.h"
-#include "common/trinary/tryte_ascii.h"
-#include "mam/api/api.h"
 #include "mam/examples/common.h"
-
-// TODO Merge into cclient
-static void send_bundle(char const *const host, uint16_t const port,
-                        bundle_transactions_t *const bundle) {
-  iota_client_service_t serv;
-  serv.http.path = "/";
-  serv.http.content_type = "application/json";
-  serv.http.accept = "application/json";
-  serv.http.host = host;
-  serv.http.port = port;
-  serv.http.api_version = 1;
-  serv.serializer_type = SR_JSON;
-  iota_client_core_init(&serv);
-  iota_client_extended_init();
-
-  Kerl kerl;
-  init_kerl(&kerl);
-  bundle_finalize(bundle, &kerl);
-  transaction_array_t out_tx_objs = transaction_array_new();
-  hash8019_array_p raw_trytes = hash8019_array_new();
-  iota_transaction_t *curr_tx = NULL;
-  flex_trit_t trits_8019[FLEX_TRIT_SIZE_8019];
-
-  fprintf(stderr, "Address: ");
-  for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
-    fprintf(stderr, "%c",
-            ((iota_transaction_t *)utarray_front(bundle))->essence.address[i]);
-  }
-  fprintf(stderr, "\n");
-
-  fprintf(stderr, "Bundle: ");
-  for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
-    fprintf(stderr, "%c",
-            ((iota_transaction_t *)utarray_front(bundle))->essence.bundle[i]);
-  }
-  fprintf(stderr, "\n");
-
-  BUNDLE_FOREACH(bundle, curr_tx) {
-    transaction_serialize_on_flex_trits(curr_tx, trits_8019);
-    hash_array_push(raw_trytes, trits_8019);
-  }
-  iota_client_send_trytes(&serv, raw_trytes, 1, 14, NULL, true, out_tx_objs);
-  // TODO uncomment
-  // hash_array_free(raw_trytes);
-  transaction_array_free(out_tx_objs);
-
-  iota_client_extended_destroy();
-  iota_client_core_destroy(&serv);
-}
 
 int main(int ac, char **av) {
   mam_api_t api;
