@@ -97,6 +97,15 @@ void mam_msg_send_ctx_serialize(mam_msg_send_context_t const *const ctx,
 retcode_t mam_msg_send_ctx_deserialize(trits_t *const buffer,
                                        mam_msg_send_context_t *const ctx);
 
+size_t mam_msg_recv_ctx_serialized_size(
+    mam_msg_recv_context_t const *const ctx);
+
+void mam_msg_recv_ctx_serialize(mam_msg_recv_context_t const *const ctx,
+                                trits_t *const buffer);
+
+retcode_t mam_msg_recv_ctx_deserialize(trits_t *const buffer,
+                                       mam_msg_recv_context_t *const ctx);
+
 #ifdef __cplusplus
 }
 #endif
