@@ -20,8 +20,9 @@
 #define CHANNEL_NAME_SIZE 27
 #define ENDPOINT_NAME_SIZE 27
 
-static bool mam_endpoint_t_set_cmp(mam_endpoint_t_set_t const endpoints_1,
-                                   mam_endpoint_t_set_t const endpoints_2) {
+static bool mam_endpoint_t_set_cmp_test_endpoints(
+    mam_endpoint_t_set_t const endpoints_1,
+    mam_endpoint_t_set_t const endpoints_2) {
   mam_endpoint_t_set_entry_t *entry_1 = NULL;
   mam_endpoint_t_set_entry_t *tmp_1 = NULL;
   mam_endpoint_t_set_entry_t *entry_2 = NULL;
@@ -105,7 +106,8 @@ void test_endpoint(void) {
   TEST_ASSERT(mam_endpoints_deserialize(&cpy, channel_name_trits, &prng,
                                         &endpoints_2) == RC_OK);
 
-  TEST_ASSERT_TRUE(mam_endpoint_t_set_cmp(endpoints_1, endpoints_2));
+  TEST_ASSERT_TRUE(
+      mam_endpoint_t_set_cmp_test_endpoints(endpoints_1, endpoints_2));
 
   mam_endpoints_destroy(&endpoints_1);
   mam_endpoints_destroy(&endpoints_2);

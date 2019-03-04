@@ -18,8 +18,8 @@
 #include "mam/mam/message.h"
 #include "mam/test_utils/test_utils.h"
 
-static bool mam_channel_t_set_cmp(mam_channel_t_set_t const channels_1,
-                                  mam_channel_t_set_t const channels_2) {
+static bool mam_channel_t_set_cmp_test(mam_channel_t_set_t const channels_1,
+                                       mam_channel_t_set_t const channels_2) {
   mam_channel_t_set_entry_t *entry_1 = NULL;
   mam_channel_t_set_entry_t *tmp_1 = NULL;
   mam_channel_t_set_entry_t *entry_2 = NULL;
@@ -100,7 +100,7 @@ void test_channel(void) {
 
   TEST_ASSERT(mam_channels_deserialize(&cpy, &prng, &channels_2) == RC_OK);
 
-  TEST_ASSERT_TRUE(mam_channel_t_set_cmp(channels_1, channels_2));
+  TEST_ASSERT_TRUE(mam_channel_t_set_cmp_test(channels_1, channels_2));
 
   mam_channels_destroy(&channels_1);
   mam_channels_destroy(&channels_2);
