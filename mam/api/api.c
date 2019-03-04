@@ -522,6 +522,7 @@ retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api) {
   api->psks = NULL;
   api->send_ctxs.map = NULL;
   api->recv_ctxs.map = NULL;
+  api->channels = NULL;
 
   trit_t_to_mam_msg_send_context_t_map_init(&api->send_ctxs, MAM_MSG_ID_SIZE);
   trit_t_to_mam_msg_recv_context_t_map_init(&api->recv_ctxs, MAM_MSG_ID_SIZE);
