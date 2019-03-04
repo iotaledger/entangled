@@ -640,7 +640,7 @@ static void mss_mt_serialize(mam_mss_t const *const mss, trits_t *buffer) {
   mss_mt_height_t height;
   mss_mt_idx_t i;
 
-  MAM_ASSERT(trits_size(*buffer) == mss_mt_serialized_size(mss));
+  MAM_ASSERT(trits_size(*buffer) >= mss_mt_serialized_size(mss));
 
 #if defined(MAM_MSS_TRAVERSAL)
   /* <apath> */
