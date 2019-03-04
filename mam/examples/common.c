@@ -49,6 +49,7 @@ retcode_t mam_example_create_channel(mam_api_t *const api,
     fprintf(stderr, "%c", address[i]);
   }
   fprintf(stderr, "\n");
+  return RC_OK;
 }
 
 // TODO Merge into cclient
@@ -84,6 +85,14 @@ retcode_t send_bundle(char const *const host, uint16_t const port,
 
   iota_client_extended_destroy();
   iota_client_core_destroy(&serv);
+
+  fprintf(stderr, "Bundle: ");
+  for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
+    fprintf(stderr, "%c",
+            ((iota_transaction_t *)utarray_front(bundle))->essence.bundle[i]);
+  }
+  fprintf(stderr, "\n");
+
   return RC_OK;
 }
 

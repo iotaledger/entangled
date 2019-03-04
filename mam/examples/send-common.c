@@ -20,9 +20,13 @@ retcode_t mam_example_write_header(mam_api_t* const api,
   tryte_t msg_id_trytes[MAM_MSG_ID_SIZE / 3];
   mam_psk_t_set_t psks = NULL;
 
-  mam_psk_t_set_add(&psks, &psk);
-  mam_api_bundle_write_header(api, channel, NULL, NULL, NULL, psks, NULL, 0,
-                              bundle, msg_id);
+  if ((ret = mam_psk_t_set_add(&psks, &psk)) != RC_OK) {
+    return ret;
+  }
+  if ((ret = mam_api_bundle_write_header(api, channel, NULL, NULL, NULL, psks,
+                                         NULL, 0, bundle, msg_id)) != RC_OK) {
+    return ret;
+  }
   mam_psk_t_set_free(&psks);
 
   trits_to_trytes(msg_id, msg_id_trytes, MAM_MSG_ID_SIZE);
@@ -45,8 +49,12 @@ retcode_t mam_example_write_packet(mam_api_t* const api,
       (tryte_t*)malloc(2 * strlen(payload) * sizeof(tryte_t));
 
   ascii_to_trytes(payload, payload_trytes);
-  mam_api_bundle_write_packet(api, channel, msg_id, payload_trytes,
-                              strlen(payload) * 2, 0, bundle);
+  if ((ret = mam_api_bundle_write_packet(api, channel, msg_id, payload_trytes,
+                                         strlen(payload) * 2, 0, bundle)) !=
+      RC_OK) {
+    return ret;
+  }
   free(payload_trytes);
+
   return ret;
 }
