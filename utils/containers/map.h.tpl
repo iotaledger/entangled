@@ -55,6 +55,9 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_find({KEY_TYPE}_to_{VALUE_TYPE}_map_t const 
 
 retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_free({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map);
 
+bool {KEY_TYPE}_to_{VALUE_TYPE}_map_cmp({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const lhs,
+                                        {KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const rhs);
+
 #ifdef __cplusplus
 }
 #endif

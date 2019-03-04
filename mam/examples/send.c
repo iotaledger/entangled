@@ -86,6 +86,7 @@ int main(int ac, char **av) {
   memset(cha, 0, sizeof(mam_channel_t));
   mam_channel_create(&api.prng, TEST_MSS_DEPTH, cha_name, cha);
 
+  ERR_BIND_RETURN(mam_channel_t_set_add(api.channels, cha), ret);
   bundle_transactions_new(&bundle);
 
   {

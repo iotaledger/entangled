@@ -18,40 +18,6 @@
 #include "mam/ntru/ntru.h"
 #include "mam/ntru/ntru_types.h"
 
-static bool mam_ntru_pk_t_set_cmp(mam_ntru_pk_t_set_t const ntru_pk_set_1,
-                                  mam_ntru_pk_t_set_t const ntru_pk_set_2) {
-  mam_ntru_pk_t_set_entry_t *entry = NULL;
-  mam_ntru_pk_t_set_entry_t *tmp = NULL;
-
-  TEST_ASSERT_EQUAL_INT(mam_ntru_pk_t_set_size(ntru_pk_set_1),
-                        mam_ntru_pk_t_set_size(ntru_pk_set_2));
-
-  HASH_ITER(hh, ntru_pk_set_1, entry, tmp) {
-    if (!mam_ntru_pk_t_set_contains(&ntru_pk_set_2, &entry->value)) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
-static bool mam_ntru_sk_t_set_cmp(mam_ntru_sk_t_set_t const ntru_sk_set_1,
-                                  mam_ntru_sk_t_set_t const ntru_sk_set_2) {
-  mam_ntru_sk_t_set_entry_t *entry = NULL;
-  mam_ntru_sk_t_set_entry_t *tmp = NULL;
-
-  TEST_ASSERT_EQUAL_INT(mam_ntru_sk_t_set_size(ntru_sk_set_1),
-                        mam_ntru_sk_t_set_size(ntru_sk_set_2));
-
-  HASH_ITER(hh, ntru_sk_set_1, entry, tmp) {
-    if (!mam_ntru_sk_t_set_contains(&ntru_sk_set_2, &entry->value)) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 static void test_ntru_pk_serialization(void) {
   mam_ntru_pk_t_set_t ntru_set_1 = NULL;
   mam_ntru_pk_t_set_t ntru_set_2 = NULL;
@@ -74,7 +40,7 @@ static void test_ntru_pk_serialization(void) {
 
   TEST_ASSERT(mam_ntru_pks_deserialize(trits, &ntru_set_2) == RC_OK);
 
-  TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(ntru_set_1, ntru_set_2));
+  TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(&ntru_set_1, &ntru_set_2));
 
   trits_free(trits);
   mam_ntru_pk_t_set_free(&ntru_set_1);
@@ -115,7 +81,7 @@ static void test_ntru_sk_serialization(void) {
 
   TEST_ASSERT(mam_ntru_sks_deserialize(trits, &ntru_sk_set_2) == RC_OK);
 
-  TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(ntru_sk_set_1, ntru_sk_set_2));
+  TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&ntru_sk_set_1, &ntru_sk_set_2));
 
   mam_ntru_sk_t_set_free(&ntru_sk_set_1);
   mam_ntru_sk_t_set_free(&ntru_sk_set_2);

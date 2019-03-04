@@ -81,3 +81,21 @@ retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_free({KEY_TYPE}_to_{VALUE_TYPE}_map_t *
   map->map = NULL;
   return RC_OK;
 }
+
+bool {KEY_TYPE}_to_{VALUE_TYPE}_map_cmp({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const lhs,
+{KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const rhs){
+
+  if (HASH_COUNT(lhs->map) != HASH_COUNT(rhs->map)){
+    return false;
+  }
+
+  {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *curr_entry = NULL;
+  {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *tmp_entry = NULL;
+
+  HASH_ITER(hh, lhs->map, curr_entry, tmp_entry) {
+  if (!{KEY_TYPE}_to_{VALUE_TYPE}_map_contains(rhs,curr_entry->key)){
+    return false;
+    }
+  }
+  return true;
+}

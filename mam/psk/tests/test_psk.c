@@ -16,24 +16,6 @@
 #include "mam/psk/mam_psk_t_set.h"
 #include "mam/psk/psk.h"
 
-static bool mam_psk_t_set_cmp(mam_psk_t_set_t const psks_1,
-                              mam_psk_t_set_t const psks_2) {
-  mam_psk_t_set_entry_t *entry = NULL;
-  mam_psk_t_set_entry_t *tmp = NULL;
-
-  if (mam_psk_t_set_size(psks_1) != mam_psk_t_set_size(psks_2)) {
-    return false;
-  }
-
-  HASH_ITER(hh, psks_1, entry, tmp) {
-    if (!mam_psk_t_set_contains(&psks_2, &entry->value)) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 static void test_psks_serialization(void) {
   mam_psk_t_set_t psks_1 = NULL;
   mam_psk_t_set_t psks_2 = NULL;
@@ -59,7 +41,7 @@ static void test_psks_serialization(void) {
 
   TEST_ASSERT(mam_psks_deserialize(trits, &psks_2) == RC_OK);
 
-  TEST_ASSERT_TRUE(mam_psk_t_set_cmp(psks_1, psks_2));
+  TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&psks_1, &psks_2));
 
   trits_free(trits);
   mam_psk_t_set_free(&psks_1);

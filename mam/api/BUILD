@@ -14,6 +14,7 @@ cc_library(
         "//mam/mam:message",
         "//mam/ntru:mam_ntru_pk_t_set",
         "//mam/ntru:mam_ntru_sk_t_set",
+        "//mam/ntru:ntru_types",
         "//mam/psk",
         "//mam/psk:mam_psk_t_set",
         "//utils:time",
