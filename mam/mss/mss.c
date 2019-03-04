@@ -12,6 +12,7 @@
 #include <stdlib.h>
 
 #include "mam/mss/mss.h"
+#include "mam/pb3/pb3.h"
 
 #define MAM_MSS_MAX_SKN(d) (((mss_mt_idx_t)1 << (d)) - 1)
 
@@ -635,25 +636,25 @@ static size_t mss_mt_serialized_size(mam_mss_t const *const mss) {
   return size;
 }
 
-static void mss_mt_serialize(mam_mss_t const *const mss, trits_t buffer) {
+static void mss_mt_serialize(mam_mss_t const *const mss, trits_t *buffer) {
   mss_mt_height_t height;
   mss_mt_idx_t i;
 
-  MAM_ASSERT(trits_size(buffer) == mss_mt_serialized_size(mss));
+  MAM_ASSERT(trits_size(*buffer) == mss_mt_serialized_size(mss));
 
 #if defined(MAM_MSS_TRAVERSAL)
   /* <apath> */
   for (height = 0; height != mss->height; ++height) {
     trits_copy(mss_mt_auth_path_trits(mss, height),
-               trits_take(buffer, MAM_MSS_MT_HASH_SIZE));
-    buffer = trits_drop(buffer, MAM_MSS_MT_HASH_SIZE);
+               trits_take(*buffer, MAM_MSS_MT_HASH_SIZE));
+    *buffer = trits_drop(*buffer, MAM_MSS_MT_HASH_SIZE);
   }
   /* <node-hashes> */
   for (height = 0; height != mss->height; ++height) {
     for (i = 0; i != mss->stacks[height].size; ++i) {
       trits_copy(mss_mt_node_hash_trits(mss, height, i),
-                 trits_take(buffer, MAM_MSS_MT_HASH_SIZE));
-      buffer = trits_drop(buffer, MAM_MSS_MT_HASH_SIZE);
+                 trits_take(*buffer, MAM_MSS_MT_HASH_SIZE));
+      *buffer = trits_drop(*buffer, MAM_MSS_MT_HASH_SIZE);
     }
   }
 #else
@@ -661,8 +662,8 @@ static void mss_mt_serialize(mam_mss_t const *const mss, trits_t buffer) {
   do {
     for (i = 0; i != (mss_mt_idx_t)1 << height; ++i) {
       trits_copy(mss_mt_node_t_trits(mss, height, i),
-                 trits_take(buffer, MAM_MSS_MT_HASH_SIZE));
-      buffer = trits_drop(buffer, MAM_MSS_MT_HASH_SIZE);
+                 trits_take(*buffer, MAM_MSS_MT_HASH_SIZE));
+      *buffer = trits_drop(*buffer, MAM_MSS_MT_HASH_SIZE);
     }
   } while (height-- > 0);
 #endif
@@ -708,17 +709,20 @@ static void mss_mt_deserialize(trits_t buffer, mam_mss_t *mss) {
 
 size_t mam_mss_serialized_size(mam_mss_t const *const mss) {
   return MAM_MSS_SKN_TREE_DEPTH_SIZE + MAM_MSS_SKN_KEY_NUMBER_SIZE +
-         mss_mt_serialized_size(mss);
+         mss_mt_serialized_size(mss) + MAM_MSS_PK_SIZE;
 }
 
 void mam_mss_serialize(mam_mss_t const *const mss, trits_t buffer) {
   MAM_ASSERT(mam_mss_serialized_size(mss) == trits_size(buffer));
 
   mam_mss_skn(mss, trits_take(buffer, MAM_MSS_SKN_SIZE));
-  mss_mt_serialize(mss, trits_drop(buffer, MAM_MSS_SKN_SIZE));
+  buffer = trits_drop(buffer, MAM_MSS_SKN_SIZE);
+  mss_mt_serialize(mss, &buffer);
+  pb3_encode_ntrytes(trits_from_rep(MAM_MSS_PK_SIZE, mss->root), &buffer);
 }
 
 retcode_t mam_mss_deserialize(trits_t *buffer, mam_mss_t *mss) {
+  retcode_t ret = RC_OK;
   mss_mt_height_t height;
   mss_mt_idx_t skn;
 
@@ -741,5 +745,10 @@ retcode_t mam_mss_deserialize(trits_t *buffer, mam_mss_t *mss) {
                    RC_MAM_BUFFER_TOO_SMALL);
   mss_mt_deserialize(trits_advance(buffer, mss_mt_serialized_size(mss)), mss);
 
-  return RC_OK;
+  if ((ret = pb3_decode_ntrytes(trits_from_rep(MAM_MSS_PK_SIZE, mss->root),
+                                buffer)) != RC_OK) {
+    return ret;
+  }
+
+  return ret;
 }
