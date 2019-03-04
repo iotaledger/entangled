@@ -457,6 +457,34 @@ static void test_api_multiple_packets() {
   }
 }
 
+static void test_api_serialization() {
+  mam_api_t deserialized_api;
+  size_t serialized_size = mam_api_serialized_size(&api);
+  MAM_TRITS_DEF0(buffer, serialized_size);
+  buffer = MAM_TRITS_INIT(buffer, serialized_size);
+  mam_api_serialize(&api, &buffer);
+  buffer = trits_pickup_all(buffer);
+  TEST_ASSERT((mam_api_deserialize(&buffer, &deserialized_api) == RC_OK));
+
+  TEST_ASSERT_EQUAL_MEMORY(&deserialized_api.prng, &api.prng,
+                           MAM_PRNG_KEY_SIZE);
+  TEST_ASSERT_TRUE(
+      mam_ntru_sk_t_set_cmp(&deserialized_api.ntru_sks, &api.ntru_sks));
+  TEST_ASSERT_TRUE(
+      mam_ntru_pk_t_set_cmp(&deserialized_api.ntru_pks, &api.ntru_pks));
+  TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&deserialized_api.psks, &api.psks));
+
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_send_context_t_map_cmp(
+      &deserialized_api.send_ctxs, &api.send_ctxs));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_recv_context_t_map_cmp(
+      &deserialized_api.recv_ctxs, &api.recv_ctxs));
+
+  TEST_ASSERT_TRUE(
+      mam_channel_t_set_cmp(&deserialized_api.channels, &api.channels));
+
+  mam_api_destroy(&deserialized_api);
+}
+
 int main(void) {
   UNITY_BEGIN();
 
@@ -465,6 +493,7 @@ int main(void) {
 
   RUN_TEST(test_api_generic);
   RUN_TEST(test_api_multiple_packets);
+  RUN_TEST(test_api_serialization);
 
   /* destroy channels/endpoints */
   {

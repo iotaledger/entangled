@@ -349,15 +349,11 @@ void serialize_send_ctx_test() {
   mam_msg_send_context_t deserialized_ctx;
   mam_spongos_init(&send_ctx.spongos);
   send_ctx.ord = 0;
-  mam_mss_t mss;
 
-  mam_mss_t deserialized_mss;
   //"Random" root
   for (size_t i = 0; i < MAM_MSS_PK_SIZE; ++i) {
-    mss.root[i] = -1 + rand() % 3;
+    send_ctx.mss_root[i] = -1 + rand() % 3;
   }
-  send_ctx.mss = &mss;
-  deserialized_ctx.mss = &deserialized_mss;
 
   MAM_TRITS_DEF0(rand_msg, strlen(TEST_PLAINTEXT1));
   rand_msg = MAM_TRITS_INIT(rand_msg, strlen(TEST_PLAINTEXT1));
@@ -373,7 +369,7 @@ void serialize_send_ctx_test() {
   TEST_ASSERT_EQUAL_MEMORY(&send_ctx.spongos.sponge,
                            &deserialized_ctx.spongos.sponge, MAM_SPONGE_WIDTH);
 
-  TEST_ASSERT_EQUAL_MEMORY(&send_ctx.mss->root, &deserialized_ctx.mss->root,
+  TEST_ASSERT_EQUAL_MEMORY(&send_ctx.mss_root, &deserialized_ctx.mss_root,
                            MAM_MSS_PK_SIZE);
   TEST_ASSERT_EQUAL_INT(send_ctx.ord, deserialized_ctx.ord);
 }

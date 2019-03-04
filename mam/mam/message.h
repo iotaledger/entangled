@@ -54,6 +54,7 @@ typedef struct mam_msg_send_context_s {
   mam_spongos_t spongos;
   trint18_t ord;
   mam_mss_t *mss;
+  trit_t mss_root[MAM_MSS_PK_SIZE];
 } mam_msg_send_context_t;
 
 typedef struct mam_msg_recv_context_s {

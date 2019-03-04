@@ -17,8 +17,8 @@
 #include "mam/prng/prng.h"
 #include "mam/prng/prng_types.h"
 
-static bool mam_prng_t_set_cmp(mam_prng_t_set_t const set1,
-                               mam_prng_t_set_t const set2) {
+static bool mam_prng_t_set_cmp_test_prng(mam_prng_t_set_t const set1,
+                                         mam_prng_t_set_t const set2) {
   mam_prng_t_set_entry_t *entry1 = NULL;
   mam_prng_t_set_entry_t *tmp1 = NULL;
 
@@ -70,7 +70,7 @@ static void test_prng_serialization(void) {
 
   TEST_ASSERT(mam_prngs_deserialize(trits, &set2) == RC_OK);
 
-  TEST_ASSERT_TRUE(mam_prng_t_set_cmp(set1, set2));
+  TEST_ASSERT_TRUE(mam_prng_t_set_cmp_test_prng(set1, set2));
 
   mam_prng_t_set_free(&set1);
   mam_prng_t_set_free(&set2);
