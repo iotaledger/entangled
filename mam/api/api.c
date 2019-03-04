@@ -426,7 +426,7 @@ retcode_t mam_api_send_ctx_map_deserialize(
   retcode_t ret;
   mam_msg_send_context_t ctx;
   trit_t msg_id[MAM_MSG_ID_SIZE];
-  const size_t num_ctxs = 0;
+  size_t num_ctxs = 0;
 
   pb3_decode_size_t(&num_ctxs, buffer);
 
@@ -446,7 +446,7 @@ retcode_t mam_api_recv_ctx_map_deserialize(
   retcode_t ret;
   mam_msg_recv_context_t ctx;
   trit_t msg_id[MAM_MSG_ID_SIZE];
-  const size_t num_ctxs = 0;
+  size_t num_ctxs = 0;
 
   pb3_decode_size_t(&num_ctxs, buffer);
 
@@ -575,7 +575,7 @@ retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api) {
                   tmp_endpoint_entry) {
           if (memcmp(endpoint_entry->value.mss.root,
                      curr_ctx_entry->value.mss_root,
-                     MAM_CHANNEL_ID_SIZE) == 0) {
+                     MAM_ENDPOINT_ID_SIZE) == 0) {
             curr_ctx_entry->value.mss = &endpoint_entry->value.mss;
           }
         }
