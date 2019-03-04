@@ -379,9 +379,40 @@ void serialize_send_ctx_test() {
   TEST_ASSERT_EQUAL_INT(send_ctx.ord, deserialized_ctx.ord);
 }
 
+void serialize_recv_ctx_test() {
+  mam_msg_recv_context_t recv_context;
+  mam_msg_recv_context_t deserialized_ctx;
+  mam_spongos_init(&recv_context.spongos);
+  recv_context.ord = 0;
+
+  //"Random" root
+  for (size_t i = 0; i < MAM2_CHANNEL_ID_SIZE; ++i) {
+    recv_context.pk[i] = -1 + rand() % 3;
+  }
+
+  MAM2_TRITS_DEF0(rand_msg, strlen(TEST_PLAINTEXT1));
+  rand_msg = MAM2_TRITS_INIT(rand_msg, strlen(TEST_PLAINTEXT1));
+  trits_from_str(rand_msg, TEST_PLAINTEXT1);
+  mam_spongos_absorb(&recv_context.spongos, rand_msg);
+  MAM2_TRITS_DEF0(ctx_buffer, mam_msg_recv_ctx_serialized_size(&recv_context));
+  ctx_buffer = MAM2_TRITS_INIT(ctx_buffer,
+                               mam_msg_recv_ctx_serialized_size(&recv_context));
+  mam_msg_recv_ctx_serialize(&recv_context, &ctx_buffer);
+  ctx_buffer = trits_pickup_all(ctx_buffer);
+  mam_msg_recv_ctx_deserialize(&ctx_buffer, &deserialized_ctx);
+  TEST_ASSERT_EQUAL_INT(recv_context.spongos.pos, deserialized_ctx.spongos.pos);
+  TEST_ASSERT_EQUAL_MEMORY(&recv_context.spongos.sponge,
+                           &deserialized_ctx.spongos.sponge, MAM2_SPONGE_WIDTH);
+
+  TEST_ASSERT_EQUAL_MEMORY(&recv_context.pk, &deserialized_ctx.pk,
+                           MAM2_CHANNEL_ID_SIZE);
+  TEST_ASSERT_EQUAL_INT(recv_context.ord, deserialized_ctx.ord);
+}
+
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(message_test);
   RUN_TEST(serialize_send_ctx_test);
+  RUN_TEST(serialize_recv_ctx_test);
   return UNITY_END();
 }
