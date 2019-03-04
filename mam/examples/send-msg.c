@@ -30,23 +30,7 @@ int main(int ac, char **av) {
   }
 
   // Creating channel
-  {
-    trits_t channel_name = trits_alloc(3 * strlen(TEST_CHANNEL_NAME));
-    tryte_t address[NUM_TRYTES_ADDRESS];
-
-    trits_from_str(channel_name, TEST_CHANNEL_NAME);
-    if ((channel = malloc(sizeof(mam_channel_t))) == NULL) {
-      fprintf(stderr, "malloc failed\n");
-      return EXIT_FAILURE;
-    }
-    mam_channel_create(&api.prng, TEST_MSS_DEPTH, channel_name, channel);
-    trits_to_trytes(channel->id, address, NUM_TRITS_ADDRESS);
-    fprintf(stderr, "Address: ");
-    for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
-      fprintf(stderr, "%c", address[i]);
-    }
-    fprintf(stderr, "\n");
-  }
+  mam_example_create_channel(&api, &channel);
 
   ERR_BIND_RETURN(mam_channel_t_set_add(api.channels, cha), ret);
   bundle_transactions_new(&bundle);

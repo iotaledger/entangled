@@ -30,6 +30,9 @@ find_transactions_req_t recv_example_req;
 
 extern mam_psk_t const psk;
 
+retcode_t mam_example_create_channel(mam_api_t *const api,
+                                     mam_channel_t **const channel);
+
 retcode_t send_bundle(char const *const host, uint16_t const port,
                       bundle_transactions_t *const bundle);
 retcode_t receive_bundle(char const *const host, uint16_t const port,

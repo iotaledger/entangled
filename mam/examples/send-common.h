@@ -26,7 +26,7 @@ retcode_t mam_example_write_packet(mam_api_t* const api,
                                    mam_channel_t* const channel,
                                    bundle_transactions_t* const bundle,
                                    char const* const payload,
-                                   trit_t* const msg_id);
+                                   trit_t const* const msg_id);
 
 #ifdef __cplusplus
 }

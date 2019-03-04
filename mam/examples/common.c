@@ -32,6 +32,25 @@ mam_psk_t const psk = {
             0,  0,  1,  0,  1,  0,  -1, 1,  -1, 0,  1,  0,  -1, 1,  1,  -1, -1,
             0,  0,  -1, 0,  -1}};
 
+retcode_t mam_example_create_channel(mam_api_t *const api,
+                                     mam_channel_t **const channel) {
+  trits_t channel_name = trits_alloc(3 * strlen(TEST_CHANNEL_NAME));
+  tryte_t address[NUM_TRYTES_ADDRESS];
+
+  trits_from_str(channel_name, TEST_CHANNEL_NAME);
+  if ((*channel = malloc(sizeof(mam_channel_t))) == NULL) {
+    fprintf(stderr, "malloc failed\n");
+    return EXIT_FAILURE;
+  }
+  mam_channel_create(&api->prng, TEST_MSS_DEPTH, channel_name, *channel);
+  trits_to_trytes((*channel)->id, address, NUM_TRITS_ADDRESS);
+  fprintf(stderr, "Address: ");
+  for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
+    fprintf(stderr, "%c", address[i]);
+  }
+  fprintf(stderr, "\n");
+}
+
 // TODO Merge into cclient
 retcode_t send_bundle(char const *const host, uint16_t const port,
                       bundle_transactions_t *const bundle) {
