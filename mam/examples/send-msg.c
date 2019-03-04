@@ -32,6 +32,7 @@ int main(int ac, char **av) {
   // Creating channel
   {
     trits_t channel_name = trits_alloc(3 * strlen(TEST_CHANNEL_NAME));
+    tryte_t address[NUM_TRYTES_ADDRESS];
 
     trits_from_str(channel_name, TEST_CHANNEL_NAME);
     if ((channel = malloc(sizeof(mam_channel_t))) == NULL) {
@@ -39,6 +40,12 @@ int main(int ac, char **av) {
       return EXIT_FAILURE;
     }
     mam_channel_create(&api.prng, TEST_MSS_DEPTH, channel_name, channel);
+    trits_to_trytes(channel->id, address, NUM_TRITS_ADDRESS);
+    fprintf(stderr, "Address: ");
+    for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
+      fprintf(stderr, "%c", address[i]);
+    }
+    fprintf(stderr, "\n");
   }
 
   ERR_BIND_RETURN(mam_channel_t_set_add(api.channels, cha), ret);
@@ -55,13 +62,6 @@ int main(int ac, char **av) {
     fprintf(stderr, "send_bundle failed with err %d\n", err);
     return EXIT_FAILURE;
   }
-
-  fprintf(stderr, "Address: ");
-  for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
-    fprintf(stderr, "%c",
-            ((iota_transaction_t *)utarray_front(bundle))->essence.address[i]);
-  }
-  fprintf(stderr, "\n");
 
   fprintf(stderr, "Bundle: ");
   for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
