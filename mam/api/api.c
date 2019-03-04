@@ -11,16 +11,14 @@
 #include <stdlib.h>
 
 #include "common/model/bundle.h"
-
 #include "mam/api/api.h"
 #include "mam/mam/mam_channel_t_set.h"
 #include "mam/ntru/mam_ntru_pk_t_set.h"
 #include "mam/ntru/mam_ntru_sk_t_set.h"
 #include "mam/ntru/ntru_types.h"
+#include "mam/pb3/pb3.h"
 #include "mam/prng/prng.h"
 #include "mam/psk/mam_psk_t_set.h"
-
-#include "mam/pb3/pb3.h"
 #include "utils/time.h"
 
 /*

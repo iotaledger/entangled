@@ -11,7 +11,6 @@ cc_library(
         ":trit_t_to_mam_msg_send_context_t_map",
         "//common:errors",
         "//common/model:bundle",
-        "//mam/mam:channel",
         "//mam/mam:message",
         "//mam/ntru:mam_ntru_pk_t_set",
         "//mam/ntru:mam_ntru_sk_t_set",
