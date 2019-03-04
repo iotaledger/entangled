@@ -567,13 +567,14 @@ retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api) {
 
   HASH_ITER(hh, api->send_ctxs.map, curr_ctx_entry, tmp_ctx_entry) {
     HASH_ITER(hh, api->channels, curr_channel_entry, tmp_channel_entry) {
-      if (memcmp(curr_channel_entry->value.id, curr_ctx_entry->value.mss_root,
-                 MAM_CHANNEL_ID_SIZE) == 0) {
+      if (memcmp(curr_channel_entry->value.mss.root,
+                 curr_ctx_entry->value.mss_root, MAM_CHANNEL_ID_SIZE) == 0) {
         curr_ctx_entry->value.mss = &curr_channel_entry->value.mss;
       } else {
         HASH_ITER(hh, curr_channel_entry->value.endpoints, endpoint_entry,
                   tmp_endpoint_entry) {
-          if (memcmp(endpoint_entry->value.id, curr_ctx_entry->value.mss_root,
+          if (memcmp(endpoint_entry->value.mss.root,
+                     curr_ctx_entry->value.mss_root,
                      MAM_CHANNEL_ID_SIZE) == 0) {
             curr_ctx_entry->value.mss = &endpoint_entry->value.mss;
           }
