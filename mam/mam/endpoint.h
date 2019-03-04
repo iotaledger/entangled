@@ -21,7 +21,6 @@ extern "C" {
 #endif
 
 typedef struct mam_endpoint_s {
-  trit_t id[MAM_ENDPOINT_ID_SIZE];
   trits_t name;
   mam_mss_t mss;
 } mam_endpoint_t;
