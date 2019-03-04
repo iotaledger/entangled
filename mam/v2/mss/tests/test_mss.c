@@ -21,7 +21,7 @@
 #if defined(MAM2_MSS_TRAVERSAL)
 #define def_test_mss(D, sfx)                           \
   typedef struct test_mss##sfx##_s {                   \
-    mss_t m;                                           \
+    mam_mss_t m;                                       \
     trit_t auth_path[MAM2_MSS_MT_AUTH_WORDS(D)];       \
     uint32_t ap_check;                                 \
     trit_t nodes_hashes[MAM2_MSS_MT_HASH_WORDS(D, 1)]; \
@@ -41,17 +41,17 @@
 #endif
 
 #if defined(MAM2_MSS_TRAVERSAL)
-#define def_test_mss_init(D, sfx)                          \
-  static mss_t *test_mss_init##sfx(test_mss##sfx##_t *m) { \
-    m->m.auth_path = m->auth_path;                         \
-    m->ap_check = 0xdeadbeef;                              \
-    m->m.nodes_hashes = m->nodes_hashes;                   \
-    m->hs_check = 0xdeadbeef;                              \
-    m->m.nodes = m->nodes;                                 \
-    m->ns_check = 0xdeadbeef;                              \
-    m->m.stacks = m->stacks;                               \
-    m->ss_check = 0xdeadbeef;                              \
-    return &m->m;                                          \
+#define def_test_mss_init(D, sfx)                              \
+  static mam_mss_t *test_mss_init##sfx(test_mss##sfx##_t *m) { \
+    m->m.auth_path = m->auth_path;                             \
+    m->ap_check = 0xdeadbeef;                                  \
+    m->m.nodes_hashes = m->nodes_hashes;                       \
+    m->hs_check = 0xdeadbeef;                                  \
+    m->m.nodes = m->nodes;                                     \
+    m->ns_check = 0xdeadbeef;                                  \
+    m->m.stacks = m->stacks;                                   \
+    m->ss_check = 0xdeadbeef;                                  \
+    return &m->m;                                              \
   }
 #else
 #define def_test_mss_init(D, sfx)                          \
@@ -99,7 +99,7 @@ def_test_mss_check(4, 4);
 // def_test_mss_check(10, x);
 // def_test_mss_check(MAM2_MSS_TEST_MAX_D, );
 
-static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
+static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng,
                            mss_mt_height_t max_height) {
   bool r = true;
   retcode_t e;
@@ -107,7 +107,6 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
   MAM2_TRITS_DEF0(key, MAM2_PRNG_KEY_SIZE);
   MAM2_TRITS_DEF0(nonce, 24);
   MAM2_TRITS_DEF0(hash, MAM2_MSS_HASH_SIZE);
-  MAM2_TRITS_DEF0(pk, MAM2_MSS_PK_SIZE);
   MAM2_TRITS_DEF0(pk2, MAM2_MSS_PK_SIZE);
   MAM2_TRITS_DEF0(sig_, MAM2_MSS_SIG_SIZE(5));
   MAM2_TRITS_DEF0(sig2_, MAM2_MSS_SIG_SIZE(5));
@@ -117,7 +116,6 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
   key = MAM2_TRITS_INIT(key, MAM2_PRNG_KEY_SIZE);
   nonce = MAM2_TRITS_INIT(nonce, 24);
   hash = MAM2_TRITS_INIT(hash, MAM2_MSS_HASH_SIZE);
-  pk = MAM2_TRITS_INIT(pk, MAM2_MSS_PK_SIZE);
   pk2 = MAM2_TRITS_INIT(pk2, MAM2_MSS_PK_SIZE);
   sig_ = MAM2_TRITS_INIT(sig_, MAM2_MSS_SIG_SIZE(5));
   sig2_ = MAM2_TRITS_INIT(sig2_, MAM2_MSS_SIG_SIZE(5));
@@ -141,27 +139,27 @@ static bool mss_store_test(mss_t *mss1, mss_t *mss2, mam_prng_t *prng,
     sig = trits_take(sig_, MAM2_MSS_SIG_SIZE(curr_height));
     sig2 = trits_take(sig2_, MAM2_MSS_SIG_SIZE(curr_height));
 
-    mss_init(mss1, prng, curr_height, nonce, trits_null());
-    mss_init(mss2, prng, curr_height, nonce, trits_null());
-    mss_gen(mss1, pk);
+    mam_mss_init(mss1, prng, curr_height, nonce, trits_null());
+    mam_mss_init(mss2, prng, curr_height, nonce, trits_null());
+    mam_mss_gen(mss1);
 
     do {
-      mss_sign(mss1, hash, sig);
+      mam_mss_sign(mss1, hash, sig);
 
-      store = trits_take(store_, mss_serialized_size(mss1));
-      mss_serialize(mss1, store);
-      e = mss_deserialize(&store, mss2);
+      store = trits_take(store_, mam_mss_serialized_size(mss1));
+      mam_mss_serialize(mss1, store);
+      e = mam_mss_deserialize(&store, mss2);
       MAM2_ASSERT(RC_OK == e);
-      mss_sign(mss2, hash, sig2);
+      mam_mss_sign(mss2, hash, sig2);
 
       r = r && trits_cmp_eq(sig, sig2);
-    } while (mss_next(mss1));
+    } while (mam_mss_next(mss1));
   }
 
   return r;
 }
 
-static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
+static bool mss_test(mam_mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
                      mss_mt_height_t max_height) {
   bool r = true;
   MAM2_TRITS_DEF0(key, MAM2_PRNG_KEY_SIZE);
@@ -199,46 +197,48 @@ static bool mss_test(mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
         trits_take(trits_drop(sig, MAM2_MSS_SKN_SIZE), MAM2_WOTS_SIG_SIZE);
     trits_t sig_apath = trits_drop(sig, MAM2_MSS_SKN_SIZE + MAM2_WOTS_SIG_SIZE);
 
-    mss_init(mss, prng, curr_height, nonce, trits_null());
+    mam_mss_init(mss, prng, curr_height, nonce, trits_null());
 
-    mss_gen(mss, pk);
+    mam_mss_gen(mss);
+
+    trits_t pk = trits_from_rep(MAM2_MSS_PK_SIZE, mss->root);
 
     do {
       if (curr_height > 1 && ((rand_handle_rand() % 2) == 0)) {
         continue;
       }
-      mss_sign(mss, hash, sig);
+      mam_mss_sign(mss, hash, sig);
       mam_spongos_init(&wots_spongos);
-      r = r && mss_verify(spongos, &wots_spongos, hash, sig, pk);
+      r = r && mam_mss_verify(spongos, &wots_spongos, hash, sig, pk);
 
       /* H is ignored, makes no sense to modify and check */
       trits_put1(hash, trit_add(trits_get1(hash), 1));
-      r = r && !mss_verify(spongos, &wots_spongos, hash, sig, pk);
+      r = r && !mam_mss_verify(spongos, &wots_spongos, hash, sig, pk);
       trits_put1(hash, trit_sub(trits_get1(hash), 1));
 
       trits_put1(sig_skn, trit_add(trits_get1(sig_skn), 1));
-      r = r && !mss_verify(spongos, &wots_spongos, hash, sig, pk);
+      r = r && !mam_mss_verify(spongos, &wots_spongos, hash, sig, pk);
       trits_put1(sig_skn, trit_sub(trits_get1(sig_skn), 1));
 
       /* WOTS sig is ignored, makes no sense to modify and check */
       trits_put1(sig_wots, trit_add(trits_get1(sig_wots), 1));
-      r = r && !mss_verify(spongos, &wots_spongos, hash, sig, pk);
+      r = r && !mam_mss_verify(spongos, &wots_spongos, hash, sig, pk);
       trits_put1(sig_wots, trit_sub(trits_get1(sig_wots), 1));
 
       if (!trits_is_empty(sig_apath)) {
         trits_put1(sig_apath, trit_add(trits_get1(sig_apath), 1));
-        r = r && !mss_verify(spongos, &wots_spongos, hash, sig, pk);
+        r = r && !mam_mss_verify(spongos, &wots_spongos, hash, sig, pk);
         trits_put1(sig_apath, trit_sub(trits_get1(sig_apath), 1));
       }
 
-      r = r && !mss_verify(spongos, &wots_spongos, hash,
-                           trits_take(sig, trits_size(sig) - 1), pk);
+      r = r && !mam_mss_verify(spongos, &wots_spongos, hash,
+                               trits_take(sig, trits_size(sig) - 1), pk);
 
       trits_put1(pk, trit_add(trits_get1(pk), 1));
-      r = r && !mss_verify(spongos, &wots_spongos, hash, sig, pk);
+      r = r && !mam_mss_verify(spongos, &wots_spongos, hash, sig, pk);
       trits_put1(pk, trit_sub(trits_get1(pk), 1));
 
-    } while (mss_next(mss));
+    } while (mam_mss_next(mss));
   }
 
   trits_free(sig_);
@@ -259,11 +259,11 @@ static void mss_meta_test(void) {
   mam_spongos_t sg;
 
   mam_prng_t p;
-  mss_t *m1 = test_mss_init1(_m1);
-  mss_t *m2 = test_mss_init2(_m2);
-  mss_t *m3 = test_mss_init3(_m3);
-  mss_t *m4 = test_mss_init4(_m4);
-  mss_t *m42 = test_mss_init4(_m42);
+  mam_mss_t *m1 = test_mss_init1(_m1);
+  mam_mss_t *m2 = test_mss_init2(_m2);
+  mam_mss_t *m3 = test_mss_init3(_m3);
+  mam_mss_t *m4 = test_mss_init4(_m4);
+  mam_mss_t *m42 = test_mss_init4(_m42);
   // mss_t *m5 = test_mss_init5(_m5);
   // mss_t *mx = test_mss_initx(_mx);
   // mss_t *m = test_mss_init(_m);

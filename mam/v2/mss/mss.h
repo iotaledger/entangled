@@ -115,7 +115,9 @@ typedef struct mss_s {
 #endif
   trits_t nonce1,
       nonce2; /*!< Nonce = `N1`||`N2`, stored pointers only, NOT copies. */
-} mss_t;
+
+  trit_t root[MAM2_MSS_PK_SIZE];
+} mam_mss_t;
 
 #if defined(MAM2_MSS_TRAVERSAL)
 /*! \note
@@ -154,16 +156,15 @@ It is achieved by allocating one extra node:
  * @return void
  */
 
-void mss_init(mss_t *mss, mam_prng_t *prng, mss_mt_height_t height,
-              trits_t nonce1, trits_t nonce2);
+void mam_mss_init(mam_mss_t *mss, mam_prng_t *prng, mss_mt_height_t height,
+                  trits_t nonce1, trits_t nonce2);
 /**
  * Generate MSS keys, stores current and next auth_path
  *
  * @param mss [in] MSS interface
- * @param pk [out] [out] public key, Merkle-tree root
  * @return void
  */
-void mss_gen(mss_t *mss, trits_t pk);
+void mam_mss_gen(mam_mss_t *mss);
 
 /**
  * Encodes mss height and current sk index
@@ -172,8 +173,8 @@ void mss_gen(mss_t *mss, trits_t pk);
  * @param skn [out] encoded height and current private key number
  * @return void
  */
-void mss_skn(
-    mss_t const *const mss, /*!< [in] MSS interface */
+void mam_mss_skn(
+    mam_mss_t const *const mss, /*!< [in] MSS interface */
     trits_t skn /*!< [out] encoded height and current private key number */
 );
 
@@ -188,7 +189,7 @@ void mss_skn(
  *
  * @return void
  */
-void mss_auth_path(mss_t *mss, mss_mt_idx_t skn, trits_t path);
+void mam_mss_auth_path(mam_mss_t *mss, mss_mt_idx_t skn, trits_t path);
 
 /**
  * Signs a hash
@@ -199,9 +200,9 @@ void mss_auth_path(mss_t *mss, mss_mt_idx_t skn, trits_t path);
  *
  * @return void
  */
-void mss_sign(mss_t *mss, trits_t hash, trits_t sig);
+void mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig);
 
-bool mss_next(mss_t *mss);
+bool mam_mss_next(mam_mss_t *mss);
 
 /**
  * Verifies MSS signature.
@@ -214,8 +215,8 @@ bool mss_next(mss_t *mss);
  *
  * @return bool True is the signature is correct, False otherwise
  */
-bool mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos,
-                trits_t hash, trits_t sig, trits_t pk);
+bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos,
+                    trits_t hash, trits_t sig, trits_t pk);
 
 /**
  * Allocate memory for internal Merkle tree structure.
@@ -230,7 +231,7 @@ bool mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos,
  *
  * @return void
  */
-retcode_t mss_create(mss_t *mss, mss_mt_height_t height);
+retcode_t mam_mss_create(mam_mss_t *mss, mss_mt_height_t height);
 
 /**
  * Deallocate memory for internal Merkle tree structure.
@@ -240,7 +241,7 @@ retcode_t mss_create(mss_t *mss, mss_mt_height_t height);
  *
  * @return void
  */
-void mss_destroy(mss_t *mss);
+void mam_mss_destroy(mam_mss_t *mss);
 
 /**
  * returns The size of a serialized Merkle tree.
@@ -250,7 +251,7 @@ void mss_destroy(mss_t *mss);
  * @return size_t The size for stored MT
  */
 
-size_t mss_serialized_size(mss_t const *const mss);
+size_t mam_mss_serialized_size(mam_mss_t const *const mss);
 
 /**
  * Serialize Merkle tree.
@@ -261,7 +262,7 @@ size_t mss_serialized_size(mss_t const *const mss);
  * @return void
  */
 
-void mss_serialize(mss_t const *const mss, trits_t buffer);
+void mam_mss_serialize(mam_mss_t const *const mss, trits_t buffer);
 
 /**
  * Deerialize Merkle tree.
@@ -271,7 +272,7 @@ void mss_serialize(mss_t const *const mss, trits_t buffer);
  *
  * @return void
  */
-retcode_t mss_deserialize(trits_t *buffer, mss_t *mss);
+retcode_t mam_mss_deserialize(trits_t *buffer, mam_mss_t *mss);
 
 #ifdef __cplusplus
 }

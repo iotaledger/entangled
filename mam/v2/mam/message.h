@@ -26,6 +26,7 @@
 #include "mam/v2/wots/wots.h"
 
 #define MAM2_MSG_ID_SIZE 63
+#define MAM2_MSG_ORD_SIZE 18
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,7 +53,7 @@ typedef enum mam_msg_checksum_e {
 typedef struct mam_msg_send_context_s {
   mam_spongos_t spongos;
   trint18_t ord;
-  mss_t *mss;
+  mam_mss_t *mss;
 } mam_msg_send_context_t;
 
 typedef struct mam_msg_recv_context_s {
@@ -73,7 +74,7 @@ void mam_msg_send(mam_msg_send_context_t *ctx, mam_prng_t *prng,
                   mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks,
                   trits_t *msg);
 
-size_t mam_msg_send_packet_size(mam_msg_checksum_t checksum, mss_t *mss,
+size_t mam_msg_send_packet_size(mam_msg_checksum_t checksum, mam_mss_t *mss,
                                 size_t payload_size);
 
 void mam_msg_send_packet(mam_msg_send_context_t *ctx,
@@ -86,6 +87,15 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
 
 retcode_t mam_msg_recv_packet(mam_msg_recv_context_t *ctx, trits_t *packet,
                               trits_t *payload);
+
+size_t mam_msg_send_ctx_serialized_size(
+    mam_msg_send_context_t const *const ctx);
+
+void mam_msg_send_ctx_serialize(mam_msg_send_context_t const *const ctx,
+                                trits_t *const buffer);
+
+retcode_t mam_msg_send_ctx_deserialize(trits_t *const buffer,
+                                       mam_msg_send_context_t *const ctx);
 
 #ifdef __cplusplus
 }

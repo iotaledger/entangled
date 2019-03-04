@@ -50,8 +50,8 @@ static bool mam_channel_t_set_cmp(mam_channel_t_set_t const channels_1,
             MAM2_TRITS_INIT(sig1, MAM2_MSS_SIG_SIZE(entry_1->value.mss.height));
         sig2 =
             MAM2_TRITS_INIT(sig2, MAM2_MSS_SIG_SIZE(entry_2->value.mss.height));
-        mss_sign(&entry_1->value.mss, hash, sig1);
-        mss_sign(&entry_2->value.mss, hash, sig2);
+        mam_mss_sign(&entry_1->value.mss, hash, sig1);
+        mam_mss_sign(&entry_2->value.mss, hash, sig2);
         if (trits_cmp_eq(sig1, sig2)) {
           match++;
           break;
