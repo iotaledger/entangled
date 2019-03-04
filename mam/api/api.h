@@ -99,6 +99,12 @@ retcode_t mam_api_bundle_read_packet(mam_api_t *const api,
                                      tryte_t **const payload,
                                      size_t *const payload_size);
 
+size_t mam_api_serialized_size(mam_api_t const *const api);
+
+void mam_api_serialize(mam_api_t const *const api, trits_t *const buffer);
+
+retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api);
+
 #ifdef __cplusplus
 }
 #endif
