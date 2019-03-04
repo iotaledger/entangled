@@ -19,14 +19,6 @@
 extern "C" {
 #endif
 
-typedef flex_hash_array_t hashes_t;
-typedef flex_hash_array_t address_list_t;
-typedef flex_hash_array_t inputs_list_t;
-typedef flex_hash_array_t transfer_list_t;
-typedef flex_hash_array_t transaction_list_t;
-typedef flex_hash_array_t booleans_t;
-typedef flex_hash_array_t input_list_t;
-
 typedef struct {
   int64_t balance;
   int32_t key_index;
