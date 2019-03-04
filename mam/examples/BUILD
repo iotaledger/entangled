@@ -3,7 +3,7 @@ cc_binary(
     srcs = ["send.c"],
     deps = [
         ":commmon",
-        "//cclient:api",
+        "//cclient/api",
         "//common/trinary:tryte_ascii",
         "//mam/api",
     ],
@@ -14,7 +14,7 @@ cc_binary(
     srcs = ["recv.c"],
     deps = [
         ":commmon",
-        "//cclient:api",
+        "//cclient/api",
         "//common/trinary:tryte_ascii",
         "//mam/api",
     ],

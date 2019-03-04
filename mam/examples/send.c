@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-#include "cclient/iota_client_extended_api.h"
+#include "cclient/api/extended/extended_api.h"
 #include "common/trinary/tryte_ascii.h"
 #include "mam/api/api.h"
 #include "mam/examples/common.h"
