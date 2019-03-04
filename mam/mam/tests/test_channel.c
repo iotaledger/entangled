@@ -39,8 +39,8 @@ static bool mam_channel_t_set_cmp(mam_channel_t_set_t const channels_1,
 
   HASH_ITER(hh, channels_1, entry_1, tmp_1) {
     HASH_ITER(hh, channels_2, entry_2, tmp_2) {
-      if (memcmp(entry_1->value.id, entry_2->value.id, MAM_ENDPOINT_ID_SIZE) ==
-              0 &&
+      if (memcmp(entry_1->value.mss.root, entry_2->value.mss.root,
+                 MAM_ENDPOINT_ID_SIZE) == 0 &&
           trits_cmp_eq(entry_1->value.name, entry_2->value.name) &&
           memcmp(entry_1->value.msg_ord, entry_2->value.msg_ord,
                  MAM_CHANNEL_MSG_ORD_SIZE) == 0) {

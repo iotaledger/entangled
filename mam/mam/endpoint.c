@@ -14,7 +14,7 @@
 #include "mam/pb3/pb3.h"
 
 trits_t mam_endpoint_id(mam_endpoint_t const *const endpoint) {
-  return trits_from_rep(MAM_ENDPOINT_ID_SIZE, endpoint->id);
+  return trits_from_rep(MAM_ENDPOINT_ID_SIZE, endpoint->mss.root);
 }
 
 trits_t mam_endpoint_channel_name(mam_endpoint_t const *const endpoint) {
@@ -49,9 +49,6 @@ retcode_t mam_endpoint_create(mam_prng_t const *const prng,
 
   mam_mss_gen(&endpoint->mss);
 
-  trits_t pk1 = trits_from_rep(MAM_MSS_PK_SIZE, endpoint->mss.root);
-  trits_copy(pk1, mam_endpoint_id(endpoint));
-
   return ret;
 }
 
@@ -78,9 +75,7 @@ retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t *const endpoints) {
 size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint) {
   size_t mss_size = mam_mss_serialized_size(&endpoint->mss);
 
-  return pb3_sizeof_ntrytes(MAM_ENDPOINT_ID_SIZE /
-                            NUMBER_OF_TRITS_IN_A_TRYTE) +  // id
-         pb3_sizeof_size_t(trits_size(endpoint->name)) +   // name size
+  return pb3_sizeof_size_t(trits_size(endpoint->name)) +  // name size
          pb3_sizeof_ntrytes(trits_size(endpoint->name) /
                             NUMBER_OF_TRITS_IN_A_TRYTE) +            // name
          pb3_sizeof_size_t(mss_size) +                               // mss size
@@ -91,8 +86,6 @@ void mam_endpoint_serialize(mam_endpoint_t const *const endpoint,
                             trits_t *const buffer) {
   size_t mss_size = mam_mss_serialized_size(&endpoint->mss);
 
-  pb3_encode_ntrytes(trits_from_rep(MAM_ENDPOINT_ID_SIZE, endpoint->id),
-                     buffer);                             // id
   pb3_encode_size_t(trits_size(endpoint->name), buffer);  // name size
   pb3_encode_ntrytes(endpoint->name, buffer);             // name
   pb3_encode_size_t(mss_size, buffer);                    // mss size
@@ -109,12 +102,6 @@ retcode_t mam_endpoint_deserialize(trits_t *const buffer,
   retcode_t ret = RC_OK;
   size_t size = 0;
   mss_mt_height_t height = 0;
-
-  if ((ret = pb3_decode_ntrytes(
-           trits_from_rep(MAM_ENDPOINT_ID_SIZE, endpoint->id), buffer)) !=
-      RC_OK) {  // id
-    return ret;
-  }
 
   if ((ret = pb3_decode_size_t(&size, buffer)) != RC_OK) {  // name size
     return ret;

@@ -24,7 +24,6 @@ extern "C" {
 #endif
 
 typedef struct mam_channel_s {
-  trit_t id[MAM_CHANNEL_ID_SIZE];
   trits_t name;
   trit_t msg_ord[MAM_CHANNEL_MSG_ORD_SIZE];
   mam_mss_t mss;

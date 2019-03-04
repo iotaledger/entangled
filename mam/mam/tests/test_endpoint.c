@@ -41,8 +41,8 @@ static bool mam_endpoint_t_set_cmp(mam_endpoint_t_set_t const endpoints_1,
 
   HASH_ITER(hh, endpoints_1, entry_1, tmp_1) {
     HASH_ITER(hh, endpoints_2, entry_2, tmp_2) {
-      if (memcmp(entry_1->value.id, entry_2->value.id, MAM_ENDPOINT_ID_SIZE) ==
-              0 &&
+      if (memcmp(entry_1->value.mss.root, entry_2->value.mss.root,
+                 MAM_ENDPOINT_ID_SIZE) == 0 &&
           trits_cmp_eq(entry_1->value.name, entry_2->value.name)) {
         MAM_TRITS_DEF0(sig1, MAM_MSS_SIG_SIZE(entry_1->value.mss.height));
         MAM_TRITS_DEF0(sig2, MAM_MSS_SIG_SIZE(entry_2->value.mss.height));
