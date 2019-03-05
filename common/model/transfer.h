@@ -56,6 +56,7 @@ typedef struct _transfer {
   transfer_type_e type;
   const flex_trit_t *address;
   const flex_trit_t *tag;
+  flex_trit_t obsolete_tag[FLEX_TRIT_SIZE_81];
   int64_t value;
   uint64_t timestamp;
   void *meta;  // extend informations depended on transfer type.
