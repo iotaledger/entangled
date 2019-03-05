@@ -16,6 +16,9 @@
 #define LOW_3 0xFFC0000007FFFFFF
 #define HIGH_3 0x003FFFFFFFFFFFFF
 
+uint64_t const HIGH_BITS = 0xFFFFFFFFFFFFFFFF;
+uint64_t const LOW_BITS = 0x0000000000000000;
+
 void ptrit_offset(ptrit_t *const trits, size_t const length) {
   if (length < 4) {
     return;
