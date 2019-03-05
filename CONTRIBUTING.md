@@ -1,5 +1,25 @@
 # Contributing to Project Guidelines
 
+## Create a global .gitignore  
+The goal is to exclude the system and IDE directories from the .gitignore of this repository. Please read [Ignoring files](https://help.github.com/articles/ignoring-files/)  
+If you didn't setup global .gitignore before, here is an example for adding it on your system.  
+Feel free to create a suitable ignore file from https://www.gitignore.io base on your environment.  
+
+Ubuntu or MacOS  
+
+```
+git config --global core.excludesfile ~/.gitignore_global
+curl https://www.gitignore.io/api/vim,bazel,gradle,android,eclipse,intellij,visualstudio,androidstudio,visualstudiocode -o ~/.gitignore_global
+```
+
+Windows  
+
+```
+git config --global core.excludesfile "%USERPROFILE%\.gitignore_global"
+```
+
+`curl` is not out-of-the-box on Windows, you need to download and put the file into "%USERPROFILE%\\.gitignore\_global"  
+
 ## Coding Style
 The majority of the code in this repository adheres to [Google's C++ guidelines](https://google.github.io/styleguide/cppguide.html). Below are additional rules which we adhere to:
 
