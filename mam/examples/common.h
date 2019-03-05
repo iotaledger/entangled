@@ -11,7 +11,8 @@
 #ifndef __MAM_EXAMPLES_COMMON_H__
 #define __MAM_EXAMPLES_COMMON_H__
 
-#include "cclient/iota_client_extended_api.h"
+#include "cclient/api/core/core_api.h"
+#include "cclient/api/extended/extended_api.h"
 #include "common/trinary/trit_tryte.h"
 #include "common/trinary/tryte_ascii.h"
 #include "mam/api/api.h"

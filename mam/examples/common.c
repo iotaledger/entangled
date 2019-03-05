@@ -43,7 +43,7 @@ retcode_t mam_example_create_channel(mam_api_t *const api,
     return EXIT_FAILURE;
   }
   mam_channel_create(&api->prng, TEST_MSS_DEPTH, channel_name, *channel);
-  trits_to_trytes((*channel)->id, address, NUM_TRITS_ADDRESS);
+  trits_to_trytes(mam_channel_id(*channel).p, address, NUM_TRITS_ADDRESS);
   fprintf(stderr, "Address: ");
   for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
     fprintf(stderr, "%c", address[i]);

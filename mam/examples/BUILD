@@ -44,7 +44,7 @@ cc_library(
     srcs = ["common.c"],
     hdrs = ["common.h"],
     deps = [
-        "//cclient:api",
+        "//cclient/api",
         "//common/trinary:trit_tryte",
         "//common/trinary:tryte_ascii",
         "//mam/api",
