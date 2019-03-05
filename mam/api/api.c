@@ -196,7 +196,7 @@ retcode_t mam_api_bundle_write_header(
 
     mam_spongos_hashn(&ctx.spongos, 2, msg_id_parts,
                       trits_from_rep(MAM_MSG_ID_SIZE, msg_id));
-    add_assign(ch->msg_ord, MAM_MSG_ID_SIZE, 1);
+    add_assign(ch->msg_ord, MAM_CHANNEL_MSG_ORD_SIZE, 1);
     mam_api_tag(tag, msg_id, 0);
   }
 
