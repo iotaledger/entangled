@@ -107,7 +107,7 @@ typedef struct {
                                             get_trytes_req_t const* const req,
                                             char_buffer_t* out);
   retcode_t (*get_trytes_deserialize_response)(serializer_t const* const s,
-                                               const char* const obj,
+                                               char const* const obj,
                                                get_trytes_res_t* const res);
 
   retcode_t (*attach_to_tangle_serialize_request)(
