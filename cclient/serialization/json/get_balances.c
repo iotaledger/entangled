@@ -77,10 +77,11 @@ retcode_t json_get_balances_deserialize_request(serializer_t const *const s,
   if (ret) {
     goto end;
   }
-
-  ret = json_array_to_hash243_queue(json_obj, "tips", &req->tips);
-  if (ret) {
-    goto end;
+  if (cJSON_GetObjectItemCaseSensitive(json_obj, "tips")) {
+    ret = json_array_to_hash243_queue(json_obj, "tips", &req->tips);
+    if (ret) {
+      goto end;
+    }
   }
 
 end:
