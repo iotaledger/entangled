@@ -22,32 +22,36 @@ trits_t mam_psk_trits(mam_psk_t const *const psk) {
 }
 
 size_t mam_psks_serialized_size(mam_psk_t_set_t const psks) {
-  return mam_psk_t_set_size(psks) * sizeof(mam_psk_t);
+  return pb3_sizeof_size_t(mam_psk_t_set_size(psks)) +
+         mam_psk_t_set_size(psks) * sizeof(mam_psk_t);
 }
 
-retcode_t mam_psks_serialize(mam_psk_t_set_t const psks, trits_t trits) {
+retcode_t mam_psks_serialize(mam_psk_t_set_t const psks, trits_t *const trits) {
   mam_psk_t_set_entry_t *entry = NULL;
   mam_psk_t_set_entry_t *tmp = NULL;
 
+  pb3_encode_size_t(mam_psk_t_set_size(psks), trits);
+
   HASH_ITER(hh, psks, entry, tmp) {
-    pb3_encode_ntrytes(trits_from_rep(MAM_PSK_ID_SIZE, entry->value.id),
-                       &trits);
+    pb3_encode_ntrytes(trits_from_rep(MAM_PSK_ID_SIZE, entry->value.id), trits);
     pb3_encode_ntrytes(trits_from_rep(MAM_PSK_KEY_SIZE, entry->value.key),
-                       &trits);
+                       trits);
   }
 
   return RC_OK;
 }
 
-retcode_t mam_psks_deserialize(trits_t const trits,
+retcode_t mam_psks_deserialize(trits_t *const trits,
                                mam_psk_t_set_t *const psks) {
   retcode_t ret = RC_OK;
-  trits_t cpy = trits;
   mam_psk_t psk;
 
-  while (!trits_is_empty(cpy)) {
-    pb3_decode_ntrytes(trits_from_rep(MAM_PSK_ID_SIZE, psk.id), &cpy);
-    pb3_decode_ntrytes(trits_from_rep(MAM_PSK_KEY_SIZE, psk.key), &cpy);
+  size_t container_size = 0;
+  pb3_decode_size_t(&container_size, trits);
+
+  while (!trits_is_empty(*trits) && container_size-- > 0) {
+    pb3_decode_ntrytes(trits_from_rep(MAM_PSK_ID_SIZE, psk.id), trits);
+    pb3_decode_ntrytes(trits_from_rep(MAM_PSK_KEY_SIZE, psk.key), trits);
     if ((ret = mam_psk_t_set_add(psks, &psk)) != RC_OK) {
       break;
     }

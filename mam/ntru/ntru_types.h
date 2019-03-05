@@ -33,8 +33,8 @@ typedef mam_ntru_pk_t_set_entry_t* mam_ntru_pk_t_set_t;
 
 size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set);
 retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
-                                 trits_t trits);
-retcode_t mam_ntru_pks_deserialize(trits_t const trits,
+                                 trits_t* const trits);
+retcode_t mam_ntru_pks_deserialize(trits_t* const trits,
                                    mam_ntru_pk_t_set_t* const ntru_pk_set);
 
 // NTRU layer interface
@@ -52,8 +52,8 @@ typedef mam_ntru_sk_t_set_entry_t* mam_ntru_sk_t_set_t;
 
 size_t mam_ntru_sks_serialized_size(mam_ntru_sk_t_set_t const ntru_sk_set);
 retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sk_set,
-                                 trits_t trits);
-retcode_t mam_ntru_sks_deserialize(trits_t const trits,
+                                 trits_t* const trits);
+retcode_t mam_ntru_sks_deserialize(trits_t* const trits,
                                    mam_ntru_sk_t_set_t* const ntru_sk_set);
 
 #endif  // __MAM_NTRU_NTRU_TYPES_H__
