@@ -65,7 +65,6 @@ retcode_t json_broadcast_transactions_deserialize_request(
 
   ret = json_array_to_hash8019_array(json_obj, kTrytes, out->trytes);
 
-done:
   cJSON_Delete(json_obj);
   return ret;
 }

@@ -28,11 +28,12 @@ retcode_t check_consistency_res_info_set(check_consistency_res_t* res,
   }
 
   char_buffer_set(res->info, info);
+  return RC_OK;
 }
 
-retcode_t check_consistency_res_free(check_consistency_res_t** res) {
+void check_consistency_res_free(check_consistency_res_t** res) {
   if (!res || !(*res)) {
-    return RC_NULL_PARAM;
+    return;
   }
 
   if ((*res)->info) {
