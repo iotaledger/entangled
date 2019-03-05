@@ -37,7 +37,6 @@ int main(int ac, char **av) {
     return EXIT_FAILURE;
   }
 
-  ERR_BIND_RETURN(mam_channel_t_set_add(api.channels, cha), ret);
   bundle_transactions_new(&bundle);
 
   {
