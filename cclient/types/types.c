@@ -75,66 +75,6 @@ void char_buffer_free(char_buffer_t* in) {
   }
 }
 
-retcode_t flex_hash_to_trytes(const trit_array_p hash, char* trytes) {
-  size_t trits_len = 0;
-  if (trytes == NULL) {
-    return RC_CCLIENT_FLEX_TRITS;
-  }
-
-  trits_len = flex_trits_to_trytes(
-      (signed char*)trytes, NUM_FLEX_TRITS_FOR_TRITS(hash->num_trits),
-      hash->trits, hash->num_trits, hash->num_trits);
-
-  if (trits_len == 0) {
-    return RC_CCLIENT_FLEX_TRITS;
-  }
-  return RC_OK;
-}
-
-retcode_t trytes_to_flex_hash(trit_array_p hash, const char* trytes) {
-  size_t str_len = strlen(trytes);
-  size_t trits_len = str_len * 3;
-  size_t ret_trytes = 0;
-  if (trits_len > hash->num_trits) {
-    trit_array_set_null(hash);
-    return RC_CCLIENT_FLEX_TRITS;
-  }
-  ret_trytes = flex_trits_from_trytes(hash->trits, trits_len,
-                                      (const tryte_t*)trytes, str_len, str_len);
-
-  if (ret_trytes == 0) {
-    trit_array_set_null(hash);
-    return RC_CCLIENT_FLEX_TRITS;
-  }
-
-  return RC_OK;
-}
-
-retcode_t flex_hash_to_char_buffer(trit_array_p hash, char_buffer_t* out) {
-  retcode_t ret = RC_OK;
-  size_t trits_len = 0;
-  if (hash == NULL || hash->trits == NULL) {
-    log_error(logger_id, "[%s:%d] %s \n", __func__, __LINE__,
-              STR_CCLIENT_NULL_PTR);
-    return RC_CCLIENT_NULL_PTR;
-  }
-  ret = char_buffer_allocate(out, hash->num_trits / 3);
-  if (ret != RC_OK) {
-    log_error(logger_id, "[%s:%d] %s \n", __func__, __LINE__,
-              error_2_string(ret));
-    return ret;
-  }
-
-  trits_len = flex_trits_to_trytes(
-      (signed char*)out->data, NUM_FLEX_TRITS_FOR_TRITS(hash->num_trits),
-      hash->trits, hash->num_trits, hash->num_trits);
-
-  if (trits_len == 0) {
-    return RC_CCLIENT_FLEX_TRITS;
-  }
-  return RC_OK;
-}
-
 static UT_icd ut_transactions_icd = {sizeof(iota_transaction_t), NULL, NULL,
                                      NULL};
 
