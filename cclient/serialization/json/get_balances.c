@@ -47,10 +47,8 @@ retcode_t json_get_balances_serialize_request(
     if (ret == RC_OK) {
       strncpy(out->data, json_text, len);
     }
-    cJSON_free((void *)json_text);
   }
 
-  cJSON_Delete(json_root);
   return ret;
 
 err:
@@ -79,9 +77,6 @@ retcode_t json_get_balances_deserialize_request(serializer_t const *const s,
   }
   if (cJSON_GetObjectItemCaseSensitive(json_obj, "tips")) {
     ret = json_array_to_hash243_queue(json_obj, "tips", &req->tips);
-    if (ret) {
-      goto end;
-    }
   }
 
 end:
@@ -124,10 +119,8 @@ retcode_t json_get_balances_serialize_response(
     if (ret == RC_OK) {
       strncpy(out->data, json_text, len);
     }
-    cJSON_free((void *)json_text);
   }
 
-  cJSON_Delete(json_root);
   return ret;
 
 err:

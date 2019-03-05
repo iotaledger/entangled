@@ -7,6 +7,7 @@
 
 #include "cclient/serialization/json/helpers.h"
 
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -73,9 +74,9 @@ retcode_t utarray_uint64_to_json_array(UT_array const* const ut,
     cJSON_AddItemToObject(json_root, obj_name, array_obj);
 
     uint64_t* p = NULL;
+    char buffer[20];
     while ((p = (uint64_t*)utarray_next(ut, p))) {
-      char buffer[20];
-      sprintf(buffer, "%lld", *p);
+      sprintf(buffer, "%" PRIu64, *p);
       cJSON_AddItemToArray(array_obj, cJSON_CreateString(buffer));
     }
   }
