@@ -289,8 +289,8 @@ static void test_api_read_msg(mam_api_t *const api,
   tryte_t *payload_trytes = NULL;
   size_t payload_size = 0;
 
-  TEST_ASSERT(mam_api_bundle_read_msg(api, bundle, &payload_trytes,
-                                      &payload_size) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_read(api, bundle, &payload_trytes,
+                                  &payload_size) == RC_OK);
 
   *payload2 = (char *)calloc(payload_size / 2 + 1, sizeof(char));
   trytes_to_ascii(payload_trytes, payload_size, *payload2);
@@ -436,8 +436,8 @@ static void test_api_multiple_packets() {
     bundle_transactions_new(&bundle);
     TEST_ASSERT(mam_api_bundle_write_header(&api, cha, NULL, NULL, NULL, NULL,
                                             NULL, 0, bundle, msg_id) == RC_OK);
-    TEST_ASSERT(mam_api_bundle_read_msg(&api, bundle, &payload_out,
-                                        &payload_out_size) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_read(&api, bundle, &payload_out,
+                                    &payload_out_size) == RC_OK);
     TEST_ASSERT(payload_out == NULL);
     TEST_ASSERT(payload_out_size == 0);
     bundle_transactions_free(&bundle);
@@ -449,8 +449,8 @@ static void test_api_multiple_packets() {
     TEST_ASSERT(mam_api_bundle_write_packet(
                     &api, cha, msg_id, payload_in, payload_in_size,
                     (mam_msg_checksum_t)(i % 3), bundle) == RC_OK);
-    TEST_ASSERT(mam_api_bundle_read_packet(&api, bundle, &payload_out,
-                                           &payload_out_size) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_read(&api, bundle, &payload_out,
+                                    &payload_out_size) == RC_OK);
     TEST_ASSERT_EQUAL_MEMORY(payload_in, payload_out, payload_in_size);
     free(payload_out);
     payload_out = NULL;

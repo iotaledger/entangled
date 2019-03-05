@@ -37,7 +37,7 @@ int main(int ac, char **av) {
 
   mam_psk_t_set_add(&api.psks, &psk);
 
-  if (mam_api_bundle_read_msg(&api, bundle, &payload_trytes, &payload_size) ==
+  if (mam_api_bundle_read(&api, bundle, &payload_trytes, &payload_size) ==
       RC_OK) {
     if (payload_trytes == NULL || payload_size == 0) {
       fprintf(stderr, "No payload\n");
