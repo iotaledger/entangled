@@ -19,9 +19,9 @@ extern "C" {
 #include "cclient/serialization/serializer.h"
 
 retcode_t json_get_balances_serialize_request(
-    const serializer_t* const s, get_balances_req_t const* const req,
+    serializer_t const* const s, get_balances_req_t const* const req,
     char_buffer_t* out);
-retcode_t json_get_balances_deserialize_request(const serializer_t* const s,
+retcode_t json_get_balances_deserialize_request(serializer_t const* const s,
                                                 char const* const obj,
                                                 get_balances_req_t* const req);
 retcode_t json_get_balances_serialize_response(
