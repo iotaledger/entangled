@@ -109,6 +109,10 @@ void mam_api_serialize(mam_api_t const *const api, trits_t *const buffer);
 
 retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api);
 
+retcode_t mam_api_save(mam_api_t const *const api, char const *const filename);
+
+retcode_t mam_api_load(char const *const filename, mam_api_t *const api);
+
 #ifdef __cplusplus
 }
 #endif

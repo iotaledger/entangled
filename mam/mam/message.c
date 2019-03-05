@@ -890,7 +890,7 @@ void mam_msg_send_ctx_serialize(mam_msg_send_context_t const *const ctx,
   mam_spongos_serialize(&ctx->spongos, buffer);
   trits_put18(*buffer, ctx->ord);
   trits_advance(buffer, MAM_MSG_ORD_SIZE);
-  pb3_encode_ntrytes(trits_from_rep(MAM_MSS_PK_SIZE, ctx->mss_root), buffer);
+  pb3_encode_ntrytes(trits_from_rep(MAM_MSS_PK_SIZE, ctx->mss->root), buffer);
 }
 
 retcode_t mam_msg_send_ctx_deserialize(trits_t *const buffer,

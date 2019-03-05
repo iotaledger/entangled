@@ -369,7 +369,7 @@ void serialize_send_ctx_test() {
   TEST_ASSERT_EQUAL_MEMORY(&send_ctx.spongos.sponge,
                            &deserialized_ctx.spongos.sponge, MAM_SPONGE_WIDTH);
 
-  TEST_ASSERT_EQUAL_MEMORY(&send_ctx.mss_root, &deserialized_ctx.mss_root,
+  TEST_ASSERT_EQUAL_MEMORY(&send_ctx.mss->root, &deserialized_ctx.mss_root,
                            MAM_MSS_PK_SIZE);
   TEST_ASSERT_EQUAL_INT(send_ctx.ord, deserialized_ctx.ord);
 }
