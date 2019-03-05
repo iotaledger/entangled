@@ -33,11 +33,13 @@ retcode_t json_get_balances_serialize_request(
 
   cJSON_AddItemToObject(json_root, "threshold",
                         cJSON_CreateNumber(obj->threshold));
-
-  ret = hash243_queue_to_json_array(obj->tips, json_root, "tips");
-  if (ret != RC_OK) {
-    goto err;
+  if (obj->tips) {
+    ret = hash243_queue_to_json_array(obj->tips, json_root, "tips");
+    if (ret != RC_OK) {
+      goto err;
+    }
   }
+
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
     len = strlen(json_text);
