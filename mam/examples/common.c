@@ -49,7 +49,8 @@ retcode_t mam_example_create_channel(mam_api_t *const api,
     fprintf(stderr, "%c", address[i]);
   }
   fprintf(stderr, "\n");
-  return RC_OK;
+
+  return mam_api_add_channel(api, *channel);
 }
 
 // TODO Merge into cclient

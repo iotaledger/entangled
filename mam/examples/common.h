@@ -22,6 +22,7 @@
   "9999999"
 #define TEST_CHANNEL_NAME "CHANAME"
 #define TEST_MSS_DEPTH 1
+#define MAM_FILE "mam.bin"
 
 #ifdef __cplusplus
 extern "C" {
