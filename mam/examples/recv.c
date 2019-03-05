@@ -30,18 +30,21 @@ int main(int ac, char **av) {
     return EXIT_FAILURE;
   }
 
-  receive_bundle(av[1], atoi(av[2]), av[3], bundle);
+  receive_bundle(av[1], atoi(av[2]), (tryte_t *)av[3], bundle);
 
   mam_psk_t_set_add(&api.psks, &psk);
 
   if (mam_api_bundle_read_msg(&api, bundle, &payload_trytes, &payload_size) ==
       RC_OK) {
-    char *payload = calloc(payload_size * 2 + 1, sizeof(char));
+    if (payload_trytes == NULL || payload_size == 0) {
+      fprintf(stderr, "No payload\n");
+    } else {
+      char *payload = calloc(payload_size * 2 + 1, sizeof(char));
 
-    trytes_to_ascii(payload_trytes, payload_size, payload);
-    fprintf(stderr, "Payload: %s\n", payload);
-    free(payload);
-
+      trytes_to_ascii(payload_trytes, payload_size, payload);
+      fprintf(stderr, "Payload: %s\n", payload);
+      free(payload);
+    }
   } else {
     fprintf(stderr, "mam_api_bundle_read_msg failed\n");
   }

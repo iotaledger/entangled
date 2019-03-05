@@ -41,7 +41,7 @@ int main(int ac, char **av) {
   {
     trit_t msg_id[MAM_MSG_ID_SIZE];
 
-    trytes_to_trits(av[4], msg_id, strlen(av[4]));
+    trytes_to_trits((tryte_t *)av[4], msg_id, strlen(av[4]));
     if ((ret = mam_example_write_packet(&api, channel, bundle, av[5],
                                         msg_id)) != RC_OK) {
       fprintf(stderr, "mam_example_write_packet failed with err %d\n", ret);

@@ -155,13 +155,6 @@ static transaction_array_t get_bundle_transactions(
     fprintf(stderr, "iota_client_find_transaction_objects failed with %d\n",
             err);
     return out_tx_objs;
-  } else {
-    fprintf(stderr, "iota_client_find_transaction_objects succeeded\n");
-  }
-
-  if (utarray_len(out_tx_objs) > 0) {
-    fprintf(stderr, "number of transactions for given bundle: %d\n",
-            utarray_len(out_tx_objs));
   }
 
   return out_tx_objs;
