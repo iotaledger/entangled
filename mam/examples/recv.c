@@ -25,9 +25,12 @@ int main(int ac, char **av) {
     return EXIT_FAILURE;
   }
 
-  if (mam_api_init(&api, (tryte_t *)DUMMY_SEED) != RC_OK) {
-    fprintf(stderr, "mam_api_init failed\n");
-    return EXIT_FAILURE;
+  // Loading or creating MAM API
+  if ((ret = mam_api_load(MAM_FILE, &api)) != RC_OK) {
+    if ((ret = mam_api_init(&api, (tryte_t *)av[3])) != RC_OK) {
+      fprintf(stderr, "mam_api_init failed with err %d\n", ret);
+      return EXIT_FAILURE;
+    }
   }
 
   receive_bundle(av[1], atoi(av[2]), (tryte_t *)av[3], bundle);
@@ -49,12 +52,17 @@ int main(int ac, char **av) {
     fprintf(stderr, "mam_api_bundle_read_msg failed\n");
   }
 
-  bundle_transactions_free(&bundle);
-
-  if (mam_api_destroy(&api) != RC_OK) {
-    fprintf(stderr, "mam_api_destroy failed\n");
-    ret = EXIT_FAILURE;
+  // Saving and destroying MAM API
+  if ((ret = mam_api_save(&api, MAM_FILE)) != RC_OK) {
+    fprintf(stderr, "mam_api_save failed with err %d\n", ret);
   }
+  if ((ret = mam_api_destroy(&api)) != RC_OK) {
+    fprintf(stderr, "mam_api_destroy failed with err %d\n", ret);
+    return EXIT_FAILURE;
+  }
+
+  // Cleanup
+  { bundle_transactions_free(&bundle); }
 
   return ret;
 }
