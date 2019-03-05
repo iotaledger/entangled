@@ -46,7 +46,14 @@ retcode_t iota_client_promote_transaction(
               error_2_string(ret_code));
     goto done;
   }
-  hash243_queue_push(&consistency_req->tails, tail_hash);
+
+  if ((ret_code = hash243_queue_push(&consistency_req->tails, tail_hash)) !=
+      RC_OK) {
+    log_error(client_extended_logger_id, "hash queue push failed: %s\n",
+              error_2_string(ret_code));
+    goto done;
+  }
+
   ret_code =
       iota_client_check_consistency(serv, consistency_req, consistency_res);
   if (ret_code != RC_OK) {
