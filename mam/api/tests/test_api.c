@@ -12,6 +12,8 @@
 
 #include "common/trinary/tryte_ascii.h"
 #include "mam/api/api.h"
+#include "mam/mam/mam_channel_t_set.h"
+#include "mam/ntru/mam_ntru_sk_t_set.h"
 #include "mam/test_utils/test_utils.h"
 
 static mam_api_t api;
@@ -473,16 +475,33 @@ static void test_api_serialization() {
   TEST_ASSERT_TRUE(
       mam_ntru_pk_t_set_cmp(&deserialized_api.ntru_pks, &api.ntru_pks));
   TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&deserialized_api.psks, &api.psks));
-
   TEST_ASSERT_TRUE(trit_t_to_mam_msg_send_context_t_map_cmp(
       &deserialized_api.send_ctxs, &api.send_ctxs));
   TEST_ASSERT_TRUE(trit_t_to_mam_msg_recv_context_t_map_cmp(
       &deserialized_api.recv_ctxs, &api.recv_ctxs));
-
   TEST_ASSERT_TRUE(
       mam_channel_t_set_cmp(&deserialized_api.channels, &api.channels));
 
   mam_api_destroy(&deserialized_api);
+}
+
+static void test_api_save_load() {
+  mam_api_t loaded_api;
+
+  TEST_ASSERT(mam_api_save(&api, "mam-api.bin") == RC_OK);
+  TEST_ASSERT(mam_api_load("mam-api.bin", &loaded_api) == RC_OK);
+
+  TEST_ASSERT_EQUAL_MEMORY(&loaded_api.prng, &api.prng, MAM_PRNG_KEY_SIZE);
+  TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&loaded_api.ntru_sks, &api.ntru_sks));
+  TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(&loaded_api.ntru_pks, &api.ntru_pks));
+  TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&loaded_api.psks, &api.psks));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_send_context_t_map_cmp(
+      &loaded_api.send_ctxs, &api.send_ctxs));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_recv_context_t_map_cmp(
+      &loaded_api.recv_ctxs, &api.recv_ctxs));
+  TEST_ASSERT_TRUE(mam_channel_t_set_cmp(&loaded_api.channels, &api.channels));
+
+  mam_api_destroy(&loaded_api);
 }
 
 int main(void) {
@@ -494,6 +513,7 @@ int main(void) {
   RUN_TEST(test_api_generic);
   RUN_TEST(test_api_multiple_packets);
   RUN_TEST(test_api_serialization);
+  RUN_TEST(test_api_save_load);
 
   /* destroy channels/endpoints */
   {
