@@ -19,7 +19,7 @@ int main(int ac, char **av) {
   retcode_t ret = RC_OK;
 
   if (ac != 4) {
-    fprintf(stderr, "usage: send <host> <port> <seed>\n");
+    fprintf(stderr, "usage: send-header <host> <port> <seed>\n");
     return EXIT_FAILURE;
   }
 

@@ -19,7 +19,8 @@ int main(int ac, char **av) {
   retcode_t ret = RC_OK;
 
   if (ac != 6) {
-    fprintf(stderr, "usage: send <host> <port> <seed> <msg_id> <payload>\n");
+    fprintf(stderr,
+            "usage: send-packet <host> <port> <seed> <msg_id> <payload>\n");
     return EXIT_FAILURE;
   }
 
