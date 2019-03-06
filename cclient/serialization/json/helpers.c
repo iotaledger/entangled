@@ -301,6 +301,10 @@ retcode_t json_array_to_hash243_queue(cJSON const* const obj,
   retcode_t ret_code = RC_OK;
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
+  if (!json_item) {
+    return RC_CCLIENT_JSON_KEY;
+  }
+
   if (cJSON_IsArray(json_item)) {
     cJSON* current_obj = NULL;
     cJSON_ArrayForEach(current_obj, json_item) {
