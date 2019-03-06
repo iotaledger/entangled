@@ -15,7 +15,7 @@ static FORCED_INLINE void ptrit_sbox(ptrit_t *const c, ptrit_t const *const s) {
   for (; i < STATE_LENGTH; ++i) {
     alpha = s[CURL_INDEX[i]].low;
     beta = s[CURL_INDEX[i]].high;
-    delta = beta ^ s[CURL_INDEX[i + 1]].low;
+    delta = alpha & (s[CURL_INDEX[i + 1]].low ^ beta);
 
     c[i].low = ~(delta & alpha);
     c[i].high = (alpha ^ s[CURL_INDEX[i + 1]].high) | delta;
