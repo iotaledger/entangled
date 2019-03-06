@@ -63,16 +63,6 @@ retcode_t mam_api_bundle_write_packet(
     mam_msg_checksum_t checksum, bundle_transactions_t *const bundle);
 
 /**
- * Checks if a bundle which is assumed to contain MAM message contains header
- *
- * @param bundle The bundle
- *
- * @return True if the bundle contains MAM header
- */
-
-bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
-
-/**
  * Reads MAM's session key and potentially the first packet using NTRU secret
  * key
  *
@@ -83,25 +73,10 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
  *
  * @return return code
  */
-
-retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
-                                  bundle_transactions_t const *const bundle,
-                                  tryte_t **const payload,
-                                  size_t *const payload_size);
-
-/**
- * Reads next packet
- *
- * @param api - The API
- * @param bundle - The bundle containing the MAM message
- *
- * @return return code
- */
-
-retcode_t mam_api_bundle_read_packet(mam_api_t *const api,
-                                     bundle_transactions_t const *const bundle,
-                                     tryte_t **const payload,
-                                     size_t *const payload_size);
+retcode_t mam_api_bundle_read(mam_api_t *const api,
+                              bundle_transactions_t const *const bundle,
+                              tryte_t **const payload,
+                              size_t *const payload_size);
 
 size_t mam_api_serialized_size(mam_api_t const *const api);
 

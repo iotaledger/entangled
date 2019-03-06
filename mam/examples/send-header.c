@@ -10,18 +10,16 @@
 
 #include <stdio.h>
 
-#include "mam/examples/common.h"
+#include "mam/examples/send-common.h"
 
 int main(int ac, char **av) {
   mam_api_t api;
-  int ret = EXIT_SUCCESS;
-  tryte_t *payload_trytes = NULL;
-  size_t payload_size = 0;
   bundle_transactions_t *bundle = NULL;
-  bundle_transactions_new(&bundle);
+  mam_channel_t *channel = NULL;
+  retcode_t ret = RC_OK;
 
   if (ac != 4) {
-    fprintf(stderr, "usage: recv <host> <port> <bundle>\n");
+    fprintf(stderr, "usage: send <host> <port> <seed>\n");
     return EXIT_FAILURE;
   }
 
@@ -33,23 +31,29 @@ int main(int ac, char **av) {
     }
   }
 
-  receive_bundle(av[1], atoi(av[2]), (tryte_t *)av[3], bundle);
+  // Creating channel
+  if ((ret = mam_example_create_channel(&api, &channel)) != RC_OK) {
+    fprintf(stderr, "mam_example_create_channel failed with err %d\n", ret);
+    return EXIT_FAILURE;
+  }
 
-  mam_psk_t_set_add(&api.psks, &psk);
+  bundle_transactions_new(&bundle);
 
-  if (mam_api_bundle_read(&api, bundle, &payload_trytes, &payload_size) ==
-      RC_OK) {
-    if (payload_trytes == NULL || payload_size == 0) {
-      fprintf(stderr, "No payload\n");
-    } else {
-      char *payload = calloc(payload_size * 2 + 1, sizeof(char));
+  {
+    trit_t msg_id[MAM_MSG_ID_SIZE];
 
-      trytes_to_ascii(payload_trytes, payload_size, payload);
-      fprintf(stderr, "Payload: %s\n", payload);
-      free(payload);
+    // Writing header to bundle
+    if ((ret = mam_example_write_header(&api, channel, bundle, msg_id)) !=
+        RC_OK) {
+      fprintf(stderr, "mam_example_write_header failed with err %d\n", ret);
+      return EXIT_FAILURE;
     }
-  } else {
-    fprintf(stderr, "mam_api_bundle_read_msg failed\n");
+  }
+
+  // Sending bundle
+  if ((ret = send_bundle(av[1], atoi(av[2]), bundle)) != RC_OK) {
+    fprintf(stderr, "send_bundle failed with err %d\n", ret);
+    return EXIT_FAILURE;
   }
 
   // Saving and destroying MAM API
@@ -64,5 +68,5 @@ int main(int ac, char **av) {
   // Cleanup
   { bundle_transactions_free(&bundle); }
 
-  return ret;
+  return EXIT_SUCCESS;
 }

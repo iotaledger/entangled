@@ -78,6 +78,7 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv,
     goto done;
   }
 
+  attach_req->trytes = NULL;
   attach_to_tangle_req_free(&attach_req);
 
   // store and broadcast
