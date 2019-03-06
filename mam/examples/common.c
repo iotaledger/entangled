@@ -118,12 +118,23 @@ static int idx_sort(void const *lhs, void const *rhs) {
 static void get_first_bundle_from_transactions(
     transaction_array_t const transactions,
     bundle_transactions_t *const bundle) {
-  iota_transaction_t *curr_tx;
+  iota_transaction_t *tail = NULL;
+  iota_transaction_t *curr_tx = NULL;
+  iota_transaction_t *prev = NULL;
 
   utarray_sort(transactions, idx_sort);
+  tail = (iota_transaction_t *)utarray_eltptr(transactions, 0);
+  bundle_transactions_add(bundle, tail);
 
+  prev = tail;
   TX_OBJS_FOREACH(transactions, curr_tx) {
-    bundle_transactions_add(bundle, curr_tx);
+    if (transaction_current_index(curr_tx) ==
+            (transaction_current_index(prev) + 1) &&
+        (memcmp(transaction_hash(curr_tx), transaction_trunk(prev),
+                FLEX_TRIT_SIZE_243) == 0)) {
+      bundle_transactions_add(bundle, curr_tx);
+      prev = curr_tx;
+    }
   }
 }
 
