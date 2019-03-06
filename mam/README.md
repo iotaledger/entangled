@@ -38,3 +38,8 @@ MAM allows for:
 *Troika* - Trinary hash function, it's transform function is used as the _Round_ function for the Sponge layer
 
 *Trits* - utility functions for manipulating trit arrays
+
+## How to use it?
+
+Examples for writing/reading messages to/from the tangle are available here:
+https://github.com/iotaledger/entangled/tree/develop/mam/examples
