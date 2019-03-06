@@ -49,8 +49,6 @@ retcode_t json_get_balances_serialize_request(
     }
   }
 
-  return ret;
-
 err:
   cJSON_Delete(json_root);
   return ret;
@@ -75,12 +73,9 @@ retcode_t json_get_balances_deserialize_request(serializer_t const *const s,
   if (ret) {
     goto end;
   }
-  if (cJSON_GetObjectItemCaseSensitive(json_obj, "tips")) {
-    ret = json_array_to_hash243_queue(json_obj, "tips", &req->tips);
-  }
+  ret = json_array_to_hash243_queue(json_obj, "tips", &req->tips);
 
 end:
-
   cJSON_Delete(json_obj);
   return ret;
 }
@@ -121,8 +116,6 @@ retcode_t json_get_balances_serialize_response(
     }
   }
 
-  return ret;
-
 err:
   cJSON_Delete(json_root);
   return ret;
@@ -149,12 +142,8 @@ retcode_t json_get_balances_deserialize_response(serializer_t const *const s,
   }
 
   ret = json_get_int(json_obj, "milestoneIndex", &out->milestoneIndex);
-  if (ret != RC_OK) {
-    goto end;
-  }
 
 end:
-
   cJSON_Delete(json_obj);
   return ret;
 }
