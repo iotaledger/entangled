@@ -315,8 +315,13 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
                       NUM_TRITS_TAG, NUM_TRITS_TAG);
 
   // If header
-  if (trits_get18(trits_from_rep(18, tag + MAM_MSG_ID_SIZE)) == 0) {
+  if (trits_get18(trits_from_rep(MAM_MSG_ORD_SIZE, tag + MAM_MSG_ID_SIZE)) ==
+      0) {
     mam_msg_recv_context_t ctx;
+
+    if (trit_t_to_mam_msg_recv_context_t_map_contains(&api->recv_ctxs, tag)) {
+      return RC_OK;
+    }
 
     flex_trits_to_trits(ctx.pk, NUM_TRITS_ADDRESS, transaction_address(curr_tx),
                         NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
