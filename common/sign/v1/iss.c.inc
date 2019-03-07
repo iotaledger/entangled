@@ -74,9 +74,9 @@ int _ISS_PREFIX(key_digest)(trit_t *key, trit_t *digest,
 
 int _ISS_PREFIX(address)(trit_t const *const digest, trit_t *const address,
                          size_t const digest_length, HASH_STATE *const state) {
+  _HASH_PREFIX(reset)(state);
   _HASH_PREFIX(absorb)(state, digest, digest_length);
   _HASH_PREFIX(squeeze)(state, address, HASH_LENGTH_TRIT);
-  _HASH_PREFIX(reset)(state);
   return 0;
 }
 
@@ -106,13 +106,14 @@ int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t const *const hash,
                             HASH_STATE *const state) {
   size_t i, j;
   trit_t *sig_start = sig, *sig_end = &sig[sig_len];
-  for (i = 0; sig < sig_end; i++, sig = &sig[HASH_LENGTH_TRIT]) {
-    for (j = 0; j < (HASH_TRYTE_VAL(hash, i) - TRYTE_VALUE_MIN); j++) {
+  for (i = 0, sig = sig_start; sig < sig_end; i++, sig = &sig[HASH_LENGTH_TRIT]) {
+    for (j = (hash[i] - TRYTE_VALUE_MIN); j-- > 0;) {
+      _HASH_PREFIX(reset)(state);
       _HASH_PREFIX(absorb)(state, sig, HASH_LENGTH_TRIT);
       _HASH_PREFIX(squeeze)(state, sig, HASH_LENGTH_TRIT);
-      _HASH_PREFIX(reset)(state);
     }
   }
+  _HASH_PREFIX(reset)(state);
   _HASH_PREFIX(absorb)(state, sig_start, sig_len);
   _HASH_PREFIX(squeeze)(state, dig, HASH_LENGTH_TRIT);
   return 0;
