@@ -337,9 +337,9 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
   flex_trits_to_trits(tag, NUM_TRITS_TAG, transaction_tag(curr_tx),
                       NUM_TRITS_TAG, NUM_TRITS_TAG);
 
-  // If header
   trint18_t ord =
       trits_get18(trits_from_rep(MAM_MSG_ORD_SIZE, tag + MAM_MSG_ID_SIZE));
+  // If header
   if (ord == 0) {
     mam_msg_recv_context_t ctx;
 
@@ -393,6 +393,11 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
     }
 
     ctx = &entry->value;
+
+    if (ord != ctx->ord && -ord != ctx->ord) {
+      return RC_MAM_BAD_PACKET_ORD;
+    }
+
     if (ord < 0) {
       ctx->ord = -ctx->ord;
     }
@@ -406,8 +411,6 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
       }
     }
   }
-
-  // TODO check if ord matches
 
   return RC_OK;
 }
