@@ -94,8 +94,7 @@ retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed) {
 
   trytes_to_trits(mam_seed, mam_seed_trits, MAM_PRNG_KEY_SIZE / 3);
   mam_prng_init(&api->prng, trits_from_rep(MAM_PRNG_KEY_SIZE, mam_seed_trits));
-  // TODO use safe memset
-  memset(mam_seed_trits, 0, MAM_PRNG_KEY_SIZE);
+  memset_safe(mam_seed_trits, MAM_PRNG_KEY_SIZE, 0, MAM_PRNG_KEY_SIZE);
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
   api->psks = NULL;
@@ -119,9 +118,9 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
   }
 
   mam_prng_destroy(&api->prng);
-  mam_ntru_sk_t_set_free(&api->ntru_sks);
+  mam_ntru_sks_destroy(&api->ntru_sks);
   mam_ntru_pk_t_set_free(&api->ntru_pks);
-  mam_psk_t_set_free(&api->psks);
+  mam_psks_destroy(&api->psks);
   mam_channel_t_set_free(&api->channels);
   ret = trit_t_to_mam_msg_send_context_t_map_free(&api->send_ctxs);
   if (ret != RC_OK) {
