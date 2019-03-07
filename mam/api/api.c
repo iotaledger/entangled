@@ -397,11 +397,16 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
       ctx->ord = -ctx->ord;
     }
 
-    return mam_api_bundle_read_packet_from_msg(api, ctx, msg, payload,
-                                               payload_size, is_last_packet);
+    ERR_BIND_RETURN(mam_api_bundle_read_packet_from_msg(
+                        api, ctx, msg, payload, payload_size, is_last_packet),
+                    ret);
+    if (*is_last_packet) {
+      if (!trit_t_to_mam_msg_recv_context_t_map_remove(&api->recv_ctxs, tag)) {
+        return RC_MAM_RECV_CTX_NOT_FOUND;
+      }
+    }
   }
 
-  // TODO check if last packet
   // TODO check if ord matches
 
   return RC_OK;
