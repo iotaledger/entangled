@@ -43,15 +43,16 @@ retcode_t mam_example_write_packet(mam_api_t* const api,
                                    mam_channel_t* const channel,
                                    bundle_transactions_t* const bundle,
                                    char const* const payload,
-                                   trit_t const* const msg_id) {
+                                   trit_t const* const msg_id,
+                                   bool is_last_packet) {
   retcode_t ret = RC_OK;
   tryte_t* payload_trytes =
       (tryte_t*)malloc(2 * strlen(payload) * sizeof(tryte_t));
 
   ascii_to_trytes(payload, payload_trytes);
   if ((ret = mam_api_bundle_write_packet(api, channel, msg_id, payload_trytes,
-                                         strlen(payload) * 2, 0, bundle)) !=
-      RC_OK) {
+                                         strlen(payload) * 2, 0, bundle,
+                                         is_last_packet)) != RC_OK) {
     return ret;
   }
   free(payload_trytes);

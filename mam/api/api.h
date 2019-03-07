@@ -60,7 +60,8 @@ retcode_t mam_api_bundle_write_header(
 retcode_t mam_api_bundle_write_packet(
     mam_api_t *const api, mam_channel_t *const ch, trit_t *const msg_id,
     tryte_t const *const payload, size_t const payload_size,
-    mam_msg_checksum_t checksum, bundle_transactions_t *const bundle);
+    mam_msg_checksum_t checksum, bundle_transactions_t *const bundle,
+    bool is_last_packet);
 
 /**
  * Reads MAM's session key and potentially the first packet using NTRU secret
@@ -76,7 +77,8 @@ retcode_t mam_api_bundle_write_packet(
 retcode_t mam_api_bundle_read(mam_api_t *const api,
                               bundle_transactions_t const *const bundle,
                               tryte_t **const payload,
-                              size_t *const payload_size);
+                              size_t *const payload_size,
+                              bool *const is_last_packet);
 
 size_t mam_api_serialized_size(mam_api_t const *const api);
 

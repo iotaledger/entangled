@@ -232,7 +232,8 @@ retcode_t mam_api_bundle_write_header(
 retcode_t mam_api_bundle_write_packet(
     mam_api_t *const api, mam_channel_t *const ch, trit_t *const msg_id,
     tryte_t const *const payload, size_t const payload_size,
-    mam_msg_checksum_t checksum, bundle_transactions_t *const bundle) {
+    mam_msg_checksum_t checksum, bundle_transactions_t *const bundle,
+    bool is_last_packet) {
   mam_msg_send_context_t *ctx = NULL;
   trit_t_to_mam_msg_send_context_t_map_entry_t *entry = NULL;
 
@@ -261,31 +262,51 @@ retcode_t mam_api_bundle_write_packet(
       return RC_OOM;
     }
 
+    if (is_last_packet) {
+      ctx->ord = -ctx->ord;
+    }
+
     mam_msg_send_packet(ctx, checksum, payload_trits, &packet);
     packet = trits_pickup(packet, packet_size);
-    // TODO negate if last packet
-    mam_api_tag(tag, msg_id, ctx->ord++);
+    mam_api_tag(tag, msg_id, ctx->ord);
+
+    if (!is_last_packet) {
+      ctx->ord++;
+    }
     mam_api_bundle_wrap(bundle, mam_channel_id(ch).p, tag, packet);
+
     trits_free(packet);
   }
 
-  // TODO if last remove pending state
+  if (is_last_packet) {
+    if (!trit_t_to_mam_msg_send_context_t_map_remove(&api->send_ctxs, msg_id)) {
+      return RC_MAM_SEND_CTX_NOT_FOUND;
+    }
+  }
 
   return RC_OK;
 }
 
 static retcode_t mam_api_bundle_read_packet_from_msg(
     mam_api_t *const api, mam_msg_recv_context_t *ctx, trits_t msg,
-    tryte_t **const payload, size_t *const payload_size) {
+    tryte_t **const payload, size_t *const payload_size, bool *is_last_packet) {
   retcode_t err;
   trits_t payload_trits = trits_null();
+  *is_last_packet = false;
 
   ERR_BIND_RETURN(mam_msg_recv_packet(ctx, &msg, &payload_trits), err);
   *payload_size = trits_size(payload_trits) / 3;
   *payload = malloc(*payload_size * sizeof(tryte_t));
   trits_to_trytes(payload_trits.p, *payload, *payload_size * 3);
   trits_free(payload_trits);
-  ctx->ord++;
+
+  // negative ord means it's the last packet, so no need to increment in that
+  // case
+  if (ctx->ord >= 0) {
+    ctx->ord++;
+  } else {
+    *is_last_packet = true;
+  }
 
   return RC_OK;
 }
@@ -293,12 +314,15 @@ static retcode_t mam_api_bundle_read_packet_from_msg(
 retcode_t mam_api_bundle_read(mam_api_t *const api,
                               bundle_transactions_t const *const bundle,
                               tryte_t **const payload,
-                              size_t *const payload_size) {
+                              size_t *const payload_size,
+                              bool *const is_last_packet) {
   retcode_t ret = RC_OK;
   trit_t tag[NUM_TRITS_TAG];
   iota_transaction_t *curr_tx = NULL;
 
   MAM_ASSERT(payload && *payload == NULL && payload_size);
+
+  *is_last_packet = false;
 
   // Flatten flex_trits encoded in transaction sig_or_fragment field
   // into a single long trits_t data structure
@@ -314,8 +338,9 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
                       NUM_TRITS_TAG, NUM_TRITS_TAG);
 
   // If header
-  if (trits_get18(trits_from_rep(MAM_MSG_ORD_SIZE, tag + MAM_MSG_ID_SIZE)) ==
-      0) {
+  trint18_t ord =
+      trits_get18(trits_from_rep(MAM_MSG_ORD_SIZE, tag + MAM_MSG_ID_SIZE));
+  if (ord == 0) {
     mam_msg_recv_context_t ctx;
 
     if (trit_t_to_mam_msg_recv_context_t_map_contains(&api->recv_ctxs, tag)) {
@@ -333,10 +358,23 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
 
     size_t packet_index = msg.d / NUM_TRITS_MESSAGE + 1;
     if (packet_index < bundle_transactions_size(bundle)) {
+      curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, packet_index);
+
+      flex_trits_to_trits(tag, NUM_TRITS_TAG, transaction_tag(curr_tx),
+                          NUM_TRITS_TAG, NUM_TRITS_TAG);
+
+      ord =
+          trits_get18(trits_from_rep(MAM_MSG_ORD_SIZE, tag + MAM_MSG_ID_SIZE));
+
+      if (ord < 0) {
+        ctx.ord = ord;
+      }
+
       trits_advance(&msg, NUM_TRITS_MESSAGE - msg.d % NUM_TRITS_MESSAGE);
-      ERR_BIND_RETURN(mam_api_bundle_read_packet_from_msg(
-                          api, &ctx, msg, payload, payload_size),
-                      ret);
+      ERR_BIND_RETURN(
+          mam_api_bundle_read_packet_from_msg(api, &ctx, msg, payload,
+                                              payload_size, is_last_packet),
+          ret);
     }
 
     ERR_BIND_RETURN(
@@ -355,12 +393,20 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
     }
 
     ctx = &entry->value;
+    if (ord < 0) {
+      ctx->ord = -ctx->ord;
+    }
 
-    return mam_api_bundle_read_packet_from_msg(api, ctx, msg, payload,
-                                               payload_size);
+    ERR_BIND_RETURN(mam_api_bundle_read_packet_from_msg(
+                        api, ctx, msg, payload, payload_size, is_last_packet),
+                    ret);
+    if (*is_last_packet) {
+      if (!trit_t_to_mam_msg_recv_context_t_map_remove(&api->recv_ctxs, tag)) {
+        return RC_MAM_RECV_CTX_NOT_FOUND;
+      }
+    }
   }
 
-  // TODO check if last packet
   // TODO check if ord matches
 
   return RC_OK;

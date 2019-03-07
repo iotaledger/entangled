@@ -267,8 +267,8 @@ static void test_api_write_packet(
     mam_api_t *const api, bundle_transactions_t *const bundle,
     trit_t *const msg_id, mam_msg_pubkey_t pubkey, mam_msg_checksum_t checksum,
     mam_channel_t *const cha, mam_endpoint_t *const epa,
-    mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
-    char const *payload1) {
+    mam_channel_t *const ch1a, mam_endpoint_t *const ep1a, char const *payload1,
+    bool is_last_packet) {
   tryte_t *payload_trytes = NULL;
 
   payload_trytes = (tryte_t *)malloc(2 * strlen(payload1) * sizeof(tryte_t));
@@ -276,7 +276,7 @@ static void test_api_write_packet(
 
   TEST_ASSERT(mam_api_bundle_write_packet(api, cha, msg_id, payload_trytes,
                                           2 * strlen(payload1), checksum,
-                                          bundle) == RC_OK);
+                                          bundle, is_last_packet) == RC_OK);
 
   free(payload_trytes);
 }
@@ -285,12 +285,13 @@ static void test_api_read_msg(mam_api_t *const api,
                               bundle_transactions_t *const bundle,
                               mam_psk_t const *const pre_shared_key,
                               mam_ntru_sk_t const *const ntru,
-                              mam_channel_t *const cha, char **payload2) {
+                              mam_channel_t *const cha, char **payload2,
+                              bool *const is_last_packet) {
   tryte_t *payload_trytes = NULL;
   size_t payload_size = 0;
 
-  TEST_ASSERT(mam_api_bundle_read(api, bundle, &payload_trytes,
-                                  &payload_size) == RC_OK);
+  TEST_ASSERT(mam_api_bundle_read(api, bundle, &payload_trytes, &payload_size,
+                                  is_last_packet) == RC_OK);
 
   *payload2 = (char *)calloc(payload_size / 2 + 1, sizeof(char));
   trytes_to_ascii(payload_trytes, payload_size, *payload2);
@@ -380,6 +381,8 @@ static void test_api_generic() {
     TEST_ASSERT(mam_api_add_psk(&api, pskb) == RC_OK);
   }
 
+  bool is_last_packet;
+
   /* chid=0, epid=1, chid1=2, epid1=3*/
   for (mam_msg_pubkey_t pubkey = 0; (int)pubkey < 4; ++pubkey) {
     /* public=0, psk=1, ntru=2 */
@@ -392,10 +395,12 @@ static void test_api_generic() {
         test_api_write_header(&api, pska, pskb, &ntru->public_key, pubkey,
                               keyload, cha, epa, ch1a, ep1a, bundle, msg_id);
         test_api_write_packet(&api, bundle, msg_id, pubkey, checksum, cha, epa,
-                              ch1a, ep1a, PAYLOAD);
+                              ch1a, ep1a, PAYLOAD, true);
 
         /* recv header and packet */
-        test_api_read_msg(&api, bundle, pskb, ntru, cha, &payload2);
+        test_api_read_msg(&api, bundle, pskb, ntru, cha, &payload2,
+                          &is_last_packet);
+        TEST_ASSERT(is_last_packet);
         TEST_ASSERT_EQUAL_STRING(PAYLOAD, payload2);
 
         /* cleanup */
@@ -430,6 +435,7 @@ static void test_api_multiple_packets() {
   size_t payload_in_size = strlen((char *)payload_in);
   tryte_t *payload_out = NULL;
   size_t payload_out_size = 0;
+  bool is_last_packet;
 
   // send and receive header
   {
@@ -437,20 +443,30 @@ static void test_api_multiple_packets() {
     TEST_ASSERT(mam_api_bundle_write_header(&api, cha, NULL, NULL, NULL, NULL,
                                             NULL, 0, bundle, msg_id) == RC_OK);
     TEST_ASSERT(mam_api_bundle_read(&api, bundle, &payload_out,
-                                    &payload_out_size) == RC_OK);
+                                    &payload_out_size,
+                                    &is_last_packet) == RC_OK);
     TEST_ASSERT(payload_out == NULL);
     TEST_ASSERT(payload_out_size == 0);
     bundle_transactions_free(&bundle);
   }
 
   // send and receive packets
-  for (size_t i = 0; i < 256; i++) {
+  const size_t num_packets = 256;
+  for (size_t i = 0; i < num_packets; i++) {
     bundle_transactions_new(&bundle);
     TEST_ASSERT(mam_api_bundle_write_packet(
                     &api, cha, msg_id, payload_in, payload_in_size,
-                    (mam_msg_checksum_t)(i % 3), bundle) == RC_OK);
+                    (mam_msg_checksum_t)(i % 3), bundle,
+                    i == (num_packets - 1) ? true : false) == RC_OK);
     TEST_ASSERT(mam_api_bundle_read(&api, bundle, &payload_out,
-                                    &payload_out_size) == RC_OK);
+                                    &payload_out_size,
+                                    &is_last_packet) == RC_OK);
+    if (i < num_packets - 1) {
+      TEST_ASSERT(!is_last_packet);
+    } else {
+      TEST_ASSERT(is_last_packet);
+    }
+
     TEST_ASSERT_EQUAL_MEMORY(payload_in, payload_out, payload_in_size);
     free(payload_out);
     payload_out = NULL;
