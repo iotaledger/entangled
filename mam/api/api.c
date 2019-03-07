@@ -393,7 +393,9 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
     }
 
     ctx = &entry->value;
-    ctx->ord = ord;
+    if (ord < 0) {
+      ctx->ord = -ctx->ord;
+    }
 
     return mam_api_bundle_read_packet_from_msg(api, ctx, msg, payload,
                                                payload_size, is_last_packet);
