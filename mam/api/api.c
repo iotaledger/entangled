@@ -280,7 +280,7 @@ retcode_t mam_api_bundle_write_packet(
 
   if (is_last_packet) {
     if (!trit_t_to_mam_msg_send_context_t_map_remove(&api->send_ctxs, msg_id)) {
-      return RC_MAM_RECV_CTX_NOT_FOUND;
+      return RC_MAM_SEND_CTX_NOT_FOUND;
     }
   }
 
