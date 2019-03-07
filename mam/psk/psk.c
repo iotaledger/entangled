@@ -21,6 +21,22 @@ trits_t mam_psk_trits(mam_psk_t const *const psk) {
   return trits_from_rep(MAM_PSK_KEY_SIZE, psk->key);
 }
 
+void mam_psk_destroy(mam_psk_t *const psk) {
+  memset_safe(psk->key, MAM_PSK_KEY_SIZE, 0, MAM_PSK_KEY_SIZE);
+}
+
+void mam_psks_destroy(mam_psk_t_set_t *const psks) {
+  mam_psk_t_set_entry_t *entry = NULL;
+  mam_psk_t_set_entry_t *tmp = NULL;
+
+  if (psks == NULL || *psks == NULL) {
+    return;
+  }
+
+  HASH_ITER(hh, *psks, entry, tmp) { mam_psk_destroy(&entry->value); }
+  mam_psk_t_set_free(psks);
+}
+
 size_t mam_psks_serialized_size(mam_psk_t_set_t const psks) {
   return pb3_sizeof_size_t(mam_psk_t_set_size(psks)) +
          mam_psk_t_set_size(psks) * sizeof(mam_psk_t);
