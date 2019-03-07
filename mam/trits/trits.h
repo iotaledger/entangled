@@ -40,6 +40,9 @@ typedef struct trits_s {
 #define MAM_TRITS_DEF(X, key) MAM_TRITS_DEF0(X, key) = MAM_TRITS_INIT(X, key)
 #endif
 
+static inline trit_t *trits_begin(trits_t x) { return x.p + x.d; }
+static inline trit_t *trits_end(trits_t x) { return x.p + x.d + x.n; }
+
 /*! \brief Check `x.n` against zero. */
 bool trits_is_empty(trits_t x);
 

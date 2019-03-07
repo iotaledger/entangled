@@ -50,6 +50,18 @@ retcode_t mam_ntru_pks_deserialize(trits_t *const trits,
   return ret;
 }
 
+void mam_ntru_sks_destroy(mam_ntru_sk_t_set_t *const ntru_sks) {
+  mam_ntru_sk_t_set_entry_t *entry = NULL;
+  mam_ntru_sk_t_set_entry_t *tmp = NULL;
+
+  if (ntru_sks == NULL || *ntru_sks == NULL) {
+    return;
+  }
+
+  HASH_ITER(hh, *ntru_sks, entry, tmp) { ntru_destroy(&entry->value); }
+  mam_ntru_sk_t_set_free(ntru_sks);
+}
+
 size_t mam_ntru_sks_serialized_size(mam_ntru_sk_t_set_t const ntru_sk_set) {
   return pb3_sizeof_size_t(mam_ntru_sk_t_set_size(ntru_sk_set)) +
          mam_ntru_sk_t_set_size(ntru_sk_set) *
