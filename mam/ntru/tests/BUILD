@@ -3,7 +3,6 @@ cc_test(
     srcs = ["test_ntru.c"],
     deps = [
         "//mam/ntru",
-        "//mam/test_utils",
         "@unity",
     ],
 )

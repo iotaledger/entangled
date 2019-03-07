@@ -3,7 +3,6 @@ cc_test(
     srcs = ["test_prng.c"],
     deps = [
         "//mam/prng",
-        "//mam/test_utils",
         "@unity",
     ],
 )

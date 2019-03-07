@@ -10,7 +10,6 @@
 
 #include <unity/unity.h>
 
-#include "mam/test_utils/test_utils.h"
 #include "mam/wots/wots.h"
 
 static void mam_wots_test(void) {

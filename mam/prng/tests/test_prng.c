@@ -11,7 +11,6 @@
 #include <unity/unity.h>
 
 #include "mam/prng/prng.h"
-#include "mam/test_utils/test_utils.h"
 
 static void prng_test(void) {
   mam_prng_t prng;

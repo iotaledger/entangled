@@ -17,7 +17,6 @@ cc_test(
         "//mam/mam:endpoint",
         "//mam/mam:mam_endpoint_t_set",
         "//mam/mam:message",
-        "//mam/test_utils",
         "@unity",
     ],
 )
@@ -30,7 +29,6 @@ cc_test(
         "//mam/mam:channel",
         "//mam/mam:mam_channel_t_set",
         "//mam/mam:message",
-        "//mam/test_utils",
         "@unity",
     ],
 )
