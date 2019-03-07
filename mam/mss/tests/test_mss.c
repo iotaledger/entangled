@@ -11,7 +11,6 @@
 #include <unity/unity.h>
 
 #include "mam/mss/mss.h"
-#include "mam/test_utils/test_utils.h"
 #include "utils/handles/rand.h"
 
 #if !defined(MAM_MSS_TEST_MAX_D)

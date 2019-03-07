@@ -15,7 +15,6 @@
 #include "common/trinary/trit_tryte.h"
 #include "mam/mam/endpoint.h"
 #include "mam/mam/mam_endpoint_t_set.h"
-#include "mam/test_utils/test_utils.h"
 
 #define CHANNEL_NAME_SIZE 27
 #define ENDPOINT_NAME_SIZE 27

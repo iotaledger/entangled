@@ -11,7 +11,6 @@
 #include <unity/unity.h>
 
 #include "mam/sponge/sponge.h"
-#include "mam/test_utils/test_utils.h"
 
 static void mam_sponge_hash_test(void) {
   mam_sponge_t sponge;
