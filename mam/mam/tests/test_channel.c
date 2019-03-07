@@ -16,7 +16,6 @@
 #include "mam/mam/channel.h"
 #include "mam/mam/mam_channel_t_set.h"
 #include "mam/mam/message.h"
-#include "mam/test_utils/test_utils.h"
 
 static bool mam_channel_t_set_cmp_test(mam_channel_t_set_t const channels_1,
                                        mam_channel_t_set_t const channels_2) {

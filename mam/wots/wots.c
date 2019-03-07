@@ -84,13 +84,14 @@ static inline trits_t wots_secret_key_trits(mam_wots_t const *const wots) {
 
 void mam_wots_init(mam_wots_t *const wots) {
   MAM_ASSERT(wots);
-  memset(wots->secret_key, 0, MAM_WOTS_SK_SIZE);
+
+  memset_safe(wots->secret_key, MAM_WOTS_SK_SIZE, 0, MAM_WOTS_SK_SIZE);
 }
 
 void mam_wots_destroy(mam_wots_t *const wots) {
   MAM_ASSERT(wots);
 
-  memset(wots, 0, sizeof(mam_wots_t));
+  memset_safe(wots->secret_key, MAM_WOTS_SK_SIZE, 0, MAM_WOTS_SK_SIZE);
 }
 
 void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *const prng,
@@ -122,7 +123,8 @@ void mam_wots_calc_pk(mam_wots_t *const wots, trits_t public_key) {
   mam_wots_calc_pks(&spongos, secret_key, public_key);
   mam_spongos_hash(&spongos, secret_key, public_key);
 
-  trits_set_zero(secret_key);
+  memset_safe(trits_begin(secret_key), trits_size(secret_key), 0,
+              trits_size(secret_key));
 }
 
 void mam_wots_sign(mam_wots_t *const wots, trits_t const hash,

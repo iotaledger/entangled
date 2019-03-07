@@ -611,7 +611,8 @@ void mam_msg_send(mam_msg_send_context_t *ctx, mam_prng_t *prng,
     mam_spongos_commit(&ctx->spongos);
   }
 
-  trits_set_zero(session_key);
+  memset_safe(trits_begin(session_key), trits_size(session_key), 0,
+              trits_size(session_key));
 }
 
 size_t mam_msg_send_packet_size(mam_msg_checksum_t checksum, mam_mss_t *mss,

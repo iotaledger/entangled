@@ -24,7 +24,7 @@ trits_t mam_ntru_pk_trits(mam_ntru_pk_t const *const ntru_pk) {
 retcode_t ntru_init(mam_ntru_sk_t *const ntru) {
   MAM_ASSERT(ntru);
 
-  memset(ntru, 0, sizeof(mam_ntru_sk_t));
+  memset_safe(ntru, sizeof(mam_ntru_sk_t), 0, sizeof(mam_ntru_sk_t));
 
   return RC_OK;
 }
@@ -72,8 +72,10 @@ void ntru_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
 
   poly_to_trits(h, ntru_pk_trits(ntru));
 
-  trits_set_zero(nonce_i);
-  trits_set_zero(secret_key);
+  memset_safe(trits_begin(nonce_i), trits_size(nonce_i), 0,
+              trits_size(nonce_i));
+  memset_safe(trits_begin(secret_key), trits_size(secret_key), 0,
+              trits_size(secret_key));
 }
 
 void ntru_encr(trits_t const public_key, mam_prng_t const *const prng,
@@ -126,7 +128,7 @@ void ntru_encr_r(trits_t const public_key, mam_spongos_t *const spongos,
   poly_add(s, h, s);
   poly_to_trits(s, encrypted_session_key);
 
-  memset(h, 0, sizeof(h));
+  memset_safe(h, sizeof(h), 0, sizeof(h));
 }
 
 bool ntru_decr(mam_ntru_sk_t const *const ntru, mam_spongos_t *const spongos,
@@ -172,11 +174,11 @@ bool ntru_decr(mam_ntru_sk_t const *const ntru, mam_spongos_t *const spongos,
   mam_spongos_squeeze(spongos, m);
   b = trits_cmp_eq(m, trits_drop(kt, MAM_NTRU_KEY_SIZE));
 
-  trits_set_zero(kt);
-  trits_set_zero(rh);
-  trits_set_zero(m);
-  memset(s, 0, sizeof(s));
-  memset(r, 0, sizeof(r));
+  memset_safe(trits_begin(kt), trits_size(kt), 0, trits_size(kt));
+  memset_safe(trits_begin(rh), trits_size(rh), 0, trits_size(rh));
+  memset_safe(trits_begin(m), trits_size(m), 0, trits_size(m));
+  memset_safe(s, sizeof(s), 0, sizeof(s));
+  memset_safe(r, sizeof(r), 0, sizeof(r));
 
   return b;
 }

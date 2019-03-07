@@ -50,6 +50,8 @@ typedef struct mam_ntru_sk_s {
 typedef struct mam_ntru_sk_t_set_entry_s mam_ntru_sk_t_set_entry_t;
 typedef mam_ntru_sk_t_set_entry_t* mam_ntru_sk_t_set_t;
 
+void mam_ntru_sks_destroy(mam_ntru_sk_t_set_t* const ntru_sks);
+
 size_t mam_ntru_sks_serialized_size(mam_ntru_sk_t_set_t const ntru_sk_set);
 retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sk_set,
                                  trits_t* const trits);

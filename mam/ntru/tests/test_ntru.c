@@ -13,7 +13,6 @@
 
 #include "mam/ntru/ntru.h"
 #include "mam/ntru/poly.h"
-#include "mam/test_utils/test_utils.h"
 
 static void ntru_test(void) {
   mam_spongos_t spongos;
