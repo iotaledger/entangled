@@ -391,13 +391,13 @@ static void test_api_generic() {
       for (mam_msg_checksum_t checksum = 0; (int)checksum < 3; ++checksum) {
         bundle_transactions_new(&bundle);
 
-        /* send header and packet */
+        /* write header and packet */
         test_api_write_header(&api, pska, pskb, &ntru->public_key, pubkey,
                               keyload, cha, epa, ch1a, ep1a, bundle, msg_id);
         test_api_write_packet(&api, bundle, msg_id, pubkey, checksum, cha, epa,
                               ch1a, ep1a, PAYLOAD, true);
 
-        /* recv header and packet */
+        /* read header and packet */
         test_api_read_msg(&api, bundle, pskb, ntru, cha, &payload2,
                           &is_last_packet);
         TEST_ASSERT(is_last_packet);
@@ -437,7 +437,7 @@ static void test_api_multiple_packets() {
   size_t payload_out_size = 0;
   bool is_last_packet;
 
-  // send and receive header
+  // write and read header
   {
     bundle_transactions_new(&bundle);
     TEST_ASSERT(mam_api_bundle_write_header(&api, cha, NULL, NULL, NULL, NULL,
@@ -450,7 +450,7 @@ static void test_api_multiple_packets() {
     bundle_transactions_free(&bundle);
   }
 
-  // send and receive packets
+  // write and read packets
   const size_t num_packets = 256;
   for (size_t i = 0; i < num_packets; i++) {
     bundle_transactions_new(&bundle);
@@ -491,10 +491,10 @@ static void test_api_serialization() {
   TEST_ASSERT_TRUE(
       mam_ntru_pk_t_set_cmp(&deserialized_api.ntru_pks, &api.ntru_pks));
   TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&deserialized_api.psks, &api.psks));
-  TEST_ASSERT_TRUE(trit_t_to_mam_msg_send_context_t_map_cmp(
-      &deserialized_api.send_ctxs, &api.send_ctxs));
-  TEST_ASSERT_TRUE(trit_t_to_mam_msg_recv_context_t_map_cmp(
-      &deserialized_api.recv_ctxs, &api.recv_ctxs));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_write_context_t_map_cmp(
+      &deserialized_api.write_ctxs, &api.write_ctxs));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_read_context_t_map_cmp(
+      &deserialized_api.read_ctxs, &api.read_ctxs));
   TEST_ASSERT_TRUE(
       mam_channel_t_set_cmp(&deserialized_api.channels, &api.channels));
 
@@ -511,10 +511,10 @@ static void test_api_save_load() {
   TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&loaded_api.ntru_sks, &api.ntru_sks));
   TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(&loaded_api.ntru_pks, &api.ntru_pks));
   TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&loaded_api.psks, &api.psks));
-  TEST_ASSERT_TRUE(trit_t_to_mam_msg_send_context_t_map_cmp(
-      &loaded_api.send_ctxs, &api.send_ctxs));
-  TEST_ASSERT_TRUE(trit_t_to_mam_msg_recv_context_t_map_cmp(
-      &loaded_api.recv_ctxs, &api.recv_ctxs));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_write_context_t_map_cmp(
+      &loaded_api.write_ctxs, &api.write_ctxs));
+  TEST_ASSERT_TRUE(trit_t_to_mam_msg_read_context_t_map_cmp(
+      &loaded_api.read_ctxs, &api.read_ctxs));
   TEST_ASSERT_TRUE(mam_channel_t_set_cmp(&loaded_api.channels, &api.channels));
 
   mam_api_destroy(&loaded_api);
