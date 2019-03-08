@@ -12,7 +12,6 @@
 #define __MAM_PSK_PSK_H__
 
 #include "common/errors.h"
-#include "mam/defs.h"
 #include "mam/trits/trits.h"
 
 #define MAM_PSK_ID_SIZE 81

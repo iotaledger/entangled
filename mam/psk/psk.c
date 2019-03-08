@@ -9,9 +9,9 @@
  */
 
 #include "mam/psk/psk.h"
-#include "mam/ntru/ntru.h"
 #include "mam/pb3/pb3.h"
 #include "mam/psk/mam_psk_t_set.h"
+#include "utils/memset_safe.h"
 
 trits_t mam_psk_id(mam_psk_t const *const psk) {
   return trits_from_rep(MAM_PSK_ID_SIZE, psk->id);
