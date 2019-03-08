@@ -493,7 +493,7 @@ size_t mam_msg_header_size(mam_channel_t *ch, mam_endpoint_t *ep,
   return sz;
 }
 
-void mam_msg_write_header(mam_msg_send_context_t *ctx, mam_prng_t *prng,
+void mam_msg_write_header(mam_msg_write_context_t *ctx, mam_prng_t *prng,
                           mam_channel_t *ch, mam_endpoint_t *ep,
                           mam_channel_t *ch1, mam_endpoint_t *ep1,
                           trits_t msg_id, trint9_t msg_type_id,
@@ -646,7 +646,7 @@ size_t mam_msg_packet_size(mam_msg_checksum_t checksum, mam_mss_t *mss,
   return sz;
 }
 
-void mam_msg_write_packet(mam_msg_send_context_t *ctx,
+void mam_msg_write_packet(mam_msg_write_context_t *ctx,
                           mam_msg_checksum_t checksum, trits_t payload,
                           trits_t *b) {
   MAM_ASSERT(ctx);
@@ -686,7 +686,7 @@ void mam_msg_write_packet(mam_msg_send_context_t *ctx,
   mam_spongos_commit(&ctx->spongos);
 }
 
-retcode_t mam_msg_read_header(mam_msg_recv_context_t *ctx,
+retcode_t mam_msg_read_header(mam_msg_read_context_t *ctx,
                               trits_t const *const msg, mam_psk_t_set_t psks,
                               mam_ntru_sk_t_set_t ntru_sks, trits_t msg_id) {
   retcode_t e = RC_OK;
@@ -814,7 +814,7 @@ retcode_t mam_msg_read_header(mam_msg_recv_context_t *ctx,
   return e;
 }
 
-retcode_t mam_msg_read_packet(mam_msg_recv_context_t *ctx, trits_t *b,
+retcode_t mam_msg_read_packet(mam_msg_read_context_t *ctx, trits_t *b,
                               trits_t *payload) {
   retcode_t e = RC_OK;
   trits_t p = trits_null();
@@ -881,22 +881,22 @@ cleanup:
   return e;
 }
 
-size_t mam_msg_send_ctx_serialized_size(
-    mam_msg_send_context_t const *const ctx) {
+size_t mam_msg_write_ctx_serialized_size(
+    mam_msg_write_context_t const *const ctx) {
   return mam_spongos_serialized_size(&ctx->spongos) + MAM_MSG_ORD_SIZE +
          MAM_MSS_PK_SIZE;
 }
 
-void mam_msg_send_ctx_serialize(mam_msg_send_context_t const *const ctx,
-                                trits_t *const buffer) {
+void mam_msg_write_ctx_serialize(mam_msg_write_context_t const *const ctx,
+                                 trits_t *const buffer) {
   mam_spongos_serialize(&ctx->spongos, buffer);
   trits_put18(*buffer, ctx->ord);
   trits_advance(buffer, MAM_MSG_ORD_SIZE);
   pb3_encode_ntrytes(trits_from_rep(MAM_MSS_PK_SIZE, ctx->mss->root), buffer);
 }
 
-retcode_t mam_msg_send_ctx_deserialize(trits_t *const buffer,
-                                       mam_msg_send_context_t *const ctx) {
+retcode_t mam_msg_write_ctx_deserialize(trits_t *const buffer,
+                                        mam_msg_write_context_t *const ctx) {
   retcode_t ret;
   ERR_BIND_RETURN(mam_spongos_deserialize(buffer, &ctx->spongos), ret);
   ctx->ord = trits_get18(*buffer);
@@ -907,13 +907,13 @@ retcode_t mam_msg_send_ctx_deserialize(trits_t *const buffer,
   return ret;
 }
 
-size_t mam_msg_recv_ctx_serialized_size(
-    mam_msg_recv_context_t const *const ctx) {
+size_t mam_msg_read_ctx_serialized_size(
+    mam_msg_read_context_t const *const ctx) {
   return mam_spongos_serialized_size(&ctx->spongos) + MAM_CHANNEL_ID_SIZE +
          MAM_MSG_ORD_SIZE;
 }
 
-void mam_msg_recv_ctx_serialize(mam_msg_recv_context_t const *const ctx,
+void mam_msg_read_ctx_serialize(mam_msg_read_context_t const *const ctx,
                                 trits_t *const buffer) {
   mam_spongos_serialize(&ctx->spongos, buffer);
   pb3_encode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk), buffer);
@@ -921,8 +921,8 @@ void mam_msg_recv_ctx_serialize(mam_msg_recv_context_t const *const ctx,
   trits_advance(buffer, MAM_MSG_ORD_SIZE);
 }
 
-retcode_t mam_msg_recv_ctx_deserialize(trits_t *const buffer,
-                                       mam_msg_recv_context_t *const ctx) {
+retcode_t mam_msg_read_ctx_deserialize(trits_t *const buffer,
+                                       mam_msg_read_context_t *const ctx) {
   retcode_t ret;
   ERR_BIND_RETURN(mam_spongos_deserialize(buffer, &ctx->spongos), ret);
   ERR_BIND_RETURN(

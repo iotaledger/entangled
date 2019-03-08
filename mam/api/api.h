@@ -14,8 +14,8 @@
 #include "common/errors.h"
 #include "common/model/bundle.h"
 #include "common/trinary/flex_trit.h"
-#include "mam/api/trit_t_to_mam_msg_recv_context_t_map.h"
-#include "mam/api/trit_t_to_mam_msg_send_context_t_map.h"
+#include "mam/api/trit_t_to_mam_msg_read_context_t_map.h"
+#include "mam/api/trit_t_to_mam_msg_write_context_t_map.h"
 #include "mam/mam/message.h"
 #include "mam/ntru/ntru_types.h"
 #include "mam/prng/prng_types.h"
@@ -30,8 +30,8 @@ typedef struct mam_api_s {
   mam_ntru_sk_t_set_t ntru_sks;
   mam_ntru_pk_t_set_t ntru_pks;
   mam_psk_t_set_t psks;
-  trit_t_to_mam_msg_send_context_t_map_t send_ctxs;
-  trit_t_to_mam_msg_recv_context_t_map_t recv_ctxs;
+  trit_t_to_mam_msg_write_context_t_map_t write_ctxs;
+  trit_t_to_mam_msg_read_context_t_map_t read_ctxs;
   mam_channel_t_set_t channels;
 } mam_api_t;
 
