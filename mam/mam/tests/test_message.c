@@ -352,7 +352,12 @@ void serialize_write_ctx_test() {
   mam_spongos_init(&write_ctx.spongos);
   write_ctx.ord = 0;
 
-  //"Random" root
+  // "Random" chid
+  for (size_t i = 0; i < MAM_CHANNEL_ID_SIZE; ++i) {
+    write_ctx.chid[i] = -1 + rand() % 3;
+  }
+
+  // "Random" root
   for (size_t i = 0; i < MAM_MSS_PK_SIZE; ++i) {
     mss.root[i] = -1 + rand() % 3;
   }
@@ -368,10 +373,11 @@ void serialize_write_ctx_test() {
   mam_msg_write_ctx_serialize(&write_ctx, &ctx_buffer);
   ctx_buffer = trits_pickup_all(ctx_buffer);
   mam_msg_write_ctx_deserialize(&ctx_buffer, &deserialized_ctx);
+  TEST_ASSERT_EQUAL_MEMORY(write_ctx.chid, deserialized_ctx.chid,
+                           MAM_CHANNEL_ID_SIZE);
   TEST_ASSERT_EQUAL_INT(write_ctx.spongos.pos, deserialized_ctx.spongos.pos);
   TEST_ASSERT_EQUAL_MEMORY(&write_ctx.spongos.sponge,
                            &deserialized_ctx.spongos.sponge, MAM_SPONGE_WIDTH);
-
   TEST_ASSERT_EQUAL_MEMORY(&write_ctx.mss->root, &deserialized_ctx.mss_root,
                            MAM_MSS_PK_SIZE);
   TEST_ASSERT_EQUAL_INT(write_ctx.ord, deserialized_ctx.ord);
