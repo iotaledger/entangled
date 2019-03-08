@@ -79,7 +79,7 @@ void test_key(trit_t *s, trit_t *k, size_t l, Kerl *c) {
   "CFOYUCXLHLSUBAEYOTAWUNRPJFA9TSJNLBFLMZQASPTVCMTFBOQQRGGQ9MRZCJWYGBORJZQWVS" \
   "BLVKBVW"
 
-#define EXP_SIG                                                                \
+#define EXP_DIGEST                                                             \
   "DQMAVYJTIIQUCDHRIZAPYKFCFBTHNDAMHLYEEIEBSR9REQBBVUQOSDWFSGPTZFNQQTVMQPVUDH" \
   "DTEZVSW"
 
@@ -88,31 +88,29 @@ void test_sig_digest() {
   trit_t seed[HASH_LENGTH_TRIT];
   trit_t subseed[HASH_LENGTH_TRIT];
   trit_t key[key_length];
-  trit_t *k = key;
-  const size_t l = ISS_KEY_LENGTH;
-
+  trit_t *key_p = key;
+  const size_t len = ISS_KEY_LENGTH;
   Kerl kerl;
-  Kerl* c = &kerl;
-  init_kerl(&kerl);
-
+  Kerl* crypto = &kerl;
   tryte_t tryte_seed[] = TEST_SEED2;
-  trytes_to_trits(tryte_seed, seed, 81);
-  iss_kerl_subseed(seed, subseed, 0, c);
-  iss_kerl_key(subseed, k, l, c);
+  tryte_t addy_trytes[len];
+  trit_t sig[ISS_KEY_LENGTH];
+  trit_t digest[ISS_KEY_LENGTH];
 
-  tryte_t addy_trytes[l];
-  trit_t s[6561];
-  trit_t d[6561];
-  memcpy(s, k, sizeof(trit_t)*6561);
+  init_kerl(&kerl);
+  trytes_to_trits(tryte_seed, seed, HASH_LENGTH_TRIT);
+  iss_kerl_subseed(seed, subseed, 0, crypto);
+  iss_kerl_key(subseed, key_p, len, crypto);
 
-  iss_kerl_sig_digest(d, s, k, l, c);
-  iss_kerl_address(d, d, HASH_LENGTH_TRIT, c);
+  memcpy(sig, key_p, sizeof(trit_t)*ISS_KEY_LENGTH);
+  iss_kerl_sig_digest(digest, sig, key_p, len, crypto);
+  iss_kerl_address(digest, digest, HASH_LENGTH_TRIT, crypto);
 
-  trits_to_trytes(d, addy_trytes, l);
+  trits_to_trytes(digest, addy_trytes, len);
 
   addy_trytes[HASH_LENGTH_TRYTE] = 0;
 
-  TEST_ASSERT_EQUAL_MEMORY(EXP_SIG, addy_trytes,
+  TEST_ASSERT_EQUAL_MEMORY(EXP_DIGEST, addy_trytes,
                            HASH_LENGTH_TRYTE * sizeof(tryte_t));
 }
 
@@ -130,7 +128,7 @@ void test_addy(trit_t *k, size_t l, Kerl *c) {
                            HASH_LENGTH_TRYTE * sizeof(tryte_t));
 }
 #undef EXP_ADDY
-#undef EXP_SIG
+#undef EXP_DIGEST
 #undef TEST_SEED2
 
 void test_iss() {
