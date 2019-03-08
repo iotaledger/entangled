@@ -31,11 +31,11 @@ This command will send a header meaning it will declare a new message.
 
 This command will send a packet to an already existing message.
 
-`bazel run -c opt -- //mam/examples:send-packet <host> <port> <seed> <msg_id> <payload>`
+`bazel run -c opt -- //mam/examples:send-packet <host> <port> <seed> <msg_id> <payload> <last_packet>`
 
 This command will send a header and a packet at the same time.
 
-`bazel run -c opt -- //mam/examples:send-msg <host> <port> <seed> <payload>`
+`bazel run -c opt -- //mam/examples:send-msg <host> <port> <seed> <payload> <last_packet>`
 
 ### Receiving
 

@@ -18,8 +18,14 @@ int main(int ac, char **av) {
   mam_channel_t *channel = NULL;
   retcode_t ret = RC_OK;
 
-  if (ac != 5) {
-    fprintf(stderr, "usage: send-msg <host> <port> <seed> <payload>\n");
+  if (ac != 6) {
+    fprintf(stderr,
+            "usage: send-msg <host> <port> <seed> <payload> <last_packet>\n");
+    return EXIT_FAILURE;
+  }
+
+  if (strcmp(av[6], "yes") && strcmp(av[6], "no")) {
+    fprintf(stderr, "Arg <last_packet> should be \"yes\" or \"no\" only\n");
     return EXIT_FAILURE;
   }
 
@@ -50,8 +56,9 @@ int main(int ac, char **av) {
     }
 
     // Writing packet to bundle
-    if ((ret = mam_example_write_packet(&api, channel, bundle, av[4],
-                                        msg_id)) != RC_OK) {
+    bool last_packet = strcmp(av[5], "yes") == 0;
+    if ((ret = mam_example_write_packet(&api, channel, bundle, av[4], msg_id,
+                                        last_packet)) != RC_OK) {
       fprintf(stderr, "mam_example_write_packet failed with err %d\n", ret);
       return EXIT_FAILURE;
     }
