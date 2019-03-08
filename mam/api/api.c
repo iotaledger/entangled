@@ -211,10 +211,11 @@ retcode_t mam_api_bundle_write_header(
                          trits_from_rep(MAM_MSG_ID_SIZE, msg_id), msg_type_id,
                          psks, ntru_pks, &header);
     header = trits_pickup(header, header_size);
-    mam_api_bundle_wrap(bundle, mam_channel_id(ch).p, tag, header);
+    mam_api_bundle_wrap(bundle, trits_begin(mam_channel_id(ch)), tag, header);
     trits_free(header);
   }
 
+  memcpy(ctx.chid, trits_begin(mam_channel_id(ch)), MAM_CHANNEL_ID_SIZE);
   ctx.ord = 1;
   if (ch1) {
     ctx.mss = &ch1->mss;
@@ -231,10 +232,9 @@ retcode_t mam_api_bundle_write_header(
 }
 
 retcode_t mam_api_bundle_write_packet(
-    mam_api_t *const api, mam_channel_t *const ch, trit_t *const msg_id,
-    tryte_t const *const payload, size_t const payload_size,
-    mam_msg_checksum_t checksum, bundle_transactions_t *const bundle,
-    bool is_last_packet) {
+    mam_api_t *const api, trit_t *const msg_id, tryte_t const *const payload,
+    size_t const payload_size, mam_msg_checksum_t checksum,
+    bundle_transactions_t *const bundle, bool is_last_packet) {
   mam_msg_write_context_t *ctx = NULL;
   trit_t_to_mam_msg_write_context_t_map_entry_t *entry = NULL;
 
@@ -273,7 +273,7 @@ retcode_t mam_api_bundle_write_packet(
     if (!is_last_packet) {
       ctx->ord++;
     }
-    mam_api_bundle_wrap(bundle, mam_channel_id(ch).p, tag, packet);
+    mam_api_bundle_wrap(bundle, ctx->chid, tag, packet);
 
     trits_free(packet);
   }

@@ -15,7 +15,6 @@
 int main(int ac, char **av) {
   mam_api_t api;
   bundle_transactions_t *bundle = NULL;
-  mam_channel_t *channel = NULL;
   retcode_t ret = RC_OK;
 
   if (ac != 7) {
@@ -38,12 +37,6 @@ int main(int ac, char **av) {
     }
   }
 
-  // Creating channel
-  if ((ret = mam_example_create_channel(&api, &channel)) != RC_OK) {
-    fprintf(stderr, "mam_example_create_channel failed with err %d\n", ret);
-    return EXIT_FAILURE;
-  }
-
   bundle_transactions_new(&bundle);
 
   // Writing packet to bundle
@@ -52,7 +45,7 @@ int main(int ac, char **av) {
 
     bool last_packet = strcmp(av[6], "yes") == 0;
     trytes_to_trits((tryte_t *)av[4], msg_id, strlen(av[4]));
-    if ((ret = mam_example_write_packet(&api, channel, bundle, av[5], msg_id,
+    if ((ret = mam_example_write_packet(&api, bundle, av[5], msg_id,
                                         last_packet)) != RC_OK) {
       fprintf(stderr, "mam_example_write_packet failed with err %d\n", ret);
       return EXIT_FAILURE;

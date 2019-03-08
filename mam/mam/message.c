@@ -883,12 +883,13 @@ cleanup:
 
 size_t mam_msg_write_ctx_serialized_size(
     mam_msg_write_context_t const *const ctx) {
-  return mam_spongos_serialized_size(&ctx->spongos) + MAM_MSG_ORD_SIZE +
-         MAM_MSS_PK_SIZE;
+  return MAM_CHANNEL_ID_SIZE + mam_spongos_serialized_size(&ctx->spongos) +
+         MAM_MSG_ORD_SIZE + MAM_MSS_PK_SIZE;
 }
 
 void mam_msg_write_ctx_serialize(mam_msg_write_context_t const *const ctx,
                                  trits_t *const buffer) {
+  pb3_encode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->chid), buffer);
   mam_spongos_serialize(&ctx->spongos, buffer);
   trits_put18(*buffer, ctx->ord);
   trits_advance(buffer, MAM_MSG_ORD_SIZE);
@@ -897,13 +898,19 @@ void mam_msg_write_ctx_serialize(mam_msg_write_context_t const *const ctx,
 
 retcode_t mam_msg_write_ctx_deserialize(trits_t *const buffer,
                                         mam_msg_write_context_t *const ctx) {
-  retcode_t ret;
+  retcode_t ret = RC_OK;
+
+  ERR_BIND_RETURN(pb3_decode_ntrytes(
+                      trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->chid), buffer),
+                  ret);
   ERR_BIND_RETURN(mam_spongos_deserialize(buffer, &ctx->spongos), ret);
   ctx->ord = trits_get18(*buffer);
   trits_advance(buffer, MAM_MSG_ORD_SIZE);
   ctx->mss = NULL;
-  trits_t root_id = trits_from_rep(MAM_MSS_PK_SIZE, ctx->mss_root);
-  ERR_BIND_RETURN(pb3_decode_ntrytes(root_id, buffer), ret);
+  ERR_BIND_RETURN(pb3_decode_ntrytes(
+                      trits_from_rep(MAM_MSS_PK_SIZE, ctx->mss_root), buffer),
+                  ret);
+
   return ret;
 }
 
@@ -923,12 +930,14 @@ void mam_msg_read_ctx_serialize(mam_msg_read_context_t const *const ctx,
 
 retcode_t mam_msg_read_ctx_deserialize(trits_t *const buffer,
                                        mam_msg_read_context_t *const ctx) {
-  retcode_t ret;
+  retcode_t ret = RC_OK;
+
   ERR_BIND_RETURN(mam_spongos_deserialize(buffer, &ctx->spongos), ret);
   ERR_BIND_RETURN(
       pb3_decode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk), buffer),
       ret);
   ctx->ord = trits_get18(*buffer);
   trits_advance(buffer, MAM_MSG_ORD_SIZE);
+
   return ret;
 }

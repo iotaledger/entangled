@@ -274,7 +274,7 @@ static void test_api_write_packet(
   payload_trytes = (tryte_t *)malloc(2 * strlen(payload1) * sizeof(tryte_t));
   ascii_to_trytes(payload1, payload_trytes);
 
-  TEST_ASSERT(mam_api_bundle_write_packet(api, cha, msg_id, payload_trytes,
+  TEST_ASSERT(mam_api_bundle_write_packet(api, msg_id, payload_trytes,
                                           2 * strlen(payload1), checksum,
                                           bundle, is_last_packet) == RC_OK);
 
@@ -455,7 +455,7 @@ static void test_api_multiple_packets() {
   for (size_t i = 0; i < num_packets; i++) {
     bundle_transactions_new(&bundle);
     TEST_ASSERT(mam_api_bundle_write_packet(
-                    &api, cha, msg_id, payload_in, payload_in_size,
+                    &api, msg_id, payload_in, payload_in_size,
                     (mam_msg_checksum_t)(i % 3), bundle,
                     i == (num_packets - 1) ? true : false) == RC_OK);
     TEST_ASSERT(mam_api_bundle_read(&api, bundle, &payload_out,
