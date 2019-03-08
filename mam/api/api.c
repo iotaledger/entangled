@@ -298,7 +298,7 @@ static retcode_t mam_api_bundle_read_packet_from_msg(
   *is_last_packet = false;
 
   {
-    mam_msg_recv_context_t rollback_ctx = *ctx;
+    mam_msg_read_context_t rollback_ctx = *ctx;
 
     if ((ret = mam_msg_read_packet(ctx, &msg, &payload_trits)) != RC_OK) {
       *ctx = rollback_ctx;
