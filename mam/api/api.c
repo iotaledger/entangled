@@ -289,12 +289,22 @@ retcode_t mam_api_bundle_write_packet(
 
 static retcode_t mam_api_bundle_read_packet_from_msg(
     mam_api_t *const api, mam_msg_recv_context_t *ctx, trits_t msg,
-    tryte_t **const payload, size_t *const payload_size, bool *is_last_packet) {
-  retcode_t err;
+    tryte_t **const payload, size_t *const payload_size,
+    bool *const is_last_packet) {
+  retcode_t ret = RC_OK;
   trits_t payload_trits = trits_null();
+
   *is_last_packet = false;
 
-  ERR_BIND_RETURN(mam_msg_recv_packet(ctx, &msg, &payload_trits), err);
+  {
+    mam_msg_recv_context_t rollback_ctx = *ctx;
+
+    if ((ret = mam_msg_recv_packet(ctx, &msg, &payload_trits)) != RC_OK) {
+      *ctx = rollback_ctx;
+      return ret;
+    }
+  }
+
   *payload_size = trits_size(payload_trits) / 3;
   *payload = malloc(*payload_size * sizeof(tryte_t));
   trits_to_trytes(payload_trits.p, *payload, *payload_size * 3);
@@ -308,7 +318,7 @@ static retcode_t mam_api_bundle_read_packet_from_msg(
     *is_last_packet = true;
   }
 
-  return RC_OK;
+  return ret;
 }
 
 retcode_t mam_api_bundle_read(mam_api_t *const api,
@@ -377,9 +387,7 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
           ret);
     }
 
-    ERR_BIND_RETURN(
-        trit_t_to_mam_msg_recv_context_t_map_add(&api->recv_ctxs, tag, ctx),
-        ret);
+    return trit_t_to_mam_msg_recv_context_t_map_add(&api->recv_ctxs, tag, ctx);
   }
   // Else packet
   else {
