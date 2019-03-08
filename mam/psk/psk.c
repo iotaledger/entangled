@@ -17,7 +17,7 @@ trits_t mam_psk_id(mam_psk_t const *const psk) {
   return trits_from_rep(MAM_PSK_ID_SIZE, psk->id);
 }
 
-trits_t mam_psk_trits(mam_psk_t const *const psk) {
+trits_t mam_psk_key(mam_psk_t const *const psk) {
   return trits_from_rep(MAM_PSK_KEY_SIZE, psk->key);
 }
 

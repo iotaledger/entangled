@@ -31,7 +31,7 @@ typedef struct mam_psk_t_set_entry_s mam_psk_t_set_entry_t;
 typedef mam_psk_t_set_entry_t* mam_psk_t_set_t;
 
 trits_t mam_psk_id(mam_psk_t const* const psk);
-trits_t mam_psk_trits(mam_psk_t const* const psk);
+trits_t mam_psk_key(mam_psk_t const* const psk);
 
 void mam_psk_destroy(mam_psk_t* const psk);
 void mam_psks_destroy(mam_psk_t_set_t* const psks);

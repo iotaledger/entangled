@@ -374,10 +374,10 @@ static void test_api_generic() {
   {
     trits_from_str(mam_psk_id(pska), TEST_PRE_SHARED_KEY_A_STR);
     prng_gen_str(&api.prng, MAM_PRNG_DST_SEC_KEY,
-                 TEST_PRE_SHARED_KEY_A_NONCE_STR, mam_psk_trits(pska));
+                 TEST_PRE_SHARED_KEY_A_NONCE_STR, mam_psk_key(pska));
     trits_from_str(mam_psk_id(pskb), TEST_PRE_SHARED_KEY_B_STR);
     prng_gen_str(&api.prng, MAM_PRNG_DST_SEC_KEY,
-                 TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_trits(pskb));
+                 TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_key(pskb));
     TEST_ASSERT(mam_api_add_psk(&api, pskb) == RC_OK);
   }
 

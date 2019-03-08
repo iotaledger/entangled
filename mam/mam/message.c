@@ -298,7 +298,7 @@ static retcode_t mam_msg_unwrap_keyload_psk(mam_spongos_t *s, trits_t *b,
 
   if (psk_found) {
     /*  absorb external tryte psk[81]; */
-    pb3_absorb_external_ntrytes(s, mam_psk_trits(&entry->value));
+    pb3_absorb_external_ntrytes(s, mam_psk_key(&entry->value));
     /*  commit; */
     mam_spongos_commit(s);
     /*  crypt tryte ekey[81]; */
@@ -587,7 +587,7 @@ void mam_msg_write_header(mam_msg_write_context_t *ctx, mam_prng_t *prng,
         /*  KeyloadPSK psk = 1; */
         mam_msg_wrap_keyload_psk(&spongos_fork, msg, session_key,
                                  mam_psk_id(&curr_entry_psk->value),
-                                 mam_psk_trits(&curr_entry_psk->value));
+                                 mam_psk_key(&curr_entry_psk->value));
       }
 
       mam_ntru_pk_t_set_entry_t *curr_entry_ntru = NULL;
