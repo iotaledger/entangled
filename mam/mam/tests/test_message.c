@@ -69,12 +69,12 @@ static trits_t message_test_generic_send_msg(
   }
 
   size_t sz;
-  sz = mam_msg_send_size(ch, ep, ch1, ep1, psks, ntru_pks);
+  sz = mam_msg_header_size(ch, ep, ch1, ep1, psks, ntru_pks);
   msg = trits_alloc(sz);
   TEST_ASSERT(!trits_is_null(msg));
 
-  mam_msg_send(send_ctx, prng, ch, ep, ch1, ep1, msg_id, msg_type_id, psks,
-               ntru_pks, &msg);
+  mam_msg_write_header(send_ctx, prng, ch, ep, ch1, ep1, msg_id, msg_type_id,
+                       psks, ntru_pks, &msg);
   TEST_ASSERT(trits_is_empty(msg));
   msg = trits_pickup(msg, sz);
   mam_psk_t_set_free(&psks);
@@ -108,11 +108,11 @@ static trits_t message_test_generic_send_first_packet(
   TEST_ASSERT(!trits_is_null(payload));
   trits_from_str(payload, payload_str);
 
-  sz = mam_msg_send_packet_size(checksum, send_ctx->mss, trits_size(payload));
+  sz = mam_msg_packet_size(checksum, send_ctx->mss, trits_size(payload));
   packet = trits_alloc(sz);
   TEST_ASSERT(!trits_is_null(packet));
 
-  mam_msg_send_packet(send_ctx, checksum, payload, &packet);
+  mam_msg_write_packet(send_ctx, checksum, payload, &packet);
   TEST_ASSERT(trits_is_empty(packet));
   packet = trits_pickup(packet, sz);
   trits_set_zero(payload);
@@ -137,7 +137,7 @@ static void message_test_generic_receive_msg(
 
   trits_copy(mam_channel_id(cha), trits_from_rep(MAM_CHANNEL_ID_SIZE, cfg->pk));
 
-  e = mam_msg_recv(cfg_msg_recv, msg, psks, ntru_sks, msg_id);
+  e = mam_msg_read_header(cfg_msg_recv, msg, psks, ntru_sks, msg_id);
 
   TEST_ASSERT(RC_OK == e);
   TEST_ASSERT(trits_is_empty(*msg));
@@ -152,7 +152,7 @@ static void message_test_generic_receive_packet(
   retcode_t e = RC_MAM_INTERNAL_ERROR;
   ctx->ord = 0;
 
-  e = mam_msg_recv_packet(ctx, packet, payload);
+  e = mam_msg_read_packet(ctx, packet, payload);
   TEST_ASSERT(RC_OK == e);
   TEST_ASSERT(trits_is_empty(*packet));
   TEST_ASSERT(trits_is_empty(*payload));

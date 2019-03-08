@@ -203,13 +203,13 @@ retcode_t mam_api_bundle_write_header(
     trits_t header = trits_null();
     size_t header_size = 0;
 
-    header_size = mam_msg_send_size(ch, ep, ch1, ep1, psks, ntru_pks);
+    header_size = mam_msg_header_size(ch, ep, ch1, ep1, psks, ntru_pks);
     if (trits_is_null(header = trits_alloc(header_size))) {
       return RC_OOM;
     }
-    mam_msg_send(&ctx, &api->prng, ch, ep, ch1, ep1,
-                 trits_from_rep(MAM_MSG_ID_SIZE, msg_id), msg_type_id, psks,
-                 ntru_pks, &header);
+    mam_msg_write_header(&ctx, &api->prng, ch, ep, ch1, ep1,
+                         trits_from_rep(MAM_MSG_ID_SIZE, msg_id), msg_type_id,
+                         psks, ntru_pks, &header);
     header = trits_pickup(header, header_size);
     mam_api_bundle_wrap(bundle, mam_channel_id(ch).p, tag, header);
     trits_free(header);
@@ -256,8 +256,7 @@ retcode_t mam_api_bundle_write_packet(
     payload_trits = MAM_TRITS_INIT(payload_trits, payload_size * 3);
     trits_from_str(payload_trits, payload);
 
-    packet_size =
-        mam_msg_send_packet_size(checksum, ctx->mss, payload_size * 3);
+    packet_size = mam_msg_packet_size(checksum, ctx->mss, payload_size * 3);
     if (trits_is_null(packet = trits_alloc(packet_size))) {
       return RC_OOM;
     }
@@ -266,7 +265,7 @@ retcode_t mam_api_bundle_write_packet(
       ctx->ord = -ctx->ord;
     }
 
-    mam_msg_send_packet(ctx, checksum, payload_trits, &packet);
+    mam_msg_write_packet(ctx, checksum, payload_trits, &packet);
     packet = trits_pickup(packet, packet_size);
     mam_api_tag(tag, msg_id, ctx->ord);
 
@@ -299,7 +298,7 @@ static retcode_t mam_api_bundle_read_packet_from_msg(
   {
     mam_msg_recv_context_t rollback_ctx = *ctx;
 
-    if ((ret = mam_msg_recv_packet(ctx, &msg, &payload_trits)) != RC_OK) {
+    if ((ret = mam_msg_read_packet(ctx, &msg, &payload_trits)) != RC_OK) {
       *ctx = rollback_ctx;
       return ret;
     }
@@ -362,8 +361,8 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
 
     ctx.ord = 1;
 
-    ERR_BIND_RETURN(mam_msg_recv(&ctx, &msg, api->psks, api->ntru_sks,
-                                 trits_from_rep(MAM_MSG_ID_SIZE, tag)),
+    ERR_BIND_RETURN(mam_msg_read_header(&ctx, &msg, api->psks, api->ntru_sks,
+                                        trits_from_rep(MAM_MSG_ID_SIZE, tag)),
                     ret);
 
     size_t packet_index = msg.d / NUM_TRITS_MESSAGE + 1;

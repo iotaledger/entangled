@@ -439,9 +439,9 @@ static retcode_t mam_msg_unwrap_checksum_mssig(mam_spongos_t *s, trits_t *b,
   return mam_msg_unwrap_mssig(s, b, ms, ws, pk);
 }
 
-size_t mam_msg_send_size(mam_channel_t *ch, mam_endpoint_t *ep,
-                         mam_channel_t *ch1, mam_endpoint_t *ep1,
-                         mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks) {
+size_t mam_msg_header_size(mam_channel_t *ch, mam_endpoint_t *ep,
+                           mam_channel_t *ch1, mam_endpoint_t *ep1,
+                           mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks) {
   size_t sz = 0;
 
   MAM_ASSERT(ch);
@@ -493,11 +493,12 @@ size_t mam_msg_send_size(mam_channel_t *ch, mam_endpoint_t *ep,
   return sz;
 }
 
-void mam_msg_send(mam_msg_send_context_t *ctx, mam_prng_t *prng,
-                  mam_channel_t *ch, mam_endpoint_t *ep, mam_channel_t *ch1,
-                  mam_endpoint_t *ep1, trits_t msg_id, trint9_t msg_type_id,
-                  mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks,
-                  trits_t *msg) {
+void mam_msg_write_header(mam_msg_send_context_t *ctx, mam_prng_t *prng,
+                          mam_channel_t *ch, mam_endpoint_t *ep,
+                          mam_channel_t *ch1, mam_endpoint_t *ep1,
+                          trits_t msg_id, trint9_t msg_type_id,
+                          mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks,
+                          trits_t *msg) {
   trit_t session_key_trits[MAM_SPONGE_KEY_SIZE];
   trits_t session_key = trits_from_rep(MAM_SPONGE_KEY_SIZE, session_key_trits);
 
@@ -509,7 +510,7 @@ void mam_msg_send(mam_msg_send_context_t *ctx, mam_prng_t *prng,
   MAM_ASSERT(msg);
 
   MAM_ASSERT(!(trits_size(*msg) <
-               mam_msg_send_size(ch, ep, ch1, ep1, psks, ntru_pks)));
+               mam_msg_header_size(ch, ep, ch1, ep1, psks, ntru_pks)));
 
   if (ep) {
     mam_mss_skn(&ep->mss, skn);
@@ -615,8 +616,8 @@ void mam_msg_send(mam_msg_send_context_t *ctx, mam_prng_t *prng,
               trits_size(session_key));
 }
 
-size_t mam_msg_send_packet_size(mam_msg_checksum_t checksum, mam_mss_t *mss,
-                                size_t payload_size) {
+size_t mam_msg_packet_size(mam_msg_checksum_t checksum, mam_mss_t *mss,
+                           size_t payload_size) {
   size_t sz = 0;
   MAM_ASSERT(0 == payload_size % 3);
   sz = 0
@@ -645,14 +646,14 @@ size_t mam_msg_send_packet_size(mam_msg_checksum_t checksum, mam_mss_t *mss,
   return sz;
 }
 
-void mam_msg_send_packet(mam_msg_send_context_t *ctx,
-                         mam_msg_checksum_t checksum, trits_t payload,
-                         trits_t *b) {
+void mam_msg_write_packet(mam_msg_send_context_t *ctx,
+                          mam_msg_checksum_t checksum, trits_t payload,
+                          trits_t *b) {
   MAM_ASSERT(ctx);
   MAM_ASSERT(b);
 
-  MAM_ASSERT(!(trits_size(*b) < mam_msg_send_packet_size(checksum, ctx->mss,
-                                                         trits_size(payload))));
+  MAM_ASSERT(!(trits_size(*b) <
+               mam_msg_packet_size(checksum, ctx->mss, trits_size(payload))));
 
   /*  absorb long trint ord; */
   {
@@ -685,9 +686,9 @@ void mam_msg_send_packet(mam_msg_send_context_t *ctx,
   mam_spongos_commit(&ctx->spongos);
 }
 
-retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
-                       mam_psk_t_set_t psks, mam_ntru_sk_t_set_t ntru_sks,
-                       trits_t msg_id) {
+retcode_t mam_msg_read_header(mam_msg_recv_context_t *ctx,
+                              trits_t const *const msg, mam_psk_t_set_t psks,
+                              mam_ntru_sk_t_set_t ntru_sks, trits_t msg_id) {
   retcode_t e = RC_OK;
 
   MAM_ASSERT(ctx);
@@ -813,7 +814,7 @@ retcode_t mam_msg_recv(mam_msg_recv_context_t *ctx, trits_t const *const msg,
   return e;
 }
 
-retcode_t mam_msg_recv_packet(mam_msg_recv_context_t *ctx, trits_t *b,
+retcode_t mam_msg_read_packet(mam_msg_recv_context_t *ctx, trits_t *b,
                               trits_t *payload) {
   retcode_t e = RC_OK;
   trits_t p = trits_null();
