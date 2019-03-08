@@ -89,22 +89,16 @@ retcode_t mam_psks_deserialize(trits_t *const trits,
     return RC_NULL_PARAM;
   }
 
-  if ((ret = pb3_decode_size_t(&psks_size, trits)) != RC_OK) {
-    return ret;
-  }
+  ERR_BIND_RETURN(pb3_decode_size_t(&psks_size, trits), ret);
 
   for (size_t i = 0; i < psks_size; i++) {
-    if ((ret = pb3_decode_ntrytes(trits_from_rep(MAM_PSK_ID_SIZE, psk.id),
-                                  trits)) != RC_OK) {
-      break;
-    }
-    if ((ret = pb3_decode_ntrytes(trits_from_rep(MAM_PSK_KEY_SIZE, psk.key),
-                                  trits)) != RC_OK) {
-      break;
-    }
-    if ((ret = mam_psk_t_set_add(psks, &psk)) != RC_OK) {
-      break;
-    }
+    ERR_BIND_RETURN(
+        pb3_decode_ntrytes(trits_from_rep(MAM_PSK_ID_SIZE, psk.id), trits),
+        ret);
+    ERR_BIND_RETURN(
+        pb3_decode_ntrytes(trits_from_rep(MAM_PSK_KEY_SIZE, psk.key), trits),
+        ret);
+    ERR_BIND_RETURN(mam_psk_t_set_add(psks, &psk), ret);
   }
 
   return ret;
