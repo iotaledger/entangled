@@ -24,7 +24,7 @@ int main(int ac, char **av) {
     return EXIT_FAILURE;
   }
 
-  if (strcmp(av[6], "yes") && strcmp(av[6], "no")) {
+  if (strcmp(av[5], "yes") && strcmp(av[5], "no")) {
     fprintf(stderr, "Arg <last_packet> should be \"yes\" or \"no\" only\n");
     return EXIT_FAILURE;
   }
