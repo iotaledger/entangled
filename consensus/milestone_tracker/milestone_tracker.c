@@ -138,7 +138,7 @@ static retcode_t validate_milestone(
       *milestone_status = MILESTONE_VALID;
     }
   } else {
-    log_warning(logger_id, "Abnormal bundle_status %d\n", bundle_status);
+    log_debug(logger_id, "Abnormal bundle_status %d\n", bundle_status);
   }
 
 done:
