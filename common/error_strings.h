@@ -34,6 +34,17 @@ extern "C" {
 #define STR_CCLIENT_INVALID_TAIL_HASH "Invalid tail hash"
 #define SRT_CCLIENT_INVALID_BUNDLE "Invalid bundle"
 
+#define STR_UTILS_SOCKET_TLS_RNG "TLS random number generator"
+#define STR_UTILS_SOCKET_TLS_CA "TLS parsing CA PEM error"
+#define STR_UTILS_SOCKET_TLS_CLIENT_PEM \
+  "TLS parsing client Certificate Authority error"
+#define STR_UTILS_SOCKET_TLS_CLIENT_PK "TLS parsing client private key error"
+#define STR_UTILS_SOCKET_TLS_CONF "TLS setup error"
+#define STR_UTILS_SOCKET_TLS_AUTHMODE "TLS configure auth mode error"
+#define STR_UTILS_SOCKET_CLIENT_AUTH \
+  "TLS set own certificate chain and private key error"
+#define STR_UTILS_SOCKET_TLS_HANDSHAKE "TLS handshake error"
+#define STR_UTILS_SOCKET_CONNECT "Socket connect error"
 #ifdef __cplusplus
 }
 #endif

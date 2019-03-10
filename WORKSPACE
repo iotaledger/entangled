@@ -4,7 +4,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_r
 
 git_repository(
     name = "rules_iota",
-    commit = "b15744b9ea520717752c866d5afc769c3b6b68f3",
+    commit = "54efbbdf18d55ac4ee1c9b9b2b66bb47f7eaa5f2",
     remote = "https://github.com/iotaledger/rules_iota.git",
 )
 

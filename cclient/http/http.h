@@ -15,6 +15,15 @@ extern "C" {
 #include <stdlib.h>
 #include "cclient/service.h"
 
+// socket buffer can overwrite thought config
+#ifndef RECEIVE_BUFFER_SIZE
+#ifdef __XTENSA__
+#define RECEIVE_BUFFER_SIZE 2 * 1024
+#else
+#define RECEIVE_BUFFER_SIZE 4 * 1024
+#endif
+#endif
+
 extern const char* khttp_ApplicationJson;
 extern const char* khttp_ApplicationFormUrlencoded;
 
