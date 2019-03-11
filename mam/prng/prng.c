@@ -55,3 +55,17 @@ void mam_prng_gen3(mam_prng_t const *const prng,
   mam_sponge_absorbn(&sponge, MAM_SPONGE_CTL_KEY, 5, KdN);
   mam_sponge_squeeze(&sponge, MAM_SPONGE_CTL_PRN, output);
 }
+
+void mam_prng_gen_trytes(mam_prng_t const *const prng,
+                         mam_prng_destination_tryte_t const destination,
+                         char const *nonce, trits_t output) {
+  size_t n;
+  MAM_TRITS_DEF0(N, MAM_SPONGE_RATE);
+  N = MAM_TRITS_INIT(N, MAM_SPONGE_RATE);
+
+  n = strlen(nonce) * 3;
+  N = trits_take_min(N, n);
+  trits_from_str(N, nonce);
+
+  mam_prng_gen(prng, destination, N, output);
+}

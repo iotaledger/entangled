@@ -13,7 +13,6 @@
 
 #include "mam/mam/message.h"
 #include "mam/ntru/mam_ntru_sk_t_set.h"
-#include "mam/test_utils/test_utils.h"
 
 #define TEST_CHANNEL_NAME "CHANAME"
 #define TEST_CHANNEL_1_NAME "CHANAME9"
@@ -260,12 +259,12 @@ static void message_test_generic(mam_prng_t *prng_sender,
   /* gen psk */
   {
     trits_from_str(mam_psk_id(pska), TEST_PRE_SHARED_KEY_A_STR);
-    prng_gen_str(prng_sender, MAM_PRNG_DST_SEC_KEY,
-                 TEST_PRE_SHARED_KEY_A_NONCE_STR, mam_psk_key(pska));
+    mam_prng_gen_trytes(prng_sender, MAM_PRNG_DST_SEC_KEY,
+                        TEST_PRE_SHARED_KEY_A_NONCE_STR, mam_psk_key(pska));
 
     trits_from_str(mam_psk_id(pskb), TEST_PRE_SHARED_KEY_B_STR);
-    prng_gen_str(prng_receiver, MAM_PRNG_DST_SEC_KEY,
-                 TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_key(pskb));
+    mam_prng_gen_trytes(prng_receiver, MAM_PRNG_DST_SEC_KEY,
+                        TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_key(pskb));
   }
 
   MAM_TRITS_DEF0(msg_id, MAM_MSG_ID_SIZE);
