@@ -29,6 +29,35 @@ extern "C" {
 
 trits_t mam_ntru_pk_id(mam_ntru_pk_t const *const ntru_pk);
 trits_t mam_ntru_pk_key(mam_ntru_pk_t const *const ntru_pk);
+
+/**
+ * NTRU encryption of a session key
+ *
+ * @param public_key A NTRU public key
+ * @param prng A PRNG interface
+ * @param spongos A spongos interface
+ * @param session_key A session symmetric key to be encrypted
+ * @param nonce A nonce
+ * @param encrypted_session_key The encrypted session key
+ */
+void ntru_pk_encr(mam_ntru_pk_t const *const ntru_pk,
+                  mam_prng_t const *const prng, mam_spongos_t *const spongos,
+                  trits_t const session_key, trits_t const nonce,
+                  trits_t encrypted_session_key);
+
+/**
+ * NTRU encryption of a session key
+ *
+ * @param public_key A NTRU public key
+ * @param spongos A spongos interface
+ * @param r Pseudo-random trits
+ * @param session_key A session symmetric key to be encrypted
+ * @param encrypted_session_key The encrypted session key
+ */
+void ntru_pk_encr_r(mam_ntru_pk_t const *const ntru_pk,
+                    mam_spongos_t *const spongos, trits_t const r,
+                    trits_t const session_key, trits_t encrypted_session_key);
+
 size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set);
 retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
                                  trits_t *const trits);
@@ -101,33 +130,6 @@ void ntru_sk_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
                  trits_t const nonce);
 
 /**
- * NTRU encryption of a session key
- *
- * @param public_key A NTRU public key
- * @param prng A PRNG interface
- * @param spongos A spongos interface
- * @param session_key A session symmetric key to be encrypted
- * @param nonce A nonce
- * @param encrypted_session_key The encrypted session key
- */
-void ntru_encr(trits_t const public_key, mam_prng_t const *const prng,
-               mam_spongos_t *const spongos, trits_t const session_key,
-               trits_t const nonce, trits_t encrypted_session_key);
-
-/**
- * NTRU encryption of a session key
- *
- * @param public_key A NTRU public key
- * @param spongos A spongos interface
- * @param r Pseudo-random trits
- * @param session_key A session symmetric key to be encrypted
- * @param encrypted_session_key The encrypted session key
- */
-void ntru_encr_r(trits_t const public_key, mam_spongos_t *const spongos,
-                 trits_t const r, trits_t const session_key,
-                 trits_t encrypted_session_key);
-
-/**
  * NTRU decryption of an encrypted session key
  *
  * @param ntru A NTRU interface
@@ -137,8 +139,8 @@ void ntru_encr_r(trits_t const public_key, mam_spongos_t *const spongos,
  *
  * @return
  */
-bool ntru_decr(mam_ntru_sk_t const *const ntru, mam_spongos_t *const spongos,
-               trits_t const encrypted_session_key, trits_t session_key);
+bool ntru_sk_decr(mam_ntru_sk_t const *const ntru, mam_spongos_t *const spongos,
+                  trits_t const encrypted_session_key, trits_t session_key);
 
 /**
  * NTRU load the sk functional representation from sk

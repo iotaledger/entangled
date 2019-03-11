@@ -59,18 +59,18 @@ static void ntru_test(void) {
 
     do {
       TEST_ASSERT_TRUE(trits_from_str(nonce, "NONCE9ENC9"));
-      ntru_encr(pk, &prng, &spongos, key, nonce, ekey);
+      ntru_pk_encr(&ntru.public_key, &prng, &spongos, key, nonce, ekey);
 
-      TEST_ASSERT_TRUE(ntru_decr(&ntru, &spongos, ekey, dekey));
+      TEST_ASSERT_TRUE(ntru_sk_decr(&ntru, &spongos, ekey, dekey));
       TEST_ASSERT_TRUE(trits_cmp_eq(key, dekey));
 
       trits_put1(ekey, trit_add(trits_get1(ekey), 1));
-      TEST_ASSERT_TRUE(!ntru_decr(&ntru, &spongos, ekey, dekey));
+      TEST_ASSERT_TRUE(!ntru_sk_decr(&ntru, &spongos, ekey, dekey));
       TEST_ASSERT_TRUE(!trits_cmp_eq(key, dekey));
       trits_put1(ekey, trit_sub(trits_get1(ekey), 1));
 
       memcpy(ntru.f, f, sizeof(poly_t));
-      TEST_ASSERT_TRUE(!ntru_decr(&ntru, &spongos, ekey, dekey));
+      TEST_ASSERT_TRUE(!ntru_sk_decr(&ntru, &spongos, ekey, dekey));
       TEST_ASSERT_TRUE(!trits_cmp_eq(key, dekey));
       memcpy(ntru.f, f0, sizeof(poly_t));
 

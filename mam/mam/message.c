@@ -331,8 +331,9 @@ static size_t mam_msg_wrap_keyload_ntru_size() {
 }
 
 static void mam_msg_wrap_keyload_ntru(mam_spongos_t *s, trits_t *b, trits_t key,
-                                      trits_t pk, mam_prng_t *p,
-                                      mam_spongos_t *ns, trits_t N) {
+                                      mam_ntru_pk_t const *const ntru_pk,
+                                      mam_prng_t *p, mam_spongos_t *ns,
+                                      trits_t N) {
   trits_t ekey;
 
   MAM_ASSERT(mam_msg_wrap_keyload_ntru_size() <= trits_size(*b));
@@ -340,10 +341,10 @@ static void mam_msg_wrap_keyload_ntru(mam_spongos_t *s, trits_t *b, trits_t key,
   MAM_ASSERT(MAM_NTRU_PK_SIZE == trits_size(pk));
 
   /*  absorb tryte id[27]; */
-  pb3_wrap_absorb_ntrytes(s, b, trits_take(pk, pb3_sizeof_ntrytes(27)));
+  pb3_wrap_absorb_ntrytes(s, b, mam_ntru_pk_id(ntru_pk));
   /*  absorb tryte ekey[3072]; */
   ekey = pb3_trits_take(b, MAM_NTRU_EKEY_SIZE);
-  ntru_encr(pk, p, ns, key, N, ekey);
+  ntru_pk_encr(ntru_pk, p, ns, key, N, ekey);
   mam_spongos_absorb(s, ekey);
 }
 
@@ -377,7 +378,7 @@ static retcode_t mam_msg_unwrap_keyload_ntru(mam_spongos_t *s, trits_t *b,
     /*  absorb tryte ekey[3072]; */
     ERR_GUARD_RETURN(MAM_NTRU_EKEY_SIZE <= trits_size(*b), RC_MAM_PB3_EOF);
     ekey = pb3_trits_take(b, MAM_NTRU_EKEY_SIZE);
-    ERR_GUARD_RETURN(ntru_decr(&entry->value, ns, ekey, key2),
+    ERR_GUARD_RETURN(ntru_sk_decr(&entry->value, ns, ekey, key2),
                      RC_MAM_PB3_BAD_EKEY);
     mam_spongos_absorb(s, ekey);
 
@@ -606,8 +607,8 @@ retcode_t mam_msg_write_header(mam_msg_write_context_t *ctx, mam_prng_t *prng,
         mam_mam_spongos_fork(&ctx->spongos, &spongos_fork);
         /*  KeyloadNTRU ntru = 2; */
         mam_msg_wrap_keyload_ntru(&spongos_fork, msg, session_key,
-                                  mam_ntru_pk_key(&curr_entry_ntru->value),
-                                  prng, &spongos_ntru, msg_id);
+                                  &curr_entry_ntru->value, prng, &spongos_ntru,
+                                  msg_id);
       }
     }
 

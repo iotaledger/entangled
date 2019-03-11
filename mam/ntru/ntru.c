@@ -25,6 +25,59 @@ trits_t mam_ntru_pk_key(mam_ntru_pk_t const *const ntru_pk) {
   return trits_from_rep(MAM_NTRU_PK_SIZE, ntru_pk->key);
 }
 
+void ntru_pk_encr(mam_ntru_pk_t const *const ntru_pk,
+                  mam_prng_t const *const prng, mam_spongos_t *const spongos,
+                  trits_t const session_key, trits_t const nonce,
+                  trits_t encrypted_session_key) {
+  MAM_ASSERT(trits_size(session_key) == MAM_NTRU_KEY_SIZE);
+  MAM_ASSERT(trits_size(encrypted_session_key) == MAM_NTRU_EKEY_SIZE);
+  MAM_ASSERT(!trits_is_same(session_key, encrypted_session_key));
+
+  trits_t r;
+
+  r = trits_take(encrypted_session_key, MAM_NTRU_SK_SIZE);
+  mam_prng_gen3(prng, MAM_PRNG_DST_NTRU_KEY, mam_ntru_pk_id(ntru_pk),
+                session_key, nonce, r);
+  ntru_pk_encr_r(ntru_pk, spongos, r, session_key, encrypted_session_key);
+}
+
+void ntru_pk_encr_r(mam_ntru_pk_t const *const ntru_pk,
+                    mam_spongos_t *const spongos, trits_t const r,
+                    trits_t const session_key, trits_t encrypted_session_key) {
+  MAM_ASSERT(trits_size(r) == MAM_NTRU_SK_SIZE);
+  MAM_ASSERT(trits_size(session_key) == MAM_NTRU_KEY_SIZE);
+  MAM_ASSERT(trits_size(encrypted_session_key) == MAM_NTRU_EKEY_SIZE);
+
+  bool ok = false;
+  MAM_POLY_DEF(h);
+  MAM_POLY_DEF(s);
+
+  ok = poly_from_trits(h, mam_ntru_pk_key(ntru_pk));
+  MAM_ASSERT(ok);
+  poly_ntt(h, h);
+
+  /* s(x) := r(x)*h(x) */
+  poly_small_from_trits(s, r);
+  poly_ntt(s, s);
+  poly_conv(s, h, s);
+  poly_intt(s, s);
+
+  /* h(x) = AE(r*h;K) */
+  poly_to_trits(s, encrypted_session_key);
+  mam_spongos_init(spongos);
+  mam_spongos_absorb(spongos, encrypted_session_key);
+  mam_spongos_commit(spongos);
+  mam_spongos_encr(spongos, session_key, trits_take(r, MAM_NTRU_KEY_SIZE));
+  mam_spongos_squeeze(spongos, trits_drop(r, MAM_NTRU_KEY_SIZE));
+  poly_small_from_trits(h, r);
+
+  /* Y = r*h + AE(r*h;K) */
+  poly_add(s, h, s);
+  poly_to_trits(s, encrypted_session_key);
+
+  memset_safe(h, sizeof(h), 0, sizeof(h));
+}
+
 size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set) {
   return pb3_sizeof_size_t(mam_ntru_pk_t_set_size(ntru_pk_set)) +
          mam_ntru_pk_t_set_size(ntru_pk_set) * sizeof(mam_ntru_pk_t);
@@ -119,61 +172,8 @@ void ntru_sk_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
               trits_size(secret_key));
 }
 
-void ntru_encr(trits_t const public_key, mam_prng_t const *const prng,
-               mam_spongos_t *const spongos, trits_t const session_key,
-               trits_t const nonce, trits_t encrypted_session_key) {
-  MAM_ASSERT(trits_size(session_key) == MAM_NTRU_KEY_SIZE);
-  MAM_ASSERT(trits_size(encrypted_session_key) == MAM_NTRU_EKEY_SIZE);
-  MAM_ASSERT(!trits_is_same(session_key, encrypted_session_key));
-
-  trits_t r;
-
-  r = trits_take(encrypted_session_key, MAM_NTRU_SK_SIZE);
-  mam_prng_gen3(prng, MAM_PRNG_DST_NTRU_KEY,
-                trits_take(public_key, MAM_NTRU_ID_SIZE), session_key, nonce,
-                r);
-  ntru_encr_r(public_key, spongos, r, session_key, encrypted_session_key);
-}
-
-void ntru_encr_r(trits_t const public_key, mam_spongos_t *const spongos,
-                 trits_t const r, trits_t const session_key,
-                 trits_t encrypted_session_key) {
-  MAM_ASSERT(trits_size(r) == MAM_NTRU_SK_SIZE);
-  MAM_ASSERT(trits_size(session_key) == MAM_NTRU_KEY_SIZE);
-  MAM_ASSERT(trits_size(encrypted_session_key) == MAM_NTRU_EKEY_SIZE);
-
-  bool ok = false;
-  MAM_POLY_DEF(h);
-  MAM_POLY_DEF(s);
-
-  ok = poly_from_trits(h, public_key);
-  MAM_ASSERT(ok);
-  poly_ntt(h, h);
-
-  /* s(x) := r(x)*h(x) */
-  poly_small_from_trits(s, r);
-  poly_ntt(s, s);
-  poly_conv(s, h, s);
-  poly_intt(s, s);
-
-  /* h(x) = AE(r*h;K) */
-  poly_to_trits(s, encrypted_session_key);
-  mam_spongos_init(spongos);
-  mam_spongos_absorb(spongos, encrypted_session_key);
-  mam_spongos_commit(spongos);
-  mam_spongos_encr(spongos, session_key, trits_take(r, MAM_NTRU_KEY_SIZE));
-  mam_spongos_squeeze(spongos, trits_drop(r, MAM_NTRU_KEY_SIZE));
-  poly_small_from_trits(h, r);
-
-  /* Y = r*h + AE(r*h;K) */
-  poly_add(s, h, s);
-  poly_to_trits(s, encrypted_session_key);
-
-  memset_safe(h, sizeof(h), 0, sizeof(h));
-}
-
-bool ntru_decr(mam_ntru_sk_t const *const ntru, mam_spongos_t *const spongos,
-               trits_t const encrypted_session_key, trits_t session_key) {
+bool ntru_sk_decr(mam_ntru_sk_t const *const ntru, mam_spongos_t *const spongos,
+                  trits_t const encrypted_session_key, trits_t session_key) {
   MAM_ASSERT(trits_size(session_key) == MAM_NTRU_KEY_SIZE);
   MAM_ASSERT(trits_size(encrypted_session_key) == MAM_NTRU_EKEY_SIZE);
 
