@@ -13,16 +13,44 @@ config_setting(
 )
 
 cc_library(
+    name = "ntru_types_hdr",
+    hdrs = ["ntru_types.h"],
+    deps = [
+        ":poly",
+        "//common:errors",
+        "//mam:defs",
+        "//mam/trits",
+    ],
+)
+
+cc_library(
     name = "ntru",
     srcs = ["ntru.c"],
     hdrs = ["ntru.h"],
     deps = [
+        ":mam_ntru_pk_t_set",
+        ":mam_ntru_sk_t_set",
         ":ntru_types_hdr",
-        ":poly",
         "//mam/prng",
         "//mam/sponge:spongos",
         "//utils:memset_safe",
     ],
+)
+
+typed_container_generate(
+    additional_deps = ":ntru_types_hdr",
+    additional_include_path = "mam/ntru/ntru_types.h",
+    container_type = "set",
+    parent_directory = "mam/ntru",
+    value_type = "mam_ntru_pk_t",
+)
+
+typed_container_generate(
+    additional_deps = ":ntru_types_hdr",
+    additional_include_path = "mam/ntru/ntru_types.h",
+    container_type = "set",
+    parent_directory = "mam/ntru",
+    value_type = "mam_ntru_sk_t",
 )
 
 cc_library(
@@ -60,43 +88,4 @@ cc_library(
         "//mam:defs",
         "//mam/trits",
     ],
-)
-
-cc_library(
-    name = "ntru_types_hdr",
-    hdrs = ["ntru_types.h"],
-    deps = [
-        ":poly",
-        "//common:errors",
-        "//mam:defs",
-        "//mam/trits",
-    ],
-)
-
-cc_library(
-    name = "ntru_types",
-    srcs = ["ntru_types.c"],
-    deps = [
-        ":mam_ntru_pk_t_set",
-        ":mam_ntru_sk_t_set",
-        "//mam:defs",
-        "//mam/ntru",
-        "//mam/trits",
-    ],
-)
-
-typed_container_generate(
-    additional_deps = ":ntru_types_hdr",
-    additional_include_path = "mam/ntru/ntru_types.h",
-    container_type = "set",
-    parent_directory = "mam/ntru",
-    value_type = "mam_ntru_pk_t",
-)
-
-typed_container_generate(
-    additional_deps = ":ntru_types_hdr",
-    additional_include_path = "mam/ntru/ntru_types.h",
-    container_type = "set",
-    parent_directory = "mam/ntru",
-    value_type = "mam_ntru_sk_t",
 )

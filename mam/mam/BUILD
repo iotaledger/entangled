@@ -12,8 +12,6 @@ cc_library(
         "//mam:defs",
         "//mam/mss",
         "//mam/ntru",
-        "//mam/ntru:mam_ntru_pk_t_set",
-        "//mam/ntru:mam_ntru_sk_t_set",
         "//mam/pb3",
         "//mam/prng",
         "//mam/psk",

@@ -142,6 +142,20 @@ bool ntru_decr(mam_ntru_sk_t const *const ntru, mam_spongos_t *const spongos,
 
 void ntru_load_sk(mam_ntru_sk_t *n);
 
+size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set);
+retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
+                                 trits_t *const trits);
+retcode_t mam_ntru_pks_deserialize(trits_t *const trits,
+                                   mam_ntru_pk_t_set_t *const ntru_pk_set);
+
+void mam_ntru_sks_destroy(mam_ntru_sk_t_set_t *const ntru_sks);
+
+size_t mam_ntru_sks_serialized_size(mam_ntru_sk_t_set_t const ntru_sk_set);
+retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sk_set,
+                                 trits_t *const trits);
+retcode_t mam_ntru_sks_deserialize(trits_t *const trits,
+                                   mam_ntru_sk_t_set_t *const ntru_sk_set);
+
 #ifdef __cplusplus
 }
 #endif
