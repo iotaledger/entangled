@@ -130,7 +130,7 @@ static char const* data =
     "dignissim. Proin malesuada adipiscing lacus.";
 
 void test_http_request(void) {
-  iota_client_service_t service = {{0}};
+  iota_client_service_t service = {};
   service.http.host = "httpbin.org";
   service.http.content_type = khttp_ApplicationFormUrlencoded;
   service.http.accept = khttp_ApplicationJson;
@@ -139,6 +139,8 @@ void test_http_request(void) {
   service.http.ca_pem = NULL;
   char_buffer_t* req = char_buffer_new();
   char_buffer_t* res = char_buffer_new();
+  TEST_ASSERT_NOT_NULL(req);
+  TEST_ASSERT_NOT_NULL(res);
   char_buffer_allocate(req, strlen(data));
   memcpy(req->data, data, req->length);
   TEST_ASSERT(iota_service_query(&service, req, res) == RC_OK);
@@ -157,7 +159,7 @@ void test_http_request(void) {
 }
 
 void test_https_request(void) {
-  iota_client_service_t service = {{0}};
+  iota_client_service_t service = {};
   service.http.host = "postman-echo.com";
   service.http.content_type = khttp_ApplicationFormUrlencoded;
   service.http.accept = khttp_ApplicationJson;
@@ -166,6 +168,8 @@ void test_https_request(void) {
   service.http.ca_pem = amazon_ca1_pem;
   char_buffer_t* req = char_buffer_new();
   char_buffer_t* res = char_buffer_new();
+  TEST_ASSERT_NOT_NULL(req);
+  TEST_ASSERT_NOT_NULL(res);
   char_buffer_allocate(req, strlen(data));
   memcpy(req->data, data, req->length);
   TEST_ASSERT(iota_service_query(&service, req, res) == RC_OK);

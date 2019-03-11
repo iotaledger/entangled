@@ -15,7 +15,7 @@ extern "C" {
 #include <stdlib.h>
 #include "cclient/service.h"
 
-// socket buffer can overwrite thought config
+// socket buffer can overwrite through the preprocessor macro.
 #ifndef RECEIVE_BUFFER_SIZE
 #ifdef __XTENSA__
 #define RECEIVE_BUFFER_SIZE 2 * 1024

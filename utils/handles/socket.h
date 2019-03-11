@@ -41,17 +41,16 @@
 extern "C" {
 #endif
 
-int open_client_socket(char const *const hostname, const size_t port);
-static inline void close_socket(int sockfd) {
+int socket_connect(char const *const hostname, const size_t port);
+static inline void socket_close(int sockfd) {
   if (sockfd != -1) {
     close(sockfd);
   }
 }
-static inline int receive_on_socket_wait(int sockfd, void *buffer, size_t len) {
+static inline int socket_recv(int sockfd, void *buffer, size_t len) {
   return recv(sockfd, buffer, len, 0);
 }
-static inline int send_on_socket_wait(int sockfd, const void *buffer,
-                                      size_t len) {
+static inline int socket_send(int sockfd, const void *buffer, size_t len) {
   return send(sockfd, buffer, len, 0);
 }
 

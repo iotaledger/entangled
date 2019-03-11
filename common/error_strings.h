@@ -12,6 +12,7 @@
 extern "C" {
 #endif
 #define STR_OK "OK"
+#define STR_ERROR "ERROR"
 
 // Cclient Module
 #define STR_CCLIENT_JSON_CREATE "Create JSON object error!"
@@ -45,6 +46,8 @@ extern "C" {
   "TLS set own certificate chain and private key error"
 #define STR_UTILS_SOCKET_TLS_HANDSHAKE "TLS handshake error"
 #define STR_UTILS_SOCKET_CONNECT "Socket connect error"
+#define STR_UTILS_SOCKET_RECV "Socket receive error"
+#define STR_UTILS_SOCKET_SEND "Socket send error"
 #ifdef __cplusplus
 }
 #endif

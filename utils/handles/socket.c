@@ -12,9 +12,9 @@
 
 #include "socket.h"
 
-int open_client_socket(char const *const hostname, const size_t port) {
+int socket_connect(char const *const hostname, const size_t port) {
   struct addrinfo hints, *serverinfo, *info;
-  char port_string[6];
+  char port_string[6] = {};
   int sockfd = -1;
 
   memset(&hints, 0, sizeof hints);
@@ -86,7 +86,7 @@ int tls_socket_connect(mbedtls_ctx_t *tls_ctx, char const *host, uint16_t port,
   int mbedtls_ret = -1;
   char const drgb_pres[] = "iota_tls_client";
   bool is_client_auth = false;
-  char port_string[6];
+  char port_string[6] = {};
   sprintf(port_string, "%d", port);
 
   tls_init(tls_ctx);

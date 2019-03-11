@@ -86,28 +86,18 @@ static int request_parse_message_complete(struct _response_ctx* response) {
   return RC_OK;
 }
 
-// Socket creation
-static retcode_t connect_to_iota_service(char const* const hostname,
-                                         const size_t port, int* sockfd) {
-  if ((*sockfd = open_client_socket(hostname, port)) == -1) {
-    return RC_CCLIENT_HTTP;
-  }
-  return RC_OK;
-}
-
-static retcode_t read_data_from_iota_service(int sockfd,
-                                             char_buffer_t* response) {
-  char buffer[RECEIVE_BUFFER_SIZE] = {0};
+static retcode_t http_response_read(int sockfd, char_buffer_t* response) {
+  char buffer[RECEIVE_BUFFER_SIZE] = {};
   ssize_t num_received = 0;
   // Setup parser settings - callbacks
-  http_parser_settings settings = {0};
+  http_parser_settings settings = {};
   settings.on_headers_complete = &request_parse_header_complete_cb;
   settings.on_body = &request_parse_data_cb;
   settings.on_message_complete = &request_parse_message_complete_cb;
   // Setup parser
-  http_parser parser = {0};
+  http_parser parser = {};
   // Setup response structure
-  struct _response_ctx response_context = {0};
+  struct _response_ctx response_context = {};
   response_context.parser = &parser;
   response_context.response = response;
   response_context.status = IOTA_REQUEST_STATUS_OK;
@@ -116,13 +106,13 @@ static retcode_t read_data_from_iota_service(int sockfd,
   http_parser_init(&parser, HTTP_RESPONSE);
   parser.data = &response_context;
   // Loop over received data
-  while ((num_received = receive_on_socket_wait(sockfd, buffer,
-                                                RECEIVE_BUFFER_SIZE)) > 0) {
+  while ((num_received = socket_recv(sockfd, buffer, RECEIVE_BUFFER_SIZE)) >
+         0) {
     int parsed = http_parser_execute(&parser, &settings, buffer, num_received);
     // A parsing error occured, or an error in a callback
     if (parsed < num_received ||
         response_context.status == IOTA_REQUEST_STATUS_ERROR) {
-      return RC_CCLIENT_HTTP_RES;
+      return RC_UTILS_SOCKET_RECV;
     } else if (response_context.status == IOTA_REQUEST_STATUS_DONE) {
       return RC_OK;
     }
@@ -134,13 +124,13 @@ static retcode_t read_data_from_iota_service(int sockfd,
   return RC_OK;
 }
 
-static retcode_t send_data_to_iota_service(int sockfd, char const* const data,
-                                           size_t data_length) {
+static retcode_t http_request_data(int sockfd, char const* const data,
+                                   size_t data_length) {
   char* ptr = (char*)data;
   while (data_length > 0) {
-    ssize_t num_sent = send_on_socket_wait(sockfd, ptr, data_length);
+    ssize_t num_sent = socket_send(sockfd, ptr, data_length);
     if (num_sent < 0) {
-      return RC_CCLIENT_HTTP;
+      return RC_UTILS_SOCKET_SEND;
     }
     ptr += num_sent;
     data_length -= num_sent;
@@ -148,14 +138,14 @@ static retcode_t send_data_to_iota_service(int sockfd, char const* const data,
   return RC_OK;
 }
 
-static retcode_t send_headers_to_iota_service(int sockfd,
-                                              http_info_t const* http_settings,
-                                              size_t data_length) {
-  char header[256];
+static retcode_t http_request_header(int sockfd,
+                                     http_info_t const* http_settings,
+                                     size_t data_length) {
+  char header[256] = {};
   sprintf(header, header_template, http_settings->path, http_settings->host,
           http_settings->api_version, http_settings->content_type,
           http_settings->accept, data_length);
-  return send_data_to_iota_service(sockfd, header, strlen(header));
+  return http_request_data(sockfd, header, strlen(header));
 }
 
 static int https_request_header(mbedtls_ctx_t* ctx,
@@ -174,7 +164,7 @@ static retcode_t https_request_data(mbedtls_ctx_t* ctx, char const* const data,
   while (data_length > 0) {
     ssize_t num_sent = tls_socket_send(ctx, ptr, data_length);
     if (num_sent < 0) {
-      return RC_CCLIENT_HTTP;
+      return RC_UTILS_SOCKET_SEND;
     }
     ptr += num_sent;
     data_length -= num_sent;
@@ -209,7 +199,7 @@ static retcode_t https_response_read(mbedtls_ctx_t* ctx,
     // A parsing error occured, or an error in a callback
     if (parsed < num_received ||
         response_context.status == IOTA_REQUEST_STATUS_ERROR) {
-      return RC_CCLIENT_HTTP_RES;
+      return RC_UTILS_SOCKET_RECV;
     } else if (response_context.status == IOTA_REQUEST_STATUS_DONE) {
       return RC_OK;
     }
@@ -224,33 +214,26 @@ static retcode_t https_response_read(mbedtls_ctx_t* ctx,
 retcode_t iota_service_query(const void* const service_opaque,
                              char_buffer_t* obj, char_buffer_t* response) {
   int sockfd = -1;
-  retcode_t result = RC_OK;
+  retcode_t result = RC_ERROR;
   const iota_client_service_t* const service =
       (const iota_client_service_t* const)service_opaque;
   const http_info_t* http_settings = &service->http;
 
   if (http_settings->ca_pem == NULL) {
     // HTTP
-    if ((result = connect_to_iota_service(
-             http_settings->host, http_settings->port, &sockfd)) != RC_OK) {
-      goto cleanup;
+    sockfd = socket_connect(http_settings->host, http_settings->port);
+    if (sockfd >= 0) {
+      if ((result = http_request_header(sockfd, http_settings, obj->length)) ==
+          RC_OK) {
+        if ((result = http_request_data(sockfd, obj->data, obj->length)) ==
+            RC_OK) {
+          result = http_response_read(sockfd, response);
+        }
+      } else {
+        result = RC_UTILS_SOCKET_CONNECT;
+      }
     }
-
-    if ((result = send_headers_to_iota_service(sockfd, http_settings,
-                                               obj->length)) != RC_OK) {
-      goto cleanup;
-    }
-    if ((result = send_data_to_iota_service(sockfd, obj->data, obj->length)) !=
-        RC_OK) {
-      goto cleanup;
-    }
-    if ((result = read_data_from_iota_service(sockfd, response)) != RC_OK) {
-      goto cleanup;
-    }
-  cleanup:
-    if (sockfd != -1) {
-      close_socket(sockfd);
-    }
+    socket_close(sockfd);
   } else {
     // HTTPS with ca auth
     mbedtls_ctx_t tls_ctx;
@@ -264,8 +247,10 @@ retcode_t iota_service_query(const void* const service_opaque,
           result = https_response_read(&tls_ctx, response);
         }
       } else {
-        result = RC_CCLIENT_HTTP_RES;
+        result = RC_CCLIENT_HTTP_REQ;
       }
+    } else {
+      result = RC_UTILS_SOCKET_CONNECT;
     }
     tls_socket_close(&tls_ctx);
   }
