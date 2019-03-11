@@ -27,22 +27,41 @@ extern "C" {
  * NTRU public key
  */
 
-trits_t mam_ntru_pk_id(mam_ntru_pk_t const *const ntru_pk);
-trits_t mam_ntru_pk_key(mam_ntru_pk_t const *const ntru_pk);
+/**
+ * Gets a NTRU public key id trits
+ *
+ * @param ntru_pk The NTRU public key
+ *
+ * @return the NTRU public key id trits
+ */
+static inline trits_t mam_ntru_pk_id(mam_ntru_pk_t const *const ntru_pk) {
+  return trits_from_rep(MAM_NTRU_ID_SIZE, ntru_pk->key);
+}
+
+/**
+ * Gets a NTRU public key trits
+ *
+ * @param ntru_pk The NTRU public key
+ *
+ * @return the NTRU public key trits
+ */
+static inline trits_t mam_ntru_pk_key(mam_ntru_pk_t const *const ntru_pk) {
+  return trits_from_rep(MAM_NTRU_PK_SIZE, ntru_pk->key);
+}
 
 /**
  * NTRU encryption of a session key
  *
- * @param public_key A NTRU public key
+ * @param ntru_pk A NTRU public key
  * @param prng A PRNG interface
  * @param spongos A spongos interface
- * @param session_key A session symmetric key to be encrypted
  * @param nonce A nonce
+ * @param session_key A session symmetric key to be encrypted
  * @param encrypted_session_key The encrypted session key
  */
 void ntru_pk_encr(mam_ntru_pk_t const *const ntru_pk,
                   mam_prng_t const *const prng, mam_spongos_t *const spongos,
-                  trits_t const session_key, trits_t const nonce,
+                  trits_t const nonce, trits_t const session_key,
                   trits_t encrypted_session_key);
 
 /**
@@ -58,107 +77,152 @@ void ntru_pk_encr_r(mam_ntru_pk_t const *const ntru_pk,
                     mam_spongos_t *const spongos, trits_t const r,
                     trits_t const session_key, trits_t encrypted_session_key);
 
-size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set);
-retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
+/**
+ * Gets the size of a serialized set of NTRU public keys
+ *
+ * @param ntru_pks The set of NTRU public keys
+ *
+ * @return the serialized size
+ */
+size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pks);
+
+/**
+ * Serializes a set of NTRU public keys into a trits buffer
+ *
+ * @param ntru_pks The set of NTRU public keys
+ * @param trits The trits buffer to serialize into
+ *
+ * @return a status code
+ */
+retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pks,
                                  trits_t *const trits);
+
+/**
+ * Deserializes a set of NTRU public keys from a trits buffer
+ *
+ * @param trits The trits buffer to deserialize from
+ * @param ntru_pks The set of NTRU public keys
+ *
+ * @return a status code
+ */
 retcode_t mam_ntru_pks_deserialize(trits_t *const trits,
-                                   mam_ntru_pk_t_set_t *const ntru_pk_set);
+                                   mam_ntru_pk_t_set_t *const ntru_pks);
 
 /*
  * NTRU secret key
  */
 
 /**
- * Gets public key id trits
+ * Gets a NTRU secret key's public key id trits
  *
- * @param ntru A NTRU interface
+ * @param ntru_sk The NTRU secret key
  *
- * @return the id trits
+ * @return the NTRU secret key's public key id trits
  */
-static inline trits_t ntru_sk_pk_id(mam_ntru_sk_t const *const ntru) {
-  return trits_from_rep(MAM_NTRU_ID_SIZE, ntru->public_key.key);
+static inline trits_t ntru_sk_pk_id(mam_ntru_sk_t const *const ntru_sk) {
+  return trits_from_rep(MAM_NTRU_ID_SIZE, ntru_sk->public_key.key);
 }
 
 /**
- * Gets public key trits
+ * Gets a NTRU secret key's public key trits
  *
- * @param ntru A NTRU interface
+ * @param ntru_sk The NTRU secret key
  *
- * @return the trits
+ * @return the NTRU secret key's public key trits
  */
-static inline trits_t ntru_sk_pk_key(mam_ntru_sk_t const *const ntru) {
-  return trits_from_rep(MAM_NTRU_PK_SIZE, ntru->public_key.key);
+static inline trits_t ntru_sk_pk_key(mam_ntru_sk_t const *const ntru_sk) {
+  return trits_from_rep(MAM_NTRU_PK_SIZE, ntru_sk->public_key.key);
 }
 
 /**
- * Getssecret key trits
+ * Gets a NTRU secret key trits
  *
- * @param ntru A NTRU interface
+ * @param ntru_sk The NTRU secret key
  *
- * @return the secret  key trits
+ * @return the NTRU secret key trits
  */
-static inline trits_t ntru_sk_key(mam_ntru_sk_t const *const ntru) {
-  return trits_from_rep(MAM_NTRU_SK_SIZE, ntru->secret_key);
+static inline trits_t ntru_sk_key(mam_ntru_sk_t const *const ntru_sk) {
+  return trits_from_rep(MAM_NTRU_SK_SIZE, ntru_sk->secret_key);
 }
 
 /**
- * Allocates memory for a NTRU interface
+ * Safely resets a NTRU secret key by clearing its secret part
  *
- * @param ntru A NTRU interface
+ * @param ntru_sk The NTRU secret key
  *
  * @return a status code
  */
-retcode_t ntru_sk_init(mam_ntru_sk_t *const ntru);
+retcode_t ntru_sk_reset(mam_ntru_sk_t *const ntru_sk);
 
 /**
- * Deallocates memory for a NTRU interface
+ * Generates a NTRU secret key
  *
- * @param ntru A NTRU interface
- *
- * @return a status code
- */
-retcode_t ntru_sk_destroy(mam_ntru_sk_t *const ntru);
-
-/**
- * Generates a NTRU puublic key
- *
- * @param ntru A NTRU interface
+ * @param ntru_sk The NTRU secret key
  * @param prng A PRNG interface
  * @param nonce A nonce
  */
-void ntru_sk_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
-                 trits_t const nonce);
+void ntru_sk_gen(mam_ntru_sk_t const *const ntru_sk,
+                 mam_prng_t const *const prng, trits_t const nonce);
 
 /**
  * NTRU decryption of an encrypted session key
  *
- * @param ntru A NTRU interface
- * @param spongos Aspongos interface
+ * @param ntru_sk A NTRU secret key
+ * @param spongos A spongos interface
  * @param encrypted_session_key An encrypted session key
  * @param session_key The decrypted session symmetric key
  *
- * @return
+ * @return true if decryption succeeded,false otherwise
  */
-bool ntru_sk_decr(mam_ntru_sk_t const *const ntru, mam_spongos_t *const spongos,
+bool ntru_sk_decr(mam_ntru_sk_t const *const ntru_sk,
+                  mam_spongos_t *const spongos,
                   trits_t const encrypted_session_key, trits_t session_key);
 
 /**
- * NTRU load the sk functional representation from sk
+ * Loads the internal representation of a NTRU secret key
  *
- * @param ntru A NTRU interface
- *
- * @return
+ * @param ntru_sk A NTRU secret key
  */
+void ntru_sk_load(mam_ntru_sk_t *const ntru_sk);
 
-void ntru_sk_load(mam_ntru_sk_t *n);
-
+/**
+ * Safely destroys a set of NTRU secret keys by clearing their secret part and
+ * releasing memory
+ *
+ * @param ntru_pks The set of NTRU public keys
+ */
 void mam_ntru_sks_destroy(mam_ntru_sk_t_set_t *const ntru_sks);
 
-size_t mam_ntru_sks_serialized_size(mam_ntru_sk_t_set_t const ntru_sk_set);
-retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sk_set,
+/**
+ * Gets the size of a serialized set of NTRU secret keys
+ *
+ * @param ntru_sks The set of NTRU secret keys
+ *
+ * @return the serialized size
+ */
+size_t mam_ntru_sks_serialized_size(mam_ntru_sk_t_set_t const ntru_sks);
+
+/**
+ * Serializes a set of NTRU secret keys into a trits buffer
+ *
+ * @param ntru_sks The set of NTRU secret keys
+ * @param trits The trits buffer to serialize into
+ *
+ * @return a status code
+ */
+retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sks,
                                  trits_t *const trits);
+
+/**
+ * Deserializes a set of NTRU secret keys from a trits buffer
+ *
+ * @param trits The trits buffer to deserialize from
+ * @param ntru_sks The set of NTRU secret keys
+ *
+ * @return a status code
+ */
 retcode_t mam_ntru_sks_deserialize(trits_t *const trits,
-                                   mam_ntru_sk_t_set_t *const ntru_sk_set);
+                                   mam_ntru_sk_t_set_t *const ntru_sks);
 
 #ifdef __cplusplus
 }

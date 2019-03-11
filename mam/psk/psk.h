@@ -104,7 +104,7 @@ size_t mam_psks_serialized_size(mam_psk_t_set_t const psks);
 retcode_t mam_psks_serialize(mam_psk_t_set_t const psks, trits_t* const trits);
 
 /**
- * Deserializes a set of pre-shared keys from a trrits buffer
+ * Deserializes a set of pre-shared keys from a trits buffer
  *
  * @param trits The trits buffer to deserialize from
  * @param psks The set of pre-shared keys

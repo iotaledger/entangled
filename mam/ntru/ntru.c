@@ -11,23 +11,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mam/ntru/mam_ntru_pk_t_set.h"
-#include "mam/ntru/mam_ntru_sk_t_set.h"
 #include "mam/ntru/ntru.h"
 #include "mam/pb3/pb3.h"
 #include "utils/memset_safe.h"
 
-trits_t mam_ntru_pk_id(mam_ntru_pk_t const *const ntru_pk) {
-  return trits_from_rep(MAM_NTRU_ID_SIZE, ntru_pk->key);
-}
-
-trits_t mam_ntru_pk_key(mam_ntru_pk_t const *const ntru_pk) {
-  return trits_from_rep(MAM_NTRU_PK_SIZE, ntru_pk->key);
-}
+/*
+ * NTRU public key
+ */
 
 void ntru_pk_encr(mam_ntru_pk_t const *const ntru_pk,
                   mam_prng_t const *const prng, mam_spongos_t *const spongos,
-                  trits_t const session_key, trits_t const nonce,
+                  trits_t const nonce, trits_t const session_key,
                   trits_t encrypted_session_key) {
   MAM_ASSERT(trits_size(session_key) == MAM_NTRU_KEY_SIZE);
   MAM_ASSERT(trits_size(encrypted_session_key) == MAM_NTRU_EKEY_SIZE);
@@ -115,15 +109,7 @@ retcode_t mam_ntru_pks_deserialize(trits_t *const trits,
   return ret;
 }
 
-retcode_t ntru_sk_init(mam_ntru_sk_t *const ntru) {
-  MAM_ASSERT(ntru);
-
-  memset_safe(ntru, sizeof(mam_ntru_sk_t), 0, sizeof(mam_ntru_sk_t));
-
-  return RC_OK;
-}
-
-retcode_t ntru_sk_destroy(mam_ntru_sk_t *const ntru) {
+retcode_t ntru_sk_reset(mam_ntru_sk_t *const ntru) {
   MAM_ASSERT(ntru);
 
   memset_safe(ntru, sizeof(mam_ntru_sk_t), 0, sizeof(mam_ntru_sk_t));
@@ -242,7 +228,7 @@ void mam_ntru_sks_destroy(mam_ntru_sk_t_set_t *const ntru_sks) {
     return;
   }
 
-  HASH_ITER(hh, *ntru_sks, entry, tmp) { ntru_sk_destroy(&entry->value); }
+  HASH_ITER(hh, *ntru_sks, entry, tmp) { ntru_sk_reset(&entry->value); }
   mam_ntru_sk_t_set_free(ntru_sks);
 }
 
@@ -276,7 +262,7 @@ retcode_t mam_ntru_sks_deserialize(trits_t *const trits,
   mam_ntru_sk_t ntru_sk;
   size_t container_size = 0;
 
-  ntru_sk_init(&ntru_sk);
+  ntru_sk_reset(&ntru_sk);
   pb3_decode_size_t(&container_size, trits);
 
   while (!trits_is_empty(*trits) && container_size-- > 0) {
@@ -291,7 +277,7 @@ retcode_t mam_ntru_sks_deserialize(trits_t *const trits,
     }
   }
 
-  ntru_sk_destroy(&ntru_sk);
+  ntru_sk_reset(&ntru_sk);
 
   return ret;
 }

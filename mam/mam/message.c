@@ -344,7 +344,7 @@ static void mam_msg_wrap_keyload_ntru(mam_spongos_t *s, trits_t *b, trits_t key,
   pb3_wrap_absorb_ntrytes(s, b, mam_ntru_pk_id(ntru_pk));
   /*  absorb tryte ekey[3072]; */
   ekey = pb3_trits_take(b, MAM_NTRU_EKEY_SIZE);
-  ntru_pk_encr(ntru_pk, p, ns, key, N, ekey);
+  ntru_pk_encr(ntru_pk, p, ns, N, key, ekey);
   mam_spongos_absorb(s, ekey);
 }
 

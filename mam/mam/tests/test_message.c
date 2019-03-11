@@ -246,7 +246,7 @@ static void message_test_generic(mam_prng_t *prng_sender,
     ntru_nonce = MAM_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
 
-    e = ntru_sk_init(ntru);
+    e = ntru_sk_reset(ntru);
     ntru_sk_gen(ntru, prng_receiver, ntru_nonce);
     TEST_ASSERT(RC_OK == e);
   }
@@ -318,7 +318,7 @@ static void message_test_generic(mam_prng_t *prng_sender,
     }
   }
 
-  ntru_sk_destroy(ntru);
+  ntru_sk_reset(ntru);
 
   trits_free(payload);
 

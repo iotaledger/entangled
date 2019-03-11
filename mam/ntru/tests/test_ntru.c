@@ -42,7 +42,7 @@ static void ntru_test(void) {
   /* as spongos is exclusively used in ntru_encr/ntru_decr. */
   mam_spongos_init(&spongos);
   mam_prng_init(&prng, key);
-  ntru_sk_init(&ntru);
+  ntru_sk_reset(&ntru);
   trits_t pk = ntru_sk_pk_key(&ntru);
 
   i = 0;
@@ -59,7 +59,7 @@ static void ntru_test(void) {
 
     do {
       TEST_ASSERT_TRUE(trits_from_str(nonce, "NONCE9ENC9"));
-      ntru_pk_encr(&ntru.public_key, &prng, &spongos, key, nonce, ekey);
+      ntru_pk_encr(&ntru.public_key, &prng, &spongos, nonce, key, ekey);
 
       TEST_ASSERT_TRUE(ntru_sk_decr(&ntru, &spongos, ekey, dekey));
       TEST_ASSERT_TRUE(trits_cmp_eq(key, dekey));
@@ -78,7 +78,7 @@ static void ntru_test(void) {
       mam_prng_gen(&prng, MAM_PRNG_DST_SEC_KEY, nonce, key);
     } while (0 != (++i % (test_count / 10)));
   } while (++i < test_count);
-  ntru_sk_destroy(&ntru);
+  ntru_sk_reset(&ntru);
 }
 
 static void test_ntru_pk_serialization(void) {
@@ -128,7 +128,7 @@ static void test_ntru_sk_serialization(void) {
                  "AAABBBCCCAAABBBCCCAAABBBCCC");
 
   mam_prng_init(&prng, key);
-  ntru_sk_init(&ntru_sk);
+  ntru_sk_reset(&ntru_sk);
 
   for (int i = -1; i <= 1; i++) {
     memset(nonce.p, i, 3 * 10);
