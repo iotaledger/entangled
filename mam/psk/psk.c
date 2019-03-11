@@ -13,9 +13,9 @@
 #include "mam/psk/mam_psk_t_set.h"
 #include "utils/memset_safe.h"
 
-retcode_t mam_psk_init(mam_psk_t *const psk, mam_prng_t const *const prng,
-                       tryte_t const *const id, tryte_t const *const nonce,
-                       size_t const nonce_length) {
+retcode_t mam_psk_gen(mam_psk_t *const psk, mam_prng_t const *const prng,
+                      tryte_t const *const id, tryte_t const *const nonce,
+                      size_t const nonce_length) {
   MAM_TRITS_DEF0(nonce_trits, MAM_SPONGE_RATE);
   nonce_trits = MAM_TRITS_INIT(nonce_trits, MAM_SPONGE_RATE);
 

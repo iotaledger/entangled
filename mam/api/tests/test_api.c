@@ -371,13 +371,13 @@ static void test_api_generic() {
 
   /* gen psk */
   {
-    mam_psk_init(&pska, &api.prng, TEST_PRE_SHARED_KEY_A_STR,
-                 TEST_PRE_SHARED_KEY_A_NONCE_STR,
-                 strlen(TEST_PRE_SHARED_KEY_A_NONCE_STR));
+    mam_psk_gen(&pska, &api.prng, TEST_PRE_SHARED_KEY_A_STR,
+                TEST_PRE_SHARED_KEY_A_NONCE_STR,
+                strlen(TEST_PRE_SHARED_KEY_A_NONCE_STR));
 
-    mam_psk_init(&pskb, &api.prng, TEST_PRE_SHARED_KEY_B_STR,
-                 TEST_PRE_SHARED_KEY_B_NONCE_STR,
-                 strlen(TEST_PRE_SHARED_KEY_B_NONCE_STR));
+    mam_psk_gen(&pskb, &api.prng, TEST_PRE_SHARED_KEY_B_STR,
+                TEST_PRE_SHARED_KEY_B_NONCE_STR,
+                strlen(TEST_PRE_SHARED_KEY_B_NONCE_STR));
     TEST_ASSERT(mam_api_add_psk(&api, &pskb) == RC_OK);
   }
 

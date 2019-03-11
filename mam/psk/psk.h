@@ -37,7 +37,7 @@ typedef struct mam_psk_t_set_entry_s mam_psk_t_set_entry_t;
 typedef mam_psk_t_set_entry_t* mam_psk_t_set_t;
 
 /**
- * Initializes a pre-shared key with an id and a nonce
+ * Generates a pre-shared key with an id and a nonce
  *
  * @param psk The pre-shared key
  * @param prng A PRNG interface
@@ -47,9 +47,9 @@ typedef mam_psk_t_set_entry_t* mam_psk_t_set_t;
  *
  * @return a status code
  */
-retcode_t mam_psk_init(mam_psk_t* const psk, mam_prng_t const* const prng,
-                       tryte_t const* const id, tryte_t const* const nonce,
-                       size_t const nonce_length);
+retcode_t mam_psk_gen(mam_psk_t* const psk, mam_prng_t const* const prng,
+                      tryte_t const* const id, tryte_t const* const nonce,
+                      size_t const nonce_length);
 
 /**
  * Safely destroys a pre-shared key by clearing its secret part

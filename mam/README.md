@@ -46,7 +46,7 @@ MAM allows for:
 The sender creates a PSK by providing a 27-trytes id and a custom trytes nonce, then provides it to recipients.
 ```
 mam_psk_t psk;
-mam_psk_init(&psk, &prng, "B9IOSRYXSJPELPKGTG9PJDQC9YS", "PZQZ...AKKEF", 42);
+mam_psk_gen(&psk, &prng, "B9IOSRYXSJPELPKGTG9PJDQC9YS", "PZQZ...AKKEF", 42);
 // Provides it to recipients
 mam_psk_destroy(&psk);
 ```

@@ -258,13 +258,13 @@ static void message_test_generic(mam_prng_t *prng_sender,
 
   /* gen psk */
   {
-    mam_psk_init(&pska, prng_sender, TEST_PRE_SHARED_KEY_A_STR,
-                 TEST_PRE_SHARED_KEY_A_NONCE_STR,
-                 strlen(TEST_PRE_SHARED_KEY_A_NONCE_STR));
+    mam_psk_gen(&pska, prng_sender, TEST_PRE_SHARED_KEY_A_STR,
+                TEST_PRE_SHARED_KEY_A_NONCE_STR,
+                strlen(TEST_PRE_SHARED_KEY_A_NONCE_STR));
 
-    mam_psk_init(&pskb, prng_receiver, TEST_PRE_SHARED_KEY_B_STR,
-                 TEST_PRE_SHARED_KEY_B_NONCE_STR,
-                 strlen(TEST_PRE_SHARED_KEY_B_NONCE_STR));
+    mam_psk_gen(&pskb, prng_receiver, TEST_PRE_SHARED_KEY_B_STR,
+                TEST_PRE_SHARED_KEY_B_NONCE_STR,
+                strlen(TEST_PRE_SHARED_KEY_B_NONCE_STR));
   }
 
   MAM_TRITS_DEF0(msg_id, MAM_MSG_ID_SIZE);
