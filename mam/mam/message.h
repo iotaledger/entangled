@@ -70,19 +70,19 @@ size_t mam_msg_header_size(mam_channel_t *ch, mam_endpoint_t *ep,
                            mam_channel_t *ch1, mam_endpoint_t *ep1,
                            mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks);
 
-void mam_msg_write_header(mam_msg_write_context_t *ctx, mam_prng_t *prng,
-                          mam_channel_t *ch, mam_endpoint_t *ep,
-                          mam_channel_t *ch1, mam_endpoint_t *ep1,
-                          trits_t msg_id, trint9_t msg_type_id,
-                          mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks,
-                          trits_t *msg);
+retcode_t mam_msg_write_header(mam_msg_write_context_t *ctx, mam_prng_t *prng,
+                               mam_channel_t *ch, mam_endpoint_t *ep,
+                               mam_channel_t *ch1, mam_endpoint_t *ep1,
+                               trits_t msg_id, trint9_t msg_type_id,
+                               mam_psk_t_set_t psks,
+                               mam_ntru_pk_t_set_t ntru_pks, trits_t *msg);
 
 size_t mam_msg_packet_size(mam_msg_checksum_t checksum, mam_mss_t *mss,
                            size_t payload_size);
 
-void mam_msg_write_packet(mam_msg_write_context_t *ctx,
-                          mam_msg_checksum_t checksum, trits_t payload,
-                          trits_t *b);
+retcode_t mam_msg_write_packet(mam_msg_write_context_t *ctx,
+                               mam_msg_checksum_t checksum, trits_t payload,
+                               trits_t *b);
 
 retcode_t mam_msg_read_header(mam_msg_read_context_t *ctx,
                               trits_t const *const msg, mam_psk_t_set_t psks,

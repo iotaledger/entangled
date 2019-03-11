@@ -62,6 +62,10 @@ retcode_t mam_api_bundle_write_packet(
     size_t const payload_size, mam_msg_checksum_t checksum,
     bundle_transactions_t *const bundle, bool is_last_packet);
 
+retcode_t mam_api_num_remaining_sks(mam_api_t *const api,
+                                    trit_t const *const msg_id,
+                                    size_t *const num_sks);
+
 /**
  * Reads MAM's session key and potentially the first packet using NTRU secret
  * key

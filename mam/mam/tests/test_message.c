@@ -33,7 +33,7 @@
 
 #define TEST_PLAINTEXT1 "WHATANONSENSEMESSAGE"
 
-#define TEST_MSS_DEPTH 1
+#define TEST_MSS_DEPTH 6
 
 // TODO - Test functions should take set of prng_t instead of raw ptrs
 
@@ -73,8 +73,9 @@ static trits_t message_test_generic_write_msg(
   msg = trits_alloc(sz);
   TEST_ASSERT(!trits_is_null(msg));
 
-  mam_msg_write_header(write_ctx, prng, ch, ep, ch1, ep1, msg_id, msg_type_id,
-                       psks, ntru_pks, &msg);
+  TEST_ASSERT_EQUAL_INT(
+      RC_OK, mam_msg_write_header(write_ctx, prng, ch, ep, ch1, ep1, msg_id,
+                                  msg_type_id, psks, ntru_pks, &msg));
   TEST_ASSERT(trits_is_empty(msg));
   msg = trits_pickup(msg, sz);
   mam_psk_t_set_free(&psks);
@@ -112,7 +113,8 @@ static trits_t message_test_generic_write_first_packet(
   packet = trits_alloc(sz);
   TEST_ASSERT(!trits_is_null(packet));
 
-  mam_msg_write_packet(write_ctx, checksum, payload, &packet);
+  TEST_ASSERT_EQUAL_INT(
+      RC_OK, mam_msg_write_packet(write_ctx, checksum, payload, &packet));
   TEST_ASSERT(trits_is_empty(packet));
   packet = trits_pickup(packet, sz);
   trits_set_zero(payload);

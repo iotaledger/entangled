@@ -192,11 +192,38 @@ void mam_mss_auth_path(mam_mss_t *mss, mss_mt_idx_t skn, trits_t path);
  * @param hash [in] the hash to sign on
  * @param sig [out] the signature
  *
- * @return void
+ * @return retcode
  */
-void mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig);
+retcode_t mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig);
 
+/**
+ * Signs a hash and advances skn
+ *
+ * @param mss [in] MSS interface
+ * @param hash [in] the hash to sign on
+ * @param sig [out] the signature
+ *
+ * @return retcode
+ */
+retcode_t mam_mss_sign_and_next(mam_mss_t *mss, trits_t hash, trits_t sig);
+
+/**
+ * Advances skn
+ *
+ * @param mss [in] MSS interface
+ *
+ * @return True if can produce next signature
+ */
 bool mam_mss_next(mam_mss_t *mss);
+
+/**
+ * Advances skn
+ *
+ * @param mss [in] MSS interface
+ *
+ * @return The number of remaining signatures
+ */
+size_t mam_mss_num_remaining_sks(mam_mss_t *mss);
 
 /**
  * Verifies MSS signature.
