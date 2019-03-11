@@ -254,17 +254,17 @@ static void message_test_generic(mam_prng_t *prng_sender,
     TEST_ASSERT(RC_OK == e);
   }
 
-  mam_psk_t pska[1], pskb[1];
+  mam_psk_t pska, pskb;
 
   /* gen psk */
   {
-    trits_from_str(mam_psk_id(pska), TEST_PRE_SHARED_KEY_A_STR);
-    mam_prng_gen_trytes(prng_sender, MAM_PRNG_DST_SEC_KEY,
-                        TEST_PRE_SHARED_KEY_A_NONCE_STR, mam_psk_key(pska));
+    mam_psk_init(&pska, prng_sender, TEST_PRE_SHARED_KEY_A_STR,
+                 TEST_PRE_SHARED_KEY_A_NONCE_STR,
+                 strlen(TEST_PRE_SHARED_KEY_A_NONCE_STR));
 
-    trits_from_str(mam_psk_id(pskb), TEST_PRE_SHARED_KEY_B_STR);
-    mam_prng_gen_trytes(prng_receiver, MAM_PRNG_DST_SEC_KEY,
-                        TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_key(pskb));
+    mam_psk_init(&pskb, prng_receiver, TEST_PRE_SHARED_KEY_B_STR,
+                 TEST_PRE_SHARED_KEY_B_NONCE_STR,
+                 strlen(TEST_PRE_SHARED_KEY_B_NONCE_STR));
   }
 
   MAM_TRITS_DEF0(msg_id, MAM_MSG_ID_SIZE);
@@ -281,8 +281,8 @@ static void message_test_generic(mam_prng_t *prng_sender,
         /* write msg and packet */
         {
           msg = message_test_generic_write_msg(
-              prng_sender, pska, pskb, &ntru->public_key, pubkey, keyload, cha,
-              epa, ch1a, ep1a, &write_ctx, msg_id);
+              prng_sender, &pska, &pskb, &ntru->public_key, pubkey, keyload,
+              cha, epa, ch1a, ep1a, &write_ctx, msg_id);
 
           packet = message_test_generic_write_first_packet(
               pubkey, checksum, cha, epa, ch1a, ep1a, &write_ctx, payload_str);
@@ -290,7 +290,7 @@ static void message_test_generic(mam_prng_t *prng_sender,
 
         /* read msg and packet */
         {
-          message_test_generic_read_msg(pskb, ntru, cha, &msg, cfg_msg_read,
+          message_test_generic_read_msg(&pskb, ntru, cha, &msg, cfg_msg_read,
                                         msg_id);
 
           message_test_generic_read_packet(cfg_msg_read, &packet, &payload);

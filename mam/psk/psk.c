@@ -10,8 +10,37 @@
 
 #include "mam/psk/psk.h"
 #include "mam/pb3/pb3.h"
+#include "mam/prng/prng.h"
 #include "mam/psk/mam_psk_t_set.h"
 #include "utils/memset_safe.h"
+
+retcode_t mam_psk_init(mam_psk_t *const psk, mam_prng_t const *const prng,
+                       tryte_t const *const id, tryte_t const *const nonce,
+                       size_t const nonce_length) {
+  MAM_TRITS_DEF0(nonce_trits, MAM_SPONGE_RATE);
+  nonce_trits = MAM_TRITS_INIT(nonce_trits, MAM_SPONGE_RATE);
+
+  if (psk == NULL || prng == NULL || id == NULL || nonce == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  trits_from_str(mam_psk_id(psk), id);
+
+  nonce_trits = trits_take_min(nonce_trits, nonce_length * 3);
+  trits_from_str(nonce_trits, nonce);
+
+  mam_prng_gen(prng, MAM_PRNG_DST_SEC_KEY, nonce_trits, mam_psk_key(psk));
+
+  return RC_OK;
+}
+
+void mam_psk_destroy(mam_psk_t *const psk) {
+  if (psk == NULL) {
+    return;
+  }
+
+  memset_safe(psk->key, MAM_PSK_KEY_SIZE, 0, MAM_PSK_KEY_SIZE);
+}
 
 trits_t mam_psk_id(mam_psk_t const *const psk) {
   if (psk == NULL) {
@@ -27,14 +56,6 @@ trits_t mam_psk_key(mam_psk_t const *const psk) {
   }
 
   return trits_from_rep(MAM_PSK_KEY_SIZE, psk->key);
-}
-
-void mam_psk_destroy(mam_psk_t *const psk) {
-  if (psk == NULL) {
-    return;
-  }
-
-  memset_safe(psk->key, MAM_PSK_KEY_SIZE, 0, MAM_PSK_KEY_SIZE);
 }
 
 void mam_psks_destroy(mam_psk_t_set_t *const psks) {

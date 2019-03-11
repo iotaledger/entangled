@@ -77,18 +77,6 @@ void mam_prng_gen3(mam_prng_t const *const prng,
                    trits_t const nonce1, trits_t const nonce2,
                    trits_t const nonce3, trits_t output);
 
-/**
- * PRNG output generation from trytes
- *
- * @param prng A PRNG interface
- * @param destination A destination tryte
- * @param nonce The nonce as a string
- * @param output Pseudorandom output trits
- */
-void mam_prng_gen_trytes(mam_prng_t const *const prng,
-                         mam_prng_destination_tryte_t const destination,
-                         char const *nonce, trits_t output);
-
 #ifdef __cplusplus
 }
 #endif

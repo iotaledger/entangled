@@ -357,7 +357,7 @@ static void test_api_generic() {
   trit_t msg_id[MAM_MSG_ID_SIZE];
   char *payload2 = NULL;
   mam_ntru_sk_t ntru[1];
-  mam_psk_t pska[1], pskb[1];
+  mam_psk_t pska, pskb;
 
   /* gen recipient'spongos ntru keys, public key is shared with sender */
   {
@@ -371,13 +371,14 @@ static void test_api_generic() {
 
   /* gen psk */
   {
-    trits_from_str(mam_psk_id(pska), TEST_PRE_SHARED_KEY_A_STR);
-    mam_prng_gen_trytes(&api.prng, MAM_PRNG_DST_SEC_KEY,
-                        TEST_PRE_SHARED_KEY_A_NONCE_STR, mam_psk_key(pska));
-    trits_from_str(mam_psk_id(pskb), TEST_PRE_SHARED_KEY_B_STR);
-    mam_prng_gen_trytes(&api.prng, MAM_PRNG_DST_SEC_KEY,
-                        TEST_PRE_SHARED_KEY_B_NONCE_STR, mam_psk_key(pskb));
-    TEST_ASSERT(mam_api_add_psk(&api, pskb) == RC_OK);
+    mam_psk_init(&pska, &api.prng, TEST_PRE_SHARED_KEY_A_STR,
+                 TEST_PRE_SHARED_KEY_A_NONCE_STR,
+                 strlen(TEST_PRE_SHARED_KEY_A_NONCE_STR));
+
+    mam_psk_init(&pskb, &api.prng, TEST_PRE_SHARED_KEY_B_STR,
+                 TEST_PRE_SHARED_KEY_B_NONCE_STR,
+                 strlen(TEST_PRE_SHARED_KEY_B_NONCE_STR));
+    TEST_ASSERT(mam_api_add_psk(&api, &pskb) == RC_OK);
   }
 
   bool is_last_packet;
@@ -391,13 +392,13 @@ static void test_api_generic() {
         bundle_transactions_new(&bundle);
 
         /* write header and packet */
-        test_api_write_header(&api, pska, pskb, &ntru->public_key, pubkey,
+        test_api_write_header(&api, &pska, &pskb, &ntru->public_key, pubkey,
                               keyload, cha, epa, ch1a, ep1a, bundle, msg_id);
         test_api_write_packet(&api, bundle, msg_id, pubkey, checksum, cha, epa,
                               ch1a, ep1a, PAYLOAD, true);
 
         /* read header and packet */
-        test_api_read_msg(&api, bundle, pskb, ntru, cha, &payload2,
+        test_api_read_msg(&api, bundle, &pskb, ntru, cha, &payload2,
                           &is_last_packet);
         TEST_ASSERT(is_last_packet);
         TEST_ASSERT_EQUAL_STRING(PAYLOAD, payload2);
