@@ -22,6 +22,10 @@
 #define MAM_NTRU_SK_SIZE 1024
 // NTRU id size
 #define MAM_NTRU_ID_SIZE 81
+// NTRU session symmetric key size
+#define MAM_NTRU_KEY_SIZE MAM_SPONGE_KEY_SIZE
+// NTRU encrypted key size
+#define MAM_NTRU_EKEY_SIZE 9216
 
 // Recipient's NTRU public key
 typedef struct mam_ntru_pk_s {

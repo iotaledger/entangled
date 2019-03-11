@@ -42,8 +42,8 @@ static void ntru_test(void) {
   /* as spongos is exclusively used in ntru_encr/ntru_decr. */
   mam_spongos_init(&spongos);
   mam_prng_init(&prng, key);
-  ntru_init(&ntru);
-  trits_t pk = ntru_pk_trits(&ntru);
+  ntru_sk_init(&ntru);
+  trits_t pk = ntru_sk_pk_key(&ntru);
 
   i = 0;
   trits_set_zero(key);
@@ -53,7 +53,7 @@ static void ntru_test(void) {
     trits_set_zero(pk);
     trits_put1(pk, 1);
     poly_small_from_trits(f, trits_take(pk, MAM_NTRU_SK_SIZE));
-    ntru_gen(&ntru, &prng, nonce);
+    ntru_sk_gen(&ntru, &prng, nonce);
     memcpy(f0, ntru.f, sizeof(poly_t));
     poly_add(f, f0, f);
 
@@ -78,7 +78,7 @@ static void ntru_test(void) {
       mam_prng_gen(&prng, MAM_PRNG_DST_SEC_KEY, nonce, key);
     } while (0 != (++i % (test_count / 10)));
   } while (++i < test_count);
-  ntru_destroy(&ntru);
+  ntru_sk_destroy(&ntru);
 }
 
 static void test_ntru_pk_serialization(void) {
@@ -128,11 +128,11 @@ static void test_ntru_sk_serialization(void) {
                  "AAABBBCCCAAABBBCCCAAABBBCCC");
 
   mam_prng_init(&prng, key);
-  ntru_init(&ntru_sk);
+  ntru_sk_init(&ntru_sk);
 
   for (int i = -1; i <= 1; i++) {
     memset(nonce.p, i, 3 * 10);
-    ntru_gen(&ntru_sk, &prng, nonce);
+    ntru_sk_gen(&ntru_sk, &prng, nonce);
     TEST_ASSERT(mam_ntru_sk_t_set_add(&ntru_sk_set_1, &ntru_sk) == RC_OK);
   }
 

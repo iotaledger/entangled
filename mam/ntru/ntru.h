@@ -12,42 +12,32 @@
 #define __MAM_NTRU_NTRU_H__
 
 #include "mam/defs.h"
+#include "mam/ntru/mam_ntru_pk_t_set.h"
+#include "mam/ntru/mam_ntru_sk_t_set.h"
 #include "mam/ntru/ntru_types.h"
 #include "mam/prng/prng.h"
 #include "mam/sponge/spongos.h"
 #include "mam/trits/trits.h"
 
-#include "utils/memset_safe.h"
-
-// NTRU session symmetric key size
-#define MAM_NTRU_KEY_SIZE MAM_SPONGE_KEY_SIZE
-// NTRU encrypted key size
-#define MAM_NTRU_EKEY_SIZE 9216
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/*
+ * NTRU public key
+ */
+
 trits_t mam_ntru_pk_id(mam_ntru_pk_t const *const ntru_pk);
 trits_t mam_ntru_pk_key(mam_ntru_pk_t const *const ntru_pk);
+size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set);
+retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
+                                 trits_t *const trits);
+retcode_t mam_ntru_pks_deserialize(trits_t *const trits,
+                                   mam_ntru_pk_t_set_t *const ntru_pk_set);
 
-/**
- * Allocates memory for a NTRU interface
- *
- * @param ntru A NTRU interface
- *
- * @return a status code
+/*
+ * NTRU secret key
  */
-retcode_t ntru_init(mam_ntru_sk_t *const ntru);
-
-/**
- * Deallocates memory for a NTRU interface
- *
- * @param ntru A NTRU interface
- *
- * @return a status code
- */
-retcode_t ntru_destroy(mam_ntru_sk_t *const ntru);
 
 /**
  * Gets public key id trits
@@ -56,7 +46,7 @@ retcode_t ntru_destroy(mam_ntru_sk_t *const ntru);
  *
  * @return the id trits
  */
-static inline trits_t ntru_id_trits(mam_ntru_sk_t const *const ntru) {
+static inline trits_t ntru_sk_pk_id(mam_ntru_sk_t const *const ntru) {
   return trits_from_rep(MAM_NTRU_ID_SIZE, ntru->public_key.key);
 }
 
@@ -67,7 +57,7 @@ static inline trits_t ntru_id_trits(mam_ntru_sk_t const *const ntru) {
  *
  * @return the trits
  */
-static inline trits_t ntru_pk_trits(mam_ntru_sk_t const *const ntru) {
+static inline trits_t ntru_sk_pk_key(mam_ntru_sk_t const *const ntru) {
   return trits_from_rep(MAM_NTRU_PK_SIZE, ntru->public_key.key);
 }
 
@@ -78,9 +68,27 @@ static inline trits_t ntru_pk_trits(mam_ntru_sk_t const *const ntru) {
  *
  * @return the secret  key trits
  */
-static inline trits_t ntru_sk_trits(mam_ntru_sk_t const *const ntru) {
+static inline trits_t ntru_sk_key(mam_ntru_sk_t const *const ntru) {
   return trits_from_rep(MAM_NTRU_SK_SIZE, ntru->secret_key);
 }
+
+/**
+ * Allocates memory for a NTRU interface
+ *
+ * @param ntru A NTRU interface
+ *
+ * @return a status code
+ */
+retcode_t ntru_sk_init(mam_ntru_sk_t *const ntru);
+
+/**
+ * Deallocates memory for a NTRU interface
+ *
+ * @param ntru A NTRU interface
+ *
+ * @return a status code
+ */
+retcode_t ntru_sk_destroy(mam_ntru_sk_t *const ntru);
 
 /**
  * Generates a NTRU puublic key
@@ -89,8 +97,8 @@ static inline trits_t ntru_sk_trits(mam_ntru_sk_t const *const ntru) {
  * @param prng A PRNG interface
  * @param nonce A nonce
  */
-void ntru_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
-              trits_t const nonce);
+void ntru_sk_gen(mam_ntru_sk_t const *const ntru, mam_prng_t const *const prng,
+                 trits_t const nonce);
 
 /**
  * NTRU encryption of a session key
@@ -140,13 +148,7 @@ bool ntru_decr(mam_ntru_sk_t const *const ntru, mam_spongos_t *const spongos,
  * @return
  */
 
-void ntru_load_sk(mam_ntru_sk_t *n);
-
-size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pk_set);
-retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pk_set,
-                                 trits_t *const trits);
-retcode_t mam_ntru_pks_deserialize(trits_t *const trits,
-                                   mam_ntru_pk_t_set_t *const ntru_pk_set);
+void ntru_sk_load(mam_ntru_sk_t *n);
 
 void mam_ntru_sks_destroy(mam_ntru_sk_t_set_t *const ntru_sks);
 

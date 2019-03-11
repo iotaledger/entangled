@@ -365,8 +365,8 @@ static void test_api_generic() {
     MAM_TRITS_DEF0(ntru_nonce, 30);
     ntru_nonce = MAM_TRITS_INIT(ntru_nonce, 30);
     trits_from_str(ntru_nonce, TEST_NTRU_NONCE);
-    TEST_ASSERT(ntru_init(ntru) == RC_OK);
-    ntru_gen(ntru, &api.prng, ntru_nonce);
+    TEST_ASSERT(ntru_sk_init(ntru) == RC_OK);
+    ntru_sk_gen(ntru, &api.prng, ntru_nonce);
     TEST_ASSERT(mam_api_add_ntru_sk(&api, ntru) == RC_OK);
   }
 
