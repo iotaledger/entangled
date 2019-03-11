@@ -129,8 +129,6 @@ static char const* data =
     "vitae ante. Vivamus ultrices luctus nunc. Suspendisse et dolor. Etiam "
     "dignissim. Proin malesuada adipiscing lacus.";
 
-char const* data2 =
-    "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Phasellus ";
 void test_http_request(void) {
   iota_client_service_t service = {{0}};
   service.http.host = "httpbin.org";
@@ -160,7 +158,7 @@ void test_http_request(void) {
 
 void test_https_request(void) {
   iota_client_service_t service = {{0}};
-  service.http.host = "httpbin.org";
+  service.http.host = "postman-echo.com";
   service.http.content_type = khttp_ApplicationFormUrlencoded;
   service.http.accept = khttp_ApplicationJson;
   service.http.port = 443;
