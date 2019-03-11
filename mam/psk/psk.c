@@ -10,7 +10,6 @@
 
 #include "mam/psk/psk.h"
 #include "mam/pb3/pb3.h"
-#include "mam/prng/prng.h"
 #include "mam/psk/mam_psk_t_set.h"
 #include "utils/memset_safe.h"
 
