@@ -58,6 +58,9 @@ retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_free({KEY_TYPE}_to_{VALUE_TYPE}_map_t *
 bool {KEY_TYPE}_to_{VALUE_TYPE}_map_cmp({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const lhs,
                                         {KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const rhs);
 
+bool {KEY_TYPE}_to_{VALUE_TYPE}_map_remove({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
+{KEY_TYPE} const *const key);
+
 #ifdef __cplusplus
 }
 #endif

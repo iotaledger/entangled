@@ -23,10 +23,10 @@ retcode_t mam_example_write_header(mam_api_t* const api,
                                    trit_t* const msg_id);
 
 retcode_t mam_example_write_packet(mam_api_t* const api,
-                                   mam_channel_t* const channel,
                                    bundle_transactions_t* const bundle,
                                    char const* const payload,
-                                   trit_t const* const msg_id);
+                                   trit_t const* const msg_id,
+                                   bool is_last_packet);
 
 #ifdef __cplusplus
 }

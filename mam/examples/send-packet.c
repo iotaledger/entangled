@@ -15,12 +15,17 @@
 int main(int ac, char **av) {
   mam_api_t api;
   bundle_transactions_t *bundle = NULL;
-  mam_channel_t *channel = NULL;
   retcode_t ret = RC_OK;
 
-  if (ac != 6) {
+  if (ac != 7) {
     fprintf(stderr,
-            "usage: send-packet <host> <port> <seed> <msg_id> <payload>\n");
+            "usage: send-packet <host> <port> <seed> <msg_id> <payload> "
+            "<last_packet>\n");
+    return EXIT_FAILURE;
+  }
+
+  if (strcmp(av[6], "yes") && strcmp(av[6], "no")) {
+    fprintf(stderr, "Arg <last_packet> should be \"yes\" or \"no\" only\n");
     return EXIT_FAILURE;
   }
 
@@ -32,21 +37,16 @@ int main(int ac, char **av) {
     }
   }
 
-  // Creating channel
-  if ((ret = mam_example_create_channel(&api, &channel)) != RC_OK) {
-    fprintf(stderr, "mam_example_create_channel failed with err %d\n", ret);
-    return EXIT_FAILURE;
-  }
-
   bundle_transactions_new(&bundle);
 
   // Writing packet to bundle
   {
     trit_t msg_id[MAM_MSG_ID_SIZE];
 
+    bool last_packet = strcmp(av[6], "yes") == 0;
     trytes_to_trits((tryte_t *)av[4], msg_id, strlen(av[4]));
-    if ((ret = mam_example_write_packet(&api, channel, bundle, av[5],
-                                        msg_id)) != RC_OK) {
+    if ((ret = mam_example_write_packet(&api, bundle, av[5], msg_id,
+                                        last_packet)) != RC_OK) {
       fprintf(stderr, "mam_example_write_packet failed with err %d\n", ret);
       return EXIT_FAILURE;
     }

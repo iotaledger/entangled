@@ -19,6 +19,7 @@ int main(int ac, char **av) {
   size_t payload_size = 0;
   bundle_transactions_t *bundle = NULL;
   bundle_transactions_new(&bundle);
+  bool is_last_packet;
 
   if (ac != 4) {
     fprintf(stderr, "usage: recv <host> <port> <bundle>\n");
@@ -37,8 +38,8 @@ int main(int ac, char **av) {
 
   mam_psk_t_set_add(&api.psks, &psk);
 
-  if (mam_api_bundle_read(&api, bundle, &payload_trytes, &payload_size) ==
-      RC_OK) {
+  if (mam_api_bundle_read(&api, bundle, &payload_trytes, &payload_size,
+                          &is_last_packet) == RC_OK) {
     if (payload_trytes == NULL || payload_size == 0) {
       fprintf(stderr, "No payload\n");
     } else {

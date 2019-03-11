@@ -48,8 +48,8 @@ static void test_psks_serialization(void) {
   TEST_ASSERT_TRUE(mam_psk_t_set_cmp(&psks_1, &psks_2));
 
   trits_free(trits);
-  mam_psk_t_set_free(&psks_1);
-  mam_psk_t_set_free(&psks_2);
+  mam_psks_destroy(&psks_1);
+  mam_psks_destroy(&psks_2);
 }
 
 int main(void) {
