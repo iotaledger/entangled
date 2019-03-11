@@ -27,7 +27,7 @@ MAM allows for:
 
 *NTRU* - Public key encryption scheme
 
-*PSK* - Pre-Shared Key (PSK) is a secret key of Authenticated Encryption (AE). It is preliminarily transmitted between the entities and beyond the scope of MAM. The PSK id is an identifier of a group of recipients who share the same PSK.
+*PSK* - Pre-Shared Key (PSK) is a secret key of Authenticated Encryption (AE). It is preliminarily transmitted between the entities and is beyond the scope of MAM. The PSK id is an identifier of a group of recipients who share the same PSK.
 
 *PRNG* - Pseudo randomness generator based on sponge's hash function
 

@@ -23,10 +23,10 @@ extern "C" {
 #endif
 
 /**
- * Pre-Shared Key (PSK) is a secret key of Authenticated Encryption (AE) and is
- * preliminarily transmitted between the entities (beyond the scope of MAM)
- * The id field presents an identifier of a group of recipients who share the
- * same PSK
+ * Pre-Shared Key (PSK) is a secret key of Authenticated Encryption (AE)
+ * It is preliminarily transmitted between the entities and is beyond the scope
+ * of MAM
+ * The PSK id is an identifier of a group of recipients who share the same PSK
  */
 typedef struct mam_psk_s {
   trit_t id[MAM_PSK_ID_SIZE];

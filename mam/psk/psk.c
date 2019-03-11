@@ -24,10 +24,8 @@ retcode_t mam_psk_init(mam_psk_t *const psk, mam_prng_t const *const prng,
   }
 
   trits_from_str(mam_psk_id(psk), id);
-
   nonce_trits = trits_take_min(nonce_trits, nonce_length * 3);
   trits_from_str(nonce_trits, nonce);
-
   mam_prng_gen(prng, MAM_PRNG_DST_SEC_KEY, nonce_trits, mam_psk_key(psk));
 
   return RC_OK;
