@@ -17,9 +17,7 @@ cc_library(
     hdrs = ["ntru_types.h"],
     deps = [
         ":poly",
-        "//common:errors",
         "//mam:defs",
-        "//mam/trits",
     ],
 )
 

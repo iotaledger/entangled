@@ -25,7 +25,7 @@ MAM allows for:
 
 *WOTS* - "Winternitz one time signatures" - the underlying signature implementation of the MSS layer
 
-*NTRU* - Public key encryption scheme
+*NTRU* - Supports an NTRU-style public key encryption scheme. Using NTRU a sender can encrypt session keys with a public key of a recipient. The secret key must be kept in secret. The corresponding public key, on the contrary, is publicly announced.
 
 *PSK* - Pre-Shared Key (PSK) is a secret key of Authenticated Encryption (AE). It is preliminarily transmitted between the entities and is beyond the scope of MAM. The PSK id is an identifier of a group of recipients who share the same PSK.
 
