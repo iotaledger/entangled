@@ -14,7 +14,6 @@
 
 #include "mam/sponge/spongos.h"
 #include "mam/sponge/spongos_types.h"
-#include "mam/test_utils/test_utils.h"
 
 static void mam_spongos_test(void) {
   mam_spongos_t spongos;

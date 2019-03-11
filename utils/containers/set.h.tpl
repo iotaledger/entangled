@@ -15,6 +15,8 @@
 #include "common/errors.h"
 {ADDITIONAL_INCLUDE_PATH}
 
+#define SET_ITER(set, entry, tmp) HASH_ITER(hh, set, entry, tmp)
+
 #ifdef __cplusplus
 extern "C" {
 #endif

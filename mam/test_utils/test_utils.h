@@ -11,22 +11,10 @@
 #ifndef __MAM_TEST_UTILS_TEST_UTILS_H__
 #define __MAM_TEST_UTILS_TEST_UTILS_H__
 
-#include <stdlib.h>
-
-#include "mam/mss/mss.h"
-#include "mam/ntru/ntru.h"
-#include "mam/ntru/poly.h"
 #include "mam/prng/prng.h"
-#include "mam/sponge/sponge.h"
-#include "mam/sponge/spongos.h"
-#include "mam/wots/wots.h"
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#if !defined(MAM_MSS_TEST_MAX_D)
-#define MAM_MSS_TEST_MAX_D 3
 #endif
 
 /**

@@ -17,6 +17,7 @@
 #include "mam/ntru/mam_ntru_sk_t_set.h"
 #include "mam/ntru/ntru.h"
 #include "mam/ntru/ntru_types.h"
+#include "mam/pb3/pb3.h"
 
 static void test_ntru_pk_serialization(void) {
   mam_ntru_pk_t_set_t ntru_set_1 = NULL;
@@ -32,13 +33,15 @@ static void test_ntru_pk_serialization(void) {
 
   size_t size = mam_ntru_pks_serialized_size(ntru_set_1);
 
-  TEST_ASSERT_EQUAL_INT(size, 26 * MAM_NTRU_PK_SIZE);
+  TEST_ASSERT_EQUAL_INT(size, 26 * MAM_NTRU_PK_SIZE + pb3_sizeof_size_t(26));
 
-  trits_t trits = trits_alloc(size);
+  trits_t trits = trits_alloc(size + pb3_sizeof_size_t(26));
 
-  TEST_ASSERT(mam_ntru_pks_serialize(ntru_set_1, trits) == RC_OK);
+  TEST_ASSERT(mam_ntru_pks_serialize(ntru_set_1, &trits) == RC_OK);
 
-  TEST_ASSERT(mam_ntru_pks_deserialize(trits, &ntru_set_2) == RC_OK);
+  trits = trits_pickup_all(trits);
+
+  TEST_ASSERT(mam_ntru_pks_deserialize(&trits, &ntru_set_2) == RC_OK);
 
   TEST_ASSERT_TRUE(mam_ntru_pk_t_set_cmp(&ntru_set_1, &ntru_set_2));
 
@@ -73,13 +76,14 @@ static void test_ntru_sk_serialization(void) {
 
   size_t size = mam_ntru_sks_serialized_size(ntru_sk_set_1);
 
-  TEST_ASSERT_EQUAL_INT(size, 3 * (MAM_NTRU_PK_SIZE + MAM_NTRU_SK_SIZE));
+  TEST_ASSERT_EQUAL_INT(
+      size, 3 * (MAM_NTRU_PK_SIZE + MAM_NTRU_SK_SIZE) + pb3_sizeof_size_t(3));
 
   trits_t trits = trits_alloc(size);
 
-  TEST_ASSERT(mam_ntru_sks_serialize(ntru_sk_set_1, trits) == RC_OK);
-
-  TEST_ASSERT(mam_ntru_sks_deserialize(trits, &ntru_sk_set_2) == RC_OK);
+  TEST_ASSERT(mam_ntru_sks_serialize(ntru_sk_set_1, &trits) == RC_OK);
+  trits = trits_pickup_all(trits);
+  TEST_ASSERT(mam_ntru_sks_deserialize(&trits, &ntru_sk_set_2) == RC_OK);
 
   TEST_ASSERT_TRUE(mam_ntru_sk_t_set_cmp(&ntru_sk_set_1, &ntru_sk_set_2));
 

@@ -14,8 +14,8 @@
 #include "common/errors.h"
 #include "common/model/bundle.h"
 #include "common/trinary/flex_trit.h"
-#include "mam/api/trit_t_to_mam_msg_recv_context_t_map.h"
-#include "mam/api/trit_t_to_mam_msg_send_context_t_map.h"
+#include "mam/api/trit_t_to_mam_msg_read_context_t_map.h"
+#include "mam/api/trit_t_to_mam_msg_write_context_t_map.h"
 #include "mam/mam/message.h"
 #include "mam/ntru/ntru_types.h"
 #include "mam/prng/prng_types.h"
@@ -30,8 +30,8 @@ typedef struct mam_api_s {
   mam_ntru_sk_t_set_t ntru_sks;
   mam_ntru_pk_t_set_t ntru_pks;
   mam_psk_t_set_t psks;
-  trit_t_to_mam_msg_send_context_t_map_t send_ctxs;
-  trit_t_to_mam_msg_recv_context_t_map_t recv_ctxs;
+  trit_t_to_mam_msg_write_context_t_map_t write_ctxs;
+  trit_t_to_mam_msg_read_context_t_map_t read_ctxs;
   mam_channel_t_set_t channels;
 } mam_api_t;
 
@@ -58,19 +58,9 @@ retcode_t mam_api_bundle_write_header(
     bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 retcode_t mam_api_bundle_write_packet(
-    mam_api_t *const api, mam_channel_t *const ch, trit_t *const msg_id,
-    tryte_t const *const payload, size_t const payload_size,
-    mam_msg_checksum_t checksum, bundle_transactions_t *const bundle);
-
-/**
- * Checks if a bundle which is assumed to contain MAM message contains header
- *
- * @param bundle The bundle
- *
- * @return True if the bundle contains MAM header
- */
-
-bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
+    mam_api_t *const api, trit_t *const msg_id, tryte_t const *const payload,
+    size_t const payload_size, mam_msg_checksum_t checksum,
+    bundle_transactions_t *const bundle, bool is_last_packet);
 
 /**
  * Reads MAM's session key and potentially the first packet using NTRU secret
@@ -83,31 +73,21 @@ bool mam_api_bundle_contains_header(bundle_transactions_t const *const bundle);
  *
  * @return return code
  */
-
-retcode_t mam_api_bundle_read_msg(mam_api_t *const api,
-                                  bundle_transactions_t const *const bundle,
-                                  tryte_t **const payload,
-                                  size_t *const payload_size);
-
-/**
- * Reads next packet
- *
- * @param api - The API
- * @param bundle - The bundle containing the MAM message
- *
- * @return return code
- */
-
-retcode_t mam_api_bundle_read_packet(mam_api_t *const api,
-                                     bundle_transactions_t const *const bundle,
-                                     tryte_t **const payload,
-                                     size_t *const payload_size);
+retcode_t mam_api_bundle_read(mam_api_t *const api,
+                              bundle_transactions_t const *const bundle,
+                              tryte_t **const payload,
+                              size_t *const payload_size,
+                              bool *const is_last_packet);
 
 size_t mam_api_serialized_size(mam_api_t const *const api);
 
 void mam_api_serialize(mam_api_t const *const api, trits_t *const buffer);
 
 retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api);
+
+retcode_t mam_api_save(mam_api_t const *const api, char const *const filename);
+
+retcode_t mam_api_load(char const *const filename, mam_api_t *const api);
 
 #ifdef __cplusplus
 }

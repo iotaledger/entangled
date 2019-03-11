@@ -4,7 +4,6 @@ cc_test(
     srcs = ["test_mss.c"],
     deps = [
         "//mam/mss",
-        "//mam/test_utils",
         "//utils/handles:rand",
         "@unity",
     ],

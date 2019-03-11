@@ -40,7 +40,7 @@ typedef struct {KEY_TYPE}_to_{VALUE_TYPE}_map_s {
 retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_init({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
                                               size_t key_size);
 
-retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_size({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map);
+retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_size({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map);
 
 retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_add({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
                                              {KEY_TYPE} const *const key,
@@ -57,6 +57,9 @@ retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_free({KEY_TYPE}_to_{VALUE_TYPE}_map_t *
 
 bool {KEY_TYPE}_to_{VALUE_TYPE}_map_cmp({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const lhs,
                                         {KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const rhs);
+
+bool {KEY_TYPE}_to_{VALUE_TYPE}_map_remove({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
+{KEY_TYPE} const *const key);
 
 #ifdef __cplusplus
 }

@@ -3,7 +3,6 @@ cc_test(
     srcs = ["test_sponge.c"],
     deps = [
         "//mam/sponge",
-        "//mam/test_utils",
         "@unity",
     ],
 )
@@ -14,7 +13,6 @@ cc_test(
     deps = [
         "//mam/sponge:spongos",
         "//mam/sponge:spongos_types",
-        "//mam/test_utils",
         "@unity",
     ],
 )

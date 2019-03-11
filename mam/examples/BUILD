@@ -1,11 +1,33 @@
 cc_binary(
-    name = "send",
-    srcs = ["send.c"],
+    name = "send-header",
+    srcs = ["send-header.c"],
     deps = [
-        ":commmon",
-        "//cclient:api",
-        "//common/trinary:tryte_ascii",
-        "//mam/api",
+        ":send-common",
+    ],
+)
+
+cc_binary(
+    name = "send-packet",
+    srcs = ["send-packet.c"],
+    deps = [
+        ":send-common",
+    ],
+)
+
+cc_binary(
+    name = "send-msg",
+    srcs = ["send-msg.c"],
+    deps = [
+        ":send-common",
+    ],
+)
+
+cc_library(
+    name = "send-common",
+    srcs = ["send-common.c"],
+    hdrs = ["send-common.h"],
+    deps = [
+        ":common",
     ],
 )
 
@@ -13,17 +35,18 @@ cc_binary(
     name = "recv",
     srcs = ["recv.c"],
     deps = [
-        ":commmon",
-        "//cclient:api",
-        "//common/trinary:tryte_ascii",
-        "//mam/api",
+        ":common",
     ],
 )
 
 cc_library(
-    name = "commmon",
+    name = "common",
+    srcs = ["common.c"],
     hdrs = ["common.h"],
     deps = [
+        "//cclient/api",
         "//common/trinary:trit_tryte",
+        "//common/trinary:tryte_ascii",
+        "//mam/api",
     ],
 )

@@ -95,37 +95,26 @@ extern "C" {
 
 #define RC_RESOLVE_FORMAT_STR "M=0x%02X, E=0x%02X, S=0x%X (0x%04X)"
 
-#define err_bind(expr)       \
-  if (RC_OK != (e = (expr))) \
-    continue;                \
-  else
-
-#define err_guard(expr, err) \
-  if (!(expr)) {             \
-    e = (err);               \
-    continue;                \
-  } else
-
 #define ERR_BIND_RETURN(expr, e) \
-  if (RC_OK != (e = (expr)))     \
+  if (RC_OK != (e = (expr))) {   \
     return e;                    \
-  else
+  }
 
 #define ERR_BIND_GOTO(expr, e, label) \
-  if (RC_OK != (e = (expr)))          \
+  if (RC_OK != (e = (expr))) {        \
     goto label;                       \
-  else
+  }
 
 #define ERR_GUARD_RETURN(expr, err) \
   if (!(expr)) {                    \
     return err;                     \
-  } else
+  }
 
 #define ERR_GUARD_GOTO(expr, err, e, label) \
   if (!(expr)) {                            \
     e = (err);                              \
     goto label;                             \
-  } else
+  }
 
 /** Return Codes */
 enum retcode_t {
@@ -320,6 +309,8 @@ enum retcode_t {
   RC_UTILS_OOM = 0x05 | RC_MODULE_UTILS | RC_SEVERITY_MAJOR,
   RC_UTILS_INVALID_SIG_FILE = 0x06 | RC_MODULE_UTILS | RC_SEVERITY_MAJOR,
   RC_UTILS_INVALID_LOGGER_VERSION = 0x07 | RC_MODULE_UTILS | RC_SEVERITY_MAJOR,
+  RC_UTILS_FAILED_WRITE_FILE = 0x08 | RC_MODULE_UTILS | RC_SEVERITY_MAJOR,
+  RC_UTILS_FAILED_READ_FILE = 0x09 | RC_MODULE_UTILS | RC_SEVERITY_MAJOR,
 
   // Broadcaster module
 
@@ -481,7 +472,9 @@ enum retcode_t {
   RC_MAM_BUNDLE_DOES_NOT_CONTAIN_HEADER =
       0x17 | RC_MODULE_MAM | RC_SEVERITY_MODERATE,
   RC_MAM_RECV_CTX_NOT_FOUND = 0x18 | RC_MODULE_MAM | RC_SEVERITY_MODERATE,
-  RC_MAM_MESSAGE_NOT_FOUND = 0x19 | RC_MODULE_MAM | RC_SEVERITY_MODERATE,
+  RC_MAM_SEND_CTX_NOT_FOUND = 0x19 | RC_MODULE_MAM | RC_SEVERITY_MODERATE,
+  RC_MAM_MESSAGE_NOT_FOUND = 0x1A | RC_MODULE_MAM | RC_SEVERITY_MODERATE,
+  RC_MAM_BAD_PACKET_ORD = 0x1B | RC_MODULE_MAM | RC_SEVERITY_MODERATE,
 
   // Helpers Module
   RC_HELPERS_POW_INVALID_TX = 0x01 | RC_MODULE_HELPERS | RC_SEVERITY_MODERATE,

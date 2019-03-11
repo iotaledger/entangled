@@ -14,7 +14,7 @@ retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_init({KEY_TYPE}_to_{VALUE_TYPE}_map_t *
   return RC_OK;
 }
 
-retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_size({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map) {
+retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_size({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map) {
   return HASH_COUNT(map->map);
 }
 
@@ -98,4 +98,23 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_cmp({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *
     }
   }
   return true;
+}
+
+bool {KEY_TYPE}_to_{VALUE_TYPE}_map_remove({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
+{KEY_TYPE} const *const key) {
+{KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *entry = NULL;
+
+  if (map == NULL || map->map == NULL) {
+    return false;
+  }
+
+  HASH_FIND(hh, map->map, key,map->key_size, entry);
+
+  if (entry != NULL){
+    free(entry->key);
+    HASH_DEL(map->map, entry);
+    free(entry);
+  }
+
+  return entry != NULL;
 }
