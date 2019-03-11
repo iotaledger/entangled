@@ -502,7 +502,7 @@ retcode_t mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig) {
   MAM_ASSERT(trits_size(sig) == MAM_MSS_SIG_SIZE(mss->height));
 
   if (mss->skn == MAM_MSS_MAX_SKN(mss->height)) {
-    return RC_MAM_MSS_EXAHUSTED;
+    return RC_MAM_MSS_EXHAUSTED;
   }
 
   // Write both tree height and the sk index to the signature
