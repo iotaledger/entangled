@@ -606,7 +606,7 @@ retcode_t mam_msg_write_header(mam_msg_write_context_t *ctx, mam_prng_t *prng,
         mam_mam_spongos_fork(&ctx->spongos, &spongos_fork);
         /*  KeyloadNTRU ntru = 2; */
         mam_msg_wrap_keyload_ntru(&spongos_fork, msg, session_key,
-                                  mam_ntru_pk_trits(&curr_entry_ntru->value),
+                                  mam_ntru_pk_key(&curr_entry_ntru->value),
                                   prng, &spongos_ntru, msg_id);
       }
     }

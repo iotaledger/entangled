@@ -17,7 +17,7 @@ trits_t mam_ntru_pk_id(mam_ntru_pk_t const *const ntru_pk) {
   return trits_from_rep(MAM_NTRU_ID_SIZE, ntru_pk->key);
 }
 
-trits_t mam_ntru_pk_trits(mam_ntru_pk_t const *const ntru_pk) {
+trits_t mam_ntru_pk_key(mam_ntru_pk_t const *const ntru_pk) {
   return trits_from_rep(MAM_NTRU_PK_SIZE, ntru_pk->key);
 }
 
