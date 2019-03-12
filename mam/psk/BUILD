@@ -7,6 +7,7 @@ cc_library(
     hdrs = ["psk.h"],
     deps = [
         "//common:errors",
+        "//mam/prng",
         "//mam/trits",
     ],
 )

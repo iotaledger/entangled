@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-typedef enum prng_destination_tryte_e {
+typedef enum mam_prng_destination_tryte_e {
   // PRNG AE destination tryte
   MAM_PRNG_DST_SEC_KEY = 0,
   // PRNG WOTS destination tryte
