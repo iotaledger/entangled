@@ -17,6 +17,7 @@
 #include "mam/trits/trits.h"
 
 #define MAM_CHANNEL_ID_SIZE MAM_MSS_MT_HASH_SIZE
+#define MAM_CHANNEL_NAME_SIZE 18
 #define MAM_CHANNEL_MSG_ORD_SIZE 81
 
 #ifdef __cplusplus

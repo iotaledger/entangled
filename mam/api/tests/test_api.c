@@ -304,7 +304,7 @@ static void test_api_create_channels(mam_api_t *api, mam_channel_t **const cha,
                                      mss_mt_height_t depth) {
   mss_mt_height_t d = depth;
 
-  // TODO usse api methods
+  // TODO use api methods
   /* create channels */
   {
     trits_t cha_name = trits_alloc(3 * strlen(TEST_CHANNEL_NAME));

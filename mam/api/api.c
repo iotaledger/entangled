@@ -168,6 +168,28 @@ retcode_t mam_api_add_channel(mam_api_t *const api,
   return mam_channel_t_set_add(&api->channels, ch);
 }
 
+retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height,
+                                 tryte_t *const channel_id) {
+  retcode_t ret = RC_OK;
+  mam_channel_t channel;
+  MAM_TRITS_DEF0(channel_ord, MAM_CHANNEL_NAME_SIZE);
+  channel_ord = MAM_TRITS_INIT(channel_ord, MAM_CHANNEL_NAME_SIZE);
+
+  if (api == NULL || channel_id == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  trits_put18(channel_ord, api->channel_ord);
+  ERR_BIND_RETURN(mam_channel_create(&api->prng, height, channel_ord, &channel),
+                  ret);
+  ERR_BIND_RETURN(mam_channel_t_set_add(&api->channels, &channel), ret);
+  trits_to_trytes(trits_begin(mam_channel_id(&channel)), channel_id,
+                  MAM_CHANNEL_ID_SIZE);
+  api->channel_ord++;
+
+  return ret;
+}
+
 void mam_api_tag(trit_t *const tag, trit_t const *const msg_id,
                  trint18_t const ord) {
   memcpy(tag, msg_id, MAM_MSG_ID_SIZE);
@@ -462,8 +484,7 @@ void mam_api_write_ctx_map_serialize(
 }
 
 retcode_t mam_api_write_ctx_map_deserialize(
-    trits_t const *const buffer,
-    trit_t_to_mam_msg_write_context_t_map_t *const map) {
+    trits_t *const buffer, trit_t_to_mam_msg_write_context_t_map_t *const map) {
   retcode_t ret;
   mam_msg_write_context_t ctx;
   trit_t msg_id[MAM_MSG_ID_SIZE];
@@ -511,8 +532,7 @@ void mam_api_read_ctx_map_serialize(
 }
 
 retcode_t mam_api_read_ctx_map_deserialize(
-    trits_t const *const buffer,
-    trit_t_to_mam_msg_read_context_t_map_t *const map) {
+    trits_t *const buffer, trit_t_to_mam_msg_read_context_t_map_t *const map) {
   retcode_t ret;
   mam_msg_read_context_t ctx;
   trit_t msg_id[MAM_MSG_ID_SIZE];
