@@ -7,6 +7,7 @@
 
 #include "cclient/serialization/json/helpers.h"
 
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,6 +55,29 @@ retcode_t utarray_to_json_array(UT_array const* const ut,
     char** p = NULL;
     while ((p = (char**)utarray_next(ut, p))) {
       cJSON_AddItemToArray(array_obj, cJSON_CreateString(*p));
+    }
+  }
+  return RC_OK;
+}
+
+retcode_t utarray_uint64_to_json_array(UT_array const* const ut,
+                                       cJSON* const json_root,
+                                       char const* const obj_name) {
+  if (utarray_len(ut) > 0) {
+    cJSON* array_obj = cJSON_CreateArray();
+    if (array_obj == NULL) {
+      log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__,
+                   STR_CCLIENT_JSON_CREATE);
+      return RC_CCLIENT_JSON_CREATE;
+    }
+
+    cJSON_AddItemToObject(json_root, obj_name, array_obj);
+
+    uint64_t* p = NULL;
+    char buffer[20];
+    while ((p = (uint64_t*)utarray_next(ut, p))) {
+      sprintf(buffer, "%" PRIu64, *p);
+      cJSON_AddItemToArray(array_obj, cJSON_CreateString(buffer));
     }
   }
   return RC_OK;
@@ -277,6 +301,10 @@ retcode_t json_array_to_hash243_queue(cJSON const* const obj,
   retcode_t ret_code = RC_OK;
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
+  if (!json_item) {
+    return RC_CCLIENT_JSON_KEY;
+  }
+
   if (cJSON_IsArray(json_item)) {
     cJSON* current_obj = NULL;
     cJSON_ArrayForEach(current_obj, json_item) {

@@ -16,9 +16,11 @@ extern "C" {
 
 typedef struct {
   /**
-   * Transactions with any of these tags will be returned
+   * The confirmation threshold between 0 and 100(inclusive).
+   *  Should be set to 100 for getting balance by counting only confirmed
+   * transactions.
    */
-  size_t threshold;
+  uint8_t threshold;
   /**
    * List of addresses you want to get the confirmed balance for.
    */

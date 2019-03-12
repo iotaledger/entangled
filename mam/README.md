@@ -6,7 +6,7 @@ implementation & specification by apmi.bsu.by
 
 MAM allows for:
 
-- Message encryption via NTRU (public key encrytpion) and PSK (PRe shared key)
+- Message encryption via NTRU (public key encrytpion) and PSK (Pre-Shared Key)
 
 - Sending a message to multiple receivers, each having his/her own session key
 
@@ -27,7 +27,7 @@ MAM allows for:
 
 *NTRU* - Public key encryption scheme
 
-*PSK* - pre shared key encryption (symmetric encryption)
+*PSK* - Pre-Shared Key (PSK) is a secret key of Authenticated Encryption (AE). It is preliminarily transmitted between the entities and is beyond the scope of MAM. The PSK id is an identifier of a group of recipients who share the same PSK.
 
 *PRNG* - Pseudo randomness generator based on sponge's hash function
 
@@ -41,5 +41,20 @@ MAM allows for:
 
 ## How to use it?
 
-Examples for writing/reading messages to/from the tangle are available here:
-https://github.com/iotaledger/entangled/tree/develop/mam/examples
+### Managing PSKs
+
+The sender creates a PSK by providing a 27-trytes id and a custom trytes nonce, then provides it to recipients.
+```
+mam_psk_t psk;
+mam_psk_gen(&psk, &prng, "B9IOSRYXSJPELPKGTG9PJDQC9YS", "PZQZ...AKKEF", 42);
+// Provides it to recipients
+mam_psk_destroy(&psk);
+```
+
+The receiver receives a PSK from a sender and adds it to the API.
+```
+mam_psk_t psk;
+// Receives it from sender
+mam_api_add_psk(&api, &psk);
+mam_psk_destroy(&psk);
+```
