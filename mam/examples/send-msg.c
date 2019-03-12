@@ -57,6 +57,16 @@ int main(int ac, char **av) {
 
     // Writing packet to bundle
     bool last_packet = strcmp(av[5], "yes") == 0;
+
+    if (mam_channel_num_remaining_sks(channel) == 0) {
+      // TODO
+      // - remove old ch
+      // - create new ch
+      // - add ch via `mam_api_add_channel`
+
+      return RC_OK;
+    }
+
     if ((ret = mam_example_write_packet(&api, bundle, av[4], msg_id,
                                         last_packet)) != RC_OK) {
       fprintf(stderr, "mam_example_write_packet failed with err %d\n", ret);

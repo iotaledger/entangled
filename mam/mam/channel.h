@@ -77,6 +77,14 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
                              mam_channel_t *const channel);
 
 /**
+ * Returns the number of remaining secret keys (unused leaves on merkle tree)
+ * @param channel The channel
+ *
+ * @return a status code
+ */
+size_t mam_channel_num_remaining_sks(mam_channel_t const *const channel);
+
+/**
  * Deallocates memory for internal objects
  * Before destroying channel, make sure to destroy all associated endpoints
  *

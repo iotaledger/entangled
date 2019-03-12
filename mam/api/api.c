@@ -292,26 +292,6 @@ retcode_t mam_api_bundle_write_packet(
   return RC_OK;
 }
 
-retcode_t mam_api_num_remaining_sks(mam_api_t *const api,
-                                    trit_t const *const msg_id,
-                                    size_t *const num_sks) {
-  mam_msg_write_context_t *ctx = NULL;
-  trit_t_to_mam_msg_write_context_t_map_entry_t *entry = NULL;
-
-  if (api == NULL || msg_id == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  if (!trit_t_to_mam_msg_write_context_t_map_find(&api->write_ctxs, msg_id,
-                                                  &entry) ||
-      entry == NULL) {
-    return RC_MAM_MESSAGE_NOT_FOUND;
-  }
-  ctx = &entry->value;
-
-  return mam_mss_num_remaining_sks(ctx->mss);
-}
-
 static retcode_t mam_api_bundle_read_packet_from_msg(
     mam_api_t *const api, mam_msg_read_context_t *ctx, trits_t msg,
     tryte_t **const payload, size_t *const payload_size,

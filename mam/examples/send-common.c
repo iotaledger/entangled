@@ -59,15 +59,6 @@ retcode_t mam_example_write_packet(mam_api_t* const api,
       (tryte_t*)malloc(2 * strlen(payload) * sizeof(tryte_t));
 
   ascii_to_trytes(payload, payload_trytes);
-  size_t num_remaining_sks;
-  if (mam_api_num_remaining_sks(api, msg_id, &num_remaining_sks) == 0) {
-    // TODO
-    // - remove old ch/ep
-    // - create new ch/ep
-    // - add ch/ep via `mam_api_add_channel/mam_api_add_endpoint`
-
-    return RC_OK;
-  }
   if ((ret = mam_api_bundle_write_packet(api, msg_id, payload_trytes,
                                          strlen(payload) * 2, 0, bundle,
                                          is_last_packet)) != RC_OK) {

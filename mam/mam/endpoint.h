@@ -74,6 +74,14 @@ retcode_t mam_endpoint_create(mam_prng_t const *const prng,
                               mam_endpoint_t *const endpoint);
 
 /**
+ * Returns the number of remaining secret keys (unused leaves on merkle tree)
+ * @param endpoint The endpoint
+ *
+ * @return a status code
+ */
+size_t mam_endpoint_num_remaining_sks(mam_endpoint_t const *const endpoint);
+
+/**
  * Deallocates memory for internal objects
  *
  * @param allocator A MAM allocator

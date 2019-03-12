@@ -217,13 +217,13 @@ retcode_t mam_mss_sign_and_next(mam_mss_t *mss, trits_t hash, trits_t sig);
 bool mam_mss_next(mam_mss_t *mss);
 
 /**
- * Advances skn
+ * Returns the number of remaining secret keys (unused leaves on merkle tree)
  *
  * @param mss [in] MSS interface
  *
  * @return The number of remaining signatures
  */
-size_t mam_mss_num_remaining_sks(mam_mss_t *mss);
+size_t mam_mss_num_remaining_sks(mam_mss_t const *const mss);
 
 /**
  * Verifies MSS signature.

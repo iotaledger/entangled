@@ -550,12 +550,12 @@ bool mam_mss_next(mam_mss_t *mss) {
   return true;
 }
 
-size_t mam_mss_num_remaining_sks(mam_mss_t *mss) {
+size_t mam_mss_num_remaining_sks(mam_mss_t const *const mss) {
   if (mss->skn >= MAM_MSS_MAX_SKN(mss->height)) {
     return 0;
   }
 
-  return mss->skn - MAM_MSS_MAX_SKN(mss->height);
+  return MAM_MSS_MAX_SKN(mss->height) - mss->skn;
 }
 
 bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos,
