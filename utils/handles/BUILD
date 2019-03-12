@@ -60,4 +60,8 @@ cc_library(
     name = "socket",
     srcs = ["socket.c"],
     hdrs = ["socket.h"],
+    deps = [
+        "//common:errors",
+        "@mbedtls",
+    ],
 )

@@ -11,6 +11,8 @@ const char* error_2_string(retcode_t err) {
   switch (err) {
     case RC_OK:
       return STR_OK;
+    case RC_ERROR:
+      return STR_ERROR;
 
     // Storage SQLite3 Module
     case RC_STORAGE_OOM:
@@ -127,6 +129,30 @@ const char* error_2_string(retcode_t err) {
     // Utils module
     case RC_UTILS_FAILED_REMOVE_FILE:
     case RC_UTILS_FAILED_TO_COPY_FILE:
+      return "String not defined.";
+    case RC_UTILS_SOCKET_TLS_RNG:
+      return STR_UTILS_SOCKET_TLS_RNG;
+    case RC_UTILS_SOCKET_TLS_CA:
+      return STR_UTILS_SOCKET_TLS_CA;
+    case RC_UTILS_SOCKET_TLS_CLIENT_PEM:
+      return STR_UTILS_SOCKET_TLS_CLIENT_PEM;
+    case RC_UTILS_SOCKET_TLS_CLIENT_PK:
+      return STR_UTILS_SOCKET_TLS_CLIENT_PK;
+    case RC_UTILS_SOCKET_TLS_CONF:
+      return STR_UTILS_SOCKET_TLS_CONF;
+    case RC_UTILS_SOCKET_TLS_AUTHMODE:
+      return STR_UTILS_SOCKET_TLS_AUTHMODE;
+    case RC_UTILS_SOCKET_CLIENT_AUTH:
+      return STR_UTILS_SOCKET_CLIENT_AUTH;
+    case RC_UTILS_SOCKET_TLS_HANDSHAKE:
+      return STR_UTILS_SOCKET_TLS_HANDSHAKE;
+    case RC_UTILS_SOCKET_CONNECT:
+      return STR_UTILS_SOCKET_CONNECT;
+    case RC_UTILS_SOCKET_RECV:
+      return STR_UTILS_SOCKET_RECV;
+    case RC_UTILS_SOCKET_SEND:
+      return STR_UTILS_SOCKET_SEND;
+
     // Broadcaster module
     case RC_BROADCASTER_FAILED_PUSH_QUEUE:
     case RC_BROADCASTER_STILL_RUNNING:
