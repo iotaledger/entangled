@@ -72,8 +72,9 @@ static trits_t message_test_generic_write_msg(
   msg = trits_alloc(sz);
   TEST_ASSERT(!trits_is_null(msg));
 
-  mam_msg_write_header(write_ctx, prng, ch, ep, ch1, ep1, msg_id, msg_type_id,
-                       psks, ntru_pks, &msg);
+  TEST_ASSERT_EQUAL_INT(
+      RC_OK, mam_msg_write_header(write_ctx, prng, ch, ep, ch1, ep1, msg_id,
+                                  msg_type_id, psks, ntru_pks, &msg));
   TEST_ASSERT(trits_is_empty(msg));
   msg = trits_pickup(msg, sz);
   mam_psk_t_set_free(&psks);
@@ -111,7 +112,8 @@ static trits_t message_test_generic_write_first_packet(
   packet = trits_alloc(sz);
   TEST_ASSERT(!trits_is_null(packet));
 
-  mam_msg_write_packet(write_ctx, checksum, payload, &packet);
+  TEST_ASSERT_EQUAL_INT(
+      RC_OK, mam_msg_write_packet(write_ctx, checksum, payload, &packet));
   TEST_ASSERT(trits_is_empty(packet));
   packet = trits_pickup(packet, sz);
   trits_set_zero(payload);
@@ -221,9 +223,6 @@ static void message_test_generic(mam_prng_t *prng_sender,
 
   trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
 
-  mam_channel_t *cha = NULL, *ch1a = NULL;
-  mam_endpoint_t *epa = NULL, *ep1a = NULL;
-
   mam_msg_write_context_t write_ctx;
   mam_spongos_init(&write_ctx.spongos);
   write_ctx.ord = 0;
@@ -234,8 +233,6 @@ static void message_test_generic(mam_prng_t *prng_sender,
   mam_msg_pubkey_t pubkey;     /* chid=0, epid=1, chid1=2, epid1=3 */
   mam_msg_keyload_t keyload;   /* psk=1, ntru=2 */
   mam_msg_checksum_t checksum; /* none=0, mac=1, mssig=2 */
-
-  message_test_create_channels(prng_sender, &cha, &ch1a, &epa, &ep1a);
 
   char const *payload_str = "PAYLOAD9999";
   payload = trits_alloc(3 * strlen(payload_str));
@@ -278,6 +275,9 @@ static void message_test_generic(mam_prng_t *prng_sender,
       for (checksum = 0; (int)checksum < 3; ++checksum)
       /* none=0, mac=1, mssig=2 */
       {
+        mam_channel_t *cha = NULL, *ch1a = NULL;
+        mam_endpoint_t *epa = NULL, *ep1a = NULL;
+        message_test_create_channels(prng_sender, &cha, &ch1a, &epa, &ep1a);
         /* write msg and packet */
         {
           msg = message_test_generic_write_msg(
@@ -302,6 +302,18 @@ static void message_test_generic(mam_prng_t *prng_sender,
           trits_free(msg);
           trits_free(packet);
         }
+
+        /* destroy channels/endpoints */
+        {
+          if (cha) mam_channel_destroy(cha);
+          if (ch1a) mam_channel_destroy(ch1a);
+          if (epa) mam_endpoint_destroy(epa);
+          if (ep1a) mam_endpoint_destroy(ep1a);
+          free(cha);
+          free(epa);
+          free(ch1a);
+          free(ep1a);
+        }
       }
     }
   }
@@ -309,18 +321,6 @@ static void message_test_generic(mam_prng_t *prng_sender,
   ntru_destroy(ntru);
 
   trits_free(payload);
-
-  /* destroy channels/endpoints */
-  {
-    if (cha) mam_channel_destroy(cha);
-    if (ch1a) mam_channel_destroy(ch1a);
-    if (epa) mam_endpoint_destroy(epa);
-    if (ep1a) mam_endpoint_destroy(ep1a);
-    free(cha);
-    free(epa);
-    free(ch1a);
-    free(ep1a);
-  }
 
   TEST_ASSERT(e == RC_OK);
 }

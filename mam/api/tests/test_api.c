@@ -224,7 +224,7 @@ static tryte_t API_SEED[] =
 #define TEST_PRE_SHARED_KEY_B_STR "PSKIDBPSKIDBPSKIDBPSKIDBPSK"
 #define TEST_PRE_SHARED_KEY_B_NONCE_STR "PSKBNONCE"
 #define TEST_NTRU_NONCE "NTRUBNONCE"
-#define TEST_MSS_DEPTH 1
+#define TEST_MSS_DEPTH 6
 
 static void test_api_write_header(
     mam_api_t *const api, mam_psk_t const *const pska,
@@ -300,8 +300,9 @@ static void test_api_read_msg(mam_api_t *const api,
 static void test_api_create_channels(mam_api_t *api, mam_channel_t **const cha,
                                      mam_channel_t **const ch1,
                                      mam_endpoint_t **const epa,
-                                     mam_endpoint_t **ep1) {
-  mss_mt_height_t d = TEST_MSS_DEPTH;
+                                     mam_endpoint_t **ep1,
+                                     mss_mt_height_t depth) {
+  mss_mt_height_t d = depth;
 
   // TODO usse api methods
   /* create channels */
@@ -451,7 +452,7 @@ static void test_api_multiple_packets() {
   }
 
   // write and read packets
-  const size_t num_packets = 256;
+  const size_t num_packets = 36;
   for (size_t i = 0; i < num_packets; i++) {
     bundle_transactions_new(&bundle);
     TEST_ASSERT(mam_api_bundle_write_packet(
@@ -520,36 +521,44 @@ static void test_api_save_load() {
   mam_api_destroy(&loaded_api);
 }
 
+static void clean_channels() {
+  if (cha) {
+    mam_channel_destroy(cha);
+    free(cha);
+    cha = NULL;
+  }
+  if (ch1a) {
+    mam_channel_destroy(ch1a);
+    free(ch1a);
+    ch1a = NULL;
+  }
+  if (epa) {
+    mam_endpoint_destroy(epa);
+    free(epa);
+    epa = NULL;
+  }
+  if (ep1a) {
+    mam_endpoint_destroy(ep1a);
+    free(ep1a);
+    ep1a = NULL;
+  }
+}
+
 int main(void) {
   UNITY_BEGIN();
 
   TEST_ASSERT(mam_api_init(&api, API_SEED) == RC_OK);
-  test_api_create_channels(&api, &cha, &ch1a, &epa, &ep1a);
-
+  test_api_create_channels(&api, &cha, &ch1a, &epa, &ep1a, TEST_MSS_DEPTH);
   RUN_TEST(test_api_generic);
-  RUN_TEST(test_api_multiple_packets);
   RUN_TEST(test_api_serialization);
   RUN_TEST(test_api_save_load);
+  clean_channels();
+  TEST_ASSERT(mam_api_destroy(&api) == RC_OK);
 
-  /* destroy channels/endpoints */
-  {
-    if (cha) {
-      mam_channel_destroy(cha);
-      free(cha);
-    }
-    if (ch1a) {
-      mam_channel_destroy(ch1a);
-      free(ch1a);
-    }
-    if (epa) {
-      mam_endpoint_destroy(epa);
-      free(epa);
-    }
-    if (ep1a) {
-      mam_endpoint_destroy(ep1a);
-      free(ep1a);
-    }
-  }
+  TEST_ASSERT(mam_api_init(&api, API_SEED) == RC_OK);
+  test_api_create_channels(&api, &cha, &ch1a, &epa, &ep1a, 4);
+  RUN_TEST(test_api_multiple_packets);
+  clean_channels();
   TEST_ASSERT(mam_api_destroy(&api) == RC_OK);
 
   return UNITY_END();

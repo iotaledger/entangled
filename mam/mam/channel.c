@@ -55,6 +55,10 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
   return ret;
 }
 
+size_t mam_channel_num_remaining_sks(mam_channel_t const *const channel) {
+  return mam_mss_num_remaining_sks(&channel->mss);
+}
+
 void mam_channel_destroy(mam_channel_t *const channel) {
   MAM_ASSERT(channel);
 

@@ -1,5 +1,6 @@
 cc_test(
     name = "test_mam",
+    timeout = "long",
     srcs = ["test_mam.c"],
     linkopts = ["-lpthread"],
     deps =

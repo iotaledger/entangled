@@ -142,7 +142,7 @@ static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng,
     mam_mss_init(mss2, prng, curr_height, nonce, trits_null());
     mam_mss_gen(mss1);
 
-    do {
+    while (mam_mss_num_remaining_sks(mss1) > 0) {
       mam_mss_sign(mss1, hash, sig);
 
       store = trits_take(store_, mam_mss_serialized_size(mss1));
@@ -152,7 +152,8 @@ static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng,
       mam_mss_sign(mss2, hash, sig2);
 
       r = r && trits_cmp_eq(sig, sig2);
-    } while (mam_mss_next(mss1));
+      mam_mss_next(mss1);
+    }
   }
 
   return r;
@@ -273,8 +274,9 @@ static void mss_meta_test(void) {
   TEST_ASSERT_TRUE(mss_test(m2, &p, &sg, 2) && test_mss_check2(_m2));
   TEST_ASSERT_TRUE(mss_test(m3, &p, &sg, 3) && test_mss_check3(_m3));
   // TEST_ASSERT_TRUE(mss_test(m4, &p, &sg, 4) && test_mss_check4(_m4));
-  TEST_ASSERT_TRUE(mss_store_test(m4, m42, &p, 2) && test_mss_check4(_m4) &&
-                   test_mss_check4(_m42));
+  TEST_ASSERT_TRUE(mss_store_test(m4, m42, &p, 2));
+  TEST_ASSERT_TRUE(test_mss_check4(_m4));
+  TEST_ASSERT_TRUE(test_mss_check4(_m42));
   // #if 0
   //   TEST_ASSERT_TRUE(mss_test(m5, p, sg, w, 5) && test_mss_check5(_m5));
   //   TEST_ASSERT_TRUE(mss_test(mx, p, sg, w, 10) && test_mss_checkx(_mx));
