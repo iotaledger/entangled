@@ -12,6 +12,7 @@
 #define __MAM_PSK_PSK_H__
 
 #include "common/errors.h"
+#include "mam/prng/prng.h"
 #include "mam/trits/trits.h"
 
 #define MAM_PSK_ID_SIZE 81
@@ -22,10 +23,10 @@ extern "C" {
 #endif
 
 /**
- * Pre-Shared Key (PSK) is a secret key of Authenticated Encryption (AE) and is
- * preliminarily transmitted between the entities (beyond the scope of MAM)
- * The id field presents an identifier of a group of recipients who share the
- * same PSK
+ * Pre-Shared Key (PSK) is a secret key of Authenticated Encryption (AE)
+ * It is preliminarily transmitted between the entities and is beyond the scope
+ * of MAM
+ * The PSK id is an identifier of a group of recipients who share the same PSK
  */
 typedef struct mam_psk_s {
   trit_t id[MAM_PSK_ID_SIZE];
@@ -34,6 +35,28 @@ typedef struct mam_psk_s {
 
 typedef struct mam_psk_t_set_entry_s mam_psk_t_set_entry_t;
 typedef mam_psk_t_set_entry_t* mam_psk_t_set_t;
+
+/**
+ * Generates a pre-shared key with an id and a nonce
+ *
+ * @param psk The pre-shared key
+ * @param prng A PRNG interface
+ * @param id The pre-shared key id (27 trytes)
+ * @param nonce A trytes nonce
+ * @param nonce_length Length of the trytes nonce
+ *
+ * @return a status code
+ */
+retcode_t mam_psk_gen(mam_psk_t* const psk, mam_prng_t const* const prng,
+                      tryte_t const* const id, tryte_t const* const nonce,
+                      size_t const nonce_length);
+
+/**
+ * Safely destroys a pre-shared key by clearing its secret part
+ *
+ * @param psk The pre-shared key
+ */
+void mam_psk_destroy(mam_psk_t* const psk);
 
 /**
  * Gets a pre-shared key id trits
@@ -52,13 +75,6 @@ trits_t mam_psk_id(mam_psk_t const* const psk);
  * @return the pre-shared key trits
  */
 trits_t mam_psk_key(mam_psk_t const* const psk);
-
-/**
- * Safely destroys a pre-shared key by clearing its secret part
- *
- * @param psk The pre-shared key
- */
-void mam_psk_destroy(mam_psk_t* const psk);
 
 /**
  * Safely destroys a set of pre-shared keys by clearing their secret part and
