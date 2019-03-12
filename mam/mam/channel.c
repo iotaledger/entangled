@@ -82,17 +82,14 @@ retcode_t mam_channels_destroy(mam_channel_t_set_t *const channels) {
 }
 
 size_t mam_channel_serialized_size(mam_channel_t const *const channel) {
-  size_t mss_size = mam_mss_serialized_size(&channel->mss);
-  size_t endpoints_size = mam_endpoints_serialized_size(channel->endpoints);
-
   return pb3_sizeof_size_t(trits_size(channel->name)) +  // name size
          pb3_sizeof_ntrytes(trits_size(channel->name) /
                             NUMBER_OF_TRITS_IN_A_TRYTE) +  // name
          pb3_sizeof_ntrytes(MAM_CHANNEL_MSG_ORD_SIZE /
                             NUMBER_OF_TRITS_IN_A_TRYTE) +  // msg_ord
-         pb3_sizeof_size_t(mss_size) +                     // mss size
-         pb3_sizeof_ntrytes(mss_size / NUMBER_OF_TRITS_IN_A_TRYTE) +  // mss
-         pb3_sizeof_ntrytes(endpoints_size /
+         pb3_sizeof_ntrytes(mam_mss_serialized_size(&channel->mss) /
+                            NUMBER_OF_TRITS_IN_A_TRYTE) +  // mss
+         pb3_sizeof_ntrytes(mam_endpoints_serialized_size(channel->endpoints) /
                             NUMBER_OF_TRITS_IN_A_TRYTE);  // endpoints
 }
 
@@ -104,7 +101,6 @@ void mam_channel_serialize(mam_channel_t const *const channel,
   pb3_encode_ntrytes(channel->name, buffer);             // name
   pb3_encode_ntrytes(trits_from_rep(MAM_CHANNEL_MSG_ORD_SIZE, channel->msg_ord),
                      buffer);                                       // msg_ord
-  pb3_encode_size_t(mss_size, buffer);                              // mss size
   mam_mss_serialize(&channel->mss, trits_take(*buffer, mss_size));  // mss
   trits_advance(buffer, mss_size);
   mam_endpoints_serialize(channel->endpoints, buffer);  // endpoints
@@ -129,10 +125,6 @@ retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
   if ((ret = pb3_decode_ntrytes(
            trits_from_rep(MAM_CHANNEL_MSG_ORD_SIZE, channel->msg_ord),
            buffer)) != RC_OK) {  // msg_ord
-    return ret;
-  }
-
-  if ((ret = pb3_decode_size_t(&size, buffer)) != RC_OK) {  // mss size
     return ret;
   }
 
