@@ -116,6 +116,7 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_remove({KEY_TYPE}_to_{VALUE_TYPE}_map_t *con
   }
 
   return entry != NULL;
+}
 
 {VALUE_TYPE} {KEY_TYPE}_to_{VALUE_TYPE}_map_at(
 {KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map,
@@ -138,7 +139,7 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_set(
  }
 
 HASH_FIND(hh, map->map, key, sizeof({KEY_TYPE}), res);
-    memcpy(res->value,value,sizeof({VALUE_TYPE}));
+    memcpy(&res->value,value,sizeof({VALUE_TYPE}));
     return res != NULL;
 }
 

@@ -19,8 +19,8 @@ map_generate(
     additional_deps = [":person_example"],
     additional_include_path = "utils/containers/person_example.h",
     key_type = "person_example_t",
-    value_type = "int",
     parent_directory = "ciri/perceptive_node",
+    value_type = "int",
 )
 
 typed_container_generate(
@@ -33,8 +33,8 @@ cc_library(
 )
 
 map_generate(
+    additional_deps = ["//gossip:neighbor"],
     additional_include_path = "gossip/neighbor.h",
     key_type = "neighbor_t",
     value_type = "uint32_t",
-    additional_deps = ["//gossip:neighbor",]
 )

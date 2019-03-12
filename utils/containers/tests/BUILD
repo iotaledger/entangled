@@ -1,4 +1,3 @@
-
 cc_test(
     name = "test_map",
     srcs = ["test_map.c"],

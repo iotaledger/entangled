@@ -77,12 +77,8 @@ extern "C" {
 #define RC_MODULE_API (0xA8 << RC_SHIFT_MODULE)
 #define RC_MODULE_GOSSIP (0xA9 << RC_SHIFT_MODULE)
 
-<<<<<<< HEAD
 #define RC_MODULE_MAM (0xB0 << RC_SHIFT_MODULE)
-=======
-#define RC_MODULE_MAM2 (0xB0 << RC_SHIFT_MODULE)
 #define RC_MODULE_PERCEPTIVE_NODE (0xB1 << RC_SHIFT_MODULE)
->>>>>>> ciri/perceptive_node: wip - initilize the component and enable basic configuration
 
 #define RC_MODULE_HELPERS (0xB1 << RC_SHIFT_MODULE)
 
