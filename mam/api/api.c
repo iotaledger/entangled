@@ -98,14 +98,14 @@ retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed) {
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
   api->psks = NULL;
-  api->channels = NULL;
-
   ERR_BIND_RETURN(trit_t_to_mam_msg_write_context_t_map_init(&api->write_ctxs,
                                                              MAM_MSG_ID_SIZE),
                   ret);
   ERR_BIND_RETURN(trit_t_to_mam_msg_read_context_t_map_init(&api->read_ctxs,
                                                             MAM_MSG_ID_SIZE),
                   ret);
+  api->channels = NULL;
+  api->channel_ord = 0;
 
   return ret;
 }
@@ -537,19 +537,19 @@ size_t mam_api_serialized_size(mam_api_t const *const api) {
          mam_psks_serialized_size(api->psks) +
          mam_api_write_ctx_map_serialized_size(&api->write_ctxs) +
          mam_api_read_ctx_map_serialized_size(&api->read_ctxs) +
-         mam_channels_serialized_size(api->channels);
+         mam_channels_serialized_size(api->channels) + pb3_sizeof_longtrint();
 }
 
 void mam_api_serialize(mam_api_t const *const api, trits_t *const buffer) {
   mam_prng_serialize(&api->prng, *buffer);
   trits_advance(buffer, mam_prng_serialized_size());
-
   mam_ntru_sks_serialize(api->ntru_sks, buffer);
   mam_ntru_pks_serialize(api->ntru_pks, buffer);
   mam_psks_serialize(api->psks, buffer);
   mam_api_write_ctx_map_serialize(&api->write_ctxs, buffer);
   mam_api_read_ctx_map_serialize(&api->read_ctxs, buffer);
   mam_channels_serialize(api->channels, buffer);
+  pb3_encode_longtrint(api->channel_ord, buffer);
 }
 
 retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api) {
@@ -567,19 +567,16 @@ retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api) {
 
   mam_prng_deserialize(*buffer, &api->prng);
   trits_advance(buffer, mam_prng_serialized_size());
-
   ERR_BIND_RETURN(mam_ntru_sks_deserialize(buffer, &api->ntru_sks), ret);
-
   ERR_BIND_RETURN(mam_ntru_pks_deserialize(buffer, &api->ntru_pks), ret);
-
   ERR_BIND_RETURN(mam_psks_deserialize(buffer, &api->psks), ret);
-
   ERR_BIND_RETURN(mam_api_write_ctx_map_deserialize(buffer, &api->write_ctxs),
                   ret);
   ERR_BIND_RETURN(mam_api_read_ctx_map_deserialize(buffer, &api->read_ctxs),
                   ret);
   ERR_BIND_RETURN(mam_channels_deserialize(buffer, &api->prng, &api->channels),
                   ret);
+  ERR_BIND_RETURN(pb3_decode_longtrint(&api->channel_ord, buffer), ret);
 
   trit_t_to_mam_msg_write_context_t_map_entry_t *curr_ctx_entry = NULL;
   trit_t_to_mam_msg_write_context_t_map_entry_t *tmp_ctx_entry = NULL;

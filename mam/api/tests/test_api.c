@@ -481,6 +481,7 @@ static void test_api_serialization() {
   size_t serialized_size = mam_api_serialized_size(&api);
   MAM_TRITS_DEF0(buffer, serialized_size);
   buffer = MAM_TRITS_INIT(buffer, serialized_size);
+
   mam_api_serialize(&api, &buffer);
   buffer = trits_pickup_all(buffer);
   TEST_ASSERT((mam_api_deserialize(&buffer, &deserialized_api) == RC_OK));
@@ -498,6 +499,7 @@ static void test_api_serialization() {
       &deserialized_api.read_ctxs, &api.read_ctxs));
   TEST_ASSERT_TRUE(
       mam_channel_t_set_cmp(&deserialized_api.channels, &api.channels));
+  TEST_ASSERT_EQUAL_INT(deserialized_api.channel_ord, api.channel_ord);
 
   mam_api_destroy(&deserialized_api);
 }
@@ -517,6 +519,7 @@ static void test_api_save_load() {
   TEST_ASSERT_TRUE(trit_t_to_mam_msg_read_context_t_map_cmp(
       &loaded_api.read_ctxs, &api.read_ctxs));
   TEST_ASSERT_TRUE(mam_channel_t_set_cmp(&loaded_api.channels, &api.channels));
+  TEST_ASSERT_EQUAL_INT(loaded_api.channel_ord, api.channel_ord);
 
   mam_api_destroy(&loaded_api);
 }

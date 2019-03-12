@@ -33,6 +33,7 @@ typedef struct mam_api_s {
   trit_t_to_mam_msg_write_context_t_map_t write_ctxs;
   trit_t_to_mam_msg_read_context_t_map_t read_ctxs;
   mam_channel_t_set_t channels;
+  trint18_t channel_ord;
 } mam_api_t;
 
 /**
