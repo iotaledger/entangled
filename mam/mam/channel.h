@@ -80,7 +80,7 @@ retcode_t mam_channel_create(mam_prng_t const *const prng,
  * Returns the number of remaining secret keys (unused leaves on merkle tree)
  * @param channel The channel
  *
- * @return a status code
+ * @return number of remaining secret keys
  */
 size_t mam_channel_num_remaining_sks(mam_channel_t const *const channel);
 

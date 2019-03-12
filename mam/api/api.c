@@ -131,6 +131,9 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
     // TODO - LOG
   }
 
+  api->ntru_sks = NULL;
+  api->ntru_pks = NULL;
+
   return ret;
 }
 

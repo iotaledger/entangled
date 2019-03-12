@@ -559,6 +559,7 @@ int main(void) {
   test_api_create_channels(&api, &cha, &ch1a, &epa, &ep1a, 4);
   RUN_TEST(test_api_multiple_packets);
   clean_channels();
+  TEST_ASSERT(mam_api_destroy(&api) == RC_OK);
 
   return UNITY_END();
 }
