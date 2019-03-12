@@ -187,7 +187,7 @@ static void message_test_create_channels(mam_prng_t *prng,
       *epa = malloc(sizeof(mam_endpoint_t));
       TEST_ASSERT(0 != *epa);
       memset(*epa, 0, sizeof(mam_endpoint_t));
-      e = mam_endpoint_create(prng, d, (*cha)->name, epa_name, *epa);
+      e = mam_endpoint_create(prng, d, mam_channel_name(*cha), epa_name, *epa);
       TEST_ASSERT(RC_OK == e);
       trits_free(epa_name);
     }
@@ -198,7 +198,7 @@ static void message_test_create_channels(mam_prng_t *prng,
       *ep1 = malloc(sizeof(mam_endpoint_t));
       TEST_ASSERT(0 != *ep1);
       memset(*ep1, 0, sizeof(mam_endpoint_t));
-      e = mam_endpoint_create(prng, d, (*cha)->name, ep1a_name, *ep1);
+      e = mam_endpoint_create(prng, d, mam_channel_name(*cha), ep1a_name, *ep1);
       TEST_ASSERT(RC_OK == e);
       trits_free(ep1a_name);
     }
@@ -255,12 +255,12 @@ static void message_test_generic(mam_prng_t *prng_sender,
 
   /* gen psk */
   {
-    mam_psk_gen(&pska, prng_sender, TEST_PRE_SHARED_KEY_A_STR,
-                TEST_PRE_SHARED_KEY_A_NONCE_STR,
+    mam_psk_gen(&pska, prng_sender, (tryte_t *)TEST_PRE_SHARED_KEY_A_STR,
+                (tryte_t *)TEST_PRE_SHARED_KEY_A_NONCE_STR,
                 strlen(TEST_PRE_SHARED_KEY_A_NONCE_STR));
 
-    mam_psk_gen(&pskb, prng_receiver, TEST_PRE_SHARED_KEY_B_STR,
-                TEST_PRE_SHARED_KEY_B_NONCE_STR,
+    mam_psk_gen(&pskb, prng_receiver, (tryte_t *)TEST_PRE_SHARED_KEY_B_STR,
+                (tryte_t *)TEST_PRE_SHARED_KEY_B_NONCE_STR,
                 strlen(TEST_PRE_SHARED_KEY_B_NONCE_STR));
   }
 
