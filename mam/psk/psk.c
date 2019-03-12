@@ -70,10 +70,6 @@ void mam_psks_destroy(mam_psk_t_set_t *const psks) {
 }
 
 size_t mam_psks_serialized_size(mam_psk_t_set_t const psks) {
-  if (psks == NULL) {
-    return 0;
-  }
-
   return pb3_sizeof_size_t(mam_psk_t_set_size(psks)) +
          mam_psk_t_set_size(psks) * (MAM_PSK_ID_SIZE + MAM_PSK_KEY_SIZE);
 }

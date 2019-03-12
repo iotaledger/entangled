@@ -330,10 +330,12 @@ static size_t mam_msg_wrap_keyload_ntru_size() {
          + pb3_sizeof_ntrytes(3072);
 }
 
-static void mam_msg_wrap_keyload_ntru(mam_spongos_t *s, trits_t *b, trits_t key,
-                                      mam_ntru_pk_t const *const ntru_pk,
-                                      mam_prng_t *p, mam_spongos_t *ns,
-                                      trits_t N) {
+static retcode_t mam_msg_wrap_keyload_ntru(mam_spongos_t *s, trits_t *b,
+                                           trits_t key,
+                                           mam_ntru_pk_t const *const ntru_pk,
+                                           mam_prng_t *p, mam_spongos_t *ns,
+                                           trits_t N) {
+  retcode_t ret = RC_OK;
   trits_t ekey;
 
   MAM_ASSERT(mam_msg_wrap_keyload_ntru_size() <= trits_size(*b));
@@ -344,8 +346,12 @@ static void mam_msg_wrap_keyload_ntru(mam_spongos_t *s, trits_t *b, trits_t key,
   pb3_wrap_absorb_ntrytes(s, b, mam_ntru_pk_id(ntru_pk));
   /*  absorb tryte ekey[3072]; */
   ekey = pb3_trits_take(b, MAM_NTRU_EKEY_SIZE);
-  ntru_pk_encr(ntru_pk, p, ns, N, key, ekey);
+  if ((ret = ntru_pk_encr(ntru_pk, p, ns, N, key, ekey)) != RC_OK) {
+    return ret;
+  }
   mam_spongos_absorb(s, ekey);
+
+  return RC_OK;
 }
 
 static retcode_t mam_msg_unwrap_keyload_ntru(mam_spongos_t *s, trits_t *b,
@@ -606,6 +612,7 @@ retcode_t mam_msg_write_header(mam_msg_write_context_t *ctx, mam_prng_t *prng,
         /*  fork; */
         mam_mam_spongos_fork(&ctx->spongos, &spongos_fork);
         /*  KeyloadNTRU ntru = 2; */
+        // TODO ERR_BIND_RETURN
         mam_msg_wrap_keyload_ntru(&spongos_fork, msg, session_key,
                                   &curr_entry_ntru->value, prng, &spongos_ntru,
                                   msg_id);

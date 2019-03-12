@@ -19,35 +19,47 @@
  * NTRU public key
  */
 
-void ntru_pk_encr(mam_ntru_pk_t const *const ntru_pk,
-                  mam_prng_t const *const prng, mam_spongos_t *const spongos,
-                  trits_t const nonce, trits_t const session_key,
-                  trits_t encrypted_session_key) {
+retcode_t ntru_pk_encr(mam_ntru_pk_t const *const ntru_pk,
+                       mam_prng_t const *const prng,
+                       mam_spongos_t *const spongos, trits_t const nonce,
+                       trits_t const session_key,
+                       trits_t encrypted_session_key) {
+  trits_t r;
+
+  if (ntru_pk == NULL || prng == NULL || spongos == NULL) {
+    return RC_NULL_PARAM;
+  }
+
   MAM_ASSERT(trits_size(session_key) == MAM_NTRU_KEY_SIZE);
   MAM_ASSERT(trits_size(encrypted_session_key) == MAM_NTRU_EKEY_SIZE);
   MAM_ASSERT(!trits_is_same(session_key, encrypted_session_key));
 
-  trits_t r;
-
   r = trits_take(encrypted_session_key, MAM_NTRU_SK_SIZE);
   mam_prng_gen3(prng, MAM_PRNG_DST_NTRU_KEY, mam_ntru_pk_id(ntru_pk),
                 session_key, nonce, r);
-  ntru_pk_encr_r(ntru_pk, spongos, r, session_key, encrypted_session_key);
+
+  return ntru_pk_encr_r(ntru_pk, spongos, r, session_key,
+                        encrypted_session_key);
 }
 
-void ntru_pk_encr_r(mam_ntru_pk_t const *const ntru_pk,
-                    mam_spongos_t *const spongos, trits_t const r,
-                    trits_t const session_key, trits_t encrypted_session_key) {
+retcode_t ntru_pk_encr_r(mam_ntru_pk_t const *const ntru_pk,
+                         mam_spongos_t *const spongos, trits_t const r,
+                         trits_t const session_key,
+                         trits_t encrypted_session_key) {
   MAM_ASSERT(trits_size(r) == MAM_NTRU_SK_SIZE);
   MAM_ASSERT(trits_size(session_key) == MAM_NTRU_KEY_SIZE);
   MAM_ASSERT(trits_size(encrypted_session_key) == MAM_NTRU_EKEY_SIZE);
 
-  bool ok = false;
   MAM_POLY_DEF(h);
   MAM_POLY_DEF(s);
 
-  ok = poly_from_trits(h, mam_ntru_pk_key(ntru_pk));
-  MAM_ASSERT(ok);
+  if (ntru_pk == NULL || spongos == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if (!poly_from_trits(h, mam_ntru_pk_key(ntru_pk))) {
+    return RC_MAM_NTRU_POLY_FAILED;
+  }
   poly_ntt(h, h);
 
   /* s(x) := r(x)*h(x) */
@@ -70,6 +82,8 @@ void ntru_pk_encr_r(mam_ntru_pk_t const *const ntru_pk,
   poly_to_trits(s, encrypted_session_key);
 
   memset_safe(h, sizeof(h), 0, sizeof(h));
+
+  return RC_OK;
 }
 
 size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pks) {
@@ -82,8 +96,13 @@ retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pks,
   mam_ntru_pk_t_set_entry_t *entry = NULL;
   mam_ntru_pk_t_set_entry_t *tmp = NULL;
 
+  if (ntru_pks == NULL || trits == NULL) {
+    return RC_NULL_PARAM;
+  }
+
   pb3_encode_size_t(mam_ntru_pk_t_set_size(ntru_pks), trits);
-  HASH_ITER(hh, ntru_pks, entry, tmp) {
+
+  SET_ITER(ntru_pks, entry, tmp) {
     pb3_encode_ntrytes(trits_from_rep(MAM_NTRU_PK_SIZE, entry->value.key),
                        trits);
   }
@@ -94,23 +113,29 @@ retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pks,
 retcode_t mam_ntru_pks_deserialize(trits_t *const trits,
                                    mam_ntru_pk_t_set_t *const ntru_pks) {
   retcode_t ret = RC_OK;
+  size_t ntru_pks_size = 0;
   mam_ntru_pk_t ntru_pk;
 
-  size_t container_size = 0;
-  pb3_decode_size_t(&container_size, trits);
+  if (trits == NULL || ntru_pks == NULL) {
+    return RC_NULL_PARAM;
+  }
 
-  while (!trits_is_empty(*trits) && container_size-- > 0) {
-    pb3_decode_ntrytes(trits_from_rep(MAM_NTRU_PK_SIZE, ntru_pk.key), trits);
-    if ((ret = mam_ntru_pk_t_set_add(ntru_pks, &ntru_pk)) != RC_OK) {
-      break;
-    }
+  ERR_BIND_RETURN(pb3_decode_size_t(&ntru_pks_size, trits), ret);
+
+  for (size_t i = 0; i < ntru_pks_size; i++) {
+    ERR_BIND_RETURN(pb3_decode_ntrytes(
+                        trits_from_rep(MAM_NTRU_PK_SIZE, ntru_pk.key), trits),
+                    ret);
+    ERR_BIND_RETURN(mam_ntru_pk_t_set_add(ntru_pks, &ntru_pk), ret);
   }
 
   return ret;
 }
 
 retcode_t ntru_sk_reset(mam_ntru_sk_t *const ntru_sk) {
-  MAM_ASSERT(ntru);
+  if (ntru_sk == NULL) {
+    return RC_NULL_PARAM;
+  }
 
   memset_safe(ntru_sk, sizeof(mam_ntru_sk_t), 0, sizeof(mam_ntru_sk_t));
 
@@ -125,7 +150,13 @@ void ntru_sk_gen(mam_ntru_sk_t const *const ntru_sk,
   secret_key = MAM_TRITS_INIT(secret_key, 2 * MAM_NTRU_SK_SIZE);
   MAM_POLY_DEF(g);
   MAM_POLY_DEF(h);
-  poly_coeff_t *f = (poly_coeff_t *)ntru_sk->f;
+  poly_coeff_t *f = NULL;
+
+  if (ntru_sk == NULL || prng == NULL) {
+    return;
+  }
+
+  f = (poly_coeff_t *)ntru_sk->f;
 
   trits_set_zero(nonce_i);
   do {
@@ -161,11 +192,8 @@ void ntru_sk_gen(mam_ntru_sk_t const *const ntru_sk,
 bool ntru_sk_decr(mam_ntru_sk_t const *const ntru_sk,
                   mam_spongos_t *const spongos,
                   trits_t const encrypted_session_key, trits_t session_key) {
-  MAM_ASSERT(trits_size(session_key) == MAM_NTRU_KEY_SIZE);
-  MAM_ASSERT(trits_size(encrypted_session_key) == MAM_NTRU_EKEY_SIZE);
-
-  bool b;
-  poly_coeff_t *f;
+  bool eq = false;
+  poly_coeff_t *f = NULL;
   MAM_POLY_DEF(s);
   MAM_POLY_DEF(r);
   MAM_TRITS_DEF0(kt, MAM_NTRU_SK_SIZE);
@@ -174,6 +202,13 @@ bool ntru_sk_decr(mam_ntru_sk_t const *const ntru_sk,
   kt = MAM_TRITS_INIT(kt, MAM_NTRU_SK_SIZE);
   rh = MAM_TRITS_INIT(rh, MAM_NTRU_EKEY_SIZE);
   m = MAM_TRITS_INIT(m, MAM_NTRU_SK_SIZE - MAM_NTRU_KEY_SIZE);
+
+  if (ntru_sk == NULL || spongos == NULL) {
+    return false;
+  }
+
+  MAM_ASSERT(trits_size(session_key) == MAM_NTRU_KEY_SIZE);
+  MAM_ASSERT(trits_size(encrypted_session_key) == MAM_NTRU_EKEY_SIZE);
 
   /* f is NTT form */
   f = (poly_coeff_t *)ntru_sk->f;
@@ -200,7 +235,7 @@ bool ntru_sk_decr(mam_ntru_sk_t const *const ntru_sk,
   mam_spongos_commit(spongos);
   mam_spongos_decr(spongos, trits_take(kt, MAM_NTRU_KEY_SIZE), session_key);
   mam_spongos_squeeze(spongos, m);
-  b = trits_cmp_eq(m, trits_drop(kt, MAM_NTRU_KEY_SIZE));
+  eq = trits_cmp_eq(m, trits_drop(kt, MAM_NTRU_KEY_SIZE));
 
   memset_safe(trits_begin(kt), trits_size(kt), 0, trits_size(kt));
   memset_safe(trits_begin(rh), trits_size(rh), 0, trits_size(rh));
@@ -208,11 +243,17 @@ bool ntru_sk_decr(mam_ntru_sk_t const *const ntru_sk,
   memset_safe(s, sizeof(s), 0, sizeof(s));
   memset_safe(r, sizeof(r), 0, sizeof(r));
 
-  return b;
+  return eq;
 }
 
 void ntru_sk_load(mam_ntru_sk_t *const ntru_sk) {
-  poly_coeff_t *f = (poly_coeff_t *)ntru_sk->f;
+  poly_coeff_t *f = NULL;
+
+  if (ntru_sk == NULL) {
+    return;
+  }
+
+  f = (poly_coeff_t *)ntru_sk->f;
 
   poly_small_from_trits(f, ntru_sk_key(ntru_sk));
   /* f := NTT(1+3f) */
@@ -229,8 +270,10 @@ void mam_ntru_sks_destroy(mam_ntru_sk_t_set_t *const ntru_sks) {
     return;
   }
 
-  HASH_ITER(hh, *ntru_sks, entry, tmp) { ntru_sk_reset(&entry->value); }
-  mam_ntru_sk_t_set_free(ntru_sks);
+  SET_ITER(*ntru_sks, entry, tmp) {
+    ntru_sk_reset(&entry->value);
+    mam_ntru_sk_t_set_remove_entry(ntru_sks, entry);
+  }
 }
 
 size_t mam_ntru_sks_serialized_size(mam_ntru_sk_t_set_t const ntru_sks) {
@@ -244,14 +287,17 @@ retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sks,
   mam_ntru_sk_t_set_entry_t *entry = NULL;
   mam_ntru_sk_t_set_entry_t *tmp = NULL;
 
+  if (ntru_sks == NULL || trits == NULL) {
+    return RC_NULL_PARAM;
+  }
+
   pb3_encode_size_t(mam_ntru_sk_t_set_size(ntru_sks), trits);
 
-  HASH_ITER(hh, ntru_sks, entry, tmp) {
+  SET_ITER(ntru_sks, entry, tmp) {
     pb3_encode_ntrytes(
         trits_from_rep(MAM_NTRU_PK_SIZE, entry->value.public_key.key), trits);
-    trits_copy(trits_from_rep(MAM_NTRU_SK_SIZE, entry->value.secret_key),
-               trits_take(*trits, MAM_NTRU_SK_SIZE));
-    trits_advance(trits, MAM_NTRU_SK_SIZE);
+    pb3_encode_ntrytes(
+        trits_from_rep(MAM_NTRU_SK_SIZE, entry->value.secret_key), trits);
   }
 
   return RC_OK;
@@ -260,22 +306,28 @@ retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sks,
 retcode_t mam_ntru_sks_deserialize(trits_t *const trits,
                                    mam_ntru_sk_t_set_t *const ntru_sks) {
   retcode_t ret = RC_OK;
+  size_t ntru_sks_size = 0;
   mam_ntru_sk_t ntru_sk;
-  size_t container_size = 0;
+
+  if (trits == NULL || ntru_sks == NULL) {
+    return RC_NULL_PARAM;
+  }
 
   ntru_sk_reset(&ntru_sk);
-  pb3_decode_size_t(&container_size, trits);
 
-  while (!trits_is_empty(*trits) && container_size-- > 0) {
-    pb3_decode_ntrytes(trits_from_rep(MAM_NTRU_PK_SIZE, ntru_sk.public_key.key),
-                       trits);
-    trits_copy(trits_take(*trits, MAM_NTRU_SK_SIZE),
-               trits_from_rep(MAM_NTRU_SK_SIZE, ntru_sk.secret_key));
-    *trits = trits_drop(*trits, MAM_NTRU_SK_SIZE);
+  ERR_BIND_RETURN(pb3_decode_size_t(&ntru_sks_size, trits), ret);
+
+  for (size_t i = 0; i < ntru_sks_size; i++) {
+    ERR_BIND_RETURN(
+        pb3_decode_ntrytes(
+            trits_from_rep(MAM_NTRU_PK_SIZE, ntru_sk.public_key.key), trits),
+        ret);
+    ERR_BIND_RETURN(
+        pb3_decode_ntrytes(trits_from_rep(MAM_NTRU_SK_SIZE, ntru_sk.secret_key),
+                           trits),
+        ret);
     ntru_sk_load(&ntru_sk);
-    if ((ret = mam_ntru_sk_t_set_add(ntru_sks, &ntru_sk)) != RC_OK) {
-      break;
-    }
+    ERR_BIND_RETURN(mam_ntru_sk_t_set_add(ntru_sks, &ntru_sk), ret);
   }
 
   ntru_sk_reset(&ntru_sk);

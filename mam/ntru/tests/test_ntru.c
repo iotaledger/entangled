@@ -59,7 +59,8 @@ static void ntru_test(void) {
 
     do {
       TEST_ASSERT_TRUE(trits_from_str(nonce, "NONCE9ENC9"));
-      ntru_pk_encr(&ntru.public_key, &prng, &spongos, nonce, key, ekey);
+      TEST_ASSERT(ntru_pk_encr(&ntru.public_key, &prng, &spongos, nonce, key,
+                               ekey) == RC_OK);
 
       TEST_ASSERT_TRUE(ntru_sk_decr(&ntru, &spongos, ekey, dekey));
       TEST_ASSERT_TRUE(trits_cmp_eq(key, dekey));
