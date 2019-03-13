@@ -88,17 +88,6 @@ retcode_t mam_api_add_ntru_pk(mam_api_t *const api,
 retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk);
 
 /**
- * Add channel to api's channels set
- *
- * @param api - The API [in,out]
- * @param ch - A new channel [in]
- *
- * @return return code
- */
-retcode_t mam_api_add_channel(mam_api_t *const api,
-                              mam_channel_t const *const ch);
-
-/**
  * Creates and adds a channel to the API
  *
  * @param api - The API [in, out]
