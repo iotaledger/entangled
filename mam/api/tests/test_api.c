@@ -228,14 +228,9 @@ static tryte_t API_SEED[] =
 static void test_api_write_header(
     mam_api_t *const api, mam_psk_t const *const pska,
     mam_psk_t const *const pskb, mam_ntru_pk_t const *const ntru_pk,
-    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
-    tryte_t const *const cha, tryte_t const *const epa,
-    tryte_t const *const ch1a, tryte_t *const ep1a,
+    mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload, tryte_t const *const ch,
+    tryte_t const *const ep, tryte_t const *const ch1, tryte_t *const ep1,
     bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  tryte_t *ch = cha;
-  tryte_t *ep = NULL;
-  tryte_t *ch1 = NULL;
-  tryte_t *ep1 = NULL;
   mam_psk_t_set_t psks = NULL;
   mam_ntru_pk_t_set_t ntru_pks = NULL;
 
@@ -248,13 +243,13 @@ static void test_api_write_header(
 
   if (mam_msg_pubkey_epid == pubkey) {
     TEST_ASSERT(mam_api_bundle_write_header_on_endpoint(
-                    api, ch, epa, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+                    api, ch, ep, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
   } else if (mam_msg_pubkey_chid1 == pubkey) {
     TEST_ASSERT(mam_api_bundle_announce_new_channel(
-                    api, ch, ch1a, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+                    api, ch, ch1, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
   } else if (mam_msg_pubkey_epid1 == pubkey) {
     TEST_ASSERT(mam_api_bundle_announce_new_endpoint(
-                    api, ch, ep1a, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+                    api, ch, ep1, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
   } else {
     TEST_ASSERT(mam_api_bundle_write_header_on_channel(
                     api, ch, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
@@ -397,7 +392,7 @@ static void test_api_multiple_packets() {
   {
     bundle_transactions_new(&bundle);
     TEST_ASSERT(mam_api_bundle_write_header_on_channel(
-                    &api, cha, NULL, NULL, 0, bundle, msg_id) == RC_OK);
+                    &api, ch_id, NULL, NULL, 0, bundle, msg_id) == RC_OK);
     TEST_ASSERT(mam_api_bundle_read(&api, bundle, &payload_out,
                                     &payload_out_size,
                                     &is_last_packet) == RC_OK);

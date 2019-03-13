@@ -322,15 +322,15 @@ static retcode_t mam_api_bundle_write_header(
     return RC_MAM_CHANNEL_NOT_FOUND;
   }
 
-  if (ch1_id != NULL && (ch1 = mam_api_get_channel(api, ch1_id)) == NULL) {
+  if (ch1_id && (ch1 = mam_api_get_channel(api, ch1_id)) == NULL) {
     return RC_MAM_CHANNEL_NOT_FOUND;
   }
 
-  if (ep_id != NULL && (ep = mam_api_get_endpoint(api, ep_id)) == NULL) {
+  if (ep_id && (ep = mam_api_get_endpoint(api, ch_id, ep_id)) == NULL) {
     return RC_MAM_ENDPOINT_NOT_FOUND;
   }
 
-  if (ep1_id != NULL && (ep1 = mam_api_get_endpoint(api, ep1_id)) == NULL) {
+  if (ep1_id && (ep1 = mam_api_get_endpoint(api, ch_id, ep1_id)) == NULL) {
     return RC_MAM_ENDPOINT_NOT_FOUND;
   }
 
@@ -839,33 +839,36 @@ done:
 }
 
 retcode_t mam_api_bundle_write_header_on_channel(
-    mam_api_t *const api, mam_channel_t *const ch, mam_psk_t_set_t psks,
+    mam_api_t *const api, tryte_t const *const ch_id, mam_psk_t_set_t psks,
     mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  return mam_api_bundle_write_header(api, ch, NULL, NULL, NULL, psks, ntru_pks,
-                                     msg_type_id, bundle, msg_id);
+  return mam_api_bundle_write_header(api, ch_id, NULL, NULL, NULL, psks,
+                                     ntru_pks, msg_type_id, bundle, msg_id);
 }
 
 retcode_t mam_api_bundle_write_header_on_endpoint(
-    mam_api_t *const api, mam_channel_t *const ch, mam_endpoint_t *const ep,
-    mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    mam_api_t *const api, tryte_t const *const ch_id,
+    tryte_t const *const ep_id, mam_psk_t_set_t psks,
+    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  return mam_api_bundle_write_header(api, ch, ep, NULL, NULL, psks, ntru_pks,
-                                     msg_type_id, bundle, msg_id);
+  return mam_api_bundle_write_header(api, ch_id, ep_id, NULL, NULL, psks,
+                                     ntru_pks, msg_type_id, bundle, msg_id);
 }
 
 retcode_t mam_api_bundle_announce_new_channel(
-    mam_api_t *const api, mam_channel_t *const ch, mam_channel_t *const ep1,
-    mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    mam_api_t *const api, tryte_t const *const ch_id,
+    tryte_t const *const ch1_id, mam_psk_t_set_t psks,
+    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  return mam_api_bundle_write_header(api, ch, NULL, ep1, NULL, psks, ntru_pks,
-                                     msg_type_id, bundle, msg_id);
+  return mam_api_bundle_write_header(api, ch_id, NULL, ch1_id, NULL, psks,
+                                     ntru_pks, msg_type_id, bundle, msg_id);
 }
 
 retcode_t mam_api_bundle_announce_new_endpoint(
-    mam_api_t *const api, mam_channel_t *const ch, mam_endpoint_t *const ep1,
-    mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    mam_api_t *const api, tryte_t const *const ch_id,
+    tryte_t const *const ep1_id, mam_psk_t_set_t psks,
+    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  return mam_api_bundle_write_header(api, ch, NULL, NULL, ep1, psks, ntru_pks,
-                                     msg_type_id, bundle, msg_id);
+  return mam_api_bundle_write_header(api, ch_id, NULL, NULL, ep1_id, psks,
+                                     ntru_pks, msg_type_id, bundle, msg_id);
 }
