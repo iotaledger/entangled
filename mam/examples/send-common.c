@@ -60,8 +60,8 @@ retcode_t mam_example_write_packet(mam_api_t* const api,
 
   ascii_to_trytes(payload, payload_trytes);
   if ((ret = mam_api_bundle_write_packet(api, msg_id, payload_trytes,
-                                         strlen(payload) * 2, 0, bundle,
-                                         is_last_packet)) != RC_OK) {
+                                         strlen(payload) * 2, 0, is_last_packet,
+                                         bundle)) != RC_OK) {
     return ret;
   }
   free(payload_trytes);
