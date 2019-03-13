@@ -98,9 +98,28 @@ retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk);
 retcode_t mam_api_add_channel(mam_api_t *const api,
                               mam_channel_t const *const ch);
 
+/**
+ * Creates and adds a channel to the API
+ *
+ * @param api - The API [in, out]
+ * @param height - The channel's MSS height [in]
+ * @param channel_id - The channel id [out]
+ *
+ * @return return code
+ */
 retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height,
                                  tryte_t *const channel_id);
 
+/**
+ * Creates and adds an endpoint to the API
+ *
+ * @param api - The API [in, out]
+ * @param height - The endpoint's MSS height [in]
+ * @param channel_id - The associated channel id [in]
+ * @param endpoint_id - The endpoint id [out]
+ *
+ * @return return code
+ */
 retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
                                   tryte_t const *const channel_id,
                                   tryte_t *const endpoint_id);
