@@ -102,7 +102,12 @@ retcode_t iota_client_promote_transaction(
       get_transactions_to_approve_res_free(&gtta_res);
       BUNDLE_FOREACH(bundle, curr_tx) {
         if (!transaction_serialize_on_flex_trits(curr_tx, flex_tx)) {
-          attach_to_tangle_req_add_trytes(att_req, flex_tx);
+          if ((ret_code = attach_to_tangle_req_trytes_add(att_req, flex_tx)) !=
+              RC_OK) {
+            log_error(client_extended_logger_id, "%s\n",
+                      error_2_string(ret_code));
+            goto done;
+          }
         } else {
           ret_code = RC_CCLIENT_TX_DESERIALIZE_FAILED;
           log_error(client_extended_logger_id, "%s\n",

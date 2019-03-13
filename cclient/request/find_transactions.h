@@ -43,6 +43,26 @@ typedef struct find_transactions_req_s {
 find_transactions_req_t* find_transactions_req_new();
 void find_transactions_req_free(find_transactions_req_t** req);
 
+static inline retcode_t find_transactions_req_bundle_add(
+    find_transactions_req_t* const req, flex_trit_t const* const hash) {
+  return hash243_queue_push(&req->bundles, hash);
+}
+
+static inline retcode_t find_transactions_req_address_add(
+    find_transactions_req_t* const req, flex_trit_t const* const hash) {
+  return hash243_queue_push(&req->addresses, hash);
+}
+
+static inline retcode_t find_transactions_req_tag_add(
+    find_transactions_req_t* const req, flex_trit_t const* const hash) {
+  return hash81_queue_push(&req->tags, hash);
+}
+
+static inline retcode_t find_transactions_req_approvee_add(
+    find_transactions_req_t* const req, flex_trit_t const* const hash) {
+  return hash243_queue_push(&req->approvees, hash);
+}
+
 #ifdef __cplusplus
 }
 #endif

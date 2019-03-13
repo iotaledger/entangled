@@ -24,20 +24,13 @@ typedef struct get_node_info_res_s {
    */
   char_buffer_t* app_version;
   /**
-   * Latest milestone that was signed off by the coordinator.
+   * Current UNIX timestamp.
    */
-  flex_trit_t latest_milestone[FLEX_TRIT_SIZE_243];
+  uint64_t time;
   /**
    * Index of the latest milestone.
    */
   uint32_t latest_milestone_index;
-  /**
-   * The latest milestone which is solid and is used for sending transactions.
-   * For a milestone to become solid your local node must basically approve the
-   * subtangle of coordinator-approved transactions, and have a consistent view
-   * of all referenced transactions.
-   */
-  flex_trit_t latest_solid_subtangle_milestone[FLEX_TRIT_SIZE_243];
   /**
    * Index of the latest solid subtangle.
    */
@@ -48,6 +41,14 @@ typedef struct get_node_info_res_s {
    */
   uint32_t milestone_start_index;
   /**
+   * Number of tips in the network.
+   */
+  uint32_t tips;
+  /**
+   * Transactions to request during syncing process.
+   */
+  uint32_t transactions_to_request;
+  /**
    * Number of neighbors you are directly connected with.
    */
   uint16_t neighbors;
@@ -56,17 +57,16 @@ typedef struct get_node_info_res_s {
    */
   uint16_t packets_queue_size;
   /**
-   * Current UNIX timestamp.
+   * Latest milestone that was signed off by the coordinator.
    */
-  uint64_t time;
+  flex_trit_t latest_milestone[FLEX_TRIT_SIZE_243];
   /**
-   * Number of tips in the network.
+   * The latest milestone which is solid and is used for sending transactions.
+   * For a milestone to become solid your local node must basically approve the
+   * subtangle of coordinator-approved transactions, and have a consistent view
+   * of all referenced transactions.
    */
-  uint32_t tips;
-  /**
-   * Transactions to request during syncing process.
-   */
-  uint32_t transactions_to_request;
+  flex_trit_t latest_solid_subtangle_milestone[FLEX_TRIT_SIZE_243];
   /**
    * The address of the coordinator being followed by this node.
    */

@@ -30,6 +30,16 @@ typedef struct {
 get_inclusion_state_req_t* get_inclusion_state_req_new();
 void get_inclusion_state_req_free(get_inclusion_state_req_t** req);
 
+static inline retcode_t get_inclusion_state_req_hash_add(
+    get_inclusion_state_req_t* const req, flex_trit_t const* const hash) {
+  return hash243_queue_push(&req->hashes, hash);
+}
+
+static inline retcode_t get_inclusion_state_req_tip_add(
+    get_inclusion_state_req_t* const req, flex_trit_t const* const hash) {
+  return hash243_queue_push(&req->tips, hash);
+}
+
 #ifdef __cplusplus
 }
 #endif

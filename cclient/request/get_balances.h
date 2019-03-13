@@ -35,6 +35,16 @@ typedef struct {
 get_balances_req_t* get_balances_req_new();
 void get_balances_req_free(get_balances_req_t** req);
 
+static inline retcode_t get_balances_req_address_add(
+    get_balances_req_t* const req, flex_trit_t const* const hash) {
+  return hash243_queue_push(&req->addresses, hash);
+}
+
+static inline retcode_t get_balances_req_tip_add(
+    get_balances_req_t* const req, flex_trit_t const* const hash) {
+  return hash243_queue_push(&req->tips, hash);
+}
+
 #ifdef __cplusplus
 }
 #endif
