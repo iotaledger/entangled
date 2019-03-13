@@ -240,14 +240,6 @@ static void test_api_write_header(
   mam_psk_t_set_t psks = NULL;
   mam_ntru_pk_t_set_t ntru_pks = NULL;
 
-  if (mam_msg_pubkey_epid == pubkey) {
-    ep = epa;
-  } else if (mam_msg_pubkey_chid1 == pubkey) {
-    ch1 = ch1a;
-  } else if (mam_msg_pubkey_epid1 == pubkey) {
-    ep1 = ep1a;
-  }
-
   if (mam_msg_keyload_psk == keyload) {
     TEST_ASSERT(mam_psk_t_set_add(&psks, pska) == RC_OK);
     TEST_ASSERT(mam_psk_t_set_add(&psks, pskb) == RC_OK);
@@ -255,8 +247,19 @@ static void test_api_write_header(
     TEST_ASSERT(mam_ntru_pk_t_set_add(&ntru_pks, ntru_pk) == RC_OK);
   }
 
-  TEST_ASSERT(mam_api_bundle_write_header(api, ch, ep, ch1, ep1, psks, ntru_pks,
-                                          0, bundle, msg_id) == RC_OK);
+  if (mam_msg_pubkey_epid == pubkey) {
+    TEST_ASSERT(mam_api_bundle_write_header_on_channel(
+                    api, ch, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+  } else if (mam_msg_pubkey_chid1 == pubkey) {
+    TEST_ASSERT(mam_api_bundle_write_header_announce_new_channel(
+                    api, ch, ch1a, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+  } else if (mam_msg_pubkey_epid1 == pubkey) {
+    TEST_ASSERT(mam_api_bundle_write_header_announce_new_endpoint(
+                    api, ch, ep1a, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+  } else {
+    TEST_ASSERT(mam_api_bundle_write_header_on_endpoint(
+                    api, ch, epa, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
+  }
 
   mam_psk_t_set_free(&psks);
   mam_ntru_pk_t_set_free(&ntru_pks);
@@ -441,8 +444,8 @@ static void test_api_multiple_packets() {
   // write and read header
   {
     bundle_transactions_new(&bundle);
-    TEST_ASSERT(mam_api_bundle_write_header(&api, cha, NULL, NULL, NULL, NULL,
-                                            NULL, 0, bundle, msg_id) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_write_header_on_channel(
+                    &api, cha, NULL, NULL, 0, bundle, msg_id) == RC_OK);
     TEST_ASSERT(mam_api_bundle_read(&api, bundle, &payload_out,
                                     &payload_out_size,
                                     &is_last_packet) == RC_OK);

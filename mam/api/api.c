@@ -282,7 +282,26 @@ void mam_api_tag(trit_t *const tag, trit_t const *const msg_id,
   trits_put18(trits_from_rep(18, tag + MAM_MSG_ID_SIZE), ord);
 }
 
-retcode_t mam_api_bundle_write_header(
+/**
+ * Writes MAM header (keyloads (session keys) + potential packet) into a bundle
+ *
+ * @param api - The API [in,out]
+ * @param ch - A known channel [in]
+ * @param ep - A known endpoint [in]
+ * @param ch1 - A new channel to announce [in]
+ * @param ep1 - A new endpoint to announce [in]
+ * @param psks - pre shared keys used for encrypting the session keys [in]
+ * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
+ * @param msg_type_id - The message type [in]
+ * @param bundle - The bundle that the packet will be written into [out]
+ * @param msg_id - The msg_id (hashed channel_name and message index within the
+ *  channel) embedded into transaction's tag (together with packet index to
+ * allow Tangle lookup) [out]
+ *
+ * @return return code
+ */
+
+static retcode_t mam_api_bundle_write_header(
     mam_api_t *const api, mam_channel_t *const ch,
     mam_endpoint_t const *const ep, mam_channel_t const *const ch1,
     mam_endpoint_t const *const ep1, mam_psk_t_set_t psks,

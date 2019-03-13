@@ -132,8 +132,8 @@ retcode_t mam_example_write_header(mam_api_t* const api,
     return RC_OK;
   }
 
-  if ((ret = mam_api_bundle_write_header(api, channel, NULL, NULL, NULL, psks,
-                                         NULL, 0, bundle, msg_id)) != RC_OK) {
+  if ((ret = mam_api_bundle_write_header_on_channel(api, channel, psks, NULL, 0,
+                                                    bundle, msg_id)) != RC_OK) {
     return ret;
   }
   mam_psk_t_set_free(&psks);
