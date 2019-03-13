@@ -72,6 +72,7 @@ retcode_t send_bundle(char const *const host, uint16_t const port,
   serv.http.port = port;
   serv.http.api_version = 1;
   serv.serializer_type = SR_JSON;
+  serv.http.ca_pem = NULL;
   iota_client_core_init(&serv);
   iota_client_extended_init();
 
