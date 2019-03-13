@@ -8,21 +8,26 @@
 #ifndef __SOCKETS_H
 #define __SOCKETS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "mbedtls/certs.h"
+#include "mbedtls/config.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/debug.h"
+#include "mbedtls/entropy.h"
+#include "mbedtls/error.h"
+#include "mbedtls/net_sockets.h"
+#include "mbedtls/ssl.h"
+
+#include "common/errors.h"
 
 // Windows headers
 #ifdef __WIN32__
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#define RECEIVE_BUFFER_SIZE 4096
 // ESP headers
 #elif __XTENSA__
 #include "lwip/netdb.h"
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
-#define RECEIVE_BUFFER_SIZE 2048
 // Should cover all POSIX complient platforms
 // Linux, macOS...
 #else
@@ -30,22 +35,43 @@ extern "C" {
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-#define RECEIVE_BUFFER_SIZE 4096
 #endif
 
-int open_client_socket(char const *const hostname, const size_t port);
-static inline void close_socket(int sockfd) {
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int socket_connect(char const *const hostname, const size_t port);
+static inline void socket_close(int sockfd) {
   if (sockfd != -1) {
     close(sockfd);
   }
 }
-static inline int receive_on_socket_wait(int sockfd, void *buffer, size_t len) {
+static inline int socket_recv(int sockfd, void *buffer, size_t len) {
   return recv(sockfd, buffer, len, 0);
 }
-static inline int send_on_socket_wait(int sockfd, const void *buffer,
-                                      size_t len) {
+static inline int socket_send(int sockfd, const void *buffer, size_t len) {
   return send(sockfd, buffer, len, 0);
 }
+
+typedef struct mbedtls_ctx_s {
+  mbedtls_entropy_context entropy;
+  mbedtls_ctr_drbg_context ctr_drbg;
+  mbedtls_ssl_context ssl;
+  mbedtls_ssl_config ssl_conf;
+  mbedtls_x509_crt cacert;
+  mbedtls_x509_crt client_cacert;
+  mbedtls_pk_context pk_ctx;
+  mbedtls_net_context net_ctx;
+} mbedtls_ctx_t;
+
+int tls_socket_connect(mbedtls_ctx_t *tls_ctx, char const *host, uint16_t port,
+                       char const *ca_pem, char const *client_cert_pem,
+                       char const *client_pk_pem, retcode_t *error);
+int tls_socket_send(mbedtls_ctx_t *ctx, char const *data, size_t size);
+int tls_socket_recv(mbedtls_ctx_t *ctx, char *data, size_t size,
+                    uint64_t timeout);
+void tls_socket_close(mbedtls_ctx_t *tls_ctx);
 
 #ifdef __cplusplus
 }

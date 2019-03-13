@@ -50,8 +50,10 @@ static bool mam_endpoint_t_set_cmp_test_endpoints(
             MAM_TRITS_INIT(sig1, MAM_MSS_SIG_SIZE(entry_1->value.mss.height));
         sig2 =
             MAM_TRITS_INIT(sig2, MAM_MSS_SIG_SIZE(entry_2->value.mss.height));
-        mam_mss_sign(&entry_1->value.mss, hash, sig1);
-        mam_mss_sign(&entry_2->value.mss, hash, sig2);
+        TEST_ASSERT_EQUAL_INT(RC_OK,
+                              mam_mss_sign(&entry_1->value.mss, hash, sig1));
+        TEST_ASSERT_EQUAL_INT(RC_OK,
+                              mam_mss_sign(&entry_2->value.mss, hash, sig2));
         if (trits_cmp_eq(sig1, sig2)) {
           match++;
           break;

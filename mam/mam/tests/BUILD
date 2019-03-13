@@ -4,7 +4,6 @@ cc_test(
     srcs = ["test_message.c"],
     deps = [
         "//mam/mam:message",
-        "//mam/test_utils",
         "@unity",
     ],
 )

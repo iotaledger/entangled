@@ -52,6 +52,10 @@ retcode_t mam_endpoint_create(mam_prng_t const *const prng,
   return ret;
 }
 
+size_t mam_endpoint_num_remaining_sks(mam_endpoint_t const *const endpoint) {
+  return mam_mss_num_remaining_sks(&endpoint->mss);
+}
+
 void mam_endpoint_destroy(mam_endpoint_t *const endpoint) {
   MAM_ASSERT(endpoint);
   trits_free(endpoint->name);

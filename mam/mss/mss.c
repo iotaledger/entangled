@@ -496,10 +496,14 @@ void mam_mss_auth_path(mam_mss_t *mss, mss_mt_idx_t skn, trits_t path) {
   }
 }
 
-void mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig) {
+retcode_t mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig) {
   mam_wots_t wots;
   mam_sponge_t sponge;
   MAM_ASSERT(trits_size(sig) == MAM_MSS_SIG_SIZE(mss->height));
+
+  if (mss->skn == MAM_MSS_MAX_SKN(mss->height)) {
+    return RC_MAM_MSS_EXHAUSTED;
+  }
 
   // Write both tree height and the sk index to the signature
   mam_mss_skn(mss, trits_take(sig, MAM_MSS_SKN_SIZE));
@@ -519,6 +523,15 @@ void mam_mss_sign(mam_mss_t *mss, trits_t hash, trits_t sig) {
   sig = trits_drop(sig, MAM_WOTS_SIG_SIZE);
 
   mam_mss_auth_path(mss, mss->skn, sig);
+
+  return RC_OK;
+}
+
+retcode_t mam_mss_sign_and_next(mam_mss_t *mss, trits_t hash, trits_t sig) {
+  retcode_t ret;
+  ERR_BIND_RETURN(mam_mss_sign(mss, hash, sig), ret);
+  mam_mss_next(mss);
+  return RC_OK;
 }
 
 bool mam_mss_next(mam_mss_t *mss) {
@@ -535,6 +548,14 @@ bool mam_mss_next(mam_mss_t *mss) {
 
   mss->skn++;
   return true;
+}
+
+size_t mam_mss_num_remaining_sks(mam_mss_t const *const mss) {
+  if (mss->skn >= MAM_MSS_MAX_SKN(mss->height)) {
+    return 0;
+  }
+
+  return MAM_MSS_MAX_SKN(mss->height) - mss->skn;
 }
 
 bool mam_mss_verify(mam_spongos_t *mt_spongos, mam_spongos_t *wots_spongos,

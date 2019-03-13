@@ -5,7 +5,6 @@ cc_test(
     deps = [
         "//common/trinary:tryte_ascii",
         "//mam/api",
-        "//mam/test_utils",
         "@unity",
     ],
 )
