@@ -24,7 +24,7 @@ void test_get_balances_serialize_request(void) {
   TEST_ASSERT_NOT_NULL(get_bal);
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT(hash243_queue_push(&get_bal->addresses, hash) == RC_OK);
+  TEST_ASSERT(get_balances_req_address_add(get_bal, hash) == RC_OK);
 
   get_bal->threshold = TEST_BALANCES_SERIALIZE_THRESHOLD;
   serializer.vtable.get_balances_serialize_request(&serializer, get_bal,
@@ -83,10 +83,12 @@ void test_get_balances_serialize_response(void) {
   TEST_ASSERT_NOT_NULL(get_bal);
 
   uint64_t TEST_BALANCES_BALANCE_LONG = TEST_BALANCES_BALANCE;
-  utarray_push_back(get_bal->balances, &TEST_BALANCES_BALANCE_LONG);
+  TEST_ASSERT(get_balances_res_balances_add(
+                  get_bal, TEST_BALANCES_BALANCE_LONG) == RC_OK);
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1,
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT(hash243_queue_push(&get_bal->milestone, hash) == RC_OK);
+
+  TEST_ASSERT(get_balances_res_milestone_add(get_bal, hash) == RC_OK);
   get_bal->milestoneIndex = TEST_BALANCES_MILESTONEINDEX;
 
   serializer.vtable.get_balances_serialize_response(&serializer, get_bal,

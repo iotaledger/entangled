@@ -55,12 +55,18 @@ retcode_t get_neighbors_res_add_neighbor(get_neighbors_res_t* nbors,
                         .all_trans_num = all_trans,
                         .invalid_trans_num = invalid_trans,
                         .new_trans_num = new_trans};
+  if (!nbors) {
+    return RC_NULL_PARAM;
+  }
   utarray_push_back(nbors, &nb);
   return RC_OK;
 }
 
 neighbor_info_t* get_neighbors_res_neighbor_at(get_neighbors_res_t* nbors,
                                                int index) {
+  if (!nbors) {
+    return NULL;
+  }
   if (utarray_len(nbors) > index) {
     neighbor_info_t* p = NULL;
     p = (neighbor_info_t*)utarray_eltptr(nbors, index);

@@ -17,8 +17,16 @@ remove_neighbors_req_t* remove_neighbors_req_new() {
   return req;
 }
 
-void remove_neighbors_req_add(remove_neighbors_req_t* req, const char* uri) {
+retcode_t remove_neighbors_req_add(remove_neighbors_req_t* req,
+                                   const char* uri) {
+  if (!req->uris) {
+    utarray_new(req->uris, &ut_str_icd);
+  }
+  if (!req->uris) {
+    return RC_OOM;
+  }
   utarray_push_back(req->uris, &uri);
+  return RC_OK;
 }
 
 size_t remove_neighbors_req_uris_len(remove_neighbors_req_t* req) {

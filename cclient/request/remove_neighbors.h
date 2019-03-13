@@ -20,7 +20,8 @@ typedef struct remove_neighbors_req_s {
 } remove_neighbors_req_t;
 
 remove_neighbors_req_t* remove_neighbors_req_new();
-void remove_neighbors_req_add(remove_neighbors_req_t* req, const char* uri);
+retcode_t remove_neighbors_req_add(remove_neighbors_req_t* req,
+                                   const char* uri);
 void remove_neighbors_req_free(remove_neighbors_req_t** req);
 const char* remove_neighbors_req_uris_at(remove_neighbors_req_t* req,
                                          size_t idx);

@@ -11,7 +11,7 @@ broadcast_transactions_req_t *broadcast_transactions_req_new() {
   broadcast_transactions_req_t *req = (broadcast_transactions_req_t *)malloc(
       sizeof(broadcast_transactions_req_t));
   if (req) {
-    req->trytes = NULL;
+    req->trytes = hash8019_array_new();
   }
 
   return req;

@@ -19,8 +19,8 @@ void test_remove_neighbors(void) {
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(node.neighbors), 6);
 
-  remove_neighbors_req_add(req, "udp://8.8.8.2:15002");
-  remove_neighbors_req_add(req, "tcp://8.8.8.4:15004");
+  TEST_ASSERT(remove_neighbors_req_add(req, "udp://8.8.8.2:15002") == RC_OK);
+  TEST_ASSERT(remove_neighbors_req_add(req, "tcp://8.8.8.4:15004") == RC_OK);
 
   TEST_ASSERT(iota_api_remove_neighbors(&api, req, res) == RC_OK);
 
@@ -60,9 +60,9 @@ void test_remove_neighbors_with_not_paired(void) {
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(node.neighbors), 4);
 
-  remove_neighbors_req_add(req, "udp://8.8.8.1:15001");
-  remove_neighbors_req_add(req, "udp://8.8.8.7:15007");
-  remove_neighbors_req_add(req, "tcp://8.8.8.3:15003");
+  TEST_ASSERT(remove_neighbors_req_add(req, "udp://8.8.8.1:15001") == RC_OK);
+  TEST_ASSERT(remove_neighbors_req_add(req, "udp://8.8.8.7:15007") == RC_OK);
+  TEST_ASSERT(remove_neighbors_req_add(req, "tcp://8.8.8.3:15003") == RC_OK);
 
   TEST_ASSERT(iota_api_remove_neighbors(&api, req, res) == RC_OK);
 
@@ -92,9 +92,9 @@ void test_remove_neighbors_with_invalid(void) {
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(node.neighbors), 4);
 
-  remove_neighbors_req_add(req, "tcp://8.8.8.6:15006");
-  remove_neighbors_req_add(req, "udp://8.8.8.7@15007");
-  remove_neighbors_req_add(req, "udp://8.8.8.5:15005");
+  TEST_ASSERT(remove_neighbors_req_add(req, "tcp://8.8.8.6:15006") == RC_OK);
+  TEST_ASSERT(remove_neighbors_req_add(req, "udp://8.8.8.7@15007") == RC_OK);
+  TEST_ASSERT(remove_neighbors_req_add(req, "udp://8.8.8.5:15005") == RC_OK);
 
   TEST_ASSERT(iota_api_remove_neighbors(&api, req, res) == RC_OK);
 

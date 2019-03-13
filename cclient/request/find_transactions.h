@@ -67,7 +67,7 @@ static inline retcode_t find_transactions_req_tag_add(
 }
 static inline flex_trit_t* find_transactions_req_tag_get(
     find_transactions_req_t* const req, size_t index) {
-  return hash243_queue_at(&req->tags, index);
+  return hash81_queue_at(&req->tags, index);
 }
 
 static inline retcode_t find_transactions_req_approvee_add(

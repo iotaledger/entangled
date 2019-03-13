@@ -11,7 +11,7 @@ store_transactions_req_t* store_transactions_req_new() {
   store_transactions_req_t* req =
       (store_transactions_req_t*)malloc(sizeof(store_transactions_req_t));
   if (req) {
-    req->trytes = NULL;
+    req->trytes = hash8019_array_new();
   }
   return req;
 }

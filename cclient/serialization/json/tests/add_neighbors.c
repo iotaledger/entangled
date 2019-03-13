@@ -16,8 +16,8 @@ static void test_request(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
   add_neighbors_req_t* req = add_neighbors_req_new();
-  add_neighbors_req_uris_add(req, TEST_NEIGHBOR1);
-  add_neighbors_req_uris_add(req, TEST_NEIGHBOR2);
+  TEST_ASSERT(add_neighbors_req_uris_add(req, TEST_NEIGHBOR1) == RC_OK);
+  TEST_ASSERT(add_neighbors_req_uris_add(req, TEST_NEIGHBOR2) == RC_OK);
 
   serializer.vtable.add_neighbors_serialize_request(&serializer, req,
                                                     serializer_out);

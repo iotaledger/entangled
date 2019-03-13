@@ -45,13 +45,13 @@ void test_deserialize_get_inclusion_states(void) {
 
   serializer.vtable.get_inclusion_state_deserialize_response(
       &serializer, json_text, deserialize_get_is);
-  TEST_ASSERT_TRUE(get_inclusion_state_res_bool_at(deserialize_get_is, 0) ==
+  TEST_ASSERT_TRUE(get_inclusion_state_res_states_at(deserialize_get_is, 0) ==
                    true);
-  TEST_ASSERT_TRUE(get_inclusion_state_res_bool_at(deserialize_get_is, 1) ==
+  TEST_ASSERT_TRUE(get_inclusion_state_res_states_at(deserialize_get_is, 1) ==
                    false);
-  TEST_ASSERT_TRUE(get_inclusion_state_res_bool_at(deserialize_get_is, 2) ==
+  TEST_ASSERT_TRUE(get_inclusion_state_res_states_at(deserialize_get_is, 2) ==
                    false);
-  TEST_ASSERT_FALSE(get_inclusion_state_res_bool_at(deserialize_get_is, 2) ==
+  TEST_ASSERT_FALSE(get_inclusion_state_res_states_at(deserialize_get_is, 2) ==
                     true);
   get_inclusion_state_res_free(&deserialize_get_is);
 }
