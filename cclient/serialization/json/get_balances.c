@@ -85,7 +85,7 @@ end:
 }
 
 retcode_t json_get_balances_serialize_response(
-    serializer_t const *const s, const get_balances_res_t *const res,
+    serializer_t const *const s, get_balances_res_t const *const res,
     char_buffer_t *out) {
   retcode_t ret = RC_OK;
   const char *json_text = NULL;
@@ -98,7 +98,7 @@ retcode_t json_get_balances_serialize_response(
     return RC_CCLIENT_JSON_CREATE;
   }
 
-  ret = utarray_uint64_to_json_array(res->balances, json_root, "balances");
+  ret = uint64_utarray_to_json_array(res->balances, json_root, "balances");
   if (ret != RC_OK) {
     goto err;
   }

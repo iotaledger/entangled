@@ -9,7 +9,7 @@
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
-retcode_t json_get_neighbors_serialize_request(const serializer_t *const s,
+retcode_t json_get_neighbors_serialize_request(serializer_t const *const s,
                                                char_buffer_t *out) {
   retcode_t ret = RC_OK;
   const char *req_text = "{\"command\":\"getNeighbors\"}";
@@ -22,7 +22,7 @@ retcode_t json_get_neighbors_serialize_request(const serializer_t *const s,
 }
 
 retcode_t json_get_neighbors_serialize_response(
-    const serializer_t *const s, const get_neighbors_res_t *const obj,
+    serializer_t const *const s, get_neighbors_res_t const *const obj,
     char_buffer_t *out) {
   retcode_t ret = RC_OK;
   const char *json_text = NULL;
@@ -35,7 +35,7 @@ retcode_t json_get_neighbors_serialize_response(
     return RC_CCLIENT_JSON_CREATE;
   }
 
-  ret = neighbor_utarray_to_json_array(obj, json_root, "neighbors");
+  ret = neighbor_info_utarray_to_json_array(obj, json_root, "neighbors");
   if (ret) {
     goto err;
   }
@@ -55,8 +55,8 @@ err:
   return ret;
 }
 
-retcode_t json_get_neighbors_deserialize_response(const serializer_t *const s,
-                                                  const char *const obj,
+retcode_t json_get_neighbors_deserialize_response(serializer_t const *const s,
+                                                  char const *const obj,
                                                   get_neighbors_res_t *out) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);

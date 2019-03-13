@@ -17,13 +17,13 @@ extern "C" {
 #include "cclient/response/get_neighbors.h"
 #include "cclient/serialization/serializer.h"
 
-retcode_t json_get_neighbors_serialize_request(const serializer_t* const s,
+retcode_t json_get_neighbors_serialize_request(serializer_t const* const s,
                                                char_buffer_t* out);
 retcode_t json_get_neighbors_serialize_response(
-    const serializer_t* const s, const get_neighbors_res_t* const obj,
+    serializer_t const* const s, get_neighbors_res_t const* const obj,
     char_buffer_t* out);
 retcode_t json_get_neighbors_deserialize_response(
-    const serializer_t* const s, const char* const obj,
+    serializer_t const* const s, char const* const obj,
     get_neighbors_res_t* const res);
 
 #ifdef __cplusplus
