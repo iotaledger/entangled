@@ -40,12 +40,9 @@ void test_get_neighbors_serialize_response(void) {
 
   get_neighbors_res_t* res = get_neighbors_res_new();
   char_buffer_t* test_neighbors_neighbor1 = char_buffer_new();
-  char_buffer_allocate(test_neighbors_neighbor1,
-                       sizeof(TEST_NEIGHBORS_NEIGHBOR1));
+
   char_buffer_set(test_neighbors_neighbor1, TEST_NEIGHBORS_NEIGHBOR1);
   char_buffer_t* test_neighbors_neighbor2 = char_buffer_new();
-  char_buffer_allocate(test_neighbors_neighbor2,
-                       sizeof(TEST_NEIGHBORS_NEIGHBOR2));
   char_buffer_set(test_neighbors_neighbor2, TEST_NEIGHBORS_NEIGHBOR2);
   ret = get_neighbors_res_add_neighbor(
       res, test_neighbors_neighbor1, TEST_NEIGHBORS_NUMALLTX1,

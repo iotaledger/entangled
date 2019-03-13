@@ -88,6 +88,9 @@ retcode_t uint64_utarray_to_json_array(UT_array const* const ut,
 retcode_t neighbor_info_utarray_to_json_array(UT_array const* const ut,
                                               cJSON* const json_root,
                                               char const* const obj_name) {
+  if (!ut) {
+    return RC_CCLIENT_JSON_PARSE;
+  }
   if (utarray_len(ut) > 0) {
     cJSON* array_obj = cJSON_CreateArray();
     if (array_obj == NULL) {

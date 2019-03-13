@@ -42,11 +42,7 @@ retcode_t json_get_balances_serialize_request(
 
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
-    len = strlen(json_text);
-    ret = char_buffer_allocate(out, len);
-    if (ret == RC_OK) {
-      strncpy(out->data, json_text, len);
-    }
+    ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
   }
 
@@ -113,11 +109,7 @@ retcode_t json_get_balances_serialize_response(
 
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
-    len = strlen(json_text);
-    ret = char_buffer_allocate(out, len);
-    if (ret == RC_OK) {
-      strncpy(out->data, json_text, len);
-    }
+    ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
   }
 

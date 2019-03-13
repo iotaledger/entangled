@@ -14,10 +14,8 @@ retcode_t json_get_neighbors_serialize_request(serializer_t const *const s,
   retcode_t ret = RC_OK;
   const char *req_text = "{\"command\":\"getNeighbors\"}";
   log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
-  ret = char_buffer_allocate(out, strlen(req_text));
-  if (ret == RC_OK) {
-    strcpy(out->data, req_text);
-  }
+
+  ret = char_buffer_set(out, req_text);
   return ret;
 }
 
@@ -42,11 +40,7 @@ retcode_t json_get_neighbors_serialize_response(
 
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
-    len = strlen(json_text);
-    ret = char_buffer_allocate(out, len);
-    if (ret == RC_OK) {
-      strncpy(out->data, json_text, len);
-    }
+    ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
   }
 
