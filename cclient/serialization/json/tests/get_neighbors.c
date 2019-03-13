@@ -61,8 +61,6 @@ void test_get_neighbors_serialize_response(void) {
   TEST_ASSERT_EQUAL_STRING(TEST_JSON_TEXT, out->data);
 
   char_buffer_free(out);
-  char_buffer_free(test_neighbors_neighbor1);
-  char_buffer_free(test_neighbors_neighbor2);
   get_neighbors_res_free(res);
 }
 
