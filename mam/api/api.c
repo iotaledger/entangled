@@ -238,8 +238,8 @@ retcode_t mam_api_bundle_write_header(
 
 retcode_t mam_api_bundle_write_packet(
     mam_api_t *const api, trit_t *const msg_id, tryte_t const *const payload,
-    size_t const payload_size, mam_msg_checksum_t checksum,
-    bundle_transactions_t *const bundle, bool is_last_packet) {
+    size_t const payload_size, mam_msg_checksum_t checksum, bool is_last_packet,
+    bundle_transactions_t *const bundle) {
   retcode_t ret;
   mam_msg_write_context_t *ctx = NULL;
   trit_t_to_mam_msg_write_context_t_map_entry_t *entry = NULL;

@@ -275,7 +275,7 @@ static void test_api_write_packet(
 
   TEST_ASSERT(mam_api_bundle_write_packet(api, msg_id, payload_trytes,
                                           2 * strlen(payload1), checksum,
-                                          bundle, is_last_packet) == RC_OK);
+                                          is_last_packet, bundle) == RC_OK);
 
   free(payload_trytes);
 }
@@ -457,8 +457,8 @@ static void test_api_multiple_packets() {
     bundle_transactions_new(&bundle);
     TEST_ASSERT(mam_api_bundle_write_packet(
                     &api, msg_id, payload_in, payload_in_size,
-                    (mam_msg_checksum_t)(i % 3), bundle,
-                    i == (num_packets - 1) ? true : false) == RC_OK);
+                    (mam_msg_checksum_t)(i % 3),
+                    i == (num_packets - 1) ? true : false, bundle) == RC_OK);
     TEST_ASSERT(mam_api_bundle_read(&api, bundle, &payload_out,
                                     &payload_out_size,
                                     &is_last_packet) == RC_OK);
