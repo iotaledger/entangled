@@ -218,8 +218,8 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
   retcode_t ret = RC_OK;
   mam_channel_t *channel = NULL;
   mam_endpoint_t endpoint;
-  MAM_TRITS_DEF0(endpoint_ord, MAM_CHANNEL_NAME_SIZE);
-  endpoint_ord = MAM_TRITS_INIT(endpoint_ord, MAM_CHANNEL_NAME_SIZE);
+  MAM_TRITS_DEF0(endpoint_ord, MAM_ENDPOINT_NAME_SIZE);
+  endpoint_ord = MAM_TRITS_INIT(endpoint_ord, MAM_ENDPOINT_NAME_SIZE);
 
   if (api == NULL || channel_id == NULL || endpoint_id == NULL) {
     return RC_NULL_PARAM;
