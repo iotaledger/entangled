@@ -17,11 +17,65 @@
 extern "C" {
 #endif
 
+/**
+ * Creates and announce a new Channel (Header only)
+ *
+ * @param api - The API [in,out]
+ * @param channel - A known channel [in]
+ * @param bundle - The bundle that the packet will be written into [out]
+ * @param msg_id - The msg_id
+ * @param new_channel - The new channel
+ *
+ * @return return code
+ */
+retcode_t mam_example_announce_new_channel(mam_api_t* const api,
+                                           mam_channel_t* const channel,
+                                           bundle_transactions_t* const bundle,
+                                           trit_t* const msg_id,
+                                           mam_channel_t** const new_channel);
+
+/**
+ * Creates and announce a new endpoint (Header only)
+ *
+ * @param api - The API [in,out]
+ * @param channel - A known channel [in]
+ * @param bundle - The bundle that the packet will be written into [out]
+ * @param msg_id - The msg_id
+ * @param new_endpoint - The new endpoint
+ *
+ * @return return code
+ */
+retcode_t mam_example_announce_new_endpoint(
+    mam_api_t* const api, mam_channel_t* const channel,
+    bundle_transactions_t* const bundle, trit_t* const msg_id,
+    mam_endpoint_t** const new_endpoint);
+
+/**
+ * Writes a header only bundle
+ *
+ * @param api - The API [in,out]
+ * @param channel - A known channel [in]
+ * @param bundle - The bundle that the packet will be written into [out]
+ * @param msg_id - The msg_id
+ *
+ * @return return code
+ */
 retcode_t mam_example_write_header(mam_api_t* const api,
                                    mam_channel_t* const channel,
                                    bundle_transactions_t* const bundle,
                                    trit_t* const msg_id);
 
+/**
+ * Writes a packet on a bundle
+ *
+ * @param api - The API [in,out]
+ * @param bundle - The bundle that the packet will be written into [out]
+ * @param payload - The payload to write [in]
+ * @param msg_id - The msg_id [in]
+ * @param is_last_packet - True if this is the last packet to be written
+ *
+ * @return return code
+ */
 retcode_t mam_example_write_packet(mam_api_t* const api,
                                    bundle_transactions_t* const bundle,
                                    char const* const payload,

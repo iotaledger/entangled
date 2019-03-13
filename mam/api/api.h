@@ -150,6 +150,93 @@ retcode_t mam_api_bundle_write_header(
     bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 /**
+ * Writes MAM header on a channel(keyloads (session keys) + potential packet)
+ * into a bundle
+ *
+ * @param api - The API [in,out]
+ * @param ch - A known channel [in]
+ * @param psks - pre shared keys used for encrypting the session keys [in]
+ * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
+ * @param msg_type_id - The message type [in]
+ * @param bundle - The bundle that the packet will be written into [out]
+ * @param msg_id - The msg_id (hashed channel_name and message index within the
+ *  channel) embedded into transaction's tag (together with packet index to
+ * allow Tangle lookup) [out]
+ *
+ * @return return code
+ */
+retcode_t mam_api_bundle_write_header_on_channel(
+    mam_api_t *const api, mam_channel_t *const ch, mam_psk_t_set_t psks,
+    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    bundle_transactions_t *const bundle, trit_t *const msg_id);
+
+/**
+ * Writes MAM header on an endpoint(keyloads (session keys) + potential packet)
+ * into a bundle
+ *
+ * @param api - The API [in,out]
+ * @param ch - A known channel [in]
+ * @param ep - A known endpoint [in]
+ * @param psks - pre shared keys used for encrypting the session keys [in]
+ * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
+ * @param msg_type_id - The message type [in]
+ * @param bundle - The bundle that the packet will be written into [out]
+ * @param msg_id - The msg_id (hashed channel_name and message index within the
+ *  channel) embedded into transaction's tag (together with packet index to
+ * allow Tangle lookup) [out]
+ *
+ * @return return code
+ */
+retcode_t mam_api_bundle_write_header_on_endpoint(
+    mam_api_t *const api, mam_channel_t *const ch, mam_endpoint_t *const ep,
+    mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    bundle_transactions_t *const bundle, trit_t *const msg_id);
+
+/**
+ * Writes MAM header to announce a new channel (keyloads (session keys) +
+ * potential packet) into a bundle
+ *
+ * @param api - The API [in,out]
+ * @param ch - A known channel [in]
+ * @param ch1 - The new channel [in]
+ * @param psks - pre shared keys used for encrypting the session keys [in]
+ * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
+ * @param msg_type_id - The message type [in]
+ * @param bundle - The bundle that the packet will be written into [out]
+ * @param msg_id - The msg_id (hashed channel_name and message index within the
+ *  channel) embedded into transaction's tag (together with packet index to
+ * allow Tangle lookup) [out]
+ *
+ * @return return code
+ */
+retcode_t mam_api_bundle_write_header_announce_new_channel(
+    mam_api_t *const api, mam_channel_t *const ch, mam_channel_t *const ep1,
+    mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    bundle_transactions_t *const bundle, trit_t *const msg_id);
+
+/**
+ * Writes MAM header to announce a new endpoint(keyloads (session keys) +
+ * potential packet) into a bundle
+ *
+ * @param api - The API [in,out]
+ * @param ch - A known channel [in]
+ * @param ep1 - The new endpoint [in]
+ * @param psks - pre shared keys used for encrypting the session keys [in]
+ * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
+ * @param msg_type_id - The message type [in]
+ * @param bundle - The bundle that the packet will be written into [out]
+ * @param msg_id - The msg_id (hashed channel_name and message index within the
+ *  channel) embedded into transaction's tag (together with packet index to
+ * allow Tangle lookup) [out]
+ *
+ * @return return code
+ */
+retcode_t mam_api_bundle_write_header_announce_new_endpoint(
+    mam_api_t *const api, mam_channel_t *const ch, mam_endpoint_t *const ep1,
+    mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    bundle_transactions_t *const bundle, trit_t *const msg_id);
+
+/**
  * Writes MAM packet into a bundle
  *
  * @param api - The API [in,out]
@@ -230,6 +317,13 @@ retcode_t mam_api_save(mam_api_t const *const api, char const *const filename);
  * @return return code
  */
 retcode_t mam_api_load(char const *const filename, mam_api_t *const api);
+
+mam_channel_t *mam_api_get_channel(mam_api_t const *const api,
+                                   tryte_t const *const channel_id);
+
+mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api,
+                                     tryte_t const *const channel_id,
+                                     tryte_t const *const endpoint_id);
 
 #ifdef __cplusplus
 }
