@@ -101,6 +101,10 @@ retcode_t mam_api_add_channel(mam_api_t *const api,
 retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height,
                                  tryte_t *const channel_id);
 
+retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
+                                  tryte_t const *const channel_id,
+                                  tryte_t *const endpoint_id);
+
 /**
  * Writes MAM header (keyloads (session keys) + potential packet) into a bundle
  *

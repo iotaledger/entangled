@@ -80,6 +80,28 @@ static trits_t mam_api_bundle_unwrap(bundle_transactions_t const *const bundle,
   return trits_from_rep(num_trits_in_bundle, msg_trits);
 }
 
+static mam_channel_t *mam_api_get_channel(mam_api_t const *const api,
+                                          tryte_t const *const channel_id) {
+  trit_t channel_id_trits[MAM_CHANNEL_ID_SIZE];
+  mam_channel_t_set_entry_t *entry = NULL;
+  mam_channel_t_set_entry_t *tmp = NULL;
+
+  if (channel_id == NULL) {
+    return NULL;
+  }
+
+  trytes_to_trits(channel_id, channel_id_trits, MAM_CHANNEL_ID_SIZE / 3);
+
+  SET_ITER(api->channels, entry, tmp) {
+    if (memcmp(trits_begin(mam_channel_id(&entry->value)), channel_id_trits,
+               MAM_CHANNEL_ID_SIZE) == 0) {
+      return &entry->value;
+    }
+  }
+
+  return NULL;
+}
+
 /*
  * Public functions
  */
@@ -186,6 +208,36 @@ retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height,
   trits_to_trytes(trits_begin(mam_channel_id(&channel)), channel_id,
                   MAM_CHANNEL_ID_SIZE);
   api->channel_ord++;
+
+  return ret;
+}
+
+retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
+                                  tryte_t const *const channel_id,
+                                  tryte_t *const endpoint_id) {
+  retcode_t ret = RC_OK;
+  mam_channel_t *channel = NULL;
+  mam_endpoint_t endpoint;
+  MAM_TRITS_DEF0(endpoint_ord, MAM_CHANNEL_NAME_SIZE);
+  endpoint_ord = MAM_TRITS_INIT(endpoint_ord, MAM_CHANNEL_NAME_SIZE);
+
+  if (api == NULL || channel_id == NULL || endpoint_id == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  if ((channel = mam_api_get_channel(api, channel_id)) == NULL) {
+    return RC_MAM_CHANNEL_NOT_FOUND;
+  }
+
+  trits_put18(endpoint_ord, channel->endpoint_ord);
+  ERR_BIND_RETURN(
+      mam_endpoint_create(&api->prng, height, mam_channel_name(channel),
+                          endpoint_ord, &endpoint),
+      ret);
+  ERR_BIND_RETURN(mam_endpoint_t_set_add(&channel->endpoints, &endpoint), ret);
+  trits_to_trytes(trits_begin(mam_endpoint_id(&endpoint)), endpoint_id,
+                  MAM_ENDPOINT_ID_SIZE);
+  channel->endpoint_ord++;
 
   return ret;
 }
