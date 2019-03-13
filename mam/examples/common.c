@@ -34,27 +34,18 @@ mam_psk_t const psk = {
             0,  0,  -1, 0,  -1}};
 
 retcode_t mam_example_create_channel(mam_api_t *const api,
-                                     mam_channel_t **const channel) {
-  tryte_t address[NUM_TRYTES_ADDRESS];
-
+                                     tryte_t *const channel_id) {
   if (mam_channel_t_set_size(api->channels) == 0) {
-    trits_t channel_name = trits_alloc(3 * strlen(TEST_CHANNEL_NAME));
-
-    trits_from_str(channel_name, TEST_CHANNEL_NAME);
-    if ((*channel = malloc(sizeof(mam_channel_t))) == NULL) {
-      fprintf(stderr, "malloc failed\n");
-      return EXIT_FAILURE;
-    }
-    mam_channel_create(&api->prng, TEST_MSS_DEPTH, channel_name, *channel);
-
-    mam_api_add_channel(api, *channel);
+    mam_api_create_channel(api, TEST_MSS_DEPTH, channel_id);
+  } else {
+    mam_channel_t *channel = &api->channels->value;
+    trits_to_trytes(trits_begin(mam_channel_id(channel)), channel_id,
+                    NUM_TRITS_ADDRESS);
   }
-  *channel = &api->channels->value;
 
-  trits_to_trytes(mam_channel_id(*channel).p, address, NUM_TRITS_ADDRESS);
   fprintf(stderr, "Address: ");
   for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
-    fprintf(stderr, "%c", address[i]);
+    fprintf(stderr, "%c", channel_id[i]);
   }
   fprintf(stderr, "\n");
 

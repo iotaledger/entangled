@@ -23,63 +23,64 @@ extern "C" {
  * Creates and announce a new Channel (Header only)
  *
  * @param api - The API [in,out]
- * @param channel - A known channel [in]
+ * @param channel_id - A known channel ID [in]
  * @param bundle - The bundle that the packet will be written into [out]
  * @param msg_id - The msg_id
- * @param new_channel - The new channel
+ * @param new_channel_id - The new channel ID
  *
  * @return return code
  */
 retcode_t mam_example_announce_new_channel(mam_api_t* const api,
-                                           mam_channel_t* const channel,
+                                           tryte_t const* const channel_id,
                                            bundle_transactions_t* const bundle,
                                            trit_t* const msg_id,
-                                           mam_channel_t** const new_channel);
+                                           tryte_t* const new_channel_id);
 
 /**
  * Creates and announce a new endpoint (Header only)
  *
  * @param api - The API [in,out]
- * @param channel - A known channel [in]
+ * @param channel_id - A known channel ID [in]
  * @param bundle - The bundle that the packet will be written into [out]
  * @param msg_id - The msg_id
  * @param new_endpoint - The new endpoint
  *
  * @return return code
  */
-retcode_t mam_example_announce_new_endpoint(
-    mam_api_t* const api, mam_channel_t* const channel,
-    bundle_transactions_t* const bundle, trit_t* const msg_id,
-    mam_endpoint_t** const new_endpoint);
+retcode_t mam_example_announce_new_endpoint(mam_api_t* const api,
+                                            tryte_t const* const channel_id,
+                                            bundle_transactions_t* const bundle,
+                                            trit_t* const msg_id,
+                                            tryte_t* const new_endpoint_id);
 
 /**
  * Writes a header only bundle on a channel
  *
  * @param api - The API [in,out]
- * @param channel - A known channel [in]
+ * @param channel_id - A known channel ID [in]
  * @param bundle - The bundle that the packet will be written into [out]
  * @param msg_id - The msg_id
  *
  * @return return code
  */
 retcode_t mam_example_write_header_on_channel(
-    mam_api_t* const api, mam_channel_t* const channel,
+    mam_api_t* const api, tryte_t const* const channel_id,
     bundle_transactions_t* const bundle, trit_t* const msg_id);
 
 /**
  * Writes a header only bundle on an endpoint
  *
  * @param api - The API [in,out]
- * @param channel - A known channel [in]
- * @param endpoint - A known endpoint [in]
+ * @param channel_id - A known channel ID [in]
+ * @param endpoint_id - A known endpoint ID [in]
  * @param bundle - The bundle that the packet will be written into [out]
  * @param msg_id - The msg_id
  *
  * @return return code
  */
 retcode_t mam_example_write_header_on_endpoint(
-    mam_api_t* const api, mam_channel_t* const channel,
-    mam_endpoint_t* const endpoint, bundle_transactions_t* const bundle,
+    mam_api_t* const api, tryte_t const* const channel_id,
+    tryte_t const* const endpoint_id, bundle_transactions_t* const bundle,
     trit_t* const msg_id);
 
 /**
