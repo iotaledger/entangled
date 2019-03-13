@@ -21,6 +21,40 @@ retcode_t json_get_neighbors_serialize_request(const serializer_t *const s,
   return ret;
 }
 
+retcode_t json_get_neighbors_serialize_response(
+    const serializer_t *const s, const get_neighbors_res_t *const obj,
+    char_buffer_t *out) {
+  retcode_t ret = RC_OK;
+  const char *json_text = NULL;
+  size_t len;
+
+  cJSON *json_root = cJSON_CreateObject();
+  if (json_root == NULL) {
+    log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_JSON_CREATE);
+    return RC_CCLIENT_JSON_CREATE;
+  }
+
+  ret = neighbor_utarray_to_json_array(obj, json_root, "neighbors");
+  if (ret) {
+    goto err;
+  }
+
+  json_text = cJSON_PrintUnformatted(json_root);
+  if (json_text) {
+    len = strlen(json_text);
+    ret = char_buffer_allocate(out, len);
+    if (ret == RC_OK) {
+      strncpy(out->data, json_text, len);
+    }
+    cJSON_free((void *)json_text);
+  }
+
+err:
+  cJSON_Delete(json_root);
+  return ret;
+}
+
 retcode_t json_get_neighbors_deserialize_response(const serializer_t *const s,
                                                   const char *const obj,
                                                   get_neighbors_res_t *out) {

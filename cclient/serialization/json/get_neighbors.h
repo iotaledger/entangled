@@ -19,7 +19,9 @@ extern "C" {
 
 retcode_t json_get_neighbors_serialize_request(const serializer_t* const s,
                                                char_buffer_t* out);
-
+retcode_t json_get_neighbors_serialize_response(
+    const serializer_t* const s, const get_neighbors_res_t* const obj,
+    char_buffer_t* out);
 retcode_t json_get_neighbors_deserialize_response(
     const serializer_t* const s, const char* const obj,
     get_neighbors_res_t* const res);

@@ -19,6 +19,8 @@
 #include "common/model/transaction.h"
 #include "utils/logger_helper.h"
 
+#include "cclient/response/get_neighbors.h"
+
 retcode_t json_array_to_uint64(cJSON const* const obj,
                                char const* const obj_name, UT_array* ut) {
   char* endptr;
@@ -78,6 +80,37 @@ retcode_t utarray_uint64_to_json_array(UT_array const* const ut,
     while ((p = (uint64_t*)utarray_next(ut, p))) {
       sprintf(buffer, "%" PRIu64, *p);
       cJSON_AddItemToArray(array_obj, cJSON_CreateString(buffer));
+    }
+  }
+  return RC_OK;
+}
+
+retcode_t neighbor_info_utarray_to_json_array(UT_array const* const ut,
+                                              cJSON* const json_root,
+                                              char const* const obj_name) {
+  if (utarray_len(ut) > 0) {
+    cJSON* array_obj = cJSON_CreateArray();
+    if (array_obj == NULL) {
+      log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__,
+                   STR_CCLIENT_JSON_CREATE);
+      return RC_CCLIENT_JSON_CREATE;
+    }
+
+    cJSON_AddItemToObject(json_root, obj_name, array_obj);
+    neighbor_info_t* nbr_info = NULL;
+    while ((nbr_info = (neighbor_info_t*)utarray_next(ut, nbr_info))) {
+      cJSON* json_nbr_info = cJSON_CreateObject();
+
+      cJSON_AddStringToObject(json_nbr_info, "address",
+                              nbr_info->address->data);
+      cJSON_AddNumberToObject(json_nbr_info, "numberOfAllTransactions",
+                              nbr_info->all_trans_num);
+      cJSON_AddNumberToObject(json_nbr_info, "numberOfInvalidTransactions",
+                              nbr_info->invalid_trans_num);
+      cJSON_AddNumberToObject(json_nbr_info, "numberOfNewTransactions",
+                              nbr_info->new_trans_num);
+
+      cJSON_AddItemToArray(array_obj, json_nbr_info);
     }
   }
   return RC_OK;
