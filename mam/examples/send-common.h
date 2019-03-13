@@ -17,6 +17,8 @@
 extern "C" {
 #endif
 
+#define MAM_EXAMPLES_MSS_HEIGHT 3
+
 /**
  * Creates and announce a new Channel (Header only)
  *
@@ -51,7 +53,7 @@ retcode_t mam_example_announce_new_endpoint(
     mam_endpoint_t** const new_endpoint);
 
 /**
- * Writes a header only bundle
+ * Writes a header only bundle on a channel
  *
  * @param api - The API [in,out]
  * @param channel - A known channel [in]
@@ -60,10 +62,25 @@ retcode_t mam_example_announce_new_endpoint(
  *
  * @return return code
  */
-retcode_t mam_example_write_header(mam_api_t* const api,
-                                   mam_channel_t* const channel,
-                                   bundle_transactions_t* const bundle,
-                                   trit_t* const msg_id);
+retcode_t mam_example_write_header_on_channel(
+    mam_api_t* const api, mam_channel_t* const channel,
+    bundle_transactions_t* const bundle, trit_t* const msg_id);
+
+/**
+ * Writes a header only bundle on an endpoint
+ *
+ * @param api - The API [in,out]
+ * @param channel - A known channel [in]
+ * @param endpoint - A known endpoint [in]
+ * @param bundle - The bundle that the packet will be written into [out]
+ * @param msg_id - The msg_id
+ *
+ * @return return code
+ */
+retcode_t mam_example_write_header_on_endpoint(
+    mam_api_t* const api, mam_channel_t* const channel,
+    mam_endpoint_t* const endpoint, bundle_transactions_t* const bundle,
+    trit_t* const msg_id);
 
 /**
  * Writes a packet on a bundle
