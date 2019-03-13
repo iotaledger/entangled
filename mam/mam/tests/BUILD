@@ -1,3 +1,16 @@
+cc_library(
+    name = "test_channel_lib",
+    srcs = ["test_channel.c"],
+    hdrs = ["test_channel.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//mam/mam:channel",
+        "//mam/mam:mam_channel_t_set",
+        "//mam/mam:message",
+        "@unity",
+    ],
+)
+
 cc_test(
     name = "test_message",
     timeout = "long",
@@ -23,11 +36,7 @@ cc_test(
 cc_test(
     name = "test_channel",
     timeout = "long",
-    srcs = ["test_channel.c"],
     deps = [
-        "//mam/mam:channel",
-        "//mam/mam:mam_channel_t_set",
-        "//mam/mam:message",
-        "@unity",
+        ":test_channel_lib",
     ],
 )

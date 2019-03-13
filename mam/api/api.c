@@ -296,23 +296,42 @@ void mam_api_tag(trit_t *const tag, trit_t const *const msg_id,
  *
  * @return return code
  */
-
 static retcode_t mam_api_bundle_write_header(
-    mam_api_t *const api, mam_channel_t *const ch,
-    mam_endpoint_t const *const ep, mam_channel_t const *const ch1,
-    mam_endpoint_t const *const ep1, mam_psk_t_set_t psks,
+    mam_api_t *const api, tryte_t const *const ch_id,
+    tryte_t const *const ep_id, tryte_t const *const ch1_id,
+    tryte_t const *const ep1_id, mam_psk_t_set_t psks,
     mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id) {
   retcode_t ret = RC_OK;
+  mam_channel_t *ch = NULL;
+  mam_channel_t *ch1 = NULL;
+  mam_endpoint_t *ep = NULL;
+  mam_endpoint_t *ep1 = NULL;
   mam_msg_write_context_t ctx;
   trit_t tag[NUM_TRITS_TAG];
 
-  if (api == NULL || ch == NULL || bundle == NULL || msg_id == NULL) {
+  if (api == NULL || ch_id == NULL || bundle == NULL || msg_id == NULL) {
     return RC_NULL_PARAM;
   }
 
   if (bundle_transactions_size(bundle) != 0) {
     return RC_MAM_BUNDLE_NOT_EMPTY;
+  }
+
+  if ((ch = mam_api_get_channel(api, ch_id)) == NULL) {
+    return RC_MAM_CHANNEL_NOT_FOUND;
+  }
+
+  if (ch1_id != NULL && (ch1 = mam_api_get_channel(api, ch1_id)) == NULL) {
+    return RC_MAM_CHANNEL_NOT_FOUND;
+  }
+
+  if (ep_id != NULL && (ep = mam_api_get_endpoint(api, ep_id)) == NULL) {
+    return RC_MAM_ENDPOINT_NOT_FOUND;
+  }
+
+  if (ep1_id != NULL && (ep1 = mam_api_get_endpoint(api, ep1_id)) == NULL) {
+    return RC_MAM_ENDPOINT_NOT_FOUND;
   }
 
   // TODO add a random part

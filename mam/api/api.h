@@ -153,7 +153,7 @@ mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api,
  * into a bundle
  *
  * @param api - The API [in,out]
- * @param ch - A known channel [in]
+ * @param ch_id - A known channel ID [in]
  * @param psks - pre shared keys used for encrypting the session keys [in]
  * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
  * @param msg_type_id - The message type [in]
