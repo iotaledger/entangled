@@ -839,15 +839,15 @@ retcode_t mam_api_bundle_write_header_on_endpoint(
                                      msg_type_id, bundle, msg_id);
 }
 
-retcode_t mam_api_bundle_write_header_announce_new_channel(
-    mam_api_t *const api, mam_channel_t *const ch, mam_channel_t *const ch1,
+retcode_t mam_api_bundle_announce_new_channel(
+    mam_api_t *const api, mam_channel_t *const ch, mam_channel_t *const ep1,
     mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  return mam_api_bundle_write_header(api, ch, NULL, ch1, NULL, psks, ntru_pks,
+  return mam_api_bundle_write_header(api, ch, NULL, ep1, NULL, psks, ntru_pks,
                                      msg_type_id, bundle, msg_id);
 }
 
-retcode_t mam_api_bundle_write_header_announce_new_endpoint(
+retcode_t mam_api_bundle_announce_new_endpoint(
     mam_api_t *const api, mam_channel_t *const ch, mam_endpoint_t *const ep1,
     mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id) {

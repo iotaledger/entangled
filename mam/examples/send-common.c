@@ -38,7 +38,7 @@ retcode_t mam_example_announce_new_channel(mam_api_t* const api,
     return RC_MAM_API_FAILED_CREATE_CHANNEL;
   }
 
-  if ((ret = mam_api_bundle_write_header_announce_new_channel(
+  if ((ret = mam_api_bundle_announce_new_channel(
            api, channel, *new_channel, psks, NULL, 0, bundle, msg_id)) !=
       RC_OK) {
     return ret;
@@ -89,7 +89,7 @@ retcode_t mam_example_announce_new_endpoint(
     return RC_MAM_API_FAILED_CREATE_ENDPOINT;
   }
 
-  if ((ret = mam_api_bundle_write_header_announce_new_endpoint(
+  if ((ret = mam_api_bundle_announce_new_endpoint(
            api, channel, *new_endpoint, psks, NULL, 0, bundle, msg_id)) !=
       RC_OK) {
     return ret;

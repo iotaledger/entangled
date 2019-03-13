@@ -251,10 +251,10 @@ static void test_api_write_header(
     TEST_ASSERT(mam_api_bundle_write_header_on_channel(
                     api, ch, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
   } else if (mam_msg_pubkey_chid1 == pubkey) {
-    TEST_ASSERT(mam_api_bundle_write_header_announce_new_channel(
+    TEST_ASSERT(mam_api_bundle_announce_new_channel(
                     api, ch, ch1a, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
   } else if (mam_msg_pubkey_epid1 == pubkey) {
-    TEST_ASSERT(mam_api_bundle_write_header_announce_new_endpoint(
+    TEST_ASSERT(mam_api_bundle_announce_new_endpoint(
                     api, ch, ep1a, psks, ntru_pks, 0, bundle, msg_id) == RC_OK);
   } else {
     TEST_ASSERT(mam_api_bundle_write_header_on_endpoint(
