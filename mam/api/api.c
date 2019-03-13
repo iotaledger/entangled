@@ -80,56 +80,6 @@ static trits_t mam_api_bundle_unwrap(bundle_transactions_t const *const bundle,
   return trits_from_rep(num_trits_in_bundle, msg_trits);
 }
 
-mam_channel_t *mam_api_get_channel(mam_api_t const *const api,
-                                   tryte_t const *const channel_id) {
-  trit_t channel_id_trits[MAM_CHANNEL_ID_SIZE];
-  mam_channel_t_set_entry_t *entry = NULL;
-  mam_channel_t_set_entry_t *tmp = NULL;
-
-  if (channel_id == NULL) {
-    return NULL;
-  }
-
-  trytes_to_trits(channel_id, channel_id_trits, MAM_CHANNEL_ID_SIZE / 3);
-
-  SET_ITER(api->channels, entry, tmp) {
-    if (memcmp(trits_begin(mam_channel_id(&entry->value)), channel_id_trits,
-               MAM_CHANNEL_ID_SIZE) == 0) {
-      return &entry->value;
-    }
-  }
-
-  return NULL;
-}
-
-mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api,
-                                     tryte_t const *const channel_id,
-                                     tryte_t const *const endpoint_id) {
-  mam_channel_t *parent_channel = mam_api_get_channel(api, channel_id);
-  if (parent_channel == NULL) {
-    return NULL;
-  }
-
-  trit_t ep_id_trits[MAM_ENDPOINT_ID_SIZE];
-  mam_endpoint_t_set_entry_t *entry = NULL;
-  mam_endpoint_t_set_entry_t *tmp = NULL;
-
-  if (endpoint_id == NULL) {
-    return NULL;
-  }
-
-  trytes_to_trits(endpoint_id, ep_id_trits, MAM_ENDPOINT_ID_SIZE / 3);
-
-  SET_ITER(parent_channel->endpoints, entry, tmp) {
-    if (memcmp(trits_begin(mam_endpoint_id(&entry->value)), ep_id_trits,
-               MAM_ENDPOINT_ID_SIZE) == 0) {
-      return &entry->value;
-    }
-  }
-
-  return NULL;
-}
-
 /*
  * Public functions
  */
@@ -243,6 +193,28 @@ retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height,
   return ret;
 }
 
+mam_channel_t *mam_api_get_channel(mam_api_t const *const api,
+                                   tryte_t const *const channel_id) {
+  trit_t channel_id_trits[MAM_CHANNEL_ID_SIZE];
+  mam_channel_t_set_entry_t *entry = NULL;
+  mam_channel_t_set_entry_t *tmp = NULL;
+
+  if (api == NULL || channel_id == NULL) {
+    return NULL;
+  }
+
+  trytes_to_trits(channel_id, channel_id_trits, MAM_CHANNEL_ID_SIZE / 3);
+
+  SET_ITER(api->channels, entry, tmp) {
+    if (memcmp(trits_begin(mam_channel_id(&entry->value)), channel_id_trits,
+               MAM_CHANNEL_ID_SIZE) == 0) {
+      return &entry->value;
+    }
+  }
+
+  return NULL;
+}
+
 retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
                                   tryte_t const *const channel_id,
                                   tryte_t *const endpoint_id) {
@@ -274,6 +246,30 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
   channel->endpoint_ord++;
 
   return ret;
+}
+
+mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api,
+                                     tryte_t const *const channel_id,
+                                     tryte_t const *const endpoint_id) {
+  trit_t endpoint_id_trits[MAM_ENDPOINT_ID_SIZE];
+  mam_endpoint_t_set_entry_t *entry = NULL;
+  mam_endpoint_t_set_entry_t *tmp = NULL;
+  mam_channel_t *parent_channel = mam_api_get_channel(api, channel_id);
+
+  if (endpoint_id == NULL || parent_channel == NULL) {
+    return NULL;
+  }
+
+  trytes_to_trits(endpoint_id, endpoint_id_trits, MAM_ENDPOINT_ID_SIZE / 3);
+
+  SET_ITER(parent_channel->endpoints, entry, tmp) {
+    if (memcmp(trits_begin(mam_endpoint_id(&entry->value)), endpoint_id_trits,
+               MAM_ENDPOINT_ID_SIZE) == 0) {
+      return &entry->value;
+    }
+  }
+
+  return NULL;
 }
 
 void mam_api_tag(trit_t *const tag, trit_t const *const msg_id,
@@ -710,14 +706,14 @@ retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api) {
   mam_endpoint_t_set_entry_t *endpoint_entry = NULL;
   mam_endpoint_t_set_entry_t *tmp_endpoint_entry = NULL;
 
-  HASH_ITER(hh, api->write_ctxs.map, curr_ctx_entry, tmp_ctx_entry) {
-    HASH_ITER(hh, api->channels, curr_channel_entry, tmp_channel_entry) {
+  SET_ITER(api->write_ctxs.map, curr_ctx_entry, tmp_ctx_entry) {
+    SET_ITER(api->channels, curr_channel_entry, tmp_channel_entry) {
       if (memcmp(curr_channel_entry->value.mss.root,
                  curr_ctx_entry->value.mss_root, MAM_CHANNEL_ID_SIZE) == 0) {
         curr_ctx_entry->value.mss = &curr_channel_entry->value.mss;
       } else {
-        HASH_ITER(hh, curr_channel_entry->value.endpoints, endpoint_entry,
-                  tmp_endpoint_entry) {
+        SET_ITER(curr_channel_entry->value.endpoints, endpoint_entry,
+                 tmp_endpoint_entry) {
           if (memcmp(endpoint_entry->value.mss.root,
                      curr_ctx_entry->value.mss_root,
                      MAM_ENDPOINT_ID_SIZE) == 0) {
