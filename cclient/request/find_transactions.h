@@ -74,7 +74,7 @@ static inline retcode_t find_transactions_req_approvee_add(
     find_transactions_req_t* const req, flex_trit_t const* const hash) {
   return hash243_queue_push(&req->approvees, hash);
 }
-static inline flex_trit_t* find_transactions_req_approve_get(
+static inline flex_trit_t* find_transactions_req_approvee_get(
     find_transactions_req_t* const req, size_t index) {
   return hash243_queue_at(&req->approvees, index);
 }
