@@ -39,10 +39,17 @@ static bool mam_channel_t_set_cmp_test(mam_channel_t_set_t const channels_1,
   HASH_ITER(hh, channels_1, entry_1, tmp_1) {
     HASH_ITER(hh, channels_2, entry_2, tmp_2) {
       if (memcmp(entry_1->value.mss.root, entry_2->value.mss.root,
-                 MAM_ENDPOINT_ID_SIZE) == 0 &&
-          trits_cmp_eq(entry_1->value.name, entry_2->value.name) &&
-          memcmp(entry_1->value.msg_ord, entry_2->value.msg_ord,
-                 MAM_CHANNEL_MSG_ORD_SIZE) == 0) {
+                 MAM_ENDPOINT_ID_SIZE) == 0) {
+        if (!trits_cmp_eq(entry_1->value.name, entry_2->value.name)) {
+          continue;
+        }
+        if (memcmp(entry_1->value.msg_ord, entry_2->value.msg_ord,
+                   MAM_CHANNEL_MSG_ORD_SIZE) != 0) {
+          continue;
+        }
+        if (entry_1->value.endpoint_ord != entry_2->value.endpoint_ord) {
+          continue;
+        }
         MAM_TRITS_DEF0(sig1, MAM_MSS_SIG_SIZE(entry_1->value.mss.height));
         MAM_TRITS_DEF0(sig2, MAM_MSS_SIG_SIZE(entry_2->value.mss.height));
         sig1 =
@@ -89,6 +96,7 @@ void test_channel(void) {
     TEST_ASSERT(mam_channel_create(&prng, i, channel_name_trits, &channel) ==
                 RC_OK);
     add_assign(channel.msg_ord, MAM_CHANNEL_MSG_ORD_SIZE, i);
+    channel.endpoint_ord = i;
     TEST_ASSERT(mam_channel_t_set_add(&channels_1, &channel) == RC_OK);
   }
 
