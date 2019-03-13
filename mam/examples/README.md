@@ -27,7 +27,7 @@ If so, please file an issue: https://github.com/iotaledger/entangled/issues/new.
 
 This command will send a header meaning it will declare a new message.
 
-`bazel run -c opt -- //mam/examples:send-header <host> <port> <seed>`
+`bazel run -c opt -- //mam/examples:send-header <host> <port> <seed> <msg_public_key_type>`
 
 This command will send a packet to an already existing message.
 

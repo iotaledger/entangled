@@ -49,8 +49,8 @@ int main(int ac, char **av) {
     trit_t msg_id[MAM_MSG_ID_SIZE];
 
     // Writing header to bundle
-    if ((ret = mam_example_write_header(&api, channel, bundle, msg_id)) !=
-        RC_OK) {
+    if ((ret = mam_example_write_header_on_channel(&api, channel, bundle,
+                                                   msg_id)) != RC_OK) {
       fprintf(stderr, "mam_example_write_header failed with err %d\n", ret);
       return EXIT_FAILURE;
     }
