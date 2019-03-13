@@ -33,6 +33,7 @@ typedef struct mam_api_s {
   trit_t_to_mam_msg_write_context_t_map_t write_ctxs;
   trit_t_to_mam_msg_read_context_t_map_t read_ctxs;
   mam_channel_t_set_t channels;
+  trint18_t channel_ord;
 } mam_api_t;
 
 /**
@@ -98,6 +99,32 @@ retcode_t mam_api_add_channel(mam_api_t *const api,
                               mam_channel_t const *const ch);
 
 /**
+ * Creates and adds a channel to the API
+ *
+ * @param api - The API [in, out]
+ * @param height - The channel's MSS height [in]
+ * @param channel_id - The channel id [out]
+ *
+ * @return return code
+ */
+retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height,
+                                 tryte_t *const channel_id);
+
+/**
+ * Creates and adds an endpoint to the API
+ *
+ * @param api - The API [in, out]
+ * @param height - The endpoint's MSS height [in]
+ * @param channel_id - The associated channel id [in]
+ * @param endpoint_id - The endpoint id [out]
+ *
+ * @return return code
+ */
+retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
+                                  tryte_t const *const channel_id,
+                                  tryte_t *const endpoint_id);
+
+/**
  * Writes MAM header (keyloads (session keys) + potential packet) into a bundle
  *
  * @param api - The API [in,out]
@@ -115,7 +142,6 @@ retcode_t mam_api_add_channel(mam_api_t *const api,
  *
  * @return return code
  */
-
 retcode_t mam_api_bundle_write_header(
     mam_api_t *const api, mam_channel_t *const ch,
     mam_endpoint_t const *const ep, mam_channel_t const *const ch1,

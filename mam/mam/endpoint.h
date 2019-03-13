@@ -15,6 +15,7 @@
 #include "mam/trits/trits.h"
 
 #define MAM_ENDPOINT_ID_SIZE MAM_MSS_MT_HASH_SIZE
+#define MAM_ENDPOINT_NAME_SIZE 18
 
 #ifdef __cplusplus
 extern "C" {

@@ -304,7 +304,7 @@ static void test_api_create_channels(mam_api_t *api, mam_channel_t **const cha,
                                      mss_mt_height_t depth) {
   mss_mt_height_t d = depth;
 
-  // TODO usse api methods
+  // TODO use api methods
   /* create channels */
   {
     trits_t cha_name = trits_alloc(3 * strlen(TEST_CHANNEL_NAME));
@@ -323,8 +323,8 @@ static void test_api_create_channels(mam_api_t *api, mam_channel_t **const cha,
       *epa = malloc(sizeof(mam_endpoint_t));
       TEST_ASSERT(0 != *epa);
       memset(*epa, 0, sizeof(mam_endpoint_t));
-      TEST_ASSERT(mam_endpoint_create(&api->prng, d, (*cha)->name, epa_name,
-                                      *epa) == RC_OK);
+      TEST_ASSERT(mam_endpoint_create(&api->prng, d, mam_channel_name(*cha),
+                                      epa_name, *epa) == RC_OK);
       trits_free(epa_name);
     }
     {
@@ -334,8 +334,8 @@ static void test_api_create_channels(mam_api_t *api, mam_channel_t **const cha,
       *ep1 = malloc(sizeof(mam_endpoint_t));
       TEST_ASSERT(0 != *ep1);
       memset(*ep1, 0, sizeof(mam_endpoint_t));
-      TEST_ASSERT(mam_endpoint_create(&api->prng, d, (*cha)->name, ep1a_name,
-                                      *ep1) == RC_OK);
+      TEST_ASSERT(mam_endpoint_create(&api->prng, d, mam_channel_name(*cha),
+                                      ep1a_name, *ep1) == RC_OK);
       trits_free(ep1a_name);
     }
     {
@@ -372,12 +372,12 @@ static void test_api_generic() {
 
   /* gen psk */
   {
-    mam_psk_gen(&pska, &api.prng, TEST_PRE_SHARED_KEY_A_STR,
-                TEST_PRE_SHARED_KEY_A_NONCE_STR,
+    mam_psk_gen(&pska, &api.prng, (tryte_t *)TEST_PRE_SHARED_KEY_A_STR,
+                (tryte_t *)TEST_PRE_SHARED_KEY_A_NONCE_STR,
                 strlen(TEST_PRE_SHARED_KEY_A_NONCE_STR));
 
-    mam_psk_gen(&pskb, &api.prng, TEST_PRE_SHARED_KEY_B_STR,
-                TEST_PRE_SHARED_KEY_B_NONCE_STR,
+    mam_psk_gen(&pskb, &api.prng, (tryte_t *)TEST_PRE_SHARED_KEY_B_STR,
+                (tryte_t *)TEST_PRE_SHARED_KEY_B_NONCE_STR,
                 strlen(TEST_PRE_SHARED_KEY_B_NONCE_STR));
     TEST_ASSERT(mam_api_add_psk(&api, &pskb) == RC_OK);
   }
@@ -481,6 +481,7 @@ static void test_api_serialization() {
   size_t serialized_size = mam_api_serialized_size(&api);
   MAM_TRITS_DEF0(buffer, serialized_size);
   buffer = MAM_TRITS_INIT(buffer, serialized_size);
+
   mam_api_serialize(&api, &buffer);
   buffer = trits_pickup_all(buffer);
   TEST_ASSERT((mam_api_deserialize(&buffer, &deserialized_api) == RC_OK));
@@ -498,6 +499,7 @@ static void test_api_serialization() {
       &deserialized_api.read_ctxs, &api.read_ctxs));
   TEST_ASSERT_TRUE(
       mam_channel_t_set_cmp(&deserialized_api.channels, &api.channels));
+  TEST_ASSERT_EQUAL_INT(deserialized_api.channel_ord, api.channel_ord);
 
   mam_api_destroy(&deserialized_api);
 }
@@ -517,6 +519,7 @@ static void test_api_save_load() {
   TEST_ASSERT_TRUE(trit_t_to_mam_msg_read_context_t_map_cmp(
       &loaded_api.read_ctxs, &api.read_ctxs));
   TEST_ASSERT_TRUE(mam_channel_t_set_cmp(&loaded_api.channels, &api.channels));
+  TEST_ASSERT_EQUAL_INT(loaded_api.channel_ord, api.channel_ord);
 
   mam_api_destroy(&loaded_api);
 }
