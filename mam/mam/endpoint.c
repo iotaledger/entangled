@@ -70,7 +70,7 @@ retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t *const endpoints) {
     return RC_OK;
   }
 
-  HASH_ITER(hh, *endpoints, entry, tmp) { mam_endpoint_destroy(&entry->value); }
+  SET_ITER(*endpoints, entry, tmp) { mam_endpoint_destroy(&entry->value); }
   mam_endpoint_t_set_free(endpoints);
 
   return RC_OK;
@@ -141,7 +141,7 @@ size_t mam_endpoints_serialized_size(mam_endpoint_t_set_t const endpoints) {
   size_t size = pb3_sizeof_size_t(
       mam_endpoint_t_set_size(endpoints));  // endpoints number
 
-  HASH_ITER(hh, endpoints, entry, tmp) {  // endpoint
+  SET_ITER(endpoints, entry, tmp) {  // endpoint
     size += mam_endpoint_serialized_size(&entry->value);
   }
 
@@ -156,7 +156,7 @@ void mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints,
   pb3_encode_size_t(mam_endpoint_t_set_size(endpoints),
                     buffer);  // endpoints number
 
-  HASH_ITER(hh, endpoints, entry, tmp) {
+  SET_ITER(endpoints, entry, tmp) {
     mam_endpoint_serialize(&entry->value, buffer);
   }
 }
