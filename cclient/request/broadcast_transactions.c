@@ -46,3 +46,11 @@ retcode_t broadcast_transactions_req_trytes_add(
 
   return RC_OK;
 }
+
+flex_trit_t *broadcat_transactions_req_trytes_get(
+    broadcast_transactions_req_t *req, size_t index) {
+  if (!req->trytes) {
+    return NULL;
+  }
+  return hash_array_at(req->trytes, index);
+}

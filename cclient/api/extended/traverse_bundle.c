@@ -40,7 +40,7 @@ retcode_t traverse_bundle(iota_client_service_t const* const serv,
   }
 
   do {
-    ret_code = get_trytes_req_add_hash(
+    ret_code = get_trytes_req_hash_add(
         get_trytes_req, is_tail ? tail_hash : transaction_trunk(&tx));
     if (ret_code != RC_OK) {
       log_error(client_extended_logger_id, "%s hash243_queue_push failed: %s\n",
@@ -67,7 +67,7 @@ retcode_t traverse_bundle(iota_client_service_t const* const serv,
     // Create a transaction with the received trytes
     transaction_deserialize_from_trits(&tx, tmp_trytes, false);
     transaction_set_hash(
-        &tx, is_tail ? tail_hash : get_trytes_req_get_hash(get_trytes_req, 0));
+        &tx, is_tail ? tail_hash : get_trytes_req_hash_get(get_trytes_req, 0));
     if (is_tail) {
       current_index = transaction_current_index(&tx);
       // Check that the first transaction we get is really a tail transaction

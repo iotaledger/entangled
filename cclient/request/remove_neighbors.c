@@ -21,6 +21,15 @@ void remove_neighbors_req_add(remove_neighbors_req_t* req, const char* uri) {
   utarray_push_back(req->uris, &uri);
 }
 
+size_t remove_neighbors_req_uris_len(remove_neighbors_req_t* req) {
+  return utarray_len(req->uris);
+}
+
+const char* remove_neighbors_req_uris_at(remove_neighbors_req_t* req,
+                                         size_t idx) {
+  return *(const char**)utarray_eltptr(req->uris, idx);
+}
+
 void remove_neighbors_req_free(remove_neighbors_req_t** req) {
   if (!req || !(*req)) {
     return;

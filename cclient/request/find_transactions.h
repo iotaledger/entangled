@@ -47,20 +47,36 @@ static inline retcode_t find_transactions_req_bundle_add(
     find_transactions_req_t* const req, flex_trit_t const* const hash) {
   return hash243_queue_push(&req->bundles, hash);
 }
+static inline flex_trit_t* find_transactions_req_bundle_get(
+    find_transactions_req_t* const req, size_t index) {
+  return hash243_queue_at(&req->bundles, index);
+}
 
 static inline retcode_t find_transactions_req_address_add(
     find_transactions_req_t* const req, flex_trit_t const* const hash) {
   return hash243_queue_push(&req->addresses, hash);
+}
+static inline flex_trit_t* find_transactions_req_address_get(
+    find_transactions_req_t* const req, size_t index) {
+  return hash243_queue_at(&req->addresses, index);
 }
 
 static inline retcode_t find_transactions_req_tag_add(
     find_transactions_req_t* const req, flex_trit_t const* const hash) {
   return hash81_queue_push(&req->tags, hash);
 }
+static inline flex_trit_t* find_transactions_req_tag_get(
+    find_transactions_req_t* const req, size_t index) {
+  return hash243_queue_at(&req->tags, index);
+}
 
 static inline retcode_t find_transactions_req_approvee_add(
     find_transactions_req_t* const req, flex_trit_t const* const hash) {
   return hash243_queue_push(&req->approvees, hash);
+}
+static inline flex_trit_t* find_transactions_req_approve_get(
+    find_transactions_req_t* const req, size_t index) {
+  return hash243_queue_at(&req->approvees, index);
 }
 
 #ifdef __cplusplus

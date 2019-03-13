@@ -39,10 +39,18 @@ static inline retcode_t get_balances_req_address_add(
     get_balances_req_t* const req, flex_trit_t const* const hash) {
   return hash243_queue_push(&req->addresses, hash);
 }
+static inline flex_trit_t* get_balances_req_address_get(
+    get_balances_req_t* const req, size_t index) {
+  return hash243_queue_at(&req->addresses, index);
+}
 
 static inline retcode_t get_balances_req_tip_add(
     get_balances_req_t* const req, flex_trit_t const* const hash) {
   return hash243_queue_push(&req->tips, hash);
+}
+static inline flex_trit_t* get_balances_req_tip_get(
+    get_balances_req_t* const req, size_t index) {
+  return hash243_queue_at(&req->tips, index);
 }
 
 #ifdef __cplusplus

@@ -21,10 +21,10 @@ typedef struct store_transactions_req_s {
 
 store_transactions_req_t* store_transactions_req_new();
 void store_transactions_req_free(store_transactions_req_t** const req);
-static inline void store_transactions_req_trytes_add(
-    store_transactions_req_t* const req, flex_trit_t const* const trytes) {
-  return hash_array_push(&req->trytes, trytes);
-}
+retcode_t store_transactions_req_trytes_add(
+    store_transactions_req_t* req, flex_trit_t const* const raw_trytes);
+flex_trit_t* store_transactions_req_trytes_get(store_transactions_req_t* req,
+                                               size_t index);
 
 #ifdef __cplusplus
 }
