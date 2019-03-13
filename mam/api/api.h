@@ -138,6 +138,16 @@ mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api,
                                      tryte_t const *const endpoint_id);
 
 /**
+ * Creates a MAM tag that can be used in IOTA transactions
+ *
+ * @param tag - The tag [out]
+ * @param msg_id - The message ID [in]
+ * @param ord - The packet ord [in]
+ */
+void mam_api_tag(trit_t *const tag, trit_t const *const msg_id,
+                 trint18_t const ord);
+
+/**
  * Writes MAM header on a channel(keyloads (session keys) + potential packet)
  * into a bundle
  *
