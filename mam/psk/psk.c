@@ -78,7 +78,7 @@ retcode_t mam_psks_serialize(mam_psk_t_set_t const psks, trits_t *const trits) {
   mam_psk_t_set_entry_t *entry = NULL;
   mam_psk_t_set_entry_t *tmp = NULL;
 
-  if (psks == NULL || trits == NULL) {
+  if (trits == NULL) {
     return RC_NULL_PARAM;
   }
 

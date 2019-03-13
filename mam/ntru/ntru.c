@@ -96,7 +96,7 @@ retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pks,
   mam_ntru_pk_t_set_entry_t *entry = NULL;
   mam_ntru_pk_t_set_entry_t *tmp = NULL;
 
-  if (ntru_pks == NULL || trits == NULL) {
+  if (trits == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -287,7 +287,7 @@ retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sks,
   mam_ntru_sk_t_set_entry_t *entry = NULL;
   mam_ntru_sk_t_set_entry_t *tmp = NULL;
 
-  if (ntru_sks == NULL || trits == NULL) {
+  if (trits == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -296,8 +296,9 @@ retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sks,
   SET_ITER(ntru_sks, entry, tmp) {
     pb3_encode_ntrytes(
         trits_from_rep(MAM_NTRU_PK_SIZE, entry->value.public_key.key), trits);
-    pb3_encode_ntrytes(
-        trits_from_rep(MAM_NTRU_SK_SIZE, entry->value.secret_key), trits);
+    trits_copy(trits_from_rep(MAM_NTRU_SK_SIZE, entry->value.secret_key),
+               trits_take(*trits, MAM_NTRU_SK_SIZE));
+    trits_advance(trits, MAM_NTRU_SK_SIZE);
   }
 
   return RC_OK;
@@ -322,10 +323,9 @@ retcode_t mam_ntru_sks_deserialize(trits_t *const trits,
         pb3_decode_ntrytes(
             trits_from_rep(MAM_NTRU_PK_SIZE, ntru_sk.public_key.key), trits),
         ret);
-    ERR_BIND_RETURN(
-        pb3_decode_ntrytes(trits_from_rep(MAM_NTRU_SK_SIZE, ntru_sk.secret_key),
-                           trits),
-        ret);
+    trits_copy(trits_take(*trits, MAM_NTRU_SK_SIZE),
+               trits_from_rep(MAM_NTRU_SK_SIZE, ntru_sk.secret_key));
+    trits_advance(trits, MAM_NTRU_SK_SIZE);
     ntru_sk_load(&ntru_sk);
     ERR_BIND_RETURN(mam_ntru_sk_t_set_add(ntru_sks, &ntru_sk), ret);
   }

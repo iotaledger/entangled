@@ -340,7 +340,6 @@ static retcode_t mam_msg_wrap_keyload_ntru(mam_spongos_t *s, trits_t *b,
 
   MAM_ASSERT(mam_msg_wrap_keyload_ntru_size() <= trits_size(*b));
   MAM_ASSERT(MAM_NTRU_KEY_SIZE == trits_size(key));
-  MAM_ASSERT(MAM_NTRU_PK_SIZE == trits_size(pk));
 
   /*  absorb tryte id[27]; */
   pb3_wrap_absorb_ntrytes(s, b, mam_ntru_pk_id(ntru_pk));
