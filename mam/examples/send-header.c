@@ -37,7 +37,7 @@ int main(int ac, char **av) {
   }
 
   msg_pubkey_int = atoi(av[4]);
-  if (msg_pubkey_int < 0 || msg_pubkey_int > 4) {
+  if (msg_pubkey_int < 0 || msg_pubkey_int > 3) {
     fprintf(stderr,
             "usage: send-header <host> <port> <seed> <msg_public_key_type> (0 "
             "-  on channel, 1 - on endpoint, 2 - announce channel, 3 - "
