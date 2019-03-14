@@ -132,16 +132,23 @@ static void message_test_generic_read_msg(
   mam_msg_read_context_t *cfg = cfg_msg_read;
   mam_psk_t_set_t psks = NULL;
   mam_ntru_sk_t_set_t ntru_sks = NULL;
+  mam_pk_t_set_t trusted_channel_ids = NULL;
+  mam_pk_t_set_t trusted_endpoint_ids = NULL;
 
   TEST_ASSERT(mam_psk_t_set_add(&psks, pre_shared_key) == RC_OK);
   TEST_ASSERT(mam_ntru_sk_t_set_add(&ntru_sks, ntru) == RC_OK);
+  TEST_ASSERT(mam_pk_t_set_add(&trusted_channel_ids,
+                               trits_begin(mam_channel_id(cha))) == RC_OK);
 
   trits_copy(mam_channel_id(cha), trits_from_rep(MAM_CHANNEL_ID_SIZE, cfg->pk));
 
-  e = mam_msg_read_header(cfg_msg_read, msg, psks, ntru_sks, msg_id);
+  e = mam_msg_read_header(cfg_msg_read, msg, psks, ntru_sks, msg_id,
+                          &trusted_channel_ids, &trusted_endpoint_ids);
 
   TEST_ASSERT(RC_OK == e);
   TEST_ASSERT(trits_is_empty(*msg));
+  mam_pk_t_set_free(&trusted_channel_ids);
+  mam_pk_t_set_free(&trusted_endpoint_ids);
 
   mam_ntru_sk_t_set_free(&ntru_sks);
   mam_psk_t_set_free(&psks);

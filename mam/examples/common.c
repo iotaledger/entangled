@@ -140,6 +140,7 @@ static void recv_example_init_client_service(iota_client_service_t *const serv,
   serv->http.host = host;
   serv->http.port = port;
   serv->http.api_version = 1;
+  serv->http.ca_pem = NULL;
   serv->serializer_type = SR_JSON;
   iota_client_core_init(serv);
 }
