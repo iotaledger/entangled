@@ -13,7 +13,7 @@
 #include "common/trinary/tryte_ascii.h"
 #include "mam/api/api.h"
 #include "mam/mam/mam_channel_t_set.h"
-#include "mam/mam/tests/test_channel.h"
+#include "mam/mam/tests/test_channel_utils.h"
 #include "mam/ntru/mam_ntru_sk_t_set.h"
 
 static mam_api_t api;

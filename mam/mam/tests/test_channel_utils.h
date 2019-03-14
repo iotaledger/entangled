@@ -8,8 +8,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __MAM_MAM_TESTS_TEST_CHANNEL_H__
-#define __MAM_MAM_TESTS_TEST_CHANNEL_H__
+#ifndef __MAM_MAM_TESTS_TEST_CHANNEL_UTILS_H__
+#define __MAM_MAM_TESTS_TEST_CHANNEL_UTILS_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,4 +22,4 @@ bool mam_channel_t_set_cmp_test(mam_channel_t_set_t const channels_1,
 }
 #endif
 
-#endif  // __MAM_MAM_TESTS_TEST_CHANNEL_H__
+#endif  // __MAM_MAM_TESTS_TEST_CHANNEL_UTILS_H__
