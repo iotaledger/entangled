@@ -89,7 +89,7 @@ void test_get_balances_serialize_response(void) {
                          NUM_TRYTES_HASH, NUM_TRYTES_HASH);
 
   TEST_ASSERT(get_balances_res_milestone_add(get_bal, hash) == RC_OK);
-  get_bal->milestoneIndex = TEST_BALANCES_MILESTONEINDEX;
+  get_bal->milestone_index = TEST_BALANCES_MILESTONEINDEX;
 
   serializer.vtable.get_balances_serialize_response(&serializer, get_bal,
                                                     serializer_out);
@@ -127,7 +127,7 @@ void test_get_balances_deserialize_response(void) {
                            FLEX_TRIT_SIZE_243);
 
   TEST_ASSERT_EQUAL_INT(TEST_BALANCES_MILESTONEINDEX,
-                        deserialize_get_bal->milestoneIndex);
+                        deserialize_get_bal->milestone_index);
 
   get_balances_res_free(&deserialize_get_bal);
 }

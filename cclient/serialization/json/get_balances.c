@@ -109,7 +109,7 @@ retcode_t json_get_balances_serialize_response(
   }
 
   cJSON_AddItemToObject(json_root, "milestoneIndex",
-                        cJSON_CreateNumber(res->milestoneIndex));
+                        cJSON_CreateNumber(res->milestone_index));
 
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
@@ -146,7 +146,7 @@ retcode_t json_get_balances_deserialize_response(serializer_t const *const s,
     goto end;
   }
 
-  ret = json_get_int(json_obj, "milestoneIndex", &out->milestoneIndex);
+  ret = json_get_int(json_obj, "milestoneIndex", &out->milestone_index);
 
 end:
   cJSON_Delete(json_obj);

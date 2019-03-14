@@ -17,7 +17,7 @@ extern "C" {
 static const UT_icd ut_uint64_icd UTARRAY_UNUSED = {sizeof(uint64_t), NULL,
                                                     NULL, NULL};
 typedef struct {
-  int milestoneIndex;
+  int milestone_index;
   UT_array* balances;
   hash243_queue_t milestone;
 } get_balances_res_t;
