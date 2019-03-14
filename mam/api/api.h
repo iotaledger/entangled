@@ -249,10 +249,13 @@ retcode_t mam_api_bundle_announce_new_endpoint(
  *
  * @return return code
  */
-retcode_t mam_api_bundle_write_packet(
-    mam_api_t *const api, trit_t *const msg_id, tryte_t const *const payload,
-    size_t const payload_size, mam_msg_checksum_t checksum, bool is_last_packet,
-    bundle_transactions_t *const bundle);
+retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
+                                      trit_t const *const msg_id,
+                                      tryte_t const *const payload,
+                                      size_t const payload_size,
+                                      mam_msg_checksum_t checksum,
+                                      bool is_last_packet,
+                                      bundle_transactions_t *const bundle);
 
 /**
  * Reads MAM's session key and potentially the first packet using NTRU secret

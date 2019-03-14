@@ -61,7 +61,7 @@ static void mam_api_bundle_wrap(bundle_transactions_t *const bundle,
 }
 
 static trits_t mam_api_bundle_unwrap(bundle_transactions_t const *const bundle,
-                                     trit_t const *msg_trits,
+                                     trit_t *const msg_trits,
                                      size_t num_trits_in_bundle,
                                      size_t start_index) {
   iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
@@ -440,10 +440,13 @@ retcode_t mam_api_bundle_announce_new_endpoint(
                                      ntru_pks, msg_type_id, bundle, msg_id);
 }
 
-retcode_t mam_api_bundle_write_packet(
-    mam_api_t *const api, trit_t *const msg_id, tryte_t const *const payload,
-    size_t const payload_size, mam_msg_checksum_t checksum, bool is_last_packet,
-    bundle_transactions_t *const bundle) {
+retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
+                                      trit_t const *const msg_id,
+                                      tryte_t const *const payload,
+                                      size_t const payload_size,
+                                      mam_msg_checksum_t checksum,
+                                      bool is_last_packet,
+                                      bundle_transactions_t *const bundle) {
   retcode_t ret;
   mam_msg_write_context_t *ctx = NULL;
   trit_t_to_mam_msg_write_context_t_map_entry_t *entry = NULL;
@@ -465,7 +468,7 @@ retcode_t mam_api_bundle_write_packet(
     size_t packet_size = 0;
     MAM_TRITS_DEF0(payload_trits, payload_size * 3);
     payload_trits = MAM_TRITS_INIT(payload_trits, payload_size * 3);
-    trits_from_str(payload_trits, payload);
+    trits_from_str(payload_trits, (char const *)payload);
 
     packet_size = mam_msg_packet_size(checksum, ctx->mss, payload_size * 3);
     if (trits_is_null(packet = trits_alloc(packet_size))) {
