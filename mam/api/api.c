@@ -263,7 +263,7 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
   if (ret != RC_OK) {
     // TODO - LOG
   }
-  mam_channel_t_set_free(&api->channels);
+  mam_channels_destroy(&api->channels);
 
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
