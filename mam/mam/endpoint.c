@@ -25,7 +25,7 @@ trits_t mam_endpoint_name(mam_endpoint_t const *const endpoint) {
   return endpoint->name;
 }
 
-retcode_t mam_endpoint_create(mam_prng_t const *const prng,
+retcode_t mam_endpoint_create(mam_prng_t *const prng,
                               mss_mt_height_t const height,
                               trits_t const channel_name,
                               trits_t const endpoint_name,
