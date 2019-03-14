@@ -80,54 +80,138 @@ static trits_t mam_api_bundle_unwrap(bundle_transactions_t const *const bundle,
   return trits_from_rep(num_trits_in_bundle, msg_trits);
 }
 
-mam_channel_t *mam_api_get_channel(mam_api_t const *const api,
-                                   tryte_t const *const channel_id) {
-  trit_t channel_id_trits[MAM_CHANNEL_ID_SIZE];
-  mam_channel_t_set_entry_t *entry = NULL;
-  mam_channel_t_set_entry_t *tmp = NULL;
+/**
+ * Writes MAM header (keyloads (session keys) + potential packet) into a bundle
+ *
+ * @param api - The API [in,out]
+ * @param ch - A known channel [in]
+ * @param ep - A known endpoint [in]
+ * @param ch1 - A new channel to announce [in]
+ * @param ep1 - A new endpoint to announce [in]
+ * @param psks - pre shared keys used for encrypting the session keys [in]
+ * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
+ * @param msg_type_id - The message type [in]
+ * @param bundle - The bundle that the packet will be written into [out]
+ * @param msg_id - The msg_id (hashed channel_name and message index within the
+ *  channel) embedded into transaction's tag (together with packet index to
+ * allow Tangle lookup) [out]
+ *
+ * @return return code
+ */
+static retcode_t mam_api_bundle_write_header(
+    mam_api_t *const api, tryte_t const *const ch_id,
+    tryte_t const *const ep_id, tryte_t const *const ch1_id,
+    tryte_t const *const ep1_id, mam_psk_t_set_t psks,
+    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    bundle_transactions_t *const bundle, trit_t *const msg_id) {
+  retcode_t ret = RC_OK;
+  mam_channel_t *ch = NULL;
+  mam_channel_t *ch1 = NULL;
+  mam_endpoint_t *ep = NULL;
+  mam_endpoint_t *ep1 = NULL;
+  mam_msg_write_context_t ctx;
+  trit_t tag[NUM_TRITS_TAG];
 
-  if (channel_id == NULL) {
-    return NULL;
+  if (api == NULL || ch_id == NULL || bundle == NULL || msg_id == NULL) {
+    return RC_NULL_PARAM;
   }
 
-  trytes_to_trits(channel_id, channel_id_trits, MAM_CHANNEL_ID_SIZE / 3);
+  if (bundle_transactions_size(bundle) != 0) {
+    return RC_MAM_BUNDLE_NOT_EMPTY;
+  }
 
-  SET_ITER(api->channels, entry, tmp) {
-    if (memcmp(trits_begin(mam_channel_id(&entry->value)), channel_id_trits,
-               MAM_CHANNEL_ID_SIZE) == 0) {
-      return &entry->value;
+  if ((ch = mam_api_get_channel(api, ch_id)) == NULL) {
+    return RC_MAM_CHANNEL_NOT_FOUND;
+  }
+
+  if (ch1_id && (ch1 = mam_api_get_channel(api, ch1_id)) == NULL) {
+    return RC_MAM_CHANNEL_NOT_FOUND;
+  }
+
+  if (ep_id && (ep = mam_api_get_endpoint(api, ch_id, ep_id)) == NULL) {
+    return RC_MAM_ENDPOINT_NOT_FOUND;
+  }
+
+  if (ep1_id && (ep1 = mam_api_get_endpoint(api, ch_id, ep1_id)) == NULL) {
+    return RC_MAM_ENDPOINT_NOT_FOUND;
+  }
+
+  // TODO add a random part
+  {
+    trits_t msg_id_parts[] = {mam_channel_name(ch), mam_channel_msg_ord(ch)};
+
+    mam_spongos_hashn(&ctx.spongos, 2, msg_id_parts,
+                      trits_from_rep(MAM_MSG_ID_SIZE, msg_id));
+    add_assign(ch->msg_ord, MAM_CHANNEL_MSG_ORD_SIZE, 1);
+    mam_api_write_tag(tag, msg_id, 0);
+  }
+
+  {
+    trits_t header = trits_null();
+    size_t header_size = 0;
+
+    header_size = mam_msg_header_size(ch, ep, ch1, ep1, psks, ntru_pks);
+    if (trits_is_null(header = trits_alloc(header_size))) {
+      return RC_OOM;
     }
+    ERR_BIND_RETURN(
+        mam_msg_write_header(&ctx, &api->prng, ch, ep, ch1, ep1,
+                             trits_from_rep(MAM_MSG_ID_SIZE, msg_id),
+                             msg_type_id, psks, ntru_pks, &header),
+        ret);
+    header = trits_pickup(header, header_size);
+    mam_api_bundle_wrap(bundle, trits_begin(mam_channel_id(ch)), tag, header);
+    trits_free(header);
   }
 
-  return NULL;
+  memcpy(ctx.chid, trits_begin(mam_channel_id(ch)), MAM_CHANNEL_ID_SIZE);
+  ctx.ord = 1;
+  if (ch1) {
+    ctx.mss = &ch1->mss;
+  } else if (ep1) {
+    ctx.mss = &ep1->mss;
+  } else if (ep) {
+    ctx.mss = &ep->mss;
+  } else if (ch) {
+    ctx.mss = &ch->mss;
+  }
+
+  return trit_t_to_mam_msg_write_context_t_map_add(&api->write_ctxs, msg_id,
+                                                   ctx);
 }
 
-mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api,
-                                     tryte_t const *const channel_id,
-                                     tryte_t const *const endpoint_id) {
-  mam_channel_t *parent_channel = mam_api_get_channel(api, channel_id);
-  if (parent_channel == NULL) {
-    return NULL;
-  }
+static retcode_t mam_api_bundle_read_packet_from_msg(
+    mam_api_t *const api, mam_msg_read_context_t *ctx, trits_t msg,
+    tryte_t **const payload, size_t *const payload_size,
+    bool *const is_last_packet) {
+  retcode_t ret = RC_OK;
+  trits_t payload_trits = trits_null();
 
-  trit_t ep_id_trits[MAM_ENDPOINT_ID_SIZE];
-  mam_endpoint_t_set_entry_t *entry = NULL;
-  mam_endpoint_t_set_entry_t *tmp = NULL;
+  *is_last_packet = false;
 
-  if (endpoint_id == NULL) {
-    return NULL;
-  }
+  {
+    mam_msg_read_context_t rollback_ctx = *ctx;
 
-  trytes_to_trits(endpoint_id, ep_id_trits, MAM_ENDPOINT_ID_SIZE / 3);
-
-  SET_ITER(parent_channel->endpoints, entry, tmp) {
-    if (memcmp(trits_begin(mam_endpoint_id(&entry->value)), ep_id_trits,
-               MAM_ENDPOINT_ID_SIZE) == 0) {
-      return &entry->value;
+    if ((ret = mam_msg_read_packet(ctx, &msg, &payload_trits)) != RC_OK) {
+      *ctx = rollback_ctx;
+      return ret;
     }
   }
 
-  return NULL;
+  *payload_size = trits_size(payload_trits) / 3;
+  *payload = malloc(*payload_size * sizeof(tryte_t));
+  trits_to_trytes(payload_trits.p, *payload, *payload_size * 3);
+  trits_free(payload_trits);
+
+  // negative ord means it's the last packet, so no need to increment in that
+  // case
+  if (ctx->ord >= 0) {
+    ctx->ord++;
+  } else {
+    *is_last_packet = true;
+  }
+
+  return ret;
 }
 
 /*
@@ -179,7 +263,7 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
   if (ret != RC_OK) {
     // TODO - LOG
   }
-  mam_channel_t_set_free(&api->channels);
+  mam_channels_destroy(&api->channels);
 
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
@@ -210,14 +294,6 @@ retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk) {
   return mam_psk_t_set_add(&api->psks, psk);
 }
 
-retcode_t mam_api_add_channel(mam_api_t *const api,
-                              mam_channel_t const *const ch) {
-  if (api == NULL || ch == NULL) {
-    return RC_NULL_PARAM;
-  }
-  return mam_channel_t_set_add(&api->channels, ch);
-}
-
 retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height,
                                  tryte_t *const channel_id) {
   retcode_t ret = RC_OK;
@@ -241,6 +317,28 @@ retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height,
   api->channel_ord++;
 
   return ret;
+}
+
+mam_channel_t *mam_api_get_channel(mam_api_t const *const api,
+                                   tryte_t const *const channel_id) {
+  trit_t channel_id_trits[MAM_CHANNEL_ID_SIZE];
+  mam_channel_t_set_entry_t *entry = NULL;
+  mam_channel_t_set_entry_t *tmp = NULL;
+
+  if (api == NULL || channel_id == NULL) {
+    return NULL;
+  }
+
+  trytes_to_trits(channel_id, channel_id_trits, MAM_CHANNEL_ID_SIZE / 3);
+
+  SET_ITER(api->channels, entry, tmp) {
+    if (memcmp(trits_begin(mam_channel_id(&entry->value)), channel_id_trits,
+               MAM_CHANNEL_ID_SIZE) == 0) {
+      return &entry->value;
+    }
+  }
+
+  return NULL;
 }
 
 retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
@@ -276,91 +374,69 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
   return ret;
 }
 
-void mam_api_tag(trit_t *const tag, trit_t const *const msg_id,
-                 trint18_t const ord) {
+mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api,
+                                     tryte_t const *const channel_id,
+                                     tryte_t const *const endpoint_id) {
+  trit_t endpoint_id_trits[MAM_ENDPOINT_ID_SIZE];
+  mam_endpoint_t_set_entry_t *entry = NULL;
+  mam_endpoint_t_set_entry_t *tmp = NULL;
+  mam_channel_t *parent_channel = mam_api_get_channel(api, channel_id);
+
+  if (endpoint_id == NULL || parent_channel == NULL) {
+    return NULL;
+  }
+
+  trytes_to_trits(endpoint_id, endpoint_id_trits, MAM_ENDPOINT_ID_SIZE / 3);
+
+  SET_ITER(parent_channel->endpoints, entry, tmp) {
+    if (memcmp(trits_begin(mam_endpoint_id(&entry->value)), endpoint_id_trits,
+               MAM_ENDPOINT_ID_SIZE) == 0) {
+      return &entry->value;
+    }
+  }
+
+  return NULL;
+}
+
+void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id,
+                       trint18_t const ord) {
   memcpy(tag, msg_id, MAM_MSG_ID_SIZE);
   trits_put18(trits_from_rep(18, tag + MAM_MSG_ID_SIZE), ord);
 }
 
-/**
- * Writes MAM header (keyloads (session keys) + potential packet) into a bundle
- *
- * @param api - The API [in,out]
- * @param ch - A known channel [in]
- * @param ep - A known endpoint [in]
- * @param ch1 - A new channel to announce [in]
- * @param ep1 - A new endpoint to announce [in]
- * @param psks - pre shared keys used for encrypting the session keys [in]
- * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
- * @param msg_type_id - The message type [in]
- * @param bundle - The bundle that the packet will be written into [out]
- * @param msg_id - The msg_id (hashed channel_name and message index within the
- *  channel) embedded into transaction's tag (together with packet index to
- * allow Tangle lookup) [out]
- *
- * @return return code
- */
-
-static retcode_t mam_api_bundle_write_header(
-    mam_api_t *const api, mam_channel_t *const ch,
-    mam_endpoint_t const *const ep, mam_channel_t const *const ch1,
-    mam_endpoint_t const *const ep1, mam_psk_t_set_t psks,
+retcode_t mam_api_bundle_write_header_on_channel(
+    mam_api_t *const api, tryte_t const *const ch_id, mam_psk_t_set_t psks,
     mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  retcode_t ret = RC_OK;
-  mam_msg_write_context_t ctx;
-  trit_t tag[NUM_TRITS_TAG];
+  return mam_api_bundle_write_header(api, ch_id, NULL, NULL, NULL, psks,
+                                     ntru_pks, msg_type_id, bundle, msg_id);
+}
 
-  if (api == NULL || ch == NULL || bundle == NULL || msg_id == NULL) {
-    return RC_NULL_PARAM;
-  }
+retcode_t mam_api_bundle_write_header_on_endpoint(
+    mam_api_t *const api, tryte_t const *const ch_id,
+    tryte_t const *const ep_id, mam_psk_t_set_t psks,
+    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    bundle_transactions_t *const bundle, trit_t *const msg_id) {
+  return mam_api_bundle_write_header(api, ch_id, ep_id, NULL, NULL, psks,
+                                     ntru_pks, msg_type_id, bundle, msg_id);
+}
 
-  if (bundle_transactions_size(bundle) != 0) {
-    return RC_MAM_BUNDLE_NOT_EMPTY;
-  }
+retcode_t mam_api_bundle_announce_new_channel(
+    mam_api_t *const api, tryte_t const *const ch_id,
+    tryte_t const *const ch1_id, mam_psk_t_set_t psks,
+    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    bundle_transactions_t *const bundle, trit_t *const msg_id) {
+  return mam_api_bundle_write_header(api, ch_id, NULL, ch1_id, NULL, psks,
+                                     ntru_pks, msg_type_id, bundle, msg_id);
+}
 
-  // TODO add a random part
-  {
-    trits_t msg_id_parts[] = {mam_channel_name(ch), mam_channel_msg_ord(ch)};
-
-    mam_spongos_hashn(&ctx.spongos, 2, msg_id_parts,
-                      trits_from_rep(MAM_MSG_ID_SIZE, msg_id));
-    add_assign(ch->msg_ord, MAM_CHANNEL_MSG_ORD_SIZE, 1);
-    mam_api_tag(tag, msg_id, 0);
-  }
-
-  {
-    trits_t header = trits_null();
-    size_t header_size = 0;
-
-    header_size = mam_msg_header_size(ch, ep, ch1, ep1, psks, ntru_pks);
-    if (trits_is_null(header = trits_alloc(header_size))) {
-      return RC_OOM;
-    }
-    ERR_BIND_RETURN(
-        mam_msg_write_header(&ctx, &api->prng, ch, ep, ch1, ep1,
-                             trits_from_rep(MAM_MSG_ID_SIZE, msg_id),
-                             msg_type_id, psks, ntru_pks, &header),
-        ret);
-    header = trits_pickup(header, header_size);
-    mam_api_bundle_wrap(bundle, trits_begin(mam_channel_id(ch)), tag, header);
-    trits_free(header);
-  }
-
-  memcpy(ctx.chid, trits_begin(mam_channel_id(ch)), MAM_CHANNEL_ID_SIZE);
-  ctx.ord = 1;
-  if (ch1) {
-    ctx.mss = &ch1->mss;
-  } else if (ep1) {
-    ctx.mss = &ep1->mss;
-  } else if (ep) {
-    ctx.mss = &ep->mss;
-  } else if (ch) {
-    ctx.mss = &ch->mss;
-  }
-
-  return trit_t_to_mam_msg_write_context_t_map_add(&api->write_ctxs, msg_id,
-                                                   ctx);
+retcode_t mam_api_bundle_announce_new_endpoint(
+    mam_api_t *const api, tryte_t const *const ch_id,
+    tryte_t const *const ep1_id, mam_psk_t_set_t psks,
+    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    bundle_transactions_t *const bundle, trit_t *const msg_id) {
+  return mam_api_bundle_write_header(api, ch_id, NULL, NULL, ep1_id, psks,
+                                     ntru_pks, msg_type_id, bundle, msg_id);
 }
 
 retcode_t mam_api_bundle_write_packet(
@@ -402,7 +478,7 @@ retcode_t mam_api_bundle_write_packet(
     ERR_BIND_RETURN(mam_msg_write_packet(ctx, checksum, payload_trits, &packet),
                     ret);
     packet = trits_pickup(packet, packet_size);
-    mam_api_tag(tag, msg_id, ctx->ord);
+    mam_api_write_tag(tag, msg_id, ctx->ord);
 
     if (!is_last_packet) {
       ctx->ord++;
@@ -420,40 +496,6 @@ retcode_t mam_api_bundle_write_packet(
   }
 
   return RC_OK;
-}
-
-static retcode_t mam_api_bundle_read_packet_from_msg(
-    mam_api_t *const api, mam_msg_read_context_t *ctx, trits_t msg,
-    tryte_t **const payload, size_t *const payload_size,
-    bool *const is_last_packet) {
-  retcode_t ret = RC_OK;
-  trits_t payload_trits = trits_null();
-
-  *is_last_packet = false;
-
-  {
-    mam_msg_read_context_t rollback_ctx = *ctx;
-
-    if ((ret = mam_msg_read_packet(ctx, &msg, &payload_trits)) != RC_OK) {
-      *ctx = rollback_ctx;
-      return ret;
-    }
-  }
-
-  *payload_size = trits_size(payload_trits) / 3;
-  *payload = malloc(*payload_size * sizeof(tryte_t));
-  trits_to_trytes(payload_trits.p, *payload, *payload_size * 3);
-  trits_free(payload_trits);
-
-  // negative ord means it's the last packet, so no need to increment in that
-  // case
-  if (ctx->ord >= 0) {
-    ctx->ord++;
-  } else {
-    *is_last_packet = true;
-  }
-
-  return ret;
 }
 
 retcode_t mam_api_bundle_read(mam_api_t *const api,
@@ -710,14 +752,14 @@ retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api) {
   mam_endpoint_t_set_entry_t *endpoint_entry = NULL;
   mam_endpoint_t_set_entry_t *tmp_endpoint_entry = NULL;
 
-  HASH_ITER(hh, api->write_ctxs.map, curr_ctx_entry, tmp_ctx_entry) {
-    HASH_ITER(hh, api->channels, curr_channel_entry, tmp_channel_entry) {
+  SET_ITER(api->write_ctxs.map, curr_ctx_entry, tmp_ctx_entry) {
+    SET_ITER(api->channels, curr_channel_entry, tmp_channel_entry) {
       if (memcmp(curr_channel_entry->value.mss.root,
                  curr_ctx_entry->value.mss_root, MAM_CHANNEL_ID_SIZE) == 0) {
         curr_ctx_entry->value.mss = &curr_channel_entry->value.mss;
       } else {
-        HASH_ITER(hh, curr_channel_entry->value.endpoints, endpoint_entry,
-                  tmp_endpoint_entry) {
+        SET_ITER(curr_channel_entry->value.endpoints, endpoint_entry,
+                 tmp_endpoint_entry) {
           if (memcmp(endpoint_entry->value.mss.root,
                      curr_ctx_entry->value.mss_root,
                      MAM_ENDPOINT_ID_SIZE) == 0) {
@@ -821,36 +863,4 @@ done:
   fclose(file);
 
   return ret;
-}
-
-retcode_t mam_api_bundle_write_header_on_channel(
-    mam_api_t *const api, mam_channel_t *const ch, mam_psk_t_set_t psks,
-    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-    bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  return mam_api_bundle_write_header(api, ch, NULL, NULL, NULL, psks, ntru_pks,
-                                     msg_type_id, bundle, msg_id);
-}
-
-retcode_t mam_api_bundle_write_header_on_endpoint(
-    mam_api_t *const api, mam_channel_t *const ch, mam_endpoint_t *const ep,
-    mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-    bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  return mam_api_bundle_write_header(api, ch, ep, NULL, NULL, psks, ntru_pks,
-                                     msg_type_id, bundle, msg_id);
-}
-
-retcode_t mam_api_bundle_announce_new_channel(
-    mam_api_t *const api, mam_channel_t *const ch, mam_channel_t *const ep1,
-    mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-    bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  return mam_api_bundle_write_header(api, ch, NULL, ep1, NULL, psks, ntru_pks,
-                                     msg_type_id, bundle, msg_id);
-}
-
-retcode_t mam_api_bundle_announce_new_endpoint(
-    mam_api_t *const api, mam_channel_t *const ch, mam_endpoint_t *const ep1,
-    mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-    bundle_transactions_t *const bundle, trit_t *const msg_id) {
-  return mam_api_bundle_write_header(api, ch, NULL, NULL, ep1, psks, ntru_pks,
-                                     msg_type_id, bundle, msg_id);
 }

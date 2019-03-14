@@ -70,8 +70,10 @@ retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t *const endpoints) {
     return RC_OK;
   }
 
-  SET_ITER(*endpoints, entry, tmp) { mam_endpoint_destroy(&entry->value); }
-  mam_endpoint_t_set_free(endpoints);
+  SET_ITER(*endpoints, entry, tmp) {
+    mam_endpoint_destroy(&entry->value);
+    mam_endpoint_t_set_remove_entry(endpoints, entry);
+  }
 
   return RC_OK;
 }

@@ -76,8 +76,10 @@ retcode_t mam_channels_destroy(mam_channel_t_set_t *const channels) {
     return RC_OK;
   }
 
-  SET_ITER(*channels, entry, tmp) { mam_channel_destroy(&entry->value); }
-  mam_channel_t_set_free(channels);
+  SET_ITER(*channels, entry, tmp) {
+    mam_channel_destroy(&entry->value);
+    mam_channel_t_set_remove_entry(channels, entry);
+  }
 
   return RC_OK;
 }
