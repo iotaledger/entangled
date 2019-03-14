@@ -124,7 +124,7 @@ static trits_t message_test_generic_write_first_packet(
 
 static void message_test_generic_read_msg(
     mam_psk_t const *const pre_shared_key, mam_ntru_sk_t const *const ntru,
-    mam_channel_t *const cha, trits_t *const msg,
+    mam_channel_t *const cha, mam_endpoint_t *const ep, trits_t *const msg,
     mam_msg_read_context_t *const cfg_msg_read, trits_t msg_id) {
   retcode_t e = RC_MAM_INTERNAL_ERROR;
 
@@ -132,16 +132,27 @@ static void message_test_generic_read_msg(
   mam_msg_read_context_t *cfg = cfg_msg_read;
   mam_psk_t_set_t psks = NULL;
   mam_ntru_sk_t_set_t ntru_sks = NULL;
+  mam_pk_t_set_t trusted_channel_ids = NULL;
+  mam_pk_t_set_t trusted_endpoint_ids = NULL;
 
   TEST_ASSERT(mam_psk_t_set_add(&psks, pre_shared_key) == RC_OK);
   TEST_ASSERT(mam_ntru_sk_t_set_add(&ntru_sks, ntru) == RC_OK);
+  TEST_ASSERT(mam_pk_t_set_add(&trusted_channel_ids,
+                               trits_begin(mam_channel_id(cha))) == RC_OK);
+  if (ep) {
+    TEST_ASSERT(mam_pk_t_set_add(&trusted_endpoint_ids,
+                                 trits_begin(mam_endpoint_id(ep))) == RC_OK);
+  }
 
   trits_copy(mam_channel_id(cha), trits_from_rep(MAM_CHANNEL_ID_SIZE, cfg->pk));
 
-  e = mam_msg_read_header(cfg_msg_read, msg, psks, ntru_sks, msg_id);
+  e = mam_msg_read_header(cfg_msg_read, msg, psks, ntru_sks, msg_id,
+                          &trusted_channel_ids, &trusted_endpoint_ids);
 
   TEST_ASSERT(RC_OK == e);
   TEST_ASSERT(trits_is_empty(*msg));
+  mam_pk_t_set_free(&trusted_channel_ids);
+  mam_pk_t_set_free(&trusted_endpoint_ids);
 
   mam_ntru_sk_t_set_free(&ntru_sks);
   mam_psk_t_set_free(&psks);
@@ -268,6 +279,8 @@ static void message_test_generic(mam_prng_t *prng_sender,
   msg_id = MAM_TRITS_INIT(msg_id, MAM_MSG_ID_SIZE);
   trits_from_str(msg_id, "SENDERMSGIDAAAAASENDERMSGID");
 
+  mam_endpoint_t *curr_ep;
+
   /* chid=0, epid=1, chid1=2, epid1=3*/
   for (pubkey = 0; (int)pubkey < 4; ++pubkey) {
     /* public=0, psk=1, ntru=2 */
@@ -288,10 +301,16 @@ static void message_test_generic(mam_prng_t *prng_sender,
               pubkey, checksum, cha, epa, ch1a, ep1a, &write_ctx, payload_str);
         }
 
+        if (pubkey == mam_msg_pubkey_epid) {
+          curr_ep = epa;
+        } else {
+          curr_ep = NULL;
+        }
+
         /* read msg and packet */
         {
-          message_test_generic_read_msg(&pskb, ntru, cha, &msg, cfg_msg_read,
-                                        msg_id);
+          message_test_generic_read_msg(&pskb, ntru, cha, curr_ep, &msg,
+                                        cfg_msg_read, msg_id);
 
           message_test_generic_read_packet(cfg_msg_read, &packet, &payload);
           TEST_ASSERT(trits_cmp_eq_str(payload, payload_str));

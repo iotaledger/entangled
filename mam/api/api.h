@@ -34,6 +34,8 @@ typedef struct mam_api_s {
   trit_t_to_mam_msg_read_context_t_map_t read_ctxs;
   mam_channel_t_set_t channels;
   trint18_t channel_ord;
+  mam_pk_t_set_t trusted_channel_ids;
+  mam_pk_t_set_t trusted_endpoint_ids;
 } mam_api_t;
 
 /**
@@ -54,6 +56,28 @@ retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed);
  * @return return code
  */
 retcode_t mam_api_destroy(mam_api_t *const api);
+
+/**
+ * Add a trusted channel id into the api's trusted channels set
+ *
+ * @param api - The API [in,out]
+ * @param pk - A new public key [in]
+ *
+ * @return return code
+ */
+retcode_t mam_api_add_trusted_channel_pk(mam_api_t *const api,
+                                         tryte_t const *const pk);
+
+/**
+ * Add a trusted endpoint id into the api's trusted endpoints set
+ *
+ * @param api - The API [in,out]
+ * @param pk - A new public key [in]
+ *
+ * @return return code
+ */
+retcode_t mam_api_add_trusted_endpoint_pk(mam_api_t *const api,
+                                          tryte_t const *const pk);
 
 /**
  * Add a NTRU secret key to api's NTRU sks set

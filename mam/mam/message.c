@@ -713,7 +713,9 @@ retcode_t mam_msg_write_packet(mam_msg_write_context_t *const ctx,
 retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx,
                               trits_t *const msg, mam_psk_t_set_t const psks,
                               mam_ntru_sk_t_set_t const ntru_sks,
-                              trits_t msg_id) {
+                              trits_t msg_id,
+                              mam_pk_t_set_t *const trusted_channels_pks,
+                              mam_pk_t_set_t *const trusted_endpoints_pks) {
   retcode_t ret;
 
   MAM_ASSERT(ctx);
@@ -734,6 +736,10 @@ retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx,
                                trits_from_rep(MAM_CHANNEL_ID_SIZE, chid)),
         ret);
     ERR_GUARD_RETURN(0 == ver, RC_MAM_VERSION_NOT_SUPPORTED);
+
+    if (!mam_pk_t_set_contains(trusted_channels_pks, &chid)) {
+      return RC_MAM_PK_IS_NOT_TRUSTED;
+    }
   }
 
   /* unwrap Endpoint */
@@ -745,30 +751,31 @@ retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx,
     ERR_GUARD_RETURN(0 <= pubkey && pubkey <= 3, RC_MAM_PB3_BAD_ONEOF);
 
     if (mam_msg_pubkey_chid1 == pubkey) { /*  SignedId chid1 = 2; */
-      /*TODO: verify chid is trusted */
       ERR_BIND_RETURN(
           mam_msg_unwrap_pubkey_chid1(
               &ctx->spongos, msg, trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk),
               &spongos_mss, &spongos_wots,
               trits_from_rep(MAM_CHANNEL_ID_SIZE, chid)),
           ret);
-      /*TODO: record new channel/endpoint */
+      mam_pk_t_set_add(trusted_channels_pks, ctx->pk);
     } else if (mam_msg_pubkey_epid1 == pubkey) { /*  SignedId epid1 = 3; */
 
-      /*TODO: verify chid is trusted */
       ERR_BIND_RETURN(
           mam_msg_unwrap_pubkey_epid1(
               &ctx->spongos, msg, trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk),
               &spongos_mss, &spongos_wots,
               trits_from_rep(MAM_CHANNEL_ID_SIZE, chid)),
           ret);
-      /*TODO: record new channel/endpoint */
+      mam_pk_t_set_add(trusted_endpoints_pks, ctx->pk);
     } else if (mam_msg_pubkey_epid ==
                pubkey) { /*  absorb tryte epid[81] = 1; */
       ERR_BIND_RETURN(
           mam_msg_unwrap_pubkey_epid(
               &ctx->spongos, msg, trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->pk)),
           ret);
+      if (!mam_pk_t_set_contains(trusted_endpoints_pks, &ctx->pk)) {
+        return RC_MAM_PK_IS_NOT_TRUSTED;
+      }
     } else if (mam_msg_pubkey_chid == pubkey) { /*  absorb null chid = 0; */
       ERR_BIND_RETURN(mam_msg_unwrap_pubkey_chid(&ctx->spongos, msg), ret);
     } else
