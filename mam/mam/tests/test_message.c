@@ -159,7 +159,7 @@ static void message_test_generic_read_msg(
 }
 
 static void message_test_generic_read_packet(mam_msg_read_context_t *const ctx,
-                                             trits_t const *const packet,
+                                             trits_t *const packet,
                                              trits_t *const payload) {
   retcode_t e = RC_MAM_INTERNAL_ERROR;
   ctx->ord = 0;

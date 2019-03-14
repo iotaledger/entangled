@@ -25,7 +25,7 @@ trits_t mam_channel_msg_ord(mam_channel_t const *const channel) {
   return trits_from_rep(MAM_CHANNEL_MSG_ORD_SIZE, channel->msg_ord);
 }
 
-retcode_t mam_channel_create(mam_prng_t const *const prng,
+retcode_t mam_channel_create(mam_prng_t *const prng,
                              mss_mt_height_t const height,
                              trits_t const channel_name,
                              mam_channel_t *const channel) {

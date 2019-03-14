@@ -20,6 +20,7 @@
 #include "mam/pb3/pb3.h"
 #include "mam/prng/prng.h"
 #include "mam/psk/mam_psk_t_set.h"
+#include "utils/memset_safe.h"
 #include "utils/time.h"
 
 /*
@@ -60,7 +61,7 @@ static void mam_api_bundle_wrap(bundle_transactions_t *const bundle,
 }
 
 static trits_t mam_api_bundle_unwrap(bundle_transactions_t const *const bundle,
-                                     trit_t const *msg_trits,
+                                     trit_t *const msg_trits,
                                      size_t num_trits_in_bundle,
                                      size_t start_index) {
   iota_transaction_t *curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
@@ -450,10 +451,13 @@ retcode_t mam_api_bundle_announce_new_endpoint(
                                      ntru_pks, msg_type_id, bundle, msg_id);
 }
 
-retcode_t mam_api_bundle_write_packet(
-    mam_api_t *const api, trit_t *const msg_id, tryte_t const *const payload,
-    size_t const payload_size, mam_msg_checksum_t checksum, bool is_last_packet,
-    bundle_transactions_t *const bundle) {
+retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
+                                      trit_t const *const msg_id,
+                                      tryte_t const *const payload,
+                                      size_t const payload_size,
+                                      mam_msg_checksum_t checksum,
+                                      bool is_last_packet,
+                                      bundle_transactions_t *const bundle) {
   retcode_t ret;
   mam_msg_write_context_t *ctx = NULL;
   trit_t_to_mam_msg_write_context_t_map_entry_t *entry = NULL;
@@ -475,7 +479,7 @@ retcode_t mam_api_bundle_write_packet(
     size_t packet_size = 0;
     MAM_TRITS_DEF0(payload_trits, payload_size * 3);
     payload_trits = MAM_TRITS_INIT(payload_trits, payload_size * 3);
-    trits_from_str(payload_trits, payload);
+    trits_from_str(payload_trits, (char const *)payload);
 
     packet_size = mam_msg_packet_size(checksum, ctx->mss, payload_size * 3);
     if (trits_is_null(packet = trits_alloc(packet_size))) {
@@ -768,8 +772,7 @@ size_t mam_api_serialized_size(mam_api_t const *const api) {
 }
 
 void mam_api_serialize(mam_api_t const *const api, trits_t *const buffer) {
-  mam_prng_serialize(&api->prng, *buffer);
-  trits_advance(buffer, mam_prng_serialized_size());
+  mam_prng_serialize(&api->prng, buffer);
   mam_ntru_sks_serialize(api->ntru_sks, buffer);
   mam_ntru_pks_serialize(api->ntru_pks, buffer);
   mam_psks_serialize(api->psks, buffer);
@@ -796,8 +799,7 @@ retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api) {
   trit_t_to_mam_msg_write_context_t_map_init(&api->write_ctxs, MAM_MSG_ID_SIZE);
   trit_t_to_mam_msg_read_context_t_map_init(&api->read_ctxs, MAM_MSG_ID_SIZE);
 
-  mam_prng_deserialize(*buffer, &api->prng);
-  trits_advance(buffer, mam_prng_serialized_size());
+  mam_prng_deserialize(buffer, &api->prng);
   ERR_BIND_RETURN(mam_ntru_sks_deserialize(buffer, &api->ntru_sks), ret);
   ERR_BIND_RETURN(mam_ntru_pks_deserialize(buffer, &api->ntru_pks), ret);
   ERR_BIND_RETURN(mam_psks_deserialize(buffer, &api->psks), ret);

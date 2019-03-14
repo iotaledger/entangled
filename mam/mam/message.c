@@ -14,6 +14,7 @@
 #include "mam/mam/message.h"
 #include "mam/ntru/mam_ntru_sk_t_set.h"
 #include "mam/pb3/pb3.h"
+#include "utils/memset_safe.h"
 
 /* MAC, MSSig, SignedId */
 
