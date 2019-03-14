@@ -9,7 +9,7 @@
 
 void test_get_neighbors_serialize_request(void) {
   serializer_t serializer;
-  const char* json_text = "{\"command\":\"getNeighbors\"}";
+  char const* json_text = "{\"command\":\"getNeighbors\"}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
@@ -27,7 +27,7 @@ void test_get_neighbors_serialize_response(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
   char_buffer_t* out = char_buffer_new();
-  const char* TEST_JSON_TEXT =
+  char const * TEST_JSON_TEXT =
       "{\"neighbors\":[{"
       "\"address\":\"" TEST_NEIGHBORS_NEIGHBOR1
       "\",\"numberOfAllTransactions\":" STR(TEST_NEIGHBORS_NUMALLTX1)
@@ -64,7 +64,7 @@ void test_get_neighbors_serialize_response(void) {
 void test_get_neighbors_deserialize_response(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
-  const char* json_text =
+  char const * json_text =
       "{\"duration\":37,\"neighbors\":[{"
       "\"address\":\"" TEST_NEIGHBORS_NEIGHBOR1
       "\",\"numberOfAllTransactions\":" STR(TEST_NEIGHBORS_NUMALLTX1)

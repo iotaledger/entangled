@@ -9,9 +9,9 @@
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
-retcode_t neighbor_info_utarray_to_json_array(UT_array const *const ut,
-                                              cJSON *const json_root,
-                                              char const *const obj_name) {
+static retcode_t neighbor_info_utarray_to_json_array(
+    UT_array const *const ut, cJSON *const json_root,
+    char const *const obj_name) {
   if (!ut) {
     return RC_NULL_PARAM;
   }
@@ -46,7 +46,7 @@ retcode_t neighbor_info_utarray_to_json_array(UT_array const *const ut,
 retcode_t json_get_neighbors_serialize_request(serializer_t const *const s,
                                                char_buffer_t *out) {
   retcode_t ret = RC_OK;
-  const char *req_text = "{\"command\":\"getNeighbors\"}";
+  char const *req_text = "{\"command\":\"getNeighbors\"}";
   log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
 
   ret = char_buffer_set(out, req_text);
@@ -57,7 +57,7 @@ retcode_t json_get_neighbors_serialize_response(
     serializer_t const *const s, get_neighbors_res_t const *const obj,
     char_buffer_t *out) {
   retcode_t ret = RC_OK;
-  const char *json_text = NULL;
+  char const *json_text = NULL;
 
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
