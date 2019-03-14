@@ -148,8 +148,7 @@ retcode_t mam_msg_write_packet(mam_msg_write_context_t *const ctx,
  * @return return error code
  */
 retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx,
-                              trits_t const *const msg,
-                              mam_psk_t_set_t const psks,
+                              trits_t *const msg, mam_psk_t_set_t const psks,
                               mam_ntru_sk_t_set_t const ntru_sks,
                               trits_t msg_id);
 
@@ -163,8 +162,7 @@ retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx,
  * @return return error code
  */
 retcode_t mam_msg_read_packet(mam_msg_read_context_t *const ctx,
-                              trits_t const *const buffer,
-                              trits_t *const payload);
+                              trits_t *const buffer, trits_t *const payload);
 
 /**
  * Gets the size for serialization of mam_msg_write_context_t
