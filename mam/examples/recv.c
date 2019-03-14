@@ -19,7 +19,6 @@ int main(int ac, char **av) {
   size_t payload_size = 0;
   bundle_transactions_t *bundle = NULL;
   bundle_transactions_new(&bundle);
-  mam_pk_t chid;
   bool is_last_packet;
 
   if (ac < 4 || ac > 5) {
@@ -39,9 +38,7 @@ int main(int ac, char **av) {
 
   mam_psk_t_set_add(&api.psks, &psk);
   if (ac == 5) {
-    trytes_to_trits((tryte_t *)av[4], chid.pk,
-                    MAM_CHANNEL_ID_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
-    mam_pk_t_set_add(&api.trusted_channel_ids, &chid);
+    mam_api_add_trusted_channel_pk(&api, av[4]);
   }
 
   if (mam_api_bundle_read(&api, bundle, &payload_trytes, &payload_size,

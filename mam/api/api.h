@@ -58,6 +58,28 @@ retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed);
 retcode_t mam_api_destroy(mam_api_t *const api);
 
 /**
+ * Add a trusted channel id into the api's trusted channels set
+ *
+ * @param api - The API [in,out]
+ * @param pk - A new public key [in]
+ *
+ * @return return code
+ */
+retcode_t mam_api_add_trusted_channel_pk(mam_api_t *const api,
+                                         tryte_t const *const pk);
+
+/**
+ * Add a trusted endpoint id into the api's trusted endpoints set
+ *
+ * @param api - The API [in,out]
+ * @param pk - A new public key [in]
+ *
+ * @return return code
+ */
+retcode_t mam_api_add_trusted_endpoint_pk(mam_api_t *const api,
+                                          tryte_t const *const pk);
+
+/**
  * Add a NTRU secret key to api's NTRU sks set
  *
  * @param api - The API [in,out]

@@ -62,8 +62,6 @@ typedef struct mam_msg_write_context_s {
 typedef struct mam_msg_read_context_s {
   mam_spongos_t spongos; /*!< Main Spongos interface */
   trit_t pk[MAM_CHANNEL_ID_SIZE];
-  /*TODO: check for trusted chid/epid*/
-  /*TODO: handle (add to trusted list) new chid1*/
   trint18_t ord; /*!< Packet ordinal number. */
 } mam_msg_read_context_t;
 
@@ -146,7 +144,7 @@ retcode_t mam_msg_write_packet(mam_msg_write_context_t *const ctx,
  * @param ntru_sks - The set of the NTRU secret keys[in]
  * @param msg_id - The msg_id[out]
  * @param trusted_channels_pks - The set of trusted channels pks [in, out]
- * @param trusted_endpoint_pks - The set of trusted endpoint pks [in, out]
+ * @param trusted_endpoints_pks - The set of trusted endpoint pks [in, out]
  *
  * @return return error code
  */
@@ -155,7 +153,7 @@ retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx,
                               mam_ntru_sk_t_set_t const ntru_sks,
                               trits_t msg_id,
                               mam_pk_t_set_t *const trusted_channels_pks,
-                              mam_pk_t_set_t *const trusted_endpoint_pks);
+                              mam_pk_t_set_t *const trusted_endpoints_pks);
 
 /**
  * Reads a packet

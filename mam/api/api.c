@@ -375,8 +375,8 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
     mam_endpoint_destroy(&endpoint);
     return ret;
   }
-  ERR_BIND_RETURN(mam_pk_t_set_add(&api->trusted_channel_ids,
-                                   trits_begin(mam_channel_id(&channel))),
+  ERR_BIND_RETURN(mam_pk_t_set_add(&api->trusted_endpoint_ids,
+                                   trits_begin(mam_endpoint_id(&endpoint))),
                   ret);
   trits_to_trytes(trits_begin(mam_endpoint_id(&endpoint)), endpoint_id,
                   MAM_ENDPOINT_ID_SIZE);
@@ -930,4 +930,20 @@ done:
   fclose(file);
 
   return ret;
+}
+
+retcode_t mam_api_add_trusted_channel_pk(mam_api_t *const api,
+                                         tryte_t const *const pk) {
+  mam_pk_t chid;
+  trytes_to_trits(pk, chid.pk,
+                  MAM_CHANNEL_ID_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
+  mam_pk_t_set_add(&api->trusted_channel_ids, &chid);
+}
+
+retcode_t mam_api_add_trusted_endpoint_pk(mam_api_t *const api,
+                                          tryte_t const *const pk) {
+  mam_pk_t epid;
+  trytes_to_trits(pk, epid.pk,
+                  MAM_CHANNEL_ID_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
+  mam_pk_t_set_add(&api->trusted_endpoint_ids, &epid);
 }
