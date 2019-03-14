@@ -53,8 +53,10 @@ static void test_prng_serialization(void) {
 
   trits_t trits = trits_alloc(size);
 
-  mam_prng_serialize(&prng1, trits);
-  TEST_ASSERT(mam_prng_deserialize(trits, &prng2) == RC_OK);
+  mam_prng_serialize(&prng1, &trits);
+  trits = trits_pickup_all(trits);
+
+  TEST_ASSERT(mam_prng_deserialize(&trits, &prng2) == RC_OK);
 
   TEST_ASSERT_EQUAL_MEMORY(prng1.secret_key, prng2.secret_key,
                            MAM_PRNG_KEY_SIZE);
