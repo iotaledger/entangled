@@ -143,7 +143,7 @@ static retcode_t mam_api_bundle_write_header(
     mam_spongos_hashn(&ctx.spongos, 2, msg_id_parts,
                       trits_from_rep(MAM_MSG_ID_SIZE, msg_id));
     add_assign(ch->msg_ord, MAM_CHANNEL_MSG_ORD_SIZE, 1);
-    mam_api_tag(tag, msg_id, 0);
+    mam_api_write_tag(tag, msg_id, 0);
   }
 
   {
@@ -398,8 +398,8 @@ mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api,
   return NULL;
 }
 
-void mam_api_tag(trit_t *const tag, trit_t const *const msg_id,
-                 trint18_t const ord) {
+void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id,
+                       trint18_t const ord) {
   memcpy(tag, msg_id, MAM_MSG_ID_SIZE);
   trits_put18(trits_from_rep(18, tag + MAM_MSG_ID_SIZE), ord);
 }
@@ -478,7 +478,7 @@ retcode_t mam_api_bundle_write_packet(
     ERR_BIND_RETURN(mam_msg_write_packet(ctx, checksum, payload_trits, &packet),
                     ret);
     packet = trits_pickup(packet, packet_size);
-    mam_api_tag(tag, msg_id, ctx->ord);
+    mam_api_write_tag(tag, msg_id, ctx->ord);
 
     if (!is_last_packet) {
       ctx->ord++;
