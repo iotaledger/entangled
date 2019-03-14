@@ -22,7 +22,7 @@ int main(int ac, char **av) {
   mam_pk_t chid;
   bool is_last_packet;
 
-  if (ac < 4) {
+  if (ac < 4 || ac > 5) {
     fprintf(stderr, "usage: recv <host> <port> <bundle> <chid> (optional)\n");
     return EXIT_FAILURE;
   }
