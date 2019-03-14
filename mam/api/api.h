@@ -18,7 +18,7 @@
 #include "mam/api/trit_t_to_mam_msg_write_context_t_map.h"
 #include "mam/mam/message.h"
 #include "mam/ntru/ntru_types.h"
-#include "mam/prng/prng_types.h"
+#include "mam/prng/prng.h"
 #include "mam/psk/psk.h"
 
 #ifdef __cplusplus

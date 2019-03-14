@@ -11,8 +11,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mam/prng/mam_prng_t_set.h"
+#include "mam/pb3/pb3.h"
 #include "mam/prng/prng.h"
+#include "mam/sponge/sponge.h"
+#include "utils/memset_safe.h"
 
 void mam_prng_init(mam_prng_t *const prng, trits_t const secret_key) {
   MAM_ASSERT(trits_size(secret_key) == MAM_PRNG_KEY_SIZE);
@@ -54,4 +56,16 @@ void mam_prng_gen3(mam_prng_t const *const prng,
   mam_sponge_init(&sponge);
   mam_sponge_absorbn(&sponge, MAM_SPONGE_CTL_KEY, 5, KdN);
   mam_sponge_squeeze(&sponge, MAM_SPONGE_CTL_PRN, output);
+}
+
+size_t mam_prng_serialized_size() { return MAM_PRNG_KEY_SIZE; }
+
+void mam_prng_serialize(mam_prng_t const *const prng, trits_t trits) {
+  pb3_encode_ntrytes(trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key),
+                     &trits);
+}
+
+retcode_t mam_prng_deserialize(trits_t const trits, mam_prng_t *const prng) {
+  return pb3_decode_ntrytes(trits_from_rep(MAM_PRNG_KEY_SIZE, prng->secret_key),
+                            &trits);
 }
