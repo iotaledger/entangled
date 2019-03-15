@@ -338,9 +338,10 @@ retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height,
     return ret;
   }
 
-  ERR_BIND_RETURN(mam_pk_t_set_add(&api->trusted_channel_ids,
-                                   trits_begin(mam_channel_id(&channel))),
-                  ret);
+  ERR_BIND_RETURN(
+      mam_pk_t_set_add(&api->trusted_channel_ids,
+                       (mam_pk_t *)trits_begin(mam_channel_id(&channel))),
+      ret);
   trits_to_trytes(trits_begin(mam_channel_id(&channel)), channel_id,
                   MAM_CHANNEL_ID_SIZE);
   api->channel_ord++;
@@ -396,9 +397,10 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
     mam_endpoint_destroy(&endpoint);
     return ret;
   }
-  ERR_BIND_RETURN(mam_pk_t_set_add(&api->trusted_endpoint_ids,
-                                   trits_begin(mam_endpoint_id(&endpoint))),
-                  ret);
+  ERR_BIND_RETURN(
+      mam_pk_t_set_add(&api->trusted_endpoint_ids,
+                       (mam_pk_t *)trits_begin(mam_endpoint_id(&endpoint))),
+      ret);
   trits_to_trytes(trits_begin(mam_endpoint_id(&endpoint)), endpoint_id,
                   MAM_ENDPOINT_ID_SIZE);
   channel->endpoint_ord++;
