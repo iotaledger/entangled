@@ -736,9 +736,10 @@ retcode_t mam_api_read_ctx_map_deserialize(
   return RC_OK;
 }
 
-static size_t mam_pks_serialized_size(mam_pk_t_set_t *const pks) {
-  return pb3_sizeof_size_t(mam_pk_t_set_size(pks)) +
-         mam_pk_t_set_size(pks) * (MAM_CHANNEL_ID_SIZE);
+static size_t mam_pks_serialized_size(mam_pk_t_set_t const pks) {
+  size_t pks_size = mam_pk_t_set_size(pks);
+
+  return pb3_sizeof_size_t(pks_size) + pks_size * MAM_CHANNEL_ID_SIZE;
 }
 
 static retcode_t mam_pks_serialize(mam_pk_t_set_t const pks,
