@@ -276,6 +276,26 @@ retcode_t mam_api_destroy(mam_api_t *const api) {
   return ret;
 }
 
+retcode_t mam_api_add_trusted_channel_pk(mam_api_t *const api,
+                                         tryte_t const *const pk) {
+  mam_pk_t chid;
+
+  trytes_to_trits(pk, chid.pk,
+                  MAM_CHANNEL_ID_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
+
+  return mam_pk_t_set_add(&api->trusted_channel_ids, &chid);
+}
+
+retcode_t mam_api_add_trusted_endpoint_pk(mam_api_t *const api,
+                                          tryte_t const *const pk) {
+  mam_pk_t epid;
+
+  trytes_to_trits(pk, epid.pk,
+                  MAM_CHANNEL_ID_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
+
+  return mam_pk_t_set_add(&api->trusted_endpoint_ids, &epid);
+}
+
 retcode_t mam_api_add_ntru_sk(mam_api_t *const api,
                               mam_ntru_sk_t const *const ntru_sk) {
   if (api == NULL || ntru_sk == NULL) {
@@ -932,20 +952,4 @@ done:
   fclose(file);
 
   return ret;
-}
-
-retcode_t mam_api_add_trusted_channel_pk(mam_api_t *const api,
-                                         tryte_t const *const pk) {
-  mam_pk_t chid;
-  trytes_to_trits(pk, chid.pk,
-                  MAM_CHANNEL_ID_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
-  mam_pk_t_set_add(&api->trusted_channel_ids, &chid);
-}
-
-retcode_t mam_api_add_trusted_endpoint_pk(mam_api_t *const api,
-                                          tryte_t const *const pk) {
-  mam_pk_t epid;
-  trytes_to_trits(pk, epid.pk,
-                  MAM_CHANNEL_ID_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
-  mam_pk_t_set_add(&api->trusted_endpoint_ids, &epid);
 }
