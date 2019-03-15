@@ -25,7 +25,7 @@ trits_t mam_endpoint_name(mam_endpoint_t const *const endpoint) {
   return endpoint->name;
 }
 
-retcode_t mam_endpoint_create(mam_prng_t const *const prng,
+retcode_t mam_endpoint_create(mam_prng_t *const prng,
                               mss_mt_height_t const height,
                               trits_t const channel_name,
                               trits_t const endpoint_name,
@@ -70,20 +70,20 @@ retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t *const endpoints) {
     return RC_OK;
   }
 
-  HASH_ITER(hh, *endpoints, entry, tmp) { mam_endpoint_destroy(&entry->value); }
-  mam_endpoint_t_set_free(endpoints);
+  SET_ITER(*endpoints, entry, tmp) {
+    mam_endpoint_destroy(&entry->value);
+    mam_endpoint_t_set_remove_entry(endpoints, entry);
+  }
 
   return RC_OK;
 }
 
 size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint) {
-  size_t mss_size = mam_mss_serialized_size(&endpoint->mss);
-
   return pb3_sizeof_size_t(trits_size(endpoint->name)) +  // name size
          pb3_sizeof_ntrytes(trits_size(endpoint->name) /
-                            NUMBER_OF_TRITS_IN_A_TRYTE) +            // name
-         pb3_sizeof_size_t(mss_size) +                               // mss size
-         pb3_sizeof_ntrytes(mss_size / NUMBER_OF_TRITS_IN_A_TRYTE);  // mss
+                            NUMBER_OF_TRITS_IN_A_TRYTE) +  // name
+         pb3_sizeof_ntrytes(mam_mss_serialized_size(&endpoint->mss) /
+                            NUMBER_OF_TRITS_IN_A_TRYTE);  // mss
 }
 
 void mam_endpoint_serialize(mam_endpoint_t const *const endpoint,
@@ -92,7 +92,6 @@ void mam_endpoint_serialize(mam_endpoint_t const *const endpoint,
 
   pb3_encode_size_t(trits_size(endpoint->name), buffer);  // name size
   pb3_encode_ntrytes(endpoint->name, buffer);             // name
-  pb3_encode_size_t(mss_size, buffer);                    // mss size
   mam_mss_serialize(&endpoint->mss, trits_take(*buffer, mss_size));  // mss
   trits_advance(buffer, mss_size);
 }
@@ -114,10 +113,6 @@ retcode_t mam_endpoint_deserialize(trits_t *const buffer,
     return RC_OOM;
   }
   if ((ret = pb3_decode_ntrytes(endpoint->name, buffer)) != RC_OK) {  // name
-    return ret;
-  }
-
-  if ((ret = pb3_decode_size_t(&size, buffer)) != RC_OK) {  // mss size
     return ret;
   }
 
@@ -148,7 +143,7 @@ size_t mam_endpoints_serialized_size(mam_endpoint_t_set_t const endpoints) {
   size_t size = pb3_sizeof_size_t(
       mam_endpoint_t_set_size(endpoints));  // endpoints number
 
-  HASH_ITER(hh, endpoints, entry, tmp) {  // endpoint
+  SET_ITER(endpoints, entry, tmp) {  // endpoint
     size += mam_endpoint_serialized_size(&entry->value);
   }
 
@@ -163,7 +158,7 @@ void mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints,
   pb3_encode_size_t(mam_endpoint_t_set_size(endpoints),
                     buffer);  // endpoints number
 
-  HASH_ITER(hh, endpoints, entry, tmp) {
+  SET_ITER(endpoints, entry, tmp) {
     mam_endpoint_serialize(&entry->value, buffer);
   }
 }

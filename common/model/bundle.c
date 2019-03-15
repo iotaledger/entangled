@@ -36,6 +36,8 @@ static retcode_t validate_signatures(bundle_transactions_t const *const bundle,
   flex_trit_t digest[FLEX_TRIT_SIZE_243];
   size_t offset = 0, next_offset = 0;
 
+  *is_valid = true;
+
   for (curr_tx = (iota_transaction_t *)utarray_eltptr(bundle, 0);
        curr_tx != NULL;) {
     if (transaction_value(curr_tx) >= 0) {
@@ -72,7 +74,6 @@ static retcode_t validate_signatures(bundle_transactions_t const *const bundle,
       break;
     }
     curr_tx = curr_inp_tx;
-    *is_valid = true;
   }
 
   return RC_OK;
