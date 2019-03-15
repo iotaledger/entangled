@@ -60,9 +60,9 @@ typedef struct mam_msg_write_context_s {
 } mam_msg_write_context_t;
 
 typedef struct mam_msg_read_context_s {
-  mam_spongos_t spongos; /*!< Main Spongos interface */
+  mam_spongos_t spongos;
   trit_t pk[MAM_CHANNEL_ID_SIZE];
-  trint18_t ord; /*!< Packet ordinal number. */
+  trint18_t ord;
 } mam_msg_read_context_t;
 
 /**

@@ -138,10 +138,12 @@ static void message_test_generic_read_msg(
   TEST_ASSERT(mam_psk_t_set_add(&psks, pre_shared_key) == RC_OK);
   TEST_ASSERT(mam_ntru_sk_t_set_add(&ntru_sks, ntru) == RC_OK);
   TEST_ASSERT(mam_pk_t_set_add(&trusted_channel_ids,
-                               trits_begin(mam_channel_id(cha))) == RC_OK);
+                               (mam_pk_t *)trits_begin(mam_channel_id(cha))) ==
+              RC_OK);
   if (ep) {
-    TEST_ASSERT(mam_pk_t_set_add(&trusted_endpoint_ids,
-                                 trits_begin(mam_endpoint_id(ep))) == RC_OK);
+    TEST_ASSERT(mam_pk_t_set_add(
+                    &trusted_endpoint_ids,
+                    (mam_pk_t *)trits_begin(mam_endpoint_id(ep))) == RC_OK);
   }
 
   trits_copy(mam_channel_id(cha), trits_from_rep(MAM_CHANNEL_ID_SIZE, cfg->pk));
