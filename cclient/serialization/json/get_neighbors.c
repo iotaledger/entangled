@@ -9,20 +9,81 @@
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
-retcode_t json_get_neighbors_serialize_request(const serializer_t *const s,
+static retcode_t neighbor_info_utarray_to_json_array(
+    UT_array const *const ut, cJSON *const json_root,
+    char const *const obj_name) {
+  if (!ut) {
+    return RC_NULL_PARAM;
+  }
+  if (utarray_len(ut) > 0) {
+    cJSON *array_obj = cJSON_CreateArray();
+    if (array_obj == NULL) {
+      log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__,
+                   STR_CCLIENT_JSON_CREATE);
+      return RC_CCLIENT_JSON_CREATE;
+    }
+
+    cJSON_AddItemToObject(json_root, obj_name, array_obj);
+    neighbor_info_t *nbr_info = NULL;
+    while ((nbr_info = (neighbor_info_t *)utarray_next(ut, nbr_info))) {
+      cJSON *json_nbr_info = cJSON_CreateObject();
+
+      cJSON_AddStringToObject(json_nbr_info, "address",
+                              nbr_info->address->data);
+      cJSON_AddNumberToObject(json_nbr_info, "numberOfAllTransactions",
+                              nbr_info->all_trans_num);
+      cJSON_AddNumberToObject(json_nbr_info, "numberOfInvalidTransactions",
+                              nbr_info->invalid_trans_num);
+      cJSON_AddNumberToObject(json_nbr_info, "numberOfNewTransactions",
+                              nbr_info->new_trans_num);
+
+      cJSON_AddItemToArray(array_obj, json_nbr_info);
+    }
+  }
+  return RC_OK;
+}
+
+retcode_t json_get_neighbors_serialize_request(serializer_t const *const s,
                                                char_buffer_t *out) {
   retcode_t ret = RC_OK;
-  const char *req_text = "{\"command\":\"getNeighbors\"}";
+  char const *req_text = "{\"command\":\"getNeighbors\"}";
   log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
-  ret = char_buffer_allocate(out, strlen(req_text));
-  if (ret == RC_OK) {
-    strcpy(out->data, req_text);
-  }
+
+  ret = char_buffer_set(out, req_text);
   return ret;
 }
 
-retcode_t json_get_neighbors_deserialize_response(const serializer_t *const s,
-                                                  const char *const obj,
+retcode_t json_get_neighbors_serialize_response(
+    serializer_t const *const s, get_neighbors_res_t const *const obj,
+    char_buffer_t *out) {
+  retcode_t ret = RC_OK;
+  char const *json_text = NULL;
+
+  cJSON *json_root = cJSON_CreateObject();
+  if (json_root == NULL) {
+    log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__,
+                 STR_CCLIENT_JSON_CREATE);
+    return RC_CCLIENT_JSON_CREATE;
+  }
+
+  ret = neighbor_info_utarray_to_json_array(obj, json_root, "neighbors");
+  if (ret) {
+    goto err;
+  }
+
+  json_text = cJSON_PrintUnformatted(json_root);
+  if (json_text) {
+    ret = char_buffer_set(out, json_text);
+    cJSON_free((void *)json_text);
+  }
+
+err:
+  cJSON_Delete(json_root);
+  return ret;
+}
+
+retcode_t json_get_neighbors_deserialize_response(serializer_t const *const s,
+                                                  char const *const obj,
                                                   get_neighbors_res_t *out) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
