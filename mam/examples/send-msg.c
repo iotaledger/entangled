@@ -15,7 +15,7 @@
 int main(int ac, char **av) {
   mam_api_t api;
   bundle_transactions_t *bundle = NULL;
-  mam_channel_t *channel = NULL;
+  tryte_t channel_id[MAM_CHANNEL_ID_SIZE];
   retcode_t ret = RC_OK;
 
   if (ac != 6) {
@@ -38,7 +38,7 @@ int main(int ac, char **av) {
   }
 
   // Creating channel
-  if ((ret = mam_example_create_channel(&api, &channel)) != RC_OK) {
+  if ((ret = mam_example_create_channel(&api, channel_id)) != RC_OK) {
     fprintf(stderr, "mam_example_create_channel failed with err %d\n", ret);
     return EXIT_FAILURE;
   }
@@ -49,7 +49,7 @@ int main(int ac, char **av) {
     trit_t msg_id[MAM_MSG_ID_SIZE];
 
     // Writing header to bundle
-    if ((ret = mam_example_write_header_on_channel(&api, channel, bundle,
+    if ((ret = mam_example_write_header_on_channel(&api, channel_id, bundle,
                                                    msg_id)) != RC_OK) {
       fprintf(stderr, "mam_example_write_header failed with err %d\n", ret);
       return EXIT_FAILURE;
@@ -58,14 +58,14 @@ int main(int ac, char **av) {
     // Writing packet to bundle
     bool last_packet = strcmp(av[5], "yes") == 0;
 
-    if (mam_channel_num_remaining_sks(channel) == 0) {
-      // TODO
-      // - remove old ch
-      // - create new ch
-      // - add ch via `mam_api_add_channel`
+    // if (mam_channel_num_remaining_sks(channel) == 0) {
+    // TODO
+    // - remove old ch
+    // - create new ch
+    // - add ch via `mam_api_add_channel`
 
-      return RC_OK;
-    }
+    //   return RC_OK;
+    // }
 
     if ((ret = mam_example_write_packet(&api, bundle, av[4], msg_id,
                                         last_packet)) != RC_OK) {

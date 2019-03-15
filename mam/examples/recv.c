@@ -21,8 +21,8 @@ int main(int ac, char **av) {
   bundle_transactions_new(&bundle);
   bool is_last_packet;
 
-  if (ac != 4) {
-    fprintf(stderr, "usage: recv <host> <port> <bundle>\n");
+  if (ac < 4 || ac > 5) {
+    fprintf(stderr, "usage: recv <host> <port> <bundle> <chid> (optional)\n");
     return EXIT_FAILURE;
   }
 
@@ -37,6 +37,9 @@ int main(int ac, char **av) {
   receive_bundle(av[1], atoi(av[2]), (tryte_t *)av[3], bundle);
 
   mam_psk_t_set_add(&api.psks, &psk);
+  if (ac == 5) {
+    mam_api_add_trusted_channel_pk(&api, (tryte_t *)av[4]);
+  }
 
   if (mam_api_bundle_read(&api, bundle, &payload_trytes, &payload_size,
                           &is_last_packet) == RC_OK) {

@@ -22,17 +22,6 @@ static trits_t sponge_control_trits(mam_sponge_t const *const sponge) {
                     MAM_SPONGE_CONTROL);
 }
 
-static void sponge_set_control12(mam_sponge_t *const sponge, trit_t const c1,
-                                 trit_t const c2) {
-  trits_t t =
-      trits_take(sponge_control_trits(sponge), NUMBER_OF_TRITS_IN_A_TRYTE);
-
-  trits_drop(t, 1);
-  trits_put1(t, c1);
-  trits_drop(t, 1);
-  trits_put1(t, c2);
-}
-
 static void sponge_set_control012(mam_sponge_t *const sponge, trit_t const c0,
                                   trit_t const c1, trit_t const c2) {
   trits_t t =

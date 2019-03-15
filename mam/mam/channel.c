@@ -25,7 +25,7 @@ trits_t mam_channel_msg_ord(mam_channel_t const *const channel) {
   return trits_from_rep(MAM_CHANNEL_MSG_ORD_SIZE, channel->msg_ord);
 }
 
-retcode_t mam_channel_create(mam_prng_t const *const prng,
+retcode_t mam_channel_create(mam_prng_t *const prng,
                              mss_mt_height_t const height,
                              trits_t const channel_name,
                              mam_channel_t *const channel) {
@@ -76,8 +76,10 @@ retcode_t mam_channels_destroy(mam_channel_t_set_t *const channels) {
     return RC_OK;
   }
 
-  SET_ITER(*channels, entry, tmp) { mam_channel_destroy(&entry->value); }
-  mam_channel_t_set_free(channels);
+  SET_ITER(*channels, entry, tmp) {
+    mam_channel_destroy(&entry->value);
+    mam_channel_t_set_remove_entry(channels, entry);
+  }
 
   return RC_OK;
 }

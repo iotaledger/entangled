@@ -48,6 +48,7 @@ static serializer_vtable json_vtable = {
     .get_inclusion_state_deserialize_response =
         json_get_inclusion_state_deserialize_response,
     .get_neighbors_serialize_request = json_get_neighbors_serialize_request,
+    .get_neighbors_serialize_response = json_get_neighbors_serialize_response,
     .get_neighbors_deserialize_response =
         json_get_neighbors_deserialize_response,
     .get_node_info_serialize_request = json_get_node_info_serialize_request,

@@ -21,6 +21,7 @@ void init_kerl(Kerl* const ctx) {
   uint8_t succ =
       Keccak_HashInitialize(&ctx->keccak, 832, 768, 384, 0x01) == SUCCESS;
   assert(succ);
+  (void)succ;
 }
 
 void kerl_absorb(Kerl* const ctx, trit_t const* trits, size_t const length) {

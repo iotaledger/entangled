@@ -39,4 +39,4 @@ This command will send a header and a packet at the same time.
 
 ### Receiving
 
-`bazel run -c opt -- //mam/examples:recv <host> <port> <bundle>`
+`bazel run -c opt -- //mam/examples:recv <host> <port> <bundle> <chid> (optional)`

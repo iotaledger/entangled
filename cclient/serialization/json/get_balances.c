@@ -14,7 +14,6 @@ retcode_t json_get_balances_serialize_request(
     char_buffer_t *out) {
   retcode_t ret = RC_OK;
   const char *json_text = NULL;
-  size_t len = 0;
   log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
@@ -42,11 +41,7 @@ retcode_t json_get_balances_serialize_request(
 
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
-    len = strlen(json_text);
-    ret = char_buffer_allocate(out, len);
-    if (ret == RC_OK) {
-      strncpy(out->data, json_text, len);
-    }
+    ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
   }
 
@@ -85,11 +80,10 @@ end:
 }
 
 retcode_t json_get_balances_serialize_response(
-    serializer_t const *const s, const get_balances_res_t *const res,
+    serializer_t const *const s, get_balances_res_t const *const res,
     char_buffer_t *out) {
   retcode_t ret = RC_OK;
   const char *json_text = NULL;
-  size_t len = 0;
   log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
@@ -98,7 +92,7 @@ retcode_t json_get_balances_serialize_response(
     return RC_CCLIENT_JSON_CREATE;
   }
 
-  ret = utarray_uint64_to_json_array(res->balances, json_root, "balances");
+  ret = uint64_utarray_to_json_array(res->balances, json_root, "balances");
   if (ret != RC_OK) {
     goto err;
   }
@@ -113,11 +107,7 @@ retcode_t json_get_balances_serialize_response(
 
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
-    len = strlen(json_text);
-    ret = char_buffer_allocate(out, len);
-    if (ret == RC_OK) {
-      strncpy(out->data, json_text, len);
-    }
+    ret = char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
   }
 

@@ -40,7 +40,6 @@ static void test_psks_serialization(void) {
   trits_t trits = trits_alloc(size);
 
   TEST_ASSERT(mam_psks_serialize(psks_1, &trits) == RC_OK);
-
   trits = trits_pickup_all(trits);
 
   TEST_ASSERT(mam_psks_deserialize(&trits, &psks_2) == RC_OK);

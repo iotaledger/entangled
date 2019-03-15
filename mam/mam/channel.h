@@ -35,6 +35,10 @@ typedef struct mam_channel_s {
 typedef struct mam_channel_t_set_entry_s mam_channel_t_set_entry_t;
 typedef mam_channel_t_set_entry_t *mam_channel_t_set_t;
 
+typedef struct mam_pk_s {
+  trit_t pk[MAM_CHANNEL_ID_SIZE];
+} mam_pk_t;
+
 /**
  * Gets a channel's id
  *
@@ -73,7 +77,7 @@ trits_t mam_channel_msg_ord(mam_channel_t const *const channel);
  *
  * @return a status code
  */
-retcode_t mam_channel_create(mam_prng_t const *const prng,
+retcode_t mam_channel_create(mam_prng_t *const prng,
                              mss_mt_height_t const height,
                              trits_t const channel_name,
                              mam_channel_t *const channel);

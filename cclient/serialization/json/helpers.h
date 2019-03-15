@@ -52,7 +52,7 @@ retcode_t utarray_to_json_array(UT_array const *const ut,
                                 cJSON *const json_root,
                                 char const *const obj_name);
 
-retcode_t utarray_uint64_to_json_array(UT_array const *const ut,
+retcode_t uint64_utarray_to_json_array(UT_array const *const ut,
                                        cJSON *const json_root,
                                        char const *const obj_name);
 

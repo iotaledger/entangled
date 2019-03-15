@@ -18,7 +18,7 @@
 #include "mam/api/trit_t_to_mam_msg_write_context_t_map.h"
 #include "mam/mam/message.h"
 #include "mam/ntru/ntru_types.h"
-#include "mam/prng/prng_types.h"
+#include "mam/prng/prng.h"
 #include "mam/psk/psk.h"
 
 #ifdef __cplusplus
@@ -34,6 +34,8 @@ typedef struct mam_api_s {
   trit_t_to_mam_msg_read_context_t_map_t read_ctxs;
   mam_channel_t_set_t channels;
   trint18_t channel_ord;
+  mam_pk_t_set_t trusted_channel_ids;
+  mam_pk_t_set_t trusted_endpoint_ids;
 } mam_api_t;
 
 /**
@@ -54,6 +56,28 @@ retcode_t mam_api_init(mam_api_t *const api, tryte_t const *const mam_seed);
  * @return return code
  */
 retcode_t mam_api_destroy(mam_api_t *const api);
+
+/**
+ * Add a trusted channel id into the api's trusted channels set
+ *
+ * @param api - The API [in,out]
+ * @param pk - A new public key [in]
+ *
+ * @return return code
+ */
+retcode_t mam_api_add_trusted_channel_pk(mam_api_t *const api,
+                                         tryte_t const *const pk);
+
+/**
+ * Add a trusted endpoint id into the api's trusted endpoints set
+ *
+ * @param api - The API [in,out]
+ * @param pk - A new public key [in]
+ *
+ * @return return code
+ */
+retcode_t mam_api_add_trusted_endpoint_pk(mam_api_t *const api,
+                                          tryte_t const *const pk);
 
 /**
  * Add a NTRU secret key to api's NTRU sks set
@@ -88,17 +112,6 @@ retcode_t mam_api_add_ntru_pk(mam_api_t *const api,
 retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk);
 
 /**
- * Add channel to api's channels set
- *
- * @param api - The API [in,out]
- * @param ch - A new channel [in]
- *
- * @return return code
- */
-retcode_t mam_api_add_channel(mam_api_t *const api,
-                              mam_channel_t const *const ch);
-
-/**
  * Creates and adds a channel to the API
  *
  * @param api - The API [in, out]
@@ -109,6 +122,17 @@ retcode_t mam_api_add_channel(mam_api_t *const api,
  */
 retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height,
                                  tryte_t *const channel_id);
+
+/**
+ * Gets a channel from its id
+ *
+ * @param api - The API [in]
+ * @param channel_id - The channel id [in]
+ *
+ * @return a pointer to the channel or NULL if not found
+ */
+mam_channel_t *mam_api_get_channel(mam_api_t const *const api,
+                                   tryte_t const *const channel_id);
 
 /**
  * Creates and adds an endpoint to the API
@@ -125,11 +149,34 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
                                   tryte_t *const endpoint_id);
 
 /**
+ * Gets an endpoint from its id
+ *
+ * @param api - The API [in]
+ * @param channel_id - The associated channel id [in]
+ * @param endpoint_id - The endpoint id [in]
+ *
+ * @return a pointer to the endpoint or NULL if not found
+ */
+mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api,
+                                     tryte_t const *const channel_id,
+                                     tryte_t const *const endpoint_id);
+
+/**
+ * Creates a MAM tag that can be used in IOTA transactions
+ *
+ * @param tag - The tag [out]
+ * @param msg_id - The message ID [in]
+ * @param ord - The packet ord [in]
+ */
+void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id,
+                       trint18_t const ord);
+
+/**
  * Writes MAM header on a channel(keyloads (session keys) + potential packet)
  * into a bundle
  *
  * @param api - The API [in,out]
- * @param ch - A known channel [in]
+ * @param ch_id - A known channel ID [in]
  * @param psks - pre shared keys used for encrypting the session keys [in]
  * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
  * @param msg_type_id - The message type [in]
@@ -141,7 +188,7 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
  * @return return code
  */
 retcode_t mam_api_bundle_write_header_on_channel(
-    mam_api_t *const api, mam_channel_t *const ch, mam_psk_t_set_t psks,
+    mam_api_t *const api, tryte_t const *const ch_id, mam_psk_t_set_t psks,
     mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id);
 
@@ -150,8 +197,8 @@ retcode_t mam_api_bundle_write_header_on_channel(
  * into a bundle
  *
  * @param api - The API [in,out]
- * @param ch - A known channel [in]
- * @param ep - A known endpoint [in]
+ * @param ch_id - A known channel ID [in]
+ * @param ep_id - A known endpoint ID [in]
  * @param psks - pre shared keys used for encrypting the session keys [in]
  * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
  * @param msg_type_id - The message type [in]
@@ -163,8 +210,9 @@ retcode_t mam_api_bundle_write_header_on_channel(
  * @return return code
  */
 retcode_t mam_api_bundle_write_header_on_endpoint(
-    mam_api_t *const api, mam_channel_t *const ch, mam_endpoint_t *const ep,
-    mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    mam_api_t *const api, tryte_t const *const ch_id,
+    tryte_t const *const ep_id, mam_psk_t_set_t psks,
+    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 /**
@@ -172,8 +220,8 @@ retcode_t mam_api_bundle_write_header_on_endpoint(
  * potential packet) into a bundle
  *
  * @param api - The API [in,out]
- * @param ch - A known channel [in]
- * @param ch1 - The new channel [in]
+ * @param ch_id - A known channel ID [in]
+ * @param ch1_id - The new channel ID [in]
  * @param psks - pre shared keys used for encrypting the session keys [in]
  * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
  * @param msg_type_id - The message type [in]
@@ -185,8 +233,9 @@ retcode_t mam_api_bundle_write_header_on_endpoint(
  * @return return code
  */
 retcode_t mam_api_bundle_announce_new_channel(
-    mam_api_t *const api, mam_channel_t *const ch, mam_channel_t *const ep1,
-    mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    mam_api_t *const api, tryte_t const *const ch_id,
+    tryte_t const *const ch1_id, mam_psk_t_set_t psks,
+    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 /**
@@ -194,8 +243,8 @@ retcode_t mam_api_bundle_announce_new_channel(
  * potential packet) into a bundle
  *
  * @param api - The API [in,out]
- * @param ch - A known channel [in]
- * @param ep1 - The new endpoint [in]
+ * @param ch_id - A known channel ID [in]
+ * @param ep1_id - The new endpoint ID [in]
  * @param psks - pre shared keys used for encrypting the session keys [in]
  * @param ntru_pks - ntru public keys used for encrypting the session keys [in]
  * @param msg_type_id - The message type [in]
@@ -207,8 +256,9 @@ retcode_t mam_api_bundle_announce_new_channel(
  * @return return code
  */
 retcode_t mam_api_bundle_announce_new_endpoint(
-    mam_api_t *const api, mam_channel_t *const ch, mam_endpoint_t *const ep1,
-    mam_psk_t_set_t psks, mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+    mam_api_t *const api, tryte_t const *const ch_id,
+    tryte_t const *const ep1_id, mam_psk_t_set_t psks,
+    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
     bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 /**
@@ -223,10 +273,13 @@ retcode_t mam_api_bundle_announce_new_endpoint(
  *
  * @return return code
  */
-retcode_t mam_api_bundle_write_packet(
-    mam_api_t *const api, trit_t *const msg_id, tryte_t const *const payload,
-    size_t const payload_size, mam_msg_checksum_t checksum, bool is_last_packet,
-    bundle_transactions_t *const bundle);
+retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
+                                      trit_t const *const msg_id,
+                                      tryte_t const *const payload,
+                                      size_t const payload_size,
+                                      mam_msg_checksum_t checksum,
+                                      bool is_last_packet,
+                                      bundle_transactions_t *const bundle);
 
 /**
  * Reads MAM's session key and potentially the first packet using NTRU secret
@@ -292,13 +345,6 @@ retcode_t mam_api_save(mam_api_t const *const api, char const *const filename);
  * @return return code
  */
 retcode_t mam_api_load(char const *const filename, mam_api_t *const api);
-
-mam_channel_t *mam_api_get_channel(mam_api_t const *const api,
-                                   tryte_t const *const channel_id);
-
-mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api,
-                                     tryte_t const *const channel_id,
-                                     tryte_t const *const endpoint_id);
 
 #ifdef __cplusplus
 }

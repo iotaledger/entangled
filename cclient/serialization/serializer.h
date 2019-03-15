@@ -72,20 +72,24 @@ typedef struct {
   retcode_t (*get_neighbors_serialize_request)(serializer_t const* const s,
                                                char_buffer_t* out);
 
+  retcode_t (*get_neighbors_serialize_response)(
+      serializer_t const* const s, get_neighbors_res_t const* const obj,
+      char_buffer_t* out);
+
   retcode_t (*get_neighbors_deserialize_response)(serializer_t const* const,
                                                   char const* const obj,
                                                   get_neighbors_res_t* out);
 
-  retcode_t (*get_node_info_serialize_request)(const serializer_t* const,
+  retcode_t (*get_node_info_serialize_request)(serializer_t const* const,
                                                char_buffer_t* out);
 
-  retcode_t (*get_node_info_deserialize_response)(const serializer_t* const,
+  retcode_t (*get_node_info_deserialize_response)(serializer_t const* const,
                                                   const char* const obj,
                                                   get_node_info_res_t* out);
 
-  retcode_t (*get_tips_serialize_request)(const serializer_t* const,
+  retcode_t (*get_tips_serialize_request)(serializer_t const* const,
                                           char_buffer_t* out);
-  retcode_t (*get_tips_deserialize_response)(const serializer_t* const,
+  retcode_t (*get_tips_deserialize_response)(serializer_t const* const,
                                              const char* const obj,
                                              get_tips_res_t* res);
 
