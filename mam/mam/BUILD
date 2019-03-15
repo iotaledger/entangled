@@ -9,11 +9,10 @@ cc_library(
     deps = [
         ":channel",
         ":endpoint",
+        ":mam_pk_t_set",
         "//mam:defs",
         "//mam/mss",
         "//mam/ntru",
-        "//mam/ntru:mam_ntru_pk_t_set",
-        "//mam/ntru:mam_ntru_sk_t_set",
         "//mam/pb3",
         "//mam/prng",
         "//mam/psk",
@@ -74,4 +73,12 @@ typed_container_generate(
     container_type = "set",
     parent_directory = "mam/mam",
     value_type = "mam_channel_t",
+)
+
+typed_container_generate(
+    additional_deps = "channel_hdr",
+    additional_include_path = "mam/mam/channel.h",
+    container_type = "set",
+    parent_directory = "mam/mam",
+    value_type = "mam_pk_t",
 )

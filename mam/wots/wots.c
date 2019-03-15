@@ -14,6 +14,7 @@
 #include "mam/pb3/pb3.h"
 #include "mam/sponge/spongos_types.h"
 #include "mam/wots/wots.h"
+#include "utils/memset_safe.h"
 
 /*
  * Private functions

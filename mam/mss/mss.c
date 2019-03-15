@@ -307,8 +307,8 @@ static void mss_fold_auth_path(mam_spongos_t *spongos, mss_mt_idx_t skn,
   }
 }
 
-void mam_mss_init(mam_mss_t *mss, mam_prng_t *prng, mss_mt_height_t height,
-                  trits_t nonce1, trits_t nonce2) {
+void mam_mss_init(mam_mss_t *mss, mam_prng_t *const prng,
+                  mss_mt_height_t height, trits_t nonce1, trits_t nonce2) {
   MAM_ASSERT(mss);
   MAM_ASSERT(prng);
   MAM_ASSERT(0 <= height && height <= MAM_MSS_MAX_D);
