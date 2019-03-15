@@ -61,7 +61,7 @@ typedef struct mam_msg_write_context_s {
 
 typedef struct mam_msg_read_context_s {
   mam_spongos_t spongos;
-  trit_t pk[MAM_CHANNEL_ID_SIZE];
+  mam_pk_t pk;
   trint18_t ord;
 } mam_msg_read_context_t;
 

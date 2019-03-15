@@ -280,7 +280,7 @@ retcode_t mam_api_add_trusted_channel_pk(mam_api_t *const api,
                                          tryte_t const *const pk) {
   mam_pk_t chid;
 
-  trytes_to_trits(pk, chid.pk,
+  trytes_to_trits(pk, chid.key,
                   MAM_CHANNEL_ID_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
 
   return mam_pk_t_set_add(&api->trusted_channel_ids, &chid);
@@ -290,7 +290,7 @@ retcode_t mam_api_add_trusted_endpoint_pk(mam_api_t *const api,
                                           tryte_t const *const pk) {
   mam_pk_t epid;
 
-  trytes_to_trits(pk, epid.pk,
+  trytes_to_trits(pk, epid.key,
                   MAM_CHANNEL_ID_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
 
   return mam_pk_t_set_add(&api->trusted_endpoint_ids, &epid);
@@ -338,7 +338,7 @@ retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height,
     mam_channel_destroy(&channel);
     return ret;
   }
-  memcpy(channel_pk.pk, trits_begin(mam_channel_id(&channel)),
+  memcpy(channel_pk.key, trits_begin(mam_channel_id(&channel)),
          MAM_CHANNEL_ID_SIZE);
   ERR_BIND_RETURN(mam_pk_t_set_add(&api->trusted_channel_ids, &channel_pk),
                   ret);
@@ -398,7 +398,7 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
     mam_endpoint_destroy(&endpoint);
     return ret;
   }
-  memcpy(endpoint_pk.pk, trits_begin(mam_endpoint_id(&endpoint)),
+  memcpy(endpoint_pk.key, trits_begin(mam_endpoint_id(&endpoint)),
          MAM_ENDPOINT_ID_SIZE);
   ERR_BIND_RETURN(mam_pk_t_set_add(&api->trusted_endpoint_ids, &endpoint_pk),
                   ret);
@@ -572,8 +572,9 @@ retcode_t mam_api_bundle_read(mam_api_t *const api,
       return RC_OK;
     }
 
-    flex_trits_to_trits(ctx.pk, NUM_TRITS_ADDRESS, transaction_address(curr_tx),
-                        NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS);
+    flex_trits_to_trits(ctx.pk.key, NUM_TRITS_ADDRESS,
+                        transaction_address(curr_tx), NUM_TRITS_ADDRESS,
+                        NUM_TRITS_ADDRESS);
 
     ctx.ord = 1;
 
@@ -755,7 +756,7 @@ static retcode_t mam_pks_serialize(mam_pk_t_set_t const pks,
   pb3_encode_size_t(mam_pk_t_set_size(pks), trits);
 
   SET_ITER(pks, entry, tmp) {
-    pb3_encode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_SIZE, entry->value.pk),
+    pb3_encode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_SIZE, entry->value.key),
                        trits);
   }
 
@@ -775,7 +776,7 @@ retcode_t mam_pks_deserialize(trits_t *const trits, mam_pk_t_set_t *const pks) {
 
   for (size_t i = 0; i < pks_size; i++) {
     ERR_BIND_RETURN(
-        pb3_decode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_SIZE, pk.pk), trits),
+        pb3_decode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_SIZE, pk.key), trits),
         ret);
     ERR_BIND_RETURN(mam_pk_t_set_add(pks, &pk), ret);
   }
