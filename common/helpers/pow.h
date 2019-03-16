@@ -5,12 +5,12 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef _COMMON_HELPERS_POW_H
-#define _COMMON_HELPERS_POW_H
+#ifndef __COMMON_HELPERS_POW_H__
+#define __COMMON_HELPERS_POW_H__
 
 #include <stdint.h>
 
-#include "common/errors.h"
+#include "common/curl-p/trit.h"
 #include "common/model/bundle.h"
 #include "common/trinary/flex_trit.h"
 #include "utils/export.h"
@@ -18,6 +18,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+trit_t *do_pow(Curl *const curl, trit_t const *const trits_in,
+               size_t const trits_len, uint8_t const mwm);
 
 IOTA_EXPORT char *iota_pow_trytes(char const *const trytes_in,
                                   uint8_t const mwm);
@@ -34,4 +37,4 @@ IOTA_EXPORT retcode_t iota_pow_bundle(bundle_transactions_t *const bundle,
 }
 #endif
 
-#endif  // _COMMON_HELPERS_POW_H
+#endif  // __COMMON_HELPERS_POW_H__

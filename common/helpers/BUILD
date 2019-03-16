@@ -41,9 +41,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":digest",
+        "//common/curl-p:hashcash",
         "//common/model:bundle",
-        "//common/pow",
         "//common/trinary:flex_trit",
+        "//common/trinary:trit_tryte",
         "//utils:export",
         "//utils:time",
         "@com_github_uthash//:uthash",
