@@ -7,9 +7,9 @@
 
 #include "cclient/serialization/json/tests/shared.h"
 
-void test_serialize_get_tips(void) {
+void test_get_tips_serialize_request(void) {
   serializer_t serializer;
-  const char* json_text = "{\"command\":\"getTips\"}";
+  char const* json_text = "{\"command\":\"getTips\"}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
@@ -21,10 +21,42 @@ void test_serialize_get_tips(void) {
   char_buffer_free(serializer_out);
 }
 
-void test_deserialize_get_tips(void) {
+void test_get_tips_serialize_response(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
-  const char* json_text =
+  char_buffer_t* out = char_buffer_new();
+  char const* json_text =
+      "{\"hashes\":["
+      "\"" TEST_81_TRYTES_1
+      "\","
+      "\"" TEST_81_TRYTES_2
+      "\","
+      "\"" TEST_81_TRYTES_3 "\"]}";
+  get_tips_res_t* res = get_tips_res_new();
+
+  flex_trit_t trits_243[FLEX_TRIT_SIZE_243];
+  TEST_ASSERT(flex_trits_from_trytes(trits_243, NUM_TRITS_HASH,
+                                     (const tryte_t*)TEST_81_TRYTES_1,
+                                     NUM_TRYTES_HASH, NUM_TRYTES_HASH));
+  TEST_ASSERT(get_tips_res_hashes_add(res, trits_243) == RC_OK);
+  TEST_ASSERT(flex_trits_from_trytes(trits_243, NUM_TRITS_HASH,
+                                     (const tryte_t*)TEST_81_TRYTES_2,
+                                     NUM_TRYTES_HASH, NUM_TRYTES_HASH));
+  TEST_ASSERT(get_tips_res_hashes_add(res, trits_243) == RC_OK);
+  TEST_ASSERT(flex_trits_from_trytes(trits_243, NUM_TRITS_HASH,
+                                     (const tryte_t*)TEST_81_TRYTES_3,
+                                     NUM_TRYTES_HASH, NUM_TRYTES_HASH));
+  TEST_ASSERT(get_tips_res_hashes_add(res, trits_243) == RC_OK);
+
+  serializer.vtable.get_tips_serialize_response(&serializer, res, out);
+
+  TEST_ASSERT_EQUAL_STRING(json_text, out->data);
+}
+
+void test_get_tips_deserialize_response(void) {
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  char const* json_text =
       "{\"hashes\":["
       "\"" TEST_81_TRYTES_1
       "\","
@@ -64,7 +96,8 @@ void test_deserialize_get_tips(void) {
 int main(void) {
   UNITY_BEGIN();
 
-  RUN_TEST(test_serialize_get_tips);
-  RUN_TEST(test_deserialize_get_tips);
+  RUN_TEST(test_get_tips_serialize_request);
+  RUN_TEST(test_get_tips_serialize_response);
+  RUN_TEST(test_get_tips_deserialize_response);
   return UNITY_END();
 }
