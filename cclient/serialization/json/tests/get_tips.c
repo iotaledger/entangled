@@ -51,6 +51,9 @@ void test_get_tips_serialize_response(void) {
   serializer.vtable.get_tips_serialize_response(&serializer, res, out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, out->data);
+
+  char_buffer_free(out);
+  get_tips_res_free(&res);
 }
 
 void test_get_tips_deserialize_response(void) {
