@@ -134,17 +134,19 @@ static void message_test_generic_read_msg(
   mam_ntru_sk_t_set_t ntru_sks = NULL;
   mam_pk_t_set_t trusted_channel_ids = NULL;
   mam_pk_t_set_t trusted_endpoint_ids = NULL;
+  mam_pk_t pk;
 
   TEST_ASSERT(mam_psk_t_set_add(&psks, pre_shared_key) == RC_OK);
   TEST_ASSERT(mam_ntru_sk_t_set_add(&ntru_sks, ntru) == RC_OK);
-  TEST_ASSERT(mam_pk_t_set_add(&trusted_channel_ids,
-                               trits_begin(mam_channel_id(cha))) == RC_OK);
+  memcpy(pk.key, trits_begin(mam_channel_id(cha)), MAM_CHANNEL_ID_SIZE);
+  TEST_ASSERT(mam_pk_t_set_add(&trusted_channel_ids, &pk) == RC_OK);
   if (ep) {
-    TEST_ASSERT(mam_pk_t_set_add(&trusted_endpoint_ids,
-                                 trits_begin(mam_endpoint_id(ep))) == RC_OK);
+    memcpy(pk.key, trits_begin(mam_endpoint_id(ep)), MAM_ENDPOINT_ID_SIZE);
+    TEST_ASSERT(mam_pk_t_set_add(&trusted_endpoint_ids, &pk) == RC_OK);
   }
 
-  trits_copy(mam_channel_id(cha), trits_from_rep(MAM_CHANNEL_ID_SIZE, cfg->pk));
+  trits_copy(mam_channel_id(cha),
+             trits_from_rep(MAM_CHANNEL_ID_SIZE, cfg->pk.key));
 
   e = mam_msg_read_header(cfg_msg_read, msg, psks, ntru_sks, msg_id,
                           &trusted_channel_ids, &trusted_endpoint_ids);
@@ -409,7 +411,7 @@ void serialize_read_ctx_test() {
 
   //"Random" root
   for (size_t i = 0; i < MAM_CHANNEL_ID_SIZE; ++i) {
-    read_ctx.pk[i] = -1 + rand() % 3;
+    read_ctx.pk.key[i] = -1 + rand() % 3;
   }
 
   MAM_TRITS_DEF0(rand_msg, strlen(TEST_PLAINTEXT1));
