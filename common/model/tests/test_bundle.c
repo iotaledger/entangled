@@ -7,8 +7,8 @@
 
 #include <unity/unity.h>
 
+#include "common/crypto/iss/normalize.h"
 #include "common/model/bundle.h"
-#include "common/sign/normalize.h"
 
 static tryte_t *trytes =
     (tryte_t *)"AABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRSTUVWXYZ9ABCDEFGHIJKLMNOPQRS"

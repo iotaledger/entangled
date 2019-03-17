@@ -6,8 +6,8 @@
  */
 
 #include "consensus/bundle_validator/bundle_validator.h"
-#include "common/sign/normalize.h"
-#include "common/sign/v1/iss_kerl.h"
+#include "common/crypto/iss/normalize.h"
+#include "common/crypto/iss/v1/iss_kerl.h"
 #include "common/trinary/trit_long.h"
 #include "consensus/conf.h"
 #include "utils/logger_helper.h"

@@ -7,9 +7,9 @@ cc_library(
     deps = [
         ":transaction",
         "//common:errors",
+        "//common/crypto/iss:normalize",
+        "//common/crypto/iss/v1:iss_kerl",
         "//common/model:transfer",
-        "//common/sign:normalize",
-        "//common/sign/v1:iss_kerl",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_tryte",
         "//common/trinary:tryte_long",

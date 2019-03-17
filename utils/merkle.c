@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-#include "common/sign/v2/iss_curl.h"
+#include "common/crypto/iss/v2/iss_curl.h"
 #include "utils/merkle.h"
 
 static trit_t const merkle_null_hash[HASH_LENGTH_TRIT] = {0};

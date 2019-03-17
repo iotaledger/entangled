@@ -5,11 +5,11 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "iss_kerl.h"
-#include "common/crypto/kerl/kerl.h"
+#include "common/crypto/iss/v1/iss_curl.h"
+#include "common/crypto/curl-p/trit.h"
 
-#define HASH_PREFIX kerl
-#define HASH_STATE Kerl
+#define HASH_PREFIX curl
+#define HASH_STATE Curl
 
 #include "iss.c.inc"
 

@@ -8,10 +8,10 @@
 #ifndef __COMMON_MODEL_BUNDLE_H__
 #define __COMMON_MODEL_BUNDLE_H__
 
+#include "common/crypto/iss/normalize.h"
 #include "common/crypto/kerl/kerl.h"
 #include "common/errors.h"
 #include "common/model/transaction.h"
-#include "common/sign/normalize.h"
 #include "common/trinary/flex_trit.h"
 #include "utarray.h"
 

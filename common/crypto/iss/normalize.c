@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/sign/normalize.h"
+#include "common/crypto/iss/normalize.h"
 #include "common/defs.h"
 #include "common/trinary/trit_long.h"
 

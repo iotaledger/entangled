@@ -5,7 +5,7 @@ cc_test(
     ],
     deps = [
         "//common/crypto/curl-p:trit",
-        "//common/sign/v2:iss_curl",
+        "//common/crypto/iss/v2:iss_curl",
         "//common/trinary:trit_tryte",
         "@unity",
     ],

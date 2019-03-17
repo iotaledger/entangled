@@ -9,7 +9,7 @@
 #include <string.h>
 
 #include "common/crypto/curl-p/hamming.h"
-#include "common/sign/v2/iss_curl.h"
+#include "common/crypto/iss/v2/iss_curl.h"
 #include "common/trinary/trit_long.h"
 #include "mam/prototype/mask.h"
 #include "utils/merkle.h"
