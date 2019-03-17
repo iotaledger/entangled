@@ -9,8 +9,8 @@
 #include <string.h>
 #include <unity/unity.h>
 
+#include "common/crypto/kerl/converter.h"
 #include "common/defs.h"
-#include "common/kerl/converter.h"
 #include "common/trinary/trit_tryte.h"
 #include "common/trinary/trits.h"
 

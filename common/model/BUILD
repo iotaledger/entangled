@@ -39,8 +39,8 @@ cc_library(
     srcs = ["transfer.c"],
     hdrs = ["transfer.h"],
     deps = [
+        "//common/crypto/kerl",
         "//common/helpers:sign",
-        "//common/kerl",
         "//common/model:transaction",
         "//utils:logger_helper",
     ],

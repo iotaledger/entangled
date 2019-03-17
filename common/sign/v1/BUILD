@@ -29,7 +29,7 @@ cc_library(
     ],
     deps = [
         "//common:defs",
-        "//common/kerl",
+        "//common/crypto/kerl",
         "//common/trinary:add",
     ],
 )

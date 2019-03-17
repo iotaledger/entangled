@@ -7,9 +7,10 @@
 
 #include <stdio.h>
 #include <string.h>
+
 #include <unity/unity.h>
 
-#include "common/kerl/kerl.h"
+#include "common/crypto/kerl/kerl.h"
 #include "common/trinary/trit_tryte.h"
 #include "common/trinary/trits.h"
 

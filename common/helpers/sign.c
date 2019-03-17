@@ -10,9 +10,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "common/crypto/kerl/kerl.h"
 #include "common/defs.h"
 #include "common/helpers/sign.h"
-#include "common/kerl/kerl.h"
 #include "common/sign/normalize.h"
 #include "common/sign/v1/iss_kerl.h"
 #include "common/trinary/trit_tryte.h"

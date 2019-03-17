@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/kerl/hash.h"
+#include "common/crypto/kerl/hash.h"
 #include "common/trinary/tryte.h"
 
 void kerl_hash(const trit_t* const trits, size_t len, trit_t* out, Kerl* kerl) {

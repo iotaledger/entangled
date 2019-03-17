@@ -5,10 +5,6 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef __COMMON_KERL_CONVERTER_H_
 #define __COMMON_KERL_CONVERTER_H_
 
@@ -16,12 +12,17 @@ extern "C" {
 #include "common/trinary/trits.h"
 #include "utils/memset_safe.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void convert_trits_to_bytes(trit_t const *const trits, uint8_t *const bytes);
 
 // This method consumes the input bytes.
 void convert_bytes_to_trits(uint8_t *const bytes, trit_t *const trits);
 
-#endif /* __COMMON_KERL_CONVERTER_H_ */
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* __COMMON_KERL_CONVERTER_H_ */

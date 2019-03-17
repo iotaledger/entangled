@@ -23,7 +23,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:defs",
-        "//common/kerl",
+        "//common/crypto/kerl",
         "//common/sign:normalize",
         "//common/sign/v1:iss_kerl",
         "//common/trinary:flex_trit",
@@ -72,7 +72,7 @@ cc_library(
     deps = [
         ":digest",
         "//common:defs",
-        "//common/kerl:hash",
+        "//common/crypto/kerl:hash",
         "//common/sign/v1:iss_kerl",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_tryte",

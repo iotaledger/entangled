@@ -7,8 +7,8 @@
 
 #include <stdlib.h>
 
+#include "common/crypto/kerl/kerl.h"
 #include "common/curl-p/trit.h"
-#include "common/kerl/kerl.h"
 #include "common/model/bundle.h"
 #include "common/sign/normalize.h"
 #include "common/sign/v1/iss_curl.h"

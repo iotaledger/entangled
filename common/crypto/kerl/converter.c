@@ -8,9 +8,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "common/crypto/kerl/bigint.h"
+#include "common/crypto/kerl/converter.h"
 #include "common/defs.h"
-#include "common/kerl/bigint.h"
-#include "common/kerl/converter.h"
 
 #define INT_LEN 12
 #define BYTE_LEN 48

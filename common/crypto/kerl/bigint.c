@@ -9,7 +9,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#include "common/kerl/bigint.h"
+#include "common/crypto/kerl/bigint.h"
 
 typedef struct {
   uint8_t carry;

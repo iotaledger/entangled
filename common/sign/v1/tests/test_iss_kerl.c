@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <unity/unity.h>
 
-#include "common/kerl/kerl.h"
+#include "common/crypto/kerl/kerl.h"
 #include "common/sign/v1/iss_kerl.h"
 #include "common/trinary/trit_tryte.h"
 
