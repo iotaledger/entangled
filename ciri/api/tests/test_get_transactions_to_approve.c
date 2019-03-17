@@ -42,23 +42,18 @@ void test_get_transactions_to_approve_invalid_subtangle_status(void) {
   get_transactions_to_approve_res_t *res = get_transactions_to_approve_res_new();
 
   uint64_t latest_solid_subtangle_milestone_index =
-      api.core->consensus.milestone_tracker
-          .latest_solid_subtangle_milestone_index;
-  uint64_t milestone_start_index =
-      api.core->consensus.milestone_tracker.milestone_start_index;
+      api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
+  uint64_t milestone_start_index = api.core->consensus.milestone_tracker.milestone_start_index;
 
-  api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index =
-      42;
+  api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index = 42;
   api.core->consensus.milestone_tracker.milestone_start_index = 42;
 
   get_transactions_to_approve_req_set_depth(req, 5);
 
   TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res) == RC_API_INVALID_SUBTANGLE_STATUS);
 
-  api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index =
-      latest_solid_subtangle_milestone_index;
-  api.core->consensus.milestone_tracker.milestone_start_index =
-      milestone_start_index;
+  api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index = latest_solid_subtangle_milestone_index;
+  api.core->consensus.milestone_tracker.milestone_start_index = milestone_start_index;
 
   get_transactions_to_approve_req_free(&req);
   get_transactions_to_approve_res_free(&res);
@@ -75,17 +70,14 @@ int main(void) {
 
   TEST_ASSERT(iota_gossip_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
-  TEST_ASSERT(requester_init(&api.core->node.transaction_requester,
-                             &api.core->node) == RC_OK);
-  TEST_ASSERT(tips_cache_init(&api.core->node.tips,
-                              api.core->node.conf.tips_cache_size) == RC_OK);
+  TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
+  TEST_ASSERT(tips_cache_init(&api.core->node.tips, api.core->node.conf.tips_cache_size) == RC_OK);
   setUp();
 
   // Avoid verifying snapshot signature
   api.core->consensus.conf.snapshot_signature_file[0] = '\0';
 
-  TEST_ASSERT(iota_consensus_init(&api.core->consensus, &tangle,
-                                  &api.core->node.transaction_requester,
+  TEST_ASSERT(iota_consensus_init(&api.core->consensus, &tangle, &api.core->node.transaction_requester,
                                   &api.core->node.tips) == RC_OK);
 
   tearDown();

@@ -147,10 +147,8 @@ void test_check_consistency_consistent_ledger(bool consistency) {
   for (size_t i = 0; i < 4; i++) {
     flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, hashes[i], HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
     TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(
-                    &tangle, hash,
-                    api.core->consensus.milestone_tracker
-                            .latest_solid_subtangle_milestone_index -
-                        5) == RC_OK);
+                    &tangle, hash, api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index - 5) ==
+                RC_OK);
   }
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_1_OF_4_HASH, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
   hash243_queue_push(&req->tails, hash);
@@ -184,18 +182,15 @@ int main(void) {
 
   TEST_ASSERT(iota_gossip_conf_init(&api.core->node.conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
-  TEST_ASSERT(requester_init(&api.core->node.transaction_requester,
-                             &api.core->node) == RC_OK);
-  TEST_ASSERT(tips_cache_init(&api.core->node.tips,
-                              api.core->node.conf.tips_cache_size) == RC_OK);
+  TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
+  TEST_ASSERT(tips_cache_init(&api.core->node.tips, api.core->node.conf.tips_cache_size) == RC_OK);
 
   setUp();
 
   // Avoid verifying snapshot signature
   api.core->consensus.conf.snapshot_signature_file[0] = '\0';
 
-  TEST_ASSERT(iota_consensus_init(&api.core->consensus, &tangle,
-                                  &api.core->node.transaction_requester,
+  TEST_ASSERT(iota_consensus_init(&api.core->consensus, &tangle, &api.core->node.transaction_requester,
                                   &api.core->node.tips) == RC_OK);
 
   state_delta_destroy(&api.core->consensus.snapshot.state);
@@ -204,8 +199,7 @@ int main(void) {
 
   RUN_TEST(test_check_consistency_invalid_subtangle_status);
 
-  api.core->consensus.milestone_tracker
-      .latest_solid_subtangle_milestone_index++;
+  api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index++;
 
   RUN_TEST(test_check_consistency_missing_tail);
   RUN_TEST(test_check_consistency_not_tail);
@@ -214,8 +208,7 @@ int main(void) {
   RUN_TEST(test_check_consistency_false);
 
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_2_OF_4_ADDRESS,
-                         HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+  flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_2_OF_4_ADDRESS, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
   state_delta_add(&api.core->consensus.snapshot.state, hash, 1545071560);
 
   RUN_TEST(test_check_consistency_true);

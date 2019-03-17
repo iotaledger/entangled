@@ -65,11 +65,13 @@ typedef struct {
   retcode_t (*get_neighbors_deserialize_response)(serializer_t const* const, char const* const obj,
                                                   get_neighbors_res_t* out);
 
-<<<<<<< HEAD
   retcode_t (*get_node_info_serialize_request)(serializer_t const* const, char_buffer_t* out);
 
   retcode_t (*get_node_info_deserialize_response)(serializer_t const* const, const char* const obj,
                                                   get_node_info_res_t* out);
+
+  retcode_t (*get_node_info_serialize_response)(const serializer_t* const, const get_node_info_res_t* const obj,
+                                                char_buffer_t* out);
 
   retcode_t (*get_tips_serialize_request)(serializer_t const* const, char_buffer_t* out);
   retcode_t (*get_tips_deserialize_response)(serializer_t const* const, const char* const obj, get_tips_res_t* res);
@@ -86,41 +88,6 @@ typedef struct {
                                                      remove_neighbors_res_t* out);
 
   retcode_t (*get_trytes_serialize_request)(serializer_t const* const s, get_trytes_req_t const* const req,
-=======
-  retcode_t (*get_node_info_serialize_request)(serializer_t const* const,
-                                               char_buffer_t* out);
-
-  retcode_t (*get_node_info_deserialize_response)(serializer_t const* const,
-    const char* const obj,
-            get_node_info_res_t* out);
-
-  retcode_t (*get_node_info_serialize_response)(
-      const serializer_t* const, const get_node_info_res_t* const obj,
-      char_buffer_t* out);
-
-  retcode_t (*get_tips_serialize_request)(serializer_t const* const,
-                                          char_buffer_t* out);
-  retcode_t (*get_tips_deserialize_response)(serializer_t const* const,
-                                             const char* const obj,
-                                             get_tips_res_t* res);
-
-  retcode_t (*get_transactions_to_approve_serialize_request)(
-      serializer_t const* const,
-      get_transactions_to_approve_req_t const* const obj, char_buffer_t* out);
-  retcode_t (*get_transactions_to_approve_deserialize_response)(
-      serializer_t const* const, char const* const obj,
-      get_transactions_to_approve_res_t* out);
-
-  retcode_t (*remove_neighbors_serialize_request)(
-      serializer_t const* const s, const remove_neighbors_req_t* const obj,
-      char_buffer_t* out);
-  retcode_t (*remove_neighbors_deserialize_response)(
-      serializer_t const* const s, char const* const obj,
-      remove_neighbors_res_t* out);
-
-  retcode_t (*get_trytes_serialize_request)(serializer_t const* const s,
-                                            get_trytes_req_t const* const req,
->>>>>>> cclient/serialization/json: reduce log verbosity and increase JSON_CHECK_ERROR macro usage
                                             char_buffer_t* out);
   retcode_t (*get_trytes_deserialize_response)(serializer_t const* const s, char const* const obj,
                                                get_trytes_res_t* const res);

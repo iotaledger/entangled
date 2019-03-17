@@ -59,37 +59,20 @@ int main(int argc, char* argv[]) {
 
   // Default configuration
 
-<<<<<<< HEAD
-  if (iota_ciri_conf_default(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &ciri_core.api.conf) !=
-      RC_OK) {
-=======
-  if (iota_ciri_conf_default(&ciri_core.conf, &ciri_core.consensus.conf,
-                             &ciri_core.node.conf, &api.conf) != RC_OK) {
->>>>>>> ciri: move api to main and add independent DB connections for http api
+  if (iota_ciri_conf_default(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf) != RC_OK) {
     return EXIT_FAILURE;
   }
 
   // File configuration
 
-<<<<<<< HEAD
-  if (iota_ciri_conf_file(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &ciri_core.api.conf) !=
-      RC_OK) {
-=======
-  if (iota_ciri_conf_file(&ciri_core.conf, &ciri_core.consensus.conf,
-                          &ciri_core.node.conf, &api.conf) != RC_OK) {
->>>>>>> ciri: move api to main and add independent DB connections for http api
+  if (iota_ciri_conf_file(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf) != RC_OK) {
     return EXIT_FAILURE;
   }
 
   // CLI configuration
 
-<<<<<<< HEAD
-  if (iota_ciri_conf_cli(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &ciri_core.api.conf, argc,
-=======
-  if (iota_ciri_conf_cli(&ciri_core.conf, &ciri_core.consensus.conf,
-                         &ciri_core.node.conf, &api.conf, argc,
->>>>>>> ciri: move api to main and add independent DB connections for http api
-                         argv) != RC_OK) {
+  if (iota_ciri_conf_cli(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf, argc, argv) !=
+      RC_OK) {
     return EXIT_FAILURE;
   }
 
