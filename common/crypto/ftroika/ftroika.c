@@ -24,8 +24,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "common/ftroika/ftroika.h"
-#include "common/ftroika/general.h"
+#include "common/crypto/ftroika/ftroika.h"
+#include "common/crypto/ftroika/general.h"
 #include "t27.h"
 
 static const t27_t fround_constants[NUM_ROUNDS][COLUMNS] = {{{119734530, 1610953},

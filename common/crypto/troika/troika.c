@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "common/troika/troika.h"
+#include "common/crypto/troika/troika.h"
 
 #define COLUMNS 9
 #define ROWS 3

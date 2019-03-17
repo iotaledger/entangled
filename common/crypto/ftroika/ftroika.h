@@ -24,9 +24,10 @@
 #define __COMMON_FTROIKA_FTROIKA_H__
 
 #include <stdio.h>
-#include "common/ftroika/general.h"
+
+#include "common/crypto/ftroika/general.h"
+#include "common/crypto/ftroika/t27.h"
 #include "common/trinary/tryte.h"
-#include "t27.h"
 
 void ftroika_sub_trytes(t27_t *state);
 void ftroika_shift_rows(t27_t *state);

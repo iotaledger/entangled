@@ -22,9 +22,11 @@
 #define TRITMAX (729)
 
 #include <stdbool.h>
+
 #include <unity/unity.h>
-#include "common/ftroika/ftroika.h"
-#include "common/troika/troika.h"
+
+#include "common/crypto/ftroika/ftroika.h"
+#include "common/crypto/troika/troika.h"
 
 bool states_eq(trit_t *state, t27_t *fstate) {
   const int slices = 27, colums = 9, rows = 3, slicesize = rows * colums;

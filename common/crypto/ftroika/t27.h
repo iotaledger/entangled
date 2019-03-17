@@ -25,7 +25,8 @@
 
 #include <inttypes.h>
 #include <stdio.h>
-#include "common/ftroika/general.h"
+
+#include "common/crypto/ftroika/general.h"
 #include "common/trinary/trits.h"
 
 #define T27_NUM_COLUMNS 9

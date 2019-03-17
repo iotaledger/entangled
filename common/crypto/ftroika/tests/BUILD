@@ -2,8 +2,8 @@ cc_test(
     name = "test_ftroika",
     srcs = ["test_ftroika.c"],
     deps = [
-        "//common/ftroika",
-        "//common/troika",
+        "//common/crypto/ftroika",
+        "//common/crypto/troika",
         "@unity",
     ],
 )
