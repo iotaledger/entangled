@@ -22,14 +22,9 @@ static node_t node;
 static tangle_t tangle;
 static iota_consensus_t consensus;
 
-void setUp(void) {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
-}
+void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK); }
 
-void tearDown(void) {
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
-}
+void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK); }
 
 void test_broadcast_transactions_empty(void) {
   broadcast_transactions_req_t *req = broadcast_transactions_req_new();
@@ -49,9 +44,8 @@ void test_broadcast_transactions_invalid_tx(void) {
 
   // Trying to broadcast an invalid transaction (invalid supply)
 
-  flex_trits_from_trytes(
-      tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TX_1_OF_4_VALUE_BUNDLE_TRYTES,
-      NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
+  flex_trits_from_trytes(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, TX_1_OF_4_VALUE_BUNDLE_TRYTES,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
   transaction_deserialize_from_trits(&tx, tx_trits, false);
   transaction_set_value(&tx, -IOTA_SUPPLY - 1);
   transaction_serialize_on_flex_trits(&tx, tx_trits);
@@ -67,16 +61,14 @@ void test_broadcast_transactions_invalid_tx(void) {
 
 void test_broadcast_transactions(void) {
   broadcast_transactions_req_t *req = broadcast_transactions_req_new();
-  tryte_t const *const txs_trytes[4] = {
-      TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
-      TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
+  tryte_t const *const txs_trytes[4] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
+                                        TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
 
   // Broadcasting 4 transactions
 
   for (size_t i = 0; i < 4; i++) {
-    flex_trits_from_trytes(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                           txs_trytes[i], NUM_TRYTES_SERIALIZED_TRANSACTION,
+    flex_trits_from_trytes(tx_trits, NUM_TRITS_SERIALIZED_TRANSACTION, txs_trytes[i], NUM_TRYTES_SERIALIZED_TRANSACTION,
                            NUM_TRYTES_SERIALIZED_TRANSACTION);
     broadcast_transactions_req_trytes_add(req, tx_trits);
   }
@@ -100,8 +92,7 @@ int main(void) {
   api.consensus->conf.snapshot_timestamp_sec = 1536845195;
   api.consensus->conf.mwm = 1;
 
-  iota_consensus_transaction_validator_init(
-      &api.consensus->transaction_validator, &api.consensus->conf);
+  iota_consensus_transaction_validator_init(&api.consensus->transaction_validator, &api.consensus->conf);
 
   RUN_TEST(test_broadcast_transactions_empty);
   RUN_TEST(test_broadcast_transactions_invalid_tx);

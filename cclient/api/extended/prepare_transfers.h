@@ -43,10 +43,8 @@ extern "C" {
  *
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createPrepareTransfers.ts#L97
  */
-retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv,
-                                        transfer_t** const transfers,
-                                        uint32_t const num_transfer,
-                                        bundle_transactions_t* out_bundle);
+retcode_t iota_client_prepare_transfers(iota_client_service_t const* const serv, transfer_t** const transfers,
+                                        uint32_t const num_transfer, bundle_transactions_t* out_bundle);
 
 #ifdef __cplusplus
 }

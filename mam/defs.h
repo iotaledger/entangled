@@ -32,9 +32,7 @@ typedef int8_t trint1_t;
 #define MAM_TRINT1_MIN (-MAM_TRINT1_MAX)
 typedef trint1_t trit_t;
 
-#define MAM_ASSERT_TRINT1(t1)                                   \
-  MAM_ASSERT(((t1) == (trint1_t)-1) || ((t1) == (trint1_t)0) || \
-             ((t1) == (trint1_t)1))
+#define MAM_ASSERT_TRINT1(t1) MAM_ASSERT(((t1) == (trint1_t)-1) || ((t1) == (trint1_t)0) || ((t1) == (trint1_t)1))
 
 /*! \brief Return `x + s (mods 3)`. */
 trit_t trit_add(trit_t x, trit_t s);

@@ -17,17 +17,13 @@ trits_t mam_channel_id(mam_channel_t const *const channel) {
   return trits_from_rep(MAM_CHANNEL_ID_SIZE, channel->mss.root);
 }
 
-trits_t mam_channel_name(mam_channel_t const *const channel) {
-  return channel->name;
-}
+trits_t mam_channel_name(mam_channel_t const *const channel) { return channel->name; }
 
 trits_t mam_channel_msg_ord(mam_channel_t const *const channel) {
   return trits_from_rep(MAM_CHANNEL_MSG_ORD_SIZE, channel->msg_ord);
 }
 
-retcode_t mam_channel_create(mam_prng_t *const prng,
-                             mss_mt_height_t const height,
-                             trits_t const channel_name,
+retcode_t mam_channel_create(mam_prng_t *const prng, mss_mt_height_t const height, trits_t const channel_name,
                              mam_channel_t *const channel) {
   MAM_ASSERT(channel);
   MAM_ASSERT(height <= MAM_MSS_MAX_D);
@@ -86,20 +82,16 @@ retcode_t mam_channels_destroy(mam_channel_t_set_t *const channels) {
 }
 
 size_t mam_channel_serialized_size(mam_channel_t const *const channel) {
-  return pb3_sizeof_size_t(trits_size(channel->name)) +  // name size
-         pb3_sizeof_ntrytes(trits_size(channel->name) /
-                            NUMBER_OF_TRITS_IN_A_TRYTE) +  // name
-         pb3_sizeof_ntrytes(MAM_CHANNEL_MSG_ORD_SIZE /
-                            NUMBER_OF_TRITS_IN_A_TRYTE) +  // msg_ord
-         pb3_sizeof_ntrytes(mam_mss_serialized_size(&channel->mss) /
-                            NUMBER_OF_TRITS_IN_A_TRYTE) +  // mss
+  return pb3_sizeof_size_t(trits_size(channel->name)) +                                             // name size
+         pb3_sizeof_ntrytes(trits_size(channel->name) / NUMBER_OF_TRITS_IN_A_TRYTE) +               // name
+         pb3_sizeof_ntrytes(MAM_CHANNEL_MSG_ORD_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE) +                // msg_ord
+         pb3_sizeof_ntrytes(mam_mss_serialized_size(&channel->mss) / NUMBER_OF_TRITS_IN_A_TRYTE) +  // mss
          pb3_sizeof_ntrytes(mam_endpoints_serialized_size(channel->endpoints) /
                             NUMBER_OF_TRITS_IN_A_TRYTE)  // endpoints
          + pb3_sizeof_longtrint();                       // endpoint_ord
 }
 
-void mam_channel_serialize(mam_channel_t const *const channel,
-                           trits_t *const buffer) {
+void mam_channel_serialize(mam_channel_t const *const channel, trits_t *const buffer) {
   size_t mss_size = mam_mss_serialized_size(&channel->mss);
 
   pb3_encode_size_t(trits_size(channel->name), buffer);  // name size
@@ -112,8 +104,7 @@ void mam_channel_serialize(mam_channel_t const *const channel,
   pb3_encode_longtrint(channel->endpoint_ord, buffer);  // endpoint_ord
 }
 
-retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
-                                  mam_channel_t *const channel) {
+retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng, mam_channel_t *const channel) {
   retcode_t ret = RC_OK;
   size_t size = 0;
   mss_mt_height_t height = 0;
@@ -128,9 +119,8 @@ retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
     return ret;
   }
 
-  if ((ret = pb3_decode_ntrytes(
-           trits_from_rep(MAM_CHANNEL_MSG_ORD_SIZE, channel->msg_ord),
-           buffer)) != RC_OK) {  // msg_ord
+  if ((ret = pb3_decode_ntrytes(trits_from_rep(MAM_CHANNEL_MSG_ORD_SIZE, channel->msg_ord),
+                                buffer)) != RC_OK) {  // msg_ord
     return ret;
   }
 
@@ -163,8 +153,7 @@ retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
 size_t mam_channels_serialized_size(mam_channel_t_set_t const channels) {
   mam_channel_t_set_entry_t *entry = NULL;
   mam_channel_t_set_entry_t *tmp = NULL;
-  size_t size =
-      pb3_sizeof_size_t(mam_channel_t_set_size(channels));  // channels number
+  size_t size = pb3_sizeof_size_t(mam_channel_t_set_size(channels));  // channels number
 
   SET_ITER(channels, entry, tmp) {  // channel
     size += mam_channel_serialized_size(&entry->value);
@@ -173,22 +162,17 @@ size_t mam_channels_serialized_size(mam_channel_t_set_t const channels) {
   return size;
 }
 
-void mam_channels_serialize(mam_channel_t_set_t const channels,
-                            trits_t *const buffer) {
+void mam_channels_serialize(mam_channel_t_set_t const channels, trits_t *const buffer) {
   mam_channel_t_set_entry_t *entry = NULL;
   mam_channel_t_set_entry_t *tmp = NULL;
 
   pb3_encode_size_t(mam_channel_t_set_size(channels),
                     buffer);  // channels number
 
-  SET_ITER(channels, entry, tmp) {
-    mam_channel_serialize(&entry->value, buffer);
-  }
+  SET_ITER(channels, entry, tmp) { mam_channel_serialize(&entry->value, buffer); }
 }
 
-retcode_t mam_channels_deserialize(trits_t *const buffer,
-                                   mam_prng_t *const prng,
-                                   mam_channel_t_set_t *const channels) {
+retcode_t mam_channels_deserialize(trits_t *const buffer, mam_prng_t *const prng, mam_channel_t_set_t *const channels) {
   retcode_t ret = RC_OK;
   mam_channel_t channel;
   size_t size = 0;
@@ -198,8 +182,7 @@ retcode_t mam_channels_deserialize(trits_t *const buffer,
   }
 
   while (size--) {
-    if ((ret = mam_channel_deserialize(buffer, prng, &channel)) !=
-        RC_OK) {  // channel
+    if ((ret = mam_channel_deserialize(buffer, prng, &channel)) != RC_OK) {  // channel
       return ret;
     }
     if ((ret = mam_channel_t_set_add(channels, &channel)) != RC_OK) {

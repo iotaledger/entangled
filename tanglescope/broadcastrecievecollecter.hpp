@@ -54,9 +54,8 @@ class BroadcastReceiveCollector : public PrometheusCollector {
   virtual void artificialyDelay(){};
   virtual void broadcastTransactions();
 
-  virtual void subscribeToTransactions(
-      std::string zmqURL, const ZmqObservable& zmqObservable,
-      std::shared_ptr<prometheus::Registry> registry) = 0;
+  virtual void subscribeToTransactions(std::string zmqURL, const ZmqObservable& zmqObservable,
+                                       std::shared_ptr<prometheus::Registry> registry) = 0;
 
   void receivedTransactions();
 

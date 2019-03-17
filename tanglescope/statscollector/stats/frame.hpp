@@ -16,15 +16,12 @@ namespace statscollector {
 
 class FrameTXStats : public TXStats {
  public:
-  FrameTXStats(uint32_t bundleConfirmationHistogramRange,
-               uint32_t bundleConfirmationHistogramBucketSize);
+  FrameTXStats(uint32_t bundleConfirmationHistogramRange, uint32_t bundleConfirmationHistogramBucketSize);
   void trackNewTX(iri::TXMessage&, PrometheusCollector::CountersMap& counters);
   void trackReattachedTX(PrometheusCollector::CountersMap& counters);
   void trackNewBundle(PrometheusCollector::CountersMap& counters);
-  void trackConfirmedBundle(int64_t totalValue, uint64_t size,
-                            uint64_t bundleDuration,
-                            PrometheusCollector::CountersMap& counters,
-                            PrometheusCollector::HistogramsMap& histograms);
+  void trackConfirmedBundle(int64_t totalValue, uint64_t size, uint64_t bundleDuration,
+                            PrometheusCollector::CountersMap& counters, PrometheusCollector::HistogramsMap& histograms);
 
   std::vector<double> _buckets;
 };

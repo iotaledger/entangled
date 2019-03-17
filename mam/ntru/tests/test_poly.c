@@ -42,27 +42,22 @@ static void poly_mul(poly_t f, poly_t g, poly_t h) {
   for (i = 0; i < 2 * MAM_POLY_N - 1; ++i) fg[i] = 0;
 
   for (i = 0; i < MAM_POLY_N; ++i)
-    for (j = 0; j < MAM_POLY_N; ++j)
-      fg[i + j] = poly_coeff_mul_add(f[i], g[j], fg[i + j]);
+    for (j = 0; j < MAM_POLY_N; ++j) fg[i + j] = poly_coeff_mul_add(f[i], g[j], fg[i + j]);
 
-  for (i = 0; i < MAM_POLY_N - 1; ++i)
-    h[i] = poly_coeff_sub(fg[i], fg[i + MAM_POLY_N]);
+  for (i = 0; i < MAM_POLY_N - 1; ++i) h[i] = poly_coeff_sub(fg[i], fg[i + MAM_POLY_N]);
   h[i] = fg[i];
 }
 
 static void poly_ntt2(poly_t f, poly_t t) {
   size_t i;
-  for (i = 0; i < MAM_POLY_N; ++i)
-    t[i] = poly_eval(f, poly_gamma_exp[i + i + 1]);
+  for (i = 0; i < MAM_POLY_N; ++i) t[i] = poly_eval(f, poly_gamma_exp[i + i + 1]);
 }
 
 static void poly_intt2(poly_t t, poly_t f) {
   size_t i;
   for (i = 0; i < MAM_POLY_N; ++i)
-    f[i] =
-        poly_coeff_mul(poly_coeff_mul(MAM_POLY_COEFF_N_INV,
-                                      poly_gamma_exp[2 * MAM_POLY_N - i]),
-                       poly_eval(t, poly_gamma_exp[2 * MAM_POLY_N - (i + i)]));
+    f[i] = poly_coeff_mul(poly_coeff_mul(MAM_POLY_COEFF_N_INV, poly_gamma_exp[2 * MAM_POLY_N - i]),
+                          poly_eval(t, poly_gamma_exp[2 * MAM_POLY_N - (i + i)]));
 }
 
 static size_t poly_coeff_order(poly_coeff_t u, poly_coeff_t *ui) {
@@ -71,8 +66,7 @@ static size_t poly_coeff_order(poly_coeff_t u, poly_coeff_t *ui) {
 
   *ui = MAM_POLY_COEFF_ONE;
   for (i = 0; i++ < MAM_POLY_Q; *ui = v)
-    if (MAM_POLY_COEFF_ONE == (v = poly_coeff_mul(*ui, u)))
-      /*MAM_ASSERT(poly_coeff_inv(u) == *ui);*/
+    if (MAM_POLY_COEFF_ONE == (v = poly_coeff_mul(*ui, u))) /*MAM_ASSERT(poly_coeff_inv(u) == *ui);*/
       return i;
 
   return 0;
@@ -117,8 +111,7 @@ static void poly_ntt_test(void) {
       TEST_ASSERT_TRUE(poly_is_one(fitif));
     }
 
-    for (i = 0; i < MAM_POLY_N; ++i)
-      f[i] = poly_coeff_add(a, poly_coeff_mul(c, f[i]));
+    for (i = 0; i < MAM_POLY_N; ++i) f[i] = poly_coeff_add(a, poly_coeff_mul(c, f[i]));
   }
 }
 
@@ -173,10 +166,8 @@ static void poly_coeff_test(void) {
   trint9_t t;
   trint18_t s;
 
-  for (i = 0; i < MAM_POLY_TEST_N / 4; ++i)
-    tt[i] = (trint9_t)(-(MAM_POLY_Q - 1) / 2 + i);
-  for (; i < MAM_POLY_TEST_N / 2; ++i)
-    tt[i] = (trint9_t)(MAM_POLY_TEST_N / 2 - i);
+  for (i = 0; i < MAM_POLY_TEST_N / 4; ++i) tt[i] = (trint9_t)(-(MAM_POLY_Q - 1) / 2 + i);
+  for (; i < MAM_POLY_TEST_N / 2; ++i) tt[i] = (trint9_t)(MAM_POLY_TEST_N / 2 - i);
   tt[i++] = 0;
   for (; i < MAM_POLY_TEST_N; ++i) tt[i] = -tt[MAM_POLY_TEST_N - 1 - i];
 
@@ -285,9 +276,7 @@ static void poly_param_test(void) {
   TEST_ASSERT_TRUE(MAM_POLY_COEFF_ONE == poly_coeff_mul(n, ni));
 
   for (i = 0; i <= 2 * MAM_POLY_N; ++i)
-    TEST_ASSERT_TRUE(
-        MAM_POLY_COEFF_ONE ==
-        poly_coeff_mul(poly_gamma_exp[i], poly_gamma_exp[2 * MAM_POLY_N - i]));
+    TEST_ASSERT_TRUE(MAM_POLY_COEFF_ONE == poly_coeff_mul(poly_gamma_exp[i], poly_gamma_exp[2 * MAM_POLY_N - i]));
 }
 
 int main(void) {

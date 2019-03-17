@@ -43,8 +43,7 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
 
   while (broadcaster->running) {
     if (broadcaster_is_empty(broadcaster)) {
-      cond_handle_timedwait(&broadcaster->cond, &lock_cond,
-                            BROADCASTER_TIMEOUT_SEC);
+      cond_handle_timedwait(&broadcaster->cond, &lock_cond, BROADCASTER_TIMEOUT_SEC);
     }
 
     rw_lock_handle_wrlock(&broadcaster->lock);
@@ -53,16 +52,14 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
       rw_lock_handle_unlock(&broadcaster->lock);
       continue;
     }
-    memcpy(transaction_flex_trits, transaction_flex_trits_ptr,
-           FLEX_TRIT_SIZE_8019);
+    memcpy(transaction_flex_trits, transaction_flex_trits_ptr, FLEX_TRIT_SIZE_8019);
     hash8019_queue_pop(&broadcaster->queue);
     rw_lock_handle_unlock(&broadcaster->lock);
 
     log_debug(logger_id, "Broadcasting transaction\n");
     rw_lock_handle_rdlock(&broadcaster->node->neighbors_lock);
     LL_FOREACH(broadcaster->node->neighbors, iter) {
-      if (neighbor_send(broadcaster->node, &tangle, iter,
-                        transaction_flex_trits) != RC_OK) {
+      if (neighbor_send(broadcaster->node, &tangle, iter, transaction_flex_trits) != RC_OK) {
         log_warning(logger_id, "Broadcasting transaction failed\n");
       }
     }
@@ -83,8 +80,7 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
  * Public functions
  */
 
-retcode_t broadcaster_init(broadcaster_t *const broadcaster,
-                           node_t *const node) {
+retcode_t broadcaster_init(broadcaster_t *const broadcaster, node_t *const node) {
   if (broadcaster == NULL || node == NULL) {
     return RC_NULL_PARAM;
   }
@@ -123,17 +119,14 @@ retcode_t broadcaster_start(broadcaster_t *const broadcaster) {
 
   log_info(logger_id, "Spawning broadcaster thread\n");
   broadcaster->running = true;
-  if (thread_handle_create(&broadcaster->thread,
-                           (thread_routine_t)broadcaster_routine,
-                           broadcaster) != 0) {
+  if (thread_handle_create(&broadcaster->thread, (thread_routine_t)broadcaster_routine, broadcaster) != 0) {
     return RC_FAILED_THREAD_SPAWN;
   }
 
   return RC_OK;
 }
 
-retcode_t broadcaster_on_next(broadcaster_t *const broadcaster,
-                              flex_trit_t const *const transaction_flex_trits) {
+retcode_t broadcaster_on_next(broadcaster_t *const broadcaster, flex_trit_t const *const transaction_flex_trits) {
   retcode_t ret = RC_OK;
 
   if (broadcaster == NULL || transaction_flex_trits == NULL) {
@@ -145,8 +138,7 @@ retcode_t broadcaster_on_next(broadcaster_t *const broadcaster,
   rw_lock_handle_unlock(&broadcaster->lock);
 
   if (ret != RC_OK) {
-    log_warning(logger_id,
-                "Pushing transaction flex trits to broadcaster queue failed\n");
+    log_warning(logger_id, "Pushing transaction flex trits to broadcaster queue failed\n");
     return RC_BROADCASTER_FAILED_PUSH_QUEUE;
   } else {
     cond_handle_signal(&broadcaster->cond);

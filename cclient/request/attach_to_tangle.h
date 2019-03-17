@@ -40,31 +40,19 @@ attach_to_tangle_req_t* attach_to_tangle_req_new();
 void attach_to_tangle_req_free(attach_to_tangle_req_t** req);
 
 // set trunk, branch, mwm value at the same time.
-void attach_to_tangle_req_init(attach_to_tangle_req_t* req,
-                               flex_trit_t const* const trunk,
+void attach_to_tangle_req_init(attach_to_tangle_req_t* req, flex_trit_t const* const trunk,
                                flex_trit_t const* const branch, uint8_t mwm);
 // add trytes to the array
-retcode_t attach_to_tangle_req_trytes_add(attach_to_tangle_req_t* req,
-                                          flex_trit_t const* const raw_trytes);
+retcode_t attach_to_tangle_req_trytes_add(attach_to_tangle_req_t* req, flex_trit_t const* const raw_trytes);
 
 // get trytes from the array
-flex_trit_t* attach_to_tangle_req_trytes_get(attach_to_tangle_req_t* req,
-                                             size_t index);
+flex_trit_t* attach_to_tangle_req_trytes_get(attach_to_tangle_req_t* req, size_t index);
 // get trunk hash
-static inline flex_trit_t* attach_to_tangle_req_trunk(
-    attach_to_tangle_req_t* const req) {
-  return req->trunk;
-}
+static inline flex_trit_t* attach_to_tangle_req_trunk(attach_to_tangle_req_t* const req) { return req->trunk; }
 // get branch hash
-static inline flex_trit_t* attach_to_tangle_req_branch(
-    attach_to_tangle_req_t* const req) {
-  return req->branch;
-}
+static inline flex_trit_t* attach_to_tangle_req_branch(attach_to_tangle_req_t* const req) { return req->branch; }
 // get the Minimum Weight Magnitude
-static inline uint8_t attach_to_tangle_req_mwm(
-    attach_to_tangle_req_t* const req) {
-  return req->mwm;
-}
+static inline uint8_t attach_to_tangle_req_mwm(attach_to_tangle_req_t* const req) { return req->mwm; }
 
 #ifdef __cplusplus
 }

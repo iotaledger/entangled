@@ -16,12 +16,9 @@
 extern "C" {
 #endif
 
-void trits_to_ptrits(trit_t const *const trits, ptrit_t *const ptrits,
-                     size_t const index, size_t const length);
-void trits_to_ptrits_fill(trit_t const *const trits, ptrit_t *const ptrits,
-                          size_t const length);
-void ptrits_to_trits(ptrit_t const *const ptrits, trit_t *const trits,
-                     size_t const index, size_t const length);
+void trits_to_ptrits(trit_t const *const trits, ptrit_t *const ptrits, size_t const index, size_t const length);
+void trits_to_ptrits_fill(trit_t const *const trits, ptrit_t *const ptrits, size_t const length);
+void ptrits_to_trits(ptrit_t const *const ptrits, trit_t *const trits, size_t const index, size_t const length);
 
 #ifdef __cplusplus
 }

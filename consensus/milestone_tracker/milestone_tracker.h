@@ -56,10 +56,8 @@ typedef struct milestone_tracker_s {
  *
  * @return a status code
  */
-retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
-                                      iota_consensus_conf_t* const conf,
-                                      snapshot_t* const snapshot,
-                                      ledger_validator_t* const lv,
+retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consensus_conf_t* const conf,
+                                      snapshot_t* const snapshot, ledger_validator_t* const lv,
                                       transaction_solidifier_t* ts);
 
 /**
@@ -70,8 +68,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt,
  *
  * @return a status code
  */
-retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt,
-                                       tangle_t* const tangle);
+retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt, tangle_t* const tangle);
 
 /**
  * Stops a milestone tracker
@@ -99,8 +96,7 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt);
  *
  * @return a status code
  */
-retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt,
-                                               flex_trit_t const* const hash);
+retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt, flex_trit_t const* const hash);
 
 #ifdef __cplusplus
 }

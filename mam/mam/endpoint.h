@@ -68,11 +68,8 @@ trits_t mam_endpoint_name(mam_endpoint_t const *const endpoint);
  *
  * @return a status code
  */
-retcode_t mam_endpoint_create(mam_prng_t *const prng,
-                              mss_mt_height_t const height,
-                              trits_t const channel_name,
-                              trits_t const endpoint_name,
-                              mam_endpoint_t *const endpoint);
+retcode_t mam_endpoint_create(mam_prng_t *const prng, mss_mt_height_t const height, trits_t const channel_name,
+                              trits_t const endpoint_name, mam_endpoint_t *const endpoint);
 
 /**
  * Returns the number of remaining secret keys (unused leaves on merkle tree)
@@ -94,22 +91,16 @@ retcode_t mam_endpoints_destroy(mam_endpoint_t_set_t *const endpoints);
 
 size_t mam_endpoint_serialized_size(mam_endpoint_t const *const endpoint);
 
-void mam_endpoint_serialize(mam_endpoint_t const *const endpoint,
-                            trits_t *const buffer);
+void mam_endpoint_serialize(mam_endpoint_t const *const endpoint, trits_t *const buffer);
 
-retcode_t mam_endpoint_deserialize(trits_t *const buffer,
-                                   trits_t const channel_name,
-                                   mam_prng_t *const prng,
+retcode_t mam_endpoint_deserialize(trits_t *const buffer, trits_t const channel_name, mam_prng_t *const prng,
                                    mam_endpoint_t *const endpoint);
 
 size_t mam_endpoints_serialized_size(mam_endpoint_t_set_t const endpoints);
 
-void mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints,
-                             trits_t *const buffer);
+void mam_endpoints_serialize(mam_endpoint_t_set_t const endpoints, trits_t *const buffer);
 
-retcode_t mam_endpoints_deserialize(trits_t *const buffer,
-                                    trits_t const channel_name,
-                                    mam_prng_t *const prng,
+retcode_t mam_endpoints_deserialize(trits_t *const buffer, trits_t const channel_name, mam_prng_t *const prng,
                                     mam_endpoint_t_set_t *const endpoints);
 
 #ifdef __cplusplus

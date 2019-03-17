@@ -8,8 +8,7 @@
 #include "cclient/request/broadcast_transactions.h"
 
 broadcast_transactions_req_t *broadcast_transactions_req_new() {
-  broadcast_transactions_req_t *req = (broadcast_transactions_req_t *)malloc(
-      sizeof(broadcast_transactions_req_t));
+  broadcast_transactions_req_t *req = (broadcast_transactions_req_t *)malloc(sizeof(broadcast_transactions_req_t));
   if (req) {
     req->trytes = hash8019_array_new();
   }
@@ -32,8 +31,8 @@ void broadcast_transactions_req_free(broadcast_transactions_req_t **const req) {
   *req = NULL;
 }
 
-retcode_t broadcast_transactions_req_trytes_add(
-    broadcast_transactions_req_t *req, flex_trit_t const *const raw_trytes) {
+retcode_t broadcast_transactions_req_trytes_add(broadcast_transactions_req_t *req,
+                                                flex_trit_t const *const raw_trytes) {
   if (!req->trytes) {
     req->trytes = hash8019_array_new();
   }
@@ -47,8 +46,7 @@ retcode_t broadcast_transactions_req_trytes_add(
   return RC_OK;
 }
 
-flex_trit_t *broadcat_transactions_req_trytes_get(
-    broadcast_transactions_req_t *req, size_t index) {
+flex_trit_t *broadcat_transactions_req_trytes_get(broadcast_transactions_req_t *req, size_t index) {
   if (!req->trytes) {
     return NULL;
   }

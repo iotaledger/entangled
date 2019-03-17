@@ -28,12 +28,10 @@ const std::string_view TX_payload(
 
 class MockStats : public TXStats {
  public:
-  MOCK_METHOD2(trackNewTX,
-               void(iri::TXMessage&, PrometheusCollector::CountersMap&));
+  MOCK_METHOD2(trackNewTX, void(iri::TXMessage&, PrometheusCollector::CountersMap&));
   MOCK_METHOD1(trackReattachedTX, void(PrometheusCollector::CountersMap&));
   MOCK_METHOD1(trackNewBundle, void(PrometheusCollector::CountersMap&));
-  MOCK_METHOD5(trackConfirmedBundle, void(int64_t, uint64_t, uint64_t,
-                                          PrometheusCollector::CountersMap&,
+  MOCK_METHOD5(trackConfirmedBundle, void(int64_t, uint64_t, uint64_t, PrometheusCollector::CountersMap&,
                                           PrometheusCollector::HistogramsMap&));
 };
 

@@ -60,9 +60,7 @@ TEST(PoWTest, testsPoW) {
   using namespace testing;
 
   auto nonce = iota_pow_trytes(TX_TRYTES.c_str(), 9);
-  auto powed = TX_TRYTES.substr(
-                   0, NUM_TRYTES_SERIALIZED_TRANSACTION - NUM_TRYTES_NONCE) +
-               nonce;
+  auto powed = TX_TRYTES.substr(0, NUM_TRYTES_SERIALIZED_TRANSACTION - NUM_TRYTES_NONCE) + nonce;
 
   auto c_hash = iota_digest(powed.c_str());
   auto hash = std::string(c_hash);
@@ -77,20 +75,17 @@ TEST(PoWTest, testsFlexPoW) {
   using namespace testing;
 
   flex_trit_t tx[FLEX_TRIT_SIZE_8019] = {0};
-  flex_trits_from_trytes(tx, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (const tryte_t *)TX_TRYTES.c_str(), TX_TRYTES.length(),
+  flex_trits_from_trytes(tx, NUM_TRITS_SERIALIZED_TRANSACTION, (const tryte_t *)TX_TRYTES.c_str(), TX_TRYTES.length(),
                          TX_TRYTES.size());
 
   auto nonce = iota_pow_flex(tx, FLEX_TRIT_SIZE_8019, 9);
 
-  flex_trits_insert_from_pos(
-      tx, NUM_TRITS_SERIALIZED_TRANSACTION, nonce, NUM_TRITS_NONCE, 0,
-      NUM_TRITS_SERIALIZED_TRANSACTION - NUM_TRITS_NONCE, NUM_TRITS_NONCE);
+  flex_trits_insert_from_pos(tx, NUM_TRITS_SERIALIZED_TRANSACTION, nonce, NUM_TRITS_NONCE, 0,
+                             NUM_TRITS_SERIALIZED_TRANSACTION - NUM_TRITS_NONCE, NUM_TRITS_NONCE);
   auto c_fhash = iota_flex_digest(tx, FLEX_TRIT_SIZE_8019);
 
   tryte_t c_hash[NUM_TRYTES_HASH] = {0};
-  flex_trits_to_trytes(c_hash, NUM_TRYTES_HASH, c_fhash, FLEX_TRIT_SIZE_243,
-                       FLEX_TRIT_SIZE_243);
+  flex_trits_to_trytes(c_hash, NUM_TRYTES_HASH, c_fhash, FLEX_TRIT_SIZE_243, FLEX_TRIT_SIZE_243);
 
   auto hash = std::string((const char *)c_hash, NUM_TRYTES_HASH);
 

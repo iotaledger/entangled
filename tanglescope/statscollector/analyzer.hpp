@@ -25,13 +25,9 @@ namespace statscollector {
 
 class TXAnalyzer {
  public:
-  explicit TXAnalyzer(
-      PrometheusCollector::CountersMap& counters,
-      PrometheusCollector::HistogramsMap& histograms,
-      std::shared_ptr<TXStats> stats = std::make_shared<NoopTXStats>())
-      : _counters(counters),
-        _histograms(histograms),
-        _stats(std::move(stats)) {}
+  explicit TXAnalyzer(PrometheusCollector::CountersMap& counters, PrometheusCollector::HistogramsMap& histograms,
+                      std::shared_ptr<TXStats> stats = std::make_shared<NoopTXStats>())
+      : _counters(counters), _histograms(histograms), _stats(std::move(stats)) {}
 
   void newTransaction(std::shared_ptr<iri::TXMessage>);
   void transactionConfirmed(std::shared_ptr<iri::SNMessage>);
@@ -40,8 +36,7 @@ class TXAnalyzer {
   std::shared_mutex _mutex;
 
   std::list<std::string> _confirmedBundles;
-  std::unordered_map<std::string, std::vector<std::shared_ptr<iri::TXMessage>>>
-      _unconfirmedBundles;
+  std::unordered_map<std::string, std::vector<std::shared_ptr<iri::TXMessage>>> _unconfirmedBundles;
 
   std::shared_ptr<TXStats> _stats;
   PrometheusCollector::CountersMap& _counters;

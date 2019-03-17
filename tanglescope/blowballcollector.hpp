@@ -43,8 +43,7 @@ class BlowballCollector : public PrometheusCollector {
   PrometheusCollector::HistogramsMap histograms;
   // state
   cuckoohash_map<std::string, uint8_t> _txToRefCount;
-  cuckoohash_map<std::string, std::chrono::system_clock::time_point>
-      _txToLastUpdateTime;
+  cuckoohash_map<std::string, std::chrono::system_clock::time_point> _txToLastUpdateTime;
   std::list<std::string> _milestones;
 
   uint32_t _histogramRange;

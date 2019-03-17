@@ -8,8 +8,7 @@
 #include "cclient/response/find_transactions.h"
 
 find_transactions_res_t* find_transactions_res_new() {
-  find_transactions_res_t* res =
-      (find_transactions_res_t*)malloc(sizeof(find_transactions_res_t));
+  find_transactions_res_t* res = (find_transactions_res_t*)malloc(sizeof(find_transactions_res_t));
   if (res) {
     res->hashes = NULL;
   }

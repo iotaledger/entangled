@@ -21,8 +21,7 @@ typedef enum {
 extern "C" {
 #endif
 
-PearlDiverStatus hashcash(Curl *const ctx, SearchType const type,
-                          unsigned short const offset, unsigned short const end,
+PearlDiverStatus hashcash(Curl *const ctx, SearchType const type, unsigned short const offset, unsigned short const end,
                           unsigned short const min_weight);
 
 #ifdef __cplusplus

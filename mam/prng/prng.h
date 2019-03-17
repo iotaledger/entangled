@@ -59,9 +59,8 @@ void mam_prng_destroy(mam_prng_t *const prng);
  * @param nonce The nonce
  * @param output Pseudorandom output trits
  */
-void mam_prng_gen(mam_prng_t const *const prng,
-                  mam_prng_destination_tryte_t const destination,
-                  trits_t const nonce, trits_t output);
+void mam_prng_gen(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination, trits_t const nonce,
+                  trits_t output);
 
 /**
  * PRNG output generation with two nonces
@@ -72,9 +71,8 @@ void mam_prng_gen(mam_prng_t const *const prng,
  * @param nonce2 The second nonce
  * @param output Pseudorandom output trits
  */
-void mam_prng_gen2(mam_prng_t const *const prng,
-                   mam_prng_destination_tryte_t const destination,
-                   trits_t const nonce1, trits_t const nonce2, trits_t output);
+void mam_prng_gen2(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination, trits_t const nonce1,
+                   trits_t const nonce2, trits_t output);
 
 /**
  * PRNG output generation with three nonces
@@ -86,10 +84,8 @@ void mam_prng_gen2(mam_prng_t const *const prng,
  * @param nonce3 The third nonce
  * @param output Pseudorandom output trits
  */
-void mam_prng_gen3(mam_prng_t const *const prng,
-                   mam_prng_destination_tryte_t const destination,
-                   trits_t const nonce1, trits_t const nonce2,
-                   trits_t const nonce3, trits_t output);
+void mam_prng_gen3(mam_prng_t const *const prng, mam_prng_destination_tryte_t const destination, trits_t const nonce1,
+                   trits_t const nonce2, trits_t const nonce3, trits_t output);
 
 size_t mam_prng_serialized_size();
 void mam_prng_serialize(mam_prng_t const *const prng, trits_t *const buffer);

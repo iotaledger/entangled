@@ -8,8 +8,7 @@
 #include "cclient/response/remove_neighbors.h"
 
 remove_neighbors_res_t* remove_neighbors_res_new() {
-  remove_neighbors_res_t* res =
-      (remove_neighbors_res_t*)malloc(sizeof(remove_neighbors_res_t));
+  remove_neighbors_res_t* res = (remove_neighbors_res_t*)malloc(sizeof(remove_neighbors_res_t));
   if (res) {
     res->removed_neighbors = 0;
   }

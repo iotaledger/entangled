@@ -54,8 +54,7 @@ static void *tips_solidifier_routine(tips_solidifier_t *const tips_solidifier) {
       goto sleep;
     }
 
-    if (iota_tangle_transaction_approvers_count(&tangle, tip,
-                                                &approvers_count) != RC_OK) {
+    if (iota_tangle_transaction_approvers_count(&tangle, tip, &approvers_count) != RC_OK) {
       log_warning(logger_id, "Counting number of approvers of tip failed\n");
       goto sleep;
     }
@@ -68,9 +67,8 @@ static void *tips_solidifier_routine(tips_solidifier_t *const tips_solidifier) {
     }
 
     is_solid = false;
-    if (iota_consensus_transaction_solidifier_check_solidity(
-            tips_solidifier->transaction_solidifier, &tangle, tip, false,
-            &is_solid) != RC_OK) {
+    if (iota_consensus_transaction_solidifier_check_solidity(tips_solidifier->transaction_solidifier, &tangle, tip,
+                                                             false, &is_solid) != RC_OK) {
       log_warning(logger_id, "Checking solidity of tip failed\n");
       goto sleep;
     }
@@ -96,17 +94,13 @@ static void *tips_solidifier_routine(tips_solidifier_t *const tips_solidifier) {
  * Public functions
  */
 
-retcode_t tips_solidifier_init(
-    tips_solidifier_t *const tips_solidifier, iota_gossip_conf_t *const conf,
-    tips_cache_t *const tips,
-    transaction_solidifier_t *const transaction_solidifier) {
-  if (tips_solidifier == NULL || conf == NULL || tips == NULL ||
-      transaction_solidifier == NULL) {
+retcode_t tips_solidifier_init(tips_solidifier_t *const tips_solidifier, iota_gossip_conf_t *const conf,
+                               tips_cache_t *const tips, transaction_solidifier_t *const transaction_solidifier) {
+  if (tips_solidifier == NULL || conf == NULL || tips == NULL || transaction_solidifier == NULL) {
     return RC_NULL_PARAM;
   }
 
-  logger_id =
-      logger_helper_enable(TIPS_SOLIDIFIER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id = logger_helper_enable(TIPS_SOLIDIFIER_LOGGER_ID, LOGGER_DEBUG, true);
   tips_solidifier->conf = conf;
   tips_solidifier->running = false;
   tips_solidifier->tips = tips;
@@ -122,9 +116,7 @@ retcode_t tips_solidifier_start(tips_solidifier_t *const tips_solidifier) {
 
   log_info(logger_id, "Spawning tips solidifier thread\n");
   tips_solidifier->running = true;
-  if (thread_handle_create(&tips_solidifier->thread,
-                           (thread_routine_t)tips_solidifier_routine,
-                           tips_solidifier) != 0) {
+  if (thread_handle_create(&tips_solidifier->thread, (thread_routine_t)tips_solidifier_routine, tips_solidifier) != 0) {
     log_error(logger_id, "Spawning tips solidifier thread failed\n");
     return RC_FAILED_THREAD_SPAWN;
   }

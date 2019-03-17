@@ -8,8 +8,7 @@
 #include "cclient/response/check_consistency.h"
 
 check_consistency_res_t* check_consistency_res_new() {
-  check_consistency_res_t* res =
-      (check_consistency_res_t*)malloc(sizeof(check_consistency_res_t));
+  check_consistency_res_t* res = (check_consistency_res_t*)malloc(sizeof(check_consistency_res_t));
 
   if (res) {
     res->info = NULL;
@@ -17,8 +16,7 @@ check_consistency_res_t* check_consistency_res_new() {
   return res;
 }
 
-retcode_t check_consistency_res_info_set(check_consistency_res_t* res,
-                                         const char* info) {
+retcode_t check_consistency_res_info_set(check_consistency_res_t* res, const char* info) {
   if (!res->info) {
     res->info = char_buffer_new();
   }

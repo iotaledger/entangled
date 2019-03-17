@@ -8,8 +8,7 @@
 #include "cclient/response/get_inclusion_state.h"
 
 get_inclusion_state_res_t* get_inclusion_state_res_new() {
-  get_inclusion_state_res_t* res =
-      (get_inclusion_state_res_t*)malloc(sizeof(get_inclusion_state_res_t));
+  get_inclusion_state_res_t* res = (get_inclusion_state_res_t*)malloc(sizeof(get_inclusion_state_res_t));
   if (res) {
     res->states = NULL;
     utarray_new(res->states, &ut_int_icd);
@@ -17,8 +16,7 @@ get_inclusion_state_res_t* get_inclusion_state_res_new() {
   return res;
 }
 
-retcode_t get_inclusion_state_res_states_set(get_inclusion_state_res_t* res,
-                                             int st) {
+retcode_t get_inclusion_state_res_states_set(get_inclusion_state_res_t* res, int st) {
   if (!res->states) {
     utarray_new(res->states, &ut_int_icd);
   }
@@ -29,8 +27,7 @@ retcode_t get_inclusion_state_res_states_set(get_inclusion_state_res_t* res,
   return RC_OK;
 }
 
-bool get_inclusion_state_res_states_at(get_inclusion_state_res_t* in,
-                                       int index) {
+bool get_inclusion_state_res_states_at(get_inclusion_state_res_t* in, int index) {
   int* b = (int*)utarray_eltptr(in->states, index);
   if (b != NULL) {
     return (*b > 0) ? true : false;
@@ -38,9 +35,7 @@ bool get_inclusion_state_res_states_at(get_inclusion_state_res_t* in,
   return false;
 }
 
-int get_inclusion_state_res_states_count(get_inclusion_state_res_t* in) {
-  return utarray_len(in->states);
-}
+int get_inclusion_state_res_states_count(get_inclusion_state_res_t* in) { return utarray_len(in->states); }
 
 void get_inclusion_state_res_free(get_inclusion_state_res_t** res) {
   if (*res) {

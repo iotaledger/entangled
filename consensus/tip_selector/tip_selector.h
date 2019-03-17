@@ -37,22 +37,20 @@ typedef struct tip_selector_s {
   milestone_tracker_t *milestone_tracker;
 } tip_selector_t;
 
-retcode_t iota_consensus_tip_selector_init(
-    tip_selector_t *const tip_selector, iota_consensus_conf_t *const conf,
-    cw_rating_calculator_t *const cw_rating_calculator,
-    entry_point_selector_t *const entry_point_selector,
-    ep_randomizer_t *const ep_randomizer,
-    exit_prob_transaction_validator_t *const walker_validator,
-    ledger_validator_t *const ledger_validator,
-    milestone_tracker_t *const milestone_tracker);
+retcode_t iota_consensus_tip_selector_init(tip_selector_t *const tip_selector, iota_consensus_conf_t *const conf,
+                                           cw_rating_calculator_t *const cw_rating_calculator,
+                                           entry_point_selector_t *const entry_point_selector,
+                                           ep_randomizer_t *const ep_randomizer,
+                                           exit_prob_transaction_validator_t *const walker_validator,
+                                           ledger_validator_t *const ledger_validator,
+                                           milestone_tracker_t *const milestone_tracker);
 
-retcode_t iota_consensus_tip_selector_get_transactions_to_approve(
-    tip_selector_t *const tip_selector, tangle_t *const tangle,
-    size_t const depth, flex_trit_t const *const reference,
-    tips_pair_t *const tips);
+retcode_t iota_consensus_tip_selector_get_transactions_to_approve(tip_selector_t *const tip_selector,
+                                                                  tangle_t *const tangle, size_t const depth,
+                                                                  flex_trit_t const *const reference,
+                                                                  tips_pair_t *const tips);
 
-retcode_t iota_consensus_tip_selector_destroy(
-    tip_selector_t *const tip_selector);
+retcode_t iota_consensus_tip_selector_destroy(tip_selector_t *const tip_selector);
 
 #ifdef __cplusplus
 }

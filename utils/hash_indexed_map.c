@@ -11,9 +11,8 @@
  * Hash-indexed_hash_set map
  */
 
-bool hash_to_indexed_hash_set_map_contains(
-    hash_to_indexed_hash_set_map_t const *const map,
-    flex_trit_t const *const hash) {
+bool hash_to_indexed_hash_set_map_contains(hash_to_indexed_hash_set_map_t const *const map,
+                                           flex_trit_t const *const hash) {
   hash_to_indexed_hash_set_entry_t *entry = NULL;
 
   if (!(*map)) {
@@ -24,10 +23,8 @@ bool hash_to_indexed_hash_set_map_contains(
   return entry != NULL;
 }
 
-bool hash_to_indexed_hash_set_map_find(
-    hash_to_indexed_hash_set_map_t const *const map,
-    flex_trit_t const *const hash,
-    hash_to_indexed_hash_set_entry_t const **res) {
+bool hash_to_indexed_hash_set_map_find(hash_to_indexed_hash_set_map_t const *const map, flex_trit_t const *const hash,
+                                       hash_to_indexed_hash_set_entry_t const **res) {
   if (map == NULL || (*map) == NULL) {
     return false;
   }
@@ -38,12 +35,11 @@ bool hash_to_indexed_hash_set_map_find(
   return *res != NULL;
 }
 
-retcode_t hash_to_indexed_hash_set_map_add_new_set(
-    hash_to_indexed_hash_set_map_t *const map, flex_trit_t const *const hash,
-    hash_to_indexed_hash_set_entry_t **const new_set_entry,
-    size_t const index) {
-  *new_set_entry = (hash_to_indexed_hash_set_entry_t *)malloc(
-      sizeof(hash_to_indexed_hash_set_entry_t));
+retcode_t hash_to_indexed_hash_set_map_add_new_set(hash_to_indexed_hash_set_map_t *const map,
+                                                   flex_trit_t const *const hash,
+                                                   hash_to_indexed_hash_set_entry_t **const new_set_entry,
+                                                   size_t const index) {
+  *new_set_entry = (hash_to_indexed_hash_set_entry_t *)malloc(sizeof(hash_to_indexed_hash_set_entry_t));
   if (*new_set_entry == NULL) {
     return RC_UTILS_OOM;
   }
@@ -57,8 +53,7 @@ retcode_t hash_to_indexed_hash_set_map_add_new_set(
   return RC_OK;
 }
 
-void hash_to_indexed_hash_set_map_free(
-    hash_to_indexed_hash_set_map_t *const map) {
+void hash_to_indexed_hash_set_map_free(hash_to_indexed_hash_set_map_t *const map) {
   hash_to_indexed_hash_set_entry_t *curr_entry = NULL;
   hash_to_indexed_hash_set_entry_t *tmp_entry = NULL;
 

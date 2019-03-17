@@ -8,8 +8,7 @@
 #include "cclient/request/remove_neighbors.h"
 
 remove_neighbors_req_t* remove_neighbors_req_new() {
-  remove_neighbors_req_t* req =
-      (remove_neighbors_req_t*)malloc(sizeof(remove_neighbors_req_t));
+  remove_neighbors_req_t* req = (remove_neighbors_req_t*)malloc(sizeof(remove_neighbors_req_t));
   if (req) {
     req->uris = NULL;
     utarray_new(req->uris, &ut_str_icd);
@@ -17,8 +16,7 @@ remove_neighbors_req_t* remove_neighbors_req_new() {
   return req;
 }
 
-retcode_t remove_neighbors_req_add(remove_neighbors_req_t* req,
-                                   const char* uri) {
+retcode_t remove_neighbors_req_add(remove_neighbors_req_t* req, const char* uri) {
   if (!req->uris) {
     utarray_new(req->uris, &ut_str_icd);
   }
@@ -29,12 +27,9 @@ retcode_t remove_neighbors_req_add(remove_neighbors_req_t* req,
   return RC_OK;
 }
 
-size_t remove_neighbors_req_uris_len(remove_neighbors_req_t* req) {
-  return utarray_len(req->uris);
-}
+size_t remove_neighbors_req_uris_len(remove_neighbors_req_t* req) { return utarray_len(req->uris); }
 
-const char* remove_neighbors_req_uris_at(remove_neighbors_req_t* req,
-                                         size_t idx) {
+const char* remove_neighbors_req_uris_at(remove_neighbors_req_t* req, size_t idx) {
   return *(const char**)utarray_eltptr(req->uris, idx);
 }
 

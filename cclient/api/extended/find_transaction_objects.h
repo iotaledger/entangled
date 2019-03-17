@@ -35,10 +35,9 @@ extern "C" {
  * Refer:
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createFindTransactionObjects.ts#L38
  */
-retcode_t iota_client_find_transaction_objects(
-    iota_client_service_t const* const serv,
-    find_transactions_req_t const* const tx_queries,
-    transaction_array_t out_tx_objs);
+retcode_t iota_client_find_transaction_objects(iota_client_service_t const* const serv,
+                                               find_transactions_req_t const* const tx_queries,
+                                               transaction_array_t out_tx_objs);
 
 #ifdef __cplusplus
 }

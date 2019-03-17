@@ -34,8 +34,7 @@ extern "C" {
  *
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createIsPromotable.ts#L71
  */
-retcode_t iota_client_is_promotable(iota_client_service_t const* const serv,
-                                    flex_trit_t const* const tail_tx,
+retcode_t iota_client_is_promotable(iota_client_service_t const* const serv, flex_trit_t const* const tail_tx,
                                     bool* out_promotable);
 
 #ifdef __cplusplus

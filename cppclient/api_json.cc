@@ -33,8 +33,7 @@ using boost::adaptors::transformed;
 using boost::adaptors::uniqued;
 using iota::model::TryteTransaction;
 
-DEFINE_uint32(maxNumAddressesForGetBalances, 1000,
-              "Maximum number of addresses to query for in 'getBalances'");
+DEFINE_uint32(maxNumAddressesForGetBalances, 1000, "Maximum number of addresses to query for in 'getBalances'");
 
 DEFINE_uint32(maxQuerySizeFindTransactions, 500,
               "Maximum number of addresses/bundles/approvees to query for in "
@@ -89,12 +88,12 @@ nonstd::optional<NodeInfo> IotaJsonAPI::getNodeInfo() {
     return {};
   }
 
-  return {{response["latestMilestone"], response["latestMilestoneIndex"],
-           response["latestSolidSubtangleMilestoneIndex"]}};
+  return {
+      {response["latestMilestone"], response["latestMilestoneIndex"], response["latestSolidSubtangleMilestoneIndex"]}};
 }
 
-nonstd::optional<std::unordered_map<std::string, uint64_t>>
-IotaJsonAPI::getBalances(const std::vector<std::string>& addresses) {
+nonstd::optional<std::unordered_map<std::string, uint64_t>> IotaJsonAPI::getBalances(
+    const std::vector<std::string>& addresses) {
   VLOG(3) << __FUNCTION__;
   std::unordered_map<std::string, uint64_t> result;
   json req;
@@ -103,13 +102,11 @@ IotaJsonAPI::getBalances(const std::vector<std::string>& addresses) {
 
   uint32_t currAddressCount = 0;
   while (currAddressCount < addresses.size()) {
-    auto numAddressesToQuery = (addresses.size() - currAddressCount) >
-                                       FLAGS_maxNumAddressesForGetBalances
+    auto numAddressesToQuery = (addresses.size() - currAddressCount) > FLAGS_maxNumAddressesForGetBalances
                                    ? FLAGS_maxNumAddressesForGetBalances
                                    : (addresses.size() - currAddressCount);
     auto start = addresses.begin() + currAddressCount;
-    auto currAddresses =
-        std::vector<std::string>(start, start + numAddressesToQuery);
+    auto currAddresses = std::vector<std::string>(start, start + numAddressesToQuery);
     req["addresses"] = currAddresses;
 
     auto maybeResponse = post(req);
@@ -138,13 +135,11 @@ IotaJsonAPI::getBalances(const std::vector<std::string>& addresses) {
   return {result};
 }
 
-std::vector<std::string> IotaJsonAPI::findTransactions(
-    nonstd::optional<std::vector<std::string>> addresses,
-    nonstd::optional<std::vector<std::string>> bundles,
-    nonstd::optional<std::vector<std::string>> approvees) {
+std::vector<std::string> IotaJsonAPI::findTransactions(nonstd::optional<std::vector<std::string>> addresses,
+                                                       nonstd::optional<std::vector<std::string>> bundles,
+                                                       nonstd::optional<std::vector<std::string>> approvees) {
   VLOG(3) << __FUNCTION__;
-  if (!addresses.has_value() && !bundles.has_value() &&
-      !approvees.has_value()) {
+  if (!addresses.has_value() && !bundles.has_value() && !approvees.has_value()) {
     return {};
   }
 
@@ -160,23 +155,19 @@ std::vector<std::string> IotaJsonAPI::findTransactions(
   uint32_t maxBundles = bundles.has_value() ? bundles.value().size() : 0;
   uint32_t maxApprovees = approvees.has_value() ? approvees.value().size() : 0;
 
-  while (currAddressCount < maxAddresses || currBundleCount < maxBundles ||
-         currApproveeCount < maxApprovees) {
+  while (currAddressCount < maxAddresses || currBundleCount < maxBundles || currApproveeCount < maxApprovees) {
     if (currAddressCount < maxAddresses) {
-      auto currAddresses = nextBatch(addresses.value(), currAddressCount,
-                                     FLAGS_maxQuerySizeFindTransactions);
+      auto currAddresses = nextBatch(addresses.value(), currAddressCount, FLAGS_maxQuerySizeFindTransactions);
       req["addresses"] = std::move(currAddresses);
     }
 
     if (currBundleCount < maxBundles) {
-      auto currBundles = nextBatch(bundles.value(), currBundleCount,
-                                   FLAGS_maxQuerySizeFindTransactions);
+      auto currBundles = nextBatch(bundles.value(), currBundleCount, FLAGS_maxQuerySizeFindTransactions);
       req["bundles"] = std::move(currBundles);
     }
 
     if (currApproveeCount < maxApprovees) {
-      auto currApprovees = nextBatch(bundles.value(), currApproveeCount,
-                                     FLAGS_maxQuerySizeFindTransactions);
+      auto currApprovees = nextBatch(bundles.value(), currApproveeCount, FLAGS_maxQuerySizeFindTransactions);
       req["approvees"] = std::move(currApprovees);
     }
 
@@ -187,8 +178,7 @@ std::vector<std::string> IotaJsonAPI::findTransactions(
     }
 
     if (!maybeResponse.value()["hashes"].is_null()) {
-      auto resVec =
-          maybeResponse.value()["hashes"].get<std::vector<std::string>>();
+      auto resVec = maybeResponse.value()["hashes"].get<std::vector<std::string>>();
       std::copy(std::begin(resVec), std::end(resVec), std::back_inserter(txs));
     } else {
       LOG(INFO) << __FUNCTION__ << " request failed.";
@@ -198,8 +188,7 @@ std::vector<std::string> IotaJsonAPI::findTransactions(
 
   return txs;
 }
-std::vector<std::string> IotaJsonAPI::getTrytes(
-    const std::vector<std::string>& hashes) {
+std::vector<std::string> IotaJsonAPI::getTrytes(const std::vector<std::string>& hashes) {
   VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "getTrytes";
@@ -208,8 +197,7 @@ std::vector<std::string> IotaJsonAPI::getTrytes(
   std::vector<std::string> trytes;
 
   while (currHashesCount < hashes.size()) {
-    auto currHashes =
-        nextBatch(hashes, currHashesCount, FLAGS_maxQuerySizeFindTransactions);
+    auto currHashes = nextBatch(hashes, currHashesCount, FLAGS_maxQuerySizeFindTransactions);
     req["hashes"] = currHashes;
 
     auto maybeResponse = post(std::move(req));
@@ -219,8 +207,7 @@ std::vector<std::string> IotaJsonAPI::getTrytes(
     }
 
     if (!maybeResponse.value()["trytes"].is_null()) {
-      auto res =
-          maybeResponse.value()["trytes"].get<std::vector<std::string>>();
+      auto res = maybeResponse.value()["trytes"].get<std::vector<std::string>>();
       trytes.insert(std::end(trytes), std::begin(res), std::end(res));
     } else {
       LOG(INFO) << __FUNCTION__ << " request failed.";
@@ -230,8 +217,7 @@ std::vector<std::string> IotaJsonAPI::getTrytes(
   return trytes;
 }
 
-std::vector<Transaction> IotaJsonAPI::getTransactions(
-    const std::vector<std::string>& hashes) {
+std::vector<Transaction> IotaJsonAPI::getTransactions(const std::vector<std::string>& hashes) {
   VLOG(3) << __FUNCTION__;
   auto trytes = getTrytes(hashes);
 
@@ -242,39 +228,31 @@ std::vector<Transaction> IotaJsonAPI::getTransactions(
   std::vector<Transaction> txs;
   std::chrono::system_clock::time_point epoch;
 
-  boost::copy(
-      trytes | transformed([&epoch](const std::string& trytes) -> Transaction {
-        TryteTransaction* tx = new TryteTransaction(trytes);
+  boost::copy(trytes | transformed([&epoch](const std::string& trytes) -> Transaction {
+                TryteTransaction* tx = new TryteTransaction(trytes);
 
-        // We could also rely on the ordering of the hashes argument here.
-        auto hash = iota_digest(trytes.c_str());
-        std::string sHash = std::string(reinterpret_cast<char*>(hash), 81);
-        std::free(hash);
+                // We could also rely on the ordering of the hashes argument here.
+                auto hash = iota_digest(trytes.c_str());
+                std::string sHash = std::string(reinterpret_cast<char*>(hash), 81);
+                std::free(hash);
 
-        auto sAddress = tx->address();
-        auto sBundle = tx->bundle();
-        auto sTrunk = tx->trunk();
+                auto sAddress = tx->address();
+                auto sBundle = tx->bundle();
+                auto sTrunk = tx->trunk();
 
-        std::chrono::seconds sinceEpoch(tx->timestamp());
+                std::chrono::seconds sinceEpoch(tx->timestamp());
 
-        return {sHash,
-                sAddress,
-                tx->value(),
-                epoch + sinceEpoch,
-                tx->currentIndex(),
-                tx->lastIndex(),
-                sBundle,
-                sTrunk};
-      }),
-      boost::back_move_inserter(txs));
+                return {sHash,           sAddress, tx->value(), epoch + sinceEpoch, tx->currentIndex(),
+                        tx->lastIndex(), sBundle,  sTrunk};
+              }),
+              boost::back_move_inserter(txs));
 
   // transaction_free(tx);
 
   return txs;
 }
 
-std::unordered_multimap<std::string, Bundle>
-IotaJsonAPI::getConfirmedBundlesForAddresses(
+std::unordered_multimap<std::string, Bundle> IotaJsonAPI::getConfirmedBundlesForAddresses(
     const std::vector<std::string>& addresses) {
   VLOG(3) << __FUNCTION__;
   // 1. Get all transactions for address [findTransactions, getTransactions]
@@ -283,9 +261,7 @@ IotaJsonAPI::getConfirmedBundlesForAddresses(
 
   // 2. Filter unique bundles from these []
   std::vector<std::string> bundles;
-  boost::copy(transactions | transformed([](const Transaction& tx) {
-                return tx.bundleHash;
-              }) | uniqued,
+  boost::copy(transactions | transformed([](const Transaction& tx) { return tx.bundleHash; }) | uniqued,
               boost::back_move_inserter(bundles));
 
   // 3. Materialise all bundles [findTransactions, getTransactions]
@@ -294,9 +270,8 @@ IotaJsonAPI::getConfirmedBundlesForAddresses(
 
   // 4. Filter unconfirmed bundles [getNodeInfo, getInclusionStates]
   std::vector<std::string> tails;
-  boost::copy(transactions | filtered([](const Transaction& tx) {
-                return tx.currentIndex == 0;
-              }) | transformed([](const Transaction& tx) { return tx.hash; }),
+  boost::copy(transactions | filtered([](const Transaction& tx) { return tx.currentIndex == 0; }) |
+                  transformed([](const Transaction& tx) { return tx.hash; }),
               boost::back_move_inserter(tails));
 
   auto confirmedTails = filterConfirmedTails(tails, {});
@@ -327,9 +302,7 @@ IotaJsonAPI::getConfirmedBundlesForAddresses(
   for (const auto& address : addresses) {
     for (const auto& b : confirmedBundles) {
       if (std::find_if(b.begin(), b.end(),
-                       [address](const Transaction& tx) -> bool {
-                         return address == tx.address;
-                       }) != b.end()) {
+                       [address](const Transaction& tx) -> bool { return address == tx.address; }) != b.end()) {
         confirmedBundlesMap.emplace(std::pair<std::string, Bundle>(address, b));
       }
     }
@@ -338,9 +311,8 @@ IotaJsonAPI::getConfirmedBundlesForAddresses(
   return confirmedBundlesMap;
 }
 
-std::unordered_set<std::string> IotaJsonAPI::filterConfirmedTails(
-    const std::vector<std::string>& tails,
-    const nonstd::optional<std::string>& reference) {
+std::unordered_set<std::string> IotaJsonAPI::filterConfirmedTails(const std::vector<std::string>& tails,
+                                                                  const nonstd::optional<std::string>& reference) {
   VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "getInclusionStates";
@@ -362,8 +334,7 @@ std::unordered_set<std::string> IotaJsonAPI::filterConfirmedTails(
   std::vector<bool> states;
 
   while (currTailCount < tails.size()) {
-    auto currTails =
-        nextBatch(tails, currTailCount, FLAGS_maxQuerySizeGetInclusionState);
+    auto currTails = nextBatch(tails, currTailCount, FLAGS_maxQuerySizeGetInclusionState);
 
     req["transactions"] = currTails;
 
@@ -380,8 +351,7 @@ std::unordered_set<std::string> IotaJsonAPI::filterConfirmedTails(
       return {};
     } else {
       auto currVec = response["states"].get<std::vector<bool>>();
-      std::copy(std::begin(currVec), std::end(currVec),
-                std::back_inserter(states));
+      std::copy(std::begin(currVec), std::end(currVec), std::back_inserter(states));
     }
   }
 
@@ -396,8 +366,7 @@ std::unordered_set<std::string> IotaJsonAPI::filterConfirmedTails(
   return confirmedTails;
 }
 
-nonstd::optional<GetTransactionsToApproveResponse>
-IotaJsonAPI::getTransactionsToApprove(
+nonstd::optional<GetTransactionsToApproveResponse> IotaJsonAPI::getTransactionsToApprove(
     size_t depth, const nonstd::optional<std::string>& reference) {
   VLOG(3) << __FUNCTION__;
   json req;
@@ -418,13 +387,12 @@ IotaJsonAPI::getTransactionsToApprove(
 
   auto& response = maybeResponse.value();
 
-  return {{response["trunkTransaction"], response["branchTransaction"],
-           response["duration"]}};
+  return {{response["trunkTransaction"], response["branchTransaction"], response["duration"]}};
 }
 
-std::vector<std::string> IotaJsonAPI::attachToTangle(
-    const std::string& trunkTransaction, const std::string& branchTransaction,
-    size_t minWeightMagnitude, const std::vector<std::string>& trytes) {
+std::vector<std::string> IotaJsonAPI::attachToTangle(const std::string& trunkTransaction,
+                                                     const std::string& branchTransaction, size_t minWeightMagnitude,
+                                                     const std::vector<std::string>& trytes) {
   VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "attachToTangle";
@@ -461,8 +429,7 @@ bool IotaJsonAPI::storeTransactions(const std::vector<std::string>& trytes) {
   return maybeResponse && maybeResponse.has_value();
 }
 
-bool IotaJsonAPI::broadcastTransactions(
-    const std::vector<std::string>& trytes) {
+bool IotaJsonAPI::broadcastTransactions(const std::vector<std::string>& trytes) {
   VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "broadcastTransactions";
@@ -472,8 +439,7 @@ bool IotaJsonAPI::broadcastTransactions(
   return maybeResponse && maybeResponse.has_value();
 }
 
-std::unordered_set<std::string> IotaJsonAPI::filterConsistentTails(
-    const std::vector<std::string>& tails) {
+std::unordered_set<std::string> IotaJsonAPI::filterConsistentTails(const std::vector<std::string>& tails) {
   std::unordered_set<std::string> ret;
   VLOG(3) << __FUNCTION__;
   for (const auto& tail : tails) {
@@ -487,8 +453,7 @@ std::unordered_set<std::string> IotaJsonAPI::filterConsistentTails(
       continue;
     }
 
-    if ((!maybeResponse.value()["state"].is_null()) &&
-        maybeResponse.value()["state"].get<bool>()) {
+    if ((!maybeResponse.value()["state"].is_null()) && maybeResponse.value()["state"].get<bool>()) {
       ret.insert(tail);
     }
   }
@@ -496,9 +461,8 @@ std::unordered_set<std::string> IotaJsonAPI::filterConsistentTails(
   return ret;
 }
 
-GetInclusionStatesResponse IotaJsonAPI::getInclusionStates(
-    const std::vector<std::string>& trans,
-    const std::vector<std::string>& tips) {
+GetInclusionStatesResponse IotaJsonAPI::getInclusionStates(const std::vector<std::string>& trans,
+                                                           const std::vector<std::string>& tips) {
   VLOG(3) << __FUNCTION__;
   json req;
   req["command"] = "getInclusionStates";
@@ -521,12 +485,8 @@ GetInclusionStatesResponse IotaJsonAPI::getInclusionStates(
 }
 
 template <typename T>
-std::vector<T> IotaJsonAPI::nextBatch(const std::vector<T>& vec,
-                                      uint32_t& numBatchedEntries,
-                                      uint32_t batchSize) {
-  auto numToQuery = (vec.size() - numBatchedEntries) > batchSize
-                        ? batchSize
-                        : (vec.size() - numBatchedEntries);
+std::vector<T> IotaJsonAPI::nextBatch(const std::vector<T>& vec, uint32_t& numBatchedEntries, uint32_t batchSize) {
+  auto numToQuery = (vec.size() - numBatchedEntries) > batchSize ? batchSize : (vec.size() - numBatchedEntries);
   auto startEntry = vec.begin() + numBatchedEntries;
   auto currVec = std::vector<T>(startEntry, startEntry + numToQuery);
 

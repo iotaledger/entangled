@@ -74,11 +74,8 @@ TEST(IRITest, TXMessageTest) {
       msg->address().c_str());
   ASSERT_EQ(0, msg->value());
   ASSERT_STREQ("IQTNA9999999999999999999999", msg->obsoleteTag().c_str());
-  ASSERT_EQ(
-      1509897914000,
-      std::chrono::time_point_cast<std::chrono::milliseconds>(msg->timestamp())
-          .time_since_epoch()
-          .count());
+  ASSERT_EQ(1509897914000,
+            std::chrono::time_point_cast<std::chrono::milliseconds>(msg->timestamp()).time_since_epoch().count());
   ASSERT_EQ(0ULL, msg->currentIndex());
   ASSERT_EQ(1ULL, msg->lastIndex());
   ASSERT_STREQ(
@@ -94,8 +91,5 @@ TEST(IRITest, TXMessageTest) {
       "IREBA9999",
       msg->branch().c_str());
   ASSERT_EQ(1509897927055,
-            std::chrono::time_point_cast<std::chrono::milliseconds>(
-                msg->arrivalTime())
-                .time_since_epoch()
-                .count());
+            std::chrono::time_point_cast<std::chrono::milliseconds>(msg->arrivalTime()).time_since_epoch().count());
 }

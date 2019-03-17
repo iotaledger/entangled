@@ -46,23 +46,21 @@ int main(int argc, char* argv[]) {
 
   // Default configuration
 
-  if (iota_ciri_conf_default(&ciri_core.conf, &ciri_core.consensus.conf,
-                             &ciri_core.node.conf,
-                             &ciri_core.api.conf) != RC_OK) {
+  if (iota_ciri_conf_default(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &ciri_core.api.conf) !=
+      RC_OK) {
     return EXIT_FAILURE;
   }
 
   // File configuration
 
-  if (iota_ciri_conf_file(&ciri_core.conf, &ciri_core.consensus.conf,
-                          &ciri_core.node.conf, &ciri_core.api.conf) != RC_OK) {
+  if (iota_ciri_conf_file(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &ciri_core.api.conf) !=
+      RC_OK) {
     return EXIT_FAILURE;
   }
 
   // CLI configuration
 
-  if (iota_ciri_conf_cli(&ciri_core.conf, &ciri_core.consensus.conf,
-                         &ciri_core.node.conf, &ciri_core.api.conf, argc,
+  if (iota_ciri_conf_cli(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &ciri_core.api.conf, argc,
                          argv) != RC_OK) {
     return EXIT_FAILURE;
   }
@@ -102,10 +100,8 @@ int main(int argc, char* argv[]) {
     log_info(logger_id,
              "Transactions: to process %d, to broadcast %d, to request %d, "
              "to reply %d, count %d\n",
-             processor_size(&ciri_core.node.processor),
-             broadcaster_size(&ciri_core.node.broadcaster),
-             requester_size(&ciri_core.node.transaction_requester),
-             responder_size(&ciri_core.node.responder), count);
+             processor_size(&ciri_core.node.processor), broadcaster_size(&ciri_core.node.broadcaster),
+             requester_size(&ciri_core.node.transaction_requester), responder_size(&ciri_core.node.responder), count);
     sleep(STATS_LOG_INTERVAL_S);
   }
 

@@ -32,10 +32,9 @@ extern "C" {
  *
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createPromoteTransaction.ts#L51
  */
-retcode_t iota_client_promote_transaction(
-    iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
-    int const depth, int const mwm, bundle_transactions_t* const bundle,
-    bundle_transactions_t* const out_bundle);
+retcode_t iota_client_promote_transaction(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
+                                          int const depth, int const mwm, bundle_transactions_t* const bundle,
+                                          bundle_transactions_t* const out_bundle);
 
 #ifdef __cplusplus
 }

@@ -358,9 +358,7 @@ tryte_t const* const BUNDLE_OF_2_TRUNK_TX =
     "99999999999999999999999999999999999999999999999999999999RRPFLWHSFWFLIOWHEN"
     "IPCTOKOHD";
 
-void populate_bundle_of_transactions(tangle_t *const tangle,
-                                     bundle_transactions_t *bundle,
-                                     size_t num_of_trnasactions);
+void populate_bundle_of_transactions(tangle_t *const tangle, bundle_transactions_t *bundle, size_t num_of_trnasactions);
 
 #ifdef __cplusplus
 }

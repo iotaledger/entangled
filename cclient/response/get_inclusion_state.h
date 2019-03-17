@@ -19,11 +19,9 @@ typedef struct {
 } get_inclusion_state_res_t;
 
 get_inclusion_state_res_t* get_inclusion_state_res_new();
-retcode_t get_inclusion_state_res_states_set(get_inclusion_state_res_t* res,
-                                             int st);
+retcode_t get_inclusion_state_res_states_set(get_inclusion_state_res_t* res, int st);
 void get_inclusion_state_res_free(get_inclusion_state_res_t** res);
-bool get_inclusion_state_res_states_at(get_inclusion_state_res_t* in,
-                                       int index);
+bool get_inclusion_state_res_states_at(get_inclusion_state_res_t* in, int index);
 int get_inclusion_state_res_states_count(get_inclusion_state_res_t* in);
 
 #ifdef __cplusplus

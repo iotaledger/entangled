@@ -13,9 +13,8 @@
 #include "mam/psk/mam_psk_t_set.h"
 #include "utils/memset_safe.h"
 
-retcode_t mam_psk_gen(mam_psk_t *const psk, mam_prng_t const *const prng,
-                      tryte_t const *const id, tryte_t const *const nonce,
-                      size_t const nonce_length) {
+retcode_t mam_psk_gen(mam_psk_t *const psk, mam_prng_t const *const prng, tryte_t const *const id,
+                      tryte_t const *const nonce, size_t const nonce_length) {
   MAM_TRITS_DEF0(nonce_trits, MAM_SPONGE_RATE);
   nonce_trits = MAM_TRITS_INIT(nonce_trits, MAM_SPONGE_RATE);
 
@@ -70,8 +69,7 @@ void mam_psks_destroy(mam_psk_t_set_t *const psks) {
 }
 
 size_t mam_psks_serialized_size(mam_psk_t_set_t const psks) {
-  return pb3_sizeof_size_t(mam_psk_t_set_size(psks)) +
-         mam_psk_t_set_size(psks) * (MAM_PSK_ID_SIZE + MAM_PSK_KEY_SIZE);
+  return pb3_sizeof_size_t(mam_psk_t_set_size(psks)) + mam_psk_t_set_size(psks) * (MAM_PSK_ID_SIZE + MAM_PSK_KEY_SIZE);
 }
 
 retcode_t mam_psks_serialize(mam_psk_t_set_t const psks, trits_t *const trits) {
@@ -86,15 +84,13 @@ retcode_t mam_psks_serialize(mam_psk_t_set_t const psks, trits_t *const trits) {
 
   SET_ITER(psks, entry, tmp) {
     pb3_encode_ntrytes(trits_from_rep(MAM_PSK_ID_SIZE, entry->value.id), trits);
-    pb3_encode_ntrytes(trits_from_rep(MAM_PSK_KEY_SIZE, entry->value.key),
-                       trits);
+    pb3_encode_ntrytes(trits_from_rep(MAM_PSK_KEY_SIZE, entry->value.key), trits);
   }
 
   return RC_OK;
 }
 
-retcode_t mam_psks_deserialize(trits_t *const trits,
-                               mam_psk_t_set_t *const psks) {
+retcode_t mam_psks_deserialize(trits_t *const trits, mam_psk_t_set_t *const psks) {
   retcode_t ret = RC_OK;
   size_t psks_size = 0;
   mam_psk_t psk;
@@ -106,12 +102,8 @@ retcode_t mam_psks_deserialize(trits_t *const trits,
   ERR_BIND_RETURN(pb3_decode_size_t(&psks_size, trits), ret);
 
   for (size_t i = 0; i < psks_size; i++) {
-    ERR_BIND_RETURN(
-        pb3_decode_ntrytes(trits_from_rep(MAM_PSK_ID_SIZE, psk.id), trits),
-        ret);
-    ERR_BIND_RETURN(
-        pb3_decode_ntrytes(trits_from_rep(MAM_PSK_KEY_SIZE, psk.key), trits),
-        ret);
+    ERR_BIND_RETURN(pb3_decode_ntrytes(trits_from_rep(MAM_PSK_ID_SIZE, psk.id), trits), ret);
+    ERR_BIND_RETURN(pb3_decode_ntrytes(trits_from_rep(MAM_PSK_KEY_SIZE, psk.key), trits), ret);
     ERR_BIND_RETURN(mam_psk_t_set_add(psks, &psk), ret);
   }
 

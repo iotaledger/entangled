@@ -43,8 +43,7 @@ extern "C" {
  *
  * @return a status code
  */
-retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
-                                 char const *const uri);
+retcode_t neighbor_init_with_uri(neighbor_t *const neighbor, char const *const uri);
 
 /**
  * Initializes a neighbor with endpoint values
@@ -56,8 +55,7 @@ retcode_t neighbor_init_with_uri(neighbor_t *const neighbor,
  *
  * @return a status code
  */
-retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
-                                    char const *const ip, uint16_t const port,
+retcode_t neighbor_init_with_values(neighbor_t *const neighbor, char const *const ip, uint16_t const port,
                                     protocol_type_t const protocol);
 
 /**
@@ -69,8 +67,7 @@ retcode_t neighbor_init_with_values(neighbor_t *const neighbor,
  *
  * @return a status code
  */
-retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor,
-                               iota_packet_t const *const packet);
+retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor, iota_packet_t const *const packet);
 
 /**
  * Sends transaction flex trits to a neighbor
@@ -82,8 +79,7 @@ retcode_t neighbor_send_packet(node_t *const node, neighbor_t *const neighbor,
  *
  * @return a status code
  */
-retcode_t neighbor_send(node_t *const node, tangle_t *const tangle,
-                        neighbor_t *const neighbor,
+retcode_t neighbor_send(node_t *const node, tangle_t *const tangle, neighbor_t *const neighbor,
                         flex_trit_t const *const transaction);
 
 /**
@@ -95,8 +91,7 @@ retcode_t neighbor_send(node_t *const node, tangle_t *const tangle,
  *
  * @return a status code
  */
-retcode_t neighbors_add(neighbor_t **const neighbors,
-                        neighbor_t const *const neighbor);
+retcode_t neighbors_add(neighbor_t **const neighbors, neighbor_t const *const neighbor);
 
 /**
  * Removes a neighbor from a neighbors list
@@ -107,8 +102,7 @@ retcode_t neighbors_add(neighbor_t **const neighbors,
  *
  * @return a status code
  */
-retcode_t neighbors_remove(neighbor_t **const neighbors,
-                           neighbor_t *const neighbor);
+retcode_t neighbors_remove(neighbor_t **const neighbors, neighbor_t *const neighbor);
 
 /**
  * Frees a neighbors list
@@ -139,8 +133,7 @@ size_t neighbors_count(neighbor_t *const neighbors);
  *
  * @return a pointer to the neigbor if found, NULL otherwise
  */
-neighbor_t *neighbors_find_by_endpoint(neighbor_t *const neighbors,
-                                       endpoint_t const *const endpoint);
+neighbor_t *neighbors_find_by_endpoint(neighbor_t *const neighbors, endpoint_t const *const endpoint);
 
 /**
  * Finds a neigbor matching given endpoint values
@@ -153,9 +146,7 @@ neighbor_t *neighbors_find_by_endpoint(neighbor_t *const neighbors,
  *
  * @return a pointer to the neigbor if found, NULL otherwise
  */
-neighbor_t *neighbors_find_by_endpoint_values(neighbor_t *const neighbors,
-                                              char const *const ip,
-                                              uint16_t const port,
+neighbor_t *neighbors_find_by_endpoint_values(neighbor_t *const neighbors, char const *const ip, uint16_t const port,
                                               protocol_type_t const protocol);
 
 #ifdef __cplusplus

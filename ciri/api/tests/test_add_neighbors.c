@@ -90,8 +90,7 @@ void test_add_neighbors_with_invalid(void) {
   TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.7@15007") == RC_OK);
   TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.8:15008") == RC_OK);
 
-  TEST_ASSERT(iota_api_add_neighbors(&api, req, res) ==
-              RC_NEIGHBOR_FAILED_URI_PARSING);
+  TEST_ASSERT(iota_api_add_neighbors(&api, req, res) == RC_NEIGHBOR_FAILED_URI_PARSING);
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(node.neighbors), 6);
   TEST_ASSERT_EQUAL_INT(res->added_neighbors, 1);

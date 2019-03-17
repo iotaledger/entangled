@@ -15,11 +15,9 @@
 
 static logger_id_t logger_id;
 
-retcode_t iota_consensus_ep_randomizer_init(
-    ep_randomizer_t *const ep_randomizer, iota_consensus_conf_t *const conf,
-    ep_randomizer_implementation_t impl) {
-  logger_id = logger_helper_enable(EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID,
-                                   LOGGER_DEBUG, true);
+retcode_t iota_consensus_ep_randomizer_init(ep_randomizer_t *const ep_randomizer, iota_consensus_conf_t *const conf,
+                                            ep_randomizer_implementation_t impl) {
+  logger_id = logger_helper_enable(EXIT_PROBABILITY_RANDOMIZER_LOGGER_ID, LOGGER_DEBUG, true);
   rand_handle_seed(time(NULL));
   ep_randomizer->conf = conf;
   if (impl == EP_RANDOM_WALK) {
@@ -32,8 +30,7 @@ retcode_t iota_consensus_ep_randomizer_init(
   return RC_OK;
 }
 
-retcode_t iota_consensus_ep_randomizer_destroy(
-    ep_randomizer_t *const ep_randomizer) {
+retcode_t iota_consensus_ep_randomizer_destroy(ep_randomizer_t *const ep_randomizer) {
   if (ep_randomizer->base.vtable.exit_probability_destroy != NULL) {
     ep_randomizer->base.vtable.exit_probability_destroy(ep_randomizer);
   }
@@ -41,11 +38,9 @@ retcode_t iota_consensus_ep_randomizer_destroy(
   return RC_OK;
 }
 
-retcode_t iota_consensus_exit_probability_randomize(
-    ep_randomizer_t const *const ep_randomizer, tangle_t *const tangle,
-    exit_prob_transaction_validator_t *const epv,
-    cw_calc_result *const cw_result, flex_trit_t const *const ep,
-    flex_trit_t *tip) {
-  return ep_randomizer->base.vtable.exit_probability_randomize(
-      ep_randomizer, tangle, epv, cw_result, ep, tip);
+retcode_t iota_consensus_exit_probability_randomize(ep_randomizer_t const *const ep_randomizer, tangle_t *const tangle,
+                                                    exit_prob_transaction_validator_t *const epv,
+                                                    cw_calc_result *const cw_result, flex_trit_t const *const ep,
+                                                    flex_trit_t *tip) {
+  return ep_randomizer->base.vtable.exit_probability_randomize(ep_randomizer, tangle, epv, cw_result, ep, tip);
 }

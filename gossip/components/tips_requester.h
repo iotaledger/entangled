@@ -36,8 +36,7 @@ extern "C" {
  *
  * @return a status code
  */
-retcode_t tips_requester_init(tips_requester_t *const tips_requester,
-                              node_t *const node);
+retcode_t tips_requester_init(tips_requester_t *const tips_requester, node_t *const node);
 
 /**
  * Starts a tips requester

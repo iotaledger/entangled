@@ -40,8 +40,7 @@ IOTA_EXPORT char* iota_digest(const char* trytes) {
   return hash;
 }
 
-IOTA_EXPORT flex_trit_t* iota_flex_digest(flex_trit_t const* const flex_trits,
-                                          size_t num_trits) {
+IOTA_EXPORT flex_trit_t* iota_flex_digest(flex_trit_t const* const flex_trits, size_t num_trits) {
   Curl curl;
   init_curl(&curl);
   curl.type = CURL_P_81;
@@ -56,12 +55,10 @@ IOTA_EXPORT flex_trit_t* iota_flex_digest(flex_trit_t const* const flex_trits,
   free(trits);
 
   size_t flex_len = NUM_FLEX_TRITS_FOR_TRITS(num_trits);
-  flex_trit_t* hash_flex_trits =
-      (flex_trit_t*)calloc(flex_len, sizeof(flex_trit_t));
+  flex_trit_t* hash_flex_trits = (flex_trit_t*)calloc(flex_len, sizeof(flex_trit_t));
   if (!hash_flex_trits) {
     return NULL;
   }
-  flex_trits_from_trits(hash_flex_trits, HASH_LENGTH_TRIT, trits_hash,
-                        HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  flex_trits_from_trits(hash_flex_trits, HASH_LENGTH_TRIT, trits_hash, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   return hash_flex_trits;
 }

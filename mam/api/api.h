@@ -65,8 +65,7 @@ retcode_t mam_api_destroy(mam_api_t *const api);
  *
  * @return return code
  */
-retcode_t mam_api_add_trusted_channel_pk(mam_api_t *const api,
-                                         tryte_t const *const pk);
+retcode_t mam_api_add_trusted_channel_pk(mam_api_t *const api, tryte_t const *const pk);
 
 /**
  * Add a trusted endpoint id into the api's trusted endpoints set
@@ -76,8 +75,7 @@ retcode_t mam_api_add_trusted_channel_pk(mam_api_t *const api,
  *
  * @return return code
  */
-retcode_t mam_api_add_trusted_endpoint_pk(mam_api_t *const api,
-                                          tryte_t const *const pk);
+retcode_t mam_api_add_trusted_endpoint_pk(mam_api_t *const api, tryte_t const *const pk);
 
 /**
  * Add a NTRU secret key to api's NTRU sks set
@@ -87,8 +85,7 @@ retcode_t mam_api_add_trusted_endpoint_pk(mam_api_t *const api,
  *
  * @return return code
  */
-retcode_t mam_api_add_ntru_sk(mam_api_t *const api,
-                              mam_ntru_sk_t const *const ntru_sk);
+retcode_t mam_api_add_ntru_sk(mam_api_t *const api, mam_ntru_sk_t const *const ntru_sk);
 
 /**
  * Add a NTRU public key to api's NTRU pks set
@@ -98,8 +95,7 @@ retcode_t mam_api_add_ntru_sk(mam_api_t *const api,
  *
  * @return return code
  */
-retcode_t mam_api_add_ntru_pk(mam_api_t *const api,
-                              mam_ntru_pk_t const *const ntru_pk);
+retcode_t mam_api_add_ntru_pk(mam_api_t *const api, mam_ntru_pk_t const *const ntru_pk);
 
 /**
  * Add a pre shared key to api's psks set
@@ -120,8 +116,7 @@ retcode_t mam_api_add_psk(mam_api_t *const api, mam_psk_t const *const psk);
  *
  * @return return code
  */
-retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height,
-                                 tryte_t *const channel_id);
+retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height, tryte_t *const channel_id);
 
 /**
  * Gets a channel from its id
@@ -131,8 +126,7 @@ retcode_t mam_api_create_channel(mam_api_t *const api, size_t const height,
  *
  * @return a pointer to the channel or NULL if not found
  */
-mam_channel_t *mam_api_get_channel(mam_api_t const *const api,
-                                   tryte_t const *const channel_id);
+mam_channel_t *mam_api_get_channel(mam_api_t const *const api, tryte_t const *const channel_id);
 
 /**
  * Creates and adds an endpoint to the API
@@ -144,8 +138,7 @@ mam_channel_t *mam_api_get_channel(mam_api_t const *const api,
  *
  * @return return code
  */
-retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
-                                  tryte_t const *const channel_id,
+retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height, tryte_t const *const channel_id,
                                   tryte_t *const endpoint_id);
 
 /**
@@ -157,8 +150,7 @@ retcode_t mam_api_create_endpoint(mam_api_t *const api, size_t const height,
  *
  * @return a pointer to the endpoint or NULL if not found
  */
-mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api,
-                                     tryte_t const *const channel_id,
+mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api, tryte_t const *const channel_id,
                                      tryte_t const *const endpoint_id);
 
 /**
@@ -168,8 +160,7 @@ mam_endpoint_t *mam_api_get_endpoint(mam_api_t const *const api,
  * @param msg_id - The message ID [in]
  * @param ord - The packet ord [in]
  */
-void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id,
-                       trint18_t const ord);
+void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id, trint18_t const ord);
 
 /**
  * Writes MAM header on a channel(keyloads (session keys) + potential packet)
@@ -187,10 +178,9 @@ void mam_api_write_tag(trit_t *const tag, trit_t const *const msg_id,
  *
  * @return return code
  */
-retcode_t mam_api_bundle_write_header_on_channel(
-    mam_api_t *const api, tryte_t const *const ch_id, mam_psk_t_set_t psks,
-    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-    bundle_transactions_t *const bundle, trit_t *const msg_id);
+retcode_t mam_api_bundle_write_header_on_channel(mam_api_t *const api, tryte_t const *const ch_id, mam_psk_t_set_t psks,
+                                                 mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+                                                 bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 /**
  * Writes MAM header on an endpoint(keyloads (session keys) + potential packet)
@@ -209,11 +199,10 @@ retcode_t mam_api_bundle_write_header_on_channel(
  *
  * @return return code
  */
-retcode_t mam_api_bundle_write_header_on_endpoint(
-    mam_api_t *const api, tryte_t const *const ch_id,
-    tryte_t const *const ep_id, mam_psk_t_set_t psks,
-    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-    bundle_transactions_t *const bundle, trit_t *const msg_id);
+retcode_t mam_api_bundle_write_header_on_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
+                                                  tryte_t const *const ep_id, mam_psk_t_set_t psks,
+                                                  mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+                                                  bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 /**
  * Writes an announcement of a new channel (keyloads (session keys) +
@@ -232,11 +221,10 @@ retcode_t mam_api_bundle_write_header_on_endpoint(
  *
  * @return return code
  */
-retcode_t mam_api_bundle_announce_new_channel(
-    mam_api_t *const api, tryte_t const *const ch_id,
-    tryte_t const *const ch1_id, mam_psk_t_set_t psks,
-    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-    bundle_transactions_t *const bundle, trit_t *const msg_id);
+retcode_t mam_api_bundle_announce_new_channel(mam_api_t *const api, tryte_t const *const ch_id,
+                                              tryte_t const *const ch1_id, mam_psk_t_set_t psks,
+                                              mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+                                              bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 /**
  * Writes an announcement of a new endpoint (keyloads (session keys) +
@@ -255,11 +243,10 @@ retcode_t mam_api_bundle_announce_new_channel(
  *
  * @return return code
  */
-retcode_t mam_api_bundle_announce_new_endpoint(
-    mam_api_t *const api, tryte_t const *const ch_id,
-    tryte_t const *const ep1_id, mam_psk_t_set_t psks,
-    mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
-    bundle_transactions_t *const bundle, trit_t *const msg_id);
+retcode_t mam_api_bundle_announce_new_endpoint(mam_api_t *const api, tryte_t const *const ch_id,
+                                               tryte_t const *const ep1_id, mam_psk_t_set_t psks,
+                                               mam_ntru_pk_t_set_t ntru_pks, trint9_t msg_type_id,
+                                               bundle_transactions_t *const bundle, trit_t *const msg_id);
 
 /**
  * Writes MAM packet into a bundle
@@ -273,12 +260,8 @@ retcode_t mam_api_bundle_announce_new_endpoint(
  *
  * @return return code
  */
-retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
-                                      trit_t const *const msg_id,
-                                      tryte_t const *const payload,
-                                      size_t const payload_size,
-                                      mam_msg_checksum_t checksum,
-                                      bool is_last_packet,
+retcode_t mam_api_bundle_write_packet(mam_api_t *const api, trit_t const *const msg_id, tryte_t const *const payload,
+                                      size_t const payload_size, mam_msg_checksum_t checksum, bool is_last_packet,
                                       bundle_transactions_t *const bundle);
 
 /**
@@ -292,11 +275,8 @@ retcode_t mam_api_bundle_write_packet(mam_api_t *const api,
  *
  * @return return code
  */
-retcode_t mam_api_bundle_read(mam_api_t *const api,
-                              bundle_transactions_t const *const bundle,
-                              tryte_t **const payload,
-                              size_t *const payload_size,
-                              bool *const is_last_packet);
+retcode_t mam_api_bundle_read(mam_api_t *const api, bundle_transactions_t const *const bundle, tryte_t **const payload,
+                              size_t *const payload_size, bool *const is_last_packet);
 
 /**
  * Gets the number of trits needed for an API serialization

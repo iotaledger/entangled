@@ -16,10 +16,9 @@ void test_good_signature(void) {
   bool valid = false;
 
   TEST_ASSERT(iota_snapshot_conf_init(&conf) == RC_OK);
-  TEST_ASSERT(iota_file_signature_validate(
-                  conf.snapshot_file, conf.snapshot_signature_file,
-                  conf.snapshot_signature_pubkey, conf.snapshot_signature_depth,
-                  conf.snapshot_signature_index, &valid) == RC_OK);
+  TEST_ASSERT(iota_file_signature_validate(conf.snapshot_file, conf.snapshot_signature_file,
+                                           conf.snapshot_signature_pubkey, conf.snapshot_signature_depth,
+                                           conf.snapshot_signature_index, &valid) == RC_OK);
   TEST_ASSERT_TRUE(valid);
 }
 
@@ -27,10 +26,9 @@ void test_bad_signature(void) {
   bool valid = false;
 
   TEST_ASSERT(iota_snapshot_conf_init(&conf) == RC_OK);
-  TEST_ASSERT(iota_file_signature_validate(
-                  conf.snapshot_file, "utils/tests/fake.sig",
-                  conf.snapshot_signature_pubkey, conf.snapshot_signature_depth,
-                  conf.snapshot_signature_index, &valid) == RC_OK);
+  TEST_ASSERT(iota_file_signature_validate(conf.snapshot_file, "utils/tests/fake.sig", conf.snapshot_signature_pubkey,
+                                           conf.snapshot_signature_depth, conf.snapshot_signature_index,
+                                           &valid) == RC_OK);
   TEST_ASSERT_FALSE(valid);
 }
 

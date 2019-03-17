@@ -17,8 +17,7 @@ void test_tips_cache() {
       "999999999";
 
   for (size_t i = 0; i < 10; i++) {
-    flex_trits_from_trytes(hashes[i], HASH_LENGTH_TRIT, trytes,
-                           HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
+    flex_trits_from_trytes(hashes[i], HASH_LENGTH_TRIT, trytes, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
     trytes[0]++;
   }
 

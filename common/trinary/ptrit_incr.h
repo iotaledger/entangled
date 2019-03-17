@@ -15,8 +15,7 @@ extern "C" {
 #include "common/trinary/ptrit.h"
 
 void ptrit_offset(ptrit_t *const trits, size_t const length);
-void ptrit_increment(ptrit_t *const trits, size_t const offset,
-                     size_t const end);
+void ptrit_increment(ptrit_t *const trits, size_t const offset, size_t const end);
 
 #endif
 #ifdef __cplusplus

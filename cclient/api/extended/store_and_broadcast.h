@@ -37,9 +37,8 @@ extern "C" {
  *
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createStoreAndBroadcast.ts#L28
  */
-retcode_t iota_client_store_and_broadcast(
-    iota_client_service_t const* const serv,
-    store_transactions_req_t const* const trytes);
+retcode_t iota_client_store_and_broadcast(iota_client_service_t const* const serv,
+                                          store_transactions_req_t const* const trytes);
 
 #ifdef __cplusplus
 }

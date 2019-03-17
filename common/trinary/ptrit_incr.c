@@ -33,8 +33,7 @@ void ptrit_offset(ptrit_t *const trits, size_t const length) {
   trits[3].high = HIGH_3;
 }
 
-void ptrit_increment(ptrit_t *const trits, size_t const offset,
-                     size_t const end) {
+void ptrit_increment(ptrit_t *const trits, size_t const offset, size_t const end) {
   size_t i;
   ptrit_s carry = 1;
   ptrit_t copy;

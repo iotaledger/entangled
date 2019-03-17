@@ -31,8 +31,7 @@ extern "C" {
  * Refer:
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createBroadcastBundle.ts#L38
  */
-retcode_t iota_client_broadcast_bundle(iota_client_service_t const* const serv,
-                                       flex_trit_t const* const tail_hash,
+retcode_t iota_client_broadcast_bundle(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
                                        bundle_transactions_t* const bundle);
 
 #ifdef __cplusplus

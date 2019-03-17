@@ -43,10 +43,8 @@ typedef struct tips_solidifier_s {
  *
  * @return a status code
  */
-retcode_t tips_solidifier_init(
-    tips_solidifier_t *const tips_solidifier, iota_gossip_conf_t *const conf,
-    tips_cache_t *const tips,
-    transaction_solidifier_t *const transaction_solidifier);
+retcode_t tips_solidifier_init(tips_solidifier_t *const tips_solidifier, iota_gossip_conf_t *const conf,
+                               tips_cache_t *const tips, transaction_solidifier_t *const transaction_solidifier);
 
 /**
  * Starts a tips solidifier

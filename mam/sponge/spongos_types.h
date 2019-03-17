@@ -26,11 +26,9 @@ typedef struct mam_spongos_s {
 
 size_t mam_spongos_serialized_size(mam_spongos_t const *const spongos);
 
-void mam_spongos_serialize(mam_spongos_t const *const spongos,
-                           trits_t *const trits);
+void mam_spongos_serialize(mam_spongos_t const *const spongos, trits_t *const trits);
 
-retcode_t mam_spongos_deserialize(trits_t *const trits,
-                                  mam_spongos_t *const spongos);
+retcode_t mam_spongos_deserialize(trits_t *const trits, mam_spongos_t *const spongos);
 
 #ifdef __cplusplus
 }

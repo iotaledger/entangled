@@ -61,11 +61,8 @@ static inline trits_t mam_ntru_pk_key(mam_ntru_pk_t const *const ntru_pk) {
  *
  * @return a status code
  */
-retcode_t ntru_pk_encr(mam_ntru_pk_t const *const ntru_pk,
-                       mam_prng_t const *const prng,
-                       mam_spongos_t *const spongos, trits_t const nonce,
-                       trits_t const session_key,
-                       trits_t encrypted_session_key);
+retcode_t ntru_pk_encr(mam_ntru_pk_t const *const ntru_pk, mam_prng_t const *const prng, mam_spongos_t *const spongos,
+                       trits_t const nonce, trits_t const session_key, trits_t encrypted_session_key);
 
 /**
  * NTRU encryption of a session key
@@ -78,10 +75,8 @@ retcode_t ntru_pk_encr(mam_ntru_pk_t const *const ntru_pk,
  *
  * @return a status code
  */
-retcode_t ntru_pk_encr_r(mam_ntru_pk_t const *const ntru_pk,
-                         mam_spongos_t *const spongos, trits_t const r,
-                         trits_t const session_key,
-                         trits_t encrypted_session_key);
+retcode_t ntru_pk_encr_r(mam_ntru_pk_t const *const ntru_pk, mam_spongos_t *const spongos, trits_t const r,
+                         trits_t const session_key, trits_t encrypted_session_key);
 
 /**
  * Gets the size of a serialized set of NTRU public keys
@@ -100,8 +95,7 @@ size_t mam_ntru_pks_serialized_size(mam_ntru_pk_t_set_t const ntru_pks);
  *
  * @return a status code
  */
-retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pks,
-                                 trits_t *const trits);
+retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pks, trits_t *const trits);
 
 /**
  * Deserializes a set of NTRU public keys from a trits buffer
@@ -111,8 +105,7 @@ retcode_t mam_ntru_pks_serialize(mam_ntru_pk_t_set_t const ntru_pks,
  *
  * @return a status code
  */
-retcode_t mam_ntru_pks_deserialize(trits_t *const trits,
-                                   mam_ntru_pk_t_set_t *const ntru_pks);
+retcode_t mam_ntru_pks_deserialize(trits_t *const trits, mam_ntru_pk_t_set_t *const ntru_pks);
 
 /*
  * NTRU secret key
@@ -167,8 +160,7 @@ retcode_t ntru_sk_reset(mam_ntru_sk_t *const ntru_sk);
  * @param prng A PRNG interface
  * @param nonce A nonce
  */
-void ntru_sk_gen(mam_ntru_sk_t const *const ntru_sk,
-                 mam_prng_t const *const prng, trits_t const nonce);
+void ntru_sk_gen(mam_ntru_sk_t const *const ntru_sk, mam_prng_t const *const prng, trits_t const nonce);
 
 /**
  * NTRU decryption of an encrypted session key
@@ -180,9 +172,8 @@ void ntru_sk_gen(mam_ntru_sk_t const *const ntru_sk,
  *
  * @return true if decryption succeeded,false otherwise
  */
-bool ntru_sk_decr(mam_ntru_sk_t const *const ntru_sk,
-                  mam_spongos_t *const spongos,
-                  trits_t const encrypted_session_key, trits_t session_key);
+bool ntru_sk_decr(mam_ntru_sk_t const *const ntru_sk, mam_spongos_t *const spongos, trits_t const encrypted_session_key,
+                  trits_t session_key);
 
 /**
  * Loads the internal representation of a NTRU secret key
@@ -216,8 +207,7 @@ size_t mam_ntru_sks_serialized_size(mam_ntru_sk_t_set_t const ntru_sks);
  *
  * @return a status code
  */
-retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sks,
-                                 trits_t *const trits);
+retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sks, trits_t *const trits);
 
 /**
  * Deserializes a set of NTRU secret keys from a trits buffer
@@ -227,8 +217,7 @@ retcode_t mam_ntru_sks_serialize(mam_ntru_sk_t_set_t const ntru_sks,
  *
  * @return a status code
  */
-retcode_t mam_ntru_sks_deserialize(trits_t *const trits,
-                                   mam_ntru_sk_t_set_t *const ntru_sks);
+retcode_t mam_ntru_sks_deserialize(trits_t *const trits, mam_ntru_sk_t_set_t *const ntru_sks);
 
 #ifdef __cplusplus
 }
