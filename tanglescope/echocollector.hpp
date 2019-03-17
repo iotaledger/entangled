@@ -28,23 +28,20 @@ class EchoCollector : public BroadcastReceiveCollector {
   bool parseConfiguration(const YAML::Node& conf) override;
 
  protected:  // gmock classes
-  boost::future<void> handleUnseenTransactions(
-      std::shared_ptr<iri::TXMessage> tx,
-      std::chrono::time_point<std::chrono::system_clock> received,
-      HistogramsMap& histograms, const std::vector<double>& buckets);
+  boost::future<void> handleUnseenTransactions(std::shared_ptr<iri::TXMessage> tx,
+                                               std::chrono::time_point<std::chrono::system_clock> received,
+                                               HistogramsMap& histograms, const std::vector<double>& buckets);
 
  private:
   virtual void doPeriodically(){};
   const std::vector<double>& histogramBuckets() const;
 
-  virtual void subscribeToTransactions(
-      std::string zmqURL, const ZmqObservable& zmqObservable,
-      std::shared_ptr<prometheus::Registry> registry);
+  virtual void subscribeToTransactions(std::string zmqURL, const ZmqObservable& zmqObservable,
+                                       std::shared_ptr<prometheus::Registry> registry);
   // Configuration
   uint32_t _discoveryInterval;
   // Others
-  cuckoohash_map<std::string, std::chrono::system_clock::time_point>
-      _hashToDiscoveryTime;
+  cuckoohash_map<std::string, std::chrono::system_clock::time_point> _hashToDiscoveryTime;
 
   mutable std::shared_mutex _milestoneMutex;
   std::string _latestSolidMilestoneHash;

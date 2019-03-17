@@ -36,13 +36,12 @@
 
 // TODO - Test functions should take set of prng_t instead of raw ptrs
 
-static trits_t message_test_generic_write_msg(
-    mam_prng_t *prng, mam_psk_t const *const pska, mam_psk_t const *const pskb,
-    mam_ntru_pk_t const *const ntru_pk, mam_msg_pubkey_t pubkey,
-    mam_msg_keyload_t keyload, mam_channel_t *const cha,
-    mam_endpoint_t *const epa, mam_channel_t *const ch1a,
-    mam_endpoint_t *const ep1a, mam_msg_write_context_t *const write_ctx,
-    trits_t msg_id) {
+static trits_t message_test_generic_write_msg(mam_prng_t *prng, mam_psk_t const *const pska,
+                                              mam_psk_t const *const pskb, mam_ntru_pk_t const *const ntru_pk,
+                                              mam_msg_pubkey_t pubkey, mam_msg_keyload_t keyload,
+                                              mam_channel_t *const cha, mam_endpoint_t *const epa,
+                                              mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
+                                              mam_msg_write_context_t *const write_ctx, trits_t msg_id) {
   trits_t msg = trits_null();
   mam_channel_t *ch = cha;
   mam_endpoint_t *ep = NULL;
@@ -73,8 +72,7 @@ static trits_t message_test_generic_write_msg(
   TEST_ASSERT(!trits_is_null(msg));
 
   TEST_ASSERT_EQUAL_INT(
-      RC_OK, mam_msg_write_header(write_ctx, prng, ch, ep, ch1, ep1, msg_id,
-                                  msg_type_id, psks, ntru_pks, &msg));
+      RC_OK, mam_msg_write_header(write_ctx, prng, ch, ep, ch1, ep1, msg_id, msg_type_id, psks, ntru_pks, &msg));
   TEST_ASSERT(trits_is_empty(msg));
   msg = trits_pickup(msg, sz);
   mam_psk_t_set_free(&psks);
@@ -83,11 +81,11 @@ static trits_t message_test_generic_write_msg(
   return msg;
 }
 
-static trits_t message_test_generic_write_first_packet(
-    mam_msg_pubkey_t pubkey, mam_msg_checksum_t checksum,
-    mam_channel_t *const cha, mam_endpoint_t *const epa,
-    mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
-    mam_msg_write_context_t *const write_ctx, char const *payload_str) {
+static trits_t message_test_generic_write_first_packet(mam_msg_pubkey_t pubkey, mam_msg_checksum_t checksum,
+                                                       mam_channel_t *const cha, mam_endpoint_t *const epa,
+                                                       mam_channel_t *const ch1a, mam_endpoint_t *const ep1a,
+                                                       mam_msg_write_context_t *const write_ctx,
+                                                       char const *payload_str) {
   trits_t packet = trits_null();
   trits_t payload = trits_null();
 
@@ -112,8 +110,7 @@ static trits_t message_test_generic_write_first_packet(
   packet = trits_alloc(sz);
   TEST_ASSERT(!trits_is_null(packet));
 
-  TEST_ASSERT_EQUAL_INT(
-      RC_OK, mam_msg_write_packet(write_ctx, checksum, payload, &packet));
+  TEST_ASSERT_EQUAL_INT(RC_OK, mam_msg_write_packet(write_ctx, checksum, payload, &packet));
   TEST_ASSERT(trits_is_empty(packet));
   packet = trits_pickup(packet, sz);
   trits_set_zero(payload);
@@ -122,10 +119,9 @@ static trits_t message_test_generic_write_first_packet(
   return packet;
 }
 
-static void message_test_generic_read_msg(
-    mam_psk_t const *const pre_shared_key, mam_ntru_sk_t const *const ntru,
-    mam_channel_t *const cha, mam_endpoint_t *const ep, trits_t *const msg,
-    mam_msg_read_context_t *const cfg_msg_read, trits_t msg_id) {
+static void message_test_generic_read_msg(mam_psk_t const *const pre_shared_key, mam_ntru_sk_t const *const ntru,
+                                          mam_channel_t *const cha, mam_endpoint_t *const ep, trits_t *const msg,
+                                          mam_msg_read_context_t *const cfg_msg_read, trits_t msg_id) {
   retcode_t e = RC_MAM_INTERNAL_ERROR;
 
   /* init read msg context */
@@ -134,20 +130,20 @@ static void message_test_generic_read_msg(
   mam_ntru_sk_t_set_t ntru_sks = NULL;
   mam_pk_t_set_t trusted_channel_ids = NULL;
   mam_pk_t_set_t trusted_endpoint_ids = NULL;
+  mam_pk_t pk;
 
   TEST_ASSERT(mam_psk_t_set_add(&psks, pre_shared_key) == RC_OK);
   TEST_ASSERT(mam_ntru_sk_t_set_add(&ntru_sks, ntru) == RC_OK);
-  TEST_ASSERT(mam_pk_t_set_add(&trusted_channel_ids,
-                               trits_begin(mam_channel_id(cha))) == RC_OK);
+  memcpy(pk.key, trits_begin(mam_channel_id(cha)), MAM_CHANNEL_ID_SIZE);
+  TEST_ASSERT(mam_pk_t_set_add(&trusted_channel_ids, &pk) == RC_OK);
   if (ep) {
-    TEST_ASSERT(mam_pk_t_set_add(&trusted_endpoint_ids,
-                                 trits_begin(mam_endpoint_id(ep))) == RC_OK);
+    memcpy(pk.key, trits_begin(mam_endpoint_id(ep)), MAM_ENDPOINT_ID_SIZE);
+    TEST_ASSERT(mam_pk_t_set_add(&trusted_endpoint_ids, &pk) == RC_OK);
   }
 
-  trits_copy(mam_channel_id(cha), trits_from_rep(MAM_CHANNEL_ID_SIZE, cfg->pk));
+  trits_copy(mam_channel_id(cha), trits_from_rep(MAM_CHANNEL_ID_SIZE, cfg->pk.key));
 
-  e = mam_msg_read_header(cfg_msg_read, msg, psks, ntru_sks, msg_id,
-                          &trusted_channel_ids, &trusted_endpoint_ids);
+  e = mam_msg_read_header(cfg_msg_read, msg, psks, ntru_sks, msg_id, &trusted_channel_ids, &trusted_endpoint_ids);
 
   TEST_ASSERT(RC_OK == e);
   TEST_ASSERT(trits_is_empty(*msg));
@@ -158,8 +154,7 @@ static void message_test_generic_read_msg(
   mam_psk_t_set_free(&psks);
 }
 
-static void message_test_generic_read_packet(mam_msg_read_context_t *const ctx,
-                                             trits_t *const packet,
+static void message_test_generic_read_packet(mam_msg_read_context_t *const ctx, trits_t *const packet,
                                              trits_t *const payload) {
   retcode_t e = RC_MAM_INTERNAL_ERROR;
   ctx->ord = 0;
@@ -171,11 +166,8 @@ static void message_test_generic_read_packet(mam_msg_read_context_t *const ctx,
   *payload = trits_pickup_all(*payload);
 }
 
-static void message_test_create_channels(mam_prng_t *prng,
-                                         mam_channel_t **const cha,
-                                         mam_channel_t **const ch1,
-                                         mam_endpoint_t **const epa,
-                                         mam_endpoint_t **ep1) {
+static void message_test_create_channels(mam_prng_t *prng, mam_channel_t **const cha, mam_channel_t **const ch1,
+                                         mam_endpoint_t **const epa, mam_endpoint_t **ep1) {
   retcode_t e = RC_MAM_INTERNAL_ERROR;
   mss_mt_height_t d = TEST_MSS_DEPTH;
 
@@ -228,8 +220,7 @@ static void message_test_create_channels(mam_prng_t *prng,
   }
 }
 
-static void message_test_generic(mam_prng_t *prng_sender,
-                                 mam_prng_t *prng_receiver) {
+static void message_test_generic(mam_prng_t *prng_sender, mam_prng_t *prng_receiver) {
   retcode_t e = RC_OK;
 
   trits_t msg = trits_null(), packet = trits_null(), payload = trits_null();
@@ -266,12 +257,10 @@ static void message_test_generic(mam_prng_t *prng_sender,
 
   /* gen psk */
   {
-    mam_psk_gen(&pska, prng_sender, (tryte_t *)TEST_PRE_SHARED_KEY_A_STR,
-                (tryte_t *)TEST_PRE_SHARED_KEY_A_NONCE_STR,
+    mam_psk_gen(&pska, prng_sender, (tryte_t *)TEST_PRE_SHARED_KEY_A_STR, (tryte_t *)TEST_PRE_SHARED_KEY_A_NONCE_STR,
                 strlen(TEST_PRE_SHARED_KEY_A_NONCE_STR));
 
-    mam_psk_gen(&pskb, prng_receiver, (tryte_t *)TEST_PRE_SHARED_KEY_B_STR,
-                (tryte_t *)TEST_PRE_SHARED_KEY_B_NONCE_STR,
+    mam_psk_gen(&pskb, prng_receiver, (tryte_t *)TEST_PRE_SHARED_KEY_B_STR, (tryte_t *)TEST_PRE_SHARED_KEY_B_NONCE_STR,
                 strlen(TEST_PRE_SHARED_KEY_B_NONCE_STR));
   }
 
@@ -293,12 +282,11 @@ static void message_test_generic(mam_prng_t *prng_sender,
         message_test_create_channels(prng_sender, &cha, &ch1a, &epa, &ep1a);
         /* write msg and packet */
         {
-          msg = message_test_generic_write_msg(
-              prng_sender, &pska, &pskb, &ntru->public_key, pubkey, keyload,
-              cha, epa, ch1a, ep1a, &write_ctx, msg_id);
+          msg = message_test_generic_write_msg(prng_sender, &pska, &pskb, &ntru->public_key, pubkey, keyload, cha, epa,
+                                               ch1a, ep1a, &write_ctx, msg_id);
 
-          packet = message_test_generic_write_first_packet(
-              pubkey, checksum, cha, epa, ch1a, ep1a, &write_ctx, payload_str);
+          packet =
+              message_test_generic_write_first_packet(pubkey, checksum, cha, epa, ch1a, ep1a, &write_ctx, payload_str);
         }
 
         if (pubkey == mam_msg_pubkey_epid) {
@@ -309,8 +297,7 @@ static void message_test_generic(mam_prng_t *prng_sender,
 
         /* read msg and packet */
         {
-          message_test_generic_read_msg(&pskb, ntru, cha, curr_ep, &msg,
-                                        cfg_msg_read, msg_id);
+          message_test_generic_read_msg(&pskb, ntru, cha, curr_ep, &msg, cfg_msg_read, msg_id);
 
           message_test_generic_read_packet(cfg_msg_read, &packet, &payload);
           TEST_ASSERT(trits_cmp_eq_str(payload, payload_str));
@@ -386,18 +373,14 @@ void serialize_write_ctx_test() {
   trits_from_str(rand_msg, TEST_PLAINTEXT1);
   mam_spongos_absorb(&write_ctx.spongos, rand_msg);
   MAM_TRITS_DEF0(ctx_buffer, mam_msg_write_ctx_serialized_size(&write_ctx));
-  ctx_buffer =
-      MAM_TRITS_INIT(ctx_buffer, mam_msg_write_ctx_serialized_size(&write_ctx));
+  ctx_buffer = MAM_TRITS_INIT(ctx_buffer, mam_msg_write_ctx_serialized_size(&write_ctx));
   mam_msg_write_ctx_serialize(&write_ctx, &ctx_buffer);
   ctx_buffer = trits_pickup_all(ctx_buffer);
   mam_msg_write_ctx_deserialize(&ctx_buffer, &deserialized_ctx);
-  TEST_ASSERT_EQUAL_MEMORY(write_ctx.chid, deserialized_ctx.chid,
-                           MAM_CHANNEL_ID_SIZE);
+  TEST_ASSERT_EQUAL_MEMORY(write_ctx.chid, deserialized_ctx.chid, MAM_CHANNEL_ID_SIZE);
   TEST_ASSERT_EQUAL_INT(write_ctx.spongos.pos, deserialized_ctx.spongos.pos);
-  TEST_ASSERT_EQUAL_MEMORY(&write_ctx.spongos.sponge,
-                           &deserialized_ctx.spongos.sponge, MAM_SPONGE_WIDTH);
-  TEST_ASSERT_EQUAL_MEMORY(&write_ctx.mss->root, &deserialized_ctx.mss_root,
-                           MAM_MSS_PK_SIZE);
+  TEST_ASSERT_EQUAL_MEMORY(&write_ctx.spongos.sponge, &deserialized_ctx.spongos.sponge, MAM_SPONGE_WIDTH);
+  TEST_ASSERT_EQUAL_MEMORY(&write_ctx.mss->root, &deserialized_ctx.mss_root, MAM_MSS_PK_SIZE);
   TEST_ASSERT_EQUAL_INT(write_ctx.ord, deserialized_ctx.ord);
 }
 
@@ -409,7 +392,7 @@ void serialize_read_ctx_test() {
 
   //"Random" root
   for (size_t i = 0; i < MAM_CHANNEL_ID_SIZE; ++i) {
-    read_ctx.pk[i] = -1 + rand() % 3;
+    read_ctx.pk.key[i] = -1 + rand() % 3;
   }
 
   MAM_TRITS_DEF0(rand_msg, strlen(TEST_PLAINTEXT1));
@@ -417,17 +400,14 @@ void serialize_read_ctx_test() {
   trits_from_str(rand_msg, TEST_PLAINTEXT1);
   mam_spongos_absorb(&read_ctx.spongos, rand_msg);
   MAM_TRITS_DEF0(ctx_buffer, mam_msg_read_ctx_serialized_size(&read_ctx));
-  ctx_buffer =
-      MAM_TRITS_INIT(ctx_buffer, mam_msg_read_ctx_serialized_size(&read_ctx));
+  ctx_buffer = MAM_TRITS_INIT(ctx_buffer, mam_msg_read_ctx_serialized_size(&read_ctx));
   mam_msg_read_ctx_serialize(&read_ctx, &ctx_buffer);
   ctx_buffer = trits_pickup_all(ctx_buffer);
   mam_msg_read_ctx_deserialize(&ctx_buffer, &deserialized_ctx);
   TEST_ASSERT_EQUAL_INT(read_ctx.spongos.pos, deserialized_ctx.spongos.pos);
-  TEST_ASSERT_EQUAL_MEMORY(&read_ctx.spongos.sponge,
-                           &deserialized_ctx.spongos.sponge, MAM_SPONGE_WIDTH);
+  TEST_ASSERT_EQUAL_MEMORY(&read_ctx.spongos.sponge, &deserialized_ctx.spongos.sponge, MAM_SPONGE_WIDTH);
 
-  TEST_ASSERT_EQUAL_MEMORY(&read_ctx.pk, &deserialized_ctx.pk,
-                           MAM_CHANNEL_ID_SIZE);
+  TEST_ASSERT_EQUAL_MEMORY(&read_ctx.pk, &deserialized_ctx.pk, MAM_CHANNEL_ID_SIZE);
   TEST_ASSERT_EQUAL_INT(read_ctx.ord, deserialized_ctx.ord);
 }
 

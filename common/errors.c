@@ -13,6 +13,8 @@ const char* error_2_string(retcode_t err) {
       return STR_OK;
     case RC_ERROR:
       return STR_ERROR;
+    case RC_NULL_PARAM:
+      return STR_NULL_PARAM;
 
     // Storage SQLite3 Module
     case RC_STORAGE_OOM:

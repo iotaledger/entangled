@@ -10,8 +10,7 @@
 #include "cclient/api/extended/get_new_address.h"
 #include "cclient/api/extended/logger.h"
 
-static retcode_t is_unused_address(iota_client_service_t const* const serv,
-                                   flex_trit_t const* const addr,
+static retcode_t is_unused_address(iota_client_service_t const* const serv, flex_trit_t const* const addr,
                                    bool* const is_unused) {
   retcode_t ret_code = RC_OK;
   size_t ret_num = 0;
@@ -23,16 +22,14 @@ static retcode_t is_unused_address(iota_client_service_t const* const serv,
   find_tran_res = find_transactions_res_new();
   if (!find_tran_req || !find_tran_res) {
     ret_code = RC_CCLIENT_OOM;
-    log_error(client_extended_logger_id,
-              "%s: create find transactions request or response failed: %s\n",
-              __func__, error_2_string(ret_code));
+    log_error(client_extended_logger_id, "%s: create find transactions request or response failed: %s\n", __func__,
+              error_2_string(ret_code));
     goto done;
   }
 
   ret_code = hash243_queue_push(&find_tran_req->addresses, addr);
   if (ret_code) {
-    log_error(client_extended_logger_id, "%s: hahs queue push failed: %s\n",
-              __func__, error_2_string(ret_code));
+    log_error(client_extended_logger_id, "%s: hahs queue push failed: %s\n", __func__, error_2_string(ret_code));
     goto done;
   }
   ret_code = iota_client_find_transactions(serv, find_tran_req, find_tran_res);
@@ -46,10 +43,8 @@ done:
   return ret_code;
 }
 
-retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
-                                      flex_trit_t const* const seed,
-                                      address_opt_t const addr_opt,
-                                      hash243_queue_t* out_addresses) {
+retcode_t iota_client_get_new_address(iota_client_service_t const* const serv, flex_trit_t const* const seed,
+                                      address_opt_t const addr_opt, hash243_queue_t* out_addresses) {
   retcode_t ret = RC_OK;
   flex_trit_t* tmp = NULL;
   size_t addr_index = 0;
@@ -59,21 +54,17 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
   // security validation
   if (addr_opt.security == 0 || addr_opt.security > 3) {
     ret = RC_CCLIENT_INVALID_SECURITY;
-    log_error(client_extended_logger_id, "%s %s\n", __func__,
-              error_2_string(ret));
+    log_error(client_extended_logger_id, "%s %s\n", __func__, error_2_string(ret));
     return ret;
   }
 
   if (addr_opt.total != 0) {  // return addresses in a list
-    for (addr_index = addr_opt.start; addr_index < addr_opt.total;
-         addr_index++) {
-      tmp =
-          iota_sign_address_gen_flex_trits(seed, addr_index, addr_opt.security);
+    for (addr_index = addr_opt.start; addr_index < addr_opt.total; addr_index++) {
+      tmp = iota_sign_address_gen_flex_trits(seed, addr_index, addr_opt.security);
       if (tmp) {
         ret = hash243_queue_push(out_addresses, tmp);
         if (ret) {
-          log_error(client_extended_logger_id,
-                    "%s:%d hash queue push failed: %s\n", __func__, __LINE__,
+          log_error(client_extended_logger_id, "%s:%d hash queue push failed: %s\n", __func__, __LINE__,
                     error_2_string(ret));
           goto done;
         }
@@ -82,21 +73,17 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
       } else {
         // gen address failed.
         ret = RC_CCLIENT_OOM;
-        log_error(client_extended_logger_id,
-                  "%s address generation failed: %s\n", __func__,
-                  error_2_string(ret));
+        log_error(client_extended_logger_id, "%s address generation failed: %s\n", __func__, error_2_string(ret));
         goto done;
       }
     }
   } else {  // return addresses include the latest unused address.
     for (addr_index = 0;; addr_index++) {
-      tmp =
-          iota_sign_address_gen_flex_trits(seed, addr_index, addr_opt.security);
+      tmp = iota_sign_address_gen_flex_trits(seed, addr_index, addr_opt.security);
       if (tmp) {
         ret = hash243_queue_push(out_addresses, tmp);
         if (ret) {
-          log_error(client_extended_logger_id,
-                    "%s:%d hash queue push failed: %s\n", __func__, __LINE__,
+          log_error(client_extended_logger_id, "%s:%d hash queue push failed: %s\n", __func__, __LINE__,
                     error_2_string(ret));
           goto done;
         }
@@ -109,9 +96,7 @@ retcode_t iota_client_get_new_address(iota_client_service_t const* const serv,
       } else {
         // gen address failed.
         ret = RC_CCLIENT_OOM;
-        log_error(client_extended_logger_id,
-                  "%s address generation failed: %s\n", __func__,
-                  error_2_string(ret));
+        log_error(client_extended_logger_id, "%s address generation failed: %s\n", __func__, error_2_string(ret));
         goto done;
       }
     }

@@ -33,8 +33,8 @@ typedef struct transaction_validator_s {
  *
  * @return a status code
  */
-retcode_t iota_consensus_transaction_validator_init(
-    transaction_validator_t *const tv, iota_consensus_conf_t *const conf);
+retcode_t iota_consensus_transaction_validator_init(transaction_validator_t *const tv,
+                                                    iota_consensus_conf_t *const conf);
 
 /**
  * Destroys a transaction validator
@@ -43,8 +43,7 @@ retcode_t iota_consensus_transaction_validator_init(
  *
  * @return a status code
  */
-retcode_t iota_consensus_transaction_validator_destroy(
-    transaction_validator_t *const tv);
+retcode_t iota_consensus_transaction_validator_destroy(transaction_validator_t *const tv);
 
 /**
  * Runs the following validation checks on a transaction:
@@ -59,9 +58,8 @@ retcode_t iota_consensus_transaction_validator_destroy(
  *
  * @return true if valid, false otherwise
  */
-bool iota_consensus_transaction_validate(
-    transaction_validator_t const *const tv,
-    iota_transaction_t const *const transaction);
+bool iota_consensus_transaction_validate(transaction_validator_t const *const tv,
+                                         iota_transaction_t const *const transaction);
 
 #ifdef __cplusplus
 }

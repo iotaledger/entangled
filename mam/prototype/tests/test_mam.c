@@ -47,23 +47,19 @@ void test_mam_sec(int security) {
   size_t next_tree_size = merkle_size(next_count);
   trit_t merkle_tree[tree_size * HASH_LENGTH_TRIT];
   trit_t next_root[next_tree_size * HASH_LENGTH_TRIT];
-  int payload_length = payload_min_length(
-      message_length, tree_size * HASH_LENGTH_TRIT, index, security);
+  int payload_length = payload_min_length(message_length, tree_size * HASH_LENGTH_TRIT, index, security);
   trit_t *payload = (trit_t *)malloc(payload_length * sizeof(trit_t));
 
   Curl curl;
   curl.type = CURL_P_27;
   init_curl(&curl);
-  TEST_ASSERT_EQUAL_INT(
-      0, merkle_create(merkle_tree, count, seed_trits, start, security, &curl));
+  TEST_ASSERT_EQUAL_INT(0, merkle_create(merkle_tree, count, seed_trits, start, security, &curl));
   curl_reset(&curl);
-  TEST_ASSERT_EQUAL_INT(0, merkle_create(next_root, next_count, seed_trits,
-                                         next_start, security, &curl));
+  TEST_ASSERT_EQUAL_INT(0, merkle_create(next_root, next_count, seed_trits, next_start, security, &curl));
   curl_reset(&curl);
-  payload_length = mam_create(
-      payload, payload_length, message_trits, message_length, side_key_trits,
-      strlen(side_key) * 3, merkle_tree, tree_size * HASH_LENGTH_TRIT, count,
-      index, next_root, start, seed_trits, security, &curl);
+  payload_length = mam_create(payload, payload_length, message_trits, message_length, side_key_trits,
+                              strlen(side_key) * 3, merkle_tree, tree_size * HASH_LENGTH_TRIT, count, index, next_root,
+                              start, seed_trits, security, &curl);
   TEST_ASSERT_TRUE(payload_length != -1);
   curl_reset(&curl);
 
@@ -74,15 +70,12 @@ void test_mam_sec(int security) {
   size_t parsed_security = -1;
 
   TEST_ASSERT_EQUAL_INT(
-      0, mam_parse(payload, payload_length, (trit_t *)parsed_message_trits,
-                   &parsed_message_length, side_key_trits, strlen(side_key) * 3,
-                   merkle_tree, &parsed_index, parsed_next_root,
-                   &parsed_security, &curl));
+      0, mam_parse(payload, payload_length, (trit_t *)parsed_message_trits, &parsed_message_length, side_key_trits,
+                   strlen(side_key) * 3, merkle_tree, &parsed_index, parsed_next_root, &parsed_security, &curl));
 
   TEST_ASSERT_EQUAL_INT(index, parsed_index);
   TEST_ASSERT_EQUAL_MEMORY(next_root, parsed_next_root, HASH_LENGTH_TRIT);
-  TEST_ASSERT_EQUAL_MEMORY(message_trits, parsed_message_trits,
-                           parsed_message_length);
+  TEST_ASSERT_EQUAL_MEMORY(message_trits, parsed_message_trits, parsed_message_length);
   TEST_ASSERT_EQUAL_INT(security, parsed_security);
   free(payload);
 }

@@ -24,8 +24,8 @@ typedef struct {
 } attach_to_tangle_res_t;
 
 attach_to_tangle_res_t* attach_to_tangle_res_new();
-flex_trit_t* attach_to_tangle_res_trytes_at(attach_to_tangle_res_t* res,
-                                            int index);
+retcode_t attach_to_tangle_res_trytes_add(attach_to_tangle_res_t* res, flex_trit_t const* const trytes);
+flex_trit_t* attach_to_tangle_res_trytes_at(attach_to_tangle_res_t* res, int index);
 size_t attach_to_tangle_res_trytes_cnt(attach_to_tangle_res_t* res);
 void attach_to_tangle_res_free(attach_to_tangle_res_t** hashes);
 

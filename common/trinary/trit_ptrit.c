@@ -7,8 +7,7 @@
 
 #include "common/trinary/trit_ptrit.h"
 
-void trits_to_ptrits(trit_t const *const trits, ptrit_t *const ptrits,
-                     size_t const index, size_t const length) {
+void trits_to_ptrits(trit_t const *const trits, ptrit_t *const ptrits, size_t const index, size_t const length) {
   size_t j = 0;
 
   if (length == 0) {
@@ -31,8 +30,7 @@ void trits_to_ptrits(trit_t const *const trits, ptrit_t *const ptrits,
   }
 }
 
-void trits_to_ptrits_fill(trit_t const *const trits, ptrit_t *const ptrits,
-                          size_t const length) {
+void trits_to_ptrits_fill(trit_t const *const trits, ptrit_t *const ptrits, size_t const length) {
   if (length == 0) {
     return;
   }
@@ -53,8 +51,7 @@ void trits_to_ptrits_fill(trit_t const *const trits, ptrit_t *const ptrits,
   trits_to_ptrits_fill(&trits[1], &ptrits[1], length - 1);
 }
 
-void ptrits_to_trits(ptrit_t const *const ptrits, trit_t *const trits,
-                     size_t const index, size_t const length) {
+void ptrits_to_trits(ptrit_t const *const ptrits, trit_t *const trits, size_t const index, size_t const length) {
   size_t j = 0;
 
   if (length == 0) {

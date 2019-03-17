@@ -10,8 +10,7 @@ namespace iota {
 namespace tanglescope {
 
 std::map<std::string, std::string> TangleWidthCollector::nameToDescGauges = {
-    {TangleWidthCollector::TANGLE_WIDTH,
-     "Width/Number of edges crossing a measure line"},
+    {TangleWidthCollector::TANGLE_WIDTH, "Width/Number of edges crossing a measure line"},
     {TangleWidthCollector::MEASURE_LINE, "Measure line's timestamp"}};
 
 bool TangleWidthCollector::parseConfiguration(const YAML::Node& conf) {
@@ -19,8 +18,8 @@ bool TangleWidthCollector::parseConfiguration(const YAML::Node& conf) {
     return false;
   }
 
-  if (!conf[SNAPSHOT_INTERVAL] || !conf[MEASURE_LINE_BASE_AGE] ||
-      !conf[MEASURE_LINE_AGE_STEP] || !conf[MEASURE_LINE_MAX_AGE]) {
+  if (!conf[SNAPSHOT_INTERVAL] || !conf[MEASURE_LINE_BASE_AGE] || !conf[MEASURE_LINE_AGE_STEP] ||
+      !conf[MEASURE_LINE_MAX_AGE]) {
     return false;
   }
 
@@ -40,8 +39,7 @@ void TangleWidthCollector::collect() {
   auto registry = std::make_shared<Registry>();
   exposer.RegisterCollectable(registry);
 
-  _gauges =
-      buildGaugeMap(registry, "tanglewidthcollector", {}, nameToDescGauges);
+  _gauges = buildGaugeMap(registry, "tanglewidthcollector", {}, nameToDescGauges);
 
   analyzeWidthPeriodically();
 }
@@ -51,13 +49,12 @@ void TangleWidthCollector::analyzeWidthPeriodically() {
   _collectorWorker = _collectorThread.create_worker();
 
   if (_snapshotInterval > 0) {
-    _collectorWorker.schedule_periodically(
-        _collectorThread.now() + std::chrono::seconds(_measureLineBaseAge * 3),
-        std::chrono::seconds(_snapshotInterval), [this](auto scbl) {
-          auto task = boost::async(boost::launch::async,
-                                   [this]() { analyzeWidthImpl(); });
-          _tasks.emplace_back(std::move(task));
-        });
+    _collectorWorker.schedule_periodically(_collectorThread.now() + std::chrono::seconds(_measureLineBaseAge * 3),
+                                           std::chrono::seconds(_snapshotInterval), [this](auto scbl) {
+                                             auto task =
+                                                 boost::async(boost::launch::async, [this]() { analyzeWidthImpl(); });
+                                             _tasks.emplace_back(std::move(task));
+                                           });
   }
 }
 
@@ -75,30 +72,24 @@ void TangleWidthCollector::analyzeWidthImpl() {
 
   auto now = std::chrono::system_clock::now();
   auto measureLine =
-      std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch())
-          .count() -
-      _measureLineBaseAge;
+      std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count() - _measureLineBaseAge;
 
-  for (uint16_t offset = 0; offset < _measureLineMaxAge;
-       offset += _measureLineAgeStep) {
+  for (uint16_t offset = 0; offset < _measureLineMaxAge; offset += _measureLineAgeStep) {
     auto txs = std::move(TangleDB::instance().getTXsMap());
     for (auto&& kv : txs) {
-      if (std::chrono::duration_cast<std::chrono::seconds>(
-              kv.second.timestamp.time_since_epoch())
-              .count() >= measureLine) {
+      if (std::chrono::duration_cast<std::chrono::seconds>(kv.second.timestamp.time_since_epoch()).count() >=
+          measureLine) {
         auto trunkIt = txs.find(kv.second.trunk);
         if (trunkIt != txs.end()) {
-          if (std::chrono::duration_cast<std::chrono::seconds>(
-                  trunkIt->second.timestamp.time_since_epoch())
-                  .count() < measureLine) {
+          if (std::chrono::duration_cast<std::chrono::seconds>(trunkIt->second.timestamp.time_since_epoch()).count() <
+              measureLine) {
             ++offsetToWidth[offset];
           }
         }
         auto branchIt = txs.find(kv.second.branch);
         if (branchIt != txs.end()) {
-          if (std::chrono::duration_cast<std::chrono::seconds>(
-                  branchIt->second.timestamp.time_since_epoch())
-                  .count() < measureLine) {
+          if (std::chrono::duration_cast<std::chrono::seconds>(branchIt->second.timestamp.time_since_epoch()).count() <
+              measureLine) {
             ++offsetToWidth[offset];
           }
         }
@@ -110,8 +101,7 @@ void TangleWidthCollector::analyzeWidthImpl() {
   for (auto& offWidthPair : offsetToWidth) {
     _gauges.at(TANGLE_WIDTH)
         .get()
-        .Add({{"time_after_measure_line",
-               std::to_string(_measureLineBaseAge + offWidthPair.first)}})
+        .Add({{"time_after_measure_line", std::to_string(_measureLineBaseAge + offWidthPair.first)}})
         .Set(offWidthPair.second);
   }
 

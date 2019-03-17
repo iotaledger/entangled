@@ -61,8 +61,7 @@ extern char* iota_statement_transaction_select_by_hash;
 extern char* iota_statement_transaction_select_hashes_by_address;
 extern char* iota_statement_transaction_select_hashes_of_approvers;
 extern char* iota_statement_transaction_select_hashes_of_approvers_before_date;
-extern char*
-    iota_statement_transaction_select_hashes_of_transactions_to_request;
+extern char* iota_statement_transaction_select_hashes_of_transactions_to_request;
 extern char* iota_statement_transaction_select_hashes_of_tips;
 extern char* iota_statement_transaction_select_hashes_of_milestone_candidates;
 extern char* iota_statement_transaction_update_snapshot_index;
@@ -86,9 +85,8 @@ extern char* iota_statement_transaction_select_metadata;
  * Transaction statement builders
  */
 
-extern char* iota_statement_transaction_find_build(
-    size_t const bundles_count, size_t const addresses_count,
-    size_t const tags_count, size_t const approvees_count);
+extern char* iota_statement_transaction_find_build(size_t const bundles_count, size_t const addresses_count,
+                                                   size_t const tags_count, size_t const approvees_count);
 
 /*
  * Milestone statements

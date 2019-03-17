@@ -28,8 +28,7 @@ static void troika_test(void) {
   memset(state, 0, TEST_TROIKA_STATE_SIZE * sizeof(trit_t));
   mam_ftroika_transform(state, TEST_TROIKA_STATE_SIZE);
   trits_to_trytes(state, output_trytes, TEST_TROIKA_STATE_SIZE);
-  TEST_ASSERT_EQUAL_MEMORY(EXPECTED_OUTPUT, output_trytes,
-                           TEST_TROIKA_STATE_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
+  TEST_ASSERT_EQUAL_MEMORY(EXPECTED_OUTPUT, output_trytes, TEST_TROIKA_STATE_SIZE / NUMBER_OF_TRITS_IN_A_TRYTE);
 }
 
 int main(void) {

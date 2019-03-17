@@ -8,8 +8,7 @@
 #include "cclient/request/get_balances.h"
 
 get_balances_req_t* get_balances_req_new() {
-  get_balances_req_t* req =
-      (get_balances_req_t*)malloc(sizeof(get_balances_req_t));
+  get_balances_req_t* req = (get_balances_req_t*)malloc(sizeof(get_balances_req_t));
   if (req) {
     req->addresses = NULL;
     req->tips = NULL;

@@ -8,8 +8,7 @@
 #include "cclient/response/add_neighbors.h"
 
 add_neighbors_res_t* add_neighbors_res_new() {
-  add_neighbors_res_t* res =
-      (add_neighbors_res_t*)malloc(sizeof(add_neighbors_res_t));
+  add_neighbors_res_t* res = (add_neighbors_res_t*)malloc(sizeof(add_neighbors_res_t));
   if (res) {
     res->added_neighbors = 0;
   }

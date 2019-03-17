@@ -39,8 +39,7 @@ void test_channel(void) {
   for (size_t i = 1; i < 5; i++) {
     memset(channel_name, 'A' + 2 * i, 27);
     trytes_to_trits(channel_name, channel_name_trits.p, 27);
-    TEST_ASSERT(mam_channel_create(&prng, i, channel_name_trits, &channel) ==
-                RC_OK);
+    TEST_ASSERT(mam_channel_create(&prng, i, channel_name_trits, &channel) == RC_OK);
     add_assign(channel.msg_ord, MAM_CHANNEL_MSG_ORD_SIZE, i);
     channel.endpoint_ord = i;
     TEST_ASSERT(mam_channel_t_set_add(&channels_1, &channel) == RC_OK);

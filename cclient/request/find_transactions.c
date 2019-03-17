@@ -8,8 +8,7 @@
 #include "cclient/request/find_transactions.h"
 
 find_transactions_req_t* find_transactions_req_new() {
-  find_transactions_req_t* req =
-      (find_transactions_req_t*)malloc(sizeof(find_transactions_req_t));
+  find_transactions_req_t* req = (find_transactions_req_t*)malloc(sizeof(find_transactions_req_t));
   if (req) {
     req->bundles = NULL;
     req->addresses = NULL;

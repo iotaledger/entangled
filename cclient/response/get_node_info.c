@@ -8,15 +8,13 @@
 #include "cclient/response/get_node_info.h"
 
 get_node_info_res_t* get_node_info_res_new() {
-  get_node_info_res_t* res =
-      (get_node_info_res_t*)malloc(sizeof(get_node_info_res_t));
+  get_node_info_res_t* res = (get_node_info_res_t*)malloc(sizeof(get_node_info_res_t));
 
   if (res) {
     res->app_name = char_buffer_new();
     res->app_version = char_buffer_new();
     memset(res->latest_milestone, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
-    memset(res->latest_solid_subtangle_milestone, FLEX_TRIT_NULL_VALUE,
-           FLEX_TRIT_SIZE_243);
+    memset(res->latest_solid_subtangle_milestone, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
     memset(res->coordinator_address, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
   return res;

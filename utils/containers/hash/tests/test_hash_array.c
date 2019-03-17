@@ -24,10 +24,8 @@ void test_hash243_array() {
   hash_array_push(hashes, hash243_2);
   TEST_ASSERT_EQUAL_INT(2, hash_array_len(hashes));
 
-  TEST_ASSERT_EQUAL_MEMORY(hash243_1, hash_array_at(hashes, 0),
-                           FLEX_TRIT_SIZE_243);
-  TEST_ASSERT_EQUAL_MEMORY(hash243_2, hash_array_at(hashes, 1),
-                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash243_1, hash_array_at(hashes, 0), FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash243_2, hash_array_at(hashes, 1), FLEX_TRIT_SIZE_243);
   TEST_ASSERT_NULL(hash_array_at(hashes, 2));
   TEST_ASSERT_NULL(hash_array_at(hashes, -1));
 

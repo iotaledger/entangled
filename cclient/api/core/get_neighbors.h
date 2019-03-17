@@ -27,8 +27,7 @@ extern "C" {
  *
  * @return error value.
  */
-retcode_t iota_client_get_neighbors(const iota_client_service_t* const service,
-                                    get_neighbors_res_t* const res);
+retcode_t iota_client_get_neighbors(const iota_client_service_t* const service, get_neighbors_res_t* const res);
 
 #ifdef __cplusplus
 }

@@ -59,16 +59,14 @@ retcode_t json_get_tips_deserialize_response(serializer_t const *const s,
   log_info(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
   if (json_obj == NULL) {
-    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__,
-              STR_CCLIENT_JSON_PARSE);
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
   }
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(json_logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
-              STR_CCLIENT_RES_ERROR, json_item->valuestring);
+    log_error(json_logger_id, "[%s:%d] %s %s\n", __func__, __LINE__, STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
   }

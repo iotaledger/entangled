@@ -108,8 +108,7 @@ size_t encoded_length(int64_t const value) {
   return length + min_trits((1 << (length / RADIX)) - 1);
 }
 
-int encode_long(int64_t const value, trit_t *const trits,
-                size_t const num_trits) {
+int encode_long(int64_t const value, trit_t *const trits, size_t const num_trits) {
   if (num_trits < encoded_length(value)) {
     return -1;
   }
@@ -131,24 +130,20 @@ int encode_long(int64_t const value, trit_t *const trits,
   }
   if (trits_to_long(&trits[length - RADIX], RADIX) <= 0) {
     encoding |= 1 << index;
-    for (size_t i = 1; i < RADIX + 1; i++)
-      trits[length - i] = -trits[length - i];
+    for (size_t i = 1; i < RADIX + 1; i++) trits[length - i] = -trits[length - i];
   }
   long_to_trits(encoding, &trits[length]);
   return 0;
 }
 
-int64_t decode_long(trit_t const *const trits, size_t const num_trits,
-                    size_t *const size) {
+int64_t decode_long(trit_t const *const trits, size_t const num_trits, size_t *const size) {
   if (memcmp(trits, encoded_zero, encoded_length(0)) == 0) {
     *size = encoded_length(0);
     return 0;
   }
   int64_t value = 0;
   size_t encoding_start = 0;
-  while (encoding_start < num_trits &&
-         trits_to_long(&trits[encoding_start], RADIX) <= 0)
-    encoding_start += RADIX;
+  while (encoding_start < num_trits && trits_to_long(&trits[encoding_start], RADIX) <= 0) encoding_start += RADIX;
   if (encoding_start >= num_trits) {
     return -1;
   }

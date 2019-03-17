@@ -13,6 +13,7 @@ extern "C" {
 #endif
 #define STR_OK "OK"
 #define STR_ERROR "ERROR"
+#define STR_NULL_PARAM "Attempting to access a null pointer"
 
 // Cclient Module
 #define STR_CCLIENT_JSON_CREATE "Create JSON object error!"
@@ -27,8 +28,7 @@ extern "C" {
 #define STR_CCLIENT_NULL_PTR "NULL pointer"
 #define STR_CCLIENT_UNIMPLEMENTED "Function unimplemented"
 #define STR_CCLIENT_INVALID_SECURITY "Invalid security level"
-#define STR_CCLIENT_TX_DESERIALIZE_FAILED \
-  "deserializing transaction object failed"
+#define STR_CCLIENT_TX_DESERIALIZE_FAILED "deserializing transaction object failed"
 #define STR_CCLIENT_INSUFFICIENT_BALANCE "Insufficient balance"
 #define STR_CCLIENT_POW_FAILED "Local PoW failed"
 #define SRT_CCLIENT_INVALID_TRANSFER "Invalid transfers"
@@ -37,13 +37,11 @@ extern "C" {
 
 #define STR_UTILS_SOCKET_TLS_RNG "TLS random number generator"
 #define STR_UTILS_SOCKET_TLS_CA "TLS parsing CA PEM error"
-#define STR_UTILS_SOCKET_TLS_CLIENT_PEM \
-  "TLS parsing client Certificate Authority error"
+#define STR_UTILS_SOCKET_TLS_CLIENT_PEM "TLS parsing client Certificate Authority error"
 #define STR_UTILS_SOCKET_TLS_CLIENT_PK "TLS parsing client private key error"
 #define STR_UTILS_SOCKET_TLS_CONF "TLS setup error"
 #define STR_UTILS_SOCKET_TLS_AUTHMODE "TLS configure auth mode error"
-#define STR_UTILS_SOCKET_CLIENT_AUTH \
-  "TLS set own certificate chain and private key error"
+#define STR_UTILS_SOCKET_CLIENT_AUTH "TLS set own certificate chain and private key error"
 #define STR_UTILS_SOCKET_TLS_HANDSHAKE "TLS handshake error"
 #define STR_UTILS_SOCKET_CONNECT "Socket connect error"
 #define STR_UTILS_SOCKET_RECV "Socket receive error"

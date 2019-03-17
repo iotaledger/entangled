@@ -26,8 +26,7 @@ bool BroadcastReceiveCollector::parseConfiguration(const YAML::Node& conf) {
     return false;
   }
 
-  if (conf[IRI_HOST] && conf[IRI_PORT] && conf[PUBLISHERS] && conf[MWM] &&
-      conf[BROADCAST_INTERVAL]) {
+  if (conf[IRI_HOST] && conf[IRI_PORT] && conf[PUBLISHERS] && conf[MWM] && conf[BROADCAST_INTERVAL]) {
     _iriHost = conf[IRI_HOST].as<std::string>();
     _iriPort = conf[IRI_PORT].as<uint32_t>();
     _zmqPublishers = conf[PUBLISHERS].as<std::list<std::string>>();
@@ -46,8 +45,7 @@ void BroadcastReceiveCollector::collect() {
 
   for (const auto& url : _zmqPublishers) {
     auto zmqObservable =
-        rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
-            [&](auto s) { zmqPublisher(std::move(s), url); });
+        rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>([&](auto s) { zmqPublisher(std::move(s), url); });
     _urlToZmqObservables.insert(std::pair(url, zmqObservable));
   }
 
@@ -61,9 +59,8 @@ void BroadcastReceiveCollector::broadcastTransactions() {
   auto pubWorker = pubThread.create_worker();
 
   if (_broadcastInterval > 0) {
-    pubWorker.schedule_periodically(
-        pubThread.now(), std::chrono::seconds(_broadcastInterval),
-        [&](auto scbl) { broadcastOneTransaction(); });
+    pubWorker.schedule_periodically(pubThread.now(), std::chrono::seconds(_broadcastInterval),
+                                    [&](auto scbl) { broadcastOneTransaction(); });
   } else {
     broadcastOneTransaction();
   }
@@ -73,13 +70,10 @@ void BroadcastReceiveCollector::broadcastOneTransaction() {
   using namespace std::chrono;
 
   system_clock::time_point t1 = system_clock::now();
-  auto hashTXFuture =
-      boost::async(boost::launch::async,
-                   [this] { return _api->getTransactionsToApprove(DEPTH); })
-          .then(fillTX)
-          .then(
-              [this](auto resp) { return powTX(std::move(resp.get()), _mwm); })
-          .then(hashTX);
+  auto hashTXFuture = boost::async(boost::launch::async, [this] { return _api->getTransactionsToApprove(DEPTH); })
+                          .then(fillTX)
+                          .then([this](auto resp) { return powTX(std::move(resp.get()), _mwm); })
+                          .then(hashTX);
 
   try {
     auto hashed = hashTXFuture.get();
@@ -88,16 +82,13 @@ void BroadcastReceiveCollector::broadcastOneTransaction() {
     system_clock::time_point t2 = system_clock::now();
     auto duration = duration_cast<milliseconds>(t2 - t1).count();
     _hashToBroadcastTime.insert(hashed.hash,
-                                BroadcastInfo{std::chrono::system_clock::now(),
-                                              static_cast<uint64_t>(duration)});
+                                BroadcastInfo{std::chrono::system_clock::now(), static_cast<uint64_t>(duration)});
 
-    auto storeFuture = boost::async(boost::launch::async, [hashed, this] {
-      return _api->storeTransactions({hashed.tx});
-    });
+    auto storeFuture =
+        boost::async(boost::launch::async, [hashed, this] { return _api->storeTransactions({hashed.tx}); });
     storeFuture.wait();
-    auto broadcastFuture = boost::async(boost::launch::async, [hashed, this] {
-      return _api->broadcastTransactions({hashed.tx});
-    });
+    auto broadcastFuture =
+        boost::async(boost::launch::async, [hashed, this] { return _api->broadcastTransactions({hashed.tx}); });
 
     broadcastFuture.wait();
   } catch (const std::exception& e) {
@@ -117,14 +108,11 @@ void BroadcastReceiveCollector::receivedTransactions() {
   for (auto& kv : _urlToZmqObservables) {
     auto zmqURL = kv.first;
     auto zmqObservable = kv.second;
-    auto task = boost::async(
-        boost::launch::async,
-        [zmqURL = std::move(zmqURL), &zmqObservable, &registry, &catcher]() {
-          catcher.subscribeToTransactions(zmqURL, zmqObservable, registry);
-        });
+    auto task = boost::async(boost::launch::async, [zmqURL = std::move(zmqURL), &zmqObservable, &registry, &catcher]() {
+      catcher.subscribeToTransactions(zmqURL, zmqObservable, registry);
+    });
     observableTasks.push_back(std::move(task));
   }
 
-  std::for_each(observableTasks.begin(), observableTasks.end(),
-                [&](auto& task) { task.wait(); });
+  std::for_each(observableTasks.begin(), observableTasks.end(), [&](auto& task) { task.wait(); });
 }

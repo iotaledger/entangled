@@ -108,8 +108,7 @@ trint9_t poly_coeff_to_trint9(poly_coeff_t c);
 poly_coeff_t poly_coeff_add(poly_coeff_t const a, poly_coeff_t const b);
 
 // a - b (mods q)
-static inline poly_coeff_t poly_coeff_sub(poly_coeff_t const a,
-                                          poly_coeff_t const b) {
+static inline poly_coeff_t poly_coeff_sub(poly_coeff_t const a, poly_coeff_t const b) {
 #if defined(MAM_POLY_MRED_BINARY)
   /* u = a - b mod R */
   poly_coeff_t c = a < b ? MAM_POLY_Q + a - b : a - b;
@@ -120,31 +119,26 @@ static inline poly_coeff_t poly_coeff_sub(poly_coeff_t const a,
 }
 
 // a * b (mods q)
-static inline poly_coeff_t poly_coeff_mul(poly_coeff_t const a,
-                                          poly_coeff_t const b) {
+static inline poly_coeff_t poly_coeff_mul(poly_coeff_t const a, poly_coeff_t const b) {
 #if defined(MAM_POLY_MRED_BINARY)
   return poly_coeff_mredd((poly_dcoeff_t)a * b);
 #else
   poly_dcoeff_t prod = (poly_dcoeff_t)a * b;
 
-  prod = MAM_MODS(prod, ((trint18_t)MAM_POLY_Q * (trint18_t)MAM_POLY_Q),
-                  MAM_POLY_Q);
+  prod = MAM_MODS(prod, ((trint18_t)MAM_POLY_Q * (trint18_t)MAM_POLY_Q), MAM_POLY_Q);
 
   return prod;
 #endif
 }
 
 // a * b + c (mods q)
-static inline poly_coeff_t poly_coeff_mul_add(poly_coeff_t const a,
-                                              poly_coeff_t const b,
-                                              poly_coeff_t const c) {
+static inline poly_coeff_t poly_coeff_mul_add(poly_coeff_t const a, poly_coeff_t const b, poly_coeff_t const c) {
 #if defined(MAM_POLY_MRED_BINARY)
   return poly_coeff_add(poly_coeff_mul(a, b), c);
 #else
   poly_dcoeff_t prod = (poly_dcoeff_t)a * b + c;
 
-  prod = MAM_MODS(prod, ((trint18_t)MAM_POLY_Q * (trint18_t)MAM_POLY_Q),
-                  MAM_POLY_Q);
+  prod = MAM_MODS(prod, ((trint18_t)MAM_POLY_Q * (trint18_t)MAM_POLY_Q), MAM_POLY_Q);
 
   return prod;
 #endif

@@ -20,8 +20,7 @@
  * Private functions
  */
 
-static void mam_wots_calc_pks(mam_spongos_t *const spongos, trits_t secret_key,
-                              trits_t public_key) {
+static void mam_wots_calc_pks(mam_spongos_t *const spongos, trits_t secret_key, trits_t public_key) {
   trits_t secret_key_part;
 
   for (size_t i = 0; i < MAM_WOTS_SK_PART_COUNT; ++i) {
@@ -34,13 +33,9 @@ static void mam_wots_calc_pks(mam_spongos_t *const spongos, trits_t secret_key,
   }
 }
 
-typedef enum wots_hash_operation_e {
-  WOTS_HASH_SIGN,
-  WOTS_HASH_RECOVER
-} wots_hash_operation_t;
+typedef enum wots_hash_operation_e { WOTS_HASH_SIGN, WOTS_HASH_RECOVER } wots_hash_operation_t;
 
-static void wots_hash_sign_or_recover(mam_spongos_t *const spongos,
-                                      trits_t signature, trits_t const hash,
+static void wots_hash_sign_or_recover(mam_spongos_t *const spongos, trits_t signature, trits_t const hash,
                                       wots_hash_operation_t const operation) {
   size_t i;
   trint9_t t = 0;
@@ -95,21 +90,18 @@ void mam_wots_destroy(mam_wots_t *const wots) {
   memset_safe(wots->secret_key, MAM_WOTS_SK_SIZE, 0, MAM_WOTS_SK_SIZE);
 }
 
-void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *const prng,
-                     trits_t const nonce) {
+void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce) {
   mam_wots_gen_sk3(wots, prng, nonce, trits_null(), trits_null());
 }
 
-void mam_wots_gen_sk2(mam_wots_t *const wots, mam_prng_t const *const prng,
-                      trits_t const nonce1, trits_t const nonce2) {
+void mam_wots_gen_sk2(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1,
+                      trits_t const nonce2) {
   mam_wots_gen_sk3(wots, prng, nonce1, nonce2, trits_null());
 }
 
-void mam_wots_gen_sk3(mam_wots_t *const wots, mam_prng_t const *const prng,
-                      trits_t const nonce1, trits_t const nonce2,
+void mam_wots_gen_sk3(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1, trits_t const nonce2,
                       trits_t const nonce3) {
-  mam_prng_gen3(prng, MAM_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3,
-                wots_secret_key_trits(wots));
+  mam_prng_gen3(prng, MAM_PRNG_DST_WOTS_KEY, nonce1, nonce2, nonce3, wots_secret_key_trits(wots));
 }
 
 void mam_wots_calc_pk(mam_wots_t *const wots, trits_t public_key) {
@@ -124,12 +116,10 @@ void mam_wots_calc_pk(mam_wots_t *const wots, trits_t public_key) {
   mam_wots_calc_pks(&spongos, secret_key, public_key);
   mam_spongos_hash(&spongos, secret_key, public_key);
 
-  memset_safe(trits_begin(secret_key), trits_size(secret_key), 0,
-              trits_size(secret_key));
+  memset_safe(trits_begin(secret_key), trits_size(secret_key), 0, trits_size(secret_key));
 }
 
-void mam_wots_sign(mam_wots_t *const wots, trits_t const hash,
-                   trits_t signature) {
+void mam_wots_sign(mam_wots_t *const wots, trits_t const hash, trits_t signature) {
   mam_spongos_t spongos;
   mam_spongos_init(&spongos);
   MAM_ASSERT(trits_size(hash) == MAM_WOTS_HASH_SIZE);
@@ -139,8 +129,7 @@ void mam_wots_sign(mam_wots_t *const wots, trits_t const hash,
   wots_hash_sign_or_recover(&spongos, signature, hash, WOTS_HASH_SIGN);
 }
 
-void mam_wots_recover(mam_spongos_t *const spongos, trits_t const hash,
-                      trits_t const signature, trits_t public_key) {
+void mam_wots_recover(mam_spongos_t *const spongos, trits_t const hash, trits_t const signature, trits_t public_key) {
   MAM_ASSERT(trits_size(hash) == MAM_WOTS_HASH_SIZE);
   MAM_ASSERT(trits_size(signature) == MAM_WOTS_SK_SIZE);
 
@@ -152,8 +141,8 @@ void mam_wots_recover(mam_spongos_t *const spongos, trits_t const hash,
   mam_spongos_hash(spongos, sig_pks, public_key);
 }
 
-bool mam_wots_verify(mam_spongos_t *const spongos, trits_t const hash,
-                     trits_t const signature, trits_t const public_key) {
+bool mam_wots_verify(mam_spongos_t *const spongos, trits_t const hash, trits_t const signature,
+                     trits_t const public_key) {
   MAM_TRITS_DEF0(recovered_public_key, MAM_WOTS_PK_SIZE);
   recovered_public_key = MAM_TRITS_INIT(recovered_public_key, MAM_WOTS_PK_SIZE);
 

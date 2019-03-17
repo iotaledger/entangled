@@ -9,8 +9,7 @@
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
-retcode_t json_get_node_info_serialize_request(const serializer_t *const s,
-                                               char_buffer_t *out) {
+retcode_t json_get_node_info_serialize_request(const serializer_t *const s, char_buffer_t *out) {
   retcode_t ret = RC_OK;
   const char *req_text = "{\"command\":\"getNodeInfo\"}";
   log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
@@ -21,8 +20,7 @@ retcode_t json_get_node_info_serialize_request(const serializer_t *const s,
   return ret;
 }
 
-retcode_t json_get_node_info_deserialize_response(const serializer_t *const s,
-                                                  const char *const obj,
+retcode_t json_get_node_info_deserialize_response(const serializer_t *const s, const char *const obj,
                                                   get_node_info_res_t *out) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
@@ -30,16 +28,14 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t *const s,
   log_info(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
   if (json_obj == NULL) {
-    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__,
-              STR_CCLIENT_JSON_PARSE);
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_JSON_PARSE;
   }
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
   if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(json_logger_id, "[%s:%d] %s %s\n", __func__, __LINE__,
-              STR_CCLIENT_RES_ERROR, json_item->valuestring);
+    log_error(json_logger_id, "[%s:%d] %s %s\n", __func__, __LINE__, STR_CCLIENT_RES_ERROR, json_item->valuestring);
     cJSON_Delete(json_obj);
     return RC_CCLIENT_RES_ERROR;
   }
@@ -54,33 +50,28 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t *const s,
     goto end;
   }
 
-  ret = json_string_hash_to_flex_trits(json_obj, "latestMilestone",
-                                       out->latest_milestone);
+  ret = json_string_hash_to_flex_trits(json_obj, "latestMilestone", out->latest_milestone);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_uint32(json_obj, "latestMilestoneIndex",
-                        &out->latest_milestone_index);
+  ret = json_get_uint32(json_obj, "latestMilestoneIndex", &out->latest_milestone_index);
   if (ret != RC_OK) {
     goto end;
   }
 
   ret =
-      json_string_hash_to_flex_trits(json_obj, "latestSolidSubtangleMilestone",
-                                     out->latest_solid_subtangle_milestone);
+      json_string_hash_to_flex_trits(json_obj, "latestSolidSubtangleMilestone", out->latest_solid_subtangle_milestone);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_uint32(json_obj, "latestSolidSubtangleMilestoneIndex",
-                        &out->latest_solid_subtangle_milestone_index);
+  ret = json_get_uint32(json_obj, "latestSolidSubtangleMilestoneIndex", &out->latest_solid_subtangle_milestone_index);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_uint32(json_obj, "milestoneStartIndex",
-                        &out->milestone_start_index);
+  ret = json_get_uint32(json_obj, "milestoneStartIndex", &out->milestone_start_index);
   if (ret != RC_OK) {
     goto end;
   }
@@ -105,14 +96,12 @@ retcode_t json_get_node_info_deserialize_response(const serializer_t *const s,
     goto end;
   }
 
-  ret = json_get_uint32(json_obj, "transactionsToRequest",
-                        &out->transactions_to_request);
+  ret = json_get_uint32(json_obj, "transactionsToRequest", &out->transactions_to_request);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_string_hash_to_flex_trits(json_obj, "coordinatorAddress",
-                                       out->coordinator_address);
+  ret = json_string_hash_to_flex_trits(json_obj, "coordinatorAddress", out->coordinator_address);
   if (ret != RC_OK) {
     goto end;
   }

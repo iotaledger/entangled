@@ -18,8 +18,7 @@ extern "C" {
  * effect if not needed by the underlying API
  */
 
-#if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
-    (defined(__APPLE__) && defined(__MACH__))
+#if !defined(_WIN32) && defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>
 #elif defined(_WIN32)
 #include <Windows.h>
@@ -33,33 +32,22 @@ extern "C" {
 
 typedef pthread_cond_t cond_handle_t;
 
-static inline int cond_handle_init(cond_handle_t* const cond) {
-  return pthread_cond_init(cond, NULL);
-}
+static inline int cond_handle_init(cond_handle_t* const cond) { return pthread_cond_init(cond, NULL); }
 
-static inline int cond_handle_signal(cond_handle_t* const cond) {
-  return pthread_cond_signal(cond);
-}
+static inline int cond_handle_signal(cond_handle_t* const cond) { return pthread_cond_signal(cond); }
 
-static inline int cond_handle_broadcast(cond_handle_t* const cond) {
-  return pthread_cond_broadcast(cond);
-}
+static inline int cond_handle_broadcast(cond_handle_t* const cond) { return pthread_cond_broadcast(cond); }
 
-static inline int cond_handle_wait(cond_handle_t* const cond,
-                                   lock_handle_t* const lock) {
+static inline int cond_handle_wait(cond_handle_t* const cond, lock_handle_t* const lock) {
   return pthread_cond_wait(cond, lock);
 }
 
-static inline int cond_handle_timedwait(cond_handle_t* const cond,
-                                        lock_handle_t* const lock,
-                                        unsigned int timeout) {
+static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock, unsigned int timeout) {
   struct timespec ts = {time(NULL) + timeout, 0};
   return pthread_cond_timedwait(cond, lock, &ts);
 }
 
-static inline int cond_handle_destroy(cond_handle_t* const cond) {
-  return pthread_cond_destroy(cond);
-}
+static inline int cond_handle_destroy(cond_handle_t* const cond) { return pthread_cond_destroy(cond); }
 
 #elif defined(_WIN32)
 
@@ -77,15 +65,12 @@ static inline int cond_handle_broadcast(cond_handle_t* const cond) {
   WakeAllConditionVariable(cond);
   return 0;
 }
-static inline int cond_handle_wait(cond_handle_t* const cond,
-                                   lock_handle_t* const lock) {
+static inline int cond_handle_wait(cond_handle_t* const cond, lock_handle_t* const lock) {
   SleepConditionVariableCS(cond, lock, INFINITE);
   return 0;
 }
 
-static inline int cond_handle_timedwait(cond_handle_t* const cond,
-                                        lock_handle_t* const lock,
-                                        unsigned int timeout) {
+static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock, unsigned int timeout) {
   if (!SleepConditionVariableCS(cond, lock, timeout * 1000)) return ETIMEDOUT;
   return 0;
 }
@@ -136,8 +121,7 @@ static inline int cond_handle_broadcast(cond_handle_t* const cond);
  *
  * @return exit status
  */
-static inline int cond_handle_wait(cond_handle_t* const cond,
-                                   lock_handle_t* const lock);
+static inline int cond_handle_wait(cond_handle_t* const cond, lock_handle_t* const lock);
 
 /**
  * Blocks the calling thread, waiting for the condition specified by cond to be
@@ -149,9 +133,7 @@ static inline int cond_handle_wait(cond_handle_t* const cond,
  *
  * @return exit status
  */
-static inline int cond_handle_timedwait(cond_handle_t* const cond,
-                                        lock_handle_t* const lock,
-                                        unsigned int timeout);
+static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock, unsigned int timeout);
 
 /**
  * Destroys the condition variable specified by cond

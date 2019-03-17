@@ -23,8 +23,7 @@ static struct option* build_options() {
   while (cli_arguments_g[nbr].desc) {
     nbr++;
   }
-  struct option* options =
-      (struct option*)malloc((nbr + 1) * sizeof(struct option));
+  struct option* options = (struct option*)malloc((nbr + 1) * sizeof(struct option));
   size_t i;
   for (i = 0; i < nbr; i++) {
     options[i].name = cli_arguments_g[i].name;
@@ -49,11 +48,9 @@ static logger_level_t get_log_level(char const* const log_level) {
   static struct log_level_map {
     char* str;
     logger_level_t level;
-  } map[] = {{"debug", LOGGER_DEBUG},   {"info", LOGGER_INFO},
-             {"notice", LOGGER_NOTICE}, {"warning", LOGGER_WARNING},
-             {"error", LOGGER_ERR},     {"critical", LOGGER_CRIT},
-             {"alert", LOGGER_ALERT},   {"emergency", LOGGER_EMERG},
-             {NULL, LOGGER_INFO}};
+  } map[] = {{"debug", LOGGER_DEBUG},     {"info", LOGGER_INFO},       {"notice", LOGGER_NOTICE},
+             {"warning", LOGGER_WARNING}, {"error", LOGGER_ERR},       {"critical", LOGGER_CRIT},
+             {"alert", LOGGER_ALERT},     {"emergency", LOGGER_EMERG}, {NULL, LOGGER_INFO}};
   size_t i;
   for (i = 0; map[i].str != NULL && strcmp(map[i].str, log_level) != 0; i++)
     ;
@@ -62,17 +59,14 @@ static logger_level_t get_log_level(char const* const log_level) {
 
 static int get_conf_key(char const* const key) {
   int i = 0;
-  while (cli_arguments_g[i].name != NULL &&
-         strcmp(cli_arguments_g[i].name, key) != 0) {
+  while (cli_arguments_g[i].name != NULL && strcmp(cli_arguments_g[i].name, key) != 0) {
     i++;
   }
   return cli_arguments_g[i].val;
 }
 
-static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf,
-                                iota_consensus_conf_t* const consensus_conf,
-                                iota_gossip_conf_t* const gossip_conf,
-                                iota_api_conf_t* const api_conf, int const key,
+static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
+                                iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf, int const key,
                                 char const* const value) {
   retcode_t ret = RC_OK;
 
@@ -151,8 +145,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf,
       if (strlen(value) != HASH_LENGTH_TRYTE) {
         return RC_CIRI_CONF_INVALID_ARGUMENTS;
       }
-      flex_trits_from_trytes(consensus_conf->coordinator, HASH_LENGTH_TRIT,
-                             (tryte_t*)value, HASH_LENGTH_TRYTE,
+      flex_trits_from_trytes(consensus_conf->coordinator, HASH_LENGTH_TRIT, (tryte_t*)value, HASH_LENGTH_TRYTE,
                              HASH_LENGTH_TRYTE);
       break;
     case CONF_LAST_MILESTONE:  // --last-milestone
@@ -180,8 +173,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf,
       if (strlen(value) != HASH_LENGTH_TRYTE) {
         return RC_CIRI_CONF_INVALID_ARGUMENTS;
       }
-      flex_trits_from_trytes(consensus_conf->snapshot_signature_pubkey,
-                             HASH_LENGTH_TRIT, (tryte_t*)value,
+      flex_trits_from_trytes(consensus_conf->snapshot_signature_pubkey, HASH_LENGTH_TRIT, (tryte_t*)value,
                              HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
       break;
     case CONF_SNAPSHOT_TIMESTAMP:  // --snapshot-timestamp
@@ -200,10 +192,8 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf,
  * Public functions
  */
 
-retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf,
-                                 iota_consensus_conf_t* const consensus_conf,
-                                 iota_gossip_conf_t* const gossip_conf,
-                                 iota_api_conf_t* const api_conf) {
+retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
+                                 iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf) {
   retcode_t ret = RC_OK;
 
   if (ciri_conf == NULL || gossip_conf == NULL || consensus_conf == NULL) {
@@ -212,8 +202,7 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf,
 
   ciri_conf->log_level = DEFAULT_LOG_LEVEL;
   strncpy(ciri_conf->db_path, DEFAULT_DB_PATH, sizeof(ciri_conf->db_path));
-  strncpy(consensus_conf->db_path, DEFAULT_DB_PATH,
-          sizeof(consensus_conf->db_path));
+  strncpy(consensus_conf->db_path, DEFAULT_DB_PATH, sizeof(consensus_conf->db_path));
   strncpy(gossip_conf->db_path, DEFAULT_DB_PATH, sizeof(gossip_conf->db_path));
   strncpy(api_conf->db_path, DEFAULT_DB_PATH, sizeof(api_conf->db_path));
 
@@ -232,10 +221,8 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf,
   return ret;
 }
 
-retcode_t iota_ciri_conf_file(iota_ciri_conf_t* const ciri_conf,
-                              iota_consensus_conf_t* const consensus_conf,
-                              iota_gossip_conf_t* const gossip_conf,
-                              iota_api_conf_t* const api_conf) {
+retcode_t iota_ciri_conf_file(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
+                              iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf) {
   retcode_t ret = RC_OK;
   yaml_parser_t parser;
   yaml_token_t token;
@@ -273,8 +260,7 @@ retcode_t iota_ciri_conf_file(iota_ciri_conf_t* const ciri_conf,
         if (state == 0) {  // Key
           key = get_conf_key(arg);
         } else {  // Value
-          if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf,
-                                    api_conf, key, arg) != RC_OK)) {
+          if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf, key, arg) != RC_OK)) {
             goto done;
           }
         }
@@ -294,19 +280,15 @@ done:
   return ret;
 }
 
-retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf,
-                             iota_consensus_conf_t* const consensus_conf,
-                             iota_gossip_conf_t* const gossip_conf,
-                             iota_api_conf_t* const api_conf, int argc,
+retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
+                             iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf, int argc,
                              char** argv) {
   int key;
   retcode_t ret = RC_OK;
   struct option* long_options = build_options();
 
-  while ((key = getopt_long(argc, argv, short_options, long_options, NULL)) !=
-         -1) {
-    if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf,
-                              key, optarg) != RC_OK)) {
+  while ((key = getopt_long(argc, argv, short_options, long_options, NULL)) != -1) {
+    if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf, key, optarg) != RC_OK)) {
       break;
     }
   }

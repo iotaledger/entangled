@@ -11,9 +11,7 @@
  * Private functions
  */
 
-static retcode_t tips_cache_fifo_add(hash243_set_t* const set,
-                                     size_t const capacity,
-                                     flex_trit_t const* const tip) {
+static retcode_t tips_cache_fifo_add(hash243_set_t* const set, size_t const capacity, flex_trit_t const* const tip) {
   retcode_t ret = RC_OK;
 
   if (set == NULL || tip == NULL) {
@@ -29,8 +27,7 @@ static retcode_t tips_cache_fifo_add(hash243_set_t* const set,
   return hash243_set_add(set, tip);
 }
 
-static retcode_t tips_cache_random_tip_from_set(hash243_set_t* const set,
-                                                flex_trit_t* const tip) {
+static retcode_t tips_cache_random_tip_from_set(hash243_set_t* const set, flex_trit_t* const tip) {
   if (set == NULL || tip == NULL) {
     return RC_NULL_PARAM;
   }
@@ -74,8 +71,7 @@ retcode_t tips_cache_destroy(tips_cache_t* const cache) {
   return RC_OK;
 }
 
-retcode_t tips_cache_get_tips(tips_cache_t* const cache,
-                              hash243_set_t* const tips) {
+retcode_t tips_cache_get_tips(tips_cache_t* const cache, hash243_set_t* const tips) {
   retcode_t ret = RC_OK;
 
   if (cache == NULL || tips == NULL) {
@@ -97,8 +93,7 @@ retcode_t tips_cache_get_tips(tips_cache_t* const cache,
   return ret;
 }
 
-retcode_t tips_cache_add(tips_cache_t* const cache,
-                         flex_trit_t const* const tip) {
+retcode_t tips_cache_add(tips_cache_t* const cache, flex_trit_t const* const tip) {
   retcode_t ret = RC_OK;
 
   if (cache == NULL || tip == NULL) {
@@ -112,8 +107,7 @@ retcode_t tips_cache_add(tips_cache_t* const cache,
   return ret;
 }
 
-retcode_t tips_cache_remove(tips_cache_t* const cache,
-                            flex_trit_t const* const tip) {
+retcode_t tips_cache_remove(tips_cache_t* const cache, flex_trit_t const* const tip) {
   retcode_t ret = RC_OK;
 
   if (cache == NULL || tip == NULL) {
@@ -127,8 +121,7 @@ retcode_t tips_cache_remove(tips_cache_t* const cache,
   return ret;
 }
 
-retcode_t tips_cache_set_solid(tips_cache_t* const cache,
-                               flex_trit_t const* const tip) {
+retcode_t tips_cache_set_solid(tips_cache_t* const cache, flex_trit_t const* const tip) {
   retcode_t ret = RC_OK;
 
   if (cache == NULL || tip == NULL) {
@@ -198,8 +191,7 @@ size_t tips_cache_size(tips_cache_t* const cache) {
   return size;
 }
 
-retcode_t tips_cache_random_tip(tips_cache_t* const cache,
-                                flex_trit_t* const tip) {
+retcode_t tips_cache_random_tip(tips_cache_t* const cache, flex_trit_t* const tip) {
   retcode_t ret = RC_OK;
 
   if (cache == NULL || tip == NULL) {
@@ -213,8 +205,7 @@ retcode_t tips_cache_random_tip(tips_cache_t* const cache,
   return ret;
 }
 
-retcode_t tips_cache_random_solid_tip(tips_cache_t* const cache,
-                                      flex_trit_t* const tip) {
+retcode_t tips_cache_random_solid_tip(tips_cache_t* const cache, flex_trit_t* const tip) {
   retcode_t ret = RC_OK;
 
   if (cache == NULL || tip == NULL) {

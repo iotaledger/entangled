@@ -28,13 +28,11 @@ extern "C" {
  * @return a status code
  */
 
-extern retcode_t map_transition_probabilities(
-    double alpha, hash_to_int64_t_map_t const cw_ratings,
-    hash243_set_t const *const approvers, double transition_probs[]);
+extern retcode_t map_transition_probabilities(double alpha, hash_to_int64_t_map_t const cw_ratings,
+                                              hash243_set_t const *const approvers, double transition_probs[]);
 
-static inline bool iota_consensus_is_tx_a_tip(
-    hash_to_indexed_hash_set_map_t const *const tx_to_approvers,
-    flex_trit_t const *const tx) {
+static inline bool iota_consensus_is_tx_a_tip(hash_to_indexed_hash_set_map_t const *const tx_to_approvers,
+                                              flex_trit_t const *const tx) {
   hash_to_indexed_hash_set_entry_t *aps = NULL;
   hash_to_indexed_hash_set_map_find(tx_to_approvers, tx, &aps);
   return hash243_set_size(&aps->approvers) == 0;

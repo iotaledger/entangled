@@ -19,8 +19,7 @@ int main(int ac, char **av) {
   retcode_t ret = RC_OK;
 
   if (ac != 6) {
-    fprintf(stderr,
-            "usage: send-msg <host> <port> <seed> <payload> <last_packet>\n");
+    fprintf(stderr, "usage: send-msg <host> <port> <seed> <payload> <last_packet>\n");
     return EXIT_FAILURE;
   }
 
@@ -49,8 +48,7 @@ int main(int ac, char **av) {
     trit_t msg_id[MAM_MSG_ID_SIZE];
 
     // Writing header to bundle
-    if ((ret = mam_example_write_header_on_channel(&api, channel_id, bundle,
-                                                   msg_id)) != RC_OK) {
+    if ((ret = mam_example_write_header_on_channel(&api, channel_id, bundle, msg_id)) != RC_OK) {
       fprintf(stderr, "mam_example_write_header failed with err %d\n", ret);
       return EXIT_FAILURE;
     }
@@ -67,8 +65,7 @@ int main(int ac, char **av) {
     //   return RC_OK;
     // }
 
-    if ((ret = mam_example_write_packet(&api, bundle, av[4], msg_id,
-                                        last_packet)) != RC_OK) {
+    if ((ret = mam_example_write_packet(&api, bundle, av[4], msg_id, last_packet)) != RC_OK) {
       fprintf(stderr, "mam_example_write_packet failed with err %d\n", ret);
       return EXIT_FAILURE;
     }

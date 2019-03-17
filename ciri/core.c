@@ -21,9 +21,7 @@ retcode_t core_init(core_t* const core, tangle_t* const tangle) {
   core->running = false;
 
   log_info(logger_id, "Initializing consensus\n");
-  if (iota_consensus_init(&core->consensus, tangle,
-                          &core->node.transaction_requester,
-                          &core->node.tips) != RC_OK) {
+  if (iota_consensus_init(&core->consensus, tangle, &core->node.transaction_requester, &core->node.tips) != RC_OK) {
     log_critical(logger_id, "Initializing consensus failed\n");
     return RC_CORE_FAILED_CONSENSUS_INIT;
   }
@@ -35,8 +33,7 @@ retcode_t core_init(core_t* const core, tangle_t* const tangle) {
   }
 
   log_info(logger_id, "Initializing API\n");
-  if (iota_api_init(&core->api, &core->node, &core->consensus, SR_JSON) !=
-      RC_OK) {
+  if (iota_api_init(&core->api, &core->node, &core->consensus, SR_JSON) != RC_OK) {
     log_critical(logger_id, "Initializing API failed\n");
     return RC_CORE_FAILED_API_INIT;
   }

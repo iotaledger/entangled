@@ -21,24 +21,16 @@ static node_t node;
 static tangle_t tangle;
 static iota_consensus_t consensus;
 
-void setUp(void) {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
-}
+void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK); }
 
-void tearDown(void) {
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
-}
+void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK); }
 
 void test_get_transactions_to_approve_invalid_depth(void) {
-  get_transactions_to_approve_req_t *req =
-      get_transactions_to_approve_req_new();
-  get_transactions_to_approve_res_t *res =
-      get_transactions_to_approve_res_new();
+  get_transactions_to_approve_req_t *req = get_transactions_to_approve_req_new();
+  get_transactions_to_approve_res_t *res = get_transactions_to_approve_res_new();
 
   get_transactions_to_approve_req_set_depth(req, 42);
-  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res) ==
-              RC_API_INVALID_DEPTH_INPUT);
+  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res) == RC_API_INVALID_DEPTH_INPUT);
 
   get_transactions_to_approve_req_free(&req);
   get_transactions_to_approve_res_free(&res);
@@ -47,26 +39,20 @@ void test_get_transactions_to_approve_invalid_depth(void) {
 }
 
 void test_get_transactions_to_approve_invalid_subtangle_status(void) {
-  get_transactions_to_approve_req_t *req =
-      get_transactions_to_approve_req_new();
-  get_transactions_to_approve_res_t *res =
-      get_transactions_to_approve_res_new();
+  get_transactions_to_approve_req_t *req = get_transactions_to_approve_req_new();
+  get_transactions_to_approve_res_t *res = get_transactions_to_approve_res_new();
 
-  uint64_t latest_solid_subtangle_milestone_index =
-      consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
-  uint64_t milestone_start_index =
-      consensus.milestone_tracker.milestone_start_index;
+  uint64_t latest_solid_subtangle_milestone_index = consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
+  uint64_t milestone_start_index = consensus.milestone_tracker.milestone_start_index;
 
   consensus.milestone_tracker.latest_solid_subtangle_milestone_index = 42;
   consensus.milestone_tracker.milestone_start_index = 42;
 
   get_transactions_to_approve_req_set_depth(req, 5);
 
-  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res) ==
-              RC_API_INVALID_SUBTANGLE_STATUS);
+  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res) == RC_API_INVALID_SUBTANGLE_STATUS);
 
-  consensus.milestone_tracker.latest_solid_subtangle_milestone_index =
-      latest_solid_subtangle_milestone_index;
+  consensus.milestone_tracker.latest_solid_subtangle_milestone_index = latest_solid_subtangle_milestone_index;
   consensus.milestone_tracker.milestone_start_index = milestone_start_index;
 
   get_transactions_to_approve_req_free(&req);
@@ -85,19 +71,15 @@ int main(void) {
 
   TEST_ASSERT(iota_gossip_conf_init(&api.node->conf) == RC_OK);
   TEST_ASSERT(iota_consensus_conf_init(&api.consensus->conf) == RC_OK);
-  TEST_ASSERT(requester_init(&api.node->transaction_requester, api.node) ==
-              RC_OK);
-  TEST_ASSERT(tips_cache_init(&api.node->tips,
-                              api.node->conf.tips_cache_size) == RC_OK);
+  TEST_ASSERT(requester_init(&api.node->transaction_requester, api.node) == RC_OK);
+  TEST_ASSERT(tips_cache_init(&api.node->tips, api.node->conf.tips_cache_size) == RC_OK);
 
   setUp();
 
   // Avoid verifying snapshot signature
   api.consensus->conf.snapshot_signature_file[0] = '\0';
 
-  TEST_ASSERT(iota_consensus_init(api.consensus, &tangle,
-                                  &api.node->transaction_requester,
-                                  &api.node->tips) == RC_OK);
+  TEST_ASSERT(iota_consensus_init(api.consensus, &tangle, &api.node->transaction_requester, &api.node->tips) == RC_OK);
 
   tearDown();
 

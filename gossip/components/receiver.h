@@ -37,8 +37,7 @@ extern "C" {
  *
  * @return a status code
  */
-retcode_t receiver_init(receiver_state_t *const state, node_t *const node,
-                        uint16_t tcp_port, uint16_t udp_port);
+retcode_t receiver_init(receiver_state_t *const state, node_t *const node, uint16_t tcp_port, uint16_t udp_port);
 
 /**
  * Starts a receiver

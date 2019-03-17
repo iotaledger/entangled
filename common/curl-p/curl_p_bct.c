@@ -13,32 +13,24 @@ void s_transform(BCurl *const ctx);
 void transform_round(BCurl *const, BCurl *const, size_t const);
 void sbox(BCurl *const, BCurl const *const, size_t const);
 
-void init_s_curl(BCurl *const ctx) {
-  memset(ctx->state, 0, S_STATE_LENGTH * sizeof(bct_t));
-}
+void init_s_curl(BCurl *const ctx) { memset(ctx->state, 0, S_STATE_LENGTH * sizeof(bct_t)); }
 
-void s_curl_absorb(BCurl *const ctx, bct_t const *const trits,
-                   size_t const offset, size_t const length) {
-  copy_bct(ctx->state, 0, trits, offset,
-           (length < HASH_LENGTH_TRIT ? length : HASH_LENGTH_TRIT));
+void s_curl_absorb(BCurl *const ctx, bct_t const *const trits, size_t const offset, size_t const length) {
+  copy_bct(ctx->state, 0, trits, offset, (length < HASH_LENGTH_TRIT ? length : HASH_LENGTH_TRIT));
   s_transform(ctx);
   if (length <= HASH_LENGTH_TRIT) {
     return;
   }
-  s_curl_absorb(ctx, trits, offset + HASH_LENGTH_TRIT,
-                length - HASH_LENGTH_TRIT);
+  s_curl_absorb(ctx, trits, offset + HASH_LENGTH_TRIT, length - HASH_LENGTH_TRIT);
 }
 
-void s_curl_squeeze(BCurl *const ctx, bct_t *const trits, size_t const offset,
-                    size_t const length) {
-  copy_bct(trits, offset, ctx->state, 0,
-           (length < HASH_LENGTH_TRIT ? length : HASH_LENGTH_TRIT));
+void s_curl_squeeze(BCurl *const ctx, bct_t *const trits, size_t const offset, size_t const length) {
+  copy_bct(trits, offset, ctx->state, 0, (length < HASH_LENGTH_TRIT ? length : HASH_LENGTH_TRIT));
   s_transform(ctx);
   if (length <= HASH_LENGTH_TRIT) {
     return;
   }
-  s_curl_squeeze(ctx, trits, offset + HASH_LENGTH_TRIT,
-                 length - HASH_LENGTH_TRIT);
+  s_curl_squeeze(ctx, trits, offset + HASH_LENGTH_TRIT, length - HASH_LENGTH_TRIT);
 }
 
 void s_transform(BCurl *const ctx) {
@@ -67,6 +59,5 @@ void sbox(BCurl *const c, BCurl const *const s, size_t const i) {
 }
 
 void s_curl_reset(BCurl *const ctx) {
-  memset_safe(ctx->state, S_STATE_LENGTH * sizeof(bct_t), 0,
-              S_STATE_LENGTH * sizeof(bct_t));
+  memset_safe(ctx->state, S_STATE_LENGTH * sizeof(bct_t), 0, S_STATE_LENGTH * sizeof(bct_t));
 }

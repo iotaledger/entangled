@@ -36,7 +36,7 @@ typedef struct mam_channel_t_set_entry_s mam_channel_t_set_entry_t;
 typedef mam_channel_t_set_entry_t *mam_channel_t_set_t;
 
 typedef struct mam_pk_s {
-  trit_t pk[MAM_CHANNEL_ID_SIZE];
+  trit_t key[MAM_CHANNEL_ID_SIZE];
 } mam_pk_t;
 
 /**
@@ -77,9 +77,7 @@ trits_t mam_channel_msg_ord(mam_channel_t const *const channel);
  *
  * @return a status code
  */
-retcode_t mam_channel_create(mam_prng_t *const prng,
-                             mss_mt_height_t const height,
-                             trits_t const channel_name,
+retcode_t mam_channel_create(mam_prng_t *const prng, mss_mt_height_t const height, trits_t const channel_name,
                              mam_channel_t *const channel);
 
 /**
@@ -103,20 +101,15 @@ retcode_t mam_channels_destroy(mam_channel_t_set_t *const channels);
 
 size_t mam_channel_serialized_size(mam_channel_t const *const channel);
 
-void mam_channel_serialize(mam_channel_t const *const channel,
-                           trits_t *const buffer);
+void mam_channel_serialize(mam_channel_t const *const channel, trits_t *const buffer);
 
-retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng,
-                                  mam_channel_t *const channel);
+retcode_t mam_channel_deserialize(trits_t *const buffer, mam_prng_t *const prng, mam_channel_t *const channel);
 
 size_t mam_channels_serialized_size(mam_channel_t_set_t const channels);
 
-void mam_channels_serialize(mam_channel_t_set_t const channels,
-                            trits_t *const buffer);
+void mam_channels_serialize(mam_channel_t_set_t const channels, trits_t *const buffer);
 
-retcode_t mam_channels_deserialize(trits_t *const buffer,
-                                   mam_prng_t *const prng,
-                                   mam_channel_t_set_t *const channels);
+retcode_t mam_channels_deserialize(trits_t *const buffer, mam_prng_t *const prng, mam_channel_t_set_t *const channels);
 
 #ifdef __cplusplus
 }

@@ -22,8 +22,7 @@ typedef struct connection_config_t {
   char const* db_path;
 } connection_config_t;
 
-extern retcode_t connection_init(storage_connection_t* const connection,
-                                 connection_config_t const* const config);
+extern retcode_t connection_init(storage_connection_t* const connection, connection_config_t const* const config);
 extern retcode_t connection_destroy(storage_connection_t* const connection);
 
 #ifdef __cplusplus

@@ -60,9 +60,9 @@ typedef struct mam_msg_write_context_s {
 } mam_msg_write_context_t;
 
 typedef struct mam_msg_read_context_s {
-  mam_spongos_t spongos; /*!< Main Spongos interface */
-  trit_t pk[MAM_CHANNEL_ID_SIZE];
-  trint18_t ord; /*!< Packet ordinal number. */
+  mam_spongos_t spongos;
+  mam_pk_t pk;
+  trint18_t ord;
 } mam_msg_read_context_t;
 
 /**
@@ -77,11 +77,8 @@ typedef struct mam_msg_read_context_s {
  *
  * @return return the size of the header
  */
-size_t mam_msg_header_size(mam_channel_t const *const ch,
-                           mam_endpoint_t const *const ep,
-                           mam_channel_t const *const ch1,
-                           mam_endpoint_t const *const ep1,
-                           mam_psk_t_set_t const psks,
+size_t mam_msg_header_size(mam_channel_t const *const ch, mam_endpoint_t const *const ep,
+                           mam_channel_t const *const ch1, mam_endpoint_t const *const ep1, mam_psk_t_set_t const psks,
                            mam_ntru_pk_t_set_t const ntru_pks);
 
 /**
@@ -101,12 +98,10 @@ size_t mam_msg_header_size(mam_channel_t const *const ch,
  *
  * @return return error code
  */
-retcode_t mam_msg_write_header(
-    mam_msg_write_context_t *const ctx, mam_prng_t const *const prng,
-    mam_channel_t *const ch, mam_endpoint_t *const ep, mam_channel_t *const ch1,
-    mam_endpoint_t *const ep1, trits_t msg_id, trint9_t msg_type_id,
-    mam_psk_t_set_t const psks, mam_ntru_pk_t_set_t const ntru_pks,
-    trits_t *const msg);
+retcode_t mam_msg_write_header(mam_msg_write_context_t *const ctx, mam_prng_t const *const prng,
+                               mam_channel_t *const ch, mam_endpoint_t *const ep, mam_channel_t *const ch1,
+                               mam_endpoint_t *const ep1, trits_t msg_id, trint9_t msg_type_id,
+                               mam_psk_t_set_t const psks, mam_ntru_pk_t_set_t const ntru_pks, trits_t *const msg);
 
 /**
  * Gets the packet size for encoding
@@ -118,8 +113,7 @@ retcode_t mam_msg_write_header(
  *
  * @return return the size of the packet
  */
-size_t mam_msg_packet_size(mam_msg_checksum_t checksum,
-                           mam_mss_t const *const mss, size_t payload_size);
+size_t mam_msg_packet_size(mam_msg_checksum_t checksum, mam_mss_t const *const mss, size_t payload_size);
 
 /**
  * Writes a packet into a buffer
@@ -131,9 +125,8 @@ size_t mam_msg_packet_size(mam_msg_checksum_t checksum,
  *
  * @return return the size of the packet
  */
-retcode_t mam_msg_write_packet(mam_msg_write_context_t *const ctx,
-                               mam_msg_checksum_t checksum,
-                               trits_t const payload, trits_t *const buffer);
+retcode_t mam_msg_write_packet(mam_msg_write_context_t *const ctx, mam_msg_checksum_t checksum, trits_t const payload,
+                               trits_t *const buffer);
 
 /**
  * Reads a header
@@ -148,12 +141,9 @@ retcode_t mam_msg_write_packet(mam_msg_write_context_t *const ctx,
  *
  * @return return error code
  */
-retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx,
-                              trits_t *const msg, mam_psk_t_set_t const psks,
-                              mam_ntru_sk_t_set_t const ntru_sks,
-                              trits_t msg_id,
-                              mam_pk_t_set_t *const trusted_channels_pks,
-                              mam_pk_t_set_t *const trusted_endpoints_pks);
+retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx, trits_t *const msg, mam_psk_t_set_t const psks,
+                              mam_ntru_sk_t_set_t const ntru_sks, trits_t msg_id,
+                              mam_pk_t_set_t *const trusted_channels_pks, mam_pk_t_set_t *const trusted_endpoints_pks);
 
 /**
  * Reads a packet
@@ -164,8 +154,7 @@ retcode_t mam_msg_read_header(mam_msg_read_context_t *const ctx,
  *
  * @return return error code
  */
-retcode_t mam_msg_read_packet(mam_msg_read_context_t *const ctx,
-                              trits_t *const buffer, trits_t *const payload);
+retcode_t mam_msg_read_packet(mam_msg_read_context_t *const ctx, trits_t *const buffer, trits_t *const payload);
 
 /**
  * Gets the size for serialization of mam_msg_write_context_t
@@ -174,8 +163,7 @@ retcode_t mam_msg_read_packet(mam_msg_read_context_t *const ctx,
  *
  * @return return the size
  */
-size_t mam_msg_write_ctx_serialized_size(
-    mam_msg_write_context_t const *const ctx);
+size_t mam_msg_write_ctx_serialized_size(mam_msg_write_context_t const *const ctx);
 
 /**
  * Serializes a mam_msg_write_context_t into buffer
@@ -185,8 +173,7 @@ size_t mam_msg_write_ctx_serialized_size(
  *
  * @return return error code
  */
-void mam_msg_write_ctx_serialize(mam_msg_write_context_t const *const ctx,
-                                 trits_t *const buffer);
+void mam_msg_write_ctx_serialize(mam_msg_write_context_t const *const ctx, trits_t *const buffer);
 
 /**
  * Deserializes a mam_msg_write_context_t from buffer
@@ -196,8 +183,7 @@ void mam_msg_write_ctx_serialize(mam_msg_write_context_t const *const ctx,
  *
  * @return return error code
  */
-retcode_t mam_msg_write_ctx_deserialize(trits_t *const buffer,
-                                        mam_msg_write_context_t *const ctx);
+retcode_t mam_msg_write_ctx_deserialize(trits_t *const buffer, mam_msg_write_context_t *const ctx);
 
 /**
  * Gets the size for serialization of mam_msg_read_context_t
@@ -206,8 +192,7 @@ retcode_t mam_msg_write_ctx_deserialize(trits_t *const buffer,
  *
  * @return return the size
  */
-size_t mam_msg_read_ctx_serialized_size(
-    mam_msg_read_context_t const *const ctx);
+size_t mam_msg_read_ctx_serialized_size(mam_msg_read_context_t const *const ctx);
 
 /**
  * Serializes a mam_msg_read_context_t into buffer
@@ -217,8 +202,7 @@ size_t mam_msg_read_ctx_serialized_size(
  *
  * @return return error code
  */
-void mam_msg_read_ctx_serialize(mam_msg_read_context_t const *const ctx,
-                                trits_t *const buffer);
+void mam_msg_read_ctx_serialize(mam_msg_read_context_t const *const ctx, trits_t *const buffer);
 
 /**
  * Deserializes a mam_msg_read_context_t from buffer
@@ -228,8 +212,7 @@ void mam_msg_read_ctx_serialize(mam_msg_read_context_t const *const ctx,
  *
  * @return return error code
  */
-retcode_t mam_msg_read_ctx_deserialize(trits_t *const buffer,
-                                       mam_msg_read_context_t *const ctx);
+retcode_t mam_msg_read_ctx_deserialize(trits_t *const buffer, mam_msg_read_context_t *const ctx);
 
 #ifdef __cplusplus
 }

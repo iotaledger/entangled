@@ -34,8 +34,7 @@ static void test_psks_serialization(void) {
 
   size_t size = mam_psks_serialized_size(psks_1);
 
-  TEST_ASSERT_EQUAL_INT(
-      size, 26 * (MAM_PSK_ID_SIZE + MAM_PSK_KEY_SIZE) + pb3_sizeof_size_t(26));
+  TEST_ASSERT_EQUAL_INT(size, 26 * (MAM_PSK_ID_SIZE + MAM_PSK_KEY_SIZE) + pb3_sizeof_size_t(26));
 
   trits_t trits = trits_alloc(size);
 

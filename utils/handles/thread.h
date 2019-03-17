@@ -20,8 +20,7 @@ extern "C" {
 
 typedef void *(*thread_routine_t)(void *);
 
-#if !defined(_WIN32) && defined(__unix__) || defined(__unix) || \
-    (defined(__APPLE__) && defined(__MACH__))
+#if !defined(_WIN32) && defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>
 #elif defined(_WIN32)
 #include <Windows.h>
@@ -33,23 +32,18 @@ typedef void *(*thread_routine_t)(void *);
 
 typedef pthread_t thread_handle_t;
 
-static inline int thread_handle_create(thread_handle_t *const thread,
-                                       thread_routine_t routine, void *arg) {
+static inline int thread_handle_create(thread_handle_t *const thread, thread_routine_t routine, void *arg) {
   return pthread_create(thread, NULL, routine, arg);
 }
 
-static inline int thread_handle_join(thread_handle_t thread, void **status) {
-  return pthread_join(thread, status);
-}
+static inline int thread_handle_join(thread_handle_t thread, void **status) { return pthread_join(thread, status); }
 
 #elif defined(_WIN32)
 
 typedef HANDLE thread_handle_t;
 
-static inline int thread_handle_create(thread_handle_t *const thread,
-                                       thread_routine_t routine, void *arg) {
-  *thread =
-      CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)routine, arg, 0, NULL);
+static inline int thread_handle_create(thread_handle_t *const thread, thread_routine_t routine, void *arg) {
+  *thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)routine, arg, 0, NULL);
   return 0;
 }
 static inline int thread_handle_join(thread_handle_t thread, void **status) {
@@ -76,8 +70,7 @@ static inline int thread_handle_join(thread_handle_t thread, void **status) {
  *
  * @return exit status
  */
-static inline int thread_handle_create(thread_handle_t *const thread,
-                                       thread_routine_t routine, void *arg);
+static inline int thread_handle_create(thread_handle_t *const thread, thread_routine_t routine, void *arg);
 
 /**
  * Waits for a thread termination

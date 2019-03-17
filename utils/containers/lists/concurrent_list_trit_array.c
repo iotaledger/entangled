@@ -11,11 +11,9 @@
 
 DEFINE_CL(trit_array_p);
 
-bool trit_array_cmp(trit_array_p const *const lhs,
-                    trit_array_p const *const rhs) {
+bool trit_array_cmp(trit_array_p const *const lhs, trit_array_p const *const rhs) {
   if (lhs == NULL || rhs == NULL) {
     return false;
   }
-  return (*lhs)->num_bytes == (*rhs)->num_bytes &&
-         memcmp((*lhs)->trits, (*rhs)->trits, (*lhs)->num_bytes);
+  return (*lhs)->num_bytes == (*rhs)->num_bytes && memcmp((*lhs)->trits, (*rhs)->trits, (*lhs)->num_bytes);
 }

@@ -13,9 +13,7 @@ static void test_request(void) {
   const char* json_text =
       "{\"command\":\"attachToTangle\",\"trunkTransaction\":\"" TEST_81_TRYTES_1
       "\",\"branchTransaction\":\"" TEST_81_TRYTES_2
-      "\",\"minWeightMagnitude\":" STR(
-          TEST_MWM) ",\"trytes\":[\"" TEST_2673_TRYTES_1
-                    "\",\"" TEST_2673_TRYTES_2 "\"]}";
+      "\",\"minWeightMagnitude\":" STR(TEST_MWM) ",\"trytes\":[\"" TEST_2673_TRYTES_1 "\",\"" TEST_2673_TRYTES_2 "\"]}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   attach_to_tangle_req_t* attach_req = attach_to_tangle_req_new();
@@ -25,51 +23,38 @@ static void test_request(void) {
   TEST_ASSERT_NOT_NULL(serializer_out);
   TEST_ASSERT_NOT_NULL(attach_req);
 
-  TEST_ASSERT(flex_trits_from_trytes(attach_req->trunk, NUM_TRITS_HASH,
-                                     (const tryte_t*)TEST_81_TRYTES_1,
+  TEST_ASSERT(flex_trits_from_trytes(attach_req->trunk, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1,
                                      NUM_TRYTES_HASH, NUM_TRYTES_HASH));
-  TEST_ASSERT(flex_trits_from_trytes(attach_req->branch, NUM_TRITS_HASH,
-                                     (const tryte_t*)TEST_81_TRYTES_2,
+  TEST_ASSERT(flex_trits_from_trytes(attach_req->branch, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_2,
                                      NUM_TRYTES_HASH, NUM_TRYTES_HASH));
 
-  TEST_ASSERT(flex_trits_from_trytes(
-      trits_8019, NUM_TRITS_SERIALIZED_TRANSACTION,
-      (const tryte_t*)TEST_2673_TRYTES_1, NUM_TRYTES_SERIALIZED_TRANSACTION,
-      NUM_TRYTES_SERIALIZED_TRANSACTION));
-  attach_to_tangle_req_add_trytes(attach_req, trits_8019);
+  TEST_ASSERT(flex_trits_from_trytes(trits_8019, NUM_TRITS_SERIALIZED_TRANSACTION, (const tryte_t*)TEST_2673_TRYTES_1,
+                                     NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION));
+  TEST_ASSERT(attach_to_tangle_req_trytes_add(attach_req, trits_8019) == RC_OK);
 
-  TEST_ASSERT(flex_trits_from_trytes(
-      trits_8019, NUM_TRITS_SERIALIZED_TRANSACTION,
-      (const tryte_t*)TEST_2673_TRYTES_2, NUM_TRYTES_SERIALIZED_TRANSACTION,
-      NUM_TRYTES_SERIALIZED_TRANSACTION));
-  attach_to_tangle_req_add_trytes(attach_req, trits_8019);
+  TEST_ASSERT(flex_trits_from_trytes(trits_8019, NUM_TRITS_SERIALIZED_TRANSACTION, (const tryte_t*)TEST_2673_TRYTES_2,
+                                     NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION));
+  TEST_ASSERT(attach_to_tangle_req_trytes_add(attach_req, trits_8019) == RC_OK);
 
   TEST_ASSERT_NOT_NULL(attach_req->trytes);
 
   attach_req->mwm = TEST_MWM;
 
-  serializer.vtable.attach_to_tangle_serialize_request(&serializer, attach_req,
-                                                       serializer_out);
+  serializer.vtable.attach_to_tangle_serialize_request(&serializer, attach_req, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
-  serializer.vtable.attach_to_tangle_deserialize_request(
-      &serializer, serializer_out->data, attach_req_de);
+  serializer.vtable.attach_to_tangle_deserialize_request(&serializer, serializer_out->data, attach_req_de);
 
   TEST_ASSERT_EQUAL_INT(TEST_MWM, attach_req_de->mwm);
-  TEST_ASSERT_EQUAL_MEMORY(attach_req->trunk, attach_req_de->trunk,
-                           FLEX_TRIT_SIZE_243);
-  TEST_ASSERT_EQUAL_MEMORY(attach_req->branch, attach_req_de->branch,
-                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(attach_req->trunk, attach_req_de->trunk, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(attach_req->branch, attach_req_de->branch, FLEX_TRIT_SIZE_243);
 
-  TEST_ASSERT_EQUAL_INT(hash_array_len(attach_req->trytes),
-                        hash_array_len(attach_req_de->trytes));
+  TEST_ASSERT_EQUAL_INT(hash_array_len(attach_req->trytes), hash_array_len(attach_req_de->trytes));
 
-  TEST_ASSERT_EQUAL_MEMORY(hash_array_at(attach_req->trytes, 0),
-                           hash_array_at(attach_req_de->trytes, 0),
+  TEST_ASSERT_EQUAL_MEMORY(hash_array_at(attach_req->trytes, 0), hash_array_at(attach_req_de->trytes, 0),
                            FLEX_TRIT_SIZE_8019);
-  TEST_ASSERT_EQUAL_MEMORY(hash_array_at(attach_req->trytes, 1),
-                           hash_array_at(attach_req_de->trytes, 1),
+  TEST_ASSERT_EQUAL_MEMORY(hash_array_at(attach_req->trytes, 1), hash_array_at(attach_req_de->trytes, 1),
                            FLEX_TRIT_SIZE_8019);
 
   char_buffer_free(serializer_out);
@@ -80,8 +65,7 @@ static void test_request(void) {
 static void test_response(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
-  const char* json_text =
-      "{\"trytes\":[\"" TEST_2673_TRYTES_1 "\",\"" TEST_2673_TRYTES_2 "\"]}";
+  const char* json_text = "{\"trytes\":[\"" TEST_2673_TRYTES_1 "\",\"" TEST_2673_TRYTES_2 "\"]}";
   flex_trit_t* tmp_hash = NULL;
   flex_trit_t hash[FLEX_TRIT_SIZE_8019] = {};
   retcode_t ret;
@@ -89,29 +73,23 @@ static void test_response(void) {
   attach_to_tangle_res_t* attach_res = attach_to_tangle_res_new();
   char_buffer_t* serializer_out = char_buffer_new();
 
-  ret = serializer.vtable.attach_to_tangle_deserialize_response(
-      &serializer, json_text, attach_res);
+  ret = serializer.vtable.attach_to_tangle_deserialize_response(&serializer, json_text, attach_res);
   TEST_ASSERT_EQUAL_INT(RC_OK, ret);
 
   tmp_hash = attach_to_tangle_res_trytes_at(attach_res, 0);
-  flex_trits_from_trytes(hash, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (const tryte_t*)TEST_2673_TRYTES_1,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+  flex_trits_from_trytes(hash, NUM_TRITS_SERIALIZED_TRANSACTION, (const tryte_t*)TEST_2673_TRYTES_1,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
   TEST_ASSERT_EQUAL_MEMORY(hash, tmp_hash, FLEX_TRIT_SIZE_8019);
 
   tmp_hash = attach_to_tangle_res_trytes_at(attach_res, 1);
-  flex_trits_from_trytes(hash, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (const tryte_t*)TEST_2673_TRYTES_2,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION,
-                         NUM_TRYTES_SERIALIZED_TRANSACTION);
+  flex_trits_from_trytes(hash, NUM_TRITS_SERIALIZED_TRANSACTION, (const tryte_t*)TEST_2673_TRYTES_2,
+                         NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
   TEST_ASSERT_EQUAL_MEMORY(hash, tmp_hash, FLEX_TRIT_SIZE_8019);
 
   tmp_hash = attach_to_tangle_res_trytes_at(attach_res, 3);
   TEST_ASSERT_NULL(tmp_hash);
 
-  ret = serializer.vtable.attach_to_tangle_serialize_response(
-      &serializer, attach_res, serializer_out);
+  ret = serializer.vtable.attach_to_tangle_serialize_response(&serializer, attach_res, serializer_out);
   TEST_ASSERT_EQUAL_INT(RC_OK, ret);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);

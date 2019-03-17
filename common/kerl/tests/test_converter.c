@@ -25,8 +25,7 @@ void test_identity(tryte_t const* const trytes) {
   convert_trits_to_bytes(trits_in, bytes);
   convert_bytes_to_trits(bytes, trits_out);
 
-  TEST_ASSERT_EQUAL_MEMORY(trits_in, trits_out,
-                           HASH_LENGTH_TRIT * sizeof(trit_t));
+  TEST_ASSERT_EQUAL_MEMORY(trits_in, trits_out, HASH_LENGTH_TRIT * sizeof(trit_t));
 }
 
 void bt(uint8_t const* const bytes_in, tryte_t const* const expected) {
@@ -38,8 +37,7 @@ void bt(uint8_t const* const bytes_in, tryte_t const* const expected) {
   convert_bytes_to_trits(bytes, trits);
   trits_to_trytes(trits, trytes, HASH_LENGTH_TRIT);
 
-  TEST_ASSERT_EQUAL_MEMORY(trytes, expected,
-                           HASH_LENGTH_TRYTE * sizeof(tryte_t));
+  TEST_ASSERT_EQUAL_MEMORY(trytes, expected, HASH_LENGTH_TRYTE * sizeof(tryte_t));
 }
 
 void test_trits_all_bytes(void) {
@@ -58,8 +56,7 @@ void test_trits_all_bytes(void) {
     convert_bytes_to_trits(bytes, norm_trits);
     trits_to_trytes(norm_trits, trytes, HASH_LENGTH_TRIT);
 
-    TEST_ASSERT_EQUAL_MEMORY(trits, norm_trits,
-                             HASH_LENGTH_TRIT * sizeof(trit_t));
+    TEST_ASSERT_EQUAL_MEMORY(trits, norm_trits, HASH_LENGTH_TRIT * sizeof(trit_t));
   }
 }
 

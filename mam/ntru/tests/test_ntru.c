@@ -59,8 +59,7 @@ static void ntru_test(void) {
 
     do {
       TEST_ASSERT_TRUE(trits_from_str(nonce, "NONCE9ENC9"));
-      TEST_ASSERT(ntru_pk_encr(&ntru.public_key, &prng, &spongos, nonce, key,
-                               ekey) == RC_OK);
+      TEST_ASSERT(ntru_pk_encr(&ntru.public_key, &prng, &spongos, nonce, key, ekey) == RC_OK);
 
       TEST_ASSERT_TRUE(ntru_sk_decr(&ntru, &spongos, ekey, dekey));
       TEST_ASSERT_TRUE(trits_cmp_eq(key, dekey));
@@ -139,8 +138,7 @@ static void test_ntru_sk_serialization(void) {
 
   size_t size = mam_ntru_sks_serialized_size(ntru_sk_set_1);
 
-  TEST_ASSERT_EQUAL_INT(
-      size, 3 * (MAM_NTRU_PK_SIZE + MAM_NTRU_SK_SIZE) + pb3_sizeof_size_t(3));
+  TEST_ASSERT_EQUAL_INT(size, 3 * (MAM_NTRU_PK_SIZE + MAM_NTRU_SK_SIZE) + pb3_sizeof_size_t(3));
 
   trits_t trits = trits_alloc(size);
 

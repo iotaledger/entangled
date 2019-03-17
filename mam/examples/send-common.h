@@ -30,10 +30,8 @@ extern "C" {
  *
  * @return return code
  */
-retcode_t mam_example_announce_new_channel(mam_api_t* const api,
-                                           tryte_t const* const channel_id,
-                                           bundle_transactions_t* const bundle,
-                                           trit_t* const msg_id,
+retcode_t mam_example_announce_new_channel(mam_api_t* const api, tryte_t const* const channel_id,
+                                           bundle_transactions_t* const bundle, trit_t* const msg_id,
                                            tryte_t* const new_channel_id);
 
 /**
@@ -47,10 +45,8 @@ retcode_t mam_example_announce_new_channel(mam_api_t* const api,
  *
  * @return return code
  */
-retcode_t mam_example_announce_new_endpoint(mam_api_t* const api,
-                                            tryte_t const* const channel_id,
-                                            bundle_transactions_t* const bundle,
-                                            trit_t* const msg_id,
+retcode_t mam_example_announce_new_endpoint(mam_api_t* const api, tryte_t const* const channel_id,
+                                            bundle_transactions_t* const bundle, trit_t* const msg_id,
                                             tryte_t* const new_endpoint_id);
 
 /**
@@ -63,9 +59,8 @@ retcode_t mam_example_announce_new_endpoint(mam_api_t* const api,
  *
  * @return return code
  */
-retcode_t mam_example_write_header_on_channel(
-    mam_api_t* const api, tryte_t const* const channel_id,
-    bundle_transactions_t* const bundle, trit_t* const msg_id);
+retcode_t mam_example_write_header_on_channel(mam_api_t* const api, tryte_t const* const channel_id,
+                                              bundle_transactions_t* const bundle, trit_t* const msg_id);
 
 /**
  * Writes a header only bundle on an endpoint
@@ -78,10 +73,9 @@ retcode_t mam_example_write_header_on_channel(
  *
  * @return return code
  */
-retcode_t mam_example_write_header_on_endpoint(
-    mam_api_t* const api, tryte_t const* const channel_id,
-    tryte_t const* const endpoint_id, bundle_transactions_t* const bundle,
-    trit_t* const msg_id);
+retcode_t mam_example_write_header_on_endpoint(mam_api_t* const api, tryte_t const* const channel_id,
+                                               tryte_t const* const endpoint_id, bundle_transactions_t* const bundle,
+                                               trit_t* const msg_id);
 
 /**
  * Writes a packet on a bundle
@@ -94,11 +88,8 @@ retcode_t mam_example_write_header_on_endpoint(
  *
  * @return return code
  */
-retcode_t mam_example_write_packet(mam_api_t* const api,
-                                   bundle_transactions_t* const bundle,
-                                   char const* const payload,
-                                   trit_t const* const msg_id,
-                                   bool is_last_packet);
+retcode_t mam_example_write_packet(mam_api_t* const api, bundle_transactions_t* const bundle, char const* const payload,
+                                   trit_t const* const msg_id, bool is_last_packet);
 
 #ifdef __cplusplus
 }

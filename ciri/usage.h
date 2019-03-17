@@ -46,11 +46,7 @@ typedef enum cli_arg_value_e {
 
 } cli_arg_value_t;
 
-typedef enum cli_arg_requirement_e {
-  NO_ARG,
-  REQUIRED_ARG,
-  OPTIONAL_ARG
-} cli_arg_requirement_t;
+typedef enum cli_arg_requirement_e { NO_ARG, REQUIRED_ARG, OPTIONAL_ARG } cli_arg_requirement_t;
 
 static struct cli_argument_s {
   char* name;
@@ -75,8 +71,7 @@ static struct cli_argument_s {
      "Number of trailing ternary 0s that must appear at the end of a "
      "transaction hash. Difficulty can be described as 3^mwm.",
      REQUIRED_ARG},
-    {"neighbors", 'n', "URIs of neighbouring nodes, separated by a space.",
-     REQUIRED_ARG},
+    {"neighbors", 'n', "URIs of neighbouring nodes, separated by a space.", REQUIRED_ARG},
     {"p-propagate-request", CONF_P_PROPAGATE_REQUEST,
      "Probability of propagating the request of a transaction to a neighbor "
      "node if it can't be found. This should be low since we don't want to "
@@ -99,8 +94,7 @@ static struct cli_argument_s {
      "Probability of sending a milestone transaction when the node looks for a "
      "random transaction to send to a neighbor. Value must be in [0,1].",
      REQUIRED_ARG},
-    {"requester-queue-size", CONF_REQUESTER_QUEUE_SIZE,
-     "Size of the transaction requester queue.", REQUIRED_ARG},
+    {"requester-queue-size", CONF_REQUESTER_QUEUE_SIZE, "Size of the transaction requester queue.", REQUIRED_ARG},
     {"tcp-receiver-port", 't', "TCP listen port.", REQUIRED_ARG},
     {"tips-cache-size", CONF_TIPS_CACHE_SIZE,
      "Size of the tips cache. Also bounds the number of tips returned by "
@@ -132,8 +126,7 @@ static struct cli_argument_s {
      "the latest referenced milestone by the currently visited transaction "
      "during the random walk.",
      REQUIRED_ARG},
-    {"coordinator", CONF_COORDINATOR, "The address of the coordinator.",
-     REQUIRED_ARG},
+    {"coordinator", CONF_COORDINATOR, "The address of the coordinator.", REQUIRED_ARG},
     {"last-milestone", CONF_LAST_MILESTONE,
      "The index of the last milestone issued by the corrdinator before the "
      "last snapshot.",
@@ -150,17 +143,13 @@ static struct cli_argument_s {
      "Path to the file that contains the state of the ledger at the last "
      "snapshot.",
      REQUIRED_ARG},
-    {"snapshot-signature-depth", CONF_SNAPSHOT_SIGNATURE_DEPTH,
-     "Depth of the snapshot signature.", REQUIRED_ARG},
+    {"snapshot-signature-depth", CONF_SNAPSHOT_SIGNATURE_DEPTH, "Depth of the snapshot signature.", REQUIRED_ARG},
     {"snapshot-signature-file", CONF_SNAPSHOT_SIGNATURE_FILE,
-     "Path to the file that contains a signature for the snapshot file.",
+     "Path to the file that contains a signature for the snapshot file.", REQUIRED_ARG},
+    {"snapshot-signature-index", CONF_SNAPSHOT_SIGNATURE_INDEX, "Index of the snapshot signature.", REQUIRED_ARG},
+    {"snapshot-signature-pubkey", CONF_SNAPSHOT_SIGNATURE_PUBKEY, "Public key of the snapshot signature.",
      REQUIRED_ARG},
-    {"snapshot-signature-index", CONF_SNAPSHOT_SIGNATURE_INDEX,
-     "Index of the snapshot signature.", REQUIRED_ARG},
-    {"snapshot-signature-pubkey", CONF_SNAPSHOT_SIGNATURE_PUBKEY,
-     "Public key of the snapshot signature.", REQUIRED_ARG},
-    {"snapshot-timestamp", CONF_SNAPSHOT_TIMESTAMP,
-     "Epoch time of the last snapshot.", REQUIRED_ARG},
+    {"snapshot-timestamp", CONF_SNAPSHOT_TIMESTAMP, "Epoch time of the last snapshot.", REQUIRED_ARG},
     {NULL, 0, NULL, NO_ARG}};
 
 static char* short_options = "hl:d:n:t:u:p:";

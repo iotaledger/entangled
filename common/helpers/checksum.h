@@ -17,11 +17,9 @@
 extern "C" {
 #endif
 
-IOTA_EXPORT char* iota_checksum(const char* input, const size_t input_length,
-                                const size_t checksum_length);
+IOTA_EXPORT char* iota_checksum(const char* input, const size_t input_length, const size_t checksum_length);
 
-IOTA_EXPORT flex_trit_t* iota_flex_checksum(const flex_trit_t* flex_trits,
-                                            const size_t num_trits,
+IOTA_EXPORT flex_trit_t* iota_flex_checksum(const flex_trit_t* flex_trits, const size_t num_trits,
                                             const size_t checksum_length);
 
 #ifdef __cplusplus

@@ -22,13 +22,11 @@ void test_get_balances_serialize_request(void) {
 
   TEST_ASSERT_NOT_NULL(serializer_out);
   TEST_ASSERT_NOT_NULL(get_bal);
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1,
-                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT(hash243_queue_push(&get_bal->addresses, hash) == RC_OK);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  TEST_ASSERT(get_balances_req_address_add(get_bal, hash) == RC_OK);
 
   get_bal->threshold = TEST_BALANCES_SERIALIZE_THRESHOLD;
-  serializer.vtable.get_balances_serialize_request(&serializer, get_bal,
-                                                   serializer_out);
+  serializer.vtable.get_balances_serialize_request(&serializer, get_bal, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
@@ -45,20 +43,15 @@ void test_get_balances_deserialize_request(void) {
       "\"]"
       ",\"threshold\":" STR(TEST_BALANCES_SERIALIZE_THRESHOLD) "}";
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1,
-                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
 
   get_balances_req_t* deserialize_get_bal = get_balances_req_new();
 
-  serializer.vtable.get_balances_deserialize_request(&serializer, json_text,
-                                                     deserialize_get_bal);
+  serializer.vtable.get_balances_deserialize_request(&serializer, json_text, deserialize_get_bal);
 
-  TEST_ASSERT_EQUAL_INT(TEST_BALANCES_SERIALIZE_THRESHOLD,
-                        deserialize_get_bal->threshold);
+  TEST_ASSERT_EQUAL_INT(TEST_BALANCES_SERIALIZE_THRESHOLD, deserialize_get_bal->threshold);
 
-  TEST_ASSERT_EQUAL_MEMORY(hash,
-                           hash243_queue_at(&deserialize_get_bal->addresses, 0),
-                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&deserialize_get_bal->addresses, 0), FLEX_TRIT_SIZE_243);
 
   get_balances_req_free(&deserialize_get_bal);
 }
@@ -83,14 +76,13 @@ void test_get_balances_serialize_response(void) {
   TEST_ASSERT_NOT_NULL(get_bal);
 
   uint64_t TEST_BALANCES_BALANCE_LONG = TEST_BALANCES_BALANCE;
-  utarray_push_back(get_bal->balances, &TEST_BALANCES_BALANCE_LONG);
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1,
-                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT(hash243_queue_push(&get_bal->milestone, hash) == RC_OK);
-  get_bal->milestoneIndex = TEST_BALANCES_MILESTONEINDEX;
+  TEST_ASSERT(get_balances_res_balances_add(get_bal, TEST_BALANCES_BALANCE_LONG) == RC_OK);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
 
-  serializer.vtable.get_balances_serialize_response(&serializer, get_bal,
-                                                    serializer_out);
+  TEST_ASSERT(get_balances_res_milestone_add(get_bal, hash) == RC_OK);
+  get_bal->milestone_index = TEST_BALANCES_MILESTONEINDEX;
+
+  serializer.vtable.get_balances_serialize_response(&serializer, get_bal, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
@@ -110,22 +102,16 @@ void test_get_balances_deserialize_response(void) {
       "\"], "
       "\"milestoneIndex\":" STR(TEST_BALANCES_MILESTONEINDEX) "}";
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1,
-                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
 
   get_balances_res_t* deserialize_get_bal = get_balances_res_new();
-  serializer.vtable.get_balances_deserialize_response(&serializer, json_text,
-                                                      deserialize_get_bal);
+  serializer.vtable.get_balances_deserialize_response(&serializer, json_text, deserialize_get_bal);
 
-  TEST_ASSERT_EQUAL_UINT64(TEST_BALANCES_BALANCE, get_balances_res_balances_at(
-                                                      deserialize_get_bal, 0));
+  TEST_ASSERT_EQUAL_UINT64(TEST_BALANCES_BALANCE, get_balances_res_balances_at(deserialize_get_bal, 0));
 
-  TEST_ASSERT_EQUAL_MEMORY(hash,
-                           hash243_queue_at(&deserialize_get_bal->milestone, 0),
-                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&deserialize_get_bal->milestone, 0), FLEX_TRIT_SIZE_243);
 
-  TEST_ASSERT_EQUAL_INT(TEST_BALANCES_MILESTONEINDEX,
-                        deserialize_get_bal->milestoneIndex);
+  TEST_ASSERT_EQUAL_INT(TEST_BALANCES_MILESTONEINDEX, deserialize_get_bal->milestone_index);
 
   get_balances_res_free(&deserialize_get_bal);
 }

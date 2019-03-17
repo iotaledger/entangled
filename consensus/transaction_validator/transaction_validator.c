@@ -38,18 +38,15 @@ static bool has_invalid_timestamp(transaction_validator_t const* const tv,
   uint64_t timestamp_ms = transaction_attachment_timestamp(transaction) == 0
                               ? transaction_timestamp(transaction) * 1000UL
                               : transaction_attachment_timestamp(transaction);
-  bool is_too_futuristic =
-      timestamp_ms > (current_timestamp_ms() + MAX_TIMESTAMP_FUTURE_MS);
-  bool is_below_snapshot =
-      timestamp_ms < tv->conf->snapshot_timestamp_sec * 1000UL;
+  bool is_too_futuristic = timestamp_ms > (current_timestamp_ms() + MAX_TIMESTAMP_FUTURE_MS);
+  bool is_below_snapshot = timestamp_ms < tv->conf->snapshot_timestamp_sec * 1000UL;
 
   if (is_too_futuristic) {
     return true;
   }
 
   if (is_below_snapshot) {
-    return memcmp(transaction_hash(transaction), tv->conf->genesis_hash,
-                  FLEX_TRIT_SIZE_243) != 0;
+    return memcmp(transaction_hash(transaction), tv->conf->genesis_hash, FLEX_TRIT_SIZE_243) != 0;
   }
 
   return false;
@@ -59,29 +56,25 @@ static bool has_invalid_timestamp(transaction_validator_t const* const tv,
  * Public functions
  */
 
-retcode_t iota_consensus_transaction_validator_init(
-    transaction_validator_t* const tv, iota_consensus_conf_t* const conf) {
-  logger_id =
-      logger_helper_enable(TRANSACTION_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
+retcode_t iota_consensus_transaction_validator_init(transaction_validator_t* const tv,
+                                                    iota_consensus_conf_t* const conf) {
+  logger_id = logger_helper_enable(TRANSACTION_VALIDATOR_LOGGER_ID, LOGGER_DEBUG, true);
   tv->conf = conf;
 
   return RC_OK;
 }
 
-retcode_t iota_consensus_transaction_validator_destroy(
-    transaction_validator_t* const tv) {
+retcode_t iota_consensus_transaction_validator_destroy(transaction_validator_t* const tv) {
   tv->conf = NULL;
   logger_helper_release(logger_id);
 
   return RC_OK;
 }
 
-bool iota_consensus_transaction_validate(
-    transaction_validator_t const* const tv,
-    iota_transaction_t const* const transaction) {
+bool iota_consensus_transaction_validate(transaction_validator_t const* const tv,
+                                         iota_transaction_t const* const transaction) {
   if (transaction_weight_magnitude(transaction) < tv->conf->mwm) {
-    log_debug(logger_id,
-              "Validation failed: insufficient transaction weight\n");
+    log_debug(logger_id, "Validation failed: insufficient transaction weight\n");
     return false;
   }
 
@@ -96,10 +89,8 @@ bool iota_consensus_transaction_validate(
   }
 
   if (transaction_value(transaction) != 0 &&
-      flex_trits_at(transaction_address(transaction), NUM_TRITS_ADDRESS,
-                    NUM_TRITS_ADDRESS - 1) != 0) {
-    log_debug(logger_id,
-              "Validation failed: invalid address for value transaction\n");
+      flex_trits_at(transaction_address(transaction), NUM_TRITS_ADDRESS, NUM_TRITS_ADDRESS - 1) != 0) {
+    log_debug(logger_id, "Validation failed: invalid address for value transaction\n");
     return false;
   }
 

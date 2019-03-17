@@ -26,9 +26,8 @@ extern "C" {
  *
  * @return error value.
  */
-retcode_t iota_client_broadcast_transactions(
-    const iota_client_service_t* const service,
-    broadcast_transactions_req_t* req);
+retcode_t iota_client_broadcast_transactions(const iota_client_service_t* const service,
+                                             broadcast_transactions_req_t* req);
 
 #ifdef __cplusplus
 }

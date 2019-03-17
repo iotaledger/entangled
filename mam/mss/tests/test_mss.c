@@ -62,16 +62,14 @@
 #endif
 
 #if defined(MAM_MSS_TRAVERSAL)
-#define def_test_mss_check(D, sfx)                                        \
-  static bool test_mss_check##sfx(test_mss##sfx##_t *m) {                 \
-    return 1 && m->ap_check == 0xdeadbeef && m->hs_check == 0xdeadbeef && \
-           m->ns_check == 0xdeadbeef && m->ss_check == 0xdeadbeef;        \
+#define def_test_mss_check(D, sfx)                                                                     \
+  static bool test_mss_check##sfx(test_mss##sfx##_t *m) {                                              \
+    return 1 && m->ap_check == 0xdeadbeef && m->hs_check == 0xdeadbeef && m->ns_check == 0xdeadbeef && \
+           m->ss_check == 0xdeadbeef;                                                                  \
   }
 #else
-#define def_test_mss_check(D, sfx)                        \
-  static bool test_mss_check##sfx(test_mss##sfx##_t *m) { \
-    return 1 && m->mt_check == 0xdeadbeef;                \
-  }
+#define def_test_mss_check(D, sfx) \
+  static bool test_mss_check##sfx(test_mss##sfx##_t *m) { return 1 && m->mt_check == 0xdeadbeef; }
 #endif
 
 def_test_mss(1, 1);
@@ -98,8 +96,7 @@ def_test_mss_check(4, 4);
 // def_test_mss_check(10, x);
 // def_test_mss_check(MAM_MSS_TEST_MAX_D, );
 
-static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng,
-                           mss_mt_height_t max_height) {
+static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng, mss_mt_height_t max_height) {
   bool r = true;
   retcode_t e;
   mss_mt_height_t curr_height;
@@ -159,8 +156,7 @@ static bool mss_store_test(mam_mss_t *mss1, mam_mss_t *mss2, mam_prng_t *prng,
   return r;
 }
 
-static bool mss_test(mam_mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
-                     mss_mt_height_t max_height) {
+static bool mss_test(mam_mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos, mss_mt_height_t max_height) {
   bool r = true;
   MAM_TRITS_DEF0(key, MAM_PRNG_KEY_SIZE);
   mss_mt_height_t curr_height;
@@ -193,8 +189,7 @@ static bool mss_test(mam_mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
   for (curr_height = 1; r && curr_height <= max_height; ++curr_height) {
     trits_t sig = trits_take(sig_, MAM_MSS_SIG_SIZE(curr_height));
     trits_t sig_skn = trits_take(sig, MAM_MSS_SKN_SIZE);
-    trits_t sig_wots =
-        trits_take(trits_drop(sig, MAM_MSS_SKN_SIZE), MAM_WOTS_SIG_SIZE);
+    trits_t sig_wots = trits_take(trits_drop(sig, MAM_MSS_SKN_SIZE), MAM_WOTS_SIG_SIZE);
     trits_t sig_apath = trits_drop(sig, MAM_MSS_SKN_SIZE + MAM_WOTS_SIG_SIZE);
 
     mam_mss_init(mss, prng, curr_height, nonce, trits_null());
@@ -231,8 +226,7 @@ static bool mss_test(mam_mss_t *mss, mam_prng_t *prng, mam_spongos_t *spongos,
         trits_put1(sig_apath, trit_sub(trits_get1(sig_apath), 1));
       }
 
-      r = r && !mam_mss_verify(spongos, &wots_spongos, hash,
-                               trits_take(sig, trits_size(sig) - 1), pk);
+      r = r && !mam_mss_verify(spongos, &wots_spongos, hash, trits_take(sig, trits_size(sig) - 1), pk);
 
       trits_put1(pk, trit_add(trits_get1(pk), 1));
       r = r && !mam_mss_verify(spongos, &wots_spongos, hash, sig, pk);
