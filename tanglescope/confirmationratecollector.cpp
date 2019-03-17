@@ -28,16 +28,13 @@ bool CRCollector::parseConfiguration(const YAML::Node& conf) {
   if (!BroadcastReceiveCollector::parseConfiguration(conf)) {
     return false;
   }
-  if (conf[MESAUREMENT_LOWER_BOUND] && conf[MESAUREMENT_UPPER_BOUND] &&
-      conf[ENABLE_CR_FROM_API] && conf[ADDITIONAL_LATENCY_STEP_SECONDS] &&
-      conf[ADDITIONAL_LATENCY_NUM_STEPS]) {
+  if (conf[MESAUREMENT_LOWER_BOUND] && conf[MESAUREMENT_UPPER_BOUND] && conf[ENABLE_CR_FROM_API] &&
+      conf[ADDITIONAL_LATENCY_STEP_SECONDS] && conf[ADDITIONAL_LATENCY_NUM_STEPS]) {
     _measurementUpperBound = conf[MESAUREMENT_UPPER_BOUND].as<uint32_t>();
     _measurementLowerBound = conf[MESAUREMENT_LOWER_BOUND].as<uint32_t>();
     _enableApi = conf[ENABLE_CR_FROM_API].as<bool>();
-    _addtionalLatencyStepSeconds = std::chrono::seconds(
-        conf[ADDITIONAL_LATENCY_STEP_SECONDS].as<uint32_t>());
-    _addtionalLatencyNumSteps =
-        conf[ADDITIONAL_LATENCY_NUM_STEPS].as<uint32_t>();
+    _addtionalLatencyStepSeconds = std::chrono::seconds(conf[ADDITIONAL_LATENCY_STEP_SECONDS].as<uint32_t>());
+    _addtionalLatencyNumSteps = conf[ADDITIONAL_LATENCY_NUM_STEPS].as<uint32_t>();
     return true;
   }
   return false;
@@ -48,20 +45,19 @@ void CRCollector::doPeriodically() {
   _collectorThread = std::move(rxcpp::schedulers::make_new_thread());
   _collectorWorker = _collectorThread.create_worker();
 
-  _collectorWorker.schedule_periodically(
-      _collectorThread.now() + std::chrono::seconds(_measurementUpperBound),
-      std::chrono::seconds(API_SAMPLE_INTERVAL_SECONDS), [this](auto scbl) {
-        auto task = boost::async(boost::launch::async,
-                                 [this]() { calcConfirmationRateAPICall(); });
-        _tasks.emplace_back(std::move(task));
-      });
+  _collectorWorker.schedule_periodically(_collectorThread.now() + std::chrono::seconds(_measurementUpperBound),
+                                         std::chrono::seconds(API_SAMPLE_INTERVAL_SECONDS), [this](auto scbl) {
+                                           auto task = boost::async(boost::launch::async,
+                                                                    [this]() { calcConfirmationRateAPICall(); });
+                                           _tasks.emplace_back(std::move(task));
+                                         });
 }
 
 void CRCollector::artificialyDelay() {
   static uint16_t step = 0;
   if (_addtionalLatencyStepSeconds.count()) {
-    std::this_thread::sleep_for(std::chrono::seconds(
-        (step++ % _addtionalLatencyNumSteps) * _addtionalLatencyStepSeconds));
+    std::this_thread::sleep_for(
+        std::chrono::seconds((step++ % _addtionalLatencyNumSteps) * _addtionalLatencyStepSeconds));
   }
 }
 void CRCollector::calcConfirmationRateAPICall() {
@@ -102,22 +98,19 @@ void CRCollector::calcConfirmationRateAPICall() {
   }
   std::set<std::string> confirmedTransactions;
   uint32_t idx = 0;
-  std::copy_if(
-      transactions.begin(), transactions.end(),
-      std::inserter(confirmedTransactions, confirmedTransactions.begin()),
-      [&](const std::string& hash) { return resp.states[idx++]; });
+  std::copy_if(transactions.begin(), transactions.end(),
+               std::inserter(confirmedTransactions, confirmedTransactions.begin()),
+               [&](const std::string& hash) { return resp.states[idx++]; });
 
   calcAndExposeImpl(confirmedTransactions, CONFIRMATION_RATE_API);
 }
 
 using namespace prometheus;
 
-void CRCollector::subscribeToTransactions(
-    std::string zmqURL,
-    const BroadcastReceiveCollector::ZmqObservable& zmqObservable,
-    std::shared_ptr<Registry> registry) {
-  _gauges = buildGaugeMap(registry, "confirmationratecollector",
-                          {{"listen_node", _iriHost}, {"zmq_url", zmqURL}},
+void CRCollector::subscribeToTransactions(std::string zmqURL,
+                                          const BroadcastReceiveCollector::ZmqObservable& zmqObservable,
+                                          std::shared_ptr<Registry> registry) {
+  _gauges = buildGaugeMap(registry, "confirmationratecollector", {{"listen_node", _iriHost}, {"zmq_url", zmqURL}},
                           nameToDescGauges);
 
   zmqObservable.observe_on(rxcpp::synchronize_new_thread())
@@ -130,9 +123,7 @@ void CRCollector::subscribeToTransactions(
           },
           []() {});
 }
-void CRCollector::calcAndExposeImpl(
-    const std::set<std::string>& confirmedTransactions,
-    const std::string label) {
+void CRCollector::calcAndExposeImpl(const std::set<std::string>& confirmedTransactions, const std::string label) {
   auto now = std::chrono::system_clock::now();
   auto ub = now - std::chrono::seconds(_measurementUpperBound);
   auto lb = now - std::chrono::seconds(_measurementLowerBound);
@@ -149,13 +140,10 @@ void CRCollector::calcAndExposeImpl(
   while (it != lt.end()) {
     if (it->second.tp < ub && it->second.tp > lb) {
       totalTransactionsCount += 1;
-      durationToTotal[it->second.msDuration /
-                      (_addtionalLatencyStepSeconds.count() * 1000)] += 1;
-      if (confirmedTransactions.find(it->first) !=
-          confirmedTransactions.end()) {
+      durationToTotal[it->second.msDuration / (_addtionalLatencyStepSeconds.count() * 1000)] += 1;
+      if (confirmedTransactions.find(it->first) != confirmedTransactions.end()) {
         confirmedCount += 1;
-        durationToConfirmed[it->second.msDuration /
-                            (_addtionalLatencyStepSeconds.count() * 1000)] += 1;
+        durationToConfirmed[it->second.msDuration / (_addtionalLatencyStepSeconds.count() * 1000)] += 1;
       }
     }
     it++;
@@ -178,9 +166,7 @@ void CRCollector::calcAndExposeImpl(
     if (totalTransactionsCount > 0) {
       _gauges.at(label)
           .get()
-          .Add({{"pow_duration_group_seconds",
-                 std::to_string(kv.first *
-                                _addtionalLatencyStepSeconds.count())}})
+          .Add({{"pow_duration_group_seconds", std::to_string(kv.first * _addtionalLatencyStepSeconds.count())}})
           .Set(cr);
     }
   }

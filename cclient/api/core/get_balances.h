@@ -32,8 +32,7 @@ extern "C" {
  *
  * @return error value.
  */
-retcode_t iota_client_get_balances(iota_client_service_t const* const service,
-                                   get_balances_req_t const* const req,
+retcode_t iota_client_get_balances(iota_client_service_t const* const service, get_balances_req_t const* const req,
                                    get_balances_res_t* res);
 
 #ifdef __cplusplus

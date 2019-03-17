@@ -8,10 +8,8 @@
 #include "cclient/http/http.h"
 #include "common/model/bundle.h"
 
-retcode_t traverse_bundle(iota_client_service_t const* const serv,
-                          flex_trit_t const* const tail_hash,
-                          bundle_transactions_t* const bundle,
-                          hash8019_array_p trytes);
+retcode_t traverse_bundle(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
+                          bundle_transactions_t* const bundle, hash8019_array_p trytes);
 
 /**
  * Fetches the bundle of a given the _tail_ transaction hash, by traversing
@@ -32,6 +30,5 @@ retcode_t traverse_bundle(iota_client_service_t const* const serv,
  *
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createTraverseBundle.ts#L36
  */
-retcode_t iota_client_traverse_bundle(iota_client_service_t const* const serv,
-                                      flex_trit_t const* const tail_hash,
+retcode_t iota_client_traverse_bundle(iota_client_service_t const* const serv, flex_trit_t const* const tail_hash,
                                       bundle_transactions_t* const bundle);

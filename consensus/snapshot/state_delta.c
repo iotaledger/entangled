@@ -15,9 +15,7 @@ int64_t state_delta_sum(state_delta_t const *const state) {
   return sum;
 }
 
-retcode_t state_delta_add_or_sum(state_delta_t *const state,
-                                 flex_trit_t const *const hash,
-                                 int64_t const value) {
+retcode_t state_delta_add_or_sum(state_delta_t *const state, flex_trit_t const *const hash, int64_t const value) {
   retcode_t ret = RC_OK;
   state_delta_entry_t *entry = NULL;
 
@@ -32,9 +30,7 @@ retcode_t state_delta_add_or_sum(state_delta_t *const state,
   return RC_OK;
 }
 
-retcode_t state_delta_add_or_replace(state_delta_t *const state,
-                                     flex_trit_t const *const hash,
-                                     int64_t const value) {
+retcode_t state_delta_add_or_replace(state_delta_t *const state, flex_trit_t const *const hash, int64_t const value) {
   retcode_t ret = RC_OK;
   state_delta_entry_t *entry = NULL;
 
@@ -49,45 +45,38 @@ retcode_t state_delta_add_or_replace(state_delta_t *const state,
   return RC_OK;
 }
 
-retcode_t state_delta_create_patch(state_delta_t const *const state,
-                                   state_delta_t const *const delta,
+retcode_t state_delta_create_patch(state_delta_t const *const state, state_delta_t const *const delta,
                                    state_delta_t *const patch) {
   retcode_t ret = RC_OK;
   state_delta_entry_t *iter = NULL, *entry = NULL, *tmp = NULL;
 
   HASH_ITER(hh, *delta, iter, tmp) {
     state_delta_find(*state, iter->hash, entry);
-    if ((ret = state_delta_add(patch, iter->hash,
-                               (entry ? entry->value : 0) + iter->value)) !=
-        RC_OK) {
+    if ((ret = state_delta_add(patch, iter->hash, (entry ? entry->value : 0) + iter->value)) != RC_OK) {
       return ret;
     }
   }
   return ret;
 }
 
-retcode_t state_delta_apply_patch(state_delta_t *const state,
-                                  state_delta_t const *const patch) {
+retcode_t state_delta_apply_patch(state_delta_t *const state, state_delta_t const *const patch) {
   retcode_t ret = RC_OK;
   state_delta_entry_t *iter = NULL, *tmp = NULL;
 
   HASH_ITER(hh, *patch, iter, tmp) {
-    if ((ret = state_delta_add_or_sum(state, iter->hash, iter->value)) !=
-        RC_OK) {
+    if ((ret = state_delta_add_or_sum(state, iter->hash, iter->value)) != RC_OK) {
       return ret;
     }
   }
   return ret;
 }
 
-retcode_t state_delta_merge_patch(state_delta_t *const state,
-                                  state_delta_t const *const patch) {
+retcode_t state_delta_merge_patch(state_delta_t *const state, state_delta_t const *const patch) {
   retcode_t ret = RC_OK;
   state_delta_entry_t *iter = NULL, *tmp = NULL;
 
   HASH_ITER(hh, *patch, iter, tmp) {
-    if ((ret = state_delta_add_or_replace(state, iter->hash, iter->value)) !=
-        RC_OK) {
+    if ((ret = state_delta_add_or_replace(state, iter->hash, iter->value)) != RC_OK) {
       return ret;
     }
   }
@@ -116,8 +105,7 @@ size_t state_delta_serialized_size(state_delta_t const *const delta) {
   return HASH_COUNT(*delta) * (FLEX_TRIT_SIZE_243 + sizeof(int64_t));
 }
 
-retcode_t state_delta_serialize(state_delta_t const *const delta,
-                                byte_t *const bytes) {
+retcode_t state_delta_serialize(state_delta_t const *const delta, byte_t *const bytes) {
   uint64_t offset = 0;
   state_delta_entry_t *iter = NULL, *tmp = NULL;
 
@@ -130,15 +118,12 @@ retcode_t state_delta_serialize(state_delta_t const *const delta,
   return RC_OK;
 }
 
-retcode_t state_delta_deserialize(byte_t const *const bytes, size_t const size,
-                                  state_delta_t *const delta) {
+retcode_t state_delta_deserialize(byte_t const *const bytes, size_t const size, state_delta_t *const delta) {
   retcode_t ret;
   uint64_t offset = 0;
 
   for (size_t i = 0; i < size / (FLEX_TRIT_SIZE_243 + sizeof(int64_t)); i++) {
-    if ((ret = state_delta_add(
-             delta, bytes + offset,
-             *((int64_t *)(bytes + offset + FLEX_TRIT_SIZE_243)))) != RC_OK) {
+    if ((ret = state_delta_add(delta, bytes + offset, *((int64_t *)(bytes + offset + FLEX_TRIT_SIZE_243)))) != RC_OK) {
       return ret;
     }
     offset += FLEX_TRIT_SIZE_243 + sizeof(int64_t);

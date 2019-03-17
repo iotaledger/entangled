@@ -17,9 +17,8 @@ extern "C" {
 #include "cclient/request/store_transactions.h"
 #include "cclient/serialization/serializer.h"
 
-retcode_t json_store_transactions_serialize_request(
-    const serializer_t* const s, store_transactions_req_t const* const obj,
-    char_buffer_t* out);
+retcode_t json_store_transactions_serialize_request(const serializer_t* const s,
+                                                    store_transactions_req_t const* const obj, char_buffer_t* out);
 
 #ifdef __cplusplus
 }

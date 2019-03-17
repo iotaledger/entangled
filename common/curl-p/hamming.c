@@ -41,8 +41,7 @@ short test(PCurl *const curl, unsigned short const security) {
   return -1;
 }
 
-PearlDiverStatus hamming(Curl *const ctx, unsigned short const offset,
-                         unsigned short const end,
+PearlDiverStatus hamming(Curl *const ctx, unsigned short const offset, unsigned short const end,
                          unsigned short const security) {
   return pd_search(ctx, offset, end, test, security);
 }

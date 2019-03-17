@@ -25,10 +25,8 @@ extern "C" {
 void init_s_curl(BCurl* const ctx);
 
 void s_transform(BCurl* const ctx);
-void s_curl_absorb(BCurl* const ctx, bct_t const* const trits,
-                   size_t const offset, size_t const length);
-void s_curl_squeeze(BCurl* const ctx, bct_t* const trits, size_t const offset,
-                    size_t const length);
+void s_curl_absorb(BCurl* const ctx, bct_t const* const trits, size_t const offset, size_t const length);
+void s_curl_squeeze(BCurl* const ctx, bct_t* const trits, size_t const offset, size_t const length);
 void s_curl_reset(BCurl* const ctx);
 
 #ifdef __cplusplus

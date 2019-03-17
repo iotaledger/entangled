@@ -19,15 +19,12 @@
 /***********************************************************************************************************
  * Public interface
  ***********************************************************************************************************/
-size_t trit_array_bytes_for_trits(size_t const num_trits) {
-  return NUM_FLEX_TRITS_FOR_TRITS(num_trits);
-}
+size_t trit_array_bytes_for_trits(size_t const num_trits) { return NUM_FLEX_TRITS_FOR_TRITS(num_trits); }
 
 /***********************************************************************************************************
  * Accessors
  ***********************************************************************************************************/
-void trit_array_set_trits(trit_array_p const trit_array,
-                          flex_trit_t *const trits, size_t const num_trits) {
+void trit_array_set_trits(trit_array_p const trit_array, flex_trit_t *const trits, size_t const num_trits) {
 #if !defined(NO_DYNAMIC_ALLOCATION)
   if (trit_array->dynamic) {
     free(trit_array->trits);
@@ -48,21 +45,17 @@ bool trit_array_is_null(trit_array_p const trit_array) {
   return true;
 }
 
-trit_array_p trit_array_slice(trit_array_p trit_array,
-                              trit_array_p to_trit_array, size_t start,
-                              size_t num_trits) {
+trit_array_p trit_array_slice(trit_array_p trit_array, trit_array_p to_trit_array, size_t start, size_t num_trits) {
 #if !defined(NO_DYNAMIC_ALLOCATION)
   to_trit_array = to_trit_array ? to_trit_array : trit_array_new(num_trits);
 #endif  // NO_DYNAMIC_ALLOCATION
   to_trit_array->num_trits = num_trits;
-  to_trit_array->num_bytes = flex_trits_slice(
-      to_trit_array->trits, to_trit_array->num_trits, trit_array->trits,
-      trit_array->num_trits, start, num_trits);
+  to_trit_array->num_bytes = flex_trits_slice(to_trit_array->trits, to_trit_array->num_trits, trit_array->trits,
+                                              trit_array->num_trits, start, num_trits);
   return to_trit_array;
 }
 
-trit_array_p trit_array_slice_at_most(trit_array_p const trit_array,
-                                      trit_array_p const to_trit_array,
+trit_array_p trit_array_slice_at_most(trit_array_p const trit_array, trit_array_p const to_trit_array,
                                       const size_t start, size_t num_trits) {
   if (trit_array->num_trits - start < num_trits) {
     num_trits = trit_array->num_trits - start;
@@ -70,35 +63,27 @@ trit_array_p trit_array_slice_at_most(trit_array_p const trit_array,
   return trit_array_slice(trit_array, to_trit_array, start, num_trits);
 }
 
-trit_array_p trit_array_insert(trit_array_p const trit_array,
-                               trit_array_p const from_trit_array,
-                               size_t const start, size_t const num_trits) {
-  flex_trits_insert(trit_array->trits, trit_array->num_trits,
-                    from_trit_array->trits, from_trit_array->num_trits, start,
+trit_array_p trit_array_insert(trit_array_p const trit_array, trit_array_p const from_trit_array, size_t const start,
+                               size_t const num_trits) {
+  flex_trits_insert(trit_array->trits, trit_array->num_trits, from_trit_array->trits, from_trit_array->num_trits, start,
                     num_trits);
   return trit_array;
 }
 
-trit_array_t *trit_array_insert_from_pos(trit_array_t *const dst_trits,
-                                         trit_array_t const *const src_trits,
-                                         size_t const src_start_pos,
-                                         size_t const dst_start_pos,
+trit_array_t *trit_array_insert_from_pos(trit_array_t *const dst_trits, trit_array_t const *const src_trits,
+                                         size_t const src_start_pos, size_t const dst_start_pos,
                                          size_t const num_trits) {
-  flex_trits_insert_from_pos(dst_trits->trits, dst_trits->num_trits,
-                             src_trits->trits, src_trits->num_trits,
+  flex_trits_insert_from_pos(dst_trits->trits, dst_trits->num_trits, src_trits->trits, src_trits->num_trits,
                              src_start_pos, dst_start_pos, num_trits);
   return dst_trits;
 }
 
-trit_t *trit_array_to_int8(trit_array_p const trit_array, trit_t *const trits,
-                           size_t const len) {
-  flex_trits_to_trits(trits, len, trit_array->trits, trit_array->num_trits,
-                      trit_array->num_trits);
+trit_t *trit_array_to_int8(trit_array_p const trit_array, trit_t *const trits, size_t const len) {
+  flex_trits_to_trits(trits, len, trit_array->trits, trit_array->num_trits, trit_array->num_trits);
   return trits;
 }
 
-trit_array_p trit_array_set_range(trit_array_p const trits, size_t start,
-                                  size_t end, trit_t value) {
+trit_array_p trit_array_set_range(trit_array_p const trits, size_t start, size_t end, trit_t value) {
   assert(start < trits->num_trits && end < trits->num_trits);
   for (size_t idx = start; idx < end; ++idx) {
     trit_array_set_at(trits, idx, value);
@@ -145,8 +130,7 @@ trit_array_p trit_array_new_from_trytes(tryte_t const *const trytes) {
   if ((trit_array = trit_array_new(num_trits)) == NULL) {
     return NULL;
   }
-  flex_trits_from_trytes(trit_array->trits, num_trits, trytes, num_trytes,
-                         num_trytes);
+  flex_trits_from_trytes(trit_array->trits, num_trits, trytes, num_trytes, num_trytes);
   return trit_array;
 }
 

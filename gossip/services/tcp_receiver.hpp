@@ -17,8 +17,7 @@ typedef struct neighbor_s neighbor_t;
 
 class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
  public:
-  TcpConnection(receiver_service_t* const service,
-                boost::asio::ip::tcp::socket socket);
+  TcpConnection(receiver_service_t* const service, boost::asio::ip::tcp::socket socket);
   ~TcpConnection();
 
  public:
@@ -33,8 +32,7 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
 class TcpReceiverService {
  public:
-  TcpReceiverService(receiver_service_t* const service,
-                     boost::asio::io_context& context, uint16_t const port);
+  TcpReceiverService(receiver_service_t* const service, boost::asio::io_context& context, uint16_t const port);
   ~TcpReceiverService();
 
  private:

@@ -55,21 +55,7 @@ static void sponge_ae_test(void) {
   MAM_TRITS_DEF0(X, MAM_SPONGE_TEST_MAX_K);
   MAM_TRITS_DEF0(Y, MAM_SPONGE_TEST_MAX_K);
   MAM_TRITS_DEF0(Z, MAM_SPONGE_TEST_MAX_K);
-  size_t ks[] = {0,
-                 1,
-                 2,
-                 3,
-                 4,
-                 5,
-                 6,
-                 242,
-                 243,
-                 244,
-                 485,
-                 486,
-                 487,
-                 MAM_SPONGE_TEST_MAX_K,
-                 MAM_SPONGE_TEST_MAX_K + 1};
+  size_t ks[] = {0, 1, 2, 3, 4, 5, 6, 242, 243, 244, 485, 486, 487, MAM_SPONGE_TEST_MAX_K, MAM_SPONGE_TEST_MAX_K + 1};
   K = MAM_TRITS_INIT(K, MAM_SPONGE_KEY_SIZE);
   X = MAM_TRITS_INIT(X, MAM_SPONGE_TEST_MAX_K);
   Y = MAM_TRITS_INIT(Y, MAM_SPONGE_TEST_MAX_K);

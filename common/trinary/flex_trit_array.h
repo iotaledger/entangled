@@ -22,15 +22,12 @@ class FlexTritArray {
     int index;
 
    public:
-    FlexTritArrayProxy(FlexTritArray &flex_trit_array, int index)
-        : flex_trit_array(flex_trit_array), index(index) {}
+    FlexTritArrayProxy(FlexTritArray &flex_trit_array, int index) : flex_trit_array(flex_trit_array), index(index) {}
     operator trit_t() const {
-      return flex_trits_at(flex_trit_array.flex_trits_.data(),
-                           flex_trit_array.num_trits_, index);
+      return flex_trits_at(flex_trit_array.flex_trits_.data(), flex_trit_array.num_trits_, index);
     }
     FlexTritArrayProxy operator=(trit_t t) {
-      flex_trits_set_at(flex_trit_array.flex_trits_.data(),
-                        flex_trit_array.num_trits_, index, t);
+      flex_trits_set_at(flex_trit_array.flex_trits_.data(), flex_trit_array.num_trits_, index, t);
       return *this;
     }
   };
@@ -40,9 +37,7 @@ class FlexTritArray {
   /// current memory model.
   /// @param[in] num_trits - number of trits to store
   /// @return size_t - the number of bytes need
-  static size_t numBytesForTrits(size_t num_trits) {
-    return NUM_FLEX_TRITS_FOR_TRITS(num_trits);
-  };
+  static size_t numBytesForTrits(size_t num_trits) { return NUM_FLEX_TRITS_FOR_TRITS(num_trits); };
 
   /// Returns a new FlexTritArray from a vector of trits.
   /// @param[in] trits - a vector of trits
@@ -71,16 +66,13 @@ class FlexTritArray {
   /// Copy Constructor
   /// @param[in] other - an other FlexTritArray
   /// @return FlexTritArray
-  FlexTritArray(const FlexTritArray &other)
-      : flex_trits_(other.flex_trits_), num_trits_(other.num_trits_){};
+  FlexTritArray(const FlexTritArray &other) : flex_trits_(other.flex_trits_), num_trits_(other.num_trits_){};
 
   /// Destructor
   ~FlexTritArray(){};
 
   FlexTritArrayProxy operator[](int i) { return FlexTritArrayProxy(*this, i); }
-  const FlexTritArrayProxy operator[](int i) const {
-    return FlexTritArrayProxy(const_cast<FlexTritArray &>(*this), i);
-  }
+  const FlexTritArrayProxy operator[](int i) const { return FlexTritArrayProxy(const_cast<FlexTritArray &>(*this), i); }
 
   /// Returns the number of trits in the receiver
   /// @return size_t - the number of trits

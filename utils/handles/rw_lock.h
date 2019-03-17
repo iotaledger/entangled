@@ -30,25 +30,15 @@ extern "C" {
 
 typedef pthread_rwlock_t rw_lock_handle_t;
 
-static inline int rw_lock_handle_init(rw_lock_handle_t* const lock) {
-  return pthread_rwlock_init(lock, NULL);
-}
+static inline int rw_lock_handle_init(rw_lock_handle_t* const lock) { return pthread_rwlock_init(lock, NULL); }
 
-static inline int rw_lock_handle_rdlock(rw_lock_handle_t* const lock) {
-  return pthread_rwlock_rdlock(lock);
-}
+static inline int rw_lock_handle_rdlock(rw_lock_handle_t* const lock) { return pthread_rwlock_rdlock(lock); }
 
-static inline int rw_lock_handle_wrlock(rw_lock_handle_t* const lock) {
-  return pthread_rwlock_wrlock(lock);
-}
+static inline int rw_lock_handle_wrlock(rw_lock_handle_t* const lock) { return pthread_rwlock_wrlock(lock); }
 
-static inline int rw_lock_handle_unlock(rw_lock_handle_t* const lock) {
-  return pthread_rwlock_unlock(lock);
-}
+static inline int rw_lock_handle_unlock(rw_lock_handle_t* const lock) { return pthread_rwlock_unlock(lock); }
 
-static inline int rw_lock_handle_destroy(rw_lock_handle_t* const lock) {
-  return pthread_rwlock_destroy(lock);
-}
+static inline int rw_lock_handle_destroy(rw_lock_handle_t* const lock) { return pthread_rwlock_destroy(lock); }
 
 #elif defined(_WIN32)
 
@@ -80,9 +70,7 @@ static inline int rw_lock_handle_unlock(rw_lock_handle_t* const lock) {
   return 0;
 }
 
-static inline int rw_lock_handle_destroy(rw_lock_handle_t* const lock) {
-  return 0;
-}
+static inline int rw_lock_handle_destroy(rw_lock_handle_t* const lock) { return 0; }
 
 #else
 

@@ -16,8 +16,7 @@ bool PrometheusCollector::parseConfiguration(const YAML::Node& conf) {
 using namespace prometheus;
 
 PrometheusCollector::HistogramsMap PrometheusCollector::buildHistogramsMap(
-    std::shared_ptr<Registry> registry, const std::string& metricName,
-    const std::map<std::string, std::string>& labels,
+    std::shared_ptr<Registry> registry, const std::string& metricName, const std::map<std::string, std::string>& labels,
     const std::map<std::string, std::string>& nameToDesc) {
   std::map<std::string, std::reference_wrapper<Family<Histogram>>> families;
   for (const auto& kv : nameToDesc) {
@@ -27,8 +26,7 @@ PrometheusCollector::HistogramsMap PrometheusCollector::buildHistogramsMap(
                             .Labels(labels)
                             .Register(*registry);
 
-    families.insert(
-        std::make_pair(std::string(kv.first), std::ref(curr_family)));
+    families.insert(std::make_pair(std::string(kv.first), std::ref(curr_family)));
   }
 
   return families;
@@ -36,8 +34,7 @@ PrometheusCollector::HistogramsMap PrometheusCollector::buildHistogramsMap(
 
 using namespace prometheus;
 PrometheusCollector::CountersMap PrometheusCollector::buildCountersMap(
-    std::shared_ptr<Registry> registry, const std::string& metricName,
-    const std::map<std::string, std::string>& labels,
+    std::shared_ptr<Registry> registry, const std::string& metricName, const std::map<std::string, std::string>& labels,
     const std::map<std::string, std::string>& nameToDesc) {
   std::map<std::string, std::reference_wrapper<Family<Counter>>> families;
 
@@ -48,28 +45,23 @@ PrometheusCollector::CountersMap PrometheusCollector::buildCountersMap(
                             .Labels(labels)
                             .Register(*registry);
 
-    families.insert(
-        std::make_pair(std::string(kv.first), std::ref(curr_family)));
+    families.insert(std::make_pair(std::string(kv.first), std::ref(curr_family)));
   }
 
   return families;
 }
 
-PrometheusCollector::GaugeMap PrometheusCollector::buildGaugeMap(
-    std::shared_ptr<Registry> registry, const std::string& metricName,
-    const std::map<std::string, std::string>& labels,
-    const std::map<std::string, std::string>& nameToDesc) {
+PrometheusCollector::GaugeMap PrometheusCollector::buildGaugeMap(std::shared_ptr<Registry> registry,
+                                                                 const std::string& metricName,
+                                                                 const std::map<std::string, std::string>& labels,
+                                                                 const std::map<std::string, std::string>& nameToDesc) {
   std::map<std::string, std::reference_wrapper<Family<Gauge>>> families;
 
   for (const auto& kv : nameToDesc) {
-    auto& curr_family = BuildGauge()
-                            .Name(metricName + std::string("_") + kv.first)
-                            .Help(kv.second)
-                            .Labels(labels)
-                            .Register(*registry);
+    auto& curr_family =
+        BuildGauge().Name(metricName + std::string("_") + kv.first).Help(kv.second).Labels(labels).Register(*registry);
 
-    families.insert(
-        std::make_pair(std::string(kv.first), std::ref(curr_family)));
+    families.insert(std::make_pair(std::string(kv.first), std::ref(curr_family)));
   }
 
   return families;

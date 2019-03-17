@@ -41,8 +41,7 @@ int main(int ac, char **av) {
     mam_api_add_trusted_channel_pk(&api, (tryte_t *)av[4]);
   }
 
-  if (mam_api_bundle_read(&api, bundle, &payload_trytes, &payload_size,
-                          &is_last_packet) == RC_OK) {
+  if (mam_api_bundle_read(&api, bundle, &payload_trytes, &payload_size, &is_last_packet) == RC_OK) {
     if (payload_trytes == NULL || payload_size == 0) {
       fprintf(stderr, "No payload\n");
     } else {

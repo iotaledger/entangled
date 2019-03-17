@@ -15,8 +15,7 @@
 namespace iota {
 namespace tanglescope {
 
-void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s,
-                  const std::string& uri,
+void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s, const std::string& uri,
                   const std::atomic<bool>& shouldFinish) {
   std::array<char, 2048> buf;
 
@@ -39,8 +38,7 @@ void zmqPublisher(rxcpp::subscriber<std::shared_ptr<iri::IRIMessage>> s,
     int size = zmq_recv(subscriber, buf.data(), buf.size() - 1, 0);
     if (size == -1) continue;
 
-    std::string_view view(buf.data(),
-                          static_cast<std::string_view::size_type>(size));
+    std::string_view view(buf.data(), static_cast<std::string_view::size_type>(size));
 
     auto msg = iri::payloadToMsg(view);
 

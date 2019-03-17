@@ -28,10 +28,8 @@ class CRCollector : public BroadcastReceiveCollector {
   constexpr static auto CONFIRMATION_RATE_ZMQ = "confirmation_rate_zmq";
   constexpr static auto CONFIRMATION_RATE_API = "confirmation_rate_api";
   constexpr static auto ENABLE_CR_FROM_API = "enable_cr_from_api";
-  constexpr static auto ADDITIONAL_LATENCY_STEP_SECONDS =
-      "additional_latency_step_seconds";
-  constexpr static auto ADDITIONAL_LATENCY_NUM_STEPS =
-      "additional_latency_num_steps";
+  constexpr static auto ADDITIONAL_LATENCY_STEP_SECONDS = "additional_latency_step_seconds";
+  constexpr static auto ADDITIONAL_LATENCY_NUM_STEPS = "additional_latency_num_steps";
 
   // Defs
   constexpr static uint16_t API_SAMPLE_INTERVAL_SECONDS = 10;
@@ -42,16 +40,14 @@ class CRCollector : public BroadcastReceiveCollector {
   ~CRCollector();
 
  private:
-  void subscribeToTransactions(
-      std::string zmqURL, const ZmqObservable& zmqObservable,
-      std::shared_ptr<prometheus::Registry> registry) override;
+  void subscribeToTransactions(std::string zmqURL, const ZmqObservable& zmqObservable,
+                               std::shared_ptr<prometheus::Registry> registry) override;
 
   void doPeriodically() override;
   virtual void artificialyDelay() override;
 
   void calcConfirmationRateAPICall();
-  void calcAndExposeImpl(const std::set<std::string>& confirmedTransactions,
-                         const std::string label);
+  void calcAndExposeImpl(const std::set<std::string>& confirmedTransactions, const std::string label);
 
   static std::map<std::string, std::string> nameToDescGauges;
 

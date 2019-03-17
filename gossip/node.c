@@ -33,8 +33,7 @@ static retcode_t node_neighbors_init(node_t* const node) {
   ptr = cpy = strdup(node->conf.neighbors);
   while ((neighbor_uri = strsep(&cpy, " ")) != NULL) {
     if (neighbor_init_with_uri(&neighbor, neighbor_uri) != RC_OK) {
-      log_warning(logger_id, "Initializing neighbor with URI %s failed\n",
-                  neighbor_uri);
+      log_warning(logger_id, "Initializing neighbor with URI %s failed\n", neighbor_uri);
       continue;
     }
     log_info(logger_id, "Adding neighbor %s\n", neighbor_uri);
@@ -49,8 +48,7 @@ static retcode_t node_neighbors_init(node_t* const node) {
   return RC_OK;
 }
 
-static retcode_t node_transaction_requester_init(node_t* const node,
-                                                 tangle_t* const tangle) {
+static retcode_t node_transaction_requester_init(node_t* const node, tangle_t* const tangle) {
   retcode_t ret = RC_OK;
   iota_stor_pack_t pack;
 
@@ -63,31 +61,28 @@ static retcode_t node_transaction_requester_init(node_t* const node,
     goto done;
   }
 
-  if ((ret = iota_tangle_transaction_load_hashes_of_requests(
-           tangle, &pack, node->conf.requester_queue_size)) != RC_OK) {
+  if ((ret = iota_tangle_transaction_load_hashes_of_requests(tangle, &pack, node->conf.requester_queue_size)) !=
+      RC_OK) {
     log_error(logger_id, "Loading hashes of transactions to request failed\n");
     goto done;
   }
 
   for (size_t i = 0; i < pack.num_loaded; i++) {
-    if ((ret = request_transaction(&node->transaction_requester, tangle,
-                                   ((flex_trit_t*)(pack.models[i])), false)) !=
+    if ((ret = request_transaction(&node->transaction_requester, tangle, ((flex_trit_t*)(pack.models[i])), false)) !=
         RC_OK) {
       log_error(logger_id, "Requesting transaction failed\n");
       goto done;
     }
   }
 
-  log_info(logger_id, "Added %d transactions to request\n",
-           requester_size(&node->transaction_requester));
+  log_info(logger_id, "Added %d transactions to request\n", requester_size(&node->transaction_requester));
 
 done:
   hash_pack_free(&pack);
   return ret;
 }
 
-static retcode_t node_tips_cache_init(node_t* const node,
-                                      tangle_t* const tangle) {
+static retcode_t node_tips_cache_init(node_t* const node, tangle_t* const tangle) {
   retcode_t ret = RC_OK;
   iota_stor_pack_t pack;
 
@@ -95,8 +90,7 @@ static retcode_t node_tips_cache_init(node_t* const node,
     return RC_NODE_NULL_NODE;
   }
 
-  if ((ret = tips_cache_init(&node->tips, node->conf.tips_cache_size)) !=
-      RC_OK) {
+  if ((ret = tips_cache_init(&node->tips, node->conf.tips_cache_size)) != RC_OK) {
     return ret;
   }
 
@@ -105,15 +99,13 @@ static retcode_t node_tips_cache_init(node_t* const node,
     goto done;
   }
 
-  if ((ret = iota_tangle_transaction_load_hashes_of_tips(
-           tangle, &pack, node->conf.tips_cache_size)) != RC_OK) {
+  if ((ret = iota_tangle_transaction_load_hashes_of_tips(tangle, &pack, node->conf.tips_cache_size)) != RC_OK) {
     log_error(logger_id, "Loading hashes of tips failed\n");
     goto done;
   }
 
   for (size_t i = 0; i < pack.num_loaded; i++) {
-    if ((ret = tips_cache_add(&node->tips, ((flex_trit_t*)(pack.models[i])))) !=
-        RC_OK) {
+    if ((ret = tips_cache_add(&node->tips, ((flex_trit_t*)(pack.models[i])))) != RC_OK) {
       log_error(logger_id, "Adding tip to cache failed\n");
       goto done;
     }
@@ -130,8 +122,7 @@ done:
  * Public functions
  */
 
-retcode_t node_init(node_t* const node, core_t* const core,
-                    tangle_t* const tangle) {
+retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tangle) {
   retcode_t ret = RC_OK;
 
   if (node == NULL) {
@@ -157,17 +148,14 @@ retcode_t node_init(node_t* const node, core_t* const core,
   }
 
   log_info(logger_id, "Initializing processor component\n");
-  if (processor_init(&node->processor, node,
-                     &core->consensus.transaction_validator,
-                     &core->consensus.transaction_solidifier,
-                     &core->consensus.milestone_tracker) != RC_OK) {
+  if (processor_init(&node->processor, node, &core->consensus.transaction_validator,
+                     &core->consensus.transaction_solidifier, &core->consensus.milestone_tracker) != RC_OK) {
     log_critical(logger_id, "Initializing processor component failed\n");
     return RC_NODE_FAILED_PROCESSOR_INIT;
   }
 
   log_info(logger_id, "Initializing receiver component\n");
-  if (receiver_init(&node->receiver, node, node->conf.tcp_receiver_port,
-                    node->conf.udp_receiver_port) != RC_OK) {
+  if (receiver_init(&node->receiver, node, node->conf.tcp_receiver_port, node->conf.udp_receiver_port) != RC_OK) {
     log_critical(logger_id, "Initializing receiver component failed\n");
     return RC_NODE_FAILED_RECEIVER_INIT;
   }
@@ -186,15 +174,13 @@ retcode_t node_init(node_t* const node, core_t* const core,
 
   log_info(logger_id, "Initializing transaction requester component\n");
   if (node_transaction_requester_init(node, tangle) != RC_OK) {
-    log_critical(logger_id,
-                 "Initializing transaction requester component failed\n");
+    log_critical(logger_id, "Initializing transaction requester component failed\n");
     return RC_NODE_FAILED_REQUESTER_INIT;
   }
 
   log_info(logger_id, "Initializing tips solidifier component\n");
-  if ((ret = tips_solidifier_init(
-           &node->tips_solidifier, &node->conf, &node->tips,
-           &core->consensus.transaction_solidifier)) != RC_OK) {
+  if ((ret = tips_solidifier_init(&node->tips_solidifier, &node->conf, &node->tips,
+                                  &core->consensus.transaction_solidifier)) != RC_OK) {
     log_critical(logger_id, "Initializing  tips solidifier component failed\n");
     return ret;
   }
@@ -247,8 +233,7 @@ retcode_t node_start(node_t* const node) {
 
   log_info(logger_id, "Starting transaction requester component\n");
   if ((ret = requester_start(&node->transaction_requester)) != RC_OK) {
-    log_critical(logger_id,
-                 "Starting transaction requester component failed\n");
+    log_critical(logger_id, "Starting transaction requester component failed\n");
     return ret;
   }
 

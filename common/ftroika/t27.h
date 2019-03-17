@@ -106,8 +106,7 @@ static inline void state_to_fstate(trit_t* state, t27_t* fstate) {
   for (size_t slice = 0; slice < T27_NUM_SLICES; ++slice) {
     for (size_t row = 0; row < T27_NUM_ROWS; ++row) {
       for (size_t colum = 0; colum < T27_NUM_COLUMNS; ++colum) {
-        trit_t t =
-            state[T27_SLICE_SIZE * slice + T27_NUM_COLUMNS * row + colum];
+        trit_t t = state[T27_SLICE_SIZE * slice + T27_NUM_COLUMNS * row + colum];
         t27_set(&fstate[T27_NUM_COLUMNS * row + colum], slice, t);
       }
     }

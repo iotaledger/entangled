@@ -47,9 +47,8 @@ typedef mam_psk_t_set_entry_t* mam_psk_t_set_t;
  *
  * @return a status code
  */
-retcode_t mam_psk_gen(mam_psk_t* const psk, mam_prng_t const* const prng,
-                      tryte_t const* const id, tryte_t const* const nonce,
-                      size_t const nonce_length);
+retcode_t mam_psk_gen(mam_psk_t* const psk, mam_prng_t const* const prng, tryte_t const* const id,
+                      tryte_t const* const nonce, size_t const nonce_length);
 
 /**
  * Safely destroys a pre-shared key by clearing its secret part
@@ -111,8 +110,7 @@ retcode_t mam_psks_serialize(mam_psk_t_set_t const psks, trits_t* const trits);
  *
  * @return a status code
  */
-retcode_t mam_psks_deserialize(trits_t* const trits,
-                               mam_psk_t_set_t* const psks);
+retcode_t mam_psks_deserialize(trits_t* const trits, mam_psk_t_set_t* const psks);
 
 #ifdef __cplusplus
 }

@@ -8,16 +8,14 @@
 using namespace iota::tanglescope;
 
 std::map<std::string, std::string> BlowballCollector::nameToDescHistogram = {
-    {BlowballCollector::TX_NUM_APPROVERS,
-     "Number of transactions directly approving a single transaction"}};
+    {BlowballCollector::TX_NUM_APPROVERS, "Number of transactions directly approving a single transaction"}};
 
 bool BlowballCollector::parseConfiguration(const YAML::Node& conf) {
   if (!PrometheusCollector::parseConfiguration(conf)) {
     return false;
   }
 
-  if (!conf[SNAPSHOT_INTERVAL] || !conf[PUBLISHER] || !conf[HISTOGRAM_RANGE] ||
-      !conf[BUCKET_SIZE]) {
+  if (!conf[SNAPSHOT_INTERVAL] || !conf[PUBLISHER] || !conf[HISTOGRAM_RANGE] || !conf[BUCKET_SIZE]) {
     return false;
   }
 
@@ -32,16 +30,14 @@ void BlowballCollector::collect() {
   using namespace prometheus;
   VLOG(3) << __FUNCTION__;
 
-  _zmqObservable =
-      rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
-          [&](auto s) { zmqPublisher(std::move(s), _zmqPublisher); });
+  _zmqObservable = rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
+      [&](auto s) { zmqPublisher(std::move(s), _zmqPublisher); });
 
   Exposer exposer{_prometheusExpURI};
   auto registry = std::make_shared<Registry>();
   exposer.RegisterCollectable(registry);
 
-  histograms =
-      buildHistogramsMap(registry, "blowball", {}, nameToDescHistogram);
+  histograms = buildHistogramsMap(registry, "blowball", {}, nameToDescHistogram);
 
   analyzeBlowballsPeriodically();
   refCountPublishedTransactions();
@@ -53,17 +49,15 @@ void BlowballCollector::analyzeBlowballsPeriodically() {
 
   std::vector<double> buckets(_histogramRange / _bucketSize);
   double currInterval = 0;
-  std::generate(buckets.begin(), buckets.end(),
-                [&currInterval, bucketSize = _bucketSize]() {
-                  currInterval += bucketSize;
-                  return currInterval;
-                });
+  std::generate(buckets.begin(), buckets.end(), [&currInterval, bucketSize = _bucketSize]() {
+    currInterval += bucketSize;
+    return currInterval;
+  });
 
   auto& thisRef = *this;
   if (_snapshotInterval > 0) {
-    pubWorker.schedule_periodically(
-        pubThread.now(), std::chrono::seconds(_snapshotInterval),
-        [&thisRef, buckets](auto scbl) { thisRef.analyzeBlowballs(buckets); });
+    pubWorker.schedule_periodically(pubThread.now(), std::chrono::seconds(_snapshotInterval),
+                                    [&thisRef, buckets](auto scbl) { thisRef.analyzeBlowballs(buckets); });
   }
 }
 
@@ -77,9 +71,7 @@ void BlowballCollector::analyzeBlowballs(const std::vector<double>& buckets) {
       histograms.at(TX_NUM_APPROVERS).get().Add({}, buckets).Observe(it.second);
       std::chrono::system_clock::time_point lastUpdateTime;
       _txToLastUpdateTime.find(it.first, lastUpdateTime);
-      auto timeSinceLastUpdate =
-          std::chrono::duration_cast<std::chrono::seconds>(now - lastUpdateTime)
-              .count();
+      auto timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::seconds>(now - lastUpdateTime).count();
       if (timeSinceLastUpdate > EXPIARY_PERIOD) {
         expiredRefCounts.insert(it.first);
       }
@@ -98,8 +90,7 @@ void BlowballCollector::refCountPublishedTransactions() {
           [&](std::shared_ptr<iri::IRIMessage> msg) {
             // assuming no tx is a milestone
             if (msg->type() == iri::IRIMessageType::LMHS) {
-              auto lmhs =
-                  std::static_pointer_cast<iri::LMHSMessage>(std::move(msg));
+              auto lmhs = std::static_pointer_cast<iri::LMHSMessage>(std::move(msg));
               if (_milestones.size() > MAX_NUM_MILESTONES) {
                 _milestones.pop_front();
               }
@@ -110,14 +101,12 @@ void BlowballCollector::refCountPublishedTransactions() {
             auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
             auto now = std::chrono::system_clock::now();
 
-            if (std::find(_milestones.begin(), _milestones.end(),
-                          tx->trunk()) == _milestones.end()) {
+            if (std::find(_milestones.begin(), _milestones.end(), tx->trunk()) == _milestones.end()) {
               _txToRefCount.upsert(tx->trunk(), counterFn, 1);
               _txToLastUpdateTime.insert(tx->trunk(), now);
             }
 
-            if (std::find(_milestones.begin(), _milestones.end(),
-                          tx->branch()) == _milestones.end()) {
+            if (std::find(_milestones.begin(), _milestones.end(), tx->branch()) == _milestones.end()) {
               _txToRefCount.upsert(tx->branch(), counterFn, 1);
               _txToLastUpdateTime.insert(tx->branch(), std::move(now));
             }

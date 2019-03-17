@@ -32,10 +32,9 @@ extern "C" {
  *
  * @return error value.
  */
-retcode_t iota_client_get_transactions_to_approve(
-    const iota_client_service_t* const service,
-    const get_transactions_to_approve_req_t* const req,
-    get_transactions_to_approve_res_t* res);
+retcode_t iota_client_get_transactions_to_approve(const iota_client_service_t* const service,
+                                                  const get_transactions_to_approve_req_t* const req,
+                                                  get_transactions_to_approve_res_t* res);
 
 #ifdef __cplusplus
 }

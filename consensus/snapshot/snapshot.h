@@ -36,8 +36,7 @@ typedef struct snapshot_s {
  *
  * @return a status code
  */
-retcode_t iota_snapshot_init(snapshot_t *const snapshot,
-                             iota_consensus_conf_t *const conf);
+retcode_t iota_snapshot_init(snapshot_t *const snapshot, iota_consensus_conf_t *const conf);
 
 /**
  * Destroys a snapshot
@@ -65,8 +64,7 @@ size_t iota_snapshot_get_index(snapshot_t *const snapshot);
  *
  * @return a status code
  */
-retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
-                                    flex_trit_t *const hash, int64_t *balance);
+retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot, flex_trit_t *const hash, int64_t *balance);
 
 /**
  * Creates a patch of a snapshot state and a delta
@@ -77,8 +75,7 @@ retcode_t iota_snapshot_get_balance(snapshot_t *const snapshot,
  *
  * @return a status code
  */
-retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
-                                     state_delta_t *const delta,
+retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot, state_delta_t *const delta,
                                      state_delta_t *const patch);
 
 /**
@@ -90,8 +87,7 @@ retcode_t iota_snapshot_create_patch(snapshot_t *const snapshot,
  *
  * @return a status code
  */
-retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot,
-                                    state_delta_t *const patch, size_t index);
+retcode_t iota_snapshot_apply_patch(snapshot_t *const snapshot, state_delta_t *const patch, size_t index);
 
 #ifdef __cplusplus
 }

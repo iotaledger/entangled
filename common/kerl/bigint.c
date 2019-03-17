@@ -16,8 +16,7 @@ typedef struct {
   uint32_t v;
 } full_add_s;
 
-static void full_add(full_add_s *const fa, uint64_t const lh,
-                     uint64_t const rh) {
+static void full_add(full_add_s *const fa, uint64_t const lh, uint64_t const rh) {
   uint8_t carry1;
   uint32_t hi;
   uint64_t v;
@@ -60,8 +59,7 @@ size_t bigint_add_small(uint32_t *const base, uint32_t const other) {
   return i;
 }
 
-void bigint_add(uint32_t *const base, uint32_t const *const rh,
-                size_t const len) {
+void bigint_add(uint32_t *const base, uint32_t const *const rh, size_t const len) {
   full_add_s fa = {0, 0};
   size_t i = 0;
 
@@ -71,8 +69,7 @@ void bigint_add(uint32_t *const base, uint32_t const *const rh,
   }
 }
 
-void bigint_sub(uint32_t *const base, uint32_t const *const rh,
-                size_t const len) {
+void bigint_sub(uint32_t *const base, uint32_t const *const rh, size_t const len) {
   full_add_s fa = {1, 0};
   size_t i = 0;
 
@@ -84,8 +81,7 @@ void bigint_sub(uint32_t *const base, uint32_t const *const rh,
   assert(fa.carry);
 }
 
-int8_t bigint_cmp(uint32_t const *const lh, uint32_t const *const rh,
-                  size_t const len) {
+int8_t bigint_cmp(uint32_t const *const lh, uint32_t const *const rh, size_t const len) {
   size_t i = len;
 
   for (; i-- > 0;) {

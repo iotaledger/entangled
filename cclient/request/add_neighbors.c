@@ -8,8 +8,7 @@
 #include "cclient/request/add_neighbors.h"
 
 add_neighbors_req_t* add_neighbors_req_new() {
-  add_neighbors_req_t* req =
-      (add_neighbors_req_t*)malloc(sizeof(add_neighbors_req_t));
+  add_neighbors_req_t* req = (add_neighbors_req_t*)malloc(sizeof(add_neighbors_req_t));
   if (req) {
     req->uris = NULL;
     utarray_new(req->uris, &ut_str_icd);
@@ -17,8 +16,7 @@ add_neighbors_req_t* add_neighbors_req_new() {
   return req;
 }
 
-retcode_t add_neighbors_req_uris_add(add_neighbors_req_t* req,
-                                     const char* uri) {
+retcode_t add_neighbors_req_uris_add(add_neighbors_req_t* req, const char* uri) {
   if (!req->uris) {
     utarray_new(req->uris, &ut_str_icd);
   }
@@ -30,9 +28,7 @@ retcode_t add_neighbors_req_uris_add(add_neighbors_req_t* req,
   return RC_OK;
 }
 
-size_t add_neighbors_req_uris_len(add_neighbors_req_t* req) {
-  return utarray_len(req->uris);
-}
+size_t add_neighbors_req_uris_len(add_neighbors_req_t* req) { return utarray_len(req->uris); }
 
 const char* add_neighbors_req_uris_at(add_neighbors_req_t* req, size_t idx) {
   return *(const char**)utarray_eltptr(req->uris, idx);

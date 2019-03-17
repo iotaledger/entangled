@@ -50,10 +50,8 @@ extern "C" {
  *
  * @return a status code
  */
-retcode_t iota_consensus_init(
-    iota_consensus_t* const consensus, tangle_t* const tangle,
-    transaction_requester_t* const transaction_requester,
-    tips_cache_t* const tips);
+retcode_t iota_consensus_init(iota_consensus_t* const consensus, tangle_t* const tangle,
+                              transaction_requester_t* const transaction_requester, tips_cache_t* const tips);
 
 /**
  * Starts all consensus components
@@ -63,8 +61,7 @@ retcode_t iota_consensus_init(
  *
  * @return a status code
  */
-retcode_t iota_consensus_start(iota_consensus_t* const consensus,
-                               tangle_t* const tangle);
+retcode_t iota_consensus_start(iota_consensus_t* const consensus, tangle_t* const tangle);
 
 /**
  * Stops all consensus components

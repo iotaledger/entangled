@@ -37,16 +37,17 @@ typedef struct exit_prob_transaction_validator_s {
   hash243_set_t max_depth_ok_memoization;
 } exit_prob_transaction_validator_t;
 
-extern retcode_t iota_consensus_exit_prob_transaction_validator_init(
-    iota_consensus_conf_t *const conf, milestone_tracker_t *const mt,
-    ledger_validator_t *const lv, exit_prob_transaction_validator_t *epv);
+extern retcode_t iota_consensus_exit_prob_transaction_validator_init(iota_consensus_conf_t *const conf,
+                                                                     milestone_tracker_t *const mt,
+                                                                     ledger_validator_t *const lv,
+                                                                     exit_prob_transaction_validator_t *epv);
 
-extern retcode_t iota_consensus_exit_prob_transaction_validator_destroy(
-    exit_prob_transaction_validator_t *epv);
+extern retcode_t iota_consensus_exit_prob_transaction_validator_destroy(exit_prob_transaction_validator_t *epv);
 
-extern retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(
-    exit_prob_transaction_validator_t *const epv, tangle_t *const tangle,
-    flex_trit_t const *const tail_hash, bool *const is_valid);
+extern retcode_t iota_consensus_exit_prob_transaction_validator_is_valid(exit_prob_transaction_validator_t *const epv,
+                                                                         tangle_t *const tangle,
+                                                                         flex_trit_t const *const tail_hash,
+                                                                         bool *const is_valid);
 
 #ifdef __cplusplus
 }

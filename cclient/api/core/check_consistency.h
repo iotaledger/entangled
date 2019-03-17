@@ -33,9 +33,8 @@ extern "C" {
  *
  * @return The error value.
  */
-retcode_t iota_client_check_consistency(
-    const iota_client_service_t* const service,
-    check_consistency_req_t* const req, check_consistency_res_t* res);
+retcode_t iota_client_check_consistency(const iota_client_service_t* const service, check_consistency_req_t* const req,
+                                        check_consistency_res_t* res);
 
 #ifdef __cplusplus
 }

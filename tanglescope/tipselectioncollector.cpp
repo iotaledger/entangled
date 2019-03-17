@@ -9,24 +9,19 @@
 using namespace iota::tanglescope;
 using namespace cppclient;
 
-std::map<std::string, std::string> TipSelectionCollector::nameToDescHistogram =
-    {{TipSelectionCollector::NUM_TX_WAS_SELECTED,
-      "# of times tip/tx was selected"},
-     {TipSelectionCollector::NUM_TRUNK_EQ_BRANCH,
-      "# of times both selected tips were the same"},
-     {TipSelectionCollector::NUM_TX_WAS_NOT_A_TIP,
-      "# of times selected tx was not a tip"},
-     {TipSelectionCollector::TIP_SELECTION_DURATION,
-      "The duration_of_tip_selection"}};
+std::map<std::string, std::string> TipSelectionCollector::nameToDescHistogram = {
+    {TipSelectionCollector::NUM_TX_WAS_SELECTED, "# of times tip/tx was selected"},
+    {TipSelectionCollector::NUM_TRUNK_EQ_BRANCH, "# of times both selected tips were the same"},
+    {TipSelectionCollector::NUM_TX_WAS_NOT_A_TIP, "# of times selected tx was not a tip"},
+    {TipSelectionCollector::TIP_SELECTION_DURATION, "The duration_of_tip_selection"}};
 
 bool TipSelectionCollector::parseConfiguration(const YAML::Node& conf) {
   if (!PrometheusCollector::parseConfiguration(conf)) {
     return false;
   }
 
-  if (!conf[IRI_HOST] || !conf[IRI_PORT] || !conf[SAMPLE_INTERVAL] ||
-      !conf[SAMPLE_SIZE] || !conf[DEPTH] || !conf[DURATION_HISTOGRAM_RANGE] ||
-      !conf[DURATION_BUCKET_SIZE]) {
+  if (!conf[IRI_HOST] || !conf[IRI_PORT] || !conf[SAMPLE_INTERVAL] || !conf[SAMPLE_SIZE] || !conf[DEPTH] ||
+      !conf[DURATION_HISTOGRAM_RANGE] || !conf[DURATION_BUCKET_SIZE]) {
     return false;
   }
 
@@ -51,8 +46,7 @@ void TipSelectionCollector::collect() {
 
   _txSelectionCountBuckets = txSelectionCountBuckets;
 
-  std::vector<double> durationBuckets(_durationBucketRange /
-                                      _durationBucketSize);
+  std::vector<double> durationBuckets(_durationBucketRange / _durationBucketSize);
   currInterval = 0;
   std::generate(durationBuckets.begin(), durationBuckets.end(),
                 [&currInterval, durationBucketSize = _durationBucketSize]() {
@@ -68,8 +62,7 @@ void TipSelectionCollector::collect() {
 
   _api = std::make_shared<cppclient::BeastIotaAPI>(_iriHost, _iriPort);
 
-  _histograms = std::move(
-      buildHistogramsMap(registry, "tipselection", {}, nameToDescHistogram));
+  _histograms = std::move(buildHistogramsMap(registry, "tipselection", {}, nameToDescHistogram));
 
   queryTipSelectionPeriodically();
 }
@@ -79,8 +72,7 @@ void TipSelectionCollector::queryTipSelectionPeriodically() {
   auto pubWorker = pubThread.create_worker();
 
   if (_sampleInterval > 0) {
-    pubWorker.schedule_periodically(pubThread.now(),
-                                    std::chrono::seconds(_sampleInterval),
+    pubWorker.schedule_periodically(pubThread.now(), std::chrono::seconds(_sampleInterval),
                                     [&](auto scbl) { queryTipSelection(); });
   } else {
     queryTipSelection();
@@ -88,8 +80,7 @@ void TipSelectionCollector::queryTipSelectionPeriodically() {
 }
 
 void TipSelectionCollector::queryTipSelection() {
-  std::vector<boost::future<nonstd::optional<GetTransactionsToApproveResponse>>>
-      futures;
+  std::vector<boost::future<nonstd::optional<GetTransactionsToApproveResponse>>> futures;
 
   uint16_t branchEqTrunkCounter = 0;
   uint16_t numSelectedTXWasNotATip = 0;
@@ -98,9 +89,7 @@ void TipSelectionCollector::queryTipSelection() {
 
   try {
     for (uint16_t i = 0; i < _sampleSize; ++i) {
-      auto fu = boost::async(boost::launch::async, [this] {
-        return _api->getTransactionsToApprove(_depth);
-      });
+      auto fu = boost::async(boost::launch::async, [this] { return _api->getTransactionsToApprove(_depth); });
 
       futures.push_back(std::move(fu));
     }
@@ -116,29 +105,21 @@ void TipSelectionCollector::queryTipSelection() {
       ++txToNumSelected[resp.branchTransaction];
 
       auto nowMilliseconds =
-          std::chrono::duration_cast<std::chrono::milliseconds>(
-              std::chrono::system_clock::now().time_since_epoch())
+          std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
               .count();
 
       auto timeTipSelectionRequested = nowMilliseconds - resp.duration;
-      txToTimeTipSelectionStrated[resp.trunkTransaction] =
-          timeTipSelectionRequested;
-      txToTimeTipSelectionStrated[resp.branchTransaction] =
-          timeTipSelectionRequested;
+      txToTimeTipSelectionStrated[resp.trunkTransaction] = timeTipSelectionRequested;
+      txToTimeTipSelectionStrated[resp.branchTransaction] = timeTipSelectionRequested;
 
-      _histograms.at(TIP_SELECTION_DURATION)
-          .get()
-          .Add({}, _durationBuckets)
-          .Observe(resp.duration);
+      _histograms.at(TIP_SELECTION_DURATION).get().Add({}, _durationBuckets).Observe(resp.duration);
 
       if (resp.trunkTransaction == resp.branchTransaction) {
         ++branchEqTrunkCounter;
       }
     }
 
-    auto& hist = _histograms.at(NUM_TX_WAS_SELECTED)
-                     .get()
-                     .Add({}, _txSelectionCountBuckets);
+    auto& hist = _histograms.at(NUM_TX_WAS_SELECTED).get().Add({}, _txSelectionCountBuckets);
 
     for (const auto& kv : txToNumSelected) {
       hist.Observe(kv.second);
@@ -150,25 +131,16 @@ void TipSelectionCollector::queryTipSelection() {
 
         for (const auto& approver : transactions) {
           auto txTimestampMS =
-              std::chrono::duration_cast<std::chrono::milliseconds>(
-                  approver.timestamp.time_since_epoch())
-                  .count();
-          if (txToTimeTipSelectionStrated[kv.first] > txTimestampMS)
-            ++numSelectedTXWasNotATip;
+              std::chrono::duration_cast<std::chrono::milliseconds>(approver.timestamp.time_since_epoch()).count();
+          if (txToTimeTipSelectionStrated[kv.first] > txTimestampMS) ++numSelectedTXWasNotATip;
           break;
         }
       }
     }
 
-    _histograms.at(NUM_TRUNK_EQ_BRANCH)
-        .get()
-        .Add({}, _txSelectionCountBuckets)
-        .Observe(branchEqTrunkCounter);
+    _histograms.at(NUM_TRUNK_EQ_BRANCH).get().Add({}, _txSelectionCountBuckets).Observe(branchEqTrunkCounter);
 
-    _histograms.at(NUM_TX_WAS_NOT_A_TIP)
-        .get()
-        .Add({}, _txSelectionCountBuckets)
-        .Observe(numSelectedTXWasNotATip);
+    _histograms.at(NUM_TX_WAS_NOT_A_TIP).get().Add({}, _txSelectionCountBuckets).Observe(numSelectedTXWasNotATip);
 
   } catch (const std::exception& e) {
     LOG(ERROR) << __FUNCTION__ << " Exception: " << e.what();

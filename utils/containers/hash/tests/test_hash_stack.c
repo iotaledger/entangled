@@ -17,18 +17,14 @@ void test_hash243_stack() {
   TEST_ASSERT_EQUAL_INT(2, hash243_stack_count(stack));
   TEST_ASSERT_FALSE(hash243_stack_empty(stack));
 
-  TEST_ASSERT_EQUAL_MEMORY(hash243_2, hash243_stack_peek(stack),
-                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash243_2, hash243_stack_peek(stack), FLEX_TRIT_SIZE_243);
 
-  TEST_ASSERT_EQUAL_MEMORY(hash243_2, hash243_stack_at(stack, 0),
-                           FLEX_TRIT_SIZE_243);
-  TEST_ASSERT_EQUAL_MEMORY(hash243_1, hash243_stack_at(stack, 1),
-                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash243_2, hash243_stack_at(stack, 0), FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash243_1, hash243_stack_at(stack, 1), FLEX_TRIT_SIZE_243);
 
   hash243_stack_pop(&stack);
   TEST_ASSERT_EQUAL_INT(1, hash243_stack_count(stack));
-  TEST_ASSERT_EQUAL_MEMORY(hash243_1, hash243_stack_peek(stack),
-                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash243_1, hash243_stack_peek(stack), FLEX_TRIT_SIZE_243);
 
   hash243_stack_pop(&stack);
   TEST_ASSERT_EQUAL_INT(0, hash243_stack_count(stack));

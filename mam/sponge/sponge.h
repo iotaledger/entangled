@@ -22,8 +22,7 @@
 // Sponge state capacity
 #define MAM_SPONGE_CAPACITY 237
 // Sponge state width
-#define MAM_SPONGE_WIDTH \
-  (MAM_SPONGE_RATE + MAM_SPONGE_CONTROL + MAM_SPONGE_CAPACITY)
+#define MAM_SPONGE_WIDTH (MAM_SPONGE_RATE + MAM_SPONGE_CONTROL + MAM_SPONGE_CAPACITY)
 
 // Sponge fixed key size
 #define MAM_SPONGE_KEY_SIZE 243
@@ -88,8 +87,7 @@ void mam_sponge_transform(mam_sponge_t *const sponge);
  * @param sponge Sponge interface
  * @param fork Sponge interface
  */
-void mam_sponge_fork(mam_sponge_t const *const sponge,
-                     mam_sponge_t *const fork);
+void mam_sponge_fork(mam_sponge_t const *const sponge, mam_sponge_t *const fork);
 
 /**
  * Sponge absorption
@@ -98,8 +96,7 @@ void mam_sponge_fork(mam_sponge_t const *const sponge,
  * @param c2 Control trit encoding output data type
  * @param data Input data blocks
  */
-void mam_sponge_absorb(mam_sponge_t *const sponge, trit_t const c2,
-                       trits_t data);
+void mam_sponge_absorb(mam_sponge_t *const sponge, trit_t const c2, trits_t data);
 /**
  * Absorb concatenation of `Xs[0]`..`Xs[n-1]`
  *
@@ -108,8 +105,7 @@ void mam_sponge_absorb(mam_sponge_t *const sponge, trit_t const c2,
  * @param n Input data blocks count
  * @param data_blocks Input data blocks
  */
-void mam_sponge_absorbn(mam_sponge_t *const sponge, trit_t const c2,
-                        size_t const n, trits_t const *const data_blocks);
+void mam_sponge_absorbn(mam_sponge_t *const sponge, trit_t const c2, size_t const n, trits_t const *const data_blocks);
 /**
  * Sponge squeezing
  *
@@ -117,8 +113,7 @@ void mam_sponge_absorbn(mam_sponge_t *const sponge, trit_t const c2,
  * @param c2 Control trit encoding output data type
  * @param squeezed Output data
  */
-void mam_sponge_squeeze(mam_sponge_t *const sponge, trit_t const c2,
-                        trits_t squeezed);
+void mam_sponge_squeeze(mam_sponge_t *const sponge, trit_t const c2, trits_t squeezed);
 /**
  * Sponge AE encryption
  *
@@ -126,8 +121,7 @@ void mam_sponge_squeeze(mam_sponge_t *const sponge, trit_t const c2,
  * @param plaintext Input data
  * @param ciphertext Hash value
  */
-void mam_sponge_encr(mam_sponge_t *const sponge, trits_t plaintext,
-                     trits_t ciphertext);
+void mam_sponge_encr(mam_sponge_t *const sponge, trits_t plaintext, trits_t ciphertext);
 /**
  * Sponge AE decryption
  *
@@ -135,8 +129,7 @@ void mam_sponge_encr(mam_sponge_t *const sponge, trits_t plaintext,
  * @param ciphertext Hash value
  * @param plaintext Input data
  */
-void mam_sponge_decr(mam_sponge_t *const sponge, trits_t ciphertext,
-                     trits_t plaintext);
+void mam_sponge_decr(mam_sponge_t *const sponge, trits_t ciphertext, trits_t plaintext);
 /**
  * Sponge hashing
  *
@@ -144,8 +137,7 @@ void mam_sponge_decr(mam_sponge_t *const sponge, trits_t ciphertext,
  * @param plaintext Input data
  * @param digest Hash value
  */
-void mam_sponge_hash(mam_sponge_t *const sponge, trits_t const plaintext,
-                     trits_t digest);
+void mam_sponge_hash(mam_sponge_t *const sponge, trits_t const plaintext, trits_t digest);
 
 /**
  * Sponge hashing
@@ -155,8 +147,8 @@ void mam_sponge_hash(mam_sponge_t *const sponge, trits_t const plaintext,
  * @param plaintext_blocks Input data blocks
  * @param digest Hash value
  */
-void mam_sponge_hashn(mam_sponge_t *const sponge, size_t const n,
-                      trits_t const *const plaintext_blocks, trits_t digest);
+void mam_sponge_hashn(mam_sponge_t *const sponge, size_t const n, trits_t const *const plaintext_blocks,
+                      trits_t digest);
 
 #ifdef __cplusplus
 }

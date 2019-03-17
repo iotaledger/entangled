@@ -43,16 +43,12 @@ void ftroika_rate_to_trits(const t27_t *state, trit_t *trits, int len);
 int ftroika_trytes_to_state(t27_t *state, const tryte_t *trytes, int len);
 int ftroika_compare_states(t27_t *state, t27_t *other);
 void ftroika_increase_state(t27_t *state);
-void ftroika_absorb(t27_t *state, unsigned int rate, const trit_t *message,
-                    unsigned long long message_length,
+void ftroika_absorb(t27_t *state, unsigned int rate, const trit_t *message, unsigned long long message_length,
                     unsigned long long num_rounds);
-void ftroika_squeeze(trit_t *hash, unsigned long long hash_length,
-                     unsigned int rate, t27_t *state,
+void ftroika_squeeze(trit_t *hash, unsigned long long hash_length, unsigned int rate, t27_t *state,
                      unsigned long long num_rounds);
-void ftroika(trit_t *out, unsigned long long outlen, const trit_t *in,
-             unsigned long long inlen);
-void ftroika_var_rounds(trit_t *out, unsigned long long outlen,
-                        const trit_t *in, unsigned long long inlen,
+void ftroika(trit_t *out, unsigned long long outlen, const trit_t *in, unsigned long long inlen);
+void ftroika_var_rounds(trit_t *out, unsigned long long outlen, const trit_t *in, unsigned long long inlen,
                         unsigned long long num_rounds);
 void ftroika243_repeated(trit_t *out, const trit_t *in, int repeat);
 

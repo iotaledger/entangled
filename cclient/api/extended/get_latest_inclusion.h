@@ -29,9 +29,8 @@ extern "C" {
  *
  * https://github.com/iotaledger/iota.js/blob/next/packages/core/src/createGetLatestInclusion.ts#L34
  */
-retcode_t iota_client_get_latest_inclusion(
-    iota_client_service_t const* const serv, hash243_queue_t const transactions,
-    get_inclusion_state_res_t* out_states);
+retcode_t iota_client_get_latest_inclusion(iota_client_service_t const* const serv, hash243_queue_t const transactions,
+                                           get_inclusion_state_res_t* out_states);
 
 #ifdef __cplusplus
 }

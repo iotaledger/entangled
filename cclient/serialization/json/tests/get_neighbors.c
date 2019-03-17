@@ -14,8 +14,7 @@ void test_get_neighbors_serialize_request(void) {
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
 
-  serializer.vtable.get_neighbors_serialize_request(&serializer,
-                                                    serializer_out);
+  serializer.vtable.get_neighbors_serialize_request(&serializer, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
@@ -44,13 +43,11 @@ void test_get_neighbors_serialize_response(void) {
   char_buffer_set(test_neighbors_neighbor1, TEST_NEIGHBORS_NEIGHBOR1);
   char_buffer_t* test_neighbors_neighbor2 = char_buffer_new();
   char_buffer_set(test_neighbors_neighbor2, TEST_NEIGHBORS_NEIGHBOR2);
-  ret = get_neighbors_res_add_neighbor(
-      res, test_neighbors_neighbor1, TEST_NEIGHBORS_NUMALLTX1,
-      TEST_NEIGHBORS_NUMINVALIDTX1, TEST_NEIGHBORS_NUMNEWTX1);
+  ret = get_neighbors_res_add_neighbor(res, test_neighbors_neighbor1, TEST_NEIGHBORS_NUMALLTX1,
+                                       TEST_NEIGHBORS_NUMINVALIDTX1, TEST_NEIGHBORS_NUMNEWTX1);
   TEST_ASSERT_EQUAL_INT8(RC_OK, ret);
-  ret = get_neighbors_res_add_neighbor(
-      res, test_neighbors_neighbor2, TEST_NEIGHBORS_NUMALLTX2,
-      TEST_NEIGHBORS_NUMINVALIDTX2, TEST_NEIGHBORS_NUMNEWTX2);
+  ret = get_neighbors_res_add_neighbor(res, test_neighbors_neighbor2, TEST_NEIGHBORS_NUMALLTX2,
+                                       TEST_NEIGHBORS_NUMINVALIDTX2, TEST_NEIGHBORS_NUMNEWTX2);
   TEST_ASSERT_EQUAL_INT8(RC_OK, ret);
 
   serializer.vtable.get_neighbors_serialize_response(&serializer, res, out);
@@ -77,8 +74,7 @@ void test_get_neighbors_deserialize_response(void) {
 
   get_neighbors_res_t* nbors = get_neighbors_res_new();
 
-  serializer.vtable.get_neighbors_deserialize_response(&serializer, json_text,
-                                                       nbors);
+  serializer.vtable.get_neighbors_deserialize_response(&serializer, json_text, nbors);
 
   neighbor_info_t* nb = get_neighbors_res_neighbor_at(nbors, 0);
   TEST_ASSERT_EQUAL_STRING(TEST_NEIGHBORS_NEIGHBOR1, nb->address->data);

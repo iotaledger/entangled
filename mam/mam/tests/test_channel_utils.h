@@ -15,8 +15,7 @@
 extern "C" {
 #endif
 
-bool mam_channel_t_set_cmp_test(mam_channel_t_set_t const channels_1,
-                                mam_channel_t_set_t const channels_2);
+bool mam_channel_t_set_cmp_test(mam_channel_t_set_t const channels_1, mam_channel_t_set_t const channels_2);
 
 #ifdef __cplusplus
 }

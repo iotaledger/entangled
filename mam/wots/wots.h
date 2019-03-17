@@ -61,8 +61,7 @@ void mam_wots_destroy(mam_wots_t *const wots);
  * @param nonce The nonce
  */
 
-void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *const prng,
-                     trits_t const nonce);
+void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce);
 
 /**
  * Generates a WOTS secret key with two nonces
@@ -72,8 +71,7 @@ void mam_wots_gen_sk(mam_wots_t *const wots, mam_prng_t const *const prng,
  * @param nonce1 The first nonce
  * @param nonce2 The second nonce
  */
-void mam_wots_gen_sk2(mam_wots_t *const wots, mam_prng_t const *const prng,
-                      trits_t const nonce1, trits_t const nonce2);
+void mam_wots_gen_sk2(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1, trits_t const nonce2);
 
 /**
  * Generate a WOTS secret key with three nonces
@@ -84,8 +82,7 @@ void mam_wots_gen_sk2(mam_wots_t *const wots, mam_prng_t const *const prng,
  * @param nonce2 The second nonce
  * @param nonce3 The third nonce
  */
-void mam_wots_gen_sk3(mam_wots_t *const wots, mam_prng_t const *const prng,
-                      trits_t const nonce1, trits_t const nonce2,
+void mam_wots_gen_sk3(mam_wots_t *const wots, mam_prng_t const *const prng, trits_t const nonce1, trits_t const nonce2,
                       trits_t const nonce3);
 
 /**
@@ -104,8 +101,7 @@ void mam_wots_calc_pk(mam_wots_t *const wots, trits_t public_key);
  * @param hash A hash to be signed
  * @param signature The signature
  */
-void mam_wots_sign(mam_wots_t *const wots, trits_t const hash,
-                   trits_t signature);
+void mam_wots_sign(mam_wots_t *const wots, trits_t const hash, trits_t signature);
 
 /**
  * Recovers a WOTS public key from a signature
@@ -115,8 +111,7 @@ void mam_wots_sign(mam_wots_t *const wots, trits_t const hash,
  * @param signature The signature
  * @param public_key The recovered public key
  */
-void mam_wots_recover(mam_spongos_t *const spongos, trits_t const hash,
-                      trits_t const signature, trits_t public_key);
+void mam_wots_recover(mam_spongos_t *const spongos, trits_t const hash, trits_t const signature, trits_t public_key);
 
 /**
  * Verifies a WOTS signature
@@ -128,8 +123,8 @@ void mam_wots_recover(mam_spongos_t *const spongos, trits_t const hash,
  *
  * @return true if valid, false otherwise
  */
-bool mam_wots_verify(mam_spongos_t *const spongos, trits_t const hash,
-                     trits_t const signature, trits_t const public_key);
+bool mam_wots_verify(mam_spongos_t *const spongos, trits_t const hash, trits_t const signature,
+                     trits_t const public_key);
 
 #ifdef __cplusplus
 }

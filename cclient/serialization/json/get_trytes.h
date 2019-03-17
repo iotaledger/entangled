@@ -18,11 +18,9 @@ extern "C" {
 #include "cclient/response/get_trytes.h"
 #include "cclient/serialization/serializer.h"
 
-retcode_t json_get_trytes_serialize_request(const serializer_t* const s,
-                                            get_trytes_req_t const* const req,
+retcode_t json_get_trytes_serialize_request(const serializer_t* const s, get_trytes_req_t const* const req,
                                             char_buffer_t* out);
-retcode_t json_get_trytes_deserialize_response(const serializer_t* const s,
-                                               const char* const obj,
+retcode_t json_get_trytes_deserialize_response(const serializer_t* const s, const char* const obj,
                                                get_trytes_res_t* const res);
 
 #ifdef __cplusplus

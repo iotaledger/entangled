@@ -9,10 +9,8 @@
 #include <math.h>
 #include "utils/macros.h"
 
-retcode_t map_transition_probabilities(double alpha,
-                                       hash_to_int64_t_map_t const cw_ratings,
-                                       hash243_set_t const *const approvers,
-                                       double transition_probs[]) {
+retcode_t map_transition_probabilities(double alpha, hash_to_int64_t_map_t const cw_ratings,
+                                       hash243_set_t const *const approvers, double transition_probs[]) {
   hash243_set_entry_t *curr_approver = NULL;
   hash243_set_entry_t *tmp_approver = NULL;
   hash_to_int64_t_map_entry_t const *curr_rating = NULL;
@@ -22,8 +20,7 @@ retcode_t map_transition_probabilities(double alpha,
   size_t idx = 0;
 
   HASH_ITER(hh, *approvers, curr_approver, tmp_approver) {
-    if (!hash_to_int64_t_map_find(&cw_ratings, curr_approver->hash,
-                                  &curr_rating)) {
+    if (!hash_to_int64_t_map_find(&cw_ratings, curr_approver->hash, &curr_rating)) {
       return RC_CONSENSUS_EXIT_PROBABILITIES_MISSING_RATING;
     }
     transition_probs[idx++] = curr_rating->value;

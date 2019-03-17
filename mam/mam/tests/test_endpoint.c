@@ -19,9 +19,8 @@
 #define CHANNEL_NAME_SIZE 27
 #define ENDPOINT_NAME_SIZE 27
 
-static bool mam_endpoint_t_set_cmp_test_endpoints(
-    mam_endpoint_t_set_t const endpoints_1,
-    mam_endpoint_t_set_t const endpoints_2) {
+static bool mam_endpoint_t_set_cmp_test_endpoints(mam_endpoint_t_set_t const endpoints_1,
+                                                  mam_endpoint_t_set_t const endpoints_2) {
   mam_endpoint_t_set_entry_t *entry_1 = NULL;
   mam_endpoint_t_set_entry_t *tmp_1 = NULL;
   mam_endpoint_t_set_entry_t *entry_2 = NULL;
@@ -34,26 +33,20 @@ static bool mam_endpoint_t_set_cmp_test_endpoints(
                  "ABCNKOZWYSDF9QABCNKOZWYSDF9"
                  "ABCNKOZWYSDF9CABCNKOZWYSDF9");
 
-  if (mam_endpoint_t_set_size(endpoints_1) !=
-      mam_endpoint_t_set_size(endpoints_2)) {
+  if (mam_endpoint_t_set_size(endpoints_1) != mam_endpoint_t_set_size(endpoints_2)) {
     return false;
   }
 
   HASH_ITER(hh, endpoints_1, entry_1, tmp_1) {
     HASH_ITER(hh, endpoints_2, entry_2, tmp_2) {
-      if (memcmp(entry_1->value.mss.root, entry_2->value.mss.root,
-                 MAM_ENDPOINT_ID_SIZE) == 0 &&
+      if (memcmp(entry_1->value.mss.root, entry_2->value.mss.root, MAM_ENDPOINT_ID_SIZE) == 0 &&
           trits_cmp_eq(entry_1->value.name, entry_2->value.name)) {
         MAM_TRITS_DEF0(sig1, MAM_MSS_SIG_SIZE(entry_1->value.mss.height));
         MAM_TRITS_DEF0(sig2, MAM_MSS_SIG_SIZE(entry_2->value.mss.height));
-        sig1 =
-            MAM_TRITS_INIT(sig1, MAM_MSS_SIG_SIZE(entry_1->value.mss.height));
-        sig2 =
-            MAM_TRITS_INIT(sig2, MAM_MSS_SIG_SIZE(entry_2->value.mss.height));
-        TEST_ASSERT_EQUAL_INT(RC_OK,
-                              mam_mss_sign(&entry_1->value.mss, hash, sig1));
-        TEST_ASSERT_EQUAL_INT(RC_OK,
-                              mam_mss_sign(&entry_2->value.mss, hash, sig2));
+        sig1 = MAM_TRITS_INIT(sig1, MAM_MSS_SIG_SIZE(entry_1->value.mss.height));
+        sig2 = MAM_TRITS_INIT(sig2, MAM_MSS_SIG_SIZE(entry_2->value.mss.height));
+        TEST_ASSERT_EQUAL_INT(RC_OK, mam_mss_sign(&entry_1->value.mss, hash, sig1));
+        TEST_ASSERT_EQUAL_INT(RC_OK, mam_mss_sign(&entry_2->value.mss, hash, sig2));
         if (trits_cmp_eq(sig1, sig2)) {
           match++;
           break;
@@ -92,8 +85,7 @@ void test_endpoint(void) {
     trytes_to_trits(channel_name, channel_name_trits.p, CHANNEL_NAME_SIZE);
     memset(endpoint_name, 'A' + 2 * i + 1, ENDPOINT_NAME_SIZE);
     trytes_to_trits(endpoint_name, endpoint_name_trits.p, ENDPOINT_NAME_SIZE);
-    TEST_ASSERT(mam_endpoint_create(&prng, i, channel_name_trits,
-                                    endpoint_name_trits, &endpoint) == RC_OK);
+    TEST_ASSERT(mam_endpoint_create(&prng, i, channel_name_trits, endpoint_name_trits, &endpoint) == RC_OK);
     TEST_ASSERT(mam_endpoint_t_set_add(&endpoints_1, &endpoint) == RC_OK);
   }
 
@@ -104,11 +96,9 @@ void test_endpoint(void) {
 
   mam_endpoints_serialize(endpoints_1, &trits);
 
-  TEST_ASSERT(mam_endpoints_deserialize(&cpy, channel_name_trits, &prng,
-                                        &endpoints_2) == RC_OK);
+  TEST_ASSERT(mam_endpoints_deserialize(&cpy, channel_name_trits, &prng, &endpoints_2) == RC_OK);
 
-  TEST_ASSERT_TRUE(
-      mam_endpoint_t_set_cmp_test_endpoints(endpoints_1, endpoints_2));
+  TEST_ASSERT_TRUE(mam_endpoint_t_set_cmp_test_endpoints(endpoints_1, endpoints_2));
 
   mam_endpoints_destroy(&endpoints_1);
   mam_endpoints_destroy(&endpoints_2);

@@ -26,8 +26,7 @@ extern "C" {
  * @return error value.
  */
 
-retcode_t iota_client_get_node_info(const iota_client_service_t* const service,
-                                    get_node_info_res_t* res);
+retcode_t iota_client_get_node_info(const iota_client_service_t* const service, get_node_info_res_t* res);
 
 #ifdef __cplusplus
 }

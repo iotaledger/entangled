@@ -33,9 +33,8 @@ extern "C" {
  *
  * @return error value.
  */
-retcode_t iota_client_get_inclusion_states(
-    const iota_client_service_t* const service,
-    get_inclusion_state_req_t* const req, get_inclusion_state_res_t* res);
+retcode_t iota_client_get_inclusion_states(const iota_client_service_t* const service,
+                                           get_inclusion_state_req_t* const req, get_inclusion_state_res_t* res);
 
 #ifdef __cplusplus
 }

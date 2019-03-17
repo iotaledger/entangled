@@ -18,24 +18,20 @@ bool receiver_service_start(receiver_service_t* const service) {
   if (service == NULL) {
     return false;
   }
-  logger_id =
-      logger_helper_enable(RECEIVER_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id = logger_helper_enable(RECEIVER_SERVICE_LOGGER_ID, LOGGER_DEBUG, true);
   try {
     boost::asio::io_context ctx;
     service->context = &ctx;
     if (service->protocol == PROTOCOL_TCP) {
-      log_info(logger_id, "Starting TCP receiver service on port %d\n",
-               service->port);
+      log_info(logger_id, "Starting TCP receiver service on port %d\n", service->port);
       TcpReceiverService tcpService(service, ctx, service->port);
       ctx.run();
     } else if (service->protocol == PROTOCOL_UDP) {
-      log_info(logger_id, "Starting UDP receiver service on port %d\n",
-               service->port);
+      log_info(logger_id, "Starting UDP receiver service on port %d\n", service->port);
       UdpReceiverService udpService(service, ctx, service->port);
       ctx.run();
     } else {
-      log_error(logger_id,
-                "Starting receiver service failed: unknown protocol\n");
+      log_error(logger_id, "Starting receiver service failed: unknown protocol\n");
       return false;
     }
   } catch (std::exception const& e) {
@@ -52,8 +48,7 @@ bool receiver_service_stop(receiver_service_t* const service) {
   try {
     auto ctx = reinterpret_cast<boost::asio::io_context*>(service->context);
     if (ctx == NULL) {
-      log_error(logger_id,
-                "Stopping receiver service failed: invalid context\n");
+      log_error(logger_id, "Stopping receiver service failed: invalid context\n");
       return false;
     }
     ctx->stop();

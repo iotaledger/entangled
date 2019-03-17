@@ -45,8 +45,7 @@ int main(int ac, char **av) {
 
     bool last_packet = strcmp(av[6], "yes") == 0;
     trytes_to_trits((tryte_t *)av[4], msg_id, strlen(av[4]));
-    if ((ret = mam_example_write_packet(&api, bundle, av[5], msg_id,
-                                        last_packet)) != RC_OK) {
+    if ((ret = mam_example_write_packet(&api, bundle, av[5], msg_id, last_packet)) != RC_OK) {
       fprintf(stderr, "mam_example_write_packet failed with err %d\n", ret);
       return EXIT_FAILURE;
     }

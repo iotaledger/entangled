@@ -53,8 +53,7 @@ retcode_t tips_cache_destroy(tips_cache_t* const cache);
  *
  * @return a status code
  */
-retcode_t tips_cache_get_tips(tips_cache_t* const cache,
-                              hash243_set_t* const tips);
+retcode_t tips_cache_get_tips(tips_cache_t* const cache, hash243_set_t* const tips);
 
 /**
  * Adds a tip to a tips cache
@@ -64,8 +63,7 @@ retcode_t tips_cache_get_tips(tips_cache_t* const cache,
  *
  * @return a status code
  */
-retcode_t tips_cache_add(tips_cache_t* const cache,
-                         flex_trit_t const* const tip);
+retcode_t tips_cache_add(tips_cache_t* const cache, flex_trit_t const* const tip);
 
 /**
  * Removes a tip from a tips cache
@@ -75,8 +73,7 @@ retcode_t tips_cache_add(tips_cache_t* const cache,
  *
  * @return a status code
  */
-retcode_t tips_cache_remove(tips_cache_t* const cache,
-                            flex_trit_t const* const tip);
+retcode_t tips_cache_remove(tips_cache_t* const cache, flex_trit_t const* const tip);
 
 /**
  * Sets a cached tip as solid
@@ -86,8 +83,7 @@ retcode_t tips_cache_remove(tips_cache_t* const cache,
  *
  * @return a status code
  */
-retcode_t tips_cache_set_solid(tips_cache_t* const cache,
-                               flex_trit_t const* const tip);
+retcode_t tips_cache_set_solid(tips_cache_t* const cache, flex_trit_t const* const tip);
 
 /**
  * Gets the number of non solid tips in a tips cache
@@ -124,8 +120,7 @@ size_t tips_cache_size(tips_cache_t* const cache);
  *
  * @return a status code
  */
-retcode_t tips_cache_random_tip(tips_cache_t* const cache,
-                                flex_trit_t* const tip);
+retcode_t tips_cache_random_tip(tips_cache_t* const cache, flex_trit_t* const tip);
 
 /**
  * Gets a random solid tip from a tip cache
@@ -135,8 +130,7 @@ retcode_t tips_cache_random_tip(tips_cache_t* const cache,
  *
  * @return a status code
  */
-retcode_t tips_cache_random_solid_tip(tips_cache_t* const cache,
-                                      flex_trit_t* const tip);
+retcode_t tips_cache_random_solid_tip(tips_cache_t* const cache, flex_trit_t* const tip);
 
 #ifdef __cplusplus
 }

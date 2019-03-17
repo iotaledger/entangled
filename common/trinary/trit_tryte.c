@@ -9,16 +9,12 @@
 
 #include "common/trinary/trit_tryte.h"
 
-static const trit_t TRYTES_TRITS_LUT[TRYTE_SPACE][NUMBER_OF_TRITS_IN_A_TRYTE] =
-    {{0, 0, 0},   {1, 0, 0},   {-1, 1, 0},  {0, 1, 0},   {1, 1, 0},
-     {-1, -1, 1}, {0, -1, 1},  {1, -1, 1},  {-1, 0, 1},  {0, 0, 1},
-     {1, 0, 1},   {-1, 1, 1},  {0, 1, 1},   {1, 1, 1},   {-1, -1, -1},
-     {0, -1, -1}, {1, -1, -1}, {-1, 0, -1}, {0, 0, -1},  {1, 0, -1},
-     {-1, 1, -1}, {0, 1, -1},  {1, 1, -1},  {-1, -1, 0}, {0, -1, 0},
-     {1, -1, 0},  {-1, 0, 0}};
+static const trit_t TRYTES_TRITS_LUT[TRYTE_SPACE][NUMBER_OF_TRITS_IN_A_TRYTE] = {
+    {0, 0, 0},  {1, 0, 0},  {-1, 1, 0},  {0, 1, 0},  {1, 1, 0},  {-1, -1, 1},  {0, -1, 1},  {1, -1, 1},  {-1, 0, 1},
+    {0, 0, 1},  {1, 0, 1},  {-1, 1, 1},  {0, 1, 1},  {1, 1, 1},  {-1, -1, -1}, {0, -1, -1}, {1, -1, -1}, {-1, 0, -1},
+    {0, 0, -1}, {1, 0, -1}, {-1, 1, -1}, {0, 1, -1}, {1, 1, -1}, {-1, -1, 0},  {0, -1, 0},  {1, -1, 0},  {-1, 0, 0}};
 
-trit_t get_trit_at(tryte_t const *const trytes, size_t const length,
-                   size_t const index) {
+trit_t get_trit_at(tryte_t const *const trytes, size_t const length, size_t const index) {
   size_t tindex = index / 3U;
   if (tindex >= length) {
     return 0;
@@ -29,8 +25,7 @@ trit_t get_trit_at(tryte_t const *const trytes, size_t const length,
   return TRYTES_TRITS_LUT[cindex][tindex];
 }
 
-uint8_t set_trit_at(tryte_t *const trytes, size_t const length,
-                    size_t const index, trit_t const trit) {
+uint8_t set_trit_at(tryte_t *const trytes, size_t const length, size_t const index, trit_t const trit) {
   size_t tindex = index / 3U;
   if (tindex >= length) {
     return 0;
@@ -54,16 +49,12 @@ uint8_t set_trit_at(tryte_t *const trytes, size_t const length,
   return 1;
 }
 
-void trits_to_trytes(trit_t const *const trits, tryte_t *const trytes,
-                     size_t const length) {
+void trits_to_trytes(trit_t const *const trits, tryte_t *const trytes, size_t const length) {
   int k = 0;
 
   for (size_t i = 0, j = 0; i < length; i += RADIX, j++) {
     k = 0;
-    for (size_t l = length - i < NUMBER_OF_TRITS_IN_A_TRYTE
-                        ? length - i
-                        : NUMBER_OF_TRITS_IN_A_TRYTE;
-         l-- > 0;) {
+    for (size_t l = length - i < NUMBER_OF_TRITS_IN_A_TRYTE ? length - i : NUMBER_OF_TRITS_IN_A_TRYTE; l-- > 0;) {
       k *= RADIX;
       k += trits[i + l];
     }
@@ -74,14 +65,12 @@ void trits_to_trytes(trit_t const *const trits, tryte_t *const trytes,
   }
 }
 
-void trytes_to_trits(tryte_t const *const trytes, trit_t *const trits,
-                     size_t const length) {
+void trytes_to_trits(tryte_t const *const trytes, trit_t *const trits, size_t const length) {
   if (length == 0) {
     return;
   }
 
   for (size_t i = 0, j = 0; i < length; i++, j += RADIX) {
-    memcpy(trits + j, TRYTES_TRITS_LUT[INDEX_OF_TRYTE(trytes[i])],
-           NUMBER_OF_TRITS_IN_A_TRYTE);
+    memcpy(trits + j, TRYTES_TRITS_LUT[INDEX_OF_TRYTE(trytes[i])], NUMBER_OF_TRITS_IN_A_TRYTE);
   }
 }

@@ -36,9 +36,8 @@ void init_cw_calculator_dfs(cw_rating_calculator_base_t *calculator);
  * (E ~ 2*V - because each transaction has two outcoming edges)
  */
 
-extern retcode_t cw_rating_calculate_dfs(
-    cw_rating_calculator_t const *const cw_calc, tangle_t *const tangle,
-    flex_trit_t *entry_point, cw_calc_result *out);
+extern retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc, tangle_t *const tangle,
+                                         flex_trit_t *entry_point, cw_calc_result *out);
 
 static cw_calculator_vtable cw_topological_vtable = {
     .cw_rating_calculate = cw_rating_calculate_dfs,

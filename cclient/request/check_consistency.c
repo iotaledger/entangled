@@ -8,8 +8,7 @@
 #include "cclient/request/check_consistency.h"
 
 check_consistency_req_t *check_consistency_req_new() {
-  check_consistency_req_t *req =
-      (check_consistency_req_t *)malloc(sizeof(check_consistency_req_t));
+  check_consistency_req_t *req = (check_consistency_req_t *)malloc(sizeof(check_consistency_req_t));
   if (req) {
     req->tails = NULL;
   }

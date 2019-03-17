@@ -10,11 +10,9 @@
 
 #include "common/trinary/tryte_long.h"
 
-static const char *TRYTES[] = {"9",   "A",   "M",   "NA", "LZ",  "MM",
-                               "NNA", "N9A", "VYM", "Z",  "EBN", "PCHBSYZZHYK"};
+static const char *TRYTES[] = {"9", "A", "M", "NA", "LZ", "MM", "NNA", "N9A", "VYM", "Z", "EBN", "PCHBSYZZHYK"};
 
-static const int64_t VALUES[] = {0,   1,   13,   14, -15,   364,
-                                 365, 716, 9418, -1, -9418, 2251799813685247};
+static const int64_t VALUES[] = {0, 1, 13, 14, -15, 364, 365, 716, 9418, -1, -9418, 2251799813685247};
 
 void test_trytes_to_long(void) {
   size_t num_tests = sizeof(TRYTES) / sizeof(char *);

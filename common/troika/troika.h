@@ -37,8 +37,7 @@
  * @param inlen  Length of the input buffer in trits.
  *
  */
-void troika(trit_t *out, unsigned long long outlen, const trit_t *in,
-            unsigned long long inlen);
+void troika(trit_t *out, unsigned long long outlen, const trit_t *in, unsigned long long inlen);
 
 /*
  * Evaluates the Troika hash function on the input with a variable
@@ -51,8 +50,8 @@ void troika(trit_t *out, unsigned long long outlen, const trit_t *in,
  * @param rounds Number of rounds used for the permutation.
  *
  */
-void troika_var_rounds(trit_t *out, unsigned long long outlen, const trit_t *in,
-                       unsigned long long inlen, unsigned long long num_rounds);
+void troika_var_rounds(trit_t *out, unsigned long long outlen, const trit_t *in, unsigned long long inlen,
+                       unsigned long long num_rounds);
 /*
  * Prints the state in a nice format.
  *
@@ -61,12 +60,10 @@ void troika_var_rounds(trit_t *out, unsigned long long outlen, const trit_t *in,
 void print_troika_slice(trit_t *state, int slice);
 void print_troika_state(trit_t *state);
 
-void troika_absorb(trit_t *state, unsigned int rate, const trit_t *message,
-                   unsigned long long message_length,
+void troika_absorb(trit_t *state, unsigned int rate, const trit_t *message, unsigned long long message_length,
                    unsigned long long num_rounds);
 
-void troika_squeeze(trit_t *hash, unsigned long long hash_length,
-                    unsigned int rate, trit_t *state,
+void troika_squeeze(trit_t *hash, unsigned long long hash_length, unsigned int rate, trit_t *state,
                     unsigned long long num_rounds);
 
 void sub_trytes(trit_t *state);

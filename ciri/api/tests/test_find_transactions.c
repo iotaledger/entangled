@@ -20,8 +20,7 @@ static tangle_t tangle;
 static iota_consensus_t consensus;
 
 // Compares two queues by using an intermediary hash set
-static bool hash243_queue_cmp(hash243_queue_t const lhs,
-                              hash243_queue_t const rhs) {
+static bool hash243_queue_cmp(hash243_queue_t const lhs, hash243_queue_t const rhs) {
   hash243_set_t set = NULL;
   hash243_queue_entry_t *iter = NULL;
   bool cmp = true;
@@ -45,30 +44,21 @@ done:
   return cmp;
 }
 
-static void hash243_queue_push_trytes(hash243_queue_t *const queue,
-                                      tryte_t const *const trytes) {
+static void hash243_queue_push_trytes(hash243_queue_t *const queue, tryte_t const *const trytes) {
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, trytes, NUM_TRYTES_HASH,
-                         NUM_TRYTES_HASH);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, trytes, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   hash243_queue_push(queue, hash);
 }
 
-static void hash81_queue_push_trytes(hash81_queue_t *const queue,
-                                     tryte_t const *const trytes) {
+static void hash81_queue_push_trytes(hash81_queue_t *const queue, tryte_t const *const trytes) {
   flex_trit_t hash[FLEX_TRIT_SIZE_81];
-  flex_trits_from_trytes(hash, NUM_TRITS_TAG, trytes, NUM_TRYTES_TAG,
-                         NUM_TRYTES_TAG);
+  flex_trits_from_trytes(hash, NUM_TRITS_TAG, trytes, NUM_TRYTES_TAG, NUM_TRYTES_TAG);
   hash81_queue_push(queue, hash);
 }
 
-void setUp(void) {
-  TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
-              RC_OK);
-}
+void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK); }
 
-void tearDown(void) {
-  TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK);
-}
+void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK); }
 
 /**
  * In this test, we store 24 txs distributed in 8 bundles of 3 txs.
@@ -93,13 +83,11 @@ void test_find_transactions_bundles_only(void) {
   bundle_trytes[1] = 'A';
 
   for (size_t i = 0; i < 24; i++) {
-    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes,
-                           NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-    flex_trits_from_trytes(txs[i].essence.bundle, NUM_TRITS_BUNDLE,
-                           bundle_trytes, NUM_TRYTES_BUNDLE, NUM_TRYTES_BUNDLE);
+    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+    flex_trits_from_trytes(txs[i].essence.bundle, NUM_TRITS_BUNDLE, bundle_trytes, NUM_TRYTES_BUNDLE,
+                           NUM_TRYTES_BUNDLE);
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
-    if (bundle_trytes[1] == 'B' || bundle_trytes[1] == 'E' ||
-        bundle_trytes[1] == 'G') {
+    if (bundle_trytes[1] == 'B' || bundle_trytes[1] == 'E' || bundle_trytes[1] == 'G') {
       hash243_queue_push(&res_hashes, txs[i].consensus.hash);
     }
     hash_trytes[0]++;
@@ -145,14 +133,11 @@ void test_find_transactions_addresses_only(void) {
   address_trytes[1] = 'A';
 
   for (size_t i = 0; i < 24; i++) {
-    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes,
-                           NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-    flex_trits_from_trytes(txs[i].essence.address, NUM_TRITS_ADDRESS,
-                           address_trytes, NUM_TRYTES_ADDRESS,
+    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+    flex_trits_from_trytes(txs[i].essence.address, NUM_TRITS_ADDRESS, address_trytes, NUM_TRYTES_ADDRESS,
                            NUM_TRYTES_ADDRESS);
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
-    if (address_trytes[1] == 'A' || address_trytes[1] == 'D' ||
-        address_trytes[1] == 'F') {
+    if (address_trytes[1] == 'A' || address_trytes[1] == 'D' || address_trytes[1] == 'F') {
       hash243_queue_push(&res_hashes, txs[i].consensus.hash);
     }
     hash_trytes[0]++;
@@ -198,10 +183,8 @@ void test_find_transactions_tags_only(void) {
   tags_trytes[1] = 'A';
 
   for (size_t i = 0; i < 24; i++) {
-    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes,
-                           NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-    flex_trits_from_trytes(txs[i].attachment.tag, NUM_TRITS_TAG, tags_trytes,
-                           NUM_TRYTES_TAG, NUM_TRYTES_TAG);
+    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+    flex_trits_from_trytes(txs[i].attachment.tag, NUM_TRITS_TAG, tags_trytes, NUM_TRYTES_TAG, NUM_TRYTES_TAG);
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
     if (tags_trytes[1] == 'A' || tags_trytes[1] == 'C') {
       hash243_queue_push(&res_hashes, txs[i].consensus.hash);
@@ -247,22 +230,19 @@ void test_find_transactions_approvees_only(void) {
   approvee_trytes[1] = 'A';
 
   for (size_t i = 0; i < 24; i++) {
-    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes,
-                           NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-    flex_trits_from_trytes(txs[i].attachment.branch, NUM_TRITS_BRANCH,
-                           approvee_trytes, NUM_TRYTES_BRANCH,
+    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+    flex_trits_from_trytes(txs[i].attachment.branch, NUM_TRITS_BRANCH, approvee_trytes, NUM_TRYTES_BRANCH,
                            NUM_TRYTES_BRANCH);
-    if (approvee_trytes[1] == 'B' || approvee_trytes[1] == 'C' ||
-        approvee_trytes[1] == 'H' || approvee_trytes[1] == 'M') {
+    if (approvee_trytes[1] == 'B' || approvee_trytes[1] == 'C' || approvee_trytes[1] == 'H' ||
+        approvee_trytes[1] == 'M') {
       hash243_queue_push(&res_hashes, txs[i].consensus.hash);
     }
     approvee_trytes[1] = 'A' + (2 * i + 1) % 16;
-    flex_trits_from_trytes(txs[i].attachment.trunk, NUM_TRITS_BRANCH,
-                           approvee_trytes, NUM_TRYTES_BRANCH,
+    flex_trits_from_trytes(txs[i].attachment.trunk, NUM_TRITS_BRANCH, approvee_trytes, NUM_TRYTES_BRANCH,
                            NUM_TRYTES_BRANCH);
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
-    if (approvee_trytes[1] == 'B' || approvee_trytes[1] == 'C' ||
-        approvee_trytes[1] == 'H' || approvee_trytes[1] == 'M') {
+    if (approvee_trytes[1] == 'B' || approvee_trytes[1] == 'C' || approvee_trytes[1] == 'H' ||
+        approvee_trytes[1] == 'M') {
       hash243_queue_push(&res_hashes, txs[i].consensus.hash);
     }
     hash_trytes[0]++;
@@ -318,17 +298,13 @@ void test_find_transactions_intersection(void) {
   approvee_trytes[1] = 'A';
 
   for (size_t i = 0; i < 24; i++) {
-    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes,
-                           NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-    flex_trits_from_trytes(txs[i].essence.bundle, NUM_TRITS_BUNDLE,
-                           bundle_trytes, NUM_TRYTES_BUNDLE, NUM_TRYTES_BUNDLE);
-    flex_trits_from_trytes(txs[i].essence.address, NUM_TRITS_ADDRESS,
-                           address_trytes, NUM_TRYTES_ADDRESS,
+    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+    flex_trits_from_trytes(txs[i].essence.bundle, NUM_TRITS_BUNDLE, bundle_trytes, NUM_TRYTES_BUNDLE,
+                           NUM_TRYTES_BUNDLE);
+    flex_trits_from_trytes(txs[i].essence.address, NUM_TRITS_ADDRESS, address_trytes, NUM_TRYTES_ADDRESS,
                            NUM_TRYTES_ADDRESS);
-    flex_trits_from_trytes(txs[i].attachment.tag, NUM_TRITS_TAG, tags_trytes,
-                           NUM_TRYTES_TAG, NUM_TRYTES_TAG);
-    flex_trits_from_trytes(txs[i].attachment.branch, NUM_TRITS_BRANCH,
-                           approvee_trytes, NUM_TRYTES_BRANCH,
+    flex_trits_from_trytes(txs[i].attachment.tag, NUM_TRITS_TAG, tags_trytes, NUM_TRYTES_TAG, NUM_TRYTES_TAG);
+    flex_trits_from_trytes(txs[i].attachment.branch, NUM_TRITS_BRANCH, approvee_trytes, NUM_TRYTES_BRANCH,
                            NUM_TRYTES_BRANCH);
 
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
@@ -372,11 +348,9 @@ void test_find_transactions_intersection(void) {
 
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   hash_trytes[0] = 'G';
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, hash_trytes, NUM_TRYTES_HASH,
-                         NUM_TRYTES_HASH);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, hash_trytes, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_INT(hash243_queue_count(res->hashes), 1);
-  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_peek(res->hashes),
-                           FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_peek(res->hashes), FLEX_TRIT_SIZE_243);
 
   find_transactions_req_free(&req);
   find_transactions_res_free(&res);
@@ -386,8 +360,7 @@ void test_find_transactions_no_input(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
 
-  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res) ==
-              RC_API_FIND_TRANSACTIONS_NO_INPUT);
+  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res) == RC_API_FIND_TRANSACTIONS_NO_INPUT);
 
   find_transactions_req_free(&req);
   find_transactions_res_free(&res);
@@ -408,18 +381,16 @@ void test_find_transactions_max(void) {
   bundle_trytes[1] = 'A';
 
   for (size_t i = 0; i < 24; i++) {
-    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes,
-                           NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-    flex_trits_from_trytes(txs[i].essence.bundle, NUM_TRITS_BUNDLE,
-                           bundle_trytes, NUM_TRYTES_BUNDLE, NUM_TRYTES_BUNDLE);
+    flex_trits_from_trytes(txs[i].consensus.hash, NUM_TRITS_HASH, hash_trytes, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+    flex_trits_from_trytes(txs[i].essence.bundle, NUM_TRITS_BUNDLE, bundle_trytes, NUM_TRYTES_BUNDLE,
+                           NUM_TRYTES_BUNDLE);
     TEST_ASSERT(iota_tangle_transaction_store(&tangle, &txs[i]) == RC_OK);
     hash243_queue_push(&req->bundles, txs[i].essence.bundle);
     hash_trytes[0]++;
     bundle_trytes[1] = 'A' + (i + 1) % 8;
   }
 
-  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res) ==
-              RC_API_MAX_FIND_TRANSACTIONS);
+  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res) == RC_API_MAX_FIND_TRANSACTIONS);
 
   find_transactions_req_free(&req);
   find_transactions_res_free(&res);

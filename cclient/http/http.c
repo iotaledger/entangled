@@ -12,11 +12,7 @@
 #include "utils/handles/socket.h"
 #include "utils/macros.h"
 
-typedef enum {
-  IOTA_REQUEST_STATUS_OK,
-  IOTA_REQUEST_STATUS_DONE,
-  IOTA_REQUEST_STATUS_ERROR
-} IOTA_REQUEST_STATUS;
+typedef enum { IOTA_REQUEST_STATUS_OK, IOTA_REQUEST_STATUS_DONE, IOTA_REQUEST_STATUS_ERROR } IOTA_REQUEST_STATUS;
 
 struct _response_ctx {
   http_parser* parser;
@@ -26,8 +22,7 @@ struct _response_ctx {
 };
 
 const char* khttp_ApplicationJson = "application/json";
-const char* khttp_ApplicationFormUrlencoded =
-    "application/x-www-form-urlencoded";
+const char* khttp_ApplicationFormUrlencoded = "application/x-www-form-urlencoded";
 
 static char const* header_template =
     "POST %s HTTP/1.1\r\n"
@@ -40,8 +35,7 @@ static char const* header_template =
 
 // Callback declarations for parser
 static int request_parse_header_complete(struct _response_ctx* response);
-static int request_parse_data(struct _response_ctx* response,
-                              const unsigned char* at, size_t length);
+static int request_parse_data(struct _response_ctx* response, const unsigned char* at, size_t length);
 static int request_parse_message_complete(struct _response_ctx* response);
 
 // Callback implementation for parser
@@ -49,10 +43,8 @@ static int request_parse_header_complete_cb(http_parser* parser) {
   return request_parse_header_complete((struct _response_ctx*)parser->data);
 }
 
-static int request_parse_data_cb(http_parser* parser, const char* at,
-                                 size_t length) {
-  return request_parse_data((struct _response_ctx*)parser->data,
-                            (const unsigned char*)at, length);
+static int request_parse_data_cb(http_parser* parser, const char* at, size_t length) {
+  return request_parse_data((struct _response_ctx*)parser->data, (const unsigned char*)at, length);
 }
 
 static int request_parse_message_complete_cb(http_parser* parser) {
@@ -74,8 +66,7 @@ static int request_parse_header_complete(struct _response_ctx* response) {
   return RC_OK;
 }
 
-static int request_parse_data(struct _response_ctx* response,
-                              const unsigned char* at, size_t length) {
+static int request_parse_data(struct _response_ctx* response, const unsigned char* at, size_t length) {
   memcpy(response->response->data + response->offset, at, length);
   response->offset += length;
   return RC_OK;
@@ -106,12 +97,10 @@ static retcode_t http_response_read(int sockfd, char_buffer_t* response) {
   http_parser_init(&parser, HTTP_RESPONSE);
   parser.data = &response_context;
   // Loop over received data
-  while ((num_received = socket_recv(sockfd, buffer, RECEIVE_BUFFER_SIZE)) >
-         0) {
+  while ((num_received = socket_recv(sockfd, buffer, RECEIVE_BUFFER_SIZE)) > 0) {
     int parsed = http_parser_execute(&parser, &settings, buffer, num_received);
     // A parsing error occured, or an error in a callback
-    if (parsed < num_received ||
-        response_context.status == IOTA_REQUEST_STATUS_ERROR) {
+    if (parsed < num_received || response_context.status == IOTA_REQUEST_STATUS_ERROR) {
       return RC_UTILS_SOCKET_RECV;
     } else if (response_context.status == IOTA_REQUEST_STATUS_DONE) {
       return RC_OK;
@@ -124,8 +113,7 @@ static retcode_t http_response_read(int sockfd, char_buffer_t* response) {
   return RC_OK;
 }
 
-static retcode_t http_request_data(int sockfd, char const* const data,
-                                   size_t data_length) {
+static retcode_t http_request_data(int sockfd, char const* const data, size_t data_length) {
   char* ptr = (char*)data;
   while (data_length > 0) {
     ssize_t num_sent = socket_send(sockfd, ptr, data_length);
@@ -138,28 +126,21 @@ static retcode_t http_request_data(int sockfd, char const* const data,
   return RC_OK;
 }
 
-static retcode_t http_request_header(int sockfd,
-                                     http_info_t const* http_settings,
-                                     size_t data_length) {
+static retcode_t http_request_header(int sockfd, http_info_t const* http_settings, size_t data_length) {
   char header[256] = {};
-  sprintf(header, header_template, http_settings->path, http_settings->host,
-          http_settings->api_version, http_settings->content_type,
-          http_settings->accept, data_length);
+  sprintf(header, header_template, http_settings->path, http_settings->host, http_settings->api_version,
+          http_settings->content_type, http_settings->accept, data_length);
   return http_request_data(sockfd, header, strlen(header));
 }
 
-static int https_request_header(mbedtls_ctx_t* ctx,
-                                http_info_t const* http_settings,
-                                size_t data_length) {
+static int https_request_header(mbedtls_ctx_t* ctx, http_info_t const* http_settings, size_t data_length) {
   char header[256] = {};
-  sprintf(header, header_template, http_settings->path, http_settings->host,
-          http_settings->api_version, http_settings->content_type,
-          http_settings->accept, data_length);
+  sprintf(header, header_template, http_settings->path, http_settings->host, http_settings->api_version,
+          http_settings->content_type, http_settings->accept, data_length);
   return tls_socket_send(ctx, header, strlen(header));
 }
 
-static retcode_t https_request_data(mbedtls_ctx_t* ctx, char const* const data,
-                                    size_t data_length) {
+static retcode_t https_request_data(mbedtls_ctx_t* ctx, char const* const data, size_t data_length) {
   char* ptr = (char*)data;
   while (data_length > 0) {
     ssize_t num_sent = tls_socket_send(ctx, ptr, data_length);
@@ -172,8 +153,7 @@ static retcode_t https_request_data(mbedtls_ctx_t* ctx, char const* const data,
   return RC_OK;
 }
 
-static retcode_t https_response_read(mbedtls_ctx_t* ctx,
-                                     char_buffer_t* response) {
+static retcode_t https_response_read(mbedtls_ctx_t* ctx, char_buffer_t* response) {
   char buffer[RECEIVE_BUFFER_SIZE] = {};
   ssize_t num_received = 0;
   // Setup parser settings - callbacks
@@ -193,12 +173,10 @@ static retcode_t https_response_read(mbedtls_ctx_t* ctx,
   http_parser_init(&parser, HTTP_RESPONSE);
   parser.data = &response_context;
   // Loop over received data
-  while ((num_received = tls_socket_recv(ctx, buffer, RECEIVE_BUFFER_SIZE, 0)) >
-         0) {
+  while ((num_received = tls_socket_recv(ctx, buffer, RECEIVE_BUFFER_SIZE, 0)) > 0) {
     int parsed = http_parser_execute(&parser, &settings, buffer, num_received);
     // A parsing error occured, or an error in a callback
-    if (parsed < num_received ||
-        response_context.status == IOTA_REQUEST_STATUS_ERROR) {
+    if (parsed < num_received || response_context.status == IOTA_REQUEST_STATUS_ERROR) {
       return RC_UTILS_SOCKET_RECV;
     } else if (response_context.status == IOTA_REQUEST_STATUS_DONE) {
       return RC_OK;
@@ -211,22 +189,18 @@ static retcode_t https_response_read(mbedtls_ctx_t* ctx,
   return RC_OK;
 }
 
-retcode_t iota_service_query(const void* const service_opaque,
-                             char_buffer_t* obj, char_buffer_t* response) {
+retcode_t iota_service_query(const void* const service_opaque, char_buffer_t* obj, char_buffer_t* response) {
   int sockfd = -1;
   retcode_t result = RC_ERROR;
-  const iota_client_service_t* const service =
-      (const iota_client_service_t* const)service_opaque;
+  const iota_client_service_t* const service = (const iota_client_service_t* const)service_opaque;
   const http_info_t* http_settings = &service->http;
 
   if (http_settings->ca_pem == NULL) {
     // HTTP
     sockfd = socket_connect(http_settings->host, http_settings->port);
     if (sockfd >= 0) {
-      if ((result = http_request_header(sockfd, http_settings, obj->length)) ==
-          RC_OK) {
-        if ((result = http_request_data(sockfd, obj->data, obj->length)) ==
-            RC_OK) {
+      if ((result = http_request_header(sockfd, http_settings, obj->length)) == RC_OK) {
+        if ((result = http_request_data(sockfd, obj->data, obj->length)) == RC_OK) {
           result = http_response_read(sockfd, response);
         }
       } else {
@@ -237,13 +211,11 @@ retcode_t iota_service_query(const void* const service_opaque,
   } else {
     // HTTPS with ca auth
     mbedtls_ctx_t tls_ctx;
-    sockfd =
-        tls_socket_connect(&tls_ctx, http_settings->host, http_settings->port,
-                           http_settings->ca_pem, NULL, NULL, &result);
+    sockfd = tls_socket_connect(&tls_ctx, http_settings->host, http_settings->port, http_settings->ca_pem, NULL, NULL,
+                                &result);
     if (sockfd >= 0) {
       if (https_request_header(&tls_ctx, http_settings, obj->length) != -1) {
-        if ((result = https_request_data(&tls_ctx, obj->data, obj->length)) ==
-            RC_OK) {
+        if ((result = https_request_data(&tls_ctx, obj->data, obj->length)) == RC_OK) {
           result = https_response_read(&tls_ctx, response);
         }
       } else {
