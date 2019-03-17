@@ -17,7 +17,6 @@ static char *ciri_db_path = "ciri/api/tests/ciri.db";
 static connection_config_t config;
 static iota_api_t api;
 static tangle_t tangle;
-static iota_consensus_t consensus;
 
 // Compares two queues by using an intermediary hash set
 static bool hash243_queue_cmp(hash243_queue_t const lhs,
@@ -430,7 +429,6 @@ int main(void) {
   TEST_ASSERT(storage_init() == RC_OK);
 
   config.db_path = test_db_path;
-  api.consensus = &consensus;
   api.conf.max_find_transactions = 1024;
 
   RUN_TEST(test_find_transactions_bundles_only);

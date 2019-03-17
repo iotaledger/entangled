@@ -17,7 +17,6 @@ static char *ciri_db_path = "ciri/api/tests/ciri.db";
 static connection_config_t config;
 static iota_api_t api;
 static tangle_t tangle;
-static iota_consensus_t consensus;
 
 void setUp(void) {
   TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) ==
@@ -158,7 +157,6 @@ int main(void) {
   TEST_ASSERT(storage_init() == RC_OK);
 
   config.db_path = test_db_path;
-  api.consensus = &consensus;
 
   TEST_ASSERT(iota_api_conf_init(&api.conf) == RC_OK);
 
