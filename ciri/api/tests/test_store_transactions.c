@@ -18,9 +18,8 @@ static char *test_db_path = "ciri/api/tests/test.db";
 static char *ciri_db_path = "ciri/api/tests/ciri.db";
 static connection_config_t config;
 static iota_api_t api;
-static node_t node;
+static core_t core;
 static tangle_t tangle;
-static iota_consensus_t consensus;
 
 void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK); }
 
@@ -103,6 +102,7 @@ int main(void) {
   TEST_ASSERT(storage_init() == RC_OK);
 
   config.db_path = test_db_path;
+<<<<<<< HEAD
   api.node = &node;
   api.consensus = &consensus;
   TEST_ASSERT(iota_gossip_conf_init(&api.node->conf) == RC_OK);
@@ -114,6 +114,21 @@ int main(void) {
   tips_cache_init(&api.node->tips, 5000);
   iota_consensus_transaction_solidifier_init(&api.consensus->transaction_solidifier, &api.consensus->conf,
                                              &api.node->transaction_requester, &api.node->tips);
+=======
+  api.core = &core;
+  TEST_ASSERT(iota_gossip_conf_init(&api.core->node.conf) == RC_OK);
+  TEST_ASSERT(requester_init(&api.core->node.transaction_requester,
+                             &api.core->node) == RC_OK);
+  TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
+  api.core->consensus.conf.snapshot_timestamp_sec = 1536845195;
+  api.core->consensus.conf.mwm = 1;
+  iota_consensus_transaction_validator_init(
+      &api.core->consensus.transaction_validator, &api.core->consensus.conf);
+  tips_cache_init(&api.core->node.tips, 5000);
+  iota_consensus_transaction_solidifier_init(
+      &api.core->consensus.transaction_solidifier, &api.core->consensus.conf,
+      &api.core->node.transaction_requester, &api.core->node.tips);
+>>>>>>> ciri/http - rebase th0br0 branch
 
   RUN_TEST(test_store_transactions_empty);
   RUN_TEST(test_store_transactions_invalid_tx);
