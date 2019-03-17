@@ -12,7 +12,7 @@ attach_to_tangle_req_t *attach_to_tangle_req_new() {
       (attach_to_tangle_req_t *)malloc(sizeof(attach_to_tangle_req_t));
   if (req) {
     req->mwm = ATTACH_TO_TANGLE_MAIN_MWM;
-    req->trytes = NULL;
+    req->trytes = hash8019_array_new();
     memset(req->trunk, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
     memset(req->branch, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
   }
@@ -40,10 +40,22 @@ void attach_to_tangle_req_init(attach_to_tangle_req_t *req,
   req->mwm = mwm;
 }
 
-void attach_to_tangle_req_add_trytes(attach_to_tangle_req_t *req,
-                                     flex_trit_t const *const raw_trytes) {
+retcode_t attach_to_tangle_req_trytes_add(attach_to_tangle_req_t *req,
+                                          flex_trit_t const *const raw_trytes) {
   if (!req->trytes) {
     req->trytes = hash8019_array_new();
   }
+  if (!req->trytes) {
+    return RC_OOM;
+  }
   hash_array_push(req->trytes, raw_trytes);
+  return RC_OK;
+}
+
+flex_trit_t *attach_to_tangle_req_trytes_get(attach_to_tangle_req_t *req,
+                                             size_t index) {
+  if (!req->trytes) {
+    return NULL;
+  }
+  return hash_array_at(req->trytes, index);
 }

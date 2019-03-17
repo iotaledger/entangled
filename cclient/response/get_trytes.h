@@ -24,6 +24,14 @@ typedef struct get_trytes_res_s {
 
 get_trytes_res_t* get_trytes_res_new();
 void get_trytes_res_free(get_trytes_res_t** const res);
+static inline retcode_t get_trytes_res_trytes_add(
+    get_trytes_res_t* const res, flex_trit_t const* const hash) {
+  return hash8019_queue_push(&res->trytes, hash);
+}
+static inline flex_trit_t* get_trytes_res_trytes_get(
+    get_trytes_res_t* const res, size_t index) {
+  return hash8019_queue_at(&res->trytes, index);
+}
 
 #ifdef __cplusplus
 }

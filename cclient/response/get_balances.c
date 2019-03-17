@@ -39,3 +39,15 @@ uint64_t get_balances_res_balances_at(get_balances_res_t const* const res,
                                       int const index) {
   return *(uint64_t*)utarray_eltptr(res->balances, index);
 }
+
+retcode_t get_balances_res_balances_add(get_balances_res_t* const res,
+                                        uint64_t value) {
+  if (!res->balances) {
+    utarray_new(res->balances, &ut_uint64_icd);
+  }
+  if (!res->balances) {
+    return RC_OOM;
+  }
+  utarray_push_back(res->balances, &value);
+  return RC_OK;
+}

@@ -13,6 +13,7 @@ extern "C" {
 #endif
 #define STR_OK "OK"
 #define STR_ERROR "ERROR"
+#define STR_NULL_PARAM "Attempting to access a null pointer"
 
 // Cclient Module
 #define STR_CCLIENT_JSON_CREATE "Create JSON object error!"

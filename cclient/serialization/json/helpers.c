@@ -43,6 +43,11 @@ retcode_t json_array_to_uint64(cJSON const* const obj,
 retcode_t utarray_to_json_array(UT_array const* const ut,
                                 cJSON* const json_root,
                                 char const* const obj_name) {
+  if (!ut) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__,
+              STR_NULL_PARAM);
+    return RC_NULL_PARAM;
+  }
   if (utarray_len(ut) > 0) {
     cJSON* array_obj = cJSON_CreateArray();
     if (array_obj == NULL) {
@@ -63,6 +68,11 @@ retcode_t utarray_to_json_array(UT_array const* const ut,
 retcode_t uint64_utarray_to_json_array(UT_array const* const ut,
                                        cJSON* const json_root,
                                        char const* const obj_name) {
+  if (!ut) {
+    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__,
+              STR_NULL_PARAM);
+    return RC_NULL_PARAM;
+  }
   if (utarray_len(ut) > 0) {
     cJSON* array_obj = cJSON_CreateArray();
     if (array_obj == NULL) {

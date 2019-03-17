@@ -27,15 +27,3 @@ void get_transactions_to_approve_res_free(
   free(*res);
   *res = NULL;
 }
-
-void get_transactions_to_approve_res_set_branch(
-    get_transactions_to_approve_res_t* const res,
-    flex_trit_t const* const branch) {
-  memcpy(res->branch, branch, FLEX_TRIT_SIZE_243);
-}
-
-void get_transactions_to_approve_res_set_trunk(
-    get_transactions_to_approve_res_t* const res,
-    flex_trit_t const* const trunk) {
-  memcpy(res->trunk, trunk, FLEX_TRIT_SIZE_243);
-}

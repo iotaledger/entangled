@@ -23,7 +23,7 @@ void test_serialize_store_transactions(void) {
       NUM_TRYTES_SERIALIZED_TRANSACTION);
   TEST_ASSERT(len);
 
-  hash_array_push(req->trytes, tx_trits);
+  TEST_ASSERT(store_transactions_req_trytes_add(req, tx_trits) == RC_OK);
 
   serializer.vtable.store_transactions_serialize_request(&serializer, req,
                                                          serializer_out);

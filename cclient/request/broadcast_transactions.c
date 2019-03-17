@@ -11,7 +11,7 @@ broadcast_transactions_req_t *broadcast_transactions_req_new() {
   broadcast_transactions_req_t *req = (broadcast_transactions_req_t *)malloc(
       sizeof(broadcast_transactions_req_t));
   if (req) {
-    req->trytes = NULL;
+    req->trytes = hash8019_array_new();
   }
 
   return req;
@@ -45,4 +45,12 @@ retcode_t broadcast_transactions_req_trytes_add(
   hash_array_push(req->trytes, raw_trytes);
 
   return RC_OK;
+}
+
+flex_trit_t *broadcat_transactions_req_trytes_get(
+    broadcast_transactions_req_t *req, size_t index) {
+  if (!req->trytes) {
+    return NULL;
+  }
+  return hash_array_at(req->trytes, index);
 }

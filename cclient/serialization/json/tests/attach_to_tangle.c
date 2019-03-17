@@ -36,13 +36,13 @@ static void test_request(void) {
       trits_8019, NUM_TRITS_SERIALIZED_TRANSACTION,
       (const tryte_t*)TEST_2673_TRYTES_1, NUM_TRYTES_SERIALIZED_TRANSACTION,
       NUM_TRYTES_SERIALIZED_TRANSACTION));
-  attach_to_tangle_req_add_trytes(attach_req, trits_8019);
+  TEST_ASSERT(attach_to_tangle_req_trytes_add(attach_req, trits_8019) == RC_OK);
 
   TEST_ASSERT(flex_trits_from_trytes(
       trits_8019, NUM_TRITS_SERIALIZED_TRANSACTION,
       (const tryte_t*)TEST_2673_TRYTES_2, NUM_TRYTES_SERIALIZED_TRANSACTION,
       NUM_TRYTES_SERIALIZED_TRANSACTION));
-  attach_to_tangle_req_add_trytes(attach_req, trits_8019);
+  TEST_ASSERT(attach_to_tangle_req_trytes_add(attach_req, trits_8019) == RC_OK);
 
   TEST_ASSERT_NOT_NULL(attach_req->trytes);
 

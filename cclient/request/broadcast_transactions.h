@@ -21,8 +21,12 @@ typedef struct broadcast_transactions_req_s {
 
 broadcast_transactions_req_t* broadcast_transactions_req_new();
 void broadcast_transactions_req_free(broadcast_transactions_req_t** const req);
+// add trytes to array
 retcode_t broadcast_transactions_req_trytes_add(
     broadcast_transactions_req_t* req, flex_trit_t const* const raw_trytes);
+// get trytes from array.
+flex_trit_t* broadcat_transactions_req_trytes_get(
+    broadcast_transactions_req_t* req, size_t index);
 
 #ifdef __cplusplus
 }

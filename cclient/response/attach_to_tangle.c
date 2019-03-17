@@ -16,6 +16,18 @@ attach_to_tangle_res_t* attach_to_tangle_res_new() {
   return res;
 }
 
+retcode_t attach_to_tangle_res_trytes_add(attach_to_tangle_res_t* res,
+                                          flex_trit_t const* const trytes) {
+  if (!res->trytes) {
+    res->trytes = hash8019_array_new();
+  }
+  if (!res->trytes) {
+    return RC_OOM;
+  }
+  hash_array_push(res->trytes, trytes);
+  return RC_OK;
+}
+
 flex_trit_t* attach_to_tangle_res_trytes_at(attach_to_tangle_res_t* res,
                                             int index) {
   return hash_array_at(res->trytes, index);
