@@ -30,6 +30,7 @@ retcode_t mam_channel_create(mam_prng_t *const prng,
                              trits_t const channel_name,
                              mam_channel_t *const channel) {
   MAM_ASSERT(channel);
+  MAM_ASSERT(height <= MAM_MSS_MAX_D);
 
   retcode_t ret = RC_OK;
 

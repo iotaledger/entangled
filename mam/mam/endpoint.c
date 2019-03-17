@@ -31,6 +31,7 @@ retcode_t mam_endpoint_create(mam_prng_t *const prng,
                               trits_t const endpoint_name,
                               mam_endpoint_t *const endpoint) {
   MAM_ASSERT(endpoint);
+  MAM_ASSERT(height <= MAM_MSS_MAX_D);
 
   retcode_t ret = RC_OK;
 
