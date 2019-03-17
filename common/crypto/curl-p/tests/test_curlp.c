@@ -7,7 +7,7 @@
 
 #include <unity/unity.h>
 
-#include "common/curl-p/trit.h"
+#include "common/crypto/curl-p/trit.h"
 
 #define OTHER_TRITS_IN -1, 1, -1, -1, 1, -1
 #define TRITS_IN                                                                                                       \

@@ -28,7 +28,7 @@ cc_library(
     srcs = ["transaction.c"],
     hdrs = ["transaction.h"],
     deps = [
-        "//common/curl-p:digest",
+        "//common/crypto/curl-p:digest",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_long",
     ],

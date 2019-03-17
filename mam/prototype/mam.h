@@ -8,7 +8,7 @@
 #ifndef __MAM_PROTOTYPE_MAM_H__
 #define __MAM_PROTOTYPE_MAM_H__
 
-#include "common/curl-p/hamming.h"
+#include "common/crypto/curl-p/hamming.h"
 #include "common/trinary/trit_long.h"
 #include "mam/prototype/mask.h"
 

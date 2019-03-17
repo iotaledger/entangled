@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <unity/unity.h>
 
-#include "common/curl-p/trit.h"
+#include "common/crypto/curl-p/trit.h"
 #include "common/sign/v1/iss_curl.h"
 #include "common/trinary/trit_tryte.h"
 

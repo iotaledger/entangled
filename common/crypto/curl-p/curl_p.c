@@ -2,7 +2,7 @@
  * (c) 2016 Paul Handy, based on code from come-from-beyond
  */
 
-#include "common/curl-p/trit.h"
+#include "common/crypto/curl-p/trit.h"
 #include "utils/forced_inline.h"
 #include "utils/memset_safe.h"
 

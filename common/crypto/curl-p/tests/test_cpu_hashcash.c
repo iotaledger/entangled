@@ -7,8 +7,8 @@
 
 #include <unity/unity.h>
 
-#include "common/curl-p/hashcash.h"
-#include "common/curl-p/trit.h"
+#include "common/crypto/curl-p/hashcash.h"
+#include "common/crypto/curl-p/trit.h"
 
 #define TRYTES_IN                                                                                                      \
   -1, 1, -1, -1, 1, -1, 1, 1, 0, -1, 0, 0, 1, 0, 1, 0, 0, 0, -1, -1, -1, -1, 0, 0, -1, 0, 0, 1, 0, 0, -1, 0, 0, 1, -1, \

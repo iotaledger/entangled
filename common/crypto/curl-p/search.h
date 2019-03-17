@@ -8,9 +8,9 @@
 #ifndef __COMMON_CURL_P_SEARCH_H_
 #define __COMMON_CURL_P_SEARCH_H_
 
-#include "common/curl-p/pearl_diver.h"
-#include "common/curl-p/ptrit.h"
-#include "common/curl-p/trit.h"
+#include "common/crypto/curl-p/pearl_diver.h"
+#include "common/crypto/curl-p/ptrit.h"
+#include "common/crypto/curl-p/trit.h"
 
 #ifdef __cplusplus
 extern "C" {

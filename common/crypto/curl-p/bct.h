@@ -8,7 +8,7 @@
 #ifndef __COMMON_CURL_P_BCT_H
 #define __COMMON_CURL_P_BCT_H
 
-#include "common/curl-p/const.h"
+#include "common/crypto/curl-p/const.h"
 #include "common/trinary/bct.h"
 
 #define S_STATE_LENGTH 183

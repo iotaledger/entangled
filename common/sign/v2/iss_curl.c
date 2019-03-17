@@ -5,7 +5,7 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "common/curl-p/trit.h"
+#include "common/crypto/curl-p/trit.h"
 
 #define HASH_PREFIX curl
 #define HASH_STATE Curl

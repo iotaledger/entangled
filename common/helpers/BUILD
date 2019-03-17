@@ -41,7 +41,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":digest",
-        "//common/curl-p:hashcash",
+        "//common/crypto/curl-p:hashcash",
         "//common/model:bundle",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_tryte",
@@ -58,7 +58,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:defs",
-        "//common/curl-p:digest",
+        "//common/crypto/curl-p:digest",
         "//common/trinary:flex_trit",
         "//utils:export",
     ],

@@ -14,7 +14,6 @@
 #include <keccak/KeccakHash.h>
 #endif
 
-#include "common/curl-p/const.h"
 #include "common/stdint.h"
 #include "common/trinary/trits.h"
 

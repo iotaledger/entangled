@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "common/curl-p/digest.h"
+#include "common/crypto/curl-p/digest.h"
 #include "common/defs.h"
 #include "common/helpers/digest.h"
 #include "common/trinary/trit_tryte.h"

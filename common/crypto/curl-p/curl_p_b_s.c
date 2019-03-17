@@ -2,10 +2,10 @@
  * (c) 2016 Paul Handy, based on code from come-from-beyond
  */
 
-#include "curl_p_b_s.h"
-
 #include <stdio.h>
 #include <string.h>
+
+#include "common/crypto/curl-p/curl_p_b_s.h"
 
 #define HASH_LENGTH S_STATE_LENGTH / 3
 #define HALF_LENGTH S_STATE_LENGTH / 2

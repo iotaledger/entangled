@@ -12,7 +12,7 @@ cc_library(
     ],
     deps = [
         "//common:defs",
-        "//common/curl-p:trit",
+        "//common/crypto/curl-p:trit",
         "//common/trinary:add",
     ],
 )

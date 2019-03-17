@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "common/curl-p/bct.h"
-#include "common/curl-p/const.h"
+#include "common/crypto/curl-p/bct.h"
+#include "common/crypto/curl-p/const.h"
 #include "utils/memset_safe.h"
 
 void s_transform(BCurl *const ctx);

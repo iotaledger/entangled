@@ -50,8 +50,8 @@ cc_library(
     hdrs = ["signed_files.h"],
     deps = [
         "//common:errors",
+        "//common/crypto/curl-p:trit",
         "//common/crypto/kerl",
-        "//common/curl-p:trit",
         "//common/model:bundle",
         "//common/sign:normalize",
         "//common/sign/v1:iss_curl",

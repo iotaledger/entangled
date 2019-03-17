@@ -9,6 +9,7 @@
 
 #include "common/crypto/kerl/converter.h"
 #include "common/crypto/kerl/kerl.h"
+#include "common/defs.h"
 
 #define RATE 832
 #define CAPACITY (1600 - RATE)

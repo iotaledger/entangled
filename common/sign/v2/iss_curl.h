@@ -8,7 +8,7 @@
 #ifndef __ISS_CURL_H_
 #define __ISS_CURL_H_
 
-#include "common/curl-p/trit.h"
+#include "common/crypto/curl-p/trit.h"
 
 #define HASH_PREFIX curl
 #define HASH_STATE Curl

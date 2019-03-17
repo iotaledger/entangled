@@ -7,7 +7,7 @@
 
 #include <unity/unity.h>
 
-#include "common/curl-p/bct.h"
+#include "common/crypto/curl-p/bct.h"
 #include "common/trinary/bct.h"
 
 //{0b101101, 0b010110}

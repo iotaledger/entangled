@@ -2,7 +2,7 @@ cc_test(
     name = "test_curlp",
     srcs = ["test_curlp.c"],
     deps = [
-        "//common/curl-p:trit",
+        "//common/crypto/curl-p:trit",
         "@unity",
     ],
 )
@@ -11,7 +11,7 @@ cc_test(
     name = "test_curlp_bct",
     srcs = ["test_bct.c"],
     deps = [
-        "//common/curl-p:bct",
+        "//common/crypto/curl-p:bct",
         "@unity",
     ],
 )
@@ -23,7 +23,7 @@ cc_test(
         "test_curlp_ptrit.h",
     ],
     deps = [
-        "//common/curl-p:ptrit",
+        "//common/crypto/curl-p:ptrit",
         "@unity",
     ],
 )
@@ -36,7 +36,7 @@ cc_test(
     linkopts = ["-lpthread"],
     tags = ["exclusive"],
     deps = [
-        "//common/curl-p:hashcash",
+        "//common/crypto/curl-p:hashcash",
         "@unity",
     ],
 )
@@ -49,7 +49,7 @@ cc_test(
     linkopts = ["-lpthread"],
     tags = ["exclusive"],
     deps = [
-        "//common/curl-p:hamming",
+        "//common/crypto/curl-p:hamming",
         "@unity",
     ],
 )

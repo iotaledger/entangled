@@ -7,8 +7,8 @@
 
 #include <unity/unity.h>
 
-#include "common/curl-p/ptrit.h"
-#include "test_curlp_ptrit.h"
+#include "common/crypto/curl-p/ptrit.h"
+#include "common/crypto/curl-p/tests/test_curlp_ptrit.h"
 
 void run_curl_p_test(PCurl *curl, ptrit_t *exp) {
   ptrit_t trits[] = {TRYTES_IN};

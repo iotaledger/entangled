@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "common/curl-p/ptrit.h"
+#include "common/crypto/curl-p/ptrit.h"
 #include "utils/forced_inline.h"
 
 static FORCED_INLINE void ptrit_sbox(ptrit_t *const c, ptrit_t const *const s) {

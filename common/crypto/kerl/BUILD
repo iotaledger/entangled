@@ -26,7 +26,6 @@ cc_library(
     hdrs = ["kerl.h"],
     deps = [
         ":converter",
-        "//common/curl-p:curl-p-const",
         "@keccak",
     ],
 )

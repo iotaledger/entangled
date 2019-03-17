@@ -8,7 +8,7 @@
 #ifndef __MAM_PROTOTYPE_MASK_H__
 #define __MAM_PROTOTYPE_MASK_H__
 
-#include "common/curl-p/trit.h"
+#include "common/crypto/curl-p/trit.h"
 
 #ifdef __cplusplus
 extern "C" {

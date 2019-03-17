@@ -4,7 +4,7 @@
 
 #include <string.h>
 
-#include "curl_p_s.h"
+#include "common/crypto/curl-p/curl_p_s.h"
 
 #define S_HASH_LENGTH S_STATE_LENGTH / 3
 #define HALF_LENGTH S_STATE_LENGTH / 2

@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "iss_curl.h"
-#include "common/curl-p/trit.h"
+#include "common/sign/v1/iss_curl.h"
+#include "common/crypto/curl-p/trit.h"
 
 #define HASH_PREFIX curl
 #define HASH_STATE Curl

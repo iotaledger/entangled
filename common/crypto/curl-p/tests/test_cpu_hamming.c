@@ -7,8 +7,8 @@
 
 #include <unity/unity.h>
 
-#include "common/curl-p/hamming.h"
-#include "common/curl-p/trit.h"
+#include "common/crypto/curl-p/hamming.h"
+#include "common/crypto/curl-p/trit.h"
 
 #define START 9
 

@@ -8,8 +8,8 @@
 #ifndef __COMMON_CURL_P_CURL_P_B_S_H
 #define __COMMON_CURL_P_CURL_P_B_S_H
 
-#include "common/curl-p/bct.h"
-#include "common/curl-p/const.h"
+#include "common/crypto/curl-p/bct.h"
+#include "common/crypto/curl-p/const.h"
 #include "utils/memset_safe.h"
 
 #define S_STATE_LENGTH 183

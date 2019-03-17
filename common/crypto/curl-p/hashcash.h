@@ -8,8 +8,8 @@
 #ifndef __COMMON_CURL_P_HASHCASH_H_
 #define __COMMON_CURL_P_HASHCASH_H_
 
-#include "common/curl-p/pearl_diver.h"
-#include "common/curl-p/trit.h"
+#include "common/crypto/curl-p/pearl_diver.h"
+#include "common/crypto/curl-p/trit.h"
 
 typedef enum {
   TAIL,
