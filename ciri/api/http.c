@@ -27,9 +27,7 @@ typedef struct iota_api_http_session_s {
   char_buffer_t *request;
 } iota_api_http_session_t;
 
-static retcode_t iota_api_http_process_request(iota_api_http_t *http,
-                                               const char *command,
-                                               const char *payload,
+static retcode_t iota_api_http_process_request(iota_api_http_t *http, const char *command, const char *payload,
                                                char_buffer_t *const out) {
   retcode_t ret = RC_OK;
 
@@ -50,8 +48,7 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *http,
     ret = iota_api_get_node_info(http->api, res);
     if (ret) goto gni;
 
-    ret = http->serializer.vtable.get_node_info_serialize_response(
-        &http->serializer, res, out);
+    ret = http->serializer.vtable.get_node_info_serialize_response(&http->serializer, res, out);
 
   gni:
     get_node_info_res_free(&res);
@@ -59,15 +56,13 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *http,
     check_consistency_req_t *req = check_consistency_req_new();
     check_consistency_res_t *res = check_consistency_res_new();
 
-    ret = http->serializer.vtable.check_consistency_deserialize_request(
-        &http->serializer, payload, req);
+    ret = http->serializer.vtable.check_consistency_deserialize_request(&http->serializer, payload, req);
     if (ret) goto cc;
 
     ret = iota_api_check_consistency(http->api, tangle, req, res);
     if (ret) goto cc;
 
-    ret = http->serializer.vtable.check_consistency_serialize_response(
-        &http->serializer, res, out);
+    ret = http->serializer.vtable.check_consistency_serialize_response(&http->serializer, res, out);
 
   cc:
     check_consistency_req_free(&req);
@@ -79,8 +74,7 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *http,
   return ret;
 }
 
-static int iota_api_http_header_iter(void *cls, enum MHD_ValueKind kind,
-                                     const char *key, const char *value) {
+static int iota_api_http_header_iter(void *cls, enum MHD_ValueKind kind, const char *key, const char *value) {
   iota_api_http_session_t *sess = cls;
 
   if (0 == strcmp(MHD_HTTP_HEADER_CONTENT_TYPE, key)) {
@@ -92,10 +86,8 @@ static int iota_api_http_header_iter(void *cls, enum MHD_ValueKind kind,
   return MHD_YES;
 }
 
-static int iota_api_http_handler(void *cls, struct MHD_Connection *connection,
-                                 const char *url, const char *method,
-                                 const char *version, const char *upload_data,
-                                 size_t *upload_data_size, void **ptr) {
+static int iota_api_http_handler(void *cls, struct MHD_Connection *connection, const char *url, const char *method,
+                                 const char *version, const char *upload_data, size_t *upload_data_size, void **ptr) {
   int ret = MHD_NO;
   iota_api_http_t *api = (iota_api_http_t *)cls;
   iota_api_http_session_t *sess = *ptr;
@@ -112,8 +104,7 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection,
     sess = calloc(1, sizeof(iota_api_http_session_t));
     *ptr = sess;
 
-    MHD_get_connection_values(connection, MHD_HEADER_KIND,
-                              iota_api_http_header_iter, sess);
+    MHD_get_connection_values(connection, MHD_HEADER_KIND, iota_api_http_header_iter, sess);
     return MHD_YES;
   }
 
@@ -163,8 +154,7 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection,
   cJSON_Delete(json_obj);
 
   response_buf = char_buffer_new();
-  if (iota_api_http_process_request(api, command_str, sess->request->data,
-                                    response_buf)) {
+  if (iota_api_http_process_request(api, command_str, sess->request->data, response_buf)) {
     free(command_str);
     char_buffer_free(response_buf);
     ret = MHD_NO;
@@ -172,10 +162,8 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection,
   }
   free(command_str);
 
-  response = MHD_create_response_from_buffer(
-      response_buf->length, response_buf->data, MHD_RESPMEM_MUST_COPY);
-  MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_TYPE,
-                          "application/json");
+  response = MHD_create_response_from_buffer(response_buf->length, response_buf->data, MHD_RESPMEM_MUST_COPY);
+  MHD_add_response_header(response, MHD_HTTP_HEADER_CONTENT_TYPE, "application/json");
   ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
   MHD_destroy_response(response);
 
@@ -192,8 +180,7 @@ cleanup:
   return ret;
 }
 
-retcode_t iota_api_http_init(iota_api_http_t *const http, iota_api_t *const api,
-                             connection_config_t *const db_config) {
+retcode_t iota_api_http_init(iota_api_http_t *const http, iota_api_t *const api, connection_config_t *const db_config) {
   if (api == NULL) {
     return RC_NULL_PARAM;
   }
@@ -218,9 +205,8 @@ retcode_t iota_api_http_start(iota_api_http_t *const api) {
     return RC_OK;
   }
 
-  api->state = MHD_start_daemon(
-      MHD_USE_AUTO_INTERNAL_THREAD | MHD_USE_ERROR_LOG | MHD_USE_DEBUG, 14265,
-      NULL, NULL, iota_api_http_handler, api, MHD_OPTION_END);
+  api->state = MHD_start_daemon(MHD_USE_AUTO_INTERNAL_THREAD | MHD_USE_ERROR_LOG | MHD_USE_DEBUG, 14265, NULL, NULL,
+                                iota_api_http_handler, api, MHD_OPTION_END);
   api->running = true;
 
   return RC_OK;

@@ -62,9 +62,8 @@ err:
   return ret;
 }
 
-retcode_t json_find_transactions_deserialize_response(
-    serializer_t const *const s, char const *const obj,
-    find_transactions_res_t *out) {
+retcode_t json_find_transactions_deserialize_response(serializer_t const *const s, char const *const obj,
+                                                      find_transactions_res_t *out) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;

@@ -43,8 +43,7 @@ typedef struct iota_api_http_s {
  *
  * @return a status code
  */
-retcode_t iota_api_http_init(iota_api_http_t *const http, iota_api_t *const api,
-                             connection_config_t *const db_config);
+retcode_t iota_api_http_init(iota_api_http_t *const http, iota_api_t *const api, connection_config_t *const db_config);
 
 /**
  * Starts an HTTP API

@@ -69,8 +69,7 @@ static void test_response(void) {
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_3, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT_EQUAL_MEMORY(hash, node_info->coordinator_address, FLEX_TRIT_SIZE_243);
 
-  serializer.vtable.get_node_info_serialize_response(&serializer, node_info,
-                                                     serializer_out);
+  serializer.vtable.get_node_info_serialize_response(&serializer, node_info, serializer_out);
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
   get_node_info_res_free(&node_info);
