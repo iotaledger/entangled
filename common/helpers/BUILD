@@ -23,9 +23,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:defs",
-        "//common/kerl",
-        "//common/sign:normalize",
-        "//common/sign/v1:iss_kerl",
+        "//common/crypto/iss:normalize",
+        "//common/crypto/iss/v1:iss_kerl",
+        "//common/crypto/kerl",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_array",
         "//common/trinary:trit_tryte",
@@ -41,7 +41,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":digest",
-        "//common/curl-p:hashcash",
+        "//common/crypto/curl-p:hashcash",
         "//common/model:bundle",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_tryte",
@@ -58,7 +58,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:defs",
-        "//common/curl-p:digest",
+        "//common/crypto/curl-p:digest",
         "//common/trinary:flex_trit",
         "//utils:export",
     ],
@@ -72,8 +72,8 @@ cc_library(
     deps = [
         ":digest",
         "//common:defs",
-        "//common/kerl:hash",
-        "//common/sign/v1:iss_kerl",
+        "//common/crypto/iss/v1:iss_kerl",
+        "//common/crypto/kerl:hash",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_tryte",
         "//utils:export",

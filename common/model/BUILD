@@ -7,9 +7,9 @@ cc_library(
     deps = [
         ":transaction",
         "//common:errors",
+        "//common/crypto/iss:normalize",
+        "//common/crypto/iss/v1:iss_kerl",
         "//common/model:transfer",
-        "//common/sign:normalize",
-        "//common/sign/v1:iss_kerl",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_tryte",
         "//common/trinary:tryte_long",
@@ -28,7 +28,7 @@ cc_library(
     srcs = ["transaction.c"],
     hdrs = ["transaction.h"],
     deps = [
-        "//common/curl-p:digest",
+        "//common/crypto/curl-p:digest",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_long",
     ],
@@ -39,8 +39,8 @@ cc_library(
     srcs = ["transfer.c"],
     hdrs = ["transfer.h"],
     deps = [
+        "//common/crypto/kerl",
         "//common/helpers:sign",
-        "//common/kerl",
         "//common/model:transaction",
         "//utils:logger_helper",
     ],

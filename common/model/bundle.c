@@ -6,6 +6,7 @@
  */
 
 #include "common/model/bundle.h"
+#include "common/crypto/iss/v1/iss_kerl.h"
 #include "common/model/transfer.h"
 #include "common/trinary/trit_long.h"
 #include "common/trinary/tryte_long.h"

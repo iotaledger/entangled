@@ -7,7 +7,7 @@
 
 #include <unity/unity.h>
 
-#include "common/sign/v2/iss_curl.h"
+#include "common/crypto/iss/v2/iss_curl.h"
 #include "common/trinary/trit_tryte.h"
 #include "utils/merkle.h"
 

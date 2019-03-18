@@ -12,7 +12,7 @@
 #include <stdio.h>
 #endif
 
-#include "common/curl-p/digest.h"
+#include "common/crypto/curl-p/digest.h"
 #include "common/model/transaction.h"
 #include "common/trinary/trit_long.h"
 
