@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "mam/mam/mam_channel_t_set.h"
 #include "mam/mam/message.h"
 #include "mam/ntru/mam_ntru_sk_t_set.h"
 #include "mam/pb3/pb3.h"
@@ -837,15 +838,39 @@ void mam_msg_write_ctx_serialize(mam_msg_write_context_t const *const ctx, trits
   pb3_encode_ntrytes(trits_from_rep(MAM_MSS_PK_SIZE, ctx->mss->root), buffer);
 }
 
-retcode_t mam_msg_write_ctx_deserialize(trits_t *const buffer, mam_msg_write_context_t *const ctx) {
+retcode_t mam_msg_write_ctx_deserialize(trits_t *const buffer, mam_msg_write_context_t *const ctx,
+                                        mam_channel_t_set_t const channels) {
   retcode_t ret = RC_OK;
+  trit_t mss_root[MAM_MSS_PK_SIZE];
+  mam_channel_t_set_entry_t *ch_entry = NULL;
+  mam_channel_t_set_entry_t *ch_tmp = NULL;
+  mam_endpoint_t_set_entry_t *ep_entry = NULL;
+  mam_endpoint_t_set_entry_t *ep_tmp = NULL;
 
   ERR_BIND_RETURN(pb3_decode_ntrytes(trits_from_rep(MAM_CHANNEL_ID_SIZE, ctx->chid), buffer), ret);
   ERR_BIND_RETURN(mam_spongos_deserialize(buffer, &ctx->spongos), ret);
   ctx->ord = trits_get18(*buffer);
   trits_advance(buffer, MAM_MSG_ORD_SIZE);
   ctx->mss = NULL;
-  ERR_BIND_RETURN(pb3_decode_ntrytes(trits_from_rep(MAM_MSS_PK_SIZE, ctx->mss_root), buffer), ret);
+  ERR_BIND_RETURN(pb3_decode_ntrytes(trits_from_rep(MAM_MSS_PK_SIZE, mss_root), buffer), ret);
+
+  SET_ITER(channels, ch_entry, ch_tmp) {
+    if (memcmp(trits_begin(mam_channel_id(&ch_entry->value)), mss_root, MAM_CHANNEL_ID_SIZE) == 0) {
+      ctx->mss = &ch_entry->value.mss;
+      return RC_OK;
+    } else {
+      SET_ITER(ch_entry->value.endpoints, ep_entry, ep_tmp) {
+        if (memcmp(trits_begin(mam_endpoint_id(&ep_entry->value)), mss_root, MAM_ENDPOINT_ID_SIZE) == 0) {
+          ctx->mss = &ep_entry->value.mss;
+          return RC_OK;
+        }
+      }
+    }
+  }
+
+  if (ctx->mss == NULL) {
+    return RC_MAM_MSS_NOT_FOUND;
+  }
 
   return ret;
 }
