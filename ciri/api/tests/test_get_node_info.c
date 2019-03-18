@@ -36,22 +36,22 @@ void test_get_node_info(void) {
 
   TEST_ASSERT(iota_api_get_node_info(&api, res) == RC_OK);
 
-  TEST_ASSERT_EQUAL_STRING(res->app_name->data, CIRI_NAME);
-  TEST_ASSERT_EQUAL_STRING(res->app_version->data, CIRI_VERSION);
+  TEST_ASSERT_EQUAL_STRING(get_node_info_res_app_name(res), CIRI_NAME);
+  TEST_ASSERT_EQUAL_STRING(get_node_info_res_app_version(res), CIRI_VERSION);
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, LATEST_MILESTONE, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
-  TEST_ASSERT_EQUAL_MEMORY(res->latest_milestone, hash, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT_EQUAL_INT(res->latest_milestone_index, LATEST_MILESTONE_INDEX);
+  TEST_ASSERT_EQUAL_MEMORY(get_node_info_res_lm(res), hash, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_UINT32(res->latest_milestone_index, LATEST_MILESTONE_INDEX);
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, LATEST_SOLID_MILESTONE, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
-  TEST_ASSERT_EQUAL_MEMORY(res->latest_solid_subtangle_milestone, hash, FLEX_TRIT_SIZE_243);
-  TEST_ASSERT_EQUAL_INT(res->latest_solid_subtangle_milestone_index, LATEST_SOLID_MILESTONE_INDEX);
-  TEST_ASSERT_EQUAL_INT(res->milestone_start_index, MILESTONE_START_INDEX);
-  TEST_ASSERT_EQUAL_INT(res->neighbors, 2);
-  TEST_ASSERT_EQUAL_INT(res->packets_queue_size, 4);
+  TEST_ASSERT_EQUAL_MEMORY(get_node_info_res_lssm(res), hash, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_UINT32(res->latest_solid_subtangle_milestone_index, LATEST_SOLID_MILESTONE_INDEX);
+  TEST_ASSERT_EQUAL_UINT32(res->milestone_start_index, MILESTONE_START_INDEX);
+  TEST_ASSERT_EQUAL_UINT16(res->neighbors, 2);
+  TEST_ASSERT_EQUAL_UINT16(res->packets_queue_size, 4);
   TEST_ASSERT_INT_WITHIN(1000, res->time, current_timestamp_ms());
-  TEST_ASSERT_EQUAL_INT(res->tips, 5);
-  TEST_ASSERT_EQUAL_INT(res->transactions_to_request, 3);
+  TEST_ASSERT_EQUAL_UINT32(res->tips, 5);
+  TEST_ASSERT_EQUAL_UINT32(res->transactions_to_request, 3);
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, COORDINATOR, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
-  TEST_ASSERT_EQUAL_MEMORY(res->coordinator_address, hash, FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(get_node_info_res_coordinator_address(res), hash, FLEX_TRIT_SIZE_243);
 
   get_node_info_res_free(&res);
 }

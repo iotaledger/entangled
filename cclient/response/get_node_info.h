@@ -83,17 +83,14 @@ static inline retcode_t get_node_info_res_app_version_set(get_node_info_res_t* r
   return char_buffer_set(res->app_version, version);
 }
 static inline char const* get_node_info_res_app_version(get_node_info_res_t* res) { return res->app_version->data; }
-static inline void get_node_info_res_latest_milestone_set(get_node_info_res_t* res, flex_trit_t const* const hash) {
+static inline void get_node_info_res_lm_set(get_node_info_res_t* res, flex_trit_t const* const hash) {
   memcpy(res->latest_milestone, hash, FLEX_TRIT_SIZE_243);
 }
-static inline flex_trit_t const* get_node_info_res_latest_milestone(get_node_info_res_t* res) {
-  return res->latest_milestone;
-}
-static inline void get_node_info_res_latest_solid_subtangle_milestone_set(get_node_info_res_t* res,
-                                                                          flex_trit_t const* const hash) {
+static inline flex_trit_t const* get_node_info_res_lm(get_node_info_res_t* res) { return res->latest_milestone; }
+static inline void get_node_info_res_lssm_set(get_node_info_res_t* res, flex_trit_t const* const hash) {
   memcpy(res->latest_solid_subtangle_milestone, hash, FLEX_TRIT_SIZE_243);
 }
-static inline flex_trit_t const* get_node_info_res_latest_solid_subtangle_milestone(get_node_info_res_t* res) {
+static inline flex_trit_t const* get_node_info_res_lssm(get_node_info_res_t* res) {
   return res->latest_solid_subtangle_milestone;
 }
 static inline void get_node_info_res_coordinator_address_set(get_node_info_res_t* res, flex_trit_t const* const hash) {

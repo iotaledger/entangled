@@ -9,36 +9,32 @@
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
-static const char *kAppName = "appName";
-static const char *kAppVersion = "appVersion";
-static const char *kLatestMilestone = "latestMilestone";
-static const char *kLatestMilestoneIdx = "latestMilestoneIndex";
-static const char *kLatestSolidSubtangleMilestone = "latestSolidSubtangleMilestone";
-static const char *kLatestSolidSubtangleMilestoneIdx = "latestSolidSubtangleMilestoneIndex";
-static const char *kMilestoneStartIdx = "milestoneStartIndex";
-static const char *kNeighbors = "neighbors";
-static const char *kPacketsQueueSize = "packetsQueueSize";
-static const char *kTime = "time";
-static const char *kTips = "tips";
-static const char *kTransactionsToRequest = "transactionsToRequest";
-static const char *kCoordinatorAddress = "coordinatorAddress";
+static char const *kAppName = "appName";
+static char const *kAppVersion = "appVersion";
+static char const *kLatestMilestone = "latestMilestone";
+static char const *kLatestMilestoneIdx = "latestMilestoneIndex";
+static char const *kLatestSolidSubtangleMilestone = "latestSolidSubtangleMilestone";
+static char const *kLatestSolidSubtangleMilestoneIdx = "latestSolidSubtangleMilestoneIndex";
+static char const *kMilestoneStartIdx = "milestoneStartIndex";
+static char const *kNeighbors = "neighbors";
+static char const *kPacketsQueueSize = "packetsQueueSize";
+static char const *kTime = "time";
+static char const *kTips = "tips";
+static char const *kTransactionsToRequest = "transactionsToRequest";
+static char const *kCoordinatorAddress = "coordinatorAddress";
 
-retcode_t json_get_node_info_serialize_request(const serializer_t *const s, char_buffer_t *out) {
+retcode_t json_get_node_info_serialize_request(serializer_t const *const s, char_buffer_t *out) {
   retcode_t ret = RC_OK;
-  const char *req_text = "{\"command\":\"getNodeInfo\"}";
+  char const *req_text = "{\"command\":\"getNodeInfo\"}";
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
-  ret = char_buffer_allocate(out, strlen(req_text));
-  if (ret == RC_OK) {
-    strcpy(out->data, req_text);
-  }
+  ret = char_buffer_set(out, req_text);
   return ret;
 }
 
-retcode_t json_get_node_info_serialize_response(const serializer_t *const s, const get_node_info_res_t *const obj,
+retcode_t json_get_node_info_serialize_response(serializer_t const *const s, get_node_info_res_t const *const obj,
                                                 char_buffer_t *out) {
   retcode_t ret = RC_OK;
-  const char *json_text = NULL;
-  size_t len = 0;
+  char const *json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
 
   cJSON *json_root = cJSON_CreateObject();
@@ -47,17 +43,17 @@ retcode_t json_get_node_info_serialize_response(const serializer_t *const s, con
     return RC_CCLIENT_JSON_CREATE;
   }
 
-  cJSON_AddStringToObject(json_root, kAppName, obj->app_name->data);
-  cJSON_AddStringToObject(json_root, kAppVersion, obj->app_version->data);
+  cJSON_AddStringToObject(json_root, kAppName, get_node_info_res_app_name(obj));
+  cJSON_AddStringToObject(json_root, kAppVersion, get_node_info_res_app_version(obj));
 
-  ret = flex_trits_to_json_string(json_root, kLatestMilestone, obj->latest_milestone, HASH_LENGTH_TRIT);
+  ret = flex_trits_to_json_string(json_root, kLatestMilestone, get_node_info_res_lm(obj), HASH_LENGTH_TRIT);
   if (ret != RC_OK) {
     goto done;
   }
 
   cJSON_AddNumberToObject(json_root, kLatestMilestoneIdx, obj->latest_milestone_index);
 
-  ret = flex_trits_to_json_string(json_root, kLatestSolidSubtangleMilestone, obj->latest_solid_subtangle_milestone,
+  ret = flex_trits_to_json_string(json_root, kLatestSolidSubtangleMilestone, get_node_info_res_lssm(obj),
                                   HASH_LENGTH_TRIT);
   if (ret != RC_OK) {
     goto done;
@@ -78,11 +74,7 @@ retcode_t json_get_node_info_serialize_response(const serializer_t *const s, con
 
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
-    len = strlen(json_text);
-    ret = char_buffer_allocate(out, len);
-    if (ret == RC_OK) {
-      strncpy(out->data, json_text, len);
-    }
+    char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
   }
 
@@ -91,7 +83,7 @@ done:
   return ret;
 }
 
-retcode_t json_get_node_info_deserialize_response(const serializer_t *const s, const char *const obj,
+retcode_t json_get_node_info_deserialize_response(serializer_t const *const s, char const *const obj,
                                                   get_node_info_res_t *out) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
