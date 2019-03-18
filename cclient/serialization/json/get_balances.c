@@ -13,7 +13,6 @@ retcode_t json_get_balances_serialize_request(serializer_t const *const s, get_b
                                               char_buffer_t *out) {
   retcode_t ret = RC_OK;
   const char *json_text = NULL;
-  size_t len = 0;
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
