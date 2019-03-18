@@ -80,6 +80,7 @@ extern "C" {
 #define RC_MODULE_MAM (0xB0 << RC_SHIFT_MODULE)
 
 #define RC_MODULE_HELPERS (0xB1 << RC_SHIFT_MODULE)
+#define RC_MODULE_CRYPTO (0xB2 << RC_SHIFT_MODULE)
 
 /* error code module specific */
 #define RC_ERRORCODE_MASK 0x003F
@@ -408,6 +409,9 @@ enum retcode_t {
 
   // Helpers Module
   RC_HELPERS_POW_INVALID_TX = 0x01 | RC_MODULE_HELPERS | RC_SEVERITY_MODERATE,
+
+  // Crypto Module
+  RC_CRYPTO_UNSUPPORTED_SPONGE_TYPE = 0x01 | RC_MODULE_HELPERS | RC_SEVERITY_MAJOR,
 };
 
 typedef enum retcode_t retcode_t;
