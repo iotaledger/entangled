@@ -56,7 +56,6 @@ typedef struct mam_msg_write_context_s {
   mam_spongos_t spongos;
   trint18_t ord;
   mam_mss_t *mss;
-  trit_t mss_root[MAM_MSS_PK_SIZE];
 } mam_msg_write_context_t;
 
 typedef struct mam_msg_read_context_s {
@@ -183,7 +182,8 @@ void mam_msg_write_ctx_serialize(mam_msg_write_context_t const *const ctx, trits
  *
  * @return return error code
  */
-retcode_t mam_msg_write_ctx_deserialize(trits_t *const buffer, mam_msg_write_context_t *const ctx);
+retcode_t mam_msg_write_ctx_deserialize(trits_t *const buffer, mam_msg_write_context_t *const ctx,
+                                        mam_channel_t_set_t const channels);
 
 /**
  * Gets the size for serialization of mam_msg_read_context_t

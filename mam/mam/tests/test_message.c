@@ -11,6 +11,7 @@
 #include <string.h>
 #include <unity/unity.h>
 
+#include "mam/mam/mam_channel_t_set.h"
 #include "mam/mam/message.h"
 #include "mam/ntru/mam_ntru_sk_t_set.h"
 
@@ -34,7 +35,8 @@
 
 #define TEST_MSS_DEPTH 1
 
-// TODO - Test functions should take set of prng_t instead of raw ptrs
+static mam_prng_t prng_sender;
+static mam_prng_t prng_receiver;
 
 static trits_t message_test_generic_write_msg(mam_prng_t *prng, mam_psk_t const *const pska,
                                               mam_psk_t const *const pskb, mam_ntru_pk_t const *const ntru_pk,
@@ -340,9 +342,6 @@ void message_test() {
   key_b = MAM_TRITS_INIT(key_b, MAM_PRNG_KEY_SIZE);
   trits_from_str(key_b, TEST_PRNG_B_KEY);
 
-  mam_prng_t prng_sender;
-  mam_prng_t prng_receiver;
-
   mam_prng_init(&prng_sender, key_a);
   mam_prng_init(&prng_receiver, key_b);
 
@@ -352,21 +351,21 @@ void message_test() {
 void serialize_write_ctx_test() {
   mam_msg_write_context_t write_ctx;
   mam_msg_write_context_t deserialized_ctx;
-  mam_mss_t mss;
+  mam_channel_t ch;
+  mam_channel_t_set_t chs = NULL;
 
   mam_spongos_init(&write_ctx.spongos);
   write_ctx.ord = 0;
 
-  // "Random" chid
-  for (size_t i = 0; i < MAM_CHANNEL_ID_SIZE; ++i) {
-    write_ctx.chid[i] = -1 + rand() % 3;
-  }
+  MAM_TRITS_DEF0(ch_name, 3 * strlen(TEST_CHANNEL_NAME));
+  ch_name = MAM_TRITS_INIT(ch_name, 3 * strlen(TEST_CHANNEL_NAME));
+  trits_from_str(ch_name, TEST_CHANNEL_NAME);
 
-  // "Random" root
-  for (size_t i = 0; i < MAM_MSS_PK_SIZE; ++i) {
-    mss.root[i] = -1 + rand() % 3;
-  }
-  write_ctx.mss = &mss;
+  TEST_ASSERT(mam_channel_create(&prng_sender, 2, ch_name, &ch) == RC_OK);
+  TEST_ASSERT(mam_channel_t_set_add(&chs, &ch) == RC_OK);
+
+  memcpy(write_ctx.chid, trits_begin(mam_channel_id(&ch)), MAM_CHANNEL_ID_SIZE);
+  write_ctx.mss = &chs->value.mss;
 
   MAM_TRITS_DEF0(rand_msg, strlen(TEST_PLAINTEXT1));
   rand_msg = MAM_TRITS_INIT(rand_msg, strlen(TEST_PLAINTEXT1));
@@ -376,12 +375,14 @@ void serialize_write_ctx_test() {
   ctx_buffer = MAM_TRITS_INIT(ctx_buffer, mam_msg_write_ctx_serialized_size(&write_ctx));
   mam_msg_write_ctx_serialize(&write_ctx, &ctx_buffer);
   ctx_buffer = trits_pickup_all(ctx_buffer);
-  mam_msg_write_ctx_deserialize(&ctx_buffer, &deserialized_ctx);
+  TEST_ASSERT(mam_msg_write_ctx_deserialize(&ctx_buffer, &deserialized_ctx, chs) == RC_OK);
   TEST_ASSERT_EQUAL_MEMORY(write_ctx.chid, deserialized_ctx.chid, MAM_CHANNEL_ID_SIZE);
   TEST_ASSERT_EQUAL_INT(write_ctx.spongos.pos, deserialized_ctx.spongos.pos);
   TEST_ASSERT_EQUAL_MEMORY(&write_ctx.spongos.sponge, &deserialized_ctx.spongos.sponge, MAM_SPONGE_WIDTH);
-  TEST_ASSERT_EQUAL_MEMORY(&write_ctx.mss->root, &deserialized_ctx.mss_root, MAM_MSS_PK_SIZE);
+  TEST_ASSERT_EQUAL_INT(write_ctx.mss, deserialized_ctx.mss);
   TEST_ASSERT_EQUAL_INT(write_ctx.ord, deserialized_ctx.ord);
+
+  mam_channels_destroy(&chs);
 }
 
 void serialize_read_ctx_test() {

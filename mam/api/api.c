@@ -589,7 +589,8 @@ void mam_api_write_ctx_map_serialize(trit_t_to_mam_msg_write_context_t_map_t con
   }
 }
 
-retcode_t mam_api_write_ctx_map_deserialize(trits_t *const buffer, trit_t_to_mam_msg_write_context_t_map_t *const map) {
+retcode_t mam_api_write_ctx_map_deserialize(trits_t *const buffer, trit_t_to_mam_msg_write_context_t_map_t *const map,
+                                            mam_channel_t_set_t const channels) {
   retcode_t ret;
   mam_msg_write_context_t ctx;
   trit_t msg_id[MAM_MSG_ID_SIZE];
@@ -599,7 +600,7 @@ retcode_t mam_api_write_ctx_map_deserialize(trits_t *const buffer, trit_t_to_mam
 
   for (size_t i = 0; i < num_ctxs; ++i) {
     pb3_decode_ntrytes(trits_from_rep(MAM_MSG_ID_SIZE, msg_id), buffer);
-    ERR_BIND_RETURN(mam_msg_write_ctx_deserialize(buffer, &ctx), ret);
+    ERR_BIND_RETURN(mam_msg_write_ctx_deserialize(buffer, &ctx, channels), ret);
     ERR_BIND_RETURN(trit_t_to_mam_msg_write_context_t_map_add(map, msg_id, ctx), ret);
   }
 
@@ -714,45 +715,20 @@ retcode_t mam_api_deserialize(trits_t *const buffer, mam_api_t *const api) {
   api->ntru_sks = NULL;
   api->ntru_pks = NULL;
   api->psks = NULL;
-  api->write_ctxs.map = NULL;
-  api->read_ctxs.map = NULL;
+  trit_t_to_mam_msg_write_context_t_map_init(&api->write_ctxs, MAM_MSG_ID_SIZE);
+  trit_t_to_mam_msg_read_context_t_map_init(&api->read_ctxs, MAM_MSG_ID_SIZE);
   api->channels = NULL;
   api->trusted_channel_ids = NULL;
   api->trusted_endpoint_ids = NULL;
 
-  trit_t_to_mam_msg_write_context_t_map_init(&api->write_ctxs, MAM_MSG_ID_SIZE);
-  trit_t_to_mam_msg_read_context_t_map_init(&api->read_ctxs, MAM_MSG_ID_SIZE);
-
-  mam_prng_deserialize(buffer, &api->prng);
+  ERR_BIND_RETURN(mam_prng_deserialize(buffer, &api->prng), ret);
   ERR_BIND_RETURN(mam_ntru_sks_deserialize(buffer, &api->ntru_sks), ret);
   ERR_BIND_RETURN(mam_ntru_pks_deserialize(buffer, &api->ntru_pks), ret);
   ERR_BIND_RETURN(mam_psks_deserialize(buffer, &api->psks), ret);
-  ERR_BIND_RETURN(mam_api_write_ctx_map_deserialize(buffer, &api->write_ctxs), ret);
+  ERR_BIND_RETURN(mam_api_write_ctx_map_deserialize(buffer, &api->write_ctxs, api->channels), ret);
   ERR_BIND_RETURN(mam_api_read_ctx_map_deserialize(buffer, &api->read_ctxs), ret);
   ERR_BIND_RETURN(mam_channels_deserialize(buffer, &api->prng, &api->channels), ret);
   ERR_BIND_RETURN(pb3_decode_longtrint(&api->channel_ord, buffer), ret);
-
-  trit_t_to_mam_msg_write_context_t_map_entry_t *curr_ctx_entry = NULL;
-  trit_t_to_mam_msg_write_context_t_map_entry_t *tmp_ctx_entry = NULL;
-  mam_channel_t_set_entry_t *curr_channel_entry = NULL;
-  mam_channel_t_set_entry_t *tmp_channel_entry = NULL;
-  mam_endpoint_t_set_entry_t *endpoint_entry = NULL;
-  mam_endpoint_t_set_entry_t *tmp_endpoint_entry = NULL;
-
-  SET_ITER(api->write_ctxs.map, curr_ctx_entry, tmp_ctx_entry) {
-    SET_ITER(api->channels, curr_channel_entry, tmp_channel_entry) {
-      if (memcmp(curr_channel_entry->value.mss.root, curr_ctx_entry->value.mss_root, MAM_CHANNEL_ID_SIZE) == 0) {
-        curr_ctx_entry->value.mss = &curr_channel_entry->value.mss;
-      } else {
-        SET_ITER(curr_channel_entry->value.endpoints, endpoint_entry, tmp_endpoint_entry) {
-          if (memcmp(endpoint_entry->value.mss.root, curr_ctx_entry->value.mss_root, MAM_ENDPOINT_ID_SIZE) == 0) {
-            curr_ctx_entry->value.mss = &endpoint_entry->value.mss;
-          }
-        }
-      }
-    }
-  }
-
   ERR_BIND_RETURN(mam_pks_deserialize(buffer, &api->trusted_channel_ids), ret);
   ERR_BIND_RETURN(mam_pks_deserialize(buffer, &api->trusted_endpoint_ids), ret);
 
