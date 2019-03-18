@@ -9,7 +9,7 @@
 
 void test_remove_neighbors_serialize_request(void) {
   serializer_t serializer;
-  const char* json_text = "{\"command\":\"removeNeighbors\",\"uris\":[\"" TEST_NEIGHBOR1 "\",\"" TEST_NEIGHBOR2 "\"]}";
+  char const* json_text = "{\"command\":\"removeNeighbors\",\"uris\":[\"" TEST_NEIGHBOR1 "\",\"" TEST_NEIGHBOR2 "\"]}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
@@ -28,7 +28,7 @@ void test_remove_neighbors_serialize_request(void) {
 void test_remove_neighbors_deserialize_request(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
-  const char* json_text = "{\"command\":\"removeNeighbors\",\"uris\":[\"" TEST_NEIGHBOR1 "\",\"" TEST_NEIGHBOR2 "\"]}";
+  char const* json_text = "{\"command\":\"removeNeighbors\",\"uris\":[\"" TEST_NEIGHBOR1 "\",\"" TEST_NEIGHBOR2 "\"]}";
 
   remove_neighbors_req_t* req = remove_neighbors_req_new();
   remove_neighbors_req_add(req, TEST_NEIGHBOR1);
@@ -43,7 +43,7 @@ void test_remove_neighbors_deserialize_request(void) {
 
 void test_remove_neighbors_serialize_response(void) {
   serializer_t serializer;
-  const char* json_text = "{\"removedNeighbors\":" STR(REMOVE_NEIGHBORS_RES) "}";
+  char const* json_text = "{\"removedNeighbors\":" STR(REMOVE_NEIGHBORS_RES) "}";
 
   char_buffer_t* serializer_out = char_buffer_new();
   init_json_serializer(&serializer);
@@ -62,7 +62,7 @@ void test_remove_neighbors_serialize_response(void) {
 void test_remove_neighbors_deserialize_response(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
-  const char* json_text = "{\"removedNeighbors\":" STR(REMOVE_NEIGHBORS_RES) ",\"duration\":2}";
+  char const* json_text = "{\"removedNeighbors\":" STR(REMOVE_NEIGHBORS_RES) ",\"duration\":2}";
 
   remove_neighbors_res_t* res = remove_neighbors_res_new();
 
