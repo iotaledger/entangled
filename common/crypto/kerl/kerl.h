@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_KERL_KERL_H_
-#define __COMMON_KERL_KERL_H_
+#ifndef __COMMON_CRYPTO_KERL_KERL_H__
+#define __COMMON_CRYPTO_KERL_KERL_H__
 
 #ifdef __XTENSA__
 #include "FIPS202/KeccakHash.h"
@@ -26,7 +26,6 @@ typedef struct {
 } Kerl;
 
 void init_kerl(Kerl* const ctx);
-
 void kerl_absorb(Kerl* const ctx, trit_t const* trits, size_t const length);
 void kerl_squeeze(Kerl* const ctx, trit_t* trits, size_t const length);
 void kerl_reset(Kerl* const ctx);
@@ -35,4 +34,4 @@ void kerl_reset(Kerl* const ctx);
 }
 #endif
 
-#endif  // __COMMON_KERL_KERL_H_s
+#endif  // __COMMON_CRYPTO_KERL_KERL_H__
