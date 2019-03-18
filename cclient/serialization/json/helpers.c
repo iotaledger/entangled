@@ -252,7 +252,7 @@ retcode_t hash243_queue_to_json_array(hash243_queue_t queue, cJSON* const json_r
           flex_trits_to_trytes(trytes_out, NUM_TRYTES_HASH, q_iter->hash, NUM_TRITS_HASH, NUM_TRITS_HASH);
       trytes_out[NUM_TRYTES_HASH] = '\0';
       if (trits_count != 0) {
-        cJSON_AddItemToArray(array_obj, cJSON_CreateString((const char*)trytes_out));
+        cJSON_AddItemToArray(array_obj, cJSON_CreateString((char const*)trytes_out));
       } else {
         return RC_CCLIENT_FLEX_TRITS;
       }
@@ -261,9 +261,7 @@ retcode_t hash243_queue_to_json_array(hash243_queue_t queue, cJSON* const json_r
   return RC_OK;
 }
 
-retcode_t hash243_stack_to_json_array(hash243_stack_t stack,
-                                      cJSON* const json_root,
-                                      char const* const obj_name) {
+retcode_t hash243_stack_to_json_array(hash243_stack_t stack, cJSON* const json_root, char const* const obj_name) {
   size_t array_count;
   cJSON* array_obj = NULL;
 
@@ -277,13 +275,11 @@ retcode_t hash243_stack_to_json_array(hash243_stack_t stack,
 
     for (int i = array_count - 1; i >= 0; i--) {
       tryte_t trytes_out[NUM_TRYTES_HASH + 1];
-      size_t trits_count = flex_trits_to_trytes(trytes_out, NUM_TRYTES_HASH,
-                                                hash243_stack_at(stack, i),
-                                                NUM_TRITS_HASH, NUM_TRITS_HASH);
+      size_t trits_count =
+          flex_trits_to_trytes(trytes_out, NUM_TRYTES_HASH, hash243_stack_at(stack, i), NUM_TRITS_HASH, NUM_TRITS_HASH);
       trytes_out[NUM_TRYTES_HASH] = '\0';
       if (trits_count != 0) {
-        cJSON_AddItemToArray(array_obj,
-                             cJSON_CreateString((const char*)trytes_out));
+        cJSON_AddItemToArray(array_obj, cJSON_CreateString((char const*)trytes_out));
       } else {
         return RC_CCLIENT_FLEX_TRITS;
       }
@@ -292,9 +288,7 @@ retcode_t hash243_stack_to_json_array(hash243_stack_t stack,
   return RC_OK;
 }
 
-retcode_t json_array_to_hash243_queue(cJSON const* const obj,
-                                      char const* const obj_name,
-                                      hash243_queue_t* queue) {
+retcode_t json_array_to_hash243_queue(cJSON const* const obj, char const* const obj_name, hash243_queue_t* queue) {
   retcode_t ret_code = RC_OK;
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
   cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
@@ -362,7 +356,7 @@ retcode_t hash81_queue_to_json_array(hash81_queue_t queue, cJSON* const json_roo
       size_t trits_count = flex_trits_to_trytes(trytes_out, NUM_TRYTES_TAG, q_iter->hash, NUM_TRITS_TAG, NUM_TRITS_TAG);
       trytes_out[NUM_TRYTES_TAG] = '\0';
       if (trits_count != 0) {
-        cJSON_AddItemToArray(array_obj, cJSON_CreateString((const char*)trytes_out));
+        cJSON_AddItemToArray(array_obj, cJSON_CreateString((char const*)trytes_out));
       } else {
         return RC_CCLIENT_FLEX_TRITS;
       }
@@ -403,7 +397,7 @@ retcode_t flex_trits_to_json_string(cJSON* const json_obj, char const* const key
   trytes_out[len_trytes] = '\0';
 
   if (trits_count != 0) {
-    cJSON_AddItemToObject(json_obj, key, cJSON_CreateString((const char*)trytes_out));
+    cJSON_AddItemToObject(json_obj, key, cJSON_CreateString((char const*)trytes_out));
   } else {
     return RC_CCLIENT_FLEX_TRITS;
   }
@@ -450,7 +444,7 @@ retcode_t hash8019_queue_to_json_array(hash8019_queue_t queue, cJSON* const json
                                          NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
       trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION] = '\0';
       if (trits_count != 0) {
-        cJSON_AddItemToArray(array_obj, cJSON_CreateString((const char*)trytes_out));
+        cJSON_AddItemToArray(array_obj, cJSON_CreateString((char const*)trytes_out));
       } else {
         return RC_CCLIENT_FLEX_TRITS;
       }
@@ -479,7 +473,7 @@ retcode_t hash8019_stack_to_json_array(hash8019_stack_t stack, cJSON* const json
                                          NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
       trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION] = '\0';
       if (trits_count != 0) {
-        cJSON_AddItemToArray(array_obj, cJSON_CreateString((const char*)trytes_out));
+        cJSON_AddItemToArray(array_obj, cJSON_CreateString((char const*)trytes_out));
       } else {
         return RC_CCLIENT_FLEX_TRITS;
       }
@@ -508,7 +502,7 @@ retcode_t hash8019_array_to_json_array(hash8019_array_p array, cJSON* const json
                                          NUM_TRITS_SERIALIZED_TRANSACTION, NUM_TRITS_SERIALIZED_TRANSACTION);
       trytes_out[NUM_TRYTES_SERIALIZED_TRANSACTION] = '\0';
       if (trits_count != 0) {
-        cJSON_AddItemToArray(array_obj, cJSON_CreateString((const char*)trytes_out));
+        cJSON_AddItemToArray(array_obj, cJSON_CreateString((char const*)trytes_out));
       } else {
         return RC_CCLIENT_FLEX_TRITS;
       }
