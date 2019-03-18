@@ -7,7 +7,7 @@
 
 #include <string.h>
 
-#include "common/curl-p/ptrit.h"
+#include "common/crypto/curl-p/ptrit.h"
 #include "common/trinary/trit_ptrit.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
 #include "consensus/transaction_solidifier/transaction_solidifier.h"

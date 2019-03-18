@@ -11,8 +11,8 @@ cc_test(
     name = "test_bundle",
     srcs = ["test_bundle.c"],
     deps = [
+        "//common/crypto/iss:normalize",
         "//common/model:bundle",
-        "//common/sign:normalize",
         "@unity",
     ],
 )

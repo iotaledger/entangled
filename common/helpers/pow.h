@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 
-#include "common/curl-p/trit.h"
+#include "common/crypto/curl-p/trit.h"
 #include "common/model/bundle.h"
 #include "common/trinary/flex_trit.h"
 #include "utils/export.h"

@@ -15,7 +15,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":milestone_tracker_shared",
-        "//common/sign/v1:iss_curl",
+        "//common/crypto/iss/v1:iss_curl",
         "//consensus/bundle_validator",
         "//consensus/ledger_validator",
         "//consensus/snapshot",

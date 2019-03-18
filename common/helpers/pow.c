@@ -10,7 +10,7 @@
 
 #include "utarray.h"
 
-#include "common/curl-p/hashcash.h"
+#include "common/crypto/curl-p/hashcash.h"
 #include "common/helpers/digest.h"
 #include "common/helpers/pow.h"
 #include "common/trinary/trit_tryte.h"

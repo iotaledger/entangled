@@ -12,6 +12,7 @@ cc_library(
         "@cJSON",
         "@com_github_uthash//:uthash",
     ],
+    alwayslink = True,
 )
 
 cc_library(

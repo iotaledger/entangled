@@ -7,8 +7,9 @@
 
 #include <stdbool.h>
 
+#include "common/crypto/iss/normalize.h"
 #include "common/model/transfer.h"
-#include "common/sign/normalize.h"
+#include "common/trinary/add.h"
 
 #define TRANSFER_LOGGER_ID "transfer"
 

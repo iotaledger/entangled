@@ -7,11 +7,11 @@
 
 #include <stdlib.h>
 
-#include "common/curl-p/trit.h"
-#include "common/kerl/kerl.h"
+#include "common/crypto/curl-p/trit.h"
+#include "common/crypto/iss/normalize.h"
+#include "common/crypto/iss/v1/iss_curl.h"
+#include "common/crypto/kerl/kerl.h"
 #include "common/model/bundle.h"
-#include "common/sign/normalize.h"
-#include "common/sign/v1/iss_curl.h"
 #include "common/trinary/trit_long.h"
 #include "common/trinary/tryte_ascii.h"
 #include "utils/merkle.h"

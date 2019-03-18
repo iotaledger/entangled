@@ -41,7 +41,7 @@ cc_library(
     name = "merkle",
     srcs = ["merkle.c"],
     hdrs = ["merkle.h"],
-    deps = ["//common/sign/v2:iss_curl"],
+    deps = ["//common/crypto/iss/v2:iss_curl"],
 )
 
 cc_library(
@@ -50,11 +50,11 @@ cc_library(
     hdrs = ["signed_files.h"],
     deps = [
         "//common:errors",
-        "//common/curl-p:trit",
-        "//common/kerl",
+        "//common/crypto/curl-p:trit",
+        "//common/crypto/iss:normalize",
+        "//common/crypto/iss/v1:iss_curl",
+        "//common/crypto/kerl",
         "//common/model:bundle",
-        "//common/sign:normalize",
-        "//common/sign/v1:iss_curl",
         "//common/trinary:trit_long",
         "//common/trinary:tryte_ascii",
         "//utils:merkle",
