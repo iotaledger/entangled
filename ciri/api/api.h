@@ -36,7 +36,6 @@ extern "C" {
  */
 typedef struct iota_api_s {
   iota_api_conf_t conf;
-  bool running;
   core_t *core;
 } iota_api_t;
 
@@ -50,24 +49,6 @@ typedef struct iota_api_s {
  * @return a status code
  */
 retcode_t iota_api_init(iota_api_t *const api, core_t *const core);
-
-/**
- * Starts an API
- *
- * @param api The API
- *
- * @return a status code
- */
-retcode_t iota_api_start(iota_api_t *const api);
-
-/**
- * Stops an API
- *
- * @param api The API
- *
- * @return a status code
- */
-retcode_t iota_api_stop(iota_api_t *const api);
 
 /**
  * Destroys an API

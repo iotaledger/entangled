@@ -472,42 +472,17 @@ retcode_t iota_api_init(iota_api_t *const api, core_t *const core) {
   }
 
   logger_id = logger_helper_enable(API_LOGGER_ID, LOGGER_DEBUG, true);
-  api->running = false;
   api->core = core;
 
   return RC_OK;
-}
-retcode_t iota_api_start(iota_api_t *const api) {
-  if (api == NULL) {
-    return RC_NULL_PARAM;
-  } else if (api->running == true) {
-    return RC_OK;
-  }
-
-  api->running = true;
-  return RC_OK;
-}
-
-retcode_t iota_api_stop(iota_api_t *const api) {
-  retcode_t ret = RC_OK;
-
-  if (api == NULL) {
-    return RC_NULL_PARAM;
-  } else if (api->running == false) {
-    return RC_OK;
-  }
-
-  api->running = false;
-  return ret;
 }
 
 retcode_t iota_api_destroy(iota_api_t *const api) {
   if (api == NULL) {
     return RC_NULL_PARAM;
-  } else if (api->running) {
-    return RC_STILL_RUNNING;
   }
 
   logger_helper_release(logger_id);
+
   return RC_OK;
 }

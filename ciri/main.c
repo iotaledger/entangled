@@ -30,11 +30,6 @@ static void signal_handler(int sig) {
       log_error(logger_id, "Stopping API HTTP failed\n");
     }
 
-    log_info(logger_id, "Stopping API\n");
-    if (iota_api_stop(&api) != RC_OK) {
-      log_error(logger_id, "Stopping API failed\n");
-    }
-
     log_info(logger_id, "Stopping cIRI core\n");
     if (core_stop(&ciri_core) != RC_OK) {
       log_error(logger_id, "Stopping cIRI core failed\n");
@@ -112,12 +107,6 @@ int main(int argc, char* argv[]) {
   if (core_start(&ciri_core, &tangle) != RC_OK) {
     log_critical(logger_id, "Starting cIRI core failed\n");
     return EXIT_FAILURE;
-  }
-
-  log_info(logger_id, "Starting API\n");
-  if (iota_api_start(&api) != RC_OK) {
-    log_critical(logger_id, "Starting API failed\n");
-    return RC_CORE_FAILED_API_START;
   }
 
   log_info(logger_id, "Starting API HTTP\n");
