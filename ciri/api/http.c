@@ -32,7 +32,7 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *http, const char
   retcode_t ret = RC_OK;
 
   if (!tangle) {
-    log_error(logger_id, "Instantiating new HTTP API database connection\n");
+    log_debug(logger_id, "Instantiating new HTTP API database connection\n");
 
     tangle = (tangle_t *)calloc(1, sizeof(tangle_t));
     utarray_push_back(http->db_connections, tangle);
