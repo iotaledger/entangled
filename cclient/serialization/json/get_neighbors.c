@@ -79,19 +79,8 @@ retcode_t json_get_neighbors_deserialize_response(serializer_t const *const s, c
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
 
-  log_info(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
-  if (json_obj == NULL) {
-    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
-    cJSON_Delete(json_obj);
-    return RC_CCLIENT_JSON_PARSE;
-  }
-
-  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
-  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(json_logger_id, "[%s:%d] %s %s\n", __func__, __LINE__, STR_CCLIENT_RES_ERROR, json_item->valuestring);
-    cJSON_Delete(json_obj);
-    return RC_CCLIENT_RES_ERROR;
-  }
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "neighbors");
   if (cJSON_IsArray(json_item)) {

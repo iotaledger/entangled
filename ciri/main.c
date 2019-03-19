@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ciri/api/api.h"
+#include "ciri/api/http.h"
 #include "ciri/core.h"
 #include "utils/handles/rand.h"
 #include "utils/handles/signal.h"
@@ -18,9 +20,16 @@
 
 static core_t ciri_core;
 static logger_id_t logger_id;
+static iota_api_t api;
+static iota_api_http_t http;
 
 static void signal_handler(int sig) {
   if (ciri_core.running && sig == SIGINT) {
+    log_info(logger_id, "Stopping API HTTP\n");
+    if (iota_api_http_stop(&http) != RC_OK) {
+      log_error(logger_id, "Stopping API HTTP failed\n");
+    }
+
     log_info(logger_id, "Stopping cIRI core\n");
     if (core_stop(&ciri_core) != RC_OK) {
       log_error(logger_id, "Stopping cIRI core failed\n");
@@ -32,7 +41,6 @@ int main(int argc, char* argv[]) {
   int ret = EXIT_SUCCESS;
   tangle_t tangle;
   connection_config_t db_conf;
-
   if (signal_handle_register(SIGINT, signal_handler) == SIG_ERR) {
     return EXIT_FAILURE;
   }
@@ -46,22 +54,20 @@ int main(int argc, char* argv[]) {
 
   // Default configuration
 
-  if (iota_ciri_conf_default(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &ciri_core.api.conf) !=
-      RC_OK) {
+  if (iota_ciri_conf_default(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf) != RC_OK) {
     return EXIT_FAILURE;
   }
 
   // File configuration
 
-  if (iota_ciri_conf_file(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &ciri_core.api.conf) !=
-      RC_OK) {
+  if (iota_ciri_conf_file(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf) != RC_OK) {
     return EXIT_FAILURE;
   }
 
   // CLI configuration
 
-  if (iota_ciri_conf_cli(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &ciri_core.api.conf, argc,
-                         argv) != RC_OK) {
+  if (iota_ciri_conf_cli(&ciri_core.conf, &ciri_core.consensus.conf, &ciri_core.node.conf, &api.conf, argc, argv) !=
+      RC_OK) {
     return EXIT_FAILURE;
   }
 
@@ -85,10 +91,28 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
+  log_info(logger_id, "Initializing API\n");
+  if (iota_api_init(&api, &ciri_core) != RC_OK) {
+    log_critical(logger_id, "Initializing API failed\n");
+    return RC_CORE_FAILED_API_INIT;
+  }
+
+  log_info(logger_id, "Initializing API HTTP\n");
+  if (iota_api_http_init(&http, &api, &db_conf) != RC_OK) {
+    log_critical(logger_id, "Initializing API HTTP failed\n");
+    return RC_CORE_FAILED_API_HTTP_INIT;
+  }
+
   log_info(logger_id, "Starting cIRI core\n");
   if (core_start(&ciri_core, &tangle) != RC_OK) {
     log_critical(logger_id, "Starting cIRI core failed\n");
     return EXIT_FAILURE;
+  }
+
+  log_info(logger_id, "Starting API HTTP\n");
+  if (iota_api_http_start(&http) != RC_OK) {
+    log_critical(logger_id, "Starting API HTTP failed\n");
+    return RC_CORE_FAILED_API_HTTP_START;
   }
 
   size_t count = 0;
@@ -103,6 +127,18 @@ int main(int argc, char* argv[]) {
              processor_size(&ciri_core.node.processor), broadcaster_size(&ciri_core.node.broadcaster),
              requester_size(&ciri_core.node.transaction_requester), responder_size(&ciri_core.node.responder), count);
     sleep(STATS_LOG_INTERVAL_S);
+  }
+
+  log_info(logger_id, "Destroying API HTTP\n");
+  if (iota_api_http_destroy(&http) != RC_OK) {
+    log_error(logger_id, "Destroying API HTTP failed\n");
+    ret = RC_CORE_FAILED_API_HTTP_DESTROY;
+  }
+
+  log_info(logger_id, "Destroying API\n");
+  if (iota_api_destroy(&api) != RC_OK) {
+    log_error(logger_id, "Destroying API failed\n");
+    ret = RC_CORE_FAILED_API_DESTROY;
   }
 
   log_info(logger_id, "Destroying cIRI core\n");
