@@ -14,8 +14,8 @@ extern "C" {
 
 #include <stdlib.h>
 #include <string.h>
+#include "common/crypto/kerl/kerl.h"
 #include "common/helpers/sign.h"
-#include "common/kerl/kerl.h"
 #include "common/model/transaction.h"
 #include "common/trinary/trit_long.h"
 #include "utils/logger_helper.h"

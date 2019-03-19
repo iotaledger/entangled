@@ -9,7 +9,7 @@
 #include <string.h>
 #include <unity/unity.h>
 
-#include "common/sign/v2/iss_curl.h"
+#include "common/crypto/iss/v2/iss_curl.h"
 #include "common/trinary/trit_tryte.h"
 #include "mam/prototype/mam.h"
 #include "utils/merkle.h"

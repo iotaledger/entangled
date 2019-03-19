@@ -10,8 +10,8 @@
 #ifndef __MAM_TROIKA_TROIKA_H__
 #define __MAM_TROIKA_TROIKA_H__
 
-#include "common/ftroika/ftroika.h"
-#include "common/troika/troika.h"
+#include "common/crypto/ftroika/ftroika.h"
+#include "common/crypto/troika/troika.h"
 #include "mam/defs.h"
 
 #define MAM_TROIKA_NUM_ROUNDS 24

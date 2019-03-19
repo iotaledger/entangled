@@ -8,7 +8,7 @@
 #ifndef __UTILS_MERKLE_H__
 #define __UTILS_MERKLE_H__
 
-#include "common/curl-p/trit.h"
+#include "common/crypto/curl-p/trit.h"
 
 #define NULL_SIBLING 1
 #define NULL_TREE 2

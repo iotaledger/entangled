@@ -17,9 +17,8 @@ static char *test_db_path = "ciri/api/tests/test.db";
 static char *ciri_db_path = "ciri/api/tests/ciri.db";
 static connection_config_t config;
 static iota_api_t api;
-static node_t node;
+static core_t core;
 static tangle_t tangle;
-static iota_consensus_t consensus;
 
 void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri_db_path) == RC_OK); }
 
@@ -148,7 +147,7 @@ void test_check_consistency_consistent_ledger(bool consistency) {
   for (size_t i = 0; i < 4; i++) {
     flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, hashes[i], HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
     TEST_ASSERT(iota_tangle_transaction_update_snapshot_index(
-                    &tangle, hash, api.consensus->milestone_tracker.latest_solid_subtangle_milestone_index - 5) ==
+                    &tangle, hash, api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index - 5) ==
                 RC_OK);
   }
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_1_OF_4_HASH, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
@@ -179,28 +178,28 @@ int main(void) {
   TEST_ASSERT(storage_init() == RC_OK);
 
   config.db_path = test_db_path;
-  api.node = &node;
-  api.consensus = &consensus;
+  api.core = &core;
 
-  TEST_ASSERT(iota_gossip_conf_init(&api.node->conf) == RC_OK);
-  TEST_ASSERT(iota_consensus_conf_init(&api.consensus->conf) == RC_OK);
-  TEST_ASSERT(requester_init(&api.node->transaction_requester, api.node) == RC_OK);
-  TEST_ASSERT(tips_cache_init(&api.node->tips, api.node->conf.tips_cache_size) == RC_OK);
+  TEST_ASSERT(iota_gossip_conf_init(&api.core->node.conf) == RC_OK);
+  TEST_ASSERT(iota_consensus_conf_init(&api.core->consensus.conf) == RC_OK);
+  TEST_ASSERT(requester_init(&api.core->node.transaction_requester, &api.core->node) == RC_OK);
+  TEST_ASSERT(tips_cache_init(&api.core->node.tips, api.core->node.conf.tips_cache_size) == RC_OK);
 
   setUp();
 
   // Avoid verifying snapshot signature
-  api.consensus->conf.snapshot_signature_file[0] = '\0';
+  api.core->consensus.conf.snapshot_signature_file[0] = '\0';
 
-  TEST_ASSERT(iota_consensus_init(api.consensus, &tangle, &api.node->transaction_requester, &api.node->tips) == RC_OK);
+  TEST_ASSERT(iota_consensus_init(&api.core->consensus, &tangle, &api.core->node.transaction_requester,
+                                  &api.core->node.tips) == RC_OK);
 
-  state_delta_destroy(&api.consensus->snapshot.state);
+  state_delta_destroy(&api.core->consensus.snapshot.state);
 
   tearDown();
 
   RUN_TEST(test_check_consistency_invalid_subtangle_status);
 
-  consensus.milestone_tracker.latest_solid_subtangle_milestone_index++;
+  api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index++;
 
   RUN_TEST(test_check_consistency_missing_tail);
   RUN_TEST(test_check_consistency_not_tail);
@@ -210,11 +209,11 @@ int main(void) {
 
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_2_OF_4_ADDRESS, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
-  state_delta_add(&api.consensus->snapshot.state, hash, 1545071560);
+  state_delta_add(&api.core->consensus.snapshot.state, hash, 1545071560);
 
   RUN_TEST(test_check_consistency_true);
 
-  TEST_ASSERT(iota_consensus_destroy(&consensus) == RC_OK);
+  TEST_ASSERT(iota_consensus_destroy(&api.core->consensus) == RC_OK);
 
   TEST_ASSERT(storage_destroy() == RC_OK);
   return UNITY_END();
