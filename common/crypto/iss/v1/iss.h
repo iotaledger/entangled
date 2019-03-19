@@ -28,6 +28,9 @@ int iss_signature(sponge_t *const sponge, trit_t *sig, trit_t const *const hash,
 int iss_sig_digest(sponge_t *const sponge, trit_t *const dig, trit_t const *const hash, trit_t *sig,
                    size_t const sig_len);
 
+int iss_merkle_root(sponge_t *const sponge, trit_t *const hash, trit_t const *const siblings,
+                    size_t const siblings_number, size_t const leaf_index);
+
 #ifdef __cplusplus
 }
 #endif
