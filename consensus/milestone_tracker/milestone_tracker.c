@@ -57,8 +57,9 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt, iota_milest
   return RC_OK;
 }
 
-static retcode_t validate_milestone(milestone_tracker_t* const mt, tangle_t* const tangle,
-                                    iota_milestone_t* const candidate, milestone_status_t* const milestone_status) {
+retcode_t iota_milestone_tracker_validate_milestone(milestone_tracker_t* const mt, tangle_t* const tangle,
+                                                    iota_milestone_t* const candidate,
+                                                    milestone_status_t* const milestone_status) {
   retcode_t ret = RC_OK;
   bundle_transactions_t* bundle = NULL;
   bool exists = false, valid = false;
@@ -68,8 +69,9 @@ static retcode_t validate_milestone(milestone_tracker_t* const mt, tangle_t* con
   if (candidate->index >= 0x200000) {
     *milestone_status = MILESTONE_INVALID;
     return ret;
-  } else if (candidate->index <= mt->latest_solid_subtangle_milestone_index ||
-             candidate->index == mt->latest_milestone_index) {
+  } else if ((candidate->index <= mt->latest_solid_subtangle_milestone_index &&
+              mt->latest_solid_subtangle_milestone_index != 0) ||
+             (candidate->index == mt->latest_milestone_index && mt->latest_milestone_index != 0)) {
     *milestone_status = MILESTONE_EXISTS;
     return ret;
   }
@@ -123,7 +125,7 @@ done:
   return ret;
 }
 
-static uint64_t get_milestone_index(iota_transaction_t* const tx) {
+uint64_t iota_milestone_tracker_get_milestone_index(iota_transaction_t* const tx) {
   trit_t buffer[NUM_TRITS_OBSOLETE_TAG];
 
   flex_trits_to_trits(buffer, NUM_TRITS_OBSOLETE_TAG, transaction_obsolete_tag(tx), NUM_TRITS_OBSOLETE_TAG,
@@ -161,8 +163,8 @@ static void* milestone_validator(void* arg) {
       if (iota_tangle_transaction_load_partial(&tangle, candidate.hash, &pack, PARTIAL_TX_MODEL_ESSENCE_CONSENSUS) ==
               RC_OK &&
           pack.num_loaded != 0) {
-        candidate.index = get_milestone_index(&tx);
-        if (validate_milestone(mt, &tangle, &candidate, &milestone_status) != RC_OK) {
+        candidate.index = iota_milestone_tracker_get_milestone_index(&tx);
+        if (iota_milestone_tracker_validate_milestone(mt, &tangle, &candidate, &milestone_status) != RC_OK) {
           log_warning(logger_id, "Validating milestone failed\n");
           continue;
         }

@@ -12,6 +12,7 @@
 
 #include "common/crypto/sponge/sponge.h"
 #include "common/errors.h"
+#include "common/model/transaction.h"
 #include "consensus/conf.h"
 #include "utils/containers/hash/hash243_queue.h"
 #include "utils/handles/rw_lock.h"
@@ -106,6 +107,12 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt);
  * @return a status code
  */
 retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt, flex_trit_t const* const hash);
+
+uint64_t iota_milestone_tracker_get_milestone_index(iota_transaction_t* const tx);
+
+retcode_t iota_milestone_tracker_validate_milestone(milestone_tracker_t* const mt, tangle_t* const tangle,
+                                                    iota_milestone_t* const candidate,
+                                                    milestone_status_t* const milestone_status);
 
 #ifdef __cplusplus
 }
