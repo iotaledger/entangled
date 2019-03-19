@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 
+#include "common/crypto/sponge/sponge.h"
 #include "common/errors.h"
 #include "consensus/conf.h"
 #include "utils/containers/hash/hash243_queue.h"
@@ -43,6 +44,7 @@ typedef struct milestone_tracker_s {
   transaction_solidifier_t* transaction_solidifier;
   hash243_queue_t candidates;
   rw_lock_handle_t candidates_lock;
+  sponge_type_t sponge_type;
   // bool accept_any_testnet_coo;
 } milestone_tracker_t;
 
@@ -58,7 +60,7 @@ typedef struct milestone_tracker_s {
  */
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consensus_conf_t* const conf,
                                       snapshot_t* const snapshot, ledger_validator_t* const lv,
-                                      transaction_solidifier_t* ts);
+                                      transaction_solidifier_t* ts, sponge_type_t const sponge_type);
 
 /**
  * Starts a milestone tracker

@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 #include "common/crypto/iss/normalize.h"
-#include "common/crypto/iss/v1/iss_curl.h"
+#include "common/crypto/iss/v1/iss.h"
 #include "common/model/milestone.h"
 #include "common/storage/sql/defs.h"
 #include "common/trinary/trit_array.h"
@@ -20,7 +20,6 @@
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
-#include "utils/merkle.h"
 #include "utils/time.h"
 
 #define MILESTONE_TRACKER_LOGGER_ID "milestone_tracker"
@@ -37,26 +36,24 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt, iota_milest
   trit_t sig_digest[HASH_LENGTH_TRIT];
   trit_t root[HASH_LENGTH_TRIT];
   flex_trit_t coo[FLEX_TRIT_SIZE_243];
-  Curl curl;
+  sponge_t sponge;
 
   *valid = false;
-
   flex_trits_to_trits(signature_trits, NUM_TRITS_SIGNATURE, transaction_signature(tx1), NUM_TRITS_SIGNATURE,
                       NUM_TRITS_SIGNATURE);
   flex_trits_to_trits(siblings_trits, NUM_TRITS_SIGNATURE, transaction_signature(tx2), NUM_TRITS_SIGNATURE,
                       NUM_TRITS_SIGNATURE);
-  curl.type = CURL_P_27;
-  init_curl(&curl);
+  sponge_init(&sponge, mt->sponge_type);
   normalize_flex_hash_to_trits(transaction_trunk(tx1), normalized_trunk_trits);
-  iss_curl_sig_digest(sig_digest, normalized_trunk_trits, signature_trits, NUM_TRITS_SIGNATURE, &curl);
-  curl_reset(&curl);
-  iss_curl_address(sig_digest, root, HASH_LENGTH_TRIT, &curl);
-  merkle_root(root, siblings_trits, mt->conf->num_keys_in_milestone, candidate->index, &curl);
+  iss_sig_digest(&sponge, sig_digest, normalized_trunk_trits, signature_trits, NUM_TRITS_SIGNATURE);
+  iss_address(&sponge, sig_digest, root, HASH_LENGTH_TRIT);
+  iss_merkle_root(&sponge, root, siblings_trits, mt->conf->num_keys_in_milestone, candidate->index);
   flex_trits_from_trits(coo, HASH_LENGTH_TRIT, root, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-
   if (memcmp(coo, mt->coordinator, FLEX_TRIT_SIZE_243) == 0) {
     *valid = true;
   }
+  sponge_destroy(&sponge);
+
   return RC_OK;
 }
 
@@ -288,7 +285,7 @@ static void* milestone_solidifier(void* arg) {
 
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consensus_conf_t* const conf,
                                       snapshot_t* const snapshot, ledger_validator_t* const lv,
-                                      transaction_solidifier_t* const ts) {
+                                      transaction_solidifier_t* const ts, sponge_type_t const sponge_type) {
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
   }
@@ -306,6 +303,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consen
   mt->milestone_start_index = conf->last_milestone;
   mt->latest_milestone_index = conf->last_milestone;
   mt->latest_solid_subtangle_milestone_index = conf->last_milestone;
+  mt->sponge_type = sponge_type;
 
   return RC_OK;
 }
