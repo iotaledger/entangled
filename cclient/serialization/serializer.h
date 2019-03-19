@@ -74,8 +74,8 @@ typedef struct {
                                                 char_buffer_t* out);
 
   retcode_t (*get_tips_serialize_request)(serializer_t const* const, char_buffer_t* out);
-  
-  retcode_t (*get_tips_serialize_response)(serializer_t const* const s, get_tips_res_t const* const res, 
+
+  retcode_t (*get_tips_serialize_response)(serializer_t const* const s, get_tips_res_t const* const res,
                                            char_buffer_t* out);
   retcode_t (*get_tips_deserialize_response)(serializer_t const* const, const char* const obj, get_tips_res_t* res);
 
