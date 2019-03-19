@@ -27,11 +27,14 @@ int main(int ac, char **av) {
   }
 
   // Loading or creating MAM API
-  if ((ret = mam_api_load(MAM_FILE, &api)) != RC_OK) {
+  if ((ret = mam_api_load(MAM_FILE, &api)) == RC_UTILS_FAILED_TO_OPEN_FILE) {
     if ((ret = mam_api_init(&api, (tryte_t *)av[3])) != RC_OK) {
       fprintf(stderr, "mam_api_init failed with err %d\n", ret);
       return EXIT_FAILURE;
     }
+  } else if (ret != RC_OK) {
+    fprintf(stderr, "mam_api_load failed with err %d\n", ret);
+    return EXIT_FAILURE;
   }
 
   receive_bundle(av[1], atoi(av[2]), (tryte_t *)av[3], bundle);

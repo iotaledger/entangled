@@ -12,8 +12,8 @@
 retcode_t json_get_tips_serialize_request(serializer_t const *const s,
                                           char_buffer_t *out) {
   retcode_t ret = RC_OK;
-  char const *req_text = "{\"command\":\"getTips\"}";
-  log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  const char *req_text = "{\"command\":\"getTips\"}";
+  log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   ret = char_buffer_allocate(out, strlen(req_text));
   if (ret == RC_OK) {
     strcpy(out->data, req_text);
@@ -56,20 +56,9 @@ retcode_t json_get_tips_deserialize_response(serializer_t const *const s,
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
-  log_info(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
-  if (json_obj == NULL) {
-    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
-    cJSON_Delete(json_obj);
-    return RC_CCLIENT_JSON_PARSE;
-  }
-
-  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
-  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(json_logger_id, "[%s:%d] %s %s\n", __func__, __LINE__, STR_CCLIENT_RES_ERROR, json_item->valuestring);
-    cJSON_Delete(json_obj);
-    return RC_CCLIENT_RES_ERROR;
-  }
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   ret = json_array_to_hash243_stack(json_obj, "hashes", &res->hashes);
 

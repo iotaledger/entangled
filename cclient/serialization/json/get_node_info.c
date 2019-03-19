@@ -9,99 +9,150 @@
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
-retcode_t json_get_node_info_serialize_request(const serializer_t *const s, char_buffer_t *out) {
+static char const *app_name = "appName";
+static char const *app_version = "appVersion";
+static char const *latest_milestone = "latestMilestone";
+static char const *latest_milestone_idx = "latestMilestoneIndex";
+static char const *latest_solid_subtangle_milestone = "latestSolidSubtangleMilestone";
+static char const *latest_solid_subtangle_milestone_idx = "latestSolidSubtangleMilestoneIndex";
+static char const *milestone_start_idx = "milestoneStartIndex";
+static char const *neighbors = "neighbors";
+static char const *packets_queue_size = "packetsQueueSize";
+static char const *time = "time";
+static char const *tips = "tips";
+static char const *transactions_to_request = "transactionsToRequest";
+static char const *coordinator_address = "coordinatorAddress";
+
+retcode_t json_get_node_info_serialize_request(serializer_t const *const s, char_buffer_t *out) {
   retcode_t ret = RC_OK;
-  const char *req_text = "{\"command\":\"getNodeInfo\"}";
-  log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
-  ret = char_buffer_allocate(out, strlen(req_text));
-  if (ret == RC_OK) {
-    strcpy(out->data, req_text);
-  }
+  char const *req_text = "{\"command\":\"getNodeInfo\"}";
+  log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  ret = char_buffer_set(out, req_text);
   return ret;
 }
 
-retcode_t json_get_node_info_deserialize_response(const serializer_t *const s, const char *const obj,
+retcode_t json_get_node_info_serialize_response(serializer_t const *const s, get_node_info_res_t const *const obj,
+                                                char_buffer_t *out) {
+  retcode_t ret = RC_OK;
+  char const *json_text = NULL;
+  log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+
+  cJSON *json_root = cJSON_CreateObject();
+  if (json_root == NULL) {
+    log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
+    return RC_CCLIENT_JSON_CREATE;
+  }
+
+  cJSON_AddStringToObject(json_root, app_name, get_node_info_res_app_name(obj));
+  cJSON_AddStringToObject(json_root, app_version, get_node_info_res_app_version(obj));
+
+  ret = flex_trits_to_json_string(json_root, latest_milestone, get_node_info_res_lm(obj), HASH_LENGTH_TRIT);
+  if (ret != RC_OK) {
+    goto done;
+  }
+
+  cJSON_AddNumberToObject(json_root, latest_milestone_idx, obj->latest_milestone_index);
+
+  ret = flex_trits_to_json_string(json_root, latest_solid_subtangle_milestone, get_node_info_res_lssm(obj),
+                                  HASH_LENGTH_TRIT);
+  if (ret != RC_OK) {
+    goto done;
+  }
+  cJSON_AddNumberToObject(json_root, latest_solid_subtangle_milestone_idx, obj->latest_solid_subtangle_milestone_index);
+
+  cJSON_AddNumberToObject(json_root, milestone_start_idx, obj->milestone_start_index);
+  cJSON_AddNumberToObject(json_root, neighbors, obj->neighbors);
+  cJSON_AddNumberToObject(json_root, packets_queue_size, obj->packets_queue_size);
+  cJSON_AddNumberToObject(json_root, time, obj->time);
+  cJSON_AddNumberToObject(json_root, tips, obj->tips);
+  cJSON_AddNumberToObject(json_root, transactions_to_request, obj->transactions_to_request);
+
+  ret = flex_trits_to_json_string(json_root, coordinator_address, obj->coordinator_address, HASH_LENGTH_TRIT);
+  if (ret != RC_OK) {
+    goto done;
+  }
+
+  json_text = cJSON_PrintUnformatted(json_root);
+  if (json_text) {
+    char_buffer_set(out, json_text);
+    cJSON_free((void *)json_text);
+  }
+
+done:
+  cJSON_Delete(json_root);
+  return ret;
+}
+
+retcode_t json_get_node_info_deserialize_response(serializer_t const *const s, char const *const obj,
                                                   get_node_info_res_t *out) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
-  log_info(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
 
-  if (json_obj == NULL) {
-    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
-    cJSON_Delete(json_obj);
-    return RC_CCLIENT_JSON_PARSE;
-  }
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
-  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
-  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(json_logger_id, "[%s:%d] %s %s\n", __func__, __LINE__, STR_CCLIENT_RES_ERROR, json_item->valuestring);
-    cJSON_Delete(json_obj);
-    return RC_CCLIENT_RES_ERROR;
-  }
-
-  ret = json_get_string(json_obj, "appName", out->app_name);
+  ret = json_get_string(json_obj, app_name, out->app_name);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_string(json_obj, "appVersion", out->app_version);
+  ret = json_get_string(json_obj, app_version, out->app_version);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_string_hash_to_flex_trits(json_obj, "latestMilestone", out->latest_milestone);
+  ret = json_string_hash_to_flex_trits(json_obj, latest_milestone, out->latest_milestone);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_uint32(json_obj, "latestMilestoneIndex", &out->latest_milestone_index);
+  ret = json_get_uint32(json_obj, latest_milestone_idx, &out->latest_milestone_index);
   if (ret != RC_OK) {
     goto end;
   }
 
   ret =
-      json_string_hash_to_flex_trits(json_obj, "latestSolidSubtangleMilestone", out->latest_solid_subtangle_milestone);
+      json_string_hash_to_flex_trits(json_obj, latest_solid_subtangle_milestone, out->latest_solid_subtangle_milestone);
+  if (ret != RC_OK) {
+    goto end;
+  }
+  ret = json_get_uint32(json_obj, latest_solid_subtangle_milestone_idx, &out->latest_solid_subtangle_milestone_index);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_uint32(json_obj, "latestSolidSubtangleMilestoneIndex", &out->latest_solid_subtangle_milestone_index);
+  ret = json_get_uint32(json_obj, milestone_start_idx, &out->milestone_start_index);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_uint32(json_obj, "milestoneStartIndex", &out->milestone_start_index);
+  ret = json_get_uint16(json_obj, neighbors, &out->neighbors);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_uint16(json_obj, "neighbors", &out->neighbors);
+  ret = json_get_uint16(json_obj, packets_queue_size, &out->packets_queue_size);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_uint16(json_obj, "packetsQueueSize", &out->packets_queue_size);
+  ret = json_get_uint64(json_obj, time, &out->time);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_uint64(json_obj, "time", &out->time);
+  ret = json_get_uint32(json_obj, tips, &out->tips);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_uint32(json_obj, "tips", &out->tips);
+  ret = json_get_uint32(json_obj, transactions_to_request, &out->transactions_to_request);
   if (ret != RC_OK) {
     goto end;
   }
 
-  ret = json_get_uint32(json_obj, "transactionsToRequest", &out->transactions_to_request);
-  if (ret != RC_OK) {
-    goto end;
-  }
-
-  ret = json_string_hash_to_flex_trits(json_obj, "coordinatorAddress", out->coordinator_address);
+  ret = json_string_hash_to_flex_trits(json_obj, coordinator_address, out->coordinator_address);
   if (ret != RC_OK) {
     goto end;
   }

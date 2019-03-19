@@ -349,7 +349,7 @@ static void test_api_generic() {
   TEST_ASSERT(e == RC_OK);
 }
 
-static void test_api_multiple_packets() {
+static void test_api_multiple_packets_run(mam_api_t *const param_api, size_t const num_packets) {
   bundle_transactions_t *bundle = NULL;
   trit_t msg_id[MAM_MSG_ID_SIZE];
   tryte_t *payload_in = (tryte_t *)
@@ -375,20 +375,19 @@ static void test_api_multiple_packets() {
   // write and read header
   {
     bundle_transactions_new(&bundle);
-    TEST_ASSERT(mam_api_bundle_write_header_on_channel(&api, ch_id, NULL, NULL, 0, bundle, msg_id) == RC_OK);
-    TEST_ASSERT(mam_api_bundle_read(&api, bundle, &payload_out, &payload_out_size, &is_last_packet) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_write_header_on_channel(param_api, ch_id, NULL, NULL, 0, bundle, msg_id) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_read(param_api, bundle, &payload_out, &payload_out_size, &is_last_packet) == RC_OK);
     TEST_ASSERT(payload_out == NULL);
     TEST_ASSERT(payload_out_size == 0);
     bundle_transactions_free(&bundle);
   }
 
   // write and read packets
-  const size_t num_packets = 36;
   for (size_t i = 0; i < num_packets; i++) {
     bundle_transactions_new(&bundle);
-    TEST_ASSERT(mam_api_bundle_write_packet(&api, msg_id, payload_in, payload_in_size, (mam_msg_checksum_t)(i % 3),
+    TEST_ASSERT(mam_api_bundle_write_packet(param_api, msg_id, payload_in, payload_in_size, (mam_msg_checksum_t)(i % 3),
                                             i == (num_packets - 1) ? true : false, bundle) == RC_OK);
-    TEST_ASSERT(mam_api_bundle_read(&api, bundle, &payload_out, &payload_out_size, &is_last_packet) == RC_OK);
+    TEST_ASSERT(mam_api_bundle_read(param_api, bundle, &payload_out, &payload_out_size, &is_last_packet) == RC_OK);
     if (i < num_packets - 1) {
       TEST_ASSERT(!is_last_packet);
     } else {
@@ -402,6 +401,8 @@ static void test_api_multiple_packets() {
     bundle_transactions_free(&bundle);
   }
 }
+
+static void test_api_multiple_packets() { test_api_multiple_packets_run(&api, 36); }
 
 static void test_api_serialization() {
   mam_api_t deserialized_api;
@@ -422,6 +423,8 @@ static void test_api_serialization() {
   TEST_ASSERT_TRUE(mam_channel_t_set_cmp_test(deserialized_api.channels, api.channels));
   TEST_ASSERT_EQUAL_INT(deserialized_api.channel_ord, api.channel_ord);
 
+  test_api_multiple_packets_run(&deserialized_api, 2);
+
   mam_api_destroy(&deserialized_api);
 }
 
@@ -439,6 +442,8 @@ static void test_api_save_load() {
   TEST_ASSERT_TRUE(trit_t_to_mam_msg_read_context_t_map_cmp(&loaded_api.read_ctxs, &api.read_ctxs));
   TEST_ASSERT_TRUE(mam_channel_t_set_cmp_test(loaded_api.channels, api.channels));
   TEST_ASSERT_EQUAL_INT(loaded_api.channel_ord, api.channel_ord);
+
+  test_api_multiple_packets_run(&loaded_api, 2);
 
   mam_api_destroy(&loaded_api);
 }

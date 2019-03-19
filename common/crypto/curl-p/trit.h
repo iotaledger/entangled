@@ -5,8 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef __COMMON_CURL_P_TRIT_H_
-#define __COMMON_CURL_P_TRIT_H_
+#ifndef __COMMON_CRYPTO_CURL_P_TRIT_H__
+#define __COMMON_CRYPTO_CURL_P_TRIT_H__
 
 #include <string.h>
 
@@ -31,4 +31,4 @@ void curl_reset(Curl* const ctx);
 }
 #endif
 
-#endif  // __COMMON_CURL_P_TRIT_H_
+#endif  // __COMMON_CRYPTO_CURL_P_TRIT_H__
