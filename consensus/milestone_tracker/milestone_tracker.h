@@ -28,6 +28,13 @@ typedef struct _trit_array* trit_array_p;
 typedef struct ledger_validator_s ledger_validator_t;
 typedef struct transaction_solidifier_s transaction_solidifier_t;
 
+typedef enum milestone_status_e {
+  MILESTONE_VALID,
+  MILESTONE_INVALID,
+  MILESTONE_EXISTS,
+  MILESTONE_INCOMPLETE,
+} milestone_status_t;
+
 typedef struct milestone_tracker_s {
   bool running;
   iota_consensus_conf_t* conf;

@@ -57,13 +57,6 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt, iota_milest
   return RC_OK;
 }
 
-typedef enum milestone_status_e {
-  MILESTONE_VALID,
-  MILESTONE_INVALID,
-  MILESTONE_EXISTS,
-  MILESTONE_INCOMPLETE,
-} milestone_status_t;
-
 static retcode_t validate_milestone(milestone_tracker_t* const mt, tangle_t* const tangle,
                                     iota_milestone_t* const candidate, milestone_status_t* const milestone_status) {
   retcode_t ret = RC_OK;
