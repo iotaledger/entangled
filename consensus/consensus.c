@@ -69,7 +69,7 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
   log_info(logger_id, "Initializing milestone tracker\n");
   if ((ret = iota_milestone_tracker_init(&consensus->milestone_tracker, &consensus->conf, &consensus->snapshot,
                                          &consensus->ledger_validator, &consensus->transaction_solidifier,
-                                         SPONGE_CURLP27)) != RC_OK) {
+                                         SPONGE_CURLP27, 1)) != RC_OK) {
     log_critical(logger_id, "Initializing milestone tracker failed\n");
     return ret;
   }

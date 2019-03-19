@@ -10,7 +10,6 @@
 
 #include "common/crypto/iss/normalize.h"
 #include "common/crypto/iss/v1/iss.h"
-#include "common/model/milestone.h"
 #include "common/storage/sql/defs.h"
 #include "common/trinary/trit_array.h"
 #include "common/trinary/trit_long.h"

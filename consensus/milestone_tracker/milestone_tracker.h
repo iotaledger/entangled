@@ -12,6 +12,7 @@
 
 #include "common/crypto/sponge/sponge.h"
 #include "common/errors.h"
+#include "common/model/milestone.h"
 #include "common/model/transaction.h"
 #include "consensus/conf.h"
 #include "utils/containers/hash/hash243_queue.h"
