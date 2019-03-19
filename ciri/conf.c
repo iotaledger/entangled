@@ -131,7 +131,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       api_conf->max_get_trytes = atoi(value);
       break;
     case 'p':  // --port
-      api_conf->port = atoi(value);
+      // api_conf->port = atoi(value);
       break;
 
     // Consensus configuration

@@ -7,9 +7,6 @@
 
 #include <string.h>
 
-#include "cclient/request/requests.h"
-#include "cclient/response/responses.h"
-#include "cclient/serialization/json/json_serializer.h"
 #include "ciri/api/api.h"
 #include "gossip/node.h"
 #include "utils/logger_helper.h"
@@ -24,8 +21,8 @@ static logger_id_t logger_id;
  */
 
 static bool invalid_subtangle_status(iota_api_t const *const api) {
-  return (api->consensus->milestone_tracker.latest_solid_subtangle_milestone_index ==
-          api->consensus->milestone_tracker.milestone_start_index);
+  return (api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index ==
+          api->core->consensus.milestone_tracker.milestone_start_index);
 }
 
 typedef enum iota_api_command_e {
@@ -88,21 +85,21 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_
 
   char_buffer_set(res->app_name, CIRI_NAME);
   char_buffer_set(res->app_version, CIRI_VERSION);
-  memcpy(res->latest_milestone, api->consensus->milestone_tracker.latest_milestone, FLEX_TRIT_SIZE_243);
-  res->latest_milestone_index = api->consensus->milestone_tracker.latest_milestone_index;
-  memcpy(res->latest_solid_subtangle_milestone, api->consensus->milestone_tracker.latest_solid_subtangle_milestone,
+  memcpy(res->latest_milestone, api->core->consensus.milestone_tracker.latest_milestone, FLEX_TRIT_SIZE_243);
+  res->latest_milestone_index = api->core->consensus.milestone_tracker.latest_milestone_index;
+  memcpy(res->latest_solid_subtangle_milestone, api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone,
          FLEX_TRIT_SIZE_243);
   res->latest_solid_subtangle_milestone_index =
-      api->consensus->milestone_tracker.latest_solid_subtangle_milestone_index;
-  res->milestone_start_index = api->consensus->milestone_tracker.milestone_start_index;
-  rw_lock_handle_rdlock(&api->node->neighbors_lock);
-  res->neighbors = neighbors_count(api->node->neighbors);
-  rw_lock_handle_unlock(&api->node->neighbors_lock);
-  res->packets_queue_size = broadcaster_size(&api->node->broadcaster);
+      api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
+  res->milestone_start_index = api->core->consensus.milestone_tracker.milestone_start_index;
+  rw_lock_handle_rdlock(&api->core->node.neighbors_lock);
+  res->neighbors = neighbors_count(api->core->node.neighbors);
+  rw_lock_handle_unlock(&api->core->node.neighbors_lock);
+  res->packets_queue_size = broadcaster_size(&api->core->node.broadcaster);
   res->time = current_timestamp_ms();
-  res->tips = tips_cache_size(&api->node->tips);
-  res->transactions_to_request = requester_size(&api->node->transaction_requester);
-  memcpy(res->coordinator_address, api->consensus->milestone_tracker.coordinator, FLEX_TRIT_SIZE_243);
+  res->tips = tips_cache_size(&api->core->node.tips);
+  res->transactions_to_request = requester_size(&api->core->node.transaction_requester);
+  memcpy(res->coordinator_address, api->core->consensus.milestone_tracker.coordinator, FLEX_TRIT_SIZE_243);
 
   return RC_OK;
 }
@@ -131,13 +128,13 @@ retcode_t iota_api_add_neighbors(iota_api_t const *const api, add_neighbors_req_
       return ret;
     }
     log_info(logger_id, "Adding neighbor %s\n", *uri);
-    rw_lock_handle_wrlock(&api->node->neighbors_lock);
-    if (neighbors_add(&api->node->neighbors, &neighbor) == RC_OK) {
+    rw_lock_handle_wrlock(&api->core->node.neighbors_lock);
+    if (neighbors_add(&api->core->node.neighbors, &neighbor) == RC_OK) {
       res->added_neighbors++;
     } else {
       log_warning(logger_id, "Adding neighbor %s failed\n", *uri);
     }
-    rw_lock_handle_unlock(&api->node->neighbors_lock);
+    rw_lock_handle_unlock(&api->core->node.neighbors_lock);
   }
 
   return ret;
@@ -159,13 +156,13 @@ retcode_t iota_api_remove_neighbors(iota_api_t const *const api, remove_neighbor
       return ret;
     }
     log_info(logger_id, "Removing neighbor %s\n", *uri);
-    rw_lock_handle_wrlock(&api->node->neighbors_lock);
-    if (neighbors_remove(&api->node->neighbors, &neighbor) == RC_OK) {
+    rw_lock_handle_wrlock(&api->core->node.neighbors_lock);
+    if (neighbors_remove(&api->core->node.neighbors, &neighbor) == RC_OK) {
       res->removed_neighbors++;
     } else {
       log_warning(logger_id, "Removing neighbor %s failed\n", *uri);
     }
-    rw_lock_handle_unlock(&api->node->neighbors_lock);
+    rw_lock_handle_unlock(&api->core->node.neighbors_lock);
   }
 
   return ret;
@@ -181,7 +178,7 @@ retcode_t iota_api_get_tips(iota_api_t const *const api, get_tips_res_t *const r
     return RC_NULL_PARAM;
   }
 
-  if ((ret = tips_cache_get_tips(&api->node->tips, &tips)) != RC_OK) {
+  if ((ret = tips_cache_get_tips(&api->core->node.tips, &tips)) != RC_OK) {
     goto done;
   }
 
@@ -296,7 +293,7 @@ retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tang
     return RC_NULL_PARAM;
   }
 
-  if (req->depth > api->consensus->conf.max_depth) {
+  if (req->depth > api->core->consensus.conf.max_depth) {
     return RC_API_INVALID_DEPTH_INPUT;
   }
 
@@ -304,8 +301,8 @@ retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tang
     return RC_API_INVALID_SUBTANGLE_STATUS;
   }
 
-  if ((ret = iota_consensus_tip_selector_get_transactions_to_approve(&api->consensus->tip_selector, tangle, req->depth,
-                                                                     req->reference, &tips)) != RC_OK) {
+  if ((ret = iota_consensus_tip_selector_get_transactions_to_approve(&api->core->consensus.tip_selector, tangle,
+                                                                     req->depth, req->reference, &tips)) != RC_OK) {
     return ret;
   }
 
@@ -347,11 +344,11 @@ retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast
 
   HASH_ARRAY_FOREACH(req->trytes, elt) {
     transaction_deserialize_from_trits(&tx, elt, true);
-    if (!iota_consensus_transaction_validate(&api->consensus->transaction_validator, &tx)) {
+    if (!iota_consensus_transaction_validate(&api->core->consensus.transaction_validator, &tx)) {
       continue;
     }
     // TODO priority queue on weight_magnitude
-    if ((ret = broadcaster_on_next(&api->node->broadcaster, elt)) != RC_OK) {
+    if ((ret = broadcaster_on_next(&api->core->node.broadcaster, elt)) != RC_OK) {
       return ret;
     }
   }
@@ -372,7 +369,7 @@ retcode_t iota_api_store_transactions(iota_api_t const *const api, tangle_t *con
 
   HASH_ARRAY_FOREACH(req->trytes, elt) {
     transaction_deserialize_from_trits(&tx, elt, true);
-    if (!iota_consensus_transaction_validate(&api->consensus->transaction_validator, &tx)) {
+    if (!iota_consensus_transaction_validate(&api->core->consensus.transaction_validator, &tx)) {
       continue;
     }
     if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, transaction_hash(&tx), &exists)) !=
@@ -386,7 +383,7 @@ retcode_t iota_api_store_transactions(iota_api_t const *const api, tangle_t *con
     if ((ret = iota_tangle_transaction_store(tangle, &tx)) != RC_OK) {
       return ret;
     }
-    if ((ret = iota_consensus_transaction_solidifier_update_status(&api->consensus->transaction_solidifier, tangle,
+    if ((ret = iota_consensus_transaction_solidifier_update_status(&api->core->consensus.transaction_solidifier, tangle,
                                                                    &tx)) != RC_OK) {
       log_warning(logger_id, "Updating transaction status failed\n");
       return ret;
@@ -446,10 +443,10 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *cons
     }
   }
 
-  rw_lock_handle_rdlock(&api->consensus->milestone_tracker.latest_snapshot->rw_lock);
+  rw_lock_handle_rdlock(&api->core->consensus.milestone_tracker.latest_snapshot->rw_lock);
 
   if ((ret = iota_consensus_exit_prob_transaction_validator_init(
-           &api->consensus->conf, &api->consensus->milestone_tracker, &api->consensus->ledger_validator,
+           &api->core->consensus.conf, &api->core->consensus.milestone_tracker, &api->core->consensus.ledger_validator,
            &walker_validator)) == RC_OK) {
     CDL_FOREACH(req->tails, iter) {
       if ((ret = iota_consensus_exit_prob_transaction_validator_is_valid(&walker_validator, tangle, iter->hash,
@@ -464,59 +461,28 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *cons
 
   iota_consensus_exit_prob_transaction_validator_destroy(&walker_validator);
 
-  rw_lock_handle_unlock(&api->consensus->milestone_tracker.latest_snapshot->rw_lock);
+  rw_lock_handle_unlock(&api->core->consensus.milestone_tracker.latest_snapshot->rw_lock);
 
   return ret;
 }
 
-retcode_t iota_api_init(iota_api_t *const api, node_t *const node, iota_consensus_t *const consensus,
-                        serializer_type_t const serializer_type) {
+retcode_t iota_api_init(iota_api_t *const api, core_t *const core) {
   if (api == NULL) {
     return RC_NULL_PARAM;
   }
 
   logger_id = logger_helper_enable(API_LOGGER_ID, LOGGER_DEBUG, true);
-  api->running = false;
-  api->node = node;
-  api->consensus = consensus;
-  api->serializer_type = serializer_type;
-  if (api->serializer_type == SR_JSON) {
-    init_json_serializer(&api->serializer);
-  } else {
-    return RC_API_SERIALIZER_NOT_IMPLEMENTED;
-  }
+  api->core = core;
+
   return RC_OK;
-}
-
-retcode_t iota_api_start(iota_api_t *const api) {
-  if (api == NULL) {
-    return RC_NULL_PARAM;
-  }
-
-  api->running = true;
-  return RC_OK;
-}
-
-retcode_t iota_api_stop(iota_api_t *const api) {
-  retcode_t ret = RC_OK;
-
-  if (api == NULL) {
-    return RC_NULL_PARAM;
-  } else if (api->running == false) {
-    return RC_OK;
-  }
-
-  api->running = false;
-  return ret;
 }
 
 retcode_t iota_api_destroy(iota_api_t *const api) {
   if (api == NULL) {
     return RC_NULL_PARAM;
-  } else if (api->running) {
-    return RC_STILL_RUNNING;
   }
 
   logger_helper_release(logger_id);
+
   return RC_OK;
 }

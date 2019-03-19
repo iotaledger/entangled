@@ -14,7 +14,7 @@ retcode_t json_find_transactions_serialize_request(serializer_t const *const s,
   retcode_t ret = RC_OK;
   const char *json_text = NULL;
   size_t len = 0;
-  log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+  log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
@@ -64,23 +64,12 @@ err:
 
 retcode_t json_find_transactions_deserialize_response(serializer_t const *const s, char const *const obj,
                                                       find_transactions_res_t *out) {
-  log_info(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
 
-  if (json_obj == NULL) {
-    log_error(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
-    cJSON_Delete(json_obj);
-    return RC_CCLIENT_JSON_PARSE;
-  }
-
-  json_item = cJSON_GetObjectItemCaseSensitive(json_obj, "error");
-  if (cJSON_IsString(json_item) && (json_item->valuestring != NULL)) {
-    log_error(json_logger_id, "[%s:%d] %s %s\n", __func__, __LINE__, STR_CCLIENT_RES_ERROR, json_item->valuestring);
-    cJSON_Delete(json_obj);
-    return RC_CCLIENT_RES_ERROR;
-  }
+  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
+  JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
   ret = json_array_to_hash243_queue(json_obj, "hashes", &out->hashes);
 

@@ -23,8 +23,6 @@ extern "C" {
 // This structure contains all configuration variables needed to operate the
 // IOTA API
 typedef struct iota_api_conf_s {
-  // HTTP API listen port
-  uint16_t port;
   // The maximal number of transactions that may be returned by the
   // 'findTransactions' API call. If the number of transactions found exceeds
   // this number an error will be returned

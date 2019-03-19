@@ -14,7 +14,8 @@ retcode_t json_store_transactions_serialize_request(const serializer_t *const s,
   retcode_t ret = RC_OK;
   const char *json_text = NULL;
   size_t len = 0;
-  log_info(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
+
+  log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON *json_root = cJSON_CreateObject();
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
