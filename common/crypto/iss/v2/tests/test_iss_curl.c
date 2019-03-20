@@ -124,7 +124,7 @@ void test_iss() {
 
   Curl curl;
   curl.type = CURL_P_81;
-  init_curl(&curl);
+  curl_init(&curl);
 
   test_subseed(seed, subseed, index, &curl);
   test_key(subseed, key, key_length, &curl);

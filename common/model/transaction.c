@@ -103,7 +103,7 @@ size_t transaction_deserialize_trits(iota_transaction_t *const transaction, flex
 
   if (compute_hash) {
     Curl curl;
-    init_curl(&curl);
+    curl_init(&curl);
     curl.type = CURL_P_81;
     trit_t tx_trits[NUM_TRITS_SERIALIZED_TRANSACTION];
     trit_t hash[NUM_TRITS_HASH];

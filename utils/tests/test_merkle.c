@@ -30,7 +30,7 @@ void test_merkle(void) {
   trit_t hash[HASH_LENGTH_TRIT];
   Curl c;
   c.type = CURL_P_27;
-  init_curl(&c);
+  curl_init(&c);
 
   TEST_ASSERT_EQUAL_INT(expected_merkle_size, size);
   TEST_ASSERT_EQUAL_INT(expected_tree_depth, depth);

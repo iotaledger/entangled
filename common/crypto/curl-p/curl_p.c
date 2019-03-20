@@ -31,7 +31,7 @@ static void transform(Curl *const ctx) {
   if (round & 1) memcpy(ctx->state, s.state, sizeof(ctx->state));
 }
 
-void init_curl(Curl *const ctx) { memset(ctx->state, 0, sizeof(ctx->state)); }
+void curl_init(Curl *const ctx) { memset(ctx->state, 0, sizeof(ctx->state)); }
 
 void curl_absorb(Curl *const ctx, trit_t const *const trits, size_t length) {
   size_t num_chunks = length / HASH_LENGTH_TRIT + ((length % HASH_LENGTH_TRIT) ? 1 : 0);

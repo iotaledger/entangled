@@ -24,7 +24,7 @@ retcode_t sponge_init(sponge_t* const sponge, sponge_type_t const type) {
     sponge->absorb = (sponge_absorb_t)curl_absorb;
     sponge->squeeze = (sponge_squeeze_t)curl_squeeze;
     sponge->reset = (sponge_reset_t)curl_reset;
-    init_curl((Curl*)sponge->state);
+    curl_init((Curl*)sponge->state);
   } else if (type == SPONGE_CURLP81) {
     if ((sponge->state = malloc(sizeof(Curl))) == NULL) {
       return RC_OOM;
@@ -33,7 +33,7 @@ retcode_t sponge_init(sponge_t* const sponge, sponge_type_t const type) {
     sponge->absorb = (sponge_absorb_t)curl_absorb;
     sponge->squeeze = (sponge_squeeze_t)curl_squeeze;
     sponge->reset = (sponge_reset_t)curl_reset;
-    init_curl((Curl*)sponge->state);
+    curl_init((Curl*)sponge->state);
   } else if (type == SPONGE_KERL) {
     if ((sponge->state = malloc(sizeof(Kerl))) == NULL) {
       return RC_OOM;
