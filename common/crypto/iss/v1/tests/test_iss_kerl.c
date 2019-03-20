@@ -99,7 +99,7 @@ void test_iss() {
   int64_t index = 0;
 
   Kerl kerl;
-  init_kerl(&kerl);
+  kerl_init(&kerl);
 
   test_subseed(seed, subseed, index, &kerl);
   test_key(subseed, key, key_length, &kerl);

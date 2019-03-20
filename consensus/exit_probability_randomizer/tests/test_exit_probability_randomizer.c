@@ -82,7 +82,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
   strcpy(conf.snapshot_signature_file, "");
   TEST_ASSERT(iota_snapshot_init(&snapshot, &conf) == RC_OK);
   TEST_ASSERT(iota_consensus_transaction_solidifier_init(&ts, &conf, NULL, NULL) == RC_OK);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshot, &lv, &ts) == RC_OK);
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, &snapshot, &lv, &ts, SPONGE_CURLP27, 1) == RC_OK);
   TEST_ASSERT(iota_consensus_ledger_validator_init(&lv, &tangle, &conf, &mt) == RC_OK);
 
   // We want to avoid unnecessary validation

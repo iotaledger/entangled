@@ -18,7 +18,7 @@
 #define HASH_INT_LEN (HASH_BYTE_LEN / 4)
 #define SUFFIX 0x01
 
-void init_kerl(Kerl* const ctx) {
+void kerl_init(Kerl* const ctx) {
   uint8_t succ = Keccak_HashInitialize(&ctx->keccak, 832, 768, 384, 0x01) == SUCCESS;
   assert(succ);
   (void)succ;
@@ -55,13 +55,13 @@ void kerl_squeeze(Kerl* const ctx, trit_t* trits, size_t const length) {
       ptr[i] = ptr[i] ^ 0xFFFFFFFF;
     }
 
-    init_kerl(ctx);
+    kerl_init(ctx);
     Keccak_HashUpdate(&ctx->keccak, bytes, HASH_BIT_LEN);
     trits = &trits[HASH_LENGTH_TRIT];
   }
 }
 
-void kerl_reset(Kerl* ctx) { init_kerl(ctx); }
+void kerl_reset(Kerl* ctx) { kerl_init(ctx); }
 
 #undef SUFFIX
 #undef HASH_BIT_LEN

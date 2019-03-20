@@ -58,9 +58,9 @@ retcode_t send_bundle(char const *const host, uint16_t const port, bundle_transa
   iota_client_extended_init();
 
   Kerl kerl;
-  init_kerl(&kerl);
+  kerl_init(&kerl);
   bundle_finalize(bundle, &kerl);
-  transaction_array_t out_tx_objs = transaction_array_new();
+  transaction_array_t *out_tx_objs = transaction_array_new();
   hash8019_array_p raw_trytes = hash8019_array_new();
   iota_transaction_t *curr_tx = NULL;
   flex_trit_t trits_8019[FLEX_TRIT_SIZE_8019];
@@ -95,7 +95,7 @@ static int idx_sort(void const *lhs, void const *rhs) {
              : (transaction_current_index(_lhs) > transaction_current_index(_rhs));
 }
 
-static void get_first_bundle_from_transactions(transaction_array_t const transactions,
+static void get_first_bundle_from_transactions(transaction_array_t *const transactions,
                                                bundle_transactions_t *const bundle) {
   iota_transaction_t *tail = NULL;
   iota_transaction_t *curr_tx = NULL;
@@ -129,10 +129,10 @@ static void recv_example_init_client_service(iota_client_service_t *const serv, 
   iota_client_core_init(serv);
 }
 
-static transaction_array_t get_bundle_transactions(iota_client_service_t *const serv,
-                                                   flex_trit_t const *const bundle_hash) {
+static transaction_array_t *get_bundle_transactions(iota_client_service_t *const serv,
+                                                    flex_trit_t const *const bundle_hash) {
   flex_trit_t bundle_hash_flex[FLEX_TRIT_SIZE_243];
-  transaction_array_t out_tx_objs = transaction_array_new();
+  transaction_array_t *out_tx_objs = transaction_array_new();
   recv_example_req.approvees = NULL;
   recv_example_req.bundles = NULL;
   recv_example_req.tags = NULL;
@@ -157,7 +157,7 @@ retcode_t receive_bundle(char const *const host, uint16_t const port, tryte_t co
   recv_example_init_client_service(&serv, host, port);
   iota_client_extended_init();
 
-  transaction_array_t out_tx_objs = get_bundle_transactions(&serv, bundle_hash);
+  transaction_array_t *out_tx_objs = get_bundle_transactions(&serv, bundle_hash);
 
   get_first_bundle_from_transactions(out_tx_objs, bundle);
 

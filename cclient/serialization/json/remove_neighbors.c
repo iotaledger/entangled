@@ -49,7 +49,6 @@ retcode_t json_remove_neighbors_deserialize_request(serializer_t const *const s,
 
   ret = json_string_array_to_utarray(json_obj, "uris", req->uris);
 
-end:
   cJSON_Delete(json_obj);
   return ret;
 }

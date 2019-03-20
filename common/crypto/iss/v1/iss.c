@@ -118,3 +118,23 @@ int iss_sig_digest(sponge_t *const sponge, trit_t *const dig, trit_t const *cons
 
   return 0;
 }
+
+int iss_merkle_root(sponge_t *const sponge, trit_t *const hash, trit_t const *const siblings,
+                    size_t const siblings_number, size_t const leaf_index) {
+  for (size_t i = 0, j = 1; i < siblings_number; i++, j <<= 1) {
+    // if index is a right node, absorb a sibling (left) then the hash
+    if (leaf_index & j) {
+      sponge_absorb(sponge, &siblings[i * HASH_LENGTH_TRIT], HASH_LENGTH_TRIT);
+      sponge_absorb(sponge, hash, HASH_LENGTH_TRIT);
+    }
+    // if index is a left node, absorb the hash then a sibling (right)
+    else {
+      sponge_absorb(sponge, hash, HASH_LENGTH_TRIT);
+      sponge_absorb(sponge, &siblings[i * HASH_LENGTH_TRIT], HASH_LENGTH_TRIT);
+    }
+    sponge_squeeze(sponge, hash, HASH_LENGTH_TRIT);
+    sponge_reset(sponge);
+  }
+
+  return 0;
+}

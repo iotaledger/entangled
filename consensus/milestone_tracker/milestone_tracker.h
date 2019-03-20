@@ -10,7 +10,10 @@
 
 #include <stdbool.h>
 
+#include "common/crypto/sponge/sponge.h"
 #include "common/errors.h"
+#include "common/model/milestone.h"
+#include "common/model/transaction.h"
 #include "consensus/conf.h"
 #include "utils/containers/hash/hash243_queue.h"
 #include "utils/handles/rw_lock.h"
@@ -26,6 +29,13 @@ typedef struct snapshot_s snapshot_t;
 typedef struct _trit_array* trit_array_p;
 typedef struct ledger_validator_s ledger_validator_t;
 typedef struct transaction_solidifier_s transaction_solidifier_t;
+
+typedef enum milestone_status_e {
+  MILESTONE_VALID,
+  MILESTONE_INVALID,
+  MILESTONE_EXISTS,
+  MILESTONE_INCOMPLETE,
+} milestone_status_t;
 
 typedef struct milestone_tracker_s {
   bool running;
@@ -43,6 +53,8 @@ typedef struct milestone_tracker_s {
   transaction_solidifier_t* transaction_solidifier;
   hash243_queue_t candidates;
   rw_lock_handle_t candidates_lock;
+  sponge_type_t sponge_type;
+  uint8_t security_level;
   // bool accept_any_testnet_coo;
 } milestone_tracker_t;
 
@@ -58,7 +70,8 @@ typedef struct milestone_tracker_s {
  */
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consensus_conf_t* const conf,
                                       snapshot_t* const snapshot, ledger_validator_t* const lv,
-                                      transaction_solidifier_t* ts);
+                                      transaction_solidifier_t* ts, sponge_type_t const sponge_type,
+                                      uint8_t const security_level);
 
 /**
  * Starts a milestone tracker
@@ -97,6 +110,12 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt);
  * @return a status code
  */
 retcode_t iota_milestone_tracker_add_candidate(milestone_tracker_t* const mt, flex_trit_t const* const hash);
+
+uint64_t iota_milestone_tracker_get_milestone_index(iota_transaction_t* const tx);
+
+retcode_t iota_milestone_tracker_validate_milestone(milestone_tracker_t* const mt, tangle_t* const tangle,
+                                                    iota_milestone_t* const candidate,
+                                                    milestone_status_t* const milestone_status);
 
 #ifdef __cplusplus
 }

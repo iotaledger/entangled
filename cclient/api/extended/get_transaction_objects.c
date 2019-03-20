@@ -11,7 +11,7 @@
 #include "cclient/api/extended/logger.h"
 
 retcode_t iota_client_get_transaction_objects(iota_client_service_t const* const serv,
-                                              get_trytes_req_t* const tx_hashes, transaction_array_t out_tx_objs) {
+                                              get_trytes_req_t* const tx_hashes, transaction_array_t* out_tx_objs) {
   retcode_t ret_code = RC_OK;
   hash8019_queue_entry_t* q_iter = NULL;
   iota_transaction_t tx;

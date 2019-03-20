@@ -11,7 +11,8 @@
 
 void kerl_hash(const trit_t* const trits, size_t len, trit_t* out, Kerl* kerl) {
   trit_t digest[HASH_LENGTH_TRIT];
-  init_kerl(kerl);
+
+  kerl_init(kerl);
   kerl_absorb(kerl, trits, len);
   kerl_squeeze(kerl, digest, HASH_LENGTH_TRIT);
   memcpy((tryte_t*)out, digest, HASH_LENGTH_TRIT);
