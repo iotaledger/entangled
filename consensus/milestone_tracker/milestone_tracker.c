@@ -81,7 +81,7 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt, iota_milest
   iss_address(&sponge, digest, root, mt->security_level * HASH_LENGTH_TRIT);
   iss_merkle_root(&sponge, root, siblings_trits, mt->conf->coordinator_num_keys_in_milestone, candidate->index);
   flex_trits_from_trits(coo, HASH_LENGTH_TRIT, root, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-  if (memcmp(coo, mt->coordinator, FLEX_TRIT_SIZE_243) == 0) {
+  if (memcmp(coo, mt->conf->coordinator_address, FLEX_TRIT_SIZE_243) == 0) {
     *valid = true;
   }
   sponge_destroy(&sponge);
@@ -321,7 +321,6 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consen
   mt->transaction_solidifier = ts;
   mt->candidates = NULL;
   rw_lock_handle_init(&mt->candidates_lock);
-  memcpy(mt->coordinator, conf->coordinator_address, FLEX_TRIT_SIZE_243);
   mt->milestone_start_index = conf->last_milestone;
   mt->latest_milestone_index = conf->last_milestone;
   mt->latest_solid_subtangle_milestone_index = conf->last_milestone;
@@ -353,8 +352,8 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt, tangle_t* 
 
   hash_pack_init(&hash_pack, 512);
 
-  if ((ret = iota_tangle_transaction_load_hashes_of_milestone_candidates(tangle, &hash_pack, mt->coordinator)) !=
-      RC_OK) {
+  if ((ret = iota_tangle_transaction_load_hashes_of_milestone_candidates(tangle, &hash_pack,
+                                                                         mt->conf->coordinator_address)) != RC_OK) {
     log_critical(logger_id, "Loading milestone candidates failed\n");
   }
   log_info(logger_id, "Loaded %d milestone candidates\n", hash_pack.num_loaded);

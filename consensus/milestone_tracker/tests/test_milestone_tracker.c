@@ -29,8 +29,8 @@ void milestone_validation_curl_p_27_sec_lvl_1(void) {
   milestone_status_t status = MILESTONE_INVALID;
 
   conf.mwm = 4;
-  conf.num_keys_in_milestone = 7;
-  flex_trits_from_trytes(conf.coordinator, NUM_TRITS_ADDRESS,
+  conf.coordinator_num_keys_in_milestone = 7;
+  flex_trits_from_trytes(conf.coordinator_address, NUM_TRITS_ADDRESS,
                          (tryte_t *)"ECFTA9SVHYH9MRRKJHQCBXNQKDBNGCWWDUAVILCOF9LMJNDPZLLTRYPKNHPVLXJYGGAXGOBYHZHGLNXKE",
                          NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL, sponge_type, security_level) == RC_OK);
@@ -108,8 +108,8 @@ void milestone_validation_kerl_sec_lvl_1(void) {
   milestone_status_t status = MILESTONE_INVALID;
 
   conf.mwm = 4;
-  conf.num_keys_in_milestone = 7;
-  flex_trits_from_trytes(conf.coordinator, NUM_TRITS_ADDRESS,
+  conf.coordinator_num_keys_in_milestone = 7;
+  flex_trits_from_trytes(conf.coordinator_address, NUM_TRITS_ADDRESS,
                          (tryte_t *)"ECRGOIGKMFCNJPILB9GRUN9WIFOXY9GPKLSJV9UUQINIOHWKYJRZEQ9IHTS9HMFCMQBGRNODBIWTPILGC",
                          NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL, sponge_type, security_level) == RC_OK);
@@ -187,8 +187,8 @@ void milestone_validation_curl_p_27_sec_lvl_3(void) {
   milestone_status_t status = MILESTONE_INVALID;
 
   conf.mwm = 4;
-  conf.num_keys_in_milestone = 7;
-  flex_trits_from_trytes(conf.coordinator, NUM_TRITS_ADDRESS,
+  conf.coordinator_num_keys_in_milestone = 7;
+  flex_trits_from_trytes(conf.coordinator_address, NUM_TRITS_ADDRESS,
                          (tryte_t *)"ROLHKXFNMSN9WWAWLWYKWXJUQ9BREXTKOMCZFT99JOLWNWBPUYSCZPLSOSOPICLKXXSDRAYEYRNTTKTNI",
                          NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL, sponge_type, security_level) == RC_OK);
@@ -316,8 +316,8 @@ void milestone_validation_kerl_sec_lvl_3(void) {
   milestone_status_t status = MILESTONE_INVALID;
 
   conf.mwm = 4;
-  conf.num_keys_in_milestone = 7;
-  flex_trits_from_trytes(conf.coordinator, NUM_TRITS_ADDRESS,
+  conf.coordinator_num_keys_in_milestone = 7;
+  flex_trits_from_trytes(conf.coordinator_address, NUM_TRITS_ADDRESS,
                          (tryte_t *)"IDSWNWLGPFLAQADAEYUINRS9MBEMCYARHXHVSBOZDOBHPIPNVYUFFTQLNYGDZKKTEBHYOQXVQVHXBGXH9",
                          NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL, sponge_type, security_level) == RC_OK);
