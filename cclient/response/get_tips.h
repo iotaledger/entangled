@@ -29,8 +29,7 @@ static inline void get_tips_res_hashes_pop(get_tips_res_t* res, flex_trit_t* con
   hash243_stack_pop(&res->hashes);
 }
 
-static inline retcode_t get_tips_res_hashes_add(get_tips_res_t* const res,
-                                                flex_trit_t const* const hash) {
+static inline retcode_t get_tips_res_hashes_add(get_tips_res_t* const res, flex_trit_t const* const hash) {
   return hash243_stack_push(&res->hashes, hash);
 }
 
