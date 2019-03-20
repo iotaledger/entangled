@@ -49,7 +49,6 @@ retcode_t json_find_transactions_serialize_request(serializer_t const *const s,
   }
 
 err:
-  log_debug(json_logger_id, "[%s:%d] error!\n", __func__, __LINE__);
   cJSON_Delete(json_root);
   return ret;
 }
@@ -79,12 +78,8 @@ retcode_t json_find_transactions_deserialize_request(serializer_t const *const s
   }
 
   ret = json_array_to_hash243_queue(json_obj, "approvees", &req->approvees);
-  if (ret) {
-    goto end;
-  }
 
 end:
-  log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   cJSON_Delete(json_obj);
   return ret;
 }
@@ -112,7 +107,6 @@ retcode_t json_find_transactions_serialize_response(serializer_t const *const s,
   }
 
 err:
-  log_debug(json_logger_id, "[%s:%d] error!\n", __func__, __LINE__);
   cJSON_Delete(json_root);
   return ret;
 }
