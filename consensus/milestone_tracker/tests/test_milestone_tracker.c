@@ -31,6 +31,7 @@ void milestone_validation_curl_p_27_sec_lvl_1(void) {
                          (tryte_t *)"ECFTA9SVHYH9MRRKJHQCBXNQKDBNGCWWDUAVILCOF9LMJNDPZLLTRYPKNHPVLXJYGGAXGOBYHZHGLNXKE",
                          NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
   conf.coordinator_num_keys_in_milestone = 7;
+  conf.coordinator_max_milestone_index = 1 << conf.coordinator_num_keys_in_milestone;
   conf.coordinator_security_level = 1;
   conf.coordinator_signature_type = SPONGE_CURLP27;
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL) == RC_OK);
@@ -110,6 +111,7 @@ void milestone_validation_kerl_sec_lvl_1(void) {
                          (tryte_t *)"ECRGOIGKMFCNJPILB9GRUN9WIFOXY9GPKLSJV9UUQINIOHWKYJRZEQ9IHTS9HMFCMQBGRNODBIWTPILGC",
                          NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
   conf.coordinator_num_keys_in_milestone = 7;
+  conf.coordinator_max_milestone_index = 1 << conf.coordinator_num_keys_in_milestone;
   conf.coordinator_security_level = 1;
   conf.coordinator_signature_type = SPONGE_KERL;
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL) == RC_OK);
@@ -189,6 +191,7 @@ void milestone_validation_curl_p_27_sec_lvl_3(void) {
                          (tryte_t *)"ROLHKXFNMSN9WWAWLWYKWXJUQ9BREXTKOMCZFT99JOLWNWBPUYSCZPLSOSOPICLKXXSDRAYEYRNTTKTNI",
                          NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
   conf.coordinator_num_keys_in_milestone = 7;
+  conf.coordinator_max_milestone_index = 1 << conf.coordinator_num_keys_in_milestone;
   conf.coordinator_security_level = 3;
   conf.coordinator_signature_type = SPONGE_CURLP27;
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL) == RC_OK);
@@ -318,6 +321,7 @@ void milestone_validation_kerl_sec_lvl_3(void) {
                          (tryte_t *)"IDSWNWLGPFLAQADAEYUINRS9MBEMCYARHXHVSBOZDOBHPIPNVYUFFTQLNYGDZKKTEBHYOQXVQVHXBGXH9",
                          NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
   conf.coordinator_num_keys_in_milestone = 7;
+  conf.coordinator_max_milestone_index = 1 << conf.coordinator_num_keys_in_milestone;
   conf.coordinator_security_level = 3;
   conf.coordinator_signature_type = SPONGE_KERL;
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL) == RC_OK);

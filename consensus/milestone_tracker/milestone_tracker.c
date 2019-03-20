@@ -98,7 +98,7 @@ retcode_t iota_milestone_tracker_validate_milestone(milestone_tracker_t* const m
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
   *milestone_status = MILESTONE_INVALID;
 
-  if (candidate->index >= 0x200000) {
+  if (candidate->index >= mt->conf->coordinator_max_milestone_index) {
     *milestone_status = MILESTONE_INVALID;
     return ret;
   } else if ((candidate->index <= mt->latest_solid_subtangle_milestone_index &&
