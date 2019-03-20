@@ -23,17 +23,17 @@ void setUp(void) { TEST_ASSERT(tangle_setup(&tangle, &config, test_db_path, ciri
 void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK); }
 
 void milestone_validation_curl_p_27_sec_lvl_1(void) {
-  sponge_type_t sponge_type = SPONGE_CURLP27;
-  int security_level = 1;
   iota_milestone_t milestone;
   milestone_status_t status = MILESTONE_INVALID;
 
   conf.mwm = 4;
-  conf.coordinator_num_keys_in_milestone = 7;
   flex_trits_from_trytes(conf.coordinator_address, NUM_TRITS_ADDRESS,
                          (tryte_t *)"ECFTA9SVHYH9MRRKJHQCBXNQKDBNGCWWDUAVILCOF9LMJNDPZLLTRYPKNHPVLXJYGGAXGOBYHZHGLNXKE",
                          NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL, sponge_type, security_level) == RC_OK);
+  conf.coordinator_num_keys_in_milestone = 7;
+  conf.coordinator_security_level = 1;
+  conf.coordinator_signature_type = SPONGE_CURLP27;
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL) == RC_OK);
 
   iota_transaction_t *txs[2];
   tryte_t const *const trytes[2] = {(tryte_t*)
@@ -102,17 +102,17 @@ void milestone_validation_curl_p_27_sec_lvl_1(void) {
 }
 
 void milestone_validation_kerl_sec_lvl_1(void) {
-  sponge_type_t sponge_type = SPONGE_KERL;
-  int security_level = 1;
   iota_milestone_t milestone;
   milestone_status_t status = MILESTONE_INVALID;
 
   conf.mwm = 4;
-  conf.coordinator_num_keys_in_milestone = 7;
   flex_trits_from_trytes(conf.coordinator_address, NUM_TRITS_ADDRESS,
                          (tryte_t *)"ECRGOIGKMFCNJPILB9GRUN9WIFOXY9GPKLSJV9UUQINIOHWKYJRZEQ9IHTS9HMFCMQBGRNODBIWTPILGC",
                          NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL, sponge_type, security_level) == RC_OK);
+  conf.coordinator_num_keys_in_milestone = 7;
+  conf.coordinator_security_level = 1;
+  conf.coordinator_signature_type = SPONGE_KERL;
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL) == RC_OK);
 
   iota_transaction_t *txs[2];
   tryte_t const *const trytes[2] = {(tryte_t*)
@@ -181,17 +181,17 @@ void milestone_validation_kerl_sec_lvl_1(void) {
 }
 
 void milestone_validation_curl_p_27_sec_lvl_3(void) {
-  sponge_type_t sponge_type = SPONGE_CURLP27;
-  int security_level = 3;
   iota_milestone_t milestone;
   milestone_status_t status = MILESTONE_INVALID;
 
   conf.mwm = 4;
-  conf.coordinator_num_keys_in_milestone = 7;
   flex_trits_from_trytes(conf.coordinator_address, NUM_TRITS_ADDRESS,
                          (tryte_t *)"ROLHKXFNMSN9WWAWLWYKWXJUQ9BREXTKOMCZFT99JOLWNWBPUYSCZPLSOSOPICLKXXSDRAYEYRNTTKTNI",
                          NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL, sponge_type, security_level) == RC_OK);
+  conf.coordinator_num_keys_in_milestone = 7;
+  conf.coordinator_security_level = 3;
+  conf.coordinator_signature_type = SPONGE_CURLP27;
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL) == RC_OK);
 
   iota_transaction_t *txs[4];
   tryte_t const *const trytes[4] = { (tryte_t*)
@@ -310,17 +310,17 @@ void milestone_validation_curl_p_27_sec_lvl_3(void) {
 }
 
 void milestone_validation_kerl_sec_lvl_3(void) {
-  sponge_type_t sponge_type = SPONGE_KERL;
-  int security_level = 3;
   iota_milestone_t milestone;
   milestone_status_t status = MILESTONE_INVALID;
 
   conf.mwm = 4;
-  conf.coordinator_num_keys_in_milestone = 7;
   flex_trits_from_trytes(conf.coordinator_address, NUM_TRITS_ADDRESS,
                          (tryte_t *)"IDSWNWLGPFLAQADAEYUINRS9MBEMCYARHXHVSBOZDOBHPIPNVYUFFTQLNYGDZKKTEBHYOQXVQVHXBGXH9",
                          NUM_TRYTES_ADDRESS, NUM_TRYTES_ADDRESS);
-  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL, sponge_type, security_level) == RC_OK);
+  conf.coordinator_num_keys_in_milestone = 7;
+  conf.coordinator_security_level = 3;
+  conf.coordinator_signature_type = SPONGE_KERL;
+  TEST_ASSERT(iota_milestone_tracker_init(&mt, &conf, NULL, NULL, NULL) == RC_OK);
 
   iota_transaction_t *txs[4];
   tryte_t const *const trytes[4] = { (tryte_t*)
