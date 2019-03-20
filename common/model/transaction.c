@@ -297,26 +297,6 @@ size_t transaction_deserialize_from_trits(iota_transaction_t *const transaction,
 // Free an existing transaction - compatible with free()
 void transaction_free(iota_transaction_t *const transaction) { free(transaction); }
 
-static UT_icd ut_transactions_icd = {sizeof(iota_transaction_t), NULL, NULL, NULL};
-
-transaction_array_t *transaction_array_new() {
-  transaction_array_t *txs = NULL;
-  utarray_new(txs, &ut_transactions_icd);
-  return txs;
-}
-
-void transaction_array_push_back(transaction_array_t *txs, iota_transaction_t const *const tx) {
-  utarray_push_back(txs, tx);
-}
-
-size_t transaction_array_len(transaction_array_t *txs) { return utarray_len(txs); }
-void transaction_array_free(transaction_array_t *txs) { utarray_free(txs); }
-
-iota_transaction_t *transaction_array_at(transaction_array_t *txs, size_t index) {
-  // return NULL if not found.
-  return (iota_transaction_t *)utarray_eltptr(txs, index);
-}
-
 #ifdef DEBUG
 void transaction_obj_dump(iota_transaction_t *tx_obj) {
   tryte_t trytes_81[NUM_TRYTES_HASH + 1];
