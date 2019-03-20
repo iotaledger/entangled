@@ -42,7 +42,7 @@ void run_curl_p_test(Curl *curl, trit_t *exp) {
   trit_t trits[] = {TRITS_IN};
   trit_t hash[HASH_LENGTH_TRIT];
 
-  init_curl(curl);
+  curl_init(curl);
   curl_absorb(curl, trits, HASH_LENGTH_TRIT);
   curl_squeeze(curl, hash, HASH_LENGTH_TRIT);
   curl_reset(curl);
@@ -76,7 +76,7 @@ void test_other(void)
         trit_t hash[HASH_LENGTH_TRIT];
 
         trit_t trits[] = {OTHER_TRITS_IN};
-        init_curl(&curl);
+        curl_init(&curl);
         curl_absorb(&curl, trits, HASH_LENGTH_TRIT);
         curl_squeeze(&curl, hash, HASH_LENGTH_TRIT);
         curl_reset(&curl);

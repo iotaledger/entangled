@@ -35,7 +35,7 @@ trit_t *do_pow(Curl *const curl, trit_t const *const trits_in, size_t const trit
 
 IOTA_EXPORT char *iota_pow_trytes(char const *const trytes_in, uint8_t const mwm) {
   Curl curl;
-  init_curl(&curl);
+  curl_init(&curl);
   curl.type = CURL_P_81;
 
   int tryte_len = strlen(trytes_in);
@@ -65,7 +65,7 @@ IOTA_EXPORT char *iota_pow_trytes(char const *const trytes_in, uint8_t const mwm
 
 IOTA_EXPORT flex_trit_t *iota_pow_flex(flex_trit_t const *const flex_trits_in, size_t num_trits, uint8_t const mwm) {
   Curl curl;
-  init_curl(&curl);
+  curl_init(&curl);
   curl.type = CURL_P_81;
 
   trit_t *trits = (trit_t *)calloc(num_trits, sizeof(trit_t));

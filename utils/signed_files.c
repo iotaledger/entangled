@@ -41,7 +41,7 @@ static retcode_t validate_signature(char const *const signature_filename, flex_t
   }
 
   curl.type = CURL_P_81;
-  init_curl(&curl);
+  curl_init(&curl);
 
   normalize_flex_hash_to_trits(digest, normalized_digest);
 
@@ -55,7 +55,6 @@ static retcode_t validate_signature(char const *const signature_filename, flex_t
     trytes_to_trits((tryte_t *)line, sig_trits, read);
     iss_curl_sig_digest(sig_digests + i * HASH_LENGTH_TRIT, normalized_digest + i * NORMALIZED_FRAGMENT_LENGTH * RADIX,
                         sig_trits, RADIX * read, &curl);
-    curl_reset(&curl);
   }
   if (i != 3 || read < 0) {
     ret = RC_UTILS_INVALID_SIG_FILE;
@@ -100,7 +99,7 @@ static retcode_t digest_file(char const *const filename, flex_trit_t *const dige
     return RC_UTILS_FAILED_TO_OPEN_FILE;
   }
 
-  init_kerl(&kerl);
+  kerl_init(&kerl);
   while ((read = getline(&line, &len, fp)) > 0) {
     line[--read] = '\0';
     // 2 trytes by ASCII character

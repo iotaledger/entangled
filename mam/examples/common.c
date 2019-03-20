@@ -58,7 +58,7 @@ retcode_t send_bundle(char const *const host, uint16_t const port, bundle_transa
   iota_client_extended_init();
 
   Kerl kerl;
-  init_kerl(&kerl);
+  kerl_init(&kerl);
   bundle_finalize(bundle, &kerl);
   transaction_array_t out_tx_objs = transaction_array_new();
   hash8019_array_p raw_trytes = hash8019_array_new();

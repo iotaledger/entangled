@@ -44,9 +44,9 @@ static retcode_t validate_signatures(bundle_transactions_t const *const bundle, 
     curr_inp_tx = curr_tx;
     offset = 0;
     next_offset = 0;
-    init_kerl(address_kerl);
+    kerl_init(address_kerl);
     do {
-      init_kerl(sig_frag_kerl);
+      kerl_init(sig_frag_kerl);
       next_offset = (offset + ISS_FRAGMENTS * RADIX - 1) % NUM_TRITS_HASH + 1;
       flex_trits_to_trits(key, NUM_TRITS_SIGNATURE, transaction_signature(curr_inp_tx), NUM_TRITS_SIGNATURE,
                           NUM_TRITS_SIGNATURE);
@@ -90,8 +90,8 @@ void bundle_calculate_hash(bundle_transactions_t *bundle, Kerl *const kerl, flex
   iota_transaction_t *curr_tx = NULL;
   trit_t essence_trits[NUM_TRITS_ESSENCE];
   trit_t bundle_hash_trits[NUM_TRITS_HASH];
-  init_kerl(kerl);
 
+  kerl_init(kerl);
   BUNDLE_FOREACH(bundle, curr_tx) {
     absorb_essence(kerl, transaction_address(curr_tx), transaction_value(curr_tx), transaction_obsolete_tag(curr_tx),
                    transaction_timestamp(curr_tx), transaction_current_index(curr_tx), transaction_last_index(curr_tx),

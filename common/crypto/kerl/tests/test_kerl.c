@@ -32,7 +32,7 @@ void test_one_absorb(void) {
 
   trytes_to_trits((tryte_t*)trytes, trits, TRYTE_LENGTH);
 
-  init_kerl(&kerl);
+  kerl_init(&kerl);
 
   kerl_absorb(&kerl, trits, TRIT_LENGTH);
   kerl_squeeze(&kerl, trits, TRIT_LENGTH);
@@ -57,7 +57,7 @@ void test_multi_squeeze_multi_absorb(void) {
 
   trytes_to_trits((tryte_t*)trytes, trits, TRYTE_LENGTH * 2);
 
-  init_kerl(&kerl);
+  kerl_init(&kerl);
 
   kerl_absorb(&kerl, trits, TRIT_LENGTH * 2);
   kerl_squeeze(&kerl, trits, TRIT_LENGTH * 2);
@@ -82,7 +82,7 @@ void test_multi_squeeze(void) {
 
   trytes_to_trits((tryte_t*)trytes, trits, TRYTE_LENGTH);
 
-  init_kerl(&kerl);
+  kerl_init(&kerl);
 
   kerl_absorb(&kerl, trits, TRIT_LENGTH);
   kerl_squeeze(&kerl, trits, TRIT_LENGTH * 2);

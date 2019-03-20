@@ -52,7 +52,7 @@ void test_mam_sec(int security) {
 
   Curl curl;
   curl.type = CURL_P_27;
-  init_curl(&curl);
+  curl_init(&curl);
   TEST_ASSERT_EQUAL_INT(0, merkle_create(merkle_tree, count, seed_trits, start, security, &curl));
   curl_reset(&curl);
   TEST_ASSERT_EQUAL_INT(0, merkle_create(next_root, next_count, seed_trits, next_start, security, &curl));

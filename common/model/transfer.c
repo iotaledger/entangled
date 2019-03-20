@@ -307,7 +307,7 @@ void transfer_ctx_hash(transfer_ctx_t* transfer_ctx, Kerl* kerl, transfer_t* tra
 
   while (!valid_bundle) {
   loop:
-    init_kerl(kerl);
+    kerl_init(kerl);
     // Calculate bundle hash
     current_index = 0;
     for (i = 0; i < tx_len; i++) {
