@@ -117,6 +117,11 @@ retcode_t tips_cache_remove(tips_cache_t* const cache, flex_trit_t const* const 
   rw_lock_handle_wrlock(&cache->tips_lock);
   ret = hash243_set_remove(&cache->tips, tip);
   rw_lock_handle_unlock(&cache->tips_lock);
+
+  if (ret != RC_OK) {
+    return ret;
+  }
+
   rw_lock_handle_wrlock(&cache->solid_tips_lock);
   ret = hash243_set_remove(&cache->solid_tips, tip);
   rw_lock_handle_unlock(&cache->solid_tips_lock);
