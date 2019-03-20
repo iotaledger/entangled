@@ -13,7 +13,7 @@
 
 retcode_t iota_client_find_transaction_objects(iota_client_service_t const* const serv,
                                                find_transactions_req_t const* const tx_queries,
-                                               transaction_array_t out_tx_objs) {
+                                               transaction_array_t* out_tx_objs) {
   retcode_t ret_code = RC_OK;
   find_transactions_res_t* find_tx_res = find_transactions_res_new();
 

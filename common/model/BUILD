@@ -31,6 +31,7 @@ cc_library(
         "//common/crypto/curl-p:digest",
         "//common/trinary:flex_trit",
         "//common/trinary:trit_long",
+        "@com_github_uthash//:uthash",
     ],
 )
 

@@ -19,6 +19,5 @@ cc_library(
         "//utils/containers/hash:hash8019_stack",
         "//utils/containers/hash:hash81_queue",
         "//utils/containers/hash:hash_array",
-        "@com_github_uthash//:uthash",
     ],
 )
