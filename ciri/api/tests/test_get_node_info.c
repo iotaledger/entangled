@@ -83,7 +83,7 @@ int main(void) {
 
   flex_trit_t coordinator_trits[FLEX_TRIT_SIZE_243];
   flex_trits_from_trytes(coordinator_trits, NUM_TRITS_HASH, COORDINATOR, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
-  memcpy(api.core->consensus.milestone_tracker.coordinator, coordinator_trits, FLEX_TRIT_SIZE_243);
+  memcpy(api.core->consensus.conf.coordinator_address, coordinator_trits, FLEX_TRIT_SIZE_243);
   // Adding neighbors
 
   neighbor_t neighbor;

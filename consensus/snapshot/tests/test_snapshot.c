@@ -27,7 +27,7 @@ void test_snapshot_conf() {
   TEST_ASSERT_EQUAL_INT(conf.last_milestone, 774804UL);
   flex_trits_to_trytes(sig_pubkey, HASH_LENGTH_TRYTE, conf.snapshot_signature_pubkey, HASH_LENGTH_TRIT,
                        HASH_LENGTH_TRIT);
-  flex_trits_to_trytes(coo, HASH_LENGTH_TRYTE, conf.coordinator, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
+  flex_trits_to_trytes(coo, HASH_LENGTH_TRYTE, conf.coordinator_address, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   TEST_ASSERT_EQUAL_MEMORY(
       sig_pubkey, (tryte_t *)"TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD9CZUYAC",
       NUM_TRYTES_ADDRESS);
