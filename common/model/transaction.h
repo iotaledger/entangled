@@ -15,6 +15,7 @@ extern "C" {
 #include <assert.h>
 
 #include "common/trinary/flex_trit.h"
+#include "utarray.h"
 
 #define NUM_TRITS_SERIALIZED_TRANSACTION 8019
 #define NUM_TRITS_SIGNATURE 6561
@@ -456,6 +457,26 @@ size_t transaction_deserialize_from_trits(iota_transaction_t *const transaction,
  ***********************************************************************************************************/
 // Free an existing transaction - compatible with free()
 void transaction_free(iota_transaction_t *const transaction);
+
+typedef UT_array transaction_array_t;
+static UT_icd const ut_transactions_icd = {sizeof(iota_transaction_t), NULL, NULL, NULL};
+static inline transaction_array_t *transaction_array_new() {
+  transaction_array_t *txs = NULL;
+  utarray_new(txs, &ut_transactions_icd);
+  return txs;
+}
+static inline void transaction_array_push_back(transaction_array_t *txs, iota_transaction_t const *const tx) {
+  utarray_push_back(txs, tx);
+}
+static inline size_t transaction_array_len(transaction_array_t *txs) { return utarray_len(txs); }
+static inline void transaction_array_free(transaction_array_t *txs) { utarray_free(txs); }
+static inline iota_transaction_t *transaction_array_at(transaction_array_t *txs, size_t index) {
+  // return NULL if not found.
+  return (iota_transaction_t *)utarray_eltptr(txs, index);
+}
+
+#define TX_OBJS_FOREACH(txs, tx) \
+  for (tx = (iota_transaction_t *)utarray_front(txs); tx != NULL; tx = (iota_transaction_t *)utarray_next(txs, tx))
 
 #endif  // __COMMON_MODEL_TRANSACTION_H_
 #ifdef __cplusplus
