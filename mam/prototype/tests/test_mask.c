@@ -34,7 +34,7 @@ void test_mask(void) {
 
   add_assign(auth_id_trits, 3 * auth_id_size, index);
 
-  init_curl(&c);
+  curl_init(&c);
   curl_absorb(&c, auth_id_trits, 3 * auth_id_size);
   mask(cipher_trits, payload_trits, 3 * payload_size, &c);
 

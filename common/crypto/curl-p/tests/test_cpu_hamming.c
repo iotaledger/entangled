@@ -28,7 +28,7 @@ void run_pd_test(Curl *curl, size_t security) {
   short sum;
   trit_t trits[] = {TRYTES_IN};
   trit_t hash[HASH_LENGTH_TRIT];
-  init_curl(curl);
+  curl_init(curl);
   curl_absorb(curl, trits, HASH_LENGTH_TRIT);
   PearlDiverStatus result = hamming(curl, 0, HASH_LENGTH_TRIT, security);
   TEST_ASSERT_EQUAL_INT(PEARL_DIVER_SUCCESS, result);
