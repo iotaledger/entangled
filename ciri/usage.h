@@ -33,10 +33,12 @@ typedef enum cli_arg_value_e {
 
   CONF_ALPHA,
   CONF_BELOW_MAX_DEPTH,
-  CONF_COORDINATOR,
+  CONF_COORDINATOR_ADDRESS,
+  CONF_COORDINATOR_NUM_KEYS_IN_MILESTONE,
+  CONF_COORDINATOR_SECURITY_LEVEL,
+  CONF_COORDINATOR_SIGNATURE_TYPE,
   CONF_LAST_MILESTONE,
   CONF_MAX_DEPTH,
-  CONF_NUM_KEYS_IN_MILESTONE,
   CONF_SNAPSHOT_FILE,
   CONF_SNAPSHOT_SIGNATURE_DEPTH,
   CONF_SNAPSHOT_SIGNATURE_FILE,
@@ -126,7 +128,16 @@ static struct cli_argument_s {
      "the latest referenced milestone by the currently visited transaction "
      "during the random walk.",
      REQUIRED_ARG},
-    {"coordinator", CONF_COORDINATOR, "The address of the coordinator.", REQUIRED_ARG},
+    {"coordinator-address", CONF_COORDINATOR_ADDRESS, "The address of the coordinator.", REQUIRED_ARG},
+    {"coordinator-num-keys-in-milestone", CONF_COORDINATOR_NUM_KEYS_IN_MILESTONE,
+     "The depth of the Merkle tree which in turn determines the number of "
+     "leaves (private keys) that the coordinator can use to sign a message.",
+     REQUIRED_ARG},
+    {"coordinator-security-level", CONF_COORDINATOR_SECURITY_LEVEL,
+     "The security level used in coordinator signatures.", REQUIRED_ARG},
+    {"coordinator-signature-type", CONF_COORDINATOR_SIGNATURE_TYPE,
+     "The signature type used in coordinator signatures. Valid types: \"CURL_P27\", \"CURL_P81\" and \"KERL\".",
+     REQUIRED_ARG},
     {"last-milestone", CONF_LAST_MILESTONE,
      "The index of the last milestone issued by the corrdinator before the "
      "last snapshot.",
@@ -134,10 +145,6 @@ static struct cli_argument_s {
     {"max-depth", CONF_MAX_DEPTH,
      "Limits how many milestones behind the current one the random walk can "
      "start.",
-     REQUIRED_ARG},
-    {"num-keys-in-milestone", CONF_NUM_KEYS_IN_MILESTONE,
-     "The depth of the Merkle tree which in turn determines the number of "
-     "leaves (private keys) that the coordinator can use to sign a message.",
      REQUIRED_ARG},
     {"snapshot-file", CONF_SNAPSHOT_FILE,
      "Path to the file that contains the state of the ledger at the last "

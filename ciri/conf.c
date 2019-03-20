@@ -57,6 +57,17 @@ static logger_level_t get_log_level(char const* const log_level) {
   return map[i].level;
 }
 
+static sponge_type_t get_sponge_type(char const* const sponge_type) {
+  static struct sponge_type_map {
+    char* str;
+    sponge_type_t type;
+  } map[] = {{"CURL_P27", SPONGE_CURLP27}, {"CURL_P81", SPONGE_CURLP81}, {"KERL", SPONGE_KERL}, {NULL, SPONGE_UNKNOWN}};
+  size_t i;
+  for (i = 0; map[i].str != NULL && strcmp(map[i].str, sponge_type) != 0; i++)
+    ;
+  return map[i].type;
+}
+
 static int get_conf_key(char const* const key) {
   int i = 0;
   while (cli_arguments_g[i].name != NULL && strcmp(cli_arguments_g[i].name, key) != 0) {
@@ -141,21 +152,37 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
     case CONF_BELOW_MAX_DEPTH:  // --below-max-depth
       consensus_conf->below_max_depth = atoi(value);
       break;
-    case CONF_COORDINATOR:  // --coordinator
+    case CONF_COORDINATOR_ADDRESS:  // --coordinator-address
       if (strlen(value) != HASH_LENGTH_TRYTE) {
         return RC_CIRI_CONF_INVALID_ARGUMENTS;
       }
-      flex_trits_from_trytes(consensus_conf->coordinator, HASH_LENGTH_TRIT, (tryte_t*)value, HASH_LENGTH_TRYTE,
+      flex_trits_from_trytes(consensus_conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t*)value, HASH_LENGTH_TRYTE,
                              HASH_LENGTH_TRYTE);
+      break;
+    case CONF_COORDINATOR_NUM_KEYS_IN_MILESTONE:  // --coordinator-num-keys-in-milestone
+      consensus_conf->coordinator_num_keys_in_milestone = atoi(value);
+      consensus_conf->coordinator_max_milestone_index = 1 << consensus_conf->coordinator_num_keys_in_milestone;
+      break;
+    case CONF_COORDINATOR_SECURITY_LEVEL:  // --coordinator-security-level
+    {
+      int security_level = atoi(value);
+
+      if (security_level < 0 || security_level > 3) {
+        return RC_CIRI_CONF_INVALID_ARGUMENTS;
+      }
+      consensus_conf->coordinator_security_level = (uint8_t)security_level;
+      break;
+    }
+    case CONF_COORDINATOR_SIGNATURE_TYPE:  // --coordinator-signature-type
+      if ((consensus_conf->coordinator_signature_type = get_sponge_type(value)) == SPONGE_UNKNOWN) {
+        return RC_CIRI_CONF_INVALID_ARGUMENTS;
+      }
       break;
     case CONF_LAST_MILESTONE:  // --last-milestone
       consensus_conf->last_milestone = atoi(value);
       break;
     case CONF_MAX_DEPTH:  // --max-depth
       consensus_conf->max_depth = atoi(value);
-      break;
-    case CONF_NUM_KEYS_IN_MILESTONE:  // --num-keys-in-milestone
-      consensus_conf->num_keys_in_milestone = atoi(value);
       break;
     case CONF_SNAPSHOT_FILE:  // --snapshot-file
       strcpy(consensus_conf->snapshot_file, value);

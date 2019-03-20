@@ -79,7 +79,7 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt, iota_milest
                    NUM_TRITS_SIGNATURE);
   }
   iss_address(&sponge, digest, root, mt->security_level * HASH_LENGTH_TRIT);
-  iss_merkle_root(&sponge, root, siblings_trits, mt->conf->num_keys_in_milestone, candidate->index);
+  iss_merkle_root(&sponge, root, siblings_trits, mt->conf->coordinator_num_keys_in_milestone, candidate->index);
   flex_trits_from_trits(coo, HASH_LENGTH_TRIT, root, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
   if (memcmp(coo, mt->coordinator, FLEX_TRIT_SIZE_243) == 0) {
     *valid = true;
@@ -321,7 +321,7 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consen
   mt->transaction_solidifier = ts;
   mt->candidates = NULL;
   rw_lock_handle_init(&mt->candidates_lock);
-  memcpy(mt->coordinator, conf->coordinator, FLEX_TRIT_SIZE_243);
+  memcpy(mt->coordinator, conf->coordinator_address, FLEX_TRIT_SIZE_243);
   mt->milestone_start_index = conf->last_milestone;
   mt->latest_milestone_index = conf->last_milestone;
   mt->latest_solid_subtangle_milestone_index = conf->last_milestone;
