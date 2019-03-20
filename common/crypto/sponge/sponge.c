@@ -41,7 +41,7 @@ retcode_t sponge_init(sponge_t* const sponge, sponge_type_t const type) {
     sponge->absorb = (sponge_absorb_t)kerl_absorb;
     sponge->squeeze = (sponge_squeeze_t)kerl_squeeze;
     sponge->reset = (sponge_reset_t)kerl_reset;
-    init_kerl((Kerl*)sponge->state);
+    kerl_init((Kerl*)sponge->state);
   } else if (type == SPONGE_TROIKA) {
   } else {
     return RC_CRYPTO_UNSUPPORTED_SPONGE_TYPE;

@@ -45,7 +45,7 @@ void signature_resolves_to_address_test(void) {
     sponge_t sponge;
     Kerl kerl;
 
-    init_kerl(&kerl);
+    kerl_init(&kerl);
     sponge_init(&sponge, sponge_types[i]);
     iss_subseed(&sponge, seed_trits, subseed_trits, index);
     iss_key(&sponge, subseed_trits, key, nof * ISS_KEY_LENGTH);

@@ -99,7 +99,7 @@ static retcode_t digest_file(char const *const filename, flex_trit_t *const dige
     return RC_UTILS_FAILED_TO_OPEN_FILE;
   }
 
-  init_kerl(&kerl);
+  kerl_init(&kerl);
   while ((read = getline(&line, &len, fp)) > 0) {
     line[--read] = '\0';
     // 2 trytes by ASCII character

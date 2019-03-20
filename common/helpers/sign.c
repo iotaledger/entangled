@@ -38,7 +38,7 @@ IOTA_EXPORT trit_t* iota_sign_address_gen_trits(trit_t const* const seed, size_t
     return NULL;
   }
 
-  init_kerl(&kerl);
+  kerl_init(&kerl);
   memcpy(subseed, seed, HASH_LENGTH_TRIT);
   iss_kerl_subseed(subseed, subseed, index, &kerl);
   iss_kerl_key(subseed, key, key_length, &kerl);
@@ -119,7 +119,7 @@ IOTA_EXPORT trit_t* iota_sign_signature_gen_trits(trit_t const* const seed, size
     return NULL;
   }
 
-  init_kerl(&kerl);
+  kerl_init(&kerl);
   memcpy(subseed, seed, HASH_LENGTH_TRIT);
   iss_kerl_subseed(subseed, subseed, index, &kerl);
   iss_kerl_key(subseed, key, key_length, &kerl);
