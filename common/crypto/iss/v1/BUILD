@@ -1,6 +1,16 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "iss",
+    srcs = ["iss.c"],
+    hdrs = ["iss.h"],
+    deps = [
+        "//common/crypto/sponge",
+        "//common/trinary:add",
+    ],
+)
+
+cc_library(
     name = "iss_curl",
     srcs = [
         "iss.c.inc",

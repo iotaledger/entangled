@@ -16,18 +16,17 @@
 #define _ISS_PREFIX(A) CAT(CAT(CAT(iss_, HASH_PREFIX), _), A)
 #define _HASH_PREFIX(A) CAT(CAT(HASH_PREFIX, _), A)
 
-int _ISS_PREFIX(subseed)(trit_t const *const seed, trit_t *const out,
-                         int64_t const index, HASH_STATE *const state) {
+int _ISS_PREFIX(subseed)(trit_t const *const seed, trit_t *const out, int64_t const index, HASH_STATE *const state) {
   memcpy(out, seed, HASH_LENGTH_TRIT * sizeof(trit_t));
   add_assign(out, HASH_LENGTH_TRIT, index);
   _HASH_PREFIX(absorb)(state, out, HASH_LENGTH_TRIT);
   _HASH_PREFIX(squeeze)(state, out, HASH_LENGTH_TRIT);
   _HASH_PREFIX(reset)(state);
+
   return 0;
 }
 
-int _ISS_PREFIX(key)(trit_t const *const subseed, trit_t *key,
-                     size_t const key_length, HASH_STATE *const state) {
+int _ISS_PREFIX(key)(trit_t const *const subseed, trit_t *key, size_t const key_length, HASH_STATE *const state) {
   if (key_length % HASH_LENGTH_TRIT) return -1;
   trit_t *const end = &key[key_length];
 
@@ -42,15 +41,13 @@ int _ISS_PREFIX(key)(trit_t const *const subseed, trit_t *key,
   return 0;
 }
 
-int _ISS_PREFIX(key_digest)(trit_t *key, trit_t *digest,
-                            size_t const key_length, HASH_STATE *const state) {
+int _ISS_PREFIX(key_digest)(trit_t *key, trit_t *digest, size_t const key_length, HASH_STATE *const state) {
   if (key_length % ISS_KEY_LENGTH) return -1;
 
   size_t i;
   trit_t *const k_start = key;
   trit_t *const k_end = &key[key_length];
-  trit_t *const d_end =
-      &digest[HASH_LENGTH_TRIT * (key_length / ISS_KEY_LENGTH)];
+  trit_t *const d_end = &digest[HASH_LENGTH_TRIT * (key_length / ISS_KEY_LENGTH)];
 
   for (; key < k_end; key = &key[HASH_LENGTH_TRIT]) {
     for (i = 0; i < 26; i++) {
@@ -69,23 +66,22 @@ int _ISS_PREFIX(key_digest)(trit_t *key, trit_t *digest,
 
     key = &key[ISS_KEY_LENGTH];
   }
+
   return 0;
 }
 
-int _ISS_PREFIX(address)(trit_t const *const digest, trit_t *const address,
-                         size_t const digest_length, HASH_STATE *const state) {
+int _ISS_PREFIX(address)(trit_t const *const digest, trit_t *const address, size_t const digest_length,
+                         HASH_STATE *const state) {
   _HASH_PREFIX(absorb)(state, digest, digest_length);
   _HASH_PREFIX(squeeze)(state, address, HASH_LENGTH_TRIT);
   _HASH_PREFIX(reset)(state);
+
   return 0;
 }
 
-#define HASH_TRYTE_VAL(hash, i)                            \
-  (hash[i * TRYTE_WIDTH] + hash[i * TRYTE_WIDTH + 1] * 3 + \
-   hash[i * TRYTE_WIDTH + 2] * 9)
+#define HASH_TRYTE_VAL(hash, i) (hash[i * TRYTE_WIDTH] + hash[i * TRYTE_WIDTH + 1] * 3 + hash[i * TRYTE_WIDTH + 2] * 9)
 
-int _ISS_PREFIX(signature)(trit_t *sig, trit_t const *const hash,
-                           trit_t const *const key, size_t key_len,
+int _ISS_PREFIX(signature)(trit_t *sig, trit_t const *const hash, trit_t const *const key, size_t key_len,
                            HASH_STATE *const state) {
   size_t i, j;
   trit_t *se = &sig[key_len];
@@ -97,12 +93,11 @@ int _ISS_PREFIX(signature)(trit_t *sig, trit_t const *const hash,
       _HASH_PREFIX(reset)(state);
     }
   }
-  _HASH_PREFIX(reset)(state);
+
   return 0;
 }
 
-int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t const *const hash,
-                            trit_t *sig, size_t const sig_len,
+int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t const *const hash, trit_t *sig, size_t const sig_len,
                             HASH_STATE *const state) {
   size_t i, j;
   trit_t *sig_start = sig, *sig_end = &sig[sig_len];
@@ -115,6 +110,8 @@ int _ISS_PREFIX(sig_digest)(trit_t *const dig, trit_t const *const hash,
   }
   _HASH_PREFIX(absorb)(state, sig_start, sig_len);
   _HASH_PREFIX(squeeze)(state, dig, HASH_LENGTH_TRIT);
+  _HASH_PREFIX(reset)(state);
+
   return 0;
 }
 

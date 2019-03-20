@@ -18,7 +18,7 @@
 
 IOTA_EXPORT char* iota_digest(const char* trytes) {
   Curl curl;
-  init_curl(&curl);
+  curl_init(&curl);
   curl.type = CURL_P_81;
 
   trit_t trits_hash[HASH_LENGTH_TRIT];
@@ -42,7 +42,7 @@ IOTA_EXPORT char* iota_digest(const char* trytes) {
 
 IOTA_EXPORT flex_trit_t* iota_flex_digest(flex_trit_t const* const flex_trits, size_t num_trits) {
   Curl curl;
-  init_curl(&curl);
+  curl_init(&curl);
   curl.type = CURL_P_81;
 
   trit_t trits_hash[HASH_LENGTH_TRIT];

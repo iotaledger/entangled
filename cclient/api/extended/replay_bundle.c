@@ -30,7 +30,7 @@ retcode_t iota_client_replay_bundle(iota_client_service_t const* const serv, fle
         }
 
         // send trytes
-        ret_code = iota_client_send_trytes(serv, trytes, depth, mwm, NULL, false, (transaction_array_t)bundle);
+        ret_code = iota_client_send_trytes(serv, trytes, depth, mwm, NULL, false, (transaction_array_t*)bundle);
         if (ret_code != RC_OK) {
           log_error(client_extended_logger_id, "%s iota_client_send_trytes failed: %s\n", __func__,
                     error_2_string(ret_code));

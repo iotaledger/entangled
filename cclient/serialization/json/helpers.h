@@ -66,6 +66,8 @@ retcode_t json_get_string(cJSON const *const json_obj, char const *const obj_nam
 
 retcode_t hash243_queue_to_json_array(hash243_queue_t queue, cJSON *const json_root, char const *const obj_name);
 
+retcode_t hash243_stack_to_json_array(hash243_stack_t stack, cJSON *const json_root, char const *const obj_name);
+
 retcode_t json_array_to_hash243_queue(cJSON const *const obj, char const *const obj_name, hash243_queue_t *queue);
 
 retcode_t json_array_to_hash243_stack(cJSON const *const obj, char const *const obj_name, hash243_stack_t *queue);
