@@ -14,7 +14,7 @@
 #include "cclient/request/check_consistency.h"
 #include "cclient/request/find_transactions.h"
 #include "cclient/request/get_balances.h"
-#include "cclient/request/get_inclusion_state.h"
+#include "cclient/request/get_inclusion_states.h"
 #include "cclient/request/get_transactions_to_approve.h"
 #include "cclient/request/get_trytes.h"
 #include "cclient/request/remove_neighbors.h"

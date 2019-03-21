@@ -4,13 +4,13 @@
  *
  * Refer to the LICENSE file for licensing information
  */
-#include "cclient/serialization/json/get_inclusion_state.h"
+#include "cclient/serialization/json/get_inclusion_states.h"
 
 #include "cclient/serialization/json/helpers.h"
 #include "cclient/serialization/json/logger.h"
 
-retcode_t json_get_inclusion_state_serialize_request(const serializer_t *const s, get_inclusion_state_req_t *const obj,
-                                                     char_buffer_t *out) {
+retcode_t json_get_inclusion_states_serialize_request(const serializer_t *const s,
+                                                      get_inclusion_states_req_t *const obj, char_buffer_t *out) {
   retcode_t ret = RC_OK;
   const char *json_text = NULL;
   size_t len = 0;
@@ -48,8 +48,8 @@ done:
   return ret;
 }
 
-retcode_t json_get_inclusion_state_deserialize_response(const serializer_t *const s, const char *const obj,
-                                                        get_inclusion_state_res_t *out) {
+retcode_t json_get_inclusion_states_deserialize_response(const serializer_t *const s, const char *const obj,
+                                                         get_inclusion_states_res_t *out) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
   cJSON *json_item = NULL;
