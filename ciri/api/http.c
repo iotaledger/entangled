@@ -193,8 +193,8 @@ done:
 static inline retcode_t process_get_inclusion_states_request(iota_api_http_t *const http, char const *const payload,
                                                              char_buffer_t *const out) {
   retcode_t ret = RC_OK;
-  get_inclusion_state_req_t *req = get_inclusion_state_req_new();
-  get_inclusion_state_res_t *res = get_inclusion_state_res_new();
+  get_inclusion_states_req_t *req = get_inclusion_states_req_new();
+  get_inclusion_states_res_t *res = get_inclusion_states_res_new();
 
   if (req == NULL || res == NULL) {
     ret = RC_OOM;
@@ -210,8 +210,8 @@ static inline retcode_t process_get_inclusion_states_request(iota_api_http_t *co
   // TODO Serialize response
 
 done:
-  get_inclusion_state_req_free(&req);
-  get_inclusion_state_res_free(&res);
+  get_inclusion_states_req_free(&req);
+  get_inclusion_states_res_free(&res);
 
   return ret;
 }
