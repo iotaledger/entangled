@@ -20,8 +20,7 @@ TEST(TransactionTest, testTransaction) {
 
   std::string trytes(TRYTES, sizeof(TRYTES));
   flex_trit_t trits[FLEX_TRIT_SIZE_8019];
-  flex_trits_from_trytes(trits, NUM_TRITS_SERIALIZED_TRANSACTION,
-                         (tryte_t*)TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
+  flex_trits_from_trytes(trits, NUM_TRITS_SERIALIZED_TRANSACTION, (tryte_t*)TRYTES, NUM_TRITS_SERIALIZED_TRANSACTION,
                          NUM_TRYTES_SERIALIZED_TRANSACTION);
 
   TryteTransaction transaction = TryteTransaction(trytes);

@@ -25,24 +25,19 @@ void test_serialize_find_transactions(void) {
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
   flex_trit_t tag[FLEX_TRIT_SIZE_81] = {};
 
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1,
-                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT(hash243_queue_push(&find_tran->addresses, hash) == RC_OK);
 
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_2,
-                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_2, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT(hash243_queue_push(&find_tran->approvees, hash) == RC_OK);
 
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_3,
-                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_3, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT(hash243_queue_push(&find_tran->bundles, hash) == RC_OK);
 
-  flex_trits_from_trytes(tag, NUM_TRITS_TAG, (const tryte_t*)TEST_27_TRYTES_1,
-                         NUM_TRYTES_TAG, NUM_TRYTES_TAG);
+  flex_trits_from_trytes(tag, NUM_TRITS_TAG, (const tryte_t*)TEST_27_TRYTES_1, NUM_TRYTES_TAG, NUM_TRYTES_TAG);
   TEST_ASSERT(hash81_queue_push(&find_tran->tags, tag) == RC_OK);
 
-  serializer.vtable.find_transactions_serialize_request(&serializer, find_tran,
-                                                        serializer_out);
+  serializer.vtable.find_transactions_serialize_request(&serializer, find_tran, serializer_out);
 
   TEST_ASSERT_EQUAL_STRING(json_text, serializer_out->data);
 
@@ -65,26 +60,16 @@ void test_deserialize_find_transactions(void) {
 
   find_transactions_res_t* deserialize_find_tran = find_transactions_res_new();
 
-  serializer.vtable.find_transactions_deserialize_response(
-      &serializer, json_text, deserialize_find_tran);
+  serializer.vtable.find_transactions_deserialize_response(&serializer, json_text, deserialize_find_tran);
 
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1,
-                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash,
-                           hash243_queue_at(&deserialize_find_tran->hashes, 0),
-                           FLEX_TRIT_SIZE_243);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&deserialize_find_tran->hashes, 0), FLEX_TRIT_SIZE_243);
 
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_2,
-                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash,
-                           hash243_queue_at(&deserialize_find_tran->hashes, 1),
-                           FLEX_TRIT_SIZE_243);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_2, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&deserialize_find_tran->hashes, 1), FLEX_TRIT_SIZE_243);
 
-  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_3,
-                         NUM_TRYTES_HASH, NUM_TRYTES_HASH);
-  TEST_ASSERT_EQUAL_MEMORY(hash,
-                           hash243_queue_at(&deserialize_find_tran->hashes, 2),
-                           FLEX_TRIT_SIZE_243);
+  flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_3, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&deserialize_find_tran->hashes, 2), FLEX_TRIT_SIZE_243);
 
   TEST_ASSERT_EQUAL_INT(3, hash243_queue_count(deserialize_find_tran->hashes));
 

@@ -85,9 +85,7 @@ retcode_t responder_destroy(responder_t *const responder);
  *
  * @return a status code
  */
-retcode_t responder_on_next(responder_t *const responder,
-                            neighbor_t *const neighbor,
-                            flex_trit_t const *const hash);
+retcode_t responder_on_next(responder_t *const responder, neighbor_t *const neighbor, flex_trit_t const *const hash);
 
 /**
  * Gets the size of the responder queue
@@ -105,9 +103,7 @@ size_t responder_size(responder_t *const responder);
  *
  * @return true if empty, false otherwise
  */
-static inline bool responder_is_empty(responder_t *const responder) {
-  return responder->queue == NULL;
-}
+static inline bool responder_is_empty(responder_t *const responder) { return responder->queue == NULL; }
 
 #ifdef __cplusplus
 }

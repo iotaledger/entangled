@@ -17,8 +17,7 @@ extern "C" {
 
 IOTA_EXPORT char* iota_digest(char const* const trytes);
 
-IOTA_EXPORT flex_trit_t* iota_flex_digest(flex_trit_t const* const flex_trits,
-                                          size_t num_trits);
+IOTA_EXPORT flex_trit_t* iota_flex_digest(flex_trit_t const* const flex_trits, size_t num_trits);
 
 #ifdef __cplusplus
 }

@@ -15,6 +15,8 @@
 #include "common/errors.h"
 {ADDITIONAL_INCLUDE_PATH}
 
+#define SET_ITER(set, entry, tmp) HASH_ITER(hh, set, entry, tmp)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,6 +48,8 @@ void {TYPE}_set_free({TYPE}_set_t *const set);
 retcode_t {TYPE}_set_for_each({TYPE}_set_t const *const set,
                                  {TYPE}_on_container_func func,
                                  void *const container);
+
+bool {TYPE}_set_cmp({TYPE}_set_t const * const lhs, {TYPE}_set_t const * const rhs);
 
 #ifdef __cplusplus
 }

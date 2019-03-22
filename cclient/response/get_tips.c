@@ -15,9 +15,7 @@ get_tips_res_t* get_tips_res_new() {
   return res;
 }
 
-size_t get_tips_res_hash_num(get_tips_res_t* res) {
-  return hash243_stack_count(res->hashes);
-}
+size_t get_tips_res_hash_num(get_tips_res_t* res) { return hash243_stack_count(res->hashes); }
 
 void get_tips_res_free(get_tips_res_t** res) {
   if (!res || !(*res)) {

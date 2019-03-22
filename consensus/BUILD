@@ -13,6 +13,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//common:errors",
+        "//common/crypto/sponge",
         "//common/trinary:flex_trit",
         "//utils:logger_helper",
         "@cJSON",

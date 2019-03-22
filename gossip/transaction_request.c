@@ -9,29 +9,24 @@
 
 #include "gossip/transaction_request.h"
 
-bool transaction_request_queue_empty(transaction_request_queue_t const queue) {
-  return (queue == NULL);
-}
+bool transaction_request_queue_empty(transaction_request_queue_t const queue) { return (queue == NULL); }
 
-size_t transaction_request_queue_count(
-    transaction_request_queue_t const queue) {
+size_t transaction_request_queue_count(transaction_request_queue_t const queue) {
   transaction_request_queue_entry_t *iter = NULL;
   size_t count = 0;
   CDL_COUNT(queue, iter, count);
   return count;
 }
 
-retcode_t transaction_request_queue_push(
-    transaction_request_queue_t *const queue, neighbor_t *const neighbor,
-    flex_trit_t const *const hash) {
+retcode_t transaction_request_queue_push(transaction_request_queue_t *const queue, neighbor_t *const neighbor,
+                                         flex_trit_t const *const hash) {
   transaction_request_queue_entry_t *entry = NULL;
 
   if (queue == NULL) {
     return RC_NULL_PARAM;
   }
 
-  if ((entry = (transaction_request_queue_entry_t *)malloc(
-           sizeof(transaction_request_queue_entry_t))) == NULL) {
+  if ((entry = (transaction_request_queue_entry_t *)malloc(sizeof(transaction_request_queue_entry_t))) == NULL) {
     return RC_OOM;
   }
   entry->request.neighbor = neighbor;
@@ -54,8 +49,7 @@ void transaction_request_queue_pop(transaction_request_queue_t *const queue) {
   }
 }
 
-transaction_request_t *transaction_request_queue_peek(
-    transaction_request_queue_t const queue) {
+transaction_request_t *transaction_request_queue_peek(transaction_request_queue_t const queue) {
   if (queue == NULL) {
     return NULL;
   }

@@ -33,8 +33,7 @@ typedef struct entry_point_selector_s {
  *
  * @return a status code
  */
-retcode_t iota_consensus_entry_point_selector_init(
-    entry_point_selector_t *const eps, milestone_tracker_t *const mt);
+retcode_t iota_consensus_entry_point_selector_init(entry_point_selector_t *const eps, milestone_tracker_t *const mt);
 
 /**
  * Gets an entry point for the random walk.
@@ -48,9 +47,8 @@ retcode_t iota_consensus_entry_point_selector_init(
  *
  * @return a status code
  */
-retcode_t iota_consensus_entry_point_selector_get_entry_point(
-    entry_point_selector_t *const eps, tangle_t *const tangle,
-    size_t const depth, flex_trit_t *const ep);
+retcode_t iota_consensus_entry_point_selector_get_entry_point(entry_point_selector_t *const eps, tangle_t *const tangle,
+                                                              size_t const depth, flex_trit_t *const ep);
 
 /**
  * Destroys an entry point selector
@@ -59,8 +57,7 @@ retcode_t iota_consensus_entry_point_selector_get_entry_point(
  *
  * @return a status code
  */
-retcode_t iota_consensus_entry_point_selector_destroy(
-    entry_point_selector_t *const eps);
+retcode_t iota_consensus_entry_point_selector_destroy(entry_point_selector_t *const eps);
 
 #ifdef __cplusplus
 }

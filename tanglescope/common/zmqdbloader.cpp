@@ -25,9 +25,8 @@ bool ZmqDBLoader::parseConfiguration(const YAML::Node& conf) {
 void ZmqDBLoader::start() {
   VLOG(3) << __FUNCTION__;
 
-  _zmqObservable =
-      rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
-          [&](auto s) { zmqPublisher(std::move(s), _zmqPublisherURL); });
+  _zmqObservable = rxcpp::observable<>::create<std::shared_ptr<iri::IRIMessage>>(
+      [&](auto s) { zmqPublisher(std::move(s), _zmqPublisherURL); });
 
   cleanDBPeriodically();
   loadDB();
@@ -40,9 +39,7 @@ void ZmqDBLoader::cleanDBPeriodically() {
   if (_cleanupInterval > 0) {
     pubWorker.schedule_periodically(
         pubThread.now(), std::chrono::seconds(_cleanupInterval),
-        [oldestTXAge = _oldestTXAge](auto scbl) {
-          TangleDB::instance().removeAgedTxs(oldestTXAge);
-        });
+        [oldestTXAge = _oldestTXAge](auto scbl) { TangleDB::instance().removeAgedTxs(oldestTXAge); });
   }
 }
 
@@ -55,8 +52,7 @@ void ZmqDBLoader::loadDB() {
 
             auto tx = std::static_pointer_cast<iri::TXMessage>(std::move(msg));
 
-            TangleDB::TXRecord txRec = {tx->hash(), tx->trunk(), tx->branch(),
-                                        tx->timestamp()};
+            TangleDB::TXRecord txRec = {tx->hash(), tx->trunk(), tx->branch(), tx->timestamp()};
             TangleDB::instance().put(std::move(txRec));
           },
           []() {});

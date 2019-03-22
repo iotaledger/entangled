@@ -4,7 +4,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_r
 
 git_repository(
     name = "rules_iota",
-    commit = "b15744b9ea520717752c866d5afc769c3b6b68f3",
+    commit = "1cb59eea62fd1d071de213a9aa46e61e8273472d",
     remote = "https://github.com/iotaledger/rules_iota.git",
 )
 
@@ -51,13 +51,11 @@ load(
 apple_rules_dependencies()
 
 load("@rules_iota//:defs.bzl", "iota_deps")
+load("@iota_toolchains//:toolchains.bzl", "setup_toolchains")
+load("//tools:snapshot.bzl", "fetch_snapshot_files")
 
 iota_deps()
 
-load("@iota_toolchains//:toolchains.bzl", "setup_toolchains")
-
 setup_toolchains()
-
-load("//tools:snapshot.bzl", "fetch_snapshot_files")
 
 fetch_snapshot_files()

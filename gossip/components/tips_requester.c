@@ -25,8 +25,7 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
   iota_packet_t packet;
   neighbor_t *iter = NULL;
   DECLARE_PACK_SINGLE_TX(transaction, transaction_ptr, transaction_pack);
-  DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr,
-                                milestone_pack);
+  DECLARE_PACK_SINGLE_MILESTONE(latest_milestone, latest_milestone_ptr, milestone_pack);
   connection_config_t db_conf = {.db_path = tips_requester->node->conf.db_path};
   tangle_t tangle;
 
@@ -43,25 +42,21 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
 
   while (tips_requester->running) {
     hash_pack_reset(&milestone_pack);
-    if (iota_tangle_milestone_load_last(&tangle, &milestone_pack) != RC_OK ||
-        milestone_pack.num_loaded == 0) {
+    if (iota_tangle_milestone_load_last(&tangle, &milestone_pack) != RC_OK || milestone_pack.num_loaded == 0) {
       continue;
     }
     hash_pack_reset(&transaction_pack);
-    if (iota_tangle_transaction_load(&tangle, TRANSACTION_FIELD_HASH,
-                                     latest_milestone.hash,
-                                     &transaction_pack) != RC_OK ||
+    if (iota_tangle_transaction_load(&tangle, TRANSACTION_FIELD_HASH, latest_milestone.hash, &transaction_pack) !=
+            RC_OK ||
         transaction_pack.num_loaded == 0) {
       continue;
     }
-    transaction_serialize_on_flex_trits(transaction_ptr,
-                                        transaction_flex_trits);
+    transaction_serialize_on_flex_trits(transaction_ptr, transaction_flex_trits);
     if (iota_packet_set_transaction(&packet, transaction_flex_trits) != RC_OK) {
       continue;
     }
-    if (iota_packet_set_request(
-            &packet, latest_milestone.hash,
-            tips_requester->node->conf.request_hash_size_trit) != RC_OK) {
+    if (iota_packet_set_request(&packet, latest_milestone.hash, tips_requester->node->conf.request_hash_size_trit) !=
+        RC_OK) {
       continue;
     }
 
@@ -86,14 +81,12 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
  * Public functions
  */
 
-retcode_t tips_requester_init(tips_requester_t *const tips_requester,
-                              node_t *const node) {
+retcode_t tips_requester_init(tips_requester_t *const tips_requester, node_t *const node) {
   if (tips_requester == NULL || node == NULL) {
     return RC_NULL_PARAM;
   }
 
-  logger_id =
-      logger_helper_enable(TIPS_REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
+  logger_id = logger_helper_enable(TIPS_REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
 
   tips_requester->running = false;
   tips_requester->node = node;
@@ -108,9 +101,7 @@ retcode_t tips_requester_start(tips_requester_t *const tips_requester) {
 
   log_info(logger_id, "Spawning tips requester thread\n");
   tips_requester->running = true;
-  if (thread_handle_create(&tips_requester->thread,
-                           (thread_routine_t)tips_requester_routine,
-                           tips_requester) != 0) {
+  if (thread_handle_create(&tips_requester->thread, (thread_routine_t)tips_requester_routine, tips_requester) != 0) {
     log_critical(logger_id, "Spawning tips requester thread failed\n");
     return RC_FAILED_THREAD_SPAWN;
   }

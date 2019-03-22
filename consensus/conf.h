@@ -8,11 +8,17 @@
 #ifndef __CONSENSUS_CONF_H__
 #define __CONSENSUS_CONF_H__
 
+#include "common/crypto/sponge/sponge.h"
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
 
 #define IOTA_SUPPLY 2779530283277761LL
 
+#define DEFAULT_COORDINATOR_ADDRESS COORDINATOR_ADDRESS
+#define DEFAULT_COORDINATOR_NUM_KEYS_IN_MILESTONE COORDINATOR_NUM_KEYS_IN_MILESTONE
+#define DEFAULT_COORDINATOR_SECURITY_LEVEL 1
+#define DEFAULT_COORDINATOR_SIGNATURE_TYPE SPONGE_CURLP27
+#define DEFAULT_MWN MWM
 #define DEFAULT_TIP_SELECTION_MAX_DEPTH 15
 #define DEFAULT_TIP_SELECTION_ALPHA 0.001
 #define DEFAULT_TIP_SELECTION_BELOW_MAX_DEPTH 20000
@@ -21,8 +27,6 @@
 #define DEFAULT_SNAPSHOT_CONF_FILE SNAPSHOT_CONF_FILE
 #define DEFAULT_SNAPSHOT_SIG_FILE SNAPSHOT_SIG_FILE
 #define DEFAULT_SNAPSHOT_FILE SNAPSHOT_FILE
-#define DEFAULT_NUM_KEYS_IN_MILESTONE NUM_KEYS_IN_MILESTONE
-#define DEFAULT_MWN MWM
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,13 +61,19 @@ typedef struct iota_consensus_conf_s {
   // Public key of the snapshot signature
   flex_trit_t snapshot_signature_pubkey[FLEX_TRIT_SIZE_243];
   // The address of the coordinator
-  flex_trit_t coordinator[FLEX_TRIT_SIZE_243];
+  flex_trit_t coordinator_address[FLEX_TRIT_SIZE_243];
+  // The depth of the Merkle tree which in turn determines the number of leaves
+  // (private keys) that the coordinator can use to sign a message
+  size_t coordinator_num_keys_in_milestone;
+  // The security level used in coordinator signatures
+  uint8_t coordinator_security_level;
+  // The signature type used in coordinator signatures
+  sponge_type_t coordinator_signature_type;
+  // The maximal amount of possible milestones that can be issued
+  uint64_t coordinator_max_milestone_index;
   // The index of the last milestone issued by the corrdinator before the
   // last snapshot
   uint64_t last_milestone;
-  // The depth of the Merkle tree which in turn determines the number of leaves
-  // (private keys) that the coordinator can use to sign a message
-  size_t num_keys_in_milestone;
   // Number of trailing ternary 0s that must appear at the end of a transaction
   // hash. Difficulty can be described as 3^mwm
   uint8_t mwm;

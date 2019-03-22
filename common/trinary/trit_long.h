@@ -43,15 +43,13 @@ size_t encoded_length(int64_t const value);
 /// @param[in] trits - an array of trits
 /// @param[in] num_trits - the number of trits in the array
 /// @return int - return 0 on succes, -1 on failure
-int encode_long(int64_t const value, trit_t *const trits,
-                size_t const num_trits);
+int encode_long(int64_t const value, trit_t *const trits, size_t const num_trits);
 /// Decode a value (for MAM)
 /// @param[in] trits - an array of trits
 /// @param[in] num_trits - the number of trits in the array
 /// @param[in/out] size - the size of the encoded data
 /// @return int64_t - the value decoded from the array of trits
-int64_t decode_long(trit_t const *const trits, size_t const num_trits,
-                    size_t *const size);
+int64_t decode_long(trit_t const *const trits, size_t const num_trits, size_t *const size);
 
 #ifdef __cplusplus
 }

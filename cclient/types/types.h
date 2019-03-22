@@ -25,17 +25,9 @@
 #include "utils/containers/hash/hash_array.h"
 #include "utils/logger_helper.h"
 
-#include "utarray.h"
-#include "utlist.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef trit_array_p address_t;
-typedef trit_array_p bundle_hash_t;
-typedef trit_array_p tag_t;
-typedef trit_array_p tx_hash_t;
 
 typedef struct {
   size_t length;
@@ -47,11 +39,6 @@ typedef struct {
   int* array;
 } int_array;
 
-typedef struct flex_hash_array {
-  trit_array_p hash;  // trit_array_t is an array of flex_trit.
-  struct flex_hash_array* next;
-} flex_hash_array_t;
-
 void logger_init_types();
 void logger_destroy_types();
 
@@ -59,28 +46,6 @@ char_buffer_t* char_buffer_new();
 retcode_t char_buffer_allocate(char_buffer_t* in, const size_t n);
 retcode_t char_buffer_set(char_buffer_t* in, char const* const str);
 void char_buffer_free(char_buffer_t* in);
-
-retcode_t flex_hash_to_trytes(const trit_array_p hash, char* trytes);
-retcode_t trytes_to_flex_hash(trit_array_p hash, const char* trytes);
-retcode_t flex_hash_to_char_buffer(trit_array_p hash, char_buffer_t* out);
-
-flex_hash_array_t* flex_hash_array_new();
-flex_hash_array_t* flex_hash_array_append(flex_hash_array_t* head,
-                                          char const* const trytes);
-trit_array_p flex_hash_array_at(flex_hash_array_t* head, size_t index);
-int flex_hash_array_count(flex_hash_array_t* head);
-void flex_hash_array_free(flex_hash_array_t* head);
-
-typedef UT_array* transaction_array_t;
-transaction_array_t transaction_array_new();
-void transaction_array_push_back(transaction_array_t txs,
-                                 iota_transaction_t const* const tx);
-size_t transaction_array_len(transaction_array_t txs);
-void transaction_array_free(transaction_array_t txs);
-iota_transaction_t* transaction_array_at(transaction_array_t txs, size_t index);
-#define TX_OBJS_FOREACH(txs, tx)                                 \
-  for (tx = (iota_transaction_t*)utarray_front(txs); tx != NULL; \
-       tx = (iota_transaction_t*)utarray_next(txs, tx))
 
 #ifdef __cplusplus
 }

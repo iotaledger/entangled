@@ -14,20 +14,15 @@ namespace statscollector {
 constexpr static auto PUBLISHERS = "publishers";
 constexpr static auto PUB_INTERVAL = "pub_interval";
 constexpr static auto PUB_DELAY = "pub_delay";
-constexpr static auto BUNDLE_CONFIRMATION_HISTOGRAM_RANGE =
-    "bundle_confirmation_histogram_range";
-constexpr static auto BUNDLE_CONFIRMATION_BUCKET_SIZE =
-    "bundle_confirmation_bucket_size";
+constexpr static auto BUNDLE_CONFIRMATION_HISTOGRAM_RANGE = "bundle_confirmation_histogram_range";
+constexpr static auto BUNDLE_CONFIRMATION_BUCKET_SIZE = "bundle_confirmation_bucket_size";
 
 constexpr static auto METRIC_PREFIX = "statscollector";
 
 class ZMQCollectorImpl {
  public:
-  ZMQCollectorImpl(std::string zmqURL,
-                   std::shared_ptr<prometheus::Registry>& registry,
-                   bool useURLLable);
-  void collect(uint32_t bundleConfirmationHistogramRange,
-               uint32_t bundleConfirmationBucketSize);
+  ZMQCollectorImpl(std::string zmqURL, std::shared_ptr<prometheus::Registry>& registry, bool useURLLable);
+  void collect(uint32_t bundleConfirmationHistogramRange, uint32_t bundleConfirmationBucketSize);
 
  private:
   std::string _zmqURL;

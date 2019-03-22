@@ -27,8 +27,7 @@ DECLARE_CL(trit_array_p);
  *
  * @return true if equal, false otherwise
  */
-bool trit_array_cmp(trit_array_p const *const lhs,
-                    trit_array_p const *const rhs);
+bool trit_array_cmp(trit_array_p const *const lhs, trit_array_p const *const rhs);
 
 #ifdef __cplusplus
 }

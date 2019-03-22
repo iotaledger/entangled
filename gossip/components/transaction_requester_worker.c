@@ -21,15 +21,13 @@ static logger_id_t logger_id;
  * Private functions
  */
 
-static void *transaction_requester_routine(
-    transaction_requester_t *const transaction_requester) {
+static void *transaction_requester_routine(transaction_requester_t *const transaction_requester) {
   neighbor_t *iter = NULL;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trit_t transaction[FLEX_TRIT_SIZE_8019];
   retcode_t ret = RC_OK;
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
-  connection_config_t db_conf = {.db_path =
-                                     transaction_requester->node->conf.db_path};
+  connection_config_t db_conf = {.db_path = transaction_requester->node->conf.db_path};
   tangle_t tangle;
 
   if (transaction_requester == NULL) {
@@ -50,8 +48,7 @@ static void *transaction_requester_routine(
       memset(transaction, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
     } else {
       hash_pack_reset(&pack);
-      ret = iota_tangle_transaction_load(&tangle, TRANSACTION_FIELD_HASH, hash,
-                                         &pack);
+      ret = iota_tangle_transaction_load(&tangle, TRANSACTION_FIELD_HASH, hash, &pack);
       if (ret == RC_OK && pack.num_loaded != 0) {
         transaction_serialize_on_flex_trits(txp, transaction);
       } else {
@@ -60,8 +57,7 @@ static void *transaction_requester_routine(
     }
     rw_lock_handle_rdlock(&transaction_requester->node->neighbors_lock);
     LL_FOREACH(transaction_requester->node->neighbors, iter) {
-      if (neighbor_send(transaction_requester->node, &tangle, iter,
-                        transaction) != RC_OK) {
+      if (neighbor_send(transaction_requester->node, &tangle, iter, transaction) != RC_OK) {
         log_warning(logger_id, "Sending request failed\n");
       }
     }
@@ -81,8 +77,7 @@ static void *transaction_requester_routine(
  * Public functions
  */
 
-retcode_t requester_start(
-    transaction_requester_t *const transaction_requester) {
+retcode_t requester_start(transaction_requester_t *const transaction_requester) {
   if (transaction_requester == NULL) {
     return RC_NULL_PARAM;
   }
@@ -90,8 +85,7 @@ retcode_t requester_start(
   logger_id = logger_helper_enable(REQUESTER_LOGGER_ID, LOGGER_DEBUG, true);
   log_info(logger_id, "Spawning transaction requester thread\n");
   transaction_requester->running = true;
-  if (thread_handle_create(&transaction_requester->thread,
-                           (thread_routine_t)transaction_requester_routine,
+  if (thread_handle_create(&transaction_requester->thread, (thread_routine_t)transaction_requester_routine,
                            transaction_requester) != 0) {
     return RC_FAILED_THREAD_SPAWN;
   }

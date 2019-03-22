@@ -63,9 +63,8 @@ size_t transaction_request_queue_count(transaction_request_queue_t const queue);
  *
  * @return a status code
  */
-retcode_t transaction_request_queue_push(
-    transaction_request_queue_t* const queue, neighbor_t* const neighbor,
-    flex_trit_t const* const hash);
+retcode_t transaction_request_queue_push(transaction_request_queue_t* const queue, neighbor_t* const neighbor,
+                                         flex_trit_t const* const hash);
 
 /**
  * Pops a transaction request from a transaction request queue
@@ -83,8 +82,7 @@ void transaction_request_queue_pop(transaction_request_queue_t* const queue);
  *
  * @return the transaction request
  */
-transaction_request_t* transaction_request_queue_peek(
-    transaction_request_queue_t const queue);
+transaction_request_t* transaction_request_queue_peek(transaction_request_queue_t const queue);
 
 /**
  * Frees a transaction request queue

@@ -20,10 +20,8 @@ void ascii_to_trytes(char const *const input, tryte_t *const output) {
   }
 }
 
-void trytes_to_ascii(tryte_t const *const input, size_t const input_size,
-                     char *const output) {
+void trytes_to_ascii(tryte_t const *const input, size_t const input_size, char *const output) {
   for (int i = 0; i < input_size; i += 2) {
-    output[i / 2] =
-        INDEX_OF_TRYTE(input[i]) + INDEX_OF_TRYTE(input[i + 1]) * TRYTE_SPACE;
+    output[i / 2] = INDEX_OF_TRYTE(input[i]) + INDEX_OF_TRYTE(input[i + 1]) * TRYTE_SPACE;
   }
 }

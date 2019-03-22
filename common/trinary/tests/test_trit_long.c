@@ -12,20 +12,19 @@
 
 #define LONG_EXP 565253
 #define TRITS_IN -1, 0, 1, 1, 0, 1, 1, 0, -1, -1, 1, 0, 1
-#define TRITS_IN_ENC \
-  1, 0, -1, -1, 0, -1, 1, 0, -1, 1, -1, 0, 1, 0, 0, -1, 1, 1, 0
+#define TRITS_IN_ENC 1, 0, -1, -1, 0, -1, 1, 0, -1, 1, -1, 0, 1, 0, 0, -1, 1, 1, 0
 #define TRITS_IN_ENC_LEN 19
 
 #define MAX_LONG_EXP 0x7FFFFFFFFFFFFFFF
-#define MAX_TRITS_IN                                                           \
-  1, -1, 0, 1, -1, 0, -1, 1, 1, 0, -1, 0, -1, 0, 1, 0, 1, 0, -1, 1, 1, -1, -1, \
-      1, 0, 1, -1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, -1, 1, -1, 1
+#define MAX_TRITS_IN                                                                                                   \
+  1, -1, 0, 1, -1, 0, -1, 1, 1, 0, -1, 0, -1, 0, 1, 0, 1, 0, -1, 1, 1, -1, -1, 1, 0, 1, -1, 0, 0, 1, 1, 1, 0, 0, 1, 1, \
+      1, -1, 1, -1, 1
 #define MAX_TRITS_IN_LEN 41
 
 #define MIN_LONG_EXP 0x8000000000000000
-#define MIN_TRITS_IN                                                          \
-  1, 0, 0, -1, 1, 0, 1, -1, -1, 0, 1, 0, 1, 0, -1, 0, -1, 0, 1, -1, -1, 1, 1, \
-      -1, 0, -1, 1, 0, 0, -1, -1, -1, 0, 0, -1, -1, -1, 1, -1, 1, -1
+#define MIN_TRITS_IN                                                                                                \
+  1, 0, 0, -1, 1, 0, 1, -1, -1, 0, 1, 0, 1, 0, -1, 0, -1, 0, 1, -1, -1, 1, 1, -1, 0, -1, 1, 0, 0, -1, -1, -1, 0, 0, \
+      -1, -1, -1, 1, -1, 1, -1
 #define MIN_TRITS_IN_LEN 41
 
 void test_min_trits(void) {
@@ -94,9 +93,7 @@ void test_from_long(void) {
   TEST_ASSERT_EQUAL_MEMORY(exp, trits, sizeof(trits));
 }
 
-void test_encoded_long_length(void) {
-  TEST_ASSERT_EQUAL_INT(TRITS_IN_ENC_LEN, encoded_length(LONG_EXP));
-}
+void test_encoded_long_length(void) { TEST_ASSERT_EQUAL_INT(TRITS_IN_ENC_LEN, encoded_length(LONG_EXP)); }
 
 void test_encoded_long(void) {
   size_t size = encoded_length(LONG_EXP);

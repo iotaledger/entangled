@@ -8,7 +8,7 @@
 #ifndef __UTILS_MERKLE_H__
 #define __UTILS_MERKLE_H__
 
-#include "common/curl-p/trit.h"
+#include "common/crypto/curl-p/trit.h"
 
 #define NULL_SIBLING 1
 #define NULL_TREE 2
@@ -46,8 +46,7 @@ size_t merkle_depth(size_t const node_count);
  *
  * @return The index of the node
  */
-size_t merkle_node_index(size_t const depth, size_t const width,
-                         size_t const tree_depth);
+size_t merkle_node_index(size_t const depth, size_t const width, size_t const tree_depth);
 
 /**
  * Helper function to compute the actual site index of a leaf
@@ -71,8 +70,7 @@ size_t merkle_leaf_index(size_t const leaf_index, size_t const leaf_count);
  *
  * @return Success/error code
  */
-int merkle_create(trit_t *const tree, size_t const base_size,
-                  trit_t const *const seed, int64_t const offset,
+int merkle_create(trit_t *const tree, size_t const base_size, trit_t const *const seed, int64_t const offset,
                   size_t const security, Curl *const c);
 
 /**
@@ -87,8 +85,7 @@ int merkle_create(trit_t *const tree, size_t const base_size,
  *
  * @return Success/error code
  */
-int merkle_branch(trit_t const *const tree, trit_t *const siblings,
-                  size_t const tree_length, size_t const tree_depth,
+int merkle_branch(trit_t const *const tree, trit_t *const siblings, size_t const tree_length, size_t const tree_depth,
                   size_t const leaf_index, size_t const leaf_count);
 
 /**
@@ -100,9 +97,8 @@ int merkle_branch(trit_t const *const tree, trit_t *const siblings,
  * @param leaf_index The node index of the hash
  * @param c A curl instance to compute hashes
  */
-void merkle_root(trit_t *const hash, trit_t const *const siblings,
-                 size_t const siblings_number, size_t const leaf_index,
-                 Curl *const c);
+void merkle_root(trit_t *const hash, trit_t const *const siblings, size_t const siblings_number,
+                 size_t const leaf_index, Curl *const c);
 
 #ifdef __cplusplus
 }

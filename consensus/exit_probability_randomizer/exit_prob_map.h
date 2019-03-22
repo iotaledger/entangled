@@ -34,8 +34,7 @@ struct ep_prob_map_randomizer_s {
  *
  * @return a status code
  */
-retcode_t iota_consensus_exit_prob_map_reset(
-    ep_randomizer_t *const exit_probability_randomizer);
+retcode_t iota_consensus_exit_prob_map_reset(ep_randomizer_t *const exit_probability_randomizer);
 
 void iota_consensus_exit_prob_map_init(ep_randomizer_t *const randomizer);
 
@@ -59,12 +58,11 @@ void iota_consensus_exit_prob_map_init(ep_randomizer_t *const randomizer);
  *
  * @return a status code
  */
-retcode_t iota_consensus_exit_prob_map_randomize(
-    ep_randomizer_t const *const exit_probability_randomizer,
-    tangle_t *const tangle,
-    exit_prob_transaction_validator_t *const ep_validator,
-    cw_calc_result *const cw_result, flex_trit_t const *const ep,
-    flex_trit_t *tip);
+retcode_t iota_consensus_exit_prob_map_randomize(ep_randomizer_t const *const exit_probability_randomizer,
+                                                 tangle_t *const tangle,
+                                                 exit_prob_transaction_validator_t *const ep_validator,
+                                                 cw_calc_result *const cw_result, flex_trit_t const *const ep,
+                                                 flex_trit_t *tip);
 /**
  * Calculates exit and overall transition probabilities
  *
@@ -81,13 +79,12 @@ retcode_t iota_consensus_exit_prob_map_randomize(
  *
  * @return a status code
  */
-retcode_t iota_consensus_exit_prob_map_calculate_probs(
-    ep_randomizer_t const *const exit_probability_randomizer,
-    tangle_t *const tangle,
-    exit_prob_transaction_validator_t *const ep_validator,
-    cw_calc_result *const cw_result, flex_trit_t const *const ep,
-    hash_to_double_map_t *const hash_to_exit_probs,
-    hash_to_double_map_t *const hash_to_trans_probs);
+retcode_t iota_consensus_exit_prob_map_calculate_probs(ep_randomizer_t const *const exit_probability_randomizer,
+                                                       tangle_t *const tangle,
+                                                       exit_prob_transaction_validator_t *const ep_validator,
+                                                       cw_calc_result *const cw_result, flex_trit_t const *const ep,
+                                                       hash_to_double_map_t *const hash_to_exit_probs,
+                                                       hash_to_double_map_t *const hash_to_trans_probs);
 
 /**
  * Virtual distructor
@@ -98,8 +95,7 @@ retcode_t iota_consensus_exit_prob_map_calculate_probs(
  *
  * @return a statuc code
  */
-retcode_t iota_consensus_exit_prob_map_destroy(
-    ep_randomizer_t *const exit_probability_randomizer);
+retcode_t iota_consensus_exit_prob_map_destroy(ep_randomizer_t *const exit_probability_randomizer);
 
 /**
  * Extracts tips into set
@@ -111,11 +107,9 @@ retcode_t iota_consensus_exit_prob_map_destroy(
  *
  * @return void
  */
-void iota_consensus_exit_prob_map_eps_extract_tips(
-    cw_calc_result *const cw_result, hash243_set_t *const tips);
+void iota_consensus_exit_prob_map_eps_extract_tips(cw_calc_result *const cw_result, hash243_set_t *const tips);
 
-double iota_consensus_exit_prob_map_sum_probs(
-    hash_to_double_map_t *const hash_to_probs);
+double iota_consensus_exit_prob_map_sum_probs(hash_to_double_map_t *const hash_to_probs);
 
 static ep_randomizer_vtable exit_prob_map_vtable = {
     .exit_probability_randomize = iota_consensus_exit_prob_map_randomize,

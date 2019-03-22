@@ -29,9 +29,7 @@ void TangleDB::removeAgedTxs(uint32_t ageInSeconds) {
   std::unique_lock<std::shared_mutex> lock(mutex_);
 
   for (auto&& it = _txs.begin(); it != _txs.end();) {
-    if (std::chrono::duration_cast<std::chrono::seconds>(now -
-                                                         it->second.timestamp)
-            .count() > ageInSeconds) {
+    if (std::chrono::duration_cast<std::chrono::seconds>(now - it->second.timestamp).count() > ageInSeconds) {
       _txs.erase(it++);
     } else {
       ++it;
@@ -39,8 +37,7 @@ void TangleDB::removeAgedTxs(uint32_t ageInSeconds) {
   }
 }
 
-std::unordered_map<std::string, TangleDB::TXRecord> TangleDB::getTXsMap()
-    const {
+std::unordered_map<std::string, TangleDB::TXRecord> TangleDB::getTXsMap() const {
   std::shared_lock<std::shared_mutex> lock(mutex_);
   return _txs;
 };

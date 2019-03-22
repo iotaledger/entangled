@@ -51,8 +51,7 @@ extern "C" {
  *
  * @return a status code
  */
-retcode_t iota_packet_set_transaction(iota_packet_t* const packet,
-                                      flex_trit_t const* const transaction);
+retcode_t iota_packet_set_transaction(iota_packet_t* const packet, flex_trit_t const* const transaction);
 
 /**
  * Sets the request of a packet
@@ -63,9 +62,7 @@ retcode_t iota_packet_set_transaction(iota_packet_t* const packet,
  *
  * @return a status code
  */
-retcode_t iota_packet_set_request(iota_packet_t* const packet,
-                                  flex_trit_t const* const request,
-                                  uint8_t request_size);
+retcode_t iota_packet_set_request(iota_packet_t* const packet, flex_trit_t const* const request, uint8_t request_size);
 
 /**
  * Sets the endpoint of a packet
@@ -77,8 +74,7 @@ retcode_t iota_packet_set_request(iota_packet_t* const packet,
  *
  * @return a status code
  */
-retcode_t iota_packet_set_endpoint(iota_packet_t* const packet,
-                                   char const* const ip, uint16_t const port,
+retcode_t iota_packet_set_endpoint(iota_packet_t* const packet, char const* const ip, uint16_t const port,
                                    protocol_type_t const protocol);
 
 /**
@@ -107,8 +103,7 @@ size_t iota_packet_queue_count(iota_packet_queue_t const queue);
  *
  * @return a status code
  */
-retcode_t iota_packet_queue_push(iota_packet_queue_t* const queue,
-                                 iota_packet_t const* const packet);
+retcode_t iota_packet_queue_push(iota_packet_queue_t* const queue, iota_packet_t const* const packet);
 
 /**
  * Pops a packet from a packet queue

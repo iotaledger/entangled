@@ -20,14 +20,12 @@ namespace statscollector {
 
 class TXStats {
  public:
-  virtual void trackNewTX(iri::TXMessage&,
-                          PrometheusCollector::CountersMap& metrics) = 0;
+  virtual void trackNewTX(iri::TXMessage&, PrometheusCollector::CountersMap& metrics) = 0;
   virtual void trackReattachedTX(PrometheusCollector::CountersMap& metrics) = 0;
   virtual void trackNewBundle(PrometheusCollector::CountersMap& metrics) = 0;
-  virtual void trackConfirmedBundle(
-      int64_t totalValue, uint64_t size, uint64_t bundleDuration,
-      PrometheusCollector::CountersMap& counters,
-      PrometheusCollector::HistogramsMap& histograms) = 0;
+  virtual void trackConfirmedBundle(int64_t totalValue, uint64_t size, uint64_t bundleDuration,
+                                    PrometheusCollector::CountersMap& counters,
+                                    PrometheusCollector::HistogramsMap& histograms) = 0;
 };
 }  // namespace statscollector
 }  // namespace tanglescope

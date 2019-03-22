@@ -14,8 +14,8 @@ extern "C" {
 
 #include <stdlib.h>
 #include <string.h>
+#include "common/crypto/kerl/kerl.h"
 #include "common/helpers/sign.h"
-#include "common/kerl/kerl.h"
 #include "common/model/transaction.h"
 #include "common/trinary/trit_long.h"
 #include "utils/logger_helper.h"
@@ -56,28 +56,23 @@ typedef struct _transfer {
   transfer_type_e type;
   const flex_trit_t *address;
   const flex_trit_t *tag;
+  flex_trit_t obsolete_tag[FLEX_TRIT_SIZE_81];
   int64_t value;
   uint64_t timestamp;
   void *meta;  // extend informations depended on transfer type.
 } transfer_t;
 
 // create a data transfer object.
-transfer_t *transfer_data_new(flex_trit_t const *const address,
-                              flex_trit_t const *const tag,
-                              flex_trit_t const *const data, uint32_t data_len,
-                              uint64_t timestamp);
+transfer_t *transfer_data_new(flex_trit_t const *const address, flex_trit_t const *const tag,
+                              flex_trit_t const *const data, uint32_t data_len, uint64_t timestamp);
 
 // create a value_out transfer object.
-transfer_t *transfer_value_out_new(transfer_value_out_t const *const output,
-                                   flex_trit_t const *const tag,
-                                   flex_trit_t const *const address,
-                                   int64_t value, uint64_t timestamp);
+transfer_t *transfer_value_out_new(transfer_value_out_t const *const output, flex_trit_t const *const tag,
+                                   flex_trit_t const *const address, int64_t value, uint64_t timestamp);
 
 // create a value_int transfer object.
-transfer_t *transfer_value_in_new(flex_trit_t const *const address,
-                                  flex_trit_t const *const tag, int64_t value,
-                                  flex_trit_t const *const data,
-                                  uint32_t data_len, uint64_t timestamp);
+transfer_t *transfer_value_in_new(flex_trit_t const *const address, flex_trit_t const *const tag, int64_t value,
+                                  flex_trit_t const *const data, uint32_t data_len, uint64_t timestamp);
 
 // Get the number of transactions for this transfer
 uint32_t transfer_transactions_count(transfer_t *tf);
@@ -95,26 +90,20 @@ typedef struct _transfer_ctx {
 } transfer_ctx_t;
 
 // Creates and returns a new transfer context
-bool transfer_ctx_init(transfer_ctx_t *transfer_ctx, transfer_t *transfers[],
-                       uint32_t len);
+bool transfer_ctx_init(transfer_ctx_t *transfer_ctx, transfer_t *transfers[], uint32_t len);
 
 // Calculates the bundle hash for a collection of transfers
-void transfer_ctx_hash(transfer_ctx_t *transfer_ctx, Kerl *kerl,
-                       transfer_t *transfers[], uint32_t tx_len);
+void transfer_ctx_hash(transfer_ctx_t *transfer_ctx, Kerl *kerl, transfer_t *transfers[], uint32_t tx_len);
 
 // Returns the resulting bundle hash
 // flex_trit_t *transfer_ctx_finalize(transfer_ctx_t *transfer_ctx);
 
-void absorb_essence(Kerl *const kerl, flex_trit_t const *address, int64_t value,
-                    flex_trit_t const *obsolete_tag, uint64_t timestamp,
-                    int64_t current_index, int64_t last_index,
-                    trit_t *const essence_trits);
+void absorb_essence(Kerl *const kerl, flex_trit_t const *address, int64_t value, flex_trit_t const *obsolete_tag,
+                    uint64_t timestamp, int64_t current_index, int64_t last_index, trit_t *const essence_trits);
 /***********************************************************************************************************
  * Transfer Iterator data structure
  ***********************************************************************************************************/
-typedef flex_trit_t *(*iota_signature_generator)(const flex_trit_t *seed,
-                                                 const size_t index,
-                                                 const size_t security,
+typedef flex_trit_t *(*iota_signature_generator)(const flex_trit_t *seed, const size_t index, const size_t security,
                                                  const flex_trit_t *bundleHash);
 
 typedef struct _transfer_iterator {
@@ -132,13 +121,11 @@ typedef struct _transfer_iterator {
 } transfer_iterator_t;
 
 // Returns the next transaction
-iota_transaction_t *transfer_iterator_next(
-    transfer_iterator_t *transfer_iterator);
+iota_transaction_t *transfer_iterator_next(transfer_iterator_t *transfer_iterator);
 
 // Creates and returns a new transfer iterator
 // if `transaction` is NULL will be dynamically allocated a transaction object.
-transfer_iterator_t *transfer_iterator_new(transfer_t *transfers[],
-                                           uint32_t len, Kerl *kerl,
+transfer_iterator_t *transfer_iterator_new(transfer_t *transfers[], uint32_t len, Kerl *kerl,
                                            iota_transaction_t *transaction);
 
 // Free an existing transfer iterator
