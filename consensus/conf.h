@@ -38,7 +38,7 @@ extern "C" {
 typedef struct iota_consensus_conf_s {
   // The hash of the genesis transaction
   flex_trit_t genesis_hash[FLEX_TRIT_SIZE_243];
-  // Limits how many milestones behind the current one the random walk can start
+  // The maximal number of previous milestones from where you can perform the random walk
   size_t max_depth;
   // Randomness of the tip selection. Value must be in [0, inf] where 0 is most
   // random and inf is most deterministic
@@ -46,6 +46,8 @@ typedef struct iota_consensus_conf_s {
   // Maximum number of unconfirmed transactions that may be analysed to find the
   // latest referenced milestone by the currently visited transaction during the
   // random walk
+  // The maximal number of unconfirmed transactions that may be analyzed in order to find the latest milestone the
+  // transaction that we are stepping on during the walk approves
   size_t below_max_depth;
   // Path of the snapshot configuration file
   char snapshot_conf_file[128];

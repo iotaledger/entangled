@@ -125,9 +125,8 @@ static struct cli_argument_s {
      "most random and inf is most deterministic.",
      REQUIRED_ARG},
     {"below-max-depth", CONF_BELOW_MAX_DEPTH,
-     "Maximum number of unconfirmed transactions that may be analysed to find "
-     "the latest referenced milestone by the currently visited transaction "
-     "during the random walk.",
+     "The maximal number of unconfirmed transactions that may be analyzed in order to find the latest milestone the "
+     "transaction that we are stepping on during the walk approves.",
      REQUIRED_ARG},
     {"coordinator-address", CONF_COORDINATOR_ADDRESS, "The address of the coordinator.", REQUIRED_ARG},
     {"coordinator-num-keys-in-milestone", CONF_COORDINATOR_NUM_KEYS_IN_MILESTONE,
@@ -144,9 +143,7 @@ static struct cli_argument_s {
      "last snapshot.",
      REQUIRED_ARG},
     {"max-depth", CONF_MAX_DEPTH,
-     "Limits how many milestones behind the current one the random walk can "
-     "start.",
-     REQUIRED_ARG},
+     "The maximal number of previous milestones from where you can perform the random walk.", REQUIRED_ARG},
     {"snapshot-file", CONF_SNAPSHOT_FILE,
      "Path to the file that contains the state of the ledger at the last "
      "snapshot.",
