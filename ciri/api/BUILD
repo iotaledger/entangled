@@ -16,12 +16,9 @@ cc_library(
         ":conf",
         "//cclient/request:requests",
         "//cclient/response:responses",
-        "//ciri:core_shared",
+        "//ciri:core",
         "//common:errors",
-        "//consensus",
-        "//gossip/components:broadcaster",
         "//utils:logger_helper",
-        "//utils/handles:thread",
     ],
 )
 

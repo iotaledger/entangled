@@ -8,17 +8,11 @@
 #ifndef __CIRI_API_API_H__
 #define __CIRI_API_API_H__
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include "cclient/request/requests.h"
 #include "cclient/response/responses.h"
 #include "ciri/api/conf.h"
 #include "ciri/core.h"
 #include "common/errors.h"
-#include "consensus/consensus.h"
-#include "gossip/components/broadcaster.h"
-#include "utils/handles/thread.h"
 
 #define API_TAILS_NOT_SOLID "tails are not solid (missing a referenced tx)"
 #define API_TAILS_BUNDLE_INVALID "tails are not consistent (bundle is invalid)"

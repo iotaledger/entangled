@@ -8,7 +8,6 @@
 #include <string.h>
 
 #include "ciri/api/api.h"
-#include "gossip/node.h"
 #include "utils/logger_helper.h"
 #include "utils/time.h"
 
@@ -23,55 +22,6 @@ static logger_id_t logger_id;
 static bool invalid_subtangle_status(iota_api_t const *const api) {
   return (api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index ==
           api->core->consensus.milestone_tracker.milestone_start_index);
-}
-
-typedef enum iota_api_command_e {
-  CMD_GET_NODE_INFO,
-  CMD_GET_NEIGHBORS,
-  CMD_ADD_NEIGHBORS,
-  CMD_REMOVE_NEIGHBORS,
-  CMD_GET_TIPS,
-  CMD_FIND_TRANSACTIONS,
-  CMD_GET_TRYTES,
-  CMD_GET_INCLUSION_STATES,
-  CMD_GET_BALANCES,
-  CMD_GET_TRANSACTIONS_TO_APPROVE,
-  CMD_ATTACH_TO_TANGLE,
-  CMD_INTERRUPT_ATTACHING_TO_TANGLE,
-  CMD_BROADCAST_TRANSACTIONS,
-  CMD_STORE_TRANSACTIONS,
-  CMD_WERE_ADDRESSES_SPENT_FROM,
-  CMD_CHECK_CONSISTENCY,
-  CMD_UNKNOWN
-} iota_api_command_t;
-
-static iota_api_command_t get_command(char const *const command) {
-  static struct iota_api_command_map_s {
-    char const *const string;
-    iota_api_command_t const value;
-  } map[] = {
-      {"getNodeInfo", CMD_GET_NODE_INFO},
-      {"getNeighbors", CMD_GET_NEIGHBORS},
-      {"addNeighbors", CMD_ADD_NEIGHBORS},
-      {"removeNeighbors", CMD_REMOVE_NEIGHBORS},
-      {"getTips", CMD_GET_TIPS},
-      {"findTransactions", CMD_FIND_TRANSACTIONS},
-      {"getTrytes", CMD_GET_TRYTES},
-      {"getInclusionStates", CMD_GET_INCLUSION_STATES},
-      {"getBalances", CMD_GET_BALANCES},
-      {"getTransactionsToApprove", CMD_GET_TRANSACTIONS_TO_APPROVE},
-      {"attachToTangle", CMD_ATTACH_TO_TANGLE},
-      {"interruptAttachingToTangle", CMD_INTERRUPT_ATTACHING_TO_TANGLE},
-      {"broadcastTransactions", CMD_BROADCAST_TRANSACTIONS},
-      {"storeTransactions", CMD_STORE_TRANSACTIONS},
-      {"wereAddressesSpentFrom", CMD_WERE_ADDRESSES_SPENT_FROM},
-      {"checkConsistency", CMD_CHECK_CONSISTENCY},
-      {NULL, CMD_UNKNOWN},
-  };
-  struct iota_api_command_map_s *p = map;
-  for (; p->string != NULL && strcmp(p->string, command) != 0; ++p)
-    ;
-  return p->value;
 }
 
 /*
