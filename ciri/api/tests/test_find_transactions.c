@@ -69,6 +69,7 @@ void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK
 void test_find_transactions_bundles_only(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
+  error_res_t *error = NULL;
   hash243_queue_t res_hashes = NULL;
 
   iota_transaction_t txs[24];
@@ -100,12 +101,14 @@ void test_find_transactions_bundles_only(void) {
   bundle_trytes[1] = 'G';
   hash243_queue_push_trytes(&req->bundles, bundle_trytes);
 
-  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
 
   TEST_ASSERT(hash243_queue_cmp(res->hashes, res_hashes));
 
   find_transactions_req_free(&req);
   find_transactions_res_free(&res);
+  error_res_free(&error);
   hash243_queue_free(&res_hashes);
 }
 
@@ -119,6 +122,7 @@ void test_find_transactions_bundles_only(void) {
 void test_find_transactions_addresses_only(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
+  error_res_t *error = NULL;
   hash243_queue_t res_hashes = NULL;
 
   iota_transaction_t txs[24];
@@ -150,12 +154,14 @@ void test_find_transactions_addresses_only(void) {
   address_trytes[1] = 'F';
   hash243_queue_push_trytes(&req->addresses, address_trytes);
 
-  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
 
   TEST_ASSERT(hash243_queue_cmp(res->hashes, res_hashes));
 
   find_transactions_req_free(&req);
   find_transactions_res_free(&res);
+  error_res_free(&error);
   hash243_queue_free(&res_hashes);
 }
 
@@ -169,6 +175,7 @@ void test_find_transactions_addresses_only(void) {
 void test_find_transactions_tags_only(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
+  error_res_t *error = NULL;
   hash243_queue_t res_hashes = NULL;
 
   iota_transaction_t txs[24];
@@ -197,12 +204,14 @@ void test_find_transactions_tags_only(void) {
   tags_trytes[1] = 'C';
   hash81_queue_push_trytes(&req->tags, tags_trytes);
 
-  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
 
   TEST_ASSERT(hash243_queue_cmp(res->hashes, res_hashes));
 
   find_transactions_req_free(&req);
   find_transactions_res_free(&res);
+  error_res_free(&error);
   hash243_queue_free(&res_hashes);
 }
 
@@ -216,6 +225,7 @@ void test_find_transactions_tags_only(void) {
 void test_find_transactions_approvees_only(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
+  error_res_t *error = NULL;
   hash243_queue_t res_hashes = NULL;
 
   iota_transaction_t txs[24];
@@ -257,12 +267,14 @@ void test_find_transactions_approvees_only(void) {
   approvee_trytes[1] = 'M';
   hash243_queue_push_trytes(&req->approvees, approvee_trytes);
 
-  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
 
   TEST_ASSERT(hash243_queue_cmp(res->hashes, res_hashes));
 
   find_transactions_req_free(&req);
   find_transactions_res_free(&res);
+  error_res_free(&error);
   hash243_queue_free(&res_hashes);
 }
 
@@ -273,6 +285,7 @@ void test_find_transactions_approvees_only(void) {
 void test_find_transactions_intersection(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
+  error_res_t *error = NULL;
 
   iota_transaction_t txs[24];
 
@@ -343,7 +356,8 @@ void test_find_transactions_intersection(void) {
   approvee_trytes[1] = 'M';
   hash243_queue_push_trytes(&req->approvees, approvee_trytes);
 
-  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
 
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   hash_trytes[0] = 'G';
@@ -353,21 +367,26 @@ void test_find_transactions_intersection(void) {
 
   find_transactions_req_free(&req);
   find_transactions_res_free(&res);
+  error_res_free(&error);
 }
 
 void test_find_transactions_no_input(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
+  error_res_t *error = NULL;
 
-  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res) == RC_API_FIND_TRANSACTIONS_NO_INPUT);
+  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res, &error) == RC_API_FIND_TRANSACTIONS_NO_INPUT);
+  TEST_ASSERT(error == NULL);
 
   find_transactions_req_free(&req);
   find_transactions_res_free(&res);
+  error_res_free(&error);
 }
 
 void test_find_transactions_max(void) {
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
+  error_res_t *error = NULL;
 
   iota_transaction_t txs[24];
 
@@ -389,10 +408,12 @@ void test_find_transactions_max(void) {
     bundle_trytes[1] = 'A' + (i + 1) % 8;
   }
 
-  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res) == RC_API_MAX_FIND_TRANSACTIONS);
+  TEST_ASSERT(iota_api_find_transactions(&api, &tangle, req, res, &error) == RC_API_MAX_FIND_TRANSACTIONS);
+  TEST_ASSERT(error == NULL);
 
   find_transactions_req_free(&req);
   find_transactions_res_free(&res);
+  error_res_free(&error);
 }
 
 int main(void) {

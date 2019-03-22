@@ -33,8 +33,10 @@ static tryte_t *COORDINATOR =
 void test_get_node_info(void) {
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   get_node_info_res_t *res = get_node_info_res_new();
+  error_res_t *error = NULL;
 
-  TEST_ASSERT(iota_api_get_node_info(&api, res) == RC_OK);
+  TEST_ASSERT(iota_api_get_node_info(&api, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
 
   TEST_ASSERT_EQUAL_STRING(get_node_info_res_app_name(res), CIRI_NAME);
   TEST_ASSERT_EQUAL_STRING(get_node_info_res_app_version(res), CIRI_VERSION);
@@ -54,6 +56,7 @@ void test_get_node_info(void) {
   TEST_ASSERT_EQUAL_MEMORY(get_node_info_res_coordinator_address(res), hash, FLEX_TRIT_SIZE_243);
 
   get_node_info_res_free(&res);
+  error_res_free(&error);
 }
 
 int main(void) {

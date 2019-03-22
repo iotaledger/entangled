@@ -16,6 +16,7 @@ static core_t core;
 
 void test_get_tips(void) {
   get_tips_res_t *res = get_tips_res_new();
+  error_res_t *error = NULL;
   flex_trit_t hashes[10][FLEX_TRIT_SIZE_243];
   tryte_t trytes[81] =
       "A99999999999999999999999999999999999999999999999999999999999999999999999"
@@ -48,7 +49,8 @@ void test_get_tips(void) {
   TEST_ASSERT(tips_cache_add(&node->tips, hashes[3]) == RC_OK);
   TEST_ASSERT(tips_cache_add(&node->tips, hashes[4]) == RC_OK);
 
-  TEST_ASSERT(iota_api_get_tips(&api, res) == RC_OK);
+  TEST_ASSERT(iota_api_get_tips(&api, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
   TEST_ASSERT_EQUAL_INT(get_tips_res_hash_num(res), 10);
 
   size_t i = 9;
@@ -61,6 +63,7 @@ void test_get_tips(void) {
   TEST_ASSERT(tips_cache_destroy(&node->tips) == RC_OK);
 
   get_tips_res_free(&res);
+  error_res_free(&error);
 }
 
 int main(void) {
