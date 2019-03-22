@@ -20,7 +20,7 @@
 #include "cclient/serialization/json/check_consistency.h"
 #include "cclient/serialization/json/find_transactions.h"
 #include "cclient/serialization/json/get_balances.h"
-#include "cclient/serialization/json/get_inclusion_state.h"
+#include "cclient/serialization/json/get_inclusion_states.h"
 #include "cclient/serialization/json/get_neighbors.h"
 #include "cclient/serialization/json/get_node_info.h"
 #include "cclient/serialization/json/get_tips.h"
@@ -42,8 +42,8 @@ static serializer_vtable json_vtable = {
     .get_balances_deserialize_request = json_get_balances_deserialize_request,
     .get_balances_serialize_response = json_get_balances_serialize_response,
     .get_balances_deserialize_response = json_get_balances_deserialize_response,
-    .get_inclusion_state_serialize_request = json_get_inclusion_state_serialize_request,
-    .get_inclusion_state_deserialize_response = json_get_inclusion_state_deserialize_response,
+    .get_inclusion_states_serialize_request = json_get_inclusion_states_serialize_request,
+    .get_inclusion_states_deserialize_response = json_get_inclusion_states_deserialize_response,
     .get_neighbors_serialize_request = json_get_neighbors_serialize_request,
     .get_neighbors_serialize_response = json_get_neighbors_serialize_response,
     .get_neighbors_deserialize_response = json_get_neighbors_deserialize_response,

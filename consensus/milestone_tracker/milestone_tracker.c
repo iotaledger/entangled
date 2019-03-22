@@ -60,28 +60,28 @@ static retcode_t validate_coordinator(milestone_tracker_t* const mt, iota_milest
   trit_t signature_trits[NUM_TRITS_SIGNATURE];
   trit_t siblings_trits[NUM_TRITS_SIGNATURE];
   trit_t signed_hash[HASH_LENGTH_TRIT];
-  trit_t digest[mt->security_level * HASH_LENGTH_TRIT];
+  trit_t digest[mt->conf->coordinator_security_level * HASH_LENGTH_TRIT];
   trit_t root[HASH_LENGTH_TRIT];
   flex_trit_t coo[FLEX_TRIT_SIZE_243];
   sponge_t sponge;
 
   *valid = false;
-  tx = (iota_transaction_t*)utarray_eltptr(bundle, mt->security_level);
+  tx = (iota_transaction_t*)utarray_eltptr(bundle, mt->conf->coordinator_security_level);
   flex_trits_to_trits(siblings_trits, NUM_TRITS_SIGNATURE, transaction_signature(tx), NUM_TRITS_SIGNATURE,
                       NUM_TRITS_SIGNATURE);
-  sponge_init(&sponge, mt->sponge_type);
+  sponge_init(&sponge, mt->conf->coordinator_signature_type);
   normalize_flex_hash_to_trits(transaction_hash(tx), signed_hash);
-  for (int i = 0; i < mt->security_level; i++) {
+  for (int i = 0; i < mt->conf->coordinator_security_level; i++) {
     tx = (iota_transaction_t*)utarray_eltptr(bundle, i);
     flex_trits_to_trits(signature_trits, NUM_TRITS_SIGNATURE, transaction_signature(tx), NUM_TRITS_SIGNATURE,
                         NUM_TRITS_SIGNATURE);
     iss_sig_digest(&sponge, digest + i * HASH_LENGTH_TRIT, signed_hash + i * ISS_CHUNK_LENGTH, signature_trits,
                    NUM_TRITS_SIGNATURE);
   }
-  iss_address(&sponge, digest, root, mt->security_level * HASH_LENGTH_TRIT);
-  iss_merkle_root(&sponge, root, siblings_trits, mt->conf->num_keys_in_milestone, candidate->index);
+  iss_address(&sponge, digest, root, mt->conf->coordinator_security_level * HASH_LENGTH_TRIT);
+  iss_merkle_root(&sponge, root, siblings_trits, mt->conf->coordinator_num_keys_in_milestone, candidate->index);
   flex_trits_from_trits(coo, HASH_LENGTH_TRIT, root, HASH_LENGTH_TRIT, HASH_LENGTH_TRIT);
-  if (memcmp(coo, mt->coordinator, FLEX_TRIT_SIZE_243) == 0) {
+  if (memcmp(coo, mt->conf->coordinator_address, FLEX_TRIT_SIZE_243) == 0) {
     *valid = true;
   }
   sponge_destroy(&sponge);
@@ -98,7 +98,7 @@ retcode_t iota_milestone_tracker_validate_milestone(milestone_tracker_t* const m
   bundle_status_t bundle_status = BUNDLE_NOT_INITIALIZED;
   *milestone_status = MILESTONE_INVALID;
 
-  if (candidate->index >= 0x200000) {
+  if (candidate->index >= mt->conf->coordinator_max_milestone_index) {
     *milestone_status = MILESTONE_INVALID;
     return ret;
   } else if ((candidate->index <= mt->latest_solid_subtangle_milestone_index &&
@@ -127,7 +127,7 @@ retcode_t iota_milestone_tracker_validate_milestone(milestone_tracker_t* const m
     *milestone_status = MILESTONE_INCOMPLETE;
     goto done;
   } else if (bundle_status == BUNDLE_VALID) {
-    if (!is_milestone_bundle_structure_valid(bundle, candidate, mt->security_level)) {
+    if (!is_milestone_bundle_structure_valid(bundle, candidate, mt->conf->coordinator_security_level)) {
       log_warning(logger_id, "Invalid milestone bundle structure\n");
       goto done;
     }
@@ -306,8 +306,7 @@ static void* milestone_solidifier(void* arg) {
 
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consensus_conf_t* const conf,
                                       snapshot_t* const snapshot, ledger_validator_t* const lv,
-                                      transaction_solidifier_t* const ts, sponge_type_t const sponge_type,
-                                      uint8_t const security_level) {
+                                      transaction_solidifier_t* const ts) {
   if (mt == NULL) {
     return RC_CONSENSUS_MT_NULL_SELF;
   }
@@ -321,12 +320,9 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consen
   mt->transaction_solidifier = ts;
   mt->candidates = NULL;
   rw_lock_handle_init(&mt->candidates_lock);
-  memcpy(mt->coordinator, conf->coordinator, FLEX_TRIT_SIZE_243);
   mt->milestone_start_index = conf->last_milestone;
   mt->latest_milestone_index = conf->last_milestone;
   mt->latest_solid_subtangle_milestone_index = conf->last_milestone;
-  mt->sponge_type = sponge_type;
-  mt->security_level = security_level;
 
   return RC_OK;
 }
@@ -353,8 +349,8 @@ retcode_t iota_milestone_tracker_start(milestone_tracker_t* const mt, tangle_t* 
 
   hash_pack_init(&hash_pack, 512);
 
-  if ((ret = iota_tangle_transaction_load_hashes_of_milestone_candidates(tangle, &hash_pack, mt->coordinator)) !=
-      RC_OK) {
+  if ((ret = iota_tangle_transaction_load_hashes_of_milestone_candidates(tangle, &hash_pack,
+                                                                         mt->conf->coordinator_address)) != RC_OK) {
     log_critical(logger_id, "Loading milestone candidates failed\n");
   }
   log_info(logger_id, "Loaded %d milestone candidates\n", hash_pack.num_loaded);

@@ -99,7 +99,7 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_
   res->time = current_timestamp_ms();
   res->tips = tips_cache_size(&api->core->node.tips);
   res->transactions_to_request = requester_size(&api->core->node.transaction_requester);
-  memcpy(res->coordinator_address, api->core->consensus.milestone_tracker.coordinator, FLEX_TRIT_SIZE_243);
+  memcpy(res->coordinator_address, api->core->consensus.conf.coordinator_address, FLEX_TRIT_SIZE_243);
 
   return RC_OK;
 }
@@ -265,8 +265,8 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api, tangle_t *const tangl
   return ret;
 }
 
-retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, get_inclusion_state_req_t const *const req,
-                                        get_inclusion_state_res_t *const res) {
+retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, get_inclusion_states_req_t const *const req,
+                                        get_inclusion_states_res_t *const res) {
   if (api == NULL || req == NULL || res == NULL) {
     return RC_NULL_PARAM;
   }

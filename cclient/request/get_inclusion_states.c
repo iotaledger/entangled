@@ -5,10 +5,10 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#include "cclient/request/get_inclusion_state.h"
+#include "cclient/request/get_inclusion_states.h"
 
-get_inclusion_state_req_t* get_inclusion_state_req_new() {
-  get_inclusion_state_req_t* req = (get_inclusion_state_req_t*)malloc(sizeof(get_inclusion_state_req_t));
+get_inclusion_states_req_t* get_inclusion_states_req_new() {
+  get_inclusion_states_req_t* req = (get_inclusion_states_req_t*)malloc(sizeof(get_inclusion_states_req_t));
   if (req) {
     req->hashes = NULL;
     req->tips = NULL;
@@ -16,7 +16,7 @@ get_inclusion_state_req_t* get_inclusion_state_req_new() {
   return req;
 }
 
-void get_inclusion_state_req_free(get_inclusion_state_req_t** req) {
+void get_inclusion_states_req_free(get_inclusion_states_req_t** req) {
   if (!req || !(*req)) {
     return;
   }

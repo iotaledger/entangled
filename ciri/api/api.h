@@ -164,8 +164,8 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api, tangle_t *const tangl
  *
  * @return a status code
  */
-retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, get_inclusion_state_req_t const *const req,
-                                        get_inclusion_state_res_t *const res);
+retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, get_inclusion_states_req_t const *const req,
+                                        get_inclusion_states_res_t *const res);
 
 /**
  * Returns the confirmed balance, as viewed by tips, in case tips is not
