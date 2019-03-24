@@ -12,6 +12,7 @@ int64_t state_delta_sum(state_delta_t const *const state) {
   state_delta_entry_t *iter = NULL, *tmp = NULL;
 
   HASH_ITER(hh, *state, iter, tmp) { sum += iter->value; }
+
   return sum;
 }
 
@@ -27,6 +28,7 @@ retcode_t state_delta_add_or_sum(state_delta_t *const state, flex_trit_t const *
       return ret;
     }
   }
+
   return RC_OK;
 }
 
@@ -42,6 +44,7 @@ retcode_t state_delta_add_or_replace(state_delta_t *const state, flex_trit_t con
       return ret;
     }
   }
+
   return RC_OK;
 }
 
@@ -56,6 +59,7 @@ retcode_t state_delta_create_patch(state_delta_t const *const state, state_delta
       return ret;
     }
   }
+
   return ret;
 }
 
@@ -68,6 +72,7 @@ retcode_t state_delta_apply_patch(state_delta_t *const state, state_delta_t cons
       return ret;
     }
   }
+
   return ret;
 }
 
@@ -80,6 +85,7 @@ retcode_t state_delta_merge_patch(state_delta_t *const state, state_delta_t cons
       return ret;
     }
   }
+
   return ret;
 }
 
@@ -95,6 +101,7 @@ bool state_delta_is_consistent(state_delta_t *const delta) {
       free(entry);
     }
   }
+
   return true;
 }
 
@@ -102,6 +109,7 @@ size_t state_delta_serialized_size(state_delta_t const *const delta) {
   if (delta == NULL) {
     return 0;
   }
+
   return HASH_COUNT(*delta) * (FLEX_TRIT_SIZE_243 + sizeof(int64_t));
 }
 
@@ -115,18 +123,24 @@ retcode_t state_delta_serialize(state_delta_t const *const delta, byte_t *const 
     memcpy(bytes + offset, &iter->value, sizeof(int64_t));
     offset += sizeof(int64_t);
   }
+
   return RC_OK;
 }
 
 retcode_t state_delta_deserialize(byte_t const *const bytes, size_t const size, state_delta_t *const delta) {
-  retcode_t ret;
   uint64_t offset = 0;
+  state_delta_entry_t *new = NULL;
 
   for (size_t i = 0; i < size / (FLEX_TRIT_SIZE_243 + sizeof(int64_t)); i++) {
-    if ((ret = state_delta_add(delta, bytes + offset, *((int64_t *)(bytes + offset + FLEX_TRIT_SIZE_243)))) != RC_OK) {
-      return ret;
+    if ((new = malloc(sizeof(state_delta_entry_t))) == NULL) {
+      return RC_OOM;
     }
-    offset += FLEX_TRIT_SIZE_243 + sizeof(int64_t);
+    memcpy(new->hash, bytes + offset, FLEX_TRIT_SIZE_243);
+    offset += FLEX_TRIT_SIZE_243;
+    memcpy(&new->value, bytes + offset, sizeof(int64_t));
+    offset += sizeof(int64_t);
+    HASH_ADD(hh, *delta, hash, FLEX_TRIT_SIZE_243, new);
   }
+
   return RC_OK;
 }

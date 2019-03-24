@@ -118,18 +118,27 @@ retcode_t tips_cache_remove(tips_cache_t* const cache, flex_trit_t const* const 
   ret = hash243_set_remove(&cache->tips, tip);
   rw_lock_handle_unlock(&cache->tips_lock);
 
+  if (ret != RC_OK) {
+    return ret;
+  }
+
+  rw_lock_handle_wrlock(&cache->solid_tips_lock);
+  ret = hash243_set_remove(&cache->solid_tips, tip);
+  rw_lock_handle_unlock(&cache->solid_tips_lock);
+
   return ret;
 }
 
 retcode_t tips_cache_set_solid(tips_cache_t* const cache, flex_trit_t const* const tip) {
   retcode_t ret = RC_OK;
+  bool solidify = false;
 
   if (cache == NULL || tip == NULL) {
     return RC_NULL_PARAM;
   }
 
   rw_lock_handle_wrlock(&cache->tips_lock);
-  if (hash243_set_contains(&cache->tips, tip)) {
+  if ((solidify = hash243_set_contains(&cache->tips, tip))) {
     ret = hash243_set_remove(&cache->tips, tip);
   }
   rw_lock_handle_unlock(&cache->tips_lock);
@@ -138,9 +147,11 @@ retcode_t tips_cache_set_solid(tips_cache_t* const cache, flex_trit_t const* con
     return ret;
   }
 
-  rw_lock_handle_wrlock(&cache->solid_tips_lock);
-  ret = tips_cache_fifo_add(&cache->solid_tips, cache->capacity, tip);
-  rw_lock_handle_unlock(&cache->solid_tips_lock);
+  if (solidify) {
+    rw_lock_handle_wrlock(&cache->solid_tips_lock);
+    ret = tips_cache_fifo_add(&cache->solid_tips, cache->capacity, tip);
+    rw_lock_handle_unlock(&cache->solid_tips_lock);
+  }
 
   return ret;
 }

@@ -20,6 +20,7 @@ typedef enum sponge_type_e {
   SPONGE_CURLP81,
   SPONGE_KERL,
   SPONGE_TROIKA,
+  SPONGE_UNKNOWN,
 } sponge_type_t;
 
 typedef void (*sponge_absorb_t)(void* const state, trit_t const* const input, size_t const length);

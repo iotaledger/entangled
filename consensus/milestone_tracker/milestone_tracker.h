@@ -48,13 +48,10 @@ typedef struct milestone_tracker_s {
   thread_handle_t milestone_solidifier;
   uint64_t latest_solid_subtangle_milestone_index;
   flex_trit_t latest_solid_subtangle_milestone[FLEX_TRIT_SIZE_243];
-  flex_trit_t coordinator[FLEX_TRIT_SIZE_243];
   ledger_validator_t* ledger_validator;
   transaction_solidifier_t* transaction_solidifier;
   hash243_queue_t candidates;
   rw_lock_handle_t candidates_lock;
-  sponge_type_t sponge_type;
-  uint8_t security_level;
   // bool accept_any_testnet_coo;
 } milestone_tracker_t;
 
@@ -70,8 +67,7 @@ typedef struct milestone_tracker_s {
  */
 retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consensus_conf_t* const conf,
                                       snapshot_t* const snapshot, ledger_validator_t* const lv,
-                                      transaction_solidifier_t* ts, sponge_type_t const sponge_type,
-                                      uint8_t const security_level);
+                                      transaction_solidifier_t* ts);
 
 /**
  * Starts a milestone tracker

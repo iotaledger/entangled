@@ -9,7 +9,7 @@
 #include "cclient/api/core/logger.h"
 
 retcode_t iota_client_get_inclusion_states(const iota_client_service_t* const service,
-                                           get_inclusion_state_req_t* const req, get_inclusion_state_res_t* res) {
+                                           get_inclusion_states_req_t* const req, get_inclusion_states_res_t* res) {
   retcode_t result = RC_OK;
   char_buffer_t* res_buff = char_buffer_new();
   char_buffer_t* req_buff = char_buffer_new();
@@ -19,7 +19,7 @@ retcode_t iota_client_get_inclusion_states(const iota_client_service_t* const se
     result = RC_CCLIENT_OOM;
     goto done;
   }
-  result = service->serializer.vtable.get_inclusion_state_serialize_request(&service->serializer, req, req_buff);
+  result = service->serializer.vtable.get_inclusion_states_serialize_request(&service->serializer, req, req_buff);
   if (result != RC_OK) {
     goto done;
   }
@@ -31,7 +31,7 @@ retcode_t iota_client_get_inclusion_states(const iota_client_service_t* const se
   }
 
   result =
-      service->serializer.vtable.get_inclusion_state_deserialize_response(&service->serializer, res_buff->data, res);
+      service->serializer.vtable.get_inclusion_states_deserialize_response(&service->serializer, res_buff->data, res);
 
 done:
   char_buffer_free(req_buff);

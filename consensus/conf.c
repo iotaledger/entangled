@@ -68,7 +68,7 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
       strlen(tmp->valuestring) != HASH_LENGTH_TRYTE) {
     goto json_error;
   }
-  flex_trits_from_trytes(conf->coordinator, HASH_LENGTH_TRIT, (tryte_t *)tmp->valuestring, HASH_LENGTH_TRYTE,
+  flex_trits_from_trytes(conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t *)tmp->valuestring, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
 
   tmp = cJSON_GetObjectItemCaseSensitive(coordinator, "lastMilestone");
@@ -138,7 +138,12 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
   strcpy(conf->snapshot_conf_file, DEFAULT_SNAPSHOT_CONF_FILE);
   strcpy(conf->snapshot_signature_file, DEFAULT_SNAPSHOT_SIG_FILE);
   strcpy(conf->snapshot_file, DEFAULT_SNAPSHOT_FILE);
-  conf->num_keys_in_milestone = DEFAULT_NUM_KEYS_IN_MILESTONE;
+  flex_trits_from_trytes(conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t *)COORDINATOR_ADDRESS, HASH_LENGTH_TRYTE,
+                         HASH_LENGTH_TRYTE);
+  conf->coordinator_num_keys_in_milestone = DEFAULT_COORDINATOR_NUM_KEYS_IN_MILESTONE;
+  conf->coordinator_security_level = DEFAULT_COORDINATOR_SECURITY_LEVEL;
+  conf->coordinator_signature_type = DEFAULT_COORDINATOR_SIGNATURE_TYPE;
+  conf->coordinator_max_milestone_index = 1 << conf->coordinator_num_keys_in_milestone;
   conf->mwm = DEFAULT_MWN;
 
   ret = iota_snapshot_conf_init(conf);
