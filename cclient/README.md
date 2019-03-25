@@ -28,10 +28,10 @@ Output
 
 ## Using CClient library  
 
-CClient library is a subproject in the entangled repository, for using this library you can:  
+CClient library is a subproject in the entangled repository, in order to use this library you can:  
 
 * Link CClient shared or static libraries to your application.
-* Create a bazel project and add CClient to the dependence.
+* Create a bazel project and add CClient to the dependencies.
 * Port CClient to your build system.
 
 Below show you how to create a bazel project.  
@@ -74,7 +74,7 @@ cc_binary(
 
 ```
 
-Second include `cclient/api/core/core_api.h` and `cclient/api/extended/extended_api.h` in the source code.  
+Second is to include `cclient/api/core/core_api.h` and/or `cclient/api/extended/extended_api.h` in the source code.  
 
 This is the example project: [iota_cclient_example](https://github.com/oopsmonk/iota_cclient_example)  
 
