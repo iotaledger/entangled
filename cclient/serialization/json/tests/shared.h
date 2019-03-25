@@ -59,6 +59,8 @@ extern "C" {
   "tails are not consistent (would lead to inconsistent ledger state or " \
   "below max depth)"
 
+#define TEST_ERROR "Invalid tails input"
+
 #define TEST_27_TRYTES_1 "MINEIOTADOTCOM9999999999999"
 #define TEST_27_TRYTES_2 "HDIMCULLWWS9999ERJIQOXPDMSJ"
 #define TEST_27_TRYTES_3 "9999999999999MINEIOTADOTCOM"
