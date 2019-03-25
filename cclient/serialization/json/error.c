@@ -25,11 +25,7 @@ retcode_t json_error_serialize_response(serializer_t const *const s, error_res_t
 
   json_text = cJSON_PrintUnformatted(json_root);
   if (json_text) {
-    len = strlen(json_text);
-    ret = char_buffer_allocate(out, len);
-    if (ret == RC_OK) {
-      strncpy(out->data, json_text, len);
-    }
+    char_buffer_set(out, json_text);
     cJSON_free((void *)json_text);
   }
 
