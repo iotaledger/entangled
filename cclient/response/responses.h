@@ -11,6 +11,7 @@
 #include "cclient/response/add_neighbors.h"
 #include "cclient/response/attach_to_tangle.h"
 #include "cclient/response/check_consistency.h"
+#include "cclient/response/error.h"
 #include "cclient/response/find_transactions.h"
 #include "cclient/response/get_balances.h"
 #include "cclient/response/get_inclusion_states.h"

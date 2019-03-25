@@ -9,6 +9,7 @@
 #define CCLIENT_SERIALIZATION_SERIALIZER_H
 
 #include <stdlib.h>
+
 #include "cclient/request/requests.h"
 #include "cclient/response/responses.h"
 
@@ -127,6 +128,8 @@ typedef struct {
                                                      check_consistency_req_t* out);
   retcode_t (*check_consistency_deserialize_response)(serializer_t const* const s, char const* const obj,
                                                       check_consistency_res_t* out);
+
+  retcode_t (*error_serialize_response)(serializer_t const* const s, error_res_t* const obj, char_buffer_t* out);
 } serializer_vtable;
 
 typedef struct serializer_base {

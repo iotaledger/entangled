@@ -16,6 +16,7 @@ static core_t core;
 void test_add_neighbors(void) {
   add_neighbors_req_t *req = add_neighbors_req_new();
   add_neighbors_res_t *res = add_neighbors_res_new();
+  error_res_t *error = NULL;
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 0);
 
@@ -24,7 +25,8 @@ void test_add_neighbors(void) {
   TEST_ASSERT(add_neighbors_req_uris_add(req, "tcp://8.8.8.3:15003") == RC_OK);
   TEST_ASSERT(add_neighbors_req_uris_add(req, "tcp://8.8.8.4:15004") == RC_OK);
 
-  TEST_ASSERT(iota_api_add_neighbors(&api, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_add_neighbors(&api, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 4);
   TEST_ASSERT_EQUAL_INT(res->added_neighbors, 4);
@@ -54,11 +56,13 @@ void test_add_neighbors(void) {
 
   add_neighbors_req_free(&req);
   add_neighbors_res_free(&res);
+  error_res_free(&error);
 }
 
 void test_add_neighbors_with_already_paired(void) {
   add_neighbors_req_t *req = add_neighbors_req_new();
   add_neighbors_res_t *res = add_neighbors_res_new();
+  error_res_t *error = NULL;
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 4);
 
@@ -66,7 +70,8 @@ void test_add_neighbors_with_already_paired(void) {
   TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.5:15005") == RC_OK);
   TEST_ASSERT(add_neighbors_req_uris_add(req, "tcp://8.8.8.3:15003") == RC_OK);
 
-  TEST_ASSERT(iota_api_add_neighbors(&api, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_add_neighbors(&api, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 5);
   TEST_ASSERT_EQUAL_INT(res->added_neighbors, 1);
@@ -78,11 +83,13 @@ void test_add_neighbors_with_already_paired(void) {
 
   add_neighbors_req_free(&req);
   add_neighbors_res_free(&res);
+  error_res_free(&error);
 }
 
 void test_add_neighbors_with_invalid(void) {
   add_neighbors_req_t *req = add_neighbors_req_new();
   add_neighbors_res_t *res = add_neighbors_res_new();
+  error_res_t *error = NULL;
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 5);
 
@@ -90,7 +97,8 @@ void test_add_neighbors_with_invalid(void) {
   TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.7@15007") == RC_OK);
   TEST_ASSERT(add_neighbors_req_uris_add(req, "udp://8.8.8.8:15008") == RC_OK);
 
-  TEST_ASSERT(iota_api_add_neighbors(&api, req, res) == RC_NEIGHBOR_FAILED_URI_PARSING);
+  TEST_ASSERT(iota_api_add_neighbors(&api, req, res, &error) == RC_NEIGHBOR_FAILED_URI_PARSING);
+  TEST_ASSERT(error == NULL);
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 6);
   TEST_ASSERT_EQUAL_INT(res->added_neighbors, 1);
@@ -102,6 +110,7 @@ void test_add_neighbors_with_invalid(void) {
 
   add_neighbors_req_free(&req);
   add_neighbors_res_free(&res);
+  error_res_free(&error);
 }
 
 int main(void) {
