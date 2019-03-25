@@ -538,12 +538,7 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection, c
   cJSON_Delete(json_obj);
 
   response_buf = char_buffer_new();
-  if (iota_api_http_process_request(api, command_str, sess->request->data, response_buf)) {
-    free(command_str);
-    char_buffer_free(response_buf);
-    ret = MHD_NO;
-    goto cleanup;
-  }
+  iota_api_http_process_request(api, command_str, sess->request->data, response_buf);
   free(command_str);
 
   response = MHD_create_response_from_buffer(response_buf->length, response_buf->data, MHD_RESPMEM_MUST_COPY);
