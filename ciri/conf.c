@@ -203,6 +203,15 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       flex_trits_from_trytes(consensus_conf->snapshot_signature_pubkey, HASH_LENGTH_TRIT, (tryte_t*)value,
                              HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
       break;
+    case CONF_SNAPSHOT_SIGNATURE_SKIP_VALIDATION:  // --snapshot-signature-skip-validation
+      if (strcmp(value, "true") == 0) {
+        consensus_conf->snapshot_signature_skip_validation = true;
+      } else if (strcmp(value, "false") == 0) {
+        consensus_conf->snapshot_signature_skip_validation = false;
+      } else {
+        return RC_CIRI_CONF_INVALID_ARGUMENTS;
+      }
+      break;
     case CONF_SNAPSHOT_TIMESTAMP:  // --snapshot-timestamp
       consensus_conf->snapshot_timestamp_sec = atoi(value);
       break;

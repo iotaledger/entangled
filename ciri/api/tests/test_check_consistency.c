@@ -206,7 +206,7 @@ int main(void) {
   setUp();
 
   // Avoid verifying snapshot signature
-  api.core->consensus.conf.snapshot_signature_file[0] = '\0';
+  api.core->consensus.conf.snapshot_signature_skip_validation = true;
 
   TEST_ASSERT(iota_consensus_init(&api.core->consensus, &tangle, &api.core->node.transaction_requester,
                                   &api.core->node.tips) == RC_OK);
