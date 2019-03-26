@@ -16,13 +16,14 @@ static core_t core;
 void test_remove_neighbors(void) {
   remove_neighbors_req_t *req = remove_neighbors_req_new();
   remove_neighbors_res_t *res = remove_neighbors_res_new();
+  error_res_t *error = NULL;
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 6);
 
   TEST_ASSERT(remove_neighbors_req_add(req, "udp://8.8.8.2:15002") == RC_OK);
   TEST_ASSERT(remove_neighbors_req_add(req, "tcp://8.8.8.4:15004") == RC_OK);
 
-  TEST_ASSERT(iota_api_remove_neighbors(&api, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_remove_neighbors(&api, req, res, &error) == RC_OK);
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 4);
   TEST_ASSERT_EQUAL_INT(res->removed_neighbors, 2);
@@ -52,11 +53,13 @@ void test_remove_neighbors(void) {
 
   remove_neighbors_req_free(&req);
   remove_neighbors_res_free(&res);
+  error_res_free(&error);
 }
 
 void test_remove_neighbors_with_not_paired(void) {
   remove_neighbors_req_t *req = remove_neighbors_req_new();
   remove_neighbors_res_t *res = remove_neighbors_res_new();
+  error_res_t *error = NULL;
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 4);
 
@@ -64,7 +67,7 @@ void test_remove_neighbors_with_not_paired(void) {
   TEST_ASSERT(remove_neighbors_req_add(req, "udp://8.8.8.7:15007") == RC_OK);
   TEST_ASSERT(remove_neighbors_req_add(req, "tcp://8.8.8.3:15003") == RC_OK);
 
-  TEST_ASSERT(iota_api_remove_neighbors(&api, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_remove_neighbors(&api, req, res, &error) == RC_OK);
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 2);
   TEST_ASSERT_EQUAL_INT(res->removed_neighbors, 2);
@@ -84,11 +87,13 @@ void test_remove_neighbors_with_not_paired(void) {
 
   remove_neighbors_req_free(&req);
   remove_neighbors_res_free(&res);
+  error_res_free(&error);
 }
 
 void test_remove_neighbors_with_invalid(void) {
   remove_neighbors_req_t *req = remove_neighbors_req_new();
   remove_neighbors_res_t *res = remove_neighbors_res_new();
+  error_res_t *error = NULL;
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 4);
 
@@ -96,7 +101,7 @@ void test_remove_neighbors_with_invalid(void) {
   TEST_ASSERT(remove_neighbors_req_add(req, "udp://8.8.8.7@15007") == RC_OK);
   TEST_ASSERT(remove_neighbors_req_add(req, "udp://8.8.8.5:15005") == RC_OK);
 
-  TEST_ASSERT(iota_api_remove_neighbors(&api, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_remove_neighbors(&api, req, res, &error) == RC_OK);
 
   TEST_ASSERT_EQUAL_INT(neighbors_count(api.core->node.neighbors), 1);
   TEST_ASSERT_EQUAL_INT(res->removed_neighbors, 1);
@@ -111,6 +116,7 @@ void test_remove_neighbors_with_invalid(void) {
 
   remove_neighbors_req_free(&req);
   remove_neighbors_res_free(&res);
+  error_res_free(&error);
 }
 
 int main(void) {

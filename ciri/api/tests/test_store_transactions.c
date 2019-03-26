@@ -27,15 +27,19 @@ void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK
 
 void test_store_transactions_empty(void) {
   store_transactions_req_t *req = store_transactions_req_new();
+  error_res_t *error = NULL;
 
-  TEST_ASSERT(iota_api_store_transactions(&api, &tangle, req) == RC_OK);
+  TEST_ASSERT(iota_api_store_transactions(&api, &tangle, req, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
 
   store_transactions_req_free(&req);
+  error_res_free(&error);
   TEST_ASSERT(req == NULL);
 }
 
 void test_store_transactions_invalid_tx(void) {
   store_transactions_req_t *req = store_transactions_req_new();
+  error_res_t *error = NULL;
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
   flex_trit_t hash_trits[FLEX_TRIT_SIZE_243];
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
@@ -50,7 +54,8 @@ void test_store_transactions_invalid_tx(void) {
 
   hash_array_push(req->trytes, tx_trits);
 
-  TEST_ASSERT(iota_api_store_transactions(&api, &tangle, req) == RC_OK);
+  TEST_ASSERT(iota_api_store_transactions(&api, &tangle, req, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
 
   // Checking that it hasn't been stored
 
@@ -59,11 +64,13 @@ void test_store_transactions_invalid_tx(void) {
   TEST_ASSERT(pack.num_loaded == 0);
 
   store_transactions_req_free(&req);
+  error_res_free(&error);
   TEST_ASSERT(req == NULL);
 }
 
 void test_store_transactions(void) {
   store_transactions_req_t *req = store_transactions_req_new();
+  error_res_t *error = NULL;
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
   flex_trit_t hash_trits[FLEX_TRIT_SIZE_243];
   tryte_t const *const txs_trytes[4] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
@@ -79,7 +86,8 @@ void test_store_transactions(void) {
                            NUM_TRYTES_SERIALIZED_TRANSACTION);
     hash_array_push(req->trytes, tx_trits);
   }
-  TEST_ASSERT(iota_api_store_transactions(&api, &tangle, req) == RC_OK);
+  TEST_ASSERT(iota_api_store_transactions(&api, &tangle, req, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
   // Checking that they have been stored
 
   for (size_t i = 0; i < 4; i++) {
@@ -94,6 +102,7 @@ void test_store_transactions(void) {
   }
 
   store_transactions_req_free(&req);
+  error_res_free(&error);
   TEST_ASSERT(req == NULL);
 }
 

@@ -44,6 +44,16 @@ cc_test(
 )
 
 cc_test(
+    name = "error",
+    srcs = ["error.c"],
+    deps = [
+        ":shared",
+        "//cclient/serialization:serializer_json",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "find_transactions",
     srcs = ["find_transactions.c"],
     deps = [
