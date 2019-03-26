@@ -226,6 +226,7 @@ retcode_t responder_stop(responder_t *const responder) {
 
   log_info(logger_id, "Shutting down responder thread\n");
   responder->running = false;
+  cond_handle_signal(&responder->cond);
   if (thread_handle_join(responder->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down responder thread failed\n");
     ret = RC_FAILED_THREAD_JOIN;
