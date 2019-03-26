@@ -13,7 +13,7 @@
 #include "utils/logger_helper.h"
 
 #define BROADCASTER_LOGGER_ID "broadcaster"
-#define BROADCASTER_TIMEOUT_MS 5000
+#define BROADCASTER_TIMEOUT_MS 5000ULL
 
 static logger_id_t logger_id;
 

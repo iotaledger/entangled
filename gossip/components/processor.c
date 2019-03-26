@@ -17,7 +17,7 @@
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_LOGGER_ID "processor"
-#define PROCESSOR_TIMEOUT_MS 1000
+#define PROCESSOR_TIMEOUT_MS 1000ULL
 
 static logger_id_t logger_id;
 

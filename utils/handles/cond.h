@@ -43,7 +43,8 @@ static inline int cond_handle_wait(cond_handle_t* const cond, lock_handle_t* con
   return pthread_cond_wait(cond, lock);
 }
 
-static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock, unsigned int timeout_ms) {
+static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock,
+                                        uint64_t const timeout_ms) {
   struct timespec ts;
   struct timeval tv;
 
@@ -80,7 +81,8 @@ static inline int cond_handle_wait(cond_handle_t* const cond, lock_handle_t* con
   return 0;
 }
 
-static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock, unsigned int timeout_ms) {
+static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock,
+                                        uint64_t const timeout_ms) {
   if (!SleepConditionVariableCS(cond, lock, timeout_ms)) {
     return ETIMEDOUT;
   }
@@ -145,7 +147,8 @@ static inline int cond_handle_wait(cond_handle_t* const cond, lock_handle_t* con
  *
  * @return exit status
  */
-static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock, unsigned int timeout_ms);
+static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock,
+                                        uint64_t const timeout_ms);
 
 /**
  * Destroys the condition variable specified by cond

@@ -13,7 +13,7 @@
 #include "utils/logger_helper.h"
 
 #define RESPONDER_LOGGER_ID "responder"
-#define RESPONDER_TIMEOUT_MS 1000
+#define RESPONDER_TIMEOUT_MS 1000ULL
 
 static logger_id_t logger_id;
 
