@@ -17,7 +17,7 @@
 #include "utils/logger_helper.h"
 
 #define PROCESSOR_LOGGER_ID "processor"
-#define PROCESSOR_TIMEOUT_SEC 1
+#define PROCESSOR_TIMEOUT_MS 1000
 
 static logger_id_t logger_id;
 
@@ -258,7 +258,7 @@ static void *processor_routine(processor_t *const processor) {
 
   while (processor->running) {
     if (processor_is_empty(processor)) {
-      cond_handle_timedwait(&processor->cond, &lock_cond, PROCESSOR_TIMEOUT_SEC);
+      cond_handle_timedwait(&processor->cond, &lock_cond, PROCESSOR_TIMEOUT_MS);
     }
 
     rw_lock_handle_wrlock(&processor->lock);

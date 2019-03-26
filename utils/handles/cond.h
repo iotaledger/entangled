@@ -19,6 +19,7 @@ extern "C" {
  */
 
 #if !defined(_WIN32) && defined(__unix__) || defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
+#include <sys/time.h>
 #include <unistd.h>
 #elif defined(_WIN32)
 #include <Windows.h>
@@ -42,8 +43,14 @@ static inline int cond_handle_wait(cond_handle_t* const cond, lock_handle_t* con
   return pthread_cond_wait(cond, lock);
 }
 
-static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock, unsigned int timeout) {
-  struct timespec ts = {time(NULL) + timeout, 0};
+static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock, unsigned int timeout_ms) {
+  struct timespec ts;
+  struct timeval tv;
+
+  gettimeofday(&tv, NULL);
+  ts.tv_sec = tv.tv_sec + timeout_ms / 1000;
+  ts.tv_nsec = tv.tv_usec * 1000 + (timeout_ms % 1000) * 1000000;
+
   return pthread_cond_timedwait(cond, lock, &ts);
 }
 
@@ -57,21 +64,26 @@ static inline int cond_handle_init(cond_handle_t* const cond) {
   InitializeConditionVariable(cond);
   return 0;
 }
+
 static inline int cond_handle_signal(cond_handle_t* const cond) {
   WakeConditionVariable(cond);
   return 0;
 }
+
 static inline int cond_handle_broadcast(cond_handle_t* const cond) {
   WakeAllConditionVariable(cond);
   return 0;
 }
+
 static inline int cond_handle_wait(cond_handle_t* const cond, lock_handle_t* const lock) {
   SleepConditionVariableCS(cond, lock, INFINITE);
   return 0;
 }
 
-static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock, unsigned int timeout) {
-  if (!SleepConditionVariableCS(cond, lock, timeout * 1000)) return ETIMEDOUT;
+static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock, unsigned int timeout_ms) {
+  if (!SleepConditionVariableCS(cond, lock, timeout_ms)) {
+    return ETIMEDOUT;
+  }
   return 0;
 }
 
@@ -129,11 +141,11 @@ static inline int cond_handle_wait(cond_handle_t* const cond, lock_handle_t* con
  *
  * @param cond The condition variable
  * @param lock The associated lock
- * @param timeout The timeout in seconds
+ * @param timeout The timeout in milliseconds
  *
  * @return exit status
  */
-static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock, unsigned int timeout);
+static inline int cond_handle_timedwait(cond_handle_t* const cond, lock_handle_t* const lock, unsigned int timeout_ms);
 
 /**
  * Destroys the condition variable specified by cond

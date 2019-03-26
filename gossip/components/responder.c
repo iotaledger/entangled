@@ -13,7 +13,7 @@
 #include "utils/logger_helper.h"
 
 #define RESPONDER_LOGGER_ID "responder"
-#define RESPONDER_TIMEOUT_SEC 1
+#define RESPONDER_TIMEOUT_MS 1000
 
 static logger_id_t logger_id;
 
@@ -148,7 +148,7 @@ static void *responder_routine(responder_t *const responder) {
 
   while (responder->running) {
     if (responder_is_empty(responder)) {
-      cond_handle_timedwait(&responder->cond, &lock_cond, RESPONDER_TIMEOUT_SEC);
+      cond_handle_timedwait(&responder->cond, &lock_cond, RESPONDER_TIMEOUT_MS);
     }
 
     rw_lock_handle_wrlock(&responder->lock);
