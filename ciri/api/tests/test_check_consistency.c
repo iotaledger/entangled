@@ -27,32 +27,39 @@ void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK
 void test_check_consistency_invalid_subtangle_status(void) {
   check_consistency_req_t *req = check_consistency_req_new();
   check_consistency_res_t *res = check_consistency_res_new();
+  error_res_t *error = NULL;
 
-  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res) == RC_API_INVALID_SUBTANGLE_STATUS);
+  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_API_INVALID_SUBTANGLE_STATUS);
+  TEST_ASSERT(error == NULL);
   TEST_ASSERT(res->state == false);
 
   check_consistency_req_free(&req);
   check_consistency_res_free(&res);
+  error_res_free(&error);
 }
 
 void test_check_consistency_missing_tail(void) {
   check_consistency_req_t *req = check_consistency_req_new();
   check_consistency_res_t *res = check_consistency_res_new();
+  error_res_t *error = NULL;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
 
   flex_trits_from_trytes(hash, HASH_LENGTH_TRIT, TX_1_OF_4_HASH, HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
   hash243_queue_push(&req->tails, hash);
 
-  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res) == RC_API_TAIL_MISSING);
+  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_API_TAIL_MISSING);
+  TEST_ASSERT(error == NULL);
   TEST_ASSERT(res->state == false);
 
   check_consistency_req_free(&req);
   check_consistency_res_free(&res);
+  error_res_free(&error);
 }
 
 void test_check_consistency_not_tail(void) {
   check_consistency_req_t *req = check_consistency_req_new();
   check_consistency_res_t *res = check_consistency_res_new();
+  error_res_t *error = NULL;
   iota_transaction_t tx;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trit_t trits[FLEX_TRIT_SIZE_8019];
@@ -65,16 +72,19 @@ void test_check_consistency_not_tail(void) {
   transaction_deserialize_from_trits(&tx, trits, true);
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, &tx) == RC_OK);
 
-  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res) == RC_API_NOT_TAIL);
+  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_API_NOT_TAIL);
+  TEST_ASSERT(error == NULL);
   TEST_ASSERT(res->state == false);
 
   check_consistency_req_free(&req);
   check_consistency_res_free(&res);
+  error_res_free(&error);
 }
 
 void test_check_consistency_tail_not_solid(void) {
   check_consistency_req_t *req = check_consistency_req_new();
   check_consistency_res_t *res = check_consistency_res_new();
+  error_res_t *error = NULL;
   iota_transaction_t tx;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   flex_trit_t trits[FLEX_TRIT_SIZE_8019];
@@ -88,17 +98,20 @@ void test_check_consistency_tail_not_solid(void) {
   TEST_ASSERT(iota_tangle_transaction_store(&tangle, &tx) == RC_OK);
   TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, hash, false) == RC_OK);
 
-  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
   TEST_ASSERT(res->state == false);
   TEST_ASSERT_EQUAL_STRING(res->info->data, API_TAILS_NOT_SOLID);
 
   check_consistency_req_free(&req);
   check_consistency_res_free(&res);
+  error_res_free(&error);
 }
 
 void test_check_consistency_invalid_bundle(void) {
   check_consistency_req_t *req = check_consistency_req_new();
   check_consistency_res_t *res = check_consistency_res_new();
+  error_res_t *error = NULL;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   iota_transaction_t *txs[4];
   tryte_t const *const trytes[4] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
@@ -116,18 +129,21 @@ void test_check_consistency_invalid_bundle(void) {
   TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, hash, true) == RC_OK);
   hash243_queue_push(&req->tails, hash);
 
-  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
   TEST_ASSERT(res->state == false);
   TEST_ASSERT_EQUAL_STRING(res->info->data, API_TAILS_BUNDLE_INVALID);
 
   check_consistency_req_free(&req);
   check_consistency_res_free(&res);
+  error_res_free(&error);
   transactions_free(txs, 4);
 }
 
 void test_check_consistency_consistent_ledger(bool consistency) {
   check_consistency_req_t *req = check_consistency_req_new();
   check_consistency_res_t *res = check_consistency_res_new();
+  error_res_t *error = NULL;
   flex_trit_t hash[FLEX_TRIT_SIZE_243];
   iota_transaction_t *txs[4];
   tryte_t const *const trytes[4] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
@@ -154,7 +170,8 @@ void test_check_consistency_consistent_ledger(bool consistency) {
   hash243_queue_push(&req->tails, hash);
   TEST_ASSERT(iota_tangle_transaction_update_solid_state(&tangle, hash, true) == RC_OK);
 
-  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_check_consistency(&api, &tangle, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
   if (consistency) {
     TEST_ASSERT_TRUE(res->state);
     TEST_ASSERT_NULL(res->info);
@@ -166,6 +183,7 @@ void test_check_consistency_consistent_ledger(bool consistency) {
 
   check_consistency_req_free(&req);
   check_consistency_res_free(&res);
+  error_res_free(&error);
   transactions_free(txs, 4);
 }
 
@@ -188,7 +206,7 @@ int main(void) {
   setUp();
 
   // Avoid verifying snapshot signature
-  api.core->consensus.conf.snapshot_signature_file[0] = '\0';
+  api.core->consensus.conf.snapshot_signature_skip_validation = true;
 
   TEST_ASSERT(iota_consensus_init(&api.core->consensus, &tangle, &api.core->node.transaction_requester,
                                   &api.core->node.tips) == RC_OK);

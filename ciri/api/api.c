@@ -78,8 +78,9 @@ static iota_api_command_t get_command(char const *const command) {
  * Public functions
  */
 
-retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_t *const res) {
-  if (api == NULL || res == NULL) {
+retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_t *const res,
+                                 error_res_t **const error) {
+  if (api == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -104,8 +105,9 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_
   return RC_OK;
 }
 
-retcode_t iota_api_get_neighbors(iota_api_t const *const api, get_neighbors_res_t *const res) {
-  if (api == NULL || res == NULL) {
+retcode_t iota_api_get_neighbors(iota_api_t const *const api, get_neighbors_res_t *const res,
+                                 error_res_t **const error) {
+  if (api == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -113,12 +115,12 @@ retcode_t iota_api_get_neighbors(iota_api_t const *const api, get_neighbors_res_
 }
 
 retcode_t iota_api_add_neighbors(iota_api_t const *const api, add_neighbors_req_t const *const req,
-                                 add_neighbors_res_t *const res) {
+                                 add_neighbors_res_t *const res, error_res_t **const error) {
   char **uri;
   neighbor_t neighbor;
   retcode_t ret = RC_OK;
 
-  if (api == NULL || req == NULL || res == NULL) {
+  if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -141,12 +143,12 @@ retcode_t iota_api_add_neighbors(iota_api_t const *const api, add_neighbors_req_
 }
 
 retcode_t iota_api_remove_neighbors(iota_api_t const *const api, remove_neighbors_req_t const *const req,
-                                    remove_neighbors_res_t *const res) {
+                                    remove_neighbors_res_t *const res, error_res_t **const error) {
   char **uri;
   neighbor_t neighbor;
   retcode_t ret = RC_OK;
 
-  if (api == NULL || req == NULL || res == NULL) {
+  if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -168,13 +170,13 @@ retcode_t iota_api_remove_neighbors(iota_api_t const *const api, remove_neighbor
   return ret;
 }
 
-retcode_t iota_api_get_tips(iota_api_t const *const api, get_tips_res_t *const res) {
+retcode_t iota_api_get_tips(iota_api_t const *const api, get_tips_res_t *const res, error_res_t **const error) {
   retcode_t ret = RC_OK;
   hash243_set_t tips = NULL;
   hash243_set_entry_t *iter = NULL;
   hash243_set_entry_t *tmp = NULL;
 
-  if (api == NULL || res == NULL) {
+  if (api == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -194,11 +196,12 @@ done:
 }
 
 retcode_t iota_api_find_transactions(iota_api_t const *const api, tangle_t *const tangle,
-                                     find_transactions_req_t const *const req, find_transactions_res_t *const res) {
+                                     find_transactions_req_t const *const req, find_transactions_res_t *const res,
+                                     error_res_t **const error) {
   retcode_t ret = RC_OK;
   iota_stor_pack_t pack;
 
-  if (api == NULL || req == NULL || res == NULL) {
+  if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -232,13 +235,13 @@ done:
 }
 
 retcode_t iota_api_get_trytes(iota_api_t const *const api, tangle_t *const tangle, get_trytes_req_t const *const req,
-                              get_trytes_res_t *const res) {
+                              get_trytes_res_t *const res, error_res_t **const error) {
   retcode_t ret = RC_OK;
   hash243_queue_entry_t *iter = NULL;
   flex_trit_t tx_trits[FLEX_TRIT_SIZE_8019];
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
 
-  if (api == NULL || req == NULL || res == NULL) {
+  if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -266,8 +269,8 @@ retcode_t iota_api_get_trytes(iota_api_t const *const api, tangle_t *const tangl
 }
 
 retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, get_inclusion_states_req_t const *const req,
-                                        get_inclusion_states_res_t *const res) {
-  if (api == NULL || req == NULL || res == NULL) {
+                                        get_inclusion_states_res_t *const res, error_res_t **const error) {
+  if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -275,8 +278,8 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, get_inclusi
 }
 
 retcode_t iota_api_get_balances(iota_api_t const *const api, get_balances_req_t const *const req,
-                                get_balances_res_t *const res) {
-  if (api == NULL || req == NULL || res == NULL) {
+                                get_balances_res_t *const res, error_res_t **const error) {
+  if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -285,11 +288,12 @@ retcode_t iota_api_get_balances(iota_api_t const *const api, get_balances_req_t 
 
 retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tangle_t *const tangle,
                                                get_transactions_to_approve_req_t const *const req,
-                                               get_transactions_to_approve_res_t *const res) {
+                                               get_transactions_to_approve_res_t *const res,
+                                               error_res_t **const error) {
   retcode_t ret = RC_OK;
   tips_pair_t tips;
 
-  if (api == NULL || req == NULL || res == NULL) {
+  if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -313,28 +317,29 @@ retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tang
 }
 
 retcode_t iota_api_attach_to_tangle(iota_api_t const *const api, attach_to_tangle_req_t const *const req,
-                                    attach_to_tangle_res_t *const res) {
-  if (api == NULL || req == NULL || res == NULL) {
+                                    attach_to_tangle_res_t *const res, error_res_t **const error) {
+  if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
   return RC_OK;
 }
 
-retcode_t iota_api_interrupt_attaching_to_tangle(iota_api_t const *const api) {
-  if (api == NULL) {
+retcode_t iota_api_interrupt_attaching_to_tangle(iota_api_t const *const api, error_res_t **const error) {
+  if (api == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
   return RC_OK;
 }
 
-retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast_transactions_req_t const *const req) {
+retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast_transactions_req_t const *const req,
+                                          error_res_t **const error) {
   retcode_t ret = RC_OK;
   flex_trit_t *elt = NULL;
   iota_transaction_t tx;
 
-  if (api == NULL || req == NULL) {
+  if (api == NULL || req == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -357,13 +362,13 @@ retcode_t iota_api_broadcast_transactions(iota_api_t const *const api, broadcast
 }
 
 retcode_t iota_api_store_transactions(iota_api_t const *const api, tangle_t *const tangle,
-                                      store_transactions_req_t const *const req) {
+                                      store_transactions_req_t const *const req, error_res_t **const error) {
   retcode_t ret = RC_OK;
   flex_trit_t *elt = NULL;
   iota_transaction_t tx;
   bool exists;
 
-  if (api == NULL || req == NULL) {
+  if (api == NULL || req == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -395,8 +400,8 @@ retcode_t iota_api_store_transactions(iota_api_t const *const api, tangle_t *con
 }
 
 retcode_t iota_api_were_addresses_spent_from(iota_api_t const *const api, check_consistency_req_t const *const req,
-                                             check_consistency_res_t *const res) {
-  if (api == NULL || req == NULL || res == NULL) {
+                                             check_consistency_res_t *const res, error_res_t **const error) {
+  if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
@@ -404,7 +409,8 @@ retcode_t iota_api_were_addresses_spent_from(iota_api_t const *const api, check_
 }
 
 retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *const tangle,
-                                     check_consistency_req_t const *const req, check_consistency_res_t *const res) {
+                                     check_consistency_req_t const *const req, check_consistency_res_t *const res,
+                                     error_res_t **const error) {
   retcode_t ret = RC_OK;
   hash243_queue_entry_t *iter = NULL;
   bundle_transactions_t *bundle = NULL;
@@ -412,7 +418,7 @@ retcode_t iota_api_check_consistency(iota_api_t const *const api, tangle_t *cons
   exit_prob_transaction_validator_t walker_validator;
   DECLARE_PACK_SINGLE_TX(tx, txp, pack);
 
-  if (api == NULL || req == NULL || res == NULL) {
+  if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
