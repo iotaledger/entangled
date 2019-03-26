@@ -166,6 +166,7 @@ cc_library(
         "//common:errors",
         "//gossip:conf",
         "//gossip:tips_cache",
+        "//utils/handles:cond",
         "//utils/handles:thread",
     ],
 )
