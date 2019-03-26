@@ -141,6 +141,7 @@ cc_library(
     hdrs = ["tips_requester.h"],
     deps = [
         "//common:errors",
+        "//utils/handles:cond",
         "//utils/handles:thread",
     ],
 )
