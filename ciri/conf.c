@@ -144,6 +144,9 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
     case 'u':  // --udp-receiver-port
       gossip_conf->udp_receiver_port = atoi(value);
       break;
+    case CONF_TIPS_SOLIDIFIER_ENABLED:  // --tips-solidifier-enabled
+      ret = get_true_false(value, &gossip_conf->tips_solidifier_enabled);
+      break;
 
     // API configuration
     case CONF_MAX_FIND_TRANSACTIONS:  // --max-find-transactions
