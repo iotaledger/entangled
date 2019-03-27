@@ -12,7 +12,7 @@
 retcode_t json_get_trytes_serialize_request(const serializer_t *const s, get_trytes_req_t const *const req,
                                             char_buffer_t *out) {
   retcode_t ret = RC_OK;
-  const char *json_text = NULL;
+  char const *json_text = NULL;
 
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON *json_root = cJSON_CreateObject();
@@ -57,7 +57,7 @@ retcode_t json_get_trytes_deserialize_request(serializer_t const *const s, char 
 retcode_t json_get_trytes_serialize_response(serializer_t const *const s, get_trytes_res_t const *const res,
                                              char_buffer_t *out) {
   retcode_t ret = RC_OK;
-  const char *json_text = NULL;
+  char const *json_text = NULL;
 
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON *json_root = cJSON_CreateObject();
@@ -82,7 +82,7 @@ done:
   return ret;
 }
 
-retcode_t json_get_trytes_deserialize_response(const serializer_t *const s, const char *const obj,
+retcode_t json_get_trytes_deserialize_response(const serializer_t *const s, char const *const obj,
                                                get_trytes_res_t *const res) {
   retcode_t ret = RC_OK;
   cJSON *json_obj = cJSON_Parse(obj);
