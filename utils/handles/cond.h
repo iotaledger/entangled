@@ -25,6 +25,8 @@ extern "C" {
 #include <Windows.h>
 #endif
 
+#include <stdint.h>
+
 #include "utils/handles/lock.h"
 
 #ifdef _POSIX_THREADS
