@@ -27,6 +27,7 @@
 #define DEFAULT_SNAPSHOT_CONF_FILE SNAPSHOT_CONF_FILE
 #define DEFAULT_SNAPSHOT_SIG_FILE SNAPSHOT_SIG_FILE
 #define DEFAULT_SNAPSHOT_FILE SNAPSHOT_FILE
+#define DEFAULT_SNAPSHOT_SIGNATURE_SKIP_VALIDATION false
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,6 +61,8 @@ typedef struct iota_consensus_conf_s {
   uint64_t snapshot_signature_depth;
   // Public key of the snapshot signature
   flex_trit_t snapshot_signature_pubkey[FLEX_TRIT_SIZE_243];
+  // Skip validation of snapshot signature
+  bool snapshot_signature_skip_validation;
   // The address of the coordinator
   flex_trit_t coordinator_address[FLEX_TRIT_SIZE_243];
   // The depth of the Merkle tree which in turn determines the number of leaves

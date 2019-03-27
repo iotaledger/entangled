@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
 
   iota_consensus_conf_init(&conf);
   strcpy(conf.snapshot_conf_file, snapshot_conf_path);
-  strcpy(conf.snapshot_signature_file, "");
+  conf.snapshot_signature_skip_validation = true;
 
   RUN_TEST(test_snapshot_conf);
   RUN_TEST(test_snapshot_init_file_not_found);

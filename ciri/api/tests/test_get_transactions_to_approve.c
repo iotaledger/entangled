@@ -27,12 +27,15 @@ void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK
 void test_get_transactions_to_approve_invalid_depth(void) {
   get_transactions_to_approve_req_t *req = get_transactions_to_approve_req_new();
   get_transactions_to_approve_res_t *res = get_transactions_to_approve_res_new();
+  error_res_t *error = NULL;
 
   get_transactions_to_approve_req_set_depth(req, 42);
-  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res) == RC_API_INVALID_DEPTH_INPUT);
+  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res, &error) == RC_API_INVALID_DEPTH_INPUT);
+  TEST_ASSERT(error == NULL);
 
   get_transactions_to_approve_req_free(&req);
   get_transactions_to_approve_res_free(&res);
+  error_res_free(&error);
   TEST_ASSERT(req == NULL);
   TEST_ASSERT(res == NULL);
 }
@@ -40,6 +43,7 @@ void test_get_transactions_to_approve_invalid_depth(void) {
 void test_get_transactions_to_approve_invalid_subtangle_status(void) {
   get_transactions_to_approve_req_t *req = get_transactions_to_approve_req_new();
   get_transactions_to_approve_res_t *res = get_transactions_to_approve_res_new();
+  error_res_t *error = NULL;
 
   uint64_t latest_solid_subtangle_milestone_index =
       api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index;
@@ -50,13 +54,15 @@ void test_get_transactions_to_approve_invalid_subtangle_status(void) {
 
   get_transactions_to_approve_req_set_depth(req, 5);
 
-  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res) == RC_API_INVALID_SUBTANGLE_STATUS);
+  TEST_ASSERT(iota_api_get_transactions_to_approve(&api, &tangle, req, res, &error) == RC_API_INVALID_SUBTANGLE_STATUS);
+  TEST_ASSERT(error == NULL);
 
   api.core->consensus.milestone_tracker.latest_solid_subtangle_milestone_index = latest_solid_subtangle_milestone_index;
   api.core->consensus.milestone_tracker.milestone_start_index = milestone_start_index;
 
   get_transactions_to_approve_req_free(&req);
   get_transactions_to_approve_res_free(&res);
+  error_res_free(&error);
   TEST_ASSERT(req == NULL);
   TEST_ASSERT(res == NULL);
 }
@@ -75,7 +81,7 @@ int main(void) {
   setUp();
 
   // Avoid verifying snapshot signature
-  api.core->consensus.conf.snapshot_signature_file[0] = '\0';
+  api.core->consensus.conf.snapshot_signature_skip_validation = true;
 
   TEST_ASSERT(iota_consensus_init(&api.core->consensus, &tangle, &api.core->node.transaction_requester,
                                   &api.core->node.tips) == RC_OK);

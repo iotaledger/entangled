@@ -25,8 +25,6 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
   cJSON *json = NULL, *tmp = NULL, *timestamp = NULL, *signature = NULL, *coordinator = NULL;
 
   if ((file = fopen(conf->snapshot_conf_file, "r")) == NULL) {
-    log_error(logger_id, "Snapshot configuration file not found\n");
-    ret = RC_SNAPSHOT_FILE_NOT_FOUND;
     goto done;
   }
 
@@ -138,6 +136,7 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
   strcpy(conf->snapshot_conf_file, DEFAULT_SNAPSHOT_CONF_FILE);
   strcpy(conf->snapshot_signature_file, DEFAULT_SNAPSHOT_SIG_FILE);
   strcpy(conf->snapshot_file, DEFAULT_SNAPSHOT_FILE);
+  conf->snapshot_signature_skip_validation = DEFAULT_SNAPSHOT_SIGNATURE_SKIP_VALIDATION;
   flex_trits_from_trytes(conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t *)COORDINATOR_ADDRESS, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
   conf->coordinator_num_keys_in_milestone = DEFAULT_COORDINATOR_NUM_KEYS_IN_MILESTONE;

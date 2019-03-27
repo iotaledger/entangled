@@ -18,6 +18,7 @@
 #include "cclient/serialization/json/attach_to_tangle.h"
 #include "cclient/serialization/json/broadcast_transactions.h"
 #include "cclient/serialization/json/check_consistency.h"
+#include "cclient/serialization/json/error.h"
 #include "cclient/serialization/json/find_transactions.h"
 #include "cclient/serialization/json/get_balances.h"
 #include "cclient/serialization/json/get_inclusion_states.h"
@@ -72,6 +73,7 @@ static serializer_vtable json_vtable = {
     .check_consistency_serialize_response = json_check_consistency_serialize_response,
     .check_consistency_deserialize_request = json_check_consistency_deserialize_request,
     .check_consistency_deserialize_response = json_check_consistency_deserialize_response,
+    .error_serialize_response = json_error_serialize_response,
 };
 
 void init_json_serializer(serializer_t *serializer) { serializer->vtable = json_vtable; }
