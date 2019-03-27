@@ -35,13 +35,13 @@ typedef struct {
                                                   add_neighbors_res_t* out);
 
   retcode_t (*find_transactions_serialize_request)(serializer_t const* const s,
-                                                   find_transactions_req_t const* const req, char_buffer_t* out);
+                                                   find_transactions_req_t const* const obj, char_buffer_t* out);
   retcode_t (*find_transactions_deserialize_request)(serializer_t const* const s, char const* const obj,
-                                                     find_transactions_req_t* req);
+                                                     find_transactions_req_t* out);
   retcode_t (*find_transactions_serialize_response)(serializer_t const* const s,
-                                                    find_transactions_res_t const* const res, char_buffer_t* out);
+                                                    find_transactions_res_t const* const obj, char_buffer_t* out);
   retcode_t (*find_transactions_deserialize_response)(serializer_t const* const s, char const* const obj,
-                                                      find_transactions_res_t* res);
+                                                      find_transactions_res_t* out);
 
   retcode_t (*get_balances_serialize_request)(serializer_t const* const s, get_balances_req_t const* const obj,
                                               char_buffer_t* out);
