@@ -55,6 +55,25 @@ extern "C" {
 #define NUM_TRYTES_NONCE 27
 #define NUM_TRYTES_HASH 81
 
+#define NUM_FLEX_TRITS_SERIALIZED_TRANSACTION FLEX_TRIT_SIZE_8019
+#define NUM_FLEX_TRITS_SIGNATURE FLEX_TRIT_SIZE_6561
+#define NUM_FLEX_TRITS_MESSAGE FLEX_TRIT_SIZE_6561
+#define NUM_FLEX_TRITS_ADDRESS FLEX_TRIT_SIZE_243
+#define NUM_FLEX_TRITS_VALUE FLEX_TRIT_SIZE_81
+#define NUM_FLEX_TRITS_OBSOLETE_TAG FLEX_TRIT_SIZE_81
+#define NUM_FLEX_TRITS_TIMESTAMP FLEX_TRIT_SIZE_27
+#define NUM_FLEX_TRITS_CURRENT_INDEX FLEX_TRIT_SIZE_27
+#define NUM_FLEX_TRITS_LAST_INDEX FLEX_TRIT_SIZE_27
+#define NUM_FLEX_TRITS_BUNDLE FLEX_TRIT_SIZE_243
+#define NUM_FLEX_TRITS_TRUNK FLEX_TRIT_SIZE_243
+#define NUM_FLEX_TRITS_BRANCH FLEX_TRIT_SIZE_243
+#define NUM_FLEX_TRITS_TAG FLEX_TRIT_SIZE_81
+#define NUM_FLEX_TRITS_ATTACHMENT_TIMESTAMP FLEX_TRIT_SIZE_27
+#define NUM_FLEX_TRITS_ATTACHMENT_TIMESTAMP_LOWER FLEX_TRIT_SIZE_27
+#define NUM_FLEX_TRITS_ATTACHMENT_TIMESTAMP_UPPER FLEX_TRIT_SIZE_27
+#define NUM_FLEX_TRITS_NONCE FLEX_TRIT_SIZE_81
+#define NUM_FLEX_TRITS_HASH FLEX_TRIT_SIZE_243
+
 // bundle essence = 486 trits
 #define NUM_TRITS_ESSENCE                                                                                         \
   (NUM_TRITS_ADDRESS + NUM_TRITS_VALUE + NUM_TRITS_OBSOLETE_TAG + NUM_TRITS_TIMESTAMP + NUM_TRITS_CURRENT_INDEX + \
@@ -66,11 +85,11 @@ extern "C" {
 
 typedef struct iota_transaction_fields_essence_s {
   // 81 trytes = 243 trits
-  flex_trit_t address[FLEX_TRIT_SIZE_243];
+  flex_trit_t address[NUM_FLEX_TRITS_ADDRESS];
   // 27 trytes = 81 trits
   int64_t value;
   // 27 trytes = 81 trits
-  flex_trit_t obsolete_tag[FLEX_TRIT_SIZE_81];
+  flex_trit_t obsolete_tag[NUM_FLEX_TRITS_OBSOLETE_TAG];
   // 9 trytes = 27 trits
   uint64_t timestamp;
   // 9 trytes = 27 trits
@@ -78,14 +97,14 @@ typedef struct iota_transaction_fields_essence_s {
   // 9 trytes = 27 trits
   int64_t last_index;
   // 81 trytes = 243 trits
-  flex_trit_t bundle[FLEX_TRIT_SIZE_243];
+  flex_trit_t bundle[NUM_FLEX_TRITS_BUNDLE];
 } iota_transaction_fields_essence_t;
 
 typedef struct iota_transaction_fields_attachment_s {
   // 81 trytes = 243 trits
-  flex_trit_t trunk[FLEX_TRIT_SIZE_243];
+  flex_trit_t trunk[NUM_FLEX_TRITS_TRUNK];
   // 81 trytes = 243 trits
-  flex_trit_t branch[FLEX_TRIT_SIZE_243];
+  flex_trit_t branch[NUM_FLEX_TRITS_BRANCH];
   // 9 trytes = 27 trits
   uint64_t attachment_timestamp;
   // 9 trytes = 27 trits
@@ -93,19 +112,19 @@ typedef struct iota_transaction_fields_attachment_s {
   // 9 trytes = 27 trits
   uint64_t attachment_timestamp_upper;
   // 27 trytes = 81 trits
-  flex_trit_t nonce[FLEX_TRIT_SIZE_81];
+  flex_trit_t nonce[NUM_FLEX_TRITS_NONCE];
   // 27 trytes = 81 trits
-  flex_trit_t tag[FLEX_TRIT_SIZE_81];
+  flex_trit_t tag[NUM_FLEX_TRITS_TAG];
 } iota_transaction_fields_attachment_t;
 
 typedef struct iota_transaction_fields_consensus_s {
   // 81 trytes = 243 trits
-  flex_trit_t hash[FLEX_TRIT_SIZE_243];
+  flex_trit_t hash[NUM_FLEX_TRITS_HASH];
 } iota_transaction_fields_consensus_t;
 
 typedef struct iota_transaction_fields_data_s {
   // 2187 trytes = 6561 trits
-  flex_trit_t signature_or_message[FLEX_TRIT_SIZE_6561];
+  flex_trit_t signature_or_message[NUM_FLEX_TRITS_MESSAGE];
 } iota_transaction_fields_data_t;
 
 typedef struct iota_transaction_fields_metadata_s {
