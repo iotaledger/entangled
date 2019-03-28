@@ -79,7 +79,7 @@ void test_get_balances_serialize_response(void) {
   TEST_ASSERT(get_balances_res_balances_add(get_bal, TEST_BALANCES_BALANCE_LONG) == RC_OK);
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
 
-  TEST_ASSERT(get_balances_res_milestone_add(get_bal, hash) == RC_OK);
+  TEST_ASSERT(get_balances_res_reference_add(get_bal, hash) == RC_OK);
   get_bal->milestone_index = TEST_BALANCES_MILESTONEINDEX;
 
   serializer.vtable.get_balances_serialize_response(&serializer, get_bal, serializer_out);
@@ -109,7 +109,7 @@ void test_get_balances_deserialize_response(void) {
 
   TEST_ASSERT_EQUAL_UINT64(TEST_BALANCES_BALANCE, get_balances_res_balances_at(deserialize_get_bal, 0));
 
-  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&deserialize_get_bal->milestone, 0), FLEX_TRIT_SIZE_243);
+  TEST_ASSERT_EQUAL_MEMORY(hash, hash243_queue_at(&deserialize_get_bal->references, 0), FLEX_TRIT_SIZE_243);
 
   TEST_ASSERT_EQUAL_INT(TEST_BALANCES_MILESTONEINDEX, deserialize_get_bal->milestone_index);
 
