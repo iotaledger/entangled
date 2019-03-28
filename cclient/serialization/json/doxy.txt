@@ -1,0 +1,13 @@
+/*
+ * Copyright (c) 2019 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+ /**
+ * @defgroup serialization_json JSON serializations
+ * @ingroup serialization
+ * @brief The JSON serialization implementations. 
+ *
+ */

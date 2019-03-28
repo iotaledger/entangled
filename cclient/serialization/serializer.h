@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup serialization
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_SERIALIZATION_SERIALIZER_H
 #define CCLIENT_SERIALIZATION_SERIALIZER_H
 
@@ -17,9 +26,13 @@
 extern "C" {
 #endif
 
+/**
+ * @brief serializer type
+ *
+ */
 typedef enum serializer_type_e {
-  SR_JSON = 0,
-  SR_UNIMPLEMENTED,
+  SR_JSON = 0,      /**< USE JSON serializer */
+  SR_UNIMPLEMENTED, /**< Unimplemented */
 } serializer_type_t;
 
 typedef struct serializer_base serializer_t;
@@ -142,3 +155,5 @@ typedef struct serializer_base {
 #endif
 
 #endif  // CCLIENT_SERIALIZATION_SERIALIZER_H
+
+/** @} */
