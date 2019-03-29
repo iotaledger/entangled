@@ -130,7 +130,7 @@ size_t transaction_serialize_to_flex_trits(iota_transaction_t const *const trans
   flex_trit_t partial[FLEX_TRIT_SIZE_81];
   size_t offset = 0;
 
-  memset(trits, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_8019);
+  memset(trits, FLEX_TRIT_NULL_VALUE, NUM_FLEX_TRITS_SERIALIZED_TRANSACTION);
 
   flex_trits_insert(trits, NUM_TRITS_SERIALIZED_TRANSACTION, transaction->data.signature_or_message,
                     NUM_TRITS_SIGNATURE, offset, NUM_TRITS_SIGNATURE);
@@ -262,7 +262,7 @@ iota_transaction_t *transaction_deserialize(flex_trit_t const *const trits, bool
 // Returns the serialized data from an existing transaction
 // Returns NULL if failed
 flex_trit_t *transaction_serialize(iota_transaction_t const *const transaction) {
-  size_t num_bytes = FLEX_TRIT_SIZE_8019;
+  size_t num_bytes = NUM_FLEX_TRITS_SERIALIZED_TRANSACTION;
   flex_trit_t *serialized_value = (flex_trit_t *)malloc(sizeof(flex_trit_t) * num_bytes);
   if (!serialized_value) {
     // errno = IOTA_OUT_OF_MEMORY
