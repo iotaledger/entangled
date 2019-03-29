@@ -584,8 +584,8 @@ retcode_t iota_api_http_start(iota_api_http_t *const api) {
     return RC_OK;
   }
 
-  api->state = MHD_start_daemon(MHD_USE_AUTO_INTERNAL_THREAD | MHD_USE_ERROR_LOG | MHD_USE_DEBUG, 14265, NULL, NULL,
-                                iota_api_http_handler, api, MHD_OPTION_END);
+  api->state = MHD_start_daemon(MHD_USE_AUTO_INTERNAL_THREAD | MHD_USE_ERROR_LOG | MHD_USE_DEBUG,
+                                api->api->conf.http_port, NULL, NULL, iota_api_http_handler, api, MHD_OPTION_END);
   api->running = true;
 
   return RC_OK;
