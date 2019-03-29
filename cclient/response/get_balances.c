@@ -11,7 +11,7 @@ get_balances_res_t* get_balances_res_new() {
   get_balances_res_t* res = (get_balances_res_t*)malloc(sizeof(get_balances_res_t));
   if (res) {
     utarray_new(res->balances, &ut_uint64_icd);
-    res->milestone = NULL;
+    res->references = NULL;
   }
   return res;
 }
@@ -23,8 +23,8 @@ void get_balances_res_free(get_balances_res_t** res) {
   if ((*res)->balances) {
     utarray_free((*res)->balances);
   }
-  if ((*res)->milestone) {
-    hash243_queue_free(&(*res)->milestone);
+  if ((*res)->references) {
+    hash243_queue_free(&(*res)->references);
   }
   free(*res);
   *res = NULL;

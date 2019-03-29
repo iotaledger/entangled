@@ -95,6 +95,10 @@ typedef struct {
 
   retcode_t (*get_trytes_serialize_request)(serializer_t const* const s, get_trytes_req_t const* const req,
                                             char_buffer_t* out);
+  retcode_t (*get_trytes_deserialize_request)(serializer_t const* const s, char const* const obj,
+                                              get_trytes_req_t* const req);
+  retcode_t (*get_trytes_serialize_response)(serializer_t const* const s, get_trytes_res_t const* const res,
+                                             char_buffer_t* out);
   retcode_t (*get_trytes_deserialize_response)(serializer_t const* const s, char const* const obj,
                                                get_trytes_res_t* const res);
 

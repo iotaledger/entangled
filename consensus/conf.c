@@ -25,8 +25,6 @@ retcode_t iota_snapshot_conf_init(iota_consensus_conf_t *const conf) {
   cJSON *json = NULL, *tmp = NULL, *timestamp = NULL, *signature = NULL, *coordinator = NULL;
 
   if ((file = fopen(conf->snapshot_conf_file, "r")) == NULL) {
-    log_error(logger_id, "Snapshot configuration file not found\n");
-    ret = RC_SNAPSHOT_FILE_NOT_FOUND;
     goto done;
   }
 
