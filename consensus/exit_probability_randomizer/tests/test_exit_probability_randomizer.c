@@ -13,7 +13,6 @@
 
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
-#include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
 #include "consensus/cw_rating_calculator/cw_rating_calculator.h"
