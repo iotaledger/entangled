@@ -18,16 +18,16 @@ static const UT_icd ut_uint64_icd UTARRAY_UNUSED = {sizeof(uint64_t), NULL, NULL
 typedef struct {
   int milestone_index;
   UT_array* balances;
-  hash243_queue_t milestone;
+  hash243_queue_t references;
 } get_balances_res_t;
 
 get_balances_res_t* get_balances_res_new();
 void get_balances_res_free(get_balances_res_t** res);
-static inline retcode_t get_balances_res_milestone_add(get_balances_res_t* const res, flex_trit_t const* const hash) {
-  return hash243_queue_push(&res->milestone, hash);
+static inline retcode_t get_balances_res_reference_add(get_balances_res_t* const res, flex_trit_t const* const hash) {
+  return hash243_queue_push(&res->references, hash);
 }
-static inline flex_trit_t* get_balances_res_milestone_get(get_balances_res_t* const res, size_t index) {
-  return hash243_queue_at(&res->milestone, index);
+static inline flex_trit_t* get_balances_res_reference_get(get_balances_res_t* const res, size_t index) {
+  return hash243_queue_at(&res->references, index);
 }
 size_t get_balances_res_balances_num(get_balances_res_t const* const res);
 uint64_t get_balances_res_balances_at(get_balances_res_t const* const res, int const index);

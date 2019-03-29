@@ -36,6 +36,7 @@
 #define HASH_LENGTH_BYTE 49
 #define HASH_LENGTH_TRYTE 81
 #define HASH_LENGTH_TRIT 243
+#define HASH_LENGTH_FLEX_TRIT FLEX_TRIT_SIZE_243
 
 // IOTA Signing Scheme definitions
 

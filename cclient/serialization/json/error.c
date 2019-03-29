@@ -12,7 +12,6 @@
 retcode_t json_error_serialize_response(serializer_t const *const s, error_res_t *const obj, char_buffer_t *out) {
   retcode_t ret = RC_OK;
   char const *json_text = NULL;
-  size_t len = 0;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
 
   cJSON *json_root = cJSON_CreateObject();
