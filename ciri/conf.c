@@ -376,12 +376,18 @@ done:
 retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
                              iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf, int argc,
                              char** argv) {
-  int key;
+  int key = 0;
   retcode_t ret = RC_OK;
   struct option* long_options = build_options();
 
   while ((key = getopt_long(argc, argv, short_options, long_options, NULL)) != -1) {
-    if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf, key, optarg)) != RC_OK) {
+    if (key == ':') {
+      ret = RC_CIRI_CONF_MISSING_ARGUMENT;
+      break;
+    } else if (key == '?') {
+      ret = RC_CIRI_CONF_UNKNOWN_OPTION;
+      break;
+    } else if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf, key, optarg)) != RC_OK) {
       break;
     }
   }
