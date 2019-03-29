@@ -181,7 +181,7 @@ const char* error_2_string(retcode_t err) {
     case RC_RESPONDER_COMPONENT_INVALID_TX:
     // Conf Module
     case RC_CIRI_CONF_NULL_CONF:
-    case RC_CIRI_CONF_INVALID_ARGUMENTS:
+    case RC_CIRI_CONF_INVALID_ARGUMENT:
     // Snapshot Module
     case RC_SNAPSHOT_NULL_SELF:
     case RC_SNAPSHOT_NULL_STATE:

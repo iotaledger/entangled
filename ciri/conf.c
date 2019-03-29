@@ -168,7 +168,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       break;
     case CONF_COORDINATOR_ADDRESS:  // --coordinator-address
       if (strlen(value) != HASH_LENGTH_TRYTE) {
-        return RC_CIRI_CONF_INVALID_ARGUMENTS;
+        return RC_CIRI_CONF_INVALID_ARGUMENT;
       }
       flex_trits_from_trytes(consensus_conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t*)value, HASH_LENGTH_TRYTE,
                              HASH_LENGTH_TRYTE);
@@ -182,14 +182,14 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       int security_level = atoi(value);
 
       if (security_level < 0 || security_level > 3) {
-        return RC_CIRI_CONF_INVALID_ARGUMENTS;
+        return RC_CIRI_CONF_INVALID_ARGUMENT;
       }
       consensus_conf->coordinator_security_level = (uint8_t)security_level;
       break;
     }
     case CONF_COORDINATOR_SIGNATURE_TYPE:  // --coordinator-signature-type
       if ((consensus_conf->coordinator_signature_type = get_sponge_type(value)) == SPONGE_UNKNOWN) {
-        return RC_CIRI_CONF_INVALID_ARGUMENTS;
+        return RC_CIRI_CONF_INVALID_ARGUMENT;
       }
       break;
     case CONF_LAST_MILESTONE:  // --last-milestone
@@ -212,7 +212,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       break;
     case CONF_SNAPSHOT_SIGNATURE_PUBKEY:  // --snapshot-signature-pubkey
       if (strlen(value) != HASH_LENGTH_TRYTE) {
-        return RC_CIRI_CONF_INVALID_ARGUMENTS;
+        return RC_CIRI_CONF_INVALID_ARGUMENT;
       }
       flex_trits_from_trytes(consensus_conf->snapshot_signature_pubkey, HASH_LENGTH_TRIT, (tryte_t*)value,
                              HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
@@ -226,7 +226,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
 
     default:
       iota_usage();
-      return RC_CIRI_CONF_INVALID_ARGUMENTS;
+      return RC_CIRI_CONF_INVALID_ARGUMENT;
   }
 
   return ret;
