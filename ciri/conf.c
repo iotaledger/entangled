@@ -19,12 +19,15 @@
  */
 
 static struct option* build_options() {
+  struct option* options = NULL;
   size_t nbr = 0;
+  size_t i = 0;
+
   while (cli_arguments_g[nbr].desc) {
     nbr++;
   }
-  struct option* options = (struct option*)malloc((nbr + 1) * sizeof(struct option));
-  size_t i;
+  options = (struct option*)malloc((nbr + 1) * sizeof(struct option));
+
   for (i = 0; i < nbr; i++) {
     options[i].name = cli_arguments_g[i].name;
     if (cli_arguments_g[i].has_arg == NO_ARG) {
@@ -37,11 +40,47 @@ static struct option* build_options() {
     options[i].flag = NULL;
     options[i].val = cli_arguments_g[i].val;
   }
+
   options[i].name = NULL;
   options[i].has_arg = 0;
   options[i].flag = NULL;
   options[i].val = 0;
+
   return options;
+}
+
+static int get_conf_key(char const* const key) {
+  int i = 0;
+
+  while (cli_arguments_g[i].name != NULL && strcmp(cli_arguments_g[i].name, key) != 0) {
+    i++;
+  }
+
+  return cli_arguments_g[i].val;
+}
+
+static char const* get_conf_name(int const key) {
+  int i = 0;
+
+  while (cli_arguments_g[i].name != NULL && cli_arguments_g[i].val != key) {
+    i++;
+  }
+
+  return cli_arguments_g[i].name;
+}
+
+static char const* get_conf_desc(int const key) {
+  int i = 0;
+
+  while (cli_arguments_g[i].name != NULL && cli_arguments_g[i].val != key) {
+    i++;
+  }
+  return cli_arguments_g[i].desc;
+}
+
+static void print_invalid_argument(int const key) {
+  fprintf(stderr, "Invalid argument for parameter \'%s\'.\n", get_conf_name(key));
+  fprintf(stderr, "Usage: %s\n", get_conf_desc(key));
 }
 
 static logger_level_t get_log_level(char const* const log_level) {
@@ -52,8 +91,10 @@ static logger_level_t get_log_level(char const* const log_level) {
              {"warning", LOGGER_WARNING}, {"error", LOGGER_ERR},       {"critical", LOGGER_CRIT},
              {"alert", LOGGER_ALERT},     {"emergency", LOGGER_EMERG}, {NULL, LOGGER_INFO}};
   size_t i;
-  for (i = 0; map[i].str != NULL && strcmp(map[i].str, log_level) != 0; i++)
-    ;
+
+  for (i = 0; map[i].str != NULL && strcmp(map[i].str, log_level) != 0; i++) {
+  }
+
   return map[i].level;
 }
 
@@ -63,8 +104,10 @@ static sponge_type_t get_sponge_type(char const* const sponge_type) {
     sponge_type_t type;
   } map[] = {{"CURL_P27", SPONGE_CURLP27}, {"CURL_P81", SPONGE_CURLP81}, {"KERL", SPONGE_KERL}, {NULL, SPONGE_UNKNOWN}};
   size_t i;
-  for (i = 0; map[i].str != NULL && strcmp(map[i].str, sponge_type) != 0; i++)
-    ;
+
+  for (i = 0; map[i].str != NULL && strcmp(map[i].str, sponge_type) != 0; i++) {
+  }
+
   return map[i].type;
 }
 
@@ -81,9 +124,11 @@ static retcode_t get_true_false(char const* const input, bool* const output) {
 
 static int get_conf_key(char const* const key) {
   int i = 0;
+
   while (cli_arguments_g[i].name != NULL && strcmp(cli_arguments_g[i].name, key) != 0) {
     i++;
   }
+
   return cli_arguments_g[i].val;
 }
 
@@ -304,7 +349,7 @@ retcode_t iota_ciri_conf_file(iota_ciri_conf_t* const ciri_conf, iota_consensus_
         if (state == 0) {  // Key
           key = get_conf_key(arg);
         } else {  // Value
-          if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf, key, arg) != RC_OK)) {
+          if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf, key, arg)) != RC_OK) {
             goto done;
           }
         }
@@ -318,6 +363,10 @@ retcode_t iota_ciri_conf_file(iota_ciri_conf_t* const ciri_conf, iota_consensus_
   } while (token.type != YAML_STREAM_END_TOKEN);
 
 done:
+
+  if (ret == RC_CIRI_CONF_INVALID_ARGUMENT) {
+    print_invalid_argument(key);
+  }
   yaml_token_delete(&token);
   yaml_parser_delete(&parser);
   fclose(file);
@@ -332,11 +381,14 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf, iota_consensus_c
   struct option* long_options = build_options();
 
   while ((key = getopt_long(argc, argv, short_options, long_options, NULL)) != -1) {
-    if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf, key, optarg) != RC_OK)) {
+    if ((ret = set_conf_value(ciri_conf, consensus_conf, gossip_conf, api_conf, key, optarg)) != RC_OK) {
       break;
     }
   }
 
+  if (ret == RC_CIRI_CONF_INVALID_ARGUMENT) {
+    print_invalid_argument(key);
+  }
   free(long_options);
   return ret;
 };
