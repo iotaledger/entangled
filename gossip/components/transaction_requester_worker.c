@@ -6,7 +6,6 @@
  */
 
 #include "gossip/components/transaction_requester_worker.h"
-#include "common/storage/sql/defs.h"
 #include "consensus/tangle/tangle.h"
 #include "gossip/node.h"
 #include "utils/logger_helper.h"

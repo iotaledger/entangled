@@ -6,7 +6,6 @@
  */
 
 #include "gossip/components/transaction_requester.h"
-#include "common/storage/sql/defs.h"
 #include "consensus/tangle/tangle.h"
 #include "gossip/node.h"
 #include "utils/handles/rand.h"
