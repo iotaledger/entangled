@@ -89,7 +89,7 @@ retcode_t json_get_balances_serialize_response(serializer_t const *const s, get_
     goto err;
   }
 
-  ret = hash243_queue_to_json_array(res->milestone, json_root, "references");
+  ret = hash243_queue_to_json_array(res->references, json_root, "references");
   if (ret != RC_OK) {
     goto err;
   }
@@ -121,7 +121,7 @@ retcode_t json_get_balances_deserialize_response(serializer_t const *const s, ch
     goto end;
   }
 
-  ret = json_array_to_hash243_queue(json_obj, "references", &out->milestone);
+  ret = json_array_to_hash243_queue(json_obj, "references", &out->references);
   if (ret) {
     goto end;
   }
