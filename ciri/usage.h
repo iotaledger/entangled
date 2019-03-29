@@ -116,7 +116,7 @@ static struct cli_argument_s {
      "Maximum number of transactions that will be returned by the 'getTrytes' "
      "API call.",
      REQUIRED_ARG},
-    {"port", 'p', "HTTP API listen port.", REQUIRED_ARG},
+    {"http_port", 'p', "HTTP API listen port.", REQUIRED_ARG},
 
     // Consensus configuration
 
