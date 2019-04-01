@@ -370,6 +370,11 @@ retcode_t iota_api_store_transactions(iota_api_t const *const api, tangle_t *con
       log_warning(logger_id, "Updating transaction status failed\n");
       return ret;
     }
+    if (transaction_current_index(&tx) == 0 &&
+        memcmp(transaction_address(&tx), api->core->consensus.milestone_tracker.conf->coordinator_address,
+               FLEX_TRIT_SIZE_243) == 0) {
+      ret = iota_milestone_tracker_add_candidate(&api->core->consensus.milestone_tracker, transaction_hash(&tx));
+    }
     // TODO store metadata: arrival_time, status, sender (#407)
   }
 
