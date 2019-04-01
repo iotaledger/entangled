@@ -178,11 +178,13 @@ retcode_t node_init(node_t* const node, core_t* const core, tangle_t* const tang
     return RC_NODE_FAILED_REQUESTER_INIT;
   }
 
-  log_info(logger_id, "Initializing tips solidifier component\n");
-  if ((ret = tips_solidifier_init(&node->tips_solidifier, &node->conf, &node->tips,
-                                  &core->consensus.transaction_solidifier)) != RC_OK) {
-    log_critical(logger_id, "Initializing  tips solidifier component failed\n");
-    return ret;
+  if (node->conf.tips_solidifier_enabled) {
+    log_info(logger_id, "Initializing tips solidifier component\n");
+    if ((ret = tips_solidifier_init(&node->tips_solidifier, &node->conf, &node->tips,
+                                    &core->consensus.transaction_solidifier)) != RC_OK) {
+      log_critical(logger_id, "Initializing  tips solidifier component failed\n");
+      return ret;
+    }
   }
 
   log_info(logger_id, "Initializing tips cache\n");
@@ -237,10 +239,12 @@ retcode_t node_start(node_t* const node) {
     return ret;
   }
 
-  log_info(logger_id, "Starting tips solidifier component\n");
-  if ((ret = tips_solidifier_start(&node->tips_solidifier)) != RC_OK) {
-    log_critical(logger_id, "Starting tips solidifier component failed\n");
-    return ret;
+  if (node->conf.tips_solidifier_enabled) {
+    log_info(logger_id, "Starting tips solidifier component\n");
+    if ((ret = tips_solidifier_start(&node->tips_solidifier)) != RC_OK) {
+      log_critical(logger_id, "Starting tips solidifier component failed\n");
+      return ret;
+    }
   }
 
   node->running = true;
@@ -293,9 +297,11 @@ retcode_t node_stop(node_t* const node) {
     log_error(logger_id, "Stopping transaction requester component failed\n");
   }
 
-  log_info(logger_id, "Stopping tips solidifier component\n");
-  if ((ret = tips_solidifier_stop(&node->tips_solidifier)) != RC_OK) {
-    log_error(logger_id, "Stopping tips solidifier component failed\n");
+  if (node->conf.tips_solidifier_enabled) {
+    log_info(logger_id, "Stopping tips solidifier component\n");
+    if ((ret = tips_solidifier_stop(&node->tips_solidifier)) != RC_OK) {
+      log_error(logger_id, "Stopping tips solidifier component failed\n");
+    }
   }
 
   return ret;
@@ -316,9 +322,11 @@ retcode_t node_destroy(node_t* const node) {
     ret = RC_NODE_FAILED_REQUESTER_DESTROY;
   }
 
-  log_info(logger_id, "Destroying tips solidifier component\n");
-  if ((ret = tips_solidifier_destroy(&node->tips_solidifier)) != RC_OK) {
-    log_error(logger_id, "Destroying tips solidifier component failed\n");
+  if (node->conf.tips_solidifier_enabled) {
+    log_info(logger_id, "Destroying tips solidifier component\n");
+    if ((ret = tips_solidifier_destroy(&node->tips_solidifier)) != RC_OK) {
+      log_error(logger_id, "Destroying tips solidifier component failed\n");
+    }
   }
 
   log_info(logger_id, "Destroying tips requester component\n");

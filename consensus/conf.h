@@ -36,54 +36,52 @@ extern "C" {
 // This structure contains all configuration variables needed to operate the
 // IOTA consensus
 typedef struct iota_consensus_conf_s {
-  // The hash of the genesis transaction
-  flex_trit_t genesis_hash[FLEX_TRIT_SIZE_243];
-  // The maximal number of previous milestones from where you can perform the random walk
-  size_t max_depth;
   // Randomness of the tip selection. Value must be in [0, inf] where 0 is most
   // random and inf is most deterministic
   double alpha;
   // Maximum number of unconfirmed transactions that may be analysed to find the
   // latest referenced milestone by the currently visited transaction during the
   // random walk
-  // The maximal number of unconfirmed transactions that may be analyzed in order to find the latest milestone the
-  // transaction that we are stepping on during the walk approves
-  size_t below_max_depth;
-  // Path of the snapshot configuration file
-  char snapshot_conf_file[128];
-  // Path to the file that contains a signature for the snapshot file
-  char snapshot_signature_file[128];
-  // Path to the file that contains the state of the ledger at the last snapshot
-  char snapshot_file[128];
-  // Epoch time of the last snapshot
-  uint64_t snapshot_timestamp_sec;
-  // Index of the snapshot signature
-  uint64_t snapshot_signature_index;
-  // Depth of the snapshot signature
-  uint64_t snapshot_signature_depth;
-  // Public key of the snapshot signature
-  flex_trit_t snapshot_signature_pubkey[FLEX_TRIT_SIZE_243];
-  // Skip validation of snapshot signature
-  bool snapshot_signature_skip_validation;
+  uint64_t below_max_depth;
   // The address of the coordinator
   flex_trit_t coordinator_address[FLEX_TRIT_SIZE_243];
+  // The maximal amount of possible milestones that can be issued
+  uint64_t coordinator_max_milestone_index;
   // The depth of the Merkle tree which in turn determines the number of leaves
   // (private keys) that the coordinator can use to sign a message
-  size_t coordinator_num_keys_in_milestone;
+  uint8_t coordinator_num_keys_in_milestone;
   // The security level used in coordinator signatures
   uint8_t coordinator_security_level;
   // The signature type used in coordinator signatures
   sponge_type_t coordinator_signature_type;
-  // The maximal amount of possible milestones that can be issued
-  uint64_t coordinator_max_milestone_index;
+  // Path of the DB file
+  char db_path[128];
+  // The hash of the genesis transaction
+  flex_trit_t genesis_hash[FLEX_TRIT_SIZE_243];
   // The index of the last milestone issued by the corrdinator before the
   // last snapshot
   uint64_t last_milestone;
+  // Limits how many milestones behind the current one the random walk can start
+  size_t max_depth;
   // Number of trailing ternary 0s that must appear at the end of a transaction
   // hash. Difficulty can be described as 3^mwm
   uint8_t mwm;
-  // Path of the DB file
-  char db_path[128];
+  // Path of the snapshot configuration file
+  char snapshot_conf_file[128];
+  // Path to the file that contains the state of the ledger at the last snapshot
+  char snapshot_file[128];
+  // Depth of the snapshot signature
+  uint64_t snapshot_signature_depth;
+  // Path to the file that contains a signature for the snapshot file
+  char snapshot_signature_file[128];
+  // Index of the snapshot signature
+  uint64_t snapshot_signature_index;
+  // Public key of the snapshot signature
+  flex_trit_t snapshot_signature_pubkey[FLEX_TRIT_SIZE_243];
+  // Skip validation of snapshot signature
+  bool snapshot_signature_skip_validation;
+  // Epoch time of the last snapshot
+  uint64_t snapshot_timestamp_sec;
 } iota_consensus_conf_t;
 
 /**
