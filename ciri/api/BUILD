@@ -18,6 +18,7 @@ cc_library(
         "//cclient/response:responses",
         "//ciri:core",
         "//common:errors",
+        "//common/helpers:pow",
         "//utils:logger_helper",
     ],
 )

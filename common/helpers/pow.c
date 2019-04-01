@@ -108,12 +108,9 @@ IOTA_EXPORT retcode_t iota_pow_bundle(bundle_transactions_t *const bundle, flex_
   tx = (iota_transaction_t *)utarray_front(bundle);
   cur_idx = tx->essence.last_index + 1;
 
-  ctrunk = (flex_trit_t *)trunk;
-
   do {
     cur_idx--;
 
-    // Find current tx
     for (tx = (iota_transaction_t *)utarray_front(bundle); tx != NULL && tx->essence.current_index != cur_idx;
          tx = (iota_transaction_t *)utarray_next(bundle, tx))
       ;
@@ -122,37 +119,37 @@ IOTA_EXPORT retcode_t iota_pow_bundle(bundle_transactions_t *const bundle, flex_
       return RC_HELPERS_POW_INVALID_TX;
     }
 
-    // Set trunk & branch
-    transaction_set_trunk(tx, ctrunk);
-    transaction_set_branch(tx, branch);
+    if (transaction_current_index(tx) == transaction_last_index(tx)) {
+      transaction_set_trunk(tx, trunk);
+      transaction_set_branch(tx, branch);
+    } else {
+      transaction_set_trunk(tx, ctrunk);
+      transaction_set_branch(tx, trunk);
+      free(ctrunk);
+    }
     transaction_set_attachment_timestamp(tx, current_timestamp_ms());
     transaction_set_attachment_timestamp_lower(tx, 0);
     transaction_set_attachment_timestamp_upper(tx, 3812798742493LL);
+    if (flex_trits_are_null(transaction_tag(tx), FLEX_TRIT_SIZE_27)) {
+      memcpy(transaction_tag(tx), transaction_obsolete_tag(tx), FLEX_TRIT_SIZE_27);
+    }
 
     transaction_serialize_on_flex_trits(tx, txflex);
 
-    // Do PoW
     if ((nonce = iota_pow_flex(txflex, NUM_TRITS_SERIALIZED_TRANSACTION, mwm)) == NULL) {
       return RC_OOM;
     }
     transaction_set_nonce(tx, nonce);
     free(nonce);
 
-    if (ctrunk != trunk) {
-      free(ctrunk);
-    }
-
-    transaction_serialize_on_flex_trits(tx, txflex);
-
-    if ((ctrunk = iota_flex_digest(txflex, NUM_TRITS_SERIALIZED_TRANSACTION)) == NULL) {
-      return RC_OOM;
+    if (transaction_current_index(tx) != 0) {
+      transaction_serialize_on_flex_trits(tx, txflex);
+      if ((ctrunk = iota_flex_digest(txflex, NUM_TRITS_SERIALIZED_TRANSACTION)) == NULL) {
+        return RC_OOM;
+      }
     }
 
   } while (cur_idx != 0);
-
-  if (ctrunk != trunk) {
-    free(ctrunk);
-  }
 
   return RC_OK;
 }

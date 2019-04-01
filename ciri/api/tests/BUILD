@@ -24,6 +24,16 @@ cc_test(
 )
 
 cc_test(
+    name = "test_attach_to_tangle",
+    srcs = ["test_attach_to_tangle.c"],
+    deps = [
+        "//ciri/api",
+        "//consensus/test_utils",
+        "@unity",
+    ],
+)
+
+cc_test(
     name = "test_broadcast_transactions",
     srcs = ["test_broadcast_transactions.c"],
     data = [":db_file"],
