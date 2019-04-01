@@ -13,7 +13,6 @@
 #include "common/helpers/digest.h"
 #include "common/model/milestone.h"
 #include "common/model/transaction.h"
-#include "common/storage/sql/defs.h"
 #include "common/storage/sql/sqlite3/connection.h"
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
