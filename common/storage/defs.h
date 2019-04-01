@@ -48,4 +48,14 @@
 
 #define MILESTONE_NUM_COLS 3
 
+/*
+ * Spent address definitions
+ */
+
+#define SPENT_ADDRESS_TABLE_NAME "iota_spent_address"
+
+#define SPENT_ADDRESS_COL_HASH "hash"
+
+#define SPENT_ADDRESS_NUM_COLS 1
+
 #endif  // __COMMON_STORAGE_DEFS_H__

@@ -129,21 +129,21 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
 
   logger_id = logger_helper_enable(CONSENSUS_CONF_LOGGER_ID, LOGGER_DEBUG, true);
 
-  memset(conf->genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
-  conf->max_depth = DEFAULT_TIP_SELECTION_MAX_DEPTH;
   conf->alpha = DEFAULT_TIP_SELECTION_ALPHA;
   conf->below_max_depth = DEFAULT_TIP_SELECTION_BELOW_MAX_DEPTH;
-  strcpy(conf->snapshot_conf_file, DEFAULT_SNAPSHOT_CONF_FILE);
-  strcpy(conf->snapshot_signature_file, DEFAULT_SNAPSHOT_SIG_FILE);
-  strcpy(conf->snapshot_file, DEFAULT_SNAPSHOT_FILE);
-  conf->snapshot_signature_skip_validation = DEFAULT_SNAPSHOT_SIGNATURE_SKIP_VALIDATION;
   flex_trits_from_trytes(conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t *)COORDINATOR_ADDRESS, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
   conf->coordinator_num_keys_in_milestone = DEFAULT_COORDINATOR_NUM_KEYS_IN_MILESTONE;
+  conf->coordinator_max_milestone_index = 1 << conf->coordinator_num_keys_in_milestone;
   conf->coordinator_security_level = DEFAULT_COORDINATOR_SECURITY_LEVEL;
   conf->coordinator_signature_type = DEFAULT_COORDINATOR_SIGNATURE_TYPE;
-  conf->coordinator_max_milestone_index = 1 << conf->coordinator_num_keys_in_milestone;
+  memset(conf->genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
+  conf->max_depth = DEFAULT_TIP_SELECTION_MAX_DEPTH;
   conf->mwm = DEFAULT_MWN;
+  strcpy(conf->snapshot_conf_file, DEFAULT_SNAPSHOT_CONF_FILE);
+  strcpy(conf->snapshot_file, DEFAULT_SNAPSHOT_FILE);
+  strcpy(conf->snapshot_signature_file, DEFAULT_SNAPSHOT_SIG_FILE);
+  conf->snapshot_signature_skip_validation = DEFAULT_SNAPSHOT_SIGNATURE_SKIP_VALIDATION;
 
   ret = iota_snapshot_conf_init(conf);
 
