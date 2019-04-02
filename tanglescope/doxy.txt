@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2019 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+ /**
+ * @defgroup tanglescope Tanglescope
+ * @brief Tanglescope is a program composed of metric collectors.
+ *
+ * Tanglescope is a program composed of metric collectors, Each collector is responsible for a different aspect
+ * of the Tangle behavior and collects different set of metrics and exposes them to a configurable prometheus end point.
+ */
