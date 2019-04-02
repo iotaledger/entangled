@@ -16,7 +16,7 @@ retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_init({KEY_TYPE}_to_{VALUE_TYPE}_map_t *
   return RC_OK;
 }
 
-retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_size({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map) {
+size_t {KEY_TYPE}_to_{VALUE_TYPE}_map_size({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *const map) {
   return HASH_COUNT(map->map);
 }
 
