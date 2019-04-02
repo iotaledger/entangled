@@ -123,6 +123,8 @@ typedef struct {
 
   retcode_t (*store_transactions_serialize_request)(serializer_t const* const s,
                                                     store_transactions_req_t const* const obj, char_buffer_t* out);
+  retcode_t (*store_transactions_deserialize_request)(serializer_t const* const s, char const* const obj,
+                                                      store_transactions_req_t* const out);
 
   retcode_t (*check_consistency_serialize_request)(serializer_t const* const s, check_consistency_req_t* const obj,
                                                    char_buffer_t* out);

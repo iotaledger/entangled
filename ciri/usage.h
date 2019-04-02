@@ -23,6 +23,7 @@ typedef enum cli_arg_value_e {
   CONF_P_SEND_MILESTONE,
   CONF_REQUESTER_QUEUE_SIZE,
   CONF_TIPS_CACHE_SIZE,
+  CONF_TIPS_SOLIDIFIER_ENABLED,
 
   // API configuration
 
@@ -104,6 +105,8 @@ static struct cli_argument_s {
      "getTips API call.",
      REQUIRED_ARG},
     {"udp-receiver-port", 'u', "UDP listen port.", REQUIRED_ARG},
+    {"tips-solidifier-enabled", CONF_TIPS_SOLIDIFIER_ENABLED,
+     "Scan the current tips and attempt to mark them as solid.", REQUIRED_ARG},
 
     // API configuration
 

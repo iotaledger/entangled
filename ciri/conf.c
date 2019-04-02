@@ -68,6 +68,17 @@ static sponge_type_t get_sponge_type(char const* const sponge_type) {
   return map[i].type;
 }
 
+static retcode_t get_true_false(char const* const input, bool* const output) {
+  if (strcmp(input, "true") == 0) {
+    *output = true;
+  } else if (strcmp(input, "false") == 0) {
+    *output = false;
+  } else {
+    return RC_CIRI_CONF_INVALID_ARGUMENTS;
+  }
+  return RC_OK;
+}
+
 static int get_conf_key(char const* const key) {
   int i = 0;
   while (cli_arguments_g[i].name != NULL && strcmp(cli_arguments_g[i].name, key) != 0) {
@@ -132,6 +143,9 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       break;
     case 'u':  // --udp-receiver-port
       gossip_conf->udp_receiver_port = atoi(value);
+      break;
+    case CONF_TIPS_SOLIDIFIER_ENABLED:  // --tips-solidifier-enabled
+      ret = get_true_false(value, &gossip_conf->tips_solidifier_enabled);
       break;
 
     // API configuration
@@ -204,13 +218,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
                              HASH_LENGTH_TRYTE, HASH_LENGTH_TRYTE);
       break;
     case CONF_SNAPSHOT_SIGNATURE_SKIP_VALIDATION:  // --snapshot-signature-skip-validation
-      if (strcmp(value, "true") == 0) {
-        consensus_conf->snapshot_signature_skip_validation = true;
-      } else if (strcmp(value, "false") == 0) {
-        consensus_conf->snapshot_signature_skip_validation = false;
-      } else {
-        return RC_CIRI_CONF_INVALID_ARGUMENTS;
-      }
+      ret = get_true_false(value, &consensus_conf->snapshot_signature_skip_validation);
       break;
     case CONF_SNAPSHOT_TIMESTAMP:  // --snapshot-timestamp
       consensus_conf->snapshot_timestamp_sec = atoi(value);

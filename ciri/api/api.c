@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "ciri/api/api.h"
+#include "common/helpers/pow.h"
 #include "utils/logger_helper.h"
 #include "utils/time.h"
 
@@ -268,9 +269,35 @@ retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tang
 
 retcode_t iota_api_attach_to_tangle(iota_api_t const *const api, attach_to_tangle_req_t const *const req,
                                     attach_to_tangle_res_t *const res, error_res_t **const error) {
+  retcode_t ret = RC_OK;
+  bundle_transactions_t *bundle = NULL;
+  iota_transaction_t *tx_iter = NULL;
+  flex_trit_t *trytes_iter = NULL;
+  iota_transaction_t tx;
+  flex_trit_t tx_trytes[FLEX_TRIT_SIZE_8019];
+
   if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
+
+  bundle_transactions_new(&bundle);
+
+  HASH_ARRAY_FOREACH(req->trytes, trytes_iter) {
+    transaction_deserialize_from_trits(&tx, trytes_iter, false);
+    bundle_transactions_add(bundle, &tx);
+  }
+
+  if ((ret = iota_pow_bundle(bundle, req->trunk, req->branch, req->mwm)) != RC_OK) {
+    goto done;
+  }
+
+  BUNDLE_FOREACH(bundle, tx_iter) {
+    transaction_serialize_on_flex_trits(tx_iter, tx_trytes);
+    hash_array_push(res->trytes, tx_trytes);
+  }
+
+done:
+  bundle_transactions_free(&bundle);
 
   return RC_OK;
 }
@@ -342,6 +369,11 @@ retcode_t iota_api_store_transactions(iota_api_t const *const api, tangle_t *con
                                                                    &tx)) != RC_OK) {
       log_warning(logger_id, "Updating transaction status failed\n");
       return ret;
+    }
+    if (transaction_current_index(&tx) == 0 &&
+        memcmp(transaction_address(&tx), api->core->consensus.milestone_tracker.conf->coordinator_address,
+               FLEX_TRIT_SIZE_243) == 0) {
+      ret = iota_milestone_tracker_add_candidate(&api->core->consensus.milestone_tracker, transaction_hash(&tx));
     }
     // TODO store metadata: arrival_time, status, sender (#407)
   }
