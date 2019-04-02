@@ -12,6 +12,7 @@
 
 #include "common/errors.h"
 #include "common/trinary/flex_trit.h"
+#include "gossip/conf.h"
 #include "gossip/uint64_t_to_flex_trit_t_map.h"
 #include "utils/handles/rw_lock.h"
 
@@ -37,12 +38,12 @@ retcode_t recent_seen_bytes_cache_get(recent_seen_bytes_cache_t *const cache, ui
 retcode_t recent_seen_bytes_cache_put(recent_seen_bytes_cache_t *const cache, uint64_t const digest,
                                       flex_trit_t const *const hash);
 
-static inline retcode_t recent_seen_bytes_cache_hash(flex_trit_t const *const bytes, uint64_t *const digest) {
+static inline retcode_t recent_seen_bytes_cache_hash(byte_t const *const bytes, uint64_t *const digest) {
   if (bytes == NULL || digest == NULL) {
     return RC_NULL_PARAM;
   }
 
-  *digest = XXH64(bytes, FLEX_TRIT_SIZE_8019, 0);
+  *digest = XXH64(bytes, PACKET_SIZE, 0);
 
   return RC_OK;
 }
