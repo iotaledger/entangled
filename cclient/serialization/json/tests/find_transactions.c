@@ -69,6 +69,20 @@ void test_find_transactions_serialize_request(void) {
   find_transactions_req_free(&find_tran_1);
 }
 
+void test_find_transactions_serialize_request_no_parameters(void) {
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+
+  find_transactions_req_t* find_tran_1 = find_transactions_req_new();
+  char_buffer_t* serializer_out_1 = char_buffer_new();
+
+  TEST_ASSERT_EQUAL_INT16(RC_CCLIENT_JSON_KEY, serializer.vtable.find_transactions_serialize_request(
+                                                   &serializer, find_tran_1, serializer_out_1));
+
+  char_buffer_free(serializer_out_1);
+  find_transactions_req_free(&find_tran_1);
+}
+
 void test_find_transactions_deserialize_request(void) {
   serializer_t serializer;
   init_json_serializer(&serializer);
@@ -84,7 +98,7 @@ void test_find_transactions_deserialize_request(void) {
 
   find_transactions_req_t* req = find_transactions_req_new();
 
-  serializer.vtable.find_transactions_deserialize_request(&serializer, json_text, req);
+  TEST_ASSERT_EQUAL_INT16(RC_OK, serializer.vtable.find_transactions_deserialize_request(&serializer, json_text, req));
 
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
   flex_trit_t tag[FLEX_TRIT_SIZE_81] = {};
@@ -100,6 +114,18 @@ void test_find_transactions_deserialize_request(void) {
 
   flex_trits_from_trytes(tag, NUM_TRITS_TAG, (tryte_t const*)TEST_27_TRYTES_1, NUM_TRYTES_TAG, NUM_TRYTES_TAG);
   TEST_ASSERT_EQUAL_MEMORY(tag, hash81_queue_at(&req->tags, 0), FLEX_TRIT_SIZE_81);
+
+  find_transactions_req_free(&req);
+}
+
+void test_find_transactions_deserialize_request_no_parameters(void) {
+  serializer_t serializer;
+  init_json_serializer(&serializer);
+  char const* json_text = "{\"command\":\"findTransactions\"}";
+
+  find_transactions_req_t* req = find_transactions_req_new();
+  TEST_ASSERT_EQUAL_INT16(RC_CCLIENT_JSON_KEY,
+                          serializer.vtable.find_transactions_deserialize_request(&serializer, json_text, req));
 
   find_transactions_req_free(&req);
 }
@@ -171,7 +197,9 @@ int main(void) {
   UNITY_BEGIN();
 
   RUN_TEST(test_find_transactions_serialize_request);
+  RUN_TEST(test_find_transactions_serialize_request_no_parameters);
   RUN_TEST(test_find_transactions_deserialize_request);
+  RUN_TEST(test_find_transactions_deserialize_request_no_parameters);
   RUN_TEST(test_find_transactions_serialize_response);
   RUN_TEST(test_find_transactions_deserialize_response);
   return UNITY_END();

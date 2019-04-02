@@ -21,7 +21,7 @@ retcode_t json_find_transactions_serialize_request(serializer_t const* const s,
   }
 
   if (!obj->addresses && !obj->approvees && !obj->bundles && !obj->tags) {
-    return RC_CCLIENT_JSON_PARSE;
+    return RC_CCLIENT_JSON_KEY;
   }
 
   cJSON_AddItemToObject(json_root, "command", cJSON_CreateString("findTransactions"));
@@ -70,10 +70,14 @@ retcode_t json_find_transactions_deserialize_request(serializer_t const* const s
   retcode_t ret = RC_OK;
   cJSON* json_obj = cJSON_Parse(obj);
   cJSON* json_item = NULL;
-  bool empty = true;
 
   log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
+
+  if (!(cJSON_HasObjectItem(json_obj, "bundles") || cJSON_HasObjectItem(json_obj, "addresses") ||
+        cJSON_HasObjectItem(json_obj, "tags") || cJSON_HasObjectItem(json_obj, "approvees"))) {
+    return RC_CCLIENT_JSON_KEY;
+  }
 
   ret = json_array_to_hash243_queue(json_obj, "bundles", &out->bundles);
   if (ret) {
@@ -82,8 +86,6 @@ retcode_t json_find_transactions_deserialize_request(serializer_t const* const s
     } else {
       goto end;
     }
-  } else {
-    empty = false;
   }
 
   ret = json_array_to_hash243_queue(json_obj, "addresses", &out->addresses);
@@ -93,8 +95,6 @@ retcode_t json_find_transactions_deserialize_request(serializer_t const* const s
     } else {
       goto end;
     }
-  } else {
-    empty = false;
   }
 
   ret = json_array_to_hash81_queue(json_obj, "tags", &out->tags);
@@ -104,8 +104,6 @@ retcode_t json_find_transactions_deserialize_request(serializer_t const* const s
     } else {
       goto end;
     }
-  } else {
-    empty = false;
   }
 
   ret = json_array_to_hash243_queue(json_obj, "approvees", &out->approvees);
@@ -115,13 +113,11 @@ retcode_t json_find_transactions_deserialize_request(serializer_t const* const s
     } else {
       goto end;
     }
-  } else {
-    empty = false;
   }
 
 end:
   cJSON_Delete(json_obj);
-  return empty ? RC_CCLIENT_JSON_KEY : ret;
+  return ret;
 }
 
 retcode_t json_find_transactions_serialize_response(serializer_t const* const s,
