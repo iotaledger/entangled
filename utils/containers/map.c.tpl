@@ -117,12 +117,19 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_remove({KEY_TYPE}_to_{VALUE_TYPE}_map_t *con
 
   HASH_FIND(hh, map->map, key,map->key_size, entry);
 
-  if (entry != NULL){
+  {KEY_TYPE}_to_{VALUE_TYPE}_map_remove_entry(map, entry);
+
+  return entry != NULL;
+}
+
+retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_remove_entry({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
+                                      {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *const entry) {
+  if (entry != NULL) {
     free(entry->key);
     free(entry->value);
     HASH_DEL(map->map, entry);
     free(entry);
   }
 
-  return entry != NULL;
+  return RC_OK;
 }

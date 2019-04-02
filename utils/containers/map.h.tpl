@@ -62,6 +62,9 @@ bool {KEY_TYPE}_to_{VALUE_TYPE}_map_cmp({KEY_TYPE}_to_{VALUE_TYPE}_map_t const *
 bool {KEY_TYPE}_to_{VALUE_TYPE}_map_remove({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
 {KEY_TYPE} const *const key);
 
+retcode_t {KEY_TYPE}_to_{VALUE_TYPE}_map_remove_entry({KEY_TYPE}_to_{VALUE_TYPE}_map_t *const map,
+                                      {KEY_TYPE}_to_{VALUE_TYPE}_map_entry_t *const entry);
+
 #ifdef __cplusplus
 }
 #endif
