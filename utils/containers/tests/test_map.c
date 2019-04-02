@@ -28,15 +28,15 @@ void person_to_int_map() {
   person_example_t_to_int_map_t map;
   person_example_t_to_int_map_entry_t* e = NULL;
 
-  TEST_ASSERT(person_example_t_to_int_map_init(&map, sizeof(person_example_t)) == RC_OK);
+  TEST_ASSERT(person_example_t_to_int_map_init(&map, sizeof(person_example_t), sizeof(int)) == RC_OK);
 
   TEST_ASSERT(person_example_t_to_int_map_find(&map, &p1, &e) == false);
-  TEST_ASSERT(person_example_t_to_int_map_add(&map, &p1, p1_value) == RC_OK);
+  TEST_ASSERT(person_example_t_to_int_map_add(&map, &p1, &p1_value) == RC_OK);
   TEST_ASSERT(person_example_t_to_int_map_find(&map, &p1, &e) == true);
-  TEST_ASSERT_EQUAL_INT(p1_value, e->value);
-  TEST_ASSERT(person_example_t_to_int_map_add(&map, &p2, p2_value) == RC_OK);
+  TEST_ASSERT_EQUAL_INT(p1_value, *e->value);
+  TEST_ASSERT(person_example_t_to_int_map_add(&map, &p2, &p2_value) == RC_OK);
   TEST_ASSERT(person_example_t_to_int_map_find(&map, &p2, &e) == true);
-  TEST_ASSERT_EQUAL_INT(p2_value, e->value);
+  TEST_ASSERT_EQUAL_INT(p2_value, *e->value);
   person_example_t_to_int_map_free(&map);
 }
 
