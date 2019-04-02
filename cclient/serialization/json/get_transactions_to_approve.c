@@ -59,9 +59,8 @@ retcode_t json_get_transactions_to_approve_deserialize_request(serializer_t cons
     goto end;
   }
 
-  ret = json_string_hash_to_flex_trits(json_obj, "reference", out->reference);
-  if (ret == RC_CCLIENT_JSON_KEY) {
-    ret = RC_OK;
+  if (cJSON_HasObjectItem(json_obj, "reference")) {
+    ret = json_string_hash_to_flex_trits(json_obj, "reference", out->reference);
   }
 
 end:
