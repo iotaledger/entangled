@@ -67,6 +67,10 @@ typedef struct get_node_info_res_s {
    * of all referenced transactions.
    */
   flex_trit_t latest_solid_subtangle_milestone[FLEX_TRIT_SIZE_243];
+  /*
+   * Enabled features
+   */
+  UT_array* features;
   /**
    * The address of the coordinator being followed by this node.
    */
@@ -106,6 +110,11 @@ static inline void get_node_info_res_coordinator_address_set(get_node_info_res_t
 static inline flex_trit_t const* get_node_info_res_coordinator_address(get_node_info_res_t const* const res) {
   return res->coordinator_address;
 }
+retcode_t get_node_info_res_features_add(get_node_info_res_t* rzes, char const* feature);
+static inline char const* get_node_info_res_features_at(get_node_info_res_t* res, size_t idx) {
+  return *(const char**)utarray_eltptr(res->features, idx);
+}
+static inline size_t get_node_info_req_features_len(get_node_info_res_t* res) { return utarray_len(res->features); }
 
 #ifdef __cplusplus
 }

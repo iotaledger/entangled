@@ -21,6 +21,7 @@ static char const *packets_queue_size = "packetsQueueSize";
 static char const *time = "time";
 static char const *tips = "tips";
 static char const *transactions_to_request = "transactionsToRequest";
+static char const *features = "features";
 static char const *coordinator_address = "coordinatorAddress";
 
 retcode_t json_get_node_info_serialize_request(serializer_t const *const s, char_buffer_t *out) {
@@ -66,6 +67,11 @@ retcode_t json_get_node_info_serialize_response(serializer_t const *const s, get
   cJSON_AddNumberToObject(json_root, time, obj->time);
   cJSON_AddNumberToObject(json_root, tips, obj->tips);
   cJSON_AddNumberToObject(json_root, transactions_to_request, obj->transactions_to_request);
+
+  ret = utarray_to_json_array(obj->features, json_root, features);
+  if (ret != RC_OK) {
+    goto done;
+  }
 
   ret = flex_trits_to_json_string(json_root, coordinator_address, obj->coordinator_address, HASH_LENGTH_TRIT);
   if (ret != RC_OK) {
@@ -148,6 +154,11 @@ retcode_t json_get_node_info_deserialize_response(serializer_t const *const s, c
   }
 
   ret = json_get_uint32(json_obj, transactions_to_request, &out->transactions_to_request);
+  if (ret != RC_OK) {
+    goto end;
+  }
+
+  ret = json_string_array_to_utarray(json_obj, features, out->features);
   if (ret != RC_OK) {
     goto end;
   }

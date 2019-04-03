@@ -437,6 +437,7 @@ retcode_t iota_api_get_node_info(iota_api_t const *const api, get_node_info_res_
   res->time = current_timestamp_ms();
   res->tips = tips_cache_size(&api->core->node.tips);
   res->transactions_to_request = requester_size(&api->core->node.transaction_requester);
+  features_set(api->features, res->features);
   memcpy(res->coordinator_address, api->core->consensus.conf.coordinator_address, FLEX_TRIT_SIZE_243);
 
   return RC_OK;
