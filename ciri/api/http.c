@@ -319,13 +319,16 @@ static inline retcode_t process_get_transactions_to_approve_request(iota_api_htt
     goto done;
   }
 
-  // TODO Deserialize request
+  if ((ret = http->serializer.vtable.get_transactions_to_approve_deserialize_request(&http->serializer, payload,
+                                                                                     req)) != RC_OK) {
+    goto done;
+  }
 
   if ((ret = iota_api_get_transactions_to_approve(http->api, tangle, req, res, &error)) != RC_OK) {
     error_serialize_response(http, &error, out);
+  } else {
+    ret = http->serializer.vtable.get_transactions_to_approve_serialize_response(&http->serializer, res, out);
   }
-
-  // TODO Serialize response
 
 done:
   get_transactions_to_approve_req_free(&req);
