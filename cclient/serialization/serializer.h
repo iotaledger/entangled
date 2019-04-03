@@ -75,10 +75,15 @@ typedef struct {
                                            char_buffer_t* out);
   retcode_t (*get_tips_deserialize_response)(serializer_t const* const, const char* const obj, get_tips_res_t* res);
 
-  retcode_t (*get_transactions_to_approve_serialize_request)(serializer_t const* const,
+  retcode_t (*get_transactions_to_approve_serialize_request)(serializer_t const* const s,
                                                              get_transactions_to_approve_req_t const* const obj,
                                                              char_buffer_t* out);
-  retcode_t (*get_transactions_to_approve_deserialize_response)(serializer_t const* const, char const* const obj,
+  retcode_t (*get_transactions_to_approve_deserialize_request)(serializer_t const* const s, char const* const obj,
+                                                               get_transactions_to_approve_req_t* out);
+  retcode_t (*get_transactions_to_approve_serialize_response)(serializer_t const* const s,
+                                                              get_transactions_to_approve_res_t const* const obj,
+                                                              char_buffer_t* out);
+  retcode_t (*get_transactions_to_approve_deserialize_response)(serializer_t const* const s, char const* const obj,
                                                                 get_transactions_to_approve_res_t* out);
 
   retcode_t (*remove_neighbors_serialize_request)(serializer_t const* const s, remove_neighbors_req_t const* const obj,
