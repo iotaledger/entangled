@@ -27,10 +27,12 @@ typedef state_delta_entry_t *state_delta_t;
 
 int64_t state_delta_sum(state_delta_t const *const state);
 retcode_t state_delta_add_or_sum(state_delta_t *const state, flex_trit_t const *const hash, int64_t const value);
+retcode_t state_delta_sum_if_present(state_delta_t *const state, flex_trit_t const *const hash, int64_t const value);
 retcode_t state_delta_add_or_replace(state_delta_t *const state, flex_trit_t const *const hash, int64_t const value);
 retcode_t state_delta_create_patch(state_delta_t const *const state, state_delta_t const *const delta,
                                    state_delta_t *const patch);
 retcode_t state_delta_apply_patch(state_delta_t *const state, state_delta_t const *const patch);
+retcode_t state_delta_apply_patch_if_present(state_delta_t *const state, state_delta_t const *const patch);
 retcode_t state_delta_merge_patch(state_delta_t *const state, state_delta_t const *const patch);
 bool state_delta_is_consistent(state_delta_t *const delta);
 

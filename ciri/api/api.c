@@ -231,11 +231,103 @@ retcode_t iota_api_get_inclusion_states(iota_api_t const *const api, get_inclusi
 retcode_t iota_api_get_balances(iota_api_t const *const api, tangle_t *const tangle,
                                 get_balances_req_t const *const req, get_balances_res_t *const res,
                                 error_res_t **const error) {
+  retcode_t ret = RC_OK;
+  state_delta_t balances = NULL;
+  hash243_queue_t tips = NULL;
+
   if (api == NULL || req == NULL || res == NULL || error == NULL) {
     return RC_NULL_PARAM;
   }
 
-  return RC_OK;
+  if (req->threshold <= 0 || req->threshold > 100) {
+    return RC_API_GET_BALANCES_INVALID_THRESHOLD;
+  }
+
+  rw_lock_handle_rdlock(&api->core->consensus.milestone_tracker.latest_snapshot->rw_lock);
+
+  res->milestone_index = iota_snapshot_get_index(api->core->consensus.milestone_tracker.latest_snapshot);
+
+  if (req->tips == NULL) {
+    if ((ret = hash243_queue_push(&tips, api->core->consensus.milestone_tracker.latest_solid_subtangle_milestone)) !=
+        RC_OK) {
+      goto done;
+    }
+  } else {
+    tips = req->tips;
+  }
+
+  {
+    hash243_queue_entry_t *address = NULL;
+    int64_t balance = 0;
+
+    CDL_FOREACH(req->addresses, address) {
+      balance = 0;
+      if ((ret = iota_snapshot_get_balance(&api->core->consensus.snapshot, address->hash, &balance)) != RC_OK &&
+          ret != RC_SNAPSHOT_BALANCE_NOT_FOUND) {
+        goto done;
+      }
+      if ((ret = state_delta_add(&balances, address->hash, balance)) != RC_OK) {
+        goto done;
+      }
+    }
+  }
+
+  // TODO only if tips provided ?
+  {
+    hash243_queue_entry_t *tip = NULL;
+    hash243_set_t visited_hashes = NULL;
+    state_delta_t diff = NULL;
+    bool is_valid = false;
+
+    CDL_FOREACH(tips, tip) {
+      is_valid = false;
+      if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, tip->hash, &is_valid)) != RC_OK) {
+        goto done;
+      }
+      if (!is_valid) {
+        ret = RC_API_GET_BALANCES_UNKNOWN_TIP;
+        goto done;
+      }
+      is_valid = false;
+      if ((ret = iota_consensus_ledger_validator_update_delta(&api->core->consensus.ledger_validator, tangle,
+                                                              &visited_hashes, &diff, tip->hash, &is_valid)) != RC_OK) {
+        goto done;
+      }
+      if (!is_valid) {
+        ret = RC_API_GET_BALANCES_INCONSISTENT_TIP;
+        goto done;
+      }
+      if ((ret = get_balances_res_reference_add(res, tip->hash)) != RC_OK) {
+        goto done;
+      }
+    }
+
+    if ((ret = state_delta_apply_patch_if_present(&balances, &diff)) != RC_OK) {
+      goto done;
+    }
+  }
+
+  {
+    hash243_queue_entry_t *address = NULL;
+    state_delta_entry_t *entry = NULL;
+
+    CDL_FOREACH(req->addresses, address) {
+      state_delta_find(balances, address->hash, entry);
+      if (entry) {
+        if ((ret = get_balances_res_balances_add(res, entry->value)) != RC_OK) {
+          goto done;
+        }
+      }
+    }
+  }
+
+done:
+  rw_lock_handle_unlock(&api->core->consensus.milestone_tracker.latest_snapshot->rw_lock);
+  if (tips != req->tips) {
+    hash243_queue_free(&tips);
+  }
+
+  return ret;
 }
 
 retcode_t iota_api_get_transactions_to_approve(iota_api_t const *const api, tangle_t *const tangle,
