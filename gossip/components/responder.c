@@ -13,7 +13,7 @@
 #include "utils/logger_helper.h"
 
 #define RESPONDER_LOGGER_ID "responder"
-#define RESPONDER_TIMEOUT_SEC 1
+#define RESPONDER_TIMEOUT_MS 1000ULL
 
 static logger_id_t logger_id;
 
@@ -148,7 +148,7 @@ static void *responder_routine(responder_t *const responder) {
 
   while (responder->running) {
     if (responder_is_empty(responder)) {
-      cond_handle_timedwait(&responder->cond, &lock_cond, RESPONDER_TIMEOUT_SEC);
+      cond_handle_timedwait(&responder->cond, &lock_cond, RESPONDER_TIMEOUT_MS);
     }
 
     rw_lock_handle_wrlock(&responder->lock);
@@ -226,6 +226,7 @@ retcode_t responder_stop(responder_t *const responder) {
 
   log_info(logger_id, "Shutting down responder thread\n");
   responder->running = false;
+  cond_handle_signal(&responder->cond);
   if (thread_handle_join(responder->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down responder thread failed\n");
     ret = RC_FAILED_THREAD_JOIN;

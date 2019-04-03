@@ -11,7 +11,7 @@
 #include "gossip/node.h"
 #include "utils/logger_helper.h"
 
-#define RECEIVER_COMPONENT_LOGGER_ID "receiver_component"
+#define RECEIVER_COMPONENT_LOGGER_ID "receiver"
 
 static logger_id_t logger_id;
 
