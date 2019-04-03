@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_SERVICE_H_
 #define CCLIENT_SERVICE_H_
 
@@ -17,23 +26,43 @@
 extern "C" {
 #endif
 
+/**
+ * @brief HTTP request information
+ *
+ */
 typedef struct {
-  const char* host;
-  const char* path;
-  const char* content_type;
-  const char* accept;
-  const char* ca_pem;
-  uint16_t port;
-  int api_version;  // IOTA API version number.
+  const char* host;         /**< Host name */
+  const char* path;         /**< The path of HTTP/HTTPS request */
+  const char* content_type; /**< Content type of request */
+  const char* accept;       /**< Accept content type of response */
+  const char* ca_pem;       /**< String of root ca */
+  uint16_t port;            /**< Port number of the host*/
+  int api_version;          /**< Number of IOTA API version */
 } http_info_t;
 
+/**
+ * @brief client service
+ *
+ */
 typedef struct {
-  http_info_t http;
-  serializer_t serializer;
-  serializer_type_t serializer_type;
+  http_info_t http;                  /**< The http request information */
+  serializer_t serializer;           /**< The client serializer */
+  serializer_type_t serializer_type; /** The type of serialization */
 } iota_client_service_t;
 
+/**
+ * @brief init CClient service
+ *
+ * @param serv service object
+ * @return error code
+ */
 retcode_t iota_client_service_init(iota_client_service_t* serv);
+
+/**
+ * @brief destory and clean CClient service
+ *
+ * @param serv service object
+ */
 void iota_client_service_destroy(iota_client_service_t* serv);
 
 #ifdef __cplusplus
@@ -41,3 +70,5 @@ void iota_client_service_destroy(iota_client_service_t* serv);
 #endif
 
 #endif  // CCLIENT_SERVICE_H_
+
+/** @} */

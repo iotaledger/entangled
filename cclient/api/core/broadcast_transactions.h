@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_core
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_BROADCAST_TRANSACTIONS_H
 #define CCLIENT_API_BROADCAST_TRANSACTIONS_H
 
@@ -16,15 +25,17 @@ extern "C" {
 #endif
 
 /**
+ * @brief
+ *
  * Broadcast a list of transactions to all neighbors. The input trytes for this
  * call are provided by iota_client_attach_to_tangle.
  *
  * https://iota.readme.io/reference#broadcasttransactions
  *
- * @param service IRI node end point.
- * @param req - Request containing the transactions to broadcast
+ * @param service client service
+ * @param req Request containing the transactions to broadcast
  *
- * @return error value.
+ * @return error code
  */
 retcode_t iota_client_broadcast_transactions(const iota_client_service_t* const service,
                                              broadcast_transactions_req_t* req);
@@ -34,3 +45,5 @@ retcode_t iota_client_broadcast_transactions(const iota_client_service_t* const 
 #endif
 
 #endif  // CCLIENT_API_BROADCAST_TRANSACTIONS_H
+
+/** @} */

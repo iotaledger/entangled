@@ -1,0 +1,20 @@
+/*
+ * Copyright (c) 2019 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+ /**
+ * @defgroup common Common
+ * @brief The common modules used by entangled components. 
+ *
+ * The common module contains crypto, trinary, data models, network, and error code implementation.
+ */
+
+ /**
+ * @defgroup common_error Error Codes
+ * @ingroup common
+ * @brief The error code implementation. 
+ *
+ */

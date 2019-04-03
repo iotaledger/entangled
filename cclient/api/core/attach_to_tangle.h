@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup cclient_core
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_API_ATTACH_TO_TANGLE_H
 #define CCLIENT_API_ATTACH_TO_TANGLE_H
 
@@ -17,6 +26,8 @@ extern "C" {
 #endif
 
 /**
+ * @brief
+ *
  * Attaches the specified transactions (trytes) to the Tangle by doing Proof of
  * Work. You need to supply branchTransaction as well as trunkTransaction
  * (basically the tips which you're going to validate and reference with this
@@ -31,9 +42,12 @@ extern "C" {
  * @param service IRI node end point, NULL for local PoW.
  * @param req Request containing the attachment params
  * @param res Response containing trytes
- *
- * @return error value.
+ * @return
+ *  - `#RC_OK`
+ *  - `#RC_CCLIENT_OOM`
+ *  - `#RC_ERROR`
  */
+
 retcode_t iota_client_attach_to_tangle(const iota_client_service_t* const service,
                                        const attach_to_tangle_req_t* const req, attach_to_tangle_res_t* res);
 
@@ -42,3 +56,5 @@ retcode_t iota_client_attach_to_tangle(const iota_client_service_t* const servic
 #endif
 
 #endif  // CCLIENT_API_ATTACH_TO_TANGLE_H
+
+/** @} */

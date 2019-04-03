@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2019 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+ /**
+ * @defgroup cclient_core Core API
+ * @ingroup cclient
+ * @brief Core API implementations. 
+ *
+ * The Core API is a basic API set that comuncate with the IRI node. 
+ */
