@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 #include "common/errors.h"
+#include "utils/handles/cond.h"
 #include "utils/handles/thread.h"
 
 // Forward declarations
@@ -21,6 +22,7 @@ typedef struct tips_requester_s {
   thread_handle_t thread;
   bool running;
   node_t *node;
+  cond_handle_t cond;
 } tips_requester_t;
 
 #ifdef __cplusplus

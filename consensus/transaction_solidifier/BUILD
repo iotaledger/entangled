@@ -13,6 +13,7 @@ cc_library(
         "//gossip/components:transaction_requester",
         "//utils:logger_helper",
         "//utils/containers/hash:hash243_set",
+        "//utils/handles:cond",
         "//utils/handles:lock",
         "//utils/handles:thread",
     ],

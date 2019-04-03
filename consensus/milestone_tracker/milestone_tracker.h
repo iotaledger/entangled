@@ -16,6 +16,7 @@
 #include "common/model/transaction.h"
 #include "consensus/conf.h"
 #include "utils/containers/hash/hash243_queue.h"
+#include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
@@ -26,7 +27,6 @@ extern "C" {
 // Foward declarations
 typedef struct tangle_s tangle_t;
 typedef struct snapshot_s snapshot_t;
-typedef struct _trit_array* trit_array_p;
 typedef struct ledger_validator_s ledger_validator_t;
 typedef struct transaction_solidifier_s transaction_solidifier_t;
 
@@ -43,9 +43,11 @@ typedef struct milestone_tracker_s {
   snapshot_t* latest_snapshot;
   uint64_t milestone_start_index;
   thread_handle_t milestone_validator;
+  cond_handle_t cond_validator;
   uint64_t latest_milestone_index;
   flex_trit_t latest_milestone[FLEX_TRIT_SIZE_243];
   thread_handle_t milestone_solidifier;
+  cond_handle_t cond_solidifier;
   uint64_t latest_solid_subtangle_milestone_index;
   flex_trit_t latest_solid_subtangle_milestone[FLEX_TRIT_SIZE_243];
   ledger_validator_t* ledger_validator;

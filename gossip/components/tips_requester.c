@@ -13,7 +13,7 @@
 #include "utils/logger_helper.h"
 
 #define TIPS_REQUESTER_LOGGER_ID "tips_requester"
-#define TIPS_REQUESTER_INTERVAL 5
+#define TIPS_REQUESTER_INTERVAL_MS 5000ULL
 
 static logger_id_t logger_id;
 
@@ -39,6 +39,10 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
     log_critical(logger_id, "Initializing tangle connection failed\n");
     return NULL;
   }
+
+  lock_handle_t lock_cond;
+  lock_handle_init(&lock_cond);
+  lock_handle_lock(&lock_cond);
 
   while (tips_requester->running) {
     hash_pack_reset(&milestone_pack);
@@ -67,8 +71,11 @@ static void *tips_requester_routine(tips_requester_t *const tips_requester) {
       }
     }
     rw_lock_handle_unlock(&tips_requester->node->neighbors_lock);
-    sleep(TIPS_REQUESTER_INTERVAL);
+    cond_handle_timedwait(&tips_requester->cond, &lock_cond, TIPS_REQUESTER_INTERVAL_MS);
   }
+
+  lock_handle_unlock(&lock_cond);
+  lock_handle_destroy(&lock_cond);
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(logger_id, "Destroying tangle connection failed\n");
@@ -90,6 +97,7 @@ retcode_t tips_requester_init(tips_requester_t *const tips_requester, node_t *co
 
   tips_requester->running = false;
   tips_requester->node = node;
+  cond_handle_init(&tips_requester->cond);
 
   return RC_OK;
 }
@@ -118,6 +126,7 @@ retcode_t tips_requester_stop(tips_requester_t *const tips_requester) {
 
   log_info(logger_id, "Shutting down tips requester thread\n");
   tips_requester->running = false;
+  cond_handle_signal(&tips_requester->cond);
   if (thread_handle_join(tips_requester->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down tips requester thread failed\n");
     return RC_FAILED_THREAD_JOIN;
@@ -134,6 +143,7 @@ retcode_t tips_requester_destroy(tips_requester_t *const tips_requester) {
   }
 
   tips_requester->node = NULL;
+  cond_handle_destroy(&tips_requester->cond);
 
   logger_helper_release(logger_id);
 

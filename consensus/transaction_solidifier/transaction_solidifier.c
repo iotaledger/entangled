@@ -10,7 +10,7 @@
 #include "utils/logger_helper.h"
 
 #define TRANSACTION_SOLIDIFIER_LOGGER_ID "transaction_solidifier"
-#define SOLID_PROPAGATION_INTERVAL 500000uLL
+#define SOLID_PROPAGATION_INTERVAL_MS 500uLL
 
 static logger_id_t logger_id;
 
@@ -102,14 +102,21 @@ static void *spawn_solid_transactions_propagation(void *arg) {
     return NULL;
   }
 
+  lock_handle_t lock_cond;
+  lock_handle_init(&lock_cond);
+  lock_handle_lock(&lock_cond);
+
   while (ts->running) {
     while (hash243_set_size(&ts->newly_set_solid_transactions) > 0) {
       if (propagate_solid_transactions(ts, &tangle) != RC_OK) {
         log_error(logger_id, "Solid transaction propagation failed\n");
       }
     }
-    usleep(SOLID_PROPAGATION_INTERVAL);
+    cond_handle_timedwait(&ts->cond, &lock_cond, SOLID_PROPAGATION_INTERVAL_MS);
   }
+
+  lock_handle_unlock(&lock_cond);
+  lock_handle_destroy(&lock_cond);
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(logger_id, "Destroying tangle connection failed\n");
@@ -132,6 +139,7 @@ retcode_t iota_consensus_transaction_solidifier_init(transaction_solidifier_t *c
   ts->newly_set_solid_transactions = NULL;
   ts->tips = tips;
   lock_handle_init(&ts->lock);
+  cond_handle_init(&ts->cond);
   logger_id = logger_helper_enable(TRANSACTION_SOLIDIFIER_LOGGER_ID, LOGGER_DEBUG, true);
   return RC_OK;
 }
@@ -159,9 +167,9 @@ retcode_t iota_consensus_transaction_solidifier_stop(transaction_solidifier_t *c
     return RC_OK;
   }
 
-  ts->running = false;
-
   log_info(logger_id, "Shutting down transaction solidifier thread\n");
+  ts->running = false;
+  cond_handle_signal(&ts->cond);
   if (thread_handle_join(ts->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down transaction solidifier thread failed\n");
     ret = RC_FAILED_THREAD_JOIN;
@@ -181,6 +189,7 @@ retcode_t iota_consensus_transaction_solidifier_destroy(transaction_solidifier_t
   ts->conf = NULL;
 
   lock_handle_destroy(&ts->lock);
+  cond_handle_destroy(&ts->cond);
 
   logger_helper_release(logger_id);
   return RC_OK;

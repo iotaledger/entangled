@@ -12,7 +12,7 @@
 #include "utils/time.h"
 
 #define TIPS_SOLIDIFIER_LOGGER_ID "tips_solidifier"
-#define TIPS_SOLIDIFICATION_INTERVAL_MS 750
+#define TIPS_SOLIDIFICATION_INTERVAL_MS 750ULL
 
 static logger_id_t logger_id;
 
@@ -43,6 +43,10 @@ static void *tips_solidifier_routine(tips_solidifier_t *const tips_solidifier) {
     log_critical(logger_id, "Initializing tangle connection failed\n");
     return NULL;
   }
+
+  lock_handle_t lock_cond;
+  lock_handle_init(&lock_cond);
+  lock_handle_lock(&lock_cond);
 
   while (tips_solidifier->running) {
     if (tips_cache_non_solid_size(tips_solidifier->tips) == 0) {
@@ -80,8 +84,11 @@ static void *tips_solidifier_routine(tips_solidifier_t *const tips_solidifier) {
     }
 
   sleep:
-    sleep_ms(TIPS_SOLIDIFICATION_INTERVAL_MS);
+    cond_handle_timedwait(&tips_solidifier->cond, &lock_cond, TIPS_SOLIDIFICATION_INTERVAL_MS);
   }
+
+  lock_handle_unlock(&lock_cond);
+  lock_handle_destroy(&lock_cond);
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(logger_id, "Destroying tangle connection failed\n");
@@ -105,6 +112,7 @@ retcode_t tips_solidifier_init(tips_solidifier_t *const tips_solidifier, iota_go
   tips_solidifier->running = false;
   tips_solidifier->tips = tips;
   tips_solidifier->transaction_solidifier = transaction_solidifier;
+  cond_handle_init(&tips_solidifier->cond);
 
   return RC_OK;
 }
@@ -133,6 +141,7 @@ retcode_t tips_solidifier_stop(tips_solidifier_t *const tips_solidifier) {
 
   log_info(logger_id, "Shutting down tips solidifier thread\n");
   tips_solidifier->running = false;
+  cond_handle_signal(&tips_solidifier->cond);
   if (thread_handle_join(tips_solidifier->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down tips solidifier thread failed\n");
     return RC_FAILED_THREAD_JOIN;
@@ -151,6 +160,7 @@ retcode_t tips_solidifier_destroy(tips_solidifier_t *const tips_solidifier) {
   tips_solidifier->conf = NULL;
   tips_solidifier->tips = NULL;
   tips_solidifier->transaction_solidifier = NULL;
+  cond_handle_destroy(&tips_solidifier->cond);
 
   logger_helper_release(logger_id);
 

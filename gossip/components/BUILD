@@ -93,6 +93,7 @@ cc_library(
     deps = [
         "//common:errors",
         "//utils/containers/hash:hash243_set",
+        "//utils/handles:cond",
         "//utils/handles:rw_lock",
         "//utils/handles:thread",
     ],
@@ -141,6 +142,7 @@ cc_library(
     hdrs = ["tips_requester.h"],
     deps = [
         "//common:errors",
+        "//utils/handles:cond",
         "//utils/handles:thread",
     ],
 )
@@ -165,6 +167,7 @@ cc_library(
         "//common:errors",
         "//gossip:conf",
         "//gossip:tips_cache",
+        "//utils/handles:cond",
         "//utils/handles:thread",
     ],
 )
