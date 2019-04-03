@@ -12,7 +12,7 @@
 #include "utils/time.h"
 
 #define REQUESTER_LOGGER_ID "requester"
-#define REQUESTER_INTERVAL 10
+#define REQUESTER_INTERVAL_MS 10ULL
 
 static logger_id_t logger_id;
 
@@ -38,6 +38,10 @@ static void *transaction_requester_routine(transaction_requester_t *const transa
     return NULL;
   }
 
+  lock_handle_t lock_cond;
+  lock_handle_init(&lock_cond);
+  lock_handle_lock(&lock_cond);
+
   while (transaction_requester->running) {
     if (requester_is_empty(transaction_requester)) {
       goto sleep;
@@ -62,8 +66,11 @@ static void *transaction_requester_routine(transaction_requester_t *const transa
     }
     rw_lock_handle_unlock(&transaction_requester->node->neighbors_lock);
   sleep:
-    sleep_ms(REQUESTER_INTERVAL);
+    cond_handle_timedwait(&transaction_requester->cond, &lock_cond, REQUESTER_INTERVAL_MS);
   }
+
+  lock_handle_unlock(&lock_cond);
+  lock_handle_destroy(&lock_cond);
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(logger_id, "Destroying tangle connection failed\n");
@@ -101,6 +108,7 @@ retcode_t requester_stop(transaction_requester_t *const transaction_requester) {
 
   log_info(logger_id, "Shutting down transaction requester thread\n");
   transaction_requester->running = false;
+  cond_handle_signal(&transaction_requester->cond);
   if (thread_handle_join(transaction_requester->thread, NULL) != 0) {
     log_error(logger_id, "Shutting down transaction requester thread failed\n");
     return RC_FAILED_THREAD_JOIN;

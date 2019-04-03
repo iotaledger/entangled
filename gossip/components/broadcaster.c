@@ -13,7 +13,7 @@
 #include "utils/logger_helper.h"
 
 #define BROADCASTER_LOGGER_ID "broadcaster"
-#define BROADCASTER_TIMEOUT_SEC 5
+#define BROADCASTER_TIMEOUT_MS 5000ULL
 
 static logger_id_t logger_id;
 
@@ -43,7 +43,7 @@ static void *broadcaster_routine(broadcaster_t *const broadcaster) {
 
   while (broadcaster->running) {
     if (broadcaster_is_empty(broadcaster)) {
-      cond_handle_timedwait(&broadcaster->cond, &lock_cond, BROADCASTER_TIMEOUT_SEC);
+      cond_handle_timedwait(&broadcaster->cond, &lock_cond, BROADCASTER_TIMEOUT_MS);
     }
 
     rw_lock_handle_wrlock(&broadcaster->lock);

@@ -31,6 +31,7 @@ retcode_t requester_init(transaction_requester_t *const transaction_requester, n
   transaction_requester->milestones = NULL;
   transaction_requester->transactions = NULL;
   rw_lock_handle_init(&transaction_requester->lock);
+  cond_handle_init(&transaction_requester->cond);
 
   return RC_OK;
 }
@@ -46,6 +47,7 @@ retcode_t requester_destroy(transaction_requester_t *const transaction_requester
   hash243_set_free(&transaction_requester->transactions);
   transaction_requester->node = NULL;
   rw_lock_handle_destroy(&transaction_requester->lock);
+  cond_handle_destroy(&transaction_requester->cond);
   logger_helper_release(logger_id);
 
   return RC_OK;
