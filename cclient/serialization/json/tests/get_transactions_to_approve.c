@@ -61,7 +61,6 @@ void test_get_transactions_to_approve_deserialize_request(void) {
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)TEST_81_TRYTES_1, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
 
   get_transactions_to_approve_req_t* req = get_transactions_to_approve_req_new();
-  get_transactions_to_approve_req_set_reference(req, hash);
 
   serializer.vtable.get_transactions_to_approve_deserialize_request(&serializer, json_text, req);
   TEST_ASSERT_EQUAL_UINT32(TEST_TRANSACTION_TO_APPROVE_DEPTH, req->depth);
