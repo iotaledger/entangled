@@ -18,8 +18,9 @@
 static logger_id_t logger_id;
 
 static retcode_t cw_rating_dfs_do_dfs_from_db(cw_rating_calculator_t const *const cw_calc, tangle_t *const tangle,
-                                              flex_trit_t *entry_point, hash_to_indexed_hash_set_map_t *tx_to_approvers,
-                                              uint64_t *subtangle_size, int64_t subtangle_before_timestamp);
+                                              flex_trit_t const *const entry_point,
+                                              hash_to_indexed_hash_set_map_t *tx_to_approvers, uint64_t *subtangle_size,
+                                              int64_t subtangle_before_timestamp);
 
 static retcode_t cw_rating_dfs_do_dfs_light(hash_to_indexed_hash_set_map_t tx_to_approvers, flex_trit_t *ep,
                                             bitset_t *visited_bitset, uint64_t *subtangle_size);
@@ -30,31 +31,31 @@ void init_cw_calculator_dfs(cw_rating_calculator_base_t *calculator) {
 }
 
 retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc, tangle_t *const tangle,
-                                  flex_trit_t *entry_point, cw_calc_result *out) {
-  retcode_t res;
-
-  out->tx_to_approvers = NULL;
-  out->cw_ratings = NULL;
+                                  flex_trit_t const *const entry_point, cw_calc_result *const out) {
+  retcode_t ret = RC_OK;
   hash_to_indexed_hash_set_entry_t *curr_hash_to_approvers_entry = NULL;
   hash_to_indexed_hash_set_entry_t *tmp_hash_to_approvers_entry = NULL;
-  uint64_t sub_tangle_size;
-  uint64_t max_subtangle_size;
-  uint64_t bitset_size;
+  uint64_t sub_tangle_size = 0;
+  uint64_t max_subtangle_size = 0;
+  uint64_t bitset_size = 0;
+
+  out->cw_ratings = NULL;
+  out->tx_to_approvers = NULL;
 
   if (!entry_point) {
     return RC_NULL_PARAM;
   }
 
-  if ((res = cw_rating_dfs_do_dfs_from_db(cw_calc, tangle, entry_point, &out->tx_to_approvers, &max_subtangle_size,
+  if ((ret = cw_rating_dfs_do_dfs_from_db(cw_calc, tangle, entry_point, &out->tx_to_approvers, &max_subtangle_size,
                                           0)) != RC_OK) {
-    log_error(logger_id, "Failed in DFS from DB, error code is: %" PRIu64 "\n", res);
+    log_error(logger_id, "Failed in DFS from DB, error code is: %" PRIu64 "\n", ret);
     return RC_CONSENSUS_CW_FAILED_IN_DFS_FROM_DB;
   }
 
   // Insert first "ratings" entry
-  if ((res = hash_to_int64_t_map_add(&out->cw_ratings, entry_point, max_subtangle_size))) {
+  if ((ret = hash_to_int64_t_map_add(&out->cw_ratings, entry_point, max_subtangle_size)) != RC_OK) {
     log_error(logger_id, "Failed adding entrypoint into map\n");
-    return res;
+    return ret;
   }
 
   if (max_subtangle_size <= 1) {
@@ -62,76 +63,79 @@ retcode_t cw_rating_calculate_dfs(cw_rating_calculator_t const *const cw_calc, t
   }
 
   bitset_size = bistset_required_size(max_subtangle_size);
-  uint64_t visited_raw_bits[bitset_size];
-  bitset_t visited_txs_bitset = {
-      .raw_bits = visited_raw_bits, .bitset_integer_index = 0, .bitset_relative_index = 0, .size = bitset_size};
 
-  flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
-  HASH_ITER(hh, out->tx_to_approvers, curr_hash_to_approvers_entry, tmp_hash_to_approvers_entry) {
-    if (curr_hash_to_approvers_entry->idx == 0) {
-      continue;
-    }
+  {
+    uint64_t visited_raw_bits[bitset_size];
+    bitset_t visited_txs_bitset = {
+        .raw_bits = visited_raw_bits, .bitset_integer_index = 0, .bitset_relative_index = 0, .size = bitset_size};
+    flex_trit_t curr_hash[FLEX_TRIT_SIZE_243];
 
-    bitset_reset(&visited_txs_bitset);
-    memcpy(curr_hash, curr_hash_to_approvers_entry->hash, FLEX_TRIT_SIZE_243);
-    if ((res = cw_rating_dfs_do_dfs_light(out->tx_to_approvers, curr_hash, &visited_txs_bitset, &sub_tangle_size)) !=
-        RC_OK) {
-      log_error(logger_id, "Failed in light DFS, error code is: %" PRIu64 "\n", res);
-      return RC_CONSENSUS_CW_FAILED_IN_LIGHT_DFS;
-    }
+    HASH_ITER(hh, out->tx_to_approvers, curr_hash_to_approvers_entry, tmp_hash_to_approvers_entry) {
+      if (curr_hash_to_approvers_entry->idx == 0) {
+        continue;
+      }
 
-    if ((res = hash_to_int64_t_map_add(&out->cw_ratings, curr_hash, sub_tangle_size))) {
-      log_error(logger_id, "Failed in light DFS, error code is: %" PRIu64 "\n", res);
-      return res;
+      bitset_reset(&visited_txs_bitset);
+      memcpy(curr_hash, curr_hash_to_approvers_entry->hash, FLEX_TRIT_SIZE_243);
+      if ((ret = cw_rating_dfs_do_dfs_light(out->tx_to_approvers, curr_hash, &visited_txs_bitset, &sub_tangle_size)) !=
+          RC_OK) {
+        log_error(logger_id, "Failed in light DFS, error code is: %" PRIu64 "\n", ret);
+        return RC_CONSENSUS_CW_FAILED_IN_LIGHT_DFS;
+      }
+
+      if ((ret = hash_to_int64_t_map_add(&out->cw_ratings, curr_hash, sub_tangle_size))) {
+        log_error(logger_id, "Failed in light DFS, error code is: %" PRIu64 "\n", ret);
+        return ret;
+      }
     }
   }
 
-  return RC_OK;
+  return ret;
 }
 
 static retcode_t cw_rating_dfs_do_dfs_from_db(cw_rating_calculator_t const *const cw_calc, tangle_t *const tangle,
-                                              flex_trit_t *entry_point, hash_to_indexed_hash_set_map_t *tx_to_approvers,
-                                              uint64_t *subtangle_size, int64_t subtangle_before_timestamp) {
+                                              flex_trit_t const *const entry_point,
+                                              hash_to_indexed_hash_set_map_t *tx_to_approvers, uint64_t *subtangle_size,
+                                              int64_t subtangle_before_timestamp) {
   hash_to_indexed_hash_set_entry_t *curr_tx = NULL;
-  size_t curr_approver_index;
-  retcode_t res = RC_OK;
+  retcode_t ret = RC_OK;
   iota_stor_pack_t pack;
+  hash243_stack_t stack = NULL;
+  flex_trit_t *curr_tx_hash = NULL;
+
   *subtangle_size = 0;
 
-  if ((res = hash_pack_init(&pack, 10)) != RC_OK) {
-    return res;
+  if ((ret = hash_pack_init(&pack, 10)) != RC_OK) {
+    goto done;
   }
 
-  hash243_stack_t stack = NULL;
-  if ((res = hash243_stack_push(&stack, entry_point))) {
-    return res;
+  if ((ret = hash243_stack_push(&stack, entry_point)) != RC_OK) {
+    goto done;
   }
-
-  flex_trit_t *curr_tx_hash = NULL;
 
   while (!hash243_stack_empty(stack)) {
     curr_tx_hash = hash243_stack_peek(stack);
 
     if (!hash_to_indexed_hash_set_map_contains(tx_to_approvers, curr_tx_hash)) {
       hash_pack_reset(&pack);
-      if ((res = iota_tangle_transaction_load_hashes_of_approvers(tangle, curr_tx_hash, &pack,
-                                                                  subtangle_before_timestamp))) {
-        log_error(logger_id, "Failed in loading approvers, error code is: %" PRIu64 "\n", res);
-        return res;
+      if ((ret = iota_tangle_transaction_load_hashes_of_approvers(tangle, curr_tx_hash, &pack,
+                                                                  subtangle_before_timestamp)) != RC_OK) {
+        log_error(logger_id, "Failed in loading approvers, error code is: %" PRIu64 "\n", ret);
+        goto done;
       }
-      if ((res = hash_to_indexed_hash_set_map_add_new_set(tx_to_approvers, curr_tx_hash, &curr_tx,
-                                                          (*subtangle_size)++))) {
-        return res;
+      if ((ret = hash_to_indexed_hash_set_map_add_new_set(tx_to_approvers, curr_tx_hash, &curr_tx,
+                                                          (*subtangle_size)++)) != RC_OK) {
+        goto done;
       }
       hash243_stack_pop(&stack);
       while (pack.num_loaded > 0) {
-        curr_approver_index = --pack.num_loaded;
+        curr_tx_hash = ((flex_trit_t *)pack.models[--pack.num_loaded]);
         // Add each found approver to the currently traversed tx
-        if ((res = hash243_stack_push(&stack, ((flex_trit_t *)pack.models[curr_approver_index])))) {
-          return res;
+        if ((ret = hash243_stack_push(&stack, curr_tx_hash)) != RC_OK) {
+          goto done;
         }
-        if ((res = hash243_set_add(&curr_tx->approvers, ((flex_trit_t *)pack.models[pack.num_loaded])))) {
-          return res;
+        if ((ret = hash243_set_add(&curr_tx->approvers, curr_tx_hash)) != RC_OK) {
+          goto done;
         }
       }
       continue;
@@ -139,10 +143,11 @@ static retcode_t cw_rating_dfs_do_dfs_from_db(cw_rating_calculator_t const *cons
     hash243_stack_pop(&stack);
   }
 
+done:
   hash_pack_free(&pack);
   hash243_stack_free(&stack);
 
-  return res;
+  return ret;
 }
 
 static retcode_t cw_rating_dfs_do_dfs_light(hash_to_indexed_hash_set_map_t tx_to_approvers, flex_trit_t *ep,
@@ -150,11 +155,11 @@ static retcode_t cw_rating_dfs_do_dfs_light(hash_to_indexed_hash_set_map_t tx_to
   *subtangle_size = 0;
   flex_trit_t *curr_hash = NULL;
   hash_to_indexed_hash_set_entry_t *curr_tx_entry = NULL;
-  retcode_t ret;
-
+  retcode_t ret = RC_OK;
   hash243_stack_t stack = NULL;
-  if ((ret = hash243_stack_push(&stack, ep))) {
-    return ret;
+
+  if ((ret = hash243_stack_push(&stack, ep)) != RC_OK) {
+    goto done;
   }
 
   while (!hash243_stack_empty(stack)) {
@@ -175,12 +180,14 @@ static retcode_t cw_rating_dfs_do_dfs_light(hash_to_indexed_hash_set_map_t tx_to
 
     bitset_set_true(visited_bitset, curr_tx_entry->idx);
 
-    if ((ret =
-             hash243_set_for_each(&curr_tx_entry->approvers, (hash243_on_container_func)hash243_stack_push, &stack))) {
-      return ret;
+    if ((ret = hash243_set_for_each(&curr_tx_entry->approvers, (hash243_on_container_func)hash243_stack_push,
+                                    &stack)) != RC_OK) {
+      goto done;
     }
   }
 
+done:
   hash243_stack_free(&stack);
-  return RC_OK;
+
+  return ret;
 }

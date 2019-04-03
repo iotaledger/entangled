@@ -44,7 +44,7 @@ typedef struct cw_calc_result {
 typedef struct {
   // find_transactions_request
   retcode_t (*cw_rating_calculate)(cw_rating_calculator_t const *const, tangle_t *const tangle,
-                                   flex_trit_t *entry_point, cw_calc_result *result);
+                                   flex_trit_t const *const entry_point, cw_calc_result *const result);
 
 } cw_calculator_vtable;
 
@@ -62,7 +62,7 @@ extern retcode_t iota_consensus_cw_rating_init(cw_rating_calculator_t *const cw_
 extern retcode_t iota_consensus_cw_rating_destroy(cw_rating_calculator_t *cw_calc);
 
 extern retcode_t iota_consensus_cw_rating_calculate(cw_rating_calculator_t const *const cw_calc, tangle_t *const tangle,
-                                                    flex_trit_t const *entry_point, cw_calc_result *out);
+                                                    flex_trit_t const *const entry_point, cw_calc_result *const out);
 
 extern void cw_calc_result_destroy(cw_calc_result *const calc_result);
 
