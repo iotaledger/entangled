@@ -1,0 +1,13 @@
+/*
+ * Copyright (c) 2019 IOTA Stiftung
+ * https://github.com/iotaledger/entangled
+ *
+ * Refer to the LICENSE file for licensing information
+ */
+
+ /**
+ * @defgroup crypto_sponge Sponge
+ * @ingroup common_crypto
+ * @brief The Sponge implementations. 
+ *
+ */
