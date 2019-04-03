@@ -1,0 +1,47 @@
+# Please read https://github.com/iotaledger/entangled/tree/develop/ciri#configuration
+# The following configuration variables are provided with default values
+# Uncomment them and change their values if needed
+
+# cIRI configuration
+
+# db-path: ciri/db/ciri-mainnet.db
+# log-level: info
+
+# Gossip configuration
+
+# mwm: 14
+# neighbors: "udp://127.0.0.1:14600 tcp://127.0.0.1:15600"
+# p-propagate-request: 0.01
+# p-remove-request: 0.01
+# p-reply-random-tip: 0.66
+# p-select-milestone: 0.7
+# p-send-milestone: 0.02
+# requester-queue-size: 10000
+# tcp-receiver-port: 15600
+# tips-cache-size: 5000
+# udp-receiver-port: 14600
+# tips-solidifier-enabled: true
+
+# API configuration
+
+# max-find-transactions: 100000
+# max-get-trytes: 10000
+# http_port: 14265
+
+# Consensus configuration
+
+# alpha: 0.001
+# below-max-depth: 20000
+# coordinator-address: "KPWCHICGJZXKE9GSUDXZYUAPLHAKAHYHDXNPHENTERYMMBQOPSQIDENXKLKCEYCPVTZQLEEJVYJZV9BWU"
+# coordinator-num-keys-in-milestone: 20
+# coordinator-security-level: 1
+# coordinator-signature-type: CURL_P27
+# last-milestone: 933209
+# max-depth: 15
+# snapshot-file: /absolute/path/to/snapshot/file
+# snapshot-signature-depth: 6
+# snapshot-signature-file: /absolute/path/to/snapshot/signature/file
+# snapshot-signature-index: 10
+# snapshot-signature-pubkey: "TTXJUGKTNPOOEXSTQVVACENJOQUROXYKDRCVK9LHUXILCLABLGJTIPNF9REWHOIMEUKWQLUOKD9CZUYAC"
+# snapshot-signature-skip-validation: false
+# snapshot-timestamp: 1545469620
