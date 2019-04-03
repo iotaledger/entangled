@@ -203,7 +203,7 @@ static inline retcode_t process_get_balances_request(iota_api_http_t *const http
     goto done;
   }
 
-  if ((ret = iota_api_get_balances(http->api, req, res, &error)) != RC_OK) {
+  if ((ret = iota_api_get_balances(http->api, tangle, req, res, &error)) != RC_OK) {
     error_serialize_response(http, &error, NULL, out);
   } else {
     ret = http->serializer.vtable.get_balances_serialize_response(&http->serializer, res, out);
