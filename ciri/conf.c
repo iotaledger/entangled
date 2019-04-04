@@ -148,19 +148,9 @@ static retcode_t get_true_false(char const* const input, bool* const output) {
   } else if (strcmp(input, "false") == 0) {
     *output = false;
   } else {
-    return RC_CIRI_CONF_INVALID_ARGUMENTS;
+    return RC_CIRI_CONF_INVALID_ARGUMENT;
   }
   return RC_OK;
-}
-
-static int get_conf_key(char const* const key) {
-  int i = 0;
-
-  while (cli_arguments_g[i].name != NULL && strcmp(cli_arguments_g[i].name, key) != 0) {
-    i++;
-  }
-
-  return cli_arguments_g[i].val;
 }
 
 static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
