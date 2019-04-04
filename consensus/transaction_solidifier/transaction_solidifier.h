@@ -20,6 +20,7 @@
 #include "gossip/tips_cache.h"
 #include "utils/containers/hash/hash243_set.h"
 #include "utils/containers/hash/hash243_stack.h"
+#include "utils/handles/cond.h"
 #include "utils/handles/lock.h"
 #include "utils/handles/thread.h"
 
@@ -35,6 +36,7 @@ typedef struct transaction_solidifier_s {
   lock_handle_t lock;
   hash243_set_t newly_set_solid_transactions;
   tips_cache_t *tips;
+  cond_handle_t cond;
 } transaction_solidifier_t;
 
 retcode_t iota_consensus_transaction_solidifier_init(transaction_solidifier_t *const ts,

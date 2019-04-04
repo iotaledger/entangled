@@ -10,7 +10,6 @@
 
 #include "common/crypto/iss/normalize.h"
 #include "common/crypto/iss/v1/iss.h"
-#include "common/trinary/trit_array.h"
 #include "common/trinary/trit_long.h"
 #include "consensus/bundle_validator/bundle_validator.h"
 #include "consensus/ledger_validator/ledger_validator.h"
@@ -18,11 +17,10 @@
 #include "consensus/transaction_solidifier/transaction_solidifier.h"
 #include "utils/logger_helper.h"
 #include "utils/macros.h"
-#include "utils/time.h"
 
 #define MILESTONE_TRACKER_LOGGER_ID "milestone_tracker"
-#define MILESTONE_VALIDATION_INTERVAL 10uLL
-#define SOLID_MILESTONE_RESCAN_INTERVAL 5000uLL
+#define MILESTONE_VALIDATION_INTERVAL_MS 10ULL
+#define SOLID_MILESTONE_RESCAN_INTERVAL_MS 5000ULL
 
 static logger_id_t logger_id;
 
@@ -176,6 +174,10 @@ static void* milestone_validator(void* arg) {
     return NULL;
   }
 
+  lock_handle_t lock_cond;
+  lock_handle_init(&lock_cond);
+  lock_handle_lock(&lock_cond);
+
   while (mt->running) {
     rw_lock_handle_wrlock(&mt->candidates_lock);
     peek = hash243_queue_peek(mt->candidates);
@@ -209,8 +211,11 @@ static void* milestone_validator(void* arg) {
     } else {
       rw_lock_handle_unlock(&mt->candidates_lock);
     }
-    sleep_ms(MILESTONE_VALIDATION_INTERVAL);
+    cond_handle_timedwait(&mt->cond_validator, &lock_cond, MILESTONE_VALIDATION_INTERVAL_MS);
   }
+
+  lock_handle_unlock(&lock_cond);
+  lock_handle_destroy(&lock_cond);
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(logger_id, "Destroying tangle connection failed\n");
@@ -280,6 +285,10 @@ static void* milestone_solidifier(void* arg) {
     return NULL;
   }
 
+  lock_handle_t lock_cond;
+  lock_handle_init(&lock_cond);
+  lock_handle_lock(&lock_cond);
+
   while (mt->running) {
     log_debug(logger_id, "Scanning for latest solid subtangle milestone\n");
     previous_solid_subtangle_latest_milestone_index = mt->latest_solid_subtangle_milestone_index;
@@ -293,8 +302,11 @@ static void* milestone_solidifier(void* arg) {
                previous_solid_subtangle_latest_milestone_index, mt->latest_solid_subtangle_milestone_index);
       continue;
     }
-    sleep_ms(SOLID_MILESTONE_RESCAN_INTERVAL);
+    cond_handle_timedwait(&mt->cond_solidifier, &lock_cond, SOLID_MILESTONE_RESCAN_INTERVAL_MS);
   }
+
+  lock_handle_unlock(&lock_cond);
+  lock_handle_destroy(&lock_cond);
 
   if (iota_tangle_destroy(&tangle) != RC_OK) {
     log_critical(logger_id, "Destroying tangle connection failed\n");
@@ -322,6 +334,8 @@ retcode_t iota_milestone_tracker_init(milestone_tracker_t* const mt, iota_consen
   mt->milestone_start_index = conf->last_milestone;
   mt->latest_milestone_index = conf->last_milestone;
   mt->latest_solid_subtangle_milestone_index = conf->last_milestone;
+  cond_handle_init(&mt->cond_validator);
+  cond_handle_init(&mt->cond_solidifier);
 
   return RC_OK;
 }
@@ -388,12 +402,14 @@ retcode_t iota_milestone_tracker_stop(milestone_tracker_t* const mt) {
   mt->running = false;
 
   log_info(logger_id, "Shutting down milestone validator thread\n");
+  cond_handle_signal(&mt->cond_validator);
   if (thread_handle_join(mt->milestone_validator, NULL) != 0) {
     log_error(logger_id, "Shutting down milestone validator thread failed\n");
     ret = RC_CONSENSUS_MT_FAILED_THREAD_JOIN;
   }
 
   log_info(logger_id, "Shutting down milestone solidifier thread\n");
+  cond_handle_signal(&mt->cond_solidifier);
   if (thread_handle_join(mt->milestone_solidifier, NULL) != 0) {
     log_error(logger_id, "Shutting down milestone solidifier thread failed\n");
     ret = RC_CONSENSUS_MT_FAILED_THREAD_JOIN;
@@ -413,6 +429,8 @@ retcode_t iota_milestone_tracker_destroy(milestone_tracker_t* const mt) {
 
   hash243_queue_free(&mt->candidates);
   rw_lock_handle_destroy(&mt->candidates_lock);
+  cond_handle_destroy(&mt->cond_validator);
+  cond_handle_destroy(&mt->cond_solidifier);
   memset(mt, 0, sizeof(milestone_tracker_t));
   logger_helper_release(logger_id);
 

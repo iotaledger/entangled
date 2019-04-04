@@ -5,6 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
+/**
+ * @ingroup serialization
+ *
+ * @{
+ *
+ * @file
+ * @brief
+ *
+ */
 #ifndef CCLIENT_SERIALIZATION_SERIALIZER_H
 #define CCLIENT_SERIALIZATION_SERIALIZER_H
 
@@ -17,9 +26,13 @@
 extern "C" {
 #endif
 
+/**
+ * @brief serializer type
+ *
+ */
 typedef enum serializer_type_e {
-  SR_JSON = 0,
-  SR_UNIMPLEMENTED,
+  SR_JSON = 0,      /**< USE JSON serializer */
+  SR_UNIMPLEMENTED, /**< Unimplemented */
 } serializer_type_t;
 
 typedef struct serializer_base serializer_t;
@@ -75,10 +88,15 @@ typedef struct {
                                            char_buffer_t* out);
   retcode_t (*get_tips_deserialize_response)(serializer_t const* const, const char* const obj, get_tips_res_t* res);
 
-  retcode_t (*get_transactions_to_approve_serialize_request)(serializer_t const* const,
+  retcode_t (*get_transactions_to_approve_serialize_request)(serializer_t const* const s,
                                                              get_transactions_to_approve_req_t const* const obj,
                                                              char_buffer_t* out);
-  retcode_t (*get_transactions_to_approve_deserialize_response)(serializer_t const* const, char const* const obj,
+  retcode_t (*get_transactions_to_approve_deserialize_request)(serializer_t const* const s, char const* const obj,
+                                                               get_transactions_to_approve_req_t* out);
+  retcode_t (*get_transactions_to_approve_serialize_response)(serializer_t const* const s,
+                                                              get_transactions_to_approve_res_t const* const obj,
+                                                              char_buffer_t* out);
+  retcode_t (*get_transactions_to_approve_deserialize_response)(serializer_t const* const s, char const* const obj,
                                                                 get_transactions_to_approve_res_t* out);
 
   retcode_t (*remove_neighbors_serialize_request)(serializer_t const* const s, remove_neighbors_req_t const* const obj,
@@ -142,3 +160,5 @@ typedef struct serializer_base {
 #endif
 
 #endif  // CCLIENT_SERIALIZATION_SERIALIZER_H
+
+/** @} */
