@@ -166,13 +166,15 @@ static inline retcode_t process_find_transactions_request(iota_api_http_t *const
     goto done;
   }
 
-  // TODO Deserialize request
+  if ((ret = http->serializer.vtable.find_transactions_deserialize_request(&http->serializer, payload, req)) != RC_OK) {
+    goto done;
+  }
 
   if ((ret = iota_api_find_transactions(http->api, tangle, req, res, &error)) != RC_OK) {
     error_serialize_response(http, &error, out);
+  } else {
+    ret = http->serializer.vtable.find_transactions_serialize_response(&http->serializer, res, out);
   }
-
-  // TODO Serialize response
 
 done:
   find_transactions_req_free(&req);
