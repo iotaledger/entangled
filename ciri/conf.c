@@ -221,15 +221,37 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       break;
 
     // API configuration
+    case 'p':  // --http_port
+      api_conf->http_port = atoi(value);
+      break;
     case CONF_MAX_FIND_TRANSACTIONS:  // --max-find-transactions
       api_conf->max_find_transactions = atoi(value);
       break;
     case CONF_MAX_GET_TRYTES:  // --max-get-trytes
       api_conf->max_get_trytes = atoi(value);
       break;
-    case 'p':  // --http_port
-      api_conf->http_port = atoi(value);
+    case CONF_REMOTE_LIMIT_API:  // --remote-limit-api
+    {
+      char *token = NULL, *str = NULL, *free_str = NULL;
+      size_t i = 0;
+
+      if ((free_str = str = strdup(value)) == NULL) {
+        return RC_OOM;
+      }
+
+      while ((token = strsep(&str, ", \t")) != NULL) {
+        if (token[0]) {
+          if (i >= API_ENDPOINTS_NUM) {
+            free(free_str);
+            return RC_CIRI_CONF_INVALID_ARGUMENTS;
+          }
+          api_conf->remote_limit_api[i++] = strdup(token);
+        }
+      }
+
+      free(free_str);
       break;
+    }
 
     // Consensus configuration
     case CONF_ALPHA:  // --alpha

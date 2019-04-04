@@ -12,6 +12,8 @@
 
 #include "common/errors.h"
 
+#define API_ENDPOINTS_NUM 16
+
 #define DEFAULT_API_HTTP_PORT 14265
 #define DEFAULT_MAX_FIND_TRANSACTIONS 100000;
 #define DEFAULT_MAX_GET_TRYTES 10000;
@@ -23,6 +25,8 @@ extern "C" {
 // This structure contains all configuration variables needed to operate the
 // IOTA API
 typedef struct iota_api_conf_s {
+  // Path of the DB file
+  char db_path[128];
   // HTTP API listen port
   uint16_t http_port;
   // The maximal number of transactions that may be returned by the
@@ -32,8 +36,8 @@ typedef struct iota_api_conf_s {
   // Maximum number of transactions that will be returned by the 'getTrytes' API
   // call
   size_t max_get_trytes;
-  // Path of the DB file
-  char db_path[128];
+  // Commands that should be ignored by API
+  char* remote_limit_api[API_ENDPOINTS_NUM + 1];
 } iota_api_conf_t;
 
 /**

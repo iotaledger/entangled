@@ -5,6 +5,8 @@
  * Refer to the LICENSE file for licensing information
  */
 
+#include <string.h>
+
 #include "ciri/api/conf.h"
 
 retcode_t iota_api_conf_init(iota_api_conf_t* const conf) {
@@ -15,6 +17,7 @@ retcode_t iota_api_conf_init(iota_api_conf_t* const conf) {
   conf->http_port = DEFAULT_API_HTTP_PORT;
   conf->max_find_transactions = DEFAULT_MAX_FIND_TRANSACTIONS;
   conf->max_get_trytes = DEFAULT_MAX_GET_TRYTES;
+  memset(conf->remote_limit_api, 0, sizeof(conf->remote_limit_api));
 
   return RC_OK;
 }
