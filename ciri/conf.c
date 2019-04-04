@@ -243,7 +243,7 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
         if (token[0]) {
           if (i >= API_ENDPOINTS_NUM) {
             free(free_str);
-            return RC_CIRI_CONF_INVALID_ARGUMENTS;
+            return RC_CIRI_CONF_INVALID_ARGUMENT;
           }
           api_conf->remote_limit_api[i++] = strdup(token);
         }
@@ -320,8 +320,8 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
  * Public functions
  */
 
-retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
-                                 iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf) {
+retcode_t iota_ciri_conf_default_init(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
+                                      iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf) {
   retcode_t ret = RC_OK;
 
   if (ciri_conf == NULL || gossip_conf == NULL || consensus_conf == NULL) {
@@ -349,8 +349,8 @@ retcode_t iota_ciri_conf_default(iota_ciri_conf_t* const ciri_conf, iota_consens
   return ret;
 }
 
-retcode_t iota_ciri_conf_file(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
-                              iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf) {
+retcode_t iota_ciri_conf_file_init(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
+                                   iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf) {
   retcode_t ret = RC_OK;
   yaml_parser_t parser;
   yaml_token_t token;
@@ -412,9 +412,9 @@ done:
   return ret;
 }
 
-retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
-                             iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf, int argc,
-                             char** argv) {
+retcode_t iota_ciri_conf_cli_init(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
+                                  iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf, int argc,
+                                  char** argv) {
   int key = 0;
   retcode_t ret = RC_OK;
   struct option* long_options = build_options();
@@ -437,3 +437,14 @@ retcode_t iota_ciri_conf_cli(iota_ciri_conf_t* const ciri_conf, iota_consensus_c
   free(long_options);
   return ret;
 };
+
+retcode_t iota_ciri_conf_destroy(iota_ciri_conf_t* const ciri_conf, iota_consensus_conf_t* const consensus_conf,
+                                 iota_gossip_conf_t* const gossip_conf, iota_api_conf_t* const api_conf) {
+  if (ciri_conf == NULL || consensus_conf == NULL || gossip_conf == NULL || api_conf == NULL) {
+    return RC_NULL_PARAM;
+  }
+
+  iota_api_conf_destroy(api_conf);
+
+  return RC_OK;
+}

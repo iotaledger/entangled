@@ -49,6 +49,15 @@ typedef struct iota_api_conf_s {
  */
 retcode_t iota_api_conf_init(iota_api_conf_t* const conf);
 
+/**
+ * Destroys API configuration
+ *
+ * @param conf API configuration variables
+ *
+ * @return a status code
+ */
+retcode_t iota_api_conf_destroy(iota_api_conf_t* const conf);
+
 #ifdef __cplusplus
 }
 #endif
