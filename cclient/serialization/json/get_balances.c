@@ -128,7 +128,7 @@ retcode_t json_get_balances_deserialize_response(serializer_t const *const s, ch
     goto end;
   }
 
-  ret = json_get_int(json_obj, "milestoneIndex", &out->milestone_index);
+  ret = json_get_uint64(json_obj, "milestoneIndex", &out->milestone_index);
 
 end:
   cJSON_Delete(json_obj);
