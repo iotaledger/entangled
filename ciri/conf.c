@@ -317,6 +317,14 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
       consensus_conf->snapshot_timestamp_sec = atoi(value);
       break;
 
+    case CONF_LOCAL_SNAPSHOTS_ENABLED:
+      ret = get_true_false(value, &consensus_conf->local_snapshots.local_snapshots_is_enabled);
+      break;
+
+    case CONF_PRUNNING_ENABLED:
+      ret = get_true_false(value, &consensus_conf->local_snapshots.prunning_is_enabled);
+      break;
+
     default:
       iota_usage();
       return RC_CIRI_CONF_INVALID_ARGUMENT;
