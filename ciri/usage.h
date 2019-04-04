@@ -55,6 +55,11 @@ typedef enum cli_arg_value_e {
   CONF_SNAPSHOT_SIGNATURE_SKIP_VALIDATION,
   CONF_SNAPSHOT_TIMESTAMP,
 
+  // Local snapshots
+
+  CONF_LOCAL_SNAPSHOTS_ENABLED,
+  CONF_PRUNNING_ENABLED
+
 } cli_arg_value_t;
 
 typedef enum cli_arg_requirement_e { NO_ARG, REQUIRED_ARG, OPTIONAL_ARG } cli_arg_requirement_t;
@@ -175,7 +180,15 @@ static struct cli_argument_s {
     {"snapshot-signature-skip-validation", CONF_SNAPSHOT_SIGNATURE_SKIP_VALIDATION,
      "Skip validation of snapshot signature. Must be \"true\" or \"false\".", REQUIRED_ARG},
     {"snapshot-timestamp", CONF_SNAPSHOT_TIMESTAMP, "Epoch time of the last snapshot.", REQUIRED_ARG},
-    {NULL, 0, NULL, NO_ARG}};
+    {NULL, 0, NULL, NO_ARG},
+
+    // Local snapshots
+
+    {"local-snapshots-enabled", CONF_LOCAL_SNAPSHOTS_ENABLED, "whether or not local snapshots should are enabled",
+     OPTIONAL_ARG},
+    {"prunning-enabled", CONF_PRUNNING_ENABLED, "whether or not prunning should be enabled", OPTIONAL_ARG},
+
+};
 
 static char* short_options = "hl:d:n:t:u:p:";
 
