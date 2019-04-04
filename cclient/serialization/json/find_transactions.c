@@ -79,38 +79,30 @@ retcode_t json_find_transactions_deserialize_request(serializer_t const* const s
     return RC_CCLIENT_JSON_KEY;
   }
 
-  ret = json_array_to_hash243_queue(json_obj, "bundles", &out->bundles);
-  if (ret) {
-    if (ret == RC_CCLIENT_JSON_KEY) {
-      ret = RC_OK;
-    } else {
+  if (cJSON_HasObjectItem(json_obj, "bundles")) {
+    ret = json_array_to_hash243_queue(json_obj, "bundles", &out->bundles);
+    if (ret) {
       goto end;
     }
   }
 
-  ret = json_array_to_hash243_queue(json_obj, "addresses", &out->addresses);
-  if (ret) {
-    if (ret == RC_CCLIENT_JSON_KEY) {
-      ret = RC_OK;
-    } else {
+  if (cJSON_HasObjectItem(json_obj, "addresses")) {
+    ret = json_array_to_hash243_queue(json_obj, "addresses", &out->addresses);
+    if (ret) {
       goto end;
     }
   }
 
-  ret = json_array_to_hash81_queue(json_obj, "tags", &out->tags);
-  if (ret) {
-    if (ret == RC_CCLIENT_JSON_KEY) {
-      ret = RC_OK;
-    } else {
+  if (cJSON_HasObjectItem(json_obj, "tags")) {
+    ret = json_array_to_hash81_queue(json_obj, "tags", &out->tags);
+    if (ret) {
       goto end;
     }
   }
 
-  ret = json_array_to_hash243_queue(json_obj, "approvees", &out->approvees);
-  if (ret) {
-    if (ret == RC_CCLIENT_JSON_KEY) {
-      ret = RC_OK;
-    } else {
+  if (cJSON_HasObjectItem(json_obj, "approvees")) {
+    ret = json_array_to_hash243_queue(json_obj, "approvees", &out->approvees);
+    if (ret) {
       goto end;
     }
   }
