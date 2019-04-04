@@ -27,7 +27,6 @@ typedef struct iota_consensus_s {
   cw_rating_calculator_t cw_rating_calculator;
   entry_point_selector_t entry_point_selector;
   ep_randomizer_t ep_randomizer;
-  exit_prob_transaction_validator_t exit_prob_transaction_validator;
   ledger_validator_t ledger_validator;
   milestone_tracker_t milestone_tracker;
   snapshot_t snapshot;
