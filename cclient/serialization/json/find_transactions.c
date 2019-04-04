@@ -20,26 +20,39 @@ retcode_t json_find_transactions_serialize_request(serializer_t const* const s,
     return RC_CCLIENT_JSON_CREATE;
   }
 
+  if (!obj->addresses && !obj->approvees && !obj->bundles && !obj->tags) {
+    ret = RC_CCLIENT_JSON_KEY;
+    goto end;
+  }
+
   cJSON_AddItemToObject(json_root, "command", cJSON_CreateString("findTransactions"));
 
-  ret = hash243_queue_to_json_array(obj->addresses, json_root, "addresses");
-  if (ret != RC_OK) {
-    goto err;
+  if (obj->addresses) {
+    ret = hash243_queue_to_json_array(obj->addresses, json_root, "addresses");
+    if (ret != RC_OK) {
+      goto end;
+    }
   }
 
-  ret = hash243_queue_to_json_array(obj->approvees, json_root, "approvees");
-  if (ret != RC_OK) {
-    goto err;
+  if (obj->approvees) {
+    ret = hash243_queue_to_json_array(obj->approvees, json_root, "approvees");
+    if (ret != RC_OK) {
+      goto end;
+    }
   }
 
-  ret = hash243_queue_to_json_array(obj->bundles, json_root, "bundles");
-  if (ret != RC_OK) {
-    goto err;
+  if (obj->bundles) {
+    ret = hash243_queue_to_json_array(obj->bundles, json_root, "bundles");
+    if (ret != RC_OK) {
+      goto end;
+    }
   }
 
-  ret = hash81_queue_to_json_array(obj->tags, json_root, "tags");
-  if (ret != RC_OK) {
-    goto err;
+  if (obj->tags) {
+    ret = hash81_queue_to_json_array(obj->tags, json_root, "tags");
+    if (ret != RC_OK) {
+      goto end;
+    }
   }
 
   json_text = cJSON_PrintUnformatted(json_root);
@@ -48,7 +61,7 @@ retcode_t json_find_transactions_serialize_request(serializer_t const* const s,
     cJSON_free((void*)json_text);
   }
 
-err:
+end:
   cJSON_Delete(json_root);
   return ret;
 }
@@ -62,22 +75,39 @@ retcode_t json_find_transactions_deserialize_request(serializer_t const* const s
   log_debug(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, obj);
   JSON_CHECK_ERROR(json_obj, json_item, json_logger_id);
 
-  ret = json_array_to_hash243_queue(json_obj, "bundles", &out->bundles);
-  if (ret) {
+  if (!(cJSON_HasObjectItem(json_obj, "bundles") || cJSON_HasObjectItem(json_obj, "addresses") ||
+        cJSON_HasObjectItem(json_obj, "tags") || cJSON_HasObjectItem(json_obj, "approvees"))) {
+    ret = RC_CCLIENT_JSON_KEY;
     goto end;
   }
 
-  ret = json_array_to_hash243_queue(json_obj, "addresses", &out->addresses);
-  if (ret) {
-    goto end;
+  if (cJSON_HasObjectItem(json_obj, "bundles")) {
+    ret = json_array_to_hash243_queue(json_obj, "bundles", &out->bundles);
+    if (ret) {
+      goto end;
+    }
   }
 
-  ret = json_array_to_hash81_queue(json_obj, "tags", &out->tags);
-  if (ret) {
-    goto end;
+  if (cJSON_HasObjectItem(json_obj, "addresses")) {
+    ret = json_array_to_hash243_queue(json_obj, "addresses", &out->addresses);
+    if (ret) {
+      goto end;
+    }
   }
 
-  ret = json_array_to_hash243_queue(json_obj, "approvees", &out->approvees);
+  if (cJSON_HasObjectItem(json_obj, "tags")) {
+    ret = json_array_to_hash81_queue(json_obj, "tags", &out->tags);
+    if (ret) {
+      goto end;
+    }
+  }
+
+  if (cJSON_HasObjectItem(json_obj, "approvees")) {
+    ret = json_array_to_hash243_queue(json_obj, "approvees", &out->approvees);
+    if (ret) {
+      goto end;
+    }
+  }
 
 end:
   cJSON_Delete(json_obj);
@@ -90,14 +120,16 @@ retcode_t json_find_transactions_serialize_response(serializer_t const* const s,
   char const* json_text = NULL;
   log_debug(json_logger_id, "[%s:%d]\n", __func__, __LINE__);
   cJSON* json_root = cJSON_CreateObject();
+
   if (json_root == NULL) {
     log_critical(json_logger_id, "[%s:%d] %s\n", __func__, __LINE__, STR_CCLIENT_JSON_CREATE);
-    return RC_CCLIENT_JSON_CREATE;
+    ret = RC_CCLIENT_JSON_CREATE;
+    goto end;
   }
 
   ret = hash243_queue_to_json_array(obj->hashes, json_root, "hashes");
   if (ret != RC_OK) {
-    goto err;
+    goto end;
   }
 
   json_text = cJSON_PrintUnformatted(json_root);
@@ -106,7 +138,7 @@ retcode_t json_find_transactions_serialize_response(serializer_t const* const s,
     cJSON_free((void*)json_text);
   }
 
-err:
+end:
   cJSON_Delete(json_root);
   return ret;
 }
