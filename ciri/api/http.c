@@ -474,9 +474,11 @@ static retcode_t iota_api_http_process_request(iota_api_http_t *http, const char
     return process_remove_neighbors_request(http, payload, out);
   } else if (strcmp(command, "storeTransactions") == 0) {
     return process_store_transactions_request(http, payload, out);
+  } else {
+    error_serialize_response(http, &error, "Unknown command", out);
   }
 
-  return RC_API_INVALID_COMMAND;
+  return RC_OK;
 }
 
 static int iota_api_http_header_iter(void *cls, enum MHD_ValueKind kind, const char *key, const char *value) {
