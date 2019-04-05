@@ -133,8 +133,7 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
   conf->below_max_depth = DEFAULT_TIP_SELECTION_BELOW_MAX_DEPTH;
   flex_trits_from_trytes(conf->coordinator_address, HASH_LENGTH_TRIT, (tryte_t *)COORDINATOR_ADDRESS, HASH_LENGTH_TRYTE,
                          HASH_LENGTH_TRYTE);
-  conf->coordinator_num_keys_in_milestone = DEFAULT_COORDINATOR_NUM_KEYS_IN_MILESTONE;
-  conf->coordinator_max_milestone_index = 1 << conf->coordinator_num_keys_in_milestone;
+  conf->coordinator_depth = DEFAULT_COORDINATOR_DEPTH;
   conf->coordinator_security_level = DEFAULT_COORDINATOR_SECURITY_LEVEL;
   conf->coordinator_signature_type = DEFAULT_COORDINATOR_SIGNATURE_TYPE;
   memset(conf->genesis_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
@@ -146,6 +145,8 @@ retcode_t iota_consensus_conf_init(iota_consensus_conf_t *const conf) {
   conf->snapshot_signature_skip_validation = DEFAULT_SNAPSHOT_SIGNATURE_SKIP_VALIDATION;
 
   ret = iota_snapshot_conf_init(conf);
+
+  conf->coordinator_max_milestone_index = 1 << conf->coordinator_depth;
 
   logger_helper_release(logger_id);
 
