@@ -29,6 +29,7 @@ typedef enum cli_arg_value_e {
 
   CONF_MAX_FIND_TRANSACTIONS,
   CONF_MAX_GET_TRYTES,
+  CONF_REMOTE_LIMIT_API,
 
   // Consensus configuration
 
@@ -110,6 +111,7 @@ static struct cli_argument_s {
 
     // API configuration
 
+    {"http_port", 'p', "HTTP API listen port.", REQUIRED_ARG},
     {"max-find-transactions", CONF_MAX_FIND_TRANSACTIONS,
      "The maximal number of transactions that may be returned by the "
      "'findTransactions' API call. If the number of transactions found exceeds "
@@ -119,7 +121,7 @@ static struct cli_argument_s {
      "Maximum number of transactions that will be returned by the 'getTrytes' "
      "API call.",
      REQUIRED_ARG},
-    {"http_port", 'p', "HTTP API listen port.", REQUIRED_ARG},
+    {"remote-limit-api", CONF_REMOTE_LIMIT_API, "Commands that should be ignored by API.", REQUIRED_ARG},
 
     // Consensus configuration
 

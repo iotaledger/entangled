@@ -66,9 +66,10 @@ Long option | Short option | Description | Example input
 `--tcp-receiver-port` | `-t` | TCP listen port. | `-t 15600`
 `--tips-cache-size` | | Size of the tips cache. Also bounds the number of tips returned by getTips API call. | `--tips-cache-size 5000`
 `--udp-receiver-port` | `-u` | UDP listen port. | `-u 14600`
+`--http_port` | `-p` | HTTP API listen port. | `--http_port 14265`
 `--max-find-transactions` | | The maximal number of transactions that may be returned by the 'findTransactions' API call. If the number of transactions found exceeds this number an error will be returned | `--max-find-transactions 100000`
 `--max-get-trytes` | | Maximum number of transactions that will be returned by the 'getTrytes' API call. | `--max-get-trytes 10000`
-`--port` | `-p` | HTTP API listen port. | `--port 14265`
+`--remote-limit-api` | | Commands that should be ignored by API. | `--remote-limit-api "attachToTangle, addNeighbors"`
 `--alpha` | | Randomness of the tip selection. Value must be in [0, inf] where 0 is most random and inf is most deterministic. | `--alpha 0.001`
 `--below-max-depth` | | Maximum number of unconfirmed transactions that may be analysed to find the latest referenced milestone by the currently visited transaction during the random walk. | `--below-max-depth 20000`
 `--coordinator-address` | | The address of the coordinator. | `--coordinator-address "KPW...BWU"`
