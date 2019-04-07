@@ -122,6 +122,7 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
 }
 
 retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const lsm) {
+
   retcode_t err;
   if (lsm == NULL) {
     return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_NULL_SELF;
