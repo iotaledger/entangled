@@ -122,7 +122,6 @@ retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
 }
 
 retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const lsm) {
-
   retcode_t err;
   if (lsm == NULL) {
     return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_NULL_SELF;
@@ -131,6 +130,7 @@ retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const ls
   lsm->running = true;
 
   ERR_BIND_RETURN(iota_tangle_transaction_count(&lsm->tangle, &lsm->last_snapshot_transactions_count), err);
+
   cond_handle_signal(&lsm->cond_local_snapshots);
   log_info(logger_id, "Spawning local snapshots manager thread\n");
   if (thread_handle_create(&lsm->local_snapshots_thread, (thread_routine_t)local_snapshots_manager_routine, lsm) != 0) {
