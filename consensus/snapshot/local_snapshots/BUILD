@@ -11,12 +11,7 @@ cc_library(
 )
 
 cc_library(
-    name = "local_snapshots_manager",
-    srcs = [
-        "local_snapshots_manager.c",
-        "local_snapshots_manager.h",
-    ],
-    visibility = ["//visibility:public"],
+    name = "shared_local_snapshots",
     deps = [
         ":conf",
         "//common:errors",
@@ -25,5 +20,30 @@ cc_library(
         "//utils/handles:cond",
         "//utils/handles:rw_lock",
         "//utils/handles:thread",
+    ],
+)
+
+cc_library(
+    name = "local_snapshots_service",
+    srcs = [
+        "local_snapshots_service.c",
+        "local_snapshots_service.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":shared_local_snapshots",
+    ],
+)
+
+cc_library(
+    name = "local_snapshots_manager",
+    srcs = [
+        "local_snapshots_manager.c",
+        "local_snapshots_manager.h",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":local_snapshots_service",
+        ":shared_local_snapshots",
     ],
 )
