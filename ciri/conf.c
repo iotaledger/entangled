@@ -325,7 +325,6 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
     case CONF_TRANSACTIONS_GROWTH_THRESHOLD:
       consensus_conf->local_snapshots.transactions_growth_threshold = atoi(value);
       break;
-
     case CONF_LOCAL_SNAPSHOT_MIN_DEPTH:
       consensus_conf->local_snapshots.local_snapshot_min_depth = atoi(value);
       break;
