@@ -13,6 +13,7 @@
 
 #include "consensus/conf.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
+#include "consensus/tangle/tangle.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
@@ -27,6 +28,10 @@ typedef struct local_snapshots_manager_s {
   thread_handle_t local_snapshots_thread;
   cond_handle_t cond_local_snapshots;
   milestone_tracker_t const* mt;
+
+  // Muteable data
+  tangle_t tangle;
+  size_t last_snapshot_transactions_count;
 } local_snapshots_manager_t;
 
 /**

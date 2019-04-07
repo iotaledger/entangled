@@ -10,6 +10,7 @@
 #include "utils/logger_helper.h"
 
 #define CONSENSUS_LOCAL_SNAPSHOTS_CONF_LOGGER_ID "consensus_local_snapshots_conf"
+#define TRANSACTIONS_GROWTH_THRESHOLD 1000
 
 static logger_id_t logger_id;
 
@@ -22,6 +23,7 @@ retcode_t iota_consensus_local_snapshots_conf_init(iota_consensus_local_snapshot
 
   conf->local_snapshots_is_enabled = false;
   conf->prunning_is_enabled = false;
+  conf->transactions_growth_threshold = TRANSACTIONS_GROWTH_THRESHOLD;
 
   logger_id = logger_helper_enable(CONSENSUS_LOCAL_SNAPSHOTS_CONF_LOGGER_ID, LOGGER_DEBUG, true);
   logger_helper_release(logger_id);
