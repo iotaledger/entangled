@@ -17,8 +17,8 @@
 
 static logger_id_t logger_id;
 
-static void* local_snapshots_manager_routine(void* arg) {
-  local_snapshots_manager_t* lsm = (local_snapshots_manager_t*)arg;
+static void *local_snapshots_manager_routine(void *arg) {
+  local_snapshots_manager_t *lsm = (local_snapshots_manager_t *)arg;
   lock_handle_t lock_cond;
   retcode_t err;
   size_t transactions_count;
@@ -28,8 +28,8 @@ static void* local_snapshots_manager_routine(void* arg) {
   lock_handle_lock(&lock_cond);
 
   while (lsm->running) {
-    if (local_snapshots_should_take_snapshot(lsm)) {
-      err = local_snapshots_take_snapshot(lsm);
+    if (iota_local_snapshots_manager_should_take_snapshot(lsm)) {
+      err = iota_local_snapshots_manager_take_snapshot(lsm);
       if (err == RC_OK) {
         exponential_delay_factor = 1;
       } else if (err == RC_LEDGER_VALIDATOR_TRANSACTION_NOT_SOLID) {
@@ -52,7 +52,7 @@ cleanup:
   return NULL;
 }
 
-bool local_snapshots_should_take_snapshot(local_snapshots_manager_t const* const lsm) {
+bool iota_local_snapshots_manager_should_take_snapshot(local_snapshots_manager_t const *const lsm) {
   size_t new_transactions_count;
   if (iota_tangle_transaction_count(&lsm->tangle, &new_transactions_count) != RC_OK) {
     log_critical(logger_id, "Failed in querying db size\n");
@@ -65,15 +65,15 @@ bool local_snapshots_should_take_snapshot(local_snapshots_manager_t const* const
   return false;
 }
 
-retcode_t local_snapshots_take_snapshot(local_snapshots_manager_t* const lsm) {
+retcode_t iota_local_snapshots_manager_take_snapshot(local_snapshots_manager_t *const lsm) {
   retcode_t err;
   // TODO - implement + uncomment
   // ERR_BIND_RETURN(iota_tangle_transaction_count(&lsm->tangle, &lsm->last_snapshot_transactions_count),err);
   return RC_CONSENSUS_NOT_IMPLEMENTED;
 }
 
-retcode_t iota_local_snapshots_init(local_snapshots_manager_t* lsm, iota_consensus_conf_t const* const conf,
-                                    milestone_tracker_t const* const mt) {
+retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm, iota_consensus_conf_t const *const conf,
+                                            milestone_tracker_t const *const mt) {
   retcode_t err;
   if (lsm == NULL) {
     return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_NULL_SELF;
@@ -98,7 +98,7 @@ retcode_t iota_local_snapshots_init(local_snapshots_manager_t* lsm, iota_consens
   return RC_OK;
 }
 
-retcode_t iota_local_snapshots_start(local_snapshots_manager_t* const lsm) {
+retcode_t iota_local_snapshots_manager_start(local_snapshots_manager_t *const lsm) {
   if (lsm == NULL) {
     return RC_SNAPSHOT_LOCAL_SNAPSHOTS_MANAGER_NULL_SELF;
   }
@@ -115,7 +115,7 @@ retcode_t iota_local_snapshots_start(local_snapshots_manager_t* const lsm) {
   return RC_OK;
 }
 
-retcode_t iota_local_snapshots_stop(local_snapshots_manager_t* const lsm) {
+retcode_t iota_local_snapshots_manager_stop(local_snapshots_manager_t *const lsm) {
   retcode_t ret = RC_OK;
 
   if (lsm == NULL) {
@@ -135,7 +135,7 @@ retcode_t iota_local_snapshots_stop(local_snapshots_manager_t* const lsm) {
   return ret;
 }
 
-retcode_t iota_local_snapshots_destroy(local_snapshots_manager_t* const lsm) {
+retcode_t iota_local_snapshots_manager_destroy(local_snapshots_manager_t *const lsm) {
   retcode_t ret = RC_OK;
 
   if (lsm == NULL) {

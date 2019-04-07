@@ -88,8 +88,8 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
   }
 
   log_info(logger_id, "Initializing local snapshots manager\n");
-  if ((ret = iota_local_snapshots_init(&consensus->local_snapshots_manager, &consensus->conf,
-                                       &consensus->milestone_tracker)) != RC_OK) {
+  if ((ret = iota_local_snapshots_manager_init(&consensus->local_snapshots_manager, &consensus->conf,
+                                               &consensus->milestone_tracker)) != RC_OK) {
     log_critical(logger_id, "Initializing local snapshots manager failed failed\n");
     return ret;
   }
@@ -114,7 +114,7 @@ retcode_t iota_consensus_start(iota_consensus_t *const consensus, tangle_t *cons
 
   log_info(logger_id, "Starting local snapshots manager\n");
   if (consensus->conf.local_snapshots.local_snapshots_is_enabled) {
-    if ((ret = iota_local_snapshots_start(&consensus->local_snapshots_manager)) != RC_OK) {
+    if ((ret = iota_local_snapshots_manager_start(&consensus->local_snapshots_manager)) != RC_OK) {
       log_critical(logger_id, "Starting local snapshots manager failed\n");
       return ret;
     }
@@ -137,7 +137,7 @@ retcode_t iota_consensus_stop(iota_consensus_t *const consensus) {
   }
 
   if (consensus->conf.local_snapshots.local_snapshots_is_enabled) {
-    if ((ret = iota_local_snapshots_stop(&consensus->local_snapshots_manager)) != RC_OK) {
+    if ((ret = iota_local_snapshots_manager_stop(&consensus->local_snapshots_manager)) != RC_OK) {
       log_critical(logger_id, "Stopping local snapshots manager failed\n");
       return ret;
     }
@@ -200,7 +200,7 @@ retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
   }
 
   log_info(logger_id, "Destroying local snapshots manager\n");
-  if ((ret = iota_local_snapshots_destroy(&consensus->local_snapshots_manager)) != RC_OK) {
+  if ((ret = iota_local_snapshots_manager_destroy(&consensus->local_snapshots_manager)) != RC_OK) {
     log_error(logger_id, "Destroying local snapshots manager failed\n");
   }
 
