@@ -36,18 +36,6 @@ cc_library(
 )
 
 cc_library(
-    name = "local_snapshots_provider",
-    srcs = [
-        "local_snapshots_provider.c",
-        "local_snapshots_provider.h",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":shared_local_snapshots",
-    ],
-)
-
-cc_library(
     name = "local_snapshots_manager",
     srcs = [
         "local_snapshots_manager.c",
@@ -55,8 +43,8 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        ":local_snapshots_provider",
         ":local_snapshots_service",
         ":shared_local_snapshots",
+        "//consensus/snapshot:snapshots_provider",
     ],
 )

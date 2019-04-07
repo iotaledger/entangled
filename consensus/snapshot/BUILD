@@ -40,3 +40,16 @@ cc_library(
         "//utils/containers/hash:hash_int64_t_map",
     ],
 )
+
+cc_library(
+    name = "snapshots_provider",
+    srcs = [
+        "snapshots_provider.c",
+        "snapshots_provider.h",
+    ],
+    hdrs = ["snapshots_provider.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":snapshot",
+    ],
+)

@@ -13,8 +13,8 @@
 
 #include "consensus/conf.h"
 #include "consensus/milestone_tracker/milestone_tracker.h"
-#include "consensus/snapshot/local_snapshots/local_snapshots_provider.h"
 #include "consensus/snapshot/local_snapshots/local_snapshots_service.h"
+#include "consensus/snapshot/snapshots_provider.h"
 #include "consensus/tangle/tangle.h"
 #include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
@@ -32,7 +32,7 @@ typedef struct local_snapshots_manager_s {
   milestone_tracker_t const *mt;
 
   local_snapshots_service_t local_snapshots_service;
-  local_snapshots_provider_t local_snapshots_provider;
+  snapshots_provider_t const *snapshots_provider;
 
   // Muteable data
   tangle_t tangle;
@@ -47,8 +47,9 @@ typedef struct local_snapshots_manager_s {
  *
  * @return a status code
  */
-retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm, iota_consensus_conf_t const *const conf,
-                                            milestone_tracker_t const *const mt);
+retcode_t iota_local_snapshots_manager_init(local_snapshots_manager_t *lsm,
+                                            snapshots_provider_t *const snapshots_provider,
+                                            iota_consensus_conf_t *const conf, milestone_tracker_t const *const mt);
 
 /**
  * Starts a local snapshots manager
