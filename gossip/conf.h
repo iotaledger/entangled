@@ -8,6 +8,7 @@
 #ifndef __GOSSIP_CONF_H__
 #define __GOSSIP_CONF_H__
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "common/errors.h"
@@ -27,6 +28,7 @@
 #define DEFAULT_PROBABILITY_SEND_MILESTONE 0.02
 #define DEFAULT_TIPS_CACHE_SIZE 5000
 #define DEFAULT_REQUESTER_QUEUE_SIZE 10000
+#define DEFAULT_TIPS_SOLIDIFIER_ENABLED true
 
 #ifdef __cplusplus
 extern "C" {
@@ -68,6 +70,8 @@ typedef struct iota_gossip_conf_s {
   size_t requester_queue_size;
   // Path of the DB file
   char db_path[128];
+  // Scan the current tips and attempt to mark them as solid
+  bool tips_solidifier_enabled;
 } iota_gossip_conf_t;
 
 /**

@@ -11,7 +11,6 @@
 
 #include "common/model/transaction.h"
 #include "common/storage/connection.h"
-#include "common/storage/sql/defs.h"
 #include "common/storage/storage.h"
 #include "common/storage/tests/helpers/defs.h"
 #include "common/trinary/flex_trit.h"
@@ -53,7 +52,7 @@ static void init_epv(exit_prob_transaction_validator_t *const epv) {
 
   strcpy(consensus_conf.snapshot_file, snapshot_path);
   strcpy(consensus_conf.snapshot_conf_file, snapshot_conf_path);
-  strcpy(consensus_conf.snapshot_signature_file, "");
+  consensus_conf.snapshot_signature_skip_validation = true;
   TEST_ASSERT(iota_snapshot_init(&snapshot, &consensus_conf) == RC_OK);
   TEST_ASSERT(iota_consensus_transaction_solidifier_init(&ts, &consensus_conf, NULL, NULL) == RC_OK);
   TEST_ASSERT(iota_milestone_tracker_init(&mt, &consensus_conf, &snapshot, &lv, &ts) == RC_OK);

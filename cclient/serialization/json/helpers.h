@@ -74,6 +74,8 @@ retcode_t json_array_to_hash243_stack(cJSON const *const obj, char const *const 
 
 retcode_t hash81_queue_to_json_array(hash81_queue_t queue, cJSON *const json_root, char const *const obj_name);
 
+retcode_t json_array_to_hash81_queue(cJSON const *const obj, char const *const obj_name, hash81_queue_t *queue);
+
 retcode_t json_array_to_hash8019_queue(cJSON const *const obj, char const *const obj_name, hash8019_queue_t *queue);
 
 retcode_t flex_trits_to_json_string(cJSON *const json_obj, char const *const key, flex_trit_t const *const hash,

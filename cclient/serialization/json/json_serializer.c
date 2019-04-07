@@ -18,6 +18,7 @@
 #include "cclient/serialization/json/attach_to_tangle.h"
 #include "cclient/serialization/json/broadcast_transactions.h"
 #include "cclient/serialization/json/check_consistency.h"
+#include "cclient/serialization/json/error.h"
 #include "cclient/serialization/json/find_transactions.h"
 #include "cclient/serialization/json/get_balances.h"
 #include "cclient/serialization/json/get_inclusion_states.h"
@@ -35,6 +36,8 @@ static serializer_vtable json_vtable = {
     .add_neighbors_deserialize_request = json_add_neighbors_deserialize_request,
     .add_neighbors_deserialize_response = json_add_neighbors_deserialize_response,
     .find_transactions_serialize_request = json_find_transactions_serialize_request,
+    .find_transactions_deserialize_request = json_find_transactions_deserialize_request,
+    .find_transactions_serialize_response = json_find_transactions_serialize_response,
     .find_transactions_deserialize_response = json_find_transactions_deserialize_response,
     .get_balances_serialize_request = json_get_balances_serialize_request,
     .get_balances_deserialize_request = json_get_balances_deserialize_request,
@@ -52,12 +55,16 @@ static serializer_vtable json_vtable = {
     .get_tips_serialize_response = json_get_tips_serialize_response,
     .get_tips_deserialize_response = json_get_tips_deserialize_response,
     .get_transactions_to_approve_serialize_request = json_get_transactions_to_approve_serialize_request,
+    .get_transactions_to_approve_deserialize_request = json_get_transactions_to_approve_deserialize_request,
+    .get_transactions_to_approve_serialize_response = json_get_transactions_to_approve_serialize_response,
     .get_transactions_to_approve_deserialize_response = json_get_transactions_to_approve_deserialize_response,
     .remove_neighbors_serialize_request = json_remove_neighbors_serialize_request,
     .remove_neighbors_deserialize_request = json_remove_neighbors_deserialize_request,
     .remove_neighbors_serialize_response = json_remove_neighbors_serialize_response,
     .remove_neighbors_deserialize_response = json_remove_neighbors_deserialize_response,
     .get_trytes_serialize_request = json_get_trytes_serialize_request,
+    .get_trytes_deserialize_request = json_get_trytes_deserialize_request,
+    .get_trytes_serialize_response = json_get_trytes_serialize_response,
     .get_trytes_deserialize_response = json_get_trytes_deserialize_response,
     .attach_to_tangle_serialize_request = json_attach_to_tangle_serialize_request,
     .attach_to_tangle_serialize_response = json_attach_to_tangle_serialize_response,
@@ -66,10 +73,12 @@ static serializer_vtable json_vtable = {
     .broadcast_transactions_serialize_request = json_broadcast_transactions_serialize_request,
     .broadcast_transactions_deserialize_request = json_broadcast_transactions_deserialize_request,
     .store_transactions_serialize_request = json_store_transactions_serialize_request,
+    .store_transactions_deserialize_request = json_store_transactions_deserialize_request,
     .check_consistency_serialize_request = json_check_consistency_serialize_request,
     .check_consistency_serialize_response = json_check_consistency_serialize_response,
     .check_consistency_deserialize_request = json_check_consistency_deserialize_request,
     .check_consistency_deserialize_response = json_check_consistency_deserialize_response,
+    .error_serialize_response = json_error_serialize_response,
 };
 
 void init_json_serializer(serializer_t *serializer) { serializer->vtable = json_vtable; }

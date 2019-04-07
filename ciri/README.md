@@ -66,18 +66,22 @@ Long option | Short option | Description | Example input
 `--tcp-receiver-port` | `-t` | TCP listen port. | `-t 15600`
 `--tips-cache-size` | | Size of the tips cache. Also bounds the number of tips returned by getTips API call. | `--tips-cache-size 5000`
 `--udp-receiver-port` | `-u` | UDP listen port. | `-u 14600`
+`--http_port` | `-p` | HTTP API listen port. | `--http_port 14265`
 `--max-find-transactions` | | The maximal number of transactions that may be returned by the 'findTransactions' API call. If the number of transactions found exceeds this number an error will be returned | `--max-find-transactions 100000`
 `--max-get-trytes` | | Maximum number of transactions that will be returned by the 'getTrytes' API call. | `--max-get-trytes 10000`
-`--port` | `-p` | HTTP API listen port. | `--port 14265`
+`--remote-limit-api` | | Commands that should be ignored by API. | `--remote-limit-api "attachToTangle, addNeighbors"`
 `--alpha` | | Randomness of the tip selection. Value must be in [0, inf] where 0 is most random and inf is most deterministic. | `--alpha 0.001`
 `--below-max-depth` | | Maximum number of unconfirmed transactions that may be analysed to find the latest referenced milestone by the currently visited transaction during the random walk. | `--below-max-depth 20000`
-`--coordinator` | | The address of the coordinator. | `--coordinator "KPW...BWU"`
+`--coordinator-address` | | The address of the coordinator. | `--coordinator-address "KPW...BWU"`
+`--coordinator-num-keys-in-milestone` | | The depth of the Merkle tree which in turn determines the number of leaves (private keys) that the coordinator can use to sign a message. | `--coordinator-num-keys-in-milestone 20`
+`--coordinator-security-level` | | The security level used in coordinator signatures. | `--coordinator-security-level 1`
+`--coordinator-signature-type` | | The signature type used in coordinator signatures. Valid types: "CURL_P27", "CURL_P81" and "KERL". | `--coordinator-signature-type CURL_P27`
 `--last-milestone` | | The index of the last milestone issued by the corrdinator before the last snapshot. | `--last-milestone 774804`
 `--max-depth` | | Limits how many milestones behind the current one the random walk can start. | `--max-depth 15`
-`--num-keys-in-milestone` | | The depth of the Merkle tree which in turn determines the number of leaves (private keys) that the coordinator can use to sign a message. | `--num-keys-in-milestone 20`
 `--snapshot-file` | | Path to the file that contains the state of the ledger at the last snapshot. | `--snapshot-file external/snapshot_mainnet/file/snapshot.txt`
 `--snapshot-signature-depth` | | Depth of the snapshot signature. | `--snapshot-signature-depth 6`
 `--snapshot-signature-file` | | Path to the file that contains a signature for the snapshot file. | `--snapshot-signature-file external/snapshot_sig_mainnet/file/snapshot.sig`
 `--snapshot-signature-index` | | Index of the snapshot signature. | `--snapshot-signature-index 9`
 `--snapshot-signature-pubkey` | | Public key of the snapshot signature. | `--snapshot-signature-pubkey "TTX...YAC"`
+`--snapshot-signature-skip-validation` | | Skip validation of snapshot signature. Must be "true" or "false". | `--snapshot-signature-skip-validation false`
 `--snapshot-timestamp` | | Epoch time of the last snapshot | `--snapshot-timestamp 1537203600`

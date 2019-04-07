@@ -27,11 +27,30 @@ typedef struct iota_api_http_session_s {
   char_buffer_t *request;
 } iota_api_http_session_t;
 
+static retcode_t error_serialize_response(iota_api_http_t *const http, error_res_t **const error,
+                                          char const *const message, char_buffer_t *const out) {
+  retcode_t ret = RC_OK;
+
+  if (*error == NULL) {
+    *error = error_res_new();
+    if (message == NULL) {
+      error_res_set(*error, "Internal server error");
+    } else {
+      error_res_set(*error, message);
+    }
+  }
+  ret = http->serializer.vtable.error_serialize_response(&http->serializer, *error, out);
+  error_res_free(error);
+
+  return ret;
+}
+
 static inline retcode_t process_add_neighbors_request(iota_api_http_t *const http, char const *const payload,
                                                       char_buffer_t *const out) {
   retcode_t ret = RC_OK;
   add_neighbors_req_t *req = add_neighbors_req_new();
   add_neighbors_res_t *res = add_neighbors_res_new();
+  error_res_t *error = NULL;
 
   if (req == NULL || res == NULL) {
     ret = RC_OOM;
@@ -42,11 +61,11 @@ static inline retcode_t process_add_neighbors_request(iota_api_http_t *const htt
     goto done;
   }
 
-  if ((ret = iota_api_add_neighbors(http->api, req, res)) != RC_OK) {
-    goto done;
+  if ((ret = iota_api_add_neighbors(http->api, req, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.add_neighbors_serialize_response(&http->serializer, res, out);
   }
-
-  ret = http->serializer.vtable.add_neighbors_serialize_response(&http->serializer, res, out);
 
 done:
   add_neighbors_req_free(&req);
@@ -60,6 +79,7 @@ static inline retcode_t process_attach_to_tangle_request(iota_api_http_t *const 
   retcode_t ret = RC_OK;
   attach_to_tangle_req_t *req = attach_to_tangle_req_new();
   attach_to_tangle_res_t *res = attach_to_tangle_res_new();
+  error_res_t *error = NULL;
 
   if (req == NULL || res == NULL) {
     ret = RC_OOM;
@@ -70,11 +90,11 @@ static inline retcode_t process_attach_to_tangle_request(iota_api_http_t *const 
     goto done;
   }
 
-  if ((ret = iota_api_attach_to_tangle(http->api, req, res)) != RC_OK) {
-    goto done;
+  if ((ret = iota_api_attach_to_tangle(http->api, req, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.attach_to_tangle_serialize_response(&http->serializer, res, out);
   }
-
-  ret = http->serializer.vtable.attach_to_tangle_serialize_response(&http->serializer, res, out);
 
 done:
   attach_to_tangle_req_free(&req);
@@ -87,6 +107,7 @@ static inline retcode_t process_broadcast_transactions_request(iota_api_http_t *
                                                                char_buffer_t *const out) {
   retcode_t ret = RC_OK;
   broadcast_transactions_req_t *req = broadcast_transactions_req_new();
+  error_res_t *error = NULL;
 
   if (req == NULL) {
     ret = RC_OOM;
@@ -98,8 +119,8 @@ static inline retcode_t process_broadcast_transactions_request(iota_api_http_t *
     goto done;
   }
 
-  if ((ret = iota_api_broadcast_transactions(http->api, req)) != RC_OK) {
-    goto done;
+  if ((ret = iota_api_broadcast_transactions(http->api, req, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
   }
 
 done:
@@ -113,6 +134,7 @@ static inline retcode_t process_check_consistency_request(iota_api_http_t *const
   retcode_t ret = RC_OK;
   check_consistency_req_t *req = check_consistency_req_new();
   check_consistency_res_t *res = check_consistency_res_new();
+  error_res_t *error = NULL;
 
   if (req == NULL || res == NULL) {
     ret = RC_OOM;
@@ -123,11 +145,11 @@ static inline retcode_t process_check_consistency_request(iota_api_http_t *const
     goto done;
   }
 
-  if ((ret = iota_api_check_consistency(http->api, tangle, req, res)) != RC_OK) {
-    goto done;
+  if ((ret = iota_api_check_consistency(http->api, tangle, req, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.check_consistency_serialize_response(&http->serializer, res, out);
   }
-
-  ret = http->serializer.vtable.check_consistency_serialize_response(&http->serializer, res, out);
 
 done:
   check_consistency_req_free(&req);
@@ -141,19 +163,22 @@ static inline retcode_t process_find_transactions_request(iota_api_http_t *const
   retcode_t ret = RC_OK;
   find_transactions_req_t *req = find_transactions_req_new();
   find_transactions_res_t *res = find_transactions_res_new();
+  error_res_t *error = NULL;
 
   if (req == NULL || res == NULL) {
     ret = RC_OOM;
     goto done;
   }
 
-  // TODO Deserialize request
-
-  if ((ret = iota_api_find_transactions(http->api, tangle, req, res)) != RC_OK) {
+  if ((ret = http->serializer.vtable.find_transactions_deserialize_request(&http->serializer, payload, req)) != RC_OK) {
     goto done;
   }
 
-  // TODO Serialize response
+  if ((ret = iota_api_find_transactions(http->api, tangle, req, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.find_transactions_serialize_response(&http->serializer, res, out);
+  }
 
 done:
   find_transactions_req_free(&req);
@@ -167,6 +192,7 @@ static inline retcode_t process_get_balances_request(iota_api_http_t *const http
   retcode_t ret = RC_OK;
   get_balances_req_t *req = get_balances_req_new();
   get_balances_res_t *res = get_balances_res_new();
+  error_res_t *error = NULL;
 
   if (req == NULL || res == NULL) {
     ret = RC_OOM;
@@ -177,11 +203,11 @@ static inline retcode_t process_get_balances_request(iota_api_http_t *const http
     goto done;
   }
 
-  if ((ret = iota_api_get_balances(http->api, req, res)) != RC_OK) {
-    goto done;
+  if ((ret = iota_api_get_balances(http->api, req, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.get_balances_serialize_response(&http->serializer, res, out);
   }
-
-  ret = http->serializer.vtable.get_balances_serialize_response(&http->serializer, res, out);
 
 done:
   get_balances_req_free(&req);
@@ -195,6 +221,7 @@ static inline retcode_t process_get_inclusion_states_request(iota_api_http_t *co
   retcode_t ret = RC_OK;
   get_inclusion_states_req_t *req = get_inclusion_states_req_new();
   get_inclusion_states_res_t *res = get_inclusion_states_res_new();
+  error_res_t *error = NULL;
 
   if (req == NULL || res == NULL) {
     ret = RC_OOM;
@@ -203,8 +230,8 @@ static inline retcode_t process_get_inclusion_states_request(iota_api_http_t *co
 
   // TODO Deserialize request
 
-  if ((ret = iota_api_get_inclusion_states(http->api, req, res)) != RC_OK) {
-    goto done;
+  if ((ret = iota_api_get_inclusion_states(http->api, req, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
   }
 
   // TODO Serialize response
@@ -220,17 +247,18 @@ static inline retcode_t process_get_neighbors_request(iota_api_http_t *const htt
                                                       char_buffer_t *const out) {
   retcode_t ret = RC_OK;
   get_neighbors_res_t *res = get_neighbors_res_new();
+  error_res_t *error = NULL;
 
   if (res == NULL) {
     ret = RC_OOM;
     goto done;
   }
 
-  if ((ret = iota_api_get_neighbors(http->api, res)) != RC_OK) {
-    goto done;
+  if ((ret = iota_api_get_neighbors(http->api, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.get_neighbors_serialize_response(&http->serializer, res, out);
   }
-
-  ret = http->serializer.vtable.get_neighbors_serialize_response(&http->serializer, res, out);
 
 done:
   get_neighbors_res_free(res);
@@ -242,17 +270,18 @@ static inline retcode_t process_get_node_info_request(iota_api_http_t *const htt
                                                       char_buffer_t *const out) {
   retcode_t ret = RC_OK;
   get_node_info_res_t *res = get_node_info_res_new();
+  error_res_t *error = NULL;
 
   if (res == NULL) {
     ret = RC_OOM;
     goto done;
   }
 
-  if ((ret = iota_api_get_node_info(http->api, res)) != RC_OK) {
-    goto done;
+  if ((ret = iota_api_get_node_info(http->api, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.get_node_info_serialize_response(&http->serializer, res, out);
   }
-
-  ret = http->serializer.vtable.get_node_info_serialize_response(&http->serializer, res, out);
 
 done:
   get_node_info_res_free(&res);
@@ -264,17 +293,18 @@ static inline retcode_t process_get_tips_request(iota_api_http_t *const http, ch
                                                  char_buffer_t *const out) {
   retcode_t ret = RC_OK;
   get_tips_res_t *res = get_tips_res_new();
+  error_res_t *error = NULL;
 
   if (res == NULL) {
     ret = RC_OOM;
     goto done;
   }
 
-  if ((ret = iota_api_get_tips(http->api, res)) != RC_OK) {
-    goto done;
+  if ((ret = iota_api_get_tips(http->api, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.get_tips_serialize_response(&http->serializer, res, out);
   }
-
-  ret = http->serializer.vtable.get_tips_serialize_response(&http->serializer, res, out);
 
 done:
   get_tips_res_free(&res);
@@ -288,19 +318,23 @@ static inline retcode_t process_get_transactions_to_approve_request(iota_api_htt
   retcode_t ret = RC_OK;
   get_transactions_to_approve_req_t *req = get_transactions_to_approve_req_new();
   get_transactions_to_approve_res_t *res = get_transactions_to_approve_res_new();
+  error_res_t *error = NULL;
 
   if (req == NULL || res == NULL) {
     ret = RC_OOM;
     goto done;
   }
 
-  // TODO Deserialize request
-
-  if ((ret = iota_api_get_transactions_to_approve(http->api, tangle, req, res)) != RC_OK) {
+  if ((ret = http->serializer.vtable.get_transactions_to_approve_deserialize_request(&http->serializer, payload,
+                                                                                     req)) != RC_OK) {
     goto done;
   }
 
-  // TODO Serialize response
+  if ((ret = iota_api_get_transactions_to_approve(http->api, tangle, req, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.get_transactions_to_approve_serialize_response(&http->serializer, res, out);
+  }
 
 done:
   get_transactions_to_approve_req_free(&req);
@@ -314,19 +348,22 @@ static inline retcode_t process_get_trytes_request(iota_api_http_t *const http, 
   retcode_t ret = RC_OK;
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
+  error_res_t *error = NULL;
 
   if (req == NULL || res == NULL) {
     ret = RC_OOM;
     goto done;
   }
 
-  // TODO Deserialize request
-
-  if ((ret = iota_api_get_trytes(http->api, tangle, req, res)) != RC_OK) {
+  if ((ret = http->serializer.vtable.get_trytes_deserialize_request(&http->serializer, payload, req)) != RC_OK) {
     goto done;
   }
 
-  // TODO Serialize response
+  if ((ret = iota_api_get_trytes(http->api, tangle, req, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.get_trytes_serialize_response(&http->serializer, res, out);
+  }
 
 done:
   get_trytes_req_free(&req);
@@ -340,6 +377,7 @@ static inline retcode_t process_remove_neighbors_request(iota_api_http_t *const 
   retcode_t ret = RC_OK;
   remove_neighbors_req_t *req = remove_neighbors_req_new();
   remove_neighbors_res_t *res = remove_neighbors_res_new();
+  error_res_t *error = NULL;
 
   if (req == NULL || res == NULL) {
     ret = RC_OOM;
@@ -350,11 +388,11 @@ static inline retcode_t process_remove_neighbors_request(iota_api_http_t *const 
     goto done;
   }
 
-  if ((ret = iota_api_remove_neighbors(http->api, req, res)) != RC_OK) {
-    goto done;
+  if ((ret = iota_api_remove_neighbors(http->api, req, res, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  } else {
+    ret = http->serializer.vtable.remove_neighbors_serialize_response(&http->serializer, res, out);
   }
-
-  ret = http->serializer.vtable.remove_neighbors_serialize_response(&http->serializer, res, out);
 
 done:
   remove_neighbors_req_free(&req);
@@ -367,19 +405,21 @@ static inline retcode_t process_store_transactions_request(iota_api_http_t *cons
                                                            char_buffer_t *const out) {
   retcode_t ret = RC_OK;
   store_transactions_req_t *req = store_transactions_req_new();
+  error_res_t *error = NULL;
 
   if (req == NULL) {
     ret = RC_OOM;
     goto done;
   }
 
-  // TODO Deserialize request
-
-  if ((ret = iota_api_store_transactions(http->api, tangle, req)) != RC_OK) {
+  if ((ret = http->serializer.vtable.store_transactions_deserialize_request(&http->serializer, payload, req)) !=
+      RC_OK) {
     goto done;
   }
 
-  // TODO Serialize responses
+  if ((ret = iota_api_store_transactions(http->api, tangle, req, &error)) != RC_OK) {
+    error_serialize_response(http, &error, NULL, out);
+  }
 
 done:
   store_transactions_req_free(&req);
@@ -389,12 +429,21 @@ done:
 
 static retcode_t iota_api_http_process_request(iota_api_http_t *http, const char *command, const char *payload,
                                                char_buffer_t *const out) {
+  error_res_t *error = NULL;
+
   if (!tangle) {
     log_debug(logger_id, "Instantiating new HTTP API database connection\n");
 
     tangle = (tangle_t *)calloc(1, sizeof(tangle_t));
     utarray_push_back(http->db_connections, tangle);
     iota_tangle_init(tangle, http->db_config);
+  }
+
+  for (size_t i = 0; http->api->conf.remote_limit_api[i]; i++) {
+    if (strcmp(http->api->conf.remote_limit_api[i], command) == 0) {
+      error_serialize_response(http, &error, "This command is not available on this node", out);
+      return RC_OK;
+    }
   }
 
   if (strcmp(command, "addNeighbors") == 0) {
@@ -510,12 +559,7 @@ static int iota_api_http_handler(void *cls, struct MHD_Connection *connection, c
   cJSON_Delete(json_obj);
 
   response_buf = char_buffer_new();
-  if (iota_api_http_process_request(api, command_str, sess->request->data, response_buf)) {
-    free(command_str);
-    char_buffer_free(response_buf);
-    ret = MHD_NO;
-    goto cleanup;
-  }
+  iota_api_http_process_request(api, command_str, sess->request->data, response_buf);
   free(command_str);
 
   response = MHD_create_response_from_buffer(response_buf->length, response_buf->data, MHD_RESPMEM_MUST_COPY);
@@ -561,8 +605,8 @@ retcode_t iota_api_http_start(iota_api_http_t *const api) {
     return RC_OK;
   }
 
-  api->state = MHD_start_daemon(MHD_USE_AUTO_INTERNAL_THREAD | MHD_USE_ERROR_LOG | MHD_USE_DEBUG, 14265, NULL, NULL,
-                                iota_api_http_handler, api, MHD_OPTION_END);
+  api->state = MHD_start_daemon(MHD_USE_AUTO_INTERNAL_THREAD | MHD_USE_ERROR_LOG | MHD_USE_DEBUG,
+                                api->api->conf.http_port, NULL, NULL, iota_api_http_handler, api, MHD_OPTION_END);
   api->running = true;
 
   return RC_OK;

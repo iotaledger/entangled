@@ -300,7 +300,7 @@ retcode_t json_array_to_hash243_queue(cJSON const* const obj, char const* const 
     cJSON* current_obj = NULL;
     cJSON_ArrayForEach(current_obj, json_item) {
       if (current_obj->valuestring != NULL) {
-        flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)current_obj->valuestring, NUM_TRYTES_HASH,
+        flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)current_obj->valuestring, NUM_TRYTES_HASH,
                                NUM_TRYTES_HASH);
         ret_code = hash243_queue_push(queue, hash);
         if (ret_code) {
@@ -323,7 +323,7 @@ retcode_t json_array_to_hash243_stack(cJSON const* const obj, char const* const 
     cJSON* current_obj = NULL;
     cJSON_ArrayForEach(current_obj, json_item) {
       if (current_obj->valuestring != NULL) {
-        flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)current_obj->valuestring, NUM_TRYTES_HASH,
+        flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)current_obj->valuestring, NUM_TRYTES_HASH,
                                NUM_TRYTES_HASH);
         ret_code = hash243_stack_push(queue, hash);
         if (ret_code) {
@@ -365,6 +365,33 @@ retcode_t hash81_queue_to_json_array(hash81_queue_t queue, cJSON* const json_roo
   return RC_OK;
 }
 
+retcode_t json_array_to_hash81_queue(cJSON const* const obj, char const* const obj_name, hash81_queue_t* queue) {
+  retcode_t ret_code = RC_OK;
+  flex_trit_t hash[FLEX_TRIT_SIZE_81] = {};
+  cJSON* json_item = cJSON_GetObjectItemCaseSensitive(obj, obj_name);
+  if (!json_item) {
+    return RC_CCLIENT_JSON_KEY;
+  }
+
+  if (cJSON_IsArray(json_item)) {
+    cJSON* current_obj = NULL;
+    cJSON_ArrayForEach(current_obj, json_item) {
+      if (current_obj->valuestring != NULL) {
+        flex_trits_from_trytes(hash, NUM_TRITS_TAG, (tryte_t const*)current_obj->valuestring, NUM_TRYTES_TAG,
+                               NUM_TRYTES_TAG);
+        ret_code = hash81_queue_push(queue, hash);
+        if (ret_code) {
+          return ret_code;
+        }
+      }
+    }
+  } else {
+    log_error(json_logger_id, "[%s:%d] %s not array\n", __func__, __LINE__, STR_CCLIENT_JSON_PARSE);
+    return RC_CCLIENT_JSON_PARSE;
+  }
+  return ret_code;
+}
+
 retcode_t json_array_to_hash8019_queue(cJSON const* const obj, char const* const obj_name, hash8019_queue_t* queue) {
   retcode_t ret_code = RC_OK;
   flex_trit_t hash[FLEX_TRIT_SIZE_8019] = {};
@@ -373,7 +400,7 @@ retcode_t json_array_to_hash8019_queue(cJSON const* const obj, char const* const
     cJSON* current_obj = NULL;
     cJSON_ArrayForEach(current_obj, json_item) {
       if (current_obj->valuestring != NULL) {
-        flex_trits_from_trytes(hash, NUM_TRITS_SERIALIZED_TRANSACTION, (const tryte_t*)current_obj->valuestring,
+        flex_trits_from_trytes(hash, NUM_TRITS_SERIALIZED_TRANSACTION, (tryte_t const*)current_obj->valuestring,
                                NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
         ret_code = hash8019_queue_push(queue, hash);
         if (ret_code) {
@@ -412,7 +439,7 @@ retcode_t json_string_hash_to_flex_trits(cJSON const* const json_obj, char const
     return RC_CCLIENT_JSON_KEY;
   }
   if (cJSON_IsString(json_value) && (json_value->valuestring != NULL)) {
-    trit_len = flex_trits_from_trytes(hash, NUM_TRITS_HASH, (const tryte_t*)json_value->valuestring, NUM_TRYTES_HASH,
+    trit_len = flex_trits_from_trytes(hash, NUM_TRITS_HASH, (tryte_t const*)json_value->valuestring, NUM_TRYTES_HASH,
                                       NUM_TRYTES_HASH);
     if (!trit_len) {
       return RC_CCLIENT_FLEX_TRITS;
@@ -519,7 +546,7 @@ retcode_t json_array_to_hash8019_array(cJSON const* const obj, char const* const
     cJSON* current_obj = NULL;
     cJSON_ArrayForEach(current_obj, json_item) {
       if (current_obj->valuestring != NULL) {
-        flex_trits_from_trytes(hash, NUM_TRITS_SERIALIZED_TRANSACTION, (const tryte_t*)current_obj->valuestring,
+        flex_trits_from_trytes(hash, NUM_TRITS_SERIALIZED_TRANSACTION, (tryte_t const*)current_obj->valuestring,
                                NUM_TRYTES_SERIALIZED_TRANSACTION, NUM_TRYTES_SERIALIZED_TRANSACTION);
         hash_array_push(array, hash);
       }

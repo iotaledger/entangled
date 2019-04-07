@@ -12,6 +12,7 @@
 
 #include "common/errors.h"
 #include "utils/containers/hash/hash243_set.h"
+#include "utils/handles/cond.h"
 #include "utils/handles/rw_lock.h"
 #include "utils/handles/thread.h"
 
@@ -26,6 +27,7 @@ typedef struct transaction_requester_s {
   hash243_set_t transactions;
   node_t *node;
   rw_lock_handle_t lock;
+  cond_handle_t cond;
 } transaction_requester_t;
 
 #ifdef __cplusplus

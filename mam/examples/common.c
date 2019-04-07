@@ -45,6 +45,7 @@ retcode_t mam_example_create_channel(mam_api_t *const api, tryte_t *const channe
 
 // TODO Merge into cclient
 retcode_t send_bundle(char const *const host, uint16_t const port, bundle_transactions_t *const bundle) {
+  retcode_t ret = RC_OK;
   iota_client_service_t serv;
   serv.http.path = "/";
   serv.http.content_type = "application/json";
@@ -69,13 +70,9 @@ retcode_t send_bundle(char const *const host, uint16_t const port, bundle_transa
     transaction_serialize_on_flex_trits(curr_tx, trits_8019);
     hash_array_push(raw_trytes, trits_8019);
   }
-  iota_client_send_trytes(&serv, raw_trytes, 1, 14, NULL, true, out_tx_objs);
-  // TODO uncomment
-  // hash_array_free(raw_trytes);
-  transaction_array_free(out_tx_objs);
-
-  iota_client_extended_destroy();
-  iota_client_core_destroy(&serv);
+  if ((ret = iota_client_send_trytes(&serv, raw_trytes, 1, 14, NULL, true, out_tx_objs)) != RC_OK) {
+    goto done;
+  }
 
   fprintf(stderr, "Bundle: ");
   for (size_t i = 0; i < FLEX_TRIT_SIZE_243; i++) {
@@ -83,7 +80,13 @@ retcode_t send_bundle(char const *const host, uint16_t const port, bundle_transa
   }
   fprintf(stderr, "\n");
 
-  return RC_OK;
+done:
+  hash_array_free(raw_trytes);
+  transaction_array_free(out_tx_objs);
+  iota_client_extended_destroy();
+  iota_client_core_destroy(&serv);
+
+  return ret;
 }
 
 static int idx_sort(void const *lhs, void const *rhs) {

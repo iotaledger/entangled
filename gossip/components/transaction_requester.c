@@ -6,7 +6,6 @@
  */
 
 #include "gossip/components/transaction_requester.h"
-#include "common/storage/sql/defs.h"
 #include "consensus/tangle/tangle.h"
 #include "gossip/node.h"
 #include "utils/handles/rand.h"
@@ -32,6 +31,7 @@ retcode_t requester_init(transaction_requester_t *const transaction_requester, n
   transaction_requester->milestones = NULL;
   transaction_requester->transactions = NULL;
   rw_lock_handle_init(&transaction_requester->lock);
+  cond_handle_init(&transaction_requester->cond);
 
   return RC_OK;
 }
@@ -47,6 +47,7 @@ retcode_t requester_destroy(transaction_requester_t *const transaction_requester
   hash243_set_free(&transaction_requester->transactions);
   transaction_requester->node = NULL;
   rw_lock_handle_destroy(&transaction_requester->lock);
+  cond_handle_destroy(&transaction_requester->cond);
   logger_helper_release(logger_id);
 
   return RC_OK;
@@ -142,9 +143,14 @@ retcode_t request_transaction(transaction_requester_t *const transaction_request
     if ((ret = hash243_set_add(&transaction_requester->milestones, hash)) != RC_OK) {
       goto done;
     }
-  } else if (!hash243_set_contains(&transaction_requester->milestones, hash) &&
-             hash243_set_size(&transaction_requester->transactions) <
-                 transaction_requester->node->conf.requester_queue_size) {
+  } else if (!hash243_set_contains(&transaction_requester->milestones, hash)) {
+    if (hash243_set_size(&transaction_requester->transactions) >=
+        transaction_requester->node->conf.requester_queue_size) {
+      if ((ret = hash243_set_remove_entry(&transaction_requester->transactions, transaction_requester->transactions)) !=
+          RC_OK) {
+        goto done;
+      }
+    }
     if ((ret = hash243_set_add(&transaction_requester->transactions, hash)) != RC_OK) {
       goto done;
     }
@@ -162,7 +168,6 @@ retcode_t get_transaction_to_request(transaction_requester_t *const transaction_
   hash243_set_t *backup_set = NULL;
   hash243_set_entry_t *iter = NULL;
   hash243_set_entry_t *tmp = NULL;
-
   bool exists = false;
 
   if (transaction_requester == NULL || hash == NULL) {
@@ -176,16 +181,18 @@ retcode_t get_transaction_to_request(transaction_requester_t *const transaction_
 
   request_set = hash243_set_size(request_set) != 0 ? request_set : backup_set;
 
-  HASH_ITER(hh, *request_set, iter, tmp) {
-    memcpy(hash, iter->hash, FLEX_TRIT_SIZE_243);
-    if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, iter->hash, &exists)) != RC_OK) {
+  while (hash243_set_size(request_set) != 0) {
+    hash243_set_random_hash(request_set, hash);
+    if ((ret = iota_tangle_transaction_exist(tangle, TRANSACTION_FIELD_HASH, hash, &exists)) != RC_OK) {
       goto done;
     }
-    hash243_set_remove_entry(request_set, iter);
-    if (!exists) {
-      hash243_set_add(request_set, hash);
-      break;
+
+    if (exists) {
+      hash243_set_remove(request_set, hash);
+      continue;
     }
+
+    break;
   }
 
   if (hash243_set_size(request_set) == 0) {
@@ -194,7 +201,7 @@ retcode_t get_transaction_to_request(transaction_requester_t *const transaction_
 
   if (rand_handle_probability() < transaction_requester->node->conf.p_remove_request &&
       request_set != &transaction_requester->milestones) {
-    hash243_set_remove(request_set, hash);
+    hash243_set_remove_entry(request_set, iter);
   }
 
 done:

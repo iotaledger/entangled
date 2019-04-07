@@ -25,14 +25,17 @@ void tearDown(void) { TEST_ASSERT(tangle_cleanup(&tangle, test_db_path) == RC_OK
 void test_get_trytes_empty(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
+  error_res_t *error = NULL;
 
   api.conf.max_get_trytes = 100;
 
-  TEST_ASSERT(iota_api_get_trytes(&api, &tangle, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_get_trytes(&api, &tangle, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
   TEST_ASSERT_EQUAL_INT(hash8019_queue_count(res->trytes), 0);
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
+  error_res_free(&error);
   TEST_ASSERT(req == NULL);
   TEST_ASSERT(res == NULL);
 }
@@ -40,6 +43,7 @@ void test_get_trytes_empty(void) {
 void test_get_trytes_not_found(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
+  error_res_t *error = NULL;
   tryte_t tx_trytes[NUM_TRYTES_SERIALIZED_TRANSACTION];
   flex_trit_t null_hash[FLEX_TRIT_SIZE_243];
   memset(null_hash, FLEX_TRIT_NULL_VALUE, FLEX_TRIT_SIZE_243);
@@ -48,7 +52,8 @@ void test_get_trytes_not_found(void) {
 
   TEST_ASSERT(hash243_queue_push(&req->hashes, null_hash) == RC_OK);
 
-  TEST_ASSERT(iota_api_get_trytes(&api, &tangle, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_get_trytes(&api, &tangle, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
   TEST_ASSERT_EQUAL_INT(hash243_queue_count(req->hashes), 1);
 
   flex_trits_to_trytes(tx_trytes, NUM_TRYTES_SERIALIZED_TRANSACTION, hash8019_queue_at(&res->trytes, 0),
@@ -57,6 +62,7 @@ void test_get_trytes_not_found(void) {
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
+  error_res_free(&error);
   TEST_ASSERT(req == NULL);
   TEST_ASSERT(res == NULL);
 }
@@ -64,6 +70,7 @@ void test_get_trytes_not_found(void) {
 void test_get_trytes_max(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
+  error_res_t *error = NULL;
   flex_trit_t hash[FLEX_TRIT_SIZE_243] = {};
 
   api.conf.max_get_trytes = 1;
@@ -82,10 +89,12 @@ void test_get_trytes_max(void) {
   flex_trits_from_trytes(hash, NUM_TRITS_HASH, TX_2_OF_4_HASH, NUM_TRYTES_HASH, NUM_TRYTES_HASH);
   TEST_ASSERT(hash243_queue_push(&req->hashes, hash) == RC_OK);
 
-  TEST_ASSERT(iota_api_get_trytes(&api, &tangle, req, res) == RC_API_MAX_GET_TRYTES);
+  TEST_ASSERT(iota_api_get_trytes(&api, &tangle, req, res, &error) == RC_API_MAX_GET_TRYTES);
+  TEST_ASSERT(error == NULL);
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
+  error_res_free(&error);
   TEST_ASSERT(req == NULL);
   TEST_ASSERT(res == NULL);
   transactions_free(txs, 2);
@@ -94,6 +103,7 @@ void test_get_trytes_max(void) {
 void test_get_trytes(void) {
   get_trytes_req_t *req = get_trytes_req_new();
   get_trytes_res_t *res = get_trytes_res_new();
+  error_res_t *error = NULL;
   iota_transaction_t *txs[4];
   tryte_t const *const txs_trytes[4] = {TX_1_OF_4_VALUE_BUNDLE_TRYTES, TX_2_OF_4_VALUE_BUNDLE_TRYTES,
                                         TX_3_OF_4_VALUE_BUNDLE_TRYTES, TX_4_OF_4_VALUE_BUNDLE_TRYTES};
@@ -117,7 +127,8 @@ void test_get_trytes(void) {
     TEST_ASSERT(hash243_queue_push(&req->hashes, tmp_hash) == RC_OK);
   }
 
-  TEST_ASSERT(iota_api_get_trytes(&api, &tangle, req, res) == RC_OK);
+  TEST_ASSERT(iota_api_get_trytes(&api, &tangle, req, res, &error) == RC_OK);
+  TEST_ASSERT(error == NULL);
   TEST_ASSERT_EQUAL_INT(hash243_queue_count(req->hashes), 4);
 
   CDL_FOREACH(res->trytes, iter) {
@@ -129,6 +140,7 @@ void test_get_trytes(void) {
 
   get_trytes_req_free(&req);
   get_trytes_res_free(&res);
+  error_res_free(&error);
   TEST_ASSERT(req == NULL);
   TEST_ASSERT(res == NULL);
   transactions_free(txs, 4);

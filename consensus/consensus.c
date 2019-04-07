@@ -45,14 +45,6 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
     return ret;
   }
 
-  log_info(logger_id, "Initializing exit probability transaction validator\n");
-  if ((ret = iota_consensus_exit_prob_transaction_validator_init(
-           &consensus->conf, &consensus->milestone_tracker, &consensus->ledger_validator,
-           &consensus->exit_prob_transaction_validator)) != RC_OK) {
-    log_critical(logger_id, "Initializing exit probability transaction validator failed\n");
-    return ret;
-  }
-
   log_info(logger_id, "Initializing snapshot\n");
   if ((ret = iota_snapshot_init(&consensus->snapshot, &consensus->conf)) != RC_OK) {
     log_critical(logger_id, "Initializing snapshot failed\n");
@@ -76,8 +68,8 @@ retcode_t iota_consensus_init(iota_consensus_t *const consensus, tangle_t *const
   log_info(logger_id, "Initializing tip selector\n");
   if ((ret = iota_consensus_tip_selector_init(&consensus->tip_selector, &consensus->conf,
                                               &consensus->cw_rating_calculator, &consensus->entry_point_selector,
-                                              &consensus->ep_randomizer, &consensus->exit_prob_transaction_validator,
-                                              &consensus->ledger_validator, &consensus->milestone_tracker)) != RC_OK) {
+                                              &consensus->ep_randomizer, &consensus->ledger_validator,
+                                              &consensus->milestone_tracker)) != RC_OK) {
     log_critical(logger_id, "Initializing tip selector failed\n");
     return ret;
   }
@@ -153,12 +145,6 @@ retcode_t iota_consensus_destroy(iota_consensus_t *const consensus) {
   log_info(logger_id, "Destroying exit probability randomizer\n");
   if ((ret = iota_consensus_ep_randomizer_destroy(&consensus->ep_randomizer)) != RC_OK) {
     log_error(logger_id, "Destroying exit probability randomizer failed\n");
-  }
-
-  log_info(logger_id, "Destroying exit probability transaction validator\n");
-  if ((ret = iota_consensus_exit_prob_transaction_validator_destroy(&consensus->exit_prob_transaction_validator)) !=
-      RC_OK) {
-    log_error(logger_id, "Destroying exit probability transaction validator failed\n");
   }
 
   log_info(logger_id, "Destroying ledger validator\n");

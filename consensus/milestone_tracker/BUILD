@@ -6,6 +6,7 @@ cc_library(
         "//common:errors",
         "//common/crypto/sponge",
         "//utils/containers/hash:hash243_queue",
+        "//utils/handles:cond",
         "//utils/handles:thread",
     ],
 )

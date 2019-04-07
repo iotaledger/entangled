@@ -16,12 +16,10 @@ cc_library(
         ":conf",
         "//cclient/request:requests",
         "//cclient/response:responses",
-        "//ciri:core_shared",
+        "//ciri:core",
         "//common:errors",
-        "//consensus",
-        "//gossip/components:broadcaster",
+        "//common/helpers:pow",
         "//utils:logger_helper",
-        "//utils/handles:thread",
     ],
 )
 

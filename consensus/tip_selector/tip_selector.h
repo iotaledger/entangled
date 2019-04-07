@@ -32,7 +32,6 @@ typedef struct tip_selector_s {
   cw_rating_calculator_t *cw_rating_calculator;
   entry_point_selector_t *entry_point_selector;
   ep_randomizer_t *ep_randomizer;
-  exit_prob_transaction_validator_t *walker_validator;
   ledger_validator_t *ledger_validator;
   milestone_tracker_t *milestone_tracker;
 } tip_selector_t;
@@ -41,7 +40,6 @@ retcode_t iota_consensus_tip_selector_init(tip_selector_t *const tip_selector, i
                                            cw_rating_calculator_t *const cw_rating_calculator,
                                            entry_point_selector_t *const entry_point_selector,
                                            ep_randomizer_t *const ep_randomizer,
-                                           exit_prob_transaction_validator_t *const walker_validator,
                                            ledger_validator_t *const ledger_validator,
                                            milestone_tracker_t *const milestone_tracker);
 

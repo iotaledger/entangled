@@ -5,22 +5,15 @@
  * Refer to the LICENSE file for licensing information
  */
 
-#ifndef COMMON_ERRORS_H_
-#define COMMON_ERRORS_H_
-
-#include <stdio.h>
-#include "common/error_strings.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /**
- * @file  errors.h
+ * @ingroup common_error
+ *
+ * @{
  *
  * The following error scheme takes advantage of a 16-bit integer
  * in order to fit in data about an error, its origin and severity
  *
+ * ~~~
  * bits devision:
  * 1 -> 6 - actual error code (63 errors)
  * 7 -> 8 - error's severity (4 categories)
@@ -32,10 +25,27 @@ extern "C" {
  * *--------*--------*
  * |MMMMMMMM|SSCCCCCC|
  * *--------*--------*
+ * ~~~
+ *
+ * @file
+ * @brief
  *
  */
+#ifndef COMMON_ERRORS_H_
+#define COMMON_ERRORS_H_
+
+#include <stdio.h>
+#include "common/error_strings.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* error severity */
+/**
+ * @name error severity
+ * @{
+ */
 #define RC_SEVERITY_MASK 0x00C0
 #define RC_SHIFT_SEVERITY 6
 
@@ -43,8 +53,13 @@ extern "C" {
 #define RC_SEVERITY_MAJOR (0x2 << RC_SHIFT_SEVERITY)
 #define RC_SEVERITY_MODERATE (0x1 << RC_SHIFT_SEVERITY)
 #define RC_SEVERITY_MINOR (0x0 << RC_SHIFT_SEVERITY)
+/** @} */
 
 /* error location (module/component) */
+/**
+ * @name Mask of modules
+ * @{
+ */
 #define RC_MODULE_MASK 0xFF00
 #define RC_SHIFT_MODULE 8
 
@@ -81,6 +96,7 @@ extern "C" {
 
 #define RC_MODULE_HELPERS (0xB1 << RC_SHIFT_MODULE)
 #define RC_MODULE_CRYPTO (0xB2 << RC_SHIFT_MODULE)
+/** @} */
 
 /* error code module specific */
 #define RC_ERRORCODE_MASK 0x003F
@@ -117,12 +133,14 @@ extern "C" {
     goto label;                             \
   }
 
-/** Return Codes */
+/**
+ * @brief Error codes
+ *
+ */
 enum retcode_t {
   // Success (equal to zero)
-  RC_OK = 0,
-  // uninitialized or unknown error
-  RC_ERROR = 0xFFFF,
+  RC_OK = 0,         /**< Sucess */
+  RC_ERROR = 0xFFFF, /**< uninitialized or unknown error */
   RC_STORAGE_OOM = 0x01 | RC_MODULE_STORAGE | RC_SEVERITY_MAJOR,
 
   RC_NULL_PARAM = 0x01 | RC_MODULE_GENERAL | RC_SEVERITY_MAJOR,
@@ -227,33 +245,27 @@ enum retcode_t {
   RC_NEIGHBOR_NOT_PAIRED = 0x0E | RC_MODULE_NEIGHBOR | RC_SEVERITY_MODERATE,
 
   // Cclient Module
-  // json create object error, might OOM.
-  RC_CCLIENT_JSON_CREATE = 0x01 | RC_MODULE_CCLIENT | RC_SEVERITY_FATAL,
-  // json parsing error, might the wrong format
-  RC_CCLIENT_JSON_PARSE = 0x02 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,
-  // Out of Memory
-  RC_CCLIENT_OOM = 0x03 | RC_MODULE_CCLIENT | RC_SEVERITY_FATAL,
-  // HTTP service error
-  RC_CCLIENT_HTTP = 0x04 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,
-  // errors during issuing a HTTP request
-  RC_CCLIENT_HTTP_REQ = 0x05 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,
-  // http response error
-  RC_CCLIENT_HTTP_RES = 0x06 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,
-  // has error messages in the response
-  RC_CCLIENT_RES_ERROR = 0x07 | RC_MODULE_CCLIENT | RC_SEVERITY_MODERATE,
-  // json parsing error, key no found in the json object
-  RC_CCLIENT_JSON_KEY = 0x08 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,
-  RC_CCLIENT_FLEX_TRITS = 0x09 | RC_MODULE_CCLIENT | RC_SEVERITY_MODERATE,
-  RC_CCLIENT_NULL_PTR = 0x0A | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,
-  RC_CCLIENT_UNIMPLEMENTED = 0x0B | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,
-  RC_CCLIENT_INVALID_SECURITY = 0x0C | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,
-  RC_CCLIENT_HOST_NOT_FOUND = 0x0D | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,
-  RC_CCLIENT_TX_DESERIALIZE_FAILED = 0x0E | RC_MODULE_CCLIENT | RC_SEVERITY_MODERATE,
-  RC_CCLIENT_INSUFFICIENT_BALANCE = 0x0F | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,
-  RC_CCLIENT_POW_FAILED = 0x10 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,
-  RC_CCLIENT_INVALID_TRANSFER = 0x11 | RC_MODULE_CCLIENT | RC_SEVERITY_MODERATE,
-  RC_CCLIENT_INVALID_TAIL_HASH = 0x12 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,
-  RC_CCLIENT_INVALID_BUNDLE = 0x13 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,
+  RC_CCLIENT_JSON_CREATE = 0x01 | RC_MODULE_CCLIENT | RC_SEVERITY_FATAL, /**< json create object error, might OOM. */
+  RC_CCLIENT_JSON_PARSE =
+      0x02 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,                   /**< json parsing error, might the wrong format */
+  RC_CCLIENT_OOM = 0x03 | RC_MODULE_CCLIENT | RC_SEVERITY_FATAL,      /**< Out of memory */
+  RC_CCLIENT_HTTP = 0x04 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,     /**< HTTP service error */
+  RC_CCLIENT_HTTP_REQ = 0x05 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR, /**< HTTP post error */
+  RC_CCLIENT_HTTP_RES = 0x06 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR, /**< HTTP response error */
+  RC_CCLIENT_RES_ERROR = 0x07 | RC_MODULE_CCLIENT | RC_SEVERITY_MODERATE,     /**< IRI response error string */
+  RC_CCLIENT_JSON_KEY = 0x08 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,         /**< JSON key not found */
+  RC_CCLIENT_FLEX_TRITS = 0x09 | RC_MODULE_CCLIENT | RC_SEVERITY_MODERATE,    /**< Flex trits converting error */
+  RC_CCLIENT_NULL_PTR = 0x0A | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,         /**< Null pointer */
+  RC_CCLIENT_UNIMPLEMENTED = 0x0B | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,    /**< Method unimplemented */
+  RC_CCLIENT_INVALID_SECURITY = 0x0C | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR, /**< invalid security level */
+  RC_CCLIENT_HOST_NOT_FOUND = 0x0D | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,   /**< Host not found */
+  RC_CCLIENT_TX_DESERIALIZE_FAILED =
+      0x0E | RC_MODULE_CCLIENT | RC_SEVERITY_MODERATE, /**< transaction object deserialization */
+  RC_CCLIENT_INSUFFICIENT_BALANCE = 0x0F | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR, /**< Insufficient balance */
+  RC_CCLIENT_POW_FAILED = 0x10 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,           /**< PoW failed */
+  RC_CCLIENT_INVALID_TRANSFER = 0x11 | RC_MODULE_CCLIENT | RC_SEVERITY_MODERATE,  /**< Invalid transfer object */
+  RC_CCLIENT_INVALID_TAIL_HASH = 0x12 | RC_MODULE_CCLIENT | RC_SEVERITY_MAJOR,    /**< Invalid tail hash */
+  RC_CCLIENT_INVALID_BUNDLE = 0x13 | RC_MODULE_CCLIENT | RC_SEVERITY_MINOR,       /**< Invalid bundle object */
 
   // Consensus module
   RC_CONSENSUS_NOT_IMPLEMENTED = 0x01 | RC_MODULE_CONSENSUS | RC_SEVERITY_MAJOR,
@@ -291,7 +303,6 @@ enum retcode_t {
   RC_UTILS_SOCKET_SEND = 0x14 | RC_MODULE_UTILS | RC_SEVERITY_MINOR,
 
   // Broadcaster module
-
   RC_BROADCASTER_FAILED_PUSH_QUEUE = 0x01 | RC_MODULE_BROADCASTER | RC_SEVERITY_MINOR,
   RC_BROADCASTER_STILL_RUNNING = 0x02 | RC_MODULE_BROADCASTER | RC_SEVERITY_FATAL,
 
@@ -327,9 +338,11 @@ enum retcode_t {
 
   // Conf Module
   RC_CIRI_CONF_NULL_CONF = 0x01 | RC_MODULE_CIRI_CONF | RC_SEVERITY_FATAL,
-  RC_CIRI_CONF_INVALID_ARGUMENTS = 0x02 | RC_MODULE_CIRI_CONF | RC_SEVERITY_FATAL,
-  RC_CIRI_CONF_FILE_NOT_FOUND = 0x03 | RC_MODULE_CIRI_CONF | RC_SEVERITY_FATAL,
-  RC_CIRI_CONF_PARSER_ERROR = 0x04 | RC_MODULE_CIRI_CONF | RC_SEVERITY_FATAL,
+  RC_CIRI_CONF_INVALID_ARGUMENT = 0x02 | RC_MODULE_CIRI_CONF | RC_SEVERITY_FATAL,
+  RC_CIRI_CONF_MISSING_ARGUMENT = 0x03 | RC_MODULE_CIRI_CONF | RC_SEVERITY_FATAL,
+  RC_CIRI_CONF_UNKNOWN_OPTION = 0x04 | RC_MODULE_CIRI_CONF | RC_SEVERITY_FATAL,
+  RC_CIRI_CONF_FILE_NOT_FOUND = 0x05 | RC_MODULE_CIRI_CONF | RC_SEVERITY_FATAL,
+  RC_CIRI_CONF_PARSER_ERROR = 0x06 | RC_MODULE_CIRI_CONF | RC_SEVERITY_FATAL,
 
   // Milestone tracker Module
   RC_CONSENSUS_MT_NULL_SELF = 0x01 | RC_MODULE_CONSENSUS_MT | RC_SEVERITY_FATAL,
@@ -417,10 +430,17 @@ enum retcode_t {
 
   // Crypto Module
   RC_CRYPTO_UNSUPPORTED_SPONGE_TYPE = 0x01 | RC_MODULE_HELPERS | RC_SEVERITY_MAJOR,
+
 };
 
 typedef enum retcode_t retcode_t;
 
+/**
+ * @brief error code to string
+ *
+ * @param err error code
+ * @return string
+ */
 const char* error_2_string(retcode_t err);
 
 #ifdef __cplusplus
@@ -428,3 +448,5 @@ const char* error_2_string(retcode_t err);
 #endif
 
 #endif  // COMMON_ERRORS_H_
+
+/** @} */

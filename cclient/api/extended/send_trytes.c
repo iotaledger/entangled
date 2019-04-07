@@ -52,6 +52,8 @@ retcode_t iota_client_send_trytes(iota_client_service_t const* const serv, hash8
   memcpy(attach_req->branch, tx_approve_res->branch, FLEX_TRIT_SIZE_243);
   memcpy(attach_req->trunk, tx_approve_res->trunk, FLEX_TRIT_SIZE_243);
   attach_req->mwm = mwm;
+  // reuse hash_array instead of copy.
+  hash_array_free(attach_req->trytes);
   attach_req->trytes = trytes;
 
   get_transactions_to_approve_req_free(&tx_approve_req);

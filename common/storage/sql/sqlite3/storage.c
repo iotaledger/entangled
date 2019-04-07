@@ -14,7 +14,6 @@
 
 #include "common/model/milestone.h"
 #include "common/model/transaction.h"
-#include "common/storage/sql/defs.h"
 #include "common/storage/sql/sqlite3/connection.h"
 #include "common/storage/sql/sqlite3/wrappers.h"
 #include "common/storage/sql/statements.h"
