@@ -7,7 +7,6 @@
 //
 
 #import "TestConstants.h"
-#import <Foundation/Foundation.h>
 
 NSString* const EXPECTED_NONCE = @"YSQ9B99999OKGA9999999999999";
 

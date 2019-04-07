@@ -9,6 +9,8 @@
 #ifndef TestConstants_h
 #define TestConstants_h
 
+#import <Foundation/Foundation.h>
+
 extern NSString* const EXPECTED_NONCE;
 extern NSString* const EXPECTED_ADDRESS;
 extern NSString* const EXPECTED_SIGNATURE;
