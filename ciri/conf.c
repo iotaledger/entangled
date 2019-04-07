@@ -316,7 +316,6 @@ static retcode_t set_conf_value(iota_ciri_conf_t* const ciri_conf, iota_consensu
     case CONF_SNAPSHOT_TIMESTAMP:  // --snapshot-timestamp
       consensus_conf->snapshot_timestamp_sec = atoi(value);
       break;
-
     case CONF_LOCAL_SNAPSHOTS_ENABLED:
       ret = get_true_false(value, &consensus_conf->local_snapshots.local_snapshots_is_enabled);
       break;
